@@ -39,7 +39,7 @@ public class AchDeductMedia implements Serializable {
   private int mediaDate = 0;
 
   // 媒體別
-  /* 共用代碼檔0:非ACH1:ACH新光2:ACH他行 */
+  /* 0:非ACH1:ACH新光2:ACH他行 */
   @Column(name = "`MediaKind`", length = 1, insertable = false, updatable = false)
   private String mediaKind;
 
@@ -56,7 +56,7 @@ public class AchDeductMedia implements Serializable {
   private int facmNo = 0;
 
   // 還款類別
-  /* 共用代碼檔1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他銀扣用1.火險費 2.帳管費 3.期款 4.貸後契變手續費 */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他銀扣媒體檔用1.火險費 2.帳管費 3.期款 4.貸後契變手續費 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -65,7 +65,7 @@ public class AchDeductMedia implements Serializable {
   private BigDecimal repayAmt = new BigDecimal("0");
 
   // 退件理由代號
-  /* 共用代碼檔00-成功else-參照規格書 */
+  /* 提回規格，00-成功 */
   @Column(name = "`ReturnCode`", length = 2)
   private String returnCode;
 
@@ -86,7 +86,7 @@ public class AchDeductMedia implements Serializable {
   private String repayAcctNo;
 
   // 入帳扣款別
-  /* 共用代碼檔1.火險費2.帳管費3.期款4.貸後契變手續費 */
+  /* 1.火險費2.帳管費3.期款4.貸後契變手續費 */
   @Column(name = "`AchRepayCode`", length = 1)
   private String achRepayCode;
 
@@ -119,6 +119,7 @@ public class AchDeductMedia implements Serializable {
   private String relCustId;
 
   // 會計日期
+  /* 提回會計日期 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -178,8 +179,7 @@ public class AchDeductMedia implements Serializable {
 
 /**
 	* 媒體別<br>
-	* 共用代碼檔
-0:非ACH
+	* 0:非ACH
 1:ACH新光
 2:ACH他行
 	* @return String
@@ -190,8 +190,7 @@ public class AchDeductMedia implements Serializable {
 
 /**
 	* 媒體別<br>
-	* 共用代碼檔
-0:非ACH
+	* 0:非ACH
 1:ACH新光
 2:ACH他行
   *
@@ -260,7 +259,7 @@ public class AchDeductMedia implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 共用代碼檔
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -270,7 +269,7 @@ public class AchDeductMedia implements Serializable {
 7.法務費
 9.其他
 
-銀扣用
+銀扣媒體檔用
 1.火險費 
 2.帳管費 
 3.期款 
@@ -283,7 +282,7 @@ public class AchDeductMedia implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 共用代碼檔
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -293,7 +292,7 @@ public class AchDeductMedia implements Serializable {
 7.法務費
 9.其他
 
-銀扣用
+銀扣媒體檔用
 1.火險費 
 2.帳管費 
 3.期款 
@@ -326,9 +325,7 @@ public class AchDeductMedia implements Serializable {
 
 /**
 	* 退件理由代號<br>
-	* 共用代碼檔
-00-成功
-else-參照規格書
+	* 提回規格，00-成功
 	* @return String
 	*/
   public String getReturnCode() {
@@ -337,9 +334,7 @@ else-參照規格書
 
 /**
 	* 退件理由代號<br>
-	* 共用代碼檔
-00-成功
-else-參照規格書
+	* 提回規格，00-成功
   *
   * @param returnCode 退件理由代號
 	*/
@@ -425,8 +420,7 @@ else-參照規格書
 
 /**
 	* 入帳扣款別<br>
-	* 共用代碼檔
-1.火險費
+	* 1.火險費
 2.帳管費
 3.期款
 4.貸後契變手續費
@@ -438,8 +432,7 @@ else-參照規格書
 
 /**
 	* 入帳扣款別<br>
-	* 共用代碼檔
-1.火險費
+	* 1.火險費
 2.帳管費
 3.期款
 4.貸後契變手續費
@@ -585,7 +578,7 @@ else-參照規格書
 
 /**
 	* 會計日期<br>
-	* 
+	* 提回會計日期
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -594,7 +587,7 @@ else-參照規格書
 
 /**
 	* 會計日期<br>
-	* 
+	* 提回會計日期
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/

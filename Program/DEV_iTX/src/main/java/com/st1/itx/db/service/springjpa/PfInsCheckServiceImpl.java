@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.PfInsCheckRepositoryHist;
 import com.st1.itx.db.service.PfInsCheckService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("pfInsCheckService")
 @Repository
-public class PfInsCheckServiceImpl implements PfInsCheckService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(PfInsCheckServiceImpl.class);
-
+public class PfInsCheckServiceImpl extends ASpringJpaParm implements PfInsCheckService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class PfInsCheckServiceImpl implements PfInsCheckService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + pfInsCheckId);
+    this.info("findById " + dbName + " " + pfInsCheckId);
     Optional<PfInsCheck> pfInsCheck = null;
     if (dbName.equals(ContentName.onDay))
       pfInsCheck = pfInsCheckReposDay.findById(pfInsCheckId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Kind", "CustNo", "FacmNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Kind", "CustNo", "FacmNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = pfInsCheckReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = pfInsCheckReposHist.findAll(pageable);
     else 
       slice = pfInsCheckRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCheckWorkMonthEq " + dbName + " : " + "checkWorkMonth_0 : " + checkWorkMonth_0 + " kind_1 : " +  kind_1);
+    this.info("findCheckWorkMonthEq " + dbName + " : " + "checkWorkMonth_0 : " + checkWorkMonth_0 + " kind_1 : " +  kind_1);
     if (dbName.equals(ContentName.onDay))
       slice = pfInsCheckReposDay.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(checkWorkMonth_0, kind_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = pfInsCheckRepos.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(checkWorkMonth_0, kind_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + pfInsCheckId);
+    this.info("Hold " + dbName + " " + pfInsCheckId);
     Optional<PfInsCheck> pfInsCheck = null;
     if (dbName.equals(ContentName.onDay))
       pfInsCheck = pfInsCheckReposDay.findByPfInsCheckId(pfInsCheckId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + pfInsCheck.getPfInsCheckId());
+    this.info("Hold " + dbName + " " + pfInsCheck.getPfInsCheckId());
     Optional<PfInsCheck> pfInsCheckT = null;
     if (dbName.equals(ContentName.onDay))
       pfInsCheckT = pfInsCheckReposDay.findByPfInsCheckId(pfInsCheck.getPfInsCheckId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + pfInsCheck.getPfInsCheckId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + pfInsCheck.getPfInsCheckId());
     if (this.findById(pfInsCheck.getPfInsCheckId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + pfInsCheck.getPfInsCheckId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + pfInsCheck.getPfInsCheckId());
     if (!empNot.isEmpty())
       pfInsCheck.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + pfInsCheck.getPfInsCheckId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + pfInsCheck.getPfInsCheckId());
     if (!empNot.isEmpty())
       pfInsCheck.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + pfInsCheck.getPfInsCheckId());
+    this.info("Delete..." + dbName + " " + pfInsCheck.getPfInsCheckId());
     if (dbName.equals(ContentName.onDay)) {
       pfInsCheckReposDay.delete(pfInsCheck);	
       pfInsCheckReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (PfInsCheck t : pfInsCheck){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (pfInsCheck == null || pfInsCheck.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<PfInsCheck> pfInsCheck, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

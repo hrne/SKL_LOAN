@@ -71,7 +71,8 @@ public class CollRemind implements Serializable {
   private int editDate = 0;
 
   // 維護時間
-  @Column(name = "`EditTime`", length = 5)
+  /* 詢問過user意見，時間存入4碼即可 */
+  @Column(name = "`EditTime`", length = 4)
   private String editTime;
 
   // 提醒項目
@@ -79,7 +80,7 @@ public class CollRemind implements Serializable {
   private String remindCode;
 
   // 其他記錄
-  @Column(name = "`Remark`", length = 160)
+  @Column(name = "`Remark`", length = 500)
   private String remark;
 
   // 建檔日期時間
@@ -282,7 +283,7 @@ public class CollRemind implements Serializable {
 
 /**
 	* 維護時間<br>
-	* 
+	* 詢問過user意見，時間存入4碼即可
 	* @return String
 	*/
   public String getEditTime() {
@@ -291,7 +292,7 @@ public class CollRemind implements Serializable {
 
 /**
 	* 維護時間<br>
-	* 
+	* 詢問過user意見，時間存入4碼即可
   *
   * @param editTime 維護時間
 	*/

@@ -65,7 +65,7 @@ public class MlaundryParas implements Serializable {
   @Column(name = "`FactorDays`")
   private int factorDays = 0;
 
-  // 統計期間天數
+  // 樣態三統計期間天數
   /* L8201維護 : 統計期間天數 */
   @Column(name = "`FactorDays3`")
   private int factorDays3 = 0;
@@ -223,7 +223,7 @@ public class MlaundryParas implements Serializable {
   }
 
 /**
-	* 統計期間天數<br>
+	* 樣態三統計期間天數<br>
 	* L8201維護 : 統計期間天數
 	* @return Integer
 	*/
@@ -232,10 +232,10 @@ public class MlaundryParas implements Serializable {
   }
 
 /**
-	* 統計期間天數<br>
+	* 樣態三統計期間天數<br>
 	* L8201維護 : 統計期間天數
   *
-  * @param factorDays3 統計期間天數
+  * @param factorDays3 樣態三統計期間天數
 	*/
   public void setFactorDays3(int factorDays3) {
     this.factorDays3 = factorDays3;

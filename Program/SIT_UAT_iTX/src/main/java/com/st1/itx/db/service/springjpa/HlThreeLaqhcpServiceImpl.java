@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.HlThreeLaqhcpRepositoryHist;
 import com.st1.itx.db.service.HlThreeLaqhcpService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("hlThreeLaqhcpService")
 @Repository
-public class HlThreeLaqhcpServiceImpl implements HlThreeLaqhcpService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(HlThreeLaqhcpServiceImpl.class);
-
+public class HlThreeLaqhcpServiceImpl extends ASpringJpaParm implements HlThreeLaqhcpService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class HlThreeLaqhcpServiceImpl implements HlThreeLaqhcpService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + hlThreeLaqhcpId);
+    this.info("findById " + dbName + " " + hlThreeLaqhcpId);
     Optional<HlThreeLaqhcp> hlThreeLaqhcp = null;
     if (dbName.equals(ContentName.onDay))
       hlThreeLaqhcp = hlThreeLaqhcpReposDay.findById(hlThreeLaqhcpId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CalDate", "EmpNo", "BranchNo", "DeptNo", "UnitNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CalDate", "EmpNo", "BranchNo", "DeptNo", "UnitNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = hlThreeLaqhcpReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = hlThreeLaqhcpRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlThreeLaqhcpId);
+    this.info("Hold " + dbName + " " + hlThreeLaqhcpId);
     Optional<HlThreeLaqhcp> hlThreeLaqhcp = null;
     if (dbName.equals(ContentName.onDay))
       hlThreeLaqhcp = hlThreeLaqhcpReposDay.findByHlThreeLaqhcpId(hlThreeLaqhcpId);
@@ -133,7 +133,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
+    this.info("Hold " + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
     Optional<HlThreeLaqhcp> hlThreeLaqhcpT = null;
     if (dbName.equals(ContentName.onDay))
       hlThreeLaqhcpT = hlThreeLaqhcpReposDay.findByHlThreeLaqhcpId(hlThreeLaqhcp.getHlThreeLaqhcpId());
@@ -154,13 +154,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
     if (this.findById(hlThreeLaqhcp.getHlThreeLaqhcpId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       hlThreeLaqhcp.setCreateEmpNo(empNot);
+
+    if(hlThreeLaqhcp.getLastUpdateEmpNo() == null || hlThreeLaqhcp.getLastUpdateEmpNo().isEmpty())
+      hlThreeLaqhcp.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return hlThreeLaqhcpReposDay.saveAndFlush(hlThreeLaqhcp);	
@@ -180,8 +185,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
     if (!empNot.isEmpty())
       hlThreeLaqhcp.setLastUpdateEmpNo(empNot);
 
@@ -203,8 +210,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
     if (!empNot.isEmpty())
       hlThreeLaqhcp.setLastUpdateEmpNo(empNot);
 
@@ -224,7 +233,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
+    this.info("Delete..." + dbName + " " + hlThreeLaqhcp.getHlThreeLaqhcpId());
     if (dbName.equals(ContentName.onDay)) {
       hlThreeLaqhcpReposDay.delete(hlThreeLaqhcp);	
       hlThreeLaqhcpReposDay.flush();
@@ -253,11 +262,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (HlThreeLaqhcp t : hlThreeLaqhcp) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (HlThreeLaqhcp t : hlThreeLaqhcp){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       hlThreeLaqhcp = hlThreeLaqhcpReposDay.saveAll(hlThreeLaqhcp);	
@@ -285,8 +299,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (hlThreeLaqhcp == null || hlThreeLaqhcp.size() == 0)
       throw new DBException(6);
 
@@ -315,7 +331,7 @@ em = null;
 
   @Override
   public void deleteAll(List<HlThreeLaqhcp> hlThreeLaqhcp, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

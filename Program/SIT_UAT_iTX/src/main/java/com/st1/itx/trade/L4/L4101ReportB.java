@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.AcClose;
-import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdBank;
@@ -82,11 +80,6 @@ public class L4101ReportB extends MakeReport {
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
-
-	// 帳冊別 TODO:待修改
-	private String nowAcBookCode = "000";
-	private String nowAcBookItem = "全帳冊";
-	private String slipNo = "";
 
 	// 製表日期
 	private String nowDate;
@@ -182,7 +175,7 @@ public class L4101ReportB extends MakeReport {
 		String wkBranchItem = "";
 		String wkFullName = "";
 		String wkAmlRspItem = "";
-		String currencyCode = lBankRemit.get(0).getCurrencyCode();
+		lBankRemit.get(0).getCurrencyCode();
 
 //		this.nowAcBookCode = lAcDetail.get(0).getSlipMediaId().getAcBookCode();
 //		this.nowAcBookItem = lAcDetail.get(0).getAcBookItem();
@@ -199,7 +192,11 @@ public class L4101ReportB extends MakeReport {
 		int i = 1;
 		this.info("總數 = " + lBankRemit.size());
 		for (BankRemit tBankRemit : lBankRemit) {
-			if (tBankRemit.getCustNo() != oldCustNo && tBankRemit.getFacmNo() != oldFacmNo) {
+			this.info("oldCustNo =" + oldCustNo);
+			this.info("getCustNo =" + tBankRemit.getCustNo());
+			this.info("oldFacmNo =" + oldFacmNo);
+			this.info("getFacmNo =" + tBankRemit.getFacmNo());
+			if (tBankRemit.getCustNo() != oldCustNo || tBankRemit.getFacmNo() != oldFacmNo) {
 				oldCustNo = tBankRemit.getCustNo();
 				oldFacmNo = tBankRemit.getFacmNo();
 				subTotal = BigDecimal.ZERO;
@@ -236,13 +233,12 @@ public class L4101ReportB extends MakeReport {
 			if (slAcDetail != null) {
 				corFlag = 0;
 			}
-			String distItem = "";
 			BigDecimal lineAmt = BigDecimal.ZERO;
 			String businessOfficer = "";
 			if (tFacMain != null) {
 				lineAmt = tFacMain.getLineAmt();
 				if (tCdBcm != null)
-					distItem = tCdBcm.getDistItem();
+					tCdBcm.getDistItem();
 				businessOfficer = tFacMain.getBusinessOfficer();
 			}
 
@@ -273,7 +269,7 @@ public class L4101ReportB extends MakeReport {
 			}
 
 			String wkCustName = tBankRemit.getCustName(); // 收款戶名
-			String amlRsp = tBankRemit.getAmlRsp();// Aml回應碼
+			tBankRemit.getAmlRsp();
 			// 尋找Aml回應碼中文
 			CdCode tCdCode = cdCodeService.getItemFirst(8, "ConfirmStatus", tBankRemit.getAmlRsp(), titaVo);
 			if (tCdCode != null) {
@@ -318,9 +314,14 @@ public class L4101ReportB extends MakeReport {
 			print(0, 131, formatAmt(wkLineAmt, 0), "R");// 核貸金額
 			this.info("i  " + i);
 			this.info("lBankRemit size =   " + lBankRemit.size());
-			if (i == lBankRemit.size() || lBankRemit.get(i) != null
-					&& (oldCustNo != lBankRemit.get(i).getCustNo() && oldFacmNo != lBankRemit.get(i).getFacmNo())) {
+
+//			戶號額度最後一筆印小計
+//			list最後一筆直接印小計
+			if (i == lBankRemit.size()
+					|| (oldCustNo != lBankRemit.get(i).getCustNo() || oldFacmNo != lBankRemit.get(i).getFacmNo())) {
+
 				print(0, 151, formatAmt(subTotal, 0), "R");// 核貸金額
+
 			}
 			rounds++;
 			i++;
@@ -332,20 +333,6 @@ public class L4101ReportB extends MakeReport {
 //		print(0, 61, currencyCode);
 		print(0, 151, formatAmt(total, 0), "R");
 //		print(0, 146, formatAmt(crAmt, 2), "R");
-	}
-
-	private String getBatchNo(TitaVo titaVo) throws LogicException {
-		String batchNo = "";
-		AcCloseId tAcCloseId = new AcCloseId();
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
-		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
-		}
-		batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
-		return batchNo;
 	}
 
 }

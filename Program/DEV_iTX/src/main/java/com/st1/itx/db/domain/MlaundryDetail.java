@@ -63,6 +63,11 @@ public class MlaundryDetail implements Serializable {
   @Column(name = "`EmpNoDesc`", length = 50)
   private String empNoDesc;
 
+  // 主管覆核
+  /* Y:同意;N不同意 */
+  @Column(name = "`ManagerCheck`", length = 1)
+  private String managerCheck;
+
   // 主管同意日期
   @Column(name = "`ManagerDate`")
   private int managerDate = 0;
@@ -71,11 +76,6 @@ public class MlaundryDetail implements Serializable {
   /* 主管第二次覆核時顯示欄位 */
   @Column(name = "`ManagerCheckDate`")
   private int managerCheckDate = 0;
-
-  // 主管覆核
-  /* Y:同意;N不同意 */
-  @Column(name = "`ManagerCheck`", length = 1)
-  private String managerCheck;
 
   // 主管覆核說明
   @Column(name = "`ManagerDesc`", length = 50)
@@ -242,6 +242,25 @@ public class MlaundryDetail implements Serializable {
   }
 
 /**
+	* 主管覆核<br>
+	* Y:同意;N不同意
+	* @return String
+	*/
+  public String getManagerCheck() {
+    return this.managerCheck == null ? "" : this.managerCheck;
+  }
+
+/**
+	* 主管覆核<br>
+	* Y:同意;N不同意
+  *
+  * @param managerCheck 主管覆核
+	*/
+  public void setManagerCheck(String managerCheck) {
+    this.managerCheck = managerCheck;
+  }
+
+/**
 	* 主管同意日期<br>
 	* 
 	* @return Integer
@@ -277,25 +296,6 @@ public class MlaundryDetail implements Serializable {
   * @throws LogicException when Date Is Warn	*/
   public void setManagerCheckDate(int managerCheckDate) throws LogicException {
     this.managerCheckDate = StaticTool.rocToBc(managerCheckDate);
-  }
-
-/**
-	* 主管覆核<br>
-	* Y:同意;N不同意
-	* @return String
-	*/
-  public String getManagerCheck() {
-    return this.managerCheck == null ? "" : this.managerCheck;
-  }
-
-/**
-	* 主管覆核<br>
-	* Y:同意;N不同意
-  *
-  * @param managerCheck 主管覆核
-	*/
-  public void setManagerCheck(String managerCheck) {
-    this.managerCheck = managerCheck;
   }
 
 /**
@@ -397,7 +397,7 @@ public class MlaundryDetail implements Serializable {
   @Override
   public String toString() {
     return "MlaundryDetail [mlaundryDetailId=" + mlaundryDetailId + ", totalCnt=" + totalCnt + ", totalAmt=" + totalAmt + ", rational=" + rational
-           + ", empNoDesc=" + empNoDesc + ", managerDate=" + managerDate + ", managerCheckDate=" + managerCheckDate + ", managerCheck=" + managerCheck + ", managerDesc=" + managerDesc + ", createDate=" + createDate
+           + ", empNoDesc=" + empNoDesc + ", managerCheck=" + managerCheck + ", managerDate=" + managerDate + ", managerCheckDate=" + managerCheckDate + ", managerDesc=" + managerDesc + ", createDate=" + createDate
            + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

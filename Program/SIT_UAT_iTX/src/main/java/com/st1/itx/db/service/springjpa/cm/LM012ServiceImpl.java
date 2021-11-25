@@ -23,6 +23,7 @@ public class LM012ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
+	@Autowired
 	Parse parse;
 
 	@Override

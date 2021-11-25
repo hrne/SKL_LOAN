@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.CdBankRepositoryHist;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdBankService")
 @Repository
-public class CdBankServiceImpl implements CdBankService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdBankServiceImpl.class);
-
+public class CdBankServiceImpl extends ASpringJpaParm implements CdBankService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class CdBankServiceImpl implements CdBankService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdBankId);
+    this.info("findById " + dbName + " " + cdBankId);
     Optional<CdBank> cdBank = null;
     if (dbName.equals(ContentName.onDay))
       cdBank = cdBankReposDay.findById(cdBankId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "BankCode", "BranchCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BankCode", "BranchCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdBankReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = cdBankReposHist.findAll(pageable);
     else 
       slice = cdBankRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("bankCodeLike " + dbName + " : " + "bankCode_0 : " + bankCode_0);
+    this.info("bankCodeLike " + dbName + " : " + "bankCode_0 : " + bankCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdBankReposDay.findAllByBankCodeLikeOrderByBankCodeAsc(bankCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = cdBankReposHist.findAllByBankCodeLikeOrderByBankCodeAsc(bankCode_0, pageable);
     else 
       slice = cdBankRepos.findAllByBankCodeLikeOrderByBankCodeAsc(bankCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("branchCodeLike " + dbName + " : " + "bankCode_0 : " + bankCode_0 + " branchCode_1 : " +  branchCode_1);
+    this.info("branchCodeLike " + dbName + " : " + "bankCode_0 : " + bankCode_0 + " branchCode_1 : " +  branchCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdBankReposDay.findAllByBankCodeLikeAndBranchCodeLikeOrderByBankCodeAscBranchCodeAsc(bankCode_0, branchCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +159,9 @@ em = null;
       slice = cdBankReposHist.findAllByBankCodeLikeAndBranchCodeLikeOrderByBankCodeAscBranchCodeAsc(bankCode_0, branchCode_1, pageable);
     else 
       slice = cdBankRepos.findAllByBankCodeLikeAndBranchCodeLikeOrderByBankCodeAscBranchCodeAsc(bankCode_0, branchCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +178,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("bankItemLike " + dbName + " : " + "bankItem_0 : " + bankItem_0);
+    this.info("bankItemLike " + dbName + " : " + "bankItem_0 : " + bankItem_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdBankReposDay.findAllByBankItemLikeOrderByBankCodeAsc(bankItem_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -182,6 +188,9 @@ em = null;
     else 
       slice = cdBankRepos.findAllByBankItemLikeOrderByBankCodeAsc(bankItem_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -190,7 +199,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBankId);
+    this.info("Hold " + dbName + " " + cdBankId);
     Optional<CdBank> cdBank = null;
     if (dbName.equals(ContentName.onDay))
       cdBank = cdBankReposDay.findByCdBankId(cdBankId);
@@ -208,7 +217,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBank.getCdBankId());
+    this.info("Hold " + dbName + " " + cdBank.getCdBankId());
     Optional<CdBank> cdBankT = null;
     if (dbName.equals(ContentName.onDay))
       cdBankT = cdBankReposDay.findByCdBankId(cdBank.getCdBankId());
@@ -229,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdBank.getCdBankId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdBank.getCdBankId());
     if (this.findById(cdBank.getCdBankId()) != null)
       throw new DBException(2);
 
@@ -258,8 +269,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBank.getCdBankId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBank.getCdBankId());
     if (!empNot.isEmpty())
       cdBank.setLastUpdateEmpNo(empNot);
 
@@ -281,8 +294,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBank.getCdBankId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBank.getCdBankId());
     if (!empNot.isEmpty())
       cdBank.setLastUpdateEmpNo(empNot);
 
@@ -302,7 +317,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdBank.getCdBankId());
+    this.info("Delete..." + dbName + " " + cdBank.getCdBankId());
     if (dbName.equals(ContentName.onDay)) {
       cdBankReposDay.delete(cdBank);	
       cdBankReposDay.flush();
@@ -331,7 +346,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdBank t : cdBank){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -365,8 +383,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdBank == null || cdBank.size() == 0)
       throw new DBException(6);
 
@@ -395,7 +415,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdBank> cdBank, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

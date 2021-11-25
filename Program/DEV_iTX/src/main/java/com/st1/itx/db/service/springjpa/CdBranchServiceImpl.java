@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.CdBranchRepositoryHist;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdBranchService")
 @Repository
-public class CdBranchServiceImpl implements CdBranchService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdBranchServiceImpl.class);
-
+public class CdBranchServiceImpl extends ASpringJpaParm implements CdBranchService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class CdBranchServiceImpl implements CdBranchService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + branchNo);
+    this.info("findById " + dbName + " " + branchNo);
     Optional<CdBranch> cdBranch = null;
     if (dbName.equals(ContentName.onDay))
       cdBranch = cdBranchReposDay.findById(branchNo);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "BranchNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BranchNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdBranchReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +102,9 @@ em = null;
       slice = cdBranchReposHist.findAll(pageable);
     else 
       slice = cdBranchRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("BranchNoLike " + dbName + " : " + "branchNo_0 : " + branchNo_0);
+    this.info("BranchNoLike " + dbName + " : " + "branchNo_0 : " + branchNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdBranchReposDay.findAllByBranchNoLikeOrderByBranchNoAsc(branchNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
     else 
       slice = cdBranchRepos.findAllByBranchNoLikeOrderByBranchNoAsc(branchNo_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -139,7 +142,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + branchNo);
+    this.info("Hold " + dbName + " " + branchNo);
     Optional<CdBranch> cdBranch = null;
     if (dbName.equals(ContentName.onDay))
       cdBranch = cdBranchReposDay.findByBranchNo(branchNo);
@@ -157,7 +160,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBranch.getBranchNo());
+    this.info("Hold " + dbName + " " + cdBranch.getBranchNo());
     Optional<CdBranch> cdBranchT = null;
     if (dbName.equals(ContentName.onDay))
       cdBranchT = cdBranchReposDay.findByBranchNo(cdBranch.getBranchNo());
@@ -178,8 +181,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdBranch.getBranchNo());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdBranch.getBranchNo());
     if (this.findById(cdBranch.getBranchNo()) != null)
       throw new DBException(2);
 
@@ -207,8 +212,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBranch.getBranchNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBranch.getBranchNo());
     if (!empNot.isEmpty())
       cdBranch.setLastUpdateEmpNo(empNot);
 
@@ -230,8 +237,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBranch.getBranchNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBranch.getBranchNo());
     if (!empNot.isEmpty())
       cdBranch.setLastUpdateEmpNo(empNot);
 
@@ -251,7 +260,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdBranch.getBranchNo());
+    this.info("Delete..." + dbName + " " + cdBranch.getBranchNo());
     if (dbName.equals(ContentName.onDay)) {
       cdBranchReposDay.delete(cdBranch);	
       cdBranchReposDay.flush();
@@ -280,7 +289,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdBranch t : cdBranch){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -314,8 +326,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdBranch == null || cdBranch.size() == 0)
       throw new DBException(6);
 
@@ -344,7 +358,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdBranch> cdBranch, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

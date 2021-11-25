@@ -41,7 +41,7 @@ public class CdInsurer implements Serializable {
   private String insurerCode;
 
   // 公司統編
-  @Column(name = "`InsurerId`", length = 10)
+  @Column(name = "`InsurerId`", length = 8)
   private String insurerId;
 
   // 公司名稱

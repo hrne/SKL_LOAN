@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.Ias34CpRepositoryHist;
 import com.st1.itx.db.service.Ias34CpService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("ias34CpService")
 @Repository
-public class Ias34CpServiceImpl implements Ias34CpService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(Ias34CpServiceImpl.class);
-
+public class Ias34CpServiceImpl extends ASpringJpaParm implements Ias34CpService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class Ias34CpServiceImpl implements Ias34CpService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + ias34CpId);
+    this.info("findById " + dbName + " " + ias34CpId);
     Optional<Ias34Cp> ias34Cp = null;
     if (dbName.equals(ContentName.onDay))
       ias34Cp = ias34CpReposDay.findById(ias34CpId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo", "EffectDate"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo", "EffectDate"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = ias34CpReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = ias34CpRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ias34CpId);
+    this.info("Hold " + dbName + " " + ias34CpId);
     Optional<Ias34Cp> ias34Cp = null;
     if (dbName.equals(ContentName.onDay))
       ias34Cp = ias34CpReposDay.findByIas34CpId(ias34CpId);
@@ -133,7 +133,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ias34Cp.getIas34CpId());
+    this.info("Hold " + dbName + " " + ias34Cp.getIas34CpId());
     Optional<Ias34Cp> ias34CpT = null;
     if (dbName.equals(ContentName.onDay))
       ias34CpT = ias34CpReposDay.findByIas34CpId(ias34Cp.getIas34CpId());
@@ -154,8 +154,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + ias34Cp.getIas34CpId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + ias34Cp.getIas34CpId());
     if (this.findById(ias34Cp.getIas34CpId()) != null)
       throw new DBException(2);
 
@@ -183,8 +185,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + ias34Cp.getIas34CpId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + ias34Cp.getIas34CpId());
     if (!empNot.isEmpty())
       ias34Cp.setLastUpdateEmpNo(empNot);
 
@@ -206,8 +210,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + ias34Cp.getIas34CpId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + ias34Cp.getIas34CpId());
     if (!empNot.isEmpty())
       ias34Cp.setLastUpdateEmpNo(empNot);
 
@@ -227,7 +233,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + ias34Cp.getIas34CpId());
+    this.info("Delete..." + dbName + " " + ias34Cp.getIas34CpId());
     if (dbName.equals(ContentName.onDay)) {
       ias34CpReposDay.delete(ias34Cp);	
       ias34CpReposDay.flush();
@@ -256,7 +262,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (Ias34Cp t : ias34Cp){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -290,8 +299,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (ias34Cp == null || ias34Cp.size() == 0)
       throw new DBException(6);
 
@@ -320,7 +331,7 @@ em = null;
 
   @Override
   public void deleteAll(List<Ias34Cp> ias34Cp, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

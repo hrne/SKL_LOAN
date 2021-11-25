@@ -33,12 +33,12 @@ public class L5801Report4 extends MakeReport {
 		List<Map<String, String>> listL5801 = null;
 
 		try {
-			listL5801 = l5801ServiceImpl.findAll(thisMonth, lastMonth, titaVo);
+			listL5801 = l5801ServiceImpl.findAll4(thisMonth, lastMonth, titaVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("L5801ServiceImpl.findAll error = " + errors.toString());
+			this.info("L5801ServiceImpl.findAll4 error = " + errors.toString());
 		}
 
 		exportExcel(thisMonth, listL5801, titaVo);
@@ -70,6 +70,18 @@ public class L5801Report4 extends MakeReport {
 		makeExcel.setValue(1, 10, "屆期不再申撥補貼息", fontStyleVo);
 		makeExcel.setValue(1, 11, "本月貸款餘額", fontStyleVo);
 
+		makeExcel.setWidth(1, 15);
+		makeExcel.setWidth(2, 12);
+		makeExcel.setWidth(3, 17);
+		makeExcel.setWidth(4, 12);
+		makeExcel.setWidth(5, 9);
+		makeExcel.setWidth(6, 9);
+		makeExcel.setWidth(7, 17);
+		makeExcel.setWidth(8, 14);
+		makeExcel.setWidth(9, 14);
+		makeExcel.setWidth(10, 23);
+		makeExcel.setWidth(11, 17);
+		
 		int printRow = 2; // 從第二行開始印
 
 		if (listL5801 == null || listL5801.isEmpty()) {
@@ -94,8 +106,28 @@ public class L5801Report4 extends MakeReport {
 
 				// F3 專案融資種類
 				String ProjectKind = mapL5801.get("F3");
-
-				makeExcel.setValue(printRow, 3, ProjectKind, fontStyleVo);
+				String Kind = "";
+				switch (ProjectKind) {
+				case "1":
+					Kind = "一千二百億元青年優惠房屋貸款暨信用保證專案(不得轉貸、重購)";
+					break;
+				case "2":
+					Kind = "四千億元優惠購屋專案貸款(不得轉貸、重購)";
+					break;
+				case "3":
+					Kind = "續辦二千億元優惠購屋專案貸款(補貼 0.425%，不得轉貸、重購)";
+					break;
+				case "4":
+					Kind = "續辦四千八百億元優惠購屋專案貸款(補貼 0.25%，不得轉貸、重購)";
+					break;
+				case "5":
+					Kind = "續辦六千億元優惠購屋專案貸款(補貼 0.125%，不得轉貸、重購)";
+					break;
+				case "6":
+					Kind = "增撥新台幣四千億元優惠購屋專案貸款(補貼 0.7%，不得重購)";
+					break;
+				}
+				makeExcel.setValue(printRow, 3, Kind, fontStyleVo);
 
 				// F4 補貼利率
 				String SubsidyRate = mapL5801.get("F4");
@@ -136,10 +168,10 @@ public class L5801Report4 extends MakeReport {
 				String ThisMonthBal = mapL5801.get("F11");
 
 				makeExcel.setValue(printRow, 11, ThisMonthBal, fontStyleVo);
-
+				printRow++;
 			}
 			// 畫框線
-			makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
+			makeExcel.setAddRengionBorder("A", 1, "K", printRow-1, 1);
 
 		}
 		long sno = makeExcel.close();

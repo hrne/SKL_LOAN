@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * ClImmRankDetail 擔保品不動產檔設定順位明細<br>
+ * ClImmRankDetail 擔保品不動產檔設定順位明細檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

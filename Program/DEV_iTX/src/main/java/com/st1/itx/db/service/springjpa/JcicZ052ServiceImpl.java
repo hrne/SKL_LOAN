@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.JcicZ052RepositoryHist;
 import com.st1.itx.db.service.JcicZ052Service;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -260,6 +261,34 @@ em = null;
   }
 
   @Override
+  public Slice<JcicZ052> custSubEq(String submitKey_0, String custId_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ052> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("custSubEq " + dbName + " : " + "submitKey_0 : " + submitKey_0 + " custId_1 : " +  custId_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ052ReposDay.findAllBySubmitKeyIsAndCustIdIsOrderByCreateDateDesc(submitKey_0, custId_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ052ReposMon.findAllBySubmitKeyIsAndCustIdIsOrderByCreateDateDesc(submitKey_0, custId_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ052ReposHist.findAllBySubmitKeyIsAndCustIdIsOrderByCreateDateDesc(submitKey_0, custId_1, pageable);
+    else 
+      slice = jcicZ052Repos.findAllBySubmitKeyIsAndCustIdIsOrderByCreateDateDesc(submitKey_0, custId_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public JcicZ052 holdById(JcicZ052Id jcicZ052Id, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -303,7 +332,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + jcicZ052.getJcicZ052Id());
     if (this.findById(jcicZ052.getJcicZ052Id()) != null)
       throw new DBException(2);
@@ -332,7 +363,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + jcicZ052.getJcicZ052Id());
     if (!empNot.isEmpty())
       jcicZ052.setLastUpdateEmpNo(empNot);
@@ -355,7 +388,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + jcicZ052.getJcicZ052Id());
     if (!empNot.isEmpty())
       jcicZ052.setLastUpdateEmpNo(empNot);
@@ -405,7 +440,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (JcicZ052 t : jcicZ052){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -439,7 +477,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (jcicZ052 == null || jcicZ052.size() == 0)
       throw new DBException(6);

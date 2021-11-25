@@ -85,7 +85,7 @@ public class ForeclosureFee implements Serializable {
   private String rmk;
 
   // 件別
-  /* 1:??2: 匯款3:?? */
+  /* 1:暫收抵繳2:匯款3:呆帳戶法務費墊付 */
   @Column(name = "`CaseCode`")
   private int caseCode = 0;
 
@@ -387,9 +387,9 @@ public class ForeclosureFee implements Serializable {
 
 /**
 	* 件別<br>
-	* 1:??
-2: 匯款
-3:??
+	* 1:暫收抵繳
+2:匯款
+3:呆帳戶法務費墊付
 	* @return Integer
 	*/
   public int getCaseCode() {
@@ -398,9 +398,9 @@ public class ForeclosureFee implements Serializable {
 
 /**
 	* 件別<br>
-	* 1:??
-2: 匯款
-3:??
+	* 1:暫收抵繳
+2:匯款
+3:呆帳戶法務費墊付
   *
   * @param caseCode 件別
 	*/

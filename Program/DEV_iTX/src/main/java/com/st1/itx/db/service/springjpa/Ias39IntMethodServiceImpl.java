@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.Ias39IntMethodRepositoryHist;
 import com.st1.itx.db.service.Ias39IntMethodService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("ias39IntMethodService")
 @Repository
-public class Ias39IntMethodServiceImpl implements Ias39IntMethodService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(Ias39IntMethodServiceImpl.class);
-
+public class Ias39IntMethodServiceImpl extends ASpringJpaParm implements Ias39IntMethodService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class Ias39IntMethodServiceImpl implements Ias39IntMethodService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + ias39IntMethodId);
+    this.info("findById " + dbName + " " + ias39IntMethodId);
     Optional<Ias39IntMethod> ias39IntMethod = null;
     if (dbName.equals(ContentName.onDay))
       ias39IntMethod = ias39IntMethodReposDay.findById(ias39IntMethodId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = ias39IntMethodReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = ias39IntMethodReposHist.findAll(pageable);
     else 
       slice = ias39IntMethodRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findYearMonthEq " + dbName + " : " + "yearMonth_0 : " + yearMonth_0);
+    this.info("findYearMonthEq " + dbName + " : " + "yearMonth_0 : " + yearMonth_0);
     if (dbName.equals(ContentName.onDay))
       slice = ias39IntMethodReposDay.findAllByYearMonthIsOrderByCustNoAscFacmNoAscBormNoAsc(yearMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = ias39IntMethodRepos.findAllByYearMonthIsOrderByCustNoAscFacmNoAscBormNoAsc(yearMonth_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ias39IntMethodId);
+    this.info("Hold " + dbName + " " + ias39IntMethodId);
     Optional<Ias39IntMethod> ias39IntMethod = null;
     if (dbName.equals(ContentName.onDay))
       ias39IntMethod = ias39IntMethodReposDay.findByIas39IntMethodId(ias39IntMethodId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ias39IntMethod.getIas39IntMethodId());
+    this.info("Hold " + dbName + " " + ias39IntMethod.getIas39IntMethodId());
     Optional<Ias39IntMethod> ias39IntMethodT = null;
     if (dbName.equals(ContentName.onDay))
       ias39IntMethodT = ias39IntMethodReposDay.findByIas39IntMethodId(ias39IntMethod.getIas39IntMethodId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
     if (this.findById(ias39IntMethod.getIas39IntMethodId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
     if (!empNot.isEmpty())
       ias39IntMethod.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
     if (!empNot.isEmpty())
       ias39IntMethod.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
+    this.info("Delete..." + dbName + " " + ias39IntMethod.getIas39IntMethodId());
     if (dbName.equals(ContentName.onDay)) {
       ias39IntMethodReposDay.delete(ias39IntMethod);	
       ias39IntMethodReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (Ias39IntMethod t : ias39IntMethod){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (ias39IntMethod == null || ias39IntMethod.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<Ias39IntMethod> ias39IntMethod, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

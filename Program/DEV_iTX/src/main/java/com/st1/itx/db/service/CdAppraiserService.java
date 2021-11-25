@@ -15,107 +15,107 @@ import org.springframework.data.domain.Slice;
  */
 public interface CdAppraiserService {
 
-	/**
-	 * findByPrimaryKey
-	 *
-	 * @param appraiserCode PK
-	 * @param titaVo        Variable-Length Argument
-	 * @return CdAppraiser CdAppraiser
-	 */
-	public CdAppraiser findById(String appraiserCode, TitaVo... titaVo);
+  /**
+   * findByPrimaryKey
+   *
+   * @param appraiserCode PK
+   * @param titaVo Variable-Length Argument
+   * @return CdAppraiser CdAppraiser
+   */
+  public CdAppraiser findById(String appraiserCode, TitaVo... titaVo);
 
-	/**
-	 * findAll
-	 *
-	 * @param index  Page Index
-	 * @param limit  Page Data Limit
-	 * @param titaVo Variable-Length Argument
-	 * @return Slice CdAppraiser CdAppraiser of List
-	 */
-	public Slice<CdAppraiser> findAll(int index, int limit, TitaVo... titaVo);
+  /**
+   * findAll
+   *
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdAppraiser CdAppraiser of List
+   */
+  public Slice<CdAppraiser> findAll(int index, int limit, TitaVo... titaVo);
 
-	/**
-	 * hold By CdAppraiser
-	 * 
-	 * @param appraiserCode key
-	 * @param titaVo        Variable-Length Argument
-	 * @return CdAppraiser CdAppraiser
-	 */
-	public CdAppraiser holdById(String appraiserCode, TitaVo... titaVo);
+  /**
+   * hold By CdAppraiser
+   * 
+   * @param appraiserCode key
+   * @param titaVo Variable-Length Argument
+   * @return CdAppraiser CdAppraiser
+   */
+  public CdAppraiser holdById(String appraiserCode, TitaVo... titaVo);
 
-	/**
-	 * hold By CdAppraiser
-	 * 
-	 * @param cdAppraiser key
-	 * @param titaVo      Variable-Length Argument
-	 * @return CdAppraiser CdAppraiser
-	 */
-	public CdAppraiser holdById(CdAppraiser cdAppraiser, TitaVo... titaVo);
+  /**
+   * hold By CdAppraiser
+   * 
+   * @param cdAppraiser key
+   * @param titaVo Variable-Length Argument
+   * @return CdAppraiser CdAppraiser
+   */
+  public CdAppraiser holdById(CdAppraiser cdAppraiser, TitaVo... titaVo);
 
-	/**
-	 * Insert
-	 * 
-	 * @param cdAppraiser Entity
-	 * @param titaVo      Variable-Length Argument
-	 * @return CdAppraiser Entity
-	 * @throws DBException exception
-	 */
-	public CdAppraiser insert(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
+  /**
+   * Insert
+   * 
+   * @param cdAppraiser Entity
+   * @param titaVo Variable-Length Argument
+   * @return CdAppraiser Entity
+   * @throws DBException exception
+   */
+  public CdAppraiser insert(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update
-	 * 
-	 * @param cdAppraiser Entity
-	 * @param titaVo      Variable-Length Argument
-	 * @return CdAppraiser Entity
-	 * @throws DBException exception
-	 */
-	public CdAppraiser update(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
+  /**
+   * Update
+   * 
+   * @param cdAppraiser Entity
+   * @param titaVo Variable-Length Argument
+   * @return CdAppraiser Entity
+   * @throws DBException exception
+   */
+  public CdAppraiser update(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update2
-	 * 
-	 * @param cdAppraiser Entity
-	 * @param titaVo      Variable-Length Argument
-	 * @return CdAppraiser Entity
-	 * @throws DBException exception
-	 */
-	public CdAppraiser update2(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
+  /**
+   * Update2
+   * 
+   * @param cdAppraiser Entity
+   * @param titaVo Variable-Length Argument
+   * @return CdAppraiser Entity
+   * @throws DBException exception
+   */
+  public CdAppraiser update2(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Delete
-	 * 
-	 * @param cdAppraiser Entity
-	 * @param titaVo      Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void delete(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
+  /**
+   * Delete
+   * 
+   * @param cdAppraiser Entity
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void delete(CdAppraiser cdAppraiser, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Insert All For List
-	 * 
-	 * @param cdAppraiser Entity of List
-	 * @param titaVo      Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void insertAll(List<CdAppraiser> cdAppraiser, TitaVo... titaVo) throws DBException;
+  /**
+   * Insert All For List
+   * 
+   * @param cdAppraiser Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void insertAll(List<CdAppraiser> cdAppraiser, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update All For List
-	 * 
-	 * @param cdAppraiser Entity of List
-	 * @param titaVo      Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void updateAll(List<CdAppraiser> cdAppraiser, TitaVo... titaVo) throws DBException;
+  /**
+   * Update All For List
+   * 
+   * @param cdAppraiser Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void updateAll(List<CdAppraiser> cdAppraiser, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Delete All For List
-	 * 
-	 * @param cdAppraiser Entity of List
-	 * @param titaVo      Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void deleteAll(List<CdAppraiser> cdAppraiser, TitaVo... titaVo) throws DBException;
+  /**
+   * Delete All For List
+   * 
+   * @param cdAppraiser Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void deleteAll(List<CdAppraiser> cdAppraiser, TitaVo... titaVo) throws DBException;
 
 }

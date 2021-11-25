@@ -30,7 +30,7 @@ public class PfItDetailAdjust implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6747003899740854071L;
+	private static final long serialVersionUID = -4568209505456388685L;
 
 // 序號
   @Id
@@ -46,6 +46,10 @@ public class PfItDetailAdjust implements Serializable {
   // 額度編號
   @Column(name = "`FacmNo`")
   private int facmNo = 0;
+
+  // 撥款序號
+  @Column(name = "`BormNo`")
+  private int bormNo = 0;
 
   // 工作月
   @Column(name = "`WorkMonth`")
@@ -152,6 +156,25 @@ public class PfItDetailAdjust implements Serializable {
 	*/
   public void setFacmNo(int facmNo) {
     this.facmNo = facmNo;
+  }
+
+/**
+	* 撥款序號<br>
+	* 
+	* @return Integer
+	*/
+  public int getBormNo() {
+    return this.bormNo;
+  }
+
+/**
+	* 撥款序號<br>
+	* 
+  *
+  * @param bormNo 撥款序號
+	*/
+  public void setBormNo(int bormNo) {
+    this.bormNo = bormNo;
   }
 
 /**
@@ -370,8 +393,8 @@ public class PfItDetailAdjust implements Serializable {
 
   @Override
   public String toString() {
-    return "PfItDetailAdjust [logNo=" + logNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", workMonth=" + workMonth + ", workSeason=" + workSeason + ", adjRange=" + adjRange
-           + ", adjPerfEqAmt=" + adjPerfEqAmt + ", adjPerfReward=" + adjPerfReward + ", adjPerfAmt=" + adjPerfAmt + ", adjCntingCode=" + adjCntingCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "PfItDetailAdjust [logNo=" + logNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", workMonth=" + workMonth + ", workSeason=" + workSeason
+           + ", adjRange=" + adjRange + ", adjPerfEqAmt=" + adjPerfEqAmt + ", adjPerfReward=" + adjPerfReward + ", adjPerfAmt=" + adjPerfAmt + ", adjCntingCode=" + adjCntingCode + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

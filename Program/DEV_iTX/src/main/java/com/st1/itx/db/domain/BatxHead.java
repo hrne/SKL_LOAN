@@ -54,7 +54,7 @@ public class BatxHead implements Serializable {
   private int unfinishCnt = 0;
 
   // 作業狀態
-  /* 0.待檢核1.檢核有誤2.檢核正常3.入帳未完4.入帳完成8.已刪除 */
+  /* CdCode:BatchStatus0.待檢核1.檢核有誤2.檢核正常3.入帳未完4.入帳完成8.已刪除 */
   @Column(name = "`BatxExeCode`", length = 1)
   private String batxExeCode;
 
@@ -68,7 +68,7 @@ public class BatxHead implements Serializable {
   private String titaTlrNo;
 
   // 交易代號
-  /* L4200,L4210 */
+  /* L4200,L4210,L4450,BS020 */
   @Column(name = "`TitaTxCd`", length = 5)
   private String titaTxCd;
 
@@ -196,7 +196,8 @@ public class BatxHead implements Serializable {
 
 /**
 	* 作業狀態<br>
-	* 0.待檢核
+	* CdCode:BatchStatus
+0.待檢核
 1.檢核有誤
 2.檢核正常
 3.入帳未完
@@ -210,7 +211,8 @@ public class BatxHead implements Serializable {
 
 /**
 	* 作業狀態<br>
-	* 0.待檢核
+	* CdCode:BatchStatus
+0.待檢核
 1.檢核有誤
 2.檢核正常
 3.入帳未完
@@ -265,7 +267,7 @@ public class BatxHead implements Serializable {
 
 /**
 	* 交易代號<br>
-	* L4200,L4210
+	* L4200,L4210,L4450,BS020
 	* @return String
 	*/
   public String getTitaTxCd() {
@@ -274,7 +276,7 @@ public class BatxHead implements Serializable {
 
 /**
 	* 交易代號<br>
-	* L4200,L4210
+	* L4200,L4210,L4450,BS020
   *
   * @param titaTxCd 交易代號
 	*/

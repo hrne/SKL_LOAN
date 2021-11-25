@@ -118,6 +118,15 @@ public interface JcicZ046Service {
   public JcicZ046 otherFirst(String submitKey_0, String custId_1, int rcDate_2, int closeDate_3, TitaVo... titaVo);
 
   /**
+   * CustId=
+   *
+   * @param custId_0 custId_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ046 JcicZ046 of List
+   */
+  public JcicZ046 custIdFirst(String custId_0, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ046
    * 
    * @param jcicZ046Id key

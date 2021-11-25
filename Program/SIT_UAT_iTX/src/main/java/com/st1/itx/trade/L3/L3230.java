@@ -121,6 +121,7 @@ public class L3230 extends TradeBuffer {
 	private int wkBormNo = 0;
 	private int wkOvduNo = 0;
 	private String wkAcctCode;
+	private String iAcSubBookCode;
 	private LoanOverdue tLoanOverdue;
 	private AcDetail acDetail;
 	private TxTemp tTxTemp;
@@ -171,6 +172,8 @@ public class L3230 extends TradeBuffer {
 		iTempItemCode = titaVo.getParam("TempItemCode");
 		iCurrencyCode = titaVo.getParam("CurrencyCode");
 		iRemoveNo = titaVo.getParam("RemoveNo"); // 銷帳編號
+		iAcSubBookCode = titaVo.getParam("AcSubBookCode"); // 區隔帳冊
+
 		wkTempBal = iTempAmt;
 
 		// 檢查輸入資料
@@ -202,13 +205,13 @@ public class L3230 extends TradeBuffer {
 // 14.NPL-銷項稅額             F14  暫付及待結轉帳項－預所稅－放款部
 // 15.921貸款戶                  F15	利息收入－九二一貸款戶
 // 16.3200億專案                F16	利息收入－３２００億專案息
-// 17.3200億-利變        X => L6201 其他傳票輸入                                         
+// 17.3200億-利變        X                              
 // 18.沖備抵呆帳                  F18	備抵呆帳－催收款項
 // 19.轉債權協商         T10~T13 債協科目 
 // 20.轉應付代收         X => L5708 最大債權撥付出帳 
 // 21.88風災                       F21	利息收入－88風災貸款戶
 // 22.88風災-保費        ???
-// 23.3200億傳統A        X => L6201 其他傳票輸入                                            
+// 23.3200億傳統A        X                                            
 // 24.沖催收法務費              F24	催收款項－法務費用
 // 25.沖催收火險費              F25	催收款項－火險費用
 // 27.沖聯貸費用                  F27	聯貸管理費收入    
@@ -246,6 +249,11 @@ public class L3230 extends TradeBuffer {
 
 			case "20": // 20.轉應付代收
 				throw new LogicException(titaVo, "E0010", "由L5708 最大債權撥付出帳 "); // E0010 功能選擇錯誤
+
+			case "16": // 16.沖呆帳戶法務費墊付
+				subsidyInterest();
+				this.txBuffer.addAllAcDetailList(lAcDetail);
+				break;
 
 			case "17": // 17.3200億-利變
 			case "23": // 23.3200億傳統A
@@ -381,6 +389,29 @@ public class L3230 extends TradeBuffer {
 		if (!isFind) {
 			throw new LogicException(titaVo, "E0019", "無金額相同之未銷費用，請使用 L6907 未銷帳餘額明細查詢 "); // 查詢資料不存在
 		}
+	}
+
+	// 借:暫收可抵繳 貸:利息收入(3200億專案息)
+	private void subsidyInterest() throws LogicException {
+		AcDetail acDetail = new AcDetail();
+		acDetail.setDbCr("D");
+		acDetail.setAcctCode("TAV");
+		acDetail.setCurrencyCode(iCurrencyCode);
+		acDetail.setTxAmt(iTempAmt);
+		acDetail.setCustNo(iCustNo);
+		acDetail.setSlipNote(titaVo.getParam("Description"));
+		lAcDetail.add(acDetail);
+
+		acDetail = new AcDetail();
+		acDetail.setDbCr("C");
+		acDetail.setAcctCode("F16");
+		acDetail.setCurrencyCode(iCurrencyCode);
+		acDetail.setTxAmt(iTempAmt);
+		acDetail.setCustNo(iCustNo);
+		acDetail.setSlipNote(titaVo.getParam("Description"));
+		acDetail.setAcSubBookCode(iAcSubBookCode); // 區隔帳冊
+		acDetail.setAcBookFlag(3); // 帳冊別記號 (3: 指定帳冊)
+		lAcDetail.add(acDetail);
 	}
 
 	private void addFeeRoutine(BaTxVo ba) throws LogicException {

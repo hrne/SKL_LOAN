@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.BankRelationCompanyRepositoryHist;
 import com.st1.itx.db.service.BankRelationCompanyService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("bankRelationCompanyService")
 @Repository
-public class BankRelationCompanyServiceImpl implements BankRelationCompanyService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BankRelationCompanyServiceImpl.class);
-
+public class BankRelationCompanyServiceImpl extends ASpringJpaParm implements BankRelationCompanyService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class BankRelationCompanyServiceImpl implements BankRelationCompanyServic
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + bankRelationCompanyId);
+    this.info("findById " + dbName + " " + bankRelationCompanyId);
     Optional<BankRelationCompany> bankRelationCompany = null;
     if (dbName.equals(ContentName.onDay))
       bankRelationCompany = bankRelationCompanyReposDay.findById(bankRelationCompanyId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "CompanyId"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "CompanyId"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = bankRelationCompanyReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = bankRelationCompanyReposHist.findAll(pageable);
     else 
       slice = bankRelationCompanyRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCompanyIdEq " + dbName + " : " + "companyId_0 : " + companyId_0);
+    this.info("findCompanyIdEq " + dbName + " : " + "companyId_0 : " + companyId_0);
     if (dbName.equals(ContentName.onDay))
       slice = bankRelationCompanyReposDay.findAllByCompanyIdIs(companyId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = bankRelationCompanyRepos.findAllByCompanyIdIs(companyId_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("custIdFirst " + dbName + " : " + "custId_0 : " + custId_0);
+    this.info("custIdFirst " + dbName + " : " + "custId_0 : " + custId_0);
     Optional<BankRelationCompany> bankRelationCompanyT = null;
     if (dbName.equals(ContentName.onDay))
       bankRelationCompanyT = bankRelationCompanyReposDay.findTopByCustIdIs(custId_0);
@@ -150,6 +153,7 @@ em = null;
       bankRelationCompanyT = bankRelationCompanyReposHist.findTopByCustIdIs(custId_0);
     else 
       bankRelationCompanyT = bankRelationCompanyRepos.findTopByCustIdIs(custId_0);
+
     return bankRelationCompanyT.isPresent() ? bankRelationCompanyT.get() : null;
   }
 
@@ -158,7 +162,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankRelationCompanyId);
+    this.info("Hold " + dbName + " " + bankRelationCompanyId);
     Optional<BankRelationCompany> bankRelationCompany = null;
     if (dbName.equals(ContentName.onDay))
       bankRelationCompany = bankRelationCompanyReposDay.findByBankRelationCompanyId(bankRelationCompanyId);
@@ -176,7 +180,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
+    this.info("Hold " + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
     Optional<BankRelationCompany> bankRelationCompanyT = null;
     if (dbName.equals(ContentName.onDay))
       bankRelationCompanyT = bankRelationCompanyReposDay.findByBankRelationCompanyId(bankRelationCompany.getBankRelationCompanyId());
@@ -197,8 +201,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
     if (this.findById(bankRelationCompany.getBankRelationCompanyId()) != null)
       throw new DBException(2);
 
@@ -226,8 +232,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
     if (!empNot.isEmpty())
       bankRelationCompany.setLastUpdateEmpNo(empNot);
 
@@ -249,8 +257,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
     if (!empNot.isEmpty())
       bankRelationCompany.setLastUpdateEmpNo(empNot);
 
@@ -270,7 +280,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
+    this.info("Delete..." + dbName + " " + bankRelationCompany.getBankRelationCompanyId());
     if (dbName.equals(ContentName.onDay)) {
       bankRelationCompanyReposDay.delete(bankRelationCompany);	
       bankRelationCompanyReposDay.flush();
@@ -299,7 +309,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (BankRelationCompany t : bankRelationCompany){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -333,8 +346,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (bankRelationCompany == null || bankRelationCompany.size() == 0)
       throw new DBException(6);
 
@@ -363,7 +378,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BankRelationCompany> bankRelationCompany, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

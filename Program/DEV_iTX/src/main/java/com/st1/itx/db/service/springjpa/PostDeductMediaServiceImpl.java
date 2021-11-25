@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +26,7 @@ import com.st1.itx.db.repository.hist.PostDeductMediaRepositoryHist;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -37,9 +36,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("postDeductMediaService")
 @Repository
-public class PostDeductMediaServiceImpl implements PostDeductMediaService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(PostDeductMediaServiceImpl.class);
-
+public class PostDeductMediaServiceImpl extends ASpringJpaParm implements PostDeductMediaService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -69,7 +66,7 @@ public class PostDeductMediaServiceImpl implements PostDeductMediaService, Initi
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + postDeductMediaId);
+    this.info("findById " + dbName + " " + postDeductMediaId);
     Optional<PostDeductMedia> postDeductMedia = null;
     if (dbName.equals(ContentName.onDay))
       postDeductMedia = postDeductMediaReposDay.findById(postDeductMediaId);
@@ -96,10 +93,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "MediaDate", "MediaSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "MediaDate", "MediaSeq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = postDeductMediaReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -109,6 +106,9 @@ em = null;
     else 
       slice = postDeductMediaRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -117,7 +117,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("detailSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " detailSeq_2 : " +  detailSeq_2);
+    this.info("detailSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " detailSeq_2 : " +  detailSeq_2);
     Optional<PostDeductMedia> postDeductMediaT = null;
     if (dbName.equals(ContentName.onDay))
       postDeductMediaT = postDeductMediaReposDay.findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(acDate_0, batchNo_1, detailSeq_2);
@@ -127,6 +127,7 @@ em = null;
       postDeductMediaT = postDeductMediaReposHist.findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(acDate_0, batchNo_1, detailSeq_2);
     else 
       postDeductMediaT = postDeductMediaRepos.findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(acDate_0, batchNo_1, detailSeq_2);
+
     return postDeductMediaT.isPresent() ? postDeductMediaT.get() : null;
   }
 
@@ -135,7 +136,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("receiveCheckFirst " + dbName + " : " + "postUserNo_0 : " + postUserNo_0 + " repayAmt_1 : " +  repayAmt_1 + " outsrcRemark_2 : " +  outsrcRemark_2);
+    this.info("receiveCheckFirst " + dbName + " : " + "postUserNo_0 : " + postUserNo_0 + " repayAmt_1 : " +  repayAmt_1 + " outsrcRemark_2 : " +  outsrcRemark_2);
     Optional<PostDeductMedia> postDeductMediaT = null;
     if (dbName.equals(ContentName.onDay))
       postDeductMediaT = postDeductMediaReposDay.findTopByPostUserNoIsAndRepayAmtIsAndOutsrcRemarkIsOrderByMediaDateDesc(postUserNo_0, repayAmt_1, outsrcRemark_2);
@@ -145,6 +146,7 @@ em = null;
       postDeductMediaT = postDeductMediaReposHist.findTopByPostUserNoIsAndRepayAmtIsAndOutsrcRemarkIsOrderByMediaDateDesc(postUserNo_0, repayAmt_1, outsrcRemark_2);
     else 
       postDeductMediaT = postDeductMediaRepos.findTopByPostUserNoIsAndRepayAmtIsAndOutsrcRemarkIsOrderByMediaDateDesc(postUserNo_0, repayAmt_1, outsrcRemark_2);
+
     return postDeductMediaT.isPresent() ? postDeductMediaT.get() : null;
   }
 
@@ -160,7 +162,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("mediaDateEq " + dbName + " : " + "mediaDate_0 : " + mediaDate_0);
+    this.info("mediaDateEq " + dbName + " : " + "mediaDate_0 : " + mediaDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = postDeductMediaReposDay.findAllByMediaDateIsOrderByMediaSeqAsc(mediaDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -170,6 +172,9 @@ em = null;
     else 
       slice = postDeductMediaRepos.findAllByMediaDateIsOrderByMediaSeqAsc(mediaDate_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -178,7 +183,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + postDeductMediaId);
+    this.info("Hold " + dbName + " " + postDeductMediaId);
     Optional<PostDeductMedia> postDeductMedia = null;
     if (dbName.equals(ContentName.onDay))
       postDeductMedia = postDeductMediaReposDay.findByPostDeductMediaId(postDeductMediaId);
@@ -196,7 +201,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + postDeductMedia.getPostDeductMediaId());
+    this.info("Hold " + dbName + " " + postDeductMedia.getPostDeductMediaId());
     Optional<PostDeductMedia> postDeductMediaT = null;
     if (dbName.equals(ContentName.onDay))
       postDeductMediaT = postDeductMediaReposDay.findByPostDeductMediaId(postDeductMedia.getPostDeductMediaId());
@@ -217,8 +222,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
     if (this.findById(postDeductMedia.getPostDeductMediaId()) != null)
       throw new DBException(2);
 
@@ -246,8 +253,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
     if (!empNot.isEmpty())
       postDeductMedia.setLastUpdateEmpNo(empNot);
 
@@ -269,8 +278,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
     if (!empNot.isEmpty())
       postDeductMedia.setLastUpdateEmpNo(empNot);
 
@@ -290,7 +301,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
+    this.info("Delete..." + dbName + " " + postDeductMedia.getPostDeductMediaId());
     if (dbName.equals(ContentName.onDay)) {
       postDeductMediaReposDay.delete(postDeductMedia);	
       postDeductMediaReposDay.flush();
@@ -319,7 +330,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (PostDeductMedia t : postDeductMedia){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -353,8 +367,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (postDeductMedia == null || postDeductMedia.size() == 0)
       throw new DBException(6);
 
@@ -383,7 +399,7 @@ em = null;
 
   @Override
   public void deleteAll(List<PostDeductMedia> postDeductMedia, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

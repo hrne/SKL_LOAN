@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.RptRelationSelfRepositoryHist;
 import com.st1.itx.db.service.RptRelationSelfService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("rptRelationSelfService")
 @Repository
-public class RptRelationSelfServiceImpl implements RptRelationSelfService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(RptRelationSelfServiceImpl.class);
-
+public class RptRelationSelfServiceImpl extends ASpringJpaParm implements RptRelationSelfService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class RptRelationSelfServiceImpl implements RptRelationSelfService, Initi
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + rptRelationSelfId);
+    this.info("findById " + dbName + " " + rptRelationSelfId);
     Optional<RptRelationSelf> rptRelationSelf = null;
     if (dbName.equals(ContentName.onDay))
       rptRelationSelf = rptRelationSelfReposDay.findById(rptRelationSelfId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CusId", "STSCD", "CusSCD"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CusId", "STSCD", "CusSCD"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = rptRelationSelfReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = rptRelationSelfRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + rptRelationSelfId);
+    this.info("Hold " + dbName + " " + rptRelationSelfId);
     Optional<RptRelationSelf> rptRelationSelf = null;
     if (dbName.equals(ContentName.onDay))
       rptRelationSelf = rptRelationSelfReposDay.findByRptRelationSelfId(rptRelationSelfId);
@@ -133,7 +133,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + rptRelationSelf.getRptRelationSelfId());
+    this.info("Hold " + dbName + " " + rptRelationSelf.getRptRelationSelfId());
     Optional<RptRelationSelf> rptRelationSelfT = null;
     if (dbName.equals(ContentName.onDay))
       rptRelationSelfT = rptRelationSelfReposDay.findByRptRelationSelfId(rptRelationSelf.getRptRelationSelfId());
@@ -154,13 +154,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
     if (this.findById(rptRelationSelf.getRptRelationSelfId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       rptRelationSelf.setCreateEmpNo(empNot);
+
+    if(rptRelationSelf.getLastUpdateEmpNo() == null || rptRelationSelf.getLastUpdateEmpNo().isEmpty())
+      rptRelationSelf.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return rptRelationSelfReposDay.saveAndFlush(rptRelationSelf);	
@@ -180,8 +185,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
     if (!empNot.isEmpty())
       rptRelationSelf.setLastUpdateEmpNo(empNot);
 
@@ -203,8 +210,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
     if (!empNot.isEmpty())
       rptRelationSelf.setLastUpdateEmpNo(empNot);
 
@@ -224,7 +233,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
+    this.info("Delete..." + dbName + " " + rptRelationSelf.getRptRelationSelfId());
     if (dbName.equals(ContentName.onDay)) {
       rptRelationSelfReposDay.delete(rptRelationSelf);	
       rptRelationSelfReposDay.flush();
@@ -253,11 +262,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (RptRelationSelf t : rptRelationSelf) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (RptRelationSelf t : rptRelationSelf){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       rptRelationSelf = rptRelationSelfReposDay.saveAll(rptRelationSelf);	
@@ -285,8 +299,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (rptRelationSelf == null || rptRelationSelf.size() == 0)
       throw new DBException(6);
 
@@ -315,7 +331,7 @@ em = null;
 
   @Override
   public void deleteAll(List<RptRelationSelf> rptRelationSelf, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

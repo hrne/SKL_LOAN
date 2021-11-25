@@ -23,6 +23,7 @@ import com.st1.itx.db.repository.hist.PfRewardRepositoryHist;
 import com.st1.itx.db.service.PfRewardService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -89,7 +90,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "LogNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LogNo"));
     this.info("findAll " + dbName);
@@ -395,7 +396,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + pfReward.getLogNo());
     if (this.findById(pfReward.getLogNo()) != null)
       throw new DBException(2);
@@ -424,7 +427,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + pfReward.getLogNo());
     if (!empNot.isEmpty())
       pfReward.setLastUpdateEmpNo(empNot);
@@ -447,7 +452,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + pfReward.getLogNo());
     if (!empNot.isEmpty())
       pfReward.setLastUpdateEmpNo(empNot);
@@ -497,7 +504,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (PfReward t : pfReward){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -531,7 +541,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (pfReward == null || pfReward.size() == 0)
       throw new DBException(6);

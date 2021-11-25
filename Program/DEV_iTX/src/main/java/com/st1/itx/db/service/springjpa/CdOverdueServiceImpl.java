@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.CdOverdueRepositoryHist;
 import com.st1.itx.db.service.CdOverdueService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdOverdueService")
 @Repository
-public class CdOverdueServiceImpl implements CdOverdueService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdOverdueServiceImpl.class);
-
+public class CdOverdueServiceImpl extends ASpringJpaParm implements CdOverdueService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class CdOverdueServiceImpl implements CdOverdueService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdOverdueId);
+    this.info("findById " + dbName + " " + cdOverdueId);
     Optional<CdOverdue> cdOverdue = null;
     if (dbName.equals(ContentName.onDay))
       cdOverdue = cdOverdueReposDay.findById(cdOverdueId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "OverdueSign", "OverdueCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "OverdueSign", "OverdueCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdOverdueReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = cdOverdueReposHist.findAll(pageable);
     else 
       slice = cdOverdueRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findOverdueSign " + dbName + " : " + "overdueSign_0 : " + overdueSign_0);
+    this.info("findOverdueSign " + dbName + " : " + "overdueSign_0 : " + overdueSign_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdOverdueReposDay.findAllByOverdueSignIs(overdueSign_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = cdOverdueReposHist.findAllByOverdueSignIs(overdueSign_0, pageable);
     else 
       slice = cdOverdueRepos.findAllByOverdueSignIs(overdueSign_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findOverdueCode " + dbName + " : " + "overdueCode_0 : " + overdueCode_0);
+    this.info("findOverdueCode " + dbName + " : " + "overdueCode_0 : " + overdueCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdOverdueReposDay.findAllByOverdueCodeIs(overdueCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +159,9 @@ em = null;
       slice = cdOverdueReposHist.findAllByOverdueCodeIs(overdueCode_0, pageable);
     else 
       slice = cdOverdueRepos.findAllByOverdueCodeIs(overdueCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +178,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findEnable " + dbName + " : " + "enable_0 : " + enable_0);
+    this.info("findEnable " + dbName + " : " + "enable_0 : " + enable_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdOverdueReposDay.findAllByEnableIs(enable_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +187,9 @@ em = null;
       slice = cdOverdueReposHist.findAllByEnableIs(enable_0, pageable);
     else 
       slice = cdOverdueRepos.findAllByEnableIs(enable_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +206,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("overdueCodeRange " + dbName + " : " + "overdueSign_0 : " + overdueSign_0 + " overdueSign_1 : " +  overdueSign_1 + " overdueCode_2 : " +  overdueCode_2 + " overdueCode_3 : " +  overdueCode_3);
+    this.info("overdueCodeRange " + dbName + " : " + "overdueSign_0 : " + overdueSign_0 + " overdueSign_1 : " +  overdueSign_1 + " overdueCode_2 : " +  overdueCode_2 + " overdueCode_3 : " +  overdueCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdOverdueReposDay.findAllByOverdueSignGreaterThanEqualAndOverdueSignLessThanEqualAndOverdueCodeGreaterThanEqualAndOverdueCodeLessThanEqualOrderByOverdueSignAscOverdueCodeAsc(overdueSign_0, overdueSign_1, overdueCode_2, overdueCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -207,6 +216,9 @@ em = null;
     else 
       slice = cdOverdueRepos.findAllByOverdueSignGreaterThanEqualAndOverdueSignLessThanEqualAndOverdueCodeGreaterThanEqualAndOverdueCodeLessThanEqualOrderByOverdueSignAscOverdueCodeAsc(overdueSign_0, overdueSign_1, overdueCode_2, overdueCode_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -215,7 +227,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdOverdueId);
+    this.info("Hold " + dbName + " " + cdOverdueId);
     Optional<CdOverdue> cdOverdue = null;
     if (dbName.equals(ContentName.onDay))
       cdOverdue = cdOverdueReposDay.findByCdOverdueId(cdOverdueId);
@@ -233,7 +245,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdOverdue.getCdOverdueId());
+    this.info("Hold " + dbName + " " + cdOverdue.getCdOverdueId());
     Optional<CdOverdue> cdOverdueT = null;
     if (dbName.equals(ContentName.onDay))
       cdOverdueT = cdOverdueReposDay.findByCdOverdueId(cdOverdue.getCdOverdueId());
@@ -254,8 +266,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdOverdue.getCdOverdueId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdOverdue.getCdOverdueId());
     if (this.findById(cdOverdue.getCdOverdueId()) != null)
       throw new DBException(2);
 
@@ -283,8 +297,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdOverdue.getCdOverdueId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdOverdue.getCdOverdueId());
     if (!empNot.isEmpty())
       cdOverdue.setLastUpdateEmpNo(empNot);
 
@@ -306,8 +322,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdOverdue.getCdOverdueId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdOverdue.getCdOverdueId());
     if (!empNot.isEmpty())
       cdOverdue.setLastUpdateEmpNo(empNot);
 
@@ -327,7 +345,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdOverdue.getCdOverdueId());
+    this.info("Delete..." + dbName + " " + cdOverdue.getCdOverdueId());
     if (dbName.equals(ContentName.onDay)) {
       cdOverdueReposDay.delete(cdOverdue);	
       cdOverdueReposDay.flush();
@@ -356,7 +374,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdOverdue t : cdOverdue){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -390,8 +411,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdOverdue == null || cdOverdue.size() == 0)
       throw new DBException(6);
 
@@ -420,7 +443,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdOverdue> cdOverdue, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

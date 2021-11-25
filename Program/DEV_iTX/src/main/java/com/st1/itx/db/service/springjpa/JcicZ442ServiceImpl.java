@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.JcicZ442RepositoryHist;
 import com.st1.itx.db.service.JcicZ442Service;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -303,7 +304,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + jcicZ442.getJcicZ442Id());
     if (this.findById(jcicZ442.getJcicZ442Id()) != null)
       throw new DBException(2);
@@ -332,7 +335,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + jcicZ442.getJcicZ442Id());
     if (!empNot.isEmpty())
       jcicZ442.setLastUpdateEmpNo(empNot);
@@ -355,7 +360,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + jcicZ442.getJcicZ442Id());
     if (!empNot.isEmpty())
       jcicZ442.setLastUpdateEmpNo(empNot);
@@ -405,7 +412,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (JcicZ442 t : jcicZ442){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -439,7 +449,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (jcicZ442 == null || jcicZ442.size() == 0)
       throw new DBException(6);

@@ -22,6 +22,7 @@ public class GuarantorId implements Serializable {
 	private static final long serialVersionUID = -6782447489145964431L;
 
 // 核准號碼
+  /* 規劃調整為ApplNo */
   @Column(name = "`ApproveNo`")
   private int approveNo = 0;
 
@@ -39,7 +40,7 @@ public class GuarantorId implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 
+	* 規劃調整為ApplNo
 	* @return Integer
 	*/
   public int getApproveNo() {
@@ -48,7 +49,7 @@ public class GuarantorId implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 
+	* 規劃調整為ApplNo
   *
   * @param approveNo 核准號碼
 	*/

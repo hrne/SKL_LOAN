@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.BatxHeadRepositoryHist;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("batxHeadService")
 @Repository
-public class BatxHeadServiceImpl implements BatxHeadService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BatxHeadServiceImpl.class);
-
+public class BatxHeadServiceImpl extends ASpringJpaParm implements BatxHeadService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class BatxHeadServiceImpl implements BatxHeadService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + batxHeadId);
+    this.info("findById " + dbName + " " + batxHeadId);
     Optional<BatxHead> batxHead = null;
     if (dbName.equals(ContentName.onDay))
       batxHead = batxHeadReposDay.findById(batxHeadId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "BatchNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "BatchNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = batxHeadReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = batxHeadReposHist.findAll(pageable);
     else 
       slice = batxHeadRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acDateRange " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1);
+    this.info("acDateRange " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxHeadReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByBatchNoAsc(acDate_0, acDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = batxHeadRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByBatchNoAsc(acDate_0, acDate_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("batchNoFirst " + dbName + " : " + "acDate_0 : " + acDate_0);
+    this.info("batchNoFirst " + dbName + " : " + "acDate_0 : " + acDate_0);
     Optional<BatxHead> batxHeadT = null;
     if (dbName.equals(ContentName.onDay))
       batxHeadT = batxHeadReposDay.findTopByAcDateIsOrderByBatchNoDesc(acDate_0);
@@ -150,6 +153,7 @@ em = null;
       batxHeadT = batxHeadReposHist.findTopByAcDateIsOrderByBatchNoDesc(acDate_0);
     else 
       batxHeadT = batxHeadRepos.findTopByAcDateIsOrderByBatchNoDesc(acDate_0);
+
     return batxHeadT.isPresent() ? batxHeadT.get() : null;
   }
 
@@ -158,7 +162,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("titaTxCdFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaTxCd_1 : " +  titaTxCd_1 + " batxExeCode_2 : " +  batxExeCode_2);
+    this.info("titaTxCdFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaTxCd_1 : " +  titaTxCd_1 + " batxExeCode_2 : " +  batxExeCode_2);
     Optional<BatxHead> batxHeadT = null;
     if (dbName.equals(ContentName.onDay))
       batxHeadT = batxHeadReposDay.findTopByAcDateIsAndTitaTxCdIsAndBatxExeCodeNotOrderByBatchNoDesc(acDate_0, titaTxCd_1, batxExeCode_2);
@@ -168,6 +172,7 @@ em = null;
       batxHeadT = batxHeadReposHist.findTopByAcDateIsAndTitaTxCdIsAndBatxExeCodeNotOrderByBatchNoDesc(acDate_0, titaTxCd_1, batxExeCode_2);
     else 
       batxHeadT = batxHeadRepos.findTopByAcDateIsAndTitaTxCdIsAndBatxExeCodeNotOrderByBatchNoDesc(acDate_0, titaTxCd_1, batxExeCode_2);
+
     return batxHeadT.isPresent() ? batxHeadT.get() : null;
   }
 
@@ -176,7 +181,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxHeadId);
+    this.info("Hold " + dbName + " " + batxHeadId);
     Optional<BatxHead> batxHead = null;
     if (dbName.equals(ContentName.onDay))
       batxHead = batxHeadReposDay.findByBatxHeadId(batxHeadId);
@@ -194,7 +199,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxHead.getBatxHeadId());
+    this.info("Hold " + dbName + " " + batxHead.getBatxHeadId());
     Optional<BatxHead> batxHeadT = null;
     if (dbName.equals(ContentName.onDay))
       batxHeadT = batxHeadReposDay.findByBatxHeadId(batxHead.getBatxHeadId());
@@ -215,8 +220,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + batxHead.getBatxHeadId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + batxHead.getBatxHeadId());
     if (this.findById(batxHead.getBatxHeadId()) != null)
       throw new DBException(2);
 
@@ -244,8 +251,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + batxHead.getBatxHeadId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + batxHead.getBatxHeadId());
     if (!empNot.isEmpty())
       batxHead.setLastUpdateEmpNo(empNot);
 
@@ -267,8 +276,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + batxHead.getBatxHeadId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + batxHead.getBatxHeadId());
     if (!empNot.isEmpty())
       batxHead.setLastUpdateEmpNo(empNot);
 
@@ -288,7 +299,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + batxHead.getBatxHeadId());
+    this.info("Delete..." + dbName + " " + batxHead.getBatxHeadId());
     if (dbName.equals(ContentName.onDay)) {
       batxHeadReposDay.delete(batxHead);	
       batxHeadReposDay.flush();
@@ -317,7 +328,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (BatxHead t : batxHead){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -351,8 +365,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (batxHead == null || batxHead.size() == 0)
       throw new DBException(6);
 
@@ -381,7 +397,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BatxHead> batxHead, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

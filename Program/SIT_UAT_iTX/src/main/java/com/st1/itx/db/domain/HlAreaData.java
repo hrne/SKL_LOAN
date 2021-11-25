@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Column;
 
 /**
- * HlAreaData 顧客資料主檔<br>
+ * HlAreaData 區域資料主檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.CustFinRepositoryHist;
 import com.st1.itx.db.service.CustFinService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("custFinService")
 @Repository
-public class CustFinServiceImpl implements CustFinService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CustFinServiceImpl.class);
-
+public class CustFinServiceImpl extends ASpringJpaParm implements CustFinService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class CustFinServiceImpl implements CustFinService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + custFinId);
+    this.info("findById " + dbName + " " + custFinId);
     Optional<CustFin> custFin = null;
     if (dbName.equals(ContentName.onDay))
       custFin = custFinReposDay.findById(custFinId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustUKey", "DataYear"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustUKey", "DataYear"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = custFinReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = custFinReposHist.findAll(pageable);
     else 
       slice = custFinRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("custUKeyEq " + dbName + " : " + "custUKey_0 : " + custUKey_0);
+    this.info("custUKeyEq " + dbName + " : " + "custUKey_0 : " + custUKey_0);
     if (dbName.equals(ContentName.onDay))
       slice = custFinReposDay.findAllByCustUKeyIsOrderByDataYearDesc(custUKey_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = custFinRepos.findAllByCustUKeyIsOrderByDataYearDesc(custUKey_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + custFinId);
+    this.info("Hold " + dbName + " " + custFinId);
     Optional<CustFin> custFin = null;
     if (dbName.equals(ContentName.onDay))
       custFin = custFinReposDay.findByCustFinId(custFinId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + custFin.getCustFinId());
+    this.info("Hold " + dbName + " " + custFin.getCustFinId());
     Optional<CustFin> custFinT = null;
     if (dbName.equals(ContentName.onDay))
       custFinT = custFinReposDay.findByCustFinId(custFin.getCustFinId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + custFin.getCustFinId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + custFin.getCustFinId());
     if (this.findById(custFin.getCustFinId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + custFin.getCustFinId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + custFin.getCustFinId());
     if (!empNot.isEmpty())
       custFin.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + custFin.getCustFinId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + custFin.getCustFinId());
     if (!empNot.isEmpty())
       custFin.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + custFin.getCustFinId());
+    this.info("Delete..." + dbName + " " + custFin.getCustFinId());
     if (dbName.equals(ContentName.onDay)) {
       custFinReposDay.delete(custFin);	
       custFinReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CustFin t : custFin){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (custFin == null || custFin.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CustFin> custFin, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

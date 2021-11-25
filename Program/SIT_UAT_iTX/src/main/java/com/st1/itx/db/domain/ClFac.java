@@ -74,7 +74,7 @@ public class ClFac implements Serializable {
   @Column(name = "`ShareAmt`")
   private BigDecimal shareAmt = new BigDecimal("0");
 
-  // 設定金額
+  // 設定金額/股數
   /* 擔保品與額度綁定時當下的設定金額(擔保品最新的設定金額應到各類擔保品檔查詢) */
   @Column(name = "`OriSettingAmt`")
   private BigDecimal oriSettingAmt = new BigDecimal("0");
@@ -288,7 +288,7 @@ N:否
   }
 
 /**
-	* 設定金額<br>
+	* 設定金額/股數<br>
 	* 擔保品與額度綁定時當下的設定金額
 (擔保品最新的設定金額應到各類擔保品檔查詢)
 	* @return BigDecimal
@@ -298,11 +298,11 @@ N:否
   }
 
 /**
-	* 設定金額<br>
+	* 設定金額/股數<br>
 	* 擔保品與額度綁定時當下的設定金額
 (擔保品最新的設定金額應到各類擔保品檔查詢)
   *
-  * @param oriSettingAmt 設定金額
+  * @param oriSettingAmt 設定金額/股數
 	*/
   public void setOriSettingAmt(BigDecimal oriSettingAmt) {
     this.oriSettingAmt = oriSettingAmt;

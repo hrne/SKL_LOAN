@@ -29,7 +29,7 @@ public class BatxRateChange implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1055386299672988675L;
 
 @EmbeddedId
   private BatxRateChangeId batxRateChangeId;
@@ -77,7 +77,7 @@ public class BatxRateChange implements Serializable {
   @Column(name = "`AdjCode`")
   private int adjCode = 0;
 
-  // 是否輸入利率
+  // 利率輸入記號
   /* 0.未調整1.已調整2.待輸入3.已輸入9.待處理(檢核有誤) */
   @Column(name = "`RateKeyInCode`")
   private int rateKeyInCode = 0;
@@ -434,7 +434,7 @@ public class BatxRateChange implements Serializable {
   }
 
 /**
-	* 是否輸入利率<br>
+	* 利率輸入記號<br>
 	* 0.未調整
 1.已調整
 2.待輸入
@@ -447,14 +447,14 @@ public class BatxRateChange implements Serializable {
   }
 
 /**
-	* 是否輸入利率<br>
+	* 利率輸入記號<br>
 	* 0.未調整
 1.已調整
 2.待輸入
 3.已輸入
 9.待處理(檢核有誤)
   *
-  * @param rateKeyInCode 是否輸入利率
+  * @param rateKeyInCode 利率輸入記號
 	*/
   public void setRateKeyInCode(int rateKeyInCode) {
     this.rateKeyInCode = rateKeyInCode;

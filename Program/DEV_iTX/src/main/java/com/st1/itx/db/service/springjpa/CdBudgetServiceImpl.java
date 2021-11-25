@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.CdBudgetRepositoryHist;
 import com.st1.itx.db.service.CdBudgetService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdBudgetService")
 @Repository
-public class CdBudgetServiceImpl implements CdBudgetService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdBudgetServiceImpl.class);
-
+public class CdBudgetServiceImpl extends ASpringJpaParm implements CdBudgetService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class CdBudgetServiceImpl implements CdBudgetService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdBudgetId);
+    this.info("findById " + dbName + " " + cdBudgetId);
     Optional<CdBudget> cdBudget = null;
     if (dbName.equals(ContentName.onDay))
       cdBudget = cdBudgetReposDay.findById(cdBudgetId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Year", "Month"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Year", "Month"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdBudgetReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = cdBudgetReposHist.findAll(pageable);
     else 
       slice = cdBudgetRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findYearMonth " + dbName + " : " + "year_0 : " + year_0 + " year_1 : " +  year_1 + " month_2 : " +  month_2 + " month_3 : " +  month_3);
+    this.info("findYearMonth " + dbName + " : " + "year_0 : " + year_0 + " year_1 : " +  year_1 + " month_2 : " +  month_2 + " month_3 : " +  month_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdBudgetReposDay.findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(year_0, year_1, month_2, month_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = cdBudgetRepos.findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(year_0, year_1, month_2, month_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBudgetId);
+    this.info("Hold " + dbName + " " + cdBudgetId);
     Optional<CdBudget> cdBudget = null;
     if (dbName.equals(ContentName.onDay))
       cdBudget = cdBudgetReposDay.findByCdBudgetId(cdBudgetId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBudget.getCdBudgetId());
+    this.info("Hold " + dbName + " " + cdBudget.getCdBudgetId());
     Optional<CdBudget> cdBudgetT = null;
     if (dbName.equals(ContentName.onDay))
       cdBudgetT = cdBudgetReposDay.findByCdBudgetId(cdBudget.getCdBudgetId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdBudget.getCdBudgetId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdBudget.getCdBudgetId());
     if (this.findById(cdBudget.getCdBudgetId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBudget.getCdBudgetId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBudget.getCdBudgetId());
     if (!empNot.isEmpty())
       cdBudget.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBudget.getCdBudgetId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBudget.getCdBudgetId());
     if (!empNot.isEmpty())
       cdBudget.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdBudget.getCdBudgetId());
+    this.info("Delete..." + dbName + " " + cdBudget.getCdBudgetId());
     if (dbName.equals(ContentName.onDay)) {
       cdBudgetReposDay.delete(cdBudget);	
       cdBudgetReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdBudget t : cdBudget){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdBudget == null || cdBudget.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdBudget> cdBudget, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

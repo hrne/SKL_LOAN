@@ -27,7 +27,7 @@ public interface EmpDeductMediaRepositoryDay extends JpaRepository<EmpDeductMedi
   public Optional<EmpDeductMedia> findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(int acDate_0, String batchNo_1, int detailSeq_2);
 
   // MediaKind = ,AND CustNo = ,AND EntryDate = ,AND RepayCode = ,AND RepayAmt = 
-  public Optional<EmpDeductMedia> findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(String mediaKind_0, int custNo_1, int entryDate_2, int repayCode_3, BigDecimal repayAmt_4);
+  public Optional<EmpDeductMedia> findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIsOrderByMediaDateDesc(String mediaKind_0, int custNo_1, int entryDate_2, int repayCode_3, BigDecimal repayAmt_4);
 
   // MediaDate >= , AND MediaDate <= , AND MediaKind = 
   public Slice<EmpDeductMedia> findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualAndMediaKindIsOrderByMediaSeqAsc(int mediaDate_0, int mediaDate_1, String mediaKind_2, Pageable pageable);

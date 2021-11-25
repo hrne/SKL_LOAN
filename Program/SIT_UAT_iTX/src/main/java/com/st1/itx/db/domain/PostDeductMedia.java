@@ -51,7 +51,7 @@ public class PostDeductMedia implements Serializable {
   private int facmNo = 0;
 
   // 還款類別
-  /* 0.債協暫收款1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他11.債協匯入款(虛擬帳號為9510500NNNNNNN) */
+  /* CdCode:RepayType0.債協暫收款1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他11.債協匯入款(虛擬帳號為9510500NNNNNNN) */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -65,7 +65,7 @@ public class PostDeductMedia implements Serializable {
   private String procNoteCode;
 
   // 帳戶別
-  /* P：存簿G：劃撥 */
+  /* CdCode:PostDepCodeP：存簿G：劃撥 */
   @Column(name = "`PostDepCode`", length = 1)
   private String postDepCode;
 
@@ -98,6 +98,7 @@ public class PostDeductMedia implements Serializable {
   private String outsrcRemark;
 
   // 會計日期
+  /* 提回會計日期 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -214,7 +215,8 @@ public class PostDeductMedia implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
+0.債協暫收款
 1.期款
 2.部分償還
 3.結案
@@ -232,7 +234,8 @@ public class PostDeductMedia implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
+0.債協暫收款
 1.期款
 2.部分償還
 3.結案
@@ -291,7 +294,8 @@ else-參照需求書
 
 /**
 	* 帳戶別<br>
-	* P：存簿G：劃撥
+	* CdCode:PostDepCode
+P：存簿G：劃撥
 	* @return String
 	*/
   public String getPostDepCode() {
@@ -300,7 +304,8 @@ else-參照需求書
 
 /**
 	* 帳戶別<br>
-	* P：存簿G：劃撥
+	* CdCode:PostDepCode
+P：存簿G：劃撥
   *
   * @param postDepCode 帳戶別
 	*/
@@ -432,7 +437,7 @@ else-參照需求書
 
 /**
 	* 會計日期<br>
-	* 
+	* 提回會計日期
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -441,7 +446,7 @@ else-參照需求書
 
 /**
 	* 會計日期<br>
-	* 
+	* 提回會計日期
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/

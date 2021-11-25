@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.EmpDeductDtlRepositoryHist;
 import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("empDeductDtlService")
 @Repository
-public class EmpDeductDtlServiceImpl implements EmpDeductDtlService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(EmpDeductDtlServiceImpl.class);
-
+public class EmpDeductDtlServiceImpl extends ASpringJpaParm implements EmpDeductDtlService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class EmpDeductDtlServiceImpl implements EmpDeductDtlService, Initializin
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + empDeductDtlId);
+    this.info("findById " + dbName + " " + empDeductDtlId);
     Optional<EmpDeductDtl> empDeductDtl = null;
     if (dbName.equals(ContentName.onDay))
       empDeductDtl = empDeductDtlReposDay.findById(empDeductDtlId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "EntryDate", "CustNo", "AchRepayCode", "PerfMonth", "ProcCode", "RepayCode", "AcctCode", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "EntryDate", "CustNo", "AchRepayCode", "PerfMonth", "ProcCode", "RepayCode", "AcctCode", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductDtlReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = empDeductDtlRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("mediaSeqFirst " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaKind_1 : " +  mediaKind_1 + " mediaSeq_2 : " +  mediaSeq_2);
+    this.info("mediaSeqFirst " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaKind_1 : " +  mediaKind_1 + " mediaSeq_2 : " +  mediaSeq_2);
     Optional<EmpDeductDtl> empDeductDtlT = null;
     if (dbName.equals(ContentName.onDay))
       empDeductDtlT = empDeductDtlReposDay.findTopByMediaDateIsAndMediaKindIsAndMediaSeqIs(mediaDate_0, mediaKind_1, mediaSeq_2);
@@ -125,6 +125,7 @@ em = null;
       empDeductDtlT = empDeductDtlReposHist.findTopByMediaDateIsAndMediaKindIsAndMediaSeqIs(mediaDate_0, mediaKind_1, mediaSeq_2);
     else 
       empDeductDtlT = empDeductDtlRepos.findTopByMediaDateIsAndMediaKindIsAndMediaSeqIs(mediaDate_0, mediaKind_1, mediaSeq_2);
+
     return empDeductDtlT.isPresent() ? empDeductDtlT.get() : null;
   }
 
@@ -140,7 +141,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("entryDateRng " + dbName + " : " + "entryDate_1 : " + entryDate_1 + " entryDate_2 : " +  entryDate_2 + " procCode_3 : " +  procCode_3);
+    this.info("entryDateRng " + dbName + " : " + "entryDate_1 : " + entryDate_1 + " entryDate_2 : " +  entryDate_2 + " procCode_3 : " +  procCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductDtlReposDay.findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_1, entryDate_2, procCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -149,6 +150,9 @@ em = null;
       slice = empDeductDtlReposHist.findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_1, entryDate_2, procCode_3, pageable);
     else 
       slice = empDeductDtlRepos.findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_1, entryDate_2, procCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -165,7 +169,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("mediaSeqEq " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaKind_1 : " +  mediaKind_1 + " mediaSeq_2 : " +  mediaSeq_2);
+    this.info("mediaSeqEq " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaKind_1 : " +  mediaKind_1 + " mediaSeq_2 : " +  mediaSeq_2);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductDtlReposDay.findAllByMediaDateIsAndMediaKindIsAndMediaSeqIs(mediaDate_0, mediaKind_1, mediaSeq_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -175,6 +179,9 @@ em = null;
     else 
       slice = empDeductDtlRepos.findAllByMediaDateIsAndMediaKindIsAndMediaSeqIs(mediaDate_0, mediaKind_1, mediaSeq_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -183,7 +190,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + empDeductDtlId);
+    this.info("Hold " + dbName + " " + empDeductDtlId);
     Optional<EmpDeductDtl> empDeductDtl = null;
     if (dbName.equals(ContentName.onDay))
       empDeductDtl = empDeductDtlReposDay.findByEmpDeductDtlId(empDeductDtlId);
@@ -201,7 +208,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + empDeductDtl.getEmpDeductDtlId());
+    this.info("Hold " + dbName + " " + empDeductDtl.getEmpDeductDtlId());
     Optional<EmpDeductDtl> empDeductDtlT = null;
     if (dbName.equals(ContentName.onDay))
       empDeductDtlT = empDeductDtlReposDay.findByEmpDeductDtlId(empDeductDtl.getEmpDeductDtlId());
@@ -222,8 +229,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
     if (this.findById(empDeductDtl.getEmpDeductDtlId()) != null)
       throw new DBException(2);
 
@@ -251,8 +260,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
     if (!empNot.isEmpty())
       empDeductDtl.setLastUpdateEmpNo(empNot);
 
@@ -274,8 +285,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
     if (!empNot.isEmpty())
       empDeductDtl.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +308,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
+    this.info("Delete..." + dbName + " " + empDeductDtl.getEmpDeductDtlId());
     if (dbName.equals(ContentName.onDay)) {
       empDeductDtlReposDay.delete(empDeductDtl);	
       empDeductDtlReposDay.flush();
@@ -324,7 +337,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (EmpDeductDtl t : empDeductDtl){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -358,8 +374,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (empDeductDtl == null || empDeductDtl.size() == 0)
       throw new DBException(6);
 
@@ -388,7 +406,7 @@ em = null;
 
   @Override
   public void deleteAll(List<EmpDeductDtl> empDeductDtl, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

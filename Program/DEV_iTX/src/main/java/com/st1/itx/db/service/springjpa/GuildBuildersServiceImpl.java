@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.GuildBuildersRepositoryHist;
 import com.st1.itx.db.service.GuildBuildersService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("guildBuildersService")
 @Repository
-public class GuildBuildersServiceImpl implements GuildBuildersService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(GuildBuildersServiceImpl.class);
-
+public class GuildBuildersServiceImpl extends ASpringJpaParm implements GuildBuildersService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class GuildBuildersServiceImpl implements GuildBuildersService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + custNo);
+    this.info("findById " + dbName + " " + custNo);
     Optional<GuildBuilders> guildBuilders = null;
     if (dbName.equals(ContentName.onDay))
       guildBuilders = guildBuildersReposDay.findById(custNo);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = guildBuildersReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
     else 
       slice = guildBuildersRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -114,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + custNo);
+    this.info("Hold " + dbName + " " + custNo);
     Optional<GuildBuilders> guildBuilders = null;
     if (dbName.equals(ContentName.onDay))
       guildBuilders = guildBuildersReposDay.findByCustNo(custNo);
@@ -132,7 +132,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + guildBuilders.getCustNo());
+    this.info("Hold " + dbName + " " + guildBuilders.getCustNo());
     Optional<GuildBuilders> guildBuildersT = null;
     if (dbName.equals(ContentName.onDay))
       guildBuildersT = guildBuildersReposDay.findByCustNo(guildBuilders.getCustNo());
@@ -153,13 +153,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + guildBuilders.getCustNo());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + guildBuilders.getCustNo());
     if (this.findById(guildBuilders.getCustNo()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       guildBuilders.setCreateEmpNo(empNot);
+
+    if(guildBuilders.getLastUpdateEmpNo() == null || guildBuilders.getLastUpdateEmpNo().isEmpty())
+      guildBuilders.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return guildBuildersReposDay.saveAndFlush(guildBuilders);	
@@ -179,8 +184,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + guildBuilders.getCustNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + guildBuilders.getCustNo());
     if (!empNot.isEmpty())
       guildBuilders.setLastUpdateEmpNo(empNot);
 
@@ -202,8 +209,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + guildBuilders.getCustNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + guildBuilders.getCustNo());
     if (!empNot.isEmpty())
       guildBuilders.setLastUpdateEmpNo(empNot);
 
@@ -223,7 +232,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + guildBuilders.getCustNo());
+    this.info("Delete..." + dbName + " " + guildBuilders.getCustNo());
     if (dbName.equals(ContentName.onDay)) {
       guildBuildersReposDay.delete(guildBuilders);	
       guildBuildersReposDay.flush();
@@ -252,11 +261,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (GuildBuilders t : guildBuilders) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (GuildBuilders t : guildBuilders){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       guildBuilders = guildBuildersReposDay.saveAll(guildBuilders);	
@@ -284,8 +298,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (guildBuilders == null || guildBuilders.size() == 0)
       throw new DBException(6);
 
@@ -314,7 +330,7 @@ em = null;
 
   @Override
   public void deleteAll(List<GuildBuilders> guildBuilders, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

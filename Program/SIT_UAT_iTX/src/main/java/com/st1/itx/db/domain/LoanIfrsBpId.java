@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * LoanIfrsBp IFRS9欄位清單B檔<br>
+ * LoanIfrsBp IFRS9欄位清單2<br>
  * Gen By Tool
  * 
  * @author AdamPan

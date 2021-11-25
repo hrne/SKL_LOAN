@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -32,7 +31,7 @@ public class JcicZ570Id implements Serializable {
   @Column(name = "`CustId`", length = 10)
   private String custId = " ";
 
-  // 款項統一收付申請日
+  // 申請日期
   @Column(name = "`ApplyDate`")
   private int applyDate = 0;
 
@@ -84,7 +83,7 @@ public class JcicZ570Id implements Serializable {
   }
 
 /**
-	* 款項統一收付申請日<br>
+	* 申請日期<br>
 	* 
 	* @return Integer
 	*/
@@ -93,10 +92,10 @@ public class JcicZ570Id implements Serializable {
   }
 
 /**
-	* 款項統一收付申請日<br>
+	* 申請日期<br>
 	* 
   *
-  * @param applyDate 款項統一收付申請日
+  * @param applyDate 申請日期
   * @throws LogicException when Date Is Warn	*/
   public void setApplyDate(int applyDate) throws LogicException {
     this.applyDate = StaticTool.rocToBc(applyDate);

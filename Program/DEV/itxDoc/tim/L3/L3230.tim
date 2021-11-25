@@ -51,6 +51,7 @@ FacmNo=9,3
 TempReasonCode=9,1
 TempItemCode=9,2
 CurrencyCode=X,3
+AcSubBookCode=X,3
 TimTempAmt=9,14.2
 ChangeDate=9,7
 ChangeItemCode=9,2

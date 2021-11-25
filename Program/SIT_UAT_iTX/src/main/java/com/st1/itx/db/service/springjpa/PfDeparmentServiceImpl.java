@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.PfDeparmentRepositoryHist;
 import com.st1.itx.db.service.PfDeparmentService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("pfDeparmentService")
 @Repository
-public class PfDeparmentServiceImpl implements PfDeparmentService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(PfDeparmentServiceImpl.class);
-
+public class PfDeparmentServiceImpl extends ASpringJpaParm implements PfDeparmentService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class PfDeparmentServiceImpl implements PfDeparmentService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + pfDeparmentId);
+    this.info("findById " + dbName + " " + pfDeparmentId);
     Optional<PfDeparment> pfDeparment = null;
     if (dbName.equals(ContentName.onDay))
       pfDeparment = pfDeparmentReposDay.findById(pfDeparmentId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DistCode", "DeptCode", "UnitCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DistCode", "DeptCode", "UnitCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByDeptCode " + dbName + " : " + "deptCode_0 : " + deptCode_0);
+    this.info("findByDeptCode " + dbName + " : " + "deptCode_0 : " + deptCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAllByDeptCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(deptCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByDistCode " + dbName + " : " + "distCode_0 : " + distCode_0);
+    this.info("findByDistCode " + dbName + " : " + "distCode_0 : " + distCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAllByDistCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(distCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,7 +178,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByUnitCode " + dbName + " : " + "unitCode_0 : " + unitCode_0);
+    this.info("findByUnitCode " + dbName + " : " + "unitCode_0 : " + unitCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAllByUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(unitCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -209,7 +206,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByDeptCodeAndDistCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " distCode_1 : " +  distCode_1);
+    this.info("findByDeptCodeAndDistCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " distCode_1 : " +  distCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAllByDeptCodeIsAndDistCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(deptCode_0, distCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -237,7 +234,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByDeptCodeAndUnitCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " unitCode_1 : " +  unitCode_1);
+    this.info("findByDeptCodeAndUnitCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " unitCode_1 : " +  unitCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAllByDeptCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(deptCode_0, unitCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -265,7 +262,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByDistCodeAndUnitCode " + dbName + " : " + "distCode_0 : " + distCode_0 + " unitCode_1 : " +  unitCode_1);
+    this.info("findByDistCodeAndUnitCode " + dbName + " : " + "distCode_0 : " + distCode_0 + " unitCode_1 : " +  unitCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAllByDistCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(distCode_0, unitCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -293,7 +290,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByDeptCodeAndDistCodeAndUnitCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " distCode_1 : " +  distCode_1 + " unitCode_2 : " +  unitCode_2);
+    this.info("findByDeptCodeAndDistCodeAndUnitCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " distCode_1 : " +  distCode_1 + " unitCode_2 : " +  unitCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = pfDeparmentReposDay.findAllByDeptCodeIsAndDistCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(deptCode_0, distCode_1, unitCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -314,7 +311,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + pfDeparmentId);
+    this.info("Hold " + dbName + " " + pfDeparmentId);
     Optional<PfDeparment> pfDeparment = null;
     if (dbName.equals(ContentName.onDay))
       pfDeparment = pfDeparmentReposDay.findByPfDeparmentId(pfDeparmentId);
@@ -332,7 +329,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + pfDeparment.getPfDeparmentId());
+    this.info("Hold " + dbName + " " + pfDeparment.getPfDeparmentId());
     Optional<PfDeparment> pfDeparmentT = null;
     if (dbName.equals(ContentName.onDay))
       pfDeparmentT = pfDeparmentReposDay.findByPfDeparmentId(pfDeparment.getPfDeparmentId());
@@ -353,8 +350,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + pfDeparment.getPfDeparmentId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + pfDeparment.getPfDeparmentId());
     if (this.findById(pfDeparment.getPfDeparmentId()) != null)
       throw new DBException(2);
 
@@ -382,8 +381,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + pfDeparment.getPfDeparmentId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + pfDeparment.getPfDeparmentId());
     if (!empNot.isEmpty())
       pfDeparment.setLastUpdateEmpNo(empNot);
 
@@ -405,8 +406,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + pfDeparment.getPfDeparmentId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + pfDeparment.getPfDeparmentId());
     if (!empNot.isEmpty())
       pfDeparment.setLastUpdateEmpNo(empNot);
 
@@ -426,7 +429,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + pfDeparment.getPfDeparmentId());
+    this.info("Delete..." + dbName + " " + pfDeparment.getPfDeparmentId());
     if (dbName.equals(ContentName.onDay)) {
       pfDeparmentReposDay.delete(pfDeparment);	
       pfDeparmentReposDay.flush();
@@ -455,7 +458,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (PfDeparment t : pfDeparment){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -489,8 +495,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (pfDeparment == null || pfDeparment.size() == 0)
       throw new DBException(6);
 
@@ -519,7 +527,7 @@ em = null;
 
   @Override
   public void deleteAll(List<PfDeparment> pfDeparment, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

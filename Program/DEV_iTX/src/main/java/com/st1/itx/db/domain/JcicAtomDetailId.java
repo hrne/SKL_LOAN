@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+
 /**
  * JcicAtomDetail 債務匯入資料功能明細檔<br>
  * Gen By Tool

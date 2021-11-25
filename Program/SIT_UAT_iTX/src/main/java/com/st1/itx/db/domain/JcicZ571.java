@@ -52,7 +52,7 @@ public class JcicZ571 implements Serializable {
   @Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
   private String bankId;
 
-  // 更生款項統一收付申請日
+  // 申請日期
   @Column(name = "`ApplyDate`", insertable = false, updatable = false)
   private int applyDate = 0;
 
@@ -190,7 +190,7 @@ public class JcicZ571 implements Serializable {
   }
 
 /**
-	* 更生款項統一收付申請日<br>
+	* 申請日期<br>
 	* 
 	* @return Integer
 	*/
@@ -199,10 +199,10 @@ public class JcicZ571 implements Serializable {
   }
 
 /**
-	* 更生款項統一收付申請日<br>
+	* 申請日期<br>
 	* 
   *
-  * @param applyDate 更生款項統一收付申請日
+  * @param applyDate 申請日期
   * @throws LogicException when Date Is Warn	*/
   public void setApplyDate(int applyDate) throws LogicException {
     this.applyDate = StaticTool.rocToBc(applyDate);

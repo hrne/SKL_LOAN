@@ -40,6 +40,9 @@ public interface JcicZ451RepositoryDay extends JpaRepository<JcicZ451, JcicZ451I
   // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= , AND DelayYM=
   public Optional<JcicZ451> findTopBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsAndDelayYMIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, int delayYM_4);
 
+  // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= 
+  public Slice<JcicZ451> findAllBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByDelayYMDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

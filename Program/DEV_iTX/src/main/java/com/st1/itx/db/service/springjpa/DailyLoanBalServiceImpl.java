@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.DailyLoanBalRepositoryHist;
 import com.st1.itx.db.service.DailyLoanBalService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("dailyLoanBalService")
 @Repository
-public class DailyLoanBalServiceImpl implements DailyLoanBalService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(DailyLoanBalServiceImpl.class);
-
+public class DailyLoanBalServiceImpl extends ASpringJpaParm implements DailyLoanBalService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class DailyLoanBalServiceImpl implements DailyLoanBalService, Initializin
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + dailyLoanBalId);
+    this.info("findById " + dbName + " " + dailyLoanBalId);
     Optional<DailyLoanBal> dailyLoanBal = null;
     if (dbName.equals(ContentName.onDay))
       dailyLoanBal = dailyLoanBalReposDay.findById(dailyLoanBalId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataDate", "CustNo", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataDate", "CustNo", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = dailyLoanBalReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = dailyLoanBalRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("dataDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " dataDate_3 : " +  dataDate_3);
+    this.info("dataDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " dataDate_3 : " +  dataDate_3);
     Optional<DailyLoanBal> dailyLoanBalT = null;
     if (dbName.equals(ContentName.onDay))
       dailyLoanBalT = dailyLoanBalReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDataDateLessThanEqualOrderByDataDateDesc(custNo_0, facmNo_1, bormNo_2, dataDate_3);
@@ -125,6 +125,7 @@ em = null;
       dailyLoanBalT = dailyLoanBalReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDataDateLessThanEqualOrderByDataDateDesc(custNo_0, facmNo_1, bormNo_2, dataDate_3);
     else 
       dailyLoanBalT = dailyLoanBalRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDataDateLessThanEqualOrderByDataDateDesc(custNo_0, facmNo_1, bormNo_2, dataDate_3);
+
     return dailyLoanBalT.isPresent() ? dailyLoanBalT.get() : null;
   }
 
@@ -133,7 +134,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + dailyLoanBalId);
+    this.info("Hold " + dbName + " " + dailyLoanBalId);
     Optional<DailyLoanBal> dailyLoanBal = null;
     if (dbName.equals(ContentName.onDay))
       dailyLoanBal = dailyLoanBalReposDay.findByDailyLoanBalId(dailyLoanBalId);
@@ -151,7 +152,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + dailyLoanBal.getDailyLoanBalId());
+    this.info("Hold " + dbName + " " + dailyLoanBal.getDailyLoanBalId());
     Optional<DailyLoanBal> dailyLoanBalT = null;
     if (dbName.equals(ContentName.onDay))
       dailyLoanBalT = dailyLoanBalReposDay.findByDailyLoanBalId(dailyLoanBal.getDailyLoanBalId());
@@ -172,13 +173,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
     if (this.findById(dailyLoanBal.getDailyLoanBalId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       dailyLoanBal.setCreateEmpNo(empNot);
+
+    if(dailyLoanBal.getLastUpdateEmpNo() == null || dailyLoanBal.getLastUpdateEmpNo().isEmpty())
+      dailyLoanBal.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return dailyLoanBalReposDay.saveAndFlush(dailyLoanBal);	
@@ -198,8 +204,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
     if (!empNot.isEmpty())
       dailyLoanBal.setLastUpdateEmpNo(empNot);
 
@@ -221,8 +229,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
     if (!empNot.isEmpty())
       dailyLoanBal.setLastUpdateEmpNo(empNot);
 
@@ -242,7 +252,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
+    this.info("Delete..." + dbName + " " + dailyLoanBal.getDailyLoanBalId());
     if (dbName.equals(ContentName.onDay)) {
       dailyLoanBalReposDay.delete(dailyLoanBal);	
       dailyLoanBalReposDay.flush();
@@ -271,11 +281,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (DailyLoanBal t : dailyLoanBal) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (DailyLoanBal t : dailyLoanBal){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       dailyLoanBal = dailyLoanBalReposDay.saveAll(dailyLoanBal);	
@@ -303,8 +318,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (dailyLoanBal == null || dailyLoanBal.size() == 0)
       throw new DBException(6);
 
@@ -333,7 +350,7 @@ em = null;
 
   @Override
   public void deleteAll(List<DailyLoanBal> dailyLoanBal, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

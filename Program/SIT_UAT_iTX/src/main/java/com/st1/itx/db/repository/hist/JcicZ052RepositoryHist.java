@@ -40,6 +40,9 @@ public interface JcicZ052RepositoryHist extends JpaRepository<JcicZ052, JcicZ052
   // SubmitKey= , AND CustId= , AND RcDate=
   public Optional<JcicZ052> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2);
 
+  // SubmitKey= , AND CustId= 
+  public Slice<JcicZ052> findAllBySubmitKeyIsAndCustIdIsOrderByCreateDateDesc(String submitKey_0, String custId_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

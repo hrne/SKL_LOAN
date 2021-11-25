@@ -176,8 +176,8 @@ T(2,0000000000+#ClCode1+#ClCode2+#ClNo+Y)
 
 #BtnAddB=x,100,S
 T(2,{cmd=CHAIN; ntxcd=L2017; ntxbuf=#BTNADDBUFB; ntxbuf5=type})
-ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,擔保品額度關聯)
+ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,擔保品額度關聯)
 
 #OOCurrencyCode=X,3,O
 T(3,TWD)

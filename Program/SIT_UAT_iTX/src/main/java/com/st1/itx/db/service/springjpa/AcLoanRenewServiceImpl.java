@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.AcLoanRenewRepositoryHist;
 import com.st1.itx.db.service.AcLoanRenewService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("acLoanRenewService")
 @Repository
-public class AcLoanRenewServiceImpl implements AcLoanRenewService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(AcLoanRenewServiceImpl.class);
-
+public class AcLoanRenewServiceImpl extends ASpringJpaParm implements AcLoanRenewService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class AcLoanRenewServiceImpl implements AcLoanRenewService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + acLoanRenewId);
+    this.info("findById " + dbName + " " + acLoanRenewId);
     Optional<AcLoanRenew> acLoanRenew = null;
     if (dbName.equals(ContentName.onDay))
       acLoanRenew = acLoanRenewReposDay.findById(acLoanRenewId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "NewFacmNo", "NewBormNo", "OldFacmNo", "OldBormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "NewFacmNo", "NewBormNo", "OldFacmNo", "OldBormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = acLoanRenewReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = acLoanRenewReposHist.findAll(pageable);
     else 
       slice = acLoanRenewRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("NewFacmNoNoRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " newFacmNo_1 : " +  newFacmNo_1 + " newFacmNo_2 : " +  newFacmNo_2 + " newBormNo_3 : " +  newBormNo_3 + " newBormNo_4 : " +  newBormNo_4);
+    this.info("NewFacmNoNoRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " newFacmNo_1 : " +  newFacmNo_1 + " newFacmNo_2 : " +  newFacmNo_2 + " newBormNo_3 : " +  newBormNo_3 + " newBormNo_4 : " +  newBormNo_4);
     if (dbName.equals(ContentName.onDay))
       slice = acLoanRenewReposDay.findAllByCustNoIsAndNewFacmNoGreaterThanEqualAndNewFacmNoLessThanEqualAndNewBormNoGreaterThanEqualAndNewBormNoLessThanEqualOrderByNewFacmNoAscNewBormNoAsc(custNo_0, newFacmNo_1, newFacmNo_2, newBormNo_3, newBormNo_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = acLoanRenewReposHist.findAllByCustNoIsAndNewFacmNoGreaterThanEqualAndNewFacmNoLessThanEqualAndNewBormNoGreaterThanEqualAndNewBormNoLessThanEqualOrderByNewFacmNoAscNewBormNoAsc(custNo_0, newFacmNo_1, newFacmNo_2, newBormNo_3, newBormNo_4, pageable);
     else 
       slice = acLoanRenewRepos.findAllByCustNoIsAndNewFacmNoGreaterThanEqualAndNewFacmNoLessThanEqualAndNewBormNoGreaterThanEqualAndNewBormNoLessThanEqualOrderByNewFacmNoAscNewBormNoAsc(custNo_0, newFacmNo_1, newFacmNo_2, newBormNo_3, newBormNo_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL2079 " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " oldFacmNo_2 : " +  oldFacmNo_2 + " oldFacmNo_3 : " +  oldFacmNo_3 + " newFacmNo_4 : " +  newFacmNo_4 + " newFacmNo_5 : " +  newFacmNo_5 + " acDate_6 : " +  acDate_6 + " acDate_7 : " +  acDate_7);
+    this.info("findL2079 " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " oldFacmNo_2 : " +  oldFacmNo_2 + " oldFacmNo_3 : " +  oldFacmNo_3 + " newFacmNo_4 : " +  newFacmNo_4 + " newFacmNo_5 : " +  newFacmNo_5 + " acDate_6 : " +  acDate_6 + " acDate_7 : " +  acDate_7);
     if (dbName.equals(ContentName.onDay))
       slice = acLoanRenewReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndOldFacmNoGreaterThanEqualAndOldFacmNoLessThanEqualAndNewFacmNoGreaterThanEqualAndNewFacmNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByCustNoAscOldFacmNoAscOldBormNoAscNewFacmNoAscNewBormNoAscAcDateAsc(custNo_0, custNo_1, oldFacmNo_2, oldFacmNo_3, newFacmNo_4, newFacmNo_5, acDate_6, acDate_7, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +160,9 @@ em = null;
     else 
       slice = acLoanRenewRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndOldFacmNoGreaterThanEqualAndOldFacmNoLessThanEqualAndNewFacmNoGreaterThanEqualAndNewFacmNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByCustNoAscOldFacmNoAscOldBormNoAscNewFacmNoAscNewBormNoAscAcDateAsc(custNo_0, custNo_1, oldFacmNo_2, oldFacmNo_3, newFacmNo_4, newFacmNo_5, acDate_6, acDate_7, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +171,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + acLoanRenewId);
+    this.info("Hold " + dbName + " " + acLoanRenewId);
     Optional<AcLoanRenew> acLoanRenew = null;
     if (dbName.equals(ContentName.onDay))
       acLoanRenew = acLoanRenewReposDay.findByAcLoanRenewId(acLoanRenewId);
@@ -183,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + acLoanRenew.getAcLoanRenewId());
+    this.info("Hold " + dbName + " " + acLoanRenew.getAcLoanRenewId());
     Optional<AcLoanRenew> acLoanRenewT = null;
     if (dbName.equals(ContentName.onDay))
       acLoanRenewT = acLoanRenewReposDay.findByAcLoanRenewId(acLoanRenew.getAcLoanRenewId());
@@ -204,13 +210,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
     if (this.findById(acLoanRenew.getAcLoanRenewId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       acLoanRenew.setCreateEmpNo(empNot);
+
+    if(acLoanRenew.getLastUpdateEmpNo() == null || acLoanRenew.getLastUpdateEmpNo().isEmpty())
+      acLoanRenew.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return acLoanRenewReposDay.saveAndFlush(acLoanRenew);	
@@ -230,8 +241,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
     if (!empNot.isEmpty())
       acLoanRenew.setLastUpdateEmpNo(empNot);
 
@@ -253,8 +266,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
     if (!empNot.isEmpty())
       acLoanRenew.setLastUpdateEmpNo(empNot);
 
@@ -274,7 +289,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
+    this.info("Delete..." + dbName + " " + acLoanRenew.getAcLoanRenewId());
     if (dbName.equals(ContentName.onDay)) {
       acLoanRenewReposDay.delete(acLoanRenew);	
       acLoanRenewReposDay.flush();
@@ -303,11 +318,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (AcLoanRenew t : acLoanRenew) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (AcLoanRenew t : acLoanRenew){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       acLoanRenew = acLoanRenewReposDay.saveAll(acLoanRenew);	
@@ -335,8 +355,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (acLoanRenew == null || acLoanRenew.size() == 0)
       throw new DBException(6);
 
@@ -365,7 +387,7 @@ em = null;
 
   @Override
   public void deleteAll(List<AcLoanRenew> acLoanRenew, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

@@ -59,7 +59,7 @@ public class BatxCheque implements Serializable {
   private int custNo = 0;
 
   // 票據狀況碼
-  /* 0:未處理1:兌現2:退票3:抽票4:兌現未入帳5:即期票 */
+  /* CdCode:ChequeStatusCode0:未處理1:兌現2:退票3:抽票4:兌現未入帳5:即期票 */
   @Column(name = "`StatusCode`", length = 1)
   private String statusCode;
 
@@ -90,7 +90,7 @@ public class BatxCheque implements Serializable {
   private String processCode;
 
   // 本埠外埠
-  /* 1.本埠2.外埠 */
+  /* CdCode:OutsideCode1.本埠2.外埠 */
   @Column(name = "`OutsideCode`", length = 1)
   private String outsideCode;
 
@@ -123,7 +123,7 @@ public class BatxCheque implements Serializable {
   private String chequeName;
 
   // AML回應碼
-  /* 1.正常2.可疑名單3.未確定4.逾時5.人工檢核-正常6.人工檢核-可疑7.人工檢核-未確定 */
+  /* CdCode:AmlCheckItem0.非可疑名單/已完成名單確認1.需審查/確認2.為凍結名單/未確定名單 */
   @Column(name = "`AmlRsp`", length = 1)
   private String amlRsp;
 
@@ -270,7 +270,8 @@ public class BatxCheque implements Serializable {
 
 /**
 	* 票據狀況碼<br>
-	* 0:未處理
+	* CdCode:ChequeStatusCode
+0:未處理
 1:兌現
 2:退票
 3:抽票
@@ -284,7 +285,8 @@ public class BatxCheque implements Serializable {
 
 /**
 	* 票據狀況碼<br>
-	* 0:未處理
+	* CdCode:ChequeStatusCode
+0:未處理
 1:兌現
 2:退票
 3:抽票
@@ -415,7 +417,8 @@ C:抽/退票
 
 /**
 	* 本埠外埠<br>
-	* 1.本埠
+	* CdCode:OutsideCode
+1.本埠
 2.外埠
 	* @return String
 	*/
@@ -425,7 +428,8 @@ C:抽/退票
 
 /**
 	* 本埠外埠<br>
-	* 1.本埠
+	* CdCode:OutsideCode
+1.本埠
 2.外埠
   *
   * @param outsideCode 本埠外埠
@@ -569,13 +573,10 @@ C:抽/退票
 
 /**
 	* AML回應碼<br>
-	* 1.正常
-2.可疑名單
-3.未確定
-4.逾時
-5.人工檢核-正常
-6.人工檢核-可疑
-7.人工檢核-未確定
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
+1.需審查/確認
+2.為凍結名單/未確定名單
 	* @return String
 	*/
   public String getAmlRsp() {
@@ -584,13 +585,10 @@ C:抽/退票
 
 /**
 	* AML回應碼<br>
-	* 1.正常
-2.可疑名單
-3.未確定
-4.逾時
-5.人工檢核-正常
-6.人工檢核-可疑
-7.人工檢核-未確定
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
+1.需審查/確認
+2.為凍結名單/未確定名單
   *
   * @param amlRsp AML回應碼
 	*/

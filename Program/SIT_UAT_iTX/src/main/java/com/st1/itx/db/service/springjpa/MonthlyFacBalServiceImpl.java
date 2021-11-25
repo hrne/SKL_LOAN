@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.MonthlyFacBalRepositoryHist;
 import com.st1.itx.db.service.MonthlyFacBalService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("monthlyFacBalService")
 @Repository
-public class MonthlyFacBalServiceImpl implements MonthlyFacBalService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(MonthlyFacBalServiceImpl.class);
-
+public class MonthlyFacBalServiceImpl extends ASpringJpaParm implements MonthlyFacBalService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class MonthlyFacBalServiceImpl implements MonthlyFacBalService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + monthlyFacBalId);
+    this.info("findById " + dbName + " " + monthlyFacBalId);
     Optional<MonthlyFacBal> monthlyFacBal = null;
     if (dbName.equals(ContentName.onDay))
       monthlyFacBal = monthlyFacBalReposDay.findById(monthlyFacBalId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = monthlyFacBalReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = monthlyFacBalReposHist.findAll(pageable);
     else 
       slice = monthlyFacBalRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCl " + dbName + " : " + "clCustNo_0 : " + clCustNo_0 + " clFacmNo_1 : " +  clFacmNo_1);
+    this.info("findCl " + dbName + " : " + "clCustNo_0 : " + clCustNo_0 + " clFacmNo_1 : " +  clFacmNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = monthlyFacBalReposDay.findAllByClCustNoIsAndClFacmNoIs(clCustNo_0, clFacmNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = monthlyFacBalRepos.findAllByClCustNoIsAndClFacmNoIs(clCustNo_0, clFacmNo_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + monthlyFacBalId);
+    this.info("Hold " + dbName + " " + monthlyFacBalId);
     Optional<MonthlyFacBal> monthlyFacBal = null;
     if (dbName.equals(ContentName.onDay))
       monthlyFacBal = monthlyFacBalReposDay.findByMonthlyFacBalId(monthlyFacBalId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
+    this.info("Hold " + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
     Optional<MonthlyFacBal> monthlyFacBalT = null;
     if (dbName.equals(ContentName.onDay))
       monthlyFacBalT = monthlyFacBalReposDay.findByMonthlyFacBalId(monthlyFacBal.getMonthlyFacBalId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
     if (this.findById(monthlyFacBal.getMonthlyFacBalId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
     if (!empNot.isEmpty())
       monthlyFacBal.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
     if (!empNot.isEmpty())
       monthlyFacBal.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
+    this.info("Delete..." + dbName + " " + monthlyFacBal.getMonthlyFacBalId());
     if (dbName.equals(ContentName.onDay)) {
       monthlyFacBalReposDay.delete(monthlyFacBal);	
       monthlyFacBalReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (MonthlyFacBal t : monthlyFacBal){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (monthlyFacBal == null || monthlyFacBal.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<MonthlyFacBal> monthlyFacBal, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

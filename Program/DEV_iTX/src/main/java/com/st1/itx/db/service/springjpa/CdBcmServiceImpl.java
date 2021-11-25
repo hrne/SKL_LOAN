@@ -23,6 +23,7 @@ import com.st1.itx.db.repository.hist.CdBcmRepositoryHist;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -442,7 +443,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + cdBcm.getUnitCode());
     if (this.findById(cdBcm.getUnitCode()) != null)
       throw new DBException(2);
@@ -471,7 +474,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + cdBcm.getUnitCode());
     if (!empNot.isEmpty())
       cdBcm.setLastUpdateEmpNo(empNot);
@@ -494,7 +499,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + cdBcm.getUnitCode());
     if (!empNot.isEmpty())
       cdBcm.setLastUpdateEmpNo(empNot);
@@ -544,7 +551,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdBcm t : cdBcm){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -578,7 +588,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (cdBcm == null || cdBcm.size() == 0)
       throw new DBException(6);

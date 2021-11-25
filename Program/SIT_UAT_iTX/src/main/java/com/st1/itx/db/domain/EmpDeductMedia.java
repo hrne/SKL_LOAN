@@ -52,7 +52,7 @@ public class EmpDeductMedia implements Serializable {
   private int custNo = 0;
 
   // 還款類別
-  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他11.債協匯入款(虛擬帳號為9510500NNNNNNN) */
+  /* CdCode:RepayType1.期款5.火險費 */
   @Column(name = "`RepayCode`")
   private int repayCode = 0;
 
@@ -90,15 +90,17 @@ public class EmpDeductMedia implements Serializable {
   private BigDecimal txAmt = new BigDecimal("0");
 
   // 失敗原因
-  /* 16:扣款失敗17:扣款不足….. */
+  /* 01:扣款成功 16:扣款失敗 17:扣款不足….. */
   @Column(name = "`ErrorCode`", length = 2)
   private String errorCode;
 
   // 科目
+  /* 本金科目/000 */
   @Column(name = "`AcctCode`", length = 3)
   private String acctCode;
 
   // 會計日期
+  /* 有回應檔均會更新 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -219,14 +221,7 @@ public class EmpDeductMedia implements Serializable {
 	* 還款類別<br>
 	* CdCode:RepayType
 1.期款
-2.部分償還
-3.結案
-4.帳管費
 5.火險費
-6.契變手續費
-7.法務費
-9.其他
-11.債協匯入款(虛擬帳號為9510500NNNNNNN)
 	* @return Integer
 	*/
   public int getRepayCode() {
@@ -237,14 +232,7 @@ public class EmpDeductMedia implements Serializable {
 	* 還款類別<br>
 	* CdCode:RepayType
 1.期款
-2.部分償還
-3.結案
-4.帳管費
 5.火險費
-6.契變手續費
-7.法務費
-9.其他
-11.債協匯入款(虛擬帳號為9510500NNNNNNN)
   *
   * @param repayCode 還款類別
 	*/
@@ -408,7 +396,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 失敗原因<br>
-	* 16:扣款失敗17:扣款不足…..
+	* 01:扣款成功 16:扣款失敗 17:扣款不足…..
 	* @return String
 	*/
   public String getErrorCode() {
@@ -417,7 +405,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 失敗原因<br>
-	* 16:扣款失敗17:扣款不足…..
+	* 01:扣款成功 16:扣款失敗 17:扣款不足…..
   *
   * @param errorCode 失敗原因
 	*/
@@ -427,7 +415,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 科目<br>
-	* 
+	* 本金科目/000
 	* @return String
 	*/
   public String getAcctCode() {
@@ -436,7 +424,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 科目<br>
-	* 
+	* 本金科目/000
   *
   * @param acctCode 科目
 	*/
@@ -446,7 +434,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 有回應檔均會更新
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -455,7 +443,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 有回應檔均會更新
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/

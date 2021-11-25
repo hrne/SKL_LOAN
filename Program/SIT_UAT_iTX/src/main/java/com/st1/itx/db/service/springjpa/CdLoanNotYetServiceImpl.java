@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.CdLoanNotYetRepositoryHist;
 import com.st1.itx.db.service.CdLoanNotYetService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdLoanNotYetService")
 @Repository
-public class CdLoanNotYetServiceImpl implements CdLoanNotYetService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdLoanNotYetServiceImpl.class);
-
+public class CdLoanNotYetServiceImpl extends ASpringJpaParm implements CdLoanNotYetService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class CdLoanNotYetServiceImpl implements CdLoanNotYetService, Initializin
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + notYetCode);
+    this.info("findById " + dbName + " " + notYetCode);
     Optional<CdLoanNotYet> cdLoanNotYet = null;
     if (dbName.equals(ContentName.onDay))
       cdLoanNotYet = cdLoanNotYetReposDay.findById(notYetCode);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "NotYetCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "NotYetCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdLoanNotYetReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +102,9 @@ em = null;
       slice = cdLoanNotYetReposHist.findAll(pageable);
     else 
       slice = cdLoanNotYetRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("codeLike " + dbName + " : " + "notYetCode_0 : " + notYetCode_0);
+    this.info("codeLike " + dbName + " : " + "notYetCode_0 : " + notYetCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdLoanNotYetReposDay.findAllByNotYetCodeLikeOrderByNotYetCodeAsc(notYetCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
     else 
       slice = cdLoanNotYetRepos.findAllByNotYetCodeLikeOrderByNotYetCodeAsc(notYetCode_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -139,7 +142,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + notYetCode);
+    this.info("Hold " + dbName + " " + notYetCode);
     Optional<CdLoanNotYet> cdLoanNotYet = null;
     if (dbName.equals(ContentName.onDay))
       cdLoanNotYet = cdLoanNotYetReposDay.findByNotYetCode(notYetCode);
@@ -157,7 +160,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdLoanNotYet.getNotYetCode());
+    this.info("Hold " + dbName + " " + cdLoanNotYet.getNotYetCode());
     Optional<CdLoanNotYet> cdLoanNotYetT = null;
     if (dbName.equals(ContentName.onDay))
       cdLoanNotYetT = cdLoanNotYetReposDay.findByNotYetCode(cdLoanNotYet.getNotYetCode());
@@ -178,8 +181,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdLoanNotYet.getNotYetCode());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdLoanNotYet.getNotYetCode());
     if (this.findById(cdLoanNotYet.getNotYetCode()) != null)
       throw new DBException(2);
 
@@ -207,8 +212,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdLoanNotYet.getNotYetCode());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdLoanNotYet.getNotYetCode());
     if (!empNot.isEmpty())
       cdLoanNotYet.setLastUpdateEmpNo(empNot);
 
@@ -230,8 +237,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdLoanNotYet.getNotYetCode());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdLoanNotYet.getNotYetCode());
     if (!empNot.isEmpty())
       cdLoanNotYet.setLastUpdateEmpNo(empNot);
 
@@ -251,7 +260,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdLoanNotYet.getNotYetCode());
+    this.info("Delete..." + dbName + " " + cdLoanNotYet.getNotYetCode());
     if (dbName.equals(ContentName.onDay)) {
       cdLoanNotYetReposDay.delete(cdLoanNotYet);	
       cdLoanNotYetReposDay.flush();
@@ -280,7 +289,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdLoanNotYet t : cdLoanNotYet){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -314,8 +326,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdLoanNotYet == null || cdLoanNotYet.size() == 0)
       throw new DBException(6);
 
@@ -344,7 +358,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdLoanNotYet> cdLoanNotYet, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

@@ -73,15 +73,18 @@ public class L5501 extends TradeBuffer {
 		String FunCode = titaVo.getParam("FunCode").trim();
 		int custNo = Integer.valueOf(titaVo.getParam("CustNo").trim()); // 戶號
 		int facmNo = Integer.valueOf(titaVo.getParam("FacmNo").trim()); // 額度編號
+		int bormNo = Integer.valueOf(titaVo.getParam("BormNo").trim()); // 撥款序號
 		int workMonth = Integer.valueOf(titaVo.getParam("WorkMonth").trim()) + 191100; // 額度編號
 		
-		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmFirst(custNo, facmNo, workMonth, titaVo);
-		
+		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(custNo, facmNo, bormNo, titaVo);
+//		
 		if (pfItDetailAdjust == null) {
 			pfItDetailAdjust = new PfItDetailAdjust();
 			pfItDetailAdjust.setCustNo(custNo);
 			pfItDetailAdjust.setFacmNo(facmNo);
+			pfItDetailAdjust.setBormNo(bormNo);
 			pfItDetailAdjust.setWorkMonth(workMonth);
+			pfItDetailAdjust.setWorkSeason(workSeason(workMonth));
 			pfItDetailAdjust.setAdjRange(0);
 			pfItDetailAdjust.setAdjCntingCode("");
 			pfItDetailAdjust.setAdjPerfEqAmt(new BigDecimal("0"));
@@ -139,5 +142,23 @@ public class L5501 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 		}
+	}
+	
+	private int workSeason(int workMonth) throws LogicException {
+		int season = 0;
+		
+		int month = workMonth % 100;
+		
+		if (month>= 1 && month <= 3) {
+			season = 1;
+		} else if (month>= 4 && month <= 6) {
+			season = 2;
+		} else if (month>= 7 && month <= 9) {
+			season = 3;
+		} else {
+			season = 4;
+		}
+			
+		return season;
 	}
 }

@@ -42,7 +42,7 @@ public class PfReward implements Serializable {
   private Long logNo = 0L;
 
   // 業績日期
-  /* 業績日期=系統營業日1.撥貸(計件代碼變更)，為撥款日期；計件代碼變更不可跨工作月2.部分償還、提前結案，為會計日3.保費檢核追回，為該工作月的業績止日※保費檢核時，獎金欄會重算更新 */
+  /* 1.撥貸(計件代碼變更)，為撥款日期2.部分償還、提前結案，為會計日 */
   @Column(name = "`PerfDate`")
   private int perfDate = 0;
 
@@ -55,12 +55,11 @@ public class PfReward implements Serializable {
   private int facmNo = 0;
 
   // 撥款序號
-  /* 保費檢核追回，以額度為單位，撥款序號=0 */
   @Column(name = "`BormNo`")
   private int bormNo = 0;
 
   // 還款類別
-  /* 0.撥款 1.部分償還 2.提前結案 3.計件代碼變更 */
+  /* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -95,7 +94,7 @@ public class PfReward implements Serializable {
   private BigDecimal introducerBonus = new BigDecimal("0");
 
   // 介紹獎金轉檔日
-  /* 介紹獎金發放日!=0,表示執行過L5511-1 */
+  /* 暫不用 */
   @Column(name = "`IntroducerBonusDate`")
   private int introducerBonusDate = 0;
 
@@ -105,7 +104,7 @@ public class PfReward implements Serializable {
   private BigDecimal introducerAddBonus = new BigDecimal("0");
 
   // 獎勵津貼轉檔日
-  /* 獎勵津貼發放日!=0,表示執行過L5512-1 */
+  /* 暫不用 */
   @Column(name = "`IntroducerAddBonusDate`")
   private int introducerAddBonusDate = 0;
 
@@ -115,7 +114,7 @@ public class PfReward implements Serializable {
   private BigDecimal coorgnizerBonus = new BigDecimal("0");
 
   // 協辦獎金轉檔日
-  /* 協辦獎金發放日!=0,表示執行過L5513-1 */
+  /* 暫不用 */
   @Column(name = "`CoorgnizerBonusDate`")
   private int coorgnizerBonusDate = 0;
 
@@ -168,11 +167,8 @@ public class PfReward implements Serializable {
 
 /**
 	* 業績日期<br>
-	* 業績日期=系統營業日
-1.撥貸(計件代碼變更)，為撥款日期；計件代碼變更不可跨工作月
+	* 1.撥貸(計件代碼變更)，為撥款日期
 2.部分償還、提前結案，為會計日
-3.保費檢核追回，為該工作月的業績止日
-※保費檢核時，獎金欄會重算更新
 	* @return Integer
 	*/
   public int getPerfDate() {
@@ -181,11 +177,8 @@ public class PfReward implements Serializable {
 
 /**
 	* 業績日期<br>
-	* 業績日期=系統營業日
-1.撥貸(計件代碼變更)，為撥款日期；計件代碼變更不可跨工作月
+	* 1.撥貸(計件代碼變更)，為撥款日期
 2.部分償還、提前結案，為會計日
-3.保費檢核追回，為該工作月的業績止日
-※保費檢核時，獎金欄會重算更新
   *
   * @param perfDate 業績日期
   * @throws LogicException when Date Is Warn	*/
@@ -233,7 +226,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 撥款序號<br>
-	* 保費檢核追回，以額度為單位，撥款序號=0
+	* 
 	* @return Integer
 	*/
   public int getBormNo() {
@@ -242,7 +235,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 撥款序號<br>
-	* 保費檢核追回，以額度為單位，撥款序號=0
+	* 
   *
   * @param bormNo 撥款序號
 	*/
@@ -252,7 +245,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款 1.部分償還 2.提前結案 3.計件代碼變更
+	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案
 	* @return Integer
 	*/
   public int getRepayType() {
@@ -261,7 +254,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款 1.部分償還 2.提前結案 3.計件代碼變更
+	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案
   *
   * @param repayType 還款類別
 	*/
@@ -404,7 +397,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 介紹獎金轉檔日<br>
-	* 介紹獎金發放日!=0,表示執行過L5511-1
+	* 暫不用
 	* @return Integer
 	*/
   public int getIntroducerBonusDate() {
@@ -413,7 +406,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 介紹獎金轉檔日<br>
-	* 介紹獎金發放日!=0,表示執行過L5511-1
+	* 暫不用
   *
   * @param introducerBonusDate 介紹獎金轉檔日
   * @throws LogicException when Date Is Warn	*/
@@ -442,7 +435,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 獎勵津貼轉檔日<br>
-	* 獎勵津貼發放日!=0,表示執行過L5512-1
+	* 暫不用
 	* @return Integer
 	*/
   public int getIntroducerAddBonusDate() {
@@ -451,7 +444,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 獎勵津貼轉檔日<br>
-	* 獎勵津貼發放日!=0,表示執行過L5512-1
+	* 暫不用
   *
   * @param introducerAddBonusDate 獎勵津貼轉檔日
   * @throws LogicException when Date Is Warn	*/
@@ -480,7 +473,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 協辦獎金轉檔日<br>
-	* 協辦獎金發放日!=0,表示執行過L5513-1
+	* 暫不用
 	* @return Integer
 	*/
   public int getCoorgnizerBonusDate() {
@@ -489,7 +482,7 @@ public class PfReward implements Serializable {
 
 /**
 	* 協辦獎金轉檔日<br>
-	* 協辦獎金發放日!=0,表示執行過L5513-1
+	* 暫不用
   *
   * @param coorgnizerBonusDate 協辦獎金轉檔日
   * @throws LogicException when Date Is Warn	*/

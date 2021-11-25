@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.Ifrs9LoanDataRepositoryHist;
 import com.st1.itx.db.service.Ifrs9LoanDataService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("ifrs9LoanDataService")
 @Repository
-public class Ifrs9LoanDataServiceImpl implements Ifrs9LoanDataService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(Ifrs9LoanDataServiceImpl.class);
-
+public class Ifrs9LoanDataServiceImpl extends ASpringJpaParm implements Ifrs9LoanDataService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class Ifrs9LoanDataServiceImpl implements Ifrs9LoanDataService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + ifrs9LoanDataId);
+    this.info("findById " + dbName + " " + ifrs9LoanDataId);
     Optional<Ifrs9LoanData> ifrs9LoanData = null;
     if (dbName.equals(ContentName.onDay))
       ifrs9LoanData = ifrs9LoanDataReposDay.findById(ifrs9LoanDataId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = ifrs9LoanDataReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = ifrs9LoanDataRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ifrs9LoanDataId);
+    this.info("Hold " + dbName + " " + ifrs9LoanDataId);
     Optional<Ifrs9LoanData> ifrs9LoanData = null;
     if (dbName.equals(ContentName.onDay))
       ifrs9LoanData = ifrs9LoanDataReposDay.findByIfrs9LoanDataId(ifrs9LoanDataId);
@@ -133,7 +133,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
+    this.info("Hold " + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
     Optional<Ifrs9LoanData> ifrs9LoanDataT = null;
     if (dbName.equals(ContentName.onDay))
       ifrs9LoanDataT = ifrs9LoanDataReposDay.findByIfrs9LoanDataId(ifrs9LoanData.getIfrs9LoanDataId());
@@ -154,8 +154,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
     if (this.findById(ifrs9LoanData.getIfrs9LoanDataId()) != null)
       throw new DBException(2);
 
@@ -183,8 +185,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
     if (!empNot.isEmpty())
       ifrs9LoanData.setLastUpdateEmpNo(empNot);
 
@@ -206,8 +210,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
     if (!empNot.isEmpty())
       ifrs9LoanData.setLastUpdateEmpNo(empNot);
 
@@ -227,7 +233,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
+    this.info("Delete..." + dbName + " " + ifrs9LoanData.getIfrs9LoanDataId());
     if (dbName.equals(ContentName.onDay)) {
       ifrs9LoanDataReposDay.delete(ifrs9LoanData);	
       ifrs9LoanDataReposDay.flush();
@@ -256,7 +262,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (Ifrs9LoanData t : ifrs9LoanData){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -290,8 +299,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (ifrs9LoanData == null || ifrs9LoanData.size() == 0)
       throw new DBException(6);
 
@@ -320,7 +331,7 @@ em = null;
 
   @Override
   public void deleteAll(List<Ifrs9LoanData> ifrs9LoanData, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

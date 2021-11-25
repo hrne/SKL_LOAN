@@ -26,8 +26,8 @@ public class EmpDeductScheduleId implements Serializable {
   @Column(name = "`WorkMonth`")
   private int workMonth = 0;
 
-  // 流程/制度別
-  /* 同CdEmp.AgType1制度別對應扣薪種類於CdCode維護 */
+  // 流程別
+  /* 同CdEmp.AgType1制度別(3、4:15日薪)；流程別對應之扣薪種類，建立於CdCode(EmpDeductType)，1-15日薪:12個月，2-非15日薪:13個工作月 */
   @Column(name = "`AgType1`", length = 1)
   private String agType1 = " ";
 
@@ -59,9 +59,10 @@ public class EmpDeductScheduleId implements Serializable {
   }
 
 /**
-	* 流程/制度別<br>
-	* 同CdEmp.AgType1制度別
-對應扣薪種類於CdCode維護
+	* 流程別<br>
+	* 同CdEmp.AgType1制度別(3、4:15日薪)；
+流程別對應之扣薪種類，建立於CdCode(EmpDeductType)，
+1-15日薪:12個月，2-非15日薪:13個工作月
 	* @return String
 	*/
   public String getAgType1() {
@@ -69,11 +70,12 @@ public class EmpDeductScheduleId implements Serializable {
   }
 
 /**
-	* 流程/制度別<br>
-	* 同CdEmp.AgType1制度別
-對應扣薪種類於CdCode維護
+	* 流程別<br>
+	* 同CdEmp.AgType1制度別(3、4:15日薪)；
+流程別對應之扣薪種類，建立於CdCode(EmpDeductType)，
+1-15日薪:12個月，2-非15日薪:13個工作月
   *
-  * @param agType1 流程/制度別
+  * @param agType1 流程別
 	*/
   public void setAgType1(String agType1) {
     this.agType1 = agType1;

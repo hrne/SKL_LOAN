@@ -255,7 +255,7 @@ public class Ias39Loan34Data implements Serializable {
   private BigDecimal avblBal = new BigDecimal("0");
 
   // 記帳幣別
-  /* TWD */
+  /* NTD */
   @Column(name = "`CurrencyCode`", length = 3)
   private String currencyCode;
 
@@ -295,7 +295,7 @@ public class Ias39Loan34Data implements Serializable {
 
   // 會計科目(8碼)
   /* CdAcCode會計科子細目設定檔，對應 AcctCode */
-  @Column(name = "`AcNoCode`", length = 8)
+  @Column(name = "`AcNoCode`", length = 11)
   private String acNoCode;
 
   // 還款方式(額度)
@@ -1337,7 +1337,7 @@ public class Ias39Loan34Data implements Serializable {
 
 /**
 	* 記帳幣別<br>
-	* TWD
+	* NTD
 	* @return String
 	*/
   public String getCurrencyCode() {
@@ -1346,7 +1346,7 @@ public class Ias39Loan34Data implements Serializable {
 
 /**
 	* 記帳幣別<br>
-	* TWD
+	* NTD
   *
   * @param currencyCode 記帳幣別
 	*/

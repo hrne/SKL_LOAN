@@ -43,6 +43,7 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		String sql = " ";
 		sql += " WITH EDD AS ( ";
 		sql += "     SELECT EDD.\"EntryDate\" ";
+		sql += "          , EDD.\"EmpNo\" ";
 		sql += "          , EDD.\"CustNo\" ";
 		sql += "          , EDD.\"AchRepayCode\" ";
 		sql += "          , EDD.\"PerfMonth\" ";
@@ -61,6 +62,7 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += " ) ";
 		sql += " ,EDD2 AS ( ";
 		sql += "     SELECT EDD.\"EntryDate\" ";
+		sql += "          , EDD.\"EmpNo\" ";
 		sql += "          , EDD.\"CustNo\" ";
 		sql += "          , EDD.\"AchRepayCode\" ";
 		sql += "          , EDD.\"PerfMonth\" ";
@@ -81,7 +83,6 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "      , EDD2.\"CustId\" ";
 		sql += "      , EDD2.\"CustNo\" ";
 		sql += "      , CM.\"CustName\" ";
-		sql += "      , EDD2.\"FacmNo\" ";
 		sql += "      , EDD2.\"FacmNo\" ";
 		sql += "      , IR.\"ClNo\" ";
 		sql += "      , IR.\"FireInsuPrem\" ";

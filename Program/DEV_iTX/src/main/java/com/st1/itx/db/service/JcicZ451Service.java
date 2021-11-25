@@ -107,6 +107,20 @@ public interface JcicZ451Service {
   public JcicZ451 otherFirst(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, int delayYM_4, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= 
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param applyDate_2 applyDate_2
+   * @param courtCode_3 courtCode_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ451 JcicZ451 of List
+   */
+  public Slice<JcicZ451> custRcSubCourtEq(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ451
    * 
    * @param jcicZ451Id key

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.HlAreaDataRepositoryHist;
 import com.st1.itx.db.service.HlAreaDataService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("hlAreaDataService")
 @Repository
-public class HlAreaDataServiceImpl implements HlAreaDataService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(HlAreaDataServiceImpl.class);
-
+public class HlAreaDataServiceImpl extends ASpringJpaParm implements HlAreaDataService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class HlAreaDataServiceImpl implements HlAreaDataService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + areaUnitNo);
+    this.info("findById " + dbName + " " + areaUnitNo);
     Optional<HlAreaData> hlAreaData = null;
     if (dbName.equals(ContentName.onDay))
       hlAreaData = hlAreaDataReposDay.findById(areaUnitNo);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AreaUnitNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AreaUnitNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = hlAreaDataReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +102,9 @@ em = null;
       slice = hlAreaDataReposHist.findAll(pageable);
     else 
       slice = hlAreaDataRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("FindAreaUnitNo " + dbName + " : " + "areaUnitNo_0 : " + areaUnitNo_0);
+    this.info("FindAreaUnitNo " + dbName + " : " + "areaUnitNo_0 : " + areaUnitNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = hlAreaDataReposDay.findAllByAreaUnitNoIsOrderByAreaUnitNoAsc(areaUnitNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -130,6 +130,9 @@ em = null;
       slice = hlAreaDataReposHist.findAllByAreaUnitNoIsOrderByAreaUnitNoAsc(areaUnitNo_0, pageable);
     else 
       slice = hlAreaDataRepos.findAllByAreaUnitNoIsOrderByAreaUnitNoAsc(areaUnitNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -146,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("FindAreaChiefEmpNo " + dbName + " : " + "areaChiefEmpNo_0 : " + areaChiefEmpNo_0);
+    this.info("FindAreaChiefEmpNo " + dbName + " : " + "areaChiefEmpNo_0 : " + areaChiefEmpNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = hlAreaDataReposDay.findAllByAreaChiefEmpNoIsOrderByAreaUnitNoAsc(areaChiefEmpNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +159,9 @@ em = null;
     else 
       slice = hlAreaDataRepos.findAllByAreaChiefEmpNoIsOrderByAreaUnitNoAsc(areaChiefEmpNo_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -164,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + areaUnitNo);
+    this.info("Hold " + dbName + " " + areaUnitNo);
     Optional<HlAreaData> hlAreaData = null;
     if (dbName.equals(ContentName.onDay))
       hlAreaData = hlAreaDataReposDay.findByAreaUnitNo(areaUnitNo);
@@ -182,7 +188,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlAreaData.getAreaUnitNo());
+    this.info("Hold " + dbName + " " + hlAreaData.getAreaUnitNo());
     Optional<HlAreaData> hlAreaDataT = null;
     if (dbName.equals(ContentName.onDay))
       hlAreaDataT = hlAreaDataReposDay.findByAreaUnitNo(hlAreaData.getAreaUnitNo());
@@ -203,13 +209,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + hlAreaData.getAreaUnitNo());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + hlAreaData.getAreaUnitNo());
     if (this.findById(hlAreaData.getAreaUnitNo()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       hlAreaData.setCreateEmpNo(empNot);
+
+    if(hlAreaData.getLastUpdateEmpNo() == null || hlAreaData.getLastUpdateEmpNo().isEmpty())
+      hlAreaData.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return hlAreaDataReposDay.saveAndFlush(hlAreaData);	
@@ -229,8 +240,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlAreaData.getAreaUnitNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlAreaData.getAreaUnitNo());
     if (!empNot.isEmpty())
       hlAreaData.setLastUpdateEmpNo(empNot);
 
@@ -252,8 +265,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlAreaData.getAreaUnitNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlAreaData.getAreaUnitNo());
     if (!empNot.isEmpty())
       hlAreaData.setLastUpdateEmpNo(empNot);
 
@@ -273,7 +288,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + hlAreaData.getAreaUnitNo());
+    this.info("Delete..." + dbName + " " + hlAreaData.getAreaUnitNo());
     if (dbName.equals(ContentName.onDay)) {
       hlAreaDataReposDay.delete(hlAreaData);	
       hlAreaDataReposDay.flush();
@@ -302,11 +317,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (HlAreaData t : hlAreaData) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (HlAreaData t : hlAreaData){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       hlAreaData = hlAreaDataReposDay.saveAll(hlAreaData);	
@@ -334,8 +354,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (hlAreaData == null || hlAreaData.size() == 0)
       throw new DBException(6);
 
@@ -364,7 +386,7 @@ em = null;
 
   @Override
   public void deleteAll(List<HlAreaData> hlAreaData, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

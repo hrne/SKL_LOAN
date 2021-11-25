@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.LoanIfrsApRepositoryHist;
 import com.st1.itx.db.service.LoanIfrsApService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("loanIfrsApService")
 @Repository
-public class LoanIfrsApServiceImpl implements LoanIfrsApService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(LoanIfrsApServiceImpl.class);
-
+public class LoanIfrsApServiceImpl extends ASpringJpaParm implements LoanIfrsApService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class LoanIfrsApServiceImpl implements LoanIfrsApService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + loanIfrsApId);
+    this.info("findById " + dbName + " " + loanIfrsApId);
     Optional<LoanIfrsAp> loanIfrsAp = null;
     if (dbName.equals(ContentName.onDay))
       loanIfrsAp = loanIfrsApReposDay.findById(loanIfrsApId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = loanIfrsApReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = loanIfrsApRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + loanIfrsApId);
+    this.info("Hold " + dbName + " " + loanIfrsApId);
     Optional<LoanIfrsAp> loanIfrsAp = null;
     if (dbName.equals(ContentName.onDay))
       loanIfrsAp = loanIfrsApReposDay.findByLoanIfrsApId(loanIfrsApId);
@@ -133,7 +133,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + loanIfrsAp.getLoanIfrsApId());
+    this.info("Hold " + dbName + " " + loanIfrsAp.getLoanIfrsApId());
     Optional<LoanIfrsAp> loanIfrsApT = null;
     if (dbName.equals(ContentName.onDay))
       loanIfrsApT = loanIfrsApReposDay.findByLoanIfrsApId(loanIfrsAp.getLoanIfrsApId());
@@ -154,8 +154,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
     if (this.findById(loanIfrsAp.getLoanIfrsApId()) != null)
       throw new DBException(2);
 
@@ -183,8 +185,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
     if (!empNot.isEmpty())
       loanIfrsAp.setLastUpdateEmpNo(empNot);
 
@@ -206,8 +210,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
     if (!empNot.isEmpty())
       loanIfrsAp.setLastUpdateEmpNo(empNot);
 
@@ -227,7 +233,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
+    this.info("Delete..." + dbName + " " + loanIfrsAp.getLoanIfrsApId());
     if (dbName.equals(ContentName.onDay)) {
       loanIfrsApReposDay.delete(loanIfrsAp);	
       loanIfrsApReposDay.flush();
@@ -256,7 +262,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (LoanIfrsAp t : loanIfrsAp){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -290,8 +299,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (loanIfrsAp == null || loanIfrsAp.size() == 0)
       throw new DBException(6);
 
@@ -320,7 +331,7 @@ em = null;
 
   @Override
   public void deleteAll(List<LoanIfrsAp> loanIfrsAp, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

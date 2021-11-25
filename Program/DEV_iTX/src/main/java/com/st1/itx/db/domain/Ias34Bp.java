@@ -12,7 +12,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
 
 /**
- * Ias34Bp IAS34資料欄位清單B檔<br>
+ * Ias34Bp IAS34欄位清單B檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

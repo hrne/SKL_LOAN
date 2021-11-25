@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.HlAreaLnYg6PtRepositoryHist;
 import com.st1.itx.db.service.HlAreaLnYg6PtService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("hlAreaLnYg6PtService")
 @Repository
-public class HlAreaLnYg6PtServiceImpl implements HlAreaLnYg6PtService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(HlAreaLnYg6PtServiceImpl.class);
-
+public class HlAreaLnYg6PtServiceImpl extends ASpringJpaParm implements HlAreaLnYg6PtService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class HlAreaLnYg6PtServiceImpl implements HlAreaLnYg6PtService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + hlAreaLnYg6PtId);
+    this.info("findById " + dbName + " " + hlAreaLnYg6PtId);
     Optional<HlAreaLnYg6Pt> hlAreaLnYg6Pt = null;
     if (dbName.equals(ContentName.onDay))
       hlAreaLnYg6Pt = hlAreaLnYg6PtReposDay.findById(hlAreaLnYg6PtId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "WorkYM", "AreaUnitNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "WorkYM", "AreaUnitNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = hlAreaLnYg6PtReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = hlAreaLnYg6PtReposHist.findAll(pageable);
     else 
       slice = hlAreaLnYg6PtRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("FindWorkYM " + dbName + " : " + "workYM_0 : " + workYM_0);
+    this.info("FindWorkYM " + dbName + " : " + "workYM_0 : " + workYM_0);
     if (dbName.equals(ContentName.onDay))
       slice = hlAreaLnYg6PtReposDay.findAllByWorkYMIsOrderByWorkYMAscAreaUnitNoAsc(workYM_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = hlAreaLnYg6PtReposHist.findAllByWorkYMIsOrderByWorkYMAscAreaUnitNoAsc(workYM_0, pageable);
     else 
       slice = hlAreaLnYg6PtRepos.findAllByWorkYMIsOrderByWorkYMAscAreaUnitNoAsc(workYM_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("FindAreaUnitNo " + dbName + " : " + "areaUnitNo_0 : " + areaUnitNo_0);
+    this.info("FindAreaUnitNo " + dbName + " : " + "areaUnitNo_0 : " + areaUnitNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = hlAreaLnYg6PtReposDay.findAllByAreaUnitNoIsOrderByWorkYMAscAreaUnitNoAsc(areaUnitNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +160,9 @@ em = null;
     else 
       slice = hlAreaLnYg6PtRepos.findAllByAreaUnitNoIsOrderByWorkYMAscAreaUnitNoAsc(areaUnitNo_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +171,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlAreaLnYg6PtId);
+    this.info("Hold " + dbName + " " + hlAreaLnYg6PtId);
     Optional<HlAreaLnYg6Pt> hlAreaLnYg6Pt = null;
     if (dbName.equals(ContentName.onDay))
       hlAreaLnYg6Pt = hlAreaLnYg6PtReposDay.findByHlAreaLnYg6PtId(hlAreaLnYg6PtId);
@@ -183,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
+    this.info("Hold " + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
     Optional<HlAreaLnYg6Pt> hlAreaLnYg6PtT = null;
     if (dbName.equals(ContentName.onDay))
       hlAreaLnYg6PtT = hlAreaLnYg6PtReposDay.findByHlAreaLnYg6PtId(hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
@@ -204,13 +210,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
     if (this.findById(hlAreaLnYg6Pt.getHlAreaLnYg6PtId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       hlAreaLnYg6Pt.setCreateEmpNo(empNot);
+
+    if(hlAreaLnYg6Pt.getLastUpdateEmpNo() == null || hlAreaLnYg6Pt.getLastUpdateEmpNo().isEmpty())
+      hlAreaLnYg6Pt.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return hlAreaLnYg6PtReposDay.saveAndFlush(hlAreaLnYg6Pt);	
@@ -230,8 +241,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
     if (!empNot.isEmpty())
       hlAreaLnYg6Pt.setLastUpdateEmpNo(empNot);
 
@@ -253,8 +266,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
     if (!empNot.isEmpty())
       hlAreaLnYg6Pt.setLastUpdateEmpNo(empNot);
 
@@ -274,7 +289,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
+    this.info("Delete..." + dbName + " " + hlAreaLnYg6Pt.getHlAreaLnYg6PtId());
     if (dbName.equals(ContentName.onDay)) {
       hlAreaLnYg6PtReposDay.delete(hlAreaLnYg6Pt);	
       hlAreaLnYg6PtReposDay.flush();
@@ -303,11 +318,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (HlAreaLnYg6Pt t : hlAreaLnYg6Pt) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (HlAreaLnYg6Pt t : hlAreaLnYg6Pt){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       hlAreaLnYg6Pt = hlAreaLnYg6PtReposDay.saveAll(hlAreaLnYg6Pt);	
@@ -335,8 +355,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (hlAreaLnYg6Pt == null || hlAreaLnYg6Pt.size() == 0)
       throw new DBException(6);
 
@@ -365,7 +387,7 @@ em = null;
 
   @Override
   public void deleteAll(List<HlAreaLnYg6Pt> hlAreaLnYg6Pt, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.AcLoanIntRepositoryHist;
 import com.st1.itx.db.service.AcLoanIntService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("acLoanIntService")
 @Repository
-public class AcLoanIntServiceImpl implements AcLoanIntService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(AcLoanIntServiceImpl.class);
-
+public class AcLoanIntServiceImpl extends ASpringJpaParm implements AcLoanIntService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class AcLoanIntServiceImpl implements AcLoanIntService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + acLoanIntId);
+    this.info("findById " + dbName + " " + acLoanIntId);
     Optional<AcLoanInt> acLoanInt = null;
     if (dbName.equals(ContentName.onDay))
       acLoanInt = acLoanIntReposDay.findById(acLoanIntId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo", "BormNo", "TermNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo", "BormNo", "TermNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = acLoanIntReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = acLoanIntReposHist.findAll(pageable);
     else 
       slice = acLoanIntRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findYearMonthEq " + dbName + " : " + "yearMonth_0 : " + yearMonth_0);
+    this.info("findYearMonthEq " + dbName + " : " + "yearMonth_0 : " + yearMonth_0);
     if (dbName.equals(ContentName.onDay))
       slice = acLoanIntReposDay.findAllByYearMonthIsOrderByAcctCodeAscAgingAscAcBookCodeAscAcSubBookCodeAscCustNoAscFacmNoAscBormNoAsc(yearMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = acLoanIntRepos.findAllByYearMonthIsOrderByAcctCodeAscAgingAscAcBookCodeAscAcSubBookCodeAscCustNoAscFacmNoAscBormNoAsc(yearMonth_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + acLoanIntId);
+    this.info("Hold " + dbName + " " + acLoanIntId);
     Optional<AcLoanInt> acLoanInt = null;
     if (dbName.equals(ContentName.onDay))
       acLoanInt = acLoanIntReposDay.findByAcLoanIntId(acLoanIntId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + acLoanInt.getAcLoanIntId());
+    this.info("Hold " + dbName + " " + acLoanInt.getAcLoanIntId());
     Optional<AcLoanInt> acLoanIntT = null;
     if (dbName.equals(ContentName.onDay))
       acLoanIntT = acLoanIntReposDay.findByAcLoanIntId(acLoanInt.getAcLoanIntId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + acLoanInt.getAcLoanIntId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + acLoanInt.getAcLoanIntId());
     if (this.findById(acLoanInt.getAcLoanIntId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + acLoanInt.getAcLoanIntId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + acLoanInt.getAcLoanIntId());
     if (!empNot.isEmpty())
       acLoanInt.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + acLoanInt.getAcLoanIntId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + acLoanInt.getAcLoanIntId());
     if (!empNot.isEmpty())
       acLoanInt.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + acLoanInt.getAcLoanIntId());
+    this.info("Delete..." + dbName + " " + acLoanInt.getAcLoanIntId());
     if (dbName.equals(ContentName.onDay)) {
       acLoanIntReposDay.delete(acLoanInt);	
       acLoanIntReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (AcLoanInt t : acLoanInt){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (acLoanInt == null || acLoanInt.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<AcLoanInt> acLoanInt, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

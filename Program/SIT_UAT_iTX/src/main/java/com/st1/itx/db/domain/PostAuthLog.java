@@ -85,7 +85,7 @@ public class PostAuthLog implements Serializable {
   private int stampCancelDate = 0;
 
   // 核印註記
-  /* CdCode:StampCode1局帳號不符2戶名不符3身分證號不符4印鑑不符9其他 */
+  /* CdCode:StampCode1帳號不符2戶名不符3身分證號不符4印鑑不符9其他 */
   @Column(name = "`StampCode`", length = 1)
   private String stampCode;
 
@@ -420,7 +420,7 @@ P：存簿G：劃撥
 /**
 	* 核印註記<br>
 	* CdCode:StampCode
-1局帳號不符
+1帳號不符
 2戶名不符
 3身分證號不符
 4印鑑不符
@@ -434,7 +434,7 @@ P：存簿G：劃撥
 /**
 	* 核印註記<br>
 	* CdCode:StampCode
-1局帳號不符
+1帳號不符
 2戶名不符
 3身分證號不符
 4印鑑不符

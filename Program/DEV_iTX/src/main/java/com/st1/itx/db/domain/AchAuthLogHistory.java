@@ -62,7 +62,7 @@ public class AchAuthLogHistory implements Serializable {
   private String repayAcct;
 
   // 新增或取消記號
-  /* A:新增授權D:取消授權Z.暫停授權(DeleteDate &amp;gt; 0時，顯示用) */
+  /* A:新增授權D:取消授權Z:暫停授權Y:恢復授權 */
   @Column(name = "`CreateFlag`", length = 1)
   private String createFlag;
 
@@ -277,7 +277,8 @@ public class AchAuthLogHistory implements Serializable {
 	* 新增或取消記號<br>
 	* A:新增授權
 D:取消授權
-Z.暫停授權(DeleteDate &amp;gt; 0時，顯示用)
+Z:暫停授權
+Y:恢復授權
 	* @return String
 	*/
   public String getCreateFlag() {
@@ -288,7 +289,8 @@ Z.暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 	* 新增或取消記號<br>
 	* A:新增授權
 D:取消授權
-Z.暫停授權(DeleteDate &amp;gt; 0時，顯示用)
+Z:暫停授權
+Y:恢復授權
   *
   * @param createFlag 新增或取消記號
 	*/

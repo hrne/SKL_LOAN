@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,18 +22,19 @@ import com.st1.itx.db.domain.JobDetailId;
  */
 public interface JobDetailRepositoryDay extends JpaRepository<JobDetail, JobDetailId> {
 
-	// ExecDate = ,AND JobCode =
-	public Slice<JobDetail> findAllByExecDateIsAndJobCodeIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, String jobCode_1, Pageable pageable);
+  // ExecDate = ,AND JobCode = 
+  public Slice<JobDetail> findAllByExecDateIsAndJobCodeIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, String jobCode_1, Pageable pageable);
 
-	// ExecDate =
-	public Slice<JobDetail> findAllByExecDateIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, Pageable pageable);
+  // ExecDate = 
+  public Slice<JobDetail> findAllByExecDateIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, Pageable pageable);
 
-	// ExecDate >=
-	public Optional<JobDetail> findTopByExecDateGreaterThanEqualOrderByExecDateDesc(int execDate_0);
+  // ExecDate >=
+  public Optional<JobDetail> findTopByExecDateGreaterThanEqualOrderByExecDateDesc(int execDate_0);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<JobDetail> findByJobDetailId(JobDetailId jobDetailId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<JobDetail> findByJobDetailId(JobDetailId jobDetailId);
 
 }
+

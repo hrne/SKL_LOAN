@@ -108,8 +108,7 @@ public class L4512 extends TradeBuffer {
 			if (tCdEmp == null) {
 				throw new LogicException("E0001", "員工檔");
 			}
-			EmpDeductSchedule tEmpDeductSchedule = empDeductScheduleService
-					.findById(new EmpDeductScheduleId(iPerfMonth, tCdEmp.getAgType1()), titaVo);
+			EmpDeductSchedule tEmpDeductSchedule = empDeductScheduleService.findById(new EmpDeductScheduleId(iPerfMonth, tCdEmp.getAgType1()), titaVo);
 			if (tEmpDeductSchedule == null) {
 				throw new LogicException("E0001", "員工扣薪日程表");
 			}
@@ -123,8 +122,7 @@ public class L4512 extends TradeBuffer {
 			} else {
 				iMediaKind = "4";
 			}
-			EmpDeductMedia t1EmpDeductMedia = empDeductMediaService.lastMediaSeqFirst(iMediaDate + 19110000, iMediaKind,
-					titaVo);
+			EmpDeductMedia t1EmpDeductMedia = empDeductMediaService.lastMediaSeqFirst(iMediaDate + 19110000, iMediaKind, titaVo);
 			if (t1EmpDeductMedia == null) {
 				iMediaSeq = 1;
 			} else {
@@ -192,22 +190,26 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductMediaId.setMediaKind(iMediaKind);
 			tEmpDeductMediaId.setMediaSeq(iMediaSeq);
 			tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMediaId, titaVo);
+			
+			if (tEmpDeductMedia == null) {
+				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
+			}
 			try {
 				empDeductMediaService.delete(tEmpDeductMedia, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0008", "EmpDeductMedia : " + e.getErrorMsg());
 			}
-			// delete EmpDeductDtl
-			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(iMediaDate + 19110000, iMediaKind,
-					iMediaSeq, this.index, Integer.MAX_VALUE, titaVo);
-			if (slEmpDeductDtl == null) {
-				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
-			}
-			try {
-				empDeductDtlService.deleteAll(slEmpDeductDtl.getContent(), titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "EmpDeductDtl : " + e.getErrorMsg());
-			}
+			
+//			// delete EmpDeductDtl
+//			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(iMediaDate + 19110000, iMediaKind, iMediaSeq, this.index, Integer.MAX_VALUE, titaVo);
+//			if (slEmpDeductDtl == null) {
+//				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
+//			}
+//			try {
+//				empDeductDtlService.deleteAll(slEmpDeductDtl.getContent(), titaVo);
+//			} catch (DBException e) {
+//				throw new LogicException(titaVo, "E0008", "EmpDeductDtl : " + e.getErrorMsg());
+//			}
 
 			break;
 		}
@@ -217,8 +219,7 @@ public class L4512 extends TradeBuffer {
 
 	}
 
-	private void insertEmpDeductDtl(EmpDeductMedia t, CustMain tCustMain, CdEmp tCdEmp, TitaVo titaVo)
-			throws LogicException {
+	private void insertEmpDeductDtl(EmpDeductMedia t, CustMain tCustMain, CdEmp tCdEmp, TitaVo titaVo) throws LogicException {
 		EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 		EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 		tEmpDeductDtlId.setEntryDate(t.getEntryDate());

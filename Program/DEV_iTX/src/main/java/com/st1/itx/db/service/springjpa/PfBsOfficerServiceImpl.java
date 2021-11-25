@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.PfBsOfficerRepositoryHist;
 import com.st1.itx.db.service.PfBsOfficerService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("pfBsOfficerService")
 @Repository
-public class PfBsOfficerServiceImpl implements PfBsOfficerService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(PfBsOfficerServiceImpl.class);
-
+public class PfBsOfficerServiceImpl extends ASpringJpaParm implements PfBsOfficerService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class PfBsOfficerServiceImpl implements PfBsOfficerService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + pfBsOfficerId);
+    this.info("findById " + dbName + " " + pfBsOfficerId);
     Optional<PfBsOfficer> pfBsOfficer = null;
     if (dbName.equals(ContentName.onDay))
       pfBsOfficer = pfBsOfficerReposDay.findById(pfBsOfficerId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "WorkMonth", "EmpNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "WorkMonth", "EmpNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = pfBsOfficerReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByMonth " + dbName + " : " + "workMonth_0 : " + workMonth_0);
+    this.info("findByMonth " + dbName + " : " + "workMonth_0 : " + workMonth_0);
     if (dbName.equals(ContentName.onDay))
       slice = pfBsOfficerReposDay.findAllByWorkMonthIs(workMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findBetween " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
+    this.info("findBetween " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = pfBsOfficerReposDay.findAllByWorkMonthLessThanEqualAndWorkMonthGreaterThanEqualOrderByWorkMonthAsc(workMonth_0, workMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,7 +178,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByEmpNoAndMonth " + dbName + " : " + "empNo_0 : " + empNo_0 + " workMonth_1 : " +  workMonth_1);
+    this.info("findByEmpNoAndMonth " + dbName + " : " + "empNo_0 : " + empNo_0 + " workMonth_1 : " +  workMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = pfBsOfficerReposDay.findAllByEmpNoIsAndWorkMonthIs(empNo_0, workMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -209,7 +206,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByEmpNo " + dbName + " : " + "empNo_0 : " + empNo_0);
+    this.info("findByEmpNo " + dbName + " : " + "empNo_0 : " + empNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = pfBsOfficerReposDay.findAllByEmpNoIs(empNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -237,7 +234,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findByEmpNoAndRange " + dbName + " : " + "empNo_0 : " + empNo_0 + " workMonth_1 : " +  workMonth_1 + " workMonth_2 : " +  workMonth_2);
+    this.info("findByEmpNoAndRange " + dbName + " : " + "empNo_0 : " + empNo_0 + " workMonth_1 : " +  workMonth_1 + " workMonth_2 : " +  workMonth_2);
     if (dbName.equals(ContentName.onDay))
       slice = pfBsOfficerReposDay.findAllByEmpNoIsAndWorkMonthLessThanEqualAndWorkMonthGreaterThanEqualOrderByWorkMonthAsc(empNo_0, workMonth_1, workMonth_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -258,7 +255,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + pfBsOfficerId);
+    this.info("Hold " + dbName + " " + pfBsOfficerId);
     Optional<PfBsOfficer> pfBsOfficer = null;
     if (dbName.equals(ContentName.onDay))
       pfBsOfficer = pfBsOfficerReposDay.findByPfBsOfficerId(pfBsOfficerId);
@@ -276,7 +273,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + pfBsOfficer.getPfBsOfficerId());
+    this.info("Hold " + dbName + " " + pfBsOfficer.getPfBsOfficerId());
     Optional<PfBsOfficer> pfBsOfficerT = null;
     if (dbName.equals(ContentName.onDay))
       pfBsOfficerT = pfBsOfficerReposDay.findByPfBsOfficerId(pfBsOfficer.getPfBsOfficerId());
@@ -297,8 +294,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
     if (this.findById(pfBsOfficer.getPfBsOfficerId()) != null)
       throw new DBException(2);
 
@@ -326,8 +325,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
     if (!empNot.isEmpty())
       pfBsOfficer.setLastUpdateEmpNo(empNot);
 
@@ -349,8 +350,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
     if (!empNot.isEmpty())
       pfBsOfficer.setLastUpdateEmpNo(empNot);
 
@@ -370,7 +373,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
+    this.info("Delete..." + dbName + " " + pfBsOfficer.getPfBsOfficerId());
     if (dbName.equals(ContentName.onDay)) {
       pfBsOfficerReposDay.delete(pfBsOfficer);	
       pfBsOfficerReposDay.flush();
@@ -399,7 +402,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (PfBsOfficer t : pfBsOfficer){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -433,8 +439,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (pfBsOfficer == null || pfBsOfficer.size() == 0)
       throw new DBException(6);
 
@@ -463,7 +471,7 @@ em = null;
 
   @Override
   public void deleteAll(List<PfBsOfficer> pfBsOfficer, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

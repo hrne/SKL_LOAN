@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.GuarantorRepositoryHist;
 import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("guarantorService")
 @Repository
-public class GuarantorServiceImpl implements GuarantorService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(GuarantorServiceImpl.class);
-
+public class GuarantorServiceImpl extends ASpringJpaParm implements GuarantorService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class GuarantorServiceImpl implements GuarantorService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + guarantorId);
+    this.info("findById " + dbName + " " + guarantorId);
     Optional<Guarantor> guarantor = null;
     if (dbName.equals(ContentName.onDay))
       guarantor = guarantorReposDay.findById(guarantorId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ApproveNo", "GuaUKey"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ApproveNo", "GuaUKey"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = guarantorReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = guarantorReposHist.findAll(pageable);
     else 
       slice = guarantorRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("approveNoEq " + dbName + " : " + "approveNo_0 : " + approveNo_0);
+    this.info("approveNoEq " + dbName + " : " + "approveNo_0 : " + approveNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = guarantorReposDay.findAllByApproveNoIsOrderByGuaUKeyAsc(approveNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = guarantorReposHist.findAllByApproveNoIsOrderByGuaUKeyAsc(approveNo_0, pageable);
     else 
       slice = guarantorRepos.findAllByApproveNoIsOrderByGuaUKeyAsc(approveNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("guaUKeyEq " + dbName + " : " + "guaUKey_0 : " + guaUKey_0);
+    this.info("guaUKeyEq " + dbName + " : " + "guaUKey_0 : " + guaUKey_0);
     if (dbName.equals(ContentName.onDay))
       slice = guarantorReposDay.findAllByGuaUKeyIsOrderByApproveNoAsc(guaUKey_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +160,9 @@ em = null;
     else 
       slice = guarantorRepos.findAllByGuaUKeyIsOrderByApproveNoAsc(guaUKey_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +171,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + guarantorId);
+    this.info("Hold " + dbName + " " + guarantorId);
     Optional<Guarantor> guarantor = null;
     if (dbName.equals(ContentName.onDay))
       guarantor = guarantorReposDay.findByGuarantorId(guarantorId);
@@ -183,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + guarantor.getGuarantorId());
+    this.info("Hold " + dbName + " " + guarantor.getGuarantorId());
     Optional<Guarantor> guarantorT = null;
     if (dbName.equals(ContentName.onDay))
       guarantorT = guarantorReposDay.findByGuarantorId(guarantor.getGuarantorId());
@@ -204,8 +210,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + guarantor.getGuarantorId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + guarantor.getGuarantorId());
     if (this.findById(guarantor.getGuarantorId()) != null)
       throw new DBException(2);
 
@@ -233,8 +241,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + guarantor.getGuarantorId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + guarantor.getGuarantorId());
     if (!empNot.isEmpty())
       guarantor.setLastUpdateEmpNo(empNot);
 
@@ -256,8 +266,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + guarantor.getGuarantorId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + guarantor.getGuarantorId());
     if (!empNot.isEmpty())
       guarantor.setLastUpdateEmpNo(empNot);
 
@@ -277,7 +289,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + guarantor.getGuarantorId());
+    this.info("Delete..." + dbName + " " + guarantor.getGuarantorId());
     if (dbName.equals(ContentName.onDay)) {
       guarantorReposDay.delete(guarantor);	
       guarantorReposDay.flush();
@@ -306,7 +318,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (Guarantor t : guarantor){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -340,8 +355,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (guarantor == null || guarantor.size() == 0)
       throw new DBException(6);
 
@@ -370,7 +387,7 @@ em = null;
 
   @Override
   public void deleteAll(List<Guarantor> guarantor, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

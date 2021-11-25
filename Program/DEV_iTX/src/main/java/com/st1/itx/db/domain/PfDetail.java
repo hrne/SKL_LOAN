@@ -64,7 +64,7 @@ public class PfDetail implements Serializable {
   private int borxNo = 0;
 
   // 還款類別
-  /* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 */
+  /* 0.撥款(計件代碼變更) 1.計件代碼變更前(留存)2.部分償還 3.提前結案 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -477,7 +477,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案
+	* 0.撥款(計件代碼變更) 1.計件代碼變更前(留存)2.部分償還 3.提前結案
 	* @return Integer
 	*/
   public int getRepayType() {
@@ -486,7 +486,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案
+	* 0.撥款(計件代碼變更) 1.計件代碼變更前(留存)2.部分償還 3.提前結案
   *
   * @param repayType 還款類別
 	*/

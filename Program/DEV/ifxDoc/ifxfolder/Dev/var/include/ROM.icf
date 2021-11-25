@@ -8000,6 +8000,17 @@ TXFORM=L8R57
 ^
 </L8R57.tom>
 
+<L8R58.dec>
+#L8R58Fullname=X,100,S
+</L8R58.dec>
+
+<L8R58.tom>
+TXFORM=L8R58
+#L8R58Fullname
+^
+</L8R58.tom>
+
+
 <L5R38.rtn>
 #L5R38iCode=A,1,S
 #L5R38iDate=D,7,S

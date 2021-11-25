@@ -28,7 +28,7 @@ public class AchDeductMediaId implements Serializable {
   private int mediaDate = 0;
 
   // 媒體別
-  /* 共用代碼檔0:非ACH1:ACH新光2:ACH他行 */
+  /* 0:非ACH1:ACH新光2:ACH他行 */
   @Column(name = "`MediaKind`", length = 1)
   private String mediaKind = " ";
 
@@ -66,8 +66,7 @@ public class AchDeductMediaId implements Serializable {
 
 /**
 	* 媒體別<br>
-	* 共用代碼檔
-0:非ACH
+	* 0:非ACH
 1:ACH新光
 2:ACH他行
 	* @return String
@@ -78,8 +77,7 @@ public class AchDeductMediaId implements Serializable {
 
 /**
 	* 媒體別<br>
-	* 共用代碼檔
-0:非ACH
+	* 0:非ACH
 1:ACH新光
 2:ACH他行
   *

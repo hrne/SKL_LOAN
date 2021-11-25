@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -19,9 +20,10 @@ import com.st1.itx.db.domain.ForeclosureFinishedId;
  */
 public interface ForeclosureFinishedRepositoryHist extends JpaRepository<ForeclosureFinished, ForeclosureFinishedId> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<ForeclosureFinished> findByForeclosureFinishedId(ForeclosureFinishedId foreclosureFinishedId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<ForeclosureFinished> findByForeclosureFinishedId(ForeclosureFinishedId foreclosureFinishedId);
 
 }
+

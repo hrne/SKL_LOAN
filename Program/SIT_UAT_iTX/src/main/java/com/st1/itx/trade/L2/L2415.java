@@ -403,8 +403,6 @@ public class L2415 extends TradeBuffer {
 			clBuildingPublicId.setClCode1(iClCode1);
 			clBuildingPublicId.setClCode2(iClCode2);
 			clBuildingPublicId.setClNo(iClNo);
-			clBuildingPublicId.setPublicBdNo1(parse.stringToInteger(titaVo.getParam("PublicBdNoA" + i)));
-			clBuildingPublicId.setPublicBdNo2(parse.stringToInteger(titaVo.getParam("PublicBdNoB" + i)));
 			tClBuildingPublic.setClBuildingPublicId(clBuildingPublicId);
 			tClBuildingPublic.setClCode1(iClCode1);
 			tClBuildingPublic.setClCode2(iClCode2);

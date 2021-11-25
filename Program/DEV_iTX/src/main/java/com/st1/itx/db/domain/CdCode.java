@@ -53,8 +53,8 @@ public class CdCode implements Serializable {
   @Column(name = "`Enable`", length = 1)
   private String enable;
 
-  // 生效記號
-  /* 0:已放行, 2:未放行因應L6301放行新增記號 */
+  // 狀態
+  /* 0:已放行, 1:未放行因應L6301放行新增記號 */
   @Column(name = "`EffectFlag`")
   private int effectFlag = 0;
 
@@ -197,8 +197,8 @@ public class CdCode implements Serializable {
   }
 
 /**
-	* 生效記號<br>
-	* 0:已放行, 2:未放行
+	* 狀態<br>
+	* 0:已放行, 1:未放行
 因應L6301放行新增記號
 	* @return Integer
 	*/
@@ -207,11 +207,11 @@ public class CdCode implements Serializable {
   }
 
 /**
-	* 生效記號<br>
-	* 0:已放行, 2:未放行
+	* 狀態<br>
+	* 0:已放行, 1:未放行
 因應L6301放行新增記號
   *
-  * @param effectFlag 生效記號
+  * @param effectFlag 狀態
 	*/
   public void setEffectFlag(int effectFlag) {
     this.effectFlag = effectFlag;

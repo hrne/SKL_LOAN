@@ -19,8 +19,8 @@ import com.st1.itx.db.domain.PfItDetailAdjust;
  */
 public interface PfItDetailAdjustRepositoryHist extends JpaRepository<PfItDetailAdjust, Long> {
 
-  // CustNo = ,AND FacmNo = ,AND WorkMonth = 
-  public Optional<PfItDetailAdjust> findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(int custNo_0, int facmNo_1, int workMonth_2);
+  // CustNo = ,AND FacmNo = ,AND BormNo = 
+  public Optional<PfItDetailAdjust> findTopByCustNoIsAndFacmNoIsAndBormNoIs(int custNo_0, int facmNo_1, int bormNo_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

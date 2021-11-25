@@ -107,6 +107,19 @@ public interface JcicZ054Service {
   public JcicZ054 otherFirst(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, int payOffDate_4, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND RcDate= 
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ054 JcicZ054 of List
+   */
+  public Slice<JcicZ054> custRcSubEq(String submitKey_0, String custId_1, int rcDate_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ054
    * 
    * @param jcicZ054Id key

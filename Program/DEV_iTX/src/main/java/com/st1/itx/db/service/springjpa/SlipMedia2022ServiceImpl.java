@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.SlipMedia2022RepositoryHist;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("slipMedia2022Service")
 @Repository
-public class SlipMedia2022ServiceImpl implements SlipMedia2022Service, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(SlipMedia2022ServiceImpl.class);
-
+public class SlipMedia2022ServiceImpl extends ASpringJpaParm implements SlipMedia2022Service, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class SlipMedia2022ServiceImpl implements SlipMedia2022Service, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + slipMedia2022Id);
+    this.info("findById " + dbName + " " + slipMedia2022Id);
     Optional<SlipMedia2022> slipMedia2022 = null;
     if (dbName.equals(ContentName.onDay))
       slipMedia2022 = slipMedia2022ReposDay.findById(slipMedia2022Id);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "MediaSlipNo", "Seq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "MediaSlipNo", "Seq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = slipMedia2022ReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = slipMedia2022ReposHist.findAll(pageable);
     else 
       slice = slipMedia2022Repos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findMediaSeq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " mediaSeq_2 : " +  mediaSeq_2);
+    this.info("findMediaSeq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " mediaSeq_2 : " +  mediaSeq_2);
     if (dbName.equals(ContentName.onDay))
       slice = slipMedia2022ReposDay.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, mediaSeq_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = slipMedia2022ReposHist.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, mediaSeq_2, pageable);
     else 
       slice = slipMedia2022Repos.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, mediaSeq_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findBatchNo " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
+    this.info("findBatchNo " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = slipMedia2022ReposDay.findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +160,9 @@ em = null;
     else 
       slice = slipMedia2022Repos.findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +171,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findMediaSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
+    this.info("findMediaSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
     Optional<SlipMedia2022> slipMedia2022T = null;
     if (dbName.equals(ContentName.onDay))
       slipMedia2022T = slipMedia2022ReposDay.findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(acDate_0, batchNo_1);
@@ -175,6 +181,7 @@ em = null;
       slipMedia2022T = slipMedia2022ReposHist.findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(acDate_0, batchNo_1);
     else 
       slipMedia2022T = slipMedia2022Repos.findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(acDate_0, batchNo_1);
+
     return slipMedia2022T.isPresent() ? slipMedia2022T.get() : null;
   }
 
@@ -183,7 +190,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + slipMedia2022Id);
+    this.info("Hold " + dbName + " " + slipMedia2022Id);
     Optional<SlipMedia2022> slipMedia2022 = null;
     if (dbName.equals(ContentName.onDay))
       slipMedia2022 = slipMedia2022ReposDay.findBySlipMedia2022Id(slipMedia2022Id);
@@ -201,7 +208,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + slipMedia2022.getSlipMedia2022Id());
+    this.info("Hold " + dbName + " " + slipMedia2022.getSlipMedia2022Id());
     Optional<SlipMedia2022> slipMedia2022T = null;
     if (dbName.equals(ContentName.onDay))
       slipMedia2022T = slipMedia2022ReposDay.findBySlipMedia2022Id(slipMedia2022.getSlipMedia2022Id());
@@ -222,8 +229,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
     if (this.findById(slipMedia2022.getSlipMedia2022Id()) != null)
       throw new DBException(2);
 
@@ -251,8 +260,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
     if (!empNot.isEmpty())
       slipMedia2022.setLastUpdateEmpNo(empNot);
 
@@ -274,8 +285,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
     if (!empNot.isEmpty())
       slipMedia2022.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +308,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
+    this.info("Delete..." + dbName + " " + slipMedia2022.getSlipMedia2022Id());
     if (dbName.equals(ContentName.onDay)) {
       slipMedia2022ReposDay.delete(slipMedia2022);	
       slipMedia2022ReposDay.flush();
@@ -324,7 +337,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (SlipMedia2022 t : slipMedia2022){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -358,8 +374,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (slipMedia2022 == null || slipMedia2022.size() == 0)
       throw new DBException(6);
 
@@ -388,7 +406,7 @@ em = null;
 
   @Override
   public void deleteAll(List<SlipMedia2022> slipMedia2022, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

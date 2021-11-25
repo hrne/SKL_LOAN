@@ -23,6 +23,7 @@ import com.st1.itx.db.repository.hist.PfItDetailAdjustRepositoryHist;
 import com.st1.itx.db.service.PfItDetailAdjustService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -109,20 +110,20 @@ em = null;
   }
 
   @Override
-  public PfItDetailAdjust findCustFacmFirst(int custNo_0, int facmNo_1, int workMonth_2, TitaVo... titaVo) {
+  public PfItDetailAdjust findCustFacmBormFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findCustFacmFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " workMonth_2 : " +  workMonth_2);
+    this.info("findCustFacmBormFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2);
     Optional<PfItDetailAdjust> pfItDetailAdjustT = null;
     if (dbName.equals(ContentName.onDay))
-      pfItDetailAdjustT = pfItDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfItDetailAdjustT = pfItDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
     else if (dbName.equals(ContentName.onMon))
-      pfItDetailAdjustT = pfItDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfItDetailAdjustT = pfItDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
     else if (dbName.equals(ContentName.onHist))
-      pfItDetailAdjustT = pfItDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfItDetailAdjustT = pfItDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
     else 
-      pfItDetailAdjustT = pfItDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfItDetailAdjustT = pfItDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
 
     return pfItDetailAdjustT.isPresent() ? pfItDetailAdjustT.get() : null;
   }
@@ -171,7 +172,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + pfItDetailAdjust.getLogNo());
     if (this.findById(pfItDetailAdjust.getLogNo()) != null)
       throw new DBException(2);
@@ -200,7 +203,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + pfItDetailAdjust.getLogNo());
     if (!empNot.isEmpty())
       pfItDetailAdjust.setLastUpdateEmpNo(empNot);
@@ -223,7 +228,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + pfItDetailAdjust.getLogNo());
     if (!empNot.isEmpty())
       pfItDetailAdjust.setLastUpdateEmpNo(empNot);
@@ -273,7 +280,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (PfItDetailAdjust t : pfItDetailAdjust){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -307,7 +317,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (pfItDetailAdjust == null || pfItDetailAdjust.size() == 0)
       throw new DBException(6);

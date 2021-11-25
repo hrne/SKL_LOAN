@@ -51,7 +51,7 @@ public class BankRmtf implements Serializable {
   private int custNo = 0;
 
   // 還款類別
-  /* 0.債協暫收款1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
   @Column(name = "`RepayType`", length = 2)
   private String repayType;
 
@@ -96,7 +96,7 @@ public class BankRmtf implements Serializable {
   private String traderInfo;
 
   // AML回應碼
-  /* 1.正常2.可疑名單3.未確定4.逾時5.人工檢核-正常6.人工檢核-可疑7.人工檢核-未確定 */
+  /* CdCode:AmlCheckItem0.非可疑名單/已完成名單確認1.需審查/確認2.為凍結名單/未確定名單 */
   @Column(name = "`AmlRsp`", length = 1)
   private String amlRsp;
 
@@ -205,7 +205,7 @@ public class BankRmtf implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -222,7 +222,7 @@ public class BankRmtf implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -430,13 +430,10 @@ public class BankRmtf implements Serializable {
 
 /**
 	* AML回應碼<br>
-	* 1.正常
-2.可疑名單
-3.未確定
-4.逾時
-5.人工檢核-正常
-6.人工檢核-可疑
-7.人工檢核-未確定
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
+1.需審查/確認
+2.為凍結名單/未確定名單
 	* @return String
 	*/
   public String getAmlRsp() {
@@ -445,13 +442,10 @@ public class BankRmtf implements Serializable {
 
 /**
 	* AML回應碼<br>
-	* 1.正常
-2.可疑名單
-3.未確定
-4.逾時
-5.人工檢核-正常
-6.人工檢核-可疑
-7.人工檢核-未確定
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
+1.需審查/確認
+2.為凍結名單/未確定名單
   *
   * @param amlRsp AML回應碼
 	*/

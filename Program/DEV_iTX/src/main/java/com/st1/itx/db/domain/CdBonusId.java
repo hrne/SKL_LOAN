@@ -27,7 +27,7 @@ public class CdBonusId implements Serializable {
   private int workMonth = 0;
 
   // 條件記號
-  /* 1.篩選條件-計件代碼2.排除條件-商品代號3.金額級距 */
+  /* 1.篩選條件-計件代碼2.排除條件-商品代號3.金額級距4.排除部門別5.是否排除15日薪非業績人員 */
   @Column(name = "`ConditionCode`")
   private int conditionCode = 0;
 
@@ -69,6 +69,8 @@ public class CdBonusId implements Serializable {
 	* 1.篩選條件-計件代碼
 2.排除條件-商品代號
 3.金額級距
+4.排除部門別
+5.是否排除15日薪非業績人員
 	* @return Integer
 	*/
   public int getConditionCode() {
@@ -80,6 +82,8 @@ public class CdBonusId implements Serializable {
 	* 1.篩選條件-計件代碼
 2.排除條件-商品代號
 3.金額級距
+4.排除部門別
+5.是否排除15日薪非業績人員
   *
   * @param conditionCode 條件記號
 	*/

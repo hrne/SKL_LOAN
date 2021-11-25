@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.BankRelationFamilyRepositoryHist;
 import com.st1.itx.db.service.BankRelationFamilyService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("bankRelationFamilyService")
 @Repository
-public class BankRelationFamilyServiceImpl implements BankRelationFamilyService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BankRelationFamilyServiceImpl.class);
-
+public class BankRelationFamilyServiceImpl extends ASpringJpaParm implements BankRelationFamilyService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class BankRelationFamilyServiceImpl implements BankRelationFamilyService,
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + bankRelationFamilyId);
+    this.info("findById " + dbName + " " + bankRelationFamilyId);
     Optional<BankRelationFamily> bankRelationFamily = null;
     if (dbName.equals(ContentName.onDay))
       bankRelationFamily = bankRelationFamilyReposDay.findById(bankRelationFamilyId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "RelationId"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "RelationId"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = bankRelationFamilyReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = bankRelationFamilyReposHist.findAll(pageable);
     else 
       slice = bankRelationFamilyRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findRelationIdEq " + dbName + " : " + "relationId_0 : " + relationId_0);
+    this.info("findRelationIdEq " + dbName + " : " + "relationId_0 : " + relationId_0);
     if (dbName.equals(ContentName.onDay))
       slice = bankRelationFamilyReposDay.findAllByRelationIdIs(relationId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = bankRelationFamilyRepos.findAllByRelationIdIs(relationId_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankRelationFamilyId);
+    this.info("Hold " + dbName + " " + bankRelationFamilyId);
     Optional<BankRelationFamily> bankRelationFamily = null;
     if (dbName.equals(ContentName.onDay))
       bankRelationFamily = bankRelationFamilyReposDay.findByBankRelationFamilyId(bankRelationFamilyId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+    this.info("Hold " + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
     Optional<BankRelationFamily> bankRelationFamilyT = null;
     if (dbName.equals(ContentName.onDay))
       bankRelationFamilyT = bankRelationFamilyReposDay.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
     if (this.findById(bankRelationFamily.getBankRelationFamilyId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
     if (!empNot.isEmpty())
       bankRelationFamily.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
     if (!empNot.isEmpty())
       bankRelationFamily.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+    this.info("Delete..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
     if (dbName.equals(ContentName.onDay)) {
       bankRelationFamilyReposDay.delete(bankRelationFamily);	
       bankRelationFamilyReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (BankRelationFamily t : bankRelationFamily){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (bankRelationFamily == null || bankRelationFamily.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BankRelationFamily> bankRelationFamily, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

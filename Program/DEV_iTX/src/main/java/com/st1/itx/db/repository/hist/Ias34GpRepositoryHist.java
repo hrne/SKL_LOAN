@@ -26,7 +26,7 @@ public interface Ias34GpRepositoryHist extends JpaRepository<Ias34Gp, Ias34GpId>
   @Transactional(readOnly = false)
   public Optional<Ias34Gp> findByIas34GpId(Ias34GpId ias34GpId);
 
-  // (月底日日終批次)維護 Ias34Gp IAS34資料欄位清單G檔
+  // (月底日日終批次)維護 IAS34 欄位清單G檔
   @Procedure(value = "\"Usp_L7_Ias34Gp_Upd\"")
   public void uspL7Ias34gpUpd(int TBSDYF, String EmpNo);
 

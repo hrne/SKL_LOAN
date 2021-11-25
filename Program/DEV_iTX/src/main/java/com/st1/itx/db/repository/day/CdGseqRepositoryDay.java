@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -19,9 +20,10 @@ import com.st1.itx.db.domain.CdGseqId;
  */
 public interface CdGseqRepositoryDay extends JpaRepository<CdGseq, CdGseqId> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdGseq> findByCdGseqId(CdGseqId cdGseqId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdGseq> findByCdGseqId(CdGseqId cdGseqId);
 
 }
+

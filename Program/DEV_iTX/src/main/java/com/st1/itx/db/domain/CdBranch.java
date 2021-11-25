@@ -39,12 +39,10 @@ public class CdBranch implements Serializable {
   private String acBranchNo;
 
   // 總分處
-  /* 用途? */
   @Column(name = "`CRH`", length = 2)
   private String cRH;
 
   // 單位控制碼
-  /* 用途? */
   @Column(name = "`BranchStatusCode`", length = 1)
   private String branchStatusCode;
 
@@ -90,52 +88,60 @@ public class CdBranch implements Serializable {
   private String mediaUnitCode;
 
   // CIF KEY
-  /* 用途? */
   @Column(name = "`CIFKey`", length = 6)
   private String cIFKey;
 
   // 最終戶號
-  /* 用途? */
   @Column(name = "`LastestCustNo`", length = 7)
   private String lastestCustNo;
 
   // 課組別1
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group1`", length = 10)
   private String group1;
 
   // 課組別2
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group2`", length = 10)
   private String group2;
 
   // 課組別3
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group3`", length = 10)
   private String group3;
 
   // 課組別4
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group4`", length = 10)
   private String group4;
 
   // 課組別5
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group5`", length = 10)
   private String group5;
 
   // 課組別6
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group6`", length = 10)
   private String group6;
 
   // 課組別7
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group7`", length = 10)
   private String group7;
 
   // 課組別8
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group8`", length = 10)
   private String group8;
 
   // 課組別9
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group9`", length = 10)
   private String group9;
 
   // 課組別10
+  /* 停用,改記錄於CdBranchGroup */
   @Column(name = "`Group10`", length = 10)
   private String group10;
 
@@ -218,7 +224,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 總分處<br>
-	* 用途?
+	* 
 	* @return String
 	*/
   public String getCRH() {
@@ -227,7 +233,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 總分處<br>
-	* 用途?
+	* 
   *
   * @param cRH 總分處
 	*/
@@ -237,7 +243,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 單位控制碼<br>
-	* 用途?
+	* 
 	* @return String
 	*/
   public String getBranchStatusCode() {
@@ -246,7 +252,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 單位控制碼<br>
-	* 用途?
+	* 
   *
   * @param branchStatusCode 單位控制碼
 	*/
@@ -446,7 +452,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* CIF KEY<br>
-	* 用途?
+	* 
 	* @return String
 	*/
   public String getCIFKey() {
@@ -455,7 +461,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* CIF KEY<br>
-	* 用途?
+	* 
   *
   * @param cIFKey CIF KEY
 	*/
@@ -465,7 +471,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 最終戶號<br>
-	* 用途?
+	* 
 	* @return String
 	*/
   public String getLastestCustNo() {
@@ -474,7 +480,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 最終戶號<br>
-	* 用途?
+	* 
   *
   * @param lastestCustNo 最終戶號
 	*/
@@ -484,7 +490,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別1<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup1() {
@@ -493,7 +499,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別1<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group1 課組別1
 	*/
@@ -503,7 +509,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別2<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup2() {
@@ -512,7 +518,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別2<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group2 課組別2
 	*/
@@ -522,7 +528,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別3<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup3() {
@@ -531,7 +537,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別3<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group3 課組別3
 	*/
@@ -541,7 +547,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別4<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup4() {
@@ -550,7 +556,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別4<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group4 課組別4
 	*/
@@ -560,7 +566,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別5<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup5() {
@@ -569,7 +575,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別5<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group5 課組別5
 	*/
@@ -579,7 +585,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別6<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup6() {
@@ -588,7 +594,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別6<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group6 課組別6
 	*/
@@ -598,7 +604,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別7<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup7() {
@@ -607,7 +613,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別7<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group7 課組別7
 	*/
@@ -617,7 +623,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別8<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup8() {
@@ -626,7 +632,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別8<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group8 課組別8
 	*/
@@ -636,7 +642,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別9<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup9() {
@@ -645,7 +651,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別9<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group9 課組別9
 	*/
@@ -655,7 +661,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別10<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
 	* @return String
 	*/
   public String getGroup10() {
@@ -664,7 +670,7 @@ public class CdBranch implements Serializable {
 
 /**
 	* 課組別10<br>
-	* 
+	* 停用,改記錄於CdBranchGroup
   *
   * @param group10 課組別10
 	*/

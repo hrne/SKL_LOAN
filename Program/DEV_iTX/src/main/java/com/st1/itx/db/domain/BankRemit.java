@@ -39,7 +39,7 @@ public class BankRemit implements Serializable {
   private int acDate = 0;
 
   // 經辦
-  @Column(name = "`TitaTlrNo`", length = 8, insertable = false, updatable = false)
+  @Column(name = "`TitaTlrNo`", length = 6, insertable = false, updatable = false)
   private String titaTlrNo;
 
   // 交易序號
@@ -47,16 +47,17 @@ public class BankRemit implements Serializable {
   private String titaTxtNo;
 
   // 整批批號
+  /* "LN + 傳票批號 + 匯款批號 */
   @Column(name = "`BatchNo`", length = 6)
   private String batchNo;
 
   // 撥款方式
-  /* CdCode:DrawdownCode201:整批匯款02:單筆匯款04:退款台新(存款憑條)05:退款他行(整批匯款)11:退款新光(存款憑條) */
+  /* CdCode:DrawdownCode201:撥款(整批匯款)02:撥款(單筆匯款)04:退款台新(存款憑條)05:退款他行(整批匯款)11:退款新光(存款憑條) */
   @Column(name = "`DrawdownCode`")
   private int drawdownCode = 0;
 
   // 狀態
-  /* CdCode:DrawdownStatus0:正常1:產檔後修正2:產檔後訂正3.未放行(ActFg=時顯示用) */
+  /* CdCode:DrawdownStatus0:正常1:產檔後修正2:產檔後訂正3.未放行(ActFg=1時顯示用) */
   @Column(name = "`StatusCode`")
   private int statusCode = 0;
 
@@ -201,7 +202,7 @@ public class BankRemit implements Serializable {
 
 /**
 	* 整批批號<br>
-	* 
+	* "LN + 傳票批號 + 匯款批號
 	* @return String
 	*/
   public String getBatchNo() {
@@ -210,7 +211,7 @@ public class BankRemit implements Serializable {
 
 /**
 	* 整批批號<br>
-	* 
+	* "LN + 傳票批號 + 匯款批號
   *
   * @param batchNo 整批批號
 	*/
@@ -221,8 +222,8 @@ public class BankRemit implements Serializable {
 /**
 	* 撥款方式<br>
 	* CdCode:DrawdownCode2
-01:整批匯款
-02:單筆匯款
+01:撥款(整批匯款)
+02:撥款(單筆匯款)
 04:退款台新(存款憑條)
 05:退款他行(整批匯款)
 11:退款新光(存款憑條)
@@ -235,8 +236,8 @@ public class BankRemit implements Serializable {
 /**
 	* 撥款方式<br>
 	* CdCode:DrawdownCode2
-01:整批匯款
-02:單筆匯款
+01:撥款(整批匯款)
+02:撥款(單筆匯款)
 04:退款台新(存款憑條)
 05:退款他行(整批匯款)
 11:退款新光(存款憑條)
@@ -253,7 +254,7 @@ public class BankRemit implements Serializable {
 0:正常
 1:產檔後修正
 2:產檔後訂正
-3.未放行(ActFg=時顯示用)
+3.未放行(ActFg=1時顯示用)
 	* @return Integer
 	*/
   public int getStatusCode() {
@@ -266,7 +267,7 @@ public class BankRemit implements Serializable {
 0:正常
 1:產檔後修正
 2:產檔後訂正
-3.未放行(ActFg=時顯示用)
+3.未放行(ActFg=1時顯示用)
   *
   * @param statusCode 狀態
 	*/

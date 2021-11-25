@@ -12,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Column;
 
 /**
- * CdVarValue 變動數值設定檔<br>
+ * CdVarValue 會計變動數值設定檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

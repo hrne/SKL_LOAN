@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.EmpDeductScheduleRepositoryHist;
 import com.st1.itx.db.service.EmpDeductScheduleService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("empDeductScheduleService")
 @Repository
-public class EmpDeductScheduleServiceImpl implements EmpDeductScheduleService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(EmpDeductScheduleServiceImpl.class);
-
+public class EmpDeductScheduleServiceImpl extends ASpringJpaParm implements EmpDeductScheduleService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class EmpDeductScheduleServiceImpl implements EmpDeductScheduleService, I
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + empDeductScheduleId);
+    this.info("findById " + dbName + " " + empDeductScheduleId);
     Optional<EmpDeductSchedule> empDeductSchedule = null;
     if (dbName.equals(ContentName.onDay))
       empDeductSchedule = empDeductScheduleReposDay.findById(empDeductScheduleId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "WorkMonth", "AgType1"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "WorkMonth", "AgType1"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = empDeductScheduleReposHist.findAll(pageable);
     else 
       slice = empDeductScheduleRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("monthEqual " + dbName + " : " + "workMonth_0 : " + workMonth_0);
+    this.info("monthEqual " + dbName + " : " + "workMonth_0 : " + workMonth_0);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAllByWorkMonthIs(workMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = empDeductScheduleReposHist.findAllByWorkMonthIs(workMonth_0, pageable);
     else 
       slice = empDeductScheduleRepos.findAllByWorkMonthIs(workMonth_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("agType1Equal " + dbName + " : " + "agType1_0 : " + agType1_0);
+    this.info("agType1Equal " + dbName + " : " + "agType1_0 : " + agType1_0);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAllByAgType1Is(agType1_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +159,9 @@ em = null;
       slice = empDeductScheduleReposHist.findAllByAgType1Is(agType1_0, pageable);
     else 
       slice = empDeductScheduleRepos.findAllByAgType1Is(agType1_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +178,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("entryDateRange " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1);
+    this.info("entryDateRange " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(entryDate_0, entryDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +187,9 @@ em = null;
       slice = empDeductScheduleReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(entryDate_0, entryDate_1, pageable);
     else 
       slice = empDeductScheduleRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(entryDate_0, entryDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +206,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("mediaDateRange " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaDate_1 : " +  mediaDate_1);
+    this.info("mediaDateRange " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaDate_1 : " +  mediaDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualOrderByAgType1Asc(mediaDate_0, mediaDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -206,6 +215,9 @@ em = null;
       slice = empDeductScheduleReposHist.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualOrderByAgType1Asc(mediaDate_0, mediaDate_1, pageable);
     else 
       slice = empDeductScheduleRepos.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualOrderByAgType1Asc(mediaDate_0, mediaDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -222,7 +234,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("monthRange " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
+    this.info("monthRange " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByWorkMonthAscAgType1Asc(workMonth_0, workMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -231,6 +243,9 @@ em = null;
       slice = empDeductScheduleReposHist.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByWorkMonthAscAgType1Asc(workMonth_0, workMonth_1, pageable);
     else 
       slice = empDeductScheduleRepos.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByWorkMonthAscAgType1Asc(workMonth_0, workMonth_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -247,7 +262,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4R15A " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
+    this.info("findL4R15A " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByAgType1AscWorkMonthAsc(workMonth_0, workMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -256,6 +271,9 @@ em = null;
       slice = empDeductScheduleReposHist.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByAgType1AscWorkMonthAsc(workMonth_0, workMonth_1, pageable);
     else 
       slice = empDeductScheduleRepos.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByAgType1AscWorkMonthAsc(workMonth_0, workMonth_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -272,7 +290,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4R15B " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1 + " agType1_2 : " +  agType1_2);
+    this.info("findL4R15B " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1 + " agType1_2 : " +  agType1_2);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductScheduleReposDay.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualAndAgType1IsOrderByAgType1AscWorkMonthAsc(workMonth_0, workMonth_1, agType1_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -282,6 +300,9 @@ em = null;
     else 
       slice = empDeductScheduleRepos.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualAndAgType1IsOrderByAgType1AscWorkMonthAsc(workMonth_0, workMonth_1, agType1_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -290,7 +311,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + empDeductScheduleId);
+    this.info("Hold " + dbName + " " + empDeductScheduleId);
     Optional<EmpDeductSchedule> empDeductSchedule = null;
     if (dbName.equals(ContentName.onDay))
       empDeductSchedule = empDeductScheduleReposDay.findByEmpDeductScheduleId(empDeductScheduleId);
@@ -308,7 +329,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
+    this.info("Hold " + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
     Optional<EmpDeductSchedule> empDeductScheduleT = null;
     if (dbName.equals(ContentName.onDay))
       empDeductScheduleT = empDeductScheduleReposDay.findByEmpDeductScheduleId(empDeductSchedule.getEmpDeductScheduleId());
@@ -329,8 +350,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
     if (this.findById(empDeductSchedule.getEmpDeductScheduleId()) != null)
       throw new DBException(2);
 
@@ -358,8 +381,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
     if (!empNot.isEmpty())
       empDeductSchedule.setLastUpdateEmpNo(empNot);
 
@@ -381,8 +406,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
     if (!empNot.isEmpty())
       empDeductSchedule.setLastUpdateEmpNo(empNot);
 
@@ -402,7 +429,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
+    this.info("Delete..." + dbName + " " + empDeductSchedule.getEmpDeductScheduleId());
     if (dbName.equals(ContentName.onDay)) {
       empDeductScheduleReposDay.delete(empDeductSchedule);	
       empDeductScheduleReposDay.flush();
@@ -431,7 +458,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (EmpDeductSchedule t : empDeductSchedule){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -465,8 +495,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (empDeductSchedule == null || empDeductSchedule.size() == 0)
       throw new DBException(6);
 
@@ -495,7 +527,7 @@ em = null;
 
   @Override
   public void deleteAll(List<EmpDeductSchedule> empDeductSchedule, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

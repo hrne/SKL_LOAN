@@ -12,7 +12,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
 
 /**
- * ClImmRankDetail 擔保品不動產檔設定順位明細<br>
+ * ClImmRankDetail 擔保品不動產檔設定順位明細檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

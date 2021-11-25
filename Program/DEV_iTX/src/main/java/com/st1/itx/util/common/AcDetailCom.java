@@ -312,10 +312,10 @@ public class AcDetailCom extends TradeBuffer {
 				tAcDetail.setAcBookCode(this.txBuffer.getSystemParas().getAcBookCode());
 				// 帳冊別記號
 				// 0:不細分，區隔帳冊固定為00A:傳統帳冊
-				// 1: 細分，區隔帳冊By戶號設定(AcBookCom)
+				// 1: 細分，區隔帳冊By戶號設定(AcBookCom)或由業務交易指定
 				// 2: 中介，應收調撥款科目，明細檔無(只寫入總帳檔)，應收調撥款之核心傳票媒體檔，係自動產生。
-				// 3: 指定帳冊，區隔帳冊由業務交易指定(L6201:其他傳票輸入、L618D:各項提存)
-				if (ac.getAcBookFlag() > 0) {
+				// 3: 指定，區隔帳冊由業務交易指定(L6201:其他傳票輸入、L618D:各項提存、L3230暫收款退還(作業項目： 16.3200億專案)
+				if (tCdAcCode.getAcBookFlag() == 1 && ac.getAcBookFlag() > 0) {
 					tAcDetail.setAcBookFlag(ac.getAcBookFlag());
 				} else {
 					tAcDetail.setAcBookFlag(tCdAcCode.getAcBookFlag());
@@ -373,7 +373,8 @@ public class AcDetailCom extends TradeBuffer {
 				throw new LogicException("E6001", "AcDetailCom 支票業務別需為02," + titaVo.getSecNo());
 			}
 			// 撥款匯款業務別 2xx ,201:整批匯款 202:單筆匯款 204:退款台新(存款憑條) 205:退款他行(整批匯款) 211:退款新光(存款憑條)
-			if (ac.getSumNo() != null && ac.getSumNo().length() == 3 && ac.getSumNo().startsWith("2") && !"01".equals(titaVo.getSecNo())) {
+			if (ac.getSumNo() != null && ac.getSumNo().length() == 3 && ac.getSumNo().startsWith("2")
+					&& !"01".equals(titaVo.getSecNo())) {
 				throw new LogicException("E6001", "AcDetailCom 撥款匯款業務別需為01," + titaVo.getSecNo());
 			}
 		}
@@ -396,7 +397,8 @@ public class AcDetailCom extends TradeBuffer {
 
 		// 2. StampTaxFreeAmt 免印花稅金額
 // 還款來源 = 4.支票兌現 && 業務科目 = 利息收入(Ixx)	
-		if (titaVo.get("RpCode1") != null && parse.stringToInteger(titaVo.getParam("RpCode1")) == 4 && "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
+		if (titaVo.get("RpCode1") != null && parse.stringToInteger(titaVo.getParam("RpCode1")) == 4
+				&& "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
 			tTempVo.putParam("StampTaxFreeAmt", tAcDetail.getTxAmt());
 		}
 

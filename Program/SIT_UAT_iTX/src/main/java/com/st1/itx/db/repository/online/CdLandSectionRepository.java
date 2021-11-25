@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.online;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,18 +22,19 @@ import com.st1.itx.db.domain.CdLandSectionId;
  */
 public interface CdLandSectionRepository extends JpaRepository<CdLandSection, CdLandSectionId> {
 
-	// CityCode =
-	public Slice<CdLandSection> findAllByCityCodeIsOrderByCityCodeAscIrCodeAsc(String cityCode_0, Pageable pageable);
+  // CityCode = 
+  public Slice<CdLandSection> findAllByCityCodeIsOrderByCityCodeAscIrCodeAsc(String cityCode_0, Pageable pageable);
 
-	// CityCode = ,AND AreaCode =
-	public Slice<CdLandSection> findAllByCityCodeIsAndAreaCodeIsOrderByCityCodeAscIrCodeAsc(String cityCode_0, String areaCode_1, Pageable pageable);
+  // CityCode = ,AND AreaCode = 
+  public Slice<CdLandSection> findAllByCityCodeIsAndAreaCodeIsOrderByCityCodeAscIrCodeAsc(String cityCode_0, String areaCode_1, Pageable pageable);
 
-	// LandOfficeCode =
-	public Slice<CdLandSection> findAllByLandOfficeCodeIsOrderByCityCodeAscIrCodeAsc(String landOfficeCode_0, Pageable pageable);
+  // LandOfficeCode = 
+  public Slice<CdLandSection> findAllByLandOfficeCodeIsOrderByCityCodeAscIrCodeAsc(String landOfficeCode_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdLandSection> findByCdLandSectionId(CdLandSectionId cdLandSectionId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdLandSection> findByCdLandSectionId(CdLandSectionId cdLandSectionId);
 
 }
+

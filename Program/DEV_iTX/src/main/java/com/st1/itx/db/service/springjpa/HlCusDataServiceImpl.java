@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.HlCusDataRepositoryHist;
 import com.st1.itx.db.service.HlCusDataService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("hlCusDataService")
 @Repository
-public class HlCusDataServiceImpl implements HlCusDataService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(HlCusDataServiceImpl.class);
-
+public class HlCusDataServiceImpl extends ASpringJpaParm implements HlCusDataService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class HlCusDataServiceImpl implements HlCusDataService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + hlCusNo);
+    this.info("findById " + dbName + " " + hlCusNo);
     Optional<HlCusData> hlCusData = null;
     if (dbName.equals(ContentName.onDay))
       hlCusData = hlCusDataReposDay.findById(hlCusNo);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "HlCusNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "HlCusNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = hlCusDataReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
     else 
       slice = hlCusDataRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -114,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlCusNo);
+    this.info("Hold " + dbName + " " + hlCusNo);
     Optional<HlCusData> hlCusData = null;
     if (dbName.equals(ContentName.onDay))
       hlCusData = hlCusDataReposDay.findByHlCusNo(hlCusNo);
@@ -132,7 +132,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlCusData.getHlCusNo());
+    this.info("Hold " + dbName + " " + hlCusData.getHlCusNo());
     Optional<HlCusData> hlCusDataT = null;
     if (dbName.equals(ContentName.onDay))
       hlCusDataT = hlCusDataReposDay.findByHlCusNo(hlCusData.getHlCusNo());
@@ -153,13 +153,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + hlCusData.getHlCusNo());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + hlCusData.getHlCusNo());
     if (this.findById(hlCusData.getHlCusNo()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       hlCusData.setCreateEmpNo(empNot);
+
+    if(hlCusData.getLastUpdateEmpNo() == null || hlCusData.getLastUpdateEmpNo().isEmpty())
+      hlCusData.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return hlCusDataReposDay.saveAndFlush(hlCusData);	
@@ -179,8 +184,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlCusData.getHlCusNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlCusData.getHlCusNo());
     if (!empNot.isEmpty())
       hlCusData.setLastUpdateEmpNo(empNot);
 
@@ -202,8 +209,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlCusData.getHlCusNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlCusData.getHlCusNo());
     if (!empNot.isEmpty())
       hlCusData.setLastUpdateEmpNo(empNot);
 
@@ -223,7 +232,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + hlCusData.getHlCusNo());
+    this.info("Delete..." + dbName + " " + hlCusData.getHlCusNo());
     if (dbName.equals(ContentName.onDay)) {
       hlCusDataReposDay.delete(hlCusData);	
       hlCusDataReposDay.flush();
@@ -252,11 +261,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (HlCusData t : hlCusData) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (HlCusData t : hlCusData){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       hlCusData = hlCusDataReposDay.saveAll(hlCusData);	
@@ -284,8 +298,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (hlCusData == null || hlCusData.size() == 0)
       throw new DBException(6);
 
@@ -314,7 +330,7 @@ em = null;
 
   @Override
   public void deleteAll(List<HlCusData> hlCusData, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

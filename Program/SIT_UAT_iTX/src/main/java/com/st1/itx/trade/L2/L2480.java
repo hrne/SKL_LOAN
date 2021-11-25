@@ -391,6 +391,8 @@ public class L2480 extends TradeBuffer {
 					throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 				}
 				
+				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue()).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+				
 				// 變更前
 				ClMain beforeClMain = (ClMain) dataLog.clone(tClMain);
 				tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));

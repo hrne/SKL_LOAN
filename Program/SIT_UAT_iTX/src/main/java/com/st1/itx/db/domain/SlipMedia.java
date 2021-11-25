@@ -69,7 +69,7 @@ public class SlipMedia implements Serializable {
   private String acBookItem;
 
   // 會計科目代號
-  @Column(name = "`AcNoCode`", length = 8)
+  @Column(name = "`AcNoCode`", length = 11)
   private String acNoCode;
 
   // 子目代號

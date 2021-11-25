@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.CdBonusRepositoryHist;
 import com.st1.itx.db.service.CdBonusService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdBonusService")
 @Repository
-public class CdBonusServiceImpl implements CdBonusService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdBonusServiceImpl.class);
-
+public class CdBonusServiceImpl extends ASpringJpaParm implements CdBonusService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class CdBonusServiceImpl implements CdBonusService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdBonusId);
+    this.info("findById " + dbName + " " + cdBonusId);
     Optional<CdBonus> cdBonus = null;
     if (dbName.equals(ContentName.onDay))
       cdBonus = cdBonusReposDay.findById(cdBonusId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "WorkMonth", "ConditionCode", "Condition"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "WorkMonth", "ConditionCode", "Condition"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdBonusReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = cdBonusReposHist.findAll(pageable);
     else 
       slice = cdBonusRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCondition " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " conditionCode_1 : " +  conditionCode_1 + " condition_2 : " +  condition_2 + " condition_3 : " +  condition_3);
+    this.info("findCondition " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " conditionCode_1 : " +  conditionCode_1 + " condition_2 : " +  condition_2 + " condition_3 : " +  condition_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdBonusReposDay.findAllByWorkMonthIsAndConditionCodeIsAndConditionGreaterThanEqualAndConditionLessThanEqualOrderByWorkMonthAscConditionCodeAscConditionAsc(workMonth_0, conditionCode_1, condition_2, condition_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
       slice = cdBonusReposHist.findAllByWorkMonthIsAndConditionCodeIsAndConditionGreaterThanEqualAndConditionLessThanEqualOrderByWorkMonthAscConditionCodeAscConditionAsc(workMonth_0, conditionCode_1, condition_2, condition_3, pageable);
     else 
       slice = cdBonusRepos.findAllByWorkMonthIsAndConditionCodeIsAndConditionGreaterThanEqualAndConditionLessThanEqualOrderByWorkMonthAscConditionCodeAscConditionAsc(workMonth_0, conditionCode_1, condition_2, condition_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +150,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findYearMonth " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
+    this.info("findYearMonth " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdBonusReposDay.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByWorkMonthAsc(workMonth_0, workMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +160,9 @@ em = null;
     else 
       slice = cdBonusRepos.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByWorkMonthAsc(workMonth_0, workMonth_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +171,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findWorkMonthFirst " + dbName + " : " + "workMonth_0 : " + workMonth_0);
+    this.info("findWorkMonthFirst " + dbName + " : " + "workMonth_0 : " + workMonth_0);
     Optional<CdBonus> cdBonusT = null;
     if (dbName.equals(ContentName.onDay))
       cdBonusT = cdBonusReposDay.findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(workMonth_0);
@@ -175,6 +181,7 @@ em = null;
       cdBonusT = cdBonusReposHist.findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(workMonth_0);
     else 
       cdBonusT = cdBonusRepos.findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(workMonth_0);
+
     return cdBonusT.isPresent() ? cdBonusT.get() : null;
   }
 
@@ -183,7 +190,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBonusId);
+    this.info("Hold " + dbName + " " + cdBonusId);
     Optional<CdBonus> cdBonus = null;
     if (dbName.equals(ContentName.onDay))
       cdBonus = cdBonusReposDay.findByCdBonusId(cdBonusId);
@@ -201,7 +208,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBonus.getCdBonusId());
+    this.info("Hold " + dbName + " " + cdBonus.getCdBonusId());
     Optional<CdBonus> cdBonusT = null;
     if (dbName.equals(ContentName.onDay))
       cdBonusT = cdBonusReposDay.findByCdBonusId(cdBonus.getCdBonusId());
@@ -222,8 +229,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdBonus.getCdBonusId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdBonus.getCdBonusId());
     if (this.findById(cdBonus.getCdBonusId()) != null)
       throw new DBException(2);
 
@@ -251,8 +260,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBonus.getCdBonusId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBonus.getCdBonusId());
     if (!empNot.isEmpty())
       cdBonus.setLastUpdateEmpNo(empNot);
 
@@ -274,8 +285,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdBonus.getCdBonusId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdBonus.getCdBonusId());
     if (!empNot.isEmpty())
       cdBonus.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +308,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdBonus.getCdBonusId());
+    this.info("Delete..." + dbName + " " + cdBonus.getCdBonusId());
     if (dbName.equals(ContentName.onDay)) {
       cdBonusReposDay.delete(cdBonus);	
       cdBonusReposDay.flush();
@@ -324,7 +337,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdBonus t : cdBonus){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -358,8 +374,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdBonus == null || cdBonus.size() == 0)
       throw new DBException(6);
 
@@ -388,7 +406,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdBonus> cdBonus, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

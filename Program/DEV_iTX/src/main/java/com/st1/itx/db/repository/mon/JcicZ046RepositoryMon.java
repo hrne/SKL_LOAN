@@ -43,6 +43,9 @@ public interface JcicZ046RepositoryMon extends JpaRepository<JcicZ046, JcicZ046I
   // SubmitKey= , AND CustId= , AND RcDate= , AND CloseDate=
   public Optional<JcicZ046> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndCloseDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int closeDate_3);
 
+  // CustId=
+  public Optional<JcicZ046> findTopByCustIdIsOrderByRcDateDesc(String custId_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -11,7 +11,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
 
 /**
- * RptJcic 報表Jcic<br>
+ * RptJcic 呆帳不報送檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

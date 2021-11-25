@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.JcicAtomMainRepositoryHist;
 import com.st1.itx.db.service.JcicAtomMainService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("jcicAtomMainService")
 @Repository
-public class JcicAtomMainServiceImpl implements JcicAtomMainService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(JcicAtomMainServiceImpl.class);
-
+public class JcicAtomMainServiceImpl extends ASpringJpaParm implements JcicAtomMainService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class JcicAtomMainServiceImpl implements JcicAtomMainService, Initializin
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + functionCode);
+    this.info("findById " + dbName + " " + functionCode);
     Optional<JcicAtomMain> jcicAtomMain = null;
     if (dbName.equals(ContentName.onDay))
       jcicAtomMain = jcicAtomMainReposDay.findById(functionCode);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "FunctionCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "FunctionCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = jcicAtomMainReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
     else 
       slice = jcicAtomMainRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -114,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + functionCode);
+    this.info("Hold " + dbName + " " + functionCode);
     Optional<JcicAtomMain> jcicAtomMain = null;
     if (dbName.equals(ContentName.onDay))
       jcicAtomMain = jcicAtomMainReposDay.findByFunctionCode(functionCode);
@@ -132,7 +132,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jcicAtomMain.getFunctionCode());
+    this.info("Hold " + dbName + " " + jcicAtomMain.getFunctionCode());
     Optional<JcicAtomMain> jcicAtomMainT = null;
     if (dbName.equals(ContentName.onDay))
       jcicAtomMainT = jcicAtomMainReposDay.findByFunctionCode(jcicAtomMain.getFunctionCode());
@@ -153,13 +153,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + jcicAtomMain.getFunctionCode());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + jcicAtomMain.getFunctionCode());
     if (this.findById(jcicAtomMain.getFunctionCode()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       jcicAtomMain.setCreateEmpNo(empNot);
+
+    if(jcicAtomMain.getLastUpdateEmpNo() == null || jcicAtomMain.getLastUpdateEmpNo().isEmpty())
+      jcicAtomMain.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return jcicAtomMainReposDay.saveAndFlush(jcicAtomMain);	
@@ -179,8 +184,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + jcicAtomMain.getFunctionCode());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + jcicAtomMain.getFunctionCode());
     if (!empNot.isEmpty())
       jcicAtomMain.setLastUpdateEmpNo(empNot);
 
@@ -202,8 +209,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + jcicAtomMain.getFunctionCode());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + jcicAtomMain.getFunctionCode());
     if (!empNot.isEmpty())
       jcicAtomMain.setLastUpdateEmpNo(empNot);
 
@@ -223,7 +232,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + jcicAtomMain.getFunctionCode());
+    this.info("Delete..." + dbName + " " + jcicAtomMain.getFunctionCode());
     if (dbName.equals(ContentName.onDay)) {
       jcicAtomMainReposDay.delete(jcicAtomMain);	
       jcicAtomMainReposDay.flush();
@@ -252,11 +261,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (JcicAtomMain t : jcicAtomMain) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (JcicAtomMain t : jcicAtomMain){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       jcicAtomMain = jcicAtomMainReposDay.saveAll(jcicAtomMain);	
@@ -284,8 +298,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (jcicAtomMain == null || jcicAtomMain.size() == 0)
       throw new DBException(6);
 
@@ -314,7 +330,7 @@ em = null;
 
   @Override
   public void deleteAll(List<JcicAtomMain> jcicAtomMain, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

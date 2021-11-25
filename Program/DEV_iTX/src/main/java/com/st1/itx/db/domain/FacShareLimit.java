@@ -12,8 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Column;
 
 /**
- * FacShareLimit 合併額度
-控管資料檔<br>
+ * FacShareLimit 合併額度控管資料檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

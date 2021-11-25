@@ -121,7 +121,7 @@ public interface Ias34CpService {
 
   /**
    * Stored Procedure<br>
-   * (月底日日終批次)維護 Ias34Cp IAS34資料欄位清單C檔
+   * (月底日日終批次)維護 IAS34 欄位清單C檔
    * @param  TBSDYF int
    * @param  EmpNo String
    * @param titaVo Variable-Length Argument

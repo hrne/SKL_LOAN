@@ -3,6 +3,31 @@
 </sub>
 
 <sub type="SYS" name="label">
+
+
+!#TXCD
+!T(3,L4102)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -25,6 +50,28 @@ E(0,0)
 #FdBatchNo=X,2,L
 #FdItemCode=X,2,L
 T(3,*)
+
+
+![戶別]
+#CDDEF01=x,26,S
+T(3,CdCode.DrawdownCode2)
+
+#DrawdownCodeHelp=x,1024,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(B,@DrawdownCodeHelp,#HelpDesc1+;99:全部)
+
+#SearchFlagHelp=x,30,S
+T(3,1:戶號;2:整批批號;3:全部批號)
+
+#StatusCodeHelp=x,50,S
+T(3,0:正常;1:產檔後修正;2:產檔後更正;3:未放行;9:全部)
+
+
 
 #ItemCodeHelp=x,1024,S
 T(3,1:撥款;2:退款)
@@ -61,12 +108,108 @@ C(3,#ItemCode,2,T(3,RT0100),$)
 
 #FlagA=X,1,S
 T(2,Y)
+
+
+#RPTFG=A,1,S
+E(0,1)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
 
+!--------------L412B------------------------
+#L412BPRT=A,1,S
+C(5,#TXFORM,L412B,E(0,1),E(0,0))
+C(3,#L412BPRT,1,E(0,@RPTFG,1),$)
+
+#L412BHD=n,3,S
+C(5,#TXFORM,L412B,$,S)
+E(0,0)ASGN(INQHD$)
+
+![每筆明細(OCCURS)長度]
+#L412BLN=n,3,S
+C(5,#TXFORM,L412B,$,S)
+E(0,309)ASGN(INQLEN$)
+
+![每張印錄單列印的筆數]
+#L412BQPRT=n,2,S
+C(5,#TXFORM,L412B,$,S)
+E(0,30)ASGN(INQPRT$)
+
+![畫面顯示的明細間的高度]
+#L412BLOOP=n,3,S
+C(5,#TXFORM,L412B,$,S)
+E(0,1)ASGN(LOOPHEIGHT$)
+
+</sub>
+
+!------------ TXFORM = L4102 -----------
+<sub type="FORM" name="L4102" tota-mode="1">
+
+!防止重複單據
+#CloseL412B=X,1,S
+E(0,@RPTFG,0)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+</sub>
+
+!------------ TXFORM = L412B -----------
+<sub type="FORM" name="L412B" tota-mode="1">
+
+
+#L412B_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+#OOAcDate=D,7,O
+
+#OOBatchNo=X,6,O
+
+#OODrawdownCode=A,2,O
+
+#OODrawdownCodeX=X,22,O
+T(H,#OODrawdownCode,#DrawdownCodeHelp)
+!SWITCH(#OODrawdownCode,1,T(3,整批匯款),2,T(3,單筆匯款),3,T(3,退款-整批匯款),4,T(3,退款-存款憑條),9,T(3,全部))
+
+#OOStatusCode=A,1,O
+
+#OOStatusCodeX=X,10,O
+T(3,)T(H,#OOStatusCode,#StatusCodeHelp)
+!SWITCH(#OOStatusCode,0,T(3,正常),1,T(3,產檔後修正),2,T(3,產檔後訂正),9,T(3,全部))
+
+#OORemitBank=A,3,O
+
+#OORemitBranch=A,4,O
+
+
+#OORemitBankX=X,40,O
+
+
+#OORemitBranchX=X,40,O
+
+#RemitAcctNo=A,14,O
+
+#OOCustNo=A,7,O
+
+#OOFacmNo=A,3,O
+
+#OOBormNo=A,3,O
+
+#OOCustNoX=X,15,O
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+
+#OOCustName=x,100,O
+#OOCustNameX=x,20,O
+
+#OORemaker=X,60,O
+
+#OOCurrencyCode=X,3,O
+
+#OORemitAmt=m,14.2,O
 
 </sub>
 
@@ -79,15 +222,40 @@ T(2,Y)
 </sub>
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L4102^
+TXFORM=L4102
+^
+TXFORM=L412B
+#OOAcDate
+#OOBatchNo
+#OODrawdownCode
+#OOStatusCode
+#OORemitBank
+#OORemitBranch
+#OORemitBankX
+#OORemitBranchX
+#RemitAcctNo
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOCustName
+#OORemaker
+#OOCurrencyCode
+#OORemitAmt
+^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 
 </sub>
-
-! pdf:1, excel:2, txt:3(分號區隔)
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
 <include src="PRT.icf::UPDH01.sel"/>
+#RPTFG=1,L4102,NA,,D,15
+%
+#OOAcDate#OOBatchNo#OODrawdownCodeX#OORemitBankX
+#RemitAcctNo#OOCustNo#OOFacmNo#OOBormNo#OOCustNameX#OORemaker
+#OOCurrencyCode#OORemitAmt#OORemitBranchX
+@^
+
 </sub>

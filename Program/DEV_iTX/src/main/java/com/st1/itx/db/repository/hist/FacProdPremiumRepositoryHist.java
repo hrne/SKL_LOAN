@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import java.math.BigDecimal;
@@ -22,12 +23,13 @@ import com.st1.itx.db.domain.FacProdPremiumId;
  */
 public interface FacProdPremiumRepositoryHist extends JpaRepository<FacProdPremium, FacProdPremiumId> {
 
-	// ProdNo = ,AND PremiumLow >= ,AND PremiumLow <=
-	public Slice<FacProdPremium> findAllByProdNoIsAndPremiumLowGreaterThanEqualAndPremiumLowLessThanEqual(String prodNo_0, BigDecimal premiumLow_1, BigDecimal premiumLow_2, Pageable pageable);
+  // ProdNo = ,AND PremiumLow >= ,AND PremiumLow <=
+  public Slice<FacProdPremium> findAllByProdNoIsAndPremiumLowGreaterThanEqualAndPremiumLowLessThanEqual(String prodNo_0, BigDecimal premiumLow_1, BigDecimal premiumLow_2, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<FacProdPremium> findByFacProdPremiumId(FacProdPremiumId facProdPremiumId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<FacProdPremium> findByFacProdPremiumId(FacProdPremiumId facProdPremiumId);
 
 }
+

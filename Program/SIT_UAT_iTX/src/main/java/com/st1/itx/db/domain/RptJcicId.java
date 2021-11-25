@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * RptJcic 報表Jcic<br>
+ * RptJcic 呆帳不報送檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

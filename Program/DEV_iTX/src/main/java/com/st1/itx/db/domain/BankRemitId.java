@@ -28,7 +28,7 @@ public class BankRemitId implements Serializable {
   private int acDate = 0;
 
   // 經辦
-  @Column(name = "`TitaTlrNo`", length = 8)
+  @Column(name = "`TitaTlrNo`", length = 6)
   private String titaTlrNo = " ";
 
   // 交易序號

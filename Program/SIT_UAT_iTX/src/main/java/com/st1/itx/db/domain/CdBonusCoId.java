@@ -27,12 +27,12 @@ public class CdBonusCoId implements Serializable {
   private int workMonth = 0;
 
   // 條件記號
-  /* 1.篩選條件-計件代碼2.協辦等級 */
+  /* 1.篩選條件-計件代碼2.協辦等級3.專業獎勵金4.排除商品別5.排除部門別6.是否排除15日薪非業績人員 */
   @Column(name = "`ConditionCode`")
   private int conditionCode = 0;
 
   // 標準條件
-  /* 條件記號=1時為計件代碼1位(1、2、A、B)條件記號=2時為協辦等級1位(1:初級、2:中級、3:高級) */
+  /* 條件記號=1時為計件代碼1位(1、2、A、B)條件記號=2時為協辦等級1位(1:初級、2:中級、3:高級)條件記號=3時為1個空白條件記號=4時為商品別代號條件記號=5時為部門別代號條件記號=6時為Y/N */
   @Column(name = "`Condition`", length = 5)
   private String condition = " ";
 
@@ -68,6 +68,10 @@ public class CdBonusCoId implements Serializable {
 	* 條件記號<br>
 	* 1.篩選條件-計件代碼
 2.協辦等級
+3.專業獎勵金
+4.排除商品別
+5.排除部門別
+6.是否排除15日薪非業績人員
 	* @return Integer
 	*/
   public int getConditionCode() {
@@ -78,6 +82,10 @@ public class CdBonusCoId implements Serializable {
 	* 條件記號<br>
 	* 1.篩選條件-計件代碼
 2.協辦等級
+3.專業獎勵金
+4.排除商品別
+5.排除部門別
+6.是否排除15日薪非業績人員
   *
   * @param conditionCode 條件記號
 	*/
@@ -89,6 +97,10 @@ public class CdBonusCoId implements Serializable {
 	* 標準條件<br>
 	* 條件記號=1時為計件代碼1位(1、2、A、B)
 條件記號=2時為協辦等級1位(1:初級、2:中級、3:高級)
+條件記號=3時為1個空白
+條件記號=4時為商品別代號
+條件記號=5時為部門別代號
+條件記號=6時為Y/N
 	* @return String
 	*/
   public String getCondition() {
@@ -99,6 +111,10 @@ public class CdBonusCoId implements Serializable {
 	* 標準條件<br>
 	* 條件記號=1時為計件代碼1位(1、2、A、B)
 條件記號=2時為協辦等級1位(1:初級、2:中級、3:高級)
+條件記號=3時為1個空白
+條件記號=4時為商品別代號
+條件記號=5時為部門別代號
+條件記號=6時為Y/N
   *
   * @param condition 標準條件
 	*/

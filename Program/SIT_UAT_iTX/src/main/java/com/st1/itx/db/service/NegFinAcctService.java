@@ -15,107 +15,107 @@ import org.springframework.data.domain.Slice;
  */
 public interface NegFinAcctService {
 
-	/**
-	 * findByPrimaryKey
-	 *
-	 * @param finCode PK
-	 * @param titaVo  Variable-Length Argument
-	 * @return NegFinAcct NegFinAcct
-	 */
-	public NegFinAcct findById(String finCode, TitaVo... titaVo);
+  /**
+   * findByPrimaryKey
+   *
+   * @param finCode PK
+   * @param titaVo Variable-Length Argument
+   * @return NegFinAcct NegFinAcct
+   */
+  public NegFinAcct findById(String finCode, TitaVo... titaVo);
 
-	/**
-	 * findAll
-	 *
-	 * @param index  Page Index
-	 * @param limit  Page Data Limit
-	 * @param titaVo Variable-Length Argument
-	 * @return Slice NegFinAcct NegFinAcct of List
-	 */
-	public Slice<NegFinAcct> findAll(int index, int limit, TitaVo... titaVo);
+  /**
+   * findAll
+   *
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegFinAcct NegFinAcct of List
+   */
+  public Slice<NegFinAcct> findAll(int index, int limit, TitaVo... titaVo);
 
-	/**
-	 * hold By NegFinAcct
-	 * 
-	 * @param finCode key
-	 * @param titaVo  Variable-Length Argument
-	 * @return NegFinAcct NegFinAcct
-	 */
-	public NegFinAcct holdById(String finCode, TitaVo... titaVo);
+  /**
+   * hold By NegFinAcct
+   * 
+   * @param finCode key
+   * @param titaVo Variable-Length Argument
+   * @return NegFinAcct NegFinAcct
+   */
+  public NegFinAcct holdById(String finCode, TitaVo... titaVo);
 
-	/**
-	 * hold By NegFinAcct
-	 * 
-	 * @param negFinAcct key
-	 * @param titaVo     Variable-Length Argument
-	 * @return NegFinAcct NegFinAcct
-	 */
-	public NegFinAcct holdById(NegFinAcct negFinAcct, TitaVo... titaVo);
+  /**
+   * hold By NegFinAcct
+   * 
+   * @param negFinAcct key
+   * @param titaVo Variable-Length Argument
+   * @return NegFinAcct NegFinAcct
+   */
+  public NegFinAcct holdById(NegFinAcct negFinAcct, TitaVo... titaVo);
 
-	/**
-	 * Insert
-	 * 
-	 * @param negFinAcct Entity
-	 * @param titaVo     Variable-Length Argument
-	 * @return NegFinAcct Entity
-	 * @throws DBException exception
-	 */
-	public NegFinAcct insert(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
+  /**
+   * Insert
+   * 
+   * @param negFinAcct Entity
+   * @param titaVo Variable-Length Argument
+   * @return NegFinAcct Entity
+   * @throws DBException exception
+   */
+  public NegFinAcct insert(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update
-	 * 
-	 * @param negFinAcct Entity
-	 * @param titaVo     Variable-Length Argument
-	 * @return NegFinAcct Entity
-	 * @throws DBException exception
-	 */
-	public NegFinAcct update(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
+  /**
+   * Update
+   * 
+   * @param negFinAcct Entity
+   * @param titaVo Variable-Length Argument
+   * @return NegFinAcct Entity
+   * @throws DBException exception
+   */
+  public NegFinAcct update(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update2
-	 * 
-	 * @param negFinAcct Entity
-	 * @param titaVo     Variable-Length Argument
-	 * @return NegFinAcct Entity
-	 * @throws DBException exception
-	 */
-	public NegFinAcct update2(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
+  /**
+   * Update2
+   * 
+   * @param negFinAcct Entity
+   * @param titaVo Variable-Length Argument
+   * @return NegFinAcct Entity
+   * @throws DBException exception
+   */
+  public NegFinAcct update2(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Delete
-	 * 
-	 * @param negFinAcct Entity
-	 * @param titaVo     Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void delete(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
+  /**
+   * Delete
+   * 
+   * @param negFinAcct Entity
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void delete(NegFinAcct negFinAcct, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Insert All For List
-	 * 
-	 * @param negFinAcct Entity of List
-	 * @param titaVo     Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void insertAll(List<NegFinAcct> negFinAcct, TitaVo... titaVo) throws DBException;
+  /**
+   * Insert All For List
+   * 
+   * @param negFinAcct Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void insertAll(List<NegFinAcct> negFinAcct, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update All For List
-	 * 
-	 * @param negFinAcct Entity of List
-	 * @param titaVo     Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void updateAll(List<NegFinAcct> negFinAcct, TitaVo... titaVo) throws DBException;
+  /**
+   * Update All For List
+   * 
+   * @param negFinAcct Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void updateAll(List<NegFinAcct> negFinAcct, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Delete All For List
-	 * 
-	 * @param negFinAcct Entity of List
-	 * @param titaVo     Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void deleteAll(List<NegFinAcct> negFinAcct, TitaVo... titaVo) throws DBException;
+  /**
+   * Delete All For List
+   * 
+   * @param negFinAcct Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void deleteAll(List<NegFinAcct> negFinAcct, TitaVo... titaVo) throws DBException;
 
 }

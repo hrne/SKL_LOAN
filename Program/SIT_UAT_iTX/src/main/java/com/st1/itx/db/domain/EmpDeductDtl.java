@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * EmpDeductDtl 員工扣薪明細檔<br>
@@ -41,7 +43,7 @@ public class EmpDeductDtl implements Serializable {
   private int custNo = 0;
 
   // 入帳扣款別
-  /* 0.債協暫收款1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
   @Column(name = "`AchRepayCode`", insertable = false, updatable = false)
   private int achRepayCode = 0;
 
@@ -54,7 +56,7 @@ public class EmpDeductDtl implements Serializable {
   private String procCode;
 
   // 扣款代碼
-  /* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件 */
+  /* CdCode:PerfRepayCode1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件 */
   @Column(name = "`RepayCode`", length = 1, insertable = false, updatable = false)
   private String repayCode;
 
@@ -78,7 +80,7 @@ public class EmpDeductDtl implements Serializable {
   @Column(name = "`CustId`", length = 10)
   private String custId;
 
-  // 交易金額
+  // 交易金額(實扣金額)
   @Column(name = "`TxAmt`")
   private BigDecimal txAmt = new BigDecimal("0");
 
@@ -87,18 +89,22 @@ public class EmpDeductDtl implements Serializable {
   private String errMsg;
 
   // 會計日期
+  /* 入帳時更新 */
   @Column(name = "`Acdate`")
   private int acdate = 0;
 
   // 經辦
+  /* 入帳時更新 */
   @Column(name = "`TitaTlrNo`", length = 6)
   private String titaTlrNo;
 
   // 交易序號
+  /* 入帳時更新 */
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo;
 
   // 批次號碼
+  /* 入帳時更新 */
   @Column(name = "`BatchNo`", length = 6)
   private String batchNo;
 
@@ -143,7 +149,7 @@ public class EmpDeductDtl implements Serializable {
   private BigDecimal sumOvpayAmt = new BigDecimal("0");
 
   // jason格式紀錄欄
-  /* (JSON格式)報表:違約金、欠繳本金、欠繳利息、暫收抵繳 */
+  /* 暫收抵繳 TempAmt欠繳本金 ShortPri欠繳利息 ShortInt違約金 Breach火險單號碼 InsuNo(split by ,) */
   @Column(name = "`JsonFields`", length = 300)
   private String jsonFields;
 
@@ -203,7 +209,7 @@ public class EmpDeductDtl implements Serializable {
 	* @return Integer
 	*/
   public int getEntryDate() {
-    return this.entryDate;
+    return StaticTool.bcToRoc(this.entryDate);
   }
 
 /**
@@ -211,9 +217,9 @@ public class EmpDeductDtl implements Serializable {
 	* 
   *
   * @param entryDate 入帳日期
-	*/
-  public void setEntryDate(int entryDate) {
-    this.entryDate = entryDate;
+  * @throws LogicException when Date Is Warn	*/
+  public void setEntryDate(int entryDate) throws LogicException {
+    this.entryDate = StaticTool.rocToBc(entryDate);
   }
 
 /**
@@ -237,7 +243,7 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 入帳扣款別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -254,7 +260,7 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 入帳扣款別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -310,7 +316,8 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 扣款代碼<br>
-	* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
+	* CdCode:PerfRepayCode
+1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
 	* @return String
 	*/
   public String getRepayCode() {
@@ -319,7 +326,8 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 扣款代碼<br>
-	* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
+	* CdCode:PerfRepayCode
+1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
   *
   * @param repayCode 扣款代碼
 	*/
@@ -423,7 +431,7 @@ public class EmpDeductDtl implements Serializable {
   }
 
 /**
-	* 交易金額<br>
+	* 交易金額(實扣金額)<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -432,10 +440,10 @@ public class EmpDeductDtl implements Serializable {
   }
 
 /**
-	* 交易金額<br>
+	* 交易金額(實扣金額)<br>
 	* 
   *
-  * @param txAmt 交易金額
+  * @param txAmt 交易金額(實扣金額)
 	*/
   public void setTxAmt(BigDecimal txAmt) {
     this.txAmt = txAmt;
@@ -462,26 +470,26 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 入帳時更新
 	* @return Integer
 	*/
   public int getAcdate() {
-    return this.acdate;
+    return StaticTool.bcToRoc(this.acdate);
   }
 
 /**
 	* 會計日期<br>
-	* 
+	* 入帳時更新
   *
   * @param acdate 會計日期
-	*/
-  public void setAcdate(int acdate) {
-    this.acdate = acdate;
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcdate(int acdate) throws LogicException {
+    this.acdate = StaticTool.rocToBc(acdate);
   }
 
 /**
 	* 經辦<br>
-	* 
+	* 入帳時更新
 	* @return String
 	*/
   public String getTitaTlrNo() {
@@ -490,7 +498,7 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 經辦<br>
-	* 
+	* 入帳時更新
   *
   * @param titaTlrNo 經辦
 	*/
@@ -500,7 +508,7 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 交易序號<br>
-	* 
+	* 入帳時更新
 	* @return String
 	*/
   public String getTitaTxtNo() {
@@ -509,7 +517,7 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 交易序號<br>
-	* 
+	* 入帳時更新
   *
   * @param titaTxtNo 交易序號
 	*/
@@ -519,7 +527,7 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 批次號碼<br>
-	* 
+	* 入帳時更新
 	* @return String
 	*/
   public String getBatchNo() {
@@ -528,7 +536,7 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 批次號碼<br>
-	* 
+	* 入帳時更新
   *
   * @param batchNo 批次號碼
 	*/
@@ -618,7 +626,7 @@ public class EmpDeductDtl implements Serializable {
 	* @return Integer
 	*/
   public int getIntStartDate() {
-    return this.intStartDate;
+    return StaticTool.bcToRoc(this.intStartDate);
   }
 
 /**
@@ -626,9 +634,9 @@ public class EmpDeductDtl implements Serializable {
 	* 
   *
   * @param intStartDate 計息起日
-	*/
-  public void setIntStartDate(int intStartDate) {
-    this.intStartDate = intStartDate;
+  * @throws LogicException when Date Is Warn	*/
+  public void setIntStartDate(int intStartDate) throws LogicException {
+    this.intStartDate = StaticTool.rocToBc(intStartDate);
   }
 
 /**
@@ -637,7 +645,7 @@ public class EmpDeductDtl implements Serializable {
 	* @return Integer
 	*/
   public int getIntEndDate() {
-    return this.intEndDate;
+    return StaticTool.bcToRoc(this.intEndDate);
   }
 
 /**
@@ -645,9 +653,9 @@ public class EmpDeductDtl implements Serializable {
 	* 
   *
   * @param intEndDate 計息迄日
-	*/
-  public void setIntEndDate(int intEndDate) {
-    this.intEndDate = intEndDate;
+  * @throws LogicException when Date Is Warn	*/
+  public void setIntEndDate(int intEndDate) throws LogicException {
+    this.intEndDate = StaticTool.rocToBc(intEndDate);
   }
 
 /**
@@ -728,7 +736,11 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* jason格式紀錄欄<br>
-	* (JSON格式)報表:違約金、欠繳本金、欠繳利息、暫收抵繳
+	* 暫收抵繳 TempAmt
+欠繳本金 ShortPri
+欠繳利息 ShortInt
+違約金 Breach
+火險單號碼 InsuNo(split by ,)
 	* @return String
 	*/
   public String getJsonFields() {
@@ -737,7 +749,11 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* jason格式紀錄欄<br>
-	* (JSON格式)報表:違約金、欠繳本金、欠繳利息、暫收抵繳
+	* 暫收抵繳 TempAmt
+欠繳本金 ShortPri
+欠繳利息 ShortInt
+違約金 Breach
+火險單號碼 InsuNo(split by ,)
   *
   * @param jsonFields jason格式紀錄欄
 	*/
@@ -789,7 +805,7 @@ public class EmpDeductDtl implements Serializable {
 	* @return Integer
 	*/
   public int getMediaDate() {
-    return this.mediaDate;
+    return StaticTool.bcToRoc(this.mediaDate);
   }
 
 /**
@@ -797,9 +813,9 @@ public class EmpDeductDtl implements Serializable {
 	* 員工扣薪媒體檔
   *
   * @param mediaDate 媒體日期
-	*/
-  public void setMediaDate(int mediaDate) {
-    this.mediaDate = mediaDate;
+  * @throws LogicException when Date Is Warn	*/
+  public void setMediaDate(int mediaDate) throws LogicException {
+    this.mediaDate = StaticTool.rocToBc(mediaDate);
   }
 
 /**

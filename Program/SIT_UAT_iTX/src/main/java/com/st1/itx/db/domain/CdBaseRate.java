@@ -57,7 +57,7 @@ public class CdBaseRate implements Serializable {
   private String remark;
 
   // 生效記號
-  /* 0:已放行(生效日期&amp;gt;會計日:未生效 else 已生效)1:已使用(不可刪除)2:未放行 */
+  /* 0:已放行(生效日期&amp;gt;日曆日:未生效 else 已生效)1:已使用(不可刪除)2:未放行 */
   @Column(name = "`EffectFlag`")
   private int effectFlag = 0;
 
@@ -193,7 +193,7 @@ TWD: 新台幣
 
 /**
 	* 生效記號<br>
-	* 0:已放行(生效日期&amp;gt;會計日:未生效 else 已生效)
+	* 0:已放行(生效日期&amp;gt;日曆日:未生效 else 已生效)
 1:已使用(不可刪除)
 2:未放行
 	* @return Integer
@@ -204,7 +204,7 @@ TWD: 新台幣
 
 /**
 	* 生效記號<br>
-	* 0:已放行(生效日期&amp;gt;會計日:未生效 else 已生效)
+	* 0:已放行(生效日期&amp;gt;日曆日:未生效 else 已生效)
 1:已使用(不可刪除)
 2:未放行
   *

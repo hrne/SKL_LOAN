@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * EmpDeductDtl 員工扣薪明細檔<br>
@@ -30,7 +32,7 @@ public class EmpDeductDtlId implements Serializable {
   private int custNo = 0;
 
   // 入帳扣款別
-  /* 0.債協暫收款1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
   @Column(name = "`AchRepayCode`")
   private int achRepayCode = 0;
 
@@ -43,7 +45,7 @@ public class EmpDeductDtlId implements Serializable {
   private String procCode = " ";
 
   // 扣款代碼
-  /* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件 */
+  /* CdCode:PerfRepayCode1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件 */
   @Column(name = "`RepayCode`", length = 1)
   private String repayCode = " ";
 
@@ -80,7 +82,7 @@ public class EmpDeductDtlId implements Serializable {
 	* @return Integer
 	*/
   public int getEntryDate() {
-    return this.entryDate;
+    return  StaticTool.bcToRoc(this.entryDate);
   }
 
 /**
@@ -88,9 +90,9 @@ public class EmpDeductDtlId implements Serializable {
 	* 
   *
   * @param entryDate 入帳日期
-	*/
-  public void setEntryDate(int entryDate) {
-    this.entryDate = entryDate;
+  * @throws LogicException when Date Is Warn	*/
+  public void setEntryDate(int entryDate) throws LogicException {
+    this.entryDate = StaticTool.rocToBc(entryDate);
   }
 
 /**
@@ -114,7 +116,7 @@ public class EmpDeductDtlId implements Serializable {
 
 /**
 	* 入帳扣款別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -131,7 +133,7 @@ public class EmpDeductDtlId implements Serializable {
 
 /**
 	* 入帳扣款別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -187,7 +189,8 @@ public class EmpDeductDtlId implements Serializable {
 
 /**
 	* 扣款代碼<br>
-	* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
+	* CdCode:PerfRepayCode
+1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
 	* @return String
 	*/
   public String getRepayCode() {
@@ -196,7 +199,8 @@ public class EmpDeductDtlId implements Serializable {
 
 /**
 	* 扣款代碼<br>
-	* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
+	* CdCode:PerfRepayCode
+1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
   *
   * @param repayCode 扣款代碼
 	*/

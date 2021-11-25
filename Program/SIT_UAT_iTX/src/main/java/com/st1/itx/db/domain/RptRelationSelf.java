@@ -26,7 +26,7 @@ public class RptRelationSelf implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 5335911172178526802L;
+	private static final long serialVersionUID = 7908221808328356406L;
 
 @EmbeddedId
   private RptRelationSelfId rptRelationSelfId;
@@ -87,9 +87,9 @@ public class RptRelationSelf implements Serializable {
   @Column(name = "`LAW009`", length = 1)
   private String lAW009;
 
-  // LAW0010
-  @Column(name = "`LAW0010`", length = 1)
-  private String lAW0010;
+  // LAW010
+  @Column(name = "`LAW010`", length = 1)
+  private String lAW010;
 
   // Mark
   @Column(name = "`Mark`", length = 10)
@@ -389,22 +389,22 @@ public class RptRelationSelf implements Serializable {
   }
 
 /**
-	* LAW0010<br>
+	* LAW010<br>
 	* 
 	* @return String
 	*/
-  public String getLAW0010() {
-    return this.lAW0010 == null ? "" : this.lAW0010;
+  public String getLAW010() {
+    return this.lAW010 == null ? "" : this.lAW010;
   }
 
 /**
-	* LAW0010<br>
+	* LAW010<br>
 	* 
   *
-  * @param lAW0010 LAW0010
+  * @param lAW010 LAW010
 	*/
-  public void setLAW0010(String lAW0010) {
-    this.lAW0010 = lAW0010;
+  public void setLAW010(String lAW010) {
+    this.lAW010 = lAW010;
   }
 
 /**
@@ -507,7 +507,7 @@ public class RptRelationSelf implements Serializable {
   public String toString() {
     return "RptRelationSelf [rptRelationSelfId=" + rptRelationSelfId + ", cusName=" + cusName + ", cusCCD=" + cusCCD + ", lAW001=" + lAW001
            + ", lAW002=" + lAW002 + ", lAW003=" + lAW003 + ", lAW004=" + lAW004 + ", lAW005=" + lAW005 + ", lAW006=" + lAW006 + ", lAW007=" + lAW007
-           + ", lAW008=" + lAW008 + ", lAW009=" + lAW009 + ", lAW0010=" + lAW0010 + ", mark=" + mark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lAW008=" + lAW008 + ", lAW009=" + lAW009 + ", lAW010=" + lAW010 + ", mark=" + mark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
            + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

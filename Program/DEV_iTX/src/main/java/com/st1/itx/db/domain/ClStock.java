@@ -29,7 +29,7 @@ public class ClStock implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4535359742057207557L;
+	private static final long serialVersionUID = 2128258589789300823L;
 
 @EmbeddedId
   private ClStockId clStockId;
@@ -136,6 +136,10 @@ public class ClStock implements Serializable {
   // 實行職權維持率(%)
   @Column(name = "`ImplementMtr`")
   private BigDecimal implementMtr = new BigDecimal("0");
+
+  // 全戶維持率(%)
+  @Column(name = "`AcMtr`")
+  private BigDecimal acMtr = new BigDecimal("0");
 
   // 質權設定書號
   @Column(name = "`PledgeNo`", length = 14)
@@ -712,6 +716,25 @@ public class ClStock implements Serializable {
   }
 
 /**
+	* 全戶維持率(%)<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getAcMtr() {
+    return this.acMtr;
+  }
+
+/**
+	* 全戶維持率(%)<br>
+	* 
+  *
+  * @param acMtr 全戶維持率(%)
+	*/
+  public void setAcMtr(BigDecimal acMtr) {
+    this.acMtr = acMtr;
+  }
+
+/**
 	* 質權設定書號<br>
 	* 
 	* @return String
@@ -956,8 +979,8 @@ N:否
            + ", companyId=" + companyId + ", dataYear=" + dataYear + ", issuedShares=" + issuedShares + ", netWorth=" + netWorth + ", evaStandard=" + evaStandard + ", parValue=" + parValue
            + ", monthlyAvg=" + monthlyAvg + ", ydClosingPrice=" + ydClosingPrice + ", threeMonthAvg=" + threeMonthAvg + ", evaUnitPrice=" + evaUnitPrice + ", ownerCustUKey=" + ownerCustUKey + ", insiderJobTitle=" + insiderJobTitle
            + ", insiderPosition=" + insiderPosition + ", legalPersonId=" + legalPersonId + ", loanToValue=" + loanToValue + ", clMtr=" + clMtr + ", noticeMtr=" + noticeMtr + ", implementMtr=" + implementMtr
-           + ", pledgeNo=" + pledgeNo + ", computeMTR=" + computeMTR + ", settingStat=" + settingStat + ", clStat=" + clStat + ", settingDate=" + settingDate + ", settingBalance=" + settingBalance
-           + ", mtgDate=" + mtgDate + ", custodyNo=" + custodyNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", acMtr=" + acMtr + ", pledgeNo=" + pledgeNo + ", computeMTR=" + computeMTR + ", settingStat=" + settingStat + ", clStat=" + clStat + ", settingDate=" + settingDate
+           + ", settingBalance=" + settingBalance + ", mtgDate=" + mtgDate + ", custodyNo=" + custodyNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

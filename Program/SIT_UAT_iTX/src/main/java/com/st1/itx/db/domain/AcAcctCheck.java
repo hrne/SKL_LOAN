@@ -46,6 +46,10 @@ public class AcAcctCheck implements Serializable {
   @Column(name = "`CurrencyCode`", length = 3, insertable = false, updatable = false)
   private String currencyCode;
 
+  // 區隔帳冊
+  @Column(name = "`AcSubBookCode`", length = 3, insertable = false, updatable = false)
+  private String acSubBookCode;
+
   // 業務科目代號
   @Column(name = "`AcctCode`", length = 3, insertable = false, updatable = false)
   private String acctCode;
@@ -103,10 +107,6 @@ public class AcAcctCheck implements Serializable {
   @LastModifiedDate
   @Column(name = "`LastUpdate`")
   private java.sql.Timestamp lastUpdate;
-
-  // 區隔帳冊
-  @Column(name = "`AcSubBookCode`", length = 3, insertable = false, updatable = false)
-  private String acSubBookCode;
 
 
   public AcAcctCheckId getAcAcctCheckId() {
@@ -172,6 +172,25 @@ public class AcAcctCheck implements Serializable {
 	*/
   public void setCurrencyCode(String currencyCode) {
     this.currencyCode = currencyCode;
+  }
+
+/**
+	* 區隔帳冊<br>
+	* 
+	* @return String
+	*/
+  public String getAcSubBookCode() {
+    return this.acSubBookCode == null ? "" : this.acSubBookCode;
+  }
+
+/**
+	* 區隔帳冊<br>
+	* 
+  *
+  * @param acSubBookCode 區隔帳冊
+	*/
+  public void setAcSubBookCode(String acSubBookCode) {
+    this.acSubBookCode = acSubBookCode;
   }
 
 /**
@@ -440,31 +459,12 @@ public class AcAcctCheck implements Serializable {
     this.lastUpdate = lastUpdate;
   }
 
-/**
-	* 區隔帳冊<br>
-	* 
-	* @return String
-	*/
-  public String getAcSubBookCode() {
-    return this.acSubBookCode == null ? "" : this.acSubBookCode;
-  }
-
-/**
-	* 區隔帳冊<br>
-	* 
-  *
-  * @param acSubBookCode 區隔帳冊
-	*/
-  public void setAcSubBookCode(String acSubBookCode) {
-    this.acSubBookCode = acSubBookCode;
-  }
-
 
   @Override
   public String toString() {
-    return "AcAcctCheck [acAcctCheckId=" + acAcctCheckId + ", acctItem=" + acctItem + ", tdBal=" + tdBal
-           + ", tdCnt=" + tdCnt + ", tdNewCnt=" + tdNewCnt + ", tdClsCnt=" + tdClsCnt + ", tdExtCnt=" + tdExtCnt + ", tdExtAmt=" + tdExtAmt + ", receivableBal=" + receivableBal
-           + ", acctMasterBal=" + acctMasterBal + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate
+    return "AcAcctCheck [acAcctCheckId=" + acAcctCheckId + ", acctItem=" + acctItem
+           + ", tdBal=" + tdBal + ", tdCnt=" + tdCnt + ", tdNewCnt=" + tdNewCnt + ", tdClsCnt=" + tdClsCnt + ", tdExtCnt=" + tdExtCnt + ", tdExtAmt=" + tdExtAmt
+           + ", receivableBal=" + receivableBal + ", acctMasterBal=" + acctMasterBal + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate
            + "]";
   }
 }

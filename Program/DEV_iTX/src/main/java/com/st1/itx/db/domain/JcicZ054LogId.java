@@ -2,10 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-
 
 /**
  * JcicZ054Log 單獨全數受清償資料檔案<br>

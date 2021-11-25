@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.CdCashFlowRepositoryHist;
 import com.st1.itx.db.service.CdCashFlowService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdCashFlowService")
 @Repository
-public class CdCashFlowServiceImpl implements CdCashFlowService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdCashFlowServiceImpl.class);
-
+public class CdCashFlowServiceImpl extends ASpringJpaParm implements CdCashFlowService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class CdCashFlowServiceImpl implements CdCashFlowService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + dataYearMonth);
+    this.info("findById " + dbName + " " + dataYearMonth);
     Optional<CdCashFlow> cdCashFlow = null;
     if (dbName.equals(ContentName.onDay))
       cdCashFlow = cdCashFlowReposDay.findById(dataYearMonth);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYearMonth"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYearMonth"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdCashFlowReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +102,9 @@ em = null;
       slice = cdCashFlowReposHist.findAll(pageable);
     else 
       slice = cdCashFlowRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findDataYearMonth " + dbName + " : " + "dataYearMonth_0 : " + dataYearMonth_0 + " dataYearMonth_1 : " +  dataYearMonth_1);
+    this.info("findDataYearMonth " + dbName + " : " + "dataYearMonth_0 : " + dataYearMonth_0 + " dataYearMonth_1 : " +  dataYearMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdCashFlowReposDay.findAllByDataYearMonthGreaterThanEqualAndDataYearMonthLessThanEqualOrderByDataYearMonthAsc(dataYearMonth_0, dataYearMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
     else 
       slice = cdCashFlowRepos.findAllByDataYearMonthGreaterThanEqualAndDataYearMonthLessThanEqualOrderByDataYearMonthAsc(dataYearMonth_0, dataYearMonth_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -139,7 +142,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + dataYearMonth);
+    this.info("Hold " + dbName + " " + dataYearMonth);
     Optional<CdCashFlow> cdCashFlow = null;
     if (dbName.equals(ContentName.onDay))
       cdCashFlow = cdCashFlowReposDay.findByDataYearMonth(dataYearMonth);
@@ -157,7 +160,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdCashFlow.getDataYearMonth());
+    this.info("Hold " + dbName + " " + cdCashFlow.getDataYearMonth());
     Optional<CdCashFlow> cdCashFlowT = null;
     if (dbName.equals(ContentName.onDay))
       cdCashFlowT = cdCashFlowReposDay.findByDataYearMonth(cdCashFlow.getDataYearMonth());
@@ -178,8 +181,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdCashFlow.getDataYearMonth());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdCashFlow.getDataYearMonth());
     if (this.findById(cdCashFlow.getDataYearMonth()) != null)
       throw new DBException(2);
 
@@ -207,8 +212,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdCashFlow.getDataYearMonth());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdCashFlow.getDataYearMonth());
     if (!empNot.isEmpty())
       cdCashFlow.setLastUpdateEmpNo(empNot);
 
@@ -230,8 +237,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdCashFlow.getDataYearMonth());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdCashFlow.getDataYearMonth());
     if (!empNot.isEmpty())
       cdCashFlow.setLastUpdateEmpNo(empNot);
 
@@ -251,7 +260,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdCashFlow.getDataYearMonth());
+    this.info("Delete..." + dbName + " " + cdCashFlow.getDataYearMonth());
     if (dbName.equals(ContentName.onDay)) {
       cdCashFlowReposDay.delete(cdCashFlow);	
       cdCashFlowReposDay.flush();
@@ -280,7 +289,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdCashFlow t : cdCashFlow){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -314,8 +326,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdCashFlow == null || cdCashFlow.size() == 0)
       throw new DBException(6);
 
@@ -344,7 +358,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdCashFlow> cdCashFlow, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

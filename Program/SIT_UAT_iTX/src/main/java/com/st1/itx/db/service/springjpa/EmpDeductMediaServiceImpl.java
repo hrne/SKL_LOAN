@@ -26,6 +26,7 @@ import com.st1.itx.db.repository.hist.EmpDeductMediaRepositoryHist;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -138,13 +139,13 @@ em = null;
     this.info("receiveCheckFirst " + dbName + " : " + "mediaKind_0 : " + mediaKind_0 + " custNo_1 : " +  custNo_1 + " entryDate_2 : " +  entryDate_2 + " repayCode_3 : " +  repayCode_3 + " repayAmt_4 : " +  repayAmt_4);
     Optional<EmpDeductMedia> empDeductMediaT = null;
     if (dbName.equals(ContentName.onDay))
-      empDeductMediaT = empDeductMediaReposDay.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
+      empDeductMediaT = empDeductMediaReposDay.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIsOrderByMediaDateDesc(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
     else if (dbName.equals(ContentName.onMon))
-      empDeductMediaT = empDeductMediaReposMon.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
+      empDeductMediaT = empDeductMediaReposMon.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIsOrderByMediaDateDesc(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
     else if (dbName.equals(ContentName.onHist))
-      empDeductMediaT = empDeductMediaReposHist.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
+      empDeductMediaT = empDeductMediaReposHist.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIsOrderByMediaDateDesc(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
     else 
-      empDeductMediaT = empDeductMediaRepos.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
+      empDeductMediaT = empDeductMediaRepos.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIsOrderByMediaDateDesc(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
 
     return empDeductMediaT.isPresent() ? empDeductMediaT.get() : null;
   }
@@ -268,7 +269,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     if (this.findById(empDeductMedia.getEmpDeductMediaId()) != null)
       throw new DBException(2);
@@ -297,7 +300,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     if (!empNot.isEmpty())
       empDeductMedia.setLastUpdateEmpNo(empNot);
@@ -320,7 +325,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     if (!empNot.isEmpty())
       empDeductMedia.setLastUpdateEmpNo(empNot);
@@ -370,7 +377,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (EmpDeductMedia t : empDeductMedia){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -404,7 +414,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (empDeductMedia == null || empDeductMedia.size() == 0)
       throw new DBException(6);

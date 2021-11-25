@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.online;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -18,9 +19,10 @@ import com.st1.itx.db.domain.NegFinAcct;
  */
 public interface NegFinAcctRepository extends JpaRepository<NegFinAcct, String> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<NegFinAcct> findByFinCode(String finCode);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<NegFinAcct> findByFinCode(String finCode);
 
 }
+

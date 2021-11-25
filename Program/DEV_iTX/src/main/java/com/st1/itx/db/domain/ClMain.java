@@ -81,7 +81,7 @@ public class ClMain implements Serializable {
   private BigDecimal evaAmt = new BigDecimal("0");
 
   // 可分配金額
-  /* 鑑估總值*貸放成數(四捨五入至個位數)與設定金額比較,較低者為可分配金額同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額 */
+  /* 1.若"評估淨值"有值取"評估淨值"否則取"鑑估總值")*貸放成數(四捨五入至個位數)2.若設定金額低於可分配金額則為設定金額3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零) */
   @Column(name = "`ShareTotal`")
   private BigDecimal shareTotal = new BigDecimal("0");
 
@@ -329,8 +329,9 @@ public class ClMain implements Serializable {
 
 /**
 	* 可分配金額<br>
-	* 鑑估總值*貸放成數(四捨五入至個位數)與設定金額比較,較低者為可分配金額
-同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額
+	* 1.若"評估淨值"有值取"評估淨值"否則取"鑑估總值")*貸放成數(四捨五入至個位數)
+2.若設定金額低於可分配金額則為設定金額
+3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)
 	* @return BigDecimal
 	*/
   public BigDecimal getShareTotal() {
@@ -339,8 +340,9 @@ public class ClMain implements Serializable {
 
 /**
 	* 可分配金額<br>
-	* 鑑估總值*貸放成數(四捨五入至個位數)與設定金額比較,較低者為可分配金額
-同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額
+	* 1.若"評估淨值"有值取"評估淨值"否則取"鑑估總值")*貸放成數(四捨五入至個位數)
+2.若設定金額低於可分配金額則為設定金額
+3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)
   *
   * @param shareTotal 可分配金額
 	*/

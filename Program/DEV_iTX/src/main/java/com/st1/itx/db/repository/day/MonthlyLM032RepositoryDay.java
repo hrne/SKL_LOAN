@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,13 +21,14 @@ import com.st1.itx.db.domain.MonthlyLM032Id;
  */
 public interface MonthlyLM032RepositoryDay extends JpaRepository<MonthlyLM032, MonthlyLM032Id> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<MonthlyLM032> findByMonthlyLM032Id(MonthlyLM032Id monthlyLM032Id);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<MonthlyLM032> findByMonthlyLM032Id(MonthlyLM032Id monthlyLM032Id);
 
-	// (月底日日終批次)維護MonthlyLM032月報工作檔
-	@Procedure(value = "\"Usp_L9_MonthlyLM032_Upd\"")
-	public void uspL9Monthlylm032Upd(int TBSDYF, String empNo, int LMBSDYF);
+  // (月底日日終批次)維護MonthlyLM032月報工作檔
+  @Procedure(value = "\"Usp_L9_MonthlyLM032_Upd\"")
+  public void uspL9Monthlylm032Upd(int TBSDYF, String empNo,int LMBSDYF);
 
 }
+

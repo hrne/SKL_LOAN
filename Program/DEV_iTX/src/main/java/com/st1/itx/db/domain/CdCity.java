@@ -76,17 +76,14 @@ public class CdCity implements Serializable {
   private String legalExt;
 
   // 利率加減碼
-  /* 刪除 */
   @Column(name = "`IntRateIncr`")
   private BigDecimal intRateIncr = new BigDecimal("0");
 
   // 利率上限
-  /* 刪除 */
   @Column(name = "`IntRateCeiling`")
   private BigDecimal intRateCeiling = new BigDecimal("0");
 
   // 利率下限
-  /* 刪除 */
   @Column(name = "`IntRateFloor`")
   private BigDecimal intRateFloor = new BigDecimal("0");
 
@@ -363,7 +360,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率加減碼<br>
-	* 刪除
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getIntRateIncr() {
@@ -372,7 +369,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率加減碼<br>
-	* 刪除
+	* 
   *
   * @param intRateIncr 利率加減碼
 	*/
@@ -382,7 +379,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率上限<br>
-	* 刪除
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getIntRateCeiling() {
@@ -391,7 +388,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率上限<br>
-	* 刪除
+	* 
   *
   * @param intRateCeiling 利率上限
 	*/
@@ -401,7 +398,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率下限<br>
-	* 刪除
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getIntRateFloor() {
@@ -410,7 +407,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率下限<br>
-	* 刪除
+	* 
   *
   * @param intRateFloor 利率下限
 	*/

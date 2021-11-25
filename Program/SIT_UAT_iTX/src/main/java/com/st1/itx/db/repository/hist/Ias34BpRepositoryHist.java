@@ -26,7 +26,7 @@ public interface Ias34BpRepositoryHist extends JpaRepository<Ias34Bp, Ias34BpId>
   @Transactional(readOnly = false)
   public Optional<Ias34Bp> findByIas34BpId(Ias34BpId ias34BpId);
 
-  // (月底日日終批次)維護 Ias34Bp IAS34資料欄位清單B檔
+  // (月底日日終批次)維護 IAS34 欄位清單B檔
   @Procedure(value = "\"Usp_L7_Ias34Bp_Upd\"")
   public void uspL7Ias34bpUpd(int TBSDYF, String EmpNo);
 

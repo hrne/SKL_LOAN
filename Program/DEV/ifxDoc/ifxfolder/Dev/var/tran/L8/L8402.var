@@ -39,7 +39,7 @@ E(0,0)
 
 !---------- 交易畫面及個別交易變數宣告 ----------
 !---------- ["@",#Btn5, "@B087 聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔"],
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,80];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,120];">
 [
 ["[L8402]                                 產生JCIC月報媒體檔"],
 ["#R1+@會計日期",#ACCTDATE],

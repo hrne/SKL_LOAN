@@ -171,7 +171,8 @@ public class CdReport implements Serializable {
 
 /**
 	* 寄送記號<br>
-	* 0:不送 1:依利率調整通知方式
+	* 0:不送 
+1:依利率調整通知方式
 2:依設定優先序
 	* @return Integer
 	*/
@@ -181,7 +182,8 @@ public class CdReport implements Serializable {
 
 /**
 	* 寄送記號<br>
-	* 0:不送 1:依利率調整通知方式
+	* 0:不送 
+1:依利率調整通知方式
 2:依設定優先序
   *
   * @param sendCode 寄送記號

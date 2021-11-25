@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -18,9 +19,10 @@ import com.st1.itx.db.domain.CdAppraiser;
  */
 public interface CdAppraiserRepositoryMon extends JpaRepository<CdAppraiser, String> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdAppraiser> findByAppraiserCode(String appraiserCode);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdAppraiser> findByAppraiserCode(String appraiserCode);
 
 }
+

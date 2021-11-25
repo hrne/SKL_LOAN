@@ -123,7 +123,7 @@ public class NegTrans implements Serializable {
   private BigDecimal interestAmt = new BigDecimal("0");
 
   // 轉入溢收金額
-  /* 暫收金額(減退還金額)減還款金額，為正時 */
+  /* 暫收金額減還款金額，為正時 */
   @Column(name = "`OverAmt`")
   private BigDecimal overAmt = new BigDecimal("0");
 
@@ -623,7 +623,7 @@ public class NegTrans implements Serializable {
 
 /**
 	* 轉入溢收金額<br>
-	* 暫收金額(減退還金額)減還款金額，為正時
+	* 暫收金額減還款金額，為正時
 	* @return BigDecimal
 	*/
   public BigDecimal getOverAmt() {
@@ -632,7 +632,7 @@ public class NegTrans implements Serializable {
 
 /**
 	* 轉入溢收金額<br>
-	* 暫收金額(減退還金額)減還款金額，為正時
+	* 暫收金額減還款金額，為正時
   *
   * @param overAmt 轉入溢收金額
 	*/

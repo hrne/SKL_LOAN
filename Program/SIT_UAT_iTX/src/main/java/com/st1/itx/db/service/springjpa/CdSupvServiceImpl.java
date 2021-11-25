@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.CdSupvRepositoryHist;
 import com.st1.itx.db.service.CdSupvService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdSupvService")
 @Repository
-public class CdSupvServiceImpl implements CdSupvService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdSupvServiceImpl.class);
-
+public class CdSupvServiceImpl extends ASpringJpaParm implements CdSupvService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class CdSupvServiceImpl implements CdSupvService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + supvReasonCode);
+    this.info("findById " + dbName + " " + supvReasonCode);
     Optional<CdSupv> cdSupv = null;
     if (dbName.equals(ContentName.onDay))
       cdSupv = cdSupvReposDay.findById(supvReasonCode);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "SupvReasonCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "SupvReasonCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdSupvReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +102,9 @@ em = null;
       slice = cdSupvReposHist.findAll(pageable);
     else 
       slice = cdSupvRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findSupvReasonLevel " + dbName + " : " + "supvReasonLevel_0 : " + supvReasonLevel_0);
+    this.info("findSupvReasonLevel " + dbName + " : " + "supvReasonLevel_0 : " + supvReasonLevel_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdSupvReposDay.findAllBySupvReasonLevelIs(supvReasonLevel_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -130,6 +130,9 @@ em = null;
       slice = cdSupvReposHist.findAllBySupvReasonLevelIs(supvReasonLevel_0, pageable);
     else 
       slice = cdSupvRepos.findAllBySupvReasonLevelIs(supvReasonLevel_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -146,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findSupvReasonCode " + dbName + " : " + "supvReasonCode_0 : " + supvReasonCode_0 + " supvReasonCode_1 : " +  supvReasonCode_1);
+    this.info("findSupvReasonCode " + dbName + " : " + "supvReasonCode_0 : " + supvReasonCode_0 + " supvReasonCode_1 : " +  supvReasonCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdSupvReposDay.findAllBySupvReasonCodeGreaterThanEqualAndSupvReasonCodeLessThanEqualOrderBySupvReasonCodeAsc(supvReasonCode_0, supvReasonCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +159,9 @@ em = null;
     else 
       slice = cdSupvRepos.findAllBySupvReasonCodeGreaterThanEqualAndSupvReasonCodeLessThanEqualOrderBySupvReasonCodeAsc(supvReasonCode_0, supvReasonCode_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -164,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + supvReasonCode);
+    this.info("Hold " + dbName + " " + supvReasonCode);
     Optional<CdSupv> cdSupv = null;
     if (dbName.equals(ContentName.onDay))
       cdSupv = cdSupvReposDay.findBySupvReasonCode(supvReasonCode);
@@ -182,7 +188,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdSupv.getSupvReasonCode());
+    this.info("Hold " + dbName + " " + cdSupv.getSupvReasonCode());
     Optional<CdSupv> cdSupvT = null;
     if (dbName.equals(ContentName.onDay))
       cdSupvT = cdSupvReposDay.findBySupvReasonCode(cdSupv.getSupvReasonCode());
@@ -203,8 +209,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdSupv.getSupvReasonCode());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdSupv.getSupvReasonCode());
     if (this.findById(cdSupv.getSupvReasonCode()) != null)
       throw new DBException(2);
 
@@ -232,8 +240,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdSupv.getSupvReasonCode());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdSupv.getSupvReasonCode());
     if (!empNot.isEmpty())
       cdSupv.setLastUpdateEmpNo(empNot);
 
@@ -255,8 +265,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdSupv.getSupvReasonCode());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdSupv.getSupvReasonCode());
     if (!empNot.isEmpty())
       cdSupv.setLastUpdateEmpNo(empNot);
 
@@ -276,7 +288,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdSupv.getSupvReasonCode());
+    this.info("Delete..." + dbName + " " + cdSupv.getSupvReasonCode());
     if (dbName.equals(ContentName.onDay)) {
       cdSupvReposDay.delete(cdSupv);	
       cdSupvReposDay.flush();
@@ -305,7 +317,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdSupv t : cdSupv){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -339,8 +354,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdSupv == null || cdSupv.size() == 0)
       throw new DBException(6);
 
@@ -369,7 +386,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdSupv> cdSupv, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

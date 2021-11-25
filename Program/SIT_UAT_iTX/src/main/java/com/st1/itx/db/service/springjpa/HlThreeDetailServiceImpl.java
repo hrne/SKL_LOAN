@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.HlThreeDetailRepositoryHist;
 import com.st1.itx.db.service.HlThreeDetailService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("hlThreeDetailService")
 @Repository
-public class HlThreeDetailServiceImpl implements HlThreeDetailService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(HlThreeDetailServiceImpl.class);
-
+public class HlThreeDetailServiceImpl extends ASpringJpaParm implements HlThreeDetailService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class HlThreeDetailServiceImpl implements HlThreeDetailService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + hlThreeDetailId);
+    this.info("findById " + dbName + " " + hlThreeDetailId);
     Optional<HlThreeDetail> hlThreeDetail = null;
     if (dbName.equals(ContentName.onDay))
       hlThreeDetail = hlThreeDetailReposDay.findById(hlThreeDetailId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CusBNo", "HlCusNo", "AmountNo", "CaseNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CusBNo", "HlCusNo", "AmountNo", "CaseNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = hlThreeDetailReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +104,9 @@ em = null;
     else 
       slice = hlThreeDetailRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +115,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlThreeDetailId);
+    this.info("Hold " + dbName + " " + hlThreeDetailId);
     Optional<HlThreeDetail> hlThreeDetail = null;
     if (dbName.equals(ContentName.onDay))
       hlThreeDetail = hlThreeDetailReposDay.findByHlThreeDetailId(hlThreeDetailId);
@@ -133,7 +133,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + hlThreeDetail.getHlThreeDetailId());
+    this.info("Hold " + dbName + " " + hlThreeDetail.getHlThreeDetailId());
     Optional<HlThreeDetail> hlThreeDetailT = null;
     if (dbName.equals(ContentName.onDay))
       hlThreeDetailT = hlThreeDetailReposDay.findByHlThreeDetailId(hlThreeDetail.getHlThreeDetailId());
@@ -154,13 +154,18 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
     if (this.findById(hlThreeDetail.getHlThreeDetailId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       hlThreeDetail.setCreateEmpNo(empNot);
+
+    if(hlThreeDetail.getLastUpdateEmpNo() == null || hlThreeDetail.getLastUpdateEmpNo().isEmpty())
+      hlThreeDetail.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return hlThreeDetailReposDay.saveAndFlush(hlThreeDetail);	
@@ -180,8 +185,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
     if (!empNot.isEmpty())
       hlThreeDetail.setLastUpdateEmpNo(empNot);
 
@@ -203,8 +210,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
     if (!empNot.isEmpty())
       hlThreeDetail.setLastUpdateEmpNo(empNot);
 
@@ -224,7 +233,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
+    this.info("Delete..." + dbName + " " + hlThreeDetail.getHlThreeDetailId());
     if (dbName.equals(ContentName.onDay)) {
       hlThreeDetailReposDay.delete(hlThreeDetail);	
       hlThreeDetailReposDay.flush();
@@ -253,11 +262,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (HlThreeDetail t : hlThreeDetail) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (HlThreeDetail t : hlThreeDetail){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       hlThreeDetail = hlThreeDetailReposDay.saveAll(hlThreeDetail);	
@@ -285,8 +299,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (hlThreeDetail == null || hlThreeDetail.size() == 0)
       throw new DBException(6);
 
@@ -315,7 +331,7 @@ em = null;
 
   @Override
   public void deleteAll(List<HlThreeDetail> hlThreeDetail, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

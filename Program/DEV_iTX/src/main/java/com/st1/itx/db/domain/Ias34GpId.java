@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * Ias34Gp IAS34資料欄位清單G檔<br>
+ * Ias34Gp IAS34欄位清單G檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

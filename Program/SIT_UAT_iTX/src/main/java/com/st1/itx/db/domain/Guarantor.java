@@ -35,6 +35,7 @@ public class Guarantor implements Serializable {
   private GuarantorId guarantorId;
 
   // 核准號碼
+  /* 規劃調整為ApplNo */
   @Column(name = "`ApproveNo`", insertable = false, updatable = false)
   private int approveNo = 0;
 
@@ -98,7 +99,7 @@ public class Guarantor implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 
+	* 規劃調整為ApplNo
 	* @return Integer
 	*/
   public int getApproveNo() {
@@ -107,7 +108,7 @@ public class Guarantor implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 
+	* 規劃調整為ApplNo
   *
   * @param approveNo 核准號碼
 	*/

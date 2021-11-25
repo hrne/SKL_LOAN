@@ -308,7 +308,7 @@ public class FacMain implements Serializable {
   private String prodBreachFlag;
 
   // 違約適用說明
-  @Column(name = "`BreachDescription`", length = 100)
+  @Column(name = "`BreachDescription`", length = 200)
   private String breachDescription;
 
   // 信用評分

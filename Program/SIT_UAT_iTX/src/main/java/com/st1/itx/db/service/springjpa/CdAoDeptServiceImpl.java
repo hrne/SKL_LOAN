@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import com.st1.itx.db.repository.hist.CdAoDeptRepositoryHist;
 import com.st1.itx.db.service.CdAoDeptService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -34,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdAoDeptService")
 @Repository
-public class CdAoDeptServiceImpl implements CdAoDeptService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdAoDeptServiceImpl.class);
-
+public class CdAoDeptServiceImpl extends ASpringJpaParm implements CdAoDeptService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +63,7 @@ public class CdAoDeptServiceImpl implements CdAoDeptService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + employeeNo);
+    this.info("findById " + dbName + " " + employeeNo);
     Optional<CdAoDept> cdAoDept = null;
     if (dbName.equals(ContentName.onDay))
       cdAoDept = cdAoDeptReposDay.findById(employeeNo);
@@ -93,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "EmployeeNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "EmployeeNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdAoDeptReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +102,9 @@ em = null;
       slice = cdAoDeptReposHist.findAll(pageable);
     else 
       slice = cdAoDeptRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findEmployeeNo " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " employeeNo_1 : " +  employeeNo_1);
+    this.info("findEmployeeNo " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " employeeNo_1 : " +  employeeNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdAoDeptReposDay.findAllByEmployeeNoGreaterThanEqualAndEmployeeNoLessThanEqualOrderByEmployeeNoAsc(employeeNo_0, employeeNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +131,9 @@ em = null;
     else 
       slice = cdAoDeptRepos.findAllByEmployeeNoGreaterThanEqualAndEmployeeNoLessThanEqualOrderByEmployeeNoAsc(employeeNo_0, employeeNo_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -139,7 +142,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + employeeNo);
+    this.info("Hold " + dbName + " " + employeeNo);
     Optional<CdAoDept> cdAoDept = null;
     if (dbName.equals(ContentName.onDay))
       cdAoDept = cdAoDeptReposDay.findByEmployeeNo(employeeNo);
@@ -157,7 +160,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdAoDept.getEmployeeNo());
+    this.info("Hold " + dbName + " " + cdAoDept.getEmployeeNo());
     Optional<CdAoDept> cdAoDeptT = null;
     if (dbName.equals(ContentName.onDay))
       cdAoDeptT = cdAoDeptReposDay.findByEmployeeNo(cdAoDept.getEmployeeNo());
@@ -178,8 +181,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdAoDept.getEmployeeNo());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdAoDept.getEmployeeNo());
     if (this.findById(cdAoDept.getEmployeeNo()) != null)
       throw new DBException(2);
 
@@ -207,8 +212,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdAoDept.getEmployeeNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdAoDept.getEmployeeNo());
     if (!empNot.isEmpty())
       cdAoDept.setLastUpdateEmpNo(empNot);
 
@@ -230,8 +237,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdAoDept.getEmployeeNo());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdAoDept.getEmployeeNo());
     if (!empNot.isEmpty())
       cdAoDept.setLastUpdateEmpNo(empNot);
 
@@ -251,7 +260,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdAoDept.getEmployeeNo());
+    this.info("Delete..." + dbName + " " + cdAoDept.getEmployeeNo());
     if (dbName.equals(ContentName.onDay)) {
       cdAoDeptReposDay.delete(cdAoDept);	
       cdAoDeptReposDay.flush();
@@ -280,7 +289,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdAoDept t : cdAoDept){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -314,8 +326,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdAoDept == null || cdAoDept.size() == 0)
       throw new DBException(6);
 
@@ -344,7 +358,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdAoDept> cdAoDept, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

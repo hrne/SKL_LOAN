@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+
 /**
  * JcicAtomMain 債務匯入資料功能主檔<br>
  * Gen By Tool

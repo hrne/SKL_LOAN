@@ -26,7 +26,7 @@ public interface Ias34CpRepository extends JpaRepository<Ias34Cp, Ias34CpId> {
   @Transactional(readOnly = false)
   public Optional<Ias34Cp> findByIas34CpId(Ias34CpId ias34CpId);
 
-  // (月底日日終批次)維護 Ias34Cp IAS34資料欄位清單C檔
+  // (月底日日終批次)維護 IAS34 欄位清單C檔
   @Procedure(value = "\"Usp_L7_Ias34Cp_Upd\"")
   public void uspL7Ias34cpUpd(int TBSDYF, String EmpNo);
 

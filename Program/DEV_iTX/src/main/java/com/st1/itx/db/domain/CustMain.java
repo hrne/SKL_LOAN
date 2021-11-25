@@ -272,6 +272,7 @@ public class CustMain implements Serializable {
   private int lastSyndNo = 0;
 
   // 開放查詢
+  /* 1:不開放 2:開放 */
   @Column(name = "`AllowInquire`", length = 1)
   private String allowInquire;
 
@@ -1453,7 +1454,8 @@ N:否
 
 /**
 	* 開放查詢<br>
-	* 
+	* 1:不開放 
+2:開放
 	* @return String
 	*/
   public String getAllowInquire() {
@@ -1462,7 +1464,8 @@ N:否
 
 /**
 	* 開放查詢<br>
-	* 
+	* 1:不開放 
+2:開放
   *
   * @param allowInquire 開放查詢
 	*/

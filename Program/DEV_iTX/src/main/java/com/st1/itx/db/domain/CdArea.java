@@ -53,7 +53,7 @@ public class CdArea implements Serializable {
   private String areaShort;
 
   // JCIC縣市碼
-  /* by eric 2021.9.29 */
+  /* by eric 2021.9.29C:基隆市A:台北市F:新北市H:桃園市O:新竹市J:新竹縣K:苗栗縣B:台中市N:彰化縣M:南投縣P:雲林縣I:嘉義市Q:嘉義縣D:台南市E:高雄市T:屏東縣V:台東縣U:花蓮縣G:宜蘭縣W:金門縣X:澎湖縣Z:連江縣 */
   @Column(name = "`JcicCityCode`", length = 1)
   private String jcicCityCode;
 
@@ -204,6 +204,28 @@ public class CdArea implements Serializable {
 /**
 	* JCIC縣市碼<br>
 	* by eric 2021.9.29
+C:基隆市
+A:台北市
+F:新北市
+H:桃園市
+O:新竹市
+J:新竹縣
+K:苗栗縣
+B:台中市
+N:彰化縣
+M:南投縣
+P:雲林縣
+I:嘉義市
+Q:嘉義縣
+D:台南市
+E:高雄市
+T:屏東縣
+V:台東縣
+U:花蓮縣
+G:宜蘭縣
+W:金門縣
+X:澎湖縣
+Z:連江縣
 	* @return String
 	*/
   public String getJcicCityCode() {
@@ -213,6 +235,28 @@ public class CdArea implements Serializable {
 /**
 	* JCIC縣市碼<br>
 	* by eric 2021.9.29
+C:基隆市
+A:台北市
+F:新北市
+H:桃園市
+O:新竹市
+J:新竹縣
+K:苗栗縣
+B:台中市
+N:彰化縣
+M:南投縣
+P:雲林縣
+I:嘉義市
+Q:嘉義縣
+D:台南市
+E:高雄市
+T:屏東縣
+V:台東縣
+U:花蓮縣
+G:宜蘭縣
+W:金門縣
+X:澎湖縣
+Z:連江縣
   *
   * @param jcicCityCode JCIC縣市碼
 	*/

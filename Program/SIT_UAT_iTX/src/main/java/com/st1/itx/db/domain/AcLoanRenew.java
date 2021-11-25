@@ -54,7 +54,7 @@ public class AcLoanRenew implements Serializable {
   private int oldBormNo = 0;
 
   // 展期記號
-  /* 1.一般 2.協議 */
+  /* 代碼檔: 02-業務作業RenewCode展期記號1.一般2.協議 */
   @Column(name = "`RenewCode`", length = 1)
   private String renewCode;
 
@@ -191,7 +191,10 @@ public class AcLoanRenew implements Serializable {
 
 /**
 	* 展期記號<br>
-	* 1.一般 2.協議
+	* 代碼檔: 02-業務作業
+RenewCode展期記號
+1.一般
+2.協議
 	* @return String
 	*/
   public String getRenewCode() {
@@ -200,7 +203,10 @@ public class AcLoanRenew implements Serializable {
 
 /**
 	* 展期記號<br>
-	* 1.一般 2.協議
+	* 代碼檔: 02-業務作業
+RenewCode展期記號
+1.一般
+2.協議
   *
   * @param renewCode 展期記號
 	*/

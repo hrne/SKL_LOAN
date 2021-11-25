@@ -74,12 +74,9 @@ E(0,@RemoveNo,0)
 ["#FdTempReasonCode+暫收帳戶",#TempReasonCode,#TempReasonCodeX],
 ["#FdTempItemCode+作業項目",#TempItemCode,#TempItemCodeX],
 ["#FdFacmNo+額度編號",#FacmNo,#BTN4,#BTN5,#BTN6],
-! ["#FdBormNo+撥款序號",#BormNo,#BTN6],
-! ["#FdChangeDate+契變日期",#ChangeDate],
-! ["#FdChangeItemCode+貸後契變項目",#ChangeItemCode,#ChangeItemCodeX],
-! ["#FdYear+年月份",#Year," / ",#Month],
 ["#FdRemoveNo+銷帳編號",#RemoveNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
+["#FdAcSubBookCode+區隔帳冊",#AcSubBookCode,#AcSubBookCodeX],
 ["#FdTempAmt+暫收款金額",#TwTempAmt,#UsTempAmt,#BTN7],
 ["#FdBDCL+呆帳結案",#BDCLFg,#BDCLFgX],
 ["#FdSupervisor+核決主管",#Supervisor,#SupervisorX],
@@ -99,7 +96,8 @@ E(0,@RemoveNo,0)
 
 #BUF1=X,42,S
 HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5,#BTN6,#BTN7)
-INVOKEJS(SHOW,p1,10,12,0)
+INVOKEJS(SHOW,p1,11,13,0)
+INVOKEJS(SHOW,p1,9,9,0)
 ! HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5,#BTN6)
 !---------- AP TEXT AREA Variables ----------
 ! Help
@@ -128,15 +126,23 @@ T(3,CdCode.Temp2ReasonCode)
 
 #Temp2ReasonCodeHelp=x,1024,S
 
+!區隔帳冊
+#CDDEF05=x,25,S
+T(3,CdCode.AcSubBookCode)
+
+#AcSubBookCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05)
 R(1,XXR99)
 CALL(#HelpProc) 
 T(2,@CurrencyCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2)
 T(2,@Temp2ItemCodeHelp,#HelpDesc3)
+T(HELP,@Temp2ItemCodeHelp,#Temp2ItemCodeHelp,-,16;23)
 T(2,@Temp2ReasonCodeHelp,#HelpDesc4)
+T(2,@AcSubBookCodeHelp,#HelpDesc5)
 
 
 #YNHelp=x,20,S
@@ -157,6 +163,8 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 #FdYear=X,2,L
 #FdRemoveNo=X,2,L
 #FdCurrencyCode=X,2,L
+#FdAcSubBookCode=X,2,L
+T(3,*)
 #FdTempAmt=X,2,L
 #FdBDCL=X,2,L
 #FdSupervisor=X,2,L
@@ -332,7 +340,7 @@ T(3,)T(H,#TempReasonCode,#Temp2ReasonCodeHelp)
 T(3,*)
 
 #TempItemCode=A,2,I
-INVOKEJS(SHOW,p1,6,9,1)
+INVOKEJS(SHOW,p1,6,10,1)
 HELP(#Temp2ItemCodeHelp,cols:2)
 @V(H,#Temp2ItemCodeHelp)
 C(3,#TempReasonCode,2,V(2,19),$)
@@ -340,7 +348,8 @@ C(3,#TempItemCode,29,SHOW(#BTN7),HIDE(#BTN7))
 
 #TempItemCodeX=X,20,L
 T(3,)T(H,#TempItemCode,#Temp2ItemCodeHelp)
-C(3,#TempItemCode,8,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
+C(3,#TempItemCode,8,INVOKEJS(SHOW,p1,11,11,1),INVOKEJS(SHOW,p1,11,11,0))
+C(3,#TempItemCode,16,INVOKEJS(SHOW,p1,9,9,1),INVOKEJS(SHOW,p1,9,9,0))
 
 !ing
 #WKHIDE29=X,1,S
@@ -519,6 +528,16 @@ T(2,#TimCustNo+#FacmNo)
 #BIND7A=X,1,S
 BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L2061; ntxbuf=#BUF7A;ntxbuf5=type<-1:TwTempAmt<-OOFeeAmtX})
                  
+!區隔帳冊
+#AcSubBookCode=X,3,I
+C(3,#TempItemCode,16,$,S)
+HELP(#AcSubBookCodeHelp)
+@V(H,#AcSubBookCodeHelp)
+
+#AcSubBookCodeX=X,20,L
+T(3,)
+T(H,#AcSubBookCode,#AcSubBookCodeHelp)
+
                   
 ![暫收款金額]
 !退還暫收款金額不可>該戶號目前暫收金額
@@ -550,7 +569,7 @@ HELP(#YNHelp)
 
 #BDCLFgX=X,2,L
 T(3,)T(H,#BDCLFg,#YNHelp)
-C(5,#BDCLFg,Y,INVOKEJS(SHOW,p1,11,12,1),INVOKEJS(SHOW,p1,11,12,0))
+C(5,#BDCLFg,Y,INVOKEJS(SHOW,p1,12,13,1),INVOKEJS(SHOW,p1,12,13,0))
 !核決主管
 #Supervisor=X,6,I
 C(3,#TempItemCode,8,$,S)
@@ -604,6 +623,8 @@ E(0,@RPAMTZ,#TimTempAmt)
 #TempFacmNo2=X,1,S
 IF(#RPFG>0,$,s)
 E(0,@RP_FACMNO,#FacmNo)
+
+
 <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
@@ -646,7 +667,9 @@ T(3,[L3230] 暫收款退還)
 
 #TimCustNo#CustId#ApplNo#FacmNo
 #TempReasonCode#TempItemCode
-#CurrencyCode#TimTempAmt
+#CurrencyCode
+#AcSubBookCode
+#TimTempAmt
 #ChangeDate#ChangeItemCode#Year#Month
 #Description#BormNo#RemoveNo
 #BDCLFg

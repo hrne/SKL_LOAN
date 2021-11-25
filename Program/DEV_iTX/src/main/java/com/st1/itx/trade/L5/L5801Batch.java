@@ -69,16 +69,16 @@ public class L5801Batch extends TradeBuffer {
 		l5801report4.setParentTranCode(parentTranCode);
 
 		l5801report.exec(thisMonth, lastMonth, titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息申貸名冊工作檔已完成", titaVo);
+//		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息申貸名冊工作檔已完成", titaVo);
 
 		l5801report2.exec(thisMonth, lastMonth, titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息結清名冊終止名冊工作檔已完成", titaVo);
+//		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息結清名冊終止名冊工作檔已完成", titaVo);
 
 		l5801report3.exec(thisMonth, lastMonth, titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息核撥清單工作檔已完成", titaVo);
+//		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息核撥清單工作檔已完成", titaVo);
 
 		l5801report4.exec(thisMonth, lastMonth, titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息核撥清單明細檔已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L5801補貼息作業已完成", titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
