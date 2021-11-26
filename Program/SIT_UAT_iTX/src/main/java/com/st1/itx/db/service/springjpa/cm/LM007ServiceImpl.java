@@ -39,11 +39,11 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '330' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC3Amt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4EntAmt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' AND S1.\"EntCode\" = '1' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4Amt\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '999' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"ColAmt\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" IN ('310','320','330','340','990') AND S1.\"EntCode\" IN ('0','1') THEN (S1.\"TxAmt\") ELSE 0 END) AS \"TotalAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '990' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"ColAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" IN ('310','320','330','340','990') THEN (S1.\"TxAmt\") ELSE 0 END) AS \"TotalAmt\"";
 		sql += "      FROM(SELECT A.\"AcSubBookCode\" AS F0";
 		sql += "                 ,MOD(TRUNC(A.\"AcDate\" / 100), 100) AS \"AcMonth\"";
-		sql += "                 ,DECODE (L.\"Status\", 5, '999', F.\"AcctCode\") AS \"AcctCode\"";
+		sql += "                 ,DECODE (L.\"Status\", 5, '990', F.\"AcctCode\") AS \"AcctCode\"";
 		sql += "                 ,DECODE (C.\"EntCode\", '1', 1, 0) AS \"EntCode\"";
 		sql += "                 ,DECODE (A.\"DbCr\", 'C', A.\"TxAmt\", -A.\"TxAmt\") AS \"TxAmt\"";
 		sql += "           FROM \"AcDetail\" A";

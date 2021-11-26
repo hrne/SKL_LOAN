@@ -80,12 +80,6 @@ public class L8950 extends TradeBuffer {
 					occursList.putParam("OOHeadOfficeCodeX", iCdBank.getContent().get(0).getBankItem());
 				}
 				occursList.putParam("OOBranchCode", aTbJcicMu01.getBranchCode());
-				iCdBank = iCdBankService.branchCodeLike(aTbJcicMu01.getHeadOfficeCode(),aTbJcicMu01.getBranchCode(), 0, Integer.MAX_VALUE, titaVo);
-				if (iCdBank == null) {
-					occursList.putParam("OOBranchCodeX", "");
-				}else {
-					occursList.putParam("OOBranchCodeX", iCdBank.getContent().get(0).getBranchItem());
-				}
 				occursList.putParam("OODataDate", Integer.valueOf(aTbJcicMu01.getDataDate()));
 				occursList.putParam("OOEmpId", aTbJcicMu01.getEmpId());
 				CdEmp iCdEmp = new CdEmp();

@@ -37,7 +37,7 @@ T(3,111)
 
 #Button=x,100,S
 T(2,{cmd=CHAIN; ntxcd=LD006; ntxbuf=#BufLD006})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,產生媒體檔)
+K(MODIFYBUTTON,1,LD006 三階放款明細統計檔)
 
 </sub>
 !--使用資料庫 PfItDetail
@@ -49,6 +49,7 @@ K(MODIFYBUTTON,1,產生媒體檔)
 ["#FdWorkMonthFm+．工作月期間",#WorkMonthFm,"~",#WorkMonthTo],
 ["#FdPerfDateFm+．撥款起訖日",#PerfDateFm,"~",#PerfDateTo],
 ["#FdCustNo+戶號",#CustNo,"-",#FacmNo],
+["#FdIntroducer+介紹人",#Introducer],
 ["#FdSumByFacm+額度加總",#SumByFacm],
 ]
 
@@ -62,6 +63,9 @@ T(3,*)
 T(3, )
 
 #FdPerfDateFm=X,2,L
+T(3, )
+
+#FdIntroducer=X,2,L
 T(3, )
 
 #FdSumByFacm=X,2,L
@@ -137,9 +141,11 @@ C(3,#CustNo,0,S,$)
 C(3,#CustNo,0,S,$)
 C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo)) 
 
+#Introducer=X,6,I
+
 ! 額度加總
 #SumByFacm=X,1,I
-C(4,#SumByFacm,T(3,Y),$)
+C(4,#SumByFacm,T(3,N),$)
 HELP(#YNHelp)
 @
 V(H,#YNHelp)
@@ -258,7 +264,7 @@ E(0,1)ASGN(LOOP$)
 T(H,@OORepayType,#RepayTypeHelp)
 
 #OOBufA=X,21,S
-T(2,2+#OOCustNo+#OOFacmNo+#OOWorkMonth)
+T(2,2+#OOLogNo)
 
 #OOBtnA=A,2,O
 !C(5,#OOAdjRange,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=修改; ntxbuf=#OOBufA}),
@@ -276,7 +282,7 @@ C(3,#OOCanModify,1,$,BIND(grid,cancel))
 !C(4,#OOWorkMonth,BIND(grid,cancel),$)
 
 #OOBufC=X,21,S
-T(2,4+#OOCustNo+#OOFacmNo+#OOWorkMonth)
+T(2,4+#OOLogNo)
 
 #OOBtnC=A,2,O
 C(5,#OOAdjRange,0,BIND(grid,cancel),
@@ -294,6 +300,7 @@ C(4,#OOWorkMonth,BIND(grid,cancel),$)
 #PerfDateTo
 #CustNo
 #FacmNo
+#Introducer
 #SumByFacm
 </sub>
 
@@ -346,11 +353,14 @@ TXFORM=L5051
 #RPTFG=1,QUERY.GRID,L5051
 #any={detail:true, header:'L5051.part', caption:'', width:1020, rowNum:10, rowList:[20,40,60]}
 
+#OOBtnA=業績
+{search:false,formatter:'cust:bind-button:#OOBtnA',align:'center',canExport:false,width:40}
+
+#OOBtnC=調整
+{search:false,formatter:'cust:bind-button:#OOBtnC',align:'center',canExport:false,width:40}
+
 #OOBtnB=計件<BR>代碼
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
-
-#OOBufA=rim
-{width:120,align:'left'}
 
 !部室中文(房貸專員)
 #OOBsDeptName=房貸專員<br>部室中文
@@ -452,19 +462,11 @@ TXFORM=L5051
 #OOPerfAmt=三階業績金額
 {width:100,align:'right'}
 
-!備註
-#OORepayTypeX=備註
+#OORepayTypeX=業績類別
 {width:100,align:'left'}
-
 ^
 #RPTFG=2,QUERY.GRID,L5051
 #any={detail:true, header:'L5051.part', caption:'', width:1020, rowNum:10, rowList:[20,40,60]}
-
-#OOBtnA=業績
-{search:false,formatter:'cust:bind-button:#OOBtnA',align:'center',canExport:false,width:40}
-
-#OOBtnC=調整
-{search:false,formatter:'cust:bind-button:#OOBtnC',align:'center',canExport:false,width:40}
 
 !部室中文(房貸專員)
 #OOBsDeptName=房貸專員<br>部室中文
@@ -550,8 +552,6 @@ TXFORM=L5051
 #OOPerfAmt=三階業績金額
 {width:100,align:'right'}
 
-!備註
-#OORepayTypeX=備註
-{width:100,align:'left'}
+
 ^
 </sub>

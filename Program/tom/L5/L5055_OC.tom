@@ -1,0 +1,16 @@
+OOPerfDate=9,7
+OOCustNo=9,7
+OOFacmNo=9,3
+OOBormNo=9,3
+OOCustNm=X,100
+OOBsOfficer=X,6
+OOBsOfficerName=X,50
+OOIntroducer=X,6
+OOIntroducerName=X,50
+OOIntroducerBonus=+9,14
+OODrawdownDate=9,7
+OOProdCode=X,5
+OOPieceCode=X,1
+OODrawdownAmt=+9,14
+OOLastUpdateEmpNo=X,6
+OOLastUpdateEmpNoName=X,50

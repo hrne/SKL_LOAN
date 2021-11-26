@@ -111,7 +111,7 @@ public class L5504 extends TradeBuffer {
 					}
 					//
 					dataLog.setEnv(titaVo, pfRewardMedia2, pfRewardMedia);
-					dataLog.exec();
+					dataLog.exec(titaVo.get("Remark").trim());
 
 				} else if ("4".equals(iFunCode)) {
 					if (pfRewardMedia.getManualFg() == 0) {

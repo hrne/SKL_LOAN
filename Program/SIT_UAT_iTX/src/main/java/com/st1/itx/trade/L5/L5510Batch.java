@@ -628,10 +628,6 @@ public class L5510Batch extends TradeBuffer {
 //			}
 //		}
 
-		// 寫入交易控制檔
-
-		String controlCode = "L5510." + iWorkMonth + ".2";
-		logTxControl(titaVo, controlCode);
 
 		if (cnt > 0) {
 			makeFile.close();
@@ -643,6 +639,10 @@ public class L5510Batch extends TradeBuffer {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", msg, titaVo);
 		}
 
+		// 寫入交易控制檔
+
+		String controlCode = "L5510." + iWorkMonth + ".2";
+		logTxControl(titaVo, controlCode);
 	}
 
 	private void writeMedia(TitaVo titaVo, Map<String, String> d, BigDecimal drawdownAmt, BigDecimal perfReward,

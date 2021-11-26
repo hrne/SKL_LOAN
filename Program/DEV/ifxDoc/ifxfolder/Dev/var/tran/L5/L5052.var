@@ -37,6 +37,13 @@ E(0,0)
 ! T(2,{cmd=CHAIN; ntxcd=L5502; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
 ! K(MODIFYBUTTON,1,新增)
 
+#BufLD007=X,3,S
+T(3,111)
+
+#Button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LD007; ntxbuf=#BufLD007})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,LD007 放款專員明細統計)
+
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -372,8 +379,8 @@ TXFORM=L5052
 #OOIntroducerName=介紹人姓名
 {width:100,align:'left'}
 
-!備註
-#OORepayTypeX=備註
+!業績類別
+#OORepayTypeX=業績類別
 {width:100,align:'left'}
 
 ^
@@ -454,8 +461,5 @@ TXFORM=L5052
 #OOIntroducerName=介紹人姓名
 {width:100,align:'left'}
 
-!備註
-#OORepayTypeX=備註
-{width:100,align:'left'}
 ^
 </sub>

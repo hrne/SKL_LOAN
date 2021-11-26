@@ -116,7 +116,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll_2(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM013.findAll ");
-		int lyentdy = yearMonth;
+		int lyentdy = yearMonth - 100;
 		int lmentdy = 0;
 		if (yearMonth % 100 == 1) {
 			lmentdy = yearMonth - 89;

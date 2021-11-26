@@ -38,6 +38,9 @@ public interface EmpDeductMediaRepositoryDay extends JpaRepository<EmpDeductMedi
   // MediaDate = ,AND MediaKind = 
   public Optional<EmpDeductMedia> findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(int mediaDate_0, String mediaKind_1);
 
+  // EntryDate >= , AND EntryDate <= , AND MediaKind =
+  public Slice<EmpDeductMedia> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, String mediaKind_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

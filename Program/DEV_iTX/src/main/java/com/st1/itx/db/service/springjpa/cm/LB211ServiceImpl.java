@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,7 +23,6 @@ import com.st1.itx.eum.ContentName;
  * @param titaVo B211 聯徵每日授信餘額變動資料檔
  */
 public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LB211ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -32,35 +31,42 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LB211.findAll ---------------");
-		logger.info("-----LB211 TitaVo=" + titaVo);
-		logger.info("-----LB211 Tita ENTDY=" + titaVo.getEntDy());
+		this.info("----------- LB211.findAll ---------------");
+		this.info("-----LB211 TitaVo=" + titaVo);
+		this.info("-----LB211 Tita ENTDY=" + titaVo.getEntDy());
 
 		int acctDate = Integer.parseInt(titaVo.getEntDy()) + 19110000; // 西元
-		logger.info("-----LB211 acctDate=" + acctDate);
+		this.info("-----LB211 acctDate=" + acctDate);
+
+		int iacdateStart = Integer.parseInt(titaVo.getParam("AcDateStart")) + 19110000; // 西元
+		int iacdateEnd = Integer.parseInt(titaVo.getParam("AcDateEnd")) + 19110000; // 西元
+		String acdateStart = String.valueOf(iacdateStart);
+		String acdateEnd = String.valueOf(iacdateEnd);
+		this.info("acdateStart=" + acdateStart + ",acdateEnd=" + acdateEnd);
 
 //		if (onLineMode == true) {
 //			acctDate = 20200423;
 //		}
 
-		logger.info("acctDate= " + acctDate);
+		this.info("acctDate= " + acctDate);
 
 		String sql = "";
 
 		// B211 聯徵每日授信餘額變動資料檔
-		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"TranCode\" " + "     , M.\"CustId\" " + "     , M.\"SubTranCode\" " + "     , M.\"AcDate\" "
-				+ "     , M.\"AcctNo\" " + "     , M.\"TxAmt\" " + "     , M.\"LoanBal\" " + "     , M.\"RepayCode\" " + "     , M.\"NegStatus\" " + "     , M.\"AcctCode\" "
-				+ "     , M.\"SubAcctCode\" " + "     , M.\"BadDebtDate\" " + "     , M.\"ConsumeFg\" " + "     , M.\"FinCode\" " + "     , M.\"UsageCode\" "
-				+ "     , M.\"Filler18\" "
-				+ " FROM  \"JcicB211\" M " 
-				+ " WHERE ( M.\"DataYMD\" = " + acctDate + " )"
+		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"TranCode\" " + "     , M.\"CustId\" "
+				+ "     , M.\"SubTranCode\" " + "     , M.\"AcDate\" " + "     , M.\"AcctNo\" " + "     , M.\"TxAmt\" "
+				+ "     , M.\"LoanBal\" " + "     , M.\"RepayCode\" " + "     , M.\"NegStatus\" "
+				+ "     , M.\"AcctCode\" " + "     , M.\"SubAcctCode\" " + "     , M.\"BadDebtDate\" "
+				+ "     , M.\"ConsumeFg\" " + "     , M.\"FinCode\" " + "     , M.\"UsageCode\" "
+				+ "     , M.\"Filler18\" " + " FROM  \"JcicB211\" M " + " WHERE ( M.\"DataYMD\" Between " + acdateStart
+				+ " AND " + acdateEnd + " )"
 				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
@@ -74,6 +80,6 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

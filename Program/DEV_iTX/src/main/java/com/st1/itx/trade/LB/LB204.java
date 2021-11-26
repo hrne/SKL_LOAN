@@ -32,7 +32,6 @@ public class LB204 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LB204.class);
 		this.info("LB204 active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,6 +41,9 @@ public class LB204 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB204 active LB204 ");
 		this.info("LB204 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		titaVo.putParam("AcDateStart", Integer.parseInt(titaVo.getEntDy()));
+		titaVo.putParam("AcDateEnd", Integer.parseInt(titaVo.getEntDy()));
+		
 		lB204Report.exec(titaVo);
 	}
 
@@ -57,7 +59,6 @@ public class LB204 extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LB204 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LB204.class);
 //
 //	@Autowired
 //	public LB204Report lb204Report;

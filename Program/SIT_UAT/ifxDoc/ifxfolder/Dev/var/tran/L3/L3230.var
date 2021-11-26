@@ -140,7 +140,7 @@ CALL(#HelpProc)
 T(2,@CurrencyCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2)
 T(2,@Temp2ItemCodeHelp,#HelpDesc3)
-T(HELP,@Temp2ItemCodeHelp,#Temp2ItemCodeHelp,-,16;23)
+T(HELP,@Temp2ItemCodeHelp,#Temp2ItemCodeHelp,-,17;23)
 T(2,@Temp2ReasonCodeHelp,#HelpDesc4)
 T(2,@AcSubBookCodeHelp,#HelpDesc5)
 

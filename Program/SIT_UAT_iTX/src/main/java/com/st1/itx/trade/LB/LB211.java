@@ -32,7 +32,6 @@ public class LB211 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LB211.class);
 		this.info("LB211 active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,6 +41,9 @@ public class LB211 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB211 active LB211 ");
 		this.info("LB211 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		titaVo.putParam("AcDateStart", Integer.parseInt(titaVo.getEntDy()));
+		titaVo.putParam("AcDateEnd", Integer.parseInt(titaVo.getEntDy()));
+		
 		lB211Report.exec(titaVo);
 	}
 
@@ -57,7 +59,6 @@ public class LB211 extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LB211 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LB211.class);
 //
 //	@Autowired
 //	public LB211Report lb211Report;

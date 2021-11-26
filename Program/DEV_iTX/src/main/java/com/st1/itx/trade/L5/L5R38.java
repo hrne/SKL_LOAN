@@ -24,7 +24,6 @@ import com.st1.itx.db.service.CdWorkMonthService;
  * @version 1.0.0
  */
 public class L5R38 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5R38.class);
 
 	@Autowired
 	CdWorkMonthService cdWorkMonthService;
@@ -35,17 +34,17 @@ public class L5R38 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String iCode = titaVo.get("L5R38iCode").trim();
-		
+
 		int wYear = 0;
 		int wMonth = 0;
 		int startDate = 0;
 		int endDate = 0;
-		
+
 		if ("1".equals(iCode)) {
-			//依日期回上個月工作年月及業績起訖日
+			// 依日期回上個月工作年月及業績起訖日
 			int iDate = Integer.valueOf(titaVo.get("L5R38iDate").trim());
-			CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(iDate + 19110000, iDate + 19110000,titaVo);
-			if (cdWorkMonth ==null) {
+			CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(iDate + 19110000, iDate + 19110000, titaVo);
+			if (cdWorkMonth == null) {
 				throw new LogicException("E0001", "放款業績工作月對照檔");
 			}
 			wMonth = cdWorkMonth.getMonth();
@@ -56,36 +55,36 @@ public class L5R38 extends TradeBuffer {
 			} else {
 				wMonth--;
 			}
-			//上工作月
+			// 上工作月
 			CdWorkMonthId cdWorkMonthId = new CdWorkMonthId();
 			cdWorkMonthId.setYear(wYear);
 			cdWorkMonthId.setMonth(wMonth);
 			cdWorkMonth = cdWorkMonthService.findById(cdWorkMonthId, titaVo);
-			if (cdWorkMonth ==null) {
+			if (cdWorkMonth == null) {
 				throw new LogicException("E0001", "放款業績工作月對照檔");
 			}
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
 		} else if ("2".equals(iCode)) {
-			//依工作年月回業績起訖日
+			// 依工作年月回業績起訖日
 			wYear = Integer.valueOf(titaVo.get("L5R38iWorkYM").trim().substring(0, 3)) + 1911;
 			wMonth = Integer.valueOf(titaVo.get("L5R38iWorkYM").trim().substring(3, 5));
-			
-			//上工作月
+
+			// 上工作月
 			CdWorkMonthId cdWorkMonthId = new CdWorkMonthId();
 			cdWorkMonthId.setYear(wYear);
 			cdWorkMonthId.setMonth(wMonth);
 			CdWorkMonth cdWorkMonth = cdWorkMonthService.findById(cdWorkMonthId, titaVo);
-			if (cdWorkMonth ==null) {
+			if (cdWorkMonth == null) {
 				throw new LogicException("E0001", "放款業績工作月對照檔");
 			}
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
 		} else if ("3".equals(iCode)) {
-			//依日期回工作年月及業績起訖日
+			// 依日期回工作年月及業績起訖日
 			int iDate = Integer.valueOf(titaVo.get("L5R38iDate").trim());
-			CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(iDate + 19110000, iDate + 19110000,titaVo);
-			if (cdWorkMonth ==null) {
+			CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(iDate + 19110000, iDate + 19110000, titaVo);
+			if (cdWorkMonth == null) {
 				throw new LogicException("E0001", "放款業績工作月對照檔");
 			}
 			wMonth = cdWorkMonth.getMonth();
@@ -93,31 +92,31 @@ public class L5R38 extends TradeBuffer {
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
 		}
-		
+
 		wYear -= 1911;
-		
+
 		int wSeason = wYear * 10;
-		
-		if (wMonth>=1 && wMonth<=3) {
+
+		if (wMonth >= 1 && wMonth <= 3) {
 			wSeason += 1;
-		} else if (wMonth>=4 && wMonth<=6) {
+		} else if (wMonth >= 4 && wMonth <= 6) {
 			wSeason += 2;
-		} else if (wMonth>=7 && wMonth<=9) {
+		} else if (wMonth >= 7 && wMonth <= 9) {
 			wSeason += 3;
-		} else if (wMonth>=10 && wMonth<=13) {
+		} else if (wMonth >= 10 && wMonth <= 13) {
 			wSeason += 4;
 		}
-		
+
 		int bonusDate = Integer.valueOf(titaVo.getCalDy());
-		
-		this.totaVo.putParam("L5R38oWorkYM", String.format("%03d%02d", wYear,wMonth));
+
+		this.totaVo.putParam("L5R38oWorkYM", String.format("%03d%02d", wYear, wMonth));
 		this.totaVo.putParam("L5R38oWorkYear", wYear);
 		this.totaVo.putParam("L5R38oWorkMonth", wMonth);
 		this.totaVo.putParam("L5R38oWorkSeason", wSeason);
 		this.totaVo.putParam("L5R38oStartDate", startDate);
 		this.totaVo.putParam("L5R38oEndDate", endDate);
 		this.totaVo.putParam("L5R38oBonusDate", bonusDate);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

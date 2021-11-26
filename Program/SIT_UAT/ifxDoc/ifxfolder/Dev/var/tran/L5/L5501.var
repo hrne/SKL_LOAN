@@ -31,7 +31,7 @@ E(0,0)
 [
 ["[L5501]                                 介紹人業績案件維護"],
 ["#<->#,#FdFunCode+功能選項",#FunCodeX],
-["#<->#,#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo],
+["#<->#,#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,"-",#BormNo],
 ["#<->#,#FdCustNm+戶名",#CustNm],
 ["#<->#,#FdIntroducer+介紹人",#Introducer,#IntroducerName],
 ["#<->#,#FdBsOfficer+房貸專員",#BsOfficer,#BsOfficerName],
@@ -65,9 +65,7 @@ IF(#CHAIN==0,V(P,本交易為連動交易，請由L5051連動進入),$)
 #NTXBUF=X,30,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCode,#NTXBUF,1,1)
-T(1,@CustNo,#NTXBUF,2,7)
-T(1,@FacmNo,#NTXBUF,9,3)
-T(1,@WorkMonth,#NTXBUF,12,5)
+T(1,@LogNo,#NTXBUF,2,8)
 
 #FdWorkMonth=X,2,L
 #FdTitle=X,2,L
@@ -130,6 +128,7 @@ C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
 #RimBormNo=A,3,S
 #RimPerfDate=D,7,S
 
+#LogNo=A,8,S
 #AdjLogNo=A,8,S
 
 #Tf=x,1,S
@@ -143,10 +142,11 @@ T(F,@AdjRange,0)
 #RimL5r27=X,1,S
 IF(#CHAIN==1,$,S)
 RESET_RIM(#RimL5r27,L5R27)
-S(L5R27,1,#CustNo,#FacmNo,#WorkMonth)
+S(L5R27,1,#LogNo)
 R(1,L5R27)
 E(0,@CustNo,#L5r27CustNo)
 E(0,@FacmNo,#L5r27FacmNo)
+E(0,@BormNo,#L5r27BormNo)
 T(2,@CustNm,#L5r27CustNm)
 T(2,@BsOfficer,#L5r27BsOfficer)
 T(2,@BsOfficerName,#L5r27BsOfficerName)
@@ -159,19 +159,20 @@ E(0,@AdjPerfAmt,#L5r27AdjPerfAmt)
 T(2,@AdjCntingCode,#L5r27AdjCntingCode)
 T(2,@AdjRange,#L5r27AdjRange)
 E(0,@AdjLogNo,#L5r27AdjLogNo)
+E(0,@WorkMonth,#L5r27WorkMonth)
 
 ! 借款人戶號
 #CustNo=A,7,L
 ! 額度編號
 #FacmNo=A,3,L
 ! 撥款序號
-#BormNo=A,3,S
+#BormNo=A,3,L
 
 !工作月
 #WorkMonth=X,5,L
 
 #MRKEY=_,_,S
-T(2,#CustNo+-+#FacmNo)
+T(2,#CustNo+-+#FacmNo+-+#BormNo)
 
 ! 戶名
 #CustNm=X,2.100,L
@@ -269,8 +270,10 @@ V(1,1,2)
 !------ 上行電文 TEXT ------這邊別亂動關係到放行
 <sub type="TIM">
 #FunCode
+#LogNo
 #CustNo
 #FacmNo
+#BormNo
 #WorkMonth
 #AdjLogNo
 #AdjPerfEqAmt

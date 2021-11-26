@@ -230,6 +230,7 @@ T(2,4+#CBUF)
 #OOBtnC=A,1,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5504; ntxbuf=#OOBufC})
 C(3,#OManualFg,1,$,BIND(grid,cancel))
+C(3,#OMediaFg,1,BIND(grid,cancel),$)
 
 
 </sub>
@@ -278,11 +279,11 @@ TXFORM=L5054
 
 #RPTFG=1,QUERY.GRID,L5054A
 #any={detail:true, header:'L5054A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
-#OOBtnA=
+#OOBtnA=查詢
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
-#OOBtnB=
+#OOBtnB=修改
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
-#OOBtnC=
+#OOBtnC=刪除
 {search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
 
 #OBonusTypeX=獎金類別

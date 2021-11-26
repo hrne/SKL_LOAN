@@ -44,6 +44,9 @@ public class L5056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo").trim());
 		int iBormNo = Integer.valueOf(titaVo.getParam("BormNo").trim());
 		int iWorkYM = Integer.valueOf(titaVo.getParam("WorkYM").trim());
+		if (iWorkYM > 0) {
+			iWorkYM += 191100;
+		}
 
 		String sql = "SELECT A.\"LogNo\",A.\"CustNo\",A.\"FacmNo\",A.\"BormNo\""
 				+ ",DECODE(A.\"WorkMonth\",0,0,A.\"WorkMonth\"-191100) AS YM,A.\"CreateDate\",A.\"CreateEmpNo\",A.\"LastUpdate\",A.\"LastUpdateEmpNo\""
@@ -69,7 +72,7 @@ public class L5056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (iWorkYM > 0) {
-			sql += "AND A.\"WorkMonth\"= :workMonth ";
+			sql += "AND A.\"WorkMonth\"= :WorkMonth ";
 		}
 
 		sql += sqlRow;

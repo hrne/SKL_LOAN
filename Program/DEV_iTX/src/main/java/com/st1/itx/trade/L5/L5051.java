@@ -166,7 +166,7 @@ public class L5051 extends TradeBuffer {
 		occursList.putParam("OOCustNo", d.get("CustNo"));// 戶號
 		occursList.putParam("OOFacmNo", d.get("FacmNo"));// 額度編號
 		occursList.putParam("OOBormNo", d.get("BormNo"));// 撥款序號
-		occursList.putParam("OOPerfDate", d.get("PerfDate"));// 撥款日期
+		occursList.putParam("OOPerfDate", d.get("DrawdownDate"));// 撥款日期
 		occursList.putParam("OOProdCode", d.get("ProdCode"));// 商品代碼
 		occursList.putParam("OOPieceCode", d.get("PieceCode"));// 計件代碼
 		occursList.putParam("OODrawdownAmt", DrawdownAmt);// 撥款金額
@@ -181,17 +181,22 @@ public class L5051 extends TradeBuffer {
 		occursList.putParam("OOUnitManagerName", d.get("UnitManagerName"));// 員工姓名(處經理姓名(介紹人))
 		occursList.putParam("OODistManagerName", d.get("DistManagerName"));// 員工姓名(區經理姓名(介紹人))
 
-		if ("Y".equals(SumByFacm) && ("1".equals(d.get("AdjRange")) || "2".equals(d.get("AdjRange")))) {
-			occursList.putParam("OOPerfEqAmt", new BigDecimal(d.get("AdjPerfEqAmt")));// 三階換算業績
-			occursList.putParam("OOPerfReward", new BigDecimal(d.get("AdjPerfReward")));// 三階業務報酬
-			occursList.putParam("OOPerfAmt", new BigDecimal(d.get("AdjPerfAmt")));// 三階業績金額
-			occursList.putParam("OOCntingCode", d.get("adjCntingCode"));// 是否計件
-		} else {
-			occursList.putParam("OOPerfEqAmt", PerfEqAmt);// 三階換算業績
-			occursList.putParam("OOPerfReward", PerfReward);// 三階業務報酬
-			occursList.putParam("OOPerfAmt", PerfAmt);// 三階業績金額
-			occursList.putParam("OOCntingCode", d.get("CntingCode"));// 是否計件
-		}
+		occursList.putParam("OOPerfEqAmt", PerfEqAmt);// 三階換算業績
+		occursList.putParam("OOPerfReward", PerfReward);// 三階業務報酬
+		occursList.putParam("OOPerfAmt", PerfAmt);// 三階業績金額
+		occursList.putParam("OOCntingCode", d.get("CntingCode"));// 是否計件
+
+//		if ("Y".equals(SumByFacm) && ("1".equals(d.get("AdjRange")) || "2".equals(d.get("AdjRange")))) {
+//			occursList.putParam("OOPerfEqAmt", new BigDecimal(d.get("AdjPerfEqAmt")));// 三階換算業績
+//			occursList.putParam("OOPerfReward", new BigDecimal(d.get("AdjPerfReward")));// 三階業務報酬
+//			occursList.putParam("OOPerfAmt", new BigDecimal(d.get("AdjPerfAmt")));// 三階業績金額
+//			occursList.putParam("OOCntingCode", d.get("adjCntingCode"));// 是否計件
+//		} else {
+//			occursList.putParam("OOPerfEqAmt", PerfEqAmt);// 三階換算業績
+//			occursList.putParam("OOPerfReward", PerfReward);// 三階業務報酬
+//			occursList.putParam("OOPerfAmt", PerfAmt);// 三階業績金額
+//			occursList.putParam("OOCntingCode", d.get("CntingCode"));// 是否計件
+//		}
 		occursList.putParam("OOAdjRange", d.get("AdjRange"));
 		occursList.putParam("OOCanModify", canModify);
 		occursList.putParam("OORepayType", d.get("RepayType"));

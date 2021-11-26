@@ -3,8 +3,6 @@
 </sub>
 
 <sub type="SYS" name="label">
-!#TXCD
-!T(3,L5512)
 
 </sub>
 
@@ -13,7 +11,15 @@
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
+#BufLM070=X,3,S
+T(3,111)
+
+#Button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LM070; ntxbuf=#BufLM070})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,LM070 介紹人加碼獎勵津貼明細)
+
 </sub>
+
 
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L5512" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
@@ -38,7 +44,7 @@ T(4,CHAIN$)
 T(3,@FunCode,1)
 
 #FunCodeHelp=X,200,S
-T(3,1:匯入介紹人加碼獎金發放資料;2:產生介紹人加碼獎金媒體檔;3:取消介紹人加碼獎金媒體檔)
+T(3,1:保費檢核及匯入介紹人加碼獎金發放資料;2:產生介紹人加碼獎金媒體檔;3:取消介紹人加碼獎金媒體檔)
 
 
 <include src="ROM.icf::L5R38.rtn"/>
@@ -58,7 +64,7 @@ E(0,@DateTo,#L5R38oEndDate)
 HELP(#FunCodeHelp)
 @V(H,#FunCodeHelp)
 
-#FunCodeX=X,40,L
+#FunCodeX=X,60,L
 T(H,#FunCode,#FunCodeHelp)
 C(2,#FunCode,$,K(MODIFYBUTTON,匯入資料),K(MODIFYBUTTON,產生媒體),K(MODIFYBUTTON,取消媒體))
 C(3,#FunCode,2,INVOKEJS(SHOW,L5512_4,1),INVOKEJS(SHOW,L5512_4,0))

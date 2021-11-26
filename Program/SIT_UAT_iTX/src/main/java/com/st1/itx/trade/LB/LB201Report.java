@@ -93,8 +93,8 @@ public class LB201Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B201", "聯徵授信餘額月報檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B201-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－許高政", 20, ' ')
-					+ makeFile.fillStringR("02-23895858#7067", 16, ' ') + makeFile.fillStringR("", 20, ' ') + makeFile.fillStringR("", 16, ' ') + StringUtils.repeat(" ", 80)
+			strContent = "JCIC-DAT-B201-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－鄧雪美", 20, ' ')
+					+ makeFile.fillStringR("02-23895858#7279", 16, ' ') + makeFile.fillStringR("", 20, ' ') + makeFile.fillStringR("", 16, ' ') + StringUtils.repeat(" ", 80)
 					+ StringUtils.repeat(" ", 315);
 			makeFile.put(strContent);
 
@@ -104,7 +104,7 @@ public class LB201Report extends MakeReport {
 			} else {
 				for (Map<String, String> tLBVo : LBList) {
 					strContent = "";
-					for (int j = 1; j <= tLBVo.size(); j++) {
+					for (int j = 1; j <= 91; j++) {
 						String strField = "";
 						if (tLBVo.get(txt1[j - 1]) == null) {
 							strField = "";
@@ -530,7 +530,7 @@ public class LB201Report extends MakeReport {
 			} else {
 				for (Map<String, String> tLBVo : LBList) {
 					strContent = "";
-					for (int j = 1; j <= tLBVo.size(); j++) {
+					for (int j = 1; j <= 91; j++) {
 						String strField = "";
 						if (tLBVo.get(txt1[j - 1]) == null) {
 							strField = "";

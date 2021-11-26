@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度-Occ回來後去切的長度]
 #INQLEN=n,3,S
-E(0,255)ASGN(INQLEN$)
+E(0,205)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -55,6 +55,16 @@ E(0,0)
 
 #FdEmpId=X,2,L
 #FdDataDate=X,2,L
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDCODEMuSub=x,20,S
+T(3,CdCode.MuSub)
+#MuSubHelp=x,2024,S
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEMuSub)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@MuSubHelp,#HelpDesc1)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -87,6 +97,7 @@ T(2,#OOHeadOfficeCode+ +#OOHeadOfficeCodeX)
 ! 分行代號
 #OOBranchCode=X,4,S
 #OOBranchCodeX=X,50,S
+T(H,#OOBranchCode,#MuSubHelp)
 #OOBranch=X,55,S
 T(2,#OOBranchCode+ +#OOBranchCodeX)
 ! 資料日期
@@ -125,11 +136,11 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L8350; ntxbuf=#OOBUF2})
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L8950
 #OOHeadOfficeCode
 #OOHeadOfficeCodeX
 #OOBranchCode
-#OOBranchCodeX
 #OODataDate
 #OOEmpId
 #OOEmpName
@@ -158,7 +169,7 @@ TXFORM=L8950
 {width:105,align:'center'}
 !分行代號
 #OOBranch=分行
-{width:105,align:'center'}
+{width:130,align:'center'}
 !資料日期
 #OODataDate=資料日期
 {width:105,align:'center'}

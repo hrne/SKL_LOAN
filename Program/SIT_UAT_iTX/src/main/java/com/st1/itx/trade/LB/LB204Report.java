@@ -104,7 +104,7 @@ public class LB204Report extends MakeReport {
 			} else {
 				for (Map<String, String> tLBVo : LBList) {
 					strContent = "";
-					for (int j = 1; j <= tLBVo.size(); j++) {
+					for (int j = 1; j <= 13; j++) {
 						String strField = "";
 						if (tLBVo.get(txt1[j - 1]) == null) {
 							strField = "";
@@ -229,7 +229,7 @@ public class LB204Report extends MakeReport {
 			} else {
 				for (Map<String, String> tLBVo : LBList) {
 					strContent = "";
-					for (int j = 1; j <= tLBVo.size(); j++) {
+					for (int j = 1; j <= 13; j++) {
 						String strField = "";
 						if (tLBVo.get(txt1[j - 1]) == null) {
 							strField = "";

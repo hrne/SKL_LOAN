@@ -53,6 +53,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String CustNo = titaVo.getParam("CustNo").trim(); // 戶號
 		String FacmNo = titaVo.getParam("FacmNo").trim(); // 額度編號
 		String SumByFacm = titaVo.getParam("SumByFacm").trim();
+		String Introducer = titaVo.getParam("Introducer").trim();
 
 		String sql = "SELECT A.\"LogNo\",";
 		sql += "E1.\"UnitItem\" AS \"BsDeptName\",";
@@ -62,10 +63,10 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "A.\"CustNo\",";
 		sql += "A.\"FacmNo\",";
 		sql += "A.\"BormNo\",";
-		sql += "A.\"PerfDate\" - 19110000 AS \"PerfDate\",";
+		sql += "A.\"DrawdownDate\" - 19110000 AS \"DrawdownDate\",";
 		sql += "A.\"ProdCode\",";
 		sql += "A.\"PieceCode\",";
-		sql += "A.\"CntingCode\",";
+		sql += "NVL(A.\"CntingCode\",A.\"CntingCode\") AS \"CntingCode\",";
 		sql += "A.\"DrawdownAmt\",";
 		sql += "A.\"DeptCode\",";
 		sql += "A.\"DistCode\",";
@@ -77,9 +78,9 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "F2.\"Fullname\" AS \"IntroducerName\",";
 		sql += "F3.\"Fullname\" AS \"UnitManagerName\",";
 		sql += "F4.\"Fullname\" AS \"DistManagerName\",";
-		sql += "A.\"PerfEqAmt\",";
-		sql += "A.\"PerfReward\",";
-		sql += "A.\"PerfAmt\",";
+		sql += "NVL(D.\"AdjPerfEqAmt\",A.\"PerfEqAmt\") AS \"PerfEqAmt\",";
+		sql += "NVL(D.\"AdjPerfReward\",A.\"PerfReward\") AS \"PerfReward\",";
+		sql += "NVL(D.\"AdjPerfAmt\",A.\"PerfAmt\") AS \"PerfAmt\",";
 		sql += "A.\"RepayType\",";
 		sql += "A.\"WorkMonth\" - 191100 as \"WorkMonth\", ";
 		sql += "NVL(D.\"AdjRange\",0) AS \"AdjRange\", ";
@@ -90,7 +91,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "FROM \"PfItDetail\" A ";
 		sql += "LEFT JOIN \"PfBsDetail\" B ON B.\"CustNo\"=A.\"CustNo\" AND B.\"FacmNo\"=A.\"FacmNo\" AND B.\"BormNo\"=A.\"BormNo\" AND B.\"PerfDate\"=A.\"PerfDate\" AND B.\"RepayType\"=A.\"RepayType\" AND B.\"PieceCode\"=A.\"PieceCode\" AND B.\"DrawdownAmt\">0 ";
 		sql += "LEFT JOIN \"CustMain\" C ON C.\"CustNo\"=A.\"CustNo\" ";
-		sql += "LEFT JOIN \"PfItDetailAdjust\" D ON D.\"CustNo\"=A.\"CustNo\" AND D.\"FacmNo\"=A.\"FacmNo\"  AND D.\"WorkMonth\"=A.\"WorkMonth\" ";
+		sql += "LEFT JOIN \"PfItDetailAdjust\" D ON D.\"CustNo\"=A.\"CustNo\" AND D.\"FacmNo\"=A.\"FacmNo\" AND D.\"BormNo\"=A.\"BormNo\" ";
 		sql += "LEFT JOIN \"CdBcm\" E1 ON E1.\"UnitCode\"=B.\"DeptCode\" ";
 		sql += "LEFT JOIN \"CdBcm\" E2 ON E2.\"UnitCode\"=A.\"DeptCode\" ";
 		sql += "LEFT JOIN \"CdBcm\" E3 ON E3.\"UnitCode\"=A.\"DistCode\" ";
@@ -100,22 +101,25 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdEmp\" F3 ON F3.\"EmployeeNo\"=A.\"UnitManager\" ";
 		sql += "LEFT JOIN \"CdEmp\" F4 ON F4.\"EmployeeNo\"=A.\"DistManager\" ";
 		sql += "WHERE A.\"DrawdownAmt\" > 0 ";
-//		sql += "AND A.\"RepayType\" = 0 ";
+		sql += "AND A.\"RepayType\" = 0 ";
 		if (WorkMonthFm > 0) {
 			sql += "AND A.\"WorkMonth\" BETWEEN :WorkMonthFm AND :WorkMonthTo ";
 		} else {
 			sql += "AND A.\"PerfDate\" BETWEEN :PerfDateFm AND :PerfDateTo ";
 		}
 		// 2:戶號
-		if (CustNo != null && Integer.parseInt(CustNo) != 0) {
+		if (!"".equals(CustNo) && Integer.parseInt(CustNo) != 0) {
 			// 戶號
 			// sql += "AND I.\"CustNo\"=" + Integer.parseInt(CustNo) + " ";
 			sql += "AND A.\"CustNo\"= :CustNo ";
 		}
-		if (FacmNo != null && Integer.parseInt(FacmNo) != 0) {
+		if (!"".equals(FacmNo) && Integer.parseInt(FacmNo) != 0) {
 			// 額度編號
 			// sql += "AND I.\"FacmNo\"=" + Integer.parseInt(FacmNo) + " ";// 額度編號
 			sql += "AND A.\"FacmNo\"= :FacmNo ";// 額度編號
+		}
+		if (!"".equals(Introducer)) {
+			sql += "AND A.\"Introducer\"= :Introducer ";
 		}
 
 		sql += "ORDER BY A.\"Introducer\",A.\"CustNo\",A.\"FacmNo\",A.\"BormNo\" ";
@@ -163,6 +167,9 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!"".equals(FacmNo) && Integer.parseInt(FacmNo) != 0) {
 			// 額度編號
 			query.setParameter("FacmNo", Integer.parseInt(FacmNo));
+		}
+		if (!"".equals(Introducer)) {
+			query.setParameter("Introducer",Introducer);
 		}
 
 		this.info("L5051Service FindData=" + query);

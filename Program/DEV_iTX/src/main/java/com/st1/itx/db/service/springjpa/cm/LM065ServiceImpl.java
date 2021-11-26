@@ -1,7 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -35,58 +33,26 @@ public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+//		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
 		// 月
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		String iYearMonthL5 = "";
 
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int wDay = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[wDay - 1]);
-		int diff = 0;
-		if (wDay == 1) {
-			diff = -2;
-		} else if (wDay == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
+		// 此表根據樣張明細備註有取五個月前的撥款日
+		if (iMonth - 5 < 0) {
+			iYearMonthL5 = String.valueOf(((iYear - 1) * 100) + (12 + (iMonth - 5)));
+		} else {
+			iYearMonthL5 = String.valueOf((iYear * 100) + (iMonth - 5));
 		}
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
-		this.info("lM065.findAll iYearMonth=" + iYearMonth);
+		this.info("lM065.findAll");
+		this.info("iYearMonth=" + iYearMonth);
+		this.info("iYearMonthL5=" + iYearMonthL5);
 
 		String sql = "SELECT DISTINCT(S1.\"CustNo\") AS F0";
 		sql += "			,S1.\"FacmNo\" AS F1";
@@ -111,11 +77,7 @@ public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  	   WHERE R.\"YearMonth\" = :yyyymm";
 		sql += "			 AND R.\"ConditionCode\" = 4";
 		sql += "			 AND R.\"LoanBal\" > 0 ";
-		sql += "			 AND CAST(SUBSTR(TRUNC(LBM.\"DrawdownDate\"/100),0,6) AS INT) =(";
-		sql += "		   CASE";
-		sql += "		  	 WHEN CAST(SUBSTR( :yyyymm ,5,2) AS INT) < 5";
-		sql += "		  	 THEN SUBSTR(TRUNC( :yyyymm /100),0,4) || SUBSTR( :yyyymm ,5,2) ";
-		sql += "			 ELSE SUBSTR(TRUNC( :yyyymm /100) - 1 ,0,4) || SUBSTR( :yyyymm + 7 ,5,2 ) END)) S0 ";
+		sql += "			 AND TRUNC(LBM.\"DrawdownDate\"/100) = :l5yymm";
 		sql += "	  LEFT JOIN(SELECT R.\"CustNo\" \"CustNo\"";
 		sql += "					  ,R.\"FacmNo\" \"FacmNo\"";
 		sql += "				  	  ,C.\"CustName\" \"CustName\"";
@@ -159,6 +121,7 @@ public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("l5yymm", iYearMonthL5);
 		query.setParameter("yyyymm", iYearMonth);
 		return this.convertToMap(query);
 	}

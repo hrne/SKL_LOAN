@@ -86,8 +86,8 @@ public class LB085Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B085", "帳號轉換資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B085-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("02-23895858#7067", 16, ' ')
-					+ makeFile.fillStringR("審查單位聯絡人－許高政", 67, ' ');
+			strContent = "JCIC-DAT-B085-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("02-23895858#7279", 16, ' ')
+					+ makeFile.fillStringR("審查單位聯絡人－鄧雪美", 67, ' ');
 			makeFile.put(strContent);
 
 			// 欄位內容
@@ -96,7 +96,7 @@ public class LB085Report extends MakeReport {
 			} else {
 				for (Map<String, String> tLBVo : LBList) {
 					strContent = "";
-					for (int j = 1; j <= tLBVo.size(); j++) {
+					for (int j = 1; j <= 12; j++) {
 						String strField = "";
 						if (tLBVo.get(txt1[j - 1]) == null) {
 							strField = "";
@@ -197,7 +197,7 @@ public class LB085Report extends MakeReport {
 			} else {
 				for (Map<String, String> tLBVo : LBList) {
 					strContent = "";
-					for (int j = 1; j <= tLBVo.size(); j++) {
+					for (int j = 1; j <= 12; j++) {
 						String strField = "";
 						if (tLBVo.get(txt1[j - 1]) == null) {
 							strField = "";

@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,139)ASGN(INQLEN$)
+E(0,204)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -43,15 +43,17 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L5053" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
-["[L5053]                                 介紹、協辦、專業獎勵獎金處理清單"],
+["[L5053]                                 介紹、協辦獎金明細查詢"],
 ["#FdWorkYM+工作年月",#WorkYM],
 ["#FdBonusType+獎金類別",#BonusType,#BonusTypeX],
 ]
 !["#FdDateFm+撥款起訖日",#DateFm,"~",#DateTo],
 !---------- AP TEXT AREA Variables ----------
+!["[L5053]                                 介紹、協辦、專業獎勵獎金處理清單"],
 
 #BonusTypeHelp=x,50,S
-T(3,1:介紹獎金;5:協辦獎金;6:專業獎勵金;9:全部)
+!T(3,1:介紹獎金;5:協辦獎金;6:專業獎勵金;9:全部)
+T(3,1:介紹獎金;5:協辦獎金;9:全部)
 
 #FdDateFm=X,2,L
 T(3,*)
@@ -190,15 +192,15 @@ T(H,@OBonusType,#BonusTypeHelp)
 C(3,#OBonusType,6,S,$)
 
 ! 戶號
-#OCustNo=X,7,O
+#OCustNo=A,7,S
 C(3,#OBonusType,6,S,$)
 
 ! 額度
-#OFacmNo=X,3,O
+#OFacmNo=A,3,S
 C(3,#OBonusType,6,S,$)
 
 ! 撥款
-#OBormNo=X,3,O
+#OBormNo=A,3,S
 C(3,#OBonusType,6,S,$)
 
 ! 發放專員
@@ -232,7 +234,7 @@ C(3,#OBonusType,6,S,$)
 #OMediaFg=A,1,O	
 
 ! 產出媒體檔日期
-#OMediaDate=D,7,O
+#OMediaDate=X,9,O
 C(3,#OMediaDate,0,S,$)
 
 ! 人工新增記號
@@ -240,6 +242,12 @@ C(3,#OMediaDate,0,S,$)
 
 #OManualFgX=X,2,S
 C(3,#OManualFg,1,T(3,是),S)
+
+#OLogFg=A,1,S
+
+#OLastUpdate=x,20,S
+
+#OLastEmp=x,20,S
 
 #CBUF=X,15,S
 T(2,#OBonusNo)
@@ -264,19 +272,17 @@ T(2,4+#CBUF)
 #OOBtnC=A,1,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBufC})
 C(3,#OManualFg,1,$,BIND(grid,cancel))
+C(3,#OMediaFg,1,BIND(grid,cancel),$)
 
-!#OOBufD=X,21,S
-!T(2,4+#CBUF)
+#b1=X,5,S
+T(3,L5503)
 
-!#OOBtnD=A,1,O
-!BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBtnD})
+#OOBufD=x,30,S
+T(2,L5503+#OCustNo+-+#OFacmNo+-+#OBormNo+-+#OBonusType)
 
-! <追回> 0106 +撥款金額
-! #OOBUF_B=X,214,S
-! T(2,#OOCustNo+#OOFacmNo+#OOBormNo+#OOCustNm+#OOIntroducer+#OOBsOfficer+#OOPieceCode+#OOCASECNT+#OOTRNSPERF+#OOPERFRWD+#OOPERFAMT+#OOIntroducerBonus+#OODrawdownAmt)
-! #OOBTN_B=A,2,O
-! BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBUF_B})
-! C(3,#OOSUMMARYWORKAMT,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBUF_B}))
+#OOBtnD=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L6933; ntxbuf=#OOBufD})
+C(3,#OLogFg,0,BIND(grid,cancel),$)
 
 </sub>
 
@@ -310,12 +316,16 @@ TXFORM=L5053
 #OMediaFg
 #OMediaDate
 #OManualFg
+#OLogFg
+#OLastUpdate
+#OLastEmp
 ^
 </sub>
 
+!["[L5053]                                  介紹、協辦、專業獎勵獎金處理清單                                                                          "],
 <sub type="PART" name="L5053A" layout="cols=1;screen.width=[130,870];printer.width=[15,30,15,30];order=1">
 [
-["[L5053]                                  介紹、協辦、專業獎勵獎金處理清單                                                                          "],
+["[L5053]                                  介紹、協辦獎金明細查詢                                                                          "],
 ]
 </sub>
 
@@ -324,12 +334,14 @@ TXFORM=L5053
 
 #RPTFG=1,QUERY.GRID,L5053A
 #any={detail:true, header:'L5053A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
-#OOBtnA=
+#OOBtnA=查詢
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
-#OOBtnB=
+#OOBtnB=修改
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
-#OOBtnC=
-{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+!#OOBtnC=刪除
+!{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBtnD=歷程
+{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
 
 #OBonusTypeX=獎金類別
 {width:100,align:'center'}
@@ -356,7 +368,7 @@ TXFORM=L5053
 {width:120,align:'center'}
 
 #OBonusDate=獎金發放日
-{width:80,align:'center'}
+{width:85,align:'center'}
 
 #OPerfDate=業績日期
 {width:80,align:'center'}
@@ -375,5 +387,11 @@ TXFORM=L5053
 
 #OWorkSeason=工作季
 {width:80,align:'center'}
+
+#OLastUpdate=修改日期
+{width:150,align:'left'}
+
+#OLastEmp=修改人員
+{width:150,align:'left'}
 ^
 </sub>

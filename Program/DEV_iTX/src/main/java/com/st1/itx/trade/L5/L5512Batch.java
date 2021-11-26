@@ -18,8 +18,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.PfInsCheck;
-import com.st1.itx.db.domain.PfItDetail;
-import com.st1.itx.db.domain.PfItDetailId;
 import com.st1.itx.db.domain.PfReward;
 import com.st1.itx.db.domain.PfRewardMedia;
 import com.st1.itx.db.service.PfRewardService;
@@ -315,26 +313,28 @@ public class L5512Batch extends TradeBuffer {
 				pfRewardMedia.setAdjustBonusDate(0);
 				pfRewardMedia.setWorkMonth(pfReward.getWorkMonth());
 				pfRewardMedia.setWorkSeason(pfReward.getWorkSeason());
+				pfRewardMedia.setProdCode(pfReward.getProdCode());
+				pfRewardMedia.setPieceCode(pfReward.getPieceCode());
 				pfRewardMedia.setRemark("");
 				pfRewardMedia.setMediaFg(0);
 				pfRewardMedia.setMediaDate(0);
 				pfRewardMedia.setManualFg(0);
 
-				PfItDetailId pfItDetailId = new PfItDetailId();
+//				PfItDetailId pfItDetailId = new PfItDetailId();
+//
+//				pfItDetailId.setPerfDate(pfReward.getPerfDate());
+//				pfItDetailId.setCustNo(pfReward.getCustNo());
+//				pfItDetailId.setFacmNo(pfReward.getFacmNo());
+//				pfItDetailId.setBormNo(pfReward.getBormNo());
 
-				pfItDetailId.setPerfDate(pfReward.getPerfDate());
-				pfItDetailId.setCustNo(pfReward.getCustNo());
-				pfItDetailId.setFacmNo(pfReward.getFacmNo());
-				pfItDetailId.setBormNo(pfReward.getBormNo());
-
-				PfItDetail pfItDetail = pfItDetailService.findByTxFirst(pfReward.getCustNo(), pfReward.getFacmNo(), pfReward.getBormNo(), pfReward.getPerfDate(), pfReward.getRepayType(), pfReward.getPieceCode(), titaVo);
-				if (pfItDetail == null) {
-					pfRewardMedia.setProdCode("");
-					pfRewardMedia.setPieceCode("");
-				} else {
-					pfRewardMedia.setProdCode(pfItDetail.getProdCode());
-					pfRewardMedia.setPieceCode(pfItDetail.getPieceCode());
-				}
+//				PfItDetail pfItDetail = pfItDetailService.findByTxFirst(pfReward.getCustNo(), pfReward.getFacmNo(), pfReward.getBormNo(), pfReward.getPerfDate(), pfReward.getRepayType(), pfReward.getPieceCode(), titaVo);
+//				if (pfItDetail == null) {
+//					pfRewardMedia.setProdCode("");
+//					pfRewardMedia.setPieceCode("");
+//				} else {
+//					pfRewardMedia.setProdCode(pfItDetail.getProdCode());
+//					pfRewardMedia.setPieceCode(pfItDetail.getPieceCode());
+//				}
 
 				pfRewardMedia.setBonusType(7);
 				pfRewardMedia.setBonus(pfReward.getIntroducerAddBonus());
@@ -395,7 +395,7 @@ public class L5512Batch extends TradeBuffer {
 //				}
 
 				BigDecimal bbonus = pfRewardMedia.getAdjustBonus();
-				bbonus = bbonus.setScale(0, BigDecimal.ROUND_FLOOR);
+				bbonus = bbonus.setScale(0, bbonus.ROUND_FLOOR);
 
 				if (bbonus.compareTo(BigDecimal.ZERO) == 0) {
 					continue;

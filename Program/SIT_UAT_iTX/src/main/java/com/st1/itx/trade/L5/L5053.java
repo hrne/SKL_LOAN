@@ -88,12 +88,13 @@ public class L5053 extends TradeBuffer {
 				// titaVo);
 				OccursList occursList = new OccursList();
 
-				int oBonusDate = Integer.valueOf(MapL5053.get("F0"));
-
-				if (oBonusDate > 0) {
-					oBonusDate -= 19110000;
+				if (MapL5053.get("Desc") == null || "".equals(MapL5053.get("Desc").toString().trim())) {
+					occursList.putParam("OBonusDate", 0);// 獎金發放日期
+				} else {
+					int oBonusDate = Integer.valueOf(MapL5053.get("Desc").toString().substring(0, 8)) - 19110000;
+					occursList.putParam("OBonusDate", oBonusDate);// 獎金發放日期
 				}
-				occursList.putParam("OBonusDate", oBonusDate);// 獎金發放日期
+								
 				occursList.putParam("OBonusNo", MapL5053.get("F16"));// 序號
 				occursList.putParam("OBonusType", MapL5053.get("F15"));// 獎金類別
 				int oPerfDate = Integer.valueOf(MapL5053.get("F1"));
@@ -124,14 +125,31 @@ public class L5053 extends TradeBuffer {
 					workSeason -= 19110;
 				}
 				occursList.putParam("OWorkSeason", workSeason);//
-				occursList.putParam("OMediaFg", MapL5053.get("F12"));//
-				int mediaDate = Integer.valueOf(MapL5053.get("F13"));
-				if (mediaDate > 0) {
-					mediaDate -= 19110000;
+				if (MapL5053.get("MediaDate") == null || "".equals(MapL5053.get("MediaDate"))) {
+					occursList.putParam("OMediaFg", 0);//
+					occursList.putParam("OMediaDate", 0);
+				} else {
+					occursList.putParam("OMediaFg", 1);//
+					occursList.putParam("OMediaDate", parse.stringToStringDate(MapL5053.get("MediaDate")));
 				}
-				occursList.putParam("OMediaDate", mediaDate);//
+				
+//				int mediaDate = Integer.valueOf(MapL5053.get("F13"));
+//				if (mediaDate > 0) {
+//					mediaDate -= 19110000;
+//				}
 				occursList.putParam("OManualFg", MapL5053.get("F14"));//
 
+				if (MapL5053.get("CreateDate").equals(MapL5053.get("LastUpdate"))) {
+					occursList.putParam("OLogFg", 0);//
+				} else {
+					occursList.putParam("OLogFg", 1);//
+				}
+				
+				this.info("LastUpdate = " + MapL5053.get("LastUpdate") + "=" + parse.stringToStringDate(MapL5053.get("LastUpdate")));
+				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5053.get("LastUpdate")));
+				
+				occursList.putParam("OLastEmp", MapL5053.get("LastUpdateEmpNo") + " " + MapL5053.get("LastUpdateEmpName"));
+				
 				this.totaVo.addOccursList(occursList);
 			}
 		}

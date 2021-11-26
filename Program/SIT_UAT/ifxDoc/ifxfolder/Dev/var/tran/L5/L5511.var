@@ -39,7 +39,7 @@ T(4,CHAIN$)
 
 ! 37*2+3*2+2=74+6
 #FunCodeHelp=X,200,S
-T(3,1:匯入介紹、協辦獎金發放資料;2:產生介紹、協辦、專業獎勵獎金媒體檔;3:取消介紹、協辦、專業獎勵獎金媒體檔)
+T(3,1:保費檢核及匯入介紹、協辦獎金發放資料;2:產生介紹、協辦、專業獎勵獎金媒體檔;3:取消介紹、協辦、專業獎勵獎金媒體檔)
 
 
 <include src="ROM.icf::L5R38.rtn"/>
@@ -59,7 +59,7 @@ E(0,@DateTo,#L5R38oEndDate)
 HELP(#FunCodeHelp)
 @V(H,#FunCodeHelp)
 
-#FunCodeX=X,40,L
+#FunCodeX=X,60,L
 T(H,#FunCode,#FunCodeHelp)
 C(2,#FunCode,$,K(MODIFYBUTTON,匯入資料),K(MODIFYBUTTON,產生媒體),K(MODIFYBUTTON,取消媒體))
 C(3,#FunCode,2,INVOKEJS(SHOW,L5511_4,1),INVOKEJS(SHOW,L5511_4,0))
