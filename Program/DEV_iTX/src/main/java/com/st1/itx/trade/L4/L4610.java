@@ -146,7 +146,8 @@ public class L4610 extends TradeBuffer {
 					tNewInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate")));
 					tNewInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate")));
 					tNewInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
-
+					tNewInsuRenew.setRemark(titaVo.getParam("Remark").trim());
+					
 					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuRenew.getInsuEndDate()) {
 						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
 					}
@@ -197,7 +198,7 @@ public class L4610 extends TradeBuffer {
 					tNewInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
 					tNewInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 					tNewInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
-
+					tNewInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
 					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuOrignal.getInsuEndDate()) {
 						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
 					}
@@ -221,6 +222,7 @@ public class L4610 extends TradeBuffer {
 				tInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
 				tInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 				tInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+				tInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
 				try {
 					insuOrignalService.insert(tInsuOrignal, titaVo);
 				} catch (DBException e) {
@@ -242,6 +244,7 @@ public class L4610 extends TradeBuffer {
 			editInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
 			editInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 			editInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+			editInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
 			try {
 				// 送出到DB
 				insuOrignalService.update(editInsuOrignal, titaVo);

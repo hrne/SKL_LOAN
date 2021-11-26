@@ -978,8 +978,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1013,8 +1013,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1052,8 +1052,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1089,8 +1089,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1125,8 +1125,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1161,8 +1161,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1191,8 +1191,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1217,8 +1217,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:120,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1249,8 +1249,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1277,8 +1277,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1305,8 +1305,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}
@@ -1333,8 +1333,8 @@ TXFORM=L2038
 #ClTypeCodeX=擔保品類別
 {width:200,align:'left'}
 
-#Amt=設定金額
-{width:100,align:'right'}
+#Amt=設定金額/股數
+{width:110,align:'right'}
 
 #OOSetting=設定狀態
 {width:75,align:'center'}

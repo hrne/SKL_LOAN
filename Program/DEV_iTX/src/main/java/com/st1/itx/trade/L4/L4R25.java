@@ -69,6 +69,7 @@ public class L4R25 extends TradeBuffer {
 			this.totaVo.putParam("L4r25InsuStartDate", tInsuOrignal.getInsuStartDate());
 			this.totaVo.putParam("L4r25InsuEndDate", tInsuOrignal.getInsuEndDate());
 			this.totaVo.putParam("L4r25CommericalFlag", tInsuOrignal.getCommericalFlag());
+			this.totaVo.putParam("L4r25Remark", tInsuOrignal.getRemark());
 		} else {
 			throw new LogicException(titaVo, "E0001", " 查無資料");
 		}

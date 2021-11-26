@@ -90,7 +90,7 @@ T(3,*)
 !---------- AP Button AREA ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 <include src="ROM.icf::L8R56.dec"/>
-<include src="ROM.icf::L5R28.dec"/>
+<include src="ROM.icf::L8R58.dec"/>
 #CDCODEAuthQryCode=x,20,S
 T(3,CdCode.AuthQryType)
 
@@ -101,13 +101,18 @@ T(3,CdCode.FuncCode)
 
 #FuncCodeHelp=x,1024,S 
 
+#CDDEF0003=x,20,S
+T(3,CdCode.MuSub)
+#MuSubHelp=x,2024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODEAuthQryCode,#CDDEF0002)
+S(XXR99,01,#CDCODEAuthQryCode,#CDDEF0002,#CDDEF0003)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@AuthQryCodeHelp,#HelpDesc1)
 T(2,@FuncCodeHelp,#HelpDesc2)
+T(2,@MuSubHelp,#HelpDesc3)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -118,6 +123,7 @@ C(3,#FunCd,1,S,$)
 T(1,@HeadOfficeCode,#NTXBUF,2,3)
 T(1,@BranchCode,#NTXBUF,5,4)
 T(1,@DataDate,#NTXBUF,9,7)
+T(1,@OldDataDate,#NTXBUF,9,7)
 T(1,@EmpId,#NTXBUF,16,6)
 
 #RimL8R56=X,1,S
@@ -149,8 +155,8 @@ T(2,@AuthMgrIdE,#L8R56AuthMgrIdE)
 T(2,@AuthMgrNameE,#L8R56AuthMgrNameE)
 T(2,@EmailAccount,#L8R56EmailAccount)
 E(0,@OutJcicTxtDate,#L8R56OutJcictxtDate)
-T(F,@BranchCode,0)T(F,@DataDate,0)T(F,@EmpId,0)
-T(2,@FdBranchCode, )T(2,@FdDataDate, )T(2,@FdEmpId, )
+T(F,@BranchCode,0)T(F,@EmpId,0)
+T(2,@FdBranchCode, )T(2,@FdEmpId, )
 
 #FunCd=A,1,S
 
@@ -158,35 +164,42 @@ T(2,@FdBranchCode, )T(2,@FdDataDate, )T(2,@FdEmpId, )
 T(H,#FunCd,#FuncCodeHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 
+#CDate=D,7,S
+C(3,#FunCd,1,$,S)
+T(1,#SYSCDATE,2,7)
+T(2,@DataDate,#CDate)
+
 !總行代號
 #HeadOfficeCode=X,3,L
 T(2,458)
 #HeadOfficeCodeX=X,20,L
-
+T(2,新光人壽)
 !分行代號
 #BranchCode=X,4,I
 C(3,#FunCd,1,$,s)
-@V(NL)
-V(7)
+HELP(#MuSubHelp)
+@V(H,#MuSubHelp)
 #BranchCodeX=X,20,L
+T(H,#BranchCode,#MuSubHelp)
 
 !資料日期
 #DataDate=D,7,I
-C(3,#FunCd,1,$,s)
+C(2,#FunCd,s,$,$,s,s,s)
 @V(7)
 A(DATE,0,#DataDate)
+#OldDataDate=D,7,S
 !員工代號
 #EmpId=X,6,I
 C(3,#FunCd,1,$,s)
 @V(7)V(NL)
 
-#RimL5R28=X,1,S
-#RimEmployeeNo=X,6,S
-T(2,@RimEmployeeNo,#EmpId)
-RESET_RIM(#RimL5R28,L5R28)
-S(L5R28,1,#RimEmployeeNo)
-R(1,L5R28)
-T(2,@EmpName,#L5r28FullName)
+#RimL8R58=X,1,S
+#RimEmpNo=X,6,S
+T(2,@RimEmpNo,#EmpId)
+RESET_RIM(#RimL8R58,L8R58)
+S(L8R58,1,#RimEmpNo)
+R(1,L8R58)
+T(2,@EmpName,#L8R58Fullname)
 
 !員工姓名
 #EmpName=X,42,L
@@ -209,11 +222,14 @@ T(H,#AuthQryType,#AuthQryCodeHelp)
 
 !授權辦理事項
 #AuthItemQuery=X,1,I,ui:checkbox;value:;
+@C(4,#AuthItemQuery,$,C(5,#AuthItemQuery,V,$,V(P,限輸入V或空白)))
 
 #AuthItemReview=X,1,I,ui:checkbox;value:;
-
+@C(4,#AuthItemReview,$,C(5,#AuthItemReview,V,$,V(P,限輸入V或空白)))
 #AuthItemOther=X,1,I,ui:checkbox;value:;
-@C(4,#AuthItemQuery,C(4,#AuthItemReview,C(4,#AuthItemOther,V(P,審核、覆核、其他，至少需勾選一項),$),$),$)
+@
+@C(4,#AuthItemOther,$,C(5,#AuthItemOther,V,$,V(P,限輸入V或空白)))
+C(4,#AuthItemQuery,C(4,#AuthItemReview,C(4,#AuthItemOther,V(P,審核、覆核、其他，至少需勾選一項),$),$),$)
 !授權起日
 #AuthStartDay=D,7,I
 @V(7)
@@ -231,11 +247,11 @@ C(4,#AuthEndDay,$,IF(#AuthEndDay>#AuthStartDay,$,V(P,迄日需大於起日)))
 !起日授權主管中文姓名
 #AuthMgrNameS=X,42,L
 C(4,#AuthMgrIdS,S,$)
-T(2,@RimEmployeeNo,#AuthMgrIdS)
-RESET_RIM(#RimL5R28,L5R28)
-S(L5R28,1,#RimEmployeeNo)
-R(1,L5R28)
-T(2,@AuthMgrNameS,#L5r28FullName)
+T(2,@RimEmpNo,#AuthMgrIdS)
+RESET_RIM(#RimL8R58,L8R58)
+S(L8R58,1,#RimEmpNo)
+R(1,L8R58)
+T(2,@AuthMgrNameS,#L8R58Fullname)
 
 !迄日授權主管中文代號
 #AuthMgrIdE=X,6,I
@@ -243,11 +259,11 @@ T(2,@AuthMgrNameS,#L5r28FullName)
 !迄日授權主管中文姓名
 #AuthMgrNameE=X,42,L
 C(4,#AuthMgrIdE,S,$)
-T(2,@RimEmployeeNo,#AuthMgrIdE)
-RESET_RIM(#RimL5R28,L5R28)
-S(L5R28,1,#RimEmployeeNo)
-R(1,L5R28)
-T(2,@AuthMgrNameE,#L5r28FullName)
+T(2,@RimEmpNo,#AuthMgrIdE)
+RESET_RIM(#RimL8R58,L8R58)
+S(L8R58,1,#RimEmpNo)
+R(1,L8R58)
+T(2,@AuthMgrNameE,#L8R58Fullname)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L
@@ -271,6 +287,7 @@ T(2,@AuthMgrNameE,#L5r28FullName)
 #HeadOfficeCode
 #BranchCode
 #DataDate
+#OldDataDate
 #EmpId
 #EmailAccount
 #Title
@@ -291,7 +308,7 @@ T(2,@AuthMgrNameE,#L5r28FullName)
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L8R56.tom"/>
-<include src="ROM.icf::L5R28.tom"/>
+<include src="ROM.icf::L8R58.tom"/>
 TXFORM=L8350
 ^
 </sub>

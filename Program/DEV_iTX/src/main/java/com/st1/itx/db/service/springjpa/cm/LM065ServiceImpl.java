@@ -77,7 +77,7 @@ public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  	   WHERE R.\"YearMonth\" = :yyyymm";
 		sql += "			 AND R.\"ConditionCode\" = 4";
 		sql += "			 AND R.\"LoanBal\" > 0 ";
-		sql += "			 AND TRUNC(LBM.\"DrawdownDate\"/100) = :l5yymm";
+		sql += "			 AND TRUNC(LBM.\"DrawdownDate\"/100) = :l5yymm ) S0";
 		sql += "	  LEFT JOIN(SELECT R.\"CustNo\" \"CustNo\"";
 		sql += "					  ,R.\"FacmNo\" \"FacmNo\"";
 		sql += "				  	  ,C.\"CustName\" \"CustName\"";

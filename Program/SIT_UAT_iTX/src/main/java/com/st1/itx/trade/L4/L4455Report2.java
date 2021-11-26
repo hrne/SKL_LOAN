@@ -295,11 +295,11 @@ public class L4455Report2 extends MakeReport {
 //					扣除總計合計的行數 +1 
 					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					this.print(1, 1,"                                                                                                                                                                               ");
-					this.print(0, 70, "合    計             件                                       總戶數 ：　　　　　　失敗戶數 ：");
+					this.print(0, 70, "合    計             件                                       　　　 　　　　　　　失敗戶數 ：");
 					
 					this.print(0, 90, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F0"))),"R");
 					this.print(0, 117, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F1"))),"R");
-					this.print(0, 160, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F2"))),"R");
+//					this.print(0, 160, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F2"))),"R");
 					this.print(0, 184, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F3"))),"R");
 					pageCnt = pageCnt + 2 ;
 					this.print(pageIndex - pageCnt - 2, 95, "=====報表結束=====", "C");

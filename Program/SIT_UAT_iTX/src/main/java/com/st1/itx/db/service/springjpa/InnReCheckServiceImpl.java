@@ -195,7 +195,7 @@ em = null;
   }
 
   @Override
-  public Slice<InnReCheck> findSpecify(int conditionCode_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<InnReCheck> findSpecify(int conditionCode_0, int yearMonth_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<InnReCheck> slice = null;
     if (titaVo.length != 0)
@@ -206,15 +206,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findSpecify " + dbName + " : " + "conditionCode_0 : " + conditionCode_0);
+    this.info("findSpecify " + dbName + " : " + "conditionCode_0 : " + conditionCode_0 + " yearMonth_1 : " +  yearMonth_1);
     if (dbName.equals(ContentName.onDay))
-      slice = innReCheckReposDay.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+      slice = innReCheckReposDay.findAllByConditionCodeIsAndYearMonthIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = innReCheckReposMon.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+      slice = innReCheckReposMon.findAllByConditionCodeIsAndYearMonthIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = innReCheckReposHist.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+      slice = innReCheckReposHist.findAllByConditionCodeIsAndYearMonthIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, pageable);
     else 
-      slice = innReCheckRepos.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+      slice = innReCheckRepos.findAllByConditionCodeIsAndYearMonthIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -223,7 +223,7 @@ em = null;
   }
 
   @Override
-  public Slice<InnReCheck> findSpecifyNo(int conditionCode_0, int custNo_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<InnReCheck> findSpecifyNo(int conditionCode_0, int yearMonth_1, int custNo_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<InnReCheck> slice = null;
     if (titaVo.length != 0)
@@ -234,15 +234,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findSpecifyNo " + dbName + " : " + "conditionCode_0 : " + conditionCode_0 + " custNo_1 : " +  custNo_1);
+    this.info("findSpecifyNo " + dbName + " : " + "conditionCode_0 : " + conditionCode_0 + " yearMonth_1 : " +  yearMonth_1 + " custNo_2 : " +  custNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = innReCheckReposDay.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+      slice = innReCheckReposDay.findAllByConditionCodeIsAndYearMonthIsAndCustNoIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, custNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = innReCheckReposMon.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+      slice = innReCheckReposMon.findAllByConditionCodeIsAndYearMonthIsAndCustNoIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, custNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = innReCheckReposHist.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+      slice = innReCheckReposHist.findAllByConditionCodeIsAndYearMonthIsAndCustNoIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, custNo_2, pageable);
     else 
-      slice = innReCheckRepos.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+      slice = innReCheckRepos.findAllByConditionCodeIsAndYearMonthIsAndCustNoIsOrderByConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, yearMonth_1, custNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

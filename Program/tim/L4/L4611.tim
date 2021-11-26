@@ -79,3 +79,4 @@ OvduDate=9,7
 OvduNo=9,10
 RenewCode=9,1
 CommericalFlag=X,1
+Remark=X,50

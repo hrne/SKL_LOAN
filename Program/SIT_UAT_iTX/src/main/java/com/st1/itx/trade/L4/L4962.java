@@ -312,17 +312,18 @@ public class L4962 extends TradeBuffer {
 		occursListReport.putParam("ReportCClCode2", tInsuRenew.getClCode2());
 		occursListReport.putParam("ReportCClNo", tInsuRenew.getClNo());
 		occursListReport.putParam("ReportCNowInsuNo", tInsuRenew.getNowInsuNo());
-		switch (errorFlag) {
-		case 1:
-			occursListReport.putParam("ReportCErrMsg", "無新保單號碼");
-			break;
-		case 2:
-			occursListReport.putParam("ReportCErrMsg", "保費未入帳");
-			break;
-		default:
-			occursListReport.putParam("ReportCErrMsg", "");
-			break;
-		}
+		occursListReport.putParam("ReportCRemark", tInsuRenew.getRemark());
+//		switch (errorFlag) {
+//		case 1:
+//			occursListReport.putParam("ReportCErrMsg", "無新保單號碼");
+//			break;
+//		case 2:
+//			occursListReport.putParam("ReportCErrMsg", "保費未入帳");
+//			break;
+//		default:
+//			occursListReport.putParam("ReportCErrMsg", "");
+//			break;
+//		}
 
 		totaC.addOccursList(occursListReport);
 	}
@@ -361,7 +362,7 @@ public class L4962 extends TradeBuffer {
 		occursListReport.putParam("ReportCClCode2", tInsuOrignal.getClCode2());
 		occursListReport.putParam("ReportCClNo", tInsuOrignal.getClNo());
 		occursListReport.putParam("ReportCNowInsuNo", "");
-		
+		occursListReport.putParam("ReportCRemark", tInsuOrignal.getRemark());
 //		switch (errorFlag) {
 //		case 1:
 //			occursListReport.putParam("ReportCErrMsg", "無新保單號碼");
@@ -370,7 +371,7 @@ public class L4962 extends TradeBuffer {
 //			occursListReport.putParam("ReportCErrMsg", "保費未入帳");
 //			break;
 //		default:
-			occursListReport.putParam("ReportCErrMsg", "");
+//			occursListReport.putParam("ReportCErrMsg", "");
 //			break;
 //		}
 

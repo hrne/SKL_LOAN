@@ -43,6 +43,7 @@ public class L8350 extends TradeBuffer {
 		String iHeadOfficeCode = titaVo.getParam("HeadOfficeCode");
 		String iBranchCode = titaVo.getParam("BranchCode");
 		int iDataDate = Integer.valueOf(titaVo.getParam("DataDate"));
+		int iOldDataDate = Integer.valueOf(titaVo.getParam("OldDataDate"));
 		String iEmpId = titaVo.getParam("EmpId");
 		String iEmailAccount = titaVo.getParam("EmailAccount");
 		String iTitle = titaVo.getParam("Title");
@@ -61,14 +62,17 @@ public class L8350 extends TradeBuffer {
 		TbJcicMu01 iTbJcicMu01 = new TbJcicMu01();
 		TbJcicMu01Id iTbJcicMu01Id = new TbJcicMu01Id();
 
-		
 		iTbJcicMu01Id.setHeadOfficeCode(iHeadOfficeCode);
 		iTbJcicMu01Id.setBranchCode(iBranchCode);
-		iTbJcicMu01Id.setDataDate(iDataDate);
+		if (iFunCd.equals("2")) {
+			iTbJcicMu01Id.setDataDate(iOldDataDate);
+		}else {
+			iTbJcicMu01Id.setDataDate(iDataDate);
+		}	
 		iTbJcicMu01Id.setEmpId(iEmpId);
 		iTbJcicMu01.setTbJcicMu01Id(iTbJcicMu01Id);
-		switch(iFunCd) {
-		case"1":
+		switch (iFunCd) {
+		case "1":
 			iTbJcicMu01.setEmailAccount(iEmailAccount);
 			iTbJcicMu01.setTitle(iTitle);
 			iTbJcicMu01.setQryUserId(iQryUserId);
@@ -80,7 +84,7 @@ public class L8350 extends TradeBuffer {
 			iTbJcicMu01.setAuthEndDay(iAuthEndDay);
 			iTbJcicMu01.setAuthMgrIdS(iAuthMgrIdS);
 			iTbJcicMu01.setAuthMgrIdE(iAuthMgrIdE);
-			iTbJcicMu01.setOutJcictxtDate(iOutJcicTxtDate);
+			
 			TbJcicMu01 aTbJcicMu01 = sTbJcicMu01Service.findById(iTbJcicMu01Id, titaVo);
 			this.info("前置=" + aTbJcicMu01);
 			if (aTbJcicMu01 == null) {
@@ -91,37 +95,43 @@ public class L8350 extends TradeBuffer {
 				}
 			}
 			break;
-		case"2":
-			TbJcicMu01 uTbJcicMu01 = sTbJcicMu01Service.holdById(iTbJcicMu01Id, titaVo);
-			if (uTbJcicMu01 == null) {
-				throw new LogicException(titaVo, "E0003", "");	
-			}
-			TbJcicMu01 beforeTbJcicMu01 = (TbJcicMu01) iDataLog.clone(uTbJcicMu01);
-			uTbJcicMu01.setEmailAccount(iEmailAccount);
-			uTbJcicMu01.setTitle(iTitle);
-			uTbJcicMu01.setQryUserId(iQryUserId);
-			uTbJcicMu01.setAuthQryType(iAuthQryType);
-			uTbJcicMu01.setAuthItemQuery(iAuthItemQuery);
-			uTbJcicMu01.setAuthItemReview(iAuthItemReview);
-			uTbJcicMu01.setAuthItemOther(iAuthItemOther);
-			uTbJcicMu01.setAuthStartDay(iAuthStartDay);
-			uTbJcicMu01.setAuthEndDay(iAuthEndDay);
-			uTbJcicMu01.setAuthMgrIdS(iAuthMgrIdS);
-			uTbJcicMu01.setAuthMgrIdE(iAuthMgrIdE);
-			uTbJcicMu01.setOutJcictxtDate(iOutJcicTxtDate);
-			
+		case "2":
 			try {
-				uTbJcicMu01 = sTbJcicMu01Service.update2(uTbJcicMu01, titaVo);
+				sTbJcicMu01Service.delete(iTbJcicMu01, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "");
 			}
 			
-			iDataLog.setEnv(titaVo, beforeTbJcicMu01, uTbJcicMu01);
-			iDataLog.exec();
+			TbJcicMu01 dTbJcicMu01 = new TbJcicMu01();
+			TbJcicMu01Id dTbJcicMu01Id = new TbJcicMu01Id();
+
+			dTbJcicMu01Id.setHeadOfficeCode(iHeadOfficeCode);
+			dTbJcicMu01Id.setBranchCode(iBranchCode);
+			dTbJcicMu01Id.setDataDate(iDataDate);	
+			dTbJcicMu01Id.setEmpId(iEmpId);
+			dTbJcicMu01.setTbJcicMu01Id(dTbJcicMu01Id);
+			dTbJcicMu01.setEmailAccount(iEmailAccount);
+			dTbJcicMu01.setTitle(iTitle);
+			dTbJcicMu01.setQryUserId(iQryUserId);
+			dTbJcicMu01.setAuthQryType(iAuthQryType);
+			dTbJcicMu01.setAuthItemQuery(iAuthItemQuery);
+			dTbJcicMu01.setAuthItemReview(iAuthItemReview);
+			dTbJcicMu01.setAuthItemOther(iAuthItemOther);
+			dTbJcicMu01.setAuthStartDay(iAuthStartDay);
+			dTbJcicMu01.setAuthEndDay(iAuthEndDay);
+			dTbJcicMu01.setAuthMgrIdS(iAuthMgrIdS);
+			dTbJcicMu01.setAuthMgrIdE(iAuthMgrIdE);
 			
+
+			try {
+				sTbJcicMu01Service.insert(dTbJcicMu01, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
+			}
+
 			break;
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

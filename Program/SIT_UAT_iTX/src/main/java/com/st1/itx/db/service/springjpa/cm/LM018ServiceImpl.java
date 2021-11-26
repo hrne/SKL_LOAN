@@ -123,7 +123,7 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            LEFT JOIN \"OutputMonths\" om ON om.\"YearMonth\" = FLOOR(ad.\"RelDy\"/100) ";
 		sql += "            WHERE ad.\"RelDy\" BETWEEN TO_NUMBER(:entYear||'0101') AND TO_NUMBER(:entYear||'1231') ";
 		sql += "            AND spn.\"ProdNo\" is not null ";
-		sql += "            AND ad.\"AcctCode\" IN ('IC1','IC2','IC3','IC4','IOP','IOV','F15','F16') ";
+		sql += "            AND ad.\"AcctCode\" IN ('IC1','IC2','IC3','IC4','IOV','F15','F16') ";
 		sql += "            GROUP BY spn.\"ProdNoShow\" ";
 		sql += "                    ,om.\"YearMonth\" ";
 		sql += "           ) int ON int.\"YearMonth\" = om.\"YearMonth\" ";

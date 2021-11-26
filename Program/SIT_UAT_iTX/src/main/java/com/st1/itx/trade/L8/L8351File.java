@@ -82,7 +82,7 @@ public class L8351File extends MakeFile {
 					this.put(iContent);
 					// 修改Jcic日期為今天日期
 					TbJcicMu01 bTbJcicMu01 = iTbJcicMu01Service.holdById(aTbJcicMu01.getTbJcicMu01Id());
-					bTbJcicMu01.setOutJcictxtDate(Integer.valueOf(titaVo.getOrgEntdyI()) + 19110000);
+					bTbJcicMu01.setOutJcictxtDate(Integer.valueOf(titaVo.getCalDy()) + 19110000);
 					try {
 						iTbJcicMu01Service.update(bTbJcicMu01);
 					} catch (DBException e) {

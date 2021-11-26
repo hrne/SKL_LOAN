@@ -29,7 +29,7 @@ public class InsuOrignal implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7122371180483226568L;
+	private static final long serialVersionUID = 6751954939234637062L;
 
 @EmbeddedId
   private InsuOrignalId insuOrignalId;
@@ -90,6 +90,10 @@ public class InsuOrignal implements Serializable {
   // 住宅險改商業險註記
   @Column(name = "`CommericalFlag`", length = 1)
   private String commericalFlag;
+
+  // 備註
+  @Column(name = "`Remark`", length = 50)
+  private String remark;
 
   // 建檔日期時間
   @CreatedDate
@@ -399,6 +403,25 @@ public class InsuOrignal implements Serializable {
   }
 
 /**
+	* 備註<br>
+	* 
+	* @return String
+	*/
+  public String getRemark() {
+    return this.remark == null ? "" : this.remark;
+  }
+
+/**
+	* 備註<br>
+	* 
+  *
+  * @param remark 備註
+	*/
+  public void setRemark(String remark) {
+    this.remark = remark;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -479,7 +502,7 @@ public class InsuOrignal implements Serializable {
   public String toString() {
     return "InsuOrignal [insuOrignalId=" + insuOrignalId + ", insuCompany=" + insuCompany
            + ", insuTypeCode=" + insuTypeCode + ", fireInsuCovrg=" + fireInsuCovrg + ", ethqInsuCovrg=" + ethqInsuCovrg + ", fireInsuPrem=" + fireInsuPrem + ", ethqInsuPrem=" + ethqInsuPrem + ", insuStartDate=" + insuStartDate
-           + ", insuEndDate=" + insuEndDate + ", commericalFlag=" + commericalFlag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", insuEndDate=" + insuEndDate + ", commericalFlag=" + commericalFlag + ", remark=" + remark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -99,9 +99,9 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",Y.\"FirstDrawdownDate\" - 19110000            AS F25   					 ";  //貸款起日
         sql += ",Y.\"MaturityDate\" - 19110000                 AS F26  						 ";  //貸款迄日
        	sql += ",Y.\"LoanBal\"                                 AS F27  						 ";  //本期未償還本金額
-    	sql += ",CASE WHEN TRUNC(Y.\"FirstDrawdownDate\",10000)	< TRUNC("+iYYYYMM +"* 100)	 ";
-    	sql += "  THEN TRUNC("+iYYYYMM+" * 100) -19110000 + 01                               ";
-    	sql += "        ELSE TRUNC(Y.\"FirstDrawdownDate\",100) - 19110000             		     ";
+    	sql += ",CASE WHEN TRUNC(Y.\"FirstDrawdownDate\")	< TRUNC("+iYYYYMM +"* 100)	 ";
+    	sql += "  THEN TRUNC("+iYYYYMM+",-2) -191100+01                                ";
+    	sql += "        ELSE TRUNC(Y.\"FirstDrawdownDate\",-2)/100 - 191100            		     ";
     	sql += " END                                           AS F28  						 ";  //繳息所屬年月(起)
     	sql += ",Y.\"YearMonth\" - 191100                    AS F29 						 ";  //繳息所屬年月(止)
     	sql += ",Y.\"YearlyInt\"                               AS F30  						 ";  //繳息金額 	
@@ -132,7 +132,7 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
     	sql += "    ON CA.\"CityCode\" = CB.\"CityCode\"									 ";
     	sql += "   AND CA.\"AreaCode\" = CB.\"AreaCode\"									 ";        
     	sql += "WHERE Y.\"YearMonth\" = "+iYYYYMM											;
-//    	sql += "AND \"UsageCode\" =  iUsageCode												 ";
+    	sql += "AND Y.\"UsageCode\" =  '2' or Y.\"UsageCode\" =  '02'							";
 
 		this.info("sql=" + sql);
 		Query query;

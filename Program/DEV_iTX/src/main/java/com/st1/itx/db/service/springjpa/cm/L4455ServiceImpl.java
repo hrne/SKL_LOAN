@@ -285,7 +285,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql +=  "                ) TMP" ; 
 			sql +=  "           WHERE TMP.\"Seq\" <= 1" ; 
 			sql +=  "          ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\"" ; 
-			sql +=  "  WHERE NVL(BKD.\"ReturnCode\",' ') != ' '" ; 
+			sql +=  "  WHERE NVL(BKD.\"ReturnCode\",'00') != '00'" ; 
 			sql +=  "  AND BKD.\"EntryDate\" = :inputEntryDate" ; 
 			sql +=  "  ORDER BY BKD.\"RepayBank\"    " ; 
 			sql +=  "       , BKD.\"AcctCode\"     " ; 

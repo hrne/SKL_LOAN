@@ -14,6 +14,7 @@ import com.st1.itx.db.domain.InnLoanMeeting;
 import com.st1.itx.db.service.InnLoanMeetingService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -30,11 +31,10 @@ import com.st1.itx.util.parse.Parse;
 /**
  * 
  * 
- * @author Zi-Jun,Huang
+ * @author Fegie
  * @version 1.0.0
  */
 public class L5102 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5102.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -46,10 +46,13 @@ public class L5102 extends TradeBuffer {
 
 	@Autowired
 	public InnLoanMeetingService innLoanMeetingService;
-	
+
 	/* 自動取號 */
 	@Autowired
 	GSeqCom gGSeqCom;
+	
+	@Autowired
+	SendRsp iSendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -58,29 +61,29 @@ public class L5102 extends TradeBuffer {
 
 		int iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode").trim());
 		int iMeetingDate = parse.stringToInteger(titaVo.getParam("MeetingDate").trim());
-		
-		int iMeetNo = 0; //放審會流水號(2020/12/2新增)
-		if(iFunctionCode == 1) {
-			//新增時取號
+
+		int iMeetNo = 0; // 放審會流水號(2020/12/2新增)
+		if (iFunctionCode == 1) {
+			// 新增時取號
 			iMeetNo = gGSeqCom.getSeqNo(0, 0, "L5", "0001", 9999999, titaVo);
-		}else {
+		} else {
 			iMeetNo = parse.stringToInteger(titaVo.getParam("MeetNo").trim());
 		}
-		this.info("取號="+iMeetNo);
+		this.info("取號=" + iMeetNo);
 		InnLoanMeeting iInnLoanMeeting = innLoanMeetingService.findById(iMeetNo, titaVo);
 		InnLoanMeeting tInnLoanMeeting = new InnLoanMeeting();
-		switch(iFunctionCode) {
+		switch (iFunctionCode) {
 		case 1:
-			if(iInnLoanMeeting!=null) {
-				throw new LogicException(titaVo,"E0005","");
-			}else {
+			if (iInnLoanMeeting != null) {
+				throw new LogicException(titaVo, "E0005", "");
+			} else {
 				tInnLoanMeeting.setMeetNo(iMeetNo);
 				tInnLoanMeeting.setMeetingDate(iMeetingDate);
 				tInnLoanMeeting.setCustCode(titaVo.getParam("CustCode").trim());
 				tInnLoanMeeting.setAmount(parse.stringToBigDecimal(titaVo.getParam("Amount").trim()));
 				tInnLoanMeeting.setIssue(titaVo.getParam("Issue"));
 				tInnLoanMeeting.setRemark(titaVo.getParam("Remark"));
-				try{
+				try {
 					innLoanMeetingService.insert(tInnLoanMeeting, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", "L5102 InnLoanMeeting insert " + e.getErrorMsg());
@@ -88,30 +91,38 @@ public class L5102 extends TradeBuffer {
 			}
 			break;
 		case 2:
-			if(iInnLoanMeeting == null) {
-				throw new LogicException(titaVo,"E0006","");
-			}else {
+			if (!titaVo.getHsupCode().equals("1")) {
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0002", "");
+			}
+			
+			if (iInnLoanMeeting == null) {
+				throw new LogicException(titaVo, "E0006", "");
+			} else {
 				tInnLoanMeeting = innLoanMeetingService.holdById(iMeetNo, titaVo);
 				tInnLoanMeeting.setMeetingDate(iMeetingDate);
 				tInnLoanMeeting.setCustCode(titaVo.getParam("CustCode").trim());
-				tInnLoanMeeting.setAmount(parse.stringToBigDecimal(titaVo.getParam("Amount").trim()));	
+				tInnLoanMeeting.setAmount(parse.stringToBigDecimal(titaVo.getParam("Amount").trim()));
 				tInnLoanMeeting.setIssue(titaVo.getParam("Issue"));
 				tInnLoanMeeting.setRemark(titaVo.getParam("Remark"));
 				try {
 					innLoanMeetingService.update(tInnLoanMeeting, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", "L5102 InnLoanMeeting update " + e.getErrorMsg());
 				}
 			}
 			break;
 		case 4:
-			if(iInnLoanMeeting == null) {
-				throw new LogicException(titaVo,"E0006","");
-			}else {
+			if (!titaVo.getHsupCode().equals("1")) {
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+			
+			if (iInnLoanMeeting == null) {
+				throw new LogicException(titaVo, "E0006", "");
+			} else {
 				tInnLoanMeeting = innLoanMeetingService.holdById(iMeetNo, titaVo);
 				try {
 					innLoanMeetingService.delete(tInnLoanMeeting, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5102 InnLoanMeeting delete " + e.getErrorMsg());
 				}
 			}

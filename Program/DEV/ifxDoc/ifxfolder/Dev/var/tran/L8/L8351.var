@@ -41,6 +41,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
 ["[L8351]                                 聯徵產品檔案匯出作業"],
+["#FdSubmitType+功能,"#SubmitType,#SubmitTypeX],
 ["#FdFuleOption+報送檔案",#FileOption,#FileOptionX],
 ["#FdSubmitKey+報送金融機構代號",#SubmitKey],
 ["#FdTxDate+報送日期",#TxtDate],
@@ -48,28 +49,35 @@ E(0,0)
 ]
 
 !---------- AP Button AREA ----------
+#FdSubmitType=X,2,L
+T(2, )
 #FdFuleOption=X,2,L
-T(2,*)
+T(2, )
 #FdSubmitKey=X,2,L
 T(2, )
 #FdTxDate=X,2,L
-T(2,*)
+T(2, )
 #FdTxtCount=X,2,L
 T(2, )
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 !DdlQuery
-#CDCODEDdlQuery=x,20,S                  
+#CDDEF0001=x,20,S                  
 T(3,CdCode.DdlQuery)                  
 #DdlQueryHelp=x,300,S 
+
+#CDDEF0002=x,20,S
+T(3,CdCode.SubmitType)
+#SubmitTypeHelp=x,1024,S
        
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODEDdlQuery)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@DdlQueryHelp,#HelpDesc1)
+T(2,@SubmitTypeHelp,#HelpDesc2)
 
 T(2,@SubmitKey,458)
 T(2,@TxtCount,01)
@@ -78,11 +86,18 @@ T(2,@TxtCount,01)
 T(1,#SYSCDATE,2,7)
 T(2,@TxtDate,#CDate)
 
+! 報送類別
+#SubmitType=A,1,I
+HELP(#SubmitTypeHelp)
+@V(H,#SubmitTypeHelp)
+#SubmitTypeX=X,10,L
+T(H,#SubmitType,#SubmitTypeHelp)
 
 !報送檔案代號
-#FileOption=X,1,I
-HELP(#DdlQueryHelp)
-@V(H,#DdlQueryHelp)
+#FileOption=X,1,L
+T(2,1)
+! HELP(#DdlQueryHelp)
+! @V(H,#DdlQueryHelp)
 
 !報送檔案代號名稱
 #FileOptionX=X,30,L
@@ -92,10 +107,10 @@ T(H,#FileOption,#DdlQueryHelp)
 #SubmitKey=X,3,L
 
 !調解申請日 要預設為今天日期
-#TxtDate=D,7,I
-D(8)
-@V(7)
-A(DATE,0,#TxtDate)
+#TxtDate=D,7,L
+! D(8)
+! @V(7)
+! A(DATE,0,#TxtDate)
 
 !報送次數
 #TxtCount=X,2,L
@@ -130,6 +145,7 @@ T(3,[L8351] 債務人繳款資料檔案)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#SubmitType
 #SubmitKey
 #TxtDate
 #TxtCount

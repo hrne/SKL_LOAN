@@ -82,13 +82,13 @@ public class L5905 extends TradeBuffer {
 		case 1:
 			if (iCustNo == 0) {
 				if (iConditionCode == 99){
-					slInnReCheck = sInnReCheckService.findSpecify(99, this.index, this.limit, titaVo);
+					slInnReCheck = sInnReCheckService.findSpecify(99,iFYearMonth, this.index, this.limit, titaVo);
 				}else {
 					slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, 0000000, 9999999, this.index, this.limit, titaVo);
 				}
 			} else {
 				if (iConditionCode == 99){
-					slInnReCheck = sInnReCheckService.findSpecifyNo(99, iCustNo,this.index, this.limit, titaVo);
+					slInnReCheck = sInnReCheckService.findSpecifyNo(99,iFYearMonth, iCustNo,this.index, this.limit, titaVo);
 				}else {
 					slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, iCustNo, iCustNo, this.index, this.limit, titaVo);
 				}
@@ -117,8 +117,7 @@ public class L5905 extends TradeBuffer {
 
 			wkYearMonth = this.parse.IntegerToString(tInnReCheck.getReChkYearMonth(), 6);
 			wkReChkMonth = FormatUtil.right(wkYearMonth, 2);
-			this.info("L5905 wkReChkMonth : " + wkReChkMonth);
-			
+						
 			if (iInqFg == 2 && !(iReChkMonth.equals(wkReChkMonth))) {
 //			if (iInqFg == 2) {
 				continue;

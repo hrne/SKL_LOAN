@@ -527,7 +527,7 @@ TXFORM=L2017
 #OOEvaAmtX=鑑價總值
 {width:110,align:'right'}
 
-#OOSettingAmtX=設定金額
+#OOSettingAmtX=設定金額/股數
 {width:110,align:'right'}
 
 #OOApproveDate=核准日期

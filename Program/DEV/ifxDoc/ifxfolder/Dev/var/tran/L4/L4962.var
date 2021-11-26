@@ -200,7 +200,7 @@ E(0,1)ASGN(LOOP$)
 #ReportCClCode2=A,2,O
 #ReportCClNo=A,7,O
 #ReportCNowInsuNo=X,20,O
-#ReportCErrMsg=x,20,O
+#ReportCRemark=X,50,O
 ![防止二次單據]
 E(0,@L462APRT,0)
 E(0,@L462BPRT,0)
@@ -260,7 +260,7 @@ TXFORM=L462C
 #ReportCClCode2
 #ReportCClNo
 #ReportCNowInsuNo
-#ReportCErrMsg
+#ReportCRemark
 ^
 </sub>
 ------- 單據輸出組合 ----------
@@ -308,6 +308,7 @@ TXFORM=L462C
 #ReportCClCode2
 #ReportCClNo
 #ReportCNowInsuNo
+#ReportCRemark
 @
 ^
 </sub>

@@ -39,7 +39,8 @@ E(0,0)
 ["#FdStatusCode+處理代碼",#StatusCode,#StatusCodeX],["#FdNotiTempFg+入通知檔",#NotiTempFg],
 ["#FdAcDate+會計日期",#AcDate],["#FdTitaTxtNo+交易序號",#TitaTxtNo],
 ["#FdOvduDate+轉催收日",#OvduDate],["#FdOvduNo+轉催編號",#OvduNo],
-["#FdCommericalFlag+住宅險改商業險註記",#CommericalFlag]
+["#FdCommericalFlag+住宅險改商業險註記",#CommericalFlag],
+[#<->#,"#FdRemark+備註",#Remark],
 ]
 
 
@@ -73,7 +74,7 @@ E(0,0)
 #FdStatusCode=X,2,L
 #FdOvduNo=X,2,L
 #FdCommericalFlag=X,2,L
-
+#FdRemark=X,2,L
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 #BUF1=X,42,S
@@ -184,6 +185,7 @@ T(F,@InsuCompany,0)
 T(F,@InsuTypeCode,0)
 T(F,@StatusCode,0)
 T(F,@CommericalFlag,0)
+T(F,@Remark,0)
 HIDE(#NewCustNo)
 HIDE(#NewFacmNo)
 
@@ -236,6 +238,7 @@ E(0,@RenewCode,#L4r18RenewCode)
 T(2,@InsuCompany,#L4r18InsuCompany)
 T(2,@InsuTypeCode,#L4r18InsuTypeCode)
 T(2,@CommericalFlag,#L4r18CommericalFlag)
+T(2,@Remark,#L4r18Remark)
 
 #SelfInsuCodeHelp2=x,30,S
 T(3,1:自保;2:續保)
@@ -559,6 +562,9 @@ T(3,@StatusCodeX, ))
 #CommericalFlag=X,1,I
 C(2,#FunctionCode,s,$,$,s,s,s)
 @V(3, ,Y)
+
+#Remark=X,50,I
+C(2,#FunctionCode,s,$,$,s,s,s)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -621,6 +627,7 @@ T(3,[L4611] 火險保費資料查詢修改-依戶號)
 #OvduNo
 #RenewCode
 #CommericalFlag
+#Remark
 </sub>
 
 

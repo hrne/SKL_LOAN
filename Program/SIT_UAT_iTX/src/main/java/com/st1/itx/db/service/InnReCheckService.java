@@ -76,27 +76,29 @@ public interface InnReCheckService {
   public Slice<InnReCheck> findTraceMonth(int traceMonth_0, int traceMonth_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * ConditionCode =
+   * ConditionCode = ,AND YearMonth=
    *
    * @param conditionCode_0 conditionCode_0
+   * @param yearMonth_1 yearMonth_1
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice InnReCheck InnReCheck of List
    */
-  public Slice<InnReCheck> findSpecify(int conditionCode_0, int index, int limit, TitaVo... titaVo);
+  public Slice<InnReCheck> findSpecify(int conditionCode_0, int yearMonth_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * ConditionCode = ,AND CustNo=
+   * ConditionCode = ,AND YearMonth= ,AND CustNo=
    *
    * @param conditionCode_0 conditionCode_0
-   * @param custNo_1 custNo_1
+   * @param yearMonth_1 yearMonth_1
+   * @param custNo_2 custNo_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice InnReCheck InnReCheck of List
    */
-  public Slice<InnReCheck> findSpecifyNo(int conditionCode_0, int custNo_1, int index, int limit, TitaVo... titaVo);
+  public Slice<InnReCheck> findSpecifyNo(int conditionCode_0, int yearMonth_1, int custNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By InnReCheck

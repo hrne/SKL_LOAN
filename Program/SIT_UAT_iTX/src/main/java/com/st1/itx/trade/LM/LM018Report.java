@@ -283,11 +283,12 @@ public class LM018Report extends MakeReport {
 					this.print(thisSubject.printY, xPivot + xShift - 18, formatAmt(f2, 3, 8), "C");
 					thisSubject.lastBal = f2;
 
+					thisSubject.lastInt = thisSubject.lastInt.add(f3);
+
 					// interest
 					if (!thisSubject.showsGroupIntOnly) {
-						this.print(thisSubject.printY, xPivot + xShift - 6, formatAmt(f3, 4, 8), "C");
+						this.print(thisSubject.printY, xPivot + xShift - 6, formatAmt(thisSubject.lastInt, 4, 8), "C");
 					}
-					thisSubject.lastInt = thisSubject.lastInt.add(f3);
 
 				}
 

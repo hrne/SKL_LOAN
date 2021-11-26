@@ -177,6 +177,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
 			
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
 			
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
@@ -260,7 +261,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
-			
+			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 
@@ -338,7 +339,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
-			
+			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			try {

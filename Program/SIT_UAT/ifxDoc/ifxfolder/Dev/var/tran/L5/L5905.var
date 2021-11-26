@@ -160,7 +160,6 @@ T(H,#ConditionCode,#ConditionHelp)
 !資料年月
 #YearMonth=A,5,I
 C(3,#InqFg,1,$,S)
-C(3,#ConditionCode,99,S,$)
 T(1,#DATE,2,5)
 @V(2,0)A(YM,0,#YearMonth)
 
