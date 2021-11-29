@@ -15,17 +15,15 @@ import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L7903")
 @Scope("prototype")
 public class L7903 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L7903.class);
 
 	/* DB服務注入 */
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	public FacProdService iFacProdService;
 
@@ -41,16 +39,16 @@ public class L7903 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 200; // 229 * 200 = 45800
-		
+
 		String iProdNo = titaVo.getParam("ProdNo");
 		Slice<FacProd> sFacProd = null;
 		FacProd pFacProd = new FacProd();
 		if (iProdNo.equals("")) {
 			sFacProd = iFacProdService.findAll(this.index, this.limit, titaVo);
 			if (sFacProd == null) {
-				throw new LogicException("E0001", "商品主檔"); // 查無資料
-			}else {
-				for (FacProd aFacProd:sFacProd) {
+				throw new LogicException("E0001", "商品分類資料檔"); // 查無資料
+			} else {
+				for (FacProd aFacProd : sFacProd) {
 					OccursList occursList = new OccursList();
 					occursList.putParam("OOProdNo", aFacProd.getProdNo());
 					occursList.putParam("OOProdName", aFacProd.getProdName());
@@ -61,12 +59,12 @@ public class L7903 extends TradeBuffer {
 					this.totaVo.addOccursList(occursList);
 				}
 			}
-		}else{
+		} else {
 			pFacProd = iFacProdService.findById(iProdNo, titaVo);
 			if (pFacProd == null) {
 				throw new LogicException("E0001", "商品主檔"); // 查無資料
-			}else {
-						
+			} else {
+
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOProdNo", pFacProd.getProdNo());
 				occursList.putParam("OOProdName", pFacProd.getProdName());
@@ -76,9 +74,9 @@ public class L7903 extends TradeBuffer {
 				occursList.putParam("OOIfrsProdCode", pFacProd.getIfrsProdCode());
 				this.totaVo.addOccursList(occursList);
 			}
-		
+
 		}
-		
+
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (sFacProd != null && sFacProd.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());

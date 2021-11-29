@@ -36,11 +36,9 @@ import com.st1.itx.util.parse.Parse;
  * 
  * 1.L6709帳冊別目標金額維護交易時，更新系統參數設定檔的帳冊別帳務調整日期()<br>
  * 
- * 2.依帳冊別金額設定檔內的分配順序及放款目標金額，重置帳冊別(區隔帳冊)，原帳冊別排序優先
- * 2.1 排相同帳冊別、相同區隔帳冊
- * 2.1 排相同帳冊別、區隔帳冊=00A-傳統帳冊(參數檔)、有餘額
- * 2.3 排相同帳冊別、按分配順序排、有餘額
- *  
+ * 2.依帳冊別金額設定檔內的分配順序及放款目標金額，重置帳冊別(區隔帳冊)，原帳冊別排序優先 2.1 排相同帳冊別、相同區隔帳冊 2.1
+ * 排相同帳冊別、區隔帳冊=00A-傳統帳冊(參數檔)、有餘額 2.3 排相同帳冊別、按分配順序排、有餘額
+ * 
  * 3.BY 戶號啟動 L6801 放款戶帳冊別轉換<br>
  * 
  * 4.L6905日結明細查詢(經辦別:999999，整批批號:BS600)，可查詢帳務明細<br>
@@ -50,7 +48,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS600 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS600.class);
 
 	@Autowired
 	public Parse parse;
@@ -117,12 +114,10 @@ public class BS600 extends TradeBuffer {
 			tCdAcBook.setActualAmt(BigDecimal.ZERO);
 			// Step 1. 排相同帳冊別、相同區隔帳冊
 			for (Map<String, String> result : sqlResult) {
-				if (result.get("F1").equals(tCdAcBook.getAcBookCode())
-						&& result.get("F2").equals(tCdAcBook.getAcSubBookCode())) {
+				if (result.get("F1").equals(tCdAcBook.getAcBookCode()) && result.get("F2").equals(tCdAcBook.getAcSubBookCode())) {
 					BigDecimal bal = new BigDecimal(result.get("F3"));
 					// 若此戶號尚未被指派到新帳冊別且放款目標金額 >= 放款實際金額，將戶號指派到此帳冊別
-					if (result.get("newAcSubBookCode") == null
-							&& tCdAcBook.getTargetAmt().compareTo(tCdAcBook.getActualAmt().add(bal)) >= 0) {
+					if (result.get("newAcSubBookCode") == null && tCdAcBook.getTargetAmt().compareTo(tCdAcBook.getActualAmt().add(bal)) >= 0) {
 						this.info("BS600 replaceAcBookCode ======== Step 1 ============");
 						setingAcSubBookCode(result, tCdAcBook, bal, titaVo);
 					}
@@ -130,12 +125,10 @@ public class BS600 extends TradeBuffer {
 			}
 			// Step 2. 排相同帳冊別、區隔帳冊=00A-傳統帳冊(參數檔)、有餘額
 			for (Map<String, String> result : sqlResult) {
-				if (result.get("F1").equals(tCdAcBook.getAcBookCode())
-						&& result.get("F2").equals(this.txBuffer.getSystemParas().getAcSubBookCode())) {
+				if (result.get("F1").equals(tCdAcBook.getAcBookCode()) && result.get("F2").equals(this.txBuffer.getSystemParas().getAcSubBookCode())) {
 					BigDecimal bal = new BigDecimal(result.get("F3"));
 					// 若此戶號尚未被指派到新帳冊別且放款目標金額 >= 放款實際金額，將戶號指派到此帳冊別
-					if (result.get("newAcSubBookCode") == null && bal.compareTo(BigDecimal.ZERO) > 0
-							&& tCdAcBook.getTargetAmt().compareTo(tCdAcBook.getActualAmt().add(bal)) >= 0) {
+					if (result.get("newAcSubBookCode") == null && bal.compareTo(BigDecimal.ZERO) > 0 && tCdAcBook.getTargetAmt().compareTo(tCdAcBook.getActualAmt().add(bal)) >= 0) {
 						this.info("BS600 replaceAcBookCode ======== Step 1 ============");
 						setingAcSubBookCode(result, tCdAcBook, bal, titaVo);
 					}
@@ -147,8 +140,7 @@ public class BS600 extends TradeBuffer {
 				if (result.get("F1").equals(tCdAcBook.getAcBookCode())) {
 					BigDecimal bal = new BigDecimal(result.get("F3"));
 					// 若此戶號尚未被指派到新帳冊別且放款目標金額 >= 放款實際金額，將戶號指派到此帳冊別
-					if (result.get("newAcSubBookCode") == null && bal.compareTo(BigDecimal.ZERO) > 0
-							&& tCdAcBook.getTargetAmt().compareTo(tCdAcBook.getActualAmt().add(bal)) >= 0) {
+					if (result.get("newAcSubBookCode") == null && bal.compareTo(BigDecimal.ZERO) > 0 && tCdAcBook.getTargetAmt().compareTo(tCdAcBook.getActualAmt().add(bal)) >= 0) {
 						this.info("BS600 replaceAcBookCode ======== Step 1 ============");
 						setingAcSubBookCode(result, tCdAcBook, bal, titaVo);
 					}
@@ -162,8 +154,7 @@ public class BS600 extends TradeBuffer {
 		for (CdAcBook tCdAcBook : lCdAcBook) {
 			BigDecimal actualAmt = BigDecimal.ZERO;
 			for (Map<String, String> result : sqlResult) {
-				if (result.get("F1").equals(tCdAcBook.getAcBookCode())
-						&& result.get("F2").equals(tCdAcBook.getAcSubBookCode()))
+				if (result.get("F1").equals(tCdAcBook.getAcBookCode()) && result.get("F2").equals(tCdAcBook.getAcSubBookCode()))
 					actualAmt = actualAmt.add(new BigDecimal(result.get("F3").trim()));
 			}
 			tCdAcBook.setActualAmt(actualAmt);
@@ -184,10 +175,10 @@ public class BS600 extends TradeBuffer {
 			if (result.get("newAcSubBookCode") == null) {
 				result.put("newAcSubBookCode", this.txBuffer.getSystemParas().getAcSubBookCode());
 			}
-		//	if (!result.get("F2").equals(result.get("newAcSubBookCode"))) {
-				this.info("BS600 convert custNo = " + result.get("F0") + " , oldAcSubBookCode = " + result.get("F2")
-						+ " , newAcSubBookCode = " + result.get("newAcSubBookCode") + " ,Bal=" + result.get("F3"));
-		//	}
+			// if (!result.get("F2").equals(result.get("newAcSubBookCode"))) {
+			this.info("BS600 convert custNo = " + result.get("F0") + " , oldAcSubBookCode = " + result.get("F2") + " , newAcSubBookCode = " + result.get("newAcSubBookCode") + " ,Bal="
+					+ result.get("F3"));
+			// }
 		}
 
 		// 紀錄帳冊別有異動的戶號執行L6801放款戶帳冊別轉換
@@ -209,13 +200,11 @@ public class BS600 extends TradeBuffer {
 // "00A"  "201"   ("00A","201")
 // "201"  "301"   ("201","00A") ("00A","301")
 				if (!oldAcSubBookCode.equals(this.txBuffer.getSystemParas().getAcSubBookCode())) {
-					excuteTxCode(custNo, acBookCode, oldAcSubBookCode,
-							this.txBuffer.getSystemParas().getAcSubBookCode(), titaVo);
+					excuteTxCode(custNo, acBookCode, oldAcSubBookCode, this.txBuffer.getSystemParas().getAcSubBookCode(), titaVo);
 				}
 
 				if (!newAcSubBookCode.equals(this.txBuffer.getSystemParas().getAcSubBookCode())) {
-					excuteTxCode(custNo, acBookCode, this.txBuffer.getSystemParas().getAcSubBookCode(),
-							newAcSubBookCode, titaVo);
+					excuteTxCode(custNo, acBookCode, this.txBuffer.getSystemParas().getAcSubBookCode(), newAcSubBookCode, titaVo);
 				}
 			}
 		}
@@ -223,8 +212,7 @@ public class BS600 extends TradeBuffer {
 		return null;
 	}
 
-	private void setingAcSubBookCode(Map<String, String> result, CdAcBook tCdAcBook, BigDecimal bal, TitaVo titaVo)
-			throws LogicException {
+	private void setingAcSubBookCode(Map<String, String> result, CdAcBook tCdAcBook, BigDecimal bal, TitaVo titaVo) throws LogicException {
 		this.info("BS600 replaceAcBookCode custNo = " + result.get("F0"));
 		this.info("BS600 replaceAcBookCode oldAcSubBookCode = " + result.get("F2"));
 		this.info("BS600 replaceAcBookCode newAcSubBookCode = " + tCdAcBook.getAcSubBookCode());
@@ -243,8 +231,7 @@ public class BS600 extends TradeBuffer {
 	}
 
 	/* 執行交易 */
-	private void excuteTxCode(int custNo, String acBookCode, String oldAcSubBookCode, String newAcSubBookCode,
-			TitaVo titaVo) throws LogicException {
+	private void excuteTxCode(int custNo, String acBookCode, String oldAcSubBookCode, String newAcSubBookCode, TitaVo titaVo) throws LogicException {
 		// 組入帳交易電文
 		cnt++;
 		TitaVo txTitaVo = new TitaVo();

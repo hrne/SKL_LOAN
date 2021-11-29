@@ -30,7 +30,9 @@ E(0,0)
 #FdMeetingDate=X,2,L
 T(3,*)
 #FdIssue=X,2,L
+
 #FdCustCode=X,2,L
+T(3,*)
 #FdAmount=X,2,L
 #FdRemark=X,2,L
 
@@ -85,6 +87,8 @@ E(0,@Amount,#AmountX)
 C(3,#FunctionCode,1,S,$)
 T(H,@CustCodeX,#CustCode,#InnEntCodeHelp)
 
+C(2,#FunctionCode,s,s,T(3,@FdMeetingDate, ),T(3,@FdMeetingDate, )T(3,@FdCustCode, ),T(3,@FdMeetingDate, )T(3,@FdCustCode, ),T(3,@FdMeetingDate, )T(3,@FdCustCode, ))
+
 ! 功能
 #FunctionCode=A,1,S
 C(3,#CHAIN,0,E(0,@FunctionCode,1),HELP(#FuncHelp1))
@@ -103,9 +107,6 @@ C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
 C(3,#FunctionCode,1,S,$)
 E(0,1)ASGN(AGAIN$)
 
-#ShowFd=X,1,S
-C(2,#FunctionCode,T(3, ),T(3,*),T(3, ),T(3, ),T(3, ),T(3, ))
-T(2,@FdMeetingDate,#ShowFd)
 
 !顯示框線
 #WKTF=X,1,S

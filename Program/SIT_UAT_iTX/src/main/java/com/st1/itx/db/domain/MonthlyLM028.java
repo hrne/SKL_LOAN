@@ -27,142 +27,180 @@ public class MonthlyLM028 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1963833765496219433L;
+	private static final long serialVersionUID = 808865319457777101L;
 
 @EmbeddedId
   private MonthlyLM028Id monthlyLM028Id;
 
+  // 資料年月
+  /* YYYYMM */
+  @Column(name = "`DataMonth`", insertable = false, updatable = false)
+  private int dataMonth = 0;
+
   // 戶況
-  @Column(name = "`LMSSTS`")
-  private int lMSSTS = 0;
+  /* 原LMSSTS */
+  @Column(name = "`Status`")
+  private int status = 0;
 
   // 企金別
-  @Column(name = "`CUSENT`")
-  private int cUSENT = 0;
+  /* 原CUSENT */
+  @Column(name = "`EntCode`")
+  private int entCode = 0;
 
   // 營業單位別
-  @Column(name = "`CUSBRH`", length = 4)
-  private String cUSBRH;
+  /* 原CUSBRH */
+  @Column(name = "`BranchNo`", length = 4)
+  private String branchNo;
 
   // 借款人戶號
-  @Column(name = "`LMSACN`", insertable = false, updatable = false)
-  private int lMSACN = 0;
+  /* 原LMSACN */
+  @Column(name = "`CustNo`", insertable = false, updatable = false)
+  private int custNo = 0;
 
   // 額度編號
-  @Column(name = "`LMSAPN`", insertable = false, updatable = false)
-  private int lMSAPN = 0;
+  /* 原LMSAPN */
+  @Column(name = "`FacmNo`", insertable = false, updatable = false)
+  private int facmNo = 0;
 
   // 撥款序號
-  @Column(name = "`LMSASQ`", insertable = false, updatable = false)
-  private int lMSASQ = 0;
+  /* 原LMSASQ */
+  @Column(name = "`BormNo`", insertable = false, updatable = false)
+  private int bormNo = 0;
 
   // 利率
-  @Column(name = "`IRTRAT`")
-  private BigDecimal iRTRAT = new BigDecimal("0");
+  /* 原IRTRAT */
+  @Column(name = "`StoreRate`")
+  private BigDecimal storeRate = new BigDecimal("0");
 
   // 繳息週期
-  @Column(name = "`LMSISC`")
-  private int lMSISC = 0;
+  /* 原LMSISC */
+  @Column(name = "`PayIntFreq`")
+  private int payIntFreq = 0;
 
   // 扣款銀行
-  @Column(name = "`LMSPBK`", length = 3)
-  private String lMSPBK;
+  /* 原LMSPBK */
+  @Column(name = "`RepayBank`", length = 3)
+  private String repayBank;
 
   // 貸款期間－月
-  @Column(name = "`APLMON`")
-  private int aPLMON = 0;
+  /* 原APLMON */
+  @Column(name = "`LoanTermMm`")
+  private int loanTermMm = 0;
 
   // 貸款期間－日
-  @Column(name = "`APLDAY`")
-  private int aPLDAY = 0;
+  /* 原APLDAY */
+  @Column(name = "`LoanTermDd`")
+  private int loanTermDd = 0;
 
   // 放款餘額
-  @Column(name = "`LMSLBL`")
-  private BigDecimal lMSLBL = new BigDecimal("0");
+  /* 原LMSLBL */
+  @Column(name = "`LoanBal`")
+  private BigDecimal loanBal = new BigDecimal("0");
 
   // 利率區分
-  @Column(name = "`AILIRT`", length = 1)
-  private String aILIRT;
+  /* 原AILIRT */
+  @Column(name = "`RateCode`", length = 1)
+  private String rateCode;
 
   // 郵局存款別
-  @Column(name = "`POSCDE`", length = 1)
-  private String pOSCDE;
+  /* 原POSCDE */
+  @Column(name = "`PostDepCode`", length = 1)
+  private String postDepCode;
 
   // 應繳日
-  @Column(name = "`LMSPDY`")
-  private int lMSPDY = 0;
+  /* 原LMSPDY */
+  @Column(name = "`SpecificDd`")
+  private int specificDd = 0;
 
   // 首次調整週期
-  @Column(name = "`IRTFSC`")
-  private int iRTFSC = 0;
+  /* 原IRTFSC */
+  @Column(name = "`FirstRateAdjFreq`")
+  private int firstRateAdjFreq = 0;
 
   // 基本利率代碼
-  @Column(name = "`IRTBCD`", length = 2)
-  private String iRTBCD;
+  /* 原IRTBCD */
+  @Column(name = "`BaseRateCode`", length = 2)
+  private String baseRateCode;
 
   // 利率1
-  @Column(name = "`IRTRATYR1`")
-  private BigDecimal iRTRATYR1 = new BigDecimal("0");
+  /* 原IRTRATYR1 */
+  @Column(name = "`FitRate1`")
+  private BigDecimal fitRate1 = new BigDecimal("0");
 
   // 利率2
-  @Column(name = "`IRTRATYR2`")
-  private BigDecimal iRTRATYR2 = new BigDecimal("0");
+  /* 原IRTRATYR2 */
+  @Column(name = "`FitRate2`")
+  private BigDecimal fitRate2 = new BigDecimal("0");
 
   // 利率3
-  @Column(name = "`IRTRATYR3`")
-  private BigDecimal iRTRATYR3 = new BigDecimal("0");
+  /* 原IRTRATYR3 */
+  @Column(name = "`FitRate3`")
+  private BigDecimal fitRate3 = new BigDecimal("0");
 
   // 利率4
-  @Column(name = "`IRTRATYR4`")
-  private BigDecimal iRTRATYR4 = new BigDecimal("0");
+  /* 原IRTRATYR4 */
+  @Column(name = "`FitRate4`")
+  private BigDecimal fitRate4 = new BigDecimal("0");
 
   // 利率5
-  @Column(name = "`IRTRATYR5`")
-  private BigDecimal iRTRATYR5 = new BigDecimal("0");
+  /* 原IRTRATYR5 */
+  @Column(name = "`FitRate5`")
+  private BigDecimal fitRate5 = new BigDecimal("0");
 
   // 押品別１
-  @Column(name = "`GDRID1`")
-  private int gDRID1 = 0;
+  /* 原GDRID1 */
+  @Column(name = "`ClCode1`")
+  private int clCode1 = 0;
 
   // 押品別２
-  @Column(name = "`GDRID2`")
-  private int gDRID2 = 0;
+  /* 原GDRID2 */
+  @Column(name = "`ClCode2`")
+  private int clCode2 = 0;
 
   // 撥款日-年
-  @Column(name = "`YYYY`")
-  private int yYYY = 0;
+  /* 原YYYY */
+  @Column(name = "`DrawdownYear`")
+  private int drawdownYear = 0;
 
   // 撥款日-月
-  @Column(name = "`MONTH`")
-  private int mONTH = 0;
+  /* 原MONTH */
+  @Column(name = "`DrawdownMonth`")
+  private int drawdownMonth = 0;
 
   // 撥款日-日
-  @Column(name = "`DAY`")
-  private int dAY = 0;
+  /* 原DAY */
+  @Column(name = "`DrawdownDay`")
+  private int drawdownDay = 0;
 
   // 到期日碼
-  @Column(name = "`W08CDE`")
-  private int w08CDE = 0;
+  /* 原W08CDE */
+  @Column(name = "`W08Code`")
+  private int w08Code = 0;
 
   // 是否為關係人
-  @Column(name = "`RELATION`", length = 1)
-  private String rELATION;
+  /* 原RELATION */
+  @Column(name = "`IsRelation`", length = 1)
+  private String isRelation;
 
   // 制度別
-  @Column(name = "`DPTLVL`", length = 1)
-  private String dPTLVL;
+  /* 原DPTLVL */
+  @Column(name = "`AgType1`", length = 1)
+  private String agType1;
 
   // 資金來源
-  @Column(name = "`ACTFSC`", length = 1)
-  private String aCTFSC;
+  /* 原ACTFSC */
+  @Column(name = "`AcctSource`", length = 1)
+  private String acctSource;
 
   // 最新利率
-  @Column(name = "`LIRTRATYR`")
-  private BigDecimal lIRTRATYR = new BigDecimal("0");
+  /* 原LIRTRATYR */
+  @Column(name = "`LastestRate`")
+  private BigDecimal lastestRate = new BigDecimal("0");
 
   // 最新利率生效起日
-  @Column(name = "`LIRTDAY`")
-  private int lIRTDAY = 0;
+  /* 原LIRTDAY */
+  @Column(name = "`LastestRateStartDate`")
+  private int lastestRateStartDate = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -192,630 +230,649 @@ public class MonthlyLM028 implements Serializable {
   }
 
 /**
-	* 戶況<br>
-	* 
+	* 資料年月<br>
+	* YYYYMM
 	* @return Integer
 	*/
-  public int getLMSSTS() {
-    return this.lMSSTS;
+  public int getDataMonth() {
+    return this.dataMonth;
+  }
+
+/**
+	* 資料年月<br>
+	* YYYYMM
+  *
+  * @param dataMonth 資料年月
+	*/
+  public void setDataMonth(int dataMonth) {
+    this.dataMonth = dataMonth;
   }
 
 /**
 	* 戶況<br>
-	* 
-  *
-  * @param lMSSTS 戶況
+	* 原LMSSTS
+	* @return Integer
 	*/
-  public void setLMSSTS(int lMSSTS) {
-    this.lMSSTS = lMSSTS;
+  public int getStatus() {
+    return this.status;
+  }
+
+/**
+	* 戶況<br>
+	* 原LMSSTS
+  *
+  * @param status 戶況
+	*/
+  public void setStatus(int status) {
+    this.status = status;
   }
 
 /**
 	* 企金別<br>
-	* 
+	* 原CUSENT
 	* @return Integer
 	*/
-  public int getCUSENT() {
-    return this.cUSENT;
+  public int getEntCode() {
+    return this.entCode;
   }
 
 /**
 	* 企金別<br>
-	* 
+	* 原CUSENT
   *
-  * @param cUSENT 企金別
+  * @param entCode 企金別
 	*/
-  public void setCUSENT(int cUSENT) {
-    this.cUSENT = cUSENT;
+  public void setEntCode(int entCode) {
+    this.entCode = entCode;
   }
 
 /**
 	* 營業單位別<br>
-	* 
+	* 原CUSBRH
 	* @return String
 	*/
-  public String getCUSBRH() {
-    return this.cUSBRH == null ? "" : this.cUSBRH;
+  public String getBranchNo() {
+    return this.branchNo == null ? "" : this.branchNo;
   }
 
 /**
 	* 營業單位別<br>
-	* 
+	* 原CUSBRH
   *
-  * @param cUSBRH 營業單位別
+  * @param branchNo 營業單位別
 	*/
-  public void setCUSBRH(String cUSBRH) {
-    this.cUSBRH = cUSBRH;
+  public void setBranchNo(String branchNo) {
+    this.branchNo = branchNo;
   }
 
 /**
 	* 借款人戶號<br>
-	* 
+	* 原LMSACN
 	* @return Integer
 	*/
-  public int getLMSACN() {
-    return this.lMSACN;
+  public int getCustNo() {
+    return this.custNo;
   }
 
 /**
 	* 借款人戶號<br>
-	* 
+	* 原LMSACN
   *
-  * @param lMSACN 借款人戶號
+  * @param custNo 借款人戶號
 	*/
-  public void setLMSACN(int lMSACN) {
-    this.lMSACN = lMSACN;
+  public void setCustNo(int custNo) {
+    this.custNo = custNo;
   }
 
 /**
 	* 額度編號<br>
-	* 
+	* 原LMSAPN
 	* @return Integer
 	*/
-  public int getLMSAPN() {
-    return this.lMSAPN;
+  public int getFacmNo() {
+    return this.facmNo;
   }
 
 /**
 	* 額度編號<br>
-	* 
+	* 原LMSAPN
   *
-  * @param lMSAPN 額度編號
+  * @param facmNo 額度編號
 	*/
-  public void setLMSAPN(int lMSAPN) {
-    this.lMSAPN = lMSAPN;
+  public void setFacmNo(int facmNo) {
+    this.facmNo = facmNo;
   }
 
 /**
 	* 撥款序號<br>
-	* 
+	* 原LMSASQ
 	* @return Integer
 	*/
-  public int getLMSASQ() {
-    return this.lMSASQ;
+  public int getBormNo() {
+    return this.bormNo;
   }
 
 /**
 	* 撥款序號<br>
-	* 
+	* 原LMSASQ
   *
-  * @param lMSASQ 撥款序號
+  * @param bormNo 撥款序號
 	*/
-  public void setLMSASQ(int lMSASQ) {
-    this.lMSASQ = lMSASQ;
+  public void setBormNo(int bormNo) {
+    this.bormNo = bormNo;
   }
 
 /**
 	* 利率<br>
-	* 
+	* 原IRTRAT
 	* @return BigDecimal
 	*/
-  public BigDecimal getIRTRAT() {
-    return this.iRTRAT;
+  public BigDecimal getStoreRate() {
+    return this.storeRate;
   }
 
 /**
 	* 利率<br>
-	* 
+	* 原IRTRAT
   *
-  * @param iRTRAT 利率
+  * @param storeRate 利率
 	*/
-  public void setIRTRAT(BigDecimal iRTRAT) {
-    this.iRTRAT = iRTRAT;
+  public void setStoreRate(BigDecimal storeRate) {
+    this.storeRate = storeRate;
   }
 
 /**
 	* 繳息週期<br>
-	* 
+	* 原LMSISC
 	* @return Integer
 	*/
-  public int getLMSISC() {
-    return this.lMSISC;
+  public int getPayIntFreq() {
+    return this.payIntFreq;
   }
 
 /**
 	* 繳息週期<br>
-	* 
+	* 原LMSISC
   *
-  * @param lMSISC 繳息週期
+  * @param payIntFreq 繳息週期
 	*/
-  public void setLMSISC(int lMSISC) {
-    this.lMSISC = lMSISC;
+  public void setPayIntFreq(int payIntFreq) {
+    this.payIntFreq = payIntFreq;
   }
 
 /**
 	* 扣款銀行<br>
-	* 
+	* 原LMSPBK
 	* @return String
 	*/
-  public String getLMSPBK() {
-    return this.lMSPBK == null ? "" : this.lMSPBK;
+  public String getRepayBank() {
+    return this.repayBank == null ? "" : this.repayBank;
   }
 
 /**
 	* 扣款銀行<br>
-	* 
+	* 原LMSPBK
   *
-  * @param lMSPBK 扣款銀行
+  * @param repayBank 扣款銀行
 	*/
-  public void setLMSPBK(String lMSPBK) {
-    this.lMSPBK = lMSPBK;
+  public void setRepayBank(String repayBank) {
+    this.repayBank = repayBank;
   }
 
 /**
 	* 貸款期間－月<br>
-	* 
+	* 原APLMON
 	* @return Integer
 	*/
-  public int getAPLMON() {
-    return this.aPLMON;
+  public int getLoanTermMm() {
+    return this.loanTermMm;
   }
 
 /**
 	* 貸款期間－月<br>
-	* 
+	* 原APLMON
   *
-  * @param aPLMON 貸款期間－月
+  * @param loanTermMm 貸款期間－月
 	*/
-  public void setAPLMON(int aPLMON) {
-    this.aPLMON = aPLMON;
+  public void setLoanTermMm(int loanTermMm) {
+    this.loanTermMm = loanTermMm;
   }
 
 /**
 	* 貸款期間－日<br>
-	* 
+	* 原APLDAY
 	* @return Integer
 	*/
-  public int getAPLDAY() {
-    return this.aPLDAY;
+  public int getLoanTermDd() {
+    return this.loanTermDd;
   }
 
 /**
 	* 貸款期間－日<br>
-	* 
+	* 原APLDAY
   *
-  * @param aPLDAY 貸款期間－日
+  * @param loanTermDd 貸款期間－日
 	*/
-  public void setAPLDAY(int aPLDAY) {
-    this.aPLDAY = aPLDAY;
+  public void setLoanTermDd(int loanTermDd) {
+    this.loanTermDd = loanTermDd;
   }
 
 /**
 	* 放款餘額<br>
-	* 
+	* 原LMSLBL
 	* @return BigDecimal
 	*/
-  public BigDecimal getLMSLBL() {
-    return this.lMSLBL;
+  public BigDecimal getLoanBal() {
+    return this.loanBal;
   }
 
 /**
 	* 放款餘額<br>
-	* 
+	* 原LMSLBL
   *
-  * @param lMSLBL 放款餘額
+  * @param loanBal 放款餘額
 	*/
-  public void setLMSLBL(BigDecimal lMSLBL) {
-    this.lMSLBL = lMSLBL;
+  public void setLoanBal(BigDecimal loanBal) {
+    this.loanBal = loanBal;
   }
 
 /**
 	* 利率區分<br>
-	* 
+	* 原AILIRT
 	* @return String
 	*/
-  public String getAILIRT() {
-    return this.aILIRT == null ? "" : this.aILIRT;
+  public String getRateCode() {
+    return this.rateCode == null ? "" : this.rateCode;
   }
 
 /**
 	* 利率區分<br>
-	* 
+	* 原AILIRT
   *
-  * @param aILIRT 利率區分
+  * @param rateCode 利率區分
 	*/
-  public void setAILIRT(String aILIRT) {
-    this.aILIRT = aILIRT;
+  public void setRateCode(String rateCode) {
+    this.rateCode = rateCode;
   }
 
 /**
 	* 郵局存款別<br>
-	* 
+	* 原POSCDE
 	* @return String
 	*/
-  public String getPOSCDE() {
-    return this.pOSCDE == null ? "" : this.pOSCDE;
+  public String getPostDepCode() {
+    return this.postDepCode == null ? "" : this.postDepCode;
   }
 
 /**
 	* 郵局存款別<br>
-	* 
+	* 原POSCDE
   *
-  * @param pOSCDE 郵局存款別
+  * @param postDepCode 郵局存款別
 	*/
-  public void setPOSCDE(String pOSCDE) {
-    this.pOSCDE = pOSCDE;
+  public void setPostDepCode(String postDepCode) {
+    this.postDepCode = postDepCode;
   }
 
 /**
 	* 應繳日<br>
-	* 
+	* 原LMSPDY
 	* @return Integer
 	*/
-  public int getLMSPDY() {
-    return this.lMSPDY;
+  public int getSpecificDd() {
+    return this.specificDd;
   }
 
 /**
 	* 應繳日<br>
-	* 
+	* 原LMSPDY
   *
-  * @param lMSPDY 應繳日
+  * @param specificDd 應繳日
 	*/
-  public void setLMSPDY(int lMSPDY) {
-    this.lMSPDY = lMSPDY;
+  public void setSpecificDd(int specificDd) {
+    this.specificDd = specificDd;
   }
 
 /**
 	* 首次調整週期<br>
-	* 
+	* 原IRTFSC
 	* @return Integer
 	*/
-  public int getIRTFSC() {
-    return this.iRTFSC;
+  public int getFirstRateAdjFreq() {
+    return this.firstRateAdjFreq;
   }
 
 /**
 	* 首次調整週期<br>
-	* 
+	* 原IRTFSC
   *
-  * @param iRTFSC 首次調整週期
+  * @param firstRateAdjFreq 首次調整週期
 	*/
-  public void setIRTFSC(int iRTFSC) {
-    this.iRTFSC = iRTFSC;
+  public void setFirstRateAdjFreq(int firstRateAdjFreq) {
+    this.firstRateAdjFreq = firstRateAdjFreq;
   }
 
 /**
 	* 基本利率代碼<br>
-	* 
+	* 原IRTBCD
 	* @return String
 	*/
-  public String getIRTBCD() {
-    return this.iRTBCD == null ? "" : this.iRTBCD;
+  public String getBaseRateCode() {
+    return this.baseRateCode == null ? "" : this.baseRateCode;
   }
 
 /**
 	* 基本利率代碼<br>
-	* 
+	* 原IRTBCD
   *
-  * @param iRTBCD 基本利率代碼
+  * @param baseRateCode 基本利率代碼
 	*/
-  public void setIRTBCD(String iRTBCD) {
-    this.iRTBCD = iRTBCD;
+  public void setBaseRateCode(String baseRateCode) {
+    this.baseRateCode = baseRateCode;
   }
 
 /**
 	* 利率1<br>
-	* 
+	* 原IRTRATYR1
 	* @return BigDecimal
 	*/
-  public BigDecimal getIRTRATYR1() {
-    return this.iRTRATYR1;
+  public BigDecimal getFitRate1() {
+    return this.fitRate1;
   }
 
 /**
 	* 利率1<br>
-	* 
+	* 原IRTRATYR1
   *
-  * @param iRTRATYR1 利率1
+  * @param fitRate1 利率1
 	*/
-  public void setIRTRATYR1(BigDecimal iRTRATYR1) {
-    this.iRTRATYR1 = iRTRATYR1;
+  public void setFitRate1(BigDecimal fitRate1) {
+    this.fitRate1 = fitRate1;
   }
 
 /**
 	* 利率2<br>
-	* 
+	* 原IRTRATYR2
 	* @return BigDecimal
 	*/
-  public BigDecimal getIRTRATYR2() {
-    return this.iRTRATYR2;
+  public BigDecimal getFitRate2() {
+    return this.fitRate2;
   }
 
 /**
 	* 利率2<br>
-	* 
+	* 原IRTRATYR2
   *
-  * @param iRTRATYR2 利率2
+  * @param fitRate2 利率2
 	*/
-  public void setIRTRATYR2(BigDecimal iRTRATYR2) {
-    this.iRTRATYR2 = iRTRATYR2;
+  public void setFitRate2(BigDecimal fitRate2) {
+    this.fitRate2 = fitRate2;
   }
 
 /**
 	* 利率3<br>
-	* 
+	* 原IRTRATYR3
 	* @return BigDecimal
 	*/
-  public BigDecimal getIRTRATYR3() {
-    return this.iRTRATYR3;
+  public BigDecimal getFitRate3() {
+    return this.fitRate3;
   }
 
 /**
 	* 利率3<br>
-	* 
+	* 原IRTRATYR3
   *
-  * @param iRTRATYR3 利率3
+  * @param fitRate3 利率3
 	*/
-  public void setIRTRATYR3(BigDecimal iRTRATYR3) {
-    this.iRTRATYR3 = iRTRATYR3;
+  public void setFitRate3(BigDecimal fitRate3) {
+    this.fitRate3 = fitRate3;
   }
 
 /**
 	* 利率4<br>
-	* 
+	* 原IRTRATYR4
 	* @return BigDecimal
 	*/
-  public BigDecimal getIRTRATYR4() {
-    return this.iRTRATYR4;
+  public BigDecimal getFitRate4() {
+    return this.fitRate4;
   }
 
 /**
 	* 利率4<br>
-	* 
+	* 原IRTRATYR4
   *
-  * @param iRTRATYR4 利率4
+  * @param fitRate4 利率4
 	*/
-  public void setIRTRATYR4(BigDecimal iRTRATYR4) {
-    this.iRTRATYR4 = iRTRATYR4;
+  public void setFitRate4(BigDecimal fitRate4) {
+    this.fitRate4 = fitRate4;
   }
 
 /**
 	* 利率5<br>
-	* 
+	* 原IRTRATYR5
 	* @return BigDecimal
 	*/
-  public BigDecimal getIRTRATYR5() {
-    return this.iRTRATYR5;
+  public BigDecimal getFitRate5() {
+    return this.fitRate5;
   }
 
 /**
 	* 利率5<br>
-	* 
+	* 原IRTRATYR5
   *
-  * @param iRTRATYR5 利率5
+  * @param fitRate5 利率5
 	*/
-  public void setIRTRATYR5(BigDecimal iRTRATYR5) {
-    this.iRTRATYR5 = iRTRATYR5;
+  public void setFitRate5(BigDecimal fitRate5) {
+    this.fitRate5 = fitRate5;
   }
 
 /**
 	* 押品別１<br>
-	* 
+	* 原GDRID1
 	* @return Integer
 	*/
-  public int getGDRID1() {
-    return this.gDRID1;
+  public int getClCode1() {
+    return this.clCode1;
   }
 
 /**
 	* 押品別１<br>
-	* 
+	* 原GDRID1
   *
-  * @param gDRID1 押品別１
+  * @param clCode1 押品別１
 	*/
-  public void setGDRID1(int gDRID1) {
-    this.gDRID1 = gDRID1;
+  public void setClCode1(int clCode1) {
+    this.clCode1 = clCode1;
   }
 
 /**
 	* 押品別２<br>
-	* 
+	* 原GDRID2
 	* @return Integer
 	*/
-  public int getGDRID2() {
-    return this.gDRID2;
+  public int getClCode2() {
+    return this.clCode2;
   }
 
 /**
 	* 押品別２<br>
-	* 
+	* 原GDRID2
   *
-  * @param gDRID2 押品別２
+  * @param clCode2 押品別２
 	*/
-  public void setGDRID2(int gDRID2) {
-    this.gDRID2 = gDRID2;
+  public void setClCode2(int clCode2) {
+    this.clCode2 = clCode2;
   }
 
 /**
 	* 撥款日-年<br>
-	* 
+	* 原YYYY
 	* @return Integer
 	*/
-  public int getYYYY() {
-    return this.yYYY;
+  public int getDrawdownYear() {
+    return this.drawdownYear;
   }
 
 /**
 	* 撥款日-年<br>
-	* 
+	* 原YYYY
   *
-  * @param yYYY 撥款日-年
+  * @param drawdownYear 撥款日-年
 	*/
-  public void setYYYY(int yYYY) {
-    this.yYYY = yYYY;
+  public void setDrawdownYear(int drawdownYear) {
+    this.drawdownYear = drawdownYear;
   }
 
 /**
 	* 撥款日-月<br>
-	* 
+	* 原MONTH
 	* @return Integer
 	*/
-  public int getMONTH() {
-    return this.mONTH;
+  public int getDrawdownMonth() {
+    return this.drawdownMonth;
   }
 
 /**
 	* 撥款日-月<br>
-	* 
+	* 原MONTH
   *
-  * @param mONTH 撥款日-月
+  * @param drawdownMonth 撥款日-月
 	*/
-  public void setMONTH(int mONTH) {
-    this.mONTH = mONTH;
+  public void setDrawdownMonth(int drawdownMonth) {
+    this.drawdownMonth = drawdownMonth;
   }
 
 /**
 	* 撥款日-日<br>
-	* 
+	* 原DAY
 	* @return Integer
 	*/
-  public int getDAY() {
-    return this.dAY;
+  public int getDrawdownDay() {
+    return this.drawdownDay;
   }
 
 /**
 	* 撥款日-日<br>
-	* 
+	* 原DAY
   *
-  * @param dAY 撥款日-日
+  * @param drawdownDay 撥款日-日
 	*/
-  public void setDAY(int dAY) {
-    this.dAY = dAY;
+  public void setDrawdownDay(int drawdownDay) {
+    this.drawdownDay = drawdownDay;
   }
 
 /**
 	* 到期日碼<br>
-	* 
+	* 原W08CDE
 	* @return Integer
 	*/
-  public int getW08CDE() {
-    return this.w08CDE;
+  public int getW08Code() {
+    return this.w08Code;
   }
 
 /**
 	* 到期日碼<br>
-	* 
+	* 原W08CDE
   *
-  * @param w08CDE 到期日碼
+  * @param w08Code 到期日碼
 	*/
-  public void setW08CDE(int w08CDE) {
-    this.w08CDE = w08CDE;
+  public void setW08Code(int w08Code) {
+    this.w08Code = w08Code;
   }
 
 /**
 	* 是否為關係人<br>
-	* 
+	* 原RELATION
 	* @return String
 	*/
-  public String getRELATION() {
-    return this.rELATION == null ? "" : this.rELATION;
+  public String getIsRelation() {
+    return this.isRelation == null ? "" : this.isRelation;
   }
 
 /**
 	* 是否為關係人<br>
-	* 
+	* 原RELATION
   *
-  * @param rELATION 是否為關係人
+  * @param isRelation 是否為關係人
 	*/
-  public void setRELATION(String rELATION) {
-    this.rELATION = rELATION;
+  public void setIsRelation(String isRelation) {
+    this.isRelation = isRelation;
   }
 
 /**
 	* 制度別<br>
-	* 
+	* 原DPTLVL
 	* @return String
 	*/
-  public String getDPTLVL() {
-    return this.dPTLVL == null ? "" : this.dPTLVL;
+  public String getAgType1() {
+    return this.agType1 == null ? "" : this.agType1;
   }
 
 /**
 	* 制度別<br>
-	* 
+	* 原DPTLVL
   *
-  * @param dPTLVL 制度別
+  * @param agType1 制度別
 	*/
-  public void setDPTLVL(String dPTLVL) {
-    this.dPTLVL = dPTLVL;
+  public void setAgType1(String agType1) {
+    this.agType1 = agType1;
   }
 
 /**
 	* 資金來源<br>
-	* 
+	* 原ACTFSC
 	* @return String
 	*/
-  public String getACTFSC() {
-    return this.aCTFSC == null ? "" : this.aCTFSC;
+  public String getAcctSource() {
+    return this.acctSource == null ? "" : this.acctSource;
   }
 
 /**
 	* 資金來源<br>
-	* 
+	* 原ACTFSC
   *
-  * @param aCTFSC 資金來源
+  * @param acctSource 資金來源
 	*/
-  public void setACTFSC(String aCTFSC) {
-    this.aCTFSC = aCTFSC;
+  public void setAcctSource(String acctSource) {
+    this.acctSource = acctSource;
   }
 
 /**
 	* 最新利率<br>
-	* 
+	* 原LIRTRATYR
 	* @return BigDecimal
 	*/
-  public BigDecimal getLIRTRATYR() {
-    return this.lIRTRATYR;
+  public BigDecimal getLastestRate() {
+    return this.lastestRate;
   }
 
 /**
 	* 最新利率<br>
-	* 
+	* 原LIRTRATYR
   *
-  * @param lIRTRATYR 最新利率
+  * @param lastestRate 最新利率
 	*/
-  public void setLIRTRATYR(BigDecimal lIRTRATYR) {
-    this.lIRTRATYR = lIRTRATYR;
+  public void setLastestRate(BigDecimal lastestRate) {
+    this.lastestRate = lastestRate;
   }
 
 /**
 	* 最新利率生效起日<br>
-	* 
+	* 原LIRTDAY
 	* @return Integer
 	*/
-  public int getLIRTDAY() {
-    return this.lIRTDAY;
+  public int getLastestRateStartDate() {
+    return this.lastestRateStartDate;
   }
 
 /**
 	* 最新利率生效起日<br>
-	* 
+	* 原LIRTDAY
   *
-  * @param lIRTDAY 最新利率生效起日
+  * @param lastestRateStartDate 最新利率生效起日
 	*/
-  public void setLIRTDAY(int lIRTDAY) {
-    this.lIRTDAY = lIRTDAY;
+  public void setLastestRateStartDate(int lastestRateStartDate) {
+    this.lastestRateStartDate = lastestRateStartDate;
   }
 
 /**
@@ -897,12 +954,12 @@ public class MonthlyLM028 implements Serializable {
 
   @Override
   public String toString() {
-    return "MonthlyLM028 [monthlyLM028Id=" + monthlyLM028Id + ", lMSSTS=" + lMSSTS + ", cUSENT=" + cUSENT + ", cUSBRH=" + cUSBRH
-           + ", iRTRAT=" + iRTRAT + ", lMSISC=" + lMSISC + ", lMSPBK=" + lMSPBK + ", aPLMON=" + aPLMON + ", aPLDAY=" + aPLDAY + ", lMSLBL=" + lMSLBL
-           + ", aILIRT=" + aILIRT + ", pOSCDE=" + pOSCDE + ", lMSPDY=" + lMSPDY + ", iRTFSC=" + iRTFSC + ", iRTBCD=" + iRTBCD + ", iRTRATYR1=" + iRTRATYR1
-           + ", iRTRATYR2=" + iRTRATYR2 + ", iRTRATYR3=" + iRTRATYR3 + ", iRTRATYR4=" + iRTRATYR4 + ", iRTRATYR5=" + iRTRATYR5 + ", gDRID1=" + gDRID1 + ", gDRID2=" + gDRID2
-           + ", yYYY=" + yYYY + ", mONTH=" + mONTH + ", dAY=" + dAY + ", w08CDE=" + w08CDE + ", rELATION=" + rELATION + ", dPTLVL=" + dPTLVL
-           + ", aCTFSC=" + aCTFSC + ", lIRTRATYR=" + lIRTRATYR + ", lIRTDAY=" + lIRTDAY + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "MonthlyLM028 [monthlyLM028Id=" + monthlyLM028Id + ", status=" + status + ", entCode=" + entCode + ", branchNo=" + branchNo
+           + ", storeRate=" + storeRate + ", payIntFreq=" + payIntFreq + ", repayBank=" + repayBank + ", loanTermMm=" + loanTermMm + ", loanTermDd=" + loanTermDd
+           + ", loanBal=" + loanBal + ", rateCode=" + rateCode + ", postDepCode=" + postDepCode + ", specificDd=" + specificDd + ", firstRateAdjFreq=" + firstRateAdjFreq + ", baseRateCode=" + baseRateCode
+           + ", fitRate1=" + fitRate1 + ", fitRate2=" + fitRate2 + ", fitRate3=" + fitRate3 + ", fitRate4=" + fitRate4 + ", fitRate5=" + fitRate5 + ", clCode1=" + clCode1
+           + ", clCode2=" + clCode2 + ", drawdownYear=" + drawdownYear + ", drawdownMonth=" + drawdownMonth + ", drawdownDay=" + drawdownDay + ", w08Code=" + w08Code + ", isRelation=" + isRelation
+           + ", agType1=" + agType1 + ", acctSource=" + acctSource + ", lastestRate=" + lastestRate + ", lastestRateStartDate=" + lastestRateStartDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

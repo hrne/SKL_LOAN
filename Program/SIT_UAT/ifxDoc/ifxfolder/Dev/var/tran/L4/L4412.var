@@ -247,6 +247,7 @@ HIDE(#PostDepCode,#AuthCode)
 
 !依授權已成功記號顯示修改欄位
 #checkSuFg=X,1,S
+IF(#FuncCode==4 || #FuncCode==5,S,$)
 C(3,#PostSuccessFg,1,
 T(F,@CustId,0)
 T(F,@RelationCode,0)

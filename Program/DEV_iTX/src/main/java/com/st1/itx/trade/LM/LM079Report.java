@@ -31,7 +31,7 @@ public class LM079Report extends MakeReport {
 	@Autowired
 	Parse parse;
 	
-	private static final BigDecimal hundredMillion = new BigDecimal("100000000");
+	private static final BigDecimal billion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LM079Report exec start ...");
@@ -39,28 +39,28 @@ public class LM079Report extends MakeReport {
 		int iAcDate = titaVo.getEntDyI() + 19110000;
 		this.info("LM079Report exec AcDate = " + iAcDate);
 
-		List<Map<String, String>> lLM079 = null;
-
+		List<Map<String, String>> lLM079Before = null;
+		List<Map<String, String>> lLM079After = null;
+		
 		try {
-			lLM079 = lM079ServiceImpl.findAll(titaVo, iAcDate / 100);
+			lLM079Before = lM079ServiceImpl.findAll(titaVo, iAcDate / 100, true);
+			lLM079After = lM079ServiceImpl.findAll(titaVo, iAcDate / 100, false);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("LM079ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		exportExcel(titaVo, lLM079, iAcDate);
+		exportExcel(titaVo, lLM079Before, lLM079After, iAcDate);
 
 		return true;
 
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList, int date) throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lListBefore, List<Map<String, String>> lListAfter, int date) throws LogicException {
 
 		// pivot position for data inputs
-		int pivotRow = 5; // 1-based
-		int pivotCol = 3; // 1-based
-
+		
 		this.info("LM079Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
 		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
@@ -69,52 +69,14 @@ public class LM079Report extends MakeReport {
 				"LM079_底稿_B045金融機構承作「工業區閒置土地抵押貸款」統計表.xlsx", 1, "FOA");
 
 		// 資料期間 C2
-		makeExcel.setValue(2, 3, "民國 " + YearMonth, "R");
+		makeExcel.setValue(3, 4, "民國 " + YearMonth, "R");
 
-		if (lList != null && !lList.isEmpty()) {
+		if ((lListBefore != null && !lListBefore.isEmpty()) || (lListAfter != null && !lListAfter.isEmpty())) {
 
-			for (Map<String, String> tLDVo : lList) {
-				int colShift = 0;
-				int rowShift = 0;
-
-				for (int i = 0; i <= 3; i++) {
-
-					int col = i + pivotCol; // 1-based
-					int row = pivotRow; // 1-based
-
-					// Query received will have column names in the format of F0, even if no alias
-					// is set in SQL
-					// notice it's 0-based for those names
-					String value = tLDVo.get("F" + i);
-
-					switch (i) {
-					// if specific column needs special treatment, insert case here.
-					case 0:
-						// CityCode: already properly converted
-						rowShift = parse.stringToInteger(value) - 1;
-						colShift--; // doesn't write
-						break;
-					case 1:
-						// Newly Drawdown Amount: hundred million
-						makeExcel.setValue(row + rowShift, col + colShift, computeDivide(getBigDecimal(value), hundredMillion, 2), "R");
-						break;
-					case 2:
-						// Weighted Average of Loan: Percent
-						makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_UP), "R");
-						break;
-					case 3:
-						// Weighted Average of Loan Rate: Percent
-						makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_UP), "R");
-						break;
-					default:
-						makeExcel.setValue(row + rowShift, col + colShift, value, "R");
-						break;
-					}
-				} // for
-
-			} // for
-
-			for (int i = 3; i < 6; i++) {
+			doOutput(lListBefore, 3);
+			doOutput(lListAfter, 6);
+			
+			for (int i = 3; i < 9; i++) {
 				makeExcel.formulaCaculate(12, i);
 			}
 		} else {
@@ -123,5 +85,49 @@ public class LM079Report extends MakeReport {
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
+	}
+	
+	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException
+	{
+		for (Map<String, String> tLDVo : list) {
+			int colShift = 0;
+			int rowShift = 0;
+
+			for (int i = 0; i <= 3; i++) {
+
+				int col = i + startColumn; // 1-based
+				int row = 7; // 1-based
+
+				// Query received will have column names in the format of F0, even if no alias
+				// is set in SQL
+				// notice it's 0-based for those names
+				String value = tLDVo.get("F" + i);
+
+				switch (i) {
+				// if specific column needs special treatment, insert case here.
+				case 0:
+					// CityCode: already properly converted
+					rowShift = parse.stringToInteger(value) - 1;
+					colShift--; // doesn't write
+					break;
+				case 1:
+					// Newly Drawdown Amount: hundred million
+					makeExcel.setValue(row + rowShift, col + colShift, computeDivide(getBigDecimal(value), billion, 2), "R");
+					break;
+				case 2:
+					// Weighted Average of Loan: Percent
+					makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_UP), "R");
+					break;
+				case 3:
+					// Weighted Average of Loan Rate: Percent
+					makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_UP), "R");
+					break;
+				default:
+					makeExcel.setValue(row + rowShift, col + colShift, value, "R");
+					break;
+				}
+			} // for
+
+		} // for
 	}
 }

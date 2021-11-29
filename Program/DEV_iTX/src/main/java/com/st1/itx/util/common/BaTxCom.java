@@ -526,6 +526,11 @@ public class BaTxCom extends TradeBuffer {
 		loadUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 1, titaVo);
 
 		// END
+		if (this.baTxList != null) {
+			for (BaTxVo ba : this.baTxList) {
+				this.info("termsPay " + ba.toString());
+			}
+		}
 		return this.baTxList;
 	}
 
@@ -1292,6 +1297,7 @@ public class BaTxCom extends TradeBuffer {
 									break;
 								case "YOP": // YOP 清償違約金(未收費用，清償時寫入)
 									baTxVo.setRepayType(9); // 09-其他(清償違約金)
+									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 									baTxVo.setCloseBreachAmt(rv.getRvBal());
 									this.shortCloseBreach = this.shortCloseBreach.add(rv.getRvBal());
 									break;

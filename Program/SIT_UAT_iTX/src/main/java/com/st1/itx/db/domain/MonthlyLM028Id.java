@@ -19,90 +19,118 @@ public class MonthlyLM028Id implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6842651577136666558L;
+	private static final long serialVersionUID = -8626628223314194373L;
 
-// 借款人戶號
-  @Column(name = "`LMSACN`")
-  private int lMSACN = 0;
+// 資料年月
+  /* YYYYMM */
+  @Column(name = "`DataMonth`")
+  private int dataMonth = 0;
+
+  // 借款人戶號
+  /* 原LMSACN */
+  @Column(name = "`CustNo`")
+  private int custNo = 0;
 
   // 額度編號
-  @Column(name = "`LMSAPN`")
-  private int lMSAPN = 0;
+  /* 原LMSAPN */
+  @Column(name = "`FacmNo`")
+  private int facmNo = 0;
 
   // 撥款序號
-  @Column(name = "`LMSASQ`")
-  private int lMSASQ = 0;
+  /* 原LMSASQ */
+  @Column(name = "`BormNo`")
+  private int bormNo = 0;
 
   public MonthlyLM028Id() {
   }
 
-  public MonthlyLM028Id(int lMSACN, int lMSAPN, int lMSASQ) {
-    this.lMSACN = lMSACN;
-    this.lMSAPN = lMSAPN;
-    this.lMSASQ = lMSASQ;
+  public MonthlyLM028Id(int dataMonth, int custNo, int facmNo, int bormNo) {
+    this.dataMonth = dataMonth;
+    this.custNo = custNo;
+    this.facmNo = facmNo;
+    this.bormNo = bormNo;
+  }
+
+/**
+	* 資料年月<br>
+	* YYYYMM
+	* @return Integer
+	*/
+  public int getDataMonth() {
+    return this.dataMonth;
+  }
+
+/**
+	* 資料年月<br>
+	* YYYYMM
+  *
+  * @param dataMonth 資料年月
+	*/
+  public void setDataMonth(int dataMonth) {
+    this.dataMonth = dataMonth;
   }
 
 /**
 	* 借款人戶號<br>
-	* 
+	* 原LMSACN
 	* @return Integer
 	*/
-  public int getLMSACN() {
-    return this.lMSACN;
+  public int getCustNo() {
+    return this.custNo;
   }
 
 /**
 	* 借款人戶號<br>
-	* 
+	* 原LMSACN
   *
-  * @param lMSACN 借款人戶號
+  * @param custNo 借款人戶號
 	*/
-  public void setLMSACN(int lMSACN) {
-    this.lMSACN = lMSACN;
+  public void setCustNo(int custNo) {
+    this.custNo = custNo;
   }
 
 /**
 	* 額度編號<br>
-	* 
+	* 原LMSAPN
 	* @return Integer
 	*/
-  public int getLMSAPN() {
-    return this.lMSAPN;
+  public int getFacmNo() {
+    return this.facmNo;
   }
 
 /**
 	* 額度編號<br>
-	* 
+	* 原LMSAPN
   *
-  * @param lMSAPN 額度編號
+  * @param facmNo 額度編號
 	*/
-  public void setLMSAPN(int lMSAPN) {
-    this.lMSAPN = lMSAPN;
+  public void setFacmNo(int facmNo) {
+    this.facmNo = facmNo;
   }
 
 /**
 	* 撥款序號<br>
-	* 
+	* 原LMSASQ
 	* @return Integer
 	*/
-  public int getLMSASQ() {
-    return this.lMSASQ;
+  public int getBormNo() {
+    return this.bormNo;
   }
 
 /**
 	* 撥款序號<br>
-	* 
+	* 原LMSASQ
   *
-  * @param lMSASQ 撥款序號
+  * @param bormNo 撥款序號
 	*/
-  public void setLMSASQ(int lMSASQ) {
-    this.lMSASQ = lMSASQ;
+  public void setBormNo(int bormNo) {
+    this.bormNo = bormNo;
   }
 
 
   @Override
   public int hashCode() {
-    return Objects.hash(lMSACN, lMSAPN, lMSASQ);
+    return Objects.hash(dataMonth, custNo, facmNo, bormNo);
   }
 
   @Override
@@ -112,11 +140,11 @@ public class MonthlyLM028Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     MonthlyLM028Id monthlyLM028Id = (MonthlyLM028Id) obj;
-    return lMSACN == monthlyLM028Id.lMSACN && lMSAPN == monthlyLM028Id.lMSAPN && lMSASQ == monthlyLM028Id.lMSASQ;
+    return dataMonth == monthlyLM028Id.dataMonth && custNo == monthlyLM028Id.custNo && facmNo == monthlyLM028Id.facmNo && bormNo == monthlyLM028Id.bormNo;
   }
 
   @Override
   public String toString() {
-    return "MonthlyLM028Id [lMSACN=" + lMSACN + ", lMSAPN=" + lMSAPN + ", lMSASQ=" + lMSASQ + "]";
+    return "MonthlyLM028Id [dataMonth=" + dataMonth + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + "]";
   }
 }

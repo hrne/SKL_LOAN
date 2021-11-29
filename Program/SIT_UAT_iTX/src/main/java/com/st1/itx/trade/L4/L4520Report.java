@@ -1,21 +1,23 @@
 package com.st1.itx.trade.L4;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
+import com.st1.itx.db.service.springjpa.cm.L4520ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -36,10 +38,15 @@ public class L4520Report extends MakeReport {
 	public EmpDeductMediaService empDeductMediaService;
 
 	@Autowired
+	public L4520ServiceImpl l4520ServiceImpl;
+	@Autowired
 	public CustMainService custMainService;
 
 	private int header = 0;
-
+	private String PerfMonth = "";
+	private String MediaKind = "";
+	private String BatchNo= "";
+	
 	@Override
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
@@ -51,40 +58,54 @@ public class L4520Report extends MakeReport {
 		}
 
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(7);
+		this.setBeginRow(9);
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(54);
 	}
 
 	public void printHeaderP() {
-		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
+		this.print(-2, 1, "程式ID：" + "L4520Report");
+		this.print(-2, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
-		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
-		this.print(-2, 70, "更新成功明細表", "C");
-		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
-		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
-//		this.print(-4, 1, "業績年月：" + perfMonth);
-//		this.print(-4, 30, "流程別：" + procCode);
+		this.print(-2, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-3, 1, "報　表：" + "L4520Report");
+		if("4".equals(MediaKind)) {
+		  this.print(-3, 70, "15日薪扣薪媒體回傳作業", "C");
+		} else {
+		  this.print(-3, 70, "非15日薪扣薪媒體回傳作業", "C");
+		}
+		this.print(-3, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-4, 70, "(更新成功明細表)", "C");
+		this.print(-4, 123, "頁　　次：" + this.getNowPage(), "R");
+		this.print(-5, 1, "申請年月：   " + PerfMonth.substring(0,3) + "/" + PerfMonth.substring(3,5));
+		this.print(-5, 30, "申請批號：" + BatchNo);
 //		this.print(-4, 60, "入帳日期：" + formatDate(entryDate));
-		this.print(-5, 1, " 戶號    員工姓名              回傳訊息                       應扣金額           實扣金額   員工代號   身份證字號 入帳日期  作業結果");
-		this.print(-6, 0, "-------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-7, 1, "  戶號       員工姓名              回傳訊息               應扣金額           實扣金額     員工代號     身份證字號   入帳日期    作業結果");
+		this.print(-8, 0, "-------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void printHeaderP1() {
-		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
+		this.print(-2, 1, "程式ID：" + "L4520Report");
+		this.print(-2, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
-		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
-		this.print(-2, 70, "更新失敗明細表", "C");
-		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
-		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
-//		this.print(-4, 1, "業績年月：" + perfMonth);
-//		this.print(-4, 30, "流程別：" + procCode);
+		this.print(-2, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-3, 1, "報　表：" + "L4520Report");
+		if("4".equals(MediaKind)) {
+			  this.print(-3, 70, "15日薪扣薪媒體回傳作業", "C");
+			} else {
+			  this.print(-3, 70, "非15日薪扣薪媒體回傳作業", "C");
+			}
+		this.print(-3, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-4, 70, "(失敗明細表)", "C");
+		this.print(-4, 123, "頁　　次：" + this.getNowPage(), "R");
+		this.print(-5, 1, "申請年月：   " + PerfMonth.substring(0,3) + "/" + PerfMonth.substring(3,5));
+		this.print(-5, 30, "申請批號：" + BatchNo);
 //		this.print(-4, 60, "入帳日期：" + formatDate(entryDate));
-		this.print(-5, 1, " 戶號    員工姓名              失敗原因                       應扣金額           實扣金額   員工代號   身份證字號 入帳日期  作業結果");
-		this.print(-6, 0, "-------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-7, 1, "  戶號       員工姓名              失敗原因               應扣金額           實扣金額     員工代號     身份證字號   入帳日期    作業結果");
+		this.print(-8, 0, "-------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void exec(TitaVo titaVo1) throws LogicException {
@@ -96,57 +117,78 @@ public class L4520Report extends MakeReport {
 		this.limit = 500;
 
 		this.info("L4520Report exec");
+		
+		PerfMonth = titaVo.getParam("PerfMonth");
 
-		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		int iPerfMonth = parse.stringToInteger(titaVo.getParam("PerfMonth")) + 191100;
-		String iProcCode = titaVo.getParam("ProcCode");
+		List<Map<String, String>> lEmpDeductMediaA = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> lEmpDeductMediaB = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> lEmpDeductMediaC = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> lEmpDeductMediaD = new ArrayList<Map<String, String>>();
+		
+		List<Map<String, String>> fnAllList = new ArrayList<>();
+		
+		try {
+			fnAllList = l4520ServiceImpl.findSF(titaVo1);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("L4520ServiceImpl.fs error = " + errors.toString());
+		}
 
-		List<EmpDeductMedia> lEmpDeductMedia = new ArrayList<EmpDeductMedia>();
-		List<EmpDeductMedia> lEmpDeductMediaA = new ArrayList<EmpDeductMedia>();
-		List<EmpDeductMedia> lEmpDeductMediaB = new ArrayList<EmpDeductMedia>();
-		Slice<EmpDeductMedia> sEmpDeductMedia = null;
-
-		sEmpDeductMedia = empDeductMediaService.findL4520A(iAcDate, iPerfMonth, iProcCode, this.index, this.limit);
-
-		lEmpDeductMedia = sEmpDeductMedia == null ? null : sEmpDeductMedia.getContent();
-
-		if (lEmpDeductMedia != null && lEmpDeductMedia.size() != 0) {
-			for (EmpDeductMedia tEmpDeductMedia : lEmpDeductMedia) {
-				if (tEmpDeductMedia.getErrorCode() == null) {
+		if (fnAllList != null && fnAllList.size() != 0) {
+			for (Map<String, String> tEmpDeductMedia : fnAllList) {
+				if (tEmpDeductMedia.get("ErrorCode") == null) {
 					continue;
-				} else if ("01".equals(tEmpDeductMedia.getErrorCode())) {
+				} else if ("01".equals(tEmpDeductMedia.get("ErrorCode")) && "4".equals(tEmpDeductMedia.get("MediaKind"))) {
 					lEmpDeductMediaA.add(tEmpDeductMedia);
-				} else {
+				} else if ("01".equals(tEmpDeductMedia.get("ErrorCode")) && "5".equals(tEmpDeductMedia.get("MediaKind"))) {	
+					lEmpDeductMediaC.add(tEmpDeductMedia);
+				} else if(!"01".equals(tEmpDeductMedia.get("ErrorCode")) && "4".equals(tEmpDeductMedia.get("MediaKind"))) {
 					lEmpDeductMediaB.add(tEmpDeductMedia);
-				} // else
+				} else if(!"01".equals(tEmpDeductMedia.get("ErrorCode")) && "5".equals(tEmpDeductMedia.get("MediaKind"))) {
+					lEmpDeductMediaD.add(tEmpDeductMedia);
+				}
 			} // for
 
 			int Asize = lEmpDeductMediaA.size();
 			int Bsize = lEmpDeductMediaB.size();
-
+			int Csize = lEmpDeductMediaC.size();
+			int Dsize = lEmpDeductMediaD.size();
+			
 			if (Asize != 0) {
-				setReportA(lEmpDeductMediaA, titaVo1);
+				setReportA(lEmpDeductMediaA, titaVo1); // 15 成功
 			}
 
+			if (Csize != 0) {
+				setReportA(lEmpDeductMediaC, titaVo1); // 非15 成功
+			}
+			
 			if (Bsize != 0) {
 				header = 1;
-				setReportB(lEmpDeductMediaB, titaVo1);
+				setReportB(lEmpDeductMediaB, titaVo1); // 15 失敗
 			}
-
-//			if (Asize + Bsize == 0) {
-//				throw new LogicException("E0001", "查無資料");
-//			}
+			
+			if (Dsize != 0) {
+				setReportB(lEmpDeductMediaD, titaVo1); // 非15 失敗	
+			}
+			
 		} else {
 //			throw new LogicException("E0001", "查無資料");
 		}
 	}
 
-	private void setReportA(List<EmpDeductMedia> tEmpDeductMedia, TitaVo titaVo) throws LogicException {
+	private void setReportA(List<Map<String, String>> tEmpDeductMedia, TitaVo titaVo) throws LogicException {
 
 		long sno = 0;
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "更新成功明細表", "", "A4", "L");
-
+		MediaKind = tEmpDeductMedia.get(0).get("MediaKind");
+		BatchNo = tEmpDeductMedia.get(0).get("BatchNo");
+		if("4".equals(MediaKind)) {
+		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "15日薪扣薪媒體回傳成功明細表", "", "A4", "L");
+		} else {
+		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "非15日薪扣薪媒體回傳成功明細表", "", "A4", "L");
+		}
+		
 		DecimalFormat df1 = new DecimalFormat("#,##0");
 
 		BigDecimal RepayAmt = new BigDecimal("0");
@@ -163,10 +205,10 @@ public class L4520Report extends MakeReport {
 //			1.每筆先印出明細
 			this.print(1, 1,
 					"                                                                                                                                                                               ");
-			this.print(0, 2, FormatUtil.pad9(parse.IntegerToString(tEmpDeductMedia.get(i).getCustNo(), 7), 7)); // 戶號
+			this.print(0, 2, FormatUtil.pad9(tEmpDeductMedia.get(i).get("CustNo"), 7)); // 戶號
 
 			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(tEmpDeductMedia.get(i).getCustNo(), tEmpDeductMedia.get(i).getCustNo());
+			tCustMain = custMainService.custNoFirst(parse.stringToInteger(tEmpDeductMedia.get(i).get("CustNo")), parse.stringToInteger(tEmpDeductMedia.get(i).get("CustNo")));
 
 			if (tCustMain != null) {
 
@@ -174,13 +216,13 @@ public class L4520Report extends MakeReport {
 				if (tCustMain.getCustName().length() < 10) {
 					nameLength = tCustMain.getCustName().length();
 				}
-				this.print(0, 10, tCustMain.getCustName().substring(0, nameLength));// 員工姓名
+				this.print(0, 14, tCustMain.getCustName().substring(0, nameLength));// 員工姓名
 			} else {
-				this.print(0, 10, "");// 員工姓名
+				this.print(0, 14, "");// 員工姓名
 			}
 
 			String Msg = "";
-			switch (tEmpDeductMedia.get(i).getErrorCode()) {
+			switch (tEmpDeductMedia.get(i).get("ErrorCode")) {
 			case "01":
 				Msg = "成功";
 				break;
@@ -195,24 +237,30 @@ public class L4520Report extends MakeReport {
 				break;
 			}
 
-			this.print(0, 31, Msg);// 回傳訊息
+			this.print(0, 38, tEmpDeductMedia.get(i).get("ErrorCode"));// 回傳訊息
 
-			this.print(0, 69, df1.format(tEmpDeductMedia.get(i).getRepayAmt()), "R");// 應扣金額
-			this.print(0, 87, df1.format(tEmpDeductMedia.get(i).getTxAmt()), "R");// 實扣金額
+			this.print(0, 64, df1.format(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt"))), "R");// 應扣金額
+			this.print(0, 83, df1.format(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt"))), "R");// 實扣金額
 
 			if (tCustMain != null) {
-				this.print(0, 90, tCustMain.getEmpNo());// 員工代號
+				this.print(0, 89, tCustMain.getEmpNo());// 員工代號
 				this.print(0, 100, tCustMain.getCustId());// 身分證字號
 			} else {
-				this.print(0, 90, "");// 員工代號
+				this.print(0, 89, "");// 員工代號
 				this.print(0, 100, "");// 身分證字號
 			}
 
-			this.print(0, 111, parse.IntegerToString(tEmpDeductMedia.get(i).getAcDate(), 7));// 入帳日期
-			this.print(0, 128, "  ");// 作業結果
+			String AcDate = String.valueOf(parse.stringToInteger(tEmpDeductMedia.get(i).get("AcDate")) -19110000);
+			if(AcDate.length() == 7) {
+				this.print(0, 113, AcDate.substring(0,3) + "/" + AcDate.substring(3,5) + "/" + AcDate.substring(5,7));// 入帳日期
+			} else {
+				this.print(0, 113, AcDate.substring(0,2) + "/" + AcDate.substring(2,4) + "/" + AcDate.substring(4,6));// 入帳日期
+			}
+			
+			this.print(0, 124, Msg);// 作業結果
 //			每頁應扣金額，實扣金額總和
-			RepayAmt = RepayAmt.add(tEmpDeductMedia.get(i).getRepayAmt());
-			TxAmt = TxAmt.add(tEmpDeductMedia.get(i).getTxAmt());
+			RepayAmt = RepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt")));
+			TxAmt = TxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
 
 //			全部應扣金額，實扣金額總和			
 			totalRepayAmt = totalRepayAmt.add(RepayAmt);
@@ -227,13 +275,15 @@ public class L4520Report extends MakeReport {
 //			2.再與下一筆比較，決定是否換行或換頁
 			if (j != tEmpDeductMedia.size()) {
 
+				MediaKind = tEmpDeductMedia.get(j).get("MediaKind");
+				BatchNo = tEmpDeductMedia.get(j).get("BatchNo");
 //				每頁第41筆 跳頁 
 				if (pageCnt == 41) {
 					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 1, "         失敗筆數：           筆                                                                                                  ");
+					this.print(1, 1, "         失敗筆數：                                                                                                             ");
 					this.print(0, 27, String.format("%,d", pageCnt), "R");
-					this.print(0, 69, df1.format(RepayAmt), "R");// 應扣金額
-					this.print(0, 87, df1.format(TxAmt), "R");// 實扣金額
+					this.print(0, 64, df1.format(RepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(TxAmt), "R");// 實扣金額
 					this.print(1, 70, "=====續下頁=====", "C");
 
 					RepayAmt = new BigDecimal("0");
@@ -247,14 +297,14 @@ public class L4520Report extends MakeReport {
 //			3.若為最後一筆，則固定產出小計、總計、報表合計
 				if (total == tEmpDeductMedia.size()) {
 					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 1, "         成功筆數：           筆                                                                                                  ");
+					this.print(1, 1, "         成功筆數：                                                                                                             ");
 					this.print(0, 27, String.format("%,d", pageCnt), "R");
-					this.print(0, 69, df1.format(RepayAmt), "R");// 應扣金額
-					this.print(0, 87, df1.format(TxAmt), "R");// 實扣金額
+					this.print(0, 64, df1.format(RepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(TxAmt), "R");// 實扣金額
 
-					this.print(1, 1, "         總計筆數：           筆                                                                                                  ");
-					this.print(0, 69, df1.format(totalRepayAmt), "R");// 應扣金額
-					this.print(0, 87, df1.format(totalTxAmt), "R");// 實扣金額
+					this.print(1, 1, "         總計筆數：                                                                                                             ");
+					this.print(0, 64, df1.format(totalRepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(totalTxAmt), "R");// 實扣金額
 					this.print(0, 27, String.format("%,d", total), "R");
 
 				}
@@ -265,11 +315,18 @@ public class L4520Report extends MakeReport {
 
 	}
 
-	private void setReportB(List<EmpDeductMedia> tEmpDeductMedia, TitaVo titaVo) throws LogicException {
+	private void setReportB(List<Map<String, String>> tEmpDeductMedia, TitaVo titaVo) throws LogicException {
 
 		long sno = 0;
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "更新失敗明細表", "", "A4", "L");
+		MediaKind = tEmpDeductMedia.get(0).get("MediaKind");
+		BatchNo = tEmpDeductMedia.get(0).get("BatchNo");
+		if("4".equals(MediaKind)) {
+		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "15日薪扣薪媒體回傳失敗明細表", "", "A4", "L");
+		} else {
+		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "非15日薪扣薪媒體回傳失敗明細表", "", "A4", "L");
+		}
+		
 
 		DecimalFormat df1 = new DecimalFormat("#,##0");
 
@@ -288,10 +345,10 @@ public class L4520Report extends MakeReport {
 //			1.每筆先印出明細
 			this.print(1, 1,
 					"                                                                                                                                                                               ");
-			this.print(0, 2, FormatUtil.pad9(parse.IntegerToString(tEmpDeductMedia.get(i).getCustNo(), 7), 7)); // 戶號
+			this.print(0, 2, FormatUtil.pad9(tEmpDeductMedia.get(i).get("CustNo"), 7)); // 戶號
 
 			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(tEmpDeductMedia.get(i).getCustNo(), tEmpDeductMedia.get(i).getCustNo());
+			tCustMain = custMainService.custNoFirst(parse.stringToInteger(tEmpDeductMedia.get(i).get("CustNo")), parse.stringToInteger(tEmpDeductMedia.get(i).get("CustNo")));
 
 			if (tCustMain != null) {
 
@@ -299,13 +356,13 @@ public class L4520Report extends MakeReport {
 				if (tCustMain.getCustName().length() < 10) {
 					nameLength = tCustMain.getCustName().length();
 				}
-				this.print(0, 10, tCustMain.getCustName().substring(0, nameLength));// 員工姓名
+				this.print(0, 14, tCustMain.getCustName().substring(0, nameLength));// 員工姓名
 			} else {
-				this.print(0, 10, "");// 員工姓名
+				this.print(0, 14, "");// 員工姓名
 			}
 
 			String Msg = "";
-			switch (tEmpDeductMedia.get(i).getErrorCode()) {
+			switch (tEmpDeductMedia.get(i).get("ErrorCode")) {
 			case "01":
 				Msg = "成功";
 				break;
@@ -320,28 +377,34 @@ public class L4520Report extends MakeReport {
 				break;
 			}
 
-			this.print(0, 31, Msg);// 回傳訊息
+			this.print(0, 38, tEmpDeductMedia.get(i).get("ErrorCode"));// 回傳訊息
 
-			this.print(0, 69, df1.format(tEmpDeductMedia.get(i).getRepayAmt()), "R");// 應扣金額
-			this.print(0, 87, df1.format(tEmpDeductMedia.get(i).getTxAmt()), "R");// 實扣金額
-
+			this.print(0, 64, df1.format(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt"))), "R");// 應扣金額
+			this.print(0, 83, df1.format(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt"))), "R");// 實扣金額
+			
 			if (tCustMain != null) {
-				this.print(0, 90, tCustMain.getEmpNo());// 員工代號
+				this.print(0, 89, tCustMain.getEmpNo());// 員工代號
 				this.print(0, 100, tCustMain.getCustId());// 身分證字號
 			} else {
-				this.print(0, 90, "");// 員工代號
+				this.print(0, 89, "");// 員工代號
 				this.print(0, 100, "");// 身分證字號
 			}
 
-			this.print(0, 111, parse.IntegerToString(tEmpDeductMedia.get(i).getAcDate(), 7));// 入帳日期
-			this.print(0, 128, "  ");// 作業結果
+			String AcDate = String.valueOf(parse.stringToInteger(tEmpDeductMedia.get(i).get("AcDate")) -19110000);
+			if(AcDate.length() == 7) {
+				this.print(0, 113, AcDate.substring(0,3) + "/" + AcDate.substring(3,5) + "/" + AcDate.substring(5,7));// 入帳日期
+			} else {
+				this.print(0, 113, AcDate.substring(0,2) + "/" + AcDate.substring(2,4) + "/" + AcDate.substring(4,6));// 入帳日期
+			}
+			
+			this.print(0, 124, Msg);// 作業結果
 //			每頁應扣金額，實扣金額總和
-			RepayAmt = RepayAmt.add(tEmpDeductMedia.get(i).getRepayAmt());
-			TxAmt = TxAmt.add(tEmpDeductMedia.get(i).getTxAmt());
+			RepayAmt = RepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt")));
+			TxAmt = TxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
 
 //			全部應扣金額，實扣金額總和			
-			totalRepayAmt = totalRepayAmt.add(tEmpDeductMedia.get(i).getRepayAmt());
-			totalTxAmt = totalTxAmt.add(tEmpDeductMedia.get(i).getTxAmt());
+			totalRepayAmt = totalRepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt")));
+			totalTxAmt = totalTxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
 
 //			全部筆數統計
 			total++;
@@ -351,14 +414,16 @@ public class L4520Report extends MakeReport {
 
 //			2.再與下一筆比較，決定是否換行或換頁
 			if (j != tEmpDeductMedia.size()) {
-
+				MediaKind = tEmpDeductMedia.get(j).get("MediaKind");
+				BatchNo = tEmpDeductMedia.get(j).get("BatchNo");
+				
 //				每頁第41筆 跳頁 
 				if (pageCnt == 41) {
 					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 1, "         失敗筆數：           筆                                                                                                  ");
+					this.print(1, 1, "         失敗筆數：                                                                                                             ");
 					this.print(0, 27, String.format("%,d", pageCnt), "R");
-					this.print(0, 69, df1.format(RepayAmt), "R");// 應扣金額
-					this.print(0, 87, df1.format(TxAmt), "R");// 實扣金額
+					this.print(0, 64, df1.format(RepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(TxAmt), "R");// 實扣金額
 					this.print(1, 70, "=====續下頁=====", "C");
 
 					RepayAmt = new BigDecimal("0");
@@ -372,14 +437,14 @@ public class L4520Report extends MakeReport {
 //			3.若為最後一筆，則固定產出小計、總計、報表合計
 				if (total == tEmpDeductMedia.size()) {
 					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 1, "         失敗筆數：           筆                                                                                                  ");
+					this.print(1, 1, "         失敗筆數：                                                                                                             ");
 					this.print(0, 27, String.format("%,d", pageCnt), "R");
-					this.print(0, 69, df1.format(RepayAmt), "R");// 應扣金額
-					this.print(0, 87, df1.format(TxAmt), "R");// 實扣金額
+					this.print(0, 64, df1.format(RepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(TxAmt), "R");// 實扣金額
 
-					this.print(1, 1, "         總計筆數：           筆                                                                                                  ");
-					this.print(0, 69, df1.format(totalRepayAmt), "R");// 應扣金額
-					this.print(0, 87, df1.format(totalTxAmt), "R");// 實扣金額
+					this.print(1, 1, "         總計筆數：                                                                                                             ");
+					this.print(0, 64, df1.format(totalRepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(totalTxAmt), "R");// 實扣金額
 					this.print(0, 27, String.format("%,d", total), "R");
 
 				}

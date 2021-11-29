@@ -611,6 +611,7 @@ public class L4510 extends TradeBuffer {
 			}
 			tEmpDeductDtlId.setAcctCode(facmAcctCode.get(tmp3));
 			tEmpDeductDtlId.setFacmNo(tmp.getFacmNo());
+			tEmpDeductDtlId.setBormNo(tmp.getBormNo());
 
 			tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
 			tEmpDeductDtl.setEntryDate(tEmpDeductDtlId.getEntryDate());
@@ -621,6 +622,7 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductDtl.setRepayCode(tEmpDeductDtlId.getRepayCode());
 			tEmpDeductDtl.setAcctCode(tEmpDeductDtlId.getAcctCode());
 			tEmpDeductDtl.setFacmNo(tEmpDeductDtlId.getFacmNo());
+			tEmpDeductDtl.setBormNo(tEmpDeductDtlId.getBormNo());
 
 			tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());
 			tEmpDeductDtl.setCustId(tCustMain.getCustId());

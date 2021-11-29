@@ -98,7 +98,6 @@ public class LM076ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,s.e1 / s.e0 \"AvgLoanPercent\" ";
 		sql += "       ,s.e2 / s.e0 \"AvgIntRate\" ";
 		sql += " FROM tmp s ";
-		sql += " ; ";
 
 
 		this.info("sql=" + sql);

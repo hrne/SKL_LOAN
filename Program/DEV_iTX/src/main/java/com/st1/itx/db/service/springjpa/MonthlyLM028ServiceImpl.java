@@ -91,9 +91,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "LMSACN", "LMSAPN", "LMSASQ"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataMonth", "CustNo", "FacmNo", "BormNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LMSACN", "LMSAPN", "LMSASQ"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataMonth", "CustNo", "FacmNo", "BormNo"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = monthlyLM028ReposDay.findAll(pageable);
@@ -103,6 +103,34 @@ em = null;
       slice = monthlyLM028ReposHist.findAll(pageable);
     else 
       slice = monthlyLM028Repos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<MonthlyLM028> findByMonth(int dataMonth_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<MonthlyLM028> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByMonth " + dbName + " : " + "dataMonth_0 : " + dataMonth_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = monthlyLM028ReposDay.findAllByDataMonthIsOrderByDataMonthAscCustNoAscFacmNoAscBormNoAsc(dataMonth_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = monthlyLM028ReposMon.findAllByDataMonthIsOrderByDataMonthAscCustNoAscFacmNoAscBormNoAsc(dataMonth_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = monthlyLM028ReposHist.findAllByDataMonthIsOrderByDataMonthAscCustNoAscFacmNoAscBormNoAsc(dataMonth_0, pageable);
+    else 
+      slice = monthlyLM028Repos.findAllByDataMonthIsOrderByDataMonthAscCustNoAscFacmNoAscBormNoAsc(dataMonth_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

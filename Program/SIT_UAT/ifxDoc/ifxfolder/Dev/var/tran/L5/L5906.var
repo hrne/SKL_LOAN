@@ -34,8 +34,10 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
+#Chain_L5116=X,12,S
+T(2,100000000000)
 #button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L5116; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+T(2,{cmd=CHAIN; ntxcd=L5116; ntxbuf=#Chain_L5116; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增)
 #button1=x,100,S
 T(2,{cmd=CHAIN; ntxcd=LM016; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
@@ -58,7 +60,13 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustNoS,#NTXBUF,1,7)
 T(1,@CustNoE,#NTXBUF,1,7)
+
+#Sapce=X,1,S
+C(3,#CustNoS,0,$,T(2,@Chain_L5116,1+#CustNoS+000))
+
 #CustNoS=A,7,I
+@
+T(2,@Chain_L5116,1+#CustNoS+000)
 #CustNoE=A,7,I
 #RPTFG=A,1,S
 

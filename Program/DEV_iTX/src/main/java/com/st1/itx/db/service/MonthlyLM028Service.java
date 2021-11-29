@@ -36,6 +36,17 @@ public interface MonthlyLM028Service {
   public Slice<MonthlyLM028> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
+   * DataMonth = 
+   *
+   * @param dataMonth_0 dataMonth_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice MonthlyLM028 MonthlyLM028 of List
+   */
+  public Slice<MonthlyLM028> findByMonth(int dataMonth_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By MonthlyLM028
    * 
    * @param monthlyLM028Id key

@@ -435,9 +435,9 @@ public class AcDetailCom extends TradeBuffer {
 			if (acctCode.substring(0, 1).equals("Z")) {
 				acctCode = "3" + acctCode.substring(1, 3);
 			}
-			if (acctCode.equals("YOP")) {
-				acctCode = "IOP";
-			}
+		}
+		if (acctCode.equals("YOP")) {
+			acctCode = "IOP";
 		}
 
 		// step 2. 轉換專戶
