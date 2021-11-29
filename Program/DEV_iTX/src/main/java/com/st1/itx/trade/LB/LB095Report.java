@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LB095ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.L8ConstantEum;
 import com.st1.itx.util.common.MakeFile;
 
 import java.util.Date;
@@ -88,8 +89,9 @@ public class LB095Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B095", "不動產擔保品明細－建號附加檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B095-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("02-23895858#7279", 16, ' ')
-					+ makeFile.fillStringR("審查單位聯絡人－鄧雪美", 80, ' ') + StringUtils.repeat(" ", 159);
+			strContent = "JCIC-DAT-B095-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 80, ' ') + StringUtils.repeat(" ", 159);
 			makeFile.put(strContent);
 
 			// 欄位內容

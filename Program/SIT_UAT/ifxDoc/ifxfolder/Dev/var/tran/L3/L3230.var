@@ -406,13 +406,12 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2078; ntxbuf=#BUF6A;ntxbuf5=type<-1
 ! IF(#TempItemCode==09 || #TempItemCode==10 || #TempItemCode==25 || #TempItemCode==29,$,S)
 
 
-
 #FacmNo=A,3,I
 C(3,#ApplNo,0,$,s)
 C(3,#TempItemCode,10,SHOW(#BTN5),SHOW(#BTN4))
 C(3,#TempItemCode,07,SHOW(#BTN6)HIDE(#BTN4,#BTN5),HIDE(#BTN6))
 IF(#TempReasonCode==2 || #TempReasonCode==3,S,$)
-@V(2,0)
+
 
 
 ![撥款序號]
@@ -542,11 +541,14 @@ T(H,#AcSubBookCode,#AcSubBookCodeHelp)
 ![暫收款金額]
 !退還暫收款金額不可>該戶號目前暫收金額
 !INVOKEJS(SHOW,p1,4,8,1)
-
+#TEMPAMTMSG=x,50,S
+T(2,該戶號目前暫收款金額為+#L3r05TempAmt)
 #TwTempAmt=m,14,I
 C(3,#Precision,0,$,s)
-@V(5,0,#L3r05TempAmt)
-V(2,0)
+@
+IF(#TwTempAmt>#L3r05TempAmt,V(P,#TEMPAMTMSG),$)
+! V(5,0,#L3r05TempAmt)
+! V(2,0)
 
 #UsTempAmt=m,14.2,I
 C(3,#Precision,0,s,$)

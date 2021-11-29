@@ -95,6 +95,11 @@ T(1,@BatchNo,#NTXBUF,1,6)
 #AcDate=D,7,L
 E(0,#SYSDATE)
 
+
+![經辦編號]
+#TlrNo=X,6,S
+T(4,TLRNO$)
+
 !作業項目
 
 #ItemCode=X,1,I
@@ -148,7 +153,7 @@ E(0,0)ASGN(INQHD$)
 ![每筆明細(OCCURS)長度]
 #L410BLN=n,3,S
 C(5,#TXFORM,L410B,$,S)
-E(0,309)ASGN(INQLEN$)
+E(0,67)ASGN(INQLEN$)
 
 ![每張印錄單列印的筆數]
 #L410BQPRT=n,2,S
@@ -182,51 +187,13 @@ T(3,1)ASGN(LOOP$)
 #L410B_LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
 
-#OOAcDate=D,7,O
-
-#OOBatchNo=X,6,O
-
-#OODrawdownCode=A,2,O
-
-#OODrawdownCodeX=X,22,O
-T(H,#OODrawdownCode,#DrawdownCodeHelp)
-!SWITCH(#OODrawdownCode,1,T(3,整批匯款),2,T(3,單筆匯款),3,T(3,退款-整批匯款),4,T(3,退款-存款憑條),9,T(3,全部))
-
-#OOStatusCode=A,1,O
-
-#OOStatusCodeX=X,10,O
-T(3,)T(H,#OOStatusCode,#StatusCodeHelp)
-!SWITCH(#OOStatusCode,0,T(3,正常),1,T(3,產檔後修正),2,T(3,產檔後訂正),9,T(3,全部))
-
-#OORemitBank=A,3,O
-
-#OORemitBranch=A,4,O
-
-
-#OORemitBankX=X,40,O
-
-
-#OORemitBranchX=X,40,O
-
-#RemitAcctNo=A,14,O
-
 #OOCustNo=A,7,O
-
 #OOFacmNo=A,3,O
-
 #OOBormNo=A,3,O
-
-#OOCustNoX=X,15,O
-T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
-
-#OOCustName=x,100,O
-#OOCustNameX=x,20,O
-
-#OORemaker=X,60,O
-
-#OOCurrencyCode=X,3,O
-
-#OORemitAmt=m,14.2,O
+#OOCustName=x,20,O
+#OOTlrNo=X,6,O
+#OOTlrNoX=x,20,O
+#OOLastUpdateTime=X,8,O
 
 </sub>
 
@@ -247,22 +214,13 @@ TXFORM=L4101
 ^
 
 TXFORM=L410B
-#OOAcDate
-#OOBatchNo
-#OODrawdownCode
-#OOStatusCode
-#OORemitBank
-#OORemitBranch
-#OORemitBankX
-#OORemitBranchX
-#RemitAcctNo
 #OOCustNo
 #OOFacmNo
 #OOBormNo
 #OOCustName
-#OORemaker
-#OOCurrencyCode
-#OORemitAmt
+#OOTlrNo
+#OOTlrNoX
+#OOLastUpdateTime
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -273,10 +231,10 @@ TXFORM=L410B
 <include src="PRT.icf::UPD01.sel"/>
 
 #RPTFG=1,L4101,NA,,D,15
-%
-#OOAcDate#OOBatchNo#OODrawdownCodeX#OORemitBankX
-#RemitAcctNo#OOCustNo#OOFacmNo#OOBormNo#OOCustNameX#OORemaker
-#OOCurrencyCode#OORemitAmt#OORemitBranchX
+#AcDate#TlrNo%
+#OOCustNo#OOFacmNo#OOBormNo
+#OOCustName
+#OOTlrNo#OOTlrNoX#OOLastUpdateTime
 @^
 
 

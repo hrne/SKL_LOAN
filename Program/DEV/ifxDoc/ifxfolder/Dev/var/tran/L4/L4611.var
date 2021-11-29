@@ -39,7 +39,7 @@ E(0,0)
 ["#FdStatusCode+處理代碼",#StatusCode,#StatusCodeX],["#FdNotiTempFg+入通知檔",#NotiTempFg],
 ["#FdAcDate+會計日期",#AcDate],["#FdTitaTxtNo+交易序號",#TitaTxtNo],
 ["#FdOvduDate+轉催收日",#OvduDate],["#FdOvduNo+轉催編號",#OvduNo],
-["#FdCommericalFlag+住宅險改商業險註記",#CommericalFlag],
+["#FdCommericalFlag+險種註記",#CommericalFlag,#CommericalFlagX],
 [#<->#,"#FdRemark+備註",#Remark],
 ]
 
@@ -94,14 +94,21 @@ T(3,CdCode.InsuTypeCode)
 
 #InsuTypeCodeHelp=x,1024,S
 
+![險種註記]
+#CDDEF03=x,26,S
+T(3,CdCode.CommericalFlag)
+
+#CommericalFlagHelp=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@InsuCompanyHelp,#HelpDesc1)
 T(2,@InsuTypeCodeHelp,#HelpDesc2)
-
+T(2,@CommericalFlagHelp,#HelpDesc3)
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -559,9 +566,14 @@ T(3,@StatusCodeX, ))
 !轉催編號
 #OvduNo=A,10,L
 
-#CommericalFlag=X,1,I
+#CommericalFlag=X,2,I
 C(2,#FunctionCode,s,$,$,s,s,s)
-@V(3, ,Y)
+HELP(#CommericalFlagHelp)
+@C(4,#CommericalFlag,$,V(H,#CommericalFlagHelp))
+
+#CommericalFlagX=X,30,L
+C(4,#CommericalFlag,S,$)
+T(H,#CommericalFlag,#CommericalFlagHelp)
 
 #Remark=X,50,I
 C(2,#FunctionCode,s,$,$,s,s,s)

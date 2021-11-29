@@ -5016,7 +5016,7 @@ TXFORM=L4R17
 #L4r18RenewCodeX=x,4,S
 #L4r18InsuCompany=A,2,S
 #L4r18InsuTypeCode=A,2,S
-#L4r18CommericalFlag=X,1,S
+#L4r18CommericalFlag=X,2,S
 #L4r18Remark=X,50,S
 </L4R18.dec>
 
@@ -5143,7 +5143,7 @@ TXFORM=L4R24
 #L4r25EthqInsuPrem=m,14,S
 #L4r25InsuStartDate=D,7,S
 #L4r25InsuEndDate=D,7,S
-#L4r25CommericalFlag=X,1,S
+#L4r25CommericalFlag=X,2,S
 #L4r25Remark=X,50,S
 </L4R25.dec>
 

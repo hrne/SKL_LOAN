@@ -340,10 +340,6 @@ C(3,#CHAIN,1,s,$)
 C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
 
-#TNo=A,1,S
-C(3,#RPTFG2,1,T(3,@RPTFG2,3),$)
-C(3,#RPTFG2,2,T(3,@RPTFG2,4),$)
-
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -452,6 +448,7 @@ CALL2(#AdjustDate,#OEffectDate3,#OEffectDate3X)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
+
 #OOFacmNo=A,3,O
 
 #OOBormNo=A,3,O
@@ -506,6 +503,8 @@ T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo)
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3912; ntxbuf=#OOBUF1})
 
+
+
 </sub>
 
 
@@ -552,7 +551,7 @@ TXFORM=L3911
 #RPTFG2=1,QUERY.GRID,L3911
 #any={detail:true, header:'L3911.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN1=
+#OOBTN1=內容查詢
 {width:80,search:false,formatter:'cust:bind-button:內容查詢;L3912 交易內容查詢',align:'center',canExport:false}
 
 #OOFacmNo=額度編號 
@@ -584,6 +583,10 @@ TXFORM=L3911
 
 #OORepayCodeX=還款來源
 {width:170}
+
+#OCustNo=
+{width:1,hidden:true}
+
 
 ^
 
@@ -620,73 +623,8 @@ TXFORM=L3911
 #OORepayCodeX=還款來源
 {width:170}
 
-^
-
-
-#RPTFG2=3,QUERY.GRID,L3911
-#any={detail:true, header:'L3911.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
-
-#OOBTN1=內容查詢
-{width:80,search:false,formatter:'cust:bind-button:內容查詢;L3912 交易內容查詢',align:'center',canExport:false}
-
-#OOFacmNo=額度編號 
-{width:85,align:'center'}
-
-#OOEntryDate=入帳日
-{width:85,align:'center'}
-
-#OOIntStartDate=計息起日
-{width:85,align:'center'}
-
-#OOIntEndDate=計息迄日
-{width:85,align:'center'}
-
-#OOCurrencyCode=幣別 
-{width:50,align:'center'}
- 
-#OOTxAmtX=交易金額
-{width:170}
-
-#OOShortFallX=溢短收
-{width:170}
-
-#OOBreachAmtX=違約金
-{width:170}
-
-#OORepayCodeX=還款來源
-{width:170}
-
-^
-
-#RPTFG2=4,QUERY.GRID,L3911
-#any={detail:true, header:'L3911.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
-
-#OOFacmNo=額度編號 
-{width:85,align:'center'}
-
-#OOEntryDate=入帳日
-{width:85,align:'center'}
-
-#OOIntStartDate=計息起日
-{width:85,align:'center'}
-
-#OOIntEndDate=計息迄日
-{width:85,align:'center'}
-
-#OOCurrencyCode=幣別 
-{width:50,align:'center'}
- 
-#OOTxAmtX=交易金額
-{width:170}
-
-#OOShortFallX=溢短收
-{width:170}
-
-#OOBreachAmtX=違約金
-{width:170}
-
-#OORepayCodeX=還款來源
-{width:170}
+#OCustNo=
+{width:1,hidden:true}
 
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L3911;cpi=15"/>

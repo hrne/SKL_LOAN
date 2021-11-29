@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LB085ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.L8ConstantEum;
 import com.st1.itx.util.common.MakeFile;
 
 import java.util.Date;
@@ -86,8 +87,9 @@ public class LB085Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B085", "帳號轉換資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B085-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("02-23895858#7279", 16, ' ')
-					+ makeFile.fillStringR("審查單位聯絡人－鄧雪美", 67, ' ');
+			strContent = "JCIC-DAT-B085-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 67, ' ');
 			makeFile.put(strContent);
 
 			// 欄位內容

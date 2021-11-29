@@ -56,6 +56,12 @@ public interface LoanBorTxRepositoryDay extends JpaRepository<LoanBorTx, LoanBor
   // AcDate >= ,AND AcDate <= ,AND TitaHCode ^i
   public Slice<LoanBorTx> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndTitaHCodeInOrderByAcDateAscCustNoAscFacmNoAscBormNoAscBorxNoAsc(int acDate_0, int acDate_1, List<String> titaHCode_2, Pageable pageable);
 
+  // CustNo = ,AND FacmNo = ,AND BormNo >= ,AND BormNo <= ,AND IntEndDate = ,AND TitaHCode ^i 
+  public Slice<LoanBorTx> findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int intEndDate_4, List<String> titaHCode_5, Pageable pageable);
+
+  // CustNo = ,AND FacmNo = ,AND BormNo >= ,AND BormNo <= ,AND EntryDate = ,AND IntStartDate = ,AND IntEndDate = ,AND AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
+  public Slice<LoanBorTx> findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int entryDate_4, int intStartDate_5, int intEndDate_6, int acDate_7, String titaTlrNo_8, String titaTxtNo_9, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

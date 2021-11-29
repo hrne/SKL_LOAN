@@ -14,8 +14,8 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankRemit;
-import com.st1.itx.db.domain.CdBank;
-import com.st1.itx.db.domain.CdBankId;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
@@ -31,7 +31,6 @@ import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BankRemitFileVo;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.report.RemitForm;
 
@@ -128,23 +127,20 @@ public class L4102 extends TradeBuffer {
 
 		int unReleaseCnt = 0;
 		for (BankRemit t : slBankRemit.getContent()) {
-			//作業項目為1.撥款時把退款篩選掉
+			// 作業項目為1.撥款時把退款篩選掉
 			if (iItemCode == 1) {
-				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5
-						|| t.getDrawdownCode() == 11) {
+				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
 					continue;
 				}
 			}
 
-			//作業項目為2.退款時把撥款篩選掉
+			// 作業項目為2.退款時把撥款篩選掉
 			if (iItemCode == 2) {
 				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
 					continue;
 				}
 			}
-			
-			
-			
+
 			if (t.getActFg() == 1) {
 				unReleaseCnt++;
 				unReleaselBankRemit.add(t);
@@ -152,7 +148,7 @@ public class L4102 extends TradeBuffer {
 				lBankRemit.add(t);
 			}
 		}
-		
+
 		if (unReleaselBankRemit != null) {
 
 			// tota 未放行清單
@@ -162,8 +158,7 @@ public class L4102 extends TradeBuffer {
 
 			this.addList(totaB);
 		}
-		
-		
+
 		if (lBankRemit.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
@@ -183,37 +178,42 @@ public class L4102 extends TradeBuffer {
 
 		OccursList occursList = new OccursList();
 
-		occursList.putParam("OOAcDate", t.getAcDate());
-		occursList.putParam("OOBatchNo", t.getBatchNo());
-		occursList.putParam("OODrawdownCode", t.getDrawdownCode());
-		occursList.putParam("OOStatusCode", t.getStatusCode());
-		occursList.putParam("OORemitBank", t.getRemitBank());
-		occursList.putParam("OORemitBranch", t.getRemitBranch());
+//		戶號 戶名 經辦 交易時間
 
-		CdBank tCdBank = new CdBank();
-		if (!t.getRemitBranch().isEmpty()) {
-			tCdBank = cdBankService.findById(new CdBankId(t.getRemitBank(), t.getRemitBranch()), titaVo);
-		}
-		String ckItem = "";
-		String brItem = "";
-
-		if (tCdBank != null) {
-			ckItem = tCdBank.getBankItem();
-			brItem = tCdBank.getBranchItem();
+		occursList.putParam("OOCustNo", t.getCustNo()); // 戶號
+		occursList.putParam("OOFacmNo", t.getFacmNo()); // 額度
+		occursList.putParam("OOBormNo", t.getBormNo()); // 撥款
+		CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
+		if (tCustMain != null) {
+			occursList.putParam("OOCustName", t.getBormNo()); // 戶名
+		} else {
+			occursList.putParam("OOCustName", ""); // 戶名
 		}
 
-		occursList.putParam("OORemitBankX", ckItem);
-		occursList.putParam("OORemitBranchX", brItem);
-		occursList.putParam("RemitAcctNo", t.getRemitAcctNo());
-		occursList.putParam("OOCustNo", t.getCustNo());
-		occursList.putParam("OOFacmNo", t.getFacmNo());
-		occursList.putParam("OOBormNo", t.getBormNo());
-		occursList.putParam("OOCustName", FormatUtil.padX("" + t.getCustName(), 20));
-		occursList.putParam("OORemaker", t.getRemark());
-		occursList.putParam("OOCurrencyCode", t.getCurrencyCode());
-		occursList.putParam("OORemitAmt", t.getRemitAmt());
-
+		// 查詢員工資料檔
+		if (!"".equals(t.getTitaTlrNo())) {
+			CdEmp tCdEmp = cdEmpService.findById(t.getTitaTlrNo(), titaVo);
+			if (tCdEmp == null) {
+				occursList.putParam("OOTlrNo", t.getTitaTlrNo());
+				occursList.putParam("OOTlrNoX", "");
+			} else {
+				occursList.putParam("OOTlrNo", t.getTitaTlrNo());// 經辦
+				occursList.putParam("OOTlrNoX", tCdEmp.getFullname());
+			}
+		} else {
+			occursList.putParam("OOTlrNo", "");
+			occursList.putParam("OOTlrNoX", "");
+		}
+		if (t.getLastUpdate() != null && t.getLastUpdate().toString().length() >= 19) {
+			occursList.putParam("OOLastUpdateTime", dbDateToRocTime(t.getLastUpdate().toString()));// 交易時間
+		} else {
+			occursList.putParam("OOLastUpdateTime", 0);// 交易時間
+		}
 		totaB.addOccursList(occursList);
 	}
 
+	private String dbDateToRocTime(String dbDate) {
+
+		return dbDate.substring(11, 19);
+	}
 }

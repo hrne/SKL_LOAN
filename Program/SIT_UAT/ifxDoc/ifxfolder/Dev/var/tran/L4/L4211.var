@@ -68,7 +68,7 @@ E(0,@EntryDate,#SYSDATE)
 
 #ReconCode=X,3,I
 @
-C(4,#ReconCode,$,V(3,V1,V2,V3,V4,V5,V6,V7))
+C(4,#ReconCode,$,V(3,A1,A2,A3,A4,A5,A6,A7))
 
 </sub>
 

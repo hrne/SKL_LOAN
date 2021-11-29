@@ -13,10 +13,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuRenew;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.InsuOrignalService;
@@ -58,6 +60,9 @@ public class L4962 extends TradeBuffer {
 	@Autowired
 	public L4962ServiceImpl l4962ServiceImpl;
 
+	@Autowired
+	public CdCodeService sCdCodeDefService;
+	
 	@Autowired
 	public TotaVo totaA;
 
@@ -196,7 +201,7 @@ public class L4962 extends TradeBuffer {
 		}
 		
 		
-		if ("Y".equals(CommericalFlag)) {
+		if (!"N".equals(CommericalFlag)) {
 			
 			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit, titaVo);
 
@@ -204,12 +209,19 @@ public class L4962 extends TradeBuffer {
 			
 			if (lInsuRenew != null && lInsuRenew.size() != 0) {
 				for (InsuRenew tInsuRenew : lInsuRenew) {
-					if("Y".equals(tInsuRenew.getCommericalFlag())) {
+					if("01".equals(tInsuRenew.getCommericalFlag())) {  // 01 住宅險改商業險
 						totaC.init(titaVo);
 						if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
-							errorReportC(tInsuRenew, 1);
+							errorReportC(tInsuRenew, 1, titaVo);
 						} else if (tInsuRenew.getAcDate() == 0) {
-							errorReportC(tInsuRenew, 2);
+							errorReportC(tInsuRenew, 2, titaVo);
+						}
+					} else if(!"".equals(tInsuRenew.getCommericalFlag())) { // 00 全部
+						totaC.init(titaVo);
+						if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
+							errorReportC(tInsuRenew, 1, titaVo);
+						} else if (tInsuRenew.getAcDate() == 0) {
+							errorReportC(tInsuRenew, 2, titaVo);
 						}
 					}
 					
@@ -296,7 +308,7 @@ public class L4962 extends TradeBuffer {
 	}
 	
 	
-	private void errorReportC(InsuRenew tInsuRenew, int errorFlag) {
+	private void errorReportC(InsuRenew tInsuRenew, int errorFlag, TitaVo titaVo) {
 		cntC = cntC + 1;
 
 		CustMain tCustMain = new CustMain();
@@ -304,6 +316,19 @@ public class L4962 extends TradeBuffer {
 
 		OccursList occursListReport = new OccursList();
 		occursListReport.putParam("ReportCInsuEndMonth", tInsuRenew.getInsuYearMonth());
+		
+		List<CdCode> lCdCode = null;
+		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("CommericalFlag", "%", this.index, this.limit, titaVo);
+		lCdCode = slCdCode == null ? null : slCdCode.getContent();
+		
+		String CommericalFlag = tInsuRenew.getCommericalFlag();
+		String CommericalFlagX = "";
+		for(CdCode tCdCode :lCdCode) {
+			if(CommericalFlag.equals(tCdCode.getCode())) {
+				CommericalFlagX = tCdCode.getItem();
+			}
+		}
+		occursListReport.putParam("ReportCCommericalFlagX", CommericalFlagX);
 		occursListReport.putParam("ReportCPrevInsuNo", tInsuRenew.getPrevInsuNo());
 		occursListReport.putParam("ReportCCustNo", tInsuRenew.getCustNo());
 		occursListReport.putParam("ReportCFacmNo", tInsuRenew.getFacmNo());
@@ -354,6 +379,20 @@ public class L4962 extends TradeBuffer {
 		
 		OccursList occursListReport = new OccursList();
 		occursListReport.putParam("ReportCInsuEndMonth", (tInsuOrignal.getInsuEndDate() / 100) + 191100);
+		
+		List<CdCode> lCdCode = null;
+		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("CommericalFlag", "%", this.index, this.limit, titaVo);
+		lCdCode = slCdCode == null ? null : slCdCode.getContent();
+		
+		String CommericalFlag = tInsuOrignal.getCommericalFlag();
+		String CommericalFlagX = "";
+		for(CdCode tCdCode :lCdCode) {
+			if(CommericalFlag.equals(tCdCode.getCode())) {
+				CommericalFlagX = tCdCode.getItem();
+			}
+		}
+		
+		occursListReport.putParam("ReportCCommericalFlagX", CommericalFlagX);
 		occursListReport.putParam("ReportCPrevInsuNo", tInsuOrignal.getOrigInsuNo());
 		occursListReport.putParam("ReportCCustNo", custno);
 		occursListReport.putParam("ReportCFacmNo", facmno);

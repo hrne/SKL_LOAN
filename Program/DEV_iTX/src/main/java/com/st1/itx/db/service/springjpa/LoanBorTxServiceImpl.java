@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.LoanBorTxRepositoryHist;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -391,6 +392,62 @@ em = null;
   }
 
   @Override
+  public Slice<LoanBorTx> findIntEndDateEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int intEndDate_4, List<String> titaHCode_5, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanBorTx> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findIntEndDateEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " bormNo_3 : " +  bormNo_3 + " intEndDate_4 : " +  intEndDate_4 + " titaHCode_5 : " +  titaHCode_5);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
+    else 
+      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<LoanBorTx> findFacmNoEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int entryDate_4, int intStartDate_5, int intEndDate_6, int acDate_7, String titaTlrNo_8, String titaTxtNo_9, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanBorTx> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findFacmNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " bormNo_3 : " +  bormNo_3 + " entryDate_4 : " +  entryDate_4 + " intStartDate_5 : " +  intStartDate_5 + " intEndDate_6 : " +  intEndDate_6 + " acDate_7 : " +  acDate_7 + " titaTlrNo_8 : " +  titaTlrNo_8 + " titaTxtNo_9 : " +  titaTxtNo_9);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
+    else 
+      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public LoanBorTx holdById(LoanBorTxId loanBorTxId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -434,7 +491,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + loanBorTx.getLoanBorTxId());
     if (this.findById(loanBorTx.getLoanBorTxId()) != null)
       throw new DBException(2);
@@ -463,7 +522,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + loanBorTx.getLoanBorTxId());
     if (!empNot.isEmpty())
       loanBorTx.setLastUpdateEmpNo(empNot);
@@ -486,7 +547,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + loanBorTx.getLoanBorTxId());
     if (!empNot.isEmpty())
       loanBorTx.setLastUpdateEmpNo(empNot);
@@ -536,7 +599,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (LoanBorTx t : loanBorTx){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -570,7 +636,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (loanBorTx == null || loanBorTx.size() == 0)
       throw new DBException(6);

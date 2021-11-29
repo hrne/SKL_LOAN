@@ -1943,6 +1943,7 @@ T(2,1+#ClCode1+#ClCode2+#ClNo)
 #button3=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L4610; ntxbuf=#BUF3})ASGN(BTN_NEW3$)
 C(3,#FunCd,1,$,S)
+C(3,#ClCode1,1,$,S)
 K(MODIFYBUTTON,3,保險單)
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------

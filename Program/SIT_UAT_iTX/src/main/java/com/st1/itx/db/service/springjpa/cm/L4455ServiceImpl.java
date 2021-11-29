@@ -306,7 +306,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql +=  "     SELECT COUNT(1) AS \"Counts\"" ; 
 			sql +=  "          , SUM(BKD.\"RepayAmt\") AS \"Total\"" ; 
 			sql +=  "     FROM \"BankDeductDtl\" BKD" ; 
-			sql +=  "     WHERE NVL(BKD.\"ReturnCode\",' ') != ' '" ; 
+			sql +=  "     WHERE NVL(BKD.\"ReturnCode\",'00') != '00'" ; 
 			sql +=  "       AND BKD.\"EntryDate\" = :inputEntryDate" ; 
 			sql +=  "  )" ; 
 			sql +=  "  , BKDCustNo AS (" ; 

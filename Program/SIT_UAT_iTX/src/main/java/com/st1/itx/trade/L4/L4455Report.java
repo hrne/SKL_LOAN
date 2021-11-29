@@ -125,7 +125,11 @@ public class L4455Report extends MakeReport {
 //		月/日/年(西元後兩碼)
 		this.print(-2, 203, "日　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 1, "報　表：" + "L4455Report");
-		this.print(-3, 95, "ACH 扣款總傳票明細表", "C");
+		if(!"700".equals(repaybank)) {
+		  this.print(-3, 95, "郵局扣款總傳票明細表", "C");
+		} else {
+		  this.print(-3, 95, "ACH 扣款總傳票明細表", "C");
+		}
 		this.print(-3, 203, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 185, "頁　數：");
 		this.print(-4, 200, ""+this.getNowPage(),"R");
@@ -497,7 +501,7 @@ public class L4455Report extends MakeReport {
 		}
 		
 		if(totPrincipal.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 97, df1.format(totPrincipal), "R");// 本金
+		  this.print(0, 103, df1.format(totPrincipal), "R");// 本金
 		}
 			
 		if(totInterest.compareTo(new BigDecimal("0")) != 0) { // 0不顯示

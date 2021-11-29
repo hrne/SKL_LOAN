@@ -113,6 +113,35 @@ public class L5912Report extends MakeReport {
 		//明細
 		makeExcel.setSheet("L5912", "明細");
 		for (String content : header) {
+			makeExcel.setFontType(1);
+			switch(hcol+1) {
+			case 4:
+				makeExcel.setColor("Blue");
+				break;
+			case 5:
+				makeExcel.setBackGroundColor("Orange");
+				makeExcel.setColor("White");
+				break;
+			case 7:
+				makeExcel.setBackGroundColor("Green");
+				makeExcel.setColor("White");
+				break;
+			case 8:
+				makeExcel.setBackGroundColor("Orange");
+				makeExcel.setColor("White");
+				break;
+			case 9:
+				makeExcel.setBackGroundColor("Green");
+				makeExcel.setColor("White");
+				break;
+			case 10:
+				makeExcel.setBackGroundColor("Green");
+				makeExcel.setColor("White");
+				break;
+			default:
+				makeExcel.setBackGroundColor("Grey");
+				break;
+			}
 			makeExcel.setValue(row, hcol + 1, content);
 			hcol++;
 		}
@@ -131,7 +160,8 @@ public class L5912Report extends MakeReport {
 					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("BormNo")));
 					break;
 				case 3:
-					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("DrawdownAmt")));
+					makeExcel.setColor("Blue");
+					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("DrawdownAmt")),"#,##0");
 					break;	
 				case 4:
 					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("DrawdownDate"))-19110000);
@@ -155,6 +185,7 @@ public class L5912Report extends MakeReport {
 				}
 			}
 		}
+		
 		//報表
 		// 列數
 		row = 1;

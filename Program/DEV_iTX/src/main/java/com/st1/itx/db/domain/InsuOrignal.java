@@ -88,7 +88,7 @@ public class InsuOrignal implements Serializable {
   private int insuEndDate = 0;
 
   // 住宅險改商業險註記
-  @Column(name = "`CommericalFlag`", length = 1)
+  @Column(name = "`CommericalFlag`", length = 2)
   private String commericalFlag;
 
   // 備註

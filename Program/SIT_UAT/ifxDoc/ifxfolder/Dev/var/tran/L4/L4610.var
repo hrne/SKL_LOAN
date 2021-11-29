@@ -30,7 +30,7 @@ E(0,0)
 ["#FdFireInsuCovrg+火災險保險金額",#FireInsuCovrg,#FireInsuCovrgL],["#FdFireInsuPrem+火災險保費",#FireInsuPrem,#FireInsuPremL],
 ["#FdEthqInsuCovrg+地震險保險金額",#EthqInsuCovrg,#EthqInsuCovrgL],["#FdEthqInsuPrem+地震險保費",#EthqInsuPrem,#EthqInsuPremL],
 ["#FdInsuStartDate+保險起日",#InsuStartDate],["#FdInsuEndDate+保險迄日",#InsuEndDate],
-[#<->#,"#FdCommericalFlag+住宅險改商業險註記",#CommericalFlag],
+[#<->#,"#FdCommericalFlag+險種註記",#CommericalFlag,#CommericalFlagX],
 [#<->#,"#FdRemark+備註",#Remark],
 ]
 
@@ -96,15 +96,22 @@ T(3,CdCode.ClCode1)
 
 #ClCode1Help=x,1024,S
 
+![險種註記]
+#CDDEF05=x,26,S
+T(3,CdCode.CommericalFlag)
+
+#CommericalFlagHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClCode2Help,#HelpDesc1)
 T(2,@InsuCompanyHelp,#HelpDesc2)
 T(2,@InsuTypeCodeHelp,#HelpDesc3)
 T(2,@ClCode1Help,#HelpDesc4)
+T(2,@CommericalFlagHelp,#HelpDesc5)
 
 #FunctionHelp=x,50,S
 T(3,1:新增;2:修改;4:刪除;5:查詢)
@@ -391,10 +398,15 @@ A(4,0,#InsuEndDate)
 #InsuEndDateL=D,7,L
 
 
-#CommericalFlag=X,1,I
+#CommericalFlag=X,2,I
 C(2,#FunctionCode,s,$,$,s,s,s)
-@V(3, ,Y)
+HELP(#CommericalFlagHelp)
+@C(4,#CommericalFlag,$,V(H,#CommericalFlagHelp))
 
+
+#CommericalFlagX=X,30,L
+C(4,#CommericalFlag,S,$)
+T(H,#CommericalFlag,#CommericalFlagHelp)
 
 #Remark=X,50,I
 C(2,#FunctionCode,s,$,$,s,s,s)

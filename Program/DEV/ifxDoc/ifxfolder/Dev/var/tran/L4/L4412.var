@@ -156,7 +156,7 @@ T(3,)T(H,#StampCode,#StampCodeHelp)
 T(3,)T(H,#AuthErrorCode,#AuthErrorCodeHelp)
 #PostMediaCodeX=X,10,L
 T(3,)T(H,#PostMediaCode,#MediaCodeHelp)
-#AmlRspX=X,20,L
+#AmlRspX=X,30,L
 T(3,)T(H,#AmlRsp,#AmlRspHelp)
 
 !授權已成功記號 授權狀態為00時set 1 否則 0

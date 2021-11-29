@@ -410,7 +410,8 @@ T(2,#OOCustNo)
 
 #OOBTN15=X,1,S
 C(2,#OOGraceConditionFg,BIND(grid,{ cmd=CHAIN; ntxcd=L5906; text=未設定; ntxbuf=#OOBUF15}),
-BIND(grid,{ cmd=CHAIN; ntxcd=L5906;text=已設定; ntxbuf=#OOBUF15}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L5906;text=控管; ntxbuf=#OOBUF15}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L5906;text=不控管; ntxbuf=#OOBUF15}),
 BIND(grid,cancel))
 
 !變更修改

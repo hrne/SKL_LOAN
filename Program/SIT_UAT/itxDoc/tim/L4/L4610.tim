@@ -60,5 +60,5 @@ FireInsuPrem=9,14
 EthqInsuPrem=9,14
 InsuStartDate=9,7
 InsuEndDate=9,7
-CommericalFlag=X,1
+CommericalFlag=X,2
 Remark=X,50

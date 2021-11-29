@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * L5811
@@ -41,6 +43,9 @@ public class L5811 extends TradeBuffer {
 	@Autowired
 	L5811ServiceImpl l5811ServiceImpl;
 
+	@Autowired
+	Parse parse;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5811 ");
@@ -91,8 +96,8 @@ public class L5811 extends TradeBuffer {
 
 			makeExcel.setValue(i, 26, result.get("F17"));// 戶號
 			makeExcel.setValue(i, 27, result.get("F18"));// 額度
-
-			makeExcel.setValue(i, 28, Integer.parseInt(result.get("F24")), "#,##0"); // 初貸金額
+			BigDecimal LoanAmt = parse.stringToBigDecimal(result.get("F24"));
+			makeExcel.setValue(i, 28, LoanAmt, "#,##0"); // 初貸金額
 			if (Integer.parseInt(result.get("F25")) <= 0) { // 貸款起日
 				makeExcel.setValue(i, 29, "0");
 			} else {
@@ -103,8 +108,8 @@ public class L5811 extends TradeBuffer {
 			} else {
 				makeExcel.setValue(i, 30, result.get("F26"));
 			}
-
-			makeExcel.setValue(i, 31, Integer.parseInt(result.get("F27")), "#,##0");// 本期未償還本金額
+			BigDecimal LoanBal = parse.stringToBigDecimal(result.get("F27"));
+			makeExcel.setValue(i, 31, LoanBal, "#,##0");// 本期未償還本金額
 
 			if (Integer.parseInt(result.get("F28")) <= 0) {// 繳息所屬年月(起)
 				makeExcel.setValue(i, 32, "0");
@@ -117,8 +122,8 @@ public class L5811 extends TradeBuffer {
 			} else {
 				makeExcel.setValue(i, 33, result.get("F29"));
 			}
-
-			makeExcel.setValue(i, 34, Integer.parseInt(result.get("F30")), "#,##0");// 繳息金額
+			BigDecimal YearlyInt = parse.stringToBigDecimal(result.get("F30"));
+			makeExcel.setValue(i, 34, YearlyInt, "#,##0");// 繳息金額
 			makeExcel.setValue(i, 35, result.get("F31"));// 科子細目代號暨說明
 
 			i++;

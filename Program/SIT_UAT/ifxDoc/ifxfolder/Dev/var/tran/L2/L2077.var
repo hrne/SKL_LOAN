@@ -321,7 +321,13 @@ C(3,#OOFunCode,2,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOB
 C(3,#OOFunCode,3,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOBTN6; ntxbuf=#OOBUF6}),$),$)
 C(3,#OOReceiveFg,1,BIND(grid,cancel),$)
 
+#18sp=X,18,S
 
+#OOBUF1=X,61,S
+T(2,0010101+9991231+L2632+#18sp+#OOCustNo+#OOFacmNo+000)
+
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L6932;text=歷程 ;ntxbuf=#OOBUF1})
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -390,6 +396,9 @@ TXFORM=L2077
 
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+
+#OOBTN1=歷程
+{width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
 
 #OOTranDate=入帳日期
 {width:100,align:'center'}

@@ -496,11 +496,16 @@ public class L1001 extends TradeBuffer {
 			CustTleNoBTNFg = 2;
 		}
 		
-		//寬限條件控管 0:未設定; 1:已設定
+		//寬限條件控管 0:未設定; 1:Y;2:N
 		if (!custDataControl) {
-			Slice<GraceCondition> sGraceConditon = iGraceConditionService.custNoEq(aCustMain.getCustNo(),aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
-			if (sGraceConditon != null) {
-				iGraceCondition = 1;
+			Slice<GraceCondition> sGraceCondition = iGraceConditionService.custNoEq(aCustMain.getCustNo(),aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			if (sGraceCondition != null) {
+				iGraceCondition = 2;
+				for (GraceCondition rGraceCondition :sGraceCondition) {
+					if (!rGraceCondition.getActUse().trim().isEmpty() && rGraceCondition.getActUse().equals("Y")) {
+						iGraceCondition = 1;
+					}
+				}
 			}
 		}
 		

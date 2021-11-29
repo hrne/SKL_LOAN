@@ -27,10 +27,26 @@ T(3,Y: ;N: )
 ["[L4962]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@保險單資料檢核作業"],
 [#<->#,"#FdFlagA+檢核表類別",#FlagA,"保費、保單未完成檢核表(1.無新保單 2.保費未入帳)","@@@火險到期年月",#InsuEndMonthFrom,"~",#InsuEndMonthTo],
 [#<->#,"@",#FlagB,"額度無保單檢核表(1.無保單 2.已到期)"],
-[#<->#,"@",#CommericalFlag,"住宅險改商業險註記","@@@火險到期年月",#InsuEndMonthFrom1,"~",#InsuEndMonthTo1],
+[#<->#,"@",#CommericalFlag,"險種註記",#CommericalFlagX,"@@@火險到期年月",#InsuEndMonthFrom1,"~",#InsuEndMonthTo1],
 ]
 
 #FdFlagA=X,2,L
+
+!Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![險種註記]
+#CDDEF01=x,26,S
+T(3,CdCode.CommericalFlag)
+
+#CommericalFlagHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CommericalFlagHelp,#HelpDesc1)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -53,10 +69,12 @@ HELP(#YnH)
 ! 火險到期年月
 #InsuEndMonthFrom=A,5,I
 C(5,#FlagA,Y,$,S)
+T(1,@InsuEndMonthFrom,#SYSDATE,2,5)
 @A(YM,1,#InsuEndMonthFrom)
 
 #InsuEndMonthTo=A,5,I
 C(5,#FlagA,Y,$,S)
+T(1,@InsuEndMonthTo,#SYSDATE,2,5)
 @A(YM,1,#InsuEndMonthTo)
 IF(#InsuEndMonthTo<#InsuEndMonthFrom,V(P,訖年月不可小於起年月),$)
 
@@ -66,18 +84,28 @@ T(2,Y)
 HELP(#YnH)
 @V(H,#YnH)
 
-#CommericalFlag=X,1,I
-T(2,Y)
-HELP(#YnH)
-@V(H,#YnH)
+#TCommericalFlagHelp=x,1024,S
+T(2,N:不產生;00:全部;+#CommericalFlagHelp)
+
+
+#CommericalFlag=X,2,I
+T(2,01)
+HELP(#TCommericalFlagHelp)
+@V(H,#TCommericalFlagHelp)
+
+#CommericalFlagX=X,30,L
+C(4,#CommericalFlag,S,$)
+T(H,#CommericalFlag,#TCommericalFlagHelp)
 
 ! 火險到期年月
 #InsuEndMonthFrom1=A,5,I
-C(5,#CommericalFlag,Y,$,S)
+C(3,#CommericalFlag,1,$,S)
+T(1,@InsuEndMonthFrom1,#SYSDATE,2,5)
 @A(YM,1,#InsuEndMonthFrom1)
 
 #InsuEndMonthTo1=A,5,I
-C(5,#CommericalFlag,Y,$,S)
+C(3,#CommericalFlag,1,$,S)
+T(1,@InsuEndMonthTo1,#SYSDATE,2,5)
 @A(YM,1,#InsuEndMonthTo1)
 IF(#InsuEndMonthTo1<#InsuEndMonthFrom1,V(P,訖年月不可小於起年月),$)
 
@@ -192,6 +220,7 @@ C(3,#OCntC,0,E(0,@L462CPRT,0),E(0,@L462CPRT,1))
 #L462C_LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
 #ReportCInsuEndMonth=A,6,O
+#ReportCCommericalFlagX=X,30,O
 #ReportCPrevInsuNo=X,20,O
 #ReportCCustNo=A,7,O
 #ReportCFacmNo=A,3,O
@@ -221,6 +250,7 @@ E(0,@L462BPRT,0)
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L462A
 #OCntA
 #ReportAInsuEndMonth
@@ -252,6 +282,7 @@ TXFORM=L462B
 TXFORM=L462C
 #OCntC
 #ReportCInsuEndMonth
+#ReportCCommericalFlagX
 #ReportCPrevInsuNo
 #ReportCCustNo
 #ReportCFacmNo
@@ -300,6 +331,7 @@ TXFORM=L462C
 #L462CPRT=1,L462C,NA,,D,15
 %
 #ReportCInsuEndMonth
+#ReportCCommericalFlagX
 #ReportCPrevInsuNo
 #ReportCCustNo
 #ReportCFacmNo
