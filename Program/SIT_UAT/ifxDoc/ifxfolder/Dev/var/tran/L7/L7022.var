@@ -49,9 +49,9 @@ K(MODIFYBUTTON,查詢)
 ["[L7022]                                 違約損失率檔查詢"],
 ["#FdDateStart+生效日期",#DateStart,"@～@",#DateEnd],
 ["#FdType+類別",#Type],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -72,8 +72,8 @@ T(4,CHAIN$)
 #NTXBUF=X,4,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
-!#RPTFG=A,1,S
-!E(0,0)
+#RPTFG=A,1,S
+E(0,0)
 
 #DATE=D,8,S
 T(4,DATE$)
@@ -95,7 +95,7 @@ C(4,#DateEnd,$,V(5,#DateStart,9991231))
 ! 類別
 #Type=A,2,I
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 </sub>
 

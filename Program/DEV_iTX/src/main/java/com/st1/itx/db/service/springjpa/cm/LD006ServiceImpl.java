@@ -30,8 +30,8 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(int entDy, String workSeason, TitaVo titaVo) throws Exception {
-		this.info("lD006.findAll entDy = " + entDy + " , workSeason = " + workSeason);
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+		this.info("lD006.findAll WorkMonthStart = " + titaVo.getParam("workMonthStart") + " ; " + titaVo.getParam("workMonthEnd"));
 
 		String sql = "";
 		sql += " SELECT B0.\"UnitItem\" AS \"BsDeptItem\""; // 部室中文(房貸專員)
@@ -55,9 +55,9 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // 區經理姓名(介紹人)
-		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", IGroup.\"PerfEqAmt\") AS \"PerfEqAmt\" ";   // 換算業績 - 參考樣張輸出, 同額度的三項業績金額為 Group By FacmNo
-		sql += "       ,NVL(PIDA.\"AdjPerfReward\", IGroup.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬   因此 IGroup 以 FacmNo 作 Group
-		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", IGroup.\"PerfAmt\") AS \"PerfAmt\" ";       // 業績金額   PIDA 只到額度層
+		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", IGroup.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 - 參考樣張輸出, 同額度的三項業績金額為 Group By FacmNo
+		sql += "       ,NVL(PIDA.\"AdjPerfReward\", IGroup.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 因此 IGroup 以 FacmNo 作 Group
+		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", IGroup.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額 PIDA 只到額度層
 		sql += " FROM \"PfItDetail\" I";
 		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\"    = I.\"PerfDate\""; // 取房貸專員
 		sql += "                           AND B.\"CustNo\"      = I.\"CustNo\"";
@@ -93,13 +93,14 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
 		sql += " WHERE I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		sql += "   AND I.\"DrawdownAmt\" > 0 ";
-		//		sql += "   AND NVL(B0.\"UnitItem\", ' ') != ' ' "; PfDetailCom 取 FacMain.BusinessOfficer, 此欄位不一定會填入房貸專員的員編, 串得到部室中文才是房貸專員
-		//                                                         20211117 依eric指示先disable
+		// sql += " AND NVL(B0.\"UnitItem\", ' ') != ' ' "; PfDetailCom 取
+		// FacMain.BusinessOfficer, 此欄位不一定會填入房貸專員的員編, 串得到部室中文才是房貸專員
+		// 20211117 依eric指示先disable
 		sql += "   AND NVL(I.\"Introducer\", ' ') != ' ' "; // PfItDetail 存在介紹人為 Null 的資料
 		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=FRENCH') ";
 		sql += "         ,NLSSORT(I.\"DistCode\", 'NLS_SORT=FRENCH') ";
 		sql += "         ,NLSSORT(I.\"UnitCode\", 'NLS_SORT=FRENCH') "; // 原表排序用到這三個欄位, 但原環境會將英文排在數字前面;
-		sql += "         ,I.\"CustNo\" ";                               // 這裡利用 NLSSORT 取法語環境排序方式, 確保排序順序上英文先於數字
+		sql += "         ,I.\"CustNo\" "; // 這裡利用 NLSSORT 取法語環境排序方式, 確保排序順序上英文先於數字
 		sql += "         ,I.\"FacmNo\" ";
 		sql += "         ,I.\"BormNo\" ";
 		this.info("sql=" + sql);

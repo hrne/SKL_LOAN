@@ -184,9 +184,17 @@ public class L5801Report extends MakeReport {
 				makeExcel.setValue(printRow, 12, CityItem, fontStyleVo);
 
 				
-				
 				// F13 註記
-				String Remark = mapL5801.get("F13");
+				String SellerName = mapL5801.get("F13");
+
+				makeExcel.setValue(printRow, 13, SellerName, fontStyleVo);
+				// F14 註記
+				String SellerId = mapL5801.get("F14");
+
+				makeExcel.setValue(printRow, 14, SellerId, fontStyleVo);
+				
+				// F15 註記
+				String Remark = mapL5801.get("F15");
 
 				makeExcel.setValue(printRow, 15, Remark, fontStyleVo);
 				printRow++;

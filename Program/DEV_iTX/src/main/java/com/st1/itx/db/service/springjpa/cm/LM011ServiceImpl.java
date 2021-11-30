@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
@@ -27,13 +26,8 @@ public class LM011ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@Autowired
-	Parse parse;
-
-	public List<Map<String, String>> findAll(int bcYear, int drawdownFg, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int entYearMonth, int drawdownFg, TitaVo titaVo) throws Exception {
 		this.info("lM011.findAll ");
-
-		String entdy = parse.IntegerToString(bcYear / 100, 1);
 
 		String sql = "SELECT I.\"CustNo\"";
 		sql += "            ,I.\"FacmNo\"";
@@ -65,7 +59,7 @@ public class LM011ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", entdy);
+		query.setParameter("entdy", entYearMonth);
 		query.setParameter("drawdownFg", drawdownFg);
 		return this.convertToMap(query);
 	}

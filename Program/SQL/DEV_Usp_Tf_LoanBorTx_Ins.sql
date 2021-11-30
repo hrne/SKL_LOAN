@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_LoanBorTx_Ins" 
+  CREATE OR REPLACE PROCEDURE "Usp_Tf_LoanBorTx_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -92,8 +92,8 @@ BEGIN
 	        -- "TRXNMT" NUMBER(7,0), 目前最大20519
 	        -- "TRXNM2" NUMBER(3,0), 目前最大72
           -- 左補零,總長度8
-          ,LPAD(TR1."TRXNMT",5,0) 
-           || LPAD(TR1."TRXNM2",3,0)      AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
+          -- 2021-11-30 修改 只紀錄TRXNMT
+          ,LPAD(TR1."TRXNMT",8,0)         AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
           ,TR1."TRXTRN"                   AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 
           ,''                             AS "TitaCrDb"            -- 借貸別 VARCHAR2 1 
           ,TR1."TRXCRC"                   AS "TitaHCode"           -- 訂正別 VARCHAR2 1 
@@ -121,19 +121,48 @@ BEGIN
              WHEN TR1."TRXIDT" > 20400101 THEN TR1."TRXDAT"
            ELSE TR1."TRXIDT" END          AS "EntryDate"           -- 入帳日期 DECIMALD 8 
           ,TR1."TRXIED"                   AS "DueDate"             -- 應繳日期 DECIMALD 8 
-          ,TR."TRXAMT"                    AS "TxAmt"               -- 交易金額 DECIMAL 16 2
+          -- 2021-11-30 智偉增加邏輯(from賴桑):訂正別為1、3時，將金額反向
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+           THEN 0 - TR."TRXAMT"
+           ELSE TR."TRXAMT"
+           END                            AS "TxAmt"               -- 交易金額 DECIMAL 16 2
           ,TR1."LMSLBL"                   AS "LoanBal"             -- 放款餘額 DECIMAL 16 2
           ,TR1."TRXISD"                   AS "IntStartDate"        -- 計息起日 DECIMALD 8 
           ,TR1."TRXIED"                   AS "IntEndDate"          -- 計息迄日 DECIMALD 8 
           ,TR1."TRXPRD"                   AS "RepaidPeriod"        -- 回收期數 DECIMAL 3
           ,NVL(RC."FitRate",0)            AS "Rate"                -- 利率 DECIMAL 6 4
-          ,TR."Principal"                 AS "Principal"           -- 本金 DECIMAL 16 2
-          ,TR."Interest"                  AS "Interest"            -- 利息 DECIMAL 16 2
-          ,TR."DelayInt"                  AS "DelayInt"            -- 延滯息 NUMBER(16,2)
-          ,TR."BreachAmt"                 AS "BreachAmt"           -- 違約金 DECIMAL 16 2
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+           THEN 0 - TR."Principal"
+           ELSE TR."Principal"
+           END                            AS "Principal"           -- 本金 DECIMAL 16 2
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+           THEN 0 - TR."Interest"
+           ELSE TR."Interest"
+           END                            AS "Interest"            -- 利息 DECIMAL 16 2
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+           THEN 0 - TR."DelayInt"
+           ELSE TR."DelayInt"
+           END                            AS "DelayInt"            -- 延滯息 NUMBER(16,2)
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+           THEN 0 - TR."BreachAmt"
+           ELSE TR."BreachAmt"
+           END                            AS "BreachAmt"           -- 違約金 DECIMAL 16 2
           ,0                              AS "CloseBreachAmt"      -- 清償違約金 DECIMAL 16 2
-          ,TR."TempAmt"                   AS "TempAmt"             -- 暫收款 DECIMAL 16 2
-          ,TR."ExtraRepay"                AS "ExtraRepay"          -- 部分償還本金 DECIMAL 16 2
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+           THEN 0 - TR."TempAmt"
+           ELSE TR."TempAmt"
+           END                            AS "TempAmt"             -- 暫收款 DECIMAL 16 2
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+           THEN 0 - TR."ExtraRepay"
+           ELSE TR."ExtraRepay"
+           END                            AS "ExtraRepay"          -- 部分償還本金 DECIMAL 16 2
           ,TR1."TRXLIN"                   AS "UnpaidInterest"      -- 欠繳利息 DECIMAL 16 2
           ,TR1."TRXLPN"                   AS "UnpaidPrincipal"     -- 欠繳本金 DECIMAL 16 2
           ,TR1."TRXLBC"                   AS "UnpaidCloseBreach"   -- 欠繳違約金 DECIMAL 16 2
@@ -157,14 +186,26 @@ BEGIN
                                     WHEN TR1."TRXTCT" = '6' THEN '7'
                                   ELSE TR1."TRXTCT" END
                                 || '"' -- 結案區分
-           || ',' || '"FireFee":"' || NVL(JL."JLNAMT",'0') || '"' -- 火險保費
-           || ',' || '"ReduceAmt":"' || NVL(TR1."TRXDAM",'0') || '"' -- 減免金額
-           || ',' || '"ReduceBreachAmt":"' || NVL(TR1."TRXDBC",'0') || '"' -- 減免違約金
+           || ',' || '"FireFee":"' || NVL(CASE
+                                            WHEN TR1."TRXCRC" IN ('1','3')
+                                            THEN TO_CHAR(0 - JL."JLNAMT")
+                                          ELSE TO_CHAR(JL."JLNAMT")
+                                          END ,'0') || '"' -- 火險保費
+           || ',' || '"ReduceAmt":"' || NVL(CASE
+                                              WHEN TR1."TRXCRC" IN ('1','3')
+                                              THEN TO_CHAR(0 - TR1."TRXDAM")
+                                            ELSE TO_CHAR(TR1."TRXDAM")
+                                            END ,'0') || '"' -- 減免金額
+           || ',' || '"ReduceBreachAmt":"' || NVL(CASE
+                                                   WHEN TR1."TRXCRC" IN ('1','3')
+                                                   THEN TO_CHAR(0 - TR1."TRXDBC")
+                                                 ELSE TO_CHAR(TR1."TRXDBC")
+                                                 END  ,'0') || '"' -- 減免違約金
            || '}'                         AS "OtherFields"         -- 其他欄位 VARCHAR2 1000 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM (SELECT S0."CUSBRH"
                 ,S0."TRXDAT"
                 ,S0."TRXNMT"

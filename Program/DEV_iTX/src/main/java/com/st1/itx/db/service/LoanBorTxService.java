@@ -194,7 +194,7 @@ public interface LoanBorTxService {
   public Slice<LoanBorTx> findAcDateRange(int acDate_0, int acDate_1, List<String> titaHCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND FacmNo = ,AND BormNo &gt;= ,AND BormNo &lt;= ,AND IntEndDate = ,AND TitaHCode ^i 
+   * CustNo = ,AND FacmNo = ,AND BormNo &gt;= ,AND BormNo &lt;= ,AND IntEndDate = ,AND TitaHCode ^i ,AND AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
    *
    * @param custNo_0 custNo_0
    * @param facmNo_1 facmNo_1
@@ -202,32 +202,15 @@ public interface LoanBorTxService {
    * @param bormNo_3 bormNo_3
    * @param intEndDate_4 intEndDate_4
    * @param titaHCode_5 titaHCode_5
+   * @param acDate_6 acDate_6
+   * @param titaTlrNo_7 titaTlrNo_7
+   * @param titaTxtNo_8 titaTxtNo_8
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice LoanBorTx LoanBorTx of List
    */
-  public Slice<LoanBorTx> findIntEndDateEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int intEndDate_4, List<String> titaHCode_5, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND FacmNo = ,AND BormNo &gt;= ,AND BormNo &lt;= ,AND EntryDate = ,AND IntStartDate = ,AND IntEndDate = ,AND AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
-   *
-   * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param bormNo_2 bormNo_2
-   * @param bormNo_3 bormNo_3
-   * @param entryDate_4 entryDate_4
-   * @param intStartDate_5 intStartDate_5
-   * @param intEndDate_6 intEndDate_6
-   * @param acDate_7 acDate_7
-   * @param titaTlrNo_8 titaTlrNo_8
-   * @param titaTxtNo_9 titaTxtNo_9
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice LoanBorTx LoanBorTx of List
-   */
-  public Slice<LoanBorTx> findFacmNoEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int entryDate_4, int intStartDate_5, int intEndDate_6, int acDate_7, String titaTlrNo_8, String titaTxtNo_9, int index, int limit, TitaVo... titaVo);
+  public Slice<LoanBorTx> findIntEndDateEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int intEndDate_4, List<String> titaHCode_5, int acDate_6, String titaTlrNo_7, String titaTxtNo_8, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By LoanBorTx

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcDetail_Ins" 
+  CREATE OR REPLACE PROCEDURE "Usp_Tf_AcDetail_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -37,9 +37,8 @@ BEGIN
     INSERT INTO "AcDetail"
     SELECT S."TRXDAT"                     AS "RelDy"               -- 登放日期 Decimald 8 0
           ,'0000999999'
-           || LPAD(S."TRXNMT",5,0) -- 2021-01-29 Wei : 原用JLNVNO 改用 TRXNMT
-           || LPAD(S."TRXNM2",3,0) -- 2021-04-19 Wei : 加上NM2
-                                          AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0
+          -- 2021-11-30 修改 只紀錄TRXNMT
+           || LPAD(S."TRXNMT",8,0)        AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0
           ,ROW_NUMBER() OVER (PARTITION BY S."TRXDAT"
                                           ,S."TRXNMT"
                               ORDER BY S."JLNVNO"
@@ -110,9 +109,9 @@ BEGIN
              THEN '{"CaseCloseCode":"' || S."TRXTCT" || '"}' -- 結案區分
            ELSE '' END                    AS "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM (SELECT DISTINCT
                  S1."TRXDAT"
                 ,S1."TRXNMT"

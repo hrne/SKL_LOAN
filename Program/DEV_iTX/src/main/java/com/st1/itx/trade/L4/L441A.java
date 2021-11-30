@@ -52,7 +52,7 @@ public class L441A extends TradeBuffer {
 
 	@Autowired
 	public BankAuthActService bankAuthActService;
-	
+
 	@Autowired
 	public TxToDoCom txToDoCom;
 
@@ -81,7 +81,7 @@ public class L441A extends TradeBuffer {
 
 //		Aml
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
-		TxToDoDetail tTxToDoDetail= new TxToDoDetail();
+		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 
 		// 1.新增授權 2.再次授權 3.取消授權
 		switch (authApplCode) {
@@ -98,7 +98,7 @@ public class L441A extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "L441A tPostAuthLog update " + e.getErrorMsg());
 			}
 			break;
-			
+
 		case "2":
 			PostAuthLog t1PostAuthLog = new PostAuthLog();
 			tPostAuthLogId.setAuthApplCode(tPostAuthLog.getAuthApplCode());
@@ -112,8 +112,9 @@ public class L441A extends TradeBuffer {
 			t1PostAuthLog.setFacmNo(tPostAuthLog.getFacmNo());
 			t1PostAuthLog.setCustId(tPostAuthLog.getCustId());
 			t1PostAuthLog.setRepayAcctSeq(tPostAuthLog.getRepayAcctSeq());
+			t1PostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 			t1PostAuthLog.setProcessDate(tPostAuthLog.getProcessDate());
-			t1PostAuthLog.setAuthErrorCode("");                  // 再次授權 
+			t1PostAuthLog.setAuthErrorCode(""); // 再次授權
 			t1PostAuthLog.setRelationCode(tPostAuthLog.getRelationCode());
 			t1PostAuthLog.setRelAcctName(tPostAuthLog.getRelAcctName());
 			t1PostAuthLog.setRelAcctBirthday(tPostAuthLog.getRelAcctBirthday());
@@ -123,7 +124,7 @@ public class L441A extends TradeBuffer {
 				throw new LogicException(titaVo, "E0006", "AML檢核不為正常");
 			}
 			t1PostAuthLog.setAmlRsp(checkAmlVo.getConfirmStatus());
-			
+
 			try {
 				postAuthLogService.insert(t1PostAuthLog);
 			} catch (DBException e) {
@@ -137,7 +138,7 @@ public class L441A extends TradeBuffer {
 			tTxToDoDetail.setStatus(0);
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 			break;
-			
+
 		case "3":
 			PostAuthLog t2PostAuthLog = new PostAuthLog();
 			tPostAuthLogId.setAuthApplCode("2");

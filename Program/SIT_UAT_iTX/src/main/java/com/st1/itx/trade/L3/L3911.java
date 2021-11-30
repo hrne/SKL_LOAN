@@ -216,7 +216,6 @@ public class L3911 extends TradeBuffer {
 
 				/* 資料不同 先拿temp資料塞occurs */
 				occursList.putParam("OOFacmNo", TempFacmNo);
-				occursList.putParam("OOBormNo", 0);
 				occursList.putParam("OOEntryDate", TempEntryDate);
 				occursList.putParam("OOIntStartDate", TempIntStartDate);
 				occursList.putParam("OOIntEndDate", TempIntEndDate);
@@ -266,7 +265,6 @@ public class L3911 extends TradeBuffer {
 
 		if (!firstFg) { // 只有一筆資料 或是 最後一筆
 			occursList.putParam("OOFacmNo", TempFacmNo);
-			occursList.putParam("OOBormNo", TempBormNo);
 			occursList.putParam("OOEntryDate", TempEntryDate);
 			occursList.putParam("OOIntStartDate", TempIntStartDate);
 			occursList.putParam("OOIntEndDate", TempIntEndDate);

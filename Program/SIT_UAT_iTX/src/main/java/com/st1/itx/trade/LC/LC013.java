@@ -102,7 +102,7 @@ public class LC013 extends TradeBuffer {
 
 				checkAuth.setTxBuffer(this.txBuffer);
 
-				if (!checkAuth.isAgent(txAgent)) {
+				if (!checkAuth.isAgent(titaVo, txAgent)) {
 					continue;
 				}
 
@@ -180,13 +180,13 @@ public class LC013 extends TradeBuffer {
 			return;
 		}
 
-		// 檢查重複權限
-		if (authNos.size() > 0) {
-			if (authNos.get(authNo) != null) {
-				return;
-			}
-
-		}
+		// 檢查重複權限 remove by eric 2021.11.29
+//		if (authNos.size() > 0) {
+//			if (authNos.get(authNo) != null) {
+//				return;
+//			}
+//
+//		}
 //		this.info("LC013.authNos.put : " + authNo);
 		authNos.put(authNo, authNo);
 

@@ -36,10 +36,10 @@ public class LM011Report extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LM011Report exec start ...");
 
-		dateYear = parse.stringToInteger(titaVo.getParam("Year"));
+		dateYear = parse.stringToInteger(titaVo.getParam("Year")) + 1911;
 		dateMonth = parse.stringToInteger(titaVo.getParam("Month"));
 
-		int dateSent = (dateYear + dateMonth) * 100 + 19110000;
+		int dateSent = dateYear * 100 + dateMonth;
 
 		this.info("LM011Report exec dateSent = " + dateSent);
 

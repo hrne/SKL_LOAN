@@ -60,7 +60,9 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"DrawdownAmt\"                                                "; // -- F10 優惠貸款金額
 		sql += "      , N.\"FirstDrawdownDate\"                                          "; // -- F11 撥款日期
 		sql += "      , CI.\"CityItem\"                                                  "; // -- F12 屋址區域
-		sql += "      , N.\"Remark\"                                                     "; // -- F13 註記
+		sql += "      , N.\"SellerName\"                                                 "; // -- F13 屋址區域
+		sql += "      , N.\"SellerId\"                                                   "; // -- F14 屋址區域
+		sql += "      , N.\"Remark\"                                                     "; // -- F15 註記
 		sql += " FROM ( ";
 		sql += " SELECT T.\"CustNo\"                           AS \"CustNo\" ";
 		sql += "      , T.\"FacmNo\"                           AS \"FacmNo\" ";
@@ -81,12 +83,44 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(LN.\"DrawdownAmt\")                AS \"DrawdownAmt\"";
 		sql += "      , MAX(FA.\"FirstDrawdownDate\")          AS \"FirstDrawdownDate\"";
 		sql += "      , MAX(T.\"CityCode\")                    AS \"CityCode\"";
+		sql += "      , MAX(c.\"SellerId\")                    AS \"SellerId\"";
+		sql += "      , MAX(c.\"SellerName\")                  AS \"SellerName\"";
 		sql += "      , MAX(CASE WHEN B.\"AcctCode\" = '990'";
 		sql += "                      THEN '催收轉正戶'";
 		sql += "                 ELSE      '新貸戶'";
 		sql += "            END)                             AS \"Remark\"";
 
 		sql += " FROM \"MonthlyLoanBal\" T";
+		sql += " LEFT JOIN ("; 
+		sql += "                 SELECT" ; 
+		sql += "                    cf.\"CustNo\"," ; 
+		sql += "                    cf.\"FacmNo\"," ; 
+		sql += "                    clb.\"SellerId\"," ; 
+		sql += "                    clb.\"SellerName\"," ; 
+		sql += "                    ROW_NUMBER() OVER(" ; 
+		sql += "                        PARTITION BY cf.\"CustNo\", cf.\"FacmNo\"" ; 
+		sql += "                        ORDER BY" ; 
+		sql += "                            clb.\"SellerId\", clb.\"SellerName\"" ; 
+		sql += "                    ) AS \"Seq\"" ; 
+		sql += "                FROM" ; 
+		sql += "                    \"ClFac\"        cf" ; 
+		sql += "                    LEFT JOIN \"ClBuilding\"   clb ON clb.\"ClCode1\" = cf.\"ClCode1\"" ; 
+		sql += "                                                  AND clb.\"ClCode2\" = cf.\"ClCode2\"" ; 
+		sql += "                                                  AND clb.\"ClNo\" = cf.\"ClNo\"" ; 
+		sql += "                WHERE" ; 
+		sql += "                    cf.\"MainFlag\" = 'Y'" ; 
+		sql += "                    AND" ; 
+		sql += "                    CASE" ; 
+		sql += "                            WHEN nvl(clb.\"SellerId\", ' ') != ' '   THEN" ; 
+		sql += "                                1" ; 
+		sql += "                            WHEN nvl(clb.\"SellerName\", ' ') != ' ' THEN" ; 
+		sql += "                                1" ; 
+		sql += "        else 0" ; 
+		sql += "                        END" ; 
+		sql += "                    = 1" ; 
+		sql += "            ) c ON c.\"CustNo\" = t.\"CustNo\"" ; 
+		sql += "                   AND c.\"FacmNo\" = t.\"FacmNo\"" ; 
+		sql += "                   AND C.\"Seq\" = 1";
 		sql += "   LEFT JOIN \"MonthlyLoanBal\" B";
 		sql += "          ON B.\"YearMonth\" = :lastMonth ";
 		sql += "         AND B.\"CustNo\" = T.\"CustNo\"";
@@ -117,6 +151,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ON CU2.\"CustNo\" = RM.\"CustNo\"";
 		sql += "   LEFT JOIN \"CdCity\" CI";
 		sql += "          ON CI.\"CityCode\" =  N.\"CityCode\"";
+
 		sql += "   ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 
 		this.info("sql=" + sql);

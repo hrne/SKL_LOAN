@@ -135,9 +135,8 @@ public class AcReceivableCom extends TradeBuffer {
 				}
 				// 業務科目
 				wkAcctCode = ac.getAcctCode();
-				// 銷帳科目記號ReceivableFlag = 4-短繳期金
 				// 轉換業務科目 YOP 清償違約金 IOP 違約金
-				if (ac.getReceivableFlag() == 4 && "IOP".equals(ac.getAcctCode())) {
+				if ("IOP".equals(ac.getAcctCode())) {
 					wkAcctCode = "YOP";
 				}
 

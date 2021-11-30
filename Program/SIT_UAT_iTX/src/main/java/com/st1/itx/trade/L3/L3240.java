@@ -89,11 +89,13 @@ public class L3240 extends TradeBuffer {
 	private int iIntEndDate;
 	private int wkBorxNo;
 	private int wkNewBorxNo;
+	private int iAcDate;
+	private String iTellerNo;
+	private String iTxtNo;
 
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private LoanBorMain tLoanBorMain;
-
 
 	// work area
 	private AcDetail acDetail;
@@ -131,6 +133,10 @@ public class L3240 extends TradeBuffer {
 		iIntStartDate = this.parse.stringToInteger(titaVo.getParam("IntStartDate"));
 		iIntEndDate = this.parse.stringToInteger(titaVo.getParam("IntEndDate"));
 		iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
+		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
+		String iTellerNo = titaVo.getParam("TellerNo");
+		String iTxtNo = titaVo.getParam("TxtNo");
+
 		// Check Input
 
 		checkInputRoutine();
@@ -174,7 +180,7 @@ public class L3240 extends TradeBuffer {
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
 		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990,
-				iIntEndDate + 19110000, ltitaHCode, 0, Integer.MAX_VALUE, titaVo);
+				iIntEndDate + 19110000, ltitaHCode, iAcDate, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
 		}
@@ -245,7 +251,8 @@ public class L3240 extends TradeBuffer {
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
 		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, tx.getBormNo(),
-				tx.getBormNo(), tx.getIntStartDate() + 19110000, ltitaHCode, 0, Integer.MAX_VALUE, titaVo);
+				tx.getBormNo(), tx.getIntStartDate() + 19110000, ltitaHCode, iAcDate, iTellerNo, iTxtNo, 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx == null) {
 			return;
 		}

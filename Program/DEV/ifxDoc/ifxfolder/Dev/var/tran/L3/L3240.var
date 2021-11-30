@@ -53,6 +53,9 @@ K(MODIFYBUTTON,登錄)
 ["#FdEntryDate+入帳日期",#EntryDate],
 ["#FdIntStartDate+計息起日",#IntStartDate],
 ["#FdIntEndDate+計息迄日",#IntEndDate],
+["#FdAcDate+會計日期",#AcDate],
+["#FdTellerNo+經辦",#TellerNo],
+["#FdTxtNo+交易序號",#TxtNo],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -237,7 +240,7 @@ T(2,@LockCustNo,#CustNo)
 T(2,#TXCD+#TimCustNo+000+000)
 
 #BIND4=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF4;ntxbuf5=type<-1:IntEndDate<-OOIntEndDate:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:CustNo<-OCustNo})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF4;ntxbuf5=type<-1:TxtNo<-OOTxtNo:TellerNo<-OOTellerNo:AcDate<-OOAcDate:IntEndDate<-OOIntEndDate:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:CustNo<-OCustNo})
 
 !額度編號
 #FdFacmNo=X,2,L
@@ -264,7 +267,18 @@ IF(#IntEndDate<#IntStartDate,V(P,計息迄日不可小於計息起日),$)
 
 
 
+!會計日期
+#FdAcDate=X,2,L
 
+#AcDate=D,7,I
+!經辦
+#FdTellerNo=X,2,L
+
+#TellerNo=X,6,I
+!交易序號
+#FdTxtNo=X,2,L
+
+#TxtNo=X,8,I
 
 
 
@@ -318,6 +332,7 @@ T(3,[L3240] 回收冲正)
 <sub type="TIM">
 #TimCustNo#TimFacmNo
 #EntryDate#IntStartDate#IntEndDate
+#AcDate#TellerNo#TxtNo
 #END
 #CustNo#CustId#ApplNo
 <include src="RPDTL.icf::RPDTL.tim"/>

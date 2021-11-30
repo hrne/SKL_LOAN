@@ -108,7 +108,7 @@ public class CheckAuth extends CommBuffer {
 				return checkAuthVo;
 			}
 
-			if (!isAgent(txAgent)) {
+			if (!isAgent(titaVo, txAgent)) {
 //				throw new LogicException(titaVo, "EC008", "(CheckAuth.getAuth) 代理權限" + agentNo + "未生效或逾期");
 				return checkAuthVo;
 			}
@@ -167,8 +167,10 @@ public class CheckAuth extends CommBuffer {
 	 * @param txAgent 代理人資料
 	 * @return 是否有權限 true/false
 	 */
-	public boolean isAgent(TxAgent txAgent) {
-		this.info("CheckAuth.isAgeng tbsdy = " + this.getTxBuffer().getTxCom().getTbsdy());
+	public boolean isAgent(TitaVo titaVo, TxAgent txAgent) throws LogicException {
+		this.info("CheckAuth.isAgeng CALDY = " + titaVo.getParam("CALDY"));
+		
+		int caldy = Integer.valueOf(titaVo.getParam("CALDY"));
 
 		// 現在時間
 		SimpleDateFormat sdFormat = new SimpleDateFormat("HHmm");
@@ -180,19 +182,19 @@ public class CheckAuth extends CommBuffer {
 			return false;
 		}
 		// 未在有效期間
-		if (txAgent.getBeginDate() > this.getTxBuffer().getTxCom().getTbsdy()) {
+		if (txAgent.getBeginDate() > caldy) {
 			return false;
 		}
 
-		if (txAgent.getBeginDate() == this.getTxBuffer().getTxCom().getTbsdy() && txAgent.getBeginTime() > nowTime) {
+		if (txAgent.getBeginDate() == caldy && txAgent.getBeginTime() > nowTime) {
 			return false;
 		}
 
-		if (txAgent.getEndDate() < this.getTxBuffer().getTxCom().getTbsdy()) {
+		if (txAgent.getEndDate() < caldy) {
 			return false;
 		}
 
-		if (txAgent.getEndDate() == this.getTxBuffer().getTxCom().getTbsdy() && txAgent.getEndTime() < nowTime) {
+		if (txAgent.getEndDate() == caldy && txAgent.getEndTime() < nowTime) {
 			return false;
 		}
 

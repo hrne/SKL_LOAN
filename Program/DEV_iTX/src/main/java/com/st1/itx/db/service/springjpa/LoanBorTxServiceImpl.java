@@ -392,7 +392,7 @@ em = null;
   }
 
   @Override
-  public Slice<LoanBorTx> findIntEndDateEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int intEndDate_4, List<String> titaHCode_5, int index, int limit, TitaVo... titaVo) {
+  public Slice<LoanBorTx> findIntEndDateEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int intEndDate_4, List<String> titaHCode_5, int acDate_6, String titaTlrNo_7, String titaTxtNo_8, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<LoanBorTx> slice = null;
     if (titaVo.length != 0)
@@ -403,43 +403,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findIntEndDateEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " bormNo_3 : " +  bormNo_3 + " intEndDate_4 : " +  intEndDate_4 + " titaHCode_5 : " +  titaHCode_5);
+    this.info("findIntEndDateEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " bormNo_3 : " +  bormNo_3 + " intEndDate_4 : " +  intEndDate_4 + " titaHCode_5 : " +  titaHCode_5 + " acDate_6 : " +  acDate_6 + " titaTlrNo_7 : " +  titaTlrNo_7 + " titaTxtNo_8 : " +  titaTxtNo_8);
     if (dbName.equals(ContentName.onDay))
-      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
+      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, acDate_6, titaTlrNo_7, titaTxtNo_8, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
+      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, acDate_6, titaTlrNo_7, titaTxtNo_8, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
+      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, acDate_6, titaTlrNo_7, titaTxtNo_8, pageable);
     else 
-      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<LoanBorTx> findFacmNoEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int entryDate_4, int intStartDate_5, int intEndDate_6, int acDate_7, String titaTlrNo_8, String titaTxtNo_9, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<LoanBorTx> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findFacmNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " bormNo_3 : " +  bormNo_3 + " entryDate_4 : " +  entryDate_4 + " intStartDate_5 : " +  intStartDate_5 + " intEndDate_6 : " +  intEndDate_6 + " acDate_7 : " +  acDate_7 + " titaTlrNo_8 : " +  titaTlrNo_8 + " titaTxtNo_9 : " +  titaTxtNo_9);
-    if (dbName.equals(ContentName.onDay))
-      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
-    else 
-      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateIsAndIntStartDateIsAndIntEndDateIsAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, entryDate_4, intStartDate_5, intEndDate_6, acDate_7, titaTlrNo_8, titaTxtNo_9, pageable);
+      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoIsAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndIntEndDateIsAndTitaHCodeInAndAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, intEndDate_4, titaHCode_5, acDate_6, titaTlrNo_7, titaTxtNo_8, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

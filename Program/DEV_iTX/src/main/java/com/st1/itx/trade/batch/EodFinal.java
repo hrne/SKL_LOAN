@@ -33,12 +33,11 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.titaVo.putParam(ContentName.empnot, "BAT001");
+		this.titaVo.putParam(ContentName.empnot, "999999");
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -52,11 +51,7 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 帳務日
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日
-//		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
-		int mfbsdyf = this.txBuffer.getTxCom().getTbsdyf();
-
-		// 此為日終維護,讀onlineDB
-//		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
 
 		this.info("EodFinal tbsdyf : " + tbsdyf);
 		this.info("EodFinal mfbsdyf : " + mfbsdyf);
@@ -64,12 +59,8 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 每月月底日才執行
 		if (tbsdyf == mfbsdyf) {
 			this.info("EodFinal 本日為月底日,執行月底日日終維護.");
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC701", titaVo.getTlrNo(), "本日為月底日,執行LC701月底日日終維護", titaVo);
 
-//			MySpring.newTask("LC701", this.txBuffer, titaVo);
-
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC701",
-					titaVo.getTlrNo(), "本日為月底日,執行LC701月底日日終維護", titaVo);
-			
 			String yearMonth = String.valueOf((tbsdyf / 100));
 
 			if (yearMonth.length() >= 2) {
@@ -78,17 +69,10 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 				// 每年年底日才執行
 				if (yearMonth.equals("12")) {
 					this.info("EodFinal 本日為年底日,執行年底日日終維護.");
-
-//					MySpring.newTask("LC702", this.txBuffer, titaVo);
-					
-					webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC702",
-							titaVo.getTlrNo(), "本日為年底日,執行LC702年底日日終維護", titaVo);
+					webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC702", titaVo.getTlrNo(), "本日為年底日,執行LC702年底日日終維護", titaVo);
 				}
 			}
 		}
-
 		this.info("EodFinal exit.");
-
 	}
-
 }

@@ -224,6 +224,7 @@ public class L4510 extends TradeBuffer {
 //		刪除舊資料
 		if (iOpItem == 1) {
 			deleEmpDeductDtl(procCodeIs15, iY15EntryDate, titaVo);
+			deleEmpDeductMedia("4", iY15EntryDate, titaVo);
 			// 還款試算
 			calculateY15BaTxCom(titaVo);
 			List<EmpDeductDtl> is15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
@@ -255,14 +256,15 @@ public class L4510 extends TradeBuffer {
 		}
 		if (iOpItem == 2) {
 			deleEmpDeductDtl(procCodeUn15, iN15EntryDate, titaVo);
+			deleEmpDeductMedia("5", iN15EntryDate, titaVo);
 //			3.產出火險(05)、帳管(04)、明細表
+			calculateN15BaTxCom(titaVo);
 			List<EmpDeductDtl> un15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
 
 			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.entryDateRng(iN15EntryDate, iN15EntryDate,
 					procCodeUn15, this.index, this.limit, titaVo);
 
 			un15EmpDeductDtl = sun15EmpDeductDtl == null ? null : sun15EmpDeductDtl.getContent();
-			calculateN15BaTxCom(titaVo);
 			this.info("Un15 Dtl Start...");
 //			4.寫入EmpDeductMedia (彙總by戶號) 5:非15日
 			setEmpDeductMedia(un15EmpDeductDtl, 5, titaVo);
@@ -958,6 +960,23 @@ public class L4510 extends TradeBuffer {
 		}
 	}
 
+	private void deleEmpDeductMedia(String MediaKind, int iEntryDate, TitaVo titaVo) throws LogicException {
+
+		Slice<EmpDeductMedia> slEmpDeductMedia = empDeductMediaService.entryDateRng(iEntryDate, iEntryDate, MediaKind,
+				this.index, this.limit, titaVo);
+
+		if (slEmpDeductMedia != null) {
+			for (EmpDeductMedia tEmpDeductMedia : slEmpDeductMedia.getContent()) {
+				tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMedia.getEmpDeductMediaId(), titaVo);
+				try {
+					empDeductMediaService.delete(tEmpDeductMedia, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0008", "員工媒體檔刪除失敗 :" + e.getErrorMsg());
+				}
+			}
+		}
+	}
+	
 //	flag 1:15日薪 2:非15日薪
 	private void setBatxValue(List<BaTxVo> listBaTxVo, String flag) throws LogicException {
 		this.info("setBatxValue Start ...");
