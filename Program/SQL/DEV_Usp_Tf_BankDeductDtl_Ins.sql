@@ -114,9 +114,9 @@ BEGIN
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0
           ,''                             AS "JsonFields"          -- jason格式紀錄欄 nvarchar2 300
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LA$MBKP" MBK
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
                             AND APLP."LMSAPN" = MBK."MBKAPN"
@@ -239,9 +239,9 @@ BEGIN
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0
           ,''                             AS "JsonFields"          -- jason格式紀錄欄 nvarchar2 300
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "AH$MBKP" MBK
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
                             AND APLP."LMSAPN" = MBK."MBKAPN"

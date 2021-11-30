@@ -313,22 +313,22 @@ T(6A,#AdjDate+#TxKind+#OOAdjCode+#OOCustNo+#OOFacmNo+#OOBormNo+#OOCurtEffDate)
 #batch-print=A,1,S
 
 !#batch-rows 總筆數
-#batch-rows=X,2,S
+#batch-rows=X,3,S
 
 !#batch-rows-selected 勾選之筆數
-#batch-rows-selected=X,2,S
+#batch-rows-selected=X,3,S
 
 !#batch-rows-ok  傳送成功筆數
-#batch-rows-ok=X,2,S
+#batch-rows-ok=X,3,S
 
 !#batch-rows-error 傳送失敗筆數
-#batch-rows-error=X,2,S
+#batch-rows-error=X,3,S
 
 !#batch-row-status 該列傳送狀態
 #batch-row-status=X,50,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,14,O
+#batch-row-txtno=X,18,O
 
 
 </sub>
@@ -420,7 +420,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號      ","放行狀態"],
 	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
 }
 }
@@ -568,7 +568,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號      ","放行狀態"],
 	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
 }
 }
@@ -627,7 +627,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號      ","放行狀態"],
 	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
 }
 }

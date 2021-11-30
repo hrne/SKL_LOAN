@@ -45,9 +45,9 @@ BEGIN
          , FSC."FSCPTY"                   AS "AssignSeq"           -- 分配順序 DECIMAL 2 
          , 'A'                            AS "AcctSource"          --	VARCHAR2(1 BYTE)	Yes		6	資金來源
          , JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 
-         , 'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+         , '999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
-         , 'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+         , '999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LN$FSCP" FSC
     LEFT JOIN (
       SELECT S2."ACTFSC"

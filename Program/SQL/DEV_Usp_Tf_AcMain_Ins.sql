@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcMain_Ins" 
+  CREATE OR REPLACE PROCEDURE "Usp_Tf_AcMain_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -65,9 +65,9 @@ BEGIN
           ,S3."AcctCode"                  AS "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
           ,0                              AS "MonthEndYm"          -- 月底年月 DECIMAL 6 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "LA$LDGP" S1
     LEFT JOIN "TB$LCDP" S2 ON S2."ACNACC" = S1."ACNACC"
                           AND NVL(S2."ACNACS",' ') = NVL(S1."ACNACS",' ')
@@ -75,7 +75,7 @@ BEGIN
     LEFT JOIN "CdAcCode" S3 ON S3."AcNoCodeOld" = S2."CORACC" -- 2021-07-15 修改以8碼會科串接
                            AND S3."AcSubCode" = NVL(S2."CORACS",'     ')
                            AND S3."AcDtlCode" = '  '
-    WHERE S1."TRXDAT" >= 20100101
+    WHERE S1."TRXDAT" >= 20190101
       AND S1."TRXDAT" <= "TbsDyF"
       AND NVL(S2."CORACC",' ') <> ' ' -- 有串到新會科才寫入
       AND NVL(S3."AcNoCode",' ') <> ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入

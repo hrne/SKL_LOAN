@@ -1047,17 +1047,17 @@ public class BaTxCom extends TradeBuffer {
 
 	/* 計算溢(C)短(D)繳 */
 	private void settleOverAmt(int CustNo, int FacmNo, TitaVo titaVo) {
-		// 無額度 ---> 抓最大
-		int minFacmNo = FacmNo;
+		// 無額度 ---> 抓最小
+		int rpFacmNo = FacmNo;
 		if (FacmNo == 0)
-			minFacmNo = gettingRpFacmNo(CustNo, FacmNo, titaVo);
+			rpFacmNo = gettingRpFacmNo(CustNo, titaVo);
 		else
-			minFacmNo = FacmNo;
+			rpFacmNo = FacmNo;
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(4); // 4.本期溢(+)短(-)繳
 		baTxVo.setRepayType(0);
 		baTxVo.setCustNo(CustNo);
-		baTxVo.setFacmNo(minFacmNo);
+		baTxVo.setFacmNo(rpFacmNo);
 		baTxVo.setBormNo(0);
 		baTxVo.setRvNo(" ");
 		baTxVo.setAcctCode("TAV");
@@ -1077,47 +1077,55 @@ public class BaTxCom extends TradeBuffer {
 		this.baTxList.add(baTxVo);
 	}
 
-	private int gettingRpFacmNo(int CustNo, int FacmNo, TitaVo titaVo) {
+	private int gettingRpFacmNo(int CustNo, TitaVo titaVo) {
 		// 無應繳資料 ---> 抓資負明細科目
-		int minFacmNo = FacmNo;
+		int rpFacmNo = 0;
 		if (this.baTxList == null || this.baTxList.size() == 0) {
-			this.baTxList = new ArrayList<BaTxVo>();
-
-			Slice<AcReceivable> srvList = null;
-			rvList = new ArrayList<AcReceivable>();
-			if (FacmNo == 0)
-				srvList = acReceivableService.acrvFacmNoRange(0, CustNo, 1, 0, 999, this.index, Integer.MAX_VALUE,
-						titaVo); // 銷帳記號
-			// 0-未銷,
-			// 業務科目記號
-			// 1:
-			// 資負明細科目
-			else
-				srvList = acReceivableService.acrvFacmNoRange(0, CustNo, 1, FacmNo, FacmNo, this.index,
-						Integer.MAX_VALUE, titaVo);
-			rvList = srvList == null ? null : srvList.getContent();
-
-			if (rvList != null) {
-				for (int i = 0; i < rvList.size(); i++) {
-					if (rvList.get(i).getFacmNo() < minFacmNo || minFacmNo == 0)
-						minFacmNo = rvList.get(i).getFacmNo();
-				}
+			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, CustNo, 1, 0, 999, 0,
+					Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 1:資負明細科目
+			if (srvList != null) {
+				rpFacmNo = srvList.getContent().get(0).getFacmNo();
 			}
 		} else {
-			// 最小值有帳優先
-			for (int i = 0; i < this.baTxList.size(); i++) {
-				if ((this.baTxList.get(i).getFacmNo() < minFacmNo || minFacmNo == 0)
-						&& this.baTxList.get(i).getAcctAmt().compareTo(BigDecimal.ZERO) > 0)
-					minFacmNo = this.baTxList.get(i).getFacmNo();
-			}
-			if (minFacmNo == 0) {
-				for (int i = 0; i < this.baTxList.size(); i++) {
-					if (this.baTxList.get(i).getFacmNo() < minFacmNo || minFacmNo == 0)
-						minFacmNo = this.baTxList.get(i).getFacmNo();
+			// 計息、有帳務、非結案
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0 && ba.getCloseFg() == 0) {
+					rpFacmNo = ba.getFacmNo();
+					break;
 				}
 			}
+			// 計息、非結案
+			if (rpFacmNo == 0) {
+				for (BaTxVo ba : this.baTxList) {
+					if (ba.getDataKind() == 2 && ba.getCloseFg() == 0) {
+						rpFacmNo = ba.getFacmNo();
+						break;
+					}
+				}
+			}
+			// 計息
+			if (rpFacmNo == 0) {
+				for (BaTxVo ba : this.baTxList) {
+					if (ba.getDataKind() == 2) {
+						rpFacmNo = ba.getFacmNo();
+						break;
+					}
+				}
+			}
+			// 有帳務
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+					rpFacmNo = ba.getFacmNo();
+					break;
+				}
+			}
+			// 
+			for (BaTxVo ba : this.baTxList) {
+				rpFacmNo = ba.getFacmNo();
+				break;
+			}
 		}
-		return minFacmNo;
+		return rpFacmNo;
 	}
 
 	/* Load UnPaid */

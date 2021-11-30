@@ -29,9 +29,9 @@ BEGIN
     --       ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
     --       ,'Y'                            AS "Enable"              -- 啟用記號 VARCHAR2 1 
     --       ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-    --       ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+    --       ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
     --       ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-    --       ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    --       ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     -- FROM "CU$MRKP"
     -- LEFT JOIN "CustMain" on "CustMain"."CustNo" = "CU$MRKP"."LMSACN"
     -- ;
@@ -43,9 +43,9 @@ BEGIN
           ,0                              AS "ApplMark"            -- 申請記號 DECIMAL 1 
           ,''                             AS "Reason"              -- 解除原因 VARCHAR2 50  
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LN$PDCP"
     LEFT JOIN "CustMain" on "CustMain"."CustId" = "LN$PDCP"."CUSID1"
     ;

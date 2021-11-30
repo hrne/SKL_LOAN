@@ -46,7 +46,7 @@ public class LM018Report extends MakeReport {
 
 		this.print(-3, 70, "專案放款餘額及利收明細", "C");
 
-		this.setFontSize(5);
+		this.setFontSize(7);
 
 		this.print(-5, 260, "機密等級：密");
 		this.print(-6, 260, "單位：億元");

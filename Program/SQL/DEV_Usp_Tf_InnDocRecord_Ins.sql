@@ -47,9 +47,9 @@ BEGIN
           ,0                              AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
           ,null                           AS "JsonFields"          -- JsonFields
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LN$DOCP"
     LEFT JOIN "CdEmp" ON TRIM("CdEmp"."Fullname") = TRIM("LN$DOCP"."DOCEMN")
     ;

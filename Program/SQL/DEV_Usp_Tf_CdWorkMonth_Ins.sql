@@ -33,9 +33,9 @@ BEGIN
           ,S1."DATEE"                     AS "EndDate"             -- 終止日期 DECIMALD 8
           ,0                              AS "BonusDate"           -- 獎金發放日 DECIMALD 8
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "TB$WKMP" S1
     ;
 

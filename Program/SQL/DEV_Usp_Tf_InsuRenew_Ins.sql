@@ -66,9 +66,9 @@ BEGIN
           ,S0."OvduNo"                    AS "OvduNo"              -- 轉催編號 DECIMAL 10 0
           ,null                           AS "CommericalFlag"      -- 住宅險改商業險註記 VARCHAR2 1
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM (
       SELECT CNM."ClCode1"                  AS "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
            , CNM."ClCode2"                  AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0

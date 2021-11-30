@@ -55,9 +55,9 @@ BEGIN
           ,0                              AS "ClNo"
           ,0                              AS "ReceiveFg"           -- 領取記號 DECIMAL 1
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "LN$ENDP" E
     ;
 

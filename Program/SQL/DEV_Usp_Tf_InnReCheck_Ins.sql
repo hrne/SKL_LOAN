@@ -69,9 +69,9 @@ BEGIN
           ,S1."DTARSN"                    AS "Remark"              -- 備註 NVARCHAR2 60 0
           ,0                              AS "TraceMonth"          -- 追蹤年月 Decimal 6 FollowMark=2時輸入
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM (SELECT "REVWMM"
                 ,"DA$RTP"
                 ,"LMSACN"
@@ -134,9 +134,9 @@ BEGIN
           ,S1."DTARSN"                    AS "Remark"              -- 備註 NVARCHAR2 60 0
           ,0                              AS "TraceMonth"          -- 追蹤年月 Decimal 6 FollowMark=2時輸入
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM (SELECT "REVWMM"
                 ,"LMSACN"
                 ,"LMSAPN"

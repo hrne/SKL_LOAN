@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_CdGseq_Ins" 
+  CREATE OR REPLACE PROCEDURE "Usp_Tf_CdGseq_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -46,9 +46,9 @@ BEGIN
           -- 2021-11-26 智偉修改: 新系統從2200000起編號
           ,2200000                        AS "SeqNo"               -- 流水號 DECIMAL 8 (目前已編到第幾號)
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "CU$CUSP"
     ;
 
@@ -66,9 +66,9 @@ BEGIN
           ,99999                          AS "Offset"              -- 有效值 DECIMAL 8 (例:有效值=999,流水號為999時,下一個為001)
           ,S0."SeqEnd"                    AS "SeqNo"               -- 流水號 DECIMAL 8 (目前已編到第幾號)
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM (SELECT CASE
                    WHEN TO_NUMBER(SUBSTR("ApplNo",0,2)) + 1911 <= 1994 -- 舊案件編號推出來的年份最早是1995
                    THEN TO_NUMBER(SUBSTR("ApplNo",0,2)) + 2011
@@ -104,9 +104,9 @@ BEGIN
           ,9999999                        AS "Offset"              -- 有效值 DECIMAL 8 (例:有效值=999,流水號為999時,下一個為001)
           ,S0."LastUsedNo"                AS "SeqNo"               -- 流水號 DECIMAL 8 (目前已編到第幾號)
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM (SELECT LPAD("GDRID1",2,'0') || LPAD("GDRID2",2,'0')
                           AS "ClCode"
                 ,"GDRLUN" AS "LastUsedNo"          -- 最後使用碼 DECIMAL 7 

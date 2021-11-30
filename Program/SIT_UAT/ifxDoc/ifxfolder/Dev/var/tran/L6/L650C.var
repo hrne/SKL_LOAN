@@ -18,7 +18,7 @@ K(MODIFYBUTTON,修改)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p0" layout="cols=2;screen.width=[300,700];printer.width=[20,80];">
 [
-["[L650C]                                 業績計算特殊參數設定(是否排除15日薪非業績人員)"],
+["[L650C]                                 業績計算特殊參數設定(是否排除非業績人員)"],
 ["#FdExclude+設定選項",#ExcludeX],
 [#<->#,"#FdExcludeItem+業績全部",#YesNoA,#YesNoXA,"起始年月",#WorkMonthSA,"結束年月",#WorkMonthEA],
 [#<->#,"#FdExcludeItem+換算業績、業務報酬",#YesNoB,#YesNoXB,"起始年月",#WorkMonthSB,"結束年月",#WorkMonthEB],

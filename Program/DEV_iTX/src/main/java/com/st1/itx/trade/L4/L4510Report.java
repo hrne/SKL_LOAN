@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.springjpa.cm.L4510RServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
@@ -34,9 +33,6 @@ public class L4510Report extends MakeReport {
 
 	@Autowired
 	private DateUtil dateUtil;
-
-	@Autowired
-	private CdCodeService cdCodeService;
 
 	private int perfMonth = 0;
 	private String procCode = "";
@@ -218,31 +214,6 @@ public class L4510Report extends MakeReport {
 		result = FormatUtil.pad9("" + date, 7);
 
 		result = result.substring(0, 3) + "/" + result.substring(3, 5) + "/" + result.substring(5);
-
-		return result;
-	}
-
-	private String limitLength(String str, int pos) {
-		byte[] input = str.getBytes();
-
-		int inputLength = input.length;
-
-		this.info("str ..." + str);
-		this.info("inputLength ..." + inputLength);
-
-		int resultLength = inputLength;
-
-		if (inputLength > pos) {
-			resultLength = pos;
-		}
-
-		String result = "";
-
-		if (resultLength > 0) {
-			byte[] resultBytes = new byte[resultLength];
-			System.arraycopy(input, 0, resultBytes, 0, resultLength);
-			result = new String(resultBytes);
-		}
 
 		return result;
 	}

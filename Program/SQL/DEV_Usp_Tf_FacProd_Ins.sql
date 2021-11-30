@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_FacProd_Ins" 
+  CREATE OR REPLACE PROCEDURE "Usp_Tf_FacProd_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -121,9 +121,9 @@ BEGIN
           ,NVL("TB$TBLP"."STRFLG",' ')    AS "IfrsStepProdCode"    -- IFRS階梯商品別 varchar2 1
           ,TRIM("TB$TBLP"."PRDGRP")       AS "IfrsProdCode"        -- IFRS產品別 varchar2 2
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "TB$TBLP"
     LEFT JOIN (SELECT S1."IN$COD" -- 利率類別
                      ,S1."STRFLG" -- 階梯商品別

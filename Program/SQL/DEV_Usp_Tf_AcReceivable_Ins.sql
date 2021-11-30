@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcReceivable_Ins" 
+  CREATE OR REPLACE PROCEDURE "Usp_Tf_AcReceivable_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -111,9 +111,9 @@ BEGIN
           ,''                   AS "TitaTlrNo"        -- 經辦
           ,0                    AS "TitaTxtNo"        -- 交易序號
           ,''                   AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'             AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'             AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "FacMain" F1
     LEFT JOIN "LoanBorMain" L1 ON L1."CustNo" = F1."CustNo"
@@ -180,9 +180,9 @@ BEGIN
           ,''                  AS "TitaTlrNo"        -- 經辦
           ,0                   AS "TitaTxtNo"        -- 交易序號
           ,''                  AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "InsuRenew" S1
     LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = CASE
@@ -242,9 +242,9 @@ BEGIN
           ,''                  AS "TitaTlrNo"        -- 經辦
           ,0                   AS "TitaTxtNo"        -- 交易序號
           ,''                  AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "ForeclosureFee" S1
     LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = CASE
@@ -288,9 +288,9 @@ BEGIN
           ,''                  AS "TitaTlrNo"        -- 經辦
           ,0                   AS "TitaTxtNo"        -- 交易序號
           ,''                  AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LN$ACFP" S1
     WHERE S1."TRXDAT" = 0 -- 會計日期為0者未銷
@@ -337,9 +337,9 @@ BEGIN
           ,0                   AS "TitaTxtNo"        -- 交易序號
           ,'{"ContractChgCode":"' || TRIM(TO_CHAR(S1.CFRCOD,'00')) || '"}'
                                AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LN$CFRP" S1
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = S1."CFPMEM"
@@ -384,9 +384,9 @@ BEGIN
           ,''                  AS "TitaTlrNo"        -- 經辦
           ,0                   AS "TitaTxtNo"        -- 交易序號
           ,''                  AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM (SELECT ROW_NUMBER() OVER (PARTITION BY ACTP.LMSACN ORDER BY ACTP.BKPDAT DESC) AS "Seq"
                 ,ACTP.BKPDAT
@@ -437,9 +437,9 @@ BEGIN
     --       ,''                  AS "TitaTlrNo"        -- 經辦
     --       ,0                   AS "TitaTxtNo"        -- 交易序號
     --       ,''                  AS "JsonFields"       -- jason格式紀錄
-    --       ,'DataTf'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+    --       ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
     --       ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-    --       ,'DataTf'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    --       ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     --       ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     -- FROM (SELECT SUM("LORAMT") AS "LORAMT"
     --       FROM "LN$LORP"
@@ -483,9 +483,9 @@ BEGIN
           ,''                  AS "TitaTlrNo"        -- 經辦
           ,0                   AS "TitaTxtNo"        -- 交易序號
           ,''                  AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LoanCheque" S1
     LEFT JOIN (SELECT LC."ChequeNo"
@@ -560,9 +560,9 @@ BEGIN
           ,''                   AS "TitaTlrNo"        -- 經辦
           ,0                    AS "TitaTxtNo"        -- 交易序號
           ,''                   AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'             AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'             AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LA$ACTP" ACT
     LEFT JOIN (SELECT F1."CustNo"
@@ -640,9 +640,9 @@ BEGIN
           ,''                   AS "TitaTlrNo"        -- 經辦
           ,0                    AS "TitaTxtNo"        -- 交易序號
           ,''                   AS "JsonFields"       -- jason格式紀錄
-          ,'DataTf'             AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,'999999'             AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'DataTf'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LA$ACTP" ACT
     LEFT JOIN (SELECT F1."CustNo"

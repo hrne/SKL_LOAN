@@ -70,9 +70,9 @@ BEGIN
          , 0                              AS "AdjPerfAmt"          -- 調整後業績金額 DECIMAL 16 2 
          , ''                             AS "AdjCntingCode"       -- 調整後是否計件 VARCHAR2 1  Y/N
          , JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-         , 'DataTf'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+         , '999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-         , 'DataTf'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+         , '999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM ( SELECT A1."LMSLLD"
                 , A1."LMSACN"
                 , A1."LMSAPN"
