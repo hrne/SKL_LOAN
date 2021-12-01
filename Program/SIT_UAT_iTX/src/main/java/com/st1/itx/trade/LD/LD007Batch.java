@@ -60,7 +60,7 @@ public class LD007Batch extends BatchBase implements Tasklet, InitializingBean {
 
 		CdWorkMonth cdWorkMonth = sCdWorkMonthService.findDateFirst(tbsdyf, tbsdyf, titaVo);
 
-		int year = cdWorkMonth.getYear();
+		int year = cdWorkMonth.getYear() - 1911;
 		int month = cdWorkMonth.getMonth();
 
 		titaVo.putParam("inputYearStart", year);

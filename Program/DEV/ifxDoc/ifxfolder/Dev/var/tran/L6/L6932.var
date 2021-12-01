@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,593)ASGN(INQLEN$)
+E(0,290)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -41,11 +41,14 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6932]                                 資料變更交易查詢"],
-["#FD_ST_DT+會計日期",#ST_DT,"~",#ED_DT],
+["#FdDate+查詢條件","會計日期、交易日期，需擇一輸入"],
+["#FD_ST_DT+．會計日期",#ST_DT,"~",#ED_DT],
+["#FD_TX_DT+．交易日期",#SX_DT,"~",#EX_DT],
 ["#FdSearch+查詢條件","交易序號、交易代號、戶號，需擇一輸入"],
 ["#FdTxtNo+．交易序號",#TxtNo],
 ["#FD_TRN_CODE+．交易代號",#TRN_CODE],
-["#FD_CUST_NO+．戶號",#CUST_NO,"-",#FACM_NO,"-",#BORM_SEQ],
+["#FD_CUST_NO+．戶@@@@號",#CUST_NO,"-",#FACM_NO,"-",#BORM_SEQ],
+["#FD_MrKey+．參考編號",#MrKey],
 
 ]
 !---------- AP Button AREA ----------
@@ -57,6 +60,9 @@ E(0,0)
 !ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
 
 ! 必輸欄位
+#FdDate=X,2,L
+T(3,*)
+
 #FdSearch=X,2,L
 T(3,*)
 #FD_TRN_CODE=X,2,L
@@ -65,8 +71,12 @@ T(3,*)
 
 ! 永遠為必輸欄位
 #FD_ST_DT=X,2,L
-T(3,*)
+T(3, )
 
+#FD_TX_DT=X,2,L
+T(3, )
+
+#FD_MrKey=X,2,L
 
 #WKHIDE=X,1,S
 INVOKEJS(SHOW,p1,1)
@@ -80,8 +90,9 @@ T(4,CHAIN$)
 #CHAINFlag=A,1,S
 C(3,#CHAIN,1,E(0,1),E(0,0))
 
-#NTXBUF=X,69,S
+#NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
 #CHAIN_ST_DT=X,7,S
 T(1,#NTXBUF,1,7)
 
@@ -103,6 +114,18 @@ T(1,#NTXBUF,45,3)
 #CHAIN_BORM_SEQ=X,3,S
 T(1,#NTXBUF,48,3)
 
+#CHAIN_MrKey=X,20,S
+T(1,#NTXBUF,51,20)
+
+#CHAIN_TRN_CODE2=X,5,S
+T(1,#NTXBUF,71,5)
+
+#CHAIN_SX_DT=X,7,S
+T(1,#NTXBUF,76,7)
+
+#CHAIN_EX_DT=X,7,S
+T(1,#NTXBUF,83,7)
+
 #CHAINSET=X,1,S
 E(0,@ST_DT,#CHAIN_ST_DT)
 E(0,@ED_DT,#CHAIN_ED_DT)
@@ -111,6 +134,10 @@ T(2,@TRN_CODE,#CHAIN_TRN_CODE)
 E(0,@CUST_NO,#CHAIN_CUST_NO)
 E(0,@FACM_NO,#CHAIN_FACM_NO)
 E(0,@BORM_SEQ,#CHAIN_BORM_SEQ)
+T(2,@MrKey,#CHAIN_MrKey)
+T(2,@TRN_CODE2,#CHAIN_TRN_CODE2)
+E(0,@SX_DT,#CHAIN_SX_DT)
+E(0,@EX_DT,#CHAIN_EX_DT)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -136,13 +163,35 @@ E(0,#DT)
 #ST_DT=D,7,I
 C(3,#CHAIN,1,s,$)
 T(2,#ST_DTS)
-@V(7)A(4,0,#ST_DT)
+@
+C(3,#ST_DT,0,S,A(4,0,#ST_DT))
 
 #ED_DT=D,7,I
 C(3,#CHAIN,1,s,$)
+C(3,#ST_DT,0,S,$)
 T(2,#ED_DTS)
 D(8)
-@V(7)V(5,#ST_DT,#ED_DTS)
+@
+V(7)
+A(4,0,#ED_DT)
+V(5,#ST_DT,#ED_DTS)
+
+#SX_DT=D,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#ST_DT,0,$,S)
+C(3,#SX_DT,0,E(0,#SYSCDATE),$)
+@
+V(7)
+A(4,0,#SX_DT)
+
+#EX_DT=D,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#SX_DT,0,S,$)
+C(3,#EX_DT,0,E(0,#SX_DT),$)
+@
+V(7)
+A(4,0,#EX_DT)
+V(5,#SX_DT,#SYSCDATE)
 
 !交易序號
 #TxtNo=X,18,I
@@ -157,6 +206,8 @@ C(3,#CHAIN,1,s,$)
 C(3,#CHAIN,1,s,$)
 C(4,#TxtNo,$,S)
 !INVOKEJS(SHOW,p1,3,4,1)
+
+#TRN_CODE2=X,5,S
 
 #WKBTN=X,1,S
 !C(3,#TRN_CODE,0,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
@@ -177,6 +228,11 @@ C(4,#TxtNo,$,S)
 C(3,#TRN_CODE,0,$,S)
 C(3,#FACM_NO,0,S,$)
 
+#MrKey=x,20,I
+C(3,#CHAIN,1,s,$)
+C(4,#TxtNo,$,S)
+C(3,#CUST_NO,0,$,S)
+
 #MRKEY=_,_,S
 C(3,#CUST_NO,0,S,$)
 C(3,#FACM_NO,0,T(2,#CUST_NO),T(2,#CUST_NO+-+#FACM_NO))
@@ -188,7 +244,8 @@ C(3,#CHAIN,1,s,$)
 T(2,#CUST_NO+#FACM_NO+#BORM_SEQ)
 C(4,#TxtNo,$,S)
 C(3,#TRN_CODE,0,$,S)
-@C(3,#VCUSTNO,0,V(P,交易序號、交易代號、戶號，需擇一輸入),$)
+C(4,#MrKey,$,S)
+@C(3,#VCUSTNO,0,V(P,交易序號、交易代號、戶號、交易編號，需擇一輸入),$)
 
 
 
@@ -213,61 +270,35 @@ T(3,[L6932] 資料變更交易)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
-#O_ST_DT=D,7,L
-T(2,#ST_DT)
-#O_ED_DT=D,7,L
-T(2,#ED_DT)
-#O_TRN_CODE=X,5,L
-T(2,#TRN_CODE)
-#O_CUST_NO=A,7,L
-T(2,#CUST_NO)
-#O_FACM_NO=A,3,L
-T(2,#FACM_NO)
-#O_BORM_SEQ=A,3,L
-T(2,#BORM_SEQ)
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
-! 作業日期
-!#OO_TRN_DT=D,7,S
-! 交易時間
-!#OO_TRN_TM=X,8,S
-! 作業日期時間
-#OO_TRN_DTTM=X,18,L
-!T(2,#OO_TRN_DT+ +#OO_TRN_TM)
-! 會計日期
-#OO_TxDate=D,7,S
-! 異動人員
-#OO_TlrItem=X,20,L
-! 交易代號
-#OO_TRN_CODE=X,5,S
-#OO_TranItem=X,80,S
-#OO_TranItemX=X,86,S
-T(2,#OO_TRN_CODE+ +#OO_TranItem)
-! 戶號
-#OO_CUST_NO=A,7,S
-#OO_FACM_NO=A,3,S
-#OO_BORM_SEQ=A,3,S
-#OO_CUST_NO_LB=X,17,L
-T(2,#OO_CUST_NO+－+#OO_FACM_NO+－+#OO_BORM_SEQ)
-! 欄位名稱
-#OO_COLUMN_NAME=X,50,L
-! 變更前
-#OO_DATA_BEFORE=X,200,L
-! 變更後
-#OO_DATA_AFTER=X,200,L
+#OTranName=X,40,S
+#OCustNo=A,7,S
+#OFacmNo=A,3,S
+#OBormNo=A,3,S
+#OCustNoX=20,7,S
+T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 
-! 修改的按鈕
-! #OO_FUNCD=A,1,S
-! E(0,2)
+#OMrKey=x,20,S
+#OReason=x,120,S
+#OLastUpdate=x,40,S
+#OLastEmp=x,30,S
+!會計日期
+#OTxDate=D,7,S
+!交易序號
+#OTxSeq=X,18,S
+!明細序號
+#OTxSno=A,2,S
 
-! #OO_BUF=X,108,S
-! T(2,#OO_FUNCD+#OO_BANK_CODE+#OO_BANK_NM+#OO_BRANCH_NM)
+#BufA=X,50,S
+T(2,#OTxDate+#OTxSeq+#OTxSno)
 
-! #OO_BTN=X,4,S
-! BIND(grid,{cmd=CHAIN;ntxcd=L6701;text=修改;ntxbuf=#OO_BUF})
+#OOBtnA=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L6934; ntxbuf=#BufA})
+
 </sub>
 
 
@@ -275,7 +306,10 @@ T(2,#OO_CUST_NO+－+#OO_FACM_NO+－+#OO_BORM_SEQ)
 <sub type="TIM">
 #ST_DT
 #ED_DT
+#SX_DT
+#EX_DT
 #TRN_CODE
+#TRN_CODE2
 #CUST_NO
 #FACM_NO
 #BORM_SEQ
@@ -289,17 +323,17 @@ T(2,#OO_CUST_NO+－+#OO_FACM_NO+－+#OO_BORM_SEQ)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L6932
-#OO_TRN_DTTM
-#OO_TxDate
-#OO_TlrItem
-#OO_TRN_CODE
-#OO_TranItem
-#OO_CUST_NO
-#OO_FACM_NO
-#OO_BORM_SEQ
-#OO_COLUMN_NAME
-#OO_DATA_BEFORE
-#OO_DATA_AFTER
+#OTranName
+#OCustNo
+#OFacmNo
+#OBormNo
+#OMrKey
+#OReason
+#OLastUpdate
+#OLastEmp
+#OTxDate
+#OTxSeq
+#OTxSno
 ^
 </sub>
 
@@ -317,36 +351,22 @@ TXFORM=L6932
 #RPTFG=0,QUERY.GRID,L6932
 #any={detail:true, header:'L6932.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-! #OO_BTN=
-! {width:50,search:false,formatter:'cust:bind-button:#OO_BTN',align:'center',canExport:false}
+#OOBtnA=修改內容
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:70}
 
-#OO_TRN_DTTM=作業日期時間
-{width:130,align:'center'}
-
-#OO_TxDate=會計日期
-{width:80,align:'center'}
-
-#OO_TlrItem=異動人員
-{width:90,align:'center'}
-
-#OO_TranItemX=交易代號
-{width:150,align:'center'}
-
-#OO_CUST_NO_LB=戶號
-{width:150,align:'center'}
-
-#OO_COLUMN_NAME=欄位名稱
+#OTranName=交易名稱
+{width:250,align:'left'}
+#OCustNoX=戶號
+{width:100,align:'center'}
+#OMrKey=參考編號
+{width:150,align:'left'}
+#OReason=修改原因
 {width:300,align:'left'}
+#OLastUpdate=修改日期
+{width:140,align:'left'}
+#OLastEmp=修改人員
+{width:140,align:'left'}
+#OTxDate=會計日期
+{width:100,align:'left'}
 
-#OO_DATA_BEFORE=變更前
-{width:300,align:'left'}
-
-#OO_DATA_AFTER=變更後
-{width:300,align:'left'}
-^
-<include src="PRT.icf::INQ01.sel" map="i=L6932;cpi=15"/>
-
-%
-
-@^
 </sub>

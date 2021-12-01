@@ -328,7 +328,7 @@ public class L6101 extends TradeBuffer {
 
 	// 讀取整批入帳總數檔
 	private int findBatxHead(int fBatxTotCnt, TitaVo titaVo) throws LogicException {
-
+		int errocount = 0;
 		int acDate = this.txBuffer.getTxBizDate().getTbsDyf();
 		Slice<BatxHead> slBatxHead;
 		slBatxHead = sBatxHeadService.acDateRange(acDate, acDate, this.index, Integer.MAX_VALUE);
@@ -344,7 +344,7 @@ public class L6101 extends TradeBuffer {
 				if (tBatxHead.getBatxExeCode().equals("4") || tBatxHead.getBatxExeCode().equals("8")) {
 					continue;
 				}
-
+				errocount = 1;
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOMsgCode", "錯誤");
 				occursList.putParam("OOMessage",
@@ -357,7 +357,7 @@ public class L6101 extends TradeBuffer {
 		}
 
 		this.info("L6101 findBatxHead fBatxTotCnt : " + fBatxTotCnt);
-		return fBatxTotCnt;
+		return errocount;
 	}
 
 	// 讀取交易流程控制檔

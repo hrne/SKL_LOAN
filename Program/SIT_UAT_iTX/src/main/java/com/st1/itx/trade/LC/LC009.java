@@ -1,11 +1,12 @@
 package com.st1.itx.trade.LC;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -29,7 +30,6 @@ import com.st1.itx.util.date.DateUtil;
  * @version 1.0.0
  */
 public class LC009 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC009.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -128,7 +128,18 @@ public class LC009 extends TradeBuffer {
 			slTxFile = txFileService.findByLC009(iEntdyStart, iEntdyEnd, iBrNo, iTlrNo + "%", iCode + "%",
 					"%" + iItem + "%", this.index, this.limit);
 		}
-		List<TxFile> lTxFile = slTxFile == null ? null : slTxFile.getContent();
+		List<TxFile> lTxFile = slTxFile == null ? null : new ArrayList<>(slTxFile.getContent());
+
+		// 按分配順序排序
+		Collections.sort(lTxFile, new Comparator<TxFile>() {
+			public int compare(TxFile c1, TxFile c2) {
+				String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate()) + c1.getFileCode()
+						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
+				String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate()) + c2.getFileCode()
+						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());
+				return 0 - c1OrderKey.compareTo(c2OrderKey);
+			}
+		});
 
 		if (lTxFile == null) {
 			throw new LogicException(titaVo, "E0001", "");

@@ -92,7 +92,7 @@ public class LNM34DPReport extends MakeReport {
 			} else {
 				for (Map<String, String> tL7Vo : L7List) {
 					strContent = "";
-					for (int j = 1; j <= tL7Vo.size(); j++) {
+					for (int j = 1; j <= 44; j++) {
 						String strField = "";
 						if (tL7Vo.get(txt1[j - 1]) == null) {
 							strField = "";

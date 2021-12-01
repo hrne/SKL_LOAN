@@ -126,7 +126,6 @@ public class L3912 extends TradeBuffer {
 			RPTFG = 8;
 		}
 
-
 		this.info("BorxNo     =" + tLoanBorTx.getBorxNo());
 		this.info("TitaTxCd   =" + tLoanBorTx.getTitaTxCd());
 		this.info("RPTFG      =" + RPTFG);
@@ -182,7 +181,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OUnpaidBreach", tLoanBorTx.getUnpaidCloseBreach());
 		this.totaVo.putParam("ORemitAcctNo", tTempVo.getParam("RemitAcctNo"));
 		this.totaVo.putParam("OShortFall", tLoanBorTx.getShortfall());
-		this.totaVo.putParam("OOverflow", tLoanBorTx.getOverflow());
+		this.totaVo.putParam("OOverflow", tLoanBorTx.getUnpaidInterest().add(tLoanBorTx.getUnpaidPrincipal()));
 		this.totaVo.putParam("OSupperNo", tLoanBorTx.getTitaEmpNoS());
 		this.totaVo.putParam("OSupperNoX", loanCom.getEmpFullnameByEmpNo(tLoanBorTx.getTitaEmpNoS()));
 		this.totaVo.putParam("OReduceAmt", wkReduceAmt);

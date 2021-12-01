@@ -222,13 +222,13 @@ T(H,#AuthQryType,#AuthQryCodeHelp)
 
 !授權辦理事項
 #AuthItemQuery=X,1,I,ui:checkbox;value:;
-@C(4,#AuthItemQuery,$,C(5,#AuthItemQuery,V,$,V(P,限輸入V或空白)))
+@C(4,#AuthItemQuery,$,C(5,#AuthItemQuery,Y,$,V(P,限輸入Y或空白)))
 
 #AuthItemReview=X,1,I,ui:checkbox;value:;
-@C(4,#AuthItemReview,$,C(5,#AuthItemReview,V,$,V(P,限輸入V或空白)))
+@C(4,#AuthItemReview,$,C(5,#AuthItemReview,Y,$,V(P,限輸入Y或空白)))
 #AuthItemOther=X,1,I,ui:checkbox;value:;
 @
-@C(4,#AuthItemOther,$,C(5,#AuthItemOther,V,$,V(P,限輸入V或空白)))
+@C(4,#AuthItemOther,$,C(5,#AuthItemOther,Y,$,V(P,限輸入Y或空白)))
 C(4,#AuthItemQuery,C(4,#AuthItemReview,C(4,#AuthItemOther,V(P,審核、覆核、其他，至少需勾選一項),$),$),$)
 !授權起日
 #AuthStartDay=D,7,I

@@ -19,7 +19,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcLoanInt;
 import com.st1.itx.db.domain.AcLoanIntId;
 import com.st1.itx.db.domain.LoanBorMain;
-import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.service.AcLoanIntService;
@@ -77,7 +76,7 @@ public class BS900 extends TradeBuffer {
 
 	@Autowired
 	private AcBookCom acBookCom;
-	
+
 	@Autowired
 	LoanCom loanCom;
 
@@ -86,7 +85,7 @@ public class BS900 extends TradeBuffer {
 
 	private int commitCnt = 200;
 	private int iAcDate;
-	private int iAcDateReverse;
+	private int iAcDateReverse = 0;
 	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
 	private List<TxToDoDetailReserve> lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
 
@@ -98,16 +97,31 @@ public class BS900 extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		baTxCom.setTxBuffer(this.getTxBuffer());
 		iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
-
+		iAcDateReverse = this.getTxBuffer().getMgBizDate().getLmnDy();
 		// 迴轉上個月底營業日
 		dateUtil.init();
-		dateUtil.setDate_1(this.getTxBuffer().getMgBizDate().getLmnDy());
-		TxBizDate tTxBizDate = dateUtil.getForTxBizDate();
-		iAcDateReverse = tTxBizDate.getMfbsDy();
-
+	 	dateUtil.setDate_2(this.getTxBuffer().getMgBizDate().getLmnDy());
+		if (dateUtil.isHoliDay()) {
+			int i = 0;
+			do {
+				i--;
+				dateUtil.init();
+				dateUtil.setDate_1(this.getTxBuffer().getMgBizDate().getLmnDy());
+				dateUtil.setDays(i);
+				iAcDateReverse = dateUtil.getCalenderDay();
+				dateUtil.init();
+				dateUtil.setDate_2(iAcDateReverse);
+			} while (dateUtil.isHoliDay());
+		}
+		this.info("iAcDateReverse=" + iAcDateReverse);
+		if (iAcDateReverse > 0) {
+			return null;
+		}
 		// 1.刪除當月提息明細檔 //
 		this.info("1.bs900 delete acLoanint, yearMonth=" + yearMonth);
-		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE, titaVo);
+
+		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE,
+				titaVo);
 		List<AcLoanInt> lAcLoanInt = slAcLoanInt == null ? null : slAcLoanInt.getContent();
 		if (lAcLoanInt != null) {
 			try {
@@ -122,7 +136,8 @@ public class BS900 extends TradeBuffer {
 
 		// 2.刪除處理清單檔 ACCL01-應收利息提存入帳 //
 		this.info("2.bs900 delete ACCL01");
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index,
+				Integer.MAX_VALUE, titaVo);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
@@ -130,7 +145,8 @@ public class BS900 extends TradeBuffer {
 
 		// 3.刪除處理清單留存檔 ACCL01-應收利息提存入帳 //
 		this.info("3.bs900 delete Reserve ACCL01");
-		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL01", 0, 3, iAcDate + 19110000, iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL01", 0, 3,
+				iAcDate + 19110000, iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 		lTxToDoDetailReserve = slTxToDoDetailReserve == null ? null : slTxToDoDetailReserve.getContent();
 		if (lTxToDoDetailReserve != null) {
 			try {
@@ -148,7 +164,8 @@ public class BS900 extends TradeBuffer {
 
 		// 3.迴轉上月
 		this.info("3.bs900 last month ACCL01");
-		slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL01", 0, 3, iAcDateReverse + 19110000, iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+		slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL01", 0, 3, iAcDateReverse + 19110000,
+				iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 		lTxToDoDetailReserve = slTxToDoDetailReserve == null ? null : slTxToDoDetailReserve.getContent();
 		if (lTxToDoDetailReserve != null) {
 			for (TxToDoDetailReserve t2 : lTxToDoDetailReserve) {
@@ -188,6 +205,7 @@ public class BS900 extends TradeBuffer {
 		dateUtil.setMons(1);
 		int intDate = (dateUtil.getCalenderDay() / 100) * 100 + 01; // 提存日期 =>下個月一號
 		int iEntryDate = this.getTxBuffer().getMgBizDate().getTmnDy(); // 入帳日 ==> 月底日曆日
+
 		procAcLoanint(yearMonth, iEntryDate, intDate, titaVo);
 
 		this.batchTransaction.commit();
@@ -228,12 +246,14 @@ public class BS900 extends TradeBuffer {
 		HashMap<String, BigDecimal> map = new HashMap<>();
 
 		// AcReceivable 會計銷帳檔，ICR 應收利息－放款部 ，未銷//
-		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE, titaVo); // ASC
+		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE,
+				titaVo); // ASC
 		List<AcLoanInt> lAcLoanInt = slAcLoanInt == null ? null : slAcLoanInt.getContent();
 		if (lAcLoanInt != null) {
 			for (AcLoanInt ac : lAcLoanInt) {
 				if (ac.getInterest().compareTo(BigDecimal.ZERO) > 0) {
-					String key = ac.getAcctCode() + "," + parse.IntegerToString(ac.getAging(), 1) + "," + ac.getAcBookCode() + "," + ac.getAcSubBookCode();
+					String key = ac.getAcctCode() + "," + parse.IntegerToString(ac.getAging(), 1) + ","
+							+ ac.getAcBookCode() + "," + ac.getAcSubBookCode();
 					if (map.containsKey(key)) {
 						map.put(key, map.get(key).add(ac.getInterest()));
 					} else {
@@ -249,10 +269,14 @@ public class BS900 extends TradeBuffer {
 		}
 	}
 
-	private void addTxToDoThisMonth(String acctCode, String aging, String acBookCode, String acSubBookCode, BigDecimal intAmt, TitaVo titaVo) throws LogicException {
+	private void addTxToDoThisMonth(String acctCode, String aging, String acBookCode, String acSubBookCode,
+			BigDecimal intAmt, TitaVo titaVo) throws LogicException {
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
+		String rvNo = "AC"
+				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(
+						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
+						6);
 		// 提存(傳票批號:99)
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setItemCode("ACCL01");
@@ -312,16 +336,19 @@ public class BS900 extends TradeBuffer {
 		String acSubBookCode = null;
 		int custNo = 0;
 		// find all loanBorMain status = 0 //
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, 99999999, 0, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, 99999999, 0, this.index,
+				Integer.MAX_VALUE, titaVo);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain != null) {
 			int cntTrans = 0;
 			// 逐筆 call BaTxCom 計算並寫入提息明細檔 //
 			for (LoanBorMain ln : lLoanBorMain) {
 				try {
-					lBaTxVo = baTxCom.acLoanInt(iEntryDate, intDate, ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), titaVo); // 提存
+					lBaTxVo = baTxCom.acLoanInt(iEntryDate, intDate, ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(),
+							titaVo); // 提存
 				} catch (LogicException e) {
-					this.error("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo());
+					this.error("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + ln.getCustNo() + "-" + ln.getFacmNo() + "-"
+							+ ln.getBormNo());
 					continue;
 				}
 				// 帳齡 以放款主檔的下次應繳日~本營業日計算 0.一個月以下 1.一~三個月 2.三~六個月3.六個月以上

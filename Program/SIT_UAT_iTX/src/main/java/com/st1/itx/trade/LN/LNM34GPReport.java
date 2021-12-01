@@ -2,11 +2,9 @@ package com.st1.itx.trade.LN;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,7 +23,6 @@ import java.text.SimpleDateFormat;
 @Scope("prototype")
 
 public class LNM34GPReport extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LNM34GPReport.class);
 
 	Date dateNow = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -50,7 +47,7 @@ public class LNM34GPReport extends MakeReport {
 		// LNM34GP 資料欄位清單G
 		try {
 			this.info("---------- LNM34GPReport exec titaVo: " + titaVo);
-			List<HashMap<String, String>> LNM34GPList = lNM34GPServiceImpl.findAll(titaVo);
+			List<Map<String, String>> LNM34GPList = lNM34GPServiceImpl.findAll(titaVo);
 			genFile(titaVo, LNM34GPList);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -59,7 +56,7 @@ public class LNM34GPReport extends MakeReport {
 		}
 	}
 
-	private void genFile(TitaVo titaVo, List<HashMap<String, String>> L7List) throws LogicException {
+	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM34GP genFile : ");
 		String txt = "F0;F1;F2;F3;F4;F5";
 		String txt1[] = txt.split(";");
@@ -70,17 +67,18 @@ public class LNM34GPReport extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNM34GP", "IAS39 資料欄位清單G", "LNM34GP.csv", 2);
 
 			// 標題列
-			// strContent = "戶號(1~7),借款人ID/統編(8~17),協議編號(18~20),協議前後(21~21),額度編號(22~24),撥款序號(25~27)";
+			// strContent =
+			// "戶號(1~7),借款人ID/統編(8~17),協議編號(18~20),協議前後(21~21),額度編號(22~24),撥款序號(25~27)";
 			// makeFile.put(strContent);
 
 			// 欄位內容
 			// this.info("-----------------" + L7List);
-			if (L7List.size() == 0) {	// 無資料時，會出空檔
+			if (L7List.size() == 0) { // 無資料時，會出空檔
 
 			} else {
-				for (HashMap<String, String> tL7Vo : L7List) {
+				for (Map<String, String> tL7Vo : L7List) {
 					strContent = "";
-					for (int j = 1; j <= tL7Vo.size(); j++) {
+					for (int j = 1; j <= 6; j++) {
 						String strField = "";
 						if (tL7Vo.get(txt1[j - 1]) == null) {
 							strField = "";
@@ -117,9 +115,8 @@ public class LNM34GPReport extends MakeReport {
 					makeFile.put(strContent);
 				}
 			}
-			
-			long sno = makeFile.close();
-			// makeFile.toFile(sno);	// 不直接下傳
+
+			makeFile.close();
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

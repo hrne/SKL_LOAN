@@ -122,6 +122,8 @@ public class L4031 extends TradeBuffer {
 					continue;
 				}
 				OccursList occursList = new OccursList();
+				this.info("totCnt=" + totCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
+						+ ignCnt.get(tempL4031Vo) + ", conCnt=" + conCnt.get(tempL4031Vo));
 				checkFlag = 9;
 				if (tempL4031Vo.getRank() == 1) {
 					if (sumCnt.get(tempL4031Vo) == conCnt.get(tempL4031Vo)) {

@@ -83,6 +83,11 @@
 					<tasklet ref="LW003" />
 				</step>
 			</flow>
+			<flow>
+				<step id="sLD010Batch" parent="parentStep">
+					<tasklet ref="LD010Batch" />
+				</step>
+			</flow>
 		</split>
 		<!-- 每日批次結束，判斷是否需要執行月批 -->
 		<step id="eodFinal" parent="parentStep">
