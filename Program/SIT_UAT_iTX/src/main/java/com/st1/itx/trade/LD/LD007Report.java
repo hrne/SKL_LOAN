@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD007ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -24,6 +25,9 @@ public class LD007Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void printTitle() {
@@ -46,15 +50,8 @@ public class LD007Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LD007List) throws LogicException {
 
-		makeExcel.open(titaVo
-				, titaVo.getEntDyI()
-				, titaVo.getKinbr()
-				, "LD007"
-				, "房貸專員明細統計"
-				, "LD007房貸專員明細統計"
-				, "LD007房貸專員明細統計.xls"
-				, "房貸專員明細統計");
-		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD007", "房貸專員明細統計", "LD007房貸專員明細統計", "LD007房貸專員明細統計.xls", "房貸專員明細統計");
+
 		int row = 2;
 		BigDecimal total = BigDecimal.ZERO;
 		if (LD007List != null && LD007List.size() != 0) {
@@ -65,12 +62,11 @@ public class LD007Report extends MakeReport {
 				for (int i = 0; i <= 15; i++) {
 
 					value = tLDVo.get("F" + i);
-					
-					if (value == null)
-					{
+
+					if (value == null) {
 						value = "";
 					}
-					
+
 					col++;
 					switch (i) {
 					case 0:
@@ -92,7 +88,7 @@ public class LD007Report extends MakeReport {
 						total = total.add(bd);
 						break;
 					default:
-						makeExcel.setValue(row, col, value);
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? getBigDecimal(value) : value);
 						break;
 					}
 				} // for

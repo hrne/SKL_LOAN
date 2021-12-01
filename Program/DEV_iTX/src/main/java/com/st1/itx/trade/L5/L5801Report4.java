@@ -57,31 +57,32 @@ public class L5801Report4 extends MakeReport {
 		fontStyleVo.setFont((short) 1); // 字體 : 標楷體
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
-
+		// 補貼息移到最後  確認 本月貸款餘額為0時 不顯示資料
 		makeExcel.setValue(1, 1, "戶號額度", fontStyleVo);
 		makeExcel.setValue(1, 2, "商品代碼", fontStyleVo);
 		makeExcel.setValue(1, 3, "專案融資種類", fontStyleVo);
 		makeExcel.setValue(1, 4, "補貼利率", fontStyleVo);
-		makeExcel.setValue(1, 5, "補貼息", fontStyleVo);
-		makeExcel.setValue(1, 6, "帳冊別", fontStyleVo);
-		makeExcel.setValue(1, 7, "上月貸款餘額", fontStyleVo);
-		makeExcel.setValue(1, 8, "本月貸出數", fontStyleVo);
-		makeExcel.setValue(1, 9, "本月收回數", fontStyleVo);
-		makeExcel.setValue(1, 10, "屆期不再申撥補貼息", fontStyleVo);
-		makeExcel.setValue(1, 11, "本月貸款餘額", fontStyleVo);
-
+//		makeExcel.setValue(1, 5, "補貼息", fontStyleVo);
+		makeExcel.setValue(1, 5, "帳冊別", fontStyleVo);
+		makeExcel.setValue(1, 6, "上月貸款餘額", fontStyleVo);
+		makeExcel.setValue(1, 7, "本月貸出數", fontStyleVo);
+		makeExcel.setValue(1, 8, "本月收回數", fontStyleVo);
+		makeExcel.setValue(1, 9, "屆期不再申撥補貼息", fontStyleVo);
+		makeExcel.setValue(1, 10, "本月貸款餘額", fontStyleVo);
+		makeExcel.setValue(1, 11, "補貼息", fontStyleVo);
+		
 		makeExcel.setWidth(1, 15);
 		makeExcel.setWidth(2, 12);
 		makeExcel.setWidth(3, 17);
 		makeExcel.setWidth(4, 12);
+//		makeExcel.setWidth(5, 9);
 		makeExcel.setWidth(5, 9);
-		makeExcel.setWidth(6, 9);
-		makeExcel.setWidth(7, 17);
+		makeExcel.setWidth(6, 17);
+		makeExcel.setWidth(7, 14);
 		makeExcel.setWidth(8, 14);
-		makeExcel.setWidth(9, 14);
-		makeExcel.setWidth(10, 23);
-		makeExcel.setWidth(11, 17);
-		
+		makeExcel.setWidth(9, 23);
+		makeExcel.setWidth(10, 17);
+		makeExcel.setWidth(11, 9);
 		int printRow = 2; // 從第二行開始印
 
 		if (listL5801 == null || listL5801.isEmpty()) {
@@ -134,40 +135,45 @@ public class L5801Report4 extends MakeReport {
 
 				makeExcel.setValue(printRow, 4, SubsidyRate, fontStyleVo);
 
-				// F5 補貼息
-				String Money = mapL5801.get("F5");
-
-				makeExcel.setValue(printRow, 5, Money, fontStyleVo);
+//				// F5 補貼息
+//				String Money = mapL5801.get("F5");
+//
+//				makeExcel.setValue(printRow, 5, Money, fontStyleVo);
 
 				// F6 帳冊別
-				String AcBookCode = mapL5801.get("F6");
+				String AcBookCode = mapL5801.get("F5");
 
-				makeExcel.setValue(printRow, 6, AcBookCode, fontStyleVo);
+				makeExcel.setValue(printRow, 5, AcBookCode, fontStyleVo);
 
 				// F7 A.上月貸款餘額
-				String LastMonthBal = mapL5801.get("F7");
+				String LastMonthBal = mapL5801.get("F6");
 
-				makeExcel.setValue(printRow, 7, LastMonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 6, LastMonthBal, fontStyleVo);
 
 				// F8 B.本月貸出數
-				String OpenAmount = mapL5801.get("F8");
+				String OpenAmount = mapL5801.get("F7");
 
-				makeExcel.setValue(printRow, 8, OpenAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 7, OpenAmount, fontStyleVo);
 
 				// F9 C1.本月收回數
-				String CloseAmount = mapL5801.get("F9");
+				String CloseAmount = mapL5801.get("F8");
 
-				makeExcel.setValue(printRow, 9, CloseAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 8, CloseAmount, fontStyleVo);
 
 				// F10 C2.屆期不再申撥補貼息
-				String MaturityAmount = mapL5801.get("F10");
+				String MaturityAmount = mapL5801.get("F9");
 
-				makeExcel.setValue(printRow, 10, MaturityAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 9, MaturityAmount, fontStyleVo);
 
 				// F11 D.本月貸款餘額
-				String ThisMonthBal = mapL5801.get("F11");
+				String ThisMonthBal = mapL5801.get("F10");
+				
+				makeExcel.setValue(printRow, 10, ThisMonthBal, fontStyleVo);
+				
+				// F5 補貼息
+				String Money = mapL5801.get("F11");
 
-				makeExcel.setValue(printRow, 11, ThisMonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 11, Money, fontStyleVo);
 				printRow++;
 			}
 			// 畫框線

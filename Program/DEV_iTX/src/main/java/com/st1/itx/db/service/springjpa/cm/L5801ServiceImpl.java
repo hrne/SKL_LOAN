@@ -285,14 +285,19 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " ";
-		sql += " SELECT N.\"ProjectKind\"                                                   "; // -- F0 專案融資種類
-		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)  AS \"F1\"        "; // -- F1 補貼息"
-		sql += "      , N.\"LastMonthBal\"                                                  "; // -- F2 A.上月貸款餘額
-		sql += "      , N.\"OpenAmount\"                                                    "; // -- F3 B.本月貸出數
-		sql += "      , N.\"CloseAmount\"                                                   "; // -- F4 C1.本月收回數" --還款+結清+轉催收
-		sql += "      , N.\"MaturityAmount\"                                                "; // -- F5 C2.屆期不再申撥補貼息" --超過到期日
-		sql += "      , N.\"ThisMonthBal\"                                                  "; // -- F6 D.本月貸款餘額
-
+		sql += " SELECT N.\"ProjectKind\"                                                         "; // -- F0 專案融資種類
+		sql += "      , N.\"LastMonthBalCount\"                                                   "; // -- F1 A.上月貸款餘額(次數)
+		sql += "      , N.\"LastMonthBal\"                                                        "; // -- F2 A.上月貸款餘額
+		sql += "      , N.\"OpenAmountCount\"                                                     "; // -- F3 B.本月貸出數(次數)
+		sql += "      , N.\"OpenAmount\"                                                          "; // -- F4 B.本月貸出數
+		sql += "      , N.\"CloseAmountCount\"                                                    "; // -- F5 C1.本月收回數" --還款+結清+轉催收(次數)
+		sql += "      , N.\"CloseAmount\"                                                         "; // -- F6 C1.本月收回數" --還款+結清+轉催收
+		sql += "      , N.\"MaturityAmountCount\"                                                 "; // -- F7 C2.屆期不再申撥補貼息" --超過到期日(次數)
+		sql += "      , N.\"MaturityAmount\"                                                      "; // -- F8 C2.屆期不再申撥補貼息" --超過到期日
+		sql += "      , N.\"ThisMonthBalCount\"                                                   "; // -- F9 D.本月貸款餘額(次數)
+		sql += "      , N.\"ThisMonthBal\"                                                        "; // -- F10 D.本月貸款餘額
+		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)  AS \"F11\"       "; // -- F11 補貼息"
+		
 		sql += "      FROM (SELECT MAX(CASE T.\"ProdNo\"";
 		sql += "                            WHEN 'IA' THEN 1";
 		sql += "                            WHEN 'IB' THEN 2";
@@ -317,11 +322,19 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            ELSE           0.7";
 		sql += "                       END)                           AS \"SubsidyRate\"";
 
+		sql += "                 , SUM(CASE WHEN NVL(B.\"AcctCode\",'*') != '990' AND NVL(B.\"LoanBalance\",0) != 0";
+		sql += "                                 THEN 1";
+		sql += "                            ELSE  0";
+		sql += "                       END)                           AS \"LastMonthBalCount\"";
 		sql += "                 , SUM(CASE WHEN NVL(B.\"AcctCode\",'*') = '990'";
 		sql += "                                 THEN 0";
 		sql += "                            ELSE NVL(B.\"LoanBalance\",0)";
 		sql += "                       END)                           AS \"LastMonthBal\"";
 
+		sql += "                 , SUM(CASE  WHEN t.\"AcctCode\" != '990' AND (nvl(b.\"AcctCode\", '*') = '*' OR ";
+		sql += "                    nvl(b.\"AcctCode\", '*') = '990') THEN 1" ; 
+		sql += "                    ELSE 0 ";
+		sql += "                       END)                            AS \"OpenAmountCount\"";
 		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990'";
 		sql += "                                 THEN 0";
 		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*'";
@@ -331,6 +344,16 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            ELSE 0";
 		sql += "                       END)                            AS \"OpenAmount\"";
 
+		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990' AND NVL(B.\"LoanBalance\",0) != 0";
+		sql += "                                 THEN 1        "; 
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
+		sql += "                                 THEN 0";
+		sql += "                            WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth  ";
+		sql += "                                 THEN 0";
+		sql += "                            WHEN NVL(B.\"LoanBalance\",0) > 0         "; 
+		sql += "                                 THEN 1";
+		sql += "                            ELSE 0";
+		sql += "                       END)                             AS \"CloseAmountCount\"   "; // --還款+結清+轉催收
 		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990'";
 		sql += "                                 THEN NVL(B.\"LoanBalance\",0)        "; // -- 轉催收
 		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
@@ -345,10 +368,22 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth ";
 		sql += "                             AND T.\"AcctCode\" <> '990'";
 		sql += "                             AND T.\"LoanBalance\" > 0";
+		sql += "                                 THEN 1";
+		sql += "                            ELSE 0";
+		sql += "                       END)                             AS \"MaturityAmountCount\" "; // --超過到期日
+		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth ";
+		sql += "                             AND T.\"AcctCode\" <> '990'";
+		sql += "                             AND T.\"LoanBalance\" > 0";
 		sql += "                                 THEN T.\"LoanBalance\"";
 		sql += "                            ELSE 0";
 		sql += "                       END)                             AS \"MaturityAmount\" "; // --超過到期日
 
+		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) <= :thisMonth ";
+		sql += "                                 THEN 0";
+		sql += "                            WHEN T.\"AcctCode\" = '990'";
+		sql += "                                 THEN 0";
+		sql += "                            ELSE 1";
+		sql += "                       END)                             AS \"ThisMonthBalCount\"";
 		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) <= :thisMonth ";
 		sql += "                                 THEN 0";
 		sql += "                            WHEN T.\"AcctCode\" = '990'";
@@ -421,14 +456,14 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"ProdNo\"                                                     "; // -- F2 商品代碼
 		sql += "      , N.\"ProjectKind\"                                                "; // -- F3 專案融資種類
 		sql += "      , N.\"SubsidyRate\"                                                "; // -- F4 補貼利率
-		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)   AS \"F5\" "; // -- F5 補貼息
-		sql += "      , N.\"AcBookCode\" + '/' + N.\"AcSubBookCode\"              AS \"F6\" "; // -- F6 帳冊別
-		sql += "      , N.\"LastMonthBal\"                                               "; // -- F7 A.上月貸款餘額
-		sql += "      , N.\"OpenAmount\"                                                 "; // -- F8 B.本月貸出數
-		sql += "      , N.\"CloseAmount\"                                                "; // -- F9 C1.本月收回數 --還款+結清+轉催收
-		sql += "      , N.\"MaturityAmount\"                                             "; // -- F10 C2.屆期不再申撥補貼息 --超過到期日
-		sql += "      , N.\"ThisMonthBal\"                                               "; // -- F11 D.本月貸款餘額
-
+		sql += "      , N.\"AcBookCode\" + '/' + N.\"AcSubBookCode\"              AS \"F5\" "; // -- F5 帳冊別
+		sql += "      , N.\"LastMonthBal\"                                               "; // -- F6 A.上月貸款餘額
+		sql += "      , N.\"OpenAmount\"                                                 "; // -- F7 B.本月貸出數
+		sql += "      , N.\"CloseAmount\"                                                "; // -- F8 C1.本月收回數 --還款+結清+轉催收
+		sql += "      , N.\"MaturityAmount\"                                             "; // -- F9 C2.屆期不再申撥補貼息 --超過到期日
+		sql += "      , N.\"ThisMonthBal\"                                               "; // -- F10 D.本月貸款餘額
+		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)   AS \"F11\" "; // -- F11 補貼息
+		
 		sql += "      FROM (";
 		sql += "            SELECT T.\"CustNo\"                           AS \"CustNo\"";
 		sql += "                 , T.\"FacmNo\"                           AS \"FacmNo\"";
@@ -521,6 +556,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "             GROUP BY T.\"CustNo\", T.\"FacmNo\"";
 		sql += "             ) N";
+		sql += "  WHERE n.\"ThisMonthBal\" != 0 " ;
 		sql += " ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 		this.info("sql=" + sql);
 		Query query;

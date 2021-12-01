@@ -30,13 +30,19 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		this.info("lD006.findAll WorkMonthStart = " + titaVo.getParam("workMonthStart") + " ; " + titaVo.getParam("workMonthEnd"));
-
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {		
+		Boolean useWorkMonth = parse.stringToInteger(titaVo.getParam("workMonthStart")) > 0;
+		Boolean useCustNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0;
+		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
+		Boolean useIntroducer = !titaVo.getParam("Introducer").trim().isEmpty();
+		
+		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useIntroducer:%s", useWorkMonth, useCustNo, useFacmNo, useIntroducer));
+		// check titaVo for input values
+		
 		String sql = "";
-		sql += " SELECT B0.\"UnitItem\" AS \"BsDeptItem\""; // 部室中文(房貸專員)
-		sql += "       ,E0.\"Fullname\" AS \"BsName\""; // 房貸專員姓名
-		sql += "       ,C.\"CustName\""; // 戶名
+		sql += " SELECT B0.\"UnitItem\" AS \"BsDeptItem\" "; // 部室中文(房貸專員)
+		sql += "       ,E0.\"Fullname\" AS \"BsName\" "; // 房貸專員姓名
+		sql += "       ,\"Fn_MaskName\"(C.\"CustName\") AS \"CustName\" "; // 戶名
 		sql += "       ,I.\"CustNo\""; // 戶號
 		sql += "       ,I.\"FacmNo\""; // 額度號碼
 		sql += "       ,I.\"BormNo\""; // 撥款序號
@@ -91,12 +97,27 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\"    = I.\"CustNo\"     ";
 		sql += "                                    AND PIDA.\"FacmNo\"    = I.\"FacmNo\"     ";
 		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
-		sql += " WHERE I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
-		sql += "   AND I.\"DrawdownAmt\" > 0 ";
-		// sql += " AND NVL(B0.\"UnitItem\", ' ') != ' ' "; PfDetailCom 取
-		// FacMain.BusinessOfficer, 此欄位不一定會填入房貸專員的員編, 串得到部室中文才是房貸專員
-		// 20211117 依eric指示先disable
-		sql += "   AND NVL(I.\"Introducer\", ' ') != ' ' "; // PfItDetail 存在介紹人為 Null 的資料
+		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
+		sql += "   AND I.\"Introducer\" IS NOT NULL"; // PfItDetail 存在介紹人為 Null 的資料
+		if (useWorkMonth)
+		{
+			sql += "   AND I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
+		} else
+		{
+			sql += "   AND I.\"DrawdownDate\" BETWEEN :perfDateStart AND :perfDateEnd";
+		}
+		if (useCustNo)
+		{
+			sql += "   AND I.\"CustNo\" = :custNo";
+		}
+		if (useFacmNo)
+		{
+			sql += "   AND I.\"CustNo\" = :facmNo";
+		}
+		if (useIntroducer)
+		{
+			sql += "   AND I.\"Introducer\" = :introducer";
+		}
 		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=FRENCH') ";
 		sql += "         ,NLSSORT(I.\"DistCode\", 'NLS_SORT=FRENCH') ";
 		sql += "         ,NLSSORT(I.\"UnitCode\", 'NLS_SORT=FRENCH') "; // 原表排序用到這三個欄位, 但原環境會將英文排在數字前面;
@@ -108,10 +129,32 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
+		
+		if (useWorkMonth)
+		{
 		query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
 		query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
-
+		} else
+		{
+		query.setParameter("perfDateStart", parse.stringToInteger(titaVo.getParam("perfDateStart")) + 19110000);
+		query.setParameter("perfDateEnd", parse.stringToInteger(titaVo.getParam("perfDateEnd")) + 19110000);
+		}
+		
+		if (useCustNo)
+		{
+			query.setParameter("custNo", titaVo.getParam("custNo"));
+		}
+		
+		if (useFacmNo)
+		{
+			query.setParameter("facmNo", titaVo.getParam("facmNo"));
+		}
+		
+		if (useIntroducer)
+		{
+			query.setParameter("introducer", titaVo.getParam("Introducer"));
+		}
+		
 		return this.convertToMap(query);
 	}
 

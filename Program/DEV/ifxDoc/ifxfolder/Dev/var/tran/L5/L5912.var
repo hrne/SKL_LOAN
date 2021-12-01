@@ -105,6 +105,7 @@ C(3,#SnoM,0,E(0,0),E(0,1))
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L5912
+#ExcelSnoM
 ^
 </sub>
 

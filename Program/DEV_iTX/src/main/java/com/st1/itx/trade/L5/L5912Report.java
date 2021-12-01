@@ -142,7 +142,7 @@ public class L5912Report extends MakeReport {
 				makeExcel.setBackGroundColor("Grey");
 				break;
 			}
-			makeExcel.setValue(row, hcol + 1, content);
+			makeExcel.setValue(row, hcol + 1, content,"R");
 			hcol++;
 		}
 		for (Map<String, String> s5912SqlReturn : t5912SqlReturn) {
@@ -170,10 +170,10 @@ public class L5912Report extends MakeReport {
 					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("MaturityDate"))-19110000);
 					break;
 				case 6:
-					makeExcel.setValue(row, col + 1, s5912SqlReturn.get("RepayBank"));
+					makeExcel.setValue(row, col + 1, s5912SqlReturn.get("RepayBank"),"R");
 					break;
 				case 7:
-					makeExcel.setValue(row, col + 1, s5912SqlReturn.get("PieceCode"));
+					makeExcel.setValue(row, col + 1, s5912SqlReturn.get("PieceCode"),"R");
 					break;
 				case 8:
 					makeExcel.setValue(row, col + 1, s5912SqlReturn.get("BsOfficer"));
@@ -185,6 +185,9 @@ public class L5912Report extends MakeReport {
 				}
 			}
 		}
+		makeExcel.setWidth(4, 16);
+		makeExcel.setWidth(7, 14);
+		makeExcel.setWidth(8, 14);
 		
 		//報表
 		// 列數
@@ -213,8 +216,6 @@ public class L5912Report extends MakeReport {
 				if (!a5912SqlReturn.get("F9").isEmpty() && !a5912SqlReturn.get("F9").equals("")) {
 					i103Total = new BigDecimal(a5912SqlReturn.get("F9"));
 				}
-				this.info("全部="+iTotal);
-				this.info("103="+i103Total);
 				if 	(iTotal.compareTo(iComp)>0) {
 					if 	(i103Total.compareTo(iComp)>0) {
 						iAvg = i103Total.divide(iTotal,3,RoundingMode.HALF_UP);
@@ -245,6 +246,11 @@ public class L5912Report extends MakeReport {
 				}
 			}
 		}
+		makeExcel.setWidth(1, 14);
+		makeExcel.setWidth(2, 14);
+		makeExcel.setWidth(3, 14);
+		makeExcel.setWidth(4, 18);
+		makeExcel.setWidth(5, 20);
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 

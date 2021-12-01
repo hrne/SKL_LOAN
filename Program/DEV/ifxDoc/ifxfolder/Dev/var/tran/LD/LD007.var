@@ -22,28 +22,45 @@ T(3,LD007)
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[140,850];printer.width=[20,80];order=1;">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,80];">
 [
 ["[LD007]                                  LD007放款專員明細統計"],
-["#FdWorkMonth+工作月區間",#workMonthStart," ~ ",#workMonthEnd],
+["#FdMain+查詢條件","@(工作月期間、撥款起訖日，需擇一輸入)"],
+["#FdWorkMonth+．工作月區間",#workMonthStart," ~ ",#workMonthEnd],
+["#FdPerfDate+．撥款起訖日",#perfDateStart,"~",#perfDateEnd],
+["#FdCustNo+戶號",#custNo,"-",#facmNo],
+["#FdBsOfficer+房貸專員",#bsOfficer,#BtnCdEmp,#bsOfficerX],
 ]
+<include src="ROM.icf::L2R08.dec"/>
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
-! #NTXBUF=X,3,S
-! C(3,#CHAIN,1,T(4,NTXBUF$),S)
-! T(1,@FUNCD,#NTXBUF,1,1)
-! T(1,@TLR,#NTXBUF,2,2)
-! T(2,@FKEY,7)
 
 
 !-----------------------------------------------------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
-#FdWorkMonth=X,2,L
+![Button資料查詢]
+#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
+#BindCdEmp=X,1,S
+BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:Introducer2<-OOEmployeeNo:IntroducerX<-OOFullname})
+
+#FdMain=X,2,L
 T(3,*)
+
+#FdWorkMonth=X,2,L
+T(3, )
+
+#FdPerfDate=X,2,L
+T(3, )
+
+#FdCustNo=X,2,L
+T(3, )
+
+#FdBsOfficer=X,2,L
+T(3, )
 
 ! 工作月
 #workMonthStart=A,5,I
@@ -56,6 +73,52 @@ C(3,#workMonthStart,0,S,C(3,#workMonthEnd,0,E(0,#workMonthStart),$))
 @
 A(YM13,1,#workMonthEnd)
 IF(#workMonthEnd<#workMonthStart,V(P,工作月訖起不得小於工作月起),$)
+
+! 業績日期
+#perfDateStart=D,7,I
+C(3,#workMonthStart,0,$,S)
+C(3,#perfDateStart,0,T(1,#SYSDATE,2,7),$)
+D(8)
+@
+V(7)
+A(DATE,0,#perfDateStart)
+
+#perfDateEnd=D,7,I
+C(3,#workMonthStart,0,$,S)
+C(3,#perfDateEnd,0,E(0,#perfDateStart),$)
+D(8)
+@
+V(7)
+A(DATE,0,#perfDateEnd)
+
+#checkPerfDate=X,1,S
+@IF(#perfDateEnd>=#perfDateStart,$,V(P,撥款訖日不得大於等於起日))
+
+#custNo=A,7,I
+
+#facmNo=A,3,I
+C(3,#custNo,0,S,$)
+
+#bsOfficer=X,6,I
+
+#bsOfficer2=X,6,S
+
+#bsOfficerX=X,40,L
+C(4,#bsOfficer,S,$)
+
+#RimEmployeeNo=X,6,S
+
+#RIM_L2R08=X,1,S
+C(4,#bsOfficer,S,$)
+C(5,#bsOfficer,#bsOfficer2,S,$)
+T(3,@bsOfficerX,)
+C(4,#bsOfficer,S,$)
+RESET_RIM(#RIM_L2R08,L2R08)
+T(2,@RimEmployeeNo,#bsOfficer)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo)
+R(1,L2R08)
+T(2,@bsOfficerX,#L2r08FullName)
+T(2,@bsOfficer2,#bsOfficer)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R34.dec"/>
@@ -106,13 +169,18 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 <sub type="TIM">
 #workMonthStart
 #workMonthEnd
+#perfDateStart
+#perfDateEnd
+#custNo
+#facmNo
+#bsOfficer
 #END
 </sub>
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
-<include src="ROM.icf::L6R34.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
 
 TXFORM=LD007
 ^

@@ -14,6 +14,7 @@ import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.springjpa.cm.LD006ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -29,6 +30,9 @@ public class LD006Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+	
+	@Autowired
+	Parse parse;
 
 	public Boolean exec(TitaVo titaVo) throws LogicException {
 
@@ -75,7 +79,7 @@ public class LD006Report extends MakeReport {
 						makeExcel.setValue(row, col, getBigDecimal(tmpValue), "#,##0");
 						break;
 					default:
-						makeExcel.setValue(row, col, tmpValue);
+						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue);
 						break;
 					}
 				} // for

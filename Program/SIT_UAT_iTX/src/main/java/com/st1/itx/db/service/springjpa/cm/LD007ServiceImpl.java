@@ -31,13 +31,18 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-
-		this.info("lD007.findAll ");
+		
+		Boolean useWorkMonth = parse.stringToInteger(titaVo.getParam("workMonthStart")) > 0;
+		Boolean useCustNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0;
+		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
+		Boolean useBsOfficer = !titaVo.getParam("bsOfficer").trim().isEmpty();
+		
+		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useBfOfficer:%s", useWorkMonth, useCustNo, useFacmNo, useBsOfficer));
 
 		String sql = "";
 		sql += " SELECT E0.\"DepItem\" \"LoanEmpItem\" ";
 		sql += "       ,E0.\"Fullname\" \"LoanEmpName\" ";
-		sql += "       ,C.\"CustName\" \"CustName\" ";
+		sql += "       ,\"Fn_MaskName\"(C.\"CustName\") AS \"CustName\" "; // 戶名
 		sql += "       ,B.\"CustNo\" \"CustNo\" ";
 		sql += "       ,B.\"FacmNo\" \"FacmNo\" ";
 		sql += "       ,B.\"BormNo\" \"BormNo\" ";
@@ -69,10 +74,27 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = I.\"UnitCode\" ";
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = B.\"CustNo\" ";
 		sql += "                        AND F.\"FacmNo\" = B.\"FacmNo\" ";
-		sql += " WHERE B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd ";
-		sql += "   AND B.\"DrawdownAmt\" > 0 ";
+		sql += " WHERE B.\"DrawdownAmt\" > 0 ";
 		sql += "   AND B.\"PerfAmt\" > 0 ";
-		
+		if (useWorkMonth)
+		{
+			sql += "   AND B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
+		} else
+		{
+			sql += "   AND B.\"DrawdownDate\" BETWEEN :perfDateStart AND :perfDateEnd";
+		}
+		if (useCustNo)
+		{
+			sql += "   AND B.\"CustNo\" = :custNo";
+		}
+		if (useFacmNo)
+		{
+			sql += "   AND B.\"CustNo\" = :facmNo";
+		}
+		if (useBsOfficer)
+		{
+			sql += "   AND B.\"BsOfficer\" = :bsOfficer";
+		}
 
 		this.info("sql=" + sql);
 		Query query;
@@ -80,8 +102,30 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
+		if (useWorkMonth)
+		{
 		query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
 		query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
+		} else
+		{
+		query.setParameter("perfDateStart", parse.stringToInteger(titaVo.getParam("perfDateStart")) + 19110000);
+		query.setParameter("perfDateEnd", parse.stringToInteger(titaVo.getParam("perfDateEnd")) + 19110000);
+		}
+		
+		if (useCustNo)
+		{
+			query.setParameter("custNo", titaVo.getParam("custNo"));
+		}
+		
+		if (useFacmNo)
+		{
+			query.setParameter("facmNo", titaVo.getParam("facmNo"));
+		}
+		
+		if (useBsOfficer)
+		{
+			query.setParameter("bsOfficer", titaVo.getParam("bsOfficer"));
+		}
 
 		return this.convertToMap(query);
 	}
