@@ -469,96 +469,96 @@ public interface JobMainService {
 
   /**
    * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsAp 每月IFRS9欄位清單A檔
+   * (月底日日終批次)維護 LoanIfrs9Ap 每月IFRS9欄位清單A檔
    * @param  tbsdyf int
    * @param  empNo String
    * @param  newAcFg int
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L7_LoanIfrsAp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo);
+  public void Usp_L7_LoanIfrs9Ap_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsBp 每月IFRS9欄位清單B檔
+   * (月底日日終批次)維護 LoanIfrs9Bp 每月IFRS9欄位清單B檔
    * @param  tbsdyf int
    * @param  empNo String
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L7_LoanIfrsBp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+  public void Usp_L7_LoanIfrs9Bp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsCp 每月IFRS9欄位清單C檔
+   * (月底日日終批次)維護 LoanIfrs9Cp 每月IFRS9欄位清單C檔
    * @param  tbsdyf int
    * @param  empNo String
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L7_LoanIfrsCp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+  public void Usp_L7_LoanIfrs9Cp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsDp 每月IFRS9欄位清單D檔
-   * @param  tbsdyf int
-   * @param  empNo String
-   * @param  newAcFg int
-   * @param titaVo Variable-Length Argument
-   *
-   */
-  public void Usp_L7_LoanIfrsDp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo);
-
-  /**
-   * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsFp 每月IFRS9欄位清單F檔
-   * @param  tbsdyf int
-   * @param  empNo String
-   * @param titaVo Variable-Length Argument
-   *
-   */
-  public void Usp_L7_LoanIfrsFp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
-
-  /**
-   * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsGp 每月IFRS9欄位清單G檔
-   * @param  tbsdyf int
-   * @param  empNo String
-   * @param titaVo Variable-Length Argument
-   *
-   */
-  public void Usp_L7_LoanIfrsGp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
-
-  /**
-   * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsHp 每月IFRS9欄位清單H檔
-   * @param  tbsdyf int
-   * @param  empNo String
-   * @param titaVo Variable-Length Argument
-   *
-   */
-  public void Usp_L7_LoanIfrsHp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
-
-  /**
-   * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsIp 每月IFRS9欄位清單I檔
+   * (月底日日終批次)維護 LoanIfrs9Dp 每月IFRS9欄位清單D檔
    * @param  tbsdyf int
    * @param  empNo String
    * @param  newAcFg int
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L7_LoanIfrsIp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo);
+  public void Usp_L7_LoanIfrs9Dp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>
-   * (月底日日終批次)維護 LoanIfrsJp 每月IFRS9欄位清單J檔
+   * (月底日日終批次)維護 LoanIfrs9Fp 每月IFRS9欄位清單F檔
    * @param  tbsdyf int
    * @param  empNo String
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L7_LoanIfrsJp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+  public void Usp_L7_LoanIfrs9Fp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (月底日日終批次)維護 LoanIfrs9Gp 每月IFRS9欄位清單G檔
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L7_LoanIfrs9Gp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (月底日日終批次)維護 LoanIfrs9Hp 每月IFRS9欄位清單H檔
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L7_LoanIfrs9Hp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (月底日日終批次)維護 LoanIfrs9Ip 每月IFRS9欄位清單I檔
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param  newAcFg int
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L7_LoanIfrs9Ip_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (月底日日終批次)維護 LoanIfrs9Jp 每月IFRS9欄位清單J檔
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L7_LoanIfrs9Jp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>

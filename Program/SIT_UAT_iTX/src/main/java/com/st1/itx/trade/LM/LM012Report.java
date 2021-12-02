@@ -29,12 +29,14 @@ public class LM012Report extends MakeReport {
 
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	@Autowired
 	Parse parse;
 
 	String dataDate = "";
-	
+
+	// 計算用
+	// 非輸出格式
 	private static final BigDecimal million = new BigDecimal("1000000");
 	private static final BigDecimal hundred = new BigDecimal("100");
 
@@ -159,10 +161,10 @@ public class LM012Report extends MakeReport {
 			BigDecimal totalLoanBalance = BigDecimal.ZERO;
 			for (int k = 1; k < 5; k++) {
 				String ad = "F" + String.valueOf(k);
-				
+
 				value[i][k - 1] = value[i][k - 1].add(getBigDecimal(LM12Vo.get(ad)).divide(million, 0, 4));
 				total[k - 1] = total[k - 1].add(getBigDecimal(LM12Vo.get(ad)).divide(million, 0, 4));
-				
+
 				totalLoanBalance = totalLoanBalance.add(value[i][k - 1]);
 			}
 
@@ -192,7 +194,7 @@ public class LM012Report extends MakeReport {
 				}
 				temp = 0;
 				for (int j = 0; j < 5; j++) {
-					BigDecimal result = value[i][j];// Last Version
+					BigDecimal result = value[i][j];
 					this.print(0, 31 + temp, this.formatAmt(result, 0), "R");
 					if (!value[i][j].equals(BigDecimal.ZERO)) {
 						BigDecimal percent = this.computeDivide(value[i][j], total[j], 4).multiply(hundred);
@@ -278,7 +280,7 @@ public class LM012Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		this.toPdf(sno);
+		// this.toPdf(sno);
 
 		return true;
 	}

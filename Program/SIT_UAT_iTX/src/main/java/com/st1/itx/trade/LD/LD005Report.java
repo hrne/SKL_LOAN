@@ -21,7 +21,7 @@ public class LD005Report extends MakeReport {
 
 	@Autowired
 	public LD005ServiceImpl lD005ServiceImpl;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -58,14 +58,7 @@ public class LD005Report extends MakeReport {
 	public Boolean exec(TitaVo titaVo) throws LogicException {
 		// 讀取VAR參數
 		this.setCharSpaces(0);
-		this.open(titaVo
-				, titaVo.getEntDyI()
-				, titaVo.getKinbr()
-				, "LD005"
-				, "暫收支票收據列印(個人戶)"
-				, ""
-				, "A4"
-				, "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD005", "暫收支票收據列印(個人戶)", "", "A4", "L");
 
 		int temp = 0;
 		List<Map<String, String>> LD005List = null;
@@ -107,7 +100,7 @@ public class LD005Report extends MakeReport {
 
 				if (!CustNo.equals(tempNo) || !ChequeName.equals(tempName)) {
 					// 有項目不一樣, 換頁
-					
+
 					printSum(temp);
 					temp = 0;
 					CustNo = tempNo;
@@ -119,7 +112,7 @@ public class LD005Report extends MakeReport {
 				this.print(0, 16, LD005List.get(i).get("F3"));
 
 				BigDecimal f4 = getBigDecimal(LD005List.get(i).get("F4"));
-				
+
 				this.print(0, 45, formatAmt(f4, 0), "R");
 
 				this.print(0, 52, this.showRocDate(LD005List.get(i).get("F5"), 1));
@@ -153,7 +146,7 @@ public class LD005Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		this.toPdf(sno);
+		// this.toPdf(sno);
 
 		return true;
 	}

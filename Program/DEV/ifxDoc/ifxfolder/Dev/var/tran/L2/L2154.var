@@ -2819,7 +2819,7 @@ HELP(#RelationCodeHelp)
 @C(3,#RepayCode,2,s,V(H,#RelationCodeHelp))
 
 #RelationCodeX=X,4,L
-T(3,)
+C(4,#RelationCode,S,$)
 T(H,#RelationCode,#RelationCodeHelp)
 
 #WkFDP5C=X,1,S
@@ -2959,10 +2959,12 @@ IF(#L2r05Introducer==#Introducer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08A,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@IntroducerX,#L2r08FullName)
+T(2,@District,#L2r08CenterCode1)
+T(2,@DistrictX,#L2r08CenterCode1Name)
 
 #IntroducerX=X,20,L
 C(4,#Introducer,S,$)
-T(2,#L2r08FullName)
 
 ![區部]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -2970,11 +2972,9 @@ T(2,#L2r08FullName)
 
 #District=X,6,L
 C(4,#Introducer,S,$)
-T(2,#L2r08CenterCode1)
 
 #DistrictX=X,20,L
 C(4,#Introducer,S,$)
-T(2,#L2r08CenterCode1Name)
 
 #BUF12A=X,7,S
 T(3,      Y)
@@ -3003,10 +3003,10 @@ IF(#L2r05FireOfficer==#FireOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08B,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@FireOfficerX,#L2r08FullName)
 
 #FireOfficerX=X,20,L
 C(4,#FireOfficer,S,$)
-T(2,#L2r08FullName)
 
 #BUF13A=X,7,S
 T(3,      Y)
@@ -3035,10 +3035,10 @@ IF(#L2r05Estimate==#Estimate,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08C,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@EstimateX,#L2r08FullName)
 
 #EstimateX=X,20,L
 C(4,#Estimate,S,$)
-T(2,#L2r08FullName)
 
 #BUF14A=X,7,S
 T(3,      Y)
@@ -3068,10 +3068,10 @@ IF(#L2r05CreditOfficer==#CreditOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08D,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@CreditOfficerX,#L2r08FullName)
 
 #CreditOfficerX=X,20,L
 C(4,#CreditOfficer,S,$)
-T(2,#L2r08FullName)
 
 
 #BUF16A=X,7,S
@@ -3101,10 +3101,10 @@ IF(#L2r05BusinessOfficer==#BusinessOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSki
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08F,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@BusinessOfficerX,#L2r08FullName)
 
 #BusinessOfficerX=X,20,L
 C(4,#BusinessOfficer,S,$)
-T(2,#L2r08FullName)
 
 #BUF17A=X,7,S
 T(3,      Y)
@@ -3120,7 +3120,7 @@ HELP(#ApprovedLevelHelp)
 @V(H,#ApprovedLevelHelp)
 
 #ApprovedLevelX=X,20,L
-T(3,)
+C(4,#ApprovedLevel,S,$)
 T(H,#ApprovedLevel,#ApprovedLevelHelp)
 C(3,#UpdateCode,1,C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F,@Supervisor,1)T(3,@FdSupervisor,*)),$)
 
@@ -3151,10 +3151,10 @@ IF(#L2r05Supervisor==#Supervisor,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08G,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@SupervisorX,#L2r08FullName)
 
 #SupervisorX=X,20,L
 C(4,#Supervisor,S,$)
-T(2,#L2r08FullName)
 
 #BUF19A=X,7,S
 T(3,      Y)
@@ -3182,10 +3182,10 @@ IF(#L2r05InvestigateOfficer==#InvestigateOfficer,T(3,@RimErrorSkip,Y),T(3,@RimEr
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08H,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@InvestigateOfficerX,#L2r08FullName)
 
 #InvestigateOfficerX=X,20,L
 C(4,#InvestigateOfficer,S,$)
-T(2,#L2r08FullName)
 
 #BUF20A=X,7,S
 T(3,      Y)
@@ -3213,10 +3213,10 @@ IF(#L2r05EstimateReview==#EstimateReview,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08I,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@EstimateReviewX,#L2r08FullName)
 
 #EstimateReviewX=X,20,L
 C(4,#EstimateReview,S,$)
-T(2,#L2r08FullName)
 
 #BUF21A=X,7,S
 T(3,      Y)
@@ -3245,10 +3245,10 @@ IF(#L2r05Coorgnizer==#Coorgnizer,E(0,@RimFunCd,5),E(0,@RimFunCd,#FuncCode))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r13J,L2R13),$)
 S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
+T(2,@CoorgnizerX,#L2r13FullName)
 
 #CoorgnizerX=X,20,L
 C(4,#Coorgnizer,S,$)
-T(2,#L2r13FullName)
 
 
 !---- P10 其他

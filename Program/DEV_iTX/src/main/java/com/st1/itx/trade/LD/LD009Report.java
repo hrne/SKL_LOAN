@@ -131,11 +131,11 @@ public class LD009Report extends MakeReport {
 //		this.print(-9, 1, "業務科目                　前日　　加　　減　展入　展出　淨值　　本日　　　　前　　日　　　　　　　加　　　　　　　減　　　　淨增減　　　　本　　日　　　　　　展　期");
 
 		if (lLD009 != null && lLD009.size() != 0) {
-			
+
 			// 全表總計
 			BigDecimal[] totalAll = new BigDecimal[13];
 			Arrays.fill(totalAll, BigDecimal.ZERO);
-			
+
 			// 小計
 			BigDecimal[] totalPerItem = new BigDecimal[13];
 			Arrays.fill(totalPerItem, BigDecimal.ZERO);
@@ -194,7 +194,7 @@ public class LD009Report extends MakeReport {
 				print(0, 132, formatAmt(tLDVo.get("F14"), 0), "R");
 				print(0, 148, formatAmt(tLDVo.get("F15"), 0), "R");
 				print(0, 166, formatAmt(tLDVo.get("F16"), 0), "R");
-				
+
 				// 計算小計與總計
 
 				for (int i = 0; i < 13; i++) {
@@ -255,7 +255,7 @@ public class LD009Report extends MakeReport {
 
 		fillData(titaVo);
 
-		this.toPdf(this.close(), reportCode + "_" + reportItem);
+		// this.toPdf(this.close(), reportCode + "_" + reportItem);
 
 	}
 

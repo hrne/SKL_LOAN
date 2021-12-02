@@ -46,7 +46,7 @@ public class LM018Report extends MakeReport {
 
 		this.print(-3, 70, "專案放款餘額及利收明細", "C");
 
-		this.setFontSize(5);
+		this.setFontSize(10);
 
 		this.print(-5, 260, "機密等級：密");
 		this.print(-6, 260, "單位：億元");
@@ -215,7 +215,7 @@ public class LM018Report extends MakeReport {
 						this.print(-15, xPivot + xShift, "┼────┼────");
 						this.print(-16, xPivot + xShift, "│　　　　│　　　　");
 						this.print(-17, xPivot + xShift, "│　　　　│　　　　");
-						this.print(-18, xPivot + xShift, "├────┼────");
+						this.print(-18, xPivot + xShift, "┼────┼────");
 						this.print(-19, xPivot + xShift, "│　　　　│　　　　");
 						this.print(-20, xPivot + xShift, "│　　　　│　　　　");
 						this.print(-21, xPivot + xShift, "├────┤　　　　");
@@ -283,12 +283,11 @@ public class LM018Report extends MakeReport {
 					this.print(thisSubject.printY, xPivot + xShift - 18, formatAmt(f2, 3, 8), "C");
 					thisSubject.lastBal = f2;
 
-					thisSubject.lastInt = thisSubject.lastInt.add(f3);
-
 					// interest
 					if (!thisSubject.showsGroupIntOnly) {
-						this.print(thisSubject.printY, xPivot + xShift - 6, formatAmt(thisSubject.lastInt, 4, 8), "C");
+						this.print(thisSubject.printY, xPivot + xShift - 6, formatAmt(f3, 4, 8), "C");
 					}
+					thisSubject.lastInt = thisSubject.lastInt.add(f3);
 
 				}
 
@@ -401,7 +400,7 @@ public class LM018Report extends MakeReport {
 		this.print(-41, xPivot + xShift + 31, formatAmt(GetIntTotal(), 0), "C");
 
 		long sno = this.close();
-		this.toPdf(sno);
+		// this.toPdf(sno);
 
 	}
 

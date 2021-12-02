@@ -57,7 +57,7 @@ public class LM047Report extends MakeReport {
 		}
 		exportExcel(LM047List);
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {

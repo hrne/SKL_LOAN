@@ -453,7 +453,7 @@ public class L9717Report extends MakeReport {
 
 		fillData(titaVo);
 
-		this.toPdf(this.close(), this.reportCode + "_" + this.reportItem);
+		// this.toPdf(this.close(), this.reportCode + "_" + this.reportItem);
 	}
 
 	public boolean exec(TitaVo titaVo, OutputSortBy sort) throws LogicException {

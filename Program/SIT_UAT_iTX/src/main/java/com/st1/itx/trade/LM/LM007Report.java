@@ -116,7 +116,7 @@ public class LM007Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		this.toPdf(sno);
+		// this.toPdf(sno);
 	}
 
 	private void exportPdf(List<Map<String, String>> lLM007) throws LogicException {

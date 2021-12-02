@@ -64,6 +64,7 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		int iCustNo=this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iCondition = Integer.parseInt(titaVo.getParam("Condition"));
+		int iUsageCode = Integer.parseInt(titaVo.getParam("UsageCode"));
 		String sql = "";
 		sql += " select                                   		 	  \n";
 		sql += " Y.\"YearMonth\"     			as F0                 \n";
@@ -86,7 +87,7 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "and F.\"FacmNo\" = Y.\"FacmNo\"					  	  \n";
 		
 		if(iYearMonth!=0 && iCustNo!=0) {
-			sql += "where Y.\"YearMonth\" = :yearmonth and  Y.\"CustNo\" = :custno";
+			sql += "where Y.\"YearMonth\" = :yearMonth and  Y.\"CustNo\" = :custNo";
 		} else if(iYearMonth!=0) {
 			sql += "where Y.\"YearMonth\" = :yearMonth";
 		} else if(iCustNo!=0) {
@@ -94,10 +95,13 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += "where Y.\"YearMonth\" >0 and Y.\"YearMonth\" <999912";
 		}
+		if(iUsageCode>0) {
+			sql += " and Y.\"UsageCode\" = '02' or Y.\"UsageCode\" = '2'    \n";
+		}
 		if(iCondition==1) {//借戶姓名空白
-			
+			sql += " and C.\"CustName\" = ''     				  \n";
 		} else if(iCondition==2) {//統一編號空白 
-			
+			sql += " and C.\"CustId\" = ''     				  \n";
 		} else if(iCondition==3) {//貸款帳號空白
 			sql += " and Y.\"CustNo\" = 0 OR  Y.\"FacmNo\" = 0	  \n";
 		} else if(iCondition==4) {//初貸金額為0
@@ -117,7 +121,7 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if(iCondition==11) {//科子細目代號暨說明空白
 			sql += " and Y.\"AcctCode\"= ' '			  		  \n";
 		}
-		sql += "order by Y.\"YearMonth\", Y.\"CustNo\",Y.\"FacmNo\"";
+		sql += " order by Y.\"YearMonth\", Y.\"CustNo\",Y.\"FacmNo\"";
 
 		this.info("sql=" + sql);
 		Query query;

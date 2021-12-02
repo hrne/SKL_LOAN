@@ -207,7 +207,7 @@ public class LM014Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		this.toPdf(sno);
+		// this.toPdf(sno);
 
 		return true;
 	}

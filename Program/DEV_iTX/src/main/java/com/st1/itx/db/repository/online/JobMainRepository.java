@@ -162,41 +162,41 @@ public interface JobMainRepository extends JpaRepository<JobMain, JobMainId> {
   @Procedure(value = "\"Usp_L7_Ias34Gp_Upd\"")
   public void uspL7Ias34gpUpd(int tbsdyf,  String empNo);
 
-  // (月底日日終批次)維護 LoanIfrsAp 每月IFRS9欄位清單A檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsAp_Upd\"")
-  public void uspL7LoanifrsapUpd(int tbsdyf,  String empNo,int newAcFg);
+  // (月底日日終批次)維護 LoanIfrs9Ap 每月IFRS9欄位清單A檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Ap_Upd\"")
+  public void uspL7Loanifrs9apUpd(int tbsdyf,  String empNo,int newAcFg);
 
-  // (月底日日終批次)維護 LoanIfrsBp 每月IFRS9欄位清單B檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsBp_Upd\"")
-  public void uspL7LoanifrsbpUpd(int tbsdyf,  String empNo);
+  // (月底日日終批次)維護 LoanIfrs9Bp 每月IFRS9欄位清單B檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Bp_Upd\"")
+  public void uspL7Loanifrs9bpUpd(int tbsdyf,  String empNo);
 
-  // (月底日日終批次)維護 LoanIfrsCp 每月IFRS9欄位清單C檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsCp_Upd\"")
-  public void uspL7LoanifrscpUpd(int tbsdyf,  String empNo);
+  // (月底日日終批次)維護 LoanIfrs9Cp 每月IFRS9欄位清單C檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Cp_Upd\"")
+  public void uspL7Loanifrs9cpUpd(int tbsdyf,  String empNo);
 
-  // (月底日日終批次)維護 LoanIfrsDp 每月IFRS9欄位清單D檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsDp_Upd\"")
-  public void uspL7LoanifrsdpUpd(int tbsdyf,  String empNo,int newAcFg);
+  // (月底日日終批次)維護 LoanIfrs9Dp 每月IFRS9欄位清單D檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Dp_Upd\"")
+  public void uspL7Loanifrs9dpUpd(int tbsdyf,  String empNo,int newAcFg);
 
-  // (月底日日終批次)維護 LoanIfrsFp 每月IFRS9欄位清單F檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsFp_Upd\"")
-  public void uspL7LoanifrsfpUpd(int tbsdyf,  String empNo);
+  // (月底日日終批次)維護 LoanIfrs9Fp 每月IFRS9欄位清單F檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Fp_Upd\"")
+  public void uspL7Loanifrs9fpUpd(int tbsdyf,  String empNo);
 
-  // (月底日日終批次)維護 LoanIfrsGp 每月IFRS9欄位清單G檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsGp_Upd\"")
-  public void uspL7LoanifrsgpUpd(int tbsdyf,  String empNo);
+  // (月底日日終批次)維護 LoanIfrs9Gp 每月IFRS9欄位清單G檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Gp_Upd\"")
+  public void uspL7Loanifrs9gpUpd(int tbsdyf,  String empNo);
 
-  // (月底日日終批次)維護 LoanIfrsHp 每月IFRS9欄位清單H檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsHp_Upd\"")
-  public void uspL7LoanifrshpUpd(int tbsdyf,  String empNo);
+  // (月底日日終批次)維護 LoanIfrs9Hp 每月IFRS9欄位清單H檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Hp_Upd\"")
+  public void uspL7Loanifrs9hpUpd(int tbsdyf,  String empNo);
 
-  // (月底日日終批次)維護 LoanIfrsIp 每月IFRS9欄位清單I檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsIp_Upd\"")
-  public void uspL7LoanifrsipUpd(int tbsdyf,  String empNo,int newAcFg);
+  // (月底日日終批次)維護 LoanIfrs9Ip 每月IFRS9欄位清單I檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Ip_Upd\"")
+  public void uspL7Loanifrs9ipUpd(int tbsdyf,  String empNo,int newAcFg);
 
-  // (月底日日終批次)維護 LoanIfrsJp 每月IFRS9欄位清單J檔
-  @Procedure(value = "\"Usp_L7_LoanIfrsJp_Upd\"")
-  public void uspL7LoanifrsjpUpd(int tbsdyf,  String empNo);
+  // (月底日日終批次)維護 LoanIfrs9Jp 每月IFRS9欄位清單J檔
+  @Procedure(value = "\"Usp_L7_LoanIfrs9Jp_Upd\"")
+  public void uspL7Loanifrs9jpUpd(int tbsdyf,  String empNo);
 
   // (月底日日終批次)維護 MonthlyLM052AssetClass
   @Procedure(value = "\"Usp_L9_MonthlyLM052AssetClass_Ins\"")

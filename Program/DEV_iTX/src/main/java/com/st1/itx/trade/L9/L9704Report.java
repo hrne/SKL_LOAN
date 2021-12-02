@@ -142,7 +142,7 @@ public class L9704Report extends MakeReport {
 				makeExcel.setValue(printRow, 12, thisMonthOvduPrinBal, "#,##0", "R", fontStyleVo);
 
 				// F10 本月催收利息餘額 + 本月催收違約金餘額
-				BigDecimal thisMonthOvduIntBal =  mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : getBigDecimal(mapL9704.get("F10"));
+				BigDecimal thisMonthOvduIntBal = mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : getBigDecimal(mapL9704.get("F10"));
 
 				makeExcel.setValue(printRow, 13, thisMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
@@ -195,7 +195,7 @@ public class L9704Report extends MakeReport {
 		makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	// 印小計

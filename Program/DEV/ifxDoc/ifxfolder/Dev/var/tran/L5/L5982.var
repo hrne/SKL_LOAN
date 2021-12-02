@@ -51,6 +51,7 @@ E(0,0)
 ["[L5982]                                 國稅局申報檔查詢"],
 ["#FdYearMonth+資料年月",#YearMonth],
 ["#FdCustNo+戶號",#CustNo],
+["#FdUsageCode+資金用途別",#UsageCode,#UsageCodeX],
 ["#FdCondition+檢核條件",#Condition,#ConditionX],
 ]
 !---------- AP Button AREA ----------
@@ -62,8 +63,10 @@ E(0,0)
 #FdYearMonth=X,2,L
 #FdCustNo=X,2,L
 #FdCondition=X,2,L
+#FdUsageCode=X,2,L
 
-
+#UsageHelp=x,100,S
+T(3,0:全部;2:購置不動產)
 
 #CODEAcctCod=x,20,S                  
 T(3,CdCode.AcctCode)  
@@ -93,7 +96,7 @@ CALL(#HelpProc)
 T(2,@AcctCodeHelp,#HelpDesc1)
 T(2,@RepayCodeHelp,#HelpDesc2)
 T(2,@UsageCodeHelp,00:全部;+#HelpDesc3)
-T(2,@ConditionsCodeHelp,#HelpDesc4)
+T(2,@ConditionsCodeHelp,00:全部;+#HelpDesc4)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -116,6 +119,15 @@ C(3,#RPTFG,0,$,S)
 !戶號
 #CustNo=A,7,I
 
+!資金用途別
+#UsageCode=A,1,I
+HELP(#UsageHelp)
+@
+V(H,#UsageHelp)
+
+#UsageCodeX=X,10,L
+T(H,#UsageCode,#UsageHelp)
+
 !檢核條件
 #Condition=A,2,I
 HELP(#ConditionsCodeHelp)
@@ -123,7 +135,6 @@ HELP(#ConditionsCodeHelp)
 C(3,#Condition,0,s,V(H,#ConditionsCodeHelp))
 
 #ConditionX=X,30,L
-C(3,#Condition,0,s,$)
 T(H,#Condition,#ConditionsCodeHelp)
 
 #CHAINXMT=X,1,S
@@ -227,7 +238,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L5812;text=刪除;ntxbuf=#OOBUF4})
 
 !------ 上行電文 ------
 <sub type="TIM">
-#YearMonth#CustNo#Condition
+#YearMonth#CustNo#Condition#UsageCode
 #END
 </sub>
 

@@ -131,7 +131,7 @@ public class L8701Batch extends TradeBuffer {
 
 		}
 		// 查詢機管編碼2+公司編碼3+資料產生日8+類別代碼固定B1+序號從01編碼
-		// 查詢機管編碼 抓 資料交換序號第9碼開始取兩位
+	
 		if(iCode.length()>=10) {
 			iCode = iCode.substring(8, 10);
 		} else {

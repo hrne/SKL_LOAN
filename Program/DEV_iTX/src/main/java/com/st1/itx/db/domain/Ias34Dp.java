@@ -29,7 +29,7 @@ public class Ias34Dp implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -999267624912432306L;
+	private static final long serialVersionUID = -6471406881958779948L;
 
 @EmbeddedId
   private Ias34DpId ias34DpId;
@@ -231,8 +231,8 @@ public class Ias34Dp implements Serializable {
   private int custKind = 0;
 
   // 產品別
-  @Column(name = "`IfrsProdCode`", length = 2)
-  private String ifrsProdCode;
+  @Column(name = "`Ifrs9ProdCode`", length = 2)
+  private String ifrs9ProdCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -1108,18 +1108,18 @@ public class Ias34Dp implements Serializable {
 	* 
 	* @return String
 	*/
-  public String getIfrsProdCode() {
-    return this.ifrsProdCode == null ? "" : this.ifrsProdCode;
+  public String getIfrs9ProdCode() {
+    return this.ifrs9ProdCode == null ? "" : this.ifrs9ProdCode;
   }
 
 /**
 	* 產品別<br>
 	* 
   *
-  * @param ifrsProdCode 產品別
+  * @param ifrs9ProdCode 產品別
 	*/
-  public void setIfrsProdCode(String ifrsProdCode) {
-    this.ifrsProdCode = ifrsProdCode;
+  public void setIfrs9ProdCode(String ifrs9ProdCode) {
+    this.ifrs9ProdCode = ifrs9ProdCode;
   }
 
 /**
@@ -1208,7 +1208,7 @@ public class Ias34Dp implements Serializable {
            + ", derY1Amt=" + derY1Amt + ", derY2Amt=" + derY2Amt + ", derY3Amt=" + derY3Amt + ", derY4Amt=" + derY4Amt + ", derY5Amt=" + derY5Amt + ", derY1Int=" + derY1Int
            + ", derY2Int=" + derY2Int + ", derY3Int=" + derY3Int + ", derY4Int=" + derY4Int + ", derY5Int=" + derY5Int + ", derY1Fee=" + derY1Fee + ", derY2Fee=" + derY2Fee
            + ", derY3Fee=" + derY3Fee + ", derY4Fee=" + derY4Fee + ", derY5Fee=" + derY5Fee + ", industryCode=" + industryCode + ", clTypeJCIC=" + clTypeJCIC + ", zip3=" + zip3
-           + ", prodCode=" + prodCode + ", custKind=" + custKind + ", ifrsProdCode=" + ifrsProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", prodCode=" + prodCode + ", custKind=" + custKind + ", ifrs9ProdCode=" + ifrs9ProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
            + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

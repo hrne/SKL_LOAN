@@ -146,7 +146,7 @@ public class LM035Report extends MakeReport {
 		makeExcel.setValue(2, yearSeason.size() + 2, "放款餘額");
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList, int timesLeft) throws LogicException {

@@ -415,6 +415,9 @@ public class MakeFile extends CommBuffer {
 			fw.flush();
 			this.info("MakeFile.toFile flush");
 		} catch (IOException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("MakeFile  IOException error = " + e.toString());
 			throw new LogicException("EC009", "(MakeFile)輸出檔(TxFile)序號:" + fileno + ",產檔失敗");
 		} finally {
 			SafeClose.close(fw);

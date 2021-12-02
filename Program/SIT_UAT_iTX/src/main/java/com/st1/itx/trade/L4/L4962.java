@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.InsuOrignal;
@@ -56,13 +57,13 @@ public class L4962 extends TradeBuffer {
 
 	@Autowired
 	public ClFacService sClFacService;
-	
+
 	@Autowired
 	public L4962ServiceImpl l4962ServiceImpl;
 
 	@Autowired
 	public CdCodeService sCdCodeDefService;
-	
+
 	@Autowired
 	public TotaVo totaA;
 
@@ -71,10 +72,11 @@ public class L4962 extends TradeBuffer {
 
 	@Autowired
 	public TotaVo totaC;
-	
+
 	private int cntA = 0;
 	private int cntB = 0;
 	private int cntC = 0;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4962 ");
@@ -87,11 +89,11 @@ public class L4962 extends TradeBuffer {
 
 		int iInsuEndMonthFrom1 = parse.stringToInteger(titaVo.getParam("InsuEndMonthFrom1")) + 191100;
 		int iInsuEndMonthTo1 = parse.stringToInteger(titaVo.getParam("InsuEndMonthTo1")) + 191100;
-		
+
 		String flagA = titaVo.getParam("FlagA");
 		String flagB = titaVo.getParam("FlagB");
 		String CommericalFlag = titaVo.getParam("CommericalFlag");
-		
+
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
@@ -99,11 +101,11 @@ public class L4962 extends TradeBuffer {
 
 		Slice<InsuRenew> sInsuRenew = null;
 		Slice<InsuOrignal> sInsuOrignal = null;
-		
+
 		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
-		
-		List<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>(); 
-		
+
+		List<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>();
+
 		sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom, iInsuEndMonthTo, this.index, this.limit, titaVo);
 
 		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
@@ -199,24 +201,32 @@ public class L4962 extends TradeBuffer {
 				}
 			}
 		}
-		
-		
+
 		if (!"N".equals(CommericalFlag)) {
-			
-			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit, titaVo);
+
+			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit,
+					titaVo);
 
 			lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-			
+
 			if (lInsuRenew != null && lInsuRenew.size() != 0) {
 				for (InsuRenew tInsuRenew : lInsuRenew) {
-					if("01".equals(tInsuRenew.getCommericalFlag())) {  // 01 住宅險改商業險
-						totaC.init(titaVo);
-						if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
-							errorReportC(tInsuRenew, 1, titaVo);
-						} else if (tInsuRenew.getAcDate() == 0) {
-							errorReportC(tInsuRenew, 2, titaVo);
+					// 險種註記不為全部時 篩出特定種類資料
+					if (!"00".equals(CommericalFlag)) {
+						if (!CommericalFlag.equals(tInsuRenew.getCommericalFlag())) {
+							continue;
 						}
-					} else if(!"".equals(tInsuRenew.getCommericalFlag())) { // 00 全部
+					}
+
+//					if ("01".equals(tInsuRenew.getCommericalFlag())) { // 01 住宅險改商業險
+//					totaC.init(titaVo);
+//					if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
+//						errorReportC(tInsuRenew, 1, titaVo);
+//					} else if (tInsuRenew.getAcDate() == 0) {
+//						errorReportC(tInsuRenew, 2, titaVo);
+//					}
+//					} else 
+					if (!"".equals(tInsuRenew.getCommericalFlag())) { // 00 全部
 						totaC.init(titaVo);
 						if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
 							errorReportC(tInsuRenew, 1, titaVo);
@@ -224,32 +234,41 @@ public class L4962 extends TradeBuffer {
 							errorReportC(tInsuRenew, 2, titaVo);
 						}
 					}
-					
+
 				}
 			}
-			
+
 			iInsuEndMonthFrom1 = iInsuEndMonthFrom1 * 100 + 1;
-			iInsuEndMonthTo1 = iInsuEndMonthTo1 *100 + 31;
-			sInsuOrignal = insuOrignalService.insuEndDateRange(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit, titaVo);
-			
+			iInsuEndMonthTo1 = iInsuEndMonthTo1 * 100 + 31;
+			sInsuOrignal = insuOrignalService.insuEndDateRange(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index,
+					this.limit, titaVo);
+
 			lInsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
-			
+
 			if (lInsuOrignal != null && lInsuOrignal.size() != 0) {
 				for (InsuOrignal tInsuOrignal : lInsuOrignal) {
-					if("Y".equals(tInsuOrignal.getCommericalFlag())) {						
-						totaC.init(titaVo);						
-						errorReportC2(tInsuOrignal, titaVo);						
+
+					// 險種註記不為全部時 篩出特定種類資料
+					if (!"00".equals(CommericalFlag)) {
+						if (!CommericalFlag.equals(tInsuOrignal.getCommericalFlag())) {
+							continue;
+						}
 					}
 					
+					if (!"".equals(tInsuOrignal.getCommericalFlag())) {
+						totaC.init(titaVo);
+						errorReportC2(tInsuOrignal, titaVo);
+					}
+
 				}
 			}
-			
+
 			TotaVo t = totaC;
-			t.getOccursList().sort((c1,c2) -> {
+			t.getOccursList().sort((c1, c2) -> {
 				int result = 0;
 				if (c1.get("ReportCInsuEndMonth") != c2.get("ReportCInsuEndMonth")) {
 					result = Integer.valueOf(c1.get("ReportCInsuEndMonth").compareTo(c2.get("ReportCInsuEndMonth")));
-				}  else {
+				} else {
 					result = 0;
 				}
 
@@ -257,9 +276,7 @@ public class L4962 extends TradeBuffer {
 			});
 			totaC = t;
 		}
-		
-		
-		
+
 		totaA.putParam("MSGID", "L462A");
 		totaB.putParam("MSGID", "L462B");
 		totaC.putParam("MSGID", "L462C");
@@ -283,7 +300,9 @@ public class L4962 extends TradeBuffer {
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo());
 
 		OccursList occursListReport = new OccursList();
-		occursListReport.putParam("ReportAInsuEndMonth", tInsuRenew.getInsuYearMonth());
+		occursListReport.putParam("ReportAInsuEndMonth",
+				tInsuRenew.getInsuYearMonth() > 191100 ? tInsuRenew.getInsuYearMonth() - 191100
+						: tInsuRenew.getInsuYearMonth());
 		occursListReport.putParam("ReportAPrevInsuNo", tInsuRenew.getPrevInsuNo());
 		occursListReport.putParam("ReportACustNo", tInsuRenew.getCustNo());
 		occursListReport.putParam("ReportAFacmNo", tInsuRenew.getFacmNo());
@@ -306,8 +325,7 @@ public class L4962 extends TradeBuffer {
 
 		totaA.addOccursList(occursListReport);
 	}
-	
-	
+
 	private void errorReportC(InsuRenew tInsuRenew, int errorFlag, TitaVo titaVo) {
 		cntC = cntC + 1;
 
@@ -315,19 +333,19 @@ public class L4962 extends TradeBuffer {
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo());
 
 		OccursList occursListReport = new OccursList();
-		occursListReport.putParam("ReportCInsuEndMonth", tInsuRenew.getInsuYearMonth());
-		
-		List<CdCode> lCdCode = null;
-		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("CommericalFlag", "%", this.index, this.limit, titaVo);
-		lCdCode = slCdCode == null ? null : slCdCode.getContent();
-		
-		String CommericalFlag = tInsuRenew.getCommericalFlag();
+		occursListReport.putParam("ReportCInsuEndMonth",
+				tInsuRenew.getInsuYearMonth() > 191100 ? tInsuRenew.getInsuYearMonth() - 191100
+						: tInsuRenew.getInsuYearMonth());
+
+		CdCode tCdCode = sCdCodeDefService.findById(new CdCodeId("CommericalFlag", tInsuRenew.getCommericalFlag()),
+				titaVo);
 		String CommericalFlagX = "";
-		for(CdCode tCdCode :lCdCode) {
-			if(CommericalFlag.equals(tCdCode.getCode())) {
-				CommericalFlagX = tCdCode.getItem();
-			}
+		if (tCdCode != null) {
+			CommericalFlagX = tCdCode.getItem();
 		}
+		this.info("InsuRenew_CommericalFlag = " + tInsuRenew.getCommericalFlag());
+		this.info("InsuRenew_CommericalFlagX = " + CommericalFlagX);
+
 		occursListReport.putParam("ReportCCommericalFlagX", CommericalFlagX);
 		occursListReport.putParam("ReportCPrevInsuNo", tInsuRenew.getPrevInsuNo());
 		occursListReport.putParam("ReportCCustNo", tInsuRenew.getCustNo());
@@ -352,46 +370,42 @@ public class L4962 extends TradeBuffer {
 
 		totaC.addOccursList(occursListReport);
 	}
-	
+
 	private void errorReportC2(InsuOrignal tInsuOrignal, TitaVo titaVo) {
 		cntC = cntC + 1;
 
-
-		Slice<ClFac> sClFac = sClFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(), 
+		Slice<ClFac> sClFac = sClFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(),
 				tInsuOrignal.getClNo(), this.index, this.limit, titaVo);
-		
+
 		int custno = 0;
 		int facmno = 0;
 		String custname = "";
-		List<ClFac>  lClFac = null;
-		if(sClFac != null) {
+		List<ClFac> lClFac = null;
+		if (sClFac != null) {
 			lClFac = sClFac.getContent();
 		}
-		
-		if(lClFac != null) {
+
+		if (lClFac != null) {
 			custno = lClFac.get(0).getCustNo();
 			facmno = lClFac.get(0).getFacmNo();
 			CustMain tCustMain = custMainService.custNoFirst(custno, custno, titaVo);
-			if(tCustMain != null) {
-				custname = 	tCustMain.getCustName();
+			if (tCustMain != null) {
+				custname = tCustMain.getCustName();
 			}
 		}
-		
+
 		OccursList occursListReport = new OccursList();
-		occursListReport.putParam("ReportCInsuEndMonth", (tInsuOrignal.getInsuEndDate() / 100) + 191100);
-		
-		List<CdCode> lCdCode = null;
-		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("CommericalFlag", "%", this.index, this.limit, titaVo);
-		lCdCode = slCdCode == null ? null : slCdCode.getContent();
-		
-		String CommericalFlag = tInsuOrignal.getCommericalFlag();
+		occursListReport.putParam("ReportCInsuEndMonth", (tInsuOrignal.getInsuEndDate() / 100));
+
+		CdCode tCdCode = sCdCodeDefService.findById(new CdCodeId("CommericalFlag", tInsuOrignal.getCommericalFlag()),
+				titaVo);
 		String CommericalFlagX = "";
-		for(CdCode tCdCode :lCdCode) {
-			if(CommericalFlag.equals(tCdCode.getCode())) {
-				CommericalFlagX = tCdCode.getItem();
-			}
+		if (tCdCode != null) {
+			CommericalFlagX = tCdCode.getItem();
 		}
-		
+		this.info("InsuOrignal_CommericalFlag = " + tInsuOrignal.getCommericalFlag());
+		this.info("InsuOrignal_CommericalFlagX = " + CommericalFlagX);
+
 		occursListReport.putParam("ReportCCommericalFlagX", CommericalFlagX);
 		occursListReport.putParam("ReportCPrevInsuNo", tInsuOrignal.getOrigInsuNo());
 		occursListReport.putParam("ReportCCustNo", custno);
@@ -416,5 +430,5 @@ public class L4962 extends TradeBuffer {
 
 		totaC.addOccursList(occursListReport);
 	}
-	
+
 }

@@ -106,7 +106,7 @@ public class L4101 extends TradeBuffer {
 
 	@Autowired
 	LoanCom loanCom;
-	
+
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
 
@@ -159,7 +159,7 @@ public class L4101 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 
-		if (unReleaselBankRemit != null) {
+		if (unReleaseCnt > 0) {
 
 			// tota 未放行清單
 			for (BankRemit t : unReleaselBankRemit) {
@@ -243,7 +243,7 @@ public class L4101 extends TradeBuffer {
 		occursList.putParam("OOCustNo", t.getCustNo()); // 戶號
 		occursList.putParam("OOFacmNo", t.getFacmNo()); // 額度
 		occursList.putParam("OOBormNo", t.getBormNo()); // 撥款
-		
+
 		occursList.putParam("OOCustName", loanCom.getCustNameByNo(t.getCustNo())); // 戶名
 
 		// 查詢員工資料檔

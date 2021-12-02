@@ -29,7 +29,7 @@ public class Ifrs9FacData implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8700209044317792984L;
+	private static final long serialVersionUID = 5039538859959855794L;
 
 @EmbeddedId
   private Ifrs9FacDataId ifrs9FacDataId;
@@ -123,8 +123,8 @@ public class Ifrs9FacData implements Serializable {
 
   // IFRS階梯商品別
   /* 空白=非階梯式;A=固定階梯;B=浮動階梯; */
-  @Column(name = "`IfrsStepProdCode`", length = 1)
-  private String ifrsStepProdCode;
+  @Column(name = "`Ifrs9StepProdCode`", length = 1)
+  private String ifrs9StepProdCode;
 
   // 授信行業別
   @Column(name = "`IndustryCode`", length = 6)
@@ -167,8 +167,8 @@ public class Ifrs9FacData implements Serializable {
 
   // 產品別
   /* 作為群組分類。Ex:1=員工；2=車貸；3＝房貸；4＝政府優惠貸款…etc */
-  @Column(name = "`IfrsProdCode`", length = 2)
-  private String ifrsProdCode;
+  @Column(name = "`Ifrs9ProdCode`", length = 2)
+  private String ifrs9ProdCode;
 
   // 原始鑑價金額
   @Column(name = "`EvaAmt`")
@@ -641,8 +641,8 @@ A=固定階梯;
 B=浮動階梯;
 	* @return String
 	*/
-  public String getIfrsStepProdCode() {
-    return this.ifrsStepProdCode == null ? "" : this.ifrsStepProdCode;
+  public String getIfrs9StepProdCode() {
+    return this.ifrs9StepProdCode == null ? "" : this.ifrs9StepProdCode;
   }
 
 /**
@@ -651,10 +651,10 @@ B=浮動階梯;
 A=固定階梯;
 B=浮動階梯;
   *
-  * @param ifrsStepProdCode IFRS階梯商品別
+  * @param ifrs9StepProdCode IFRS階梯商品別
 	*/
-  public void setIfrsStepProdCode(String ifrsStepProdCode) {
-    this.ifrsStepProdCode = ifrsStepProdCode;
+  public void setIfrs9StepProdCode(String ifrs9StepProdCode) {
+    this.ifrs9StepProdCode = ifrs9StepProdCode;
   }
 
 /**
@@ -841,18 +841,18 @@ N:否
 	* 作為群組分類。Ex:1=員工；2=車貸；3＝房貸；4＝政府優惠貸款…etc
 	* @return String
 	*/
-  public String getIfrsProdCode() {
-    return this.ifrsProdCode == null ? "" : this.ifrsProdCode;
+  public String getIfrs9ProdCode() {
+    return this.ifrs9ProdCode == null ? "" : this.ifrs9ProdCode;
   }
 
 /**
 	* 產品別<br>
 	* 作為群組分類。Ex:1=員工；2=車貸；3＝房貸；4＝政府優惠貸款…etc
   *
-  * @param ifrsProdCode 產品別
+  * @param ifrs9ProdCode 產品別
 	*/
-  public void setIfrsProdCode(String ifrsProdCode) {
-    this.ifrsProdCode = ifrsProdCode;
+  public void setIfrs9ProdCode(String ifrs9ProdCode) {
+    this.ifrs9ProdCode = ifrs9ProdCode;
   }
 
 /**
@@ -1112,8 +1112,8 @@ N:否
     return "Ifrs9FacData [ifrs9FacDataId=" + ifrs9FacDataId + ", applNo=" + applNo + ", custId=" + custId + ", drawdownFg=" + drawdownFg
            + ", approveDate=" + approveDate + ", utilDeadline=" + utilDeadline + ", firstDrawdownDate=" + firstDrawdownDate + ", maturityDate=" + maturityDate + ", lineAmt=" + lineAmt + ", acctFee=" + acctFee
            + ", lawFee=" + lawFee + ", fireFee=" + fireFee + ", gracePeriod=" + gracePeriod + ", amortizedCode=" + amortizedCode + ", rateCode=" + rateCode + ", repayFreq=" + repayFreq
-           + ", payIntFreq=" + payIntFreq + ", ifrsStepProdCode=" + ifrsStepProdCode + ", industryCode=" + industryCode + ", clTypeJCIC=" + clTypeJCIC + ", cityCode=" + cityCode + ", areaCode=" + areaCode
-           + ", zip3=" + zip3 + ", prodNo=" + prodNo + ", agreementFg=" + agreementFg + ", entCode=" + entCode + ", assetClass=" + assetClass + ", ifrsProdCode=" + ifrsProdCode
+           + ", payIntFreq=" + payIntFreq + ", ifrs9StepProdCode=" + ifrs9StepProdCode + ", industryCode=" + industryCode + ", clTypeJCIC=" + clTypeJCIC + ", cityCode=" + cityCode + ", areaCode=" + areaCode
+           + ", zip3=" + zip3 + ", prodNo=" + prodNo + ", agreementFg=" + agreementFg + ", entCode=" + entCode + ", assetClass=" + assetClass + ", ifrs9ProdCode=" + ifrs9ProdCode
            + ", evaAmt=" + evaAmt + ", utilAmt=" + utilAmt + ", utilBal=" + utilBal + ", totalLoanBal=" + totalLoanBal + ", recycleCode=" + recycleCode + ", irrevocableFlag=" + irrevocableFlag
            + ", tempAmt=" + tempAmt + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
            + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";

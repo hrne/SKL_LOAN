@@ -57,15 +57,8 @@ public class L9707Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LDList, TxBuffer txbuffer) throws LogicException {
 		this.info("===========in testExcel");
-		makeExcel.open(titaVo
-				, titaVo.getEntDyI()
-				, titaVo.getKinbr()
-				, "L9707"
-				, "新增逾放案件明細"
-				, "L9707-新增逾放案件明細"
-				, "L9707_底稿_新增逾放案件明細.xlsx"
-				, "工作表1");
-		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細", "L9707_底稿_新增逾放案件明細.xlsx", "工作表1");
+
 		// F0 申請日期
 		// F1 准駁日期
 		// F2 借款人戶號
@@ -95,20 +88,19 @@ public class L9707Report extends MakeReport {
 			int row = 3;
 			BigDecimal totalDataCount = BigDecimal.ZERO;
 			BigDecimal totalLoanAmt = BigDecimal.ZERO;
-			
+
 			for (Map<String, String> tLDVo : LDList) {
-				for (String key : tLDVo.keySet())
-				{
+				for (String key : tLDVo.keySet()) {
 					this.info("L9707Report tLDVo " + key + "=" + tLDVo.get(key));
 				}
-				
+
 				int col = 0;
-				
+
 				// 如果欄位數量有改變, 這裡也要改
 				for (int i = 0; i <= 13; i++) {
 					col++;
-					String value = tLDVo.get("F"+i);
-					
+					String value = tLDVo.get("F" + i);
+
 					switch (i) {
 					case 2:
 						// 資料筆數
@@ -145,7 +137,7 @@ public class L9707Report extends MakeReport {
 			makeExcel.setValue(3, 1, "無資料");
 		}
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	public int calculateTimeDifferenceBySimpleDateFormat(String date1, String date2) throws ParseException {

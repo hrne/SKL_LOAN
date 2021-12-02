@@ -29,7 +29,7 @@ public class Ias34Ap implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2707568736815323412L;
+	private static final long serialVersionUID = -8353793754471558496L;
 
 @EmbeddedId
   private Ias34ApId ias34ApId;
@@ -199,8 +199,8 @@ public class Ias34Ap implements Serializable {
 
   // 產品別
   /* 作為群組分類。Ex:1=員工；2=車貸；3＝房貸；4＝政府優惠貸款…etc */
-  @Column(name = "`IfrsProdCode`", length = 1)
-  private String ifrsProdCode;
+  @Column(name = "`Ifrs9ProdCode`", length = 1)
+  private String ifrs9ProdCode;
 
   // 原始鑑價金額
   @Column(name = "`EvaAmt`")
@@ -974,18 +974,18 @@ public class Ias34Ap implements Serializable {
 	* 作為群組分類。Ex:1=員工；2=車貸；3＝房貸；4＝政府優惠貸款…etc
 	* @return String
 	*/
-  public String getIfrsProdCode() {
-    return this.ifrsProdCode == null ? "" : this.ifrsProdCode;
+  public String getIfrs9ProdCode() {
+    return this.ifrs9ProdCode == null ? "" : this.ifrs9ProdCode;
   }
 
 /**
 	* 產品別<br>
 	* 作為群組分類。Ex:1=員工；2=車貸；3＝房貸；4＝政府優惠貸款…etc
   *
-  * @param ifrsProdCode 產品別
+  * @param ifrs9ProdCode 產品別
 	*/
-  public void setIfrsProdCode(String ifrsProdCode) {
-    this.ifrsProdCode = ifrsProdCode;
+  public void setIfrs9ProdCode(String ifrs9ProdCode) {
+    this.ifrs9ProdCode = ifrs9ProdCode;
   }
 
 /**
@@ -1168,7 +1168,7 @@ public class Ias34Ap implements Serializable {
            + ", rate=" + rate + ", ovduDays=" + ovduDays + ", ovduDate=" + ovduDate + ", badDebtDate=" + badDebtDate + ", badDebtAmt=" + badDebtAmt + ", derCode=" + derCode
            + ", gracePeriod=" + gracePeriod + ", approveRate=" + approveRate + ", amortizedCode=" + amortizedCode + ", rateCode=" + rateCode + ", repayFreq=" + repayFreq + ", payIntFreq=" + payIntFreq
            + ", industryCode=" + industryCode + ", clTypeJCIC=" + clTypeJCIC + ", zip3=" + zip3 + ", prodNo=" + prodNo + ", custKind=" + custKind + ", assetClass=" + assetClass
-           + ", ifrsProdCode=" + ifrsProdCode + ", evaAmt=" + evaAmt + ", firstDueDate=" + firstDueDate + ", totalPeriod=" + totalPeriod + ", agreeBefFacmNo=" + agreeBefFacmNo + ", agreeBefBormNo=" + agreeBefBormNo
+           + ", ifrs9ProdCode=" + ifrs9ProdCode + ", evaAmt=" + evaAmt + ", firstDueDate=" + firstDueDate + ", totalPeriod=" + totalPeriod + ", agreeBefFacmNo=" + agreeBefFacmNo + ", agreeBefBormNo=" + agreeBefBormNo
            + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

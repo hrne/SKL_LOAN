@@ -93,14 +93,14 @@ public class L5982 extends TradeBuffer {
 				occursList.putParam("OOFirstDrawdownDate", iFirstDrawdownDate);
 				
 				int iMaturityDate=0;
-				if(Integer.parseInt(result.get("F8"))!=0) {
+				if(Integer.parseInt(result.get("F9"))!=0) {
 					iMaturityDate=Integer.parseInt(result.get("F9"))-19110000;
 				}
 				occursList.putParam("OOMaturityDate", iMaturityDate);
 				occursList.putParam("OOYearlyInt", result.get("F10"));
 				
 				int iHouseBuyDate=0;
-				if(Integer.parseInt(result.get("F8"))!=0) {
+				if(Integer.parseInt(result.get("F11"))!=0) {
 					iHouseBuyDate=Integer.parseInt(result.get("F11"))-19110000;
 				}
 				occursList.putParam("OOHouseBuyDate", iHouseBuyDate);

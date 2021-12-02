@@ -26,7 +26,7 @@ public class Ias34Ep implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4674699820182350998L;
+	private static final long serialVersionUID = 1354260503160662172L;
 
 @EmbeddedId
   private Ias34EpId ias34EpId;
@@ -88,8 +88,8 @@ public class Ias34Ep implements Serializable {
   private String derFg;
 
   // 產品別
-  @Column(name = "`IfrsProdCode`", length = 2)
-  private String ifrsProdCode;
+  @Column(name = "`Ifrs9ProdCode`", length = 2)
+  private String ifrs9ProdCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -378,18 +378,18 @@ N=未符合減損客觀證據條件
 	* 
 	* @return String
 	*/
-  public String getIfrsProdCode() {
-    return this.ifrsProdCode == null ? "" : this.ifrsProdCode;
+  public String getIfrs9ProdCode() {
+    return this.ifrs9ProdCode == null ? "" : this.ifrs9ProdCode;
   }
 
 /**
 	* 產品別<br>
 	* 
   *
-  * @param ifrsProdCode 產品別
+  * @param ifrs9ProdCode 產品別
 	*/
-  public void setIfrsProdCode(String ifrsProdCode) {
-    this.ifrsProdCode = ifrsProdCode;
+  public void setIfrs9ProdCode(String ifrs9ProdCode) {
+    this.ifrs9ProdCode = ifrs9ProdCode;
   }
 
 /**
@@ -473,7 +473,7 @@ N=未符合減損客觀證據條件
   public String toString() {
     return "Ias34Ep [ias34EpId=" + ias34EpId + ", custId=" + custId
            + ", industryCode=" + industryCode + ", clTypeJCIC=" + clTypeJCIC + ", zip3=" + zip3 + ", prodNo=" + prodNo + ", custKind=" + custKind
-           + ", derFg=" + derFg + ", ifrsProdCode=" + ifrsProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + ", derFg=" + derFg + ", ifrs9ProdCode=" + ifrs9ProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
            + "]";
   }
 }

@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,7 +24,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LNM34APServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LNM34APServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,13 +32,13 @@ public class LNM34APServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LNM34AP.findAll ---------------");
-		logger.info("-----LNM34AP TitaVo=" + titaVo);
-		logger.info("-----LNM34AP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LNM34AP.findAll ---------------");
+		this.info("-----LNM34AP TitaVo=" + titaVo);
+		this.info("-----LNM34AP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
@@ -48,7 +47,7 @@ public class LNM34APServiceImpl extends ASpringJpaParm implements InitializingBe
 //			dateMonth = 202003;
 //		}
 
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
@@ -56,12 +55,10 @@ public class LNM34APServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"FacLineDate\" "
 				+ ", \"MaturityDate\", \"LineAmt\", \"DrawdownAmt\", \"AcctFee\", \"LoanBal\" " + ", \"IntAmt\", \"Fee\", \"Rate\", \"OvduDays\", \"OvduDate\" "
 				+ ", \"BadDebtDate\", \"BadDebtAmt\", \"DerCode\", \"GracePeriod\", \"ApproveRate\" " + ", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", \"IndustryCode\" "
-				+ ", \"ClTypeJCIC\", \"Zip3\" "
-				+ ", \"ProdNo\", \"CustKind\", \"AssetClass\" " 
-				+ ", \"IfrsProdCode\", \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\" " + ", \"AgreeBefFacmNo\", \"AgreeBefBormNo\" "
-				+ " FROM  \"Ias34Ap\" " + " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+				+ ", \"ClTypeJCIC\", \"Zip3\" " + ", \"ProdNo\", \"CustKind\", \"AssetClass\" " + ", \"Ifrs9ProdCode\", \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\" "
+				+ ", \"AgreeBefFacmNo\", \"AgreeBefBormNo\" " + " FROM  \"Ias34Ap\" " + " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
@@ -73,6 +70,6 @@ public class LNM34APServiceImpl extends ASpringJpaParm implements InitializingBe
 		query = em.createNativeQuery(sql);
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

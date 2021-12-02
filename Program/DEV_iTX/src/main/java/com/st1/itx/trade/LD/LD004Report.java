@@ -61,18 +61,16 @@ public class LD004Report extends MakeReport {
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD004", "企金戶還本收據及繳息收據", "", "A4", "L");
 
 		if (LD004List != null && !LD004List.isEmpty()) {
-			
+
 			Boolean firstPage = true;
 			for (Map<String, String> LD4Vo : LD004List) {
-				
-				if (firstPage)
-				{
+
+				if (firstPage) {
 					newPage();
-				} else
-				{
+				} else {
 					firstPage = false;
 				}
-				
+
 				/*
 				 * F0 = 傳票號碼 F1 = 登錄交易序號 F2 = 科目代號 F3 = 業務科目名稱 F4 = 彙總別 F5 = 入帳日期 F6 = 戶號 F7 =
 				 * 額度編號 F8 = 撥款序號 F9 = 戶名/公司名稱 F10 = 記帳金額 F11 = 計息起日 F12 = 計息迄日
@@ -142,10 +140,7 @@ public class LD004Report extends MakeReport {
 				}
 				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 13, LD4Vo.get("F15"), "C");
-				this.print(0, 34,
-						padStart(LD4Vo.get("F6").toString(), 7, "0") + "-"
-								+ padStart(LD4Vo.get("F7").toString(), 3, "0") + "-"
-								+ padStart(LD4Vo.get("F8").toString(), 3, "0"));
+				this.print(0, 34, padStart(LD4Vo.get("F6").toString(), 7, "0") + "-" + padStart(LD4Vo.get("F7").toString(), 3, "0") + "-" + padStart(LD4Vo.get("F8").toString(), 3, "0"));
 
 				this.print(0, 63, "$");
 
@@ -173,8 +168,7 @@ public class LD004Report extends MakeReport {
 				// 這裡可以考慮改成for迴圈
 
 				this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 37,
-						showDate(LD4Vo.get("F11").toString(), 1) + " - " + showDate(LD4Vo.get("F12").toString(), 1));
+				this.print(0, 37, showDate(LD4Vo.get("F11").toString(), 1) + " - " + showDate(LD4Vo.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "└──────────┴──────────────────┴─────────┘");
@@ -222,7 +216,7 @@ public class LD004Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		this.toPdf(sno);
+		// this.toPdf(sno);
 
 	}
 
@@ -282,13 +276,11 @@ public class LD004Report extends MakeReport {
 
 		return result;
 	}
-	
-	private int mixedLength(String s)
-	{
+
+	private int mixedLength(String s) {
 		try {
 			return (s.getBytes("UTF-8").length - s.length()) / 2 + s.length();
-		} catch (UnsupportedEncodingException e)
-		{
+		} catch (UnsupportedEncodingException e) {
 			this.error("LD004 MixedLength() failed to encode!");
 			this.error("Original string: " + s);
 			return 0;

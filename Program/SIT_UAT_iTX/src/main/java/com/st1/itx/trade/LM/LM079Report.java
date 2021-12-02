@@ -84,7 +84,7 @@ public class LM079Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 	
 	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException

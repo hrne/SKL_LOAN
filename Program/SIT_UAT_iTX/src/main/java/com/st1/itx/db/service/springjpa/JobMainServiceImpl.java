@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.JobMainRepositoryHist;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -153,7 +154,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + jobMain.getJobMainId());
     if (this.findById(jobMain.getJobMainId()) != null)
       throw new DBException(2);
@@ -182,7 +185,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + jobMain.getJobMainId());
     if (!empNot.isEmpty())
       jobMain.setLastUpdateEmpNo(empNot);
@@ -205,7 +210,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + jobMain.getJobMainId());
     if (!empNot.isEmpty())
       jobMain.setLastUpdateEmpNo(empNot);
@@ -255,7 +262,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (JobMain t : jobMain){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -289,7 +299,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (jobMain == null || jobMain.size() == 0)
       throw new DBException(6);
@@ -889,147 +901,147 @@ em = null;
   }
 
   @Override
-  public void Usp_L7_LoanIfrsAp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Ap_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrsapUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposDay.uspL7Loanifrs9apUpd(tbsdyf,  empNo,newAcFg);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrsapUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposMon.uspL7Loanifrs9apUpd(tbsdyf,  empNo,newAcFg);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrsapUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposHist.uspL7Loanifrs9apUpd(tbsdyf,  empNo,newAcFg);
    else
-      jobMainRepos.uspL7LoanifrsapUpd(tbsdyf,  empNo,newAcFg);
+      jobMainRepos.uspL7Loanifrs9apUpd(tbsdyf,  empNo,newAcFg);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsBp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Bp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrsbpUpd(tbsdyf,  empNo);
+      jobMainReposDay.uspL7Loanifrs9bpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrsbpUpd(tbsdyf,  empNo);
+      jobMainReposMon.uspL7Loanifrs9bpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrsbpUpd(tbsdyf,  empNo);
+      jobMainReposHist.uspL7Loanifrs9bpUpd(tbsdyf,  empNo);
    else
-      jobMainRepos.uspL7LoanifrsbpUpd(tbsdyf,  empNo);
+      jobMainRepos.uspL7Loanifrs9bpUpd(tbsdyf,  empNo);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsCp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Cp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrscpUpd(tbsdyf,  empNo);
+      jobMainReposDay.uspL7Loanifrs9cpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrscpUpd(tbsdyf,  empNo);
+      jobMainReposMon.uspL7Loanifrs9cpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrscpUpd(tbsdyf,  empNo);
+      jobMainReposHist.uspL7Loanifrs9cpUpd(tbsdyf,  empNo);
    else
-      jobMainRepos.uspL7LoanifrscpUpd(tbsdyf,  empNo);
+      jobMainRepos.uspL7Loanifrs9cpUpd(tbsdyf,  empNo);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsDp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Dp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrsdpUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposDay.uspL7Loanifrs9dpUpd(tbsdyf,  empNo,newAcFg);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrsdpUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposMon.uspL7Loanifrs9dpUpd(tbsdyf,  empNo,newAcFg);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrsdpUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposHist.uspL7Loanifrs9dpUpd(tbsdyf,  empNo,newAcFg);
    else
-      jobMainRepos.uspL7LoanifrsdpUpd(tbsdyf,  empNo,newAcFg);
+      jobMainRepos.uspL7Loanifrs9dpUpd(tbsdyf,  empNo,newAcFg);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsFp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Fp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrsfpUpd(tbsdyf,  empNo);
+      jobMainReposDay.uspL7Loanifrs9fpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrsfpUpd(tbsdyf,  empNo);
+      jobMainReposMon.uspL7Loanifrs9fpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrsfpUpd(tbsdyf,  empNo);
+      jobMainReposHist.uspL7Loanifrs9fpUpd(tbsdyf,  empNo);
    else
-      jobMainRepos.uspL7LoanifrsfpUpd(tbsdyf,  empNo);
+      jobMainRepos.uspL7Loanifrs9fpUpd(tbsdyf,  empNo);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsGp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Gp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrsgpUpd(tbsdyf,  empNo);
+      jobMainReposDay.uspL7Loanifrs9gpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrsgpUpd(tbsdyf,  empNo);
+      jobMainReposMon.uspL7Loanifrs9gpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrsgpUpd(tbsdyf,  empNo);
+      jobMainReposHist.uspL7Loanifrs9gpUpd(tbsdyf,  empNo);
    else
-      jobMainRepos.uspL7LoanifrsgpUpd(tbsdyf,  empNo);
+      jobMainRepos.uspL7Loanifrs9gpUpd(tbsdyf,  empNo);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsHp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Hp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrshpUpd(tbsdyf,  empNo);
+      jobMainReposDay.uspL7Loanifrs9hpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrshpUpd(tbsdyf,  empNo);
+      jobMainReposMon.uspL7Loanifrs9hpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrshpUpd(tbsdyf,  empNo);
+      jobMainReposHist.uspL7Loanifrs9hpUpd(tbsdyf,  empNo);
    else
-      jobMainRepos.uspL7LoanifrshpUpd(tbsdyf,  empNo);
+      jobMainRepos.uspL7Loanifrs9hpUpd(tbsdyf,  empNo);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsIp_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Ip_Upd(int tbsdyf,  String empNo,int newAcFg, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrsipUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposDay.uspL7Loanifrs9ipUpd(tbsdyf,  empNo,newAcFg);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrsipUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposMon.uspL7Loanifrs9ipUpd(tbsdyf,  empNo,newAcFg);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrsipUpd(tbsdyf,  empNo,newAcFg);
+      jobMainReposHist.uspL7Loanifrs9ipUpd(tbsdyf,  empNo,newAcFg);
    else
-      jobMainRepos.uspL7LoanifrsipUpd(tbsdyf,  empNo,newAcFg);
+      jobMainRepos.uspL7Loanifrs9ipUpd(tbsdyf,  empNo,newAcFg);
   }
 
   @Override
-  public void Usp_L7_LoanIfrsJp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L7_LoanIfrs9Jp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7LoanifrsjpUpd(tbsdyf,  empNo);
+      jobMainReposDay.uspL7Loanifrs9jpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7LoanifrsjpUpd(tbsdyf,  empNo);
+      jobMainReposMon.uspL7Loanifrs9jpUpd(tbsdyf,  empNo);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7LoanifrsjpUpd(tbsdyf,  empNo);
+      jobMainReposHist.uspL7Loanifrs9jpUpd(tbsdyf,  empNo);
    else
-      jobMainRepos.uspL7LoanifrsjpUpd(tbsdyf,  empNo);
+      jobMainRepos.uspL7Loanifrs9jpUpd(tbsdyf,  empNo);
   }
 
   @Override

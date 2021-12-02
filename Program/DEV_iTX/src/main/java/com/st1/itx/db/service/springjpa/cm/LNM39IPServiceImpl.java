@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,12 +20,10 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * IFRS9 資料欄位清單9(表外放款與應收帳款-資產基本資料與計算原始有效利率用))
- * LNFIP 放款已核准未動撥額度(額度層)(LNFIP)
+ * IFRS9 資料欄位清單9(表外放款與應收帳款-資產基本資料與計算原始有效利率用)) LNFIP 放款已核准未動撥額度(額度層)(LNFIP)
  */
 
 public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LNM39IPServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -34,13 +32,13 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LNM39IP.findAll ---------------");
-		logger.info("-----LNM39IP TitaVo=" + titaVo);
-		logger.info("-----LNM39IP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LNM39IP.findAll ---------------");
+		this.info("-----LNM39IP TitaVo=" + titaVo);
+		this.info("-----LNM39IP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
@@ -49,25 +47,19 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 //			dateMonth = 202004;
 //		}
 
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
 		// IFRS9 資料欄位清單9
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", " +
-				" \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", " +
-				" \"ApproveRate\", \"GracePeriod\", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", " +
-				" \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"IfrsProdCode\", " +
-				" \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", " +
-				" \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", " +
-				" \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " +
-				" FROM  \"LoanIfrsIp\" " + 
-	            " WHERE \"DataYM\" = " + dateMonth +
-				" ORDER BY \"DrawdownFg\", \"CustNo\", \"FacmNo\" " ;
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", " + " \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", "
+				+ " \"ApproveRate\", \"GracePeriod\", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
+				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"Ifrs9ProdCode\", " + " \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", "
+				+ " \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", " + " \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " + " FROM  \"LoanIfrs9Ip\" "
+				+ " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"DrawdownFg\", \"CustNo\", \"FacmNo\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
-		
 		Query query;
 		EntityManager em;
 		if (onLineMode == true) {
@@ -78,6 +70,6 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 		query = em.createNativeQuery(sql);
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

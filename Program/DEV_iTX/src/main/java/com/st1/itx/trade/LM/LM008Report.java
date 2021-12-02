@@ -29,7 +29,6 @@ import com.st1.itx.util.date.DateUtil;
 @Component
 @Scope("prototype")
 public class LM008Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM008Report.class);
 
 	@Autowired
 	MakeExcel makeExcel;
@@ -68,38 +67,37 @@ public class LM008Report extends MakeReport {
 		makeExcel.setWidth(6, 28);
 		makeExcel.setWidth(7, 28);
 		makeExcel.setWidth(8, 28);
-		makeExcel.setWidth(9, 28);//新增
+		makeExcel.setWidth(9, 28);// 新增
 
 		// 合併儲存格
-		makeExcel.setMergedRegion(2, 2, 3, 8);//(2, 2, 3, 7)
-		makeExcel.setMergedRegion(3, 4, 3, 8);//(3, 4, 3, 7)
-		makeExcel.setMergedRegion(5, 5, 3, 8);//(5, 5, 3, 7)
+		makeExcel.setMergedRegion(2, 2, 3, 8);// (2, 2, 3, 7)
+		makeExcel.setMergedRegion(3, 4, 3, 8);// (3, 4, 3, 7)
+		makeExcel.setMergedRegion(5, 5, 3, 8);// (5, 5, 3, 7)
 
 		ExcelFontStyleVo headerStyleVo = new ExcelFontStyleVo();
 		headerStyleVo.setBold(true);
 
 		// 第1列
-		makeExcel.setValue(row, 9, "機密等級：密", "L", headerStyleVo);//col:8
+		makeExcel.setValue(row, 9, "機密等級：密", "L", headerStyleVo);// col:8
 		row++;
 
 		// 第2列
 		makeExcel.setValue(row, 1, "程式ID：", "L", headerStyleVo);
 		makeExcel.setValue(row, 2, this.getParentTranCode(), "L", headerStyleVo);
 		makeExcel.setValue(row, 3, "新光人壽保險股份有限公司", "C", headerStyleVo);
-		makeExcel.setValue(row, 9, "日　期：" + this.showBcDate(dateUtil.getNowStringBc(), 1), "L", headerStyleVo);//col:8
+		makeExcel.setValue(row, 9, "日　期：" + this.showBcDate(dateUtil.getNowStringBc(), 1), "L", headerStyleVo);// col:8
 		row++;
 
 		// 第3列
 		makeExcel.setValue(row, 1, "報　表：", "L", headerStyleVo);
 		makeExcel.setValue(row, 2, makeExcel.getFileCode(), "L", headerStyleVo);
 		makeExcel.setValue(row, 3, "應收利息明細表", "C", headerStyleVo);
-		makeExcel.setValue(row, 9, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6),
-				"L", headerStyleVo);//col:8
+		makeExcel.setValue(row, 9, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "L",
+				headerStyleVo);// col:8
 		row++;
 
 		// 第4列
-		makeExcel.setValue(row, 9, "頁　數：" + page, "L", headerStyleVo);//col:8
+		makeExcel.setValue(row, 9, "頁　數：" + page, "L", headerStyleVo);// col:8
 		row++;
 
 		// 第5列
@@ -113,14 +111,14 @@ public class LM008Report extends MakeReport {
 
 		// 第7列
 		makeExcel.setValue(row, 1, "戶號", "C", headerStyleVo);
-		makeExcel.setValue(row, 2, "額度", "C", headerStyleVo);//新增
+		makeExcel.setValue(row, 2, "額度", "C", headerStyleVo);// 新增
 		makeExcel.setValue(row, 3, "戶名", "C", headerStyleVo);
-		makeExcel.setValue(row, 4, "放款餘額", "C", headerStyleVo);//col:3
-		makeExcel.setValue(row, 5, "利率", "C", headerStyleVo);//col:4
-		makeExcel.setValue(row, 6, "繳息迄日", "C", headerStyleVo);//col:5
-		makeExcel.setValue(row, 7, "已到期未繳利息", "C", headerStyleVo);//col:6
-		makeExcel.setValue(row, 8, "未到期應收利息", "C", headerStyleVo);//col:7
-		makeExcel.setValue(row, 9, "合計", "C", headerStyleVo);//col:8
+		makeExcel.setValue(row, 4, "放款餘額", "C", headerStyleVo);// col:3
+		makeExcel.setValue(row, 5, "利率", "C", headerStyleVo);// col:4
+		makeExcel.setValue(row, 6, "繳息迄日", "C", headerStyleVo);// col:5
+		makeExcel.setValue(row, 7, "已到期未繳利息", "C", headerStyleVo);// col:6
+		makeExcel.setValue(row, 8, "未到期應收利息", "C", headerStyleVo);// col:7
+		makeExcel.setValue(row, 9, "合計", "C", headerStyleVo);// col:8
 		row++;
 	}
 
@@ -149,7 +147,7 @@ public class LM008Report extends MakeReport {
 			makeExcel.setValue(row, 1, "本日無資料");
 
 			// 畫框線
-			makeExcel.setAddRengionBorder("A", 1, "I", row, 1);//("A", 1, "H", row, 1)
+			makeExcel.setAddRengionBorder("A", 1, "I", row, 1);// ("A", 1, "H", row, 1)
 
 			row++;
 
@@ -207,7 +205,7 @@ public class LM008Report extends MakeReport {
 		printTotal();
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void resetSubtotal() {
@@ -237,11 +235,11 @@ public class LM008Report extends MakeReport {
 				String custNo = detail.get("F2");
 				String facmNo = detail.get("F3");
 				String custName = detail.get("F4"); // 額度(新增)
-				BigDecimal loanBal = detail.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F5"));//F4
-				BigDecimal rate = detail.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F6"));//F5
-				String date = detail.get("F7");//F6
-				BigDecimal unpaid = detail.get("F8") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F8"));//F7
-				BigDecimal unexpired = detail.get("F9") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F9"));//F8
+				BigDecimal loanBal = detail.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F5"));// F4
+				BigDecimal rate = detail.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F6"));// F5
+				String date = detail.get("F7");// F6
+				BigDecimal unpaid = detail.get("F8") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F8"));// F7
+				BigDecimal unexpired = detail.get("F9") == null ? BigDecimal.ZERO : new BigDecimal(detail.get("F9"));// F8
 				BigDecimal custInt = unpaid.add(unexpired);
 
 				makeExcel.setValue(row, 1, custNo, "R"); // 戶號
@@ -292,7 +290,7 @@ public class LM008Report extends MakeReport {
 		makeExcel.setValue(row, 9, custIntSubtotal, "#,##0", "R", footerStyleVo); // 歸戶利息合計小計 col:8
 
 		// 畫框線
-		makeExcel.setAddRengionBorder("A", 1, "I", row, 1);//("A", 1, "H", row, 1)
+		makeExcel.setAddRengionBorder("A", 1, "I", row, 1);// ("A", 1, "H", row, 1)
 
 		row++;
 	}
@@ -302,13 +300,13 @@ public class LM008Report extends MakeReport {
 		ExcelFontStyleVo totalStyleVo = new ExcelFontStyleVo();
 		totalStyleVo.setBold(true);
 
-		makeExcel.setValue(row, 5, "合計", "C", totalStyleVo); //col:4
+		makeExcel.setValue(row, 5, "合計", "C", totalStyleVo); // col:4
 		makeExcel.setValue(row, 6, countsTotal + "筆", "R", totalStyleVo); // 筆數合計 col:5
 		makeExcel.setValue(row, 7, unpaidTotal, "#,##0", "R", totalStyleVo); // 已到期未繳利息合計 col:6
 		makeExcel.setValue(row, 8, unexpiredTotal, "#,##0", "R", totalStyleVo); // 未到期應收利息合計 col:7
 		makeExcel.setValue(row, 9, custIntTotal, "#,##0", "R", totalStyleVo); // 歸戶利息合計合計 col:8
 
 		// 畫框線(只畫合計這一行)
-		makeExcel.setAddRengionBorder("A", row, "I", row, 1);//("A", 1, "H", row, 1)
+		makeExcel.setAddRengionBorder("A", row, "I", row, 1);// ("A", 1, "H", row, 1)
 	}
 }

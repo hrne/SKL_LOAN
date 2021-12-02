@@ -28,7 +28,7 @@ public class LD008Report extends MakeReport {
 
 	@Autowired
 	InnFundAplService innFundAplService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -49,7 +49,7 @@ public class LD008Report extends MakeReport {
 	BigDecimal fundsLimitAmt;
 	String fundsMonth;
 	String fundsDay;
-	
+
 	// percent函數計算用
 	private static final BigDecimal hundred = new BigDecimal("100");
 
@@ -102,14 +102,7 @@ public class LD008Report extends MakeReport {
 			this.error("lD008ServiceImpl.findAll error = " + e.getMessage());
 		}
 
-		this.open(titaVo
-				, titaVo.getEntDyI()
-				, titaVo.getKinbr()
-				, "LD008"
-				, (findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")
-				, "機密"
-				, "A4"
-				, "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD008", (findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表"), "機密", "A4", "L");
 
 		List<Map<String, String>> listLD008 = null;
 		List<Map<String, String>> listLD008r = null;
@@ -151,7 +144,7 @@ public class LD008Report extends MakeReport {
 
 		long sno = this.close();
 
-		this.toPdf(sno);
+		// this.toPdf(sno);
 		return true;
 
 	}
@@ -445,7 +438,7 @@ public class LD008Report extends MakeReport {
 		// 計算
 		for (Map<String, String> tLD008 : listLD008) {
 			int detailSeq = 0;
-			
+
 			try {
 				detailSeq = parse.stringToInteger(tLD008.get("F0"));
 			} catch (LogicException e) {
@@ -453,7 +446,7 @@ public class LD008Report extends MakeReport {
 				this.error("tLD008 detailSeq: " + tLD008.get("F0"));
 				this.error(e.toString());
 			}
-			
+
 			BigDecimal counts = getBigDecimal(tLD008.get("F1"));
 			BigDecimal amt = getBigDecimal(tLD008.get("F2"));
 

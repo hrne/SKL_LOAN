@@ -22,12 +22,12 @@ T(3,Y: ;N: )
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="L4962" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+<sub type="DC" name="L4962" layout="cols=3;screen.width=[130,500,130,240];printer.width=[20,80];order=1">
 [
 ["[L4962]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@保險單資料檢核作業"],
-[#<->#,"#FdFlagA+檢核表類別",#FlagA,"保費、保單未完成檢核表(1.無新保單 2.保費未入帳)","@@@火險到期年月",#InsuEndMonthFrom,"~",#InsuEndMonthTo],
+["#FdFlagA+檢核表類別",#FlagA,"保費、保單未完成檢核表(1.無新保單 2.保費未入帳)"],["@@@火險到期年月",#InsuEndMonthFrom,"~",#InsuEndMonthTo],
 [#<->#,"@",#FlagB,"額度無保單檢核表(1.無保單 2.已到期)"],
-[#<->#,"@",#CommericalFlag,"險種註記",#CommericalFlagX,"@@@火險到期年月",#InsuEndMonthFrom1,"~",#InsuEndMonthTo1],
+["@",#CommericalFlag,"險種註記明細表-",#CommericalFlagX],["@@@火險到期年月",#InsuEndMonthFrom1,"~",#InsuEndMonthTo1],
 ]
 
 #FdFlagA=X,2,L
@@ -99,12 +99,12 @@ T(H,#CommericalFlag,#TCommericalFlagHelp)
 
 ! 火險到期年月
 #InsuEndMonthFrom1=A,5,I
-C(3,#CommericalFlag,1,$,S)
+C(5,#CommericalFlag,N,S,$)
 T(1,@InsuEndMonthFrom1,#SYSDATE,2,5)
 @A(YM,1,#InsuEndMonthFrom1)
 
 #InsuEndMonthTo1=A,5,I
-C(3,#CommericalFlag,1,$,S)
+C(5,#CommericalFlag,N,S,$)
 T(1,@InsuEndMonthTo1,#SYSDATE,2,5)
 @A(YM,1,#InsuEndMonthTo1)
 IF(#InsuEndMonthTo1<#InsuEndMonthFrom1,V(P,訖年月不可小於起年月),$)
@@ -175,7 +175,7 @@ C(3,#OCntA,0,E(0,@L462APRT,0),E(0,@L462APRT,1))
 
 #L462A_LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
-#ReportAInsuEndMonth=A,6,O
+#ReportAInsuEndMonth=X,6,O
 #ReportAPrevInsuNo=X,20,O
 #ReportACustNo=A,7,O
 #ReportAFacmNo=A,3,O
@@ -219,7 +219,7 @@ C(3,#OCntC,0,E(0,@L462CPRT,0),E(0,@L462CPRT,1))
 
 #L462C_LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
-#ReportCInsuEndMonth=A,6,O
+#ReportCInsuEndMonth=X,6,O
 #ReportCCommericalFlagX=X,30,O
 #ReportCPrevInsuNo=X,20,O
 #ReportCCustNo=A,7,O

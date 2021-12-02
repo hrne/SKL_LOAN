@@ -140,7 +140,7 @@ public class LM030Report extends MakeReport {
 		makeExcel.setValue(row + 13, 7, total, "#,##0");
 		
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

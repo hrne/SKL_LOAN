@@ -47,4 +47,5 @@ ORGEMPNM=X,8
 YearMonth=9,5
 CustNo=9,7
 Condition=9,2
+UsageCode=9,1
 END=X,1

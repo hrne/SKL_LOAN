@@ -134,7 +134,7 @@ public class LM031Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	public String showDate(String date) {

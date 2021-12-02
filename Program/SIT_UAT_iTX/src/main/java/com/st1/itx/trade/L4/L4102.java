@@ -149,7 +149,8 @@ public class L4102 extends TradeBuffer {
 			}
 		}
 
-		if (unReleaselBankRemit != null) {
+		if (unReleaseCnt > 0) {
+			this.info("unReleaselBankRemit =" + unReleaselBankRemit);
 			totaB.putParam("MSGID", "L412B");
 
 			// tota 未放行清單

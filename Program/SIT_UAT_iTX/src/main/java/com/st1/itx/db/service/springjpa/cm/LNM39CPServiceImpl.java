@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,7 +24,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LNM39CPServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LNM39CPServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,13 +32,13 @@ public class LNM39CPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LNM39CP.findAll ---------------");
-		logger.info("-----LNM39CP TitaVo=" + titaVo);
-		logger.info("-----LNM39CP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LNM39CP.findAll ---------------");
+		this.info("-----LNM39CP TitaVo=" + titaVo);
+		this.info("-----LNM39CP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
@@ -48,17 +47,15 @@ public class LNM39CPServiceImpl extends ASpringJpaParm implements InitializingBe
 //			dateMonth = 202004;
 //		}
 
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
 		// 清單3
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"AmortizedCode\", \"PayIntFreq\", \"RepayFreq\", \"EffectDate\"" +
-				" FROM  \"LoanIfrsCp\"" + 
-				" WHERE \"DataYM\" = " + dateMonth +
-				" ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\"" ;
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"AmortizedCode\", \"PayIntFreq\", \"RepayFreq\", \"EffectDate\"" + " FROM  \"LoanIfrs9Cp\"" + " WHERE \"DataYM\" = " + dateMonth
+				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
@@ -70,6 +67,6 @@ public class LNM39CPServiceImpl extends ASpringJpaParm implements InitializingBe
 		query = em.createNativeQuery(sql);
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

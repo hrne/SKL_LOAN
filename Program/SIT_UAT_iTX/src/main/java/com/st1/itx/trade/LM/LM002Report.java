@@ -26,7 +26,7 @@ public class LM002Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -85,13 +85,10 @@ public class LM002Report extends MakeReport {
 				}
 
 				try {
-					// 第三排為當年分　為20
+					// 第三排為當年分 為20
 					// 第二排 12
 					// 第一排 4
-					makeExcel.setValue(20 - (currentYear - parse.stringToInteger(F[0])) * 8 + parse.stringToInteger(F[1]) - 1
-				         			 , parse.stringToInteger(F[2]) + 1
-				         			 , getBigDecimal(F[3])
-				         			 , "R");
+					makeExcel.setValue(20 - (currentYear - parse.stringToInteger(F[0])) * 8 + parse.stringToInteger(F[1]) - 1, parse.stringToInteger(F[2]) + 1, getBigDecimal(F[3]), "R");
 				} catch (Exception e) {
 					this.warn("LM002 trying to parse data failed: ");
 					this.info("F0: " + F[0]);
@@ -99,7 +96,7 @@ public class LM002Report extends MakeReport {
 					this.info("F2: " + F[2]);
 					this.info("F3: " + F[3]);
 				}
-				
+
 				// 從上到下每排啟動 excel formulas
 				for (int y = 0; y < 3; y++) {
 					for (int x = 0; x < 12; x++) {
@@ -114,7 +111,7 @@ public class LM002Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 	}
 

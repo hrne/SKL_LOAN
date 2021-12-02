@@ -58,7 +58,7 @@ public class LM043Report extends MakeReport {
 			exportExcel(titaVo, LM043List);
 		}
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {

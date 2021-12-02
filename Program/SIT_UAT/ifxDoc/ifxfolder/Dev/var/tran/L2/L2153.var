@@ -651,7 +651,7 @@ C(4,#BusinessOfficerItem,T(3,房貸專員),$)
 
 #ACTFGX=X,8,L
 T(H,#ACTFG,#ActFgHelp)
-K(MODIFYBUTTON,核准)
+!K(MODIFYBUTTON,核准)
 
 #WkFdP1=X,1,S
 C(3,#FKEY,0,$,s)
@@ -1927,7 +1927,7 @@ HELP(#RelationCodeHelp)
 @V(H,#RelationCodeHelp)
 
 #RelationCodeX=X,4,L
-T(3,)
+C(4,#RelationCode,S,$)
 T(H,#RelationCode,#RelationCodeHelp)
 
 #WkFdP5C=X,1,S
@@ -2025,10 +2025,12 @@ T(2,@RimEmployeeNo,#Introducer)
 IF(#L2r02Introducer==#Introducer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@IntroducerX,#L2r08FullName)
+T(2,@District,#L2r08CenterCode1)
+T(2,@DistrictX,#L2r08CenterCode1Name)
 
 #IntroducerX=X,20,L
 C(4,#Introducer,S,$)
-T(2,#L2r08FullName)
 
 ![區部]
 !可不輸入
@@ -2036,11 +2038,9 @@ T(2,#L2r08FullName)
 
 #District=X,6,L
 C(4,#Introducer,S,$)
-T(2,#L2r08CenterCode1)
 
 #DistrictX=X,20,L
 C(4,#Introducer,S,$)
-T(2,#L2r08CenterCode1Name)
 
 #BUF12A=X,7,S
 T(3,      Y)
@@ -2064,10 +2064,10 @@ T(2,@RimEmployeeNo,#FireOfficer)
 IF(#L2r02Introducer==#FireOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@FireOfficerX,#L2r08FullName)
 
 #FireOfficerX=X,20,L
 C(4,#FireOfficer,S,$)
-T(2,#L2r08FullName)
 
 #BUF13A=X,7,S
 T(3,      Y)
@@ -2091,10 +2091,10 @@ T(2,@RimEmployeeNo,#Estimate)
 IF(#L2r02Estimate==#Estimate,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@EstimateX,#L2r08FullName)
 
 #EstimateX=X,20,L
 C(4,#Estimate,S,$)
-T(2,#L2r08FullName)
 
 #BUF14A=X,7,S
 T(3,      Y)
@@ -2119,10 +2119,10 @@ T(2,@RimEmployeeNo,#CreditOfficer)
 IF(#L2r02CreditOfficer==#CreditOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@CreditOfficerX,#L2r08FullName)
 
 #CreditOfficerX=X,20,L
 C(4,#CreditOfficer,S,$)
-T(2,#L2r08FullName)
 
 
 #BUF16A=X,7,S
@@ -2147,10 +2147,10 @@ T(2,@RimEmployeeNo,#BusinessOfficer)
 IF(#L2r02LoanOfficer==#BusinessOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@BusinessOfficerX,#L2r08FullName)
 
 #BusinessOfficerX=X,20,L
 C(4,#BusinessOfficer,S,$)
-T(2,#L2r08FullName)
 
 #BUF17A=X,7,S
 T(3,      Y)
@@ -2164,7 +2164,7 @@ HELP(#ApprovedLevelHelp)
 @V(H,#ApprovedLevelHelp)
 
 #ApprovedLevelX=X,20,L
-T(3,)
+C(4,#ApprovedLevel,S,$)
 T(H,#ApprovedLevel,#ApprovedLevelHelp)
 C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F,@Supervisor,1)T(3,@FdSupervisor,*))
 
@@ -2191,10 +2191,10 @@ T(2,@RimEmployeeNo,#Supervisor)
 IF(#L2r02Supervisor==#Supervisor,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
+T(2,@SupervisorX,#L2r08FullName)
 
 #SupervisorX=X,20,L
 C(4,#Supervisor,S,$)
-T(2,#L2r08FullName)
 
 #BUF18A=X,7,S
 T(3,      Y)
@@ -2219,10 +2219,10 @@ T(2,@RimEmployeeNo,#Coorgnizer)
 E(0,@RimFunCd,1)
 S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
+T(2,@CoorgnizerX,#L2r13FullName)
 
 #CoorgnizerX=X,20,L
 C(4,#Coorgnizer,S,$)
-T(2,#L2r13FullName)
 
 !--- P7 清償金類型
 !#BTNHIDEP7=X,15,I,ui:button;value: 清償金類型 ;enable:1;tabbable:1
