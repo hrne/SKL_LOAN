@@ -23,6 +23,7 @@ import com.st1.itx.db.repository.hist.TxTellerRepositoryHist;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -137,6 +138,34 @@ em = null;
   }
 
   @Override
+  public Slice<TxTeller> findByGroupNo(String brNo_0, String groupNo_1, String groupNo_2, int levelFg_3, int levelFg_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<TxTeller> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByGroupNo " + dbName + " : " + "brNo_0 : " + brNo_0 + " groupNo_1 : " +  groupNo_1 + " groupNo_2 : " +  groupNo_2 + " levelFg_3 : " +  levelFg_3 + " levelFg_4 : " +  levelFg_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = txTellerReposDay.findAllByBrNoIsAndGroupNoGreaterThanEqualAndGroupNoLessThanEqualAndLevelFgGreaterThanEqualAndLevelFgLessThanEqualOrderByTlrNoAsc(brNo_0, groupNo_1, groupNo_2, levelFg_3, levelFg_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = txTellerReposMon.findAllByBrNoIsAndGroupNoGreaterThanEqualAndGroupNoLessThanEqualAndLevelFgGreaterThanEqualAndLevelFgLessThanEqualOrderByTlrNoAsc(brNo_0, groupNo_1, groupNo_2, levelFg_3, levelFg_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = txTellerReposHist.findAllByBrNoIsAndGroupNoGreaterThanEqualAndGroupNoLessThanEqualAndLevelFgGreaterThanEqualAndLevelFgLessThanEqualOrderByTlrNoAsc(brNo_0, groupNo_1, groupNo_2, levelFg_3, levelFg_4, pageable);
+    else 
+      slice = txTellerRepos.findAllByBrNoIsAndGroupNoGreaterThanEqualAndGroupNoLessThanEqualAndLevelFgGreaterThanEqualAndLevelFgLessThanEqualOrderByTlrNoAsc(brNo_0, groupNo_1, groupNo_2, levelFg_3, levelFg_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public TxTeller holdById(String tlrNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -180,7 +209,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + txTeller.getTlrNo());
     if (this.findById(txTeller.getTlrNo()) != null)
       throw new DBException(2);
@@ -209,7 +240,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + txTeller.getTlrNo());
     if (!empNot.isEmpty())
       txTeller.setLastUpdateEmpNo(empNot);
@@ -232,7 +265,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + txTeller.getTlrNo());
     if (!empNot.isEmpty())
       txTeller.setLastUpdateEmpNo(empNot);
@@ -282,7 +317,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (TxTeller t : txTeller){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -316,7 +354,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (txTeller == null || txTeller.size() == 0)
       throw new DBException(6);

@@ -33,7 +33,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6601 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6601.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -103,7 +102,7 @@ public class L6601 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdAcCode2, tCdAcCode); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改會計科子細目"); ////
 			break;
 
 		case 4: // 刪除

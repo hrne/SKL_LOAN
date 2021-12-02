@@ -54,15 +54,15 @@ public class L7903 extends TradeBuffer {
 					occursList.putParam("OOProdName", aFacProd.getProdName());
 					occursList.putParam("OOStartDate", aFacProd.getStartDate());
 					occursList.putParam("OOEndDate", aFacProd.getEndDate());
-					occursList.putParam("OOIfrsStepProdCode", aFacProd.getIfrsStepProdCode());
-					occursList.putParam("OOIfrsProdCode", aFacProd.getIfrsProdCode());
+					occursList.putParam("OOIfrsStepProdCode", aFacProd.getIfrs9StepProdCode());
+					occursList.putParam("OOIfrsProdCode", aFacProd.getIfrs9ProdCode());
 					this.totaVo.addOccursList(occursList);
 				}
 			}
 		} else {
 			pFacProd = iFacProdService.findById(iProdNo, titaVo);
 			if (pFacProd == null) {
-				throw new LogicException("E0001", "商品主檔"); // 查無資料
+				throw new LogicException("E0001", "商品分類資料檔"); // 查無資料
 			} else {
 
 				OccursList occursList = new OccursList();
@@ -70,8 +70,8 @@ public class L7903 extends TradeBuffer {
 				occursList.putParam("OOProdName", pFacProd.getProdName());
 				occursList.putParam("OOStartDate", pFacProd.getStartDate());
 				occursList.putParam("OOEndDate", pFacProd.getEndDate());
-				occursList.putParam("OOIfrsStepProdCode", pFacProd.getIfrsStepProdCode());
-				occursList.putParam("OOIfrsProdCode", pFacProd.getIfrsProdCode());
+				occursList.putParam("OOIfrsStepProdCode", pFacProd.getIfrs9StepProdCode());
+				occursList.putParam("OOIfrsProdCode", pFacProd.getIfrs9ProdCode());
 				this.totaVo.addOccursList(occursList);
 			}
 

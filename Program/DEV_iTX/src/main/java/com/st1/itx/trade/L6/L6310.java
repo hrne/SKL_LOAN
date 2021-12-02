@@ -141,7 +141,7 @@ public class L6310 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 				dataLog.setEnv(titaVo, tTxHoliday2, tTxHoliday); ////
-				dataLog.exec(); ////
+				dataLog.exec("修改特殊/例假日"); ////
 
 			}
 

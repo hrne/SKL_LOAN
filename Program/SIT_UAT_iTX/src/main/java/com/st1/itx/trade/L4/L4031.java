@@ -118,22 +118,27 @@ public class L4031 extends TradeBuffer {
 			});
 
 			for (tmpBatx tempL4031Vo : tempList) {
-				if (totCnt.get(tempL4031Vo) == 0 && sumCnt.get(tempL4031Vo) == 0 && ignCnt.get(tempL4031Vo) == 0) {
+				int totcnt = totCnt.get(tempL4031Vo);
+				int sumcnt = sumCnt.get(tempL4031Vo);
+				int igncnt = ignCnt.get(tempL4031Vo);
+				int concnt = conCnt.get(tempL4031Vo);
+				int keyincnt = keyinCnt.get(tempL4031Vo);
+				if (totcnt == 0 && sumcnt == 0 && igncnt == 0) {
 					continue;
 				}
 				OccursList occursList = new OccursList();
-				this.info("totCnt=" + totCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
-						+ ignCnt.get(tempL4031Vo) + ", conCnt=" + conCnt.get(tempL4031Vo));
+				this.info("totCnt=" + totcnt + ", sumCnt = " + sumcnt + ",ignCnt=" + igncnt + ", conCnt=" + concnt);
 				checkFlag = 9;
 				if (tempL4031Vo.getRank() == 1) {
-					if (sumCnt.get(tempL4031Vo) == conCnt.get(tempL4031Vo)) {
+					if (sumcnt == concnt) {
 						checkFlag = 1; // 1-已確認報表
-					} else if (keyinCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+					} else if (keyincnt == totcnt) {
 						checkFlag = 0; // 0-確認
 					}
 				}
 				int adjCode = tempL4031Vo.getLableB() / 10;
 				int keyinCode = tempL4031Vo.getLableB() % 10;
+				int txKind = tempL4031Vo.getLableA();
 				// 1.批次自動調整 RPTFG = 5(只有目前&調後，無取消調整)
 				// 2.按地區別調整 RPTFG = 6(只有目前&調後&上下限，無取消調整)
 				// 3.人工調整(未調整) RPTFG = 3(全部欄位，可選擇4種調整方式) 若為機動利率調整則為7
@@ -141,27 +146,26 @@ public class L4031 extends TradeBuffer {
 				// 5.人工調整(已調整) RPTFG = 2(全部欄位，無取消調整)
 				// A.全部 RPTFG = 4(全部欄位，可取消調整)
 
-// TxKind           adjcode            KeyinCode          RptFg                                    
+// TxKind           adjcode            KeyinCode          RptFg    
+// ------------------------------------------------------------------------------------------------------------------------
 //                  0.全部                                2(無利率欄)
-
 // 1.定期機動調整
 // 3.機動利率調整                                                                                           
-//                  1.批次自動調整                        5(目前&調後，無取消調整)   
-//                  2.按地區別調整                                   
+//                  1.批次自動調整                        5(目前&調後)   
+//                  2.按地區別調整                                                   
 //                  3.人工調整                                   
-//                                      0.未調整          7(有地區別，可選擇3種調整方式)  
-//                                      1.已調整          4(無地區別，可取消調整)         
-//                                      2.待輸入          4(全部欄位，無取消調整)
-
+//                                      0.未調整          7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//                                      1.已調整          6(有地區別，可選擇<取消調整>)         
+//                                      2.待輸入          6(有地區別，可選擇<取消調整>)   
 // 2.指數型利率調整
 // 4.員工利率調整 
-// 5.按商品別調整 7 機動利率調整 
-//				    1.批次自動調整                                              5(只有目前&調後，無取消調整)   
+// 5.按商品別調整  
+//				    1.批次自動調整                                              5(目前&調後)  
 //				             
 //				    3.人工調整                                   
-//				                        0.未調整                     3(無地區別，可選擇3種調整方式)  
-//				                        1.已調整                     4(無地區別，可取消調整)         
-//				                        2.待輸入                     4(全部欄位，無取消調整)
+//				                        0.未調整                     3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//				                        1.已調整                     4(無地區別，可選擇<取消調整>)   
+//				                        2.待輸入                     4(無地區別，可選擇<取消調整>)   
 
 				int rptFg = 0;
 				String lableBX = "";
@@ -184,21 +188,27 @@ public class L4031 extends TradeBuffer {
 					switch (keyinCode) {
 					case 0:
 						lableBX += "(未調整)";
-						if (tempL4031Vo.getLableA() == 1 || tempL4031Vo.getLableA() == 3) {
-							rptFg = 3;
-						} else {
-							rptFg = 7;
-						}
 						break;
 					case 1:
 						lableBX += "(已調整)";
-						rptFg = 4;
 						break;
 					case 2:
 						lableBX += "(待輸入)";
 						checkFlag = 2; // 2-輸入利率
-						rptFg = 4;
 						break;
+					}
+					if (keyinCode == 0) {
+						if (txKind == 1 || txKind == 3) {
+							rptFg = 7;
+						} else {
+							rptFg = 3;
+						}
+					} else {
+						if (txKind == 1 || txKind == 3) {
+							rptFg = 6;
+						} else {
+							rptFg = 4;
+						}
 					}
 				}
 
@@ -322,7 +332,6 @@ public class L4031 extends TradeBuffer {
 	}
 
 	private void setCount(BatxRateChange tBatxRateChange, tmpBatx grp, int rank) {
-		this.info("grp : " + grp.toString());
 		if (!totCnt.containsKey(grp)) {
 			totCnt.put(grp, 0);
 		}

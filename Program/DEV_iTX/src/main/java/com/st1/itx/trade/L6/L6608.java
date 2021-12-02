@@ -87,7 +87,7 @@ public class L6608 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdReport2, tCdReport); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改報表代號對照檔"); ////
 			break;
 
 		case 4: // 刪除

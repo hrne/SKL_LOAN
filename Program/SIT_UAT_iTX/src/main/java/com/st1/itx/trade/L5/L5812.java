@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.YearlyHouseLoanInt;
@@ -19,8 +20,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.data.DataLog;
-
-
 
 @Service("L5812")
 @Scope("prototype")
@@ -50,7 +49,7 @@ public class L5812 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
-		int iYearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth"))+191100;
+		int iYearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		String iUsageCode = titaVo.getParam("UsageCode").trim();
@@ -64,17 +63,17 @@ public class L5812 extends TradeBuffer {
 		YearlyHouseLoanIntId tYearlyHouseLoanIntId = new YearlyHouseLoanIntId();
 		switch (iFuncCode) {
 		case 1: // 新增
-			
+
 			break;
 
 		case 2: // 修改
-			tYearlyHouseLoanInt = sYearlyHouseLoanIntService.holdById(new YearlyHouseLoanIntId(iYearMonth,iCustNo,iFacmNo,iUsageCode));
+			tYearlyHouseLoanInt = sYearlyHouseLoanIntService.holdById(new YearlyHouseLoanIntId(iYearMonth, iCustNo, iFacmNo, iUsageCode));
 			if (tYearlyHouseLoanInt == null) {
-				throw new LogicException(titaVo, "E0003",""); // 修改資料不存在
+				throw new LogicException(titaVo, "E0003", ""); // 修改資料不存在
 			}
 			YearlyHouseLoanInt tYearlyHouseLoanInt2 = (YearlyHouseLoanInt) dataLog.clone(tYearlyHouseLoanInt); ////
 			try {
-				moveYearlyHouse(tYearlyHouseLoanInt, tYearlyHouseLoanIntId, iFuncCode, iYearMonth, iCustNo,iFacmNo,iUsageCode, titaVo);
+				moveYearlyHouse(tYearlyHouseLoanInt, tYearlyHouseLoanIntId, iFuncCode, iYearMonth, iCustNo, iFacmNo, iUsageCode, titaVo);
 				tYearlyHouseLoanInt = sYearlyHouseLoanIntService.update2(tYearlyHouseLoanInt, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
@@ -84,7 +83,7 @@ public class L5812 extends TradeBuffer {
 			break;
 
 		case 4: // 刪除
-			tYearlyHouseLoanInt = sYearlyHouseLoanIntService.holdById(new YearlyHouseLoanIntId(iYearMonth,iCustNo,iFacmNo,iUsageCode));
+			tYearlyHouseLoanInt = sYearlyHouseLoanIntService.holdById(new YearlyHouseLoanIntId(iYearMonth, iCustNo, iFacmNo, iUsageCode));
 			if (tYearlyHouseLoanInt != null) {
 				try {
 					sYearlyHouseLoanIntService.delete(tYearlyHouseLoanInt);
@@ -104,37 +103,42 @@ public class L5812 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveYearlyHouse(YearlyHouseLoanInt mYearlyHouseLoanInt, YearlyHouseLoanIntId mYearlyHouseLoanIntId, int mFuncCode, int mYearMonth, int mCustNo,int mFacmNo,String mUsageCode, TitaVo titaVo) throws LogicException {
-
+	private void moveYearlyHouse(YearlyHouseLoanInt mYearlyHouseLoanInt, YearlyHouseLoanIntId mYearlyHouseLoanIntId, int mFuncCode, int mYearMonth, int mCustNo, int mFacmNo, String mUsageCode,
+			TitaVo titaVo) throws LogicException {
+		TempVo tTempVo = new TempVo();
 		mYearlyHouseLoanIntId.setYearMonth(mYearMonth);
 		mYearlyHouseLoanIntId.setCustNo(mCustNo);
 		mYearlyHouseLoanIntId.setFacmNo(mFacmNo);
 		mYearlyHouseLoanIntId.setUsageCode(mUsageCode);
 		mYearlyHouseLoanInt.setYearlyHouseLoanIntId(mYearlyHouseLoanIntId);
 
-		mYearlyHouseLoanInt.setYearMonth(this.parse.stringToInteger(titaVo.getParam("YearMonth"))+191100);//資料年月
-		mYearlyHouseLoanInt.setCustNo(this.parse.stringToInteger(titaVo.getParam("CustNo")));//戶號
-		mYearlyHouseLoanInt.setFacmNo(this.parse.stringToInteger(titaVo.getParam("FacmNo")));//額度
-		mYearlyHouseLoanInt.setUsageCode(titaVo.getParam("UsageCode"));//資金用途別
-		mYearlyHouseLoanInt.setAcctCode(titaVo.getParam("AcctCode"));//業務科目代號
+//		mYearlyHouseLoanInt.setYearMonth(this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100);// 資料年月
+//		mYearlyHouseLoanInt.setCustNo(this.parse.stringToInteger(titaVo.getParam("CustNo")));// 戶號
+//		mYearlyHouseLoanInt.setFacmNo(this.parse.stringToInteger(titaVo.getParam("FacmNo")));// 額度
+//		mYearlyHouseLoanInt.setUsageCode(titaVo.getParam("UsageCode"));// 資金用途別
 		
-		int RepayCode=Integer.parseInt(titaVo.getParam("RepayCode"));
-		String iRepayCode=String.valueOf(RepayCode);
-		mYearlyHouseLoanInt.setRepayCode(iRepayCode);//繳款方式
-		mYearlyHouseLoanInt.setLoanAmt(this.parse.stringToBigDecimal(titaVo.getParam("LoanAmt")));//VARCHAR2?撥款金額
-		mYearlyHouseLoanInt.setLoanBal(this.parse.stringToBigDecimal(titaVo.getParam("LoanBal")));//放款餘額
-		mYearlyHouseLoanInt.setYearlyInt(this.parse.stringToBigDecimal(titaVo.getParam("YearlyInt")));//年度繳息金額
-		
-		
-		mYearlyHouseLoanInt.setFirstDrawdownDate(this.parse.stringToInteger(titaVo.getParam("FirstDrawdownDate")));//初貸日
-		mYearlyHouseLoanInt.setMaturityDate(this.parse.stringToInteger(titaVo.getParam("MaturityDate")));//到期日
-		mYearlyHouseLoanInt.setHouseBuyDate(this.parse.stringToInteger(titaVo.getParam("HouseBuyDate")));//房屋取得日期
+		mYearlyHouseLoanInt.setAcctCode(titaVo.getParam("AcctCode"));// 業務科目代號
+//		int RepayCode = Integer.parseInt(titaVo.getParam("RepayCode"));
+//		String iRepayCode = String.valueOf(RepayCode);
+//		mYearlyHouseLoanInt.setRepayCode(iRepayCode);// 繳款方式 
+		mYearlyHouseLoanInt.setLoanAmt(this.parse.stringToBigDecimal(titaVo.getParam("LoanAmt"))); // 撥款金額
+		mYearlyHouseLoanInt.setLoanBal(this.parse.stringToBigDecimal(titaVo.getParam("LoanBal"))); // 放款餘額
+		mYearlyHouseLoanInt.setYearlyInt(this.parse.stringToBigDecimal(titaVo.getParam("YearlyInt"))); // 年度繳息金額
 
-		if (mFuncCode != 2) {
-			mYearlyHouseLoanInt.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			mYearlyHouseLoanInt.setCreateEmpNo(titaVo.getTlrNo());
-		}
-		mYearlyHouseLoanInt.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-		mYearlyHouseLoanInt.setLastUpdateEmpNo(titaVo.getTlrNo());
+		mYearlyHouseLoanInt.setFirstDrawdownDate(this.parse.stringToInteger(titaVo.getParam("FirstDrawdownDate")));// 初貸日
+		mYearlyHouseLoanInt.setMaturityDate(this.parse.stringToInteger(titaVo.getParam("MaturityDate"))); // 到期日
+		mYearlyHouseLoanInt.setHouseBuyDate(this.parse.stringToInteger(titaVo.getParam("HouseBuyDate"))); // 房屋取得日期
+
+		tTempVo.putParam("F0", titaVo.getParam("CustName"));   //戶名
+		tTempVo.putParam("F1", titaVo.getParam("CustId")); //統編
+		tTempVo.putParam("F5", titaVo.getParam("LineAmt"));  //核准額度
+		mYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
+		
+//		if (mFuncCode != 2) {
+//			mYearlyHouseLoanInt.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+//			mYearlyHouseLoanInt.setCreateEmpNo(titaVo.getTlrNo());
+//		}
+//		mYearlyHouseLoanInt.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+//		mYearlyHouseLoanInt.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
 }

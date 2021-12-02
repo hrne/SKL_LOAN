@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -39,7 +37,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6701 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6701.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -65,8 +62,7 @@ public class L6701 extends TradeBuffer {
 		if (iBranchCode.isEmpty()) {
 			iBranchCode = "    ";
 		}
-		this.info(
-				"L6701 CdBank : " + iFuncCode + "-" + iBankCode + iBranchCode + "-" + iBankItem + "-" + iBranchItem);
+		this.info("L6701 CdBank : " + iFuncCode + "-" + iBankCode + iBranchCode + "-" + iBankItem + "-" + iBranchItem);
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
@@ -84,11 +80,9 @@ public class L6701 extends TradeBuffer {
 
 			tCdBank.setBankItem(iBankItem);
 			tCdBank.setBranchItem(iBranchItem);
-			tCdBank.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tCdBank.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tCdBank.setCreateEmpNo(titaVo.getTlrNo());
-			tCdBank.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tCdBank.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
 			try {
 				sCdBankService.insert(tCdBank, titaVo);
@@ -112,15 +106,14 @@ public class L6701 extends TradeBuffer {
 				tCdBank.setBankItem(iBankItem);
 				tCdBank.setBranchCode(iBranchCode);
 				tCdBank.setBranchItem(iBranchItem);
-				tCdBank.setLastUpdate(
-						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tCdBank.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 				tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
 				tCdBank = sCdBankService.update2(tCdBank, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdBank2, tCdBank); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改行庫資料"); ////
 			break;
 
 		case 4: // 刪除

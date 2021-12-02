@@ -25,6 +25,9 @@ public interface CdLandOfficeRepositoryHist extends JpaRepository<CdLandOffice, 
   // LandOfficeCode =
   public Slice<CdLandOffice> findAllByLandOfficeCodeIsOrderByRecWordAsc(String landOfficeCode_0, Pageable pageable);
 
+  // LandOfficeCode =
+  public Optional<CdLandOffice> findTopByLandOfficeCodeIsOrderByRecWordDesc(String landOfficeCode_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -73,6 +73,11 @@ public class LD006Report extends MakeReport {
 					switch (i) {
 					case 10: // K欄:撥款金額
 						total = total.add(getBigDecimal(tmpValue));
+						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue, "#,##0");
+						break;
+					case 17: // 員工代號
+						makeExcel.setValue(row, col, tmpValue);
+						break;
 					case 21: // V欄:換算業績
 					case 22: // W欄:業務報酬
 					case 23: // X欄:業績金額

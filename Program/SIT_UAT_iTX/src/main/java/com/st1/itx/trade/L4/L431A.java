@@ -109,7 +109,7 @@ public class L431A extends TradeBuffer {
 			throw new LogicException("E0007", " 此筆資料已被確定，請先訂正L4321。");
 		}
 
-		// 取消調整
+		// 選擇調整、取消調整
 		if (tBatxRateChange.getRateKeyInCode() == 0) {
 			switch (btnIndex) {
 			case 0: // 0.按擬調利率調整

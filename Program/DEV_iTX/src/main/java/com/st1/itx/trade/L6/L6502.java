@@ -32,7 +32,6 @@ import com.st1.itx.util.common.SendRsp;
  * @version 1.0.0
  */
 public class L6502 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6502.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -98,7 +97,7 @@ public class L6502 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdVarValue2, tCdVarValue); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改會計變動值設定"); ////
 			break;
 
 		case 4: // 刪除

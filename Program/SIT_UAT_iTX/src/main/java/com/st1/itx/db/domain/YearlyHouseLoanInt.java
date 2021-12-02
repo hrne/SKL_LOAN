@@ -29,7 +29,7 @@ public class YearlyHouseLoanInt implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1134143130986775311L;
+	private static final long serialVersionUID = 511275848152625286L;
 
 @EmbeddedId
   private YearlyHouseLoanIntId yearlyHouseLoanIntId;
@@ -52,7 +52,7 @@ public class YearlyHouseLoanInt implements Serializable {
   private String usageCode;
 
   // 業務科目代號
-  /* CdAcCode會計科子細目設定檔310: 短期擔保放款 320: 中期擔保放款330: 長期擔保放款340: 三十年房貸990: 催收款項 */
+  /* CdAcCode會計科子細目設定檔310: 短期擔保放款 320: 中期擔保放款330: 長期擔保放款340: 三十年房貸 */
   @Column(name = "`AcctCode`", length = 3)
   private String acctCode;
 
@@ -84,6 +84,10 @@ public class YearlyHouseLoanInt implements Serializable {
   // 房屋取得日期
   @Column(name = "`HouseBuyDate`")
   private int houseBuyDate = 0;
+
+  // jason格式紀錄欄
+  @Column(name = "`JsonFields`", length = 300)
+  private String jsonFields;
 
   // 建檔日期時間
   @CreatedDate
@@ -197,7 +201,6 @@ public class YearlyHouseLoanInt implements Serializable {
 320: 中期擔保放款
 330: 長期擔保放款
 340: 三十年房貸
-990: 催收款項
 	* @return String
 	*/
   public String getAcctCode() {
@@ -211,7 +214,6 @@ public class YearlyHouseLoanInt implements Serializable {
 320: 中期擔保放款
 330: 長期擔保放款
 340: 三十年房貸
-990: 催收款項
   *
   * @param acctCode 業務科目代號
 	*/
@@ -367,6 +369,25 @@ public class YearlyHouseLoanInt implements Serializable {
   }
 
 /**
+	* jason格式紀錄欄<br>
+	* 
+	* @return String
+	*/
+  public String getJsonFields() {
+    return this.jsonFields == null ? "" : this.jsonFields;
+  }
+
+/**
+	* jason格式紀錄欄<br>
+	* 
+  *
+  * @param jsonFields jason格式紀錄欄
+	*/
+  public void setJsonFields(String jsonFields) {
+    this.jsonFields = jsonFields;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -447,6 +468,6 @@ public class YearlyHouseLoanInt implements Serializable {
   public String toString() {
     return "YearlyHouseLoanInt [yearlyHouseLoanIntId=" + yearlyHouseLoanIntId + ", acctCode=" + acctCode + ", repayCode=" + repayCode
            + ", loanAmt=" + loanAmt + ", loanBal=" + loanBal + ", firstDrawdownDate=" + firstDrawdownDate + ", maturityDate=" + maturityDate + ", yearlyInt=" + yearlyInt + ", houseBuyDate=" + houseBuyDate
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

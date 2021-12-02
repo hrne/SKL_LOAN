@@ -197,7 +197,7 @@ public class L2221 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeFacRelation, tFacRelation);
-			dataLog.exec();
+			dataLog.exec("修改掃描類別，客戶姓名");
 
 			this.totaVo.putParam("OWarningMsg", "");
 		} else if (iFunCd == 4) {

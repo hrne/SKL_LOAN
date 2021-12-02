@@ -121,7 +121,7 @@ public class L6604 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", iDefCode + "-" + iCode + ":" + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdCode2, tCdCode); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改各類代碼檔"); ////
 			break;
 
 		case 4: // 刪除

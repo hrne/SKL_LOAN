@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -39,7 +37,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6709 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6709.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -88,11 +85,11 @@ public class L6709 extends TradeBuffer {
 		CdAcBookId tCdAcBookId = new CdAcBookId();
 		switch (iFuncCode) {
 		case 1: // 新增
-			moveCdAcBook(tCdAcBook,tCdAcBookId, iFuncCode, iAcBookCode, iAcSubBookCode, titaVo);
-			
+			moveCdAcBook(tCdAcBook, tCdAcBookId, iFuncCode, iAcBookCode, iAcSubBookCode, titaVo);
+
 			try {
 				this.info("1");
-				this.info("tCdAcBooktCdAcBook="+tCdAcBook);
+				this.info("tCdAcBooktCdAcBook=" + tCdAcBook);
 				sCdAcBookService.insert(tCdAcBook, titaVo);
 				this.info("L6709 ins : " + iFuncCode + iAcBookCode);
 			} catch (DBException e) {
@@ -105,23 +102,23 @@ public class L6709 extends TradeBuffer {
 			break;
 
 		case 2: // 修改
-			tCdAcBook = sCdAcBookService.holdById(new CdAcBookId(iAcBookCode,iAcSubBookCode));
+			tCdAcBook = sCdAcBookService.holdById(new CdAcBookId(iAcBookCode, iAcSubBookCode));
 			if (tCdAcBook == null) {
 				throw new LogicException(titaVo, "E0003", iAcBookCode); // 修改資料不存在
 			}
 			CdAcBook tCdAcBook2 = (CdAcBook) dataLog.clone(tCdAcBook); ////
 			try {
-				moveCdAcBook(tCdAcBook,tCdAcBookId, iFuncCode, iAcBookCode, iAcSubBookCode, titaVo);
+				moveCdAcBook(tCdAcBook, tCdAcBookId, iFuncCode, iAcBookCode, iAcSubBookCode, titaVo);
 				tCdAcBook = sCdAcBookService.update2(tCdAcBook, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdAcBook2, tCdAcBook); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改帳冊別目標金額"); ////
 			break;
 
 		case 4: // 刪除
-			tCdAcBook = sCdAcBookService.holdById(new CdAcBookId(iAcBookCode,iAcSubBookCode));
+			tCdAcBook = sCdAcBookService.holdById(new CdAcBookId(iAcBookCode, iAcSubBookCode));
 			this.info("L6709 del : " + iFuncCode + iAcBookCode);
 			if (tCdAcBook != null) {
 				try {
@@ -156,9 +153,9 @@ public class L6709 extends TradeBuffer {
 		}
 		mCdAcBook.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mCdAcBook.setLastUpdateEmpNo(titaVo.getTlrNo());
-	
+
 	}
-	
+
 	private void updSystemParas(int uFuncCode, int uAdjDate, TitaVo titaVo) throws LogicException {
 
 		SystemParas tSystemParas = new SystemParas();
@@ -174,7 +171,7 @@ public class L6709 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 		dataLog.setEnv(titaVo, tSystemParas2, tSystemParas); ////
-		dataLog.exec(); ////
+		dataLog.exec("修改系統參數設定檔"); ////
 
 	}
 
@@ -224,7 +221,7 @@ public class L6709 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdCode2, tCdCode); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改各類代碼檔"); ////
 			break;
 
 		case 4: // 刪除時 Enable維護為"N"
@@ -240,7 +237,7 @@ public class L6709 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdCode4, tCdCode); ////
-			dataLog.exec(); ////
+			dataLog.exec("刪除各類代碼檔"); ////
 			break;
 
 		}

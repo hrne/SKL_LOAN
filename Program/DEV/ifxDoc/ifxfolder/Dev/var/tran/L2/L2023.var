@@ -55,6 +55,7 @@ K(MODIFYBUTTON,查詢)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
 
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -72,6 +73,23 @@ T(3,*)
 
 #CustId=X,10,I
 @V(7)
+
+#CustIdX=X,10,L
+T(2,#CustId)
+<include src="ROM.icf::L2R07.dec"/>
+#RimCustId=X,10,L
+#RimCustNo=A,7,L
+#RimTxCode=X,5,L
+
+#SendL2r07=X,1,S
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#CustName=X,100,L
+T(2,#L2r07CustName)
 
 !#CHAINXMT=X,1,S
 !C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -120,14 +138,6 @@ C(4,#oCustNo,S,T(2,#oCustNo+#Dash+#oFacmNo))
 C(4,#oClCode1,S,T(2,#oClCode1+#Dash+#oClCode2+#Dash+#oClNo))
 #oModify=X,1,S
 
-!關聯戶
-#Buf1=x,350,S
-T(2,#oCreditSysNo+#oCustNo+#oFacmNo+#oCustName+#oUKey+#oId+#oName+#oType)
-
-#Btn1=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2222; ntxbuf=#Buf1})
-IF(#oModify=="0",BIND(grid,cancel),$)
-
 </sub>
 
 
@@ -156,13 +166,15 @@ TXFORM=L2023
 #oModify
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 <sub type="PART" name="L2023" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];order=1">
 [
 ["[L2023]                                 ID所有人案件關係查詢"],
-[""],
+["統一編號",#CustIdX],
+["戶名",#CustName],
 ]
 </sub>
 
@@ -181,10 +193,7 @@ TXFORM=L2023
 #oCustNoX=戶號
 {width:100,align:'center'}
 
-#oId=身份證號
-{width:100,align:'center'}
-
-#oName=名稱
+#oName=借戶戶名
 {width:200,align:'left'}
 
 #oType=類別
@@ -192,9 +201,6 @@ TXFORM=L2023
 
 #oRelation=與授信戶關係/掃描類別
 {width:200,align:'left'}
-
-#Btn1=登錄關係
-{width:70,search:false,formatter:'cust:bind-button:登錄',align:'center',canExport:false}
 
 #oClNoX=擔保品編號
 {width:120,align:'left'}

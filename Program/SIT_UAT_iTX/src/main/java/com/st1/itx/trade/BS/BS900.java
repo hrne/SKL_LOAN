@@ -114,9 +114,6 @@ public class BS900 extends TradeBuffer {
 			} while (dateUtil.isHoliDay());
 		}
 		this.info("iAcDateReverse=" + iAcDateReverse);
-		if (iAcDateReverse > 0) {
-			return null;
-		}
 		// 1.刪除當月提息明細檔 //
 		this.info("1.bs900 delete acLoanint, yearMonth=" + yearMonth);
 

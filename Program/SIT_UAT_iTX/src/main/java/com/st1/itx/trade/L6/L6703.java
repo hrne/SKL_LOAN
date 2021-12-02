@@ -90,7 +90,7 @@ public class L6703 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdInsurer2, tCdInsurer); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改保險/鑑定公司資料"); ////
 			break;
 
 		case 4: // 刪除
@@ -126,7 +126,7 @@ public class L6703 extends TradeBuffer {
 		mCdInsurer.setTelNo(titaVo.getParam("TelNo"));
 		mCdInsurer.setTelExt(titaVo.getParam("TelExt"));
 		mCdInsurer.setInsurerId(titaVo.getParam("InsurerId"));
-		
+
 		if (mFuncCode != 2) {
 			mCdInsurer.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdInsurer.setCreateEmpNo(titaVo.getTlrNo());

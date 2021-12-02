@@ -102,7 +102,7 @@ public class L6501 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tSystemParas2, tSystemParas); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改系統變數級參數設定值"); ////
 			break;
 
 		case 4: // 刪除

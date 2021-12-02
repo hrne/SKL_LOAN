@@ -26,12 +26,15 @@ E(0,0)
 ["#FdYearMonth+年月",#YearMonth],
 ["#FdCustNo+戶號",#CustNo,"-",#FacmNo],
 ["#FdUsageCode+資金用途別",#UsageCode1,#UsageCodeX],
-["#FdAcctCode+業務科目代號",#AcctCode,#AcctCodX],
-["#FdRepayCode+繳款方式",#RepayCode,#RepayCodeX],
-["#FdLoanAmt+撥款金額",#LoanAmt],
-["#FdLoanBal+放款餘額",#LoanBal],
-["#FdFirstDrawdownDate+初貸日",#FirstDrawdownDate],
-["#FdMaturityDate+到期日",#MaturityDate],
+["#FdCustId+借戶統編",#CustId],
+["#FdCustName+借戶姓名",#CustName],
+[#<->#,"#FdAcctCode+業務科目代號",#AcctCode,#AcctCodX],
+!["#FdRepayCode+繳款方式",#RepayCode,#RepayCodeX],
+["#FdLineAmt+核准額度",#LineAmt],
+["#FdLoanAmt+初貸金額",#LoanAmt],
+[#<->#,"#FdLoanBal+放款餘額",#LoanBal],
+["#FdFirstDrawdownDate+貸款起日",#FirstDrawdownDate],
+["#FdMaturityDate+貸款迄日",#MaturityDate],
 ["#FdYearlyInt+年度繳息金額",#YearlyInt],
 ["#FdHouseBuyDate+房屋取得日期",#HouseBuyDate],
 ]
@@ -52,7 +55,9 @@ T(3, )
 #FdMaturityDate=X,2,L
 #FdYearlyInt=X,2,L
 #FdHouseBuyDate=X,2,L
-
+#FdCustName=X,2,L
+#FdCustId=X,2,L
+#FdLineAmt=X,2,L
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -66,6 +71,7 @@ T(3,CdCode.FuncCode2)
 T(3,CdCode.AcctCode)  
                 
 #AcctCodeHelp=x,1024,S   
+T(2,310:短期擔保放款;320:中期擔保放款;330:長期擔保放款;340:三十年房貸;)
 
 #CODERepayCode=x,20,S                  
 T(3,CdCode.RepayCode)  
@@ -80,13 +86,12 @@ T(3,CdCode.UsageCode)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CODEFuncCode2,#CODEAcctCod,#CODERepayCode,#CODEUsageCode)
+S(XXR99,01,#CODEFuncCode2,#CODERepayCode,#CODEUsageCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCode2Help,#HelpDesc1)
-T(2,@AcctCodeHelp,#HelpDesc2)
-T(2,@RepayCodeHelp,#HelpDesc3)
-T(2,@UsageCodeHelp,00:全部;+#HelpDesc4)
+T(2,@RepayCodeHelp,#HelpDesc2)
+T(2,@UsageCodeHelp,00:全部;+#HelpDesc3)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -161,7 +166,9 @@ T(2,@FdFirstDrawdownDate,#WKSTAR1)
 T(2,@FdMaturityDate,#WKSTAR1)
 T(2,@FdYearlyInt,#WKSTAR1)
 T(2,@FdHouseBuyDate,#WKSTAR1)   
-
+T(2,@FdCustName,#WKSTAR1)
+T(2,@FdCustId,#WKSTAR1)
+T(2,@FdLineAmt,#WKSTAR1)
                                
 #YearMonth=A,5,L
 #CustNo=A,7,L
@@ -184,6 +191,9 @@ S(L5R41,1,#RimFuncCode,#RimYearMonth,#RimCustNo,#RimFacmNo,#RimUsageCode)
 R(1,L5R41)
 
 #RIMSET=X,1,S
+T(2,@CustName,#L5R41CustName)
+T(2,@CustId,#L5R41CustId)
+E(0,@LineAmt,#L5R41LineAmt)
 E(0,@AcctCode,#L5R41AcctCode)
 E(0,@RepayCode,#L5R41RepayCode)
 E(0,@LoanAmt,#L5R41LoanAmt)
@@ -192,7 +202,17 @@ E(0,@FirstDrawdownDate,#L5R41FirstDrawdownDate)
 E(0,@MaturityDate,#L5R41MaturityDate)
 E(0,@YearlyInt,#L5R41YearlyInt)
 E(0,@HouseBuyDate,#L5R41HouseBuyDate)
-T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
+T(H,@AcctCodX,#AcctCode,#AcctCodeHelp)
+
+#CustId=X,10,I
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(7)A(ID_UNINO,0,#CustId)
+
+
+#CustName=X,20,I
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(7)
+
 !業務科目
 #AcctCode=A,3,I
 C(2,#FuncCode,s,s,$,s,s,s)
@@ -203,13 +223,18 @@ HELP(#AcctCodeHelp)
 T(H,#AcctCode,#AcctCodeHelp)
 
 !繳款方式
-#RepayCode=A,2,I
-C(2,#FuncCode,s,s,$,s,s,s)
-HELP(#RepayCodeHelp)
-@C(3,#FuncCode,2,V(H,#RepayCodeHelp),$)
+#RepayCode=A,2,S
+!C(2,#FuncCode,s,s,$,s,s,s)
+!HELP(#RepayCodeHelp)
+!@C(3,#FuncCode,2,V(H,#RepayCodeHelp),$)
 
 #RepayCodeX=X,20,L
-T(H,#RepayCode,#RepayCodeHelp)
+!T(H,#RepayCode,#RepayCodeHelp)
+
+!核准額度
+#LineAmt=m,14,I
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(2,0)
 
 !撥款金額
 #LoanAmt=m,14,I
@@ -281,13 +306,15 @@ T(3,[L5812] 國稅局申報檔維護)
 #FacmNo
 #UsageCode
 #AcctCode
-#RepayCode
 #LoanAmt
 #LoanBal
 #FirstDrawdownDate
 #MaturityDate
 #YearlyInt
 #HouseBuyDate
+#CustId
+#CustName
+#LineAmt
 #END
 </sub>
 

@@ -9,9 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.YearlyHouseLoanInt;
+import com.st1.itx.db.domain.YearlyHouseLoanIntId;
+import com.st1.itx.db.service.YearlyHouseLoanIntService;
 import com.st1.itx.db.service.springjpa.cm.L5811ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
@@ -44,7 +49,11 @@ public class L5811 extends TradeBuffer {
 	L5811ServiceImpl l5811ServiceImpl;
 
 	@Autowired
+	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
+	
+	@Autowired
 	Parse parse;
+	
 	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -52,12 +61,29 @@ public class L5811 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		this.info("L5811 titaVo.getTxcd() = " + titaVo.getTxcd());
-
+		
 		String iYear = titaVo.getParam("Year");
+		
+		checkAll(iYear,titaVo);
+		
+		doJsonField(iYear,titaVo);
+		
+		
+		long sno = makeExcel.close();
+		makeExcel.toExcel(sno);
+		totaVo.put("ExcelSnoM", "" + sno);
+		
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+	
+	public void checkAll(String iYear, TitaVo titaVo) throws LogicException{
+		
+		
 
 		int ExcelYear = Integer.parseInt(iYear) + 1;
 		List<Map<String, String>> resultList = null;
-
+		
 		try {
 			resultList = l5811ServiceImpl.checkAll(iYear, titaVo);
 		} catch (Exception e) {
@@ -129,12 +155,56 @@ public class L5811 extends TradeBuffer {
 			i++;
 
 		}
-
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
-		totaVo.put("ExcelSnoM", "" + sno);
-		this.addList(this.totaVo);
-		return this.sendList();
+		
+		
 	}
 
+	public void doJsonField(String iYear, TitaVo titaVo) throws LogicException{
+		
+		List<Map<String, String>> resultList = null;
+		
+		try {
+			resultList = l5811ServiceImpl.doJsonField(iYear, titaVo);
+		} catch (Exception e) {
+			throw new LogicException("E0013", e.getMessage());
+		}
+		
+		TempVo tTempVo = new TempVo();
+		
+		for (Map<String, String> result : resultList) {
+			YearlyHouseLoanIntId tYearlyHouseLoanIntId = new YearlyHouseLoanIntId();
+			YearlyHouseLoanInt tYearlyHouseLoanInt = new YearlyHouseLoanInt();
+			
+			tYearlyHouseLoanIntId.setYearMonth(Integer.parseInt(result.get("F9")));
+			tYearlyHouseLoanIntId.setCustNo(Integer.parseInt(result.get("F2")));
+			tYearlyHouseLoanIntId.setFacmNo(Integer.parseInt(result.get("F3")));
+			tYearlyHouseLoanIntId.setUsageCode(result.get("F12"));
+			tYearlyHouseLoanInt = sYearlyHouseLoanIntService.findById(tYearlyHouseLoanIntId, titaVo);
+			if(tYearlyHouseLoanInt == null) {
+				continue;
+			}
+			tTempVo.putParam("F0",result.get("F0"));// 戶名
+			tTempVo.putParam("F1",result.get("F1"));// 統編
+//			tTempVo.putParam("F2",result.get("F2"));
+//			tTempVo.putParam("F3",result.get("F3"));
+//			tTempVo.putParam("F4",result.get("F4"));
+			tTempVo.putParam("F5",result.get("F5"));//核准額度
+//			tTempVo.putParam("F6",result.get("F6"));
+//			tTempVo.putParam("F7",result.get("F7"));
+//			tTempVo.putParam("F8",result.get("F8"));
+//			tTempVo.putParam("F9",result.get("F9"));
+//			tTempVo.putParam("F10",result.get("F10"));
+//			tTempVo.putParam("F11",result.get("F11"));
+			
+			tYearlyHouseLoanInt.setYearlyHouseLoanIntId(tYearlyHouseLoanIntId);
+			tYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
+			
+			try {
+				sYearlyHouseLoanIntService.update(tYearlyHouseLoanInt,titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007",e.getErrorMsg());
+			}
+			
+		}
+	}
 }

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import java.math.BigDecimal;
@@ -23,13 +22,13 @@ import com.st1.itx.db.domain.FacProdAcctFeeId;
  */
 public interface FacProdAcctFeeRepositoryDay extends JpaRepository<FacProdAcctFee, FacProdAcctFeeId> {
 
-  // ProdNo = ,AND FeeType = ,AND LoanLow >= ,AND LoanLow <= 
-  public Slice<FacProdAcctFee> findAllByProdNoIsAndFeeTypeIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(String prodNo_0, String feeType_1, BigDecimal loanLow_2, BigDecimal loanLow_3, Pageable pageable);
+	// ProdNo = ,AND FeeType = ,AND LoanLow >= ,AND LoanLow <=
+	public Slice<FacProdAcctFee> findAllByProdNoIsAndFeeTypeIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(String prodNo_0, String feeType_1, BigDecimal loanLow_2, BigDecimal loanLow_3,
+			Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacProdAcctFee> findByFacProdAcctFeeId(FacProdAcctFeeId facProdAcctFeeId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacProdAcctFee> findByFacProdAcctFeeId(FacProdAcctFeeId facProdAcctFeeId);
 
 }
-

@@ -16,8 +16,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.BankRemit;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
@@ -30,6 +28,7 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BankRemitFileVo;
 import com.st1.itx.util.date.DateUtil;
@@ -105,6 +104,9 @@ public class L4101 extends TradeBuffer {
 	@Autowired
 	CdEmpService cdEmpService;
 
+	@Autowired
+	LoanCom loanCom;
+	
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
 
@@ -241,23 +243,13 @@ public class L4101 extends TradeBuffer {
 		occursList.putParam("OOCustNo", t.getCustNo()); // 戶號
 		occursList.putParam("OOFacmNo", t.getFacmNo()); // 額度
 		occursList.putParam("OOBormNo", t.getBormNo()); // 撥款
-		CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
-		if (tCustMain != null) {
-			occursList.putParam("OOCustName", t.getBormNo()); // 戶名
-		} else {
-			occursList.putParam("OOCustName", ""); // 戶名
-		}
+		
+		occursList.putParam("OOCustName", loanCom.getCustNameByNo(t.getCustNo())); // 戶名
 
 		// 查詢員工資料檔
 		if (!"".equals(t.getTitaTlrNo())) {
-			CdEmp tCdEmp = cdEmpService.findById(t.getTitaTlrNo(), titaVo);
-			if (tCdEmp == null) {
-				occursList.putParam("OOTlrNo", t.getTitaTlrNo());
-				occursList.putParam("OOTlrNoX", "");
-			} else {
-				occursList.putParam("OOTlrNo", t.getTitaTlrNo());// 經辦
-				occursList.putParam("OOTlrNoX", tCdEmp.getFullname());
-			}
+			occursList.putParam("OOTlrNo", t.getTitaTlrNo());// 經辦
+			occursList.putParam("OOTlrNoX", loanCom.getEmpFullnameByEmpNo(t.getTitaTlrNo()));
 		} else {
 			occursList.putParam("OOTlrNo", "");
 			occursList.putParam("OOTlrNoX", "");

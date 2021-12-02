@@ -47,6 +47,15 @@ public interface CdLandOfficeService {
   public Slice<CdLandOffice> findLandOfficeCode(String landOfficeCode_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * LandOfficeCode =
+   *
+   * @param landOfficeCode_0 landOfficeCode_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdLandOffice CdLandOffice of List
+   */
+  public CdLandOffice findRecWordFirst(String landOfficeCode_0, TitaVo... titaVo);
+
+  /**
    * hold By CdLandOffice
    * 
    * @param cdLandOfficeId key

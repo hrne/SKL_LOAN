@@ -186,7 +186,7 @@ C(3,#FuncCode,1,D(7,2,#StartDate1,0,27),T(2,0+#L6R19EndDate1))
 C(3,#FuncCode,2,D(7,2,#StartDate1,0,27),$)
 
 #EndDate1=D,7,I
-E(0,#DEFAULT_ED_1)
+C(3,#L6R19EndDate1,0,E(0,#DEFAULT_ED_1),$)
 C(2,#FuncCode,$,$,$,$,s,s)
 D(8)
 @V(2,0)V(7)A(4,0,#EndDate1)V(5,#StartDate1,9991231)
@@ -222,7 +222,7 @@ C(3,#FuncCode,1,D(7,2,#StartDate{i},0,27),T(2,0+#L6R19EndDate{i}))
 C(3,#FuncCode,2,D(7,2,#StartDate{i},0,27),$)
 
 #EndDate{i}=D,7,I
-E(0,#DEFAULT_ED_{i})
+C(3,#L6R19EndDate{i},0,E(0,#DEFAULT_ED_{i}),$)
 C(2,#FuncCode,$,$,$,$,s,s)
 D(8)
 @V(2,0)V(7)A(4,0,#EndDate{i})V(5,#StartDate{i},9991231)

@@ -29,7 +29,7 @@ public class FacProd implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8930057707413740796L;
+	private static final long serialVersionUID = 7731356101590960957L;
 
 // 商品代碼
   @Id
@@ -142,14 +142,14 @@ public class FacProd implements Serializable {
   private int breachStartPercent = 0;
 
   // IFRS階梯商品別
-  /* 空白 = 非階梯式A = 固定階梯B = 浮動階梯 */
-  @Column(name = "`IfrsStepProdCode`", length = 1)
-  private String ifrsStepProdCode;
+  /* N = 非階梯式A = 固定階梯B = 浮動階梯 */
+  @Column(name = "`Ifrs9StepProdCode`", length = 1)
+  private String ifrs9StepProdCode;
 
   // IFRS產品別
   /* 共用代碼檔 */
-  @Column(name = "`IfrsProdCode`", length = 2)
-  private String ifrsProdCode;
+  @Column(name = "`Ifrs9ProdCode`", length = 2)
+  private String ifrs9ProdCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -658,25 +658,25 @@ public class FacProd implements Serializable {
 
 /**
 	* IFRS階梯商品別<br>
-	* 空白 = 非階梯式
+	* N = 非階梯式
 A = 固定階梯
 B = 浮動階梯
 	* @return String
 	*/
-  public String getIfrsStepProdCode() {
-    return this.ifrsStepProdCode == null ? "" : this.ifrsStepProdCode;
+  public String getIfrs9StepProdCode() {
+    return this.ifrs9StepProdCode == null ? "" : this.ifrs9StepProdCode;
   }
 
 /**
 	* IFRS階梯商品別<br>
-	* 空白 = 非階梯式
+	* N = 非階梯式
 A = 固定階梯
 B = 浮動階梯
   *
-  * @param ifrsStepProdCode IFRS階梯商品別
+  * @param ifrs9StepProdCode IFRS階梯商品別
 	*/
-  public void setIfrsStepProdCode(String ifrsStepProdCode) {
-    this.ifrsStepProdCode = ifrsStepProdCode;
+  public void setIfrs9StepProdCode(String ifrs9StepProdCode) {
+    this.ifrs9StepProdCode = ifrs9StepProdCode;
   }
 
 /**
@@ -684,18 +684,18 @@ B = 浮動階梯
 	* 共用代碼檔
 	* @return String
 	*/
-  public String getIfrsProdCode() {
-    return this.ifrsProdCode == null ? "" : this.ifrsProdCode;
+  public String getIfrs9ProdCode() {
+    return this.ifrs9ProdCode == null ? "" : this.ifrs9ProdCode;
   }
 
 /**
 	* IFRS產品別<br>
 	* 共用代碼檔
   *
-  * @param ifrsProdCode IFRS產品別
+  * @param ifrs9ProdCode IFRS產品別
 	*/
-  public void setIfrsProdCode(String ifrsProdCode) {
-    this.ifrsProdCode = ifrsProdCode;
+  public void setIfrs9ProdCode(String ifrs9ProdCode) {
+    this.ifrs9ProdCode = ifrs9ProdCode;
   }
 
 /**
@@ -781,7 +781,7 @@ B = 浮動階梯
            + ", enterpriseFg=" + enterpriseFg + ", currencyCode=" + currencyCode + ", baseRateCode=" + baseRateCode + ", prodIncr=" + prodIncr + ", lowLimitRate=" + lowLimitRate + ", incrFlag=" + incrFlag
            + ", rateCode=" + rateCode + ", govOfferFlag=" + govOfferFlag + ", financialFlag=" + financialFlag + ", empFlag=" + empFlag + ", breachFlag=" + breachFlag + ", breachCode=" + breachCode
            + ", breachGetCode=" + breachGetCode + ", prohibitMonth=" + prohibitMonth + ", breachPercent=" + breachPercent + ", breachDecreaseMonth=" + breachDecreaseMonth + ", breachDecrease=" + breachDecrease + ", breachStartPercent=" + breachStartPercent
-           + ", ifrsStepProdCode=" + ifrsStepProdCode + ", ifrsProdCode=" + ifrsProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + ", ifrs9StepProdCode=" + ifrs9StepProdCode + ", ifrs9ProdCode=" + ifrs9ProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
            + "]";
   }
 }

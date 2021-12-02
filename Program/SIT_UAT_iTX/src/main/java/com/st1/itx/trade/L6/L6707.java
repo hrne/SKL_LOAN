@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6707 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6707.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -94,7 +91,7 @@ public class L6707 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdCashFlow2, tCdCashFlow); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改現金流量預估資料"); ////
 			break;
 
 		case 4: // 刪除

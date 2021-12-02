@@ -33,7 +33,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6605 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6605.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -92,39 +91,37 @@ public class L6605 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdOverdue2, tCdOverdue); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改逾期新增減少原因"); ////
 			break;
 
 		case 4: // 刪除
-			//去右邊零
+			// 去右邊零
 			String mOverduecode = iOverdueCode.replaceAll("0+$", "");
-			String cOverduecode="";
+			String cOverduecode = "";
 			tCdOverdue = sCdOverdueService.holdById(new CdOverdueId(iOverdueSign, iOverdueCode));
-			
+
 			Slice<CdOverdue> slCdOverdue;
 			slCdOverdue = sCdOverdueService.overdueCodeRange(iOverdueSign, iOverdueSign, "0000", "ZZZZ", this.index, this.limit, titaVo);
 			List<CdOverdue> lCdOverdue = slCdOverdue == null ? null : slCdOverdue.getContent();
-			
-			
-			if(lCdOverdue!=null) {
-				//判斷是否為增減原因大類
-			  if(mOverduecode.length()==1) {
-				 for (CdOverdue cCdOverdue : lCdOverdue) {
-					cOverduecode = cCdOverdue.getOverdueCode().replaceAll("0+$", "");
-					  // 若第一碼相同
-					 if(cOverduecode.length()>1) {
-						 if((mOverduecode).equals(cOverduecode.subSequence(0, 1))) {
-							 this.info("Overduecode delet mOverduecode ="+mOverduecode+",Db Overduecode="+cOverduecode);
-							 throw new LogicException("","增減原因下仍有細項存在,不可刪除");
-						 }
-						 
-					 }
-				 }
-			
-		 	 }
+
+			if (lCdOverdue != null) {
+				// 判斷是否為增減原因大類
+				if (mOverduecode.length() == 1) {
+					for (CdOverdue cCdOverdue : lCdOverdue) {
+						cOverduecode = cCdOverdue.getOverdueCode().replaceAll("0+$", "");
+						// 若第一碼相同
+						if (cOverduecode.length() > 1) {
+							if ((mOverduecode).equals(cOverduecode.subSequence(0, 1))) {
+								this.info("Overduecode delet mOverduecode =" + mOverduecode + ",Db Overduecode=" + cOverduecode);
+								throw new LogicException("", "增減原因下仍有細項存在,不可刪除");
+							}
+
+						}
+					}
+
+				}
 			}
-			
-			
+
 			if (tCdOverdue != null) {
 				try {
 					sCdOverdueService.delete(tCdOverdue);

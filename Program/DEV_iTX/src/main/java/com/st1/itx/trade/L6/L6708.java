@@ -33,7 +33,6 @@ import com.st1.itx.util.data.DataLog;
  */
 
 public class L6708 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6708.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -128,7 +127,7 @@ public class L6708 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 				dataLog.setEnv(titaVo, tCdBudget2, tCdBudget); ////
-				dataLog.exec(); ////
+				dataLog.exec("修改利息收入預算數"); ////
 			}
 
 		} else if (FuncCode.equals("4")) {

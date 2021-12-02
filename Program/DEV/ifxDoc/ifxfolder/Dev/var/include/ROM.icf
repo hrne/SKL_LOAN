@@ -6243,6 +6243,9 @@ TXFORM=L5R40
 </L5R41Rim.dec>
 
 <L5R41.dec>
+#L5R41CustName=X,20,S
+#L5R41CustId=X,10,S
+#L5R41LineAmt=M,14,S
 #L5R41AcctCode=X,3,S
 #L5R41RepayCode=X,2,S
 #L5R41LoanAmt=M,14,S
@@ -6257,6 +6260,9 @@ TXFORM=L5R40
 
 <L5R41.tom>
 TXFORM=L5R41
+#L5R41CustName
+#L5R41CustId
+#L5R41LineAmt
 #L5R41AcctCode
 #L5R41RepayCode
 #L5R41LoanAmt

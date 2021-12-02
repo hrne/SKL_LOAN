@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.CdLandOfficeRepositoryHist;
 import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -138,6 +139,25 @@ em = null;
   }
 
   @Override
+  public CdLandOffice findRecWordFirst(String landOfficeCode_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findRecWordFirst " + dbName + " : " + "landOfficeCode_0 : " + landOfficeCode_0);
+    Optional<CdLandOffice> cdLandOfficeT = null;
+    if (dbName.equals(ContentName.onDay))
+      cdLandOfficeT = cdLandOfficeReposDay.findTopByLandOfficeCodeIsOrderByRecWordDesc(landOfficeCode_0);
+    else if (dbName.equals(ContentName.onMon))
+      cdLandOfficeT = cdLandOfficeReposMon.findTopByLandOfficeCodeIsOrderByRecWordDesc(landOfficeCode_0);
+    else if (dbName.equals(ContentName.onHist))
+      cdLandOfficeT = cdLandOfficeReposHist.findTopByLandOfficeCodeIsOrderByRecWordDesc(landOfficeCode_0);
+    else 
+      cdLandOfficeT = cdLandOfficeRepos.findTopByLandOfficeCodeIsOrderByRecWordDesc(landOfficeCode_0);
+
+    return cdLandOfficeT.isPresent() ? cdLandOfficeT.get() : null;
+  }
+
+  @Override
   public CdLandOffice holdById(CdLandOfficeId cdLandOfficeId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -181,7 +201,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + cdLandOffice.getCdLandOfficeId());
     if (this.findById(cdLandOffice.getCdLandOfficeId()) != null)
       throw new DBException(2);
@@ -210,7 +232,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + cdLandOffice.getCdLandOfficeId());
     if (!empNot.isEmpty())
       cdLandOffice.setLastUpdateEmpNo(empNot);
@@ -233,7 +257,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + cdLandOffice.getCdLandOfficeId());
     if (!empNot.isEmpty())
       cdLandOffice.setLastUpdateEmpNo(empNot);
@@ -283,7 +309,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdLandOffice t : cdLandOffice){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -317,7 +346,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (cdLandOffice == null || cdLandOffice.size() == 0)
       throw new DBException(6);

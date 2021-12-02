@@ -135,7 +135,7 @@ public class L6752 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 				dataLog.setEnv(titaVo, tCdWorkMonth2, tCdWorkMonth); ////
-				dataLog.exec(); ////
+				dataLog.exec("修改放款業績工作月"); ////
 			}
 
 		} else if (FuncCode.equals("4")) {

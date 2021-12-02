@@ -68,7 +68,7 @@ public class L4965 extends TradeBuffer {
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100;
+		this.limit = 100;  // 266*100 = 26600
 
 		List<String[]> dataL4965 = l4965ServiceImpl.findData(this.index, this.limit, titaVo);
 
@@ -76,8 +76,8 @@ public class L4965 extends TradeBuffer {
 		if (dataL4965 != null && dataL4965.size() == this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToAuto();// 自動折返
-//			this.totaVo.setMsgEndToEnter();// 手動折返
+//			this.totaVo.setMsgEndToAuto();// 自動折返
+			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
 		if (this.index == 0 && (dataL4965 == null || dataL4965.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "");

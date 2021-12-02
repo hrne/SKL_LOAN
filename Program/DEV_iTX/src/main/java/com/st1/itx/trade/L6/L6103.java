@@ -27,7 +27,6 @@ import com.st1.itx.db.service.TxTellerService;
  * @version 1.0.0
  */
 public class L6103 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6103.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -97,7 +96,7 @@ public class L6103 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", "使用者:" + titaVo.getTlrNo() + "/" + e.getErrorMsg());
 		}
 		dataLog.setEnv(titaVo, tTxTeller2, tTxTeller); ////
-		dataLog.exec(); ////
+		dataLog.exec("報表查詢作業申請"); ////
 
 	}
 }

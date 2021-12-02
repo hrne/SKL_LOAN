@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TotaVo;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.data.DataLog;
 
 @Service("L5813")
@@ -27,8 +28,6 @@ import com.st1.itx.util.data.DataLog;
 public class L5813 extends TradeBuffer {
 	@Autowired
 	public DataLog iDataLog;
-	@Autowired
-	public L5813File l5813File;
 
 
 
@@ -37,16 +36,12 @@ public class L5813 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5813 ");
 		this.totaVo.init(titaVo);
-		String iYear = titaVo.getParam("Year");
-		int tYear = Integer.parseInt(iYear)+1;
 		
-		String fileName = "每年房屋擔保借款繳息媒體檔"+tYear+"年度";
-		l5813File.exec(titaVo);
-		long fileNo = l5813File.close();
-		l5813File.toFile(fileNo, fileName);
+		// 執行交易
+		MySpring.newTask("L5813Batch", this.txBuffer, titaVo);
+
+		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 		
-
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

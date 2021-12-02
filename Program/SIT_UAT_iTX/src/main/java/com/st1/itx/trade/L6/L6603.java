@@ -94,7 +94,7 @@ public class L6603 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdCl2, tCdCl); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改擔保品代號資料"); ////
 			break;
 
 		case 4: // 刪除

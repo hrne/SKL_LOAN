@@ -61,9 +61,9 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // 區經理姓名(介紹人)
-		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", IGroup.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 - 參考樣張輸出, 同額度的三項業績金額為 Group By FacmNo
-		sql += "       ,NVL(PIDA.\"AdjPerfReward\", IGroup.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 因此 IGroup 以 FacmNo 作 Group
-		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", IGroup.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額 PIDA 只到額度層
+		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示 此三金額修改為撥款層而非額度層總計
+		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 -- 參考L5051
+		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額
 		sql += " FROM \"PfItDetail\" I";
 		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\"    = I.\"PerfDate\""; // 取房貸專員
 		sql += "                           AND B.\"CustNo\"      = I.\"CustNo\"";
@@ -81,30 +81,18 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"UnitCode\""; // 取單位中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DeptCode\""; // 取部室中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = I.\"DistCode\""; // 取區部中文(介紹人)
-		sql += " LEFT JOIN ( SELECT PID.\"CustNo\" ";
-		sql += "                   ,PID.\"FacmNo\" ";
-		sql += "                   ,PID.\"WorkMonth\" ";
-		sql += "                   ,SUM(PID.\"PerfEqAmt\") \"PerfEqAmt\" ";
-		sql += "                   ,SUM(PID.\"PerfReward\") \"PerfReward\" ";
-		sql += "                   ,SUM(PID.\"PerfAmt\") \"PerfAmt\" ";
-		sql += "             FROM \"PfItDetail\" PID";
-		sql += "             GROUP BY PID.\"CustNo\" ";
-		sql += "                     ,PID.\"FacmNo\" ";
-		sql += "                     ,PID.\"WorkMonth\" ";
-		sql += "           ) IGroup ON IGroup.\"CustNo\" = I.\"CustNo\" ";
-		sql += "                   AND IGroup.\"FacmNo\" = I.\"FacmNo\" ";
-		sql += "                   AND IGroup.\"WorkMonth\" = I.\"WorkMonth\" ";
 		sql += " LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\"    = I.\"CustNo\"     ";
 		sql += "                                    AND PIDA.\"FacmNo\"    = I.\"FacmNo\"     ";
+		sql += "                                    AND PIDA.\"BormNo\"    = I.\"BormNo\"     ";
 		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
+		sql += "                                    AND I.\"AdjRange\" IN (1,2)               ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
-		sql += "   AND I.\"Introducer\" IS NOT NULL"; // PfItDetail 存在介紹人為 Null 的資料
 		if (useWorkMonth)
 		{
 			sql += "   AND I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else
 		{
-			sql += "   AND I.\"DrawdownDate\" BETWEEN :perfDateStart AND :perfDateEnd";
+			sql += "   AND I.\"PerfDate\" BETWEEN :perfDateStart AND :perfDateEnd";
 		}
 		if (useCustNo)
 		{

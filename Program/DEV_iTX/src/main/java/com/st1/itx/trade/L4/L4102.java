@@ -14,8 +14,6 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankRemit;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
@@ -28,6 +26,7 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BankRemitFileVo;
 import com.st1.itx.util.date.DateUtil;
@@ -102,6 +101,9 @@ public class L4102 extends TradeBuffer {
 	@Autowired
 	CdEmpService cdEmpService;
 
+	@Autowired
+	LoanCom loanCom;
+
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
 
@@ -112,8 +114,6 @@ public class L4102 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4102 ");
 		this.totaVo.init(titaVo);
-		totaB.putParam("MSGID", "L412B");
-
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getParam("BatchNo");
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
@@ -150,6 +150,7 @@ public class L4102 extends TradeBuffer {
 		}
 
 		if (unReleaselBankRemit != null) {
+			totaB.putParam("MSGID", "L412B");
 
 			// tota 未放行清單
 			for (BankRemit t : unReleaselBankRemit) {
@@ -183,23 +184,13 @@ public class L4102 extends TradeBuffer {
 		occursList.putParam("OOCustNo", t.getCustNo()); // 戶號
 		occursList.putParam("OOFacmNo", t.getFacmNo()); // 額度
 		occursList.putParam("OOBormNo", t.getBormNo()); // 撥款
-		CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
-		if (tCustMain != null) {
-			occursList.putParam("OOCustName", t.getBormNo()); // 戶名
-		} else {
-			occursList.putParam("OOCustName", ""); // 戶名
-		}
+
+		occursList.putParam("OOCustName", loanCom.getCustNameByNo(t.getCustNo())); // 戶名
 
 		// 查詢員工資料檔
 		if (!"".equals(t.getTitaTlrNo())) {
-			CdEmp tCdEmp = cdEmpService.findById(t.getTitaTlrNo(), titaVo);
-			if (tCdEmp == null) {
-				occursList.putParam("OOTlrNo", t.getTitaTlrNo());
-				occursList.putParam("OOTlrNoX", "");
-			} else {
-				occursList.putParam("OOTlrNo", t.getTitaTlrNo());// 經辦
-				occursList.putParam("OOTlrNoX", tCdEmp.getFullname());
-			}
+			occursList.putParam("OOTlrNo", t.getTitaTlrNo());// 經辦
+			occursList.putParam("OOTlrNoX", loanCom.getEmpFullnameByEmpNo(t.getTitaTlrNo()));
 		} else {
 			occursList.putParam("OOTlrNo", "");
 			occursList.putParam("OOTlrNoX", "");

@@ -238,7 +238,7 @@ public class L2101 extends TradeBuffer {
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		String iProdNo = titaVo.getParam("ProdNo");
-		String iBreachCode = titaVo.getParam("BreachCode");
+		titaVo.getParam("BreachCode");
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
@@ -285,7 +285,7 @@ public class L2101 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "商品代碼 = " + iProdNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			datalog.setEnv(titaVo, beforeFacProd, tFacProd);
-			datalog.exec();
+			datalog.exec("修改商品狀態，商品截止日期");
 			break;
 		case 4: // 刪除 商品參數生效後禁止刪除
 			try {
@@ -309,8 +309,7 @@ public class L2101 extends TradeBuffer {
 		List<FacProdAcctFee> lFacProdAcctFee = new ArrayList<FacProdAcctFee>();
 		// 更新階梯式利率
 		FacProdStepRate tFacProdStepRate = new FacProdStepRate();
-		Slice<FacProdStepRate> slFacProdStepRate = facProdStepRateService.stepRateProdNoEq(iProdNo, 0, 999, this.index,
-				Integer.MAX_VALUE);
+		Slice<FacProdStepRate> slFacProdStepRate = facProdStepRateService.stepRateProdNoEq(iProdNo, 0, 999, this.index, Integer.MAX_VALUE);
 		List<FacProdStepRate> lFacProdStepRate = slFacProdStepRate == null ? null : slFacProdStepRate.getContent();
 		if (lFacProdStepRate != null && lFacProdStepRate.size() > 0) {
 			try {
@@ -321,15 +320,13 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 10; i++) {
-				if (titaVo.get("StepMonthS" + i) != null
-						&& this.parse.stringToDouble(titaVo.get("StepMonthS" + i)) >= 0) {
+				if (titaVo.get("StepMonthS" + i) != null && this.parse.stringToDouble(titaVo.get("StepMonthS" + i)) >= 0) {
 					if (this.parse.stringToDouble(titaVo.getParam("StepMonthS" + i)) == 0 && i > 1) {
 						break;
 					}
 					tFacProdStepRate.setProdNo(iProdNo);
 					tFacProdStepRate.setMonthStart(this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i)));
-					tFacProdStepRate.setFacProdStepRateId(new FacProdStepRateId(iProdNo,
-							this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i))));
+					tFacProdStepRate.setFacProdStepRateId(new FacProdStepRateId(iProdNo, this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i))));
 					if (i == 10) {
 						tFacProdStepRate.setMonthEnd(999);
 					} else {
@@ -341,11 +338,9 @@ public class L2101 extends TradeBuffer {
 					}
 					tFacProdStepRate.setRateType(titaVo.getParam("StepRateType" + i));
 					tFacProdStepRate.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("StepRateIncr" + i)));
-					tFacProdStepRate.setCreateDate(
-							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+					tFacProdStepRate.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 					tFacProdStepRate.setCreateEmpNo(titaVo.getTlrNo());
-					tFacProdStepRate.setLastUpdate(
-							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+					tFacProdStepRate.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 					tFacProdStepRate.setLastUpdateEmpNo(titaVo.getTlrNo());
 					// this.info("L2101 StepRate i=" + i + "key=" +
 					// tFacProdStepRate.getFacProdStepRateId());
@@ -362,8 +357,7 @@ public class L2101 extends TradeBuffer {
 
 		// 更新年繳保費優惠減碼
 		FacProdPremium tFacProdPremium = new FacProdPremium();
-		Slice<FacProdPremium> slFacProdPremium = facProdPremiumService.premiumProdNoEq(iProdNo, new BigDecimal(0.00),
-				new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
+		Slice<FacProdPremium> slFacProdPremium = facProdPremiumService.premiumProdNoEq(iProdNo, new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
 		List<FacProdPremium> lFacProdPremium = slFacProdPremium == null ? null : slFacProdPremium.getContent();
 		if (lFacProdPremium != null && lFacProdPremium.size() > 0) {
 			try {
@@ -374,28 +368,23 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 10; i++) {
-				if (titaVo.get("TimPremium" + i) != null
-						&& this.parse.stringToDouble(titaVo.get("TimPremium" + i)) > 0) {
+				if (titaVo.get("TimPremium" + i) != null && this.parse.stringToDouble(titaVo.get("TimPremium" + i)) > 0) {
 					tFacProdPremium.setProdNo(iProdNo);
 					tFacProdPremium.setPremiumLow(this.parse.stringToBigDecimal(titaVo.getParam("TimPremium" + i)));
-					tFacProdPremium.setFacProdPremiumId(new FacProdPremiumId(iProdNo,
-							this.parse.stringToBigDecimal(titaVo.getParam("TimPremium" + i))));
+					tFacProdPremium.setFacProdPremiumId(new FacProdPremiumId(iProdNo, this.parse.stringToBigDecimal(titaVo.getParam("TimPremium" + i))));
 					if (i == 10) {
 						tFacProdPremium.setPremiumHigh(new BigDecimal(99999999999999.00));
 					} else {
 						if (this.parse.stringToDouble(titaVo.getParam("TimPremium" + (i + 1)).trim()) == 0) {
 							tFacProdPremium.setPremiumHigh(new BigDecimal(99999999999999.00));
 						} else {
-							tFacProdPremium.setPremiumHigh(this.parse
-									.stringToBigDecimal(titaVo.getParam("TimPremium" + i)).subtract(new BigDecimal(1)));
+							tFacProdPremium.setPremiumHigh(this.parse.stringToBigDecimal(titaVo.getParam("TimPremium" + i)).subtract(new BigDecimal(1)));
 						}
 					}
 					tFacProdPremium.setPremiumIncr(this.parse.stringToBigDecimal(titaVo.getParam("PremiumIncr" + i)));
-					tFacProdPremium.setCreateDate(
-							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+					tFacProdPremium.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 					tFacProdPremium.setCreateEmpNo(titaVo.getTlrNo());
-					tFacProdPremium.setLastUpdate(
-							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+					tFacProdPremium.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 					tFacProdPremium.setLastUpdateEmpNo(titaVo.getTlrNo());
 					try {
 						facProdPremiumService.insert(tFacProdPremium, titaVo);
@@ -408,8 +397,7 @@ public class L2101 extends TradeBuffer {
 			}
 		}
 		// 更新帳管費
-		slFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iProdNo, "1", new BigDecimal(0.00),
-				new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
+		slFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iProdNo, "1", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
 		lFacProdAcctFee = slFacProdAcctFee == null ? null : slFacProdAcctFee.getContent();
 		if (lFacProdAcctFee != null && lFacProdAcctFee.size() > 0) {
 			try {
@@ -421,20 +409,17 @@ public class L2101 extends TradeBuffer {
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 5; i++) {
 				tFacProdAcctFee = new FacProdAcctFee();
-				if (titaVo.get("TimLoanAmt" + i) != null
-						&& this.parse.stringToDouble(titaVo.get("TimLoanAmt" + i)) > 0) {
+				if (titaVo.get("TimLoanAmt" + i) != null && this.parse.stringToDouble(titaVo.get("TimLoanAmt" + i)) > 0) {
 					tFacProdAcctFee.setProdNo(iProdNo);
 					tFacProdAcctFee.setLoanLow(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmt" + i)));
-					tFacProdAcctFee.setFacProdAcctFeeId(new FacProdAcctFeeId(iProdNo, "1",
-							this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmt" + i))));
+					tFacProdAcctFee.setFacProdAcctFeeId(new FacProdAcctFeeId(iProdNo, "1", this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmt" + i))));
 					if (i == 5) {
 						tFacProdAcctFee.setLoanHigh(new BigDecimal(99999999999999.00));
 					} else {
 						if (this.parse.stringToDouble(titaVo.getParam("TimLoanAmt" + (i + 1))) == 0) {
 							tFacProdAcctFee.setLoanHigh(new BigDecimal(99999999999999.00));
 						} else {
-							tFacProdAcctFee.setLoanHigh(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmt" + i))
-									.subtract(new BigDecimal(1)));
+							tFacProdAcctFee.setLoanHigh(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmt" + i)).subtract(new BigDecimal(1)));
 						}
 					}
 					tFacProdAcctFee.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee" + i)));
@@ -450,8 +435,7 @@ public class L2101 extends TradeBuffer {
 			}
 		}
 		// 更新手續費 handlingFee
-		slFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iProdNo, "2", new BigDecimal(0.00),
-				new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
+		slFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iProdNo, "2", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
 		lFacProdAcctFee = slFacProdAcctFee == null ? null : slFacProdAcctFee.getContent();
 		if (lFacProdAcctFee != null && lFacProdAcctFee.size() > 0) {
 			try {
@@ -463,21 +447,17 @@ public class L2101 extends TradeBuffer {
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 5; i++) {
 				tFacProdAcctFee = new FacProdAcctFee();
-				if (titaVo.get("TimHandlingFee" + i) != null
-						&& this.parse.stringToDouble(titaVo.get("TimHandlingFee" + i)) > 0) {
+				if (titaVo.get("TimHandlingFee" + i) != null && this.parse.stringToDouble(titaVo.get("TimHandlingFee" + i)) > 0) {
 					tFacProdAcctFee.setProdNo(iProdNo);
 					tFacProdAcctFee.setLoanLow(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmtB" + i)));
-					tFacProdAcctFee.setFacProdAcctFeeId(new FacProdAcctFeeId(iProdNo, "2",
-							this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmtB" + i))));
+					tFacProdAcctFee.setFacProdAcctFeeId(new FacProdAcctFeeId(iProdNo, "2", this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmtB" + i))));
 					if (i == 5) {
 						tFacProdAcctFee.setLoanHigh(new BigDecimal(99999999999999.00));
 					} else {
 						if (this.parse.stringToDouble(titaVo.getParam("TimLoanAmtB" + (i + 1))) == 0) {
 							tFacProdAcctFee.setLoanHigh(new BigDecimal(99999999999999.00));
 						} else {
-							tFacProdAcctFee
-									.setLoanHigh(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmtB" + i))
-											.subtract(new BigDecimal(1)));
+							tFacProdAcctFee.setLoanHigh(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmtB" + i)).subtract(new BigDecimal(1)));
 						}
 					}
 					tFacProdAcctFee.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee" + i)));
@@ -618,8 +598,7 @@ public class L2101 extends TradeBuffer {
 		mFacProd.setEmpFlag(titaVo.getParam("EmpFlag"));
 
 		if (mFuncCode != 2) {
-			mFacProd.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			mFacProd.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mFacProd.setCreateEmpNo(titaVo.getTlrNo());
 		}
 		mFacProd.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));

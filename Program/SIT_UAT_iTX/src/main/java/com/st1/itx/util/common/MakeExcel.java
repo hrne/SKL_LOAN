@@ -1761,15 +1761,7 @@ public class MakeExcel extends CommBuffer {
 			this.sheet.addMergedRegion(cra);
 		}
 
-//		boolean isNumber = true;
-//
-//		try {
-//			new BigDecimal(val.toString());
-//		} catch (NumberFormatException e) {
-//			isNumber = false;
-//		}
-
-		if (val instanceof String && !(val instanceof BigDecimal)) {
+		if (val instanceof String) {
 
 			cell = prow.getCell(col - 1);
 

@@ -35,6 +35,7 @@ BEGIN
           ,"LA$W24P"."LMSDLD"             AS "MaturityDate"        -- 到期日 DECIMALD 8 0
           ,"LA$W24P"."TRXAMT"             AS "YearlyInt"           -- 年度繳息金額 DECIMAL 16 2
           ,"LA$W24P"."HGTGTD"             AS "HouseBuyDate"        -- 房屋取得日期 decimald  
+          ,null                           AS "JsonFields"          -- jason格式紀錄欄 NVARCHAR2 300
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 

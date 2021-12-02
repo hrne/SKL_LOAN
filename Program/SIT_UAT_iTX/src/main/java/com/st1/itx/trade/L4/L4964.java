@@ -79,7 +79,7 @@ public class L4964 extends TradeBuffer {
 		int clCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int clNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		int State = parse.stringToInteger(titaVo.getParam("State"));
-		
+
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
@@ -118,9 +118,9 @@ public class L4964 extends TradeBuffer {
 //		查詢條件
 //		1.原始保單及續保檔(查詢3個月前、且AcDate有)
 //		2.尚未繳款(Renew無AcDate)
-		
+
 		Boolean occursflg = true;
-		
+
 		if (lInsuRenew != null && lInsuRenew.size() != 0) {
 			for (InsuRenew tInsuRenew : lInsuRenew) {
 
@@ -133,7 +133,8 @@ public class L4964 extends TradeBuffer {
 //				僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 				if (btnShowFlag.containsKey(tmp)) {
 					btnShowFlag.put(tmp, 0);
-					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo()) && !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
+					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo())
+							&& !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
 						this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuRenew.getEndoInsuNo());
 						btnShowFlag.put(tmp, 1);
 					}
@@ -151,34 +152,31 @@ public class L4964 extends TradeBuffer {
 
 				// 自保、修改、刪除
 				this.info("tInsuRenew.getInsuEndDate : " + tInsuRenew.getInsuEndDate());
-				
-				if(State == 9) {
-					if (tInsuRenew.getAcDate() == 0 && tInsuRenew.getRenewCode() == 2 
-							||  tInsuRenew.getAcDate() != 0) {
-					  OccursList occursList = new OccursList();
 
-					  occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
-					  occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
-					  occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
-					  occursList.putParam("OOSelfInsuCode", selfInsuCode);
-					  occursList.putParam("OOBdLocation", bdLocation);
-					  occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
-					  occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
-					  occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
-					  occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
-					  occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
-					  occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
-					  occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
-					  occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
-					  occursList.putParam("OOInsuYearMonth", InsuYearMonth);
-					  occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));	
-					  
-					  /* 將每筆資料放入Tota的OcList */
-					  this.totaVo.addOccursList(occursList);
-					  occursflg = false;
-					} 
-				} else { // 近三個月
-					if (tInsuRenew.getInsuEndDate() >= threeMonthsB4Date ) {
+				if (State == 9) {
+					OccursList occursList = new OccursList();
+					occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
+					occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
+					occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
+					occursList.putParam("OOSelfInsuCode", selfInsuCode);
+					occursList.putParam("OOBdLocation", bdLocation);
+					occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
+					occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
+					occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
+					occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
+					occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
+					occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
+					occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
+					occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
+					occursList.putParam("OOInsuYearMonth", InsuYearMonth);
+					occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
+
+					/* 將每筆資料放入Tota的OcList */
+					this.totaVo.addOccursList(occursList);
+					occursflg = false;
+				} else { // 近三個月、未結案
+					if ((tInsuRenew.getInsuEndDate() >= threeMonthsB4Date) || (tInsuRenew.getRenewCode() == 2
+							&& tInsuRenew.getAcDate() == 0 && tInsuRenew.getStatusCode() != 4)) {
 						OccursList occursList = new OccursList();
 
 						occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
@@ -199,9 +197,9 @@ public class L4964 extends TradeBuffer {
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursList);
 						occursflg = false;
-					} 
-				} // else 
-				
+					}
+				} // else
+
 			}
 		}
 		if (lInsuOrignal != null && lInsuOrignal.size() != 0) {
@@ -213,7 +211,7 @@ public class L4964 extends TradeBuffer {
 				this.info("tInsuOrignal.getInsuStartDate ... " + tInsuOrignal.getInsuStartDate());
 				this.info("tInsuOrignal.getInsuEndDate ... " + tInsuOrignal.getInsuEndDate());
 
-				if(State == 9) {
+				if (State == 9) {
 
 					OccursList occursList = new OccursList();
 
@@ -223,7 +221,8 @@ public class L4964 extends TradeBuffer {
 //					僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 					if (btnShowFlag.containsKey(tmp)) {
 						btnShowFlag.put(tmp, 0);
-						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo()) && !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo())
+								&& !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
 							this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuOrignal.getEndoInsuNo());
 							btnShowFlag.put(tmp, 1);
 						}
@@ -262,7 +261,8 @@ public class L4964 extends TradeBuffer {
 //						僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 						if (btnShowFlag.containsKey(tmp)) {
 							btnShowFlag.put(tmp, 0);
-							if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo()) && !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+							if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo())
+									&& !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
 								this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuOrignal.getEndoInsuNo());
 								btnShowFlag.put(tmp, 1);
 							}
@@ -291,18 +291,18 @@ public class L4964 extends TradeBuffer {
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursList);
 						occursflg = false;
-				  }
-				  
-				} // else 
+					}
+
+				} // else
 			} // for
 		} else {
 			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
 		}
 
-		if(occursflg) {
+		if (occursflg) {
 			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

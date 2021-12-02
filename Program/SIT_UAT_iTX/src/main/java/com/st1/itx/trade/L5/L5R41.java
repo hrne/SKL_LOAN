@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.YearlyHouseLoanInt;
@@ -75,6 +76,14 @@ public class L5R41 extends TradeBuffer {
 	// 將每筆資料放入Tota
 	// 營業單位對照檔
 	private void moveTotaCdBranch(YearlyHouseLoanInt mYearlyHouseLoanInt) throws LogicException {
+		TempVo tTempVo = new TempVo();
+		
+		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
+	
+		this.totaVo.putParam("L5R41CustName", tTempVo.getParam("F0"));	// 借戶姓名
+		this.totaVo.putParam("L5R41CustId", tTempVo.getParam("F1"));	// 統一編號 
+		this.totaVo.putParam("L5R41LineAmt", tTempVo.getParam("F5"));   // 核准額度  
+		
 		this.totaVo.putParam("L5R41AcctCode", mYearlyHouseLoanInt.getAcctCode());
 		this.totaVo.putParam("L5R41RepayCode", mYearlyHouseLoanInt.getRepayCode());
 		this.totaVo.putParam("L5R41LoanAmt", mYearlyHouseLoanInt.getLoanAmt());

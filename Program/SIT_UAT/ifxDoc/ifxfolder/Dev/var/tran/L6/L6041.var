@@ -41,6 +41,8 @@ E(0,40)ASGN(INQPRT$)
 ["[L6041]                                 使用者資料查詢"],
 ["#FdBrNo+使用單位",#BrNo,#BrNoX],
 ["#FdTlrNo+使用者代號",#TlrNo],
+["#FdGroupNo+課組別",#GroupNo,#GroupNoX],
+["#FdLevelFg+權限等級",#LevelFg,#LevelFgX],
 ]
 !["@顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
@@ -69,6 +71,8 @@ T(2,@BrHelp,#HelpDesc1)
 
 #FdBrNo=X,2,L
 #FdTlrNo=X,2,L
+#FdGroupNo=X,2,L
+#FdLevelFg=X,2,L
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -83,6 +87,10 @@ C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 T(2,{cmd=CHAIN; ntxcd=L6401; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,查詢)
 C(3,#CHAIN,1,S,K(MODIFYBUTTON,1,新增使用者))
+
+![經辦/使用者等級]
+#LevelHelp=X,100,S
+T(3,0:全部;1:主管;3:經辦)
 
 
 !使用單位
@@ -119,6 +127,31 @@ C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
 @
 C(4,#TlrNo,s,$)
 V(8,6,6)
+
+#GroupHelp=x,50000,S
+
+#RimL6r44=X,1,S
+C(4,#BrNo,s,$)
+T(2,@L6R44BranchNo,#BrNo)
+S(L6R44,1,#L6R44BranchNo)
+R(1,L6R44)
+T(2,@GroupHelp,#L6r44GroupHelpList)
+T(H,@GroupNoX,#GroupNo,#GroupHelp)
+
+#GroupNo=X,1,I
+HELP(#GroupHelp,cols:2))
+@C(4,#GroupNo,s,V(H,#GroupHelp))
+
+#GroupNoX=X,20,L
+C(4,#GroupNo,S,$)
+T(H,#GroupNo,#GroupHelp)
+
+#LevelFg=A,1,I
+HELP(#LevelHelp)
+@V(H,#LevelHelp)
+
+#LevelFgX=X,10,L
+T(H,#LevelFg,#LevelHelp)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -155,6 +188,9 @@ T(3,1)ASGN(LOOP$)
 #OGroupNo=X,1,L
 
 #OGroupItem=x,20,L
+
+#OLastUpdate=X,18,L
+#OLastUpdateEmpNo=X,30,L
 
 ! 權限群組
 !#OAuthNo=X,6,L
@@ -196,6 +232,9 @@ T(2,#OFunc4+#OTlrNo)
 BIND(grid,{cmd=CHAIN;ntxcd=L6401;text=刪除;ntxbuf=#OBUF4})
 IF(#OOCHAIN==1,BIND(grid,cancel),$)
 
+<include src="ROM.icf::L6R44Rim.dec"/>
+<include src="ROM.icf::L6R44.dec"/>
+
 </sub>
 
 
@@ -203,6 +242,8 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 <sub type="TIM">
 #TlrNo
 #BrNo
+#GroupNo
+#LevelFg
 #END
 </sub>
 
@@ -218,7 +259,10 @@ TXFORM=L6041
 #OBrItem
 #OGroupNo
 #OGroupItem
+#OLastUpdate
+#OLastUpdateEmpNo
 ^
+<include src="ROM.icf::L6R44.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 
@@ -258,6 +302,12 @@ TXFORM=L6041
 #OGroupItem=課組別
 {width:120,align:'center'}
 
+#OLastUpdate=修改日期
+{width:150,align:'center'}
+
+#OLastUpdateEmpNo=修改人員
+{width:150,align:'left'}
+
 #OBrNo=需用到不可刪
 {width:0,hidden:true}
 
@@ -283,6 +333,12 @@ TXFORM=L6041
 
 #OGroupItem=課組別
 {width:120,align:'center'}
+
+#OLastUpdate=修改日期
+{width:150,align:'center'}
+
+#OLastUpdateEmpNo=修改人員
+{width:150,align:'left'}
 
 #OBrNo=需用到不可刪
 {width:0,hidden:true}

@@ -44,7 +44,7 @@ public class L6702 extends TradeBuffer {
 	public CdBranchService sCdBranchService;
 	@Autowired
 	public CdBranchGroupService sCdBranchGroupService;
-	
+
 	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
@@ -52,7 +52,6 @@ public class L6702 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6702 ");
@@ -65,7 +64,7 @@ public class L6702 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
-		
+
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		String iBranchNo = titaVo.getParam("BranchNo");
@@ -87,14 +86,14 @@ public class L6702 extends TradeBuffer {
 
 		// 更新營業單位資料檔
 		CdBranch tCdBranch = new CdBranch();
-		
+
 		switch (iFuncCode) {
 		case 1: // 新增
 			moveCdBranch(iFuncCode, iBranchAddress1, iBranchAddress2, tCdBranch, titaVo);
 			try {
 				this.info("1");
 				sCdBranchService.insert(tCdBranch, titaVo);
-				moveCdBranchGroup(iBranchNo ,iFuncCode ,titaVo);
+				moveCdBranchGroup(iBranchNo, iFuncCode, titaVo);
 				this.info("2");
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
@@ -103,8 +102,7 @@ public class L6702 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 				}
 			}
-			
-			
+
 			break;
 
 		case 2: // 修改
@@ -116,13 +114,13 @@ public class L6702 extends TradeBuffer {
 			try {
 				moveCdBranch(iFuncCode, iBranchAddress1, iBranchAddress2, tCdBranch, titaVo);
 				tCdBranch = sCdBranchService.update2(tCdBranch, titaVo); ////
-				moveCdBranchGroup(iBranchNo ,iFuncCode ,titaVo);
+				moveCdBranchGroup(iBranchNo, iFuncCode, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdBranch2, tCdBranch); ////
-			dataLog.exec(); ////
-			
+			dataLog.exec("修改營業單位對照檔"); ////
+
 			break;
 
 		case 4: // 刪除
@@ -130,15 +128,14 @@ public class L6702 extends TradeBuffer {
 			if (tCdBranch != null) {
 				try {
 					sCdBranchService.delete(tCdBranch);
-					moveCdBranchGroup(iBranchNo ,iFuncCode ,titaVo);
+					moveCdBranchGroup(iBranchNo, iFuncCode, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 				}
 			} else {
 				throw new LogicException(titaVo, "E0004", iBranchNo); // 刪除資料不存在
 			}
-			
-			
+
 			break;
 
 		case 5: // inq
@@ -181,14 +178,15 @@ public class L6702 extends TradeBuffer {
 //		mCdBranch.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 //		mCdBranch.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
+
 	private void moveCdBranchGroup(String mBranchNo, int mFuncCode, TitaVo titaVo) throws LogicException {
 		this.info("into moveCdBranchGroup");
-		
-		if(mFuncCode == 2 || mFuncCode == 4) {
-			
+
+		if (mFuncCode == 2 || mFuncCode == 4) {
+
 			Slice<CdBranchGroup> mCdBreanchGroup = sCdBranchGroupService.findByBranchNo(mBranchNo, this.index, this.limit, titaVo);
 			List<CdBranchGroup> dCdBreanchGroup = mCdBreanchGroup == null ? null : mCdBreanchGroup.getContent();
-			if(dCdBreanchGroup != null) {
+			if (dCdBreanchGroup != null) {
 				try {
 					sCdBranchGroupService.deleteAll(dCdBreanchGroup);
 				} catch (DBException e) {
@@ -196,27 +194,26 @@ public class L6702 extends TradeBuffer {
 				}
 			}
 		}
-		
-		if(mFuncCode == 1 || mFuncCode == 2) {
-			for(int i=1;i<=10;i++) {
 
-				if(titaVo.getParam("Group"+i) !=null && titaVo.getParam("Group"+i).length()>0) {
+		if (mFuncCode == 1 || mFuncCode == 2) {
+			for (int i = 1; i <= 10; i++) {
+
+				if (titaVo.getParam("Group" + i) != null && titaVo.getParam("Group" + i).length() > 0) {
 					CdBranchGroup tCdBranchGroup = new CdBranchGroup();
 					CdBranchGroupId tCdBranchGroupId = new CdBranchGroupId();
-					
-					if(i==10) {
+
+					if (i == 10) {
 						tCdBranchGroupId.setBranchNo(mBranchNo);
 						tCdBranchGroupId.setGroupNo("A");
 						tCdBranchGroup.setCdBranchGroupId(tCdBranchGroupId);
-						tCdBranchGroup.setGroupItem(titaVo.getParam("Group"+i));
+						tCdBranchGroup.setGroupItem(titaVo.getParam("Group" + i));
 					} else {
 						tCdBranchGroupId.setBranchNo(mBranchNo);
 						tCdBranchGroupId.setGroupNo(String.valueOf(i));
 						tCdBranchGroup.setCdBranchGroupId(tCdBranchGroupId);
-						tCdBranchGroup.setGroupItem(titaVo.getParam("Group"+i));
+						tCdBranchGroup.setGroupItem(titaVo.getParam("Group" + i));
 					}
 
-					
 					try {
 						sCdBranchGroupService.insert(tCdBranchGroup, titaVo);
 					} catch (DBException e) {
@@ -226,7 +223,6 @@ public class L6702 extends TradeBuffer {
 				}
 			}
 		}
-		
-		
+
 	}
 }

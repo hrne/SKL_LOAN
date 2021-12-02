@@ -86,7 +86,7 @@ public class L6755 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdBcm2, tCdBcm); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改單位及主管代號"); ////
 			break;
 
 		case 4: // 刪除
@@ -121,7 +121,7 @@ public class L6755 extends TradeBuffer {
 		mCdBcm.setDeptManager(titaVo.getParam("DeptManager"));
 		mCdBcm.setDistManager(titaVo.getParam("DistManager"));
 		mCdBcm.setEnable(titaVo.getParam("Enable"));
-		
+
 		if (mFuncCode != 2) {
 			mCdBcm.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdBcm.setCreateEmpNo(titaVo.getTlrNo());

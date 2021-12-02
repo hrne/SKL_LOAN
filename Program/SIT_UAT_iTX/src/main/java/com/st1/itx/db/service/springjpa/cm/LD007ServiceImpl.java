@@ -81,7 +81,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   AND B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else
 		{
-			sql += "   AND B.\"DrawdownDate\" BETWEEN :perfDateStart AND :perfDateEnd";
+			sql += "   AND B.\"PerfDate\" BETWEEN :perfDateStart AND :perfDateEnd";
 		}
 		if (useCustNo)
 		{

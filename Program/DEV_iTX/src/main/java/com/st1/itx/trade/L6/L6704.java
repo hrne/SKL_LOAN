@@ -87,7 +87,7 @@ public class L6704 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdCity2, tCdCity); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改地區別資料"); ////
 			break;
 
 		case 4: // 刪除

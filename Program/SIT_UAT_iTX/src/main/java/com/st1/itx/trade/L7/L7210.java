@@ -50,13 +50,13 @@ public class L7210 extends TradeBuffer {
 
 		// 變更前
 		FacProd beforeFacProd = (FacProd) dataLog.clone(iFacProd);
-		iFacProd.setIfrsProdCode(iIfrsProdCode);
-		iFacProd.setIfrsStepProdCode(iIfrsStepProdCode);
+		iFacProd.setIfrs9ProdCode(iIfrsProdCode);
+		iFacProd.setIfrs9StepProdCode(iIfrsStepProdCode);
 		// 搬值
 		try {
 			iFacProd = iFacProdService.update2(iFacProd, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "商品主檔" + e.getErrorMsg()); // 變更資料時，發生錯誤
+			throw new LogicException(titaVo, "E0007", "商品分類資料檔" + e.getErrorMsg()); // 變更資料時，發生錯誤
 		}
 		// 紀錄變更前變更後
 		dataLog.setEnv(titaVo, beforeFacProd, iFacProd);

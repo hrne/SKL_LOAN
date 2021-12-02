@@ -778,7 +778,7 @@ public class L2154 extends TradeBuffer {
 			throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
 		}
 		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
-		datalog.exec();
+		datalog.exec("修改額度主檔資料");
 
 	}
 
@@ -878,7 +878,7 @@ public class L2154 extends TradeBuffer {
 					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
-		datalog.exec();
+		datalog.exec("修改額度主檔資料");
 	}
 
 	// 放行訂正時, 還原被刪除的額度檔

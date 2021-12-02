@@ -87,6 +87,9 @@ public class LD007Report extends MakeReport {
 						makeExcel.setValue(row, col, bd, "#,##0");
 						total = total.add(bd);
 						break;
+					case 15: // 員工代號
+						makeExcel.setValue(row, col, value);
+						break;
 					default:
 						makeExcel.setValue(row, col, parse.isNumeric(value) ? getBigDecimal(value) : value);
 						break;

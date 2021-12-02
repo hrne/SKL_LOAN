@@ -60,7 +60,7 @@ public class L6754 extends TradeBuffer {
 	public DataLog iDataLog;
 
 	private boolean duringWorkMonth = false;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6754 ");
@@ -69,7 +69,7 @@ public class L6754 extends TradeBuffer {
 		// 取得輸入資料
 		int iFuncCode = this.iParse.stringToInteger(titaVo.getParam("FuncCode"));
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
-		int AcDate = titaVo.getEntDyI()+19110000;
+		int AcDate = titaVo.getEntDyI() + 19110000;
 		String iPieceCode = titaVo.getParam("PieceCode");
 		BigDecimal iUnitCnt = new BigDecimal(titaVo.getParam("UnitCnt"));
 		BigDecimal iUnitAmtCond = new BigDecimal(titaVo.getParam("UnitAmtCond"));
@@ -84,18 +84,18 @@ public class L6754 extends TradeBuffer {
 		BigDecimal iBsOffrCntLimit = new BigDecimal(titaVo.getParam("BsOffrCntLimit"));
 		BigDecimal iBsOffrAmtCond = new BigDecimal(titaVo.getParam("BsOffrAmtCond"));
 		BigDecimal iBsOffrPerccent = new BigDecimal(titaVo.getParam("BsOffrPerccent"));
-		
-		//檢查工作月區間
+
+		// 檢查工作月區間
 		CdWorkMonth tWorkMonth = iCdWorkMonthService.findDateFirst(AcDate, AcDate, titaVo);
 		int iWoarkMonthAcDAte = 0;
-		if(tWorkMonth!=null) {
-			iWoarkMonthAcDAte = Integer.parseInt(String.valueOf(tWorkMonth.getYear())+iParse.IntegerToString(tWorkMonth.getMonth(), 2));
-			this.info("iWoarkMonthAcDAte=="+iWoarkMonthAcDAte);
-			if(iWorkMonth<=iWoarkMonthAcDAte) {
+		if (tWorkMonth != null) {
+			iWoarkMonthAcDAte = Integer.parseInt(String.valueOf(tWorkMonth.getYear()) + iParse.IntegerToString(tWorkMonth.getMonth(), 2));
+			this.info("iWoarkMonthAcDAte==" + iWoarkMonthAcDAte);
+			if (iWorkMonth <= iWoarkMonthAcDAte) {
 				duringWorkMonth = true;
 			}
 		}
-		
+
 		CdPerformance iCdPerformance = new CdPerformance();
 		CdPerformanceId iCdPerformanceId = new CdPerformanceId();
 		iCdPerformanceId.setPieceCode(iPieceCode);
@@ -157,7 +157,7 @@ public class L6754 extends TradeBuffer {
 			}
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, beforeCdPerformance, iCdPerformance);
-			iDataLog.exec();
+			iDataLog.exec("修改業績件數及金額核算標準");
 			break;
 		case 4:
 			iCdPerformance = iCdPerformanceService.holdById(iCdPerformanceId, titaVo);
@@ -174,51 +174,51 @@ public class L6754 extends TradeBuffer {
 		default:
 			break;
 		}
-		
-		//異動重算業績記號
-		if(iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 4 ) {
-			
-			if(duringWorkMonth==true) {
+
+		// 異動重算業績記號
+		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 4) {
+
+			if (duringWorkMonth == true) {
 				this.info("duringWorkMonth True");
-				
+
 				CdPfParms tCdPfParm = new CdPfParms();
 				CdPfParmsId tCdPfParmId = new CdPfParmsId();
-				
-				CdPfParms sCdPfParm = iCdPfParmsService.findById(new CdPfParmsId("R"," "," "),titaVo);
-				this.info("sCdPfParm=="+sCdPfParm);
-				if(sCdPfParm == null) {
-					//業績重算 設條件記號1=R 有效工作月起 其餘為空白 OR 0
-					tCdPfParmId.setConditionCode1("R");//記號
+
+				CdPfParms sCdPfParm = iCdPfParmsService.findById(new CdPfParmsId("R", " ", " "), titaVo);
+				this.info("sCdPfParm==" + sCdPfParm);
+				if (sCdPfParm == null) {
+					// 業績重算 設條件記號1=R 有效工作月起 其餘為空白 OR 0
+					tCdPfParmId.setConditionCode1("R");// 記號
 					tCdPfParmId.setConditionCode2(" ");
 					tCdPfParmId.setCondition(" ");
 					tCdPfParm.setWorkMonthStart(iWorkMonth);
 					tCdPfParm.setWorkMonthEnd(0);
 					tCdPfParm.setCdPfParmsId(tCdPfParmId);
-					
+
 					try {
 						iCdPfParmsService.insert(tCdPfParm, titaVo);
-					} catch(DBException e) {
+					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 					}
-					
+
 				} else {
-					tCdPfParm = iCdPfParmsService.holdById(new CdPfParmsId("R"," "," "),titaVo);
+					tCdPfParm = iCdPfParmsService.holdById(new CdPfParmsId("R", " ", " "), titaVo);
 					tCdPfParm.setWorkMonthStart(iWorkMonth);
 					tCdPfParm.setWorkMonthEnd(0);
 					try {
 						iCdPfParmsService.update(tCdPfParm, titaVo);
-					} catch(DBException e) {
+					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 					}
-					
+
 				}
-				//主管授權
+				// 主管授權
 				if (!titaVo.getHsupCode().equals("1")) {
 					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 				}
 			}
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

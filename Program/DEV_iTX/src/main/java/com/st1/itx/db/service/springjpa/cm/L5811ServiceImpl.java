@@ -99,13 +99,13 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",Y.\"FirstDrawdownDate\" - 19110000            AS F25   					 ";  //貸款起日
         sql += ",Y.\"MaturityDate\" - 19110000                 AS F26  						 ";  //貸款迄日
        	sql += ",Y.\"LoanBal\"                                 AS F27  						 ";  //本期未償還本金額
-    	sql += ",CASE WHEN TRUNC(Y.\"FirstDrawdownDate\")	< TRUNC("+iYYYYMM +"* 100)	 ";
-    	sql += "  THEN TRUNC("+iYYYYMM+",-2) -191100+01                                ";
-    	sql += "        ELSE TRUNC(Y.\"FirstDrawdownDate\",-2)/100 - 191100            		     ";
+    	sql += ",CASE WHEN TRUNC(Y.\"FirstDrawdownDate\")	< TRUNC("+iYYYYMM +"* 100)	 	 ";
+    	sql += "  THEN TRUNC("+iYYYYMM+",-2) -191100+01                               		 ";
+    	sql += "        ELSE TRUNC(Y.\"FirstDrawdownDate\",-2)/100 - 191100            		 ";
     	sql += " END                                           AS F28  						 ";  //繳息所屬年月(起)
-    	sql += ",Y.\"YearMonth\" - 191100                    AS F29 						 ";  //繳息所屬年月(止)
+    	sql += ",Y.\"YearMonth\" - 191100                      AS F29 						 ";  //繳息所屬年月(止)
     	sql += ",Y.\"YearlyInt\"                               AS F30  						 ";  //繳息金額 	
-    	sql += ",NULL                                          AS F31  						 ";  //科子細目代號暨說明 ???
+    	sql += ",Y.\"AcctCode\"                                AS F31  						 ";  //科子細目代號暨說明 ???
     	sql += "FROM \"YearlyHouseLoanInt\" Y  												 ";
     	sql += "LEFT JOIN \"CustMain\" C   						 							 ";
     	sql += "    ON C.\"CustNo\" =  Y.\"CustNo\"  										 ";
@@ -140,4 +140,38 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		return this.convertToMap(query);
 	}
+	
+	public List<Map<String, String>> doJsonField(String iYear, TitaVo titaVo) throws Exception {
+
+		String sql = "　";
+		int iYYYYMM = Integer.parseInt(iYear+12)+191100;
+		
+		sql += "SELECT C.\"CustName\" 							AS F0	\n";  //借戶姓名
+		sql += ",C.\"CustId\"                                   AS F1	\n";  //統一編號        
+		sql += ",Y.\"CustNo\"  			   						AS F2 	\n";  //戶號key                                              
+		sql += ",Y.\"FacmNo\"               					AS F3 	\n";  //額度key 
+		sql += ",Y.\"LoanAmt\"              					AS F4   \n";  //最初貸款金額       
+		sql += ",F.\"LineAmt\"            						AS F5	\n";  //核准額度                     
+		sql += ",Y.\"LoanBal\"              					AS F6	\n";  //放款餘額                      
+		sql += ",Y.\"FirstDrawdownDate\"           				AS F7   \n";  //貸款起日
+		sql += ",Y.\"MaturityDate\"                             AS F8   \n";  //貸款訖日
+		sql += ",Y.\"YearMonth\"                                AS F9   \n";  //繳息所屬年月key 
+		sql += ",Y.\"YearlyInt\"                                AS F10  \n";  // 繳息金額
+		sql += ",Y.\"AcctCode\"  								AS F11  \n";  // 科子細目代號暨說明    
+		sql += ",Y.\"UsageCode\"  								AS F12  \n";  // 資金用途別key 
+    	sql += "FROM \"YearlyHouseLoanInt\" Y  												 ";
+    	sql += "LEFT JOIN \"CustMain\" C   						 							 ";
+    	sql += "    ON C.\"CustNo\" =  Y.\"CustNo\"  										 ";
+    	sql += "LEFT JOIN \"FacMain\" F    													 ";
+    	sql += "    ON F.\"CustNo\" = Y.\"CustNo\"  						 				 ";
+    	sql += "   AND F.\"FacmNo\" = Y.\"FacmNo\"   										 ";        
+    	sql += "WHERE Y.\"YearMonth\" = "+iYYYYMM											;
+
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		return this.convertToMap(query);
+	}
+	
 }
