@@ -45,7 +45,7 @@ K(MODIFYBUTTON,登錄)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,1000];printer.width=[20,80];">
 [
-["[L3240]                                 回收冲正"],
+["[L3240]                                 回收冲正（轉換前資料）"],
 ["#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
 ["#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
 ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
@@ -330,7 +330,7 @@ T(3,[L3240] 回收冲正)
 </sub>
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#TimCustNo#TimFacmNo
+#TimCustNo#FacmNo
 #EntryDate#IntStartDate#IntEndDate
 #AcDate#TellerNo#TxtNo
 #END

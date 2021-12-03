@@ -96,7 +96,7 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "where Y.\"YearMonth\" >0 and Y.\"YearMonth\" <999912";
 		}
 		if(iUsageCode>0) {
-			sql += " and Y.\"UsageCode\" = '02' or Y.\"UsageCode\" = '2'    \n";
+			sql += " and (Y.\"UsageCode\" = '02' or Y.\"UsageCode\" = '2')    \n";
 		}
 		if(iCondition==1) {//借戶姓名空白
 			sql += " and C.\"CustName\" = ''     				  \n";

@@ -51,9 +51,9 @@ K(MODIFYBUTTON,查詢)
 ["#FdUnitCode+單位代號",#UnitCode],
 ["#FdDistCode+區部代號",#DistCode],
 ["#FdDeptCode+部室代號",#DeptCode],
-["#FdUnitManager+單位經理代號",#UnitManager],
-["#FdDistManager+區部經理代號",#DistManager],
-["#FdDeptManager+部室經理代號",#DeptManager],
+["#FdUnitManager+單位主管代號",#UnitManager],
+["#FdDistManager+區部主管代號",#DistManager],
+["#FdDeptManager+部室主管代號",#DeptManager],
 !["#FdRPTFG+顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],
@@ -66,7 +66,7 @@ K(MODIFYBUTTON,查詢)
 !---------- AP TEXT AREA Variables ----------
 !查詢條件
 #InqFgHelp=X,100,S
-T(3,0:全部;1:單位代號;2:區部代號;3:部室代號;4:單位經理代號;5:區部經理代號;6:部室經理代號)
+T(3,0:全部;1:單位代號;2:區部代號;3:部室代號;4:單位主管代號;5:區部主管代號;6:部室主管代號)
 
 #FdInqFg=X,2,L
 T(3,*)
@@ -314,13 +314,13 @@ TXFORM=L6085
 {width:250,align:'left'}
 
 
-#OOUnitManagerX=單位經理
+#OOUnitManagerX=單位主管
 {width:110,align:'left'}
 
-#OODistManagerX=區部經理
+#OODistManagerX=區部主管
 {width:110,align:'left'}
 
-#OODeptManagerX=部室經理
+#OODeptManagerX=部室主管
 {width:110,align:'left'}
 
 #OOEnable=啟用記號

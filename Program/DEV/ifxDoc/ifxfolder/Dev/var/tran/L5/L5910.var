@@ -1,0 +1,111 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5910)
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,40)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5910" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5910]                                 新撥款利率案件資料產生"],
+[#<->#,"#FdDateFm+年月日",#DateFm,"-",#DateTo],
+]
+
+#FdDateFm=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,14,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@DateFm,#NTXBUF,1,7)
+T(1,@DateTo,#NTXBUF,8,7)
+INVOKEJS(SHOW,p1,02,02,1)
+
+! 截止日期
+! 預設系統帳務年初
+!  (產收下載檔為 LNW99FP & LNW99SP)
+#DateFm=D,7,I
+D(8)
+@A(DATE,0,#DateFm)
+V(7)
+! 預設系統帳務日期
+#DateTo=D,7,I
+D(8)
+@A(DATE,0,#DateTo)
+V(7)
+IF(#DateTo < #DateFm ,V(P,起日不可大於迄日),$)
+#RPTFG=A,1,S
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5910 -----------
+
+<sub type="FORM" name="L5910">
+#SCRTIL=_,_,S
+T(3,[L5910] 新撥款利率案件資料產生)
+
+#ExcelSnoM=X,8,S
+E(2,@SnoM,#ExcelSnoM)
+#SnoM=A,8,S
+
+
+#ExcelPrtF=A,1,S
+C(3,#SnoM,0,E(0,0),E(0,1))
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#DateFm#DateTo
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5910
+#ExcelSnoM
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#ExcelPrtF=1,PDF,,,,,,,,,,,,,ExcelSnoM;2,新撥款利率案件排行產生
+^
+</sub>

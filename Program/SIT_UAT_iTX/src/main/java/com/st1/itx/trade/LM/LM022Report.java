@@ -7,8 +7,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,7 +22,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LM022Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM022Report.class);
 
 	@Autowired
 	LM022ServiceImpl lM022ServiceImpl;
@@ -61,13 +58,11 @@ public class LM022Report extends MakeReport {
 		// 開啟EXCE
 		// 取民國年月(日)
 		String ROCyymm = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6);
-		String ROCyymmdd = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "."
-				+ titaVo.get("ENTDY").substring(6, 8);
+		String ROCyymmdd = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "." + titaVo.get("ENTDY").substring(6, 8);
 
 		this.info("ROCyymm=" + ROCyymm);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM022", "中央銀行業務局921補貼息", "LM022_中央銀行業務局921補貼息",
-				ROCyymm + "明細");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM022", "中央銀行業務局921補貼息", "LM022_中央銀行業務局921補貼息", ROCyymm + "明細");
 
 		// 設定欄寬
 		makeExcel.setWidth(1, 18);
@@ -139,11 +134,10 @@ public class LM022Report extends MakeReport {
 					}
 
 					dueAmt = BigDecimal.ZERO;
-				} 
-				
+				}
+
 				// 戶號額度(A欄)
-				makeExcel.setValue(row, 1,
-						tLM022Vo.get("F0") + tLM022Vo.get("F1") + tLM022Vo.get("F2"), "R");
+				makeExcel.setValue(row, 1, tLM022Vo.get("F0") + tLM022Vo.get("F1") + tLM022Vo.get("F2"), "R");
 
 				// 戶號(B欄)
 				makeExcel.setValue(row, 2, Integer.parseInt(tLM022Vo.get("F0")), "0000000", "R");
@@ -169,14 +163,11 @@ public class LM022Report extends MakeReport {
 					}
 				}
 
-				f4total = tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0
-						|| tLM022Vo.get("F4").equals("0") ? BigDecimal.ZERO
-								: new BigDecimal(tLM022Vo.get("F4").toString());
-				
+				f4total = tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0") ? BigDecimal.ZERO : new BigDecimal(tLM022Vo.get("F4").toString());
+
 				// 繳息訖日(G欄)
-				String f5 = tLM022Vo.get("F5") == null || tLM022Vo.get("F5").length() == 0 || tLM022Vo.get("F4") == null
-						|| tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0") ? ""
-								: showRocDate(Integer.valueOf(tLM022Vo.get("F5")) - 19110000, 1);
+				String f5 = tLM022Vo.get("F5") == null || tLM022Vo.get("F5").length() == 0 || tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0") ? ""
+						: showRocDate(Integer.valueOf(tLM022Vo.get("F5")) - 19110000, 1);
 				makeExcel.setValue(row, 7, f5, "C");
 
 				// 利率==>(H欄) + 利率(I欄)
@@ -195,8 +186,7 @@ public class LM022Report extends MakeReport {
 				}
 
 				// 每期攤還金額(J欄)
-				if (tLM022Vo.get("F7") == null || tLM022Vo.get("F7") == "" || tLM022Vo.get("F4") == null
-						|| tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0")) {
+				if (tLM022Vo.get("F7") == null || tLM022Vo.get("F7") == "" || tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0")) {
 					makeExcel.setValue(row, 10, "-", "C");
 				} else {
 					BigDecimal f7 = new BigDecimal(tLM022Vo.get("F7"));
@@ -230,8 +220,7 @@ public class LM022Report extends MakeReport {
 //				makeExcel.setValue(row, 13, "-", "C");
 //				makeExcel.setValue(row, 14, "-", "C");
 
-				makeExcel.setValue(row, 15,
-						tLM022Vo.get("F8") == null || tLM022Vo.get("F8").length() == 0 ? "" : tLM022Vo.get("F8"), "C");
+				makeExcel.setValue(row, 15, tLM022Vo.get("F8") == null || tLM022Vo.get("F8").length() == 0 ? "" : tLM022Vo.get("F8"), "C");
 
 			}
 			makeExcel.setAddRengionBorder("A", 2, "K", row, 1);
@@ -242,7 +231,7 @@ public class LM022Report extends MakeReport {
 
 		makeExcel.setHeight(1, 20);
 		long closeExcel = makeExcel.close();
-		makeExcel.toExcel(closeExcel);
+		//makeExcel.toExcel(closeExcel);
 
 	}
 
@@ -423,6 +412,6 @@ public class LM022Report extends MakeReport {
 //		} // if
 //
 //		long sno = this.close();
-//		this.toPdf(sno);
+//		//this.toPdf(sno);
 //	}
 }

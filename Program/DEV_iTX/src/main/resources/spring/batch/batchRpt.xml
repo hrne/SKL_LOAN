@@ -193,11 +193,13 @@
 			<tasklet ref="LM029" />
 		</step>
 	</job>
+	<!-- 
 	<job id="jLM030" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM030" parent="parentStep">
 			<tasklet ref="LM030" />
 		</step>
-	</job>
+	</job> 
+	-->
 	<!-- 
 	<job id="jLM031" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM031" parent="parentStep">
@@ -289,11 +291,11 @@
 			<tasklet ref="LM047" />
 		</step>
 	</job>
-	<job id="jLM048" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+	<!-- <job id="jLM048" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM048" parent="parentStep">
 			<tasklet ref="LM048" />
 		</step>
-	</job>
+	</job> -->
 	<job id="jLM049" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM049" parent="parentStep">
 			<tasklet ref="LM049" />
@@ -389,11 +391,11 @@
 			<tasklet ref="LM067" />
 		</step>
 	</job>	
-	<job id="jLM070" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+	<!-- <job id="jLM070" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM070" parent="parentStep">
 			<tasklet ref="LM070" />
 		</step>
-	</job>	
+	</job>	-->
 	<job id="jLM071" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM071" parent="parentStep">
 			<tasklet ref="LM071" />
@@ -509,7 +511,7 @@
 		</step>
 	</job>	
 	<!-- 年報 -->
-	<job id="jLY002" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+	<!--<job id="jLY002" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLY002" parent="parentStep">
 			<tasklet ref="LY002" />
 		</step>
@@ -518,7 +520,7 @@
 		<step id="sLY003" parent="parentStep">
 			<tasklet ref="LY003" />
 		</step>
-	</job>
+	</job>-->
 	<job id="jLY004" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLY004" parent="parentStep">
 			<tasklet ref="LY004" />

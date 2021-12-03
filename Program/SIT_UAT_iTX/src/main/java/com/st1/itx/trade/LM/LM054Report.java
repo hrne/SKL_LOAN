@@ -117,7 +117,7 @@ public class LM054Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> lM054tLDVo) throws LogicException {

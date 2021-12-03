@@ -51,8 +51,6 @@ public class LM023Report extends MakeReport {
 
 		}
 
-//		DecimalFormat df1 = new DecimalFormat("#,##0");
-
 		if (lM023List.size() != 0 && lM023List != null) {
 
 			BigDecimal tempAmt = BigDecimal.ZERO;
@@ -60,9 +58,6 @@ public class LM023Report extends MakeReport {
 			BigDecimal total0 = BigDecimal.ZERO;
 			BigDecimal total1 = BigDecimal.ZERO;
 			BigDecimal total2 = BigDecimal.ZERO;
-
-//			BigDecimal resTotal = BigDecimal.ZERO;
-//			BigDecimal percent = new BigDecimal("100");
 
 			int col = 0;
 
@@ -127,21 +122,14 @@ public class LM023Report extends MakeReport {
 			makeExcel.setValue(5, 14, total1, "L");
 			makeExcel.setValue(6, 14, total2, "L");
 
-//			resTotal = total0 == BigDecimal.ZERO || total2 == BigDecimal.ZERO ? BigDecimal.ZERO
-//					: total0.divide(total2, 4, BigDecimal.ROUND_HALF_UP).multiply(percent);
-//
-//			makeExcel.setValue(8, 14, resTotal + "%", "L");
-
 			makeExcel.setValue(11, 9, year + "年度預算" + total1 + "億。", "L");
 
-//			makeExcel.formulaCaculate(4, 14);
-//			makeExcel.formulaCaculate(5, 14);
 			makeExcel.formulaCaculate(14, 8);
 			makeExcel.formulaCaculate(12, 9);
 
 		}
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

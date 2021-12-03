@@ -20,7 +20,6 @@ import com.st1.itx.util.date.DateUtil;
 // Making Pdf
 
 public class LM004Report1 extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM004Report1.class);
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -92,7 +91,7 @@ public class LM004Report1 extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	private String showDate(String date, int iType) {

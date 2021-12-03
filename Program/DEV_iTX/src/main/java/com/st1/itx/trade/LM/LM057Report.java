@@ -127,7 +127,7 @@ public class LM057Report extends MakeReport {
 		exportExcel14_6();
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 //	private void reportData(List<Map<String, String>> listData, List<Map<String, String>> listData2)

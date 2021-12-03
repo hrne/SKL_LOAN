@@ -5,8 +5,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LM016Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM016Report.class);
 
 	@Autowired
 	public LM016ServiceImpl lM016ServiceImpl;
@@ -49,11 +46,9 @@ public class LM016Report extends MakeReport {
 		this.print(-3, 50, "新光人壽保險股份有限公司", "C");
 		this.print(-4, 5, "報  表：" + this.getRptCode());
 		this.print(-4, 41, "寬限條件控管繳息列印");
-		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8)
-				+ "/" + dDateUtil.getNowStringBc().substring(2, 4);
+		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-3, 80, "日　　期：" + bcDate);
-		this.print(-4, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-4, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-5, 80, "頁　　次：　　" + this.getNowPage());
 	}
 
@@ -95,17 +90,14 @@ public class LM016Report extends MakeReport {
 				print(0, 28, padStart(tLM016Vo.get("F2"), 3, "0"));
 
 				// 寬限到期日
-				print(0, 37, tLM016Vo.get("F4") == "0" || tLM016Vo.get("F4") == null || tLM016Vo.get("F4").length() == 0
-						|| tLM016Vo.get("F4").equals(" ") ? " " : showDate(tLM016Vo.get("F4"), 1));
+				print(0, 37, tLM016Vo.get("F4") == "0" || tLM016Vo.get("F4") == null || tLM016Vo.get("F4").length() == 0 || tLM016Vo.get("F4").equals(" ") ? " " : showDate(tLM016Vo.get("F4"), 1));
 
 				// 繳息迄日
-				print(0, 52, tLM016Vo.get("F4") == "0" || tLM016Vo.get("F3") == null || tLM016Vo.get("F3").length() == 0
-						|| tLM016Vo.get("F3").equals(" ") ? " " : showDate(tLM016Vo.get("F3"), 1));
+				print(0, 52, tLM016Vo.get("F4") == "0" || tLM016Vo.get("F3") == null || tLM016Vo.get("F3").length() == 0 || tLM016Vo.get("F3").equals(" ") ? " " : showDate(tLM016Vo.get("F3"), 1));
 
 				// 貸出金額
-				BigDecimal f5 = tLM016Vo.get("F5") == "0" || tLM016Vo.get("F5") == null
-						|| tLM016Vo.get("F5").length() == 0 || tLM016Vo.get("F5").equals(" ") ? BigDecimal.ZERO
-								: new BigDecimal(tLM016Vo.get("F5"));
+				BigDecimal f5 = tLM016Vo.get("F5") == "0" || tLM016Vo.get("F5") == null || tLM016Vo.get("F5").length() == 0 || tLM016Vo.get("F5").equals(" ") ? BigDecimal.ZERO
+						: new BigDecimal(tLM016Vo.get("F5"));
 
 				print(0, 79, f5.equals(BigDecimal.ZERO) ? " " : df1.format(f5), "R");
 
@@ -126,7 +118,7 @@ public class LM016Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		this.toPdf(sno);
+		//this.toPdf(sno);
 
 		if (LM016List != null && LM016List.size() > 0) {
 			return true;

@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ import com.st1.itx.util.common.MakeReport;
 // Making Excel
 
 public class LM004Report2 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM004Report2.class);
 
 	@Autowired
 	public MakeExcel makeExcel;
@@ -36,8 +33,7 @@ public class LM004Report2 extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
 		String entdy = titaVo.get("ENTDY").toString();
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表",
-				"LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
 
 		int row = 3;
 //		this.info("-----------------" + LDList);
@@ -54,7 +50,7 @@ public class LM004Report2 extends MakeReport {
 //			if (row > 27) {
 //				makeExcel.setShiftRow(row, 1);
 //			}
-			
+
 			for (col = 0; col < tLDVo.size(); col++) {
 				// 欄位數
 //				col++;
@@ -134,7 +130,7 @@ public class LM004Report2 extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private String showDate(String date, int iType) {

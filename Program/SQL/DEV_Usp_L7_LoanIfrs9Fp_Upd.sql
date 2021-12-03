@@ -10,6 +10,7 @@ CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Fp_Upd"
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
 )
+AUTHID CURRENT_USER
 AS
 BEGIN
 	"Usp_L7_LoanIfrs9Fp_Upd_Prear"();

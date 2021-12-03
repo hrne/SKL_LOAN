@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD007ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -82,6 +83,9 @@ public class LD007Report extends MakeReport {
 							makeExcel.setValue(row, col, value);
 						}
 						break;
+					case 2: // 戶名
+						makeExcel.setValue(row, col, StringCut.stringMask(value));
+						break;
 					case 9:
 						BigDecimal bd = getBigDecimal(value);
 						makeExcel.setValue(row, col, bd, "#,##0");
@@ -102,7 +106,7 @@ public class LD007Report extends MakeReport {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 }

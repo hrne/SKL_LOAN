@@ -11,6 +11,7 @@ CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Dp_Upd"
     EmpNo          IN  VARCHAR2,   -- 經辦
     NewAcFg        IN  INT         -- 0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
 )
+AUTHID CURRENT_USER
 AS
 BEGIN
 	"Usp_L7_Ias34Dp_Upd_Prear"(); -- Work_Ias34DP 資料清檔

@@ -5,6 +5,8 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,19 +21,19 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LD003Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LD003Report.class);
+	private static final Logger logger = LoggerFactory.getLogger(LD003Report.class);
 
 	@Autowired
 	// 在Spring管理的Bean，能夠找到，可允許找不到時設定為null，也可以指定required=fails
 	LD003ServiceImpl lD003ServiceImpl;
-
+ 
 	@Autowired
 	DateUtil dateUtil;
  
 	// 自訂明細標題
 	@Override
 	public void printHeader() {
-		this.info("printTitle nowRow = " + this.NowRow);
+		logger.info("printTitle nowRow = " + this.NowRow);
 
 		this.setCharSpaces(0);
 
@@ -57,7 +59,7 @@ public class LD003Report extends MakeReport {
 		try {
 			LD003List = lD003ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
-			this.info("lD003ServiceImpl.findAll error = " + e.toString());
+			logger.info("lD003ServiceImpl.findAll error = " + e.toString());
 		}
 		exportResult(titaVo, LD003List);
 	}
@@ -68,10 +70,8 @@ public class LD003Report extends MakeReport {
 
 		this.print(1, 1, "");
 
-//		boolean printfg = false;
 
 		int i = 0;
-//		int startRow = -11;
 
 		this.print(-8, 1, "┌──────────────────────────┬─────────────┬───────────────┐");
 		this.print(-9, 1, "│　　　　　　　　　　　　　  　　　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　│");
@@ -201,7 +201,7 @@ public class LD003Report extends MakeReport {
 
 		long sno = this.close();
 
-		this.toPdf(sno);
+		//this.toPdf(sno);
 
 	}
 
@@ -292,7 +292,7 @@ public class LD003Report extends MakeReport {
 		}
 		long sno = this.close();
 
-		this.toPdf(sno);
+		//this.toPdf(sno);
 
 	}
 

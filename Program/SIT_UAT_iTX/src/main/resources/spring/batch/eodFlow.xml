@@ -10,35 +10,86 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<split id="split1" task-executor="taskExecutor" next="split2">
 			<flow>
+				<!-- Usp_L5_CollList_Upd -->
 				<step id="l5CollListUpd" parent="parentStep">
 					<tasklet ref="L5CollListUpd" />
 				</step>
 			</flow>
 			<flow>
+				<!-- Usp_L9_DailyLoanBal_Upd -->
 				<step id="l9DailyLoanBalUpd" parent="parentStep">
 					<tasklet ref="L9DailyLoanBalUpd" />
 				</step>
 			</flow>
 		</split>
-		<split id="split2" task-executor="taskExecutor" next="split3">
+		<split id="split2" task-executor="taskExecutor"
+			next="startBS996">
 			<flow>
+				<!-- Usp_L8_JcicB204_Upd -->
 				<step id="l8JcicB204Upd" parent="parentStep">
 					<tasklet ref="L8JcicB204Upd" />
 				</step>
 			</flow>
 			<flow>
+				<!-- Usp_L8_JcicB211_Upd -->
 				<step id="l8JcicB211Upd" parent="parentStep">
 					<tasklet ref="L8JcicB211Upd" />
 				</step>
 			</flow>
 		</split>
-		<split id="split3" task-executor="taskExecutor" next="eodFinal">
+		<!-- BS996 重新計算業績，更新業績明細檔 -->
+		<step id="startBS996" parent="parentStep" next="split4">
+			<tasklet ref="StartBS996" />
+		</step>
+		<!-- 日報批次 -->
+		<split id="split4" task-executor="taskExecutor" next="eodFinal">
 			<flow>
-				<step id="startBS996" parent="parentStep">
-					<tasklet ref="StartBS996" />
+				<step id="sLD003" parent="parentStep">
+					<tasklet ref="LD003" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD004Batch" parent="parentStep">
+					<tasklet ref="LD004Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD005Batch" parent="parentStep">
+					<tasklet ref="LD005Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD006Batch" parent="parentStep">
+					<tasklet ref="LD006Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD007Batch" parent="parentStep">
+					<tasklet ref="LD007Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD008Batch" parent="parentStep">
+					<tasklet ref="LD008Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD009" parent="parentStep">
+					<tasklet ref="LD009" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLW003" parent="parentStep">
+					<tasklet ref="LW003" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD010Batch" parent="parentStep">
+					<tasklet ref="LD010Batch" />
 				</step>
 			</flow>
 		</split>
+		<!-- 每日批次結束，判斷是否需要執行月批 -->
 		<step id="eodFinal" parent="parentStep">
 			<tasklet ref="EodFinal" />
 		</step>

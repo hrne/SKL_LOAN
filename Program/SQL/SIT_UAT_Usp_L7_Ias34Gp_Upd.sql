@@ -10,6 +10,7 @@ CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Gp_Upd"
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
 )
+AUTHID CURRENT_USER
 AS
 BEGIN
 	"Usp_L7_Ias34Gp_Upd_Prear"(); -- Work_GP 資料清檔

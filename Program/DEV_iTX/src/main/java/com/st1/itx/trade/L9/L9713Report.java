@@ -18,7 +18,6 @@ import com.st1.itx.util.common.MakeReport;
 @Component
 @Scope("prototype")
 public class L9713Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9713Report.class);
 
 	@Autowired
 	MakeExcel makeExcel;
@@ -149,8 +148,7 @@ public class L9713Report extends MakeReport {
 
 					// 此陣列大小必為3
 					if (tmpDate.length == 3) {
-						tday = Integer.valueOf(tmpDate[0] + String.format("%02d", Integer.parseInt(tmpDate[1]))
-								+ String.format("%02d", Integer.parseInt(tmpDate[2]))) - 19110000;
+						tday = Integer.valueOf(tmpDate[0] + String.format("%02d", Integer.parseInt(tmpDate[1])) + String.format("%02d", Integer.parseInt(tmpDate[2]))) - 19110000;
 					}
 
 					// 金額
@@ -202,7 +200,7 @@ public class L9713Report extends MakeReport {
 
 		long sno = this.close();
 
-		this.toPdf(sno);
+		//this.toPdf(sno);
 
 		if (makeExcel.getListMap().size() > 0) {
 			return true;
@@ -221,8 +219,7 @@ public class L9713Report extends MakeReport {
 		this.setFontSize(12);
 		this.print(-2, 138, "機密等級：密", "R");
 
-		this.print(-3, 138, "製表日期：" + iCALDY.substring(0, 4) + "/" + iCALDY.substring(4, 6) + "/" + iCALDY.substring(6),
-				"R");
+		this.print(-3, 138, "製表日期：" + iCALDY.substring(0, 4) + "/" + iCALDY.substring(4, 6) + "/" + iCALDY.substring(6), "R");
 		this.print(-9, 128, "單位：元", "R");
 
 		// 以下為字體大小20點
@@ -240,7 +237,6 @@ public class L9713Report extends MakeReport {
 		this.print(-21 - startRow, startCol, "│　　　　　　　　　　　　　　│　　　　　　　　　│　　　　　　　　│");
 		this.print(-22 - startRow, startCol, "└──────────────┴─────────┴────────┘");
 
-		
 		this.print(-7 - startRow, 24, "帳            齡", "C");
 		this.print(-7 - startRow, 49, "金      額", "C");
 		this.print(-7 - startRow, 68, "比 例", "C");
@@ -253,12 +249,10 @@ public class L9713Report extends MakeReport {
 		tmp = iday3.substring(0, 3) + "/" + iday3.substring(3, 5) + "月";
 		this.print(-13 - startRow, 24, "60日~90日(" + tmp + ")", "C");
 
-		tmp = iday4_1.substring(0, 3) + "/" + iday4_1.substring(3, 5) + "~" + iday4.substring(0, 3) + "/"
-				+ iday4.substring(3, 5) + "月";
+		tmp = iday4_1.substring(0, 3) + "/" + iday4_1.substring(3, 5) + "~" + iday4.substring(0, 3) + "/" + iday4.substring(3, 5) + "月";
 		this.print(-15 - startRow, 24, "4~6個月(" + tmp + ")", "C");
 
-		tmp = iday5_1.substring(0, 3) + "/" + iday5_1.substring(3, 5) + "~" + iday5.substring(0, 3) + "/"
-				+ iday5.substring(3, 5) + "月";
+		tmp = iday5_1.substring(0, 3) + "/" + iday5_1.substring(3, 5) + "~" + iday5.substring(0, 3) + "/" + iday5.substring(3, 5) + "月";
 		this.print(-17 - startRow, 24, "7~12個月(" + tmp + ")", "C");
 		this.print(-19 - startRow, 24, "1年以上", "C");
 		this.print(-21 - startRow, 24, "合           計", "C");

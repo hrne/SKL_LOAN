@@ -231,6 +231,12 @@
 		</step>
 	</job>
 
+	<!-- L8402  BRel 「聯徵授信「同一關係企業及集團企業」資料報送檔 -->
+	<job id="jLBRel" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLBRel" parent="parentStep">
+			<tasklet ref="LBRel" />
+		</step>
+	</job>
 
 	<!-- 季報 -->
 

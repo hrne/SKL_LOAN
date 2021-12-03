@@ -3,8 +3,6 @@ package com.st1.itx.trade.L9;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,6 @@ import com.st1.itx.util.format.ConvertUpMoney;
 @Scope("prototype")
 
 public class L9706Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9706Report.class);
 
 	@Autowired
 	L9706ServiceImpl l9706ServiceImpl;
@@ -105,7 +102,7 @@ public class L9706Report extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		this.toPdf(sno);
+		//this.toPdf(sno);
 		if (loanBTXList != null && loanBTXList.size() != 0) {
 			return true;
 		} else {
@@ -148,8 +145,7 @@ public class L9706Report extends MakeReport {
 		tmp = ConvertUpMoney.toChinese(tL9706Vo.get("F5"));
 		this.print(0, 12, tmp + "整");
 		this.print(0, 62, "，");
-		tmp = String.format("%07d", Integer.valueOf(tL9706Vo.get("F6"))) + " - "
-				+ String.format("%03d", Integer.valueOf(tL9706Vo.get("F7")));
+		tmp = String.format("%07d", Integer.valueOf(tL9706Vo.get("F6"))) + " - " + String.format("%03d", Integer.valueOf(tL9706Vo.get("F7")));
 		this.print(1, 1, "");
 		this.print(1, 1, "戶號 ");
 		this.print(0, 6, tmp);

@@ -67,9 +67,22 @@
    <!--
 	 <import resource="file:${itx_Config}/spring/batch/jobFlow.xml" />
 	 -->
+	 
+   <!-- 連線環境用  -->
    <import resource="file:${itx_Config}/spring/batch/eodFlow.xml" />
    <import resource="file:${itx_Config}/spring/batch/eomFlow.xml" />
    <import resource="file:${itx_Config}/spring/batch/eoyFlow.xml" />
    <import resource="file:${itx_Config}/spring/batch/batchRpt.xml" />
    <import resource="file:${itx_Config}/spring/batch/batchJcic.xml" />
+   <import resource="file:${itx_Config}/spring/batch/jcicFlow.xml" />
+  
+   <!-- 本機測試用  -->
+   <!--
+   <import resource="classpath:spring/batch/eodFlow.xml" />
+   <import resource="classpath:spring/batch/eomFlow.xml" />
+   <import resource="classpath:spring/batch/eoyFlow.xml" />
+   <import resource="classpath:spring/batch/batchRpt.xml" />
+   <import resource="classpath:spring/batch/batchJcic.xml" />
+   -->
+
 </beans>

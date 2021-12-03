@@ -130,20 +130,20 @@ public class LC009 extends TradeBuffer {
 		}
 		List<TxFile> lTxFile = slTxFile == null ? null : new ArrayList<>(slTxFile.getContent());
 
-		// 按分配順序排序
-		Collections.sort(lTxFile, new Comparator<TxFile>() {
-			public int compare(TxFile c1, TxFile c2) {
-				String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate()) + c1.getFileCode()
-						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
-				String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate()) + c2.getFileCode()
-						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());
-				return 0 - c1OrderKey.compareTo(c2OrderKey);
-			}
-		});
-
-		if (lTxFile == null) {
+		if (lTxFile == null || lTxFile.isEmpty()) {
 			throw new LogicException(titaVo, "E0001", "");
 		} else {
+			// 按分配順序排序
+			Collections.sort(lTxFile, new Comparator<TxFile>() {
+				public int compare(TxFile c1, TxFile c2) {
+					String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate()) + c1.getFileCode()
+							+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
+					String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate()) + c2.getFileCode()
+							+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());
+					return 0 - c1OrderKey.compareTo(c2OrderKey);
+				}
+			});
+
 			for (TxFile tTxFile : lTxFile) {
 
 				OccursList occursList = new OccursList();

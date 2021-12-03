@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM071Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM071Report.class);
 
 	@Autowired
 	LM071ServiceImpl lm071ServiceImpl;
@@ -32,13 +29,12 @@ public class LM071Report extends MakeReport {
 
 	@Override
 	public void printTitle() {
- 
+
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM071", "推展_退休員工利率名單", "LM071_推展_退休員工利率名單",
-				"LM071_底稿_推展_退休員工利率名單.xls", "退休員工利率");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM071", "推展_退休員工利率名單", "LM071_推展_退休員工利率名單", "LM071_底稿_推展_退休員工利率名單.xls", "退休員工利率");
 
 		try {
 			fnAllList = lm071ServiceImpl.findAll(titaVo);
@@ -64,7 +60,7 @@ public class LM071Report extends MakeReport {
 					case 1:
 					case 3:
 						// 字串左靠
-						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm),"L");
+						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "L");
 						break;
 					case 10:
 						// 利率
@@ -109,7 +105,7 @@ public class LM071Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 	}
 }

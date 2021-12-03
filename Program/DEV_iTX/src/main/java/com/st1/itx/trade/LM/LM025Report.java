@@ -19,7 +19,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM025Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM025Report.class);
 
 	@Autowired
 	LM025ServiceImpl lM025ServiceImpl;
@@ -34,8 +33,7 @@ public class LM025Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM025", "減損系統有效利率資料查核", "LM025減損系統有效利率資料查核",
-				"LM025_底稿_減損系統有效利率資料查核.xls", "201903-固定");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM025", "減損系統有效利率資料查核", "LM025減損系統有效利率資料查核", "LM025_底稿_減損系統有效利率資料查核.xls", "201903-固定");
 
 		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
 
@@ -46,9 +44,9 @@ public class LM025Report extends MakeReport {
 		exportExcel(titaVo, 1);
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
- 
+
 	/**
 	 * 執行EXCEL
 	 * 
@@ -75,7 +73,7 @@ public class LM025Report extends MakeReport {
 		if (lm025List != null && lm025List.size() != 0) {
 			for (Map<String, String> tLDVo : lm025List) {
 				row++;
-				
+
 				for (int i = 0; i < tLDVo.size(); i++) {
 					ad = "F" + String.valueOf(i);
 					switch (i) {
@@ -90,11 +88,10 @@ public class LM025Report extends MakeReport {
 						break;
 					case 3:
 						makeExcel.setValue(row, 4, tLDVo.get(ad) == null ? "" : new BigDecimal(tLDVo.get(ad)), "R");
-		
+
 						break;
 					case 4:
-						makeExcel.setValue(row, 5, tLDVo.get(ad) == null ? "" : new BigDecimal(tLDVo.get(ad)), "#,##0",
-								"R");
+						makeExcel.setValue(row, 5, tLDVo.get(ad) == null ? "" : new BigDecimal(tLDVo.get(ad)), "#,##0", "R");
 						break;
 					default:
 

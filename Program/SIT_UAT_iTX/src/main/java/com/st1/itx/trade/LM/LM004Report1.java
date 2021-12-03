@@ -5,8 +5,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ import com.st1.itx.util.date.DateUtil;
 // Making Pdf
 
 public class LM004Report1 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM004Report1.class);
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -94,7 +91,7 @@ public class LM004Report1 extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	private String showDate(String date, int iType) {

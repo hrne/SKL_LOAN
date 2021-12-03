@@ -18,7 +18,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class L9714Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9714Report.class);
 
 	@Autowired
 	L9714ServiceImpl l9714ServiceImpl;
@@ -73,33 +72,25 @@ public class L9714Report extends MakeReport {
 		this.print(-11, colCount + 67, "└─┴─────────────┘");
 
 		this.print(-13, colCount + 1, "┌────┬──────┬────────┬───────────────────────────┐");
-		this.print(-14, colCount + 1,
-				"│借戶姓名│            │房屋所有權人姓名│※                                                    │");
+		this.print(-14, colCount + 1, "│借戶姓名│            │房屋所有權人姓名│※                                                    │");
 		this.print(-15, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-16, colCount + 1,
-				"│統一編號│            │統一編號        │※                                                    │");
+		this.print(-16, colCount + 1, "│統一編號│            │統一編號        │※                                                    │");
 		this.print(-17, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-18, colCount + 1,
-				"│房屋稅籍│※          │房屋坐落        │※                                                    │");
+		this.print(-18, colCount + 1, "│房屋稅籍│※          │房屋坐落        │※                                                    │");
 		this.print(-19, colCount + 1, "└────┴──────┴────────┴───────────────────────────┘");
 
 		this.print(-21, colCount + 1, "┌──────┬───────┬─────────┬──────┬──────┬─────────┐");
-		this.print(-22, colCount + 1,
-				"│房屋所有權　│              │                  │            │            │      本期未償還　│");
+		this.print(-22, colCount + 1, "│房屋所有權　│              │                  │            │            │      本期未償還　│");
 		this.print(-23, colCount + 1, "│取得日※    │ 貸款帳號     │     最初貸款金額 │   貸款起日 │   貸款迄日 │      本金額（元）│");
 		this.print(-24, colCount + 1, "├──────┼───────┼─────────┼──────┼──────┼─────────┤");
-		this.print(-25, colCount + 1,
-				"│            │              │                  │            │            │                  │");
+		this.print(-25, colCount + 1, "│            │              │                  │            │            │                  │");
 		this.print(-26, colCount + 1, "└──────┴───────┴─────────┴──────┴──────┴─────────┘");
 
 		this.print(-28, colCount + 1, "┌──────────────┬────────────────┬────────────────┐");
-		this.print(-29, colCount + 1,
-				"│繳息所屬年月                │                      繳息金額　│                    用途別      │");
+		this.print(-29, colCount + 1, "│繳息所屬年月                │                      繳息金額　│                    用途別      │");
 		this.print(-30, colCount + 1, "├──────────────┼────────────────┼────────────────┤");
-		this.print(-31, colCount + 1,
-				"│自                          │                                │                                │");
-		this.print(-32, colCount + 1,
-				"│至                          │                                │                                │");
+		this.print(-31, colCount + 1, "│自                          │                                │                                │");
+		this.print(-32, colCount + 1, "│至                          │                                │                                │");
 
 		String tmp;
 //		this.info("f0=" + f0 + ",f1=" + f1 + ",f2=" + f2 + ",f3=" + f3 + ",f4=" + f4 + ",f5=" + f5 + ",f6=" + f6
@@ -137,7 +128,6 @@ public class L9714Report extends MakeReport {
 		ieday = titaVo.get("ACCTDATE_ED");
 
 		List<Map<String, String>> l9714List = null;
-		
 
 		try {
 
@@ -154,10 +144,9 @@ public class L9714Report extends MakeReport {
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9714", "繳息證明單", "", "A4", "P");
 
-
 		if (l9714List.size() > 0) {
 			for (Map<String, String> tL9714Vo : l9714List) {
-			
+
 				if (!tL9714Vo.get("F3").equals(f3)) {
 //					if (this.getNowPage() > 0) {
 //						printEnd();
@@ -179,7 +168,6 @@ public class L9714Report extends MakeReport {
 			}
 		} else {
 
-	
 			f0 = "本日無資料";
 			f1 = " ";
 			f2 = "0";
@@ -189,11 +177,9 @@ public class L9714Report extends MakeReport {
 			f6 = "0";
 			f7 = "0";
 			printHeader();
-			
+
 			printEnd();
 		}
-
-	
 
 //		if (this.getNowPage() > 0) {
 //			printEnd();
@@ -203,7 +189,7 @@ public class L9714Report extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		this.toPdf(sno);
+		//this.toPdf(sno);
 		if (l9714List.size() > 0) {
 			return true;
 		} else {
@@ -275,8 +261,7 @@ public class L9714Report extends MakeReport {
 				this.print(-32, colCount + 6, ieday.substring(0, 3) + " 年 " + ieday.substring(3, 5) + " 月");
 			}
 		} else {
-			this.print(1, colCount + 1,
-					"│                            │                                │                                │");
+			this.print(1, colCount + 1, "│                            │                                │                                │");
 		}
 		this.print(0, colCount + 63, showAmt(tL9714Vo.get("F9")), "R");
 		this.print(0, colCount + 87, tmp);

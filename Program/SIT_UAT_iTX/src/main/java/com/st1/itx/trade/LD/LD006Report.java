@@ -14,6 +14,7 @@ import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.springjpa.cm.LD006ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -71,6 +72,9 @@ public class LD006Report extends MakeReport {
 					int col = i + 1;
 
 					switch (i) {
+					case 2: // 戶名
+						makeExcel.setValue(row, col, StringCut.stringMask(tmpValue));
+						break;
 					case 10: // K欄:撥款金額
 						total = total.add(getBigDecimal(tmpValue));
 						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue, "#,##0");
@@ -97,7 +101,7 @@ public class LD006Report extends MakeReport {
 			makeExcel.setValue(row, 1, "本日無資料");
 		}
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 }

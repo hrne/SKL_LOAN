@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_L9_MonthlyFacBal_Upd
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
+create or replace PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -501,10 +496,15 @@ BEGIN
     commit;
 
     -- 例外處理
---    Exception
---    WHEN OTHERS THEN
---   "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_MonthlyLoanBa_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
+    Exception
+    WHEN OTHERS THEN
+    "Usp_L9_UspErrorLog_Ins"(
+        'Usp_L9_MonthlyFacBal_Upd' -- UspName 預存程序名稱
+      , SQLCODE -- Sql Error Code (固定值)
+      , SQLERRM -- Sql Error Message (固定值)
+      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+      , EmpNo -- 發動預存程序的員工編號
+    );
   END;
 END;
 
-/

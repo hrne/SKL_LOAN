@@ -298,7 +298,7 @@ public class LM067Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 	}
 }

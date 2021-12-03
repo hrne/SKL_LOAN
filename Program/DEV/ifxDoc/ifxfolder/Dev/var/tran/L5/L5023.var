@@ -42,7 +42,7 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L5023]                                 晤談人員明細資料查詢"],
 ["#FdMain+查詢條件","@(戶號、案件編號，需擇一輸入)"],
-[#<->#,"#FdCustNo+．戶號",#CustNo],
+[#<->#,"#FdCustNo+．戶號",#CustNo,#CustName],
 [#<->#,"#FdCreditSysNo+．案件編號",#CreditSysNo],
 ]
 #FdMain=X,2,L
@@ -61,6 +61,17 @@ T(4,CHAIN$)
 ! 戶號
 #CustNo=A,7,I
 
+<include src="ROM.icf::L5R36.dec"/>     
+#RimL5R36=X,1,S
+#RimCustNo=A,7,S
+E(0,#CustNo)
+RESET_RIM(#RimL5R36,L5R36)
+S(L5R36,1,#RimCustNo)
+R(1,L5R36)
+T(2,@CustName,#L5R36CustName)
+
+#CustName=X,50,L
+C(3,#CustNo,0,S,s)
 ! 案件編號
 #CreditSysNo=A,7,I
 C(3,#CustNo,0,$,S)
@@ -138,6 +149,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5406; ntxbuf=#OOBUF_SEARCH})
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R36.tom"/>
 TXFORM=L5023
 #OOCustNo#OOFacmNo#OOInterviewerA#OOInterviewerB#OOKeyiner#OOCoorgnizer#OOInterviewerAX#OOInterviewerBX#OOKeyinerX#OOCoorgnizerX
 ^
@@ -178,9 +190,4 @@ TXFORM=L5023
 {width:105,align:'center'}
 
 ^
-<include src="PRT.icf::INQ04.sel" map="i=L5023;cpi=15"/>
-#CustNo
-%
-#OOCustNo#OOFacmNo#OOInterviewerA#OOInterviewerB#OOKeyiner#OOCoorgnizer#OOInterviewerAX#OOInterviewerBX#OOKeyinerX#OOCoorgnizerX
-@^
 </sub>

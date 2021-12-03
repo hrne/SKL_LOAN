@@ -42,7 +42,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		sql += " SELECT E0.\"DepItem\" \"LoanEmpItem\" ";
 		sql += "       ,E0.\"Fullname\" \"LoanEmpName\" ";
-		sql += "       ,\"Fn_MaskName\"(C.\"CustName\") AS \"CustName\" "; // 戶名
+		sql += "       ,C.\"CustName\" AS \"CustName\" "; // 戶名
 		sql += "       ,B.\"CustNo\" \"CustNo\" ";
 		sql += "       ,B.\"FacmNo\" \"FacmNo\" ";
 		sql += "       ,B.\"BormNo\" \"BormNo\" ";

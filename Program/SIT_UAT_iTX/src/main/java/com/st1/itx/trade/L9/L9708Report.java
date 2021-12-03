@@ -3,8 +3,6 @@ package com.st1.itx.trade.L9;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class L9708Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9708Report.class);
 
 	@Autowired
 	public L9708ServiceImpl l9708ServiceImpl;
@@ -47,11 +44,9 @@ public class L9708Report extends MakeReport {
 		this.print(-2, 27, "新光人壽房屋貸款自動轉帳申請書明細表");
 		this.print(0, 72, "PAGE：");
 		this.print(0, 80, Integer.toString(this.getNowPage()), "R");
-		String tim = String.format("%02d",Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
-		this.print(0, 1, tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/"
-				+ dateUtil.getNowStringBc().substring(2, 4));
-		this.print(0, 20, dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		String tim = String.format("%02d", Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
+		this.print(0, 1, tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + dateUtil.getNowStringBc().substring(2, 4));
+		this.print(0, 20, dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-5, 1, "扣款銀行   撥款日期     戶  號   額度  首次應繳日     扣款帳號         公 司 名 稱");
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(6);
@@ -93,9 +88,9 @@ public class L9708Report extends MakeReport {
 		} catch (Exception e) {
 			this.info("L9708ServiceImpl.LoanBorTx error = " + e.toString());
 		}
-		
+
 		makeReport(titaVo, l9708List);
-		
+
 		if (l9708List != null && l9708List.size() != 0) {
 			return true;
 		} else {
@@ -143,8 +138,7 @@ public class L9708Report extends MakeReport {
 					this.print(1, 1, "");
 					this.print(1, 60, "筆數：");
 					this.print(0, 75, Integer.toString(countGroup), "R");
-					
-					
+
 					this.print(1, 1, "");
 					this.print(1, 60, "總 筆 數：");
 					this.print(0, 75, Integer.toString(countAll), "R");
@@ -163,34 +157,8 @@ public class L9708Report extends MakeReport {
 		long sno = this.close();
 
 		// 輸出PDF
-		this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
-	private int report1(Map<String, String> tL9708Vo) {
 
-//		int bankGroup = 0;
-//		int count = 0;
-//
-//		if (bankGroup != Integer.valueOf(tL9708Vo.get("F0"))) {
-//			bankGroup = Integer.valueOf(tL9708Vo.get("F0"));
-//			count = 0;
-//		}
-//		
-//		count++;
-//
-//		if (count == 1) {
-//			this.print(1, 3, bankGroup + "");
-//		} else {
-//			this.print(1, 3, " ");
-//		}
-//
-//		this.print(0, 11, showBcDate(Integer.valueOf(tL9708Vo.get("F1")), 0));
-//		this.print(0, 23, String.format("%07d", Integer.valueOf(tL9708Vo.get("F2"))));
-//		this.print(0, 33, String.format("%03d", Integer.valueOf(tL9708Vo.get("F3"))));
-//		this.print(0, 38, showBcDate(Integer.valueOf(tL9708Vo.get("F4")), 0));
-//		this.print(0, 50, tL9708Vo.get("F5"));
-//		this.print(0, 72, tL9708Vo.get("F6"));
-
-		return 1111;
-	}
 }

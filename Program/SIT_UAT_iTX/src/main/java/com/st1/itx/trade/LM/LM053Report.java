@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -22,29 +20,28 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM053Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM053Report.class);
 
 	@Autowired
-	LM053ServiceImpl LM053ServiceImpl;
+	LM053ServiceImpl lM053ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
- 
+
 	@Override
 	public void printTitle() {
 
 	}
- 
+
 	public void exec(TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM053Report exec");
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM053", "法務分配款明細表_內部控管", "LM053法務分配款明細表_內部控管",
-				"LM053-法務分配款明細表_內部控管.xlsx", "法務分配表");
+				"LM053_底稿_法務分配款明細表_內部控管.xlsx", "法務分配表");
 
 		try {
-			fnAllList = LM053ServiceImpl.findAll(titaVo);
+			fnAllList = lM053ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -117,6 +114,6 @@ public class LM053Report extends MakeReport {
 		}
 		makeExcel.setValue(1, 3, row - 2);
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 }

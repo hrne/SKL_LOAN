@@ -27,9 +27,9 @@ E(0,0)
 ["#FdDistItem+區部名稱",#DistItem],
 ["#FdDeptCode+部室代號",#DeptCode,#DeptCodeBTN],
 ["#FdDeptItem+部室名稱",#DeptItem],
-["#FdUnitManager+單位經理代號",#UnitManager,#UnitManagerNm],
-["#FdDistManager+區部經理代號",#DistManager,#DistManagerNm],
-["#FdDeptManager+部室經理代號",#DeptManager,#DeptManagerNm],
+["#FdUnitManager+單位主管代號",#UnitManager,#UnitManagerNm],
+["#FdDistManager+區部主管代號",#DistManager,#DistManagerNm],
+["#FdDeptManager+部室主管代號",#DeptManager,#DeptManagerNm],
 ["#FdEnable+啟用記號",#Enable,#EnableX],
 ]
 !---------- AP Button AREA ----------

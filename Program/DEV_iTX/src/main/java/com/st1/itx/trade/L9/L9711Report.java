@@ -33,6 +33,9 @@ public class L9711Report extends MakeReport {
 	// 起始欄位 位置
 	int startPos = 4;
 
+	
+
+
 	@Override
 	public void printHeader() {
 
@@ -152,7 +155,7 @@ public class L9711Report extends MakeReport {
 
 		long sno = this.close();
 
-		this.toPdf(sno);
+		//this.toPdf(sno);
 
 		return l9711List;
 

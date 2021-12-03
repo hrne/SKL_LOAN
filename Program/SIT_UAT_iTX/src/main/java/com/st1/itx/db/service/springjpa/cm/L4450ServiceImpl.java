@@ -157,22 +157,19 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    and case                                               ";
 		sql += "         when ba.\"RepayBank\" = 700                      ";
 		sql += "           then case                                        ";
-		sql += "                 when substr(b.\"NextPayIntDate\",-2,2) IN ( '" + iPostSpecificDd + "' , '"
-				+ iPostSecondSpecificDd + "') ";
+		sql += "                 when substr(b.\"NextPayIntDate\",-2,2) IN ( '" + iPostSpecificDd + "' , '" + iPostSecondSpecificDd + "') ";
 		sql += "                 then 1                                    ";
 		sql += "                    else 0                                 ";
 		sql += "               end                                         ";
 		sql += "         else case                                          ";
-		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSpecificDdFrom + " and "
-				+ iAchSpecificDdTo;
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSpecificDdFrom + " and " + iAchSpecificDdTo;
 		sql += "               then 1                                      ";
-		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSecondSpecificDdFrom + " and "
-				+ iAchSecondSpecificDdTo;
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSecondSpecificDdFrom + " and " + iAchSecondSpecificDdTo;
 		sql += "               then 1                                      ";
 		sql += "                  else 0                                   ";
 		sql += "             end                                           ";
 		sql += "        end = 1                                           ";
-		sql += "   order by \"F4\",\"F3\",\"F0\",\"F1\",\"F2\"                              ";
+		sql += "   order by \"RepayBank\",\"AcctCode\",\"CustNo\",\"FacmNo\",\"BormNo\"    ";
 		this.info("sql=" + sql);
 
 		Query query;

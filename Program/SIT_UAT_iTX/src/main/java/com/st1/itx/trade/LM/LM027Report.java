@@ -7,8 +7,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,7 +22,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LM027Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM027Report.class);
 
 	@Autowired
 	LM027ServiceImpl lM027ServiceImpl;
@@ -58,14 +55,12 @@ public class LM027Report extends MakeReport {
 		// 取民國年月(日)
 		String ROCyymm = titaVo.get("ENTDY").substring(1, 4) + "年" + titaVo.get("ENTDY").substring(4, 6) + "月";
 		String sheetROCyymm = titaVo.get("ENTDY").substring(1, 4) + titaVo.get("ENTDY").substring(4, 6);
-		String ROCyymmdd = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "."
-				+ titaVo.get("ENTDY").substring(6, 8);
+		String ROCyymmdd = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "." + titaVo.get("ENTDY").substring(6, 8);
 
 		this.info("ROCyymm=" + ROCyymm);
 
 //		"LM027轉銷呆帳備忘錄.xls"
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM027", "轉銷呆帳備忘錄", "LM027_轉銷呆帳備忘錄",
-				sheetROCyymm);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM027", "轉銷呆帳備忘錄", "LM027_轉銷呆帳備忘錄", sheetROCyymm);
 
 		// 調整欄寬
 		makeExcel.setWidth(1, 18);
@@ -112,7 +107,7 @@ public class LM027Report extends MakeReport {
 		BigDecimal total1 = new BigDecimal("0");
 		BigDecimal total2 = new BigDecimal("0");
 		BigDecimal total3 = new BigDecimal("0");
-		
+
 //		int i = 0;
 		if (LM027List.size() > 0) {
 			BigDecimal sumAmt1 = new BigDecimal("0");
@@ -123,14 +118,11 @@ public class LM027Report extends MakeReport {
 
 			for (Map<String, String> tLM027Vo : LM027List) {
 
-				BigDecimal F3 = tLM027Vo.get("F3") == null || tLM027Vo.get("F3").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLM027Vo.get("F3"));
+				BigDecimal F3 = tLM027Vo.get("F3") == null || tLM027Vo.get("F3").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLM027Vo.get("F3"));
 				// 轉呆金額
-				BigDecimal F4 = tLM027Vo.get("F4") == null || tLM027Vo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLM027Vo.get("F4"));
+				BigDecimal F4 = tLM027Vo.get("F4") == null || tLM027Vo.get("F4").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLM027Vo.get("F4"));
 				// 累計回收金額
-				BigDecimal F5 = tLM027Vo.get("F5") == null || tLM027Vo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLM027Vo.get("F5"));
+				BigDecimal F5 = tLM027Vo.get("F5") == null || tLM027Vo.get("F5").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLM027Vo.get("F5"));
 				// 本月收回金額
 				// 上月止回額
 
@@ -167,7 +159,7 @@ public class LM027Report extends MakeReport {
 
 						makeExcel.setValue(row, 8, BigDecimal.ZERO, "C");
 
-					} else { 
+					} else {
 						makeExcel.setValue(row, 7, thisyymm, "C");
 
 						makeExcel.setValue(row, 8, F4.subtract(F5).intValue(), "#,##0", "C");
@@ -243,11 +235,9 @@ public class LM027Report extends MakeReport {
 
 		makeExcel.setMergedRegionValue(row + 7, row + 7, 1, 8, "1.擬調整會計科子目金額\n追索債權-放款\n等抵銷追索債權-放款", "L");
 
-		makeExcel.setMergedRegionValue(row + 8, row + 8, 1, 8, "2.前次餘額 " + df1.format(total1.subtract(total3)) + " 元",
-				"L");
+		makeExcel.setMergedRegionValue(row + 8, row + 8, 1, 8, "2.前次餘額 " + df1.format(total1.subtract(total3)) + " 元", "L");
 
-		makeExcel.setMergedRegionValue(row + 9, row + 9, 1, 8, "3.收回 " + df1.format(total2.subtract(total3))
-				+ " 元，出傳票回沖後，餘額 " + df1.format(total1.subtract(total2)) + "元", "L");
+		makeExcel.setMergedRegionValue(row + 9, row + 9, 1, 8, "3.收回 " + df1.format(total2.subtract(total3)) + " 元，出傳票回沖後，餘額 " + df1.format(total1.subtract(total2)) + "元", "L");
 
 		makeExcel.setMergedRegionValue(row + 10, row + 10, 1, 8, "4.敬會放款服務課接續帳務作業（出傳票、入帳）", "L");
 
@@ -257,7 +247,7 @@ public class LM027Report extends MakeReport {
 		makeExcel.setMergedRegionValue(row + 13, row + 13, 1, 4, "", "C");
 
 		long closeExcel = makeExcel.close();
-		makeExcel.toExcel(closeExcel);
+		//makeExcel.toExcel(closeExcel);
 
 	}
 
@@ -388,7 +378,7 @@ public class LM027Report extends MakeReport {
 //
 //		} // if
 //		long sno = this.close();
-//		this.toPdf(sno);
+//		//this.toPdf(sno);
 //	}
 //
 //	private String showDate(String date, int iType) {

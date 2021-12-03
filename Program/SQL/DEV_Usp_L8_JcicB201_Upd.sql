@@ -12,6 +12,7 @@ CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB201_Upd"
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
 )
+AUTHID CURRENT_USER
 AS
 BEGIN
 	"Usp_L8_JcicB201_Upd_Prear"();

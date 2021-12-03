@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LM015Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM015Report.class);
 
 	@Autowired
 	LM015ServiceImpl lM015ServiceImpl;
@@ -41,8 +38,7 @@ public class LM015Report extends MakeReport {
 		this.print(-4, 50, "信用曝險分佈報表", "C");
 //		String bcDate=dDateUtil.getNowStringBc().substring(6, 8)+"/"+dDateUtil.getNowStringBc().substring(4, 6)+"/"+dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-3, 80, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
-		this.print(-4, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-4, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-5, 80, "頁　　次：" + this.getNowPage());
 		String yearMon = this.showRocDate(this.getReportDate());
 		this.print(-6, 50, "年月份：" + yearMon.substring(0, 7), "C");
@@ -90,8 +86,7 @@ public class LM015Report extends MakeReport {
 				String f1 = tLDVo.get("F1") == null || tLDVo.get("F1").length() == 0 ? "" : tLDVo.get("F1");
 
 				// 擔保放款or催收 金額
-				BigDecimal f3 = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F2"));
+				BigDecimal f3 = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 
 				// 相同為0=擔保放款 反之為1= 催收款
 				if (temptt0.equals(f0)) {
@@ -169,24 +164,19 @@ public class LM015Report extends MakeReport {
 
 			this.print(0, 95, df1.format(totalV[0].add(totalV[1])), "R");
 			this.print(1, 1, "────────────────────────────────────────────────────");
-			this.print(1, 2,
-					"佔整體比率                  %                %               %                %               %");
+			this.print(1, 2, "佔整體比率                  %                %               %                %               %");
 
-			this.print(0, 29, totalH0[0].add(totalH1[0]).multiply(new BigDecimal("100"))
-					.divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
-			this.print(0, 46, totalH0[1].add(totalH1[1]).multiply(new BigDecimal("100"))
-					.divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
-			this.print(0, 62, totalH0[2].add(totalH1[2]).multiply(new BigDecimal("100"))
-					.divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
-			this.print(0, 79, totalH0[3].add(totalH1[3]).multiply(new BigDecimal("100"))
-					.divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
+			this.print(0, 29, totalH0[0].add(totalH1[0]).multiply(new BigDecimal("100")).divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
+			this.print(0, 46, totalH0[1].add(totalH1[1]).multiply(new BigDecimal("100")).divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
+			this.print(0, 62, totalH0[2].add(totalH1[2]).multiply(new BigDecimal("100")).divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
+			this.print(0, 79, totalH0[3].add(totalH1[3]).multiply(new BigDecimal("100")).divide(totalV[0].add(totalV[1]), 2, BigDecimal.ROUND_HALF_UP) + "", "R");
 
 			this.print(0, 95, "100.00", "R");
 		} else {
 			noData();
 		}
 		long sno = this.close();
-		this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	// 無資料列印格式

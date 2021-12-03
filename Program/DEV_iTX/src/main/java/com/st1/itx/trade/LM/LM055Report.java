@@ -115,7 +115,7 @@ public class LM055Report extends MakeReport {
 		exportExcel(fnAllList);
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 	}
 

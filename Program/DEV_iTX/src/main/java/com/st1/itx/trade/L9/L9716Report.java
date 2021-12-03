@@ -55,7 +55,7 @@ public class L9716Report extends MakeReport {
 //		exportExcel2(titaVo, lL9716_2);
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 		return true;
 

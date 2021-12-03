@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class L9712Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9712Report.class);
 
 	@Autowired
 	L9712ServiceImpl l9712ServiceImpl;
@@ -33,7 +30,7 @@ public class L9712Report extends MakeReport {
 	private int totalBreachAmtReceive = 0;
 	private int totalInterestGrace = 0;
 	private int totalBreachAmtGrace = 0;
- 
+
 	@Override
 	public void printHeader() {
 
@@ -45,26 +42,21 @@ public class L9712Report extends MakeReport {
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		this.print(-3, 3, "報  表：" + this.getRptCode());
 		String tim = String.format("%02d", Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
-		this.print(-2, 146, "日　　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/"
-				+ dDateUtil.getNowStringBc().substring(2, 4));
+		this.print(-2, 146, "日　　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
 
 		this.print(-3, 80, "利息違約金減免明細表", "C");
 
-		this.print(-3, 146, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 146, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 146, "頁　　次：");
 		this.print(0, 160, Integer.toString(this.getNowPage()), "R");
 
-		this.print(-5, 80, showRocDate(titaVo.get("ACCTDATE"), 1) + " - " + showRocDate(titaVo.get("ACCTDATE"), 1),
-				"C");
+		this.print(-5, 80, showRocDate(titaVo.get("ACCTDATE"), 1) + " - " + showRocDate(titaVo.get("ACCTDATE"), 1), "C");
 		this.print(-5, 146, "單　　位：元");
 
 		this.print(-7, 84, "應    收                               減    免");
 		this.print(-8, 73, "-----------------------------            ---------------------------");
-		this.print(-9, 1,
-				"   會計日      業務科目          戶號           戶名                        利息             違約金                利息             違約金  　 授權主管       備註");
-		this.print(-10, 1,
-				"----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-9, 1, "   會計日      業務科目          戶號           戶名                        利息             違約金                利息             違約金  　 授權主管       備註");
+		this.print(-10, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(11);
@@ -113,7 +105,7 @@ public class L9712Report extends MakeReport {
 
 		long sno = this.close();
 
-		this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	private void report1(Map<String, String> tL9712Vo) throws LogicException {
@@ -125,8 +117,7 @@ public class L9712Report extends MakeReport {
 		this.print(0, 16, "擔保放款");
 
 		// 戶號(戶號+額度)
-		tmp = String.format("%07d", Integer.valueOf(tL9712Vo.get("F1"))) + "-"
-				+ String.format("%03d", Integer.valueOf(tL9712Vo.get("F2")));
+		tmp = String.format("%07d", Integer.valueOf(tL9712Vo.get("F1"))) + "-" + String.format("%03d", Integer.valueOf(tL9712Vo.get("F2")));
 		this.print(0, 33, tmp);
 
 		// 戶名

@@ -229,7 +229,7 @@ public class LM065Report extends MakeReport {
 		makeExcel.setHeight(3, 30);
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 	}
 

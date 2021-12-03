@@ -21,7 +21,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM058Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM058Report.class);
 
 	@Autowired
 	LM058ServiceImpl lm058ServiceImpl;
@@ -39,10 +38,9 @@ public class LM058Report extends MakeReport {
 
 		this.info("LM058Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表", "LM058_表A19_會計部申報表",
-				"LM058-表A19_會計部申報表.xlsx", "108.04");
-
 		String iENTDY = titaVo.get("ENTDY");
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表", "LM058_表A19_會計部申報表_" + iENTDY.substring(1, 6), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
 
 		makeExcel.setSheet("108.04", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6));
 
@@ -55,9 +53,7 @@ public class LM058Report extends MakeReport {
 		}
 
 		// 民國年月日
-		String date = "民國" + iENTDY.substring(1, 4).replaceFirst("^0", "") + "年"
-				+ iENTDY.substring(4, 6).replaceFirst("^0", "") + "月" + iENTDY.substring(6, 8).replaceFirst("^0", "")
-				+ "日";
+		String date = "民國" + iENTDY.substring(1, 4).replaceFirst("^0", "") + "年" + iENTDY.substring(4, 6).replaceFirst("^0", "") + "月" + iENTDY.substring(6, 8).replaceFirst("^0", "") + "日";
 
 		makeExcel.setValue(2, 2, date);
 
@@ -153,7 +149,7 @@ public class LM058Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	/**

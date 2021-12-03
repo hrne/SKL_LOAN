@@ -154,7 +154,7 @@ public class LM060Report extends MakeReport {
 //			}
 		}
 		long sno = this.close();
-		this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	private String showAmt(String xamt) {

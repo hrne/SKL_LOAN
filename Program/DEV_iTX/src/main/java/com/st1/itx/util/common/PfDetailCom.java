@@ -361,7 +361,7 @@ public class PfDetailCom extends TradeBuffer {
 			this.info("iPf skip workMonthDrawdown == 0" + iPf.toString());
 			return null;
 		}
-		
+
 		this.info("iPf workMonthDrawdown =" + workMonthDrawdown);
 
 		// Load 業績特殊參數設定檔
@@ -582,10 +582,9 @@ public class PfDetailCom extends TradeBuffer {
 
 		// add to List
 		lPfDetail.add(pf);
-		
+
 		// 逐筆計算業績並更新業績明細檔
 		pf = procCompute(pf);
-
 
 		// add to ListProcess
 		lPfDetailProcess.add(pf);
@@ -1145,15 +1144,15 @@ public class PfDetailCom extends TradeBuffer {
 		// 生效日期<=撥款日<停效日期
 		if ("".equals(pf.getCoorgnizer())) {
 			this.info("PfDetailCom PfCoOfficer space skip ");
-			return pf;			
+			return pf;
 		}
 		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0,
 				pf.getDrawdownDate() + 19110000, titaVo);
 		if (tPfCoOfficer == null) {
 			this.info("PfDetailCom PfCoOfficer null skip ");
 			return pf;
-		}		
-		if (tPfCoOfficer.getIneffectiveDate() > 0 &&  pf.getDrawdownDate() >= tPfCoOfficer.getIneffectiveDate()) {
+		}
+		if (tPfCoOfficer.getIneffectiveDate() > 0 && pf.getDrawdownDate() >= tPfCoOfficer.getIneffectiveDate()) {
 			this.info("PfDetailCom PfCoOfficer IneffectiveDate skip " + tPfCoOfficer.toString());
 			return pf;
 		}
@@ -1372,13 +1371,17 @@ public class PfDetailCom extends TradeBuffer {
 		if (!"".equals(pf.getUnitCode()) && "".equals(pf.getDistCode())) {
 			// 分公司資料檔
 			CdBcm tCdBcm = cdBcmService.findById(pf.getUnitCode(), titaVo);
-			if (tCdBcm != null) {
-				pf.setDistCode(tCdBcm.getDistCode()); // 區部代號(介紹人)
-				pf.setDeptCode(tCdBcm.getDeptCode()); // 部室代號(介紹人)
-				pf.setUnitManager(tCdBcm.getUnitManager()); // 處經理代號(介紹人)
-				pf.setDistManager(tCdBcm.getDistManager()); // 區經理代號(介紹人)
-				pf.setDeptManager(tCdBcm.getDeptManager()); // 部經理代號(介紹人)
+			if (tCdBcm == null) {
+				throw new LogicException(titaVo, "E0001", "CdBcm 分公司資料檔" + pf.getUnitCode()); // 查詢資料不存在
 			}
+			if ("N".equals(tCdBcm.getEnable())) {
+				throw new LogicException(titaVo, "E0019", "分公司資料未啟用" + pf.getUnitCode()); // 輸入資料錯誤
+			}
+			pf.setDistCode(tCdBcm.getDistCode()); // 區部代號(介紹人)
+			pf.setDeptCode(tCdBcm.getDeptCode()); // 部室代號(介紹人)
+			pf.setUnitManager(tCdBcm.getUnitManager()); // 處經理代號(介紹人)
+			pf.setDistManager(tCdBcm.getDistManager()); // 區經理代號(介紹人)
+			pf.setDeptManager(tCdBcm.getDeptManager()); // 部經理代號(介紹人)
 		}
 
 		// 還款、.計件代碼變更、重轉時更新記號=N => 抓最新房貸專員及所屬部室(變動 by L5502房貸專員業績案件維護)

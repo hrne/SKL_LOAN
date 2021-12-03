@@ -26,14 +26,14 @@ public class LD003Report extends MakeReport {
 	@Autowired
 	// 在Spring管理的Bean，能夠找到，可允許找不到時設定為null，也可以指定required=fails
 	LD003ServiceImpl lD003ServiceImpl;
-
+ 
 	@Autowired
 	DateUtil dateUtil;
  
 	// 自訂明細標題
 	@Override
 	public void printHeader() {
-		this.info("printTitle nowRow = " + this.NowRow);
+		logger.info("printTitle nowRow = " + this.NowRow);
 
 		this.setCharSpaces(0);
 
@@ -59,7 +59,7 @@ public class LD003Report extends MakeReport {
 		try {
 			LD003List = lD003ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
-			this.info("lD003ServiceImpl.findAll error = " + e.toString());
+			logger.info("lD003ServiceImpl.findAll error = " + e.toString());
 		}
 		exportResult(titaVo, LD003List);
 	}
@@ -70,10 +70,8 @@ public class LD003Report extends MakeReport {
 
 		this.print(1, 1, "");
 
-//		boolean printfg = false;
 
 		int i = 0;
-//		int startRow = -11;
 
 		this.print(-8, 1, "┌──────────────────────────┬─────────────┬───────────────┐");
 		this.print(-9, 1, "│　　　　　　　　　　　　　  　　　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　│");
@@ -203,7 +201,7 @@ public class LD003Report extends MakeReport {
 
 		long sno = this.close();
 
-		this.toPdf(sno);
+		//this.toPdf(sno);
 
 	}
 
@@ -294,7 +292,7 @@ public class LD003Report extends MakeReport {
 		}
 		long sno = this.close();
 
-		this.toPdf(sno);
+		//this.toPdf(sno);
 
 	}
 

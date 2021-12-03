@@ -235,7 +235,7 @@ public class LM061Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void checkMergeRegionValue(String custNo, String custName, BigDecimal eAmt, BigDecimal ovduAmt, int row) {

@@ -119,7 +119,7 @@ public class LM056Report extends MakeReport {
 		reportExcel14_2(findList3);
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void reportExcel(List<Map<String, String>> listData) throws LogicException {

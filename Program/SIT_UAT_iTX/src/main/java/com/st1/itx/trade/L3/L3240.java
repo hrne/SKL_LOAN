@@ -92,6 +92,7 @@ public class L3240 extends TradeBuffer {
 	private int iAcDate;
 	private String iTellerNo;
 	private String iTxtNo;
+	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 
 	private FacProd tFacProd;
 	private FacMain tFacMain;
@@ -133,9 +134,9 @@ public class L3240 extends TradeBuffer {
 		iIntStartDate = this.parse.stringToInteger(titaVo.getParam("IntStartDate"));
 		iIntEndDate = this.parse.stringToInteger(titaVo.getParam("IntEndDate"));
 		iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
-		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
-		String iTellerNo = titaVo.getParam("TellerNo");
-		String iTxtNo = titaVo.getParam("TxtNo");
+		iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
+		iTellerNo = titaVo.getParam("TellerNo");
+		iTxtNo = titaVo.getParam("TxtNo");
 
 		// Check Input
 
@@ -146,12 +147,23 @@ public class L3240 extends TradeBuffer {
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
+
+//			// 暫收可抵繳
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("TAV");
+			acDetail.setTxAmt(wkTempAmt);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			lAcDetail.add(acDetail);
+
 			// 借： 本金利息、貸：暫收可抵繳
 			this.txBuffer.addAllAcDetailList(lAcDetail);
-
+			
 			// 產生會計分錄
 			acDetailCom.setTxBuffer(this.txBuffer);
 			acDetailCom.run(titaVo);
+
 		}
 		acReceivableCom.setTxBuffer(this.getTxBuffer());
 
@@ -180,7 +192,8 @@ public class L3240 extends TradeBuffer {
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
 		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990,
-				iIntEndDate + 19110000, ltitaHCode, iAcDate, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE, titaVo);
+				iIntEndDate + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE,
+				titaVo);
 		if (slLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
 		}
@@ -194,6 +207,8 @@ public class L3240 extends TradeBuffer {
 			if (tx.getIntStartDate() != iIntStartDate) {
 				continue;
 			}
+			wkBorxNo = tx.getBorxNo();
+
 			// 更新額度檔
 			updFacMainRoutine(tx);
 			// 還原撥款主檔
@@ -251,7 +266,7 @@ public class L3240 extends TradeBuffer {
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
 		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, tx.getBormNo(),
-				tx.getBormNo(), tx.getIntStartDate() + 19110000, ltitaHCode, iAcDate, iTellerNo, iTxtNo, 0,
+				tx.getBormNo(), tx.getIntStartDate() + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0,
 				Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx == null) {
 			return;
@@ -408,15 +423,8 @@ public class L3240 extends TradeBuffer {
 		acDetail.setFacmNo(tx.getFacmNo());
 		acDetail.setBormNo(tx.getBormNo());
 		lAcDetail.add(acDetail);
-
-		// 暫收可抵繳
-		acDetail = new AcDetail();
-		acDetail.setDbCr("C");
-		acDetail.setAcctCode("TAV");
-		acDetail.setTxAmt(tx.getPrincipal().add(tx.getBreachAmt()).add(tx.getBreachAmt()).add(tx.getBreachAmt()));
-		acDetail.setCustNo(tx.getCustNo());
-		acDetail.setFacmNo(tx.getFacmNo());
-		lAcDetail.add(acDetail);
+		wkTempAmt = wkTempAmt.add(tx.getPrincipal().add(tx.getInterest()).add(tx.getDelayInt()).add(tx.getBreachAmt())
+				.add(tx.getCloseBreachAmt()));
 	}
 
 }

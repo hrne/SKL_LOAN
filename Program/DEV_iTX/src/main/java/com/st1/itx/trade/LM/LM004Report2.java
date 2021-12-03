@@ -36,12 +36,24 @@ public class LM004Report2 extends MakeReport {
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
 
 		int row = 3;
+//		this.info("-----------------" + LDList);
 		int num = 1;
 		makeExcel.setValue(1, 1, showDate(entdy, 2) + "長中短期放款到期追蹤表");
 
 		for (Map<String, String> tLDVo : LDList) {
 
-			for (int col = 0; col < 17; col++) {
+//			String ad = "";
+			int col = 0;
+//			int rows = 2;
+
+			// this causes endRow<ShiftRowFrom problem and idk what they trying to do here
+//			if (row > 27) {
+//				makeExcel.setShiftRow(row, 1);
+//			}
+
+			for (col = 0; col < tLDVo.size(); col++) {
+				// 欄位數
+//				col++;
 
 				switch (col) {
 				case 1:
@@ -118,7 +130,7 @@ public class LM004Report2 extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private String showDate(String date, int iType) {
