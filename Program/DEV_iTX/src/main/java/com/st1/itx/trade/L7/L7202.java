@@ -33,7 +33,6 @@ import com.st1.itx.util.data.DataLog;
  */
 
 public class L7202 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L7202.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -55,7 +54,7 @@ public class L7202 extends TradeBuffer {
 		this.info("active L7202 ");
 		this.totaVo.init(titaVo);
 
-		// 功能 1:新增 2:修改 4:刪除 5:查詢
+		// 功能 1:新增 2:修改  5:查詢 (移除刪除功能)
 		String funcd = titaVo.getParam("FuncCode").trim();
 		String iType;
 		int iDate;
@@ -94,7 +93,9 @@ public class L7202 extends TradeBuffer {
 					sIas39LGDService.insert(tIas39LGD);
 				} catch (DBException e) {
 					if (e.getErrorId() == 2) {
-						throw new LogicException(titaVo, "E0002", titaVo.getParam("Date" + i) + "-" + titaVo.getParam("Type" + i) ); // E0002 新增資料已存在(XXX)
+						throw new LogicException(titaVo, "E0002",
+								"生效日期=" + titaVo.getParam("Date" + i) + ",類別=" + titaVo.getParam("Type" + i)); // E0002
+																												// 新增資料已存在(XXX)
 					} else {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
@@ -120,7 +121,9 @@ public class L7202 extends TradeBuffer {
 				tIas39LGD = sIas39LGDService.holdById(new Ias39LGDId(iDate, iType));
 
 				if (tIas39LGD == null) {
-					throw new LogicException(titaVo, "E0003", titaVo.getParam("Date" + i) + "-" + titaVo.getParam("Type" + i) ); // E0003 修改資料不存在(XXX)
+					throw new LogicException(titaVo, "E0003",
+							"生效日期=" + titaVo.getParam("Date" + i) + ",類別=" + titaVo.getParam("Type" + i)); // E0003
+																											// 修改資料不存在(XXX)
 				}
 
 				Ias39LGD tIas39LGD2 = (Ias39LGD) dataLog.clone(tIas39LGD); ////
@@ -138,40 +141,10 @@ public class L7202 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 				dataLog.setEnv(titaVo, tIas39LGD2, tIas39LGD); ////
-				dataLog.exec(); ////
+				dataLog.exec("修改違約損失率檔"); ////
 			}
 
-		} else if (funcd.equals("4")) {
-
-			for (int i = 1; i <= 100; i++) {
-
-				iDate = this.parse.stringToInteger(titaVo.getParam("Date" + i));
-				iDate = iDate + 19110000;
-				iType = titaVo.getParam("Type" + i);
-
-				this.info("L7202 Date 4 : " + titaVo.getParam("Date" + i));
-
-				// 若該筆無資料就離開迴圈
-				if (titaVo.getParam("Date" + i).equals("0000000") || titaVo.getParam("Date" + i) == null || titaVo.getParam("Date" + i).trim().isEmpty()) {
-					break;
-				}
-
-				Ias39LGD tIas39LGD = new Ias39LGD();
-				tIas39LGD = sIas39LGDService.holdById(new Ias39LGDId(iDate, iType));
-
-				if (tIas39LGD != null) {
-					try {
-						sIas39LGDService.delete(tIas39LGD);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
-					}
-				} else {
-					throw new LogicException(titaVo, "E0004", titaVo.getParam("Date" + i) + "-" + titaVo.getParam("Type" + i) ); // E0004 刪除資料不存在(XXX)
-				}
-
-			}
-
-		} else if (!(funcd.equals("5"))) {
+		}  else if (!(funcd.equals("5"))) {
 			throw new LogicException(titaVo, "E0010", "L7202"); // 功能選擇錯誤
 		}
 

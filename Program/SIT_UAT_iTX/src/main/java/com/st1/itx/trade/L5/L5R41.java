@@ -7,11 +7,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.YearlyHouseLoanInt;
 import com.st1.itx.db.domain.YearlyHouseLoanIntId;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.YearlyHouseLoanIntService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -30,6 +34,13 @@ public class L5R41 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
+	
+	@Autowired
+	public FacMainService sFacMainService;
+	
 	@Autowired
 	Parse parse;
 
@@ -51,14 +62,14 @@ public class L5R41 extends TradeBuffer {
 		}
 
 		// 初始值Tota
-		moveTotaCdBranch(new YearlyHouseLoanInt());
+		moveTotaYearlyHouseLoanInt(iRimCustNo,iRimFacmNo,new YearlyHouseLoanInt(),titaVo);
 
 		// 查詢營業單位對照檔
 		YearlyHouseLoanInt tYearlyHouseLoanIntService = sYearlyHouseLoanIntService.findById(new YearlyHouseLoanIntId(iYearMonth,iRimCustNo,iRimFacmNo,iRimUsageCode), titaVo);
 		/* 如有找到資料 */
 		if (tYearlyHouseLoanIntService != null) {
 	
-				moveTotaCdBranch(tYearlyHouseLoanIntService);
+			moveTotaYearlyHouseLoanInt(iRimCustNo,iRimFacmNo,tYearlyHouseLoanIntService,titaVo);
 			
 		} else {
 			if (iRimFuncCode == 5) {
@@ -75,14 +86,27 @@ public class L5R41 extends TradeBuffer {
 
 	// 將每筆資料放入Tota
 	// 營業單位對照檔
-	private void moveTotaCdBranch(YearlyHouseLoanInt mYearlyHouseLoanInt) throws LogicException {
-		TempVo tTempVo = new TempVo();
+	private void moveTotaYearlyHouseLoanInt(int iRimCustNo,int iRimFacmNo, YearlyHouseLoanInt mYearlyHouseLoanInt,TitaVo titaVo) throws LogicException {
+//		TempVo tTempVo = new TempVo();
 		
-		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
+//		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
 	
-		this.totaVo.putParam("L5R41CustName", tTempVo.getParam("F0"));	// 借戶姓名
-		this.totaVo.putParam("L5R41CustId", tTempVo.getParam("F1"));	// 統一編號 
-		this.totaVo.putParam("L5R41LineAmt", tTempVo.getParam("F5"));   // 核准額度  
+		CustMain tCustMain = sCustMainService.custNoFirst(iRimCustNo, iRimCustNo, titaVo);
+		if(tCustMain!=null) {
+			this.totaVo.putParam("L5R41CustName", tCustMain.getCustName());	// 借戶姓名F0
+			this.totaVo.putParam("L5R41CustId", tCustMain.getCustId());	// 統一編號 F1
+		} else {
+			this.totaVo.putParam("L5R41CustName", "");	
+			this.totaVo.putParam("L5R41CustId", "");	 
+		}
+		
+		FacMain tFacMain = sFacMainService.findById(new FacMainId(iRimCustNo,iRimFacmNo), titaVo);
+		if(tFacMain != null) {
+			this.totaVo.putParam("L5R41LineAmt", tFacMain.getLineAmt());   // 核准額度F5
+		} else {
+			this.totaVo.putParam("L5R41LineAmt", "");   
+		}
+		  
 		
 		this.totaVo.putParam("L5R41AcctCode", mYearlyHouseLoanInt.getAcctCode());
 		this.totaVo.putParam("L5R41RepayCode", mYearlyHouseLoanInt.getRepayCode());

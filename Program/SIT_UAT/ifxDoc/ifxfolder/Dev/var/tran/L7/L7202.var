@@ -148,10 +148,13 @@ IF (#FuncCode==1 ,T(F,#Date{i},1)T(F,#Type{i},1),
                   T(F,#Date{i},0)T(F,#Type{i},0))
 ##end
 
+#DATE=D,8,S
+T(4,DATE$)
 
 ! 生效日期
 #Date1=D,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+T(1,#DATE,2,7)
 D(8)
 @V(7)A(DATE,0,#Date1)
 

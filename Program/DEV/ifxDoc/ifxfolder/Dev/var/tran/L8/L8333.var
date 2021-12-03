@@ -46,8 +46,9 @@ E(0,0)
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+申請日期",#ApplyDate],["#FdBankId+受理款項統一收付之債權金融機構代號",#BankId,#BankIdX],
 ["#FdOwnerYn+是否為更生債權人",#OwnerYn,#OwnerYnX],["#FdPayYn+債務人是否仍依更生方案正常還款予本金融機構",#PayYn,#PayYnX],
-["#FdOwnerAmt+本金融機構更生債權總金額",#OwnerAmt],["#FdAllotAmt+參與分配債權金額",#AllotAmt],
+["#FdAllotAmt+參與分配債權金額",#AllotAmt],
 ["#FdUnallotAmt+未參與分配債權金額",#UnallotAmt],
+["#FdOwnerAmt+本金融機構更生債權總金額",#OwnerAmt],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -92,7 +93,7 @@ T(2,@YesNoHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易,請由L8030-Jcic571連動進入),$)
-T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@BankId,0)T(F,@OwnerYn,0)T(F,@PayYn,0)T(F,@OwnerAmt,0)T(F,@AllotAmt,0)T(F,@UnallotAmt,0)
+T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@BankId,0)T(F,@OwnerYn,0)T(F,@PayYn,0)T(F,@AllotAmt,0)T(F,@UnallotAmt,0)
 #AutoReFresh=A,1,S
 C(3,#CHAIN,1,$,S)
 E(0,1)
@@ -108,30 +109,23 @@ T(1,@TranKey,#NTXBUF,2,1)
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@ApplyDate,1)T(F,@BankId,1)T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@OwnerAmt,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
+T(F,@ApplyDate,1)T(F,@BankId,1)T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdApplyDate,*)
 T(2,@FdBankId,*)
 T(2,@FdOwnerYn,*)
 T(2,@FdPayYn,*)
-T(2,@FdOwnerAmt,*)
-T(2,@FdAllotAmt,*)
-T(2,@FdUnallotAmt,*)
 
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@OwnerAmt,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
+T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
 T(2,@FdTranKey,*)
 T(2,@FdOwnerYn,*)
 T(2,@FdPayYn,*)
-T(2,@FdOwnerAmt,*)
-T(2,@FdAllotAmt,*)
-T(2,@FdUnallotAmt,*)
-
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -252,12 +246,12 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 C(5,#OwnerYn,N,T(3,@PayYn,Y)E(0,@OwnerAmt,0)E(0,@AllotAmt,0)E(0,@UnallotAmt,0)
-T(F,@PayYn,0)T(F,@OwnerAmt,0)T(F,@AllotAmt,0)T(F,@UnallotAmt,0)
-T(2,@FdPayYn, )T(2,@FdOwnerAmt, )T(2,@FdAllotAmt, )T(2,@FdUnallotAmt, )
+T(F,@PayYn,0)T(F,@AllotAmt,0)T(F,@UnallotAmt,0)
+T(2,@FdPayYn, )
 ,$)
 C(5,#OwnerYn,Y,T(3,@PayYn,Y)E(0,@OwnerAmt,0)E(0,@AllotAmt,0)E(0,@UnallotAmt,0)
-T(F,@PayYn,1)T(F,@OwnerAmt,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
-T(2,@FdPayYn,*)T(2,@FdOwnerAmt,*)T(2,@FdAllotAmt,*)T(2,@FdUnallotAmt,*)
+T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
+T(2,@FdPayYn,*)
 ,$)
 
 #OwnerYnX=X,2,L
@@ -269,17 +263,13 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#OwnerYn,N,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
-C(5,#PayYn,Y,E(0,@AllotAmt,0)T(F,@AllotAmt,0)T(2,@FdAllotAmt, ),$)
-C(5,#PayYn,N,E(0,@AllotAmt,0)T(F,@AllotAmt,1)T(2,@FdAllotAmt,*),$)
+C(5,#PayYn,Y,E(0,@AllotAmt,0)E(0,@UnallotAmt,0)E(0,@OwnerAmt,0)T(F,@AllotAmt,0)T(F,@UnallotAmt,0),$)
+C(5,#PayYn,N,T(F,@AllotAmt,1)T(F,@UnallotAmt,1),$)
 
 #PayYnX=X,2,L
 C(4,#PayYn,S,T(H,@PayYnX,#PayYn,#YesNoHelp))
 
-!本金融機構更生債權總金額
-#OwnerAmt=M,9,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(5,#OwnerYn,N,S,$)
+
 
 !參與分配債權金額
 #AllotAmt=M,9,I
@@ -287,9 +277,17 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#OwnerYn,N,S,$)
 C(5,#PayYn,Y,s,$)
+@E(0,@OwnerAmt,#AllotAmt)
 
 !未參與分配債權金額
 #UnallotAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#OwnerYn,N,S,$)
+C(5,#PayYn,Y,s,$)
+@E(0,@OwnerAmt,#AllotAmt+#UnallotAmt)
+!本金融機構更生債權總金額
+#OwnerAmt=M,9,L
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#OwnerYn,N,S,$)

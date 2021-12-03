@@ -6367,8 +6367,10 @@ TXFORM=L6R03
 #L7R04CustNo=9,7,S
 #L7R04FacmNo=9,3,S
 #L7R04MarkDate=9,7,S
-#L7R04MarkCode=9,2,S
-#L7R04MarkCodeDesc=X,20,S
+#L7R04MarkCode=9,1,S
+#L7R04MarkRsn=9,2,S
+#L7R04MarkRsnDesc=X,500,S
+#L7R04LosCod=9,2,S
 #L7R04StartDate=9,7,S
 #L7R04EndDate=9,7,S
 </L7R04.dec>
@@ -6379,7 +6381,9 @@ TXFORM=L7R04
 #L7R04FacmNo
 #L7R04MarkDate
 #L7R04MarkCode
-#L7R04MarkCodeDesc
+#L7R04MarkRsn
+#L7R04MarkRsnDesc
+#L7R04LosCod
 #L7R04StartDate
 #L7R04EndDate
 ^
@@ -7313,6 +7317,7 @@ TXFORM=L8R32
 #L8r33BankCount=9,2,S
 ##loop{times:30,i:1}
 #L8r33Bank{i}=X,3,S
+#L8r33BankX{i}=X,80,S
 ##end
 #L8r33OutJcicTxtDate=D,7,S
 </L8R33.dec>
@@ -7327,6 +7332,7 @@ TXFORM=L8R33
 #L8r33BankCount
 ##loop{times:30,i:1}
 #L8r33Bank{i}
+#L8r33BankX{i}
 ##end
 #L8r33OutJcicTxtDate
 ^

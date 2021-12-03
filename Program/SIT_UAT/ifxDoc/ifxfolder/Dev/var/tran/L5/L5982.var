@@ -301,7 +301,7 @@ TXFORM=L5982
 !#OORepayCodeX=繳款方式
 !{width:120,align:'left'}
 
-#OOLoanAmt=撥款金額
+#OOLoanAmt=初貸金額
 {width:200,align:'right'}
 
 #OOLoanBal=放款餘額

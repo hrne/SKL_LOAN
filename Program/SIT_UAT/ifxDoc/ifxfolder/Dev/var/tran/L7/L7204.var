@@ -17,19 +17,31 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[100,1100];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L7204]                                 特殊客觀減損狀況維護"],
-["@功能",#FuncCodeX],
-["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","","",
-["戶號","額度","中文姓名","發生日期","註記碼","起始日期","終止日期"],
-[
-  [#CustNo1],[#FacmNo1],[#CustName1],[#MarkDate1],[#MarkCode1,#MarkCodeDesc1],[#StartDate1],[#EndDate1]
-],
-],
+[#<->#,"#FdFunctionCd+功能",#FuncCodeX],
+!["@功能",#FuncCodeX],
+[#<->#,"#FdCustNo+戶號",#CustNo,"@",#CustName],
+[#<->#,"#FdFacmNo+額度",#FacmNo],
+[#<->#,"#FdMarkDate+發生日期",#MarkDate],
+[#<->#,"#FdMarkCode+註記碼",#MarkCode,#MarkCodeX],
+[#<->#,"#FdMarkRsn+原因代碼",#MarkRsn,#MarkRsnX],
+[#<->#,"#FdMarkRsnDesc+原因說明",#MarkRsnDesc],
+[#<->#,"#FdStartDate+起始日期",#StartDate],
+[#<->#,"#FdEndDate+終止日期",#EndDate],
+[#<->#,"#FdLosCod+客觀減損條件",#LosCod],
 ]
-!["戶號","額度","中文姓名","發生日期","註記碼","註記碼說明","起始日期","終止日期"],
-!  [#CustNo1],[#FacmNo1],[#CustName1],[#MarkDate1],[#MarkCode1],[#MarkCodeDesc1],[#StartDate1],[#EndDate1]
+
+!["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","","",
+!["戶號","額度","戶名","發生日期","註記碼","原因代碼","原因說明","客觀減損條件","起始日期","終止日期"],
+![
+!  [#CustNo1],[#FacmNo1],[#CustName1],[#MarkDate1],[#MarkCode1,#MarkCodeX1],[#MarkRsn1,#MarkRsnX1],[#MarkRsnDesc1],[#LosCod1],[#StartDate1],[#EndDate1]
+!],
+!],
+!]
+!["戶號","額度","戶名","發生日期","註記碼","原因代碼","原因說明","客觀減損條件","起始日期","終止日期"],
+!  [#CustNo1],[#FacmNo1],[#CustName1],[#MarkDate1],[#MarkCode1,#MarkCodeX1],[#MarkRsn1,#MarkRsnX1],[#MarkRsnDesc1],[#LosCod1],[#StartDate1],[#EndDate1]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 !#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
@@ -40,24 +52,62 @@ E(0,0)
 !ENABLE(#BTN2)
 !ENABLE(#BTN3)
 !---------- AP TEXT AREA Variables ----------
+
+#FdFunctionCd=X,1,L
+#FdCustNo=X,1,L
+T(3,*)
+#FdFacmNo=X,1,L
+T(3,*)
+#FdMarkDate=X,1,L
+T(3,*)
+#FdMarkCode=X,1,L
+T(3,*)
+#FdMarkRsn=X,1,L
+T(3,*)
+#FdMarkRsnDesc=X,1,L
+T(3,*)
+#FdStartDate=X,1,L
+T(3,*)
+#FdEndDate=X,1,L
+T(3,*)
+#FdLosCod=X,1,L
+T(3,*)
+
+
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 <include src="ROM.icf::L1R01.dec"/>
 <include src="ROM.icf::L7R04.dec"/>
 #CDCODEFuncCode2=x,20,S
 T(3,CdCode.FuncCode2)
 
+! 註記碼下拉選單2
+#MarkCodeRimName=x,20,S
+T(3,CdCode.MarkCode)
+#MarkCodeHelp=x,1024,S
+! 原因代碼下拉選單3
+#MarkRsnRimName=x,20,S
+T(3,CdCode.MarkRsn)
+#MarkRsnHelp=x,1024,S
+
+
 #FuncCode2HelpRim=X,1,S
 RESET_RIM(#FuncCode2HelpRim,XXR99)
-S(XXR99,01,#CDCODEFuncCode2)
+S(XXR99,01,#CDCODEFuncCode2,#MarkCodeRimName,#MarkRsnRimName)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@MarkCodeHelp,#HelpDesc2)
+T(2,@MarkRsnHelp,#HelpDesc3)
 
 #FuncCode2Help=x,300,S
 
-!啟用記號
-#MarkCodeHelp=x,100,S
-T(3,01:個別評估;99:其他)
+
+!註記碼
+!#MarkCodeHelp=x,100,S
+!T(3,1:重整;2:破產;9:其他)
+!原因代碼
+!#MarkRsnHelp=x,100,S
+!T(3,01:個別評價;99:其他)
 
 #INIT=X,1,S
 ##loop {times:9,i:2}
@@ -107,13 +157,13 @@ T(1,#NTXBUF,28,7)
 C(3,#CHAIN,1,$,S)
 T(2,@FuncCode,#CHAIN_FuncCode)
 C(3,#FuncCode,1,S,$)
-E(0,@CustNo1,#CHAIN_CustNo)
-E(0,@FacmNo1,#CHAIN_FacmNo)
-E(0,@MarkDate1,#CHAIN_MarkDate)
-!E(0,@MarkCode1,#CHAIN_MarkCode)
-!T(H,@MarkCodeDesc1,#MarkCode1,#MarkCodeHelp)
-!E(0,@StartDate1,#CHAIN_StartDate)
-!E(0,@EndDate1,#CHAIN_EndDate)
+E(0,@CustNo,#CHAIN_CustNo)
+E(0,@FacmNo,#CHAIN_FacmNo)
+E(0,@MarkDate,#CHAIN_MarkDate)
+!E(0,@MarkCode,#CHAIN_MarkCode)
+!T(H,@MarkCodeDesc,#MarkCode1,#MarkCodeHelp)
+!E(0,@StartDate,#CHAIN_StartDate)
+!E(0,@EndDate,#CHAIN_EndDate)
 
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
@@ -138,172 +188,227 @@ E(0,#FuncCode)
 
 !FuncCode=1,2 顯示框線
 #WKTF=X,1,S
-##loop {times:10,i:1}
-IF (#FuncCode==1 || #FuncCode==2 ,T(F,#MarkCode{i},1)T(F,#StartDate{i},1)T(F,#EndDate{i},1),
-                                  T(F,#MarkCode{i},0)T(F,#StartDate{i},0)T(F,#EndDate{i},0))
-IF (#FuncCode==1 ,T(F,#CustNo{i},1)T(F,#FacmNo{i},1)T(F,#MarkDate{i},1),
-                  T(F,#CustNo{i},0)T(F,#FacmNo{i},0)T(F,#MarkDate{i},0))
-T(F,#CustName{i},0)T(F,#MarkCodeDesc{i},0)
-##end
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,#MarkCode,1)T(F,#StartDate,1)T(F,#EndDate,1)T(F,#MarkRsn,1)T(F,#MarkRsnDesc,1)T(F,#LosCod,1),
+                                  T(F,#MarkCode,0)T(F,#StartDate,0)T(F,#EndDate,0)T(F,#MarkRsn,0)T(F,#MarkRsnDesc,0)T(F,#LosCod,0))
+IF (#FuncCode==1 ,T(F,#CustNo,1)T(F,#FacmNo,1)T(F,#MarkDate,1),
+                  T(F,#CustNo,0)T(F,#FacmNo,0)T(F,#MarkDate,0))
+T(F,#CustName,0)
 
 #RimFunCd=A,1,S
 #RimCustId=X,10,S
 #RimCustNo=A,7,S
-#CustName=c,100,S
+#RimCustName=c,100,S
 
 ! 戶號
-#CustNo1=A,7,I
+#CustNo=A,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 @V(7)V(2,0)
 
 #RimL1r01=X,1,S
 E(0,@RimFunCd,5)
-E(0,@RimCustNo,#CustNo1)
+E(0,@RimCustNo,#CustNo)
 RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
-T(2,@CustName,#L1r01CustName)
-T(1,@CustName1,#CustName,1,50)
+T(2,@RimCustName,#L1r01CustName)
+T(1,@CustName,#RimCustName,1,50)
 
 ! 額度
-#FacmNo1=A,3,I
+#FacmNo=A,3,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 @V(7)V(2,0)
 
-! 中文姓名
-#CustName1=c,50,S
+! 戶名
+#CustName=c,50,L
 !C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 
 ! 發生日期
-#MarkDate1=D,7,I
+#MarkDate=D,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-@V(7)A(DATE,0,#MarkDate1)
+@V(7)A(DATE,0,#MarkDate)
 
 #RimFacmNo=A,3,S
 #RimMarkDate=A,7,S
 
 #RimL7R04=X,1,S
 C(2,#FuncCode,S,$,$,S,$)
-E(0,@RimCustNo,#CustNo1)
-E(0,@RimFacmNo,#FacmNo1)
-E(0,@RimMarkDate,#MarkDate1)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimMarkDate,#MarkDate)
 E(0,@RimFunCd,#FuncCode)
 RESET_RIM(#RimL7R04,L7R04)
 S(L7R04,4,#RimCustNo,#RimFacmNo,#RimMarkDate,#RimFunCd)
 R(1,L7R04)
-E(0,@MarkCode1,#L7R04MarkCode)
-!T(2,@MarkCodeDesc1,#L7R04MarkCodeDesc)
-E(0,@StartDate1,#L7R04StartDate)
-E(0,@EndDate1,#L7R04EndDate)
+
+#SetRim=X,1,S
+C(2,#FuncCode,S,S,$,S,$)
+E(0,@MarkCode,#L7R04MarkCode)
+T(2,@MarkRsn,#L7R04MarkRsn)
+T(2,@MarkRsnDesc,#L7R04MarkRsnDesc)
+T(2,@LosCod,#L7R04LosCod)
+E(0,@StartDate,#L7R04StartDate)
+E(0,@EndDate,#L7R04EndDate)
+
+! 調Rim完成預先帶入
+T(H,@MarkCodeX,#MarkCode,#MarkCodeHelp)
+T(H,@MarkRsnX,#MarkRsn,#MarkRsnHelp)
+
 
 ! 註記碼
-#MarkCode1=A,2,I
+#MarkCode=A,1,I
 C(3,#FuncCode,4,s)
 HELP(#MarkCodeHelp)
 @V(H,#MarkCodeHelp)
 
+#MarkCodeX=X,30,L
+T(H,#MarkCode,#MarkCodeHelp)
+
 ! 註記碼說明
-#MarkCodeDesc1=X,20,L
+!#MarkCodeDesc1=X,6,L
 !C(3,#FuncCode,4,s)
-T(H,#MarkCode1,#MarkCodeHelp)
+!T(H,#MarkCode1,#MarkCodeHelp)
 
-! 起始日期
-#StartDate1=D,7,I
+! 原因代碼
+#MarkRsn=A,2,I
 C(3,#FuncCode,4,s)
-@V(7)A(DATE,0,#StartDate1)
+HELP(#MarkRsnHelp)
+@V(H,#MarkRsnHelp)
 
-! 終止日期
-#EndDate1=D,7,I
-C(3,#FuncCode,4,s)
-@V(7)A(DATE,0,#EndDate1)
-IF(#EndDate1 < #StartDate1,V(P,終止日期不可小於起始日期),s)
+#MarkRsnX=X,30,L
+T(H,#MarkRsn,#MarkRsnHelp)
 
-
-##loop{times:9,i:2,j:1}
-
-! 戶號
-#CustNo{i}=A,7,I
-C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
-C(3,#CustNo{j},0,INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
-C(3,#CustNo{j},0,S,$)
-@C(3,#CustNo{i},0,INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
-
-#Space{i}=X,1,S
-C(3,#CustNo{i},0,S,$)
-E(0,@RimFunCd,5)
-E(0,@RimCustNo,#CustNo{i})
-RESET_RIM(#RimL1r01,L1R01)
-S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
-R(1,L1R01)
-T(2,@CustName,#L1r01CustName)
-T(1,@CustName{i},#CustName,1,50)
-
-! 額度
-#FacmNo{i}=A,3,I
-! C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
-C(3,#CustNo{i},0,S,$)
+! 原因說明
+#MarkRsnDesc=x,10.50,I
 C(3,#FuncCode,4,s)
 @V(7)
 
-! 中文姓名
-#CustName{i}=c,50,S
+
+! 起始日期
+#StartDate=D,7,I
+C(3,#FuncCode,4,s)
+@V(7)A(DATE,0,#StartDate)
+
+! 終止日期
+#EndDate=D,7,I
+C(3,#FuncCode,4,s)
+@V(7)A(DATE,0,#EndDate)
+IF(#EndDate < #StartDate,V(P,終止日期不可小於起始日期),s)
+
+! 客觀減損條件
+#LosCod=A,2,I
+C(3,#FuncCode,4,s)
+@V(7)V(2,0)
+
+!##loop{times:9,i:2,j:1}
+
+!! 戶號
+!#CustNo{i}=A,7,I
+!C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
+!C(3,#CustNo{j},0,INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+!C(3,#CustNo{j},0,S,$)
+!@C(3,#CustNo{i},0,INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+
+!#Space{i}=X,1,S
+!C(3,#CustNo{i},0,S,$)
+!E(0,@RimFunCd,5)
+!E(0,@RimCustNo,#CustNo{i})
+!RESET_RIM(#RimL1r01,L1R01)
+!S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+!R(1,L1R01)
+!T(2,@CustName,#L1r01CustName)
+!T(1,@CustName{i},#CustName,1,50)
+
+! 額度
+!#FacmNo{i}=A,3,I
+! C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
+!C(3,#CustNo{i},0,S,$)
+!C(3,#FuncCode,4,s)
+!@V(7)
+
+! 戶名
+!#CustName{i}=c,50,S
 ! C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
 !C(3,#CustNo{i},0,S,$)
 !C(3,#FuncCode,4,s)
 
 ! 發生日期
-#MarkDate{i}=D,7,I
+!#MarkDate{i}=D,7,I
 ! C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
-C(3,#CustNo{i},0,S,$)
-C(3,#FuncCode,4,s)
-@V(7)A(DATE,0,#MarkDate{i})
+!C(3,#CustNo{i},0,S,$)
+!C(3,#FuncCode,4,s)
+!@V(7)A(DATE,0,#MarkDate{i})
 
-#RimL7R04{i}=X,1,S
-C(3,#CustNo{i},0,S,$)
-C(2,#FuncCode,S,$,$,S,$)
-E(0,@RimCustNo,#CustNo{i})
-E(0,@RimFacmNo,#FacmNo{i})
-E(0,@RimMarkDate,#MarkDate{i})
-E(0,@RimFunCd,#FuncCode)
-RESET_RIM(#RimL7R04,L7R04)
-S(L7R04,4,#RimCustNo,#RimFacmNo,#RimMarkDate,#RimFunCd)
-R(1,L7R04)
-E(0,@MarkCode{i},#L7R04MarkCode)
+!#RimL7R04{i}=X,1,S
+!C(3,#CustNo{i},0,S,$)
+!C(2,#FuncCode,S,$,$,S,$)
+!E(0,@RimCustNo,#CustNo{i})
+!E(0,@RimFacmNo,#FacmNo{i})
+!E(0,@RimMarkDate,#MarkDate{i})
+!E(0,@RimFunCd,#FuncCode)
+!RESET_RIM(#RimL7R04,L7R04)
+!S(L7R04,4,#RimCustNo,#RimFacmNo,#RimMarkDate,#RimFunCd)
+!R(1,L7R04)
+!E(0,@MarkCode{i},#L7R04MarkCode)
 !T(2,@MarkCodeDesc{i},#L7R04MarkCodeDesc)
-E(0,@StartDate{i},#L7R04StartDate)
-E(0,@EndDate{i},#L7R04EndDate)
+!E(0,@StartDate{i},#L7R04StartDate)
+!E(0,@EndDate{i},#L7R04EndDate)
 
 ! 註記碼
-#MarkCode{i}=A,2,I
-! C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
-C(3,#CustNo{i},0,S,$)
-C(3,#FuncCode,4,s)
-HELP(#MarkCodeHelp)
-@V(H,#MarkCodeHelp)
-
-! 註記碼說明
-#MarkCodeDesc{i}=X,20,L
-!C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
-C(4,#CustNo{i},S,$)
+!#MarkCode{i}=A,1,I
+!C(3,#CustNo{i},0,S,$)
 !C(3,#FuncCode,4,s)
-T(H,#MarkCode{i},#MarkCodeHelp)
+!HELP(#MarkCodeHelp)
+!@V(H,#MarkCodeHelp)
+
+!#MarkCodeX{i}=X,6,L
+!T(H,#MarkCode{i},#MarkCodeHelp)
+
+!! 註記碼說明
+!#MarkCodeDesc{i}=X,6,L
+!!C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+!C(4,#CustNo{i},S,$)
+!!C(3,#FuncCode,4,s)
+!T(H,#MarkCode{i},#MarkCodeHelp)
+
+! 原因代碼
+!#MarkRsn{i}=A,2,I
+!C(3,#CustNo{i},0,S,$)
+!C(3,#FuncCode,4,s)
+!HELP(#MarkRsnHelp)
+!@V(H,#MarkRsnHelp)
+
+!#MarkRsnX{i}=X,8,L
+!T(H,#MarkRsn{i},#MarkRsnHelp)
+
+! 原因說明
+!#MarkRsnDesc{i}=x,2.50,I
+!C(3,#CustNo{i},0,S,$)
+!C(3,#FuncCode,4,s)
+!@V(7)
+
+! 客觀減損條件
+!#LosCod{i}=A,2,I
+!C(3,#CustNo{i},0,S,$)
+!C(3,#FuncCode,4,s)
+!@V(7)V(2,0)
+
 
 ! 起始日期
-#StartDate{i}=D,7,I
+!#StartDate{i}=D,7,I
 ! C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
-C(3,#CustNo{i},0,S,$)
-C(3,#FuncCode,4,s)
-@V(7)A(DATE,0,#StartDate{i})
+!C(3,#CustNo{i},0,S,$)
+!C(3,#FuncCode,4,s)
+!@V(7)A(DATE,0,#StartDate{i})
 
 ! 終止日期
-#EndDate{i}=D,7,I
+!#EndDate{i}=D,7,I
 ! C(4,#CustNo{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
-C(3,#CustNo{i},0,S,$)
-C(3,#FuncCode,4,s)
-@V(7)A(DATE,0,#EndDate{i})
-IF(#EndDate{i} < #StartDate{i},V(P,終止日期不可小於起始日期),s)
+!C(3,#CustNo{i},0,S,$)
+!C(3,#FuncCode,4,s)
+!@V(7)A(DATE,0,#EndDate{i})
+!IF(#EndDate{i} < #StartDate{i},V(P,終止日期不可小於起始日期),s)
 
-##end
+!##end
 
 
 #RPTFG=A,1,S
@@ -331,15 +436,15 @@ T(3,[L7204] 特殊客觀減損狀況維護)
 !------ 上行電文 ------
 <sub type="TIM">
 #FuncCode
-##loop{times:10,i:1}
-#CustNo{i}
-#FacmNo{i}
-#MarkDate{i}
-#MarkCode{i}
-#MarkCodeDesc{i}
-#StartDate{i}
-#EndDate{i}
-##end
+#CustNo
+#FacmNo
+#MarkDate
+#MarkCode
+#MarkRsn
+#MarkRsnDesc
+#StartDate
+#EndDate
+#LosCod
 #END
 </sub>
 

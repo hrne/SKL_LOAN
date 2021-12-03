@@ -60,7 +60,7 @@ public class L7210 extends TradeBuffer {
 		}
 		// 紀錄變更前變更後
 		dataLog.setEnv(titaVo, beforeFacProd, iFacProd);
-		dataLog.exec();
+		dataLog.exec("修改商品分類資料檔");
 
 		this.addList(this.totaVo);
 		return this.sendList();

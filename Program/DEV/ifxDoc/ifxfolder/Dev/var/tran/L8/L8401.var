@@ -128,12 +128,12 @@ T(1,#DT3,2,7)
 
 !會計日期起迄
 #AcDateStart=D,7,I
-C(3,#CHAIN,0,E(0,#DT4),s)
+C(3,#CHAIN,0,E(0,#DT2),s)
 D(8)	
 @V(7)A(4,0,#AcDateStart)V(5,0010101,#DT2)
 
 #AcDateEnd=D,7,I
-C(3,#CHAIN,0,E(0,#DT4),s)
+C(3,#CHAIN,0,E(0,#DT2),s)
 D(8)
 @V(7)A(4,0,#AcDateEnd)V(5,#AcDateStart,#DT2)
 

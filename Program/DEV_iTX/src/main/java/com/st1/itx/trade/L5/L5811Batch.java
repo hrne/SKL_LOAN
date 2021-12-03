@@ -44,6 +44,7 @@ public class L5811Batch extends TradeBuffer {
 	@Autowired
 	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
 
+	
 	@Autowired
 	Parse parse;
 
@@ -158,6 +159,19 @@ public class L5811Batch extends TradeBuffer {
 			makeExcel.setValue(i, 34, YearlyInt, "#,##0");// 繳息金額
 			makeExcel.setValue(i, 35, result.get("F31"));// 科子細目代號暨說明
 
+			String UsageCode = result.get("F31");
+			String UsageCodeItem = "";
+			if((UsageCode).equals("310")) {
+				UsageCodeItem = "短期擔保放款";
+			} else if((UsageCode).equals("320")) {
+				UsageCodeItem = "中期擔保放款";
+			} else if((UsageCode).equals("330")) {
+				UsageCodeItem = "長期擔保放款";
+			} else if((UsageCode).equals("340")) {
+				UsageCodeItem = "三十年房貸";
+			}
+			makeExcel.setValue(i, 36, UsageCodeItem);// 科子細目代號暨說明
+			
 			i++;
 
 		}

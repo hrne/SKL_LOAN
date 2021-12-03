@@ -28,7 +28,7 @@ public class Ias39Loss implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3403343184511140475L;
+	private static final long serialVersionUID = -8991295825134026401L;
 
 @EmbeddedId
   private Ias39LossId ias39LossId;
@@ -46,13 +46,24 @@ public class Ias39Loss implements Serializable {
   private int markDate = 0;
 
   // 註記碼
-  /* 01:個別評估 99:其他 */
+  /* 1重整2破產9其他 */
   @Column(name = "`MarkCode`")
   private int markCode = 0;
 
-  // 註記碼說明
-  @Column(name = "`MarkCodeDesc`", length = 20)
-  private String markCodeDesc;
+  // 原因代碼
+  /* 01個別評價99其他 add 2021/12/2 */
+  @Column(name = "`MarkRsn`")
+  private int markRsn = 0;
+
+  // 原因說明
+  /* add 2021/12/2 */
+  @Column(name = "`MarkRsnDesc`", length = 500)
+  private String markRsnDesc;
+
+  // 客觀減損條件
+  /* 1~5, add 2021/12/2 */
+  @Column(name = "`LosCod`")
+  private int losCod = 0;
 
   // 起始日期
   @Column(name = "`StartDate`")
@@ -148,7 +159,7 @@ public class Ias39Loss implements Serializable {
 
 /**
 	* 註記碼<br>
-	* 01:個別評估 99:其他
+	* 1重整2破產9其他
 	* @return Integer
 	*/
   public int getMarkCode() {
@@ -157,7 +168,7 @@ public class Ias39Loss implements Serializable {
 
 /**
 	* 註記碼<br>
-	* 01:個別評估 99:其他
+	* 1重整2破產9其他
   *
   * @param markCode 註記碼
 	*/
@@ -166,22 +177,62 @@ public class Ias39Loss implements Serializable {
   }
 
 /**
-	* 註記碼說明<br>
-	* 
-	* @return String
+	* 原因代碼<br>
+	* 01個別評價99其他 
+add 2021/12/2
+	* @return Integer
 	*/
-  public String getMarkCodeDesc() {
-    return this.markCodeDesc == null ? "" : this.markCodeDesc;
+  public int getMarkRsn() {
+    return this.markRsn;
   }
 
 /**
-	* 註記碼說明<br>
-	* 
+	* 原因代碼<br>
+	* 01個別評價99其他 
+add 2021/12/2
   *
-  * @param markCodeDesc 註記碼說明
+  * @param markRsn 原因代碼
 	*/
-  public void setMarkCodeDesc(String markCodeDesc) {
-    this.markCodeDesc = markCodeDesc;
+  public void setMarkRsn(int markRsn) {
+    this.markRsn = markRsn;
+  }
+
+/**
+	* 原因說明<br>
+	* add 2021/12/2
+	* @return String
+	*/
+  public String getMarkRsnDesc() {
+    return this.markRsnDesc == null ? "" : this.markRsnDesc;
+  }
+
+/**
+	* 原因說明<br>
+	* add 2021/12/2
+  *
+  * @param markRsnDesc 原因說明
+	*/
+  public void setMarkRsnDesc(String markRsnDesc) {
+    this.markRsnDesc = markRsnDesc;
+  }
+
+/**
+	* 客觀減損條件<br>
+	* 1~5, add 2021/12/2
+	* @return Integer
+	*/
+  public int getLosCod() {
+    return this.losCod;
+  }
+
+/**
+	* 客觀減損條件<br>
+	* 1~5, add 2021/12/2
+  *
+  * @param losCod 客觀減損條件
+	*/
+  public void setLosCod(int losCod) {
+    this.losCod = losCod;
   }
 
 /**
@@ -301,7 +352,8 @@ public class Ias39Loss implements Serializable {
 
   @Override
   public String toString() {
-    return "Ias39Loss [ias39LossId=" + ias39LossId + ", markCode=" + markCode + ", markCodeDesc=" + markCodeDesc + ", startDate=" + startDate
-           + ", endDate=" + endDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "Ias39Loss [ias39LossId=" + ias39LossId + ", markCode=" + markCode + ", markRsn=" + markRsn + ", markRsnDesc=" + markRsnDesc
+           + ", losCod=" + losCod + ", startDate=" + startDate + ", endDate=" + endDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

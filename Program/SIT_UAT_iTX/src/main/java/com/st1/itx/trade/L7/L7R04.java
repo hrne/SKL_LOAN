@@ -2,8 +2,6 @@ package com.st1.itx.trade.L7;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L7R04")
 @Scope("prototype")
 public class L7R04 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L7R04.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -67,7 +64,7 @@ public class L7R04 extends TradeBuffer {
 		FacMainId iFacMainId = new FacMainId();
 		iFacMainId.setCustNo(iCustNo);
 		iFacMainId.setFacmNo(iFacmNo);
-		
+
 		FacMain tFacMain = new FacMain();
 
 		/* DB服務 */
@@ -91,7 +88,6 @@ public class L7R04 extends TradeBuffer {
 			}
 		}
 
-		
 		// 檢核 [特殊客觀減損狀況檔(Ias39Loss)]
 		Ias39LossId iIas39LossId = new Ias39LossId();
 		iIas39LossId.setCustNo(iCustNo);
@@ -139,19 +135,21 @@ public class L7R04 extends TradeBuffer {
 		/* key 名稱需與L7R04.tom相同 */
 		this.totaVo.putParam("L7R04CustNo", tIas39Loss.getCustNo());
 		this.totaVo.putParam("L7R04FacmNo", tIas39Loss.getFacmNo());
-		if ( tIas39Loss.getMarkDate() == 0) {
+		if (tIas39Loss.getMarkDate() == 0) {
 			this.totaVo.putParam("L7R04MarkDate", "");
 		} else {
 			this.totaVo.putParam("L7R04MarkDate", tIas39Loss.getMarkDate());
 		}
 		this.totaVo.putParam("L7R04MarkCode", tIas39Loss.getMarkCode());
-		this.totaVo.putParam("L7R04MarkCodeDesc", tIas39Loss.getMarkCodeDesc());
-		if ( tIas39Loss.getStartDate() == 0) {
+		this.totaVo.putParam("L7R04MarkRsn", tIas39Loss.getMarkRsn());
+		this.totaVo.putParam("L7R04MarkRsnDesc", tIas39Loss.getMarkRsnDesc());
+		this.totaVo.putParam("L7R04LosCod", tIas39Loss.getLosCod());
+		if (tIas39Loss.getStartDate() == 0) {
 			this.totaVo.putParam("L7R04StartDate", "");
 		} else {
 			this.totaVo.putParam("L7R04StartDate", tIas39Loss.getStartDate());
 		}
-		if ( tIas39Loss.getEndDate() == 0) {
+		if (tIas39Loss.getEndDate() == 0) {
 			this.totaVo.putParam("L7R04EndDate", "");
 		} else {
 			this.totaVo.putParam("L7R04EndDate", tIas39Loss.getEndDate());

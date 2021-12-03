@@ -28,11 +28,11 @@ E(0,0)
 ["#FdUsageCode+資金用途別",#UsageCode1,#UsageCodeX],
 ["#FdCustId+借戶統編",#CustId],
 ["#FdCustName+借戶姓名",#CustName],
+[#<->#,"#FdLineAmt+核准額度",#LineAmt],
+["#FdLoanAmt+初貸金額",#LoanAmt],
+["#FdLoanBal+放款餘額",#LoanBal],
 [#<->#,"#FdAcctCode+業務科目代號",#AcctCode,#AcctCodX],
 !["#FdRepayCode+繳款方式",#RepayCode,#RepayCodeX],
-["#FdLineAmt+核准額度",#LineAmt],
-["#FdLoanAmt+初貸金額",#LoanAmt],
-[#<->#,"#FdLoanBal+放款餘額",#LoanBal],
 ["#FdFirstDrawdownDate+貸款起日",#FirstDrawdownDate],
 ["#FdMaturityDate+貸款迄日",#MaturityDate],
 ["#FdYearlyInt+年度繳息金額",#YearlyInt],
@@ -71,7 +71,7 @@ T(3,CdCode.FuncCode2)
 T(3,CdCode.AcctCode)  
                 
 #AcctCodeHelp=x,1024,S   
-T(2,310:短期擔保放款;320:中期擔保放款;330:長期擔保放款;340:三十年房貸;)
+T(2,310:短期擔保放款;320:中期擔保放款;330:長期擔保放款;340:三十年房貸)
 
 #CODERepayCode=x,20,S                  
 T(3,CdCode.RepayCode)  
@@ -165,10 +165,10 @@ T(2,@FdLoanBal,#WKSTAR1)
 T(2,@FdFirstDrawdownDate,#WKSTAR1)
 T(2,@FdMaturityDate,#WKSTAR1)
 T(2,@FdYearlyInt,#WKSTAR1)
-T(2,@FdHouseBuyDate,#WKSTAR1)   
-T(2,@FdCustName,#WKSTAR1)
-T(2,@FdCustId,#WKSTAR1)
-T(2,@FdLineAmt,#WKSTAR1)
+T(2,@FdHouseBuyDate,)   
+T(2,@FdCustName,)
+T(2,@FdCustId,)
+T(2,@FdLineAmt,)
                                
 #YearMonth=A,5,L
 #CustNo=A,7,L
@@ -204,15 +204,30 @@ E(0,@YearlyInt,#L5R41YearlyInt)
 E(0,@HouseBuyDate,#L5R41HouseBuyDate)
 T(H,@AcctCodX,#AcctCode,#AcctCodeHelp)
 
-#CustId=X,10,I
+#CustId=X,10,L
+!C(2,#FuncCode,s,s,$,s,s,s)
+!@V(7)A(ID_UNINO,0,#CustId)
+
+
+#CustName=X,20,L
+!C(2,#FuncCode,s,s,$,s,s,s)
+!@V(7)
+
+!核准額度
+#LineAmt=m,14,L
+!C(2,#FuncCode,s,s,$,s,s,s)
+!@V(2,0)
+
+!撥款金額
+#LoanAmt=m,14,I
 C(2,#FuncCode,s,s,$,s,s,s)
-@V(7)A(ID_UNINO,0,#CustId)
+@V(2,0)
 
-
-#CustName=X,20,I
-C(2,#FuncCode,s,s,$,s,s,s)
-@V(7)
-
+!放款餘額
+#LoanBal=m,14,I                       
+C(2,#FuncCode,s,s,$,s,s,s)   
+@V(2,0)
+	
 !業務科目
 #AcctCode=A,3,I
 C(2,#FuncCode,s,s,$,s,s,s)
@@ -231,20 +246,8 @@ T(H,#AcctCode,#AcctCodeHelp)
 #RepayCodeX=X,20,L
 !T(H,#RepayCode,#RepayCodeHelp)
 
-!核准額度
-#LineAmt=m,14,I
-C(2,#FuncCode,s,s,$,s,s,s)
-@V(2,0)
 
-!撥款金額
-#LoanAmt=m,14,I
-C(2,#FuncCode,s,s,$,s,s,s)
-@V(2,0)
 
-!放款餘額
-#LoanBal=m,14,I                       
-C(2,#FuncCode,s,s,$,s,s,s)   
-@V(2,0)
 
 !初貸日
 #FirstDrawdownDate=D,7,I
@@ -264,7 +267,7 @@ C(2,#FuncCode,s,s,$,s,s,s)
 !房屋取得日期
 #HouseBuyDate=D,7,I                      
 C(2,#FuncCode,s,s,$,s,s,s)
-@V(7)A(DATE,0,#HouseBuyDate)                                 
+@A(DATE,0,#HouseBuyDate)                                 
                                   
                                   
 #AGAIN=X,1,S

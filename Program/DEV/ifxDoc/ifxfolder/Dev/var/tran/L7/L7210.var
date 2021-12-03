@@ -56,7 +56,7 @@ T(3,CdCode.FuncCode2)
 #FuncCode2Help=x,50,S 
 
 #CODEIFRSCODE=x,20,S                  
-T(3,CdCode.IfrsProdCode)                  
+T(3,CdCode.Ifrs9ProdCode)                  
 #IfrsProdCode2Help=x,300,S 
 
 #HelpRim=X,1,S
@@ -101,7 +101,7 @@ C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,�
 
 ! IFRS階梯商品別下拉選單
 #IfrsStepProdCodeHelp=X,50,S
-T(3, :非階梯式;A:固定階梯;B:浮動階梯)
+T(3,N:非階梯式;A:固定階梯;B:浮動階梯)
 
 ! 商品代碼
 #ProdNo=X,5,L

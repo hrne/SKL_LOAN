@@ -152,15 +152,15 @@ T(2,#OOFunc2+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent+#OOEnable)
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L7202;text=修改;ntxbuf=#OOBUF2})
 
-! 刪除的按鈕
-#OOFunc4=A,1,S
-E(0,4)
-
-#OOBUF4=X,38,S
-T(2,#OOFunc4+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent+#OOEnable)
-
-#OOBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L7202;text=刪除;ntxbuf=#OOBUF4})
+!! 刪除的按鈕  (移除刪除功能)
+!#OOFunc4=A,1,S
+!E(0,4)
+!
+!#OOBUF4=X,38,S
+!T(2,#OOFunc4+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent+#OOEnable)
+!
+!#OOBTN4=X,4,S
+!BIND(grid,{cmd=CHAIN;ntxcd=L7202;text=刪除;ntxbuf=#OOBUF4})
 
 </sub>
 
@@ -201,8 +201,8 @@ TXFORM=L7022
 #OOBTN2=
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 
-#OOBTN4=
-{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+!#OOBTN4=
+!{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
 #OODate=生效日期
 {width:100,align:'center'}
