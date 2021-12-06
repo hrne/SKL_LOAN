@@ -145,6 +145,10 @@ T(3,1)ASGN(LOOP$)
 #OOMarkCode=A,1,S
 #OOMarkCodeDesc=X,20,S
 T(H,#OOMarkCode,#MarkCodeHelp)
+#OOMarkCodeFull=X,23,L
+C(4,#OOMarkCode,S,$)
+T(2,#OOMarkCode+ +#OOMarkCodeDesc)
+
 
 ! 起始日期(TOTA)
 #OOStartDate=D,7,S
@@ -229,7 +233,7 @@ TXFORM=L7904
 #OOMarkDate=發生日期
 {width:100,align:'center'}
 
-#OOMarkCodeDesc=註記碼
+#OOMarkCodeFull=註記碼
 {width:100,align:'center'}
 
 #OOStartDate=起始日期

@@ -65,7 +65,7 @@ T(3,*)
 #FdMarkRsn=X,1,L
 T(3,*)
 #FdMarkRsnDesc=X,1,L
-T(3,*)
+T(3, )
 #FdStartDate=X,1,L
 T(3,*)
 #FdEndDate=X,1,L
@@ -222,9 +222,13 @@ C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 #CustName=c,50,L
 !C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 
+#DATE=D,8,S
+T(4,#SYSCDATE)
+
 ! 發生日期
 #MarkDate=D,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+T(1,#DATE,2,7)
 @V(7)A(DATE,0,#MarkDate)
 
 #RimFacmNo=A,3,S
@@ -280,8 +284,7 @@ T(H,#MarkRsn,#MarkRsnHelp)
 ! 原因說明
 #MarkRsnDesc=x,10.50,I
 C(3,#FuncCode,4,s)
-@V(7)
-
+!@V(7)
 
 ! 起始日期
 #StartDate=D,7,I

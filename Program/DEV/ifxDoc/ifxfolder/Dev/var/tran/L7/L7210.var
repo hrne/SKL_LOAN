@@ -42,7 +42,7 @@ T(3, )
 #FdEndDate=X,2,L
 T(3, )
 #FdIfrsStepProdCode=X,2,L
-T(3, )
+T(3,*)
 #FdIfrsProdCode=X,2,L
 T(3,*)
 

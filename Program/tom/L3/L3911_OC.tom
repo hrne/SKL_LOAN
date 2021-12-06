@@ -4,6 +4,7 @@ OOIntStartDate=9,7
 OOIntEndDate=9,7
 OOCurrencyCode=X,3
 OOTxAmt=+9,14.2
+OOTempRepay=+9,14.2
 OOShortFall=+9,14.2
 OOBreachAmt=+9,14.2
 OORepayCode=X,20

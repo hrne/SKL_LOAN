@@ -468,6 +468,11 @@ E(0,0)T(H,#OOCurrencyCode,#CurrPrecisionHelp)
 #OOTxAmtX=X,22,O
 CALL2(#ADJUSTDOT,#OOPrecision,#OOTxAmt,#OOTxAmtX)
 P(R,#OOTxAmtX)
+#OOTempRepay=+m,14.2,S
+
+#OOTempRepayX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOTempRepay,#OOTempRepayX)
+P(R,#OOTempRepayX)
 
 #OOShortFall=+m,14.2,S
 
@@ -520,7 +525,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3917; ntxbuf=#OOBUF1})
 
 TXFORM=L3911
 #OCurrencyCode#OLoanBal#OSpecificDd#OStoreRate1#OStoreRate2#OStoreRate3#OEffectDate1#OEffectDate2#OEffectDate3
-#OOFacmNo#OOEntryDate#OOIntStartDate#OOIntEndDate#OOCurrencyCode#OOTxAmt#OOShortFall#OOBreachAmt#OORepayCode
+#OOFacmNo#OOEntryDate#OOIntStartDate#OOIntEndDate#OOCurrencyCode#OOTxAmt#OOTempRepay#OOShortFall#OOBreachAmt#OORepayCode
 #OOAcDate#OOTellerNo#OOTxtNo
 ^
 
@@ -571,6 +576,9 @@ TXFORM=L3911
 #OOTxAmtX=交易金額
 {width:170}
 
+#OOTempRepayX=暫收金額
+{width:170}
+
 #OOShortFallX=溢短收
 {width:170}
 
@@ -615,6 +623,9 @@ TXFORM=L3911
 #OOTxAmtX=交易金額
 {width:170}
 
+#OOTempRepayX=暫收金額
+{width:170}
+
 #OOShortFallX=溢短收
 {width:170}
 
@@ -643,6 +654,6 @@ TXFORM=L3911
 #OSpecificDd#OStoreRate2X
 #EntryStartDate#EntryEndDate#OStoreRate3X
 %
-#OOFacmNo#OOEntryDate#OOIntStartDate#OOIntEndDate#OOCurrencyCode#OOTxAmtX#OOShortFallX#OOBreachAmtX#OORepayCodeX
+#OOFacmNo#OOEntryDate#OOIntStartDate#OOIntEndDate#OOCurrencyCode#OOTxAmtX#OOTempRepayX#OOShortFallX#OOBreachAmtX#OORepayCodeX
 @^
 </sub>

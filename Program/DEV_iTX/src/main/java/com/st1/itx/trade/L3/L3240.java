@@ -351,11 +351,11 @@ public class L3240 extends TradeBuffer {
 		}
 		tLoanBorMain.setNextPayIntDate(loanCom.getNextPayIntDate(tLoanBorMain.getAmortizedCode(),
 				tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFreqBase(), tLoanBorMain.getSpecificDate(),
-				tLoanBorMain.getSpecificDd(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getMaturityDate()));
+				tLoanBorMain.getSpecificDd(), tLoanBorMain.getPrevPayIntDate(), tLoanBorMain.getMaturityDate()));
 		tLoanBorMain
 				.setNextRepayDate(loanCom.getNextRepayDate(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getRepayFreq(),
 						tLoanBorMain.getFreqBase(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
-						tLoanBorMain.getSpecificDate(), tLoanBorMain.getMaturityDate(), tLoanBorMain.getGraceDate()));
+						tLoanBorMain.getPrevRepaidDate(), tLoanBorMain.getMaturityDate(), tLoanBorMain.getGraceDate()));
 		wkNewBorxNo = tLoanBorMain.getLastBorxNo() + 1;
 		// 放款交易訂正交易須由最後一筆交易開始訂正
 		tLoanBorMain.setLastBorxNo(wkNewBorxNo);

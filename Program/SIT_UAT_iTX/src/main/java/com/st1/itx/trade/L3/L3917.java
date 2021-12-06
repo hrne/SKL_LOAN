@@ -110,6 +110,7 @@ public class L3917 extends TradeBuffer {
 
 			if (t.getTempAmt().compareTo(BigDecimal.ZERO) > 0) {
 				wkTempAmt = wkTempAmt.add(t.getTempAmt());
+				wkOverflow = wkOverflow.add(t.getTempAmt()); // 溢收金額
 			} else {
 				wkTempRepay = wkTempRepay.subtract(t.getTempAmt());
 			}
@@ -119,7 +120,6 @@ public class L3917 extends TradeBuffer {
 			wkDelayInt = wkDelayInt.add(t.getDelayInt()); // 延遲息
 			wkBreachAmt = wkBreachAmt.add(t.getBreachAmt()); // 違約金
 			wkShortfall = wkShortfall.add(t.getUnpaidInterest().add(t.getUnpaidPrincipal())); // 短收金額
-			wkOverflow = wkOverflow.add(t.getOverflow()); // 溢收金額
 			wkLawFee = wkLawFee.add(TempLawFee); // 法務費
 			wkAcctFee = wkAcctFee.add(TempAcctFee); // 帳管費
 			wkModifyFee = wkModifyFee.add(TempModifyFee); // 契變手續費

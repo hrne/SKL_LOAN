@@ -70,10 +70,10 @@ public class L7204 extends TradeBuffer {
 			switch (funcd) {
 			case "1": // 若為新增，但額度資料不存在，拋錯
 				throw new LogicException("E0001",
-						"額度主檔(戶號:" + titaVo.getParam("CustNo") + ",額度:" + titaVo.getParam("FacmNo") + ")");
+						"額度主檔(戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ")");
 			case "2": // 若為修改，但額度資料不存在，拋錯
 				throw new LogicException("E0001",
-						"額度主檔(戶號:" + titaVo.getParam("CustNo") + ",額度:" + titaVo.getParam("FacmNo") + ")");
+						"額度主檔(戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ")");
 			default:
 				break;
 			}
@@ -114,8 +114,8 @@ public class L7204 extends TradeBuffer {
 				sIas39LossService.insert(tIas39Loss);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
-					throw new LogicException(titaVo, "E0002", "戶號:" + titaVo.getParam("CustNo") + ",額度:"
-							+ titaVo.getParam("FacmNo") + ",發生日期" + titaVo.getParam("MarkDate")); // 新增資料已存在
+					throw new LogicException(titaVo, "E0002", "戶號=" + titaVo.getParam("CustNo") + ",額度="
+							+ titaVo.getParam("FacmNo") + ",發生日期=" + titaVo.getParam("MarkDate")); // 新增資料已存在
 				} else {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 				}
@@ -135,8 +135,8 @@ public class L7204 extends TradeBuffer {
 			tIas39Loss = sIas39LossService.holdById(new Ias39LossId(iCustNo, iFacmNo, iMarkDate));
 
 			if (tIas39Loss == null) {
-				throw new LogicException(titaVo, "E0003", "戶號:" + titaVo.getParam("CustNo") + ",額度:"
-						+ titaVo.getParam("FacmNo") + ",發生日期:" + titaVo.getParam("MarkDate")); // 修改資料不存在
+				throw new LogicException(titaVo, "E0003", "戶號=" + titaVo.getParam("CustNo") + ",額度="
+						+ titaVo.getParam("FacmNo") + ",發生日期=" + titaVo.getParam("MarkDate")); // 修改資料不存在
 			}
 
 			Ias39Loss tIas39Loss2 = (Ias39Loss) dataLog.clone(tIas39Loss); ////

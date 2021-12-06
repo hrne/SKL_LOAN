@@ -76,7 +76,8 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 E(0,0)
 
 #DATE=D,8,S
-T(4,DATE$)
+T(4,#SYSCDATE)
+!T(4,DATE$)
 
 ! 生效日期起
 #DateStart=D,7,I

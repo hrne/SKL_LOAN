@@ -174,11 +174,19 @@ public class L3911 extends TradeBuffer {
 		String TempCurrencyCode = "";
 		String TempTitaTlrNo = "";
 		String TempTitaTxtNo = "";
-		Object TempRepayCode = "";
+		Object repayCode = "";
 
-		BigDecimal TempTxAmt = new BigDecimal("0");
 		BigDecimal TempShortFall = new BigDecimal("0");
 		BigDecimal TempBreachAmt = new BigDecimal("0");
+		BigDecimal wkTempAmt = new BigDecimal("0");// 暫收抵繳
+		BigDecimal wkRepayAmt = new BigDecimal("0");// 回收金額
+		BigDecimal reduceAmt = new BigDecimal("0");
+		BigDecimal acctFee = new BigDecimal("0");
+		BigDecimal modifyFee = new BigDecimal("0");
+		BigDecimal fireFee = new BigDecimal("0");
+		BigDecimal lawFee = new BigDecimal("0");
+		BigDecimal repayAmt = new BigDecimal("0");
+		BigDecimal wkTempRepay = new BigDecimal("0");// 暫收金額
 
 		OccursList occursList = new OccursList();
 
@@ -190,7 +198,7 @@ public class L3911 extends TradeBuffer {
 				continue;
 			}
 
-			/* 暫存的額度編號 撥款序號 入帳日 計息起日 計息迄日 */
+			/* 暫存的額度編號 撥款序號 入帳日 計息起日 計息迄日 會計日期 交易經辦 交易序號 */
 			this.info("LoanBorTx" + ln);
 
 			if (firstFg) {// 先存第一筆資料
@@ -200,18 +208,41 @@ public class L3911 extends TradeBuffer {
 				TempIntStartDate = ln.getIntStartDate();
 				TempIntEndDate = ln.getIntEndDate();
 				TempCurrencyCode = ln.getTitaCurCd();
+				TempAcDate = ln.getAcDate();
+				TempTitaTxtNo = ln.getTitaTxtNo();
+				TempTitaTlrNo = ln.getTitaTlrNo();
 				firstFg = false;
 
 			}
-
+			// 資料都相同，資金加總
 			if (TempFacmNo == ln.getFacmNo() && TempEntryDate == ln.getEntryDate()
-					&& TempIntStartDate == ln.getIntStartDate() && TempIntEndDate == ln.getIntEndDate()) { // 資料都相同
-																											// 資金加總
+					&& TempIntStartDate == ln.getIntStartDate() && TempIntEndDate == ln.getIntEndDate()
+					&& TempAcDate == ln.getAcDate() && TempTitaTxtNo.equals(ln.getTitaTxtNo())
+					&& TempTitaTlrNo.equals(ln.getTitaTlrNo())) {
 
-				TempTxAmt = TempTxAmt.add(ln.getTxAmt());
 				TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
 				TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt());
 
+				TempVo tTempVo = new TempVo();
+
+				tTempVo = tTempVo.getVo(ln.getOtherFields());
+
+				
+				acctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
+				modifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
+				fireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
+				lawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
+
+				repayAmt = ln.getPrincipal().add(ln.getInterest()).add(ln.getDelayInt()).add(ln.getBreachAmt())
+						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee)
+						.add(lawFee);
+
+				wkRepayAmt = wkRepayAmt.add(repayAmt); // 回收金額
+				wkTempAmt = wkTempAmt.add(ln.getTempAmt());
+
+				if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
+					wkTempRepay = wkTempRepay.subtract(ln.getTempAmt());
+				}
 			} else { // 資料不同 先拿temp資料塞occurs再更新temp資料
 
 				/* 資料不同 先拿temp資料塞occurs */
@@ -221,12 +252,13 @@ public class L3911 extends TradeBuffer {
 				occursList.putParam("OOIntEndDate", TempIntEndDate);
 				occursList.putParam("OOCurrencyCode", TempCurrencyCode);
 
-				occursList.putParam("OOTxAmt", TempTxAmt);
+				occursList.putParam("OOTxAmt", wkRepayAmt.add(wkTempAmt)); // 交易金額
+				occursList.putParam("OOTempRepay", wkTempRepay);
 				occursList.putParam("OOShortFall", TempShortFall);
 				occursList.putParam("OOBreachAmt", TempBreachAmt);
 
-				if (TempRepayCode.toString().length() == 2) {
-					occursList.putParam("OORepayCode", TempRepayCode);
+				if (repayCode.toString().length() == 2) {
+					occursList.putParam("OORepayCode", repayCode);
 				} else {
 					occursList.putParam("OORepayCode", "");
 				}
@@ -242,21 +274,36 @@ public class L3911 extends TradeBuffer {
 				TempIntEndDate = ln.getIntEndDate();
 				TempCurrencyCode = ln.getTitaCurCd();
 
-				TempTxAmt = new BigDecimal("0");
 				TempShortFall = new BigDecimal("0");
 				TempBreachAmt = new BigDecimal("0");
 
-				TempTxAmt = TempTxAmt.add(ln.getTxAmt());
 				TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
 				TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt());
 
 				TempVo tTempVo = new TempVo();
-				TempRepayCode = tTempVo.getVo(ln.getOtherFields()).getParam("RepayCode");
+				repayCode = ln.getRepayCode();
 
+				tTempVo = tTempVo.getVo(ln.getOtherFields());
+
+
+				acctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
+				modifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
+				fireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
+				lawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
+
+				repayAmt = ln.getPrincipal().add(ln.getInterest()).add(ln.getDelayInt()).add(ln.getBreachAmt())
+						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee)
+						.add(lawFee);
+
+				wkRepayAmt = wkRepayAmt.add(repayAmt); // 回收金額
+				wkTempAmt = wkTempAmt.add(ln.getTempAmt()); //暫收金額
 				TempAcDate = ln.getAcDate();
 				TempTitaTlrNo = ln.getTitaTlrNo();
 				TempTitaTxtNo = ln.getTitaTxtNo();
 
+				if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
+					wkTempRepay = wkTempRepay.subtract(ln.getTempAmt()); //暫收抵繳
+				}
 				this.totaVo.addOccursList(occursList);
 				occursList = new OccursList();
 			}
@@ -270,12 +317,13 @@ public class L3911 extends TradeBuffer {
 			occursList.putParam("OOIntEndDate", TempIntEndDate);
 			occursList.putParam("OOCurrencyCode", TempCurrencyCode);
 
-			occursList.putParam("OOTxAmt", TempTxAmt);
+			occursList.putParam("OOTxAmt", wkRepayAmt.add(wkTempAmt));
+			occursList.putParam("OOTempRepay", wkTempRepay);
 			occursList.putParam("OOShortFall", TempShortFall);
 			occursList.putParam("OOBreachAmt", TempBreachAmt);
 
-			if (TempRepayCode.toString().length() == 2) {
-				occursList.putParam("OORepayCode", TempRepayCode);
+			if (repayCode.toString().length() == 2) {
+				occursList.putParam("OORepayCode", repayCode);
 			} else {
 				occursList.putParam("OORepayCode", "");
 			}

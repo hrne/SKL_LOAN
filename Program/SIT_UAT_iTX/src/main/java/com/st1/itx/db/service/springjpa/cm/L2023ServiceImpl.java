@@ -269,6 +269,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"  WHERE" ; 
 		sql +=	"    cu.\"CustId\" = :custid" ; 
 		sql +=	"    AND fr.\"CreditSysNo\" = fm.\"CreditSysNo\"";
+		sql +=	"  ORDER BY \"CreditSysNo\", \"ApplNo\"";
 
 		this.info("sql=" + sql);
 		Query query;

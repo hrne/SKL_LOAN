@@ -1,10 +1,10 @@
+
+CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Ap_Upd"
+(
 -- 程式功能：維護 Ias34Ap 每月IAS34資料欄位清單A檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L7_Ias34Ap_Upd"(20201231,'System',0);
 --
-
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Ap_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2,   -- 經辦
@@ -86,7 +86,7 @@ BEGIN
          , NVL(M."OvduDate", 0)                      AS "OvduDate"          -- 轉催收款日期
          , NVL(M."BadDebtDate", 0)                   AS "BadDebtDate"       -- 轉銷呆帳日期
          , NVL(M."BadDebtAmt", 0)                    AS "BadDebtAmt"        -- 轉銷呆帳金額
-         , CASE WHEN LOS."MarkCode" IS NOT NULL  THEN LOS."MarkCode"                     -- 符合特殊客觀減損狀況檔
+         , CASE WHEN LOS."LosCod" IS NOT NULL  THEN LOS."LosCod"            -- 符合特殊客觀減損狀況檔
                 WHEN NVL(F."AgreementFg",' ') = 'Y' AND F."EntCode" IN ('1')     THEN 3  -- 協議件 法人
                 WHEN NVL(F."AgreementFg",' ') = 'Y' AND F."EntCode" NOT IN ('1') THEN 4  -- 協議件 自然人
                 WHEN M."Status" NOT IN (0)          AND F."EntCode" IN ('1')     THEN 3  -- 非正常戶 法人

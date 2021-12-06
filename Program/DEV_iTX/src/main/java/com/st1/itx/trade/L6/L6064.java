@@ -60,20 +60,20 @@ public class L6064 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 200; // 217 * 200 = 43400
+		this.limit = 100; // 217 * 200 = 43400
 
 		Slice<CdCode> slCdCode = null;
-		if (iDefCode.length() > 0 || iDefType.equals("") || iDefItem.length()>0 ) {
-			if(iDefItem.length()>0) {
+		if (iDefCode.length() > 0 || iDefType.equals("") || iDefItem.length() > 0) {
+			if (iDefItem.length() > 0) {
 				slCdCode = sCdCodeDefService.defItemEq3("%" + iDefItem + "%", this.index, this.limit, titaVo);
-			} else if(("").equals(iCode)) {
-				slCdCode = sCdCodeDefService.defItemEq(iDefCode, "%" +iCodeItem + "%", index, limit, titaVo);
-			} else {				
-				slCdCode = sCdCodeDefService.defCodeEq(iDefCode, "%" +iCode + "%", this.index, this.limit, titaVo);
+			} else if (("").equals(iCode)) {
+				slCdCode = sCdCodeDefService.defItemEq(iDefCode, "%" + iCodeItem + "%", index, limit, titaVo);
+			} else {
+				slCdCode = sCdCodeDefService.defCodeEq(iDefCode, "%" + iCode + "%", this.index, this.limit, titaVo);
 			}
 		} else {
 			int iDefType9 = Integer.parseInt(iDefType);
-			slCdCode = sCdCodeDefService.DefTypeEq("CodeType", iDefType9, iCode + "%",iCodeItem + "%", this.index, this.limit, titaVo);
+			slCdCode = sCdCodeDefService.DefTypeEq("CodeType", iDefType9, iCode + "%", iCodeItem + "%", this.index, this.limit, titaVo);
 		}
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
@@ -82,23 +82,23 @@ public class L6064 extends TradeBuffer {
 		}
 		// 如有找到資料
 		for (CdCode tCdCode : lCdCode) {
-			
-			if(iDefItem.length() > 0) {
-				Slice<CdCode> m1CdCode = sCdCodeDefService.defCodeEq(tCdCode.getCode(), "%" +iCode + "%", index, limit, titaVo);
+
+			if (iDefItem.length() > 0) {
+				Slice<CdCode> m1CdCode = sCdCodeDefService.defCodeEq(tCdCode.getCode(), "%" + iCode + "%", index, limit, titaVo);
 				List<CdCode> m2CdCode = m1CdCode == null ? null : m1CdCode.getContent();
-				if(m2CdCode != null) {
-					this.info("m2CdCode=="+m2CdCode);
+				if (m2CdCode != null) {
+					this.info("m2CdCode==" + m2CdCode);
 					for (CdCode m3CdCode : m2CdCode) {
-					OccursList occursList = new OccursList();
-					occursList.putParam("OODefCode", m3CdCode.getDefCode());
-					occursList.putParam("OOCode", m3CdCode.getCode());
-					occursList.putParam("OOItem", m3CdCode.getItem());
-					occursList.putParam("OOType", m3CdCode.getDefType());
-					occursList.putParam("OOEnable", m3CdCode.getEnable());
-					this.totaVo.addOccursList(occursList);
+						OccursList occursList = new OccursList();
+						occursList.putParam("OODefCode", m3CdCode.getDefCode());
+						occursList.putParam("OOCode", m3CdCode.getCode());
+						occursList.putParam("OOItem", m3CdCode.getItem());
+						occursList.putParam("OOType", m3CdCode.getDefType());
+						occursList.putParam("OOEnable", m3CdCode.getEnable());
+						this.totaVo.addOccursList(occursList);
 					}
 				}
-				
+
 			} else {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OODefCode", tCdCode.getDefCode());
@@ -108,9 +108,9 @@ public class L6064 extends TradeBuffer {
 				occursList.putParam("OOEnable", tCdCode.getEnable());
 				this.totaVo.addOccursList(occursList);
 			}
-			
+
 			/* 將每筆資料放入Tota的OcList */
-			
+
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

@@ -109,65 +109,79 @@ public class L6905 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 482 * 100 = 48,200
+		this.limit = 50; // 482 * 100 = 48,200
 
 		// 查詢會計帳務明細檔
 		Slice<AcDetail> slAcDetail = null;
 		switch (iInqType) {
 		case 0: // 全部彙計方式
-			if(iRvNo.trim().isEmpty()) {
-				slAcDetail = sAcDetailService.SubBookAcNoCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, this.index, this.limit, titaVo);
+			if (iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookAcNoCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, this.index, this.limit,
+						titaVo);
 			} else {
-				slAcDetail = sAcDetailService.SubBookAcNoCodeRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iRvNo+"%", this.index, this.limit, titaVo);
+				slAcDetail = sAcDetailService.SubBookAcNoCodeRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iRvNo + "%", this.index,
+						this.limit, titaVo);
 			}
-			
+
 			break;
 		case 1: // 彙總別
-			if(iRvNo.trim().isEmpty()) {
-				slAcDetail = sAcDetailService.SubBookSumNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSumNo, iSumNo, this.index,this.limit, titaVo);
+			if (iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookSumNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSumNo, iSumNo, this.index,
+						this.limit, titaVo);
 			} else {
-				slAcDetail = sAcDetailService.SubBookSumNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSumNo, iSumNo, iRvNo+"%", this.index,this.limit, titaVo);
+				slAcDetail = sAcDetailService.SubBookSumNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSumNo, iSumNo, iRvNo + "%",
+						this.index, this.limit, titaVo);
 			}
 			break;
 		case 2: // 經辦別
-			if(iRvNo.trim().isEmpty()) {
-				slAcDetail = sAcDetailService.SubBookTitaTlrNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaTlrNo, iTitaTlrNo, this.index, this.limit, titaVo);
+			if (iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookTitaTlrNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaTlrNo, iTitaTlrNo,
+						this.index, this.limit, titaVo);
 			} else {
-				slAcDetail = sAcDetailService.SubBookTitaTlrNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaTlrNo, iTitaTlrNo,iRvNo+"%", this.index, this.limit, titaVo);			
+				slAcDetail = sAcDetailService.SubBookTitaTlrNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaTlrNo, iTitaTlrNo,
+						iRvNo + "%", this.index, this.limit, titaVo);
 			}
-			
+
 			break;
 		case 3: // 整批批號
-			if(iRvNo.trim().isEmpty()) {
-				slAcDetail = sAcDetailService.SubBookTitaBatchNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaBatchNo, iTitaBatchNo, this.index, this.limit, titaVo);
+			if (iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookTitaBatchNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaBatchNo, iTitaBatchNo,
+						this.index, this.limit, titaVo);
 			} else {
-				slAcDetail = sAcDetailService.SubBookTitaBatchNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaBatchNo, iTitaBatchNo,iRvNo+"%", this.index, this.limit, titaVo);
+				slAcDetail = sAcDetailService.SubBookTitaBatchNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaBatchNo, iTitaBatchNo,
+						iRvNo + "%", this.index, this.limit, titaVo);
 			}
-						
+
 			break;
 		case 4: // 摘要代號
-			if(iRvNo.trim().isEmpty()) {
-				slAcDetail = sAcDetailService.SubBookDscptCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iDscptCode, iDscptCode, this.index, this.limit, titaVo);
+			if (iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookDscptCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iDscptCode, iDscptCode,
+						this.index, this.limit, titaVo);
 			} else {
-				slAcDetail = sAcDetailService.SubBookDscptCodeRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iDscptCode, iDscptCode,iRvNo+"%", this.index, this.limit, titaVo);
+				slAcDetail = sAcDetailService.SubBookDscptCodeRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iDscptCode, iDscptCode,
+						iRvNo + "%", this.index, this.limit, titaVo);
 			}
-						
+
 			break;
 		case 5: // 傳票批號
-			if(iRvNo.trim().isEmpty()) {
-				slAcDetail = sAcDetailService.SubBookSlipBatNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSlipBatNo, iSlipBatNo, this.index, this.limit, titaVo);
+			if (iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookSlipBatNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSlipBatNo, iSlipBatNo,
+						this.index, this.limit, titaVo);
 			} else {
-				slAcDetail = sAcDetailService.SubBookSlipBatNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSlipBatNo, iSlipBatNo,iRvNo+"%", this.index, this.limit, titaVo);
-							}
-			
+				slAcDetail = sAcDetailService.SubBookSlipBatNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSlipBatNo, iSlipBatNo,
+						iRvNo + "%", this.index, this.limit, titaVo);
+			}
+
 			break;
 		case 6: // 業務類別
-			if(iRvNo.trim().isEmpty()) {
-				slAcDetail = sAcDetailService.SubBookTitaSecNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaSecNo, iTitaSecNo, this.index, this.limit, titaVo);
+			if (iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookTitaSecNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaSecNo, iTitaSecNo,
+						this.index, this.limit, titaVo);
 			} else {
-				slAcDetail = sAcDetailService.SubBookTitaSecNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaSecNo, iTitaSecNo,iRvNo+"%", this.index, this.limit, titaVo);
+				slAcDetail = sAcDetailService.SubBookTitaSecNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaSecNo, iTitaSecNo,
+						iRvNo + "%", this.index, this.limit, titaVo);
 			}
-						
+
 			break;
 		}
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();

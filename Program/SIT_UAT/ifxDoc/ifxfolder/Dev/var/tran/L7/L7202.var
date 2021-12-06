@@ -149,7 +149,9 @@ IF (#FuncCode==1 ,T(F,#Date{i},1)T(F,#Type{i},1),
 ##end
 
 #DATE=D,8,S
-T(4,DATE$)
+T(4,#SYSCDATE)
+!T(4,DATE$)
+
 
 ! 生效日期
 #Date1=D,7,I

@@ -281,11 +281,11 @@ public class L8701Batch extends TradeBuffer {
 		if ("990".equals(acctCode))
 			oAcctItem = "催收";
 		else if ("310".equals(acctCode))
-			oAcctItem = "短擔";
+			oAcctItem = "短擔(放)";
 		else if ("320".equals(acctCode))
-			oAcctItem = "中擔";
+			oAcctItem = "中擔(放)";
 		else
-			oAcctItem = "長擔";
+			oAcctItem = "長擔(放)";
 
 		String oUsageItem;
 		// 1:購置不動產 ==> 2: 購置不動產 3: 營業用資產 4: 固定資產
