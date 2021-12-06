@@ -8766,6 +8766,7 @@ TXFORM=L6R27
 #L6R28PerfBackRepayAmt=m,14.2,S
 #L6R28PerfBackPeriodS=N,3,S
 #L6R28PerfBackPeriodE=N,3,S
+#L6R28EmpNoList=X,150,S
 #L6R28AcctCode310A=N,3,S
 #L6R28AcctCode310B=N,3,S
 #L6R28AcctCode320A=N,3,S
@@ -8808,6 +8809,7 @@ TXFORM=L6R28
 #L6R28PerfBackRepayAmt
 #L6R28PerfBackPeriodS
 #L6R28PerfBackPeriodE
+#L6R28EmpNoList
 #L6R28AcctCode310A
 #L6R28AcctCode310B
 #L6R28AcctCode320A

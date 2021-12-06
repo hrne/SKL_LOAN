@@ -52,7 +52,7 @@ public class L2702 extends TradeBuffer {
 
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2702 ");
@@ -136,7 +136,7 @@ public class L2702 extends TradeBuffer {
 			if (tCustRmk.getCreateEmpNo() != tCustRmk.getLastUpdateEmpNo() && titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "非建檔者修改");
 			}
-						
+
 			try {
 				// 修改
 				tCustRmk = sCustRmkService.update2(tCustRmk);
@@ -146,7 +146,7 @@ public class L2702 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeCustRmk, tCustRmk);
-			dataLog.exec();
+			dataLog.exec("修改顧客管控警訊檔資料");
 
 			// FunCd 4刪除
 		} else if (iFunCd == 4) {
@@ -163,7 +163,7 @@ public class L2702 extends TradeBuffer {
 			if (titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-						
+
 			try {
 
 				this.info(" L2702 deleteCustRmkLog" + tCustRmk);

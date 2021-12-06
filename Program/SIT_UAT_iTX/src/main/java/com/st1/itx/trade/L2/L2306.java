@@ -211,7 +211,7 @@ public class L2306 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeReltMain, tReltMain);
-			dataLog.exec();
+			dataLog.exec("修改關係人主檔關係");
 
 			// 刪除
 		} else if (iFunCd == 4) {

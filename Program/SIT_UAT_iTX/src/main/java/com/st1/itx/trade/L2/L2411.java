@@ -378,7 +378,7 @@ public class L2411 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClMain, tClMain);
-				dataLog.exec();
+				dataLog.exec("修改擔保品主檔資料");
 
 				// 不動產檔
 				tClImm = sClImmService.holdById(ClImmId, titaVo);
@@ -395,7 +395,7 @@ public class L2411 extends TradeBuffer {
 
 				// 紀錄變更前變更後 不動產檔
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
-				dataLog.exec();
+				dataLog.exec("修改擔保品不動產檔資料");
 
 				// 擔保品不動產檔設定順位明細
 				deleteClImmRankDetail(titaVo);
@@ -431,7 +431,7 @@ public class L2411 extends TradeBuffer {
 						}
 						// 紀錄變更前變更後
 						dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
-						dataLog.exec();
+						dataLog.exec("修改擔保品不動產建物檔資料");
 					}
 
 					// delete 建物所有權人
@@ -465,7 +465,7 @@ public class L2411 extends TradeBuffer {
 						}
 						// 紀錄變更前變更後
 						dataLog.setEnv(titaVo, beforeClLand, tClLand);
-						dataLog.exec();
+						dataLog.exec("修改擔保品不動產土地檔資料");
 					}
 
 					// delete 土地所有權人

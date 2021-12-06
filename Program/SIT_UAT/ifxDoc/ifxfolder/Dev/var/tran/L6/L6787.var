@@ -1,0 +1,241 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,900];printer.width=[20,40];">
+[
+["[L6787]                                 協辦獎勵津貼標準設定"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdWorkMonth+工作年月",#WorkMonth],
+["#FdPieceCode+計件代碼",#PieceCode0,#PieceCodex0,#PieceCode1,#PieceCodex1,"</br>",
+                        #PieceCode2,#PieceCodex2,#PieceCode3,#PieceCodex3,"</br>",
+                        #PieceCode4,#PieceCodex4,#PieceCode5,#PieceCodex5,"</br>",
+                        #PieceCode6,#PieceCodex6,#PieceCode7,#PieceCodex7,"</br>",
+                        #PieceCode8,#PieceCodex8,#PieceCode9,#PieceCodex9,"</br>",
+                        #PieceCode10,#PieceCodex10,#PieceCode11,#PieceCodex11,"</br>",
+                        #PieceCode12,#PieceCodex12,#PieceCode13,#PieceCodex13,"</br>",
+                        #PieceCode14,#PieceCodex14,#PieceCode15,#PieceCodex15,"</br>",
+                        #PieceCode16,#PieceCodex16,#PieceCode17,#PieceCodex17,"</br>",
+                        #PieceCode18,#PieceCodex18,#PieceCode19,#PieceCodex19],
+["#FdConditionAmt+標準金額",#ConditionAmt],
+["#FdPrizeAmt+專業獎勵金",#PrizeAmt],
+["#grid#,{id:3,expand:true,loop:3,row_height:1,s_cols:[], p_cols:[]}","","","","",
+["協辦等級","獎勵津貼","獎勵津貼-初階授信通過"],
+[
+ [#Condition0],[#Bonus0],[#ClassPassBonus0]
+],
+],
+]
+!---------- AP Button AREA ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,1,$,V(P,此為連動交易，請從交易:L6087進入))
+#NTXBUF=X,7,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FuncCode,#NTXBUF,1,1)
+T(1,@WorkMonth,#NTXBUF,2,5)
+
+#FdFuncCode=X,1,L
+#FdWorkMonth=X,1,L
+#FdPieceCode=X,1,L
+#FdConditionAmt=X,1,L
+#FdPrizeAmt=X,1,L
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!FuncCode1 (1:新增;2:修改;4:刪除;5:查詢)
+#CDCODEFuncCode1=x,20,S                  
+T(3,CdCode.FunctionCd)                  
+#FuncCodeHelp=x,50,S
+
+!計件代碼
+#CDCODEPieceCode=x,20,S
+T(3,CdCode.PieceCode)
+#ApHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode1,#CDCODEPieceCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+T(2,@ApHelp,#HelpDesc2)
+
+! 協辦等級塞值
+T(3,@Condition0,初級)
+T(3,@Condition1,中級)
+T(3,@Condition2,高級)
+
+#AGAIN=X,1,S
+C(2,#FuncCode,$,$,E(0,1),$,E(0,1))
+ASGN(AGAIN$)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FuncCode=A,1,S
+
+#FuncCodeX=X,4,L
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(NOBUTTON,CLOSEY))
+
+
+#RimWorkMonth=A,5,S
+#SendL6R36=X,1,S
+C(3,#FuncCode,1,S,$)
+E(0,@RimWorkMonth,#WorkMonth)
+RESET_RIM(#SendL6R36,L6R36)
+S(L6R36,1,#RimWorkMonth)
+R(1,L6R36)
+##loop {times:20,i:0,j:0}
+C(4,#L6R36PieceCode{i},HIDE(#PieceCode{i}),T(2,@PieceCode{i},#L6R36PieceCode{i})T(H,@PieceCodex{i},#PieceCode{i},#ApHelp))
+##end
+E(0,@ConditionAmt,#L6R36ConditionAmt)
+E(0,@Bonus0,#L6R36Bonus0)
+E(0,@ClassPassBonus0,#L6R36ClassPassBonus0)
+E(0,@Bonus1,#L6R36Bonus1)
+E(0,@ClassPassBonus1,#L6R36ClassPassBonus1)
+E(0,@Bonus2,#L6R36Bonus2)
+E(0,@ClassPassBonus2,#L6R36ClassPassBonus2)
+E(0,@PrizeAmt,#L6R36PrizeAmt)
+
+#HIDE=X,1,S
+##loop{times:19,i:1}
+IF (#FuncCode==1 ,HIDE(#PieceCode{i}),S)
+##end
+
+#Space=X,1,S
+##loop {times:20,i:0,j:0}
+IF (#FuncCode==4 ||#FuncCode==5,T(F,@PieceCode{i},0),$)
+##end
+#Space1=X,1,S
+IF (#FuncCode==2 ,T(F,@WorkMonth,0),$)
+IF (#FuncCode==4 ||#FuncCode==5 ,T(F,@WorkMonth,0)T(F,@ConditionAmt,0)T(F,@PrizeAmt,0)T(F,@Bonus0,0)T(F,@Bonus1,0)T(F,@Bonus2,0)T(F,@ClassPassBonus0,0)T(F,@ClassPassBonus1,0)T(F,@ClassPassBonus2,0),$)
+IF( #FuncCode==2 ||#FuncCode==4 ||#FuncCode==5,T(3,#FdWorkMonth, ),T(3,#FdWorkMonth,*))
+! 工作年月
+#WorkMonth=A,5,I
+IF(#FuncCode == 2 ||#FuncCode == 4  || #FuncCode == 5,s,$)
+@A(YM13,1,#WorkMonth)
+
+#PieceCode0=X,5,I
+C(2,#FuncCode,$,$,$,$,s,s)
+HELP(#ApHelp,cols:2)
+@C(4,#PieceCode0,S,V(H,#ApHelp))
+
+#PieceCodex0=X,50,L
+C(4,#PieceCode0,S,$)
+T(H,#PieceCode0,#ApHelp)
+
+
+##loop {times:19,i:1,j:0}
+
+#PieceCode{i}=X,5,I
+C(4,#PieceCode{j},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
+C(4,#PieceCode{j},S,$)
+C(2,#FuncCode,$,$,$,$,s,s)
+HELP(#ApHelp,cols:2)
+@C(4,#PieceCode{i},S,V(H,#ApHelp))
+C(4,#PieceCode{i},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
+   
+#PieceCodex{i}=X,50,L
+C(4,#PieceCode{j},HIDE(#PieceCodex{i}),SHOW(#PieceCodex{i}))
+C(4,#PieceCode{i},S,$)
+T(H,#PieceCode{i},#ApHelp)
+
+#showPieceCode{i}=X,1,S
+C(4,#PieceCode{i},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
+C(4,#PieceCode{i},HIDE(#PieceCodex{i}),SHOW(#PieceCodex{i}))
+
+##end
+
+! 標準金額
+#ConditionAmt=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+! 專業獎勵金
+#PrizeAmt=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+
+
+! 協辦等級-初級
+#Condition0=X,4,L
+! 獎勵津貼-初級
+#Bonus0=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+! 協辦獎勵津貼-初級
+#ClassPassBonus0=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+! 協辦等級-中級
+#Condition1=X,4,L
+! 獎勵津貼-中級
+#Bonus1=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+! 協辦獎勵津貼-中級
+#ClassPassBonus1=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+! 協辦等級-高級
+#Condition2=X,4,L
+! 獎勵津貼-高級
+#Bonus2=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+! 協辦獎勵津貼-高級
+#ClassPassBonus2=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+<include src="ROM.icf::L6R36.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6787 ----------
+<sub type="FORM" name="L6787">
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+#WorkMonth
+##loop{times:20,i:0}
+#PieceCode{i}
+##end
+#ConditionAmt
+#PrizeAmt
+#Bonus0
+#Bonus1
+#Bonus2
+#ClassPassBonus0
+#ClassPassBonus1
+#ClassPassBonus2
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L6R36.tom"/>
+TXFORM=L6787
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+</sub>

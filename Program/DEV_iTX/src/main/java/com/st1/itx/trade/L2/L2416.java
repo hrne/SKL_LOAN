@@ -188,7 +188,7 @@ public class L2416 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec();
+				dataLog.exec("修改擔保品不動產土地檔");
 
 				// delete 土地所有權人
 				deleteClLandOwner(titaVo);
@@ -244,7 +244,7 @@ public class L2416 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec();
+				dataLog.exec("修改擔保品不動產土地檔");
 				// delete 土地修改原因檔
 				deleteClLandReason(titaVo);
 				// insert 土地修改原因檔
@@ -262,7 +262,7 @@ public class L2416 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec();
+				dataLog.exec("修改擔保品不動產土地檔");
 				// delete 土地修改原因檔
 				deleteClLandReason(titaVo);
 			}

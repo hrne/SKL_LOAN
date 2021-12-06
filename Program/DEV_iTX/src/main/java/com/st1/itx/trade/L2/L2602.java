@@ -96,7 +96,7 @@ public class L2602 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeForeclosureFee, tForeclosureFee);
-			dataLog.exec();
+			dataLog.exec("修改法拍費用檔資料");
 
 			// 銷帳
 			AcReceivable acReceivable = new AcReceivable();
@@ -143,11 +143,11 @@ public class L2602 extends TradeBuffer {
 			if (tForeclosureFee == null) {
 				throw new LogicException("E0004", "L2602(ForeclosureFee)");
 			}
-			
-			if(iCloseDate != 0 ) {
+
+			if (iCloseDate != 0) {
 				throw new LogicException("E0008", "此筆已銷帳不可刪除");
 			}
-			
+
 			try {
 
 				ForeclosureFee tForeclosureFee4 = sForeclosureFeeService.holdById(iRecordNo);

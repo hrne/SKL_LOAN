@@ -29,7 +29,7 @@ public class SystemParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 5020843128575229586L;
+	private static final long serialVersionUID = -5916746765955218455L;
 
 // 業務類型
   /* LN */
@@ -151,6 +151,11 @@ public class SystemParas implements Serializable {
   /* L6501維護預設值:3                                                  追回[繳納1期]但[未繳足3期]期款即結清（含部分還款達60萬之案件)，未曾繳款者則同時追回房貸專員業績 */
   @Column(name = "`PerfBackPeriodE`")
   private int perfBackPeriodE = 0;
+
+  // 業績追回通知員工代碼清單
+  /* L6501維護 add 2021/12/6 by 智誠預設空白 */
+  @Column(name = "`EmpNoList`", length = 150)
+  private String empNoList;
 
   // 短期擔保放款年限之起
   /* L6501維護預設值:0 */
@@ -790,6 +795,27 @@ N:一日多批
   }
 
 /**
+	* 業績追回通知員工代碼清單<br>
+	* L6501維護 add 2021/12/6 by 智誠
+預設空白
+	* @return String
+	*/
+  public String getEmpNoList() {
+    return this.empNoList == null ? "" : this.empNoList;
+  }
+
+/**
+	* 業績追回通知員工代碼清單<br>
+	* L6501維護 add 2021/12/6 by 智誠
+預設空白
+  *
+  * @param empNoList 業績追回通知員工代碼清單
+	*/
+  public void setEmpNoList(String empNoList) {
+    this.empNoList = empNoList;
+  }
+
+/**
 	* 短期擔保放款年限之起<br>
 	* L6501維護
 預設值:0
@@ -1268,10 +1294,10 @@ N:一日多批
            + ", achDeductDD3=" + achDeductDD3 + ", achDeductDD4=" + achDeductDD4 + ", achDeductDD5=" + achDeductDD5 + ", achSecondDeductDays=" + achSecondDeductDays + ", achDeductMethod=" + achDeductMethod + ", postDeductFlag=" + postDeductFlag
            + ", postDeductDD1=" + postDeductDD1 + ", postDeductDD2=" + postDeductDD2 + ", postDeductDD3=" + postDeductDD3 + ", postDeductDD4=" + postDeductDD4 + ", postDeductDD5=" + postDeductDD5 + ", postSecondDeductDays=" + postSecondDeductDays
            + ", postDeductMethod=" + postDeductMethod + ", loanDeptCustNo=" + loanDeptCustNo + ", negDeptCustNo=" + negDeptCustNo + ", perfBackRepayAmt=" + perfBackRepayAmt + ", perfBackPeriodS=" + perfBackPeriodS + ", perfBackPeriodE=" + perfBackPeriodE
-           + ", acctCode310A=" + acctCode310A + ", acctCode310B=" + acctCode310B + ", acctCode320A=" + acctCode320A + ", acctCode320B=" + acctCode320B + ", acctCode330A=" + acctCode330A + ", acctCode330B=" + acctCode330B
-           + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg
-           + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg
-           + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", empNoList=" + empNoList + ", acctCode310A=" + acctCode310A + ", acctCode310B=" + acctCode310B + ", acctCode320A=" + acctCode320A + ", acctCode320B=" + acctCode320B + ", acctCode330A=" + acctCode330A
+           + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortIntPercent=" + shortIntPercent
+           + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", acBookAdjDate=" + acBookAdjDate
+           + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

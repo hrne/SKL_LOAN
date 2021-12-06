@@ -67,6 +67,21 @@ public class StringCut {
 		}
 		return sb.toString();
 	}
+	
+	/**
+	 * replace LineUp
+	 * 
+	 * @param value String
+	 * @return String replace LineUp
+	 */
+	public static String replaceLineUp(String value) {
+		if (value == null)
+			value = "";
+		value = value.replaceAll("\\r\\n", "");
+		value = value.replaceAll("\\n", "");
+		value = value.replaceAll("\\$n", "");
+		return value;
+	}
 
 	/**
 	 * String Count Length<br>

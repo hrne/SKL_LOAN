@@ -107,6 +107,7 @@ public class L6R28 extends TradeBuffer {
 		this.totaVo.putParam("L6R28PerfBackRepayAmt", mSystemParas.getPerfBackRepayAmt());
 		this.totaVo.putParam("L6R28PerfBackPeriodS", mSystemParas.getPerfBackPeriodS());
 		this.totaVo.putParam("L6R28PerfBackPeriodE", mSystemParas.getPerfBackPeriodE());
+		this.totaVo.putParam("L6R28EmpNoList", mSystemParas.getEmpNoList());
 		this.totaVo.putParam("L6R28AcctCode310A", mSystemParas.getAcctCode310A());
 		this.totaVo.putParam("L6R28AcctCode310B", mSystemParas.getAcctCode310B());
 		this.totaVo.putParam("L6R28AcctCode320A", mSystemParas.getAcctCode320A());

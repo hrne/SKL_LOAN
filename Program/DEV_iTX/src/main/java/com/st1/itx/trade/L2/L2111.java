@@ -199,7 +199,7 @@ public class L2111 extends TradeBuffer {
 					}
 					// 紀錄變更前變更後
 					iDataLog.setEnv(titaVo, beforeCustMain, custMain);
-					iDataLog.exec();
+					iDataLog.exec("修改客戶主檔資料");
 				}
 
 			}
@@ -309,7 +309,7 @@ public class L2111 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, beforeFacCaseAppl, tFacCaseAppl);
-			iDataLog.exec();
+			iDataLog.exec("修改案件申請檔資料");
 			break;
 		case 4: // 刪除 案件申請准駁後禁止刪除
 			tFacCaseAppl = facCaseApplService.holdById(iApplNo);

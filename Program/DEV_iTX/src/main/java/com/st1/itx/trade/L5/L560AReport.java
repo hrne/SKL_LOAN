@@ -1,7 +1,13 @@
 package com.st1.itx.trade.L5;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -28,11 +34,12 @@ import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.report.WarningLetterForm;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeFile;
-
+import com.st1.itx.db.service.springjpa.cm.L560AServiceImpl;
 
 @Service("L560AReport")
 @Scope("prototype")
@@ -68,6 +75,12 @@ public class L560AReport extends MakeReport {
 
 	@Autowired
 	public MakeFile makeFile;
+	
+	@Autowired
+	public Parse parse;
+	
+	@Autowired
+	L560AServiceImpl l560AServiceImpl;
 
 	@Override
 	public void printTitle() {
@@ -208,16 +221,15 @@ public class L560AReport extends MakeReport {
 				}
 			}
 		}
-
+		
 		switch (adjFlag) {
 		case "0": // 列印存證信函
 			strFileName = "催收存證信函" + iCustNo + "-" + iFacmNo;
-			this.info("***0  strFileName=" + strFileName);
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", strFileName, strFileName + ".TXT", 2);
 
 			makeFile.put("寄件人姓名：新光人壽保險股份有限公司");
 			makeFile.put("　　　　　　法定代理人：潘  柏  錚");
-			makeFile.put("寄件人詳細地址：台北市中正區忠孝西路一段66號18樓");
+			makeFile.put("寄件人詳細地址：台北市松山區南京東路五段125號13樓");
 			strContent = "收件人姓名：" + iCustName + "   戶號：" + iCustNo;
 			makeFile.put(strContent);
 			strContent = "收件人詳細地址：" + iaddress;
@@ -233,10 +245,10 @@ public class L560AReport extends MakeReport {
 			strContent = "";
 			makeFile.put(strContent);
 
-			strContent = "一、台端前向本公司辦理房屋抵押貸款新台幣" + aLineAmt + "元整，約定於每月" + iPrDd + "日繳交應攤還之本息；惟台端僅繳至" + iPrYyy + "年"
+			strContent = "一、台端前向本公司辦理房屋抵押貸款新台幣" + aLineAmt + "元整，約定於每月" + iPrDd + "日繳交應攤還之本息；惟　台端僅繳至" + iPrYyy + "年"
 					+ iPrMm + "月" + iPrDd + "日，共計積欠" + sterms + "期未繳付。";
 			makeFile.put(strContent);
-			strContent = "二、依約定借款人如有一期未繳付應攤還本金或利息時，全部借款視為到期，借款人應即償還全部借款餘額，為此特通知台端三日內繳清所積欠之本金、利息、違約金，否則將聲請法院查封拍賣抵押物追償，事涉台端權益，請速處理，祈勿自誤為禱。";
+			strContent = "二、依約定借款人如有一期未繳付應攤還本金或利息時，全部借款視為到期，借款人應即償還全部借款餘額，為此特通知　台端三日內繳清所積欠之本金、利息、違約金，否則將聲請法院查封拍賣抵押物追償，事涉　台端權益，請速處理，祈勿自誤為禱。";
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -269,15 +281,15 @@ public class L560AReport extends MakeReport {
 			makeFile.put(strContent);
 			strContent = "";
 			makeFile.put(strContent);
-			strContent = "一、台端前向本公司辦理房屋抵押貸款，約定於每月" + iPrDd + "日繳交應攤還之本息；惟  台端僅繳至" + iPrYyy + "年" + iPrMm + "月" + iPrDd
-					+ "日止，積欠計" + sterms + "期。為此特此函知  台端，請於五天內繳清積欠逾期之本息及違約金。";
+			strContent = "一、台端前向本公司辦理房屋抵押貸款，約定於每月" + iPrDd + "日繳交應攤還之本息；惟　台端僅繳至" + iPrYyy + "年" + iPrMm + "月" + iPrDd
+					+ "日止，積欠計" + sterms + "期。為此特此函知　台端，請於五天內繳清積欠逾期之本息及違約金。";
 			makeFile.put(strContent);
-			strContent = "    額度編號" + iFacmNo + "：計息期間 " + iPrYyy + "/" + iPrMm + "/" + iPrDd + " - " + iPrYyy1 + "/"
+			strContent = "    額度" + iFacmNo + "：計息期間 " + iPrYyy + "/" + iPrMm + "/" + iPrDd + " - " + iPrYyy1 + "/"
 					+ iPrMm1 + "/" + iPrDd1 + " 總計" + iPrinBalance + "元";
 			makeFile.put(strContent);
 			strContent = "";
 			makeFile.put(strContent);
-			strContent = "二、※提醒您！如逾期放款資料依規報送聯合徵信中心，將嚴重影響  台端及保證人信用（將無法辦理增貸，信用卡，其他銀行貸款…），事涉  台端權益，請速處理。";
+			strContent = "二、※提醒您！如逾期放款資料依規報送聯合徵信中心，將嚴重影響　台端及保證人信用（將無法辦理增貸，信用卡，其他銀行貸款…），事涉　台端權益，請速處理。";
 			makeFile.put(strContent);
 			strContent = "    ※自行匯款期款專戶：";
 			makeFile.put(strContent);
@@ -289,11 +301,201 @@ public class L560AReport extends MakeReport {
 			makeFile.put(strContent);
 			strContent = "";
 			makeFile.put(strContent);
+			// 列出最近6筆繳款明細
+			List<Map<String, String>> listL560A = null;
+			try {
+				listL560A = l560AServiceImpl.findLoanBorTx(titaVo, this.index, this.limit);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.info("l560AServiceImpl.findLoanBorTx error = " + errors.toString());
+			}
+			if (listL560A == null || listL560A.size() == 0) {
+				this.info("L560A LoanBorTx DETAIL NO DATA");
+			} else {
+				strContent = " 撥款 入帳日期       放款餘額       計息期間         利率  交易內容    交易金額    作帳金額"
+						+ "       本金       利息     違約金     暫收借     暫收貸       短繳";
+				makeFile.put(strContent);
+				strContent = "-------------------------------------------------------------------------------------------"
+						+ "------------------------------------------------------------------";
+				makeFile.put(strContent);
+
+				String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14";
+				String txt1[] = txt.split(";");
+
+				int count = 0;
+				int loanBal = 0;// 當日餘額
+				int sumPrincipal = 0;// 本金小計
+				int sumInterest = 0;// 利息小計
+				String strContent1 = "";
+				String strContent2 = "";
+				String strContent3 = "";
+				String strContent4 = "";
+				String strContent5 = "";
+				String strContent6 = "";
+
+				DecimalFormat df1 = new DecimalFormat("#,##0");
+				
+				for (Map<String, String> t560A : listL560A) {
+					count = count + 1;
+					strContent = "";
+					int tDate = 0;
+					for (int j = 1; j <= 15; j++) {
+						String strField = "";
+						if (t560A.get(txt1[j - 1]) == null) {
+							strField = "";
+						} else {
+							strField = t560A.get(txt1[j - 1]).trim();
+						}
+						// 格式處理
+						switch (j) {
+						case 1://撥款序號
+							strField = " " + makeFile.fillStringL(strField, 3, '0');
+							break;
+						case 2://入帳日期
+							if ("0".equals(strField)) {
+								strField = makeFile.fillStringL("000/00/00",10, ' ');
+							} else {
+								tDate = Integer.valueOf(strField) - 19110000;
+								String sDate = String.valueOf(tDate);
+								sDate = sDate.substring(0, 3) + "/" + sDate.substring(3, 5) + "/"
+										+ sDate.substring(5, 7);
+								strField = makeFile.fillStringL(sDate,10, ' ');
+							}
+							break;
+						case 3://放款餘額
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),15, ' ');
+							break;
+						case 4://計息期間-起
+							if ("0".equals(strField) || "".equals(strField)) {
+								strField = makeFile.fillStringL("000/00/00",10, ' ');
+							} else {
+								tDate = Integer.valueOf(strField) - 19110000;
+								String sDate = String.valueOf(tDate);
+								sDate = sDate.substring(0, 3) + "/" + sDate.substring(3, 5) + "/"
+										+ sDate.substring(5, 7);
+								strField = makeFile.fillStringL(sDate,10, ' ');
+							}
+							break;
+						case 5://計息期間-迄
+							if ("0".equals(strField) || "".equals(strField)) {
+								strField = makeFile.fillStringL("-000/00/00",10, ' ');
+							} else {
+								tDate = Integer.valueOf(strField) - 19110000;
+								String sDate = String.valueOf(tDate);
+								sDate = "-" + sDate.substring(0, 3) + "/" + sDate.substring(3, 5) + "/"
+										+ sDate.substring(5, 7);
+								strField = makeFile.fillStringL(sDate,10, ' ');
+							}
+							break;
+						case 6://利率
+							strField = makeFile.fillStringL(strField, 8, ' ');
+							break;
+						case 7://交易內容
+							strField = makeFile.fillStringL(strField,10, ' ');
+							break;
+						case 8://交易金額
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),12, ' ');
+							break;
+						case 9://作帳金額
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),12, ' ');
+							break;
+						case 10://本金
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							break;
+						case 11://利息
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							break;
+						case 12://違約金
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							break;
+						case 13://暫收借
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							break;
+						case 14://暫收貸
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							break;
+						case 15://短繳
+							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							break;
+						default:
+							strField = "";
+							break;
+						}
+						strContent = strContent + strField;
+					}
+					
+					//資料為入帳日期遞減排序,只抓日期最近的6筆資料,要列印的順序相反,以入帳日期遞增顯示
+					if (count == 1) {
+						loanBal = Integer.valueOf(t560A.get("F2"));
+						strContent6 = strContent;
+					}
+					if (count == 2) {
+						strContent5 = strContent;
+					}
+					if (count == 3) {
+						strContent4 = strContent;
+					}
+					if (count == 4) {
+						strContent3 = strContent;
+					}
+					if (count == 5) {
+						strContent2 = strContent;
+					}
+					if (count == 6) {
+						strContent1 = strContent;
+					}
+					sumPrincipal = sumPrincipal + Integer.valueOf(t560A.get("F9"));
+					sumInterest = sumInterest + Integer.valueOf(t560A.get("F10"));
+					if (count == 6) {
+						break;
+					}
+
+				} // for
+				if (!"".equals(strContent1)){
+					makeFile.put(strContent1);
+				}
+				if (!"".equals(strContent2)){
+					makeFile.put(strContent2);
+				}
+				if (!"".equals(strContent3)){
+					makeFile.put(strContent3);
+				}
+				if (!"".equals(strContent4)){
+					makeFile.put(strContent4);
+				}
+				if (!"".equals(strContent5)){
+					makeFile.put(strContent5);
+				}
+				if (!"".equals(strContent6)){
+					makeFile.put(strContent6);
+				}
+				
+				strContent = "-------------------------------------------------------------------------------------------"
+						+ "------------------------------------------------------------------";
+				makeFile.put(strContent);
+				
+				String sloanBal = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(String.valueOf(loanBal))),15, ' ');
+				String ssumPrincipal = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(String.valueOf(sumPrincipal))),15, ' ');
+				String ssumInterest = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(String.valueOf(sumInterest))),15, ' ');
+
+				strContent = " " + iCalyy + "年" + iCalMm + "月" + iCalDd + "日當日餘額:" + sloanBal + "        本金小計:"
+						+ ssumPrincipal + "        利息小計:" + ssumInterest;
+				makeFile.put(strContent);
+
+			} // else
+
+			strContent = "";
+			makeFile.put(strContent);
+			strContent = "";
+			makeFile.put(strContent);
+
 			strContent = "中　　華　　民　　國　" + iCalyy + "　年　" + iCalMm + "　月　" + iCalDd + "　日";
 			makeFile.put(strContent);
 
 			makeFile.close();
 
+			//產pdf寫法,已改為txt故點掉
 			// open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "延遲繳款通知函" +
 			// iCustNo + "-" + iFacmNo, "Normal",
 			// "A4", "P");

@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -41,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2250 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2250.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -131,7 +128,6 @@ public class L2250 extends TradeBuffer {
 
 		// FunCd=1新增 FunCd=3複製
 		if (iFunCd == 1 || iFunCd == 3) {
-			boolean isInsert = true;
 			// 新增資料存在拋錯
 			if (tGuarantor != null) {
 				throw new LogicException("E0002", "保證人檔");
@@ -173,9 +169,9 @@ public class L2250 extends TradeBuffer {
 			this.info("newamt = " + parse.stringToBigDecimal(titaVo.getParam("GuaAmt")));
 			this.info("empnos = " + titaVo.getEmpNos().trim());
 
-			// 修改保證金額須刷主管卡
-			if (tGuarantor.getGuaAmt().compareTo(parse.stringToBigDecimal(titaVo.getParam("GuaAmt"))) != 0 && titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "修改保證金額");
+			// 異動須刷主管卡
+			if (titaVo.getEmpNos().trim().isEmpty()) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 
 			// tita寫進table
@@ -195,7 +191,7 @@ public class L2250 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeGuarantor, tGuarantor);
-			dataLog.exec();
+			dataLog.exec("修改保證人關係，金額，類別，對保日期，狀況碼，解除日期");
 
 		} else if (iFunCd == 4) {
 			// FunCd=4刪除

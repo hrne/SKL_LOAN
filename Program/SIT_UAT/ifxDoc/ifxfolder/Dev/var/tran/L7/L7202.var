@@ -156,7 +156,7 @@ T(4,#SYSCDATE)
 ! 生效日期
 #Date1=D,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-T(1,#DATE,2,7)
+!T(1,#DATE,2,7)
 D(8)
 @V(7)A(DATE,0,#Date1)
 

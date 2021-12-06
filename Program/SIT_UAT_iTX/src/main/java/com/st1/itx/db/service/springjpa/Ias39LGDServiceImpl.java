@@ -124,13 +124,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findDate " + dbName + " : " + "type_0 : " + type_0 + " date_1 : " +  date_1 + " date_2 : " +  date_2);
     if (dbName.equals(ContentName.onDay))
-      slice = ias39LGDReposDay.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateAsc(type_0, date_1, date_2, pageable);
+      slice = ias39LGDReposDay.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(type_0, date_1, date_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = ias39LGDReposMon.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateAsc(type_0, date_1, date_2, pageable);
+      slice = ias39LGDReposMon.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(type_0, date_1, date_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = ias39LGDReposHist.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateAsc(type_0, date_1, date_2, pageable);
+      slice = ias39LGDReposHist.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(type_0, date_1, date_2, pageable);
     else 
-      slice = ias39LGDRepos.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateAsc(type_0, date_1, date_2, pageable);
+      slice = ias39LGDRepos.findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(type_0, date_1, date_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -152,13 +152,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findType " + dbName + " : " + "date_0 : " + date_0 + " date_1 : " +  date_1 + " type_2 : " +  type_2 + " type_3 : " +  type_3);
     if (dbName.equals(ContentName.onDay))
-      slice = ias39LGDReposDay.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateAscTypeAsc(date_0, date_1, type_2, type_3, pageable);
+      slice = ias39LGDReposDay.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateDescTypeAsc(date_0, date_1, type_2, type_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = ias39LGDReposMon.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateAscTypeAsc(date_0, date_1, type_2, type_3, pageable);
+      slice = ias39LGDReposMon.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateDescTypeAsc(date_0, date_1, type_2, type_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = ias39LGDReposHist.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateAscTypeAsc(date_0, date_1, type_2, type_3, pageable);
+      slice = ias39LGDReposHist.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateDescTypeAsc(date_0, date_1, type_2, type_3, pageable);
     else 
-      slice = ias39LGDRepos.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateAscTypeAsc(date_0, date_1, type_2, type_3, pageable);
+      slice = ias39LGDRepos.findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateDescTypeAsc(date_0, date_1, type_2, type_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

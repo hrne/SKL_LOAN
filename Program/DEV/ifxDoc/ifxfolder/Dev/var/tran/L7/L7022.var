@@ -81,13 +81,13 @@ T(4,#SYSCDATE)
 
 ! 生效日期起
 #DateStart=D,7,I
-T(1,#DATE,2,7)
+!T(1,#DATE,2,7)
 D(8)
 @A(DATE,0,#DateStart)
 
 ! 生效日期迄
 #DateEnd=D,7,I
-E(0,#DateStart)
+!E(0,#DateStart)
 D(8)
 @A(DATE,0,#DateEnd)
 C(4,#DateEnd,$,V(5,#DateStart,9991231))

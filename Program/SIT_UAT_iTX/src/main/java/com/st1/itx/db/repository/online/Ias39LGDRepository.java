@@ -23,10 +23,10 @@ import com.st1.itx.db.domain.Ias39LGDId;
 public interface Ias39LGDRepository extends JpaRepository<Ias39LGD, Ias39LGDId> {
 
   // Type = ,AND Date >= ,AND Date <= 
-  public Slice<Ias39LGD> findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateAsc(String type_0, int date_1, int date_2, Pageable pageable);
+  public Slice<Ias39LGD> findAllByTypeIsAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(String type_0, int date_1, int date_2, Pageable pageable);
 
   // Date >= ,AND Date <= ,AND Type >= ,AND Type <= 
-  public Slice<Ias39LGD> findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateAscTypeAsc(int date_0, int date_1, String type_2, String type_3, Pageable pageable);
+  public Slice<Ias39LGD> findAllByDateGreaterThanEqualAndDateLessThanEqualAndTypeGreaterThanEqualAndTypeLessThanEqualOrderByDateDescTypeAsc(int date_0, int date_1, String type_2, String type_3, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

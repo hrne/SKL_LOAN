@@ -85,7 +85,7 @@ public class L6903 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 50; // 305 * 100 = 30,500
+		this.limit = 100; // 305 * 100 = 30,500
 
 		// 查詢會計總帳檔
 		AcMain tAcMain = sAcMainService.findById(new AcMainId(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt), titaVo);

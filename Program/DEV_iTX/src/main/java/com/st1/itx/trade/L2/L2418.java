@@ -139,7 +139,7 @@ public class L2418 extends TradeBuffer {
 
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClOtherRights, tClOtherRights);
-				dataLog.exec();
+				dataLog.exec("修改擔保品他項權利檔資料");
 			} else if (iFunCd == 4) { // 刪除
 //				tClOtherRights = sClOtherRightsService.holdById(tClOtherRightsId, titaVo);
 				try {

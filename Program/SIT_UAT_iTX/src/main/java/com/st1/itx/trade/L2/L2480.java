@@ -253,7 +253,7 @@ public class L2480 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeClMain, tClMain);
-			dataLog.exec();
+			dataLog.exec("修改擔保品主檔資料");
 
 			// 變更前
 			ClImm beforeClImm = (ClImm) dataLog.clone(tClImm);
@@ -272,7 +272,7 @@ public class L2480 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeClImm, tClImm);
-			dataLog.exec();
+			dataLog.exec("修改擔保品不動產檔資料");
 
 			// FunCd = 2 修改
 		} else if (iFunCd == 2) {
@@ -303,7 +303,7 @@ public class L2480 extends TradeBuffer {
 			}
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeClEva, tClEva1);
-			dataLog.exec();
+			dataLog.exec("修改擔保品重評資料檔資料");
 
 			// 如果為最後一筆序號才更新擔保品主檔與擔保品不動產檔
 			// 最新的序號 == 目前序號
@@ -343,7 +343,7 @@ public class L2480 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClMain, tClMain);
-				dataLog.exec();
+				dataLog.exec("修改擔保品主檔資料");
 
 				// 變更前
 				ClImm beforeClImm = (ClImm) dataLog.clone(tClImm);
@@ -363,7 +363,7 @@ public class L2480 extends TradeBuffer {
 
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
-				dataLog.exec();
+				dataLog.exec("修改擔保品不動產檔資料");
 			}
 			// FunCd = 4 刪除
 		} else if (iFunCd == 4) {
@@ -413,7 +413,7 @@ public class L2480 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClMain, tClMain);
-				dataLog.exec();
+				dataLog.exec("修改擔保品主檔資料");
 
 				// 變更前
 				ClImm beforeClImm = (ClImm) dataLog.clone(tClImm);
@@ -433,7 +433,7 @@ public class L2480 extends TradeBuffer {
 
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
-				dataLog.exec();
+				dataLog.exec("修改擔保品不動產檔資料");
 			} else {
 
 				sCheckClEva.checkAmt(titaVo,iClNo);
@@ -461,7 +461,7 @@ public class L2480 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClMain, tClMain);
-				dataLog.exec();
+				dataLog.exec("修改擔保品主檔資料");
 
 				// 組ClImm PK
 				ClImm tClImm = new ClImm();
@@ -484,7 +484,7 @@ public class L2480 extends TradeBuffer {
 
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
-				dataLog.exec();
+				dataLog.exec("修改擔保品不動產檔資料");
 
 			} // else
 		}

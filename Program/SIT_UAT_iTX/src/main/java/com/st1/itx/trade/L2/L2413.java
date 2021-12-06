@@ -405,7 +405,7 @@ public class L2413 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClMain, tClMain);
-				dataLog.exec();
+				dataLog.exec("修改擔保品主檔資料");
 				try {
 					// 修改
 					tClStock = sClStockService.update2(tClStock);
@@ -414,7 +414,7 @@ public class L2413 extends TradeBuffer {
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClStock, tClStock);
-				dataLog.exec();
+				dataLog.exec("修改擔保品股票檔資料");
 
 			} else if (iFunCd == 4) {
 				/* 刪除 */

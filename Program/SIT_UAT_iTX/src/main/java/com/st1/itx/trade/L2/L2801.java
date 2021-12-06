@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -32,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2801")
 @Scope("prototype")
 public class L2801 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2801.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,7 +44,7 @@ public class L2801 extends TradeBuffer {
 
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	// work area
 	TitaVo iTitaVo = new TitaVo();
 	private LoanNotYetId tLoanNotYetId;
@@ -67,15 +64,15 @@ public class L2801 extends TradeBuffer {
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iFunCd = this.parse.stringToInteger(titaVo.getParam("FunCd"));
-		
+
 		wkNotYetCode = titaVo.getParam("NotYetCode").trim();
 		tLoanNotYetId = new LoanNotYetId();
 		tLoanNotYetId.setCustNo(iCustNo);
 		tLoanNotYetId.setFacmNo(iFacmNo);
 		tLoanNotYetId.setNotYetCode(wkNotYetCode);
 		tLoanNotYet = new LoanNotYet();
-		
-		switch(iFunCd){
+
+		switch (iFunCd) {
 		case 1:
 			tLoanNotYet = loanNotYetService.findById(tLoanNotYetId);
 			if (tLoanNotYet != null) {
@@ -85,8 +82,8 @@ public class L2801 extends TradeBuffer {
 			moveLoanNotYet();
 			try {
 				loanNotYetService.insert(tLoanNotYet);
-			} catch (DBException e) {		
-					throw new LogicException(titaVo, "E0005", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 新增資料已存在
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 新增資料已存在
 			}
 			break;
 		case 2:
@@ -94,12 +91,12 @@ public class L2801 extends TradeBuffer {
 			if (tLoanNotYet == null) {
 				throw new LogicException(titaVo, "E0006", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 鎖定資料時，發生錯誤
 			}
-			
+
 			// 異動銷帳日期須刷主管卡
 			if (tLoanNotYet.getCloseDate() != parse.stringToInteger(titaVo.getParam("CloseDate")) && titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "修改銷帳日期");
 			}
-			
+
 			LoanNotYet bLoanNotYet = tLoanNotYet;
 			moveLoanNotYet();
 			try {
@@ -108,7 +105,7 @@ public class L2801 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			datalog.setEnv(titaVo, bLoanNotYet, tLoanNotYet);
-			datalog.exec();
+			datalog.exec("修改未齊案件檔資料");
 			break;
 		case 4:
 			tLoanNotYet = loanNotYetService.holdById(tLoanNotYetId);
@@ -120,16 +117,15 @@ public class L2801 extends TradeBuffer {
 			if (titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			try {
 				loanNotYetService.delete(tLoanNotYet);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
-	    default:
-	    	break;
+		default:
+			break;
 		}
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

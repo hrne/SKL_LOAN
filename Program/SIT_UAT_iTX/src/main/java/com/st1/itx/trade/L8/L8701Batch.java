@@ -313,9 +313,23 @@ public class L8701Batch extends TradeBuffer {
 		strField += makeFile.fillStringR(parse.IntegerToString(ln.getCustNo(), 7) + parse.IntegerToString(ln.getFacmNo(), 3) + parse.IntegerToString(ln.getBormNo(), 3), 50);
 		strField += makeFile.fillStringR(oAcctItem, 20);// 放款科目20碼
 		strField += makeFile.fillStringR(iDataDatef, 8);// 資料基準日8碼
-		strField += parse.IntegerToString(tFacMain.getFirstDrawdownDate() + 19110000, 8);// 初貸日期 8碼
-		strField += parse.IntegerToString(ln.getDrawdownDate() + 19110000, 8);// 契約起始日期 8碼
-		strField += parse.IntegerToString(ln.getMaturityDate() + 19110000, 8);// 契約終止日期 8碼
+		int FirstDrawdownDate = 0; 
+		if(tFacMain.getFirstDrawdownDate()!=0) {
+			FirstDrawdownDate = tFacMain.getFirstDrawdownDate() + 19110000;
+		}
+		strField += parse.IntegerToString(FirstDrawdownDate, 8);// 初貸日期 8碼
+		
+		int DrawdownDate = 0; 
+		if(ln.getDrawdownDate()!=0) {
+			DrawdownDate = ln.getDrawdownDate() + 19110000;
+		}
+		strField += parse.IntegerToString(DrawdownDate, 8);// 契約起始日期 8碼
+		
+		int MaturityDate = 0; 
+		if(ln.getMaturityDate()!=0) {
+			MaturityDate = ln.getMaturityDate() + 19110000;
+		}
+		strField += parse.IntegerToString(MaturityDate, 8);// 契約終止日期 8碼
 		strField += "TWD"; // 幣別
 		strField += "0000000001000000"; // 匯率
 		strField += sign;// 基準日放款餘額 1碼 ( + OR - )

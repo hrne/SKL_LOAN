@@ -154,6 +154,7 @@ public class L6501 extends TradeBuffer {
 		mSystemParas.setPerfBackRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("PerfBackRepayAmt")));
 		mSystemParas.setPerfBackPeriodS(this.parse.stringToInteger(titaVo.getParam("PerfBackPeriodS")));
 		mSystemParas.setPerfBackPeriodE(this.parse.stringToInteger(titaVo.getParam("PerfBackPeriodE")));
+		mSystemParas.setEmpNoList(titaVo.getParam("EmpNoList"));
 		mSystemParas.setAcctCode310A(this.parse.stringToInteger(titaVo.getParam("AcctCode310A")));
 		mSystemParas.setAcctCode310B(this.parse.stringToInteger(titaVo.getParam("AcctCode310B")));
 		mSystemParas.setAcctCode320A(this.parse.stringToInteger(titaVo.getParam("AcctCode320A")));

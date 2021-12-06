@@ -2,6 +2,10 @@ package com.st1.itx.trade.L6;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -13,7 +17,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBonusCo;
 import com.st1.itx.db.domain.CdBonusCoId;
+import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.service.CdBonusCoService;
+import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.springjpa.cm.L6087ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 
@@ -27,7 +34,12 @@ public class L6787 extends TradeBuffer {
 	@Autowired
 	public CdBonusCoService iCdBonusCoService;
 	@Autowired
+	public CdWorkMonthService iCdWorkMonthService;
+	@Autowired
+	public L6087ServiceImpl iL6087ServiceImpl;
+	@Autowired
 	SendRsp iSendRsp;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6787 ");
@@ -35,12 +47,43 @@ public class L6787 extends TradeBuffer {
 
 		int iFuncd = Integer.valueOf(titaVo.getParam("FuncCode"));
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
+		int iEntdy = titaVo.getEntDyI() + 19110000;
 		int iConditionCode = 0;
-		int iBtnFg = Integer.valueOf(titaVo.getParam("BtnFg")); //等於2時需主管授權
-		
-		if (!titaVo.getHsupCode().equals("1") && iBtnFg ==2) {
-			iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+		int nWorkMonth = 0; // 當前工作月
+		int maxWorkMonth = 0; //生效中工作月(CdBonusCo中<=當前工作月中之最大值)
+		List<Map<String, String>> wCdBonusCo = new ArrayList<Map<String, String>>();
+		//判斷是否為已生效工作月
+		// 取當前工作月
+		CdWorkMonth iCdWorkMonth = new CdWorkMonth();
+		iCdWorkMonth = iCdWorkMonthService.findDateFirst(iEntdy, iEntdy, titaVo);
+		if (iCdWorkMonth == null) {
+			throw new LogicException(titaVo, "E0001", "查無工作月資料"); // 查無資料
 		}
+		String iYear = StringUtils.leftPad(String.valueOf(iCdWorkMonth.getYear() - 1911), 3, "0");
+		String iMonth = StringUtils.leftPad(String.valueOf(iCdWorkMonth.getMonth()), 2, "0");
+		nWorkMonth = Integer.valueOf(iYear + iMonth)+191100;
+		
+		try {
+			wCdBonusCo = iL6087ServiceImpl.findAllData(Integer.valueOf(nWorkMonth), titaVo);
+		} catch (Exception e) {
+			throw new LogicException(titaVo, "E5004", "");
+		}
+		if (wCdBonusCo == null) {
+			throw new LogicException(titaVo, "E0001", "查無對應工作月");
+		}
+		for (Map<String, String> wwCdBonusCo : wCdBonusCo) {
+			if (wwCdBonusCo.get("Sort").equals("1")) {
+				maxWorkMonth = Integer.valueOf(wwCdBonusCo.get("WorkMonth"));
+			}
+		}
+
+		//修改生效中工作月需主管授權
+		if (maxWorkMonth == iWorkMonth) {
+			if (!titaVo.getHsupCode().equals("1")) {
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+		}
+		
 		// 有值計件代碼list
 		ArrayList<String> iPieceCodeList = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
@@ -182,7 +225,7 @@ public class L6787 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時發生錯誤
 				}
 			}
-			//專業獎勵金
+			// 專業獎勵金
 			iConditionCode = 3;
 			CdBonusCo bCdBonusCo = new CdBonusCo();
 			CdBonusCoId bCdBonusCoId = new CdBonusCoId();

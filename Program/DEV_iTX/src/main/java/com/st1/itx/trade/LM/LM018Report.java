@@ -30,6 +30,38 @@ public class LM018Report extends MakeReport {
 
 	@Autowired
 	Parse parse;
+	
+	
+	// 調整的訣竅:
+	// 先對準表格, 再對準字
+	// 字的位置會被表格Shift影響到
+	
+	// 字體大小
+	private int fontSize = 10;
+	
+	// 最左欄寬度
+	private int shiftFromLegends = 22;
+	
+	// 每季寬度
+	private int shiftPerSeason = 20;
+	
+	// 主表格與最後小計表格之間的留白
+	private int shiftBeforeSum = 14;
+	
+	// 主表格餘額shift (負數:因為是先向右畫好表格再回頭填數字)
+	private int shiftMainBal = -14;
+	
+	// 主表格利收shift (負數:因為是先向右畫好表格再回頭填數字)
+	private int shiftMainInt = -4;
+	
+	// 主表格年月shift
+	private int shiftYearMonth = 11;
+	
+	// 小計表格餘額shift
+	private int shiftSumBal = 9;
+	
+	// 小計表格利收shift
+	private int shiftSumInt = 25;
 
 	@Override
 	public void printHeader() {
@@ -46,10 +78,10 @@ public class LM018Report extends MakeReport {
 
 		this.print(-3, 70, "專案放款餘額及利收明細", "C");
 
-		this.setFontSize(10);
+		this.setFontSize(fontSize);
 
-		this.print(-5, 260, "機密等級：密");
-		this.print(-6, 260, "單位：億元");
+		this.print(-5, 138, "機密等級：密", "R");
+		this.print(-6, 138, "單位：億元　", "R");
 
 		this.setCharSpaces(0);
 
@@ -84,7 +116,6 @@ public class LM018Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
-
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM018", "專案放款餘額及利息收入", "密", "", "L");
 
 		List<Map<String, String>> LM018List = null;
@@ -110,7 +141,7 @@ public class LM018Report extends MakeReport {
 
 		// draw start of the form
 
-		this.print(-9, xPivot + xShift, "┌──────────");
+		this.print(-9,  xPivot + xShift, "┌──────────");
 		this.print(-10, xPivot + xShift, "│　　　　　　　　　　");
 		this.print(-11, xPivot + xShift, "│　　　　　　　　　　");
 		this.print(-12, xPivot + xShift, "├──────────");
@@ -145,7 +176,7 @@ public class LM018Report extends MakeReport {
 		this.print(-41, xPivot + xShift, "│　　　合計　　　　　");
 		this.print(-42, xPivot + xShift, "└──────────");
 
-		xShift += 27;
+		xShift += shiftFromLegends;
 
 		if (LM018List != null && !LM018List.isEmpty()) {
 
@@ -162,7 +193,7 @@ public class LM018Report extends MakeReport {
 						this.print(-9, xPivot + xShift, "┬─────────");
 						this.print(-10, xPivot + xShift, "│　　　　　　　　　");
 						this.print(-11, xPivot + xShift, "│　　　　　　　　　");
-						this.print(-11, xPivot + xShift + 13,
+						this.print(-11, xPivot + xShift + shiftYearMonth,
 								(parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年"
 										+ LM018Vo.get("F1").substring(4) + "月",
 								"C");
@@ -205,7 +236,7 @@ public class LM018Report extends MakeReport {
 						this.print(-9, xPivot + xShift, "┬─────────");
 						this.print(-10, xPivot + xShift, "│　　　　　　　　　");
 						this.print(-11, xPivot + xShift, "│　　　　　　　　　");
-						this.print(-11, xPivot + xShift + 13,
+						this.print(-11, xPivot + xShift + shiftYearMonth,
 								(parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年"
 										+ LM018Vo.get("F1").substring(4) + "月",
 								"C");
@@ -242,17 +273,17 @@ public class LM018Report extends MakeReport {
 						this.print(-42, xPivot + xShift, "┴────┴────");
 
 						// Output: year-to-be-ended group int total
-						this.print(-27, xPivot + xShift - 6, formatAmt(this.GetGroupIntTotal(), 3, 8), "C");
+						this.print(-27, xPivot + xShift + shiftMainInt, formatAmt(this.GetGroupIntTotal(), 3, 8), "C");
 
 						// Output: year-to-be-ended sums
-						this.print(-41, xPivot + xShift - 18, formatAmt(this.GetBalTotal(), 3, 8), "C");
-						this.print(-41, xPivot + xShift - 6, formatAmt(this.GetIntTotal(), 3, 8), "C");
+						this.print(-41, xPivot + xShift + shiftMainBal, formatAmt(this.GetBalTotal(), 3, 8), "C");
+						this.print(-41, xPivot + xShift + shiftMainInt, formatAmt(this.GetIntTotal(), 3, 8), "C");
 
 					}
 
 					lastYearMonth = LM018Vo.get("F1"); // YYYYMM
 
-					xShift += 26; // length of a new part of form
+					xShift += shiftPerSeason; // length of a new part of form
 
 					// !!!!!
 
@@ -280,12 +311,12 @@ public class LM018Report extends MakeReport {
 					BigDecimal f3 = getBigDecimal(LM018Vo.get("F3")).setScale(10, BigDecimal.ROUND_HALF_UP);
 
 					// loanbal
-					this.print(thisSubject.printY, xPivot + xShift - 18, formatAmt(f2, 3, 8), "C");
+					this.print(thisSubject.printY, xPivot + xShift + shiftMainBal, formatAmt(f2, 3, 8), "C");
 					thisSubject.lastBal = f2;
 
 					// interest
 					if (!thisSubject.showsGroupIntOnly) {
-						this.print(thisSubject.printY, xPivot + xShift - 6, formatAmt(f3, 4, 8), "C");
+						this.print(thisSubject.printY, xPivot + xShift + shiftMainInt, formatAmt(f3, 4, 8), "C");
 					}
 					thisSubject.lastInt = thisSubject.lastInt.add(f3);
 
@@ -297,10 +328,10 @@ public class LM018Report extends MakeReport {
 
 			// last yearMonth's GroupInt, totalSum and total Int
 
-			this.print(-27, xPivot + xShift - 6, formatAmt(this.GetGroupIntTotal(), 3, 8), "C");
+			this.print(-27, xPivot + xShift + shiftMainInt, formatAmt(this.GetGroupIntTotal(), 3, 8), "C");
 
-			this.print(-41, xPivot + xShift - 18, formatAmt(this.GetBalTotal(), 3, 8), "C");
-			this.print(-41, xPivot + xShift - 6, formatAmt(this.GetIntTotal(), 3, 8), "C");
+			this.print(-41, xPivot + xShift + shiftMainBal, formatAmt(this.GetBalTotal(), 3, 8), "C");
+			this.print(-41, xPivot + xShift + shiftMainInt, formatAmt(this.GetIntTotal(), 3, 8), "C");
 
 		} else {
 			this.print(-6, 1, "本日無資料");
@@ -308,7 +339,7 @@ public class LM018Report extends MakeReport {
 
 		// draw the end of the form and right-side total
 
-		this.print(-9, xPivot + xShift, "┐");
+		this.print(-9 , xPivot + xShift, "┐");
 		this.print(-10, xPivot + xShift, "│");
 		this.print(-11, xPivot + xShift, "│");
 		this.print(-12, xPivot + xShift, "┤");
@@ -343,11 +374,10 @@ public class LM018Report extends MakeReport {
 		this.print(-41, xPivot + xShift, "│");
 		this.print(-42, xPivot + xShift, "┘");
 
-		xShift += 14; // 2 for above; rest are extra spaces
+		xShift += shiftBeforeSum; // 2 for above; rest are extra spaces
 
 		// 第二個表格
-		this.print(-14, xPivot + xShift + 11, "餘額", "C");
-		this.print(-14, xPivot + xShift + 31, "利收", "C");
+		this.print(-14, xPivot + xShift, "　　　 餘額　　　　　　利收");
 		this.print(-15, xPivot + xShift, "┌───────┬───────┐");
 		this.print(-16, xPivot + xShift, "│　　　　　　　│　　　　　　　│");
 		this.print(-17, xPivot + xShift, "│　　　　　　　│　　　　　　　│");
@@ -385,19 +415,19 @@ public class LM018Report extends MakeReport {
 
 		// Output: loanbal and not-group lastInt output
 		for (subject s : subject.values()) {
-			this.print(s.printY, xPivot + xShift + 11, formatAmt(s.lastBal, 0), "C");
+			this.print(s.printY, xPivot + xShift + shiftSumBal, formatAmt(s.lastBal, 0), "C");
 
 			if (!s.showsGroupIntOnly) {
-				this.print(s.printY, xPivot + xShift + 31, formatAmt(s.lastInt, 0), "C");
+				this.print(s.printY, xPivot + xShift + shiftSumInt, formatAmt(s.lastInt, 0), "C");
 			}
 		}
 
 		// Output: group lastInt
-		this.print(-28, xPivot + xShift + 31, formatAmt(GetGroupIntTotal(), 0), "C");
+		this.print(-28, xPivot + xShift + shiftSumInt, formatAmt(GetGroupIntTotal(), 0), "C");
 
 		// Output: int and bal sum
-		this.print(-41, xPivot + xShift + 11, formatAmt(GetBalTotal(), 0), "C");
-		this.print(-41, xPivot + xShift + 31, formatAmt(GetIntTotal(), 0), "C");
+		this.print(-41, xPivot + xShift + shiftSumBal, formatAmt(GetBalTotal(), 0), "C");
+		this.print(-41, xPivot + xShift + shiftSumInt, formatAmt(GetIntTotal(), 0), "C");
 
 		long sno = this.close();
 		// this.toPdf(sno);
