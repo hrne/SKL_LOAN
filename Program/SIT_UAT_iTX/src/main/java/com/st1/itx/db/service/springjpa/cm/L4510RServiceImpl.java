@@ -28,7 +28,7 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-	private int entryDate = 0;
+	private int mediaDate = 0;
 	private String procCode = "";
 
 	@Override
@@ -56,7 +56,7 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "     FROM \"EmpDeductDtl\" EDD ";
 		sql += "     WHERE JSON_VALUE(EDD.\"JsonFields\", '$.InsuNo') IS NOT NULL "; // -- 判斷NOT NULL 避免後面資料重複
 		sql += "       AND EDD.\"ErrMsg\" IS NULL ";
-		sql += "       AND EDD.\"EntryDate\" = :entryDate ";
+		sql += "       AND EDD.\"MediaDate\" = :mediaDate ";
 		sql += "       AND EDD.\"ProcCode\" IN ( :procCode ) ";
 		sql += "       AND EDD.\"AchRepayCode\" = 5 ";
 		sql += " ) ";
@@ -102,14 +102,14 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("entryDate", entryDate);
+		query.setParameter("mediaDate", mediaDate);
 		query.setParameter("procCode", procCode);
 
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findAll(int iEntryDate, String iProcCode, TitaVo titaVo) throws Exception {
-		entryDate = iEntryDate;
+	public List<Map<String, String>> findAll(int iMediaDate, String iProcCode, TitaVo titaVo) throws Exception {
+		mediaDate = iMediaDate;
 		procCode = iProcCode;
 
 		return findAll(titaVo);

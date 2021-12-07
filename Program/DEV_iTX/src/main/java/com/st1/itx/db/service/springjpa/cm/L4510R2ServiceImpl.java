@@ -15,8 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("l4510R2ServiceImpl")
 @Repository
@@ -29,13 +27,8 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-	@Autowired
-	private Parse parse;
 
-	@Autowired
-	private DateUtil dateUtil;
-
-	private int entryDate = 0;
+	private int mediaDate = 0;
 	private String procCode = "";
 
 	@Override
@@ -43,7 +36,6 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4510R2.findAll");
@@ -62,8 +54,8 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += " from \"EmpDeductDtl\" d                                                ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\"                ";
 		sql += " where d.\"ErrMsg\" is null                                             ";
-		sql += "   and d.\"EntryDate\" = " + entryDate;
-		sql += "   and d.\"ProcCode\" in ( " + procCode + " ) ";
+		sql += "   and d.\"MediaDate\" = :mediaDate ";
+		sql += "   and d.\"ProcCode\" in (:procCode) ";
 		sql += "   and d.\"AchRepayCode\" = 4                                           ";
 		sql += " order by d.\"CustNo\",d.\"FacmNo\"                                     ";
 
@@ -72,14 +64,13 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
-		List<Object> result = query.getResultList();
-
-		return this.convertToMap(result);
+		query.setParameter("mediaDate", mediaDate);
+		query.setParameter("procCode", procCode);
+		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findAll(int iEntryDate, String iProcCode, TitaVo titaVo) throws Exception {
-		entryDate = iEntryDate;
+	public List<Map<String, String>> findAll(int iMediaDate, String iProcCode, TitaVo titaVo) throws Exception {
+		mediaDate = iMediaDate;
 		procCode = iProcCode;
 
 		return findAll(titaVo);

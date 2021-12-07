@@ -470,7 +470,8 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return boolean true or false
 	 */
 	public boolean isTxcdSpecial() {
-		return this.getTxcd().equals("LC100") || this.getTxcd().equals("LC101") || this.getTxcd().equals("LCR07") || this.getTxcd().equals("L6103") || this.getTxcd().equals("LC013");
+		return this.getTxcd().startsWith("LC") || this.getTxcd().equals("L6103");
+//		return this.getTxcd().equals("LC100") || this.getTxcd().equals("LC101") || this.getTxcd().equals("LCR07") || this.getTxcd().equals("L6103") || this.getTxcd().equals("LC013");
 	}
 
 	/**

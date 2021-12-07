@@ -22,7 +22,7 @@ import com.st1.itx.db.domain.TxAttachment;
 public interface TxAttachmentRepository extends JpaRepository<TxAttachment, Long> {
 
   // TranNo = ,AND MrKey =
-  public Slice<TxAttachment> findAllByTranNoIsAndMrKeyIsOrderByLastUpdateEmpNoDesc(String tranNo_0, String mrKey_1, Pageable pageable);
+  public Slice<TxAttachment> findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(String tranNo_0, String mrKey_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

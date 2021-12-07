@@ -32,6 +32,9 @@ public interface EmpDeductDtlRepositoryHist extends JpaRepository<EmpDeductDtl, 
   // MediaDate = , AND MediaKind = , AND MediaSeq = 
   public Slice<EmpDeductDtl> findAllByMediaDateIsAndMediaKindIsAndMediaSeqIs(int mediaDate_0, String mediaKind_1, int mediaSeq_2, Pageable pageable);
 
+  // MediaDate = , AND MediaKind = 
+  public Slice<EmpDeductDtl> findAllByMediaDateIsAndMediaKindIsOrderByEntryDateAscCustNoAscAchRepayCodeDesc(int mediaDate_0, String mediaKind_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

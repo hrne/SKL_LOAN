@@ -1,4 +1,4 @@
-package com.st1.itx.db.repository.day;
+package com.st1.itx.db.repository.mon;
 
 
 import java.util.Optional;
@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.st1.itx.db.domain.TxAttachment;
+import com.st1.itx.db.domain.TxAttachType;
 
 /**
  * Gen By Tool
@@ -19,15 +19,18 @@ import com.st1.itx.db.domain.TxAttachment;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface TxAttachmentRepositoryDay extends JpaRepository<TxAttachment, Long> {
+public interface TxAttachTypeRepositoryMon extends JpaRepository<TxAttachType, Long> {
 
-  // TranNo = ,AND MrKey =
-  public Slice<TxAttachment> findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(String tranNo_0, String mrKey_1, Pageable pageable);
+  // TranNo = 
+  public Slice<TxAttachType> findAllByTranNoIsOrderByTypeItemAsc(String tranNo_0, Pageable pageable);
+
+  // TranNo = ,AND TypeItem =
+  public Optional<TxAttachType> findTopByTranNoIsAndTypeItemIs(String tranNo_0, String typeItem_1);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
-  public Optional<TxAttachment> findByFileNo(Long fileNo);
+  public Optional<TxAttachType> findByTypeNo(Long typeNo);
 
 }
 

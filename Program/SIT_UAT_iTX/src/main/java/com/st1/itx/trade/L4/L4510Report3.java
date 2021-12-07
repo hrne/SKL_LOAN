@@ -40,6 +40,7 @@ public class L4510Report3 extends MakeReport {
 	private String repayCode = "";
 	private String acctCode = "";
 	private String acctItem = "";
+	private int mediaDate = 0;
 	private int entryDate = 0;
 	private int flag = 0;
 
@@ -93,7 +94,7 @@ public class L4510Report3 extends MakeReport {
 //		txExcel.setSheet("108.04", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6));
 
 		try {
-			fnAllList = l4510R3ServiceImpl.findAll(entryDate, procCode, titaVo);
+			fnAllList = l4510R3ServiceImpl.findAll(mediaDate, procCode, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -351,8 +352,8 @@ public class L4510Report3 extends MakeReport {
 		return sno;
 	}
 
-	public long exec(int iEntryDate, List<String> iProcCode, int flags, TitaVo titaVo) throws LogicException {
-		entryDate = iEntryDate;
+	public long exec(int iMediaDate, List<String> iProcCode, int flags, TitaVo titaVo) throws LogicException {
+		mediaDate = iMediaDate;
 		flag = flags;
 
 		for (int i = 0; i < iProcCode.size(); i++) {

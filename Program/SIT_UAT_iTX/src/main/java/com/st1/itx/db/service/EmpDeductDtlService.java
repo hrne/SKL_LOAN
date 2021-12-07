@@ -73,6 +73,18 @@ public interface EmpDeductDtlService {
   public Slice<EmpDeductDtl> mediaSeqEq(int mediaDate_0, String mediaKind_1, int mediaSeq_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * MediaDate = , AND MediaKind = 
+   *
+   * @param mediaDate_0 mediaDate_0
+   * @param mediaKind_1 mediaKind_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice EmpDeductDtl EmpDeductDtl of List
+   */
+  public Slice<EmpDeductDtl> mediaDateRng(int mediaDate_0, String mediaKind_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By EmpDeductDtl
    * 
    * @param empDeductDtlId key

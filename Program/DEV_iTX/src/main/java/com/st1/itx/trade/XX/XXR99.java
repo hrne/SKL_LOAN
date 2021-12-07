@@ -24,8 +24,10 @@ import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.CdLoanNotYet;
 import com.st1.itx.db.domain.CdSyndFee;
+import com.st1.itx.db.domain.TxAttachType;
 import com.st1.itx.db.service.CdLoanNotYetService;
 import com.st1.itx.db.service.CdSyndFeeService;
+import com.st1.itx.db.service.TxAttachTypeService;
 import com.st1.itx.db.domain.CdGuarantor;
 import com.st1.itx.db.service.CdGuarantorService;
 
@@ -64,6 +66,9 @@ public class XXR99 extends TradeBuffer {
 	@Autowired
 	public CdSyndFeeService sCdSyndFeeService;
 
+	@Autowired
+	public TxAttachTypeService txAttachTypeService;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active XXR99 ");
@@ -105,6 +110,8 @@ public class XXR99 extends TradeBuffer {
 
 				s = getCdBcmDist();
 
+			} else if (k.length() > 12 && "TxAttachType".equals(k.substring(0, 12))) {
+				s = getTxAttachType(k);
 			} else if ("AUTHGROUP".equals(k)) {
 				s = getAuthGroup();
 			} else if (k.length() == 14 && "AUTHGROUP".equals(k.substring(0, 9))) {
@@ -136,6 +143,27 @@ public class XXR99 extends TradeBuffer {
 		return this.sendList();
 	}
 
+	private String getTxAttachType(String k) {
+		String s = "";
+		
+		String tranNo = k.substring(12, 17);
+		
+		this.info("XXR99 getTxAttachType TranNo= " + tranNo);
+		
+		Slice<TxAttachType> slTxAttachType = txAttachTypeService.findByTranNo(tranNo, 0, Integer.MAX_VALUE);
+		List<TxAttachType> lTxAttachType = slTxAttachType == null ? null : slTxAttachType.getContent();
+		
+		if (lTxAttachType != null && lTxAttachType.size() > 0) {
+			for (TxAttachType txAttachType : lTxAttachType) {
+				if (!"".equals(s)) {
+					s += ";";
+				}
+				s += txAttachType.getTypeItem() + ":";
+			}
+		}
+		return s;
+	}
+	
 	// getCdGuarantor
 	private String getCdGuarantor() {
 		String s = "";

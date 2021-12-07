@@ -27,7 +27,7 @@ public class CdCity implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3793268157174323481L;
+	private static final long serialVersionUID = -5577982913913465722L;
 
 // 縣市代碼(地區別)
   /* 03:基隆市05:台北市10:新北市15:桃園市17:新竹市20:新竹縣25:苗栗縣35:台中市40:彰化縣45:南投縣50:雲林縣54:嘉義市55:嘉義縣65:台南市70:高雄市80:屏東縣95:宜蘭縣90:花蓮縣85:台東縣97:澎湖縣 */
@@ -86,11 +86,6 @@ public class CdCity implements Serializable {
   // 利率下限
   @Column(name = "`IntRateFloor`")
   private BigDecimal intRateFloor = new BigDecimal("0");
-
-  // 聯徵用縣市代碼
-  /* 刪除 */
-  @Column(name = "`JcicCityCode`", length = 0)
-  private String jcicCityCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -416,25 +411,6 @@ public class CdCity implements Serializable {
   }
 
 /**
-	* 聯徵用縣市代碼<br>
-	* 刪除
-	* @return String
-	*/
-  public String getJcicCityCode() {
-    return this.jcicCityCode == null ? "" : this.jcicCityCode;
-  }
-
-/**
-	* 聯徵用縣市代碼<br>
-	* 刪除
-  *
-  * @param jcicCityCode 聯徵用縣市代碼
-	*/
-  public void setJcicCityCode(String jcicCityCode) {
-    this.jcicCityCode = jcicCityCode;
-  }
-
-/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -515,7 +491,7 @@ public class CdCity implements Serializable {
   public String toString() {
     return "CdCity [cityCode=" + cityCode + ", cityItem=" + cityItem + ", unitCode=" + unitCode + ", accCollPsn=" + accCollPsn + ", accTelArea=" + accTelArea + ", accTelNo=" + accTelNo
            + ", accTelExt=" + accTelExt + ", legalPsn=" + legalPsn + ", legalArea=" + legalArea + ", legalNo=" + legalNo + ", legalExt=" + legalExt + ", intRateIncr=" + intRateIncr
-           + ", intRateCeiling=" + intRateCeiling + ", intRateFloor=" + intRateFloor + ", jcicCityCode=" + jcicCityCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", intRateCeiling=" + intRateCeiling + ", intRateFloor=" + intRateFloor + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

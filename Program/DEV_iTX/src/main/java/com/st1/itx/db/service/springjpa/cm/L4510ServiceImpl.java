@@ -15,8 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L4510ServiceImpl")
 @Repository
@@ -29,11 +27,6 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-	@Autowired
-	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	private int intStartDate = 0;
 	private int intEndDate = 0;

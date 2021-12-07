@@ -160,6 +160,7 @@ public class L4510 extends TradeBuffer {
 //	重複註記
 	private HashMap<tmpFacm, Integer> flagMap2 = new HashMap<>();
 
+	Slice<EmpDeductSchedule> slEmpDeductSchedule = null;
 	private long reportA = 0;
 	private long reportB = 0;
 	private long reportC = 0;
@@ -186,6 +187,9 @@ public class L4510 extends TradeBuffer {
 		List<String> procCodeIs15 = new ArrayList<String>();
 		List<String> procCodeUn15 = new ArrayList<String>();
 
+//		List<String> dateIs15 = new ArrayList<String>();
+//		List<String> dateUn15 = new ArrayList<String>();
+		
 //		1.清除原扣款檔
 //		2.從主檔撈資料
 //		3.BatxCom算金額
@@ -197,7 +201,7 @@ public class L4510 extends TradeBuffer {
 		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
 
 //		抓取媒體日為今日者
-		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate,
+		 slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate,
 				this.index, this.limit, titaVo);
 		if (slEmpDeductSchedule != null) {
 			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
@@ -207,15 +211,13 @@ public class L4510 extends TradeBuffer {
 //				1.15日薪 2.非15日薪
 				if (iOpItem == 1 && "1".equals(tCdCode.getItem().substring(0, 1))) {
 					procCodeIs15.add(tEmpDeductSchedule.getAgType1());
-					iY15EntryDate = tEmpDeductSchedule.getEntryDate() + 19110000;
+//					iY15EntryDate = tEmpDeductSchedule.getEntryDate();
 				}
 				if (iOpItem == 2 && "2".equals(tCdCode.getItem().substring(0, 1))) {
 					procCodeUn15.add(tEmpDeductSchedule.getAgType1());
-					iN15EntryDate = tEmpDeductSchedule.getEntryDate() + 19110000;
+//					iN15EntryDate = tEmpDeductSchedule.getEntryDate();
 				}
 			}
-			this.info("iN15EntryDate ... " + iN15EntryDate);
-			this.info("iY15EntryDate ... " + iY15EntryDate);
 
 		} else {
 			throw new LogicException("E0001", "查無資料");
@@ -223,13 +225,12 @@ public class L4510 extends TradeBuffer {
 
 //		刪除舊資料
 		if (iOpItem == 1) {
-			deleEmpDeductDtl(procCodeIs15, iY15EntryDate, titaVo);
-			deleEmpDeductMedia("4", iY15EntryDate, titaVo);
+			deleEmpDeductDtl("4", mediaDate, titaVo);
+			deleEmpDeductMedia("4", mediaDate, titaVo);
 			// 還款試算
 			calculateY15BaTxCom(titaVo);
 			List<EmpDeductDtl> is15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
-			Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.entryDateRng(iY15EntryDate, iY15EntryDate,
-					procCodeIs15, this.index, this.limit, titaVo);
+			Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "4", this.index, this.limit, titaVo);
 			is15EmpDeductDtl = sis15EmpDeductDtl == null ? null : sis15EmpDeductDtl.getContent();
 			this.info("Is15 Dtl Start...");
 //		4.寫入EmpDeductMedia (彙總by戶號) 4:15日
@@ -237,33 +238,31 @@ public class L4510 extends TradeBuffer {
 //		D E F
 //		火險費
 			try {
-				reportD = setReportInsuFee(iY15EntryDate, procCodeIs15, 1, titaVo);
+				reportD = setReportInsuFee(mediaDate, procCodeIs15, 1, titaVo);
 			} catch (LogicException e1) {
 				throw new LogicException("E0008 ", e1.getErrorMsg());
 			}
 //		帳管費
 			try {
-				reportE = setReportAcctFee(iY15EntryDate, procCodeIs15, 1, titaVo);
+				reportE = setReportAcctFee(mediaDate, procCodeIs15, 1, titaVo);
 			} catch (LogicException e1) {
 				throw new LogicException("E0008 ", e1.getErrorMsg());
 			}
 
 			try {
-				reportF = setReportMedia(iY15EntryDate, procCodeIs15, 1, titaVo);
+				reportF = setReportMedia(mediaDate, procCodeIs15, 1, titaVo);
 			} catch (LogicException e1) {
 				throw new LogicException("E0008 ", e1.getErrorMsg());
 			}
 		}
 		if (iOpItem == 2) {
-			deleEmpDeductDtl(procCodeUn15, iN15EntryDate, titaVo);
-			deleEmpDeductMedia("5", iN15EntryDate, titaVo);
+			deleEmpDeductDtl("5", mediaDate, titaVo);
+			deleEmpDeductMedia("5", mediaDate, titaVo);
 //			3.產出火險(05)、帳管(04)、明細表
 			calculateN15BaTxCom(titaVo);
 			List<EmpDeductDtl> un15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
 
-			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.entryDateRng(iN15EntryDate, iN15EntryDate,
-					procCodeUn15, this.index, this.limit, titaVo);
-
+			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "5", this.index, this.limit, titaVo);
 			un15EmpDeductDtl = sun15EmpDeductDtl == null ? null : sun15EmpDeductDtl.getContent();
 			this.info("Un15 Dtl Start...");
 //			4.寫入EmpDeductMedia (彙總by戶號) 5:非15日
@@ -272,19 +271,19 @@ public class L4510 extends TradeBuffer {
 //			A B C
 //			火險費
 			try {
-				reportA = setReportInsuFee(iN15EntryDate, procCodeUn15, 2, titaVo);
+				reportA = setReportInsuFee(mediaDate, procCodeUn15, 2, titaVo);
 			} catch (LogicException e1) {
 				throw new LogicException("E0008 ", e1.getErrorMsg());
 			}
 //			帳管費
 			try {
-				reportB = setReportAcctFee(iN15EntryDate, procCodeUn15, 2, titaVo);
+				reportB = setReportAcctFee(mediaDate, procCodeUn15, 2, titaVo);
 			} catch (LogicException e1) {
 				throw new LogicException("E0008 ", e1.getErrorMsg());
 			}
 
 			try {
-				reportC = setReportMedia(iN15EntryDate, procCodeUn15, 2, titaVo);
+				reportC = setReportMedia(mediaDate, procCodeUn15, 2, titaVo);
 			} catch (LogicException e1) {
 				throw new LogicException("E0008 ", e1.getErrorMsg());
 			}
@@ -311,6 +310,18 @@ public class L4510 extends TradeBuffer {
 		return this.sendList();
 	}
 
+	private int getList(Slice<EmpDeductSchedule> slEmpDeductSchedule,String AgType1) throws LogicException {
+		int entryday = 0;
+		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
+			
+		  if(AgType1.equals(tEmpDeductSchedule.getAgType1())) {
+			  return tEmpDeductSchedule.getEntryDate();
+		  }
+		  
+		}
+		return entryday;
+	}
+	
 //	用既有之List for each 找出RepayCode 1.期款  4.帳管 5.火險 6.契變手續費 
 	private void doBaTxCom(List<Map<String, String>> resultList, TitaVo titaVo) throws LogicException {
 		List<BaTxVo> listBaTxVo = new ArrayList<>();
@@ -346,11 +357,14 @@ public class L4510 extends TradeBuffer {
 				custAcctCode.put(parse.stringToInteger(result.get("F0")), result.get("F2"));
 			}
 
+			
 			// 應繳試算
 			if ("2".equals(result.get("F3"))) {
+				iN15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
 				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			} else {
+				iN15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
 				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			}
@@ -595,9 +609,11 @@ public class L4510 extends TradeBuffer {
 
 //			1.15日薪 2.非15日薪
 			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
-				tEmpDeductDtlId.setEntryDate(iN15EntryDate);
-			} else {
+				iY15EntryDate = getList(slEmpDeductSchedule,tCdEmp.getAgType1());
 				tEmpDeductDtlId.setEntryDate(iY15EntryDate);
+			} else {
+				iN15EntryDate = getList(slEmpDeductSchedule,tCdEmp.getAgType1());
+				tEmpDeductDtlId.setEntryDate(iN15EntryDate);
 			}
 			tEmpDeductDtlId.setCustNo(tmp.getCustNo());
 			tEmpDeductDtlId.setAchRepayCode(tmp.getAchRepayCode());
@@ -702,25 +718,25 @@ public class L4510 extends TradeBuffer {
 	}
 
 //	flag = 1.15日 2.非15
-	private long setReportInsuFee(int iEntryDate, List<String> iProcCode, int flag, TitaVo titaVo)
+	private long setReportInsuFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo)
 			throws LogicException {
 
-		return l4510Report.exec(iEntryDate, iProcCode, flag, titaVo);
+		return l4510Report.exec(imediaDate, iProcCode, flag, titaVo);
 	}
 
-	private long setReportAcctFee(int iEntryDate, List<String> iProcCode, int flag, TitaVo titaVo)
+	private long setReportAcctFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo)
 			throws LogicException {
 
-		return l4510Report2.exec(iEntryDate, iProcCode, flag, titaVo);
+		return l4510Report2.exec(imediaDate, iProcCode, flag, titaVo);
 	}
 
-	private long setReportMedia(int iEntryDate, List<String> iProcCode, int flag, TitaVo titaVo) throws LogicException {
+	private long setReportMedia(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo) throws LogicException {
 		this.info("setReportMedia Start... ");
-		this.info("iEntryDate ... " + iEntryDate);
+		this.info("imediaDate ... " + imediaDate);
 		this.info("iProcCode ... " + iProcCode);
 		this.info("flag ... " + flag);
 
-		return l4510Report3.exec(iEntryDate, iProcCode, flag, titaVo);
+		return l4510Report3.exec(imediaDate, iProcCode, flag, titaVo);
 	}
 
 //		[flag = 4:15日 ; 5:非15日]
@@ -943,9 +959,9 @@ public class L4510 extends TradeBuffer {
 		}
 	}
 
-	private void deleEmpDeductDtl(List<String> procCode, int iEntryDate, TitaVo titaVo) throws LogicException {
+	private void deleEmpDeductDtl(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
 
-		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.entryDateRng(iEntryDate, iEntryDate, procCode,
+		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaDateRng(iMediaDate, MediaKind,
 				this.index, this.limit, titaVo);
 
 		if (slEmpDeductDtl != null) {
@@ -960,9 +976,9 @@ public class L4510 extends TradeBuffer {
 		}
 	}
 
-	private void deleEmpDeductMedia(String MediaKind, int iEntryDate, TitaVo titaVo) throws LogicException {
+	private void deleEmpDeductMedia(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
 
-		Slice<EmpDeductMedia> slEmpDeductMedia = empDeductMediaService.entryDateRng(iEntryDate, iEntryDate, MediaKind,
+		Slice<EmpDeductMedia> slEmpDeductMedia = empDeductMediaService.mediaDateRng(iMediaDate, iMediaDate, MediaKind,
 				this.index, this.limit, titaVo);
 
 		if (slEmpDeductMedia != null) {
@@ -1136,11 +1152,11 @@ public class L4510 extends TradeBuffer {
 	}
 
 	private void calculateY15BaTxCom(TitaVo titaVo) throws LogicException {
-		if (iY15EntryDate > 19110000) {
+		if (mediaDate > 19110000) {
 			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 			try {
-				resultList = l4510ServiceImpl.findAll(0, iY15EntryDate, 1, titaVo);
+				resultList = l4510ServiceImpl.findAll(0, mediaDate, 1, titaVo);
 			} catch (Exception e) {
 				throw new LogicException("E0013", e.getMessage());
 			}
@@ -1152,9 +1168,9 @@ public class L4510 extends TradeBuffer {
 	}
 
 	private void calculateN15BaTxCom(TitaVo titaVo) throws LogicException {
-		if (iN15EntryDate > 19110000) {
+		if (mediaDate > 19110000) {
 //			QC.616 非15扣薪 滯繳兩期者，而非全部
-			delayDate = delayTerms(2, iN15EntryDate);
+			delayDate = delayTerms(2, mediaDate);
 			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 			try {

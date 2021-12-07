@@ -36,6 +36,7 @@ public class L4510Report extends MakeReport {
 
 	private int perfMonth = 0;
 	private String procCode = "";
+	private int mediaDate = 0;
 	private int entryDate = 0;
 	private int flag = 0;
 
@@ -83,7 +84,7 @@ public class L4510Report extends MakeReport {
 		this.info("L4510Report exec");
 
 		try {
-			fnAllList = l4510RServiceImpl.findAll(entryDate, procCode, titaVo);
+			fnAllList = l4510RServiceImpl.findAll(mediaDate, procCode, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -190,8 +191,8 @@ public class L4510Report extends MakeReport {
 		return sno;
 	}
 
-	public long exec(int iEntryDate, List<String> iProcCode, int flags, TitaVo titaVo) throws LogicException {
-		entryDate = iEntryDate;
+	public long exec(int iMediaDate, List<String> iProcCode, int flags, TitaVo titaVo) throws LogicException {
+		mediaDate = iMediaDate;
 		flag = flags;
 
 		for (int i = 0; i < iProcCode.size(); i++) {

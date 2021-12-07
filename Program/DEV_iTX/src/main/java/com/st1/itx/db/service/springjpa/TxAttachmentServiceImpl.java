@@ -123,13 +123,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findByTran " + dbName + " : " + "tranNo_0 : " + tranNo_0 + " mrKey_1 : " +  mrKey_1);
     if (dbName.equals(ContentName.onDay))
-      slice = txAttachmentReposDay.findAllByTranNoIsAndMrKeyIsOrderByLastUpdateEmpNoDesc(tranNo_0, mrKey_1, pageable);
+      slice = txAttachmentReposDay.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txAttachmentReposMon.findAllByTranNoIsAndMrKeyIsOrderByLastUpdateEmpNoDesc(tranNo_0, mrKey_1, pageable);
+      slice = txAttachmentReposMon.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txAttachmentReposHist.findAllByTranNoIsAndMrKeyIsOrderByLastUpdateEmpNoDesc(tranNo_0, mrKey_1, pageable);
+      slice = txAttachmentReposHist.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
     else 
-      slice = txAttachmentRepos.findAllByTranNoIsAndMrKeyIsOrderByLastUpdateEmpNoDesc(tranNo_0, mrKey_1, pageable);
+      slice = txAttachmentRepos.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
