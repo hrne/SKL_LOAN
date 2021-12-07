@@ -6,7 +6,6 @@
 	<artifactId>iTX</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-
 	<properties>
 		<!-- Generic properties -->
 		<Java-Ver>1.8</Java-Ver>
@@ -333,10 +332,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc8</artifactId>
-			<version>19.3.0</version>
-			<scope>provided</scope>
+		  <groupId>com.oracle.database.jdbc</groupId>
+		  <artifactId>ojdbc8</artifactId>
+		  <version>19.3.0.0</version>
 		</dependency>
 
 		<!-- hibernate -->
@@ -451,6 +449,7 @@
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.49</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
