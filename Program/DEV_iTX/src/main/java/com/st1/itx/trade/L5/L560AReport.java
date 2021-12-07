@@ -102,6 +102,10 @@ public class L560AReport extends MakeReport {
 		String iCalyy = iCalDy.substring(0, 3);
 		String iCalMm = iCalDy.substring(3, 5);
 		String iCalDd = iCalDy.substring(5, 7);
+		String iEntDy = titaVo.getEntDy(); // 會計日
+		String iEntyy = iEntDy.substring(1, 4);
+		String iEntMm = iEntDy.substring(4, 6);
+		String iEntDd = iEntDy.substring(6, 8);
 		String iaddress = "";
 
 		CustMain iCustMain = iCustMainService.custNoFirst(rCustNo, rCustNo, titaVo);
@@ -132,8 +136,8 @@ public class L560AReport extends MakeReport {
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<BaTxVo>();
 		baTxCom.setTxBuffer(txbuffer);
 		try {
-			listBaTxVo = baTxCom.settingUnPaid(txbuffer.getTxBizDate().getLbsDy(), rCustNo, rFacmNo, 0, 1,
-					BigDecimal.ZERO, titaVo);// 日期為上一個會計日
+			listBaTxVo = baTxCom.settingUnPaid(txbuffer.getTxBizDate().getTbsDy(), rCustNo, rFacmNo, 0, 1,
+					BigDecimal.ZERO, titaVo);// 日期為會計日(110/12/6怡婷確認)
 		} catch (LogicException e) {
 			this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
 		}
@@ -333,6 +337,17 @@ public class L560AReport extends MakeReport {
 				String strContent4 = "";
 				String strContent5 = "";
 				String strContent6 = "";
+				String tempDate = "";
+				int tempLoanBal= 0;
+				int tempTxAmt= 0;
+				int tempTxAmt2= 0;
+				int tempPrincipal = 0;
+				int tempInterest = 0;
+				int tempBreachAmt = 0;
+				int tempTempAmt1 = 0;
+				int tempTempAmt2 = 0;
+				int tempUnpaidAmt = 0;
+				boolean samEntdate = false;
 
 				DecimalFormat df1 = new DecimalFormat("#,##0");
 				
@@ -340,17 +355,33 @@ public class L560AReport extends MakeReport {
 					count = count + 1;
 					strContent = "";
 					int tDate = 0;
+
+					if (tempDate.equals(t560A.get(txt1[1]).trim())) {//入帳日期相同時,不同撥款序號資料合併
+						count = count - 1;
+						samEntdate = true;
+					}else {
+						samEntdate = false;
+					}
+					if (count == 7) {
+						break;
+					}
+					
 					for (int j = 1; j <= 15; j++) {
 						String strField = "";
 						if (t560A.get(txt1[j - 1]) == null) {
 							strField = "";
 						} else {
 							strField = t560A.get(txt1[j - 1]).trim();
+							
 						}
 						// 格式處理
 						switch (j) {
 						case 1://撥款序號
-							strField = " " + makeFile.fillStringL(strField, 3, '0');
+							if (samEntdate == true) {
+								strField = " " + makeFile.fillStringL("000", 3, '0');
+							} else {
+								strField = " " + makeFile.fillStringL(strField, 3, '0');
+							}
 							break;
 						case 2://入帳日期
 							if ("0".equals(strField)) {
@@ -361,10 +392,19 @@ public class L560AReport extends MakeReport {
 								sDate = sDate.substring(0, 3) + "/" + sDate.substring(3, 5) + "/"
 										+ sDate.substring(5, 7);
 								strField = makeFile.fillStringL(sDate,10, ' ');
+								tempDate = t560A.get(txt1[1]).trim();
 							}
 							break;
 						case 3://放款餘額
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),15, ' ');
+							if (samEntdate == true) {
+								tempLoanBal = tempLoanBal + Integer.valueOf(t560A.get("F2"));
+								strField =  makeFile.fillStringL(df1.format(parse.stringToBigDecimal(String.valueOf(tempLoanBal))), 15,
+										' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 15,
+										' ');
+								tempLoanBal = Integer.valueOf(t560A.get("F2"));
+							}
 							break;
 						case 4://計息期間-起
 							if ("0".equals(strField) || "".equals(strField)) {
@@ -395,28 +435,92 @@ public class L560AReport extends MakeReport {
 							strField = makeFile.fillStringL(strField,10, ' ');
 							break;
 						case 8://交易金額
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),12, ' ');
+							if (samEntdate == true) {
+								tempTxAmt = tempTxAmt + Integer.valueOf(t560A.get("F7"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempTxAmt))), 12, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 12,
+										' ');
+								tempTxAmt = Integer.valueOf(t560A.get("F7"));
+							}
 							break;
 						case 9://作帳金額
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),12, ' ');
+							if (samEntdate == true) {
+								tempTxAmt2 = tempTxAmt2 + Integer.valueOf(t560A.get("F8"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempTxAmt2))), 12, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 12,
+										' ');
+								tempTxAmt2 = Integer.valueOf(t560A.get("F8"));
+							}
 							break;
 						case 10://本金
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							if (samEntdate == true) {
+								tempPrincipal = tempPrincipal + Integer.valueOf(t560A.get("F9"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempPrincipal))), 11, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 11,
+										' ');
+								tempPrincipal = Integer.valueOf(t560A.get("F9"));
+							}
 							break;
 						case 11://利息
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							if (samEntdate == true) {
+								tempInterest = tempInterest + Integer.valueOf(t560A.get("F10"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempInterest))), 11, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 11,
+										' ');
+								tempInterest = Integer.valueOf(t560A.get("F10"));
+							}
 							break;
 						case 12://違約金
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							if (samEntdate == true) {
+								tempBreachAmt = tempBreachAmt + Integer.valueOf(t560A.get("F11"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempBreachAmt))), 11, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 11,
+										' ');
+								tempBreachAmt = Integer.valueOf(t560A.get("F11"));
+							}
 							break;
 						case 13://暫收借
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							if (samEntdate == true) {
+								tempTempAmt1 = tempTempAmt1 + Integer.valueOf(t560A.get("F12"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempTempAmt1))), 11, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 11,
+										' ');
+								tempTempAmt1 = Integer.valueOf(t560A.get("F12"));
+							}
 							break;
 						case 14://暫收貸
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							if (samEntdate == true) {
+								tempTempAmt2 = tempTempAmt2 + Integer.valueOf(t560A.get("F13"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempTempAmt2))), 11, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 11,
+										' ');
+								tempTempAmt2 = Integer.valueOf(t560A.get("F13"));
+							}
 							break;
 						case 15://短繳
-							strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)),11, ' ');
+							if (samEntdate == true) {
+								tempUnpaidAmt = tempUnpaidAmt + Integer.valueOf(t560A.get("F14"));
+								strField = makeFile.fillStringL(
+										df1.format(parse.stringToBigDecimal(String.valueOf(tempUnpaidAmt))), 11, ' ');
+							} else {
+								strField = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(strField)), 11,
+										' ');
+								tempUnpaidAmt = Integer.valueOf(t560A.get("F14"));
+							}
 							break;
 						default:
 							strField = "";
@@ -427,7 +531,7 @@ public class L560AReport extends MakeReport {
 					
 					//資料為入帳日期遞減排序,只抓日期最近的6筆資料,要列印的順序相反,以入帳日期遞增顯示
 					if (count == 1) {
-						loanBal = Integer.valueOf(t560A.get("F2"));
+						loanBal = tempLoanBal;
 						strContent6 = strContent;
 					}
 					if (count == 2) {
@@ -447,9 +551,6 @@ public class L560AReport extends MakeReport {
 					}
 					sumPrincipal = sumPrincipal + Integer.valueOf(t560A.get("F9"));
 					sumInterest = sumInterest + Integer.valueOf(t560A.get("F10"));
-					if (count == 6) {
-						break;
-					}
 
 				} // for
 				if (!"".equals(strContent1)){
@@ -479,7 +580,7 @@ public class L560AReport extends MakeReport {
 				String ssumPrincipal = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(String.valueOf(sumPrincipal))),15, ' ');
 				String ssumInterest = makeFile.fillStringL(df1.format(parse.stringToBigDecimal(String.valueOf(sumInterest))),15, ' ');
 
-				strContent = " " + iCalyy + "年" + iCalMm + "月" + iCalDd + "日當日餘額:" + sloanBal + "        本金小計:"
+				strContent = " " + iEntyy + "年" + iEntMm + "月" + iEntDd + "日當日餘額:" + sloanBal + "        本金小計:"
 						+ ssumPrincipal + "        利息小計:" + ssumInterest;
 				makeFile.put(strContent);
 

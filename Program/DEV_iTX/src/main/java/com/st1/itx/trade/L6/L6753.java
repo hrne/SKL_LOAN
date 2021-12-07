@@ -140,7 +140,8 @@ public class L6753 extends TradeBuffer {
 				} else {
 					throw new LogicException(titaVo, "E0004", EmployeeNo); // 刪除資料不存在
 				}
-
+				dataLog.setEnv(titaVo, tCdAoDept, tCdAoDept); ////
+				dataLog.exec("刪除房貸專員所屬業務部室"); ////
 			}
 
 		} else if (!(funcd.equals("5"))) {

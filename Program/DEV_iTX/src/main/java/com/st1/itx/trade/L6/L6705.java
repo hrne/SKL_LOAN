@@ -105,6 +105,8 @@ public class L6705 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iCityCode + "-" + iAreaCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdArea, tCdArea); ////
+			dataLog.exec("刪除聯徵報送-地區別資料"); ////
 			break;
 
 		case 5: // inq

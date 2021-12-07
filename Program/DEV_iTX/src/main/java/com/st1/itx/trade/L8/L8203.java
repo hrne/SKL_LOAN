@@ -110,7 +110,7 @@ public class L8203 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tMlaundryDetail2, tMlaundryDetail); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改疑似洗錢交易合理性"); 
 			break;
 		case 4: // 刪除
 			tMlaundryDetail = sMlaundryDetailService.holdById(new MlaundryDetailId(iFEntryDate, iFactor, iCustNo));
@@ -135,6 +135,8 @@ public class L8203 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", titaVo.getParam("CustNo")); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tMlaundryDetail, tMlaundryDetail); ////
+			dataLog.exec("刪除疑似洗錢交易合理性"); 
 			break;
 		}
 		this.info("3");

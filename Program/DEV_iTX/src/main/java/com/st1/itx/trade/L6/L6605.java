@@ -131,6 +131,8 @@ public class L6605 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iOverdueSign + iOverdueCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdOverdue, tCdOverdue); ////
+			dataLog.exec("刪除逾期新增減少原因"); ////
 			break;
 
 		case 5: // inq

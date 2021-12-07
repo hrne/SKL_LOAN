@@ -167,6 +167,8 @@ public class L6302 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iBaseRateCode + "-" + iFEffectDate); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdBaseRate, tCdBaseRate);
+			dataLog.exec("刪除指標利率");
 			break;
 		}
 		this.info("3");

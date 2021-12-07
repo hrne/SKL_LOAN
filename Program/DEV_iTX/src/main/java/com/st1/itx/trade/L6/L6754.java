@@ -170,6 +170,8 @@ public class L6754 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0005", "刪除時無資料");
 			}
+			iDataLog.setEnv(titaVo, iCdPerformance, iCdPerformance);
+			iDataLog.exec("刪除業績件數及金額核算標準");
 			break;
 		default:
 			break;

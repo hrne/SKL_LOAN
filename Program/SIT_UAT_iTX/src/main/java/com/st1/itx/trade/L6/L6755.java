@@ -100,6 +100,8 @@ public class L6755 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iUnitCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdBcm, tCdBcm); ////
+			dataLog.exec("刪除單位及主管代號"); ////
 			break;
 		case 5: // inq
 			break;

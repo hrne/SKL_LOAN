@@ -101,6 +101,8 @@ public class L6606 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iSupvReasonCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdSupv, tCdSupv); ////
+			dataLog.exec("刪除主管理由"); ////
 			break;
 
 		}

@@ -101,6 +101,8 @@ public class L6607 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iGuaRelCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdGuarantor, tCdGuarantor); ////
+			dataLog.exec("刪除保證人關係代碼"); ////
 			break;
 		}
 		this.info("3");

@@ -129,6 +129,8 @@ public class L6709 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iAcBookCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdAcBook, tCdAcBook); ////
+			dataLog.exec("刪除帳冊別目標金額"); ////
 			break;
 		}
 		this.info("3");

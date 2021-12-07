@@ -175,7 +175,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findSingle(TitaVo titaVo) throws Exception {

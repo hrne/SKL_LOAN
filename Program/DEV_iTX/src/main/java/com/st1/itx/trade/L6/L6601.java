@@ -116,6 +116,8 @@ public class L6601 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdAcCode, tCdAcCode); ////
+			dataLog.exec("刪除會計科子細目"); ////
 			break;
 
 		}

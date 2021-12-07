@@ -171,7 +171,8 @@ public class L6310 extends TradeBuffer {
 				} else {
 					throw new LogicException(titaVo, "E0004", titaVo.getParam("Holiday" + i)); // 刪除資料不存在
 				}
-
+				dataLog.setEnv(titaVo, tTxHoliday, tTxHoliday); ////
+				dataLog.exec("刪除特殊/例假日"); ////
 			}
 
 		} else if (!(funcd.equals("5"))) {

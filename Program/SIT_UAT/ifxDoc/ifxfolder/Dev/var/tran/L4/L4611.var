@@ -226,7 +226,7 @@ E(0,@FacmNo,#L4r18FacmNo)
 E(0,@InsuYearMonth,#L4r18InsuYearMonth)
 
 !C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo),T(2,@PrevInsuNo,#L4r18NowInsuNo)),T(2,@NowInsuNo,#L4r18NowInsuNo))
-C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo)),T(2,@NowInsuNo,#L4r18NowInsuNo))
+C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo),$),T(2,@NowInsuNo,#L4r18NowInsuNo))
 
 T(2,@EndoInsuNo,#L4r18EndoInsuNo)
 E(0,@FireInsuCovrg,#L4r18FireInsuCovrg)

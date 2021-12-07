@@ -135,7 +135,8 @@ public class L6702 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iBranchNo); // 刪除資料不存在
 			}
-
+			dataLog.setEnv(titaVo, tCdBranch, tCdBranch); ////
+			dataLog.exec("刪除營業單位對照檔"); //
 			break;
 
 		case 5: // inq

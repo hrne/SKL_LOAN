@@ -160,7 +160,8 @@ public class L6752 extends TradeBuffer {
 				} else {
 					throw new LogicException(titaVo, "E0004", titaVo.getParam("Year") + titaVo.getParam("Month" + i)); // 刪除資料不存在
 				}
-
+				dataLog.setEnv(titaVo, tCdWorkMonth, tCdWorkMonth); ////
+				dataLog.exec("刪除放款業績工作月"); ////
 			}
 
 		} else if (!(FuncCode.equals("5"))) {

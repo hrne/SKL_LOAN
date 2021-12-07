@@ -112,6 +112,8 @@ public class L6502 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", titaVo.getParam("YearMonth")); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdVarValue, tCdVarValue); ////
+			dataLog.exec("刪除會計變動值設定"); ////
 			break;
 		}
 

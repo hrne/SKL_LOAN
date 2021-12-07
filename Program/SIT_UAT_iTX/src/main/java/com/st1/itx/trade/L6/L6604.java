@@ -133,9 +133,10 @@ public class L6604 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", iDefCode + "-" + iCode + ":" + e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
-
+			dataLog.setEnv(titaVo, tCdCode, tCdCode); ////
+			dataLog.exec("刪除各類代碼檔"); ////
 			break;
-
+			
 		}
 
 		this.addList(this.totaVo);

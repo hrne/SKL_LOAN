@@ -99,7 +99,7 @@ public class L8204 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tMlaundryRecord2, tMlaundryRecord); ////
-			dataLog.exec(); ////
+			dataLog.exec("修改疑似洗錢交易訪談記錄"); ////
 			break;
 		case 4: // 刪除
 			tMlaundryRecord = sMlaundryRecordService.holdById(new MlaundryRecordId(iFRecordDate, iCustNo, iFacmNo, iBormNo));
@@ -121,6 +121,8 @@ public class L8204 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", titaVo.getParam("CustNo")); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tMlaundryRecord, tMlaundryRecord); ////
+			dataLog.exec("刪除疑似洗錢交易訪談記錄"); ////
 			break;
 		}
 		this.info("3");

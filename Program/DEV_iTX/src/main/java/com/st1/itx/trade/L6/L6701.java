@@ -127,6 +127,8 @@ public class L6701 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", "行庫代號:" + iBankCode + "-" + iBranchCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdBank, tCdBank); ////
+			dataLog.exec("刪除行庫資料"); ////
 			break;
 
 		case 5: // inq

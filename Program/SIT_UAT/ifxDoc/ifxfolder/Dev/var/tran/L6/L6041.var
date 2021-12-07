@@ -139,6 +139,7 @@ T(2,@GroupHelp,#L6r44GroupHelpList)
 T(H,@GroupNoX,#GroupNo,#GroupHelp)
 
 #GroupNo=X,1,I
+C(4,#TlrNo,$,S)
 HELP(#GroupHelp,cols:2))
 @C(4,#GroupNo,s,V(H,#GroupHelp))
 
@@ -147,6 +148,7 @@ C(4,#GroupNo,S,$)
 T(H,#GroupNo,#GroupHelp)
 
 #LevelFg=A,1,I
+C(4,#TlrNo,$,S)
 HELP(#LevelHelp)
 @V(H,#LevelHelp)
 

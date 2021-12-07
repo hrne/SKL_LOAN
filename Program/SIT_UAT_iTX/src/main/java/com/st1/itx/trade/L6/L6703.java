@@ -104,6 +104,8 @@ public class L6703 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iInsurerType + "-" + iInsurerCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdInsurer, tCdInsurer); ////
+			dataLog.exec("刪除保險/鑑定公司資料"); ////
 			break;
 
 		}

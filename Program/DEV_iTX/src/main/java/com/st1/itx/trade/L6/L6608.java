@@ -101,6 +101,8 @@ public class L6608 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iFormNo); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdReport, tCdReport); ////
+			dataLog.exec("刪除報表代號對照檔"); ////
 			break;
 		}
 		this.info("3");

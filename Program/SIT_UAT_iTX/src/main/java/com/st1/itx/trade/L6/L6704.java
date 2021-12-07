@@ -101,6 +101,8 @@ public class L6704 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iCityCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdCity, tCdCity); ////
+			dataLog.exec("刪除地區別資料"); ////
 			break;
 		}
 		this.info("3");

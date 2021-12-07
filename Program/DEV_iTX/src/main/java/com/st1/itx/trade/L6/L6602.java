@@ -100,6 +100,8 @@ public class L6602 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iIndustryCode); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tCdIndustry, tCdIndustry); ////
+			dataLog.exec("刪除行業別代號資料"); ////
 			break;
 
 		case 5: // inq

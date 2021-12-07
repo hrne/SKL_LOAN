@@ -152,6 +152,8 @@ public class L6708 extends TradeBuffer {
 				} else {
 					throw new LogicException(titaVo, "E0004", iFYear + "-" + iMonth); // 刪除資料不存在
 				}
+				dataLog.setEnv(titaVo, tCdBudget, tCdBudget); ////
+				dataLog.exec("刪除利息收入預算數"); ////
 			}
 
 		} else if (!(FuncCode.equals("5"))) {
