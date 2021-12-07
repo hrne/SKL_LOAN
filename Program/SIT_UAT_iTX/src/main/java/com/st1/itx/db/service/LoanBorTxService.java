@@ -213,6 +213,24 @@ public interface LoanBorTxService {
   public Slice<LoanBorTx> findIntEndDateEq(int custNo_0, int facmNo_1, int bormNo_2, int bormNo_3, int intEndDate_4, List<String> titaHCode_5, int acDate_6, String titaTlrNo_7, String titaTxtNo_8, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo &gt;= ,AND FacmNo &lt;= ,AND BormNo &gt;= ,AND BormNo &lt;= ,AND EntryDate &gt;= ,AND EntryDate &lt;=,AND Displayflag  ^i
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param facmNo_2 facmNo_2
+   * @param bormNo_3 bormNo_3
+   * @param bormNo_4 bormNo_4
+   * @param entryDate_5 entryDate_5
+   * @param entryDate_6 entryDate_6
+   * @param displayflag_7 displayflag_7
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice LoanBorTx LoanBorTx of List
+   */
+  public Slice<LoanBorTx> borxIntEndDateDescRange(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int entryDate_5, int entryDate_6, List<String> displayflag_7, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By LoanBorTx
    * 
    * @param loanBorTxId key

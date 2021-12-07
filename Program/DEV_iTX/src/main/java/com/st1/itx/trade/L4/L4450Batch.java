@@ -522,7 +522,7 @@ public class L4450Batch extends TradeBuffer {
 				}
 
 //				 // 1.已送出媒體未回或未製成媒體 2.期款二扣
-				int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp), titaVo);
+				int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp2), titaVo);
 				if (sendCode == 1) {
 					if (sendCode == 1 && "L4451".equals(titaVo.getTxcd())) {
 						checkMsg = "已送出媒體未回或未製成媒體";

@@ -87,7 +87,7 @@ public class BS010 extends TradeBuffer {
 		this.mfbsDyf = this.getTxBuffer().getMgBizDate().getMfbsDyf();
 
 		// step 1. 年底呆帳產生法務費墊付
-		if (parse.stringToInteger(entryDateMm) == 12) {
+		if (parse.stringToInteger(entryDateMm) == 12 && this.tbsDyf == this.mfbsDyf) {
 			procBdLawFee(titaVo);
 			this.batchTransaction.commit();
 		}
@@ -267,33 +267,37 @@ public class BS010 extends TradeBuffer {
 		// find data
 		slAcReceivable = acReceivableService.UseL5074(0, lAcctCode, 0, Integer.MAX_VALUE, titaVo);
 		lAcReceivableAll = slAcReceivable == null ? null : slAcReceivable.getContent();
+		if (lAcReceivableAll != null) {
+			for (AcReceivable rv : lAcReceivableAll) {
+				// 同一戶號非呆帳戶或呆帳結案戶直接刪除
+				if (wkCustNo != rv.getCustNo()) {
+					wkDBFg = true;
+					wkCustNo = rv.getCustNo();
+				} else {
+					if (!wkDBFg) {
+						lAcReceivableAll.remove(rv);
+					}
+					continue;
+				}
+				Slice<LoanBorMain> slLoanBorMain = null;
+				List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+				slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE,
+						titaVo);
+				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+				// 檢查戶號下全額度撥款 只要有一筆非呆帳戶或呆帳結案戶 即跳開並刪除
+				if (lLoanBorMain != null) {
+					for (LoanBorMain t : lLoanBorMain) {
+						if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
+							wkDBFg = false;
+							break;
+						}
+					}
+				}
 
-		for (AcReceivable rv : lAcReceivableAll) {
-			// 同一戶號非呆帳戶或呆帳結案戶直接刪除
-			if (wkCustNo != rv.getCustNo()) {
-				wkDBFg = true;
-				wkCustNo = rv.getCustNo();
-			} else {
 				if (!wkDBFg) {
 					lAcReceivableAll.remove(rv);
+					continue;
 				}
-				continue;
-			}
-			Slice<LoanBorMain> slLoanBorMain = null;
-			List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-			slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE,
-					titaVo);
-			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-			// 檢查戶號下全額度撥款 只要有一筆非呆帳戶或呆帳結案戶 即跳開並刪除
-			for (LoanBorMain t : lLoanBorMain) {
-				if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
-					wkDBFg = false;
-					break;
-				}
-			}
-			if (!wkDBFg) {
-				lAcReceivableAll.remove(rv);
-				continue;
 			}
 		}
 

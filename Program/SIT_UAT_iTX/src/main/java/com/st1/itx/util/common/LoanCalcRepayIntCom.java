@@ -341,12 +341,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkPrincipal = iPrincipal; // // 計息本金
 		wkLoanBal = iPrincipal;
 		wkDueAmt = iDueAmt; // 每期攤還金額
-		if ((iAmortizedCode == 3 || iAmortizedCode == 4) && (iPrevRepaidDate > 0) && (iNextRepayDate < iIntStartDate)
-				&& (iNonePrincipalFlag != 1)) {
-			wkIntStartDate = iPrevRepaidDate; // 計算起日
-		} else {
-			wkIntStartDate = iIntStartDate; // 計算起日
-		}
+		wkIntStartDate = iIntStartDate; // 計算起日
 		wkIntEndDate = iIntEndDate; // 計算止日
 		wkIntEndDateX = 0; // 計算止日
 		wkIntEndDateY = 0; // 計算止日

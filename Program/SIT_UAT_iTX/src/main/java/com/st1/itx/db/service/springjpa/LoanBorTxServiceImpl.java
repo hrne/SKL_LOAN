@@ -420,6 +420,34 @@ em = null;
   }
 
   @Override
+  public Slice<LoanBorTx> borxIntEndDateDescRange(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int entryDate_5, int entryDate_6, List<String> displayflag_7, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanBorTx> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("borxIntEndDateDescRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3 + " bormNo_4 : " +  bormNo_4 + " entryDate_5 : " +  entryDate_5 + " entryDate_6 : " +  entryDate_6 + " displayflag_7 : " +  displayflag_7);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByIntEndDateDescAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByIntEndDateDescAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByIntEndDateDescAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+    else 
+      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByIntEndDateDescAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public LoanBorTx holdById(LoanBorTxId loanBorTxId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

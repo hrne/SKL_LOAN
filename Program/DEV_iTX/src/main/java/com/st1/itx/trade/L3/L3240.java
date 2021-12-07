@@ -31,7 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.LoanCom;
-import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -44,7 +43,14 @@ import com.st1.itx.util.parse.Parse;
 /*
  * Tita
  * TimCustNo=9,7 戶號
- * EraseTxSeq=X,25 沖正交易序號 ，會計日(7)+單位別(4)+經辦(6)+交易序號(8)
+ * FacmNo=9,3  額度編號 
+ * IntStartDate 計息起日
+ * IntEndDate 計息迄日
+ * EntryDate 入帳日期
+ * AcDate 會計日期
+ * AcDate 經辦
+ * TxtNo 交易序號
+  * 沖正交易序號 ，會計日(7)+單位別(4)+經辦(6)+交易序號(8)
  */
 
 /**
@@ -72,14 +78,13 @@ public class L3240 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 	@Autowired
-	DataLog datalog;
-	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
 	LoanCom loanCom;
-
 	@Autowired
 	AcDetailCom acDetailCom;
+	@Autowired
+	AcReceivableCom acReceivableCom;
 
 	private TitaVo titaVo;
 	private int iCustNo;
@@ -104,8 +109,6 @@ public class L3240 extends TradeBuffer {
 	private List<AcReceivable> lAcReceivableDelete = new ArrayList<AcReceivable>();
 	private List<AcReceivable> lAcReceivableInsert = new ArrayList<AcReceivable>();
 
-	@Autowired
-	AcReceivableCom acReceivableCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

@@ -100,7 +100,7 @@ public class BS900 extends TradeBuffer {
 		iAcDateReverse = this.getTxBuffer().getMgBizDate().getLmnDy();
 		// 迴轉上個月底營業日
 		dateUtil.init();
-	 	dateUtil.setDate_2(this.getTxBuffer().getMgBizDate().getLmnDy());
+		dateUtil.setDate_2(this.getTxBuffer().getMgBizDate().getLmnDy());
 		if (dateUtil.isHoliDay()) {
 			int i = 0;
 			do {
@@ -396,7 +396,11 @@ public class BS900 extends TradeBuffer {
 						tAcLoanInt.setBreachAmt(ba.getBreachAmt()); // 違約金
 						tAcLoanInt.setRateIncr(ba.getRateIncr()); // 加碼利率
 						tAcLoanInt.setIndividualIncr(ba.getIndividualIncr()); // 個別加碼利率
-						tAcLoanInt.setAcctCode(loanCom.setIntAcctCode(ba.getAcctCode())); // 業務科目代號
+						if ("3".equals(ba.getAcctCode().substring(0, 1))) {
+							tAcLoanInt.setAcctCode(loanCom.setIntAcctCode(ba.getAcctCode())); //
+						} else {
+							tAcLoanInt.setAcctCode(ba.getAcctCode()); //
+						}
 						tAcLoanInt.setPayIntDate(ba.getPayIntDate()); // 應繳息日
 						tAcLoanInt.setLoanBal(ba.getLoanBal()); // 放款餘額
 						tAcLoanInt.setAging(aging); // 帳齡

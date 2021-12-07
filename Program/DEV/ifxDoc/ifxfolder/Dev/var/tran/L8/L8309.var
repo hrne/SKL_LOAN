@@ -164,7 +164,6 @@ T(2,@RimUkey,#Ukey)
 RESET_RIM(#RimL8r20,L8R20)
 S(L8R20,1,#RimUkey)
 R(1,L8R20)
-T(2,@TranKey,#L8r20TranKey)
 T(2,@CustId,#L8r20CustId)
 T(2,@SubmitKey,#L8r20SubmitKey)
 E(0,@RcDate,#L8r20RcDate)
@@ -180,6 +179,8 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r20TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+
+
 ! 調Rim相關 結束
 
 ![交易代碼]
@@ -246,18 +247,18 @@ T(2,5+#CustId)
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF1})
 
 !債務人戶籍之郵遞區號及地址 只能存38個全形中文字
-#CustRegAddr=C,114,I
+#CustRegAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,X,S,$)
-@V(7)V(8,0,38)V(NL)
+@V(7)V(8,0,38)
 
 !債務人通訊地之郵遞區號及地址 只能存38個全形中文字
-#CustComAddr=C,114,I
+#CustComAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,X,S,$)
-@V(7)V(8,0,38)V(NL)
+@V(7)V(8,0,38)
 
 !債務人戶籍電話
 #CustRegTelNo=X,16,I

@@ -1,22 +1,10 @@
--- 程式功能：維護 JcicB204 聯徵授信餘額日報檔
--- 執行時機：每日日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB204_Upd"(20200423,'System');
---
-
-DROP TABLE "Work_B204" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_B204"
-    ( "AcDate"      decimal(8, 0) default 0 not null,
-      "CustNo"      decimal(7, 0) default 0 not null,
-      "FacmNo"      decimal(3, 0) default 0 not null,
-      "BormNo"      decimal(3, 0) default 0 not null,
-      "SubTranCode" varchar2(1),
-      "Amt"         decimal(16, 0) default 0 not null
-    )
-    ON COMMIT DELETE ROWS;
-
 
 CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB204_Upd"
 (
+-- 程式功能：維護 JcicB204 聯徵授信餘額日報檔
+-- 執行時機：每日日終批次(換日前)
+-- 執行方式：EXEC "Usp_L8_JcicB204_Upd"(20200521,'System');
+
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
@@ -51,16 +39,25 @@ BEGIN
     END IF;
 
 
-    -- 寫入資料 Work_B204
+    -- 刪除舊資料
+    DBMS_OUTPUT.PUT_LINE('DELETE JcicB204');
 
+    DELETE FROM "JcicB204"
+    WHERE "DataYMD" = TBSDYF
+      ;
+
+    -- 寫入資料
+    DBMS_OUTPUT.PUT_LINE('INSERT JcicB204');
+
+   INSERT INTO "JcicB204"
+   WITH "Work_B204" AS (
     -- 當日清償
-    INSERT INTO "Work_B204"
     SELECT Tx."AcDate"         AS "AcDate"
          , Tx."CustNo"         AS "CustNo"
          , Tx."FacmNo"         AS "FacmNo"
          , Tx."BormNo"         AS "BormNo"
          , 'P'                 AS "SubTranCode"       -- 交易別  -- P:每筆撥款清償後額度未解約(第10欄清償金額需大於0)
-         , SUM(Tx."TxAmt")     AS "Amt"
+         , SUM(Tx."Principal" + Tx."Interest" ) AS "Amt"
     FROM   "LoanBorTx" Tx
       LEFT JOIN "FacMain" F  ON F."CustNo"  =  Tx."CustNo"
                             AND F."FacmNo"  =  Tx."FacmNo"
@@ -72,10 +69,9 @@ BEGIN
       AND  NVL(F."AdvanceCloseCode",0) <> 0
       AND  NVL(F."UtilAmt",0)          =  0
     GROUP BY  Tx."AcDate", Tx."CustNo", Tx."FacmNo", Tx."BormNo"
-      ;
-
+    
     -- 當日授信
-    INSERT INTO "Work_B204"
+    UNION
     SELECT Tx."AcDate"         AS "AcDate"
          , Tx."CustNo"         AS "CustNo"
          , Tx."FacmNo"         AS "FacmNo"
@@ -92,21 +88,8 @@ BEGIN
       AND  NVL(Tx."TitaTxCd", ' ')  IN ('L3100', 'L3110', 'L3120')
       AND  NVL(M."RenewFlag", ' ')  NOT IN ('Y', '1')
     GROUP BY  Tx."AcDate", Tx."CustNo", Tx."FacmNo", Tx."BormNo"
-      ;
-
-
-    -- 刪除舊資料
-    DBMS_OUTPUT.PUT_LINE('DELETE JcicB204');
-
-    DELETE FROM "JcicB204"
-    WHERE "DataYMD" = TBSDYF
-      ;
-
-    -- 寫入資料
-    DBMS_OUTPUT.PUT_LINE('INSERT JcicB204');
-
-    INSERT INTO "JcicB204"
-    SELECT TBSDYF                                AS "DataYMD"           -- 資料日期
+    )
+    SELECT TBSDYF                              AS "DataYMD"           -- 資料日期
          , '458'                                 AS "BankItem"          -- 總行代號
          , '0001'                                AS "BranchItem"        -- 分行代號
          , Tx."AcDate" - 19110000                AS "DataDate"          -- 新增核准額度日期／清償日期／額度到期或解約日期

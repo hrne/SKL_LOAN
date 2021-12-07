@@ -135,10 +135,7 @@ T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@SubmitKey,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdChangePayDate,*)
-T(2,@FdPeriod,*)
-T(2,@FdRate,*)
 T(2,@FdChaRepayAgreeDate,*)
-T(2,@FdChaRepayEndDate,*)
 T(2,@FdChaRepayFirstDate,*)
 T(2,@FdPayAccount,*)
 T(2,@FdMonthPayAmt,*)
@@ -153,11 +150,7 @@ T(F,@ChaRepayEndDate,1)T(F,@ChaRepayFirstDate,1)T(F,@PayAccount,1)T(F,@PostAddr,
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
-T(2,@FdTranKey,*)
-T(2,@FdPeriod,*)
-T(2,@FdRate,*)
 T(2,@FdChaRepayAgreeDate,*)
-T(2,@FdChaRepayEndDate,*)
 T(2,@FdChaRepayFirstDate,*)
 T(2,@FdPayAccount,*)
 T(2,@FdMonthPayAmt,*)
@@ -273,7 +266,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @C(4,#GradeType,$,C(5,#GradeType,Y,$,V(P,限輸入Y或空白)))
-C(5,#GradeType,Y,E(0,#Rate,0)T(F,@Rate,0)T(2,#FdRate, )T(F,@Period2,1)T(F,@MonthPayAmt2,1)T(F,@Rate2,1),T(F,@Rate,1)T(2,@FdRate,*)E(0,@Period2,0)T(F,@Period2,0)T(F,@MonthPayAmt2,0)T(F,@Rate2,0)E(0,@Rate2,0))
+C(5,#GradeType,Y,T(2,@FdPeriod,*)E(0,#Rate,0)T(F,@Rate,0)T(F,@Period2,1)T(F,@MonthPayAmt2,1)T(F,@Rate2,1),T(2,@FdPeriod, )T(F,@Rate,1)E(0,@Period2,0)T(F,@Period2,0)T(F,@MonthPayAmt2,0)T(F,@Rate2,0)E(0,@Rate2,0))
 
 !原前置協商申請日
 #RcDate=D,7,I
@@ -300,7 +293,7 @@ C(5,#TranKey_Tmp,4,s,$)
 #Period=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(2,0)
+@
 C(5,#GradeType,Y,V(1,12,24),$)
 
 !（第一階梯）利率
@@ -308,7 +301,6 @@ C(5,#GradeType,Y,V(1,12,24),$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#GradeType,Y,s,$)
-@V(2,0)
 
 !信用貸款協商剩餘債務簽約餘額 11
 #ExpBalanceAmt=M,9,I
@@ -351,8 +343,8 @@ D(8)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
-@V(7)A(DATE,0,#ChaRepayEndDate)
-IF(#ChaRepayEndDate>=#ChaRepayAgreeDate,$,V(P,變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日))
+@A(DATE,0,#ChaRepayEndDate)
+C(4,#ChaRepayEndDate,$,IF(#ChaRepayEndDate>=#ChaRepayAgreeDate,$,V(P,變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日)))
 
 !變更還款條件首期應繳款日
 #ChaRepayFirstDate=D,7,I
@@ -372,7 +364,7 @@ C(5,#TranKey_Tmp,4,s,$)
 #PostAddr=X,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(8,0,38)V(NL)
+@V(8,0,38)
 
 !月付金
 #MonthPayAmt=M,9,I
