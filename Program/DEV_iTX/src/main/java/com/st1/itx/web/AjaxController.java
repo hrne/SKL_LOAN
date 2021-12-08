@@ -1,5 +1,6 @@
 package com.st1.itx.web;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -29,20 +30,59 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.TxAttachment;
+import com.st1.itx.db.service.TxAttachmentService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.data.Manufacture;
 import com.st1.itx.util.filter.FilterUtils;
+import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.log.SysLogger;
+import com.st1.itx.util.parse.ZLibUtils;
 
 @Controller
 @RequestMapping("hnd/*")
 public class AjaxController extends SysLogger {
+
 	@PostConstruct
 	public void init() {
 		this.info("AjaxController Init....");
+	}
+
+	@RequestMapping(value = "download/file/{fileNo}")
+	public void getFile(@PathVariable String fileNo, HttpServletResponse response) throws Exception {
+		ThreadVariable.setObject(ContentName.loggerFg, true);
+		this.info("getFile FileNo : [" + fileNo + "]");
+
+		Long fileNoL = Long.parseLong(fileNo);
+
+		ZLibUtils zLibUtils = MySpring.getBean("zLibUtils", ZLibUtils.class);
+
+		TxAttachmentService txAttachmentService = MySpring.getBean("txAttachmentService", TxAttachmentService.class);
+		TxAttachment txAttachment = txAttachmentService.findById(fileNoL);
+
+		InputStream inputStream = null;
+		try {
+			if (txAttachment != null) {
+				response.addHeader("Access-Control-Allow-Origin", "*");
+				response.setHeader("Content-Disposition", "attachment;filename*=UTF-8'zh_TW'" + URLEncoder.encode(txAttachment.getFileItem().trim(), "UTF-8"));
+				response.setContentType("application/force-download");
+
+				inputStream = new ByteArrayInputStream(zLibUtils.unCompress7z(txAttachment.getFileData()));
+				IOUtils.copy(inputStream, response.getOutputStream());
+				inputStream.close();
+				response.flushBuffer();
+			}
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+		} finally {
+			ThreadVariable.clearThreadLocal();
+			SafeClose.close(inputStream);
+		}
 	}
 
 	@RequestMapping(value = "download/file/{sno}/{fileType}/{name}")
@@ -88,7 +128,7 @@ public class AjaxController extends SysLogger {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
 		} finally {
-			inputStream.close();
+			SafeClose.close(inputStream);
 			ThreadVariable.clearThreadLocal();
 		}
 	}
@@ -143,6 +183,13 @@ public class AjaxController extends SysLogger {
 		return result;
 	}
 
+	@RequestMapping(value = "txcd/jsonp", method = RequestMethod.GET)
+	public ResponseEntity<String> getTxcdList(@RequestParam String term, @RequestParam(required = false) String callback, HttpSession session, HttpServletResponse response) {
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
+
+		return makeJsonResponse(map, true);
+	}
+
 	@SuppressWarnings("unchecked")
 	private Map<String, String> stringToMap(String _d) {
 		Gson gson = new Gson();
@@ -152,18 +199,27 @@ public class AjaxController extends SysLogger {
 		return m;
 	}
 
-	private ResponseEntity<String> makeJsonResponse(Map<String, ?> m, boolean isOtherNet) throws Exception {
+	private ResponseEntity<String> makeJsonResponse(Map<String, ?> m, boolean isOtherNet) {
 
-		Gson gson = new Gson();
-		String output = gson.toJson(m);
-
-		HttpHeaders responseHeaders = new HttpHeaders();
-		if (isOtherNet)
-			responseHeaders.add("Access-Control-Allow-Origin", "*");
-		responseHeaders.add("Content-Type", "application/json; charset=utf-8");
-
-		this.info("return json: " + FilterUtils.escape(output));
-		ThreadVariable.clearThreadLocal();
-		return new ResponseEntity<String>(output, responseHeaders, HttpStatus.CREATED);
+		Gson gson = null;
+		String output = null;
+		HttpHeaders responseHeaders = null;
+		try {
+			gson = new Gson();
+			output = gson.toJson(m);
+			responseHeaders = new HttpHeaders();
+			if (isOtherNet)
+				responseHeaders.add("Access-Control-Allow-Origin", "*");
+			responseHeaders.add("Content-Type", "application/json; charset=utf-8");
+			this.info("return json: " + FilterUtils.escape(output));
+			return new ResponseEntity<String>(output, responseHeaders, HttpStatus.CREATED);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			return new ResponseEntity<String>("", responseHeaders, HttpStatus.CREATED);
+		} finally {
+			ThreadVariable.clearThreadLocal();
+		}
 	}
 }

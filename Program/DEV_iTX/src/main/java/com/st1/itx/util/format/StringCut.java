@@ -88,7 +88,7 @@ public class StringCut {
 			for (String s : ss)
 				resValue += s.trim() + " ";
 		else
-			return value;
+			return value.trim();
 
 //		value = value.replaceAll("\\r\\n", "");
 //		value = value.replaceAll("\\n", "");
