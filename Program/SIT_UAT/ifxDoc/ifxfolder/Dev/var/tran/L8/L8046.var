@@ -175,8 +175,8 @@ T(H,#OOTranKey,#TranKeyHelp)
 T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 ! 以下變動
 #OOYear=A,3,S
-#OOCourtDiv=C,9,S
-#OOCourtCaseNo=C,45,S
+#OOCourtDiv=X,9,S
+#OOCourtCaseNo=X,45,S
 #OOPayDate=D,7,S
 #OOPayEndDate=D,7,S
 #OOPeriod=A,3,S
@@ -188,7 +188,7 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 #OOClaimStatus2=X,1,S
 #OOSaveEndDate=D,7,S
 #OOIsImplement=X,1,S
-#OOInspectName=C,10,S 
+#OOInspectName=X,10,S 
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S

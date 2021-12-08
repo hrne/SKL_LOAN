@@ -1,0 +1,228 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L6310)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+!參考編號
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+[
+["[L6310]                                 特殊/例假日登錄"],
+["@功能",#FuncCodeX],
+["#grid#,{id:1,expand:true,loop:150,row_height:1,s_cols:[], p_cols:[]}","","","","",
+["假日","假日型態"],
+[
+  [#Holiday1],[#TypeCode1,#TypeCodeX1]
+],
+],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)
+!ENABLE(#BTN2)
+!ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2
+#CDCODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,100,S        
+
+!HolidayType
+#CDCODEHolidayType=x,20,S                  
+T(3,CdCode.HolidayType)                  
+#HolidayTypeHelp=x,200,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode2,#CDCODEHolidayType)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@HolidayTypeHelp,#HelpDesc2)
+
+#INIT=X,1,S
+##loop {times:150,i:4}
+INVOKEJS(SHOW,grd1_{i},0)
+##end
+
+#INIT1=X,1,S
+##loop {times:150,i:1}
+T(F,@TypeCodeX{i},0)
+##end
+
+#CHAIN=X,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6030進入),$)
+
+#NTXBUF=X,11,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_Country=X,2,S
+T(1,#NTXBUF,2,2)
+
+#CHAIN_Holiday=X,7,S
+T(1,#NTXBUF,4,7)
+
+#CHAIN_TypeCode=X,1,S
+T(1,#NTXBUF,11,1)
+
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+T(2,@Country,#CHAIN_Country)
+E(0,@Holiday1,#CHAIN_Holiday)
+E(0,@TypeCode1,#CHAIN_TypeCode)
+#TypeCodeTmp1=X,12,L
+T(H,#TypeCode1,#HolidayTypeHelp)
+!SWITCH(#TypeCode1,1,T(3,一般例假日),
+!                  2,T(3,特殊狀況假日))
+T(2,@TypeCodeX1,#TypeCodeTmp1)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+##loop {times:150,i:1}
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeCode{i},1),T(F,#TypeCode{i},0))
+IF (#FuncCode==1 ,T(F,#Holiday{i},1),T(F,#Holiday{i},0))
+##end
+
+地區別
+#Country=X,2,S
+T(3,TW)
+
+! 假日
+#Holiday1=D,7,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+@V(7)A(4,0,#Holiday1)
+
+! 假日型態
+#TypeCode1=N,1,I
+C(3,#FuncCode,4,s)
+HELP(#HolidayTypeHelp)
+@V(H,#HolidayTypeHelp)
+
+#TypeCodeX1=X,12,O
+C(3,#TypeCode1,0,T(3, ),T(H,#TypeCode1,#HolidayTypeHelp))
+!SWITCH(#TypeCode1,0,T(3, ),1,T(3,一般例假日),
+!                           2,T(3,特殊狀況假日))
+
+
+##loop{times:149,i:2,j:1,k:5,l:4}
+
+! 假日
+#Holiday{i}=D,7,I
+C(4,#Holiday{j},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Holiday{j},S,$)
+C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
+C(4,#Holiday{i},INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
+@A(4,0,#Holiday{i})
+
+! 假日型態
+#TypeCode{i}=N,1,I
+C(4,#Holiday{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Holiday{i},S,$)
+C(3,#FuncCode,4,s)
+HELP(1:一般例假日;2:特殊狀況假日)
+@V(3,1,2)
+
+#TypeCodeX{i}=X,12,O
+C(4,#Holiday{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Holiday{i},S,$)
+SWITCH(#TypeCode{i},0,T(3, ),1,T(3,一般例假日),
+                             2,T(3,特殊狀況假日))
+
+##end
+
+#RPTFG=A,1,S
+E(0,0)
+
+#MRKEY=_,_,S
+T(2,#Holiday1)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6310 ----------
+<sub type="FORM" name="L6310">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6310,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6310] 特殊/例假日登錄)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+#Country
+##loop{times:150,i:1}
+#Holiday{i}
+#TypeCode{i}
+##end
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L6310^
+
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -206,7 +206,7 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@CloseCode,1)T(F,@CloseDate,1)T(2,@FdCloseCode,*)T(2,@FdCloseDate,*),
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CloseCode,1)T(F,@CloseDate,1)T(2,@FdCloseCode,*)T(2,@FdCloseDate,*),
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@CloseCode,1)T(F,@CloseDate,1)T(2,@FdCloseCode,*)T(2,@FdCloseDate,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CloseCode,0)T(F,@CloseDate,0)T(2,@FdCloseCode, )T(2,@FdCloseDate, ),$))
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@CloseCode,0)T(F,@CloseDate,0)T(2,@FdCloseCode, )T(2,@FdCloseDate, ),$))
 

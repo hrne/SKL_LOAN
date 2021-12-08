@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.st1.itx.eum.ThreadVariable;
 
 /**
- * 字串切割
+ * 字串切割 And 遮罩
  * 
  * @author AdamPan
  * @version 1.0.0
@@ -38,11 +38,12 @@ public class StringCut {
 
 			if (len >= sPos + 1 && len <= ePos)
 				cutString += text.charAt(i);
+
 		}
 
 		return cutString;
 	}
-	
+
 	/**
 	 * String Mask
 	 * 
@@ -67,7 +68,7 @@ public class StringCut {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * replace LineUp
 	 * 
@@ -77,10 +78,23 @@ public class StringCut {
 	public static String replaceLineUp(String value) {
 		if (value == null)
 			value = "";
-		value = value.replaceAll("\\r\\n", "");
-		value = value.replaceAll("\\n", "");
-		value = value.replaceAll("\\$n", "");
-		return value;
+		String resValue = "";
+		String[] ss = value.split("\\r\\n");
+		if (ss.length == 1)
+			ss = value.split("\\n");
+		if (ss.length == 1)
+			ss = value.split("\\$n");
+		if (ss.length > 1)
+			for (String s : ss)
+				resValue += s.trim() + " ";
+		else
+			return value;
+
+//		value = value.replaceAll("\\r\\n", "");
+//		value = value.replaceAll("\\n", "");
+//		value = value.replaceAll("\\$n", "");
+
+		return resValue.trim();
 	}
 
 	/**

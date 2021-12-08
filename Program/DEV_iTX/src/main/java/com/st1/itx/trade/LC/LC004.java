@@ -17,8 +17,10 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.db.service.TxRecordService;
+import com.st1.itx.db.service.TxTellerService;
 
 @Service("LC004")
 @Scope("prototype")
@@ -29,7 +31,6 @@ import com.st1.itx.db.service.TxRecordService;
  * @version 1.0.0
  */
 public class LC004 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC004.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -38,6 +39,9 @@ public class LC004 extends TradeBuffer {
 	@Autowired
 	public TxRecordService txRecordService;
 
+	@Autowired
+	public TxTellerService txTellerService;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC004 ");
@@ -45,9 +49,20 @@ public class LC004 extends TradeBuffer {
 
 		int iEntday = Integer.valueOf(titaVo.get("iEntdy").trim()) + 19110000;
 		String iBrNo = titaVo.get("iBrNo").trim();
-		String iGroupNo = titaVo.get("iGroupNo").trim();
+		titaVo.get("iGroupNo").trim();
 		String iTranNo = titaVo.get("iTranNo").trim();
 
+		TxTeller tTxTeller = txTellerService.findById(titaVo.getTlrNo(), titaVo);
+		if(tTxTeller==null) {
+			throw new LogicException(titaVo, "E0001", "經辦資料");
+		}
+		
+		this.info("LC004 TlrNo = " + titaVo.getTlrNo() + "/" + tTxTeller.getGroupNo());
+		
+		List<String> groupNoList = new ArrayList<String>();
+
+		groupNoList.add(tTxTeller.getGroupNo());
+		
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -56,10 +71,6 @@ public class LC004 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		List<String> groupNoList = new ArrayList<String>();
-
-		groupNoList.add(this.txBuffer.getTxCom().getTlrDept());
-		
 		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 2, iTranNo + "%", groupNoList, this.index, this.limit);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
 

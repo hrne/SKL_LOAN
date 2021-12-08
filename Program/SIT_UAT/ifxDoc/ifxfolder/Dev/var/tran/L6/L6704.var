@@ -228,6 +228,10 @@ T(2,@UnitItem,#L6R13UnitItem)
 #RPTFG=A,1,S
 E(0,0)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#CityCode)
+
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R12Rim.dec"/>
 <include src="ROM.icf::L6R12.dec"/>

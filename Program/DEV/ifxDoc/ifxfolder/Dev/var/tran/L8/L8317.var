@@ -240,7 +240,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@OutstandAmt,1)T(F,@ClaimStatus1,1)T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@SubAmt,1)T(F,@AdminName,1)T(2,@FdYear,*)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@OutstandAmt,1)T(F,@ClaimStatus1,1)T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@SubAmt,1)T(F,@AdminName,1)T(2,@FdYear,*)
 T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdClaimStatus1,*)T(2,@FdSaveDate,*)T(2,@FdClaimStatus2,*)T(2,@FdSaveEndDate,*)T(2,@FdSubAmt,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Year,0)T(F,@CourtDiv,0)T(F,@CourtCaseNo,0)T(F,@Approve,0)T(2,@FdApprove, )T(F,@OutstandAmt,0)T(F,@ClaimStatus1,0)T(F,@SaveDate,0)T(F,@ClaimStatus2,0)T(F,@SaveEndDate,0)T(F,@SubAmt,0)T(F,@AdminName,0)T(2,@FdYear, )
 T(2,@FdCourtDiv, )T(2,@FdCourtCaseNo, )T(2,@FdClaimStatus1, )T(2,@FdSaveDate, )T(2,@FdClaimStatus2, )T(2,@FdSaveEndDate, )T(2,@FdSubAmt, ),$))
@@ -334,20 +334,20 @@ C(5,#TranKey,D,s,$)
 @V(7)
 
 !法院承審股別 4個中文字
-#CourtDiv=C,8,I
+#CourtDiv=X,8,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtDiv,#L8r28CourtDiv),$)
 C(5,#TranKey,D,s,$)
-@V(7)V(8,0,4)
+@V(7)
 
 !法院案號 40個中文字
-#CourtCaseNo=C,80,I
+#CourtCaseNo=X,80,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtCaseNo,#L8r28CourtCaseNo),$)
 C(5,#TranKey,D,s,$)
-@V(7)V(8,0,40)
+@V(7)
 
 !法院裁定免責確定
 #Approve=X,1,I
@@ -425,7 +425,6 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@AdminName,#L8r28AdminName),$)
 C(5,#TranKey,D,s,$)
-@V(8,0,10)
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

@@ -266,7 +266,7 @@ public class L2101 extends TradeBuffer {
 				}
 			}
 			break;
-		case 2: // 修改 商品參數生效,只允許修改商品狀態、商品截止日期
+		case 2: // 修改 商品生效,商品未被額度使用可修改
 			tFacProd = facProdService.holdById(iProdNo);
 			beforeFacProd = (FacProd) datalog.clone(tFacProd);
 			if (tFacProd == null) {
@@ -285,7 +285,7 @@ public class L2101 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "商品代碼 = " + iProdNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			datalog.setEnv(titaVo, beforeFacProd, tFacProd);
-			datalog.exec("修改商品狀態，商品截止日期");
+			datalog.exec();
 			break;
 		case 4: // 刪除 商品參數生效後禁止刪除
 			try {
@@ -294,6 +294,8 @@ public class L2101 extends TradeBuffer {
 					if (tFacProd.getStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 						throw new LogicException(titaVo, "E2056", ""); // 商品參數生效後禁止刪除
 					}
+				datalog.setEnv(titaVo, tFacProd, tFacProd);
+				datalog.exec("刪除商品參數主檔");
 				facProdService.delete(tFacProd, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0004", "商品代碼 = " + iProdNo + " " + e.getErrorMsg()); // 刪除資料不存在

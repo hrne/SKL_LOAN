@@ -201,7 +201,7 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdMain,*)INVOKEJS(SHOW,p1,6,6,1),$)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdMain,*)INVOKEJS(SHOW,p1,6,6,1),
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdMain,*)INVOKEJS(SHOW,p1,6,6,1),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdMain, )INVOKEJS(SHOW,p1,6,6,0),$))
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdMain, )INVOKEJS(SHOW,p1,6,6,0),$))
 #TranKeyX=X,4,L
@@ -264,22 +264,22 @@ T(2,5+#CustId)
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF1})
 
 !債務人戶籍之郵遞區號及地址
-#CustRegAddr=C,114,I
+#CustRegAddr=X,114,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CustRegAddr,#L8r42CustRegAddr),$)
 C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
-@V(7)V(8,0,38)V(NL)
+@V(7)
 
 !債務人通訊地之郵遞區號及地址
-#CustComAddr=C,114,I
+#CustComAddr=X,114,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CustComAddr,#L8r42CustComAddr),$)
 C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
-@V(7)V(8,0,38)V(NL)
+@V(7)
 
 !債務人戶籍電話
 #CustRegTelNo=X,16,I

@@ -26,6 +26,10 @@ public interface JobMainRepositoryDay extends JpaRepository<JobMain, JobMainId> 
   @Transactional(readOnly = false)
   public Optional<JobMain> findByJobMainId(JobMainId jobMainId);
 
+  // (日終批次)維護 CustDataCtrl 結清戶個資控管檔
+  @Procedure(value = "\"Usp_L2_CustDataCtrl_Ins\"")
+  public void uspL2CustdatactrlIns(int tbsdyf,  String empNo);
+
   // (日終批次)維護 CollList 法催紀錄清單檔
   @Procedure(value = "\"Usp_L5_CollList_Upd\"")
   public void uspL5ColllistUpd(int tbsdyf,  String empNo,String txtNo, int l6bsdyf, int l7bsdyf);

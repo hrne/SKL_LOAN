@@ -121,16 +121,6 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@BankCode1,1)T(F,@BankCode2,1)T(F,@BankCode3,1)T(F,@BankCode4,1)T(F,@BankCode5,1)T(F,@DataCode1,1)T(F,@DataCode2,1)T(F,@DataCode3,1)T(F,@DataCode4,1)T(F,@DataCode5,1)T(F,@ChangePayDate,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
-T(2,@FdBankCode1,*)
-T(2,@FdBankCode2,*)
-T(2,@FdBankCode3,*)
-T(2,@FdBankCode4,*)
-T(2,@FdBankCode5,*)
-T(2,@FdDataCode1,*)
-T(2,@FdDataCode2,*)
-T(2,@FdDataCode3,*)
-T(2,@FdDataCode4,*)
-T(2,@FdDataCode5,*)
 T(2,@FdChangePayDate,*)
 T(2,@FdSubmitKey,*)
 ! 異動進入
@@ -150,16 +140,6 @@ T(F,@DataCode3,1)
 T(F,@DataCode4,1)
 T(F,@DataCode5,1)
 T(F,@ChangePayDate,1)
-T(2,@FdBankCode1,*)
-T(2,@FdBankCode2,*)
-T(2,@FdBankCode3,*)
-T(2,@FdBankCode4,*)
-T(2,@FdBankCode5,*)
-T(2,@FdDataCode1,*)
-T(2,@FdDataCode2,*)
-T(2,@FdDataCode3,*)
-T(2,@FdDataCode4,*)
-T(2,@FdDataCode5,*)
 T(2,@FdChangePayDate,*)
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -275,43 +255,33 @@ T(2,1)
 ##loop {times:5,i:1,j:0}
 ! 同意報送債權機構代號
 #BankCode{i}=X,3,I
-IF(#BankCode{j}!="",$,S)
+C(4,#BankCode{j},S,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+@C(4,#BankCode{i},T(2,@FdDataCode{i}, ),T(2,@FdDataCode{i},*))
 #RimL8r01{i}=X,1,S
-IF(#BankCode{i}=="",S,$)
+C(4,#BankCode{i},S,$)
 C(5,#TranKey_Tmp,4,S,$)
 T(2,@RimJcicBankCode,#BankCode{i})
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@BankCodeX{i},#L8r01JcicBankName)
 
-#CheckBankCode{i}=X,1,S
-IF(#BankCode{i}!="",S,$)
-T(2,@BankCodeX{i},)
-
 ! 同意報送債權機構代號,債協機構中文名稱
-#BankCodeX{i}=X,40,L
-!IF(#BankCode{i}=="",S,$)
+#BankCodeX{i}=X,80,L
+C(4,#BankCode{i},S,$)
 
 ! 同意報送檔案格式資料別
 #DataCode{i}=X,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
-IF(#BankCode{i}=="",S,$)
+C(4,#BankCode{i},S,$)
 HELP(#DataCodeHelp)
 @V(H,#DataCodeHelp)
 
-#CheckDataCode{i}=X,1,S
-IF(#BankCode{i}=="",S,$)
-T(2,@DataCodeX{i},)
-
 ! 同意報送檔案格式資料別名稱
 #DataCodeX{i}=X,40,L
-T(H,#DataCode{i},#DataCodeHelp)
-
+C(4,#DataCode{i},S,T(H,#DataCode{i},#DataCodeHelp))
 
 ##end
 
@@ -320,7 +290,6 @@ T(H,#DataCode{i},#DataCodeHelp)
 #ChangePayDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
 D(8)
 @V(7)
 A(DATE,0,#ChangePayDate)

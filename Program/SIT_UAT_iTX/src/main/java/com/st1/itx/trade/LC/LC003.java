@@ -56,6 +56,17 @@ public class LC003 extends TradeBuffer {
 		this.info("LC003 iGroupNo = " + iGroupNo);
 		this.info("LC003 iTranNo = " + iTranNo);
 
+		TxTeller tTxTeller = txTellerService.findById(titaVo.getTlrNo(), titaVo);
+		if(tTxTeller==null) {
+			throw new LogicException(titaVo, "E0001", "主管資料");
+		}
+		
+		this.info("LC003 TlrNo = " + titaVo.getTlrNo() + "/" + tTxTeller.getGroupNo());
+
+		List<String> groupNoList = new ArrayList<String>();
+
+		groupNoList.add(tTxTeller.getGroupNo());
+
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -64,13 +75,9 @@ public class LC003 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		List<String> groupNoList = new ArrayList<String>();
-
-		groupNoList.add(this.txBuffer.getTxCom().getTlrDept());
 
 		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index, this.limit);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
-		TxTeller tTxTeller = null;
 		if (lTxFlow == null) {
 			throw new LogicException(titaVo, "E0001", "放行資料");
 		} else {

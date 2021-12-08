@@ -358,13 +358,12 @@ IF(#ChaRepayFirstDate>=#ChaRepayEndDate,$,V(P,變更還款條件首期應繳款�
 #PayAccount=x,20,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(7)V(8,0,20)V(NL)
+@V(7)V(NL)
 
 !最大債權金融機構聲請狀送達地址
 #PostAddr=X,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(8,0,38)
 
 !月付金
 #MonthPayAmt=M,9,I

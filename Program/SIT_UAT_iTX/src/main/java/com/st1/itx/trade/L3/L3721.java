@@ -14,6 +14,8 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.BatxRateChange;
+import com.st1.itx.db.domain.BatxRateChangeId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
@@ -22,6 +24,7 @@ import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.domain.LoanRateChangeId;
 import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
+import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanRateChangeService;
@@ -77,6 +80,8 @@ public class L3721 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public LoanRateChangeService loanRateChangeService;
+	@Autowired
+	public BatxRateChangeService batxRateChangeService;
 
 	@Autowired
 	Parse parse;
@@ -224,8 +229,7 @@ public class L3721 extends TradeBuffer {
 	private void EntryNormalRoutine() throws LogicException {
 		this.info("EntryNormalRoutine ... ");
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -239,11 +243,9 @@ public class L3721 extends TradeBuffer {
 			}
 
 			// 鎖定放款利率變動檔
-			tLoanRateChange = loanRateChangeService
-					.holdById(new LoanRateChangeId(iCustNo, iFacmNo, wkBormNo, iEffectDate + 19110000), titaVo);
+			tLoanRateChange = loanRateChangeService.holdById(new LoanRateChangeId(iCustNo, iFacmNo, wkBormNo, iEffectDate + 19110000), titaVo);
 			if ("Y".equals(iDeleteFg) && tLoanRateChange == null) {
-				this.totaVo.setWarnMsg(
-						"無放款利率變動檔資料 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + "," + iEffectDate);
+				this.totaVo.setWarnMsg("無放款利率變動檔資料 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + "," + iEffectDate);
 				this.addList(this.totaVo);
 				continue;
 			}
@@ -252,12 +254,10 @@ public class L3721 extends TradeBuffer {
 			// 鎖定放款主檔
 			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, wkBormNo), titaVo);
 			if (tLoanBorMain == null) {
-				throw new LogicException(titaVo, "E0006",
-						"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006", "撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
 			}
 			if (titaVo.isHcodeNormal() && tLoanBorMain.getActFg() == 1) {
-				throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 =  "
-						+ tLoanBorMain.getFacmNo() + " 撥款序號 = " + tLoanBorMain.getBormNo()); // 該筆資料待放行中
+				throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 =  " + tLoanBorMain.getFacmNo() + " 撥款序號 = " + tLoanBorMain.getBormNo()); // 該筆資料待放行中
 			}
 			if (titaVo.isHcodeNormal())
 				wkBorxNo = tLoanBorMain.getLastBorxNo() + 1;
@@ -283,6 +283,9 @@ public class L3721 extends TradeBuffer {
 				}
 			}
 
+			// 刪除整批利率調整檔(未確認)
+			DeleteBatxRateChangeRoutine();
+
 			// 更新放款主檔
 			updLoanBorMainRoutine();
 
@@ -302,12 +305,10 @@ public class L3721 extends TradeBuffer {
 	private void ReleaseRoutine() throws LogicException {
 		this.info("ReleaseRoutine ... ");
 
-		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
-				titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
 		lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
 		if (lTxTemp == null || lTxTemp.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = "
-					+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = " + titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
 		}
 		for (TxTemp tx : lTxTemp) {
 			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
@@ -320,6 +321,25 @@ public class L3721 extends TradeBuffer {
 			this.info("   wkBormNo = " + wkBormNo);
 			this.info("   wkBorxNo = " + wkBorxNo);
 			ReleaseLoanBorMainRoutine();
+			DeleteBatxRateChangeRoutine();
+		}
+	}
+
+	// 刪除整批利率調整檔(未確認)(//，放行後刪除整批利率調整檔， 撥款序號 =
+	private void DeleteBatxRateChangeRoutine() throws LogicException {
+		this.info("ReleaseBatxRateRoutine ... ");
+		BatxRateChange tBatxRateChange = batxRateChangeService.holdById(new BatxRateChangeId(titaVo.getEntDyI() + 19110000, iCustNo, iFacmNo, wkBormNo), titaVo);
+		if (tBatxRateChange != null && tBatxRateChange.getConfirmFlag() == 0) {
+			if (titaVo.isActfgEntry()) {
+				this.totaVo.setWarnMsg("利率已變動,，放行後刪除整批利率調整檔， 撥款序號 =" + wkBormNo + " 生效日 = " + tBatxRateChange.getCurtEffDate());
+				this.addList(this.totaVo);
+			} else {
+				try {
+					loanRateChangeService.delete(tLoanRateChange, titaVo);
+				} catch (DBException f) {
+					throw new LogicException(titaVo, "E0007", "整批利率調整檔"); // 更新資料時，發生錯誤
+				}
+			}
 		}
 	}
 
@@ -379,19 +399,16 @@ public class L3721 extends TradeBuffer {
 		try {
 			loanBorMainService.update(tLoanBorMain, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007",
-					"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
+			throw new LogicException(titaVo, "E0007", "撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
 		}
 	}
 
 	// 檢核下次利率調整日期
 	private void checkNextRateAdjDate() throws LogicException {
 		// 下次利率調整日期應是大於本月的第一筆
-		LoanRateChange t2 = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, wkBormNo,
-				iNextRateAdjDate + 19110000 - 1, titaVo);
-		if (t2 != null & t2.getEffectDate() / 100 > this.txBuffer.getTxBizDate().getTbsDy() / 100) {
-			this.totaVo.setWarnMsg("戶號" + iCustNo + "-" + iFacmNo + "-" + wkBormNo + "，未生效利率變動日" + t2.getEffectDate()
-					+ " < 下次利率調整日期" + tLoanBorMain.getNextAdjRateDate());
+		LoanRateChange t2 = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, wkBormNo, iNextRateAdjDate + 19110000 - 1, titaVo);
+		if (t2 != null && t2.getEffectDate() / 100 > this.txBuffer.getTxBizDate().getTbsDy() / 100) {
+			this.totaVo.setWarnMsg("戶號" + iCustNo + "-" + iFacmNo + "-" + wkBormNo + "，未生效利率變動日" + t2.getEffectDate() + " < 下次利率調整日期" + tLoanBorMain.getNextAdjRateDate());
 		}
 	}
 
@@ -485,8 +502,7 @@ public class L3721 extends TradeBuffer {
 	private void DelLoanRateChangeRoutine(int effectDate) throws LogicException {
 		this.info("DelLoanRateChangeRoutine ...");
 
-		tLoanRateChange = loanRateChangeService
-				.holdById(new LoanRateChangeId(wkCustNo, wkFacmNo, wkBormNo, effectDate + 19110000), titaVo);
+		tLoanRateChange = loanRateChangeService.holdById(new LoanRateChangeId(wkCustNo, wkFacmNo, wkBormNo, effectDate + 19110000), titaVo);
 		if (tLoanRateChange == null) {
 			throw new LogicException(titaVo, "E0006", "放款利率變動檔"); // 鎖定資料時，發生錯誤
 		}
@@ -501,8 +517,7 @@ public class L3721 extends TradeBuffer {
 	private void DelLoanRateChangeNextAdj(int effectDate) throws LogicException {
 		this.info("DelLoanRateChangeRoutine2 ...");
 
-		LoanRateChange tLoanRateChange2 = loanRateChangeService
-				.holdById(new LoanRateChangeId(wkCustNo, wkFacmNo, wkBormNo, effectDate + 19110000), titaVo);
+		LoanRateChange tLoanRateChange2 = loanRateChangeService.holdById(new LoanRateChangeId(wkCustNo, wkFacmNo, wkBormNo, effectDate + 19110000), titaVo);
 		if (tLoanRateChange2 != null) {
 			try {
 				loanRateChangeService.delete(tLoanRateChange2, titaVo);
@@ -552,8 +567,7 @@ public class L3721 extends TradeBuffer {
 
 		tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(wkCustNo, wkFacmNo, wkBormNo), titaVo);
 		if (tLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0006",
-					"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006", "撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
 		}
 		// 放款交易訂正交易須由最後一筆交易開始訂正
 		loanCom.checkEraseBormTxSeqNo(tLoanBorMain, titaVo);
@@ -570,8 +584,7 @@ public class L3721 extends TradeBuffer {
 		try {
 			loanBorMainService.update(tLoanBorMain, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007",
-					"撥款主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
+			throw new LogicException(titaVo, "E0007", "撥款主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
 		}
 	}
 
@@ -579,8 +592,7 @@ public class L3721 extends TradeBuffer {
 	private void RestoredLoanRateChangeRoutine() throws LogicException {
 		this.info("RestoredLoanRateChangeRoutine ... ");
 
-		tLoanRateChange = loanRateChangeService
-				.holdById(new LoanRateChangeId(wkCustNo, wkFacmNo, wkBormNo, wkEffectDate + 19110000), titaVo);
+		tLoanRateChange = loanRateChangeService.holdById(new LoanRateChangeId(wkCustNo, wkFacmNo, wkBormNo, wkEffectDate + 19110000), titaVo);
 		if (tLoanRateChange == null) {
 			throw new LogicException(titaVo, "E0006", "放款利率變動檔"); // 鎖定資料時，發生錯誤
 		}
@@ -610,8 +622,7 @@ public class L3721 extends TradeBuffer {
 		// 放行 一般
 		if (titaVo.isHcodeNormal()) {
 			if (tLoanBorMain.getActFg() != 1) {
-				throw new LogicException(titaVo, "E0017",
-						"撥款主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + "撥款序號 = " + wkBormNo); // 該筆交易狀態非待放行，不可做交易放行
+				throw new LogicException(titaVo, "E0017", "撥款主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + "撥款序號 = " + wkBormNo); // 該筆交易狀態非待放行，不可做交易放行
 			}
 			// 新增交易暫存檔作為放行訂正使用
 			TxTemp tTxTemp = new TxTemp();
@@ -641,10 +652,8 @@ public class L3721 extends TradeBuffer {
 			// 放款交易訂正交易須由最後一筆交易開始訂正
 			loanCom.checkEraseBormTxSeqNo(tLoanBorMain, titaVo);
 			// 查詢交易暫存檔
-			String wkSeqNo = FormatUtil.pad9(String.valueOf(iCustNo), 7) + FormatUtil.pad9(String.valueOf(iFacmNo), 3)
-					+ FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "000";
-			TxTemp tTxTemp = txTempService.findById(new TxTempId(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), wkSeqNo), titaVo);
+			String wkSeqNo = FormatUtil.pad9(String.valueOf(iCustNo), 7) + FormatUtil.pad9(String.valueOf(iFacmNo), 3) + FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "000";
+			TxTemp tTxTemp = txTempService.findById(new TxTempId(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), wkSeqNo), titaVo);
 			if (tTxTemp == null) {
 				throw new LogicException(titaVo, "E0001", "交易暫存檔"); // 查詢資料不存在
 			}
@@ -658,20 +667,17 @@ public class L3721 extends TradeBuffer {
 		try {
 			tLoanBorMain = loanBorMainService.update2(tLoanBorMain, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008",
-					"撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + wkBormNo + e.getErrorMsg()); // 新增資料時，發生錯誤
+			throw new LogicException(titaVo, "E0008", "撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + wkBormNo + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
 	}
 
 	private void EntryModifyRoutine() throws LogicException {
 		this.info("EntryModifyRoutine ... ");
 
-		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
-				titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
 		lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
 		if (lTxTemp == null || lTxTemp.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = "
-					+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = " + titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
 		}
 		for (TxTemp tx : lTxTemp) {
 			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
@@ -702,11 +708,9 @@ public class L3721 extends TradeBuffer {
 			}
 			// 刪除原交易內容檔
 			if (titaVo.isHcodeModify()) {
-				LoanBorTx tLoanBorTx = loanBorTxService
-						.holdById(new LoanBorTxId(wkCustNo, wkFacmNo, wkBormNo, wkBorxNo), titaVo);
+				LoanBorTx tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(wkCustNo, wkFacmNo, wkBormNo, wkBorxNo), titaVo);
 				if (tLoanBorTx == null) {
-					throw new LogicException(titaVo, "E0006", "放款交易內容檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo
-							+ " 撥款序號 = " + wkBormNo + " 交易內容檔序號 = " + wkBorxNo); // 鎖定資料時，發生錯誤
+					throw new LogicException(titaVo, "E0006", "放款交易內容檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo + " 交易內容檔序號 = " + wkBorxNo); // 鎖定資料時，發生錯誤
 				}
 				try {
 					loanBorTxService.delete(tLoanBorTx, titaVo);

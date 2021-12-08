@@ -319,6 +319,10 @@ E(0,0)
 IF(#FuncCode==4 || #FuncCode==2,$,S)
 E(0,1)ASGN(AGAIN$)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#UnitCode)
+
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R13Rim.dec"/>
 <include src="ROM.icf::L6R13.dec"/>

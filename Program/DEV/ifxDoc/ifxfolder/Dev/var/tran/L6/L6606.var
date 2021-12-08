@@ -1,0 +1,214 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6606]                                 主管理由維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdSupvReasonCode+理由代碼",#SupvReasonCode],
+["#FdSupvReasonItem+理由說明",#SupvReasonItem],
+["#FdSupvReasonLevel+理由階層",#SupvReasonLevel],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+
+! 必輸欄位
+
+! 永遠為必輸欄位
+#FdFuncCode=X,2,L
+T(3,*)
+#FdSupvReasonCode=X,2,L
+T(3,*)
+#FdSupvReasonItem=X,2,L
+T(3,*)
+#FdSupvReasonLevel=X,2,L
+T(3,*)
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2(1:新增;2:修改;4:刪除)
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,50,S     
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode2)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6066進入),$)
+
+#NTXBUF=X,86,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_SupvReasonCode=X,4,S
+T(1,#NTXBUF,2,4)
+
+#CHAIN_SupvReasonItem=x,80,S
+T(1,#NTXBUF,6,80)
+
+#CHAIN_SupvReasonLevel=1,4,S
+T(1,#NTXBUF,86,1)
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+T(2,@SupvReasonCode,#CHAIN_SupvReasonCode)
+T(2,@SupvReasonItem,#CHAIN_SupvReasonItem)
+T(2,@SupvReasonLevel,#CHAIN_SupvReasonLevel)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==1 ||#FuncCode==2 ,T(F,@SupvReasonItem,1)T(F,@SupvReasonLevel,1),
+                                 T(F,@SupvReasonItem,0)T(F,@SupvReasonLevel,0))
+IF (#FuncCode==1 ,T(F,@SupvReasonCode,1),T(F,@SupvReasonCode,0))
+                                  
+#WKPSC=X,2,S
+
+#WKSTAR=X,2,S
+C(3,#CHAIN,1,S,T(3,*))
+
+#WKSTAR1=X,2,S
+C(3,#CHAIN,1,C(2,#FuncCode,S,T(3,*)),T(3,*))
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+T(2,@FdFuncCode,#WKSTAR)
+T(2,@FdSupvReasonCode,#WKSTAR1)
+T(2,@FdSupvReasonItem,#WKSTAR2)
+T(2,@FdSupvReasonLevel,#WKSTAR2)
+
+
+!理由代碼
+#SupvReasonCode=A,4,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(3,#FuncCode,4,s)
+@V(2,0)
+
+#SendL6R09=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+E(0,@RimL6R09SupvReasonCode,#SupvReasonCode)
+RESET_RIM(#SendL6R09,L6R09)
+S(L6R09,1,#RimFuncCode,#RimTxCode,#RimL6R09SupvReasonCode)
+R(1,L6R09)
+
+#RimFg=X,1,S
+C(3,#CHAIN,1,S,$)
+C(3,#FuncCode,1,S,$)
+T(2,@SupvReasonItem,#L6R09SupvReasonItem)
+T(2,@SupvReasonLevel,#L6R09SupvReasonLevel)
+
+!理由說明
+#SupvReasonItem=x,80,I
+C(3,#FuncCode,4,s)
+@V(7)
+
+!理由階層
+#SupvReasonLevel=A,1,I
+C(3,#FuncCode,4,s)
+@V(2,0)
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#SupvReasonCode)
+
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R09Rim.dec"/>
+<include src="ROM.icf::L6R09.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6606 ----------
+<sub type="FORM" name="L6606">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6606,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6606] 主管理由維護)
+
+</sub>
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode#SupvReasonCode#SupvReasonItem#SupvReasonLevel
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L6606
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R09.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

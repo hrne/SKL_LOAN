@@ -10,6 +10,12 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<split id="split1" task-executor="taskExecutor" next="split2">
 			<flow>
+				<!-- Usp_L2_CustDataCtrl_Ins -->
+				<step id="l2CustDataCtrlIns" parent="parentStep">
+					<tasklet ref="L2CustDataCtrlIns" />
+				</step>
+			</flow>
+			<flow>
 				<!-- Usp_L5_CollList_Upd -->
 				<step id="l5CollListUpd" parent="parentStep">
 					<tasklet ref="L5CollListUpd" />

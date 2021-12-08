@@ -265,7 +265,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
 T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
 T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
 T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
@@ -518,15 +518,15 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PayAccount,#L8r18PayAccount),$)
 C(5,#TranKey,D,s,$)
-@V(7)V(8,0,20)V(NL)
+@V(7)V(NL)
 
 ![最大債權金融機構聲請狀送達地址]-可存入38個全形中文字
-#PostAddr=C,76,I
+#PostAddr=X,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PostAddr,#L8r18PostAddr),$)
 C(5,#TranKey,D,s,$)
-@V(7)V(8,0,38)V(NL)
+@V(7)
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

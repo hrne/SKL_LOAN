@@ -227,7 +227,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)
 T(F,@CollateralType,1)
 T(F,@OriginLoanAmt,1)
 T(F,@CreditBalance,1)T(F,@PerPeriordAmt,1)T(F,@LastPayAmt,1)T(F,@LastPayDate,1)
@@ -302,10 +302,7 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)V(NL)
-V(8,0,50)
-
-
+@V(7)V(NL) 
 
 ![擔保品類別]
 #CollateralType=X,2,I

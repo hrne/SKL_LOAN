@@ -487,9 +487,11 @@ public class MainProcess extends SysLogger {
 		/* 交易控制 */
 		TxTranCode tTxTranCode = txTranCodeService.findById(this.titaVo.getTxCode());
 
-		if (this.titaVo.isTxcdSpecial() || this.titaVo.isTxcdInq()) {
+		if (this.titaVo.isTxcdSpecial()) {
 			txCom.setCanCancel(0);
 			txCom.setCanModify(0);
+			txCom.setSubmitFg(0);
+			txCom.setCustRmkFg(0);
 		} else {
 			if (tTxTranCode == null)
 				throw new LogicException("EC001", "交易控制檔(TxTranCode):" + this.titaVo.getTxCode());
@@ -497,17 +499,22 @@ public class MainProcess extends SysLogger {
 			if (tTxTranCode.getStatus() == 1)
 				throw new LogicException("EC008", "交易代號 " + this.titaVo.getTxCode() + " 已停用");
 
-			txCom.setCanCancel(tTxTranCode.getCancelFg());
-			txCom.setCanModify(tTxTranCode.getModifyFg());
-			txCom.setSubmitFg(tTxTranCode.getSubmitFg());
+			if (this.titaVo.isTxcdInq()) {
+				txCom.setCanCancel(0);
+				txCom.setCanModify(0);
+				txCom.setSubmitFg(0);
+			} else {
+				txCom.setCanCancel(tTxTranCode.getCancelFg());
+				txCom.setCanModify(tTxTranCode.getModifyFg());
+				txCom.setSubmitFg(tTxTranCode.getSubmitFg());
 
+				int funcode = Integer.parseInt(this.titaVo.getFuncind());
+				if (!checkAuth.isCan(this.titaVo, this.titaVo.getTlrNo(), this.titaVo.getAgent(), this.titaVo.getAuthNo(), this.titaVo.getTxCode(), this.titaVo.getActFgI(), funcode)) {
+					throw new LogicException("EC008", "經辦 [" + this.titaVo.getTlrNo() + "] 無交易 [" + this.titaVo.getTxCode() + "] 執行權限");
+				}
+			}
 			// 2021.10.13 by eric
 			txCom.setCustRmkFg(tTxTranCode.getCustRmkFg());
-
-			int funcode = Integer.parseInt(this.titaVo.getFuncind());
-			if (!checkAuth.isCan(this.titaVo, this.titaVo.getTlrNo(), this.titaVo.getAgent(), this.titaVo.getAuthNo(), this.titaVo.getTxCode(), this.titaVo.getActFgI(), funcode)) {
-				throw new LogicException("EC008", "經辦 [" + this.titaVo.getTlrNo() + "] 無交易 [" + this.titaVo.getTxCode() + "] 執行權限");
-			}
 		}
 
 		if (txCom.isTxTypeInq() && tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && this.titaVo.getReason().isEmpty()) {

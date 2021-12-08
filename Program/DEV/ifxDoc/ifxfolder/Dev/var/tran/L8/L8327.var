@@ -197,7 +197,7 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPayAccount,*),
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPayAccount,*),
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPayAccount,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPayAccount, ),$))
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPayAccount, ),$))
 #TranKeyX=X,4,L

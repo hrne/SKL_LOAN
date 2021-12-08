@@ -299,7 +299,7 @@ T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank1
 T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
 T(F,@Bank27,1)T(F,@Bank28,1)T(F,@Bank29,1)T(F,@Bank30,1)
 T(2,@FdApplyDate,*)T(2,@FdAdjudicateDate,*)T(2,@FdBankCount,*),$)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
 T(F,@Bank1,1)T(F,@Bank2,1)T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
 T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
 T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)

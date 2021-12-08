@@ -253,7 +253,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@GuarantyType,1)T(F,@LoanAmt,1)T(F,@Principal,1)T(F,@Interest,1)T(F,@Penalty,1)T(F,@Other,1)T(F,@TerminalPayAmt,1)T(F,@LatestPayAmt,1)T(F,@FinalPayDay,1)T(F,@NotyetacQuit,1)T(F,@MothPayDay,1)T(F,@BeginDate,1)T(F,@EndDate,1)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@GuarantyType,1)T(F,@LoanAmt,1)T(F,@Principal,1)T(F,@Interest,1)T(F,@Penalty,1)T(F,@Other,1)T(F,@TerminalPayAmt,1)T(F,@LatestPayAmt,1)T(F,@FinalPayDay,1)T(F,@NotyetacQuit,1)T(F,@MothPayDay,1)T(F,@BeginDate,1)T(F,@EndDate,1)
 T(2,@FdGuarantyType,*)T(2,@FdMothPayDay,*)T(2,@FdBeginDate,*)T(2,@FdEndDate,*)
 ,
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@GuarantyType,0)T(F,@LoanAmt,0)T(F,@Principal,0)T(F,@Interest,0)T(F,@Penalty,0)T(F,@Other,0)T(F,@TerminalPayAmt,0)T(F,@LatestPayAmt,0)T(F,@FinalPayDay,0)T(F,@NotyetacQuit,0)T(F,@MothPayDay,0)T(F,@BeginDate,0)T(F,@EndDate,0)
@@ -345,8 +345,6 @@ C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @V(7)
-V(8,0,50)
-
 
 !擔保品類別
 #GuarantyType=X,2,I

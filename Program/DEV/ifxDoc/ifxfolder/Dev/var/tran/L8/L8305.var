@@ -415,7 +415,6 @@ C(5,#TranKey_Tmp,4,s,$)
 #CompName=X,40,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(8,0,20)
 
 !目前主要所得公司統編
 #CompId=X,8,I

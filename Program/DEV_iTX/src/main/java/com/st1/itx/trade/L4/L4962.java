@@ -27,6 +27,7 @@ import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4962ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4962")
@@ -185,7 +186,7 @@ public class L4962 extends TradeBuffer {
 						OccursList occursListReport = new OccursList();
 						occursListReport.putParam("ReportBCustNo", result.get("F0"));
 						occursListReport.putParam("ReportBFacmNo", result.get("F1"));
-						occursListReport.putParam("ReportBCustName", result.get("F2"));
+						occursListReport.putParam("ReportBCustName", StringCut.replaceLineUp(result.get("F2")));
 						occursListReport.putParam("ReportBFirstDrDwDate", drDwDate);
 						occursListReport.putParam("ReportBClCode1", result.get("F4"));
 						occursListReport.putParam("ReportBClCode2", result.get("F5"));
@@ -254,7 +255,7 @@ public class L4962 extends TradeBuffer {
 							continue;
 						}
 					}
-					
+
 					if (!"".equals(tInsuOrignal.getCommericalFlag())) {
 						totaC.init(titaVo);
 						errorReportC2(tInsuOrignal, titaVo);
@@ -306,7 +307,7 @@ public class L4962 extends TradeBuffer {
 		occursListReport.putParam("ReportAPrevInsuNo", tInsuRenew.getPrevInsuNo());
 		occursListReport.putParam("ReportACustNo", tInsuRenew.getCustNo());
 		occursListReport.putParam("ReportAFacmNo", tInsuRenew.getFacmNo());
-		occursListReport.putParam("ReportACustName", tCustMain.getCustName());
+		occursListReport.putParam("ReportACustName", StringCut.replaceLineUp(tCustMain.getCustName()));
 		occursListReport.putParam("ReportAClCode1", tInsuRenew.getClCode1());
 		occursListReport.putParam("ReportAClCode2", tInsuRenew.getClCode2());
 		occursListReport.putParam("ReportAClNo", tInsuRenew.getClNo());
@@ -350,7 +351,7 @@ public class L4962 extends TradeBuffer {
 		occursListReport.putParam("ReportCPrevInsuNo", tInsuRenew.getPrevInsuNo());
 		occursListReport.putParam("ReportCCustNo", tInsuRenew.getCustNo());
 		occursListReport.putParam("ReportCFacmNo", tInsuRenew.getFacmNo());
-		occursListReport.putParam("ReportCCustName", tCustMain.getCustName());
+		occursListReport.putParam("ReportCCustName", StringCut.replaceLineUp(tCustMain.getCustName()));
 		occursListReport.putParam("ReportCClCode1", tInsuRenew.getClCode1());
 		occursListReport.putParam("ReportCClCode2", tInsuRenew.getClCode2());
 		occursListReport.putParam("ReportCClNo", tInsuRenew.getClNo());
@@ -410,7 +411,7 @@ public class L4962 extends TradeBuffer {
 		occursListReport.putParam("ReportCPrevInsuNo", tInsuOrignal.getOrigInsuNo());
 		occursListReport.putParam("ReportCCustNo", custno);
 		occursListReport.putParam("ReportCFacmNo", facmno);
-		occursListReport.putParam("ReportCCustName", custname);
+		occursListReport.putParam("ReportCCustName", StringCut.replaceLineUp(custname));
 		occursListReport.putParam("ReportCClCode1", tInsuOrignal.getClCode1());
 		occursListReport.putParam("ReportCClCode2", tInsuOrignal.getClCode2());
 		occursListReport.putParam("ReportCClNo", tInsuOrignal.getClNo());

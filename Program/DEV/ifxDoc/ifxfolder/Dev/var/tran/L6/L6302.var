@@ -1,0 +1,256 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+E(0,2)
+
+#ACTFG=_,_,S
+C(2,#FKEY,E(0,1),$)
+
+#TXCD
+T(3,L6302)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6302]                                 指標利率登錄/維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdBaseRateCode+指標利率種類",#BaseRateCode,#BaseRateItem],
+["#FdCurrencyCode+幣別",#CurrencyCode],
+["#FdEffectDate+生效日期",#EffectDate],
+["#FdBaseRate+利率",#BaseRate,"%"],
+["#FdRemark+備註",#Remark],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN_SELECT_ALL=X,15,I,ui:button;value:查詢;enable:0;tabbable:0;title:LXXXX
+
+#FdFuncCode=X,2,L
+#FdBaseRateCode=X,2,L
+#FdCurrencyCode=X,2,L
+#FdEffectDate=X,2,L
+#FdBaseRate=X,2,L
+#FdRemark=X,2,L
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2
+#CDCODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,100,S        
+
+!BaseRate
+#CDCODECode=x,20,S                  
+T(3,CdCode.BaseRate)                  
+#ApHelp=x,200,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode2,#CDCODECode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@ApHelp,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6032進入),$)
+
+#NTXBUF=X,136,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_BaseRateCode=X,2,S
+T(1,#NTXBUF,2,2)
+
+#CHAIN_BaseRateItem=X,40,S
+T(1,#NTXBUF,4,40)
+
+#CHAIN_BaseRate_1=X,2,S
+T(1,#NTXBUF,44,2)
+
+#CHAIN_BaseRate_2=X,4,S
+T(1,#NTXBUF,46,4)
+
+#CHAIN_BaseRate=X,7,S
+T(2,#CHAIN_BaseRate_1+.+#CHAIN_BaseRate_2)
+
+#CHAIN_EffectDate=D,7,S
+T(1,#NTXBUF,50,7)
+
+#CHAIN_Remark=x,80,S
+T(1,#NTXBUF,57,80)
+
+
+C(3,#CHAIN,1,T(2,@FuncCode,#CHAIN_FuncCode),)
+C(3,#CHAIN,1,T(2,@BaseRateCode,#CHAIN_BaseRateCode),)
+C(3,#CHAIN,1,T(2,@BaseRateItem,#CHAIN_BaseRateItem),)
+C(3,#CHAIN,1,E(0,@BaseRate,#CHAIN_BaseRate),)
+C(3,#CHAIN,1,T(2,@EffectDate,#CHAIN_EffectDate),)
+C(3,#CHAIN,1,T(2,@Remark,#CHAIN_Remark),)
+
+! 功能
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@BaseRateItem,1)T(F,@BaseRate,1)T(F,@EffectDate,1)T(F,@Remark,1),
+                                  T(F,@BaseRateItem,0)T(F,@BaseRate,0)T(F,@EffectDate,0)T(F,@Remark,0))
+IF (#FuncCode==1 ,T(F,@EffectDate,1),T(F,@EffectDate,0))
+
+#WKPSC=X,2,S
+
+#WKSTAR1=X,2,S
+C(2,#FuncCode,S,T(3,*),S,S,S,S)
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+T(2,@FdBaseRateCode,#WKSTAR1)
+T(2,@FdBaseRate,#WKSTAR2)
+T(2,@FdEffectDate,#WKSTAR1)
+
+! 指標利率種類
+#BaseRateCode=A,2,I
+IF(#FuncCode==1,T(F,@BaseRateCode,1),T(F,@BaseRateCode,0))
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+HELP(#ApHelp)
+@V(H,#ApHelp)
+
+#BaseRateItem=X,40,L
+T(H,#BaseRateCode,#ApHelp)
+
+! 幣別
+#CurrencyCode=X,3,L
+T(3,TWD)
+@V(7)
+
+! 生效日期
+! 下營業日
+#NBSDY=D,7,S
+T(4,NBSDY$)
+
+#EffectDate=D,7,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(3,#CHAIN,1,T(2,@EffectDate,#CHAIN_EffectDate),T(2,#NBSDY))
+C(3,#FuncCode,4,s)
+D(8)
+@V(7)A(4,0,#EffectDate)
+!V(5,#NBSDY,9991231) !公文比較晚,所以不限生效日期
+
+#SendL6R14=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimL6R14BaseRateCode,#BaseRateCode)
+T(2,@RimL6R14CurrencyCode,#CurrencyCode)
+T(2,@RimL6R14EffectDate,#EffectDate)
+RESET_RIM(#SendL6R14,L6R14)
+S(L6R14,1,#RimFuncCode,#RimTxCode,#RimL6R14BaseRateCode,#RimL6R14CurrencyCode,#RimL6R14EffectDate)
+R(1,L6R14)
+
+! 利率
+#BaseRate=m,2.4,I
+C(3,#FuncCode,4,s)
+@V(2,0)
+
+! 備註
+#Remark=x,80,I
+C(3,#FuncCode,4,s)
+
+
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+!#RPTFG=A,1,S
+!E(0,0)
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#BaseRateCode+-+#EffectDate)
+
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R14Rim.dec"/>
+<include src="ROM.icf::L6R14.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+
+</sub>
+
+!---------- TXFORM = L6302 ----------
+<sub type="FORM" name="L6302">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6302,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6302] 指標利率登錄/維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+#CurrencyCode
+#BaseRateCode
+#EffectDate
+#BaseRate
+#Remark
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L6R14.tom"/>
+
+TXFORM=L6302^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+</sub>
+

@@ -357,6 +357,10 @@ E(0,#BsOffrPerccent)
 #RPTFG=A,1,S
 E(0,0)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#WorkMonth+-+#PieceCode)
+
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R21Rim.dec"/>
 <include src="ROM.icf::L6R21.dec"/>

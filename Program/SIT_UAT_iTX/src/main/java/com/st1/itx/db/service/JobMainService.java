@@ -121,6 +121,16 @@ public interface JobMainService {
 
   /**
    * Stored Procedure<br>
+   * (日終批次)維護 CustDataCtrl 結清戶個資控管檔
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L2_CustDataCtrl_Ins(int tbsdyf,  String empNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
    * (日終批次)維護 CollList 法催紀錄清單檔
    * @param  tbsdyf int
    * @param  empNo String

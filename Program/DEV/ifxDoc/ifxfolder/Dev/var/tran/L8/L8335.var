@@ -166,7 +166,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@TotalPayAmt,1),C(5,#TranKey,D,K(MODIFYBUTTON,異動)T(F,@PayAmt,0)T(F,@TotalPayAmt,0),$))
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@TotalPayAmt,1),C(5,#TranKey,D,K(MODIFYBUTTON,異動)T(F,@PayAmt,0)T(F,@TotalPayAmt,0),$))
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)

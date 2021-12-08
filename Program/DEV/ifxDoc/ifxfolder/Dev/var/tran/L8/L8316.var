@@ -254,7 +254,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)
 T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@PayDate,1)T(F,@PayEndDate,1)
 T(F,@Period,1)T(F,@Rate,1)T(F,@OutstandAmt,1)T(F,@SubAmt,1)T(F,@ClaimStatus1,1)
 T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@IsImplement,1)T(F,@InspectName,1)
@@ -345,20 +345,20 @@ C(5,#TranKey,D,s,$)
 @V(7)
 
 !法院承審股別 2個全形
-#CourtDiv=C,9,I
+#CourtDiv=X,4,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtDiv,#L8r27CourtDiv),$)
 C(5,#TranKey,D,s,$)
-@V(8,0,2)
+
 
 !法院案號 20個全形
-#CourtCaseNo=C,45,I
+#CourtCaseNo=X,40,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtCaseNo,#L8r27CourtCaseNo),$)
 C(5,#TranKey,D,s,$)
-@V(8,0,20)
+
 
 !更生方案首期應繳款日
 #PayDate=D,7,I
@@ -463,12 +463,12 @@ HELP(#YesNoHelp)
 T(H,@IsImplementX,#IsImplement,#YesNoHelp)
 
 !監督人姓名 5全形
-#InspectName=C,10,I
+#InspectName=X,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@InspectName,#L8r27InspectName),$)
 C(5,#TranKey,D,s,$)
-@V(8,0,5)
+
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L
