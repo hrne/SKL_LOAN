@@ -60,7 +60,7 @@ public class L5606 extends TradeBuffer {
 		try {
 			uCdCity = iCdCityService.update2(iCdCity, titaVo);
 			iDataLog.setEnv(titaVo, beforeCdCity, uCdCity);
-			iDataLog.exec();
+			iDataLog.exec("修改催收人員法務人員資料");
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}

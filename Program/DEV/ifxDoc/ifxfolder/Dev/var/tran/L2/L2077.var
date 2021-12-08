@@ -317,6 +317,7 @@ C(3,#FUNC6,2,T(3,@OOBTN6,清償作業補領),$)
 C(3,#FUNC6,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=#OOBTN6; ntxbuf=#OOBUF6}),BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOBTN6; ntxbuf=#OOBUF6}))
 IF(#OOCloseDate==0,BIND(grid,cancel),$)
 IF(#OOAllCloseFg=="N",BIND(grid,cancel),$)
+IF(#OOAllCloseFg=="N",s,$)
 C(3,#OOFunCode,2,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOBTN6; ntxbuf=#OOBUF6}),$),$)
 C(3,#OOFunCode,3,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOBTN6; ntxbuf=#OOBUF6}),$),$)
 C(3,#OOReceiveFg,1,BIND(grid,cancel),$)
@@ -424,7 +425,7 @@ TXFORM=L2077
 #OOCloseAmtX=還清金額
 {width:170,align:'right'}
 
-#OOCollectWayCodeX=領取方式
+#OOCollectWayCodeX=領取地點
 {width:120,align:'left'}
 
 #OORmk=備註

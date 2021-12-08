@@ -321,6 +321,10 @@ T(2,@EditEmpNoX,#L5r28FullName)
 #TitaAcDate=D,7,L
 </sub>
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#CustNo+#FacmNo)
+
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>

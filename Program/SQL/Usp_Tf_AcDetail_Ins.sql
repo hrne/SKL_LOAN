@@ -268,8 +268,9 @@ BEGIN
           WHERE NVL(S1."TRXDAT",0) > 0      -- 傳票檔會計日期不為0 *日期為0者為問題資料,則排除
             AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除
             AND NVL(S2."TRXDAT",0) = 0      -- 若在S2有資料,表示S1此筆為被訂正資料,則排除
-            AND NVL(S3."CORACC",' ') <> ' ' -- 有串到新會科才寫入
-            AND NVL(S5."AcNoCode",' ') <> ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
+            AND NVL(S3."CORACC",' ') != ' ' -- 有串到新會科才寫入
+            AND NVL(S3."AGLACC",' ') != ' ' -- 2021-12-08 新增判斷 有串到最新的11碼會科才寫入
+            AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
             AND S1."JLNCRC" = '0'
             AND S1."TRXDAT" >= 20190101
             AND S1."TRXDAT" <= "TbsDyF"
@@ -281,7 +282,7 @@ BEGIN
                        AND NVL(S4."LMSACN",0) = 0
                   THEN 1
                 ELSE 0 
-                END >= 1
+                END = 1
          ) S
     LEFT JOIN (SELECT "LMSACN"
                     , "ACTFSC"

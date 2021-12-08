@@ -116,7 +116,7 @@ public class L5605 extends TradeBuffer {
 					try {
 						iCollRemindService.update(uCollRemind, titaVo);
 						iDataLog.setEnv(titaVo, beforeCollRemind, uCollRemind);
-						iDataLog.exec();		
+						iDataLog.exec("修改法催紀錄提醒事項檔");		
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}

@@ -98,6 +98,11 @@ T(H,@AgentTlrnoNa2,#AgentTlrno2,#tlrnoH)
 T(H,@AgentTlrnoNa3,#AgentTlrno3,#tlrnoH)
 T(H,@AgentTlrnoNa4,#AgentTlrno4,#tlrnoH)
 T(H,@AgentTlrnoNa5,#AgentTlrno5,#tlrnoH)
+!C(3,#FunCode,1,$,s)
+!T(1,@BeginTimeh,#BeginTime,1,2)
+!T(1,@BeginTimem,#BeginTime,3,2)
+!T(1,@EndTimeh,#EndTime,1,2)
+!T(1,@EndTimem,#EndTime,3,2)
 
 #Status=A,1,L
 C(2,#FunCode,$,T(3,1),T(3,0),$)
@@ -181,6 +186,7 @@ T(H,#AgentTlrno5,#tlrnoH)
 
 #BeginDate=D,7,I
 C(3,#FunCode,1,$,s)
+C(3,#BeginDate,0,E(0,#CDATEX),$)
 @V(7)A(DATE,0,#BeginDate)
 IF(#BeginDate<#CDATEX,V(P,開始日期不可小於日曆日),$)
 
@@ -204,8 +210,10 @@ T(2,@BeginTime,#BeginTimeh+#BeginTimem)
 
 #EndDate=D,7,I
 C(3,#FunCode,1,$,s)
+C(3,#EndDate,0,E(0,#CDATEX),$)
 @V(7)A(DATE,0,#EndDate)
 V(5,#BeginDate,9991231)
+C(3,#BeginTimeh,24,C(3,#BeginDate,#EndDate,V(P,結束日期不可等於開始日期),$),$)
 IF(#EndDate<#BeginDate,V(P,結束日期不可小於開始日期),$)
 
 #EndTime=A,4,S

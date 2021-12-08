@@ -447,6 +447,10 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 T(1,#EditTimeX,1,4)
 @V(7)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#CustNo+#FacmNo)
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

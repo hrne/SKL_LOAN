@@ -147,7 +147,7 @@ public class L3911 extends TradeBuffer {
 		lDisplayFlag.add("I"); // 繳息次筆
 		lDisplayFlag.add("F"); // 繳息首筆
 		lDisplayFlag.add("Y"); // for轉換
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.borxIntEndDateDescRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
 				wkBormNoStart, wkBormNoEnd, iEntryStartDate + 19110000, iEntryEndDate + 19110000, lDisplayFlag,
 				this.index, this.limit, titaVo);
 		lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
@@ -227,15 +227,13 @@ public class L3911 extends TradeBuffer {
 
 				tTempVo = tTempVo.getVo(ln.getOtherFields());
 
-				
 				acctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
 				modifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
 				fireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
 				lawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
 
 				repayAmt = ln.getPrincipal().add(ln.getInterest()).add(ln.getDelayInt()).add(ln.getBreachAmt())
-						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee)
-						.add(lawFee);
+						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee).add(lawFee);
 
 				wkRepayAmt = wkRepayAmt.add(repayAmt); // 回收金額
 				wkTempAmt = wkTempAmt.add(ln.getTempAmt());
@@ -285,24 +283,22 @@ public class L3911 extends TradeBuffer {
 
 				tTempVo = tTempVo.getVo(ln.getOtherFields());
 
-
 				acctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
 				modifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
 				fireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
 				lawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
 
 				repayAmt = ln.getPrincipal().add(ln.getInterest()).add(ln.getDelayInt()).add(ln.getBreachAmt())
-						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee)
-						.add(lawFee);
+						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee).add(lawFee);
 
 				wkRepayAmt = wkRepayAmt.add(repayAmt); // 回收金額
-				wkTempAmt = wkTempAmt.add(ln.getTempAmt()); //暫收金額
+				wkTempAmt = wkTempAmt.add(ln.getTempAmt()); // 暫收金額
 				TempAcDate = ln.getAcDate();
 				TempTitaTlrNo = ln.getTitaTlrNo();
 				TempTitaTxtNo = ln.getTitaTxtNo();
 
 				if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
-					wkTempRepay = wkTempRepay.subtract(ln.getTempAmt()); //暫收抵繳
+					wkTempRepay = wkTempRepay.subtract(ln.getTempAmt()); // 暫收抵繳
 				}
 				this.totaVo.addOccursList(occursList);
 				occursList = new OccursList();

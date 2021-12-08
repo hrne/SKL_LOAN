@@ -291,16 +291,19 @@ C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 
 !支票號碼
 #ChequeNo=A,7,I
+C(3,#CHAIN,1,s,$)
 
 ![支票到期日]
 !可不輸入
 
 #ChequeDateStart=D,7,I
+C(3,#CHAIN,1,s,$)
 HIDE(#BTN2,#BTN3,#BTN4)
 D(8)
 @A(DATE,0,#ChequeDateStart)
 
 #ChequeDateEnd=D,7,I
+C(3,#CHAIN,1,s,$)
 D(8)
 @IF(#ChequeDateStart==0 && #ChequeDateEnd==0,S,$)
 V(7)V(5,#ChequeDateStart,9991231)A(DATE,0,#ChequeDateEnd)

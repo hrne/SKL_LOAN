@@ -137,7 +137,7 @@ public class L560AReport extends MakeReport {
 		baTxCom.setTxBuffer(txbuffer);
 		try {
 			listBaTxVo = baTxCom.settingUnPaid(txbuffer.getTxBizDate().getTbsDy(), rCustNo, rFacmNo, 0, 1,
-					BigDecimal.ZERO, titaVo);// 日期為會計日(110/12/6怡婷確認)
+					BigDecimal.ZERO, titaVo);// 日期為會計日
 		} catch (LogicException e) {
 			this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
 		}
@@ -275,7 +275,7 @@ public class L560AReport extends MakeReport {
 			strFileName = "延遲繳款通知函" + iCustNo + "-" + iFacmNo;
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", strFileName, strFileName + ".TXT", 2);
 
-			strContent = "新光人壽保險股份有限公司　　通知(戶號 " + iCustNo + ")";
+			strContent = "新光人壽保險股份有限公司　　通知(戶號 " + iCustNo + "-" + iFacmNo + ")";
 			makeFile.put(strContent);
 			strContent = "聯絡電話：" + iAccTel + "  " + iAccCollPsnX;
 			makeFile.put(strContent);

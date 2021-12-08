@@ -407,8 +407,6 @@ public class L4450Batch extends TradeBuffer {
 
 				tmpBorm tmp = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(),
 						tBaTxVo.getRepayType() <= 3 ? tBaTxVo.getPayIntDate() : 0);
-				tmpBorm tmp3 = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, 0);
-
 				this.info("L4450 Test's Log Start");
 				this.info("CustNo : " + tmp.getCustNo());
 				this.info("FacmNo : " + tmp.getFacmNo());
@@ -443,7 +441,11 @@ public class L4450Batch extends TradeBuffer {
 //				短繳後方合計第一筆欠款
 				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
 					this.info("continue... 短繳期金");
-					shortAmtMap.put(tmp3, tBaTxVo.getUnPaidAmt());
+					if (shortAmtMap.containsKey(tmp2)) {
+						shortAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt().add(shortAmtMap.get(tmp2)));
+					} else {
+						shortAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt());
+					}
 					continue;
 				}
 
@@ -543,9 +545,9 @@ public class L4450Batch extends TradeBuffer {
 				}
 
 //				短繳合計於第一筆欠款
-				if (shortAmtMap.get(tmp3) != null && shortAmtMap.get(tmp3).compareTo(BigDecimal.ZERO) > 0) {
-					shPayAmtMap.put(tmp, shPayAmtMap.get(tmp).add(shortAmtMap.get(tmp3)));
-					shortAmtMap.put(tmp3, BigDecimal.ZERO);
+				if (shortAmtMap.get(tmp2) != null && shortAmtMap.get(tmp2).compareTo(BigDecimal.ZERO) > 0) {
+					shPayAmtMap.put(tmp, shPayAmtMap.get(tmp).add(shortAmtMap.get(tmp2)));
+					shortAmtMap.put(tmp2, BigDecimal.ZERO);
 				}
 
 //              除火險費外可暫收抵繳
@@ -570,6 +572,7 @@ public class L4450Batch extends TradeBuffer {
 				} else {
 					if (tBaTxVo.getUnPaidAmt().compareTo(tmpAmtMap.get(tmp2)) <= 0) {
 						if (repAmtMap.containsKey(tmp)) {
+						} else {
 							repAmtMap.put(tmp, BigDecimal.ZERO);
 						}
 						tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
@@ -709,7 +712,8 @@ public class L4450Batch extends TradeBuffer {
 			}
 //			扣款金額(by 額度)超過帳號設定限額(限額為零不檢查)
 			this.info("repAmtFacMap ..." + repAmtFacMap.get(tmp2));
-			if (limitAmt.get(tmp2).compareTo(BigDecimal.ZERO) > 0 && repAmtFacMap.get(tmp2).compareTo(limitAmt.get(tmp2)) > 0) {
+			if (limitAmt.get(tmp2).compareTo(BigDecimal.ZERO) > 0
+					&& repAmtFacMap.get(tmp2).compareTo(limitAmt.get(tmp2)) > 0) {
 				tTempVo.putParam("Deduct", "超過帳戶限額");
 			}
 			// 火險單
@@ -797,10 +801,10 @@ public class L4450Batch extends TradeBuffer {
 		BankDeductDtl tBankDeductDtl = null;
 		if (tmp.getRepayType() <= 3) {
 			tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
-					 prevIntDate + 19110000, titaVo);
+					prevIntDate + 19110000, titaVo);
 		} else {
 			tBankDeductDtl = bankDeductDtlService.findL4450EntryDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
-					 tmp.getRepayType(), titaVo);
+					tmp.getRepayType(), titaVo);
 		}
 
 		if (tBankDeductDtl != null) {
@@ -960,7 +964,6 @@ public class L4450Batch extends TradeBuffer {
 		private void setFacmNo(int facmNo) {
 			this.facmNo = facmNo;
 		}
-
 
 		private void setBormNo(int bormNo) {
 			this.bormNo = bormNo;

@@ -144,6 +144,7 @@ R(1,L2R36)
 C(3,#CHAIN,1,$,S)
 E(0,@FacmNo,#L2r36FacmNo)
 T(2,@CloseInd,#L2r36CloseInd)
+T(H,@CloseIndX,#CloseInd,#CloseIndHelp)
 T(2,@CollectFlag,#L2r36CollectFlag)
 T(2,@CloseReasonCode,#L2r36CloseReasonCode)
 E(0,@TimCloseAmt,#L2r36CloseAmt)
@@ -175,6 +176,10 @@ C(3,#L2r36CloseDate,0,S,$)
 T(F,@AgreeNo,0)
 T(F,@DocNo,0)
 T(F,@ClsNo,0)
+T(F,@EntryDate,0)
+T(F,@CloseInd,0)
+T(F,@CollectFlag,0)
+T(F,@CloseReasonCode,0)
 
 !作業項目
 #ItemCode=A,1,S
@@ -195,9 +200,9 @@ C(2,#FunCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新�
 
 #ShowFd=X,1,S
 C(2,#FunCode,T(3, ),T(3,*),T(3,*),T(3, ),T(3, ),T(3, ))
-T(2,@FdFunCode,#ShowFd)     
+T(2,@FdFunCode,#ShowFd)
 T(2,@FdCustNo,#ShowFd)
-T(2,@FdCloseReasonCode,#ShowFd)
+! T(2,@FdCloseReasonCode,#ShowFd)
 T(2,@FdCollectWayCode,#ShowFd)
 T(2,@FdReceiveDate,#ShowFd)
 
@@ -220,7 +225,6 @@ SHOW(#CloseReasonCode,#CollectWayCode)
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
 T(F,@CloseNo,0)
-T(F,@CloseReasonCode,1)
 T(F,@CollectWayCode,1)
 T(F,@ReceiveDate,1)
 T(F,@CreateDate,1)
@@ -230,7 +234,6 @@ C(3,#FunCode,2,S,$)
 HIDE(#CloseReasonCode,#CollectWayCode)
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
-T(F,@CloseReasonCode,0)
 T(F,@CollectWayCode,0)
 T(F,@ReceiveDate,0)
 T(F,@AgreeNo,0)
@@ -240,9 +243,14 @@ T(F,@NTXBUF,0)
 T(F,@TelNo1,0)
 T(F,@TelNo2,0)
 T(F,@TelNo3,0)
+T(F,@Rmk,0)
 T(F,@CloseNo,0)
 T(F,@CloseDate,0)
 T(F,@CreateDate,0)
+T(F,@EntryDate,0)
+T(F,@CloseInd,0)
+T(F,@CollectFlag,0)
+T(F,@CloseReasonCode,0)
 
 
 
@@ -261,9 +269,6 @@ C(3,#CHAIN,1,s,$)
 !調rim參數
 #RimCloseNo=A,3,S
 
-
-
-
 !額度編號 自動顯示不需輸入
 #FacmNo=A,3,I
 C(3,#CHAIN,1,s,$)
@@ -275,6 +280,7 @@ C(3,#CHAIN,1,s,$)
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
 C(3,#L2r36CloseDate,0,$,s)
+@V(7)A(DATE,0,#EntryDate)
 
 
 

@@ -125,6 +125,11 @@ C(4,#LegalPsn,S,$)
 C(4,#LegalPsn,S,$)
 @C(4,#LegalExt,S,$)
 V(9)
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#CityCode)
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

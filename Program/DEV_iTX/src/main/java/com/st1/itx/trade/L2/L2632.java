@@ -122,7 +122,7 @@ public class L2632 extends TradeBuffer {
 			
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeFacClose, tFacClose);
-			dataLog.exec("修改清償作業檔資料");
+			dataLog.exec();
 			// 刪除
 		} else if (iFunCd == 4) {
 			
@@ -132,7 +132,9 @@ public class L2632 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0004", "戶號= " + iCustNo + " 清償序號 =" + iCloseNo); // 刪除資料不存在
 			}
 			try {
-				
+				// 紀錄變更前變更後
+				dataLog.setEnv(titaVo, tFacClose4, tFacClose4);
+				dataLog.exec("刪除清償作業");
 				sFacCloseService.delete(tFacClose4);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());

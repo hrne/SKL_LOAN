@@ -125,7 +125,7 @@ public class L5602 extends TradeBuffer {
 					try {
 						iCollMeetService.update(uCollMeet, titaVo);
 						iDataLog.setEnv(titaVo, beforeCollMeetr, uCollMeet);
-						iDataLog.exec();
+						iDataLog.exec("修改法催紀錄面催檔");
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
@@ -138,11 +138,16 @@ public class L5602 extends TradeBuffer {
 					if (!titaVo.getHsupCode().equals("1")) {
 						iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 					}
-					iCollMeetService.holdById(iCollMeetId);
-					try {
-						iCollMeetService.delete(iCollMeet, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+					CollMeet uCollMeet = new CollMeet();
+					uCollMeet = iCollMeetService.holdById(iCollMeetId);
+					if (uCollMeet != null) {
+						try {
+							iCollMeetService.delete(uCollMeet, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+						}
+						iDataLog.setEnv(titaVo, uCollMeet, uCollMeet);
+						iDataLog.exec("刪除法催紀錄面催檔");
 					}
 				} else {
 					throw new LogicException(titaVo, "E0004", "");

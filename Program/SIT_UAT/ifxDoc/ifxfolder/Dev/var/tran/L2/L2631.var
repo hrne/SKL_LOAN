@@ -34,22 +34,58 @@
 <sub type="DC" name="p1" layout="cols=3;screen.width=[180,420,150,400];printer.width=[20,20,20,20];order=1;">
 [
 ["[L2631]                                 清償作業"],
-[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#BTN9,#CustName],
-[#<->#,"#FdCustId+統一編號",#CustId,#BTN2,#BTN12,#CustIdX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#BTN3,#CustName],
+[#<->#,"#FdCustId+統一編號",#CustId,#BTN2,#BTN4,#CustIdX],
 [#<->#,"#FdCloseNo+清償序號",#CloseNo],
 [#<->#,"#FdFunCode+作業功能",#FunCode,#FunCodX],
 [#<->#,"#FdTranDate+入帳日期",#TranDate],
 [#<->#,"#FdApplDate+申請日期",#ApplDate],
 [#<->#,"#FdCloseInd+結案區分",#CloseInd,#CloseIndX],
-[#<->#,"#FdFacmNo+額度編號",#FacmNo,#BTND],
-[#<->#,"@",#BTNA,"@",#BTNC,"@",#BTNB],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo,#BTN8],
+[#<->#,"@",#BTN5,"@",#BTN7,"@",#BTN6],
 [#<->#,"#FdCollectFlag+是否領取清償證明",#CollectFlag,#CollectFlagX],
 [#<->#,"#FdCloseAmt+清償金額",#CloseAmt],
-["#FdTelNo1+連絡電話１",#TelNo1],["#FdTelNo2+連絡電話２",#TelNo2],
-["#FdTelNo3+連絡電話３",#TelNo3],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
+["#FdTelNo1+連絡電話１",#TelNo1,#BTN9],["#FdTelNo2+連絡電話２",#TelNo2,#BTN10],
+["#FdTelNo3+連絡電話３",#TelNo3,#BTN11],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 ["#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],["#FdReceiveDate+領取日期",#ReceiveDate],
 [#<->#,"#FdRmk1+備註欄",#Rmk1],
 ]
+!---------- AP Button AREA ----------   
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢
+#BTN3=X,15,I,ui:button;value:疑似洗錢交易訪談記錄維護;enable:1;tabbable:0;title:L8204	疑似洗錢交易訪談記錄維護
+#BTN4=X,15,I,ui:button;value:疑似洗錢交易訪談記錄維護;enable:1;tabbable:0;title:L8204 疑似洗錢交易訪談記錄維護
+#BTN5=X,15,I,ui:button;value:清償違約明細;enable:1;tabbable:0;title:L2931 清償違約明細
+#BTN6=X,15,I,ui:button;value:額度清償資料;enable:1;tabbable:0;title:L2932 額度清償資料
+#BTN7=X,15,I,ui:button;value:結案試算;enable:1;tabbable:0;title:L3922 結案試算
+#BTN8=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title:L2015 額度明細資料查詢
+#BTN9=X,15,I,ui:button;value:聯絡電話;enable:1;tabbable:0;title:L1905 顧客聯絡電話查詢
+#BTN10=X,15,I,ui:button;value:聯絡電話;enable:1;tabbable:0;title:L1905 顧客聯絡電話查詢
+#BTN11=X,15,I,ui:button;value:聯絡電話;enable:1;tabbable:0;title:L1905 顧客聯絡電話查詢
+
+
+!按鈕<清償違約明細>
+#BINDA=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L2931; ntxbuf=#BUFA})
+!按鈕<清償額度資料>
+#BINDB=X,1,S
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2932; ntxbuf=#BUFB})
+!按鈕<結案試算>
+#BINDC=X,1,S
+BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L3922; ntxbuf=#BUFC})
+!按鈕<顧客聯絡電話查詢>
+#BIND9=X,1,S
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFTelNo})
+#BIND10=X,1,S
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFTelNo})
+#BIND11=X,1,S
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFTelNo})
+
+#WKHIDEA=X,1,S
+HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5,#BTN6,#BTN7,#BTN8)
+!INVOKEJS(SHOW,p1,27,30,0)
+
 
 #FdCustNo=X,2,L
 #FdCustId=X,2,L
@@ -74,41 +110,6 @@ T(3,* )
 #FdCloseReasonCode=X,2,L
 T(3,* )
 #FdReceiveDate=X,2,L
-
-!---------- AP Button AREA ----------   
-![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢
-#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢
-! #BTN3=X,15,I,ui:button;value:顧客控管警訊查詢;enable:1;tabbable:0;title:L2072 顧客控管警訊明細資料查詢
-! #BTN4=X,15,I,ui:button;value:清償違約明細;enable:1;tabbable:0;title:L2931 清償違約明細
-! #BTN5=X,15,I,ui:button;value:放款資料查詢;enable:1;tabbable:0;title:L3001 放款明細資料查詢
-! #BTN6=X,15,I,ui:button;value:保證人保證查詢;enable:1;tabbable:0;title:L2902 保證人保證資料查詢
-! #BTN7=X,15,I,ui:button;value:暫收支票查詢;enable:1;tabbable:0;title:L3007 暫收支票明細資料查詢
-! #BTN8=X,15,I,ui:button;value:火險保費查詢;enable:1;tabbable:0;title:L4960 火險保費資料查詢By客戶
-#BTN9=X,15,I,ui:button;value:疑似洗錢交易訪談記錄維護;enable:1;tabbable:0;title:L8204	疑似洗錢交易訪談記錄維護
-! #BTN10=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
-! #BTN11=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
-#BTN12=X,15,I,ui:button;value:疑似洗錢交易訪談記錄維護;enable:1;tabbable:0;title:L8204 疑似洗錢交易訪談記錄維護
-#BTNA=X,15,I,ui:button;value:清償違約明細;enable:1;tabbable:0;title:L2931 清償違約明細
-#BTNB=X,15,I,ui:button;value:額度清償資料;enable:1;tabbable:0;title:L2932 額度清償資料
-#BTNC=X,15,I,ui:button;value:結案試算;enable:1;tabbable:0;title:L3922 結案試算
-#BTND=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title:L2015 額度明細資料查詢
-
-
-!按鈕<清償違約明細>
-#BINDA=X,1,S
-BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L2931; ntxbuf=#BUFA})
-!按鈕<清償額度資料>
-#BINDB=X,1,S
-BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L2932; ntxbuf=#BUFB})
-!按鈕<結案試算>
-#BINDC=X,1,S
-BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L3922; ntxbuf=#BUFC})
-
-#WKHIDEA=X,1,S
-HIDE(#BTN1,#BTN2,#BTN9,#BTN12,#BTNA,#BTNB,#BTNC,#BTND)
-!INVOKEJS(SHOW,p1,27,30,0)
-
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -186,8 +187,8 @@ E(0,#SYSDATE)
 #BUF9A=X,25,S
 T(3,1+#SysDate+#CustNo+#FacmNo+#BormNo)
 
-#BIND9A=X,1,S
-BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF9A})
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF9A})
 
 !借戶戶號 按[瀏覽]連結[顧客明細資料查詢] 額度號碼可不輸入
 
@@ -199,7 +200,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustNo<-
 #CustNo=A,7,I
 INVOKEJS(SHOW,p1,1,2,1)
 C(4,#NTXBUF,$,s)
-SHOW(#BTN1,#BTN9)
+SHOW(#BTN1,#BTN3)
 @
 
 #SENDL2R07A=X,1,S
@@ -216,10 +217,10 @@ T(2,#L2r07CustName)
 
 
 #BUF9B=X,25,S
-T(3,1+#SysDate+#CustNo+#FacmNo+#BormNo)
+T(2,1+#SysDate+#CustNo+#FacmNo+000)
 
 #BIND9B=X,1,S
-BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF9B})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF9B})
 
 !統一編號 按[瀏覽]連結[顧客明細資料查詢]
 #BUF2=X,8,S
@@ -230,7 +231,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustId<-
 #CustId=X,10,I
 C(3,#CustNo,0,$,S)
 C(4,#NTXBUF,$,s)
-SHOW(#BTN2,#BTN12)
+SHOW(#BTN2,#BTN4)
 @C(4,#CustId,V(P,需擇一輸入),$)
 A(ID_UNINO,0,#CustId)
 
@@ -251,16 +252,26 @@ C(3,#CustNo,0,$,E(0,#CustNo))
 T(2,#L2r07CustNo)
 
 
+#CSPACE=X,10,S
+#BUFTelNo=X,18,S
+T(2,1+#CSPACE+#TimCustNo)
+#BIND9A=X,1,S
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFTelNo;ntxbuf5=type<-1:TelNo1<-OOTEL_PHONE})
+#BIND10A=X,1,S
+BIND(#BTN10,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFTelNo;ntxbuf5=type<-1:TelNo2<-OOTEL_PHONE})
+#BIND11A=X,1,S
+BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFTelNo;ntxbuf5=type<-1:TelNo3<-OOTEL_PHONE})
+
 #TimCustId=X,10,S
 C(3,#CustNo,0,T(2,#CustId),T(2,#L2r07CustId))
 C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,1,1,1)INVOKEJS(SHOW,p1,2,2,0))
 
 
-#BUF12=X,8,S
-T(2,1+#L2r07CustNo)
+#BUF12=X,25,S
+T(2,1+#SysDate+#TimCustNo+#FacmNo+000)
 
 #BIND12=X,1,S
-BIND(#BTN12,click, {cmd=CHAIN; ntxcd=L8203; ntxbuf=#BUF12})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF12})
 
 !清償序號
 #CloseNo=A,3,L
@@ -282,7 +293,7 @@ C(3,#FunCode,2,T(3,@FdCloseReasonCode, ),$)
 !必須輸入
 #TranDate=D,7,I
 C(4,#NTXBUF,$,s)
-HIDE(#BTND)
+HIDE(#BTN8)
 C(3,#TranDate,0,E(0,#SYSDATE),$)
 D(8)
 @V(7)
@@ -304,7 +315,7 @@ E(0,#SYSDATE)
 !必須輸入
 #CloseInd=X,1,I
 C(4,#NTXBUF,$,s)
-HIDE(#BTND)
+HIDE(#BTN8)
 HELP(#CloseIndHelp)
 ! HELP(L3DEF,CLOSEINDDEF,CloseInd,CloseIndX)
 E(0,0)
@@ -320,14 +331,14 @@ T(2,#TimCustNo+#TimCustNo+000)
 
 !按鈕<額度明細資料>
 #BINDD=X,1,S
-BIND(#BTND,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUFD;ntxbuf5=type<-1:CustNo<-OOCustNo:TimCustNo<-OOCustNo:FacmNo<-OOFacmNo})
+BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUFD;ntxbuf5=type<-1:CustNo<-OOCustNo:TimCustNo<-OOCustNo:FacmNo<-OOFacmNo})
 
 ![額度編號]
 #FacmNo=A,3,I
-C(2,#FunCode,INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTNA,#BTNC,#BTNB),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTNA,#BTNB)HIDE(#BTNC),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTNA,#BTNB)HIDE(#BTNC),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTNB)HIDE(#BTNA,#BTNC),$,$)
+C(2,#FunCode,INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN7,#BTN6),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN6)HIDE(#BTN5,#BTN7),$,$)
 C(4,#NTXBUF,$,s)
-SHOW(#BTND)
-@HIDE(#BTND)
+SHOW(#BTN8)
+@HIDE(#BTN8)
 
 #L3R07=X,1,S
 C(3,#FunCode,2,$,S)
@@ -352,49 +363,35 @@ T(2,     +#TimCustNo+          +0000000+#FacmNo+000+   +#CloseInd+#TranDate)
 
 !按鈕<清償違約明細>
 #BINDA2=X,1,S
-BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L2931; ntxbuf=#BUFA})
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L2931; ntxbuf=#BUFA})
 !按鈕<清償額度資料>
 #BINDB2=X,1,S
-BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L2932; ntxbuf=#BUFB})
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2932; ntxbuf=#BUFB})
 !按鈕<結案試算>
 #BINDC2=X,1,S
-BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L3922; ntxbuf=#BUFC})
+BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L3922; ntxbuf=#BUFC})
 
 #BUF3=X,7,S
 T(2,#TimCustNo)
 
-! #BIND3=X,1,S
-! BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2072; ntxbuf=#BUF3})
 
 #BUF4=X,14,S
 T(2,#TimCustNo+#FacmNo+000+0)
 
-! #BIND4=X,1,S
-! BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2931; ntxbuf=#BUF4})
 
 #BUF5=X,34,S
 T(2,0000000+#TimCustNo+          +0000000+#FacmNo)
 
-! #BIND5=X,1,S
-! BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3001; ntxbuf=#BUF5})
-
 #BUF6=X,10,S
 T(2,#TimCustId)
 
-! #BIND6=X,1,S
-! BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2902; ntxbuf=#BUF6})
 
 #BUF7=X,31,S
 T(2,0000000+#TimCustNo+          +0000000)
 
-! #BIND7=X,1,S
-! BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L3007; ntxbuf=#BUF7})
-
 #BUF8=X,18,S
 T(2,1+#TimCustNo+          )
 
-! #BIND8=X,1,S
-! BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L4960; ntxbuf=#BUF8})
 
 !是否領取清償證明
 #CollectFlag=X,1,I
@@ -453,6 +450,7 @@ T(2,@CloseReasonCode,#L3r11CloseReasonCode)
 !HELP(Y: 是;N: 否)
 !@V(2,0)
 !V(3,Y,N)
+
 
 !連絡電話１
 #TelNo1=x,15,I

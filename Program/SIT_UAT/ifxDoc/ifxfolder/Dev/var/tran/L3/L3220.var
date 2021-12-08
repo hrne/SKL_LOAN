@@ -65,7 +65,7 @@ K(MODIFYBUTTON,登錄)
 #BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
 #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:0;tabbable:0;title: L2016 核准號碼明細資料查詢;
-#BTN4=X,15,I,ui:button;value:支票資料查詢;enable:1;tabbable:0;title: L3008 支票查詢;
+#BTN4=X,15,I,ui:button;value:支票資料查詢;enable:1;tabbable:0;title: L3007 支票查詢;
 #BUF1=X,42,S
 
 !---------- AP TEXT AREA Variables ----------
@@ -272,7 +272,7 @@ C(3,#ApplNo,0,E(0,0),E(0,#L2r05FacmNo))
 #BUF4=X,45,S
 T(2,0000000+#TimCustNo+          +0000000)
 #BIND4=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3008; ntxbuf=#BUF4;ntxbuf5=type<-1:ChequeAcct<-OOChequeAcct:ChequeNo<-OOChequeNo})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3007; ntxbuf=#BUF4;ntxbuf5=type<-1:ChequeAcct<-OOChequeAcct:ChequeNo<-OOChequeNo})
 
 
 ![作業項目]

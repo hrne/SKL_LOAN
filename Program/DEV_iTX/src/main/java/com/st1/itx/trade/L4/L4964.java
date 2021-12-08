@@ -295,9 +295,10 @@ public class L4964 extends TradeBuffer {
 
 				} // else
 			} // for
-		} else {
-			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
-		}
+		} 
+//		else {
+//			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
+//		}
 
 		if (occursflg) {
 			throw new LogicException(titaVo, "E0001", "L4964  查無資料");

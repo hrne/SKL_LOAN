@@ -48,7 +48,7 @@ E(0,0)
 ["#FdTelNo2+連絡電話２",#TelNo2],
 ["#FdTelNo3+連絡電話３",#TelNo3],
 ["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
-["#FdCollectWayCode+領取方式",#CollectWayCode,#CollectWayCodeX],
+["#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],
 ["#FdReceiveDate+領取日期",#ReceiveDate],
 ["#FdRmk1+備註欄",#Rmk1],
 ]
@@ -103,6 +103,7 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@AdvanceCloseCodeHelp,#HelpDesc1)
 T(2,@CollectWayCodeHelp,#HelpDesc2)
+T(HELP,@CollectWayCodeHelp,#CollectWayCodeHelp,-,01;20)
 T(2,@CurrPrecisionHelp,#HelpDesc3)
 T(2,@ClRightsNoteHelp,#HelpDesc4)
 
@@ -158,7 +159,9 @@ T(2,@TelNo1,#L2r45TelNo1)
 T(2,@TelNo2,#L2r45TelNo2)
 T(2,@TelNo3,#L2r45TelNo3)
 E(0,@CloseReasonCode,#L2r45CloseReasonCode)
+T(H,@CloseReasonCodeX,#CloseReasonCode,#AdvanceCloseCodeHelp)
 T(2,@CollectWayCode,#L2r45CollectWayCode)
+T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
 ! E(0,@ReceiveDate,#L2r45ReceiveDate)
 T(1,@Rmk1,#L2r45Rmk,1,100)
 E(0,@CloseNo,#L2r45CloseNo)
@@ -213,13 +216,14 @@ HELP(#CollectWayCodeHelp,cols:5)
 
 
 #CollectWayCodeX=x,12,L
-C(4,#CollectWayCode,S,$)T(H,#CollectWayCode,#CollectWayCodeHelp)
+C(4,#CollectWayCode,S,$)
+T(H,#CollectWayCode,#CollectWayCodeHelp)
 
 
 !領取日期
 #ReceiveDate=D,7,I
 C(3,#CollectWayCode,1,S,$)
-E(0,#SYSDATE)
+E(0,#SYSCDATE)
 @A(DATE,0,#ReceiveDate)
 
 !備註欄

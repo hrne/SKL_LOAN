@@ -46,12 +46,12 @@ K(MODIFYBUTTON,上傳)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,1200];printer.width=[20,20];">
 [
 ["[LC104]                                 上傳附件"],
-["#FdTranNo+交易代號",#TranNo,#FromTranNo],
+["#FdTranNo+交易代號",#TranNo],
 ["#FdCustNo+戶@@@@號",#CustNo,"-",#FacmNo,"-",#BormNo],
 ["#FdMrKey+參考編號",#MrKey],
 ["#FdNote+說@@@@明",#Note],
 [#<->#,"#FdRBUTTON_FLD+選擇檔案","#BUTTON_FLD"],
-["#FdTypeItem+附件類別,#TypeItem,#BTNADD],
+["#FdTypeItem+附件類別,#TypeItem,#BTNAdd,#BTNSub],
 ["#FdDesc+備@@@@註,#Desc],
 ]
 
@@ -70,16 +70,39 @@ T(3,*)
 
 #FdDesc=X,2,L
 
-#BTNADD=X,15,O,ui:button;value:加入常用類別;enable:1;tabbable:0;
-!#BtnEmpno=X,15,I,ui:button;value:介紹人資料查詢;enable:1;tabbable:0;title:L5022 協辦人員等級明細資料查詢;
+#FunCode=A,1,S
+
+!加入常用類別
+#BTNAdd=X,15,O,ui:button;value:加入常用類別;enable:1;tabbable:0;
 
 !設定按下按鈕後執行call PTOTRP
-#BINDADD=X,1,S
-BIND(#BTNADD,click, {cmd=CALLSEND;DOCODE=DOADD;GOFILED=FdTypeItem})
+#BINDAdd=X,1,S
+!BIND(#BTNAdd,click, {cmd=CALLSEND;DOCODE=DOAdd;GOFILED=FdTypeItem})
+BIND(#BTNAdd,click, {cmd=CALLSEND;DOCODE=DOAdd})
 
-#DOADD=@,1,S
-RESET_RIM(#DOADD,XCR2B)
-S(LCR08,1,#FdTypeItem)
+#DOAdd=@,1,S
+RESET_RIM(#DOAdd,LCR08)
+E(0,@FunCode,1)
+S(LCR08,1,#FunCode,#TranNo,#TypeItem)
+R(1,LCR08)
+ALERT(已成功加入常用附件類別)
+
+
+!從常用類別移除
+#BTNSub=X,15,O,ui:button;value:從常用類別移除;enable:1;tabbable:0;
+
+!設定按下按鈕後執行call PTOTRP
+#BINDSub=X,1,S
+!BIND(#BTNSub,click, {cmd=CALLSEND;DOCODE=DOSub;GOFILED=FdTypeItem})
+BIND(#BTNSub,click, {cmd=CALLSEND;DOCODE=DOSub})
+
+#DOSub=@,1,S
+RESET_RIM(#DOSub,LCR08)
+E(0,@FunCode,2)
+S(LCR08,1,#FunCode,#TranNo,#TypeItem)
+R(1,LCR08)
+ALERT(已成功從常用附件類別移除)
+
 
 ![一般數值 multiple:true 可上傳多個檔案]
 #BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:false;fieldName:#FileItem;width:600
@@ -122,8 +145,21 @@ ASGN(CAUTO$)
 #MRKEY=_,_,S
 C(3,#CustNo,0,S,T(2,#CustNo+-+#FacmNo+-+#BormNo))
 
+#HelpCode=x,17,S                  
+T(2,TxAttachType+#TranNo)                  
+
+#TypeItemHelp=x,10240,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#HelpCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TypeItemHelp,#HelpDesc1)
+
 !附件類別
 #TypeItem=x,50,I
+C(4,#TypeItemHelp,$,HELP(#TypeItemHelp))
 @
 V(7)
 
@@ -193,6 +229,9 @@ T(3,1)ASGN(LOOP$)
 <include src="PRT.icf::FM101.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=LC104
+^
+TXFORM=LCR08
+#TypeItemHelp
 ^
 </sub>
 

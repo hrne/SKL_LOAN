@@ -137,7 +137,7 @@ public class L5604 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
 				iDataLog.setEnv(titaVo, beforeCollLaw, uuCollLaw);
-				iDataLog.exec();
+				iDataLog.exec("修改法催紀錄法務進度檔");
 				
 			}else { //刪除
 				int dAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
@@ -163,6 +163,9 @@ public class L5604 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 				}
+				iDataLog.setEnv(titaVo, dCollLaw, dCollLaw);
+				iDataLog.exec("刪除法催紀錄法務進度檔");
+
 			}
 			CollListId rCollListId = new CollListId();
 			CollList rCollList = new CollList();

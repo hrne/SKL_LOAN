@@ -26,7 +26,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,40];">
 [
 ["[L8201]                                 疑似洗錢樣態條件設定"],
-["#FdFactorDays+統計期間天數",#FactorDays],
+["#FdFactorDays+統計期間天數",#FactorDays," (洗錢樣態一、二)"],
 ["@洗錢樣態一","銀扣/匯款轉帳/支票兌現(不含專戶)"],
 ["#FdFactor1TotLimit+金額合計超過",#Factor1TotLimit],
 ["@洗錢樣態二","銀扣/匯款轉帳/支票兌現(不含專戶)"],
