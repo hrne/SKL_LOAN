@@ -2022,7 +2022,7 @@ TXFORM=L2R07
 #L2r07RemitBirthday
 ^
 </L2R07.tom>
-
+L2R08
 !尋找員工檔資料
 <L2R08.dec>
 #L2r08FullName=X,40,S
@@ -2030,6 +2030,8 @@ TXFORM=L2R07
 #L2r08CenterCode1Name=X,40,S
 #L2r08CenterCode2=X,6,S
 #L2r08CenterCode2Name=X,40,S
+#L2r08GroupNo=X,1,S
+#L2r08Brno=X,4,S
 </L2R08.dec>
 
 <L2R08.tom>
@@ -2039,6 +2041,8 @@ TXFORM=L2R08
 #L2r08CenterCode1Name
 #L2r08CenterCode2
 #L2r08CenterCode2Name
+#L2r08GroupNo
+#L2r08Brno
 ^
 </L2R08.tom>
 

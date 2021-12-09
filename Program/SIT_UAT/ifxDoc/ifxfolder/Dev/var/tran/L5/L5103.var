@@ -244,7 +244,8 @@ BIND(#BTND,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFD;ntxbuf5=type<-1:
 CustNo<-OOCustNo:
 CustName<-OOCustName})
 
-
+#TODAY=A,7,S
+E(0,#SYSCDATE)
 
 ! 申請或歸還
 #ApplCode=A,1,S
@@ -351,6 +352,29 @@ C(3,#ApplCode,0,$,s)
 #ApplSeq=A,3,L
 C(3,#ApplCode,1,$,s)
 
+
+#LC014Mrkey=x,100,S
+T(2,#TODAY+-+#CustNo+-+#FacmNo+-+#ApplSeq)
+
+#LC014Text=X,10,S
+T(H,#ApplCode,#ApplCodeHelp)
+
+#LC014Note=x,100,S
+T(2,日期:+#TODAY+/ID:+#CustNo+-+#FacmNo+-+#ApplSeq+ 檔案借閱+#LC014Text)
+
+#BufLC014=X,200,S
+T(2,L5103+#CustNo+#FacmNo+000+#LC014Mrkey+#LC014Note)
+
+#Button=x,100,S
+C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,LC104 上傳附件)
+
+#Button2=x,100,S
+C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
+T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,LC014 上傳附件查詢)
+
 #BUFA=X,74,S
 !T(2,#ApplEmpNo)
 
@@ -429,8 +453,7 @@ E(0,0)
 #TmpReturnDate=A,7,S
 E(0,0)
 
-#TODAY=A,7,S
-E(0,#SYSCDATE)
+#TODAY1=X,1,S
 C(3,#ApplCode,2,E(0,@ReturnDate,#TODAY),E(0,@ApplDate,#TODAY))
 
 ! 借閱日期
@@ -470,6 +493,9 @@ RESET_RIM(#SendL2r08C,L2R08)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
 T(2,@KeeperEmpNoX,#L2r08FullName)
+C(4,#KeeperEmpNo,s,$)
+T(2,@L5103ConfirmGroupNo,#L2r08GroupNo)
+T(2,@L5103ConfirmBrNo,#L2r08Brno)
 
 ! 員工姓名---調RIM
 #KeeperEmpNoX=X,8,L
@@ -520,6 +546,9 @@ RESET_RIM(#SendL2r08B,L2R08)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
 T(2,@ReturnEmpNoX,#L2r08FullName)
+C(4,#ReturnEmpNo,s,$)
+T(2,@L5103ConfirmGroupNo,#L2r08GroupNo)
+T(2,@L5103ConfirmBrNo,#L2r08Brno)
 
 #ReturnEmpNoX=X,8,L
 

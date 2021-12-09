@@ -340,7 +340,7 @@ C(3,#SendCode,2,$,S)
 #Message=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 C(3,#SendCode,2,$,S)
-C(3,#Letter,0,s,$)
+!C(3,#Letter,0,s,$)
 @C(3,#SendCode,2,C(2,#Message,$,$,IF(#Letter==2,V(P,優先序重複),$),IF(#Letter==3,V(P,優先序重複),$)),$)
 V(1,0,1,2,3)
 
@@ -348,9 +348,14 @@ V(1,0,1,2,3)
 #Email=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 C(3,#SendCode,2,$,S)
-C(3,#Letter,0,s,$)
+!C(3,#Letter,0,s,$)
 @C(3,#SendCode,2,C(2,#Email,$,$,IF(#Letter==2||#Message==2,V(P,優先序重複),$),IF(#Letter==3||#Message==3,V(P,優先序重複),$)),$)
 V(1,0,1,2,3)
+
+#Check=X,1,S
+C(3,#SendCode,2,$,s)
+IF(#Letter==0 && #Message==0 && #Email==0,$,s)
+V(P,需至少有一項不為0)
 
 #RPTFG=A,1,S
 E(0,0)

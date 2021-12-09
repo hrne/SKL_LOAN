@@ -459,8 +459,8 @@ T(H,#AuthNo1,#AuthGroupH)
 
 #AuthNo2=X,6,I
 C(2,#FunCode,s,$,$,s,s,s)
-C(4,#AuthNo1,s,$)
-C(4,#AuthNo1,INVOKEJS(SHOW,p2_2,0),INVOKEJS(SHOW,p2_2,1))
+INVOKEJS(SHOW,p2_2,1)
+C(4,#AuthNo1,C(4,#AuthNo2,s,INVOKEJS(SHOW,p2_2,1)),$)
 HELP(#AuthGroupH)
 @C(4,#AuthNo2,S,$)V(H,#AuthGroupH)
 C(4,#AuthNo1,$,V(4,#AuthNo1))
