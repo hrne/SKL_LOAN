@@ -149,7 +149,7 @@ public class L4510 extends TradeBuffer {
 	private int cnt = 0;
 
 	private HashMap<String, Integer> perfMonth = new HashMap<>();
-
+	
 	private HashMap<tmpFacm, String> errMsg = new HashMap<>();
 
 	private HashMap<tmpFacm, String> facmAcctCode = new HashMap<>();
@@ -211,11 +211,9 @@ public class L4510 extends TradeBuffer {
 //				1.15日薪 2.非15日薪
 				if (iOpItem == 1 && "1".equals(tCdCode.getItem().substring(0, 1))) {
 					procCodeIs15.add(tEmpDeductSchedule.getAgType1());
-//					iY15EntryDate = tEmpDeductSchedule.getEntryDate();
 				}
 				if (iOpItem == 2 && "2".equals(tCdCode.getItem().substring(0, 1))) {
 					procCodeUn15.add(tEmpDeductSchedule.getAgType1());
-//					iN15EntryDate = tEmpDeductSchedule.getEntryDate();
 				}
 			}
 
@@ -364,12 +362,12 @@ public class L4510 extends TradeBuffer {
 				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			} else {
-				iN15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
+				iY15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
 				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			}
-			setBatxValue(listBaTxVo, result.get("F3"));
-		}
+			setBatxValue(listBaTxVo, result.get("F3") );
+		} // for
 
 //		各個repaycode寫入BankDeductDtl
 		if (mapFlag != null) {
@@ -609,10 +607,11 @@ public class L4510 extends TradeBuffer {
 
 //			1.15日薪 2.非15日薪
 			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
-				iY15EntryDate = getList(slEmpDeductSchedule,tCdEmp.getAgType1());
+//				iY15EntryDate = getList(slEmpDeductSchedule,);
+				
 				tEmpDeductDtlId.setEntryDate(iY15EntryDate);
 			} else {
-				iN15EntryDate = getList(slEmpDeductSchedule,tCdEmp.getAgType1());
+//				iN15EntryDate = getList(slEmpDeductSchedule,);
 				tEmpDeductDtlId.setEntryDate(iN15EntryDate);
 			}
 			tEmpDeductDtlId.setCustNo(tmp.getCustNo());
@@ -785,7 +784,7 @@ public class L4510 extends TradeBuffer {
 				rpcd = "XH";
 			}
 
-			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getEntryDate(), tEmpDeductDtl.getCustNo(), rpcd);
+			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getMediaDate(), tEmpDeductDtl.getCustNo(), rpcd);
 			this.info("tmp : " + tmp.toString());
 
 			if (repayAmt.containsKey(tmp)) {
@@ -794,7 +793,7 @@ public class L4510 extends TradeBuffer {
 				repayAmt.put(tmp, tEmpDeductDtl.getRepayAmt());
 			}
 			this.info("repayAmt : " + repayAmt.get(tmp));
-		}
+		} // for 
 		List<EmpDeductMedia> deleEmpDeductMedia = new ArrayList<EmpDeductMedia>();
 
 		Slice<EmpDeductMedia> delesEmpDeductMedia = null;
@@ -831,7 +830,7 @@ public class L4510 extends TradeBuffer {
 				rpcd = "XH";
 			}
 
-			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getEntryDate(), tEmpDeductDtl.getCustNo(), rpcd);
+			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getMediaDate(), tEmpDeductDtl.getCustNo(), rpcd);
 
 			if (empCnt.containsKey(tmp)) {
 				updateEmpDeductDtl(tEmpDeductDtl.getEmpDeductDtlId(), todayF, flag, seq, titaVo);
@@ -890,23 +889,29 @@ public class L4510 extends TradeBuffer {
 		}
 	}
 
-//	暫時紀錄 入帳日期 戶號-額度-撥款 扣款代碼
+//	暫時紀錄 媒體日期 戶號-額度-撥款 扣款代碼
 	private class tmpCustRpCd {
 
-		private int entryDate = 0;
+//		private int entryDate = 0;
+		private int mediaDate = 0;
 		private int custNo = 0;
 		private String repayFlag = "";
 
-		public tmpCustRpCd(int entryDate, int custNo, String repayFlag) {
-			this.setEntryDate(entryDate);
+		public tmpCustRpCd(int mediaDate,int custNo, String repayFlag) {
+//			this.setEntryDate(entryDate);
+			this.setMediaDate(mediaDate);
 			this.setCustNo(custNo);
 			this.setRepayFlag(repayFlag);
 		}
 
-		private void setEntryDate(int entryDate) {
-			this.entryDate = entryDate;
-		}
+//		private void setEntryDate(int entryDate) {
+//			this.entryDate = entryDate;
+//		}
 
+		private void setMediaDate(int mediaDate) {
+			this.mediaDate = mediaDate;
+		}
+		
 		private void setCustNo(int custNo) {
 			this.custNo = custNo;
 		}
@@ -921,7 +926,7 @@ public class L4510 extends TradeBuffer {
 			int result = 1;
 			result = prime * result + getEnclosingInstance().hashCode();
 			result = prime * result + custNo;
-			result = prime * result + entryDate;
+			result = prime * result + mediaDate;
 			result = prime * result + ((repayFlag == null) ? 0 : repayFlag.hashCode());
 			return result;
 		}
@@ -939,7 +944,7 @@ public class L4510 extends TradeBuffer {
 				return false;
 			if (custNo != other.custNo)
 				return false;
-			if (entryDate != other.entryDate)
+			if (mediaDate != other.mediaDate)
 				return false;
 			if (repayFlag == null) {
 				if (other.repayFlag != null)
@@ -955,7 +960,7 @@ public class L4510 extends TradeBuffer {
 
 		@Override
 		public String toString() {
-			return "tmpCustRpCd [entryDate=" + entryDate + ", custNo=" + custNo + ", repayFlag=" + repayFlag + "]";
+			return "tmpCustRpCd [mediaDate=" + mediaDate + ", custNo=" + custNo + ", repayFlag=" + repayFlag + "]";
 		}
 	}
 

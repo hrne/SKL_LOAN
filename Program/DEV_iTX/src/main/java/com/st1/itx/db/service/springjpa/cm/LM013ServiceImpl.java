@@ -64,7 +64,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   ,TO_CHAR(D.\"CustNo\") AS \"CustNo\"  ";
 		sql += "                   ,LPAD(D.\"FacmNo\", 3, '0') AS \"FacmNo\"  ";
 		sql += "                   ,C.\"CustId\" AS \"CustId\"  ";
-		sql += "                   ,C.\"CustName\" AS \"CustName\"  ";
+		sql += "                   ,\"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\"  ";
 		sql += "                   ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" IN ('81','82','83') OR D.\"AcctCode\" = '340'  ";
 		sql += "                         THEN 0  ";
 		sql += "                    ELSE CASE CF.\"ClCode1\"  ";

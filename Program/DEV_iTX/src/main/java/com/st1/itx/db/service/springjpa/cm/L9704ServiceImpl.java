@@ -27,7 +27,6 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int lastMonth, int thisMonth, TitaVo titaVo) throws Exception {
 		this.info("L9704ServiceImpl.findAll ");
 
@@ -44,7 +43,7 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += " SELECT F.\"CustNo\"                                                      "; // -- F0 戶號
 		sql += "      , F.\"FacmNo\"                                                      "; // -- F1 額度
-		sql += "      , C.\"CustName\"                                                    "; // -- F2 戶名/公司名稱
+		sql += "      , \"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\"                "; // -- F2 戶名/公司名稱
 		sql += "      , F.\"FirstDrawdownDate\"                                           "; // -- F3 初貸日
 		sql += "      , CASE WHEN L.\"PrevIntDate\" != 0                                  ";
 		sql += "             THEN L.\"PrevIntDate\"                                       ";
@@ -54,11 +53,11 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , NVL(LASTM.\"OvduPrinBal\",0)                AS \"LastOvduPrinBal\""; // -- F7 上月催收本金餘額
 		sql += "      , NVL(LASTM.\"OvduIntBal\" + LASTM.\"OvduBreachBal\",0)             ";
 		sql += "                                                    AS \"LastOvduIntBal\" "; // -- F8 上月催收利息餘額 +
-								   														 	 //       上月催收違約金餘額
+																								// 上月催收違約金餘額
 		sql += "      , NVL(THISM.\"OvduPrinBal\",0)                AS \"ThisOvduPrinBal\""; // -- F9 本月催收本金餘額
 		sql += "      , NVL(THISM.\"OvduIntBal\" + THISM.\"OvduBreachBal\",0)             ";
 		sql += "                                                    AS \"ThisOvduIntBal\" "; // -- F10 本月催收利息餘額 +
-																							 //        本月催收違約金餘額
+																								// 本月催收違約金餘額
 		sql += "      , E.\"Fullname\"                                                    "; // -- F11 催收人員姓名
 		sql += "      , CT.\"CityItem\"                                                   "; // -- F12 地區別名稱
 		sql += "      , NVL(DF.\"Item\", '一般帳戶')                AS \"AcBookItem\"     "; // -- F13 帳冊別中文

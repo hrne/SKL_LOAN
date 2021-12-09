@@ -42,7 +42,7 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		sql += " SELECT B0.\"UnitItem\" AS \"BsDeptItem\" "; // 部室中文(房貸專員)
 		sql += "       ,E0.\"Fullname\" AS \"BsName\" "; // 房貸專員姓名
-		sql += "       ,C.\"CustName\" AS \"CustName\" "; // 戶名
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\" "; // 戶名
 		sql += "       ,I.\"CustNo\""; // 戶號
 		sql += "       ,I.\"FacmNo\""; // 額度號碼
 		sql += "       ,I.\"BormNo\""; // 撥款序號

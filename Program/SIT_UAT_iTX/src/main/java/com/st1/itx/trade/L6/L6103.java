@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,6 @@ import com.st1.itx.db.service.TxTellerService;
  * @version 1.0.0
  */
 public class L6103 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6103.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -51,11 +48,11 @@ public class L6103 extends TradeBuffer {
 
 		this.info("L6103 SupCode : " + titaVo.getHsupCode());
 		// 交易需主管核可
-		if (!titaVo.getHsupCode().equals("1")) {
-			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-		} else {
+//		if (!titaVo.getHsupCode().equals("1")) {
+//			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+//		} else {
 			toDo(titaVo);
-		}
+//		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -99,7 +96,7 @@ public class L6103 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", "使用者:" + titaVo.getTlrNo() + "/" + e.getErrorMsg());
 		}
 		dataLog.setEnv(titaVo, tTxTeller2, tTxTeller); ////
-		dataLog.exec(); ////
+		dataLog.exec("報表查詢作業申請"); ////
 
 	}
 }

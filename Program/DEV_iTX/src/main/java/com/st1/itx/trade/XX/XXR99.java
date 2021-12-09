@@ -119,7 +119,7 @@ public class XXR99 extends TradeBuffer {
 				this.info("AUTHGROUP = " + k.substring(0, 9) + "/" + k.substring(9));
 				s = getAuthGroup(k.substring(9, 13), k.substring(13, 14));
 			} else if ("Teller".equals(k)) {
-				s = getTeller();
+				s = getTeller(titaVo);
 			} else if ("CdLoanNotYet".equals(k)) {
 				s = getCdLoanNotYet();
 			} else if ("CdLoanNotYet.YetDays".equals(k)) {
@@ -542,7 +542,7 @@ public class XXR99 extends TradeBuffer {
 		return s;
 	}
 
-	private String getTeller() {
+	private String getTeller(TitaVo titaVo) {
 		this.info("XXR99 getTeller");
 		String s = "";
 
@@ -554,11 +554,33 @@ public class XXR99 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
+		String iTlrNo = titaVo.getTlrNo();
+		String iBrno = titaVo.getBrno();
+		
 		Slice<TxTeller> slTxTeller = sTxTellerService.findAll(this.index, this.limit);
 		List<TxTeller> lTxTeller = slTxTeller == null ? null : slTxTeller.getContent();
 
+		String iGroupNo="";
+		TxTeller tTxTeller = sTxTellerService.findById(iTlrNo, titaVo);
+		if(tTxTeller!=null) {
+			iGroupNo = tTxTeller.getGroupNo();
+		}
+		
+		
 		if (lTxTeller != null) {
+			
 			for (TxTeller txTeller : lTxTeller) {
+				
+				if(txTeller.getLevelFg()==3) {//經辦不同課組別跳過
+					if(!(iGroupNo).equals(txTeller.getGroupNo())) {
+						continue;
+					}
+				}else if(txTeller.getLevelFg()==1){//主管不同單位跳過
+					if(!(iBrno).equals(txTeller.getBrNo())) {
+						continue;
+					}
+				}
+				
 				if (!"".equals(s)) {
 					s += ";";
 				}

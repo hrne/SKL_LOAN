@@ -72,9 +72,9 @@ public class AjaxController extends SysLogger {
 
 				inputStream = new ByteArrayInputStream(zLibUtils.unCompress7z(txAttachment.getFileData()));
 				IOUtils.copy(inputStream, response.getOutputStream());
-				inputStream.close();
 				response.flushBuffer();
-			}
+			} else
+				this.info("txAttachment is Null");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

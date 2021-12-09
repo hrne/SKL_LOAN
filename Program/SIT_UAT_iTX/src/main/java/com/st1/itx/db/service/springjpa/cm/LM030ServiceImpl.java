@@ -23,7 +23,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -35,13 +35,13 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM030.findAll ");
 
 		this.info("inputted AcDate = " + titaVo.getParam("AcDate"));
-		
+
 		String sql = "";
 		sql += " SELECT CITY.\"CityItem\" ";
 		sql += "       ,\"Fn_GetEmpName\"(F.\"AccCollPsn\", 1) \"AccCollPsn\" ";
 		sql += "       ,D.\"CustNo\" ";
 		sql += "       ,D.\"FacmNo\" ";
-		sql += "       ,C.\"CustName\" ";
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0) \"CustName\" ";
 		sql += "       ,D.\"DrawdownDate\" ";
 		sql += "       ,D.\"LoanBal\" ";
 		sql += "       ,D.\"Interest\" ";

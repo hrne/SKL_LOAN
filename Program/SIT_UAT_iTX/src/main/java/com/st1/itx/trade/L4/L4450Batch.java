@@ -523,19 +523,17 @@ public class L4450Batch extends TradeBuffer {
 					} else {
 						minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
 					}
-				}
 //				 // 1.已送出媒體未回或未製成媒體 2.期款二扣
-				int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp2), titaVo);
-				if (sendCode == 1) {
-					if (sendCode == 1 && "L4451".equals(titaVo.getTxcd())) {
-						checkMsg = "已送出媒體未回或未製成媒體";
-						checkFlag = false;
-					} else {
-						this.info("continue 已送出未提回 : " + tmp.toString());
-						continue;
+					int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp2), titaVo);
+					if (sendCode == 1) {
+						if (sendCode == 1 && "L4451".equals(titaVo.getTxcd())) {
+							checkMsg = "已送出媒體未回或未製成媒體";
+							checkFlag = false;
+						} else {
+							this.info("continue 已送出未提回 : " + tmp.toString());
+							continue;
+						}
 					}
-				}
-				if (sendCode == 2) {
 				}
 //				應扣金額 shPayAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
 

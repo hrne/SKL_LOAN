@@ -22,7 +22,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -170,7 +170,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " SELECT FM.\"CreditOfficer\" \"Officer\" ";
 			sql += "       ,CE.\"Fullname\" \"EmpName\" ";
 			sql += "       ,MFB.\"CustNo\" \"CustNo\" ";
-			sql += "       ,SUBSTR(CM.\"CustName\", 1, 5) \"CustName\" ";
+			sql += "       ,SUBSTR(\"Fn_ParseEOL\"(CM.\"CustName\", 0), 1, 5) \"CustName\" ";
 			sql += "       ,DECODE(MFB.\"AcctCode\", '990', 990, MFB.\"OvduTerm\") \"Term\" ";
 			sql += "       ,SUM(MFB.\"PrinBalance\") \"PrinBal\" ";
 			sql += " FROM \"MonthlyFacBal\" MFB ";
@@ -236,7 +236,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		this.info("sql=" + sql);
-		
+
 		// 表中實際要查lastYearMonth
 		// 利用 DB 的 Function 做, 簡短一些
 		String entYearMonth = (parse.stringToInteger(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth");

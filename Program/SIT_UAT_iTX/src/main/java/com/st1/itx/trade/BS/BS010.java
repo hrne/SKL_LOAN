@@ -29,8 +29,8 @@ import com.st1.itx.util.parse.Parse;
 
 /**
  * 新增應處理明細－轉列催收 <br>
- * 執行時機：日始作業，應處理清單維護(BS003)後自動執行 <br>
- * 1.逾期放款應於清償期屆滿六個月內轉入「催收款項」<br>
+ * 執行時機：日始作業，應處理清單維護(BS001)自動執行 <br>
+ * 1.逾期放款應於清償期屆滿六個月內轉入「催收款項」(前三營業日寫入應處理清單)<br>
  * 2.月底日將逾三個月之火險費轉列催收<br>
  * 3.月底日將逾三個月之法務費轉列催收<br>
  * 
@@ -87,12 +87,12 @@ public class BS010 extends TradeBuffer {
 		this.mfbsDyf = this.getTxBuffer().getMgBizDate().getMfbsDyf();
 
 		// step 1. 年底呆帳產生法務費墊付
-		if (parse.stringToInteger(entryDateMm) == 12 && this.tbsDyf == this.mfbsDyf) {
+		if (parse.stringToInteger(entryDateMm) == 12) {
 			procBdLawFee(titaVo);
 			this.batchTransaction.commit();
 		}
 
-		// step 2. 逾期放款應於清償期屆滿六個月內轉入「催收款項」
+		// step 2. 逾期放款應於清償期屆滿六個月內轉入「催收款項」(前三營業日寫入應處理清單)
 		procLoanOverdue(titaVo);
 		this.batchTransaction.commit();
 
@@ -113,15 +113,24 @@ public class BS010 extends TradeBuffer {
 		return null;
 	}
 
-	/* 逾期放款應於清償期屆滿六個月內轉入「催收款項」 */
+	/* 逾期放款應於清償期屆滿六個月內轉入「催收款項」(前三營業日寫入應處理清單) */
 	private void procLoanOverdue(TitaVo titaVo) throws LogicException {
 		this.info("procLoanOverdue ...");
-		int iPayDate = 0;
-		// 遇假日提前
-		dateUtil.init();
-		dateUtil.setDate_1(this.getTxBuffer().getMgBizDate().getNbsDyf());
-		dateUtil.setDays(-1);
-		iPayDate = dateUtil.getCalenderDay();
+		// 取得前三營業日
+		int iPayDate = this.getTxBuffer().getMgBizDate().getTbsDy();
+		int count = 0;
+		do {
+			dateUtil.init();
+			dateUtil.setDate_1(iPayDate);
+			dateUtil.setDays(-1);
+			iPayDate = dateUtil.getCalenderDay();
+			dateUtil.init();
+			dateUtil.setDate_2(iPayDate);
+			if (!dateUtil.isHoliDay()) {
+				count++;
+				this.info("cont=" +count);
+			}
+		} while (count < 2);
 
 		dateUtil.init();
 		dateUtil.setDate_1(iPayDate);
@@ -131,7 +140,7 @@ public class BS010 extends TradeBuffer {
 		baTxCom.setTxBuffer(this.getTxBuffer());
 
 		// find data
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate, 0, this.index,
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate + 19110000, 0, this.index,
 				Integer.MAX_VALUE);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		// size > 0 -> 新增應處理明細
@@ -267,37 +276,33 @@ public class BS010 extends TradeBuffer {
 		// find data
 		slAcReceivable = acReceivableService.UseL5074(0, lAcctCode, 0, Integer.MAX_VALUE, titaVo);
 		lAcReceivableAll = slAcReceivable == null ? null : slAcReceivable.getContent();
-		if (lAcReceivableAll != null) {
-			for (AcReceivable rv : lAcReceivableAll) {
-				// 同一戶號非呆帳戶或呆帳結案戶直接刪除
-				if (wkCustNo != rv.getCustNo()) {
-					wkDBFg = true;
-					wkCustNo = rv.getCustNo();
-				} else {
-					if (!wkDBFg) {
-						lAcReceivableAll.remove(rv);
-					}
-					continue;
-				}
-				Slice<LoanBorMain> slLoanBorMain = null;
-				List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-				slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE,
-						titaVo);
-				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-				// 檢查戶號下全額度撥款 只要有一筆非呆帳戶或呆帳結案戶 即跳開並刪除
-				if (lLoanBorMain != null) {
-					for (LoanBorMain t : lLoanBorMain) {
-						if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
-							wkDBFg = false;
-							break;
-						}
-					}
-				}
 
+		for (AcReceivable rv : lAcReceivableAll) {
+			// 同一戶號非呆帳戶或呆帳結案戶直接刪除
+			if (wkCustNo != rv.getCustNo()) {
+				wkDBFg = true;
+				wkCustNo = rv.getCustNo();
+			} else {
 				if (!wkDBFg) {
 					lAcReceivableAll.remove(rv);
-					continue;
 				}
+				continue;
+			}
+			Slice<LoanBorMain> slLoanBorMain = null;
+			List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+			slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE,
+					titaVo);
+			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+			// 檢查戶號下全額度撥款 只要有一筆非呆帳戶或呆帳結案戶 即跳開並刪除
+			for (LoanBorMain t : lLoanBorMain) {
+				if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
+					wkDBFg = false;
+					break;
+				}
+			}
+			if (!wkDBFg) {
+				lAcReceivableAll.remove(rv);
+				continue;
 			}
 		}
 

@@ -162,9 +162,51 @@ public class MakeReport extends CommBuffer {
 	private String signOff = "$$$Sign off$$$";
 
 	private String rptPassword = "";
+	
+	private boolean formMode = false;
 
 	// 列印明細
 	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+
+	/**
+	 * 開始製作印表機套印格式
+	 * 
+	 * @param titaVo          titaVo
+	 * @param date            日期
+	 * @param brno            單位
+	 * @param rptCode         報表編號
+	 * @param rptItem         報表說明
+	 * @param PageSize        報表尺寸,例A4,A5,LETTER;自訂尺寸(寛,長)(單位:吋),例:8.5,5.5
+	 * @param pageOrientation 報表方向,P:直印/L:橫印
+	 * @throws LogicException LogicException
+	 */
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem,
+			String PageSize, String pageOrientation) throws LogicException {
+
+		formMode = true;
+		
+		this.checkParm(date, brno, rptCode, rptItem);
+		
+		this.titaVo = titaVo;
+		
+		this.date = date;
+		this.brno = brno;
+		this.rptCode = rptCode;
+		this.rptItem = rptItem;
+
+		this.rptSize = PageSize.toUpperCase();
+
+		pageOrientation = pageOrientation.toUpperCase();
+		if ("P".equals(pageOrientation)) {
+			this.pageOrientation = pageOrientation;
+		} else {
+			this.pageOrientation = "L";
+		}
+		
+		this.useDefault = false;
+
+		init();
+	}
 
 	/**
 	 * 開始製作報表<br>
@@ -179,7 +221,8 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String PageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String PageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -217,7 +260,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
+			throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -249,7 +293,8 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -505,6 +550,13 @@ public class MakeReport extends CommBuffer {
 	}
 
 	/**
+	 * 預設續下頁
+	 */
+	public void printContinueNext() {
+
+	}
+
+	/**
 	 * 換新頁<br>
 	 * 
 	 * @param changeDefault 套印用強迫換頁
@@ -534,6 +586,7 @@ public class MakeReport extends CommBuffer {
 		this.hfProcess = true;
 
 		if (this.nowPage > 0) {
+			this.printContinueNext();
 			this.printFooter();
 		}
 
@@ -927,7 +980,12 @@ public class MakeReport extends CommBuffer {
 			}
 		}
 
-		tTxFile.setFileType(1); // 固定1:PDF
+		if (formMode) {
+			tTxFile.setFileType(6); // 固定1:PDF
+		} else {
+			tTxFile.setFileType(1); // 固定1:PDF
+		}
+		
 		tTxFile.setFileFormat(1);
 		tTxFile.setFileCode(this.rptCode);
 		tTxFile.setFileItem(this.rptItem);
@@ -995,6 +1053,10 @@ public class MakeReport extends CommBuffer {
 
 		if (tTxFile == null) {
 			throw new LogicException(titaVo, "EC001", "(MakeReport)輸出檔(TxFile)序號:" + pdfno);
+		}
+		
+		if (tTxFile.getFileType() != 1) {
+			throw new LogicException(titaVo, "E0015", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + "，不為PDF格式");
 		}
 
 		if (tTxFile.getFileCode() != null) {
@@ -2014,7 +2076,8 @@ public class MakeReport extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString
+						+ "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -2033,7 +2096,8 @@ public class MakeReport extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble
+					+ "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -2225,6 +2289,10 @@ public class MakeReport extends CommBuffer {
 			throw new LogicException(titaVo, "EC001", "(MakeReport)輸出檔(TxFile)序號:" + pdfno);
 		}
 
+		if (tTxFile.getFileType() != 6) {
+			throw new LogicException(titaVo, "E0015", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + "，不為套印格式");
+		}
+
 		if (pageno == 0) {
 			pageno = 1;
 		}
@@ -2298,12 +2366,12 @@ public class MakeReport extends CommBuffer {
 
 			} else if ("2".equals(type) && nowPage == pageno) {
 				// set font
-				String font = map.get("font").toString();
+//				String font = map.get("font").toString();
 				int fontsize = Integer.parseInt(map.get("size").toString());
 
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put("Action", 4);
-				map2.put("Font", "微軟正黑體");
+				map2.put("Font", map.get("font").toString());
 				map2.put("FontSize", fontsize);
 				map2.put("FontWeight", "normal");
 				map2.put("FontStyle", "normal");

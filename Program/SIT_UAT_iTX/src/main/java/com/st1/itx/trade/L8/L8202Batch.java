@@ -242,12 +242,18 @@ public class L8202Batch extends TradeBuffer {
 					lChkDtl.add(c);
 				}
 			}
-			try {
-				mlaundryChkDtlService.insertAll(lChkDtl, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", ", MlaundryChkDtl insert error : " + e.getErrorMsg());
+			this.info("lChkDtl=="+lChkDtl);
+			this.info("lChkDtl=="+lChkDtl.size());
+			if(lChkDtl!=null && lChkDtl.size()>0) {
+				this.info("into lChkDtl");
+				try {
+					mlaundryChkDtlService.insertAll(lChkDtl, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", ", MlaundryChkDtl insert error : " + e.getErrorMsg());
+				}
+			
 			}
-		
+			
 	}
 
 	private void insertDetail(TitaVo titaVo) throws LogicException {

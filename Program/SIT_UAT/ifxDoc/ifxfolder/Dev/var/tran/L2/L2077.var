@@ -300,7 +300,7 @@ C(3,#OOFunCode,2,E(0,2),$)
 C(3,#OOFunCode,3,E(0,3),$)
 
 #OOBUF6=X,60,S
-T(2,#FUNC6+#OOCustNo+#OOFacmNo)
+T(2,#FUNC6+#OOCustNo+#OOFacmNo+#OOCloseNo)
 C(3,#FUNC6,2,IF(#OORepayFg=="Y",$,T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)),$)
 
 #BTNNAME=X,1,S

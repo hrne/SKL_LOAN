@@ -462,7 +462,12 @@ public class AcPaymentCom extends TradeBuffer {
 				BankRemit t2BankRemit = new BankRemit();
 				t2BankRemit = moveTitaToBankRemit(i, t2BankRemit, titaVo);// 搬BankRemit內容
 				if (isModifyRemit(tBankRemit, t2BankRemit)) {
-					tBankRemit.setStatusCode(1);
+					if (t2BankRemit.getDrawdownCode() != tBankRemit.getDrawdownCode()
+							&& tBankRemit.getDrawdownCode() == 01) {
+						tBankRemit.setStatusCode(4); // 4.產檔後改單筆匯款
+					} else {
+						tBankRemit.setStatusCode(3);// 3. 產檔後修正
+					}
 					tBankRemit.setModifyContent(tTempVo.getJsonString());
 					isUpdate = true;
 					this.totaVo.setWarnMsg("該筆匯款產檔後修正，批號=" + tBankRemit.getBatchNo());
@@ -479,7 +484,7 @@ public class AcPaymentCom extends TradeBuffer {
 		if (titaVo.isHcodeNormal() && titaVo.isActfgSuprele()) {
 			tBankRemit.setActFg(2);
 			isUpdate = true;
-			if (tBankRemit.getStatusCode() == 1) {
+			if (tBankRemit.getStatusCode() == 3) {
 				this.totaVo.setWarnMsg("該筆匯款產檔後修正，批號=" + tBankRemit.getBatchNo());
 				this.addList(this.totaVo);
 			}

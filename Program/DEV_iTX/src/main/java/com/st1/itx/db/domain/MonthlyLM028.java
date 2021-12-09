@@ -27,7 +27,7 @@ public class MonthlyLM028 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 808865319457777101L;
+	private static final long serialVersionUID = 4987801823987692703L;
 
 @EmbeddedId
   private MonthlyLM028Id monthlyLM028Id;
@@ -77,20 +77,20 @@ public class MonthlyLM028 implements Serializable {
   @Column(name = "`PayIntFreq`")
   private int payIntFreq = 0;
 
-  // 扣款銀行
+  // 額度主檔到期日-年
   /* 原LMSPBK */
-  @Column(name = "`RepayBank`", length = 3)
-  private String repayBank;
+  @Column(name = "`MaturityYear`")
+  private int maturityYear = 0;
 
-  // 貸款期間－月
+  // 額度主檔到期日-月
   /* 原APLMON */
-  @Column(name = "`LoanTermMm`")
-  private int loanTermMm = 0;
+  @Column(name = "`MaturityMonth`")
+  private int maturityMonth = 0;
 
-  // 貸款期間－日
+  // 額度主檔到期日-日
   /* 原APLDAY */
-  @Column(name = "`LoanTermDd`")
-  private int loanTermDd = 0;
+  @Column(name = "`MaturityDay`")
+  private int maturityDay = 0;
 
   // 放款餘額
   /* 原LMSLBL */
@@ -117,10 +117,10 @@ public class MonthlyLM028 implements Serializable {
   @Column(name = "`FirstRateAdjFreq`")
   private int firstRateAdjFreq = 0;
 
-  // 基本利率代碼
+  // 商品代碼
   /* 原IRTBCD */
-  @Column(name = "`BaseRateCode`", length = 2)
-  private String baseRateCode;
+  @Column(name = "`ProdNo`", length = 5)
+  private String prodNo;
 
   // 利率1
   /* 原IRTRATYR1 */
@@ -401,60 +401,60 @@ public class MonthlyLM028 implements Serializable {
   }
 
 /**
-	* 扣款銀行<br>
+	* 額度主檔到期日-年<br>
 	* 原LMSPBK
-	* @return String
+	* @return Integer
 	*/
-  public String getRepayBank() {
-    return this.repayBank == null ? "" : this.repayBank;
+  public int getMaturityYear() {
+    return this.maturityYear;
   }
 
 /**
-	* 扣款銀行<br>
+	* 額度主檔到期日-年<br>
 	* 原LMSPBK
   *
-  * @param repayBank 扣款銀行
+  * @param maturityYear 額度主檔到期日-年
 	*/
-  public void setRepayBank(String repayBank) {
-    this.repayBank = repayBank;
+  public void setMaturityYear(int maturityYear) {
+    this.maturityYear = maturityYear;
   }
 
 /**
-	* 貸款期間－月<br>
+	* 額度主檔到期日-月<br>
 	* 原APLMON
 	* @return Integer
 	*/
-  public int getLoanTermMm() {
-    return this.loanTermMm;
+  public int getMaturityMonth() {
+    return this.maturityMonth;
   }
 
 /**
-	* 貸款期間－月<br>
+	* 額度主檔到期日-月<br>
 	* 原APLMON
   *
-  * @param loanTermMm 貸款期間－月
+  * @param maturityMonth 額度主檔到期日-月
 	*/
-  public void setLoanTermMm(int loanTermMm) {
-    this.loanTermMm = loanTermMm;
+  public void setMaturityMonth(int maturityMonth) {
+    this.maturityMonth = maturityMonth;
   }
 
 /**
-	* 貸款期間－日<br>
+	* 額度主檔到期日-日<br>
 	* 原APLDAY
 	* @return Integer
 	*/
-  public int getLoanTermDd() {
-    return this.loanTermDd;
+  public int getMaturityDay() {
+    return this.maturityDay;
   }
 
 /**
-	* 貸款期間－日<br>
+	* 額度主檔到期日-日<br>
 	* 原APLDAY
   *
-  * @param loanTermDd 貸款期間－日
+  * @param maturityDay 額度主檔到期日-日
 	*/
-  public void setLoanTermDd(int loanTermDd) {
-    this.loanTermDd = loanTermDd;
+  public void setMaturityDay(int maturityDay) {
+    this.maturityDay = maturityDay;
   }
 
 /**
@@ -553,22 +553,22 @@ public class MonthlyLM028 implements Serializable {
   }
 
 /**
-	* 基本利率代碼<br>
+	* 商品代碼<br>
 	* 原IRTBCD
 	* @return String
 	*/
-  public String getBaseRateCode() {
-    return this.baseRateCode == null ? "" : this.baseRateCode;
+  public String getProdNo() {
+    return this.prodNo == null ? "" : this.prodNo;
   }
 
 /**
-	* 基本利率代碼<br>
+	* 商品代碼<br>
 	* 原IRTBCD
   *
-  * @param baseRateCode 基本利率代碼
+  * @param prodNo 商品代碼
 	*/
-  public void setBaseRateCode(String baseRateCode) {
-    this.baseRateCode = baseRateCode;
+  public void setProdNo(String prodNo) {
+    this.prodNo = prodNo;
   }
 
 /**
@@ -955,8 +955,8 @@ public class MonthlyLM028 implements Serializable {
   @Override
   public String toString() {
     return "MonthlyLM028 [monthlyLM028Id=" + monthlyLM028Id + ", status=" + status + ", entCode=" + entCode + ", branchNo=" + branchNo
-           + ", storeRate=" + storeRate + ", payIntFreq=" + payIntFreq + ", repayBank=" + repayBank + ", loanTermMm=" + loanTermMm + ", loanTermDd=" + loanTermDd
-           + ", loanBal=" + loanBal + ", rateCode=" + rateCode + ", postDepCode=" + postDepCode + ", specificDd=" + specificDd + ", firstRateAdjFreq=" + firstRateAdjFreq + ", baseRateCode=" + baseRateCode
+           + ", storeRate=" + storeRate + ", payIntFreq=" + payIntFreq + ", maturityYear=" + maturityYear + ", maturityMonth=" + maturityMonth + ", maturityDay=" + maturityDay
+           + ", loanBal=" + loanBal + ", rateCode=" + rateCode + ", postDepCode=" + postDepCode + ", specificDd=" + specificDd + ", firstRateAdjFreq=" + firstRateAdjFreq + ", prodNo=" + prodNo
            + ", fitRate1=" + fitRate1 + ", fitRate2=" + fitRate2 + ", fitRate3=" + fitRate3 + ", fitRate4=" + fitRate4 + ", fitRate5=" + fitRate5 + ", clCode1=" + clCode1
            + ", clCode2=" + clCode2 + ", drawdownYear=" + drawdownYear + ", drawdownMonth=" + drawdownMonth + ", drawdownDay=" + drawdownDay + ", w08Code=" + w08Code + ", isRelation=" + isRelation
            + ", agType1=" + agType1 + ", acctSource=" + acctSource + ", lastestRate=" + lastestRate + ", lastestRateStartDate=" + lastestRateStartDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo

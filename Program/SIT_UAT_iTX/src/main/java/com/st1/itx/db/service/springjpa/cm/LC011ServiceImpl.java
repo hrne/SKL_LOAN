@@ -56,10 +56,11 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int iStatus = Integer.valueOf(titaVo.getParam("iStatus").trim());
 
-		String sql = "SELECT A.*,";
+		String sql = "SELECT A.*,F.\"FlowMode\",";
 		sql += "B.\"TranItem\" ";
 		sql += "FROM \"TxRecord\" A ";
 		sql += "LEFT JOIN \"TxTranCode\" B ON B.\"TranNo\" = A.\"TranNo\" ";
+		sql += "LEFT JOIN \"TxFlow\" F ON F.\"FlowNo\" = A.\"FlowNo\"  ";
 		if (iEntdySt > 0) {
 			sql += "WHERE A.\"Entdy\" >= :Entdy1 AND A.\"Entdy\" <= :Entdy2 ";
 		} else {

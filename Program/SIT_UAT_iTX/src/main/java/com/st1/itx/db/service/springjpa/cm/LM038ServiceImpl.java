@@ -23,7 +23,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -34,7 +34,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int yearMonth = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
-		
+
 		this.info("yearMonth = " + yearMonth);
 		this.info("lM038.findAll ");
 		String sql = "";
@@ -43,7 +43,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(B.\"AcctSource\", '')                    F2 ";
 		sql += "       ,M.\"CustNo\"                                 F3 ";
 		sql += "       ,M.\"FacmNo\"                                 F4 ";
-		sql += "       ,C.\"CustName\"                               F5 ";
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0)           F5 ";
 		sql += "       ,M.\"PrevIntDate\"                            F6 ";
 		sql += "       ,M.\"PrinBalance\"                            F7 ";
 		sql += "       ,F.\"FirstDrawdownDate\"                      F8 ";
@@ -109,7 +109,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entdy", yearMonth);
 
 		return this.convertToMap(query);

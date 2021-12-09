@@ -22,7 +22,7 @@ public class LM031ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -33,13 +33,13 @@ public class LM031ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int entdy = parse.stringToInteger(titaVo.get("inputDate")) + 19110000;
-		
+
 		this.info("lM031 inputDate in BC: " + entdy);
 		this.info("lM031.findAll ");
 		String sql = "";
 		sql += " SELECT   LB.\"CustNo\" ";
 		sql += "         ,LB.\"FacmNo\" ";
-		sql += "         ,C.\"CustName\" ";
+		sql += "         ,\"Fn_ParseEOL\"(C.\"CustName\", 0) \"CustName\" ";
 		sql += "         ,LB.\"BormNo\" ";
 		sql += "         ,F.\"LineAmt\" ";
 		sql += "         ,LB.\"LoanBal\" ";
@@ -68,9 +68,9 @@ public class LM031ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entdy", entdy);
-		
+
 		return this.convertToMap(query);
 	}
 

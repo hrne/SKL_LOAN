@@ -107,7 +107,8 @@ public class LC011 extends TradeBuffer {
 			occursList.putParam("CurName", d.get("CurName"));
 			occursList.putParam("TxAmt", new BigDecimal(d.get("TxAmt").toString().trim()));
 			occursList.putParam("BrNo", cdBranch.getBranchItem());
-
+			occursList.putParam("FlowMode", d.get("FlowMode"));
+			
 			String iTlrItem = "";
 			// 放行、審核放行，抓經辦代碼
 			int flowStep = Integer.valueOf(d.get("FlowStep"));

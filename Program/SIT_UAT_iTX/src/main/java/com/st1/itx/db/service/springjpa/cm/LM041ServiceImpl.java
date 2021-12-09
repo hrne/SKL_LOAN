@@ -22,7 +22,7 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -41,7 +41,7 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,ViableCusts.\"CustNo\" ";
 		sql += "       ,ViableCusts.\"FacmNo\" ";
 		sql += "       ,ViableCusts.\"Status\" ";
-		sql += "       ,C.\"CustName\" ";
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0) \"CustName\" ";
 		sql += "       ,A.\"RvBal\" ";
 		sql += " FROM ( SELECT \"CityCode\" ";
 		sql += "              ,MAX(\"Status\") \"Status\" ";

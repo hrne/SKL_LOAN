@@ -117,6 +117,35 @@ T(4,NTXBUF$)
 T(1,@FunCode,#NTXBUF,1,1)
 T(1,@CustNo,#NTXBUF,2,7)
 T(1,@FacmNo,#NTXBUF,9,3)
+T(1,@LcCloseNo,#NTXBUF,12,3)
+
+#LcCloseNo=A,3,S
+
+#SysCDate=D,7,S
+E(0,#SYSCDATE)
+
+#LC014Mrkey=x,100,S
+T(2,#CustNo+-+#FacmNo)
+
+#LC014Note=x,100,S
+T(B,日期:+#SysCDate+/MrKey:+#LC014Mrkey+ 清償序號:+#LcCloseNo+用印申請書)
+
+#BufLC014=X,200,S
+T(2,L2076+#CustNo+#FacmNo+000+#LC014Mrkey+#LC014Note)
+
+#Button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,LC104 上傳附件)
+
+#Button2=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,LC014 上傳附件查詢)
+
+
+
+
+
+
 
 #initchain=X,1,S
 T(F,#FunCode,0)

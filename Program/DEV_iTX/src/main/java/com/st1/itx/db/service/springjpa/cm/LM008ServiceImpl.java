@@ -33,7 +33,6 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAcctCodeGroup(TitaVo titaVo) throws Exception {
 		this.info("lM008.findAcctCodeGroup ");
 
@@ -53,10 +52,9 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("bcYearMonth", bcYearMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findDetail(String acctCode, TitaVo titaVo) throws Exception {
 		this.info("lM008.findDetail acctCode = " + acctCode);
 
@@ -67,7 +65,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              , \"Aging\" AS F1";
 		sql += "              , \"CustNo\" AS F2";
 		sql += "              , \"FacmNo\" AS F3";
-		sql += "              , \"CustName\" AS F4";
+		sql += "              , \"Fn_ParseEOL\"(\"CustName\", 0) AS F4";
 		sql += "              , SUM(\"LoanBal\") AS F5";
 		sql += "              , MAX(\"IntRate\") AS F6";
 		sql += "              , MIN(\"IntStartDate\") AS F7";
@@ -89,7 +87,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = A.\"CustNo\"";
 		sql += "               WHERE A.\"YearMonth\" = :bcYearMonth ";
 		sql += "                 AND A.\"AcctCode\" = :acctCode";
-		// sql += "                 AND A.\"IntStartDate\" <> 0";
+		// sql += " AND A.\"IntStartDate\" <> 0";
 		sql += " ) S1";
 		sql += "        GROUP BY \"AcctCode\", \"Aging\", \"CustNo\", \"CustName\", \"FacmNo\"";
 		sql += "        ORDER BY F0, F1, F2, F3";
@@ -101,7 +99,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("acctCode", acctCode);
 		query.setParameter("bcDate", bcDate);
 		query.setParameter("bcYearMonth", bcYearMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

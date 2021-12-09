@@ -22,7 +22,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -59,7 +59,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,M.\"OvduTerm\" AS \"OvduTerm\" ";
 			sql += "  ,M.\"CustNo\" AS \"CustNo\" ";
 			sql += "  ,M.\"FacmNo\" AS \"FacmNo\" ";
-			sql += "  ,CUS.\"CustName\" AS \"CustName\" ";
+			sql += "  ,\"Fn_ParseEOL\"(CUS.\"CustName\", 0) AS \"CustName\" ";
 			sql += "  ,CASE WHEN M.\"EntCode\" = '1' ";
 			sql += "        THEN '企金' ";
 			sql += "        ELSE ' ' ";
@@ -168,7 +168,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,M.\"OvduTerm\" AS \"OvduTerm\" ";
 			sql += "  ,M.\"CustNo\" AS \"CustNo\" ";
 			sql += "  ,M.\"FacmNo\" AS \"FacmNo\" ";
-			sql += "  ,CUS.\"CustName\" AS \"CustName\" ";
+			sql += "  ,\"Fn_ParseEOL\"(CUS.\"CustName\", 0) AS \"CustName\" ";
 			sql += "  ,CASE WHEN M.\"EntCode\" = '1' ";
 			sql += "        THEN '企金' ";
 			sql += "        ELSE ' ' ";

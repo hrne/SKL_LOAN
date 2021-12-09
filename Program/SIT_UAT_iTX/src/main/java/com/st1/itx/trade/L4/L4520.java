@@ -91,7 +91,7 @@ public class L4520 extends TradeBuffer {
 		l4520Report2.exec(titaVo);
 		
 		//產生火險費沖銷明細表(員工扣薪)
-		long sno = l4520Report3.exec(titaVo);
+		l4520Report3.exec(titaVo);
 		
 //		if(sno == 0) {
 //			throw new LogicException("E0001", "查無資料");

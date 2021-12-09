@@ -53,7 +53,6 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if(ProcCode != 0) {
 			sql += "  AND   \"FlowCode\" = :ProcCode " ;
 		}
-		sql += "  AND   \"AcDate\" = :AcDate " ;
 		sql += "  AND   \"BatchNo\" >= :BatchNoFm " ;
 		sql += "  AND   \"BatchNo\" <= :BatchNoTo " ;
 		sql += "  ORDER BY  \"MediaKind\",\"FlowCode\",\"MediaSeq\"  " ;
@@ -81,6 +80,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int PerfMonth = parse.stringToInteger(titaVo.getParam("PerfMonth")) + 191100;
 		String BatchNoFm = "BATX" + titaVo.getParam("BatchNoFm");
 		String BatchNoTo = "BATX" + titaVo.getParam("BatchNoTo");
+		String ProcCode = titaVo.getParam("ProcCode");
 		String sql = "  SELECT  ";
 		sql += "  substr(ed.\"TitaTxtNo\", 0, 2) as f0,";
 		sql += "  ed.\"CustNo\" as f1,   ";
@@ -97,21 +97,29 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  + JSON_VALUE(ed.\"JsonFields\", '$.LawFee')))),0)  as f11,";
 		sql += "  ce.\"CenterCode\" as f12, ";
 		sql += "  ce.\"EmployeeNo\" as f13, ";
-		sql += "  cm.\"CustId\" as f14";
+		sql += "  cm.\"CustId\" as f14,  ";
+		sql += "  ed.\"RepayCode\" as f15,  ";
+		sql += "  ed.\"AcctCode\" as f16,  ";
+		sql += "  ed.\"ProcCode\" as f17";
 		sql += "  FROM";
 		sql += "  \"EmpDeductDtl\"   ed ";
 		sql += "  LEFT JOIN \"LoanBorTx\"      lb ON lb.\"TitaTxtNo\" = lpad(ed.\"TitaTxtNo\", 8, 0)";
 		sql += "  LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\"              ";
 		sql += "  LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"TitaTlrNo\"       ";
 		sql += "  WHERE \"AchRepayCode\" = 1";
+		sql += "  AND ed.\"TitaTxtNo\" != ' ' ";
 		sql += "  AND lb.\"IntStartDate\" <> 0 ";
 		sql += "  AND lb.\"IntEndDate\"   <> 0 ";
 		sql += "  AND \"PerfMonth\" = :PerfMonth";
 		sql += "    AND ed.\"BatchNo\" >= :BatchNoFm";
 		sql += "    AND ed.\"BatchNo\" <= :BatchNoTo";
+		if(!"0".equals(ProcCode)) {
+			sql += "    AND ed.\"ProcCode\" = :ProcCode";
+		}
+		
 		sql += "  GROUP BY ed.\"TitaTxtNo\", substr(ed.\"TitaTxtNo\", 0, 2), ed.\"CustNo\", lb.\"IntStartDate\", lb.\"IntEndDate\", ";
-		sql += "  ce.\"Fullname\", ed.\"JsonFields\", ce.\"CenterCode\", ce.\"EmployeeNo\", cm.\"CustId\"";
-		sql += "  ORDER BY ed.\"TitaTxtNo\",ed.\"CustNo\",lb.\"IntStartDate\",lb.\"IntEndDate\"";
+		sql += "  ce.\"Fullname\", ed.\"JsonFields\", ce.\"CenterCode\", ce.\"EmployeeNo\", cm.\"CustId\", ed.\"RepayCode\", ed.\"AcctCode\", ed.\"ProcCode\" ";
+		sql += "  ORDER BY  ed.\"TitaTxtNo\", ed.\"RepayCode\", ed.\"AcctCode\", ed.\"ProcCode\", ed.\"TitaTxtNo\", ed.\"CustNo\", lb.\"IntStartDate\", lb.\"IntEndDate\"";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -121,6 +129,9 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("BatchNoFm", BatchNoFm);
 		query.setParameter("BatchNoTo", BatchNoTo);
 		query.setParameter("PerfMonth", PerfMonth);
+		if(!"0".equals(ProcCode)) {
+		  query.setParameter("ProcCode", ProcCode);
+		}
 		return this.convertToMap(query);
 	}
 

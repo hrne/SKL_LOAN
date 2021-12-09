@@ -30,7 +30,7 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM047.findAll ");
 		String sql = "SELECT R.\"CustNo\"                                                           F0";
 		sql += "            ,R.\"OldFacmNo\"                                                        F1";
-		sql += "            ,C.\"CustName\"                                                         F2";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\", 0)                                     F2";
 		sql += "            ,F.\"LineAmt\"                                                          F3";
 		sql += "            ,M.\"Status\"                                                           F4";
 		sql += "            ,R.\"OvduPrinAmt\"                                                      F5";

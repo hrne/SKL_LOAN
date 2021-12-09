@@ -22,7 +22,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -43,7 +43,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , LPAD(TX.\"CustNo\", 7, '0') AS \"CustNo\" "; // 戶號
 		sql += "      , LPAD(TX.\"FacmNo\", 3, '0') AS \"FacmNo\" "; // 額度
 		sql += "      , LPAD(TX.\"BormNo\", 3, '0') AS \"BormNo\" "; // 撥款編號
-		sql += "      , CM.\"CustName\" "; // 戶名
+		sql += "      , \"Fn_ParseEOL\"(CM.\"CustName\", 0) AS \"CustName\" "; // 戶名
 		sql += "      , CASE WHEN :inputOption = 1 "; // 還本收據
 		sql += "             THEN TX.\"Principal\" + TX.\"ExtraRepay\" ";
 		sql += "             WHEN :inputOption = 2 "; // 繳息收據
@@ -79,7 +79,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND TX.\"TxAmt\" > 0 ";
 
 		this.info("sql=" + sql);
-		
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 

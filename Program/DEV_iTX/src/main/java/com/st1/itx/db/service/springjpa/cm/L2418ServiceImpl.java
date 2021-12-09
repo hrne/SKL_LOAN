@@ -60,7 +60,70 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String iCityCode = titaVo.getParam("CityCode");
 
+
+		sql += " select distinct                            ";
+		sql += "    \"LandOfficeCode\"                      ";
+		sql += "  , \"Item\"                                ";
+		sql += " from                                       ";
+		sql += "   \"CdLandSection\"    s                   ";
+		sql += " left join                                  ";
+		sql += "   \"CdCode\"           c                   ";
+		sql += " on                                         ";
+		sql += "   s.\"LandOfficeCode\" = c.\"Code\"        ";
+		sql += " where                                      ";
+		sql += "   c.\"DefCode\" = " + "'LandOfficeCode'    ";
+		
+
+//		switch (iCityCode) {
+//		//台北含新北
+//		case "05":
+//			sql += "   or \"CityCode\" = '10'               ";
+//			break;
+//
+//		
+//		}
+
+//		排序用
+		sql += "   order by S.\"LandOfficeCode\" ASC    ";
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		query = em.createNativeQuery(sql);
+
+		cnt = query.getResultList().size();
+		this.info("Total cnt ..." + cnt);
+
+		// *** 折返控制相關 ***
+		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+		query.setFirstResult(this.index * this.limit);
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(this.limit);
+
+		List<Object> result = query.getResultList();
+
+		size = result.size();
+		this.info("Total size ..." + size);
+
+		return this.convertToMap(query);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findCityEq(TitaVo titaVo) throws Exception {
+
+		this.info("L2418.findCityEq");
+
+		String sql = "";
+		String searchstatus = "";
+		String searchMediaCode = "";
+
+		String iCityCode = titaVo.getParam("CityCode");
+
 		this.info("iCityCode = " + iCityCode);
+
 
 		sql += " select distinct                            ";
 		sql += "    \"LandOfficeCode\"                      ";
@@ -115,6 +178,13 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
+		this.index = index;
+		this.limit = limit;
+
+		return findAll(titaVo);
+	}
+
+	public List<Map<String, String>> findCityEq(int index, int limit, TitaVo titaVo) throws Exception {
 		this.index = index;
 		this.limit = limit;
 

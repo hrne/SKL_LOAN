@@ -446,6 +446,9 @@ public class Cs80UpDBS extends CommBuffer {
 			txRecord.setCanModify(this.txBuffer.getTxCom().getCanModify());
 		else
 			txRecord.setCanModify(0);
+		
+		if (!this.titaVo.getReason().isEmpty())
+			txRecord.setImportFg("1");
 
 		try {
 			/* E-Loan 完整電文 */

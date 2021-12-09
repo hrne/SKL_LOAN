@@ -18,7 +18,7 @@ create table "MonthlyLM028" (
   "PostDepCode" varchar2(1),
   "SpecificDd" decimal(2, 0) default 0 not null,
   "FirstRateAdjFreq" decimal(2, 0) default 0 not null,
-  "BaseRateCode" varchar2(2),
+  "ProdNo" varchar2(5),
   "FitRate1" decimal(6, 4) default 0 not null,
   "FitRate2" decimal(6, 4) default 0 not null,
   "FitRate3" decimal(6, 4) default 0 not null,
@@ -61,7 +61,7 @@ comment on column "MonthlyLM028"."RateCode" is '利率區分';
 comment on column "MonthlyLM028"."PostDepCode" is '郵局存款別';
 comment on column "MonthlyLM028"."SpecificDd" is '應繳日';
 comment on column "MonthlyLM028"."FirstRateAdjFreq" is '首次調整週期';
-comment on column "MonthlyLM028"."BaseRateCode" is '基本利率代碼';
+comment on column "MonthlyLM028"."ProdNo" is '商品代碼';
 comment on column "MonthlyLM028"."FitRate1" is '利率1';
 comment on column "MonthlyLM028"."FitRate2" is '利率2';
 comment on column "MonthlyLM028"."FitRate3" is '利率3';

@@ -35,6 +35,9 @@ public class L2R59 extends TradeBuffer {
 		this.info("active L2R59 ");
 		this.totaVo.init(titaVo);
 
+		// tita
+		String iCity = titaVo.getParam("CityCode");
+
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -47,11 +50,18 @@ public class L2R59 extends TradeBuffer {
 		String outs = "";
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-
-		try {
-			resultList = l2418ServiceImpl.findAll(this.index, this.limit, titaVo);
-		} catch (Exception e) {
-			this.info("Error ... " + e.getMessage());
+		if ("".equals(iCity)) {
+			try {
+				resultList = l2418ServiceImpl.findAll(this.index, this.limit, titaVo);
+			} catch (Exception e) {
+				this.info("Error ... " + e.getMessage());
+			}
+		} else {
+			try {
+				resultList = l2418ServiceImpl.findCityEq(this.index, this.limit, titaVo);
+			} catch (Exception e) {
+				this.info("Error ... " + e.getMessage());
+			}
 		}
 
 		if (resultList != null) {

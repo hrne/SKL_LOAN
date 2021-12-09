@@ -22,10 +22,10 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
@@ -35,13 +35,13 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		this.info("lM039.findAll ");
-		
+
 		String sql = "SELECT CASE WHEN B.\"AcctSource\" = 'A' THEN B.\"AcctSource\"";
 		sql += "             ELSE '' END AS C1";
 		sql += "            ,O.\"CustNo\"";
 		sql += "            ,O.\"FacmNo\"";
 		sql += "            ,O.\"BormNo\"";
-		sql += "            ,C.\"CustName\"";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\" ";
 		sql += "            ,F.\"FirstDrawdownDate\"";
 		sql += "            ,L.\"PrevPayIntDate\"";
 		sql += "            ,O.\"OvduBal\"";
@@ -99,9 +99,9 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entdy", yearMonth);
-		
+
 		return this.convertToMap(query);
 	}
 

@@ -22,7 +22,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -40,7 +40,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,M.\"FacmNo\"                              AS F1 ";
 		sql += "       ,M.\"BormNo\"                              AS F2 ";
 		sql += "       ,C.\"CustId\"                              AS F3 ";
-		sql += "       ,C.\"CustName\"                            AS F4 ";
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0)        AS F4 ";
 		sql += "       ,M.\"AcctCode\"                            AS F5 ";
 		sql += "       ,L.\"DrawdownDate\"                        AS F6 ";
 		sql += "       ,L.\"MaturityDate\"                        AS F7 ";
@@ -79,7 +79,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   ,M.\"ClCode2\" ";
 		sql += "                   ,M.\"ClNo\" ";
 		sql += "                   ,CM.\"CustId\"                                  AS \"OwnerId\" ";
-		sql += "                   ,CM.\"CustName\"                                AS \"OwnerName\" ";
+		sql += "                   ,\"Fn_ParseEOL\"(CM.\"CustName\", 0)            AS \"OwnerName\" ";
 		sql += "                   ,LPAD(NVL(CL.\"LandNo1\",'0'),4,'0') ";
 		sql += "                         || LPAD(NVL(CL.\"LandNo2\",'0'),4,'0')    AS \"LandNo\"  "; // 地號格式為 4-4
 		sql += "                   ,LPAD(NVL(CB.\"BdNo1\",'0'),5,'0') ";
@@ -111,15 +111,15 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE M.\"YearMonth\" = :entdy ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += " ORDER BY F0,F1,F2 ";
-		
+
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entdy", entdy);
-		
+
 		return this.convertToMap(query);
 	}
 

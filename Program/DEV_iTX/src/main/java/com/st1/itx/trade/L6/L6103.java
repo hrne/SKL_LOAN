@@ -48,11 +48,11 @@ public class L6103 extends TradeBuffer {
 
 		this.info("L6103 SupCode : " + titaVo.getHsupCode());
 		// 交易需主管核可
-		if (!titaVo.getHsupCode().equals("1")) {
-			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-		} else {
+//		if (!titaVo.getHsupCode().equals("1")) {
+//			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+//		} else {
 			toDo(titaVo);
-		}
+//		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
