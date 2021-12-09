@@ -406,7 +406,7 @@ public class L4450Batch extends TradeBuffer {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
 
 				tmpBorm tmp = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(),
-						tBaTxVo.getRepayType() <= 3 ? tBaTxVo.getPayIntDate() : 0);
+						tBaTxVo.getDataKind() == 2 ? tBaTxVo.getPayIntDate() : 0);
 				this.info("L4450 Test's Log Start");
 				this.info("CustNo : " + tmp.getCustNo());
 				this.info("FacmNo : " + tmp.getFacmNo());
@@ -515,14 +515,15 @@ public class L4450Batch extends TradeBuffer {
 					continue;
 				}
 
-				if (minIntStartDate.containsKey(tmp2)) {
-					if (tBaTxVo.getIntStartDate() < minIntStartDate.get(tmp2)) {
+				if (tBaTxVo.getDataKind() == 2) {
+					if (minIntStartDate.containsKey(tmp2)) {
+						if (tBaTxVo.getIntStartDate() < minIntStartDate.get(tmp2)) {
+							minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
+						}
+					} else {
 						minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
 					}
-				} else {
-					minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
 				}
-
 //				 // 1.已送出媒體未回或未製成媒體 2.期款二扣
 				int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp2), titaVo);
 				if (sendCode == 1) {

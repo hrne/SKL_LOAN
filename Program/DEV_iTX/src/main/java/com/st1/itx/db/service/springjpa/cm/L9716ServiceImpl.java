@@ -62,7 +62,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,CITY.\"CityItem\" F3";
 		sql += "            ,M.\"CustNo\" F4";
 		sql += "            ,M.\"FacmNo\" F5";
-		sql += "            ,NVL(C.\"CustName\",'') F6";
+		sql += "            ,NVL(\"Fn_ParseEOL\"(C.\"CustName\",0),'') F6";
 		sql += "            ,FAC.\"FirstDrawdownDate\" - 19110000 AS  F7";
 		sql += "            ,M.\"PrinBalance\" F8";
 		sql += "            ,M.\"StoreRate\" F9";
@@ -93,8 +93,8 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = M.\"CustNo\"";
 		sql += "                               AND FAC.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "      LEFT JOIN (SELECT C.\"CustNo\"";
-		sql += "                       ,C.\"CustName\"";
-		sql += "                       ,NVL(T.\"LiaisonName\",C.\"CustName\") AS \"LiaisonName\"";
+		sql += "                       ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
+		sql += "                       ,NVL(T.\"LiaisonName\",\"Fn_ParseEOL\"(C.\"CustName\",0)) AS \"LiaisonName\"";
 		sql += "					   ,T.\"TelArea\" AS \"TelArea\"";
 		sql += "					   ,T.\"TelNo\" AS \"TelNo\"";
 		sql += "					   ,T.\"TelTypeCode\" AS \"TelTypeCode\"";
@@ -110,8 +110,8 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                ) CUS ON CUS.\"CustNo\" = M.\"CustNo\"";
 		sql += "                     AND CUS.\"TelRowNo\" = 1";
 		sql += "      LEFT JOIN (SELECT C.\"CustNo\"";
-		sql += "                       ,C.\"CustName\"";
-		sql += "                       ,NVL(T.\"LiaisonName\",C.\"CustName\") AS \"LiaisonName\"";
+		sql += "                       ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
+		sql += "                       ,NVL(T.\"LiaisonName\",\"Fn_ParseEOL\"(C.\"CustName\",0)) AS \"LiaisonName\"";
 		sql += "					   ,T.\"TelArea\" AS \"TelArea\"";
 		sql += "					   ,T.\"TelNo\" AS \"TelNo\"";
 		sql += "					   ,T.\"TelTypeCode\" AS \"TelTypeCode\"";
@@ -162,7 +162,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputOvduTermMin", titaVo.getParam("inputOvduTermMin"));
 		query.setParameter("inputOvduTermMax", titaVo.getParam("inputOvduTermMax"));
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -197,7 +197,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,L.\"CustNo\" F1";
 		sql += "            ,L.\"FacmNo\" AS F2";
 		sql += "            ,L.\"BormNo\" F3";
-		sql += "            ,C.\"CustName\" F4";
+		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0) F4";
 		sql += "            ,F.\"FirstDrawdownDate\" F5";
 		sql += "            ,M.\"PrevIntDate\" F6";
 		sql += "            ,LO.\"OvduBal\" F7";
@@ -321,7 +321,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9716 inputYearMonth: " + iYear + String.format("%02d", iMonth));
 		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

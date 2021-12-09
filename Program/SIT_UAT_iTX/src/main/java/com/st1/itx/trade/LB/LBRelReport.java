@@ -242,7 +242,7 @@ public class LBRelReport extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
-						if (j != tLBVo.size()) {
+						if (j != 11) {
 							strContent = strContent + ",";
 						}
 					}

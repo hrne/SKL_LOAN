@@ -296,7 +296,7 @@ public class LB204Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
-						if (j != tLBVo.size()) {
+						if (j != 13) {
 							strContent = strContent + ",";
 						}
 					}

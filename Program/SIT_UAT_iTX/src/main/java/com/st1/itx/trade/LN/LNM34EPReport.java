@@ -138,7 +138,7 @@ public class LNM34EPReport extends MakeReport {
 						} // 產品別
 
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 14) {
 							strContent = strContent + ",";
 						}
 					}

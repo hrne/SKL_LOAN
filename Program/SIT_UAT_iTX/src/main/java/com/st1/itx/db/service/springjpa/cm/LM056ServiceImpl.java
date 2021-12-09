@@ -93,7 +93,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 		sql += "	SELECT MLB.\"CustNo\"";
-		sql += "		  ,C.\"CustName\"";
+		sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "		  ,C.\"CustId\"";
 		sql += "		  ,SUM(MLB.\"LoanBalance\") AS \"LoanBalance\"";
 		sql += "		  ,(CASE";
@@ -127,7 +127,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	  AND MLB2.\"CustNo\" IS NOT NULL ";
 		}
 		sql += "	GROUP BY MLB.\"CustNo\"";
-		sql += "		    ,C.\"CustName\"";
+		sql += "		    ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "		    ,C.\"CustId\"";
 		sql += "		    ,(CASE";
 		sql += "			    WHEN L.\"SyndNo\" <> 0 THEN '聯貸'";
@@ -267,7 +267,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 //sql += "			,J.\"CustNo\" AS F1";
 //sql += "			,J.\"FacmNo\" AS F2";
 //sql += "			,J.\"BormNo\" AS F3";
-//sql += "			,C.\"CustName\" AS F4";
+//sql += "			,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS F4";
 //sql += "			,M.\"LoanBal\" AS F5";
 //sql += "			,M.\"MaturityDate\" AS F6";
 //sql += "			,CASE";

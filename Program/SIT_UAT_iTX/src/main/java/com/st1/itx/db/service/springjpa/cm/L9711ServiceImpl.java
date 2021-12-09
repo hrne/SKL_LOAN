@@ -50,7 +50,7 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,E.\"Fullname\" F3";
 		sql += "        ,M.\"CustNo\" F4";
 		sql += "        ,M.\"FacmNo\" F5";
-		sql += "		,C.\"CustName\" F6";
+		sql += "		,\"Fn_ParseEOL\"(C.\"CustName\",0) F6";
 		sql += "		,F.\"ApplNo\" F7";
 		sql += "        ,M.\"MaturityDate\" F8";
 		sql += "        ,F.\"LineAmt\" F9";

@@ -312,7 +312,7 @@ public class LB211Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
-						if (j != tLBVo.size()) {
+						if (j != 18) {
 							strContent = strContent + ",";
 						}
 					}

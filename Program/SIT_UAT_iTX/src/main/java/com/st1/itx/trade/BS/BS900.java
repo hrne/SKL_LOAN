@@ -45,6 +45,7 @@ import com.st1.itx.util.parse.Parse;
  * 2.新增應處理明細－應收利息提存入帳<br>
  * 2.1 迴轉上月，傳票批號=98<br>
  * 2.2 本月提存，傳票批號=99<br>
+ * 3.發動報表LM008應收利息明細表、LM009應收利息總表
  * 
  * @author LAI
  * @version 1.0.0
@@ -231,6 +232,9 @@ public class BS900 extends TradeBuffer {
 		// end
 		this.batchTransaction.commit();
 
+		// 3.發動報表LM008應收利息明細表、LM009應收利息總表
+		titaVo.setBatchJobId("jLM008;jLM009");
+		
 		this.addList(this.totaVo);
 
 		this.info("bs900 process end");

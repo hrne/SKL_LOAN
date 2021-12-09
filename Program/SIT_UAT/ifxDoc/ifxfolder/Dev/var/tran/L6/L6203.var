@@ -1,0 +1,195 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L6203)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+[
+["[L6203]                                 收件字代碼維護"],
+["#FdFunCd+功能",#FunCdX],
+["#FdLandOfficeCode+地政所代碼",#LandOfficeCode,#LandOfficeCodeX],
+["#FdRecWord+收件字代碼",#RecWord],
+["#FdRecWordItem+收件字說明",#RecWordItem],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+
+! 必輸欄位
+
+! 永遠為必輸欄位
+#FdFunCd=X,2,L
+#FdLandOfficeCode=X,2,L
+#FdRecWord=X,2,L
+#FdRecWordItem=X,2,L
+
+
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FunCd2(1:新增;2:修改;4:刪除)
+#CODE0001=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FunCd2Help=x,50,S     
+
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODE0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FunCd2Help,#HelpDesc1)
+
+!RIM參數
+#RimTxCode=X,5,S
+#RimFunCd=A,1,S
+#RimSyndFeeCode=X,2,S
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6023進入),$)
+
+#NTXBUF=X,66,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+T(1,@LandOfficeCode,#NTXBUF,2,2)
+T(1,@RecWord,#NTXBUF,4,3)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FunCd=A,1,S
+C(3,#CHAIN,1,s,$)
+HELP(#FunCd2Help)
+@V(H,#FunCd2Help)
+
+#FunCdX=X,12,L
+T(H,#FunCd,#FunCd2Help)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+#CheckFunCd=X,1,S
+C(3,#FunCd,1,s,$)
+T(F,@LandOfficeCode,0)
+C(3,#FunCd,4,$,s)
+T(F,@RecWordItem,0)
+
+#FUNCIND=_,_,S
+E(0,#FunCd)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#AGAIN=X,1,S
+IF(#FunCd==4 || #FunCd==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#LandOfficeHelp=X,2000,S
+
+#City=X,2,S
+#CityCode=X,2,S
+
+! 依縣市別組地政下拉選單
+#RimL2r59=X,1,S
+T(2,@CityCode,#City)
+RESET_RIM(#RimL2r59,L2R59)
+S(L2R59,1,#CityCode)
+R(1,L2R59)
+T(2,@LandOfficeHelp,#L2r59Help1)
+
+
+
+#LandOfficeCode=X,2,I
+C(3,#FunCd,1,$,s)
+HELP(#LandOfficeHelp)
+@V(H,#LandOfficeHelp)
+
+#LandOfficeCodeX=x,8,L
+T(H,#LandOfficeCode,#LandOfficeHelp)
+
+#RecWord=X,3,L
+
+#RimLandOfficeCode=X,2,S
+#RimRecWord=X,3,S
+
+#RimL6r47=X,1,S
+C(3,#FunCd,1,S,$)
+T(2,@RimLandOfficeCode,#LandOfficeCode)
+T(2,@RimRecWord,#RecWord)
+S(L6R47,1,#RimFunCd,#RimLandOfficeCode,#RimRecWord)
+R(1,L6R47)
+T(2,@RecWordItem,#L6r47RecWordItem)
+
+
+
+#RecWordItem=x,60,I
+C(3,#FunCd,4,s,$)
+@V(7)
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+!<include src="ROM.icf::L0Rim.dec"/>
+!<include src="ROM.icf::L6R45Rim.dec"/>
+<include src="ROM.icf::L2R59.dec"/>
+<include src="ROM.icf::L6R47.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6203 ----------
+<sub type="FORM" name="L6203">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6203,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6203] 收件字代碼維護)
+
+#ORecWord=X,3,S
+C(3,#RecWord,0,T(2,@RecWord,#ORecWord)K(LIGHT,#RecWord,TXTRED,0,1),$)
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd#LandOfficeCode#RecWord#RecWordItem
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L6203
+#ORecWord
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L2R59.tom"/>
+<include src="ROM.icf::L6R47.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -1,7 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,6 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -35,62 +33,19 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+//		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
 		// 月
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int wDay = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[wDay - 1]);
-		int diff = 0;
-		if (wDay == 1) {
-			diff = -2;
-		} else if (wDay == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
-		this.info("lM062.findAll iYear=" + iYear + ",iMonth=" + iMonth);
+		this.info("lM062.findAll iYeariMonth=" + iYearMonth);
 
 		String sql = "SELECT R.\"CustNo\" AS F0";
 		sql += "			,R.\"FacmNo\" AS F1";
-		sql += "			,C.\"CustName\" AS F2";
+		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
 		sql += "			,R.\"ReChkYearMonth\" AS F3";
 		sql += "			,R.\"DrawdownDate\" AS F4";
 		sql += "			,R.\"LoanBal\" AS F5";

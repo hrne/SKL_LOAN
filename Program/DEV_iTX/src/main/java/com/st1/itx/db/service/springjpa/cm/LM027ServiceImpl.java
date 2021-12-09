@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM027ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -36,18 +33,18 @@ public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY").toString()) + 19110000) / 100);
 
-		logger.info("lM027.findAll ");
+		this.info("lM027.findAll ");
 		String sql = "";
 		sql += "	SELECT M.\"CustNo\"";
 		sql += "	      ,M.\"FacmNo\"";
 		sql += "		  ,M.\"CustName\"";
 		sql += "		  ,M.\"Principal\"";
 		sql += "		  ,NVL(M.\"TxAmt\",0) AS \"thisBal\"";
-		sql += "		  ,NVL(M.\"TxAmt\" + LTT.\"TempAmt\",0) AS \"lastBal\""; 
+		sql += "		  ,NVL(M.\"TxAmt\" + LTT.\"TempAmt\",0) AS \"lastBal\"";
 		sql += "		  ,NVL(-LTT.\"TempAmt\",0) AS \"Amt\"";
 		sql += "	FROM(SELECT O.\"CustNo\" AS \"CustNo\"";
 		sql += "	      	   ,O.\"FacmNo\" AS \"FacmNo\"";
-		sql += "		  	   ,C.\"CustName\" AS \"CustName\"";
+		sql += "		  	   ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
 		sql += "		  	   ,SUM(LT.	\"Principal\") AS \"Principal\"";
 		sql += "		  	   ,SUM(NVL(D.\"TxAmt\",0)) AS \"TxAmt\"";
 		sql += "		 FROM \"LoanOverdue\" O";
@@ -80,7 +77,7 @@ public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		   AND O.\"Status\" in ('2','3') ";
 		sql += "		 GROUP BY O.\"CustNo\"";
 		sql += "				 ,O.\"FacmNo\"";
-		sql += "				 ,C.\"CustName\"";
+		sql += "				 ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
 		sql += "		 ORDER BY \"CustNo\"";
 		sql += "				 ,\"FacmNo\") M";
 		sql += "	LEFT JOIN(SELECT \"CustNo\"";
@@ -90,7 +87,7 @@ public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			    		 ,\"FacmNo\"";
 		sql += "						 ,\"BormNo\"";
 		sql += "						 ,NVL(\"BadDebtAmt\",0) + NVL(\"BadDebtBal\",0) AS \"LastBadDebt\"";
-		// sql += "						 ,NVL(\"OvduAmt\",0) + NVL(\"OvduBal\",0) AS \"LastOvdu\"";
+		// sql += " ,NVL(\"OvduAmt\",0) + NVL(\"OvduBal\",0) AS \"LastOvdu\"";
 		sql += "						 ,ROW_NUMBER () OVER (PARTITION BY \"CustNo\",\"FacmNo\" ORDER BY \"BormNo\" DESC) AS \"Seq\"";
 		sql += "				   FROM \"LoanOverdue\")";
 		sql += "			  WHERE \"Seq\" = 1 ) O2";
@@ -107,7 +104,7 @@ public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 			   WHERE LT.\"Seq\" = 1 ) LTT ";
 		sql += " 	ON LTT.\"CustNo\" = M.\"CustNo\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -120,7 +117,7 @@ public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 // sql += "	SELECT O.\"CustNo\" AS \"CustNo\"";
 // sql += "	      ,O.\"FacmNo\" AS \"FacmNo\"";
-// sql += "		  ,C.\"CustName\" AS \"CustName\"";
+// sql += "		  ,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS \"CustName\"";
 // sql += "		  ,SUM(\"Principal\") AS \"Principal\"";
 // sql += "		  ,SUM(NVL(O.\"BadDebtAmt\",0)) AS \"BadDebtAmt\"";
 // sql += "		  ,SUM(O.\"BadDebtAmt\"-O.\"BadDebtBal\") AS \"BadDebtDiff\"";
@@ -152,13 +149,13 @@ public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean
 // sql += "	WHERE M.\"Status\" in ('6','7') ";
 // sql += "	GROUP BY O.\"CustNo\"";
 // sql += "			,O.\"FacmNo\"";
-// sql += "			,C.\"CustName\"";
+// sql += "			,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
 // sql += "	ORDER BY \"CustNo\"";
 // sql += "			,\"FacmNo\"";
 
 // String sql = "SELECT D.\"F1\"";
 // sql += "             , D.\"F2\"";
-// sql += "             , C.\"CustName\"";
+// sql += "             , \"Fn_ParseEOL\"(CM.\"CustName\",0)";
 // sql += "             , D.\"F3\"";
 // sql += "             , D.\"F4\"";
 // sql += "             , D.\"F5\"";

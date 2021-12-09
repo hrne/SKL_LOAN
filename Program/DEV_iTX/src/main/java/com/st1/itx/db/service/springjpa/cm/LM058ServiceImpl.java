@@ -96,7 +96,7 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM058.findAll YYMM=" + iYearMonth + ",LYYMM=" + iLYearMonth);
 
 		String sql = "SELECT D.\"CustNo\" AS F0";
-		sql += "			,C.\"CustName\" AS F1";
+		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F1";
 		sql += "			,C.\"CustId\" AS F2";
 		sql += "			,CASE";
 		sql += "			   WHEN R.\"RelsCode\" = '99' THEN 'F'";

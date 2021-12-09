@@ -108,7 +108,7 @@ public class LNM34GPReport extends MakeReport {
 						} // 撥款序號
 
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 6) {
 							strContent = strContent + ",";
 						}
 					}

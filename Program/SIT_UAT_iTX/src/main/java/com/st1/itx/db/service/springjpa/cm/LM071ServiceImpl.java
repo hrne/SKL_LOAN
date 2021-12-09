@@ -1,7 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -36,33 +34,22 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
 //		// 5年前1911-5= 1906
 //		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19060000);
-
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 取得會計日(同頁面上會計日)
+		// 年月日
+//				int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		// 月
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日(int)
-		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthLastDate = Calendar.getInstance();
-		// 設當年月底日
-		calMonthLastDate.set(iYear, iMonth, 0);
-
-		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
-
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		if (nowDate < monthLastDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
+		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
 		this.info("LM071.findAll iday=" + iYear + String.format("%02d", iMonth));
 
 		String sql = "SELECT M.\"ProdNo\" AS F0"; // 商品代碼
 		sql += "			,C.\"CustId\" AS F1";
 		sql += "			,E.\"QuitDate\" AS F2"; // 離職/停約日
-		sql += "			,C.\"CustName\" AS F3"; // 戶名/公司名稱
+		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F3"; // 戶名/公司名稱
 		sql += "			,L.\"CustNo\" AS F4"; // 借款人戶號
 		sql += "			,L.\"FacmNo\" AS F5"; // 額度編號
 		sql += "			,L.\"BormNo\" AS F6"; // 撥款序號, 預約序號
@@ -80,19 +67,19 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  LEFT JOIN \"FacProd\" P ON P.\"ProdNo\" = M.\"ProdNo\"";
 		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = L.\"CustNo\"";
 		sql += "	  LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = C.\"EmpNo\"";
-		sql += "	  LEFT JOIN (SELECT * FROM ( SELECT \"CustNo\"";
-		sql += "									   ,\"FacmNo\"";
-		sql += "									   ,\"BormNo\"";
-		sql += "									   ,\"EffectDate\"";
-		sql += "									   ,\"FitRate\"";
-		sql += "									   ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\"";
-		sql += "																	   ,\"FacmNo\"";
-		sql += "																	   ,\"BormNo\"";
-		sql += "														       ORDER BY \"EffectDate\" DESC) AS \"SEQ\"";
-		sql += "								 FROM \"LoanRateChange\") RES";
-		sql += "								 WHERE RES.\"SEQ\" = 1 )RES ON RES.\"CustNo\" = L.\"CustNo\"";
-		sql += "								  						   AND RES.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "								  						   AND REs.\"BormNo\" = L.\"BormNo\"";
+		sql += "	  LEFT JOIN (SELECT \"CustNo\"";
+		sql += "					   ,\"FacmNo\"";
+		sql += "					   ,\"BormNo\"";
+		sql += "					   ,\"EffectDate\"";
+		sql += "					   ,\"FitRate\"";
+		sql += "					   ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\"";
+		sql += "													   ,\"FacmNo\"";
+		sql += "													   ,\"BormNo\"";
+		sql += "										       ORDER BY \"EffectDate\" DESC) AS \"SEQ\"";
+		sql += "				 FROM \"LoanRateChange\" )RES ON RES.\"CustNo\" = L.\"CustNo\"";
+		sql += "				    						 AND RES.\"FacmNo\" = L.\"FacmNo\"";
+		sql += "								  			 AND REs.\"BormNo\" = L.\"BormNo\"";
+		sql += "								  			 AND REs.\"SEQ\" = 1";
 		sql += "	  WHERE L.\"Status\" IN(0,4)";
 		sql += "		AND M.\"ProdNo\" = '11'";
 		sql += "	  ORDER BY L.\"CustNo\"";
@@ -107,8 +94,8 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("iyymm", iYear + String.format("%02d", iMonth));
+		query.setParameter("iyymm", iYearMonth);
 //		query.setParameter("iday", iDAY);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

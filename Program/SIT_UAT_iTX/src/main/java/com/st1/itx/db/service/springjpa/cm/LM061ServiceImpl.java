@@ -59,7 +59,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
 		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
+/*
 		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
 		// 星期 X (排除六日用) 代號 0~6對應 日到六
 		int day = calendar.get(Calendar.DAY_OF_WEEK);
@@ -72,9 +72,11 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		this.info("diff=" + diff);
 		calendar.add(Calendar.DATE, diff);
+	
 		// 矯正月底日
 		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
+			*/
+//		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
 		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
 
@@ -103,7 +105,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		sql += "      SELECT M.\"CustNo\"";
 		sql += "            ,M.\"FacmNo\"";
-		sql += "            ,C.\"CustName\"";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "            ,F.\"LineAmt\"";
 		sql += "            ,M.\"UnpaidPrincipal\"";
 		sql += "             + M.\"UnpaidInterest\" AS \"OvduPay\"";
@@ -169,7 +171,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// String sql = "SELECT F.\"CustNo\" AS F0"; // 戶號
 		// sql += " ,F.\"FacmNo\" AS F1"; // 額度
-		// sql += " ,C.\"CustName\" AS F2"; // 戶名
+		// sql += " ,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS F2"; // 戶名
 		// sql += " ,F.\"LineAmt\" AS F3"; // 核貸金額
 		// sql += " ,NVL(LO.\"OvduAmt\",0) AS F4"; // 轉催收本息
 		// sql += " ,M.\"OvduBal\" AS F5"; // 催收款餘額

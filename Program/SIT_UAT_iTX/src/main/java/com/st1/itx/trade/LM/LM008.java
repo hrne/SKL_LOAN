@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LM008")
 @Scope("step")
@@ -26,6 +28,12 @@ public class LM008 extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	LM008Report lM008report;
 
+	@Autowired
+	WebClient webClient;
+	
+	@Autowired
+	DateUtil dDateUtil;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -33,7 +41,6 @@ public class LM008 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM008.class);
 		return this.exec(contribution, "M");
 	}
 
@@ -43,6 +50,9 @@ public class LM008 extends BatchBase implements Tasklet, InitializingBean {
 		lM008report.setParentTranCode(this.getParent());
 		lM008report.setTxBuffer(this.getTxBuffer());
 		lM008report.exec(titaVo);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM008應收利息明細表已完成", titaVo);
+
 	}
 
 }

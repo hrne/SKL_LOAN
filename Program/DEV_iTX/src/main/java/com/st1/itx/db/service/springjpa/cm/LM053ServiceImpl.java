@@ -91,7 +91,7 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,CI.\"CityItem\"     F1";
 		sql += "            ,L.\"CustNo\"        F2";
 		sql += "            ,L.\"FacmNo\"        F3";
-		sql += "            ,C.\"CustName\"      F4";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0)      F4";
 		sql += "            ,L.\"Amount056\"     F5";
 		sql += "            ,DECODE(L.\"Amount060\",0,L.\"Amount058\" ";
 		sql += "			 + L.\"Amount092\",L.\"Amount060\" + L.\"Amount092\")  F6";
@@ -157,7 +157,7 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 //sql += "            ,Ci.\"CityItem\"     F1";
 //sql += "            ,L.\"CustNo\"        F2";
 //sql += "            ,L.\"FacmNo\"        F3";
-//sql += "            ,C.\"CustName\"      F4";
+//sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0)      F4";
 //sql += "            ,L.\"Amount056\"     F5";
 //sql += "            ,DECODE(L.\"Amount058\",0,L.\"Amount058\",L.\"Amount060\")     F6";
 //sql += "            ,CASE WHEN M.\"PrinBalance\" < L.\"Amount901\" THEN L.\"Amount901\" - M.\"PrinBalance\"";

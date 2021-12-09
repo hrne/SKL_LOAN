@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9710ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -38,14 +35,14 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L9710.findAll");
+		this.info("L9710.findAll");
 
 		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
 		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ED")) + 19110000);
 		String iCUSTNO = titaVo.get("CustNo");
-		
-		logger.info("iSDAY:"+iSDAY+",iEDAY:"+iEDAY+",iCUSTNO:"+iCUSTNO);
-		
+
+		this.info("iSDAY:" + iSDAY + ",iEDAY:" + iEDAY + ",iCUSTNO:" + iCUSTNO);
+
 		String sql = " SELECT * ";
 		sql += "       FROM ( SELECT               ' ' F0";
 		sql += "                     , Cl.\"CityCode\" F1";
@@ -53,7 +50,7 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                     , E.\"Fullname\" F3";
 		sql += "                     , M.\"CustNo\" F4";
 		sql += "                     , M.\"FacmNo\" F5";
-		sql += "                     , C.\"CustName\" F6";
+		sql += "                     , \"Fn_ParseEOL\"(C.\"CustName\",0) F6";
 		sql += "                     , F.\"ApplNo\" F7";
 		sql += "                     , M.\"GraceDate\" F8";
 		sql += "                     , F.\"LineAmt\" F9";
@@ -66,16 +63,16 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                     , M.\"NextRepayDate\" F16";
 		sql += "                     , C.\"CurrZip3\" F17";
 		sql += "                     , C.\"CurrZip2\" F18";
-		sql += "                     , C2.\"CityItem\" F19";	//城市名
-		sql += "                     , C3.\"AreaItem\" F20";	//市區
-		sql += "                     , C.\"CurrRoad\" F21"; 	//路名
-		sql += "                     , C.\"CurrSection\" F22"; 	//段
-		sql += "                     , C.\"CurrAlley\" F23";	//巷
-		sql += "                     , C.\"CurrLane\" F24";		//弄
-		sql += "                     , C.\"CurrNum\" F25";		//號
-		sql += "                     , C.\"CurrNumDash\" F26";	//號之
-		sql += "                     , C.\"CurrFloor\" F27";	//樓
-		sql += "                     , C.\"CurrFloorDash\" F28";//樓之
+		sql += "                     , C2.\"CityItem\" F19"; // 城市名
+		sql += "                     , C3.\"AreaItem\" F20"; // 市區
+		sql += "                     , C.\"CurrRoad\" F21"; // 路名
+		sql += "                     , C.\"CurrSection\" F22"; // 段
+		sql += "                     , C.\"CurrAlley\" F23"; // 巷
+		sql += "                     , C.\"CurrLane\" F24"; // 弄
+		sql += "                     , C.\"CurrNum\" F25"; // 號
+		sql += "                     , C.\"CurrNumDash\" F26"; // 號之
+		sql += "                     , C.\"CurrFloor\" F27"; // 樓
+		sql += "                     , C.\"CurrFloorDash\" F28";// 樓之
 		sql += "                     , F.\"RepayCode\" F29";
 //		sql += "                     , M.\"BormNo\" T1";
 		sql += "                     , ROW_NUMBER() OVER ( PARTITION BY M.\"CustNo\", M.\"FacmNo\"";
@@ -98,7 +95,7 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       		AND  \"GraceDate\" <= :ieday";
 		sql += "                       		AND  \"LoanBal\"  > 0";
 		if (!iCUSTNO.equals("0000000")) {
-		sql += "                       		AND  \"CustNo\"     =  :icustno";
+			sql += "                       		AND  \"CustNo\"     =  :icustno";
 		}
 		sql += "             			  GROUP BY \"CustNo\"";
 		sql += "             					  ,\"FacmNo\"";
@@ -108,7 +105,7 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       AND  M.\"GraceDate\"  <= :ieday";
 		sql += "                       AND  M.\"LoanBal\"  > 0";
 		if (!iCUSTNO.equals("0000000")) {
-		sql += "                       AND  M.\"CustNo\"     =  :icustno";
+			sql += "                       AND  M.\"CustNo\"     =  :icustno";
 		}
 		sql += "                                                           ) M";
 		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
@@ -130,7 +127,7 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       WHERE D.\"SEQ\" = 1 ";
 		sql += " 	   ORDER BY D.\"F1\", D.\"F3\", D.\"F4\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

@@ -425,6 +425,9 @@ ENABLE(#BTN1)ENABLE(#BTN2)
 
 !---------- AP TEXT AREA Variables ----------
 
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
 #init=X,1,S
 HIDE(#Wait)
 T(F,@ProdNo,0)

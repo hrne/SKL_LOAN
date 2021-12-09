@@ -121,7 +121,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  WHEN MLB.\"ClCode1\" = 5 THEN 'A'";
 			sql += "			  WHEN MLB.\"ClCode1\" = 9  THEN 'B'";
 			sql += "			ELSE 'Z' END ) AS F1";
-			sql += "		  ,C.\"CustName\" AS F2";
+			sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL THEN 'A'";
 			sql += "			  WHEN R.\"ReltCode\" ='08' THEN 'C'";

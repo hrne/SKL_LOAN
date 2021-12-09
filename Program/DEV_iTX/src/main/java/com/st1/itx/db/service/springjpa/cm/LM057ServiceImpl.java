@@ -164,7 +164,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 //sql += "			,J.\"CustNo\" AS F1";
 //sql += "			,J.\"FacmNo\" AS F2";
 //sql += "			,J.\"BormNo\" AS F3";
-//sql += "			,C.\"CustName\" AS F4";
+//sql += "			,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS F4";
 //sql += "			,M.\"LoanBal\" AS F5";
 //sql += "			,M.\"MaturityDate\" AS F6";
 //sql += "			,CASE";

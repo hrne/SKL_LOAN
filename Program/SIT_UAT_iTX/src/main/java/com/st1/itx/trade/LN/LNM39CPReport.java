@@ -127,7 +127,7 @@ public class LNM39CPReport extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 8) {
 							strContent = strContent + ",";
 						}
 					}

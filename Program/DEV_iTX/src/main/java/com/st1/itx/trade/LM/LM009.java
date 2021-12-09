@@ -13,6 +13,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.trade.L9.L9131Report;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LM009")
 @Scope("step")
@@ -30,6 +32,12 @@ public class LM009 extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	L9131Report l9131Report;
 
+	@Autowired
+	WebClient webClient;
+	
+	@Autowired
+	DateUtil dDateUtil;
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -45,6 +53,9 @@ public class LM009 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("active LM009 ");
 		lM009report.setParentTranCode(this.getParent());
 		lM009report.exec(titaVo);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM009應收利息總表已完成", titaVo);
+
 		String acDate = titaVo.getEntDy();
 
 		// 此處putParam給L9131用

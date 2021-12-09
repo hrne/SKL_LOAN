@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,7 +18,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9725ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -31,10 +28,10 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("l9725.findAll ");
+		this.info("l9725.findAll ");
 
 		String sql = "SELECT L.\"CustNo\" AS F0";
-		sql += "            ,C.\"CustName\" AS F1";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F1";
 		sql += "            ,L.\"LoanBal\" AS F2";
 		sql += "            ,C.\"EntCode\" AS F3";
 		sql += "            ,C.\"AMLJobCode\" AS F4";
@@ -47,10 +44,10 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ) L";
 		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = L.\"CustNo\"";
 
-		logger.info("sql=" + sql);
-		
+		this.info("sql=" + sql);
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
+
 		Query query;
 		query = em.createNativeQuery(sql);
 

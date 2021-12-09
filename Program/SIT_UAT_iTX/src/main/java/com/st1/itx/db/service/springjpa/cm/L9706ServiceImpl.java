@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9706ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -38,46 +35,46 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L9706.findAll");
+		this.info("L9706.findAll");
 
 		String iCUSTNO = titaVo.get("CUSTNO");
 		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
 		String iENTDAY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
 
-		String sql = "SELECT  C.\"CustName\" F0";
-		sql +="             , F.\"FirstDrawdownDate\" F1";
-		sql +="             , F.\"LoanTermYy\" F2";
-		sql +="             , F.\"LoanTermMm\" F3";
-		sql +="             , F.\"LoanTermDd\" F4";
-		sql +="             , F.\"LineAmt\" F5";
-		sql +="             , M.\"CustNo\" F6";
-		sql +="             , M.\"FacmNo\" F7";
-		sql +="             , M.\"LoanBal\" F8";
+		String sql = "SELECT  \"Fn_ParseEOL\"(C.\"CustName\",0) F0";
+		sql += "             , F.\"FirstDrawdownDate\" F1";
+		sql += "             , F.\"LoanTermYy\" F2";
+		sql += "             , F.\"LoanTermMm\" F3";
+		sql += "             , F.\"LoanTermDd\" F4";
+		sql += "             , F.\"LineAmt\" F5";
+		sql += "             , M.\"CustNo\" F6";
+		sql += "             , M.\"FacmNo\" F7";
+		sql += "             , M.\"LoanBal\" F8";
 
 		if (iDAY.equals(iENTDAY)) {
-		sql +="       FROM ( SELECT  M.\"CustNo\"";
-		sql +="                    , M.\"FacmNo\"";
-		sql +="                    , SUM(M.\"LoanBal\") \"LoanBal\"";
-		sql +="              FROM  \"LoanBorMain\" M";
-		sql +="              WHERE  M.\"CustNo\" = :icustno ";
-		sql +="                AND  M.\"Status\" IN (0, 2, 6, 7)";
-		sql +="              GROUP BY M.\"CustNo\", M.\"FacmNo\" ) M";
+			sql += "       FROM ( SELECT  M.\"CustNo\"";
+			sql += "                    , M.\"FacmNo\"";
+			sql += "                    , SUM(M.\"LoanBal\") \"LoanBal\"";
+			sql += "              FROM  \"LoanBorMain\" M";
+			sql += "              WHERE  M.\"CustNo\" = :icustno ";
+			sql += "                AND  M.\"Status\" IN (0, 2, 6, 7)";
+			sql += "              GROUP BY M.\"CustNo\", M.\"FacmNo\" ) M";
 		} else {
-		sql +="        FROM ( SELECT  M.\"CustNo\"";
-		sql +="                    , M.\"FacmNo\"";
-		sql +="                    , SUM(M.\"LoanBalance\") \"LoanBal\"";
-		sql +="              FROM  \"DailyLoanBal\" M";
-		sql +="              WHERE  M.\"DataDate\" = :iday ";
-		sql +="                AND  M.\"CustNo\"   = :icustno ";
-		sql +="              GROUP BY M.\"CustNo\", M.\"FacmNo\" ) M";
+			sql += "        FROM ( SELECT  M.\"CustNo\"";
+			sql += "                    , M.\"FacmNo\"";
+			sql += "                    , SUM(M.\"LoanBalance\") \"LoanBal\"";
+			sql += "              FROM  \"DailyLoanBal\" M";
+			sql += "              WHERE  M.\"DataDate\" = :iday ";
+			sql += "                AND  M.\"CustNo\"   = :icustno ";
+			sql += "              GROUP BY M.\"CustNo\", M.\"FacmNo\" ) M";
 		}
 
-		sql +="       LEFT JOIN \"CustMain\" C";
-		sql +="              ON   C.\"CustNo\" = M.\"CustNo\"";
-		sql +="       LEFT JOIN \"FacMain\" F ON F.\"CustNo\"= M.\"CustNo\"";
-		sql +="              AND  F.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "       LEFT JOIN \"CustMain\" C";
+		sql += "              ON   C.\"CustNo\" = M.\"CustNo\"";
+		sql += "       LEFT JOIN \"FacMain\" F ON F.\"CustNo\"= M.\"CustNo\"";
+		sql += "              AND  F.\"FacmNo\" = M.\"FacmNo\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);

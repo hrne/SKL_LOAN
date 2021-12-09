@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9712ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -38,14 +35,14 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L9712.findAll");
+		this.info("L9712.findAll");
 
 		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
 
 		String sql = "SELECT T.\"AcDate\" F0";
 		sql += "			,T.\"CustNo\" F1";
 		sql += "			,T.\"FacmNo\" F2";
-		sql += "			,C.\"CustName\" F3";
+		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) F3";
 		sql += "			,T.\"Interest\" F4";
 		sql += "			,T.\"BreachAmt\" F5";
 		sql += "			,0 F6";
@@ -69,8 +66,8 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				   ,T.\"TitaEmpNoS\" ) T";
 		sql += "	  LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = T.\"CustNo\"";
 		sql += " 	  ORDER  BY  T.\"AcDate\"";
-		sql +="				    ,T.\"CustNo\"";
-		logger.info("sql=" + sql);
+		sql += "				    ,T.\"CustNo\"";
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

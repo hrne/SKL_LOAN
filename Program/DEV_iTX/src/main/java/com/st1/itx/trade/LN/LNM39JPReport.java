@@ -119,7 +119,7 @@ public class LNM39JPReport extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 6) {
 							strContent = strContent + ",";
 						}
 					}

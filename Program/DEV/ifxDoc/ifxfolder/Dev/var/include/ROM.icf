@@ -9241,6 +9241,19 @@ TXFORM=L6R46
 ^
 </L6R46.tom>
 
+<L6R47.dec>
+#L6r47LandOfficeCode=X,2,S
+#L6r47RecWord=X,3,S
+#L6r47RecWordItem=X,60,S
+</L6R47.dec>
+
+<L6R47.tom>
+TXFORM=L6R47
+#L6r47LandOfficeCode
+#L6r47RecWord
+#L6r47RecWordItem
+</L6R47.tom>
+
 <L5R47.dec>
 #L5R47CustName=x,100,S
 #L5R47ReCheckYearMonth=9,5,S

@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM022ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM022ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,12 +32,12 @@ public class LM022ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY").toString()) + 19110000) / 100);
 		String today = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY").toString()) + 19110000));
-		logger.info("lM022.findAll ");
+		this.info("lM022.findAll ");
 
 		String sql = "SELECT M.\"CustNo\"         AS F0";
 		sql += "            ,M.\"FacmNo\"         AS F1";
 		sql += "            ,M.\"BormNo\"         AS F2";
-		sql += "            ,C.\"CustName\"       AS F3";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0)       AS F3";
 		sql += "            ,L.\"LoanBal\"      AS F4";
 		sql += "            ,L.\"PrevPayIntDate\"   AS F5";
 		sql += "            ,M.\"StoreRate\"      AS F6";
@@ -60,7 +57,7 @@ public class LM022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND L.\"MaturityDate\" > :today ";
 		sql += "        AND M.\"ProdNo\" IN ('81', '82', '83')";
 		sql += "        ORDER BY M.\"CustNo\",L.\"LoanBal\" DESC";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

@@ -8,26 +8,18 @@
 	<!-- 作業名稱 -->
 	<job id="eodFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
-		<split id="split1" task-executor="taskExecutor" next="split2">
-			<flow>
-				<!-- Usp_L2_CustDataCtrl_Ins -->
-				<step id="l2CustDataCtrlIns" parent="parentStep">
-					<tasklet ref="L2CustDataCtrlIns" />
-				</step>
-			</flow>
-			<flow>
-				<!-- Usp_L5_CollList_Upd -->
-				<step id="l5CollListUpd" parent="parentStep">
-					<tasklet ref="L5CollListUpd" />
-				</step>
-			</flow>
-			<flow>
-				<!-- Usp_L9_DailyLoanBal_Upd -->
-				<step id="l9DailyLoanBalUpd" parent="parentStep">
-					<tasklet ref="L9DailyLoanBalUpd" />
-				</step>
-			</flow>
-		</split>
+		<!-- Usp_L2_CustDataCtrl_Ins -->
+		<step id="l2CustDataCtrlIns" parent="parentStep" next="l5CollListUpd">
+			<tasklet ref="L2CustDataCtrlIns" />
+		</step>
+		<!-- Usp_L5_CollList_Upd -->
+		<step id="l5CollListUpd" parent="parentStep" next="l9DailyLoanBalUpd">
+			<tasklet ref="L5CollListUpd" />
+		</step>
+		<!-- Usp_L9_DailyLoanBal_Upd -->
+		<step id="l9DailyLoanBalUpd" parent="parentStep" next="split2">
+			<tasklet ref="L9DailyLoanBalUpd" />
+		</step>
 		<split id="split2" task-executor="taskExecutor"
 			next="startBS996">
 			<flow>

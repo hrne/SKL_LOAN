@@ -8,21 +8,14 @@
 	<!-- 作業名稱 -->
 	<job id="eomFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
-		<!-- 月底餘額檔批次 -->
-		<split id="split1" task-executor="taskExecutor" next="split2">
-			<flow>
-				<!-- Usp_L9_MonthlyLoanBal_Upd -->
-				<step id="l9MonthlyLoanBalUpd" parent="parentStep">
-					<tasklet ref="L9MonthlyLoanBalUpd" />
-				</step>
-			</flow>
-			<flow>
-				<!-- Usp_L9_MonthlyFacBal_Upd -->
-				<step id="l9MonthlyFacBalUpd" parent="parentStep">
-					<tasklet ref="L9MonthlyFacBalUpd" />
-				</step>
-			</flow>
-		</split>
+		<!-- Usp_L9_MonthlyLoanBal_Upd -->
+		<step id="l9MonthlyLoanBalUpd" parent="parentStep" next="l9MonthlyFacBalUpd">
+			<tasklet ref="L9MonthlyLoanBalUpd" />
+		</step>
+		<!-- Usp_L9_MonthlyFacBal_Upd -->
+		<step id="l9MonthlyFacBalUpd" parent="parentStep" next="split2">
+			<tasklet ref="L9MonthlyFacBalUpd" />
+		</step>
 		<!-- 月底報表檔批次 -->
 		<split id="split2" task-executor="taskExecutor" next="split3">
 			<flow>
@@ -209,48 +202,48 @@
 		<!-- IFRS9 月檔 -->
 		<split id="splitIfrs9" task-executor="taskExecutor">
 			<flow>
-				<step id="l7LoanIfrsApUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsApUpd" />
+				<step id="l7LoanIfrs9ApUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9ApUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsBpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsBpUpd" />
+				<step id="l7LoanIfrs9BpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9BpUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsCpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsCpUpd" />
+				<step id="l7LoanIfrs9CpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9CpUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsDpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsDpUpd" />
+				<step id="l7LoanIfrs9DpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9DpUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsFpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsFpUpd" />
+				<step id="l7LoanIfrs9FpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9FpUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsGpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsGpUpd" />
+				<step id="l7LoanIfrs9GpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9GpUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsHpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsHpUpd" />
+				<step id="l7LoanIfrs9HpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9HpUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsIpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsIpUpd" />
+				<step id="l7LoanIfrs9IpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9IpUpd" />
 				</step>
 			</flow>
 			<flow>
-				<step id="l7LoanIfrsJpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsJpUpd" />
+				<step id="l7LoanIfrs9JpUpd" parent="parentStep">
+					<tasklet ref="L7LoanIfrs9JpUpd" />
 				</step>
 			</flow>
 		</split>

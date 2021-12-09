@@ -57,7 +57,7 @@ public class L6202 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6607"); // 功能選擇錯誤
 		}
 
-		// 更新保證人關係代碼檔
+
 		CdSyndFee tCdSyndFee = new CdSyndFee();
 		switch (iFunCd) {
 		case 1: // 新增
@@ -100,6 +100,8 @@ public class L6202 extends TradeBuffer {
 					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 				}
 				try {
+					dataLog.setEnv(titaVo, tCdSyndFee, tCdSyndFee);
+					dataLog.exec("刪除聯貸費用代碼");
 					cdSyndFeeService.delete(tCdSyndFee);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤

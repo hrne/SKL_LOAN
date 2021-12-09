@@ -195,7 +195,7 @@ public class LNM34APReport extends MakeReport {
 							strField = makeFile.fillStringR(strField, 3, ' ');
 							break; // 擔保品地區別(擔保品郵遞區號)
 						case 33:
-							strField = makeFile.fillStringR(strField, 2, ' ');
+							strField = makeFile.fillStringR(strField, 5, ' ');
 							break; // 商品利率代碼
 						case 34:
 							strField = makeFile.fillStringL(strField, 1, '0');
@@ -223,7 +223,7 @@ public class LNM34APReport extends MakeReport {
 							break; // 協議前之撥款序號
 						}
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 41) {
 							strContent = strContent + ",";
 						}
 					}

@@ -80,7 +80,7 @@ public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			 AND TRUNC(LBM.\"DrawdownDate\"/100) = :l5yymm ) S0";
 		sql += "	  LEFT JOIN(SELECT R.\"CustNo\" \"CustNo\"";
 		sql += "					  ,R.\"FacmNo\" \"FacmNo\"";
-		sql += "				  	  ,C.\"CustName\" \"CustName\"";
+		sql += "				  	  ,\"Fn_ParseEOL\"(C.\"CustName\",0) \"CustName\"";
 		sql += "				  	  ,E.\"CenterShortName\" \"CenterShortName\"";
 		sql += "					  ,R.\"ReChkUnit\" \"ReChkUnit\"";
 		sql += "					  ,R.\"ReChkYearMonth\" \"ReChkYearMonth\"";

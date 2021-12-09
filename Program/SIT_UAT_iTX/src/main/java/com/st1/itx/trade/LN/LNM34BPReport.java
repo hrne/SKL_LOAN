@@ -112,7 +112,7 @@ public class LNM34BPReport extends MakeReport {
 						} // 利率欄位生效日
 
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 7) {
 							strContent = strContent + ",";
 						}
 					}

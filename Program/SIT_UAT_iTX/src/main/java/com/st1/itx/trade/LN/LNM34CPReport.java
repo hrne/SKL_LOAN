@@ -113,7 +113,7 @@ public class LNM34CPReport extends MakeReport {
 						} // 生效日期
 
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 8) {
 							strContent = strContent + ",";
 						}
 					}

@@ -234,7 +234,7 @@ public class LNM39IPReport extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
-						if (j != tL7Vo.size()) {
+						if (j != 34) {
 							strContent = strContent + ",";
 						}
 					}
