@@ -64,7 +64,7 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "     , M.\"ConsumeFg\" " + "     , M.\"FinCode\" " + "     , M.\"UsageCode\" "
 				+ "     , M.\"Filler18\" " + " FROM  \"JcicB211\" M " + " WHERE ( M.\"DataYMD\" Between " + acdateStart
 				+ " AND " + acdateEnd + " )"
-				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"LoanBal\"  ";
+				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"TranCode\", M.\"LoanBal\"  ";
 
 		this.info("sql=" + sql);
 

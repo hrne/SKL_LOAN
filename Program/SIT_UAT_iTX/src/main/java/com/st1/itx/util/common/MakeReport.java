@@ -176,7 +176,7 @@ public class MakeReport extends CommBuffer {
 	 * @param brno            單位
 	 * @param rptCode         報表編號
 	 * @param rptItem         報表說明
-	 * @param PageSize        報表尺寸,例A4,A5,LETTER;自訂尺寸(寛,長)(單位:吋),例:8.5,5.5
+	 * @param PageSize        報表尺寸,例A4,A5,LETTER;自訂尺寸(單位,寛,長)(單位:mm,cm,inch),例:cm,8.5,5.5
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
@@ -195,7 +195,15 @@ public class MakeReport extends CommBuffer {
 		this.rptItem = rptItem;
 
 		this.rptSize = PageSize.toUpperCase();
+		
+		String[] ss = PageSize.split(",");
 
+        this.info("PageSize length = " + ss.length);
+		
+        if (ss.length != 1 && ss.length != 3) {
+        	throw new LogicException("EC004", "(MakeReport)報表尺寸錯誤=" + PageSize);
+        }
+        
 		pageOrientation = pageOrientation.toUpperCase();
 		if ("P".equals(pageOrientation)) {
 			this.pageOrientation = pageOrientation;
@@ -336,7 +344,7 @@ public class MakeReport extends CommBuffer {
 			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數必須有值");
 		}
 		if (haveChinese(rptCode)) {
-			throw new LogicException("EC007", "(MakeReport)報表編號(rptCode)參數不可有全形字");
+			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數不可有全形字");
 		}
 		if (rptItem == null || "".equals(rptItem)) {
 			throw new LogicException("EC004", "(MakeReport)報表說明(rptItem)參數必須有值");
@@ -2333,14 +2341,14 @@ public class MakeReport extends CommBuffer {
 				String paperorientaton = map.get("paper.orientation").toString();
 
 				String[] ss = papersize.split(",");
-
+				
 				map2 = new HashMap<String, Object>();
-				if (ss.length == 2) {
+				if (ss.length == 3) {
 					map2.put("Action", 3);
 					map2.put("PageSize", "Custom");
-					map2.put("PageUnit", "Inch");
-					map2.put("PageWidth", ss[0]);
-					map2.put("PageHeight", ss[1]);
+					map2.put("PageUnit", ss[0]);
+					map2.put("PageWidth", ss[1]);
+					map2.put("PageHeight", ss[2]);
 					map2.put("Orientation", paperorientaton);
 				} else {
 					map2.put("Action", 3);

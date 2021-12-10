@@ -1,28 +1,20 @@
+
+CREATE OR REPLACE PROCEDURE "Usp_L7_Ifrs9FacData_Upd"
+(
 -- 程式功能：維護 Ifrs9FacData 每月IFRS9額度資料檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L7_Ifrs9FacData_Upd"(20200430,'System');
 --
-
 -- 額度資料
-DROP TABLE "Work_Ifrs9FacData" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_Ifrs9FacData"
-    (  "CustNo"          decimal(7, 0)   default 0 not null    -- 戶號
-     , "FacmNo"          decimal(3, 0)   default 0 not null    -- 額度編號
-     , "DrawdownFg"      decimal(1, 0)   default 0 not null    -- 已核撥記號 (0: 未核撥 1: 已核撥)
-     , "TotalLoanBal"    decimal(16, 2)  default 0 not null    -- 本金餘額(撥款)合計
-    )
-    ON COMMIT DELETE ROWS;
 
-
-
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ifrs9FacData_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
 )
+AUTHID CURRENT_USER
 AS
 BEGIN
+	"Usp_L7_Ifrs9FacData_Upd_Prear"(); -- Work_Ifrs9FacData 資料清檔
   DECLARE
     INS_CNT        INT;         -- 新增筆數
     UPD_CNT        INT;         -- 更新筆數
@@ -128,8 +120,8 @@ BEGIN
          , NVL(F."RateCode",'0')                AS "RateCode"          -- 契約當時利率調整方式(月底日)
          , NVL(F."RepayFreq",0)                 AS "RepayFreq"         -- 契約約定當時還本週期(月底日)
          , NVL(F."PayIntFreq",0)                AS "PayIntFreq"        -- 契約約定當時繳息週期(月底日)
-         , NVL("FacProd"."IfrsStepProdCode", ' ')
-                                                AS "IfrsStepProdCode"  -- IFRS階梯商品別
+         , NVL("FacProd"."Ifrs9StepProdCode", ' ')
+                                                AS "Ifrs9StepProdCode" -- IFRS階梯商品別
          , CASE WHEN TRIM(NVL("CustMain"."IndustryCode", ' ')) = '' THEN ' '
                 ELSE SUBSTR('000000' || TRIM("CustMain"."IndustryCode"), -6)
            END                                  AS "IndustryCode"      -- 授信行業別
@@ -149,7 +141,7 @@ BEGIN
                 WHEN SUBSTR(MF."AssetClass", 1, 1)   = '5' THEN 5
                 ELSE 0
            END                                  AS "AssetClass"        -- 資產五分類代號
-         , NVL("FacProd"."IfrsProdCode", ' ')   AS "IfrsProdCode"      -- 產品別
+         , NVL("FacProd"."Ifrs9ProdCode", ' ')  AS "Ifrs9ProdCode"     -- 產品別
          , CASE WHEN Cl."ClCode1" in (1)    THEN NVL(Eva1."EvaAmt",0)
                 WHEN Cl."ClCode1" in (2)    THEN NVL(Eva2."EvaAmt",0)
                 WHEN Cl."ClCode1" in (3, 4) THEN NVL(Eva3."EvaAmt",0)
@@ -199,7 +191,7 @@ BEGIN
                       , F."FacmNo"
                       , F."ApplNo"
                       , SUM( NVL(B."EvaUnitPrice",0) *
-                             ( NVL(B."FloorArea",0) + NVL(P."Area",0) + NVL(C."Area",0) )
+                             ( NVL(B."FloorArea",0) + NVL(P."Area",0) + NVL(C."ParkingArea",0) )
                            ) AS "EvaAmt"
                  FROM   "FacMain" F
                    LEFT JOIN "ClFac" CL  ON CL."ApproveNo" = F."ApplNo"
@@ -209,7 +201,7 @@ BEGIN
                    LEFT JOIN "ClBuildingPublic" P  ON p."ClCode1"   = CL."ClCode1"
                                                   AND P."ClCode2"   = CL."ClCode2"
                                                   AND P."ClNo"      = CL."ClNo"
-                   LEFT JOIN "ClBuildingParking" C  ON C."ClCode1"  = CL."ClCode1"
+                   LEFT JOIN "ClParking" C  ON C."ClCode1"  = CL."ClCode1"
                                                    AND C."ClCode2"  = CL."ClCode2"
                                                    AND C."ClNo"     = CL."ClNo"
                  WHERE  CL."ClCode1"  IN (1)
@@ -309,7 +301,7 @@ END;
 --       , 0                                    AS "RateCode"          -- 契約當時利率調整方式(月底日)
 --       , 0                                    AS "RepayFreq"         -- 契約約定當時還本週期(月底日)
 --       , 0                                    AS "PayIntFreq"        -- 契約約定當時繳息週期(月底日)
---       , ' '                                  AS "IfrsStepProdCode"  -- IFRS階梯商品別
+--       , ' '                                  AS "Ifrs9StepProdCode" -- IFRS階梯商品別
 --       , ' '                                  AS "IndustryCode"      -- 授信行業別
 --       , ' '                                  AS "ClTypeJCIC"        -- 擔保品類別
 --       , ' '                                  AS "CityCode"          -- 擔保品地區別
@@ -319,7 +311,7 @@ END;
 --       , ' '                                  AS "AgreementFg"       -- 是否為協議商品 (Y:是 N:否)
 --       , ' '                                  AS "EntCode"           -- 企金別
 --       , 0                                    AS "AssetClass"        -- 資產五分類代號
---       , ' '                                  AS "IfrsProdCode"      -- 產品別
+--       , ' '                                  AS "Ifrs9ProdCode"     -- 產品別
 --       , 0                                    AS "EvaAmt"            -- 原始鑑價金額
 --       , 0                                    AS "UtilAmt"           -- 累計撥款金額(額度層)
 --       , 0                                    AS "UtilBal"           -- 已動用餘額(額度層)

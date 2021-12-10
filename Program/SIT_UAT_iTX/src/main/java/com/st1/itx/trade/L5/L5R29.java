@@ -27,26 +27,26 @@ import com.st1.itx.tradeService.TradeBuffer;
 @Service("L5R29")
 @Scope("prototype")
 /**
- * 
+ * L5R29
  * 
  * @author Jacky
  * @version 1.0.0
  */
 public class L5R29 extends TradeBuffer {
 	@Autowired
-	public PfBsDetailService pfBsDetailService;
+	PfBsDetailService pfBsDetailService;
 
 	@Autowired
-	public PfItDetailService sPfItDetailService;
+	PfItDetailService sPfItDetailService;
 
 	@Autowired
-	public CustMainService sCustMainService;
+	CustMainService sCustMainService;
 
 	@Autowired
-	public CdEmpService sCdEmpService;
+	CdEmpService sCdEmpService;
 
 	@Autowired
-	public PfBsDetailAdjustService pfBsDetailAdjustService;
+	PfBsDetailAdjustService pfBsDetailAdjustService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -71,7 +71,7 @@ public class L5R29 extends TradeBuffer {
 		boolean first = true;
 		BigDecimal perfAmt = new BigDecimal("0");
 		
-		if (lPfBsDetail != null || lPfBsDetail.size() > 0) {
+		if (lPfBsDetail != null && lPfBsDetail.size() > 0) {
 			for (PfBsDetail pfBsDetail : lPfBsDetail) {
 				if (pfBsDetail.getDrawdownAmt().compareTo(bigZero) <= 0) {
 					continue;
@@ -100,14 +100,14 @@ public class L5R29 extends TradeBuffer {
 
 					totaVo.putParam("L5r29WorkMonth", pfBsDetail.getWorkMonth() - 191100);
 					totaVo.putParam("L5r29BsOfficer", pfBsDetail.getBsOfficer());
-					totaVo.putParam("L5r29BsOfficerName", FindEmpName(pfBsDetail.getBsOfficer(), titaVo));
+					totaVo.putParam("L5r29BsOfficerName", findEmpName(pfBsDetail.getBsOfficer(), titaVo));
 
 					PfItDetail pfItDetail = sPfItDetailService.findByTxFirst(pfBsDetail.getCustNo(),
 							pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), pfBsDetail.getPerfDate() + 19110000,
 							pfBsDetail.getRepayType(), pfBsDetail.getPieceCode(), titaVo);
 					if (pfItDetail != null) {
 						totaVo.putParam("L5r29Introducer", pfItDetail.getIntroducer());
-						totaVo.putParam("L5r29IntroducerName", FindEmpName(pfItDetail.getIntroducer(), titaVo));
+						totaVo.putParam("L5r29IntroducerName", findEmpName(pfItDetail.getIntroducer(), titaVo));
 					} else {
 						totaVo.putParam("L5r29Introducer", "");
 						totaVo.putParam("L5r29IntroducerName", "");
@@ -162,14 +162,14 @@ public class L5R29 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	public String FindEmpName(String employeeNo, TitaVo titaVo) {
-		String EmpName = "";
+	public String findEmpName(String employeeNo, TitaVo titaVo) {
+		String empName = "";
 		if (employeeNo != null && employeeNo.length() != 0) {
 			CdEmp CdEmpVo = sCdEmpService.findById(employeeNo, titaVo);
 			if (CdEmpVo != null) {
-				EmpName = CdEmpVo.getFullname();
+				empName = CdEmpVo.getFullname();
 			}
 		}
-		return EmpName;
+		return empName;
 	}
 }
