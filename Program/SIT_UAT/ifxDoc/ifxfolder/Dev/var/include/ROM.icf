@@ -8030,6 +8030,16 @@ TXFORM=L8R58
 ^
 </L8R58.tom>
 
+<L8R59.dec>
+#L8R59CourtCodeX=X,100,S
+</L8R59.dec>
+
+<L8R59.tom>
+TXFORM=L8R59
+#L8R59CourtCodeX
+^
+</L8R59.tom>
+
 
 <L5R38.rtn>
 #L5R38iCode=A,1,S

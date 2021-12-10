@@ -3,7 +3,12 @@
 </sub>
 
 <sub type="SYS" name="label">
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+E(0,2)
 
+#ACTFG=_,_,S
+C(2,#FKEY,E(0,1),$)
 
 </sub>
 
@@ -12,6 +17,7 @@
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
+
 
 #Help=X,200,S
 T(3,1:設定;2:解除;3:查詢)
@@ -33,7 +39,7 @@ T(3,0:未生效;1:生效)
 ["#FdNone+代理人5",#AgentTlrno5,#AgentTlrnoNa5],
 ["#FdBegin+開始日期",#BeginDate," 開始時間",#BeginTimeh,#BeginTimem],
 ["#FdEnd+結束日期",#EndDate," 結束時間",#EndTimeh,#EndTimem],
-["#FdNone+設定狀態",#Status,#StatusX],
+!["#FdNone+設定狀態",#Status,#StatusX],
 ]
 !---------- AP Button AREA ----------
 
@@ -105,10 +111,10 @@ T(H,@AgentTlrnoNa5,#AgentTlrno5,#tlrnoH)
 !T(1,@EndTimem,#EndTime,3,2)
 
 #Status=A,1,L
-C(2,#FunCode,$,T(3,1),T(3,0),$)
+!C(2,#FunCode,$,T(3,1),T(3,0),$)
 
-#StatusX=X,6,L
-T(H,#Status,#Help2)
+!#StatusX=X,6,L
+!T(H,#Status,#Help2)
 
 #AgentTlrno1=X,6,I
 C(3,#FunCode,1,$,s)
@@ -233,7 +239,8 @@ C(3,#EndTimem,0,$,V(5,0,59))
 C(3,#BeginDate,#EndDate,V(5,#BeginTimem,59),$)
 T(2,@EndTime,#EndTimeh+#EndTimem)
 
-
+#TimTlrNo=X,6,S
+T(2,#TLRNO)
 
 
 </sub>
@@ -266,9 +273,13 @@ T(3,[L6104] 代理人設定)
 #AgentTlrno5
 #BeginDate
 #BeginTime
+#BeginTimeh
+#BeginTimem
 #EndDate
 #EndTime
-#Status
+#EndTimeh
+#EndTimem
+#TimTlrNo
 #END
 </sub>
 

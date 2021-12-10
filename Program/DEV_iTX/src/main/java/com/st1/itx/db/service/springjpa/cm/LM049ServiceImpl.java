@@ -26,7 +26,6 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("lM049.findAll ");
@@ -57,12 +56,13 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- 第一段:金控公司負責人(經理以上)及大股東名單
 		sql += "   SELECT '1'               AS \"CusType\" ";
 		sql += "        , N'1'              AS \"CusSCD\" ";
-		sql += "        , N'1'              AS \"CusscdName\" ";
+		sql += "        , RSC.\"CusSName\"  AS \"CusscdName\" ";
 		sql += "        , RS.\"CusId\"      AS \"CusID\" ";
 		sql += "        , RS.\"CusName\"    AS \"CusName\" ";
 		sql += "        , null              AS \"STSName\" "; // -- 缺表 STATUS
 		sql += "        , null              AS \"CusName2\" ";
 		sql += "   FROM \"RptRelationSelf\" RS ";
+		sql += "   LEFT JOIN \"RptSubCom\" RSC ON RSC.\"CusSCD\" = RS.\"CusSCD\" ";
 		sql += "   WHERE RS.\"CusSCD\" = '1' ";
 		sql += "     AND RS.\"STSCD\" IN ('1','2','3','4','5','6','7','8','11','13','14','15','16','17','18','19','28','48','49') ";
 		// -- RE201203455(13副董事長,14獨立董事,15獨立監察人,16關係企業)
@@ -71,12 +71,13 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- 第二段:前者經營事業為董事長 "前者為獨資、合夥經營事業或擔任負責人或為代表人團體"
 		sql += "   SELECT '2'               AS \"CusType\" ";
 		sql += "        , RC.\"CusSCD\"     AS \"CusSCD\" ";
-		sql += "        , RC.\"CusSCD\"     AS \"CusscdName\" ";
+		sql += "        , RSC.\"CusSName\"  AS \"CusscdName\" ";
 		sql += "        , RC.\"ComNo\"      AS \"CusID\" ";
 		sql += "        , RC.\"ComName\"    AS \"CusName\" ";
 		sql += "        , null              AS \"STSName\" "; // -- 缺表 STATUS
 		sql += "        , RS.\"CusName\"    AS \"CusName2\" ";
 		sql += "   FROM \"RptRelationCompany\" RC ";
+		sql += "   LEFT JOIN \"RptSubCom\" RSC ON RSC.\"CusSCD\" = RC.\"CusSCD\" ";
 		sql += "   LEFT JOIN \"RptRelationSelf\" RS ON RS.\"CusId\" = RC.\"CusId\" ";
 		sql += "   WHERE RS.\"STSCD\" = '1' ";
 		sql += "     AND RS.\"CusSCD\" = '1' ";
@@ -85,12 +86,13 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- 第三段:cusccd = 2(法人類) "有半數以上董事與金控公司或其子公司相同之公司"
 		sql += "   SELECT '2'               AS \"CusType\" ";
 		sql += "        , RS.\"CusSCD\"     AS \"CusSCD\" ";
-		sql += "        , RS.\"CusSCD\"     AS \"CusscdName\" ";
+		sql += "        , RSC.\"CusSName\"  AS \"CusscdName\" ";
 		sql += "        , RS.\"CusId\"      AS \"CusID\" ";
 		sql += "        , RS.\"CusName\"    AS \"CusName\" ";
 		sql += "        , null              AS \"STSName\" "; // -- 缺表 STATUS
 		sql += "        , null              AS \"CusName2\" ";
 		sql += "   FROM \"RptRelationSelf\" RS ";
+		sql += "   LEFT JOIN \"RptSubCom\" RSC ON RSC.\"CusSCD\" = RS.\"CusSCD\" ";
 		sql += "   WHERE RS.\"CusSCD\" = '2' ";
 		sql += "     AND RS.\"STSCD\" IN ('1','2','3','4','5','6','7','8','11','13','14','15','16','17','18','19','28','48','49') ";
 		// -- RE201203455(13副董事長,14獨立董事,15獨立監察人,16關係企業)
@@ -99,12 +101,13 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- 第四段: ??? 可能是"金控公司子公司及其負責人、大股東"
 		sql += "   SELECT '3'               AS \"CusType\" ";
 		sql += "        , RS.\"CusSCD\"     AS \"CusSCD\" ";
-		sql += "        , RS.\"CusSCD\"     AS \"CusscdName\" ";
+		sql += "        , RSC.\"CusSName\"  AS \"CusscdName\" ";
 		sql += "        , RS.\"CusId\"      AS \"CusID\" ";
 		sql += "        , RS.\"CusName\"    AS \"CusName\" ";
 		sql += "        , null              AS \"STSName\" "; // -- 缺表 STATUS
 		sql += "        , null              AS \"CusName2\" ";
 		sql += "   FROM \"RptRelationSelf\" RS ";
+		sql += "   LEFT JOIN \"RptSubCom\" RSC ON RSC.\"CusSCD\" = RS.\"CusSCD\" ";
 		sql += "   WHERE RS.\"CusSCD\" != '1' ";
 		sql += "     AND RS.\"STSCD\" IN ('1','2','3','4','5','6','7','8','11','13','14','15','16','17','18','19','28','48','49') ";
 		// -- RE201203455(13副董事長,14獨立董事,15獨立監察人,16關係企業)
@@ -195,7 +198,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

@@ -36,12 +36,19 @@ public class L6104 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String FunCode = titaVo.getParam("FunCode").trim();
-
-		delAll(titaVo);
-
+		
+		
+		if (("3").equals(FunCode)) {
+			titaVo.put("RELCD", "1");
+		}
+		
+		if ((!titaVo.isActfgSuprele() || ("2").equals(FunCode)) && !("3").equals(FunCode)) {
+			delAll(titaVo);
+		}
+		
 		for (int i = 1; i <= 5; i++) {
 			String AgentTlrno = titaVo.getParam("AgentTlrno" + i).trim();
-			if (!"".equals(AgentTlrno)&& ("1").equals(FunCode)) {
+			if (!"".equals(AgentTlrno) && ("1").equals(FunCode)) {
 				addOne(titaVo, AgentTlrno);
 			}
 		}
@@ -55,33 +62,51 @@ public class L6104 extends TradeBuffer {
 		TxAgent txAgent = new TxAgent();
 
 		TxAgentId txAgentId = new TxAgentId();
-		txAgentId.setTlrNo(titaVo.getTlrNo());
+		txAgentId.setTlrNo(titaVo.getParam("TimTlrNo"));
 		txAgentId.setAgentTlrNo(agentTlrno);
-
 		txAgent.setTxAgentId(txAgentId);
-		txAgent.setBeginDate(Integer.parseInt(titaVo.getParam("BeginDate").toString().trim()));
-		txAgent.setBeginTime(Integer.parseInt(titaVo.getParam("BeginTime").toString().trim()));
-		txAgent.setEndDate(Integer.parseInt(titaVo.getParam("EndDate").toString().trim()));
-		txAgent.setEndTime(Integer.parseInt(titaVo.getParam("EndTime").toString().trim()));
-		txAgent.setStatus(Integer.parseInt(titaVo.getParam("Status").toString().trim()));
-
+		
 		try {
-			txAgentService.insert(txAgent);
+			if (titaVo.isActfgSuprele()) {//放行
+				txAgent = txAgentService.holdById(txAgent.getTxAgentId());
+				txAgent.setStatus(1);
+				txAgentService.update(txAgent);
+			}else {
+				txAgent.setBeginDate(Integer.parseInt(titaVo.getParam("BeginDate").toString().trim()));
+				txAgent.setBeginTime(Integer.parseInt(titaVo.getParam("BeginTime").toString().trim()));
+				txAgent.setEndDate(Integer.parseInt(titaVo.getParam("EndDate").toString().trim()));
+				txAgent.setEndTime(Integer.parseInt(titaVo.getParam("EndTime").toString().trim()));
+				txAgent.setStatus(0);
+				txAgentService.insert(txAgent);
+			}
+			
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 		}
 	}
 
 	private void delAll(TitaVo titaVo) throws LogicException {
-		Slice<TxAgent> slTxAgent = txAgentService.findByTlrNo(titaVo.getTlrNo().trim(), 0, Integer.MAX_VALUE);
+		Slice<TxAgent> slTxAgent = txAgentService.findByTlrNo(titaVo.getParam("TimTlrNo").trim(), 0, Integer.MAX_VALUE);
 		List<TxAgent> lTxAgent = slTxAgent == null ? null : slTxAgent.getContent();
 		if (lTxAgent == null) {
 			return;
 		}
+		
+		
 		for (TxAgent txAgent : lTxAgent) {
+			if (!titaVo.isActfgSuprele() && txAgent.getStatus()==0) {//0:未放行
+				throw new LogicException(titaVo, "", "未放行交易不可設定/解除");
+			}
+			
 			TxAgent txAgent2 = txAgentService.holdById(txAgent.getTxAgentId());
 			try {
-				txAgentService.delete(txAgent2);
+				if(("2").equals(titaVo.getParam("FunCode").trim()) && !titaVo.isActfgSuprele()) {//刪除只改狀態
+					txAgent2.setStatus(0);
+					txAgentService.update(txAgent2);
+				} else {
+					txAgentService.delete(txAgent2);
+				}
+				
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
