@@ -186,6 +186,62 @@ em = null;
   }
 
   @Override
+  public Slice<JobDetail> findExecDateIn(int execDate_0, int execDate_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JobDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findExecDateIn " + dbName + " : " + "execDate_0 : " + execDate_0 + " execDate_1 : " +  execDate_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jobDetailReposDay.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualOrderByStepStartTimeDesc(execDate_0, execDate_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jobDetailReposMon.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualOrderByStepStartTimeDesc(execDate_0, execDate_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jobDetailReposHist.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualOrderByStepStartTimeDesc(execDate_0, execDate_1, pageable);
+    else 
+      slice = jobDetailRepos.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualOrderByStepStartTimeDesc(execDate_0, execDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JobDetail> findStatusExecDateIn(int execDate_0, int execDate_1, String status_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JobDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findStatusExecDateIn " + dbName + " : " + "execDate_0 : " + execDate_0 + " execDate_1 : " +  execDate_1 + " status_2 : " +  status_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = jobDetailReposDay.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(execDate_0, execDate_1, status_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jobDetailReposMon.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(execDate_0, execDate_1, status_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jobDetailReposHist.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(execDate_0, execDate_1, status_2, pageable);
+    else 
+      slice = jobDetailRepos.findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(execDate_0, execDate_1, status_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public JobDetail holdById(JobDetailId jobDetailId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

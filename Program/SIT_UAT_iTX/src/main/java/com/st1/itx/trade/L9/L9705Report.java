@@ -316,7 +316,7 @@ public class L9705Report extends MakeReport {
 		long sno = this.close();
 		this.toPdf(sno);
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "L9705放款本息攤還表暨繳息通知單已完成", titaVo);
+				titaVo.getParam("TLRNO"), titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "放款本息攤還表暨繳息通知單已完成", titaVo);
 	}
 
 	private String transRocChinese(String date) {

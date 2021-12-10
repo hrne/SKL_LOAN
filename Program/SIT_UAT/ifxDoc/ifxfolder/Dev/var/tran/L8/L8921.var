@@ -42,16 +42,7 @@ E(0,0)
 [
 ["[L8921]                                 疑似洗錢樣態檢核查詢"],
 ["#FdAcDate+入帳日期",#AcDateStart,"~",#AcDateEnd],
-!["@洗錢樣態一"],
-!["#FdFactor1TotLimit+金額合計超過",#Factor1TotLimit],
-!["@洗錢樣態二"],
-!["#FdFactor2Count+次數",#Factor2Count],
-!["#FdFactor2AmtStart+單筆金額起迄",#Factor2AmtStart,"~",#Factor2AmtEnd],
-!["@洗錢樣態三"],
-!["#FdFactor3TotLimit+金額合計超過",#Factor3TotLimit],
-!["#FdRPTFG+顯示方式",
-!<include src="COM.icf::RPTFG.scr"/>
-!],
+["#FdFactor+交易樣態",#Factor,#FactorX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -67,9 +58,14 @@ T(3, )
 T(3, )
 #FdAcDate=X,2,L
 T(3,*)
+#FdFactor=X,2,L
+T(3,*)
+
 #FdRPTFG=X,2,L
 
 !---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
@@ -85,25 +81,6 @@ K(MODIFYBUTTON,查詢)
 #BusinessType=X,2,S
 T(3,LN)
 
-!#SendL8R49=X,1,S
-!E(0,@RimFuncCode,#FuncCode)
-!T(2,@RimTxCode,#TXCD)
-!T(2,@RimBusinessType,#BusinessType)
-!RESET_RIM(#SendL8R49,L8R49)
-!S(L8R49,1,#RimFuncCode,#RimTxCode,#RimBusinessType)
-!R(1,L8R49)
-
-!E(0,@Factor1TotLimit,#L8R49Factor1TotLimit)
-!E(0,@Factor2Count,#L8R49Factor2Count)
-!E(0,@Factor2AmtStart,#L8R49Factor2AmtStart)
-!E(0,@Factor2AmtEnd,#L8R49Factor2AmtEnd)
-!E(0,@Factor3TotLimit,#L8R49Factor3TotLimit)
-
-!T(F,@Factor1TotLimit,0)
-!T(F,@Factor2Count,0)
-!T(F,@Factor2AmtStart,0)
-!T(F,@Factor2AmtEnd,0)
-!T(F,@Factor3TotLimit,0)
 
 !本營業日
 #DATE=D,8,S
@@ -123,6 +100,17 @@ C(3,#CHAIN,1,$,s)
 T(1,@LDATE,#NTXBUF,8,7)
 E(0,@AcDateEnd,#LDATE)
 
+
+! 交易樣態(Factor)
+#FactorHelpRim=X,1,S
+RESET_RIM(#FactorHelpRim,XXR99)
+S(XXR99,01,CdCode.Factor)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FactorHelp,0:全部;+#HelpDesc1)
+#FactorHelp=x,1024,S
+
+
 !入帳日期起止
 #AcDateStart=D,7,I
 C(3,#CHAIN,0,E(0,#DATE),s)
@@ -134,22 +122,14 @@ C(3,#CHAIN,0,E(0,#DATE),s)
 D(8)
 @V(7)A(4,0,#AcDateEnd)V(5,#AcDateStart,#CDATE)
 
-! 樣態一-金額合計超過
-!#Factor1TotLimit=m,14,S
+!交易樣態
+#Factor=A,1,I
+C(3,#CHAIN,1,s,$)
+HELP(#FactorHelp)
+@V(H,#FactorHelp)
 
-! 樣態二-次數
-!#Factor2Count=N,4,S
-
-! 樣態二-單筆金額起迄
-!#Factor2AmtStart=m,14,S
-
-!#Factor2AmtEnd=m,14,S
-
-! 樣態三-金額合計超過
-!#Factor3TotLimit=m,14,S
-
-!#CHAINXMT=X,1,S
-!C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+#FactorX=X,6,L
+T(H,#Factor,#FactorHelp)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -247,6 +227,7 @@ E(0,#OOEntryDate)
 <sub type="TIM">
 #AcDateStart
 #AcDateEnd
+#Factor
 #END
 </sub>
 
@@ -268,6 +249,7 @@ TXFORM=L8921
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L8R49.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 
 </sub>
 

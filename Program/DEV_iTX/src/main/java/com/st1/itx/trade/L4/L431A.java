@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.BatxRateChangeId;
+import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -79,10 +82,9 @@ public class L431A extends TradeBuffer {
 		facmNo = parse.stringToInteger(titaVo.getParam("OOFacmNo"));
 		bormNo = parse.stringToInteger(titaVo.getParam("OOBormNo"));
 		curtEffDate = parse.stringToInteger(titaVo.getParam("OOCurtEffDate"));
-
 		this.info("titaVo.getBtnIndex() ..." + titaVo.getBtnIndex());
 		btnIndex = parse.stringToInteger(titaVo.getBtnIndex());
-
+		String checkMsg = "";
 		this.info("adjDate ..." + adjDate);
 		this.info("txKind ..." + txKind);
 		this.info("adjCode ..." + adjCode);
@@ -110,13 +112,14 @@ public class L431A extends TradeBuffer {
 		}
 
 		// 選擇調整、取消調整
-		if (tBatxRateChange.getRateKeyInCode() == 0) {
+		switch (tBatxRateChange.getRateKeyInCode()) {
+		case 0: // 0.未調整
+			// 選擇調整
 			switch (btnIndex) {
 			case 0: // 0.按擬調利率調整
 				tBatxRateChange.setAdjustedRate(tBatxRateChange.getProposalRate());
 				tBatxRateChange.setRateKeyInCode(1); // 1.已調整
 				break;
-
 			case 1: // 1.按目前利率調整
 				tBatxRateChange.setAdjustedRate(tBatxRateChange.getPresentRate());
 				tBatxRateChange.setRateKeyInCode(1); // 1.已調整
@@ -127,10 +130,34 @@ public class L431A extends TradeBuffer {
 				tBatxRateChange.setRateKeyInCode(2); // 2.待輸入
 				break;
 			}
-		} else {
+			checkMsg = check(tBatxRateChange, titaVo);
+			if (!checkMsg.isEmpty()) {
+				throw new LogicException("E0015", checkMsg); // 檢查錯誤
+			}
+			break;
+
+		case 1: // 1.已調整
+			// 取消調整
 			tBatxRateChange.setAdjustedRate(BigDecimal.ZERO);
 			tBatxRateChange.setRateKeyInCode(0); // 0.未調整
+			break;
+
+		case 9: // 9.待處理(檢核有誤)
+			// 重新處理
+			if (tBatxRateChange.getAdjCode() == 1) {
+				checkMsg = check(tBatxRateChange, titaVo);
+				if (!checkMsg.isEmpty()) {
+					throw new LogicException("E0015", checkMsg); // 檢查錯誤
+				}
+				tBatxRateChange.setAdjustedRate(tBatxRateChange.getProposalRate());
+				tBatxRateChange.setRateKeyInCode(1); // 1.已調整
+			} else {
+				tBatxRateChange.setAdjustedRate(BigDecimal.ZERO);
+				tBatxRateChange.setRateKeyInCode(0); // 0.未調整
+			}
+			break;
 		}
+
 		try {
 			batxRateChangeService.update(tBatxRateChange);
 		} catch (DBException e) {
@@ -138,6 +165,32 @@ public class L431A extends TradeBuffer {
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private String check(BatxRateChange t, TitaVo titaVo) throws LogicException {
+		String checkMsg = "";
+		LoanBorMain tLoanBorMain = loanBorMainService
+				.holdById(new LoanBorMainId(t.getCustNo(), t.getFacmNo(), t.getBormNo()));
+		if (tLoanBorMain == null) {
+			throw new LogicException("E0006", "LoanBorMain ");
+		}
+		t.setPreNextAdjFreq(tLoanBorMain.getRateAdjFreq());
+		t.setPrevIntDate(tLoanBorMain.getPrevPayIntDate());
+
+		if ("3".equals(t.getRateCode()) && t.getPreNextAdjFreq() == 0) {
+			checkMsg += "定期機動但無利率調整週期";
+		}
+		BigDecimal fitRate = t.getPresentRate();
+		TempVo tTempVo = new TempVo();
+		tTempVo = tTempVo.getVo(t.getJsonFields());
+		if (tTempVo.get("FitRate") != null) {
+			fitRate = parse.stringToBigDecimal(tTempVo.get("FitRate"));
+		}
+		if (t.getAdjustedRate().compareTo(fitRate) != 0 && t.getPrevIntDate() > t.getCurtEffDate()) {
+			checkMsg += "上次繳息日大於利率生效日";
+		}
+		t.setJsonFields(tTempVo.getJsonString());
+		return checkMsg;
 	}
 
 }

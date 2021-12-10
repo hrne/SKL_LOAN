@@ -133,13 +133,18 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OONextAdjRate", result.get("F25"));
 //              逾期期數
 				occursList.putParam("OOOvduTerm", result.get("F41"));
-				
+
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(result.get("F34"));
 				String procNote = "";
-
-				if (tempVo.get("CheckMsg") != null && tempVo.get("CheckMsg").length() > 0) {
-					procNote = "檢核訊息:" + tempVo.get("CheckMsg") + " ";
+				if (tempVo.get("CheckMsg") != null) {
+					procNote += tempVo.get("CheckMsg");
+				}
+				if (tempVo.get("WarnMsg") != null) {
+					procNote += tempVo.get("WarnMsg");
+				}
+				if (!procNote.isEmpty()) {
+					procNote = "檢核訊息:" + procNote + " ";
 				}
 
 				occursList.putParam("OOProcNote", procNote);

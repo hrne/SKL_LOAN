@@ -77,6 +77,10 @@ public class L8203 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L8203"); // 功能選擇錯誤
 		}
 
+		if (iFuncCode==4) {
+			titaVo.put("RELCD", "1");
+		}
+		
 		// 更新疑似洗錢交易合理性明細檔
 		MlaundryDetail tMlaundryDetail = new MlaundryDetail();
 		MlaundryDetailId tMlaundryDetailId = new MlaundryDetailId();

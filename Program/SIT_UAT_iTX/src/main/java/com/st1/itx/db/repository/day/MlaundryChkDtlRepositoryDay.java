@@ -25,6 +25,9 @@ public interface MlaundryChkDtlRepositoryDay extends JpaRepository<MlaundryChkDt
   // EntryDate >= ,AND EntryDate <= 
   public Slice<MlaundryChkDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscFactorAscCustNoAscDtlSeqAsc(int entryDate_0, int entryDate_1, Pageable pageable);
 
+  // EntryDate >= ,AND EntryDate <= ,AND Factor =
+  public Slice<MlaundryChkDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsOrderByEntryDateAscCustNoAscDtlSeqAsc(int entryDate_0, int entryDate_1, int factor_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

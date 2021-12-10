@@ -3,39 +3,6 @@
 -- 執行方式：EXEC "Usp_L8_JcicB096_Upd"(20200430,'System');
 --
 
-DROP TABLE "Work_B096_All" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_B096_All"
-    (
-       "MainClActNo"      varchar2(50)
-     , "ClCode1"          decimal (1, 0)   default 0 not null
-     , "ClCode2"          decimal (2, 0)   default 0 not null
-     , "ClNo"             decimal (7, 0)   default 0 not null
-     , "LandSeq"          decimal (3, 0)   default 0 not null
-     , "CityCode"         varchar2(2)
-     , "AreaCode"         varchar2(2)
-     , "IrCode"           varchar2(4)
-     , "LandNo1"          decimal(4, 0)   default 0 not null
-     , "LandNo2"          decimal(4, 0)   default 0 not null
-    )
-    ON COMMIT DELETE ROWS;
-
-
-DROP TABLE "Work_B096" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_B096"
-    (
-       "MainClActNo"      varchar2(50)
-     , "ClCode1"          decimal (1, 0)   default 0 not null
-     , "ClCode2"          decimal (2, 0)   default 0 not null
-     , "ClNo"             decimal (7, 0)   default 0 not null
-     , "LandSeq"          decimal (3, 0)   default 0 not null
-     , "CityCode"         varchar2(2)
-     , "AreaCode"         varchar2(2)
-     , "IrCode"           varchar2(4)
-     , "LandNo1"          decimal(4, 0)   default 0 not null
-     , "LandNo2"          decimal(4, 0)   default 0 not null
-    )
-    ON COMMIT DELETE ROWS;
-
 
 CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB096_Upd"
 (
@@ -72,8 +39,19 @@ BEGIN
        LYYYYMM := YYYYMM - 1;
     END IF;
 
+    -- 刪除舊資料
+    DBMS_OUTPUT.PUT_LINE('DELETE JcicB096');
 
-    INSERT INTO "Work_B096_All"
+    DELETE FROM "JcicB096"
+    WHERE "DataYM" = YYYYMM
+      ;
+
+    -- 寫入資料
+    DBMS_OUTPUT.PUT_LINE('INSERT JcicB096');
+
+    INSERT INTO "JcicB096"
+    WITH "Work_B096_All" AS (
+
     SELECT
            M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
          , CF."ClCode1"                          AS "ClCode1"           -- 擔保品代號1
@@ -97,6 +75,7 @@ BEGIN
                               AND "CdCl"."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))
       LEFT JOIN "ClFac"  CF    ON CF."CustNo"     = to_number(SUBSTR(M."FacmNo",1,7))
                               AND CF."FacmNo"     = to_number(SUBSTR(M."FacmNo",8,3))  -- 關聯所有擔保品編號(含主要擔保品)
+                              AND CF."MainFlag"   = 'Y'
       LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = CF."ClCode1"
                               AND CI."ClCode2"  = CF."ClCode2"
                               AND CI."ClNo"     = CF."ClNo"
@@ -107,10 +86,9 @@ BEGIN
       AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')   -- 主要擔保品為不動產
       AND  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
       AND  ( NVL(TRIM(L."LandNo1"),0)  > 0 OR NVL(TRIM(L."LandNo2"),0) > 0 )
-    ;
+    )
+    , "Work_B096" AS (
 
-
-    INSERT INTO "Work_B096"
     SELECT
            WK."MainClActNo"              AS "MainClActNo"       -- 主要擔保品控制編碼
          , WK."ClCode1"                  AS "ClCode1"           -- 擔保品代號1
@@ -126,21 +104,9 @@ BEGIN
     GROUP BY WK."MainClActNo", WK."ClCode1", WK."ClCode2", WK."ClNo", WK."LandSeq"
            , WK."CityCode", WK."AreaCode", WK."IrCode"
            , WK."LandNo1", WK."LandNo2"
-    ;
+    )
 
 
-    -- 刪除舊資料
-    DBMS_OUTPUT.PUT_LINE('DELETE JcicB096');
-
-    DELETE FROM "JcicB096"
-    WHERE "DataYM" = YYYYMM
-      ;
-
-
-    -- 寫入資料
-    DBMS_OUTPUT.PUT_LINE('INSERT JcicB096');
-
-    INSERT INTO "JcicB096"
     SELECT
            YYYYMM                                AS "DataYM"            -- 資料年月                      DECIMAL   6
          , '96'                                  AS "DataType"          -- 資料別                        VARCHAR2  2

@@ -55,6 +55,7 @@ public class L8921 extends TradeBuffer {
 		int iAcDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDateEnd"));
 		int iFAcDateStart = iAcDateStart + 19110000;
 		int iFAcDateEnd = iAcDateEnd + 19110000;
+		int iFactor = this.parse.stringToInteger(titaVo.getParam("Factor"));
 		this.info("L8921 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -65,7 +66,12 @@ public class L8921 extends TradeBuffer {
 
 		// 查詢疑似洗錢樣態檢核明細檔檔
 		Slice<MlaundryChkDtl> slMlaundryChkDtl;
-		slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRange(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
+		if(iFactor==0) {
+			slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRange(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
+		} else {
+			slMlaundryChkDtl = sMlaundryChkDtlService.findFactor(iFAcDateStart, iFAcDateEnd, iFactor, this.index, this.limit, titaVo);
+		}
+		
 		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null : slMlaundryChkDtl.getContent();
 
 		if (lMlaundryChkDtl == null || lMlaundryChkDtl.size() == 0) {

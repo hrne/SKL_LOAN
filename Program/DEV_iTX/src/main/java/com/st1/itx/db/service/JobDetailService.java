@@ -68,6 +68,31 @@ public interface JobDetailService {
   public JobDetail execDateFirst(int execDate_0, TitaVo... titaVo);
 
   /**
+   * ExecDate &gt;= ,AND ExecDate &lt;= 
+   *
+   * @param execDate_0 execDate_0
+   * @param execDate_1 execDate_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JobDetail JobDetail of List
+   */
+  public Slice<JobDetail> findExecDateIn(int execDate_0, int execDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * ExecDate &gt;= ,AND ExecDate &lt;= ,AND Status =
+   *
+   * @param execDate_0 execDate_0
+   * @param execDate_1 execDate_1
+   * @param status_2 status_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JobDetail JobDetail of List
+   */
+  public Slice<JobDetail> findStatusExecDateIn(int execDate_0, int execDate_1, String status_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By JobDetail
    * 
    * @param jobDetailId key

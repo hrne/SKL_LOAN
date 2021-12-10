@@ -31,6 +31,12 @@ public interface JobDetailRepositoryMon extends JpaRepository<JobDetail, JobDeta
   // ExecDate >=
   public Optional<JobDetail> findTopByExecDateGreaterThanEqualOrderByExecDateDesc(int execDate_0);
 
+  // ExecDate >= ,AND ExecDate <= 
+  public Slice<JobDetail> findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualOrderByStepStartTimeDesc(int execDate_0, int execDate_1, Pageable pageable);
+
+  // ExecDate >= ,AND ExecDate <= ,AND Status =
+  public Slice<JobDetail> findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(int execDate_0, int execDate_1, String status_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -26,8 +26,11 @@ BEGIN
     -- 寫入資料
     INSERT INTO "CustMain"
     SELECT SYS_GUID()                     AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-          ,REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')
-                                          AS "CustId"              -- 身份證字號/統一編號 VARCHAR2 10 
+          ,CASE
+             WHEN CUSP."LMSACN" = 601776 -- 2021-12-10 智偉修改 from Linda
+             THEN 'A111111131'
+           ELSE REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')
+           END                            AS "CustId"              -- 身份證字號/統一編號 VARCHAR2 10 
           ,CUSP."LMSACN"                  AS "CustNo"              -- 戶號 DECIMAL 7 
           ,LPAD(CUSP."CUSBRH",4,'0')      AS "BranchNo"            -- 單位別 VARCHAR2 4 
           ,REPLACE(REPLACE(TRIM(CUSP."CUSNA1"),'	','')||REPLACE(TRIM(CUSP."CUSNA5"),'	',''),'○','o')

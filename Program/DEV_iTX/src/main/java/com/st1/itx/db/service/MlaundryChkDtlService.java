@@ -48,6 +48,19 @@ public interface MlaundryChkDtlService {
   public Slice<MlaundryChkDtl> findEntryDateRange(int entryDate_0, int entryDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * EntryDate &gt;= ,AND EntryDate &lt;= ,AND Factor =
+   *
+   * @param entryDate_0 entryDate_0
+   * @param entryDate_1 entryDate_1
+   * @param factor_2 factor_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice MlaundryChkDtl MlaundryChkDtl of List
+   */
+  public Slice<MlaundryChkDtl> findFactor(int entryDate_0, int entryDate_1, int factor_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By MlaundryChkDtl
    * 
    * @param mlaundryChkDtlId key

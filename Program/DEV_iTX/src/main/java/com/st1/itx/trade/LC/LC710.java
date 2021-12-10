@@ -25,7 +25,6 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class LC710 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC710.class);
 
 	@Autowired
 	JobDetailService jobDetailService;
@@ -34,6 +33,10 @@ public class LC710 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC710 ");
 		this.totaVo.init(titaVo);
+
+		int choice = Integer.parseInt(titaVo.getParam("Choice"));
+		int inputStartDate = Integer.parseInt(titaVo.getParam("InputStartDate")) + 19110000;
+		int inputEndDate = Integer.parseInt(titaVo.getParam("InputEndDate")) + 19110000;
 
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -45,16 +48,24 @@ public class LC710 extends TradeBuffer {
 
 		Slice<JobDetail> slJobDetail;
 
-		slJobDetail = jobDetailService.findAll(this.index, this.limit, titaVo);
+		if (choice == 0) {
+			// 查全部
+			slJobDetail = jobDetailService.findExecDateIn(inputStartDate, inputEndDate, this.index, this.limit, titaVo);
+		} else {
+			// 只查成功或失敗
+			slJobDetail = jobDetailService.findStatusExecDateIn(inputStartDate, inputEndDate, choice == 1 ? "S" : "F",
+					this.index, this.limit, titaVo);
+		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slJobDetail != null && slJobDetail.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			/* 手動折返 */
-			this.totaVo.setMsgEndToEnter();
+			this.totaVo.setMsgEndToAuto();
 		}
 
-		ArrayList<JobDetail> lJobDetail = slJobDetail == null ? null : new ArrayList<JobDetail>(slJobDetail.getContent());
+		ArrayList<JobDetail> lJobDetail = slJobDetail == null ? null
+				: new ArrayList<JobDetail>(slJobDetail.getContent());
 
 		if (lJobDetail != null && !lJobDetail.isEmpty()) {
 

@@ -139,6 +139,34 @@ em = null;
   }
 
   @Override
+  public Slice<MlaundryChkDtl> findFactor(int entryDate_0, int entryDate_1, int factor_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<MlaundryChkDtl> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findFactor " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " factor_2 : " +  factor_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = mlaundryChkDtlReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsOrderByEntryDateAscCustNoAscDtlSeqAsc(entryDate_0, entryDate_1, factor_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = mlaundryChkDtlReposMon.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsOrderByEntryDateAscCustNoAscDtlSeqAsc(entryDate_0, entryDate_1, factor_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = mlaundryChkDtlReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsOrderByEntryDateAscCustNoAscDtlSeqAsc(entryDate_0, entryDate_1, factor_2, pageable);
+    else 
+      slice = mlaundryChkDtlRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsOrderByEntryDateAscCustNoAscDtlSeqAsc(entryDate_0, entryDate_1, factor_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public MlaundryChkDtl holdById(MlaundryChkDtlId mlaundryChkDtlId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

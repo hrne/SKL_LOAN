@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
@@ -33,6 +33,7 @@ import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.FileCom;
@@ -90,7 +91,7 @@ public class L4603 extends TradeBuffer {
 
 	@Autowired
 	public CustNoticeCom custNoticeCom;
-
+	
 	@Autowired
 	public MakeFile makeFile;
 
@@ -105,6 +106,8 @@ public class L4603 extends TradeBuffer {
 	private String noticeAddress = "";
 	private int iEntryDate = 0;
 	private String sEntryDate = "";
+	
+	private Boolean mailfg = false;
 	private ArrayList<String> dataListLatter = new ArrayList<String>();
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 
@@ -245,7 +248,7 @@ public class L4603 extends TradeBuffer {
 					acReceivableCom.setTxBuffer(this.getTxBuffer());
 					acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳-刪除
 				}
-			}
+			} // for
 
 			if (dataListLatter.size() > 0)
 
@@ -264,6 +267,10 @@ public class L4603 extends TradeBuffer {
 
 				totaVo.put("PdfSnoM", "" + sno);
 
+			}
+			
+			if(mailfg) {
+			  MySpring.newTask("L4603p", this.txBuffer, titaVo); // 寄MAIL 跑批
 			}
 		}
 
@@ -376,7 +383,7 @@ public class L4603 extends TradeBuffer {
 		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\""
 				+ sEntryDate + "\"";
 		dataList.add(dataLines);
-
+		
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());
 		tTxToDoDetail.setFacmNo(tInsuRenew.getFacmNo());
@@ -387,6 +394,8 @@ public class L4603 extends TradeBuffer {
 		tTxToDoDetail.setProcessNote(dataLines);
 
 		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo);
+		
+		mailfg = true;
 	}
 
 //	火險應繳日跟著期款->額度內>0、最小之應繳日

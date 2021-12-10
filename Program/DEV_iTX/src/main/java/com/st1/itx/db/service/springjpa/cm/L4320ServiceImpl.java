@@ -94,7 +94,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAdjustDateC = parse.stringToInteger(titaVo.getParam("AdjustDateC")); // 可為 0
 
 		// 團體戶 ....... 9999999999 + => 團體戶統編 , 5.按商品別調整
-		String iGroupId = titaVo.getParam("GroupId"); // 可為空白
+		String iGroupUKey = titaVo.getParam("GroupUKey"); // 可為空白
 
 		// 超過 2 年調為 99.9999 % ??????
 
@@ -140,8 +140,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(cc.\"IntRateIncr\", 0)                   as F25 "; // 地區別利率加減碼
 		sql += "   ,b.\"NextPayIntDate\"                         as F26 "; // 下次繳息日,下次應繳日
 		sql += "   ,b.\"DrawdownDate\"                           as F27 "; // 撥款日期
-		sql += "   ,NVL(r2.\"FitRate\", 0)                       as F29 "; // 機動非指數目前利率
-		sql += "   ,NVL(r2.\"EffectDate\", 0)                    as F30 "; // 機動非指數目前生效日
+		sql += "   ,NVL(r2.\"FitRate\", 0)                       as F28 "; // 機動非指數目前利率
+		sql += "   ,NVL(r2.\"EffectDate\", 0)                    as F29 "; // 機動非指數目前生效日
 		sql += " from \"LoanBorMain\" b                                 ";
 		sql += " left join(                                             ";
 		sql += "           select                                       ";
@@ -180,9 +180,6 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       and  r2.seq = 1                          ";
 		sql += " left join \"FacProd\"  p on  p.\"ProdNo\" = r.\"ProdNo\"      ";
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = b.\"CustNo\"      ";
-		if (iTxKind == 4) {
-			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
-		}
 		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = b.\"CustNo\"      ";
 		sql += "                       and  f.\"FacmNo\" = b.\"FacmNo\"        ";
 		sql += " left join \"ClFac\"   cf on cf.\"CustNo\" = b.\"CustNo\"      ";
@@ -192,48 +189,49 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       and cm.\"ClCode2\" = cf.\"ClCode2\"     ";
 		sql += "                       and cm.\"ClNo\" = cf.\"ClNo\"           ";
 		sql += " left join \"CdCity\" cc  on cc.\"CityCode\" = cm.\"CityCode\" ";
+		if (iTxKind == 4) {
+			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
+		}
+		if (iTxKind == 5 && !iGroupUKey.isEmpty()) {
+			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
+		}
 		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and b.\"MaturityDate\" > b.\"NextAdjRateDate\"              ";
 		sql += "   and b.\"MaturityDate\" > " + iEffectDateE;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
-		sql += "   and case " + iTxKind;
 //  1.定期機動調整 ==>  1.撥款主檔的利率區分=3.定期機動，下次利率調整日為調整月份
 //	                    2.借戶利率檔的的利率區分=3.定期機動，指標利率種類=該指標利率種類抓，生效日期 <= 調整月份 
-		sql += "      when 1  then case when b.\"RateCode\" = '3' " + "    and  b.\"NextAdjRateDate\" >= "
-				+ iEffectDateS;
-		sql += "       and  b.\"NextAdjRateDate\" <= " + iEffectDateE;
-		sql += "                         and r.\"BaseRateCode\" = " + iBaseRateCode;
-		sql += "                         and r.\"RateCode\" = '3'                  ";
-		sql += "                        then 1                                     ";
-		sql += "                        else 0                                     ";
-		sql += "                   end                                             ";
+		if (iTxKind == 1) {
+			sql += "       and b.\"RateCode\" = '3' " + "    and  b.\"NextAdjRateDate\" >= " + iEffectDateS;
+			sql += "       and b.\"NextAdjRateDate\" <= " + iEffectDateE;
+			sql += "       and r.\"BaseRateCode\" = " + iBaseRateCode;
+			sql += "       and r.\"RateCode\" = '3'                  ";
+		}
 // 2.指數型利率調整 ==> 1.撥款主檔的利率區分=1.機動
 //                      2.借戶利率檔的利率區分=1.機動,指標利率種類=該指標利率種類,生效日期 <= 調整日期 
-		sql += "      when 2  then case when b.\"RateCode\" = '1'                  ";
-		sql += "                         and r.\"BaseRateCode\" = " + iBaseRateCode + " and  r.\"RateCode\" = '1'  ";
-		sql += "                        then 1                                     ";
-		sql += "                        else 0                                     ";
-		sql += "                   end                                             ";
+		if (iTxKind == 2) {
+			sql += "       and b.\"RateCode\" = '1'                  ";
+			sql += "       and r.\"BaseRateCode\" = " + iBaseRateCode;
+			sql += "       and r.\"RateCode\" = '1'  ";
+		}
 // 3.機動利率調整 ==> 1.撥款主檔的利率區分=1.機動
 //                    2.借戶利率檔的利率區分=1.機動,指標利率種類=99，生效日期 = 調整月份，商品<>員工利率
-		sql += "      when 3  then case when b.\"RateCode\" = '1' and  p.\"EmpFlag\" <> 'Y' ";
-		sql += "                         and r.\"RateCode\" = '1' and r.\"BaseRateCode\" = 99 and  r.\"EffectDate\" >= "
-				+ iEffectDateS;
-		sql += "	 	                 and r.\"EffectDate\" <= " + iEffectDateE;
-		sql += "                        then 1                                     ";
-		sql += "                        else 0                                     ";
-		sql += "                   end                                             ";
-// 4.員工利率調整 ==>1.撥款主檔的利率區分=1.機動 
+		if (iTxKind == 3) {
+			sql += "           and b.\"RateCode\" = '1' ";
+			sql += "           and r.\"RateCode\" = '1' ";
+			sql += "           and r.\"BaseRateCode\" = 99 ";
+			sql += "           and r.\"EffectDate\" >= " + iEffectDateS;
+			sql += "	 	   and r.\"EffectDate\" <= " + iEffectDateE;
+			sql += "           and p.\"EmpFlag\" <> 'Y' ";
+		}
+// 4.員工利率調整 ==>1.撥款主檔的利率區分=1.機動
 //				     2.借戶利率檔的利率區分=1.機動,生效日期 <= 調整日期，商品=員工利率
-		sql += "      when 4 then case when b.\"RateCode\" = '1' and p.\"EmpFlag\" = 'Y' ";
-		sql += "                        then 1                                     ";
-		sql += "                        else 0                                     ";
-		sql += "                   end                                             ";
+		if (iTxKind == 4) {
+			sql += "           and b.\"RateCode\" = '1' ";
+			sql += "           and p.\"EmpFlag\" = 'Y' ";
+		}
 // 5.按商品別調整 [iAdjDateS=iAdjDateE=利率生效日]    
-		sql += "      when 5 then  1                                               ";
-		sql += "      else 0                                                       ";
-		sql += "      end = 1                                                      ";
 
 		// 商品代碼
 		String prodNoString = getProdNoString(titaVo);
@@ -273,14 +271,19 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (parse.stringToInteger(iCityCodeE) > 0) {
 			sql += "   and NVL(cm.\"CityCode\", -1)  between " + iCityCodeS + " and " + iCityCodeE;
 		}
-		
+
 		// 並且＞＝ ..... 9999999999 9 ( 1. 起未調整過利率者 2. 起已調整過利率者 ) 4-員工利率調整 5.按商品別調整 int
-		if (iAdjustDate > 0 && iAdjustDateC == 1 ) {
-			sql += "   and r.\"EffectDate\"  < " + iAdjustDate;			
-		}			
-		if (iAdjustDate > 0 && iAdjustDateC == 2 ) {
-			sql += "   and r.\"EffectDate\"  >= " + iAdjustDate;			
-		}		
+		if (iAdjustDate > 0 && iAdjustDateC == 1) {
+			sql += "   and r.\"EffectDate\"  < " + iAdjustDate;
+		}
+		if (iAdjustDate > 0 && iAdjustDateC == 2) {
+			sql += "   and r.\"EffectDate\"  >= " + iAdjustDate;
+		}
+		
+		// 團體戶 ....... 9999999999 + => 團體戶統編 , 5.按商品別調整
+		if (iTxKind == 5 && !iGroupUKey.isEmpty()) {
+			sql += "   and a.\"GroupUKey\" = '" + iGroupUKey + "' ";
+		}
 		this.info("sql=" + sql);
 
 		Query query;

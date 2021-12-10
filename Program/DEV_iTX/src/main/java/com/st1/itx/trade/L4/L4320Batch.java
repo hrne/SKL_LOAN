@@ -86,6 +86,7 @@ public class L4320Batch extends TradeBuffer {
 	private int iCustType = 0;
 
 	private String checkMsg = "";
+	private String warnMsg = "";
 	private String sendMsg = "";
 	private int wkAdjDate = 0;
 	private int wkLastMonthDateS = 0;
@@ -232,6 +233,7 @@ public class L4320Batch extends TradeBuffer {
 				this.info("fnAllList=" + s);
 				/* 判斷新增或更新整批利率調整檔，已確認跳過 */
 				checkMsg = "";
+				warnMsg = "";
 				// F0 戶號
 				// F1 額度
 				// F2 撥款
@@ -373,13 +375,13 @@ public class L4320Batch extends TradeBuffer {
 		int effDateCurt = 0;
 
 		// 機動非指數=>抓出的為預調利率(本次生效日)，需抓生效月份前的資料為目前利率與目前生效日
-		// F29 // 機動非指數目前利率
-		// F30 // 機動非指數目前生效日
+		// F28 // 機動非指數目前利率
+		// F29 // 機動非指數目前生效日
 		if (iTxKind == 3) {
 			effDateCurt = effectDatePresent;
-			if (parse.stringToInteger(s.get("F30")) > 0) {
-				fitRate = parse.stringToBigDecimal(s.get("F29"));
-				effectDatePresent = StaticTool.bcToRoc(parse.stringToInteger(s.get("F30")));
+			if (parse.stringToInteger(s.get("F29")) > 0) {
+				fitRate = parse.stringToBigDecimal(s.get("F28"));
+				effectDatePresent = StaticTool.bcToRoc(parse.stringToInteger(s.get("F29")));
 				effDateCurt = StaticTool.bcToRoc(parse.stringToInteger(s.get("F19")));
 			}
 		}
@@ -461,7 +463,7 @@ public class L4320Batch extends TradeBuffer {
 			// 逾一期 => 下次繳息日,下次應繳日 < 上次月初日
 			if (b.getOvduTerm() >= 1) {
 				adjCode = 3;
-				checkMsg = "逾 " + dateUtil.getMons() + " 期";
+				warnMsg += "逾 " + dateUtil.getMons() + " 期";
 			}
 
 			break;
@@ -550,19 +552,22 @@ public class L4320Batch extends TradeBuffer {
 		/* 檢核有誤 */
 		int errorFlag = 0;
 
-		tmpBorm facm = new tmpBorm(custNo, facmNo, 0);
-		if (errorFlag == 0 && facRateFlag.get(facm) == 1) {
+		if ("3".equals(rateCode) && rateAdjFreq == 0) {
 			errorFlag = 1;
-			checkMsg = "額度下撥款的目前利率不同";
+			checkMsg += "定期機動但無利率調整週期";
+		}
 
+		// 若利率變動且大於利率生效日
+		if (adjCode == 1 ) {
+			if (rateCurt.compareTo(fitRate) != 0 && prevIntDate > effDateCurt) {
+				errorFlag = 1;
+				checkMsg += "上次繳息日大於利率生效日";
+			}
 		}
-		if (errorFlag == 0 && prevIntDate > effDateCurt) {
-			errorFlag = 1;
-			checkMsg = "上次繳息日大於利率生效日";
-		}
-		if (errorFlag == 0 && "3".equals(rateCode) && rateAdjFreq == 0) {
-			errorFlag = 1;
-			checkMsg = "定期機動但無利率調整週期";
+
+		tmpBorm facm = new tmpBorm(custNo, facmNo, 0);
+		if (facRateFlag.get(facm) == 1) {
+			warnMsg += "額度下撥款的目前利率不同";       // warning only
 		}
 		// 預調週期
 		b.setTxRateAdjFreq(iNextAdjPeriod);
@@ -574,7 +579,12 @@ public class L4320Batch extends TradeBuffer {
 		TempVo tTempVo = new TempVo();
 		// 檢核訊息
 		tTempVo.putParam("CheckMsg", checkMsg);
-		// 預調利率
+		
+		// 目前利率 <> 借戶利率檔適用利率(預調利率)
+		if (fitRate.compareTo(parse.stringToBigDecimal(s.get("F14"))) !=0) {			
+			tTempVo.putParam("FitRate",s.get("F14"));
+		}
+
 		b.setJsonFields(tTempVo.getJsonString());
 
 		/* 設定調整後利率 */
@@ -594,6 +604,7 @@ public class L4320Batch extends TradeBuffer {
 
 	}
 
+	
 //	訂正(刪除)
 	private void deleteBatxRate(TitaVo titaVo) throws LogicException {
 		// 戶別 CustType 1:個金;2:企金（含企金自然人）=> 客戶檔 0:個金1:企金2:企金自然人
