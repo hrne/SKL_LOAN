@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
@@ -87,9 +88,9 @@ public class L5R41 extends TradeBuffer {
 	// 將每筆資料放入Tota
 	// 營業單位對照檔
 	private void moveTotaYearlyHouseLoanInt(int iRimCustNo,int iRimFacmNo, YearlyHouseLoanInt mYearlyHouseLoanInt,TitaVo titaVo) throws LogicException {
-//		TempVo tTempVo = new TempVo();
+		TempVo tTempVo = new TempVo();
 		
-//		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
+		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
 	
 		CustMain tCustMain = sCustMainService.custNoFirst(iRimCustNo, iRimCustNo, titaVo);
 		if(tCustMain!=null) {
@@ -116,7 +117,7 @@ public class L5R41 extends TradeBuffer {
 		this.totaVo.putParam("L5R41MaturityDate", mYearlyHouseLoanInt.getMaturityDate());
 		this.totaVo.putParam("L5R41YearlyInt", mYearlyHouseLoanInt.getYearlyInt());
 		this.totaVo.putParam("L5R41HouseBuyDate", mYearlyHouseLoanInt.getHouseBuyDate());
-
+		this.totaVo.putParam("L5R41Location", tTempVo.get("F21"));
 
 	}
 

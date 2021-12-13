@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.*;
@@ -147,6 +148,9 @@ public class L5813Batch extends TradeBuffer {
 				int iMaturityDate = iYearlyHouseLoanInt.getMaturityDate(); // 貸款迄日
 				BigDecimal iLoanBal = iYearlyHouseLoanInt.getLoanBal();// 放款餘額
 				
+				TempVo tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(iYearlyHouseLoanInt.getJsonFields());
+				bdLocation = tTempVo.get("F21");
 
 				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 				
@@ -168,10 +172,10 @@ public class L5813Batch extends TradeBuffer {
 					int oClCode1 = tClFac.getClCode1();
 					int oClCode2 = tClFac.getClCode2();
 					int oClNo = tClFac.getClNo();
-					tClBuilding = sClBuildingService.findById(new ClBuildingId(oClCode1, oClCode2, oClNo), titaVo);
-					if(tClBuilding!=null) {
-						bdLocation = tClBuilding.getBdLocation();//	
-					}
+//					tClBuilding = sClBuildingService.findById(new ClBuildingId(oClCode1, oClCode2, oClNo), titaVo);
+//					if(tClBuilding!=null) {
+//						bdLocation = tClBuilding.getBdLocation();//	
+//					}
 					
 					//所有權人戶名、統編 先找本人
 					cClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(oClCode1,oClCode2,oClNo,iUkey), titaVo);

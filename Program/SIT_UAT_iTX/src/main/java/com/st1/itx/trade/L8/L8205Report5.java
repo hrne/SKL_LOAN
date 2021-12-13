@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L8205ServiceImpl;
+import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -26,6 +28,15 @@ public class L8205Report5 extends MakeReport {
 	@Autowired
 	DateUtil dDateUtil;
 
+	/* 轉換工具 */
+	@Autowired
+	public Parse parse;
+	
+	@Autowired
+	MakeExcel makeExcel;
+	
+	private List<Map<String, String>> L8205List = null;
+	private DecimalFormat df1 = new DecimalFormat("#,##0");
 //	自訂表頭
 	@Override
 	public void printHeader() {
@@ -62,19 +73,30 @@ public class L8205Report5 extends MakeReport {
 		}
 	public boolean exec(TitaVo titaVo) throws LogicException {
 
-
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢交易登記表", "", "A4", "L");
-
-		List<Map<String, String>> L8205List = null;
-
 		try {
 			L8205List = l8205ServiceImpl.L8205Rpt5(titaVo);
 		} catch (Exception e) {
 			this.info("l8205ServiceImpl.L8205Rpt5 error = " + e.toString());
 		}
 
+		makeReport(titaVo);
+
+		makeExcel(titaVo);
+		
 		if (L8205List != null && L8205List.size() > 0) {
-			DecimalFormat df1 = new DecimalFormat("#,##0");
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	public void makeReport(TitaVo titaVo) throws LogicException{
+		
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢交易登記表", "", "A4", "L");
+		
+		if (L8205List != null && L8205List.size() > 0) {
+			
 
 			this.print(-6, 3, "　　　　預計還款 實際還款　　　　　　　　　　　　　　　　　　　　　　　 年收入");
 			this.print(-7, 3, "訪談日期　日期　　 日期 　　戶號　　　戶名　　　還款金額　　　　職業別 　(萬) 　　　還款來源　　代償銀行　　其他說明　　　　　　　　　　　　　經辦	");
@@ -168,14 +190,87 @@ public class L8205Report5 extends MakeReport {
 		long sno = this.close();
 		this.toPdf(sno);
 
-		if (L8205List != null && L8205List.size() > 0) {
-			return true;
-		} else {
-			return false;
-		}
-
 	}
-
+	
+	public void makeExcel(TitaVo titaVo) throws LogicException{
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢交易登記表", "L8205" + "_" + "疑似洗錢交易登記表");
+		printExcelHeader();
+		
+		int rowCursor = 2;
+		
+		if (L8205List != null && L8205List.size() > 0) {
+			
+			for (Map<String, String> tL8205Vo : L8205List) {
+				
+				int recorddate = Integer.parseInt(tL8205Vo.get("F0"))-19110000;
+				makeExcel.setValue(rowCursor, 1, recorddate);
+				
+				//預計還款日期
+				int repaydate = Integer.parseInt(tL8205Vo.get("F1"));
+				if(repaydate!=0) {
+					repaydate = repaydate-19110000;
+				}
+				makeExcel.setValue(rowCursor, 2, repaydate);
+				
+				//實際還款日期
+				int acrepaydate = Integer.parseInt(tL8205Vo.get("F2"));
+				if(acrepaydate==0) {
+					makeExcel.setValue(rowCursor, 3, "");
+				} else if(acrepaydate>0){
+					acrepaydate = acrepaydate-19110000;
+					makeExcel.setValue(rowCursor, 3, acrepaydate);
+				}
+			
+				
+				makeExcel.setValue(rowCursor, 4, padStart(tL8205Vo.get("F3"), 7, "0"));
+				
+				makeExcel.setValue(rowCursor, 5, tL8205Vo.get("F4"));
+				
+				BigDecimal f5 = tL8205Vo.get("F5") == "0" || tL8205Vo.get("F5") == null || tL8205Vo.get("F5").length() == 0 || tL8205Vo.get("F5").equals(" ") ? BigDecimal.ZERO
+						: new BigDecimal(tL8205Vo.get("F5"));
+				
+				makeExcel.setValue(rowCursor, 6, f5.equals(BigDecimal.ZERO) ? " " : df1.format(f5));
+				
+				makeExcel.setValue(rowCursor, 7, tL8205Vo.get("F6"));
+				
+				// 年收入
+				if(tL8205Vo.get("F7").isEmpty()) {
+					makeExcel.setValue(rowCursor, 8, "0");
+				} else {
+					makeExcel.setValue(rowCursor, 8, tL8205Vo.get("F7"));
+				}
+			
+				//還款來源
+				String sourse = tL8205Vo.get("F8")+" "+tL8205Vo.get("F12");
+				if(sourse.length()<2) {
+					sourse = "0"+sourse;
+				}
+				
+				makeExcel.setValue(rowCursor, 9, sourse);
+				
+				makeExcel.setValue(rowCursor, 10, tL8205Vo.get("F9"));
+				
+				String description = "";
+				description = tL8205Vo.get("F10").replace("$n", "");
+				makeExcel.setValue(rowCursor, 11, description);
+				
+				makeExcel.setValue(rowCursor, 12, tL8205Vo.get("F13"));
+				
+				
+				
+				
+				rowCursor++;
+			}
+			
+			
+			
+		}
+		
+		long sno = makeExcel.close();
+		makeExcel.toExcel(sno);
+		
+	}
+	
 	private String padStart(String temp, int len, String tran) {
 		if (temp.length() < len) {
 			for (int i = temp.length(); i < len; i++) {
@@ -193,35 +288,54 @@ public class L8205Report5 extends MakeReport {
 	 */
 	private void checkRow() {
 		if (this.NowRow >= 40) {
-//
+
 			newPage();
 			this.print(-6, 3, "　　　　預計還款 實際還款　　　　　　　　　　　　　　　　　　　　　　　 年收入");
 			this.print(-7, 3, "訪談日期　日期　　 日期 　　戶號　　　戶名　　　還款金額　　　　職業別 　(萬) 　還款來源　　代償銀行　　其他說明　　　　　　　　　　　　　　　經辦	");
 			this.print(-9, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		}
-//
+
 	}
 
-//	private String showDate(String date, int iType) {
-////		this.info("MakeReport.toPdf showRocDate1 = " + date);
-//		if (date == null || date.equals("") || date.equals("0") || date.equals(" ")) {
-//			return " ";
-//		}
-//		int rocdate = Integer.valueOf(date);
-//		if (rocdate > 19110000) {
-//			rocdate -= 19110000;
-//		}
-//		String rocdatex = String.valueOf(rocdate);
-////		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
-//
-//		if (rocdatex.length() == 7) {
-//			return rocdatex.substring(0, 3) + "/" + rocdatex.substring(3, 5) + "/" + rocdatex.substring(5, 7);
-//		} else {
-//			return rocdatex.substring(0, 2) + "/" + rocdatex.substring(2, 4) + "/" + rocdatex.substring(4, 6);
-//
-//		}
-//
-//	}
+	private void printExcelHeader() throws LogicException {
+		makeExcel.setValue(1, 1, "訪談日期");
+		makeExcel.setWidth(1, 14);
+		
+		makeExcel.setValue(1, 2, "預計還款日期");
+		makeExcel.setWidth(2, 18);
+		
+		makeExcel.setValue(1, 3, "實際還款日期");
+		makeExcel.setWidth(3, 18);
+		
+		
+		makeExcel.setValue(1, 4, "戶號");
+		makeExcel.setWidth(4, 16);
+		
+		makeExcel.setValue(1, 5, "戶名");
+		makeExcel.setWidth(5, 20);
+		
+		makeExcel.setValue(1, 6, "還款金額");
+		makeExcel.setWidth(6, 20);
+		
+		makeExcel.setValue(1, 7, "職業別");
+		
+		makeExcel.setValue(1, 8, "年收入(萬)");
+		makeExcel.setWidth(8, 16);
+		
+		makeExcel.setValue(1, 9, "還款來源");
+		makeExcel.setWidth(9, 18);
+		
+		makeExcel.setValue(1, 10, "代償銀行");
+		makeExcel.setWidth(10, 20);
+		
+		makeExcel.setValue(1, 11, "其他說明");
+		makeExcel.setWidth(11, 40);
+		
+		makeExcel.setValue(1, 12, "經辦");
+		makeExcel.setWidth(12, 20);
+		
+		
+	}
 
 }

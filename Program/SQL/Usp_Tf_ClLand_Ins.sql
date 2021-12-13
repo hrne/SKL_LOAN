@@ -170,22 +170,22 @@ BEGIN
                       ,AREA."AreaItem"
                 FROM "CdCity" CITY
                 LEFT JOIN "CdArea" AREA ON AREA."CityCode" = CITY."CityCode"
-              ) C1 ON NVL(S2."LGTCTY",' ') != ' '
-                  AND C1."CityItem" = CASE
-                                        WHEN S2."LGTCTY" = '　南投' THEN '南投縣'
-                                        WHEN S2."LGTCTY" = '　台中' THEN '台中市'
-                                        WHEN S2."LGTCTY" = '　台北' THEN '台北市'
-                                        WHEN S2."LGTCTY" = '　基隆' THEN '基隆市'
-                                        WHEN S2."LGTCTY" = '　彰化' THEN '彰化縣'
-                                        WHEN S2."LGTCTY" = '　花蓮' THEN '花蓮縣'
-                                        WHEN S2."LGTCTY" = '　雲林' THEN '雲林縣'
-                                        WHEN S2."LGTCTY" = '　高雄' THEN '高雄市'
-                                        WHEN S2."LGTCTY" = '台中縣' THEN '台中市'
-                                        WHEN S2."LGTCTY" = '台北縣' THEN '新北市'
-                                        WHEN S2."LGTCTY" = '台南縣' THEN '台南市'
-                                        WHEN S2."LGTCTY" = '嘉義嘉' THEN '嘉義市'
-                                        WHEN S2."LGTCTY" = '高雄縣' THEN '高雄市'
-                                      ELSE S2."LGTCTY" END
+              ) C1 ON C1."CityItem" LIKE CASE
+                                           WHEN S2."LGTCTY" = '　南投' THEN '南投縣'
+                                           WHEN S2."LGTCTY" = '　台中' THEN '台中市'
+                                           WHEN S2."LGTCTY" = '　台北' THEN '台北市'
+                                           WHEN S2."LGTCTY" = '　基隆' THEN '基隆市'
+                                           WHEN S2."LGTCTY" = '　彰化' THEN '彰化縣'
+                                           WHEN S2."LGTCTY" = '　花蓮' THEN '花蓮縣'
+                                           WHEN S2."LGTCTY" = '　雲林' THEN '雲林縣'
+                                           WHEN S2."LGTCTY" = '　高雄' THEN '高雄市'
+                                           WHEN S2."LGTCTY" = '台中縣' THEN '台中市'
+                                           WHEN S2."LGTCTY" = '台北縣' THEN '新北市'
+                                           WHEN S2."LGTCTY" = '台南縣' THEN '台南市'
+                                           WHEN S2."LGTCTY" = '嘉義嘉' THEN '嘉義市'
+                                           WHEN S2."LGTCTY" = '高雄縣' THEN '高雄市'
+                                         ELSE S2."LGTCTY" END || '%'
+                  AND NVL(S2."LGTCTY",' ') != ' '
                   AND CASE
                         WHEN NVL(S2."LGTTWN",' ') != ' '
                              AND C1."AreaItem" LIKE S2."LGTTWN" || '%'
@@ -383,11 +383,17 @@ BEGIN
 
     -- 把地區別更新回ClMain
     MERGE INTO "ClMain" T1
-    USING (SELECT DISTINCT
-                  S1."ClCode1"
+    USING (SELECT S1."ClCode1"
                  ,S1."ClCode2"
                  ,S1."ClNo"
                  ,S1."CityCode"
+                 ,ROW_NUMBER()
+                  OVER (
+                    PARTITION BY S1."ClCode1"
+                               , S1."ClCode2"
+                               , S1."ClNo"
+                    ORDER BY S1."LandSeq"
+                  ) AS "Seq" 
            FROM "ClLand" S1
            LEFT JOIN "ClMain" CM ON CM."ClCode1" = S1."ClCode1"
                                 AND CM."ClCode2" = S1."ClCode2"
@@ -398,6 +404,7 @@ BEGIN
     ON (    SC1."ClCode1" = T1."ClCode1"
         AND SC1."ClCode2" = T1."ClCode2"
         AND SC1."ClNo"    = T1."ClNo"
+        AND SC1."Seq" = 1 -- 多筆時只取一筆
        )
     WHEN MATCHED THEN UPDATE SET
     T1."CityCode" = SC1."CityCode"

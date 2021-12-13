@@ -11,7 +11,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,244)ASGN(INQLEN$)
+E(0,277)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -206,6 +206,11 @@ T(2,#TranNo+ +#TranItem)
 #TlrItem=X,20,S
 #SupItem=X,20,S
 
+#FlowMode=A,1,S
+
+#FlowModeX=x,6,S
+C(2,#FlowMode,S,T(3,待放行),T(3,待審核),T(3,待提交),S)
+
 #TypeX=X,8,S
 C(2,#FlowStep,T(3,登錄),T(3,登錄),T(3,放行),T(3,審核),T(3,審核放行))
 
@@ -274,6 +279,7 @@ TXFORM=LC011
 #TlrItem
 #SupItem
 #OOOrgEntdy
+#FlowMode
 ^
 <include src="ROM.icf::L6R17.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
@@ -295,6 +301,10 @@ TXFORM=LC011
 
 #BTN2=分錄
 {width:40,search:false,formatter:'cust:bind-button:分錄',canExport:false,align:'center'}
+
+
+#FlowModeX=待處理
+{width:60,align:'center'}
 
 #CalDate=交易日期
 {width:80,align:'center'}

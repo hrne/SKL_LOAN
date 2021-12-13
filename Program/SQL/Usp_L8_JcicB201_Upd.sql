@@ -1,32 +1,19 @@
+
+CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB201_Upd"
+(
 -- 程式功能：維護 JcicB201 每月聯徵授信餘額月報資料檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L8_JcicB201_Upd"(20210531,'System');
 --
 
--- 產生 JcicB201 的 保證人/所有權人
-DROP TABLE "Work_B201_Guarantor" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_B201_Guarantor"
-    (  "DataYM"               decimal(6, 0) default 0 not null
-     , "ApplNo"               decimal(7, 0) default 0 not null  -- 核准號碼
-     , "CustId"               varchar2(10)                      -- 保證人身份統一編號
-     , "ROW_NUM"              decimal(2, 0) default 0 not null  -- 序號（同一核准號碼編列流水號）
-     , "ApplNoCount"          decimal(2, 0) default 0 not null  -- 筆數（同一核准號碼）
-     , "Source"               decimal(2, 0) default 0 not null  -- 資料來源(1=保證人檔 2=所有權人檔)
-     , "GuaRelCode"           varchar2(2)                       -- 保證人關係代碼
-     , "GuaRelJcic"           varchar2(2)                       -- 保證人關係ＪＣＩＣ代碼
-     , "GuaTypeCode"          varchar2(2)                       -- 保證類別代碼
-     , "GuaTypeJcic"          varchar2(1)                       -- 保證類別ＪＣＩＣ代碼
-    )
-    ON COMMIT DELETE ROWS;
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB201_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
 )
+AUTHID CURRENT_USER
 AS
 BEGIN
+	"Usp_L8_JcicB201_Upd_Prear"();
   DECLARE
     INS_CNT        INT;         -- 新增筆數
     UPD_CNT        INT;         -- 更新筆數

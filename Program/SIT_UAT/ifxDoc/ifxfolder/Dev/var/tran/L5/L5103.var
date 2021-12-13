@@ -529,14 +529,18 @@ L5103ConfirmGroupNo<-OGroupNo})
 
 ! 歸還人
 #ReturnEmpNo=X,6,I
+IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,$,s)
-C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
+!C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
 !V(P,請點選[瀏覽]取得員工編號)
 @V(7)
 
 #CheckC=A,1,S
-C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
+!C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 T(F,@ReturnEmpNo,0)
+IF(#InitApplCode == 1,$,s)
+C(3,#ApplCode,2,s,$)
+T(F,@ReturnEmpNo,1)
 
 
 #SendL2r08B=X,1,S

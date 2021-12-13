@@ -146,7 +146,7 @@ C(3,#BackACnt,0,E(0,@L514APRT,0),E(0,@L514APRT,1))
 E(0,1)ASGN(LOOP$)
 #ReportACustNo=A,7,O
 #ReportACustNoX=X,7,O
-C(3,#ReportACustNo,0,T(2,),T(2,#ReportACustNo))
+C(3,#ReportACustNo,0,T(2,無資料),T(2,#ReportACustNo))
 #ReportAFacmNo=A,3,O
 #ReportAFacmNoX=X,3,O
 C(3,#ReportAFacmNo,0,T(2,),T(2,#ReportAFacmNo))
@@ -193,7 +193,7 @@ C(3,#BackBCnt,0,E(0,@L514BPRT,0),E(0,@L514BPRT,1))
 E(0,1)ASGN(LOOP$)
 #ReportBCustNo=A,7,O
 #ReportBCustNoX=X,7,O
-C(3,#ReportBCustNo,0,T(2,),T(2,#ReportBCustNo))
+C(3,#ReportBCustNo,0,T(2,無資料),T(2,#ReportBCustNo))
 #ReportBFacmNo=A,3,O
 #ReportBFacmNoX=X,3,O
 C(3,#ReportBFacmNo,0,T(2,),T(2,#ReportBFacmNo))

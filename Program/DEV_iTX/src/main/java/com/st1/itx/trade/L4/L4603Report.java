@@ -89,6 +89,7 @@ public class L4603Report extends MakeReport {
 		
 		checkC(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(), titaVo);
 		
+		this.setPassword(tCustMain.getCustId());
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4603", "火險及地震險保費_繳款通知單", "火險及地震險保費_繳款通知單", "A4", "P");
 		
 		this.print(1, 38,"火險及地震險保費 繳款通知單","C");

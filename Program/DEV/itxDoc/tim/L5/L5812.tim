@@ -59,4 +59,5 @@ HouseBuyDate=9,7
 CustId=X,10
 CustName=X,20
 LineAmt=9,14
+Location=X,100
 END=X,1

@@ -112,11 +112,6 @@ public class L5812 extends TradeBuffer {
 		mYearlyHouseLoanIntId.setUsageCode(mUsageCode);
 		mYearlyHouseLoanInt.setYearlyHouseLoanIntId(mYearlyHouseLoanIntId);
 
-//		mYearlyHouseLoanInt.setYearMonth(this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100);// 資料年月
-//		mYearlyHouseLoanInt.setCustNo(this.parse.stringToInteger(titaVo.getParam("CustNo")));// 戶號
-//		mYearlyHouseLoanInt.setFacmNo(this.parse.stringToInteger(titaVo.getParam("FacmNo")));// 額度
-//		mYearlyHouseLoanInt.setUsageCode(titaVo.getParam("UsageCode"));// 資金用途別
-		
 		mYearlyHouseLoanInt.setAcctCode(titaVo.getParam("AcctCode"));// 業務科目代號
 //		int RepayCode = Integer.parseInt(titaVo.getParam("RepayCode"));
 //		String iRepayCode = String.valueOf(RepayCode);
@@ -132,13 +127,9 @@ public class L5812 extends TradeBuffer {
 		tTempVo.putParam("F0", titaVo.getParam("CustName"));   //戶名
 		tTempVo.putParam("F1", titaVo.getParam("CustId")); //統編
 		tTempVo.putParam("F5", titaVo.getParam("LineAmt"));  //核准額度
+		tTempVo.putParam("F21", titaVo.getParam("Location"));  //核准額度
 		mYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
 		
-//		if (mFuncCode != 2) {
-//			mYearlyHouseLoanInt.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//			mYearlyHouseLoanInt.setCreateEmpNo(titaVo.getTlrNo());
-//		}
-//		mYearlyHouseLoanInt.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//		mYearlyHouseLoanInt.setLastUpdateEmpNo(titaVo.getTlrNo());
+
 	}
 }

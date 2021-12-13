@@ -103,7 +103,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "from \"MlaundryDetail\" M										\n";  
 		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n"; 
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n"; 
-		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd   \n";
+		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd   and M.\"Factor\" <> '3'\n";
 		sql += "order by M.\"EntryDate\" "; 
 																
 			
@@ -151,6 +151,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
 		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
+		sql += "and (M.\"ManagerDate\" = 0 or M.\"ManagerDate\">= M.\"EntryDate\"+4)      \n     ";
 		sql += "order by M.\"EntryDate\" "; 
 		
 
@@ -195,7 +196,8 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "from \"MlaundryDetail\" M										\n";  
 		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n"; 
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n"; 
-		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd   \n";
+		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd and M.\"Factor\" <> '3'  \n";
+		sql += "and ( M.\"ManagerDate\" = 0 or M.\"ManagerDate\">= M.\"EntryDate\"+4)      \n     ";
 		sql += "order by M.\"EntryDate\" "; 
 																
 			

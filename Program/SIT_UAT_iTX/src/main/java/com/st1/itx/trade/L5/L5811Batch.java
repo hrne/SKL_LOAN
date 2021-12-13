@@ -215,7 +215,7 @@ public class L5811Batch extends TradeBuffer {
 //			tTempVo.putParam("F9",result.get("F9"));
 //			tTempVo.putParam("F10",result.get("F10"));
 //			tTempVo.putParam("F11",result.get("F11"));
-			
+			tTempVo.putParam("F21",result.get("F21"));
 			tYearlyHouseLoanInt.setYearlyHouseLoanIntId(tYearlyHouseLoanIntId);
 			tYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
 			

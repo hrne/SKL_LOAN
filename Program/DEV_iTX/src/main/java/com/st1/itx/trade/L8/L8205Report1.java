@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L8205ServiceImpl;
+import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -25,11 +26,16 @@ public class L8205Report1 extends MakeReport {
 	public L8205ServiceImpl l8205ServiceImpl;
 
 	@Autowired
+	MakeExcel makeExcel;
+	
+	@Autowired
 	DateUtil dDateUtil;
 
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
+	
+	private List<Map<String, String>> L8205List = null;
 	
 //	自訂表頭
 	@Override
@@ -67,18 +73,6 @@ public class L8205Report1 extends MakeReport {
 			
 	public boolean exec(TitaVo titaVo) throws LogicException {
 
-		// 入帳日區間 Min
-		String stEntryDate = titaVo.getParam("DateStart");
-		stEntryDate = stEntryDate.substring(0, 3)+"/"+stEntryDate.substring(3, 5)+"/"+stEntryDate.substring(5, 7);
-
-		// 入帳日區間  Max
-		String edEntryDate = titaVo.getParam("DateEnd");
-		edEntryDate = edEntryDate.substring(0, 3)+"/"+edEntryDate.substring(3, 5)+"/"+edEntryDate.substring(5, 7);
-		
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態3合理性報表", "", "A4", "P");
-
-		List<Map<String, String>> L8205List = null;
-
 		try {
 			L8205List = l8205ServiceImpl.L8205Rpt1(titaVo);
 			
@@ -86,6 +80,30 @@ public class L8205Report1 extends MakeReport {
 			this.info("l8205ServiceImpl.L8205Rpt1 error = " + e.toString());
 		}
 
+		makeReport(titaVo);
+
+		makeExcel(titaVo);
+
+		if (L8205List != null && L8205List.size() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	public void makeReport(TitaVo titaVo) throws LogicException{
+		
+		// 入帳日區間 Min
+		String stEntryDate = titaVo.getParam("DateStart");
+		stEntryDate = stEntryDate.substring(0, 3)+"/"+stEntryDate.substring(3, 5)+"/"+stEntryDate.substring(5, 7);
+			
+		// 入帳日區間  Max
+		String edEntryDate = titaVo.getParam("DateEnd");
+		edEntryDate = edEntryDate.substring(0, 3)+"/"+edEntryDate.substring(3, 5)+"/"+edEntryDate.substring(5, 7);
+				
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態3合理性報表", "", "A4", "P");
+				
 		if (L8205List != null && L8205List.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 
@@ -156,15 +174,66 @@ public class L8205Report1 extends MakeReport {
 		this.print(-64, 50, "===== 報　表　結　束 =====", "C");
 		long sno = this.close();
 		this.toPdf(sno);
-
-		if (L8205List != null && L8205List.size() > 0) {
-			return true;
-		} else {
-			return false;
-		}
-
+		
 	}
-
+	
+	public void makeExcel(TitaVo titaVo) throws LogicException{
+		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態3合理性報表", "L8205" + "_" + "疑似洗錢樣態3合理性報表");
+		printExcelHeader();
+		
+		int rowCursor = 2;
+		
+		if (L8205List != null && L8205List.size() > 0) {
+			
+			for (Map<String, String> tL8205Vo : L8205List) {
+				
+				makeExcel.setValue(rowCursor, 1, tL8205Vo.get("F0"));
+				
+				makeExcel.setValue(rowCursor, 2, tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null || tL8205Vo.get("F1").length() == 0 || tL8205Vo.get("F1").equals(" ") ? " " : showDate(tL8205Vo.get("F1"),1));
+				
+				makeExcel.setValue(rowCursor, 3, padStart(tL8205Vo.get("F2"), 7, "0"));
+				
+				makeExcel.setValue(rowCursor, 4, tL8205Vo.get("F3"));
+				
+				BigDecimal Amt = parse.stringToBigDecimal(tL8205Vo.get("F4"));
+				makeExcel.setValue(rowCursor, 5, Amt, "#,##0");
+				
+				makeExcel.setValue(rowCursor, 6, tL8205Vo.get("F5"));
+				
+				makeExcel.setValue(rowCursor, 7, tL8205Vo.get("F6"));
+				
+				makeExcel.setValue(rowCursor, 8, tL8205Vo.get("F7"));
+				
+				makeExcel.setValue(rowCursor, 9, tL8205Vo.get("F8") == "0" || tL8205Vo.get("F8") == null || tL8205Vo.get("F8").length() == 0 || tL8205Vo.get("F8").equals(" ") ? " " : showDate(tL8205Vo.get("F8"), 1));
+				
+				//經辦說明
+				String EmpNoDesc = tL8205Vo.get("F9");
+				if(!EmpNoDesc.isEmpty()) {
+					EmpNoDesc = EmpNoDesc.replace("$n", "");
+				}
+				makeExcel.setValue(rowCursor, 10, EmpNoDesc);
+				
+				String check = tL8205Vo.get("F10");
+				if(("Y").equals(check)) {
+					check = "同意";
+				}
+				makeExcel.setValue(rowCursor, 11, check);
+				
+				
+				
+				rowCursor++;
+			}
+			
+			
+			
+		}
+		
+		long sno = makeExcel.close();
+		makeExcel.toExcel(sno);
+		
+	}
+	
 	private String padStart(String temp, int len, String tran) {
 		if (temp.length() < len) {
 			for (int i = temp.length(); i < len; i++) {
@@ -211,5 +280,39 @@ public class L8205Report1 extends MakeReport {
 		}
 
 	}
-
+	private void printExcelHeader() throws LogicException {
+		makeExcel.setValue(1, 1, "樣態");
+		
+		
+		makeExcel.setValue(1, 2, "入帳日");
+		makeExcel.setWidth(2, 14);
+		
+		makeExcel.setValue(1, 3, "戶號");
+		makeExcel.setWidth(3, 16);
+		
+		
+		makeExcel.setValue(1, 4, "戶名");
+		makeExcel.setWidth(4, 20);
+		
+		makeExcel.setValue(1, 5, "累積金額");
+		makeExcel.setWidth(5, 20);
+		
+		makeExcel.setValue(1, 6, "總筆數");
+		
+		makeExcel.setValue(1, 7, "經辦");
+		makeExcel.setWidth(7, 20);
+		
+		makeExcel.setValue(1, 8, "合理性");
+		
+		makeExcel.setValue(1, 9, "異動日期");
+		makeExcel.setWidth(9, 14);
+		
+		makeExcel.setValue(1, 10, "經辦說明");
+		makeExcel.setWidth(10, 30);
+		
+		makeExcel.setValue(1, 11, "主管覆核");
+		makeExcel.setWidth(11, 20);
+		
+		
+	}
 }
