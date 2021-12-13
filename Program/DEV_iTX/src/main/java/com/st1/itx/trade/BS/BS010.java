@@ -128,7 +128,7 @@ public class BS010 extends TradeBuffer {
 			dateUtil.setDate_2(iPayDate);
 			if (!dateUtil.isHoliDay()) {
 				count++;
-				this.info("cont=" +count);
+				this.info("cont=" + count);
 			}
 		} while (count < 2);
 
@@ -277,7 +277,7 @@ public class BS010 extends TradeBuffer {
 		slAcReceivable = acReceivableService.UseL5074(0, lAcctCode, 0, Integer.MAX_VALUE, titaVo);
 		lAcReceivableAll = slAcReceivable == null ? null : slAcReceivable.getContent();
 
-		for (AcReceivable rv : lAcReceivableAll) {
+		for (AcReceivable rv : new ArrayList<>(lAcReceivableAll)) {
 			// 同一戶號非呆帳戶或呆帳結案戶直接刪除
 			if (wkCustNo != rv.getCustNo()) {
 				wkDBFg = true;

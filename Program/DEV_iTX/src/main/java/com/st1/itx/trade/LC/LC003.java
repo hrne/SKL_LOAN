@@ -13,14 +13,19 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
-
+import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxFlow;
+import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.db.service.TxTranCodeService;
 
 @Service("LC003")
 @Scope("prototype")
@@ -40,8 +45,17 @@ public class LC003 extends TradeBuffer {
 	public TxRecordService txRecordService;
 
 	@Autowired
+	public TxTranCodeService txTranCodeService;
+
+	@Autowired
 	public TxTellerService txTellerService;
-	
+
+	@Autowired
+	public CdEmpService cdEmpService;
+
+	@Autowired
+	public CdBranchService cdBranchService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC003 ");
@@ -57,10 +71,10 @@ public class LC003 extends TradeBuffer {
 		this.info("LC003 iTranNo = " + iTranNo);
 
 		TxTeller tTxTeller = txTellerService.findById(titaVo.getTlrNo(), titaVo);
-		if(tTxTeller==null) {
+		if (tTxTeller == null) {
 			throw new LogicException(titaVo, "E0001", "主管資料");
 		}
-		
+
 		this.info("LC003 TlrNo = " + titaVo.getTlrNo() + "/" + tTxTeller.getGroupNo());
 
 		List<String> groupNoList = new ArrayList<String>();
@@ -73,10 +87,10 @@ public class LC003 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
+		this.limit = 40;
 
-
-		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index, this.limit);
+		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index,
+				this.limit);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
 		if (lTxFlow == null) {
 			throw new LogicException(titaVo, "E0001", "放行資料");
@@ -109,18 +123,31 @@ public class LC003 extends TradeBuffer {
 				occursList.putParam("CalTime", tTxRecord.getCalTime());
 				occursList.putParam("Entdy", tTxRecord.getEntdy());
 				occursList.putParam("TxNo", tTxRecord.getTxNo());
-				occursList.putParam("TranNo", tTxRecord.getTranNo());
+
+				String tran = tTxRecord.getTranNo();
+				TxTranCode txTranCode = txTranCodeService.findById(tTxRecord.getTranNo(), titaVo);
+				if (txTranCode != null) {
+					tran += " " + txTranCode.getTranItem();
+				}
+				occursList.putParam("TranNo", tran);
+				
 				occursList.putParam("MrKey", tTxRecord.getMrKey());
 				occursList.putParam("CurName", tTxRecord.getCurName());
 				occursList.putParam("TxAmt", tTxRecord.getTxAmt());
-				occursList.putParam("BrNo", tTxRecord.getBrNo());
-				
-				tTxTeller = txTellerService.findById(tTxRecord.getTlrNo(), titaVo);
-				String tTlrItem = "";
-				if(tTxTeller!=null) {
-					tTlrItem = tTxTeller.getTlrItem();
+
+				String br = tTxRecord.getBrNo();
+				CdBranch cdBranch = cdBranchService.findById(tTxRecord.getBrNo(), titaVo);
+				if (cdBranch != null) {
+					br += " " + cdBranch.getBranchShort();
 				}
-				occursList.putParam("TlrNo", tTxRecord.getTlrNo()+" "+tTlrItem);
+				occursList.putParam("BrNo", br);
+
+				String tTlrItem = tTxRecord.getTlrNo();
+				CdEmp cdEmp = cdEmpService.findById(tTxRecord.getTlrNo(), titaVo);
+				if (cdEmp != null) {
+					tTlrItem += " " + cdEmp.getFullname();
+				}
+				occursList.putParam("TlrNo", tTlrItem);
 
 				occursList.putParam("FlowType", tTxFlow.getFlowType());
 				occursList.putParam("FlowStep", tTxFlow.getFlowStep());

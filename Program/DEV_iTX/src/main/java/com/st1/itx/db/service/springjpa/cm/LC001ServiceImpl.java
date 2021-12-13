@@ -18,7 +18,7 @@ import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
+
 public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -47,7 +47,7 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",A.\"CurName\"";
 		sql += ",A.\"TxAmt\"";
 		sql += ",A.\"BrNo\"||' '||C.\"BranchShort\" BrX";
-		sql += ",A.\"TlrNo\"||' '||D.\"TlrItem\" TlrX";
+		sql += ",A.\"TlrNo\"||' '||D.\"Fullname\" TlrX";
 		sql += ",A.\"FlowType\"";
 		sql += ",A.\"FlowStep\"";
 		sql += ",E.\"FlowStep\" FlowStep2";
@@ -56,7 +56,7 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " from \"TxRecord\" A";
 		sql += " left join \"TxTranCode\" B on B.\"TranNo\"=A.\"TranNo\"";
 		sql += " left join \"CdBranch\" C on C.\"BranchNo\"=A.\"BrNo\"";
-		sql += " left join \"TxTeller\" D on D.\"TlrNo\"=A.\"TlrNo\"";
+		sql += " left join \"CdEmp\" D on D.\"EmployeeNo\"=A.\"TlrNo\"";
 		sql += " left join \"TxFlow\" E on E.\"Entdy\"=A.\"Entdy\" AND E.\"FlowNo\"=A.\"FlowNo\"";
 		sql += " where A.\"Entdy\"=:entdy";
 		sql += "   and A.\"BrNo\"=:brno";

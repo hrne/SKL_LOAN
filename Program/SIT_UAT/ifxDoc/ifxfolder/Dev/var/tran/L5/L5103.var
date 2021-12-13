@@ -212,8 +212,8 @@ IF(#ApplObj==4&&#ApplCode==2,$,s)
 INVOKEJS(SHOW,L5103,9,11,1)
 ##loop {times:25,i:1}
 C(3,#OPTA{i},0,$,T(H,@FILENMA{i},#OPTA{i},#ApplicationCodeHelp))
-C(3,#OPTB{i},0,$,T(H,@FILENMB{i},#OPTB{i},#ApplicationCodeHelp))
-C(3,#OPTC{i},0,$,T(H,@FILENMC{i},#OPTC{i},#ApplicationCodeHelp))
+C(3,#OPTB{i},0,$,T(H,@FILENMB{i},#OPTB{i},#SettingCodeHelp))
+C(3,#OPTC{i},0,$,T(H,@FILENMC{i},#OPTC{i},#GuaranteedCodeHelp))
 C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
 C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2_{i},0),INVOKEJS(SHOW,grd2_{i},1))
 C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3_{i},0),INVOKEJS(SHOW,grd3_{i},1))
@@ -354,13 +354,13 @@ C(3,#ApplCode,1,$,s)
 
 
 #LC014Mrkey=x,100,S
-T(2,#TODAY+-+#CustNo+-+#FacmNo+-+#ApplSeq)
+T(2,#CustNo+-+#FacmNo+-+#ApplSeq)
 
 #LC014Text=X,10,S
 T(H,#ApplCode,#ApplCodeHelp)
 
 #LC014Note=x,100,S
-T(2,日期:+#TODAY+/ID:+#CustNo+-+#FacmNo+-+#ApplSeq+ 檔案借閱+#LC014Text)
+T(2,#CustNo+-+#FacmNo+-+#ApplSeq+ 檔案借閱+#LC014Text)
 
 #BufLC014=X,200,S
 T(2,L5103+#CustNo+#FacmNo+000+#LC014Mrkey+#LC014Note)
@@ -370,10 +370,10 @@ C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
 T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,LC104 上傳附件)
 
-#Button2=x,100,S
-C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
-T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
-K(MODIFYBUTTON,2,LC014 上傳附件查詢)
+!#Button2=x,100,S
+!C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
+!T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+!K(MODIFYBUTTON,2,LC014 上傳附件查詢)
 
 #BUFA=X,74,S
 !T(2,#ApplEmpNo)
@@ -699,7 +699,7 @@ C(3,{i},25,C(3,#OPTB25,0,$,V(2,#OPTB1,#OPTB2,#OPTB3,#OPTB4,#OPTB5,#OPTB6,#OPTB7,
 #FILENMB{i}=X,20,L
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
-T(H,#OPTB{i},#SettingCodeHelp)
+T(H,#OPTB{i},#SettingCodeHelp#GuaranteedCodeHelp)
 
 #AMTB{i}=A,2,I
 C(3,#ApplObj,4,$,S)
@@ -772,9 +772,14 @@ C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3,{i},{i},0),INVOKEJS(SHOW,grd3,{k},{k},1))
 
 ##end
 
+#Check=X,1,S
+C(3,#ApplObj,4,$,s)
+IF(#OPTA1==0 && #OPTB1==0 && #OPTC1==0,$,s)
+V(P,申請、設定、對保資料需至少借閱一項)
 
-
-
+!參考編號
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo+-+#ApplSeq)
 
 
 </sub>

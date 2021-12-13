@@ -1,0 +1,95 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4453)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4453" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4453]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@銀扣扣款前通知"],
+[#<->#,"#FdEntryDate+入帳日期",#EntryDate],
+[#<->#,"#FdRepayBank+扣款銀行",#RepayBank,#RepayBankX],
+]
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+! 銀行下拉選單
+#BankDeductCdRimName=x,50,S
+T(3,CdCode.BankDeductCd)
+
+#BankCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#BankDeductCdRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@BankCodeHelp,#HelpDesc1)
+
+#FdEntryDate=X,2,L
+T(3,*)
+#FdRepayBank=X,2,L
+T(3,*)
+       
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+! 入帳日期
+#EntryDate=D,7,I
+C(3,#CHAIN,0,$,s)
+E(0,NBSDY$)
+@
+V(7)A(DATE,0,#EntryDate)
+
+! 扣款銀行
+#RepayBank=A,3,I
+C(3,#CHAIN,0,$,s)
+E(0,999)
+HELP(#BankCodeHelp,cols:4)
+@V(H,#BankCodeHelp)
+
+! 扣款銀行中文
+#RepayBankX=X,12,L  
+T(H,#RepayBank,#BankCodeHelp)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4453 -----------
+<sub type="FORM" name="L4453">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#EntryDate#RepayBank
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L4453
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+
+</sub>

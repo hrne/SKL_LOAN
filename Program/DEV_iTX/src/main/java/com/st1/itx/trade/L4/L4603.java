@@ -33,7 +33,6 @@ import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.FileCom;
@@ -132,8 +131,28 @@ public class L4603 extends TradeBuffer {
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
 		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+		
+		/*
+		 * *** 折返控制相關 *** 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = titaVo.getReturnIndex();
+
+		// *** 折返控制相關 ***
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = 100; // 129 * 400 = 51600
+
+		
+		
 //		條件 : 畫面輸入火險年月整月份
-		Slice<InsuRenew> slInsuRenew = insuRenewService.selectC(iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenew> slInsuRenew = insuRenewService.selectC(iInsuEndMonth, this.index, this.limit, titaVo);
+		
+		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		if (slInsuRenew != null && slInsuRenew.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
+		}
+		
 		if (slInsuRenew != null) {
 			for (InsuRenew t : slInsuRenew.getContent()) {
 //			 續保件
@@ -270,7 +289,8 @@ public class L4603 extends TradeBuffer {
 			}
 			
 			if(mailfg) {
-			  MySpring.newTask("L4603p", this.txBuffer, titaVo); // 寄MAIL 跑批
+//			  MySpring.newTask("L4603p", this.txBuffer, titaVo); // 寄MAIL 跑批
+			  
 			}
 		}
 

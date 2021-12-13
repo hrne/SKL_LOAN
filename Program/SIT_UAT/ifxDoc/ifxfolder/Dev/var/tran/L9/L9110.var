@@ -1,0 +1,278 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L9110)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+<sub type="DC" name="p1" layout="cols=1;screen.width=[140,860];printer.width=[15,200];">
+[
+["[L9110]                                 首次撥款審核資料表"],
+["#R1+@核@准@號@碼@",#APPLNO1,#Btn1],
+["#R2",#APPLNO2,#Btn2],
+["#R3",#APPLNO3,#Btn3],
+["#R4",#APPLNO4,#Btn4],
+["#R5",#APPLNO5,#Btn5],
+["#R6",#APPLNO6,#Btn6],
+["#R7",#APPLNO7,#Btn7],
+["#R8",#APPLNO8,#Btn8],
+["#R9",#APPLNO9,#Btn9],
+["#R10",#APPLNO10,#Btn10],
+["#R11",#APPLNO11,#Btn11],
+["#R12",#APPLNO12,#Btn12],
+["#R13",#APPLNO13,#Btn13],
+["#R14",#APPLNO14,#Btn14],
+["#R15",#APPLNO15,#Btn15],
+["#R16",#APPLNO16,#Btn16],
+["#R17",#APPLNO17,#Btn17],
+["#R18",#APPLNO18,#Btn18],
+["#R19",#APPLNO19,#Btn19],
+["#R20",#APPLNO20,#Btn20],
+["#R21",#APPLNO21,#Btn21],
+["#R22",#APPLNO22,#Btn22],
+["#R23",#APPLNO23,#Btn23],
+["#R24",#APPLNO24,#Btn24],
+["#R25",#APPLNO25,#Btn25],
+["#R26",#APPLNO26,#Btn26],
+["#R27",#APPLNO27,#Btn27],
+["#R28",#APPLNO28,#Btn28],
+["#R29",#APPLNO29,#Btn29],
+["#R30",#APPLNO30,#Btn30],
+["#R31",#APPLNO31,#Btn31],
+["#R32",#APPLNO32,#Btn32],
+["#R33",#APPLNO33,#Btn33],
+["#R34",#APPLNO34,#Btn34],
+["#R35",#APPLNO35,#Btn35],
+["#R36",#APPLNO36,#Btn36],
+["#R37",#APPLNO37,#Btn37],
+["#R38",#APPLNO38,#Btn38],
+["#R39",#APPLNO39,#Btn39],
+["#R40",#APPLNO40,#Btn40],
+["#R41",#APPLNO41,#Btn41],
+["#R42",#APPLNO42,#Btn42],
+["#R43",#APPLNO43,#Btn43],
+["#R44",#APPLNO44,#Btn44],
+["#R45",#APPLNO45,#Btn45],
+["#R46",#APPLNO46,#Btn46],
+["#R47",#APPLNO47,#Btn47],
+["#R48",#APPLNO48,#Btn48],
+["#R49",#APPLNO49,#Btn49],
+["#R50",#APPLNO50,#Btn50],
+
+]
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+
+! 2021-07-28 智偉增加
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+!連接L2016
+
+#R1=X,1,L
+INVOKEJS(SHOW,#R1,0)
+K(LIGHT,#R1,TXTRED,0)
+
+! 必輸欄位
+##loop{times:49,i:2}
+#R{i}=X,1,L
+##end
+
+! 永遠為必輸欄位
+#ALWAYS_HIGHLIGHT=@,1,S
+T(3,@R1,*)
+
+!隱藏2-10行
+#HIDEAPPLNO=X,1,S
+INVOKEJS(SHOW,p1,2,50,0)
+
+#APPLNO0=A,7,S
+E(0,0)
+
+! 隱藏APPLNO
+##loop{times:49,i:2}
+#HIDEIDALL{i}=X,1,S
+HIDE(#APPLNO{i},#Btn{i})
+##end
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#INIT=X,1,S
+CALL(#ALWAYS_HIGHLIGHT)
+
+#BufSerch=X,15,S
+T(2,0000001+9999999+0)
+
+
+! ---------------
+##loop{times:50,i:1,j:0,k:2}
+
+#Btn{i}=X,1,S,ui:button;value:核准號碼查詢;enable:1;tabbable:0
+
+#BindSearch{i}=X,1,S
+BIND(#Btn{i},click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BufSerch;ntxbuf5=type<-1:APPLNO{i}<-OOApplNo})
+
+![核准號碼]
+#APPLNO{i}=A,7,I
+IF({i}!=1 && #APPLNO{j}==0,S,$))
+@IF({i}==1,V(2,0),$)
+
+#CheckApplNO{i}=X,1,S
+IF({k}<=50,$,S)
+IF(#APPLNO{i}>0,SHOW(#APPLNO{k},#Btn{k}),HIDE(#APPLNO{k},#Btn{k}))
+C(3,#APPLNO{i},0,INVOKEJS(SHOW,p1,{k},50,0),INVOKEJS(SHOW,p1,2,{k},1))
+
+##end
+
+#RPTFG=A,1,S
+E(0,0)
+
+#PRINTRIM=X,200,S
+T(6B,LCR98+1+#APPLNO1)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L9110 ----------
+<sub type="FORM" name="L9110">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L9110,$,S)
+
+
+#SCRTIL=_,_,S
+T(3,[L9110] 首次撥款審核資料表)
+
+#TestTitle=X,50,S
+T(2,#SCRTIL+#APPLNO1)
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+! 匯款單FileNo
+#PdfSnoF=X,8,S
+E(2,@SnoF,#PdfSnoF)
+#SnoF=A,8,S
+
+! 匯款單FileNo
+#PdfPrtF=A,1,S
+C(3,#SnoF,0,E(0,0),E(0,1))
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#APPLNO1
+#APPLNO2
+#APPLNO3
+#APPLNO4
+#APPLNO5
+#APPLNO6
+#APPLNO7
+#APPLNO8
+#APPLNO9
+#APPLNO10
+#APPLNO11
+#APPLNO12
+#APPLNO13
+#APPLNO14
+#APPLNO15
+#APPLNO16
+#APPLNO17
+#APPLNO18
+#APPLNO19
+#APPLNO20
+#APPLNO21
+#APPLNO22
+#APPLNO23
+#APPLNO24
+#APPLNO25
+#APPLNO26
+#APPLNO27
+#APPLNO28
+#APPLNO29
+#APPLNO30
+#APPLNO31
+#APPLNO32
+#APPLNO33
+#APPLNO34
+#APPLNO35
+#APPLNO36
+#APPLNO37
+#APPLNO38
+#APPLNO39
+#APPLNO40
+#APPLNO41
+#APPLNO42
+#APPLNO43
+#APPLNO44
+#APPLNO45
+#APPLNO46
+#APPLNO47
+#APPLNO48
+#APPLNO49
+#APPLNO50
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L9110
+#PdfSnoF
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L9110" layout="cols=1;screen.width=[130,870];printer.width=[15,200];order=1">
+[
+["[L9110]                                 首次撥款審核資料表"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel" map="printNo=PRINTRIM"/>
+
+#PdfPrtF=1,PDF,,,,,,,,,,,,,PdfSnoF;1,首次撥款審核資料表
+^
+</sub>

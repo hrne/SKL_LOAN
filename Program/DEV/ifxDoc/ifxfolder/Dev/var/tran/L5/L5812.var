@@ -37,6 +37,7 @@ E(0,0)
 ["#FdMaturityDate+貸款迄日",#MaturityDate],
 ["#FdYearlyInt+年度繳息金額",#YearlyInt],
 ["#FdHouseBuyDate+房屋取得日期",#HouseBuyDate],
+[#<->#,"#FdLocation+地址",#Location],
 ]
 !---------- AP Button AREA ----------
 #FdFuncCode=X,2,L
@@ -58,6 +59,8 @@ T(3, )
 #FdCustName=X,2,L
 #FdCustId=X,2,L
 #FdLineAmt=X,2,L
+#FdLocation=X,2,L
+
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -150,8 +153,8 @@ E(0,#FuncCode)
 !FuncCode=1,2 顯示框線
 #WKTF=X,1,S
 IF (#FuncCode==2 || #FuncCode==4 ,T(F,@YearMonth,0)T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@UsageCode,0),$)
-IF (#FuncCode==2 ,T(F,@AcctCode,1)T(F,@RepayCode,1)T(F,@LoanAmt,1)T(F,@LoanBal,1)T(F,@FirstDrawdownDate,1)T(F,@MaturityDate,1)T(F,@YearlyInt,1)T(F,@HouseBuyDate,1)
-                 ,T(F,@AcctCode,0)T(F,@RepayCode,0)T(F,@LoanAmt,0)T(F,@LoanBal,0)T(F,@FirstDrawdownDate,0)T(F,@MaturityDate,0)T(F,@YearlyInt,0)T(F,@HouseBuyDate,0))                                 
+IF (#FuncCode==2 ,T(F,@AcctCode,1)T(F,@RepayCode,1)T(F,@LoanAmt,1)T(F,@LoanBal,1)T(F,@FirstDrawdownDate,1)T(F,@MaturityDate,1)T(F,@YearlyInt,1)T(F,@HouseBuyDate,1)T(F,@Location,1)
+                 ,T(F,@AcctCode,0)T(F,@RepayCode,0)T(F,@LoanAmt,0)T(F,@LoanBal,0)T(F,@FirstDrawdownDate,0)T(F,@MaturityDate,0)T(F,@YearlyInt,0)T(F,@HouseBuyDate,0)T(F,@Location,0))                                 
 
 #WKSTAR1=X,2,S
 C(2,#FuncCode,S,S,T(3,*),S,S,S)  
@@ -165,6 +168,7 @@ T(2,@FdLoanBal,#WKSTAR1)
 T(2,@FdFirstDrawdownDate,#WKSTAR1)
 T(2,@FdMaturityDate,#WKSTAR1)
 T(2,@FdYearlyInt,#WKSTAR1)
+T(2,@FdLocation,#WKSTAR1)
 T(2,@FdHouseBuyDate,)   
 T(2,@FdCustName,)
 T(2,@FdCustId,)
@@ -202,6 +206,7 @@ E(0,@FirstDrawdownDate,#L5R41FirstDrawdownDate)
 E(0,@MaturityDate,#L5R41MaturityDate)
 E(0,@YearlyInt,#L5R41YearlyInt)
 E(0,@HouseBuyDate,#L5R41HouseBuyDate)
+T(2,@Location,#L5R41Location)
 T(H,@AcctCodX,#AcctCode,#AcctCodeHelp)
 
 #CustId=X,10,L
@@ -268,7 +273,11 @@ C(2,#FuncCode,s,s,$,s,s,s)
 #HouseBuyDate=D,7,I                      
 C(2,#FuncCode,s,s,$,s,s,s)
 @A(DATE,0,#HouseBuyDate)                                 
-                                  
+          
+!地址
+#Location=X,100,I
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(7)                        
                                   
 #AGAIN=X,1,S
 IF(#FuncCode==4||#FuncCode==2,$,S)
@@ -318,6 +327,7 @@ T(3,[L5812] 國稅局申報檔維護)
 #CustId
 #CustName
 #LineAmt
+#Location
 #END
 </sub>
 

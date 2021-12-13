@@ -60,8 +60,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"DrawdownAmt\"                                                "; // -- F10 優惠貸款金額
 		sql += "      , N.\"FirstDrawdownDate\"                                          "; // -- F11 撥款日期
 		sql += "      , CI.\"CityItem\"                                                  "; // -- F12 屋址區域
-		sql += "      , N.\"SellerName\"                                                 "; // -- F13 屋址區域
-		sql += "      , N.\"SellerId\"                                                   "; // -- F14 屋址區域
+		sql += "      , N.\"SellerName\"                                                 "; // -- F13 售屋者戶名
+		sql += "      , N.\"SellerId\"                                                   "; // -- F14 售屋者身份證字號及營利事業編號
 		sql += "      , N.\"Remark\"                                                     "; // -- F15 註記
 		sql += " FROM ( ";
 		sql += " SELECT T.\"CustNo\"                           AS \"CustNo\" ";
@@ -145,10 +145,10 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"CustMain\" CU";
 		sql += "          ON CU.\"CustNo\" = N.\"CustNo\"";
 		sql += "   LEFT JOIN \"ReltMain\" RM";
-		sql += "          ON RM.\"ReltUKey\" = CU.\"CustUKey\"";
-		sql += "          AND RM.\"ReltCode\" = '2'";
+		sql += "          ON RM.\"CustNo\" = CU.\"CustNo\"";
+		sql += "          AND RM.\"ReltCode\" = 2";
 		sql += "   LEFT JOIN \"CustMain\" CU2";
-		sql += "          ON CU2.\"CustNo\" = RM.\"CustNo\"";
+		sql += "          ON CU2.\"CustUKey\" = RM.\"ReltUKey\"";
 		sql += "   LEFT JOIN \"CdCity\" CI";
 		sql += "          ON CI.\"CityCode\" =  N.\"CityCode\"";
 

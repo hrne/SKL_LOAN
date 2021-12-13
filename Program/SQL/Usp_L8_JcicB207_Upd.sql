@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB207_Upd"
 (
 -- 程式功能：維護 JcicB207 聯徵授信戶基本資料檔
@@ -55,8 +54,8 @@ BEGIN
     -- 寫入資料 Work_B207    -- 撈應申報之戶號
     SELECT DISTINCT
            M."CustId"                    AS "CustId"            -- ID
-         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate")
-                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最早貸放的那一筆)
+         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" DESC)
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最近貸放的那一筆)
     FROM   "JcicMonthlyLoanData" M
     WHERE  M."DataYM"   =  YYYYMM
       AND  M."CustId"   IS NOT NULL
@@ -79,7 +78,7 @@ BEGIN
              WHEN NVL(C."Birthday",0) < 19110000 THEN NVL(C."Birthday",0)
              ELSE C."Birthday" - 19110000
            END                                   AS "Birthday"          -- 出生日期 (民國)
-         , RPAD("Fn_GetCustAddr"(C."CustUkey",0),60,'　') AS "RegAddr"  -- 戶籍地址
+         , RPAD("Fn_GetCustAddr"(C."CustUKey",0),60,'　') AS "RegAddr"  -- 戶籍地址
 --         , SUBSTRB(NVL(
 --             CASE
 --               WHEN RegCity."CityItem" IS NOT NULL THEN RegCity."CityItem"
@@ -109,7 +108,7 @@ BEGIN
                WHEN C."CurrZip2" IS NOT NULL THEN SUBSTR(C."CurrZip2",1,2)
              END
            , ' ')                                AS "CurrZip"           -- 聯絡地址郵遞區號
-         , RPAD("Fn_GetCustAddr"(C."CustUkey",1),60,'　') AS "CurrAddr" -- 聯絡地址
+         , RPAD("Fn_GetCustAddr"(C."CustUKey",1),60,'　') AS "CurrAddr" -- 聯絡地址
 --         , SUBSTRB(NVL(
 --             CASE
 --               WHEN MailCity."CityItem" IS NOT NULL THEN MailCity."CityItem"

@@ -157,7 +157,11 @@ public class AjaxController extends SysLogger {
 				Map<String, ?> p = makeReport.toPrint(reportNo, pageNo++, printer);
 				if (p.get("printJson") != null)
 					pLi.add((List<Map<String, ?>>) p.get("printJson"));
-				if (!"1".equals(p.get("morePage")) || pageNo > 100)
+				
+				this.info("morePage : " + "1".equals(p.get("morePage").toString()));
+				this.info("pageNo   : " + pageNo);
+
+				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100)
 					break;
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
