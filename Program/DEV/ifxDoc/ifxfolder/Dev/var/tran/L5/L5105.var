@@ -149,14 +149,14 @@ C(5,#FollowMark,2,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
 HELP(#ReCheckHelp)
 @
 C(4,#ReCheckCode,$,V(H,#ReCheckHelp))
-C(5,#ReCheckCode,2,T(F,@ReChkYearMonth,1)T(2,@FdReChkYearMonth,*),T(F,@ReChkYearMonth,0)T(2,@FdReChkYearMonth, ))
+C(5,#ReCheckCode,1,T(F,@ReChkYearMonth,1)T(2,@FdReChkYearMonth,*),T(F,@ReChkYearMonth,0)T(2,@FdReChkYearMonth, ))
 
 #ReCheckCodeX=X,6,L
 C(4,#ReCheckCode,S,T(H,#ReCheckCode,#ReCheckHelp))
 
 !覆審年月  免覆審=1 不輸入 
 #ReChkYearMonth=A,5,I
-C(5,#ReCheckCode,2,$,S)
+C(5,#ReCheckCode,1,$,S)
 @A(YM,0,#ReChkYearMonth)V(2,0)
 
 !應覆審單位

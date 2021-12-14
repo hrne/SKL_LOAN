@@ -738,13 +738,10 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "POSP00;Y;Y;-;-;-;L698A;L4041;L4041;-;產生郵局授權資料";
 			break;
 		case "CHCK00":
-			settingValue = "CHCK00;-;M;-;-;-;L698A;     ;     ;-;支票兌現檢核";
-			break;
-		case "CHJC00":
-			settingValue = "CHJC00;-;M;-;-;-;L698A;L698A;L8401;-;JCIC報送預先檢核";
+			settingValue = "CHCK00;-;M;-;-;-;L698A;     ;L4200;-;支票兌現檢核";
 			break;
 		case "CHRE00":
-			settingValue = "CHRE00;Y;C;-;-;-;L698A;L698A;L2307;-;關係人資料撿核";
+			settingValue = "CHRE00;-;C;-;-;-;L698A;L698A;L2306;-;關係人資料撿核";
 			break;
 		case "ACCL01":
 			settingValue = "ACCL01;Y;Y;-;-;-;L6985;L6985;L618D;Y;應收利息提存入帳";
@@ -758,20 +755,11 @@ public class TxToDoCom extends TradeBuffer {
 		case "RVTX00":
 			settingValue = "RVTX00;-;C;-;-;Y;L698A;L6984;L3100;Y;預約撥款到期";
 			break;
-		case "RVLN00":
-			settingValue = "RVLN00;-;C;-;-;Y;L698A;L6986;L3101;Y;撥款收息作業";
-			break;
-		case "AMLX00":
-			settingValue = "AMLX00;Y;Y;-;-;-;L698A;     ;L8200;-;AML交易檢核異常";
-			break;
 		case "TEXT00":
 			settingValue = "TEXT00;Y;Y;Y;Y;-;L698A;     ;L4710;-;簡訊通知";
 			break;
 		case "MAIL00":
 			settingValue = "MAIL00;Y;Y;Y;Y;-;L698A;     ;L4711;-;電子郵件";
-			break;
-		case "DOCU00":
-			settingValue = "DOCU00;Y;Y;Y;Y;-;L698A;     ;     ;-;書面通知";
 			break;
 		case "L45101":
 			settingValue = "L45101;-;Y;-;-;Y;L698A;L4510;L4511;-;產出15日薪員工扣薪檔";
@@ -786,7 +774,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "L4602 ;Y;C;-;-;-;L698A;L4602;L4602;-;火險出單明細表作業";
 			break;
 		case "L4604":
-			settingValue = "L4604 ;Y;C;-;-;-;L698A;L4603;L4603;Y;火險保費未繳轉借支";
+			settingValue = "L4604 ;Y;C;-;-;-;L698A;L4604;L4604;Y;火險保費未繳轉借支";
 			break;
 		case "L4702":
 			settingValue = "L4702 ;Y;C;Y;-;-;L698A;L4702;L4702;-;繳息通知單產生作業";
@@ -804,13 +792,13 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "L9711 ;-;C;-;-;-;L698A;L9711;L9711;-;產生放款到期明細表及通知單";
 			break;
 		case "PFCL00":
-			settingValue = "PFCL00;-;M;-;-;-;L698A;     ;     ;-;業績工作月結算啟動通知";
+			settingValue = "PFCL00;-;M;-;-;-;L698A;     ;L5500;-;業績工作月結算啟動通知";
 			break;
 		case "NOTI01":
-			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;     ;-;銀扣失敗繳息還本通知單";
+			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;L4454;-;銀扣失敗繳息還本通知單";
 			break;
 		case "NOTI02":
-			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;     ;-;銀扣二扣失敗明信片";
+			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;L4454;-;銀扣二扣失敗明信片";
 			break;
 		default:
 			throw new LogicException(titaVo, "E0013", "項目代號有誤" + itemCode);

@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L8;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,19 +9,19 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
-
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
-
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L8924")
@@ -46,6 +44,9 @@ public class L8924 extends TradeBuffer {
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
 
+	@Autowired
+	public CdEmpService cdEmpService;
+	
 	@Autowired
 	Parse parse;
 
@@ -70,75 +71,79 @@ public class L8924 extends TradeBuffer {
 
 		if (("1").equals(TranNo)) {
 			iTranNo.add("L8203");
+			TranNo = "L8203";
 		} else if (("2").equals(TranNo)) {
 			iTranNo.add("L8204");
-		} else {
-			iTranNo.add("L8203");
-			iTranNo.add("L8204");
-		}
+			TranNo = "L8204";
+		} 
 
-		this.info("L8924 iDateStart=" + titaVo.getParam("CDATESTART") + "L8924 iDateEND=" + titaVo.getParam("CDATEEND"));
-//		int Code = Integer.parseInt(titaVo.getParam("TRN_CODE").toString());
 		int CustNo = Integer.parseInt(titaVo.getParam("CUST_NO").toString());
 		int iDateStart = Integer.parseInt(titaVo.getParam("CDATESTART").toString());
 		int iDateEnd = Integer.parseInt(titaVo.getParam("CDATEEND").toString());
 		iDateStart = iDateStart + 19110000;
 		iDateEnd = iDateEnd + 19110000;
-		this.info("L8924 iDateStart=" + iDateStart + "L8924 iDateEND=" + iDateEnd);
+		
+		String iMrkey = titaVo.getMrKey().trim();
+		
 
-		List<TxDataLog> lTxDataLog = null;
-		Slice<TxDataLog> slTxDataLog = null;
-//		if (CustNo > 0 && FacmNo > 0 && BormNo > 0) {
-//			slTxDataLog = txDataLogService.findByCustNo7(iDateStart, iDateEnd, iTranNo, CustNo, FacmNo, BormNo, this.index, this.limit, titaVo);
-//		} else if (CustNo > 0 && FacmNo > 0) {
-//			slTxDataLog = txDataLogService.findByCustNo6(iDateStart, iDateEnd, iTranNo, CustNo, FacmNo, this.index, this.limit, titaVo);
-//		} 
-//		if (CustNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo, CustNo, this.index, this.limit, titaVo);
-//		} else {
-//			slTxDataLog = txDataLogService.findByCustNo4(iDateStart, iDateEnd, iTranNo, this.index, this.limit, titaVo);
-//		}
-		lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
+		 Slice<TxDataLog> slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo, CustNo, this.index, this.limit, titaVo);
+
+
+		 List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
 
 		if (lTxDataLog == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
+		
+			for (TxDataLog txDataLog : lTxDataLog) {
 
-		for (TxDataLog txDataLog : lTxDataLog) {
-
-			List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
-			try {
-				this.info("txDataLog.getContent()=" + txDataLog.getContent());
-				listMap = new ObjectMapper().readValue(txDataLog.getContent(), ArrayList.class);
-			} catch (IOException e) {
-				throw new LogicException("EC009", "資料格式");
-			}
-			this.info("listMap=" + listMap);
-			for (HashMap<String, Object> map : listMap) {
-				String fld = map.get("f").toString();
-				String oval = map.get("o").toString();
-				String nval = map.get("n").toString();
-				if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld) || "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
-					continue;
-				}
+			
 				OccursList occursList = new OccursList();
-				occursList.putParam("OO_TRN_DTTM", parse.timeStampToString(txDataLog.getCreateDate()));
-				occursList.putParam("OO_TxDate", txDataLog.getTxDate());
 
-				iTlrItem = "";
-				iTlrItem = inqTxTeller(txDataLog.getTlrNo(), iTlrItem, titaVo);
-				occursList.putParam("OO_TlrItem", iTlrItem);
-				occursList.putParam("OO_CUST_NO", txDataLog.getCustNo());
+				if(!iMrkey.isEmpty()) {
+					this.info("iMrkey=="+iMrkey);
+					if(!(iMrkey).equals(txDataLog.getMrKey())) {
+						continue;					}
+				}
 
-				occursList.putParam("OO_COLUMN_NAME", fld);
-				occursList.putParam("OO_DATA_BEFORE", oval.replace("$n", ""));
-				occursList.putParam("OO_DATA_AFTER", nval.replace("$n", ""));
+				String tranName = txDataLog.getTranNo();
+				
+				TxTranCode txTranCode = sTxTranCodeService.findById(txDataLog.getTranNo(), titaVo);
+				
+				if (txTranCode != null) {
+					tranName += " " + txTranCode.getTranItem();
+				}
+				
+				occursList.putParam("OTranName", tranName);
 
+				occursList.putParam("OCustNo", txDataLog.getCustNo());
+				occursList.putParam("OFacmNo", txDataLog.getFacmNo());
+				occursList.putParam("OBormNo", txDataLog.getBormNo());
+				occursList.putParam("OMrKey", txDataLog.getMrKey());
+
+				occursList.putParam("OReason", txDataLog.getReason());
+
+				String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
+
+				occursList.putParam("OLastUpdate", lastUpdate);
+
+				String lastEmp = txDataLog.getLastUpdateEmpNo();
+				if (txDataLog.getLastUpdateEmpNo() != null && txDataLog.getLastUpdateEmpNo().toString().length() > 0) {
+					CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
+					if (cdEmp != null) {
+						lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
+					}
+				}
+
+				occursList.putParam("OLastEmp", lastEmp);
+				occursList.putParam("OTxDate", txDataLog.getTxDate());
+				occursList.putParam("OTxSeq", txDataLog.getTxSeq());
+				occursList.putParam("OTxSno", txDataLog.getTxSno());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
 
-		}
+//		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slTxDataLog != null && slTxDataLog.hasNext()) {

@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,280)ASGN(INQLEN$)
+E(0,334)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -30,6 +30,8 @@ E(0,40)ASGN(INQPRT$)
 </sub>
 
 <sub type="DC" name="BFHEAD">
+#button=x,1,S
+K(MODIFYBUTTON,查詢)
 
 </sub>
 
@@ -37,15 +39,22 @@ E(0,40)ASGN(INQPRT$)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[LC009]                                 報表及檔案查詢"],
-["@使用單位",#iBrNo],
-["*會計日期",#iEntdyStart,#iEntdyEnd],
-["@製作日期",#createDateStart,#createDateEnd,"@（清空可查全部）"],
-["@經@@@@辦",#iTlrNo],
-["@代@@@@碼",#iCode,"@（報表代號或檔案代號）"],
-["@說@@@@明",#iItem,"@（關鍵字）"],
+["#FdBrNo+使用單位",#iBrNo],
+["#FdEntdy+會計日期",#iEntdyStart,#iEntdyEnd],
+["#FdcreateDate+製作日期",#createDateStart,#createDateEnd,"@（清空可查全部）"],
+["#FdTlrNo+經@@@@辦",#iTlrNo],
+["#FdCode+代@@@@碼",#iCode,"@（報表代號或檔案代號）"],
+["#FdItem+說@@@@明",#iItem,"@（關鍵字）"],
 ]
 !---------- AP Button AREA ----------
 
+#FdBrNo=X,2,L
+#FdEntdy=X,2,L
+T(3,*)
+#FdcreateDate=X,2,L
+#FdTlrNo=X,2,L
+#FdCode=X,2,L
+#FdItem=X,2,L
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -166,17 +175,20 @@ T(3,1)ASGN(LOOP$)
 #Ymd=D,7,S
 #Code=X,80,S
 #Item=X,160,S
-#TlrNo=X,6,S
+#TlrNo=X,20,S
+#SupNo=X,20,S
+#CreTlrNo=X,20,S
 #CalDate=X,9,S
 #CalTime=X,8,S
 #Sno=9,8,S
 #Type=9,1,S
 #TypeX=X,6,S
-C(2,#Type,$,T(3,PDF),T(3,EXCEL),T(3,TXT),T(3,DBF),T(3,CSV),$)
+C(2,#Type,$,T(3,PDF),T(3,EXCEL),T(3,TXT),T(3,DBF),T(3,CSV),T(3,套印),$)
 #SignCode=9,1,S
 
+!套印printReport
 #BTN=X,1,S
-BIND(grid,{cmd=viewPdf;sno=#Sno;fileType=#Type;item=#Item})
+C(3,#Type,6,BIND(grid,{cmd=printReport;sno=#Sno;fileType=#Type;item=#Item;text=套印}),BIND(grid,{cmd=viewPdf;sno=#Sno;fileType=#Type;item=#Item}))
 
 ! 簽核按鈕
 
@@ -209,7 +221,9 @@ TXFORM=LC009
 #Ymd
 #Code
 #Item
+#CreTlrNo
 #TlrNo
+#SupNo
 #CalDate
 #CalTime
 #Sno
@@ -227,11 +241,11 @@ TXFORM=LC009
 #RPTFG=0,QUERY.GRID,LC009
 #any={detail:true, header:'LC009.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#BTN=
-{width:40,search:false,formatter:'cust:bind-button:開啟',canExport:false,align:'center'}
+#BTN=開啟/套印
+{width:70,search:false,formatter:'cust:bind-button:開啟',canExport:false,align:'center'}
 
-#BTN2=
-{width:65,search:false,formatter:'cust:bind-button:#BTN2',align:'center',canExport:false}
+#BTN2=簽核
+{width:60,search:false,formatter:'cust:bind-button:#BTN2',align:'center',canExport:false}
 
 #Sno=序號
 {width:80,align:'center'}
@@ -245,16 +259,22 @@ TXFORM=LC009
 #Item=說明
 {width:400,align:'left'}
 
-#TlrNo=經辦
-{width:60,align:'center'}
-
 #TypeX=格式
 {width:60,align:'center'}
 
-#CalDate=製作日期
+#TlrNo=簽核經辦
+{width:120,align:'left'}
+
+#SupNo=簽核主管
+{width:120,align:'left'}
+
+#CreTlrNo=製表經辦
+{width:120,align:'left'}
+
+#CalDate=製表日期
 {width:80,align:'center'}
 
-#CalTime=製作時間
+#CalTime=製表時間
 {width:100,align:'center'}
 
 ^

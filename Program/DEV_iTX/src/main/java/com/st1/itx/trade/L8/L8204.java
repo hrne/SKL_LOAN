@@ -94,7 +94,7 @@ public class L8204 extends TradeBuffer {
 			MlaundryRecord tMlaundryRecord2 = (MlaundryRecord) dataLog.clone(tMlaundryRecord); ////
 			try {
 				moveMlaundryRecord(tMlaundryRecord, tMlaundryRecordId, iFuncCode, iFRecordDate, iCustNo, iFacmNo, iBormNo, titaVo);
-				tMlaundryRecord = sMlaundryRecordService.update2(tMlaundryRecord); ////
+				tMlaundryRecord = sMlaundryRecordService.update2(tMlaundryRecord,titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}

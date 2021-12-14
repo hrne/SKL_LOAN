@@ -101,7 +101,7 @@ public class L4450Batch extends TradeBuffer {
 //	重複註記
 	private HashMap<tmpBorm, Integer> flagMap = new HashMap<>();
 //	繳息迄日 minIntStartDate
-	private HashMap<tmpBorm, Integer> minIntStartDate = new HashMap<>();
+	private HashMap<tmpBorm, Integer> prevIntDate = new HashMap<>();
 //	計息起日 prevPayIntDateList
 	private HashMap<tmpBorm, Integer> intStartDate = new HashMap<>();
 //	計息止日 prevRepaidDateList
@@ -516,15 +516,15 @@ public class L4450Batch extends TradeBuffer {
 				}
 
 				if (tBaTxVo.getDataKind() == 2) {
-					if (minIntStartDate.containsKey(tmp2)) {
-						if (tBaTxVo.getIntStartDate() < minIntStartDate.get(tmp2)) {
-							minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
+					if (prevIntDate.containsKey(tmp)) {
+						if (tBaTxVo.getIntEndDate() > prevIntDate.get(tmp)) {
+							prevIntDate.put(tmp, tBaTxVo.getIntEndDate());
 						}
 					} else {
-						minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
+						prevIntDate.put(tmp, tBaTxVo.getIntEndDate());
 					}
 //				 // 1.已送出媒體未回或未製成媒體 2.期款二扣
-					int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp2), titaVo);
+					int sendCode = isMediaSent(tmp, iRepayType, prevIntDate.get(tmp), titaVo);
 					if (sendCode == 1) {
 						if (sendCode == 1 && "L4451".equals(titaVo.getTxcd())) {
 							checkMsg = "已送出媒體未回或未製成媒體";
@@ -601,8 +601,21 @@ public class L4450Batch extends TradeBuffer {
 				} else {
 					rpAcCodeMap.put(tmp, "");
 				}
-				intStartDate.put(tmp, tBaTxVo.getIntStartDate());
-				intEndDate.put(tmp, tBaTxVo.getIntEndDate());
+
+				if (intStartDate.containsKey(tmp)) {
+					if (tBaTxVo.getIntStartDate() < intStartDate.get(tmp)) {
+						intStartDate.put(tmp, tBaTxVo.getIntStartDate());
+					}
+				} else {
+					intStartDate.put(tmp, tBaTxVo.getIntStartDate());
+				}
+				if (intEndDate.containsKey(tmp)) {
+					if (tBaTxVo.getIntEndDate() > intEndDate.get(tmp)) {
+						intEndDate.put(tmp, tBaTxVo.getIntEndDate());
+					}
+				} else {
+					intEndDate.put(tmp, tBaTxVo.getIntEndDate());
+				}
 
 				this.info("RepayType : " + tBaTxVo.getRepayType());
 				this.info("shPayAmtMap : " + shPayAmtMap.get(tmp));
@@ -660,7 +673,7 @@ public class L4450Batch extends TradeBuffer {
 			}
 
 			tBankDeductDtl.setAcctCode(sAcctCode);
-			tBankDeductDtl.setPrevIntDate(minIntStartDate.get(tmp2));
+			tBankDeductDtl.setPrevIntDate(prevIntDate.get(tmp));
 			this.info("1RepayType : " + tmp.getRepayType());
 			this.info("1shPayAmtMap : " + shPayAmtMap.get(tmp));
 			this.info("1repAmtMap : " + repAmtMap.get(tmp));

@@ -1,0 +1,3 @@
+
+ALTER TABLE "Ias34Ap" MODIFY "OvduDays" NUMBER(4,0);
+COMMIT;

@@ -22,16 +22,19 @@ T(3,LM070)
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[140,300,110,200];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20,20,20];order=1;">
 [
 ["[LM070]                         LM070介紹人加碼獎勵津貼明細 "],
-["工作年月",#inputYear,"/",#inputMonth],
-
+["#FdWorkMonth+工作月",#WorkMonth],
 ]
+!["工作年月",#inputYear,"/",#inputMonth],
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
+
+#FdWorkMonth=X,2,L
+T(3,*)
 
 !#NTXBUF=X,3,S
 !C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -43,14 +46,19 @@ T(4,CHAIN$)
 !-----------------------------------------------------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
-#TXCD2=X,5,S
-T(3,LD070)
+! 工作月
+#WorkMonth=A,5,I
+C(3,#WorkMonth,0,T(1,@WorkMonth,#SYSDATE,2,5),$)
+@
+C(3,#WorkMonth,0,S,A(YM13,1,#WorkMonth))
 
 
-#inputYear=A,3,I
+#inputYear=A,3,S
+T(1,#WorkMonth,1,3)
 
-#inputMonth=A,2,I
-@V(5,1,13)
+#inputMonth=A,2,S
+T(1,#WorkMonth,4,2)
+!@V(5,1,13)
 
 </sub>
 
@@ -71,7 +79,7 @@ C(3,#FKEY,2,E(0,0),E(0,1))
 <sub type="FORM" name="LM070">
 
 #SCRPRT=_,_,S
-C(5,#TXFORM,C5100,$,S)
+C(5,#TXFORM,LM070,$,S)
 
 #SCRTIL=_,_,S
 T(3,[LM070] LM070介紹人加碼獎勵津貼明細)

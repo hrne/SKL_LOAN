@@ -54,8 +54,8 @@ BEGIN
     -- 寫入資料 Work_B207    -- 撈應申報之戶號
     SELECT DISTINCT
            M."CustId"                    AS "CustId"            -- ID
-         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" DESC)
-                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最近貸放的那一筆)
+         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate")
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最早貸放的那一筆)
     FROM   "JcicMonthlyLoanData" M
     WHERE  M."DataYM"   =  YYYYMM
       AND  M."CustId"   IS NOT NULL

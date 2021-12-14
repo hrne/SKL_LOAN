@@ -187,6 +187,8 @@ C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 @V(7)
 
+
+
 #RimRecordDate=9,7,S
 E(0,#RecordDate)
 #RimCustNo=9,7,S
@@ -282,6 +284,9 @@ E(0,0)
 IF(#FuncCode==2 || #FuncCode==4,$,S)
 E(0,1)ASGN(AGAIN$)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo+-+#BormNo)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L8R51.dec"/>

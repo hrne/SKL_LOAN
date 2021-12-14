@@ -57,12 +57,12 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ,\"FacmNo\"                                        ";
 		sql += "      from \"LoanBorMain\"                               ";
 		sql += "     where \"Status\" = 0                                ";
-		sql += "       and \"NextPayIntDate\" <= " + entDy;
+		sql += "       and \"NextPayIntDate\" <= :entDy";
 		sql += " ) b   on b.\"CustNo\" = d.\"CustNo\"                    ";
 		sql += " where d.\"RepayCode\" = 1                               ";
 		sql += "   and d.\"ProcStsCode\" <> 'D'                          ";
 		sql += "   and d.\"CustNo\" <> 0                                 ";
-		sql += "   and d.\"AcDate\" = " + entDy;
+		sql += "   and d.\"AcDate\" = :entDy";
 		sql += "   and b.\"CustNo\" is not null                          ";
 		sql += " order by d.\"CustNo\", d.\"FacmNo\"                     ";
 
@@ -71,7 +71,7 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-
+		query.setParameter("entDy", entDy);
 		return this.convertToMap(query);
 	}
 

@@ -91,7 +91,7 @@ public class L9711Report2 extends MakeReport {
 
 		long sno = this.close();
 
-		this.toPdf(sno);
+		// this.toPdf(sno);
 	}
 
 	private void reportEmpty() throws LogicException {
@@ -199,12 +199,12 @@ public class L9711Report2 extends MakeReport {
 		if (listBaTxVo.size() > 0) {
 			List<Map<String, Integer>> tempList = new ArrayList<Map<String, Integer>>();
 
-			Map<String, Integer> tempMap = 	new HashMap<String, Integer>();
+			Map<String, Integer> tempMap = new HashMap<String, Integer>();
 
 			String payIntDate = "";
 			int a = 1;
 			for (int i = 0; i < listBaTxVo.size(); i++) {
-			
+
 				this.info("No." + i);
 				this.info("getCustNo=" + listBaTxVo.get(i).getCustNo());
 				this.info("getFacmNo=" + listBaTxVo.get(i).getFacmNo());
@@ -215,20 +215,22 @@ public class L9711Report2 extends MakeReport {
 				this.info("getLoanBal=" + listBaTxVo.get(i).getLoanBal());
 
 				payIntDate = String.valueOf(listBaTxVo.get(i).getPayIntDate());
+				if (payIntDate.equals("0")) {
+					payIntDate = "0000000";
+				}
 
 				if (!payIntDate.equals(tempDate)) {
 
 					// 防第一次沒資料就加入
 					if (i > 0 && !payIntDate.equals(tempDate)) {
 
-
 						tempList.add(tempMap);
 
-						tempMap = 	new HashMap<String, Integer>();
-						
+						tempMap = new HashMap<String, Integer>();
+
 //						this.info(a + " count join list");
 //						a++;
-						
+
 						BreachAmt = 0;
 						Principal = 0;
 						Interest = 0;
@@ -279,18 +281,16 @@ public class L9711Report2 extends MakeReport {
 
 				// 最後一筆需加入
 				if (listBaTxVo.size() - 1 == i) {
-		
+
 					tempList.add(tempMap);
 				}
 			}
 
-//			this.info("tempList=" + tempList.toString());
 			for (Map<String, Integer> listData : tempList) {
-				
-				
-				
+
+				this.info("date=" + listData.get("pday").toString());
 				tempDate = listData.get("pday").toString();
-				//應繳日
+				// 應繳日
 				this.print(dataRow, 7,
 						tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
 				// 違約金

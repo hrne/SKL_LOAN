@@ -70,12 +70,12 @@ BEGIN
          , NVL(M."OvduDays",0)                         AS "OvduDays"          -- 逾期繳款天數
 
          , CASE   -- 債務人屬企業戶，且其歸戶下任一債務逾期90天(含)以上
-             WHEN NVL(M."OvduDate",0) >= 90 AND NVL(F."EntCode",' ') IN ('1','2') THEN 1
+             WHEN NVL(M."OvduDays",0) >= 90 AND NVL(F."EntCode",' ') IN ('1','2') THEN 1
              ELSE 2
            END                                         AS "Stage1"            -- IAS39減損客觀條件1 (1=是 2=否)
 
          , CASE   -- 個人消費性放款逾期超逾90天(含)以上
-             WHEN NVL(M."OvduDate",0) >= 90 AND NVL(F."EntCode",' ') NOT IN ('1','2') THEN 1
+             WHEN NVL(M."OvduDays",0) >= 90 AND NVL(F."EntCode",' ') NOT IN ('1','2') THEN 1
              ELSE 2
            END                                         AS "Stage2"            -- IAS39減損客觀條件2 (1=是 2=否)
 

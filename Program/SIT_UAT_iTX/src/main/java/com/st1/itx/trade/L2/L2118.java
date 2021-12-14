@@ -121,7 +121,7 @@ public class L2118 extends TradeBuffer {
 
 			// 共同借款人闗係檔
 			insertFacShareRelation(titaVo);
-			
+
 			break;
 		case 4: // 刪除
 
@@ -182,7 +182,7 @@ public class L2118 extends TradeBuffer {
 	// delete 共同借款人資料檔
 	private void deleteFacShareAppl(TitaVo titaVo) throws LogicException {
 		this.info("L2218.deleteFacShareAppl");
-		
+
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo" + 1));
 
 		tFacShareAppl = facShareApplService.findById(iApplNo, titaVo);

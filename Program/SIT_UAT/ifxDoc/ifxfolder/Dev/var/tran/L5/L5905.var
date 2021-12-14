@@ -50,7 +50,7 @@ K(MODIFYBUTTON,查詢)
 ["#FdYearS+資料年份",#YearS,"~",#YearE],
 ["#FdReChkMonth+覆審月份",#ReChkMonth],
 ["#FdCustNo+借款人戶號",#CustNo],
-["#FdTraceYearMonth+追蹤月份",#TraceYearMonthS,#TraceYearMonthE]
+["#FdTraceYearMonth+追蹤年月",#TraceYearMonthS,#TraceYearMonthE]
 ]
 
 #FdInqFg=X,2,L

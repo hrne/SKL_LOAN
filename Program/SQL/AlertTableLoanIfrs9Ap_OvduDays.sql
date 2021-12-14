@@ -1,0 +1,3 @@
+
+ALTER TABLE "LoanIfrs9Ap" MODIFY "OvduDays" NUMBER(4,0);
+COMMIT;

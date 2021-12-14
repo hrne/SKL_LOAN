@@ -3,12 +3,12 @@ CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Ip_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Ip 每月IFRS9欄位清單9
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_LoanIfrs9Ip_Upd"(20201231,'System',0);
+-- 執行方式：EXEC "Usp_L7_LoanIfrs9Ip_Upd"(20201231,'System');
 --
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
-    EmpNo          IN  VARCHAR2,   -- 經辦
-    NewAcFg        IN  INT         -- 0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
+    EmpNo          IN  VARCHAR2    -- 經辦
+--    NewAcFg        IN  INT         -- 0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
 )
 AS
 BEGIN
@@ -115,9 +115,9 @@ BEGIN
                 || trim(to_char(NVL(F."LoanTermDd",0),'00'))
                                                      AS "LoanTer"           -- 合約期限
          --, CASE WHEN NewAcFg = 0 THEN RPAD(NVL("CdAcCode"."AcNoCodeOld",' '),8,' ')
-         , CASE WHEN NewAcFg = 0 AND NVL(M."IrrevocableFlag",0) = 1 THEN '91300000'
-                WHEN NewAcFg = 0 AND NVL(M."IrrevocableFlag",0) = 0 THEN '91500000'
-                ELSE                  RPAD(NVL("CdAcCode"."AcNoCode",' '),11,' ')
+         --       ELSE                  RPAD(NVL("CdAcCode"."AcNoCode",' '),11,' ')
+         , CASE WHEN NVL(M."IrrevocableFlag",0) = 1 THEN '91300000'
+                ELSE '91500000'
            END                                       AS "AcCode"            -- 備忘分錄會計科目
          , 1                                         AS "AcCurcd"           -- 記帳幣別 1=台幣 2=美元 3=澳幣 4=人民幣 5=歐元
          , CASE WHEN M."AcSubBookCode" IS NULL THEN '1'

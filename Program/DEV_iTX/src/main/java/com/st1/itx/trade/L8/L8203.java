@@ -61,6 +61,7 @@ public class L8203 extends TradeBuffer {
 //		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		int iFEntryDate = iEntryDate + 19110000;
+		int iLevel = this.txBuffer.getTxCom().getTlrLevel();
 		this.info("L8203 iFAcDate : " + iFEntryDate);
 
 		String iManagerCheck = titaVo.getParam("ManagerCheck");
@@ -109,12 +110,17 @@ public class L8203 extends TradeBuffer {
 
 			try {
 				moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo, iManagerCheck, iFManagerDate, titaVo);
-				tMlaundryDetail = sMlaundryDetailService.update2(tMlaundryDetail); ////
+				tMlaundryDetail = sMlaundryDetailService.update2(tMlaundryDetail,titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tMlaundryDetail2, tMlaundryDetail); ////
-			dataLog.exec("修改疑似洗錢交易合理性"); 
+			if(iLevel==1) {
+				dataLog.exec("主管覆核");
+			} else {
+				dataLog.exec("經辦修改合理性");
+			}
+			 
 			break;
 		case 4: // 刪除
 			tMlaundryDetail = sMlaundryDetailService.holdById(new MlaundryDetailId(iFEntryDate, iFactor, iCustNo));
@@ -172,11 +178,12 @@ public class L8203 extends TradeBuffer {
 		mMlaundryDetail.setEmpNoDesc(titaVo.getParam("EmpNoDesc"));
 		mMlaundryDetail.setManagerDesc(titaVo.getParam("ManagerDesc"));
 
-		if (mFuncCode != 2) {
-			mMlaundryDetail.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			mMlaundryDetail.setCreateEmpNo(titaVo.getTlrNo());
-		}
+//		if (mFuncCode != 2) {
+//			mMlaundryDetail.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+//			mMlaundryDetail.setCreateEmpNo(titaVo.getTlrNo());
+//		}
 		mMlaundryDetail.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mMlaundryDetail.setLastUpdateEmpNo(titaVo.getTlrNo());
+		this.info("getTlrNo=="+titaVo.getTlrNo());
 	}
 }

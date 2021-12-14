@@ -23,12 +23,7 @@ import javax.persistence.Column;
 public class FacShareAppl implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6290559835941195671L;
-
-// 核准號碼
+  // 核准號碼
   @Id
   @Column(name = "`ApplNo`")
   private int applNo = 0;

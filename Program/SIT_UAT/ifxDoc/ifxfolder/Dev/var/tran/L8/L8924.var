@@ -79,6 +79,14 @@ T(1,#NTXBUF,1,1)
 #CHAIN_CutNo=X,7,S
 T(1,#NTXBUF,2,7)
 
+#CHAIN_AcDAte=D,7,S
+T(1,#NTXBUF,9,7)
+
+#CHAIN_Factor=A,2,S
+T(1,#NTXBUF,16,2)
+
+
+
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
 E(0,@TRN_CODE,#CHAIN_Code)
@@ -155,7 +163,9 @@ T(2,@CustName,#L1r09CustName)
 
 
 #MRKEY=_,_,S
-C(3,#CUST_NO,0,S,T(2,#CUST_NO)) 
+C(3,#CHAIN_AcDAte,0,S,$)
+T(2,#CHAIN_AcDAte+-+#CHAIN_Factor+-+#CHAIN_CutNo)
+
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -194,25 +204,29 @@ T(2,#CUST_NO)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
-! 作業日期
-!#OO_TRN_DT=D,7,S
-! 交易時間
-!#OO_TRN_TM=X,8,S
-! 作業日期時間
-#OO_TRN_DTTM=X,18,L
-!T(2,#OO_TRN_DT+ +#OO_TRN_TM)
-! 異動人員
-#OO_TlrItem=X,20,L
+#OTranName=X,40,S
+#OCustNo=A,7,S
+#OFacmNo=A,3,S
+#OBormNo=A,3,S
+#OCustNoX=20,7,S
+T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 
-! 戶號
-#OO_CUST_NO=A,7,L
+#OMrKey=x,20,S
+#OReason=x,120,S
+#OLastUpdate=x,40,S
+#OLastEmp=x,30,S
+!會計日期
+#OTxDate=D,7,S
+!交易序號
+#OTxSeq=X,18,S
+!明細序號
+#OTxSno=A,2,S
 
-! 欄位名稱
-#OO_COLUMN_NAME=X,50,L
-! 變更前
-#OO_DATA_BEFORE=X,100,L
-! 變更後
-#OO_DATA_AFTER=X,100,L
+#BufA=X,50,S
+T(2,#OTxDate+#OTxSeq+#OTxSno)
+
+#OOBtnA=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L8925; ntxbuf=#BufA})
 
 </sub>
 
@@ -233,12 +247,17 @@ T(3,1)ASGN(LOOP$)
 <include src="ROM.icf::L1R09.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L8924
-#OO_TRN_DTTM
-#OO_TlrItem
-#OO_CUST_NO
-#OO_COLUMN_NAME
-#OO_DATA_BEFORE
-#OO_DATA_AFTER
+#OTranName
+#OCustNo
+#OFacmNo
+#OBormNo
+#OMrKey
+#OReason
+#OLastUpdate
+#OLastEmp
+#OTxDate
+#OTxSeq
+#OTxSno
 ^
 </sub>
 
@@ -246,9 +265,9 @@ TXFORM=L8924
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L8924" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];">
 [
-["[L8924]                                 疑似洗錢資料變更查詢"],
-["戶號",#CustNo],
-["戶名",#CustName],
+["[L8924]                                 疑似洗錢資料變更查詢                                                                  "],
+!["戶號",#CustNo],
+!["戶名",#CustName],
 ]
 </sub>
 
@@ -257,21 +276,25 @@ TXFORM=L8924
 #RPTFG=0,QUERY.GRID,L8924
 #any={detail:true, header:'L8924.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OO_TRN_DTTM=作業日期時間
-{width:130,align:'center'}
+#OOBtnA=修改內容
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:70}
 
-#OO_TlrItem=異動人員
-{width:80,align:'center'}
-
-
-#OO_COLUMN_NAME=欄位名稱
+#OTranName=交易名稱
+{width:250,align:'left'}
+#OCustNoX=戶號
+{width:100,align:'center'}
+#CustName=戶名
+{width:150,align:'center'}
+#OMrKey=參考編號
+{width:150,align:'left'}
+#OReason=修改原因
 {width:300,align:'left'}
-
-#OO_DATA_BEFORE=變更前
-{width:300,align:'left'}
-
-#OO_DATA_AFTER=變更後
-{width:300,align:'left'}
+#OLastUpdate=修改日期
+{width:140,align:'left'}
+#OLastEmp=修改人員
+{width:140,align:'left'}
+#OTxDate=會計日期
+{width:100,align:'left'}
 ^
 
 </sub>

@@ -359,6 +359,10 @@ C(3,#FuncCode,4,s,$)
 C(3,#Level,1,$,s)
 @C(5,#ManagerCheck,N,C(4,#ManagerDesc,V(7),$),$)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#AcDate+-+#Factor+-+#CustNo)
+
 
 #RPTFG=A,1,S
 E(0,0)
