@@ -90,7 +90,7 @@ public class L2023 extends TradeBuffer {
 			
 			chkOccursList = this.totaVo.getOccursList();
 
-			if (resultList.size() == this.limit && hasNext()) {
+			if (resultList.size() >= this.limit ) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
@@ -107,23 +107,5 @@ public class L2023 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private Boolean hasNext() {
-		Boolean result = true;
 
-		int times = this.index + 1;
-		int cnt = sL2023ServiceImpl.getSize();
-		int size = times * this.limit;
-
-		this.info("index ..." + this.index);
-		this.info("times ..." + times);
-		this.info("cnt ..." + cnt);
-		this.info("size ..." + size);
-
-		if (size == cnt) {
-			result = false;
-		}
-		this.info("result ..." + result);
-
-		return result;
-	}
 }

@@ -13,8 +13,14 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxLock;
+import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxLockService;
+import com.st1.itx.db.service.TxTranCodeService;
 
 @Service("LC010")
 @Scope("prototype")
@@ -25,11 +31,19 @@ import com.st1.itx.db.service.TxLockService;
  * @version 1.0.0
  */
 public class LC010 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC010.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public TxLockService txLockService;
+	
+	@Autowired
+	public CdEmpService cdEmpService;
+	
+	@Autowired
+	public CdBranchService cdBranchService;
+	
+	@Autowired
+	public TxTranCodeService txTranCodeService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -52,10 +66,29 @@ public class LC010 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OLockNo", tTxLock.getLockNo());
 				occursList.putParam("OCustNo", tTxLock.getCustNo());
-				occursList.putParam("OTranNo", tTxLock.getTranNo());
-				occursList.putParam("OBrNo", tTxLock.getBrNo());
-				occursList.putParam("OTlrNo", tTxLock.getCreateEmpNo());
-				this.info("tTxLock.getCreateDate() = " + tTxLock.getCreateDate().toString());
+				
+				String tranno = tTxLock.getTranNo();
+				TxTranCode txTranCode = txTranCodeService.findById(tTxLock.getTranNo(), titaVo);
+				if (txTranCode != null) {
+					tranno += " " + txTranCode.getTranItem();
+				}
+				occursList.putParam("OTranNo", tranno);
+
+				String brno = tTxLock.getBrNo();
+				CdBranch cdBranch = cdBranchService.findById(tTxLock.getBrNo(), titaVo);
+				if (cdBranch != null) {
+					brno += " " + cdBranch.getBranchShort();
+				}
+				occursList.putParam("OBrNo", brno);
+				
+				String tlrno = tTxLock.getCreateEmpNo();
+				CdEmp cdEmp = cdEmpService.findById(tTxLock.getCreateEmpNo(), titaVo);
+				if (cdEmp != null) {
+					tlrno += " " + cdEmp.getFullname();
+				}
+				occursList.putParam("OTlrNo", tlrno);
+				
+//				this.info("tTxLock.getCreateDate() = " + tTxLock.getCreateDate().toString());
 				occursList.putParam("OTxDate", DbDateToRocDate(tTxLock.getCreateDate().toString()));
 				occursList.putParam("OTxTime", DbDateToRocTime(tTxLock.getCreateDate().toString()));
 				/* 將每筆資料放入Tota的OcList */

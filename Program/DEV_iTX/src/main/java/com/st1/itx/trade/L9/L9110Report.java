@@ -191,8 +191,7 @@ public class L9110Report extends MakeReport {
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
 
-		this.print(-6, 1,
-				"戶號 .........            　戶名 ..........　　　　　　　　　　　　　　　　　　　　　　　　　　　 統一編號 ..... 　　　　　　　　　　　　核准號碼 ..... ");
+		this.print(-6, 1, "戶號 .........            　戶名 ..........　　　　　　　　　　　　　　　　　　　　　　　　　　　 統一編號 ..... 　　　　　　　　　　　　核准號碼 ..... ");
 
 		if (tL9110 != null && tL9110.size() != 0) {
 			// header fill-in
@@ -250,7 +249,7 @@ public class L9110Report extends MakeReport {
 			String relateCustName = "資料未建立";
 
 			// TODO:關聯戶???
-			
+
 			this.print(1, 1, "二、關聯戶戶名： " + relateCustName);
 
 			// 3
@@ -269,8 +268,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 35, "核准額度 ..... "); // amount is R-pined at 49
 			this.print(0, 65, formatAmt(tL9110.get("F17"), 0), "R");
 			this.print(0, 69, "核准科目 ..... " + tL9110.get("F18"));
-			this.print(0, 105,
-					"貸款期間 ..... " + tL9110.get("F19") + " 年 " + tL9110.get("F20") + " 月 " + tL9110.get("F21") + " 日");
+			this.print(0, 105, "貸款期間 ..... " + tL9110.get("F19") + " 年 " + tL9110.get("F20") + " 月 " + tL9110.get("F21") + " 日");
 
 			this.print(1, 5, "商品代碼 ..... " + tL9110.get("F22"));
 			this.print(0, 35, "核准利率 ..... ");
@@ -496,8 +494,7 @@ public class L9110Report extends MakeReport {
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
 
-		this.print(-6, 1,
-				"戶號 .........            　戶名 ..........　　　　　　　　　　　　　　　　　　　　　　　　　　　 統一編號 ..... 　　　　　　　　　　　　核准號碼 ..... ");
+		this.print(-6, 1, "戶號 .........            　戶名 ..........　　　　　　　　　　　　　　　　　　　　　　　　　　　 統一編號 ..... 　　　　　　　　　　　　核准號碼 ..... ");
 
 		if (tL9110 != null && tL9110.size() != 0) {
 			// header fill-in
@@ -573,8 +570,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 35, "核准額度 ..... "); // amount is R-pined at 49
 			this.print(0, 65, formatAmt(tL9110.get("F17"), 0), "R");
 			this.print(0, 69, "核准科目 ..... " + tL9110.get("F18"));
-			this.print(0, 105,
-					"貸款期間 ..... " + tL9110.get("F19") + " 年 " + tL9110.get("F20") + " 月 " + tL9110.get("F21") + " 日");
+			this.print(0, 105, "貸款期間 ..... " + tL9110.get("F19") + " 年 " + tL9110.get("F20") + " 月 " + tL9110.get("F21") + " 日");
 
 			this.print(1, 5, "商品代碼 ..... " + tL9110.get("F22"));
 			this.print(0, 35, "核准利率 ..... ");
@@ -791,8 +787,7 @@ public class L9110Report extends MakeReport {
 					custEntCode = "0";
 				}
 
-				this.info("L9110Report : " + thisApplNo + ", This applNo is..." + (custEntCode.equals("1") ? "" : "not")
-						+ " a legal person");
+				this.info("L9110Report : " + thisApplNo + ", This applNo is..." + (custEntCode.equals("1") ? "" : "not") + " a legal person");
 
 				if (currentApplNoItem > 1) {
 					this.newPage();
@@ -968,11 +963,11 @@ public class L9110Report extends MakeReport {
 			this.print(1, 5, "統一編號 ..... " + tGua.get("F0"));
 			this.print(0, 35, "姓名 ......... " + tGua.get("F1"));
 			this.print(0, 69, "關係 ......... " + tGua.get("F2"));
-			this.print(0, 105, "類別 ......... " + tGua.get("F6"));
-			this.print(0, 135, "保証金額 ..... " + formatAmt(tGua.get("F3"), 0));
+			this.print(0, 105, "類別 ......... " + tGua.get("F6")); // 保證類別最長有十個中文字,把保證金額移到第二行
 
 			this.print(1, 5, "通訊地址 ..... " + tGua.get("F4"));
 			this.print(0, 105, "郵遞區號 ..... " + tGua.get("F5"));
+			this.print(0, 135, "保証金額 ..... " + formatAmt(tGua.get("F3"), 0));
 		}
 	}
 
@@ -992,8 +987,7 @@ public class L9110Report extends MakeReport {
 		this.print(-4, newBorder.length() - rpad, "頁　　數：" + this.getNowPage());
 
 		this.print(-2, (newBorder.length() + 2) / 2, "新光人壽保險股份有限公司", "C");
-		this.print(-3, (newBorder.length() + 2) / 2, this.reportItem.concat(custEntCode.equals("1") ? "（法人）" : "（自然人）"),
-				"C");
+		this.print(-3, (newBorder.length() + 2) / 2, this.reportItem.concat(custEntCode.equals("1") ? "（法人）" : "（自然人）"), "C");
 
 		this.setBeginRow(thisBeginRow);
 		this.setMaxRows(thisMaxRow);
@@ -1138,8 +1132,7 @@ public class L9110Report extends MakeReport {
 
 						// 可用額度 = 總額度 - 已動用額度餘額
 
-						BigDecimal availableAmt = getBigDecimal(queryShareQuota.get("F2"))
-								.subtract(getBigDecimal(queryShareQuota.get("F3")));
+						BigDecimal availableAmt = getBigDecimal(queryShareQuota.get("F2")).subtract(getBigDecimal(queryShareQuota.get("F3")));
 
 						// 負數時擺0
 

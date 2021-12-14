@@ -82,6 +82,9 @@ T(3,1)ASGN(LOOP$)
 ! 計件代碼(TOTA)
 #OOWorkMonth=A,5,S
 
+!1:已停效
+#OOFlag=A,1,S
+
 ! 複製
 #OOBUF3=X,6,S
 T(2,3+#OOWorkMonth)
@@ -94,7 +97,8 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6757;text=複製;ntxbuf=#OOBUF3})
 T(2,4+#OOWorkMonth)
 
 #OOBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6757;text=刪除;ntxbuf=#OOBUF4})
+IF(#OOFlag==0 ,BIND(grid,{cmd=CHAIN;ntxcd=L6757;text=刪除;ntxbuf=#OOBUF4}),
+														BIND(grid,cancel))
 
 ! 查詢的按鈕
 #OOFunc5=A,1,S
@@ -122,6 +126,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6994;text=查詢;ntxbuf=#OOBUF5})
 
 TXFORM=L6084
 #OOWorkMonth
+#OOFlag
 ^
 </sub>
 

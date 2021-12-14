@@ -1852,7 +1852,7 @@ public class L8403File extends MakeFile {
 					String iApplyDate = String.valueOf(sJcicZ049.getApplyDate());
 					int ixApplyDate = Integer.valueOf(sJcicZ049.getApplyDate());
 					String iCourtCode = sJcicZ049.getCourtCode();
-					String iYear = String.valueOf(sJcicZ049.getYear());
+					String iYear = String.valueOf(sJcicZ049.getYear()-1911);
 					int ixYear = Integer.valueOf(sJcicZ049.getYear());
 					String iCourtDiv = sJcicZ049.getCourtDiv();
 					String iCourtCaseNo = sJcicZ049.getCourtCaseNo();
@@ -1884,7 +1884,7 @@ public class L8403File extends MakeFile {
 					iJcicZ049Log.setClaimStatus(ixClaimStatus);
 					iJcicZ049Log.setApplyDate(ixApplyDate);
 					iJcicZ049Log.setCourtCode(iCourtCode);
-					iJcicZ049Log.setYear(ixYear);
+					iJcicZ049Log.setYear(ixYear+1911);
 					iJcicZ049Log.setCourtDiv(iCourtDiv);
 					iJcicZ049Log.setCourtCaseNo(iCourtCaseNo);
 					iJcicZ049Log.setApprove(iApprove);
@@ -1919,7 +1919,7 @@ public class L8403File extends MakeFile {
 					String iSumRepayActualAmt = String.valueOf(sJcicZ050.getSumRepayActualAmt());
 					String iSumRepayShouldAmt = String.valueOf(sJcicZ050.getSumRepayShouldAmt());
 					String iStatus = sJcicZ050.getStatus();
-					String iSecondRepayYM = String.valueOf(sJcicZ050.getSecondRepayYM());
+					String iSecondRepayYM = String.valueOf(sJcicZ050.getSecondRepayYM()-191100);
 					int ixSecondRepayYM = Integer.valueOf(sJcicZ050.getSecondRepayYM());
 					int ixPayAmt = Integer.valueOf(sJcicZ050.getPayAmt());
 					int ixSumRepayActualAmt = Integer.valueOf(sJcicZ050.getSumRepayActualAmt());
@@ -1949,7 +1949,7 @@ public class L8403File extends MakeFile {
 					iJcicZ050Log.setSumRepayActualAmt(ixSumRepayActualAmt);
 					iJcicZ050Log.setSumRepayShouldAmt(ixSumRepayShouldAmt);
 					iJcicZ050Log.setStatus(iStatus);
-					iJcicZ050Log.setSecondRepayYM(ixSecondRepayYM);
+					iJcicZ050Log.setSecondRepayYM(ixSecondRepayYM+191100);
 					iJcicZ050Log.setTranKey(iTranKey);
 					iJcicZ050Log.setOutJcicTxtDate(iDate);
 
@@ -2202,7 +2202,7 @@ public class L8403File extends MakeFile {
 					String iCaseStatus = sJcicZ055.getCaseStatus();
 					String iClaimDate = String.valueOf(sJcicZ055.getClaimDate());
 					String iCourtCode = sJcicZ055.getCourtCode();
-					int iYear = sJcicZ055.getYear();
+					int iYear = sJcicZ055.getYear()-1911;
 					String iCourtDiv = sJcicZ055.getCourtDiv();
 					String iCourtCaseNo = sJcicZ055.getCourtCaseNo();
 					String iPayDate = String.valueOf(sJcicZ055.getPayDate());
@@ -2247,7 +2247,7 @@ public class L8403File extends MakeFile {
 					iJcicZ055LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ055LogId.setUkey(iUkey);
 					iJcicZ055Log.setJcicZ055LogId(iJcicZ055LogId);
-					iJcicZ055Log.setYear(iYear);
+					iJcicZ055Log.setYear(iYear+1911);
 					iJcicZ055Log.setCourtDiv(iCourtDiv);
 					iJcicZ055Log.setCourtCaseNo(iCourtCaseNo);
 					iJcicZ055Log.setPayDate(ixPayDate);
@@ -2288,7 +2288,7 @@ public class L8403File extends MakeFile {
 					String iCaseStatus = sJcicZ056.getCaseStatus();
 					String iClaimDate = String.valueOf(sJcicZ056.getClaimDate());
 					String iCourtCode = sJcicZ056.getCourtCode();
-					String iYear = String.valueOf(sJcicZ056.getYear());
+					String iYear = String.valueOf(sJcicZ056.getYear()-1911);
 					int ixYear = Integer.valueOf(sJcicZ056.getYear());
 					String iCourtDiv = sJcicZ056.getCourtDiv();
 					String iCourtCaseNo = sJcicZ056.getCourtCaseNo();
@@ -2327,7 +2327,7 @@ public class L8403File extends MakeFile {
 					iJcicZ056LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ056LogId.setUkey(iUkey);
 					iJcicZ056Log.setJcicZ056LogId(iJcicZ056LogId);
-					iJcicZ056Log.setYear(ixYear);
+					iJcicZ056Log.setYear(ixYear+1911);
 					iJcicZ056Log.setCourtDiv(iCourtDiv);
 					iJcicZ056Log.setCourtCaseNo(iCourtCaseNo);
 					iJcicZ056Log.setApprove(iApprove);

@@ -11,7 +11,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,277)ASGN(INQLEN$)
+E(0,262)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -187,7 +187,7 @@ E(0,#TxAmt)
 #TxAmtX=X,17,S
 X(#TxAmt1)
 
-#BrNo=X,20,S
+#BrNo=X,25,S
 #TlrNo=X,6,S
 #SupNo=X,6,S
 #FlowType=X,1,S
@@ -199,7 +199,7 @@ X(#TxAmt1)
 #OOOrgEntdy=D,7,S
 C(3,#OOOrgEntdy,0,S,$)
 
-#TranItem=X,80,S
+#TranItem=X,60,S
 #TranItemX=X,86,S
 T(2,#TranNo+ +#TranItem)
 
@@ -334,13 +334,13 @@ TXFORM=LC011
 {width:120,align:'right'}
 
 #BrNo=單位
-{width:80,align:'center'}
+{width:120,align:'center'}
 
 #TlrItem=經辦
-{width:60,align:'center'}
+{width:100,align:'center'}
 
 #SupItem=主管
-{width:60,align:'center'}
+{width:100,align:'center'}
 
 #TypeX=流程
 {width:80,align:'center'}
@@ -352,7 +352,7 @@ TXFORM=LC011
 {width:80,align:'center'}
 
 #OOOrgEntdy=原會計日期
-{width:80,align:'center'}
+{width:90,align:'center'}
 
 ^
 

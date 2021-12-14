@@ -88,7 +88,7 @@ public class L8312 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"));
+		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"))+191100;
 		String iDelayCode = titaVo.getParam("DelayCode");
 		String iDelayDesc = titaVo.getParam("DelayDesc");
 		String iKey = "";
@@ -113,8 +113,7 @@ public class L8312 extends TradeBuffer {
 			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***
 			// 2.2 start 完整key值已報送結案則予以剔退
 			if ("A".equals(iTranKey)) {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
 					int sTranKey = 0;
 					for (JcicZ046 xJcicZ046 : sJcicZ046) {
@@ -141,10 +140,8 @@ public class L8312 extends TradeBuffer {
 				Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ051 != null) {
 					for (JcicZ051 xJcicZ051 : sJcicZ051) {
-						if (!"D".equals(xJcicZ051.getTranKey())
-								&& !titaVo.getParam("Ukey").equals(xJcicZ051.getUkey())) {
-							if (("D".equals(iDelayCode) && "D".equals(xJcicZ051.getDelayCode()))
-									&& (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
+						if (!"D".equals(xJcicZ051.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ051.getUkey())) {
+							if (("D".equals(iDelayCode) && "D".equals(xJcicZ051.getDelayCode())) && (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
 								if ("A".equals(iTranKey)) {
 									throw new LogicException("E0005", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
 								} else {

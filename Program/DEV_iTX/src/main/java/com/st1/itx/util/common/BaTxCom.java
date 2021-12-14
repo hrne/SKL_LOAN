@@ -1119,7 +1119,7 @@ public class BaTxCom extends TradeBuffer {
 					break;
 				}
 			}
-			// 
+			//
 			for (BaTxVo ba : this.baTxList) {
 				rpFacmNo = ba.getFacmNo();
 				break;
@@ -1234,10 +1234,23 @@ public class BaTxCom extends TradeBuffer {
 							} else {
 								switch (rv.getAcctCode()) {
 								case "F10": // 帳管費/手續費
-								case "F12": // 聯貸件
-								case "F27": // 聯貸管理費
 									baTxVo.setRepayType(4); // 04-帳管費/手續費
 									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
+									this.acctFee = this.acctFee.add(rv.getRvBal());
+									break;
+								case "F12": // 聯貸件
+								case "F27": // 聯貸管理費
+									if (iRepayType >= 1 && iRepayType <= 3) {// 期款 另收費用
+										baTxVo.setDataKind(6); // 另收費用
+									} else {
+										if (rv.getReceivableFlag() == 3) {
+											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
+										} else {
+											baTxVo.setDataKind(6); // 另收費用
+										}
+									}
+									baTxVo.setRepayType(4); // 04-帳管費/手續費
+
 									this.acctFee = this.acctFee.add(rv.getRvBal());
 									break;
 								case "F29": // F29 契變手續費

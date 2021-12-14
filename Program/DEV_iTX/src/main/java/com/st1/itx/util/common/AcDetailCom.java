@@ -289,7 +289,7 @@ public class AcDetailCom extends TradeBuffer {
 				tAcDetail.setTitaSupNo(titaVo.getEmpNos()); // 核准主管
 				tAcDetail.setTitaRelCd(parse.stringToInteger(titaVo.getRelCode())); // 作業模式
 				/*------------jsonFields -----------*/
-				settingjsonfields(ac.getJsonFields(), titaVo);
+				settingjsonfields(ac, titaVo);
 
 				/*----------- 自動設定 -----------*/
 				tAcDetailId.setRelDy(this.txBuffer.getTxCom().getReldy()); // 登放日期
@@ -381,11 +381,11 @@ public class AcDetailCom extends TradeBuffer {
 	}
 
 	/* 設定 jsonFields 欄 */
-	private void settingjsonfields(String JsonFields, TitaVo titaVo) throws LogicException {
+	private void settingjsonfields(AcDetail ac, TitaVo titaVo) throws LogicException {
 		TempVo tTempVo = new TempVo();
 		tTempVo.clear();
-		if (JsonFields != null) {
-			tTempVo = tTempVo.getVo(JsonFields);
+		if (ac.getJsonFields() != null) {
+			tTempVo = tTempVo.getVo(ac.getJsonFields());
 		}
 		// 1. CaseCloseCode 結案區分、RenewCode展期記號
 //	    交易代號 = L3410 結案登錄-可欠繳 
@@ -401,6 +401,9 @@ public class AcDetailCom extends TradeBuffer {
 				&& "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
 			tTempVo.putParam("StampTaxFreeAmt", tAcDetail.getTxAmt());
 		}
+		if (!ac.getAcctCode().equals(tCdAcCode.getAcctCode())) {
+			tTempVo.putParam("RvAcctCode", ac.getAcctCode());			
+		}
 
 		tAcDetail.setJsonFields(tTempVo.getJsonString());
 	}
@@ -411,7 +414,10 @@ public class AcDetailCom extends TradeBuffer {
 // 銷帳科目記號ReceivableFlag = 3-未收款    
 // F10 帳管費  
 // TMI 火險保費 
-// F29 契變手續費		
+// F29 契變手續費
+// F12聯貸件收入
+// F27聯貸管理費收入
+
 // 銷帳科目記號ReceivableFlag = 4-短繳期金 		               	         
 // Z10	短期擔保放款	  310	短期擔保放款
 // Z20	中期擔保放款	  320	中期擔保放款
@@ -423,10 +429,13 @@ public class AcDetailCom extends TradeBuffer {
 // IC4	三十年房貸息
 // IOV	逾期息
 // IOP	違約金
-// YOP  清償違約金         IOP	違約金     
+// YOP  清償違約金         IOP	違約金    
 // 銷帳科目記號ReceivableFlag = 5-另收欠款
-// 未用     
-		// step 1. 轉換業務科目: 4-短繳期金
+// F12聯貸件收入
+// F27聯貸管理費收入
+
+		// step 1. 轉換業務科目
+		// 短繳期金
 		if (ac.getReceivableFlag() == 4) {
 			if (ac.getRvNo().length() < 3) {
 				throw new LogicException("E6001", "AcDetailCom 短繳期金需有撥款序號"); // E6001 分錄檢核有誤
@@ -438,6 +447,17 @@ public class AcDetailCom extends TradeBuffer {
 		}
 		if (acctCode.equals("YOP")) {
 			acctCode = "IOP";
+		}
+
+		// 聯貸費攤提，未到期收入轉入TSL暫收款－聯貸費攤提
+		// F12聯貸件收入、 F27聯貸管理費收入
+		// 聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
+		if (acctCode.equals("F12") || acctCode.equals("F27")) {
+			if (ac.getReceivableFlag() == 3 && ac.getRvNo().length() >= 15 && parse.isNumeric(ac.getRvNo().substring(10, 15))) {
+				if (parse.stringToInteger(ac.getRvNo().substring(10, 15)) > this.txBuffer.getTxCom().getTbsdy() / 100) {
+					acctCode = "TSL";
+				}
+			}
 		}
 
 		// step 2. 轉換專戶

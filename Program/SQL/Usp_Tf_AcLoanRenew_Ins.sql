@@ -33,7 +33,7 @@ BEGIN
           ,CASE
              WHEN NVL(S2."LMSACN",0) <> 0 THEN '2'  -- 協議
            ELSE '1' -- 一般
-           END                            AS "ReNewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+           END                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
           ,CASE
              WHEN S1."Seq" = 1 -- 新撥款對到舊撥款 最早的一筆 為Y
              THEN 'Y'
@@ -75,7 +75,7 @@ BEGIN
 
     MERGE INTO "AcLoanRenew" TARGET_TABLE
     USING (
-      WITH NEW (
+      WITH NEW_NO AS (
         SELECT LMSACN
              , NEGNUM
              , LMSAPN
@@ -83,7 +83,7 @@ BEGIN
         FROM LN$NODP
         WHERE CHGFLG = 'A' -- 新
       )
-      , OLD AS (
+      , OLD_NO AS (
         SELECT LMSACN
              , NEGNUM
              , LMSAPN
@@ -92,30 +92,30 @@ BEGIN
         WHERE CHGFLG = 'B' -- 舊
       )
       , S1 AS (
-        SELECT OLD.LMSACN
-             , OLD.LMSAPN
-             , OLD.LMSASQ
-             , NEW.LMSAPN AS OLD_LMSAPN
-             , NEW.LMSASQ AS OLD_LMSASQ
+        SELECT NEW_NO.LMSACN
+             , NEW_NO.LMSAPN
+             , NEW_NO.LMSASQ
+             , OLD_NO.LMSAPN AS OLD_LMSAPN
+             , OLD_NO.LMSASQ AS OLD_LMSASQ
              , ROW_NUMBER() 
                OVER (
-                 PARTITION BY OLD.LMSACN
-                            , OLD.LMSAPN
-                            , OLD.LMSASQ
-                 ORDER BY NEW.LMSAPN
-                        , NEW.LMSASQ
+                 PARTITION BY NEW_NO.LMSACN
+                            , NEW_NO.LMSAPN
+                            , NEW_NO.LMSASQ
+                 ORDER BY OLD_NO.LMSAPN
+                        , OLD_NO.LMSASQ
                ) AS "Seq"
-        FROM NEW
-        LEFT JOIN OLD ON OLD.LMSACN = NEW.LMSACN
-                     AND OLD.NEGNUM = NEW.NEGNUM
-        WHERE NVL(OLD.LMSACN,0) != 0
+        FROM NEW_NO
+        LEFT JOIN OLD_NO ON OLD_NO.LMSACN = NEW_NO.LMSACN
+                        AND OLD_NO.NEGNUM = NEW_NO.NEGNUM
+        WHERE NVL(OLD_NO.LMSACN,0) != 0
       )
       SELECT S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 3
             ,S1."LMSAPN"                    AS "NewFacmNo"           -- 新額度編號 DECIMAL 3
             ,S1."LMSASQ"                    AS "NewBormNo"           -- 新撥款序號 DECIMAL 3
             ,S1."OLD_LMSAPN"                AS "OldFacmNo"           -- 舊額度編號 DECIMAL 6
             ,S1."OLD_LMSASQ"                AS "OldBormNo"           -- 舊撥款序號 DECIMAL 6
-            ,'2'                            AS "ReNewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+            ,'2'                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
             ,CASE
               WHEN S1."Seq" = 1 -- 新撥款對到舊撥款 最早的一筆 為Y
               THEN 'Y'
@@ -138,14 +138,14 @@ BEGIN
       AND TARGET_TABLE."OldBormNo" = SOURCE_TABLE."OldBormNo"
     )
     WHEN MATCHED THEN UPDATE
-    SET "ReNewCode" = '2'
+    SET "RenewCode" = '2'
     WHEN NOT MATCHED THEN INSERT (
         "CustNo"          -- 戶號 DECIMAL 3
       , "NewFacmNo"       -- 新額度編號 DECIMAL 3
       , "NewBormNo"       -- 新撥款序號 DECIMAL 3
       , "OldFacmNo"       -- 舊額度編號 DECIMAL 6
       , "OldBormNo"       -- 舊撥款序號 DECIMAL 6
-      , "ReNewCode"       -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+      , "RenewCode"       -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
       , "MainFlag"        -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
       , "AcDate"          -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期
       , "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 
@@ -158,7 +158,7 @@ BEGIN
       , SOURCE_TABLE."NewBormNo"       -- 新撥款序號 DECIMAL 3
       , SOURCE_TABLE."OldFacmNo"       -- 舊額度編號 DECIMAL 6
       , SOURCE_TABLE."OldBormNo"       -- 舊撥款序號 DECIMAL 6
-      , SOURCE_TABLE."ReNewCode"       -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+      , SOURCE_TABLE."RenewCode"       -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
       , SOURCE_TABLE."MainFlag"        -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
       , SOURCE_TABLE."AcDate"          -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期
       , SOURCE_TABLE."CreateEmpNo"     -- 建檔人員 VARCHAR2 6 

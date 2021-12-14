@@ -152,11 +152,11 @@ public class L8205Report5 extends MakeReport {
 				
 				
 				// 還款來源
-				String sourse = tL8205Vo.get("F8");
-				if(sourse.length()<2) {
-					sourse = "0"+sourse;
-				}
-				print(0, 79, sourse);
+//				String sourse = tL8205Vo.get("F8");
+//				if(sourse.length()<2) {
+//					sourse = "0"+sourse;
+//				}
+//				print(0, 79, sourse);
 				//還款來源中文
 				print(0, 81, tL8205Vo.get("F12"));
 				

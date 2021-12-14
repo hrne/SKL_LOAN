@@ -94,7 +94,7 @@ public class L8311 extends TradeBuffer {
 		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt"));
 		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt"));
 		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
-		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM"));
+		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM"))+191100;
 		String iStatus = titaVo.getParam("Status");
 		String iKey = "";
 		int sPayAmt = iPayAmt;// 該IDN所有已報送本檔案資料之第8欄繳款金額之合計
@@ -118,8 +118,7 @@ public class L8311 extends TradeBuffer {
 			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***不能為空
 			// 2.2 start 完整key值已報送結案則予以剔退
 			if ("A".equals(iTranKey)) {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
 					int sTranKey = 0;
 					for (JcicZ046 xJcicZ046 : sJcicZ046) {
@@ -154,8 +153,7 @@ public class L8311 extends TradeBuffer {
 				Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ050 != null) {
 					for (JcicZ050 xJcicZ050 : sJcicZ050) {
-						if (!"D".equals(xJcicZ050.getTranKey())
-								&& !titaVo.getParam("Ukey").equals(xJcicZ050.getUkey())) {
+						if (!"D".equals(xJcicZ050.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ050.getUkey())) {
 							sPayAmt += xJcicZ050.getPayAmt();
 						}
 					}

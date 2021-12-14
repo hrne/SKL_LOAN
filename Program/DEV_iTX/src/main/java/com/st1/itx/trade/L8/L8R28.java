@@ -25,7 +25,6 @@ public class L8R28 extends TradeBuffer {
 	@Autowired
 	public JcicZ056Service iJcicZ056Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r28 ");
@@ -33,31 +32,30 @@ public class L8R28 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ056 iJcicZ056 = new JcicZ056();
 		iJcicZ056 = iJcicZ056Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ056 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r28CustId", iJcicZ056.getCustId());
 			totaVo.putParam("L8r28SubmitKey", iJcicZ056.getSubmitKey());
-			totaVo.putParam("L8r28CaseStatus",iJcicZ056.getCaseStatus());
-			totaVo.putParam("L8r28ClaimDate",iJcicZ056.getClaimDate());
-			totaVo.putParam("L8r28CourtCode",iJcicZ056.getCourtCode());
-			totaVo.putParam("L8r28Year",iJcicZ056.getYear());
-			totaVo.putParam("L8r28CourtDiv",iJcicZ056.getCourtDiv());
-			totaVo.putParam("L8r28CourtCaseNo",iJcicZ056.getCourtCaseNo());
-			totaVo.putParam("L8r28Approve",iJcicZ056.getApprove());
-			totaVo.putParam("L8r28OutstandAmt",iJcicZ056.getOutstandAmt());
-			totaVo.putParam("L8r28ClaimStatus1",iJcicZ056.getClaimStatus1());
-			totaVo.putParam("L8r28SaveDate",iJcicZ056.getSaveDate());
-			totaVo.putParam("L8r28ClaimStatus2",iJcicZ056.getClaimStatus2());
-			totaVo.putParam("L8r28SaveEndDate",iJcicZ056.getSaveEndDate());
-			totaVo.putParam("L8r28SubAmt",iJcicZ056.getSubAmt());
-			totaVo.putParam("L8r28AdminName",iJcicZ056.getAdminName());
-			totaVo.putParam("L8r28TranKey", iJcicZ056.getTranKey());	
+			totaVo.putParam("L8r28CaseStatus", iJcicZ056.getCaseStatus());
+			totaVo.putParam("L8r28ClaimDate", iJcicZ056.getClaimDate());
+			totaVo.putParam("L8r28CourtCode", iJcicZ056.getCourtCode());
+			totaVo.putParam("L8r28Year", iJcicZ056.getYear()-1911);
+			totaVo.putParam("L8r28CourtDiv", iJcicZ056.getCourtDiv());
+			totaVo.putParam("L8r28CourtCaseNo", iJcicZ056.getCourtCaseNo());
+			totaVo.putParam("L8r28Approve", iJcicZ056.getApprove());
+			totaVo.putParam("L8r28OutstandAmt", iJcicZ056.getOutstandAmt());
+			totaVo.putParam("L8r28ClaimStatus1", iJcicZ056.getClaimStatus1());
+			totaVo.putParam("L8r28SaveDate", iJcicZ056.getSaveDate());
+			totaVo.putParam("L8r28ClaimStatus2", iJcicZ056.getClaimStatus2());
+			totaVo.putParam("L8r28SaveEndDate", iJcicZ056.getSaveEndDate());
+			totaVo.putParam("L8r28SubAmt", iJcicZ056.getSubAmt());
+			totaVo.putParam("L8r28AdminName", iJcicZ056.getAdminName());
+			totaVo.putParam("L8r28TranKey", iJcicZ056.getTranKey());
 			totaVo.putParam("L8r28OutJcicTxtDate", iJcicZ056.getOutJcicTxtDate());
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

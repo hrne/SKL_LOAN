@@ -215,15 +215,12 @@ public class L9711Report2 extends MakeReport {
 				this.info("getLoanBal=" + listBaTxVo.get(i).getLoanBal());
 
 				payIntDate = String.valueOf(listBaTxVo.get(i).getPayIntDate());
-				if (payIntDate.equals("0")) {
-					payIntDate = "0000000";
-				}
 
 				if (!payIntDate.equals(tempDate)) {
 
 					// 防第一次沒資料就加入
-					if (i > 0 && !payIntDate.equals(tempDate)) {
-
+					if (i > 0) {
+//						if (i > 0 && !payIntDate.equals(tempDate)) {
 						tempList.add(tempMap);
 
 						tempMap = new HashMap<String, Integer>();
@@ -284,35 +281,38 @@ public class L9711Report2 extends MakeReport {
 
 					tempList.add(tempMap);
 				}
+
 			}
 
 			for (Map<String, Integer> listData : tempList) {
 
 				this.info("date=" + listData.get("pday").toString());
 				tempDate = listData.get("pday").toString();
-				// 應繳日
-				this.print(dataRow, 7,
-						tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
-				// 違約金
-				this.print(dataRow, 26, String.format("%,d", listData.get("bAmt")), "R");
-				// 本金
-				this.print(dataRow, 38, String.format("%,d", listData.get("pAmt")), "R");
-				// 利息
-				this.print(dataRow, 52, String.format("%,d", listData.get("iAmt")), "R");
-				// 應繳合計
-				this.print(dataRow, 66,
-						String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
-						"R");
-				// 未還 本金餘額
-				this.print(dataRow, 78, String.format("%,d", listData.get("lAmt")), "R");
-				// 暫付 所得稅
-				this.print(dataRow, 88, "0", "R");
-				// 應繳淨額
-				this.print(dataRow, 100,
-						String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
-						"R");
+				if (!tempDate.equals("0")) {
+					// 應繳日
+					this.print(dataRow, 7,
+							tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
+					// 違約金
+					this.print(dataRow, 26, String.format("%,d", listData.get("bAmt")), "R");
+					// 本金
+					this.print(dataRow, 38, String.format("%,d", listData.get("pAmt")), "R");
+					// 利息
+					this.print(dataRow, 52, String.format("%,d", listData.get("iAmt")), "R");
+					// 應繳合計
+					this.print(dataRow, 66,
+							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+							"R");
+					// 未還 本金餘額
+					this.print(dataRow, 78, String.format("%,d", listData.get("lAmt")), "R");
+					// 暫付 所得稅
+					this.print(dataRow, 88, "0", "R");
+					// 應繳淨額
+					this.print(dataRow, 100,
+							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+							"R");
 
-				dataRow--;
+					dataRow--;
+				}
 			}
 
 		}

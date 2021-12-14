@@ -22,7 +22,6 @@ import com.st1.itx.util.common.LockControl;
  * @version 1.0.0
  */
 public class LC110 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC110.class);
 
 	@Autowired
 	public LockControl LockControl;

@@ -673,7 +673,11 @@ public class L4450Batch extends TradeBuffer {
 			}
 
 			tBankDeductDtl.setAcctCode(sAcctCode);
-			tBankDeductDtl.setPrevIntDate(prevIntDate.get(tmp));
+			if (prevIntDate.get(tmp) != null) {
+				tBankDeductDtl.setPrevIntDate(prevIntDate.get(tmp));
+			} else {
+				tBankDeductDtl.setPrevIntDate(0);
+			}
 			this.info("1RepayType : " + tmp.getRepayType());
 			this.info("1shPayAmtMap : " + shPayAmtMap.get(tmp));
 			this.info("1repAmtMap : " + repAmtMap.get(tmp));

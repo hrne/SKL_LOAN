@@ -114,6 +114,7 @@ public class AcReceivableCom extends TradeBuffer {
 			else
 				idx = this.txBuffer.getAcDetailList().size() - 1 - i;
 			ac = this.txBuffer.getAcDetailList().get(idx);
+			tTempVo = tTempVo.getVo(ac.getJsonFields());
 			if ((ac.getAcctFlag() == 1 && !"L6801".equals(titaVo.getTxcd()))
 					|| (ac.getReceivableFlag() > 0 && ac.getReceivableFlag() < 8)) {
 				// 銷帳記號 0-起帳 1-銷帳
@@ -133,11 +134,30 @@ public class AcReceivableCom extends TradeBuffer {
 					else
 						wkRvFg = 0;
 				}
-				// 業務科目
+				// 銷帳業務科目
 				wkAcctCode = ac.getAcctCode();
-				// 轉換業務科目 YOP 清償違約金 IOP 違約金
-				if ("IOP".equals(ac.getAcctCode())) {
-					wkAcctCode = "YOP";
+				if (tTempVo.getParam("RvAcctCode") != null) {
+					wkAcctCode = tTempVo.getParam("RvAcctCode");
+				}
+				wkRvNo = ac.getRvNo().trim();
+				// 短繳本金Zxx銷帳，除銷放款科目帳外，需另作短繳本金Zxx銷帳
+				// 銷帳科目記號ReceivableFlag = 4-短繳期金
+				if (ac.getReceivableFlag() == 4 && "3".equals(ac.getAcctCode().substring(0, 1))) {
+					tAcReceivable = new AcReceivable();
+					tAcReceivable.setAcctCode(wkAcctCode);
+					tAcReceivable.setReceivableFlag(ac.getReceivableFlag());
+					tAcReceivable.setRvAmt(ac.getTxAmt());
+					tAcReceivable.setCustNo(ac.getCustNo());
+					tAcReceivable.setFacmNo(ac.getFacmNo());
+					tAcReceivable.setRvNo(parse.IntegerToString(ac.getBormNo(), 3));
+					mntRvList.add(tAcReceivable);
+					wkAcctCode = ac.getAcctCode();
+				}
+				// 暫收款－聯貸費攤提， 需轉換攤提銷帳科目記號 3:未收費用 -> 5.另收欠款
+				if (ac.getReceivableFlag() == 4 && "TSL".equals(ac.getAcctCode())) {
+					procSyndLoan(titaVo.getHCodeI());
+					wkAcctCode = ac.getAcctCode();
+					wkRvNo = "";
 				}
 
 				// 設定
@@ -170,22 +190,6 @@ public class AcReceivableCom extends TradeBuffer {
 					}
 				}
 
-				// 短繳本金Zxx銷帳
-				// 銷帳科目記號ReceivableFlag = 4-短繳期金
-				// Z10 短期擔保放款 310 短期擔保放款
-				// Z20 中期擔保放款 320 中期擔保放款
-				// Z30 長期擔保放款 330 長期擔保放款
-				// Z40 三十年房貸 340 三十年房貸
-				if (ac.getReceivableFlag() == 4 && "3".equals(ac.getAcctCode().substring(0, 1))) {
-					tAcReceivable = new AcReceivable();
-					tAcReceivable.setAcctCode("Z" + ac.getAcctCode().substring(1, 3));
-					tAcReceivable.setReceivableFlag(ac.getReceivableFlag());
-					tAcReceivable.setRvAmt(ac.getTxAmt());
-					tAcReceivable.setCustNo(ac.getCustNo());
-					tAcReceivable.setFacmNo(ac.getFacmNo());
-					tAcReceivable.setRvNo(parse.IntegerToString(ac.getBormNo(), 3));
-					mntRvList.add(tAcReceivable);
-				}
 				this.info("tAcReceivable=" + tAcReceivable);
 			}
 		}
@@ -348,6 +352,7 @@ public class AcReceivableCom extends TradeBuffer {
 		ac.setCustNo(rv.getCustNo());// 戶號+額度+撥款
 		ac.setFacmNo(rv.getFacmNo()); //
 		ac.setRvNo(rv.getRvNo()); // 銷帳編號
+		wkRvNo = ac.getRvNo().trim();
 		/*----------- 選擇參數 ----------*/
 		ac.setSlipNote(rv.getSlipNote()); // 傳票摘要
 		ac.setAcBookCode(rv.getAcBookCode()); // 帳冊別
@@ -398,7 +403,6 @@ public class AcReceivableCom extends TradeBuffer {
 				+ ac.getAcNoCode() + ",DbCr=" + ac.getDbCr());
 
 		// 銷帳編號wkRvNo primary key 不可有null, 放 " "
-		wkRvNo = ac.getRvNo().trim();
 		if (wkRvNo.isEmpty()) {
 			wkRvNo = " ";
 			// 資負明細科目（放款、催收款項..) --> 撥款序號(擔保放款、催收款項)
@@ -412,6 +416,31 @@ public class AcReceivableCom extends TradeBuffer {
 						+ parse.IntegerToString(gSeqCom.getSeqNo(ac.getAcDate(), 1, "L6", "RvNo", 999999, titaVo), 6);
 		}
 
+	}
+
+	/* 更新 */
+	private void procSyndLoan(int AcHCode) throws LogicException {
+		// --------------- hold該筆銷帳檔 --------------------
+		tAcReceivableId = new AcReceivableId();
+		tAcReceivableId.setAcctCode(wkAcctCode);
+		tAcReceivableId.setCustNo(ac.getCustNo());
+		tAcReceivableId.setFacmNo(ac.getFacmNo());
+		tAcReceivableId.setRvNo(wkRvNo);
+		tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
+		if (tAcReceivable == null) {
+			throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
+		}
+		if (AcHCode == 0) {
+			tAcReceivable.setReceivableFlag(5);
+		} else {
+			tAcReceivable.setReceivableFlag(3);
+		}
+		try {
+			acReceivableService.update(tAcReceivable, titaVo); // update
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new LogicException(titaVo, "E6003", "AcReceivable update " + tAcReceivableId + e.getErrorMsg());
+		}
 	}
 
 	/* 更新 */

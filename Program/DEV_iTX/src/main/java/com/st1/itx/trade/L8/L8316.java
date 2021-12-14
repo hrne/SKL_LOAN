@@ -85,7 +85,7 @@ public class L8316 extends TradeBuffer {
 		String iCaseStatus = titaVo.getParam("CaseStatus");// 案件狀態
 		int iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate"));// 裁定日期
 		String iCourtCode = titaVo.getParam("CourtCode");// 承審法院代碼
-		int iYear = Integer.valueOf(titaVo.getParam("Year"));
+		int iYear = Integer.valueOf(titaVo.getParam("Year"))+1911;
 		String iCourtDiv = titaVo.getParam("CourtDiv");
 		String iCourtCaseNo = titaVo.getParam("CourtCaseNo");
 		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));

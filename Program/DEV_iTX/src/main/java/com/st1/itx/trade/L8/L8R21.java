@@ -25,7 +25,6 @@ public class L8R21 extends TradeBuffer {
 	@Autowired
 	public JcicZ049Service iJcicZ049Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r21 ");
@@ -33,24 +32,24 @@ public class L8R21 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ049 iJcicZ049 = new JcicZ049();
 		iJcicZ049 = iJcicZ049Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ049 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r21CustId", iJcicZ049.getCustId());
 			totaVo.putParam("L8r21SubmitKey", iJcicZ049.getSubmitKey());
-			totaVo.putParam("L8r21RcDate",iJcicZ049.getRcDate());
-			totaVo.putParam("L8r21ClaimStatus",iJcicZ049.getClaimStatus());
-			totaVo.putParam("L8r21ApplyDate",iJcicZ049.getApplyDate());
-			totaVo.putParam("L8r21CourtCode",iJcicZ049.getCourtCode());
-			totaVo.putParam("L8r21Year",iJcicZ049.getYear());
-			totaVo.putParam("L8r21CourtDiv",iJcicZ049.getCourtDiv());
-			totaVo.putParam("L8r21CourtCaseNo",iJcicZ049.getCourtCaseNo());
-			totaVo.putParam("L8r21Approve",iJcicZ049.getApprove());
-			totaVo.putParam("L8r21ClaimDate",iJcicZ049.getClaimDate());
-			totaVo.putParam("L8r21TranKey", iJcicZ049.getTranKey());	
+			totaVo.putParam("L8r21RcDate", iJcicZ049.getRcDate());
+			totaVo.putParam("L8r21ClaimStatus", iJcicZ049.getClaimStatus());
+			totaVo.putParam("L8r21ApplyDate", iJcicZ049.getApplyDate());
+			totaVo.putParam("L8r21CourtCode", iJcicZ049.getCourtCode());
+			totaVo.putParam("L8r21Year", iJcicZ049.getYear()-1911);
+			totaVo.putParam("L8r21CourtDiv", iJcicZ049.getCourtDiv());
+			totaVo.putParam("L8r21CourtCaseNo", iJcicZ049.getCourtCaseNo());
+			totaVo.putParam("L8r21Approve", iJcicZ049.getApprove());
+			totaVo.putParam("L8r21ClaimDate", iJcicZ049.getClaimDate());
+			totaVo.putParam("L8r21TranKey", iJcicZ049.getTranKey());
 			totaVo.putParam("L8r21OutJcicTxtDate", iJcicZ049.getOutJcicTxtDate());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

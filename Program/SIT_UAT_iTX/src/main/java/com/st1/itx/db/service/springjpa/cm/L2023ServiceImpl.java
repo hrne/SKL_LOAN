@@ -33,8 +33,6 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	public Parse parse;
 
-	// *** 折返控制相關 ***
-	private int index;
 
 	// *** 折返控制相關 ***
 	private int limit;
@@ -45,6 +43,9 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int size;
 
+	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+	
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
@@ -85,7 +86,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"    0 AS \"Modify\"" ; 
 		sql +=	"  FROM" ; 
 		sql +=	"    \"FacMain\"    fm" ; 
-		sql +=	"    LEFT JOIN \"CustMain\"   cu ON cu.\"CustUKey\" = fm.\"CustUKey\"" ; 
+		sql +=	"    LEFT JOIN \"CustMain\"   cu ON cu.\"CustNo\" = fm.\"CustNo\"" ; 
 		sql +=	"  WHERE" ; 
 		sql +=	"    cu.\"CustId\" = :custid" ; 
 		
@@ -124,7 +125,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"  END AS \"Modify\"" ; 
 		sql +=	"  FROM" ; 
 		sql +=	"    \"FacMain\"            fm" ; 
-		sql +=	"    LEFT JOIN \"CustMain\"           cu ON cu.\"CustUKey\" = fm.\"CustUKey\"" ; 
+		sql +=	"    LEFT JOIN \"CustMain\"           cu ON cu.\"CustNo\" = fm.\"CustNo\"" ; 
 		sql +=	"    LEFT JOIN \"FacShareAppl\"       fs ON fs.\"ApplNo\" = fm.\"ApplNo\"" ; 
 		sql +=	"    LEFT JOIN \"FacShareAppl\"       fs2 ON fs2.\"MainApplNo\" = fs.\"MainApplNo\"" ; 
 		sql +=	"    LEFT JOIN \"FacShareRelation\"   fsr ON fsr.\"ApplNo\" = fs.\"ApplNo\"" ; 
@@ -160,7 +161,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"    0 AS \"Modify\"" ; 
 		sql +=	"  FROM" ; 
 		sql +=	"    \"FacMain\"       fm" ; 
-		sql +=	"    LEFT JOIN \"CustMain\"      cu ON cu.\"CustUKey\" = fm.\"CustUKey\"" ; 
+		sql +=	"    LEFT JOIN \"CustMain\"      cu ON cu.\"CustNo\" = fm.\"CustNo\"" ; 
 		sql +=	"    LEFT JOIN \"Guarantor\"     gu ON gu.\"ApproveNo\" = fm.\"ApplNo\"" ; 
 		sql +=	"    LEFT JOIN \"CdGuarantor\"   cdg ON cdg.\"GuaRelCode\" = gu.\"GuaRelCode\"" ; 
 		sql +=	"    LEFT JOIN \"CustMain\"      cu2 ON cu2.\"CustUKey\" = gu.\"GuaUKey\"" ; 
@@ -209,7 +210,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"    END AS \"Modify\"" ; 
 		sql +=	"  FROM" ; 
 		sql +=	"    \"FacMain\"           fm" ; 
-		sql +=	"    LEFT JOIN \"CustMain\"          cu ON cu.\"CustUKey\" = fm.\"CustUKey\"" ; 
+		sql +=	"    LEFT JOIN \"CustMain\"          cu ON cu.\"CustNo\" = fm.\"CustNo\"" ; 
 		sql +=	"    LEFT JOIN \"ClFac\"             cf ON cf.\"ApproveNo\" = fm.\"ApplNo\"" ; 
 		sql +=	"                            AND cf.\"CustNo\" = cu.\"CustNo\"" ; 
 		sql +=	"                            AND cf.\"FacmNo\" = fm.\"FacmNo\"" ; 
@@ -261,7 +262,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"    0 AS \"Modify\"" ; 
 		sql +=	"  FROM" ; 
 		sql +=	"    \"FacMain\"       fm" ; 
-		sql +=	"    LEFT JOIN \"CustMain\"      cu ON cu.\"CustUKey\" = fm.\"CustUKey\"" ; 
+		sql +=	"    LEFT JOIN \"CustMain\"      cu ON cu.\"CustNo\" = fm.\"CustNo\"" ; 
 		sql +=	"    LEFT JOIN \"FacRelation\"   fr ON fr.\"CreditSysNo\" = fm.\"CreditSysNo\"" ; 
 		sql +=	"    LEFT JOIN \"CustMain\"      cu2 ON cu2.\"CustUKey\" = fr.\"CustUKey\"" ; 
 		sql +=	"    LEFT JOIN \"CdCode\"        cd ON cd.\"DefCode\" = 'FacRelationCode'" ; 
@@ -270,19 +271,22 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"    cu.\"CustId\" = :custid" ; 
 		sql +=	"    AND fr.\"CreditSysNo\" = fm.\"CreditSysNo\"";
 		sql +=	"  ORDER BY \"CreditSysNo\", \"ApplNo\"";
-
+		sql += " " + sqlRow;
+		
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("custid", CustId);
+		query.setParameter("ThisIndex", index);
+		query.setParameter("ThisLimit", limit);
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
+//		query.setFirstResult(this.index * this.limit);
+		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);

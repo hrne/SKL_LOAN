@@ -28,6 +28,7 @@ import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.FileCom;
@@ -215,7 +216,7 @@ public class L4603 extends TradeBuffer {
 
 			
 			if(this.index == 0) {
-//			  MySpring.newTask("L4603p", this.txBuffer, titaVo); // 寄信 mail  跑批
+			  MySpring.newTask("L4603p", this.txBuffer, titaVo); // 寄信 mail  跑批
 			  
 			}
 		}

@@ -122,7 +122,7 @@ public class BS010 extends TradeBuffer {
 		do {
 			dateUtil.init();
 			dateUtil.setDate_1(iPayDate);
-			dateUtil.setDays(-1);
+			dateUtil.setDays(1);
 			iPayDate = dateUtil.getCalenderDay();
 			dateUtil.init();
 			dateUtil.setDate_2(iPayDate);

@@ -180,7 +180,7 @@ TXFORM=LC004
 #RPTFG=0,QUERY.GRID,LC004
 #any={detail:true, header:'LC004.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#BTN=
+#BTN=審核
 {width:40,search:false,formatter:'cust:bind-button:審核',canExport:false,align:'center'}
 
 #CalDate=交易日期

@@ -1,0 +1,15 @@
+OORecordDate=9,7
+OOCustNo=9,7
+OOFacmNo=9,3
+OOBormNo=9,3
+OOCustName=X,200
+OORepayDate=9,7
+OOActualRepayDate=9,7
+OORepayAmt=9,14.2
+OOCareer=X,40
+OOIncome=X,60
+OORepaySource=9,2
+OORepayBank=X,20
+OODescription=X,120
+OOEmpNo=X,6
+OOUpdate=X,9

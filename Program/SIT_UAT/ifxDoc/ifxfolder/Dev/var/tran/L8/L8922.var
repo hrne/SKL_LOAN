@@ -250,7 +250,7 @@ C(3,#Level,1,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=刪除;ntxb
 
 ! 歷程的按鈕
 #OOBUF5=X,32,S
-T(2,1+#OOCustNo+#OOAcDate+#OOFactor)
+T(2,1+#OOCustNo+000000+#OOAcDate+#OOFactor)
 
 #OOBTN5=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5})

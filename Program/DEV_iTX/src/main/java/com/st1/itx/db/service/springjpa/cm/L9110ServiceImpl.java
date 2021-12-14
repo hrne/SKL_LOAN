@@ -39,8 +39,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         )              AS Seq "; // -- 序號 F0
 		sql += "      , LO.\"Owner\"                    AS Owner "; // -- 提供人 F1
 		sql += "      , LPAD(L.\"BdNo1\",5,'0') ";
+		sql += "        || '-' ";
 		sql += "        || LPAD(L.\"BdNo2\",3,'0')      AS BdNo "; // -- 主建物建號 F2
 		sql += "      , LPAD(CBP1.\"PublicBdNo1\",5,'0') ";
+		sql += "        || '-' ";
 		sql += "        || LPAD(CBP1.\"PublicBdNo2\",3,'0') ";
 		sql += "                                        AS PublicBdNo ";// -- 公設建號 F3
 		sql += "      , NVL(L.\"FloorArea\",0) ";
@@ -318,7 +320,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- L9110 法人Query(火險)
 		String sql = "";
 		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ApproveNo\"";
-		sql += "                           ORDER BY IR.\"PrevInsuNo\" DESC";
+		sql += "                           ORDER BY IR.\"InsuStartDate\" ASC";
+		sql += "                                  , CF.\"ClCode1\" ";
+		sql += "                                  , CF.\"ClCode2\" ";
+		sql += "                                  , CF.\"ClNo\" ";
 		sql += "                          )   AS Seq "; // -- 序號
 		sql += "      , IR.\"NowInsuNo\"      AS NowInsuNo"; // -- 保單號碼
 		sql += "      , IR.\"InsuAmt\"        AS InsuAmt"; // -- 保險金額
@@ -326,7 +331,20 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , IR.\"InsuEndDate\"    AS InsuEndDate"; // -- 保險迄日
 		sql += "      , IR.\"InsuCompany\"    AS InsuCompany"; // -- 保險公司
 		sql += " FROM \"ClFac\" CF";
-		sql += " LEFT JOIN ( SELECT IR.\"ClCode1\"";
+		sql += " LEFT JOIN ( SELECT IO.\"ClCode1\" ";
+		sql += "                  , IO.\"ClCode2\" ";
+		sql += "                  , IO.\"ClNo\" ";
+		sql += "                  , IO.\"OrigInsuNo\" AS \"PrevInsuNo\" ";
+		sql += "                  , IO.\"OrigInsuNo\" AS \"NowInsuNo\" ";
+		sql += "                  , IO.\"FireInsuCovrg\" + IO.\"EthqInsuCovrg\" AS \"InsuAmt\" ";
+		sql += "                  , IO.\"InsuStartDate\"";
+		sql += "                  , IO.\"InsuEndDate\"";
+		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\"";
+		sql += "             FROM \"InsuOrignal\" IO ";
+		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany'"; // -- 共用代碼檔(保險公司)
+		sql += "                                      AND CDC1.\"Code\"    = IO.\"InsuCompany\"";
+		sql += "             UNION ";
+		sql += "             SELECT IR.\"ClCode1\"";
 		sql += "                  , IR.\"ClCode2\"";
 		sql += "                  , IR.\"ClNo\"";
 		sql += "                  , IR.\"PrevInsuNo\"";
@@ -335,21 +353,14 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  , IR.\"InsuStartDate\"";
 		sql += "                  , IR.\"InsuEndDate\"";
 		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\"";
-		sql += "                  , ROW_NUMBER() OVER (PARTITION BY IR.\"ClCode1\"";
-		sql += "                                                  , IR.\"ClCode2\"";
-		sql += "                                                  , IR.\"ClNo\"";
-		sql += "                                                  , IR.\"PrevInsuNo\"";
-		sql += "                                       ORDER BY IR.\"InsuStartDate\" DESC";
-		sql += "                                      ) AS \"Seq\"";
 		sql += "             FROM \"InsuRenew\" IR ";
 		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany'"; // -- 共用代碼檔(保險公司)
-		sql += "                                    AND CDC1.\"Code\"    = IR.\"InsuCompany\"";
-		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "               AND IR.\"Seq\" = 1"; // -- 每張保單取最新一筆 ??? 待確認此邏輯是否正確
-		sql += " WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "   AND NVL(IR.\"NowInsuNo\",' ') <> ' '";
+		sql += "                                      AND CDC1.\"Code\"    = IR.\"InsuCompany\"";
+		sql += "             WHERE NVL(IR.\"NowInsuNo\",' ') != ' ' ";
+		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";
+		sql += " WHERE CF.\"ApproveNo\" = :applNo ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -495,8 +506,15 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F38扣款銀行 ";
 		sql += "      , \"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')";
 		sql += "                                       AS F39扣款帳號 ";
-		sql += "      , FAC.\"PayIntFreq\"             AS F40繳息週期 ";
-		sql += "      , FAC.\"RateCode\"               AS F41利率區分 ";
+		sql += "      , FAC.\"PayIntFreq\" ";
+		sql += "        || CASE FAC.\"FreqBase\" ";
+		sql += "             WHEN '1' THEN '日' ";
+		sql += "             WHEN '2' THEN '月' ";
+		sql += "             WHEN '3' THEN '週' ";
+		sql += "           ELSE '' "; 
+		sql += "           END                         AS F40繳息週期 ";
+		sql += "      , FAC.\"RateCode\" || \"Fn_GetCdCode\"('FacmRateCode',FAC.\"RateCode\") ";
+		sql += "                                       AS F41利率區分 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
 //		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
@@ -505,7 +523,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "        ELSE NULL ";
 		sql += "        END                            AS F42違約適用方式 ";
 		sql += "      , \"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0)           AS F43團體戶名 "; // 法人不出
-		sql += "      , FAC.\"PieceCode\"              AS F44計件代碼 ";
+		sql += "      , FAC.\"PieceCode\" || ' ' || \"Fn_GetCdCode\"('PieceCode',FAC.\"PieceCode\") ";
+		sql += "　　　　　　　　　　　　　　             AS F44計件代碼 ";
 		sql += "      , \"Fn_GetEmpName\"(FAC.\"FireOfficer\",1) ";
 		sql += "                                       AS F45火險服務姓名 ";
 		sql += "      , \"Fn_GetEmpName\"(FAC.\"LoanOfficer\",1) ";
@@ -613,9 +632,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       WHERE FSA.\"MainApplNo\" = :applNo ";
 		sql += "      ) S0 ";
 		sql += " LEFT JOIN \"FacShareAppl\" S1 ON S1.\"MainApplNo\" = S0.\"MainApplNo\" ";
+		sql += " LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = S1.\"ApplNo\" ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = S1.\"CustNo\" ";
-		sql += "                        AND FAC.\"FacmNo\" = S1.\"FacmNo\" ";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = S1.\"CustNo\" ";
+		sql += "                          AND FAC.\"FacmNo\" = S1.\"FacmNo\" ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FCA.\"CustUKey\" ";
 		sql += " ORDER BY S1.\"MainApplNo\" ";
 		sql += "        , S1.\"KeyinSeq\" ";
 
@@ -666,6 +686,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       WHERE FSL.\"MainApplNo\" = :applNo ";
 		sql += "      ) S0 ";
 		sql += " LEFT JOIN \"FacShareLimit\" S1 ON S1.\"MainApplNo\" = S0.\"MainApplNo\" ";
+		sql += " LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = S1.\"ApplNo\" ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = S1.\"CustNo\" ";
 		sql += "                        AND FAC.\"FacmNo\" = S1.\"FacmNo\" ";
 		sql += " LEFT JOIN (SELECT FSL.\"MainApplNo\" ";
@@ -680,7 +701,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   , FAC.\"CurrencyCode\" ";
 		sql += "           ) TTL ON TTL.\"MainApplNo\" = S0.\"MainApplNo\" ";
 		sql += "                AND TTL.\"MainCCY\" = FAC.\"CurrencyCode\" ";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = S1.\"CustNo\" ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FCA.\"CustUKey\" ";
 		sql += " ORDER BY TTL.\"MainApplNo\" ";
 		sql += "        , TTL.\"MainCCY\" ";
 		sql += "        , S1.\"KeyinSeq\" ";
