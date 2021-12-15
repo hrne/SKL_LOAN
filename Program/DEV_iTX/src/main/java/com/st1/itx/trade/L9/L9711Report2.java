@@ -219,8 +219,8 @@ public class L9711Report2 extends MakeReport {
 				if (!payIntDate.equals(tempDate)) {
 
 					// 防第一次沒資料就加入
-					if (i > 0) {
-//						if (i > 0 && !payIntDate.equals(tempDate)) {
+					if (i > 0 && !payIntDate.equals(tempDate)) {
+
 						tempList.add(tempMap);
 
 						tempMap = new HashMap<String, Integer>();
@@ -281,12 +281,11 @@ public class L9711Report2 extends MakeReport {
 
 					tempList.add(tempMap);
 				}
-
 			}
 
+//			this.info("tempList=" + tempList.toString());
 			for (Map<String, Integer> listData : tempList) {
 
-				this.info("date=" + listData.get("pday").toString());
 				tempDate = listData.get("pday").toString();
 				if (!tempDate.equals("0")) {
 					// 應繳日
@@ -314,7 +313,6 @@ public class L9711Report2 extends MakeReport {
 					dataRow--;
 				}
 			}
-
 		}
 
 		dataRow--;
@@ -336,8 +334,25 @@ public class L9711Report2 extends MakeReport {
 		}
 
 		this.print(dataRow--, 82, "製表人 " + tmp);
+		dataRow = dataRow - 2;
 
-		this.newPage();
+		String payIntAcct = "";
+		String payPriAcct = "";
+
+		if (tL9711Vo.get("F4") != null) {
+//			共用代碼檔0:個金1:企金2:企金自然人
+			if ("0".equals(tL9711Vo.get("F23"))) {
+				payIntAcct = "9510200" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4")));
+				payPriAcct = "9510300" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4")));
+			} else {
+				payIntAcct = "9510100" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4")));
+				payPriAcct = "9510100" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4")));
+			}
+		}
+		this.print(dataRow, 18, payIntAcct);
+		this.print(dataRow, 75, payPriAcct);
+
+//		this.newPage();
 
 	}
 

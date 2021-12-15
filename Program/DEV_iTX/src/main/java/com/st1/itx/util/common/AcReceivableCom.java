@@ -136,7 +136,7 @@ public class AcReceivableCom extends TradeBuffer {
 				}
 				// 銷帳業務科目
 				wkAcctCode = ac.getAcctCode();
-				if (tTempVo.getParam("RvAcctCode") != null) {
+				if (tTempVo.getParam("RvAcctCode").length() == 3 ) {
 					wkAcctCode = tTempVo.getParam("RvAcctCode");
 				}
 				wkRvNo = ac.getRvNo().trim();

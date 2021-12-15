@@ -101,7 +101,8 @@ public class L4454 extends TradeBuffer {
 	private HashMap<Integer, Integer> custFireFlag = new HashMap<>();
 	private TempVo tTempVo = new TempVo();
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
-	private List<Map<String, String>> l9705List = new ArrayList<>();
+	private List<Map<String, String>> l9705ListA = new ArrayList<>();
+	private List<Map<String, String>> l9705ListB = new ArrayList<>();
 	private List<Map<String, String>> l4454List = new ArrayList<>();
 	private int entryDate = 0;
 	private int custNo = 0;
@@ -220,7 +221,7 @@ public class L4454 extends TradeBuffer {
 				}
 				msg += ", 明信片份數：" + l4454List.size();
 			}
-			msg += ", 繳息還本通知單份數：" + l9705List.size();
+			msg += ", 繳息還本通知單份數：" + l9705ListA.size() + l9705ListB.size();
 			if (l4454List.size() > 0) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 						titaVo.getTlrNo(), msg, titaVo);
@@ -265,9 +266,9 @@ public class L4454 extends TradeBuffer {
 					if ("Y".equals(t.get("FireFeeSuccess")) && repayType == 1) {
 						putTotaA(t, titaVo); // 列印清單
 						if ("1".equals(t.get("RowNumber"))) {
-							l9705List.add(t); // 繳息還本通知單 ，同戶號、額度只印一份
+							l9705ListB.add(t); // 繳息還本通知單(火險成功期款失敗通知) ，同戶號、額度只印一份
 						}
-						failNoticeDateUpdate("一扣火險成功期款失敗通知", titaVo); // 失敗通知日期
+						failNoticeDateUpdate("火險成功期款失敗通知", titaVo); // 失敗通知日期
 					}
 				}
 				if (fistDeduct == 2) {
@@ -282,7 +283,7 @@ public class L4454 extends TradeBuffer {
 			case 3: // 連續扣款失敗明細＆通知
 				putTotaA(t, titaVo); // 列印清單
 				if ("1".equals(t.get("RowNumber"))) {
-					l9705List.add(t); // 繳息還本通知單，同戶號、額度只印一份
+					l9705ListA.add(t); // 繳息還本通知單，同戶號、額度只印一份
 				}
 				failNoticeDateUpdate("連續扣款失敗通知", titaVo); // 失敗通知日期
 				break;
@@ -327,7 +328,7 @@ public class L4454 extends TradeBuffer {
 
 	private void sendText(String repayBank, Map<String, String> t, String phoneNo, int insuM, TitaVo titaVo)
 			throws LogicException {
-		if (repayType == 1) {
+		if (repayType == 1 || repayType == 3) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
 				cntText++;
@@ -503,8 +504,11 @@ public class L4454 extends TradeBuffer {
 //	還本繳息通知單(出火險成功期款失敗通知)
 	private void reportB(TitaVo titaVo) throws LogicException {
 		this.info("ReportB Start...");
-
-		l9705Report.exec(l9705List, titaVo, this.getTxBuffer());
+		titaVo.putParam("CONDITION1", "A");	
+		l9705Report.exec(l9705ListA, titaVo, this.getTxBuffer());
+		
+		titaVo.putParam("CONDITION1", "B");
+		l9705Report.exec(l9705ListB, titaVo, this.getTxBuffer());
 	}
 
 //	二扣未成功之明信片

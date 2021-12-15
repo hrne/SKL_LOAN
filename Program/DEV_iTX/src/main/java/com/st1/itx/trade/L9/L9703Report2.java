@@ -138,8 +138,7 @@ public class L9703Report2 extends MakeReport {
 			this.print(0, 87, tmp);
 
 			this.print(1, 10, "戶號：　　　　　　　目前利率：　　　　%");
-			this.print(0, 16, String.format("%07d", Integer.valueOf(iCUSTNO)) + "-"
-					+ String.format("%03d", Integer.valueOf(iFACMNO)));
+			this.print(0, 16, String.format("%07d", Integer.valueOf(iCUSTNO)) + "-" + String.format("%03d", Integer.valueOf(iFACMNO)));
 			this.print(1, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
 			this.print(1, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　帳管費：");
 			this.print(1, 10, "　　　　　　　　　　　　　每期應攤還　　　　　　　　　　　　未　　還　　暫　付");
@@ -174,9 +173,7 @@ public class L9703Report2 extends MakeReport {
 		this.info("entdy = " + entdy);
 
 		try {
-			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9703Vo.get("F4")), parse.stringToInteger(tL9703Vo.get("F5")), 0, termEnd,
-					titaVo);
+			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9703Vo.get("F4")), parse.stringToInteger(tL9703Vo.get("F5")), 0, termEnd, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -355,8 +352,7 @@ public class L9703Report2 extends MakeReport {
 
 		this.print(0, 87, tmp);
 		this.print(1, 10, "戶號：　　　　　　　目前利率：　　　　%");
-		this.print(0, 16, String.format("%07d", Integer.valueOf(tL9703Vo.get("F4"))) + "-"
-				+ String.format("%03d", Integer.valueOf(tL9703Vo.get("F5"))));
+		this.print(0, 16, String.format("%07d", Integer.valueOf(tL9703Vo.get("F4"))) + "-" + String.format("%03d", Integer.valueOf(tL9703Vo.get("F5"))));
 		this.print(0, 47, padStart(6, "" + intRate), "R");
 		this.print(1, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
 		this.print(0, 20, tL9703Vo.get("F6"));
@@ -367,6 +363,7 @@ public class L9703Report2 extends MakeReport {
 		this.print(1, 10, "應繳日　　違約金　　　　本金　　　　　利息　　　應繳合計　　本金餘額　　所得稅　　應繳淨額");
 		this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
+		String BreachDate = "";
 		for (int i = 0; i < listBaTxVo.size(); i++) {
 			// 本金、利息
 			if (listBaTxVo.get(i).getDataKind() != 2) {
@@ -412,8 +409,7 @@ public class L9703Report2 extends MakeReport {
 			this.print(1, 1,
 					"                                                                                                                                                                               ");
 			if (!"00000000".equals(sPayIntDate)) {
-				this.print(0, 7, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/"
-						+ sPayIntDate.substring(5, 7));
+				this.print(0, 7, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/" + sPayIntDate.substring(5, 7));
 			}
 
 			this.print(0, 25, df1.format(bBreachAmt), "R");
@@ -423,16 +419,25 @@ public class L9703Report2 extends MakeReport {
 			this.print(0, 78, df1.format(loanBal), "R");
 			this.print(0, 87, "0", "R");
 			this.print(0, 100, df1.format(bSummry), "R");
+			
+			
+			if( bBreachAmt.compareTo(new BigDecimal("0")) == 0 && "".equals(BreachDate)) {
+				BreachDate = sPayIntDate;
+			}
 		} // loop -- batxCom
 
 		this.print(2, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 		this.print(1, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
-		if (tL9703Vo.get("F8").equals("0")) {
-			this.print(1, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
-			this.print(1, 8, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
-		} else {
-			this.print(1, 8, "　　貴戶所貸上列款項。於　" + showDate(tL9703Vo.get("F8"), 2) + "到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+		if(!"".equals(BreachDate)) {
+		  this.print(1, 8, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢"
+				+ "　該違約金金額");
 		}
+//		if (tL9703Vo.get("F8").equals("0")) {
+//			this.print(1, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
+//			this.print(1, 8, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+//		} else {
+//			this.print(1, 8, "　　貴戶所貸上列款項。於　" + showDate(tL9703Vo.get("F8"), 2) + "到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+//		}
 		this.print(1, 8, "＊＊新光銀行城內分行代號： 1030116");
 
 		String iTLRNO = "";
@@ -459,8 +464,8 @@ public class L9703Report2 extends MakeReport {
 			}
 		}
 
-		this.print(2, 8, "期款專用帳號：" + payIntAcct);
-		this.print(0, 65, "還本專用帳號： " + payPriAcct);
+		this.print(2, 8, payIntAcct);
+		this.print(0, 65,  payPriAcct);
 	}
 
 	// 顯示民國年
@@ -483,11 +488,9 @@ public class L9703Report2 extends MakeReport {
 			}
 		} else if (iType == 2) {
 			if (rocdatex.length() == 6) {
-				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6)
-						+ " 日";
+				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6) + " 日";
 			} else {
-				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7)
-						+ " 日";
+				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7) + " 日";
 			}
 		} else {
 			return rocdatex;

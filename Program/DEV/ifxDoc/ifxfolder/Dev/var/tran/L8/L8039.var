@@ -212,7 +212,7 @@ TXFORM=L8039
 #OOCustMobilNo=債務人行動電話
 {width:120,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
-{width:200,align:'center'}
+{width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員

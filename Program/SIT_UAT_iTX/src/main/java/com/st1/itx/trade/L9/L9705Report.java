@@ -112,7 +112,8 @@ public class L9705Report extends MakeReport {
 				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
 				String repayCode = "";
 				String custName = "";
-
+				String payIntAcct = "";
+				String payPriAcct = "";
 				if (tL9Vo.get("CustNo") != null) {
 					custNo = parse.stringToInteger(tL9Vo.get("CustNo"));
 				}
@@ -127,6 +128,19 @@ public class L9705Report extends MakeReport {
 					custName = tL9Vo.get("CustName");
 				}
 
+			
+				if (tL9Vo.get("CustNo") != null) {
+//					共用代碼檔0:個金1:企金2:企金自然人
+				if ("0".equals(tL9Vo.get("EntCode"))) {
+					payIntAcct = "9510200" + String.format("%07d", Integer.valueOf(custNo));
+					payPriAcct = "9510300" + String.format("%07d", Integer.valueOf(custNo));
+				} else {
+					payIntAcct = "9510100" + String.format("%07d", Integer.valueOf(custNo));
+					payPriAcct = "9510100" + String.format("%07d", Integer.valueOf(custNo));
+				}
+			}
+
+			
 				try {
 					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, 6, titaVo);
 				} catch (LogicException e) {
@@ -223,7 +237,7 @@ public class L9705Report extends MakeReport {
 							entdy.substring(1, 4) + "/" + entdy.substring(4, 6) + "/" + entdy.substring(6, 8));
 					this.print(0, 78, repayCodeX(repayCode));
 					this.print(1, 10, "戶號：　　　　　　　目前利率：　　　　%");
-					this.print(0, 16, custNo + "-" + facmNo);
+					this.print(0, 16, String.format("%07d", Integer.valueOf(custNo)) + "-" + String.format("%03d", Integer.valueOf(facmNo)));
 					this.print(0, 47, padStart(6, "" + intRate), "R");
 					this.print(1, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
 					this.print(0, 23, custName);
@@ -279,12 +293,27 @@ public class L9705Report extends MakeReport {
 					} // loop -- batxCom
 
 					this.print(2, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
+					
+					// 滯繳通知單
+//					this.print(1, 8,
+//							"＊＊註：違約金暫計到" + transRocChinese(titaVo.getParam("EntryDate")) + "，若提前或延後繳款，請電話查詢　該違約金額");
+					
+					// 到期通知單
+//					this.print(1, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意，貴戶仍應依約履行，");
+//					this.print(1, 8, "　　貴戶所貸上列款項，於" + transRocChinese(titaVo.getParam("EntryDate")) + "到期，請依約到本公司辦理清償或展期手續，請勿延誤。");
+					
+					// 銀扣火險成功期款失敗通知單
+//					this.print(1, 8,
+//							"＊＊註：違約金暫計到" + transRocChinese(titaVo.getParam("EntryDate")) + "，若提前或延後繳款，請電話查詢　該違約金額");
+//					this.print(1, 8, "＊＊您好！本月份扣款含年度火險、地震險保費、每月房貸期款，因您存款不足；");
+//					this.print(1, 8, "　　請速將本期款匯入期款專用帳號。");
+					
 					if ("B".equals(conditionCode)) {
 						this.print(1, 8,
 								"＊＊註：違約金暫計到" + transRocChinese(titaVo.getParam("EntryDate")) + "，若提前或延後繳款，請電話查詢　該違約金額");
 						this.print(1, 8, "＊＊您好！本月份扣款含年度火險、地震險保費、每月房貸期款，因您存款不足；");
 						this.print(1, 8, "　　請速將本期款匯入期款專用帳號。");
-					}
+					} 
 
 					this.print(1, 8, "＊＊新光銀行城內分行代號： 1030116");
 
@@ -306,6 +335,10 @@ public class L9705Report extends MakeReport {
 
 					this.info("l9705List.size()..." + l9705List.size());
 					this.info("times..." + times);
+					
+
+					this.print(3, 18, payIntAcct);
+					this.print(0, 75, payPriAcct);
 				} else {
 					if (cnt == 0) {
 //					this.print(1, 20, "*******    查無資料   ******");

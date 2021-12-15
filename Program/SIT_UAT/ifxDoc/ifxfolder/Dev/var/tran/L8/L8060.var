@@ -42,7 +42,7 @@ K(NOBUTTON,CLOSEY)
 [
 ["[L8060]                                 消債條列JCIC報送資料歷程查詢(451)"],
 ["#FdCustId+身分證字號",#CustId,#CustIdX],
-["#FdRcDate+款項統一收付申請日",#RcDate],
+["#FdRcDate+調解申請日",#RcDate],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdDelayYM+延期繳款年月",#DelayYM],
@@ -108,8 +108,10 @@ T(1,@Ukey,#NTXBUF,6,32)
 #SubmitKeyX=X,80,L
 #CourtCodeX=X,80,L
 <include src="ROM.icf::L8R55.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 #RimUkey=X,32,S
 #RimChainCd=X,5,S
+#RimCourtCode=X,3,S
 #RimL8r55=X,1,S
 T(2,@RimUkey,#Ukey)
 T(2,@RimChainCd,#ChainCd)
@@ -121,7 +123,11 @@ T(2,@SubmitKey,#L8r55SubmitKey)
 E(0,@RcDate,#L8r55ApplyDate)
 T(2,@CourtCode,#L8r55CourtCode)
 T(2,@DelayYM,#L8r55DelayYM)
-T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
+#Lr859=X,1,S
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
@@ -197,6 +203,7 @@ TXFORM=L8060
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

@@ -6258,6 +6258,7 @@ TXFORM=L5R40
 #L5R41MaturityDate=D,7,S
 #L5R41YearlyInt=M,14,S
 #L5R41HouseBuyDate=D,7,S
+#L5R41Location=X,100,S
 
 
 </L5R41.dec>
@@ -6275,6 +6276,7 @@ TXFORM=L5R41
 #L5R41MaturityDate
 #L5R41YearlyInt
 #L5R41HouseBuyDate
+#L5R41Location
 ^
 </L5R41.tom>
 
@@ -6620,7 +6622,7 @@ TXFORM=L8R13
 #L8r14CustId=X,10,S
 #L8r14SubmitKey=X,3,S
 #L8r14RcDate=D,7,S
-#L8r14MaxMainCode=X,10,S
+#L8r14MaxMainCode=X,3,S
 #L8r14Account=x,50,S
 #L8r14CollateralType=X,2,S
 #L8r14OriginLoanAmt=M,12,S
@@ -6674,7 +6676,7 @@ TXFORM=L8R14
 #L8r15CurrentMonthIncome=M,9,S
 #L8r15LivingCost=M,9,S
 #L8r15CompName=X,40,S
-#L8r15CompId=A,8,S
+#L8r15CompId=X,8,S
 #L8r15CarCnt=A,2,S
 #L8r15HouseCnt=M,2,S
 #L8r15LandCnt=M,2,S
@@ -6804,7 +6806,7 @@ TXFORM=L8R17
 #L8r18Rate2=m,2.2,S
 #L8r18MonthPayAmt2=M,9,S
 #L8r18PayLastAmt2=M,9,S
-#L8r18PayAccount=X,40,S
+#L8r18PayAccount=x,20,S
 #L8r18PostAddr=X,76,S
 #L8r18OutJcicTxtDate=D,7,S
 </L8R18.dec>
@@ -6983,19 +6985,19 @@ TXFORM=L8R23
 #L8r24SubmitKey=X,3,S
 #L8r24RcDate=D,7,S
 #L8r24BankCode1=X,3,S
-#L8r24BankCodeX1=X,80,S
+#L8r24BankCodeX1=X,40,S
 #L8r24DataCode1=X,2,S
 #L8r24BankCode2=X,3,S
-#L8r24BankCodeX2=X,80,S
+#L8r24BankCodeX2=X,40,S
 #L8r24DataCode2=X,2,S
 #L8r24BankCode3=X,3,S
-#L8r24BankCodeX3=X,80,S
+#L8r24BankCodeX3=X,40,S
 #L8r24DataCode3=X,2,S
 #L8r24BankCode4=X,3,S
-#L8r24BankCodeX4=X,80,S
+#L8r24BankCodeX4=X,40,S
 #L8r24DataCode4=X,2,S
 #L8r24BankCode5=X,3,S
-#L8r24BankCodeX5=X,80,S
+#L8r24BankCodeX5=X,40,S
 #L8r24DataCode5=X,2,S
 #L8r24ChangePayDate=D,7,S
 #L8r24OutJcicTxtDate=D,7,S
@@ -7139,8 +7141,8 @@ TXFORM=L8R27
 #L8r28ClaimDate=D,7,S
 #L8r28CourtCode=X,3,S
 #L8r28Year=A,3,S
-#L8r28CourtDiv=X,8,S
-#L8r28CourtCaseNo=X,80,S
+#L8r28CourtDiv=X,4,S
+#L8r28CourtCaseNo=X,40,S
 #L8r28Approve=X,1,S
 #L8r28OutstandAmt=M,9,S
 #L8r28ClaimStatus1=X,1,S
@@ -7485,6 +7487,7 @@ TXFORM=L8R38
 #L8r39ReportYn=X,1,S
 ##loop{times:6,i:1}
 #L8r39NotBankId{i}=X,3,S
+#L8r39NotBankIdX{i}=X,80,S
 ##end
 #L8r39OutJcicTxtDate=D,7,S
 </L8R39.dec>
@@ -7503,6 +7506,7 @@ TXFORM=L8R39
 #L8r39ReportYn
 ##loop{times:6,i:1}
 #L8r39NotBankId{i}
+#L8r39NotBankIdX{i}
 ##end
 #L8r39OutJcicTxtDate
 ^
@@ -7696,7 +7700,7 @@ TXFORM=L8R43
 #L8r44Period=A,3,S
 #L8r44Rate=m,2.2,S
 #L8r44MonthPayAmt=m,9,S
-#L8r44PayAccount=X,20,S
+#L8r44PayAccount=x,20,S
 #L8r44OutJcicTxtDate=D,7,S
 
 </L8R44.dec>
@@ -7947,7 +7951,7 @@ TXFORM=L8R54
 #L8r55ClaimDate=D,7,S
 #L8r55CourtCode=X,3,S
 #L8r55MaxMainCode=X,3,S
-#L8r55DelayYM=X,6,S
+#L8r55DelayYM=A,5,S
 #L8r55Account=x,50,S
 #L8r55PayOffDate=D,7,S
 #L8r55CloseDate=D,7,S
@@ -9230,6 +9234,7 @@ TXFORM=L6R44
 #L6R45SyndFeeCode=X,2,S
 #L6R45SyndFeeItem=x,60,S
 #L6R45AcctCode=X,3,S
+#L6R45IsAllocation=X,1,S
 </L6R45.dec>
 
 <L6R45.tom>
@@ -9237,6 +9242,7 @@ TXFORM=L6R45
 #L6R45SyndFeeCode
 #L6R45SyndFeeItem
 #L6R45AcctCode
+#L6R45IsAllocation
 ^
 </L6R45.tom>
 
@@ -9267,6 +9273,7 @@ TXFORM=L6R47
 #L6r47RecWord
 #L6r47RecWordItem
 </L6R47.tom>
+^
 
 <L5R47.dec>
 #L5R47CustName=x,100,S

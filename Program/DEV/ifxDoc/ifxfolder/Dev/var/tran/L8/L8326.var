@@ -38,13 +38,14 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,200,300];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,800];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8326]                                 (446)前置調解結案通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdApplyDate+調解申請日",#ApplyDate],
+[#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 [#<->#,"#FdCloseCode+結案原因代號",#CloseCode,#CloseCodeX],
 [#<->#,"#FdCloseDate+結案日期",#CloseDate],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
@@ -156,6 +157,7 @@ K(MODIFYBUTTON,刪除)
 #Default=X,1,S
 T(2,@SubmitKey,458)
 #RimJcicBankCode=X,3,S
+#RimCourtCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -220,6 +222,7 @@ T(H,#TranKey,#TranKeyHelp)
 
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 T(2,@RimCustId,#CustId)
 ! 檢核該統編是否存在於客戶檔
 #RimL8R57=X,1,S
@@ -259,10 +262,13 @@ C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
+@V(7)
 
 #CourtCodeX=X,80,L
-T(H,#CourtCode,#CourtCodeHelp)
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 
 !結案原因代號
@@ -350,6 +356,7 @@ TXFORM=L8326^
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R43.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 <sub type="PART" name="L8326" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

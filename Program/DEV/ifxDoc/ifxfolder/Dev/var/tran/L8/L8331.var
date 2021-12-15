@@ -150,6 +150,7 @@ K(MODIFYBUTTON,刪除)
 #Default=X,1,S
 T(2,@SubmitKey,458)
 #RimJcicBankCode=X,3,S
+#RimCourtCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -212,6 +213,7 @@ T(H,#TranKey,#TranKeyHelp)
 #CustId=X,10,L
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 T(2,@RimCustId,#CustId)
 ! 檢核該統編是否存在於客戶檔
 #RimL8R57=X,1,S
@@ -243,11 +245,14 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
+@V(7)
 
 
 #CourtCodeX=X,80,L
-T(H,#CourtCode,#CourtCodeHelp)
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
@@ -349,6 +354,7 @@ TXFORM=L8331^
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R48.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 <sub type="PART" name="L8331" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

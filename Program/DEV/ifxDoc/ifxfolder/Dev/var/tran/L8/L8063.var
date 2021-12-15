@@ -43,7 +43,7 @@ K(NOBUTTON,CLOSEY)
 [
 ["[L8063]                                 消債條列JCIC報送資料歷程查詢(571)"],
 ["#FdCustId+身分證字號",#CustId,#CustIdX],
-["#FdRcDate+款項統一收付申請日",#RcDate],
+["#FdRcDate+申請日期",#RcDate],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdBankId+債權金融機構代號",#BankId,#BankIdX],
 ]
@@ -221,8 +221,8 @@ TXFORM=L8063
 {width:100,align:'center'}
 #OOOwnerYnX=是否為更生債權人
 {width:150,align:'center'}
-#OOPayYnX=債務人是否仍依更生方案正常還款予本金融機構
-{width:350,align:'center'}
+#OOPayYnX=債務人是否仍依更生<br>方案正常還款予本金融機構
+{width:200,align:'center'}
 #OOOwnerAmt=本金融機構更生債權總金額
 {width:150,align:'right'}
 #OOAllotAmt=參與分配債權金額
@@ -230,7 +230,7 @@ TXFORM=L8063
 #OOUnallotAmt=未參與分配債權金額
 {width:150,align:'right'}
 #OOOutJcicTxtDate=資料轉出日期
-{width:200,align:'center'}
+{width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員

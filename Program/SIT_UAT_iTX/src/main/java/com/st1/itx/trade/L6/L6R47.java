@@ -37,6 +37,7 @@ public class L6R47 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6R47 ");
 		this.totaVo.init(titaVo);
+		initset();
 
 		// tita
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
@@ -57,12 +58,28 @@ public class L6R47 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2003",
 						"不存在地政收件字檔" + "地政所代號 = " + iLandOfficeCode + " 收件字代號 = " + iRecWord); // 查無資料
 			}
-		}
-		this.totaVo.putParam("OLandOfficeCode", tCdLandOffice.getLandOfficeCode());
-		this.totaVo.putParam("ORecWord", tCdLandOffice.getRecWord());
-		this.totaVo.putParam("ORecWordItem", tCdLandOffice.getRecWordItem());
+		} else {
+			if (iFunCd == 1) {
+				throw new LogicException(titaVo, "E0002",
+						"地政收件字檔" + "地政所代號 = " + iLandOfficeCode + " 收件字代號 =" + iRecWord); // 新增資料已存在
+			}
 
+			this.totaVo.putParam("OLandOfficeCode", tCdLandOffice.getLandOfficeCode());
+			this.totaVo.putParam("ORecWord", tCdLandOffice.getRecWord());
+			this.totaVo.putParam("ORecWordItem", tCdLandOffice.getRecWordItem());
+
+		}
+
+		this.info("end ... ");
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void initset() throws LogicException {
+		this.info("initset ... ");
+
+		this.totaVo.putParam("OLandOfficeCode", " ");
+		this.totaVo.putParam("ORecWord", " ");
+		this.totaVo.putParam("ORecWordItem", " ");
 	}
 }

@@ -37,12 +37,12 @@ public class L8R29 extends TradeBuffer {
 		if (iJcicZ060 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
 		} else {
-			totaVo.putParam("L8r29TranKey",iJcicZ060.getTranKey());// 交易代碼
+			totaVo.putParam("L8r29TranKey", iJcicZ060.getTranKey());// 交易代碼
 			totaVo.putParam("L8r29CustId", iJcicZ060.getCustId());// 債務人IDN
 			totaVo.putParam("L8r29SubmitKey", iJcicZ060.getSubmitKey());// 報送單位代號
 			totaVo.putParam("L8r29RcDate", iJcicZ060.getRcDate());// 原前置協商申請日
 			totaVo.putParam("L8r29ChangePayDate", iJcicZ060.getChangePayDate());// 申請變更還款條件日
-			totaVo.putParam("L8r29YM", iJcicZ060.getYM());// 已清分足月期付金年月
+			totaVo.putParam("L8r29YM", iJcicZ060.getYM()-191100);// 已清分足月期付金年月
 			totaVo.putParam("L8r29OutJcicTxtDate", iJcicZ060.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);

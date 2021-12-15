@@ -81,7 +81,7 @@ public class L8318 extends TradeBuffer {
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
-		int iYM = Integer.valueOf(titaVo.getParam("YM"));
+		int iYM = Integer.valueOf(titaVo.getParam("YM"))+191100;
 		String iKey = "";
 		// JcicZ060, JcicZ046, JcicZ047, JcicZ062, JcicZ063
 		JcicZ060 iJcicZ060 = new JcicZ060();

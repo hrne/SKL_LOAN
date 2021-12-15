@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 
 import com.st1.itx.util.common.LockControl;
+import com.st1.itx.util.common.SendRsp;
 
 @Service("LC110")
 @Scope("prototype")
@@ -26,11 +27,18 @@ public class LC110 extends TradeBuffer {
 	@Autowired
 	public LockControl LockControl;
 
+	@Autowired
+	public SendRsp sendRsp;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC110 ");
 		this.totaVo.init(titaVo);
 
+		if (!titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "解除戶號鎖定");
+		}
+		
 		LockControl.setTitaVo(titaVo);
 
 		long iLockNo = Long.valueOf(titaVo.get("iLockNo").toString());

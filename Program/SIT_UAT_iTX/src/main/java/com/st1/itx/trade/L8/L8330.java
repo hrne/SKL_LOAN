@@ -81,7 +81,7 @@ public class L8330 extends TradeBuffer {
 		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
 		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
 		String iCourtCode = titaVo.getParam("CourtCode").trim();
-		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"));
+		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"))+191100;
 		String iDelayCode = titaVo.getParam("DelayCode");
 		String iKey = "";
 		int sCovDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款')

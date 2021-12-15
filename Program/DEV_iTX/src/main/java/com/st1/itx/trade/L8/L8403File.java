@@ -1884,7 +1884,7 @@ public class L8403File extends MakeFile {
 					iJcicZ049Log.setClaimStatus(ixClaimStatus);
 					iJcicZ049Log.setApplyDate(ixApplyDate);
 					iJcicZ049Log.setCourtCode(iCourtCode);
-					iJcicZ049Log.setYear(ixYear+1911);
+					iJcicZ049Log.setYear(ixYear);
 					iJcicZ049Log.setCourtDiv(iCourtDiv);
 					iJcicZ049Log.setCourtCaseNo(iCourtCaseNo);
 					iJcicZ049Log.setApprove(iApprove);
@@ -1949,7 +1949,7 @@ public class L8403File extends MakeFile {
 					iJcicZ050Log.setSumRepayActualAmt(ixSumRepayActualAmt);
 					iJcicZ050Log.setSumRepayShouldAmt(ixSumRepayShouldAmt);
 					iJcicZ050Log.setStatus(iStatus);
-					iJcicZ050Log.setSecondRepayYM(ixSecondRepayYM+191100);
+					iJcicZ050Log.setSecondRepayYM(ixSecondRepayYM);
 					iJcicZ050Log.setTranKey(iTranKey);
 					iJcicZ050Log.setOutJcicTxtDate(iDate);
 
@@ -2247,7 +2247,7 @@ public class L8403File extends MakeFile {
 					iJcicZ055LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ055LogId.setUkey(iUkey);
 					iJcicZ055Log.setJcicZ055LogId(iJcicZ055LogId);
-					iJcicZ055Log.setYear(iYear+1911);
+					iJcicZ055Log.setYear(iYear);
 					iJcicZ055Log.setCourtDiv(iCourtDiv);
 					iJcicZ055Log.setCourtCaseNo(iCourtCaseNo);
 					iJcicZ055Log.setPayDate(ixPayDate);
@@ -2327,7 +2327,7 @@ public class L8403File extends MakeFile {
 					iJcicZ056LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ056LogId.setUkey(iUkey);
 					iJcicZ056Log.setJcicZ056LogId(iJcicZ056LogId);
-					iJcicZ056Log.setYear(ixYear+1911);
+					iJcicZ056Log.setYear(ixYear);
 					iJcicZ056Log.setCourtDiv(iCourtDiv);
 					iJcicZ056Log.setCourtCaseNo(iCourtCaseNo);
 					iJcicZ056Log.setApprove(iApprove);
@@ -2364,7 +2364,7 @@ public class L8403File extends MakeFile {
 					String iCustId = sJcicZ060.getCustId();
 					String iRcDate = String.valueOf(sJcicZ060.getRcDate());
 					String iChangePayDate = String.valueOf(sJcicZ060.getChangePayDate());
-					int iYM = Integer.valueOf(sJcicZ060.getYM());
+					int iYM = Integer.valueOf(sJcicZ060.getYM())+191100;
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String iUkey = sJcicZ060.getUkey();
 					String text = "60" + iTranKey + iSubmitKey + StringUtils.rightPad(iCustId, 10, "") + StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
@@ -2853,9 +2853,9 @@ public class L8403File extends MakeFile {
 					String ixNotyetacQuit = String.valueOf(sJcicZ443.getNotyetacQuit());
 					int iMothPayDay = Integer.valueOf(sJcicZ443.getMothPayDay());
 					String ixMothPayDay = String.valueOf(sJcicZ443.getMothPayDay());
-					int iBeginDate = Integer.valueOf(sJcicZ443.getBeginDate());
+					int iBeginDate = Integer.valueOf(sJcicZ443.getBeginDate())-191100;
 					String ixBeginDate = String.valueOf(sJcicZ443.getBeginDate());
-					int iEndDate = Integer.valueOf(sJcicZ443.getEndDate());
+					int iEndDate = Integer.valueOf(sJcicZ443.getEndDate())-191100;
 					String ixEndDate = String.valueOf(sJcicZ443.getEndDate());
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String iUkey = sJcicZ443.getUkey();
@@ -3227,7 +3227,7 @@ public class L8403File extends MakeFile {
 					String iCustId = sJcicZ451.getCustId();
 					String iApplyDate = String.valueOf(sJcicZ451.getApplyDate());
 					String iCourtCode = sJcicZ451.getCourtCode();
-					String iDelayYM = String.valueOf(sJcicZ451.getDelayYM());
+					String iDelayYM = String.valueOf(sJcicZ451.getDelayYM()-191100);
 					String iDelayCode = sJcicZ451.getDelayCode();
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String iUkey = sJcicZ451.getUkey();

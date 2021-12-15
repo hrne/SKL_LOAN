@@ -38,7 +38,7 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=2;screen.width=[400,600];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=2;screen.width=[400,700];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8325]                                 (444)前置調解債務人基本資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
@@ -155,6 +155,7 @@ INVOKEJS(SHOW,p1,6,6,0)
 #Default=X,1,S
 T(2,@SubmitKey,458)
 #RimJcicBankCode=X,3,S
+#RimCourtCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -214,6 +215,7 @@ T(H,#TranKey,#TranKeyHelp)
 
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 T(2,@RimCustId,#CustId)
 ! 檢核該統編是否存在於客戶檔
 #RimL8R57=X,1,S
@@ -252,10 +254,13 @@ C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
+@V(7)
 
 #CourtCodeX=X,80,L
-T(H,#CourtCode,#CourtCodeHelp)
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 #BUF1=X,11,S
 T(2,5+#CustId)
@@ -264,7 +269,7 @@ T(2,5+#CustId)
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF1})
 
 !債務人戶籍之郵遞區號及地址
-#CustRegAddr=X,114,I
+#CustRegAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CustRegAddr,#L8r42CustRegAddr),$)
@@ -273,7 +278,7 @@ C(5,#TranKey,X,S,$)
 @V(7)
 
 !債務人通訊地之郵遞區號及地址
-#CustComAddr=X,114,I
+#CustComAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CustComAddr,#L8r42CustComAddr),$)
@@ -373,6 +378,7 @@ TXFORM=L8325^
 <include src="ROM.icf::L8R19.tom"/>
 <include src="ROM.icf::L8R42.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 <sub type="PART" name="L8325" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

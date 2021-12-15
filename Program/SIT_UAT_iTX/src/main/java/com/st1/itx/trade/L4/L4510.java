@@ -359,11 +359,11 @@ public class L4510 extends TradeBuffer {
 			// 應繳試算
 			if ("2".equals(result.get("F3"))) {
 				iN15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
-				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
+				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			} else {
 				iY15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
-				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
+				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			}
 			setBatxValue(listBaTxVo, result.get("F3") );

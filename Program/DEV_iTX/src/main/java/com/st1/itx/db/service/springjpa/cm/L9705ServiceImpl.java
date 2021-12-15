@@ -52,6 +52,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"FacmNo\"             AS \"FacmNo\"    ";
 		sql += "            ,C.\"CustName\"           AS \"CustName\"  ";
 		sql += "            ,F.\"RepayCode\"          AS \"RepayCode\" ";
+		sql += "            ,C.\"EntCode\"            AS \"EntCode\"   ";
 		sql += "      FROM \"LoanBorMain\" M";
 		sql += "      LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "                             AND F.\"FacmNo\" = M.\"FacmNo\"";

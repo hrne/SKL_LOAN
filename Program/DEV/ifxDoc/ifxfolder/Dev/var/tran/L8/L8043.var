@@ -148,64 +148,64 @@ T(3,1)ASGN(LOOP$)
 #OOTranKey_Tmp=X,10,S
 T(H,#OOTranKey,#TranKeyHelp)
 #OOTranKeyX=X,15,S
-T(2,#OOTranKey+ - +#OOTranKey_Tmp)
+T(2,#OOTranKey+ +#OOTranKey_Tmp)
 ! 以下變動
-#OOBankCode1=X,10,S
-#OOBankCode1X=X,50,S
-#OOBankCode_Combine1=X,60,S
+#OOBankCode1=X,3,S
+#OOBankCode1X=X,40,S
+#OOBankCode_Combine1=X,45,S
 T(2,#OOBankCode1+ +#OOBankCode1X)
 
 #OODataCode1=X,2,S
 #OODataCode1_Tmp=X,10,S
 C(4,#OODataCode1,S,T(H,#OODataCode1,#DataCodeHelp)))
 #OODataCode1X=X,15,S
-C(4,#OODataCode1,S,T(2,#OODataCode1+ - +#OODataCode1_Tmp))
+C(4,#OODataCode1,S,T(2,#OODataCode1+ +#OODataCode1_Tmp))
 
 
-#OOBankCode2=X,10,S
-#OOBankCode2X=X,50,S
-#OOBankCode_Combine2=X,60,S
+#OOBankCode2=X,3,S
+#OOBankCode2X=X,40,S
+#OOBankCode_Combine2=X,45,S
 T(2,#OOBankCode2+ +#OOBankCode2X)
 
 #OODataCode2=X,2,S
 #OODataCode2_Tmp=X,10,S
 C(4,#OODataCode2,S,T(H,#OODataCode2,#DataCodeHelp)))
 #OODataCode2X=X,15,S
-C(4,#OODataCode2,S,T(2,#OODataCode2+ - +#OODataCode2_Tmp))
+C(4,#OODataCode2,S,T(2,#OODataCode2+ +#OODataCode2_Tmp))
 
-#OOBankCode3=X,10,S
-#OOBankCode3X=X,50,S
-#OOBankCode_Combine3=X,60,S
+#OOBankCode3=X,3,S
+#OOBankCode3X=X,40,S
+#OOBankCode_Combine3=X,45,S
 T(2,#OOBankCode3+ +#OOBankCode3X)
 
 #OODataCode3=X,2,S
 #OODataCode3_Tmp=X,10,S
 C(4,#OODataCode3,S,T(H,#OODataCode3,#DataCodeHelp)))
 #OODataCode3X=X,15,S
-C(4,#OODataCode3,S,T(2,#OODataCode3+ - +#OODataCode3_Tmp))
+C(4,#OODataCode3,S,T(2,#OODataCode3+ +#OODataCode3_Tmp))
 
 
-#OOBankCode4=X,10,S
-#OOBankCode4X=X,50,S
-#OOBankCode_Combine4=X,60,S
+#OOBankCode4=X,3,S
+#OOBankCode4X=X,40,S
+#OOBankCode_Combine4=X,45,S
 T(2,#OOBankCode4+ +#OOBankCode4X)
 
 #OODataCode4=X,2,S
 #OODataCode4_Tmp=X,10,S
 C(4,#OODataCode4,S,T(H,#OODataCode4,#DataCodeHelp)))
 #OODataCode4X=X,15,S
-C(4,#OODataCode4,S,T(2,#OODataCode4+ - +#OODataCode4_Tmp))
+C(4,#OODataCode4,S,T(2,#OODataCode4+ +#OODataCode4_Tmp))
 
-#OOBankCode5=X,10,S
-#OOBankCode5X=X,50,S
-#OOBankCode_Combine5=X,60,S
+#OOBankCode5=X,3,S
+#OOBankCode5X=X,40,S
+#OOBankCode_Combine5=X,45,S
 T(2,#OOBankCode5+ +#OOBankCode5X)
 
 #OODataCode5=X,2,S
 #OODataCode5_Tmp=X,10,S
 C(4,#OODataCode5,S,T(H,#OODataCode5,#DataCodeHelp)))
 #OODataCode5X=X,15,S
-C(4,#OODataCode5,S,T(2,#OODataCode5+ - +#OODataCode5_Tmp))
+C(4,#OODataCode5,S,T(2,#OODataCode5+ +#OODataCode5_Tmp))
 
 #OOChangePayDate=D,7,S
 
@@ -270,30 +270,30 @@ TXFORM=L8043
 #OOTranKeyX=交易代碼
 {width:100,align:'center'}
 !L8313(52)
-#OOBankCode_Combine1=補報送債權機構代號1
-{width:100,align:'left'}
-#OODataCode1X=補報送檔案格式資料別1
-{width:100,align:'left'}
-#OOBankCode_Combine2=補報送債權機構代號2
-{width:100,align:'left'}
-#OODataCode2X=補報送檔案格式資料別2
-{width:100,align:'left'}
-#OOBankCode_Combine3=補報送債權機構代號3
-{width:100,align:'left'}
-#OODataCode3X=補報送檔案格式資料別3
-{width:100,align:'left'}
-#OOBankCode_Combine4=補報送債權機構代號4
-{width:100,align:'left'}
-#OODataCode4X=補報送檔案格式資料別4
-{width:100,align:'left'}
-#OOBankCode_Combine5=補報送債權機構代號5
-{width:100,align:'left'}
-#OODataCode5X=補報送檔案格式資料別5
-{width:100,align:'left'}
+#OOBankCode_Combine1=補報送<br>債權機構代號1
+{width:120,align:'left'}
+#OODataCode1X=補報送檔案格式<br>資料別1
+{width:120,align:'left'}
+#OOBankCode_Combine2=補報送<br>債權機構代號2
+{width:120,align:'left'}
+#OODataCode2X=補報送檔案格式<br>資料別2
+{width:120,align:'left'}
+#OOBankCode_Combine3=補報送<br>債權機構代號3
+{width:120,align:'left'}
+#OODataCode3X=補報送檔案格式<br>資料別3
+{width:120,align:'left'}
+#OOBankCode_Combine4=補報送<br>債權機構代號4
+{width:120,align:'left'}
+#OODataCode4X=補報送檔案格式<br>資料別4
+{width:120,align:'left'}
+#OOBankCode_Combine5=補報送<br>債權機構代號5
+{width:120,align:'left'}
+#OODataCode5X=補報送檔案格式<br>資料別5
+{width:120,align:'left'}
 #OOChangePayDate=申請變更還款條件日
 {width:100,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
-{width:200,align:'center'}
+{width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員

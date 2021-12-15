@@ -247,14 +247,14 @@ T(2,5+#CustId)
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF1})
 
 !債務人戶籍之郵遞區號及地址 只能存38個全形中文字
-#CustRegAddr=X,76,I
+#CustRegAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,X,S,$)
 @V(7)
 
 !債務人通訊地之郵遞區號及地址 只能存38個全形中文字
-#CustComAddr=X,76,I
+#CustComAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,X,S,$)

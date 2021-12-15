@@ -46,7 +46,7 @@ K(NOBUTTON,CLOSEY)
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCaseStatus+案件狀態",#CaseStatus,#CaseStatusX],
 ["#FdClaimDate+裁定日期或發文日期",#ClaimDate],
-["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdCourtCode+承審法院代碼",#CourtCode,#CourtCodeX],
 ]
 
 #FdCustId=X,2,L
@@ -179,8 +179,8 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 ! 以下變動
 !056
 #OOYear=M,3,S
-#OOCourtDiv=X,8,S
-#OOCourtCaseNo=X,80,S
+#OOCourtDiv=X,4,S
+#OOCourtCaseNo=X,40,S
 #OOApprove=X,1,S
 #OOOutstandAmt=M,9,S
 #OOClaimStatus1=X,1,S
@@ -270,7 +270,7 @@ TXFORM=L8047
 #OOAdminName=管理人姓名
 {width:150,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
-{width:200,align:'center'}
+{width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員

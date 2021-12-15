@@ -151,7 +151,7 @@ T(2,@FdClaimStatus,*)
 T(2,@FdApplyDate,*)
 T(3,@TranKeyHelp,C:異動;D:刪除))
 
-!! 查詢進入
+! 查詢進入
 #Deal_Search=X,1,S
 C(5,#TranKey_Tmp,5,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
@@ -313,7 +313,7 @@ C(5,#TranKey,D,T(2,@Year,#L8r21Year),$)
 C(5,#TranKey,D,s,$)
 @C(5,#ClaimStatus,1,$,V(2,0))
 !法院承審股別(兩個中文字) 11
-#CourtDiv=X,4,I
+#CourtDiv=C,4,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtDiv,#L8r21CourtDiv),$)
@@ -321,7 +321,7 @@ C(5,#TranKey,D,s,$)
 @C(5,#ClaimStatus,1,$,V(7))
 
 !法院案號(只可寫入10個中文字) 12
-#CourtCaseNo=X,20,I
+#CourtCaseNo=C,20,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtCaseNo,#L8r21CourtCaseNo),$)

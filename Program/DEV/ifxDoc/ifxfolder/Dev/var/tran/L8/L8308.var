@@ -521,7 +521,7 @@ C(5,#TranKey,D,s,$)
 @V(7)V(NL)
 
 ![最大債權金融機構聲請狀送達地址]-可存入38個全形中文字
-#PostAddr=X,76,I
+#PostAddr=x,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PostAddr,#L8r18PostAddr),$)

@@ -181,6 +181,7 @@ K(MODIFYBUTTON,刪除)
 #Default=X,1,S
 T(2,@SubmitKey,458)
 #RimJcicBankCode=X,3,S
+#RimCourtCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -214,11 +215,17 @@ E(0,@RemindDate,#L8r39RemindDate)
 T(2,@ApplyType,#L8r39ApplyType)
 T(2,@ReportYn,#L8r39ReportYn)
 T(2,@NotBankId1,#L8r39NotBankId1)
+T(2,@NotBankIdX1,#L8r39NotBankIdX1)
 T(2,@NotBankId2,#L8r39NotBankId2)
+T(2,@NotBankIdX2,#L8r39NotBankIdX2)
 T(2,@NotBankId3,#L8r39NotBankId3)
+T(2,@NotBankIdX3,#L8r39NotBankIdX3)
 T(2,@NotBankId4,#L8r39NotBankId4)
+T(2,@NotBankIdX4,#L8r39NotBankIdX4)
 T(2,@NotBankId5,#L8r39NotBankId5)
+T(2,@NotBankIdX5,#L8r39NotBankIdX5)
 T(2,@NotBankId6,#L8r39NotBankId6)
+T(2,@NotBankIdX6,#L8r39NotBankIdX6)
 E(0,@OutJcicTxtDate,#L8r39OutJcicTxtDate)
 T(H,@ReportYnX,#ReportYn,#YesNoHelp)
 ![下拉選單的值]
@@ -247,6 +254,7 @@ HELP(#TranKeyHelp)
 
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 T(2,@RimCustId,#CustId)
 ! 檢核該統編是否存在於客戶檔
 #RimL8R57=X,1,S
@@ -300,10 +308,13 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
+@V(7)
 
 #CourtCodeX=X,80,L
-T(H,#CourtCode,#CourtCodeHelp)
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 !同意書取得日期
 #AgreeDate=D,7,I
@@ -394,7 +405,7 @@ E(0,0)
 !C(5,#TXFORM,L8322,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L8322] 前置調解受理申請暨請求回報債權通知資料)
+T(3,[L8322] 前置受理申請暨請求回報債權通知資料)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -436,6 +447,7 @@ TXFORM=L8322^
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R39.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 <sub type="PART" name="L8322" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

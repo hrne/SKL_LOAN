@@ -45,7 +45,7 @@ K(NOBUTTON,CLOSEY)
 ["[L8049]                                 消債條列JCIC報送資料歷程查詢(061)"],
 
 ["#FdCustId+身分證字號",#CustId,#CustIdX],
-["#FdRcDate+款項統一收付申請日",#RcDate],
+["#FdRcDate+原前置協商申請日",#RcDate],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 ["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
@@ -214,20 +214,20 @@ TXFORM=L8049
 !L8319(61)
 #OOTranKeyX=交易代碼
 {width:80,align:'center'}
-#OOExpBalanceAmt=信用貸款協商剩餘債權餘額
-{width:200,align:'right'}
-#OOCashBalanceAmt=現金卡協商剩餘債權餘額
-{width:200,align:'right'}
-#OOCreditBalanceAmt=信用卡協商剩餘債權餘額
-{width:200,align:'right'}
-#OOMaxMainNote=最大債權金融機構報送註記
-{width:200,align:'center'}
+#OOExpBalanceAmt=信用貸款協商<br>剩餘債權餘額
+{width:140}
+#OOCashBalanceAmt=現金卡協商<br>剩餘債權餘額
+{width:140}
+#OOCreditBalanceAmt=信用卡協商<br>剩餘債權餘額
+{width:140}
+#OOMaxMainNote=最大債權金融機構<br>報送註記
+{width:180,align:'center'}
 #OOIsGuarantor=是否有保證人
 {width:100,align:'center'}
-#OOIsChangePayment=是否同意債務人申請變更還款條件方案
-{width:280,align:'center'}
+#OOIsChangePayment=是否同意債務人<br>申請變更還款條件方案
+{width:180,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
-{width:200,align:'center'}
+{width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員

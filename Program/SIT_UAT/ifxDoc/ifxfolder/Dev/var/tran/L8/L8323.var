@@ -44,7 +44,8 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdApplyDate+調解申請日",#ApplyDate],
+[#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 [#<->#,"#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain,#IsMaxMainX],
 [#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 ["#FdIsClaims+是否為本金融機構債務人",#IsClaims,#IsClaimsX],["#FdGuarLoanCnt+本金融機構有擔保債權筆數",#GuarLoanCnt],
@@ -174,7 +175,6 @@ T(F,@ReceExpPrin,1)T(F,@ReceExpInte,1)T(F,@ReceExpPena,1)T(F,@ReceExpOther,1)
 T(F,@CashCardPrin,1)T(F,@CashCardInte,1)T(F,@CashCardPena,1)T(F,@CashCardOther,1)
 T(F,@CreditCardPrin,1)T(F,@CreditCardInte,1)T(F,@CreditCardPena,1)T(F,@CreditCardOther,1)
 T(F,@GuarObliPrin,1)T(F,@GuarObliInte,1)T(F,@GuarObliPena,1)T(F,@GuarObliOther,1)
-T(2,@FdTranKey,*)
 T(2,@FdIsClaims,*)
 
 
@@ -195,6 +195,7 @@ K(MODIFYBUTTON,刪除)
 #Default=X,1,S
 T(2,@SubmitKey,458)
 #RimJcicBankCode=X,3,S
+#RimCourtCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -266,6 +267,7 @@ HELP(#TranKeyHelp)
 #CustId=X,10,L
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 T(2,@RimCustId,#CustId)
 ! 檢核該統編是否存在於客戶檔
 #RimL8R57=X,1,S
@@ -296,10 +298,13 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
+@V(7)
 
 #CourtCodeX=X,80,L
-T(H,#CourtCode,#CourtCodeHelp)
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 !是否為最大債權金融機構報送
 #IsMaxMain=X,1,I
@@ -539,6 +544,7 @@ TXFORM=L8323^
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R40.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 <sub type="PART" name="L8323" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

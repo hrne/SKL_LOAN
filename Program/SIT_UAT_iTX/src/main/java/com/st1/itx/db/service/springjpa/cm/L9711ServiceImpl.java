@@ -77,6 +77,7 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,CC.\"Item\" F20";
 		sql += "        ,M.\"AmortizedCode\" F21";
 		sql += "        ,F.\"AcctCode\" F22";
+		sql += "        ,C.\"EntCode\"                         AS  F23   ";
 		sql += "        ,ROW_NUMBER() OVER (PARTITION BY M.\"CustNo\", M.\"FacmNo\" ORDER BY T.\"TelTypeCode\") AS SEQ";
 		sql += "	FROM(SELECT M.\"CustNo\"";
 		sql += "			   ,M.\"FacmNo\"";

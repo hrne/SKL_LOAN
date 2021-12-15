@@ -44,7 +44,8 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdApplyDate+調解申請日",#ApplyDate],
+[#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdCivil323Amt+依民法第323條計算之債權總金額",#Civil323Amt],["#FdTotalAmt+簽約總債權金額",#TotalAmt],
 ["#FdSignDate+簽約完成日期",#SignDate],["#FdFirstPayDate+首期應繳日",#FirstPayDate],
 ["#FdPeriod+期數",#Period],["#FdRate+利率",#Rate,"%"],
@@ -153,6 +154,7 @@ T(F,@SignDate,0)
 #Default=X,1,S
 T(2,@SubmitKey,458)
 #RimJcicBankCode=X,3,S
+#RimCourtCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -197,7 +199,7 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPayAccount,*),
-C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPayAccount,*),
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPayAccount,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPayAccount, ),$))
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPayAccount, ),$))
 #TranKeyX=X,4,L
@@ -210,6 +212,7 @@ T(H,#TranKey,#TranKeyHelp)
 
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 T(2,@RimCustId,#CustId)
 ! 檢核該統編是否存在於客戶檔
 #RimL8R57=X,1,S
@@ -248,10 +251,13 @@ C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
+@V(7)
 
 #CourtCodeX=X,80,L
-T(H,#CourtCode,#CourtCodeHelp)
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 !依民法第323條計算之債權總金額
 #Civil323Amt=m,10,I
@@ -385,6 +391,7 @@ TXFORM=L8327^
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R44.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 <sub type="PART" name="L8327" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

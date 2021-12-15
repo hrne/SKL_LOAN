@@ -123,7 +123,6 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
-T(2,@FdTranKey,*)
 T(2,@FdOwnerYn,*)
 T(2,@FdPayYn,*)
 
@@ -223,7 +222,7 @@ D(8)
 @V(7)
 A(DATE,0,#ApplyDate)
 
-!受理調解機構代號-承審法院代碼OR郵遞區號
+!受理更生款項統一收付之債權金融機構代號
 #BankId=X,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)

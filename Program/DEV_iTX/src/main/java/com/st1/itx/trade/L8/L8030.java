@@ -1520,7 +1520,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCustId", xJcicZ051.getCustId());
 				occursListB.putParam("OORcDate", xJcicZ051.getRcDate());
 				occursListB.putParam("OOSubmitKey", xJcicZ051.getSubmitKey());
-				occursListB.putParam("OODelayYM", xJcicZ051.getDelayYM());
+				occursListB.putParam("OODelayYM", xJcicZ051.getDelayYM()-191100);
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ051.getSubmitKey(), titaVo));
 				occursListB.putParam("OOTranKey", xJcicZ051.getTranKey());
 				int iOutJcicTxtDate = 0;
@@ -1535,7 +1535,7 @@ public class L8030 extends TradeBuffer {
 				JcicZ051Id rJcicZ051Id = new JcicZ051Id();
 				rJcicZ051Id.setRcDate(xJcicZ051.getRcDate());
 				rJcicZ051Id.setCustId(xJcicZ051.getCustId());
-				rJcicZ051Id.setDelayYM(xJcicZ051.getDelayYM());
+				rJcicZ051Id.setDelayYM(xJcicZ051.getDelayYM()-191100);
 				rJcicZ051Id.setSubmitKey(xJcicZ051.getSubmitKey());
 				rJcicZ051 = iJcicZ051Service.findById(rJcicZ051Id, titaVo);
 				// 已報送檔案(OutJcicDate!=0)才可做異動，否則只能刪除
@@ -3309,7 +3309,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OORcDate", xJcicZ451.getApplyDate());
 				occursListB.putParam("OOCourtCode", xJcicZ451.getCourtCode());
 				occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ451.getCourtCode(), titaVo));
-				occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM());
+				occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM()-191100);
 				occursListB.putParam("OOTranKey", xJcicZ451.getTranKey());
 				int iOutJcicTxtDate = 0;
 				iOutJcicTxtDate = xJcicZ451.getOutJcicTxtDate();
@@ -3325,7 +3325,7 @@ public class L8030 extends TradeBuffer {
 				rJcicZ451Id.setSubmitKey(xJcicZ451.getSubmitKey());
 				rJcicZ451Id.setApplyDate(xJcicZ451.getApplyDate());
 				rJcicZ451Id.setCourtCode(xJcicZ451.getCourtCode());
-				rJcicZ451Id.setDelayYM(xJcicZ451.getDelayYM());
+				rJcicZ451Id.setDelayYM(xJcicZ451.getDelayYM()-191100);
 				rJcicZ451 = iJcicZ451Service.findById(rJcicZ451Id, titaVo);
 				// 已報送檔案(OutJcicDate!=0)才可做異動，否則只能刪除
 				if (rJcicZ451.getOutJcicTxtDate() == 0) {

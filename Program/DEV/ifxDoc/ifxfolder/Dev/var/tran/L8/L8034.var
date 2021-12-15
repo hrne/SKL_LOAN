@@ -121,8 +121,8 @@ R(1,L8R55)
 T(2,@CustId,#L8r55CustId)
 T(2,@SubmitKey,#L8r55SubmitKey)
 E(0,@RcDate,#L8r55ApplyDate)
-E(0,@MaxMainCode,#L8r55MaxMainCode)
-E(0,@Account,#L8r55Account)
+T(2,@MaxMainCode,#L8r55MaxMainCode)
+T(2,@Account,#L8r55Account)
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
@@ -177,6 +177,7 @@ T(2,#OOCollateralType+ - +#OOCollateralType_Tmp)
 #OOPerPeriordAmt=M,10,S
 #OOLastPayAmt=M,10,S
 #OOLastPayDate=D,7,S
+C(3,#OOLastPayDate,0,S,$)
 #OOOutstandAmt=M,10,S
 #OORepayPerMonDay=A,2,S
 #OOContractStartYM=A,5,S
@@ -257,7 +258,7 @@ TXFORM=L8034
 #OOContractEndYM=契約截止年月
 {width:100,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
-{width:200,align:'center'}
+{width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員

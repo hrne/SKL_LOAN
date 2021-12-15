@@ -12,7 +12,6 @@ import com.st1.itx.db.domain.JcicZ451;
 import com.st1.itx.db.service.JcicZ451Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
-
 @Service("L8R47")
 @Scope("prototype")
 /**
@@ -32,21 +31,20 @@ public class L8R47 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ451 iJcicZ451 = new JcicZ451();
 		iJcicZ451 = iJcicZ451Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ451 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r47TranKey", iJcicZ451.getTranKey());
 			totaVo.putParam("L8r47CustId", iJcicZ451.getCustId());
 			totaVo.putParam("L8r47SubmitKey", iJcicZ451.getSubmitKey());
 			totaVo.putParam("L8r47ApplyDate", iJcicZ451.getApplyDate());
 			totaVo.putParam("L8r47CourtCode", iJcicZ451.getCourtCode());
-			totaVo.putParam("L8r47DelayYM", iJcicZ451.getDelayYM());
+			totaVo.putParam("L8r47DelayYM", iJcicZ451.getDelayYM()-191100);
 			totaVo.putParam("L8r47DelayCode", iJcicZ451.getDelayCode());
-			totaVo.putParam("L8r47OutJcicTxtDate", iJcicZ451.getOutJcicTxtDate());		
+			totaVo.putParam("L8r47OutJcicTxtDate", iJcicZ451.getOutJcicTxtDate());
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

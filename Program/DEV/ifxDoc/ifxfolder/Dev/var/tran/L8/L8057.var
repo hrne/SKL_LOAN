@@ -43,7 +43,7 @@ K(NOBUTTON,CLOSEY)
 [
 ["[L8057]                                 消債條列JCIC報送資料歷程查詢(447)"],
 ["#FdCustId+身分證字號",#CustId,#CustIdX],
-["#FdRcDate+款項統一收付申請日",#RcDate],
+["#FdRcDate+調解申請日",#RcDate],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ]
@@ -102,8 +102,10 @@ T(1,@Ukey,#NTXBUF,6,32)
 #SubmitKeyX=X,80,L
 #CourtCodeX=X,80,L
 <include src="ROM.icf::L8R55.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 #RimUkey=X,32,S
 #RimChainCd=X,5,S
+#RimCourtCode=X,3,S
 #RimL8r55=X,1,S
 T(2,@RimUkey,#Ukey)
 T(2,@RimChainCd,#ChainCd)
@@ -114,7 +116,11 @@ T(2,@CustId,#L8r55CustId)
 T(2,@SubmitKey,#L8r55SubmitKey)
 E(0,@RcDate,#L8r55ApplyDate)
 T(2,@CourtCode,#L8r55CourtCode)
-T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
+#Lr859=X,1,S
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
@@ -160,7 +166,7 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 C(3,#OOSignDate,0,S,$)
 #OOFirstPayDate=D,7,S
 C(3,#OOFirstPayDate,0,S,$)
-#OOPeriod=A,3,S
+#OOPeriod=M,3,S
 #OORate=m,2.2,S
 #OOMonthPayAmt=m,9,S
 #OOPayAccount=x,20,S
@@ -201,6 +207,7 @@ TXFORM=L8057
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------
@@ -217,23 +224,23 @@ TXFORM=L8057
 {width:100,align:'center'}
 !L8327(447)
 #OOCivil323Amt=依民法第323條計算之債務總金額
-{width:300,align:'right'}
+{width:300}
 #OOTotalAmt=簽約總債務金額
-{width:150,align:'right'}
+{width:150}
 #OOSignDate=簽約完成日期
 {width:150,align:'center'}
 #OOFirstPayDate=首期應繳款日
 {width:150,align:'center'}
 #OOPeriod=期數
-{width:100,align:'left'}
+{width:100}
 #OORate=利率
-{width:100,align:'left'}
+{width:100}
 #OOMonthPayAmt=月付金
-{width:100,align:'right'}
+{width:100}
 #OOPayAccount=繳款帳號
-{width:100,align:'center'}
+{width:100}
 #OOOutJcicTxtDate=資料轉出日期
-{width:200,align:'center'}
+{width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員

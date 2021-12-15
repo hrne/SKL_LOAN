@@ -128,18 +128,18 @@ E(0,#SYSCDATE)
 T(2,#CustNo+-+#FacmNo)
 
 #LC014Note=x,100,S
-T(B,日期:+#SysCDate+/MrKey:+#LC014Mrkey+ 清償序號:+#LcCloseNo+用印申請書)
+T(B,戶號:+#LC014Mrkey+ 清償序號:+#LcCloseNo+用印申請書)
 
 #BufLC014=X,200,S
 T(2,L2076+#CustNo+#FacmNo+000+#LC014Mrkey+#LC014Note)
 
 #Button=x,100,S
 T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,LC104 上傳附件)
+K(MODIFYBUTTON,1,上傳附件)
 
 #Button2=x,100,S
 T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
-K(MODIFYBUTTON,2,LC014 上傳附件查詢)
+K(MODIFYBUTTON,2,上傳附件查詢)
 
 
 

@@ -118,9 +118,6 @@ T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdPayDate,*)
-T(2,@FdPayAmt,*)
-T(2,@FdSumRepayActualAmt,*)
-T(2,@FdSumRepayShouldAmt,*)
 T(2,@FdStatus,*)
 T(2,@FdSecondRepayYM,*)
 T(2,@FdSubmitKey,*)
@@ -131,9 +128,6 @@ T(F,@TranKey,1)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
 T(2,@FdTranKey,*)
-T(2,@FdPayAmt,*)
-T(2,@FdSumRepayActualAmt,*)
-T(2,@FdSumRepayShouldAmt,*)
 T(2,@FdStatus,*)
 T(2,@FdSecondRepayYM,*)
 T(3,@TranKeyHelp,C:異動;D:刪除))
@@ -203,9 +197,9 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
-T(2,@FdPayAmt,*)T(2,@FdSumRepayActualAmt,*)T(2,@FdSumRepayShouldAmt,*)T(2,@FdStatus,*)T(2,@FdSecondRepayYM,*),
+T(2,@FdStatus,*)T(2,@FdSecondRepayYM,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@Status,0)T(F,@SecondRepayYM,0)
-T(2,@FdPayAmt, )T(2,@FdSumRepayActualAmt, )T(2,@FdSumRepayShouldAmt, )T(2,@FdStatus, )T(2,@FdSecondRepayYM, ),$))
+T(2,@FdStatus, )T(2,@FdSecondRepayYM, ),$))
 
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)

@@ -44,10 +44,12 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdApplyDate+調解申請日",#ApplyDate],
+[#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 [#<->#,"#FdPayDate+繳款日期",#PayDate],
 ["#FdPayAmt+本次繳款金額",#PayAmt],["#FdSumRepayActualAmt+累計實際還款金額",#SumRepayActualAmt],
-["#FdSumRepayShouldAmt+截至目前累計應還款金額",#SumRepayShouldAmt],["#FdPayStatus+債權結案註記",#PayStatus,#PayStatusX],
+["#FdSumRepayShouldAmt+截至目前累計應還款金額",#SumRepayShouldAmt],
+[#<->#,"#FdPayStatus+債權結案註記",#PayStatus,#PayStatusX],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -147,6 +149,7 @@ K(MODIFYBUTTON,刪除)
 #Default=X,1,S
 T(2,@SubmitKey,458)
 #RimJcicBankCode=X,3,S
+#RimCourtCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -193,7 +196,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@PayStatus,1)T(2,@FdPayStatus,*),
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@PayStatus,1)T(2,@FdPayStatus,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@PayStatus,0)T(2,@FdPayStatus, ),$))
 
 #TranKeyX=X,4,L
@@ -207,6 +210,7 @@ T(H,#TranKey,#TranKeyHelp)
 
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>
+<include src="ROM.icf::L8R59.dec"/>
 T(2,@RimCustId,#CustId)
 ! 檢核該統編是否存在於客戶檔
 #RimL8R57=X,1,S
@@ -249,11 +253,14 @@ C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey,D,T(2,@CourtCode,#L8r46CourtCode),$)
 C(5,#TranKey,D,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
+@V(7)
 
 
 #CourtCodeX=X,80,L
-T(H,#CourtCode,#CourtCodeHelp)
+T(2,@RimCourtCode,#CourtCode)
+S(L8R59,1,#RimCourtCode)
+R(1,L8R59)
+T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 #CDate=D,7,S
 T(1,#SYSCDATE,2,7)
@@ -365,6 +372,7 @@ TXFORM=L8329^
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R46.tom"/>
 <include src="ROM.icf::L8R57.tom"/>
+<include src="ROM.icf::L8R59.tom"/>
 </sub>
 
 <sub type="PART" name="L8329" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

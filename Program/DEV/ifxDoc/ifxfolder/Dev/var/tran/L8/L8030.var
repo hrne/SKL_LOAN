@@ -279,19 +279,19 @@ T(2,#OOCourtCode+ +#OOCourtCodeX)
 
 !法院代號
 #OOCourtCode56_Combine=X,60,S
-! T(H,@OOCourtCodeX,#OOCourtCode,#CourtCode56Help)
+T(H,@OOCourtCodeX,#OOCourtCode,#CourtCode56Help)
 T(2,@OOCourtCode56_Combine,#OOCourtCode+ +#OOCourtCodeX)
 
 
 #OOCaseStatus=X,1,S
 #OOCaseStatusX=X,100,S
 T(2, )
-#OOCaseStatus_Combine=X,20,S
+#OOCaseStatus_Combine=X,110,S
 T(2, )
 T(H,@OOCaseStatusX,#OOCaseStatus,#CaseStatus56Help)
 T(2,@OOCaseStatus_Combine,#OOCaseStatus+ +#OOCaseStatusX)
 
-#OOCaseStatus55_Combine=X,20,S
+#OOCaseStatus55_Combine=X,110,S
 T(H,@OOCaseStatusX,#OOCaseStatus,#CaseStatus55Help)
 T(2,@OOCaseStatus55_Combine,#OOCaseStatus+ +#OOCaseStatusX)
 

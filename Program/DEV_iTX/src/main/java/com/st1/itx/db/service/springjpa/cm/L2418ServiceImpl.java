@@ -188,7 +188,7 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.index = index;
 		this.limit = limit;
 
-		return findAll(titaVo);
+		return findCityEq(titaVo);
 	}
 
 	public int getSize() {
