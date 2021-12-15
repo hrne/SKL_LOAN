@@ -79,7 +79,7 @@ public class L8048 extends TradeBuffer {
 			String iLastUpdateEmpNo = rrJcicZ060Log.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursList.putParam("OOTranKey", rrJcicZ060Log.getTranKey());
-			occursList.putParam("OOYM", rrJcicZ060Log.getYM());
+			occursList.putParam("OOYM", rrJcicZ060Log.getYM()-191100);
 			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 			if (iLastUpdateEmpNo.equals("")) {
 				occursList.putParam("OOLastUpdateEmpNoName", "");

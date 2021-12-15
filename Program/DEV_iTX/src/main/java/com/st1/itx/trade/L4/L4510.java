@@ -312,7 +312,8 @@ public class L4510 extends TradeBuffer {
 		int entryday = 0;
 		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 			
-		  if(AgType1.equals(tEmpDeductSchedule.getAgType1())) {
+		  this.info("tEmpDeductSchedule = "+ tEmpDeductSchedule);
+		  if(AgType1.equals(""+tEmpDeductSchedule.getAgType1())) {
 			  return tEmpDeductSchedule.getEntryDate();
 		  }
 		  
@@ -366,6 +367,8 @@ public class L4510 extends TradeBuffer {
 				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			}
+			this.info("iN15EntryDate = " + iN15EntryDate);
+			this.info("iY15EntryDate = " + iY15EntryDate);
 			setBatxValue(listBaTxVo, result.get("F3") );
 		} // for
 
@@ -607,11 +610,10 @@ public class L4510 extends TradeBuffer {
 
 //			1.15日薪 2.非15日薪
 			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
-//				iY15EntryDate = getList(slEmpDeductSchedule,);
-				
+				this.info("entrydate ... " + iY15EntryDate);
 				tEmpDeductDtlId.setEntryDate(iY15EntryDate);
 			} else {
-//				iN15EntryDate = getList(slEmpDeductSchedule,);
+				this.info("entrydate ... " + iY15EntryDate);
 				tEmpDeductDtlId.setEntryDate(iN15EntryDate);
 			}
 			tEmpDeductDtlId.setCustNo(tmp.getCustNo());
@@ -706,7 +708,7 @@ public class L4510 extends TradeBuffer {
 				this.info("jsonField ... " + jsonField.toString());
 				tEmpDeductDtl.setJsonFields(jsonField.get(tmp2));
 			}
-
+			
 			try {
 				empDeductDtlService.insert(tEmpDeductDtl, titaVo);
 			} catch (DBException e) {

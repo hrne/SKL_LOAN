@@ -114,6 +114,7 @@ public class L4702 extends TradeBuffer {
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("l4702ServiceImpl.findAll error = " + errors.toString());
 			}
+			titaVo.putParam("CONDITION1", "C");
 			l9705Report.exec(l9705List, titaVo, this.txBuffer);
 
 			break;

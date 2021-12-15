@@ -800,6 +800,18 @@ public class TxToDoCom extends TradeBuffer {
 		case "NOTI02":
 			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;L4454;-;銀扣二扣失敗明信片";
 			break;
+		case "L2921":
+			settingValue = "L2921;-;M;-;-;-;L2921;     ;     ;-;未齊件到期通知";
+			break;
+		case "AMLH":
+			settingValue = "AMLH  ;-;C;-;-;-;L8081;L8081;L8081;Y;AML定審高風險處理";
+			break;
+		case "AMLM":
+			settingValue = "AMLM  ;-;C;-;-;-;L8082;L8082;L8082;Y;AML定審中風險處理";
+			break;
+		case "AMLL":
+			settingValue = "AMLL  ;-;C;-;-;-;L8083;L8083;L8083;Y;AML定審低風險處理";
+			break;
 		default:
 			throw new LogicException(titaVo, "E0013", "項目代號有誤" + itemCode);
 		}

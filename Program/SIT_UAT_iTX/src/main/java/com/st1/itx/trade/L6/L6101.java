@@ -89,7 +89,10 @@ public class L6101 extends TradeBuffer {
 	
 	@Autowired
 	L9133 tranL9133;
-
+	
+	@Autowired
+	L6101Report l6101Report;
+	
 	@Autowired
 	TxToDoCom txToDoCom;
 
@@ -529,8 +532,14 @@ public class L6101 extends TradeBuffer {
 		} else {
 			titaVo.putParam("DoL9133", "N");
 		}
+		
+		// 2021-12-15 智誠修改
+//		MySpring.newTask("L6101Report", this.txBuffer, titaVo);
+		l6101Report.exec(titaVo);
+		
 		// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
 		MySpring.newTask("L9130", this.txBuffer, titaVo);
+
 	}
 
 	// 寫入應處理清單-業績工作月結算啟動通知(工作月結束，放款關帳)

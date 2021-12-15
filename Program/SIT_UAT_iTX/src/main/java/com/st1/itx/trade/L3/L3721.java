@@ -31,6 +31,7 @@ import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -89,6 +90,8 @@ public class L3721 extends TradeBuffer {
 	LoanCom loanCom;
 	@Autowired
 	public DateUtil dateUtil;
+	@Autowired
+	DataLog datalog;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -335,7 +338,8 @@ public class L3721 extends TradeBuffer {
 				this.addList(this.totaVo);
 			} else {
 				try {
-					loanRateChangeService.delete(tLoanRateChange, titaVo);
+
+					batxRateChangeService.delete(tBatxRateChange, titaVo);
 				} catch (DBException f) {
 					throw new LogicException(titaVo, "E0007", "整批利率調整檔"); // 更新資料時，發生錯誤
 				}
@@ -507,6 +511,9 @@ public class L3721 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0006", "放款利率變動檔"); // 鎖定資料時，發生錯誤
 		}
 		try {
+
+			datalog.setEnv(titaVo, tLoanRateChange, tLoanRateChange);
+			datalog.exec("刪除放款利率變動檔");
 			loanRateChangeService.delete(tLoanRateChange, titaVo);
 		} catch (DBException f) {
 			throw new LogicException(titaVo, "E0007", "放款利率變動檔"); // 更新資料時，發生錯誤

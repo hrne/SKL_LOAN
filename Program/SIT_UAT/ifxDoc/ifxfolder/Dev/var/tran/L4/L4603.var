@@ -90,13 +90,13 @@ C(4,#ReportC,S,$)E(0,1)ASGN(LOOPHEIGHT$)
 !------------ TXFORM = L4603 -----------
 <sub type="FORM" name="L4603">
 ! 媒體檔FileNo
-#PdfSnoM=X,8,S
-E(2,@SnoM,#PdfSnoM)
-#SnoM=A,8,S
+!#PdfSnoM=X,8,S
+!E(2,@SnoM,#PdfSnoM)
+!#SnoM=A,8,S
 
 ! 媒體檔FileNo
-#PdfPrtM=A,1,S
-C(3,#SnoM,0,E(0,0),E(0,1))
+!#PdfPrtM=A,1,S
+!C(3,#SnoM,0,E(0,0),E(0,1))
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
@@ -223,7 +223,6 @@ E(0,@RPTFG,1)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L4603
-#PdfSnoM
 #OOCustNo
 #OOFacmNo
 #OOClCode1
@@ -272,10 +271,6 @@ TXFORM=L461C
 
 #OOLableAX=通知種類
 {width:120}
-^
-
-
-#PdfPrtM=1,PDF,,,,,,,,,,,,,PdfSnoM;3,火險通知作業_LNM52P.txt
 ^
 
 #L461CPRT=1,L461C,NA,,D,15

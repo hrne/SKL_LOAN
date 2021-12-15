@@ -142,6 +142,7 @@ T(2,@FdYear,*)
 T(2,@FdCourtDiv,*)
 T(2,@FdClaimDate,*)
 T(2,@FdClaimDate1,*)
+T(2,@FdCourtCaseNo,*)
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)

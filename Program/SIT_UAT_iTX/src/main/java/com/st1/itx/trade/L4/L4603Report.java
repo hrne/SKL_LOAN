@@ -113,11 +113,9 @@ public class L4603Report extends MakeReport {
 		this.setFontSize(15);
 		this.print(4, 38,"火險及地震險保費明細表","C");
 		
-		
 		this.setFontSize(12);
 		this.print(9, 9,"貸款戶號："  + tInsuRenew.getCustNo());
-		
-		this.print(0, 65,"銀行扣款");
+		this.print(0, 65,repayCodeX(tInsuRenew.getRepayCode()));
 		
 		this.print(2, 9,"客戶名稱：" + tCustMain.getCustName());
 		this.print(2, 9,"擔保品地址：" + getBdLocation(tInsuRenew, titaVo));
@@ -221,4 +219,38 @@ public class L4603Report extends MakeReport {
 		}
 		
 	}
+	
+	private String repayCodeX(int repayCode) {
+		String result = "";
+		switch (repayCode) {
+		case 1:
+			result = "匯款轉帳";
+			break;
+		case 2:
+			result = "銀行扣款";
+			break;
+		case 3:
+			result = "員工扣薪";
+			break;
+		case 4:
+			result = "支票繳款";
+			break;
+		case 5:
+			result = "特約金";
+			break;
+		case 6:
+			result = "人事特約金";
+			break;
+		case 7:
+			result = "定存特約";
+			break;
+		case 8:
+			result = "劃撥存款繳款";
+			break;
+		default:
+			break;
+		}
+		return result;
+	}
+	
 }

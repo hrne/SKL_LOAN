@@ -134,6 +134,9 @@ public class BS001 extends TradeBuffer {
 		
 		// 啟動背景作業－BS006 新增應處理明細－支票兌現檢核
 		MySpring.newTask("BS006", this.txBuffer, titaVo);
+		
+		// 啟動背景作業－BS007 新增應處理明細－未齊件到期通知
+		MySpring.newTask("BS007", this.txBuffer, titaVo);
 
 		// 啟動背景作業－新增應處理明細－未付火險費提存，月初日迴轉上月
 		if (this.txBuffer.getMgBizDate().getTbsDy() / 100 != this.txBuffer.getMgBizDate().getLbsDy() / 100) {

@@ -36,7 +36,7 @@ public class LC009 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	private TxFileService txFileService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
 
@@ -135,52 +135,59 @@ public class LC009 extends TradeBuffer {
 		}
 		List<TxFile> lTxFile = slTxFile == null ? null : new ArrayList<>(slTxFile.getContent());
 
-		// 按分配順序排序
-		Collections.sort(lTxFile, new Comparator<TxFile>() {
-			public int compare(TxFile c1, TxFile c2) {
-				String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate()) + c1.getFileCode()
-						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
-				String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate()) + c2.getFileCode()
-						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());
-				return 0 - c1OrderKey.compareTo(c2OrderKey);
-			}
-		});
-
 		if (lTxFile == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		} else {
+
+			// 按分配順序排序
+			Collections.sort(lTxFile, new Comparator<TxFile>() {
+
+				public int compare(TxFile c1, TxFile c2) {
+					if (c1.getCreateDate() == null || c2.getCreateDate() == null) {
+						return 0;
+					}
+
+					String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate())
+							+ (c1.getFileCode() == null ? " " : c1.getFileCode())
+							+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
+					String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate())
+							+ (c2.getFileCode() == null ? " " : c2.getFileCode())
+							+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());
+					return 0 - c1OrderKey.compareTo(c2OrderKey);
+				}
+			});
 			for (TxFile tTxFile : lTxFile) {
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("Ymd", tTxFile.getFileDate());
 				occursList.putParam("Code", tTxFile.getFileCode().trim());
 				occursList.putParam("Item", tTxFile.getFileItem().trim());
-				
+
 				String cretlrno = tTxFile.getCreateEmpNo();
 				CdEmp cdEmp = cdEmpService.findById(tTxFile.getCreateEmpNo(), titaVo);
 				if (cdEmp != null) {
 					cretlrno += " " + cdEmp.getFullname();
 				}
 				occursList.putParam("CreTlrNo", cretlrno);
-				
+
 				String tlrno = tTxFile.getTlrNo();
 				if (!tTxFile.getTlrNo().isEmpty()) {
 					cdEmp = cdEmpService.findById(tTxFile.getTlrNo(), titaVo);
 					if (cdEmp != null) {
 						tlrno += " " + cdEmp.getFullname();
 					}
-				} 
+				}
 				occursList.putParam("TlrNo", tlrno);
-				
+
 				String supno = tTxFile.getSupNo();
 				if (!tTxFile.getSupNo().isEmpty()) {
 					cdEmp = cdEmpService.findById(tTxFile.getSupNo(), titaVo);
 					if (cdEmp != null) {
 						supno += " " + cdEmp.getFullname();
 					}
-				} 
+				}
 				occursList.putParam("SupNo", supno);
-				
+
 				occursList.putParam("Type", tTxFile.getFileType());
 				if (tTxFile.getCreateDate() == null) {
 					occursList.putParam("CalDate", "");

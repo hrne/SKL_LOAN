@@ -109,7 +109,6 @@ public class L4603 extends TradeBuffer {
 		this.info("active L4603 ");
 		this.totaVo.init(titaVo);
 
-		totaVo.put("PdfSnoM", "");
 		totaC.putParam("MSGID", "L461C");
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());

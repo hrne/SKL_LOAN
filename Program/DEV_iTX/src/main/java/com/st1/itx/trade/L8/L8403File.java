@@ -2364,7 +2364,7 @@ public class L8403File extends MakeFile {
 					String iCustId = sJcicZ060.getCustId();
 					String iRcDate = String.valueOf(sJcicZ060.getRcDate());
 					String iChangePayDate = String.valueOf(sJcicZ060.getChangePayDate());
-					int iYM = Integer.valueOf(sJcicZ060.getYM())+191100;
+					int iYM = Integer.valueOf(sJcicZ060.getYM())-191100;
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String iUkey = sJcicZ060.getUkey();
 					String text = "60" + iTranKey + iSubmitKey + StringUtils.rightPad(iCustId, 10, "") + StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
@@ -2385,7 +2385,7 @@ public class L8403File extends MakeFile {
 					iJcicZ060LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ060LogId.setUkey(iUkey);
 					iJcicZ060Log.setJcicZ060LogId(iJcicZ060LogId);
-					iJcicZ060Log.setYM(iYM);
+					iJcicZ060Log.setYM(iYM+191100);
 					iJcicZ060Log.setTranKey(iTranKey);
 					iJcicZ060Log.setOutJcicTxtDate(iDate);
 
@@ -2896,8 +2896,8 @@ public class L8403File extends MakeFile {
 					iJcicZ443Log.setFinalPayDay(iFinalPayDay);
 					iJcicZ443Log.setNotyetacQuit(iNotyetacQuit);
 					iJcicZ443Log.setMothPayDay(iMothPayDay);
-					iJcicZ443Log.setBeginDate(iBeginDate);
-					iJcicZ443Log.setEndDate(iEndDate);
+					iJcicZ443Log.setBeginDate(iBeginDate+191100);
+					iJcicZ443Log.setEndDate(iEndDate+191100);
 					iJcicZ443Log.setTranKey(iTranKey);
 					iJcicZ443Log.setOutJcicTxtDate(iDate);
 

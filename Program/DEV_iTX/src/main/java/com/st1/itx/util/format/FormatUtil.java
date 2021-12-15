@@ -40,6 +40,8 @@ public class FormatUtil {
 		}
 
 		String re = s.length() >= i ? s.substring(0, i) : s;
+		if (len == -1)
+			i++;
 		return String.format("%1$-" + i + "s", re);
 	}
 

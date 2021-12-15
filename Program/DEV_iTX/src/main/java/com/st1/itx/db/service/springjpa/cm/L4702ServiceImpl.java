@@ -50,6 +50,8 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,c.\"CustName\"                        AS \"CustName\"  ";
 		sql += " ,d.\"RepayCode\"                       AS \"RepayCode\" ";
 		sql += " ,c.\"EntCode\"                         AS \"EntCode\"   ";
+		sql += " ,d.\"EntryDate\"                       AS \"EntryDate\" ";
+		sql += " ,d.\"RepayAmt\"                        AS \"RepayAmt\"  ";
 		sql += " from \"BatxDetail\" d                                   ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\" ";
 		sql += " left join (                                             ";

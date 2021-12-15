@@ -1,0 +1,214 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,198)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6403; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增群組)
+K(MODIFYBUTTON,查詢)
+
+#LevelHelp=X,100,S
+T(3,0: ;1:主管;3:經辦)
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6943]                                 使用者交易權限查詢"],
+["#Fd+使用單位",#BrNo,#BrNoX],
+["#Fd+使用者",#TlrNo],
+["#Fd+交易代號",#TranNo],
+]
+!---------- AP Button AREA ----------
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+!T(4,CHAIN$) 
+E(0,1)
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#Fd=X,2,L
+T(3, )
+
+!單位別
+#Help1=X,10,S
+T(3,CDBR)
+
+#BrHelp=X,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#Help1)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@BrHelp,#HelpDesc1)
+
+
+#BrNo=X,4,I
+HELP(#BrHelp)
+@C(4,#BrNo,S,$)V(H,#BrHelp)
+
+#BrNoX=X,50,L
+C(4,#BrNo,S,$)
+T(H,#BrNo,#BrHelp)
+
+#TlrNo=X,6,I
+C(4,#BrNo,$,S)
+
+#TranNo=X,5,I
+
+#RPTFG=A,1,S
+
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6943 ----------
+<sub type="FORM" name="L6943">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6943,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6943] 權限群組)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OBrNo=X,4,S
+#OBrNoX=X,30,S
+#OTlrNo=X,6,S
+#OTlrNoX=X,20,S
+#OAuthNo=X,6,S
+#OAuthNoX=X,30,S
+#OTranNo=X,5,S
+#OTranNoX=X,40,S
+#OAuthFg=X,1,S
+#OAuthFgX=X,6,S
+#OLastUpdate=X,20,S
+#OLastEmp=X,30,S
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#BrNo
+#TlrNo
+#TranNo
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L6943
+#OBrNo
+#OBrNoX
+#OTlrNo
+#OTlrNoX
+#OAuthNo
+#OAuthNoX
+#OTranNo
+#OTranNoX
+#OAuthFg
+#OAuthFgX
+#OLastUpdate
+#OLastEmp
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6943" layout="cols=1;screen.width=[400,800];printer.width=[20,20];">
+[
+["[L6943]                                 使用者交易權限查詢                                                                                "],
+[""],
+]
+</sub>
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6943
+#any={detail:true, header:'L6943.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+
+#OBrNo=使用單位
+{width:70,align:'center'}
+
+#OBrNoX=單位名稱
+{width:120,align:'left'}
+
+#OTlrNo=使用者
+{width:70,align:'center'}
+
+#OTlrNoX=使用者名稱
+{width:120,align:'left'}
+
+#OAuthNo=權限群組
+{width:70,align:'center'}
+
+#OAuthNoX=權限群組名稱
+{width:120,align:'left'}
+
+#OTranNo=交易代號
+{width:70,align:'center'}
+
+#OTranNoX=交易名稱
+{width:120,align:'left'}
+
+#OAuthFgX=權限說明
+{width:70,align:'center'}
+
+#OLastUpdate=修改日期
+{width:120,align:'center'}
+
+#OLastEmp=修改人員
+{width:120,align:'left'}
+
+^
+
+</sub>

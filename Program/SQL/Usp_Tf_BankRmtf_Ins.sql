@@ -57,10 +57,10 @@ BEGIN
           ,NVL(DPSP.DPSBN3, ' ')          AS "RemintBank"          -- 匯款銀行代碼 VARCHAR2 7
           ,DPSP.DPSTRA                    AS "TraderInfo"          -- 交易人資料 NVARCHAR2 20
           ,'0'                            AS "AmlRsp"              -- AML 回應碼 VARCHAR2 1
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM DAT_LA$DPSP DPSP -- 匯款轉帳檔
     LEFT JOIN TB$SPLP SPLP ON SPLP.TB$FNM = 'DPSATC' -- 特殊代碼檔: 調存摺代號 DPSATC 對應的定義
                           AND SPLP.TB$FCD = DPSP.DPSATC

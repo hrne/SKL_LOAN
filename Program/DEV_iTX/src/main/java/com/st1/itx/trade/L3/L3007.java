@@ -93,7 +93,7 @@ public class L3007 extends TradeBuffer {
 		}
 		int wkChequeDateStart = 0;
 		int wkChequeDateEnd = 99991231;
-		String wkRvNo;
+
 
 		if (iChequeDateStart > 0) {
 			wkChequeDateStart = iChequeDateStart + 19110000;
@@ -165,7 +165,7 @@ public class L3007 extends TradeBuffer {
 		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
 		if (slLoanCheque != null && slLoanCheque.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToAuto(); // 自動折返
+			this.totaVo.setMsgEndToEnter(); // 手動折返
 		}
 
 		this.addList(this.totaVo);

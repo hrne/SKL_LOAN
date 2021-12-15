@@ -55,8 +55,6 @@ public class L3004 extends TradeBuffer {
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 
-		int iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
-		
 		// work area
 		Slice<LoanBook> slLoanBook;
 		List<LoanBook> lLoanBook = new ArrayList<LoanBook>();
@@ -105,10 +103,6 @@ public class L3004 extends TradeBuffer {
 			occursList.putParam("OORepayAmt", tLoanBook.getRepayAmt());
 			occursList.putParam("OOBookStatus", tLoanBook.getStatus());
 
-			
-			if( iCustDataCtrl == 1 ) {
-				occursList.putParam("OOCustNo", "");
-			}
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);
 		}
@@ -116,7 +110,7 @@ public class L3004 extends TradeBuffer {
 		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
 		if (slLoanBook != null && slLoanBook.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToAuto(); // 自動折返
+			this.totaVo.setMsgEndToEnter(); // 手動折返
 		}
 
 		this.addList(this.totaVo);

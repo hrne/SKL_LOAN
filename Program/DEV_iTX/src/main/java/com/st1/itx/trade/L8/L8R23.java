@@ -25,7 +25,6 @@ public class L8R23 extends TradeBuffer {
 	@Autowired
 	public JcicZ051Service iJcicZ051Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r23 ");
@@ -33,19 +32,19 @@ public class L8R23 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ051 iJcicZ051 = new JcicZ051();
 		iJcicZ051 = iJcicZ051Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ051 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r23CustId", iJcicZ051.getCustId());
 			totaVo.putParam("L8r23SubmitKey", iJcicZ051.getSubmitKey());
-			totaVo.putParam("L8r23RcDate",iJcicZ051.getRcDate());
-			totaVo.putParam("L8r23DelayCode",iJcicZ051.getDelayCode());
-			totaVo.putParam("L8r23DelayYM" ,iJcicZ051.getDelayYM());
-			totaVo.putParam("L8r23DelayDesc" ,iJcicZ051.getDelayDesc());
-			totaVo.putParam("L8r23TranKey", iJcicZ051.getTranKey());	
+			totaVo.putParam("L8r23RcDate", iJcicZ051.getRcDate());
+			totaVo.putParam("L8r23DelayCode", iJcicZ051.getDelayCode());
+			totaVo.putParam("L8r23DelayYM", iJcicZ051.getDelayYM()-191100);
+			totaVo.putParam("L8r23DelayDesc", iJcicZ051.getDelayDesc());
+			totaVo.putParam("L8r23TranKey", iJcicZ051.getTranKey());
 			totaVo.putParam("L8r23OutJcicTxtDate", iJcicZ051.getOutJcicTxtDate());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

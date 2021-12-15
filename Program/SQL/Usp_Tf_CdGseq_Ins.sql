@@ -117,6 +117,26 @@ BEGIN
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
+    -- 寫入資料
+    -- GseqType = L2 (業務作業)
+    -- GseqKind = 2601 (法務費用檔紀錄號碼)
+    INSERT INTO "CdGseq"
+    SELECT 0                              AS "GseqDate"            -- 編號日期 DECIMAL 8 (編號方式為年度編號時,月日為0,月份編號時,日為0,不分時,擺0)
+          ,0                              AS "GseqCode"            -- 編號方式 DECIMAL 1 (0:不分 1:年度編號 2:月份編號 3:日編號)
+          ,'L2'                           AS "GseqType"            -- 業務類別 VARCHAR2 2 (業務自行編制 例:L2 = 業務作業) 
+          ,'2601'                         AS "GseqKind"            -- 交易種類 VARCHAR2 4 (業務自行編制 例:GseqType = L2 AND GseqKind = 0001 為 戶號)
+          ,9999999                        AS "Offset"              -- 有效值 DECIMAL 8 (例:有效值=999,流水號為999時,下一個為001)
+          ,MAX("RecordNo")                AS "SeqNo"               -- 流水號 DECIMAL 8 (目前已編到第幾號)
+          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    FROM "ForeclosureFee"
+    ;
+
+    -- 記錄寫入筆數
+    INS_CNT := INS_CNT + sql%rowcount;
+
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 

@@ -140,7 +140,7 @@ T(6A,#Entdy+#TxNo)
 #SupRelease=A,1,S
 
 #BTN=X,1,S
-C(3,#SupRelease,1,BIND(grid,cancel),BIND(grid,{ cmd=MODIFY;once=1; ntxcd=#TranNo; txno=#RimData;rim=LCR02}))
+C(3,#SupRelease,1,BIND(grid,cancel),BIND(grid,{ cmd=MODIFY;once=1; ntxcd=#TranCode; txno=#RimData;rim=LCR02}))
 
 </sub>
 

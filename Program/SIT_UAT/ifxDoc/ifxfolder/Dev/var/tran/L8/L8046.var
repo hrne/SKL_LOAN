@@ -178,7 +178,9 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 #OOCourtDiv=X,9,S
 #OOCourtCaseNo=X,45,S
 #OOPayDate=D,7,S
+C(3,#OOPayDate,0,S,$)
 #OOPayEndDate=D,7,S
+C(3,#OOPayEndDate,0,S,$)
 #OOPeriod=m,3,S
 #OORate=m,2.2,S
 #OOOutstandAmt=M,9,S

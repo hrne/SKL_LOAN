@@ -192,7 +192,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@DelayCode,1)T(2,@FdDelayCode,*),
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@DelayCode,1)T(2,@FdDelayCode,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@DelayCode,0)T(2,@FdDelayCode, ),$))
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)

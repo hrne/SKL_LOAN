@@ -512,16 +512,18 @@ C(5,#GradeType,2,$,S)
 ! 流水號
 #Ukey=X,32,S
 
-#NTXBUF1=X,18,S
-IF(#TranKey_Tmp == 1,$,S) 
-T(2,1+A+#CustId)ASGN(NTXBUF$)
+! #NTXBUF1=X,18,S
+! IF(#TranKey_Tmp == 1,$,S) 
+! T(2,1+A+#CustId)ASGN(NTXBUF$)
 
 ! 新增時開啟48
-#TmpNTXCD=X,5,S
-IF(#TranKey_Tmp == 1,$,S) 
-T(3,L8309)
-ASGN(NTXCD$)
-K(NEXTNOCLOSE,true)
+IF(#TranKey_Tmp == 1,ALERT(需報送048檔案),S) 
+
+! #TmpNTXCD=X,5,S
+! IF(#TranKey_Tmp == 1,$,S) 
+! T(3,L8309)
+! ASGN(NTXCD$)
+! K(NEXTNOCLOSE,true)
 
 ![列印用系統變數]
 #RPTFG=X,1,S

@@ -67,8 +67,10 @@ public class CheckAuth extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	private CheckAuthVo getAuth(TitaVo titaVo, String tlrNo, String agentNo, String authNo, String tranNo, int actFg) throws LogicException {
-		this.info("CheckAuth.getAuth(new) tlrNo=" + tlrNo + ",agentNo=" + agentNo + ",authNo=" + authNo + ",tranNo=" + tranNo + ",actFg=" + actFg);
+	private CheckAuthVo getAuth(TitaVo titaVo, String tlrNo, String agentNo, String authNo, String tranNo, int actFg)
+			throws LogicException {
+		this.info("CheckAuth.getAuth(new) tlrNo=" + tlrNo + ",agentNo=" + agentNo + ",authNo=" + authNo + ",tranNo="
+				+ tranNo + ",actFg=" + actFg);
 
 		if (actFg < 0 || actFg > 4) {
 			throw new LogicException(titaVo, "EC008", "(CheckAuth.getAuth) 流程步驟 =" + actFg);
@@ -138,7 +140,8 @@ public class CheckAuth extends CommBuffer {
 			return checkAuthVo;
 		}
 
-		this.info("@@@CheckAuth.TxAuthority AuthFg=" + txAuthority.getAuthFg() + ",actFg=" + actFg + ",txTeller.getLevelFg=" + txTeller.getLevelFg());
+		this.info("@@@CheckAuth.TxAuthority AuthFg=" + txAuthority.getAuthFg() + ",actFg=" + actFg
+				+ ",txTeller.getLevelFg=" + txTeller.getLevelFg());
 
 		if (actFg == 0) {
 			// 全部權限
@@ -169,7 +172,7 @@ public class CheckAuth extends CommBuffer {
 	 */
 	public boolean isAgent(TitaVo titaVo, TxAgent txAgent) throws LogicException {
 		this.info("CheckAuth.isAgeng CALDY = " + titaVo.getParam("CALDY"));
-		
+
 		int caldy = Integer.valueOf(titaVo.getParam("CALDY"));
 
 		// 現在時間
@@ -223,7 +226,8 @@ public class CheckAuth extends CommBuffer {
 	 * @return true有權限,/false無權限
 	 * @throws LogicException LogicException
 	 */
-	public boolean isCan(TitaVo titaVo, String tlrNo, String agentNo, String authNo, String tranNo, int actFg, int funCode) throws LogicException {
+	public boolean isCan(TitaVo titaVo, String tlrNo, String agentNo, String authNo, String tranNo, int actFg,
+			int funCode) throws LogicException {
 
 		this.info("CheckAuth.isCan (new)");
 
@@ -237,7 +241,8 @@ public class CheckAuth extends CommBuffer {
 
 		CheckAuthVo checkAuthVo = this.getAuth(titaVo, tlrNo, agentNo, authNo, tranNo, actFg);
 
-		this.info("CheckAuth.isCan tlrno=" + tlrNo + ",agentNo=" + agentNo + ",authNo=" + authNo + ",tranNo=" + tranNo + ",actFg=" + actFg);
+		this.info("CheckAuth.isCan tlrno=" + tlrNo + ",agentNo=" + agentNo + ",authNo=" + authNo + ",tranNo=" + tranNo
+				+ ",actFg=" + actFg);
 		this.info("CheckAuth.isCan Update=" + checkAuthVo.isCanUpdate() + ",Inquiry=" + checkAuthVo.isCanInquiry());
 
 		if (funCode == 0) {
@@ -260,13 +265,16 @@ public class CheckAuth extends CommBuffer {
 
 	/**
 	 * 回覆交易可執行清單
+	 * 
 	 * @param txcd 交易代號
 	 * @return 有權限櫃員清單
+	 * @throws LogicException
 	 */
+	
 	public List<Map<String, String>> canDoList(String txcd) throws LogicException {
-		
+
 		List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
-		
+
 		List<Map<String, String>> rList = null;
 
 		try {
@@ -276,7 +284,7 @@ public class CheckAuth extends CommBuffer {
 			this.info("CheckAuth ErrorForDB=" + e);
 			throw new LogicException(titaVo, "E0005", "");
 		}
-		
+
 //		if (rList != null && rList.size() > 0) {
 //			for (Map<String, String> d : rList) {
 //				this.info("CheckAuth.canDoList TlrNo = " + d.get("TlrNo") + " , AuthFg = " + d.get("AuthFg"));
@@ -284,7 +292,36 @@ public class CheckAuth extends CommBuffer {
 //		}
 		return rList;
 	}
-	
+
+	/**
+	 * 回覆全部或指定使用者的交易權限
+	 * 
+	 * @param tlrno 指定使用者
+	 * @return 有權限交易清單
+	 * @throws LogicException
+	 */
+	public List<Map<String, String>> canDoPgms(String brno, String tlrno, String tranno) throws LogicException {
+
+		List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+
+		List<Map<String, String>> rList = null;
+
+		try {
+			rList = checkAuthServiceImpl.findCanDoPgms(brno,tlrno,tranno);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			this.info("CheckAuth ErrorForDB=" + e);
+			throw new LogicException(titaVo, "E0005", "");
+		}
+
+//		if (rList != null && rList.size() > 0) {
+//			for (Map<String, String> d : rList) {
+//				this.info("CheckAuth.canDoList TlrNo = " + d.get("TlrNo") + " , AuthFg = " + d.get("AuthFg"));
+//			}			
+//		}
+		return rList;
+	}
+
 	// TitaVo:ACTFG,FUNCIND
 
 	/**
@@ -321,7 +358,8 @@ public class CheckAuth extends CommBuffer {
 			List<Map<String, String>> lCheckAuthVo = checkAuthServiceImpl.findAll(tlrno, tranno);
 			for (Map<String, String> tVo : lCheckAuthVo) {
 //				F0:"TlrNo\",F1:\"LevelFg\",F2:\"AuthNo\",F3:\"AuthFg\",F4:\"BeginDate\",F5:\"BeginTime\",f6:\"EndDate\",F7:\"EndTime\"
-				this.info("Vo = " + tVo.get("F0") + "/" + tVo.get("F1") + "/" + tVo.get("F2") + "/" + tVo.get("F3") + "/" + tVo.get("F4") + "/" + tVo.get("F5"));
+				this.info("Vo = " + tVo.get("F0") + "/" + tVo.get("F1") + "/" + tVo.get("F2") + "/" + tVo.get("F3")
+						+ "/" + tVo.get("F4") + "/" + tVo.get("F5"));
 				if (actfg == 0) {
 					if ("2".equals(tVo.get("F3"))) {
 						checkAuthVo = setUpd(checkAuthVo, tlrno, tVo.get("F0"));
@@ -343,8 +381,8 @@ public class CheckAuth extends CommBuffer {
 			throw new LogicException(titaVo, "EC004", e.getMessage());
 		}
 
-		this.info("CheckAuth.getAuth inquiry=" + checkAuthVo.isCanInquiry() + ",update=" + checkAuthVo.isCanUpdate() + ",agenttlrno=" + checkAuthVo.getAgenInqtTlrNo() + "/"
-				+ checkAuthVo.getAgenUpdtTlrNo());
+		this.info("CheckAuth.getAuth inquiry=" + checkAuthVo.isCanInquiry() + ",update=" + checkAuthVo.isCanUpdate()
+				+ ",agenttlrno=" + checkAuthVo.getAgenInqtTlrNo() + "/" + checkAuthVo.getAgenUpdtTlrNo());
 
 		return checkAuthVo;
 	}
@@ -386,7 +424,8 @@ public class CheckAuth extends CommBuffer {
 	 */
 	public boolean isCan(TitaVo titaVo, String tlrno, String tranno, int actfg, int funcode) throws LogicException {
 
-		this.info("CheckAuth.isCan(old) tlrno=" + tlrno + ",tranno=" + tranno + ",actfg=" + actfg + "funcode=" + funcode);
+		this.info(
+				"CheckAuth.isCan(old) tlrno=" + tlrno + ",tranno=" + tranno + ",actfg=" + actfg + "funcode=" + funcode);
 
 		if (actfg < 0 || actfg > 4) {
 			throw new LogicException(titaVo, "EC010", "(CheckAuth.isCan) actfg=" + actfg);

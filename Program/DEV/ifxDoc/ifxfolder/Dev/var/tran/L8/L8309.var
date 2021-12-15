@@ -159,6 +159,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 <include src="ROM.icf::L8R20.dec"/>
 #RimUkey=X,32,S
 #RimL8r20=X,1,S
+C(4,#TranKey,S,$)
 C(5,#TranKey,A,S,$)
 T(2,@RimUkey,#Ukey)
 RESET_RIM(#RimL8r20,L8R20)

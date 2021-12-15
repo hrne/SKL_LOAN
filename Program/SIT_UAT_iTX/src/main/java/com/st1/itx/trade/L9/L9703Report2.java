@@ -431,6 +431,7 @@ public class L9703Report2 extends MakeReport {
 		if(!"".equals(BreachDate)) {
 		  this.print(1, 8, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢"
 				+ "　該違約金金額");
+		  this.print(1, 8, "＊＊截至　" +" 　　　　　　　　　" +"，貸款尚欠   期。請撥空盡速繳納");
 		}
 //		if (tL9703Vo.get("F8").equals("0")) {
 //			this.print(1, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
