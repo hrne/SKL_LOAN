@@ -43,31 +43,40 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int entDy = parse.stringToInteger(titaVo.get("ACCTDATE_ED"));
 		this.info("entDy = " + entDy);
-
+        // 本日匯款轉帳且有逾期未繳
 		String sql = " select                                            ";
-		sql += "  b.\"CustNo\"                          AS \"CustNo\"    ";
-		sql += " ,b.\"FacmNo\"                          AS \"FacmNo\"    ";
+		sql += "  l.\"CustNo\"                          AS \"CustNo\"    ";
+		sql += " ,NVL(l.\"FacmNo\", x.\"FacmNo\")       AS \"FacmNo\"    ";
 		sql += " ,c.\"CustName\"                        AS \"CustName\"  ";
 		sql += " ,d.\"RepayCode\"                       AS \"RepayCode\" ";
 		sql += " ,c.\"EntCode\"                         AS \"EntCode\"   ";
 		sql += " ,d.\"EntryDate\"                       AS \"EntryDate\" ";
-		sql += " ,d.\"RepayAmt\"                        AS \"RepayAmt\"  ";
+		sql += " ,NVL(x.\"TxAmt\",0)                    AS \"RepayAmt\"  ";
 		sql += " from \"BatxDetail\" d                                   ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\" ";
+		sql += " left join \"LoanBorTx\" x on x.\"AcDate\" = d.\"AcDate\"        ";
+		sql += "                          and x.\"TitaTlrNo\" = d.\"TitaTlrNo\"  ";
+		sql += "                          and x.\"TitaTxtNo\"= d.\"TitaTxtNo\"   ";
+		sql += "                          and x.\"TxAmt\"= d.\"RepayAmt\"        ";
 		sql += " left join (                                             ";
-		sql += "     select distinct                                     ";
+		sql += "     select                                              ";
 		sql += "       \"CustNo\"                                        ";
 		sql += "      ,\"FacmNo\"                                        ";
+		sql += "      ,min(\"NextPayIntDate\") as  \"NextPayIntDate\"    ";
 		sql += "      from \"LoanBorMain\"                               ";
-		sql += "     where \"Status\" = 0                                ";
-		sql += "       and \"NextPayIntDate\" <= :entDy";
-		sql += " ) b   on b.\"CustNo\" = d.\"CustNo\"                    ";
-		sql += " where d.\"RepayCode\" = 1                               ";
-		sql += "   and d.\"ProcStsCode\" <> 'D'                          ";
+		sql += "      where \"Status\" = 0                               ";
+		sql += "       and \"NextPayIntDate\" <= :entDy                  ";
+		sql += "      group by \"CustNo\", \"FacmNo\"                    ";
+		sql += " ) l   on l.\"CustNo\" = d.\"CustNo\"                    ";
+		sql += "      and l.\"NextPayIntDate\" <= d.\"EntryDate\"        "; // 有逾期
+		sql += " where d.\"RepayCode\" = 1                               "; // 01.匯款轉帳
+		sql += "   and d.\"ProcStsCode\" <> 'D'                          "; 
+		sql += "   and d.\"RepayType\" = 1                               ";
 		sql += "   and d.\"CustNo\" <> 0                                 ";
-		sql += "   and d.\"AcDate\" = :entDy";
-		sql += "   and b.\"CustNo\" is not null                          ";
-		sql += " order by d.\"CustNo\", d.\"FacmNo\"                     ";
+		sql += "   and d.\"AcDate\" = :entDy                             "; 
+		sql += "   and l.\"CustNo\" is not null                          "; // 有逾期
+		sql += "   and (l.\"NextPayIntDate\" <= d.\"EntryDate\" or x.\"FacmNo\" is not null) ";
+		sql += " order by l.\"CustNo\", NVL(l.\"FacmNo\", x.\"FacmNo\")  ";
 
 		this.info("sql=" + sql);
 		Query query;

@@ -111,7 +111,7 @@ E(0,2)
 T(2,2+#OOProdNo+#OOProdName+#OOStartDate+#OOEndDate+#OOIfrsStepProdCode+#OOIfrsProdCode)
 
 #OOBTN2=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L7210;text=維護;ntxbuf=#OOBUF2})
+BIND(grid,{cmd=CHAIN;ntxcd=L7210;text=修改;ntxbuf=#OOBUF2})
 
 #OOIfrsStepProdCodeFull=X,12,L
 T(2,#OOIfrsStepProdCode+ +#OOIfrsStepProdCodeX)

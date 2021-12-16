@@ -52,8 +52,7 @@ T(3,1:郵寄通知;2:郵寄通知;3:簡訊通知)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L8081]                                 AML定審資料查詢"],
-["#FdReviewType+評　　級",#ReviewType,#ReviewTypeX],
+["[L8081]                                 AML定審高風險資料查詢"],
 ["#FdProcessType+通知類別",#ProcessType,#ProcessTypeX],
 ["#FdStatus+狀　　態",#Status,#StatusX],
 ["#FdAcDate+定審日期",#AcDate1,'~',#AcDate2],
@@ -61,6 +60,7 @@ T(3,1:郵寄通知;2:郵寄通知;3:簡訊通知)
 !["@顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],
+!["#FdReviewType+評　　級",#ReviewType,#ReviewTypeX],
 !---------- AP Button AREA ----------
 
 
@@ -74,7 +74,7 @@ T(3,)
 T(3,*)
 
 #FdProcessType=X,2,L
-T(3,*)
+T(3, )
 
 #FdAcDate=X,2,L
 T(3,*)
@@ -134,25 +134,27 @@ T(2,@AMLIsStatusHelp,#HelpDesc2)
 T(2,#KINBR)
 
 !評級
-#ReviewType=X,1,I
-C(3,#CHAIN,1,s,$)
-C(3,#AutoSubmit,1,s,$)
-HELP(#AMLReviewTypeHelp,cols:1)
-@V(H,#AMLReviewTypeHelp)
+#ReviewType=X,1,S
+T(3,H)
+!C(3,#CHAIN,1,s,$)
+!C(3,#AutoSubmit,1,s,$)
+!HELP(#AMLReviewTypeHelp,cols:1)
+!@V(H,#AMLReviewTypeHelp)
 
 #downButton=x,100,S
 C(5,#ReviewType,"H",$,s)
-T(2,{cmd=CHAIN; ntxcd=LC009; ntxbuf=      L9703A; ntxbuf5=type})ASGN(BTN_NEW1$)
+T(2,{cmd=CHAIN; ntxcd=LC009; ntxbuf=      L8101; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,下載高風險郵寄名單及明細)
 
 #ReviewTypeX=X,6,L
 T(H,#ReviewType,#AMLReviewTypeHelp)
 
 !通知類別
-#ProcessType=A,1,I
-C(3,#AutoSubmit,1,s,$)
-HELP(#ProcessTypeHelp,cols:1)
-@V(H,#ProcessTypeHelp)
+#ProcessType=A,1,L
+E(0,1)
+!C(3,#AutoSubmit,1,s,$)
+!HELP(#ProcessTypeHelp,cols:1)
+!@V(H,#ProcessTypeHelp)
 
 #ProcessTypeX=X,100,L
 T(H,#ProcessType,#ProcessTypeHelp)
@@ -270,7 +272,7 @@ T(2,#oDataDt+#oCustKey)
 C(3,#oProcessCount,0,T(3,0),T(3,1))
 
 #oBTN2=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L8082;text=#oProcessCount;ntxbuf=#oBUF2c;visible=#oBTN2_visible})
+BIND(grid,{cmd=CHAIN;ntxcd=L8084;text=#oProcessCount;ntxbuf=#oBUF2c;visible=#oBTN2_visible})
 		
 #L8100=X,5,S
 T(3,L8100)
@@ -346,7 +348,7 @@ TXFORM=L8081
 ^
 
 #RPTFG=0,QUERY.GRID,L8081
-#any={caption:'[L8081]AML定審資料查詢／單筆更新狀態點選[更新狀態]按鈕;整批更新狀態先勾選後再按[整批通知]按鈕(點各欄右方可排序)',width:1200,shrinkToFit:'false',rowList:[100,400,800,1600],rowNum:20,
+#any={caption:'[L8081]AML定審高風險資料查詢／單筆更新狀態點選[更新狀態]按鈕;整批更新狀態先勾選後再按[整批通知]按鈕(點各欄右方可排序)',width:1200,shrinkToFit:'false',rowList:[100,400,800,1600],rowNum:20,
 ifxBatch:{
 	name:'整批通知',
 	type:'5',
@@ -378,7 +380,7 @@ ifxBatch:{
 #oReviewTypeX=評級
 {width:60,align:'center'}
 
-#oUnitItem=單位代號
+#oUnitItem=單位
 {width:120,align:'center'}
 
 #oIsStatusX2=定審狀態

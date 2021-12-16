@@ -236,13 +236,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findL4321Report " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " custCode_2 : " +  custCode_2 + " custCode_3 : " +  custCode_3 + " txKind_4 : " +  txKind_4 + " confirmFlag_5 : " +  confirmFlag_5);
     if (dbName.equals(ContentName.onDay))
-      slice = batxRateChangeReposDay.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
+      slice = batxRateChangeReposDay.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = batxRateChangeReposMon.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
+      slice = batxRateChangeReposMon.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = batxRateChangeReposHist.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
+      slice = batxRateChangeReposHist.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
     else 
-      slice = batxRateChangeRepos.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
+      slice = batxRateChangeRepos.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

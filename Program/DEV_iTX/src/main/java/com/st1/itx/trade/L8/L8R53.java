@@ -17,12 +17,13 @@ import com.st1.itx.db.service.TxAmlCreditService;
 
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
-
+import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdBranchGroup;
+import com.st1.itx.db.domain.CdBranchGroupId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBranchService;
-
-import com.st1.itx.db.domain.TxTeller;
-import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.db.service.CdEmpService;
 
 @Service("L8R53")
 @Scope("prototype")
@@ -33,7 +34,6 @@ import com.st1.itx.db.service.TxTellerService;
  * @version 1.0.0
  */
 public class L8R53 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8R53.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -46,7 +46,10 @@ public class L8R53 extends TradeBuffer {
 	CdBranchService cdBranchService;
 
 	@Autowired
-	TxTellerService txTellerService;
+	CdBranchGroupService cdBranchGroupService;
+	
+	@Autowired
+	CdEmpService cdEmpService;
 
 	@Autowired
 	Parse parse;
@@ -66,7 +69,7 @@ public class L8R53 extends TradeBuffer {
 			throw new LogicException("E0001", dataDt + "/" + custKey);
 		}
 
-		this.totaVo.putParam("DataDt", txAmlCredit.getDataDt() - 19110000);
+		this.totaVo.putParam("DataDt", txAmlCredit.getDataDt());
 		this.totaVo.putParam("CustKey", txAmlCredit.getCustKey());
 		this.totaVo.putParam("RRSeq", txAmlCredit.getRRSeq());
 		this.totaVo.putParam("ReviewType", txAmlCredit.getReviewType());
@@ -83,55 +86,40 @@ public class L8R53 extends TradeBuffer {
 		this.totaVo.putParam("ProcessCount", txAmlCredit.getProcessCount());
 
 		this.totaVo.putParam("LastProcessDate", txAmlCredit.getProcessDate());
-		
+
 		this.totaVo.putParam("LastProcessBrNo", txAmlCredit.getProcessBrNo());
-		String groupNoX = getGroupNoX(txAmlCredit, titaVo);
-		this.totaVo.putParam("LastGroupNoX", groupNoX);
 		
+		String brNoX = "";
+		CdBranch cdBranch = cdBranchService.findById(txAmlCredit.getProcessBrNo(), titaVo);
+		if (cdBranch != null) {
+			brNoX = cdBranch.getBranchShort();
+		}
+		this.totaVo.putParam("LastProcessBrNoX", brNoX);
+		
+		String groupNoX = "";
+		CdBranchGroupId cdBranchGroupId = new CdBranchGroupId();
+		cdBranchGroupId.setBranchNo(txAmlCredit.getProcessBrNo());
+		cdBranchGroupId.setGroupNo(txAmlCredit.getProcessGroupNo());
+		CdBranchGroup cdBranchGroup = cdBranchGroupService.findById(cdBranchGroupId, titaVo);
+		if (cdBranchGroup != null) {
+			groupNoX = cdBranchGroup.getGroupItem();
+		}
+		this.totaVo.putParam("LastGroupNoX", groupNoX);
+
 		this.totaVo.putParam("LastProcessTlrNo", txAmlCredit.getProcessTlrNo());
 
-		String tlrItem ="";
-		TxTeller txTeller = txTellerService.findById(txAmlCredit.getProcessTlrNo(), titaVo);
-		if (txTeller != null) {
-			tlrItem = txTeller.getTlrItem();
+		String tlrItem = "";
+		CdEmp cdEmp = cdEmpService.findById(txAmlCredit.getProcessTlrNo(), titaVo);
+		if (cdEmp != null) {
+			tlrItem = cdEmp.getFullname();
 		}
-		
+
 		this.totaVo.putParam("LastProcessTlrNoX", tlrItem);
-		
+
 		this.totaVo.putParam("LastProcessNote", txAmlCredit.getProcessNote());
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	private String getGroupNoX(TxAmlCredit txAmlCredit, TitaVo titaVo) {
-		String groupNoX = "";
-
-		CdBranch cdBranch = cdBranchService.findById(txAmlCredit.getProcessBrNo(), titaVo);
-
-		if (cdBranch != null) {
-			if ("1".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup1();
-			} else if ("2".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup2();
-			} else if ("3".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup3();
-			} else if ("4".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup4();
-			} else if ("5".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup5();
-			} else if ("6".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup6();
-			} else if ("7".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup7();
-			} else if ("8".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup8();
-			} else if ("9".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup9();
-			} else if ("A".equals(txAmlCredit.getProcessGroupNo())) {
-				groupNoX = cdBranch.getGroup10();
-			}
-		}
-		return groupNoX;
-	}
 }

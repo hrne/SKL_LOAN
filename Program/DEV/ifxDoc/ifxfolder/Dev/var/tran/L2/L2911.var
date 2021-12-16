@@ -534,7 +534,7 @@ E(0,@ClaimDate,#L2r20ClaimDate)
 E(0,@SettingSeq,#L2r20SettingSeq)
 
 #Ranktxt1=x,2,S
-T(3,前)
+T(3,第)
 #Ranktxt3=x,4,S
 T(3,順位)
 

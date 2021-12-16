@@ -856,8 +856,7 @@ public class L3200 extends TradeBuffer {
 		checkMsg = " 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo();
 		isCalcRepayInt = false;
 		isLoanClose = false; // 最後一期期款
-		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalDelayInt)
-				.add(wkTotalBreachAmt);
+		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan + ", 試算償還本利:" + iRepayLoan);
 
 		// 整批入帳電文有償還本利償則只計至還至應繳日時本利 > 0 (未全部償還時)>= 已償還本利

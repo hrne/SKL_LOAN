@@ -56,7 +56,11 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int today = parse.stringToInteger(titaVo.getCalDy()) + 19110000;
 		int iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
-		String iAdjCode = titaVo.getParam("AdjCode").substring(0, 1);
+		
+		String iAdjCode = "";
+		if(titaVo.getParam("AdjCode") !=null || !"".equals(titaVo.getParam("AdjCode"))) {
+		  iAdjCode = titaVo.getParam("AdjCode").substring(0, 1);
+		}
 		String iRateKeyInCode = "";
 		if (titaVo.getParam("AdjCode").length() == 2) {
 			iRateKeyInCode = titaVo.getParam("AdjCode").substring(1, 2);

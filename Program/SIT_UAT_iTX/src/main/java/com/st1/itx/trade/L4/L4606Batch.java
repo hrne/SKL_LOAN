@@ -109,8 +109,7 @@ public class L4606Batch extends TradeBuffer {
 	private String inFolder = "";
 
 	private int iInsuEndMonth = 0;
-	private int insuStartDate = 0;
-	private int insuEndDate = 0;
+
 //	寄送筆數
 	private int commitCnt = 500;
 	private String sendMsg = "";
@@ -121,8 +120,7 @@ public class L4606Batch extends TradeBuffer {
 		this.info("active L4606Batch ");
 		this.totaVo.init(titaVo);
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
-		insuStartDate = parse.stringToInteger(iInsuEndMonth + "01");
-		insuEndDate = parse.stringToInteger(iInsuEndMonth + "31");
+
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();

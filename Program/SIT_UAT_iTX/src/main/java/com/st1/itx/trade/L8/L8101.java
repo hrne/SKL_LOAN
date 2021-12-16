@@ -18,7 +18,9 @@ import com.st1.itx.db.service.TxAmlCreditService;
 
 import com.st1.itx.db.domain.TxAmlNotice;
 import com.st1.itx.db.domain.TxAmlNoticeId;
+import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.TxAmlNoticeService;
+import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.trade.L9.L9703Report2;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
@@ -43,6 +45,9 @@ import com.st1.itx.util.common.CustNoticeCom;
 public class L8101 extends TradeBuffer {
 
 	/* DB服務注入 */
+	@Autowired
+	TxFileService txFileService;
+	
 	@Autowired
 	CustMainService custMainService;
 
@@ -87,9 +92,9 @@ public class L8101 extends TradeBuffer {
 
 		String processType = txAmlCredit.getProcessType();
 
-		if ("2".equals(processType) && "B".equals(titaVo.get("LogFlag").trim())) {
-			throw new LogicException("E0000", "不可整批處理");
-		}
+//		if ("2".equals(processType) && "B".equals(titaVo.get("LogFlag").trim())) {
+//			throw new LogicException("E0000", "不可整批處理");
+//		}
 
 		String custName = "";
 		String custAddr = "";
@@ -118,6 +123,23 @@ public class L8101 extends TradeBuffer {
 			} else {
 				custMobile = custTelNo.getTelNo();
 			}
+
+			// must
+			txToDoCom.setTxBuffer(this.getTxBuffer());
+			
+			String dataLines = "<" + custMobile + ">";
+			dataLines += "\"H1\",\"" + custMain.getCustId() + "\",\"" + custMobile + "\",\"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。\"";
+
+			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+			tTxToDoDetail.setCustNo(custMain.getCustNo());
+			tTxToDoDetail.setFacmNo(0);
+			tTxToDoDetail.setBormNo(0);
+			tTxToDoDetail.setDtlValue("<AML定審簡訊通知>");
+			tTxToDoDetail.setItemCode("TEXT00");
+			tTxToDoDetail.setStatus(0);
+			tTxToDoDetail.setProcessNote(dataLines);
+
+			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 
 		}
 
@@ -171,7 +193,7 @@ public class L8101 extends TradeBuffer {
 			txAmlNotice.setProcessNote(processNote);
 
 			try {
-				txAmlNoticeService.insert(txAmlNotice);
+				txAmlNoticeService.insert(txAmlNotice,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料已存在
 			}
@@ -190,8 +212,7 @@ public class L8101 extends TradeBuffer {
 
 		Long pdfSno = 0L;
 
-		if ("2".equals(txAmlCredit.getProcessType()) && custMain.getCustNo() > 0
-				&& "N".equals(titaVo.get("LogFlag").trim())) {
+		if ("2".equals(txAmlCredit.getProcessType()) && custMain.getCustNo() > 0 && "N".equals(titaVo.get("LogFlag").trim())) {
 //			#AcctDate     會計日期
 //			#CustNo       戶號-1
 //			#FacmNo       戶號-2
@@ -214,8 +235,12 @@ public class L8101 extends TradeBuffer {
 			titaVo.putParam("RepayType", "0");
 			titaVo.putParam("CustType", "0");
 
+			String batchno = titaVo.getParam("BatchNo");
+			
 			l9703report2.setParentTranCode(titaVo.get("TXCD"));
 			pdfSno = l9703report2.exec(titaVo, this.txBuffer);
+			
+			
 		}
 
 		this.totaVo.putParam("CustAddr", custAddr);

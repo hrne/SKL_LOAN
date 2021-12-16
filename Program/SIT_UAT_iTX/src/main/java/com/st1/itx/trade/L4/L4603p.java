@@ -158,7 +158,7 @@ public class L4603p extends TradeBuffer {
 							l4603report.exec(titaVo, t, this.getTxBuffer());
 							
 							String noticeEmail = tempVo.getParam("EmailAddress");		
-							
+							this.info("noticeEmail = " + noticeEmail);
 //							mailService.setParams(tempVo.getParam("EmailAddress"), subject, bodyText);
 							String bodyText = "親愛的客戶，繳款通知"+"\n"+"新光人壽關心您。";
 							
@@ -250,6 +250,8 @@ public class L4603p extends TradeBuffer {
 
 		this.info("Text... dataList = " + dataList);
 
+		txToDoCom.setTxBuffer(this.getTxBuffer());
+		
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());
 		tTxToDoDetail.setFacmNo(tInsuRenew.getFacmNo());
@@ -277,6 +279,8 @@ public class L4603p extends TradeBuffer {
 		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\""
 				+ sEntryDate + "\"";
 		dataList.add(dataLines);
+		
+		txToDoCom.setTxBuffer(this.getTxBuffer());
 		
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());

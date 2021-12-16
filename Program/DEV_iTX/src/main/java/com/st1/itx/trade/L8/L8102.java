@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -54,6 +56,7 @@ import com.st1.itx.util.common.CustNoticeCom;
  * @version 1.0.0
  */
 public class L8102 extends TradeBuffer {
+	private static final Logger logger = LoggerFactory.getLogger(L8102.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -206,7 +209,7 @@ public class L8102 extends TradeBuffer {
 //					dataLines = "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp)
 //					+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 				}
-
+				
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(0);
 				tTxToDoDetail.setFacmNo(0);
@@ -314,7 +317,7 @@ public class L8102 extends TradeBuffer {
 		makeExcel1.setValue(excelRow, 3, String.valueOf(custMain.getCustNo()));
 		makeExcel1.setValue(excelRow, 4, txAmlCredit.getCustKey());
 		makeExcel1.setValue(excelRow, 5, custMain.getCustName());
-		makeExcel1.setValue(excelRow, 6, custNoticeCom.getCurrAddress(custMain, titaVo));
+		makeExcel1.setValue(excelRow, 6, custNoticeCom.getCurrAddress(custMain,titaVo));
 		makeExcel1.setValue(excelRow, 7, custMain.getCurrZip2() + custMain.getCurrZip3());
 		makeExcel1.setValue(excelRow, 8, "高");
 		makeExcel1.setValue(excelRow, 9, txAmlCredit.getUnit() + "-" + unitItem);
@@ -335,7 +338,7 @@ public class L8102 extends TradeBuffer {
 		makeExcel2.setValue(excelRow, 5, "高");
 		makeExcel2.setValue(excelRow, 6, txAmlCredit.getUnit() + "-" + unitItem);
 		makeExcel2.setValue(excelRow, 7, txAmlCredit.getWlfConfirmStatus() + ":" + ConfirmStatus);
-
+		
 		String isStatus = "";
 		cdCodeId = new CdCodeId("AmlIsStatus", String.format("%02d", txAmlCredit.getIsStatus()));
 		cdCode = cdCodeService.findById(cdCodeId, titaVo);
@@ -358,10 +361,10 @@ public class L8102 extends TradeBuffer {
 
 		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 			try {
-				this.info("DeleteAll...");
+				logger.info("DeleteAll...");
 				txToDoCom.addByDetailList(false, 1, lTxToDoDetail, titaVo);
 			} catch (LogicException e) {
-				this.info("DeleteAll Error : " + e.getErrorMsg());
+				logger.info("DeleteAll Error : " + e.getErrorMsg());
 			}
 		}
 	}

@@ -1,0 +1,266 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+!<include src="COM.icf::BFHEAD.dec"/>
+
+#ReviewTypeH=x,100,S
+T(3,H:高風險;M:中風險;L:低風險)
+#IsStatusH=x,500,S
+!T(3,1:定審名單產出;11:案件轉派中;12:案件轉派退回;13:案件轉派覆核完成;2:電訪未完成;21:定審問卷暫存;22:定審問卷經辦完成;23:定審問卷主管覆核完成;24:定審問卷督導主管覆核完成[需進行四、五關覆核];25:定審問卷法遵經辦完成;3:電訪完成;31:定審問卷主管退回;32:定審問卷督導主管退回;33:定審問卷法遵經辦退回;4:定審問卷法遵主管退回;4:無須電訪;5:中低風險需定審;6:非一般壽險需定審;98:不須定審;99:完成定審)
+#ConfirmStatusH=x,500,S
+
+#ProcessTypeH=x,100,S
+T(3,1:郵寄-定期審查客戶基本資料更新表（房貸自然人）;2:郵寄-放款本息攤還表暨息通知單;3:簡訊通知)
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[40,60];">
+[
+["[L8101]                                 AML定審通知處理"],
+["#Fd+定審日期",#DataDt],
+["#Fd+身分證字號／統一編號",#CustKey],
+["#Fd+AML流水號",#RRSeq],
+["#Fd+評    級",#ReviewType,#ReviewTypeX],
+["#Fd+單位代號",#Unit,#UnitItem],
+["#Fd+定審狀態",#IsStatus,#IsStatusX],
+["#Fd+名單類型",#ConfirmStatus,#ConfirmStatusX],
+["#Fd+通知類別",#ProcessType,#ProcessTypeX],
+["#Fd+通知次數",#ProcessCount],
+]
+!---------- AP Button AREA ----------
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#B=X,1,S
+K(MODIFYBUTTON,通知)
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#Fd=X,2,L
+
+#NTXBUF=x,36,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@DataDt,#NTXBUF,1,7)
+T(1,@CustKey,#NTXBUF,8,10)
+
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+#AmlIsStautsT=x,30,S
+T(3,CdCode.AmlIsStatus)
+
+#AmlConfirmStautsT=x,30,S
+T(3,CdCode.AmlConfirmStatus)
+
+#HR=X,1,S
+S(XXR99,01,#AmlIsStautsT,#AmlConfirmStautsT)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@IsStatusH,#HelpDesc1)
+T(2,@ConfirmStatusH,#HelpDesc2)
+
+#DataDt=D,7,L
+#CustKey=X,10,L
+
+S(L8R53,01,#DataDt,#CustKey,#END)
+R(1,L8R53)
+
+#RRSeq=A,10,L
+#ReviewType=X,1,L
+#ReviewTypeX=X,6,L
+T(H,#ReviewType,#ReviewTypeH)
+#Unit=X,6,L
+#UnitItem=X,20,L
+#IsStatus=A,2,L
+#IsStatusX=X,40,L
+T(H,#IsStatus,#IsStatusH)
+
+#ConfirmStatus=A,1,L
+#ConfirmStatusX=X,40,L
+T(H,#ConfirmStatus,#ConfirmStatusH)
+
+#ProcessType=X,1,L
+#ProcessTypeX=X,50,L
+T(H,#ProcessType,#ProcessTypeH)
+#ProcessCount=A,2,L
+</sub>
+
+<sub type="DC" name="p2" layout="cols=1;screen.width=[200,800];printer.width=[40,60];order=1;">
+[
+["最後通知處理資訊"],
+["#Fd+最後通知日期",#LastProcessDate],
+["#Fd+最後通知單位",#LastProcessBrNo,#LastProcessBrNoX,#LastGroupNoX],
+["#Fd+最後通知經辦",#LastProcessTlrNo,#LastProcessTlrNoX],
+["#Fd+最後通知備註",#LastProcessNote],
+]
+
+!------------------
+
+#LastProcessDate=D,7,L
+#LastProcessBrNo=X,4,L
+#LastProcessBrNoX=X,30,L
+#LastGroupNoX=x,20,L
+#LastProcessTlrNo=X,6,L
+#LastProcessTlrNoX=x,20,L
+#LastProcessNote=x,100,L
+</sub>
+
+<sub type="DC" name="p3" layout="cols=1;screen.width=[200,800];printer.width=[40,60];order=1;">
+[
+["本次通知處理資訊"],
+["#Fd2+通知日期",#ProcessDate],
+["#Fd+通知經辦",#ProcessTlrNoX],
+["#Fd+通知備註",#ProcessNote],
+]
+
+!------------------
+
+#Fd2=X,2,L
+T(3,* )
+
+#ProcessTlrNo=X,6,L
+T(2,#TLRNO)
+
+#ProcessTlrNoX=X,20,L
+T(2,#EMPNM)
+
+#ProcessDate=D,7,I
+E(0,#SYSCDATE)
+@
+V(7)
+A(DATE,0,#ProcessDate)
+V(5,1100101,#SYSCDATE)
+
+#ProcessNote=x,100,I
+
+
+#PRT=A,1,S
+C(3,#ProcessType,1,E(0,1),E(0,0))
+
+#LogFlag=X,1,S
+!C(3,#ProcessType,2,T(3,N),T(3,Y))
+T(3,Y)
+
+![確定傳送]自動或手動
+#TXMT=A,1,S
+!C(3,#CHAIN,0,$,C(2,#FunCode,$,$,XMT(),$,$,XMT()))
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L8101 ----------
+<sub type="FORM" name="L8101">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L8101,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8101] AML定審高風險處理)
+
+#CustAddr=X,100,S
+#spaces=X,2,S
+T(3,　)
+
+#CustName=X,100,S
+!印錄PDF序號
+#PdfSno=A,8,S
+
+#PdfPrt=A,1,S
+C(3,#PdfSno,0,E(0,0),E(0,1))
+
+#TT=X,1,S
+T(3,@LogFlag,Y)
+
+#PrintRim=x,1000,S
+T(6B,L8101+0+#DataDt+#CustKey+#RRSeq+#ReviewType+#Unit+#IsStatus+#ProcessType+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag)
+
+#LC014Mrkey=x,100,S
+T(2,#DataDt+-+#CustKey)
+
+#LC014Note=x,100,S
+T(2,日期:+#DataDt+/ID:+#CustKey+ AML定審通知附件)
+
+#BufLC014=X,200,S
+T(2,L81010000000000000+#LC014Mrkey+#LC014Note)
+
+#Button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,上傳附件)
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#DataDt
+#CustKey
+#RRSeq
+#ReviewType
+#Unit
+#IsStatus
+#ProcessType
+#ProcessDate
+#ProcessTlrNo
+#ProcessNote
+#LogFlag
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L8101
+#PdfSno
+#CustAddr
+#CustName
+^
+
+TXFORM=L8R53
+#DataDt
+#CustKey
+#RRSeq
+#ReviewType
+#Unit
+#UnitItem
+#IsStatus
+#ConfirmStatus
+#ProcessType
+#ProcessCount
+#LastProcessDate
+#LastProcessBrNo
+#LastProcessBrNoX
+#LastGroupNoX
+#LastProcessTlrNo
+#LastProcessTlrNoX
+#LastProcessNote
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+
+!#PdfPrt=1,PDF,,,,,,,,,,,,,PdfSno, 放款本息攤還表暨息通知單,PrintRim
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#PRT=1,L8101,NE
+#CustAddr
+#spaces
+#spaces
+#CustName
+^
+#PdfPrt=1,PDF,,,,,,,,,,,,,PdfSno, 放款本息攤還表暨息通知單
+^
+</sub>

@@ -230,11 +230,11 @@ public class L4603 extends TradeBuffer {
 		
 
 		this.addList(this.totaVo);
-		this.info("this.totaVo.size = " + this.totaVo.size());
+		this.info("this.totaVo.size = " + this.totaVo.getOccursList().size());
 		this.info("errorCCnt  = ");
 		totaC.putParam("ErrorCCnt", errorCCnt);
 		this.addList(totaC);
-		this.info("this.totaC.size = " + this.totaC.size());
+		this.info("this.totaC.size = " + this.totaC.getOccursList().size());
 		return this.sendList();
 	}
 

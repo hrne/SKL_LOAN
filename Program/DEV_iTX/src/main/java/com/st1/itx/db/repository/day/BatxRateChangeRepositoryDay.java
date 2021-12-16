@@ -35,7 +35,7 @@ public interface BatxRateChangeRepositoryDay extends JpaRepository<BatxRateChang
   public Slice<BatxRateChange> findAllByAdjDateIsAndTxKindIsAndRateKeyInCodeIsOrderByCustNoAscFacmNoAscBormNoAsc(int adjDate_0, int txKind_1, int rateKeyInCode_2, Pageable pageable);
 
   // AdjDate >= ,AND AdjDate <= ,AND CustCode >= ,AND CustCode <= ,AND TxKind = ,AND ConfirmFlag = 
-  public Slice<BatxRateChange> findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(int adjDate_0, int adjDate_1, int custCode_2, int custCode_3, int txKind_4, int confirmFlag_5, Pageable pageable);
+  public Slice<BatxRateChange> findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIsOrderByCustNoAscFacmNoAscBormNoAsc(int adjDate_0, int adjDate_1, int custCode_2, int custCode_3, int txKind_4, int confirmFlag_5, Pageable pageable);
 
   // AdjDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
   public Slice<BatxRateChange> findAllByAdjDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int adjDate_0, String titaTlrNo_1, String titaTxtNo_2, Pageable pageable);

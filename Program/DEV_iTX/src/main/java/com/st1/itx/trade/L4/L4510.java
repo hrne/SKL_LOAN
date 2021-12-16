@@ -310,10 +310,11 @@ public class L4510 extends TradeBuffer {
 
 	private int getList(Slice<EmpDeductSchedule> slEmpDeductSchedule,String AgType1) throws LogicException {
 		int entryday = 0;
+		 this.info("slEmpDeductSchedule = "+ slEmpDeductSchedule);
 		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 			
-		  this.info("tEmpDeductSchedule = "+ tEmpDeductSchedule);
 		  if(AgType1.equals(""+tEmpDeductSchedule.getAgType1())) {
+			  this.info("tEmpDeductSchedule = "+ tEmpDeductSchedule);
 			  return tEmpDeductSchedule.getEntryDate();
 		  }
 		  
@@ -369,6 +370,7 @@ public class L4510 extends TradeBuffer {
 			}
 			this.info("iN15EntryDate = " + iN15EntryDate);
 			this.info("iY15EntryDate = " + iY15EntryDate);
+			this.info("listBaTxVo =" + listBaTxVo);
 			setBatxValue(listBaTxVo, result.get("F3") );
 		} // for
 
@@ -610,11 +612,11 @@ public class L4510 extends TradeBuffer {
 
 //			1.15日薪 2.非15日薪
 			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
-				this.info("entrydate ... " + iY15EntryDate);
-				tEmpDeductDtlId.setEntryDate(iY15EntryDate);
+				this.info("entrydate ... iN15EntryDate = " + iN15EntryDate);
+				tEmpDeductDtlId.setEntryDate(iN15EntryDate + 19110000);
 			} else {
-				this.info("entrydate ... " + iY15EntryDate);
-				tEmpDeductDtlId.setEntryDate(iN15EntryDate);
+				this.info("entrydate ... iY15EntryDate = " + iY15EntryDate);
+				tEmpDeductDtlId.setEntryDate(iY15EntryDate + 19110000);
 			}
 			tEmpDeductDtlId.setCustNo(tmp.getCustNo());
 			tEmpDeductDtlId.setAchRepayCode(tmp.getAchRepayCode());

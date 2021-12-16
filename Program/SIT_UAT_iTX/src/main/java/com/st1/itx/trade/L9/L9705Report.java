@@ -344,8 +344,10 @@ public class L9705Report extends MakeReport {
 						String EntryDate = tL9Vo.get("EntryDate"); // 入帳日期
 						BigDecimal RepayAmt = parse.stringToBigDecimal(tL9Vo.get("RepayAmt"));
 						
-						this.print(1, 8,"◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$　　　　　　　　　業已入帳無誤。");
-						this.print(0, 48,df1.format(RepayAmt),"");		
+						if(RepayAmt.compareTo(new BigDecimal("0")) > 0) {
+							this.print(1, 8,"◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$　　　　　　　　　業已入帳無誤。");
+							this.print(0, 48,df1.format(RepayAmt),"");									
+						}
 					} 
 				} else {
 					if (cnt == 0) {

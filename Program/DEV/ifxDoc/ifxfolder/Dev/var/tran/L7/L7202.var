@@ -176,7 +176,7 @@ C(3,#FuncCode,4,s)
 @V(7)
 
 ! 違約損失率％
-#LGDPercent1=N,2.5,I
+#LGDPercent1=n,2.5,I
 C(3,#FuncCode,4,s)
 @V(2,0)
 

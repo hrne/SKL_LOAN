@@ -20,7 +20,7 @@ E(0,0)
 [#<->#,"#FdFunctionCodeX+報表種類",#FunctionCode,#FunctionCodeX], 
 [#<->#,"#FdAcDate+會計日期",#AcDate],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate],
-[#<->#,"#FdReconCode+存摺代號",#ReconCode,"(A1～A7，空白:全部)"],
+[#<->#,"#FdReconCode+存摺代號",#ReconCode,#ReconCodeX],
 ]
 
 #FdFunctionCodeX=X,2,L
@@ -30,7 +30,6 @@ T(3,*)
 #FdEntryDate=X,2,L
 T(3,*)
 #FdReconCode=X,2,L
-T(3,*)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -66,14 +65,16 @@ C(3,#FunctionCode,2,$,S)
 E(0,@EntryDate,#SYSDATE)
 @V(7)A(DATE,0,#EntryDate)
 
-#ReconCodeHelp=X,50,S
-T(3,A1: ;A2: ;A3: ;A4: ;A5: ;A6: ;A7: )
+#ReconCodeHelp=X,100,S
+T(3,A1:企金;A2:期款;A3:還本;A6:債協;A7:前置協商收款專戶)
 
 #ReconCode=X,3,I
 HELP(#ReconCodeHelp)
 @
 C(4,#ReconCode,$,V(H,#ReconCodeHelp))
 
+#ReconCodeX=X,20,L
+T(H,#ReconCode,#ReconCodeHelp)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

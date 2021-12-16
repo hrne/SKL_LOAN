@@ -50,6 +50,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int FacmNo = Integer.parseInt(titaVo.getParam("FACM_NO").toString());
 		int BormNo = Integer.parseInt(titaVo.getParam("BORM_SEQ").toString());
 		String iTxtNo = titaVo.getParam("TxtNo").trim();
+		String iMrKey = titaVo.getParam("MrKey").trim();
 
 		String sql = "SELECT A.\"TranNo\",";
 		sql += "B.\"TranItem\",";
@@ -88,6 +89,10 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND (A.\"TranNo\" = :TranNo1 OR A.\"TranNo\" = :TranNo2) ";
 		} else if (!"".equals(TranNo)) {
 			sql += "AND A.\"TranNo\" = :TranNo ";
+		}
+		
+		if (!"".equals(iMrKey)) {
+			sql += "AND A.\"MrKey\" = :Mrkey ";
 		}
 		
 		sql += "ORDER BY A.\"LastUpdate\" DESC ";
@@ -136,6 +141,10 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("TranNo2", TranNo2);
 		} else if (!"".equals(TranNo)) {
 			query.setParameter("TranNo", TranNo);
+		}
+		
+		if (!"".equals(iMrKey)) {
+			query.setParameter("Mrkey", iMrKey);
 		}
 
 		this.info("L6932Service FindData=" + query);

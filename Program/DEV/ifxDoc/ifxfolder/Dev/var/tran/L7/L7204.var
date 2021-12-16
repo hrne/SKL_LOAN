@@ -300,7 +300,7 @@ IF(#EndDate < #StartDate,V(P,終止日期不可小於起始日期),s)
 ! 客觀減損條件
 #LosCod=A,2,I
 C(3,#FuncCode,4,s)
-@V(7)V(5,1,9)
+@V(7)V(5,1,99)
 
 !##loop{times:9,i:2,j:1}
 
@@ -416,6 +416,10 @@ C(3,#FuncCode,4,s)
 
 #RPTFG=A,1,S
 E(0,0)
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#CustNo+#FacmNo+#MarkDate)
 
 </sub>
 

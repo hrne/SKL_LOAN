@@ -99,7 +99,7 @@ public class LC011 extends TradeBuffer {
 			occursList.putParam("MrKey", d.get("MrKey"));
 			occursList.putParam("CurName", d.get("CurName"));
 			occursList.putParam("TxAmt", new BigDecimal(d.get("TxAmt").toString().trim()));
-			occursList.putParam("BrNo", iBrNo + " " + cdBranch.getBranchItem());
+			occursList.putParam("BrNo", iBrNo + " " + cdBranch.getBranchShort());
 			occursList.putParam("FlowMode", d.get("FlowMode"));
 			
 			String iTlrItem = "";

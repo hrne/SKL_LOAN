@@ -129,6 +129,10 @@ T(H,#IfrsProdCode,#IfrsProdCode2Help)
 #RPTFG=A,1,S
 E(0,0)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#ProdNo)
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

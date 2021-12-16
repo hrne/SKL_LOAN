@@ -78,7 +78,7 @@ public class BatxRateChange implements Serializable {
   private int adjCode = 0;
 
   // 利率輸入記號
-  /* 0.未調整1.已調整2.待輸入3.已輸入9.待處理(檢核有誤) */
+  /* 0.未調整1.已調整2.待輸入9.待處理(檢核有誤) */
   @Column(name = "`RateKeyInCode`")
   private int rateKeyInCode = 0;
 
@@ -177,8 +177,8 @@ public class BatxRateChange implements Serializable {
   @Column(name = "`CurrBaseRate`")
   private BigDecimal currBaseRate = new BigDecimal("0");
 
-  // 調整時鍵入利率生效日
-  /* 未用,同本次生效日 */
+  // 放款利率變動檔生效日
+  /* 利率未變動為零 */
   @Column(name = "`TxEffectDate`")
   private int txEffectDate = 0;
 
@@ -438,7 +438,6 @@ public class BatxRateChange implements Serializable {
 	* 0.未調整
 1.已調整
 2.待輸入
-3.已輸入
 9.待處理(檢核有誤)
 	* @return Integer
 	*/
@@ -451,7 +450,6 @@ public class BatxRateChange implements Serializable {
 	* 0.未調整
 1.已調整
 2.待輸入
-3.已輸入
 9.待處理(檢核有誤)
   *
   * @param rateKeyInCode 利率輸入記號
@@ -886,8 +884,8 @@ RateType
   }
 
 /**
-	* 調整時鍵入利率生效日<br>
-	* 未用,同本次生效日
+	* 放款利率變動檔生效日<br>
+	* 利率未變動為零
 	* @return Integer
 	*/
   public int getTxEffectDate() {
@@ -895,10 +893,10 @@ RateType
   }
 
 /**
-	* 調整時鍵入利率生效日<br>
-	* 未用,同本次生效日
+	* 放款利率變動檔生效日<br>
+	* 利率未變動為零
   *
-  * @param txEffectDate 調整時鍵入利率生效日
+  * @param txEffectDate 放款利率變動檔生效日
   * @throws LogicException when Date Is Warn	*/
   public void setTxEffectDate(int txEffectDate) throws LogicException {
     this.txEffectDate = StaticTool.rocToBc(txEffectDate);
