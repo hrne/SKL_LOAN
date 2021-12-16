@@ -299,7 +299,7 @@ public class L4321Batch extends TradeBuffer {
 					if (this.iConfirmFlag == 0) {
 						tBatxRateChange.setTxEffectDate(0);
 					} else {
-						tBatxRateChange.setTxEffectDate(txEffectDate);						
+						tBatxRateChange.setTxEffectDate(txEffectDate);
 					}
 					tBatxRateChange.setConfirmFlag(this.iConfirmFlag);
 					try {
@@ -358,11 +358,13 @@ public class L4321Batch extends TradeBuffer {
 		int updateFg = 0;
 		rateIncr = BigDecimal.ZERO;
 		individualIncr = BigDecimal.ZERO;
-		if (tBatxRateChange.getIncrFlag().equals("Y")) {
-			rateIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
-		} else {
-			rateIncr = tBatxRateChange.getRateIncr();
-			individualIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
+		if (!"99".equals(tBatxRateChange.getBaseRateCode())) {
+			if (tBatxRateChange.getIncrFlag().equals("Y")) {
+				rateIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
+			} else {
+				rateIncr = tBatxRateChange.getRateIncr();
+				individualIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
+			}
 		}
 		LoanRateChange tLoanRateChange = new LoanRateChange();
 		LoanRateChangeId tLoanRateChangeId = new LoanRateChangeId();

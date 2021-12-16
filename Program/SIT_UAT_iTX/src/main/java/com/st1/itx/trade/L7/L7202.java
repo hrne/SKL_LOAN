@@ -82,7 +82,7 @@ public class L7202 extends TradeBuffer {
 				tIas39LGD.setType(titaVo.getParam("Type" + i));
 				tIas39LGD.setTypeDesc(titaVo.getParam("TypeDesc" + i));
 				tIas39LGD.setLGDPercent(this.parse.stringToBigDecimal(titaVo.getParam("LGDPercent" + i)));
-				tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
+				//tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
 
 				tIas39LGD.setCreateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tIas39LGD.setCreateEmpNo(titaVo.getTlrNo());
@@ -132,7 +132,7 @@ public class L7202 extends TradeBuffer {
 				tIas39LGD.setType(titaVo.getParam("Type" + i));
 				tIas39LGD.setTypeDesc(titaVo.getParam("TypeDesc" + i));
 				tIas39LGD.setLGDPercent(this.parse.stringToBigDecimal(titaVo.getParam("LGDPercent" + i)));
-				tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
+				//tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
 				tIas39LGD.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tIas39LGD.setLastUpdateEmpNo(titaVo.getTlrNo());
 				try {

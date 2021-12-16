@@ -109,6 +109,8 @@ public class L4606Batch extends TradeBuffer {
 	private String inFolder = "";
 
 	private int iInsuEndMonth = 0;
+	private int insuStartDate = 0;
+	private int insuEndDate = 0;
 //	寄送筆數
 	private int commitCnt = 500;
 	private String sendMsg = "";
@@ -119,6 +121,8 @@ public class L4606Batch extends TradeBuffer {
 		this.info("active L4606Batch ");
 		this.totaVo.init(titaVo);
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
+		insuStartDate = parse.stringToInteger(iInsuEndMonth + "01");
+		insuEndDate = parse.stringToInteger(iInsuEndMonth + "31");
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -154,7 +158,7 @@ public class L4606Batch extends TradeBuffer {
 		int zeroDueAmtCnt = 0;
 		int paidCnt = 0;
 		int unPaidCnt = 0;
-		deleinsuComm();
+		deleinsuComm(titaVo);
 
 //		PC上傳媒體檔轉入佣金媒體檔
 		if (!"".equals(flagA)) {
@@ -249,7 +253,7 @@ public class L4606Batch extends TradeBuffer {
 					tFacMainId.setCustNo(custNo);
 					tFacMainId.setFacmNo(facmNo);
 					tFacMain = facMainService.findById(tFacMainId, titaVo);
-					
+
 					if (tFacMain != null && tFacMain.getFireOfficer() != null) {
 						empNo = tFacMain.getFireOfficer();
 					} else {
@@ -258,12 +262,12 @@ public class L4606Batch extends TradeBuffer {
 							empNo = tCustMain.getIntroducer();
 						}
 					}
-					
-					tCdEmp = cdEmpService.findById(empNo);
+
+					tCdEmp = cdEmpService.findById(empNo, titaVo);
 					if (tCdEmp != null) {
 						empId = tCdEmp.getAgentId();
 						empName = tCdEmp.getFullname();
-						agStatusCode = tCdEmp.getAgStatusCode();   
+						agStatusCode = tCdEmp.getStatusCode();                     						
 					}
 
 					tInsuComm.setFireOfficer(empNo);
@@ -271,10 +275,6 @@ public class L4606Batch extends TradeBuffer {
 					tInsuComm.setEmpName(empName);
 					InsuRenew tInsuRenew = insuRenewService.findNowInsuNoFirst(custNo, facmNo,
 							tempOccursList.get("InsuNo"), titaVo);
-					
-					this.info("tInsuRenew =" + tInsuRenew);
-					this.info("agStatusCode2 =" + agStatusCode );
-					
 					if (tInsuRenew != null && "1".equals(agStatusCode)) {
 						mediaCode = "Y";
 					}
@@ -288,7 +288,7 @@ public class L4606Batch extends TradeBuffer {
 					}
 
 					try {
-						insuCommService.insert(tInsuComm);
+						insuCommService.insert(tInsuComm, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0005", "InsuComm insert Error : " + e.getErrorMsg());
 					}
@@ -330,7 +330,7 @@ public class L4606Batch extends TradeBuffer {
 
 			Slice<InsuComm> sInsuComm = null;
 
-			sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit);
+			sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit, titaVo);
 
 			lInsuComm = sInsuComm == null ? null : sInsuComm.getContent();
 
@@ -439,12 +439,12 @@ public class L4606Batch extends TradeBuffer {
 		}
 	}
 
-	private void deleinsuComm() throws LogicException {
+	private void deleinsuComm(TitaVo titaVo) throws LogicException {
 		List<InsuComm> deleinsuComm = new ArrayList<InsuComm>();
 
 		Slice<InsuComm> sInsuComm = null;
 
-		sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit);
+		sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit, titaVo);
 
 		deleinsuComm = sInsuComm == null ? null : sInsuComm.getContent();
 
@@ -457,9 +457,9 @@ public class L4606Batch extends TradeBuffer {
 					this.batchTransaction.commit();
 				}
 
-				tInsuComm = insuCommService.holdById(tInsuComm.getInsuCommId());
+				tInsuComm = insuCommService.holdById(tInsuComm.getInsuCommId(), titaVo);
 				try {
-					insuCommService.delete(tInsuComm);
+					insuCommService.delete(tInsuComm, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("XXXXX", "InsuComm delete Error : " + e.getErrorMsg());
 				}

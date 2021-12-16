@@ -138,17 +138,18 @@ X(#OOLGDPercent)
 T(B,#OOLGDPercentX+%)
 
 ! 啟用記號(TOTA)
-#OOEnable=X,1,S
-#OOEnableX=X,6,S
-SWITCH(#OOEnable,Y,T(3,啟用),
-                 N,T(3,未啟用))
+!#OOEnable=X,1,S
+!#OOEnableX=X,6,S
+!SWITCH(#OOEnable,Y,T(3,啟用),
+!                 N,T(3,未啟用))
 
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
 
 #OOBUF2=X,38,S
-T(2,#OOFunc2+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent+#OOEnable)
+T(2,#OOFunc2+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent)
+!T(2,#OOFunc2+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent+#OOEnable)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L7202;text=修改;ntxbuf=#OOBUF2})
@@ -180,7 +181,6 @@ TXFORM=L7022
 #OOType
 #OOTypeDesc
 #OOLGDPercent
-#OOEnable
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
@@ -188,8 +188,8 @@ TXFORM=L7022
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="L7022" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];">
 [
-["[L7022]                                 違約損失率檔查詢"],
-[""],
+["[L7022]                                 違約損失率檔查詢                           "],
+![""],
 ]
 </sub>
 
@@ -214,8 +214,8 @@ TXFORM=L7022
 #OOLGDPercentX1=違約損失率％
 {width:150,align:'center'}
 
-#OOEnableX=啟用記號
-{width:100,align:'center'}
+!#OOEnableX=啟用記號
+!{width:100,align:'center'}
 
 ^
 

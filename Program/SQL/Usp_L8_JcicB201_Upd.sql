@@ -402,6 +402,8 @@ BEGIN
                                                  Order By "CaseSeq" DESC)
                                               AS ROW_NO
                       FROM  "NegMain" N
+                     WHERE  N."CaseKindCode" = '1'    --案件種類-債協
+                       AND  N."Status"    = '0'       --戶況正常
                     ) N            ON N."CustNo"    = M."CustNo"
                                   AND N.ROW_NO      = 1
           LEFT JOIN "Work_B201_Guarantor" WK1  ON WK1."DataYM"   = M."DataYM"
@@ -500,7 +502,7 @@ BEGIN
     WHEN MATCHED THEN UPDATE
       SET M."RepayCode" = CASE
                             WHEN ( B."PrevPayIntDate" / 100 ) < YYYYMM AND ( B."PrevRepaidDate" / 100 ) < YYYYMM
-                             AND ( B."NextPayIntDate" / 100 ) > YYYYMM AND ( B."NextRepayDate"  / 100 ) > YYYYMM  THEN 'X'
+                             AND ( B."NextPayIntDate" / 100 ) > YYYYMM AND ( B."NextRepayDate"  / 100 ) > YYYYMM  THEN '0'
                             WHEN B."IntDelayMon" =   0 THEN '0'
                             WHEN B."IntDelayMon" =   1 THEN '1'
                             WHEN B."IntDelayMon" =   2 THEN '2'
@@ -572,14 +574,16 @@ BEGIN
       SET M."PayAmt"         =  ROUND(NVL(B."OvduAmt",0) / 1000, 3)      -- 本月（累計）應繳金額 (催收)
         , M."FirstDelayCode" =  CASE WHEN B."LegalProg2" IS NOT NULL THEN '3'
                                      WHEN B."LegalProg1" IS NOT NULL THEN 'X'
-                                     WHEN TRUNC( to_char(add_months( TO_DATE(B."MaturityDate",'yyyy-mm-dd'), 3), 'YYYYMMDD') / 100 ) <= YYYYMM THEN '1'  -- 到期日+3個月 <= 年月份
                                      WHEN TRUNC( NVL(B."OvduDate",0) / 100 ) <= YYYYMM THEN '3'  -- 催收日年月份 <= 年月份
+                                     WHEN TRUNC( to_char(add_months( TO_DATE(B."MaturityDate",'yyyy-mm-dd'), 3), 'YYYYMMDD') / 100 ) <= YYYYMM THEN '1'  -- 到期日+3個月 <= 年月份
+                                     --WHEN TRUNC( NVL(B."OvduDate",0) / 100 ) <= YYYYMM THEN '3'  -- 催收日年月份 <= 年月份
                                      ELSE 'X'
                                 END
         , M."SecondDelayCode" = CASE WHEN B."LegalProg2" IS NOT NULL THEN 'X'
                                      WHEN B."LegalProg1" IS NOT NULL THEN '5'
-                                     WHEN TRUNC( to_char(add_months( TO_DATE(B."MaturityDate",'yyyy-mm-dd'), 3), 'YYYYMMDD') / 100 ) <= YYYYMM THEN 'X'  -- 到期日+3個月 <= 年月份
                                      WHEN TRUNC( NVL(B."OvduDate",0) / 100 ) <= YYYYMM THEN 'X'  -- 催收日年月份 <= 年月份
+                                     WHEN TRUNC( to_char(add_months( TO_DATE(B."MaturityDate",'yyyy-mm-dd'), 3), 'YYYYMMDD') / 100 ) <= YYYYMM THEN 'X'  -- 到期日+3個月 <= 年月份
+                                     --WHEN TRUNC( NVL(B."OvduDate",0) / 100 ) <= YYYYMM THEN 'X'  -- 催收日年月份 <= 年月份
                                      ELSE 'X'
                                 END
       ;

@@ -136,7 +136,7 @@ T(3,1)ASGN(LOOP$)
 #OOFacmNo=A,3,S
 
 !中文姓名(TOTA)
-#OOCustName=c,100,S
+#OOCustName=c,2.50,S
 
 ! 發生日期(TOTA)
 #OOMarkDate=D,7,S

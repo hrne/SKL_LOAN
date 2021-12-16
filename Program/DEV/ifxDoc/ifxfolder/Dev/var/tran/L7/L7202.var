@@ -17,14 +17,16 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,570];printer.width=[20,20];">
 [
-["[L7202]                                 違約損失率登錄"],
+["[L7202]                    違約損失率登錄"],
 ["@功能",#FuncCodeX],
 ["#grid#,{id:1,expand:true,loop:100,row_height:1,s_cols:[], p_cols:[]}","","","","",
-["生效日期","類別","類別型態","違約損失率％","啟用記號"],
+["生效日期","類別","類別型態","違約損失率％"],
+!["生效日期","類別","類別型態","違約損失率％","啟用記號"],
 [
-  [#Date1],[#Type1],[#TypeDesc1],[#LGDPercent1],[#Enable1],[#EnableX1]
+  [#Date1],[#Type1],[#TypeDesc1],[#LGDPercent1]
+!  [#Date1],[#Type1],[#TypeDesc1],[#LGDPercent1],[#Enable1],[#EnableX1]
 ],
 ],
 ]
@@ -53,8 +55,8 @@ T(2,@FuncCode2Help,#HelpDesc1)
 #FuncCode2Help=x,300,S
 
 !啟用記號
-#EnableHelp=x,100,S
-T(3,Y:啟用;N:未啟用)
+!#EnableHelp=x,100,S
+!T(3,Y:啟用;N:未啟用)
 
 #INIT=X,1,S
 ##loop {times:100,i:4}
@@ -111,13 +113,13 @@ E(0,@Date1,#CHAIN_Date)
 T(2,@Type1,#CHAIN_Type)
 T(2,@TypeDesc1,#CHAIN_TypeDesc)
 E(0,@LGDPercent1,#CHAIN_LGDPercent)
-T(2,@Enable1,#CHAIN_Enable)
+!T(2,@Enable1,#CHAIN_Enable)
 
-#EnableTmp1=X,6,S
-T(H,#Enable1,#EnableHelp)
-!SWITCH(#Enable1,Y,T(3,啟用),
-!                N,T(3,未啟用), ,T(3, ))
-T(2,@EnableX1,#EnableTmp1)
+!#EnableTmp1=X,6,S
+!T(H,#Enable1,#EnableHelp)
+!!SWITCH(#Enable1,Y,T(3,啟用),
+!!                N,T(3,未啟用), ,T(3, ))
+!T(2,@EnableX1,#EnableTmp1)
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
 #FuncCode=A,1,S
@@ -142,8 +144,10 @@ E(0,#FuncCode)
 !FuncCode=1,2 顯示框線
 #WKTF=X,1,S
 ##loop {times:100,i:1}
-IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeDesc{i},1)T(F,#LGDPercent{i},1)T(F,#Enable{i},1),
-                                  T(F,#TypeDesc{i},0)T(F,#LGDPercent{i},0)T(F,#Enable{i},0))
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeDesc{i},1)T(F,#LGDPercent{i},1),
+                                  T(F,#TypeDesc{i},0)T(F,#LGDPercent{i},0))
+!IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeDesc{i},1)T(F,#LGDPercent{i},1)T(F,#Enable{i},1),
+!                                  T(F,#TypeDesc{i},0)T(F,#LGDPercent{i},0)T(F,#Enable{i},0))
 IF (#FuncCode==1 ,T(F,#Date{i},1)T(F,#Type{i},1),
                   T(F,#Date{i},0)T(F,#Type{i},0))
 ##end
@@ -177,13 +181,13 @@ C(3,#FuncCode,4,s)
 @V(2,0)
 
 ! 啟用記號
-#Enable1=X,1,I
-C(3,#FuncCode,4,s)
-HELP(#EnableHelp)
-@V(H,#EnableHelp)
+!#Enable1=X,1,I
+!C(3,#FuncCode,4,s)
+!HELP(#EnableHelp)
+!@V(H,#EnableHelp)
 
-#EnableX1=X,6,S
-T(H,#Enable1,#EnableHelp)
+!#EnableX1=X,6,S
+!T(H,#Enable1,#EnableHelp)
 
 ##loop{times:99,i:2,j:1,k:5,l:4}
 
@@ -218,22 +222,25 @@ C(3,#FuncCode,4,s)
 @V(2,0)
 
 ! 啟用記號
-#Enable{i}=X,1,I
-C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
-C(4,#Date{i},S,$)
-C(3,#FuncCode,4,s)
-HELP(#EnableHelp)
-@V(H,#EnableHelp)
+!#Enable{i}=X,1,I
+!C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+!C(4,#Date{i},S,$)
+!C(3,#FuncCode,4,s)
+!HELP(#EnableHelp)
+!@V(H,#EnableHelp)
 
-#EnableX{i}=X,12,O
-C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
-C(4,#Date{i},S,$)
-T(H,#Enable{i},#EnableHelp)
+!#EnableX{i}=X,12,O
+!C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+!C(4,#Date{i},S,$)
+!T(H,#Enable{i},#EnableHelp)
 
 ##end
 
 #RPTFG=A,1,S
 E(0,0)
+!參考編號
+#MRKEY=_,_,S
+T(2,#Date1+#Type1)
 
 </sub>
 
@@ -262,7 +269,6 @@ T(3,[L7202] 違約損失率登錄)
 #Type{i}
 #TypeDesc{i}
 #LGDPercent{i}
-#Enable{i}
 ##end
 #END
 </sub>

@@ -159,7 +159,7 @@ BEGIN
                      (M."Status" IN (6) AND A."CustNo" IS NULL)
                    )
                AND (  T3."TitaHCode" = 0      OR
-                     (T3."TitaHCode" = 3 AND T3."OrigAcDate" <> T3."AcDate")
+                     (T3."TitaHCode" = 3 AND T3."OrigAcDate" <> T3."AcDate" AND TRUNC(T3."OrigAcDate" / 100) = YYYYMM)
                    )
              ORDER BY T3."CustNo", T3."FacmNo", T3."BormNo", T3."BorxNo"
           ) T

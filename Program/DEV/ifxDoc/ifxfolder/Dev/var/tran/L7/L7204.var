@@ -211,7 +211,7 @@ RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
 T(2,@RimCustName,#L1r01CustName)
-T(1,@CustName,#RimCustName,1,50)
+T(2,@CustName,#RimCustName)
 
 ! 額度
 #FacmNo=A,3,I
@@ -219,7 +219,7 @@ C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 @V(7)V(2,0)
 
 ! 戶名
-#CustName=c,50,L
+#CustName=c,2.50,L
 !C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 
 #DATE=D,8,S

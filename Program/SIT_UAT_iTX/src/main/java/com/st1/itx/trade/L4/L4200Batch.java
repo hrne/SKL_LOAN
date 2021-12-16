@@ -566,11 +566,17 @@ public class L4200Batch extends TradeBuffer {
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 					switch (tempOccursList.get("OccVirAcctNo").substring(0, 5)) {
 					case "95101":
+						reconCode = "A1";
+						break;
 					case "95102":
+						repayType = 1;
+						reconCode = "A2";
+						break;
 					case "95103":
 						reconCode = "A" + tempOccursList.get("OccVirAcctNo").substring(4, 5);
 						break;
 					case "95105":
+						repayType = 11;
 						if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 							reconCode = "A7";
 						} else {

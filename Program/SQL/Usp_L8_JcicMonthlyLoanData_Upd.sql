@@ -1,10 +1,10 @@
+CREATE OR REPLACE PROCEDURE "Usp_L8_JcicMonthlyLoanData_Upd"
+(
 -- 程式功能：維護 JcicMonthlyLoanData 聯徵放款月報資料檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L8_JcicMonthlyLoanData_Upd"(20210531,'System');
 --
 
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicMonthlyLoanData_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
@@ -20,6 +20,7 @@ BEGIN
     LYYYYMM        INT;         -- 上月年月
     MM             INT;         -- 本月月份
     YYYY           INT;         -- 本月年度
+    TMNDYF         INT;         -- 本月月底日
   BEGIN
     INS_CNT := 0;
     UPD_CNT := 0;
@@ -38,6 +39,12 @@ BEGIN
        LYYYYMM := YYYYMM - 1;
     END IF;
 
+    -- 抓本月月底日
+    SELECT "TmnDyf"
+    INTO TMNDYF
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
+    ;
 
     -- 刪除舊資料
     DBMS_OUTPUT.PUT_LINE('DELETE JcicMonthlyLoanData');
@@ -86,14 +93,14 @@ BEGIN
              WHEN NVL(M."ProdNo",' ') IN ('88','89')         THEN '24'  -- 莫拉克受災戶
              WHEN NVL(M."ProdNo",' ') IN ('IA')              THEN '09'
              WHEN SUBSTR(NVL(M."ProdNo",' '),1,1) IN ('I')   THEN '10'
-             WHEN M."AcctCode" IN ('340')                    THEN '11'
+             WHEN M."FacAcctCode" IN ('340')                 THEN '11'
              ELSE 'XX'
            END                                    AS "ProjCode"          -- 政府專業補助貸款分類   (ref:AS400 LN15F1)
          , CASE
              WHEN TRIM(NVL(M."ProdNo",' ')) IN ('8')         THEN '1'
              WHEN NVL(M."ProdNo",' ') IN ('81','82','83')    THEN '1'
              WHEN SUBSTR(NVL(M."ProdNo",' '),1,1) IN ('I')   THEN '1'
-             WHEN M."AcctCode" IN ('340')                    THEN '1'
+             WHEN M."FacAcctCode" IN ('340')                 THEN '1'
              ELSE ' '
            END                                    AS "NonCreditCode"     -- 不計入授信項目   (ref:AS400 LN15F1)
          , "LoanBorMain"."UsageCode"              AS "UsageCode"         -- 用途別
@@ -118,20 +125,20 @@ BEGIN
          , CASE
 --           WHEN  NVL("LoanBorMain"."NextPayIntDate", 0) = 0
              WHEN  NVL("LoanBorMain"."NextPayIntDate", 0) <  19110000
-                OR NVL("LoanBorMain"."NextPayIntDate", 0) >= TBSDYF THEN 0
-             ELSE  TRUNC(months_between(TO_DATE(TBSDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextPayIntDate",'yyyy-mm-dd')))
+                OR NVL("LoanBorMain"."NextPayIntDate", 0) >= TMNDYF THEN 0
+             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextPayIntDate",'yyyy-mm-dd')))
            END                                    AS "IntDelayMon"       -- 利息逾期月數
          , CASE
 --           WHEN  NVL("LoanBorMain"."NextRepayDate", 0) = 0
              WHEN  NVL("LoanBorMain"."NextRepayDate", 0) <  19110000
-                OR NVL("LoanBorMain"."NextRepayDate", 0) >= TBSDYF THEN 0
-             ELSE  TRUNC(months_between(TO_DATE(TBSDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextRepayDate",'yyyy-mm-dd')))
+                OR NVL("LoanBorMain"."NextRepayDate", 0) >= TMNDYF THEN 0
+             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextRepayDate",'yyyy-mm-dd')))
            END                                     AS "RepayDelayMon"     -- 本金逾期月數
          , CASE
 --           WHEN  NVL("LoanBorMain"."MaturityDate", 0) =  0
              WHEN  NVL("LoanBorMain"."MaturityDate", 0) <  19110000
-                OR NVL("LoanBorMain"."MaturityDate", 0) >= TBSDYF THEN 0
-             ELSE  TRUNC(months_between(TO_DATE(TBSDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."MaturityDate",'yyyy-mm-dd')))
+                OR NVL("LoanBorMain"."MaturityDate", 0) >= TMNDYF THEN 0
+             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."MaturityDate",'yyyy-mm-dd')))
            END                                    AS "RepaidEndMon"      -- 本金逾到期日(清償期)月數
          , NVL(C."ClCode1", 0)                    AS "ClCode1"           -- 主要擔保品代號1
          , NVL(C."ClCode2", 0)                    AS "ClCode2"           -- 主要擔保品代號2
@@ -207,8 +214,8 @@ BEGIN
 --                GROUP BY "ClFac"."CustNo", "ClFac"."FacmNo"
 --              ) Cl          ON M."CustNo"    = Cl."CustNo"
 --                           AND M."FacmNo"    = Cl."FacmNo"
-      LEFT JOIN "LoanSynd"    ON "LoanSynd"."CustNo"      = "LoanBorMain"."CustNo"
-                             AND "LoanSynd"."SyndNo"      = "LoanBorMain"."SyndNo"
+      LEFT JOIN "FacCaseAppl" FCA ON FCA."ApplNo" = "FacMain"."ApplNo"
+      LEFT JOIN "LoanSynd"    ON "LoanSynd"."SyndNo"      = FCA."SyndNo"
       LEFT JOIN ( SELECT L2."CustNo"            AS  "CustNo"
                        , L2."FacmNo"            AS  "FacmNo"
                        , L2."BormNo"            AS  "BormNo"
@@ -381,11 +388,36 @@ BEGIN
               LEFT JOIN ( SELECT Tx."CustNo"
                                , Tx."FacmNo"
                                , Tx."BormNo"
-                               , SUM ( NVL(Tx."Principal", 0) )      AS "Principal"
-                               , SUM ( NVL(Tx."Interest", 0) )       AS "Interest"
-                               , SUM ( NVL(Tx."DelayInt", 0) )       AS "DelayInt"
-                               , SUM ( NVL(Tx."BreachAmt", 0) )      AS "BreachAmt"
-                               , SUM ( NVL(Tx."CloseBreachAmt", 0) ) AS "CloseBreachAmt"
+                               --, SUM ( NVL(Tx."Principal", 0) )      AS "Principal"
+                               , SUM ( CASE 
+                                         WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
+                                              NVL(Tx."Principal", 0)  * (-1)  
+                                         ELSE NVL(Tx."Principal", 0) 
+                                       END )                           AS "Principal"
+                               --, SUM ( NVL(Tx."Interest", 0) )       AS "Interest"
+                               , SUM ( CASE 
+                                         WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
+                                              NVL(Tx."Interest", 0)  * (-1)  
+                                         ELSE NVL(Tx."Interest", 0) 
+                                       END )                           AS "Interest"
+                               --, SUM ( NVL(Tx."DelayInt", 0) )       AS "DelayInt"
+                               , SUM ( CASE 
+                                         WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
+                                              NVL(Tx."DelayInt", 0)  * (-1)  
+                                         ELSE NVL(Tx."DelayInt", 0) 
+                                       END )                           AS "DelayInt"
+                               --, SUM ( NVL(Tx."BreachAmt", 0) )      AS "BreachAmt"
+                               , SUM ( CASE 
+                                         WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
+                                              NVL(Tx."BreachAmt", 0)  * (-1)  
+                                         ELSE NVL(Tx."BreachAmt", 0) 
+                                       END )                           AS "BreachAmt"
+                               --, SUM ( NVL(Tx."CloseBreachAmt", 0) ) AS "CloseBreachAmt"
+                               , SUM ( CASE 
+                                         WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
+                                              NVL(Tx."CloseBreachAmt", 0)  * (-1)  
+                                         ELSE NVL(Tx."CloseBreachAmt", 0) 
+                                       END )                           AS "CloseBreachAmt"
                           FROM   "LoanBorTx" Tx
                           WHERE  TRUNC(Tx."EntryDate" / 100)  = YYYYMM
                             AND  SUBSTR(NVL(Tx."TitaTxCd",' '), 1, 2) = 'L3'

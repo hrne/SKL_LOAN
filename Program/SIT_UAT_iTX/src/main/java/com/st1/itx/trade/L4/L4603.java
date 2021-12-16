@@ -155,6 +155,7 @@ public class L4603 extends TradeBuffer {
 
 		// 正常交易
 		if (titaVo.isHcodeNormal()) {
+			this.info("slInsuRenew ---------->" + slInsuRenew.getContent().size());
 			for (InsuRenew t : slInsuRenew.getContent()) {
 				if ("Y".equals(t.getNotiTempFg())) {
 					throw new LogicException("E0005", "已入通知，請先訂正此交易。");
@@ -229,11 +230,11 @@ public class L4603 extends TradeBuffer {
 		
 
 		this.addList(this.totaVo);
-
+		this.info("this.totaVo.size = " + this.totaVo.size());
 		this.info("errorCCnt  = ");
 		totaC.putParam("ErrorCCnt", errorCCnt);
 		this.addList(totaC);
-
+		this.info("this.totaC.size = " + this.totaC.size());
 		return this.sendList();
 	}
 

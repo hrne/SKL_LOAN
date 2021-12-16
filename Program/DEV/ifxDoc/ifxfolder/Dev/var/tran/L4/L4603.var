@@ -8,7 +8,7 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,8)ASGN(INQHD$)
+E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -58,6 +58,7 @@ T(2,@ReportC,V)
 
 ! 火險到期年月 15號前為當月，15號後為下個月
 #InsuEndMonth=A,5,I
+C(2,#FKEY,0,$,s)
 IF(#CheckDays<15,T(1,#SYSDATE,2,5),T(1,#NEXT_MONTH,2,5))
 @A(YM,1,#InsuEndMonth)
 
