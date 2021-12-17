@@ -2,6 +2,7 @@ package com.st1.itx.trade.LN;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -139,21 +140,33 @@ public class LNM39APReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 到期日(撥款)
 						case 12:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額
 						case 13:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 撥款金額
 						case 14:
+							formatter.applyPattern("00000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 帳管費
 						case 15:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 本金餘額(撥款)
 						case 16:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 應收利息
 						case 17:
+							formatter.applyPattern("00000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 法拍及火險費用
 						case 18:
@@ -171,6 +184,8 @@ public class LNM39APReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 轉銷呆帳日期
 						case 22:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 轉銷呆帳金額
 						case 23:
@@ -215,6 +230,8 @@ public class LNM39APReport extends MakeReport {
 							strField = makeFile.fillStringR(strField, 2, ' ');
 							break; // 產品別
 						case 36:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 原始鑑價金額
 						case 37:
@@ -224,6 +241,8 @@ public class LNM39APReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 3, '0');
 							break; // 總期數
 						case 39:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(台幣)
 						case 40:
@@ -233,6 +252,8 @@ public class LNM39APReport extends MakeReport {
 							strField = makeFile.fillStringR(strField, 1, ' ');
 							break; // 該筆額度是否為不可徹銷
 						case 42:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 暫收款金額(台幣)
 						case 43:
@@ -250,27 +271,43 @@ public class LNM39APReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 報導日匯率
 						case 47:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(交易幣)
 						case 48:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 撥款金額(交易幣)
 						case 49:
+							formatter.applyPattern("00000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 帳管費(交易幣)
 						case 50:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 本金餘額(撥款)(交易幣)
 						case 51:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 應收利息(交易幣)
 						case 52:
+							formatter.applyPattern("00000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 法拍及火險費用(交易幣)
 						case 53:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(交易幣)
 						case 54:
+							formatter.applyPattern("00000000000");
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 暫收款金額(交易幣)
 						default:

@@ -39,8 +39,10 @@ public class LM079ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           ELSE 7 END ";
 		sql += "                           AS ecity";
 		sql += "                          ,SUM(fac.\"LineAmt\") e0";
-		sql += "                          ,SUM( CASE WHEN NVL(cm.\"EvaAmt\", 0) > 0";
-		sql += "                                     THEN fac.\"LineAmt\" / (cm.\"EvaAmt\" * fac.\"LineAmt\")";
+		sql += "                          ,SUM( CASE ";
+		sql +="                                   WHEN NVL(cm.\"EvaAmt\", 0) > 0";
+		sql += "                                  THEN ROUND(fac.\"LineAmt\" / cm.\"EvaAmt\" * 100, 2) "; // 1. 先計算單筆的貸放成數
+		sql += "                                       * fac.\"LineAmt\" "; // 2. 加權
 		sql += "                                ELSE 0 END) e1";
 		sql += "                          ,SUM(fac.\"ApproveRate\" * fac.\"LineAmt\") e2";
 		sql += "                    FROM \"FacMain\" fac";

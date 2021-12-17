@@ -39,8 +39,10 @@ public class LM077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           ELSE 7 END ";
 		sql += "                           AS ecity";
 		sql += "                          ,SUM(fac.\"LineAmt\") e0";
-		sql += "                          ,SUM( CASE WHEN NVL(cm.\"EvaAmt\", 0) > 0";
-		sql += "                                     THEN fac.\"LineAmt\" / (cm.\"EvaAmt\" * fac.\"LineAmt\")";
+		sql += "                          ,SUM( CASE ";
+		sql +="                                   WHEN NVL(cm.\"EvaAmt\", 0) > 0";
+		sql += "                                  THEN ROUND(fac.\"LineAmt\" / cm.\"EvaAmt\" * 100, 2) "; // 1. 先計算單筆的貸放成數
+		sql += "                                       * fac.\"LineAmt\" "; // 2. 加權
 		sql += "                                ELSE 0 END) e1";
 		sql += "                          ,SUM(NVL(LBM.\"StoreRate\", fac.\"ApproveRate\") * fac.\"LineAmt\") e2";
 		sql += "                    FROM \"FacMain\" fac";
@@ -86,7 +88,7 @@ public class LM077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  )";
 		sql += "      SELECT s.ecity f0";
 		sql += "            ,s.e0 f1";
-		sql += "            ,s.e1 / s.e0 f2";
+		sql += "            ,ROUND(s.e1 / s.e0,2) f2"; // 3. 加權平均貸放成數
 		sql += "            ,s.e2 / s.e0 f3";
 		sql += "      FROM tmp s";
 

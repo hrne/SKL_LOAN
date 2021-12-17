@@ -73,7 +73,7 @@ BEGIN
     FROM   "FacMain" M
       LEFT JOIN "Work_Ifrs9FacData" WK ON WK."CustNo" = M."CustNo"
                                       AND WK."FacmNo" = M."FacmNo"
-    WHERE  M."LastBormNo" = 0
+    WHERE  M."LastBormRvNo" > 899
       AND  TRUNC(NVL(M."UtilDeadline",0) / 100 ) >= YYYYMM   -- 已核貸未曾動撥且仍可動撥之放款額度編號
       AND  WK."CustNo" IS NULL
     GROUP BY M."CustNo", M."FacmNo"
