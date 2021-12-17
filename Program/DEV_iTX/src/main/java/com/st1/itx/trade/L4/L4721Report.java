@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L4;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +14,7 @@ import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.service.BatxRateChangeService;
-import com.st1.itx.db.service.springjpa.cm.BankStatementServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
@@ -35,7 +33,7 @@ import com.st1.itx.util.format.FormatUtil;
 public class L4721Report extends MakeReport {
 
 	@Autowired
-	public BankStatementServiceImpl bankStatementServiceImpl;
+	public L4721ServiceImpl l4721ServiceImpl;
 
 	@Autowired
 	public BatxRateChangeService batxRateChangeService;
@@ -50,8 +48,7 @@ public class L4721Report extends MakeReport {
 	String headerRepayTypeDesc = "";
 	String headerLoanBal = "0";
 	String headerSumAmt = "0";
-	String headerTxAmt = "0";
-	Map<tmpFacm, Integer> reportedCode = new HashMap<tmpFacm, Integer>();
+	String headerDueAmt = "0";
 	int cnt = 0;
 
 	@Override
@@ -99,7 +96,7 @@ public class L4721Report extends MakeReport {
 
 		this.setFontSize(12);
 		print(-33, 3, "＊利率調整後次月份應繳金額為＄　　　　　　　　元，如因部分還本、利率調整或契約內容");
-		print(-33, 44, headerTxAmt, "R");
+		print(-33, 44, headerDueAmt, "R");
 		print(-34, 3, "　變更，致使應繳金額有所變動時再另行通知。");
 		print(-35, 3, "＊本公司各項放款利率公佈於全省各營業處所。");
 		print(-36, 3, "＊本單之貸款餘額計算至列印日期為止。");
@@ -153,257 +150,162 @@ public class L4721Report extends MakeReport {
 			custType2 = 2;
 		}
 
+		int custNo = 0;
+		int facmNo = 0;
+
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 2, this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 2,
+				this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
-		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
+		if (lBatxRateChange == null || lBatxRateChange.size() == 0) {
+			throw new LogicException("E0001", "查無資料");
+		}
 
-			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單", "密", "8.5,12", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單", "密", "8.5,12", "P");
 
-			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
-				List<Map<String, String>> listBankStatement = new ArrayList<Map<String, String>>();
-				int custNo = tBatxRateChange.getCustNo();
-				int facmNo = tBatxRateChange.getFacmNo();
+		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
+			List<Map<String, String>> listBankStatement = new ArrayList<Map<String, String>>();
+			// 放款利率變動檔生效日，利率未變動為零
+			if (tBatxRateChange.getTxEffectDate() == 0) {
+				continue;
+			}
+			if (custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
+				continue;
+			}
 
-				tmpFacm tmp = new tmpFacm(custNo, facmNo);
+			custNo = tBatxRateChange.getCustNo();
+			facmNo = tBatxRateChange.getFacmNo();
 
 //				每張表有該戶號額度對應之Header，所以必須有兩個迴圈
 //				第一層為應產出list，第二層為產出客戶之列印內容
-				try {
-					listBankStatement = bankStatementServiceImpl.doQuery(custNo, facmNo, adjDate, titaVo);
-				} catch (Exception e) {
-					this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
-					throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-				}
+			try {
+				listBankStatement = l4721ServiceImpl.doQuery(custNo, facmNo, titaVo);
+			} catch (Exception e) {
+				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
+				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+			}
 
-				if (listBankStatement == null || listBankStatement.isEmpty()) {
-					// 產空表?
-					this.info("custNo ..." + custNo);
-					this.info("facmNo ..." + facmNo);
-					this.info("listBankStatement == null ...");
-				} else {
-					if (!reportedCode.containsKey(tmp)) {
-						reportedCode.put(tmp, 1);
-					} else {
-						this.info("此戶號額度已產出通知單，continue...");
-						continue;
+			if (listBankStatement == null || listBankStatement.isEmpty()) {
+				// 產空表?
+				this.info("custNo ..." + custNo);
+				this.info("facmNo ..." + facmNo);
+				this.info("listBankStatement == null ...");
+				continue;
+			}
+
+			Map<String, String> headerBankStatement = listBankStatement.get(0);
+
+			// 先更新表頭資料
+			setHead(headerBankStatement, custNo, facmNo, tBatxRateChange.getTxEffectDate());
+
+			// 有資料產表
+			cnt = cnt + 1;
+
+			this.info("custNo ..." + custNo);
+			this.info("facmNo ..." + facmNo);
+			this.info("cnt ..." + cnt);
+
+			if (cnt >= 2) {
+				this.newPage();
+			}
+
+			try {
+				listBankStatement = l4721ServiceImpl.doDetail(custNo, facmNo, titaVo);
+			} catch (Exception e) {
+				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
+				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+			}
+
+			if (listBankStatement != null && !listBankStatement.isEmpty()) {
+
+				for (Map<String, String> rowBankStatement : listBankStatement) {
+					print(1, 1, "　");
+
+					// 入帳日期
+					print(0, 1, showRocDate(rowBankStatement.get("EntryDate"), 3));
+
+					// 計息期間
+					String dateRange = " ";
+					String startDate = rowBankStatement.get("IntStartDate");
+					String endDate = rowBankStatement.get("IntEndDate");
+
+					// 組成yyymmdd-yyymmdd
+					if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+						dateRange = showRocDate(startDate, 3) + "-" + showRocDate(endDate, 3);
 					}
 
-					Map<String, String> headerBankStatement = listBankStatement.get(0);
+					print(0, 10, dateRange);
 
-					// 先更新表頭資料
-					setHead(headerBankStatement, custNo, facmNo);
+					// 繳款方式
+					print(0, 26, rowBankStatement.get("RepayCodeX"));
 
-					// 有資料產表
-					cnt = cnt + 1;
+					// 繳款金額
+					print(0, 47, formatAmt(rowBankStatement.get("TxAmt"), 0), "R");
 
-					this.info("custNo ..." + custNo);
-					this.info("facmNo ..." + facmNo);
-					this.info("cnt ..." + cnt);
+					// 攤還本金
+					print(0, 60, formatAmt(rowBankStatement.get("Principal"), 0), "R");
 
-					if (cnt >= 2) {
-						this.newPage();
+					// 繳息金額
+					print(0, 73, formatAmt(rowBankStatement.get("Interest"), 0), "R");
+
+					// 違約金
+					String bt = "";
+					if (!"0".equals(formatAmt(rowBankStatement.get("BreachAmt"), 0))) {
+						bt = formatAmt(rowBankStatement.get("BreachAmt"), 0);
 					}
+					print(0, 82, bt, "R");
 
-					for (Map<String, String> rowBankStatement : listBankStatement) {
-						print(1, 1, "　");
-
-						// 入帳日期
-						print(0, 1, showRocDate(rowBankStatement.get("F0"), 3));
-
-						// 計息期間
-						String dateRange = " ";
-						String startDate = rowBankStatement.get("F1");
-						String endDate = rowBankStatement.get("F2");
-
-						// 組成yyymmdd-yyymmdd
-						if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
-							dateRange = showRocDate(startDate, 3) + "-" + showRocDate(endDate, 3);
-						}
-
-						print(0, 10, dateRange);
-
-						// 繳款方式
-						print(0, 26, rowBankStatement.get("F3"));
-
-						// 繳款金額
-						print(0, 47, formatAmt(rowBankStatement.get("F4"), 0), "R");
-
-						// 攤還本金
-						print(0, 60, formatAmt(rowBankStatement.get("F5"), 0), "R");
-
-						// 繳息金額
-						print(0, 73, formatAmt(rowBankStatement.get("F6"), 0), "R");
-
-						// 違約金
-						String bt = "";
-						if (!"0".equals(formatAmt(rowBankStatement.get("F7"), 0))) {
-							bt = formatAmt(rowBankStatement.get("F7"), 0);
-						}
-						print(0, 82, bt, "R");
-
-						// 火險費或其他費用
-						String fe = "";
-						if (!"0".equals(formatAmt(rowBankStatement.get("F8"), 0))) {
-							fe = formatAmt(rowBankStatement.get("F8"), 0);
-						}
-						print(0, 98, fe, "R");
+					// 火險費或其他費用
+					String fe = "";
+					if (!"0".equals(formatAmt(rowBankStatement.get("OtherFee"), 0))) {
+						fe = formatAmt(rowBankStatement.get("OtherFee"), 0);
 					}
-
-					this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
-
-					// 額度號碼
-					print(0, 6, FormatUtil.pad9("" + facmNo, 3));
-
-					// 利率變動日
-					String rateChangeDate = showRocDate(headerBankStatement.get("F16"), 0);
-					print(0, 16, rateChangeDate);
-
-					// 原利率
-					String originRate = formatAmt(headerBankStatement.get("F17"), 2) + "%";
-					print(0, 43, originRate, "R");
-
-					// 現在利率
-					String newRate = formatAmt(headerBankStatement.get("F18"), 2) + "%";
-					print(0, 55, newRate, "R");
-
-					this.print(1, 1, "＊其他額度利率，若有調整另行通知。");
-
-				} // if list.size > 0
-			} // for
-			long sno = this.close();
-			this.toPdf(sno);
-		} else {
-			throw new LogicException("E0001", "查無資料");
-		}
-	}
-
-	private Map<String, BigDecimal> doBatxCom(int custNo, int facmNo, int nextPayIntDate, TitaVo titaVo) throws LogicException {
-
-		Map<String, BigDecimal> mapResult = new HashMap<String, BigDecimal>();
-
-		// 初始化
-		mapResult.put("TempAmt", BigDecimal.ZERO);
-		mapResult.put("ShortAmt", BigDecimal.ZERO);
-		mapResult.put("TxAmt", BigDecimal.ZERO);
-
-		baTxCom.setTxBuffer(this.getTxBuffer());
-
-		this.info("nextPayIntDate ..." + nextPayIntDate);
-
-		if (nextPayIntDate > 19110000) {
-			nextPayIntDate = nextPayIntDate - 19110000;
-		}
-
-		this.info("nextPayIntDate ..." + nextPayIntDate);
-
-		List<BaTxVo> listBaTxVo = baTxCom.settingUnPaid(nextPayIntDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
-
-		if (listBaTxVo != null && listBaTxVo.size() != 0) {
-			for (BaTxVo tBaTxVo : listBaTxVo) {
-				// 暫收款累加
-				if (tBaTxVo.getDataKind() == 3) {
-					mapResult.put("TempAmt", mapResult.get("TempAmt").add(tBaTxVo.getUnPaidAmt()));
-				}
-				if (tBaTxVo.getDataKind() == 1) {
-					// 短收款累加
-					if (tBaTxVo.getReceivableFlag() == 5) {
-						mapResult.put("ShortAmt", mapResult.get("ShortAmt").add(tBaTxVo.getUnPaidAmt()));
-					}
-				}
-				// 應收期金
-				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getRepayType() == 1) {
-					mapResult.put("TxAmt", mapResult.get("TxAmt").add(tBaTxVo.getUnPaidAmt()));
+					print(0, 98, fe, "R");
 				}
 			}
+
+			this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
+
+			// 額度號碼
+			print(0, 6, FormatUtil.pad9("" + facmNo, 3));
+
+			// 利率變動日
+			String rateChangeDate = showRocDate(tBatxRateChange.getTxEffectDate(), 0);
+			print(0, 16, rateChangeDate);
+
+			// 原利率
+			String originRate = formatAmt(tBatxRateChange.getAdjustedRate(), 2) + "%";
+			print(0, 43, originRate, "R");
+
+			// 現在利率
+			String newRate = formatAmt(tBatxRateChange.getPresentRate(), 2) + "%";
+			print(0, 55, newRate, "R");
+
+			this.print(1, 1, "＊其他額度利率，若有調整另行通知。");
 		}
-		return mapResult;
+		long sno = this.close();
+		this.toPdf(sno);
 	}
 
-	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo) throws NumberFormatException, LogicException {
-		headerCustName = headerBankStatement.get("F10");
-		headerCustNo = headerBankStatement.get("F11");
+	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
+			throws NumberFormatException, LogicException {
+		headerCustName = headerBankStatement.get("CustName");
+		headerCustNo = headerBankStatement.get("CustNo");
 		headerPrintDate = showRocDate(titaVo.getEntDyI(), 1);
-		headerRepayDate = FormatUtil.pad9(headerBankStatement.get("F13"), 8).substring(6, 8) + "日";
-		headerRepayTypeDesc = headerBankStatement.get("F14");
-		if (headerBankStatement.get("F15") != null) {
-			headerLoanBal = headerBankStatement.get("F15");
-		}
+		headerRepayDate = headerBankStatement.get("SpecificDd") + "日";
+		headerRepayTypeDesc = headerBankStatement.get("RepayCodeX");
+		headerLoanBal = headerBankStatement.get("LoanBal");
 
 		int nextPayIntDate = 0;
 
-		if (headerBankStatement.get("F19") != null && !"".equals(headerBankStatement.get("F19"))) {
-			nextPayIntDate = Integer.parseInt(headerBankStatement.get("F19"));
-		}
+		nextPayIntDate = Integer.parseInt(headerBankStatement.get("NextPayIntDate"));
 
-		Map<String, BigDecimal> mapAmts = doBatxCom(custNo, facmNo, nextPayIntDate, titaVo);
+		List<BaTxVo> listBaTxVo =  baTxCom.getDueAmt(nextPayIntDate, custNo, facmNo, 0, titaVo);
 
-		headerTxAmt = mapAmts.get("TxAmt").toString();
-
-		headerSumAmt = mapAmts.get("TempAmt").subtract(mapAmts.get("ShortAmt")).toString();
 	}
 
-//	暫時紀錄戶號額度
-	private class tmpFacm {
-
-		private int custNo = 0;
-		private int facmNo = 0;
-
-		public tmpFacm(int custNo, int facmNo) {
-			this.setCustNo(custNo);
-			this.setFacmNo(facmNo);
-		}
-
-		public int getCustNo() {
-			return custNo;
-		}
-
-		public void setCustNo(int custNo) {
-			this.custNo = custNo;
-		}
-
-		public int getFacmNo() {
-			return facmNo;
-		}
-
-		public void setFacmNo(int facmNo) {
-			this.facmNo = facmNo;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + custNo;
-			result = prime * result + facmNo;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpFacm other = (tmpFacm) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (custNo != other.custNo)
-				return false;
-			if (facmNo != other.facmNo)
-				return false;
-			return true;
-		}
-
-		private L4721Report getEnclosingInstance() {
-			return L4721Report.this;
-		}
-	}
 }

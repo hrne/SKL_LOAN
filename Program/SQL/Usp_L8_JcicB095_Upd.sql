@@ -1,42 +1,10 @@
+CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB095_Upd"
+(
 -- 程式功能：維護 JcicB095 每月聯徵不動產擔保品明細-建號附加檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L8_JcicB095_Upd"(20200430,'System');
 --
 
-DROP TABLE "Work_B095_All" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_B095_All"
-    (
-       "MainClActNo"      varchar2(50)
-     , "ClCode1"          decimal (1, 0)   default 0 not null
-     , "ClCode2"          decimal (2, 0)   default 0 not null
-     , "ClNo"             decimal (7, 0)   default 0 not null
-     , "CityCode"         varchar2(2)
-     , "AreaCode"         varchar2(2)
-     , "IrCode"           varchar2(4)
-     , "BdNo1"            decimal (5, 0)   default 0 not null
-     , "BdNo2"            decimal (3, 0)   default 0 not null
-    )
-    ON COMMIT DELETE ROWS;
-
-
-DROP TABLE "Work_B095" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_B095"
-    (
-       "MainClActNo"      varchar2(50)
-     , "ClCode1"          decimal (1, 0)   default 0 not null
-     , "ClCode2"          decimal (2, 0)   default 0 not null
-     , "ClNo"             decimal (7, 0)   default 0 not null
-     , "CityCode"         varchar2(2)
-     , "AreaCode"         varchar2(2)
-     , "IrCode"           varchar2(4)
-     , "BdNo1"            decimal (5, 0)   default 0 not null
-     , "BdNo2"            decimal (3, 0)   default 0 not null
-    )
-    ON COMMIT DELETE ROWS;
-
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB095_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
@@ -70,8 +38,20 @@ BEGIN
        LYYYYMM := YYYYMM - 1;
     END IF;
 
+    -- 刪除舊資料
+    DBMS_OUTPUT.PUT_LINE('DELETE JcicB095');
 
-    INSERT INTO "Work_B095_All"
+    DELETE FROM "JcicB095"
+    WHERE "DataYM" = YYYYMM
+      ;
+
+
+    -- 寫入資料
+    DBMS_OUTPUT.PUT_LINE('INSERT JcicB095');
+    INS_CNT := 0;
+
+    INSERT INTO "JcicB095"
+    WITH "Work_B095_All" AS (
     SELECT
            M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
          , CF."ClCode1"                          AS "ClCode1"           -- 擔保品代號1
@@ -109,41 +89,34 @@ BEGIN
       AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')   -- 主要擔保品為不動產
       AND  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
       AND  ( NVL(TRIM(B."BdNo1"),0)  > 0 OR NVL(TRIM(B."BdNo2"),0) > 0 )
-    ;
+    )
+	  , "Work_B095" AS (
+    SELECT "MainClActNo"       -- 主要擔保品控制編碼
+         , "ClCode1"           -- 擔保品代號1
+         , "ClCode2"           -- 擔保品代號2
+         , "ClNo"              -- 擔保品編號
+         , "CityCode"          -- 縣市別
+         , "AreaCode"          -- 鄉鎮市區別
+         , "IrCode"            -- 段、小段號
+         , "BdNo1"             -- 建號-前五碼
+         , "BdNo2"             -- 建號-後三碼
+         , ROW_NUMBER()
+           OVER (
+            PARTITION BY "MainClActNo"
+                       , "CityCode"
+                       , "AreaCode"
+                       , "IrCode"
+                       , "BdNo1"
+                       , "BdNo2"
+            ORDER BY "ClCode1" 
+                   , "ClCode2"
+                   , "ClNo"
+           ) AS "Seq"                  
+    FROM "Work_B095_All"
+    )
 
 
-    INSERT INTO "Work_B095"
-    SELECT
-           WK."MainClActNo"              AS "MainClActNo"       -- 主要擔保品控制編碼
-         , WK."ClCode1"                  AS "ClCode1"           -- 擔保品代號1
-         , WK."ClCode2"                  AS "ClCode2"           -- 擔保品代號2
-         , WK."ClNo"                     AS "ClNo"              -- 擔保品編號
-         , WK."CityCode"                 AS "CityCode"          -- 縣市別
-         , WK."AreaCode"                 AS "AreaCode"          -- 鄉鎮市區別
-         , WK."IrCode"                   AS "IrCode"            -- 段、小段號
-         , WK."BdNo1"                    AS "BdNo1"             -- 建號-前五碼
-         , WK."BdNo2"                    AS "BdNo2"             -- 建號-後三碼
-    FROM   "Work_B095_All" WK
-    GROUP BY WK."MainClActNo", WK."ClCode1", WK."ClCode2", WK."ClNo"
-           , WK."CityCode", WK."AreaCode", WK."IrCode"
-           , WK."BdNo1", WK."BdNo2"
-    ;
-
-
-    -- 刪除舊資料
-    DBMS_OUTPUT.PUT_LINE('DELETE JcicB095');
-
-    DELETE FROM "JcicB095"
-    WHERE "DataYM" = YYYYMM
-      ;
-
-
-    -- 寫入資料
-    DBMS_OUTPUT.PUT_LINE('INSERT JcicB095');
-    INS_CNT := 0;
-
-    INSERT INTO "JcicB095"
-    SELECT
+    SELECT DISTINCT
            YYYYMM                                AS "DataYM"            -- 資料年月
          , '95'                                  AS "DataType"          -- 資料別
          , '458'                                 AS "BankItem"          -- 總行代號
@@ -156,7 +129,8 @@ BEGIN
              WHEN BuPublicOwner."OwnerId"  IS NOT NULL THEN BuPublicOwner."OwnerId"
              ELSE ' '
            END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
-         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
+         , NVL("CdArea"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
+--         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
          , NVL(TRIM(WK."AreaCode"),0)            AS "AreaCode"          -- 鄉鎮市區別
          , WK."IrCode"                           AS "IrCode"            -- 段、小段號
          , WK."BdNo1"                            AS "BdNo1"             -- 建號-前五碼
@@ -288,6 +262,7 @@ BEGIN
                                   AND BuPublicOwner."ClNo"    = CM."ClNo"
                                   AND LandOwner."OwnerId"     IS NULL
                                   AND BuildingOwner."OwnerId" IS NULL
+    WHERE WK."Seq" = 1  
     ;
 
 

@@ -56,8 +56,8 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"CdCode\"   d on d.\"DefType\"    = 4               ";
 		sql += "                         and d.\"DefCode\"    = 'EmpDeductType' ";
 		sql += "                         and substr(d.\"Item\",0,1) = e.\"AgType1\"   ";
-		sql += " where l.\"NextPayIntDate\" >= " + intStartDate;
-		sql += "   and l.\"NextPayIntDate\" <= " + intEndDate;
+		sql += " where l.\"NextPayIntDate\" >= :intStartDate";
+		sql += "   and l.\"NextPayIntDate\" <= :intEndDate";
 		sql += "   and l.\"Status\" = 0                                         ";
 		sql += "   and l.\"AmortizedCode\" != 5 "; // --逆向房貸跳過
 		sql += "   and substr(d.\"Item\",0,1) = " + flag; // c."EmpNo" is not null && d.Item = flag
@@ -77,7 +77,8 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
+		query.setParameter("intStartDate", intStartDate);
+		query.setParameter("intEndDate", intEndDate);
 		List<Object> result = query.getResultList();
 
 		return this.convertToMap(result);

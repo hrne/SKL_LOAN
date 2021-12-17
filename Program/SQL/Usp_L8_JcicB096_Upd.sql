@@ -1,11 +1,10 @@
+CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB096_Upd"
+(
 -- 程式功能：維護 JcicB096 每月聯徵不動產擔保品明細-地號附加檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L8_JcicB096_Upd"(20200430,'System');
 --
 
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB096_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
@@ -119,7 +118,8 @@ BEGIN
              WHEN LandOwner."OwnerId"      IS NOT NULL THEN LandOwner."OwnerId"
              ELSE ' '
            END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
-         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
+--         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
+         , NVL("CdArea"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
          , NVL(TRIM(WK."AreaCode"),0)            AS "AreaCode"          -- 鄉鎮市區別
          , WK."IrCode"                           AS "IrCode"            -- 段、小段號
          , WK."LandNo1"                          AS "LandNo1"           -- 地號-前四碼
@@ -234,6 +234,8 @@ BEGIN
          , EmpNo                                 AS "LastUpdateEmpNo"    -- 最後更新人員
     FROM   "Work_B096" WK
       LEFT JOIN "CdCity"       ON "CdCity"."CityCode"  = WK."CityCode"
+      LEFT JOIN "CdArea"       ON "CdArea"."CityCode"  = WK."CityCode"
+                              AND "CdArea"."AreaCode"  = WK."AreaCode"
       LEFT JOIN "ClLand"  L    ON L."ClCode1" = WK."ClCode1"
                               AND L."ClCode2" = WK."ClCode2"
                               AND L."ClNo"    = WK."ClNo"

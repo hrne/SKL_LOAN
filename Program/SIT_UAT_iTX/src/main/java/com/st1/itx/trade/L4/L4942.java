@@ -81,9 +81,8 @@ public class L4942 extends TradeBuffer {
 				String wkCreateFlag = tPostAuthLogHistory.getAuthApplCode();
 				if (tPostAuthLogHistory.getDeleteDate() > 0) {
 //					1申請 2終止 9暫停
-					if ("00".equals(tPostAuthLogHistory.getAuthErrorCode())) {
-						wkCreateFlag = "9";
-					} else {
+					if (!"00".equals(tPostAuthLogHistory.getAuthErrorCode())) {
+
 						wkCreateFlag = "2";
 					}
 				}

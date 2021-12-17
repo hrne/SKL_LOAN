@@ -120,6 +120,7 @@ public class BaTxCom extends TradeBuffer {
 	private String unpaidIntFlag = "";// 利息是否可欠繳
 	private String payMethod = "";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 	// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
+	private BigDecimal dueAmt = BigDecimal.ZERO; // 應繳期金
 
 //  initialize
 	private void init() {
@@ -535,6 +536,37 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/**
+	 * 計算至利率調整後次月份應繳期金
+	 * 
+	 * @param iEntryDate 入帳日
+	 * @param iCustNo    戶號
+	 * @param iFacmNo    額度
+	 * @param iBormNo    撥款
+	 * @param titaVo     TitaVo
+	 * @return ArrayList of BaTxVo
+	 * @throws LogicException ...
+	 */
+	public ArrayList<BaTxVo> getDueAmt(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo)
+			throws LogicException {
+		this.info("BaTxCom acLoanInt ...");
+		init();
+
+		// isTermAdvance 是否含提前繳期款
+		this.isTermAdvance = true;
+
+		// isEmptyLoanBaTxVo 是否放未計息餘額
+		this.isEmptyLoanBaTxVo = true;
+		
+		// Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
+		loadUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 1, titaVo);
+
+		// 計算利息
+		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 80, BigDecimal.ZERO, 0, titaVo); // Terms = 0
+
+		return this.baTxList;
+	}
+
+	/**
 	 * 現金流量預估
 	 * 
 	 * @param iEntryDate 入帳日
@@ -763,6 +795,25 @@ public class BaTxCom extends TradeBuffer {
 					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, 0);
 					break;
+
+				case 80: // 計算利利率調整後次月份應繳期金
+					int wkPrevTermNo = 0;
+					int wkRepayTermNo = 0;
+					// 計算至上次繳息日之期數
+					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+						wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+								ln.getSpecificDd(), ln.getPrevPayIntDate());
+					}
+					// 可回收期數 = 計算至入帳日/應繳日的當期期數
+					wkRepayTermNo = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+							ln.getSpecificDd(), wkPayIntDate);
+					wkTerms = wkRepayTermNo - wkPrevTermNo + 1;
+
+					// 計息參數
+					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
+					this.dueAmt = this.dueAmt.add(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額;
+					break;
+
 				case 90: // 提存
 					// iEntryDate 入帳日 ==> 月底日曆日
 					// iPayIntDate 利息計算止日 ==> 次月月初日
@@ -1087,17 +1138,18 @@ public class BaTxCom extends TradeBuffer {
 				rpFacmNo = srvList.getContent().get(0).getFacmNo();
 			}
 		} else {
-			// 計息、有帳務、非結案
+			// 計息、無帳務
 			for (BaTxVo ba : this.baTxList) {
-				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0 && ba.getCloseFg() == 0) {
+				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
 					rpFacmNo = ba.getFacmNo();
 					break;
 				}
 			}
-			// 計息、非結案
+			// 計息、有帳務、非結案
 			if (rpFacmNo == 0) {
 				for (BaTxVo ba : this.baTxList) {
-					if (ba.getDataKind() == 2 && ba.getCloseFg() == 0) {
+					if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0
+							&& ba.getCloseFg() == 0) {
 						rpFacmNo = ba.getFacmNo();
 						break;
 					}
@@ -1592,6 +1644,15 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public int getOvduDays() {
 		return ovduDays;
+	}
+
+	/**
+	 * 應繳期金
+	 * 
+	 * @return 應繳期金
+	 */
+	public BigDecimal getDueAmt() {
+		return dueAmt;
 	}
 
 }

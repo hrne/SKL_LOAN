@@ -1,54 +1,18 @@
+create or replace PROCEDURE "Usp_L8_JcicB092_Upd"
+(
 -- 程式功能：維護 JcicB092 每月聯徵不動產擔保品明細檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L8_JcicB092_Upd"(20200430,'System');
 --
 
-DROP TABLE "Work_B092" purge;
-CREATE GLOBAL TEMPORARY TABLE "Work_B092"
-    (
-       "FacmNo"           varchar2(50)
-     , "MainClActNo"      varchar2(50)
-     , "ClCode1"          decimal(1, 0)   default 0 not null
-     , "ClCode2"          decimal(2, 0)   default 0 not null
-     , "ClNo"             decimal(7, 0)   default 0 not null
-     , "ClTypeJCIC"       varchar2(2)
-     , "OwnerId"          varchar2(10)
-     , "EvaAmt"           varchar2(8)
-     , "EvaDate"          decimal(5, 0)   default 0 not null
-     , "SettingDate"      decimal(5, 0)   default 0 not null
-     , "MonthSettingAmt"  varchar2(8)
-     , "SettingSeq"       decimal(1, 0)   default 0 not null
-     , "PreSettingAmt"    varchar2(8)
-     , "DispPrice"        varchar2(8)
-     , "IssueEndDate"     decimal(5, 0)   default 0 not null
-     , "CityCode"         varchar2(1)
-     , "AreaCode"         varchar2(2)
-     , "IrCode"           varchar2(4)
-     , "LandNo1"          decimal(4, 0)   default 0 not null
-     , "LandNo2"          decimal(4, 0)   default 0 not null
-     , "BdNo1"            decimal(5, 0)   default 0 not null
-     , "BdNo2"            decimal(3, 0)   default 0 not null
-     , "Zip"              varchar2(5)
-     , "LVITax"           decimal(14,2)   default 0 not null
-     , "LVITaxYearMonth"  decimal(5, 0)   default 0 not null
-     , "ContractPrice"    varchar2(8)
-     , "ContractDate"     varchar2(8)
-     , "ParkingTypeCode"  varchar2(1)
-     , "Area"             varchar2(9)
-     , "LandOwnedArea"    decimal(14, 2)  default 0 not null
-     , "LineAmt"          decimal(14, 0)  default 0 not null
-    )
-    ON COMMIT DELETE ROWS;
-
-
-create or replace PROCEDURE "Usp_L8_JcicB092_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
 )
+AUTHID CURRENT_USER
 AS
 BEGIN
+	"Usp_L8_JcicB092_Upd_Prear"();
   DECLARE
     INS_CNT        INT;         -- 新增筆數
     UPD_CNT        INT;         -- 更新筆數
@@ -123,7 +87,8 @@ BEGIN
              WHEN TRUNC(NVL(CI."ClaimDate",0) / 100) < 191100 THEN TRUNC(NVL(CI."ClaimDate",0) / 100)
              ELSE TRUNC(NVL(CI."ClaimDate",0) / 100) - 191100
            END                                   AS "IssueEndDate"      -- 權利到期年月
-         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"
+--         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"
+         , NVL("CdArea"."JcicCityCode", ' ')     AS "CityCode"
          , NVL(TRIM(L."AreaCode"), '00')         AS "AreaCode"
          , CASE
 --           WHEN "ClBuilding"."IrCode" IS NOT NULL THEN SUBSTR('0000' || "ClBuilding"."IrCode", -4)
@@ -391,11 +356,13 @@ BEGIN
     UPD_CNT := 0;
 
     UPDATE "JcicB092" M
-    SET   M."EvaAmt" = SUBSTR('00000000' || TRUNC(to_number(M."LVITax")), -8)
-        , M."LVITax" = SUBSTR('00000000' || TRUNC(to_number(M."EvaAmt")), -8)
+--    SET   M."EvaAmt" = SUBSTR('00000000' || TRUNC(to_number(M."LVITax")), -8)
+--        , M."LVITax" = SUBSTR('00000000' || TRUNC(to_number(M."EvaAmt")), -8)
+     SET  M."EvaAmt" = LPAD(M."LVITax",8,'0')
+         ,M."LVITax" = LPAD(M."EvaAmt",8,'0')
     WHERE M."DataYM" =  YYYYMM
       AND M."LVITax" <> 'X'
-      AND to_number(M."EvaAmt") < to_number(M."LVITax")
+      AND M."EvaAmt" < M."LVITax"
      ;
 
     UPD_CNT := UPD_CNT + sql%rowcount;
