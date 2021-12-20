@@ -116,7 +116,7 @@ public class L4211Report2 extends MakeReport {
 		
 		this.print(-3, 165, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
-		this.print(-4, 158, "頁    數：" + this.getNowPage(), "R");
+		this.print(-4, 148, "頁    數：" + this.getNowPage());
 		this.print(-5, 64, "入帳日期 :           ---");
 		
 		if(String.valueOf(entrydate).length() == 7) {
@@ -155,16 +155,17 @@ public class L4211Report2 extends MakeReport {
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4211", "匯款轉帳失敗表", "", "A4", "L");
+		if(fnAllList.size() != 0 ) {
+		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4211", "匯款轉帳失敗表", "", "A4", "L");
 		
-		entrydate = titaVo.get("EntryDate");
+		  entrydate = titaVo.get("EntryDate");
 		
-		DecimalFormat df1 = new DecimalFormat("#,##0");
+		  DecimalFormat df1 = new DecimalFormat("#,##0");
 		
-		int i = 0,pageCnt = 0;
-		
-		ReconCode = fnAllList.get(0).get("F0");
-		for (int j = 1 ; j <= fnAllList.size() ; j++) {
+		  int i = 0,pageCnt = 0;
+			
+		  ReconCode = fnAllList.get(0).get("F0");
+		  for (int j = 1 ; j <= fnAllList.size() ; j++) {
 			i = j - 1;
 
 			int lengthF7 = 10;
@@ -277,10 +278,13 @@ public class L4211Report2 extends MakeReport {
 				this.print(2, 90, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
 			}
 
-		} // for
+		  } // for
+		
 		sno = this.close();
 		this.toPdf(sno);
-
+		} else {
+			throw new LogicException("E2003", "查無資料"); // 查無資料
+		}
 	}
 	
 	private void amt() {

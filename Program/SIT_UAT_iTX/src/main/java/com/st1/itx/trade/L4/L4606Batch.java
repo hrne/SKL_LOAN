@@ -25,12 +25,10 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuComm;
 import com.st1.itx.db.domain.InsuCommId;
-import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
-import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -67,9 +65,6 @@ public class L4606Batch extends TradeBuffer {
 
 	@Autowired
 	public InsuCommFileVo insuCommFileVo;
-
-	@Autowired
-	public InsuRenewService insuRenewService;
 
 	@Autowired
 	public InsuCommService insuCommService;
@@ -120,7 +115,6 @@ public class L4606Batch extends TradeBuffer {
 		this.info("active L4606Batch ");
 		this.totaVo.init(titaVo);
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
-
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -240,8 +234,9 @@ public class L4606Batch extends TradeBuffer {
 					tInsuComm.setCustNo(custNo);
 					tInsuComm.setFacmNo(facmNo);
 					BigDecimal commBase = parse.stringToBigDecimal(tempOccursList.get("CommBase"));
-					BigDecimal commRate =  parse.stringToBigDecimal(tempOccursList.get("CommRate"));;
-				    this.info("commBase=" + commBase + ", commRate = " + commRate);
+					BigDecimal commRate = parse.stringToBigDecimal(tempOccursList.get("CommRate"));
+					;
+					this.info("commBase=" + commBase + ", commRate = " + commRate);
 					BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
 					tInsuComm.setDueAmt(dueAmt);
 
@@ -252,28 +247,26 @@ public class L4606Batch extends TradeBuffer {
 					tFacMainId.setFacmNo(facmNo);
 					tFacMain = facMainService.findById(tFacMainId, titaVo);
 
-					if (tFacMain != null && tFacMain.getFireOfficer() != null) {
-						empNo = tFacMain.getFireOfficer();
-					} else {
+					if (tFacMain == null || tFacMain.getFireOfficer().isEmpty()) {
 						tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
-						if (tCustMain != null && tCustMain.getIntroducer() != null) {
+						if (tCustMain != null) {
 							empNo = tCustMain.getIntroducer();
 						}
+					} else {
+						empNo = tFacMain.getFireOfficer();
 					}
 
 					tCdEmp = cdEmpService.findById(empNo, titaVo);
 					if (tCdEmp != null) {
 						empId = tCdEmp.getAgentId();
 						empName = tCdEmp.getFullname();
-						agStatusCode = tCdEmp.getStatusCode();                     						
+						agStatusCode = tCdEmp.getStatusCode();
 					}
 
 					tInsuComm.setFireOfficer(empNo);
 					tInsuComm.setEmpId(empId);
 					tInsuComm.setEmpName(empName);
-					InsuRenew tInsuRenew = insuRenewService.findNowInsuNoFirst(custNo, facmNo,
-							tempOccursList.get("InsuNo"), titaVo);
-					if (tInsuRenew != null && "1".equals(agStatusCode)) {
+					if ("1".equals(agStatusCode)) {
 						mediaCode = "Y";
 					}
 					tInsuComm.setMediaCode(mediaCode);

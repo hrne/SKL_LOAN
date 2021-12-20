@@ -1,10 +1,10 @@
+CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Ap_Upd"
+(
 -- 程式功能：維護 LoanIfrs9Ap 每月IFRS9欄位清單A檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L7_LoanIfrs9Ap_Upd"(20201231,'System',0);
 --
 
-CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Ap_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2,   -- 經辦
@@ -89,7 +89,15 @@ BEGIN
          , NVL(M."BadDebtAmt", 0)                    AS "BadDebtAmt"        -- 轉銷呆帳金額
          , NVL(F."GracePeriod", 0)                   AS "GracePeriod"       -- 初貸時約定還本寬限期
          , ROUND(NVL(M."ApproveRate", 0) / 100, 6)   AS "ApproveRate"       -- 核准利率
-         , to_number(NVL(M."AmortizedCode", 0))      AS "AmortizedCode"     -- 契約當時還款方式  -- 1=按期繳息(到期還本)；2=平均攤還本息；3=平均攤還本金；4=到期繳息還本
+--         , to_number(NVL(M."AmortizedCode", 0))      AS "AmortizedCode"     -- 契約當時還款方式  -- 1=按期繳息(到期還本)；2=平均攤還本息；3=平均攤還本金；4=到期繳息還本
+         , CASE
+             WHEN NVL(M."AmortizedCode",'0') = '1' THEN '1'  -- 1.按月繳息(按期繳息到期還本)
+             WHEN NVL(M."AmortizedCode",'0') = '2' THEN '4'  -- 2.到期取息(到期繳息還本)
+             WHEN NVL(M."AmortizedCode",'0') = '3' THEN '2'  -- 3.本息平均法(期金)
+             WHEN NVL(M."AmortizedCode",'0') = '4' THEN '3'  -- 4.本金平均法
+             WHEN NVL(M."AmortizedCode",'0') = '5' THEN '4'  -- 5.按月撥款收息(逆向貸款)  --???
+             ELSE '3'
+           END                                       AS "AmortizedCode"     -- 契約當時還款方式
          , CASE
              WHEN NVL(F."Ifrs9StepProdCode",' ') = 'B' THEN 4  -- 浮動階梯
              WHEN NVL(F."Ifrs9StepProdCode",' ') = 'A' THEN 3  -- 固定階梯
@@ -97,18 +105,24 @@ BEGIN
              WHEN NVL(M."RateCode", '0')  = '2'           THEN 2  -- 固定
              ELSE to_number(NVL(M."RateCode", '0'))
            END                                       AS "RateCode"          -- 契約當時利率調整方式（1=機動；2=固定；3=固定階梯；4=浮動階梯）
-         , NVL(M."RepayFreq", 0)                     AS "RepayFreq"         -- 契約約定當時還本週期
-         , NVL(M."PayIntFreq", 0)                    AS "PayIntFreq"        -- 契約約定當時繳息週期
+--         , NVL(M."RepayFreq", 0)                     AS "RepayFreq"         -- 契約約定當時還本週期
+         , CASE WHEN NVL(M."AmortizedCode", '0') IN ('1', '2') THEN 0  -- 到期還本
+                ELSE NVL(M."RepayFreq", 0)
+           END                                       AS "RepayFreq"         -- 契約約定當時還本週期
+--         , NVL(M."PayIntFreq", 0)                    AS "PayIntFreq"        -- 契約約定當時繳息週期
+         , CASE WHEN NVL(M."AmortizedCode",'0') = '2' THEN 0  -- 到期繳息還本
+                ELSE NVL(M."PayIntFreq",0)
+           END                                       AS "PayIntFreq"        -- 契約約定當時繳息週期
          , NVL(F."IndustryCode", ' ')                AS "IndustryCode"      -- 授信行業別
          , NVL(F."ClTypeJCIC", ' ')                  AS "ClTypeJCIC"        -- 擔保品類別
 --         , NVL("CdCity"."JcicCityCode", ' ')         AS "CityCode"          -- 擔保品地區別
          , CASE 
-             WHEN NVL("Ifrs9FacData"."CityCode", ' ') = '05' THEN 'A'
-             WHEN NVL("Ifrs9FacData"."CityCode", ' ') = '10' THEN 'B' 
-             WHEN NVL("Ifrs9FacData"."CityCode", ' ') = '15' THEN 'C' 
-             WHEN NVL("Ifrs9FacData"."CityCode", ' ') = '35' THEN 'D' 
-             WHEN NVL("Ifrs9FacData"."CityCode", ' ') = '65' THEN 'E' 
-             WHEN NVL("Ifrs9FacData"."CityCode", ' ') = '70' THEN 'F' 
+             WHEN NVL(F."CityCode", ' ') = '05' THEN 'A'
+             WHEN NVL(F."CityCode", ' ') = '10' THEN 'B' 
+             WHEN NVL(F."CityCode", ' ') = '15' THEN 'C' 
+             WHEN NVL(F."CityCode", ' ') = '35' THEN 'D' 
+             WHEN NVL(F."CityCode", ' ') = '65' THEN 'E' 
+             WHEN NVL(F."CityCode", ' ') = '70' THEN 'F' 
              ELSE 'G'
            END                                       AS "CityCode"          -- 擔保品地區別 A~G
          , NVL(F."ProdNo", ' ')                      AS "ProdNo"            -- 商品利率代碼

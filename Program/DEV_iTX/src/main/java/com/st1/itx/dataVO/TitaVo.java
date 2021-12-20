@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -462,6 +463,37 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public boolean isActfgSuprele() {
 		return this.get(ContentName.actfg) != null && (this.get(ContentName.actfg).equals("2") || this.get(ContentName.actfg).equals("4"));
 	}
+	
+	/**
+	 * NBSDY
+	 * 
+	 * @return NBSDY String
+	 */
+	public String getNbsDy() {
+		return Objects.isNull(this.get("NBSDY")) ? "" : this.get("NBSDY");
+	}
+
+	/**
+	 * NNBSDY String
+	 * 
+	 * @return NNBSDY String
+	 */
+	public String getNnbsDy() {
+		return Objects.isNull(this.get("NNBSDY")) ? "" : this.get("NNBSDY");
+	}
+
+	/**
+	 * chk nbsdy and nnbsdy
+	 * 
+	 * @param nbsDy  Integer
+	 * @param nnbsDy Integer
+	 * @return if not same return true else false
+	 */
+	public boolean isHolidayChange(int nbsDy, int nnbsDy) {
+		if (Integer.parseInt(this.getNbsDy()) != nbsDy || Integer.parseInt(this.getNnbsDy()) != nnbsDy)
+			return true;
+		return false;
+	}
 
 	/**
 	 * is TXCD Special?<br>
@@ -470,7 +502,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return boolean true or false
 	 */
 	public boolean isTxcdSpecial() {
-		return this.getTxcd().startsWith("LC") || this.getTxcd().equals("L6103");
+		return this.getTxcd().startsWith("BS") || this.getTxcd().startsWith("LC") || this.getTxcd().equals("L6103");
 //		return this.getTxcd().equals("LC100") || this.getTxcd().equals("LC101") || this.getTxcd().equals("LCR07") || this.getTxcd().equals("L6103") || this.getTxcd().equals("LC013");
 	}
 

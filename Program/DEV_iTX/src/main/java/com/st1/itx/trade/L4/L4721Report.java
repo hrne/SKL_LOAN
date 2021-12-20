@@ -17,8 +17,8 @@ import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * 製作利率變動對帳單 <BR>
@@ -40,6 +40,9 @@ public class L4721Report extends MakeReport {
 
 	@Autowired
 	public BaTxCom baTxCom;
+	
+	@Autowired
+	Parse parse;
 
 	String headerCustName = "";
 	String headerCustNo = "0";
@@ -47,8 +50,8 @@ public class L4721Report extends MakeReport {
 	String headerRepayDate = "0";
 	String headerRepayTypeDesc = "";
 	String headerLoanBal = "0";
-	String headerSumAmt = "0";
-	String headerDueAmt = "0";
+	String headerExcessive = "";
+	String headerDueAmt = "";
 	int cnt = 0;
 
 	@Override
@@ -74,7 +77,7 @@ public class L4721Report extends MakeReport {
 		print(-5, 98, formatAmt(headerLoanBal, 0), "R");
 
 		print(-6, 80, "累溢短繳：", "L");
-		print(-6, 98, formatAmt(headerSumAmt, 0), "R");
+		print(-6, 98, formatAmt(headerExcessive, 0), "R");
 
 		print(-7, 1, "入帳日期　計息期間　　　　　繳款方式　　　繳款金額　　　攤還本金　　　繳息金額　　違約金　火險費或其他費用");
 
@@ -137,6 +140,7 @@ public class L4721Report extends MakeReport {
 		this.limit = Integer.MAX_VALUE;
 
 		this.setTxBuffer(txbuffer);
+		baTxCom.setTxBuffer(txbuffer);
 
 		int adjDate = Integer.parseInt(titaVo.getParam("AdjDate")) + 19110000;
 		int custType1 = 0;
@@ -168,7 +172,7 @@ public class L4721Report extends MakeReport {
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單", "密", "8.5,12", "P");
 
 		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
-			List<Map<String, String>> listBankStatement = new ArrayList<Map<String, String>>();
+			List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 			// 放款利率變動檔生效日，利率未變動為零
 			if (tBatxRateChange.getTxEffectDate() == 0) {
 				continue;
@@ -183,55 +187,52 @@ public class L4721Report extends MakeReport {
 //				每張表有該戶號額度對應之Header，所以必須有兩個迴圈
 //				第一層為應產出list，第二層為產出客戶之列印內容
 			try {
-				listBankStatement = l4721ServiceImpl.doQuery(custNo, facmNo, titaVo);
+				listL4721Head = l4721ServiceImpl.doQuery(custNo, facmNo, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
-			if (listBankStatement == null || listBankStatement.isEmpty()) {
+			if (listL4721Head == null || listL4721Head.isEmpty()) {
 				// 產空表?
 				this.info("custNo ..." + custNo);
 				this.info("facmNo ..." + facmNo);
-				this.info("listBankStatement == null ...");
+				this.info("listL4721Head == null ...");
 				continue;
 			}
 
-			Map<String, String> headerBankStatement = listBankStatement.get(0);
+			Map<String, String> mapL4721Head = listL4721Head.get(0);
 
 			// 先更新表頭資料
-			setHead(headerBankStatement, custNo, facmNo, tBatxRateChange.getTxEffectDate());
+			setHead(mapL4721Head, custNo, facmNo, tBatxRateChange.getTxEffectDate());
 
 			// 有資料產表
 			cnt = cnt + 1;
-
-			this.info("custNo ..." + custNo);
-			this.info("facmNo ..." + facmNo);
-			this.info("cnt ..." + cnt);
-
+			
 			if (cnt >= 2) {
 				this.newPage();
 			}
+			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listBankStatement = l4721ServiceImpl.doDetail(custNo, facmNo, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, facmNo, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
-			if (listBankStatement != null && !listBankStatement.isEmpty()) {
+			if (listL4721Detail != null && !listL4721Detail.isEmpty()) {
 
-				for (Map<String, String> rowBankStatement : listBankStatement) {
+				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 					print(1, 1, "　");
 
 					// 入帳日期
-					print(0, 1, showRocDate(rowBankStatement.get("EntryDate"), 3));
+					print(0, 1, showRocDate(mapL4721Detail.get("EntryDate"), 3));
 
 					// 計息期間
 					String dateRange = " ";
-					String startDate = rowBankStatement.get("IntStartDate");
-					String endDate = rowBankStatement.get("IntEndDate");
+					String startDate = mapL4721Detail.get("IntStartDate");
+					String endDate = mapL4721Detail.get("IntEndDate");
 
 					// 組成yyymmdd-yyymmdd
 					if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
@@ -241,28 +242,28 @@ public class L4721Report extends MakeReport {
 					print(0, 10, dateRange);
 
 					// 繳款方式
-					print(0, 26, rowBankStatement.get("RepayCodeX"));
+					print(0, 26, mapL4721Detail.get("RepayCodeX"));
 
 					// 繳款金額
-					print(0, 47, formatAmt(rowBankStatement.get("TxAmt"), 0), "R");
+					print(0, 47, formatAmt(mapL4721Detail.get("TxAmt"), 0), "R");
 
 					// 攤還本金
-					print(0, 60, formatAmt(rowBankStatement.get("Principal"), 0), "R");
+					print(0, 60, formatAmt(mapL4721Detail.get("Principal"), 0), "R");
 
 					// 繳息金額
-					print(0, 73, formatAmt(rowBankStatement.get("Interest"), 0), "R");
+					print(0, 73, formatAmt(mapL4721Detail.get("Interest"), 0), "R");
 
 					// 違約金
 					String bt = "";
-					if (!"0".equals(formatAmt(rowBankStatement.get("BreachAmt"), 0))) {
-						bt = formatAmt(rowBankStatement.get("BreachAmt"), 0);
+					if (!"0".equals(formatAmt(mapL4721Detail.get("BreachAmt"), 0))) {
+						bt = formatAmt(mapL4721Detail.get("BreachAmt"), 0);
 					}
 					print(0, 82, bt, "R");
 
 					// 火險費或其他費用
 					String fe = "";
-					if (!"0".equals(formatAmt(rowBankStatement.get("OtherFee"), 0))) {
-						fe = formatAmt(rowBankStatement.get("OtherFee"), 0);
+					if (!"0".equals(formatAmt(mapL4721Detail.get("OtherFee"), 0))) {
+						fe = formatAmt(mapL4721Detail.get("OtherFee"), 0);
 					}
 					print(0, 98, fe, "R");
 				}
@@ -293,18 +294,17 @@ public class L4721Report extends MakeReport {
 
 	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
 			throws NumberFormatException, LogicException {
+		this.info("L4721Report.setHead" + custNo + "-" + facmNo + "" + effectDate);
 		headerCustName = headerBankStatement.get("CustName");
 		headerCustNo = headerBankStatement.get("CustNo");
-		headerPrintDate = showRocDate(titaVo.getEntDyI(), 1);
+		headerPrintDate = showRocDate(titaVo.getCalDy(), 1);
 		headerRepayDate = headerBankStatement.get("SpecificDd") + "日";
 		headerRepayTypeDesc = headerBankStatement.get("RepayCodeX");
 		headerLoanBal = headerBankStatement.get("LoanBal");
-
-		int nextPayIntDate = 0;
-
-		nextPayIntDate = Integer.parseInt(headerBankStatement.get("NextPayIntDate"));
-
-		List<BaTxVo> listBaTxVo =  baTxCom.getDueAmt(nextPayIntDate, custNo, facmNo, 0, titaVo);
+		baTxCom.getDueAmt(effectDate, custNo, facmNo, 0, titaVo);
+		headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
+		headerExcessive = ""+baTxCom.getExcessive().subtract(baTxCom.getShortfall());
+	
 
 	}
 

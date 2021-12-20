@@ -32,7 +32,6 @@ public class L4925ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private Parse parse;
 
-
 	// *** 折返控制相關 ***
 	private int index;
 
@@ -54,128 +53,120 @@ public class L4925ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4925.findAll");
-		
-		
-		
+
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		int iRepayCode = parse.stringToInteger(titaVo.get("RepayCode"));
-		
+
 		int iEntryDateFrom = parse.stringToInteger(titaVo.getParam("EntryDateFrom")) + 19110000;
 		int iEntryDateTo = parse.stringToInteger(titaVo.getParam("EntryDateTo")) + 19110000;
-		
-		
+
 		String iProcStsCode = titaVo.get("ProcStsCode");
-		
+
 		String sql = "";
-		
-			sql += "  SELECT                            ";  
-			sql += "    bd.\"AcDate\",                  "; 
-			sql += "    bd.\"BatchNo\",                 ";
-			sql += "    bd.\"DetailSeq\",               ";
-			sql += "    bd.\"RepayCode\",               "; 
-			sql += "    bd.\"EntryDate\",               "; 
-			sql += "    bd.\"CustNo\",                  ";
-			sql += "    bd.\"FacmNo\",                  ";
-			sql += "    bd.\"RepayType\",               ";
-			sql += "    bd.\"ReconCode\",               "; 
-			sql += "    bd.\"RepayAmt\",                ";
-			sql += "    bd.\"AcctAmt\",                 ";
-			sql += "    bd.\"DisacctAmt\",              ";
-			sql += "    bd.\"ProcStsCode\",             ";
-			sql += "    bd.\"ProcCode\",                ";
-			sql += "    bd.\"TitaTlrNo\",               ";
-			sql += "    bd.\"TitaTxtNo\",               ";
-			sql += "    bd.\"ProcNote\"                 ";
-			sql += "  FROM                              ";
-			sql += "    \"BatxDetail\"              bd  ";
-			sql += "    LEFT JOIN  \"BatxHead\"     bh  ";
-			sql += "         ON bh.\"AcDate\" = bd.\"AcDate\"             ";
-			sql += "         AND bh.\"BatchNo\" = bd.\"BatchNo\"          ";
-			sql += "  WHERE                             ";
-			
-			if(iRepayCode == 0 && iCustNo == 0) {
-				sql += "    bd.\"AcDate\" >= :EntryDateFrom       ";
-				sql += "    AND bd.\"AcDate\" <= :EntryDateTo     "; 
-				sql += "    AND bd.\"CustNo\" >= 0          ";
-				sql += "    AND bd.\"CustNo\" <= 9999999    ";
-				sql += "    AND bd.\"RepayCode\" >= 0       ";
-				sql += "    AND bd.\"RepayCode\" <= 99      ";
-			} else if (iRepayCode == 0) {
-				sql += "    bd.\"AcDate\" >= :EntryDateFrom       ";
-				sql += "    AND bd.\"AcDate\" <= :EntryDateTo     "; 
-				sql += "    AND bd.\"CustNo\" >= :CustNo   ";
-				sql += "    AND bd.\"CustNo\" <= :CustNo   ";
-				sql += "    AND bd.\"RepayCode\" >= 0       ";
-				sql += "    AND bd.\"RepayCode\" <= 99      ";
-			} else if (iCustNo == 0) {
-				sql += "    bd.\"AcDate\" >= :EntryDateFrom       ";
-				sql += "    AND bd.\"AcDate\" <= :EntryDateTo     "; 
-				sql += "    AND bd.\"CustNo\" >= 0          ";
-				sql += "    AND bd.\"CustNo\" <= 9999999    ";
-				sql += "    AND bd.\"RepayCode\" >= :RepayCode    ";
-				sql += "    AND bd.\"RepayCode\" <= :RepayCode    ";
-			} else {
-				sql += "    bd.\"AcDate\" >= :EntryDateFrom       ";
-				sql += "    AND bd.\"AcDate\" <= :EntryDateTo     "; 
-				sql += "    AND bd.\"CustNo\" >= :CustNo   ";
-				sql += "    AND bd.\"CustNo\" <= :CustNo   ";
-				sql += "    AND bd.\"RepayCode\" >= :RepayCode    ";
-				sql += "    AND bd.\"RepayCode\" <= :RepayCode    ";
-			}
-					
-			
-			switch (iProcStsCode) {
-			case "A":
-				sql += "   and ((bd.\"ProcStsCode\" in ('0','2','3','4') ";
-				sql += "   and bh.\"BatxExeCode\" <> 8 )";
-				sql += "   or  bd.\"ProcStsCode\" in ('5','6','7')) ";
-				break;
-			case "R":
-				sql += "   and bd.\"ProcStsCode\" in ('0','2','3','4') ";
-				sql += "   and bh.\"BatxExeCode\" <> 8 ";
-				break;
-			case "S":
-				sql += "   and bd.\"ProcStsCode\" in ('5','6','7') ";
-				break;
-			default:
-				sql += "   and bd.\"ProcStsCode\" = '" + iProcStsCode + "'";
-				break;
-			}
-			
+
+		sql += "  SELECT                            ";
+		sql += "    bd.\"AcDate\",                  ";
+		sql += "    bd.\"BatchNo\",                 ";
+		sql += "    bd.\"DetailSeq\",               ";
+		sql += "    bd.\"RepayCode\",               ";
+		sql += "    bd.\"EntryDate\",               ";
+		sql += "    bd.\"CustNo\",                  ";
+		sql += "    bd.\"FacmNo\",                  ";
+		sql += "    bd.\"RepayType\",               ";
+		sql += "    bd.\"ReconCode\",               ";
+		sql += "    bd.\"RepayAmt\",                ";
+		sql += "    bd.\"AcctAmt\",                 ";
+		sql += "    bd.\"DisacctAmt\",              ";
+		sql += "    bd.\"ProcStsCode\",             ";
+		sql += "    bd.\"ProcCode\",                ";
+		sql += "    bd.\"TitaTlrNo\",               ";
+		sql += "    bd.\"TitaTxtNo\",               ";
+		sql += "    bd.\"ProcNote\"                 ";
+		sql += "  FROM                              ";
+		sql += "    \"BatxDetail\"              bd  ";
+		sql += "    LEFT JOIN  \"BatxHead\"     bh  ";
+		sql += "         ON bh.\"AcDate\" = bd.\"AcDate\"             ";
+		sql += "         AND bh.\"BatchNo\" = bd.\"BatchNo\"          ";
+		sql += "  WHERE                             ";
+
+		if (iRepayCode == 0 && iCustNo == 0) {
+			sql += "    bd.\"EntryDate\" >= :EntryDateFrom       ";
+			sql += "    AND bd.\"EntryDate\" <= :EntryDateTo     ";
+			sql += "    AND bd.\"CustNo\" >= 0          ";
+			sql += "    AND bd.\"CustNo\" <= 9999999    ";
+			sql += "    AND bd.\"RepayCode\" >= 0       ";
+			sql += "    AND bd.\"RepayCode\" <= 99      ";
+		} else if (iRepayCode == 0) {
+			sql += "    bd.\"EntryDate\" >= :EntryDateFrom       ";
+			sql += "    AND bd.\"EntryDate\" <= :EntryDateTo     ";
+			sql += "    AND bd.\"CustNo\" >= :CustNo   ";
+			sql += "    AND bd.\"CustNo\" <= :CustNo   ";
+			sql += "    AND bd.\"RepayCode\" >= 0       ";
+			sql += "    AND bd.\"RepayCode\" <= 99      ";
+		} else if (iCustNo == 0) {
+			sql += "    bd.\"EntryDate\" >= :EntryDateFrom       ";
+			sql += "    AND bd.\"EntryDate\" <= :EntryDateTo     ";
+			sql += "    AND bd.\"CustNo\" >= 0          ";
+			sql += "    AND bd.\"CustNo\" <= 9999999    ";
+			sql += "    AND bd.\"RepayCode\" >= :RepayCode    ";
+			sql += "    AND bd.\"RepayCode\" <= :RepayCode    ";
+		} else {
+			sql += "    bd.\"EntryDate\" >= :EntryDateFrom       ";
+			sql += "    AND bd.\"EntryDate\" <= :EntryDateTo     ";
+			sql += "    AND bd.\"CustNo\" >= :CustNo   ";
+			sql += "    AND bd.\"CustNo\" <= :CustNo   ";
+			sql += "    AND bd.\"RepayCode\" >= :RepayCode    ";
+			sql += "    AND bd.\"RepayCode\" <= :RepayCode    ";
+		}
+
+		switch (iProcStsCode) {
+		case "A":
+			sql += "   and ((bd.\"ProcStsCode\" in ('0','2','3','4') ";
+			sql += "   and bh.\"BatxExeCode\" <> 8 )";
+			sql += "   or  bd.\"ProcStsCode\" in ('5','6','7')) ";
+			break;
+		case "R":
+			sql += "   and bd.\"ProcStsCode\" in ('0','2','3','4') ";
+			sql += "   and bh.\"BatxExeCode\" <> 8 ";
+			break;
+		case "S":
+			sql += "   and bd.\"ProcStsCode\" in ('5','6','7') ";
+			break;
+		default:
+			sql += "   and bd.\"ProcStsCode\" = '" + iProcStsCode + "'";
+			break;
+		}
 
 		sql += "ORDER BY                            ";
 		sql += "    \"CustNo\" ASC,                 ";
 		sql += "    \"FacmNo\" ASC,                 ";
 		sql += "    \"RepayCode\" ASC,              ";
 		sql += "    \"DetailSeq\" ASC               ";
-		
-
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		
-		if(iRepayCode == 0 && iCustNo == 0) {
+
+		if (iRepayCode == 0 && iCustNo == 0) {
 			query.setParameter("EntryDateFrom", iEntryDateFrom);
-			query.setParameter("EntryDateTo", iEntryDateTo);			
+			query.setParameter("EntryDateTo", iEntryDateTo);
 		} else if (iRepayCode == 0) {
 			query.setParameter("EntryDateFrom", iEntryDateFrom);
-			query.setParameter("EntryDateTo", iEntryDateTo);			
+			query.setParameter("EntryDateTo", iEntryDateTo);
 			query.setParameter("CustNo", iCustNo);
 		} else if (iCustNo == 0) {
 			query.setParameter("EntryDateFrom", iEntryDateFrom);
-			query.setParameter("EntryDateTo", iEntryDateTo);			
+			query.setParameter("EntryDateTo", iEntryDateTo);
 			query.setParameter("RepayCode", iRepayCode);
 		} else {
 			query.setParameter("EntryDateFrom", iEntryDateFrom);
-			query.setParameter("EntryDateTo", iEntryDateTo);			
+			query.setParameter("EntryDateTo", iEntryDateTo);
 			query.setParameter("CustNo", iCustNo);
 			query.setParameter("RepayCode", iRepayCode);
 		}
-		
-		
+
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 

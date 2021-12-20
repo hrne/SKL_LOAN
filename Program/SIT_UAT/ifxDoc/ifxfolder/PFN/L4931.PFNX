@@ -5,6 +5,5 @@
 
 總筆數:{{#batch-rows}}  選擇筆數:{{#batch-rows-selected}}  成功筆數:{{#batch-rows-ok}} 失敗筆數:{{#batch-rows-error}}
    
-     虛擬轉暫收 
 
 {{#batch-detail}}

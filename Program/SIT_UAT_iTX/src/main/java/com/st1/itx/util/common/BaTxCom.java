@@ -119,8 +119,6 @@ public class BaTxCom extends TradeBuffer {
 	private String includeIntFlag = "";// 是否內含利息
 	private String unpaidIntFlag = "";// 利息是否可欠繳
 	private String payMethod = "";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
-	// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
-	private BigDecimal dueAmt = BigDecimal.ZERO; // 應繳期金
 
 //  initialize
 	private void init() {
@@ -505,7 +503,7 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, TitaVo titaVo)
 			throws LogicException {
-		this.info("BaTxCom acLoanInt ...");
+		this.info("BaTxCom termsPay ..." + iEntryDate + "/ " + iCustNo + "-" + iFacmNo + "-" + iBormNo + "/ " + iTerms);
 		init();
 
 		// 費用是否全部回收
@@ -548,20 +546,26 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public ArrayList<BaTxVo> getDueAmt(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo)
 			throws LogicException {
-		this.info("BaTxCom acLoanInt ...");
+		this.info("BaTxCom getDueAmt ..." + iEntryDate + "/ " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		init();
 
 		// isTermAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
-		this.isEmptyLoanBaTxVo = true;
-		
+		this.isEmptyLoanBaTxVo = false;
+
 		// Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
 		loadUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 1, titaVo);
 
 		// 計算利息
 		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 80, BigDecimal.ZERO, 0, titaVo); // Terms = 0
+
+		if (this.baTxList != null) {
+			for (BaTxVo ba : this.baTxList) {
+				this.info("getDueAmt " + ba.toString());
+			}
+		}
 
 		return this.baTxList;
 	}
@@ -619,39 +623,38 @@ public class BaTxCom extends TradeBuffer {
 		int wkPayIntDate = iPayIntDate > 0 ? iPayIntDate : iEntryDate; // 試算應繳日
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 
-		if (iRepayType <= 3 || iRepayType == 90) {
-			if (iFacmNo > 0) {
-				wkFacmNoStart = iFacmNo;
-				wkFacmNoEnd = iFacmNo;
-			}
+		if (iFacmNo > 0) {
+			wkFacmNoStart = iFacmNo;
+			wkFacmNoEnd = iFacmNo;
+		}
 
-			if (iBormNo > 0) {
-				wkBormNoStart = iBormNo;
-				wkBormNoEnd = iBormNo;
-			}
-			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-					wkBormNoStart, wkBormNoEnd, this.index, Integer.MAX_VALUE, titaVo);
-			List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null
-					: new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
-			if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
-				throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
-			}
-			Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
-				public int compare(LoanBorMain c1, LoanBorMain c2) {
-					// status
-					if (c1.getStatus() != c2.getStatus()) {
-						return c1.getStatus() - c2.getStatus();
+		if (iBormNo > 0) {
+			wkBormNoStart = iBormNo;
+			wkBormNoEnd = iBormNo;
+		}
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, this.index, Integer.MAX_VALUE, titaVo);
+		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null
+				: new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
+		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
+		}
+		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
+			public int compare(LoanBorMain c1, LoanBorMain c2) {
+				// status
+				if (c1.getStatus() != c2.getStatus()) {
+					return c1.getStatus() - c2.getStatus();
+				}
+				// 回收時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
+				if (iRepayType == 1) {
+					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
+						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
 					}
-					// 回收時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
-					if (iRepayType == 1) {
-						if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
-							return c1.getNextPayIntDate() - c2.getNextPayIntDate();
-						}
-						if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
-							return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
-						}
+					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
-					// 部分償還時排序,依利率順序由大到小
+				}
+				// 部分償還時排序,依利率順序由大到小
 //					利率高至低>用途別>由額度編號大至小
 //					用途別為9->1->3->4->5->6->2
 //					欄位代碼       欄位說明     
@@ -662,205 +665,221 @@ public class BaTxCom extends TradeBuffer {
 //					5            企業投資  
 //					6            購置動產
 //					9            其他					
-					if (iRepayType == 2) {
-						if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
-							return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
-						}
-						// 若用途別不同
-						if (!c1.getUsageCode().equals(c2.getUsageCode())) {
-							int c1UsageCode = Integer.parseInt(c1.getUsageCode());
-							int c2UsageCode = Integer.parseInt(c2.getUsageCode());
+				if (iRepayType == 2) {
+					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
+					}
+					// 若用途別不同
+					if (!c1.getUsageCode().equals(c2.getUsageCode())) {
+						int c1UsageCode = Integer.parseInt(c1.getUsageCode());
+						int c2UsageCode = Integer.parseInt(c2.getUsageCode());
 
-							// C1優先的特殊情況
-							if (c1UsageCode == 9 || c2UsageCode == 2) {
-								return -1;
-							}
-							// C2優先的特殊情況
-							if (c1UsageCode == 2 || c2UsageCode == 9) {
-								return 1;
-							}
-							// 一般情況
-							return c1UsageCode - c2UsageCode;
+						// C1優先的特殊情況
+						if (c1UsageCode == 9 || c2UsageCode == 2) {
+							return -1;
 						}
+						// C2優先的特殊情況
+						if (c1UsageCode == 2 || c2UsageCode == 9) {
+							return 1;
+						}
+						// 一般情況
+						return c1UsageCode - c2UsageCode;
 					}
-					if (c1.getFacmNo() != c2.getFacmNo()) {
-						return c2.getFacmNo() - c1.getFacmNo();
-					}
-					if (c1.getBormNo() != c2.getBormNo()) {
-						return c2.getBormNo() - c1.getBormNo();
-					}
-					return 0;
 				}
-			});
-			for (LoanBorMain ln : lLoanBorMain) {
-				if (ln.getStatus() != 0) {
-					continue;
+				if (c1.getFacmNo() != c2.getFacmNo()) {
+					return c2.getFacmNo() - c1.getFacmNo();
 				}
-				this.info("order2 = " + ln.getLoanBorMainId());
-				this.loanBal = ln.getLoanBal(); // 還款前本金餘額
-				if (ln.getNextPayIntDate() < nextIntDate || nextIntDate == 0) {
-					nextIntDate = ln.getNextPayIntDate();
+				if (c1.getBormNo() != c2.getBormNo()) {
+					return c2.getBormNo() - c1.getBormNo();
 				}
-				switch (iRepayType) {
-				case 1: // 01-期款
-					if (iTerms == 0) {
-						int wkPrevTermNo = 0;
-						int wkRepayTermNo = 0;
-						// 應繳日
-						if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
-							wkTerms = 0;
-						} else {
-							// 計算至上次繳息日之期數
-							if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-								wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
-										ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
-							}
-							// 是否含提前繳期款
-							if (this.isTermAdvance) {
-								// 可回收期數 = 計算至入帳日/應繳日的應繳期數
-								wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
-										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-										wkPayIntDate);
-
-							} else {
-								// 可回收期數 = 可回收期數 + 批次預收期數
-								wkRepayTermNo = loanCom.getTermNo(
-										this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
-										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-										this.txBuffer.getTxCom().getTbsdy())
-										+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
-							}
-							wkTerms = wkRepayTermNo - wkPrevTermNo;
-						}
-					} else {
-						wkTerms = iTerms;
-					}
-
-					// 計息參數
-					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
-
-					// 無可計息， isEmptyLoanBaTxVo 是否放未計息餘額
-					if (wkTerms == 0 && isEmptyLoanBaTxVo) {
-						emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
-						break;
-					}
-
-					// 輸出每期
-					for (int i = 1; i <= wkTerms; i++) {
-						lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-						repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, i);
-						loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
-						loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
-						loanCalcRepayIntCom.setTerms(1); // 本次計息期數
-						loanCalcRepayIntCom.setIntStartDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 計算起日
-						loanCalcRepayIntCom.setIntEndDate(0); // 計息止日
-						loanCalcRepayIntCom.setPaidTerms(loanCalcRepayIntCom.getPaidTerms()); // 已繳息期數
-						loanCalcRepayIntCom.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate()); // 上次還本日
-						loanCalcRepayIntCom.setPrevPaidIntDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 上次繳息日
-						loanCalcRepayIntCom.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
-						loanCalcRepayIntCom.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
-						loanCalcRepayIntCom.setDueAmt(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額
-						if (loanCalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
-							break;
-						}
-					}
-					break;
-				case 2: // 部分償還金額
-					if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
-						throw new LogicException(titaVo, "E3072", "額度=" + parse.IntegerToString(ln.getFacmNo(), 3)
-								+ ", 部分償還前應先償還期款, 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有未回收期款
-					}
-					if (this.extraRepayAmt.compareTo(BigDecimal.ZERO) <= 0) {
-						break;
-					}
-					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
-					// 部分償還金額超過放款餘額
-					if (this.extraRepayAmt.compareTo(ln.getLoanBal()) >= 0 || iEntryDate >= ln.getMaturityDate()) {
-						loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案記號 Y:是 N:否
-					} else {
-						loanCalcRepayIntCom.setExtraRepayFlag(this.includeIntFlag); // 是否內含利息 Y:是 N:否
-						loanCalcRepayIntCom.setExtraRepay(this.extraRepayAmt);
-					}
-					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-					// 部分還本金額
-					this.extraRepayAmt = this.extraRepayAmt.subtract(loanCalcRepayIntCom.getPrincipal())
-							.subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
-							.subtract(loanCalcRepayIntCom.getBreachAmt());
-					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, 0);
-
-					break;
-				case 3: // 結案
-					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
-					loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案記號 Y:是 N:否
-					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, 0);
-					break;
-
-				case 80: // 計算利利率調整後次月份應繳期金
+				return 0;
+			}
+		});
+		for (LoanBorMain ln : lLoanBorMain) {
+			if (ln.getStatus() != 0) {
+				continue;
+			}
+			this.info("order2 = " + ln.getLoanBorMainId());
+			this.loanBal = ln.getLoanBal(); // 還款前本金餘額
+			if (ln.getNextPayIntDate() < nextIntDate || nextIntDate == 0) {
+				nextIntDate = ln.getNextPayIntDate();
+			}
+			switch (iRepayType) {
+			case 1: // 01-期款
+				if (iTerms == 0) {
 					int wkPrevTermNo = 0;
 					int wkRepayTermNo = 0;
-					// 計算至上次繳息日之期數
-					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-						wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-								ln.getSpecificDd(), ln.getPrevPayIntDate());
-					}
-					// 可回收期數 = 計算至入帳日/應繳日的當期期數
-					wkRepayTermNo = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-							ln.getSpecificDd(), wkPayIntDate);
-					wkTerms = wkRepayTermNo - wkPrevTermNo + 1;
-
-					// 計息參數
-					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
-					this.dueAmt = this.dueAmt.add(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額;
-					break;
-
-				case 90: // 提存
-					// iEntryDate 入帳日 ==> 月底日曆日
-					// iPayIntDate 利息計算止日 ==> 次月月初日
-					// 上次繳息日超過
-					if (ln.getPrevPayIntDate() >= iPayIntDate || ln.getDrawdownDate() >= iPayIntDate) {
-						loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iPayIntDate, 0, iEntryDate, titaVo);
-						emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
-						continue;
-					}
-					// 計算到利息計算止日之繳息期數 1:指定日期之當期數
-					wkTerms = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-							ln.getSpecificDd(), iPayIntDate);
-					// 減去計算至上次繳息日之期數
-					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-						wkTerms = wkTerms - loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(),
-								ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
-					}
-
-					loanSetRepayIntCom.setTxBuffer(this.getTxBuffer());
-					// 每次計算一期，最後一期計算到利息計算止日
-					if (iPayIntDate <= ln.getNextPayIntDate()) {
-						loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iPayIntDate, 0, iEntryDate, titaVo);
+					// 應繳日
+					if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
+						wkTerms = 0;
 					} else {
-						loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
-					}
-					for (int i = 1; i <= wkTerms; i++) {
-						if (i == wkTerms) {
-							loanCalcRepayIntCom.setTerms(0); // 本次計息期數
-							loanCalcRepayIntCom.setIntEndDate(iPayIntDate); // 計息止日
+						// 計算至上次繳息日之期數
+						if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+							wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
+									ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 						}
-						lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-						repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, i);
-						loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
-						loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
-						loanCalcRepayIntCom.setIntStartDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 計算起日
-						loanCalcRepayIntCom.setPaidTerms(loanCalcRepayIntCom.getPaidTerms()); // 已繳息期數
-						loanCalcRepayIntCom.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate()); // 上次還本日
-						loanCalcRepayIntCom.setPrevPaidIntDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 上次繳息日
-						loanCalcRepayIntCom.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
-						loanCalcRepayIntCom.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
-						loanCalcRepayIntCom.setDueAmt(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額
-						if (loanCalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
-							break;
+						// 是否含提前繳期款
+						if (this.isTermAdvance) {
+							// 可回收期數 = 計算至入帳日/應繳日的應繳期數
+							wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
+									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+									wkPayIntDate);
+
+						} else {
+							// 可回收期數 = 可回收期數 + 批次預收期數
+							wkRepayTermNo = loanCom.getTermNo(
+									this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
+									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+									this.txBuffer.getTxCom().getTbsdy())
+									+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
 						}
+						wkTerms = wkRepayTermNo - wkPrevTermNo;
 					}
+				} else {
+					wkTerms = iTerms;
+				}
+
+				// 計息參數
+				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
+
+				// 無可計息， isEmptyLoanBaTxVo 是否放未計息餘額
+				if (wkTerms == 0 && isEmptyLoanBaTxVo) {
+					emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
 					break;
 				}
+
+				// 輸出每期
+				for (int i = 1; i <= wkTerms; i++) {
+					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, i);
+					loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
+					loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
+					loanCalcRepayIntCom.setTerms(1); // 本次計息期數
+					loanCalcRepayIntCom.setIntStartDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 計算起日
+					loanCalcRepayIntCom.setIntEndDate(0); // 計息止日
+					loanCalcRepayIntCom.setPaidTerms(loanCalcRepayIntCom.getPaidTerms()); // 已繳息期數
+					loanCalcRepayIntCom.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate()); // 上次還本日
+					loanCalcRepayIntCom.setPrevPaidIntDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 上次繳息日
+					loanCalcRepayIntCom.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
+					loanCalcRepayIntCom.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
+					loanCalcRepayIntCom.setDueAmt(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額
+					if (loanCalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
+						break;
+					}
+				}
+				break;
+			case 2: // 部分償還金額
+				if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+					throw new LogicException(titaVo, "E3072", "額度=" + parse.IntegerToString(ln.getFacmNo(), 3)
+							+ ", 部分償還前應先償還期款, 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有未回收期款
+				}
+				if (this.extraRepayAmt.compareTo(BigDecimal.ZERO) <= 0) {
+					break;
+				}
+				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
+				// 部分償還金額超過放款餘額
+				if (this.extraRepayAmt.compareTo(ln.getLoanBal()) >= 0 || iEntryDate >= ln.getMaturityDate()) {
+					loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案記號 Y:是 N:否
+				} else {
+					loanCalcRepayIntCom.setExtraRepayFlag(this.includeIntFlag); // 是否內含利息 Y:是 N:否
+					loanCalcRepayIntCom.setExtraRepay(this.extraRepayAmt);
+				}
+				lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+				// 部分還本金額
+				this.extraRepayAmt = this.extraRepayAmt.subtract(loanCalcRepayIntCom.getPrincipal())
+						.subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
+						.subtract(loanCalcRepayIntCom.getBreachAmt());
+				repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, 0);
+
+				break;
+			case 3: // 結案
+				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
+				loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案記號 Y:是 N:否
+				lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+				repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, 0);
+				break;
+
+			case 80: // 計算利利率調整後次月份應繳期金
+				int wkPrevTermNo = 0;
+				int wkRepayTermNo = 0;
+				// 計算至上次繳息日之期數
+				if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+					wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+							ln.getSpecificDd(), ln.getPrevPayIntDate());
+				}
+				// 可回收期數 = 計算至入帳日/應繳日的當期期數
+				wkRepayTermNo = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+						ln.getSpecificDd(), wkPayIntDate);
+				wkTerms = wkRepayTermNo - wkPrevTermNo;
+				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
+				if (wkTerms > 0) {
+					// 計息參數
+					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+					loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
+					loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
+					loanCalcRepayIntCom.setIntStartDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 計算起日
+					loanCalcRepayIntCom.setPaidTerms(loanCalcRepayIntCom.getPaidTerms()); // 已繳息期數
+					loanCalcRepayIntCom.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate()); // 上次還本日
+					loanCalcRepayIntCom.setPrevPaidIntDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 上次繳息日
+					loanCalcRepayIntCom.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
+					loanCalcRepayIntCom.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
+					loanCalcRepayIntCom.setDueAmt(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額
+					if (loanCalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
+						break;
+					}
+				}
+				// 再收一期
+				loanCalcRepayIntCom.setTerms(1);
+				lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+				repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, 1);
+				break;
+
+			case 90: // 提存
+				// iEntryDate 入帳日 ==> 月底日曆日
+				// iPayIntDate 利息計算止日 ==> 次月月初日
+				// 上次繳息日超過
+				if (ln.getPrevPayIntDate() >= iPayIntDate || ln.getDrawdownDate() >= iPayIntDate) {
+					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iPayIntDate, 0, iEntryDate, titaVo);
+					emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
+					continue;
+				}
+				// 計算到利息計算止日之繳息期數 1:指定日期之當期數
+				wkTerms = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+						ln.getSpecificDd(), iPayIntDate);
+				// 減去計算至上次繳息日之期數
+				if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+					wkTerms = wkTerms - loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+							ln.getSpecificDd(), ln.getPrevPayIntDate());
+				}
+
+				loanSetRepayIntCom.setTxBuffer(this.getTxBuffer());
+				// 每次計算一期，最後一期計算到利息計算止日
+				if (iPayIntDate <= ln.getNextPayIntDate()) {
+					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iPayIntDate, 0, iEntryDate, titaVo);
+				} else {
+					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
+				}
+				for (int i = 1; i <= wkTerms; i++) {
+					if (i == wkTerms) {
+						loanCalcRepayIntCom.setTerms(0); // 本次計息期數
+						loanCalcRepayIntCom.setIntEndDate(iPayIntDate); // 計息止日
+					}
+					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, i);
+					loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
+					loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
+					loanCalcRepayIntCom.setIntStartDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 計算起日
+					loanCalcRepayIntCom.setPaidTerms(loanCalcRepayIntCom.getPaidTerms()); // 已繳息期數
+					loanCalcRepayIntCom.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate()); // 上次還本日
+					loanCalcRepayIntCom.setPrevPaidIntDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 上次繳息日
+					loanCalcRepayIntCom.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
+					loanCalcRepayIntCom.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
+					loanCalcRepayIntCom.setDueAmt(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額
+					if (loanCalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
+						break;
+					}
+				}
+				break;
 			}
 		}
 		// 逾期期數、逾期天數
@@ -1644,15 +1663,6 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public int getOvduDays() {
 		return ovduDays;
-	}
-
-	/**
-	 * 應繳期金
-	 * 
-	 * @return 應繳期金
-	 */
-	public BigDecimal getDueAmt() {
-		return dueAmt;
 	}
 
 }

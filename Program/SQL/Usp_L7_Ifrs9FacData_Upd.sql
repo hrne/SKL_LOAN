@@ -68,7 +68,7 @@ BEGIN
     INSERT INTO "Work_Ifrs9FacData"
     SELECT M."CustNo"              AS "CustNo"        -- 戶號
          , M."FacmNo"              AS "FacmNo"        -- 額度編號
-         , 0                       AS "DrawdownFg"    -- 已核撥
+         , 1                       AS "DrawdownFg"    -- 已核撥
          , 0                       AS "TotalLoanBal"  -- 本金餘額(撥款)合計
     FROM   "FacMain" M
       LEFT JOIN "Work_Ifrs9FacData" WK ON WK."CustNo" = M."CustNo"

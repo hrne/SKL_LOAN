@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxHoliday;
 import com.st1.itx.db.domain.TxHolidayId;
 import com.st1.itx.db.service.TxHolidayService;
+import com.st1.itx.trade.LC.LC800;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -52,6 +53,9 @@ public class L6310 extends TradeBuffer {
 
 	@Autowired
 	SendRsp sendRsp;
+
+	@Autowired
+	LC800 lC800;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -179,6 +183,8 @@ public class L6310 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6310"); // 功能選擇錯誤
 		}
 
+		// Adam 更新完假日檔需更新營業日
+		this.lC800.proc(titaVo, "N2ONLINE", this.lC800.proc(titaVo, "NONLINE", this.lC800.proc(titaVo, "ONLINE", titaVo.getEntDy()).getNbsDy() + "").getNbsDy() + "");
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

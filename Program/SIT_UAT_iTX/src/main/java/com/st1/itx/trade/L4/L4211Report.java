@@ -109,7 +109,7 @@ public class L4211Report extends MakeReport {
 		this.print(-3, 82, "匯款總傳票明細表 ----(									)", "C");
 		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
-		this.print(-4, 160, "頁    數：" + this.getNowPage(), "R");
+		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
 		
@@ -148,7 +148,7 @@ public class L4211Report extends MakeReport {
 		this.print(-3, 77, "匯款總傳票明細表－以金額排序 ----(									)", "C");
 		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
-		this.print(-4, 160, "頁    數：" + this.getNowPage(), "R");
+		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
 		
@@ -187,7 +187,7 @@ public class L4211Report extends MakeReport {
 		this.print(-3, 82, "匯款明細表－依戶號 ----(									)", "C");
 		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
-		this.print(-4, 160, "頁    數：" + this.getNowPage(), "R");
+		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
 		
@@ -228,6 +228,10 @@ public class L4211Report extends MakeReport {
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
 
+		if(fnAllList == null) {	
+				throw new LogicException("E2003", "查無資料"); // 查無資料
+		}
+		
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4211", "匯款總傳票明細表", "", "A4", "L");
 
 		reportkind = 1;
@@ -411,14 +415,19 @@ public class L4211Report extends MakeReport {
 
 				}
 
-				if (pageCnt >= 40) { // 超過40筆自動換頁 並印出當前的代碼
+				if (pageCnt >= 30) { // 超過30筆自動換頁 並印出當前的代碼
 					
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					this.print(-2, 66, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-					this.print(-4, 18, tfnAllList.get("F1"));// 批次號碼(表頭)
+					if (tfnAllList.get("F0").equals("P03")) {
+						this.print(-3, 90, "A7");
+					} else {
+						this.print(-3, 90, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+					}
+					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
+				
 				}
 			} // else 
 
@@ -726,13 +735,17 @@ public class L4211Report extends MakeReport {
 
 				}
 
-				if (pageCnt >= 40) { // 超過40筆自動換頁 並印出當前的代碼
+				if (pageCnt >= 30) { // 超過40筆自動換頁 並印出當前的代碼
 					
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					this.print(-2, 66, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-					this.print(-4, 18, tfnAllList.get("F1"));// 批次號碼(表頭)
+					if (tfnAllList.get("F0").equals("P03")) {
+						this.print(-3, 90, "A7");
+					} else {
+						this.print(-3, 90, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+					}
+					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}
 			} // else 
@@ -1037,13 +1050,17 @@ public class L4211Report extends MakeReport {
 
 				}
 
-				if (pageCnt >= 40) { // 超過40筆自動換頁 並印出當前的代碼
+				if (pageCnt >= 30) { // 超過40筆自動換頁 並印出當前的代碼
 					
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					this.print(-2, 66, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-					this.print(-4, 18, tfnAllList.get("F1"));// 批次號碼(表頭)
+					if (tfnAllList.get("F0").equals("P03")) {
+						this.print(-3, 90, "A7");
+					} else {
+						this.print(-3, 90, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+					}
+					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}
 			} // else 
@@ -1257,7 +1274,6 @@ public class L4211Report extends MakeReport {
 		}
 		
 	}
-	
 	
 	private void totalAll() {
 		

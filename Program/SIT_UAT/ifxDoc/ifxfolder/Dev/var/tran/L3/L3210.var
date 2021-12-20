@@ -412,7 +412,6 @@ T(3,@FdServiceCenter, )
 T(3,@FdCreditorId, )
 T(3,@FdCreditorBankCode, )
 INVOKEJS(SHOW,p1,5,5,1)
-T(F,@FacmNo,0)
 !T(F,@FdFacmNo, )
 C(3,#ChequeFlag,1,$,S)
 SHOW(#BTN1)
@@ -431,7 +430,6 @@ T(3,@FdServiceCenter,*)
 T(3,@FdCreditorId,*)
 T(3,@FdCreditorBankCode,*)
 INVOKEJS(SHOW,p1,5,5,0)
-T(F,@FacmNo,1)
 T(F,@FdFacmNo,*)
 
 #InitDisplay=X,1,S
@@ -516,7 +514,7 @@ SHOW(#EntryDate)
 
 #MsgErrFacmNo=X,1,S
 C(3,#ChequeFlag,1,S,$)
-C(3,#FacmNo,0,$,S)
+C(3,#EntryDate,0,$,S)
 @
 V(P,入帳日期及額度編號必須有值，請按[已入帳未還款查]選取入帳日期及額度編號)
 
@@ -538,10 +536,8 @@ C(3,#ChequeFlag,1
   ,HIDE(#TwTempAmt,#UsTempAmt)SHOW(#TempAmtX)T(3,@FdTempAmt, ))
 
 #FacmNo=A,3,I
-C(3,#ChequeFlag,1,$,s)
 C(3,#ApplNo,0,$,s)
-@
-V(2,0)
+
 
 
 ![已入帳未還款-明細序號]
@@ -552,6 +548,7 @@ V(2,0)
 
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
+C(3,#FacmNo,0,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
@@ -620,7 +617,7 @@ E(0,#TimTempAmt)
 
 #TempSourceCode=A,2,S
 HIDE(#TempSourceCode)
-IF(#TempReasonCode==00,E(0,9),$)
+! IF(#TempReasonCode==00,E(0,9),$)
 IF(#TempReasonCode==00,s,$)
 C(3,#ChequeFlag,1,E(0,4),$)
 C(3,#ChequeFlag,1,s,$)
