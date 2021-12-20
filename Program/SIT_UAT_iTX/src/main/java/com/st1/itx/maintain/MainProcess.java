@@ -373,7 +373,7 @@ public class MainProcess extends SysLogger {
 		else
 			this.titaVo.putParam(ContentName.curnm, txBuffer.getMgCurr().getCurnm(titaVo.getCurCodeS()));
 		
-		if (this.titaVo.isHolidayChange(this.txBuffer.getTxBizDate().getNbsDy(), this.txBuffer.getTxBizDate().getNnbsDy()))
+		if (this.titaVo.isHolidayChange(this.txBuffer.getTxBizDate().getNbsDy(), this.txBuffer.getTxBizDate().getNnbsDy()) && !this.getTitaVo().isEloan())
 			throw new LogicException("CE000", "下營業日或下下營業日不符,請重新登入系統");
 
 		// eric 2020.6.8 remark
