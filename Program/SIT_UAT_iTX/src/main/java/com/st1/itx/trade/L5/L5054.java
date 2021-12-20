@@ -65,7 +65,7 @@ public class L5054 extends TradeBuffer {
 		} else {
 			int cnt = 0;
 			for (Map<String, String> MapL5054 : L5054VoList) {
-				this.info("L5053 L5053VoList count =" + ++cnt);
+
 //				@SuppressWarnings("unchecked")
 //				Map<String, String> MapL5054 = (Map<String, String>) ThisObject;
 				// L5053Vo L5053VO = (L5053Vo) l5053ServiceImpl.MapToVO(MapL5054, "L5053",
@@ -108,13 +108,28 @@ public class L5054 extends TradeBuffer {
 					workSeason -= 19110;
 				}
 				occursList.putParam("OWorkSeason", workSeason);//
-				occursList.putParam("OMediaFg", MapL5054.get("F12"));//
-				int mediaDate = Integer.valueOf(MapL5054.get("F13"));
-				if (mediaDate > 0) {
-					mediaDate -= 19110000;
+				
+				if (MapL5054.get("MediaDate") == null || "".equals(MapL5054.get("MediaDate"))) {
+					occursList.putParam("OMediaFg", 0);//
+					occursList.putParam("OMediaDate", 0);
+				} else {
+					occursList.putParam("OMediaFg", 1);//
+					occursList.putParam("OMediaDate", parse.stringToStringDate(MapL5054.get("MediaDate")));
 				}
-				occursList.putParam("OMediaDate", mediaDate);//
+				
 				occursList.putParam("OManualFg", MapL5054.get("F14"));//
+
+				this.info("L5054 CreateDate =" + MapL5054.get("CreateDate") + "/" + MapL5054.get("LastUpdate"));
+				if (MapL5054.get("CreateDate").equals(MapL5054.get("LastUpdate"))) {
+					occursList.putParam("OLogFg", 0);//
+				} else {
+					occursList.putParam("OLogFg", 1);//
+				}
+
+				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5054.get("LastUpdate")));
+
+				occursList.putParam("OLastEmp",
+						MapL5054.get("LastUpdateEmpNo") + " " + MapL5054.get("LastUpdateEmpName"));
 
 				this.totaVo.addOccursList(occursList);
 			}

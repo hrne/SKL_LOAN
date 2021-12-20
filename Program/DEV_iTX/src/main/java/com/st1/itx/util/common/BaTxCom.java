@@ -166,7 +166,6 @@ public class BaTxCom extends TradeBuffer {
 		this.includeIntFlag = "Y";// 是否內含利息
 		this.unpaidIntFlag = "N";// 利息是否可欠繳
 		this.payMethod = "0";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
-
 	}
 
 	@Override
@@ -1157,6 +1156,14 @@ public class BaTxCom extends TradeBuffer {
 				rpFacmNo = srvList.getContent().get(0).getFacmNo();
 			}
 		} else {
+			// 計息、至還款應繳日部分繳款
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) == 0 && this.repayIntDate > 0
+						&& ba.getPayIntDate() <= this.repayIntDate) {
+					rpFacmNo = ba.getFacmNo();
+					break;
+				}
+			}
 			// 計息、無帳務
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {

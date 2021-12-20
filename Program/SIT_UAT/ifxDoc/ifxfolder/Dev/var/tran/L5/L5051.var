@@ -10,7 +10,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,379)ASGN(INQLEN$)
+E(0,381)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -49,9 +49,15 @@ K(MODIFYBUTTON,1,LD006 三階放款明細統計檔)
 ["#FdWorkMonthFm+．工作月期間",#WorkMonthFm,"~",#WorkMonthTo],
 ["#FdPerfDateFm+．撥款起訖日",#PerfDateFm,"~",#PerfDateTo],
 ["#FdCustNo+戶號",#CustNo,"-",#FacmNo],
-["#FdIntroducer+介紹人",#Introducer],
+["#FdIntroducer+介紹人",#Introducer,#BtnCdEmp,#IntroducerX],
 ["#FdSumByFacm+額度加總",#SumByFacm],
 ]
+<include src="ROM.icf::L2R08.dec"/>
+
+![Buttom資料查詢]
+#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
+#BindCdEmp=X,1,S
+BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:Introducer2<-OOEmployeeNo:IntroducerX<-OOFullname})
 
 #FdCustNo=X,2,L
 T(3, )
@@ -143,6 +149,26 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 
 #Introducer=X,6,I
 
+#Introducer2=X,6,S
+
+#IntroducerX=X,40,L
+C(4,#Introducer,S,$)
+
+#RimTxCode=X,5,S
+#RimEmployeeNo=X,6,S
+
+#RIM_L2R08=X,1,S
+C(4,#Introducer,S,$)
+C(5,#Introducer,#Introducer2,S,$)
+T(3,@IntroducerX,)
+RESET_RIM(#RIM_L2R08,L2R08)
+T(2,@RimEmployeeNo,#Introducer)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo)
+R(1,L2R08)
+T(2,@IntroducerX,#L2r08FullName)
+T(2,@Introducer2,#Introducer)
+
+
 ! 額度加總
 #SumByFacm=X,1,I
 C(4,#SumByFacm,T(3,N),$)
@@ -184,7 +210,7 @@ E(0,1)ASGN(LOOP$)
 #OOBsOfficer=X,6,S
 
 !戶名
-#OOCustName=x,100,S
+#OOCustName=x,2.50,S
 
 !戶號
 #OOCustNo=A,7,S
@@ -263,6 +289,8 @@ E(0,1)ASGN(LOOP$)
 #OORepayTypeX=x,20,S
 T(H,@OORepayType,#RepayTypeHelp)
 
+#OOLog=A,1,S
+
 #OOBufA=X,21,S
 T(2,2+#OOLogNo)
 
@@ -287,8 +315,21 @@ T(2,4+#OOLogNo)
 #OOBtnC=A,2,O
 C(5,#OOAdjRange,0,BIND(grid,cancel),
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=刪除; ntxbuf=#OOBufC}))
-C(3,#OOCanModify,1,$,BIND(grid,cancel))
+IF(#OOLog==1||#OOLog==2,$,BIND(grid,cancel))
 C(4,#OOWorkMonth,BIND(grid,cancel),$)
+
+#OOMrKey=X,20,S
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+
+#SYSCDATE7=X,7,S
+T(1,#SYSCDATE,2,7)
+
+#OOBufD=x,100,S
+T(2,00000000000000L5501                  0000000000000+#OOMrKey+L55050010101+#SYSCDATE7)
+
+#OOBtnD=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L6932; ntxbuf=#OOBufD})
+C(3,#OOLog,9,BIND(grid,cancel),$)
 
 </sub>
 
@@ -307,6 +348,7 @@ C(4,#OOWorkMonth,BIND(grid,cancel),$)
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
 TXFORM=L5051
 #OOLogNo
 #OOBsDeptName
@@ -338,6 +380,7 @@ TXFORM=L5051
 #OOWorkMonth
 #OOCanModify
 #OORepayType
+#OOLog
 ^
 </sub>
 
@@ -361,6 +404,9 @@ TXFORM=L5051
 
 #OOBtnB=計件<BR>代碼
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+
+#OOBtnD=歷程
+{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
 
 !部室中文(房貸專員)
 #OOBsDeptName=房貸專員<br>部室中文

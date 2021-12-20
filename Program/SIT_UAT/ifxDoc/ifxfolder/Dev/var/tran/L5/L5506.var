@@ -32,28 +32,28 @@ E(0,0)
 ["#FdUnitType+單位類別",#UnitType,"@(1:全部@2:單位@3:區部@4:部室@5:區部＋部室)"],
 ["#FdSumAmt+累計達成金額",#SumAmtSign,#SumAmt],
 ["#FdSumCnt+累計達成件數",#SumCntSign,#SumCnt],
-["#FdUnitCode+單位代號",#UnitCode,#BTN2,#UnitItem],
-["#FdDistCode+區部代號",#DistCode,#BTN3,#DistItem],
-["#FdDeptCode+部室代號",#DeptCode,#BTN4,#DeptItem],
+["#FdUnitCode+單位代號",#UnitCode,#UnitItem],
+["#FdDistCode+區部代號",#DistCode,#DistItem],
+["#FdDeptCode+部室代號",#DeptCode,#DeptItem],
 ]
 
 
 ![Buttom資料查詢]
 #BTN1=X,15,I,ui:button;value:業績查詢;enable:1;tabbable:0;title:L5051 業績查詢;
-#BTN2=X,15,I,ui:button;value:單位查詢;enable:1;tabbable:0;title:L5051 單位查詢;
-#BTN3=X,15,I,ui:button;value:區部查詢;enable:1;tabbable:0;title:L5051 區部查詢;
-#BTN4=X,15,I,ui:button;value:部室查詢;enable:1;tabbable:0;title:L5051 部室查詢;
+!#BTN2=X,15,I,ui:button;value:單位查詢;enable:1;tabbable:0;title:L5051 單位查詢;
+!#BTN3=X,15,I,ui:button;value:區部查詢;enable:1;tabbable:0;title:L5051 區部查詢;
+!#BTN4=X,15,I,ui:button;value:部室查詢;enable:1;tabbable:0;title:L5051 部室查詢;
 
 #BUF1=X,100,S
 
 #BIND1=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L5051; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:BormNo<-OOBormNo:CustNm<-OOCustNm})
-#BIND2=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUF1;ntxbuf5=type<-1:UnitCode<-OOUnitCode:UnitItem<-OOUnitItem})
-#BIND3=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUF1;ntxbuf5=type<-1:DistCode<-OODistCode:DistItem<-OODistItem})
-#BIND4=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUF1;ntxbuf5=type<-1:DeptCode<-OODeptCode:DeptItem<-OODeptItem})
+!#BIND2=X,1,S
+!BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUF1;ntxbuf5=type<-1:UnitCode<-OOUnitCode:UnitItem<-OOUnitItem})
+!#BIND3=X,1,S
+!BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUF1;ntxbuf5=type<-1:DistCode<-OODistCode:DistItem<-OODistItem})
+!#BIND4=X,1,S
+!BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUF1;ntxbuf5=type<-1:DeptCode<-OODeptCode:DeptItem<-OODeptItem})
 
 
 #FdFunCodeX=X,2,L
@@ -67,19 +67,16 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUF1;ntxbuf5=type<-1:DeptCode
 #FdSumAmt=X,2,L
 #FdSumCnt=X,2,L    
 #FdUnitCode=X,2,L
-T(3,*)
 #FdDistCode=X,2,L
-T(3,*)
 #FdDeptCode=X,2,L
-T(3,*)
 
 #ShowHide=@,1,S
-INVOKEJS(SHOW,p1,10,12,0)
-C(2,#UnitType,$,INVOKEJS(SHOW,p1,10,12,1)
-               ,INVOKEJS(SHOW,p1,10,10,1)INVOKEJS(SHOW,p1,11,12,0)
-               ,INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1)INVOKEJS(SHOW,p1,12,12,0)
-               ,INVOKEJS(SHOW,p1,10,11,0)INVOKEJS(SHOW,p1,12,12,1)
-               ,INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,12,1))
+!INVOKEJS(SHOW,p1,10,12,0)
+!C(2,#UnitType,$,INVOKEJS(SHOW,p1,10,12,1)
+!               ,INVOKEJS(SHOW,p1,10,10,1)INVOKEJS(SHOW,p1,11,12,0)
+!               ,INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1)INVOKEJS(SHOW,p1,12,12,0)
+!               ,INVOKEJS(SHOW,p1,10,11,0)INVOKEJS(SHOW,p1,12,12,1)
+!               ,INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,12,1))
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #CODEFuncCode1=x,20,S                  
@@ -139,9 +136,9 @@ T(F,@SumCnt,0)
 T(F,@UnitCode,0)
 T(F,@DistCode,0)
 T(F,@DeptCode,0)
-HIDE(#BTN2)
-HIDE(#BTN3)
-HIDE(#BTN4)
+!HIDE(#BTN2)
+!HIDE(#BTN3)
+!HIDE(#BTN4)
 
 <include src="ROM.icf::L5R30.dec"/>
 
@@ -172,7 +169,7 @@ C(3,#FunCode,1,$,S)
 RESET_RIM(#Rim2,L5R45)
 S(L5R45,01,#FunCode,#CustNo,#FacmNo,#BormNo)
 R(1,L5R45)
-INVOKEJS(SHOW,p1,10,12,0)
+!INVOKEJS(SHOW,p1,10,12,0)
 
 #PerfDate=D,7,S
 
@@ -204,7 +201,7 @@ V(5,1,5)
 CALL(#ShowHide)
 
 #SignHelp=x,1024,S
-T(3, :空白不調整;+:增加;-:增少)
+T(3, :空白不調整;+:增加;-:減少)
 
 #SumAmtSign=X,1,I
 C(2,#FunCode,s,$,$,$,s,s)
@@ -212,7 +209,7 @@ HELP(#SignHelp)
 @
 V(H,#SignHelp)
 
-#SumAmt=m,15,I
+#SumAmt=m,14,I
 C(2,#FunCode,s,$,$,$,s,s)
 C(4,#SumAmtSign,S,$)
 @
@@ -233,26 +230,26 @@ V(2,0)
 #Chk=X,1,S
 C(4,#SumAmtSign,C(4,#SumCntSign,V(P,無調整累計達成金額及件數),$),$)
 
-#UnitCode=X,6,I
-C(2,#FunCode,s,$,$,$,s,s)
-C(5,#FdUnitCode,*,$,S)
-@
-V(7)
+#UnitCode=X,6,L
+!C(2,#FunCode,s,$,$,$,s,s)
+!C(5,#FdUnitCode,*,$,S)
+!@
+!V(7)
 
 #UnitItem=x,50,L
 
-#DistCode=X,6,I
-C(2,#FunCode,s,$,$,$,s,s)
-C(5,#FdDistCode,*,$,S)
-@
-V(7)
+#DistCode=X,6,L
+!C(2,#FunCode,s,$,$,$,s,s)
+!C(5,#FdDistCode,*,$,S)
+!@
+!V(7)
 #DistItem=x,50,L
 
-#DeptCode=X,6,I
-C(2,#FunCode,s,$,$,$,s,s)
-C(5,#FdDeptCode,*,$,S)
-@
-V(7)
+#DeptCode=X,6,L
+!C(2,#FunCode,s,$,$,$,s,s)
+!C(5,#FdDeptCode,*,$,S)
+!@
+!V(7)
 #DeptItem=x,50,L
 
 </sub>

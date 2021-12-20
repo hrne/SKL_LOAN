@@ -44,12 +44,24 @@ public class L5504 extends TradeBuffer {
 		this.info("active L5504 ");
 		this.totaVo.init(titaVo);
 
+		String iFunCode = titaVo.get("FunCode").trim();
+		if ("1".equals(iFunCode)) {
+			int custNo = Integer.valueOf(titaVo.getParam("CustNo"));
+			int facmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
+			int bormNo = Integer.valueOf(titaVo.getParam("BormNo"));
+			int bonusType = Integer.valueOf(titaVo.getParam("BonusType"));
+			PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(custNo, facmNo, bormNo, bonusType, titaVo);
+			if (pfRewardMedia != null) {
+
+				throw new LogicException("E0002", "介紹人加碼獎金資料");
+			}
+		}
+		
 		// 交易需主管核可
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "異動獎金資料");
 		}
 
-		String iFunCode = titaVo.get("FunCode").trim();
 		long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
 
 		PfRewardMedia pfRewardMedia = pfRewardMediaService.holdById(iBonusNo, titaVo);
@@ -111,7 +123,7 @@ public class L5504 extends TradeBuffer {
 					}
 					//
 					dataLog.setEnv(titaVo, pfRewardMedia2, pfRewardMedia);
-					dataLog.exec(titaVo.get("Remark").trim());
+					dataLog.exec("修改獎金資料");
 
 				} else if ("4".equals(iFunCode)) {
 					if (pfRewardMedia.getManualFg() == 0) {
@@ -122,6 +134,8 @@ public class L5504 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", "");
 					}
+					dataLog.setEnv(titaVo, pfRewardMedia, pfRewardMedia);
+					dataLog.exec("刪除人工新增獎金");
 				}
 			}
 		}

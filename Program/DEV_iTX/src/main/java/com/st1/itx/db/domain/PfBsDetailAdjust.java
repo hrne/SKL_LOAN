@@ -30,7 +30,7 @@ public class PfBsDetailAdjust implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2893487169468747127L;
+	private static final long serialVersionUID = 6968969355754285997L;
 
 // 序號
   @Id
@@ -47,6 +47,10 @@ public class PfBsDetailAdjust implements Serializable {
   @Column(name = "`FacmNo`")
   private int facmNo = 0;
 
+  // 撥款序號
+  @Column(name = "`BormNo`")
+  private int bormNo = 0;
+
   // 工作月
   @Column(name = "`WorkMonth`")
   private int workMonth = 0;
@@ -55,11 +59,11 @@ public class PfBsDetailAdjust implements Serializable {
   @Column(name = "`WorkSeason`")
   private int workSeason = 0;
 
-  // 週整加減件數
+  // 週整後件數
   @Column(name = "`AdjPerfCnt`")
   private BigDecimal adjPerfCnt = new BigDecimal("0");
 
-  // 週整加減業績金額
+  // 週整後業績金額
   @Column(name = "`AdjPerfAmt`")
   private BigDecimal adjPerfAmt = new BigDecimal("0");
 
@@ -141,6 +145,25 @@ public class PfBsDetailAdjust implements Serializable {
   }
 
 /**
+	* 撥款序號<br>
+	* 
+	* @return Integer
+	*/
+  public int getBormNo() {
+    return this.bormNo;
+  }
+
+/**
+	* 撥款序號<br>
+	* 
+  *
+  * @param bormNo 撥款序號
+	*/
+  public void setBormNo(int bormNo) {
+    this.bormNo = bormNo;
+  }
+
+/**
 	* 工作月<br>
 	* 
 	* @return Integer
@@ -179,7 +202,7 @@ public class PfBsDetailAdjust implements Serializable {
   }
 
 /**
-	* 週整加減件數<br>
+	* 週整後件數<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -188,17 +211,17 @@ public class PfBsDetailAdjust implements Serializable {
   }
 
 /**
-	* 週整加減件數<br>
+	* 週整後件數<br>
 	* 
   *
-  * @param adjPerfCnt 週整加減件數
+  * @param adjPerfCnt 週整後件數
 	*/
   public void setAdjPerfCnt(BigDecimal adjPerfCnt) {
     this.adjPerfCnt = adjPerfCnt;
   }
 
 /**
-	* 週整加減業績金額<br>
+	* 週整後業績金額<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -207,10 +230,10 @@ public class PfBsDetailAdjust implements Serializable {
   }
 
 /**
-	* 週整加減業績金額<br>
+	* 週整後業績金額<br>
 	* 
   *
-  * @param adjPerfAmt 週整加減業績金額
+  * @param adjPerfAmt 週整後業績金額
 	*/
   public void setAdjPerfAmt(BigDecimal adjPerfAmt) {
     this.adjPerfAmt = adjPerfAmt;
@@ -295,7 +318,8 @@ public class PfBsDetailAdjust implements Serializable {
 
   @Override
   public String toString() {
-    return "PfBsDetailAdjust [logNo=" + logNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", workMonth=" + workMonth + ", workSeason=" + workSeason + ", adjPerfCnt=" + adjPerfCnt
-           + ", adjPerfAmt=" + adjPerfAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "PfBsDetailAdjust [logNo=" + logNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", workMonth=" + workMonth + ", workSeason=" + workSeason
+           + ", adjPerfCnt=" + adjPerfCnt + ", adjPerfAmt=" + adjPerfAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

@@ -110,20 +110,20 @@ em = null;
   }
 
   @Override
-  public PfBsDetailAdjust findCustFacmFirst(int custNo_0, int facmNo_1, int workMonth_2, TitaVo... titaVo) {
+  public PfBsDetailAdjust findCustBormFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findCustFacmFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " workMonth_2 : " +  workMonth_2);
+    this.info("findCustBormFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2);
     Optional<PfBsDetailAdjust> pfBsDetailAdjustT = null;
     if (dbName.equals(ContentName.onDay))
-      pfBsDetailAdjustT = pfBsDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfBsDetailAdjustT = pfBsDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
     else if (dbName.equals(ContentName.onMon))
-      pfBsDetailAdjustT = pfBsDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfBsDetailAdjustT = pfBsDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
     else if (dbName.equals(ContentName.onHist))
-      pfBsDetailAdjustT = pfBsDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfBsDetailAdjustT = pfBsDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
     else 
-      pfBsDetailAdjustT = pfBsDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndWorkMonthIs(custNo_0, facmNo_1, workMonth_2);
+      pfBsDetailAdjustT = pfBsDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
 
     return pfBsDetailAdjustT.isPresent() ? pfBsDetailAdjustT.get() : null;
   }

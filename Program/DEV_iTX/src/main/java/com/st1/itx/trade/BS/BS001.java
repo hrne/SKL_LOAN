@@ -45,11 +45,13 @@ import com.st1.itx.util.parse.Parse;
  * 4.1 BS004 新增應處理明細－員工資料異動更新<br>
  * 4.2 BS005 新增應處理明細－預約撥款到期<br>
  * 4.3 BS006 新增應處理明細－支票兌現檢核<br>
- * 4.4 BS901 新增應處理明細－未付火險費提存，月初日迴轉上月<br>
- * 4.5 BS010 新增應處理明細－轉列催收<br>
- * 4.6 BS020 新增整批入帳明細－暫收抵繳期款<br>
- * 4.7 BS060 現金流量預估資料檔維護(月底前五個營業日)<br>
- * 4.8 BS600 放款戶帳冊別轉換(帳冊別帳務調整日期等於系統營業日時)<br>
+ * 4.4 BS007 新增應處理明細－未齊件到期通知<br>
+ * 4.5 BS901 新增應處理明細－未付火險費提存，月初日迴轉上月<br>
+ * 4.6 BS902 新增應處理明細－聯貸費用攤提(月初日)<br>
+ * 4.7 BS010 新增應處理明細－轉列催收<br>
+ * 4.8 BS020 新增整批入帳明細－暫收抵繳期款<br>
+ * 4.9 BS060 現金流量預估資料檔維護(月底前五個營業日)<br>
+ * 4.10 BS600 放款戶帳冊別轉換(帳冊別帳務調整日期等於系統營業日時)<br>
  * 
  * @author Lai
  * @version 1.0.0
@@ -141,6 +143,10 @@ public class BS001 extends TradeBuffer {
 		// 啟動背景作業－新增應處理明細－未付火險費提存，月初日迴轉上月
 		if (this.txBuffer.getMgBizDate().getTbsDy() / 100 != this.txBuffer.getMgBizDate().getLbsDy() / 100) {
 			MySpring.newTask("BS901", this.txBuffer, titaVo);
+		}
+		// 啟動背景作業－新增應處理明細－聯貸費用攤提(月初日)
+		if (this.txBuffer.getMgBizDate().getTbsDy() / 100 != this.txBuffer.getMgBizDate().getLbsDy() / 100) {
+			MySpring.newTask("BS902", this.txBuffer, titaVo);
 		}
 		// 啟動背景作業－BS010 新增應處理明細－放款轉列催收、火險費轉列催收、法務費轉列催收
 		MySpring.newTask("BS010", this.txBuffer, titaVo);

@@ -114,9 +114,17 @@ public class L5051 extends TradeBuffer {
 				}
 
 				DrawdownAmt = DrawdownAmt.add(new BigDecimal(d.get("DrawdownAmt")));
-				PerfEqAmt = PerfEqAmt.add(new BigDecimal(d.get("PerfEqAmt")));
-				PerfReward = PerfReward.add(new BigDecimal(d.get("PerfReward")));
-				PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
+
+				if ("0".equals(d.get("AdjRange")) || "9".equals(d.get("AdjRange"))) {
+					PerfEqAmt = PerfEqAmt.add(new BigDecimal(d.get("PerfEqAmt")));
+					PerfReward = PerfReward.add(new BigDecimal(d.get("PerfReward")));
+					PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
+				} else {
+					PerfEqAmt = PerfEqAmt.add(new BigDecimal(d.get("AdjPerfEqAmt")));
+					PerfReward = PerfReward.add(new BigDecimal(d.get("AdjPerfReward")));
+					PerfAmt = PerfAmt.add(new BigDecimal(d.get("AdjPerfAmt")));
+				}
+
 				cnt++;
 
 				Introducer = d.get("Introducer").trim();
@@ -126,8 +134,16 @@ public class L5051 extends TradeBuffer {
 					WorkMonth = "";
 				}
 			} else {
-				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), new BigDecimal(d.get("PerfEqAmt")),
-						new BigDecimal(d.get("PerfReward")), new BigDecimal(d.get("PerfAmt")), 1, 1, SumByFacm);
+				if ("0".equals(d.get("AdjRange")) || "9".equals(d.get("AdjRange"))) {
+					PerfEqAmt = new BigDecimal(d.get("PerfEqAmt"));
+					PerfReward = new BigDecimal(d.get("PerfReward"));
+					PerfAmt = new BigDecimal(d.get("PerfAmt"));
+				} else {
+					PerfEqAmt = new BigDecimal(d.get("AdjPerfEqAmt"));
+					PerfReward = new BigDecimal(d.get("AdjPerfReward"));
+					PerfAmt = new BigDecimal(d.get("AdjPerfAmt"));
+				}
+				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt,PerfReward,PerfAmt, 1, 1, SumByFacm);
 			}
 
 			dd.clear();
@@ -135,7 +151,7 @@ public class L5051 extends TradeBuffer {
 		}
 
 		if ("Y".equals(SumByFacm)) {
-			putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 1, SumByFacm);
+			putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 0, SumByFacm);
 		}
 
 		this.info("dd =" + dd.get("LogNo"));
@@ -154,8 +170,8 @@ public class L5051 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt, BigDecimal PerfReward,
-			BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm) {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt,
+			BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm) {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -201,6 +217,9 @@ public class L5051 extends TradeBuffer {
 		occursList.putParam("OOCanModify", canModify);
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOWorkMonth", WorkMonth);
+		
+		occursList.putParam("OOLog", d.get("AdjRange"));
+
 		this.totaVo.addOccursList(occursList);
 	}
 }

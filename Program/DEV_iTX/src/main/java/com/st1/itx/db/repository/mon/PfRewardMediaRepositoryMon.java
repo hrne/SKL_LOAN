@@ -28,6 +28,9 @@ public interface PfRewardMediaRepositoryMon extends JpaRepository<PfRewardMedia,
   // CustNo = ,AND FacmNo =
   public Slice<PfRewardMedia> findAllByCustNoIsAndFacmNoIsOrderByPerfDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
 
+  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType =
+  public Optional<PfRewardMedia> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIs(int custNo_0, int facmNo_1, int bormNo_2, int bonusType_3);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

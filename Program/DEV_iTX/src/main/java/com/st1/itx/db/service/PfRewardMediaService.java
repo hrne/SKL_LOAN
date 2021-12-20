@@ -60,6 +60,18 @@ public interface PfRewardMediaService {
   public Slice<PfRewardMedia> findFacmNo(int custNo_0, int facmNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType =
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param bormNo_2 bormNo_2
+   * @param bonusType_3 bonusType_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfRewardMedia PfRewardMedia of List
+   */
+  public PfRewardMedia findDupFirst(int custNo_0, int facmNo_1, int bormNo_2, int bonusType_3, TitaVo... titaVo);
+
+  /**
    * hold By PfRewardMedia
    * 
    * @param bonusNo key

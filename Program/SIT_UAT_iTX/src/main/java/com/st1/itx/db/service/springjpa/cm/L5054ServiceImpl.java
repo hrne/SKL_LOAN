@@ -81,7 +81,7 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "a.\"WorkMonth\", " // 工作月
 				+ "a.\"WorkSeason\", " // 工作季
 				+ "a.\"MediaFg\", " // 產出媒體檔記號
-				+ "a.\"MediaDate\", " // 產出媒體檔日期
+				+ "d.\"CreateDate\" as \"MediaDate\", " // 產出媒體檔日期
 				+ "a.\"ManualFg\", " // 人工新增記號
 				+ "a.\"BonusType\", " // 獎金類別 15
 				+ "a.\"BonusNo\", " // 序號 16
@@ -89,8 +89,12 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "a.\"CreateDate\", " // 建檔日期時間
 				+ "a.\"CreateEmpNo\", " // 建檔人員
 				+ "a.\"LastUpdate\", " // 最後更新日期時間
-				+ "a.\"LastUpdateEmpNo\" " // 最後更新人員
-				+ "FROM \"PfRewardMedia\" a " + "LEFT JOIN \"CdEmp\" b ON b.\"EmployeeNo\"=a.\"EmployeeNo\" ";
+				+ "a.\"LastUpdateEmpNo\", " // 最後更新人員
+				+ "c.\"Fullname\" as \"LastUpdateEmpName\" " // 最後更新人員
+				+ "FROM \"PfRewardMedia\" a "; 
+		sql	+= "LEFT JOIN \"CdEmp\" b ON b.\"EmployeeNo\"=a.\"EmployeeNo\" ";
+		sql += "LEFT JOIN \"CdEmp\" c ON c.\"EmployeeNo\"=a.\"LastUpdateEmpNo\" ";
+		sql += "LEFT JOIN \"TxControl\" d ON d.\"Code\"=:Code ";
 		sql += "WHERE a.\"WorkMonth\"=:WorkYM and a.\"BonusType\" = 7 ";
 
 		sql += "order by a.\"EmployeeNo\",a.\"PieceCode\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\" ";
@@ -99,10 +103,11 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		query.setParameter("ThisIndex", index);
 //		query.setParameter("ThisLimit", limit);
 		query.setParameter("WorkYM", iWorkYM);
+		query.setParameter("Code", "L5512."+iWorkYM+".2");
 
-		logger.info("L5054ServiceImpl sql=[" + sql + "]");
-		logger.info("L5054ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
-		logger.info("L5054Service FindData=" + query.toString());
+		this.info("L5054ServiceImpl sql=[" + sql + "]");
+//		logger.info("L5054ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
+//		logger.info("L5054Service FindData=" + query.toString());
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -116,7 +121,7 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// List<L5051Vo> L5051VoList =this.convertToMap(query.getResultList());
 
 //		@SuppressWarnings("unchecked")
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 

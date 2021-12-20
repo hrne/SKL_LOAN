@@ -35,15 +35,15 @@ public interface PfBsDetailAdjustService {
   public Slice<PfBsDetailAdjust> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND FacmNo = ,AND WorkMonth =
+   * CustNo = ,AND FacmNo = ,AND BormNo =
    *
    * @param custNo_0 custNo_0
    * @param facmNo_1 facmNo_1
-   * @param workMonth_2 workMonth_2
+   * @param bormNo_2 bormNo_2
    * @param titaVo Variable-Length Argument
    * @return Slice PfBsDetailAdjust PfBsDetailAdjust of List
    */
-  public PfBsDetailAdjust findCustFacmFirst(int custNo_0, int facmNo_1, int workMonth_2, TitaVo... titaVo);
+  public PfBsDetailAdjust findCustBormFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo);
 
   /**
    * hold By PfBsDetailAdjust

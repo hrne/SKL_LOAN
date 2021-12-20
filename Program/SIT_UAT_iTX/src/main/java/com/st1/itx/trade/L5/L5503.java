@@ -44,12 +44,31 @@ public class L5503 extends TradeBuffer {
 		this.info("active L5503 ");
 		this.totaVo.init(titaVo);
 
+		String iFunCode = titaVo.get("FunCode").trim();
+		if ("1".equals(iFunCode)) {
+			int custNo = Integer.valueOf(titaVo.getParam("CustNo"));
+			int facmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
+			int bormNo = Integer.valueOf(titaVo.getParam("BormNo"));
+			int bonusType = Integer.valueOf(titaVo.getParam("BonusType"));
+			PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(custNo, facmNo, bormNo, bonusType, titaVo);
+			if (pfRewardMedia != null) {
+				String s = "";
+				if (bonusType == 1) {
+					s = "介紹人";
+				} else if (bonusType == 1) {
+					s = "介紹人";
+				} else {
+					s = "介紹人加碼";
+				}
+				throw new LogicException("E0002", "獎金資料");
+			}
+		}
+
 		// 交易需主管核可
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "異動獎金資料");
 		}
 
-		String iFunCode = titaVo.get("FunCode").trim();
 		long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
 
 		PfRewardMedia pfRewardMedia = pfRewardMediaService.holdById(iBonusNo, titaVo);
@@ -96,18 +115,13 @@ public class L5503 extends TradeBuffer {
 					BigDecimal iBonus = new BigDecimal(titaVo.get("Bonus").trim());
 					BigDecimal iAdjustBonus = new BigDecimal(titaVo.get("AdjustBonus").trim());
 
-					String reason = "修改獎金資料";
-					
 					if (iBonus.compareTo(iAdjustBonus) == 0) {
 						pfRewardMedia.setAdjustBonusDate(0);
 						pfRewardMedia.setAdjustBonus(iAdjustBonus);
-						
+
 					} else {
 						pfRewardMedia.setAdjustBonusDate(Integer.valueOf(titaVo.getParam("CALDY")));
 						pfRewardMedia.setAdjustBonus(iAdjustBonus);
-						if (iAdjustBonus.compareTo(BigDecimal.ZERO) == 0) {
-							reason = "取消發放獎金";
-						}
 					}
 					pfRewardMedia.setRemark(titaVo.get("Remark").trim());
 
@@ -118,7 +132,7 @@ public class L5503 extends TradeBuffer {
 					}
 					//
 					dataLog.setEnv(titaVo, pfRewardMedia2, pfRewardMedia);
-					dataLog.exec(reason);
+					dataLog.exec("修改獎金資料");
 
 				} else if ("4".equals(iFunCode)) {
 					if (pfRewardMedia.getManualFg() == 0) {
@@ -130,7 +144,7 @@ public class L5503 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0008", "");
 					}
 					dataLog.setEnv(titaVo, pfRewardMedia, pfRewardMedia);
-					dataLog.exec("刪除獎金");
+					dataLog.exec("刪除人工新增獎金");
 				}
 			}
 		}

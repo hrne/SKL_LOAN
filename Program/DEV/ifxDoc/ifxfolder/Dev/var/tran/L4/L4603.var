@@ -6,25 +6,6 @@
 !#TXCD
 !T(3,L4603)
 
-![資料表頭(HEADER)長度]
-#INQHD=n,3,S
-E(0,0)ASGN(INQHD$)
-
-![每筆資料明細(OCCURS)長度]
-#INQLEN=n,3,S
-E(0,81)ASGN(INQLEN$)
-
-![多筆查詢之一個畫面有N筆資料]
-#INQREC=n,2,S
-E(0,40)ASGN(INQREC$)
-
-![畫面顯示的明細間的高度]
-#LOOPH=n,3,S
-E(0,1)ASGN(LOOPHEIGHT$)
-
-![每張印錄單列印的筆數]
-#INQPRT=n,2,S
-E(0,40)ASGN(INQPRT$)
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -224,73 +205,10 @@ E(0,@RPTFG,1)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L4603
-#OOCustNo
-#OOFacmNo
-#OOClCode1
-#OOClCode2
-#OOClNo
-#OOInsuNo
-#OOCustName
-#OOLableA
-^
-TXFORM=L461C
-#ErrorCCnt
-#ReportCClCode1
-#ReportCClCode2
-#ReportCClNo
-#ReportCPrevInsuNo
-#ReportCCustNo
-#ReportCFacmNo
-#ReportCCustName
-#ReportCNewInsuStartDate
-#ReportCNewInsuEndDate
-#ReportCFireAmt
-#ReportCFireFee
-#ReportCEthqAmt
-#ReportCEthqFee
-#ReportCTotlFee
-#ReportCErrMsg
 ^
 
 </sub>
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-#RPTFG=0,QUERY.GRID
-#any={detail:true, caption:'', rowNum:40, rowList:[20,40,60]}
-#OOCustNoX=戶號
-{width:120}
-
-#OOClNoX=擔保品代號
-{width:120}
-
-#OOInsuNo=原保單號碼
-{width:120}
-
-#OOCustName=戶名
-{width:120}
-
-#OOLableAX=通知種類
-{width:120}
-^
-
-#L461CPRT=1,L461C,NA,,D,15
-%
-#ReportCClCode1
-#ReportCClCode2
-#ReportCClNo
-#ReportCPrevInsuNo
-#ReportCCustNo
-#ReportCFacmNo
-#ReportCCustName
-#ReportCNewInsuStartDate
-#ReportCNewInsuEndDate
-#ReportCFireAmtX
-#ReportCFireFeeX
-#ReportCEthqAmtX
-#ReportCEthqFeeX
-#ReportCTotlFeeX
-#ReportCErrMsg
-@
-^
 </sub>

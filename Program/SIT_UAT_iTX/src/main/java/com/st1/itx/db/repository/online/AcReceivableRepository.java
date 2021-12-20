@@ -63,7 +63,13 @@ public interface AcReceivableRepository extends JpaRepository<AcReceivable, AcRe
   public Slice<AcReceivable> findAllByClsFlagIsAndAcBookCodeIsAndAcSubBookCodeLikeAndAcctCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAsc(int clsFlag_0, String acBookCode_1, String acSubBookCode_2, String acctCode_3, int custNo_4, int custNo_5, Pageable pageable);
 
   // CustNo = ,AND AcctFlag >= ,AND AcctFlag <= ,AND RvNo %
-  public Slice<AcReceivable> findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAsc(int custNo_0, int acctFlag_1, int acctFlag_2, String rvNo_3, Pageable pageable);
+  public Slice<AcReceivable> findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoDesc(int custNo_0, int acctFlag_1, int acctFlag_2, String rvNo_3, Pageable pageable);
+
+  // CustNo = ,AND FacmNo = ,AND AcctFlag >= ,AND AcctFlag <= ,AND RvNo %
+  public Slice<AcReceivable> findAllByCustNoIsAndFacmNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoAsc(int custNo_0, int facmNo_1, int acctFlag_2, int acctFlag_3, String rvNo_4, Pageable pageable);
+
+  // CustNo >= ,AND CustNo <= ,AND ClsFlag = ,AND ReceivableFlag = ,AND RvNo %
+  public Slice<AcReceivable> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndClsFlagIsAndReceivableFlagIsAndRvNoLikeOrderByCustNoAscFacmNoAsc(int custNo_0, int custNo_1, int clsFlag_2, int receivableFlag_3, String rvNo_4, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

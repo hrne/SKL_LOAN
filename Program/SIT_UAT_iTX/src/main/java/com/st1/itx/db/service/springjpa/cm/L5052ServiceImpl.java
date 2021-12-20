@@ -12,11 +12,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdBcm;
-
-import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+
 
 @Service("l5052ServiceImpl")
 @Repository
@@ -24,8 +22,7 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	@Autowired
-	private CdBcmService sCdBcmService;
+
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -57,6 +54,7 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String CustNo = titaVo.getParam("CustNo").trim(); // 戶號
 		String FacmNo = titaVo.getParam("FacmNo").trim(); // 額度編號
 		String SumByFacm = titaVo.getParam("SumByFacm").trim();
+		String BsOfficer = titaVo.getParam("BsOfficer").trim();
 		
 		String sql = "SELECT A.\"LogNo\",";
 		sql += "E1.\"UnitItem\" AS \"BsDeptName\",";
@@ -80,12 +78,13 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "B.\"Introducer\",";
 		sql += "F2.\"Fullname\" AS \"IntroducerName\",";
 		sql += "NVL(D.\"LogNo\",0) AS \"AdjLogNo\",";
-		sql += "D.\"AdjPerfCnt\",";
-		sql += "D.\"AdjPerfAmt\" ";
+		sql += "NVL(D.\"WorkMonth\",0) AS \"AdjWorkMonth\",";
+		sql += "NVL(D.\"AdjPerfCnt\",0) AS \"AdjPerfCnt\",";
+		sql += "NVL(D.\"AdjPerfAmt\",0) AS \"AdjPerfAmt\" ";
 		sql += "FROM \"PfBsDetail\" A ";
 		sql += "LEFT JOIN \"PfItDetail\" B ON B.\"CustNo\"=A.\"CustNo\" AND B.\"FacmNo\"=A.\"FacmNo\" AND B.\"BormNo\"=A.\"BormNo\" AND B.\"PerfDate\"=A.\"PerfDate\" AND B.\"RepayType\"=A.\"RepayType\" AND B.\"PieceCode\"=A.\"PieceCode\" AND B.\"DrawdownAmt\">0 ";
 		sql += "LEFT JOIN \"CustMain\" C ON C.\"CustNo\"=A.\"CustNo\" ";
-		sql += "LEFT JOIN \"PfBsDetailAdjust\" D ON D.\"CustNo\"=A.\"CustNo\" AND D.\"FacmNo\"=A.\"FacmNo\"  AND D.\"WorkMonth\"=A.\"WorkMonth\" ";
+		sql += "LEFT JOIN \"PfBsDetailAdjust\" D ON D.\"CustNo\"=A.\"CustNo\" AND D.\"FacmNo\"=A.\"FacmNo\" AND D.\"BormNo\"=A.\"BormNo\" ";
 		sql += "LEFT JOIN \"CdBcm\" E1 ON E1.\"UnitCode\"=A.\"DeptCode\" ";
 		sql += "LEFT JOIN \"CdBcm\" E2 ON E2.\"UnitCode\"=B.\"DeptCode\" ";
 		sql += "LEFT JOIN \"CdBcm\" E3 ON E3.\"UnitCode\"=B.\"DistCode\" ";
@@ -108,6 +107,9 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			// 額度編號
 			// sql += "AND bsd.\"FacmNo\"=" + Integer.parseInt(FacmNo) + " ";// 額度編號
 			sql += "AND A.\"FacmNo\"= :FacmNo ";// 額度編號
+		}
+		if (!"".equals(BsOfficer)) {
+			sql += "AND A.\"BsOfficer\"= :BsOfficer ";
 		}
 		sql += "ORDER BY A.\"BsOfficer\",A.\"CustNo\",A.\"FacmNo\",A.\"BormNo\" ";
 //		if ("Y".equals(SumByFacm)) {
@@ -149,10 +151,14 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			// 額度編號
 			query.setParameter("FacmNo", Integer.parseInt(FacmNo));
 		}
-
+		if (!"".equals(BsOfficer)) {
+			query.setParameter("BsOfficer",BsOfficer);
+		}
+		
 		this.info("L5051Service FindData=" + query);
 
 		// *** 折返控制相關 ***
+		
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
 		// query.setFirstResult(this.index*this.limit);
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
@@ -188,68 +194,6 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return str;
 	}
 
-	public int ChangeYM(String YM) {
-		int YYYYmm = 0;
-		if (YM != null) {
-			int YML = YM.length();
-			if (YML == 6) {
-				// DC
-				YYYYmm = Integer.parseInt(YM);
-			} else if (YML == 5) {
-				// ROC
-				YYYYmm = (Integer.parseInt(YM.substring(0, 3)) + 1911) * 100 + Integer.parseInt(YM.substring(3, 5));
-			} else {
-				// UnKnow
-				this.info("L5951 ChangeYM Original=" + YM);
-			}
-		}
-		return YYYYmm;
-	}
 
-	public String FindCdBcm(TitaVo titaVo, String str) {
-		String Data = "";
-		if (str != null) {
-			CdBcm CdBcmVO = new CdBcm();
-			CdBcmVO = sCdBcmService.findById(str, titaVo);
-			if (CdBcmVO != null) {
-				Data = CdBcmVO.getUnitItem();
-			}
-		}
-		return Data;
-	}
 
-	public String Format(String str, int len, String Side, String AddStr) {
-		if (str != null) {
-
-		} else {
-			str = "";
-		}
-		int strL = str.length();
-		if ("R".equals(Side)) {
-			for (int i = strL; i < len; i++) {
-				str = AddStr + str;
-			}
-		} else if ("L".equals(Side)) {
-			for (int i = strL; i < len; i++) {
-				str = str + AddStr;
-			}
-		}
-		return str;
-	}
-
-	public String PerfDateToYM(String str) {
-		if (str != null) {
-			int strL = str.length();
-			if (strL == 8 || strL == 6) {
-				str = str.substring(0, 4) + "/" + str.substring(4, 6);
-			} else if (strL == 7) {
-				str = String.valueOf(Integer.parseInt(str.substring(0, 3)) + 1911) + "/" + str.substring(3, 5);
-			} else {
-				str = "0000/00";
-			}
-		} else {
-			str = "0000/00";
-		}
-		return str;
-	}
 }

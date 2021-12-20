@@ -12,8 +12,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.dataVO.TitaVo;
+
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+;
 
 @Service("l5051ServiceImpl")
 @Repository
@@ -66,7 +68,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "A.\"DrawdownDate\" - 19110000 AS \"DrawdownDate\",";
 		sql += "A.\"ProdCode\",";
 		sql += "A.\"PieceCode\",";
-		sql += "NVL(A.\"CntingCode\",A.\"CntingCode\") AS \"CntingCode\",";
+		sql += "A.\"CntingCode\",";
 		sql += "A.\"DrawdownAmt\",";
 		sql += "A.\"DeptCode\",";
 		sql += "A.\"DistCode\",";
@@ -78,12 +80,12 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "F2.\"Fullname\" AS \"IntroducerName\",";
 		sql += "F3.\"Fullname\" AS \"UnitManagerName\",";
 		sql += "F4.\"Fullname\" AS \"DistManagerName\",";
-		sql += "NVL(D.\"AdjPerfEqAmt\",A.\"PerfEqAmt\") AS \"PerfEqAmt\",";
-		sql += "NVL(D.\"AdjPerfReward\",A.\"PerfReward\") AS \"PerfReward\",";
-		sql += "NVL(D.\"AdjPerfAmt\",A.\"PerfAmt\") AS \"PerfAmt\",";
+		sql += "A.\"PerfEqAmt\",";
+		sql += "A.\"PerfReward\",";
+		sql += "A.\"PerfAmt\",";
 		sql += "A.\"RepayType\",";
 		sql += "A.\"WorkMonth\" - 191100 as \"WorkMonth\", ";
-		sql += "NVL(D.\"AdjRange\",0) AS \"AdjRange\", ";
+		sql += "NVL(D.\"AdjRange\",9) AS \"AdjRange\", ";
 		sql += "D.\"AdjPerfEqAmt\", ";
 		sql += "D.\"AdjPerfReward\", ";
 		sql += "D.\"AdjPerfAmt\", ";
@@ -100,6 +102,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdEmp\" F2 ON F2.\"EmployeeNo\"=A.\"Introducer\" ";
 		sql += "LEFT JOIN \"CdEmp\" F3 ON F3.\"EmployeeNo\"=A.\"UnitManager\" ";
 		sql += "LEFT JOIN \"CdEmp\" F4 ON F4.\"EmployeeNo\"=A.\"DistManager\" ";
+		//sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
 		sql += "WHERE A.\"DrawdownAmt\" > 0 ";
 		sql += "AND A.\"RepayType\" = 0 ";
 		if (WorkMonthFm > 0) {

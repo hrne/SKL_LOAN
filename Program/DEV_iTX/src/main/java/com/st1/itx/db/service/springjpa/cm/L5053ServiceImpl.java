@@ -61,7 +61,7 @@ public class L5053ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		query = em.createNativeQuery(sql,L5051Vo.class);//進SQL 所以不要用.class (要用.class 就要使用HQL)
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
-		String sql = "SELECT " + "d.\"Desc\", " // 獎金發放日
+		String sql = "SELECT " + "a.\"BonusDate\", " // 獎金發放日
 				+ "a.\"PerfDate\", " // 業績日期
 				+ "a.\"CustNo\", " // 戶號
 				+ "a.\"FacmNo\", " // 額度

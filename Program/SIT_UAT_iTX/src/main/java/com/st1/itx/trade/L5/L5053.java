@@ -88,10 +88,10 @@ public class L5053 extends TradeBuffer {
 				// titaVo);
 				OccursList occursList = new OccursList();
 
-				if (MapL5053.get("Desc") == null || "".equals(MapL5053.get("Desc").toString().trim())) {
+				if (MapL5053.get("BonusDate") == null || "".equals(MapL5053.get("BonusDate").toString().trim())) {
 					occursList.putParam("OBonusDate", 0);// 獎金發放日期
 				} else {
-					int oBonusDate = Integer.valueOf(MapL5053.get("Desc").toString().substring(0, 8)) - 19110000;
+					int oBonusDate = Integer.valueOf(MapL5053.get("BonusDate").toString()) - 19110000;
 					occursList.putParam("OBonusDate", oBonusDate);// 獎金發放日期
 				}
 								

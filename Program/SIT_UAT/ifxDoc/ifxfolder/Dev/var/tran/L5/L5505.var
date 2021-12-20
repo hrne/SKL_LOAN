@@ -27,10 +27,17 @@ E(0,0)
 [#<->#,"#FdCustName+戶名",#CustName],
 [#<->#,"#FdIntroducer+介紹人",#Introducer,#IntroducerName],
 [#<->#,"#FdBsOfficer+房貸專員",#BsOfficer,#BsOfficerName],
-[#<->#,"#FdDrawdownAmt+業績金額",#DrawdownAmt],
+[#<->#,"#FdPerfAmt+業績金額",#PerfAmt],
 [#<->#,"#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
 [#<->#,"#FdPieceCodeAft+調整後計件代碼",#PieceCodeAft,#PieceCodeAftX],
 ]
+
+#button=x,100,S
+K(MODIFYBUTTON,修改)
+
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -46,7 +53,7 @@ T(3,*)
 #FdCustName=X,2,L
 #FdIntroducer=X,2,L
 #FdBsOfficer=X,2,L
-#FdDrawdownAmt=X,2,L
+#FdPerfAmt=X,2,L
 #FdPieceCode=X,2,L
 #FdPieceCodeAft=X,2,L
 T(3,*)
@@ -63,20 +70,20 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@PieceCodeHelp,#HelpDesc1) 
 
-#CustNo=A,7,I
-C(3,#CHAIN,1,s,$)
-@
-V(2,0)
+#CustNo=A,7,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(2,0)
 
-#FacmNo=A,3,I
-C(3,#CHAIN,1,s,$)
-@
-V(2,0)
+#FacmNo=A,3,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(2,0)
 
-#BormNo=A,3,I
-C(3,#CHAIN,1,s,$)
-@
-V(2,0)
+#BormNo=A,3,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(2,0)
 
 #MRKEY=_,_,S
 T(2,#CustNo+-+#FacmNo+-+#BormNo)
@@ -101,7 +108,7 @@ T(H,@PieceCodeAftX,#PieceCodeAft,#PieceCodeHelp)
 
 #BsOfficerName=x,20,L
 
-#DrawdownAmt=m,14.2,L
+#PerfAmt=m,14.2,L
 
 #PieceCode=X,1,L
 
@@ -138,7 +145,7 @@ T(H,#PieceCodeAft,#PieceCodeHelp)
 #IntroducerName
 #BsOfficer
 #BsOfficerName
-#DrawdownAmt
+#PerfAmt
 #PieceCode
 #PieceCodeAft
 </sub>
@@ -159,7 +166,7 @@ TXFORM=L5R46
 #IntroducerName
 #BsOfficer
 #BsOfficerName
-#DrawdownAmt
+#PerfAmt
 #PieceCode
 ^
 </sub>

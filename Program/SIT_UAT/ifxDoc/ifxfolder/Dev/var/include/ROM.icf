@@ -3619,6 +3619,16 @@ TXFORM=L2R57
 #L2r58SyndFee=m,14.2,S
 #L2r58Rmk=x,40,S
 #L2r58AcctCode=X,3,S
+#L2r58IsAllocation=X,1,S
+#L2r58SyndFeeYearMonth=A,5,S
+#L2r58AllocationFreq=X,2,S
+#L2r58AllocationTimes=X,2,S
+##loop{times:10,i:1}
+#L2r58OYearMonth{i}=X,5,S
+#L2r58OAllocationAmt{i}=m,14.2,S
+#L2r58OCloseFg{i}=X,1,S
+#L2r58OReceivableFg{i}=A,1,S
+##end
 </L2R58.dec>
 
 <L2R58.tom>
@@ -3629,6 +3639,16 @@ TXFORM=L2R58
 #L2r58SyndFee
 #L2r58Rmk
 #L2r58AcctCode
+#L2r58IsAllocation
+#L2r58SyndFeeYearMonth
+#L2r58AllocationFreq
+#L2r58AllocationTimes
+##loop{times:10,i:1}
+#L2r58OYearMonth{i}
+#L2r58OAllocationAmt{i}
+#L2r58OCloseFg{i}
+#L2r58OReceivableFg{i}
+##end
 ^
 </L2R58.tom>
 
@@ -6030,17 +6050,15 @@ TXFORM=L5R28
 <L5R29.dec>
 #L5r29CustNo=A,7,S
 #L5r29FacmNo=A,3,S
+#L5r29BormNo=A,3,S
 #L5r29CustNm=X,100,S
 #L5r29WorkMonth=A,5,S
 #L5r29Introducer=X,6,S
 #L5r29IntroducerName=X,50,S
 #L5r29BsOfficer=X,6,S
 #L5r29BsOfficerName=X,50,S
+#L5r29PerfCnt=+m,5.1,S
 #L5r29PerfAmt=+m,15,S
-#L5r29AdjPerfCntSign=X,1,S
-#L5r29AdjPerfCnt=m,3.1,S
-#L5r29AdjPerfAmtSign=X,1,S
-#L5r29AdjPerfAmt=m,15,S
 #L5r29AdjLogNo=A,8,S
 </L5R29.dec>
 
@@ -6048,17 +6066,15 @@ TXFORM=L5R28
 TXFORM=L5R29
 #L5r29CustNo
 #L5r29FacmNo
+#L5r29BormNo
 #L5r29CustNm
 #L5r29WorkMonth
 #L5r29Introducer
 #L5r29IntroducerName
 #L5r29BsOfficer
 #L5r29BsOfficerName
+#L5r29PerfCnt
 #L5r29PerfAmt
-#L5r29AdjPerfCntSign
-#L5r29AdjPerfCnt
-#L5r29AdjPerfAmtSign
-#L5r29AdjPerfAmt
 #L5r29AdjLogNo
 ^
 </L5R29.tom>

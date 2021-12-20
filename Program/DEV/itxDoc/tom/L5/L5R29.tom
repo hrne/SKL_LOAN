@@ -1,14 +1,12 @@
 L5r29CustNo=9,7
 L5r29FacmNo=9,3
+L5r29BormNo=9,3
 L5r29CustNm=X,100
 L5r29WorkMonth=9,5
 L5r29Introducer=X,6
 L5r29IntroducerName=X,50
 L5r29BsOfficer=X,6
 L5r29BsOfficerName=X,50
+L5r29PerfCnt=+9,5.1
 L5r29PerfAmt=+9,15
-L5r29AdjPerfCntSign=X,1
-L5r29AdjPerfCnt=9,3.1
-L5r29AdjPerfAmtSign=X,1
-L5r29AdjPerfAmt=9,15
 L5r29AdjLogNo=9,8

@@ -17,6 +17,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.domain.PfInsCheck;
 import com.st1.itx.db.domain.PfReward;
 import com.st1.itx.db.domain.PfRewardMedia;
@@ -34,6 +36,7 @@ import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.trade.L5.L5511Report;
 
 /**
@@ -63,6 +66,8 @@ public class L5511Batch extends TradeBuffer {
 	public PfRewardMediaService pfRewardMediaService;
 	@Autowired
 	public CdEmpService cdEmpService;
+	@Autowired
+	CdWorkMonthService cdWorkMonthService;
 
 	@Autowired
 	public DataLog dataLog;
@@ -304,15 +309,23 @@ public class L5511Batch extends TradeBuffer {
 	// 匯入發放檔
 	private void toDo1(TitaVo titaVo) throws LogicException {
 		this.info("L5511Batch toDo1 begin");
-		String iWorkYM = titaVo.getParam("WorkMonth").trim();// 業績起始日
+		String iWorkYM = titaVo.getParam("WorkMonth").trim();// 工作年月
+
 		int iDateFm = Integer.valueOf(titaVo.getParam("DateFm").trim()) + 19110000;// 業績起始日
 		int iDateTo = Integer.valueOf(titaVo.getParam("DateTo").trim()) + 19110000;// 業績起始日
-		
+
+		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100));
+
+		if (tCdWorkMonth == null) {
+			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth); // 查詢資料不存在
+		} else if (tCdWorkMonth.getBonusDate() == 0) {
+			throw new LogicException(titaVo, "E0015", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth + "，獎金發放日期未設定"); // 查詢資料不存在
+		}
 
 		// 寫入交易控制檔
 
 		String controlCode = "L5511." + iWorkMonth + ".1";
-		logTxControl(titaVo, controlCode,"");
+		logTxControl(titaVo, controlCode, "");
 
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = 0;
@@ -358,6 +371,7 @@ public class L5511Batch extends TradeBuffer {
 				pfRewardMedia.setMediaFg(0);
 				pfRewardMedia.setMediaDate(0);
 				pfRewardMedia.setManualFg(0);
+				pfRewardMedia.setBonusDate(tCdWorkMonth.getBonusDate());
 
 //				PfItDetailId pfItDetailId = new PfItDetailId();
 //
@@ -426,7 +440,6 @@ public class L5511Batch extends TradeBuffer {
 			}
 		}
 
-
 		this.info("L5511Batch toDo1 end");
 		// 出表
 
@@ -444,16 +457,25 @@ public class L5511Batch extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;// 查全部
 
-		int iBonusDate = Integer.valueOf(titaVo.getParam("BonusDate").trim()) + 19110000;// 獎金發放日
+		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100));
 
+		if (tCdWorkMonth == null) {
+			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth); // 查詢資料不存在
+		} else if (tCdWorkMonth.getBonusDate() == 0) {
+			throw new LogicException(titaVo, "E0015", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth + "，獎金發放日期未設定"); // 查詢資料不存在
+		}
+
+//		int iBonusDate = Integer.valueOf(titaVo.getParam("BonusDate").trim()) + 19110000;// 獎金發放日
+
+		int iBonusDate = tCdWorkMonth.getBonusDate();
+		
 		String workYM = titaVo.getParam("WorkMonth").trim();// 業績起始日
 		int iWorkYM = Integer.valueOf(workYM) + 191100;// 業績工作月
-		
 
 		// 寫入交易控制檔
 
 		String controlCode = "L5511." + iWorkMonth + ".2";
-		logTxControl(titaVo, controlCode, ""+iBonusDate);
+		logTxControl(titaVo, controlCode, "" + iBonusDate);
 
 		List<Integer> typeList = new ArrayList<>();
 		typeList.add(1);
@@ -478,7 +500,7 @@ public class L5511Batch extends TradeBuffer {
 //				}
 
 				BigDecimal bbonus = pfRewardMedia.getAdjustBonus();
-				bbonus = bbonus.setScale(0, BigDecimal.ROUND_FLOOR);
+				bbonus = bbonus.setScale(0, bbonus.ROUND_FLOOR);
 
 				if (bbonus.compareTo(BigDecimal.ZERO) == 0) {
 					continue;
@@ -552,7 +574,6 @@ public class L5511Batch extends TradeBuffer {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5053", workYM + "9", msg,
 					titaVo);
 		}
-
 
 //		makeFile.toFile(fileSno, "LNM270P");
 

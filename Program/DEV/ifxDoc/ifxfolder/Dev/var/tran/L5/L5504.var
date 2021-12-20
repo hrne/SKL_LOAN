@@ -26,17 +26,21 @@ E(0,0)
 
 <sub type="DC" name="L5504" layout="cols=3;screen.width=[180,400,180,400];printer.width=[20,30,20,30];order=1">
 [
-["L5504]                           介紹人加碼獎金案件維護"],
+["L5504]                           介紹人加碼獎金維護"],
 [#<->#,"#FdFunCode+功能選項",#FunCodeX],
 ["#FdBonusNo+序號",#BonusNo],
 [#<->#,"#FdBonusType+獎金類別",#BonusType,#BonusTypeX],
-[#<->#,"#FdEmployeeNo+發放員工",#EmployeeNo,#BtnCdEmp,#EmployeeName],
-["#FdBonus+#FdBonus2",#Bonus],
-["#FdAdjustBonus+#FdAdjustBonus2",#AdjustBonus],
+[#<->#,"#FdCustNo+戶號",#CustNo,"-",#FacmNo,"-",#BormNo,#BtnL3002],
+[#<->#,"#FdCustNm+戶名",#CustName],
+["#FdProdCode+商品代碼",#ProdCode,#ProdName],
+["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
+[#<->#,"#FdEmployeeNo+發放員工",#EmployeeNo,#EmployeeName],
 ["#FdPerfDate+業績日期",#PerfDate],
 ["#FdBonusDate+獎金發放日",#BonusDate],
 ["#FdWorkMonth+工作月",#WorkMonth],
 ["#FdWorkSeason+工作季",#WorkSeason],
+["#FdBonus+#FdBonus2",#Bonus],
+["#FdAdjustBonus+#FdAdjustBonus2",#AdjustBonus],
 [#<->#,"#FdRemark+備註",#Remark],
 ["#FdMediaDate+產出媒體檔日期",#MediaDate],
 ["#FdManualFg+人工新增記號",#ManualFgX],
@@ -44,9 +48,9 @@ E(0,0)
 
 
 ![Buttom資料查詢]
-#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BinCdEmp=X,1,S
-BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:EmployeeNo<-OOEmployeeNo:EmployeeNo2<-OOEmployeeNo:EmployeeName<-OOFullname})
+!#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
+!#BinCdEmp=X,1,S
+!BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:EmployeeNo<-OOEmployeeNo:EmployeeNo2<-OOEmployeeNo:EmployeeName<-OOFullname})
 !
 #L3002Buf=X,5,S
 T(3,L5503)
@@ -55,11 +59,11 @@ T(3,L5503)
 #BindL3002=X,1,S
 BIND(#BtnL3002,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#L3002Buf;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:BormNo<-OOBormNo})
 !
-#BtnL2001=X,15,I,ui:button;value:商品參數查詢;enable:1;tabbable:0;title:L190A 商品參數明細資料查詢;
-#BufL2001=X,7,S
-T(3,     10)
-#BindL2001=X,1,S
-BIND(#BtnL2001,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BufL2001;ntxbuf5=type<-1:ProdCode<-OOProdNo:ProdCode2<-OOProdNo:ProdName<-OOProdName})
+!#BtnL2001=X,15,I,ui:button;value:商品參數查詢;enable:1;tabbable:0;title:L190A 商品參數明細資料查詢;
+!#BufL2001=X,7,S
+!T(3,     10)
+!#BindL2001=X,1,S
+!BIND(#BtnL2001,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BufL2001;ntxbuf5=type<-1:ProdCode<-OOProdNo:ProdCode2<-OOProdNo:ProdName<-OOProdName})
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -104,6 +108,7 @@ T(1,@BonusNo,#NTXBUF,2,8)
 T(H,#FunCode,#FunCodeHelp)
 C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
 K(MODIFYBUTTON,#FunCodeX)
+C(3,#FunCode,5,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
 
 #CheckAuth=X,1,S
 E(0,#FunCode)
@@ -126,20 +131,20 @@ T(3,#ManualFgX,是))
 #FdBonusNo=X,2,L
 
 #FdBonusType=X,2,L
-C(2,#FunCode,s,T(3,*),S,S,S,S)
+!C(2,#FunCode,s,T(3,*),S,S,S,S)
 
 #FdPerfDate=X,2,L
-C(2,#FunCode,s,T(3,*),S,S,S,S)
+!C(2,#FunCode,s,T(3,*),S,S,S,S)
 
 #FdCustNo=X,2,L
 C(2,#FunCode,s,T(3,*),S,S,S,S)
 
 #FdCustNm=X,2,L
-C(2,#FunCode,s,T(3,*),S,S,S,S)
+!C(2,#FunCode,s,T(3,*),S,S,S,S)
 
 
 #FdEmployeeNo=X,2,L
-C(2,#FunCode,s,T(3,*),S,S,S,S)
+!C(2,#FunCode,s,T(3,*),S,S,S,S)
 
 #FdBonus=X,1,L
 C(2,#FunCode,s,T(3,*),S,S,S,S)
@@ -153,10 +158,10 @@ C(2,#FunCode,S,S,T(3,*),S,S,S)
 #FdAdjustBonus2=X,12,L
 
 #FdProdCode=X,2,L
-C(2,#FunCode,s,T(3,*),S,S,S,S)
+!C(2,#FunCode,s,T(3,*),S,S,S,S)
 
 #FdPieceCode=X,2,L
-C(2,#FunCode,s,T(3,*),S,S,S,S)
+!C(2,#FunCode,s,T(3,*),S,S,S,S)
 
 #FdWorkMonth=X,2,L
 !C(2,#FunCode,s,T(3,*),S,S,S,S)
@@ -192,33 +197,97 @@ V(H,#BonusTypeHelp)
 #BonusTypeX=X,20,L
 T(H,@BonusType,#BonusTypeHelp)
 
-#ShowHide=X,1,S
-C(3,#BonusType,6,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
+! 借款人戶號
+#CustNo=A,7,I
+C(2,#FunCode,s,$,s,s,s,s)
+@
+V(2,0)
+
+! 額度編號
+#FacmNo=A,3,I
+C(2,#FunCode,s,$,s,s,s,s)
+C(3,#BonusType,6,S,$)
+@
+V(2,0)
+
+! 撥款序號
+#BormNo=A,3,I
+C(2,#FunCode,s,$,s,s,s,s)
+C(3,#BonusType,6,S,$)
+@
+V(2,0)
+
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo+-+#BormNo+-+#BonusType)
+
+#RIM_L5R37B=A,1,S
+C(3,#FunCode,1,$,S)
+RESET_RIM(#RIM_L5R37B,L5R37)
+S(L5R37,01,#FunCode,#BonusType,#CustNo,#FacmNo,#BormNo,#END)
+R(1,L5R37)
+
+! 戶名
+#CustName=X,100,L
+
+#ProdCode2=X,5,S
+
+#ProdCode=X,5,L
+!C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
+!C(3,#BonusType,6,S,$)
+!@
+!V(7)
+
+!尋找商品參數檔資料
+#SendL2r01A=X,1,S
+C(5,#ProdCode,#ProdCode2,S,$)
+C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
+C(3,#BonusType,6,S,$)
+T(2,@RimProdNo,#ProdCode)
+T(3,@RimTxCode,L5504)
+E(0,@RimFuncCode,5)
+RESET_RIM(#SendL2r01A,L2R01)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+T(2,@ProdName,#L2r01ProdName)
+
+#ProdName=x,60,L
+
+#PieceCode=X,1,L
+!C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
+!HELP(#PieceHelp)
+!@
+!V(H,#PieceHelp)
+
+#PieceCodeX=x,40,L
+T(H,#PieceCode,#PieceHelp)
 
 #Frame2=X,1,S
 C(3,#FunCode,2,$,S)
 T(F,@EmployeeNo,0)
 T(F,@BonusDate,0)
 T(F,@BonusType,0)
-C(3,#ManualFg,1,T(3,@FdPerfDate,*),$)
-C(3,#ManualFg,1,T(3,@FdCustNo,*),$)
-C(3,#ManualFg,1,T(3,@FdProdCode,*),$)
-C(3,#ManualFg,1,T(3,@FdPieceCode,*),$)
-C(3,#ManualFg,1,$,T(F,@PerfDate,0))
-C(3,#ManualFg,1,$,T(F,@CustNo,0))
-C(3,#ManualFg,1,$,T(F,@FacmNo,0))
-C(3,#ManualFg,1,$,T(F,@BormNo,0))
-C(3,#ManualFg,1,$,T(F,@EmployeeNo,0))
+!C(3,#ManualFg,1,T(3,@FdPerfDate,*),$)
+!C(3,#ManualFg,1,T(3,@FdCustNo,*),$)
+!C(3,#ManualFg,1,T(3,@FdProdCode,*),$)
+!C(3,#ManualFg,1,T(3,@FdPieceCode,*),$)
+!C(3,#ManualFg,1,$,T(F,@PerfDate,0))
+!C(3,#ManualFg,1,$,T(F,@CustNo,0))
+!C(3,#ManualFg,1,$,T(F,@FacmNo,0))
+!C(3,#ManualFg,1,$,T(F,@BormNo,0))
+!C(3,#ManualFg,1,$,T(F,@EmployeeNo,0))
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@BormNo,0)
 T(F,@Bonus,0)
-C(3,#ManualFg,1,$,T(F,@ProdCode,0))
-C(3,#ManualFg,1,$,T(F,@PieceCode,0))
-C(3,#ManualFg,1,$,T(F,@WorkMonth,0))
-C(3,#ManualFg,1,$,T(F,@WorkSeason,0))
+!C(3,#ManualFg,1,$,T(F,@ProdCode,0))
+!C(3,#ManualFg,1,$,T(F,@PieceCode,0))
+!C(3,#ManualFg,1,$,T(F,@WorkMonth,0))
+!C(3,#ManualFg,1,$,T(F,@WorkSeason,0))
 !C(3,#ManualFg,1,HIDE(#AdjustBonus),$,SHOW(#AdjustBonus))
 T(3,@FdAdjustBonus2,調整發放獎金)
 HIDE(#BtnL3002)
-HIDE(#BtnCdEmp)
-C(3,#ManualFg,1,$,HIDE(#BtnL2001))
+!HIDE(#BtnCdEmp)
+!C(3,#ManualFg,1,$,HIDE(#BtnL2001))
 
 
 #Frame4=X,3,S
@@ -239,61 +308,47 @@ T(F,@WorkSeason,0)
 T(F,@Remark,0)
 C(3,#AdjustBonusDate,0,HIDE(#AdjustBonus),$,SHOW(#AdjustBonus))
 C(3,#AdjustBonusDate,0,T(3,@FdAdjustBonus2,),T(3,@FdAdjustBonus2,調整發放獎金))
-HIDE(#BtnCdEmp)
-HIDE(#BtnL2001)
+!HIDE(#BtnCdEmp)
+!HIDE(#BtnL2001)
 HIDE(#BtnL3002)
 
 #EmployeeNo2=X,6,S
 
-#EmployeeNo=X,6,I
-!C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(2,#FunCode,s,$,s,s,s,s)
-@
-V(7)
+#EmployeeNo=X,6,L
+!C(2,#FunCode,s,$,s,s,s,s)
+!@
+!V(7)
 
-#RIM_L2R08=X,1,S
-C(5,#EmployeeNo,#EmployeeNo2,S,$)
-!C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(2,#FunCode,s,$,s,s,s,s)
-RESET_RIM(#RIM_L2R08,L2R08)
-T(2,@RimEmployeeNo,#EmployeeNo)
-!T(3,@RimErrorSkip,X)
-S(L2R08,1,#RimTxCode,#RimEmployeeNo)
-R(1,L2R08)
-T(2,@EmployeeName,#L2r08FullName)
+!#RIM_L2R08=X,1,S
+!C(5,#EmployeeNo,#EmployeeNo2,S,$)
+!C(2,#FunCode,s,$,s,s,s,s)
+!RESET_RIM(#RIM_L2R08,L2R08)
+!T(2,@RimEmployeeNo,#EmployeeNo)
+!S(L2R08,1,#RimTxCode,#RimEmployeeNo)
+!R(1,L2R08)
+!T(2,@EmployeeName,#L2r08FullName)
 
 #EmployeeName=x,40,L
 
-#Bonus=+m,14.2,I
-C(2,#FunCode,s,$,s,s,s,s)
-@
-V(2,0)
-
-#RimAdjustBonus=+m,14.2,S
-
-#AdjustBonus=+m,14.2,I
-C(2,#FunCode,s,S,$,s,s,s)
-
-#AdjustBonusDate=D,7,S 
 
 <include src="ROM.icf::L5R38.rtn"/>
 
 ! 業績日期
-#PerfDate=D,7,I
-C(2,#FunCode,s,E(0,#SYSCDATE),C(2,#ManualFg,s,$),s,s,s)
-@
-V(7,0)
-A(DATE,0,#PerfDate)
+#PerfDate=D,7,L
+!C(2,#FunCode,s,E(0,#SYSCDATE),C(2,#ManualFg,s,$),s,s,s)
+!@
+!V(7,0)
+!A(DATE,0,#PerfDate)
 
-#RimL5R38=X,1,S
-C(2,#FunCode,S,$,C(3,#ManualFg,1,$,S),S,S,S)
-RESET_RIM(#RimL5R38,L5R38)
-E(0,@L5R38iCode,3)
-E(0,@L5R38iDate,#PerfDate)
-S(L5R38,01,#L5R38iCode,#L5R38iDate)
-R(1,L5R38)
-E(0,@WorkMonth,#L5R38oWorkYM)
-E(0,@WorkSeason,#L5R38oWorkSeason)
+!#RimL5R38=X,1,S
+!C(2,#FunCode,S,$,C(3,#ManualFg,1,$,S),S,S,S)
+!RESET_RIM(#RimL5R38,L5R38)
+!E(0,@L5R38iCode,3)
+!E(0,@L5R38iDate,#PerfDate)
+!S(L5R38,01,#L5R38iCode,#L5R38iDate)
+!R(1,L5R38)
+!E(0,@WorkMonth,#L5R38oWorkYM)
+!E(0,@WorkSeason,#L5R38oWorkSeason)
 
 ! 獎金發放日
 #BonusDate=D,7,L
@@ -312,15 +367,18 @@ E(0,@WorkSeason,#L5R38oWorkSeason)
 !C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
 !C(3,#BonusType,6,S,$)
 
-!#W1=A,3,S
-!C(3,#BonusType,6,S,$)
-!T(1,#WorkSeason,1,3)
-!@V(2,0)
-!
-!#W2=A,1,S
-!C(3,#BonusType,6,S,$)
-!T(1,#WorkSeason,4,1)
-!V(5,1,4)
+
+#Bonus=+m,14,I
+C(2,#FunCode,s,$,s,s,s,s)
+@
+V(2,0)
+
+#RimAdjustBonus=+m,14,S
+
+#AdjustBonus=+m,14,I
+C(2,#FunCode,s,S,$,s,s,s)
+
+#AdjustBonusDate=D,7,S 
 
 #Remark=x,50,I
 C(2,#FunCode,s,$,$,$,s,s)
@@ -337,73 +395,6 @@ C(3,#ManualFg,1,T(3,是),T(3,否))
 !-------------
 
 
-! 借款人戶號
-#CustNo=A,7,I
-C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(3,#BonusType,6,S,$)
-@
-V(2,0)
-
-! 額度編號
-#FacmNo=A,3,I
-C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(3,#BonusType,6,S,$)
-@
-V(2,0)
-
-! 撥款序號
-#BormNo=A,3,I
-C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(3,#BonusType,6,S,$)
-@
-V(2,0)
-
-#RIM_L3R15=A,1,S
-C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(3,#BonusType,6,S,$)
-RESET_RIM(#RIM_L3R15,L3R15)
-S(L3R15,01,#CustNo,#FacmNo,#BormNo,#END)
-R(1,L3R15)
-
-
-! 戶名
-#CustName=X,100,L
-
-#ProdCode2=X,5,S
-
-#ProdCode=X,5,I
-C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(3,#BonusType,6,S,$)
-@
-V(7)
-
-!尋找商品參數檔資料
-#SendL2r01A=X,1,S
-C(5,#ProdCode,#ProdCode2,S,$)
-C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(3,#BonusType,6,S,$)
-T(2,@RimProdNo,#ProdCode)
-T(3,@RimTxCode,L5504)
-E(0,@RimFuncCode,5)
-RESET_RIM(#SendL2r01A,L2R01)
-S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
-R(1,L2R01)
-T(2,@ProdName,#L2r01ProdName)
-
-#ProdName=x,60,L
-
-#PieceCode=X,1,I
-C(2,#FunCode,s,$,C(2,#ManualFg,s,$),s,s,s)
-C(3,#BonusType,6,S,$)
-HELP(#PieceHelp)
-@
-V(H,#PieceHelp)
-
-#PieceCodeX=x,40,L
-C(3,#BonusType,6,S,$)
-T(H,#PieceCode,#PieceHelp)
-
-
 
 
 <include src="ROM.icf::L0Rim.dec"/>
@@ -412,19 +403,21 @@ T(H,#PieceCode,#PieceHelp)
 <include src="ROM.icf::L2R08.dec"/>
 
 </sub>
-<sub type="DC" name="p2" layout="cols=3;screen.width=[180,400,180,400];printer.width=[20,30,20,30];order=1">
+
+<sub type="DC" name="p2" layout="cols=3;screen.width=[180,500,180,400];printer.width=[20,30,20,30];order=1">
 [
 [],
-[#<->#,"#FdCustNo+戶號",#CustNo,"-",#FacmNo,"-",#BormNo,#BtnL3002],
-[#<->#,"#FdCustNm+戶名",#CustName],
-["#FdProdCode+商品代碼",#ProdCode,#BtnL2001,#ProdName],
-["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
+["#FdLastUpdate+修改日期",#LastUpdate],
+["#FdLastEmpName+修改人員",#LastEmpName],
 ]
-
-!------------------
-
+#FdLastUpdate=X,2,L
+#FdLastEmpName=X,2,L
+#LastUpdate=x,20,L
+#LastEmpName=x,40,L
 
 </sub>
+
+!------------------
 
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
@@ -490,6 +483,8 @@ TXFORM=L5R37
 #MediaDate
 #ManualFg
 #CustName
+#LastUpdate
+#LastEmpName
 ^
 </sub>
 

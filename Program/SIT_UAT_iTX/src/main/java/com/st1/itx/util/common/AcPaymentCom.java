@@ -122,7 +122,8 @@ public class AcPaymentCom extends TradeBuffer {
 
 		// 1->短收->此交易不處理(由各交易寫入短收記號資料)
 		// 2->溢收->再加一筆溢收記號資料
-		if (titaVo.getParam("OverRpFg").equals("2")) {
+		// 3->溢收(整批入帳、部分繳款)->再加一筆溢收記號資料
+		if (titaVo.getParam("OverRpFg").equals("2") || titaVo.getParam("OverRpFg").equals("3")) {
 			/* 寫入溢收 */
 			addOverRp(titaVo);
 		}

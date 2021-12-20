@@ -28,16 +28,23 @@ K(MODIFYBUTTON,1,LD010 介紹人換算業績報酬檢核表)
 [
 ["[L5510]                           產生換算業績、業務報酬發放媒體"],
 [#<->#,"#FdFunCode+功能",#FunCode,#FunCodeX],
-[#<->#,"#FdDateFm+工作年月",#WorkMonth],
+[#<->#,"#FdWorkMonth+工作年月",#WorkMonth],
 [#<->#,"#FdDateFm+撥款起訖日",#DateFm,"~",#DateTo],
+[#<->#,"#FdMonths+檢核月數",#Months],
 ]
 
 !不可重新交易
 #AGAIN=X,1,S
 E(0,1)ASGN(AGAIN$)
+INVOKEJS(SHOW,L5510_4,0)
 
 #FdFunCode=X,2,L
+T(3,*)
+#FdWorkMonth=X,2,L
+T(3,*)
 #FdDateFm=X,2,L
+#FdMonths=X,2,L
+T(3,*)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -67,7 +74,7 @@ HELP(#FunCodeHelp)
 #FunCodeX=X,40,L
 T(H,#FunCode,#FunCodeHelp)
 C(2,#FunCode,$,K(MODIFYBUTTON,保費檢核),K(MODIFYBUTTON,產生媒體),K(MODIFYBUTTON,取消媒體))
-C(3,#FunCode,2,INVOKEJS(SHOW,L5510_4,1),INVOKEJS(SHOW,L5510_4,0))
+C(3,#FunCode,1,INVOKEJS(SHOW,L5510_4,1),INVOKEJS(SHOW,L5510_4,0))
 
 #WorkMonth2=A,5,S
 
@@ -91,6 +98,11 @@ E(0,@DateTo,#L5R38oEndDate)
 ! 撥款結束日
 #DateTo=D,7,L
 
+#Months=m,2,I
+C(3,#FunCode,1,$,S)
+C(3,#Months,0,E(0,4),$)
+@
+V(2,0)
 
 </sub>
 
@@ -122,6 +134,7 @@ T(3,[L5510] 產生換算業績、業務報酬發放媒體)
 #WorkMonth
 #DateFm
 #DateTo
+#Months
 </sub>
 
 !------ 下行電文TOM ------

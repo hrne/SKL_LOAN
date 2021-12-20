@@ -166,6 +166,25 @@ em = null;
   }
 
   @Override
+  public PfRewardMedia findDupFirst(int custNo_0, int facmNo_1, int bormNo_2, int bonusType_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findDupFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " bonusType_3 : " +  bonusType_3);
+    Optional<PfRewardMedia> pfRewardMediaT = null;
+    if (dbName.equals(ContentName.onDay))
+      pfRewardMediaT = pfRewardMediaReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIs(custNo_0, facmNo_1, bormNo_2, bonusType_3);
+    else if (dbName.equals(ContentName.onMon))
+      pfRewardMediaT = pfRewardMediaReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIs(custNo_0, facmNo_1, bormNo_2, bonusType_3);
+    else if (dbName.equals(ContentName.onHist))
+      pfRewardMediaT = pfRewardMediaReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIs(custNo_0, facmNo_1, bormNo_2, bonusType_3);
+    else 
+      pfRewardMediaT = pfRewardMediaRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIs(custNo_0, facmNo_1, bormNo_2, bonusType_3);
+
+    return pfRewardMediaT.isPresent() ? pfRewardMediaT.get() : null;
+  }
+
+  @Override
   public PfRewardMedia holdById(Long bonusNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

@@ -1165,8 +1165,8 @@ public class MakeReport extends CommBuffer {
 
 					Rectangle pagesize = PageSize.A4;
 
-					this.info("B pagesize.getWidth()  = " + pagesize.getWidth());
-					this.info("B pagesize.getHeight() = " + pagesize.getHeight());
+					// this.info("B pagesize.getWidth()  = " + pagesize.getWidth());
+					// this.info("B pagesize.getHeight() = " + pagesize.getHeight());
 
 					if ("LETTER".equals(papersize)) {
 						pagesize = PageSize.LETTER;
@@ -1182,16 +1182,16 @@ public class MakeReport extends CommBuffer {
 						long n1 = (long) Math.ceil((Double.parseDouble(ss[0]) * 72));
 						long n2 = (long) Math.ceil((Double.parseDouble(ss[1]) * 72));
 
-						this.info("compute width / height = " + n1 + "/" + n2);
+						// this.info("compute width / height = " + n1 + "/" + n2);
 						pagesize = new Rectangle(n1, n2);
 
-						this.info("MakeReport pagesize =" + papersize);
-						this.info("C pagesize.getWidth()  = " + pagesize.getWidth());
-						this.info("C pagesize.getHeight() = " + pagesize.getHeight());
+						// this.info("MakeReport pagesize =" + papersize);
+						// this.info("C pagesize.getWidth()  = " + pagesize.getWidth());
+						// this.info("C pagesize.getHeight() = " + pagesize.getHeight());
 					}
 
-					this.info("A pagesize.getWidth()  = " + pagesize.getWidth());
-					this.info("A pagesize.getHeight() = " + pagesize.getHeight());
+					// this.info("A pagesize.getWidth()  = " + pagesize.getWidth());
+					// this.info("A pagesize.getHeight() = " + pagesize.getHeight());
 
 					String paperorientaton = map.get("paper.orientation").toString();
 
@@ -1600,13 +1600,13 @@ public class MakeReport extends CommBuffer {
 		float widthMax = document.getPageSize().getWidth();
 		float heightMax = document.getPageSize().getHeight();
 
-		this.info("widthMax = " + widthMax);
-		this.info("heightMax = " + heightMax);
+		// this.info("widthMax = " + widthMax);
+		// this.info("heightMax = " + heightMax);
 
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
-			this.info("w = " + w);
+			// this.info("w = " + w);
 			for (float h = 0; h < heightMax + 80f; h += 80f) {
-				this.info("h = " + h);
+				// this.info("h = " + h);
 				cb.showTextAligned(Element.ALIGN_CENTER, watermark, w, h, 15f);
 			}
 		}

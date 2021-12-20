@@ -109,9 +109,6 @@ T(2,@FuncCode1Help,#HelpDesc1)
 
 ! FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
 #FunCode=A,1,S
-C(2,#CHAIN,$,s)
-HELP(#FuncCode1Help)
-@V(H,#FuncCode1Help)
 
 ![維護記號名稱]
 #FunCodeX=X,4,L
@@ -140,7 +137,7 @@ T(F,@AdjCntingCode,0)
 T(F,@AdjRange,0)
 
 #RimL5r27=X,1,S
-IF(#CHAIN==1,$,S)
+C(3,#CHAIN,1,$,S)
 RESET_RIM(#RimL5r27,L5R27)
 S(L5R27,1,#LogNo)
 R(1,L5R27)

@@ -30,6 +30,7 @@ import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.service.PfRewardMediaService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeExcel;
 
@@ -66,6 +67,8 @@ public class L5512Batch extends TradeBuffer {
 	public MakeExcel makeExcel;
 	@Autowired
 	public CdEmpService cdEmpService;
+	@Autowired
+	CdWorkMonthService cdWorkMonthService;
 
 	private int iWorkMonth = 0;
 	private int commitCnt = 20;
@@ -303,7 +306,7 @@ public class L5512Batch extends TradeBuffer {
 
 				PfRewardMedia pfRewardMedia = new PfRewardMedia();
 
-				pfRewardMedia.setBonusDate(0);
+				pfRewardMedia.setBonusDate(iBonusDate);
 				pfRewardMedia.setPerfDate(pfReward.getPerfDate());
 				pfRewardMedia.setCustNo(pfReward.getCustNo());
 				pfRewardMedia.setFacmNo(pfReward.getFacmNo());
@@ -395,7 +398,7 @@ public class L5512Batch extends TradeBuffer {
 //				}
 
 				BigDecimal bbonus = pfRewardMedia.getAdjustBonus();
-				bbonus = bbonus.setScale(0, BigDecimal.ROUND_FLOOR);
+				bbonus = bbonus.setScale(0, bbonus.ROUND_FLOOR);
 
 				if (bbonus.compareTo(BigDecimal.ZERO) == 0) {
 					continue;

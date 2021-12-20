@@ -103,6 +103,20 @@ public class L5052 extends TradeBuffer {
 		Map<String, String> dd = new HashMap<String, String>();
 
 		for (Map<String, String> d : L5052List) {
+			Long adjLogNo = Long.valueOf(d.get("AdjLogNo").toString());
+			Long adjWorkMonth = Long.valueOf(d.get("AdjWorkMonth").toString());
+
+			BigDecimal cntPerfCnt = BigDecimal.ZERO;
+			BigDecimal cntPerfAmt = BigDecimal.ZERO;
+
+			if (adjLogNo > 0 && adjWorkMonth > 0) {
+				cntPerfCnt = new BigDecimal(d.get("AdjPerfCnt"));
+				cntPerfAmt = new BigDecimal(d.get("AdjPerfAmt"));
+			} else {
+				cntPerfCnt = new BigDecimal(d.get("PerfCnt"));
+				cntPerfAmt = new BigDecimal(d.get("PerfAmt"));
+			}
+
 			if ("Y".equals(SumByFacm)) {
 				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim())
 						|| !FacmNo.equals(d.get("FacmNo").trim())) {
@@ -118,8 +132,11 @@ public class L5052 extends TradeBuffer {
 					first = false;
 				}
 
-				PerfCnt = PerfCnt.add(new BigDecimal(d.get("PerfCnt")));
-				PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
+//				PerfCnt = PerfCnt.add(new BigDecimal(d.get("PerfCnt")));
+//				PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
+				PerfCnt = PerfCnt.add(cntPerfCnt);
+				PerfAmt = PerfAmt.add(cntPerfAmt);
+
 				DrawdownAmt = DrawdownAmt.add(new BigDecimal(d.get("DrawdownAmt")));
 
 				cnt++;
@@ -131,7 +148,7 @@ public class L5052 extends TradeBuffer {
 					WorkMonth = "";
 				}
 			} else {
-				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("PerfCnt")), new BigDecimal(d.get("PerfAmt")),
+				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt,
 						new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm);
 			}
 
@@ -167,23 +184,24 @@ public class L5052 extends TradeBuffer {
 		occursList.putParam("OOOfficerName", d.get("OfficerName"));// 員工姓名(房貸專員)
 		occursList.putParam("OOBsOfficer", d.get("BsOfficer"));// 員工代號(房貸專員)
 
-		int AdjFg = 0; 
-		if ("Y".equals(SumByFacm)) {
-			String AdjLogNo = d.get("AdjLogNo").toString().trim();
+		int AdjFg = 0;
+		int LogFg = 0;
+		if ("N".equals(SumByFacm)) {
+			Long AdjLogNo = Long.valueOf(d.get("AdjLogNo").toString());
 
-			if (!"0".equals(AdjLogNo)) {
-				occursList.putParam("OOPerfCnt", PerfCnt);// 計件件數
-				occursList.putParam("OOPerfAmt", PerfAmt);// 業績金額
-				BigDecimal AdjPerfCnt = new BigDecimal(d.get("AdjPerfCnt").toString().trim());
-				BigDecimal AdjPerfAmt = new BigDecimal(d.get("AdjPerfAmt").toString().trim());
-				PerfCnt = PerfCnt.add(AdjPerfCnt);
-				PerfAmt = PerfAmt.add(AdjPerfAmt);
-				AdjFg = 1;
+			if (AdjLogNo > 0) {
+				LogFg = 1;
+				int AdjWorkMonth = Integer.valueOf(d.get("AdjWorkMonth").toString());
+				if (AdjWorkMonth > 0) {
+					AdjFg = 1;
+				} else {
+					AdjFg = 0;
+				}
 			}
 
 		}
+
 		occursList.putParam("OOAdjFg", AdjFg);
-		
 		occursList.putParam("OOPerfCnt", PerfCnt);// 計件件數
 		occursList.putParam("OOPerfAmt", PerfAmt);// 業績金額
 
@@ -210,6 +228,7 @@ public class L5052 extends TradeBuffer {
 
 		occursList.putParam("OOCanModify", 1);
 		occursList.putParam("OORepayType", d.get("RepayType"));
+		occursList.putParam("OOLog", LogFg);
 
 		this.totaVo.addOccursList(occursList);
 

@@ -55,12 +55,22 @@ T(3, )
 !---------- AP TEXT AREA Variables ----------
 ! ["查詢方式",#FunctionCd,#FunctionCdX],
 
+<include src="ROM.icf::L5R38.rtn"/>
+
+#RimL5R38=X,1,S
+C(3,#CHAIN,1,S,$)
+RESET_RIM(#RimL5R38,L5R38)
+E(0,@L5R38iCode,1)
+E(0,@L5R38iDate,#SYSDATE)
+S(L5R38,01,#L5R38iCode,#L5R38iDate)
+R(1,L5R38)
+E(0,@WorkYM,#L5R38oWorkYM)
+
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
 #NTXBUF=X,24,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-
 
 #CustNo=A,7,I
 
@@ -113,17 +123,19 @@ E(0,1)ASGN(LOOP$)
 T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 
 ! 戶名
-#OOCustName=X,100,S
+#OOCustName=X,2.50,S
 
 #OOWorkMonth=A,5,S
 
 #OOCreateEmp=X,20,S
 
-#OOCreateDate=X,50,S
+#OOCreateDate=X,20,S
 
 #OOLastUpdateEmp=X,20,S
 
-#OOLastUpdate=X,50,S
+#OOLastUpdate=X,20,S
+
+#OOCanDelete=A,1,S
 
 #OOBuf2=X,9,S
 T(2,2+#OOLogNo)
@@ -137,7 +149,7 @@ T(2,4+#OOLogNo)
 
 #OOBtn4=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5506; ntxbuf=#OOBuf4})
-!C(3,#OOCanModify,1,$,BIND(grid,cancel))
+C(3,#OOCanDelete,1,$,BIND(grid,cancel))
 
 #OOBuf5=X,9,S
 T(2,5+#OOLogNo)
@@ -145,6 +157,12 @@ T(2,5+#OOLogNo)
 #OOBtn5=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5506; ntxbuf=#OOBuf5})
 !C(3,#OOCanModify,1,$,BIND(grid,cancel))
+
+#OOBuf6=x,100,S
+T(2,L5506+#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+
+#OOBtn6=A,2,O
+C(5,#OOCreateDate,#OOLastUpdate,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6933; ntxbuf=#OOBuf6}))
 
 </sub>
 
@@ -159,6 +177,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5506; ntxbuf=#OOBuf5})
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R38.tom"/>
 TXFORM=L5056
 #OOLogNo
 #OOCustNo
@@ -170,6 +189,7 @@ TXFORM=L5056
 #OOCreateDate
 #OOLastUpdateEmp
 #OOLastUpdate
+#OOCanDelete
 ^
 </sub>
 
@@ -185,14 +205,17 @@ TXFORM=L5056
 #RPTFG=1,QUERY.GRID,L5056A
 #any={detail:true, header:'L5056A.part', caption:'', width:1020, rowNum:10, rowList:[20,40,60]}
 
+#OOBtn5=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+
 #OOBtn2=修改
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
 
 #OOBtn4=刪除
 {search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
 
-#OOBtn5=查詢
-{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+#OOBtn6=歷程
+{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
 
 #OOCustNoX=戶號
 {width:110}
@@ -204,9 +227,9 @@ TXFORM=L5056
 {width:100,align:'center'}
 
 #OOLastUpdateEmp=修改人員
-{width:120}
+{width:140}
 
 #OOLastUpdate=修改日期
-{width:120}
+{width:140}
 ^
 </sub>

@@ -19,27 +19,37 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L5511" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
-["[L5511]                           產生介紹、協辦、專業獎勵獎金發放媒體"],
+["[L5511]                           產生介紹、協辦獎金發放媒體"],
 [#<->#,"#FdFunCode+功能",#FunCode,#FunCodeX],
-[#<->#,"#FdDateFm+工作年月",#WorkMonth],
+[#<->#,"#FdWorkMonth+工作年月",#WorkMonth],
 [#<->#,"#FdDateFm+撥款起訖日",#DateFm,"~",#DateTo],
 [#<->#,"#FdBonusDate+獎金發放日",#BonusDate],
+[#<->#,"#FdMonths+檢核月數",#Months],
 ]
+
 
 !不可重新交易
 #AGAIN=X,1,S
 E(0,1)ASGN(AGAIN$)
+INVOKEJS(SHOW,L5511_5,0)
 
 #FdFunCode=X,2,L
+T(3,*)
+
+#FdWorkMonth=X,2,L
+T(3,*)
+
 #FdDateFm=X,2,L
 #FdBonusDate=X,2,L
+#FdMonths=X,2,L
+T(3,*)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
 ! 37*2+3*2+2=74+6
 #FunCodeHelp=X,200,S
-T(3,1:保費檢核及匯入介紹、協辦獎金發放資料;2:產生介紹、協辦、專業獎勵獎金媒體檔;3:取消介紹、協辦、專業獎勵獎金媒體檔)
+T(3,1:保費檢核及匯入介紹、協辦獎金發放資料;2:產生介紹、協辦獎金媒體檔;3:取消介紹、協辦獎金媒體檔)
 
 
 <include src="ROM.icf::L5R38.rtn"/>
@@ -54,6 +64,7 @@ E(0,@WorkMonth,#L5R38oWorkYM)
 E(0,@WorkMonth2,#L5R38oWorkYM)
 E(0,@DateFm,#L5R38oStartDate)
 E(0,@DateTo,#L5R38oEndDate)
+E(0,@BonusDate,#L5R38oBonusDate)
 
 #FunCode=X,1,I
 HELP(#FunCodeHelp)
@@ -62,7 +73,7 @@ HELP(#FunCodeHelp)
 #FunCodeX=X,60,L
 T(H,#FunCode,#FunCodeHelp)
 C(2,#FunCode,$,K(MODIFYBUTTON,匯入資料),K(MODIFYBUTTON,產生媒體),K(MODIFYBUTTON,取消媒體))
-C(3,#FunCode,2,INVOKEJS(SHOW,L5511_4,1),INVOKEJS(SHOW,L5511_4,0))
+C(3,#FunCode,1,INVOKEJS(SHOW,L5511_5,1),INVOKEJS(SHOW,L5511_5,0))
 
 #WorkMonth2=A,5,S
 
@@ -79,6 +90,7 @@ S(L5R38,01,#L5R38iCode,#L5R38iWorkYM)
 R(1,L5R38)
 E(0,@DateFm,#L5R38oStartDate)
 E(0,@DateTo,#L5R38oEndDate)
+E(0,@BonusDate,#L5R38oBonusDate)
 
 ! 撥款起始日
 #DateFm=D,7,L
@@ -87,14 +99,19 @@ E(0,@DateTo,#L5R38oEndDate)
 #DateTo=D,7,L
 
 ! 獎金發放日
-#BonusDate=D,7,I
-C(3,#FunCode,2,$,s)
-D(8)
-@
-V(7)
-A(DATE,0,#BonusDate)
-IF(#BonusDate<=#DateTo,V(P,獎金發放日必須大於撥款起訖日),$)
+#BonusDate=D,7,L
+!C(3,#FunCode,2,$,s)
+!D(8)
+!@
+!V(7)
+!A(DATE,0,#BonusDate)
+!IF(#BonusDate<=#DateTo,V(P,獎金發放日必須大於撥款起訖日),$)
 
+#Months=m,2,I
+C(3,#FunCode,1,$,S)
+C(3,#Months,0,E(0,4),$)
+@
+V(2,0)
 
 </sub>
 
@@ -108,7 +125,7 @@ IF(#BonusDate<=#DateTo,V(P,獎金發放日必須大於撥款起訖日),$)
 
 
 #SCRTIL=_,_,S
-T(3,[L5511] 產生介紹、協辦、專業獎勵獎金發放媒體)
+T(3,[L5511] 產生介紹、協辦獎金發放媒體)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 #fileSno=A,8,S
@@ -127,6 +144,7 @@ T(3,[L5511] 產生介紹、協辦、專業獎勵獎金發放媒體)
 #DateFm
 #DateTo
 #BonusDate
+#Months
 </sub>
 
 !------ 下行電文TOM ------

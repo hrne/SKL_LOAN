@@ -49,7 +49,7 @@ public class AcReceivable implements Serializable {
   private int facmNo = 0;
 
   // 銷帳編號
-  /* 1.暫收款－可抵繳 : ''primary key 不可有null, 放一個空白2.擔保放款、催收款項 : 撥款序號(3)3.會計銷帳科目：系統自編(AC+西元年後兩碼+流水號六碼)4.暫收款－支票：支票帳號(9)-支票號碼(7) 5.未收帳管費：第一筆撥款序號(3) 6.未收契變手續費：契變日期(8,西元)+契變序號(02)7.未收、暫收、暫付、催收火險保費：原保險單號碼8.暫付、催收法務費：記錄號碼(8)9.短繳期金：撥款序號(3)10.'FacmNo'+額度編號(暫收款－借新還舊)11.聯貸手續費:SL+費用代號(2)+流水號(3) */
+  /* 1.暫收款－可抵繳 : ''primary key 不可有null, 放一個空白2.擔保放款、催收款項 : 撥款序號(3)3.會計銷帳科目：系統自編(AC+西元年後兩碼+流水號六碼)4.暫收款－支票：支票帳號(9)-支票號碼(7) 5.未收帳管費：第一筆撥款序號(3) 6.未收契變手續費：契變日期(8,西元)+契變序號(02)7.未收、暫收、暫付、催收火險保費：原保險單號碼8.暫付、催收法務費：記錄號碼(8)9.短繳期金：撥款序號(3)10.'FacmNo'+額度編號(暫收款－借新還舊)11.聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM) */
   @Column(name = "`RvNo`", length = 30, insertable = false, updatable = false)
   private String rvNo;
 
@@ -87,7 +87,7 @@ public class AcReceivable implements Serializable {
   private int acctFlag = 0;
 
   // 銷帳科目記號
-  /* 1:會計銷帳科目2:業務銷帳科目3:未收費用4:短繳期金5.另收欠款(未用) */
+  /* 1:會計銷帳科目2:業務銷帳科目3:未收費用4:短繳期金5.另收欠款 */
   @Column(name = "`ReceivableFlag`")
   private int receivableFlag = 0;
 
@@ -256,7 +256,7 @@ public class AcReceivable implements Serializable {
 8.暫付、催收法務費：記錄號碼(8)
 9.短繳期金：撥款序號(3)
 10.'FacmNo'+額度編號(暫收款－借新還舊)
-11.聯貸手續費:SL+費用代號(2)+流水號(3)
+11.聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
 	* @return String
 	*/
   public String getRvNo() {
@@ -275,7 +275,7 @@ public class AcReceivable implements Serializable {
 8.暫付、催收法務費：記錄號碼(8)
 9.短繳期金：撥款序號(3)
 10.'FacmNo'+額度編號(暫收款－借新還舊)
-11.聯貸手續費:SL+費用代號(2)+流水號(3)
+11.聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
   *
   * @param rvNo 銷帳編號
 	*/
@@ -424,7 +424,7 @@ public class AcReceivable implements Serializable {
 2:業務銷帳科目
 3:未收費用
 4:短繳期金
-5.另收欠款(未用)
+5.另收欠款
 	* @return Integer
 	*/
   public int getReceivableFlag() {
@@ -437,7 +437,7 @@ public class AcReceivable implements Serializable {
 2:業務銷帳科目
 3:未收費用
 4:短繳期金
-5.另收欠款(未用)
+5.另收欠款
   *
   * @param receivableFlag 銷帳科目記號
 	*/

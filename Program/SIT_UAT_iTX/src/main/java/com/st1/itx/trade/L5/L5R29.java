@@ -1,12 +1,8 @@
 package com.st1.itx.trade.L5;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -27,26 +23,26 @@ import com.st1.itx.tradeService.TradeBuffer;
 @Service("L5R29")
 @Scope("prototype")
 /**
- * L5R29
+ * 
  * 
  * @author Jacky
  * @version 1.0.0
  */
 public class L5R29 extends TradeBuffer {
 	@Autowired
-	PfBsDetailService pfBsDetailService;
+	public PfBsDetailService pfBsDetailService;
 
 	@Autowired
-	PfItDetailService sPfItDetailService;
+	public PfItDetailService pfItDetailService;
 
 	@Autowired
-	CustMainService sCustMainService;
+	public CustMainService sCustMainService;
 
 	@Autowired
-	CdEmpService sCdEmpService;
+	public CdEmpService sCdEmpService;
 
 	@Autowired
-	PfBsDetailAdjustService pfBsDetailAdjustService;
+	public PfBsDetailAdjustService pfBsDetailAdjustService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -54,122 +50,68 @@ public class L5R29 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		// L5052調RIM
 		this.info("L5R29");
-//		Long iLogNo = Long.valueOf(titaVo.get("LogNo").trim());
-		int custNo = Integer.valueOf(titaVo.getParam("CustNo"));
-		int facmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
-		int workMonth = Integer.valueOf(titaVo.getParam("WorkMonth").trim()) + 191100;
+		long logNo = Long.valueOf(titaVo.getParam("LogNo"));
 
-		Slice<PfBsDetail> slPfBsDetail = pfBsDetailService.findByCustNoAndFacmNo(custNo, facmNo, 0, Integer.MAX_VALUE,
-				titaVo);
+		PfBsDetail pfBsDetail = pfBsDetailService.findById(logNo, titaVo);
 
-		List<PfBsDetail> lPfBsDetail = slPfBsDetail == null ? null : slPfBsDetail.getContent();
-
-		BigDecimal bigZero = new BigDecimal("0");
-		BigDecimal bigNeg = new BigDecimal("-1");
-
-		boolean found = false;
-		boolean first = true;
-		BigDecimal perfAmt = new BigDecimal("0");
-		
-		if (lPfBsDetail != null && lPfBsDetail.size() > 0) {
-			for (PfBsDetail pfBsDetail : lPfBsDetail) {
-				if (pfBsDetail.getDrawdownAmt().compareTo(bigZero) <= 0) {
-					continue;
-				}
-				if (pfBsDetail.getWorkMonth() != workMonth) {
-					continue;
-				}
-				if (pfBsDetail.getRepayType() != 0) {
-					continue;
-				}
-				found = true;
-				perfAmt = perfAmt.add(pfBsDetail.getPerfAmt());
-				if (first) {
-					first = false;
-					totaVo.putParam("L5r29CustNo", pfBsDetail.getCustNo());
-					totaVo.putParam("L5r29FacmNo", pfBsDetail.getFacmNo());
-					totaVo.putParam("L5r29BormNo", pfBsDetail.getBormNo());
-
-					CustMain custMain = sCustMainService.custNoFirst(pfBsDetail.getCustNo(), pfBsDetail.getCustNo(),
-							titaVo);
-					if (custMain != null) {
-						totaVo.putParam("L5r29CustNm", custMain.getCustName());
-					} else {
-						totaVo.putParam("L5r29CustNm", "");
-					}
-
-					totaVo.putParam("L5r29WorkMonth", pfBsDetail.getWorkMonth() - 191100);
-					totaVo.putParam("L5r29BsOfficer", pfBsDetail.getBsOfficer());
-					totaVo.putParam("L5r29BsOfficerName", findEmpName(pfBsDetail.getBsOfficer(), titaVo));
-
-					PfItDetail pfItDetail = sPfItDetailService.findByTxFirst(pfBsDetail.getCustNo(),
-							pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), pfBsDetail.getPerfDate() + 19110000,
-							pfBsDetail.getRepayType(), pfBsDetail.getPieceCode(), titaVo);
-					if (pfItDetail != null) {
-						totaVo.putParam("L5r29Introducer", pfItDetail.getIntroducer());
-						totaVo.putParam("L5r29IntroducerName", findEmpName(pfItDetail.getIntroducer(), titaVo));
-					} else {
-						totaVo.putParam("L5r29Introducer", "");
-						totaVo.putParam("L5r29IntroducerName", "");
-					}
-				}
-			}
+		if (pfBsDetail == null) {
+			throw new LogicException(titaVo, "E0001", "房貸專員業績資料");
 		}
 
-		if (!found) {
-			throw new LogicException(titaVo, "E0001", "業績資料");
-		}
-		
-		totaVo.putParam("L5r29PerfAmt", perfAmt);
+		totaVo.putParam("L5r29CustNo", pfBsDetail.getCustNo());
+		totaVo.putParam("L5r29FacmNo", pfBsDetail.getFacmNo());
+		totaVo.putParam("L5r29BormNo", pfBsDetail.getBormNo());
 
-		PfBsDetailAdjust pfBsDetailAdjust = pfBsDetailAdjustService.findCustFacmFirst(custNo, facmNo, workMonth,
-				titaVo);
+		CustMain custMain = sCustMainService.custNoFirst(pfBsDetail.getCustNo(), pfBsDetail.getCustNo(), titaVo);
+		if (custMain != null) {
+			totaVo.putParam("L5r29CustNm", custMain.getCustName());
+		} else {
+			totaVo.putParam("L5r29CustNm", "");
+		}
+
+		totaVo.putParam("L5r29WorkMonth", pfBsDetail.getWorkMonth() - 191100);
+		totaVo.putParam("L5r29BsOfficer", pfBsDetail.getBsOfficer());
+		totaVo.putParam("L5r29BsOfficerName", FindEmpName(pfBsDetail.getBsOfficer(), titaVo));
+
+		PfItDetail pfItDetail = pfItDetailService.findByTxFirst(pfBsDetail.getCustNo(), pfBsDetail.getFacmNo(),
+				pfBsDetail.getBormNo(), pfBsDetail.getPerfDate() + 19110000, pfBsDetail.getRepayType(),
+				pfBsDetail.getPieceCode(), titaVo);
+		if (pfItDetail != null) {
+			totaVo.putParam("L5r29Introducer", pfItDetail.getIntroducer());
+			totaVo.putParam("L5r29IntroducerName", FindEmpName(pfItDetail.getIntroducer(), titaVo));
+		} else {
+			totaVo.putParam("L5r29Introducer", "");
+			totaVo.putParam("L5r29IntroducerName", "");
+		}
+
+		totaVo.putParam("L5r29PerfCnt", pfBsDetail.getPerfCnt());
+		totaVo.putParam("L5r29PerfAmt", pfBsDetail.getPerfAmt());
+
+		PfBsDetailAdjust pfBsDetailAdjust = pfBsDetailAdjustService.findCustBormFirst(pfBsDetail.getCustNo(),
+				pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), titaVo);
 
 		if (pfBsDetailAdjust == null) {
-			totaVo.putParam("L5r29AdjPerfAmtSign", "");
-			totaVo.putParam("L5r29AdjPerfAmt", 0);
-			totaVo.putParam("L5r29AdjPerfCntSign", "");
-			totaVo.putParam("L5r29AdjPerfCnt", 0);
 			totaVo.putParam("L5r29AdjLogNo", 0);
 		} else {
-			BigDecimal amt = pfBsDetailAdjust.getAdjPerfAmt();
-			String sign = "";
-			if (pfBsDetailAdjust.getAdjPerfAmt().compareTo(bigZero) > 0) {
-				sign = "+";
-			} else if (pfBsDetailAdjust.getAdjPerfAmt().compareTo(bigZero) < 0) {
-				sign = "-";
-				amt = amt.multiply(bigNeg);
+			if (pfBsDetailAdjust.getWorkMonth() > 0) {
+				this.totaVo.putParam("L5r29PerfCnt", pfBsDetailAdjust.getAdjPerfCnt());
+				this.totaVo.putParam("L5r29PerfAmt", pfBsDetailAdjust.getAdjPerfAmt());
 			}
-			this.totaVo.putParam("L5r29AdjPerfAmtSign", sign);
-			this.totaVo.putParam("L5r29AdjPerfAmt", amt);
-
-			BigDecimal cnt = pfBsDetailAdjust.getAdjPerfCnt();
-
-			sign = "";
-
-			if (pfBsDetailAdjust.getAdjPerfCnt().compareTo(bigZero) > 0) {
-				sign = "+";
-			} else if (pfBsDetailAdjust.getAdjPerfCnt().compareTo(bigZero) < 0) {
-				sign = "-";
-				cnt = cnt.multiply(bigNeg);
-			}
-			this.totaVo.putParam("L5r29AdjPerfCntSign", sign);
-			this.totaVo.putParam("L5r29AdjPerfCnt", cnt);
 			totaVo.putParam("L5r29AdjLogNo", pfBsDetailAdjust.getLogNo());
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	public String findEmpName(String employeeNo, TitaVo titaVo) {
-		String empName = "";
+	public String FindEmpName(String employeeNo, TitaVo titaVo) {
+		String EmpName = "";
 		if (employeeNo != null && employeeNo.length() != 0) {
 			CdEmp CdEmpVo = sCdEmpService.findById(employeeNo, titaVo);
 			if (CdEmpVo != null) {
-				empName = CdEmpVo.getFullname();
+				EmpName = CdEmpVo.getFullname();
 			}
 		}
-		return empName;
+		return EmpName;
 	}
 }

@@ -248,6 +248,9 @@ public class TxBatchCom extends TradeBuffer {
 //  應繳息日
 	private int repayIntDate = 0;
 
+//	溢短收記號
+	private int overRpFg = 0; // 1->溢短收記號 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
+
 //  結案記號  1.正常結案  2.提前結案 
 	private int closeFg = 0;
 //  部分償還 
@@ -648,7 +651,7 @@ public class TxBatchCom extends TradeBuffer {
 			txTitaVo.putParam("OverRpFg", "1");
 			txTitaVo.putParam("OverRpAmt", shortAmt);
 		} else if (overAmt != null) {
-			txTitaVo.putParam("OverRpFg", "2");
+			txTitaVo.putParam("OverRpFg", this.tTempVo.get("OverRpFg"));
 			txTitaVo.putParam("OverRpAmt", overAmt);
 		} else {
 			txTitaVo.putParam("OverRpFg", "0");
@@ -1241,7 +1244,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.info("暫收抵繳 tmpAmt              = " + this.tmpAmt);
 		this.info("短繳金額 shortAmt            = " + this.shortAmt);
 		this.info("溢繳金額 overAmt             = " + this.overAmt);
-		this.info("溢繳款額度 OverRpFacmNo      = " + this.overRpFacmNo);
+		this.info("溢繳款額度 OverRpFacmNo      = " + this.overRpFacmNo + ", 溢短收記號=" + this.overRpFg);
 		this.info("其他額度暫收可抵繳 otrTavAmt = " + this.otrTavAmt);
 		this.info("還款前放款餘額 loanBal       = " + this.loanBal);
 		this.info("費用還款類別 feeRepayType    = " + this.feeRepayType);
@@ -1438,6 +1441,8 @@ public class TxBatchCom extends TradeBuffer {
 			this.tTempVo.putParam("OverAmt", this.overAmt);
 		if (this.overRpFacmNo != this.repayFacmNo && this.overRpFacmNo > 0)
 			this.tTempVo.putParam("OverRpFacmNo", this.overRpFacmNo);
+		if (this.overRpFg > 0)
+			this.tTempVo.putParam("OverRpFg", this.overRpFg);
 		if (this.principal.compareTo(BigDecimal.ZERO) > 0)
 			this.tTempVo.putParam("Principal", this.principal);
 		if (this.interest.compareTo(BigDecimal.ZERO) > 0)
@@ -1490,7 +1495,7 @@ public class TxBatchCom extends TradeBuffer {
 		}
 		// 是否內含利息
 		if (this.includeIntFlag != null) {
-			this.tTempVo.putParam("RepayIntDate", this.repayIntDate);
+			this.tTempVo.putParam("IncludeIntFlag", this.includeIntFlag);
 		}
 		// 利息是否可欠繳
 		if (this.unpaidIntFlag != null) {
@@ -1548,6 +1553,9 @@ public class TxBatchCom extends TradeBuffer {
 
 		// 結案記號判斷
 		boolean isCloseFg = true;
+
+//		整批入帳、部分繳款
+		boolean isRepayPart = false;
 
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
 			for (BaTxVo baTxVo : baTxList) {
@@ -1609,6 +1617,13 @@ public class TxBatchCom extends TradeBuffer {
 					if (baTxVo.getCloseFg() == 0) {
 						isCloseFg = false;
 					}
+					// 整批入帳、部分繳款
+					if (this.repayIntDate > 0) {
+						if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0
+								&& baTxVo.getPayIntDate() <= this.repayIntDate) {
+							isRepayPart = true;	
+						}
+					}
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
 						this.principal = this.principal.add(baTxVo.getPrincipal());
@@ -1631,12 +1646,20 @@ public class TxBatchCom extends TradeBuffer {
 					this.tavAmt = this.tavAmt.add(baTxVo.getUnPaidAmt());
 					this.tmpAmt = this.tmpAmt.add(baTxVo.getAcctAmt());
 				}
+				// overRpFg 溢短收記號 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 				if (baTxVo.getDataKind() == 4) {
 					if ("D".equals(baTxVo.getDbCr())) {
 						this.shortAmt = this.shortAmt.add(baTxVo.getUnPaidAmt());
+						this.overRpFacmNo = baTxVo.getFacmNo();
+						this.overRpFg = 1;
 					} else {
 						this.overAmt = this.overAmt.add(baTxVo.getUnPaidAmt());
 						this.overRpFacmNo = baTxVo.getFacmNo();
+						if (isRepayPart) {
+							this.overRpFg = 3;
+						} else {
+							this.overRpFg = 2;
+						}
 					}
 				}
 				if (baTxVo.getDataKind() == 5) {

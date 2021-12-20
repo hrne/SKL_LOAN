@@ -65,7 +65,7 @@ public class L5506 extends TradeBuffer {
 					pfIntranetAdjust = pfIntranetAdjustService.update2(pfIntranetAdjust, titaVo);
 
 					dataLog.setEnv(titaVo, pfIntranetAdjust2, pfIntranetAdjust);
-					dataLog.exec();
+					dataLog.exec("修改內網報表業績調整資料");
 
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
@@ -74,14 +74,21 @@ public class L5506 extends TradeBuffer {
 		} else if ("4".equals(iFunCode)) {
 			long iLogNo = Long.valueOf(titaVo.getParam("LogNo").trim());
 
-			PfIntranetAdjust pfIntranetAdjust = pfIntranetAdjustService.findById(iLogNo, titaVo);
+			PfIntranetAdjust pfIntranetAdjust = pfIntranetAdjustService.holdById(iLogNo, titaVo);
 
 			if (pfIntranetAdjust == null) {
 				throw new LogicException(titaVo, "E0003", "");
 			} else {
+				PfIntranetAdjust pfIntranetAdjust2 = (PfIntranetAdjust) dataLog.clone(pfIntranetAdjust);
+				
+				pfIntranetAdjust.setSumAmt(BigDecimal.ZERO);
+				pfIntranetAdjust.setSumCnt(BigDecimal.ZERO);
 
 				try {
 					pfIntranetAdjustService.delete(pfIntranetAdjust, titaVo);
+
+					dataLog.setEnv(titaVo, pfIntranetAdjust2, pfIntranetAdjust);
+					dataLog.exec("刪除內網報表業績調整資料");
 
 				} catch (DBException e) {
 					throw new LogicException("E0008", "");

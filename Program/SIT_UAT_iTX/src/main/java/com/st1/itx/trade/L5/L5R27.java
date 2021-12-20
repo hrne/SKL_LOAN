@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L5;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class L5R27 extends TradeBuffer {
 		PfItDetail pfItDetail = sPfItDetailService.findById(logNo, titaVo);
 
 		if (pfItDetail == null) {
-			throw new LogicException(titaVo, "E0001", "額度資料");
+			throw new LogicException(titaVo, "E0001", "介紹人業績資料");
 		}
 		// UtilBal = facMain.getUtilBal();
 
@@ -104,11 +103,11 @@ public class L5R27 extends TradeBuffer {
 		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
 				pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
 
-		if (pfItDetailAdjust == null) {
-			totaVo.putParam("L5r27AdjPerfEqAmt", new BigDecimal("0"));
-			totaVo.putParam("L5r27AdjPerfReward", new BigDecimal("0"));
-			totaVo.putParam("L5r27AdjPerfAmt", new BigDecimal("0"));
-			totaVo.putParam("L5r27AdjCntingCode", "");
+		if (pfItDetailAdjust == null || pfItDetailAdjust.getAdjRange() == 0) {
+			totaVo.putParam("L5r27AdjPerfEqAmt", pfItDetail.getPerfEqAmt());
+			totaVo.putParam("L5r27AdjPerfReward", pfItDetail.getPerfReward());
+			totaVo.putParam("L5r27AdjPerfAmt", pfItDetail.getPerfAmt());
+			totaVo.putParam("L5r27AdjCntingCode", pfItDetail.getCntingCode());
 			totaVo.putParam("L5r27AdjRange", 0);
 			totaVo.putParam("L5r27AdjLogNo", 0);
 		} else {

@@ -39,7 +39,8 @@ public class L5R38 extends TradeBuffer {
 		int wMonth = 0;
 		int startDate = 0;
 		int endDate = 0;
-
+		int bonusDate = Integer.valueOf(titaVo.getCalDy());
+		
 		if ("1".equals(iCode)) {
 			// 依日期回上個月工作年月及業績起訖日
 			int iDate = Integer.valueOf(titaVo.get("L5R38iDate").trim());
@@ -65,6 +66,7 @@ public class L5R38 extends TradeBuffer {
 			}
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
+			bonusDate = cdWorkMonth.getBonusDate();
 		} else if ("2".equals(iCode)) {
 			// 依工作年月回業績起訖日
 			wYear = Integer.valueOf(titaVo.get("L5R38iWorkYM").trim().substring(0, 3)) + 1911;
@@ -80,6 +82,7 @@ public class L5R38 extends TradeBuffer {
 			}
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
+			bonusDate = cdWorkMonth.getBonusDate();
 		} else if ("3".equals(iCode)) {
 			// 依日期回工作年月及業績起訖日
 			int iDate = Integer.valueOf(titaVo.get("L5R38iDate").trim());
@@ -91,6 +94,7 @@ public class L5R38 extends TradeBuffer {
 			wYear = cdWorkMonth.getYear();
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
+			bonusDate = cdWorkMonth.getBonusDate();
 		}
 
 		wYear -= 1911;
@@ -106,8 +110,6 @@ public class L5R38 extends TradeBuffer {
 		} else if (wMonth >= 10 && wMonth <= 13) {
 			wSeason += 4;
 		}
-
-		int bonusDate = Integer.valueOf(titaVo.getCalDy());
 
 		this.totaVo.putParam("L5R38oWorkYM", String.format("%03d%02d", wYear, wMonth));
 		this.totaVo.putParam("L5R38oWorkYear", wYear);

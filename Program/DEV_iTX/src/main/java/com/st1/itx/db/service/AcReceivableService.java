@@ -244,6 +244,36 @@ public interface AcReceivableService {
   public Slice<AcReceivable> useL2064Eq(int custNo_0, int acctFlag_1, int acctFlag_2, String rvNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND AcctFlag &gt;= ,AND AcctFlag &lt;= ,AND RvNo %
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param acctFlag_2 acctFlag_2
+   * @param acctFlag_3 acctFlag_3
+   * @param rvNo_4 rvNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcReceivable AcReceivable of List
+   */
+  public Slice<AcReceivable> useL2r58Eq(int custNo_0, int facmNo_1, int acctFlag_2, int acctFlag_3, String rvNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustNo &gt;= ,AND CustNo &lt;= ,AND ClsFlag = ,AND ReceivableFlag = ,AND RvNo %
+   *
+   * @param custNo_0 custNo_0
+   * @param custNo_1 custNo_1
+   * @param clsFlag_2 clsFlag_2
+   * @param receivableFlag_3 receivableFlag_3
+   * @param rvNo_4 rvNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcReceivable AcReceivable of List
+   */
+  public Slice<AcReceivable> useBs902Eq(int custNo_0, int custNo_1, int clsFlag_2, int receivableFlag_3, String rvNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AcReceivable
    * 
    * @param acReceivableId key

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txAuthorizeService")
 @Repository
-public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxAuthorizeServiceImpl.class);
+public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthorizeService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + autoSeq);
+		this.info("findById " + dbName + " " + autoSeq);
 		Optional<TxAuthorize> txAuthorize = null;
 		if (dbName.equals(ContentName.onDay))
 			txAuthorize = txAuthorizeReposDay.findById(autoSeq);
@@ -94,7 +91,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AutoSeq"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAuthorizeReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -116,7 +113,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findSupNo " + dbName + " : " + "entdy_0 : " + entdy_0 + " supNo_1 : " + supNo_1);
+		this.info("findSupNo " + dbName + " : " + "entdy_0 : " + entdy_0 + " supNo_1 : " + supNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAuthorizeReposDay.findAllByEntdyIsAndSupNoIsOrderBySupNoAsc(entdy_0, supNo_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -138,7 +135,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findEntdy " + dbName + " : " + "entdy_0 : " + entdy_0 + " entdy_1 : " + entdy_1);
+		this.info("findEntdy " + dbName + " : " + "entdy_0 : " + entdy_0 + " entdy_1 : " + entdy_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAuthorizeReposDay.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByEntdyAsc(entdy_0, entdy_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -156,7 +153,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + autoSeq);
+		this.info("Hold " + dbName + " " + autoSeq);
 		Optional<TxAuthorize> txAuthorize = null;
 		if (dbName.equals(ContentName.onDay))
 			txAuthorize = txAuthorizeReposDay.findByAutoSeq(autoSeq);
@@ -174,7 +171,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txAuthorize.getAutoSeq());
+		this.info("Hold " + dbName + " " + txAuthorize.getAutoSeq());
 		Optional<TxAuthorize> txAuthorizeT = null;
 		if (dbName.equals(ContentName.onDay))
 			txAuthorizeT = txAuthorizeReposDay.findByAutoSeq(txAuthorize.getAutoSeq());
@@ -196,7 +193,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txAuthorize.getAutoSeq());
+		this.info("Insert..." + dbName + " " + txAuthorize.getAutoSeq());
 		if (this.findById(txAuthorize.getAutoSeq()) != null)
 			throw new DBException(2);
 
@@ -222,7 +219,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txAuthorize.getAutoSeq());
+		this.info("Update..." + dbName + " " + txAuthorize.getAutoSeq());
 		if (!empNot.isEmpty())
 			txAuthorize.setLastUpdateEmpNo(empNot);
 
@@ -245,7 +242,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txAuthorize.getAutoSeq());
+		this.info("Update..." + dbName + " " + txAuthorize.getAutoSeq());
 		if (!empNot.isEmpty())
 			txAuthorize.setLastUpdateEmpNo(empNot);
 
@@ -265,7 +262,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txAuthorize.getAutoSeq());
+		this.info("Delete..." + dbName + " " + txAuthorize.getAutoSeq());
 		if (dbName.equals(ContentName.onDay)) {
 			txAuthorizeReposDay.delete(txAuthorize);
 			txAuthorizeReposDay.flush();
@@ -292,7 +289,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxAuthorize t : txAuthorize)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -321,7 +318,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txAuthorize == null || txAuthorize.size() == 0)
 			throw new DBException(6);
 
@@ -346,7 +343,7 @@ public class TxAuthorizeServiceImpl implements TxAuthorizeService, InitializingB
 
 	@Override
 	public void deleteAll(List<TxAuthorize> txAuthorize, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

@@ -294,6 +294,7 @@ public class L3200 extends TradeBuffer {
 	private boolean isCalcRepayInt = false;
 	private boolean isSettleUnpaid = false;
 	private boolean isLoanClose = false; // 最後一期期款/部分償還結案
+	private boolean isRepayPart = false; // 整批入帳、部分繳款
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -356,7 +357,7 @@ public class L3200 extends TradeBuffer {
 		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
 		iRealRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("RealRepayAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
-		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收
+		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收  2->溢收 3->溢收(整批入帳、部分繳款)
 		if (iOverRpFg == 1) {
 			iShortAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
 			iOverAmt = BigDecimal.ZERO;
@@ -386,7 +387,7 @@ public class L3200 extends TradeBuffer {
 		this.info("iFireFee=" + iFireFee + ",iLawFee1=" + iLawFee);
 		this.info("iShortfallPrin=" + iShortfallPrin + ",iShortfallInt=" + iShortfallInt + ",iShortCloseBreach="
 				+ iShortCloseBreach);
-		this.info("iOverAmt=" + iOverAmt + ",iShortAmt=" + iOverAmt + ",iOverRpFacmNo=" + iOverRpFacmNo);
+		this.info("iOverAmt=" + iOverAmt + ",iShortAmt=" + iShortAmt + ",iOverRpFacmNo=" + iOverRpFacmNo);
 		// 應繳日
 		if (titaVo.isTrmtypBatch() && titaVo.get("PayIntDate") != null) {
 			iPayIntDate = parse.stringToInteger(titaVo.getParam("PayIntDate"));
@@ -876,7 +877,10 @@ public class L3200 extends TradeBuffer {
 				return;
 			}
 		}
-
+		// 整批入帳、部分繳款(少繳一期)
+		if (iOverRpFg == 3 && ln.getFacmNo() == iOverRpFacmNo) {
+			isRepayPart = true;
+		}
 		wkIntStartDate = 9991231;
 		wkIntEndDate = 0;
 		wkLoanBal = ln.getLoanBal();
@@ -937,14 +941,17 @@ public class L3200 extends TradeBuffer {
 			}
 			wkTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
 					ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), wkPayIntDate);
-
 			// 應繳計算止日
 			wkIntEndDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
 					ln.getSpecificDd(), wkTermNo, ln.getMaturityDate());
 
 			// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
 			wkTerms = wkTermNo - wkPrevTermNo;
-
+			
+			// 整批入帳、部分繳款(少繳一期)
+            if (isRepayPart) {
+            	wkTerms --;	
+            }
 			// 應繳之期數不可大於可回收期數
 			if (wkTerms <= 0) {
 				checkMsg += ", 可預收迄日:" + wkPreRepayDate + ", 試算收息日:" + wkIntEndDate + ",可回收期數= " + wkTerms;

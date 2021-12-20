@@ -333,7 +333,7 @@ TXFORM=L5053
 <sub type="SELECT">
 
 #RPTFG=1,QUERY.GRID,L5053A
-#any={detail:true, header:'L5053A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+#any={detail:true, header:'L5053A.part', caption:'', width:1020, rowNum:10, rowList:[20,40,60]}
 #OOBtnA=查詢
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOBtnB=修改

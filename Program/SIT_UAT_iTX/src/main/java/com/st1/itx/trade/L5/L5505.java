@@ -13,8 +13,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.PfDetailCom;
 import com.st1.itx.util.common.data.PfDetailVo;
-
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.db.domain.PfItDetail;
+import com.st1.itx.db.domain.PfItDetailAdjust;
+import com.st1.itx.db.service.PfItDetailAdjustService;
 import com.st1.itx.db.service.PfItDetailService;
 
 @Service("L5505")
@@ -26,13 +28,19 @@ import com.st1.itx.db.service.PfItDetailService;
  * @version 1.0.0
  */
 public class L5505 extends TradeBuffer {
-	
+
 	@Autowired
 	PfDetailCom pfDetailCom;
-	
+
 	@Autowired
 	public PfItDetailService pfItDetailService;
-	
+
+	@Autowired
+	public PfItDetailAdjustService pfItDetailAdjustService;
+
+	@Autowired
+	public DataLog dataLog;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5505 ");
@@ -43,17 +51,17 @@ public class L5505 extends TradeBuffer {
 //		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo").trim());
 //		int iBormNo = Integer.valueOf(titaVo.getParam("BormNo").trim());
 		String PieceCodeAft = titaVo.getParam("PieceCodeAft").trim();
-		
+
 		PfItDetail pfItDetail = pfItDetailService.findById(iLogNo, titaVo);
-		
+
 		if (pfItDetail == null) {
-			throw new LogicException("E0001", "業績資料=" + iLogNo);
+			throw new LogicException("E0003", "業績資料=" + iLogNo);
 		}
-		
+
 		pfDetailCom.setTxBuffer(this.getTxBuffer());
 
 		PfDetailVo pf = new PfDetailVo();
-		
+
 		pf.setCustNo(pfItDetail.getCustNo()); // 借款人戶號
 		pf.setFacmNo(pfItDetail.getFacmNo()); // 額度編號
 		pf.setBormNo(pfItDetail.getBormNo()); // 撥款序號
@@ -67,6 +75,29 @@ public class L5505 extends TradeBuffer {
 		pf.setRepaidPeriod(0); // 已攤還期數
 
 		pfDetailCom.addDetail(pf, titaVo); // 產生業績明細
+
+		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
+				pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
+
+		PfItDetail pfItDetail2 = new PfItDetail();
+
+		if (pfItDetailAdjust == null || pfItDetailAdjust.getAdjRange() == 0) {
+			pfItDetail2 = pfItDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), pfItDetail.getPerfDate(), pfItDetail.getRepayType(), pfItDetail.getPieceCode(), titaVo);
+			if (pfItDetail2 == null) {
+				pfItDetail2 = (PfItDetail) dataLog.clone(pfItDetail);
+				pfItDetail2.setPieceCode(PieceCodeAft);
+			}
+
+		} else {
+			pfItDetail2 = (PfItDetail) dataLog.clone(pfItDetail);
+			pfItDetail2.setPieceCode(PieceCodeAft);
+			
+			this.totaVo.setWarnMsg("有人工調整，介紹人業績案件，請確認");
+		}
+
+		dataLog.setEnv(titaVo, pfItDetail, pfItDetail2);
+
+		dataLog.exec("修改業績案件計件代碼");
 
 		this.addList(this.totaVo);
 		return this.sendList();

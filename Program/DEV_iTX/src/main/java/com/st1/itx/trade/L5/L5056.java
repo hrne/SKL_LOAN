@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,10 +75,18 @@ public class L5056 extends TradeBuffer {
 			
 			occursList.putParam("OOWorkMonth", d.get("YM")); 
 			
+			BigDecimal amt = new BigDecimal(d.get("SumAmt"));
+			BigDecimal cnt = new BigDecimal(d.get("SumCnt"));
+			if (amt.compareTo(BigDecimal.ZERO) == 0 && cnt.compareTo(BigDecimal.ZERO) == 0) {
+				occursList.putParam("OOCanDelete",0);
+			} else {
+				occursList.putParam("OOCanDelete",1);
+			}
+			
 			occursList.putParam("OOCreateEmp", d.get("CreateEmpNo") + " " +d.get("CreateEmpName")); 
-			occursList.putParam("OOCreateDate", d.get("CreateDate")); 
+			occursList.putParam("OOCreateDate", parse.stringToStringDateTime(d.get("CreateDate"))); 
 			occursList.putParam("OOLastUpdateEmp", d.get("LastUpdateEmpNo")+ " " + d.get("LastUpdateEmpName")); 
-			occursList.putParam("OOLastUpdate", parse.stringToStringDate(d.get("LastUpdate"))); 
+			occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate"))); 
 			
 			this.totaVo.addOccursList(occursList);
 		}

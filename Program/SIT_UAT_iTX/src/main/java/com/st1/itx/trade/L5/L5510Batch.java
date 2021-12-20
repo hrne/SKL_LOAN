@@ -343,7 +343,7 @@ public class L5510Batch extends TradeBuffer {
 		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100),
 				titaVo);
 		if (tCdWorkMonth == null) {
-			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，業績日期=" + iWorkMonth); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth); // 查詢資料不存在
 		}
 		// 工作季(西曆)
 		int workSeason;

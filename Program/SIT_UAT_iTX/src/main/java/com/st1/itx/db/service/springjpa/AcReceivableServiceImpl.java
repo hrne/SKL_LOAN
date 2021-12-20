@@ -470,13 +470,69 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("useL2064Eq " + dbName + " : " + "custNo_0 : " + custNo_0 + " acctFlag_1 : " +  acctFlag_1 + " acctFlag_2 : " +  acctFlag_2 + " rvNo_3 : " +  rvNo_3);
     if (dbName.equals(ContentName.onDay))
-      slice = acReceivableReposDay.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAsc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
+      slice = acReceivableReposDay.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoDesc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = acReceivableReposMon.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAsc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
+      slice = acReceivableReposMon.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoDesc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = acReceivableReposHist.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAsc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
+      slice = acReceivableReposHist.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoDesc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
     else 
-      slice = acReceivableRepos.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAsc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
+      slice = acReceivableRepos.findAllByCustNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoDesc(custNo_0, acctFlag_1, acctFlag_2, rvNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcReceivable> useL2r58Eq(int custNo_0, int facmNo_1, int acctFlag_2, int acctFlag_3, String rvNo_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcReceivable> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("useL2r58Eq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " acctFlag_2 : " +  acctFlag_2 + " acctFlag_3 : " +  acctFlag_3 + " rvNo_4 : " +  rvNo_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = acReceivableReposDay.findAllByCustNoIsAndFacmNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoAsc(custNo_0, facmNo_1, acctFlag_2, acctFlag_3, rvNo_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acReceivableReposMon.findAllByCustNoIsAndFacmNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoAsc(custNo_0, facmNo_1, acctFlag_2, acctFlag_3, rvNo_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acReceivableReposHist.findAllByCustNoIsAndFacmNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoAsc(custNo_0, facmNo_1, acctFlag_2, acctFlag_3, rvNo_4, pageable);
+    else 
+      slice = acReceivableRepos.findAllByCustNoIsAndFacmNoIsAndAcctFlagGreaterThanEqualAndAcctFlagLessThanEqualAndRvNoLikeOrderByFacmNoAscRvNoAsc(custNo_0, facmNo_1, acctFlag_2, acctFlag_3, rvNo_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcReceivable> useBs902Eq(int custNo_0, int custNo_1, int clsFlag_2, int receivableFlag_3, String rvNo_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcReceivable> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("useBs902Eq " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " clsFlag_2 : " +  clsFlag_2 + " receivableFlag_3 : " +  receivableFlag_3 + " rvNo_4 : " +  rvNo_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = acReceivableReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndClsFlagIsAndReceivableFlagIsAndRvNoLikeOrderByCustNoAscFacmNoAsc(custNo_0, custNo_1, clsFlag_2, receivableFlag_3, rvNo_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acReceivableReposMon.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndClsFlagIsAndReceivableFlagIsAndRvNoLikeOrderByCustNoAscFacmNoAsc(custNo_0, custNo_1, clsFlag_2, receivableFlag_3, rvNo_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acReceivableReposHist.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndClsFlagIsAndReceivableFlagIsAndRvNoLikeOrderByCustNoAscFacmNoAsc(custNo_0, custNo_1, clsFlag_2, receivableFlag_3, rvNo_4, pageable);
+    else 
+      slice = acReceivableRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndClsFlagIsAndReceivableFlagIsAndRvNoLikeOrderByCustNoAscFacmNoAsc(custNo_0, custNo_1, clsFlag_2, receivableFlag_3, rvNo_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

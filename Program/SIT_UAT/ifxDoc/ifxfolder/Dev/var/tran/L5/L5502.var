@@ -31,27 +31,15 @@ E(0,0)
 [
 ["[L5502]                                 房貸專員件數金額資料維護"],
 ["#<->#,"#FdFunCode+功能選項",#FunCodeX],
-["#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo],
+["#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,"-",#BormNo],
 ["#<->#,"#FdCustNm+戶名",#CustNm],
 ["#<->#,"#FdIntroducer+介紹人",#Introducer,#IntroducerName],
 ["#<->#,"#FdBsOfficer+房貸專員",#BsOfficer,#BsOfficerName],
 ["#<->#,"#FdPerfAmt+業績金額",#PerfAmt],
-["#<->#,"#FdAdjPerfAmt+額度業績金額調整",#AdjPerfAmtSign,#AdjPerfAmt],
-["#<->#,"#FdAdjPerfCnt+額度業績件數調整",#AdjPerfCntSign,#AdjPerfCnt],
+["#<->#,"#FdPerfCnt+業績件數",#PerfCnt],
 ["@","※僅可異動本月資料！"],["工作年月",#WorkMonth],
 ]
-!["件數",#PerfCnt],
 
-#FdFunCode=X,2,L
-#FdCustNo=X,2,L
-#FdCustNm=X,2,L
-#FdIntroducer=X,2,L
-#FdBsOfficer=X,2,L
-#FdPerfAmt=X,2,L
-#FdAdjPerfAmt=X,2,L
-C(3,#FunCode,2,T(3,*),T(3, ))
-#FdAdjPerfCnt=X,2,L
-C(3,#FunCode,2,T(3,*),T(3, ))
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -78,33 +66,33 @@ T(2,@FuncCode1Help,#HelpDesc1)
 T(4,CHAIN$) 
 IF(#CHAIN==0,V(P,本交易為連動交易，請由L5052連動進入),$)
 
-!#BufEmpNo=X,7,S
-!T(3,      Y)
-!#BindEmpNo=X,1,S
-!BIND(#BtnEmpno,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BufEmpNo;ntxbuf5=type<-1:TempAdjBsOfficer<-OOEmployeeNo:AdjBsOfficer<-OOEmployeeNo:AdjBsOfficerName<-OOFullname:L5r28FullName<-OOFullname})
 
 ! 連動L5052
 #NTXBUF=X,21,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCode,#NTXBUF,1,1)
-T(1,@CustNo,#NTXBUF,2,7)
-T(1,@FacmNo,#NTXBUF,9,3)
-T(1,@WorkMonth,#NTXBUF,12,5)
+T(1,@LogNo,#NTXBUF,2,8)
 
-#AdjLogNo=A,8,S
+#FdFunCode=X,2,L
+#FdCustNo=X,2,L
+#FdCustNm=X,2,L
+#FdIntroducer=X,2,L
+#FdBsOfficer=X,2,L
+#FdPerfCnt=X,2,L
+C(3,#FunCode,2,T(3,*),$)
+#FdPerfAmt=X,2,L
+C(3,#FunCode,2,T(3,*),$)
 
 #Tf=x,1,S
 C(3,#FunCode,4,$,S)
-T(F,@AdjPerfAmtSign,0)
-T(F,@AdjPerfAmt,0)
-T(F,@AdjPerfCntSign,0)
-T(F,@AdjPerfCnt,0)
+T(F,@PerfCnt,0)
+T(F,@PerfAmt,0)
+
+#LogNo=A,8,S
+#AdjLogNo=A,8,S
 
 ! FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
 #FunCode=A,1,S
-!C(2,#CHAIN,$,s)
-!HELP(#FuncCode1Help)
-!@V(H,#FuncCode1Help)
 
 ![維護記號名稱]
 #FunCodeX=X,4,L
@@ -120,23 +108,21 @@ C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
 #RimPerfDate=D,7,S
 
 #RimL5r29=X,1,S
-IF(#CHAIN==1,$,S)
+C(3,#CHAIN,1,$,S)
 RESET_RIM(#RimL5r29,L5R29)
-S(L5R29,1,#CustNo,#FacmNo,#WorkMonth)
+S(L5R29,1,#LogNo)
 R(1,L5R29)
 E(0,@CustNo,#L5r29CustNo)
 E(0,@FacmNo,#L5r29FacmNo)
+E(0,@BormNo,#L5r29BormNo)
 T(2,@CustNm,#L5r29CustNm)
 E(0,@WorkMonth,#L5r29WorkMonth)
 T(2,@Introducer,#L5r29Introducer)
 T(2,@IntroducerName,#L5r29IntroducerName)
 T(2,@BsOfficer,#L5r29BsOfficer)
 T(2,@BsOfficerName,#L5r29BsOfficerName)
+E(0,@PerfCnt,#L5r29PerfCnt)
 E(0,@PerfAmt,#L5r29PerfAmt)
-T(2,@AdjPerfCntSign,#L5r29AdjPerfCntSign)
-E(0,@AdjPerfCnt,#L5r29AdjPerfCnt)
-T(2,@AdjPerfAmtSign,#L5r29AdjPerfAmtSign)
-E(0,@AdjPerfAmt,#L5r29AdjPerfAmt)
 E(0,@AdjLogNo,#L5r29AdjLogNo)
 
 
@@ -152,91 +138,37 @@ E(0,@AdjLogNo,#L5r29AdjLogNo)
 #BormNo=A,3,L
 ! C(2,#FUNCTIONCD,S,$,s,s,s,s)
 
-#MRKEY=_,_,S
-T(2,#CustNo+-+#FacmNo)
-
 !工作年月
 #WorkMonth=X,5,L
 
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo+-+#WorkMonth)
+
 ! 戶名
 #CustNm=X,2.100,L
-! C(2,#FUNCTIONCD,S,$,s,s,s,s)
 
-!<瀏覽>---戶號
-! #BUFA=X,6,S
-! T(2,#CustNo)
-! #BINDA=X,1,S
-! BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L1XXX; ntxbuf=#BUFA})
 
 ! 介紹人NM
 #Introducer=X,6,L
 #IntroducerName=X,50,L
-! C(2,#FUNCTIONCD,S,$,s,s,s,s)
 
 ! 房貸專員NM
 #BsOfficer=X,6,L
 #BsOfficerName=X,50,L
-! C(2,#FUNCTIONCD,S,$,s,s,s,s)
 
-#AdjBsOfficer=X,6,S
-@IF(#AdjBsOfficer=="",T(2,@AdjBsOfficerName,) T(2,@L5r28FullName,),$)
-#TempAdjBsOfficer=X,6,S
 
 <include src="ROM.icf::L5R28.dec"/>
 #RimEmployeeNo=X,6,S
 #RimErrorSkip=X,1,S
 
-!#SendL5r28Introducer=X,1,S
-!IF(#TempAdjBsOfficer!="" && #TempAdjBsOfficer==#AdjBsOfficer,S,$)
-!C(4,#AdjBsOfficer,S,$)
-!T(2,@RimEmployeeNo,#AdjBsOfficer)
-!T(2,@RimErrorSkip,Y)
-!RESET_RIM(#SendL5r28Introducer,L5R28)
-!S(L5R28,1,#RimErrorSkip,#RimEmployeeNo)
-!R(1,L5R28)
-
-#AdjBsOfficerName=X,50,L
-T(2,@AdjBsOfficerName,#L5r28FullName)
-
-!#CheckIsEmp=X,1,S
-!IF(#AdjBsOfficer!="" ,$,S)
-!IF(#AdjBsOfficerName=="" ,$,S)
-!V(P,此員工編號不存在)
-
-#AdjHelp=x,1024,S
-T(3, :空白不調整;+:增加;-:增少)
-
-! 業績金額
-#PerfAmt=+m,15,L
-
-#AdjPerfAmtSign=X,1,I
-C(3,#FunCode,2,$,s)
-HELP(#AdjHelp)
-@
-V(H,#AdjHelp)
 
 ! 調整後業績金額
-#AdjPerfAmt=m,15,I
+#PerfAmt=+m,15,I
 C(3,#FunCode,2,$,s)
-C(4,#AdjPerfAmtSign,S,$)
-@
-V(2,0)
-
-! 件數
-#PerfCnt=+m,2.1,L
-
-#AdjPerfCntSign=X,1,I
-C(3,#FunCode,2,$,s)
-HELP(#AdjHelp)
-@
-V(H,#AdjHelp)
 
 ! 調整後件數
-#AdjPerfCnt=m,2.1,I
+#PerfCnt=+m,5.1,I
 C(3,#FunCode,2,$,s)
-C(4,#AdjPerfCntSign,S,$)
-@
-V(2,0)
 
 </sub>
 
@@ -252,14 +184,13 @@ V(2,0)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #FunCode
+#LogNo
 #CustNo
 #FacmNo
-#WorkMonth
+#BormNo
+#PerfAmt
+#PerfCnt
 #AdjLogNo
-#AdjPerfAmtSign
-#AdjPerfAmt
-#AdjPerfCntSign
-#AdjPerfCnt
 </sub>
 
 !------ 下行電文TOM ------
