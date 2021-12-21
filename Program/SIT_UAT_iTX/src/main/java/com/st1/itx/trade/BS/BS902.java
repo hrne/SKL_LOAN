@@ -9,6 +9,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
@@ -67,7 +68,8 @@ public class BS902 extends TradeBuffer {
 		// find data
 		// SL 聯貸費用
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 6, "SL" + "%", 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 6, "SL" + "%", 0,
+				Integer.MAX_VALUE, titaVo);
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
 		// data size > 0 -> 新增應處理明細
@@ -77,10 +79,14 @@ public class BS902 extends TradeBuffer {
 //				相同月份寫入應處理清單
 				if (rv.getRvNo().length() > 10 && rv.getRvNo().substring(10, 15).equals(entryDateMm)) { // SL-XX-000-YYYMM
 					tTxToDoDetail = new TxToDoDetail();
+					TempVo tTempVo = new TempVo();
+					tTempVo.clear();
+					tTempVo.putParam("AcctCode", rv.getAcctCode());
 					tTxToDoDetail.setItemCode("TSL"); // 聯貸費用攤提
 					tTxToDoDetail.setCustNo(rv.getCustNo());
 					tTxToDoDetail.setFacmNo(rv.getFacmNo());
 					tTxToDoDetail.setDtlValue(rv.getRvNo());
+					tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 					txToDoCom.addDetail(true, titaVo.getHCodeI(), tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 				}
 			}

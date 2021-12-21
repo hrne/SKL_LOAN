@@ -17,7 +17,6 @@ import com.st1.itx.dataVO.TotaVo;
 
 import com.st1.itx.db.service.springjpa.cm.L5052ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.data.L5052Vo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -119,7 +118,8 @@ public class L5052 extends TradeBuffer {
 			}
 
 			if ("Y".equals(SumByFacm)) {
-				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim()) || !FacmNo.equals(d.get("FacmNo").trim())) {
+				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim())
+						|| !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
 						putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm);
 					}
@@ -148,7 +148,8 @@ public class L5052 extends TradeBuffer {
 					WorkMonth = "";
 				}
 			} else {
-				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt, new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm);
+				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt,
+						new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm);
 			}
 
 			dd.clear();
@@ -174,7 +175,8 @@ public class L5052 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt, BigDecimal DrawdownAmt, int canModify, String SumByFacm) {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt,
+			BigDecimal DrawdownAmt, int canModify, String SumByFacm) {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -228,9 +230,9 @@ public class L5052 extends TradeBuffer {
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOLog", LogFg);
 
-		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
-		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
-
+		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate"))); 
+		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName")); 
+		
 		this.totaVo.addOccursList(occursList);
 
 	}

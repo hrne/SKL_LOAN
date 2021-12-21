@@ -139,7 +139,7 @@ T(F,@AdjRange,0)
 #RimL5r27=X,1,S
 C(3,#CHAIN,1,$,S)
 RESET_RIM(#RimL5r27,L5R27)
-S(L5R27,1,#LogNo)
+S(L5R27,1,#FunCode,#LogNo)
 R(1,L5R27)
 E(0,@CustNo,#L5r27CustNo)
 E(0,@FacmNo,#L5r27FacmNo)

@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,142)ASGN(INQLEN$)
+E(0,166)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -65,6 +65,7 @@ K(MODIFYBUTTON,1,新增)
 !---------- AP TEXT AREA Variables ----------
 
 #FdCustNo=X,2,L
+T(3,*)
 
 
 ! Help
@@ -184,27 +185,42 @@ P(R,#OOSyndFeeX)
 CALL2(#ADJUSTDOT,#Precision,#OOClsAmt,#OOClsAmtX)
 P(R,#OOClsAmtX)
 
+#OOEntryAmt=m,14.2,O
+
+#OOEntryAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOEntryAmt,#OOEntryAmtX)
+P(R,#OOEntryAmtX)
+
 !備註
 #OORmk=x,40,O
 
+#OOEntryFG=X,1,O
+
 ! rvno
-#OORvNo=x,7,O
+#OORvNo=X,15,O
 ! 業務科目
 #OOAcctCode=X,3,O
 
+! Y為已銷
+#OOcheckamt=m,14.2,S
+E(0,#OOSyndFee-#OOClsAmt)
+#OOCheck=X,1,S
+IF(#OOcheckamt==0,T(3,Y),T(3,N))
 !修改
 #OOBUF1=X,100,S
-T(2,2+#OOCustNo+#OOFacmNo+#OORvNo+#OOAcctCode)
+T(2,2+#OOCustNo+#OOFacmNo+#OORvNo+#OOAcctCode+#OOCheck)
 
 #OOBTN1=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF1})
+C(5,#OOCheck,Y,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF1}))
+! BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF1})
 
 !刪除
 #OOBUF3=X,100,S
 T(2,4+#OOCustNo+#OOFacmNo+#OORvNo+#OOAcctCode)
 
 #OOBTN3=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF3})
+C(5,#OOCheck,Y,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF3}))
+
 
 !查詢
 #OOBUF4=X,100,S
@@ -237,6 +253,7 @@ TXFORM=L2064
 #OORmk
 #OORvNo
 #OOAcctCode
+#OOEntryAmt
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -277,7 +294,9 @@ TXFORM=L2064
 {width:120,align:'center'}
 #OOSyndFeeX=金額
 {width:180,align:'center'}
-#OOClsAmtX=已銷金額
+#OOClsAmtX=已銷／已攤提金額
+{width:180,align:'center'}
+#OOEntryAmtX=已入帳金額
 {width:180,align:'center'}
 #OORmk=備註
 {width:200,align:'center'}
@@ -295,7 +314,9 @@ TXFORM=L2064
 {width:120,align:'center'}
 #OOSyndFeeX=金額
 {width:180,align:'center'}
-#OOClsAmtX=已銷金額
+#OOClsAmtX=已銷／已攤提金額
+{width:180,align:'center'}
+#OOEntryAmtX=已入帳金額
 {width:180,align:'center'}
 #OORmk=備註
 {width:200,align:'center'}

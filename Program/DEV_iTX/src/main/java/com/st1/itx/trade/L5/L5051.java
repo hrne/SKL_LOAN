@@ -14,8 +14,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.TxControl;
-import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -81,7 +79,7 @@ public class L5051 extends TradeBuffer {
 		if (L5051List == null || L5051List.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
-
+		
 		this.info("L5051List.size() =" + L5051List.size());
 
 		Map<String, String> dd = new HashMap<String, String>();
@@ -100,7 +98,8 @@ public class L5051 extends TradeBuffer {
 		for (Map<String, String> d : L5051List) {
 
 			if ("Y".equals(SumByFacm)) {
-				if (first || !Introducer.equals(d.get("Introducer").trim()) || !CustNo.equals(d.get("CustNo").trim()) || !FacmNo.equals(d.get("FacmNo").trim())) {
+				if (first || !Introducer.equals(d.get("Introducer").trim()) || !CustNo.equals(d.get("CustNo").trim())
+						|| !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
 						putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 1, SumByFacm);
 					}
@@ -147,8 +146,8 @@ public class L5051 extends TradeBuffer {
 				int canmodify = 0;
 				if (d.get("MediaFg") == null || "".equals(d.get("MediaFg"))) {
 					canmodify = 1;
-				}
-				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1, canmodify, SumByFacm);
+				} 
+				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt,PerfReward,PerfAmt, 1, canmodify, SumByFacm);
 			}
 
 			dd.clear();
@@ -175,7 +174,8 @@ public class L5051 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt, BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm) {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt,
+			BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm) {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -221,12 +221,12 @@ public class L5051 extends TradeBuffer {
 		occursList.putParam("OOCanModify", canModify);
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOWorkMonth", WorkMonth);
-
+		
 		occursList.putParam("OOLog", d.get("AdjRange"));
-
-		occursList.putParam("OOMediaDate", parse.stringToStringDate(d.get("MediaDate")));
-		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
-		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
+		
+		occursList.putParam("OOMediaDate", parse.stringToStringDate(d.get("MediaDate"))); 
+		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate"))); 
+		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName")); 
 
 		this.totaVo.addOccursList(occursList);
 	}

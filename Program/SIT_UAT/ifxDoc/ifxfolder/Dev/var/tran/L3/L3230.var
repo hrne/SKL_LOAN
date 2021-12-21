@@ -136,7 +136,7 @@ T(3,CdCode.AcSubBookCode)
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05)
 R(1,XXR99)
-CALL(#HelpProc) 
+CALL(#HelpProc)
 T(2,@CurrencyCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2)
 T(2,@Temp2ItemCodeHelp,#HelpDesc3)
@@ -353,14 +353,14 @@ C(3,#TempItemCode,16,INVOKEJS(SHOW,p1,9,9,1),INVOKEJS(SHOW,p1,9,9,0))
 
 !ing
 #WKHIDE29=X,1,S
-INVOKEJS(SHOW,p1,6,7,0)
+INVOKEJS(SHOW,p1,6,6,0)
 T(3,@FdFacmNo, )
 T(3,@FdChangeDate, )
 T(3,@FdYear, )
 T(3,@FdBormNo, )
 T(3,@FdRemoveNo, )
 C(3,#ApplNo,0,T(F,@FacmNo,1),INVOKEJS(SHOW,p1,6,6,1)T(F,@FacmNo,0))
-C(3,#TempItemCode,7,INVOKEJS(SHOW,p1,7,7,1)T(3,@FdRemoveNo,*),$)
+! C(3,#TempItemCode,7,INVOKEJS(SHOW,p1,7,7,1)T(3,@FdRemoveNo,*),$)
 ! C(3,#TempItemCode,10,INVOKEJS(SHOW,p1,7,7,1),$)
 ! C(3,#TempItemCode,29,INVOKEJS(SHOW,p1,8,8,1)T(3,@FdChangeDate,*),$)
 ! C(3,#TempItemCode,29,INVOKEJS(SHOW,p1,9,9,1)T(3,@FdChangeItemCode,*),$)
@@ -408,8 +408,10 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2078; ntxbuf=#BUF6A;ntxbuf5=type<-1
 
 #FacmNo=A,3,I
 C(3,#ApplNo,0,$,s)
-C(3,#TempItemCode,10,SHOW(#BTN5),SHOW(#BTN4))
-C(3,#TempItemCode,07,SHOW(#BTN6)HIDE(#BTN4,#BTN5),HIDE(#BTN6))
+! C(3,#TempItemCode,10,SHOW(#BTN5),SHOW(#BTN4))
+C(3,#TempItemCode,10,SHOW(#BTN5),HIDE(#BTN5))
+! C(3,#TempItemCode,07,SHOW(#BTN6)HIDE(#BTN4,#BTN5),HIDE(#BTN6))
+C(3,#TempItemCode,07,SHOW(#BTN6),HIDE(#BTN6))
 IF(#TempReasonCode==2 || #TempReasonCode==3,S,$)
 
 
@@ -483,10 +485,9 @@ IF(#TempItemCode==09 || #TempItemCode==22 || #TempItemCode==25,$,S)
 
 ![銷帳編號]
 !作業項目=07沖執行費,必須輸入且檢核檔案是否正確,其他不必輸入
-
-#RemoveNo=A,7,I
-C(3,#TempItemCode,7,$,S)
-@V(2,0)
+#RemoveNo=X,20,I
+! C(3,#TempItemCode,7,$,S)
+! @V(2,0)
 
 #RimTempItemCode=A,2,S
 
@@ -526,7 +527,7 @@ T(2,#TimCustNo+#FacmNo)
 
 #BIND7A=X,1,S
 BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L2061; ntxbuf=#BUF7A;ntxbuf5=type<-1:TwTempAmt<-OOFeeAmtX})
-                 
+
 !區隔帳冊
 #AcSubBookCode=X,3,I
 C(3,#TempItemCode,16,$,S)
@@ -537,12 +538,16 @@ HELP(#AcSubBookCodeHelp)
 T(3,)
 T(H,#AcSubBookCode,#AcSubBookCodeHelp)
 
+#TempAmtX=X,22,S
+C(3,#L3r05TempAmt,0,s,$)
+CALL2(#ADJUSTDOT,#Precision,#L3r05TempAmt,#TempAmtX)
+
                   
 ![暫收款金額]
 !退還暫收款金額不可>該戶號目前暫收金額
 !INVOKEJS(SHOW,p1,4,8,1)
 #TEMPAMTMSG=x,50,S
-T(2,該戶號目前暫收款金額為+#L3r05TempAmt)
+T(2,該戶號目前暫收款金額為+#TempAmtX)
 #TwTempAmt=m,14,I
 C(3,#Precision,0,$,s)
 @

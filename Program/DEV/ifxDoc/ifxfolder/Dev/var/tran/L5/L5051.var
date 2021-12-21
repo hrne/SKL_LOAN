@@ -291,6 +291,12 @@ T(H,@OORepayType,#RepayTypeHelp)
 
 #OOLog=A,1,S
 
+#OOMediaDate=X,9,S
+
+#OOLastUpdate=X,20,S
+
+#OOLastEmp=x,20,S
+
 #OOBufA=X,21,S
 T(2,2+#OOLogNo)
 
@@ -299,7 +305,6 @@ T(2,2+#OOLogNo)
 !BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=有修改; ntxbuf=#OOBufA}))
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=修改; ntxbuf=#OOBufA})
 C(3,#OOCanModify,1,$,BIND(grid,cancel))
-C(4,#OOWorkMonth,BIND(grid,cancel),$)
 
 #OOBufB=X,9,S
 T(2,2+#OOLogNo)
@@ -307,7 +312,6 @@ T(2,2+#OOLogNo)
 #OOBtnB=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5505; ntxbuf=#OOBufB})
 C(3,#OOCanModify,1,$,BIND(grid,cancel))
-!C(4,#OOWorkMonth,BIND(grid,cancel),$)
 
 #OOBufC=X,21,S
 T(2,4+#OOLogNo)
@@ -316,7 +320,7 @@ T(2,4+#OOLogNo)
 C(5,#OOAdjRange,0,BIND(grid,cancel),
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=刪除; ntxbuf=#OOBufC}))
 IF(#OOLog==1||#OOLog==2,$,BIND(grid,cancel))
-C(4,#OOWorkMonth,BIND(grid,cancel),$)
+C(3,#OOCanModify,1,$,BIND(grid,cancel))
 
 #OOMrKey=X,20,S
 T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
@@ -381,6 +385,9 @@ TXFORM=L5051
 #OOCanModify
 #OORepayType
 #OOLog
+#OOMediaDate
+#OOLastUpdate
+#OOLastEmp
 ^
 </sub>
 
@@ -510,6 +517,16 @@ TXFORM=L5051
 
 #OORepayTypeX=業績類別
 {width:100,align:'left'}
+
+#OOMediaDate=產出媒體日期
+{width:100,align:'center'}
+
+#OOLastUpdate=修改日期
+{width:150,align:'left'}
+
+#OOLastEmp=修改人員
+{width:150,align:'left'}
+
 ^
 #RPTFG=2,QUERY.GRID,L5051
 #any={detail:true, header:'L5051.part', caption:'', width:1020, rowNum:10, rowList:[20,40,60]}

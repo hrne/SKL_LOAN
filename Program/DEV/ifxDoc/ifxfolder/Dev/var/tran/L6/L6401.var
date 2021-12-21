@@ -33,14 +33,17 @@ T(3,0:無權限;1:有權限)
 ![      "#Fd4+AD認證",              #AdFg,#AdFgX],
 [      "#Fd5+姓名",                #TlrItem],
 [      "#Fd3+權限等級",            #LevelFg,#LevelFgX],
-[      "#FdAllowFg+授權等級",      #AllowFg],
+[      "#FdAllowFg+主管等級",      #AllowFg],
 [      "#Fd8+使用單位",            #BrNo,#BrNoX],
 [      "#Fd9+課組別",              #GroupNo,#GroupNoX],
 [      "#Fd7+狀態",                #Status,#StatusX],
 [      "#AmlHighFgFd+AML定審高風險處理權限",#AmlHighFg,#AmlHighFgX],
-[#Fd1],
-[      "#Fd2+最後交易日",          #LtxDateXX,#LtxTimeX],
-[      "#Fd2+最後交易序號",        #TxtNo],
+![#Fd1],
+[      "#Fd2+上次登入日",          #LastDateXXX],
+[      "#Fd2+最後交易日",          #LtxDateXXX],
+[      "#Fd2+修改日期",            #LastUpdate],
+[      "#Fd2+修改人員",            #LastUpdateEmpNo,#LastUpdateEmpNoX],
+![      "#Fd2+最後交易序號",        #TxtNo],
 ![      "#Fd2+本、次日日期",        #EntdyX],
 ![      "#Fd2+登入記號",            #LogonFg,#LogonFgX],
 [#<->#,"#Fd2+備註",                #Desc],
@@ -222,6 +225,39 @@ T(H,@AuthNoX{i},#AuthNo{i},#AuthGroupH)
 
 
 
+!上次登入
+#LastDatetmp=A,7,S
+T(1,#LastDate,2,7)
+C(3,#LastDatetmp,0,S,$)
+T(2,@LastDateX,#LastDatetmp)
+
+#LastDateX=D,7,L
+
+#LastDy=X,3,S
+T(1,#LastDateX,1,3)
+#LastDm=X,2,S
+T(1,#LastDateX,4,2)
+#LastDd=X,2,S
+T(1,#LastDateX,6,2)
+
+#LastDateXX=X,9,L
+C(3,#LastDatetmp,0,S,$)
+T(2,#LastDy+/+#LastDm+/+#LastDd)
+
+#LastHH=X,2,S
+T(1,#LastTime,3,2)
+#LastMM=X,2,S
+T(1,#LastTime,5,2)
+#LastSS=X,2,S
+T(1,#LastTime,7,2)
+#LastTimetmp=X,8,L
+C(3,#FunCode,1,S,$)
+C(3,#LastTime,0,S,$)
+T(2,#LastHH+:+#LastMM+:+#LastSS)
+T(2,@LastTimeX,#LastTimetmp)
+
+#LastDateXXX=X,20,L
+T(2,#LastDateXX+ +#LastTimeX)
 
 #LtxDatetmp=A,7,S
 T(1,#LtxDate,2,7)
@@ -253,6 +289,9 @@ C(3,#LtxTime,0,S,$)
 T(2,#LtxHH+:+#LtxMM+:+#LtxSS)
 T(2,@LtxTimeX,#LtxTimetmp)
 
+#LtxDateXXX=X,20,L
+T(2,#LtxDateXX+ +#LtxTimeX)
+
 #Entdytmp=A,7,S
 T(1,#Entdy,2,7)
 T(2,@EntdyX,#Entdytmp)
@@ -270,7 +309,7 @@ T(H,#LevelFg,#LevelHelp)
 #AllowFg=A,1,I
 C(3,#LevelFg,1,$,S)
 @
-V(5,1,9)
+V(5,1,5)
 
 ![AD認證]
 !輸入後會將AD伺服器回傳的人員名稱傳到#Desc欄位
@@ -368,6 +407,11 @@ HELP(#AmlHighFgH)
 #AmlHighFgX=X,10,L
 T(H,#AmlHighFg,#AmlHighFgH)
 
+!上次登入
+#LastDate=A,8,L
+#LastTime=A,8,L
+#LastTimeX=X,8,L
+
 !最後交易日
 ![上交日]
 #LtxDate=A,8,L
@@ -384,6 +428,11 @@ T(H,#AmlHighFg,#AmlHighFgH)
 ![本、次日日期]
 #Entdy=A,8,L
 #EntdyX=D,7,S
+
+
+#LastUpdate=X,20,L
+#LastUpdateEmpNo=X,6,L
+#LastUpdateEmpNoX=X,20,L
 
 ![登入記號]
 #LogonFg=X,1,S
@@ -2501,6 +2550,11 @@ TXFORM=L6R20
 #Desc
 #TlrItem
 #AmlHighFg
+#LastDate
+#LastTime
+#LastUpdate
+#LastUpdateEmpNo
+#LastUpdateEmpNoX
 ##loop {times:40,i:1}
 #AuthNo{i}
 ##end

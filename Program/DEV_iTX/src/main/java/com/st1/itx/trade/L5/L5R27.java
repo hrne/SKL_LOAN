@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L5;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.domain.PfItDetail;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.PfItDetailAdjust;
 import com.st1.itx.db.domain.TxControl;
 import com.st1.itx.db.service.CdEmpService;
@@ -54,7 +51,7 @@ public class L5R27 extends TradeBuffer {
 
 	@Autowired
 	public PfItDetailAdjustService pfItDetailAdjustService;
-
+	
 	@Autowired
 	public TxControlService txControlService;
 
@@ -67,6 +64,7 @@ public class L5R27 extends TradeBuffer {
 		int funCode = Integer.valueOf(titaVo.getParam("FunCode"));
 		long logNo = Long.valueOf(titaVo.getParam("LogNo"));
 
+		
 		PfItDetail pfItDetail = sPfItDetailService.findById(logNo, titaVo);
 
 		if (pfItDetail == null) {
@@ -94,8 +92,9 @@ public class L5R27 extends TradeBuffer {
 
 		totaVo.putParam("L5r27CustNm", CustNm);
 
-		PfBsDetail pfBsItDetail = sPfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), pfItDetail.getPerfDate(), pfItDetail.getRepayType(),
-				pfItDetail.getPieceCode(), titaVo);
+		PfBsDetail pfBsItDetail = sPfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(),
+				pfItDetail.getBormNo(), pfItDetail.getPerfDate(), pfItDetail.getRepayType(), pfItDetail.getPieceCode(),
+				titaVo);
 
 		if (pfBsItDetail == null) {
 			totaVo.putParam("L5r27BsOfficer", "");
@@ -114,7 +113,8 @@ public class L5R27 extends TradeBuffer {
 		totaVo.putParam("L5r27IntroducerName", IntroducerName);
 		totaVo.putParam("L5r27UtilBal", pfItDetail.getDrawdownAmt());
 
-		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
+		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
+				pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
 
 		if (pfItDetailAdjust == null || pfItDetailAdjust.getAdjRange() == 0) {
 			totaVo.putParam("L5r27AdjPerfEqAmt", pfItDetail.getPerfEqAmt());

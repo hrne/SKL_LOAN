@@ -9250,7 +9250,6 @@ TXFORM=L6R44
 #L6R45SyndFeeCode=X,2,S
 #L6R45SyndFeeItem=x,60,S
 #L6R45AcctCode=X,3,S
-#L6R45IsAllocation=X,1,S
 </L6R45.dec>
 
 <L6R45.tom>
@@ -9258,7 +9257,6 @@ TXFORM=L6R45
 #L6R45SyndFeeCode
 #L6R45SyndFeeItem
 #L6R45AcctCode
-#L6R45IsAllocation
 ^
 </L6R45.tom>
 

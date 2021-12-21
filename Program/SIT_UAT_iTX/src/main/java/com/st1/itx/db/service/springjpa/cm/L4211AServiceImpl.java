@@ -26,18 +26,16 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 	public void afterPropertiesSet() throws Exception {
 		;
 	}
-
 	String inputReconCode;
 	int inputAcDate;
-
 	public List<Map<String, String>> findAll(TitaVo titaVo, int report) throws Exception {
-		inputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
-		if (inputReconCode.equals("A7")) {
+		inputReconCode =  String.valueOf(titaVo.get("ReconCode")).trim();
+		if(inputReconCode.equals("A7")) {
 			inputReconCode = "P03";
 		}
-		inputAcDate = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		this.info("ReconCode     = " + inputReconCode);
-		this.info("DATEENTDY     = " + inputAcDate);
+		inputAcDate=(Integer.valueOf(titaVo.get("AcDate"))+19110000);
+		this.info("ReconCode     = "+ inputReconCode);
+		this.info("DATEENTDY     = "+inputAcDate);
 		// 匯款總傳票明細表
 		String sql = " WITH TX1 AS (";
 		sql += "   SELECT \"CustNo\"";
@@ -61,7 +59,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"TitaTxtNo\"";
 		sql += " )";
 		sql += ", TX2 AS (";
-		// 將戶號下相同計息起迄日的明細金額加總
+		 // 將戶號下相同計息起迄日的明細金額加總
 		sql += "   SELECT \"CustNo\"";
 		sql += "        , \"FacmNo\"";
 		sql += "        , \"BormNo\"";
@@ -169,20 +167,21 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
 		sql += "                           , '6' "; // 批次入帳
 		sql += "                           , '7') ";// 轉暫收
-		sql += " ORDER BY  BATX.\"ReconCode\"";
+		sql += " ORDER BY  BATX.\"ReconCode\"" ;
 		sql += "      , BATX.\"BatchNo\"";
 		sql += "      , \"SortingForSubTotal\"";
 		sql += "      , BATX.\"EntryDate\"";
-		if (report == 1) {
-			sql += "      , BATX.\"DetailSeq\"";
+		if(report == 1) {
+		  sql += "      , BATX.\"DetailSeq\"";
 		}
-		if (report == 2) {
+		if(report == 2) {
 			sql += "      , BATX.\"RepayAmt\" DESC";
-		}
+		} 
 		sql += "      , TX2.\"CustNo\"";
 		sql += "      , TX2.\"FacmNo\"";
 		sql += "      , TX2.\"BormNo\"";
-
+		
+		
 		this.info("sql=" + sql);
 		Query query;
 
@@ -193,3 +192,4 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		return this.convertToMap(query);
 	}
 }
+	

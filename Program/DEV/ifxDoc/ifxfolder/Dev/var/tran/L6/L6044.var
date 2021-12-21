@@ -43,7 +43,9 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6044]                                 主管授權紀錄查詢"],
-["#FdEntdy+會計日期",#Entdy],
+["#FdDate+查詢條件","會計日期、交易日期，擇一輸入"],
+["#FdEntdy+．會計日期",#EntdyS,#EntdyE],
+["#FdEntdy+．交易日期",#TxDateS,#TxDateE],
 ["#FdSupNo+授權主管編號",#SupNo],
 ]
 !---------- AP Button AREA ----------
@@ -58,11 +60,13 @@ T(4,CHAIN$)
 #NTXBUF=X,13,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
+#FdDate=X,2,L
+T(3,*)
 #FdEntdy=X,2,L
-C(3,#CHAIN,1,T(3, ),T(3,*))
+!C(3,#CHAIN,1,T(3, ),T(3,*))
 
 #FdSupNo=X,2,L
-C(3,#CHAIN,1,T(3, ),T(3, ))
+!C(3,#CHAIN,1,T(3, ),T(3, ))
 
 ! 顯示框線
 #WKTF=X,1,S
@@ -75,14 +79,43 @@ K(MODIFYBUTTON,查詢)
 !會計日期
 #DATE=D,8,S
 T(4,DATE$)
-
 #DT=D,7,S
 T(1,#DATE,2,7)
 
-#Entdy=D,7,I
+!日曆日
+#CDATE=D,8,S
+T(4,CDATE$)
+#CDT=D,7,S
+T(1,#CDATE,2,7)
+
+
+#EntdyS=D,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
 T(2,#DT)
-@V(7)A(4,0,#Entdy)
+@A(4,0,#EntdyS)
+
+#EntdyE=D,7,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
+C(3,#EntdyS,0,S,$)
+E(0,#EntdyS)
+@A(4,0,#EntdyE)V(5,#EntdyS,#DT)
+
+#TxDateS=D,7,I
+C(3,#EntdyS,0,$,S)
+E(0,#CDT)
+@A(4,0,#TxDateS)
+
+
+#TxDateE=D,7,I
+C(3,#EntdyS,0,$,S)
+E(0,#TxDateS)
+@A(4,0,#TxDateE)V(5,#TxDateS,#CDT)
+
+#CheckDate=X,1,S
+C(3,#EntdyS,0,$,s)
+C(3,#TxDateS,0,$,s)
+V(P,會計日期、交易日期，擇一輸入)
+
 
 !授權主管編號
 #SupNo=X,6,I
@@ -153,7 +186,11 @@ T(1,#OOTxSeq,11,8)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#Entdy#SupNo
+#EntdyS
+#EntdyE
+#TxDateS
+#TxDateE
+#SupNo
 #END
 </sub>
 
