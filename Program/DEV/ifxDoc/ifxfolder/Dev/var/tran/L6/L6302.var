@@ -158,7 +158,7 @@ T(3,TWD)
 
 ! 生效日期
 ! 下營業日
-#NBSDY=D,7,S
+#NBSDY=_,_,S
 T(4,NBSDY$)
 
 #EffectDate=D,7,I

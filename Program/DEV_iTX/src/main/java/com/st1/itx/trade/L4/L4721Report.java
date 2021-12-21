@@ -160,7 +160,8 @@ public class L4721Report extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 2, this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 2,
+				this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -278,11 +279,11 @@ public class L4721Report extends MakeReport {
 			print(0, 16, rateChangeDate);
 
 			// 原利率
-			String originRate = formatAmt(tBatxRateChange.getAdjustedRate(), 2) + "%";
+			String originRate = formatAmt(tBatxRateChange.getPresentRate(), 2) + "%";
 			print(0, 43, originRate, "R");
 
 			// 現在利率
-			String newRate = formatAmt(tBatxRateChange.getPresentRate(), 2) + "%";
+			String newRate = formatAmt(tBatxRateChange.getAdjustedRate(), 2) + "%";
 			print(0, 55, newRate, "R");
 
 			this.print(1, 1, "＊其他額度利率，若有調整另行通知。");
@@ -291,7 +292,8 @@ public class L4721Report extends MakeReport {
 		this.toPdf(sno);
 	}
 
-	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate) throws NumberFormatException, LogicException {
+	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
+			throws NumberFormatException, LogicException {
 		this.info("L4721Report.setHead" + custNo + "-" + facmNo + "" + effectDate);
 		headerCustName = headerBankStatement.get("CustName");
 		headerCustNo = headerBankStatement.get("CustNo");

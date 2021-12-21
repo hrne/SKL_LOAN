@@ -487,7 +487,7 @@ public class L5511Batch extends TradeBuffer {
 //				}
 
 				BigDecimal bbonus = pfRewardMedia.getAdjustBonus();
-				bbonus = bbonus.setScale(0, bbonus.ROUND_FLOOR);
+				bbonus = bbonus.setScale(0, BigDecimal.ROUND_FLOOR);
 
 				if (bbonus.compareTo(BigDecimal.ZERO) == 0) {
 					continue;

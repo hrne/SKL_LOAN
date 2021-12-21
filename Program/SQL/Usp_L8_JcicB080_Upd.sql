@@ -168,8 +168,10 @@ BEGIN
       LEFT JOIN "MonthlyFacBal"  MF    ON MF."YearMonth" = WK."DataYM"
                                       AND MF."CustNo"    = WK."CustNo"
                                       AND MF."FacmNo"    = WK."FacmNo"
-                                      AND MF."PrinBalance" > 0
-      ;
+                                      AND (MF."PrinBalance" > 0  
+                                         OR (MF."PrinBalance" = 0 AND 
+                                             MF."Status" IN (3, 5, 8 , 9)))
+      ; 
 
     INS_CNT := INS_CNT + sql%rowcount;
     DBMS_OUTPUT.PUT_LINE('INSERT JcicB080 END: INS_CNT=' || INS_CNT);

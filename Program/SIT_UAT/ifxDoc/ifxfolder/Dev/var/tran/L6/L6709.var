@@ -112,7 +112,7 @@ C(3,#CHAIN,1,E(0,@AssignSeq,#CHAIN_AssignSeq),)
 C(3,#CHAIN,1,T(2,@AcctSource,#CHAIN_AcctSource),)
 
 ! 下營業日
-#NBSDY=D,8,S
+#NBSDY=_,_,S
 T(4,NBSDY$)
 E(0,@AdjDate,#NBSDY)
 

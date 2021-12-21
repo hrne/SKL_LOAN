@@ -54,13 +54,14 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 	 * @param t           LoanBorMain
 	 * @param iRepayTerms 回收期數
 	 * @param iIntEndDate 計算止日
-	 * @param iIntEndCode 計算止日代碼 0.無計算止日 1.至計算止日 2:至計算止日但不超過下次繳息日(以房養老)
+	 * @param iIntEndCode 計算止日代碼 0.無計算止日 1.至計算止日 2:利息提存
 	 * @param iEntryDate  入帳日期
 	 * @param titaVo      TitaVo
 	 * @return loanCalcRepayIntCom
 	 * @throws LogicException LogicException
 	 */
-	public LoanCalcRepayIntCom setRepayInt(LoanBorMain t, int iRepayTerms, int iIntEndDate, int iIntEndCode, int iEntryDate, TitaVo titaVo) throws LogicException {
+	public LoanCalcRepayIntCom setRepayInt(LoanBorMain t, int iRepayTerms, int iIntEndDate, int iIntEndCode,
+			int iEntryDate, TitaVo titaVo) throws LogicException {
 		this.info("active setRepayInt ");
 		this.info("   RepayTerms = " + iRepayTerms);
 		this.info("   IntEndDate = " + iIntEndDate);
@@ -109,20 +110,17 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setTerms(iRepayTerms); // 本次繳息期數
 		loanCalcRepayIntCom.setPaidTerms(t.getPaidTerms()); // 已繳息期數
 		loanCalcRepayIntCom.setIntStartDate(prevPayIntDate); // 計算起日
-		loanCalcRepayIntCom.setIntEndCode(iIntEndCode); // 計算止日代碼 0.無計算止日 1.至計算止日
+		loanCalcRepayIntCom.setIntEndCode(iIntEndCode); // 計算止日代碼 0.無計算止日 1.至計算止日 2:利息提存
 		// 計算止日小於上次繳息日，則以上次繳息日為計算止日
-		loanCalcRepayIntCom.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
-
+		loanCalcRepayIntCom
+				.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
 		loanCalcRepayIntCom.setFirstDrawdownDate(tFacMain.getFirstDrawdownDate()); // 初貸日
 		loanCalcRepayIntCom.setDrawdownDate(t.getDrawdownDate()); // 貸放起日
 		loanCalcRepayIntCom.setMaturityDate(t.getMaturityDate()); // 貸放止日
 		loanCalcRepayIntCom.setBreachValidDate(iEntryDate); // 違約金生效日
 		loanCalcRepayIntCom.setPrevRepaidDate(t.getPrevRepaidDate() == 0 ? t.getDrawdownDate() : t.getPrevRepaidDate()); // 上次還本日
 		loanCalcRepayIntCom.setPrevPaidIntDate(prevPayIntDate); // 上次繳息日
-		// 下次繳息日,應繳息日,預定收息日； 最後一期依應繳日計算的下次繳息日重新設定為到期日
-//		loanCalcRepayIntCom.setNextPayIntDate(
-//				t.getNextPayIntDate() > t.getMaturityDate() ? t.getMaturityDate() : t.getNextPayIntDate());
-		loanCalcRepayIntCom.setNextPayIntDate(t.getNextPayIntDate());
+		loanCalcRepayIntCom.setNextPayIntDate(t.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
 		loanCalcRepayIntCom.setNextRepayDate(t.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
 		loanCalcRepayIntCom.setSpecificDate(t.getSpecificDate()); // 指定基準日期, 利息基準日
 		loanCalcRepayIntCom.setSpecificDd(t.getSpecificDd()); // 指定應繳日
@@ -134,7 +132,25 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setBreachRate(t.getStoreRate()); // 違約金之利率
 		loanCalcRepayIntCom.setDelayRate(t.getStoreRate()); // 遲延息之利率
 		loanCalcRepayIntCom.setUnpaidFlag(0); // 未繳清記號
-		loanCalcRepayIntCom.setIntCalcCode(t.getIntCalcCode()); // 計息方式 1:按日計息 2:按月計息
+		loanCalcRepayIntCom.setIntCalcCode(t.getIntCalcCode());// 計息方式 1:按日計息 2:按月計息
+		// 利息提存
+		// 1.業務科目=310直接以日計算
+		// 2.中長擔按月繳息者(不看是否以日計息)，完整一個月((當月月底日-繳息迄日)+1=月底日)為以月計算，否則以日計算
+		if (iIntEndCode == 2) {
+			if (tFacMain.getAcctCode().equals("310")) {
+				loanCalcRepayIntCom.setIntCalcCode("1");
+			} else {
+				if ("1".equals(t.getAmortizedCode())) {
+					if (prevPayIntDate / 100 == this.txBuffer.getTxCom().getTbsdy() / 100
+							&& prevPayIntDate % 100 == 1) {
+						loanCalcRepayIntCom.setIntCalcCode("2");
+					} else {
+						loanCalcRepayIntCom.setIntCalcCode("1");
+					}
+				}
+			}
+		}
+
 		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(t.getAmortizedCode())); // 攤還方式,還本方式
 		// 1.按月繳息(按期繳息到期還本)
 		// 2.到期取息(到期繳息還本)
@@ -147,7 +163,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setEntryDate(iEntryDate); // 入帳日期
 		loanCalcRepayIntCom.setUsageCode(t.getUsageCode()); // 資金用途別 1: 週轉金2: 購置不動產3: 營業用資產4: 固定資產5: 企業投資6: 購置動產9: 其他
 		loanCalcRepayIntCom.setCaseCloseFlag("N"); // 結案記號 Y:是 N:否
-		loanCalcRepayIntCom.setBreachReliefFlag(t.getNextPayIntDate() > t.getMaturityDate() ? "Y" : "N"); // 減免違約金 Y:是 N:否
+		loanCalcRepayIntCom.setBreachReliefFlag(t.getNextPayIntDate() > t.getMaturityDate() ? "Y" : "N"); // 減免違約金 Y:是
+																											// N:否
 		// 聯貸案件 Y:是 N:否
 		if (t.getSyndNo() > 0) { // 聯貸案序號
 			loanCalcRepayIntCom.setSyndFlag("Y");
@@ -157,8 +174,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setFinalBal(t.getFinalBal()); // 最後一期本金餘額
 
 		// 重新計算寬限期數
-//		loanCalcRepayIntCom.setGracePeriod(t.getGracePeriod()); // 寬限期
-		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(t.getAmortizedCode(), t.getFreqBase(), t.getPayIntFreq(), t.getSpecificDate(), t.getSpecificDd(), t.getGraceDate()));
+		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(t.getAmortizedCode(), t.getFreqBase(),
+				t.getPayIntFreq(), t.getSpecificDate(), t.getSpecificDd(), t.getGraceDate()));
 		loanCalcRepayIntCom.setTotalPeriod(t.getTotalPeriod()); // 總期數
 
 		this.info("   setRepayInt iRepayTerms = " + loanCalcRepayIntCom.getRepayTerms());

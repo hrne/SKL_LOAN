@@ -390,8 +390,6 @@ public class L3230 extends TradeBuffer {
 		// 多筆總金額金額，銷帳編號相同
 		if (!isFind) {
 			for (BaTxVo ba : baTxList) {
-				this.info("ba.getRvNo().substring = " + ba.getRvNo().substring(0, iRemoveNo.length()));
-				this.info("iRemoveNo = " + iRemoveNo);
 				if (acctCode.equals(ba.getAcctCode()) || "F09".equals(acctCode) && "TMI".equals(ba.getAcctCode())) {
 					if ((iRemoveNo.isEmpty()) || (iRemoveNo.length() > 0 && ba.getRvNo().length() >= iRemoveNo.length()
 							&& ba.getRvNo().substring(0, iRemoveNo.length()).equals(iRemoveNo))) {

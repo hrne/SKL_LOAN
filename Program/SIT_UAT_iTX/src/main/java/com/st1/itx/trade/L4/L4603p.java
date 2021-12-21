@@ -216,11 +216,12 @@ public class L4603p extends TradeBuffer {
 //				this.totaVo.addOccursList(occursList);
 				} // else
 //			
-				if (lAcReceivable.size() > 0) {
-					acReceivableCom.setTxBuffer(this.getTxBuffer());
-					acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳-刪除
-				}
 			} // for
+			
+			if (lAcReceivable.size() > 0) {
+				acReceivableCom.setTxBuffer(this.getTxBuffer());
+				acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳-刪除
+			}
 
 			if (reportlist.size() > 0) {
 				l4603report.exec(titaVo, reportlist, 1);

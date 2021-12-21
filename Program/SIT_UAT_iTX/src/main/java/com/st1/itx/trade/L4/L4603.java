@@ -71,6 +71,9 @@ public class L4603 extends TradeBuffer {
 				}
 			} // for
 		}
+		
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "", "",
+				titaVo.getParam("TLRNO"), "批次作業啟動請稍等", titaVo);
 		MySpring.newTask("L4603p", this.txBuffer, titaVo); 
 		this.addList(this.totaVo);
 		return this.sendList();
