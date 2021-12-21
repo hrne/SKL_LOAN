@@ -64,7 +64,7 @@ public class L3003 extends TradeBuffer {
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 
 		int iCustDataCtrl = 0;
-		
+
 		// work area
 		Slice<LoanBorMain> slLoanBorMain;
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
@@ -107,9 +107,9 @@ public class L3003 extends TradeBuffer {
 				slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNo1, wkFacmNo2, 901, 999, this.index, this.limit, titaVo);
 				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 			}
-			
+
 			iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
-			
+
 		}
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -133,7 +133,7 @@ public class L3003 extends TradeBuffer {
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt());
 				occursList.putParam("OOStatus", tLoanBorMain.getStatus());
 
-				if( iCustDataCtrl == 1 ) {
+				if (iCustDataCtrl == 1) {
 					occursList.putParam("OOCustNo", "");
 				}
 				// 將每筆資料放入Tota的OcList

@@ -57,7 +57,7 @@ public class LM073Report extends MakeReport {
 
 		this.info("LM073Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM073", "央行報送明細資料", "LM073央行報送明細資料" + showRocDate(entdy, 0).substring(0, 7), "LM073央行報送明細資料.xlsx", "明細", "央行報送 " + YearMonth);
 

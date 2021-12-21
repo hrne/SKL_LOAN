@@ -189,7 +189,7 @@ public class L9714Report extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 		if (l9714List.size() > 0) {
 			return true;
 		} else {

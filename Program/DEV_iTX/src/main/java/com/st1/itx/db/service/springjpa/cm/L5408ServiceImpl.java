@@ -29,17 +29,14 @@ public class L5408ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	public List<Map<String, String>> FindData(int startDate,int endDate,TitaVo titaVo) throws Exception{
+	public List<Map<String, String>> FindData(int startDate, int endDate, TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = "select a.\"WorkMonth\",a.\"BsOfficer\", count(*) as \"Total\" , b.\"Fullname\"  , e.\"DeptCode\",e.\"DepItem\"" + 
-				"from \"PfBsDetail\" a " + 
-				"left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"BsOfficer\"  left join \"PfBsOfficer\" e on e.\"EmpNo\" = a.\"BsOfficer\"" + 
-				"where a.\"WorkMonth\" between '"+startDate+"' and '"+endDate+"'" + 
-				"group by a.\"WorkMonth\",a.\"BsOfficer\",b.\"Fullname\",e.\"DeptCode\",e.\"DepItem\"" + 
-				"order by \"WorkMonth\" asc";
-		
-		logger.info("sql = "+sql); 
+		String sql = "select a.\"WorkMonth\",a.\"BsOfficer\", count(*) as \"Total\" , b.\"Fullname\"  , e.\"DeptCode\",e.\"DepItem\"" + "from \"PfBsDetail\" a "
+				+ "left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"BsOfficer\"  left join \"PfBsOfficer\" e on e.\"EmpNo\" = a.\"BsOfficer\"" + "where a.\"WorkMonth\" between '" + startDate
+				+ "' and '" + endDate + "'" + "group by a.\"WorkMonth\",a.\"BsOfficer\",b.\"Fullname\",e.\"DeptCode\",e.\"DepItem\"" + "order by \"WorkMonth\" asc";
+
+		logger.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		logger.info("L5408Service FindData=" + query.toString());

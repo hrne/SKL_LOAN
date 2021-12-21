@@ -73,8 +73,7 @@ public class L3R07 extends TradeBuffer {
 		}
 
 		// 結案是否滿三年邏輯
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoS, wkFacmNoE, wkBormNoS,
-				wkBormNoE, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoS, wkFacmNoE, wkBormNoS, wkBormNoE, 0, Integer.MAX_VALUE, titaVo);
 
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		int wkAcDate = 0;

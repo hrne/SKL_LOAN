@@ -43,10 +43,10 @@ public class L4454Report2 extends MakeReport {
 
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	public L4454R2ServiceImpl l4454R2ServiceImpl;
-	
+
 	@Override
 	public void printTitle() {
 
@@ -56,8 +56,7 @@ public class L4454Report2 extends MakeReport {
 
 		this.info("銀扣失敗五萬元以上報表 Excel Start...");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "銀扣失敗五萬元以上報表", "銀扣失敗五萬元以上報表",
-				"銀扣失敗五萬元以上報表-底稿.xlsx", "LAW7N1Ppp");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "銀扣失敗五萬元以上報表", "銀扣失敗五萬元以上報表", "銀扣失敗五萬元以上報表-底稿.xlsx", "LAW7N1Ppp");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
@@ -68,7 +67,7 @@ public class L4454Report2 extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("l4454R2ServiceImpl.findAll error = " + errors.toString());
 		}
-		
+
 		if (fnAllList.size() > 0) {
 			String fdnm = "";
 //			從第幾列開始(表頭位置)
@@ -112,7 +111,7 @@ public class L4454Report2 extends MakeReport {
 		} else {
 			makeExcel.setValue(2, 1, "查無資料");
 		}
-		
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}

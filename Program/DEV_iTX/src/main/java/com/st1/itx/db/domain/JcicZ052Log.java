@@ -24,481 +24,492 @@ import com.st1.itx.Exception.LogicException;
 @Table(name = "`JcicZ052Log`")
 public class JcicZ052Log implements Serializable {
 
-
-  /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8418145464060860277L;
 
-@EmbeddedId
-  private JcicZ052LogId jcicZ052LogId;
+	@EmbeddedId
+	private JcicZ052LogId jcicZ052LogId;
 
-  // 流水號
-  @Column(name = "`Ukey`", length = 32, insertable = false, updatable = false)
-  private String ukey;
+	// 流水號
+	@Column(name = "`Ukey`", length = 32, insertable = false, updatable = false)
+	private String ukey;
 
-  // 交易序號
-  @Column(name = "`TxSeq`", length = 18, insertable = false, updatable = false)
-  private String txSeq;
+	// 交易序號
+	@Column(name = "`TxSeq`", length = 18, insertable = false, updatable = false)
+	private String txSeq;
 
-  // 交易代碼
-  /* A:新增;C:異動 */
-  @Column(name = "`TranKey`", length = 1)
-  private String tranKey;
+	// 交易代碼
+	/* A:新增;C:異動 */
+	@Column(name = "`TranKey`", length = 1)
+	private String tranKey;
 
-  // 補報送債權機構代號1
-  /* 三位文數字 */
-  @Column(name = "`BankCode1`", length = 3)
-  private String bankCode1;
+	// 補報送債權機構代號1
+	/* 三位文數字 */
+	@Column(name = "`BankCode1`", length = 3)
+	private String bankCode1;
 
-  // 補報送檔案格式資料別1
-  /* 42或43或61，二位文數字 */
-  @Column(name = "`DataCode1`", length = 2)
-  private String dataCode1;
+	// 補報送檔案格式資料別1
+	/* 42或43或61，二位文數字 */
+	@Column(name = "`DataCode1`", length = 2)
+	private String dataCode1;
 
-  // 補報送債權機構代號2
-  /* 三位文數字 */
-  @Column(name = "`BankCode2`", length = 3)
-  private String bankCode2;
+	// 補報送債權機構代號2
+	/* 三位文數字 */
+	@Column(name = "`BankCode2`", length = 3)
+	private String bankCode2;
 
-  // 補報送檔案格式資料別2
-  /* 42或43或61，二位文數字 */
-  @Column(name = "`DataCode2`", length = 2)
-  private String dataCode2;
+	// 補報送檔案格式資料別2
+	/* 42或43或61，二位文數字 */
+	@Column(name = "`DataCode2`", length = 2)
+	private String dataCode2;
 
-  // 補報送債權機構代號3
-  /* 三位文數字 */
-  @Column(name = "`BankCode3`", length = 3)
-  private String bankCode3;
+	// 補報送債權機構代號3
+	/* 三位文數字 */
+	@Column(name = "`BankCode3`", length = 3)
+	private String bankCode3;
 
-  // 補報送檔案格式資料別3
-  /* 42或43或61，二位文數字 */
-  @Column(name = "`DataCode3`", length = 2)
-  private String dataCode3;
+	// 補報送檔案格式資料別3
+	/* 42或43或61，二位文數字 */
+	@Column(name = "`DataCode3`", length = 2)
+	private String dataCode3;
 
-  // 補報送債權機構代號4
-  /* 三位文數字 */
-  @Column(name = "`BankCode4`", length = 3)
-  private String bankCode4;
+	// 補報送債權機構代號4
+	/* 三位文數字 */
+	@Column(name = "`BankCode4`", length = 3)
+	private String bankCode4;
 
-  // 補報送檔案格式資料別4
-  /* 42或43或61，二位文數字 */
-  @Column(name = "`DataCode4`", length = 2)
-  private String dataCode4;
+	// 補報送檔案格式資料別4
+	/* 42或43或61，二位文數字 */
+	@Column(name = "`DataCode4`", length = 2)
+	private String dataCode4;
 
-  // 補報送債權機構代號5
-  /* 三位文數字 */
-  @Column(name = "`BankCode5`", length = 3)
-  private String bankCode5;
+	// 補報送債權機構代號5
+	/* 三位文數字 */
+	@Column(name = "`BankCode5`", length = 3)
+	private String bankCode5;
 
-  // 補報送檔案格式資料別5
-  /* 42或43或61，二位文數字 */
-  @Column(name = "`DataCode5`", length = 2)
-  private String dataCode5;
+	// 補報送檔案格式資料別5
+	/* 42或43或61，二位文數字 */
+	@Column(name = "`DataCode5`", length = 2)
+	private String dataCode5;
 
-  // 申請變更還款條件日
-  /* 為債務人備齊申請文件向最大債權金融機構申請變更還款日期 */
-  @Column(name = "`ChangePayDate`")
-  private int changePayDate = 0;
+	// 申請變更還款條件日
+	/* 為債務人備齊申請文件向最大債權金融機構申請變更還款日期 */
+	@Column(name = "`ChangePayDate`")
+	private int changePayDate = 0;
 
-  // 轉出JCIC文字檔日期
-  @Column(name = "`OutJcicTxtDate`")
-  private int outJcicTxtDate = 0;
+	// 轉出JCIC文字檔日期
+	@Column(name = "`OutJcicTxtDate`")
+	private int outJcicTxtDate = 0;
 
-  // 建檔日期時間
-  @CreatedDate
-  @Column(name = "`CreateDate`")
-  private java.sql.Timestamp createDate;
+	// 建檔日期時間
+	@CreatedDate
+	@Column(name = "`CreateDate`")
+	private java.sql.Timestamp createDate;
 
-  // 建檔人員
-  @Column(name = "`CreateEmpNo`", length = 6)
-  private String createEmpNo;
+	// 建檔人員
+	@Column(name = "`CreateEmpNo`", length = 6)
+	private String createEmpNo;
 
-  // 最後更新日期時間
-  @LastModifiedDate
-  @Column(name = "`LastUpdate`")
-  private java.sql.Timestamp lastUpdate;
+	// 最後更新日期時間
+	@LastModifiedDate
+	@Column(name = "`LastUpdate`")
+	private java.sql.Timestamp lastUpdate;
 
-  // 最後更新人員
-  @Column(name = "`LastUpdateEmpNo`", length = 6)
-  private String lastUpdateEmpNo;
+	// 最後更新人員
+	@Column(name = "`LastUpdateEmpNo`", length = 6)
+	private String lastUpdateEmpNo;
 
+	public JcicZ052LogId getJcicZ052LogId() {
+		return this.jcicZ052LogId;
+	}
 
-  public JcicZ052LogId getJcicZ052LogId() {
-    return this.jcicZ052LogId;
-  }
+	public void setJcicZ052LogId(JcicZ052LogId jcicZ052LogId) {
+		this.jcicZ052LogId = jcicZ052LogId;
+	}
 
-  public void setJcicZ052LogId(JcicZ052LogId jcicZ052LogId) {
-    this.jcicZ052LogId = jcicZ052LogId;
-  }
+	/**
+	 * 流水號<br>
+	 * 
+	 * @return String
+	 */
+	public String getUkey() {
+		return this.ukey == null ? "" : this.ukey;
+	}
 
-/**
-	* 流水號<br>
-	* 
-	* @return String
-	*/
-  public String getUkey() {
-    return this.ukey == null ? "" : this.ukey;
-  }
+	/**
+	 * 流水號<br>
+	 * 
+	 *
+	 * @param ukey 流水號
+	 */
+	public void setUkey(String ukey) {
+		this.ukey = ukey;
+	}
 
-/**
-	* 流水號<br>
-	* 
-  *
-  * @param ukey 流水號
-	*/
-  public void setUkey(String ukey) {
-    this.ukey = ukey;
-  }
+	/**
+	 * 交易序號<br>
+	 * 
+	 * @return String
+	 */
+	public String getTxSeq() {
+		return this.txSeq == null ? "" : this.txSeq;
+	}
 
-/**
-	* 交易序號<br>
-	* 
-	* @return String
-	*/
-  public String getTxSeq() {
-    return this.txSeq == null ? "" : this.txSeq;
-  }
+	/**
+	 * 交易序號<br>
+	 * 
+	 *
+	 * @param txSeq 交易序號
+	 */
+	public void setTxSeq(String txSeq) {
+		this.txSeq = txSeq;
+	}
 
-/**
-	* 交易序號<br>
-	* 
-  *
-  * @param txSeq 交易序號
-	*/
-  public void setTxSeq(String txSeq) {
-    this.txSeq = txSeq;
-  }
+	/**
+	 * 交易代碼<br>
+	 * A:新增;C:異動
+	 * 
+	 * @return String
+	 */
+	public String getTranKey() {
+		return this.tranKey == null ? "" : this.tranKey;
+	}
 
-/**
-	* 交易代碼<br>
-	* A:新增;C:異動
-	* @return String
-	*/
-  public String getTranKey() {
-    return this.tranKey == null ? "" : this.tranKey;
-  }
+	/**
+	 * 交易代碼<br>
+	 * A:新增;C:異動
+	 *
+	 * @param tranKey 交易代碼
+	 */
+	public void setTranKey(String tranKey) {
+		this.tranKey = tranKey;
+	}
 
-/**
-	* 交易代碼<br>
-	* A:新增;C:異動
-  *
-  * @param tranKey 交易代碼
-	*/
-  public void setTranKey(String tranKey) {
-    this.tranKey = tranKey;
-  }
+	/**
+	 * 補報送債權機構代號1<br>
+	 * 三位文數字
+	 * 
+	 * @return String
+	 */
+	public String getBankCode1() {
+		return this.bankCode1 == null ? "" : this.bankCode1;
+	}
 
-/**
-	* 補報送債權機構代號1<br>
-	* 三位文數字
-	* @return String
-	*/
-  public String getBankCode1() {
-    return this.bankCode1 == null ? "" : this.bankCode1;
-  }
+	/**
+	 * 補報送債權機構代號1<br>
+	 * 三位文數字
+	 *
+	 * @param bankCode1 補報送債權機構代號1
+	 */
+	public void setBankCode1(String bankCode1) {
+		this.bankCode1 = bankCode1;
+	}
 
-/**
-	* 補報送債權機構代號1<br>
-	* 三位文數字
-  *
-  * @param bankCode1 補報送債權機構代號1
-	*/
-  public void setBankCode1(String bankCode1) {
-    this.bankCode1 = bankCode1;
-  }
+	/**
+	 * 補報送檔案格式資料別1<br>
+	 * 42或43或61，二位文數字
+	 * 
+	 * @return String
+	 */
+	public String getDataCode1() {
+		return this.dataCode1 == null ? "" : this.dataCode1;
+	}
 
-/**
-	* 補報送檔案格式資料別1<br>
-	* 42或43或61，二位文數字
-	* @return String
-	*/
-  public String getDataCode1() {
-    return this.dataCode1 == null ? "" : this.dataCode1;
-  }
+	/**
+	 * 補報送檔案格式資料別1<br>
+	 * 42或43或61，二位文數字
+	 *
+	 * @param dataCode1 補報送檔案格式資料別1
+	 */
+	public void setDataCode1(String dataCode1) {
+		this.dataCode1 = dataCode1;
+	}
 
-/**
-	* 補報送檔案格式資料別1<br>
-	* 42或43或61，二位文數字
-  *
-  * @param dataCode1 補報送檔案格式資料別1
-	*/
-  public void setDataCode1(String dataCode1) {
-    this.dataCode1 = dataCode1;
-  }
+	/**
+	 * 補報送債權機構代號2<br>
+	 * 三位文數字
+	 * 
+	 * @return String
+	 */
+	public String getBankCode2() {
+		return this.bankCode2 == null ? "" : this.bankCode2;
+	}
 
-/**
-	* 補報送債權機構代號2<br>
-	* 三位文數字
-	* @return String
-	*/
-  public String getBankCode2() {
-    return this.bankCode2 == null ? "" : this.bankCode2;
-  }
+	/**
+	 * 補報送債權機構代號2<br>
+	 * 三位文數字
+	 *
+	 * @param bankCode2 補報送債權機構代號2
+	 */
+	public void setBankCode2(String bankCode2) {
+		this.bankCode2 = bankCode2;
+	}
 
-/**
-	* 補報送債權機構代號2<br>
-	* 三位文數字
-  *
-  * @param bankCode2 補報送債權機構代號2
-	*/
-  public void setBankCode2(String bankCode2) {
-    this.bankCode2 = bankCode2;
-  }
+	/**
+	 * 補報送檔案格式資料別2<br>
+	 * 42或43或61，二位文數字
+	 * 
+	 * @return String
+	 */
+	public String getDataCode2() {
+		return this.dataCode2 == null ? "" : this.dataCode2;
+	}
 
-/**
-	* 補報送檔案格式資料別2<br>
-	* 42或43或61，二位文數字
-	* @return String
-	*/
-  public String getDataCode2() {
-    return this.dataCode2 == null ? "" : this.dataCode2;
-  }
+	/**
+	 * 補報送檔案格式資料別2<br>
+	 * 42或43或61，二位文數字
+	 *
+	 * @param dataCode2 補報送檔案格式資料別2
+	 */
+	public void setDataCode2(String dataCode2) {
+		this.dataCode2 = dataCode2;
+	}
 
-/**
-	* 補報送檔案格式資料別2<br>
-	* 42或43或61，二位文數字
-  *
-  * @param dataCode2 補報送檔案格式資料別2
-	*/
-  public void setDataCode2(String dataCode2) {
-    this.dataCode2 = dataCode2;
-  }
+	/**
+	 * 補報送債權機構代號3<br>
+	 * 三位文數字
+	 * 
+	 * @return String
+	 */
+	public String getBankCode3() {
+		return this.bankCode3 == null ? "" : this.bankCode3;
+	}
 
-/**
-	* 補報送債權機構代號3<br>
-	* 三位文數字
-	* @return String
-	*/
-  public String getBankCode3() {
-    return this.bankCode3 == null ? "" : this.bankCode3;
-  }
+	/**
+	 * 補報送債權機構代號3<br>
+	 * 三位文數字
+	 *
+	 * @param bankCode3 補報送債權機構代號3
+	 */
+	public void setBankCode3(String bankCode3) {
+		this.bankCode3 = bankCode3;
+	}
 
-/**
-	* 補報送債權機構代號3<br>
-	* 三位文數字
-  *
-  * @param bankCode3 補報送債權機構代號3
-	*/
-  public void setBankCode3(String bankCode3) {
-    this.bankCode3 = bankCode3;
-  }
+	/**
+	 * 補報送檔案格式資料別3<br>
+	 * 42或43或61，二位文數字
+	 * 
+	 * @return String
+	 */
+	public String getDataCode3() {
+		return this.dataCode3 == null ? "" : this.dataCode3;
+	}
 
-/**
-	* 補報送檔案格式資料別3<br>
-	* 42或43或61，二位文數字
-	* @return String
-	*/
-  public String getDataCode3() {
-    return this.dataCode3 == null ? "" : this.dataCode3;
-  }
+	/**
+	 * 補報送檔案格式資料別3<br>
+	 * 42或43或61，二位文數字
+	 *
+	 * @param dataCode3 補報送檔案格式資料別3
+	 */
+	public void setDataCode3(String dataCode3) {
+		this.dataCode3 = dataCode3;
+	}
 
-/**
-	* 補報送檔案格式資料別3<br>
-	* 42或43或61，二位文數字
-  *
-  * @param dataCode3 補報送檔案格式資料別3
-	*/
-  public void setDataCode3(String dataCode3) {
-    this.dataCode3 = dataCode3;
-  }
+	/**
+	 * 補報送債權機構代號4<br>
+	 * 三位文數字
+	 * 
+	 * @return String
+	 */
+	public String getBankCode4() {
+		return this.bankCode4 == null ? "" : this.bankCode4;
+	}
 
-/**
-	* 補報送債權機構代號4<br>
-	* 三位文數字
-	* @return String
-	*/
-  public String getBankCode4() {
-    return this.bankCode4 == null ? "" : this.bankCode4;
-  }
+	/**
+	 * 補報送債權機構代號4<br>
+	 * 三位文數字
+	 *
+	 * @param bankCode4 補報送債權機構代號4
+	 */
+	public void setBankCode4(String bankCode4) {
+		this.bankCode4 = bankCode4;
+	}
 
-/**
-	* 補報送債權機構代號4<br>
-	* 三位文數字
-  *
-  * @param bankCode4 補報送債權機構代號4
-	*/
-  public void setBankCode4(String bankCode4) {
-    this.bankCode4 = bankCode4;
-  }
+	/**
+	 * 補報送檔案格式資料別4<br>
+	 * 42或43或61，二位文數字
+	 * 
+	 * @return String
+	 */
+	public String getDataCode4() {
+		return this.dataCode4 == null ? "" : this.dataCode4;
+	}
 
-/**
-	* 補報送檔案格式資料別4<br>
-	* 42或43或61，二位文數字
-	* @return String
-	*/
-  public String getDataCode4() {
-    return this.dataCode4 == null ? "" : this.dataCode4;
-  }
+	/**
+	 * 補報送檔案格式資料別4<br>
+	 * 42或43或61，二位文數字
+	 *
+	 * @param dataCode4 補報送檔案格式資料別4
+	 */
+	public void setDataCode4(String dataCode4) {
+		this.dataCode4 = dataCode4;
+	}
 
-/**
-	* 補報送檔案格式資料別4<br>
-	* 42或43或61，二位文數字
-  *
-  * @param dataCode4 補報送檔案格式資料別4
-	*/
-  public void setDataCode4(String dataCode4) {
-    this.dataCode4 = dataCode4;
-  }
+	/**
+	 * 補報送債權機構代號5<br>
+	 * 三位文數字
+	 * 
+	 * @return String
+	 */
+	public String getBankCode5() {
+		return this.bankCode5 == null ? "" : this.bankCode5;
+	}
 
-/**
-	* 補報送債權機構代號5<br>
-	* 三位文數字
-	* @return String
-	*/
-  public String getBankCode5() {
-    return this.bankCode5 == null ? "" : this.bankCode5;
-  }
+	/**
+	 * 補報送債權機構代號5<br>
+	 * 三位文數字
+	 *
+	 * @param bankCode5 補報送債權機構代號5
+	 */
+	public void setBankCode5(String bankCode5) {
+		this.bankCode5 = bankCode5;
+	}
 
-/**
-	* 補報送債權機構代號5<br>
-	* 三位文數字
-  *
-  * @param bankCode5 補報送債權機構代號5
-	*/
-  public void setBankCode5(String bankCode5) {
-    this.bankCode5 = bankCode5;
-  }
+	/**
+	 * 補報送檔案格式資料別5<br>
+	 * 42或43或61，二位文數字
+	 * 
+	 * @return String
+	 */
+	public String getDataCode5() {
+		return this.dataCode5 == null ? "" : this.dataCode5;
+	}
 
-/**
-	* 補報送檔案格式資料別5<br>
-	* 42或43或61，二位文數字
-	* @return String
-	*/
-  public String getDataCode5() {
-    return this.dataCode5 == null ? "" : this.dataCode5;
-  }
+	/**
+	 * 補報送檔案格式資料別5<br>
+	 * 42或43或61，二位文數字
+	 *
+	 * @param dataCode5 補報送檔案格式資料別5
+	 */
+	public void setDataCode5(String dataCode5) {
+		this.dataCode5 = dataCode5;
+	}
 
-/**
-	* 補報送檔案格式資料別5<br>
-	* 42或43或61，二位文數字
-  *
-  * @param dataCode5 補報送檔案格式資料別5
-	*/
-  public void setDataCode5(String dataCode5) {
-    this.dataCode5 = dataCode5;
-  }
+	/**
+	 * 申請變更還款條件日<br>
+	 * 為債務人備齊申請文件向最大債權金融機構申請變更還款日期
+	 * 
+	 * @return Integer
+	 */
+	public int getChangePayDate() {
+		return StaticTool.bcToRoc(this.changePayDate);
+	}
 
-/**
-	* 申請變更還款條件日<br>
-	* 為債務人備齊申請文件向最大債權金融機構申請變更還款日期
-	* @return Integer
-	*/
-  public int getChangePayDate() {
-    return StaticTool.bcToRoc(this.changePayDate);
-  }
+	/**
+	 * 申請變更還款條件日<br>
+	 * 為債務人備齊申請文件向最大債權金融機構申請變更還款日期
+	 *
+	 * @param changePayDate 申請變更還款條件日
+	 * @throws LogicException when Date Is Warn
+	 */
+	public void setChangePayDate(int changePayDate) throws LogicException {
+		this.changePayDate = StaticTool.rocToBc(changePayDate);
+	}
 
-/**
-	* 申請變更還款條件日<br>
-	* 為債務人備齊申請文件向最大債權金融機構申請變更還款日期
-  *
-  * @param changePayDate 申請變更還款條件日
-  * @throws LogicException when Date Is Warn	*/
-  public void setChangePayDate(int changePayDate) throws LogicException {
-    this.changePayDate = StaticTool.rocToBc(changePayDate);
-  }
+	/**
+	 * 轉出JCIC文字檔日期<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getOutJcicTxtDate() {
+		return StaticTool.bcToRoc(this.outJcicTxtDate);
+	}
 
-/**
-	* 轉出JCIC文字檔日期<br>
-	* 
-	* @return Integer
-	*/
-  public int getOutJcicTxtDate() {
-    return StaticTool.bcToRoc(this.outJcicTxtDate);
-  }
+	/**
+	 * 轉出JCIC文字檔日期<br>
+	 * 
+	 *
+	 * @param outJcicTxtDate 轉出JCIC文字檔日期
+	 * @throws LogicException when Date Is Warn
+	 */
+	public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
+		this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
+	}
 
-/**
-	* 轉出JCIC文字檔日期<br>
-	* 
-  *
-  * @param outJcicTxtDate 轉出JCIC文字檔日期
-  * @throws LogicException when Date Is Warn	*/
-  public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
-    this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
-  }
+	/**
+	 * 建檔日期時間<br>
+	 * 
+	 * @return java.sql.Timestamp
+	 */
+	public java.sql.Timestamp getCreateDate() {
+		return this.createDate;
+	}
 
-/**
-	* 建檔日期時間<br>
-	* 
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getCreateDate() {
-    return this.createDate;
-  }
+	/**
+	 * 建檔日期時間<br>
+	 * 
+	 *
+	 * @param createDate 建檔日期時間
+	 */
+	public void setCreateDate(java.sql.Timestamp createDate) {
+		this.createDate = createDate;
+	}
 
-/**
-	* 建檔日期時間<br>
-	* 
-  *
-  * @param createDate 建檔日期時間
-	*/
-  public void setCreateDate(java.sql.Timestamp createDate) {
-    this.createDate = createDate;
-  }
+	/**
+	 * 建檔人員<br>
+	 * 
+	 * @return String
+	 */
+	public String getCreateEmpNo() {
+		return this.createEmpNo == null ? "" : this.createEmpNo;
+	}
 
-/**
-	* 建檔人員<br>
-	* 
-	* @return String
-	*/
-  public String getCreateEmpNo() {
-    return this.createEmpNo == null ? "" : this.createEmpNo;
-  }
+	/**
+	 * 建檔人員<br>
+	 * 
+	 *
+	 * @param createEmpNo 建檔人員
+	 */
+	public void setCreateEmpNo(String createEmpNo) {
+		this.createEmpNo = createEmpNo;
+	}
 
-/**
-	* 建檔人員<br>
-	* 
-  *
-  * @param createEmpNo 建檔人員
-	*/
-  public void setCreateEmpNo(String createEmpNo) {
-    this.createEmpNo = createEmpNo;
-  }
+	/**
+	 * 最後更新日期時間<br>
+	 * 
+	 * @return java.sql.Timestamp
+	 */
+	public java.sql.Timestamp getLastUpdate() {
+		return this.lastUpdate;
+	}
 
-/**
-	* 最後更新日期時間<br>
-	* 
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getLastUpdate() {
-    return this.lastUpdate;
-  }
+	/**
+	 * 最後更新日期時間<br>
+	 * 
+	 *
+	 * @param lastUpdate 最後更新日期時間
+	 */
+	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 
-/**
-	* 最後更新日期時間<br>
-	* 
-  *
-  * @param lastUpdate 最後更新日期時間
-	*/
-  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-    this.lastUpdate = lastUpdate;
-  }
+	/**
+	 * 最後更新人員<br>
+	 * 
+	 * @return String
+	 */
+	public String getLastUpdateEmpNo() {
+		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+	}
 
-/**
-	* 最後更新人員<br>
-	* 
-	* @return String
-	*/
-  public String getLastUpdateEmpNo() {
-    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-  }
+	/**
+	 * 最後更新人員<br>
+	 * 
+	 *
+	 * @param lastUpdateEmpNo 最後更新人員
+	 */
+	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+		this.lastUpdateEmpNo = lastUpdateEmpNo;
+	}
 
-/**
-	* 最後更新人員<br>
-	* 
-  *
-  * @param lastUpdateEmpNo 最後更新人員
-	*/
-  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-    this.lastUpdateEmpNo = lastUpdateEmpNo;
-  }
-
-
-  @Override
-  public String toString() {
-    return "JcicZ052Log [jcicZ052LogId=" + jcicZ052LogId + ", tranKey=" + tranKey + ", bankCode1=" + bankCode1 + ", dataCode1=" + dataCode1 + ", bankCode2=" + bankCode2
-           + ", dataCode2=" + dataCode2 + ", bankCode3=" + bankCode3 + ", dataCode3=" + dataCode3 + ", bankCode4=" + bankCode4 + ", dataCode4=" + dataCode4 + ", bankCode5=" + bankCode5
-           + ", dataCode5=" + dataCode5 + ", changePayDate=" + changePayDate + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-  }
+	@Override
+	public String toString() {
+		return "JcicZ052Log [jcicZ052LogId=" + jcicZ052LogId + ", tranKey=" + tranKey + ", bankCode1=" + bankCode1 + ", dataCode1=" + dataCode1 + ", bankCode2=" + bankCode2 + ", dataCode2="
+				+ dataCode2 + ", bankCode3=" + bankCode3 + ", dataCode3=" + dataCode3 + ", bankCode4=" + bankCode4 + ", dataCode4=" + dataCode4 + ", bankCode5=" + bankCode5 + ", dataCode5="
+				+ dataCode5 + ", changePayDate=" + changePayDate + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+				+ ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+	}
 }

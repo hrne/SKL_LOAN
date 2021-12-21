@@ -37,23 +37,22 @@ public class L6933 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
-	
+
 	@Autowired
 	public TxTranCodeService txTranCodeService;
 
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6933 ");
 		this.totaVo.init(titaVo);
-		
-		Slice<TxDataLog> slTxDataLog = txDataLogService.findByTranNo(titaVo.getParam("TranNo"),
-				titaVo.getParam("MrKey"), 0, Integer.MAX_VALUE, titaVo);
+
+		Slice<TxDataLog> slTxDataLog = txDataLogService.findByTranNo(titaVo.getParam("TranNo"), titaVo.getParam("MrKey"), 0, Integer.MAX_VALUE, titaVo);
 		List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
 
-        boolean first = true;
+		boolean first = true;
 		if (lTxDataLog != null && lTxDataLog.size() > 0) {
 			for (TxDataLog txDataLog : lTxDataLog) {
 				if (first) {
@@ -62,9 +61,9 @@ public class L6933 extends TradeBuffer {
 					this.totaVo.putParam("OFacmNo", txDataLog.getFacmNo());
 					this.totaVo.putParam("OBormNo", txDataLog.getBormNo());
 					this.totaVo.putParam("OMrKey", txDataLog.getMrKey());
-					
+
 					String tranName = txDataLog.getTranNo();
-					
+
 					TxTranCode txTranCode = txTranCodeService.findById(txDataLog.getTranNo(), titaVo);
 					if (txTranCode != null) {
 						tranName += " " + txTranCode.getTranItem();
@@ -75,9 +74,9 @@ public class L6933 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("OReason", txDataLog.getReason());
-				
+
 				String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
-				
+
 //				occursList.putParam("OLastUpdate", txDataLog.getLastUpdate().toString().substring(0, 16));
 				occursList.putParam("OLastUpdate", lastUpdate);
 
@@ -86,8 +85,8 @@ public class L6933 extends TradeBuffer {
 					CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
 					if (cdEmp != null) {
 						lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
-					} 
-				} 
+					}
+				}
 
 				occursList.putParam("OLastEmp", lastEmp);
 				occursList.putParam("OTxDate", txDataLog.getTxDate());

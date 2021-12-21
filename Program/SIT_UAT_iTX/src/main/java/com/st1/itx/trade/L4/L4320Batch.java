@@ -158,15 +158,12 @@ public class L4320Batch extends TradeBuffer {
 			setSendMsg(titaVo);
 
 			if (this.processCnt > 0) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4031",
-						titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4031", titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320",
-						titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
 			}
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
 		// end
 		this.addList(this.totaVo);
@@ -558,7 +555,7 @@ public class L4320Batch extends TradeBuffer {
 		}
 
 		// 若利率變動且大於利率生效日
-		if (adjCode == 1 ) {
+		if (adjCode == 1) {
 			if (rateCurt.compareTo(fitRate) != 0 && prevIntDate > effDateCurt) {
 				errorFlag = 1;
 				checkMsg += "上次繳息日大於利率生效日";
@@ -567,7 +564,7 @@ public class L4320Batch extends TradeBuffer {
 
 		tmpBorm facm = new tmpBorm(custNo, facmNo, 0);
 		if (facRateFlag.get(facm) == 1) {
-			warnMsg += "額度下撥款的目前利率不同";       // warning only
+			warnMsg += "額度下撥款的目前利率不同"; // warning only
 		}
 		// 預調週期
 		b.setTxRateAdjFreq(iNextAdjPeriod);
@@ -579,10 +576,10 @@ public class L4320Batch extends TradeBuffer {
 		TempVo tTempVo = new TempVo();
 		// 檢核訊息
 		tTempVo.putParam("CheckMsg", checkMsg);
-		
+
 		// 目前利率 <> 借戶利率檔適用利率(預調利率)
-		if (fitRate.compareTo(parse.stringToBigDecimal(s.get("F14"))) !=0) {			
-			tTempVo.putParam("FitRate",s.get("F14"));
+		if (fitRate.compareTo(parse.stringToBigDecimal(s.get("F14"))) != 0) {
+			tTempVo.putParam("FitRate", s.get("F14"));
 		}
 
 		b.setJsonFields(tTempVo.getJsonString());
@@ -604,14 +601,12 @@ public class L4320Batch extends TradeBuffer {
 
 	}
 
-	
 //	訂正(刪除)
 	private void deleteBatxRate(TitaVo titaVo) throws LogicException {
 		// 戶別 CustType 1:個金;2:企金（含企金自然人）=> 客戶檔 0:個金1:企金2:企金自然人
 		this.info("deleteBatxRate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4320Erase(titaVo.getOrgEntdyI() + 19110000,
-				titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4320Erase(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
 			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
@@ -708,8 +703,7 @@ public class L4320Batch extends TradeBuffer {
 				tmpBorm cust = new tmpBorm(custNo, 0, 0);
 
 				if (loanBalTot.containsKey(cust)) {
-					loanBalTot.put(cust,
-							loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))));
+					loanBalTot.put(cust, loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))));
 				} else {
 					loanBalTot.put(cust, parse.stringToBigDecimal(fnAllList.get(i).get("F6")));
 				}

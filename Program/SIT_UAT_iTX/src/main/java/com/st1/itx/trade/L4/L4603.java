@@ -23,21 +23,21 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L4603 extends TradeBuffer {
-	
+
 	@Autowired
 	WebClient webClient;
-	
+
 	@Autowired
 	DateUtil dDateUtil;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4603 ");
 		this.totaVo.init(titaVo);
 
-		MySpring.newTask("L4603p", this.txBuffer, titaVo); 
+		MySpring.newTask("L4603p", this.txBuffer, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-			
+
 }

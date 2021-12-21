@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.ClBuildingReasonId;
  */
 public interface ClBuildingReasonRepositoryHist extends JpaRepository<ClBuildingReason, ClBuildingReasonId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Optional<ClBuildingReason> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscReasonSeqDesc(int clCode1_0, int clCode2_1, int clNo_2);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Optional<ClBuildingReason> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscReasonSeqDesc(int clCode1_0, int clCode2_1, int clNo_2);
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClBuildingReason> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Slice<ClBuildingReason> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClBuildingReason> findByClBuildingReasonId(ClBuildingReasonId clBuildingReasonId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClBuildingReason> findByClBuildingReasonId(ClBuildingReasonId clBuildingReasonId);
 
 }
-

@@ -108,7 +108,7 @@ public class L2613 extends TradeBuffer {
 			int dSlipNo = 0;
 			int cSlipNo = 0;
 
-			Slice<AcDetail> slAcDetail = acDetailService.findL2613("F24",custno ,rvNo, this.index, this.limit);
+			Slice<AcDetail> slAcDetail = acDetailService.findL2613("F24", custno, rvNo, this.index, this.limit);
 			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 			if (lAcDetail == null) {
 				lAcDetail = new ArrayList<AcDetail>();

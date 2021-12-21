@@ -99,7 +99,7 @@ public class L8313 extends TradeBuffer {
 		String iDataCode5 = titaVo.getParam("DataCode5");
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
 		String iKey = "";
-		
+
 		// JcicZ052, JcicZ040
 		JcicZ052 iJcicZ052 = new JcicZ052();
 		JcicZ052Id iJcicZ052Id = new JcicZ052Id();

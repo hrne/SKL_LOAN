@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -23,20 +22,19 @@ import com.st1.itx.db.domain.SpecInnReCheckId;
  */
 public interface SpecInnReCheckRepository extends JpaRepository<SpecInnReCheck, SpecInnReCheckId> {
 
-  // CustNo =
-  public Slice<SpecInnReCheck> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<SpecInnReCheck> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = 
-  public Slice<SpecInnReCheck> findAllByCustNoIsAndFacmNoIs(int custNo_0, int facmNo_1, Pageable pageable);
+	// CustNo = ,AND FacmNo =
+	public Slice<SpecInnReCheck> findAllByCustNoIsAndFacmNoIs(int custNo_0, int facmNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<SpecInnReCheck> findBySpecInnReCheckId(SpecInnReCheckId specInnReCheckId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<SpecInnReCheck> findBySpecInnReCheckId(SpecInnReCheckId specInnReCheckId);
 
-  // (日終批次)維護 InnReCheck 覆審案件明細檔 
-  @Procedure(value = "\"Usp_L5_InnReCheck_Upd\"")
-  public void uspL5InnrecheckUpd(int tbsdyf,  String empNo);
+	// (日終批次)維護 InnReCheck 覆審案件明細檔
+	@Procedure(value = "\"Usp_L5_InnReCheck_Upd\"")
+	public void uspL5InnrecheckUpd(int tbsdyf, String empNo);
 
 }
-

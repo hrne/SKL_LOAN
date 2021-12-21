@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.JcicB204Id;
  */
 public interface JcicB204RepositoryDay extends JpaRepository<JcicB204, JcicB204Id> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicB204> findByJcicB204Id(JcicB204Id jcicB204Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicB204> findByJcicB204Id(JcicB204Id jcicB204Id);
 
-  // (每日日終批次)維護 JcicB204 聯徵授信餘額日報檔
-  @Procedure(value = "\"Usp_L8_JcicB204_Upd\"")
-  public void uspL8Jcicb204Upd(int TBSDYF, String EmpNo);
+	// (每日日終批次)維護 JcicB204 聯徵授信餘額日報檔
+	@Procedure(value = "\"Usp_L8_JcicB204_Upd\"")
+	public void uspL8Jcicb204Upd(int TBSDYF, String EmpNo);
 
 }
-

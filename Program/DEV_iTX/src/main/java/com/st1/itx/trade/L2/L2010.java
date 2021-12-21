@@ -64,7 +64,7 @@ public class L2010 extends TradeBuffer {
 		String iProcessCode = titaVo.getParam("ProcessCode");
 		String iCustUkey = "";
 		String iGroupUKey = "";
-		if (!iCustId.isEmpty() ) {
+		if (!iCustId.isEmpty()) {
 			CustMain tCustMain = custMainService.custIdFirst(iCustId, titaVo);
 			if (tCustMain != null) {
 				iCustUkey = tCustMain.getCustUKey();
@@ -73,7 +73,7 @@ public class L2010 extends TradeBuffer {
 			}
 		}
 
-		if (!iGroupId.isEmpty() ) {
+		if (!iGroupId.isEmpty()) {
 			CustMain tCustMain = custMainService.custIdFirst(iGroupId, titaVo);
 			if (tCustMain != null) {
 				iGroupUKey = tCustMain.getCustUKey();
@@ -81,7 +81,7 @@ public class L2010 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2003", "客戶資料主檔"); // 查無資料
 			}
 		}
-		
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -92,26 +92,21 @@ public class L2010 extends TradeBuffer {
 		Slice<FacCaseAppl> lFacCaseAppl;
 		if (iApplNo > 0) { // 以申請號碼查詢
 			if (iProcessCode.equals("9")) {
-				lFacCaseAppl = facCaseApplService.caseApplNoRange(iApplNo, 9999999, "0", "2", this.index, this.limit,
-						titaVo);
+				lFacCaseAppl = facCaseApplService.caseApplNoRange(iApplNo, 9999999, "0", "2", this.index, this.limit, titaVo);
 			} else {
-				lFacCaseAppl = facCaseApplService.caseApplNoRange(iApplNo, 9999999, iProcessCode, iProcessCode,
-						this.index, this.limit, titaVo);
+				lFacCaseAppl = facCaseApplService.caseApplNoRange(iApplNo, 9999999, iProcessCode, iProcessCode, this.index, this.limit, titaVo);
 			}
-		} else if(!iCustId.isEmpty()){ // 以統一編號查詢查詢
+		} else if (!iCustId.isEmpty()) { // 以統一編號查詢查詢
 			if (iProcessCode.equals("9")) {
-				lFacCaseAppl = facCaseApplService.caseApplCustUKeyEq(iCustUkey, "0", "2", this.index, this.limit,
-						titaVo);
+				lFacCaseAppl = facCaseApplService.caseApplCustUKeyEq(iCustUkey, "0", "2", this.index, this.limit, titaVo);
 			} else {
-				lFacCaseAppl = facCaseApplService.caseApplCustUKeyEq(iCustUkey, iProcessCode, iProcessCode, this.index,
-						this.limit, titaVo);
+				lFacCaseAppl = facCaseApplService.caseApplCustUKeyEq(iCustUkey, iProcessCode, iProcessCode, this.index, this.limit, titaVo);
 			}
 		} else { // 以團體戶統編查詢
 			if (iProcessCode.equals("9")) {
 				lFacCaseAppl = facCaseApplService.caseApplGroupUKeyEq(iGroupUKey, "0", "2", this.index, this.limit, titaVo);
 			} else {
-				lFacCaseAppl = facCaseApplService.caseApplGroupUKeyEq(iGroupUKey, iProcessCode, iProcessCode, this.index,
-						this.limit, titaVo);
+				lFacCaseAppl = facCaseApplService.caseApplGroupUKeyEq(iGroupUKey, iProcessCode, iProcessCode, this.index, this.limit, titaVo);
 			}
 		}
 
@@ -135,11 +130,11 @@ public class L2010 extends TradeBuffer {
 			occursList.putParam("OOCurrencyCode", tFacCaseAppl.getCurrencyCode());
 			occursList.putParam("OOApplAmt", tFacCaseAppl.getApplAmt());
 			occursList.putParam("OOProcessCode", tFacCaseAppl.getProcessCode());
-			
+
 			iGroupUKey = tFacCaseAppl.getGroupUKey();
-			if(!"".equals(iGroupUKey)) {
-				 tCustMain = custMainService.findById(iGroupUKey, titaVo);
-				if(tCustMain != null) {					
+			if (!"".equals(iGroupUKey)) {
+				tCustMain = custMainService.findById(iGroupUKey, titaVo);
+				if (tCustMain != null) {
 					occursList.putParam("OOGroupId", tCustMain.getCustId());
 				} else {
 					throw new LogicException(titaVo, "E2003", "客戶資料主檔"); // 查無資料
@@ -147,7 +142,7 @@ public class L2010 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOGroupId", "");
 			}
-			
+
 			tFacMain = facMainService.facmApplNoFirst(tFacCaseAppl.getApplNo(), titaVo);
 			if (tFacMain == null) {
 				occursList.putParam("OOAcctCode", "");

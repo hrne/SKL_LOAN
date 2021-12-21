@@ -44,8 +44,7 @@ public class L9715p extends TradeBuffer {
 
 		l9715report.exec(titaVo, this.getTxBuffer());
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "L9715業務專辦照顧十八個月明細表已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9715業務專辦照顧十八個月明細表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

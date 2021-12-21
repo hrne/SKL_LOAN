@@ -127,12 +127,10 @@ public class L2R43 extends TradeBuffer {
 //	  2. 土地擔保品：
 //		 縣市別(CITY)+鄉鎮市區代號(VILL)+段/小段代號(DIST)+地號(LDNO) +土地所有權人
 		int clNo = 0;
-		
 
-		
-		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(), titaVo.getParam("AreaCode").trim()
-				,titaVo.getParam("IrCode").trim(),titaVo.getParam("BdNo1").trim(), titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
-		
+		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(), titaVo.getParam("AreaCode").trim(), titaVo.getParam("IrCode").trim(),
+				titaVo.getParam("BdNo1").trim(), titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+
 		List<ClBuilding> lClBuilding = slClBuilding == null ? null : slClBuilding.getContent();
 		if (lClBuilding != null) {
 			for (ClBuilding cl : lClBuilding) {
@@ -166,10 +164,10 @@ public class L2R43 extends TradeBuffer {
 	// 土地擔保品編號
 	private int getLandClNo(TitaVo titaVo) throws LogicException {
 		int clNo = 0;
-		
-		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(), titaVo.getParam("AreaCodeB").trim()
-				,titaVo.getParam("IrCodeB").trim(),titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
-		
+
+		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(), titaVo.getParam("AreaCodeB").trim(), titaVo.getParam("IrCodeB").trim(),
+				titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+
 		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
 		if (lClLand != null) {
 			for (ClLand cl : lClLand) {

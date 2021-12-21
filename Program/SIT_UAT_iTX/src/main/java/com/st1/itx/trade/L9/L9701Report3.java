@@ -94,16 +94,16 @@ public class L9701Report3 extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9701Report3 exec");
-		
+
 		iCUSTNO = titaVo.get("CustNo");
-		
+
 		entday = titaVo.getEntDyI();
-		
+
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-		
+
 		List<Map<String, String>> listL9701 = null;
-		
+
 		try {
 			listL9701 = l9701ServiceImpl.doQuery3(titaVo);
 		} catch (Exception e) {
@@ -111,7 +111,7 @@ public class L9701Report3 extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
-		
+
 		if (listL9701 != null && listL9701.size() > 0) {
 			this.custName = listL9701.get(0).get("CustName");
 			this.open(titaVo, entday, titaVo.getKinbr(), "L9701_3", "客戶往來交易明細表", "", "A4", "L");
@@ -155,8 +155,7 @@ public class L9701Report3 extends MakeReport {
 		this.print(0, 60, formatAmt(txAmt, 0), "R"); // 交易金額
 
 		if (Integer.parseInt(tL9701Vo.get("IntStartDate")) > 0) {
-			this.print(0, 63,
-					showRocDate(tL9701Vo.get("IntStartDate"), 1) + "-" + showRocDate(tL9701Vo.get("IntEndDate"), 1)); // 計息期間
+			this.print(0, 63, showRocDate(tL9701Vo.get("IntStartDate"), 1) + "-" + showRocDate(tL9701Vo.get("IntEndDate"), 1)); // 計息期間
 		}
 
 		BigDecimal principal = getBigDecimal(tL9701Vo.get("Principal"));

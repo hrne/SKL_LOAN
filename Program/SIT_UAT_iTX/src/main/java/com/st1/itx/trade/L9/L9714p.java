@@ -51,8 +51,7 @@ public class L9714p extends TradeBuffer {
 		} else {
 			content = "L9714繳息證明單查無資料";
 		}
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), content, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

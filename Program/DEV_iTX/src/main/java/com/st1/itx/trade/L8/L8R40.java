@@ -40,10 +40,10 @@ public class L8R40 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ442 iJcicZ442 = new JcicZ442();
 		iJcicZ442 = iJcicZ442Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ442 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r40TranKey", iJcicZ442.getTranKey());
 			totaVo.putParam("L8r40CustId", iJcicZ442.getCustId());
 			totaVo.putParam("L8r40SubmitKey", iJcicZ442.getSubmitKey());
@@ -73,10 +73,9 @@ public class L8R40 extends TradeBuffer {
 			totaVo.putParam("L8r40GuarObliInte", iJcicZ442.getGuarObliInte()); // 保證債權利息
 			totaVo.putParam("L8r40GuarObliPena", iJcicZ442.getGuarObliPena()); // 保證債權其他費用
 			totaVo.putParam("L8r40GuarObliOther", iJcicZ442.getGuarObliOther()); // 信用卡其他費用
-			totaVo.putParam("L8r40OutJcicTxtDate", iJcicZ442.getOutJcicTxtDate());// 轉JCIC文字檔日期	
+			totaVo.putParam("L8r40OutJcicTxtDate", iJcicZ442.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

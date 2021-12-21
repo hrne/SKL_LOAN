@@ -73,9 +73,9 @@ public class L2919ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "                        and clf.\"ClNo\"= cm.\"ClNo\""        ;  
 //		sql += " LEFT JOIN \"CustMain\" cu on cu.\"CustNo\"= clf.\"CustNo\" " ;
 //		sql += "                               AND cu.\"CustId\"   = :custId";
-		
+
 		sql += " LEFT JOIN \"CustMain\" cu on cu.\"CustId\"   = :custId";
-		
+
 		sql += "       LEFT JOIN \"ClStock\" cs ON cs.\"ClCode1\" = cm.\"ClCode1\"";
 		sql += "                               AND cs.\"ClCode2\" = cm.\"ClCode2\"";
 		sql += "                               AND cs.\"ClNo\"    = cm.\"ClNo\"";
@@ -101,21 +101,21 @@ public class L2919ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND cl.\"ClNo\"    = cm.\"ClNo\"";
 		sql += "                                    AND cl.\"OwnerCustUKey\"   = cu.\"CustUKey\"";
 
-		sql += "       WHERE   (cm.\"ClCode1\" =  cs.\"ClCode1\"" ; 
-		sql += "          and cm.\"ClCode2\" =  cs.\"ClCode2\"" ; 
-		sql += "          and cm.\"ClNo\" =  cs.\"ClNo\")" ; 
-		sql += "           or (cm.\"ClCode1\" =  co.\"ClCode1\"" ; 
-		sql += "          and cm.\"ClCode2\" =  co.\"ClCode2\"" ; 
-		sql += "          and cm.\"ClNo\" =  co.\"ClNo\")" ; 
-		sql += "           or (cm.\"ClCode1\" =  cmv.\"ClCode1\"" ; 
-		sql += "          and cm.\"ClCode2\" =  cmv.\"ClCode2\"" ; 
-		sql += "          and cm.\"ClNo\" =  cmv.\"ClNo\")" ;
-		sql += "           or (cm.\"ClCode1\" =  cb.\"ClCode1\"" ; 
-		sql += "          and cm.\"ClCode2\" =  cb.\"ClCode2\"" ; 
-		sql += "          and cm.\"ClNo\" =  cb.\"ClNo\")" ;
-		sql += "           or (cm.\"ClCode1\" =  cl.\"ClCode1\"" ; 
-		sql += "          and cm.\"ClCode2\" =  cl.\"ClCode2\"" ; 
-		sql += "          and cm.\"ClNo\" =  cl.\"ClNo\")" ;
+		sql += "       WHERE   (cm.\"ClCode1\" =  cs.\"ClCode1\"";
+		sql += "          and cm.\"ClCode2\" =  cs.\"ClCode2\"";
+		sql += "          and cm.\"ClNo\" =  cs.\"ClNo\")";
+		sql += "           or (cm.\"ClCode1\" =  co.\"ClCode1\"";
+		sql += "          and cm.\"ClCode2\" =  co.\"ClCode2\"";
+		sql += "          and cm.\"ClNo\" =  co.\"ClNo\")";
+		sql += "           or (cm.\"ClCode1\" =  cmv.\"ClCode1\"";
+		sql += "          and cm.\"ClCode2\" =  cmv.\"ClCode2\"";
+		sql += "          and cm.\"ClNo\" =  cmv.\"ClNo\")";
+		sql += "           or (cm.\"ClCode1\" =  cb.\"ClCode1\"";
+		sql += "          and cm.\"ClCode2\" =  cb.\"ClCode2\"";
+		sql += "          and cm.\"ClNo\" =  cb.\"ClNo\")";
+		sql += "           or (cm.\"ClCode1\" =  cl.\"ClCode1\"";
+		sql += "          and cm.\"ClCode2\" =  cl.\"ClCode2\"";
+		sql += "          and cm.\"ClNo\" =  cl.\"ClNo\")";
 		sql += "       GROUP BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 		sql += "       ORDER BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 

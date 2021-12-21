@@ -27,7 +27,7 @@ public class LM019Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -74,7 +74,7 @@ public class LM019Report extends MakeReport {
 			this.info("LM019ServiceImpl.testExcel error = " + errors.toString());
 		}
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {

@@ -57,7 +57,7 @@ public class L650B extends TradeBuffer {
 
 		CdPfParms iCdPfParams = new CdPfParms();
 		CdPfParmsId iCdPfParamsId = new CdPfParmsId();
-		//Input
+		// Input
 		String iDeptCodeA = "";
 		String iDeptCodeB = "";
 		String iDeptCodeC = "";
@@ -66,14 +66,14 @@ public class L650B extends TradeBuffer {
 		int iWorkMonthS = 0;
 		int iWorkMonthE = 0;
 		int i = 1;
-		//業績全部
-		while (i<=30) {
-			iDeptCodeA = titaVo.getParam("DeptCodeA"+i);
+		// 業績全部
+		while (i <= 30) {
+			iDeptCodeA = titaVo.getParam("DeptCodeA" + i);
 			if (iDeptCodeA.equals("") || iDeptCodeA.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSA"+i))+191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEA"+i))+191100;
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSA" + i)) + 191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEA" + i)) + 191100;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("1");
 			iCdPfParamsId.setCondition(iDeptCodeA);
@@ -82,20 +82,20 @@ public class L650B extends TradeBuffer {
 			iCdPfParams.setWorkMonthEnd(iWorkMonthE);
 			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "排除商品別-業績全部");
 			}
 			i++;
 		}
-		//換算業績、業務報酬
+		// 換算業績、業務報酬
 		i = 1;
-		while (i<=30) {
-			iDeptCodeB = titaVo.getParam("DeptCodeB"+i);
+		while (i <= 30) {
+			iDeptCodeB = titaVo.getParam("DeptCodeB" + i);
 			if (iDeptCodeB.equals("") || iDeptCodeB.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSB"+i))+191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEB"+i))+191100;
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSB" + i)) + 191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEB" + i)) + 191100;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("2");
 			iCdPfParamsId.setCondition(iDeptCodeB);
@@ -104,21 +104,21 @@ public class L650B extends TradeBuffer {
 			iCdPfParams.setWorkMonthEnd(iWorkMonthE);
 			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "排除商品別-換算業績、業務報酬");
 			}
 			i++;
 		}
-		
-		//介紹獎金
+
+		// 介紹獎金
 		i = 1;
-		while (i<=30) {
-			iDeptCodeC = titaVo.getParam("DeptCodeC"+i);
+		while (i <= 30) {
+			iDeptCodeC = titaVo.getParam("DeptCodeC" + i);
 			if (iDeptCodeC.equals("") || iDeptCodeC.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSC"+i))+191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEC"+i))+191100;
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSC" + i)) + 191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEC" + i)) + 191100;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("3");
 			iCdPfParamsId.setCondition(iDeptCodeC);
@@ -127,21 +127,21 @@ public class L650B extends TradeBuffer {
 			iCdPfParams.setWorkMonthEnd(iWorkMonthE);
 			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "排除商品別-換算業績、業務報酬");
 			}
 			i++;
 		}
-		
-		//加碼獎勵津貼
+
+		// 加碼獎勵津貼
 		i = 1;
-		while (i<=30) {
-			iDeptCodeD = titaVo.getParam("DeptCodeD"+i);
+		while (i <= 30) {
+			iDeptCodeD = titaVo.getParam("DeptCodeD" + i);
 			if (iDeptCodeD.equals("") || iDeptCodeD.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSD"+i))+191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthED"+i))+191100;
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSD" + i)) + 191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthED" + i)) + 191100;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("4");
 			iCdPfParamsId.setCondition(iDeptCodeD);
@@ -150,21 +150,21 @@ public class L650B extends TradeBuffer {
 			iCdPfParams.setWorkMonthEnd(iWorkMonthE);
 			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "排除商品別-加碼獎勵津貼");
 			}
 			i++;
 		}
-		
-		//協辦獎金
+
+		// 協辦獎金
 		i = 1;
-		while (i<=30) {
-			iDeptCodeE = titaVo.getParam("DeptCodeE"+i);
+		while (i <= 30) {
+			iDeptCodeE = titaVo.getParam("DeptCodeE" + i);
 			if (iDeptCodeE.equals("") || iDeptCodeE.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSE"+i))+191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEE"+i))+191100;
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSE" + i)) + 191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEE" + i)) + 191100;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("5");
 			iCdPfParamsId.setCondition(iDeptCodeE);
@@ -173,7 +173,7 @@ public class L650B extends TradeBuffer {
 			iCdPfParams.setWorkMonthEnd(iWorkMonthE);
 			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "排除商品別-協辦獎金");
 			}
 			i++;

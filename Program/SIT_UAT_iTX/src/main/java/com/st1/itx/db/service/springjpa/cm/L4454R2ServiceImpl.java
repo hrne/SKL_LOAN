@@ -32,7 +32,6 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("銀扣失敗五萬元以上報表 findAll...");
@@ -84,7 +83,7 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "   left join \"CdEmp\" ce          on ce.\"EmployeeNo\" = fm.\"FireOfficer\" ";
 		sql += "   where bd.\"EntryDate\" = :entryDate                                       ";
 		sql += "     and bd.\"RepayType\" = 1                                                ";
-	    sql += "     and bd.\"MediaCode\" = 'Y'                                              ";
+		sql += "     and bd.\"MediaCode\" = 'Y'                                              ";
 		sql += "     and NVL(bd.\"ReturnCode\",'  ') not in ('  ','00')                      ";
 		sql += "     and bd.\"RepayAmt\" >= 50000                                            ";
 		sql += "   group by CASE WHEN                                                        ";

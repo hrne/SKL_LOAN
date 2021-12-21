@@ -105,8 +105,7 @@ public class L8322 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			if ("A".equals(iTranKey)) {
 				// 2 IDN+調解申請日，不能重複，若有重複，剔退處理.
-				Slice<JcicZ440> sJcicZ440 = sJcicZ440Service.custRcEq(iCustId, iApplyDate + 19110000, 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ440> sJcicZ440 = sJcicZ440Service.custRcEq(iCustId, iApplyDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ440 != null) {
 					throw new LogicException("E0005", "IDN+調解申請日，不能重複.");
 				}

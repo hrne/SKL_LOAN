@@ -139,19 +139,17 @@ public class L492A extends TradeBuffer {
 				}
 
 //				aml為1.需審查/確認  or 2.為凍結名單/未確定名單者     跳過
-				if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2"))
-						|| "2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
+				if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2")) || "2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
 					continue;
 				}
-				
+
 //				需抓同日
 				if (tBatxDetail.getAcDate() != titaVo.getEntDyI()) {
 					continue;
 				}
 
 //				0.未檢核1.不處理2.人工處理3.檢核錯誤4.檢核正常5.人工入帳6.批次入帳7.虛擬轉暫收
-				if ("2".equals(tBatxDetail.getProcStsCode()) || "3".equals(tBatxDetail.getProcStsCode())
-						|| "4".equals(tBatxDetail.getProcStsCode())) {
+				if ("2".equals(tBatxDetail.getProcStsCode()) || "3".equals(tBatxDetail.getProcStsCode()) || "4".equals(tBatxDetail.getProcStsCode())) {
 
 					String procNote = "";
 					String dscpt = "";

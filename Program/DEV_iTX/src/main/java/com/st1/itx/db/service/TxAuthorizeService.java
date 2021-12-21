@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxAuthorize;
@@ -47,16 +49,30 @@ public interface TxAuthorizeService {
 	public Slice<TxAuthorize> findSupNo(int entdy_0, String supNo_1, int index, int limit, TitaVo... titaVo);
 
 	/**
-	 * Entdy &gt;= ,AND Entdy &lt;=
+	 * Entdy &gt;= ,AND Entdy &lt;=,AND SupNo %
 	 *
 	 * @param entdy_0 entdy_0
 	 * @param entdy_1 entdy_1
+	 * @param supNo_2 supNo_2
 	 * @param index   Page Index
 	 * @param limit   Page Data Limit
 	 * @param titaVo  Variable-Length Argument
 	 * @return Slice TxAuthorize TxAuthorize of List
 	 */
-	public Slice<TxAuthorize> findEntdy(int entdy_0, int entdy_1, int index, int limit, TitaVo... titaVo);
+	public Slice<TxAuthorize> findEntdy(int entdy_0, int entdy_1, String supNo_2, int index, int limit, TitaVo... titaVo);
+
+	/**
+	 * CreateDate&gt;=, AND CreateDate&lt;= ,AND SupNo %
+	 *
+	 * @param createDate_0 createDate_0
+	 * @param createDate_1 createDate_1
+	 * @param supNo_2      supNo_2
+	 * @param index        Page Index
+	 * @param limit        Page Data Limit
+	 * @param titaVo       Variable-Length Argument
+	 * @return Slice TxAuthorize TxAuthorize of List
+	 */
+	public Slice<TxAuthorize> findCreatDate(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, int index, int limit, TitaVo... titaVo);
 
 	/**
 	 * hold By TxAuthorize

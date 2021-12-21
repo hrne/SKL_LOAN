@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-
 
 @Service("LY003ServiceImpl")
 @Repository
@@ -34,8 +32,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-
-	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum,int endOfYearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum, int endOfYearMonth) throws Exception {
 		this.info("LY003.findAll ");
 
 		String sql = " ";

@@ -51,7 +51,7 @@ public class L6103 extends TradeBuffer {
 //		if (!titaVo.getHsupCode().equals("1")) {
 //			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 //		} else {
-			toDo(titaVo);
+		toDo(titaVo);
 //		}
 
 		this.addList(this.totaVo);

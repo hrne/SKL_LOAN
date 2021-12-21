@@ -104,8 +104,8 @@ public class L5071 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOCustId", t5071.get("F0"));
 				tCustMain = sCustMainService.custIdFirst(t5071.get("F0"), titaVo);
-				
-				if(tCustMain!=null) {
+
+				if (tCustMain != null) {
 					CustName = tCustMain.getCustName();
 				}
 				occursList.putParam("OOCustName", CustName);
@@ -119,12 +119,12 @@ public class L5071 extends TradeBuffer {
 				occursList.putParam("OOTotalPeriod", t5071.get("F8"));
 				occursList.putParam("OOIntRate", t5071.get("F9"));
 				occursList.putParam("OOFirstDueDate", parse.stringToInteger(t5071.get("F10")) - 19110000);
-				if(parse.stringToInteger(t5071.get("F11"))==0){
+				if (parse.stringToInteger(t5071.get("F11")) == 0) {
 					occursList.putParam("OOLastDueDate", 0);
 				} else {
 					occursList.putParam("OOLastDueDate", parse.stringToInteger(t5071.get("F11")) - 19110000);
 				}
-				
+
 				occursList.putParam("OOIsMainFin", t5071.get("F12"));
 				occursList.putParam("OOTotalContrAmt", t5071.get("F14"));
 				occursList.putParam("OOMainFinCode", t5071.get("F13"));

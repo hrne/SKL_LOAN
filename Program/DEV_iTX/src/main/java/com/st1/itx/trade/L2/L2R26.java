@@ -41,7 +41,7 @@ public class L2R26 extends TradeBuffer {
 
 	@Autowired
 	public CustMainService sCustMainService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -131,7 +131,7 @@ public class L2R26 extends TradeBuffer {
 			this.totaVo.putParam("L2r26OwnerId", "");
 			this.totaVo.putParam("L2r26OwnerName", "");
 		}
-		
+
 		this.totaVo.putParam("L2r26IssuingId", tClOther.getIssuingId());
 		this.totaVo.putParam("L2r26IssuingCounty", tClOther.getIssuingCounty());
 		this.totaVo.putParam("L2r26DocNo", tClOther.getDocNo());

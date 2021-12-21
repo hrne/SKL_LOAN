@@ -82,7 +82,7 @@ public class L7022 extends TradeBuffer {
 			occursList.putParam("OOType", tIas39LGD.getType());
 			occursList.putParam("OOTypeDesc", tIas39LGD.getTypeDesc());
 			occursList.putParam("OOLGDPercent", tIas39LGD.getLGDPercent());
-			//occursList.putParam("OOEnable", tIas39LGD.getEnable());
+			// occursList.putParam("OOEnable", tIas39LGD.getEnable());
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

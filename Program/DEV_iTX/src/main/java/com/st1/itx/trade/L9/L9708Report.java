@@ -157,8 +157,7 @@ public class L9708Report extends MakeReport {
 		long sno = this.close();
 
 		// 輸出PDF
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 	}
-
 
 }

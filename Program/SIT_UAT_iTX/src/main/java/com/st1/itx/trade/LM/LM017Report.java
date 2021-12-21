@@ -66,8 +66,7 @@ public class LM017Report extends MakeReport {
 		}
 		BigDecimal num = new BigDecimal("0");
 		BigDecimal amt = new BigDecimal("0");
-		BigDecimal area[] = { new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"),
-				new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0") };
+		BigDecimal area[] = { new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0"), new BigDecimal("0") };
 		if (LM017List != null && LM017List.size() != 0) {
 
 			DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -169,7 +168,7 @@ public class LM017Report extends MakeReport {
 			this.print(-39, 20, "電　話：　　　　　　　　　　　　　　　 　電　話：　　　　　　　　　　　　　　　　　電　話：");
 			this.print(-40, 20, "E-mail：　　　　　　　　　　　　　　　  E-mail：　　　　　　　　　　　　　　　　 E-mail：");
 		} else {
-			this.print( 1, 30, "本日無資料");
+			this.print(1, 30, "本日無資料");
 			this.print(-9, 3, "┌────────────┬────────┬───────────────────────────────────────────────┐");
 			this.print(-10, 3, "│　　　　地區別　　　　　│　　貸款項目　　│　　　　撥款戶數　　　　　　　撥款金額　　　　　　　　加權平均　　　　　　　　　加權平均　　　│");
 			this.print(-11, 3, "│﹙以擔保品座落地點區分﹚│　　　　　　　　│　　　　（戶）　　　　　　　　（億元）　　　　　　　貸款成數（％）　　　　　　貸款利率（％）　│");

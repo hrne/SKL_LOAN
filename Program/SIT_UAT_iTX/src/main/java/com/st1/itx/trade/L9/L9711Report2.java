@@ -133,8 +133,7 @@ public class L9711Report2 extends MakeReport {
 		List<BaTxVo> listBaTxVo = new ArrayList<>();
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
-			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, titaVo);
+			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, titaVo);
 
 		} catch (LogicException e) {
 			this.info("baTxCom.setTxBuffer ErrorMsg :" + e.getMessage());
@@ -180,8 +179,7 @@ public class L9711Report2 extends MakeReport {
 		this.print(-22, 83, tL9711Vo.get("F20"));
 
 		this.print(-23, 10, "戶號：　　　　　　　目前利率：　　　　%");
-		this.print(-23, 16, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-"
-				+ String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))));
+		this.print(-23, 16, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-" + String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))));
 		this.print(-23, 47, String.format("%.4f", IntRate), "R");
 		this.print(-24, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
 		this.print(-24, 20, tL9711Vo.get("F6"));
@@ -289,8 +287,7 @@ public class L9711Report2 extends MakeReport {
 				tempDate = listData.get("pday").toString();
 				if (!tempDate.equals("0")) {
 					// 應繳日
-					this.print(dataRow, 7,
-							tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
+					this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
 					// 違約金
 					this.print(dataRow, 26, String.format("%,d", listData.get("bAmt")), "R");
 					// 本金
@@ -298,17 +295,13 @@ public class L9711Report2 extends MakeReport {
 					// 利息
 					this.print(dataRow, 52, String.format("%,d", listData.get("iAmt")), "R");
 					// 應繳合計
-					this.print(dataRow, 66,
-							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
-							"R");
+					this.print(dataRow, 66, String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))), "R");
 					// 未還 本金餘額
 					this.print(dataRow, 78, String.format("%,d", listData.get("lAmt")), "R");
 					// 暫付 所得稅
 					this.print(dataRow, 88, "0", "R");
 					// 應繳淨額
-					this.print(dataRow, 100,
-							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
-							"R");
+					this.print(dataRow, 100, String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))), "R");
 
 					dataRow--;
 				}
@@ -376,11 +369,9 @@ public class L9711Report2 extends MakeReport {
 			}
 		} else if (iType == 2) {
 			if (rocdatex.length() == 6) {
-				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6)
-						+ " 日";
+				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6) + " 日";
 			} else {
-				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7)
-						+ " 日";
+				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7) + " 日";
 			}
 		} else {
 			return rocdatex;

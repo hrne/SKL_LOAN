@@ -27,10 +27,10 @@ public class LM082Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	private static final BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -42,7 +42,7 @@ public class LM082Report extends MakeReport {
 		List<Map<String, String>> lLM082 = null;
 
 		try {
-			lLM082 = lM082ServiceImpl.findAll(titaVo, iAcDate/100);
+			lLM082 = lM082ServiceImpl.findAll(titaVo, iAcDate / 100);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -63,7 +63,7 @@ public class LM082Report extends MakeReport {
 
 		this.info("LM082Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", date/100%100) + " 月";
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", date / 100 % 100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM082", "B048金融機構承作「自然人購置高價住宅貸款」統計表(110.3.19(含)起辦理案件)",
 				"LM082_B048金融機構承作「自然人購置高價住宅貸款」統計表(110.3.19(含)起辦理案件)" + showRocDate(entdy, 0).substring(0, 7), "LM082_底稿_B048金融機構承作「自然人購置高價住宅貸款」統計表(110.3.19(含)起辦理案件).xlsx", 1, "FOA");
@@ -136,6 +136,6 @@ public class LM082Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 }

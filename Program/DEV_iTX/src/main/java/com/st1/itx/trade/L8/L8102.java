@@ -209,7 +209,7 @@ public class L8102 extends TradeBuffer {
 //					dataLines = "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp)
 //					+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 				}
-				
+
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(0);
 				tTxToDoDetail.setFacmNo(0);
@@ -317,7 +317,7 @@ public class L8102 extends TradeBuffer {
 		makeExcel1.setValue(excelRow, 3, String.valueOf(custMain.getCustNo()));
 		makeExcel1.setValue(excelRow, 4, txAmlCredit.getCustKey());
 		makeExcel1.setValue(excelRow, 5, custMain.getCustName());
-		makeExcel1.setValue(excelRow, 6, custNoticeCom.getCurrAddress(custMain,titaVo));
+		makeExcel1.setValue(excelRow, 6, custNoticeCom.getCurrAddress(custMain, titaVo));
 		makeExcel1.setValue(excelRow, 7, custMain.getCurrZip2() + custMain.getCurrZip3());
 		makeExcel1.setValue(excelRow, 8, "高");
 		makeExcel1.setValue(excelRow, 9, txAmlCredit.getUnit() + "-" + unitItem);
@@ -338,7 +338,7 @@ public class L8102 extends TradeBuffer {
 		makeExcel2.setValue(excelRow, 5, "高");
 		makeExcel2.setValue(excelRow, 6, txAmlCredit.getUnit() + "-" + unitItem);
 		makeExcel2.setValue(excelRow, 7, txAmlCredit.getWlfConfirmStatus() + ":" + ConfirmStatus);
-		
+
 		String isStatus = "";
 		cdCodeId = new CdCodeId("AmlIsStatus", String.format("%02d", txAmlCredit.getIsStatus()));
 		cdCode = cdCodeService.findById(cdCodeId, titaVo);

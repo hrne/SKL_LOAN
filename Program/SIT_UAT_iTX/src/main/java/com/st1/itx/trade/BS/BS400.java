@@ -89,8 +89,7 @@ public class BS400 extends TradeBuffer {
 		}
 
 		// findAll 整批入帳明細檔
-		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
-				Integer.MAX_VALUE);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, Integer.MAX_VALUE);
 		lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 		this.batchTransaction.commit();
 		if (lBatxDetail != null) {
@@ -120,8 +119,7 @@ public class BS400 extends TradeBuffer {
 					try {
 						batxDetailService.update(tDetail);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007",
-								"BS400 update batxDetail " + tDetail + e.getErrorMsg());
+						throw new LogicException(titaVo, "E0007", "BS400 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 
 				}
@@ -133,8 +131,7 @@ public class BS400 extends TradeBuffer {
 
 		// end
 		this.batchTransaction.commit();
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4002", titaVo.getTlrNo(),
-				iBatchNo + " 整批檢核, " + msg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4002", titaVo.getTlrNo(), iBatchNo + " 整批檢核, " + msg, titaVo);
 
 		return null;
 

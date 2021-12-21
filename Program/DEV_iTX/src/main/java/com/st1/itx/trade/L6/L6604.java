@@ -136,7 +136,7 @@ public class L6604 extends TradeBuffer {
 			dataLog.setEnv(titaVo, tCdCode, tCdCode); ////
 			dataLog.exec("刪除各類代碼檔"); ////
 			break;
-			
+
 		}
 
 		this.addList(this.totaVo);

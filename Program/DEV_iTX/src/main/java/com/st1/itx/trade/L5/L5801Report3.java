@@ -27,6 +27,7 @@ public class L5801Report3 extends MakeReport {
 	MakeExcel makeExcel;
 
 	ExcelFontStyleVo fontStyleVo;
+
 	public void exec(int thisMonth, int lastMonth, TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> listL5801 = null;
 
@@ -56,33 +57,32 @@ public class L5801Report3 extends MakeReport {
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
 
-		
-		thisMonth = thisMonth -191100;
+		thisMonth = thisMonth - 191100;
 		String YM = String.valueOf(thisMonth);
-		
-		if(YM.length() == 5) {
-			makeExcel.setValue(1, 1, "申報年月:" + YM.substring(0,3) + "年" + YM.substring(3,5) + "月", fontStyleVo);
+
+		if (YM.length() == 5) {
+			makeExcel.setValue(1, 1, "申報年月:" + YM.substring(0, 3) + "年" + YM.substring(3, 5) + "月", fontStyleVo);
 		} else {
-			makeExcel.setValue(1, 1, "申報年月:" + YM.substring(0,2) + "年" + YM.substring(2,4) + "月", fontStyleVo);
+			makeExcel.setValue(1, 1, "申報年月:" + YM.substring(0, 2) + "年" + YM.substring(2, 4) + "月", fontStyleVo);
 		}
 		// 補貼息欄位移到最後
 		// 個餘額新增戶號欄位
-		makeExcel.setMergedRegion(2,3,1,1);
-		makeExcel.setMergedRegion(2,2,2,3);
-		makeExcel.setMergedRegion(2,2,4,5);
-		makeExcel.setMergedRegion(2,2,6,7);
-		makeExcel.setMergedRegion(2,2,8,9);
-		makeExcel.setMergedRegion(2,2,10,11);
-		makeExcel.setMergedRegion(2,3,12,12);
-		
+		makeExcel.setMergedRegion(2, 3, 1, 1);
+		makeExcel.setMergedRegion(2, 2, 2, 3);
+		makeExcel.setMergedRegion(2, 2, 4, 5);
+		makeExcel.setMergedRegion(2, 2, 6, 7);
+		makeExcel.setMergedRegion(2, 2, 8, 9);
+		makeExcel.setMergedRegion(2, 2, 10, 11);
+		makeExcel.setMergedRegion(2, 3, 12, 12);
+
 		fontStyleVo = new ExcelFontStyleVo();
 
 		fontStyleVo.setFont((short) 1); // 字體 : 標楷體
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
-		
+
 		fontStyleVo.setAlign("C");
-		
+
 		makeExcel.setValue(2, 1, "專案融資種類", fontStyleVo);
 		makeExcel.setValue(2, 2, "上月貸款餘額", fontStyleVo);
 		makeExcel.setValue(2, 4, "本月貸出數", fontStyleVo);
@@ -90,7 +90,7 @@ public class L5801Report3 extends MakeReport {
 		makeExcel.setValue(2, 8, "屆期不再申撥補貼息", fontStyleVo);
 		makeExcel.setValue(2, 10, "本月貸款餘額", fontStyleVo);
 		makeExcel.setValue(2, 12, "補貼息", fontStyleVo);
-		
+
 		makeExcel.setValue(3, 2, "戶數", fontStyleVo);
 		makeExcel.setValue(3, 3, "金額", fontStyleVo);
 		makeExcel.setValue(3, 4, "戶數", fontStyleVo);
@@ -101,7 +101,7 @@ public class L5801Report3 extends MakeReport {
 		makeExcel.setValue(3, 9, "金額", fontStyleVo);
 		makeExcel.setValue(3, 10, "戶數", fontStyleVo);
 		makeExcel.setValue(3, 11, "金額", fontStyleVo);
-		
+
 		makeExcel.setWidth(1, 24);
 		makeExcel.setWidth(2, 10);
 		makeExcel.setWidth(3, 12);
@@ -121,9 +121,9 @@ public class L5801Report3 extends MakeReport {
 		fontStyleVo.setFont((short) 1); // 字體 : 標楷體
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
-		
+
 		fontStyleVo.setAlign("L");
-		
+
 		if (listL5801 == null || listL5801.isEmpty()) {
 
 //			makeExcel.setValue(printRow, 1, "本月無資料", fontStyleVo);
@@ -159,14 +159,14 @@ public class L5801Report3 extends MakeReport {
 
 				// F1 上月貸款餘額(次數)
 				makeExcel.setValue(printRow, 2, mapL5801.get("F1"), fontStyleVo);
-				
+
 				// F2 上月貸款餘額
 				String LastMonthBal = mapL5801.get("F2");
 				makeExcel.setValue(printRow, 3, LastMonthBal, fontStyleVo);
 
 				// F3 本月貸出數(次數)
 				makeExcel.setValue(printRow, 4, mapL5801.get("F3"), fontStyleVo);
-				
+
 				// F4 本月貸出數
 				String OpenAmount = mapL5801.get("F4");
 				makeExcel.setValue(printRow, 5, OpenAmount, fontStyleVo);
@@ -180,28 +180,28 @@ public class L5801Report3 extends MakeReport {
 
 				// F7 屆期不再申撥補貼息(次數)
 				makeExcel.setValue(printRow, 8, mapL5801.get("F7"), fontStyleVo);
-				
+
 				// F8 屆期不再申撥補貼息
 				String MaturityAmount = mapL5801.get("F8");
 				makeExcel.setValue(printRow, 9, MaturityAmount, fontStyleVo);
 
 				// F9 本月貸款餘額
 				makeExcel.setValue(printRow, 10, mapL5801.get("F9"), fontStyleVo);
-				
+
 				// F10 本月貸款餘額
 				String ThisMonthBal = mapL5801.get("F10");
 
 				makeExcel.setValue(printRow, 11, ThisMonthBal, fontStyleVo);
-				
+
 				// F1 補貼息
 				String Money = mapL5801.get("F11");
 
 				makeExcel.setValue(printRow, 12, Money, fontStyleVo);
-				
+
 				printRow++;
 			}
 			// 畫框線
-			makeExcel.setAddRengionBorder("A", 1, "L", printRow-1, 1);
+			makeExcel.setAddRengionBorder("A", 1, "L", printRow - 1, 1);
 
 		}
 

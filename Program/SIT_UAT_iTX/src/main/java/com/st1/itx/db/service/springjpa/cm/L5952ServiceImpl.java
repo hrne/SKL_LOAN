@@ -30,8 +30,7 @@ public class L5952ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	public List<String[]> findData(int workMonthFm, int workMonthTo, String sumByFacm, int index, int limit,
-			TitaVo titaVo) throws LogicException {
+	public List<String[]> findData(int workMonthFm, int workMonthTo, String sumByFacm, int index, int limit, TitaVo titaVo) throws LogicException {
 		String sqlL5952 = "";
 		sqlL5952 += "SELECT  ";
 		sqlL5952 += "BSOF.\"DepItem\" AS \"部室別名稱\" ";
@@ -53,7 +52,7 @@ public class L5952ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5952 += ",ICBUnit.\"UnitItem\" AS \"介紹人區域中心名稱\" ";
 		sqlL5952 += ",IEMP.\"Fullname\" AS \"介紹人姓名\" ";
 		sqlL5952 += ",ITD.\"Introducer\" AS \"介紹人員編\" ";
-		sqlL5952 += ",L.\"RenewFlag\" AS \"展期/借新還舊\" ";		
+		sqlL5952 += ",L.\"RenewFlag\" AS \"展期/借新還舊\" ";
 		sqlL5952 += "FROM ( SELECT ";
 		sqlL5952 += " SUM(\"PerfCnt\") AS \"PerfCnt\" ";
 		sqlL5952 += ",SUM(\"PerfAmt\") AS \"PerfAmt\" ";
@@ -85,7 +84,7 @@ public class L5952ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5952 += ",\"FacmNo\" ";
 		sqlL5952 += ",\"Introducer\" ";
 		sqlL5952 += ",\"WorkMonth\" ";
- 	    sqlL5952 += ",MIN (\"UnitCode\") AS  \"UnitCode\" ";
+		sqlL5952 += ",MIN (\"UnitCode\") AS  \"UnitCode\" ";
 		sqlL5952 += ",MIN (\"DistCode\") AS  \"DistCode\" ";
 		sqlL5952 += ",MIN (\"DeptCode\") AS  \"DeptCode\" ";
 		sqlL5952 += "FROM  \"PfItDetail\" ";
@@ -101,7 +100,7 @@ public class L5952ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5952 += "AND ITD.\"WorkMonth\" = BSD.\"WorkMonth\" ";
 		sqlL5952 += "LEFT JOIN \"PfBsOfficer\" BSOF ";
 		sqlL5952 += "ON BSOF.\"WorkMonth\"=BSD.\"WorkMonth\" AND BSOF.\"EmpNo\"=BSD.\"BsOfficer\" ";
-	    sqlL5952 += "LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"= BSD.\"CustNo\" ";
+		sqlL5952 += "LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"= BSD.\"CustNo\" ";
 		sqlL5952 += "LEFT JOIN \"CdBcm\" ICBUnit ON ICBUnit.\"UnitCode\"=ITD.\"UnitCode\" ";
 		sqlL5952 += "LEFT JOIN \"CdBcm\" ICBDist ON ICBDist.\"UnitCode\"=ITD.\"DistCode\" ";
 		sqlL5952 += "LEFT JOIN \"CdBcm\" ICBDept ON ICBDept.\"UnitCode\"=ITD.\"DeptCode\" ";

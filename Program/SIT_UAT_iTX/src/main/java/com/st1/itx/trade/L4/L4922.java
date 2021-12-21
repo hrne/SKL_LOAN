@@ -84,8 +84,7 @@ public class L4922 extends TradeBuffer {
 		this.totaVo.putParam("OCustNo", lFacMain.get(0).getCustNo());
 		// 如有有找到資料
 		for (FacMain tFacMain : lFacMain) {
-			slBankAuthAct = bankAuthActService.facmNoEq(tFacMain.getCustNo(), tFacMain.getFacmNo(), 0,
-					Integer.MAX_VALUE, titaVo);
+			slBankAuthAct = bankAuthActService.facmNoEq(tFacMain.getCustNo(), tFacMain.getFacmNo(), 0, Integer.MAX_VALUE, titaVo);
 
 			lBankAuthAct = slBankAuthAct == null ? null : slBankAuthAct.getContent();
 			OccursList occursList = new OccursList();
@@ -100,8 +99,7 @@ public class L4922 extends TradeBuffer {
 				if ("".equals(lBankAuthAct.get(0).getPostDepCode())) {
 					occursList.putParam("OORepayAcct", lBankAuthAct.get(0).getRepayAcct());
 				} else {
-					occursList.putParam("OORepayAcct",
-							lBankAuthAct.get(0).getPostDepCode() + lBankAuthAct.get(0).getRepayAcct());
+					occursList.putParam("OORepayAcct", lBankAuthAct.get(0).getPostDepCode() + lBankAuthAct.get(0).getRepayAcct());
 				}
 
 				occursList.putParam("OOStatus", lBankAuthAct.get(0).getStatus());

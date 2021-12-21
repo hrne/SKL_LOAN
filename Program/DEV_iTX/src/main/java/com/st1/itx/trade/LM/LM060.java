@@ -27,7 +27,7 @@ public class LM060 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-  
+
 	}
 
 	@Override

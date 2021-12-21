@@ -52,8 +52,7 @@ public class L2R12 extends TradeBuffer {
 			if ("Y".equals(tBankRelationCompany.getLAW005())) {
 				wkIsLimit = "Y"; // 是否為授信限制對象
 			}
-			if ("Y".equals(tBankRelationCompany.getLAW001()) || "Y".equals(tBankRelationCompany.getLAW002())
-					|| "Y".equals(tBankRelationCompany.getLAW003())) {
+			if ("Y".equals(tBankRelationCompany.getLAW001()) || "Y".equals(tBankRelationCompany.getLAW002()) || "Y".equals(tBankRelationCompany.getLAW003())) {
 				wkIsRelated = "Y"; // 是否為利害關係人
 			}
 			if ("Y".equals(tBankRelationCompany.getLAW008())) {

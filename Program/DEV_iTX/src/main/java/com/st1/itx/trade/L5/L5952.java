@@ -64,8 +64,7 @@ public class L5952 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100;// 查全部
-		List<String[]> dataL5952 = l5952ServiceImpl.findData(iWorkMonthFm, iWorkMonthTo, iSumByFacm, this.index,
-				this.limit, titaVo);
+		List<String[]> dataL5952 = l5952ServiceImpl.findData(iWorkMonthFm, iWorkMonthTo, iSumByFacm, this.index, this.limit, titaVo);
 
 		if (dataL5952 != null && dataL5952.size() == this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
@@ -100,7 +99,7 @@ public class L5952 extends TradeBuffer {
 				String OOUnitDept = lData[16];// 區域中心名稱
 				String OOIntroducerName = lData[17];// 姓名
 				String OOIntroducer = lData[18];// 員編
-				String renewFlag = lData[19];// 展期/借新還舊;		
+				String renewFlag = lData[19];// 展期/借新還舊;
 				OccursList occursList1 = new OccursList();
 				occursList1.putParam("OOBsDeptX", OOBsDeptX);// 部室名
 				occursList1.putParam("OOBsOfficerName", OOBsOfficerName);// 房貸專員名稱
@@ -114,14 +113,15 @@ public class L5952 extends TradeBuffer {
 				occursList1.putParam("OODrawdownDate", OODrawdownDate);// 撥款日
 				occursList1.putParam("OOProdCode", OOProdCode);// 商品代碼
 				occursList1.putParam("OOPieceCode", OOPieceCode);// 計件代碼
-				occursList1.putParam("OODrawdownAmt",OODrawdownAmt);// 撥款金額
+				occursList1.putParam("OODrawdownAmt", OODrawdownAmt);// 撥款金額
 				occursList1.putParam("OOWorkMonth", OOWorkMonth);// 工作月
 				occursList1.putParam("OOIntDept", OOIntDept);// 區部名稱
 				occursList1.putParam("OODistDept", OODistDept);// 部室別名稱
 				occursList1.putParam("OOUnitDept", OOUnitDept);// 區域中心名稱
 				occursList1.putParam("OOIntroducerName", OOIntroducerName);// 姓名
 				occursList1.putParam("OOIntroducer", OOIntroducer);// 員編
-				String OOReMark =  "1".equals(renewFlag) ? "展期" : ("2".equals(renewFlag) ? "借新還舊" : "");;
+				String OOReMark = "1".equals(renewFlag) ? "展期" : ("2".equals(renewFlag) ? "借新還舊" : "");
+				;
 				occursList1.putParam("OOReMark", OOReMark);// 備註
 				this.totaVo.addOccursList(occursList1);
 			}

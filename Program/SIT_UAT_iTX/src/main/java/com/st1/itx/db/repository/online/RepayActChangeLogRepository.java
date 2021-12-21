@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,19 +20,18 @@ import com.st1.itx.db.domain.RepayActChangeLog;
  */
 public interface RepayActChangeLogRepository extends JpaRepository<RepayActChangeLog, Long> {
 
-  // CustNo = , AND FacmNo = 
-  public Slice<RepayActChangeLog> findAllByCustNoIsAndFacmNoIsOrderByLogNoDesc(int custNo_0, int facmNo_1, Pageable pageable);
+	// CustNo = , AND FacmNo =
+	public Slice<RepayActChangeLog> findAllByCustNoIsAndFacmNoIsOrderByLogNoDesc(int custNo_0, int facmNo_1, Pageable pageable);
 
-  // RelDy = , AND RelTxseq =  
-  public Optional<RepayActChangeLog> findTopByRelDyIsAndRelTxseqIsOrderByLogNoDesc(int relDy_0, String relTxseq_1);
+	// RelDy = , AND RelTxseq =
+	public Optional<RepayActChangeLog> findTopByRelDyIsAndRelTxseqIsOrderByLogNoDesc(int relDy_0, String relTxseq_1);
 
-  // CustNo = , AND FacmNo = 
-  public Optional<RepayActChangeLog> findTopByCustNoIsAndFacmNoIsOrderByLogNoDesc(int custNo_0, int facmNo_1);
+	// CustNo = , AND FacmNo =
+	public Optional<RepayActChangeLog> findTopByCustNoIsAndFacmNoIsOrderByLogNoDesc(int custNo_0, int facmNo_1);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<RepayActChangeLog> findByLogNo(Long logNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<RepayActChangeLog> findByLogNo(Long logNo);
 
 }
-

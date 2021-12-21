@@ -65,8 +65,7 @@ public class LY005Report extends MakeReport {
 			this.error("LY005ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY005", "非RBC_表20_會計部年度檢查報表",
-				"LY005_非RBC_表20_會計部年度檢查報表", "LY005_底稿_非RBC_表20_會計部年度檢查報表.xlsx", "YYY.MM");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY005", "非RBC_表20_會計部年度檢查報表", "LY005_非RBC_表20_會計部年度檢查報表", "LY005_底稿_非RBC_表20_會計部年度檢查報表.xlsx", "YYY.MM");
 
 		String entdy = titaVo.getEntDy();
 
@@ -158,8 +157,7 @@ public class LY005Report extends MakeReport {
 			// 交易金額 total 輸出
 			makeExcel.setValue(rowCursor, 10, txAmtTotal, "#,##0");
 
-			makeExcel.setValue(rowCursor + 1, 2,
-					equityDataMonthOutput + " 淨值: " + formatAmt(totalEquity, 0) + "元 (核閱數)", "L");
+			makeExcel.setValue(rowCursor + 1, 2, equityDataMonthOutput + " 淨值: " + formatAmt(totalEquity, 0) + "元 (核閱數)", "L");
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(5, 5, "本日無資料", "L");

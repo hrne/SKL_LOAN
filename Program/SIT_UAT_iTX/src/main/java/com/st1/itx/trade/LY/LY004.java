@@ -1,4 +1,5 @@
 package com.st1.itx.trade.LY;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -11,13 +12,12 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
 
-
 @Service("LY004")
 @Scope("step")
 /**
  * 
  * 
- * @author  Ted Lin
+ * @author Ted Lin
  * @version 1.0.0
  */
 public class LY004 extends BatchBase implements Tasklet, InitializingBean {
@@ -44,4 +44,3 @@ public class LY004 extends BatchBase implements Tasklet, InitializingBean {
 	}
 
 }
-

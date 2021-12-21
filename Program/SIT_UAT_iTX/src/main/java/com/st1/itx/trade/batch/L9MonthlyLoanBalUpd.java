@@ -48,7 +48,7 @@ public class L9MonthlyLoanBalUpd extends BatchBase implements Tasklet, Initializ
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-		//int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
 
 		String empNo = titaVo.getTlrNo();
 

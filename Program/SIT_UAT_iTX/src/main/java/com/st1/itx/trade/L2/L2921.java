@@ -49,7 +49,7 @@ public class L2921 extends TradeBuffer {
 
 	@Autowired
 	public L2921ServiceImpl sL2921ServiceImpl;
-	
+
 	@Autowired
 	public CdEmpService sCdEmpService;
 
@@ -85,7 +85,6 @@ public class L2921 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100; // 103 * 500 = 51500
 
-		
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
@@ -96,44 +95,42 @@ public class L2921 extends TradeBuffer {
 			throw new LogicException("E0013", "L2038");
 
 		}
-		
-		
+
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
-			  // new occurs
-			  OccursList occurslist = new OccursList();
-			  
-			  int FirstDrawdownDate = 0, YetDate = 0,CloseDate = 0;
-			  if(parse.stringToInteger(result.get("F6")) > 0) {
-				  FirstDrawdownDate = parse.stringToInteger(result.get("F6")) - 19110000;
-			  }
-			  if(parse.stringToInteger(result.get("F11")) > 0) {
-				  YetDate = parse.stringToInteger(result.get("F11")) - 19110000;
-			  }
-			  if(parse.stringToInteger(result.get("F12")) > 0) {
-				  CloseDate = parse.stringToInteger(result.get("F12")) - 19110000;
-			  }
-			  
-			  occurslist.putParam("OOCaseNo", result.get("F0")); // 案號
-			  occurslist.putParam("OOCustNo", result.get("F1")); // 戶號
-			  occurslist.putParam("OOCustName", result.get("F2")); // 戶名
-			  occurslist.putParam("OOCustId", result.get("F3")); // 統編
-			  occurslist.putParam("OOApplNo", result.get("F4")); // 核准號碼
-			  occurslist.putParam("OOFacmNo", result.get("F5")); // 額度號碼
-			  occurslist.putParam("OOFirstDrawdownDate", FirstDrawdownDate); // 首撥日期
-			  occurslist.putParam("OOEmpNo", result.get("F7")); // 經辦(房貸專員)
-			  occurslist.putParam("OOEmpName", result.get("F8"));
-			  occurslist.putParam("OONotYetCode", result.get("F9")); // 未齊件代碼
-			  occurslist.putParam("OONotYetItemX", result.get("F10")); // 未齊件說明
-			  occurslist.putParam("OOYetDate", YetDate); // 齊件日期
-			  occurslist.putParam("OOCloseDate", CloseDate); // 銷號日期
-			  occurslist.putParam("OOReMark", result.get("F13")); // 備註
+				// new occurs
+				OccursList occurslist = new OccursList();
 
+				int FirstDrawdownDate = 0, YetDate = 0, CloseDate = 0;
+				if (parse.stringToInteger(result.get("F6")) > 0) {
+					FirstDrawdownDate = parse.stringToInteger(result.get("F6")) - 19110000;
+				}
+				if (parse.stringToInteger(result.get("F11")) > 0) {
+					YetDate = parse.stringToInteger(result.get("F11")) - 19110000;
+				}
+				if (parse.stringToInteger(result.get("F12")) > 0) {
+					CloseDate = parse.stringToInteger(result.get("F12")) - 19110000;
+				}
 
-			  /* 將每筆資料放入Tota的OcList */
-			  this.totaVo.addOccursList(occurslist);
+				occurslist.putParam("OOCaseNo", result.get("F0")); // 案號
+				occurslist.putParam("OOCustNo", result.get("F1")); // 戶號
+				occurslist.putParam("OOCustName", result.get("F2")); // 戶名
+				occurslist.putParam("OOCustId", result.get("F3")); // 統編
+				occurslist.putParam("OOApplNo", result.get("F4")); // 核准號碼
+				occurslist.putParam("OOFacmNo", result.get("F5")); // 額度號碼
+				occurslist.putParam("OOFirstDrawdownDate", FirstDrawdownDate); // 首撥日期
+				occurslist.putParam("OOEmpNo", result.get("F7")); // 經辦(房貸專員)
+				occurslist.putParam("OOEmpName", result.get("F8"));
+				occurslist.putParam("OONotYetCode", result.get("F9")); // 未齊件代碼
+				occurslist.putParam("OONotYetItemX", result.get("F10")); // 未齊件說明
+				occurslist.putParam("OOYetDate", YetDate); // 齊件日期
+				occurslist.putParam("OOCloseDate", CloseDate); // 銷號日期
+				occurslist.putParam("OOReMark", result.get("F13")); // 備註
+
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occurslist);
 			} // for
-				
+
 			if (resultList.size() == this.limit && hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
@@ -142,7 +139,7 @@ public class L2921 extends TradeBuffer {
 		} else {
 			throw new LogicException(titaVo, "E2003", "查無未齊件資料"); // 查無資料
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 
@@ -167,5 +164,5 @@ public class L2921 extends TradeBuffer {
 
 		return result;
 	}
-	
+
 }

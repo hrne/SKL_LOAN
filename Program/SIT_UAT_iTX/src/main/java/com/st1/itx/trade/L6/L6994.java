@@ -47,34 +47,31 @@ public class L6994 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
-		int AcDate = titaVo.getEntDyI()+19110000;
-		
+		int AcDate = titaVo.getEntDyI() + 19110000;
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200; // 168 * 200 = 33,600
 
-		
-		
 		String tWorkMonthAcDate = "";
 		CdWorkMonth iCdWorkMonth = iCdWorkMonthService.findDateFirst(AcDate, AcDate, titaVo);
-		if(iCdWorkMonth!=null) {
-			tWorkMonthAcDate = String.valueOf(iCdWorkMonth.getYear())+parse.IntegerToString(iCdWorkMonth.getMonth(), 2);
-			this.info("tWorkMonthAcDate=="+tWorkMonthAcDate);
+		if (iCdWorkMonth != null) {
+			tWorkMonthAcDate = String.valueOf(iCdWorkMonth.getYear()) + parse.IntegerToString(iCdWorkMonth.getMonth(), 2);
+			this.info("tWorkMonthAcDate==" + tWorkMonthAcDate);
 		}
-		
-		int tPerformanceAcDate =0;
-		//找生效中工作月	
-		if(!("").equals(tWorkMonthAcDate)) {
-			CdPerformance iCdPerformance  = sCdPerformanceService.findWorkMonthFirst(Integer.parseInt(tWorkMonthAcDate), titaVo);
-			if(iCdPerformance!=null) {
+
+		int tPerformanceAcDate = 0;
+		// 找生效中工作月
+		if (!("").equals(tWorkMonthAcDate)) {
+			CdPerformance iCdPerformance = sCdPerformanceService.findWorkMonthFirst(Integer.parseInt(tWorkMonthAcDate), titaVo);
+			if (iCdPerformance != null) {
 				tPerformanceAcDate = iCdPerformance.getWorkMonth();
-				this.info("tBonusAcDate=="+tPerformanceAcDate);
+				this.info("tBonusAcDate==" + tPerformanceAcDate);
 			}
 		}
-		
-		
+
 		// 查詢業績件數及金額核算標準設定檔
 		Slice<CdPerformance> slCdPerformance;
 		if (iWorkMonth == 191100) {
@@ -83,12 +80,10 @@ public class L6994 extends TradeBuffer {
 			slCdPerformance = sCdPerformanceService.findWorkMonth(iWorkMonth, this.index, this.limit, titaVo);
 		}
 
-		
-		
 		if (slCdPerformance == null) {
 			throw new LogicException(titaVo, "E0001", "業績件數及金額核算標準設定檔"); // 查無資料
 		}
-			
+
 		// 如有找到資料
 		for (CdPerformance tCdPerformance : slCdPerformance) {
 			OccursList occursList = new OccursList();
@@ -106,24 +101,19 @@ public class L6994 extends TradeBuffer {
 			occursList.putParam("OOBsOffrCntLimit", tCdPerformance.getBsOffrCntLimit());
 			occursList.putParam("OOBsOffrAmtCond", tCdPerformance.getBsOffrAmtCond());
 			occursList.putParam("OOBsOffrPerccent", tCdPerformance.getBsOffrPerccent());
-			
-			if(tCdPerformance.getWorkMonth() > tPerformanceAcDate) {//0:未生效
+
+			if (tCdPerformance.getWorkMonth() > tPerformanceAcDate) {// 0:未生效
 				occursList.putParam("OOFlag", 0);
-			} else if(tCdPerformance.getWorkMonth() == tPerformanceAcDate) {//1:生效中
+			} else if (tCdPerformance.getWorkMonth() == tPerformanceAcDate) {// 1:生效中
 				occursList.putParam("OOFlag", 1);
 			} else {
-				occursList.putParam("OOFlag", 2);//2:已失效
+				occursList.putParam("OOFlag", 2);// 2:已失效
 			}
-			
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
 
-			
-		
-		
-		
-		
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slCdPerformance != null && slCdPerformance.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());

@@ -27,10 +27,10 @@ public class LM079Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	private static final BigDecimal billion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -41,7 +41,7 @@ public class LM079Report extends MakeReport {
 
 		List<Map<String, String>> lLM079Before = null;
 		List<Map<String, String>> lLM079After = null;
-		
+
 		try {
 			lLM079Before = lM079ServiceImpl.findAll(titaVo, iAcDate / 100, true);
 			lLM079After = lM079ServiceImpl.findAll(titaVo, iAcDate / 100, false);
@@ -60,10 +60,10 @@ public class LM079Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lListBefore, List<Map<String, String>> lListAfter, int date) throws LogicException {
 
 		// pivot position for data inputs
-		
+
 		this.info("LM079Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM079", "B045金融機構承作「工業區閒置土地抵押貸款」統計表", "LM079_B045金融機構承作「工業區閒置土地抵押貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
 				"LM079_底稿_B045金融機構承作「工業區閒置土地抵押貸款」統計表.xlsx", 1, "FOA");
@@ -75,7 +75,7 @@ public class LM079Report extends MakeReport {
 
 			doOutput(lListBefore, 3);
 			doOutput(lListAfter, 6);
-			
+
 			for (int i = 3; i < 9; i++) {
 				makeExcel.formulaCaculate(12, i);
 			}
@@ -84,11 +84,10 @@ public class LM079Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
-	
-	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException
-	{
+
+	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException {
 		for (Map<String, String> tLDVo : list) {
 			int colShift = 0;
 			int rowShift = 0;

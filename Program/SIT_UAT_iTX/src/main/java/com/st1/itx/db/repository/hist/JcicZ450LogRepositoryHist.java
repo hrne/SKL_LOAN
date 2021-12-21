@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.JcicZ450LogId;
  */
 public interface JcicZ450LogRepositoryHist extends JpaRepository<JcicZ450Log, JcicZ450LogId> {
 
-  // Ukey=
-  public Optional<JcicZ450Log> findTopByUkeyIsOrderByCreateDateDesc(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ450Log> findTopByUkeyIsOrderByCreateDateDesc(String ukey_0);
 
-  // Ukey=
-  public Slice<JcicZ450Log> findAllByUkeyIsOrderByCreateDateDesc(String ukey_0, Pageable pageable);
+	// Ukey=
+	public Slice<JcicZ450Log> findAllByUkeyIsOrderByCreateDateDesc(String ukey_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ450Log> findByJcicZ450LogId(JcicZ450LogId jcicZ450LogId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ450Log> findByJcicZ450LogId(JcicZ450LogId jcicZ450LogId);
 
 }
-

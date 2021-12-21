@@ -59,23 +59,16 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
 		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-/*
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[day - 1]);
-		int diff = 0;
-		if (day == 1) {
-			diff = -2;
-		} else if (day == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-	
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-			*/
+		/*
+		 * String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" }; // 星期 X (排除六日用) 代號
+		 * 0~6對應 日到六 int day = calendar.get(Calendar.DAY_OF_WEEK); this.info("day = " +
+		 * dayItem[day - 1]); int diff = 0; if (day == 1) { diff = -2; } else if (day ==
+		 * 6) { diff = 1; } this.info("diff=" + diff); calendar.add(Calendar.DATE,
+		 * diff);
+		 * 
+		 * // 矯正月底日 thisMonthEndDate =
+		 * Integer.valueOf(dateFormat.format(calendar.getTime()));
+		 */
 //		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
 		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
@@ -87,7 +80,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-		
+
 		// 月底日
 		int iDay = thisMonthEndDate % 100;
 
@@ -95,8 +88,6 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		calendar.set(iYear, iMonth - 13, iDay);
 
 		int lastYearDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-	
 
 		String iOneYearAgo = String.valueOf(lastYearDate);
 

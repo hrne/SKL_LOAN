@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,10 +19,9 @@ import com.st1.itx.db.domain.ClOwnerRelationId;
  */
 public interface ClOwnerRelationRepository extends JpaRepository<ClOwnerRelation, ClOwnerRelationId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClOwnerRelation> findByClOwnerRelationId(ClOwnerRelationId clOwnerRelationId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClOwnerRelation> findByClOwnerRelationId(ClOwnerRelationId clOwnerRelationId);
 
 }
-

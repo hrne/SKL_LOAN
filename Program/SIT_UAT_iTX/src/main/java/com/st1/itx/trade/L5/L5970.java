@@ -139,11 +139,10 @@ public class L5970 extends TradeBuffer {
 			// wkRepay = calcAmortize(iPrincipal, iFinalBal, iRate, wkFreqBaseConstant,
 			// iPayIntFreq, iLoanTerm,
 			// iGracePeriod);
-			if (iRate.compareTo(BigDecimal.ZERO) == 0) {//利率為0時不使用本息平均法,改為[本金除以期數]
+			if (iRate.compareTo(BigDecimal.ZERO) == 0) {// 利率為0時不使用本息平均法,改為[本金除以期數]
 				wkRepay = iPrincipal.divide(new BigDecimal(iLoanTerm), 0, RoundingMode.HALF_UP);
 			} else {
-				wkRepay = LoanDueAmtCom.getDueAmt(iPrincipal, iRate, "3", iFreqBase, iLoanTerm, iGracePeriod,
-						iPayIntFreq, iFinalBal, titaVo);
+				wkRepay = LoanDueAmtCom.getDueAmt(iPrincipal, iRate, "3", iFreqBase, iLoanTerm, iGracePeriod, iPayIntFreq, iFinalBal, titaVo);
 			}
 			for (int i = 1; i <= iLoanTerm; i++) {
 				occursList = new OccursList();

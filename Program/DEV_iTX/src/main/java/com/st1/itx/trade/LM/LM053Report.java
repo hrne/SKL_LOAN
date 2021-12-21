@@ -37,8 +37,7 @@ public class LM053Report extends MakeReport {
 
 		this.info("LM053Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM053", "法務分配款明細表_內部控管", "LM053法務分配款明細表_內部控管",
-				"LM053_底稿_法務分配款明細表_內部控管.xlsx", "法務分配表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM053", "法務分配款明細表_內部控管", "LM053法務分配款明細表_內部控管", "LM053_底稿_法務分配款明細表_內部控管.xlsx", "法務分配表");
 
 		try {
 			fnAllList = lM053ServiceImpl.findAll(titaVo);
@@ -71,11 +70,9 @@ public class LM053Report extends MakeReport {
 								makeExcel.setValue(row, i + 1, xdate);
 							} else {
 								if (xdate.length() == 7) {
-									makeExcel.setValue(row, i + 1, xdate.substring(0, 3) + "." + xdate.substring(3, 5)
-											+ "." + xdate.substring(5, 7));
+									makeExcel.setValue(row, i + 1, xdate.substring(0, 3) + "." + xdate.substring(3, 5) + "." + xdate.substring(5, 7));
 								} else if (xdate.length() == 6) {
-									makeExcel.setValue(row, i + 1, xdate.substring(0, 2) + "." + xdate.substring(2, 4)
-											+ "." + xdate.substring(4, 6));
+									makeExcel.setValue(row, i + 1, xdate.substring(0, 2) + "." + xdate.substring(2, 4) + "." + xdate.substring(4, 6));
 								}
 
 							}
@@ -114,6 +111,6 @@ public class LM053Report extends MakeReport {
 		}
 		makeExcel.setValue(1, 3, row - 2);
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 }

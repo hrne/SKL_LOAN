@@ -23,7 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2912")
 @Scope("prototype")
 /**
@@ -129,7 +128,7 @@ public class L2912 extends TradeBuffer {
 		this.totaVo.putParam("OCityCode", tClMain.getCityCode());
 		this.totaVo.putParam("OCityCodeX", tCdCity.getCityItem());
 		this.totaVo.putParam("OClTypeCode", tClMain.getClTypeCode());
-		
+
 		CustMain custMain = sCustMainService.findById(tClMovables.getOwnerCustUKey(), titaVo);
 		if (custMain != null) {
 			this.totaVo.putParam("OOwnerId", custMain.getCustId());
@@ -138,7 +137,7 @@ public class L2912 extends TradeBuffer {
 			this.totaVo.putParam("OOwnerId", "");
 			this.totaVo.putParam("OOwnerName", "");
 		}
-		
+
 		this.totaVo.putParam("OEvaDate", tClMain.getEvaDate());
 		this.totaVo.putParam("OEvaAmt", tClMain.getEvaAmt());
 		this.totaVo.putParam("OServiceLife", tClMovables.getServiceLife());

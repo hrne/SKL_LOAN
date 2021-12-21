@@ -68,7 +68,7 @@ public class XXR99 extends TradeBuffer {
 
 	@Autowired
 	public TxAttachTypeService txAttachTypeService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active XXR99 ");
@@ -145,14 +145,14 @@ public class XXR99 extends TradeBuffer {
 
 	private String getTxAttachType(String k) {
 		String s = "";
-		
+
 		String tranNo = k.substring(12, 17);
-		
+
 		this.info("XXR99 getTxAttachType TranNo= " + tranNo);
-		
+
 		Slice<TxAttachType> slTxAttachType = txAttachTypeService.findByTranNo(tranNo, 0, Integer.MAX_VALUE);
 		List<TxAttachType> lTxAttachType = slTxAttachType == null ? null : slTxAttachType.getContent();
-		
+
 		if (lTxAttachType != null && lTxAttachType.size() > 0) {
 			for (TxAttachType txAttachType : lTxAttachType) {
 				if (!"".equals(s)) {
@@ -163,7 +163,7 @@ public class XXR99 extends TradeBuffer {
 		}
 		return s;
 	}
-	
+
 	// getCdGuarantor
 	private String getCdGuarantor() {
 		String s = "";
@@ -524,8 +524,7 @@ public class XXR99 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index,
-				this.limit);
+		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
 		List<TxAuthGroup> lTxAuthGroup = slTxAuthGroup == null ? null : slTxAuthGroup.getContent();
 
 		if (lTxAuthGroup != null) {
@@ -556,31 +555,30 @@ public class XXR99 extends TradeBuffer {
 
 		String iTlrNo = titaVo.getTlrNo();
 		String iBrno = titaVo.getBrno();
-		
+
 		Slice<TxTeller> slTxTeller = sTxTellerService.findAll(this.index, this.limit);
 		List<TxTeller> lTxTeller = slTxTeller == null ? null : slTxTeller.getContent();
 
-		String iGroupNo="";
+		String iGroupNo = "";
 		TxTeller tTxTeller = sTxTellerService.findById(iTlrNo, titaVo);
-		if(tTxTeller!=null) {
+		if (tTxTeller != null) {
 			iGroupNo = tTxTeller.getGroupNo();
 		}
-		
-		
+
 		if (lTxTeller != null) {
-			
+
 			for (TxTeller txTeller : lTxTeller) {
-				
-				if(txTeller.getLevelFg()==3) {//經辦不同課組別跳過
-					if(!(iGroupNo).equals(txTeller.getGroupNo())) {
+
+				if (txTeller.getLevelFg() == 3) {// 經辦不同課組別跳過
+					if (!(iGroupNo).equals(txTeller.getGroupNo())) {
 						continue;
 					}
-				}else if(txTeller.getLevelFg()==1){//主管不同單位跳過
-					if(!(iBrno).equals(txTeller.getBrNo())) {
+				} else if (txTeller.getLevelFg() == 1) {// 主管不同單位跳過
+					if (!(iBrno).equals(txTeller.getBrNo())) {
 						continue;
 					}
 				}
-				
+
 				if (!"".equals(s)) {
 					s += ";";
 				}

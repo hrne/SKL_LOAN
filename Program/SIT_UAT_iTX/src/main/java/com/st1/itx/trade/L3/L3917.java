@@ -79,8 +79,7 @@ public class L3917 extends TradeBuffer {
 
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990,
-				iIntEndDate + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990, iIntEndDate + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE,
 				titaVo);
 
 		lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
@@ -102,8 +101,8 @@ public class L3917 extends TradeBuffer {
 			BigDecimal TempLawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
 			wkCurrencyCode = t.getTitaCurCd();
 
-			BigDecimal TempRepayAmt = t.getPrincipal().add(t.getInterest()).add(t.getDelayInt()).add(t.getBreachAmt())
-					.add(t.getCloseBreachAmt()).add(TempAcctFee).add(TempModifyFee).add(TempFireFee).add(TempLawFee);
+			BigDecimal TempRepayAmt = t.getPrincipal().add(t.getInterest()).add(t.getDelayInt()).add(t.getBreachAmt()).add(t.getCloseBreachAmt()).add(TempAcctFee).add(TempModifyFee).add(TempFireFee)
+					.add(TempLawFee);
 
 			wkRepayAmt = wkRepayAmt.add(TempRepayAmt); // 回收金額
 			wkTempRepayAmt = wkTempRepayAmt.add(t.getTempAmt());

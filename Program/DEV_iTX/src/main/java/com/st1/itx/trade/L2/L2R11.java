@@ -41,7 +41,7 @@ public class L2R11 extends TradeBuffer {
 	public ClFacService clFacService;
 	@Autowired
 	public ClBuildingService sClBuildingService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -76,10 +76,10 @@ public class L2R11 extends TradeBuffer {
 				if (tClMain != null) {
 					this.totaVo.putParam("OClKey" + i, cl.getClCode1() + "-" + this.parse.IntegerToString(cl.getClCode2(), 2) + "-" + this.parse.IntegerToString(cl.getClNo(), 7));
 					this.totaVo.putParam("OApplNo" + i, cl.getApproveNo()); // 核准號碼
-					this.totaVo.putParam("OClTypeCode" + i,tClMain.getClTypeCode() ); // 擔保品類別
+					this.totaVo.putParam("OClTypeCode" + i, tClMain.getClTypeCode()); // 擔保品類別
 					this.totaVo.putParam("OMainFlag" + i, cl.getMainFlag()); // 主要擔保品記號
 					this.totaVo.putParam("OEvaAmt" + i, tClMain.getEvaAmt()); // 鑑價總值
-					
+
 					ClBuildingId clBuildingId = new ClBuildingId();
 					clBuildingId.setClCode1(cl.getClCode1());
 					clBuildingId.setClCode2(cl.getClCode2());
@@ -88,11 +88,11 @@ public class L2R11 extends TradeBuffer {
 					tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 
 					if (tClBuilding != null) { // 建物門牌
-					  this.totaVo.putParam("OBdLocation" + i, tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2()); // 門牌坐落
+						this.totaVo.putParam("OBdLocation" + i, tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2()); // 門牌坐落
 					} else {
-					  this.totaVo.putParam("OBdLocation","");
+						this.totaVo.putParam("OBdLocation", "");
 					}
-					
+
 					i++;
 				}
 			}

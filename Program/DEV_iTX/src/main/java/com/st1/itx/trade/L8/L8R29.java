@@ -42,7 +42,7 @@ public class L8R29 extends TradeBuffer {
 			totaVo.putParam("L8r29SubmitKey", iJcicZ060.getSubmitKey());// 報送單位代號
 			totaVo.putParam("L8r29RcDate", iJcicZ060.getRcDate());// 原前置協商申請日
 			totaVo.putParam("L8r29ChangePayDate", iJcicZ060.getChangePayDate());// 申請變更還款條件日
-			totaVo.putParam("L8r29YM", iJcicZ060.getYM()-191100);// 已清分足月期付金年月
+			totaVo.putParam("L8r29YM", iJcicZ060.getYM() - 191100);// 已清分足月期付金年月
 			totaVo.putParam("L8r29OutJcicTxtDate", iJcicZ060.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);

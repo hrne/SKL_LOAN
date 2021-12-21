@@ -44,14 +44,12 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// *** 折返控制相關 ***
 	private int size;
-	
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
 
@@ -84,87 +82,86 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			CloseDate1 = CloseDate1 + 19110000;
 			CloseDate2 = CloseDate2 + 19110000;
-		}		
-				
-		String sql = " SELECT                 " ; 
-			sql +=  "      fm.\"CreditSysNo\"," ; 
-			sql +=  "      cm.\"CustNo\"," ; 
-			sql +=  "      cm.\"CustName\"," ; 
-			sql +=  "      cm.\"CustId\"," ; 
-			sql +=  "      fm.\"ApplNo\"," ; 
-			sql +=  "      lo.\"FacmNo\"," ; 
-			sql +=  "      fm.\"FirstDrawdownDate\"," ; 
-			sql +=  "      fm.\"BusinessOfficer\"," ; 
-			sql +=  "      ce.\"Fullname\"," ; 
-			sql +=  "      lo.\"NotYetCode\"," ; 
-			sql +=  "      lo.\"NotYetItem\"," ; 
-			sql +=  "      lo.\"YetDate\"," ; 
-			sql +=  "      lo.\"CloseDate\"," ; 
-			sql +=  "      lo.\"ReMark\"" ; 
-			sql +=  "  FROM" ; 
-			sql +=  "      \"LoanNotYet\"   lo" ; 
-			sql +=  "      LEFT JOIN \"FacMain\"      fm ON fm.\"CustNo\" = lo.\"CustNo\"" ; 
-			sql +=  "                                AND fm.\"FacmNo\" = lo.\"FacmNo\"" ; 
-			sql +=  "      LEFT JOIN \"CustMain\"     cm ON cm.\"CustNo\" = fm.\"CustNo\"" ; 
-			sql +=  "      LEFT JOIN \"CdEmp\"        ce ON ce.\"EmployeeNo\" = fm.\"BusinessOfficer\"";
-			
-			if(iCaseNo > 0) {
-				sql +=  "      WHERE fm.\"CreditSysNo\" = :CaseNo";
-			} else if(iCustNo > 0){
-				sql +=  "      WHERE fm.\"CustNo\" = :CustNo";
-			} else if(!iCustId.isEmpty()) {
-				sql +=  "      WHERE cm.\"CustId\" = :CustId";
-			} else if(iApplNo > 0) {
-				sql +=  "      WHERE fm.\"ApplNo\" = :ApplNo";
-			} else if(!iTELLER.isEmpty()) {
-				sql +=  "      WHERE fm.\"BusinessOfficer\" = :TELLER";
-			} 
-			
-			
-			if(iCloseCode == 1) {
-				sql +=  "      AND lo.\"CloseDate\" > 0 ";
-			} else if(iCloseCode == 2) {
-				sql +=  "      AND lo.\"CloseDate\" = 0 ";
-			}
-			
-			if(YetDate1 != 0) {		
-				sql +=  "      AND lo.\"YetDate\" >= :YetDate1";
-				sql +=  "      AND lo.\"YetDate\" <= :YetDate2";
-			}
-			
-			if(CloseDate1 != 0) {
-				sql +=  "      AND lo.\"CloseDate\" >= :CloseDate1 ";
-				sql +=  "      AND lo.\"CloseDate\" <= :CloseDate2 ";
-			}
-			
-			sql +=  "      ORDER BY lo.\"FacmNo\" , lo.\"NotYetCode\" , cm.\"CustNo\"";
-			
+		}
+
+		String sql = " SELECT                 ";
+		sql += "      fm.\"CreditSysNo\",";
+		sql += "      cm.\"CustNo\",";
+		sql += "      cm.\"CustName\",";
+		sql += "      cm.\"CustId\",";
+		sql += "      fm.\"ApplNo\",";
+		sql += "      lo.\"FacmNo\",";
+		sql += "      fm.\"FirstDrawdownDate\",";
+		sql += "      fm.\"BusinessOfficer\",";
+		sql += "      ce.\"Fullname\",";
+		sql += "      lo.\"NotYetCode\",";
+		sql += "      lo.\"NotYetItem\",";
+		sql += "      lo.\"YetDate\",";
+		sql += "      lo.\"CloseDate\",";
+		sql += "      lo.\"ReMark\"";
+		sql += "  FROM";
+		sql += "      \"LoanNotYet\"   lo";
+		sql += "      LEFT JOIN \"FacMain\"      fm ON fm.\"CustNo\" = lo.\"CustNo\"";
+		sql += "                                AND fm.\"FacmNo\" = lo.\"FacmNo\"";
+		sql += "      LEFT JOIN \"CustMain\"     cm ON cm.\"CustNo\" = fm.\"CustNo\"";
+		sql += "      LEFT JOIN \"CdEmp\"        ce ON ce.\"EmployeeNo\" = fm.\"BusinessOfficer\"";
+
+		if (iCaseNo > 0) {
+			sql += "      WHERE fm.\"CreditSysNo\" = :CaseNo";
+		} else if (iCustNo > 0) {
+			sql += "      WHERE fm.\"CustNo\" = :CustNo";
+		} else if (!iCustId.isEmpty()) {
+			sql += "      WHERE cm.\"CustId\" = :CustId";
+		} else if (iApplNo > 0) {
+			sql += "      WHERE fm.\"ApplNo\" = :ApplNo";
+		} else if (!iTELLER.isEmpty()) {
+			sql += "      WHERE fm.\"BusinessOfficer\" = :TELLER";
+		}
+
+		if (iCloseCode == 1) {
+			sql += "      AND lo.\"CloseDate\" > 0 ";
+		} else if (iCloseCode == 2) {
+			sql += "      AND lo.\"CloseDate\" = 0 ";
+		}
+
+		if (YetDate1 != 0) {
+			sql += "      AND lo.\"YetDate\" >= :YetDate1";
+			sql += "      AND lo.\"YetDate\" <= :YetDate2";
+		}
+
+		if (CloseDate1 != 0) {
+			sql += "      AND lo.\"CloseDate\" >= :CloseDate1 ";
+			sql += "      AND lo.\"CloseDate\" <= :CloseDate2 ";
+		}
+
+		sql += "      ORDER BY lo.\"FacmNo\" , lo.\"NotYetCode\" , cm.\"CustNo\"";
+
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		
-		if(iCaseNo > 0) {
+
+		if (iCaseNo > 0) {
 			query.setParameter("CaseNo", iCaseNo);
-		} else if(iCustNo > 0){
+		} else if (iCustNo > 0) {
 			query.setParameter("CustNo", iCustNo);
-		} else if(!iCustId.isEmpty()) {
+		} else if (!iCustId.isEmpty()) {
 			query.setParameter("CustId", iCustId);
-		} else if(iApplNo > 0) {
+		} else if (iApplNo > 0) {
 			query.setParameter("ApplNo", iApplNo);
-		} else if(!iTELLER.isEmpty()) {
+		} else if (!iTELLER.isEmpty()) {
 			query.setParameter("TELLER", iTELLER);
-		} 
-		if(YetDate1 != 0) {	
-		  query.setParameter("YetDate1", YetDate1);
-		  query.setParameter("YetDate2", YetDate2);
 		}
-		
-		if(CloseDate1 != 0) {
+		if (YetDate1 != 0) {
+			query.setParameter("YetDate1", YetDate1);
+			query.setParameter("YetDate2", YetDate2);
+		}
+
+		if (CloseDate1 != 0) {
 			query.setParameter("CloseDate1", CloseDate1);
 			query.setParameter("CloseDate2", CloseDate2);
 		}
-		
+
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 
@@ -183,10 +180,9 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(result);
 	}
-	
+
 	public int getSize() {
 		return cnt;
 	}
-	
-	
+
 }

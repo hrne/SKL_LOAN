@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -23,20 +22,19 @@ import com.st1.itx.db.domain.Ias39LoanCommitId;
  */
 public interface Ias39LoanCommitRepositoryHist extends JpaRepository<Ias39LoanCommit, Ias39LoanCommitId> {
 
-  // DataYm = ,AND CustNo = ,AND FacmNo = ,AND ApplNo = 
-  public Slice<Ias39LoanCommit> findAllByDataYmIsAndCustNoIsAndFacmNoIsAndApplNoIs(int dataYm_0, int custNo_1, int facmNo_2, int applNo_3, Pageable pageable);
+	// DataYm = ,AND CustNo = ,AND FacmNo = ,AND ApplNo =
+	public Slice<Ias39LoanCommit> findAllByDataYmIsAndCustNoIsAndFacmNoIsAndApplNoIs(int dataYm_0, int custNo_1, int facmNo_2, int applNo_3, Pageable pageable);
 
-  // DataYm = 
-  public Slice<Ias39LoanCommit> findAllByDataYmIsOrderByAcBookCodeAsc(int dataYm_0, Pageable pageable);
+	// DataYm =
+	public Slice<Ias39LoanCommit> findAllByDataYmIsOrderByAcBookCodeAsc(int dataYm_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Ias39LoanCommit> findByIas39LoanCommitId(Ias39LoanCommitId ias39LoanCommitId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Ias39LoanCommit> findByIas39LoanCommitId(Ias39LoanCommitId ias39LoanCommitId);
 
-  // LM011 更新IAS39放款承諾明細檔
-  @Procedure(value = "\"Usp_L7_Ias39LoanCommit_Upd\"")
-  public void uspL7Ias39loancommitUpd(int tbsdyf,  String empNo);
+	// LM011 更新IAS39放款承諾明細檔
+	@Procedure(value = "\"Usp_L7_Ias39LoanCommit_Upd\"")
+	public void uspL7Ias39loancommitUpd(int tbsdyf, String empNo);
 
 }
-

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.CdAcBookId;
  */
 public interface CdAcBookRepositoryHist extends JpaRepository<CdAcBook, CdAcBookId> {
 
-  // AcBookCode = ,AND AssignSeq >=
-  public Slice<CdAcBook> findAllByAcBookCodeIsAndAssignSeqGreaterThanEqualOrderByAssignSeqAsc(String acBookCode_0, int assignSeq_1, Pageable pageable);
+	// AcBookCode = ,AND AssignSeq >=
+	public Slice<CdAcBook> findAllByAcBookCodeIsAndAssignSeqGreaterThanEqualOrderByAssignSeqAsc(String acBookCode_0, int assignSeq_1, Pageable pageable);
 
-  // AcBookCode = ,AND AcSubBookCode =
-  public Slice<CdAcBook> findAllByAcBookCodeIsAndAcSubBookCodeIsOrderByAcSubBookCodeAsc(String acBookCode_0, String acSubBookCode_1, Pageable pageable);
+	// AcBookCode = ,AND AcSubBookCode =
+	public Slice<CdAcBook> findAllByAcBookCodeIsAndAcSubBookCodeIsOrderByAcSubBookCodeAsc(String acBookCode_0, String acSubBookCode_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdAcBook> findByCdAcBookId(CdAcBookId cdAcBookId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdAcBook> findByCdAcBookId(CdAcBookId cdAcBookId);
 
 }
-

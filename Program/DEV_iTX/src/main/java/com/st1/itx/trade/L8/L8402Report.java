@@ -27,7 +27,8 @@ public class L8402Report extends MakeReport {
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 	String strToday = String.valueOf(Integer.parseInt(sdf.format(dateNow)) - 19110000); // 民國年
 
-	// private static final Logger logger = LoggerFactory.getLogger(L8402Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L8402Report.class);
 
 	@Autowired
 	public L8402ServiceImpl L8402ServiceImpl;

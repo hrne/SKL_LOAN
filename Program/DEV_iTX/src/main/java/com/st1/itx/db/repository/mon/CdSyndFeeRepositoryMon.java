@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.CdSyndFee;
  */
 public interface CdSyndFeeRepositoryMon extends JpaRepository<CdSyndFee, String> {
 
-  // AcctCode >= ,AND AcctCode <=
-  public Optional<CdSyndFee> findTopByAcctCodeGreaterThanEqualAndAcctCodeLessThanEqual(String acctCode_0, String acctCode_1);
+	// AcctCode >= ,AND AcctCode <=
+	public Optional<CdSyndFee> findTopByAcctCodeGreaterThanEqualAndAcctCodeLessThanEqual(String acctCode_0, String acctCode_1);
 
-  // SyndFeeCode >= ,AND SyndFeeCode <= 
-  public Slice<CdSyndFee> findAllBySyndFeeCodeGreaterThanEqualAndSyndFeeCodeLessThanEqualOrderBySyndFeeCodeAsc(String syndFeeCode_0, String syndFeeCode_1, Pageable pageable);
+	// SyndFeeCode >= ,AND SyndFeeCode <=
+	public Slice<CdSyndFee> findAllBySyndFeeCodeGreaterThanEqualAndSyndFeeCodeLessThanEqualOrderBySyndFeeCodeAsc(String syndFeeCode_0, String syndFeeCode_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdSyndFee> findBySyndFeeCode(String syndFeeCode);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdSyndFee> findBySyndFeeCode(String syndFeeCode);
 
 }
-

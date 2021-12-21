@@ -124,12 +124,11 @@ public class L5812 extends TradeBuffer {
 		mYearlyHouseLoanInt.setMaturityDate(this.parse.stringToInteger(titaVo.getParam("MaturityDate"))); // 到期日
 		mYearlyHouseLoanInt.setHouseBuyDate(this.parse.stringToInteger(titaVo.getParam("HouseBuyDate"))); // 房屋取得日期
 
-		tTempVo.putParam("F0", titaVo.getParam("CustName"));   //戶名
-		tTempVo.putParam("F1", titaVo.getParam("CustId")); //統編
-		tTempVo.putParam("F5", titaVo.getParam("LineAmt"));  //核准額度
-		tTempVo.putParam("F21", titaVo.getParam("Location"));  //核准額度
+		tTempVo.putParam("F0", titaVo.getParam("CustName")); // 戶名
+		tTempVo.putParam("F1", titaVo.getParam("CustId")); // 統編
+		tTempVo.putParam("F5", titaVo.getParam("LineAmt")); // 核准額度
+		tTempVo.putParam("F21", titaVo.getParam("Location")); // 核准額度
 		mYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
-		
 
 	}
 }

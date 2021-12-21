@@ -19,7 +19,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L5943")
 @Scope("prototype")
 /**
@@ -38,7 +37,7 @@ public class L5943 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
-	
+
 	@Autowired
 	public L5943ServiceImpl iL5943ServiceImpl;
 
@@ -46,8 +45,8 @@ public class L5943 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5943 ");
 		this.totaVo.init(titaVo);
-		int iYyyMm = Integer.valueOf(titaVo.getParam("YyyMm"))+191100;
-		List<Map<String, String>> i5943SqlReturn = new ArrayList<Map<String,String>>();
+		int iYyyMm = Integer.valueOf(titaVo.getParam("YyyMm")) + 191100;
+		List<Map<String, String>> i5943SqlReturn = new ArrayList<Map<String, String>>();
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -55,32 +54,32 @@ public class L5943 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		
+
 		try {
-			i5943SqlReturn = iL5943ServiceImpl.FindData(iYyyMm,titaVo);
-		}catch (Exception e) {
-			//E5004 讀取DB語法發生問題
-			this.info("L5943 ErrorForSql="+e);
-			throw new LogicException(titaVo, "E5004","");
+			i5943SqlReturn = iL5943ServiceImpl.FindData(iYyyMm, titaVo);
+		} catch (Exception e) {
+			// E5004 讀取DB語法發生問題
+			this.info("L5943 ErrorForSql=" + e);
+			throw new LogicException(titaVo, "E5004", "");
 		}
-		this.info("db return = "+i5943SqlReturn.toString());
-		if(i5943SqlReturn.isEmpty()) {
-			throw new LogicException(titaVo, "E0001","年月份: "+titaVo.getParam("YyyMm")+" 查無資料");
-		}else {
-			for (Map<String, String> r5943SqlReturn:i5943SqlReturn) {
-				OccursList occursList = new OccursList();			
+		this.info("db return = " + i5943SqlReturn.toString());
+		if (i5943SqlReturn.isEmpty()) {
+			throw new LogicException(titaVo, "E0001", "年月份: " + titaVo.getParam("YyyMm") + " 查無資料");
+		} else {
+			for (Map<String, String> r5943SqlReturn : i5943SqlReturn) {
+				OccursList occursList = new OccursList();
 				occursList.putParam("OOEmpNo", r5943SqlReturn.get("F0"));
 				occursList.putParam("OOFullName", r5943SqlReturn.get("F1"));
 				occursList.putParam("OODistItem", r5943SqlReturn.get("F2"));
 				occursList.putParam("OODeptItem", r5943SqlReturn.get("F3"));
-				occursList.putParam("OOGoalAmt", r5943SqlReturn.get("F4")); //責任額
+				occursList.putParam("OOGoalAmt", r5943SqlReturn.get("F4")); // 責任額
 				occursList.putParam("OOPerfCnt", r5943SqlReturn.get("F6"));
-				occursList.putParam("OOTotalDrawdownAmt", r5943SqlReturn.get("F5")); //房貸撥款金額
+				occursList.putParam("OOTotalDrawdownAmt", r5943SqlReturn.get("F5")); // 房貸撥款金額
 				occursList.putParam("OOCount", r5943SqlReturn.get("F7"));
 				this.totaVo.addOccursList(occursList);
 			}
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -34,7 +34,7 @@ public class L2R08 extends TradeBuffer {
 
 	@Autowired
 	public TxTellerService txTellerService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2R08 ");
@@ -80,7 +80,7 @@ public class L2R08 extends TradeBuffer {
 		TxTeller tTxTeller = txTellerService.findById(iEmployeeNo, titaVo);
 		this.totaVo.putParam("OGroupNo", "");
 		this.totaVo.putParam("OBrno", "");
-		if(tTxTeller!=null) {
+		if (tTxTeller != null) {
 			this.totaVo.putParam("OGroupNo", tTxTeller.getGroupNo());
 			this.totaVo.putParam("OBrno", tTxTeller.getBrNo());
 		}

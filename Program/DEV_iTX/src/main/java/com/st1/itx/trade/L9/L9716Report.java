@@ -55,7 +55,7 @@ public class L9716Report extends MakeReport {
 //		exportExcel2(titaVo, lL9716_2);
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 
 		return true;
 
@@ -68,8 +68,7 @@ public class L9716Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
-				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -103,8 +102,6 @@ public class L9716Report extends MakeReport {
 						}
 						break;
 					}
-
-
 
 				} // for
 

@@ -108,19 +108,19 @@ public class L6401 extends TradeBuffer {
 		tTxTeller.setAmlHighFg(titaVo.getParam("AmlHighFg"));
 		tTxTeller.setAllowFg(Integer.parseInt(titaVo.getParam("AllowFg")));
 
-
 		return tTxTeller;
 
 	}
+
 	private void moveGroup(String mTlrNo, String mFuncCode, TitaVo titaVo) throws LogicException {
-		
+
 		this.info("into moveGroup");
-		
-		if(("2").equals(mFuncCode) || ("4").equals(mFuncCode)) {
-			
+
+		if (("2").equals(mFuncCode) || ("4").equals(mFuncCode)) {
+
 			Slice<TxTellerAuth> mTxTellerAuth = sTxTellerAuthService.findByTlrNo(mTlrNo, this.index, this.limit, titaVo);
 			List<TxTellerAuth> iTxTellerAuth = mTxTellerAuth == null ? null : mTxTellerAuth.getContent();
-			if(iTxTellerAuth != null) {
+			if (iTxTellerAuth != null) {
 				try {
 					sTxTellerAuthService.deleteAll(iTxTellerAuth);
 				} catch (DBException e) {
@@ -128,19 +128,19 @@ public class L6401 extends TradeBuffer {
 				}
 			}
 		}
-		
-		if(("1").equals(mFuncCode) || ("2").equals(mFuncCode)) {
-			for(int i=1;i<=40;i++) {
-				
-				if(titaVo.getParam("AuthNo"+i) !=null && titaVo.getParam("AuthNo"+i).length()>0) {
+
+		if (("1").equals(mFuncCode) || ("2").equals(mFuncCode)) {
+			for (int i = 1; i <= 40; i++) {
+
+				if (titaVo.getParam("AuthNo" + i) != null && titaVo.getParam("AuthNo" + i).length() > 0) {
 					TxTellerAuth tTxTellerAuth = new TxTellerAuth();
 					TxTellerAuthId tTxTellerAuthId = new TxTellerAuthId();
-					
+
 					tTxTellerAuthId.setTlrNo(mTlrNo);
-					tTxTellerAuthId.setAuthNo(titaVo.getParam("AuthNo"+i));
-					
+					tTxTellerAuthId.setAuthNo(titaVo.getParam("AuthNo" + i));
+
 					tTxTellerAuth.setTxTellerAuthId(tTxTellerAuthId);
-					
+
 					try {
 						sTxTellerAuthService.insert(tTxTellerAuth, titaVo);
 					} catch (DBException e) {
@@ -150,6 +150,6 @@ public class L6401 extends TradeBuffer {
 				}
 			}
 		}
-		
+
 	}
 }

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,10 +19,9 @@ import com.st1.itx.db.domain.RptRelationSelfId;
  */
 public interface RptRelationSelfRepositoryHist extends JpaRepository<RptRelationSelf, RptRelationSelfId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<RptRelationSelf> findByRptRelationSelfId(RptRelationSelfId rptRelationSelfId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<RptRelationSelf> findByRptRelationSelfId(RptRelationSelfId rptRelationSelfId);
 
 }
-

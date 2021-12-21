@@ -53,8 +53,7 @@ public class L4R12 extends TradeBuffer {
 		if (t01CdBaseRate != null) {
 			rate = t01CdBaseRate.getBaseRate();
 			date = t01CdBaseRate.getEffectDate();
-			this.info("t01CdBaseRate : " + t01CdBaseRate.getBaseRate() + "EffectFlag = "
-					+ t01CdBaseRate.getEffectFlag() + "...");
+			this.info("t01CdBaseRate : " + t01CdBaseRate.getBaseRate() + "EffectFlag = " + t01CdBaseRate.getEffectFlag() + "...");
 		}
 
 		this.totaVo.putParam("L4r12Rate", rate);

@@ -51,14 +51,14 @@ public class L1R19 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private void checkDup(TitaVo titaVo) throws LogicException {
 		this.info("L1R19.checkDup");
-		
+
 		String iCustId = titaVo.getParam("RimCustId");
 		int iStartYYRoc = Integer.valueOf(titaVo.getParam("RimYear"));
 		int iStartYY = iStartYYRoc + 1911;
-		
+
 		CustMain custMain = iCustMainService.custIdFirst(iCustId, titaVo);
 		if (custMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔 : " + iCustId);
@@ -68,13 +68,13 @@ public class L1R19 extends TradeBuffer {
 		if (finReportDebt != null) {
 			throw new LogicException("E0012", iStartYYRoc + "年度財務報表 ");
 		}
-		
+
 		totaVo.putParam("L1R19GrowRate", 0);
 	}
-	
+
 	private void computeGrowRate(TitaVo titaVo) throws LogicException {
 		this.info("L1R19.computeGrowRate");
-		
+
 		String iCustId = titaVo.getParam("RimCustId");
 		int iYear = Integer.valueOf(titaVo.getParam("RimYear")) + 1911 - 1;
 
@@ -86,8 +86,7 @@ public class L1R19 extends TradeBuffer {
 		BigDecimal iLastBusIncome = new BigDecimal("0"); // 去年收入
 		BigDecimal iThisBusIncome = new BigDecimal(titaVo.getParam("RimBusIncome")); // 今年收入
 
-		FinReportDebt finReportDebt = iFinReportDebtService.findCustUKeyYearFirst(iCustMain.getCustUKey(), iYear,
-				titaVo);
+		FinReportDebt finReportDebt = iFinReportDebtService.findCustUKeyYearFirst(iCustMain.getCustUKey(), iYear, titaVo);
 		if (finReportDebt != null) {
 			FinReportProfitId finReportProfitId = new FinReportProfitId();
 			finReportProfitId.setCustUKey(finReportDebt.getCustUKey());
@@ -98,9 +97,9 @@ public class L1R19 extends TradeBuffer {
 				iLastBusIncome = FinReportProfit.getBusIncome();
 			}
 		}
-		
+
 		BigDecimal iPercent = new BigDecimal("0");
-		
+
 		if (iLastBusIncome.compareTo(new BigDecimal("0")) != 0) {
 			// 成長率算法 (新-舊)/舊
 			BigDecimal iHundred = new BigDecimal("100");
@@ -157,8 +156,7 @@ public class L1R19 extends TradeBuffer {
 
 					// 成長率算法 (新-舊)/舊
 					BigDecimal iGap = iThisBusIncome.subtract(iLastBusIncome);
-					BigDecimal iPercent = iGap.divide(iLastBusIncome).setScale(4, BigDecimal.ROUND_HALF_UP)
-							.multiply(iHundred);
+					BigDecimal iPercent = iGap.divide(iLastBusIncome).setScale(4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
 					this.info("去年====" + iLastBusIncome);
 					this.info("差距====" + iGap);
 					this.info("成長率====" + iPercent);

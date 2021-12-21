@@ -66,12 +66,12 @@ public class L8921 extends TradeBuffer {
 
 		// 查詢疑似洗錢樣態檢核明細檔檔
 		Slice<MlaundryChkDtl> slMlaundryChkDtl;
-		if(iFactor==0) {
+		if (iFactor == 0) {
 			slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRange(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
 		} else {
 			slMlaundryChkDtl = sMlaundryChkDtlService.findFactor(iFAcDateStart, iFAcDateEnd, iFactor, this.index, this.limit, titaVo);
 		}
-		
+
 		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null : slMlaundryChkDtl.getContent();
 
 		if (lMlaundryChkDtl == null || lMlaundryChkDtl.size() == 0) {
@@ -89,7 +89,6 @@ public class L8921 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 			}
-			
 
 			occursList.putParam("OOFactor", tMlaundryChkDtl.getFactor()); // 交易樣態
 			occursList.putParam("OOEntryDate", tMlaundryChkDtl.getEntryDate()); // 入帳日期

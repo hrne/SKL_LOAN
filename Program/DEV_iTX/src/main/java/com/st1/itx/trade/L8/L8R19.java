@@ -100,7 +100,7 @@ public class L8R19 extends TradeBuffer {
 						String TelArea = CustTelNoVo.getTelArea();// 電話區碼
 						String TelNo = CustTelNoVo.getTelNo();// 電話號碼
 						// String TelExt=CustTelNoVo.getTelExt();//分機號碼
-						//String Mobile = CustTelNoVo.getTelNo();// 手機號碼
+						// String Mobile = CustTelNoVo.getTelNo();// 手機號碼
 						if (("01").equals(TelTypeCode)) {
 							String OTelNo = "";
 							if (TelArea != null && TelArea.trim().length() != 0) {
@@ -143,24 +143,25 @@ public class L8R19 extends TradeBuffer {
 		} else {
 			// throw new LogicException(titaVo, "E8002", "L8R19");//400無此債務人聯絡資料-改在前端處理
 		}
-		
-		//該長度已L8309(JcicZ048)為主
-		totaVo.putParam("L8r19CustRegAddr", CutLength(L8r19CustRegAddr,38));// 債務人戶籍之郵遞區號及地址
-		totaVo.putParam("L8r19CustComAddr", CutLength(L8r19CustComAddr,38));// 債務人通訊地之郵遞區號及地址
-		totaVo.putParam("L8r19CustRegTelNo", CutLength(L8r19CustRegTelNo,16));// 債務人戶籍電話
-		totaVo.putParam("L8r19CustComTelNo", CutLength(L8r19CustComTelNo,16));// 債務人通訊電話
-		totaVo.putParam("L8r19CustMobilNo", CutLength(L8r19CustMobilNo,16));// 債務人行動電話
+
+		// 該長度已L8309(JcicZ048)為主
+		totaVo.putParam("L8r19CustRegAddr", CutLength(L8r19CustRegAddr, 38));// 債務人戶籍之郵遞區號及地址
+		totaVo.putParam("L8r19CustComAddr", CutLength(L8r19CustComAddr, 38));// 債務人通訊地之郵遞區號及地址
+		totaVo.putParam("L8r19CustRegTelNo", CutLength(L8r19CustRegTelNo, 16));// 債務人戶籍電話
+		totaVo.putParam("L8r19CustComTelNo", CutLength(L8r19CustComTelNo, 16));// 債務人通訊電話
+		totaVo.putParam("L8r19CustMobilNo", CutLength(L8r19CustMobilNo, 16));// 債務人行動電話
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	public String CutLength(String str,int maxLength) {
-		if(str!=null && str.length()!=0) {
-			int strL=str.length();
-			if(strL>maxLength) {
-				str=str.substring(0,maxLength);
+
+	public String CutLength(String str, int maxLength) {
+		if (str != null && str.length() != 0) {
+			int strL = str.length();
+			if (strL > maxLength) {
+				str = str.substring(0, maxLength);
 			}
-		}else {
-			str="";
+		} else {
+			str = "";
 		}
 		return str;
 	}
@@ -302,7 +303,7 @@ public class L8R19 extends TradeBuffer {
 						// 路名
 						if (Road != null && Road.length() != 0) {
 							sbAddr.append(Road);
-							//sbAddr.append("（路／街／村）");
+							// sbAddr.append("（路／街／村）");
 						}
 					}
 

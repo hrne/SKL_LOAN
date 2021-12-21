@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.Ifrs9LoanDataId;
  */
 public interface Ifrs9LoanDataRepositoryHist extends JpaRepository<Ifrs9LoanData, Ifrs9LoanDataId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Ifrs9LoanData> findByIfrs9LoanDataId(Ifrs9LoanDataId ifrs9LoanDataId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Ifrs9LoanData> findByIfrs9LoanDataId(Ifrs9LoanDataId ifrs9LoanDataId);
 
-  // (月底日日終批次)維護IFRS9撥款資料檔
-  @Procedure(value = "\"Usp_L7_Ifrs9LoanData_Upd\"")
-  public void uspL7Ifrs9loandataUpd(int TBSDYF, String EmpNo);
+	// (月底日日終批次)維護IFRS9撥款資料檔
+	@Procedure(value = "\"Usp_L7_Ifrs9LoanData_Upd\"")
+	public void uspL7Ifrs9loandataUpd(int TBSDYF, String EmpNo);
 
 }
-

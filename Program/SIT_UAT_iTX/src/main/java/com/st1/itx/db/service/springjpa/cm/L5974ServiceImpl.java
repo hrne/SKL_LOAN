@@ -26,10 +26,10 @@ public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	L5051ServiceImpl l5051ServiceImpl;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// 創建程式碼後,檢查初始值
@@ -43,42 +43,24 @@ public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	//注意異動此邊欄位,或SQL語法 請檢查L5974
+	// 注意異動此邊欄位,或SQL語法 請檢查L5974
 
 	public String sqlL5974(String FinCode) {
-		
-		String SqlNegFinAcct = "SELECT "
-				+ "FA.\"FinCode\" AS \"OOFinCode\","
-				+ "FA.\"FinItem\" AS \"OOFinCodeX\","
-				+ "FA.\"RemitBank\" AS \"OORemitBank\","
-				+ "FA1.\"FinItem\" AS \"OORemitBankX1\","
-				+ "FA2.\"BankItem\" AS \"OORemitBankX2\","
-				+ "FA.\"RemitAcct\" AS \"OORemitAcct\", "
-				+ "FA.\"DataSendSection\" AS \"OODataSendSection\", "
-				+ "FA3.\"FinItem\" AS \"OODataSendSectionX1\", "
-				+ "FA4.\"BankItem\" AS \"OODataSendSectionX2\" "
-				+ "FROM \"NegFinAcct\" FA "
-				+ "LEFT JOIN \"NegFinAcct\" FA1 "
-					+ "ON FA1.\"FinCode\"=FA.\"RemitBank\" "
-				+ "LEFT JOIN \"CdBank\" FA2 "
-					+ "ON FA2.\"BranchCode\"='    ' "
-					+ "AND FA2.\"BankCode\"=FA.\"RemitBank\" "
-				+ "LEFT JOIN \"NegFinAcct\" FA3 "
-					+ "ON FA3.\"FinCode\"=FA.\"DataSendSection\" "
-				+ "LEFT JOIN \"CdBank\" FA4 "
-					+ "ON FA4.\"BranchCode\"='    ' "
-					+ "AND FA4.\"BankCode\"=FA.\"DataSendSection\" "
-				+ "WHERE 1=1 ";
+
+		String SqlNegFinAcct = "SELECT " + "FA.\"FinCode\" AS \"OOFinCode\"," + "FA.\"FinItem\" AS \"OOFinCodeX\"," + "FA.\"RemitBank\" AS \"OORemitBank\"," + "FA1.\"FinItem\" AS \"OORemitBankX1\","
+				+ "FA2.\"BankItem\" AS \"OORemitBankX2\"," + "FA.\"RemitAcct\" AS \"OORemitAcct\", " + "FA.\"DataSendSection\" AS \"OODataSendSection\", "
+				+ "FA3.\"FinItem\" AS \"OODataSendSectionX1\", " + "FA4.\"BankItem\" AS \"OODataSendSectionX2\" " + "FROM \"NegFinAcct\" FA " + "LEFT JOIN \"NegFinAcct\" FA1 "
+				+ "ON FA1.\"FinCode\"=FA.\"RemitBank\" " + "LEFT JOIN \"CdBank\" FA2 " + "ON FA2.\"BranchCode\"='    ' " + "AND FA2.\"BankCode\"=FA.\"RemitBank\" " + "LEFT JOIN \"NegFinAcct\" FA3 "
+				+ "ON FA3.\"FinCode\"=FA.\"DataSendSection\" " + "LEFT JOIN \"CdBank\" FA4 " + "ON FA4.\"BranchCode\"='    ' " + "AND FA4.\"BankCode\"=FA.\"DataSendSection\" " + "WHERE 1=1 ";
 		if (FinCode != null && FinCode.length() != 0) {
 			SqlNegFinAcct += "AND FA.\"FinCode\"= :FinCode ";
 		}
-		String Order="ORDER BY FA.\"FinCode\" ASC ";
-		SqlNegFinAcct=SqlNegFinAcct+Order+sqlRow;
+		String Order = "ORDER BY FA.\"FinCode\" ASC ";
+		SqlNegFinAcct = SqlNegFinAcct + Order + sqlRow;
 		return SqlNegFinAcct;
 	}
-	
-	
-	public List<String[]> FindL5974(int index, int limit, String sql,String FinCode, TitaVo titaVo) throws LogicException {
+
+	public List<String[]> FindL5974(int index, int limit, String sql, String FinCode, TitaVo titaVo) throws LogicException {
 		logger.info("FindData");
 
 		// *** 折返控制相關 ***
@@ -86,16 +68,15 @@ public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// *** 折返控制相關 ***
 		this.limit = limit;
 		logger.info("L5974ServiceImpl sql=[" + sql + "]");
-		
 
 		Query query;
-		
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		logger.info("L5974ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		if (FinCode != null && FinCode.length() != 0) {
 			logger.info("L5974ServiceImpl FinCode=[" + FinCode + "]");
 			query.setParameter("FinCode", FinCode);
@@ -109,23 +90,22 @@ public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-		
+
 		@SuppressWarnings("unchecked")
-		List<Object> lObject=this.convertToMap(query.getResultList());
+		List<Object> lObject = this.convertToMap(query.getResultList());
 		return FindData(lObject);
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
-	public List<String[]> FindData(List<Object> lObject) throws LogicException{
-		List<String[]> data=new ArrayList<String[]>();
-		if(lObject!=null && lObject.size()!=0) {
-			int col=((Map<String, String>)lObject.get(0)).keySet().size();
-			for(Object obj :lObject) {
-				Map<String,String> MapObj=(Map<String, String>) obj;
-				String row[]=new String[col];
-				for(int i=0;i<col;i++) {
-					row[i]=MapObj.get("F"+String.valueOf(i));
+	public List<String[]> FindData(List<Object> lObject) throws LogicException {
+		List<String[]> data = new ArrayList<String[]>();
+		if (lObject != null && lObject.size() != 0) {
+			int col = ((Map<String, String>) lObject.get(0)).keySet().size();
+			for (Object obj : lObject) {
+				Map<String, String> MapObj = (Map<String, String>) obj;
+				String row[] = new String[col];
+				for (int i = 0; i < col; i++) {
+					row[i] = MapObj.get("F" + String.valueOf(i));
 				}
 				data.add(row);
 			}

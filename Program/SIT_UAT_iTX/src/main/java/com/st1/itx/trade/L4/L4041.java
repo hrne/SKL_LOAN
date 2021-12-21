@@ -291,7 +291,7 @@ public class L4041 extends TradeBuffer {
 						tPostAuthLogId.setRepayAcct(result.get("F4"));
 						tPostAuthLogId.setAuthCode(result.get("F5"));
 
-						PostAuthLog tempPostAuthLog = postAuthLogService.holdById(tPostAuthLogId,titaVo);
+						PostAuthLog tempPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						tempPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 						tempPostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
@@ -307,7 +307,7 @@ public class L4041 extends TradeBuffer {
 						try {
 							// 送出到DB
 							if (tempPostAuthLog != null) {
-								postAuthLogService.update(tempPostAuthLog,titaVo);
+								postAuthLogService.update(tempPostAuthLog, titaVo);
 							}
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
@@ -492,7 +492,7 @@ public class L4041 extends TradeBuffer {
 						tPostAuthLogId.setRepayAcct(result.get("F4"));
 						tPostAuthLogId.setAuthCode(result.get("F5"));
 
-						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId,titaVo);
+						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 						newPostAuthLog.setPropDate(0);
@@ -500,7 +500,7 @@ public class L4041 extends TradeBuffer {
 						newPostAuthLog.setFileSeq(0);
 
 						try {
-							postAuthLogService.update(newPostAuthLog,titaVo);
+							postAuthLogService.update(newPostAuthLog, titaVo);
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
 						}

@@ -42,7 +42,7 @@ public class L9711p extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L9711p ");
 		TxBuffer txbuffer = this.getTxBuffer();
-		
+
 		this.totaVo.init(titaVo);
 
 		this.info("L9711p titaVo.getTxcd() = " + titaVo.getTxcd());
@@ -54,11 +54,9 @@ public class L9711p extends TradeBuffer {
 
 		if (l9711List != null && !l9711List.isEmpty()) {
 			l9711report2.exec(titaVo, txbuffer, l9711List);
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單查無資料", titaVo);
 		}
 
 		if (true) {

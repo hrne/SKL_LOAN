@@ -83,9 +83,9 @@ public class L4606Report1 extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L4606ServiceImpl.findAll error = " + errors.toString());
 		}
-		
+
 		ArrayList<String> tfire = new ArrayList<String>();
-		
+
 		String officer = "";
 		int i = 0;
 		int times = 0, total = 0;
@@ -95,11 +95,11 @@ public class L4606Report1 extends MakeReport {
 
 			if (i == 0) {
 				officer = tL4606Vo.get("F8").toString();
-				
-				if(officer != "") {
-				  tfire.add(officer);
+
+				if (officer != "") {
+					tfire.add(officer);
 				}
-				
+
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
 				this.print(0, 1, tL4606Vo.get("F0"));
@@ -111,23 +111,23 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
 				this.print(0, 90, "-");
 				this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
+				this.print(0, 95, limitLength(tL4606Vo.get("F8"), 14));
 				this.print(0, 109, tL4606Vo.get("F9"));
-				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
+				this.print(0, 120, limitLength(tL4606Vo.get("F10"), 12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
-				
+
 				amt = amt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 				totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
-				
+
 				times++;
 			} else {
-				if(tfire.contains(tL4606Vo.get("F8").toString()) || "".equals(tL4606Vo.get("F8").toString())) {
+				if (tfire.contains(tL4606Vo.get("F8").toString()) || "".equals(tL4606Vo.get("F8").toString())) {
 					times++;
 				} else {
 //					reset比較值
 					officer = tL4606Vo.get("F8").toString();
-					if(officer != "") {
-						  tfire.add(officer);
+					if (officer != "") {
+						tfire.add(officer);
 					}
 					this.print(1, 1, "                                                                小　計：           筆");
 					this.print(0, 81, String.format("%,d", times), "R");
@@ -149,11 +149,11 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
 				this.print(0, 90, "-");
 				this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
+				this.print(0, 95, limitLength(tL4606Vo.get("F8"), 14));
 				this.print(0, 109, tL4606Vo.get("F9"));
-				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
+				this.print(0, 120, limitLength(tL4606Vo.get("F10"), 12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
-				
+
 				amt = amt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 				totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 			} // else

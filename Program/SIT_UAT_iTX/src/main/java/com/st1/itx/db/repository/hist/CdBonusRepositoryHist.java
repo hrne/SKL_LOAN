@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,19 @@ import com.st1.itx.db.domain.CdBonusId;
  */
 public interface CdBonusRepositoryHist extends JpaRepository<CdBonus, CdBonusId> {
 
-  // WorkMonth= ,AND ConditionCode = ,AND Condition >= ,AND Condition <= 
-  public Slice<CdBonus> findAllByWorkMonthIsAndConditionCodeIsAndConditionGreaterThanEqualAndConditionLessThanEqualOrderByWorkMonthAscConditionCodeAscConditionAsc(int workMonth_0, int conditionCode_1, String condition_2, String condition_3, Pageable pageable);
+	// WorkMonth= ,AND ConditionCode = ,AND Condition >= ,AND Condition <=
+	public Slice<CdBonus> findAllByWorkMonthIsAndConditionCodeIsAndConditionGreaterThanEqualAndConditionLessThanEqualOrderByWorkMonthAscConditionCodeAscConditionAsc(int workMonth_0,
+			int conditionCode_1, String condition_2, String condition_3, Pageable pageable);
 
-  // WorkMonth>= ,AND WorkMonth<= 
-  public Slice<CdBonus> findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByWorkMonthAsc(int workMonth_0, int workMonth_1, Pageable pageable);
+	// WorkMonth>= ,AND WorkMonth<=
+	public Slice<CdBonus> findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByWorkMonthAsc(int workMonth_0, int workMonth_1, Pageable pageable);
 
-  // WorkMonth<=
-  public Optional<CdBonus> findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(int workMonth_0);
+	// WorkMonth<=
+	public Optional<CdBonus> findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(int workMonth_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdBonus> findByCdBonusId(CdBonusId cdBonusId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdBonus> findByCdBonusId(CdBonusId cdBonusId);
 
 }
-

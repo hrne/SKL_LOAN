@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.BankRelationSelfId;
  */
 public interface BankRelationSelfRepository extends JpaRepository<BankRelationSelf, BankRelationSelfId> {
 
-  // CustId =
-  public Slice<BankRelationSelf> findAllByCustIdIs(String custId_0, Pageable pageable);
+	// CustId =
+	public Slice<BankRelationSelf> findAllByCustIdIs(String custId_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<BankRelationSelf> findByBankRelationSelfId(BankRelationSelfId bankRelationSelfId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<BankRelationSelf> findByBankRelationSelfId(BankRelationSelfId bankRelationSelfId);
 
 }
-

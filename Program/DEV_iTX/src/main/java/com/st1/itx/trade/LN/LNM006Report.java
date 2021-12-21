@@ -23,7 +23,8 @@ import java.text.SimpleDateFormat;
 @Scope("prototype")
 
 public class LNM006Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LNM006Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LNM006Report.class);
 
 	Date dateNow = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");

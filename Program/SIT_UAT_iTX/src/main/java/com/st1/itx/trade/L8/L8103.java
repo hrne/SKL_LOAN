@@ -28,24 +28,24 @@ public class L8103 extends TradeBuffer {
 
 	@Autowired
 	public CheckInsurance checkInsurance;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8103 ");
 		this.totaVo.init(titaVo);
 
-		//very importance
+		// very importance
 		checkInsurance.setTxBuffer(this.txBuffer);
-		
+
 		CheckInsuranceVo checkInsuranceVo = new CheckInsuranceVo();
-		
+
 		checkInsuranceVo.setCustId(titaVo.get("CustId").trim());
-		
+
 		checkInsuranceVo = checkInsurance.checkInsurance(titaVo, checkInsuranceVo);
-		
+
 		this.totaVo.putParam("Success", Boolean.toString(checkInsuranceVo.isSuccess()));
 		this.totaVo.putParam("MsgRs", checkInsuranceVo.getMsgRs());
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

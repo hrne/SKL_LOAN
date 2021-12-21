@@ -32,6 +32,7 @@ public class L5107 extends TradeBuffer {
 	public SpecInnReCheckService iSpecInnReCheckService;
 	@Autowired
 	public DataLog idataLog;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
@@ -39,9 +40,9 @@ public class L5107 extends TradeBuffer {
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 		int iCycle = Integer.valueOf(titaVo.getParam("Cycle"));
 		String iRemark = titaVo.getParam("Remark");
-		int iReChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth"))+191100;
+		int iReChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth")) + 191100;
 		int iFunctionCode = Integer.valueOf(titaVo.getParam("FunctionCode"));
-		
+
 		SpecInnReCheck iSpecInnReCheck = new SpecInnReCheck();
 		SpecInnReCheckId iSpecInnReCheckId = new SpecInnReCheckId();
 		iSpecInnReCheckId.setCustNo(iCustNo);
@@ -54,7 +55,7 @@ public class L5107 extends TradeBuffer {
 			iSpecInnReCheck.setReChkYearMonth(iReChkYearMonth);
 			try {
 				iSpecInnReCheckService.insert(iSpecInnReCheck, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "已有相同資料"); // 資料新建錯誤
 			}
 			break;
@@ -62,9 +63,9 @@ public class L5107 extends TradeBuffer {
 			this.info("UPDATEEEEEEEEEEEEEEEEEEE");
 			iSpecInnReCheck = iSpecInnReCheckService.holdById(iSpecInnReCheckId, titaVo);
 			if (iSpecInnReCheck == null) {
-				throw new LogicException(titaVo,"E0007","查無資料");
+				throw new LogicException(titaVo, "E0007", "查無資料");
 			}
-			
+
 			SpecInnReCheck oldSpecInnReCheck = (SpecInnReCheck) idataLog.clone(iSpecInnReCheck);
 			iSpecInnReCheck.setCycle(iCycle);
 			iSpecInnReCheck.setRemark(iRemark);
@@ -82,7 +83,7 @@ public class L5107 extends TradeBuffer {
 		case 4:
 			iSpecInnReCheck = iSpecInnReCheckService.holdById(iSpecInnReCheckId, titaVo);
 			if (iSpecInnReCheck == null) {
-				throw new LogicException(titaVo,"E0008","查無資料");
+				throw new LogicException(titaVo, "E0008", "查無資料");
 			}
 			try {
 				iSpecInnReCheckService.delete(iSpecInnReCheck, titaVo);
@@ -92,7 +93,6 @@ public class L5107 extends TradeBuffer {
 			break;
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

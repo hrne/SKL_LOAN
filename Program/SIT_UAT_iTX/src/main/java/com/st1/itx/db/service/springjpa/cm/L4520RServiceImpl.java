@@ -42,8 +42,8 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 
 		int PerfMonth = parse.stringToInteger(titaVo.getParam("PerfMonth")) + 191100;
 //		String BatchNo = parse.stringToStringDate(titaVo.getParam("BatchNo"));
-		String BatchNoFm =  titaVo.getParam("BatchNoFm");
-		String BatchNoTo =  titaVo.getParam("BatchNoTo");
+		String BatchNoFm = titaVo.getParam("BatchNoFm");
+		String BatchNoTo = titaVo.getParam("BatchNoTo");
 		this.info("L4520.Fire");
 
 		String sql = "    SELECT                      ";

@@ -110,13 +110,13 @@ public class L2111 extends TradeBuffer {
 
 		// isEloan
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
-			this.isEloan = true;	
+			this.isEloan = true;
 		}
-		
+
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo"));
 		iCustId = titaVo.getParam("CustId").trim();
 		iGroupId = titaVo.getParam("GroupId").trim();
-		
+
 		CustMain tCustMain = custMainService.custIdFirst(iCustId);
 		if (tCustMain == null) {
 			throw new LogicException(titaVo, "E2003", "客戶資料主檔" + iCustId); // 查無資料
@@ -129,49 +129,48 @@ public class L2111 extends TradeBuffer {
 			}
 			wkGroupUkey = tCustMain.getCustUKey();
 		}
-		
-		
+
 		// 取得輸入資料
 		if (this.isEloan) {
 			iFuncCode = 1;
-			
+
 			// 申請記號 ApplMark
 			// 1:滿五年自動寫入(案件申請自動刪除)
 			iCustNo = tCustMain.getCustNo();
-						
+
 			CustDataCtrl tCustDataCtrl = new CustDataCtrl();
-						
+
 			tCustDataCtrl = sCustDataCtrlService.findById(iCustNo);
 			int iApplMark = 0;
-			if(tCustDataCtrl != null) {
-			  iApplMark = tCustDataCtrl.getApplMark();
-			  if(iApplMark == 1){
-				try {
+			if (tCustDataCtrl != null) {
+				iApplMark = tCustDataCtrl.getApplMark();
+				if (iApplMark == 1) {
+					try {
 
-				  this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
+						this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
 
-				  if (tCustDataCtrl != null) {
-					sCustDataCtrlService.delete(tCustDataCtrl);
-				  }
-				} catch (DBException e) {
+						if (tCustDataCtrl != null) {
+							sCustDataCtrlService.delete(tCustDataCtrl);
+						}
+					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
-			    }
-			  } //  if
+					}
+				} // if
 			} // if
-			  
+
 		} else {
 			iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		}
-		
+
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E2004", "L2R01"); // 功能選擇錯誤
 		}
-				
+
 		// 更新案件申請檔
 		int WkTbsYy = this.txBuffer.getTxCom().getTbsdy() / 10000;
 		int wkApplNo = iApplNo;
-				
+
 		switch (iFuncCode) {
 		case 1: // 新增
 

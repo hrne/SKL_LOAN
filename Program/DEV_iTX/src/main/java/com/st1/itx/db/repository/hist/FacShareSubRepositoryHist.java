@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,19 @@ import com.st1.itx.db.domain.FacShareSubId;
  */
 public interface FacShareSubRepositoryHist extends JpaRepository<FacShareSub, FacShareSubId> {
 
-  // CreditSysNo = ,AND MainCustNo = 
-  public Slice<FacShareSub> findAllByCreditSysNoIsAndMainCustNoIsOrderByShareSeqAscShareCustNoAscShareFacmNoAsc(int creditSysNo_0, int mainCustNo_1, Pageable pageable);
+	// CreditSysNo = ,AND MainCustNo =
+	public Slice<FacShareSub> findAllByCreditSysNoIsAndMainCustNoIsOrderByShareSeqAscShareCustNoAscShareFacmNoAsc(int creditSysNo_0, int mainCustNo_1, Pageable pageable);
 
-  // ShareCustNo = ,AND ShareFacmNo >= ,AND ShareFacmNo <=
-  public Slice<FacShareSub> findAllByShareCustNoIsAndShareFacmNoGreaterThanEqualAndShareFacmNoLessThanEqualOrderByCreditSysNoAscMainCustNoAscMainFacmNoAscShareSeqAscShareCustNoAscShareFacmNoAsc(int shareCustNo_0, int shareFacmNo_1, int shareFacmNo_2, Pageable pageable);
+	// ShareCustNo = ,AND ShareFacmNo >= ,AND ShareFacmNo <=
+	public Slice<FacShareSub> findAllByShareCustNoIsAndShareFacmNoGreaterThanEqualAndShareFacmNoLessThanEqualOrderByCreditSysNoAscMainCustNoAscMainFacmNoAscShareSeqAscShareCustNoAscShareFacmNoAsc(
+			int shareCustNo_0, int shareFacmNo_1, int shareFacmNo_2, Pageable pageable);
 
-  // MainCustNo = ,AND MainFacmNo = 
-  public Slice<FacShareSub> findAllByMainCustNoIsAndMainFacmNoIsOrderByShareSeqAscShareCustNoAscShareFacmNoAsc(int mainCustNo_0, int mainFacmNo_1, Pageable pageable);
+	// MainCustNo = ,AND MainFacmNo =
+	public Slice<FacShareSub> findAllByMainCustNoIsAndMainFacmNoIsOrderByShareSeqAscShareCustNoAscShareFacmNoAsc(int mainCustNo_0, int mainFacmNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacShareSub> findByFacShareSubId(FacShareSubId facShareSubId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacShareSub> findByFacShareSubId(FacShareSubId facShareSubId);
 
 }
-

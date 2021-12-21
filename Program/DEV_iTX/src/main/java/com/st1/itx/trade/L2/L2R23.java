@@ -35,7 +35,7 @@ public class L2R23 extends TradeBuffer {
 	public ClImmService sClImmService;
 	@Autowired
 	public ClImmRankDetailService sClImmRankDetailService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -126,26 +126,25 @@ public class L2R23 extends TradeBuffer {
 		this.totaVo.putParam("L2r23SettingAmt", tClImm.getSettingAmt());
 		this.totaVo.putParam("L2r23ClaimDate", tClImm.getClaimDate());
 		this.totaVo.putParam("L2r23SettingSeq", tClImm.getSettingSeq());
-		
+
 		List<ClImmRankDetail> lClImmRankDetail = new ArrayList<ClImmRankDetail>();
 		Slice<ClImmRankDetail> slClImmRankDetail = sClImmRankDetailService.clNoEq(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
 		lClImmRankDetail = slClImmRankDetail == null ? null : slClImmRankDetail.getContent();
-		
-		
-		for(int i = 0 ; i <= 9 ; i++) {
+
+		for (int i = 0; i <= 9; i++) {
 			this.totaVo.putParam("L2r23FirstCreditor" + i, "");
 			this.totaVo.putParam("L2r23FirstAmt" + i, "");
 		}
-		
-		if(lClImmRankDetail != null) {
-		  int k = 0;
-		  for (ClImmRankDetail tClImmRankDetail : lClImmRankDetail) {
-		
-			  this.totaVo.putParam("L2r23FirstCreditor" + k, tClImmRankDetail.getFirstCreditor());
-			  this.totaVo.putParam("L2r23FirstAmt" + k, tClImmRankDetail.getFirstAmt());
 
-			k++;
-		  }
+		if (lClImmRankDetail != null) {
+			int k = 0;
+			for (ClImmRankDetail tClImmRankDetail : lClImmRankDetail) {
+
+				this.totaVo.putParam("L2r23FirstCreditor" + k, tClImmRankDetail.getFirstCreditor());
+				this.totaVo.putParam("L2r23FirstAmt" + k, tClImmRankDetail.getFirstAmt());
+
+				k++;
+			}
 		}
 
 		this.addList(this.totaVo);

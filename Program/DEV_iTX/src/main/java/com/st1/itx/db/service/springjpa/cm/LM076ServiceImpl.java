@@ -46,7 +46,7 @@ public class LM076ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      AS ecity ";
 		sql += "                     ,SUM(fac.\"LineAmt\") e0 ";
 		sql += "                          ,SUM( CASE ";
-		sql +="                                   WHEN NVL(cm.\"EvaAmt\", 0) > 0";
+		sql += "                                   WHEN NVL(cm.\"EvaAmt\", 0) > 0";
 		sql += "                                  THEN ROUND(fac.\"LineAmt\" / cm.\"EvaAmt\" * 100, 2) "; // 1. 先計算單筆的貸放成數
 		sql += "                                       * fac.\"LineAmt\" "; // 2. 加權
 		sql += "                                ELSE 0 END) e1";
@@ -75,11 +75,9 @@ public class LM076ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                      AND cd.\"Code\" = fac.\"RuleCode\" ";
 		sql += "               WHERE trunc(fac.\"FirstDrawdownDate\" / 100) = :RptMonth ";
 		sql += "                 AND fac.\"RuleCode\" = '08' ";
-		if (beforeSeptember)
-		{
+		if (beforeSeptember) {
 			sql += "     AND FCA.\"ApplDate\" BETWEEN 20201208 AND 20210923 ";
-		} else
-		{
+		} else {
 			sql += "     AND FCA.\"ApplDate\" >= 20210924";
 		}
 		sql += "               GROUP BY CASE nvl(cm.\"CityCode\", '05') ";
@@ -100,7 +98,6 @@ public class LM076ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,s.e1 / s.e0 \"AvgLoanPercent\" ";
 		sql += "       ,s.e2 / s.e0 \"AvgIntRate\" ";
 		sql += " FROM tmp s ";
-
 
 		this.info("sql=" + sql);
 

@@ -78,7 +78,7 @@ public class L5965 extends TradeBuffer {
 				occursList.putParam("OORemindDate", reCollRemind.getRemindDate());
 				String tU = reCollRemind.getLastUpdate().toString();
 				String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
-				String uTime = tU.substring(11,13) + tU.substring(14,16);
+				String uTime = tU.substring(11, 13) + tU.substring(14, 16);
 				occursList.putParam("OOEditDate", uDate);
 				occursList.putParam("OOEditTime", uTime);
 				occursList.putParam("OORemindCode", reCollRemind.getRemindCode());

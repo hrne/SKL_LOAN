@@ -58,7 +58,7 @@ public class L5981 extends TradeBuffer {
 		this.limit = 200; // 45 * 200 = 9000
 
 		Slice<NegFinShareLog> sNegFinShareLog;
-		if (iCaseSq==0) {
+		if (iCaseSq == 0) {
 			sNegFinShareLog = sNegFinShareLogService.custNoEq(iCustNo, this.index, this.limit, titaVo);
 		} else {
 			sNegFinShareLog = sNegFinShareLogService.findFinCodeAll(iCustNo, iCaseSq, this.index, this.limit, titaVo);
@@ -84,10 +84,9 @@ public class L5981 extends TradeBuffer {
 
 			tCdBankId.setBankCode(FinCode);
 			tCdBankId.setBranchCode("    ");
-			
+
 			String tBankItem = sNegCom.FindNegFinAcc(FinCode, titaVo)[0];
 			occursList.putParam("OOFinCodeName", tBankItem);// 債權機構名稱
-			
 
 			this.info("OOFinCodeName==" + occursList.get("OOFinCodeName"));
 

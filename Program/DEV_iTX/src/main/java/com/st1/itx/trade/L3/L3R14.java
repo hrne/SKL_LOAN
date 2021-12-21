@@ -129,8 +129,7 @@ public class L3R14 extends TradeBuffer {
 		}
 
 		if (tFacMain.getActFg() == 1 && iFKey == 0) {
-			throw new LogicException(titaVo, "E0021",
-					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+			throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
 
 		if (!tFacMain.getAmortizedCode().equals("5")) {
@@ -186,7 +185,7 @@ public class L3R14 extends TradeBuffer {
 //		}
 
 		// 查詢各項費用
-		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo); //00-費用全部(已到期)
+		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
 
 		// 累計撥款金額
 //		oLoanBal = oLoanBal.add(tFacMain.getDuePayAmt());
@@ -195,8 +194,7 @@ public class L3R14 extends TradeBuffer {
 		oRealPayAmt = oDuePayAmt.add(oOpenInterest).subtract(oInterest);
 
 		// 取銀行中文
-		CdBank tCdBank = cdBankService
-				.findById(new CdBankId(t2LoanBorMain.getRemitBank(), t2LoanBorMain.getRemitBranch()), titaVo);
+		CdBank tCdBank = cdBankService.findById(new CdBankId(t2LoanBorMain.getRemitBank(), t2LoanBorMain.getRemitBranch()), titaVo);
 		if (tCdBank == null) {
 			tCdBank = new CdBank();
 		}
@@ -241,13 +239,11 @@ public class L3R14 extends TradeBuffer {
 
 		this.info("RepayAmtRoutine ... ");
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		for (LoanBorMain ln : lLoanBorMain) {
 			if (ln.getActFg() == 1) {
-				throw new LogicException(titaVo, "E0021",
-						"放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
+				throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
 			}
 
 			if (ln.getBormNo() == tFacMain.getLastBormNo())
@@ -257,10 +253,8 @@ public class L3R14 extends TradeBuffer {
 				continue;
 			}
 			// 計算至入帳日期之應繳期數
-			wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-					ln.getSpecificDd(), iEntryDate);
-			wkEndDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-					ln.getSpecificDd(), wkTerms, ln.getMaturityDate());
+			wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
+			wkEndDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), wkTerms, ln.getMaturityDate());
 			wkTerms -= ln.getPaidTerms();
 			if (wkTerms > 0) {
 				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, wkEndDate, 2, iEntryDate, titaVo);

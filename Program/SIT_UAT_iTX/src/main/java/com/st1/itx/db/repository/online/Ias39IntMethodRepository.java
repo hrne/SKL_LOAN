@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.Ias39IntMethodId;
  */
 public interface Ias39IntMethodRepository extends JpaRepository<Ias39IntMethod, Ias39IntMethodId> {
 
-  // YearMonth = 
-  public Slice<Ias39IntMethod> findAllByYearMonthIsOrderByCustNoAscFacmNoAscBormNoAsc(int yearMonth_0, Pageable pageable);
+	// YearMonth =
+	public Slice<Ias39IntMethod> findAllByYearMonthIsOrderByCustNoAscFacmNoAscBormNoAsc(int yearMonth_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Ias39IntMethod> findByIas39IntMethodId(Ias39IntMethodId ias39IntMethodId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Ias39IntMethod> findByIas39IntMethodId(Ias39IntMethodId ias39IntMethodId);
 
 }
-

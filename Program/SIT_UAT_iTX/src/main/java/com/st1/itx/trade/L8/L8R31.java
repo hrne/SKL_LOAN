@@ -24,7 +24,6 @@ public class L8R31 extends TradeBuffer {
 	@Autowired
 	public JcicZ062Service iJcicZ062Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r31 ");
@@ -32,11 +31,11 @@ public class L8R31 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ062 iJcicZ062 = new JcicZ062();
 		iJcicZ062 = iJcicZ062Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ062 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
-			totaVo.putParam("L8r31TranKey",iJcicZ062.getTranKey());// 交易代碼
+		} else {
+			totaVo.putParam("L8r31TranKey", iJcicZ062.getTranKey());// 交易代碼
 			totaVo.putParam("L8r31CustId", iJcicZ062.getCustId());// 債務人IDN
 			totaVo.putParam("L8r31SubmitKey", iJcicZ062.getSubmitKey());// 報送單位代號
 			totaVo.putParam("L8r31RcDate", iJcicZ062.getRcDate());// 原前置協商申請日
@@ -62,7 +61,6 @@ public class L8R31 extends TradeBuffer {
 			totaVo.putParam("L8r31OutJcicTxtDate", iJcicZ062.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

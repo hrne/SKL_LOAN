@@ -116,7 +116,7 @@ public class L2605 extends TradeBuffer {
 	BigDecimal facmFee = BigDecimal.ZERO;
 	// 同額度催收法拍費
 	BigDecimal facmOverdueFee = BigDecimal.ZERO;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2605 ");
@@ -149,16 +149,13 @@ public class L2605 extends TradeBuffer {
 		CustMain tCustMain;
 		CdCity tCdCity;
 
-				
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDatecloseZero(iReceiveDateStart, iReceiveDate, 0,this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDatecloseZero(iReceiveDateStart, iReceiveDate, 0, this.index, this.limit);
 		List<ForeclosureFee> lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
-		
-		
+
 		if (lForeclosureFee == null || lForeclosureFee.isEmpty()) {
 			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
 		}
 
-		
 		int listsize = lForeclosureFee.size();
 
 		this.info("listsize = " + listsize);
@@ -169,7 +166,7 @@ public class L2605 extends TradeBuffer {
 //			if (tmpFF.getCloseDate() > 0) {
 //				continue;
 //			}
-		
+
 			// 與下一筆比較戶號(比到額度層)及收件日
 			int nextCustNo;
 			int nextFacmNo;
@@ -256,10 +253,10 @@ public class L2605 extends TradeBuffer {
 								cityItem = tCdCity.getCityItem();
 								this.info("縣市 = " + cityItem);
 							}
-							
-							if( "00".equals(cityCode))  {
+
+							if ("00".equals(cityCode)) {
 								cityCode = "  ";
-							} 
+							}
 
 						}
 					}
@@ -289,17 +286,17 @@ public class L2605 extends TradeBuffer {
 				occurslist.putParam("OOStatus", parse.IntegerToString(test[0], 2)); // 戶況
 				occurslist.putParam("OOPrevPayIntDate", test[1]); // 繳息迄日
 				occurslist.putParam("OOCollPsn", accCollPsn); // 催收人員
-				
+
 				CdEmp tCdEmp = new CdEmp();
-				tCdEmp = sCdEmpService.findById(accCollPsn, titaVo);	
+				tCdEmp = sCdEmpService.findById(accCollPsn, titaVo);
 				occurslist.putParam("OOName", ""); // 建檔人員姓名
-				if( tCdEmp != null) {
+				if (tCdEmp != null) {
 					occurslist.putParam("OOName", tCdEmp.getFullname()); // 建檔人員姓名
 				}
 				occurslist.putParam("OOOverdueCode", tmpFF.getOverdueDate() != 0 ? "Y" : " ");
 
 				consiz++;
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occurslist);
 
@@ -307,10 +304,10 @@ public class L2605 extends TradeBuffer {
 				facmFee = BigDecimal.ZERO;
 				facmOverdueFee = BigDecimal.ZERO;
 			} // if
-		} // for		
-		
+		} // for
+
 //		// Header資料
-		if(this.index == 0 ) {
+		if (this.index == 0) {
 			this.totaVo.putParam("OCnt", consiz);
 			this.totaVo.putParam("OFee", fee);
 			this.totaVo.putParam("OOverFee", overdueFee);
@@ -324,21 +321,20 @@ public class L2605 extends TradeBuffer {
 			this.totaVo.putParam("OFee", fee.add(parse.stringToBigDecimal(titaVo.getParam("OFee"))));
 			this.totaVo.putParam("OOverFee", overdueFee.add(parse.stringToBigDecimal(titaVo.getParam("OOverFee"))));
 			this.totaVo.putParam("OFeeAmt", (fee.add(overdueFee).add(parse.stringToBigDecimal(titaVo.getParam("OFeeAmt")))));
-			
+
 			titaVo.putParam("OCnt", consiz + parse.stringToInteger(titaVo.getParam("OCnt")));
 			titaVo.putParam("OFee", fee.add(parse.stringToBigDecimal(titaVo.getParam("OFee"))));
 			titaVo.putParam("OOverFee", overdueFee.add(parse.stringToBigDecimal(titaVo.getParam("OOverFee"))));
 			titaVo.putParam("OFeeAmt", (fee.add(overdueFee).add(parse.stringToBigDecimal(titaVo.getParam("OFeeAmt")))));
 		}
-		
 
 		if (lForeclosureFee.size() == this.limit && slForeclosureFee.hasNext()) {
-			 titaVo.setReturnIndex(this.setIndexNext());
-			 
-				/* 手動折返 */
-			 this.totaVo.setMsgEndToEnter();
+			titaVo.setReturnIndex(this.setIndexNext());
+
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

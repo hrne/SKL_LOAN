@@ -73,8 +73,7 @@ public class L4R11 extends TradeBuffer {
 
 //		特殊日扣款
 		this.totaVo.putParam("L4r11PostSpecificDd", transToRocType(findSpecificDeductDate(tbsdyf, tSystemParas, 1)));
-		this.totaVo.putParam("L4r11PostSecondSpecificDd",
-				transToRocType(findSpecificDeductDate(n4bsdyf, tSystemParas, 1)));
+		this.totaVo.putParam("L4r11PostSecondSpecificDd", transToRocType(findSpecificDeductDate(n4bsdyf, tSystemParas, 1)));
 
 //		每日扣款
 //		本營業日之隔日
@@ -265,7 +264,7 @@ public class L4R11 extends TradeBuffer {
 			dd4 = tSystemParas.getAchDeductDD4();
 			dd5 = tSystemParas.getAchDeductDD5();
 		}
-		
+
 		this.info("dd1 ... " + dd1);
 		this.info("dd2 ... " + dd2);
 		this.info("dd3 ... " + dd3);

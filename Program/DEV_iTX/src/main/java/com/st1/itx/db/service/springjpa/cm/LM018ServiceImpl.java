@@ -37,7 +37,7 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int entdy = (parse.stringToInteger(titaVo.getParam("ENTDY")) + 19110000);
 
 		String sql = "";
-		
+
 		// 副query: 所有需要輸出的工作月/月份 - 同年一月到當月
 		sql += " WITH \"OutputMonths\" AS ( ";
 		sql += " SELECT UNIQUE \"YearMonth\" ";
@@ -47,7 +47,7 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"MonthlyLoanBal\" ";
 		sql += " WHERE \"YearMonth\" BETWEEN TO_NUMBER(:entYear) * 100 + 1 AND :entYearMonth ";
 		sql += " ), ";
-		
+
 		// 副query: ProdNo 對照表
 		sql += " \"SubjectProdNo\" AS ( ";
 		sql += "  ";
@@ -111,14 +111,14 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,'ZZ' AS \"ProdNoShow\" ";
 		sql += " FROM DUAL ";
 		sql += " ) ";
-		
+
 		// 主query
 		sql += " SELECT int.\"ProdNoShow\" \"ProdNoShow\" "; // 輸出顯示的商品名稱
 		sql += "       ,om.\"VisibleMonth\" \"VisibleMonth\" "; // 輸出顯示的月份 (季末月 / 當月)
 		sql += "       ,SUM(bal.\"BalSum\") \"BalSum\" "; // 餘額
 		sql += "       ,SUM(int.\"IntSum\") \"IntSum\" "; // 利收
 		sql += " FROM \"OutputMonths\" om  ";
-		
+
 		// 利息
 		// 串月份時用 YearMonth,
 		// 最後再以 VisibleMonth group 成季
@@ -137,7 +137,7 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            GROUP BY spn.\"ProdNoShow\" ";
 		sql += "                    ,om.\"YearMonth\" ";
 		sql += "           ) int ON int.\"YearMonth\" = om.\"YearMonth\" ";
-		
+
 		// 餘額
 		// join時利用om.YearMonth = om.VisibleMonth
 		// 確保餘額是出單一個月而非多個月合起來的餘額

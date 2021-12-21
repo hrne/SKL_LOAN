@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import java.math.BigDecimal;
@@ -23,28 +22,29 @@ import com.st1.itx.db.domain.EmpDeductMediaId;
  */
 public interface EmpDeductMediaRepository extends JpaRepository<EmpDeductMedia, EmpDeductMediaId> {
 
-  // AcDate = ,AND BatchNo = ,AND DetailSeq = 
-  public Optional<EmpDeductMedia> findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(int acDate_0, String batchNo_1, int detailSeq_2);
+	// AcDate = ,AND BatchNo = ,AND DetailSeq =
+	public Optional<EmpDeductMedia> findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(int acDate_0, String batchNo_1, int detailSeq_2);
 
-  // MediaKind = ,AND CustNo = ,AND EntryDate = ,AND RepayCode = ,AND RepayAmt = 
-  public Optional<EmpDeductMedia> findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIsOrderByMediaDateDesc(String mediaKind_0, int custNo_1, int entryDate_2, int repayCode_3, BigDecimal repayAmt_4);
+	// MediaKind = ,AND CustNo = ,AND EntryDate = ,AND RepayCode = ,AND RepayAmt =
+	public Optional<EmpDeductMedia> findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIsOrderByMediaDateDesc(String mediaKind_0, int custNo_1, int entryDate_2, int repayCode_3,
+			BigDecimal repayAmt_4);
 
-  // MediaDate >= , AND MediaDate <= , AND MediaKind = 
-  public Slice<EmpDeductMedia> findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualAndMediaKindIsOrderByMediaSeqAsc(int mediaDate_0, int mediaDate_1, String mediaKind_2, Pageable pageable);
+	// MediaDate >= , AND MediaDate <= , AND MediaKind =
+	public Slice<EmpDeductMedia> findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualAndMediaKindIsOrderByMediaSeqAsc(int mediaDate_0, int mediaDate_1, String mediaKind_2, Pageable pageable);
 
-  // AcDate = ,AND PerfMonth = ,AND FlowCode = 
-  public Slice<EmpDeductMedia> findAllByAcDateIsAndPerfMonthIsAndFlowCodeIsOrderByMediaSeqAsc(int acDate_0, int perfMonth_1, String flowCode_2, Pageable pageable);
+	// AcDate = ,AND PerfMonth = ,AND FlowCode =
+	public Slice<EmpDeductMedia> findAllByAcDateIsAndPerfMonthIsAndFlowCodeIsOrderByMediaSeqAsc(int acDate_0, int perfMonth_1, String flowCode_2, Pageable pageable);
 
-  // MediaDate = ,AND MediaKind = 
-  public Optional<EmpDeductMedia> findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(int mediaDate_0, String mediaKind_1);
+	// MediaDate = ,AND MediaKind =
+	public Optional<EmpDeductMedia> findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(int mediaDate_0, String mediaKind_1);
 
-  // EntryDate >= , AND EntryDate <= , AND MediaKind =
-  public Slice<EmpDeductMedia> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, String mediaKind_2, Pageable pageable);
+	// EntryDate >= , AND EntryDate <= , AND MediaKind =
+	public Slice<EmpDeductMedia> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, String mediaKind_2,
+			Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<EmpDeductMedia> findByEmpDeductMediaId(EmpDeductMediaId empDeductMediaId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<EmpDeductMedia> findByEmpDeductMediaId(EmpDeductMediaId empDeductMediaId);
 
 }
-

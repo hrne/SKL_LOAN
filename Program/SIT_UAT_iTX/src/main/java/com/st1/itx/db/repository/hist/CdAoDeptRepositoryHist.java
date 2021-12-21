@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,13 +20,12 @@ import com.st1.itx.db.domain.CdAoDept;
  */
 public interface CdAoDeptRepositoryHist extends JpaRepository<CdAoDept, String> {
 
-  // EmployeeNo >= ,AND EmployeeNo <= 
-  public Slice<CdAoDept> findAllByEmployeeNoGreaterThanEqualAndEmployeeNoLessThanEqualOrderByEmployeeNoAsc(String employeeNo_0, String employeeNo_1, Pageable pageable);
+	// EmployeeNo >= ,AND EmployeeNo <=
+	public Slice<CdAoDept> findAllByEmployeeNoGreaterThanEqualAndEmployeeNoLessThanEqualOrderByEmployeeNoAsc(String employeeNo_0, String employeeNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdAoDept> findByEmployeeNo(String employeeNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdAoDept> findByEmployeeNo(String employeeNo);
 
 }
-

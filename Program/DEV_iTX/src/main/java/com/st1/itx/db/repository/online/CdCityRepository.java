@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.CdCity;
  */
 public interface CdCityRepository extends JpaRepository<CdCity, String> {
 
-  // UnitCode >= ,AND UnitCode <=
-  public Slice<CdCity> findAllByUnitCodeGreaterThanEqualAndUnitCodeLessThanEqualOrderByCityCodeAsc(String unitCode_0, String unitCode_1, Pageable pageable);
+	// UnitCode >= ,AND UnitCode <=
+	public Slice<CdCity> findAllByUnitCodeGreaterThanEqualAndUnitCodeLessThanEqualOrderByCityCodeAsc(String unitCode_0, String unitCode_1, Pageable pageable);
 
-  // CityCode >= ,AND CityCode <=
-  public Slice<CdCity> findAllByCityCodeGreaterThanEqualAndCityCodeLessThanEqualOrderByCityCodeAsc(String cityCode_0, String cityCode_1, Pageable pageable);
+	// CityCode >= ,AND CityCode <=
+	public Slice<CdCity> findAllByCityCodeGreaterThanEqualAndCityCodeLessThanEqualOrderByCityCodeAsc(String cityCode_0, String cityCode_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdCity> findByCityCode(String cityCode);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdCity> findByCityCode(String cityCode);
 
 }
-

@@ -38,7 +38,7 @@ public class LC110 extends TradeBuffer {
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "解除戶號鎖定");
 		}
-		
+
 		LockControl.setTitaVo(titaVo);
 
 		long iLockNo = Long.valueOf(titaVo.get("iLockNo").toString());

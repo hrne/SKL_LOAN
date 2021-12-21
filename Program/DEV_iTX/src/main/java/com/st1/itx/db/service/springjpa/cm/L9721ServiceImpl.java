@@ -32,7 +32,7 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		logger.info("l9721.findAll ");
-		
+
 		String sql = "SELECT m.\"CustNo\" AS \"戶號\"";
 		sql += "            ,m.\"FacmNo\" AS \"額度\"";
 		sql += "            ,m.\"BormNo\" AS \"撥款\"";
@@ -91,9 +91,9 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      WHERE m.row_number = 1";
 
 		logger.info("sql=" + sql);
-		
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
+
 		Query query;
 		query = em.createNativeQuery(sql);
 

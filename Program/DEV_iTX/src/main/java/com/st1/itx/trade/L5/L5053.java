@@ -94,7 +94,7 @@ public class L5053 extends TradeBuffer {
 					int oBonusDate = Integer.valueOf(MapL5053.get("BonusDate").toString()) - 19110000;
 					occursList.putParam("OBonusDate", oBonusDate);// 獎金發放日期
 				}
-								
+
 				occursList.putParam("OBonusNo", MapL5053.get("F16"));// 序號
 				occursList.putParam("OBonusType", MapL5053.get("F15"));// 獎金類別
 				int oPerfDate = Integer.valueOf(MapL5053.get("F1"));
@@ -132,7 +132,7 @@ public class L5053 extends TradeBuffer {
 					occursList.putParam("OMediaFg", 1);//
 					occursList.putParam("OMediaDate", parse.stringToStringDate(MapL5053.get("MediaDate")));
 				}
-				
+
 //				int mediaDate = Integer.valueOf(MapL5053.get("F13"));
 //				if (mediaDate > 0) {
 //					mediaDate -= 19110000;
@@ -144,12 +144,12 @@ public class L5053 extends TradeBuffer {
 				} else {
 					occursList.putParam("OLogFg", 1);//
 				}
-				
+
 				this.info("LastUpdate = " + MapL5053.get("LastUpdate") + "=" + parse.stringToStringDate(MapL5053.get("LastUpdate")));
 				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5053.get("LastUpdate")));
-				
+
 				occursList.putParam("OLastEmp", MapL5053.get("LastUpdateEmpNo") + " " + MapL5053.get("LastUpdateEmpName"));
-				
+
 				this.totaVo.addOccursList(occursList);
 			}
 		}

@@ -37,7 +37,7 @@ public class LM021ServiceImpl extends ASpringJpaParm implements InitializingBean
 		logger.info("lM021.findAll ");
 
 		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000));
-		
+
 		String sql = "";
 		sql += "	SELECT LPAD(TO_CHAR(A.\"CustNo\"),7,'0') || LPAD(TO_CHAR(A.\"FacmNo\"),3,'0') || LPAD(TO_CHAR(A.\"BormNo\"),3,'0') AS \"CustFacmBorm\"";
 		sql += "		  ,A.\"LoanBal\" AS \"LoanBal\"";
@@ -112,7 +112,6 @@ public class LM021ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	ORDER BY A.\"CustNo\"";
 
 		logger.info("sql=" + sql);
-		
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -121,37 +120,35 @@ public class LM021ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-
-
-	//ver1.0
+	// ver1.0
 	// String sql2 = "SELECT \"F1\""
-	// sql += "              , \"F2\"";
-	// sql += "              , \"F3\"";
-	// sql += "              , SUM(F4) AS F4";
-	// sql += "              , SUM(F5) AS F5";
-	// sql += "              , MAX(F6) AS F6";
-	// sql += "              , SUM(F7) AS F7";
-	// sql += "              , MAX(F8) AS F8";
-	// sql += "        FROM ( SELECT LPAD(TO_CHAR(A.\"CustNo\"), 7, '0') AS F1";
-	// sql += "                    , LPAD(TO_CHAR(A.\"FacmNo\"), 3, '0') AS F2";
-	// sql += "                    , LPAD(TO_CHAR(A.\"BormNo\"), 3, '0') AS F3";
-	// sql += "                    , A.\"Interest\" AS F4";
-	// sql += "                    , A.\"LoanBal\" AS F5";
-	// sql += "                    , A.\"PayIntDate\" AS F6";
-	// sql += "                    , 0 AS F7";
-	// sql += "                    , 0 AS F8";
-	// sql += "               FROM \"AcLoanInt\" A WHERE A.\"YearMonth\" = :entdy";
-	// sql += "               UNION ALL";
-	// sql += "               SELECT LPAD(TO_CHAR(A.\"CustNo\"), 7, '0') AS F1";
-	// sql += "                    , LPAD(TO_CHAR(A.\"FacmNo\"), 3, '0') AS F2";
-	// sql += "                    , LPAD(SUBSTR(A.\"RvNo\",0,3), 3, '0') AS F3";
-	// sql += "                    , 0 AS F4";
-	// sql += "                    , 0 AS F5";
-	// sql += "                    , 0 AS F6";
-	// sql += "                    , A.\"RvBal\" AS F7";
-	// sql += "                    , A.\"OpenAcDate\" AS F8";
-	// sql += "               FROM \"AcReceivable\" A WHERE A.\"AcctCode\" IN ('F07', 'F09')";
-	// sql += "                                         AND  A.\"ClsFlag\" = 0)";
-	// sql += "        GROUP BY \"F1\", \"F2\", \"F3\"";
-	// sql += "        ORDER BY \"F1\", \"F2\", \"F3\"";
+	// sql += " , \"F2\"";
+	// sql += " , \"F3\"";
+	// sql += " , SUM(F4) AS F4";
+	// sql += " , SUM(F5) AS F5";
+	// sql += " , MAX(F6) AS F6";
+	// sql += " , SUM(F7) AS F7";
+	// sql += " , MAX(F8) AS F8";
+	// sql += " FROM ( SELECT LPAD(TO_CHAR(A.\"CustNo\"), 7, '0') AS F1";
+	// sql += " , LPAD(TO_CHAR(A.\"FacmNo\"), 3, '0') AS F2";
+	// sql += " , LPAD(TO_CHAR(A.\"BormNo\"), 3, '0') AS F3";
+	// sql += " , A.\"Interest\" AS F4";
+	// sql += " , A.\"LoanBal\" AS F5";
+	// sql += " , A.\"PayIntDate\" AS F6";
+	// sql += " , 0 AS F7";
+	// sql += " , 0 AS F8";
+	// sql += " FROM \"AcLoanInt\" A WHERE A.\"YearMonth\" = :entdy";
+	// sql += " UNION ALL";
+	// sql += " SELECT LPAD(TO_CHAR(A.\"CustNo\"), 7, '0') AS F1";
+	// sql += " , LPAD(TO_CHAR(A.\"FacmNo\"), 3, '0') AS F2";
+	// sql += " , LPAD(SUBSTR(A.\"RvNo\",0,3), 3, '0') AS F3";
+	// sql += " , 0 AS F4";
+	// sql += " , 0 AS F5";
+	// sql += " , 0 AS F6";
+	// sql += " , A.\"RvBal\" AS F7";
+	// sql += " , A.\"OpenAcDate\" AS F8";
+	// sql += " FROM \"AcReceivable\" A WHERE A.\"AcctCode\" IN ('F07', 'F09')";
+	// sql += " AND A.\"ClsFlag\" = 0)";
+	// sql += " GROUP BY \"F1\", \"F2\", \"F3\"";
+	// sql += " ORDER BY \"F1\", \"F2\", \"F3\"";
 }

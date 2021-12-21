@@ -29,7 +29,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2911")
 @Scope("prototype")
 /**
@@ -120,7 +119,6 @@ public class L2911 extends TradeBuffer {
 
 		slClLand = sClLandService.findClNo(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
 		List<ClLand> lClLand = slClLand == null ? null : new ArrayList<ClLand>(slClLand.getContent());
-
 
 //		// 查詢保險公司資料檔
 //		Slice<CdInsurer> slCdInsurer;

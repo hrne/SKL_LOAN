@@ -25,7 +25,6 @@ public class L8R57 extends TradeBuffer {
 	@Autowired
 	public CustMainService iCustMainService;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r14 ");
@@ -35,9 +34,9 @@ public class L8R57 extends TradeBuffer {
 		iCustMain = iCustMainService.custIdFirst(iCustId, titaVo);
 		if (iCustMain == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8R57CustName", iCustMain.getCustName());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

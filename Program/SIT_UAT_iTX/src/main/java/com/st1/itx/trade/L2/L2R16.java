@@ -30,7 +30,7 @@ public class L2R16 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
-	
+
 	@Autowired
 	public FacRelationService sFacRelationService;
 
@@ -49,27 +49,27 @@ public class L2R16 extends TradeBuffer {
 		String iCustId = titaVo.getParam("RimCustId");
 
 		CustMain lCustMain = new CustMain();
-		lCustMain  = sCustMainService.custIdFirst(iCustId, titaVo);
+		lCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 
-		if( lCustMain == null ) {
+		if (lCustMain == null) {
 			throw new LogicException("E0001", "客戶資料主檔");
-		} 
-			
+		}
+
 		String Ukey = lCustMain.getCustUKey();
-		
+
 		// new table PK
 		FacRelationId tfacRelationId = new FacRelationId();
-		
-		tfacRelationId.setCreditSysNo(iCaseNo);		
+
+		tfacRelationId.setCreditSysNo(iCaseNo);
 		tfacRelationId.setCustUKey(Ukey);
-		
+
 		FacRelation tFacRelation = new FacRelation();
 		tFacRelation = sFacRelationService.holdById(tfacRelationId);
-		
-		if( tFacRelation == null ) {
+
+		if (tFacRelation == null) {
 			throw new LogicException("E0001", "交易關係人檔");
-		} 
-		
+		}
+
 		this.totaVo.putParam("L2r16CustName", lCustMain.getCustName());
 		this.totaVo.putParam("L2r16DataStatus", lCustMain.getDataStatus());
 		this.totaVo.putParam("L2r16FacRelationCode", tFacRelation.getFacRelationCode());

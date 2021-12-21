@@ -63,8 +63,7 @@ public class LH001Report extends MakeReport {
 		exportExcel(listQueryA, listQueryB, listQueryC, titaVo);
 	}
 
-	private void exportExcel(List<Map<String, String>> listA, List<Map<String, String>> listB,
-			List<Map<String, String>> listC, TitaVo titaVo) throws LogicException {
+	private void exportExcel(List<Map<String, String>> listA, List<Map<String, String>> listB, List<Map<String, String>> listC, TitaVo titaVo) throws LogicException {
 
 		this.info("exportExcel");
 
@@ -78,8 +77,7 @@ public class LH001Report extends MakeReport {
 			listC = new ArrayList<>();
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LH001", "表A07_會計部申報表", "LH001表A07_會計部申報表",
-				"LH001_底稿_表A07_會計部申報表.xlsx", "新表7(108.03.31)");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LH001", "表A07_會計部申報表", "LH001表A07_會計部申報表", "LH001_底稿_表A07_會計部申報表.xlsx", "新表7(108.03.31)");
 
 		int bcAcDate = titaVo.getEntDyI() + 19110000;
 
@@ -126,8 +124,7 @@ public class LH001Report extends MakeReport {
 		makeExcel.toExcel(sno);
 	}
 
-	private void setValueToExcel(int rowCursor, List<Map<String, String>> list, boolean mergeFlag)
-			throws LogicException {
+	private void setValueToExcel(int rowCursor, List<Map<String, String>> list, boolean mergeFlag) throws LogicException {
 
 		Map<String, int[]> mergeRowRange = new HashMap<>();
 

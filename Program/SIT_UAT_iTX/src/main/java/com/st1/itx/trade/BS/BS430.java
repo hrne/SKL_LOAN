@@ -131,7 +131,6 @@ public class BS430 extends TradeBuffer {
 		wkLastMonthDateS = this.getTxBuffer().getTxCom().getLmndy() / 100;
 		wkLastMonthDateS = wkLastMonthDateS * 100 + 01;
 
-
 //		正常
 		if (titaVo.isHcodeNormal()) {
 			try {
@@ -156,15 +155,12 @@ public class BS430 extends TradeBuffer {
 			setSendMsg(titaVo);
 
 			if (this.processCnt > 0) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4031",
-						titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4031", titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320",
-						titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
 			}
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
 		// end
 		this.addList(this.totaVo);
@@ -192,7 +188,7 @@ public class BS430 extends TradeBuffer {
 		default:
 			break;
 		}
-		
+
 		if (titaVo.isHcodeNormal()) {
 			sendMsg += "已產生";
 		} else {
@@ -437,7 +433,7 @@ public class BS430 extends TradeBuffer {
 			} else {
 				adjCode = 2;
 				// 本次利率 = 目前利率 + 地區別加減碼
-				rateCurt =  fitRate.add(cityIntRateIncr);
+				rateCurt = fitRate.add(cityIntRateIncr);
 				// 依地區別利率上、下限調整
 				if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
 					rateCurt = cityIntRateCeiling;
@@ -451,7 +447,7 @@ public class BS430 extends TradeBuffer {
 				adjCode = 3;
 				checkMsg = "逾一期以上";
 			}
-			
+
 			break;
 
 //2.機動指數利率調整
@@ -584,8 +580,7 @@ public class BS430 extends TradeBuffer {
 		}
 		this.info("processDelete...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(wkAdjDate + 19110000,
-				wkAdjDate + 19110000, custType1, custType2, iTxKind, 0, this.index, this.limit, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(wkAdjDate + 19110000, wkAdjDate + 19110000, custType1, custType2, iTxKind, 0, this.index, this.limit, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
@@ -608,16 +603,16 @@ public class BS430 extends TradeBuffer {
 		}
 		this.info("deleteBatxRate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, iTxKind,
-				iTxKind, 0, 9, wkAdjDate + 19110000, wkAdjDate + 19110000, this.index, this.limit, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, iTxKind, iTxKind, 0, 9, wkAdjDate + 19110000, wkAdjDate + 19110000, this.index, this.limit,
+				titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
-			for(BatxRateChange tBatxRateChange : lBatxRateChange) {
-				
+			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
+
 				batxRateChangeService.holdById(tBatxRateChange, titaVo);
-				
-				if(tBatxRateChange.getConfirmFlag() == 1) {
+
+				if (tBatxRateChange.getConfirmFlag() == 1) {
 					throw new LogicException("E0008", ", 該筆已確認，請先訂正L4321 ");
 				} else {
 					try {
@@ -709,8 +704,7 @@ public class BS430 extends TradeBuffer {
 				tmpBorm cust = new tmpBorm(custNo, 0, 0);
 
 				if (loanBalTot.containsKey(cust)) {
-					loanBalTot.put(cust,
-							loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))));
+					loanBalTot.put(cust, loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))));
 				} else {
 					loanBalTot.put(cust, parse.stringToBigDecimal(fnAllList.get(i).get("F6")));
 				}

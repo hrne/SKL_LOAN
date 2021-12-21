@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -32,7 +34,7 @@ public class TxAuthorize implements Serializable {
 	 */
 	private static final long serialVersionUID = 2490450675779197258L;
 
-	// 序號
+// 序號
 	@Id
 	@Column(name = "`AutoSeq`")
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`TxAuthorize_SEQ`")
@@ -55,7 +57,7 @@ public class TxAuthorize implements Serializable {
 	@Column(name = "`Reason`", length = 100)
 	private String reason;
 
-	// 交易日
+	// 會計日
 	@Column(name = "`Entdy`")
 	private int entdy = 0;
 
@@ -182,7 +184,7 @@ public class TxAuthorize implements Serializable {
 	}
 
 	/**
-	 * 交易日<br>
+	 * 會計日<br>
 	 * 
 	 * @return Integer
 	 */
@@ -191,10 +193,10 @@ public class TxAuthorize implements Serializable {
 	}
 
 	/**
-	 * 交易日<br>
+	 * 會計日<br>
 	 * 
 	 *
-	 * @param entdy 交易日
+	 * @param entdy 會計日
 	 * @throws LogicException when Date Is Warn
 	 */
 	public void setEntdy(int entdy) throws LogicException {

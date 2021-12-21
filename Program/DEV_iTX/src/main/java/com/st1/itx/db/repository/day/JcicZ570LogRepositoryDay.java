@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.JcicZ570LogId;
  */
 public interface JcicZ570LogRepositoryDay extends JpaRepository<JcicZ570Log, JcicZ570LogId> {
 
-  // Ukey=
-  public Optional<JcicZ570Log> findTopByUkeyIsOrderByCreateDateDesc(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ570Log> findTopByUkeyIsOrderByCreateDateDesc(String ukey_0);
 
-  // Ukey=
-  public Slice<JcicZ570Log> findAllByUkeyIsOrderByCreateDateDesc(String ukey_0, Pageable pageable);
+	// Ukey=
+	public Slice<JcicZ570Log> findAllByUkeyIsOrderByCreateDateDesc(String ukey_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ570Log> findByJcicZ570LogId(JcicZ570LogId jcicZ570LogId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ570Log> findByJcicZ570LogId(JcicZ570LogId jcicZ570LogId);
 
 }
-

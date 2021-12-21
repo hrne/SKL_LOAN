@@ -106,8 +106,7 @@ public class BS998 extends TradeBuffer {
 				continue;
 			}
 			// 鎖定額度檔
-			tLoanBorMain = loanBorMainService
-					.findById(new LoanBorMainId(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo()), titaVo);
+			tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo()), titaVo);
 			tFacMain = facMainService.holdById(new FacMainId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo()));
 			if (tFacMain == null || tFacMain.getFirstDrawdownDate() == 0) {
 				continue;
@@ -117,12 +116,10 @@ public class BS998 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "商品參數檔"); // 查詢資料不存在
 			}
 			wkBormNo = tLoanBorMain.getBormNo();
-			sProdStepNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
-					+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
+			sProdStepNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7) + FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
 
 			// 維護放款利率變動檔, 階梯式利率
-			Slice<FacProdStepRate> slFacProdStepRate = facProdStepRateService.stepRateProdNoEq(sProdStepNo, 0, 999, 0,
-					Integer.MAX_VALUE);
+			Slice<FacProdStepRate> slFacProdStepRate = facProdStepRateService.stepRateProdNoEq(sProdStepNo, 0, 999, 0, Integer.MAX_VALUE);
 			lFacProdStepRate = slFacProdStepRate == null ? null : slFacProdStepRate.getContent();
 			if (lFacProdStepRate != null && lFacProdStepRate.size() > 0) {
 				// 維護放款利率變動檔, 階梯式利率
@@ -192,8 +189,7 @@ public class BS998 extends TradeBuffer {
 		this.info("SetLoanRateChange2 ...");
 
 		// 查詢指標利率檔
-		CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(tLoanBorMain.getCurrencyCode(),
-				tFacMain.getBaseRateCode(), 10101, wkEffectDate + 19110000);
+		CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(tLoanBorMain.getCurrencyCode(), tFacMain.getBaseRateCode(), 10101, wkEffectDate + 19110000);
 		if (tCdBaseRate == null) {
 			throw new LogicException(titaVo, "E0001", "指標利率檔"); // 查詢資料不存在
 		}

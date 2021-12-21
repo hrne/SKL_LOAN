@@ -123,8 +123,7 @@ public class L3R08 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "L3R08 放款主檔"); // 查詢資料不存在
@@ -139,16 +138,14 @@ public class L3R08 extends TradeBuffer {
 				}
 			}
 			if (ln.getActFg() == 1 && iFKey == 0) {
-				throw new LogicException(titaVo, "E0021", "L3R08 放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  "
-						+ ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
+				throw new LogicException(titaVo, "E0021", "L3R08 放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
 			}
 			if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 				throw new LogicException(titaVo, "E3062", "L3R08 應繳息日 = " + ln.getNextPayIntDate()); // 有1期(含)以上期款未繳,不可變更繳款日
 			}
 			// 應收息迄日iNewSpecificDate>上次繳息日且小於下次繳息日
 			if (iNewSpecificDate < wkLoanPrevIntDate || iNewSpecificDate >= ln.getNextPayIntDate()) {
-				throw new LogicException(titaVo, "E3075", ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
-						+ " 上次繳息迄日 = " + ln.getPrevPayIntDate() + " 下次應繳息日 = " + ln.getNextPayIntDate()); // 變更應繳日需落在上次繳息迄日與下次應繳息日之內
+				throw new LogicException(titaVo, "E3075", ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo() + " 上次繳息迄日 = " + ln.getPrevPayIntDate() + " 下次應繳息日 = " + ln.getNextPayIntDate()); // 變更應繳日需落在上次繳息迄日與下次應繳息日之內
 			}
 			// 計息
 			loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iNewSpecificDate, 1, wkTbsDy, titaVo);

@@ -31,7 +31,7 @@ public class L2R24 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClMovablesService sClMovablesService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -107,7 +107,7 @@ public class L2R24 extends TradeBuffer {
 			this.totaVo.putParam("L2r24OwnerId", "");
 			this.totaVo.putParam("L2r24OwnerName", "");
 		}
-		
+
 		this.totaVo.putParam("L2r24ServiceLife", tClMovables.getServiceLife());
 		this.totaVo.putParam("L2r24ProductSpec", tClMovables.getProductSpec());
 		this.totaVo.putParam("L2r24ProductType", tClMovables.getProductType());

@@ -24,8 +24,8 @@ import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita<br>
-* MediaDate=9,7<br>
-*/
+ * MediaDate=9,7<br>
+ */
 
 @Service("L4951")
 @Scope("prototype")
@@ -55,14 +55,14 @@ public class L4951 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4951 ");
 		this.totaVo.init(titaVo);
-		
+
 //		1.查詢 媒體日期
 
 		int mediaDate = parse.stringToInteger(titaVo.getParam("MediaDate")) + 19110000;
 		int mediaType = parse.stringToInteger(titaVo.getParam("MediaType"));
 
 		List<EmpDeductMedia> lEmpDeductMedia = new ArrayList<EmpDeductMedia>();
-		
+
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
@@ -72,22 +72,21 @@ public class L4951 extends TradeBuffer {
 
 		if (mediaType == 1) {
 			sEmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "4", this.index, this.limit);
-			
+
 		} else if (mediaType == 2) {
-			sEmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "5", this.index, this.limit);			
+			sEmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "5", this.index, this.limit);
 		}
-		
+
 		lEmpDeductMedia = sEmpDeductMedia == null ? null : sEmpDeductMedia.getContent();
 
 		if (lEmpDeductMedia != null && lEmpDeductMedia.size() != 0) {
 			for (EmpDeductMedia tEmpDeductMedia : lEmpDeductMedia) {
 				OccursList occursList = new OccursList();
-				
+
 				CustMain tCustMain = new CustMain();
 
-				tCustMain = custMainService.custNoFirst(tEmpDeductMedia.getCustNo(),
-						tEmpDeductMedia.getCustNo());
-				
+				tCustMain = custMainService.custNoFirst(tEmpDeductMedia.getCustNo(), tEmpDeductMedia.getCustNo());
+
 				occursList.putParam("OOCustNo", tEmpDeductMedia.getCustNo());
 				occursList.putParam("OORepayCode", tEmpDeductMedia.getRepayCode());
 				occursList.putParam("OOPerfMonth", tEmpDeductMedia.getPerfMonth() - 191100);
@@ -99,13 +98,13 @@ public class L4951 extends TradeBuffer {
 				occursList.putParam("OOMediaDate", tEmpDeductMedia.getEmpDeductMediaId().getMediaDate());
 				occursList.putParam("OOMediaKind", tEmpDeductMedia.getEmpDeductMediaId().getMediaKind());
 				occursList.putParam("OOMediaSeq", tEmpDeductMedia.getEmpDeductMediaId().getMediaSeq());
-				
+
 				this.totaVo.addOccursList(occursList);
-			}			
+			}
 		} else {
 			throw new LogicException("E0001", "L4951 查無資料");
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

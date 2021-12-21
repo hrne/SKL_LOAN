@@ -40,7 +40,7 @@ public class L5R38 extends TradeBuffer {
 		int startDate = 0;
 		int endDate = 0;
 		int bonusDate = Integer.valueOf(titaVo.getCalDy());
-		
+
 		if ("1".equals(iCode)) {
 			// 依日期回上個月工作年月及業績起訖日
 			int iDate = Integer.valueOf(titaVo.get("L5R38iDate").trim());

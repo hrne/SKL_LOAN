@@ -19,16 +19,16 @@ import com.st1.itx.util.common.ReportCom;
  * @author Xiang Wei Huang
  * @version 1.0.0
  */
-public class L9802 extends TradeBuffer {	
-	
+public class L9802 extends TradeBuffer {
+
 	@Autowired
 	ReportCom reportCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		
+
 		this.totaVo.init(titaVo);
-		
+
 		reportCom.executeReports(titaVo, "L9802");
 
 		this.addList(this.totaVo);

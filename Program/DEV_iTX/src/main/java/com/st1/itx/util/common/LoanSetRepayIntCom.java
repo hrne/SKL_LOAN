@@ -60,8 +60,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 	 * @return loanCalcRepayIntCom
 	 * @throws LogicException LogicException
 	 */
-	public LoanCalcRepayIntCom setRepayInt(LoanBorMain t, int iRepayTerms, int iIntEndDate, int iIntEndCode,
-			int iEntryDate, TitaVo titaVo) throws LogicException {
+	public LoanCalcRepayIntCom setRepayInt(LoanBorMain t, int iRepayTerms, int iIntEndDate, int iIntEndCode, int iEntryDate, TitaVo titaVo) throws LogicException {
 		this.info("active setRepayInt ");
 		this.info("   RepayTerms = " + iRepayTerms);
 		this.info("   IntEndDate = " + iIntEndDate);
@@ -112,8 +111,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setIntStartDate(prevPayIntDate); // 計算起日
 		loanCalcRepayIntCom.setIntEndCode(iIntEndCode); // 計算止日代碼 0.無計算止日 1.至計算止日
 		// 計算止日小於上次繳息日，則以上次繳息日為計算止日
-		loanCalcRepayIntCom
-				.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
+		loanCalcRepayIntCom.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
 
 		loanCalcRepayIntCom.setFirstDrawdownDate(tFacMain.getFirstDrawdownDate()); // 初貸日
 		loanCalcRepayIntCom.setDrawdownDate(t.getDrawdownDate()); // 貸放起日
@@ -149,7 +147,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setEntryDate(iEntryDate); // 入帳日期
 		loanCalcRepayIntCom.setUsageCode(t.getUsageCode()); // 資金用途別 1: 週轉金2: 購置不動產3: 營業用資產4: 固定資產5: 企業投資6: 購置動產9: 其他
 		loanCalcRepayIntCom.setCaseCloseFlag("N"); // 結案記號 Y:是 N:否
-		loanCalcRepayIntCom.setBreachReliefFlag(t.getNextPayIntDate() > t.getMaturityDate() ? "Y" :"N"); // 減免違約金 Y:是 N:否
+		loanCalcRepayIntCom.setBreachReliefFlag(t.getNextPayIntDate() > t.getMaturityDate() ? "Y" : "N"); // 減免違約金 Y:是 N:否
 		// 聯貸案件 Y:是 N:否
 		if (t.getSyndNo() > 0) { // 聯貸案序號
 			loanCalcRepayIntCom.setSyndFlag("Y");
@@ -160,8 +158,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 
 		// 重新計算寬限期數
 //		loanCalcRepayIntCom.setGracePeriod(t.getGracePeriod()); // 寬限期
-		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(t.getAmortizedCode(), t.getFreqBase(),
-				t.getPayIntFreq(), t.getSpecificDate(), t.getSpecificDd(), t.getGraceDate()));
+		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(t.getAmortizedCode(), t.getFreqBase(), t.getPayIntFreq(), t.getSpecificDate(), t.getSpecificDd(), t.getGraceDate()));
 		loanCalcRepayIntCom.setTotalPeriod(t.getTotalPeriod()); // 總期數
 
 		this.info("   setRepayInt iRepayTerms = " + loanCalcRepayIntCom.getRepayTerms());

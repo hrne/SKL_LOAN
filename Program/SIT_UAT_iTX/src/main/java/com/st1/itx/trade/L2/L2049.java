@@ -228,9 +228,8 @@ public class L2049 extends TradeBuffer {
 		}
 
 		// tita Range查找
-		Slice<ClFac> slClFac = sClFacService.selectForL2049(iClCode1StatAt, iClCode1EndAt, iClCode2StatAt,
-				iClCode2EndAt, clNoStartAt, clNoEndAt, custNoStartAt, custNoEndAt, facmNoStartAt, facmNoEndAt,
-				approveNoStartAt, approveNoEndAt, this.index, this.limit, titaVo);
+		Slice<ClFac> slClFac = sClFacService.selectForL2049(iClCode1StatAt, iClCode1EndAt, iClCode2StatAt, iClCode2EndAt, clNoStartAt, clNoEndAt, custNoStartAt, custNoEndAt, facmNoStartAt,
+				facmNoEndAt, approveNoStartAt, approveNoEndAt, this.index, this.limit, titaVo);
 		lClFac = slClFac == null ? null : slClFac.getContent();
 		if (lClFac == null) {
 			throw new LogicException("E2003", "額度與擔保品關聯檔"); // 查無資料
@@ -304,8 +303,7 @@ public class L2049 extends TradeBuffer {
 			}
 
 			// 取擔保品類別代碼
-			tClMain = sClMainService
-					.findById(new ClMainId(tmpClFac.getClCode1(), tmpClFac.getClCode2(), tmpClFac.getClNo()), titaVo);
+			tClMain = sClMainService.findById(new ClMainId(tmpClFac.getClCode1(), tmpClFac.getClCode2(), tmpClFac.getClNo()), titaVo);
 			if (tClMain == null) {
 				tClMain = new ClMain();
 			}
@@ -329,7 +327,7 @@ public class L2049 extends TradeBuffer {
 				tClImmId.setClCode2(tmpClCode2);
 				tClImmId.setClNo(tmpClNo);
 				ClImm tClImm = sClImmService.findById(tClImmId, titaVo);
-				if(tClImm==null) {
+				if (tClImm == null) {
 					tClImm = new ClImm();
 				}
 				settingSeq = tClImm.getSettingSeq();
@@ -346,7 +344,7 @@ public class L2049 extends TradeBuffer {
 				tClStockId.setClCode2(tmpClCode2);
 				tClStockId.setClNo(tmpClNo);
 				ClStock tClStock = sClStockService.findById(tClStockId, titaVo);
-				if(tClStock==null) {
+				if (tClStock == null) {
 					tClStock = new ClStock();
 				}
 				settingStat = tClStock.getSettingStat();
@@ -361,7 +359,7 @@ public class L2049 extends TradeBuffer {
 				tClOtherId.setClCode2(tmpClCode2);
 				tClOtherId.setClNo(tmpClNo);
 				ClOther tClOther = sClOtherService.findById(tClOtherId, titaVo);
-				if(tClOther==null) {
+				if (tClOther == null) {
 					tClOther = new ClOther();
 				}
 				settingStat = tClOther.getSettingStat();
@@ -376,7 +374,7 @@ public class L2049 extends TradeBuffer {
 				tClMovablesId.setClCode2(tmpClCode2);
 				tClMovablesId.setClNo(tmpClNo);
 				ClMovables tClMovables = sClMovablesService.findById(tClMovablesId, titaVo);
-				if(tClMovables==null) {
+				if (tClMovables == null) {
 					tClMovables = new ClMovables();
 				}
 				settingStat = tClMovables.getSettingStat();

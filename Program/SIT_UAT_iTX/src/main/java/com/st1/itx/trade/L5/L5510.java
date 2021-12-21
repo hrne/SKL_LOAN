@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -62,14 +64,12 @@ public class L5510 extends TradeBuffer {
 			if (txControl != null) {
 				throw new LogicException(titaVo, "E0010", "已產生媒體檔");
 			}
-			MySpring.newTask("L5510Batch", this.txBuffer, titaVo);
 		} else if ("2".equals(iFunCode)) {
 			String controlCode = "L5510." + iWorkMonth + ".1";
 			TxControl txControl = txControlService.findById(controlCode, titaVo);
 			if (txControl == null) {
 				throw new LogicException(titaVo, "E0010", "未執行 L5510 保費檢核");
 			}
-			MySpring.newTask("L5510Batch", this.txBuffer, titaVo);
 		} else if ("3".equals(iFunCode)) {
 			String controlCode = "L5510." + iWorkMonth + ".2";
 			TxControl txControl = txControlService.holdById(controlCode, titaVo);
@@ -85,7 +85,10 @@ public class L5510 extends TradeBuffer {
 			}
 		}
 
-		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
+		if (!"3".equals(iFunCode)) {
+			MySpring.newTask("L5510Batch", this.txBuffer, titaVo);
+			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

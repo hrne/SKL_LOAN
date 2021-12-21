@@ -105,7 +105,7 @@ public class L9712Report extends MakeReport {
 
 		long sno = this.close();
 
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 	}
 
 	private void report1(Map<String, String> tL9712Vo) throws LogicException {

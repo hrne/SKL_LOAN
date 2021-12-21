@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,28 +21,27 @@ import com.st1.itx.db.domain.JcicZ573Id;
  */
 public interface JcicZ573RepositoryMon extends JpaRepository<JcicZ573, JcicZ573Id> {
 
-  // CustId=
-  public Slice<JcicZ573> findAllByCustIdIsOrderByCustIdAscApplyDateDescPayDateDesc(String custId_0, Pageable pageable);
+	// CustId=
+	public Slice<JcicZ573> findAllByCustIdIsOrderByCustIdAscApplyDateDescPayDateDesc(String custId_0, Pageable pageable);
 
-  // ApplyDate=
-  public Slice<JcicZ573> findAllByApplyDateIsOrderByCustIdAscApplyDateDescPayDateDesc(int applyDate_0, Pageable pageable);
+	// ApplyDate=
+	public Slice<JcicZ573> findAllByApplyDateIsOrderByCustIdAscApplyDateDescPayDateDesc(int applyDate_0, Pageable pageable);
 
-  // CustId= , AND ApplyDate=
-  public Slice<JcicZ573> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDescPayDateDesc(String custId_0, int applyDate_1, Pageable pageable);
+	// CustId= , AND ApplyDate=
+	public Slice<JcicZ573> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDescPayDateDesc(String custId_0, int applyDate_1, Pageable pageable);
 
-  // Ukey=
-  public Optional<JcicZ573> findTopByUkeyIs(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ573> findTopByUkeyIs(String ukey_0);
 
-  // CustId=, AND ApplyDate = ,AND SubmitKey = ,AND PayDate = 
-  public Slice<JcicZ573> findAllByCustIdIsAndApplyDateIsAndSubmitKeyIsAndPayDateIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, int payDate_3, Pageable pageable);
+	// CustId=, AND ApplyDate = ,AND SubmitKey = ,AND PayDate =
+	public Slice<JcicZ573> findAllByCustIdIsAndApplyDateIsAndSubmitKeyIsAndPayDateIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, int payDate_3, Pageable pageable);
 
-  // CustId=, AND ApplyDate = ,AND SubmitKey = ,AND PayDate = 
-  public Optional<JcicZ573> findTopByCustIdIsAndApplyDateIsAndSubmitKeyIsAndPayDateIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, int payDate_3);
+	// CustId=, AND ApplyDate = ,AND SubmitKey = ,AND PayDate =
+	public Optional<JcicZ573> findTopByCustIdIsAndApplyDateIsAndSubmitKeyIsAndPayDateIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, int payDate_3);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ573> findByJcicZ573Id(JcicZ573Id jcicZ573Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ573> findByJcicZ573Id(JcicZ573Id jcicZ573Id);
 
 }
-

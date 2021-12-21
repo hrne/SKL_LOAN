@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.CdPfSpecParmsId;
  */
 public interface CdPfSpecParmsRepositoryDay extends JpaRepository<CdPfSpecParms, CdPfSpecParmsId> {
 
-  // ConditionCode = 
-  public Slice<CdPfSpecParms> findAllByConditionCodeIsOrderByConditionAsc(String conditionCode_0, Pageable pageable);
+	// ConditionCode =
+	public Slice<CdPfSpecParms> findAllByConditionCodeIsOrderByConditionAsc(String conditionCode_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdPfSpecParms> findByCdPfSpecParmsId(CdPfSpecParmsId cdPfSpecParmsId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdPfSpecParms> findByCdPfSpecParmsId(CdPfSpecParmsId cdPfSpecParmsId);
 
 }
-

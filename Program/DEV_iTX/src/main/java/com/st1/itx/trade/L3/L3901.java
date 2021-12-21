@@ -94,8 +94,7 @@ public class L3901 extends TradeBuffer {
 			for (int i = 1; i <= iLoanTerm; i++) {
 				occursList = new OccursList();
 				iRate = getInterestRate(i, titaVo);
-				wkInterest = iPrincipal.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP)
-						.multiply(new BigDecimal(iPayIntFreq)).setScale(0, RoundingMode.HALF_UP);
+				wkInterest = iPrincipal.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(iPayIntFreq)).setScale(0, RoundingMode.HALF_UP);
 				occursList.putParam("OLoanTerm", i);
 				occursList.putParam("OInterest", wkInterest);
 				if (i == iLoanTerm) {
@@ -113,11 +112,8 @@ public class L3901 extends TradeBuffer {
 			for (int i = 1; i <= 3; i++) {
 				if (parse.stringToInteger(titaVo.getParam("STerm" + i)) != 0) {
 					iRate = parse.stringToBigDecimal(titaVo.getParam("Rate" + i));
-					wkTerm = parse.stringToInteger(titaVo.getParam("ETerm" + i))
-							- parse.stringToInteger(titaVo.getParam("STerm" + i)) + 1;
-					wkInterest = wkInterest
-							.add(iPrincipal.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP)
-									.multiply(new BigDecimal(wkTerm)).setScale(0, RoundingMode.HALF_UP));
+					wkTerm = parse.stringToInteger(titaVo.getParam("ETerm" + i)) - parse.stringToInteger(titaVo.getParam("STerm" + i)) + 1;
+					wkInterest = wkInterest.add(iPrincipal.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(wkTerm)).setScale(0, RoundingMode.HALF_UP));
 				}
 			}
 			occursList = new OccursList();
@@ -133,13 +129,11 @@ public class L3901 extends TradeBuffer {
 				iRate = getInterestRate(i, titaVo);
 				// 寬限期內=>總期數與寬限期數； 超過寬限期=>剩餘期數、寬限期數=0
 				if (iRate.compareTo(wkRate) != 0) {
-					wkRepay = loanDueAmtCom.getDueAmt(wkBalance, iRate, "3", iFreqBase,
-							i <= iGracePeriod ? iLoanTerm : iLoanTerm - i + 1, i <= iGracePeriod ? iGracePeriod : 0,
-							iPayIntFreq, iFinalBal, titaVo);
+					wkRepay = loanDueAmtCom.getDueAmt(wkBalance, iRate, "3", iFreqBase, i <= iGracePeriod ? iLoanTerm : iLoanTerm - i + 1, i <= iGracePeriod ? iGracePeriod : 0, iPayIntFreq, iFinalBal,
+							titaVo);
 					wkRate = iRate;
 				}
-				wkInterest = wkBalance.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP)
-						.multiply(new BigDecimal(iPayIntFreq)).setScale(0, RoundingMode.HALF_UP);
+				wkInterest = wkBalance.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(iPayIntFreq)).setScale(0, RoundingMode.HALF_UP);
 				occursList.putParam("OLoanTerm", i);
 				occursList.putParam("OInterest", wkInterest);
 				if (i == iLoanTerm) {
@@ -160,13 +154,11 @@ public class L3901 extends TradeBuffer {
 			}
 			break;
 		case 4: // 本金平均法
-			wkPrincipal = loanDueAmtCom.getDueAmt(iPrincipal, BigDecimal.ZERO, "4", iFreqBase, iLoanTerm, iGracePeriod,
-					iPayIntFreq, iFinalBal, titaVo);
+			wkPrincipal = loanDueAmtCom.getDueAmt(iPrincipal, BigDecimal.ZERO, "4", iFreqBase, iLoanTerm, iGracePeriod, iPayIntFreq, iFinalBal, titaVo);
 			for (int i = 1; i <= iLoanTerm; i++) {
 				occursList = new OccursList();
 				iRate = getInterestRate(i, titaVo);
-				wkInterest = wkBalance.multiply(iRate).divide(wkFreqBaseConstant, 15, RoundingMode.HALF_UP)
-						.multiply(new BigDecimal(iPayIntFreq)).setScale(0, RoundingMode.HALF_UP);
+				wkInterest = wkBalance.multiply(iRate).divide(wkFreqBaseConstant, 15, RoundingMode.HALF_UP).multiply(new BigDecimal(iPayIntFreq)).setScale(0, RoundingMode.HALF_UP);
 				occursList.putParam("OLoanTerm", i);
 				occursList.putParam("OInterest", wkInterest);
 				if (i == iLoanTerm) {
@@ -195,8 +187,7 @@ public class L3901 extends TradeBuffer {
 	private BigDecimal getInterestRate(int termNo, TitaVo titaVo) throws LogicException {
 		BigDecimal wkRate = BigDecimal.ZERO;
 		for (int i = 1; i <= 3; i++) {
-			if (termNo >= parse.stringToInteger(titaVo.getParam("STerm" + i))
-					&& termNo <= parse.stringToInteger(titaVo.getParam("ETerm" + i))) {
+			if (termNo >= parse.stringToInteger(titaVo.getParam("STerm" + i)) && termNo <= parse.stringToInteger(titaVo.getParam("ETerm" + i))) {
 				wkRate = parse.stringToBigDecimal(titaVo.getParam("Rate" + i));
 			}
 		}

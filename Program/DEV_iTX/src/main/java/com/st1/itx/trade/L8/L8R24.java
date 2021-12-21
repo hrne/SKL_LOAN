@@ -48,12 +48,12 @@ public class L8R24 extends TradeBuffer {
 			totaVo.putParam("L8r24BankCode1", iJcicZ052.getBankCode1());
 			if (iJcicZ052.getBankCode1().trim().isEmpty()) {
 				totaVo.putParam("L8r24BankCodeX1", "");
-			}else {
+			} else {
 				jcicBankCode = iJcicZ052.getBankCode1();
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode == null) {
 					totaVo.putParam("L8r24BankCodeX1", "");
-				}else {
+				} else {
 					totaVo.putParam("L8r24BankCodeX1", tCdCode.getItem());
 				}
 			}
@@ -61,12 +61,12 @@ public class L8R24 extends TradeBuffer {
 			totaVo.putParam("L8r24BankCode2", iJcicZ052.getBankCode2());
 			if (iJcicZ052.getBankCode2().trim().isEmpty()) {
 				totaVo.putParam("L8r24BankCodeX2", "");
-			}else {
+			} else {
 				jcicBankCode = iJcicZ052.getBankCode2();
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode == null) {
 					totaVo.putParam("L8r24BankCodeX2", "");
-				}else {
+				} else {
 					totaVo.putParam("L8r24BankCodeX2", tCdCode.getItem());
 				}
 			}
@@ -74,12 +74,12 @@ public class L8R24 extends TradeBuffer {
 			totaVo.putParam("L8r24BankCode3", iJcicZ052.getBankCode3());
 			if (iJcicZ052.getBankCode3().trim().isEmpty()) {
 				totaVo.putParam("L8r24BankCodeX3", "");
-			}else {
+			} else {
 				jcicBankCode = iJcicZ052.getBankCode3();
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode == null) {
 					totaVo.putParam("L8r24BankCodeX3", "");
-				}else {
+				} else {
 					totaVo.putParam("L8r24BankCodeX3", tCdCode.getItem());
 				}
 			}
@@ -87,12 +87,12 @@ public class L8R24 extends TradeBuffer {
 			totaVo.putParam("L8r24BankCode4", iJcicZ052.getBankCode4());
 			if (iJcicZ052.getBankCode4().trim().isEmpty()) {
 				totaVo.putParam("L8r24BankCodeX4", "");
-			}else {
+			} else {
 				jcicBankCode = iJcicZ052.getBankCode4();
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode == null) {
 					totaVo.putParam("L8r24BankCodeX4", "");
-				}else {
+				} else {
 					totaVo.putParam("L8r24BankCodeX4", tCdCode.getItem());
 				}
 			}
@@ -100,17 +100,17 @@ public class L8R24 extends TradeBuffer {
 			totaVo.putParam("L8r24BankCode5", iJcicZ052.getBankCode5());
 			if (iJcicZ052.getBankCode5().trim().isEmpty()) {
 				totaVo.putParam("L8r24BankCodeX5", "");
-			}else {
+			} else {
 				jcicBankCode = iJcicZ052.getBankCode5();
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode == null) {
 					totaVo.putParam("L8r24BankCodeX5", "");
-				}else {
+				} else {
 					totaVo.putParam("L8r24BankCodeX5", tCdCode.getItem());
 				}
 			}
 			totaVo.putParam("L8r24DataCode5", iJcicZ052.getDataCode5());
-			totaVo.putParam("L8r24ChangePayDate", iJcicZ052.getChangePayDate());	
+			totaVo.putParam("L8r24ChangePayDate", iJcicZ052.getChangePayDate());
 			totaVo.putParam("L8r24OutJcicTxtDate", iJcicZ052.getOutJcicTxtDate());
 		}
 		this.addList(this.totaVo);

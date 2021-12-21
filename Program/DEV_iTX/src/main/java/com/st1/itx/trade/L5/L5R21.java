@@ -56,7 +56,7 @@ public class L5R21 extends TradeBuffer {
 
 	@Autowired
 	public CollLawService iCollLawService;
-	
+
 	@Autowired
 	public ClBuildingService iClBuildingService;
 
@@ -103,8 +103,7 @@ public class L5R21 extends TradeBuffer {
 			totaVo.putParam("L5R21ClNo", iCollLaw.getClNo());
 			totaVo.putParam("L5R21EditEmpNo", iCollLaw.getLastUpdateEmpNo());
 			String tU = iCollLaw.getLastUpdate().toString();
-			String uDate = StringUtils
-					.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
 			String uTime = tU.substring(11, 13) + tU.substring(14, 16);
 			totaVo.putParam("L5R21EditDate", uDate);
 			totaVo.putParam("L5R21EditTime", uTime);
@@ -117,8 +116,7 @@ public class L5R21 extends TradeBuffer {
 				iClBuildingId.setClNo(iCollLaw.getClNo());
 				iClBuilding = iClBuildingService.findById(iClBuildingId, titaVo);
 				if (iClBuilding != null) {
-					tOther = iClBuilding.getBdLocation() + "，建號" + iClBuilding.getBdNo1() + "-"
-							+ iClBuilding.getBdNo2();
+					tOther = iClBuilding.getBdLocation() + "，建號" + iClBuilding.getBdNo1() + "-" + iClBuilding.getBdNo2();
 				}
 			} else if (iCollLaw.getClCode1() == 2) {// 土地-土地座落
 				ClLandId clLandId = new ClLandId();

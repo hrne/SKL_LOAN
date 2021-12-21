@@ -26,9 +26,10 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
+
 	@Autowired
 	Parse parse;
-	
+
 	// *** 折返控制相關 ***
 	private int index;
 
@@ -40,31 +41,30 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// *** 折返控制相關 ***
 	private int size;
-	
+
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryfindbycustno(int index, int limit,TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> queryfindbycustno(int index, int limit, TitaVo titaVo) throws Exception {
 
 		this.info("L8923ServiceImpl.queryRecordDate");
-		
+
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-				
+
 		int iRecordDateStart = this.parse.stringToInteger(titaVo.getParam("RecordDateStart"));
 		int iRecordDateEnd = this.parse.stringToInteger(titaVo.getParam("RecordDateEnd"));
-		int iFRecordDateStart = iRecordDateStart+ 19110000;
-		int iFRecordDateEnd = iRecordDateEnd+ 19110000;
-		this.info("iFRecordDateStart="+iFRecordDateStart+",iFRecordDateEnd="+iFRecordDateEnd);
+		int iFRecordDateStart = iRecordDateStart + 19110000;
+		int iFRecordDateEnd = iRecordDateEnd + 19110000;
+		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
 		int iFActualRepayDateStart = iActualRepayDateStart + 19110000;
 		int iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
-		this.info("iFActualRepayDateStart="+iFActualRepayDateStart+",iFActualRepayDateEnd="+iFActualRepayDateEnd);
+		this.info("iFActualRepayDateStart=" + iFActualRepayDateStart + ",iFActualRepayDateEnd=" + iFActualRepayDateEnd);
 		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
-		
-		
+
 		String sql = "";
 		sql += " SELECT                                 \n";
 		sql += "\"RecordDate\" as F0					\n"; // 訪談日
@@ -81,37 +81,35 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",\"LastUpdate\" as F11					\n"; // 更新時間
 		sql += ",\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",\"Description\" as F13					\n"; // 其他說明
-		sql += "from \"MlaundryRecord\" 				\n"; 
-		if(iRecordDateStart>0) {
-		sql += "where \"RecordDate\" >= :recordDateStart and \"RecordDate\" <= :recordDateEnd  \n";
+		sql += "from \"MlaundryRecord\" 				\n";
+		if (iRecordDateStart > 0) {
+			sql += "where \"RecordDate\" >= :recordDateStart and \"RecordDate\" <= :recordDateEnd  \n";
 		}
-		if(iActualRepayDateStart>0) {
+		if (iActualRepayDateStart > 0) {
 			sql += "where \"ActualRepayDate\" >= :actualRepayDateStart  and \"ActualRepayDate\" <= :actualRepayDateEnd  \n";
 		}
-		if(iCustNo>0) {
+		if (iCustNo > 0) {
 			sql += " and  \"CustNo\" = :custNo       \n";
 		}
-		sql += "order by \"RecordDate\",\"ActualRepayDate\", \"CustNo\",\"FacmNo\",\"BormNo\""; 
-
-
+		sql += "order by \"RecordDate\",\"ActualRepayDate\", \"CustNo\",\"FacmNo\",\"BormNo\"";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		if(iRecordDateStart>0) {
-		query.setParameter("recordDateStart", iFRecordDateStart);
-		query.setParameter("recordDateEnd", iFRecordDateEnd);
+		if (iRecordDateStart > 0) {
+			query.setParameter("recordDateStart", iFRecordDateStart);
+			query.setParameter("recordDateEnd", iFRecordDateEnd);
 		}
-		if(iActualRepayDateStart>0) {
-		query.setParameter("actualRepayDateStart", iFActualRepayDateStart);
-		query.setParameter("actualRepayDateEnd", iFActualRepayDateEnd);
+		if (iActualRepayDateStart > 0) {
+			query.setParameter("actualRepayDateStart", iFActualRepayDateStart);
+			query.setParameter("actualRepayDateEnd", iFActualRepayDateEnd);
 		}
-		if(iCustNo>0) {
-		query.setParameter("custNo", iCustNo);
+		if (iCustNo > 0) {
+			query.setParameter("custNo", iCustNo);
 		}
-		
+
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 
@@ -127,34 +125,34 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		size = result.size();
 		this.info("Total size ..." + size);
-		
+
 		return this.convertToMap(result);
-		
+
 	}
-	
-	public List<Map<String, String>> queryresult(int index, int limit,TitaVo titaVo) throws Exception {
+
+	public List<Map<String, String>> queryresult(int index, int limit, TitaVo titaVo) throws Exception {
 
 		this.info("L8923ServiceImpl.queryRecordDate");
-		
+
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-				
+
 		int iRecordDateStart = this.parse.stringToInteger(titaVo.getParam("RecordDateStart"));
 		int iRecordDateEnd = this.parse.stringToInteger(titaVo.getParam("RecordDateEnd"));
-		int iFRecordDateStart = iRecordDateStart+ 19110000;
-		int iFRecordDateEnd = iRecordDateEnd+ 19110000;
-		this.info("iFRecordDateStart="+iFRecordDateStart+",iFRecordDateEnd="+iFRecordDateEnd);
+		int iFRecordDateStart = iRecordDateStart + 19110000;
+		int iFRecordDateEnd = iRecordDateEnd + 19110000;
+		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
 		int iFActualRepayDateStart = iActualRepayDateStart + 19110000;
 		int iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
-		this.info("iFActualRepayDateStart="+iFActualRepayDateStart+",iFActualRepayDateEnd="+iFActualRepayDateEnd);
+		this.info("iFActualRepayDateStart=" + iFActualRepayDateStart + ",iFActualRepayDateEnd=" + iFActualRepayDateEnd);
 		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
 		String iCustName = titaVo.getParam("CustName");
-		
+
 		String sql = "";
 		sql += " SELECT                                 \n";
 		sql += "M.\"RecordDate\" as F0					\n"; // 訪談日
@@ -171,44 +169,42 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"LastUpdate\" as F11					\n"; // 更新時間
 		sql += ",M.\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",M.\"Description\" as F13					\n"; // 其他說明
-		sql += "from \"MlaundryRecord\" M				\n"; 
-		if(!iCustName.isEmpty() && iCustNo ==0) {
-			sql += "left join \"CustMain\" C on C.\"CustNo\" = M.\"CustNo\" \n"; 
+		sql += "from \"MlaundryRecord\" M				\n";
+		if (!iCustName.isEmpty() && iCustNo == 0) {
+			sql += "left join \"CustMain\" C on C.\"CustNo\" = M.\"CustNo\" \n";
 		}
-		if(iRecordDateStart>0) {
+		if (iRecordDateStart > 0) {
 			sql += "where M.\"RecordDate\" >= :recordDateStart and M.\"RecordDate\" <= :recordDateEnd  \n";
 		}
-		if(iActualRepayDateStart>0) {
+		if (iActualRepayDateStart > 0) {
 			sql += "where M.\"ActualRepayDate\" >= :actualRepayDateStart  and M.\"ActualRepayDate\" <= :actualRepayDateEnd  \n";
 		}
-		if(iCustNo>0) {
+		if (iCustNo > 0) {
 			sql += " and  M.\"CustNo\" = :custNo       \n";
 		}
-		if(!iCustName.isEmpty() && iCustNo ==0) {
+		if (!iCustName.isEmpty() && iCustNo == 0) {
 			sql += " and  C.\"CustName\" like :custName      \n";
 		}
-		sql += "order by M.\"RecordDate\",M.\"ActualRepayDate\", M.\"CustNo\",M.\"FacmNo\",M.\"BormNo\""; 
-
-
+		sql += "order by M.\"RecordDate\",M.\"ActualRepayDate\", M.\"CustNo\",M.\"FacmNo\",M.\"BormNo\"";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		if(iRecordDateStart>0) {
-		query.setParameter("recordDateStart", iFRecordDateStart);
-		query.setParameter("recordDateEnd", iFRecordDateEnd);
+		if (iRecordDateStart > 0) {
+			query.setParameter("recordDateStart", iFRecordDateStart);
+			query.setParameter("recordDateEnd", iFRecordDateEnd);
 		}
-		if(iActualRepayDateStart>0) {
-		query.setParameter("actualRepayDateStart", iFActualRepayDateStart);
-		query.setParameter("actualRepayDateEnd", iFActualRepayDateEnd);
+		if (iActualRepayDateStart > 0) {
+			query.setParameter("actualRepayDateStart", iFActualRepayDateStart);
+			query.setParameter("actualRepayDateEnd", iFActualRepayDateEnd);
 		}
-		if(iCustNo>0) {
-		query.setParameter("custNo", iCustNo);
+		if (iCustNo > 0) {
+			query.setParameter("custNo", iCustNo);
 		}
-		if(!iCustName.isEmpty() && iCustNo ==0) {
-		query.setParameter("custName", "%"+iCustName+"%");
+		if (!iCustName.isEmpty() && iCustNo == 0) {
+			query.setParameter("custName", "%" + iCustName + "%");
 		}
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
@@ -225,14 +221,13 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		size = result.size();
 		this.info("Total size ..." + size);
-		
+
 		return this.convertToMap(result);
-		
+
 	}
-	
+
 	public int getSize() {
 		return cnt;
 	}
-	
-	
+
 }

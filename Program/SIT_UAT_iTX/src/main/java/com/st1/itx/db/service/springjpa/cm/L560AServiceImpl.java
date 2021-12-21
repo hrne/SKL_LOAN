@@ -52,10 +52,8 @@ public class L560AServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"IntEndDate\"                "; // -- F4 計息迄日
 		sql += "      , \"Rate\"                      "; // -- F5 利率
 		sql += "      , \"Desc\"                      "; // -- F6 摘要
-		sql += "      , \"Principal\" + \"Interest\" + \"DelayInt\" + \"BreachAmt\" + \"CloseBreachAmt\" + \"TempAmt\"  "
-				+ " AS \"TxAmt\"  ";// --F7 交易金額
-		sql += "      , \"Principal\" + \"Interest\" + \"DelayInt\" + \"BreachAmt\" + \"CloseBreachAmt\"  "
-				+ " AS \"TxAmt2\"  ";// --F8 作帳金額
+		sql += "      , \"Principal\" + \"Interest\" + \"DelayInt\" + \"BreachAmt\" + \"CloseBreachAmt\" + \"TempAmt\"  " + " AS \"TxAmt\"  ";// --F7 交易金額
+		sql += "      , \"Principal\" + \"Interest\" + \"DelayInt\" + \"BreachAmt\" + \"CloseBreachAmt\"  " + " AS \"TxAmt2\"  ";// --F8 作帳金額
 		sql += "      , \"Principal\"                 "; // -- F9 實收本金
 		sql += "      , \"Interest\"                  "; // -- F10 實收利息
 		sql += "      , \"DelayInt\" + \"BreachAmt\" + \"CloseBreachAmt\"    " + " AS \"BreachAmt\"  ";// --F11 違約金
@@ -78,9 +76,9 @@ public class L560AServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("CustNo", parse.stringToInteger(titaVo.get("OOCustNo").trim()) );
+		query.setParameter("CustNo", parse.stringToInteger(titaVo.get("OOCustNo").trim()));
 		query.setParameter("FacmNo", parse.stringToInteger(titaVo.get("OOFacmNo").trim()));
-		query.setParameter("startDate", parse.stringToInteger(titaVo.getCalDy()) + 19090000  );
+		query.setParameter("startDate", parse.stringToInteger(titaVo.getCalDy()) + 19090000);
 		query.setParameter("endDate", parse.stringToInteger(titaVo.getCalDy()) + 19110000);
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
@@ -93,6 +91,5 @@ public class L560AServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-
 
 }

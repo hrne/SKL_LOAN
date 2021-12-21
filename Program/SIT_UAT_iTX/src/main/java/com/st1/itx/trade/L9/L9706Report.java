@@ -102,7 +102,7 @@ public class L9706Report extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 		if (loanBTXList != null && loanBTXList.size() != 0) {
 			return true;
 		} else {

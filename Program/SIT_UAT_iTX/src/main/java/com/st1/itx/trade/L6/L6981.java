@@ -145,8 +145,7 @@ public class L6981 extends TradeBuffer {
 				occursList.putParam("OOOvduPrinAmt", tTempVo.get("OvduPrinAmt")); // 轉催收本金
 				occursList.putParam("OOOvduIntAmt", tTempVo.get("OvduIntAmt")); // 轉催收利息
 				occursList.putParam("OOOvduAmt", tTempVo.get("OvduAmt")); // 轉催收金額
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());

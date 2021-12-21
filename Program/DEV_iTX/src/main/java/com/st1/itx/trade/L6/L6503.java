@@ -372,7 +372,7 @@ public class L6503 extends TradeBuffer {
 				throw new LogicException("E0005", "員工代號");
 			}
 		}
-		
+
 		// R.業績重算設定
 		if (!"".equals(titaVo.getParam("RePfWorkMonth"))) {
 			CdPfParms tCdPfParms = iCdPfParmsService.holdById(new CdPfParmsId("R", " ", " "), titaVo);

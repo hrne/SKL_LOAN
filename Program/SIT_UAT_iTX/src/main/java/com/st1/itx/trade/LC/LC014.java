@@ -30,29 +30,29 @@ import com.st1.itx.util.parse.Parse;
 public class LC014 extends TradeBuffer {
 	@Autowired
 	public TxAttachmentService txAttachmentService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
-	
+
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC014 ");
 		this.totaVo.init(titaVo);
-		
+
 		String iTranNo = titaVo.getParam("TranNo");
 		String iMrKey = titaVo.getParam("MrKey");
 
 		Slice<TxAttachment> slTxAttachment = txAttachmentService.findByTran(iTranNo, iMrKey, 0, Integer.MAX_VALUE, titaVo);
 		List<TxAttachment> lTxAttachment = slTxAttachment == null ? null : slTxAttachment.getContent();
-		
+
 		if (lTxAttachment == null || lTxAttachment.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "附件資料"); // 查無資料
 		}
-		
+
 		for (TxAttachment txAttachment : lTxAttachment) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OFileNo", txAttachment.getFileNo());
@@ -60,18 +60,18 @@ public class LC014 extends TradeBuffer {
 			occursList.putParam("ODesc", txAttachment.getDesc());
 			occursList.putParam("OCreateDate", parse.stringToStringDateTime(txAttachment.getCreateDate().toString()));
 			String empNo = txAttachment.getCreateEmpNo();
-			
+
 			CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
-			
+
 			if (cdEmp != null) {
 				empNo += cdEmp.getFullname();
 			}
-			
+
 			occursList.putParam("OCreateEmp", empNo);
-			
+
 			this.totaVo.addOccursList(occursList);
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

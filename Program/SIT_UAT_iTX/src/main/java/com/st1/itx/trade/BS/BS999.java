@@ -59,26 +59,26 @@ public class BS999 extends TradeBuffer {
 
 		/*---------- Step 2. 系統換日過帳(含年初損益類結轉) ----------*/
 		String iParm = titaVo.getParam("Parm");
-		if (iParm.length() != 7 || !parse.isNumeric(iParm))  {
+		if (iParm.length() != 7 || !parse.isNumeric(iParm)) {
 			throw new LogicException(titaVo, "E0000", "參數：EX.1090402( 會計起日)");
 		}
 		int iAcdate = this.parse.stringToInteger(iParm); // 會計起日
-        this.info("iAcdate =" + iAcdate );
+		this.info("iAcdate =" + iAcdate);
 		acMainCom.setTxBuffer(this.txBuffer);
-		List<AcMain> lAcMain =   new ArrayList<AcMain>();
+		List<AcMain> lAcMain = new ArrayList<AcMain>();
 		Slice<AcMain> slAcMain = acMainService.findAll(this.index, Integer.MAX_VALUE, titaVo);
-		if (slAcMain !=null) {
+		if (slAcMain != null) {
 			for (AcMain ac : slAcMain.getContent()) {
-				if ( ac.getAcDate() >= iAcdate)  {
+				if (ac.getAcDate() >= iAcdate) {
 					lAcMain.add(ac);
 				}
 			}
 		}
 		if (lAcMain.size() == 0) {
-	        this.info(" cnt = 0 skip, iAcdate =" + iAcdate );
-			return null;			
+			this.info(" cnt = 0 skip, iAcdate =" + iAcdate);
+			return null;
 		}
-	
+
 		for (AcMain ac : lAcMain) {
 			CdAcCode tCdAcCode = cdAcCodeService.findById(new CdAcCodeId(ac.getAcNoCode(), ac.getAcSubCode(), ac.getAcDtlCode()), titaVo);
 			if (tCdAcCode != null) {

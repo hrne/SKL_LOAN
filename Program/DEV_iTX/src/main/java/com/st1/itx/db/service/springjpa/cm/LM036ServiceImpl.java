@@ -124,7 +124,7 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LM036ServiceImpl endMonth = " + endMonth);
 
 		String sql = "";
-		sql += " SELECT \"YearMonth\" "; // -- F0 初貸年月 
+		sql += " SELECT \"YearMonth\" "; // -- F0 初貸年月
 		sql += "      , SUM(\"DrawdownAmt\") AS \"DrawdownAmt\" "; // -- F1 初貸金額
 		sql += "      , \"BadDebtMonth\" "; // -- F2 逾90天時年月
 		sql += "      , SUM(\"BadDebtBal\") AS \"BadDebtBal\" "; // -- F3 逾90天時餘額

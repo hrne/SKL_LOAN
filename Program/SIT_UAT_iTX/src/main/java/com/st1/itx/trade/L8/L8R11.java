@@ -36,23 +36,23 @@ public class L8R11 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ040 iJcicZ040 = new JcicZ040();
 		iJcicZ040 = iJcicZ040Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ040 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			String jcicBankCode = "";
 			CdCode tCdCode = new CdCode();
 
 			totaVo.putParam("L8r11CustId", iJcicZ040.getCustId());
 			totaVo.putParam("L8r11SubmitKey", iJcicZ040.getSubmitKey());
-			totaVo.putParam("L8r11RcDate",iJcicZ040.getRcDate());
+			totaVo.putParam("L8r11RcDate", iJcicZ040.getRcDate());
 			totaVo.putParam("L8r11RbDate", iJcicZ040.getRbDate());
 			totaVo.putParam("L8r11ApplyType", iJcicZ040.getApplyType());
 			totaVo.putParam("L8r11RefBankId", iJcicZ040.getRefBankId());
 			jcicBankCode = iJcicZ040.getRefBankId();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {
 				totaVo.putParam("L8r11RefBankIdX", "");
-			}else {
+			} else {
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode != null) {
 					totaVo.putParam("L8r11RefBankIdX", tCdCode.getItem());
@@ -64,7 +64,7 @@ public class L8R11 extends TradeBuffer {
 			jcicBankCode = iJcicZ040.getNotBankId1();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {
 				totaVo.putParam("L8r11NotBankId1X", "");
-			}else {
+			} else {
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode != null) {
 					totaVo.putParam("L8r11NotBankId1X", tCdCode.getItem());
@@ -76,7 +76,7 @@ public class L8R11 extends TradeBuffer {
 			jcicBankCode = iJcicZ040.getNotBankId2();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {
 				totaVo.putParam("L8r11NotBankId2X", "");
-			}else {
+			} else {
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode != null) {
 					totaVo.putParam("L8r11NotBankId2X", tCdCode.getItem());
@@ -88,7 +88,7 @@ public class L8R11 extends TradeBuffer {
 			jcicBankCode = iJcicZ040.getNotBankId3();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {
 				totaVo.putParam("L8r11NotBankId3X", "");
-			}else {
+			} else {
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode != null) {
 					totaVo.putParam("L8r11NotBankId3X", tCdCode.getItem());
@@ -100,7 +100,7 @@ public class L8R11 extends TradeBuffer {
 			jcicBankCode = iJcicZ040.getNotBankId4();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {
 				totaVo.putParam("L8r11NotBankId4X", "");
-			}else {
+			} else {
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode != null) {
 					totaVo.putParam("L8r11NotBankId4X", tCdCode.getItem());
@@ -112,7 +112,7 @@ public class L8R11 extends TradeBuffer {
 			jcicBankCode = iJcicZ040.getNotBankId5();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {
 				totaVo.putParam("L8r11NotBankId5X", "");
-			}else {
+			} else {
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode != null) {
 					totaVo.putParam("L8r11NotBankId5X", tCdCode.getItem());
@@ -124,7 +124,7 @@ public class L8R11 extends TradeBuffer {
 			jcicBankCode = iJcicZ040.getNotBankId6();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {
 				totaVo.putParam("L8r11NotBankId6X", "");
-			}else {
+			} else {
 				tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", jcicBankCode, titaVo);
 				if (tCdCode != null) {
 					totaVo.putParam("L8r11NotBankId6X", tCdCode.getItem());
@@ -132,12 +132,11 @@ public class L8R11 extends TradeBuffer {
 					totaVo.putParam("L8r11NotBankId6X", "");
 				}
 			}
-			totaVo.putParam("L8r11TranKey", iJcicZ040.getTranKey());	
+			totaVo.putParam("L8r11TranKey", iJcicZ040.getTranKey());
 			totaVo.putParam("L8r11OutJcicTxtDate", iJcicZ040.getOutJcicTxtDate());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
-	
+
 }

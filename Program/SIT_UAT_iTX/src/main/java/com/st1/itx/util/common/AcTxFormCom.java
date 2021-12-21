@@ -161,17 +161,17 @@ public class AcTxFormCom extends TradeBuffer {
 					}
 				}
 				String SumNoX = "";
-				
-				CdCode tCdCode = cdCodeService.findById(new CdCodeId("SumNo",tAcDetail.getSumNo()), titaVo);
-				if(tCdCode!=null) {
+
+				CdCode tCdCode = cdCodeService.findById(new CdCodeId("SumNo", tAcDetail.getSumNo()), titaVo);
+				if (tCdCode != null) {
 					SumNoX = tCdCode.getItem();
 				}
-					
+
 				OccursList occursList = new OccursList();
 //				彙總別
 				occursList.putParam("FM101_SumNo", tAcDetail.getSumNo());
 				occursList.putParam("FM101_SumNoX", SumNoX);
-				
+
 //				戶號-額度-撥款
 				occursList.putParam("FM101_CustNo", tAcDetail.getCustNo());
 				occursList.putParam("FM101_FacmNo", tAcDetail.getFacmNo());

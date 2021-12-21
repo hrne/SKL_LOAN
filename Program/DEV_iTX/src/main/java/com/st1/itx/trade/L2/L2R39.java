@@ -92,8 +92,7 @@ public class L2R39 extends TradeBuffer {
 
 		if (!iCustId.isEmpty()) {
 			this.info("iCustId 統編輸入   ");
-			Slice<RelsCompany> slRelsCompany = sRelsCompanyService.findCompanyIdEq(iCustId, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<RelsCompany> slRelsCompany = sRelsCompanyService.findCompanyIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 			lRelsCompany = slRelsCompany == null ? null : slRelsCompany.getContent();
 			this.info("lRelsCompany 統編輸入   = " + lRelsCompany);
 			Slice<RelsFamily> slRelsFamily = sRelsFamilyService.findFamilyIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
@@ -103,12 +102,10 @@ public class L2R39 extends TradeBuffer {
 			this.info("tRelsMain 統編輸入   = " + tRelsMain);
 		} else if (!iCustName.isEmpty()) {
 			this.info("iCustName 姓名輸入   ");
-			Slice<RelsCompany> slRelsCompany = sRelsCompanyService.findCompanyNameEq(iCustName, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<RelsCompany> slRelsCompany = sRelsCompanyService.findCompanyNameEq(iCustName, 0, Integer.MAX_VALUE, titaVo);
 			lRelsCompany = slRelsCompany == null ? null : slRelsCompany.getContent();
 			this.info("lRelsCompany 姓名輸入   = " + lRelsCompany);
-			Slice<RelsFamily> slRelsFamily = sRelsFamilyService.findFamilyNameEq(iCustName, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<RelsFamily> slRelsFamily = sRelsFamilyService.findFamilyNameEq(iCustName, 0, Integer.MAX_VALUE, titaVo);
 			lRelsFamily = slRelsFamily == null ? null : slRelsFamily.getContent();
 			this.info("lRelsFamily 姓名輸入   = " + lRelsFamily);
 			tRelsMain = sRelsMainService.RelsNameFirst(iCustName, titaVo);
@@ -120,8 +117,7 @@ public class L2R39 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2003", "該戶號不存在客戶主檔"); // 查無資料
 			}
 			String custid = tCustMain.getCustId();
-			Slice<RelsCompany> slRelsCompany = sRelsCompanyService.findCompanyIdEq(custid, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<RelsCompany> slRelsCompany = sRelsCompanyService.findCompanyIdEq(custid, 0, Integer.MAX_VALUE, titaVo);
 			lRelsCompany = slRelsCompany == null ? null : slRelsCompany.getContent();
 			this.info("lRelsCompany 戶號輸入   = " + lRelsCompany);
 			Slice<RelsFamily> slRelsFamily = sRelsFamilyService.findFamilyIdEq(custid, 0, Integer.MAX_VALUE, titaVo);

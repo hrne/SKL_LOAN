@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,19 +20,18 @@ import com.st1.itx.db.domain.TxAuthGroup;
  */
 public interface TxAuthGroupRepositoryDay extends JpaRepository<TxAuthGroup, String> {
 
-  // AuthNo %
-  public Slice<TxAuthGroup> findAllByAuthNoLikeOrderByAuthNoAsc(String authNo_0, Pageable pageable);
+	// AuthNo %
+	public Slice<TxAuthGroup> findAllByAuthNoLikeOrderByAuthNoAsc(String authNo_0, Pageable pageable);
 
-  // BranchNo = ,AND LevelFg = 
-  public Slice<TxAuthGroup> findAllByBranchNoIsAndLevelFgIsOrderByAuthNoAsc(String branchNo_0, int levelFg_1, Pageable pageable);
+	// BranchNo = ,AND LevelFg =
+	public Slice<TxAuthGroup> findAllByBranchNoIsAndLevelFgIsOrderByAuthNoAsc(String branchNo_0, int levelFg_1, Pageable pageable);
 
-  // BranchNo = ,AND AuthNo %
-  public Slice<TxAuthGroup> findAllByBranchNoIsAndAuthNoLikeOrderByBranchNoAscAuthNoAsc(String branchNo_0, String authNo_1, Pageable pageable);
+	// BranchNo = ,AND AuthNo %
+	public Slice<TxAuthGroup> findAllByBranchNoIsAndAuthNoLikeOrderByBranchNoAscAuthNoAsc(String branchNo_0, String authNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAuthGroup> findByAuthNo(String authNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAuthGroup> findByAuthNo(String authNo);
 
 }
-

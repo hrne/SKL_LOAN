@@ -61,8 +61,7 @@ public class L6R07 extends TradeBuffer {
 
 		// 查詢逾期新增減少原因檔
 		CdOverdue tCdOverdue = sCdOverdueService.findById(new CdOverdueId(iRimOverdueSign, iRimOverdueCode), titaVo);
-		
-	
+
 		/* 如有找到資料 */
 		if (tCdOverdue != null) {
 			if (iRimTxCode.equals("L6605") && iRimFuncCode == 1) {
@@ -72,13 +71,13 @@ public class L6R07 extends TradeBuffer {
 				moveTotaCdOverdue(tCdOverdue);
 			}
 		} else {
-			//檢查是否先建立X000增減原因
-			tCdOverdue = sCdOverdueService.findById(new CdOverdueId(iRimOverdueSign, iRimOverdueCode.substring(0,1)+"000"), titaVo);
-			if(tCdOverdue==null) {
-				if(!("000").equals(iRimOverdueCode.substring(1,4)))
-				throw new LogicException(titaVo, "", "請先建立"+iRimOverdueCode.substring(0,1)+"000,增減原因");
+			// 檢查是否先建立X000增減原因
+			tCdOverdue = sCdOverdueService.findById(new CdOverdueId(iRimOverdueSign, iRimOverdueCode.substring(0, 1) + "000"), titaVo);
+			if (tCdOverdue == null) {
+				if (!("000").equals(iRimOverdueCode.substring(1, 4)))
+					throw new LogicException(titaVo, "", "請先建立" + iRimOverdueCode.substring(0, 1) + "000,增減原因");
 			}
-			
+
 			if (iRimTxCode.equals("L6605") && iRimFuncCode == 1) {
 				this.addList(this.totaVo);
 				return this.sendList();

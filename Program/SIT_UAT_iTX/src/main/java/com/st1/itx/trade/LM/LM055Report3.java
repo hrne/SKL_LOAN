@@ -39,7 +39,7 @@ public class LM055Report3 extends MakeReport {
 		List<Map<String, String>> LM055List = new ArrayList<>();
 		try {
 			LM055List = lM055ServiceImpl.findAll(titaVo);
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			StringWriter errors = new StringWriter();
@@ -52,7 +52,7 @@ public class LM055Report3 extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("LM055Report exportExcel");
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表", "LM055-A042放款餘額彙總表_工作表", "A042放款餘額彙總表_工作表.xlsx", "LNM34AP");
-		if(LDList.size() == 0) {
+		if (LDList.size() == 0) {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
 //		makeExcel.setValue(5,1,"測試帳號");

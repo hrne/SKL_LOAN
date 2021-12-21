@@ -36,7 +36,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2915")
 @Scope("prototype")
 /**
@@ -70,7 +69,7 @@ public class L2915 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingReasonService sClBuildingReasonService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -194,7 +193,6 @@ public class L2915 extends TradeBuffer {
 
 		}
 
-
 		// TITA擔保品編號取建物所有權人檔資料list
 		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClBuildingOwner = slClBuildingOwner == null ? null : new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
@@ -224,21 +222,21 @@ public class L2915 extends TradeBuffer {
 
 		int k = 1;
 		for (ClBuildingOwner tClBuildingOwner : lClBuildingOwner) {
-			
+
 			CustMain custMain = sCustMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
-			
-			if(custMain != null) {
-			  this.totaVo.putParam("OwnerId" + k, custMain.getCustId());
-			  this.totaVo.putParam("OwnerName" + k, custMain.getCustName());
-			  this.totaVo.putParam("OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
-			  this.totaVo.putParam("OwnerPart" + k, tClBuildingOwner.getOwnerPart());
-			  this.totaVo.putParam("OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());
+
+			if (custMain != null) {
+				this.totaVo.putParam("OwnerId" + k, custMain.getCustId());
+				this.totaVo.putParam("OwnerName" + k, custMain.getCustName());
+				this.totaVo.putParam("OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
+				this.totaVo.putParam("OwnerPart" + k, tClBuildingOwner.getOwnerPart());
+				this.totaVo.putParam("OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());
 			} else {
-			  this.totaVo.putParam("OwnerId" + k, "");
-		      this.totaVo.putParam("OwnerName" + k, "");
-			  this.totaVo.putParam("OwnerRelCode" + k, "");
-			  this.totaVo.putParam("OwnerPart" + k, "");
-			  this.totaVo.putParam("OwnerTotal" + k, "");
+				this.totaVo.putParam("OwnerId" + k, "");
+				this.totaVo.putParam("OwnerName" + k, "");
+				this.totaVo.putParam("OwnerRelCode" + k, "");
+				this.totaVo.putParam("OwnerPart" + k, "");
+				this.totaVo.putParam("OwnerTotal" + k, "");
 			}
 			k++;
 		}

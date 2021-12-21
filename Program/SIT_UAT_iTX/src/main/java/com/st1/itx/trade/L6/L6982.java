@@ -113,8 +113,7 @@ public class L6982 extends TradeBuffer {
 					occursList.putParam("OOFireInsuMonth", tmpInsuRenew.getInsuYearMonth() - 191100);
 					occursList.putParam("OOCustNo", tmpInsuRenew.getCustNo());
 					occursList.putParam("OOFacmNo", tmpInsuRenew.getFacmNo());
-					occursList.putParam("OOColNo",
-							tmpInsuRenew.getClCode1() + "-" + tmpInsuRenew.getClCode2() + "-" + tmpInsuRenew.getClNo());
+					occursList.putParam("OOColNo", tmpInsuRenew.getClCode1() + "-" + tmpInsuRenew.getClCode2() + "-" + tmpInsuRenew.getClNo());
 					occursList.putParam("OOInsuNo", tmpInsuRenew.getPrevInsuNo());
 					occursList.putParam("OOInsuFireFee", tmpInsuRenew.getFireInsuPrem());
 					occursList.putParam("OOEthqInsuFee", tmpInsuRenew.getEthqInsuPrem());
@@ -176,14 +175,12 @@ public class L6982 extends TradeBuffer {
 				tTxToDoDetail.getFacmNo();
 				tTxToDoDetail.getDtlValue().trim();
 				InsuRenew tIsuRenew = new InsuRenew();
-				tIsuRenew = insuRenewService.prevInsuNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(),
-						tTxToDoDetail.getDtlValue().trim(), titaVo);
+				tIsuRenew = insuRenewService.prevInsuNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(), tTxToDoDetail.getDtlValue().trim(), titaVo);
 
 				occursList.putParam("OOProcStatus", tTxToDoDetail.getStatus());
 				if (tIsuRenew != null) {
 					occursList.putParam("OOFireInsuMonth", tIsuRenew.getInsuYearMonth() - 191100);
-					occursList.putParam("OOColNo",
-							tIsuRenew.getClCode1() + "-" + tIsuRenew.getClCode2() + "-" + tIsuRenew.getClNo());
+					occursList.putParam("OOColNo", tIsuRenew.getClCode1() + "-" + tIsuRenew.getClCode2() + "-" + tIsuRenew.getClNo());
 					occursList.putParam("OOInsuNo", tIsuRenew.getPrevInsuNo());
 					occursList.putParam("OOInsuFireFee", tIsuRenew.getFireInsuPrem());
 					occursList.putParam("OOEthqInsuFee", tIsuRenew.getEthqInsuPrem());
@@ -202,8 +199,7 @@ public class L6982 extends TradeBuffer {
 				}
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());

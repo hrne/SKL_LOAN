@@ -50,7 +50,7 @@ public class LB087ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		logger.info("dataMonth= " + dateMonth);
 
-		String sql = "";  // 無 table
+		String sql = ""; // 無 table
 
 		// LB087 聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔
 		sql = "";
@@ -65,7 +65,7 @@ public class LB087ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB087.java 帶入資料庫環境
 		}
-		query = em.createNativeQuery(sql);  // 無 table
+		query = em.createNativeQuery(sql); // 無 table
 
 		// 轉成 List<HashMap<String, String>>
 //    	return this.convertToMap(query.getResultList());

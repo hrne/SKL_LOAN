@@ -167,7 +167,6 @@ public class L2047 extends TradeBuffer {
 
 			lClFac = slClFac == null ? null : slClFac.getContent();
 
-
 			if (lClFac != null) {
 				for (ClFac tmpClFac : lClFac) {
 					// 找額度主檔

@@ -383,9 +383,9 @@ public class ApControl extends SysLogger {
 					this.totaVo.addOccursList(occursList);
 				}
 
-				//去除重複
+				// 去除重複
 				this.totaVo.getOccursList().stream().distinct().collect(Collectors.toList());
-				
+
 				this.totaVoList.clear();
 				this.totaVoList.add(totaVo);
 

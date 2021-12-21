@@ -82,8 +82,7 @@ public class L2060 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 183 * 250 = 45750
 
-		
-		if(iSigningDateEnd == 0) {
+		if (iSigningDateEnd == 0) {
 			iSigningDateEnd = 99999999;
 		} else {
 			iSigningDateEnd = iSigningDateEnd + 19110000;

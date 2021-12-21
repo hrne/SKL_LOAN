@@ -35,10 +35,10 @@ public class L6084 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdPerformanceService sCdPerformanceService;
-	
+
 	@Autowired
 	public CdWorkMonthService iCdWorkMonthService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -62,7 +62,7 @@ public class L6084 extends TradeBuffer {
 			tWorkMonthAcDate = String.valueOf(iCdWorkMonth.getYear()) + parse.IntegerToString(iCdWorkMonth.getMonth(), 2);
 			this.info("tWorkMonthAcDate==" + tWorkMonthAcDate);
 		}
-		
+
 		int tPerformanceAcDate = 0;
 		// 找生效中工作月
 		if (!("").equals(tWorkMonthAcDate)) {
@@ -72,7 +72,7 @@ public class L6084 extends TradeBuffer {
 				this.info("tBonusAcDate==" + tPerformanceAcDate);
 			}
 		}
-		
+
 		// 查詢業績件數及金額核算標準設定檔
 		Slice<CdPerformance> slCdPerformance;
 		if (iWorkMonth == 191100) {
@@ -92,15 +92,15 @@ public class L6084 extends TradeBuffer {
 				continue;
 			} else {
 				/* 將每筆資料放入Tota的OcList */
-				
+
 				iWorkMonthList.add(0, tCdPerformance.getWorkMonth());
 			}
 		}
 		for (int reWorkMonth : iWorkMonthList) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOWorkMonth", reWorkMonth - 191100);
-			this.info("reWorkMonth="+reWorkMonth);
-			this.info("tPerformanceAcDate="+tPerformanceAcDate);
+			this.info("reWorkMonth=" + reWorkMonth);
+			this.info("tPerformanceAcDate=" + tPerformanceAcDate);
 			if (reWorkMonth > tPerformanceAcDate) {// 0:未生效
 				occursList.putParam("OOFlag", 0);
 			} else if (reWorkMonth == tPerformanceAcDate) {// 1:生效中
@@ -108,7 +108,7 @@ public class L6084 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOFlag", 2);// 2:已失效
 			}
-			
+
 			this.totaVo.addOccursList(occursList);
 		}
 

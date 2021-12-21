@@ -12,7 +12,6 @@ import com.st1.itx.db.domain.JcicZ454;
 import com.st1.itx.db.service.JcicZ454Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
-
 @Service("L8R48")
 @Scope("prototype")
 /**
@@ -32,10 +31,10 @@ public class L8R48 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ454 iJcicZ454 = new JcicZ454();
 		iJcicZ454 = iJcicZ454Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ454 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r48TranKey", iJcicZ454.getTranKey());
 			totaVo.putParam("L8r48CustId", iJcicZ454.getCustId());
 			totaVo.putParam("L8r48SubmitKey", iJcicZ454.getSubmitKey());
@@ -44,10 +43,9 @@ public class L8R48 extends TradeBuffer {
 			totaVo.putParam("L8r48MaxMainCode", iJcicZ454.getMaxMainCode());// 最大債權金融機構代號
 			totaVo.putParam("L8r48PayOffResult", iJcicZ454.getPayOffResult());// 單獨全數受清償原因
 			totaVo.putParam("L8r48PayOffDate", iJcicZ454.getPayOffDate());// 單獨全數受清償日期
-			totaVo.putParam("L8r48OutJcicTxtDate", iJcicZ454.getOutJcicTxtDate());		
+			totaVo.putParam("L8r48OutJcicTxtDate", iJcicZ454.getOutJcicTxtDate());
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

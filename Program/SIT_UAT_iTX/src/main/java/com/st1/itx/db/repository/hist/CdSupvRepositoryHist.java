@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.CdSupv;
  */
 public interface CdSupvRepositoryHist extends JpaRepository<CdSupv, String> {
 
-  // SupvReasonLevel = 
-  public Slice<CdSupv> findAllBySupvReasonLevelIs(String supvReasonLevel_0, Pageable pageable);
+	// SupvReasonLevel =
+	public Slice<CdSupv> findAllBySupvReasonLevelIs(String supvReasonLevel_0, Pageable pageable);
 
-  // SupvReasonCode >= ,AND SupvReasonCode <= 
-  public Slice<CdSupv> findAllBySupvReasonCodeGreaterThanEqualAndSupvReasonCodeLessThanEqualOrderBySupvReasonCodeAsc(String supvReasonCode_0, String supvReasonCode_1, Pageable pageable);
+	// SupvReasonCode >= ,AND SupvReasonCode <=
+	public Slice<CdSupv> findAllBySupvReasonCodeGreaterThanEqualAndSupvReasonCodeLessThanEqualOrderBySupvReasonCodeAsc(String supvReasonCode_0, String supvReasonCode_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdSupv> findBySupvReasonCode(String supvReasonCode);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdSupv> findBySupvReasonCode(String supvReasonCode);
 
 }
-

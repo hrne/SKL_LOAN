@@ -70,14 +70,14 @@ public class L6R06 extends TradeBuffer {
 				totaVo.putParam("L6R06IndustryItem", "");
 				totaVo.putParam("L6R06MainType", "");
 			} else {
-				if(iRimTxCode.equals("L6602") && iRimFuncCode == 1) {
+				if (iRimTxCode.equals("L6602") && iRimFuncCode == 1) {
 					totaVo.putParam("L6R06IndustryCode", "");
 					totaVo.putParam("L6R06IndustryItem", "");
 					totaVo.putParam("L6R06MainType", "");
 				} else {
 					throw new LogicException(titaVo, "E0001", "行業別代號資料檔"); // 查無資料
 				}
-				
+
 			}
 		} else {
 			if (iRimTxCode.equals("L6602") && iRimFuncCode == 1) {

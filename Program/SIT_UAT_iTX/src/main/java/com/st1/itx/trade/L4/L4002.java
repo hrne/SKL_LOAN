@@ -80,8 +80,7 @@ public class L4002 extends TradeBuffer {
 		// 未輸入經辦 or 經辦相同 or BS020
 		if (lBatxHead != null && lBatxHead.size() != 0) {
 			for (BatxHead tBatxHead : lBatxHead) {
-				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo)
-						|| "BS020".equals(tBatxHead.getTitaTxCd())) {
+				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo) || "BS020".equals(tBatxHead.getTitaTxCd())) {
 				} else {
 					continue;
 				}
@@ -95,13 +94,11 @@ public class L4002 extends TradeBuffer {
 //				0.待處理 ->0123
 //				9.已完成 ->ALL
 				if ("0".equals(procExeCode)) {
-					if ("0".equals(tBatxHead.getBatxExeCode()) || "1".equals(tBatxHead.getBatxExeCode())
-							|| "2".equals(tBatxHead.getBatxExeCode()) || "3".equals(tBatxHead.getBatxExeCode())) {
+					if ("0".equals(tBatxHead.getBatxExeCode()) || "1".equals(tBatxHead.getBatxExeCode()) || "2".equals(tBatxHead.getBatxExeCode()) || "3".equals(tBatxHead.getBatxExeCode())) {
 
 						setL4002Tota(tBatxHead, titaVo);
 					} else {
-						this.info("continue... ，procExeCode = " + procExeCode + "， BatxHead狀態 != 0~3 ，狀態 = "
-								+ tBatxHead.getBatxExeCode());
+						this.info("continue... ，procExeCode = " + procExeCode + "， BatxHead狀態 != 0~3 ，狀態 = " + tBatxHead.getBatxExeCode());
 						continue;
 					}
 				} else {
@@ -122,33 +119,33 @@ public class L4002 extends TradeBuffer {
 	}
 
 	private void setL4002Tota(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
-				String batchNo =  tBatxHead.getBatchNo();
+		String batchNo = tBatxHead.getBatchNo();
 		int labelRankFlag = 1;
 		Slice<BatxDetail> sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
 
 		List<BatxDetail> lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 		if (lBatxDetail == null) {
-		OccursList occursList = new OccursList();
-		occursList.putParam("OOBatchNo", batchNo);
-		occursList.putParam("OORankFlag", 1);
-		occursList.putParam("OOStatusCode", batxStatus);
-		occursList.putParam("OORepayCode", 90);
-		occursList.putParam("OOReconCode", "   ");
-		occursList.putParam("OOFileName", tBatxHead.getTitaTxCd());
-		occursList.putParam("OOFileCnt", 0);
-		occursList.putParam("OODntCnt", 0);
-		occursList.putParam("OOAlrCnt", 0);
-		occursList.putParam("OOWatCnt", 0);
-		occursList.putParam("OOVirCnt", 0);
-		occursList.putParam("OOTotalRepayAmt", 0);
-		occursList.putParam("OOToDoRepayAmt", 0);
-		occursList.putParam("OOUnDoRepayAmt", 0);
-		occursList.putParam("OOLabelFgA", "");
-		occursList.putParam("OOLabelFgB", "");
-		occursList.putParam("OOLabelFgC", "");
+			OccursList occursList = new OccursList();
+			occursList.putParam("OOBatchNo", batchNo);
+			occursList.putParam("OORankFlag", 1);
+			occursList.putParam("OOStatusCode", batxStatus);
+			occursList.putParam("OORepayCode", 90);
+			occursList.putParam("OOReconCode", "   ");
+			occursList.putParam("OOFileName", tBatxHead.getTitaTxCd());
+			occursList.putParam("OOFileCnt", 0);
+			occursList.putParam("OODntCnt", 0);
+			occursList.putParam("OOAlrCnt", 0);
+			occursList.putParam("OOWatCnt", 0);
+			occursList.putParam("OOVirCnt", 0);
+			occursList.putParam("OOTotalRepayAmt", 0);
+			occursList.putParam("OOToDoRepayAmt", 0);
+			occursList.putParam("OOUnDoRepayAmt", 0);
+			occursList.putParam("OOLabelFgA", "");
+			occursList.putParam("OOLabelFgB", "");
+			occursList.putParam("OOLabelFgC", "");
 
-		/* 將每筆資料放入Tota的OcList */
-		this.totaVo.addOccursList(occursList);
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
 		} else {
 			totalCnt++;
 			// 會計日期 整批批號 還款來源 對帳類別 檔名
@@ -262,7 +259,7 @@ public class L4002 extends TradeBuffer {
 					grp1.setRepayCode(0);
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
-					grp1.setRankFlag(1);	
+					grp1.setRankFlag(1);
 					grp2.setAcDate(tBatxDetail.getAcDate());
 					grp2.setBatchNo(tBatxDetail.getBatchNo());
 					grp2.setRepayCode(tBatxDetail.getRepayCode());
@@ -322,8 +319,7 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 				// grp2待處理
-				if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-						|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
+				if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 					if (watCnt.containsKey(grp2)) {
 						watCnt.put(grp2, watCnt.get(grp2) + 1);
 					} else {
@@ -363,8 +359,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// grp3待處理
-					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-							|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (watCnt.containsKey(grp3)) {
 							watCnt.put(grp3, watCnt.get(grp3) + 1);
 						} else {
@@ -434,8 +429,7 @@ public class L4002 extends TradeBuffer {
 				}
 
 				// 可訂正筆數
-				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-						|| tBatxDetail.getProcStsCode().equals("7")) {
+				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6") || tBatxDetail.getProcStsCode().equals("7")) {
 					if (canEraseCnt.containsKey(grp1)) {
 						canEraseCnt.put(grp1, canEraseCnt.get(grp1) + 1);
 					} else {
@@ -462,8 +456,7 @@ public class L4002 extends TradeBuffer {
 					}
 				} else {
 					// 可訂正筆數
-					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-							|| tBatxDetail.getProcStsCode().equals("7")) {
+					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6") || tBatxDetail.getProcStsCode().equals("7")) {
 						if (canEraseCnt.containsKey(grp3)) {
 							canEraseCnt.put(grp3, canEraseCnt.get(grp3) + 1);
 						} else {
@@ -591,8 +584,7 @@ class tmpBatx implements Comparable<tmpBatx> {
 
 	@Override
 	public String toString() {
-		return "tmpBatx [acDate=" + acDate + ", batchNo=" + batchNo + ", repayCode=" + repayCode + ", reconCode="
-				+ reconCode + ", fileName=" + fileName + ", rankFlag=" + rankFlag + "]";
+		return "tmpBatx [acDate=" + acDate + ", batchNo=" + batchNo + ", repayCode=" + repayCode + ", reconCode=" + reconCode + ", fileName=" + fileName + ", rankFlag=" + rankFlag + "]";
 	}
 
 	@Override

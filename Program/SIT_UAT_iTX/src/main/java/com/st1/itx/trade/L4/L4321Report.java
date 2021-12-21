@@ -92,8 +92,7 @@ public class L4321Report extends MakeReport {
 			fileNm = "企金" + fileNm;
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, "LNW171E",
-				"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, "LNW171E", "LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", "利率調整作業確認", "LNW171E",
 //				"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");

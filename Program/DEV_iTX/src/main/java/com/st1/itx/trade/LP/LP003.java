@@ -48,8 +48,7 @@ public class LP003 extends BatchBase implements Tasklet, InitializingBean {
 		lP003Report.setTxBuffer(this.getTxBuffer());
 		lP003Report.setParentTranCode(this.getParent());
 		lP003Report.exec(titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LP003部專暨房專業績累計表", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LP003部專暨房專業績累計表", titaVo);
 	}
 
 }

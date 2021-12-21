@@ -25,7 +25,6 @@ public class L8R13 extends TradeBuffer {
 	@Autowired
 	public JcicZ042Service iJcicZ042Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r13 ");
@@ -33,14 +32,14 @@ public class L8R13 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ042 iJcicZ042 = new JcicZ042();
 		iJcicZ042 = iJcicZ042Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ042 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r13CustId", iJcicZ042.getCustId());
 			totaVo.putParam("L8r13SubmitKey", iJcicZ042.getSubmitKey());
-			totaVo.putParam("L8r13RcDate",iJcicZ042.getRcDate());
-			totaVo.putParam("L8r13MaxMainCode",iJcicZ042.getMaxMainCode());
+			totaVo.putParam("L8r13RcDate", iJcicZ042.getRcDate());
+			totaVo.putParam("L8r13MaxMainCode", iJcicZ042.getMaxMainCode());
 			totaVo.putParam("L8r13IsClaims", iJcicZ042.getIsClaims());
 			totaVo.putParam("L8r13GuarLoanCnt", iJcicZ042.getGuarLoanCnt());
 			totaVo.putParam("L8r13ExpLoanAmt", iJcicZ042.getExpLoanAmt());
@@ -64,9 +63,9 @@ public class L8R13 extends TradeBuffer {
 			totaVo.putParam("L8r13CreditCardInte", iJcicZ042.getCreditCardInte());
 			totaVo.putParam("L8r13CreditCardPena", iJcicZ042.getCreditCardPena());
 			totaVo.putParam("L8r13CreditCardOther", iJcicZ042.getCreditCardOther());
-			totaVo.putParam("L8r13TranKey", iJcicZ042.getTranKey());	
+			totaVo.putParam("L8r13TranKey", iJcicZ042.getTranKey());
 			totaVo.putParam("L8r13OutJcicTxtDate", iJcicZ042.getOutJcicTxtDate());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

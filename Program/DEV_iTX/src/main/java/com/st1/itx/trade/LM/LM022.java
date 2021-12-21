@@ -26,7 +26,8 @@ public class LM022 extends BatchBase implements Tasklet, InitializingBean {
 	LM022Report lm022report;
 
 	@Override
-	public void afterPropertiesSet() throws Exception {	}
+	public void afterPropertiesSet() throws Exception {
+	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {

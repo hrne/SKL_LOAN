@@ -77,7 +77,7 @@ public class LP001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                         AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
 		sql += "             WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
 		sql += "               AND TRUNC(PD.\"WorkMonth\" / 100) = :iyear ";
-		sql += "               AND PD.\"PerfAmt\" >= 0 "; 
+		sql += "               AND PD.\"PerfAmt\" >= 0 ";
 		// sql += " AND PD.\"PerfDate\" <= :iday";
 		sql += "             GROUP BY PO.\"AreaCode\" ";
 		sql += "                    , PD.\"WorkMonth\" ";

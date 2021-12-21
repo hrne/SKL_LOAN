@@ -110,6 +110,7 @@ public class L1101 extends TradeBuffer {
 	private String wkIsDataDate = "";
 	CustMain beforeCustMain = new CustMain();
 	private int iCustNo;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1101 ");
@@ -129,7 +130,7 @@ public class L1101 extends TradeBuffer {
 		String funcd = titaVo.getParam("FunCd");
 
 		// 統編
-		// 2021-11-05 智偉修改 
+		// 2021-11-05 智偉修改
 		// titaVo.get("CustId") -> titaVo.getParam("CustId")
 		// getParam會trim
 		String iCustId = titaVo.getParam("CustId");
@@ -183,36 +184,36 @@ public class L1101 extends TradeBuffer {
 			setCustCross(titaVo, tCustMain);
 			break;
 		case "2": // 修改
-			
-			if(this.isEloan) {
-			  // 申請記號 ApplMark
-			  // 1:客戶申請(案件申請時丟錯誤訊息)
-			  // 2:滿五年自動寫入(案件申請自動刪除)
-			  iCustNo = tCustMain.getCustNo();
-						
-			  CustDataCtrl tCustDataCtrl = new CustDataCtrl();
-						
-			 tCustDataCtrl = sCustDataCtrlService.findById(iCustNo);
-			  int iApplMark = 0;
-			  if(tCustDataCtrl != null) {
-				iApplMark = tCustDataCtrl.getApplMark();
-				if(iApplMark == 1) {
-					throw new LogicException(titaVo, "E2004", "結清客戶個人資料控管狀態"); // 功能選擇錯誤
-				} else if(iApplMark == 2){
-					try {
 
-						this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
+			if (this.isEloan) {
+				// 申請記號 ApplMark
+				// 1:客戶申請(案件申請時丟錯誤訊息)
+				// 2:滿五年自動寫入(案件申請自動刪除)
+				iCustNo = tCustMain.getCustNo();
 
-						if (tCustDataCtrl != null) {
-							sCustDataCtrlService.delete(tCustDataCtrl);
+				CustDataCtrl tCustDataCtrl = new CustDataCtrl();
+
+				tCustDataCtrl = sCustDataCtrlService.findById(iCustNo);
+				int iApplMark = 0;
+				if (tCustDataCtrl != null) {
+					iApplMark = tCustDataCtrl.getApplMark();
+					if (iApplMark == 1) {
+						throw new LogicException(titaVo, "E2004", "結清客戶個人資料控管狀態"); // 功能選擇錯誤
+					} else if (iApplMark == 2) {
+						try {
+
+							this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
+
+							if (tCustDataCtrl != null) {
+								sCustDataCtrlService.delete(tCustDataCtrl);
+							}
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 						}
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 					}
 				}
-			  }
 			}
-						
+
 			// 變更前
 			beforeCustMain = (CustMain) iDataLog.clone(tCustMain);
 			// 搬值
@@ -230,7 +231,6 @@ public class L1101 extends TradeBuffer {
 			// by eric 2021.7.31
 			setCustCross(titaVo, tCustMain);
 
-			
 			break;
 		case "4": // 刪除
 //		刪除功能暫時先拔掉 資料刪除影響很多db
@@ -244,11 +244,11 @@ public class L1101 extends TradeBuffer {
 //		}
 			break;
 		case "5": // 查詢
-					
+
 			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
 				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
 			}
-			
+
 			// 主管刷卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
 				this.info("主管 = " + titaVo.getEmpNos().trim());

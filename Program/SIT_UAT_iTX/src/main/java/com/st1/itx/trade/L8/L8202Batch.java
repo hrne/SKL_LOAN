@@ -157,7 +157,7 @@ public class L8202Batch extends TradeBuffer {
 			throw new LogicException("E0015", ", " + e.getMessage());
 		}
 	}
-	
+
 	private void insertChkDtl(TitaVo titaVo) throws LogicException {
 		this.info("L8202Batch insertChkDtl");
 		fnAllList12 = new ArrayList<>();
@@ -203,57 +203,57 @@ public class L8202Batch extends TradeBuffer {
 				lChkDtl.add(c);
 			}
 		}
-			fnAllList3 = new ArrayList<>();
+		fnAllList3 = new ArrayList<>();
+		try {
+			fnAllList3 = l8202ServiceImpl.findChkDtl3(titaVo);
+		} catch (Exception e) {
+			throw new LogicException("E0015", ", " + e.getMessage());
+		}
+		// 樣態3
+		if (fnAllList3 != null && fnAllList3.size() != 0) {
+			for (Map<String, String> s : fnAllList3) {
+				this.info("fnAllList=" + s);
+				// F0 入帳日期
+				// F1 交易樣態
+				// F2 戶號
+				// F3 明細序號
+				// F4 明細入帳日期
+				// F5 來源
+				// F6 摘要代碼
+				// F7 交易金額
+				// F8 累積筆數
+				// F9 累積金額
+				// F10統計期間起日
+				c = new MlaundryChkDtl();
+				cId = new MlaundryChkDtlId();
+				cId.setEntryDate(parse.stringToInteger(s.get("F0")));
+				cId.setFactor(parse.stringToInteger(s.get("F1")));
+				cId.setCustNo(parse.stringToInteger(s.get("F2")));
+				cId.setDtlSeq(parse.stringToInteger(s.get("F3")));
+				c.setMlaundryChkDtlId(cId);
+				c.setDtlEntryDate(parse.stringToInteger(s.get("F4")));
+				c.setRepayItem(s.get("F5"));
+				c.setDscptCode(s.get("F6"));
+				c.setTxAmt(parse.stringToBigDecimal(s.get("F7")));
+				c.setTotalCnt(parse.stringToInteger(s.get("F8")));
+				c.setTotalAmt(parse.stringToBigDecimal(s.get("F9")));
+				c.setStartEntryDate(parse.stringToInteger(s.get("F10")));
+				c.setCreateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+				lChkDtl.add(c);
+			}
+		}
+		this.info("lChkDtl==" + lChkDtl);
+		this.info("lChkDtl==" + lChkDtl.size());
+		if (lChkDtl != null && lChkDtl.size() > 0) {
+			this.info("into lChkDtl");
 			try {
-				fnAllList3 = l8202ServiceImpl.findChkDtl3(titaVo);
-			} catch (Exception e) {
-				throw new LogicException("E0015", ", " + e.getMessage());
+				mlaundryChkDtlService.insertAll(lChkDtl, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", ", MlaundryChkDtl insert error : " + e.getErrorMsg());
 			}
-			//樣態3
-			if (fnAllList3 != null && fnAllList3.size() != 0) {
-				for (Map<String, String> s : fnAllList3) {
-					this.info("fnAllList=" + s);
-					// F0 入帳日期
-					// F1 交易樣態
-					// F2 戶號
-					// F3 明細序號
-					// F4 明細入帳日期
-					// F5 來源
-					// F6 摘要代碼
-					// F7 交易金額
-					// F8 累積筆數
-					// F9 累積金額
-					// F10統計期間起日
-					c = new MlaundryChkDtl();
-					cId = new MlaundryChkDtlId();
-					cId.setEntryDate(parse.stringToInteger(s.get("F0")));
-					cId.setFactor(parse.stringToInteger(s.get("F1")));
-					cId.setCustNo(parse.stringToInteger(s.get("F2")));
-					cId.setDtlSeq(parse.stringToInteger(s.get("F3")));
-					c.setMlaundryChkDtlId(cId);
-					c.setDtlEntryDate(parse.stringToInteger(s.get("F4")));
-					c.setRepayItem(s.get("F5"));
-					c.setDscptCode(s.get("F6"));
-					c.setTxAmt(parse.stringToBigDecimal(s.get("F7")));
-					c.setTotalCnt(parse.stringToInteger(s.get("F8")));
-					c.setTotalAmt(parse.stringToBigDecimal(s.get("F9")));
-					c.setStartEntryDate(parse.stringToInteger(s.get("F10")));
-					c.setCreateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
-					lChkDtl.add(c);
-				}
-			}
-			this.info("lChkDtl=="+lChkDtl);
-			this.info("lChkDtl=="+lChkDtl.size());
-			if(lChkDtl!=null && lChkDtl.size()>0) {
-				this.info("into lChkDtl");
-				try {
-					mlaundryChkDtlService.insertAll(lChkDtl, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0005", ", MlaundryChkDtl insert error : " + e.getErrorMsg());
-				}
-			
-			}
-			
+
+		}
+
 	}
 
 	private void insertDetail(TitaVo titaVo) throws LogicException {
@@ -294,7 +294,7 @@ public class L8202Batch extends TradeBuffer {
 					d.setRational("?"); // 未寫檢核明細檔
 					lDetail.add(d);
 				}
-				
+
 				if (parse.stringToInteger(s.get("F5")) > 0 && parse.stringToInteger(s.get("F7")) == 0) {
 					d = new MlaundryDetail();
 					dId = new MlaundryDetailId();
@@ -307,13 +307,11 @@ public class L8202Batch extends TradeBuffer {
 					d.setRational("?"); // 未寫檢核明細檔
 					lDetail.add(d);
 				}
-				
-				
+
 			}
 
 		}
 
-		
 		if (fnAllList3 != null && fnAllList3.size() != 0) {
 			for (Map<String, String> s : fnAllList3) {
 				this.info("fnAllList3=" + s);
@@ -347,7 +345,7 @@ public class L8202Batch extends TradeBuffer {
 				}
 			}
 		}
-		
+
 		this.info("L8202Batch insertDetail size=" + lDetail.size());
 		for (MlaundryDetail dtl : lDetail) {
 			this.info("insert=" + dtl.toString());
@@ -360,7 +358,7 @@ public class L8202Batch extends TradeBuffer {
 				throw new LogicException("E0005", ", MlaundryDetail insert error : " + e.getErrorMsg());
 			}
 		}
-		
+
 	}
 
 	private void deleteDetail(TitaVo titaVo) throws LogicException {

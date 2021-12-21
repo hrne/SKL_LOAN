@@ -49,9 +49,9 @@ public class L6077 extends TradeBuffer {
 		int Month = 0;
 		int iDataYearMonth = this.parse.stringToInteger(titaVo.getParam("DataYearMonth"));
 		this.info("L6077 1 iDataYearMonth : " + iDataYearMonth);
-		Month = this.parse.stringToInteger(titaVo.getParam("DataYearMonth").substring(3,5));
+		Month = this.parse.stringToInteger(titaVo.getParam("DataYearMonth").substring(3, 5));
 		this.info("L6077 1 Month : " + Month);
-		
+
 		int iYearMonth = iDataYearMonth + 191100;
 		this.info("L6077 1 iYearMonth : " + iYearMonth);
 
@@ -65,9 +65,9 @@ public class L6077 extends TradeBuffer {
 		Slice<CdCashFlow> slCdCashFlow;
 		if (iDataYearMonth == 0) {
 			slCdCashFlow = sCdCashFlowService.findAll(this.index, this.limit, titaVo);
-		} else if(Month == 0){
-			//查詢該年度所有月份
-			Month = iYearMonth+12;
+		} else if (Month == 0) {
+			// 查詢該年度所有月份
+			Month = iYearMonth + 12;
 			slCdCashFlow = sCdCashFlowService.findDataYearMonth(iYearMonth, Month, this.index, this.limit, titaVo);
 		} else {
 			slCdCashFlow = sCdCashFlowService.findDataYearMonth(iYearMonth, iYearMonth, this.index, this.limit, titaVo);

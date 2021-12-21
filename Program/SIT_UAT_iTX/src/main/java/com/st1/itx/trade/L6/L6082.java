@@ -75,14 +75,14 @@ public class L6082 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			int wkFYear = tCdWorkMonth.getYear();
 			wkFYear = wkFYear - 1911;
-			
-			if(fYear==tCdWorkMonth.getYear()) {
+
+			if (fYear == tCdWorkMonth.getYear()) {
 				continue;
 			}
 			occursList.putParam("OOYear", wkFYear);
-			
+
 			fYear = tCdWorkMonth.getYear();
-			
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

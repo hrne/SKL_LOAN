@@ -206,24 +206,21 @@ public class L4060 extends TradeBuffer {
 			}
 
 			BigDecimal evaAmt = BigDecimal.ZERO;
-			ClMain tClMain = clMainService
-					.findById(new ClMainId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
+			ClMain tClMain = clMainService.findById(new ClMainId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
 
 			if (tClMain != null) {
 				evaAmt = tClMain.getEvaAmt();
 			}
 
 			String bdLocation = "";
-			ClBuilding tClBuilding = clBuildingService
-					.findById(new ClBuildingId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
+			ClBuilding tClBuilding = clBuildingService.findById(new ClBuildingId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
 			if (tClBuilding != null) {
 				bdLocation = limitLength(tClBuilding.getBdLocation(), 99);
 			}
 
 			tInsuOrignal = insuOrignalService.clNoFirst(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo());
 
-			Slice<InsuRenew> sInsuRenew = insuRenewService.findNowInsuEq(tClFac.getClCode1(), tClFac.getClCode2(),
-					tClFac.getClNo(), this.index, this.limit, titaVo);
+			Slice<InsuRenew> sInsuRenew = insuRenewService.findNowInsuEq(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), this.index, this.limit, titaVo);
 
 //			保單明細按鈕 on
 			if (tInsuOrignal != null || sInsuRenew != null) {
@@ -246,15 +243,14 @@ public class L4060 extends TradeBuffer {
 			/* #OOLOANAMT=貸放金額 SUM(DrawdownAmt) */
 			/* #OOLOANBAL=貸放餘額 SUM(LoanBalance) */
 
-			Slice<LoanBorMain> sLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(),
-					tClFac.getFacmNo(), 0, 900, this.index, this.limit, titaVo);
+			Slice<LoanBorMain> sLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(), tClFac.getFacmNo(), 0, 900, this.index, this.limit, titaVo);
 			List<LoanBorMain> lLoanBorMain = sLoanBorMain == null ? null : sLoanBorMain.getContent();
 			if (sLoanBorMain != null) {
 				for (LoanBorMain tLoanBorMain : sLoanBorMain.getContent()) {
 					drawdownAmt = drawdownAmt.add(tLoanBorMain.getDrawdownAmt());
 					loanBalance = loanBalance.add(tLoanBorMain.getLoanBal());
 				}
-				this.statusCode = facStatusCom.settingStatus(lLoanBorMain,this.txBuffer.getTxBizDate().getTbsDy());
+				this.statusCode = facStatusCom.settingStatus(lLoanBorMain, this.txBuffer.getTxBizDate().getTbsDy());
 			}
 			occursList = new OccursList();
 			occursList.putParam("OOCustNo", tClFac.getCustNo());

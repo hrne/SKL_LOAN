@@ -81,15 +81,12 @@ public class L5106Batch extends TradeBuffer {
 
 		// Broadcast
 		if (isError) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(),
-					"程式處理錯誤" + sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(), "程式處理錯誤" + sendMsg, titaVo);
 		} else {
 			if (this.processCnt > 0) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5905", "",
-						"覆審案件明細資料已產生，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5905", "", "覆審案件明細資料已產生，筆數：" + this.processCnt, titaVo);
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(),
-						"覆審案件明細資料", titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(), "覆審案件明細資料", titaVo);
 			}
 		}
 		// end

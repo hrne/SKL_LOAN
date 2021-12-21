@@ -34,7 +34,7 @@ public class L8R59 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r14 ");
 		this.totaVo.init(titaVo);
-		
+
 		String iRimCourtCode = titaVo.getParam("RimCourtCode");
 		CdCodeId iCdCodeId = new CdCodeId();
 		iCdCodeId.setDefCode("CourtCode");
@@ -42,15 +42,15 @@ public class L8R59 extends TradeBuffer {
 		CdCode iCdCode = iCdCodeService.findById(iCdCodeId, titaVo);
 		if (iCdCode == null) {
 			CdCity iCdCity = iCdCityService.findById(iRimCourtCode, titaVo);
-			if (iCdCity !=null) {
+			if (iCdCity != null) {
 				totaVo.putParam("L8R59CourtCodeX", iCdCity.getCityItem());
-			}else {
+			} else {
 				throw new LogicException(titaVo, "E0001", "");
 			}
-		}else {
+		} else {
 			totaVo.putParam("L8R59CourtCodeX", iCdCode.getItem());
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

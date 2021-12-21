@@ -42,11 +42,11 @@ public class L7913 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public FacMainService sFacMainService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public TxAmlRatingService sTxAmlRatingService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -59,86 +59,83 @@ public class L7913 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L7913 ");
 		this.totaVo.init(titaVo);
-		
+
 		// 取tita戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		// 取tita案件編號
 		int iCaseNo = parse.stringToInteger(titaVo.getParam("CaseNo"));
 
-		
 		Slice<FacMain> slFacMain = null;
 		List<FacMain> lFacMain = new ArrayList<FacMain>();
 		if (iCustNo != 0) {
-			slFacMain = sFacMainService.facmCustNoRange(iCustNo, iCustNo, 1, 999, this.index, this.limit, titaVo);			
-			
+			slFacMain = sFacMainService.facmCustNoRange(iCustNo, iCustNo, 1, 999, this.index, this.limit, titaVo);
+
 			lFacMain = slFacMain == null ? null : slFacMain.getContent();
-			
-			if(lFacMain == null) {			
+
+			if (lFacMain == null) {
 				throw new LogicException("E0001", "L7913額度主檔 戶號 = " + iCustNo);
 			}
-			
-			
+
 		} else {
 			slFacMain = sFacMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit, titaVo);
-			
+
 			lFacMain = slFacMain == null ? null : slFacMain.getContent();
-			
-			if(lFacMain == null) {			
+
+			if (lFacMain == null) {
 				throw new LogicException("E0001", "L7913額度主檔 案件編號 = " + iCaseNo);
 			}
-			
+
 		}
-		
+
 		String sCustNo = "";
 		String sCaseNo = "";
-		
-		for(FacMain tFacMain: lFacMain) {
-		  sCustNo = String.valueOf(tFacMain.getCustNo());
-		  sCaseNo = String.valueOf(tFacMain.getCreditSysNo());
-		  break;
+
+		for (FacMain tFacMain : lFacMain) {
+			sCustNo = String.valueOf(tFacMain.getCustNo());
+			sCaseNo = String.valueOf(tFacMain.getCreditSysNo());
+			break;
 		}
-		
+
 		Slice<TxAmlRating> slTxAmlRating = sTxAmlRatingService.findByCaseNo(sCaseNo, this.index, this.limit);
-		
+
 		List<TxAmlRating> lTxAmlRating = new ArrayList<TxAmlRating>();
-		
+
 		lTxAmlRating = slTxAmlRating == null ? null : slTxAmlRating.getContent();
-		
-		if(lTxAmlRating == null) {			
+
+		if (lTxAmlRating == null) {
 			throw new LogicException("E0001", "L7913案件編號不存在");
 		}
-		
+
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slTxAmlRating != null && slTxAmlRating.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
-		
+
 		for (TxAmlRating tmpTxAmlRating : lTxAmlRating) {
 			// new occurs
 			OccursList occurslist = new OccursList();
-			
 
 			// 借戶戶號
 			occurslist.putParam("OOCustNo", sCustNo);
 			// 案件編號
 			occurslist.putParam("OORspCaseNo", tmpTxAmlRating.getRspCaseNo());
-			
+
 			String YY = String.valueOf(parse.stringToInteger(tmpTxAmlRating.getModifyDate().substring(0, 4)));
 			String MM = tmpTxAmlRating.getModifyDate().substring(4, 6);
 			String DD = tmpTxAmlRating.getModifyDate().substring(6, 8);
 			String HH = tmpTxAmlRating.getModifyDate().substring(8, 10);
-			String mm = tmpTxAmlRating.getModifyDate().substring(10,12);
-			
+			String mm = tmpTxAmlRating.getModifyDate().substring(10, 12);
+
 			// 異動時間
-			occurslist.putParam("OOModifyDate", YY + "/" + MM + "/" + DD + " "+ HH + ":" + mm);
+			occurslist.putParam("OOModifyDate", YY + "/" + MM + "/" + DD + " " + HH + ":" + mm);
 			// 分數
 			occurslist.putParam("OORspTotalRatingsScore", tmpTxAmlRating.getRspTotalRatingsScore());
 			// 總評級
-			
+
 			String TotalRatings = " ";
-			switch(tmpTxAmlRating.getRspTotalRatings()) {
+			switch (tmpTxAmlRating.getRspTotalRatings()) {
 			case "L":
 				TotalRatings = "L.低";
 				break;
@@ -158,7 +155,7 @@ public class L7913 extends TradeBuffer {
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -72,21 +72,19 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @throws Exception ...
 	 */
 	// 當輸入空白找尋最近的日期資料
-	public List<Map<String, String>> findByStatus(int cDate,String empNo, int index, int limit, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findByStatus(int cDate, String empNo, int index, int limit, TitaVo titaVo) throws Exception {
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = "select * from (select a.* , "
-							 + "case when a.\"EffectiveDate\" > '"+cDate+"' then '3'"
-							 + " when a.\"IneffectiveDate\" < '"+cDate+"' and a.\"IneffectiveDate\" !='0' then '2'"
-							 + " when (a.\"EffectiveDate\" <= '"+cDate+"' and a.\"IneffectiveDate\" = '0') or (a.\"IneffectiveDate\" > '"+cDate+"' and a.\"EffectiveDate\" <= '"+cDate+"')then '1' "
-							 + " else '9' end \"StatusFg\","
-							 + " b.\"Fullname\" from \"PfCoOfficer\" a left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"EmpNo\" ";
-							 if (!empNo.trim().isEmpty()) {
-								 sql += " where a.\"EmpNo\" = '"+empNo+"' ";
-							 }
-				sql  += "order by a.\"EmpNo\" ASC , \"EffectiveDate\" DESC) ";
-					
+		String sql = "select * from (select a.* , " + "case when a.\"EffectiveDate\" > '" + cDate + "' then '3'" + " when a.\"IneffectiveDate\" < '" + cDate
+				+ "' and a.\"IneffectiveDate\" !='0' then '2'" + " when (a.\"EffectiveDate\" <= '" + cDate + "' and a.\"IneffectiveDate\" = '0') or (a.\"IneffectiveDate\" > '" + cDate
+				+ "' and a.\"EffectiveDate\" <= '" + cDate + "')then '1' " + " else '9' end \"StatusFg\","
+				+ " b.\"Fullname\" from \"PfCoOfficer\" a left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"EmpNo\" ";
+		if (!empNo.trim().isEmpty()) {
+			sql += " where a.\"EmpNo\" = '" + empNo + "' ";
+		}
+		sql += "order by a.\"EmpNo\" ASC , \"EffectiveDate\" DESC) ";
+
 		sql += sqlRow;
 		this.info("sql = " + sql);
 		// *** 折返控制相關 ***

@@ -74,8 +74,7 @@ public class L4201 extends TradeBuffer {
 		if (tBatxDetail == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
-		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA
-				&& iProcStsCode.equals(tBatxDetail.getProcStsCode())) {
+		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA && iProcStsCode.equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException(titaVo, "E0012", "修改值與現有資料相同");
 		}
 		tBatxDetail = batxDetailService.holdById(tBatxDetailId);

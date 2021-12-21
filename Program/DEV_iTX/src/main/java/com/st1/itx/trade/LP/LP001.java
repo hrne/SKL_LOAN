@@ -27,7 +27,7 @@ public class LP001 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LP001Report lP001Report;
-	
+
 	@Autowired
 	WebClient webClient;
 
@@ -50,8 +50,7 @@ public class LP001 extends BatchBase implements Tasklet, InitializingBean {
 		lP001Report.setTxBuffer(this.getTxBuffer());
 		lP001Report.setParentTranCode(this.getParent());
 		lP001Report.exec(titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LP001工作月放款審查課各區業績累計", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LP001工作月放款審查課各區業績累計", titaVo);
 	}
 
 }

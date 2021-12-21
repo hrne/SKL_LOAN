@@ -34,37 +34,37 @@ public class L5959 extends TradeBuffer {
 
 	@Autowired
 	public PfInsCheckService pfInsCheckService;
-	
+
 	@Autowired
 	public CheckInsurance checkInsurance;
-	
+
 	@Autowired
 	public Parse parse;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5959 ");
 		this.totaVo.init(titaVo);
 
-		PfInsCheckId pfInsCheckId =new PfInsCheckId();
-		
+		PfInsCheckId pfInsCheckId = new PfInsCheckId();
+
 		int iKind = parse.stringToInteger(titaVo.getParam("Kind"));
-		int iCustNo= parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-		
+
 		pfInsCheckId.setKind(iKind);
 		pfInsCheckId.setCustNo(iCustNo);
 		pfInsCheckId.setFacmNo(iFacmNo);
-		
+
 		PfInsCheck pfInsCheck = pfInsCheckService.findById(pfInsCheckId, titaVo);
 		CheckInsuranceVo checkVo = new CheckInsuranceVo();
 		if (pfInsCheck == null) {
 			throw new LogicException(titaVo, "E0001", "房貸獎勵保費檢核檔");
 		} else {
-			if (!"Y".equals(pfInsCheck.getCheckResult())) {				
+			if (!"Y".equals(pfInsCheck.getCheckResult())) {
 				checkVo.setCustId(pfInsCheck.getCustId());
-				
-				//very importance
+
+				// very importance
 				checkInsurance.setTxBuffer(this.txBuffer);
 				checkInsurance.checkInsurance(titaVo, checkVo);
 			} else {
@@ -93,7 +93,7 @@ public class L5959 extends TradeBuffer {
 //
 //		! 檢核工作月 
 //		#oCheckWorkMonth=A,5,S
-		
+
 		this.totaVo.putParam("oCreditSysNo", pfInsCheck.getCreditSysNo());
 		this.totaVo.putParam("oCustId", pfInsCheck.getCustId());
 		this.totaVo.putParam("oApplDate", pfInsCheck.getApplDate());
@@ -105,37 +105,36 @@ public class L5959 extends TradeBuffer {
 		} else {
 			this.totaVo.putParam("oCheckWorkMonth", 0);
 		}
-		
-		if (checkVo.isSuccess() && checkVo.getDetail().size()>0) {
-			
+
+		if (checkVo.isSuccess() && checkVo.getDetail().size() > 0) {
+
 			for (int i = 0; i < checkVo.getDetail().size() - 1; i++) {
 				// if (highest_loan == null) -> 0 else -> [loan_amt] + [highest_loan]
 				HashMap<String, String> map = checkVo.getDetail().get(i);
 
 				OccursList occursList = new OccursList();
-				
-				
+
 				occursList.putParam("oPolicyNo", map.get("policy_no"));
-				occursList.putParam("oApplicationDate", map.get("application_date")); //date
-				occursList.putParam("oPoStatusCode", map.get("po_status_code")); 
-				occursList.putParam("oNamesO", map.get("names_o")); 
-				occursList.putParam("oIssueDate", map.get("issue_date")); //date
-				occursList.putParam("oFaceAmt", map.get("face_amt")); 
-				occursList.putParam("oHighestLoan", map.get("highest_loan")); 
-				occursList.putParam("oLoanBal", map.get("loan_bal")); 
-				occursList.putParam("oExchageVal", map.get("exchage_val")); 
-				occursList.putParam("oModePremYear", map.get("mode_prem_year")); 
-				occursList.putParam("oInsuranceType", map.get("insurance_type_3")); 
-				occursList.putParam("oRvlValues", map.get("rvl_values")); 
-				occursList.putParam("oCurrency", map.get("currency_1")); 
-				occursList.putParam("oNamesI", map.get("names_i")); 
-				
+				occursList.putParam("oApplicationDate", map.get("application_date")); // date
+				occursList.putParam("oPoStatusCode", map.get("po_status_code"));
+				occursList.putParam("oNamesO", map.get("names_o"));
+				occursList.putParam("oIssueDate", map.get("issue_date")); // date
+				occursList.putParam("oFaceAmt", map.get("face_amt"));
+				occursList.putParam("oHighestLoan", map.get("highest_loan"));
+				occursList.putParam("oLoanBal", map.get("loan_bal"));
+				occursList.putParam("oExchageVal", map.get("exchage_val"));
+				occursList.putParam("oModePremYear", map.get("mode_prem_year"));
+				occursList.putParam("oInsuranceType", map.get("insurance_type_3"));
+				occursList.putParam("oRvlValues", map.get("rvl_values"));
+				occursList.putParam("oCurrency", map.get("currency_1"));
+				occursList.putParam("oNamesI", map.get("names_i"));
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
 
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -176,7 +176,7 @@ public class LM015Report extends MakeReport {
 			noData();
 		}
 		long sno = this.close();
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 	}
 
 	// 無資料列印格式

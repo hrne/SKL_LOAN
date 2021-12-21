@@ -35,7 +35,7 @@ public class L4R26 extends TradeBuffer {
 
 	@Autowired
 	public InsuRenewService insuRenewService;
-	
+
 	@Autowired
 	public Parse parse;
 
@@ -55,16 +55,13 @@ public class L4R26 extends TradeBuffer {
 		if ("".equals(iRimEndoInsuNo)) {
 			iRimEndoInsuNo = " ";
 		}
-		
+
 		BigDecimal iFireInsuCovrg = new BigDecimal("0");
 		BigDecimal iEthqInsuCovrg = new BigDecimal("0");
 		BigDecimal iFireInsuPrem = new BigDecimal("0");
 		BigDecimal iEthqInsuPrem = new BigDecimal("0");
-		
-		
-		
-		
-		//續保
+
+		// 續保
 		InsuRenew tInsuRenew = new InsuRenew();
 		InsuRenewId tInsuRenewId = new InsuRenewId();
 		tInsuRenewId.setClCode1(iClCode1);
@@ -72,37 +69,37 @@ public class L4R26 extends TradeBuffer {
 		tInsuRenewId.setClNo(iClNo);
 		tInsuRenewId.setEndoInsuNo(iRimEndoInsuNo); // 批單
 		tInsuRenewId.setPrevInsuNo(iPrevInsuNo); // 原保單號碼
-		
+
 		tInsuRenew = insuRenewService.findById(tInsuRenewId, titaVo);
-		
-		if(tInsuRenew != null) {
+
+		if (tInsuRenew != null) {
 			throw new LogicException("E0012", "續約保單資料維護"); // 該筆資料已存在
 		}
-		
+
 		// 新保
 		Slice<InsuOrignal> slInsuOrignal = null;
 		List<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>();
 
 		slInsuOrignal = insuOrignalService.findOrigInsuNoEq(iClCode1, iClCode2, iClNo, iPrevInsuNo, index, limit, titaVo);
-   
+
 		lInsuOrignal = slInsuOrignal == null ? null : slInsuOrignal.getContent();
-		
-		if(lInsuOrignal != null) {
-		  for( InsuOrignal t :lInsuOrignal ) {
-			 iFireInsuCovrg = iFireInsuCovrg.add(t.getFireInsuCovrg());
-			 iEthqInsuCovrg = iEthqInsuCovrg.add(t.getEthqInsuCovrg());
-			 iFireInsuPrem = iFireInsuPrem.add(t.getFireInsuPrem());
-			 iEthqInsuPrem = iEthqInsuPrem.add(t.getEthqInsuPrem());
-		  }
+
+		if (lInsuOrignal != null) {
+			for (InsuOrignal t : lInsuOrignal) {
+				iFireInsuCovrg = iFireInsuCovrg.add(t.getFireInsuCovrg());
+				iEthqInsuCovrg = iEthqInsuCovrg.add(t.getEthqInsuCovrg());
+				iFireInsuPrem = iFireInsuPrem.add(t.getFireInsuPrem());
+				iEthqInsuPrem = iEthqInsuPrem.add(t.getEthqInsuPrem());
+			}
 		} else {
 			throw new LogicException("E0001", "原保單號碼"); // 查詢資料不存在
 		}
-		
+
 		this.totaVo.putParam("L4r26FireInsuCovrg", iFireInsuCovrg);
 		this.totaVo.putParam("L4r26EthqInsuCovrg", iEthqInsuCovrg);
 		this.totaVo.putParam("L4r26FireInsuPrem", iFireInsuPrem);
 		this.totaVo.putParam("L4r26EthqInsuPrem", iEthqInsuPrem);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

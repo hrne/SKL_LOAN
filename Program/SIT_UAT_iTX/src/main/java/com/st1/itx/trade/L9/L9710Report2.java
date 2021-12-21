@@ -36,7 +36,7 @@ public class L9710Report2 extends MakeReport {
 	public void printHeader() {
 
 		this.setCharSpaces(0);
- 
+
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(3);
 
@@ -112,8 +112,7 @@ public class L9710Report2 extends MakeReport {
 		List<BaTxVo> listBaTxVo = new ArrayList<>();
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
-			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9710Vo.get("F4")), parse.stringToInteger(tL9710Vo.get("F5")), 0, 6, titaVo);
+			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9710Vo.get("F4")), parse.stringToInteger(tL9710Vo.get("F5")), 0, 6, titaVo);
 			this.info("listBaTxVo.size()-------->" + listBaTxVo.size());
 			this.info("listBaTxVo-------->" + listBaTxVo.toString());
 
@@ -234,8 +233,7 @@ public class L9710Report2 extends MakeReport {
 			this.print(0, 87, tmp);
 
 			this.print(1, 10, "戶號：　　　　　　　目前利率：　　　　%");
-			this.print(0, 16, String.format("%07d", Integer.valueOf(tL9710Vo.get("F4"))) + "-"
-					+ String.format("%03d", Integer.valueOf(tL9710Vo.get("F5"))));
+			this.print(0, 16, String.format("%07d", Integer.valueOf(tL9710Vo.get("F4"))) + "-" + String.format("%03d", Integer.valueOf(tL9710Vo.get("F5"))));
 			this.print(0, 47, String.format("%.4f", IntRate), "R");
 			this.print(1, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
 			this.print(0, 20, tL9710Vo.get("F6"));
@@ -264,8 +262,7 @@ public class L9710Report2 extends MakeReport {
 					Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
 					LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
 					if (!"0".equals(TempDate)) {
-						this.print(1, 7, TempDate.substring(0, 3) + "/" + TempDate.substring(3, 5) + "/"
-								+ TempDate.substring(5, 7));
+						this.print(1, 7, TempDate.substring(0, 3) + "/" + TempDate.substring(3, 5) + "/" + TempDate.substring(5, 7));
 					}
 					this.print(0, 25, String.format("%,d", BreachAmt), "R");
 					this.print(0, 38, String.format("%,d", Principal), "R");
@@ -277,8 +274,7 @@ public class L9710Report2 extends MakeReport {
 
 				} else { // 當筆日期與之前不同
 					if (!"0".equals(TempDate)) {
-						this.print(1, 7, TempDate.substring(0, 3) + "/" + TempDate.substring(3, 5) + "/"
-								+ TempDate.substring(5, 7));
+						this.print(1, 7, TempDate.substring(0, 3) + "/" + TempDate.substring(3, 5) + "/" + TempDate.substring(5, 7));
 					}
 					this.print(0, 25, String.format("%,d", BreachAmt), "R");
 					this.print(0, 38, String.format("%,d", Principal), "R");

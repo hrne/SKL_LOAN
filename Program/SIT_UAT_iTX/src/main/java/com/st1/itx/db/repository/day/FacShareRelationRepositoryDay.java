@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.FacShareRelationId;
  */
 public interface FacShareRelationRepositoryDay extends JpaRepository<FacShareRelation, FacShareRelationId> {
 
-  // ApplNo =
-  public Slice<FacShareRelation> findAllByApplNoIsOrderByRelApplNoAsc(int applNo_0, Pageable pageable);
+	// ApplNo =
+	public Slice<FacShareRelation> findAllByApplNoIsOrderByRelApplNoAsc(int applNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacShareRelation> findByFacShareRelationId(FacShareRelationId facShareRelationId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacShareRelation> findByFacShareRelationId(FacShareRelationId facShareRelationId);
 
 }
-

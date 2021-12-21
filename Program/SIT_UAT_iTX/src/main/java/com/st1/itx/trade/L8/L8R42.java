@@ -35,17 +35,17 @@ public class L8R42 extends TradeBuffer {
 		if (iJcicZ444 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
 		} else {
-			totaVo.putParam("L8r42TranKey",iJcicZ444.getTranKey());// 交易代碼
+			totaVo.putParam("L8r42TranKey", iJcicZ444.getTranKey());// 交易代碼
 			totaVo.putParam("L8r42CustId", iJcicZ444.getCustId());// 債務人IDN
 			totaVo.putParam("L8r42SubmitKey", iJcicZ444.getSubmitKey());// 報送單位代號
-            totaVo.putParam("L8r42ApplyDate", iJcicZ444.getApplyDate());// 調解申請日
-            totaVo.putParam("L8r42CourtCode", iJcicZ444.getCourtCode());// 受理調解機構代號
-            totaVo.putParam("L8r42CustRegAddr",iJcicZ444.getCustRegAddr());
-            totaVo.putParam("L8r42CustComAddr",iJcicZ444.getCustComAddr());
-            totaVo.putParam("L8r42CustRegTelNo",iJcicZ444.getCustRegTelNo());
-            totaVo.putParam("L8r42CustComTelNo",iJcicZ444.getCustComTelNo());
-            totaVo.putParam("L8r42CustMobilNo",iJcicZ444.getCustMobilNo());
-			totaVo.putParam("L8r42OutJcicTxtDate", iJcicZ444.getOutJcicTxtDate());// 轉JCIC文字檔日期  
+			totaVo.putParam("L8r42ApplyDate", iJcicZ444.getApplyDate());// 調解申請日
+			totaVo.putParam("L8r42CourtCode", iJcicZ444.getCourtCode());// 受理調解機構代號
+			totaVo.putParam("L8r42CustRegAddr", iJcicZ444.getCustRegAddr());
+			totaVo.putParam("L8r42CustComAddr", iJcicZ444.getCustComAddr());
+			totaVo.putParam("L8r42CustRegTelNo", iJcicZ444.getCustRegTelNo());
+			totaVo.putParam("L8r42CustComTelNo", iJcicZ444.getCustComTelNo());
+			totaVo.putParam("L8r42CustMobilNo", iJcicZ444.getCustMobilNo());
+			totaVo.putParam("L8r42OutJcicTxtDate", iJcicZ444.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

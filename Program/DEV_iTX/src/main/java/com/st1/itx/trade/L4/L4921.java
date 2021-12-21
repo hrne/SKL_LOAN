@@ -130,8 +130,7 @@ public class L4921 extends TradeBuffer {
 				if (tBatxDetail == null) {
 					continue;
 				}
-				if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) 
-						                                     || "7".equals(tBatxDetail.getProcStsCode())) {
+				if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) || "7".equals(tBatxDetail.getProcStsCode())) {
 					flag = 0;
 				}
 

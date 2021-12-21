@@ -29,7 +29,6 @@ public class L2R17 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClNoMapService sClNoMapService;
-	
 
 	/* 轉換工具 */
 	@Autowired
@@ -44,32 +43,29 @@ public class L2R17 extends TradeBuffer {
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 
-		
 		List<ClNoMap> lClNoMap = new ArrayList<ClNoMap>();
-		
-		Slice<ClNoMap> sClNoMap  = sClNoMapService.findNewClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 
-		
+		Slice<ClNoMap> sClNoMap = sClNoMapService.findNewClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+
 		lClNoMap = sClNoMap == null ? null : sClNoMap.getContent();
 
-		
 		this.totaVo.putParam("L2r17GdrId1", "0");
 		this.totaVo.putParam("L2r17GdrId2", "00");
 		this.totaVo.putParam("L2r17GdrNum", "0000000");
 		this.totaVo.putParam("L2r17LgtSeq", "0");
-		
-		if(lClNoMap != null ) {
-			for( ClNoMap tClNoMap : lClNoMap) {
-				if(tClNoMap.getTfStatus() == 1 || tClNoMap.getTfStatus() == 3) {
+
+		if (lClNoMap != null) {
+			for (ClNoMap tClNoMap : lClNoMap) {
+				if (tClNoMap.getTfStatus() == 1 || tClNoMap.getTfStatus() == 3) {
 					this.totaVo.putParam("L2r17GdrId1", tClNoMap.getGdrId1());
 					this.totaVo.putParam("L2r17GdrId2", tClNoMap.getGdrId2());
 					this.totaVo.putParam("L2r17GdrNum", tClNoMap.getGdrNum());
 					this.totaVo.putParam("L2r17LgtSeq", tClNoMap.getLgtSeq());
 				}
 			}
-			
+
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 

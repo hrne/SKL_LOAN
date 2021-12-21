@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.HlAreaData;
  */
 public interface HlAreaDataRepositoryHist extends JpaRepository<HlAreaData, String> {
 
-  // AreaUnitNo = 
-  public Slice<HlAreaData> findAllByAreaUnitNoIsOrderByAreaUnitNoAsc(String areaUnitNo_0, Pageable pageable);
+	// AreaUnitNo =
+	public Slice<HlAreaData> findAllByAreaUnitNoIsOrderByAreaUnitNoAsc(String areaUnitNo_0, Pageable pageable);
 
-  // AreaChiefEmpNo = 
-  public Slice<HlAreaData> findAllByAreaChiefEmpNoIsOrderByAreaUnitNoAsc(String areaChiefEmpNo_0, Pageable pageable);
+	// AreaChiefEmpNo =
+	public Slice<HlAreaData> findAllByAreaChiefEmpNoIsOrderByAreaUnitNoAsc(String areaChiefEmpNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<HlAreaData> findByAreaUnitNo(String areaUnitNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<HlAreaData> findByAreaUnitNo(String areaUnitNo);
 
 }
-

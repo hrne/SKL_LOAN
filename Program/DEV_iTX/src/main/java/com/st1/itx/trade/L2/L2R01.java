@@ -118,8 +118,7 @@ public class L2R01 extends TradeBuffer {
 					}
 					if (tFacProd.getEndDate() > 0) {
 						if (tFacProd.getEndDate() < parse.stringToInteger(titaVo.getCalDy())) {
-							throw new LogicException(titaVo, "E2054",
-									"商品參數檔" + " 商品代碼 = " + iRimProdNo + " 商品截止日期 : " + tFacProd.getEndDate()); // 此商品已截止
+							throw new LogicException(titaVo, "E2054", "商品參數檔" + " 商品代碼 = " + iRimProdNo + " 商品截止日期 : " + tFacProd.getEndDate()); // 此商品已截止
 						}
 					}
 
@@ -171,28 +170,24 @@ public class L2R01 extends TradeBuffer {
 		}
 
 		// 查詢年繳保費優惠減碼
-		lFacProdPremium = facProdPremiumService.premiumProdNoEq(iRimProdNo, new BigDecimal(0.00),
-				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		lFacProdPremium = facProdPremiumService.premiumProdNoEq(iRimProdNo, new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdPremium == null || lFacProdPremium.isEmpty())) {
 			SetTotaPremium();
 		}
 
 		// 查詢帳管費
-		lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1", new BigDecimal(0.00),
-				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
 			SetTotaAcctFee();
 		}
 		// 查詢手續費
-		lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2", new BigDecimal(0.00),
-				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty())) {
 			SetTotaHandingFee();
 		}
 		// 查詢清償金類型
 		wkBreachCode = tFacProd != null ? tFacProd.getBreachCode() : "0";
-		lFacProdBreach = facProdBreachService.breachNoEq(iRimProdNo, wkBreachCode, wkBreachCode, this.index, this.limit,
-				titaVo);
+		lFacProdBreach = facProdBreachService.breachNoEq(iRimProdNo, wkBreachCode, wkBreachCode, this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
 //			SetTotaBreach();
 		}

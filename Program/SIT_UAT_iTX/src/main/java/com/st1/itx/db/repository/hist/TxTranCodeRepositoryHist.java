@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,13 +20,12 @@ import com.st1.itx.db.domain.TxTranCode;
  */
 public interface TxTranCodeRepositoryHist extends JpaRepository<TxTranCode, String> {
 
-  // TranNo %
-  public Slice<TxTranCode> findAllByTranNoLikeOrderByTranNoAsc(String tranNo_0, Pageable pageable);
+	// TranNo %
+	public Slice<TxTranCode> findAllByTranNoLikeOrderByTranNoAsc(String tranNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxTranCode> findByTranNo(String tranNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxTranCode> findByTranNo(String tranNo);
 
 }
-

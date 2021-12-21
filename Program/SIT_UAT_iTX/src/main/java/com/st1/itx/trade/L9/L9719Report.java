@@ -64,49 +64,32 @@ public class L9719Report extends MakeReport {
 		 */
 		this.print(-3, 1, "┌──────────────────────────────────────────────────────────────────────────────┐");
 		this.print(-4, 1,
-				"｜                                                                                                                                         資料日期："
-						+ rocYear + "年" + rocMonth + "月｜");
+				"｜                                                                                                                                         資料日期：" + rocYear + "年" + rocMonth + "月｜");
 		this.print(-5, 1, "├──────────────────────────────────────────────────────────────────────────────┤");
-		this.print(-6, 1,
-				"｜                                                                                                                                              單位：新台幣元｜");
+		this.print(-6, 1, "｜                                                                                                                                              單位：新台幣元｜");
 		this.print(-7, 1, "├──────┬──────────┬────────────┬──────┬───────────┬───────────┬────────────────┤");
-		this.print(-8, 1,
-				"｜  傳票序號  ｜    會計科目代號    ｜        科目名稱        ｜    幣別    ｜       借方金額       ｜       貸方金額       ｜             摘要說明           ｜");
+		this.print(-8, 1, "｜  傳票序號  ｜    會計科目代號    ｜        科目名稱        ｜    幣別    ｜       借方金額       ｜       貸方金額       ｜             摘要說明           ｜");
 		this.print(-9, 1, "├──────┼──────────┼────────────┼──────┼───────────┼───────────┼────────────────┤");
-		this.print(-10, 1,
-				"｜    001     ｜                    ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
+		this.print(-10, 1, "｜    001     ｜                    ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
 		this.print(-11, 1, "├──────┼──────────┼────────────┼──────┼───────────┼───────────┼────────────────┤");
-		this.print(-12, 1,
-				"｜    002     ｜                    ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
+		this.print(-12, 1, "｜    002     ｜                    ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
 		this.print(-13, 1, "├──────┼──────────┼────────────┼──────┼───────────┼───────────┼────────────────┤");
-		this.print(-14, 1,
-				"｜    003     ｜                    ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
+		this.print(-14, 1, "｜    003     ｜                    ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
 		this.print(-15, 1, "├──────┼──────────┼────────────┼──────┼───────────┼───────────┼────────────────┤");
-		this.print(-16, 1,
-				"｜            ｜     合計 Total     ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
+		this.print(-16, 1, "｜            ｜     合計 Total     ｜                        ｜    NTD     ｜                      ｜                      ｜                                ｜");
 		this.print(-17, 1, "├──────┴──────────┴────────────┴──────┴───────────┼───────────┴────────────────┤");
-		this.print(-18, 1,
-				"｜                                                                                                  ｜                                                        ｜");
+		this.print(-18, 1, "｜                                                                                                  ｜                                                        ｜");
 		this.print(-19, 1, "├─────────────────────────────────────────────────┼────────────────────────────┤");
-		this.print(-20, 1,
-				"｜                                          放款管理課                                              ｜                         會辦單位                       ｜");
+		this.print(-20, 1, "｜                                          放款管理課                                              ｜                         會辦單位                       ｜");
 		this.print(-21, 1, "├─────────────────────────────────────────────────┼────────────────────────────┤");
-		this.print(-22, 1,
-				"｜                                                                                                  ｜                                                        ｜");
-		this.print(-23, 1,
-				"｜                                                                                                  ｜                                                        ｜");
-		this.print(-24, 1,
-				"｜                                                                                                  ｜                                                        ｜");
-		this.print(-25, 1,
-				"｜                                                                                                  ｜                                                        ｜");
-		this.print(-26, 1,
-				"｜                                                                                                  ｜                                                        ｜");
-		this.print(-27, 1,
-				"｜                                                                                                  ｜                                                        ｜");
-		this.print(-28, 1,
-				"｜                                                                                                  ｜                                                        ｜");
-		this.print(-29, 1,
-				"｜                                                                                                  ｜                                                        ｜");
+		this.print(-22, 1, "｜                                                                                                  ｜                                                        ｜");
+		this.print(-23, 1, "｜                                                                                                  ｜                                                        ｜");
+		this.print(-24, 1, "｜                                                                                                  ｜                                                        ｜");
+		this.print(-25, 1, "｜                                                                                                  ｜                                                        ｜");
+		this.print(-26, 1, "｜                                                                                                  ｜                                                        ｜");
+		this.print(-27, 1, "｜                                                                                                  ｜                                                        ｜");
+		this.print(-28, 1, "｜                                                                                                  ｜                                                        ｜");
+		this.print(-29, 1, "｜                                                                                                  ｜                                                        ｜");
 		this.print(-30, 1, "└─────────────────────────────────────────────────┴────────────────────────────┘");
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(31);
@@ -174,10 +157,8 @@ public class L9719Report extends MakeReport {
 					print(-10 - i * 2, 143, tLDVo.get("F14"), "C");
 				}
 
-				print(-16, 99, formatAmt(getBigDecimal(tLDVo.get("F0")).add(getBigDecimal(tLDVo.get("F4")))
-						.add(getBigDecimal(tLDVo.get("F8"))), 0), "R");
-				print(-16, 124, formatAmt(getBigDecimal(tLDVo.get("F1")).add(getBigDecimal(tLDVo.get("F5")))
-						.add(getBigDecimal(tLDVo.get("F9"))), 0), "R");
+				print(-16, 99, formatAmt(getBigDecimal(tLDVo.get("F0")).add(getBigDecimal(tLDVo.get("F4"))).add(getBigDecimal(tLDVo.get("F8"))), 0), "R");
+				print(-16, 124, formatAmt(getBigDecimal(tLDVo.get("F1")).add(getBigDecimal(tLDVo.get("F5"))).add(getBigDecimal(tLDVo.get("F9"))), 0), "R");
 
 				F12 = formatAmt(tLDVo.get("F12"), 0);
 				F13 = formatAmt(tLDVo.get("F13"), 0);

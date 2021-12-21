@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,13 +20,12 @@ import com.st1.itx.db.domain.CdLoanNotYet;
  */
 public interface CdLoanNotYetRepositoryMon extends JpaRepository<CdLoanNotYet, String> {
 
-  // NotYetCode %
-  public Slice<CdLoanNotYet> findAllByNotYetCodeLikeOrderByNotYetCodeAsc(String notYetCode_0, Pageable pageable);
+	// NotYetCode %
+	public Slice<CdLoanNotYet> findAllByNotYetCodeLikeOrderByNotYetCodeAsc(String notYetCode_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdLoanNotYet> findByNotYetCode(String notYetCode);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdLoanNotYet> findByNotYetCode(String notYetCode);
 
 }
-

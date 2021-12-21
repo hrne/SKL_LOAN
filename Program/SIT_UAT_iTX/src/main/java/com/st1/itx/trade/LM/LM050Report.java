@@ -49,17 +49,14 @@ public class LM050Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM050", "放款保險法第3條利害關係人放款餘額表_限額控管",
-				"LM050放款保險法第3條利害關係人放款餘額表_限額控管", "LM050_底稿_放款保險法第3條利害關係人放款餘額表_限額控管.xlsx", "108.04");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM050", "放款保險法第3條利害關係人放款餘額表_限額控管", "LM050放款保險法第3條利害關係人放款餘額表_限額控管", "LM050_底稿_放款保險法第3條利害關係人放款餘額表_限額控管.xlsx", "108.04");
 
 		// 取得民國年帳務日
 		String entdy = titaVo.getEntDy();
 
 		makeExcel.setSheet("108.04", entdy.substring(1, 4) + "." + entdy.substring(4, 6));
-		makeExcel.setValue(1, 2, entdy.substring(1, 4) + "年" + entdy.substring(4, 6) + "月" + entdy.substring(6, 8)
-				+ "日依「保險業利害關係人放款管理辦法」第3條利害關係人放款餘額表");
-		makeExcel.setValue(2, 4,
-				entdy.substring(1, 4) + "." + entdy.substring(4, 6) + "." + entdy.substring(6, 8) + " 淨值（核閱數）");
+		makeExcel.setValue(1, 2, entdy.substring(1, 4) + "年" + entdy.substring(4, 6) + "月" + entdy.substring(6, 8) + "日依「保險業利害關係人放款管理辦法」第3條利害關係人放款餘額表");
+		makeExcel.setValue(2, 4, entdy.substring(1, 4) + "." + entdy.substring(4, 6) + "." + entdy.substring(6, 8) + " 淨值（核閱數）");
 
 		List<Map<String, String>> equityList = null;
 

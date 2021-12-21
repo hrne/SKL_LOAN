@@ -46,7 +46,7 @@ public class L9707ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             THEN M.\"DueDate\" ";
 		sql += "             WHEN M.\"NextIntDate\" > M.\"YearMonth\" * 100 ";
 		sql += "             THEN M.\"NextIntDate\" ";
-		
+
 		// 避免兩日期中有非正確格式的情況
 		sql += "             WHEN M.\"NextIntDate\" > 9999999 AND M.\"YearMonth\" > 99999";
 		// 此時已確定NextIntDate的年月 < YearMonth
@@ -78,14 +78,14 @@ public class L9707ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         ,F.\"FacmNo\" ";
 
 		this.info("sql=" + sql);
-		
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("StartDate", startDate);
 		query.setParameter("EndDate", endDate);
-		
+
 		return this.convertToMap(query);
 	}
 

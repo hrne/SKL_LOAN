@@ -35,325 +35,314 @@ import com.st1.itx.eum.ThreadVariable;
 @Service("rptJcicService")
 @Repository
 public class RptJcicServiceImpl extends ASpringJpaParm implements RptJcicService, InitializingBean {
-  @Autowired
-  private BaseEntityManager baseEntityManager;
+	@Autowired
+	private BaseEntityManager baseEntityManager;
 
-  @Autowired
-  private RptJcicRepository rptJcicRepos;
+	@Autowired
+	private RptJcicRepository rptJcicRepos;
 
-  @Autowired
-  private RptJcicRepositoryDay rptJcicReposDay;
+	@Autowired
+	private RptJcicRepositoryDay rptJcicReposDay;
 
-  @Autowired
-  private RptJcicRepositoryMon rptJcicReposMon;
+	@Autowired
+	private RptJcicRepositoryMon rptJcicReposMon;
 
-  @Autowired
-  private RptJcicRepositoryHist rptJcicReposHist;
+	@Autowired
+	private RptJcicRepositoryHist rptJcicReposHist;
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    org.junit.Assert.assertNotNull(rptJcicRepos);
-    org.junit.Assert.assertNotNull(rptJcicReposDay);
-    org.junit.Assert.assertNotNull(rptJcicReposMon);
-    org.junit.Assert.assertNotNull(rptJcicReposHist);
-  }
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		org.junit.Assert.assertNotNull(rptJcicRepos);
+		org.junit.Assert.assertNotNull(rptJcicReposDay);
+		org.junit.Assert.assertNotNull(rptJcicReposMon);
+		org.junit.Assert.assertNotNull(rptJcicReposHist);
+	}
 
-  @Override
-  public RptJcic findById(RptJcicId rptJcicId, TitaVo... titaVo) {
-    String dbName = "";
+	@Override
+	public RptJcic findById(RptJcicId rptJcicId, TitaVo... titaVo) {
+		String dbName = "";
 
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + rptJcicId);
-    Optional<RptJcic> rptJcic = null;
-    if (dbName.equals(ContentName.onDay))
-      rptJcic = rptJcicReposDay.findById(rptJcicId);
-    else if (dbName.equals(ContentName.onMon))
-      rptJcic = rptJcicReposMon.findById(rptJcicId);
-    else if (dbName.equals(ContentName.onHist))
-      rptJcic = rptJcicReposHist.findById(rptJcicId);
-    else 
-      rptJcic = rptJcicRepos.findById(rptJcicId);
-    RptJcic obj = rptJcic.isPresent() ? rptJcic.get() : null;
-      if(obj != null) {
-        EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
-        em.detach(obj);
-em = null;
-}
-    return obj;
-  }
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("findById " + dbName + " " + rptJcicId);
+		Optional<RptJcic> rptJcic = null;
+		if (dbName.equals(ContentName.onDay))
+			rptJcic = rptJcicReposDay.findById(rptJcicId);
+		else if (dbName.equals(ContentName.onMon))
+			rptJcic = rptJcicReposMon.findById(rptJcicId);
+		else if (dbName.equals(ContentName.onHist))
+			rptJcic = rptJcicReposHist.findById(rptJcicId);
+		else
+			rptJcic = rptJcicRepos.findById(rptJcicId);
+		RptJcic obj = rptJcic.isPresent() ? rptJcic.get() : null;
+		if (obj != null) {
+			EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
+			em.detach(obj);
+			em = null;
+		}
+		return obj;
+	}
 
-  @Override
-  public Slice<RptJcic> findAll(int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<RptJcic> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = null;
-    if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "BranchNo", "CustNo", "FacmNo"));
-    else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BranchNo", "CustNo", "FacmNo"));
-    this.info("findAll " + dbName);
-    if (dbName.equals(ContentName.onDay))
-      slice = rptJcicReposDay.findAll(pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = rptJcicReposMon.findAll(pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = rptJcicReposHist.findAll(pageable);
-    else 
-      slice = rptJcicRepos.findAll(pageable);
+	@Override
+	public Slice<RptJcic> findAll(int index, int limit, TitaVo... titaVo) {
+		String dbName = "";
+		Slice<RptJcic> slice = null;
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		Pageable pageable = null;
+		if (limit == Integer.MAX_VALUE)
+			pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "BranchNo", "CustNo", "FacmNo"));
+		else
+			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BranchNo", "CustNo", "FacmNo"));
+		this.info("findAll " + dbName);
+		if (dbName.equals(ContentName.onDay))
+			slice = rptJcicReposDay.findAll(pageable);
+		else if (dbName.equals(ContentName.onMon))
+			slice = rptJcicReposMon.findAll(pageable);
+		else if (dbName.equals(ContentName.onHist))
+			slice = rptJcicReposHist.findAll(pageable);
+		else
+			slice = rptJcicRepos.findAll(pageable);
 
-		if (slice != null) 
+		if (slice != null)
 			this.baseEntityManager.clearEntityManager(dbName);
 
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
+		return slice != null && !slice.isEmpty() ? slice : null;
+	}
 
-  @Override
-  public RptJcic holdById(RptJcicId rptJcicId, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + rptJcicId);
-    Optional<RptJcic> rptJcic = null;
-    if (dbName.equals(ContentName.onDay))
-      rptJcic = rptJcicReposDay.findByRptJcicId(rptJcicId);
-    else if (dbName.equals(ContentName.onMon))
-      rptJcic = rptJcicReposMon.findByRptJcicId(rptJcicId);
-    else if (dbName.equals(ContentName.onHist))
-      rptJcic = rptJcicReposHist.findByRptJcicId(rptJcicId);
-    else 
-      rptJcic = rptJcicRepos.findByRptJcicId(rptJcicId);
-    return rptJcic.isPresent() ? rptJcic.get() : null;
-  }
+	@Override
+	public RptJcic holdById(RptJcicId rptJcicId, TitaVo... titaVo) {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Hold " + dbName + " " + rptJcicId);
+		Optional<RptJcic> rptJcic = null;
+		if (dbName.equals(ContentName.onDay))
+			rptJcic = rptJcicReposDay.findByRptJcicId(rptJcicId);
+		else if (dbName.equals(ContentName.onMon))
+			rptJcic = rptJcicReposMon.findByRptJcicId(rptJcicId);
+		else if (dbName.equals(ContentName.onHist))
+			rptJcic = rptJcicReposHist.findByRptJcicId(rptJcicId);
+		else
+			rptJcic = rptJcicRepos.findByRptJcicId(rptJcicId);
+		return rptJcic.isPresent() ? rptJcic.get() : null;
+	}
 
-  @Override
-  public RptJcic holdById(RptJcic rptJcic, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + rptJcic.getRptJcicId());
-    Optional<RptJcic> rptJcicT = null;
-    if (dbName.equals(ContentName.onDay))
-      rptJcicT = rptJcicReposDay.findByRptJcicId(rptJcic.getRptJcicId());
-    else if (dbName.equals(ContentName.onMon))
-      rptJcicT = rptJcicReposMon.findByRptJcicId(rptJcic.getRptJcicId());
-    else if (dbName.equals(ContentName.onHist))
-      rptJcicT = rptJcicReposHist.findByRptJcicId(rptJcic.getRptJcicId());
-    else 
-      rptJcicT = rptJcicRepos.findByRptJcicId(rptJcic.getRptJcicId());
-    return rptJcicT.isPresent() ? rptJcicT.get() : null;
-  }
+	@Override
+	public RptJcic holdById(RptJcic rptJcic, TitaVo... titaVo) {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Hold " + dbName + " " + rptJcic.getRptJcicId());
+		Optional<RptJcic> rptJcicT = null;
+		if (dbName.equals(ContentName.onDay))
+			rptJcicT = rptJcicReposDay.findByRptJcicId(rptJcic.getRptJcicId());
+		else if (dbName.equals(ContentName.onMon))
+			rptJcicT = rptJcicReposMon.findByRptJcicId(rptJcic.getRptJcicId());
+		else if (dbName.equals(ContentName.onHist))
+			rptJcicT = rptJcicReposHist.findByRptJcicId(rptJcic.getRptJcicId());
+		else
+			rptJcicT = rptJcicRepos.findByRptJcicId(rptJcic.getRptJcicId());
+		return rptJcicT.isPresent() ? rptJcicT.get() : null;
+	}
 
-  @Override
-  public RptJcic insert(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public RptJcic insert(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Insert..." + dbName + " " + rptJcic.getRptJcicId());
-    if (this.findById(rptJcic.getRptJcicId()) != null)
-      throw new DBException(2);
+		this.info("Insert..." + dbName + " " + rptJcic.getRptJcicId());
+		if (this.findById(rptJcic.getRptJcicId()) != null)
+			throw new DBException(2);
 
-    if (!empNot.isEmpty())
-      rptJcic.setCreateEmpNo(empNot);
+		if (!empNot.isEmpty())
+			rptJcic.setCreateEmpNo(empNot);
 
-    if(rptJcic.getLastUpdateEmpNo() == null || rptJcic.getLastUpdateEmpNo().isEmpty())
-      rptJcic.setLastUpdateEmpNo(empNot);
+		if (rptJcic.getLastUpdateEmpNo() == null || rptJcic.getLastUpdateEmpNo().isEmpty())
+			rptJcic.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      return rptJcicReposDay.saveAndFlush(rptJcic);	
-    else if (dbName.equals(ContentName.onMon))
-      return rptJcicReposMon.saveAndFlush(rptJcic);
-    else if (dbName.equals(ContentName.onHist))
-      return rptJcicReposHist.saveAndFlush(rptJcic);
-    else 
-    return rptJcicRepos.saveAndFlush(rptJcic);
-  }
+		if (dbName.equals(ContentName.onDay))
+			return rptJcicReposDay.saveAndFlush(rptJcic);
+		else if (dbName.equals(ContentName.onMon))
+			return rptJcicReposMon.saveAndFlush(rptJcic);
+		else if (dbName.equals(ContentName.onHist))
+			return rptJcicReposHist.saveAndFlush(rptJcic);
+		else
+			return rptJcicRepos.saveAndFlush(rptJcic);
+	}
 
-  @Override
-  public RptJcic update(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public RptJcic update(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + rptJcic.getRptJcicId());
-    if (!empNot.isEmpty())
-      rptJcic.setLastUpdateEmpNo(empNot);
+		this.info("Update..." + dbName + " " + rptJcic.getRptJcicId());
+		if (!empNot.isEmpty())
+			rptJcic.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      return rptJcicReposDay.saveAndFlush(rptJcic);	
-    else if (dbName.equals(ContentName.onMon))
-      return rptJcicReposMon.saveAndFlush(rptJcic);
-    else if (dbName.equals(ContentName.onHist))
-      return rptJcicReposHist.saveAndFlush(rptJcic);
-    else 
-    return rptJcicRepos.saveAndFlush(rptJcic);
-  }
+		if (dbName.equals(ContentName.onDay))
+			return rptJcicReposDay.saveAndFlush(rptJcic);
+		else if (dbName.equals(ContentName.onMon))
+			return rptJcicReposMon.saveAndFlush(rptJcic);
+		else if (dbName.equals(ContentName.onHist))
+			return rptJcicReposHist.saveAndFlush(rptJcic);
+		else
+			return rptJcicRepos.saveAndFlush(rptJcic);
+	}
 
-  @Override
-  public RptJcic update2(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public RptJcic update2(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + rptJcic.getRptJcicId());
-    if (!empNot.isEmpty())
-      rptJcic.setLastUpdateEmpNo(empNot);
+		this.info("Update..." + dbName + " " + rptJcic.getRptJcicId());
+		if (!empNot.isEmpty())
+			rptJcic.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      rptJcicReposDay.saveAndFlush(rptJcic);	
-    else if (dbName.equals(ContentName.onMon))
-      rptJcicReposMon.saveAndFlush(rptJcic);
-    else if (dbName.equals(ContentName.onHist))
-        rptJcicReposHist.saveAndFlush(rptJcic);
-    else 
-      rptJcicRepos.saveAndFlush(rptJcic);	
-    return this.findById(rptJcic.getRptJcicId());
-  }
+		if (dbName.equals(ContentName.onDay))
+			rptJcicReposDay.saveAndFlush(rptJcic);
+		else if (dbName.equals(ContentName.onMon))
+			rptJcicReposMon.saveAndFlush(rptJcic);
+		else if (dbName.equals(ContentName.onHist))
+			rptJcicReposHist.saveAndFlush(rptJcic);
+		else
+			rptJcicRepos.saveAndFlush(rptJcic);
+		return this.findById(rptJcic.getRptJcicId());
+	}
 
-  @Override
-  public void delete(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + rptJcic.getRptJcicId());
-    if (dbName.equals(ContentName.onDay)) {
-      rptJcicReposDay.delete(rptJcic);	
-      rptJcicReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      rptJcicReposMon.delete(rptJcic);	
-      rptJcicReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      rptJcicReposHist.delete(rptJcic);
-      rptJcicReposHist.flush();
-    }
-    else {
-      rptJcicRepos.delete(rptJcic);
-      rptJcicRepos.flush();
-    }
-   }
+	@Override
+	public void delete(RptJcic rptJcic, TitaVo... titaVo) throws DBException {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Delete..." + dbName + " " + rptJcic.getRptJcicId());
+		if (dbName.equals(ContentName.onDay)) {
+			rptJcicReposDay.delete(rptJcic);
+			rptJcicReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			rptJcicReposMon.delete(rptJcic);
+			rptJcicReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			rptJcicReposHist.delete(rptJcic);
+			rptJcicReposHist.flush();
+		} else {
+			rptJcicRepos.delete(rptJcic);
+			rptJcicRepos.flush();
+		}
+	}
 
-  @Override
-  public void insertAll(List<RptJcic> rptJcic, TitaVo... titaVo) throws DBException {
-    if (rptJcic == null || rptJcic.size() == 0)
-      throw new DBException(6);
-     String dbName = "";
+	@Override
+	public void insertAll(List<RptJcic> rptJcic, TitaVo... titaVo) throws DBException {
+		if (rptJcic == null || rptJcic.size() == 0)
+			throw new DBException(6);
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("InsertAll...");
-    for (RptJcic t : rptJcic){ 
-      if (!empNot.isEmpty())
-        t.setCreateEmpNo(empNot);
-      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
-        t.setLastUpdateEmpNo(empNot);
-}		
+		this.info("InsertAll...");
+		for (RptJcic t : rptJcic) {
+			if (!empNot.isEmpty())
+				t.setCreateEmpNo(empNot);
+			if (t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+				t.setLastUpdateEmpNo(empNot);
+		}
 
-    if (dbName.equals(ContentName.onDay)) {
-      rptJcic = rptJcicReposDay.saveAll(rptJcic);	
-      rptJcicReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      rptJcic = rptJcicReposMon.saveAll(rptJcic);	
-      rptJcicReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      rptJcic = rptJcicReposHist.saveAll(rptJcic);
-      rptJcicReposHist.flush();
-    }
-    else {
-      rptJcic = rptJcicRepos.saveAll(rptJcic);
-      rptJcicRepos.flush();
-    }
-    }
+		if (dbName.equals(ContentName.onDay)) {
+			rptJcic = rptJcicReposDay.saveAll(rptJcic);
+			rptJcicReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			rptJcic = rptJcicReposMon.saveAll(rptJcic);
+			rptJcicReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			rptJcic = rptJcicReposHist.saveAll(rptJcic);
+			rptJcicReposHist.flush();
+		} else {
+			rptJcic = rptJcicRepos.saveAll(rptJcic);
+			rptJcicRepos.flush();
+		}
+	}
 
-  @Override
-  public void updateAll(List<RptJcic> rptJcic, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public void updateAll(List<RptJcic> rptJcic, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("UpdateAll...");
-    if (rptJcic == null || rptJcic.size() == 0)
-      throw new DBException(6);
+		this.info("UpdateAll...");
+		if (rptJcic == null || rptJcic.size() == 0)
+			throw new DBException(6);
 
-    for (RptJcic t : rptJcic) 
-    if (!empNot.isEmpty())
-        t.setLastUpdateEmpNo(empNot);
-		
+		for (RptJcic t : rptJcic)
+			if (!empNot.isEmpty())
+				t.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay)) {
-      rptJcic = rptJcicReposDay.saveAll(rptJcic);	
-      rptJcicReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      rptJcic = rptJcicReposMon.saveAll(rptJcic);	
-      rptJcicReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      rptJcic = rptJcicReposHist.saveAll(rptJcic);
-      rptJcicReposHist.flush();
-    }
-    else {
-      rptJcic = rptJcicRepos.saveAll(rptJcic);
-      rptJcicRepos.flush();
-    }
-    }
+		if (dbName.equals(ContentName.onDay)) {
+			rptJcic = rptJcicReposDay.saveAll(rptJcic);
+			rptJcicReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			rptJcic = rptJcicReposMon.saveAll(rptJcic);
+			rptJcicReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			rptJcic = rptJcicReposHist.saveAll(rptJcic);
+			rptJcicReposHist.flush();
+		} else {
+			rptJcic = rptJcicRepos.saveAll(rptJcic);
+			rptJcicRepos.flush();
+		}
+	}
 
-  @Override
-  public void deleteAll(List<RptJcic> rptJcic, TitaVo... titaVo) throws DBException {
-    this.info("DeleteAll...");
-    String dbName = "";
-    
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    if (rptJcic == null || rptJcic.size() == 0)
-      throw new DBException(6);
-    if (dbName.equals(ContentName.onDay)) {
-      rptJcicReposDay.deleteAll(rptJcic);	
-      rptJcicReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      rptJcicReposMon.deleteAll(rptJcic);	
-      rptJcicReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      rptJcicReposHist.deleteAll(rptJcic);
-      rptJcicReposHist.flush();
-    }
-    else {
-      rptJcicRepos.deleteAll(rptJcic);
-      rptJcicRepos.flush();
-    }
-  }
+	@Override
+	public void deleteAll(List<RptJcic> rptJcic, TitaVo... titaVo) throws DBException {
+		this.info("DeleteAll...");
+		String dbName = "";
+
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		if (rptJcic == null || rptJcic.size() == 0)
+			throw new DBException(6);
+		if (dbName.equals(ContentName.onDay)) {
+			rptJcicReposDay.deleteAll(rptJcic);
+			rptJcicReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			rptJcicReposMon.deleteAll(rptJcic);
+			rptJcicReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			rptJcicReposHist.deleteAll(rptJcic);
+			rptJcicReposHist.flush();
+		} else {
+			rptJcicRepos.deleteAll(rptJcic);
+			rptJcicRepos.flush();
+		}
+	}
 
 }

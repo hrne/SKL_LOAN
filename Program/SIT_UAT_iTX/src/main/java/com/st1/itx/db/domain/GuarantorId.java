@@ -15,85 +15,84 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class GuarantorId implements Serializable {
 
-
-  /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -6782447489145964431L;
 
 // 核准號碼
-  /* 規劃調整為ApplNo */
-  @Column(name = "`ApproveNo`")
-  private int approveNo = 0;
+	/* 規劃調整為ApplNo */
+	@Column(name = "`ApproveNo`")
+	private int approveNo = 0;
 
-  // 保證人客戶識別碼
-  @Column(name = "`GuaUKey`", length = 32)
-  private String guaUKey = " ";
+	// 保證人客戶識別碼
+	@Column(name = "`GuaUKey`", length = 32)
+	private String guaUKey = " ";
 
-  public GuarantorId() {
-  }
+	public GuarantorId() {
+	}
 
-  public GuarantorId(int approveNo, String guaUKey) {
-    this.approveNo = approveNo;
-    this.guaUKey = guaUKey;
-  }
+	public GuarantorId(int approveNo, String guaUKey) {
+		this.approveNo = approveNo;
+		this.guaUKey = guaUKey;
+	}
 
-/**
-	* 核准號碼<br>
-	* 規劃調整為ApplNo
-	* @return Integer
-	*/
-  public int getApproveNo() {
-    return this.approveNo;
-  }
+	/**
+	 * 核准號碼<br>
+	 * 規劃調整為ApplNo
+	 * 
+	 * @return Integer
+	 */
+	public int getApproveNo() {
+		return this.approveNo;
+	}
 
-/**
-	* 核准號碼<br>
-	* 規劃調整為ApplNo
-  *
-  * @param approveNo 核准號碼
-	*/
-  public void setApproveNo(int approveNo) {
-    this.approveNo = approveNo;
-  }
+	/**
+	 * 核准號碼<br>
+	 * 規劃調整為ApplNo
+	 *
+	 * @param approveNo 核准號碼
+	 */
+	public void setApproveNo(int approveNo) {
+		this.approveNo = approveNo;
+	}
 
-/**
-	* 保證人客戶識別碼<br>
-	* 
-	* @return String
-	*/
-  public String getGuaUKey() {
-    return this.guaUKey == null ? "" : this.guaUKey;
-  }
+	/**
+	 * 保證人客戶識別碼<br>
+	 * 
+	 * @return String
+	 */
+	public String getGuaUKey() {
+		return this.guaUKey == null ? "" : this.guaUKey;
+	}
 
-/**
-	* 保證人客戶識別碼<br>
-	* 
-  *
-  * @param guaUKey 保證人客戶識別碼
-	*/
-  public void setGuaUKey(String guaUKey) {
-    this.guaUKey = guaUKey;
-  }
+	/**
+	 * 保證人客戶識別碼<br>
+	 * 
+	 *
+	 * @param guaUKey 保證人客戶識別碼
+	 */
+	public void setGuaUKey(String guaUKey) {
+		this.guaUKey = guaUKey;
+	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(approveNo, guaUKey);
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(approveNo, guaUKey);
-  }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		GuarantorId guarantorId = (GuarantorId) obj;
+		return approveNo == guarantorId.approveNo && guaUKey.equals(guarantorId.guaUKey);
+	}
 
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj)
-      return true;
-    if(obj == null || getClass() != obj.getClass())
-      return false;
-    GuarantorId guarantorId = (GuarantorId) obj;
-    return approveNo == guarantorId.approveNo && guaUKey.equals(guarantorId.guaUKey);
-  }
-
-  @Override
-  public String toString() {
-    return "GuarantorId [approveNo=" + approveNo + ", guaUKey=" + guaUKey + "]";
-  }
+	@Override
+	public String toString() {
+		return "GuarantorId [approveNo=" + approveNo + ", guaUKey=" + guaUKey + "]";
+	}
 }

@@ -46,11 +46,10 @@ public class LM049 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM049 ");
-		
+
 		lM049Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LM049放款金控法第44條利害關係人放款餘額表", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM049放款金控法第44條利害關係人放款餘額表", titaVo);
 
 	}
 }

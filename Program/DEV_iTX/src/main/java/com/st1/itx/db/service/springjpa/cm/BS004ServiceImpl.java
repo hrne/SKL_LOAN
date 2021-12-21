@@ -62,7 +62,7 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += "left join CdEmp e on e.employeeNo = c.empNo ";
 		queryttext += "left join FacProd p on p.prodNo = f.prodNo ";
 		queryttext += "where a.status in (0,4) "; // 戶況 0: 正常戶, 4: 逾期戶
-		queryttext += "  and f.prodNo not in ('EO','11') "; // EO 員工利率-一般客戶 ，11-退休員工 
+		queryttext += "  and f.prodNo not in ('EO','11') "; // EO 員工利率-一般客戶 ，11-退休員工
 		queryttext += "  and p.empFlag = 'Y' "; // EmpFlag=Y 員工專案貸款
 		queryttext += "  and e.agStatusCode is not null ";
 		queryttext += "  and (   (e.agStatusCode not in ('1','4','5')) ";
@@ -109,7 +109,7 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += "  and e.commLineType is not null";
 		queryttext += "  and not e.agStatusCode in ('1','4','5') ";
 		queryttext += "group by c.custNo, c.custId ";
-		
+
 		this.info("queryttext=" + queryttext);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);

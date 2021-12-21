@@ -25,7 +25,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2916")
 @Scope("prototype")
 /**
@@ -75,7 +74,6 @@ public class L2916 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100; // 75 * 500 = 37500
-
 
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("RimClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
@@ -132,7 +130,6 @@ public class L2916 extends TradeBuffer {
 		this.totaVo.putParam("LandUsageCode", tClLand.getLandUsageCode());
 		this.totaVo.putParam("LandRentStartDate", tClLand.getLandRentStartDate());
 		this.totaVo.putParam("LandRentEndDate", tClLand.getLandRentEndDate());
-
 
 		// tita擔保品編號取建物所有權人檔資料list
 		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);

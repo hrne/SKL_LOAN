@@ -11,11 +11,10 @@ public class BankRelationVo {
 	 * LAW005 = Y 保險法(放款)(5) <BR>
 	 * LAW008 = Y 準利害關係人(8) <BR>
 	 * IsSalary = true 15日薪的員工(9) <BR>
-	 * IsLimit     = true 授信限制對象(1,5,8,9) <BR> 
-	 * IsRelated   = true 利害關係人(1,5) <BR>       
-	 * IsLnrelNear = true 準利害關係人(8) <BR>       
-	 * IsSuspected = true 是否為金控疑似準利害關係人   
-	 * DataDate   資料日期
+	 * IsLimit = true 授信限制對象(1,5,8,9) <BR>
+	 * IsRelated = true 利害關係人(1,5) <BR>
+	 * IsLnrelNear = true 準利害關係人(8) <BR>
+	 * IsSuspected = true 是否為金控疑似準利害關係人 DataDate 資料日期
 	 */
 	private String LAW001 = " ";
 	private String LAW002 = " ";
@@ -28,7 +27,6 @@ public class BankRelationVo {
 	private String IsLnrelNear = " ";
 	private String IsSuspected = " ";
 	private String DataDate = "";
-
 
 	/**
 	 * @return the lAW001
@@ -180,10 +178,8 @@ public class BankRelationVo {
 
 	@Override
 	public String toString() {
-		return "BankRelationVo [LAW001=" + LAW001 + ", LAW002=" + LAW002 + ", LAW003=" + LAW003 + ", LAW005=" + LAW005
-				+ ", LAW008=" + LAW008 + ", IsSalary=" + IsSalary + ", IsLimit=" + IsLimit + ", IsRelated=" + IsRelated
-				+ ", IsLnrelNear=" + IsLnrelNear + ", IsSuspected=" + IsSuspected + ", DataDate=" + DataDate + "]";
+		return "BankRelationVo [LAW001=" + LAW001 + ", LAW002=" + LAW002 + ", LAW003=" + LAW003 + ", LAW005=" + LAW005 + ", LAW008=" + LAW008 + ", IsSalary=" + IsSalary + ", IsLimit=" + IsLimit
+				+ ", IsRelated=" + IsRelated + ", IsLnrelNear=" + IsLnrelNear + ", IsSuspected=" + IsSuspected + ", DataDate=" + DataDate + "]";
 	}
-
 
 }

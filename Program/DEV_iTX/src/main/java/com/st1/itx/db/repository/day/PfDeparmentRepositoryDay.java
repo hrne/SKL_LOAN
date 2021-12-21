@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,31 +21,30 @@ import com.st1.itx.db.domain.PfDeparmentId;
  */
 public interface PfDeparmentRepositoryDay extends JpaRepository<PfDeparment, PfDeparmentId> {
 
-  // DeptCode= 
-  public Slice<PfDeparment> findAllByDeptCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, Pageable pageable);
+	// DeptCode=
+	public Slice<PfDeparment> findAllByDeptCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, Pageable pageable);
 
-  // DistCode=
-  public Slice<PfDeparment> findAllByDistCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String distCode_0, Pageable pageable);
+	// DistCode=
+	public Slice<PfDeparment> findAllByDistCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String distCode_0, Pageable pageable);
 
-  // UnitCode=
-  public Slice<PfDeparment> findAllByUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String unitCode_0, Pageable pageable);
+	// UnitCode=
+	public Slice<PfDeparment> findAllByUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String unitCode_0, Pageable pageable);
 
-  // DeptCode= , AND DistCode=
-  public Slice<PfDeparment> findAllByDeptCodeIsAndDistCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, String distCode_1, Pageable pageable);
+	// DeptCode= , AND DistCode=
+	public Slice<PfDeparment> findAllByDeptCodeIsAndDistCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, String distCode_1, Pageable pageable);
 
-  // DeptCode= , AND UnitCode=
-  public Slice<PfDeparment> findAllByDeptCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, String unitCode_1, Pageable pageable);
+	// DeptCode= , AND UnitCode=
+	public Slice<PfDeparment> findAllByDeptCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, String unitCode_1, Pageable pageable);
 
-  // DistCode= , AND UnitCode=
-  public Slice<PfDeparment> findAllByDistCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String distCode_0, String unitCode_1, Pageable pageable);
+	// DistCode= , AND UnitCode=
+	public Slice<PfDeparment> findAllByDistCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String distCode_0, String unitCode_1, Pageable pageable);
 
-  // DeptCode= , AND DistCode= , AND UnitCode=
-  public Slice<PfDeparment> findAllByDeptCodeIsAndDistCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, String distCode_1, String unitCode_2, Pageable pageable);
+	// DeptCode= , AND DistCode= , AND UnitCode=
+	public Slice<PfDeparment> findAllByDeptCodeIsAndDistCodeIsAndUnitCodeIsOrderByDeptCodeAscDistCodeAscUnitCodeAsc(String deptCode_0, String distCode_1, String unitCode_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<PfDeparment> findByPfDeparmentId(PfDeparmentId pfDeparmentId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<PfDeparment> findByPfDeparmentId(PfDeparmentId pfDeparmentId);
 
 }
-

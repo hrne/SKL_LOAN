@@ -52,7 +52,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,B.\"SpecificDd\"                                      "; // 應繳日
 		sql += "       ,CD.\"Item\"                         AS \"RepayCodeX\" "; // 繳款方式
 		sql += "       ,B.\"LoanBal\"                                         "; // 貸放餘額
-		sql += "       ,B.\"NextPayIntDate\"                                  "; // 下繳日 
+		sql += "       ,B.\"NextPayIntDate\"                                  "; // 下繳日
 		sql += "       ,NVL(CB.\"BdLocation\", ' ')         AS \"Location\"   "; // 押品地址
 		sql += "  FROM (SELECT \"CustNo\"                                             ";
 		sql += "                   ,\"FacmNo\"                                             ";
@@ -86,7 +86,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> doDetail(int custNo, int facmNo, TitaVo titaVo) throws Exception {
 		dateUtil.init();
 
@@ -133,8 +133,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             ,T.\"TitaTlrNo\"                   ";
 		sql += "             ,T.\"TitaTxtNo\"                   ";
 		sql += "        FROM \"LoanBorTx\" T                                             ";
-		sql += "        WHERE T.\"CustNo\" = " +  custNo;
-		sql += "         AND  T.\"FacmNo\" = " +  facmNo;
+		sql += "        WHERE T.\"CustNo\" = " + custNo;
+		sql += "         AND  T.\"FacmNo\" = " + facmNo;
 		sql += "         AND  T.\"TitaHCode\" = 0                                          ";
 		sql += "         AND (T.\"Principal\" + T.\"ExtraRepay\" + T.\"Interest\" + T.\"BreachAmt\" + T.\"CloseBreachAmt\"";
 		sql += "              +  NVL(JSON_VALUE(T.\"OtherFields\",  '$.AcctFee'),0)                   ";

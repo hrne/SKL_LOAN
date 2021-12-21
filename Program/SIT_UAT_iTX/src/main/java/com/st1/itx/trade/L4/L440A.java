@@ -51,7 +51,7 @@ public class L440A extends TradeBuffer {
 
 	@Autowired
 	public BankAuthActService bankAuthActService;
-	
+
 	@Autowired
 	public TxToDoCom txToDoCom;
 
@@ -178,7 +178,7 @@ public class L440A extends TradeBuffer {
 			tTxToDoDetail.setDtlValue(FormatUtil.pad9(tAchAuthLog.getRepayAcct(), 14));
 			tTxToDoDetail.setStatus(0);
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
-		break;
+			break;
 		}
 
 		this.addList(this.totaVo);

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,25 +21,25 @@ import com.st1.itx.db.domain.InsuCommId;
  */
 public interface InsuCommRepository extends JpaRepository<InsuComm, InsuCommId> {
 
-  // InsuYearMonth >= ,AND InsuYearMonth <= 
-  public Slice<InsuComm> findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByNowInsuNoAscInsuCateAsc(int insuYearMonth_0, int insuYearMonth_1, Pageable pageable);
+	// InsuYearMonth >= ,AND InsuYearMonth <=
+	public Slice<InsuComm> findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByNowInsuNoAscInsuCateAsc(int insuYearMonth_0, int insuYearMonth_1, Pageable pageable);
 
-  // InsuYearMonth = , AND CommDate >= , AND CommDate <=
-  public Slice<InsuComm> findAllByInsuYearMonthIsAndCommDateGreaterThanEqualAndCommDateLessThanEqualOrderByNowInsuNoAscInsuCateAsc(int insuYearMonth_0, int commDate_1, int commDate_2, Pageable pageable);
+	// InsuYearMonth = , AND CommDate >= , AND CommDate <=
+	public Slice<InsuComm> findAllByInsuYearMonthIsAndCommDateGreaterThanEqualAndCommDateLessThanEqualOrderByNowInsuNoAscInsuCateAsc(int insuYearMonth_0, int commDate_1, int commDate_2,
+			Pageable pageable);
 
-  // CustNo =
-  public Slice<InsuComm> findAllByCustNoIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<InsuComm> findAllByCustNoIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(int custNo_0, Pageable pageable);
 
-  // FireOfficer = 
-  public Slice<InsuComm> findAllByFireOfficerIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(String fireOfficer_0, Pageable pageable);
+	// FireOfficer =
+	public Slice<InsuComm> findAllByFireOfficerIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(String fireOfficer_0, Pageable pageable);
 
-  // EmpId = 
-  public Slice<InsuComm> findAllByEmpIdIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(String empId_0, Pageable pageable);
+	// EmpId =
+	public Slice<InsuComm> findAllByEmpIdIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(String empId_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<InsuComm> findByInsuCommId(InsuCommId insuCommId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<InsuComm> findByInsuCommId(InsuCommId insuCommId);
 
 }
-

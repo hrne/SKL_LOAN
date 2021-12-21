@@ -27,7 +27,7 @@ public class LM043Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -43,7 +43,7 @@ public class LM043Report extends MakeReport {
 		int year = entdy / 10000;
 		int month = entdy / 100 % 100;
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM043", "地區放款數_內部控管", "LM043地區放款數_內部控管", "LM043地區放款數_內部控管.xlsx", "N總額");
-		makeExcel.setValue(1, 1, year  + "." + parse.IntegerToString(month, 2));
+		makeExcel.setValue(1, 1, year + "." + parse.IntegerToString(month, 2));
 		List<Map<String, String>> LM043List = null;
 		for (int i = 0; i < 3; i++) {// 3次，分別是正常戶，催收戶跟逾期戶
 			type = i;
@@ -58,7 +58,7 @@ public class LM043Report extends MakeReport {
 			exportExcel(titaVo, LM043List);
 		}
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {

@@ -45,25 +45,25 @@ public class L6R33 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6R33 ");
 		this.totaVo.init(titaVo);
-		
+
 		int iDefType = Integer.parseInt(titaVo.getParam("Rim6R33DefType"));
 		String iDefCode = titaVo.getParam("Rim6R33DefCode");
-		this.info("iDefType=="+iDefType+"iDefCode=="+iDefCode);
-		
+		this.info("iDefType==" + iDefType + "iDefCode==" + iDefCode);
+
 		Slice<CdCode> iCdCode = null;
-		
-		iCdCode = iCdCodeService.getCodeList(iDefType,iDefCode,this.index,this.limit, titaVo);
-		
-		this.info("iCdCode="+iCdCode);
-		
-		if (iCdCode==null) {
-			totaVo.putParam("L6R33Flag", "0");//沒資料回傳0
+
+		iCdCode = iCdCodeService.getCodeList(iDefType, iDefCode, this.index, this.limit, titaVo);
+
+		this.info("iCdCode=" + iCdCode);
+
+		if (iCdCode == null) {
+			totaVo.putParam("L6R33Flag", "0");// 沒資料回傳0
 			this.info("L6R33Flag0");
-		}else {
-			totaVo.putParam("L6R33Flag", "1");//有資料回傳1
+		} else {
+			totaVo.putParam("L6R33Flag", "1");// 有資料回傳1
 			this.info("L6R33Flag1");
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

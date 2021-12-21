@@ -419,19 +419,17 @@ public class L9703Report2 extends MakeReport {
 			this.print(0, 78, df1.format(loanBal), "R");
 			this.print(0, 87, "0", "R");
 			this.print(0, 100, df1.format(bSummry), "R");
-			
-			
-			if( bBreachAmt.compareTo(new BigDecimal("0")) == 0 && "".equals(BreachDate)) {
+
+			if (bBreachAmt.compareTo(new BigDecimal("0")) == 0 && "".equals(BreachDate)) {
 				BreachDate = sPayIntDate;
 			}
 		} // loop -- batxCom
 
 		this.print(2, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 		this.print(1, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
-		if(!"".equals(BreachDate)) {
-		  this.print(1, 8, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢"
-				+ "　該違約金金額");
-		  this.print(1, 8, "＊＊截至　" +" 　　　　　　　　　" +"，貸款尚欠   期。請撥空盡速繳納");
+		if (!"".equals(BreachDate)) {
+			this.print(1, 8, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢" + "　該違約金金額");
+			this.print(1, 8, "＊＊截至　" + " 　　　　　　　　　" + "，貸款尚欠   期。請撥空盡速繳納");
 		}
 //		if (tL9703Vo.get("F8").equals("0")) {
 //			this.print(1, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
@@ -466,7 +464,7 @@ public class L9703Report2 extends MakeReport {
 		}
 
 		this.print(2, 8, payIntAcct);
-		this.print(0, 65,  payPriAcct);
+		this.print(0, 65, payPriAcct);
 	}
 
 	// 顯示民國年

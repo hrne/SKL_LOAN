@@ -73,13 +73,13 @@ public class L5901 extends TradeBuffer {
 		if (lInnFundApl != null && lInnFundApl.size() != 0) {
 			for (InnFundApl tInnFundApl : lInnFundApl) {
 				OccursList occursList = new OccursList();
-				
+
 				int date = tInnFundApl.getAcDate();
-				
-				if(tInnFundApl.getAcDate() > 19110000) {
+
+				if (tInnFundApl.getAcDate() > 19110000) {
 					date = tInnFundApl.getAcDate() - 19110000;
 				}
-				
+
 				occursList.putParam("OOAcDate", date);
 				occursList.putParam("OOResrvStndrd", tInnFundApl.getResrvStndrd());
 				occursList.putParam("OOPosbleBorPsn", tInnFundApl.getPosbleBorPsn());

@@ -58,18 +58,18 @@ public class L650D extends TradeBuffer {
 		CdPfParms iCdPfParams = new CdPfParms();
 		CdPfParmsId iCdPfParamsId = new CdPfParmsId();
 		String iEmpNo = "";
-		for (int i = 1;i<=30;i++) {
- 			iEmpNo = titaVo.getParam("EmpNo"+i);
- 			if (iEmpNo.trim().isEmpty()) {
- 				continue;
- 			}
- 			iCdPfParamsId.setCondition(iEmpNo);
- 			iCdPfParamsId.setConditionCode1("4");
- 			iCdPfParamsId.setConditionCode2(" ");
- 			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
- 			iCdPfParams.setWorkMonthStart(Integer.valueOf(titaVo.getParam("WorkMonthS"+i))+191100);
- 			iCdPfParams.setWorkMonthEnd(Integer.valueOf(titaVo.getParam("WorkMonthE"+i))+191100);
- 			try {
+		for (int i = 1; i <= 30; i++) {
+			iEmpNo = titaVo.getParam("EmpNo" + i);
+			if (iEmpNo.trim().isEmpty()) {
+				continue;
+			}
+			iCdPfParamsId.setCondition(iEmpNo);
+			iCdPfParamsId.setConditionCode1("4");
+			iCdPfParamsId.setConditionCode2(" ");
+			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
+			iCdPfParams.setWorkMonthStart(Integer.valueOf(titaVo.getParam("WorkMonthS" + i)) + 191100);
+			iCdPfParams.setWorkMonthEnd(Integer.valueOf(titaVo.getParam("WorkMonthE" + i)) + 191100);
+			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());

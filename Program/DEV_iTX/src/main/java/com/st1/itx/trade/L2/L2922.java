@@ -58,7 +58,7 @@ public class L2922 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClLandOwnerService sClLandOwnerService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public ClMainService sClMainService;
@@ -151,70 +151,68 @@ public class L2922 extends TradeBuffer {
 
 			CustMain tCustMain = new CustMain();
 
-
 			// 取提供人
-			Slice<ClLandOwner> sClLandOwner = sClLandOwnerService.clNoEq(tClLand.getClCode1(), tClLand.getClCode2(), tClLand.getClNo(), this.index , this.limit , titaVo);
+			Slice<ClLandOwner> sClLandOwner = sClLandOwnerService.clNoEq(tClLand.getClCode1(), tClLand.getClCode2(), tClLand.getClNo(), this.index, this.limit, titaVo);
 
 			// new ArrayList
 			List<ClLandOwner> lClLandOwner = new ArrayList<ClLandOwner>();
-			
-			lClLandOwner = sClLandOwner == null ? null : sClLandOwner.getContent();
-			
-			
-			for( ClLandOwner tClLandOwner : lClLandOwner) {
-				
-			  if(tClLandOwner.getLandSeq() == tClLand.getLandSeq()) {
-				  
-				// new occurs
-				OccursList occurslist = new OccursList();
-				String custUKey = tClLandOwner.getOwnerCustUKey();
-				
-				if (custUKey == null) {
-					this.info(" 無CustUKey 無CustUKey 無CustUKey");
-				}
-				
-				tCustMain = sCustMainService.findById(custUKey, titaVo);
-				if (tCustMain == null) {
-					tCustMain = new CustMain();
-				}
 
-				String cityCode = tClLand.getCityCode();
-				String areaCode = tClLand.getAreaCode();
-				String Land = tClLand.getIrCode();
-				// new PK
-				
-				CdLandSectionId CdLandSectionId = new CdLandSectionId();
-				CdLandSectionId.setCityCode(cityCode);
-				CdLandSectionId.setAreaCode(areaCode);
-				CdLandSectionId.setIrCode(Land);
-				
-				/* 取縣市名稱 */
-				Slice<CdCity> slCdCity = cdCityService.findCityCode(cityCode, cityCode, 0, Integer.MAX_VALUE, titaVo);
-				List<CdCity> lCdCity = slCdCity == null ? null : slCdCity.getContent();
-				CdCity tCdCity = lCdCity.get(0);
-				
-				this.info("縣 市   " + lCdCity);
-				
-				/* 取行政區名稱 */
-				Slice<CdArea> slCdArea = cdAreaService.areaCodeRange(cityCode, cityCode, areaCode, areaCode, 0, Integer.MAX_VALUE, titaVo);
-				List<CdArea> lCdArea = slCdArea == null ? null : slCdArea.getContent();
-				CdArea tCdArea = lCdArea.get(0);
-				this.info("縣 市   " + lCdArea);
-				
-				/* 取段小段 */
-				CdLandSection tCdLandSection = cdLandSectionService.findById(CdLandSectionId, titaVo);
-				this.info("L2041 tCdLandSection " + tCdLandSection);
-				
-				occurslist.putParam("OOCl", tClLand.getClCode1() + "-" + tClLand.getClCode2() + "-" + tClLand.getClNo());
-				occurslist.putParam("OOProvider", tCustMain.getCustName());
-				occurslist.putParam("OOSeq", tClLandOwner.getLandSeq());
-				occurslist.putParam("OOCity", tCdCity.getCityItem());
-				occurslist.putParam("OOArea", tCdArea.getAreaItem());
-				occurslist.putParam("OOIr", tCdLandSection.getIrItem());
-				
-				/* 將每筆資料放入Tota的OcList */
-				this.totaVo.addOccursList(occurslist);
-			  } // if
+			lClLandOwner = sClLandOwner == null ? null : sClLandOwner.getContent();
+
+			for (ClLandOwner tClLandOwner : lClLandOwner) {
+
+				if (tClLandOwner.getLandSeq() == tClLand.getLandSeq()) {
+
+					// new occurs
+					OccursList occurslist = new OccursList();
+					String custUKey = tClLandOwner.getOwnerCustUKey();
+
+					if (custUKey == null) {
+						this.info(" 無CustUKey 無CustUKey 無CustUKey");
+					}
+
+					tCustMain = sCustMainService.findById(custUKey, titaVo);
+					if (tCustMain == null) {
+						tCustMain = new CustMain();
+					}
+
+					String cityCode = tClLand.getCityCode();
+					String areaCode = tClLand.getAreaCode();
+					String Land = tClLand.getIrCode();
+					// new PK
+
+					CdLandSectionId CdLandSectionId = new CdLandSectionId();
+					CdLandSectionId.setCityCode(cityCode);
+					CdLandSectionId.setAreaCode(areaCode);
+					CdLandSectionId.setIrCode(Land);
+
+					/* 取縣市名稱 */
+					Slice<CdCity> slCdCity = cdCityService.findCityCode(cityCode, cityCode, 0, Integer.MAX_VALUE, titaVo);
+					List<CdCity> lCdCity = slCdCity == null ? null : slCdCity.getContent();
+					CdCity tCdCity = lCdCity.get(0);
+
+					this.info("縣 市   " + lCdCity);
+
+					/* 取行政區名稱 */
+					Slice<CdArea> slCdArea = cdAreaService.areaCodeRange(cityCode, cityCode, areaCode, areaCode, 0, Integer.MAX_VALUE, titaVo);
+					List<CdArea> lCdArea = slCdArea == null ? null : slCdArea.getContent();
+					CdArea tCdArea = lCdArea.get(0);
+					this.info("縣 市   " + lCdArea);
+
+					/* 取段小段 */
+					CdLandSection tCdLandSection = cdLandSectionService.findById(CdLandSectionId, titaVo);
+					this.info("L2041 tCdLandSection " + tCdLandSection);
+
+					occurslist.putParam("OOCl", tClLand.getClCode1() + "-" + tClLand.getClCode2() + "-" + tClLand.getClNo());
+					occurslist.putParam("OOProvider", tCustMain.getCustName());
+					occurslist.putParam("OOSeq", tClLandOwner.getLandSeq());
+					occurslist.putParam("OOCity", tCdCity.getCityItem());
+					occurslist.putParam("OOArea", tCdArea.getAreaItem());
+					occurslist.putParam("OOIr", tCdLandSection.getIrItem());
+
+					/* 將每筆資料放入Tota的OcList */
+					this.totaVo.addOccursList(occurslist);
+				} // if
 			} // for
 		} // for
 

@@ -37,8 +37,7 @@ public class LM047Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM047", "放款分期協議案件明細_內部控管",
-				"LM047_放款分期協議案件明細_內部控管", "LM047放款分期協議案件明細_內部控管.xlsx", "協議控管表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM047", "放款分期協議案件明細_內部控管", "LM047_放款分期協議案件明細_內部控管", "LM047放款分期協議案件明細_內部控管.xlsx", "協議控管表");
 
 		int iEntdy = parse.stringToInteger(titaVo.get("ENTDY"));
 		makeExcel.setValue(1, 2, "         " + iEntdy / 10000 + "年 " + iEntdy / 100 % 100 + "月 分期協議案件明細表");
@@ -57,7 +56,7 @@ public class LM047Report extends MakeReport {
 		}
 		exportExcel(LM047List);
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {

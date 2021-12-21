@@ -15,108 +15,106 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class MonthlyFacBalId implements Serializable {
 
-
-  /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5935390734492944073L;
 
 // 資料年月
-  @Column(name = "`YearMonth`")
-  private int yearMonth = 0;
+	@Column(name = "`YearMonth`")
+	private int yearMonth = 0;
 
-  // 戶號
-  @Column(name = "`CustNo`")
-  private int custNo = 0;
+	// 戶號
+	@Column(name = "`CustNo`")
+	private int custNo = 0;
 
-  // 額度
-  @Column(name = "`FacmNo`")
-  private int facmNo = 0;
+	// 額度
+	@Column(name = "`FacmNo`")
+	private int facmNo = 0;
 
-  public MonthlyFacBalId() {
-  }
+	public MonthlyFacBalId() {
+	}
 
-  public MonthlyFacBalId(int yearMonth, int custNo, int facmNo) {
-    this.yearMonth = yearMonth;
-    this.custNo = custNo;
-    this.facmNo = facmNo;
-  }
+	public MonthlyFacBalId(int yearMonth, int custNo, int facmNo) {
+		this.yearMonth = yearMonth;
+		this.custNo = custNo;
+		this.facmNo = facmNo;
+	}
 
-/**
-	* 資料年月<br>
-	* 
-	* @return Integer
-	*/
-  public int getYearMonth() {
-    return this.yearMonth;
-  }
+	/**
+	 * 資料年月<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getYearMonth() {
+		return this.yearMonth;
+	}
 
-/**
-	* 資料年月<br>
-	* 
-  *
-  * @param yearMonth 資料年月
-	*/
-  public void setYearMonth(int yearMonth) {
-    this.yearMonth = yearMonth;
-  }
+	/**
+	 * 資料年月<br>
+	 * 
+	 *
+	 * @param yearMonth 資料年月
+	 */
+	public void setYearMonth(int yearMonth) {
+		this.yearMonth = yearMonth;
+	}
 
-/**
-	* 戶號<br>
-	* 
-	* @return Integer
-	*/
-  public int getCustNo() {
-    return this.custNo;
-  }
+	/**
+	 * 戶號<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getCustNo() {
+		return this.custNo;
+	}
 
-/**
-	* 戶號<br>
-	* 
-  *
-  * @param custNo 戶號
-	*/
-  public void setCustNo(int custNo) {
-    this.custNo = custNo;
-  }
+	/**
+	 * 戶號<br>
+	 * 
+	 *
+	 * @param custNo 戶號
+	 */
+	public void setCustNo(int custNo) {
+		this.custNo = custNo;
+	}
 
-/**
-	* 額度<br>
-	* 
-	* @return Integer
-	*/
-  public int getFacmNo() {
-    return this.facmNo;
-  }
+	/**
+	 * 額度<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getFacmNo() {
+		return this.facmNo;
+	}
 
-/**
-	* 額度<br>
-	* 
-  *
-  * @param facmNo 額度
-	*/
-  public void setFacmNo(int facmNo) {
-    this.facmNo = facmNo;
-  }
+	/**
+	 * 額度<br>
+	 * 
+	 *
+	 * @param facmNo 額度
+	 */
+	public void setFacmNo(int facmNo) {
+		this.facmNo = facmNo;
+	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(yearMonth, custNo, facmNo);
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(yearMonth, custNo, facmNo);
-  }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		MonthlyFacBalId monthlyFacBalId = (MonthlyFacBalId) obj;
+		return yearMonth == monthlyFacBalId.yearMonth && custNo == monthlyFacBalId.custNo && facmNo == monthlyFacBalId.facmNo;
+	}
 
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj)
-      return true;
-    if(obj == null || getClass() != obj.getClass())
-      return false;
-    MonthlyFacBalId monthlyFacBalId = (MonthlyFacBalId) obj;
-    return yearMonth == monthlyFacBalId.yearMonth && custNo == monthlyFacBalId.custNo && facmNo == monthlyFacBalId.facmNo;
-  }
-
-  @Override
-  public String toString() {
-    return "MonthlyFacBalId [yearMonth=" + yearMonth + ", custNo=" + custNo + ", facmNo=" + facmNo + "]";
-  }
+	@Override
+	public String toString() {
+		return "MonthlyFacBalId [yearMonth=" + yearMonth + ", custNo=" + custNo + ", facmNo=" + facmNo + "]";
+	}
 }

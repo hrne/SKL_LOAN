@@ -38,8 +38,7 @@ public class LM036Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM036", "第一類各項統計表", "LM036第一類各項統計表",
-				"LM036_底稿_第一類各項統計表.xlsx", "Portfolio");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM036", "第一類各項統計表", "LM036第一類各項統計表", "LM036_底稿_第一類各項統計表.xlsx", "Portfolio");
 
 		int entdy = titaVo.getEntDyI() + 19110000;
 
@@ -49,8 +48,7 @@ public class LM036Report extends MakeReport {
 		this.info("startMonth = " + startMonth);
 		this.info("endMonth = " + endMonth);
 
-		Slice<MonthlyLM036Portfolio> sMonthlyLM036Portfolio = sMonthlyLM036PortfolioService
-				.findDataMonthBetween(startMonth, endMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<MonthlyLM036Portfolio> sMonthlyLM036Portfolio = sMonthlyLM036PortfolioService.findDataMonthBetween(startMonth, endMonth, 0, Integer.MAX_VALUE, titaVo);
 
 		List<MonthlyLM036Portfolio> lMonthlyLM036Portfolio = new ArrayList<>(sMonthlyLM036Portfolio.getContent());
 
@@ -233,8 +231,7 @@ public class LM036Report extends MakeReport {
 				int tmpYear = yearMonth / 100;
 				int tmpMonth = yearMonth % 100;
 				// 若跨年,年+1,月+3-12,否則用原年月+3
-				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12))
-						: (yearMonth + 3);
+				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12)) : (yearMonth + 3);
 				makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
 				columnCursorMap.put(tmpBadDebtMonth, columnCursor);
 				columnCursor++;
@@ -315,8 +312,7 @@ public class LM036Report extends MakeReport {
 				int tmpYear = yearMonth / 100;
 				int tmpMonth = yearMonth % 100;
 				// 若跨年,年+1,月+3-12,否則用原年月+3
-				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12))
-						: (yearMonth + 3);
+				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12)) : (yearMonth + 3);
 				makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
 				columnCursorMap.put(tmpBadDebtMonth, columnCursor);
 				columnCursor++;

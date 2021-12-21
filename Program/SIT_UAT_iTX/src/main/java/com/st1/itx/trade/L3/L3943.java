@@ -137,10 +137,8 @@ public class L3943 extends TradeBuffer {
 		}
 
 //		 查詢會計銷帳檔
-		wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
-				+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), wkRvNo, 0,
-				Integer.MAX_VALUE, titaVo);
+		wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " " + FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), wkRvNo, 0, Integer.MAX_VALUE, titaVo);
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
 		if (lAcReceivable != null && lAcReceivable.size() > 0) {

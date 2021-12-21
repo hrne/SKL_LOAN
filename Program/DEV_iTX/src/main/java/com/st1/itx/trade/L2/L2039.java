@@ -45,7 +45,7 @@ public class L2039 extends TradeBuffer {
 
 	@Autowired
 	public ClBuildingService sClBuildingService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -115,13 +115,13 @@ public class L2039 extends TradeBuffer {
 		clBuildingId.setClNo(iClNo);
 		ClBuilding tClBuilding = new ClBuilding();
 		tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
-		
-		if(tClBuilding != null) {
+
+		if (tClBuilding != null) {
 			this.totaVo.putParam("BdLocation", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
 		} else {
 			this.totaVo.putParam("BdLocation", "");
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

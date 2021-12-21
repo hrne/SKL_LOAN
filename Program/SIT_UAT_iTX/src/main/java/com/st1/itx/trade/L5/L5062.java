@@ -51,13 +51,13 @@ public class L5062 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200; // 51 * 200 = 10,200
 		Slice<CdCity> iCdCity = null;
-		
+
 		if (iCityCode.equals("00") || iCityCode.trim().isEmpty()) {
 			iCdCity = sCdCityService.findAll(0, Integer.MAX_VALUE, titaVo);
-		}else {
+		} else {
 			iCdCity = sCdCityService.findCityCode(iCityCode, iCityCode, this.index, this.limit, titaVo);
 		}
-		
+
 		if (iCdCity == null) {
 			throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
 		} else {
@@ -112,7 +112,7 @@ public class L5062 extends TradeBuffer {
 
 				this.totaVo.addOccursList(occursList);
 			}
-		}		
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

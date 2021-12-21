@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.CustCrossId;
  */
 public interface CustCrossRepository extends JpaRepository<CustCross, CustCrossId> {
 
-  // CustUKey = 
-  public Slice<CustCross> findAllByCustUKeyIsOrderByCustUKeyAscSubCompanyCodeAsc(String custUKey_0, Pageable pageable);
+	// CustUKey =
+	public Slice<CustCross> findAllByCustUKeyIsOrderByCustUKeyAscSubCompanyCodeAsc(String custUKey_0, Pageable pageable);
 
-  // CustUKey = ,AND SubCompanyCode = 
-  public Optional<CustCross> findTopByCustUKeyIsAndSubCompanyCodeIs(String custUKey_0, String subCompanyCode_1);
+	// CustUKey = ,AND SubCompanyCode =
+	public Optional<CustCross> findTopByCustUKeyIsAndSubCompanyCodeIs(String custUKey_0, String subCompanyCode_1);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CustCross> findByCustCrossId(CustCrossId custCrossId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CustCross> findByCustCrossId(CustCrossId custCrossId);
 
 }
-

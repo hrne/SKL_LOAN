@@ -77,55 +77,54 @@ public class L8R33 extends TradeBuffer {
 			totaVo.putParam("L8r33Bank29", iJcicZ570.getBank29());
 			totaVo.putParam("L8r33Bank30", iJcicZ570.getBank30());
 			totaVo.putParam("L8r33OutJcicTxtDate", iJcicZ570.getOutJcicTxtDate());
-			
-			//增加回傳jcicbank名稱 2021/12/3-Fegie
-			totaVo.putParam("L8r33BankX1", getBankName(iJcicZ570.getBank1(),titaVo));
-			totaVo.putParam("L8r33BankX2", getBankName(iJcicZ570.getBank2(),titaVo));
-			totaVo.putParam("L8r33BankX3", getBankName(iJcicZ570.getBank3(),titaVo));
-			totaVo.putParam("L8r33BankX4", getBankName(iJcicZ570.getBank4(),titaVo));
-			totaVo.putParam("L8r33BankX5", getBankName(iJcicZ570.getBank5(),titaVo));
-			totaVo.putParam("L8r33BankX6", getBankName(iJcicZ570.getBank6(),titaVo));
-			totaVo.putParam("L8r33BankX7", getBankName(iJcicZ570.getBank7(),titaVo));
-			totaVo.putParam("L8r33BankX8", getBankName(iJcicZ570.getBank8(),titaVo));
-			totaVo.putParam("L8r33BankX9", getBankName(iJcicZ570.getBank9(),titaVo));
-			totaVo.putParam("L8r33BankX10", getBankName(iJcicZ570.getBank10(),titaVo));
-			totaVo.putParam("L8r33BankX11", getBankName(iJcicZ570.getBank11(),titaVo));
-			totaVo.putParam("L8r33BankX12", getBankName(iJcicZ570.getBank12(),titaVo));
-			totaVo.putParam("L8r33BankX13", getBankName(iJcicZ570.getBank13(),titaVo));
-			totaVo.putParam("L8r33BankX14", getBankName(iJcicZ570.getBank14(),titaVo));
-			totaVo.putParam("L8r33BankX15", getBankName(iJcicZ570.getBank15(),titaVo));
-			totaVo.putParam("L8r33BankX16", getBankName(iJcicZ570.getBank16(),titaVo));
-			totaVo.putParam("L8r33BankX17", getBankName(iJcicZ570.getBank17(),titaVo));
-			totaVo.putParam("L8r33BankX18", getBankName(iJcicZ570.getBank18(),titaVo));
-			totaVo.putParam("L8r33BankX19", getBankName(iJcicZ570.getBank19(),titaVo));
-			totaVo.putParam("L8r33BankX20", getBankName(iJcicZ570.getBank20(),titaVo));
-			totaVo.putParam("L8r33BankX21", getBankName(iJcicZ570.getBank21(),titaVo));
-			totaVo.putParam("L8r33BankX22", getBankName(iJcicZ570.getBank22(),titaVo));
-			totaVo.putParam("L8r33BankX23", getBankName(iJcicZ570.getBank23(),titaVo));
-			totaVo.putParam("L8r33BankX24", getBankName(iJcicZ570.getBank24(),titaVo));
-			totaVo.putParam("L8r33BankX25", getBankName(iJcicZ570.getBank25(),titaVo));
-			totaVo.putParam("L8r33BankX26", getBankName(iJcicZ570.getBank26(),titaVo));
-			totaVo.putParam("L8r33BankX27", getBankName(iJcicZ570.getBank27(),titaVo));
-			totaVo.putParam("L8r33BankX28", getBankName(iJcicZ570.getBank28(),titaVo));
-			totaVo.putParam("L8r33BankX29", getBankName(iJcicZ570.getBank29(),titaVo));
-			totaVo.putParam("L8r33BankX30", getBankName(iJcicZ570.getBank30(),titaVo));
+
+			// 增加回傳jcicbank名稱 2021/12/3-Fegie
+			totaVo.putParam("L8r33BankX1", getBankName(iJcicZ570.getBank1(), titaVo));
+			totaVo.putParam("L8r33BankX2", getBankName(iJcicZ570.getBank2(), titaVo));
+			totaVo.putParam("L8r33BankX3", getBankName(iJcicZ570.getBank3(), titaVo));
+			totaVo.putParam("L8r33BankX4", getBankName(iJcicZ570.getBank4(), titaVo));
+			totaVo.putParam("L8r33BankX5", getBankName(iJcicZ570.getBank5(), titaVo));
+			totaVo.putParam("L8r33BankX6", getBankName(iJcicZ570.getBank6(), titaVo));
+			totaVo.putParam("L8r33BankX7", getBankName(iJcicZ570.getBank7(), titaVo));
+			totaVo.putParam("L8r33BankX8", getBankName(iJcicZ570.getBank8(), titaVo));
+			totaVo.putParam("L8r33BankX9", getBankName(iJcicZ570.getBank9(), titaVo));
+			totaVo.putParam("L8r33BankX10", getBankName(iJcicZ570.getBank10(), titaVo));
+			totaVo.putParam("L8r33BankX11", getBankName(iJcicZ570.getBank11(), titaVo));
+			totaVo.putParam("L8r33BankX12", getBankName(iJcicZ570.getBank12(), titaVo));
+			totaVo.putParam("L8r33BankX13", getBankName(iJcicZ570.getBank13(), titaVo));
+			totaVo.putParam("L8r33BankX14", getBankName(iJcicZ570.getBank14(), titaVo));
+			totaVo.putParam("L8r33BankX15", getBankName(iJcicZ570.getBank15(), titaVo));
+			totaVo.putParam("L8r33BankX16", getBankName(iJcicZ570.getBank16(), titaVo));
+			totaVo.putParam("L8r33BankX17", getBankName(iJcicZ570.getBank17(), titaVo));
+			totaVo.putParam("L8r33BankX18", getBankName(iJcicZ570.getBank18(), titaVo));
+			totaVo.putParam("L8r33BankX19", getBankName(iJcicZ570.getBank19(), titaVo));
+			totaVo.putParam("L8r33BankX20", getBankName(iJcicZ570.getBank20(), titaVo));
+			totaVo.putParam("L8r33BankX21", getBankName(iJcicZ570.getBank21(), titaVo));
+			totaVo.putParam("L8r33BankX22", getBankName(iJcicZ570.getBank22(), titaVo));
+			totaVo.putParam("L8r33BankX23", getBankName(iJcicZ570.getBank23(), titaVo));
+			totaVo.putParam("L8r33BankX24", getBankName(iJcicZ570.getBank24(), titaVo));
+			totaVo.putParam("L8r33BankX25", getBankName(iJcicZ570.getBank25(), titaVo));
+			totaVo.putParam("L8r33BankX26", getBankName(iJcicZ570.getBank26(), titaVo));
+			totaVo.putParam("L8r33BankX27", getBankName(iJcicZ570.getBank27(), titaVo));
+			totaVo.putParam("L8r33BankX28", getBankName(iJcicZ570.getBank28(), titaVo));
+			totaVo.putParam("L8r33BankX29", getBankName(iJcicZ570.getBank29(), titaVo));
+			totaVo.putParam("L8r33BankX30", getBankName(iJcicZ570.getBank30(), titaVo));
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
-	
-	public String getBankName(String BankId ,TitaVo titaVo) {
+
+	public String getBankName(String BankId, TitaVo titaVo) {
 		String reAns = "";
 		if (BankId.equals("") || BankId.trim().isEmpty()) {
 			reAns = "";
-		}else {
+		} else {
 			CdCode tCdCode = new CdCode();
 			tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", BankId, titaVo);
 			if (tCdCode == null) {
 				reAns = "";
-			}else {
+			} else {
 				reAns = tCdCode.getItem();
 			}
 		}

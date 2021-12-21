@@ -46,10 +46,10 @@ public class L5022 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String iEmpNo = titaVo.getParam("EmpNo");
 		int cDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;
-		int iEffectiveDateS = Integer.valueOf(titaVo.getParam("EffectiveDateS"))+19110000;
-		int iEffectiveDateE = Integer.valueOf(titaVo.getParam("EffectiveDateE"))+19110000;
+		int iEffectiveDateS = Integer.valueOf(titaVo.getParam("EffectiveDateS")) + 19110000;
+		int iEffectiveDateE = Integer.valueOf(titaVo.getParam("EffectiveDateE")) + 19110000;
 		String iStatusFg = titaVo.getParam("StatusFlag");
-		
+
 		this.info("cDate=" + cDate);
 		List<Map<String, String>> iL5022SqlReturn = new ArrayList<Map<String, String>>();
 		Slice<PfCoOfficer> sPfCoOfficer = null;
@@ -61,15 +61,13 @@ public class L5022 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;
-		
-	
-		
+
 		try {
-			iL5022SqlReturn = iL5022ServiceImpl.findByStatus(cDate,iEmpNo,this.index,this.limit,titaVo);
+			iL5022SqlReturn = iL5022ServiceImpl.findByStatus(cDate, iEmpNo, this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E5004", "");
 		}
-		
+
 		if (iL5022SqlReturn.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "協辦人員等級檔查無 " + iEmpNo + " 資料");
 		}
@@ -84,8 +82,8 @@ public class L5022 extends TradeBuffer {
 		int reCount = 0;
 		for (Map<String, String> r5022SqlReturn : iL5022SqlReturn) {
 			OccursList occursList = new OccursList();
-			
-			if (!iStatusFg.trim().isEmpty()) { //有輸入狀態
+
+			if (!iStatusFg.trim().isEmpty()) { // 有輸入狀態
 				occursList.putParam("OOEmpNo", r5022SqlReturn.get("EmpNo"));
 				if (r5022SqlReturn.get("EffectiveDate").equals("") || r5022SqlReturn.get("EffectiveDate").equals("0")) {
 					occursList.putParam("OOEffectiveDate", "");
@@ -107,27 +105,27 @@ public class L5022 extends TradeBuffer {
 					occursList.putParam("OOIneffectiveDate", Integer.valueOf(r5022SqlReturn.get("IneffectiveDate")) - 19110000);
 				}
 				rStatusFg = r5022SqlReturn.get("StatusFg");
-				if (rStatusFg.equals("1")) { //若狀態為1:已生效，第一筆之後的狀態須改為已停用
+				if (rStatusFg.equals("1")) { // 若狀態為1:已生效，第一筆之後的狀態須改為已停用
 					if (rEmpNo.compareTo(r5022SqlReturn.get("EmpNo")) == 0) {
 						rStatusFg = "2";
-					}else {
+					} else {
 						rStatusFg = "1";
-					rEmpNo = r5022SqlReturn.get("EmpNo");
+						rEmpNo = r5022SqlReturn.get("EmpNo");
 					}
 				}
-						
+
 				if (!iStatusFg.equals("9")) {
-					if (rStatusFg.compareTo(iStatusFg)==0) {
+					if (rStatusFg.compareTo(iStatusFg) == 0) {
 						occursList.putParam("OOStatusFg", rStatusFg);
-					}else {
+					} else {
 						continue;
 					}
-				}else {
-						occursList.putParam("OOStatusFg", rStatusFg);
+				} else {
+					occursList.putParam("OOStatusFg", rStatusFg);
 				}
-			}else { //有輸入生效日期
-				//A.停效日等於0(1.生效日不大於迄日)
-				//B.停效日不等於0(1.生效日不大於迄日2.停效日大於起日)
+			} else { // 有輸入生效日期
+				// A.停效日等於0(1.生效日不大於迄日)
+				// B.停效日不等於0(1.生效日不大於迄日2.停效日大於起日)
 				if (Integer.valueOf(r5022SqlReturn.get("EffectiveDate")) > iEffectiveDateE) {
 					continue;
 				}
@@ -157,18 +155,18 @@ public class L5022 extends TradeBuffer {
 					occursList.putParam("OOIneffectiveDate", Integer.valueOf(r5022SqlReturn.get("IneffectiveDate")) - 19110000);
 				}
 				rStatusFg = r5022SqlReturn.get("StatusFg");
-				if (rStatusFg.equals("1")) { //若狀態為1:已生效，第一筆之後的狀態須改為已停用
+				if (rStatusFg.equals("1")) { // 若狀態為1:已生效，第一筆之後的狀態須改為已停用
 					if (rEmpNo.compareTo(r5022SqlReturn.get("EmpNo")) == 0) {
 						rStatusFg = "2";
-					}else {
+					} else {
 						rStatusFg = "1";
 						rEmpNo = r5022SqlReturn.get("EmpNo");
 					}
 				}
 				occursList.putParam("OOStatusFg", rStatusFg);
 			}
-			
-			reCount ++ ;
+
+			reCount++;
 			this.totaVo.addOccursList(occursList);
 		}
 		if (reCount == 0) {

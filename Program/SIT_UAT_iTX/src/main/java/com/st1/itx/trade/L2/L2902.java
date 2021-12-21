@@ -110,8 +110,7 @@ public class L2902 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException("E2003", "該統編不存在客戶主檔 L2902(CustMain)");
 		}
-		Slice<Guarantor> slGuarantor = sGuarantorService.guaUKeyEq(tCustMain.getCustUKey(), this.index, this.limit,
-				titaVo);
+		Slice<Guarantor> slGuarantor = sGuarantorService.guaUKeyEq(tCustMain.getCustUKey(), this.index, this.limit, titaVo);
 		lGuarantor = slGuarantor == null ? null : slGuarantor.getContent();
 		if (lGuarantor == null) {
 			throw new LogicException("E2003", "該統編不存在保證人檔 L2902(Guarantor)");
@@ -145,8 +144,7 @@ public class L2902 extends TradeBuffer {
 				tCustMain = new CustMain();
 			}
 			// 取戶況,繳息迄日
-			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(tFacMain.getCustNo(),
-					tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(tFacMain.getCustNo(), tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
 
 			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 

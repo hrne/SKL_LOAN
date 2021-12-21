@@ -46,7 +46,7 @@ public class L4R20 extends TradeBuffer {
 		if (lCdCity == null || lCdCity.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
 		}
-		
+
 //		 如有找到資料
 		int totalRow = 30;
 		int lCdCityL = lCdCity.size();
@@ -55,7 +55,7 @@ public class L4R20 extends TradeBuffer {
 		if (lCdCityL > totalRow) {
 			this.info("L4R20  需增加L4322 Grid長度 ..." + lCdCityL);
 		}
-		
+
 		for (CdCity tCdCity : lCdCity) {
 			totaVo.putParam("L4r20CityCode" + row, tCdCity.getCityCode());
 			totaVo.putParam("L4r20CityItem" + row, tCdCity.getCityItem());
@@ -64,7 +64,7 @@ public class L4R20 extends TradeBuffer {
 			totaVo.putParam("L4r20IntRateFloor" + row, tCdCity.getIntRateFloor());
 			row++;
 		}
-		
+
 		for (int i = row; i <= 30; i++) {
 			totaVo.putParam("L4r20CityCode" + row, "");
 			totaVo.putParam("L4r20CityItem" + row, "");
@@ -73,7 +73,7 @@ public class L4R20 extends TradeBuffer {
 			totaVo.putParam("L4r20IntRateFloor" + row, 0);
 			row++;
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

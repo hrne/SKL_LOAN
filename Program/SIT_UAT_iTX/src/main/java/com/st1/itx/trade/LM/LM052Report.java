@@ -89,7 +89,6 @@ public class LM052Report extends MakeReport {
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
-
 		calendar.set(iYear, iMonth - 1, 0);
 
 		String lyymm = String.valueOf(Integer.valueOf(dateFormat.format(calendar.getTime())) / 100);
@@ -97,8 +96,7 @@ public class LM052Report extends MakeReport {
 		this.info("yymm=" + iYearMonth + ",lyymm=" + lyymm);
 		this.info("LM052Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提",
-				"LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "備呆總表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提", "LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "備呆總表");
 
 		String formTitle = "";
 
@@ -129,7 +127,7 @@ public class LM052Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	/*
@@ -164,14 +162,9 @@ public class LM052Report extends MakeReport {
 											: "22".equals(tLDVo.get("F0")) ? 7
 													: "23".equals(tLDVo.get("F0")) ? 8
 															: "3".equals(tLDVo.get("F0")) ? 9
-																	: "4".equals(tLDVo.get("F0")) ? 10
-																			: "5".equals(tLDVo.get("F0")) ? 11
-																					: "6".equals(tLDVo.get("F0")) ? 12
-																							: 14;
+																	: "4".equals(tLDVo.get("F0")) ? 10 : "5".equals(tLDVo.get("F0")) ? 11 : "6".equals(tLDVo.get("F0")) ? 12 : 14;
 
-					col = "00A".equals(tLDVo.get("F1")) ? 3
-							: "201".equals(tLDVo.get("F1")) ? 4
-									: "6".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1")) ? 6 : 12;
+					col = "00A".equals(tLDVo.get("F1")) ? 3 : "201".equals(tLDVo.get("F1")) ? 4 : "6".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1")) ? 6 : 12;
 
 					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 
@@ -181,10 +174,7 @@ public class LM052Report extends MakeReport {
 					row = "1".equals(tLDVo.get("F0")) ? 17
 							: "21".equals(tLDVo.get("F0")) ? 18
 									: "22".equals(tLDVo.get("F0")) ? 19
-											: "23".equals(tLDVo.get("F0")) ? 20
-													: "3".equals(tLDVo.get("F0")) ? 21
-															: "4".equals(tLDVo.get("F0")) ? 22
-																	: "5".equals(tLDVo.get("F0")) ? 23 : 24;
+											: "23".equals(tLDVo.get("F0")) ? 20 : "3".equals(tLDVo.get("F0")) ? 21 : "4".equals(tLDVo.get("F0")) ? 22 : "5".equals(tLDVo.get("F0")) ? 23 : 24;
 
 					col = 3;
 
@@ -204,9 +194,7 @@ public class LM052Report extends MakeReport {
 				case 4:
 					row = 27;
 
-					col = "S1".equals(tLDVo.get("F0")) ? 7
-							: "S2".equals(tLDVo.get("F0")) ? 8
-									: "NS1".equals(tLDVo.get("F0")) ? 9 : "NS2".equals(tLDVo.get("F0")) ? 11 : 12;
+					col = "S1".equals(tLDVo.get("F0")) ? 7 : "S2".equals(tLDVo.get("F0")) ? 8 : "NS1".equals(tLDVo.get("F0")) ? 9 : "NS2".equals(tLDVo.get("F0")) ? 11 : 12;
 
 					amt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
 

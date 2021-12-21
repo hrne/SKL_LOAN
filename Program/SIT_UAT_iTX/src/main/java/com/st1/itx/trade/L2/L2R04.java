@@ -85,24 +85,20 @@ public class L2R04 extends TradeBuffer {
 
 		// 查詢帳管費檔
 		this.totaVo.putParam("OAcctFee", 0);
-		Slice<FacProdAcctFee> lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1",
-				new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		Slice<FacProdAcctFee> lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
 			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFee.getContent()) {
-				if (tFacProdAcctFee.getLoanLow().compareTo(iRimLoanAmt) != 1
-						&& tFacProdAcctFee.getLoanHigh().compareTo(iRimLoanAmt) != -1) {
+				if (tFacProdAcctFee.getLoanLow().compareTo(iRimLoanAmt) != 1 && tFacProdAcctFee.getLoanHigh().compareTo(iRimLoanAmt) != -1) {
 					this.totaVo.putParam("OAcctFee", tFacProdAcctFee.getAcctFee());
 				}
 			}
 		}
 		// 查詢手續費
 		this.totaVo.putParam("OHandlingFee", 0);
-		Slice<FacProdAcctFee> lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2",
-				new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		Slice<FacProdAcctFee> lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty())) {
 			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFeeB.getContent()) {
-				if (tFacProdAcctFee.getLoanLow().compareTo(iRimLoanAmt) != 1
-						&& tFacProdAcctFee.getLoanHigh().compareTo(iRimLoanAmt) != -1) {
+				if (tFacProdAcctFee.getLoanLow().compareTo(iRimLoanAmt) != 1 && tFacProdAcctFee.getLoanHigh().compareTo(iRimLoanAmt) != -1) {
 					this.totaVo.putParam("OHandlingFee", tFacProdAcctFee.getAcctFee());
 				}
 			}

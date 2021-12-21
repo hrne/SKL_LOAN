@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -19,10 +18,9 @@ import com.st1.itx.db.domain.GuildBuilders;
  */
 public interface GuildBuildersRepositoryHist extends JpaRepository<GuildBuilders, Integer> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<GuildBuilders> findByCustNo(int custNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<GuildBuilders> findByCustNo(int custNo);
 
 }
-

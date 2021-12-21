@@ -53,7 +53,7 @@ public class L4322 extends TradeBuffer {
 		for (int i = 0; i < totalRow; i++) {
 			int thisRow = i + 1;
 			this.info("thisRow ..." + thisRow);
-			
+
 			String iCityCode = titaVo.getParam("CityCode" + thisRow).trim();
 			String iIntRateIncr = titaVo.getParam("IntRateIncr" + thisRow).trim();
 			String iIntRateCeiling = titaVo.getParam("IntRateCeiling" + thisRow).trim();
@@ -65,7 +65,7 @@ public class L4322 extends TradeBuffer {
 			}
 
 			CdCity tCdCity = cdCityService.holdById(iCityCode);
-			
+
 			if (tCdCity == null) {
 				throw new LogicException(titaVo, "E0003", iCityCode); // 修改資料不存在
 			} else {
@@ -74,8 +74,7 @@ public class L4322 extends TradeBuffer {
 				tCdCity.setIntRateCeiling(parse.stringToBigDecimal(iIntRateCeiling));
 				tCdCity.setIntRateFloor(parse.stringToBigDecimal(iIntRateFloor));
 
-				if (tCdCity2.getIntRateCeiling().compareTo(tCdCity.getIntRateCeiling()) == 0
-						&& tCdCity2.getIntRateIncr().compareTo(tCdCity.getIntRateIncr()) == 0
+				if (tCdCity2.getIntRateCeiling().compareTo(tCdCity.getIntRateCeiling()) == 0 && tCdCity2.getIntRateIncr().compareTo(tCdCity.getIntRateIncr()) == 0
 						&& tCdCity2.getIntRateFloor().compareTo(tCdCity.getIntRateFloor()) == 0) {
 					this.info("tCdCity2.getIntRateCeiling() ... '" + tCdCity2.getIntRateCeiling());
 					this.info("tCdCity.getIntRateCeiling() ... '" + tCdCity.getIntRateCeiling());
@@ -87,10 +86,9 @@ public class L4322 extends TradeBuffer {
 					continue;
 				}
 
-				tCdCity.setLastUpdate(
-						parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+				tCdCity.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tCdCity.setLastUpdateEmpNo(titaVo.getTlrNo());
-				
+
 				try {
 					tCdCity = cdCityService.update2(tCdCity);
 				} catch (DBException e) {

@@ -57,14 +57,13 @@ public class BS006 extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.txBuffer);
 		// 刪除該項目
 		txToDoCom.delByItemCode("CHCK00", titaVo);
-		
+
 		// 前一營業日
 		int LbsDy = this.txBuffer.getMgBizDate().getLbsDy();
 		List<String> lStatus = new ArrayList<String>();
 		lStatus.add("0"); // 0: 未處理
 
-		Slice<LoanCheque> slLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy + 19110000, this.index,
-				this.limit, titaVo);
+		Slice<LoanCheque> slLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy + 19110000, this.index, this.limit, titaVo);
 		if (slLoanCheque != null) {
 			for (LoanCheque c : slLoanCheque.getContent()) {
 				int cashDate = getCashDate(c, titaVo);

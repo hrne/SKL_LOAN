@@ -111,16 +111,16 @@ public class L4961 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
 
-			if(this.index == 0 ) {
-			  this.totaVo.putParam("OtotalCnt", totalCnt);
-			  this.totaVo.putParam("OtotalAmt", totalAmt);
-			  titaVo.putParam("OtotalCnt",totalCnt);
-			  titaVo.putParam("OtotalAmt",totalAmt);
+			if (this.index == 0) {
+				this.totaVo.putParam("OtotalCnt", totalCnt);
+				this.totaVo.putParam("OtotalAmt", totalAmt);
+				titaVo.putParam("OtotalCnt", totalCnt);
+				titaVo.putParam("OtotalAmt", totalAmt);
 			} else {
-			  this.totaVo.putParam("OtotalCnt", totalCnt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalCnt"))));
-			  this.totaVo.putParam("OtotalAmt", totalAmt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalAmt"))));
-			  titaVo.putParam("OtotalCnt",totalCnt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalCnt"))));
-			  titaVo.putParam("OtotalAmt",totalAmt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalAmt"))));
+				this.totaVo.putParam("OtotalCnt", totalCnt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalCnt"))));
+				this.totaVo.putParam("OtotalAmt", totalAmt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalAmt"))));
+				titaVo.putParam("OtotalCnt", totalCnt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalCnt"))));
+				titaVo.putParam("OtotalAmt", totalAmt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalAmt"))));
 			}
 
 			if (resultList.size() == this.limit && hasNext()) {

@@ -25,7 +25,6 @@ public class L8R17 extends TradeBuffer {
 	@Autowired
 	public JcicZ046Service iJcicZ046Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r17 ");
@@ -33,19 +32,19 @@ public class L8R17 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ046 iJcicZ046 = new JcicZ046();
 		iJcicZ046 = iJcicZ046Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ046 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r17CustId", iJcicZ046.getCustId());
 			totaVo.putParam("L8r17SubmitKey", iJcicZ046.getSubmitKey());
-			totaVo.putParam("L8r17RcDate",iJcicZ046.getRcDate());
-			totaVo.putParam("L8r17CloseCode",iJcicZ046.getCloseCode()); 
-			totaVo.putParam("L8r17BreakCode",iJcicZ046.getBreakCode()); 
-			totaVo.putParam("L8r17CloseDate",iJcicZ046.getCloseDate()); 
-			totaVo.putParam("L8r17TranKey", iJcicZ046.getTranKey());	
+			totaVo.putParam("L8r17RcDate", iJcicZ046.getRcDate());
+			totaVo.putParam("L8r17CloseCode", iJcicZ046.getCloseCode());
+			totaVo.putParam("L8r17BreakCode", iJcicZ046.getBreakCode());
+			totaVo.putParam("L8r17CloseDate", iJcicZ046.getCloseDate());
+			totaVo.putParam("L8r17TranKey", iJcicZ046.getTranKey());
 			totaVo.putParam("L8r17OutJcicTxtDate", iJcicZ046.getOutJcicTxtDate());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

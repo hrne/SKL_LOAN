@@ -63,28 +63,28 @@ public class L5101 extends TradeBuffer {
 		this.info("acDate : " + acDate);
 		InnFundApl iInnFundApl = new InnFundApl();
 		InnFundApl xInnFundApl = innFundAplService.findById(acDate, titaVo);
-		switch(iFunctionCode) {
-		case 1 :
-			if (xInnFundApl!=null) {
-				throw new LogicException(titaVo, "E0005", "日期:"+titaVo.getParam("AcDate")+"已有相同資料");
-				}else {
+		switch (iFunctionCode) {
+		case 1:
+			if (xInnFundApl != null) {
+				throw new LogicException(titaVo, "E0005", "日期:" + titaVo.getParam("AcDate") + "已有相同資料");
+			} else {
 				iInnFundApl.setAcDate(acDate);
 				iInnFundApl.setAlrdyBorAmt(parse.stringToBigDecimal(titaVo.getParam("AlrdyBorAmt")));
 				iInnFundApl.setResrvStndrd(parse.stringToBigDecimal(titaVo.getParam("ResrvStndrd")));
 				iInnFundApl.setPosbleBorPsn(parse.stringToBigDecimal(titaVo.getParam("PosbleBorPsn")));
 				iInnFundApl.setPosbleBorAmt(parse.stringToBigDecimal(titaVo.getParam("PosbleBorAmt")));
 				iInnFundApl.setStockHoldersEqt(parse.stringToBigDecimal(titaVo.getParam("StockHoldersEqt")));
-				try{
+				try {
 					innFundAplService.insert(iInnFundApl, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", "L5101 InnFundApl insert " + e.getErrorMsg());
 				}
 			}
 			break;
-		case 2 :
-			if(xInnFundApl == null) {
-				throw new LogicException(titaVo,"E0006","日期"+titaVo.getParam("AcDate")+"資料不存在");
-			}else {
+		case 2:
+			if (xInnFundApl == null) {
+				throw new LogicException(titaVo, "E0006", "日期" + titaVo.getParam("AcDate") + "資料不存在");
+			} else {
 				iInnFundApl = innFundAplService.holdById(acDate, titaVo);
 				iInnFundApl.setAlrdyBorAmt(parse.stringToBigDecimal(titaVo.getParam("AlrdyBorAmt")));
 				iInnFundApl.setResrvStndrd(parse.stringToBigDecimal(titaVo.getParam("ResrvStndrd")));
@@ -93,19 +93,19 @@ public class L5101 extends TradeBuffer {
 				iInnFundApl.setStockHoldersEqt(parse.stringToBigDecimal(titaVo.getParam("StockHoldersEqt")));
 				try {
 					innFundAplService.update(iInnFundApl, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl update " + e.getErrorMsg());
 				}
-			}			
+			}
 			break;
 		case 4:
-			if(xInnFundApl == null) {
-				throw new LogicException(titaVo,"E0006","日期"+titaVo.getParam("AcDate")+"資料不存在");
-			}else {
-				iInnFundApl = innFundAplService.holdById(acDate,titaVo);
+			if (xInnFundApl == null) {
+				throw new LogicException(titaVo, "E0006", "日期" + titaVo.getParam("AcDate") + "資料不存在");
+			} else {
+				iInnFundApl = innFundAplService.holdById(acDate, titaVo);
 				try {
 					innFundAplService.delete(xInnFundApl, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl delete " + e.getErrorMsg());
 				}
 			}

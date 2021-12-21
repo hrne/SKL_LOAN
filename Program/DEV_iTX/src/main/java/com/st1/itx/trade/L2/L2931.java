@@ -163,8 +163,7 @@ public class L2931 extends TradeBuffer {
 			wkBormNoStart = iBormNo;
 			wkBormNoEnd = iBormNo;
 		}
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -200,11 +199,9 @@ public class L2931 extends TradeBuffer {
 						continue;
 					}
 					// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
-					wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-							ln.getSpecificDd(), iEntryDate);
+					wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
 					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-						wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
-								ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
+						wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 						wkTerms = wkTerms - wkPreRepayTermNo;
 					}
 
@@ -223,8 +220,7 @@ public class L2931 extends TradeBuffer {
 					ln.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate());
 					ln.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
 					ln.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());
-					wkExtraRepay = wkExtraRepay.subtract(loanCalcRepayIntCom.getPrincipal())
-							.subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
+					wkExtraRepay = wkExtraRepay.subtract(loanCalcRepayIntCom.getPrincipal()).subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
 							.subtract(loanCalcRepayIntCom.getBreachAmt());
 				}
 			}
@@ -254,8 +250,7 @@ public class L2931 extends TradeBuffer {
 					v.setExtraRepay(loanCalcRepayIntCom.getExtraAmt());
 					v.setEndDate(iEntryDate);
 					iListCloseBreach.add(v);
-					wkExtraRepay = wkExtraRepay.subtract(loanCalcRepayIntCom.getPrincipal())
-							.subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
+					wkExtraRepay = wkExtraRepay.subtract(loanCalcRepayIntCom.getPrincipal()).subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
 							.subtract(loanCalcRepayIntCom.getBreachAmt());
 				}
 			}

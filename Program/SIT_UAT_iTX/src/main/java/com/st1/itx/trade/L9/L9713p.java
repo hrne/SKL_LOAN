@@ -49,7 +49,7 @@ public class L9713p extends TradeBuffer {
 		} else {
 			content = "L9713應收票據之帳齡分析表無資料";
 		}
-		
+
 //		this.info("L9713p content = " + content);
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), content, titaVo);

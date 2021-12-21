@@ -91,7 +91,8 @@ public class L6902 extends TradeBuffer {
 
 		// 查詢會計總帳檔
 		Slice<AcMain> slAcMain;
-		slAcMain = sAcMainService.acmainAcBookCodeRange(iAcBookCode, iAcSubBookCode.trim()+"%",iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index, this.limit, titaVo);
+		slAcMain = sAcMainService.acmainAcBookCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index,
+				this.limit, titaVo);
 		List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 
 		if (lAcMain == null || lAcMain.size() == 0) {

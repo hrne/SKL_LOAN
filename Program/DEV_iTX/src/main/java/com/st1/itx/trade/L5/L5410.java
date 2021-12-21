@@ -16,7 +16,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L5410")
 @Scope("prototype")
 /**
@@ -35,19 +34,18 @@ public class L5410 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
-	
+
 	@Autowired
 	public PfBsDetailService iPfBsDetailService;
-	
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5410 ");
 		this.totaVo.init(titaVo);
-		
-		int iDateFm = Integer.valueOf(titaVo.getParam("DateFm"))+19110000;
-		int iDateTo = Integer.valueOf(titaVo.getParam("DateTo"))+19110000;
-		
+
+		int iDateFm = Integer.valueOf(titaVo.getParam("DateFm")) + 19110000;
+		int iDateTo = Integer.valueOf(titaVo.getParam("DateTo")) + 19110000;
+
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -55,10 +53,10 @@ public class L5410 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		
-		Slice<PfBsDetail> iPfBsDetail = iPfBsDetailService.findByPerfDate(iDateFm,iDateTo,this.index,this.limit,titaVo);
-		if (iPfBsDetail!=null) {
-			for (PfBsDetail aPfBsDetail:iPfBsDetail) {
+
+		Slice<PfBsDetail> iPfBsDetail = iPfBsDetailService.findByPerfDate(iDateFm, iDateTo, this.index, this.limit, titaVo);
+		if (iPfBsDetail != null) {
+			for (PfBsDetail aPfBsDetail : iPfBsDetail) {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOPerfDate", aPfBsDetail.getPerfDate());
 				occursList.putParam("OOCustNo", aPfBsDetail.getCustNo());
@@ -67,7 +65,7 @@ public class L5410 extends TradeBuffer {
 				occursList.putParam("OOBsOfficer", aPfBsDetail.getBsOfficer());
 				this.totaVo.addOccursList(occursList);
 			}
-		}else {
+		} else {
 			throw new LogicException(titaVo, "E0001", "");
 		}
 		this.addList(this.totaVo);

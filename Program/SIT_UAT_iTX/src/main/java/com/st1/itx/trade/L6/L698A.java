@@ -94,34 +94,26 @@ public class L698A extends TradeBuffer {
 
 		switch (selectCode) {
 		case 1:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0 + 19110000, lbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0 + 19110000, lbsDy + 19110000, this.index, this.limit, titaVo);
 			break;
 		case 2:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy + 19110000, tbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy + 19110000, tbsDy + 19110000, this.index, this.limit, titaVo);
 			break;
 		case 3:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0 + 19110000, 9991231 + 19110000, this.index, this.limit, titaVo);
 			break;
 		case 4:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, tbsDy + 19110000, tbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, tbsDy + 19110000, tbsDy + 19110000, this.index, this.limit, titaVo);
 		case 5:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, tbsDy + 19110000, tbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, tbsDy + 19110000, tbsDy + 19110000, this.index, this.limit, titaVo);
 		case 6:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0 + 19110000, 9991231 + 19110000, this.index, this.limit, titaVo);
 			break;
 		case 7:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0 + 19110000, 9991231 + 19110000, this.index, this.limit, titaVo);
 			break;
 		case 9:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0 + 19110000, 9991231 + 19110000, this.index, this.limit, titaVo);
 			break;
 		default:
 			break;
@@ -170,8 +162,7 @@ public class L698A extends TradeBuffer {
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
 				occursList.putParam("OOCustName", custName);
 				occursList.putParam("OOProcessNote", tTxToDoDetail.getProcessNote());
-				occursList.putParam("OOTxSn", tTxToDoDetail.getTitaEntdy() + titaVo.getKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + tTxToDoDetail.getTitaTxtNo()); // 登放序號
+				occursList.putParam("OOTxSn", tTxToDoDetail.getTitaEntdy() + titaVo.getKinbr() + tTxToDoDetail.getTitaTlrNo() + tTxToDoDetail.getTitaTxtNo()); // 登放序號
 				occursList.putParam("OOExcuteTxcd", tTxToDoDetail.getExcuteTxcd());
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());

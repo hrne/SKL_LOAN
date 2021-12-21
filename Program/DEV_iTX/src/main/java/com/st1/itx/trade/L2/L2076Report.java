@@ -137,8 +137,7 @@ public class L2076Report extends MakeReport {
 		FacCloseId FacCloseId = new FacCloseId();
 		FacCloseId.setCustNo(iCustNo);
 		FacCloseId.setCloseNo(iCloseNo);
-		ClOtherRights tClOtherRights = sClOtherRightsService
-				.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
+		ClOtherRights tClOtherRights = sClOtherRightsService.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
 //		FacClose tFacClose = sFacCloseService.findById(FacCloseId, titaVo);
 		int DocNo = tFacClose.getDocNo();
 		String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);
@@ -159,8 +158,7 @@ public class L2076Report extends MakeReport {
 		// 地政
 		String wkLandAdm = "";
 		if ("".equals(tClOtherRights.getOtherLandAdm())) {
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()),
-					titaVo);
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()), titaVo);
 			if (tCdCode != null) {
 				wkLandAdm = tCdCode.getItem();
 			}
@@ -173,8 +171,7 @@ public class L2076Report extends MakeReport {
 		// 收件字
 		String wkRecWord = "";
 		if ("".equals(tClOtherRights.getOtherRecWord())) {
-			CdLandOffice tCdLandOffice = cdLandOfficeService
-					.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+			CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
 			if (tCdLandOffice != null) {
 				wkRecWord = tCdLandOffice.getRecWordItem();
 			}

@@ -89,8 +89,7 @@ public class LC003 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;
 
-		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index,
-				this.limit);
+		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index, this.limit);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
 		if (lTxFlow == null) {
 			throw new LogicException(titaVo, "E0001", "放行資料");
@@ -130,7 +129,7 @@ public class LC003 extends TradeBuffer {
 					tran += " " + txTranCode.getTranItem();
 				}
 				occursList.putParam("TranNo", tran);
-				
+
 				occursList.putParam("MrKey", tTxRecord.getMrKey());
 				occursList.putParam("CurName", tTxRecord.getCurName());
 				occursList.putParam("TxAmt", tTxRecord.getTxAmt());

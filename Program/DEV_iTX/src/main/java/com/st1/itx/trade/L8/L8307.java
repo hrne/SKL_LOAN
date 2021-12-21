@@ -118,8 +118,8 @@ public class L8307 extends TradeBuffer {
 
 		// 檢核項目(D-15)
 		if (!"4".equals(iTranKey_Tmp)) {
-	
-			// 1.3 結案日期不可早於協商申請日,也不可晚於報送本檔案日期。--->(前端檢核)				
+
+			// 1.3 結案日期不可早於協商申請日,也不可晚於報送本檔案日期。--->(前端檢核)
 			// 1.4.1 結案原因代號為協商不成立或毀諾案件者，不能再度申請前置協商---->1014會議通知不需檢核
 			// 1.4.2 結案原因代號為視同未請求協商案件，且結案未滿180天，不能再度申請前置協商--->1014會議通知不需檢核
 
@@ -141,8 +141,7 @@ public class L8307 extends TradeBuffer {
 
 				// 1.6 start 同一key值於'51':延期繳款(喘息期)期間不可報送'00'毀諾
 				if ("00".equals(iCloseCode)) {
-					Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-							Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ051 != null) {
 						int sDelayYM = 0;// 最晚「延期繳款年月」
 						for (JcicZ051 xJcicZ051 : sJcicZ051) {
@@ -160,8 +159,8 @@ public class L8307 extends TradeBuffer {
 							}
 						}
 					}
-				}// 1.6 end
-			} 
+				} // 1.6 end
+			}
 
 			// 1.7
 			// 報送本結案檔後，同一KEY值不可再報送相關檔案之異動。若前述相關檔案之交易代碼為'X'補件者，及報送'49':債務清償方案法院認可資料則不在此限.***J

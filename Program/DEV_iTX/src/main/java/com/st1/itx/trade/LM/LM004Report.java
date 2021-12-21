@@ -17,7 +17,8 @@ import com.st1.itx.util.common.MakeReport;
 
 public class LM004Report extends MakeReport {
 
-	// private static final Logger logger = LoggerFactory.getLogger(LM004Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LM004Report.class);
 
 	@Autowired
 	public LM004Report1 lm004report1;
@@ -36,7 +37,7 @@ public class LM004Report extends MakeReport {
 		} catch (Exception e) {
 			this.info("lM004ServiceImpl.findAll error = " + e.toString());
 		}
-		
+
 		List<Map<String, String>> LM004List_Excel = null;
 		try {
 			LM004List_Excel = lM004ServiceImpl.findAll(titaVo, "excel");
@@ -50,7 +51,7 @@ public class LM004Report extends MakeReport {
 		this.info("LM004List_Excel--->" + LM004List_Excel.toString());
 		lm004report1.exec(titaVo, LM004List);
 		lm004report2.exec(titaVo, LM004List_Excel);
-		
+
 		return true;
 	}
 

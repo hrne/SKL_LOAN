@@ -46,26 +46,26 @@ public class L6757 extends TradeBuffer {
 		int iFunc = Integer.valueOf(titaVo.getParam("FuncCode"));
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
 		int iTargetWorkMonth = Integer.valueOf(titaVo.getParam("TargetWorkMonth")) + 191100;
-		int iEntdy = Integer.valueOf(titaVo.getEntDy())+19110000;
+		int iEntdy = Integer.valueOf(titaVo.getEntDy()) + 19110000;
 		Slice<CdPerformance> iCdPerformance = null;
 		iCdPerformance = iCdPerformanceService.findWorkMonth(iWorkMonth, this.index, this.limit, titaVo);
 		switch (iFunc) {
 		case 3:
-			//若新增工作月為當工作月需主管放行 --2021/9/23
+			// 若新增工作月為當工作月需主管放行 --2021/9/23
 			CdWorkMonth iCdWorkMonth = new CdWorkMonth();
 			iCdWorkMonth = iCdWorkMonthService.findDateFirst(iEntdy, iEntdy, titaVo);
 			if (iCdWorkMonth == null) {
 				throw new LogicException("E0005", "查無工作月設定資料");
 			}
-			int iYear = iCdWorkMonth.getYear()-1911;
+			int iYear = iCdWorkMonth.getYear() - 1911;
 			int iMonth = iCdWorkMonth.getMonth();
-			String sYear = StringUtils.leftPad(String.valueOf(iYear), 3,"0");
-			String sMonth = StringUtils.leftPad(String.valueOf(iMonth), 2,"0");
-			String sWorkMonth = sYear+sMonth;
-			if (sWorkMonth.compareTo(titaVo.getParam("TargetWorkMonth")) == 0) { //若工作月與目標工作月相同，則做主管刷卡
+			String sYear = StringUtils.leftPad(String.valueOf(iYear), 3, "0");
+			String sMonth = StringUtils.leftPad(String.valueOf(iMonth), 2, "0");
+			String sWorkMonth = sYear + sMonth;
+			if (sWorkMonth.compareTo(titaVo.getParam("TargetWorkMonth")) == 0) { // 若工作月與目標工作月相同，則做主管刷卡
 				if (!titaVo.getHsupCode().equals("1")) {
-					iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
-				}				
+					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				}
 			}
 			if (iCdPerformance == null) {
 				throw new LogicException("E0005", "新增時發生錯誤，原工作月該資料不存在");

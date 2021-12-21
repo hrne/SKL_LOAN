@@ -22,6 +22,7 @@ public class BS720ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// 創建程式碼後,檢查初始值
@@ -29,31 +30,14 @@ public class BS720ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public String FindBS720(int YearMonth, int YearMonthLast) throws Exception {
-		String sql = 
-				"SELECT \r\n" + 
-				" T.\"YearMonth\"\r\n" + 
-				",SUM(CASE WHEN NVL(TF.\"AcctCode\",' ') = '990' then T.\"AccumDPAmortized\" ELSE 0 END) AS \"OvAmortized\"\r\n" + 
-				",SUM(CASE WHEN  NVL(TF.\"AcctCode\",' ') <> '990' then T.\"AccumDPAmortized\" ELSE 0 END) AS \"LnAmortized\"\r\n" + 
-				"FROM \"Ias39IntMethod\" T\r\n" + 
-				"LEFT JOIN \"MonthlyFacBal\" TF\r\n" + 
-				"       ON  TF.\"YearMonth\" = T.\"YearMonth\"\r\n" + 
-				"      AND  TF.\"CustNo\" = T.\"CustNo\"\r\n" + 
-				"      AND  TF.\"FacmNo\" = T.\"FacmNo\"\r\n" + 
-				"WHERE T.\"YearMonth\" = " + YearMonth + " " +
-				"GROUP BY T.\"YearMonth\"\r\n" + 
-				"UNION ALL\r\n" + 
-				"SELECT \r\n" + 
-				" L.\"YearMonth\"\r\n" + 
-				",SUM(CASE WHEN NVL(LF.\"AcctCode\",' ') = '990' then L.\"AccumDPAmortized\" ELSE 0 END)    AS \"OvAmortizedLast\" \r\n" + 
-				",SUM(CASE WHEN  NVL(LF.\"AcctCode\",' ') <> '990' then L.\"AccumDPAmortized\" ELSE 0 END) AS \"LnAmortizedLast\" \r\n" + 
-				"FROM \"Ias39IntMethod\" L\r\n" + 
-				"LEFT JOIN \"MonthlyFacBal\" LF\r\n" + 
-				"       ON  LF.\"YearMonth\" = L.\"YearMonth\"\r\n" + 
-				"      AND  LF.\"CustNo\" = L.\"CustNo\"\r\n" + 
-				"      AND  LF.\"FacmNo\" = L.\"FacmNo\"\r\n" + 
-				"WHERE  L.\"YearMonth\" = " + YearMonthLast + " " +
-				"GROUP BY L.\"YearMonth\"\r\n" + 
-				"";
+		String sql = "SELECT \r\n" + " T.\"YearMonth\"\r\n" + ",SUM(CASE WHEN NVL(TF.\"AcctCode\",' ') = '990' then T.\"AccumDPAmortized\" ELSE 0 END) AS \"OvAmortized\"\r\n"
+				+ ",SUM(CASE WHEN  NVL(TF.\"AcctCode\",' ') <> '990' then T.\"AccumDPAmortized\" ELSE 0 END) AS \"LnAmortized\"\r\n" + "FROM \"Ias39IntMethod\" T\r\n"
+				+ "LEFT JOIN \"MonthlyFacBal\" TF\r\n" + "       ON  TF.\"YearMonth\" = T.\"YearMonth\"\r\n" + "      AND  TF.\"CustNo\" = T.\"CustNo\"\r\n"
+				+ "      AND  TF.\"FacmNo\" = T.\"FacmNo\"\r\n" + "WHERE T.\"YearMonth\" = " + YearMonth + " " + "GROUP BY T.\"YearMonth\"\r\n" + "UNION ALL\r\n" + "SELECT \r\n"
+				+ " L.\"YearMonth\"\r\n" + ",SUM(CASE WHEN NVL(LF.\"AcctCode\",' ') = '990' then L.\"AccumDPAmortized\" ELSE 0 END)    AS \"OvAmortizedLast\" \r\n"
+				+ ",SUM(CASE WHEN  NVL(LF.\"AcctCode\",' ') <> '990' then L.\"AccumDPAmortized\" ELSE 0 END) AS \"LnAmortizedLast\" \r\n" + "FROM \"Ias39IntMethod\" L\r\n"
+				+ "LEFT JOIN \"MonthlyFacBal\" LF\r\n" + "       ON  LF.\"YearMonth\" = L.\"YearMonth\"\r\n" + "      AND  LF.\"CustNo\" = L.\"CustNo\"\r\n"
+				+ "      AND  LF.\"FacmNo\" = L.\"FacmNo\"\r\n" + "WHERE  L.\"YearMonth\" = " + YearMonthLast + " " + "GROUP BY L.\"YearMonth\"\r\n" + "";
 		logger.info("sql = " + sql);
 		return sql;
 	}

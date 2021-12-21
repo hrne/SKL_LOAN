@@ -36,10 +36,10 @@ public class L5912Report extends MakeReport {
 
 	@Autowired
 	public CdCodeService iCdCodeService;
-	
+
 	@Autowired
 	public CdWorkMonthService iCdWorkMonthService;
-	
+
 	@Autowired
 	public L5912ServiceImpl iL5912ServiceImpl;
 
@@ -63,58 +63,58 @@ public class L5912Report extends MakeReport {
 		List<String> reportHeader = new ArrayList<>();
 		header.addAll(Arrays.asList("戶號", "額度", "撥款", "撥款金額", "撥款日", "到期日", "扣款銀行", "計件代碼", "房專員編", "房專姓名"));
 		reportHeader.addAll(Arrays.asList("部室", "經辦區部", "姓名", "新貸件數", "新光銀行扣款件數", "占率"));
-		//抓工作月
+		// 抓工作月
 		CdWorkMonth iCdWorkMonthSt = new CdWorkMonth();
 		CdWorkMonth iCdWorkMonthEd = new CdWorkMonth();
-		iCdWorkMonthSt = iCdWorkMonthService.findDateFirst(Integer.valueOf(iDrawDateFm)+19110000, Integer.valueOf(iDrawDateFm)+19110000, titaVo);
+		iCdWorkMonthSt = iCdWorkMonthService.findDateFirst(Integer.valueOf(iDrawDateFm) + 19110000, Integer.valueOf(iDrawDateFm) + 19110000, titaVo);
 		if (iCdWorkMonthSt == null) {
 			throw new LogicException(titaVo, "E0001", "工作月起");
 		}
-		iCdWorkMonthEd = iCdWorkMonthService.findDateFirst(Integer.valueOf(iDrawDateTo)+19110000, Integer.valueOf(iDrawDateTo)+19110000, titaVo);
+		iCdWorkMonthEd = iCdWorkMonthService.findDateFirst(Integer.valueOf(iDrawDateTo) + 19110000, Integer.valueOf(iDrawDateTo) + 19110000, titaVo);
 		if (iCdWorkMonthEd == null) {
 			throw new LogicException(titaVo, "E0001", "工作月迄");
 		}
-		String iYearSt = StringUtils.leftPad(String.valueOf(iCdWorkMonthSt.getYear()-1911), 3,'0');
-		String iMonthSt = StringUtils.leftPad(String.valueOf(iCdWorkMonthSt.getMonth()), 2,'0');
-		String iYearEd = StringUtils.leftPad(String.valueOf(iCdWorkMonthEd.getYear()-1911), 3,'0');
-		String iMonthEd = StringUtils.leftPad(String.valueOf(iCdWorkMonthEd.getMonth()), 2,'0');
+		String iYearSt = StringUtils.leftPad(String.valueOf(iCdWorkMonthSt.getYear() - 1911), 3, '0');
+		String iMonthSt = StringUtils.leftPad(String.valueOf(iCdWorkMonthSt.getMonth()), 2, '0');
+		String iYearEd = StringUtils.leftPad(String.valueOf(iCdWorkMonthEd.getYear() - 1911), 3, '0');
+		String iMonthEd = StringUtils.leftPad(String.valueOf(iCdWorkMonthEd.getMonth()), 2, '0');
 		List<Map<String, String>> t5912SqlReturn = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> d5912SqlReturn = new ArrayList<Map<String, String>>();
-		String fileName = iYearSt+iMonthSt+"到"+iYearEd+iMonthEd+"工作月新光銀扣款件排行-"+iCDate;
-		
+		String fileName = iYearSt + iMonthSt + "到" + iYearEd + iMonthEd + "工作月新光銀扣款件排行-" + iCDate;
+
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5912", fileName, fileName);
-		
+
 		try {
-			t5912SqlReturn = iL5912ServiceImpl.findDetail(Integer.valueOf(iDrawDateFm)+19110000, Integer.valueOf(iDrawDateTo)+19110000,titaVo);
+			t5912SqlReturn = iL5912ServiceImpl.findDetail(Integer.valueOf(iDrawDateFm) + 19110000, Integer.valueOf(iDrawDateTo) + 19110000, titaVo);
 		} catch (Exception e) {
 			// E5004 讀取DB語法發生問題
 			this.info("L5908 ErrorForSql=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
 		if (t5912SqlReturn == null || t5912SqlReturn.isEmpty()) {
-			throw new LogicException(titaVo, "E0001","查無明細資料");
+			throw new LogicException(titaVo, "E0001", "查無明細資料");
 		}
 		try {
-			d5912SqlReturn = iL5912ServiceImpl.findData(Integer.valueOf(iDrawDateFm)+19110000, Integer.valueOf(iDrawDateTo)+19110000,titaVo);
+			d5912SqlReturn = iL5912ServiceImpl.findData(Integer.valueOf(iDrawDateFm) + 19110000, Integer.valueOf(iDrawDateTo) + 19110000, titaVo);
 		} catch (Exception e) {
 			// E5004 讀取DB語法發生問題
 			this.info("L5908 ErrorForSql=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
 		if (d5912SqlReturn == null || d5912SqlReturn.isEmpty()) {
-			throw new LogicException(titaVo, "E0001","查無報表資料");
+			throw new LogicException(titaVo, "E0001", "查無報表資料");
 		}
 		// 列數
 		int row = 1;
 
 		// 表頭列數
 		int hcol = 0;
-		
-		//明細
+
+		// 明細
 		makeExcel.setSheet("L5912", "明細");
 		for (String content : header) {
 			makeExcel.setFontType(1);
-			switch(hcol+1) {
+			switch (hcol + 1) {
 			case 4:
 				makeExcel.setColor("Blue");
 				break;
@@ -161,13 +161,13 @@ public class L5912Report extends MakeReport {
 					break;
 				case 3:
 					makeExcel.setColor("Blue");
-					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("DrawdownAmt")),"#,##0");
-					break;	
+					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("DrawdownAmt")), "#,##0");
+					break;
 				case 4:
-					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("DrawdownDate"))-19110000);
+					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("DrawdownDate")) - 19110000);
 					break;
 				case 5:
-					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("MaturityDate"))-19110000);
+					makeExcel.setValue(row, col + 1, Integer.valueOf(s5912SqlReturn.get("MaturityDate")) - 19110000);
 					break;
 				case 6:
 					makeExcel.setValue(row, col + 1, s5912SqlReturn.get("RepayBank"));
@@ -185,14 +185,14 @@ public class L5912Report extends MakeReport {
 				}
 			}
 		}
-		
-		//報表
+
+		// 報表
 		// 列數
 		row = 1;
 
 		// 表頭列數
 		hcol = 0;
-		
+
 		makeExcel.newSheet("報表");
 		for (String content : reportHeader) {
 			makeExcel.setValue(row, hcol + 1, content);
@@ -209,19 +209,19 @@ public class L5912Report extends MakeReport {
 				if (!a5912SqlReturn.get("F4").isEmpty() && !a5912SqlReturn.get("F4").equals("")) {
 					iTotal = new BigDecimal(a5912SqlReturn.get("F4"));
 				}
-				
+
 				if (!a5912SqlReturn.get("F9").isEmpty() && !a5912SqlReturn.get("F9").equals("")) {
 					i103Total = new BigDecimal(a5912SqlReturn.get("F9"));
 				}
-				this.info("全部="+iTotal);
-				this.info("103="+i103Total);
-				if 	(iTotal.compareTo(iComp)>0) {
-					if 	(i103Total.compareTo(iComp)>0) {
-						iAvg = i103Total.divide(iTotal,3,RoundingMode.HALF_UP);
+				this.info("全部=" + iTotal);
+				this.info("103=" + i103Total);
+				if (iTotal.compareTo(iComp) > 0) {
+					if (i103Total.compareTo(iComp) > 0) {
+						iAvg = i103Total.divide(iTotal, 3, RoundingMode.HALF_UP);
 						iAvg = iAvg.multiply(i100).setScale(1);
 					}
 				}
-				
+
 				switch (col) {
 				// 處裡左右靠
 				case 0:
@@ -235,12 +235,12 @@ public class L5912Report extends MakeReport {
 					break;
 				case 3:
 					makeExcel.setValue(row, col + 1, iTotal);
-					break;	
+					break;
 				case 4:
 					makeExcel.setValue(row, col + 1, i103Total);
 					break;
 				case 5:
-					makeExcel.setValue(row, col + 1, String.valueOf(iAvg)+"%");
+					makeExcel.setValue(row, col + 1, String.valueOf(iAvg) + "%");
 					break;
 				}
 			}

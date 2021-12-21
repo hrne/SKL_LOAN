@@ -44,21 +44,21 @@ public class L5105 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5105 ");
 		this.totaVo.init(titaVo);
-		
-		int iYearMonth = Integer.valueOf(titaVo.getParam("YearMonth"))+191100;
+
+		int iYearMonth = Integer.valueOf(titaVo.getParam("YearMonth")) + 191100;
 		int iConditionCode = Integer.valueOf(titaVo.getParam("ConditionCode"));
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 		String iReCheckCode = titaVo.getParam("ReCheckCode");
-		int iReChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth"))+191100;
-		String iReChkUnit = titaVo.getParam("ReChkUnit");	
-		String iFollowMark = titaVo.getParam("FollowMark");	
+		int iReChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth")) + 191100;
+		String iReChkUnit = titaVo.getParam("ReChkUnit");
+		String iFollowMark = titaVo.getParam("FollowMark");
 
 		int iTraceYearMonth = 0;
-		if (Integer.valueOf(titaVo.getParam("TraceYearMonth"))!=0) {
-			iTraceYearMonth = Integer.valueOf(titaVo.getParam("TraceYearMonth"))+191100;
+		if (Integer.valueOf(titaVo.getParam("TraceYearMonth")) != 0) {
+			iTraceYearMonth = Integer.valueOf(titaVo.getParam("TraceYearMonth")) + 191100;
 		}
-		String iRemark = titaVo.getParam("Remark");	
+		String iRemark = titaVo.getParam("Remark");
 
 		InnReCheck iInnReCheck = new InnReCheck();
 		InnReCheckId iInnReCheckId = new InnReCheckId();
@@ -68,9 +68,9 @@ public class L5105 extends TradeBuffer {
 		iInnReCheckId.setYearMonth(iYearMonth);
 		iInnReCheck = iInnReCheckService.holdById(iInnReCheckId, titaVo);
 		if (iInnReCheck == null) {
-			throw new LogicException(titaVo,"E0007","查無資料");
+			throw new LogicException(titaVo, "E0007", "查無資料");
 		}
-		
+
 		InnReCheck oldInnReCheck = (InnReCheck) idataLog.clone(iInnReCheck);
 		iInnReCheck.setReCheckCode(iReCheckCode);
 		iInnReCheck.setReChkYearMonth(iReChkYearMonth);
@@ -78,7 +78,7 @@ public class L5105 extends TradeBuffer {
 		iInnReCheck.setFollowMark(iFollowMark);
 		iInnReCheck.setTraceMonth(iTraceYearMonth);
 		iInnReCheck.setRemark(iRemark);
-		
+
 		try {
 			iInnReCheck = iInnReCheckService.update2(iInnReCheck, titaVo);
 

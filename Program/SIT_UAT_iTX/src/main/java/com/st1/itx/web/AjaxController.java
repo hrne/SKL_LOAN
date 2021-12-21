@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,15 +41,33 @@ import com.st1.itx.util.data.Manufacture;
 import com.st1.itx.util.filter.FilterUtils;
 import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.log.SysLogger;
+import com.st1.itx.util.menu.MenuBuilder;
 import com.st1.itx.util.parse.ZLibUtils;
 
 @Controller
 @RequestMapping("hnd/*")
 public class AjaxController extends SysLogger {
 
+	@Autowired
+	MenuBuilder menuBuilder;
+
 	@PostConstruct
 	public void init() {
 		this.info("AjaxController Init....");
+	}
+
+	@RequestMapping(value = "menu2/jsonp", method = RequestMethod.GET)
+	public ResponseEntity<String> getMenuJson2(@RequestParam String authNo, HttpSession session, HttpServletResponse response) {
+		ThreadVariable.setObject(ContentName.loggerFg, true);
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		if (authNo.trim().isEmpty())
+			map.put("data", menuBuilder.buildRootMenu());
+		else
+			map.put("data", menuBuilder.buildMenu(authNo));
+
+		map.put("status", true);
+		return makeJsonResponse(map, true);
 	}
 
 	@RequestMapping(value = "download/file/{fileNo}")
@@ -157,7 +176,7 @@ public class AjaxController extends SysLogger {
 				Map<String, ?> p = makeReport.toPrint(reportNo, pageNo++, printer);
 				if (p.get("printJson") != null)
 					pLi.add((List<Map<String, ?>>) p.get("printJson"));
-				
+
 				this.info("morePage : " + "1".equals(p.get("morePage").toString()));
 				this.info("pageNo   : " + pageNo);
 

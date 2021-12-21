@@ -72,8 +72,7 @@ public class L2941 extends TradeBuffer {
 		// new table
 		ForeclosureFee tForeclosureFee = new ForeclosureFee();
 		// 測試該戶號是否存在法拍費用檔
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.custNoEq(iCustNo, this.index, this.limit,
-				titaVo);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.custNoEq(iCustNo, this.index, this.limit, titaVo);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slForeclosureFee != null && slForeclosureFee.hasNext()) {

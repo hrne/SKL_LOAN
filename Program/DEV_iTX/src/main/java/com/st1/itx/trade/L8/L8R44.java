@@ -14,7 +14,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 
 @Service("L8R44")
 @Scope("prototype")
-/** 
+/**
  * 
  * @author Luisito / Mata
  * @version 1.0.0
@@ -35,11 +35,11 @@ public class L8R44 extends TradeBuffer {
 		if (iJcicZ447 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
 		} else {
-			totaVo.putParam("L8r44TranKey",iJcicZ447.getTranKey());// 交易代碼
+			totaVo.putParam("L8r44TranKey", iJcicZ447.getTranKey());// 交易代碼
 			totaVo.putParam("L8r44CustId", iJcicZ447.getCustId());// 債務人IDN
 			totaVo.putParam("L8r44SubmitKey", iJcicZ447.getSubmitKey());// 報送單位代號
-            totaVo.putParam("L8r44ApplyDate", iJcicZ447.getApplyDate());// 調解申請日
-            totaVo.putParam("L8r44CourtCode", iJcicZ447.getCourtCode());// 受理調解機構代號
+			totaVo.putParam("L8r44ApplyDate", iJcicZ447.getApplyDate());// 調解申請日
+			totaVo.putParam("L8r44CourtCode", iJcicZ447.getCourtCode());// 受理調解機構代號
 			totaVo.putParam("L8r44Civil323Amt", iJcicZ447.getCivil323Amt());// 依民法第323條計算之債務總金額
 			totaVo.putParam("L8r44TotalAmt", iJcicZ447.getTotalAmt());// 簽約總債務金額
 			totaVo.putParam("L8r44SignDate", iJcicZ447.getSignDate());// 簽約完成日期
@@ -48,7 +48,7 @@ public class L8R44 extends TradeBuffer {
 			totaVo.putParam("L8r44Rate", iJcicZ447.getRate());// 利率
 			totaVo.putParam("L8r44MonthPayAmt", iJcicZ447.getMonthPayAmt());// 月付金
 			totaVo.putParam("L8r44PayAccount", iJcicZ447.getPayAccount());// 繳款帳號
-			totaVo.putParam("L8r44OutJcicTxtDate", iJcicZ447.getOutJcicTxtDate());// 轉JCIC文字檔日期  
+			totaVo.putParam("L8r44OutJcicTxtDate", iJcicZ447.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

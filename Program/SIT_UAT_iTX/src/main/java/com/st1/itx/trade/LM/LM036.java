@@ -48,8 +48,7 @@ public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("active LM036 ");
 		lM036Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LM036第一類各項統計表", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM036第一類各項統計表", titaVo);
 	}
 
 }

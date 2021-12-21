@@ -23,313 +23,307 @@ import javax.persistence.Column;
 @Table(name = "`ClLandOwner`")
 public class ClLandOwner implements Serializable {
 
-
-  /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -118850205519486741L;
 
-@EmbeddedId
-  private ClLandOwnerId clLandOwnerId;
+	@EmbeddedId
+	private ClLandOwnerId clLandOwnerId;
 
-  // 擔保品代號1
-  @Column(name = "`ClCode1`", insertable = false, updatable = false)
-  private int clCode1 = 0;
+	// 擔保品代號1
+	@Column(name = "`ClCode1`", insertable = false, updatable = false)
+	private int clCode1 = 0;
 
-  // 擔保品代號2
-  @Column(name = "`ClCode2`", insertable = false, updatable = false)
-  private int clCode2 = 0;
+	// 擔保品代號2
+	@Column(name = "`ClCode2`", insertable = false, updatable = false)
+	private int clCode2 = 0;
 
-  // 擔保品編號
-  @Column(name = "`ClNo`", insertable = false, updatable = false)
-  private int clNo = 0;
+	// 擔保品編號
+	@Column(name = "`ClNo`", insertable = false, updatable = false)
+	private int clNo = 0;
 
-  // 土地序號
-  /* 擔保品代號1=1.房地:從1起編=2.土地:固定000 */
-  @Column(name = "`LandSeq`", insertable = false, updatable = false)
-  private int landSeq = 0;
+	// 土地序號
+	/* 擔保品代號1=1.房地:從1起編=2.土地:固定000 */
+	@Column(name = "`LandSeq`", insertable = false, updatable = false)
+	private int landSeq = 0;
 
-  // 客戶識別碼
-  @Column(name = "`OwnerCustUKey`", length = 32, insertable = false, updatable = false)
-  private String ownerCustUKey;
+	// 客戶識別碼
+	@Column(name = "`OwnerCustUKey`", length = 32, insertable = false, updatable = false)
+	private String ownerCustUKey;
 
-  // 與授信戶關係
-  /* 參考CdGuarantor */
-  @Column(name = "`OwnerRelCode`", length = 2)
-  private String ownerRelCode;
+	// 與授信戶關係
+	/* 參考CdGuarantor */
+	@Column(name = "`OwnerRelCode`", length = 2)
+	private String ownerRelCode;
 
-  // 持份比率(分子)
-  @Column(name = "`OwnerPart`")
-  private BigDecimal ownerPart = new BigDecimal("0");
+	// 持份比率(分子)
+	@Column(name = "`OwnerPart`")
+	private BigDecimal ownerPart = new BigDecimal("0");
 
-  // 持份比率(分母)
-  @Column(name = "`OwnerTotal`")
-  private BigDecimal ownerTotal = new BigDecimal("0");
+	// 持份比率(分母)
+	@Column(name = "`OwnerTotal`")
+	private BigDecimal ownerTotal = new BigDecimal("0");
 
-  // 建檔日期時間
-  @CreatedDate
-  @Column(name = "`CreateDate`")
-  private java.sql.Timestamp createDate;
+	// 建檔日期時間
+	@CreatedDate
+	@Column(name = "`CreateDate`")
+	private java.sql.Timestamp createDate;
 
-  // 建檔人員
-  @Column(name = "`CreateEmpNo`", length = 6)
-  private String createEmpNo;
+	// 建檔人員
+	@Column(name = "`CreateEmpNo`", length = 6)
+	private String createEmpNo;
 
-  // 最後更新日期時間
-  @LastModifiedDate
-  @Column(name = "`LastUpdate`")
-  private java.sql.Timestamp lastUpdate;
+	// 最後更新日期時間
+	@LastModifiedDate
+	@Column(name = "`LastUpdate`")
+	private java.sql.Timestamp lastUpdate;
 
-  // 最後更新人員
-  @Column(name = "`LastUpdateEmpNo`", length = 6)
-  private String lastUpdateEmpNo;
+	// 最後更新人員
+	@Column(name = "`LastUpdateEmpNo`", length = 6)
+	private String lastUpdateEmpNo;
 
+	public ClLandOwnerId getClLandOwnerId() {
+		return this.clLandOwnerId;
+	}
 
-  public ClLandOwnerId getClLandOwnerId() {
-    return this.clLandOwnerId;
-  }
+	public void setClLandOwnerId(ClLandOwnerId clLandOwnerId) {
+		this.clLandOwnerId = clLandOwnerId;
+	}
 
-  public void setClLandOwnerId(ClLandOwnerId clLandOwnerId) {
-    this.clLandOwnerId = clLandOwnerId;
-  }
+	/**
+	 * 擔保品代號1<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getClCode1() {
+		return this.clCode1;
+	}
 
-/**
-	* 擔保品代號1<br>
-	* 
-	* @return Integer
-	*/
-  public int getClCode1() {
-    return this.clCode1;
-  }
+	/**
+	 * 擔保品代號1<br>
+	 * 
+	 *
+	 * @param clCode1 擔保品代號1
+	 */
+	public void setClCode1(int clCode1) {
+		this.clCode1 = clCode1;
+	}
 
-/**
-	* 擔保品代號1<br>
-	* 
-  *
-  * @param clCode1 擔保品代號1
-	*/
-  public void setClCode1(int clCode1) {
-    this.clCode1 = clCode1;
-  }
+	/**
+	 * 擔保品代號2<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getClCode2() {
+		return this.clCode2;
+	}
 
-/**
-	* 擔保品代號2<br>
-	* 
-	* @return Integer
-	*/
-  public int getClCode2() {
-    return this.clCode2;
-  }
+	/**
+	 * 擔保品代號2<br>
+	 * 
+	 *
+	 * @param clCode2 擔保品代號2
+	 */
+	public void setClCode2(int clCode2) {
+		this.clCode2 = clCode2;
+	}
 
-/**
-	* 擔保品代號2<br>
-	* 
-  *
-  * @param clCode2 擔保品代號2
-	*/
-  public void setClCode2(int clCode2) {
-    this.clCode2 = clCode2;
-  }
+	/**
+	 * 擔保品編號<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getClNo() {
+		return this.clNo;
+	}
 
-/**
-	* 擔保品編號<br>
-	* 
-	* @return Integer
-	*/
-  public int getClNo() {
-    return this.clNo;
-  }
+	/**
+	 * 擔保品編號<br>
+	 * 
+	 *
+	 * @param clNo 擔保品編號
+	 */
+	public void setClNo(int clNo) {
+		this.clNo = clNo;
+	}
 
-/**
-	* 擔保品編號<br>
-	* 
-  *
-  * @param clNo 擔保品編號
-	*/
-  public void setClNo(int clNo) {
-    this.clNo = clNo;
-  }
+	/**
+	 * 土地序號<br>
+	 * 擔保品代號1 =1.房地:從1起編 =2.土地:固定000
+	 * 
+	 * @return Integer
+	 */
+	public int getLandSeq() {
+		return this.landSeq;
+	}
 
-/**
-	* 土地序號<br>
-	* 擔保品代號1
-=1.房地:從1起編
-=2.土地:固定000
-	* @return Integer
-	*/
-  public int getLandSeq() {
-    return this.landSeq;
-  }
+	/**
+	 * 土地序號<br>
+	 * 擔保品代號1 =1.房地:從1起編 =2.土地:固定000
+	 *
+	 * @param landSeq 土地序號
+	 */
+	public void setLandSeq(int landSeq) {
+		this.landSeq = landSeq;
+	}
 
-/**
-	* 土地序號<br>
-	* 擔保品代號1
-=1.房地:從1起編
-=2.土地:固定000
-  *
-  * @param landSeq 土地序號
-	*/
-  public void setLandSeq(int landSeq) {
-    this.landSeq = landSeq;
-  }
+	/**
+	 * 客戶識別碼<br>
+	 * 
+	 * @return String
+	 */
+	public String getOwnerCustUKey() {
+		return this.ownerCustUKey == null ? "" : this.ownerCustUKey;
+	}
 
-/**
-	* 客戶識別碼<br>
-	* 
-	* @return String
-	*/
-  public String getOwnerCustUKey() {
-    return this.ownerCustUKey == null ? "" : this.ownerCustUKey;
-  }
+	/**
+	 * 客戶識別碼<br>
+	 * 
+	 *
+	 * @param ownerCustUKey 客戶識別碼
+	 */
+	public void setOwnerCustUKey(String ownerCustUKey) {
+		this.ownerCustUKey = ownerCustUKey;
+	}
 
-/**
-	* 客戶識別碼<br>
-	* 
-  *
-  * @param ownerCustUKey 客戶識別碼
-	*/
-  public void setOwnerCustUKey(String ownerCustUKey) {
-    this.ownerCustUKey = ownerCustUKey;
-  }
+	/**
+	 * 與授信戶關係<br>
+	 * 參考CdGuarantor
+	 * 
+	 * @return String
+	 */
+	public String getOwnerRelCode() {
+		return this.ownerRelCode == null ? "" : this.ownerRelCode;
+	}
 
-/**
-	* 與授信戶關係<br>
-	* 參考CdGuarantor
-	* @return String
-	*/
-  public String getOwnerRelCode() {
-    return this.ownerRelCode == null ? "" : this.ownerRelCode;
-  }
+	/**
+	 * 與授信戶關係<br>
+	 * 參考CdGuarantor
+	 *
+	 * @param ownerRelCode 與授信戶關係
+	 */
+	public void setOwnerRelCode(String ownerRelCode) {
+		this.ownerRelCode = ownerRelCode;
+	}
 
-/**
-	* 與授信戶關係<br>
-	* 參考CdGuarantor
-  *
-  * @param ownerRelCode 與授信戶關係
-	*/
-  public void setOwnerRelCode(String ownerRelCode) {
-    this.ownerRelCode = ownerRelCode;
-  }
+	/**
+	 * 持份比率(分子)<br>
+	 * 
+	 * @return BigDecimal
+	 */
+	public BigDecimal getOwnerPart() {
+		return this.ownerPart;
+	}
 
-/**
-	* 持份比率(分子)<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getOwnerPart() {
-    return this.ownerPart;
-  }
+	/**
+	 * 持份比率(分子)<br>
+	 * 
+	 *
+	 * @param ownerPart 持份比率(分子)
+	 */
+	public void setOwnerPart(BigDecimal ownerPart) {
+		this.ownerPart = ownerPart;
+	}
 
-/**
-	* 持份比率(分子)<br>
-	* 
-  *
-  * @param ownerPart 持份比率(分子)
-	*/
-  public void setOwnerPart(BigDecimal ownerPart) {
-    this.ownerPart = ownerPart;
-  }
+	/**
+	 * 持份比率(分母)<br>
+	 * 
+	 * @return BigDecimal
+	 */
+	public BigDecimal getOwnerTotal() {
+		return this.ownerTotal;
+	}
 
-/**
-	* 持份比率(分母)<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getOwnerTotal() {
-    return this.ownerTotal;
-  }
+	/**
+	 * 持份比率(分母)<br>
+	 * 
+	 *
+	 * @param ownerTotal 持份比率(分母)
+	 */
+	public void setOwnerTotal(BigDecimal ownerTotal) {
+		this.ownerTotal = ownerTotal;
+	}
 
-/**
-	* 持份比率(分母)<br>
-	* 
-  *
-  * @param ownerTotal 持份比率(分母)
-	*/
-  public void setOwnerTotal(BigDecimal ownerTotal) {
-    this.ownerTotal = ownerTotal;
-  }
+	/**
+	 * 建檔日期時間<br>
+	 * 
+	 * @return java.sql.Timestamp
+	 */
+	public java.sql.Timestamp getCreateDate() {
+		return this.createDate;
+	}
 
-/**
-	* 建檔日期時間<br>
-	* 
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getCreateDate() {
-    return this.createDate;
-  }
+	/**
+	 * 建檔日期時間<br>
+	 * 
+	 *
+	 * @param createDate 建檔日期時間
+	 */
+	public void setCreateDate(java.sql.Timestamp createDate) {
+		this.createDate = createDate;
+	}
 
-/**
-	* 建檔日期時間<br>
-	* 
-  *
-  * @param createDate 建檔日期時間
-	*/
-  public void setCreateDate(java.sql.Timestamp createDate) {
-    this.createDate = createDate;
-  }
+	/**
+	 * 建檔人員<br>
+	 * 
+	 * @return String
+	 */
+	public String getCreateEmpNo() {
+		return this.createEmpNo == null ? "" : this.createEmpNo;
+	}
 
-/**
-	* 建檔人員<br>
-	* 
-	* @return String
-	*/
-  public String getCreateEmpNo() {
-    return this.createEmpNo == null ? "" : this.createEmpNo;
-  }
+	/**
+	 * 建檔人員<br>
+	 * 
+	 *
+	 * @param createEmpNo 建檔人員
+	 */
+	public void setCreateEmpNo(String createEmpNo) {
+		this.createEmpNo = createEmpNo;
+	}
 
-/**
-	* 建檔人員<br>
-	* 
-  *
-  * @param createEmpNo 建檔人員
-	*/
-  public void setCreateEmpNo(String createEmpNo) {
-    this.createEmpNo = createEmpNo;
-  }
+	/**
+	 * 最後更新日期時間<br>
+	 * 
+	 * @return java.sql.Timestamp
+	 */
+	public java.sql.Timestamp getLastUpdate() {
+		return this.lastUpdate;
+	}
 
-/**
-	* 最後更新日期時間<br>
-	* 
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getLastUpdate() {
-    return this.lastUpdate;
-  }
+	/**
+	 * 最後更新日期時間<br>
+	 * 
+	 *
+	 * @param lastUpdate 最後更新日期時間
+	 */
+	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 
-/**
-	* 最後更新日期時間<br>
-	* 
-  *
-  * @param lastUpdate 最後更新日期時間
-	*/
-  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-    this.lastUpdate = lastUpdate;
-  }
+	/**
+	 * 最後更新人員<br>
+	 * 
+	 * @return String
+	 */
+	public String getLastUpdateEmpNo() {
+		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+	}
 
-/**
-	* 最後更新人員<br>
-	* 
-	* @return String
-	*/
-  public String getLastUpdateEmpNo() {
-    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-  }
+	/**
+	 * 最後更新人員<br>
+	 * 
+	 *
+	 * @param lastUpdateEmpNo 最後更新人員
+	 */
+	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+		this.lastUpdateEmpNo = lastUpdateEmpNo;
+	}
 
-/**
-	* 最後更新人員<br>
-	* 
-  *
-  * @param lastUpdateEmpNo 最後更新人員
-	*/
-  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-    this.lastUpdateEmpNo = lastUpdateEmpNo;
-  }
-
-
-  @Override
-  public String toString() {
-    return "ClLandOwner [clLandOwnerId=" + clLandOwnerId + ", ownerRelCode=" + ownerRelCode
-           + ", ownerPart=" + ownerPart + ", ownerTotal=" + ownerTotal + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
-  }
+	@Override
+	public String toString() {
+		return "ClLandOwner [clLandOwnerId=" + clLandOwnerId + ", ownerRelCode=" + ownerRelCode + ", ownerPart=" + ownerPart + ", ownerTotal=" + ownerTotal + ", createDate=" + createDate
+				+ ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+	}
 }

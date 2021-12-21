@@ -56,9 +56,9 @@ public class L6031 extends TradeBuffer {
 		// 查詢代碼檔
 		Slice<CdCode> sCdCode = null;
 		if (("00").equals(iBaseRateCode)) {
-			sCdCode = sCdCodeService.defCodeEq("BaseRate", "%",  this.index, this.limit, titaVo);
+			sCdCode = sCdCodeService.defCodeEq("BaseRate", "%", this.index, this.limit, titaVo);
 		} else {
-			sCdCode = sCdCodeService.defCodeEq("BaseRate", iBaseRateCode + "%",  this.index, this.limit, titaVo);
+			sCdCode = sCdCodeService.defCodeEq("BaseRate", iBaseRateCode + "%", this.index, this.limit, titaVo);
 		}
 
 		List<CdCode> lCdCode = sCdCode == null ? null : sCdCode.getContent();
@@ -67,7 +67,7 @@ public class L6031 extends TradeBuffer {
 		}
 
 		for (CdCode tCdCode : lCdCode) {
-	
+
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOBaseRateCode", tCdCode.getCode());
 			occursList.putParam("OOBaseRateItem", tCdCode.getItem());

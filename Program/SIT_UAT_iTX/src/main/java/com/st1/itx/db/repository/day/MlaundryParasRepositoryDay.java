@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -19,10 +18,9 @@ import com.st1.itx.db.domain.MlaundryParas;
  */
 public interface MlaundryParasRepositoryDay extends JpaRepository<MlaundryParas, String> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MlaundryParas> findByBusinessType(String businessType);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MlaundryParas> findByBusinessType(String businessType);
 
 }
-

@@ -90,8 +90,7 @@ public class L4701 extends TradeBuffer {
 
 		ArrayList<OccursList> tmp = new ArrayList<>();
 
-		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(),
-				this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
+		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 
@@ -116,8 +115,8 @@ public class L4701 extends TradeBuffer {
 		int chequeOutCnt = 0;
 		int chequeInCnt = 0;
 		BigDecimal chequeTotAmt = BigDecimal.ZERO;
-		
-		totaVo.put("PdfSnoM", "" );
+
+		totaVo.put("PdfSnoM", "");
 
 		if (lLoanCheque != null && lLoanCheque.size() != 0) {
 			for (LoanCheque tLoanCheque : lLoanCheque) {
@@ -194,19 +193,18 @@ public class L4701 extends TradeBuffer {
 
 //			String path = "D:\\temp\\pdcm.csv";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-票據媒體檔", "pdcm.csv", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-票據媒體檔", "pdcm.csv", 2);
 
-			for(String line : file) {
+			for (String line : file) {
 				makeFile.put(line);
 			}
-			
+
 			long snoM = makeFile.close();
 
 			this.info("sno : " + snoM);
 
 			makeFile.toFile(snoM);
-			
+
 			totaVo.put("PdfSnoM", "" + snoM);
 
 		}

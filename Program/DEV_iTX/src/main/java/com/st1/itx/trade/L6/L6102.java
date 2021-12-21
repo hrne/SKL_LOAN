@@ -116,16 +116,14 @@ public class L6102 extends TradeBuffer {
 
 		titaVo.putParam("MediaSeq", tAcClose.getCoreSeqNo()); // 核心傳票
 		titaVo.putParam("MediaType", tAcClose.getCoreSeqNo()); // 核心傳票
-		titaVo.putParam("DoL9133", "N"); 
-		
-		//透過L9130 控制 L9130、L9131、L9132、L9133
+		titaVo.putParam("DoL9133", "N");
+
+		// 透過L9130 控制 L9130、L9131、L9132、L9133
 		tranL9130.run(titaVo);
 //		MySpring.newTask("L9130", this.txBuffer, titaVo);
 
 //		tranL9131.run(titaVo);
 //		MySpring.newTask("L9131", this.txBuffer, titaVo);
-
-		
 
 //		tranL9132.run(titaVo);
 //		MySpring.newTask("L9132", this.txBuffer, titaVo);

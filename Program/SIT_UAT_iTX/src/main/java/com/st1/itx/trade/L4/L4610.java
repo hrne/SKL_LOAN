@@ -147,7 +147,7 @@ public class L4610 extends TradeBuffer {
 					tNewInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate")));
 					tNewInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 					tNewInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-					
+
 					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuRenew.getInsuEndDate()) {
 						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
 					}
@@ -160,8 +160,7 @@ public class L4610 extends TradeBuffer {
 					tNewInsuRenew.setOvduDate(0);
 					tNewInsuRenew.setOvduNo(BigDecimal.ZERO);
 
-					totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem"))
-							.add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+					totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
 
 					tNewInsuRenew.setTotInsuPrem(totPrem);
 

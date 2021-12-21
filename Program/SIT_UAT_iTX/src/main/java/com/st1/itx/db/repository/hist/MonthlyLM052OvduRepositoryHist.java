@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.MonthlyLM052OvduId;
  */
 public interface MonthlyLM052OvduRepositoryHist extends JpaRepository<MonthlyLM052Ovdu, MonthlyLM052OvduId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MonthlyLM052Ovdu> findByMonthlyLM052OvduId(MonthlyLM052OvduId monthlyLM052OvduId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MonthlyLM052Ovdu> findByMonthlyLM052OvduId(MonthlyLM052OvduId monthlyLM052OvduId);
 
-  // 
-  @Procedure(value = "\"Usp_L9_MonthlyLM052Ovdu_Ins\"")
-  public void uspL9Monthlylm052ovduIns(int tbsdyf,  String empNo);
+	//
+	@Procedure(value = "\"Usp_L9_MonthlyLM052Ovdu_Ins\"")
+	public void uspL9Monthlylm052ovduIns(int tbsdyf, String empNo);
 
 }
-

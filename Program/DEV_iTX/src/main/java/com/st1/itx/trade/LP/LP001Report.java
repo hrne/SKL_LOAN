@@ -43,8 +43,7 @@ public class LP001Report extends MakeReport {
 		this.print(-4, 2, "報  表：" + this.getRptCode());
 		this.print(-4, 80, "工作月放款審查課各區業績累計", "C");
 		this.print(-3, 145, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
-		this.print(-4, 145, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-4, 145, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-5, 145, "頁　　次：" + this.getNowPage());
 		String yearMon = this.showRocDate(this.getReportDate());
 		this.print(-6, 80, yearMon, "C");
@@ -94,12 +93,10 @@ public class LP001Report extends MakeReport {
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
-	private void exportReport(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList)
-			throws LogicException {
+	private void exportReport(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList) throws LogicException {
 		this.info("===========in PDF");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, security, pageSize,
-				pageOrientation);
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
 
@@ -397,21 +394,18 @@ public class LP001Report extends MakeReport {
 
 			// 間距
 			int columnInterval = 110;
-			this.drawLine(x2 + columnInterval * (x - 1), 370 + startColumn, x2 + columnInterval * (x - 1),
-					565 + startColumn); // y4
+			this.drawLine(x2 + columnInterval * (x - 1), 370 + startColumn, x2 + columnInterval * (x - 1), 565 + startColumn); // y4
 
 			this.drawLine(x3 + columnInterval * x, 345 + startColumn, x3 + columnInterval * x, 565 + startColumn); // y5
 		}
 
 	}
 
-	private void exportExcel(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList)
-			throws LogicException {
+	private void exportExcel(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList) throws LogicException {
 
 		this.info("===========in Excel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem,
-				reportCode + "_" + reportItem, "LP001_底稿_區域中心業績累計.xlsx", "10805");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, reportCode + "_" + reportItem, "LP001_底稿_區域中心業績累計.xlsx", "10805");
 
 		int iYEAR = 0;
 		int iMM = 0;

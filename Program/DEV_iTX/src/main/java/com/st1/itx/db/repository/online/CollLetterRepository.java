@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,22 +21,23 @@ import com.st1.itx.db.domain.CollLetterId;
  */
 public interface CollLetterRepository extends JpaRepository<CollLetter, CollLetterId> {
 
-  // MailDate>= , AND MailDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
-  public Slice<CollLetter> findAllByMailDateGreaterThanEqualAndMailDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMailDateDesc(int mailDate_0, int mailDate_1, String caseCode_2, int custNo_3, int facmNo_4, Pageable pageable);
+	// MailDate>= , AND MailDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
+	public Slice<CollLetter> findAllByMailDateGreaterThanEqualAndMailDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMailDateDesc(int mailDate_0, int mailDate_1, String caseCode_2,
+			int custNo_3, int facmNo_4, Pageable pageable);
 
-  // CaseCode= ,AND CustNo= ,AND FacmNo= ,
-  public Slice<CollLetter> findAllByCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMailDateDesc(String caseCode_0, int custNo_1, int facmNo_2, Pageable pageable);
+	// CaseCode= ,AND CustNo= ,AND FacmNo= ,
+	public Slice<CollLetter> findAllByCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMailDateDesc(String caseCode_0, int custNo_1, int facmNo_2, Pageable pageable);
 
-  // MailDate>= , AND MailDate<= ,AND CaseCode= ,AND CustNo= 
-  public Slice<CollLetter> findAllByMailDateGreaterThanEqualAndMailDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMailDateDesc(int mailDate_0, int mailDate_1, String caseCode_2, int custNo_3, Pageable pageable);
+	// MailDate>= , AND MailDate<= ,AND CaseCode= ,AND CustNo=
+	public Slice<CollLetter> findAllByMailDateGreaterThanEqualAndMailDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMailDateDesc(int mailDate_0, int mailDate_1, String caseCode_2, int custNo_3,
+			Pageable pageable);
 
-  // CaseCode= ,AND CustNo= 
-  public Slice<CollLetter> findAllByCaseCodeIsAndCustNoIsOrderByMailDateDesc(String caseCode_0, int custNo_1, Pageable pageable);
+	// CaseCode= ,AND CustNo=
+	public Slice<CollLetter> findAllByCaseCodeIsAndCustNoIsOrderByMailDateDesc(String caseCode_0, int custNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CollLetter> findByCollLetterId(CollLetterId collLetterId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CollLetter> findByCollLetterId(CollLetterId collLetterId);
 
 }
-

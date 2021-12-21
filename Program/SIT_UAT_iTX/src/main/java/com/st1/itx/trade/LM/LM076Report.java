@@ -30,7 +30,7 @@ public class LM076Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	private static final BigDecimal billion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -41,10 +41,10 @@ public class LM076Report extends MakeReport {
 
 		List<Map<String, String>> lLM076Before = null;
 		List<Map<String, String>> lLM076After = null;
-		
+
 		try {
-			lLM076Before = lM076ServiceImpl.findAll(titaVo, iAcDate/100, true);
-			lLM076After = lM076ServiceImpl.findAll(titaVo, iAcDate/100, true);
+			lLM076Before = lM076ServiceImpl.findAll(titaVo, iAcDate / 100, true);
+			lLM076After = lM076ServiceImpl.findAll(titaVo, iAcDate / 100, true);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -61,7 +61,7 @@ public class LM076Report extends MakeReport {
 
 		this.info("LM076Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM076", "B042金融機構承作「購地貸款」統計表", "LM076_B042金融機構承作「購地貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
 				"LM076_底稿_B042金融機構承作「購地貸款」統計表.xlsx", 1, "FOA");
@@ -70,7 +70,7 @@ public class LM076Report extends MakeReport {
 		makeExcel.setValue(3, 4, "民國 " + YearMonth, "R");
 
 		if ((lListBefore != null && !lListBefore.isEmpty()) || (lListAfter != null && !lListAfter.isEmpty())) {
-			
+
 			doOutput(lListBefore, 3);
 			doOutput(lListAfter, 6);
 
@@ -82,17 +82,15 @@ public class LM076Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
-	
-	
-	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException
-	{		
+
+	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException {
 		for (Map<String, String> tLDVo : list) {
 			int colShift = 0;
 			int rowShift = 0;
 
-			for (int i = 0; i <= 3 ; i++) {
+			for (int i = 0; i <= 3; i++) {
 
 				int col = startColumn + i; // 1-based
 				int row = 7; // 1-based

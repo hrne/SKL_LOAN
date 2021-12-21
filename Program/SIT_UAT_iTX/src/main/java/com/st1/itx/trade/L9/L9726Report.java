@@ -59,8 +59,7 @@ public class L9726Report extends MakeReport {
 
 		this.info("L9726Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txname, txcd + "_" + txname,
-				txcd + "_底稿_" + txname + ".xlsx", 1, sheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txname, txcd + "_" + txname, txcd + "_底稿_" + txname + ".xlsx", 1, sheetName);
 
 		makeExcel.setValue(2, 3, titaVo.getParam("DataYear") + "年" + txname);
 

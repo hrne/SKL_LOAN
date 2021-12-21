@@ -89,7 +89,7 @@ public class L8310 extends TradeBuffer {
 		int iClaimStatus = Integer.valueOf(titaVo.getParam("ClaimStatus"));
 		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
 		String iCourtCode = titaVo.getParam("CourtCode");
-		int iYear = Integer.valueOf(titaVo.getParam("Year"))+1911;
+		int iYear = Integer.valueOf(titaVo.getParam("Year")) + 1911;
 		String iCourtDiv = titaVo.getParam("CourtDiv");
 		String iCourtCaseNo = titaVo.getParam("CourtCaseNo");
 		String iApprove = titaVo.getParam("Approve");

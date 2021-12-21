@@ -145,9 +145,8 @@ public class L5973 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				int ThisCustNo = NegAppr01VO.getCustNo();
-				
+
 				CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
-			
 
 				occursList.putParam("OORank", "0");//
 				occursList.putParam("OOExportDate", NegAppr01VO.getExportDate());

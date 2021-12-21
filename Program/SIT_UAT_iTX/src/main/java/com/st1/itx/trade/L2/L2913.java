@@ -34,8 +34,6 @@ import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
-
 @Service("L2913")
 @Scope("prototype")
 /**
@@ -57,24 +55,24 @@ public class L2913 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClStockService sClStockService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
 	/* DB服務注入 */
 	@Autowired
 	public CdCodeService sCdCodeDefService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public ClFacService sClFacService;
-	
+
 	@Autowired
 	public LoanBorMainService sLoanBorMainService;
-	
+
 	@Autowired
 	public FacStatusCom facStatusCom;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -100,7 +98,6 @@ public class L2913 extends TradeBuffer {
 		ClMain tClMain = new ClMain();
 		ClStock tClStock = new ClStock();
 		CdCity tCdCity = new CdCity();
-
 
 		// 組PK
 		// ClMain
@@ -137,14 +134,14 @@ public class L2913 extends TradeBuffer {
 		this.totaVo.putParam("OCityCodeX", tCdCity.getCityItem());
 		this.totaVo.putParam("OClTypeCode", tClMain.getClTypeCode());
 		this.totaVo.putParam("OStockCode", tClStock.getStockCode());
-		
+
 		CdCode tCdCode = sCdCodeDefService.getItemFirst(2, "StockCode", tClStock.getStockCode(), titaVo);
-		
-		if(tCdCode != null) {
-		  this.totaVo.putParam("OStockCodeX", tCdCode.getItem());
+
+		if (tCdCode != null) {
+			this.totaVo.putParam("OStockCodeX", tCdCode.getItem());
 		} else {
-		  this.totaVo.putParam("OStockCodeX", "");
-		}	
+			this.totaVo.putParam("OStockCodeX", "");
+		}
 		this.totaVo.putParam("OListingType", tClStock.getListingType());
 		this.totaVo.putParam("OStockType", tClStock.getStockType());
 		this.totaVo.putParam("OCompanyId", tClStock.getCompanyId());
@@ -179,34 +176,29 @@ public class L2913 extends TradeBuffer {
 		this.totaVo.putParam("OClStat", tClStock.getClStat());
 		this.totaVo.putParam("OSettingDate", tClStock.getSettingDate());
 		this.totaVo.putParam("OSettingBalance", tClStock.getSettingBalance());
-		
-		
+
 		Slice<ClFac> slClFac = null;
 		List<ClFac> lClFac = new ArrayList<ClFac>();
-		
+
 		slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, this.index, Integer.MAX_VALUE, titaVo);
-		
+
 		lClFac = slClFac == null ? null : new ArrayList<ClFac>(slClFac.getContent());
 		this.info("lClFac = " + lClFac);
 		if (lClFac == null || lClFac.size() == 0) {
-			
+
 			this.totaVo.putParam("OAcMtr", "");
-			
+
 		} else {
-			
+
 			BigDecimal loanBal = new BigDecimal(0);
 			for (ClFac tmpClFac : lClFac) {
 				int thisCustNo = tmpClFac.getCustNo();
 				int thisFacmNo = tmpClFac.getFacmNo();
-				
-				
-				
-				Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(thisCustNo, thisFacmNo, thisFacmNo, 0,
-						900, 0, Integer.MAX_VALUE, titaVo);
-				
-				
+
+				Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(thisCustNo, thisFacmNo, thisFacmNo, 0, 900, 0, Integer.MAX_VALUE, titaVo);
+
 				if (slLoanBorMain != null) {
-					
+
 					for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
 
 						// 計算額度下所有撥款序號之貸放餘額加總
@@ -215,32 +207,30 @@ public class L2913 extends TradeBuffer {
 
 				} // if
 			} // for
-			
+
 			BigDecimal AcMtr = new BigDecimal("0");
-			
-			if(loanBal.compareTo(new BigDecimal("0")) == 0 ) { // 貸放餘額為0
+
+			if (loanBal.compareTo(new BigDecimal("0")) == 0) { // 貸放餘額為0
 				this.totaVo.putParam("OAcMtr", "");
 			} else {
-			
-			  // 全戶維持率 = 收盤價 * 設定股數 /借款餘額
-			  AcMtr = (tClStock.getYdClosingPrice().multiply(tClStock.getSettingBalance())).multiply(new BigDecimal("100")) ; 
-			  AcMtr = (AcMtr.divide(loanBal,2,RoundingMode.HALF_DOWN)); // 無條件捨去
-			  if(AcMtr.compareTo(new BigDecimal("0")) == 0) {// 等於 0
-				this.totaVo.putParam("OAcMtr", "");
-			  } else if(AcMtr.compareTo(new BigDecimal("1000")) == 1) {  // 大於1000
-				this.totaVo.putParam("OAcMtr", "999.99");
-		  	  } else {
+
+				// 全戶維持率 = 收盤價 * 設定股數 /借款餘額
+				AcMtr = (tClStock.getYdClosingPrice().multiply(tClStock.getSettingBalance())).multiply(new BigDecimal("100"));
+				AcMtr = (AcMtr.divide(loanBal, 2, RoundingMode.HALF_DOWN)); // 無條件捨去
+				if (AcMtr.compareTo(new BigDecimal("0")) == 0) {// 等於 0
+					this.totaVo.putParam("OAcMtr", "");
+				} else if (AcMtr.compareTo(new BigDecimal("1000")) == 1) { // 大於1000
+					this.totaVo.putParam("OAcMtr", "999.99");
+				} else {
 //		  		String acmtr = AcMtr.toString();
 //		  		for( int i = acmtr.length() ; i < 6 ; i++) {
 //		  			acmtr = " " + acmtr;
 //		  		}
-			    this.totaVo.putParam("OAcMtr", AcMtr);
-			  }
+					this.totaVo.putParam("OAcMtr", AcMtr);
+				}
 			} // else
 		}
-		
-		
-		
+
 		this.totaVo.putParam("OEvaDate", tClMain.getEvaDate());
 		this.totaVo.putParam("OEvaAmt", tClMain.getEvaAmt());
 		this.totaVo.putParam("OMtgDate", tClStock.getMtgDate());

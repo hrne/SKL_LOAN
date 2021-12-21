@@ -67,7 +67,7 @@ public class L618B extends TradeBuffer {
 
 	@Autowired
 	public DataLog dataLog;
-	
+
 	private String iItemCode;
 	private int iCustNo;
 	private int iFacmNo;
@@ -142,8 +142,8 @@ public class L618B extends TradeBuffer {
 
 		tIsuRenew = insuRenewService.holdById(tIsuRenew.getInsuRenewId());
 
-		InsuRenew tInsuRenew2 = (InsuRenew) dataLog.clone(tIsuRenew); //異動前資料
-		
+		InsuRenew tInsuRenew2 = (InsuRenew) dataLog.clone(tIsuRenew); // 異動前資料
+
 		tIsuRenew.setStatusCode(2);
 
 		if (titaVo.isHcodeNormal()) {
@@ -159,10 +159,10 @@ public class L618B extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException("E0007", "InsuRenew update error : " + e.getErrorMsg());
 		}
-		
+
 		dataLog.setEnv(titaVo, tInsuRenew2, tIsuRenew); ////
 		dataLog.exec(); ////
-		
+
 		// 放款交易內容檔
 		if (titaVo.isHcodeNormal()) {
 			addLoanBorTxRoutine(titaVo);

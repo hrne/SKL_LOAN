@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,19 @@ import com.st1.itx.db.domain.SlipMediaId;
  */
 public interface SlipMediaRepositoryMon extends JpaRepository<SlipMedia, SlipMediaId> {
 
-  // AcDate = ,AND BatchNo = ,AND MediaSeq =
-  public Slice<SlipMedia> findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(int acDate_0, int batchNo_1, int mediaSeq_2, Pageable pageable);
+	// AcDate = ,AND BatchNo = ,AND MediaSeq =
+	public Slice<SlipMedia> findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(int acDate_0, int batchNo_1, int mediaSeq_2,
+			Pageable pageable);
 
-  // AcDate = ,AND BatchNo = 
-  public Slice<SlipMedia> findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(int acDate_0, int batchNo_1, Pageable pageable);
+	// AcDate = ,AND BatchNo =
+	public Slice<SlipMedia> findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(int acDate_0, int batchNo_1, Pageable pageable);
 
-  // AcDate = ,AND BatchNo = 
-  public Optional<SlipMedia> findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(int acDate_0, int batchNo_1);
+	// AcDate = ,AND BatchNo =
+	public Optional<SlipMedia> findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(int acDate_0, int batchNo_1);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<SlipMedia> findBySlipMediaId(SlipMediaId slipMediaId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<SlipMedia> findBySlipMediaId(SlipMediaId slipMediaId);
 
 }
-

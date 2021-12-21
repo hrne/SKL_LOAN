@@ -119,8 +119,7 @@ public class L4102 extends TradeBuffer {
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}

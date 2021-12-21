@@ -64,9 +64,10 @@ public class L2R36 extends TradeBuffer {
 		// 建檔日期
 		int CreateDate = 0;
 		if (tFacClose.getCreateDate() != null) {
-			CreateDate = parse.stringToInteger((String.valueOf(tFacClose.getCreateDate().toString().substring(0, 4)
-					+ tFacClose.getCreateDate().toString().substring(5, 7)
-					+ tFacClose.getCreateDate().toString().substring(8, 10)))) - 19110000;
+			CreateDate = parse
+					.stringToInteger((String.valueOf(
+							tFacClose.getCreateDate().toString().substring(0, 4) + tFacClose.getCreateDate().toString().substring(5, 7) + tFacClose.getCreateDate().toString().substring(8, 10))))
+					- 19110000;
 		}
 
 		this.totaVo.putParam("L2r36CustNo", tFacClose.getCustNo());

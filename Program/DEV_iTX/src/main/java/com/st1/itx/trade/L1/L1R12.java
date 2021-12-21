@@ -33,7 +33,7 @@ public class L1R12 extends TradeBuffer {
 
 	@Autowired
 	public CustNoticeCom custNoticeCom;
-	
+
 	// TITA
 	private String RimCityCode;
 	private String RimAreaCode;
@@ -101,9 +101,9 @@ public class L1R12 extends TradeBuffer {
 //		if (!"".equals(RimFloorDash)) {
 //			Address += "-" + RimFloorDash;
 //		}
-		
+
 		CustMain custMain = new CustMain();
-		
+
 		custMain.setRegCityCode(RimCityCode);
 		custMain.setRegAreaCode(RimAreaCode);
 		custMain.setRegRoad(RimRoad);
@@ -114,9 +114,9 @@ public class L1R12 extends TradeBuffer {
 		custMain.setRegNumDash(RimNumDash);
 		custMain.setRegFloor(RimFloor);
 		custMain.setRegFloorDash(RimFloorDash);
-		
+
 		String Address = custNoticeCom.getRegAddress(custMain, titaVo);
-		
+
 		this.totaVo.putParam("L1r12Address", Address);
 
 		this.addList(this.totaVo);

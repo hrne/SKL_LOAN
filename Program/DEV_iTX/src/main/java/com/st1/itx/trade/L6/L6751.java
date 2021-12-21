@@ -46,16 +46,15 @@ public class L6751 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdBonusService sCdBonusService;
-	
+
 	@Autowired
 	public CdWorkMonthService iCdWorkMonthService;
-	
+
 	@Autowired
 	public CdPfParmsService iCdPfParmsService;
-	
+
 	@Autowired
 	SendRsp sendRsp;
-	
 
 	/* 日期工具 */
 	@Autowired
@@ -66,6 +65,7 @@ public class L6751 extends TradeBuffer {
 	public Parse parse;
 
 	private boolean duringWorkMonth = false;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6751 ");
@@ -73,23 +73,19 @@ public class L6751 extends TradeBuffer {
 
 		String iFuncCode = titaVo.getParam("FuncCode");
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
-		
-		int AcDate = titaVo.getEntDyI()+19110000;
+
+		int AcDate = titaVo.getEntDyI() + 19110000;
 		int iWoarkMonthAcDAte = 0;
-		
+
 		CdWorkMonth tWorkMonth = iCdWorkMonthService.findDateFirst(AcDate, AcDate, titaVo);
-		this.info("tWorkMonth=="+tWorkMonth);
-		if(tWorkMonth!=null) {
-			iWoarkMonthAcDAte = Integer.parseInt(String.valueOf(tWorkMonth.getYear())+parse.IntegerToString(tWorkMonth.getMonth(), 2));
-			this.info("iWoarkMonthAcDAte=="+iWoarkMonthAcDAte);
-			if(iWorkMonth<=iWoarkMonthAcDAte) {
+		this.info("tWorkMonth==" + tWorkMonth);
+		if (tWorkMonth != null) {
+			iWoarkMonthAcDAte = Integer.parseInt(String.valueOf(tWorkMonth.getYear()) + parse.IntegerToString(tWorkMonth.getMonth(), 2));
+			this.info("iWoarkMonthAcDAte==" + iWoarkMonthAcDAte);
+			if (iWorkMonth <= iWoarkMonthAcDAte) {
 				duringWorkMonth = true;
 			}
 		}
-		
-		
-		
-		
 
 		// 新增 - 每個條件都建一筆
 		if (iFuncCode.equals("1") || iFuncCode.equals("3")) {
@@ -160,52 +156,50 @@ public class L6751 extends TradeBuffer {
 		} else if (!(iFuncCode.equals("5"))) {
 			throw new LogicException(titaVo, "E0010", "L6751"); // 功能選擇錯誤
 		}
-		
-		if(("1").equals(iFuncCode) || ("2").equals(iFuncCode) || ("4").equals(iFuncCode)) {
-			
-			if(duringWorkMonth==true) {
+
+		if (("1").equals(iFuncCode) || ("2").equals(iFuncCode) || ("4").equals(iFuncCode)) {
+
+			if (duringWorkMonth == true) {
 				this.info("duringWorkMonth True");
-				
+
 				CdPfParms tCdPfParm = new CdPfParms();
 				CdPfParmsId tCdPfParmId = new CdPfParmsId();
-				
-				
-				CdPfParms sCdPfParm = iCdPfParmsService.findById(new CdPfParmsId("R"," "," "),titaVo);
-				this.info("sCdPfParm=="+sCdPfParm);
-				if(sCdPfParm == null) {
-					//業績重算 設條件記號1=R 有效工作月起 其餘為空白 OR 0
+
+				CdPfParms sCdPfParm = iCdPfParmsService.findById(new CdPfParmsId("R", " ", " "), titaVo);
+				this.info("sCdPfParm==" + sCdPfParm);
+				if (sCdPfParm == null) {
+					// 業績重算 設條件記號1=R 有效工作月起 其餘為空白 OR 0
 					tCdPfParmId.setConditionCode1("R");
 					tCdPfParmId.setConditionCode2(" ");
 					tCdPfParmId.setCondition(" ");
 					tCdPfParm.setWorkMonthStart(iWorkMonth);
 					tCdPfParm.setWorkMonthEnd(0);
 					tCdPfParm.setCdPfParmsId(tCdPfParmId);
-					
+
 					try {
 						iCdPfParmsService.insert(tCdPfParm, titaVo);
-					} catch(DBException e) {
+					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 					}
-					
+
 				} else {
-					tCdPfParm = iCdPfParmsService.holdById(new CdPfParmsId("R"," "," "),titaVo);
+					tCdPfParm = iCdPfParmsService.holdById(new CdPfParmsId("R", " ", " "), titaVo);
 					tCdPfParm.setWorkMonthStart(iWorkMonth);
 					tCdPfParm.setWorkMonthEnd(0);
 					try {
 						iCdPfParmsService.update(tCdPfParm, titaVo);
-					} catch(DBException e) {
+					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 					}
-					
+
 				}
-				//主管授權
+				// 主管授權
 				if (!titaVo.getHsupCode().equals("1")) {
 					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 				}
-				
+
 			}
-			
-			
+
 		}
 
 		this.addList(this.totaVo);

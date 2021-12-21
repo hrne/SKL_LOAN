@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.MonthlyLM052LoanAssetId;
  */
 public interface MonthlyLM052LoanAssetRepositoryDay extends JpaRepository<MonthlyLM052LoanAsset, MonthlyLM052LoanAssetId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MonthlyLM052LoanAsset> findByMonthlyLM052LoanAssetId(MonthlyLM052LoanAssetId monthlyLM052LoanAssetId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MonthlyLM052LoanAsset> findByMonthlyLM052LoanAssetId(MonthlyLM052LoanAssetId monthlyLM052LoanAssetId);
 
-  // 
-  @Procedure(value = "\"Usp_L9_MonthlyLM052LoanAsset_Ins\"")
-  public void uspL9Monthlylm052loanassetIns(int tbsdyf,  String empNo);
+	//
+	@Procedure(value = "\"Usp_L9_MonthlyLM052LoanAsset_Ins\"")
+	public void uspL9Monthlylm052loanassetIns(int tbsdyf, String empNo);
 
 }
-

@@ -47,7 +47,7 @@ public class L8101 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	TxFileService txFileService;
-	
+
 	@Autowired
 	CustMainService custMainService;
 
@@ -126,7 +126,7 @@ public class L8101 extends TradeBuffer {
 
 			// must
 			txToDoCom.setTxBuffer(this.getTxBuffer());
-			
+
 			String dataLines = "<" + custMobile + ">";
 			dataLines += "\"H1\",\"" + custMain.getCustId() + "\",\"" + custMobile + "\",\"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。\"";
 
@@ -193,7 +193,7 @@ public class L8101 extends TradeBuffer {
 			txAmlNotice.setProcessNote(processNote);
 
 			try {
-				txAmlNoticeService.insert(txAmlNotice,titaVo);
+				txAmlNoticeService.insert(txAmlNotice, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料已存在
 			}
@@ -236,11 +236,10 @@ public class L8101 extends TradeBuffer {
 			titaVo.putParam("CustType", "0");
 
 			String batchno = titaVo.getParam("BatchNo");
-			
+
 			l9703report2.setParentTranCode(titaVo.get("TXCD"));
 			pdfSno = l9703report2.exec(titaVo, this.txBuffer);
-			
-			
+
 		}
 
 		this.totaVo.putParam("CustAddr", custAddr);

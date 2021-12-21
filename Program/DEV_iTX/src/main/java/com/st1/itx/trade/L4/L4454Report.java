@@ -112,10 +112,10 @@ public class L4454Report extends MakeReport {
 		String custNo = FormatUtil.pad9(tL4454Vo.get("CustNo"), 7);
 		int intCustNo = parse.stringToInteger(tL4454Vo.get("CustNo"));
 		CustMain tCustMain = custMainService.custNoFirst(intCustNo, intCustNo, titaVo);
-		if ( tCustMain == null) {
+		if (tCustMain == null) {
 			throw new LogicException("E0014", "CustMain"); // 檔案錯誤
 		}
-		String address =  custNoticeCom.getCurrAddress(tCustMain, titaVo);
+		String address = custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		String custName = tCustMain.getCustName();
 		String zipCode1 = tCustMain.getCurrZip3();
 		String zipCode2 = tCustMain.getCurrZip2();

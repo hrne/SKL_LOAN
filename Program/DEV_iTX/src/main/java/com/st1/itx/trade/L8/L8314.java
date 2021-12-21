@@ -104,7 +104,7 @@ public class L8314 extends TradeBuffer {
 		// 檢核項目(D-29)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start KEY值(IDN+報送單位代號+協商申請日)未曾報送過'52':前置協商相關資料報送例外處理則予以剔退
-			//：@@@function 要改为：custRcSubEq
+			// ：@@@function 要改为：custRcSubEq
 			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ052 == null) {
 				if ("A".equals(iTranKey)) {

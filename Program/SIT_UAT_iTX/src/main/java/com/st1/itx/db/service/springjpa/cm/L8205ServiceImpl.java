@@ -26,21 +26,21 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
+
 	@Autowired
 	Parse parse;
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> L8205Rpt1(TitaVo titaVo) throws Exception {
 
 		this.info("L8205Rpt1");
 		String iEntryDateStart = titaVo.getParam("DateStart");
 		String iEntryDateEnd = titaVo.getParam("DateEnd");
-		
-		int afEntryDateStart = Integer.parseInt(iEntryDateStart)+ 19110000;
-		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd)+ 19110000;
-		this.info("afEntryDateStart="+afEntryDateStart+",afEntryDateEnd="+afEntryDateEnd);
-		
-		
+
+		int afEntryDateStart = Integer.parseInt(iEntryDateStart) + 19110000;
+		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd) + 19110000;
+		this.info("afEntryDateStart=" + afEntryDateStart + ",afEntryDateEnd=" + afEntryDateEnd);
+
 		String sql = "";
 		sql += " SELECT                               			 	   			\n";
 		sql += "M.\"Factor\" 				    as F0							\n"; // 樣態
@@ -53,41 +53,37 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"Rational\" 				as F7							\n"; // 合理性
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F8					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F9							\n"; // 經辦說明
-		sql += ",M.\"ManagerCheck\" 			as F10  						\n"; // 主管覆核	
-		sql += "from \"MlaundryDetail\" M										\n";  
-		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n"; 
-		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n"; 
+		sql += ",M.\"ManagerCheck\" 			as F10  						\n"; // 主管覆核
+		sql += "from \"MlaundryDetail\" M										\n";
+		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
+		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n";
 		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
 		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
-		sql += "order by M.\"EntryDate\" "; 
-		
-
+		sql += "order by M.\"EntryDate\" ";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entryStart", afEntryDateStart);
 		query.setParameter("entrydEnd", afEntryDateEnd);
-	
-		
+
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> L8205Rpt2(TitaVo titaVo) throws Exception {
 
 		this.info("L8205Rpt2");
 		String iEntryDateStart = titaVo.getParam("DateStart");
 		String iEntryDateEnd = titaVo.getParam("DateEnd");
-		
-		int afEntryDateStart = Integer.parseInt(iEntryDateStart)+ 19110000;
-		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd)+ 19110000;
-		this.info("afEntryDateStart="+afEntryDateStart+",afEntryDateEnd="+afEntryDateEnd);
-		
-		
+
+		int afEntryDateStart = Integer.parseInt(iEntryDateStart) + 19110000;
+		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd) + 19110000;
+		this.info("afEntryDateStart=" + afEntryDateStart + ",afEntryDateEnd=" + afEntryDateEnd);
+
 		String sql = "";
 		sql += " SELECT                               			 	   			\n";
 		sql += "M.\"Factor\" 				    as F0							\n"; // 樣態
@@ -99,38 +95,35 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"Rational\" 				as F6							\n"; // 合理性
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F7					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F8							\n"; // 經辦說明
-		sql += ",M.\"ManagerCheck\" 			as F9  						\n"; // 主管覆核	
-		sql += "from \"MlaundryDetail\" M										\n";  
-		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n"; 
-		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n"; 
+		sql += ",M.\"ManagerCheck\" 			as F9  						\n"; // 主管覆核
+		sql += "from \"MlaundryDetail\" M										\n";
+		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
+		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd   and M.\"Factor\" <> '3'\n";
-		sql += "order by M.\"EntryDate\" "; 
-																
-			
+		sql += "order by M.\"EntryDate\" ";
+
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entryStart", afEntryDateStart);
 		query.setParameter("entrydEnd", afEntryDateEnd);
-	
-		
+
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> L8205Rpt3(TitaVo titaVo) throws Exception {
 
 		this.info("L8205Rpt1");
 		String iEntryDateStart = titaVo.getParam("DateStart");
 		String iEntryDateEnd = titaVo.getParam("DateEnd");
-		
-		int afEntryDateStart = Integer.parseInt(iEntryDateStart)+ 19110000;
-		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd)+ 19110000;
-		this.info("afEntryDateStart="+afEntryDateStart+",afEntryDateEnd="+afEntryDateEnd);
-		
-		
+
+		int afEntryDateStart = Integer.parseInt(iEntryDateStart) + 19110000;
+		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd) + 19110000;
+		this.info("afEntryDateStart=" + afEntryDateStart + ",afEntryDateEnd=" + afEntryDateEnd);
+
 		String sql = "";
 		sql += " SELECT                               			 	   			\n";
 		sql += "M.\"Factor\" 				    as F0							\n"; // 樣態
@@ -143,43 +136,39 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"Rational\" 				as F7							\n"; // 合理性
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F8					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F9							\n"; // 經辦說明
-		sql += ",M.\"ManagerCheck\" 			as F10  						\n"; // 主管覆核	
+		sql += ",M.\"ManagerCheck\" 			as F10  						\n"; // 主管覆核
 		sql += ",M.\"ManagerDate\" 			    as F11  					    \n"; // 主管覆核日期
-		sql += "from \"MlaundryDetail\" M										\n";  
-		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n"; 
-		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n"; 
+		sql += "from \"MlaundryDetail\" M										\n";
+		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
+		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n";
 		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
 		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
 		sql += "and (M.\"ManagerDate\" = 0 or M.\"ManagerDate\">= M.\"EntryDate\"+4)      \n     ";
-		sql += "order by M.\"EntryDate\" "; 
-		
-
+		sql += "order by M.\"EntryDate\" ";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entryStart", afEntryDateStart);
 		query.setParameter("entrydEnd", afEntryDateEnd);
-	
-		
+
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> L8205Rpt4(TitaVo titaVo) throws Exception {
 
 		this.info("L8205Rpt4");
 		String iEntryDateStart = titaVo.getParam("DateStart");
 		String iEntryDateEnd = titaVo.getParam("DateEnd");
-		
-		int afEntryDateStart = Integer.parseInt(iEntryDateStart)+ 19110000;
-		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd)+ 19110000;
-		this.info("afEntryDateStart="+afEntryDateStart+",afEntryDateEnd="+afEntryDateEnd);
-		
-		
+
+		int afEntryDateStart = Integer.parseInt(iEntryDateStart) + 19110000;
+		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd) + 19110000;
+		this.info("afEntryDateStart=" + afEntryDateStart + ",afEntryDateEnd=" + afEntryDateEnd);
+
 		String sql = "";
 		sql += " SELECT                               			 	   			\n";
 		sql += "M.\"Factor\" 				    as F0							\n"; // 樣態
@@ -191,39 +180,37 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"Rational\" 				as F6							\n"; // 合理性
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F7					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F8							\n"; // 經辦說明
-		sql += ",M.\"ManagerCheck\" 			as F9  							\n"; // 主管覆核	
+		sql += ",M.\"ManagerCheck\" 			as F9  							\n"; // 主管覆核
 		sql += ",M.\"ManagerDate\" 			    as F10  					    \n"; // 主管覆核日期
-		sql += "from \"MlaundryDetail\" M										\n";  
-		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n"; 
-		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n"; 
+		sql += "from \"MlaundryDetail\" M										\n";
+		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
+		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd and M.\"Factor\" <> '3'  \n";
 		sql += "and ( M.\"ManagerDate\" = 0 or M.\"ManagerDate\">= M.\"EntryDate\"+4)      \n     ";
-		sql += "order by M.\"EntryDate\" "; 
-																
-			
+		sql += "order by M.\"EntryDate\" ";
+
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entryStart", afEntryDateStart);
 		query.setParameter("entrydEnd", afEntryDateEnd);
-	
-		
+
 		return this.convertToMap(query);
 	}
+
 	public List<Map<String, String>> L8205Rpt5(TitaVo titaVo) throws Exception {
 
 		this.info("L8205Rpt5");
 		String iReCordStart = titaVo.getParam("DateStart");
 		String iReCordEnd = titaVo.getParam("DateEnd");
-		
-		int fReCordStart = Integer.parseInt(iReCordStart)+ 19110000;
-		int fReCordEnd = Integer.parseInt(iReCordEnd)+ 19110000;
-		this.info("fReCordStart="+fReCordStart+",fReCordEnd="+fReCordEnd);
-		
-		
+
+		int fReCordStart = Integer.parseInt(iReCordStart) + 19110000;
+		int fReCordEnd = Integer.parseInt(iReCordEnd) + 19110000;
+		this.info("fReCordStart=" + fReCordStart + ",fReCordEnd=" + fReCordEnd);
+
 		String sql = "";
 		sql += " SELECT                               			    \n";
 		sql += "M.\"RecordDate\" 				as F0					\n"; // 訪談日
@@ -237,30 +224,27 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"RepaySource\" 			as F8					\n"; // 還款來源
 		sql += ",M.\"RepayBank\" 				as F9					\n"; // 代償銀行
 		sql += ",M.\"Description\" 			as F10				\n"; // 其他說明
-		sql += ",M.\"CreateEmpNo\" 			as F11 				\n"; // 建檔人員	
-		sql +=",CD.\"Item\"                   as F12            \n"; //還款來源中文
-		sql +=",E.\"Fullname\"                   as F13            \n";
-		sql += "from \"MlaundryRecord\" M							\n";  
-		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"			\n"; 
-		sql += "left join \"CdCode\" CD on CD.\"DefCode\" = 'RepaySource'			\n"; 
+		sql += ",M.\"CreateEmpNo\" 			as F11 				\n"; // 建檔人員
+		sql += ",CD.\"Item\"                   as F12            \n"; // 還款來源中文
+		sql += ",E.\"Fullname\"                   as F13            \n";
+		sql += "from \"MlaundryRecord\" M							\n";
+		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"			\n";
+		sql += "left join \"CdCode\" CD on CD.\"DefCode\" = 'RepaySource'			\n";
 		sql += "and CD.\"Code\" = M.\"RepaySource\"			\n";
 		sql += "left join \"CdEmp\" E on E.\"EmployeeNo\" = M.\"CreateEmpNo\"			\n";
 		sql += "where M.\"RecordDate\" >= :recordStart and M.\"RecordDate\" <= :recordEnd  \n";
-		sql += "order by M.\"RecordDate\" "; 
-		
-
-
+		sql += "order by M.\"RecordDate\" ";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("recordStart", fReCordStart);
 		query.setParameter("recordEnd", fReCordEnd);
 
 		return this.convertToMap(query);
 	}
-	
+
 }

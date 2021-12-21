@@ -117,8 +117,7 @@ public class L4414 extends TradeBuffer {
 			this.info("fileName : " + filename);
 			if (filename.indexOf("AHP21P") >= 0) {
 //					filePath1 = "D:\\temp\\TestingInPut\\AHP21P_授回.txt";
-				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
+				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
 
 				achCnt = achCnt + 1;
 
@@ -140,8 +139,7 @@ public class L4414 extends TradeBuffer {
 
 			} else if (filename.indexOf("AHP22P") >= 0) {
 //					filePath2 = "D:\\temp\\TestingInPut\\AHP22P_授回.txt";
-				String filePath2 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
+				String filePath2 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
 
 				achCnt = achCnt + 1;
 
@@ -162,8 +160,7 @@ public class L4414 extends TradeBuffer {
 //					POST
 //					暫定路徑 待討論過後決定抓取路徑方法
 //					filePath1 = "D:\\temp\\TestingInPut\\PO$P21P_846授權回.txt";
-				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
+				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
 
 				postCnt = postCnt + 1;
 
@@ -183,8 +180,7 @@ public class L4414 extends TradeBuffer {
 				setPostAuthLog(postAuthFileVo, titaVo);
 			} else if (filename.indexOf("PO$P22P") >= 0) {
 //					filePath2 = "D:\\temp\\TestingInPut\\PO$P22P_53N授權回.txt";
-				String filePath2 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
+				String filePath2 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
 
 				postCnt = postCnt + 1;
 
@@ -314,9 +310,8 @@ public class L4414 extends TradeBuffer {
 				} else if ("53N".equals(tempOccursList.get("OccOrgCode"))) {
 					authCode = "2";
 				}
-				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(
-						parse.stringToInteger(tempOccursList.get("CustNo")), tempOccursList.get("PostDepCode"),
-						tempOccursList.get("RepayAcct"), authCode, titaVo);
+				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(parse.stringToInteger(tempOccursList.get("CustNo")), tempOccursList.get("PostDepCode"), tempOccursList.get("RepayAcct"),
+						authCode, titaVo);
 				if (tPostAuthLog == null) {
 					throw new LogicException("E0014", "郵局授權記錄檔查無資料，請確認檔案");
 				}
@@ -356,13 +351,13 @@ public class L4414 extends TradeBuffer {
 						throw new LogicException("E0007", "L4414 PostAuthLog update " + e.getErrorMsg());
 					}
 					break;
-				
+
 				case "3": // 3.郵局終止
 					if (!"1".equals(tPostAuthLog.getAuthApplCode())) {
 						throw new LogicException("E0014", "郵局終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
 					}
 					PostAuthLog tPostAuthLog2 = new PostAuthLog();
-					PostAuthLogId tPostAuthLogId= new PostAuthLogId();
+					PostAuthLogId tPostAuthLogId = new PostAuthLogId();
 					tPostAuthLogId.setAuthCreateDate(dateUtil.getNowIntegerForBC());
 					tPostAuthLogId.setAuthApplCode("3");
 					tPostAuthLogId.setCustNo(tPostAuthLog.getCustNo());
@@ -387,10 +382,10 @@ public class L4414 extends TradeBuffer {
 					tPostAuthLog2.setRelAcctGender(tPostAuthLog.getRelAcctGender());
 					tPostAuthLog2.setRetrDate(dateUtil.getNowIntegerForBC());
 					tPostAuthLog2.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
-				// 變更帳號檔
+					// 變更帳號檔
 					bankAuthActCom.updPostAcct(tPostAuthLog2, titaVo);
 					try {
-						postAuthLogService.insert(tPostAuthLog2,titaVo);
+						postAuthLogService.insert(tPostAuthLog2, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0005", "L4414 PostAuthLog " + e.getErrorMsg());
 					}
@@ -401,10 +396,10 @@ public class L4414 extends TradeBuffer {
 						throw new LogicException("E0014", "誤終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
 					}
 					tPostAuthLog.setAuthApplCode("4");
-				// 變更帳號檔
+					// 變更帳號檔
 					bankAuthActCom.updPostAcct(tPostAuthLog, titaVo);
 					try {
-						postAuthLogService.delete(tPostAuthLog,titaVo);
+						postAuthLogService.delete(tPostAuthLog, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0005", "L4414 PostAuthLog " + e.getErrorMsg());
 					}

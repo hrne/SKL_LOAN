@@ -20,7 +20,8 @@ import com.st1.itx.util.common.MakeFile;
 @Scope("prototype")
 
 public class L7003Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L7003Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L7003Report.class);
 
 	@Autowired
 	public L7003ServiceImpl L7003ServiceImpl;

@@ -116,11 +116,9 @@ public class LM052 extends BatchBase implements Tasklet, InitializingBean {
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-
-
 		empNo = titaVo.getTlrNo();
 		yearMonth = (iYear * 100) + iMonth;
-		this.info("yearMonth=" +yearMonth);
+		this.info("yearMonth=" + yearMonth);
 		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
 		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
 		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);

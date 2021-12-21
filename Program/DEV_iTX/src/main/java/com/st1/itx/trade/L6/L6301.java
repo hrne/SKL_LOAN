@@ -160,7 +160,7 @@ public class L6301 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", mCode); // 刪除資料不存在
 			}
-			
+
 			dataLog.setEnv(titaVo, tCdCode, tCdCode); ////
 			dataLog.exec("刪除指標利率種類"); ////
 			break;

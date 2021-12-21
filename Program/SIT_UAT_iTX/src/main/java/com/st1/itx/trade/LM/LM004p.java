@@ -48,11 +48,9 @@ public class LM004p extends TradeBuffer {
 		boolean isFinish = lM004Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "LM004長中短期放款到期明細表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM004長中短期放款到期明細表已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "LM004長中短期放款到期明細表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM004長中短期放款到期明細表查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

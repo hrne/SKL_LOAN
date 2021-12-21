@@ -123,7 +123,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 初貸日期
 						case 8:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(台幣)
 						case 9:
@@ -131,7 +131,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 產品別
 						case 10:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(台幣)
 						case 11:
@@ -166,12 +166,12 @@ public class LNM39HPReport extends MakeReport {
 							break; // 違約損失率
 						case 20:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(交易幣)
 						case 21:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(交易幣)
 						default:

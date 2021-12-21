@@ -40,19 +40,18 @@ public class L8337ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// *** 折返控制相關 ***
 		this.limit = limit;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = "select \"CustId\","
-				+ " \"Bank\" from (";
-				for (int i = 1; i<=30 ;i ++) {
-					sql += "select \"CustId\", \"Bank"+i+"\" as \"Bank\" from \"JcicZ570\" where \"CustId\" = '"+CustId+"'";
-					if (i < 30) {
-						sql += " union ";
-					}else {
-						sql += " )";
-					}
-				}
-				sql += "where \"Bank\" = '"+BankId+"'";
-		        
-		this.info("sql===="+sql);
+		String sql = "select \"CustId\"," + " \"Bank\" from (";
+		for (int i = 1; i <= 30; i++) {
+			sql += "select \"CustId\", \"Bank" + i + "\" as \"Bank\" from \"JcicZ570\" where \"CustId\" = '" + CustId + "'";
+			if (i < 30) {
+				sql += " union ";
+			} else {
+				sql += " )";
+			}
+		}
+		sql += "where \"Bank\" = '" + BankId + "'";
+
+		this.info("sql====" + sql);
 		query = em.createNativeQuery(sql);
 
 		this.info("L8337Service FindData=" + query.toString());

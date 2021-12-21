@@ -205,23 +205,19 @@ public class L2631 extends TradeBuffer {
 				wkFacmNoEd = iFacmNo;
 			}
 			// 擔保品與額度關聯檔
-			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0, Integer.MAX_VALUE, titaVo);
 			lClFac = slClFac == null ? null : slClFac.getContent();
 			// 全部結案
 			boolean isAllClose = true;
 			for (ClFac c : lClFac) {
-				if ((c.getCustNo() == iCustNo && iFacmNo == 0)
-						|| (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
+				if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
 
 					// 撥款主檔
-					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
-							c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 					if (slLoanBorMain != null) {
 						for (LoanBorMain t : slLoanBorMain.getContent()) {
 							// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
-									|| t.getStatus() == 8) {
+							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6 || t.getStatus() == 8) {
 								isAllClose = false;
 								break;
 							}
@@ -242,7 +238,7 @@ public class L2631 extends TradeBuffer {
 
 			this.info("BeforeFacClose = " + BeforeFacClose);
 			String docNo = titaVo.getCalDy().substring(0, 3) + finalDocNo;
-			tFacClose.setFunCode("3"); //列印後固定為3補發
+			tFacClose.setFunCode("3"); // 列印後固定為3補發
 			tFacClose.setActFlag(BeforeFacClose.getActFlag());
 			tFacClose.setApplDate(BeforeFacClose.getApplDate());
 			tFacClose.setCloseInd(BeforeFacClose.getCloseInd());
@@ -278,8 +274,7 @@ public class L2631 extends TradeBuffer {
 
 			String checkMsg = "抵押權塗銷同意書已完成。";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					checkMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), checkMsg, titaVo);
 
 		}
 

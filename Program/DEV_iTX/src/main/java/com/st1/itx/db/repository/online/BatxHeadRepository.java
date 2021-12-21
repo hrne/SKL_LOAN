@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.BatxHeadId;
  */
 public interface BatxHeadRepository extends JpaRepository<BatxHead, BatxHeadId> {
 
-  // AcDate >= ,AND AcDate <= 
-  public Slice<BatxHead> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByBatchNoAsc(int acDate_0, int acDate_1, Pageable pageable);
+	// AcDate >= ,AND AcDate <=
+	public Slice<BatxHead> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByBatchNoAsc(int acDate_0, int acDate_1, Pageable pageable);
 
-  // AcDate = 
-  public Optional<BatxHead> findTopByAcDateIsOrderByBatchNoDesc(int acDate_0);
+	// AcDate =
+	public Optional<BatxHead> findTopByAcDateIsOrderByBatchNoDesc(int acDate_0);
 
-  // AcDate = ,AND TitaTxCd = ,AND BatxExeCode <> 
-  public Optional<BatxHead> findTopByAcDateIsAndTitaTxCdIsAndBatxExeCodeNotOrderByBatchNoDesc(int acDate_0, String titaTxCd_1, String batxExeCode_2);
+	// AcDate = ,AND TitaTxCd = ,AND BatxExeCode <>
+	public Optional<BatxHead> findTopByAcDateIsAndTitaTxCdIsAndBatxExeCodeNotOrderByBatchNoDesc(int acDate_0, String titaTxCd_1, String batxExeCode_2);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<BatxHead> findByBatxHeadId(BatxHeadId batxHeadId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<BatxHead> findByBatxHeadId(BatxHeadId batxHeadId);
 
 }
-

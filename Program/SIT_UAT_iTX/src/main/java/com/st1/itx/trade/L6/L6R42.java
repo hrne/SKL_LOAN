@@ -21,7 +21,7 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @author Fegie
  * @version 1.0.0
  */
-public class L6R42 extends TradeBuffer {	
+public class L6R42 extends TradeBuffer {
 	@Autowired
 	public CdEmpService iCdEmpService;
 
@@ -30,17 +30,16 @@ public class L6R42 extends TradeBuffer {
 
 		this.info("active L6R42 ");
 		this.totaVo.init(titaVo);
-		
+
 		CdEmp iCdEmp = new CdEmp();
 		String iEmpNo = titaVo.getParam("RimEmpNo");
-		
+
 		iCdEmp = iCdEmpService.findById(iEmpNo, titaVo);
 		if (iCdEmp == null) {
 			throw new LogicException(titaVo, "E0001", "無此員工代號");
-		}else {
+		} else {
 			totaVo.putParam("L6R42Email", iCdEmp.getEmail());
 		}
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -75,17 +75,16 @@ public class L6065 extends TradeBuffer {
 		String dOverdueItem = "";
 		for (CdOverdue tCdOverdue : lCdOverdue) {
 			OccursList occursList = new OccursList();
-			//後三碼000的
-			dOverdueCode = tCdOverdue.getOverdueCode().substring(1,4);
-			if(Integer.parseInt(dOverdueCode)==0) {
+			// 後三碼000的
+			dOverdueCode = tCdOverdue.getOverdueCode().substring(1, 4);
+			if (Integer.parseInt(dOverdueCode) == 0) {
 				dOverdueItem = tCdOverdue.getOverdueItem();
-				}
+			}
 			occursList.putParam("OOOverdue", dOverdueItem);
 			occursList.putParam("OOOverdueSign", tCdOverdue.getOverdueSign());
 			occursList.putParam("OOOverdueCode", tCdOverdue.getOverdueCode());
 			occursList.putParam("OOOverdueItem", tCdOverdue.getOverdueItem());
 
-			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

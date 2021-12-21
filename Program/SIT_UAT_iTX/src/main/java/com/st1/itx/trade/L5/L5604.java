@@ -68,26 +68,26 @@ public class L5604 extends TradeBuffer {
 		CollLawId iCollLawId = new CollLawId();
 		CollListId iCollListId = new CollListId();
 		CollList iCollList = new CollList();
-		
+
 		Slice<ClFac> cClFac = null;
 		cClFac = iClFacService.selectForL5064(iClCode1, iClCode2, iClNo, iCustNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
 		if (cClFac == null) {
 			throw new LogicException(titaVo, "E0005", "擔保品與額度關聯檔查無資料"); // 更新資料時發生錯誤
 		}
-		
+
 		Slice<ClFac> iClFac = null;
 		iClFac = iClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		if (iClFac == null) {
 			throw new LogicException(titaVo, "E0005", "擔保品與額度關聯檔查無資料"); // 更新資料時發生錯誤
 		}
-		for (ClFac rClFac :iClFac) {
+		for (ClFac rClFac : iClFac) {
 			iCollListId.setCustNo(rClFac.getCustNo());
 			iCollListId.setFacmNo(rClFac.getFacmNo());
 			iCollList = iCollListService.findById(iCollListId, titaVo);
 			if (iCollList == null) {
-				continue; //催收主檔若無資料則跳過
+				continue; // 催收主檔若無資料則跳過
 			}
-			if (iFunctionCd.equals("1") || iFunctionCd.equals("3")) { //新增
+			if (iFunctionCd.equals("1") || iFunctionCd.equals("3")) { // 新增
 				iCollLawId.setCustNo(rClFac.getCustNo());
 				iCollLawId.setFacmNo(rClFac.getFacmNo());
 				iCollLawId.setAcDate(Integer.valueOf(titaVo.getCalDy()));
@@ -108,7 +108,7 @@ public class L5604 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 				}
-			}else if (iFunctionCd.equals("2")) { //修改
+			} else if (iFunctionCd.equals("2")) { // 修改
 				int uAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
 				String uTitaTlrNo = titaVo.getParam("TitaTlrNo");
 				String uTitaTxtNo = titaVo.getParam("TitaTxtNo");
@@ -138,8 +138,8 @@ public class L5604 extends TradeBuffer {
 				}
 				iDataLog.setEnv(titaVo, beforeCollLaw, uuCollLaw);
 				iDataLog.exec("修改法催紀錄法務進度檔");
-				
-			}else { //刪除
+
+			} else { // 刪除
 				int dAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
 				String dTitaTlrNo = titaVo.getParam("TitaTlrNo");
 				String dTitaTxtNo = titaVo.getParam("TitaTxtNo");
@@ -184,7 +184,6 @@ public class L5604 extends TradeBuffer {
 			}
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

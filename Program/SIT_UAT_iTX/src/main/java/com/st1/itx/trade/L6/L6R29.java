@@ -73,10 +73,10 @@ public class L6R29 extends TradeBuffer {
 
 		for (CdCl tCdCl : listCdCl) {
 			String ClCode2 = String.valueOf(tCdCl.getClCode2());
-			if(ClCode2.length()==1) {
-				ClCode2=0+ClCode2;
+			if (ClCode2.length() == 1) {
+				ClCode2 = 0 + ClCode2;
 			}
-			
+
 			String ClItem = tCdCl.getClItem().trim();
 			String codeHelp = ClCode2 + ": " + ClItem;
 			this.info("L6R29 add codeHelp = " + codeHelp);

@@ -11,11 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
-import com.st1.itx.db.transaction.BaseEntityManager;
-;
+import com.st1.itx.db.transaction.BaseEntityManager;;
 
 @Service("l5051ServiceImpl")
 @Repository
@@ -89,7 +89,12 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "D.\"AdjPerfEqAmt\", ";
 		sql += "D.\"AdjPerfReward\", ";
 		sql += "D.\"AdjPerfAmt\", ";
-		sql += "D.\"AdjCntingCode\" ";
+		sql += "D.\"AdjCntingCode\", ";
+		sql += "NVL(G.\"Code\",'') AS \"MediaFg\", ";
+		sql += "NVL(G.\"CreateDate\",'') AS \"MediaDate\", ";
+		sql += "NVL(D.\"LastUpdate\",A.\"LastUpdate\") AS \"LastUpdate\", ";
+		sql += "NVL(D.\"LastUpdateEmpNo\",A.\"LastUpdateEmpNo\") AS \"LastUpdateEmpNo\", ";
+		sql += "NVL(F6.\"Fullname\",F5.\"Fullname\") AS \"LastUpdateEmpName\" ";
 		sql += "FROM \"PfItDetail\" A ";
 		sql += "LEFT JOIN \"PfBsDetail\" B ON B.\"CustNo\"=A.\"CustNo\" AND B.\"FacmNo\"=A.\"FacmNo\" AND B.\"BormNo\"=A.\"BormNo\" AND B.\"PerfDate\"=A.\"PerfDate\" AND B.\"RepayType\"=A.\"RepayType\" AND B.\"PieceCode\"=A.\"PieceCode\" AND B.\"DrawdownAmt\">0 ";
 		sql += "LEFT JOIN \"CustMain\" C ON C.\"CustNo\"=A.\"CustNo\" ";
@@ -102,7 +107,10 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdEmp\" F2 ON F2.\"EmployeeNo\"=A.\"Introducer\" ";
 		sql += "LEFT JOIN \"CdEmp\" F3 ON F3.\"EmployeeNo\"=A.\"UnitManager\" ";
 		sql += "LEFT JOIN \"CdEmp\" F4 ON F4.\"EmployeeNo\"=A.\"DistManager\" ";
-		//sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
+		sql += "LEFT JOIN \"CdEmp\" F5 ON F5.\"EmployeeNo\"=A.\"LastUpdateEmpNo\" ";
+		sql += "LEFT JOIN \"CdEmp\" F6 ON F6.\"EmployeeNo\"=D.\"LastUpdateEmpNo\" ";
+		sql += "LEFT JOIN \"TxControl\" G ON G.\"Code\"= CONCAT(CONCAT('L5510.',A.\"WorkMonth\"),'.2') ";
+		// sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
 		sql += "WHERE A.\"DrawdownAmt\" > 0 ";
 		sql += "AND A.\"RepayType\" = 0 ";
 		if (WorkMonthFm > 0) {
@@ -172,7 +180,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("FacmNo", Integer.parseInt(FacmNo));
 		}
 		if (!"".equals(Introducer)) {
-			query.setParameter("Introducer",Introducer);
+			query.setParameter("Introducer", Introducer);
 		}
 
 		this.info("L5051Service FindData=" + query);

@@ -17,11 +17,10 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L5408")
 @Scope("prototype")
 /**
- * 房貸專員撥款筆數統計表 
+ * 房貸專員撥款筆數統計表
  * 
  * @author Fegie
  * @version 1.0.0
@@ -36,7 +35,7 @@ public class L5408 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
-	
+
 	@Autowired
 	public L5408ServiceImpl iL5408ServiceImpl;
 
@@ -44,12 +43,12 @@ public class L5408 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5408 ");
 		this.totaVo.init(titaVo);
-		//處理tita日期為西元並加上日期
+		// 處理tita日期為西元並加上日期
 		String iYyyMmFm = titaVo.getParam("YyyMmFm");
-		int xYyyMmFm = Integer.valueOf(iYyyMmFm)+191100;
+		int xYyyMmFm = Integer.valueOf(iYyyMmFm) + 191100;
 		String iYyyMmTo = titaVo.getParam("YyyMmTo");
-		int xYyyMmTo = Integer.valueOf(iYyyMmTo)+191100;
-		List<Map<String, String>> iL5408SqlReturn = new ArrayList<Map<String,String>>();
+		int xYyyMmTo = Integer.valueOf(iYyyMmTo) + 191100;
+		List<Map<String, String>> iL5408SqlReturn = new ArrayList<Map<String, String>>();
 
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -58,28 +57,28 @@ public class L5408 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		
+
 		try {
-			iL5408SqlReturn = iL5408ServiceImpl.FindData(xYyyMmFm,xYyyMmTo,titaVo);
-		}catch (Exception e) {
-			//E5004 讀取DB語法發生問題
-			this.info("L5408 ErrorForSql="+e);
-			throw new LogicException(titaVo, "E5004","");
+			iL5408SqlReturn = iL5408ServiceImpl.FindData(xYyyMmFm, xYyyMmTo, titaVo);
+		} catch (Exception e) {
+			// E5004 讀取DB語法發生問題
+			this.info("L5408 ErrorForSql=" + e);
+			throw new LogicException(titaVo, "E5004", "");
 		}
-		for (Map<String, String> r5408SqlReturn:iL5408SqlReturn) {
+		for (Map<String, String> r5408SqlReturn : iL5408SqlReturn) {
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOPerfDate",Integer.valueOf(r5408SqlReturn.get("F0"))-191100);
-			occursList.putParam("OODeptCode",r5408SqlReturn.get("F4"));
-			occursList.putParam("OODeptCodeX",r5408SqlReturn.get("F5"));
-			occursList.putParam("OOBsOfficer",r5408SqlReturn.get("F1"));
-			occursList.putParam("OOBsOfficerX",r5408SqlReturn.get("F3"));
-			occursList.putParam("OOTotal",r5408SqlReturn.get("F2"));
+			occursList.putParam("OOPerfDate", Integer.valueOf(r5408SqlReturn.get("F0")) - 191100);
+			occursList.putParam("OODeptCode", r5408SqlReturn.get("F4"));
+			occursList.putParam("OODeptCodeX", r5408SqlReturn.get("F5"));
+			occursList.putParam("OOBsOfficer", r5408SqlReturn.get("F1"));
+			occursList.putParam("OOBsOfficerX", r5408SqlReturn.get("F3"));
+			occursList.putParam("OOTotal", r5408SqlReturn.get("F2"));
 			this.totaVo.addOccursList(occursList);
 		}
-		
-		this.addList(this.totaVo);{
-		return this.sendList();
+
+		this.addList(this.totaVo);
+		{
+			return this.sendList();
 		}
 	}
 }
-

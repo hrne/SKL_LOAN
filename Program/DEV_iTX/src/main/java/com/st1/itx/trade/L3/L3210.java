@@ -245,22 +245,19 @@ public class L3210 extends TradeBuffer {
 			try {
 				loanChequeService.insert(tLoanCheque, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005",
-						"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 新增資料時，發生錯誤
+				throw new LogicException(titaVo, "E0005", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 		}
 		// 訂正
 		if (titaVo.isHcodeErase()) {
 			tLoanCheque = loanChequeService.holdById(tLoanChequeId, titaVo);
 			if (tLoanCheque == null) {
-				throw new LogicException(titaVo, "E0006",
-						"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 鎖定資料時，發生錯誤
 			}
 			try {
 				loanChequeService.delete(tLoanCheque, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008",
-						"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+				throw new LogicException(titaVo, "E0008", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
 		}
 	}
@@ -331,8 +328,7 @@ public class L3210 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 				}
 				if (tFacMain.getActFg() == 1) {
-					throw new LogicException(titaVo, "E0021",
-							"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+					throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 				}
 				// 借方 收付欄
 				acPaymentCom.setTxBuffer(this.getTxBuffer());

@@ -100,9 +100,13 @@ public class L6907 extends TradeBuffer {
 		String iAcctCode = titaVo.getParam("AcctCode");
 		int iClsFlag = parse.stringToInteger(titaVo.getParam("ClsFlag"));
 
-		this.limit = 100;
-		// new ArrayList
-		List<AcReceivable> tmplAcReceivable = new ArrayList<AcReceivable>();
+		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		this.index = titaVo.getReturnIndex();
+
+		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
+		this.limit = 100; // 45 * 200 = 9000
+
+		new ArrayList<AcReceivable>();
 		Slice<AcReceivable> slAcReceivable = null;
 		// 輸入科子細目
 		if (!iAcNoCode.isEmpty()) {
@@ -180,7 +184,7 @@ public class L6907 extends TradeBuffer {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

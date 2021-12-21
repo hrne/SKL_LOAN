@@ -30,7 +30,6 @@ public class FacStatusCom {
 	public DateUtil dateUtil;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
-	
 
 	/**
 	 * 設定額度戶況
@@ -130,7 +129,7 @@ public class FacStatusCom {
 		return status;
 	}
 
-	public int getLoanStatus(int iCustNo, int iFacmNo, int tbsdy,TitaVo titaVo) throws LogicException {
+	public int getLoanStatus(int iCustNo, int iFacmNo, int tbsdy, TitaVo titaVo) throws LogicException {
 		int priorty = 11;
 		int status = 0;
 //	 priority    status  
@@ -147,7 +146,7 @@ public class FacStatusCom {
 
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 		Slice<LoanBorMain> slLoanBorMain = null;
-		
+
 		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE, titaVo);
 
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();

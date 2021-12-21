@@ -45,10 +45,10 @@ public class L9MonthlyLM032Upd extends BatchBase implements Tasklet, Initializin
 	@Override
 	public void run() throws LogicException {
 		this.info("active L9MonthlyLM032Upd ");
-		
+
 		// 報表日
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
-		
+
 		// 上月月底日
 		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
 

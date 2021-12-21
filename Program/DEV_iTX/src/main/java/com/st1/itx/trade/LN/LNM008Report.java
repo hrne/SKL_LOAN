@@ -23,7 +23,8 @@ import java.text.SimpleDateFormat;
 @Scope("prototype")
 
 public class LNM008Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LNM008Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LNM008Report.class);
 
 	Date dateNow = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -116,16 +117,16 @@ public class LNM008Report extends MakeReport {
 
 			// 設定欄位寬度
 			if (LNList != null) {
-				makeExcel.setWidth(1,  9);
+				makeExcel.setWidth(1, 9);
 				makeExcel.setWidth(2, 12);
-				// makeExcel.setWidth(3,  );
-				// makeExcel.setWidth(4,  );
-				// makeExcel.setWidth(5,  );
+				// makeExcel.setWidth(3, );
+				// makeExcel.setWidth(4, );
+				// makeExcel.setWidth(5, );
 				makeExcel.setWidth(6, 10);
 				makeExcel.setWidth(7, 10);
 				makeExcel.setWidth(8, 15);
 				// makeExcel.setWidth(9, );
-				makeExcel.setWidth(10,15);
+				makeExcel.setWidth(10, 15);
 				makeExcel.setWidth(11, 3);
 				makeExcel.setWidth(12, 3);
 				makeExcel.setWidth(13, 8);
@@ -135,8 +136,8 @@ public class LNM008Report extends MakeReport {
 				// makeExcel.setWidth(17, );
 				// makeExcel.setWidth(18, );
 				// makeExcel.setWidth(19, );
-				makeExcel.setWidth(20,15);
-				makeExcel.setWidth(21,15);
+				makeExcel.setWidth(20, 15);
+				makeExcel.setWidth(21, 15);
 			}
 
 			long sno = makeExcel.close();

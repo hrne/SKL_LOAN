@@ -76,13 +76,13 @@ public class L5505 extends TradeBuffer {
 
 		pfDetailCom.addDetail(pf, titaVo); // 產生業績明細
 
-		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
-				pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
+		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
 
 		PfItDetail pfItDetail2 = new PfItDetail();
 
 		if (pfItDetailAdjust == null || pfItDetailAdjust.getAdjRange() == 0) {
-			pfItDetail2 = pfItDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), pfItDetail.getPerfDate(), pfItDetail.getRepayType(), pfItDetail.getPieceCode(), titaVo);
+			pfItDetail2 = pfItDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), pfItDetail.getPerfDate(), pfItDetail.getRepayType(),
+					pfItDetail.getPieceCode(), titaVo);
 			if (pfItDetail2 == null) {
 				pfItDetail2 = (PfItDetail) dataLog.clone(pfItDetail);
 				pfItDetail2.setPieceCode(PieceCodeAft);
@@ -91,7 +91,7 @@ public class L5505 extends TradeBuffer {
 		} else {
 			pfItDetail2 = (PfItDetail) dataLog.clone(pfItDetail);
 			pfItDetail2.setPieceCode(PieceCodeAft);
-			
+
 			this.totaVo.setWarnMsg("有人工調整，介紹人業績案件，請確認");
 		}
 

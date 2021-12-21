@@ -160,8 +160,7 @@ public class L2076 extends TradeBuffer {
 //			}
 
 		// 擔保品與額度關聯檔
-		Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0, Integer.MAX_VALUE, titaVo);
 		lClFac = slClFac == null ? null : slClFac.getContent();
 		this.info("slClFac  = " + slClFac);
 		if (lClFac != null) {
@@ -169,8 +168,7 @@ public class L2076 extends TradeBuffer {
 			int wkClCode2 = 0;
 			int wkClNo = 0;
 			for (ClFac tClFac : slClFac) {
-				if (wkClCode1 == tClFac.getClCode1() && wkClCode2 == tClFac.getClCode2()
-						&& wkClNo == tClFac.getClNo()) {
+				if (wkClCode1 == tClFac.getClCode1() && wkClCode2 == tClFac.getClCode2() && wkClNo == tClFac.getClNo()) {
 					continue;
 				}
 
@@ -199,17 +197,14 @@ public class L2076 extends TradeBuffer {
 				l2ClFac = slClFac == null ? null : slClFac.getContent();
 				boolean isAllClose = true;
 				for (ClFac c : l2ClFac) {
-					if ((c.getCustNo() == iCustNo && iFacmNo == 0)
-							|| (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
+					if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
 
 						// 撥款主檔
-						Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
-								c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+						Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 						if (slLoanBorMain != null) {
 							for (LoanBorMain t : slLoanBorMain.getContent()) {
 								// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-								if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
-										|| t.getStatus() == 8) {
+								if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6 || t.getStatus() == 8) {
 									isAllClose = false;
 									break;
 								}
@@ -218,8 +213,7 @@ public class L2076 extends TradeBuffer {
 					}
 				}
 
-				Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(tClFac.getClCode1(),
-						tClFac.getClCode2(), tClFac.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+				Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 				lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 
 				if (lClOtherRights != null) {
@@ -258,8 +252,7 @@ public class L2076 extends TradeBuffer {
 						occursList.putParam("OORecYear", tClOtherRights.getRecYear());
 						// 找 收件字名稱
 						if ("".equals(tClOtherRights.getOtherRecWord())) {
-							CdLandOffice tCdLandOffice = cdLandOfficeService
-									.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+							CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
 							if (tCdLandOffice != null) {
 								wkRecWordItem = tCdLandOffice.getRecWordItem();
 							}

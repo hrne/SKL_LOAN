@@ -29,7 +29,7 @@
 // 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 // 		this.info("active LW003 ");
 // 		this.totaVo.init(titaVo);
-		
+
 // 		lw003report.exec(titaVo);
 // 		this.addList(this.totaVo);
 // 		return this.sendList();

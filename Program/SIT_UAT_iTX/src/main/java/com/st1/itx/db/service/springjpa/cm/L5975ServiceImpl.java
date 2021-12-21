@@ -116,7 +116,7 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findbyCustNoCaseSeq(int CustNo, int CaseSeq, TitaVo titaVo, int index, int limit) throws Exception {
 		this.info("L5975ServiceImpl.findAll ");
 
@@ -131,7 +131,7 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(\"ApprAmt\")                  AS \"AMT\"                 "; // -- F1 總金額
 		sql += "      , COUNT(\"FinCode\")                AS \"CNT\"                 "; // -- F2 總筆數
 		sql += " FROM \"NegAppr01\" ";
-		sql += "  WHERE \"CustNo\" = "+CustNo+" and \"CaseSeq\" = " + CaseSeq;
+		sql += "  WHERE \"CustNo\" = " + CustNo + " and \"CaseSeq\" = " + CaseSeq;
 		sql += "   GROUP BY  \"FinCode\" ";
 		sql += "   ORDER BY  \"FinCode\" ";
 		sql += sqlRow;
@@ -153,7 +153,7 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findbyCustNo(int CustNo, TitaVo titaVo, int index, int limit) throws Exception {
 		this.info("L5975ServiceImpl.findAll ");
 
@@ -168,7 +168,7 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(\"ApprAmt\")                  AS \"AMT\"                 "; // -- F1 總金額
 		sql += "      , COUNT(\"FinCode\")                AS \"CNT\"                 "; // -- F2 總筆數
 		sql += " FROM \"NegAppr01\" ";
-		sql += "  WHERE \"CustNo\" = "+CustNo ;
+		sql += "  WHERE \"CustNo\" = " + CustNo;
 		sql += "   GROUP BY  \"FinCode\" ";
 		sql += "   ORDER BY  \"FinCode\" ";
 		sql += sqlRow;
@@ -190,5 +190,5 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
+
 }

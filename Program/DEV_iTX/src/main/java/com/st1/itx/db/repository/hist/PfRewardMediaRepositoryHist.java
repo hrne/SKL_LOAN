@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import java.util.List;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.PfRewardMedia;
  */
 public interface PfRewardMediaRepositoryHist extends JpaRepository<PfRewardMedia, Long> {
 
-  // WorkMonth = ,AND BonusType ^i ,AND MediaFg = 
-  public Slice<PfRewardMedia> findAllByWorkMonthIsAndBonusTypeInAndMediaFgIs(int workMonth_0, List<Integer> bonusType_1, int mediaFg_2, Pageable pageable);
+	// WorkMonth = ,AND BonusType ^i ,AND MediaFg =
+	public Slice<PfRewardMedia> findAllByWorkMonthIsAndBonusTypeInAndMediaFgIs(int workMonth_0, List<Integer> bonusType_1, int mediaFg_2, Pageable pageable);
 
-  // CustNo = ,AND FacmNo =
-  public Slice<PfRewardMedia> findAllByCustNoIsAndFacmNoIsOrderByPerfDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
+	// CustNo = ,AND FacmNo =
+	public Slice<PfRewardMedia> findAllByCustNoIsAndFacmNoIsOrderByPerfDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType =
-  public Optional<PfRewardMedia> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIs(int custNo_0, int facmNo_1, int bormNo_2, int bonusType_3);
+	// CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType =
+	public Optional<PfRewardMedia> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIs(int custNo_0, int facmNo_1, int bormNo_2, int bonusType_3);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<PfRewardMedia> findByBonusNo(Long bonusNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<PfRewardMedia> findByBonusNo(Long bonusNo);
 
 }
-

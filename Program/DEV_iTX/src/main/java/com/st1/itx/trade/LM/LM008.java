@@ -30,7 +30,7 @@ public class LM008 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	WebClient webClient;
-	
+
 	@Autowired
 	DateUtil dDateUtil;
 

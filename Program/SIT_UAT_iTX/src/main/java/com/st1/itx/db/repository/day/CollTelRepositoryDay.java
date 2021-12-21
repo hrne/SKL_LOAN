@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,22 +21,23 @@ import com.st1.itx.db.domain.CollTelId;
  */
 public interface CollTelRepositoryDay extends JpaRepository<CollTel, CollTelId> {
 
-  // TelDate>= , AND TelDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
-  public Slice<CollTel> findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, int facmNo_4, Pageable pageable);
+	// TelDate>= , AND TelDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
+	public Slice<CollTel> findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(int telDate_0, int telDate_1, String caseCode_2, int custNo_3,
+			int facmNo_4, Pageable pageable);
 
-  // CaseCode= ,AND CustNo= ,AND FacmNo= ,
-  public Slice<CollTel> findAllByCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(String caseCode_0, int custNo_1, int facmNo_2, Pageable pageable);
+	// CaseCode= ,AND CustNo= ,AND FacmNo= ,
+	public Slice<CollTel> findAllByCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(String caseCode_0, int custNo_1, int facmNo_2, Pageable pageable);
 
-  // TelDate>= , AND TelDate<= ,AND CaseCode= ,AND CustNo= 
-  public Slice<CollTel> findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, Pageable pageable);
+	// TelDate>= , AND TelDate<= ,AND CaseCode= ,AND CustNo=
+	public Slice<CollTel> findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(int telDate_0, int telDate_1, String caseCode_2, int custNo_3,
+			Pageable pageable);
 
-  // CaseCode= ,AND CustNo= 
-  public Slice<CollTel> findAllByCaseCodeIsAndCustNoIsOrderByTelDateDesc(String caseCode_0, int custNo_1, Pageable pageable);
+	// CaseCode= ,AND CustNo=
+	public Slice<CollTel> findAllByCaseCodeIsAndCustNoIsOrderByTelDateDesc(String caseCode_0, int custNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CollTel> findByCollTelId(CollTelId collTelId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CollTel> findByCollTelId(CollTelId collTelId);
 
 }
-

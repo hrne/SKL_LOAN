@@ -67,18 +67,18 @@ public class L6934 extends TradeBuffer {
 		}
 
 		String tranName = txDataLog.getTranNo();
-		
+
 		TxTranCode txTranCode = txTranCodeService.findById(txDataLog.getTranNo(), titaVo);
 		if (txTranCode != null) {
 			tranName += " " + txTranCode.getTranItem();
 		}
 		totaVo.putParam("OTranName", tranName);
-		
+
 		this.totaVo.putParam("OCustNo", txDataLog.getCustNo());
 		this.totaVo.putParam("OFacmNo", txDataLog.getFacmNo());
 		this.totaVo.putParam("OBormNo", txDataLog.getBormNo());
 		this.totaVo.putParam("OMrKey", txDataLog.getMrKey());
-		
+
 		totaVo.putParam("OReason", txDataLog.getReason());
 
 		String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
@@ -101,10 +101,10 @@ public class L6934 extends TradeBuffer {
 		} catch (IOException e) {
 			throw new LogicException("EC009", "資料格式");
 		}
-		
+
 		for (HashMap<String, Object> map : listMap) {
 			String fld = "";
-			if(map.get("f") !=null) {
+			if (map.get("f") != null) {
 				fld = map.get("f").toString();
 			}
 			String oval = map.get("o").toString();
@@ -121,9 +121,7 @@ public class L6934 extends TradeBuffer {
 //				}
 //			}
 
-
 			/* 將每筆資料放入Tota的OcList */
-
 
 			OccursList occursList = new OccursList();
 
@@ -136,6 +134,5 @@ public class L6934 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
 
 }

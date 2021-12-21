@@ -43,16 +43,16 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	private String sqlRow = "";// "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
-
 	/**
 	 * query data
+	 * 
 	 * @param titaVo titaVo
-	 * @param index index
-	 * @param limit limit
+	 * @param index  index
+	 * @param limit  limit
 	 * @return return
 	 * @throws Exception Exceptions
 	 */
-	
+
 	public List<Map<String, String>> FindData(TitaVo titaVo, int index, int limit) throws Exception {
 
 		int iWorkYM = Integer.valueOf(titaVo.getParam("WorkYM").trim()) + 191100; // 工作月
@@ -91,8 +91,8 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "a.\"LastUpdate\", " // 最後更新日期時間
 				+ "a.\"LastUpdateEmpNo\", " // 最後更新人員
 				+ "c.\"Fullname\" as \"LastUpdateEmpName\" " // 最後更新人員
-				+ "FROM \"PfRewardMedia\" a "; 
-		sql	+= "LEFT JOIN \"CdEmp\" b ON b.\"EmployeeNo\"=a.\"EmployeeNo\" ";
+				+ "FROM \"PfRewardMedia\" a ";
+		sql += "LEFT JOIN \"CdEmp\" b ON b.\"EmployeeNo\"=a.\"EmployeeNo\" ";
 		sql += "LEFT JOIN \"CdEmp\" c ON c.\"EmployeeNo\"=a.\"LastUpdateEmpNo\" ";
 		sql += "LEFT JOIN \"TxControl\" d ON d.\"Code\"=:Code ";
 		sql += "WHERE a.\"WorkMonth\"=:WorkYM and a.\"BonusType\" = 7 ";
@@ -103,7 +103,7 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		query.setParameter("ThisIndex", index);
 //		query.setParameter("ThisLimit", limit);
 		query.setParameter("WorkYM", iWorkYM);
-		query.setParameter("Code", "L5512."+iWorkYM+".2");
+		query.setParameter("Code", "L5512." + iWorkYM + ".2");
 
 		this.info("L5054ServiceImpl sql=[" + sql + "]");
 //		logger.info("L5054ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
@@ -123,6 +123,5 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		@SuppressWarnings("unchecked")
 		return this.convertToMap(query);
 	}
-
 
 }

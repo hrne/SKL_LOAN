@@ -17,7 +17,7 @@ import com.st1.itx.tradeService.BatchBase;
 @Service("L5InnReCheckUpd")
 @Scope("step")
 /**
- * (日終批次)維護 InnReCheck 覆審案件明細檔 
+ * (日終批次)維護 InnReCheck 覆審案件明細檔
  * 
  * @author Chih Wei
  * @version 1.0.0
@@ -35,7 +35,7 @@ public class L5InnReCheckUpd extends BatchBase implements Tasklet, InitializingB
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		// // logger = LoggerFactory.getLogger(L5InnReCheckUpd.class);
-		
+
 		// 第二個參數
 		// D=日批
 		// M=月批

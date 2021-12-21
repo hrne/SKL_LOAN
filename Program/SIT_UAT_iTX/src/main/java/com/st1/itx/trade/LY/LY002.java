@@ -2,7 +2,6 @@ package com.st1.itx.trade.LY;
 
 import java.util.ArrayList;
 
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 

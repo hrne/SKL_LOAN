@@ -50,9 +50,9 @@ public class StartBS996 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active StartBS996 ");
-		
+
 		String parm = "0,N,0,0";
-		
+
 		titaVo.putParam("Parm", parm);
 
 		MySpring.newTask("BS996", this.txBuffer, titaVo);

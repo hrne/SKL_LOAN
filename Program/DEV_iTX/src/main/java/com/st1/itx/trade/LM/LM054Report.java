@@ -94,8 +94,7 @@ public class LM054Report extends MakeReport {
 
 		this.info("LM054Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表", "LM054-A041重要放款餘額明細表",
-				"LM054_底稿_A041放款餘額彙總表.xlsx", "A041重要放款餘額明細表(大額、逾期、催收、國外)");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表", "LM054-A041重要放款餘額明細表", "LM054_底稿_A041放款餘額彙總表.xlsx", "A041重要放款餘額明細表(大額、逾期、催收、國外)");
 		makeExcel.setValue(2, 3, iYear * 100 + iMonth);
 		try {
 			fnAllList = lM054ServiceImpl.findAll(titaVo, "N");
@@ -117,7 +116,7 @@ public class LM054Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> lM054tLDVo) throws LogicException {
@@ -160,7 +159,7 @@ public class LM054Report extends MakeReport {
 			// 擔保品估計總值
 			BigDecimal templineAmt = BigDecimal.ZERO;
 			BigDecimal f14 = new BigDecimal(lM054Vo.get("F14").toString());
-			//decimal 等於0表示相同 
+			// decimal 等於0表示相同
 			if (templineAmt.compareTo(f14) == 0) {
 				templineAmt = BigDecimal.ZERO;
 			} else {
@@ -221,8 +220,7 @@ public class LM054Report extends MakeReport {
 			makeExcel.setValue(row, 24, memo, "C");
 
 			// 逾期天數
-			makeExcel.setValue(row, 25,
-					Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
+			makeExcel.setValue(row, 25, Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
 
 		}
 

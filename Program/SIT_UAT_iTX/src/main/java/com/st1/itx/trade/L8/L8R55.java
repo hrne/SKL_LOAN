@@ -443,7 +443,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55ClaimDate", "");
 				totaVo.putParam("L8r55CourtCode", "");
 				totaVo.putParam("L8r55MaxMainCode", "");
-				totaVo.putParam("L8r55DelayYM", iJcicZ051.getDelayYM()-191100);
+				totaVo.putParam("L8r55DelayYM", iJcicZ051.getDelayYM() - 191100);
 				totaVo.putParam("L8r55Account", "");
 				totaVo.putParam("L8r55PayOffDate", "");
 				totaVo.putParam("L8r55CloseDate", "");
@@ -855,7 +855,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55ClaimDate", "");
 				totaVo.putParam("L8r55CourtCode", iJcicZ451.getCourtCode());
 				totaVo.putParam("L8r55MaxMainCode", "");
-				totaVo.putParam("L8r55DelayYM", iJcicZ451.getDelayYM()-191100);
+				totaVo.putParam("L8r55DelayYM", iJcicZ451.getDelayYM() - 191100);
 				totaVo.putParam("L8r55Account", "");
 				totaVo.putParam("L8r55PayOffDate", "");
 				totaVo.putParam("L8r55CloseDate", "");

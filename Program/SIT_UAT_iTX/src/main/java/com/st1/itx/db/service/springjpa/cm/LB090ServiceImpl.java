@@ -54,10 +54,7 @@ public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// LB090 擔保品關聯檔資料檔
 		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"CustId\"" + " , M.\"ClActNo\"" + "     , M.\"FacmNo\""
-				+ " , M.\"GlOverseas\"" + "   , M.\"JcicDataYM\"" 
-				+ " FROM  \"JcicB090\" M" 
-				+ " WHERE M.\"DataYM\" = " + dateMonth 
-				+ " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
+				+ " , M.\"GlOverseas\"" + "   , M.\"JcicDataYM\"" + " FROM  \"JcicB090\" M" + " WHERE M.\"DataYM\" = " + dateMonth + " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
 
 		logger.info("sql=" + sql);
 

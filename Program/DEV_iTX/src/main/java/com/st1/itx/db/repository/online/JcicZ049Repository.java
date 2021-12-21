@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,28 +21,27 @@ import com.st1.itx.db.domain.JcicZ049Id;
  */
 public interface JcicZ049Repository extends JpaRepository<JcicZ049, JcicZ049Id> {
 
-  // CustId=
-  public Slice<JcicZ049> findAllByCustIdIsOrderByCustIdAscRcDateDesc(String custId_0, Pageable pageable);
+	// CustId=
+	public Slice<JcicZ049> findAllByCustIdIsOrderByCustIdAscRcDateDesc(String custId_0, Pageable pageable);
 
-  // RcDate=
-  public Slice<JcicZ049> findAllByRcDateIsOrderByCustIdAscRcDateDesc(int rcDate_0, Pageable pageable);
+	// RcDate=
+	public Slice<JcicZ049> findAllByRcDateIsOrderByCustIdAscRcDateDesc(int rcDate_0, Pageable pageable);
 
-  // CustId= , AND RcDate=
-  public Slice<JcicZ049> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDesc(String custId_0, int rcDate_1, Pageable pageable);
+	// CustId= , AND RcDate=
+	public Slice<JcicZ049> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDesc(String custId_0, int rcDate_1, Pageable pageable);
 
-  // SubmitKey= , AND CustId= , AND RcDate=
-  public Slice<JcicZ049> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, Pageable pageable);
+	// SubmitKey= , AND CustId= , AND RcDate=
+	public Slice<JcicZ049> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, Pageable pageable);
 
-  // Ukey=
-  public Optional<JcicZ049> findTopByUkeyIs(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ049> findTopByUkeyIs(String ukey_0);
 
-  // SubmitKey= , AND CustId= , AND RcDate=
-  public Optional<JcicZ049> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2);
+	// SubmitKey= , AND CustId= , AND RcDate=
+	public Optional<JcicZ049> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ049> findByJcicZ049Id(JcicZ049Id jcicZ049Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ049> findByJcicZ049Id(JcicZ049Id jcicZ049Id);
 
 }
-

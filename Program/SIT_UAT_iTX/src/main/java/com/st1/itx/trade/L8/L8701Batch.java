@@ -94,12 +94,11 @@ public class L8701Batch extends TradeBuffer {
 		iTbsdyf = iTbsdy + 19110000;
 		String iCode = "";
 		boolean Zero = true;
-		
+
 		String FilePath = inFolder + dDateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		// 讀取CSV資料
 		makeExcel.openCsv(FilePath, ",");
-		
 
 		int iExcelline = 1;
 
@@ -131,16 +130,16 @@ public class L8701Batch extends TradeBuffer {
 
 		}
 		// 查詢機管編碼2+公司編碼3+資料產生日8+類別代碼固定B1+序號從01編碼
-	
-		if(iCode.length()>=10) {
+
+		if (iCode.length() >= 10) {
 			iCode = iCode.substring(8, 10);
 		} else {
 			iCode = "01";
 		}
 		String filename = iCode + "458" + iTbsdyf + "B1" + "01" + ".txt"; // 輸出檔TXT名
-				
+
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), "公務人員報送", filename, 2);
-		
+
 		for (String iData : Data) {
 			this.info("iData==" + iData);
 
@@ -193,10 +192,10 @@ public class L8701Batch extends TradeBuffer {
 				continue;
 			}
 
-			if(ln.getCustNo()!=tCustMain.getCustNo()) {
+			if (ln.getCustNo() != tCustMain.getCustNo()) {
 				continue;
 			}
-			
+
 			acctCode = "";
 			loanBal = BigDecimal.ZERO;
 
@@ -301,10 +300,10 @@ public class L8701Batch extends TradeBuffer {
 		else
 			oUsageItem = "購置不動產";
 		// 正負號
-		if(loanBal.compareTo(BigDecimal.ZERO)<0) {
+		if (loanBal.compareTo(BigDecimal.ZERO) < 0) {
 			sign = "-";
-		} 
-		
+		}
+
 		strField += makeFile.fillStringR(iCustId, 10, ' ');// 債務人統編 10碼
 		strField += makeFile.fillStringR(tCustMain.getCustName(), 60);// 債務人名稱 60
 		strField += "4580000";// 機構代碼 7碼
@@ -313,20 +312,20 @@ public class L8701Batch extends TradeBuffer {
 		strField += makeFile.fillStringR(parse.IntegerToString(ln.getCustNo(), 7) + parse.IntegerToString(ln.getFacmNo(), 3) + parse.IntegerToString(ln.getBormNo(), 3), 50);
 		strField += makeFile.fillStringR(oAcctItem, 20);// 放款科目20碼
 		strField += makeFile.fillStringR(iDataDatef, 8);// 資料基準日8碼
-		int FirstDrawdownDate = 0; 
-		if(tFacMain.getFirstDrawdownDate()!=0) {
+		int FirstDrawdownDate = 0;
+		if (tFacMain.getFirstDrawdownDate() != 0) {
 			FirstDrawdownDate = tFacMain.getFirstDrawdownDate() + 19110000;
 		}
 		strField += parse.IntegerToString(FirstDrawdownDate, 8);// 初貸日期 8碼
-		
-		int DrawdownDate = 0; 
-		if(ln.getDrawdownDate()!=0) {
+
+		int DrawdownDate = 0;
+		if (ln.getDrawdownDate() != 0) {
 			DrawdownDate = ln.getDrawdownDate() + 19110000;
 		}
 		strField += parse.IntegerToString(DrawdownDate, 8);// 契約起始日期 8碼
-		
-		int MaturityDate = 0; 
-		if(ln.getMaturityDate()!=0) {
+
+		int MaturityDate = 0;
+		if (ln.getMaturityDate() != 0) {
 			MaturityDate = ln.getMaturityDate() + 19110000;
 		}
 		strField += parse.IntegerToString(MaturityDate, 8);// 契約終止日期 8碼

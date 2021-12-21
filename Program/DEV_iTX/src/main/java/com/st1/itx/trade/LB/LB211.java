@@ -43,7 +43,7 @@ public class LB211 extends BatchBase implements Tasklet, InitializingBean {
 
 		titaVo.putParam("AcDateStart", Integer.parseInt(titaVo.getEntDy()));
 		titaVo.putParam("AcDateEnd", Integer.parseInt(titaVo.getEntDy()));
-		
+
 		lB211Report.exec(titaVo);
 	}
 

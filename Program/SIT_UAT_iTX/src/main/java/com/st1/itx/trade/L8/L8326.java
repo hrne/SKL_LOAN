@@ -137,14 +137,11 @@ public class L8326 extends TradeBuffer {
 				// 同一KEY值報送「'447':金融機構無擔保債務協議資料」後，若再報送本檔案資料時，結案理由代碼僅能報送'00','01','90'及'99'，其餘結案理由皆以剔退處理.
 				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
 				if (iJcicZ447 != null) {
-					if (!"D".equals(iJcicZ447.getTranKey())
-							&& (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals))) {
+					if (!"D".equals(iJcicZ447.getTranKey()) && (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals))) {
 						if ("C".equals(iTranKey)) {
-							throw new LogicException("E0007",
-									"已報送過(447)前置調解金融機構無擔保債務協議資料，本檔案[結案原因代號]僅能報送'00','01','90'及'99'.");
+							throw new LogicException("E0007", "已報送過(447)前置調解金融機構無擔保債務協議資料，本檔案[結案原因代號]僅能報送'00','01','90'及'99'.");
 						} else {
-							throw new LogicException("E0005",
-									"已報送過(447)前置調解金融機構無擔保債務協議資料，本檔案[結案原因代號]僅能報送'00','01','90'及'99'.");
+							throw new LogicException("E0005", "已報送過(447)前置調解金融機構無擔保債務協議資料，本檔案[結案原因代號]僅能報送'00','01','90'及'99'.");
 						}
 					}
 				} // 1.4 end
@@ -152,8 +149,7 @@ public class L8326 extends TradeBuffer {
 				// 1.5 檢核同一KEY值於'451':延期繳款期間不可報送「結案原因代號」 為'00'之本檔案資料
 				if ("00".equals(iCloseCode)) {
 					// @@@SQL-Function需改為custRcSubCourtEq
-					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate + 19110000,
-							iCourtCode, 0, 0, Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate + 19110000, iCourtCode, 0, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ451 != null) {
 						int sDelayYM = 0;
 						for (JcicZ451 xJcicZ451 : sJcicZ451) {
@@ -164,11 +160,9 @@ public class L8326 extends TradeBuffer {
 						int formateDelayYM = Integer.parseInt(sDelayYM + "31");
 						if (txDate <= formateDelayYM) {
 							if ("C".equals(iTranKey)) {
-								throw new LogicException("E0007",
-										"於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
+								throw new LogicException("E0007", "於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
 							} else {
-								throw new LogicException("E0005",
-										"於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
+								throw new LogicException("E0005", "於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
 							}
 						}
 					}

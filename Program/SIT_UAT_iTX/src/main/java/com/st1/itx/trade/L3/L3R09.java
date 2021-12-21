@@ -83,8 +83,7 @@ public class L3R09 extends TradeBuffer {
 		// 查尋放款主檔
 		tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0001",
-					"L3R09 放款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "L3R09 放款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
 		}
 		// 額度主檔
 		FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
@@ -92,18 +91,14 @@ public class L3R09 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "L3R09 額度主檔"); // 查詢資料不存在
 		}
 		// 放款利率變動檔
-		tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
-				iEffectDate + 19110000, titaVo);
+		tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo, iEffectDate + 19110000, titaVo);
 		if (tLoanRateChange == null) {
-			throw new LogicException(titaVo, "E0001", "L3R09 放款利率變動檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo
-					+ " 撥款序號 = " + iBormNo + " 生效日期 = " + iEffectDate); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "L3R09 放款利率變動檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo + " 生效日期 = " + iEffectDate); // 查詢資料不存在
 		}
 		// 查詢指標利率檔
-		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(tLoanBorMain.getCurrencyCode(),
-				tLoanRateChange.getBaseRateCode(), 10101, tLoanRateChange.getEffectDate() + 19110000, titaVo);
+		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(tLoanBorMain.getCurrencyCode(), tLoanRateChange.getBaseRateCode(), 10101, tLoanRateChange.getEffectDate() + 19110000, titaVo);
 		if (tCdBaseRate == null) {
-			throw new LogicException(titaVo, "E0001", "L3R09 指標利率檔 利率代碼 = " + tLoanRateChange.getBaseRateCode()
-					+ " 生效日期 = " + tLoanRateChange.getEffectDate()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "L3R09 指標利率檔 利率代碼 = " + tLoanRateChange.getBaseRateCode() + " 生效日期 = " + tLoanRateChange.getEffectDate()); // 查詢資料不存在
 		}
 		// 查詢商品參數檔
 		tFacProd = facProdService.findById(tLoanRateChange.getProdNo(), titaVo);
@@ -112,9 +107,7 @@ public class L3R09 extends TradeBuffer {
 		}
 		// 利率區分 1: 機動 2: 固動/ 3: 定期機動
 		wkFitRate = tLoanRateChange.getRateCode().equals("2") ? tLoanRateChange.getFitRate()
-				: tCdBaseRate.getBaseRate()
-						.add(tLoanRateChange.getIncrFlag().equals("Y") ? tLoanRateChange.getRateIncr()
-								: tLoanRateChange.getIndividualIncr());
+				: tCdBaseRate.getBaseRate().add(tLoanRateChange.getIncrFlag().equals("Y") ? tLoanRateChange.getRateIncr() : tLoanRateChange.getIndividualIncr());
 
 		this.totaVo.putParam("OEffectDate", tLoanRateChange.getEffectDate());
 		this.totaVo.putParam("OStatus", tLoanRateChange.getStatus());
@@ -129,7 +122,7 @@ public class L3R09 extends TradeBuffer {
 		this.totaVo.putParam("OIndividualIncr", tLoanRateChange.getIndividualIncr());
 		this.totaVo.putParam("OFitRate", wkFitRate);
 		this.totaVo.putParam("ORemark", tLoanRateChange.getRemark());
-		//變更記號=Y時帶原本值
+		// 變更記號=Y時帶原本值
 		if (iChangFg.equals("Y")) {
 			this.totaVo.putParam("OFacProdNo", tLoanRateChange.getProdNo());
 			this.totaVo.putParam("OFacBaseRateCode", tLoanRateChange.getBaseRateCode());

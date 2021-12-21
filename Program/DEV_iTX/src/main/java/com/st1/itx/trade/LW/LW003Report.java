@@ -21,7 +21,8 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LW003Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LW003Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LW003Report.class);
 
 	@Autowired
 	LW003ServiceImpl LW003ServiceImpl;
@@ -53,8 +54,7 @@ public class LW003Report extends MakeReport {
 		 */
 //		open(TitaVo titaVo, int date, String brno, String filecode, String fileitem, String filename, String sheetnanme)
 //		 open(TitaVo titaVo, int date, String brno, String filecode, String fileitem, String filename, String defaultExcel, Object defaultSheet) 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率",
-				"房貸獎勵費用率.xls", "獎勵費用率");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率", "房貸獎勵費用率.xls", "獎勵費用率");
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率", "獎勵費用率");
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 
@@ -92,11 +92,9 @@ public class LW003Report extends MakeReport {
 		int mm = Integer.valueOf(wkSsnVo.get("F1"));
 		this.info("4." + mm);
 //		一樣取titaVo數組中的 name=ENTDY
-		this.info(titaVo.get("ENTDY") + "-----" + titaVo.get("ENTDY").substring(6, 8) + "-----"
-				+ titaVo.get("ENTDY").substring(6, 8).replaceFirst("^0*", ""));
+		this.info(titaVo.get("ENTDY") + "-----" + titaVo.get("ENTDY").substring(6, 8) + "-----" + titaVo.get("ENTDY").substring(6, 8).replaceFirst("^0*", ""));
 //		標題串連
-		String tmp = ROCYear + "年放款部第1~" + wkSsnVo.get("F1") + "工作月房貸獎勵費用率統計表\n" + "[獎勵費 /個金總業績 ] ～ "
-				+ titaVo.get("ENTDY").substring(4, 6).replaceFirst("^0*", "") + "/"
+		String tmp = ROCYear + "年放款部第1~" + wkSsnVo.get("F1") + "工作月房貸獎勵費用率統計表\n" + "[獎勵費 /個金總業績 ] ～ " + titaVo.get("ENTDY").substring(4, 6).replaceFirst("^0*", "") + "/"
 				+ titaVo.get("ENTDY").substring(6, 8).replaceFirst("^0*", "") + "止";
 //		串接結果
 		this.info(tmp);

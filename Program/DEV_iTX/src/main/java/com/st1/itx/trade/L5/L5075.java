@@ -81,12 +81,12 @@ public class L5075 extends TradeBuffer {
 		this.info("active L5075 ");
 		this.totaVo.init(titaVo);
 
-		/*設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值*/
+		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		//this.limit=Integer.MAX_VALUE;//查全部
-		this.limit=100;//查全部
-		
+		// this.limit=Integer.MAX_VALUE;//查全部
+		this.limit = 100;// 查全部
+
 //		String IsMainFin=titaVo.getParam("IsMainFin").trim(); //是否為最大債權 1:Y;2:N
 //		String WorkSubject=titaVo.getParam("WorkSubject").trim(); //作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
 		String NextPayDate = titaVo.getParam("NextPayDate").trim(); // 1:滯繳- 逾期基準日;2:應繳-下次應繳日
@@ -133,8 +133,8 @@ public class L5075 extends TradeBuffer {
 				occursList.putParam("OOPayAmt", OOPayAmt);// 應繳金額 由L5075-NegCom計算
 				occursList.putParam("OOAccuOverAmt", NegMainVO.getAccuOverAmt());// 累溢收
 				occursList.putParam("OOOverDueAmt", OOOverDueAmt);// 應催繳金額 由L5075-NegCom計算
-				//occursList.putParam("OOAccuDueAmt", NegMainVO.getAccuDueAmt());// 已繳期金
-				occursList.putParam("OOAccuTempAmt", NegMainVO.getAccuTempAmt());//累繳金額
+				// occursList.putParam("OOAccuDueAmt", NegMainVO.getAccuDueAmt());// 已繳期金
+				occursList.putParam("OOAccuTempAmt", NegMainVO.getAccuTempAmt());// 累繳金額
 				if (NegMainVO.getDeferYMStart() != 0) {
 					occursList.putParam("OODeferYMStart", NegMainVO.getDeferYMStart() - 191100);// 延期年月(起)
 					occursList.putParam("OODeferYMEnd", NegMainVO.getDeferYMEnd() - 191100);// 延期年月(訖)
@@ -163,21 +163,20 @@ public class L5075 extends TradeBuffer {
 				BigDecimal DueAmt = NegMainVO.getDueAmt();
 				BigDecimal IntRate = NegMainVO.getIntRate();
 				int times = sNegCom.nper(Temptimes, DueAmt, IntRate);
-				this.info("Temptimes = " + Temptimes );
-				this.info("DueAmt = " + DueAmt );
-				this.info("IntRate = " + IntRate );
+				this.info("Temptimes = " + Temptimes);
+				this.info("DueAmt = " + DueAmt);
+				this.info("IntRate = " + IntRate);
 				occursList.putParam("OOTimes", times);// 剩餘期數
-				
+
 				this.totaVo.addOccursList(occursList);
 			}
-			
-			if(lNegMain != null && lNegMain.size()>=this.limit) {
+
+			if (lNegMain != null && lNegMain.size() >= this.limit) {
 				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 				titaVo.setReturnIndex(this.setIndexNext());
 				this.totaVo.setMsgEndToEnter();// 手動折返
 			}
-			
-			
+
 		} else {
 			// E2003 查無資料
 			throw new LogicException("E2003", "債務協商案件主檔");

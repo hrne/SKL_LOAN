@@ -49,7 +49,7 @@ public class L5902 extends TradeBuffer {
 
 	@Autowired
 	public InnLoanMeetingService innLoanMeetingService;
-	
+
 	@Autowired
 	public CdEmpService iCdEmpService;
 
@@ -109,27 +109,27 @@ public class L5902 extends TradeBuffer {
 					String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
 					String uTime = taU.substring(11, 19);
 					uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
-					occursList.putParam("OOLastUpdate", uaDate+ " " + uTime);
+					occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 				}
 				if (tInnLoanMeeting.getLastUpdateEmpNo().trim().isEmpty()) {
 					iEmpNo = tInnLoanMeeting.getCreateEmpNo();
-				}else {
+				} else {
 					iEmpNo = tInnLoanMeeting.getLastUpdateEmpNo();
 				}
-				
+
 				occursList.putParam("OOLastUpdateEmpNo", iEmpNo);
 				if (iEmpNo == null || iEmpNo.trim().isEmpty()) {
 					occursList.putParam("OOLastUpdateEmpNoX", "");
 				} else {
 					iCdEmp = iCdEmpService.findById(iEmpNo, titaVo);
-					if (iCdEmp==null) {
+					if (iCdEmp == null) {
 						occursList.putParam("OOLastUpdateEmpNoX", "");
-					}else {
+					} else {
 						occursList.putParam("OOLastUpdateEmpNoX", iCdEmp.getFullname());
 					}
-					
+
 				}
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

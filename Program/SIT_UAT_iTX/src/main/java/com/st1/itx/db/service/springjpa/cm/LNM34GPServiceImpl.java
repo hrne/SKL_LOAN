@@ -53,9 +53,8 @@ public class LNM34GPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// LNM34GP 資料欄位清單G
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" " 
-		    + " FROM  \"Ias34Gp\" " + " WHERE \"DataYM\" = " + dateMonth
-			+ " ORDER BY \"CustNo\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" " + " FROM  \"Ias34Gp\" " + " WHERE \"DataYM\" = " + dateMonth
+				+ " ORDER BY \"CustNo\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" ";
 
 		logger.info("sql=" + sql);
 

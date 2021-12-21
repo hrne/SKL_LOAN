@@ -29,18 +29,16 @@ public class L7912ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	public List<Map<String, String>> FindData(int CustNo,TitaVo titaVo) throws Exception{
+	public List<Map<String, String>> FindData(int CustNo, TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		String sql = "select f.\"CustNo\",f.\"FacmNo\",f.\"ApplNo\",f.\"AcctCode\",f.\"LineAmt\",f.\"LoanTermYy\",f.\"LoanTermMm\",f.\"LoanTermDd\",f.\"UtilDeadline\""
 				+ ",f.\"MaturityDate\" as \"FacMaturityDate\",f.\"BaseRateCode\",f.\"RecycleCode\",f.\"RecycleDeadline\",f.\"RateIncr\",f.\"ApproveRate\","
 				+ "f.\"FirstDrawdownDate\",f.\"MaturityDate\",f.\"RecycleCode\" as \"RecycleCode1\",f.\"UtilBal\",f.\"CurrencyCode\",f.\"FireOfficer\","
-				+ "c.\"ClCode1\",c.\"ClCode2\",c.\"ClNo\",f.\"UtilAmt\"" 
-				+ " from \"FacMain\" f "
-				+ " left join \"ClFac\" c on c.\"CustNo\" = f.\"CustNo\" and c.\"FacmNo\" = f.\"FacmNo\""
-				+ " where f.\"CustNo\" = '"+ CustNo + "'";
-		
-		logger.info("sql = "+sql); 
+				+ "c.\"ClCode1\",c.\"ClCode2\",c.\"ClNo\",f.\"UtilAmt\"" + " from \"FacMain\" f " + " left join \"ClFac\" c on c.\"CustNo\" = f.\"CustNo\" and c.\"FacmNo\" = f.\"FacmNo\""
+				+ " where f.\"CustNo\" = '" + CustNo + "'";
+
+		logger.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		logger.info("L7912Service FindData=" + query.toString());

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.Ifrs9FacDataId;
  */
 public interface Ifrs9FacDataRepositoryDay extends JpaRepository<Ifrs9FacData, Ifrs9FacDataId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Ifrs9FacData> findByIfrs9FacDataId(Ifrs9FacDataId ifrs9FacDataId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Ifrs9FacData> findByIfrs9FacDataId(Ifrs9FacDataId ifrs9FacDataId);
 
-  // (月底日日終批次)維護IFRS9額度資料檔
-  @Procedure(value = "\"Usp_L7_Ifrs9FacData_Upd\"")
-  public void uspL7Ifrs9facdataUpd(int TBSDYF, String EmpNo);
+	// (月底日日終批次)維護IFRS9額度資料檔
+	@Procedure(value = "\"Usp_L7_Ifrs9FacData_Upd\"")
+	public void uspL7Ifrs9facdataUpd(int TBSDYF, String EmpNo);
 
 }
-

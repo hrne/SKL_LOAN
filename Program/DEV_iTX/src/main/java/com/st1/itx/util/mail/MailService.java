@@ -85,10 +85,10 @@ public class MailService extends CommBuffer {
 	@PostConstruct
 	public void init() {
 		this.properties = System.getProperties();
-		
-		//設定寄件人
+
+		// 設定寄件人
 		this.from = "SKL<" + from + ">";
-		
+
 		// 設定傳輸協定為smtp
 		this.properties.setProperty("mail.transport.protocol", "smtp");
 		// 設定mail Server

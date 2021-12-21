@@ -33,23 +33,22 @@ public class L8R35 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ572 iJcicZ572 = new JcicZ572();
 		iJcicZ572 = iJcicZ572Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ572 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r35TranKey", iJcicZ572.getTranKey());
 			totaVo.putParam("L8r35CustId", iJcicZ572.getCustId());
 			totaVo.putParam("L8r35SubmitKey", iJcicZ572.getSubmitKey());
 			totaVo.putParam("L8r35ApplyDate", iJcicZ572.getApplyDate());
-			totaVo.putParam("L8r35StartDate", iJcicZ572.getStartDate());// 生效日期 
-			totaVo.putParam("L8r35PayDate", iJcicZ572.getPayDate());// 本分配表首繳日 
-			totaVo.putParam("L8r35BankId",iJcicZ572.getBankId());// 異動債權金機構代號
+			totaVo.putParam("L8r35StartDate", iJcicZ572.getStartDate());// 生效日期
+			totaVo.putParam("L8r35PayDate", iJcicZ572.getPayDate());// 本分配表首繳日
+			totaVo.putParam("L8r35BankId", iJcicZ572.getBankId());// 異動債權金機構代號
 			totaVo.putParam("L8r35AllotAmt", iJcicZ572.getAllotAmt());// 參與分配債權金額
 			totaVo.putParam("L8r35OwnPercentage", iJcicZ572.getOwnPercentage());// 債權比例
-			totaVo.putParam("L8r35OutJcicTxtDate", iJcicZ572.getOutJcicTxtDate());		
+			totaVo.putParam("L8r35OutJcicTxtDate", iJcicZ572.getOutJcicTxtDate());
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -43,10 +43,8 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	/* load 法催紀錄清單檔 */
-	public List<Map<String, String>> load(int index, int limit, String iCaseCode, int sOvduTerm, int eOvduTerm,
-			String iOvdamtfm, String iOvdamtto, int iStatus, int iBizDateF, int iIdentity, int iCustNo,
-			String iCustName, String iCustId, String iAccCollPsn, String iLegalPsn, String iTxCode, String iCityCode,
-			TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> load(int index, int limit, String iCaseCode, int sOvduTerm, int eOvduTerm, String iOvdamtfm, String iOvdamtto, int iStatus, int iBizDateF, int iIdentity,
+			int iCustNo, String iCustName, String iCustId, String iAccCollPsn, String iLegalPsn, String iTxCode, String iCityCode, TitaVo titaVo) throws Exception {
 
 		Query query;
 		// *** 折返控制相關 ***
@@ -137,7 +135,6 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 			queryttext += " and s.\"CityCode\" =  '" + iCityCode + "'"; // 擔保品地區別
 		}
 
-		
 		queryttext += "order by s.\"ClCustNo\", s.\"ClFacmNo\", s.\"ClRowNo\", s.\"CustNo\", s.\"FacmNo\" "; // 01: 逾期/催收戶
 
 		queryttext += sqlRow;

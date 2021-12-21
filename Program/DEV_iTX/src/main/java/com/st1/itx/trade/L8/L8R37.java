@@ -31,10 +31,10 @@ public class L8R37 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ574 iJcicZ574 = new JcicZ574();
 		iJcicZ574 = iJcicZ574Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ574 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r37TranKey", iJcicZ574.getTranKey());
 			totaVo.putParam("L8r37CustId", iJcicZ574.getCustId());
 			totaVo.putParam("L8r37SubmitKey", iJcicZ574.getSubmitKey());
@@ -42,10 +42,9 @@ public class L8R37 extends TradeBuffer {
 			totaVo.putParam("L8r37CloseDate", iJcicZ574.getCloseDate());
 			totaVo.putParam("L8r37CloseMark", iJcicZ574.getCloseMark());
 			totaVo.putParam("L8r37PhoneNo", iJcicZ574.getPhoneNo());
-			totaVo.putParam("L8r37OutJcicTxtDate", iJcicZ574.getOutJcicTxtDate());		
+			totaVo.putParam("L8r37OutJcicTxtDate", iJcicZ574.getOutJcicTxtDate());
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

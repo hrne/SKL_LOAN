@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.AcLoanIntId;
  */
 public interface AcLoanIntRepositoryDay extends JpaRepository<AcLoanInt, AcLoanIntId> {
 
-  // YearMonth =  
-  public Slice<AcLoanInt> findAllByYearMonthIsOrderByAcctCodeAscAgingAscAcBookCodeAscAcSubBookCodeAscCustNoAscFacmNoAscBormNoAsc(int yearMonth_0, Pageable pageable);
+	// YearMonth =
+	public Slice<AcLoanInt> findAllByYearMonthIsOrderByAcctCodeAscAgingAscAcBookCodeAscAcSubBookCodeAscCustNoAscFacmNoAscBormNoAsc(int yearMonth_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<AcLoanInt> findByAcLoanIntId(AcLoanIntId acLoanIntId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<AcLoanInt> findByAcLoanIntId(AcLoanIntId acLoanIntId);
 
 }
-

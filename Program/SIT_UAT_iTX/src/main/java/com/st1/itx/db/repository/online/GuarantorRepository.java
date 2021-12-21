@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.GuarantorId;
  */
 public interface GuarantorRepository extends JpaRepository<Guarantor, GuarantorId> {
 
-  // ApproveNo =
-  public Slice<Guarantor> findAllByApproveNoIsOrderByGuaUKeyAsc(int approveNo_0, Pageable pageable);
+	// ApproveNo =
+	public Slice<Guarantor> findAllByApproveNoIsOrderByGuaUKeyAsc(int approveNo_0, Pageable pageable);
 
-  // GuaUKey =
-  public Slice<Guarantor> findAllByGuaUKeyIsOrderByApproveNoAsc(String guaUKey_0, Pageable pageable);
+	// GuaUKey =
+	public Slice<Guarantor> findAllByGuaUKeyIsOrderByApproveNoAsc(String guaUKey_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Guarantor> findByGuarantorId(GuarantorId guarantorId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Guarantor> findByGuarantorId(GuarantorId guarantorId);
 
 }
-

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import java.math.BigDecimal;
@@ -23,19 +22,18 @@ import com.st1.itx.db.domain.PostDeductMediaId;
  */
 public interface PostDeductMediaRepositoryHist extends JpaRepository<PostDeductMedia, PostDeductMediaId> {
 
-  // AcDate = , AND BatchNo = , AND DetailSeq = 
-  public Optional<PostDeductMedia> findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(int acDate_0, String batchNo_1, int detailSeq_2);
+	// AcDate = , AND BatchNo = , AND DetailSeq =
+	public Optional<PostDeductMedia> findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(int acDate_0, String batchNo_1, int detailSeq_2);
 
-  // PostUserNo = ,AND RepayAmt = ,AND OutsrcRemark = 
-  public Optional<PostDeductMedia> findTopByPostUserNoIsAndRepayAmtIsAndOutsrcRemarkIsOrderByMediaDateDesc(String postUserNo_0, BigDecimal repayAmt_1, String outsrcRemark_2);
+	// PostUserNo = ,AND RepayAmt = ,AND OutsrcRemark =
+	public Optional<PostDeductMedia> findTopByPostUserNoIsAndRepayAmtIsAndOutsrcRemarkIsOrderByMediaDateDesc(String postUserNo_0, BigDecimal repayAmt_1, String outsrcRemark_2);
 
-  // MediaDate = 
-  public Slice<PostDeductMedia> findAllByMediaDateIsOrderByMediaSeqAsc(int mediaDate_0, Pageable pageable);
+	// MediaDate =
+	public Slice<PostDeductMedia> findAllByMediaDateIsOrderByMediaSeqAsc(int mediaDate_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<PostDeductMedia> findByPostDeductMediaId(PostDeductMediaId postDeductMediaId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<PostDeductMedia> findByPostDeductMediaId(PostDeductMediaId postDeductMediaId);
 
 }
-

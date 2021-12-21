@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,10 +19,9 @@ import com.st1.itx.db.domain.FinReportProfitId;
  */
 public interface FinReportProfitRepository extends JpaRepository<FinReportProfit, FinReportProfitId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FinReportProfit> findByFinReportProfitId(FinReportProfitId finReportProfitId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FinReportProfit> findByFinReportProfitId(FinReportProfitId finReportProfitId);
 
 }
-

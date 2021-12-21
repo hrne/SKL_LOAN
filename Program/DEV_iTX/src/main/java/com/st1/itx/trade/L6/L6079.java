@@ -47,7 +47,7 @@ public class L6079 extends TradeBuffer {
 		// 取得輸入資料
 		String iAcBookCode = titaVo.getParam("AcBookCode");
 		String iAcSubBookCode = titaVo.getParam("AcSubBookCode");
-		
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 

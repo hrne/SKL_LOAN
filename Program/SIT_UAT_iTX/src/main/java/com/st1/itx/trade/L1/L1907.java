@@ -37,14 +37,14 @@ public class L1907 extends TradeBuffer {
 
 	@Autowired
 	public FinReportDebtService finReportDebtService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
 
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1907 ");
@@ -69,16 +69,15 @@ public class L1907 extends TradeBuffer {
 //		String iCustFullname = titaVo.getParam("CustFullname");
 
 		CustMain iCustMain = new CustMain();
-		Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(custMain.getCustUKey(), this.index,
-				this.limit, titaVo);
+		Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(custMain.getCustUKey(), this.index, this.limit, titaVo);
 		List<FinReportDebt> lFinReportDebt = slFinReportDebt == null ? null : slFinReportDebt.getContent();
 
 		if (lFinReportDebt == null || lFinReportDebt.size() == 0) {
-			throw new LogicException("E0001","財務報表");
+			throw new LogicException("E0001", "財務報表");
 		} else {
 			for (FinReportDebt tFinReportDebt : lFinReportDebt) {
 				OccursList occursList = new OccursList();
-				
+
 				occursList.putParam("OCustUKey", tFinReportDebt.getCustUKey());
 				occursList.putParam("OUKey", tFinReportDebt.getUKey());
 				occursList.putParam("OCustId", iCustId);
@@ -92,7 +91,7 @@ public class L1907 extends TradeBuffer {
 					cdEmp.setFullname("");
 				}
 				occursList.putParam("OLastEmp", tFinReportDebt.getLastUpdateEmpNo() + " " + cdEmp.getFullname());
-				
+
 				this.totaVo.addOccursList(occursList);
 			}
 		}

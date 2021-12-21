@@ -47,8 +47,7 @@ public class LM084p extends TradeBuffer {
 
 		lM084Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				txcd + txnm + "已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), txcd + txnm + "已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

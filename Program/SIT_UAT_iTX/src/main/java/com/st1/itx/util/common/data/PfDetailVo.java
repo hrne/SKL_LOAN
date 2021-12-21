@@ -22,9 +22,9 @@ public class PfDetailVo {
 	private int borxNo = 0;
 
 	// 還款類別
-	/* 0.撥款 1.計件代碼變更 2.部分償還 3.提前結案*/
+	/* 0.撥款 1.計件代碼變更 2.部分償還 3.提前結案 */
 	private int repayType = 0;
-	
+
 	// 計件代碼
 	private String pieceCode;
 
@@ -57,11 +57,9 @@ public class PfDetailVo {
 
 	@Override
 	public String toString() {
-		return "PfDetailVo [custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", borxNo=" + borxNo
-				+ ", repayType=" + repayType + ", pieceCode=" + pieceCode + ", drawdownAmt=" + drawdownAmt
-				+ ", pieceCodeSecond=" + pieceCodeSecond + ", pieceCodeSecondAmt=" + pieceCodeSecondAmt
-				+ ", drawdownDate=" + drawdownDate + ", repaidPeriod=" + repaidPeriod + ", isTrial=" + isTrial
-				+ ", perfDate=" + perfDate + ", empResetFg=" + empResetFg + "]";
+		return "PfDetailVo [custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", borxNo=" + borxNo + ", repayType=" + repayType + ", pieceCode=" + pieceCode + ", drawdownAmt="
+				+ drawdownAmt + ", pieceCodeSecond=" + pieceCodeSecond + ", pieceCodeSecondAmt=" + pieceCodeSecondAmt + ", drawdownDate=" + drawdownDate + ", repaidPeriod=" + repaidPeriod
+				+ ", isTrial=" + isTrial + ", perfDate=" + perfDate + ", empResetFg=" + empResetFg + "]";
 	}
 
 	public int getCustNo() {
@@ -119,7 +117,7 @@ public class PfDetailVo {
 	public void setDrawdownAmt(BigDecimal drawdownAmt) {
 		this.drawdownAmt = drawdownAmt;
 	}
-	
+
 	public String getPieceCodeSecond() {
 		return pieceCodeSecond;
 	}
@@ -159,7 +157,7 @@ public class PfDetailVo {
 	public void setTrial(boolean isTrial) {
 		this.isTrial = isTrial;
 	}
-	
+
 	public int getPerfDate() {
 		return perfDate;
 	}

@@ -51,29 +51,29 @@ public class L5975 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	public NegCom sNegCom;
-	
+
 	@Autowired
 	public NegAppr01Service sNegAppr01Service;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("Run L5975");
 		this.info("active L5975 ");
 		this.totaVo.init(titaVo);
-        
+
 		int Select = parse.stringToInteger(titaVo.getParam("Select"));
-				
-		
+
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;// 查全部
-		
+
 		List<Map<String, String>> listL5975 = null;
-		
-		if(Select == 1) {
+
+		if (Select == 1) {
 			try {
 				listL5975 = l5975ServiceImpl.findFindCode(titaVo, this.index, this.limit);
 
@@ -92,35 +92,34 @@ public class L5975 extends TradeBuffer {
 				this.info("L5975ServiceImpl.findAll error = " + errors.toString());
 			}
 		}
-	
-		
-		if(listL5975 != null && listL5975.size() >= this.limit) {
+
+		if (listL5975 != null && listL5975.size() >= this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			titaVo.setReturnIndex(this.setIndexNext());
-			//this.totaVo.setMsgEndToAuto();// 自動折返
+			// this.totaVo.setMsgEndToAuto();// 自動折返
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
-		if(listL5975 == null || listL5975.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "最大債權撥付統計查詢");	
-			
+
+		if (listL5975 == null || listL5975.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "最大債權撥付統計查詢");
+
 		} else {
-	
-		  for( Map<String, String> t5975  : listL5975) {
-			
-		    OccursList occursList = new OccursList();
-		    occursList.putParam("OOFinCode", t5975.get("F0"));
-			String MainFinCodeName = sNegCom.FindNegFinAcc(t5975.get("F0"), titaVo)[0];
-			occursList.putParam("OOFinCodeName", MainFinCodeName);
-		    occursList.putParam("OOAmt", t5975.get("F1"));
-		    occursList.putParam("OOCnt", t5975.get("F2"));
-  
-		    this.totaVo.addOccursList(occursList);
-	    
-		  } // for
-		  
-		} // else 
-		
+
+			for (Map<String, String> t5975 : listL5975) {
+
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOFinCode", t5975.get("F0"));
+				String MainFinCodeName = sNegCom.FindNegFinAcc(t5975.get("F0"), titaVo)[0];
+				occursList.putParam("OOFinCodeName", MainFinCodeName);
+				occursList.putParam("OOAmt", t5975.get("F1"));
+				occursList.putParam("OOCnt", t5975.get("F2"));
+
+				this.totaVo.addOccursList(occursList);
+
+			} // for
+
+		} // else
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -57,8 +57,8 @@ public class L5905 extends TradeBuffer {
 		int iFYearMonthS = iYearMonthS + 191100;
 		int iYearMonthE = this.parse.stringToInteger(titaVo.getParam("YearMonthE"));
 		int iFYearMonthE = iYearMonthE + 191100;
-		int iTraceYearMonthS = Integer.valueOf(titaVo.getParam("TraceYearMonthS"))+191100;
-		int iTraceYearMonthE = Integer.valueOf(titaVo.getParam("TraceYearMonthE"))+191100;
+		int iTraceYearMonthS = Integer.valueOf(titaVo.getParam("TraceYearMonthS")) + 191100;
+		int iTraceYearMonthE = Integer.valueOf(titaVo.getParam("TraceYearMonthE")) + 191100;
 		this.info("L5905 iFYearMonth : " + iFYearMonth + "-" + iFYearMonthS + "-" + iFYearMonthE);
 		String iReChkMonth = titaVo.getParam("ReChkMonth");
 		int wkFYearMonth = 0;
@@ -66,9 +66,9 @@ public class L5905 extends TradeBuffer {
 		String wkYearMonth;
 		String wkReChkMonth;
 		if (iInqFg == 4) {
-			iTraceYearMonthE = Integer.valueOf(titaVo.getCalDy().substring(0,5))+191100;
+			iTraceYearMonthE = Integer.valueOf(titaVo.getCalDy().substring(0, 5)) + 191100;
 		}
-		this.info("迄日==="+iTraceYearMonthE);
+		this.info("迄日===" + iTraceYearMonthE);
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -78,18 +78,18 @@ public class L5905 extends TradeBuffer {
 
 		// 查詢覆審案件明細檔
 		Slice<InnReCheck> slInnReCheck = null;
-		switch(iInqFg) {
+		switch (iInqFg) {
 		case 1:
 			if (iCustNo == 0) {
-				if (iConditionCode == 99){
-					slInnReCheck = sInnReCheckService.findSpecify(99,iFYearMonth, this.index, this.limit, titaVo);
-				}else {
+				if (iConditionCode == 99) {
+					slInnReCheck = sInnReCheckService.findSpecify(99, iFYearMonth, this.index, this.limit, titaVo);
+				} else {
 					slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, 0000000, 9999999, this.index, this.limit, titaVo);
 				}
 			} else {
-				if (iConditionCode == 99){
-					slInnReCheck = sInnReCheckService.findSpecifyNo(99,iFYearMonth, iCustNo,this.index, this.limit, titaVo);
-				}else {
+				if (iConditionCode == 99) {
+					slInnReCheck = sInnReCheckService.findSpecifyNo(99, iFYearMonth, iCustNo, this.index, this.limit, titaVo);
+				} else {
 					slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, iCustNo, iCustNo, this.index, this.limit, titaVo);
 				}
 			}
@@ -117,7 +117,7 @@ public class L5905 extends TradeBuffer {
 
 			wkYearMonth = this.parse.IntegerToString(tInnReCheck.getReChkYearMonth(), 6);
 			wkReChkMonth = FormatUtil.right(wkYearMonth, 2);
-						
+
 			if (iInqFg == 2 && !(iReChkMonth.equals(wkReChkMonth))) {
 //			if (iInqFg == 2) {
 				continue;
@@ -137,9 +137,9 @@ public class L5905 extends TradeBuffer {
 			occursList.putParam("OOCustName", tCustMain.getCustName());
 
 			wkFYearMonth = tInnReCheck.getYearMonth();
-			if (wkFYearMonth==0){
+			if (wkFYearMonth == 0) {
 				occursList.putParam("OOYearMonth", 0);
-			}else {
+			} else {
 				wkFYearMonth = wkFYearMonth - 191100;
 				occursList.putParam("OOYearMonth", wkFYearMonth);
 			}
@@ -162,10 +162,10 @@ public class L5905 extends TradeBuffer {
 			occursList.putParam("OOCityItem", tInnReCheck.getCityItem());
 			occursList.putParam("OOReChkUnit", tInnReCheck.getReChkUnit());
 			occursList.putParam("OORemark", tInnReCheck.getRemark());
-			if (tInnReCheck.getTraceMonth()==0) {
+			if (tInnReCheck.getTraceMonth() == 0) {
 				occursList.putParam("OOTraceYearMonth", 0);
-			}else {
-				occursList.putParam("OOTraceYearMonth", tInnReCheck.getTraceMonth()-191100);
+			} else {
+				occursList.putParam("OOTraceYearMonth", tInnReCheck.getTraceMonth() - 191100);
 			}
 			occursList.putParam("OOSpecifyFg", tInnReCheck.getSpecifyFg());
 			/* 將每筆資料放入Tota的OcList */

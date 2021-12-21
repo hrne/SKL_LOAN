@@ -75,11 +75,9 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 		statusCode.add("4"); // 兌現未入帳
 		statusCode.add("5"); // 即期票
 
-		Slice<LoanCheque> sLoanCheque = sLoanChequeService.receiveDateRange(tbsdyf, tbsdyf, statusCode, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<LoanCheque> sLoanCheque = sLoanChequeService.receiveDateRange(tbsdyf, tbsdyf, statusCode, 0, Integer.MAX_VALUE, titaVo);
 
-		List<LoanCheque> listLoanCheque = sLoanCheque == null ? new ArrayList<>()
-				: new ArrayList<>(sLoanCheque.getContent());
+		List<LoanCheque> listLoanCheque = sLoanCheque == null ? new ArrayList<>() : new ArrayList<>(sLoanCheque.getContent());
 
 		Map<Integer, Integer> custNoMap = new HashMap<>();
 

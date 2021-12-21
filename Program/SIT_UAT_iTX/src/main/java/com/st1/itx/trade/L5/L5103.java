@@ -65,6 +65,7 @@ public class L5103 extends TradeBuffer {
 	private InnDocRecord tInnDocRecord = new InnDocRecord();
 	private InnDocRecordId tInnDocRecordId = new InnDocRecordId();
 	private TempVo tTempVo = new TempVo();
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 
@@ -82,11 +83,9 @@ public class L5103 extends TradeBuffer {
 
 		TxCom txCom = this.txBuffer.getTxCom();
 		txCom.setConfirmBrNo(cfBrNo);
-		this.info("cfGroupNo=="+cfGroupNo);
+		this.info("cfGroupNo==" + cfGroupNo);
 		txCom.setConfirmGroupNo(cfGroupNo);
 		this.txBuffer.setTxCom(txCom);
-
-		
 
 //		1.登 2.放 3.審 4.審放
 		switch (titaVo.getActFgI()) {
@@ -103,7 +102,7 @@ public class L5103 extends TradeBuffer {
 					titaVo.put("RELCD", "2");
 				}
 			}
-			//登錄
+			// 登錄
 			if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
 				insertNormal(titaVo);
 			}
@@ -111,19 +110,18 @@ public class L5103 extends TradeBuffer {
 			if (titaVo.isActfgEntry() && titaVo.isHcodeModify()) {
 				updateModify(titaVo);
 			}
-			
+
 			// 登錄/歸還 訂正
 			if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {
 				updateErase(titaVo);
 			}
-			
-			
+
 			break;
 		case 2:
 			// 放行及放行訂正
 			if (titaVo.isActfgSuprele()) {
-				//一般放行
-				if(titaVo.isHcodeNormal()) {
+				// 一般放行
+				if (titaVo.isHcodeNormal()) {
 					tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 					tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 					tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
@@ -147,9 +145,9 @@ public class L5103 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0003", "L5103 isHcodeNormal 2");
 					}
 				}
-				//放行訂正
+				// 放行訂正
 				if (titaVo.isHcodeErase()) {
-					
+
 					tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 					tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 					tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
@@ -158,7 +156,7 @@ public class L5103 extends TradeBuffer {
 
 					if (tInnDocRecord != null) {
 						tInnDocRecord.setTitaActFg("1");
-						
+
 						try {
 							innDocRecordService.update(tInnDocRecord);
 						} catch (DBException e) {
@@ -168,25 +166,24 @@ public class L5103 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0003", "L5103 isHcodeErase 2");
 					}
 				}
-				}			
-			
+			}
+
 			break;
 		case 3:
-			
+
 			tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 			tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 			tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
 			tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
-			
+
 			if (tInnDocRecord == null) {
 				throw new LogicException(titaVo, "E0003", "L5103 isHcodeErase 3");
-			} 
-			
-			//審閱訂正
-			if(titaVo.isHcodeErase()) {
+			}
 
-				
+			// 審閱訂正
+			if (titaVo.isHcodeErase()) {
+
 				tInnDocRecord.setTitaActFg("2");
 				if (tInnDocRecord.getReturnDate() > 0) {
 					tInnDocRecord.setApplCode("1");
@@ -198,13 +195,13 @@ public class L5103 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 isHcodeErase 3 update " + e.getErrorMsg());
 				}
-				
-			} else {//一般審閱
-				
+
+			} else {// 一般審閱
+
 				if ("3".equals(tInnDocRecord.getTitaActFg())) {
 					throw new LogicException(titaVo, "E0005", "待放行");
 				}
-				
+
 				tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
 				if (rdate > 0) {
 					rdate = rdate + 19110000;
@@ -217,9 +214,9 @@ public class L5103 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 isHcodeErase 3 update " + e.getErrorMsg());
 				}
-				
+
 			}
-			
+
 			break;
 		case 4:
 			tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
@@ -231,16 +228,16 @@ public class L5103 extends TradeBuffer {
 			if (tInnDocRecord == null) {
 				throw new LogicException(titaVo, "E0001", "L5103 isHcodeErase 4 ");
 			}
-			//審閱放行訂正
+			// 審閱放行訂正
 			if (titaVo.isHcodeErase()) {
-				
+
 				tInnDocRecord.setTitaActFg("3");
 				try {
 					innDocRecordService.update(tInnDocRecord);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 InnDocRecord update " + e.getErrorMsg());
 				}
-				
+
 			} else {
 
 				tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
@@ -249,19 +246,17 @@ public class L5103 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 InnDocRecord update " + e.getErrorMsg());
 				}
-				
-				
+
 			}
-			
+
 			break;
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
-	public void insertNormal(TitaVo titaVo) throws LogicException{
-		
-		
+
+	public void insertNormal(TitaVo titaVo) throws LogicException {
+
 		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
@@ -284,9 +279,7 @@ public class L5103 extends TradeBuffer {
 			nInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			nInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			nInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
-			
 
-		
 			try {
 				innDocRecordService.update(nInnDocRecord);
 			} catch (DBException e) {
@@ -307,48 +300,48 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
-			
-			for(int i =1; i<=25 ; i++) {
-				if(Integer.parseInt(titaVo.getParam("OPTA"+i))!=0) {
-					tTempVo.putParam("OPTA"+i, titaVo.getParam("OPTA"+i));
-					tTempVo.putParam("AMTA"+i, titaVo.getParam("AMTA"+i));
+
+			for (int i = 1; i <= 25; i++) {
+				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
+					tTempVo.putParam("OPTA" + i, titaVo.getParam("OPTA" + i));
+					tTempVo.putParam("AMTA" + i, titaVo.getParam("AMTA" + i));
 				}
 			}
-			
-			for(int i =1; i<=25 ; i++) {
-				if(Integer.parseInt(titaVo.getParam("OPTB"+i))!=0) {
-					tTempVo.putParam("OPTB"+i, titaVo.getParam("OPTB"+i));
-					tTempVo.putParam("AMTB"+i, titaVo.getParam("AMTB"+i));
+
+			for (int i = 1; i <= 25; i++) {
+				if (Integer.parseInt(titaVo.getParam("OPTB" + i)) != 0) {
+					tTempVo.putParam("OPTB" + i, titaVo.getParam("OPTB" + i));
+					tTempVo.putParam("AMTB" + i, titaVo.getParam("AMTB" + i));
 				}
 			}
-			
-			for(int i =1; i<=25 ; i++) {
-				if(Integer.parseInt(titaVo.getParam("OPTC"+i))!=0) {
-					tTempVo.putParam("OPTC"+i, titaVo.getParam("OPTC"+i));
-					tTempVo.putParam("AMTC"+i, titaVo.getParam("AMTC"+i));
+
+			for (int i = 1; i <= 25; i++) {
+				if (Integer.parseInt(titaVo.getParam("OPTC" + i)) != 0) {
+					tTempVo.putParam("OPTC" + i, titaVo.getParam("OPTC" + i));
+					tTempVo.putParam("AMTC" + i, titaVo.getParam("AMTC" + i));
 				}
 			}
 			tInnDocRecord.setJsonFields(tTempVo.getJsonString());
-			
+
 			try {
-				innDocRecordService.insert(tInnDocRecord,titaVo);
+				innDocRecordService.insert(tInnDocRecord, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
 			}
 		}
-		
-		
+
 	}
-	public void updateModify(TitaVo titaVo) throws LogicException{
+
+	public void updateModify(TitaVo titaVo) throws LogicException {
 		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
 		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
-		
+
 		if (tInnDocRecord != null) {
 			tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
-			
+
 			tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
 			tInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
 			tInnDocRecord.setApplEmpNo(titaVo.getParam("ApplEmpNo"));
@@ -360,71 +353,70 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
-			
-			for(int i =0; i<=25 ; i++) {
-				if(Integer.parseInt(titaVo.getParam("OPTA"+i))!=0) {
-					tTempVo.putParam("OPTA"+i, titaVo.getParam("OPTA"+i));
-					tTempVo.putParam("AMTA"+i, titaVo.getParam("AMTA"+i));
+
+			for (int i = 0; i <= 25; i++) {
+				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
+					tTempVo.putParam("OPTA" + i, titaVo.getParam("OPTA" + i));
+					tTempVo.putParam("AMTA" + i, titaVo.getParam("AMTA" + i));
 				}
 			}
-			
-			for(int i =0; i<=25 ; i++) {
-				if(Integer.parseInt(titaVo.getParam("OPTB"+i))!=0) {
-					tTempVo.putParam("OPTB"+i, titaVo.getParam("OPTB"+i));
-					tTempVo.putParam("AMTB"+i, titaVo.getParam("AMTB"+i));
+
+			for (int i = 0; i <= 25; i++) {
+				if (Integer.parseInt(titaVo.getParam("OPTB" + i)) != 0) {
+					tTempVo.putParam("OPTB" + i, titaVo.getParam("OPTB" + i));
+					tTempVo.putParam("AMTB" + i, titaVo.getParam("AMTB" + i));
 				}
 			}
-			
-			for(int i =0; i<=25 ; i++) {
-				if(Integer.parseInt(titaVo.getParam("OPTC"+i))!=0) {
-					tTempVo.putParam("OPTC"+i, titaVo.getParam("OPTC"+i));
-					tTempVo.putParam("AMTC"+i, titaVo.getParam("AMTC"+i));
+
+			for (int i = 0; i <= 25; i++) {
+				if (Integer.parseInt(titaVo.getParam("OPTC" + i)) != 0) {
+					tTempVo.putParam("OPTC" + i, titaVo.getParam("OPTC" + i));
+					tTempVo.putParam("AMTC" + i, titaVo.getParam("AMTC" + i));
 				}
 			}
 			tInnDocRecord.setJsonFields(tTempVo.getJsonString());
-			
+
 			try {
-				innDocRecordService.update(tInnDocRecord,titaVo);
+				innDocRecordService.update(tInnDocRecord, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
 			}
 		} else {
-			throw new LogicException(titaVo, "E0003", "");//修改資料不存在
+			throw new LogicException(titaVo, "E0003", "");// 修改資料不存在
 		}
 	}
-	
-	public void updateErase(TitaVo titaVo) throws LogicException{
+
+	public void updateErase(TitaVo titaVo) throws LogicException {
 		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
 		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
-		
-		if(tInnDocRecord!=null) {
-			if(("1").equals(tInnDocRecord.getApplCode())) {//申請登錄時才可刪除
+
+		if (tInnDocRecord != null) {
+			if (("1").equals(tInnDocRecord.getApplCode())) {// 申請登錄時才可刪除
 				try {
-					innDocRecordService.delete(tInnDocRecord,titaVo);
+					innDocRecordService.delete(tInnDocRecord, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0004", "L5103 deleteErase " + e.getErrorMsg());
-				}	
-			
-			}else {//登錄歸還恢復至未點選歸還時
+				}
+
+			} else {// 登錄歸還恢復至未點選歸還時
 				tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
 				tInnDocRecord.setTitaActFg("4");
 				tInnDocRecord.setApplCode("1");
 				tInnDocRecord.setReturnDate(0);
 				tInnDocRecord.setReturnEmpNo("");
 				try {
-					innDocRecordService.update(tInnDocRecord,titaVo);
+					innDocRecordService.update(tInnDocRecord, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
 				}
 			}
-			
+
 		} else {
-		throw new LogicException(titaVo, "E0004", "");//刪除資料不存在
+			throw new LogicException(titaVo, "E0004", "");// 刪除資料不存在
 		}
-			
-		
+
 	}
 }

@@ -47,7 +47,7 @@ public class LB204ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String acdateStart = String.valueOf(iacdateStart);
 		String acdateEnd = String.valueOf(iacdateEnd);
 		this.info("acdateStart=" + acdateStart + ",acdateEnd=" + acdateEnd);
-		
+
 //		if (onLineMode == true) {
 //			acctDate = 20200423;
 //		}
@@ -55,13 +55,10 @@ public class LB204ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// B204 聯徵授信餘額日報檔
-		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"DataDate\" " + "     , M.\"AcctNo\" "
-				+ "     , M.\"CustId\" " + "     , M.\"AcctCode\" " + "     , M.\"SubAcctCode\" "
-				+ "     , M.\"SubTranCode\" " + "     , M.\"LineAmt\" " + "     , M.\"DrawdownAmt\" "
-				+ "     , M.\"DBR22Amt\" " + "     , M.\"SeqNo\" " + "     , M.\"Filler13\" " + " FROM  \"JcicB204\" M "
-				+ " WHERE ( M.\"DataYMD\" Between " + acdateStart + " AND " + acdateEnd + " )"
-				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"DataDate\", M.\"AcctNo\", M.\"CustId\" "
-				+ "        , M.\"AcctCode\", M.\"SubAcctCode\", M.\"SeqNo\" ";
+		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"DataDate\" " + "     , M.\"AcctNo\" " + "     , M.\"CustId\" " + "     , M.\"AcctCode\" "
+				+ "     , M.\"SubAcctCode\" " + "     , M.\"SubTranCode\" " + "     , M.\"LineAmt\" " + "     , M.\"DrawdownAmt\" " + "     , M.\"DBR22Amt\" " + "     , M.\"SeqNo\" "
+				+ "     , M.\"Filler13\" " + " FROM  \"JcicB204\" M " + " WHERE ( M.\"DataYMD\" Between " + acdateStart + " AND " + acdateEnd + " )"
+				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"DataDate\", M.\"AcctNo\", M.\"CustId\" " + "        , M.\"AcctCode\", M.\"SubAcctCode\", M.\"SeqNo\" ";
 
 		this.info("sql=" + sql);
 

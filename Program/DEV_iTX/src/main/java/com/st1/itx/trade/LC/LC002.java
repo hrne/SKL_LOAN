@@ -51,7 +51,7 @@ public class LC002 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC002 ");
 		this.totaVo.init(titaVo);
-		
+
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -59,7 +59,7 @@ public class LC002 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;
-		
+
 		try {
 
 			List<Map<String, String>> dList = lc002ServiceImpl.findAll(titaVo, index, limit);
@@ -106,7 +106,7 @@ public class LC002 extends TradeBuffer {
 				titaVo.setReturnIndex(this.setIndexNext());
 				this.totaVo.setMsgEndToEnter();// 手動折返
 			}
-			
+
 		} catch (LogicException e) {
 			throw e;
 		} catch (Exception e) {
@@ -115,7 +115,7 @@ public class LC002 extends TradeBuffer {
 			this.error(errors.toString());
 			throw new LogicException(titaVo, "E0000", errors.toString());
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -136,8 +136,7 @@ public class LC002 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		Slice<TxRecord> slTxRecord = txRecordService.findByLC002(iEntday, iBrNo, "S", 1, 0, 1, iTlrNo + "%",
-				iTranNo + "%", this.index, this.limit);
+		Slice<TxRecord> slTxRecord = txRecordService.findByLC002(iEntday, iBrNo, "S", 1, 0, 1, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
 		List<TxRecord> lTxRecord = slTxRecord == null ? null : slTxRecord.getContent();
 
 		if (lTxRecord == null) {
@@ -151,8 +150,7 @@ public class LC002 extends TradeBuffer {
 					tTxFlowId.setEntdy(tTxRecord.getEntdy());
 					tTxFlowId.setFlowNo(tTxRecord.getFlowNo());
 					TxFlow tTxFlow = txFlowService.findById(tTxFlowId);
-					if (tTxRecord.getFlowStep() != tTxFlow.getFlowStep() || (tTxRecord.getFlowStep() == 1
-							&& tTxFlow.getSubmitFg() == 1 && tTxFlow.getFlowMode() != 3)) {
+					if (tTxRecord.getFlowStep() != tTxFlow.getFlowStep() || (tTxRecord.getFlowStep() == 1 && tTxFlow.getSubmitFg() == 1 && tTxFlow.getFlowMode() != 3)) {
 						supRelease = 1; // 1的時候 按鈕不開
 					}
 				}

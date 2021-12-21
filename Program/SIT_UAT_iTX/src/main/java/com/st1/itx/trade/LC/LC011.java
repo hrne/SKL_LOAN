@@ -101,7 +101,7 @@ public class LC011 extends TradeBuffer {
 			occursList.putParam("TxAmt", new BigDecimal(d.get("TxAmt").toString().trim()));
 			occursList.putParam("BrNo", iBrNo + " " + cdBranch.getBranchShort());
 			occursList.putParam("FlowMode", d.get("FlowMode"));
-			
+
 			String iTlrItem = "";
 			// 放行、審核放行，抓經辦代碼
 			int flowStep = Integer.valueOf(d.get("FlowStep"));
@@ -126,8 +126,7 @@ public class LC011 extends TradeBuffer {
 			}
 			occursList.putParam("FlowType", d.get("FlowType"));
 			occursList.putParam("FlowStep", d.get("FlowStep"));
-			if ("1".equals(d.get("Hcode").toString()) && Integer.valueOf(d.get("OrgEntdy").toString()) > 0
-					&&  d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
+			if ("1".equals(d.get("Hcode").toString()) && Integer.valueOf(d.get("OrgEntdy").toString()) > 0 && d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
 				occursList.putParam("Hcode", 3);
 			} else {
 				occursList.putParam("Hcode", d.get("Hcode"));
@@ -169,7 +168,6 @@ public class LC011 extends TradeBuffer {
 		return this.sendList();
 	}
 
-
 	// 查詢使用者
 
 	private String inqCdEmp(String tlrNo, TitaVo titaVo) {
@@ -194,6 +192,6 @@ public class LC011 extends TradeBuffer {
 				tlrItems.put(tlrNo, tlrItem);
 			}
 		}
-		return tlrNo + " " +tlrItem;
+		return tlrNo + " " + tlrItem;
 	}
 }

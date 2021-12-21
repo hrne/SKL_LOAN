@@ -35,12 +35,12 @@ public class L8R30 extends TradeBuffer {
 		if (iJcicZ061 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
 		} else {
-			totaVo.putParam("L8r30TranKey",iJcicZ061.getTranKey());// 交易代碼
+			totaVo.putParam("L8r30TranKey", iJcicZ061.getTranKey());// 交易代碼
 			totaVo.putParam("L8r30CustId", iJcicZ061.getCustId());// 債務人IDN
 			totaVo.putParam("L8r30SubmitKey", iJcicZ061.getSubmitKey());// 報送單位代號
 			totaVo.putParam("L8r30RcDate", iJcicZ061.getRcDate());// 原前置協商申請日
 			totaVo.putParam("L8r30ChangePayDate", iJcicZ061.getChangePayDate());// 申請變更還款條件日
-			totaVo.putParam("L8r30MaxMainCode",iJcicZ061.getMaxMainCode());//報送單位代號
+			totaVo.putParam("L8r30MaxMainCode", iJcicZ061.getMaxMainCode());// 報送單位代號
 			totaVo.putParam("L8r30ExpBalanceAmt", iJcicZ061.getExpBalanceAmt());// 信用貸款協商剩餘債權餘額
 			totaVo.putParam("L8r30CashBalanceAmt", iJcicZ061.getCashBalanceAmt());// 現金卡協商剩餘債權餘額
 			totaVo.putParam("L8r30CreditBalanceAmt", iJcicZ061.getCreditBalanceAmt());// 信用卡協商剩餘債權餘額

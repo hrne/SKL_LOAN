@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.LoanIfrsApId;
  */
 public interface LoanIfrsApRepository extends JpaRepository<LoanIfrsAp, LoanIfrsApId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<LoanIfrsAp> findByLoanIfrsApId(LoanIfrsApId loanIfrsApId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<LoanIfrsAp> findByLoanIfrsApId(LoanIfrsApId loanIfrsApId);
 
-  // (月底日日終批次)維護 LoanIfrsAp IFRS9欄位清單1
-  @Procedure(value = "\"Usp_L7_LoanIfrsAp_Upd\"")
-  public void uspL7LoanifrsapUpd(int TBSDYF, String EmpNo, int NewAcFg);
+	// (月底日日終批次)維護 LoanIfrsAp IFRS9欄位清單1
+	@Procedure(value = "\"Usp_L7_LoanIfrsAp_Upd\"")
+	public void uspL7LoanifrsapUpd(int TBSDYF, String EmpNo, int NewAcFg);
 
 }
-

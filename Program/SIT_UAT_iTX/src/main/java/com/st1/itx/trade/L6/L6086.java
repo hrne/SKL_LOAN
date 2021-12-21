@@ -57,17 +57,17 @@ public class L6086 extends TradeBuffer {
 		// 查詢分公司資料檔
 		Slice<CdBcm> slCdBcm;
 		if (!(iDistCode.isEmpty() || iDistCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findDistCode1(iDistCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDistCode1(iDistCode + "%", this.index, this.limit, titaVo);
 		} else if (!(iDeptCode.isEmpty() || iDeptCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode + "%", this.index, this.limit, titaVo);
 		} else if (!(iUnitCode.isEmpty() || iUnitCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode + "%", this.index, this.limit, titaVo);
 		} else {
 			slCdBcm = sCdBcmService.findAll(this.index, this.limit, titaVo);
 		}
 		List<CdBcm> lCdBcm = slCdBcm == null ? null : slCdBcm.getContent();
 
-		if (lCdBcm == null || lCdBcm.size() == 0 ||lCdBcm.isEmpty()) {
+		if (lCdBcm == null || lCdBcm.size() == 0 || lCdBcm.isEmpty()) {
 			throw new LogicException(titaVo, "E0001", "分公司資料檔"); // 查無資料
 		}
 		// 如有找到資料

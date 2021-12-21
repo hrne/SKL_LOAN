@@ -97,26 +97,19 @@ public class BankRmtfFileVo extends FileVo {
 				BigDecimal repayAmt = BigDecimal.ZERO;
 				// 提款負數
 				if (occursList.get("OccWithDrawAmt").indexOf("p") >= 0) {
-					repayAmt = parse.stringToBigDecimal(occursList.get("OccWithDrawAmt").substring(0, 12) + "0")
-							.divide(bigDe100);
+					repayAmt = parse.stringToBigDecimal(occursList.get("OccWithDrawAmt").substring(0, 12) + "0").divide(bigDe100);
 				}
 				// 提款正數
-				if (parse.isNumeric(occursList.get("OccWithDrawAmt"))
-						&& parse.stringToBigDecimal(occursList.get("OccWithDrawAmt")).compareTo(BigDecimal.ZERO) > 0) {
-					repayAmt = BigDecimal.ZERO
-							.subtract(parse.stringToBigDecimal(occursList.get("OccWithDrawAmt")).divide(bigDe100));
+				if (parse.isNumeric(occursList.get("OccWithDrawAmt")) && parse.stringToBigDecimal(occursList.get("OccWithDrawAmt")).compareTo(BigDecimal.ZERO) > 0) {
+					repayAmt = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(occursList.get("OccWithDrawAmt")).divide(bigDe100));
 				}
 				// 存款正數
-				if (parse.isNumeric(occursList.get("OccDepositAmt"))
-						&& parse.stringToBigDecimal(occursList.get("OccDepositAmt")).divide(bigDe100)
-								.compareTo(BigDecimal.ZERO) > 0) {
+				if (parse.isNumeric(occursList.get("OccDepositAmt")) && parse.stringToBigDecimal(occursList.get("OccDepositAmt")).divide(bigDe100).compareTo(BigDecimal.ZERO) > 0) {
 					repayAmt = parse.stringToBigDecimal(occursList.get("OccDepositAmt")).divide(bigDe100);
 				}
 				// 存款負數
 				if (occursList.get("OccDepositAmt").indexOf("p") >= 0) {
-					repayAmt = BigDecimal.ZERO
-							.subtract(parse.stringToBigDecimal(occursList.get("OccDepositAmt").substring(0, 12) + "0")
-									.divide(bigDe100));
+					repayAmt = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(occursList.get("OccDepositAmt").substring(0, 12) + "0").divide(bigDe100));
 				}
 				occursList.putParam("OccRepayAmt", repayAmt);
 				occursList.putParam("OccEraseFlag", "0");
@@ -139,8 +132,7 @@ public class BankRmtfFileVo extends FileVo {
 			if (repayAmt.compareTo(BigDecimal.ZERO) < 0) {
 				for (OccursList oc2 : occursList) {
 					if (oc1.get("OccVirAcctNo").equals(oc2.get("OccVirAcctNo")) && "0".equals(oc2.get("OccEraseFlag"))
-							&& repayAmt.equals(
-									BigDecimal.ZERO.subtract(parse.stringToBigDecimal(oc2.get("OccRepayAmt"))))) {
+							&& repayAmt.equals(BigDecimal.ZERO.subtract(parse.stringToBigDecimal(oc2.get("OccRepayAmt"))))) {
 						oc1.putParam("OccEraseFlag", "1");
 						oc2.putParam("OccEraseFlag", "1");
 						continue;
@@ -203,8 +195,7 @@ public class BankRmtfFileVo extends FileVo {
 			result = new String(resultBytes);
 		} else {
 			if (endIndex > inputLength) {
-				throw new LogicException("XXXXX",
-						"來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
+				throw new LogicException("XXXXX", "來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
 			} else if (startIndex < 0 || resultLength == 0) {
 				throw new LogicException("XXXXX", "BankRmtfFileVo程式有誤");
 			}
@@ -243,8 +234,7 @@ public class BankRmtfFileVo extends FileVo {
 			}
 		} else {
 			if (endIndex > inputLength) {
-				throw new LogicException("E0014",
-						"[BankRmtfFileVo]來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
+				throw new LogicException("E0014", "[BankRmtfFileVo]來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
 			} else if (startIndex < 0 || resultLength == 0) {
 				throw new LogicException("E0014", "[BankRmtfFileVo]程式有誤");
 			}

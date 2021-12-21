@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.CdPfParmsId;
  */
 public interface CdPfParmsRepositoryMon extends JpaRepository<CdPfParms, CdPfParmsId> {
 
-  // ConditionCode1 = 
-  public Slice<CdPfParms> findAllByConditionCode1IsOrderByConditionCode2AscConditionAsc(String conditionCode1_0, Pageable pageable);
+	// ConditionCode1 =
+	public Slice<CdPfParms> findAllByConditionCode1IsOrderByConditionCode2AscConditionAsc(String conditionCode1_0, Pageable pageable);
 
-  // ConditionCode1 = ,AND ConditionCode2 = 
-  public Slice<CdPfParms> findAllByConditionCode1IsAndConditionCode2IsOrderByConditionAsc(String conditionCode1_0, String conditionCode2_1, Pageable pageable);
+	// ConditionCode1 = ,AND ConditionCode2 =
+	public Slice<CdPfParms> findAllByConditionCode1IsAndConditionCode2IsOrderByConditionAsc(String conditionCode1_0, String conditionCode2_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdPfParms> findByCdPfParmsId(CdPfParmsId cdPfParmsId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdPfParms> findByCdPfParmsId(CdPfParmsId cdPfParmsId);
 
 }
-

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,37 +21,38 @@ import com.st1.itx.db.domain.BatxOthersId;
  */
 public interface BatxOthersRepositoryMon extends JpaRepository<BatxOthers, BatxOthersId> {
 
-  // AcDate >= ,AND AcDate <= , AND BatchNo = 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIs(int acDate_0, int acDate_1, String batchNo_2, Pageable pageable);
+	// AcDate >= ,AND AcDate <= , AND BatchNo =
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIs(int acDate_0, int acDate_1, String batchNo_2, Pageable pageable);
 
-  // AcDate >= ,AND AcDate <= , AND BatchNo = , AND RepayCode = 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIs(int acDate_0, int acDate_1, String batchNo_2, int repayCode_3, Pageable pageable);
+	// AcDate >= ,AND AcDate <= , AND BatchNo = , AND RepayCode =
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIs(int acDate_0, int acDate_1, String batchNo_2, int repayCode_3, Pageable pageable);
 
-  // AcDate >= ,AND AcDate <= , AND BatchNo = , AND CreateEmpNo = 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndCreateEmpNoIs(int acDate_0, int acDate_1, String batchNo_2, String createEmpNo_3, Pageable pageable);
+	// AcDate >= ,AND AcDate <= , AND BatchNo = , AND CreateEmpNo =
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndCreateEmpNoIs(int acDate_0, int acDate_1, String batchNo_2, String createEmpNo_3, Pageable pageable);
 
-  // AcDate >= ,AND AcDate <= , AND BatchNo = , AND RepayCode = , AND CreateEmpNo = 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(int acDate_0, int acDate_1, String batchNo_2, int repayCode_3, String createEmpNo_4, Pageable pageable);
+	// AcDate >= ,AND AcDate <= , AND BatchNo = , AND RepayCode = , AND CreateEmpNo
+	// =
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(int acDate_0, int acDate_1, String batchNo_2, int repayCode_3,
+			String createEmpNo_4, Pageable pageable);
 
-  // AcDate =  ,AND BatchNo =
-  public Optional<BatxOthers> findTopByAcDateIsAndBatchNoIsOrderByDetailSeqDesc(int acDate_0, String batchNo_1);
+	// AcDate = ,AND BatchNo =
+	public Optional<BatxOthers> findTopByAcDateIsAndBatchNoIsOrderByDetailSeqDesc(int acDate_0, String batchNo_1);
 
-  // AcDate >= ,AND AcDate <= 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(int acDate_0, int acDate_1, Pageable pageable);
+	// AcDate >= ,AND AcDate <=
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(int acDate_0, int acDate_1, Pageable pageable);
 
-  // AcDate >= ,AND AcDate <= ,AND RepayCode = 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIs(int acDate_0, int acDate_1, int repayCode_2, Pageable pageable);
+	// AcDate >= ,AND AcDate <= ,AND RepayCode =
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIs(int acDate_0, int acDate_1, int repayCode_2, Pageable pageable);
 
-  // AcDate >= ,AND AcDate <= ,AND CreateEmpNo = 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCreateEmpNoIs(int acDate_0, int acDate_1, String createEmpNo_2, Pageable pageable);
+	// AcDate >= ,AND AcDate <= ,AND CreateEmpNo =
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCreateEmpNoIs(int acDate_0, int acDate_1, String createEmpNo_2, Pageable pageable);
 
-  // AcDate >= ,AND AcDate <= ,AND RepayCode = ,AND CreateEmpNo = 
-  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsAndCreateEmpNoIs(int acDate_0, int acDate_1, int repayCode_2, String createEmpNo_3, Pageable pageable);
+	// AcDate >= ,AND AcDate <= ,AND RepayCode = ,AND CreateEmpNo =
+	public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsAndCreateEmpNoIs(int acDate_0, int acDate_1, int repayCode_2, String createEmpNo_3, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<BatxOthers> findByBatxOthersId(BatxOthersId batxOthersId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<BatxOthers> findByBatxOthersId(BatxOthersId batxOthersId);
 
 }
-

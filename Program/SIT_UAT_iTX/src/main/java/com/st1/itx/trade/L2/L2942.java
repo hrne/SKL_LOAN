@@ -43,7 +43,7 @@ public class L2942 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -141,9 +141,9 @@ public class L2942 extends TradeBuffer {
 			occurslist.putParam("OOFacmNo", tmpForeclosureFee.getFacmNo());
 			occurslist.putParam("OOCustName", "");
 			CustMain tCustMain = new CustMain();
-			tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(), tmpForeclosureFee.getCustNo(), titaVo);	
-			if(tCustMain != null) {
-				occurslist.putParam("OOCustName", tCustMain.getCustName());	
+			tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(), tmpForeclosureFee.getCustNo(), titaVo);
+			if (tCustMain != null) {
+				occurslist.putParam("OOCustName", tCustMain.getCustName());
 			}
 			occurslist.putParam("OOFEEAMT", tmpForeclosureFee.getFee());
 			occurslist.putParam("OOFeeCode", tmpForeclosureFee.getFeeCode());

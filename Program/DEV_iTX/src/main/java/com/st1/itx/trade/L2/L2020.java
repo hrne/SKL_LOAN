@@ -86,7 +86,7 @@ public class L2020 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		// 取tita核准編號
 		int iApplNo = parse.stringToInteger(titaVo.getParam("ApplNo"));
-		
+
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		// new array list
 		List<Guarantor> lGuarantor = new ArrayList<Guarantor>();
@@ -234,10 +234,10 @@ public class L2020 extends TradeBuffer {
 				continue;
 			}
 
-			if(iFacmNo != 0) {  // 額度不查全部
-				
-				if(iFacmNo == tFacMain.getFacmNo()) {  // 額度相同時
-					
+			if (iFacmNo != 0) { // 額度不查全部
+
+				if (iFacmNo == tFacMain.getFacmNo()) { // 額度相同時
+
 					occursList.putParam("OOCustNo", tFacMain.getCustNo());// 借款戶戶號
 					occursList.putParam("OOFacmNo", tFacMain.getFacmNo()); // 借款戶額度號碼
 					occursList.putParam("OOCustId", tCustMain.getCustId()); // 保證人統編
@@ -249,28 +249,28 @@ public class L2020 extends TradeBuffer {
 					occursList.putParam("OOGuaType", tGuarantor.getGuaTypeCode());
 					occursList.putParam("OOStatCd", tGuarantor.getGuaStatCode());
 					occursList.putParam("OOCancelDate", tGuarantor.getCancelDate());
-					
+
 					int lastFacmNo = tCustMain.getLastFacmNo();
-					
+
 					if (lastFacmNo > 0) { // 借戶否
 						occursList.putParam("OOBorrower", "Y");
 					} else {
 						occursList.putParam("OOBorrower", "N");
 					}
-					
+
 					CdGuarantor iCdGuarantor = sCdGuarantorService.findById(tGuarantor.getGuaRelCode(), titaVo);
 					if (iCdGuarantor == null) {
 						occursList.putParam("OOGuaRelX", "");
 					} else {
 						occursList.putParam("OOGuaRelX", iCdGuarantor.getGuaRelItem());
 					}
-					
+
 					this.info("occursList L2020" + occursList);
-					
+
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
 				} // if
-				
+
 			} else {
 				occursList.putParam("OOCustNo", tFacMain.getCustNo());// 借款戶戶號
 				occursList.putParam("OOFacmNo", tFacMain.getFacmNo()); // 借款戶額度號碼
@@ -283,31 +283,31 @@ public class L2020 extends TradeBuffer {
 				occursList.putParam("OOGuaType", tGuarantor.getGuaTypeCode());
 				occursList.putParam("OOStatCd", tGuarantor.getGuaStatCode());
 				occursList.putParam("OOCancelDate", tGuarantor.getCancelDate());
-				
+
 				int lastFacmNo = tCustMain.getLastFacmNo();
-				
+
 				if (lastFacmNo > 0) { // 借戶否
 					occursList.putParam("OOBorrower", "Y");
 				} else {
 					occursList.putParam("OOBorrower", "N");
 				}
-				
+
 				CdGuarantor iCdGuarantor = sCdGuarantorService.findById(tGuarantor.getGuaRelCode(), titaVo);
 				if (iCdGuarantor == null) {
 					occursList.putParam("OOGuaRelX", "");
 				} else {
 					occursList.putParam("OOGuaRelX", iCdGuarantor.getGuaRelItem());
 				}
-				
+
 				this.info("occursList L2020" + occursList);
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
 
 		}
 
-		if (this.totaVo.getOccursList() == null || this.totaVo.getOccursList().size() == 0 ) {
+		if (this.totaVo.getOccursList() == null || this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E2003", "保證人檔"); // 查無資料
 		}
 		this.addList(this.totaVo);

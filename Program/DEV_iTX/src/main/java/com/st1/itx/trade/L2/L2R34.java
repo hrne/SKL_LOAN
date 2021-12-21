@@ -50,7 +50,7 @@ public class L2R34 extends TradeBuffer {
 		ForeclosureFee tForeclosureFee = new ForeclosureFee();
 
 		tForeclosureFee = sForeclosureFeeService.findById(iRecordNo, titaVo);
-		//查無資料拋錯
+		// 查無資料拋錯
 		if (tForeclosureFee == null) {
 			throw new LogicException(titaVo, "E0001", "法拍費主檔"); // 查詢資料不存在
 		}

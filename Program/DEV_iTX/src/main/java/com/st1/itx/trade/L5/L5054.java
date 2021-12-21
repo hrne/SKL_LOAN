@@ -108,7 +108,7 @@ public class L5054 extends TradeBuffer {
 					workSeason -= 19110;
 				}
 				occursList.putParam("OWorkSeason", workSeason);//
-				
+
 				if (MapL5054.get("MediaDate") == null || "".equals(MapL5054.get("MediaDate"))) {
 					occursList.putParam("OMediaFg", 0);//
 					occursList.putParam("OMediaDate", 0);
@@ -116,7 +116,7 @@ public class L5054 extends TradeBuffer {
 					occursList.putParam("OMediaFg", 1);//
 					occursList.putParam("OMediaDate", parse.stringToStringDate(MapL5054.get("MediaDate")));
 				}
-				
+
 				occursList.putParam("OManualFg", MapL5054.get("F14"));//
 
 				this.info("L5054 CreateDate =" + MapL5054.get("CreateDate") + "/" + MapL5054.get("LastUpdate"));
@@ -128,8 +128,7 @@ public class L5054 extends TradeBuffer {
 
 				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5054.get("LastUpdate")));
 
-				occursList.putParam("OLastEmp",
-						MapL5054.get("LastUpdateEmpNo") + " " + MapL5054.get("LastUpdateEmpName"));
+				occursList.putParam("OLastEmp", MapL5054.get("LastUpdateEmpNo") + " " + MapL5054.get("LastUpdateEmpName"));
 
 				this.totaVo.addOccursList(occursList);
 			}

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,31 +21,30 @@ import com.st1.itx.db.domain.ClMovablesId;
  */
 public interface ClMovablesRepositoryMon extends JpaRepository<ClMovables, ClMovablesId> {
 
-  // ClCode1 = 
-  public Slice<ClMovables> findAllByClCode1Is(int clCode1_0, Pageable pageable);
+	// ClCode1 =
+	public Slice<ClMovables> findAllByClCode1Is(int clCode1_0, Pageable pageable);
 
-  // ClCode1 = ,AND ClCode2 = 
-  public Slice<ClMovables> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 =
+	public Slice<ClMovables> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
 
-  // ClCode1 = ,AND ClCode2 >= ,AND ClCode2 <= ,AND ClNo = 
-  public Slice<ClMovables> findAllByClCode1IsAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoIs(int clCode1_0, int clCode2_1, int clCode2_2, int clNo_3, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 >= ,AND ClCode2 <= ,AND ClNo =
+	public Slice<ClMovables> findAllByClCode1IsAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoIs(int clCode1_0, int clCode2_1, int clCode2_2, int clNo_3, Pageable pageable);
 
-  // ProductBrand = ,AND ProductSpec = ,AND OwnerCustUKey =
-  public Slice<ClMovables> findAllByProductBrandIsAndProductSpecIsAndOwnerCustUKeyIs(String productBrand_0, String productSpec_1, String ownerCustUKey_2, Pageable pageable);
+	// ProductBrand = ,AND ProductSpec = ,AND OwnerCustUKey =
+	public Slice<ClMovables> findAllByProductBrandIsAndProductSpecIsAndOwnerCustUKeyIs(String productBrand_0, String productSpec_1, String ownerCustUKey_2, Pageable pageable);
 
-  // ProductBrand =
-  public Slice<ClMovables> findAllByProductBrandIs(String productBrand_0, Pageable pageable);
+	// ProductBrand =
+	public Slice<ClMovables> findAllByProductBrandIs(String productBrand_0, Pageable pageable);
 
-  // LicenseNo = 
-  public Slice<ClMovables> findAllByLicenseNoIs(String licenseNo_0, Pageable pageable);
+	// LicenseNo =
+	public Slice<ClMovables> findAllByLicenseNoIs(String licenseNo_0, Pageable pageable);
 
-  // EngineSN =
-  public Slice<ClMovables> findAllByEngineSNIs(String engineSN_0, Pageable pageable);
+	// EngineSN =
+	public Slice<ClMovables> findAllByEngineSNIs(String engineSN_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClMovables> findByClMovablesId(ClMovablesId clMovablesId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClMovables> findByClMovablesId(ClMovablesId clMovablesId);
 
 }
-

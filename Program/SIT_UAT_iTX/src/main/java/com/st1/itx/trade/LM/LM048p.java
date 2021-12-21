@@ -37,17 +37,15 @@ public class LM048p extends TradeBuffer {
 		this.info("active LM048p ");
 		this.totaVo.init(titaVo);
 
-
 		this.info("LM048p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
 		lM048Report.setParentTranCode(parentTranCode);
-		
+
 		lM048Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LM049企業放款風險承擔限額控管表", titaVo);
-		
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM049企業放款風險承擔限額控管表", titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

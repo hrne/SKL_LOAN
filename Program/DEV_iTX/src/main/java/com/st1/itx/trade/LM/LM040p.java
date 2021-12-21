@@ -42,19 +42,15 @@ public class LM040p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		lM040Report.setParentTranCode(parentTranCode);
-		
+
 		boolean isFinished = lM040Report.exec(titaVo);
-		
-		if (isFinished)
-		{
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "LM040地區別正常戶金額已完成", titaVo);
-		} else
-		{
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "LM040地區別正常戶金額無資料", titaVo);
+
+		if (isFinished) {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM040地區別正常戶金額已完成", titaVo);
+		} else {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM040地區別正常戶金額無資料", titaVo);
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

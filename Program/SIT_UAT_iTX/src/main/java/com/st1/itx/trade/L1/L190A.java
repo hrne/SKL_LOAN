@@ -38,7 +38,7 @@ public class L190A extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	@Autowired
 	public CdBcmService iCdBcmService;
 
@@ -53,42 +53,42 @@ public class L190A extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 400; // 124 * 400 = 52000
-		
+
 		String iCenterCode = titaVo.getParam("CenterCode");
 		String iEmployeeNo = titaVo.getParam("EmployeeNo");
 		String iFullname = titaVo.getParam("EmployeeNoX");
 		String iAgCurInd = titaVo.getParam("AgCurInd");
 		Slice<CdEmp> slCdEmp = null;
-		if(iAgCurInd.equals("")) {
-			//查全部
-			if(!iCenterCode.equals("")) {
-				slCdEmp = sCdEmpService.findCenterCode(iCenterCode,this.index, this.limit,titaVo);
-			}else if (!iEmployeeNo.equals("")) {
-				slCdEmp = sCdEmpService.findEmployeeNo(iEmployeeNo,iEmployeeNo,this.index, this.limit,titaVo);
-			}else if (!iFullname.equals("")) {
-				slCdEmp = sCdEmpService.findFullnameLike(iFullname+ "%",this.index,this.limit,titaVo);
-			}else {
+		if (iAgCurInd.equals("")) {
+			// 查全部
+			if (!iCenterCode.equals("")) {
+				slCdEmp = sCdEmpService.findCenterCode(iCenterCode, this.index, this.limit, titaVo);
+			} else if (!iEmployeeNo.equals("")) {
+				slCdEmp = sCdEmpService.findEmployeeNo(iEmployeeNo, iEmployeeNo, this.index, this.limit, titaVo);
+			} else if (!iFullname.equals("")) {
+				slCdEmp = sCdEmpService.findFullnameLike(iFullname + "%", this.index, this.limit, titaVo);
+			} else {
 				slCdEmp = sCdEmpService.EmployeeNoLike(iEmployeeNo.trim() + "%", this.index, this.limit, titaVo);
 			}
-		}else {
-			if(!iCenterCode.equals("")) {
-				slCdEmp = sCdEmpService.findCenterCodeAndAgCurInd(iCenterCode,iAgCurInd,this.index, this.limit,titaVo);
-			}else if (!iEmployeeNo.equals("")) {
-				slCdEmp = sCdEmpService.findEmployeeNoAndAgCurInd(iEmployeeNo,iEmployeeNo,iAgCurInd,this.index, this.limit,titaVo);
-			}else if (!iFullname.equals("")) {
-				slCdEmp = sCdEmpService.findFullnameLikeAndAgCurInd(iFullname+ "%",iAgCurInd,this.index,this.limit,titaVo);
-			}else {
-				slCdEmp = sCdEmpService.EmployeeNoLikeAndAgCurInd(iEmployeeNo.trim() + "%", iAgCurInd,this.index, this.limit, titaVo);
+		} else {
+			if (!iCenterCode.equals("")) {
+				slCdEmp = sCdEmpService.findCenterCodeAndAgCurInd(iCenterCode, iAgCurInd, this.index, this.limit, titaVo);
+			} else if (!iEmployeeNo.equals("")) {
+				slCdEmp = sCdEmpService.findEmployeeNoAndAgCurInd(iEmployeeNo, iEmployeeNo, iAgCurInd, this.index, this.limit, titaVo);
+			} else if (!iFullname.equals("")) {
+				slCdEmp = sCdEmpService.findFullnameLikeAndAgCurInd(iFullname + "%", iAgCurInd, this.index, this.limit, titaVo);
+			} else {
+				slCdEmp = sCdEmpService.EmployeeNoLikeAndAgCurInd(iEmployeeNo.trim() + "%", iAgCurInd, this.index, this.limit, titaVo);
 			}
 		}
 		List<CdEmp> lCdEmp = slCdEmp == null ? null : slCdEmp.getContent();
 		if (lCdEmp == null || lCdEmp.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "員工資料檔"); // 查無資料
 		}
-		
+
 		// 查詢員工資料檔檔
-		this.info("slCdEmp===="+lCdEmp);
-		
+		this.info("slCdEmp====" + lCdEmp);
+
 		// 如有找到資料
 		for (CdEmp tCdEmp : slCdEmp) {
 			OccursList occursList = new OccursList();
@@ -96,29 +96,29 @@ public class L190A extends TradeBuffer {
 			CdBcm sCdBcm = new CdBcm();
 			String xCenterCode = "";
 			xCenterCode = tCdEmp.getCenterCode();
-			xCdBcm = iCdBcmService.findUnitCode(xCenterCode,xCenterCode,0,Integer.MAX_VALUE, titaVo);
-			if(xCdBcm!=null) {
+			xCdBcm = iCdBcmService.findUnitCode(xCenterCode, xCenterCode, 0, Integer.MAX_VALUE, titaVo);
+			if (xCdBcm != null) {
 				sCdBcm = xCdBcm.getContent().get(0);
 			}
 			occursList.putParam("OOEmployeeNo", tCdEmp.getEmployeeNo());
 			occursList.putParam("OOAgentId", tCdEmp.getAgentId());
 			occursList.putParam("OOFullname", tCdEmp.getFullname());
 			occursList.putParam("OOCenterCode", tCdEmp.getCenterCode());
-			if (sCdBcm!=null) {
+			if (sCdBcm != null) {
 				occursList.putParam("OOCenterCodeName", sCdBcm.getUnitItem());
-			}else {
+			} else {
 				occursList.putParam("OOCenterCodeName", "");
 			}
 			occursList.putParam("OOCommLineType", tCdEmp.getAgStatusCode());
 			occursList.putParam("OOAgCurInd", tCdEmp.getAgCurInd());
-			//固定
+			// 固定
 			if (tCdEmp.getLastUpdate() == null || tCdEmp.getLastUpdate().toString().equals("")) {
-				occursList.putParam("OODataDate","");
-			}else {
+				occursList.putParam("OODataDate", "");
+			} else {
 				String taU = tCdEmp.getLastUpdate().toString();
-				String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0,10).replace("-", ""))-19110000), 7,'0');
-				uaDate = uaDate.substring(0,3)+"/"+uaDate.substring(3, 5)+"/"+uaDate.substring(5);
-				occursList.putParam("OODataDate",uaDate);
+				String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+				uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
+				occursList.putParam("OODataDate", uaDate);
 			}
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

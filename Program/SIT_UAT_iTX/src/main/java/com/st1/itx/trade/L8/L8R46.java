@@ -12,7 +12,6 @@ import com.st1.itx.db.domain.JcicZ450;
 import com.st1.itx.db.service.JcicZ450Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
-
 @Service("L8R46")
 @Scope("prototype")
 /**
@@ -32,7 +31,7 @@ public class L8R46 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ450 iJcicZ450 = new JcicZ450();
 		iJcicZ450 = iJcicZ450Service.ukeyFirst(iUkey, titaVo);
-	
+
 		if (iJcicZ450 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
 		} else {
@@ -42,10 +41,10 @@ public class L8R46 extends TradeBuffer {
 			totaVo.putParam("L8r46ApplyDate", iJcicZ450.getApplyDate());
 			totaVo.putParam("L8r46CourtCode", iJcicZ450.getCourtCode());
 			totaVo.putParam("L8r46PayDate", iJcicZ450.getPayDate());
-			totaVo.putParam("L8r46PayAmt",iJcicZ450.getPayAmt());
-			totaVo.putParam("L8r46SumRepayActualAmt",iJcicZ450.getSumRepayActualAmt());
-			totaVo.putParam("L8r46SumRepayShouldAmt",iJcicZ450.getSumRepayShouldAmt());
-			totaVo.putParam("L8r46PayStatus",iJcicZ450.getPayStatus());
+			totaVo.putParam("L8r46PayAmt", iJcicZ450.getPayAmt());
+			totaVo.putParam("L8r46SumRepayActualAmt", iJcicZ450.getSumRepayActualAmt());
+			totaVo.putParam("L8r46SumRepayShouldAmt", iJcicZ450.getSumRepayShouldAmt());
+			totaVo.putParam("L8r46PayStatus", iJcicZ450.getPayStatus());
 			totaVo.putParam("L8r46OutJcicTxtDate", iJcicZ450.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);

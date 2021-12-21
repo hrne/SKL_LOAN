@@ -105,10 +105,10 @@ public class L2411 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
-	
+
 	@Autowired
-	public CheckClEva sCheckClEva ;
-	
+	public CheckClEva sCheckClEva;
+
 	/* DB服務注入 */
 	@Autowired
 	public ClParkingTypeService sClParkingTypeService;
@@ -227,7 +227,7 @@ public class L2411 extends TradeBuffer {
 				if (this.isEloan) {
 					iFunCd = 2;
 					// 新增擔保品重評資料
-					sCheckClEva.setClEva(titaVo,iClNo);
+					sCheckClEva.setClEva(titaVo, iClNo);
 				} else {
 					iFunCd = 2;
 					if (iClCode1 == 1) {
@@ -1074,7 +1074,7 @@ public class L2411 extends TradeBuffer {
 			result += AreaItem;
 		}
 		if (!Road.isEmpty()) {
-			result += Road ;
+			result += Road;
 		}
 		if (!Section.isEmpty()) {
 			result += Section + "段";
@@ -1100,5 +1100,5 @@ public class L2411 extends TradeBuffer {
 		this.info("L2415 getBdLocation result = " + result);
 		return result;
 	}
-	
+
 }

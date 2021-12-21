@@ -147,7 +147,7 @@ public class L4943 extends TradeBuffer {
 					tempVo = tempVo.getVo(result.get("JsonFields"));
 					String returnCode = result.get("ReturnCode");
 					String mediaKind = result.get("MediaKind");
-					String amlRsp  = result.get("AmlRsp");
+					String amlRsp = result.get("AmlRsp");
 					if (acDate > 0) {
 						if (tempVo.get("ProcStsCode") != null && tempVo.get("ProcStsCode").length() > 0) {
 							procNote = procStsCodeX(tempVo.get("ProcStsCode"), titaVo);

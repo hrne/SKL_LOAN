@@ -103,8 +103,7 @@ public class LM057Report extends MakeReport {
 
 		yearMon = Integer.valueOf(titaVo.get("ENTDY")) / 100;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM057", "表14-5、14-6會計部申報表",
-				"LM057-表14-5、14-6_會計部申報表", "LM057_底稿_表14-5、14-6_會計部申報表.xlsx", "14-5申報表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM057", "表14-5、14-6會計部申報表", "LM057-表14-5、14-6_會計部申報表", "LM057_底稿_表14-5、14-6_會計部申報表.xlsx", "14-5申報表");
 
 		try {
 
@@ -127,7 +126,7 @@ public class LM057Report extends MakeReport {
 		exportExcel14_6();
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 //	private void reportData(List<Map<String, String>> listData, List<Map<String, String>> listData2)

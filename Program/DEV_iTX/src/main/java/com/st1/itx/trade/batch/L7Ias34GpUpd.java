@@ -48,7 +48,7 @@ public class L7Ias34GpUpd extends BatchBase implements Tasklet, InitializingBean
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-		//int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
 
 		String empNo = titaVo.getTlrNo();
 

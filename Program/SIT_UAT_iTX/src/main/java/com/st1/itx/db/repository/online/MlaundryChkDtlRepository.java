@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,16 @@ import com.st1.itx.db.domain.MlaundryChkDtlId;
  */
 public interface MlaundryChkDtlRepository extends JpaRepository<MlaundryChkDtl, MlaundryChkDtlId> {
 
-  // EntryDate >= ,AND EntryDate <= 
-  public Slice<MlaundryChkDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscFactorAscCustNoAscDtlSeqAsc(int entryDate_0, int entryDate_1, Pageable pageable);
+	// EntryDate >= ,AND EntryDate <=
+	public Slice<MlaundryChkDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscFactorAscCustNoAscDtlSeqAsc(int entryDate_0, int entryDate_1, Pageable pageable);
 
-  // EntryDate >= ,AND EntryDate <= ,AND Factor =
-  public Slice<MlaundryChkDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsOrderByEntryDateAscCustNoAscDtlSeqAsc(int entryDate_0, int entryDate_1, int factor_2, Pageable pageable);
+	// EntryDate >= ,AND EntryDate <= ,AND Factor =
+	public Slice<MlaundryChkDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsOrderByEntryDateAscCustNoAscDtlSeqAsc(int entryDate_0, int entryDate_1, int factor_2,
+			Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MlaundryChkDtl> findByMlaundryChkDtlId(MlaundryChkDtlId mlaundryChkDtlId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MlaundryChkDtl> findByMlaundryChkDtlId(MlaundryChkDtlId mlaundryChkDtlId);
 
 }
-

@@ -2,7 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +47,7 @@ public class L8110Batch extends TradeBuffer {
 		dateUtil.setDate_1(iDate);
 		dateUtil.setYears(-5);
 		int iDate5Y = dateUtil.getCalenderDay();
-		
+
 		try {
 			l8110ServiceImpl.deleteAll(titaVo);
 		} catch (Exception e) {
@@ -57,11 +56,11 @@ public class L8110Batch extends TradeBuffer {
 		this.batchTransaction.commit();
 
 		try {
-			l8110ServiceImpl.insertAll(iDate + 19110000, iDate3Y+ 19110000, iDate5Y+ 19110000, 25000000, titaVo);
+			l8110ServiceImpl.insertAll(iDate + 19110000, iDate3Y + 19110000, iDate5Y + 19110000, 25000000, titaVo);
 		} catch (Exception e) {
 			throw new LogicException("E0015", ", " + e.getMessage()); // 檢查錯誤
 		}
-		
+
 		this.batchTransaction.commit();
 
 		return null;

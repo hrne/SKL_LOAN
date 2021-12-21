@@ -190,8 +190,7 @@ public class L9701Report extends MakeReport {
 				detailCounts = 0;
 
 				if (tL9701Vo.get("F15").equals("2")) {
-					BigDecimal unpaidLoanBal = tL9701Vo.get("F1") == null ? BigDecimal.ZERO
-							: new BigDecimal(tL9701Vo.get("F1"));
+					BigDecimal unpaidLoanBal = tL9701Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(tL9701Vo.get("F1"));
 
 					if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
 						detailCounts = 1;
@@ -260,8 +259,7 @@ public class L9701Report extends MakeReport {
 			if (tBaTxVo.getFacmNo() == Integer.valueOf(this.facmNo)) {
 				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPayIntDate() <= entday) {
 					this.print(1, 29, formatAmt(tBaTxVo.getAmount(), 0), "R"); // 計息本金
-					this.print(0, 31,
-							showRocDate(tBaTxVo.getIntStartDate(), 3) + "-" + showRocDate(tBaTxVo.getIntEndDate(), 3)); // 計息期間
+					this.print(0, 31, showRocDate(tBaTxVo.getIntStartDate(), 3) + "-" + showRocDate(tBaTxVo.getIntEndDate(), 3)); // 計息期間
 					this.print(0, 54, formatAmt(tBaTxVo.getIntRate(), 4), "R"); // 利率
 					this.print(0, 67, formatAmt(tBaTxVo.getInterest(), 0), "R"); // 利息
 					this.print(0, 82, formatAmt(tBaTxVo.getDelayInt(), 0), "R"); // 逾期息
@@ -290,8 +288,7 @@ public class L9701Report extends MakeReport {
 
 						if (tBaTxVo.getReceivableFlag() == 4) {
 
-							shortInt = shortInt
-									.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
+							shortInt = shortInt.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
 							shortPrin = shortPrin.add(tBaTxVo.getPrincipal());
 
 						} else {
@@ -305,8 +302,7 @@ public class L9701Report extends MakeReport {
 					} else if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPayIntDate() <= entday) {
 
 						repaidPrin = repaidPrin.add(tBaTxVo.getPrincipal());
-						repaidInt = repaidInt
-								.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
+						repaidInt = repaidInt.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
 
 					}
 				}
@@ -317,8 +313,7 @@ public class L9701Report extends MakeReport {
 	}
 
 	private void printLine() {
-		if (loanBal.add(shortInt).add(shortPrin).add(overflow).add(repaidPrin).add(repaidInt).add(repaidExp)
-				.compareTo(BigDecimal.ZERO) == 0) {
+		if (loanBal.add(shortInt).add(shortPrin).add(overflow).add(repaidPrin).add(repaidInt).add(repaidExp).compareTo(BigDecimal.ZERO) == 0) {
 			return;
 		}
 

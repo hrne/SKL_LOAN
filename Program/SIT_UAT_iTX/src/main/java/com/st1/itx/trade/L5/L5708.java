@@ -120,11 +120,11 @@ public class L5708 extends TradeBuffer {
 		this.info("L5708 lNegAppr01!=null titaVo.isHcodeNormal()=[" + titaVo.isHcodeNormal() + "]");
 		if (titaVo.isHcodeNormal()) {
 			// 正向交易
-			
+
 			if (lNegAppr01 != null && lNegAppr01.size() != 0) {
 //				List<String[]> lTempData=new ArrayList<String[]>();
 //				List<String> lKey=new ArrayList<String>();
-				
+
 				List<NegTransId> DistinctNegTransId = new ArrayList<NegTransId>();
 				for (NegAppr01 NegAppr01VO : lNegAppr01) {
 					NegTransId NegTransIdVO = new NegTransId();
@@ -141,14 +141,14 @@ public class L5708 extends TradeBuffer {
 				for (NegTransId NegTransIdVO : DistinctNegTransId) {
 					NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO);
 					if (NegTransVO != null) {
-						
+
 						NegMainId NegMainIdVO = new NegMainId();
 						NegMainIdVO.setCaseSeq(NegTransVO.getCaseSeq());
 						NegMainIdVO.setCustNo(NegTransVO.getCustNo());
 
 						NegMain NegMainVO = sNegMainService.findById(NegMainIdVO);
 						if (NegMainVO != null) {
-							
+
 							String IsMainFin = NegMainVO.getIsMainFin();
 							if (("Y").equals(IsMainFin)) {
 								// 最大債權
@@ -189,7 +189,7 @@ public class L5708 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0006", "債務協商交易檔");
 					}
 				}
-				
+
 				if (DistinctCustNo != null && DistinctCustNo.size() != 0) {
 					for (int CustNo : DistinctCustNo.keySet()) {
 						BigDecimal ApprAmt = DistinctCustNo.get(CustNo);
@@ -197,7 +197,7 @@ public class L5708 extends TradeBuffer {
 						// 經辦登帳非訂正交易
 						if (this.txBuffer.getTxCom().isBookAcYes()) {
 							List<AcDetail> acDetailList = new ArrayList<AcDetail>();
-							
+
 							/* 借：債協暫收款－抵繳款 */
 							AcDetail acDetail = new AcDetail();
 							acDetail.setDbCr("D");
@@ -205,7 +205,7 @@ public class L5708 extends TradeBuffer {
 							acDetail.setTxAmt(ApprAmt); // 金額
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
-							
+
 							/* 貸：應付代收款 */
 							acDetail = new AcDetail();
 							acDetail.setDbCr("C");
@@ -231,15 +231,15 @@ public class L5708 extends TradeBuffer {
 							acDetailList.add(acDetail);
 
 							this.txBuffer.addAllAcDetailList(acDetailList);
-							
+
 							/* 產生會計分錄 */
 							acDetailCom.setTxBuffer(this.txBuffer);
 							acDetailCom.run(titaVo);
-							
+
 						}
 					}
 				}
-				
+
 			} else {
 				// E2003 查無資料
 				throw new LogicException(titaVo, "E2003", "最大債權撥付資料檔");

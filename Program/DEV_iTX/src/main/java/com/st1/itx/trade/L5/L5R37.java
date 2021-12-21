@@ -40,7 +40,7 @@ public class L5R37 extends TradeBuffer {
 
 	@Autowired
 	public PfDetailService pfDetailService;
-	
+
 	@Autowired
 	public PfRewardMediaService pfRewardMediaService;
 
@@ -53,7 +53,7 @@ public class L5R37 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService custMainService;
-	
+
 	@Autowired
 	CdWorkMonthService cdWorkMonthService;
 
@@ -84,20 +84,19 @@ public class L5R37 extends TradeBuffer {
 			Slice<PfDetail> slPfDetail = pfDetailService.FindByBormNo(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, titaVo);
 			List<PfDetail> lPfDetail = slPfDetail == null ? null : slPfDetail.getContent();
 			if (lPfDetail == null || lPfDetail.size() == 0) {
-				throw new LogicException(titaVo, "E0001", "業績資料"); 
+				throw new LogicException(titaVo, "E0001", "業績資料");
 			}
 			for (PfDetail pfDetail : lPfDetail) {
 				if (pfDetail.getRepayType() != 0 || pfDetail.getDrawdownAmt().compareTo(BigDecimal.ZERO) == 0) {
 					continue;
 				}
-				
-				if ((bonusType == 1 || bonusType == 7)&& "".equals(pfDetail.getIntroducer())) {
-					throw new LogicException(titaVo, "E0001", "無介紹人資料"); 
+
+				if ((bonusType == 1 || bonusType == 7) && "".equals(pfDetail.getIntroducer())) {
+					throw new LogicException(titaVo, "E0001", "無介紹人資料");
 				}
 				if (bonusType == 5 && "".equals(pfDetail.getCoorgnizer())) {
-					throw new LogicException(titaVo, "E0001", "無協辦人員資料"); 
+					throw new LogicException(titaVo, "E0001", "無協辦人員資料");
 				}
-
 
 				this.totaVo.putParam("BonusNo", 0);
 				CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(pfDetail.getPerfDate() + 19110000, pfDetail.getPerfDate() + 19110000, titaVo);
@@ -108,9 +107,8 @@ public class L5R37 extends TradeBuffer {
 				this.totaVo.putParam("BonusType", bonusType);
 				this.totaVo.putParam("PerfDate", pfDetail.getPerfDate());
 				this.totaVo.putParam("CustNo", pfDetail.getCustNo());
-				
-				CustMain custMain = custMainService.custNoFirst(pfDetail.getCustNo(),
-						pfDetail.getCustNo(), titaVo);
+
+				CustMain custMain = custMainService.custNoFirst(pfDetail.getCustNo(), pfDetail.getCustNo(), titaVo);
 				if (custMain == null) {
 					throw new LogicException("E0001", "客戶資料");
 				}
@@ -135,7 +133,7 @@ public class L5R37 extends TradeBuffer {
 				this.totaVo.putParam("AdjustBonus", 0);
 				this.totaVo.putParam("AdjustBonusDate", 0);
 				this.totaVo.putParam("ProdCode", pfDetail.getProdCode());
-				
+
 				FacProd facProd = facProdService.findById(pfDetail.getProdCode(), titaVo);
 				if (facProd == null) {
 					this.totaVo.putParam("ProdName", pfDetail.getProdCode());
@@ -152,7 +150,7 @@ public class L5R37 extends TradeBuffer {
 				this.totaVo.putParam("ManualFg", 1);
 				this.totaVo.putParam("LastUpdate", "");
 				this.totaVo.putParam("LastEmpName", "");
-				
+
 				PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(pfDetail.getCustNo(), pfDetail.getFacmNo(), pfDetail.getBormNo(), bonusType, titaVo);
 				if (pfRewardMedia != null) {
 					String s = "";
@@ -169,12 +167,12 @@ public class L5R37 extends TradeBuffer {
 //					this.addList(msgTotaVo);
 //					throw new LogicException("E0002","獎金資料");
 				}
-				
+
 				break;
 			}
 		} else {
 			long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
-			
+
 			PfRewardMedia pfRewardMedia = pfRewardMediaService.findById(iBonusNo, titaVo);
 
 			if (pfRewardMedia == null) {
@@ -255,8 +253,7 @@ public class L5R37 extends TradeBuffer {
 					}
 
 					if (pfRewardMedia.getBonusType() != 6) {
-						CustMain custMain = custMainService.custNoFirst(pfRewardMedia.getCustNo(),
-								pfRewardMedia.getCustNo(), titaVo);
+						CustMain custMain = custMainService.custNoFirst(pfRewardMedia.getCustNo(), pfRewardMedia.getCustNo(), titaVo);
 						if (custMain == null) {
 							throw new LogicException("E0001", "客戶資料");
 						}

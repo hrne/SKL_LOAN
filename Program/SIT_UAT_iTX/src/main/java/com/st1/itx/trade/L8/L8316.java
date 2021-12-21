@@ -85,7 +85,7 @@ public class L8316 extends TradeBuffer {
 		String iCaseStatus = titaVo.getParam("CaseStatus");// 案件狀態
 		int iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate"));// 裁定日期
 		String iCourtCode = titaVo.getParam("CourtCode");// 承審法院代碼
-		int iYear = Integer.valueOf(titaVo.getParam("Year"))+1911;
+		int iYear = Integer.valueOf(titaVo.getParam("Year")) + 1911;
 		String iCourtDiv = titaVo.getParam("CourtDiv");
 		String iCourtCaseNo = titaVo.getParam("CourtCaseNo");
 		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
@@ -118,8 +118,7 @@ public class L8316 extends TradeBuffer {
 
 				// 1 start 案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」
 				if ("3".equals(iCaseStatus)) {
-					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId,
-							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ055 == null) {
 						if ("A".equals(iTranKey)) {
 							throw new LogicException("E0005", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」 .");
@@ -145,8 +144,7 @@ public class L8316 extends TradeBuffer {
 
 				// 2 start 案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」
 				if ("4".equals(iCaseStatus) || "5".equals(iCaseStatus)) {
-					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId,
-							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ055 == null) {
 						if ("A".equals(iTranKey)) {
 							throw new LogicException("E0005", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
@@ -162,11 +160,9 @@ public class L8316 extends TradeBuffer {
 						}
 						if (flagCaseStatus == 0) {
 							if ("A".equals(iTranKey)) {
-								throw new LogicException("E0005",
-										"案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+								throw new LogicException("E0005", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
 							} else {
-								throw new LogicException("E0007",
-										"案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+								throw new LogicException("E0007", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
 							}
 						}
 					}

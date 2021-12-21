@@ -61,8 +61,7 @@ public class L2R37 extends TradeBuffer {
 
 		this.info("iRvNo = " + iRvNo);
 
-		AcReceivable tAcReceivable = acReceivableService.findById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo),
-				titaVo);
+		AcReceivable tAcReceivable = acReceivableService.findById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo), titaVo);
 
 		if (tAcReceivable == null) {
 			switch (iFunCd) {
@@ -90,9 +89,9 @@ public class L2R37 extends TradeBuffer {
 		TempVo tTempVo = new TempVo();
 		tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
 
-		int CreateDate = parse.stringToInteger((String.valueOf(tAcReceivable.getCreateDate().toString().substring(0, 4)
-				+ tAcReceivable.getCreateDate().toString().substring(5, 7)
-				+ tAcReceivable.getCreateDate().toString().substring(8, 10)))) - 19110000;
+		int CreateDate = parse.stringToInteger((String.valueOf(
+				tAcReceivable.getCreateDate().toString().substring(0, 4) + tAcReceivable.getCreateDate().toString().substring(5, 7) + tAcReceivable.getCreateDate().toString().substring(8, 10))))
+				- 19110000;
 
 		String CreateTime = tAcReceivable.getCreateDate().toString().substring(11, 19);
 

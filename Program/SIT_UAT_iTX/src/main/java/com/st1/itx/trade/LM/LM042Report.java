@@ -49,23 +49,23 @@ public class LM042Report extends MakeReport {
 		List<Map<String, String>> LM042List = null;
 		exportExcel(titaVo, LM042List);
 		makeExcel.setSheet("10804RBC", String.valueOf(ym) + "RBC");
-		
+
 		makeExcel.setSheet("明細表");
 		List<Map<String, String>> LM042List1 = null;
 		exportExcel1(titaVo, LM042List1);
-		
+
 		makeExcel.setSheet("RBC工作表");
 		List<Map<String, String>> LM042List2 = null;
 		exportExcel2(titaVo, LM042List2);
-		
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
-		
-		if(LDList == null) {
+
+		if (LDList == null) {
 			makeExcel.setValue(6, 3, "本日無資料");
 		}
 //		makeExcel.setValue(5,1,"測試帳號");
@@ -97,17 +97,18 @@ public class LM042Report extends MakeReport {
 //			i++;
 //		}
 
-		
 	}
+
 	private void exportExcel1(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
-		if(LDList == null) {
+		if (LDList == null) {
 			makeExcel.setValue(5, 3, "本日無資料");
 		}
 	}
+
 	private void exportExcel2(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
-		if(LDList == null) {
+		if (LDList == null) {
 			makeExcel.setValue(6, 3, "本日無資料");
 		}
 	}

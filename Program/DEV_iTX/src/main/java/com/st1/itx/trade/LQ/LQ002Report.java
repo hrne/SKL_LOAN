@@ -22,7 +22,8 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LQ002Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LQ002Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LQ002Report.class);
 
 	@Autowired
 	LQ002ServiceImpl LQ002ServiceImpl;
@@ -66,8 +67,7 @@ public class LQ002Report extends MakeReport {
 	private void exportExcel_1(TitaVo titaVo, int year, int month, int qq) throws LogicException {
 		this.info("===========in exportExcel_1");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ002", "營建署季報貸款成數", "LQ002營建署季報貸款成數",
-				"營建署季報-貸款成數結果.xls", "108年第3季營建署季報-貸款成數明細");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ002", "營建署季報貸款成數", "LQ002營建署季報貸款成數", "營建署季報-貸款成數結果.xls", "108年第3季營建署季報-貸款成數明細");
 
 		makeExcel.setSheet("108年第3季營建署季報-貸款成數明細", year + "年第" + qq + "季營建署季報-貸款成數明細");
 
@@ -106,53 +106,43 @@ public class LQ002Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : findList) {
 				// 押品別1
-				BigDecimal f0 = tLDVo.get("F0") == null || tLDVo.get("F1").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F0"));
+				BigDecimal f0 = tLDVo.get("F0") == null || tLDVo.get("F1").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0"));
 				makeExcel.setValue(i, 1, f0.intValue(), "C");
 
 				// 押品別2
-				BigDecimal f1 = tLDVo.get("F1") == null || tLDVo.get("F1").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F1"));
+				BigDecimal f1 = tLDVo.get("F1") == null || tLDVo.get("F1").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
 				makeExcel.setValue(i, 2, f1.intValue(), "C");
 
 				// 押品號碼
-				BigDecimal f2 = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F2"));
+				BigDecimal f2 = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 				makeExcel.setValue(i, 3, f2.intValue(), "C");
 
 				// 地區
-				BigDecimal f3 = tLDVo.get("F3") == null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F3"));
+				BigDecimal f3 = tLDVo.get("F3") == null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3"));
 				makeExcel.setValue(i, 4, f3.intValue(), "C");
 
 				// 核准額度
-				BigDecimal f4 = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F4"));
+				BigDecimal f4 = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4"));
 				makeExcel.setValue(i, 5, f4.intValue(), "#,##0", "R");
 
 				// 戶號
-				BigDecimal f5 = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F5"));
+				BigDecimal f5 = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F5"));
 				makeExcel.setValue(i, 6, f5.intValue(), "C");
 
 				// 額度
-				BigDecimal f6 = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F6"));
+				BigDecimal f6 = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F6"));
 				makeExcel.setValue(i, 7, f6.intValue(), "C");
 
 				// 首次撥款日
-				BigDecimal f7 = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F7"));
+				BigDecimal f7 = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F7"));
 				makeExcel.setValue(i, 8, f7.intValue(), "C");
 
 				// 評估淨值
-				BigDecimal f8 = tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F8"));
+				BigDecimal f8 = tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F8"));
 				makeExcel.setValue(i, 9, f8.intValue(), "#,##0", "R");
 
 				// 貸款成數
-				BigDecimal f9 = tLDVo.get("F9") == null || tLDVo.get("F9").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F9"));
+				BigDecimal f9 = tLDVo.get("F9") == null || tLDVo.get("F9").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F9"));
 				makeExcel.setValue(i, 10, f9.doubleValue(), "R");
 				ltv = ltv + f9.doubleValue();
 
@@ -193,7 +183,7 @@ public class LQ002Report extends MakeReport {
 
 				}
 			}
-			//總貸放程術/
+			// 總貸放程術/
 			totalLTV = new BigDecimal(ltv / count);
 		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
@@ -238,13 +228,11 @@ public class LQ002Report extends MakeReport {
 				makeExcel.setValue(i, 2, tLDVo.get("F0"), "C");
 
 				// 地區別代號
-				BigDecimal f1 = tLDVo.get("F1") == null || tLDVo.get("F1").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F1"));
+				BigDecimal f1 = tLDVo.get("F1") == null || tLDVo.get("F1").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
 				makeExcel.setValue(i, 3, f1.intValue(), "R");
 
 				// 平均值 的貸款成數
-				BigDecimal f2 = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F2"));
+				BigDecimal f2 = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 				makeExcel.setValue(i, 4, f2.doubleValue(), "R");
 				total = total.add(f2);
 				i++;

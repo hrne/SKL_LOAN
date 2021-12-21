@@ -19,7 +19,8 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LP001Report2 extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LP001Report2.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LP001Report2.class);
 
 	@Autowired
 	public LP001ServiceImpl LP001ServiceImpl;

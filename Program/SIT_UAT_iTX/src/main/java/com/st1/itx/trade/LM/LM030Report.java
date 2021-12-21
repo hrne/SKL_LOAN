@@ -31,7 +31,7 @@ public class LM030Report extends MakeReport {
 
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -62,52 +62,51 @@ public class LM030Report extends MakeReport {
 		makeExcel.setSheet("11005", yy + mm);
 		makeExcel.setValue(1, 1, yy + "." + mm + "  轉催收明細總表");
 		BigDecimal total = BigDecimal.ZERO;
-		
+
 		int row = 3;
-		
+
 		if (listLM030 == null || listLM030.isEmpty()) {
 			makeExcel.setValue(3, 1, "本日無資料");
-		} else
-		{
-		for (Map<String, String> tLDVo : listLM030) {
+		} else {
+			for (Map<String, String> tLDVo : listLM030) {
 
-			String value = "";
-			int col = 0;
-			for (int i = 0; i <= 11; i++) {
+				String value = "";
+				int col = 0;
+				for (int i = 0; i <= 11; i++) {
 
-				value = tLDVo.get("F" + i);
-				col++;
-				switch (i) {
-				case 5:
-				case 10:
-				case 11:
-					makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
-					break;
-				case 6:
-				case 7:
-					// 金額
-					BigDecimal bd = getBigDecimal(value);
-					makeExcel.setValue(row, col, bd, "#,##0");
-					total = total.add(bd);
-					break;
-				case 8:
-					// 利率
-					makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000");
-					break;
-				case 9:
-					makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
-					break;
-				default:
-					makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToBigDecimal(value) : value);
-					break;
-				}
+					value = tLDVo.get("F" + i);
+					col++;
+					switch (i) {
+					case 5:
+					case 10:
+					case 11:
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
+						break;
+					case 6:
+					case 7:
+						// 金額
+						BigDecimal bd = getBigDecimal(value);
+						makeExcel.setValue(row, col, bd, "#,##0");
+						total = total.add(bd);
+						break;
+					case 8:
+						// 利率
+						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000");
+						break;
+					case 9:
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
+						break;
+					default:
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToBigDecimal(value) : value);
+						break;
+					}
+				} // for
+				row++;
 			} // for
-			row++;
-		} // for
 		}
-		
+
 		row += 10;
-		
+
 		// block 1
 		makeExcel.setFontType(1);
 		makeExcel.setSize(14);
@@ -138,9 +137,9 @@ public class LM030Report extends MakeReport {
 		makeExcel.setValue(row + 5, 1, "一、李案為年期延長後再協議案件，因未符合免列報逾放條件，故轉列催收款項。");
 		makeExcel.setValue(row + 13, 5, listLM030.size());
 		makeExcel.setValue(row + 13, 7, total, "#,##0");
-		
+
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 }

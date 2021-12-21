@@ -67,8 +67,7 @@ public class BS902 extends TradeBuffer {
 		// find data
 		// SL 聯貸費用
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 6, "SL" + "%", 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 6, "SL" + "%", 0, Integer.MAX_VALUE, titaVo);
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
 		// data size > 0 -> 新增應處理明細

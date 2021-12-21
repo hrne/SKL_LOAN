@@ -67,7 +67,7 @@ public class L618C extends TradeBuffer {
 
 	@Autowired
 	public DataLog dataLog;
-	
+
 	private String iItemCode;
 	private int iCustNo;
 	private int iFacmNo;
@@ -137,9 +137,9 @@ public class L618C extends TradeBuffer {
 		// update 法拍費檔
 		ForeclosureFee tForeclosureFee = new ForeclosureFee();
 		tForeclosureFee = sForeclosureFeeService.holdById(Integer.valueOf(iRvNo));
-		
-		ForeclosureFee tForeclosureFee2 = (ForeclosureFee) dataLog.clone(tForeclosureFee); //異動前資料
-		
+
+		ForeclosureFee tForeclosureFee2 = (ForeclosureFee) dataLog.clone(tForeclosureFee); // 異動前資料
+
 		if (titaVo.isHcodeNormal()) {
 			tForeclosureFee.setOverdueDate(this.txBuffer.getTxCom().getTbsdy());
 		} else {
@@ -153,7 +153,7 @@ public class L618C extends TradeBuffer {
 
 		dataLog.setEnv(titaVo, tForeclosureFee2, tForeclosureFee); ////
 		dataLog.exec(); ////
-		
+
 		// 放款交易內容檔
 		if (titaVo.isHcodeNormal()) {
 			addLoanBorTxRoutine(titaVo);

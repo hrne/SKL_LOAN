@@ -32,22 +32,21 @@ public class L8R36 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ573 iJcicZ573 = new JcicZ573();
 		iJcicZ573 = iJcicZ573Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ573 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
-			totaVo.putParam("L8r36TranKey",iJcicZ573.getTranKey());
-			totaVo.putParam("L8r36CustId" ,iJcicZ573.getCustId());
-			totaVo.putParam("L8r36SubmitKey",iJcicZ573.getSubmitKey());
-			totaVo.putParam("L8r36ApplyDate",iJcicZ573.getApplyDate());
-			totaVo.putParam("L8r36PayDate",iJcicZ573.getPayDate());
-			totaVo.putParam("L8r36PayAmt",iJcicZ573.getPayAmt());
-			totaVo.putParam("L8r36TotalPayAmt",iJcicZ573.getTotalPayAmt());
+		} else {
+			totaVo.putParam("L8r36TranKey", iJcicZ573.getTranKey());
+			totaVo.putParam("L8r36CustId", iJcicZ573.getCustId());
+			totaVo.putParam("L8r36SubmitKey", iJcicZ573.getSubmitKey());
+			totaVo.putParam("L8r36ApplyDate", iJcicZ573.getApplyDate());
+			totaVo.putParam("L8r36PayDate", iJcicZ573.getPayDate());
+			totaVo.putParam("L8r36PayAmt", iJcicZ573.getPayAmt());
+			totaVo.putParam("L8r36TotalPayAmt", iJcicZ573.getTotalPayAmt());
 			totaVo.putParam("L8r36OutJcicTxtDate", iJcicZ573.getOutJcicTxtDate());
 			totaVo.putParam("L8r36TranKey", iJcicZ573.getTranKey());
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -55,8 +55,8 @@ public class L8R41 extends TradeBuffer {
 			totaVo.putParam("L8r41FinalPayDay", iJcicZ443.getFinalPayDay());
 			totaVo.putParam("L8r41NotyetacQuit", iJcicZ443.getNotyetacQuit());
 			totaVo.putParam("L8r41MothPayDay", iJcicZ443.getMothPayDay());
-			totaVo.putParam("L8r41BeginDate", iJcicZ443.getBeginDate()-191100);
-			totaVo.putParam("L8r41EndDate", iJcicZ443.getEndDate()-191100);
+			totaVo.putParam("L8r41BeginDate", iJcicZ443.getBeginDate() - 191100);
+			totaVo.putParam("L8r41EndDate", iJcicZ443.getEndDate() - 191100);
 			totaVo.putParam("L8r41OutJcicTxtDate", iJcicZ443.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);

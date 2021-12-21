@@ -49,7 +49,7 @@ public class LM015ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               	   		 GROUP BY \"CityGroup\"";
 		sql += "               					 ,\"CityCode\") A";
 		sql += "               ON A.\"CityCode\" = M.\"CityCode\"";
-		// BookValue 
+		// BookValue
 		sql += "               LEFT JOIN \"Ias39IntMethod\" MBV ON MBV.\"YearMonth\" = M.\"YearMonth\"";
 		sql += "                                    			 AND MBV.\"CustNo\" = M.\"CustNo\"";
 		sql += "                                     			 AND MBV.\"FacmNo\" = M.\"FacmNo\"";
@@ -67,7 +67,6 @@ public class LM015ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 }
-
 
 // String sql = "SELECT \"F1\"";
 // sql += "              , \"F2\"";

@@ -40,7 +40,6 @@ public class L4R21 extends TradeBuffer {
 	@Autowired
 	public CustMainService custMainService;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4R21 ");

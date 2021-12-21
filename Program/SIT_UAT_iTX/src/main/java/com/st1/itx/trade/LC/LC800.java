@@ -62,7 +62,7 @@ public class LC800 extends TradeBuffer {
 			}
 
 			// 更改連線日期
-  		    TxBizDate tTxBizDate = proc(titaVo, "ONLINE", iEntday);
+			TxBizDate tTxBizDate = proc(titaVo, "ONLINE", iEntday);
 			proc(titaVo, "NONLINE", String.valueOf(tTxBizDate.getNbsDy()));
 			proc(titaVo, "N2ONLINE", String.valueOf(tTxBizDate.getNnbsDy()));
 

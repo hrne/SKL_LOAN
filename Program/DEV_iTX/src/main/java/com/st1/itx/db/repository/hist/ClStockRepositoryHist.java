@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.ClStockId;
  */
 public interface ClStockRepositoryHist extends JpaRepository<ClStock, ClStockId> {
 
-  // ClCode1 = 
-  public Slice<ClStock> findAllByClCode1Is(int clCode1_0, Pageable pageable);
+	// ClCode1 =
+	public Slice<ClStock> findAllByClCode1Is(int clCode1_0, Pageable pageable);
 
-  // ClCode1 = ,AND ClCode2 = 
-  public Slice<ClStock> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 =
+	public Slice<ClStock> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
 
-  // StockCode = ,AND OwnerCustUKey =
-  public Slice<ClStock> findAllByStockCodeIsAndOwnerCustUKeyIs(String stockCode_0, String ownerCustUKey_1, Pageable pageable);
+	// StockCode = ,AND OwnerCustUKey =
+	public Slice<ClStock> findAllByStockCodeIsAndOwnerCustUKeyIs(String stockCode_0, String ownerCustUKey_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClStock> findByClStockId(ClStockId clStockId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClStock> findByClStockId(ClStockId clStockId);
 
 }
-

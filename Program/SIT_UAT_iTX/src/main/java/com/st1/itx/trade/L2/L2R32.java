@@ -77,7 +77,7 @@ public class L2R32 extends TradeBuffer {
 	int iFacmNo;
 	int iTranDate;
 	int iFunCode;
-	String  iCollectFlag;
+	String iCollectFlag;
 	private BigDecimal oTotal = new BigDecimal(0);
 
 	@Override
@@ -98,7 +98,7 @@ public class L2R32 extends TradeBuffer {
 		iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iTranDate = this.parse.stringToInteger(titaVo.getParam("TranDate"));
 		iFunCode = this.parse.stringToInteger(titaVo.getParam("FunCode"));
-		
+
 		// 2: 補領
 		if (iFunCode == 2) {
 			getCloseBreachAmt(titaVo);

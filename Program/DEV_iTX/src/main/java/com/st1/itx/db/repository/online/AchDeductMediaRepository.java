@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import java.math.BigDecimal;
@@ -23,19 +22,19 @@ import com.st1.itx.db.domain.AchDeductMediaId;
  */
 public interface AchDeductMediaRepository extends JpaRepository<AchDeductMedia, AchDeductMediaId> {
 
-  // AcDate = , AND BatchNo = , AND DetailSeq = 
-  public Optional<AchDeductMedia> findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(int acDate_0, String batchNo_1, int detailSeq_2);
+	// AcDate = , AND BatchNo = , AND DetailSeq =
+	public Optional<AchDeductMedia> findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(int acDate_0, String batchNo_1, int detailSeq_2);
 
-  // CustNo = ,AND FacmNo = ,AND AchRepayCode = ,AND PrevIntDate = ,AND RepayAmt =
-  public Optional<AchDeductMedia> findTopByCustNoIsAndFacmNoIsAndAchRepayCodeIsAndPrevIntDateIsAndRepayAmtIsOrderByMediaDateDesc(int custNo_0, int facmNo_1, String achRepayCode_2, int prevIntDate_3, BigDecimal repayAmt_4);
+	// CustNo = ,AND FacmNo = ,AND AchRepayCode = ,AND PrevIntDate = ,AND RepayAmt =
+	public Optional<AchDeductMedia> findTopByCustNoIsAndFacmNoIsAndAchRepayCodeIsAndPrevIntDateIsAndRepayAmtIsOrderByMediaDateDesc(int custNo_0, int facmNo_1, String achRepayCode_2, int prevIntDate_3,
+			BigDecimal repayAmt_4);
 
-  // MediaDate = , AND MediaKind = 
-  public Slice<AchDeductMedia> findAllByMediaDateIsAndMediaKindIsOrderByMediaSeqAsc(int mediaDate_0, String mediaKind_1, Pageable pageable);
+	// MediaDate = , AND MediaKind =
+	public Slice<AchDeductMedia> findAllByMediaDateIsAndMediaKindIsOrderByMediaSeqAsc(int mediaDate_0, String mediaKind_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<AchDeductMedia> findByAchDeductMediaId(AchDeductMediaId achDeductMediaId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<AchDeductMedia> findByAchDeductMediaId(AchDeductMediaId achDeductMediaId);
 
 }
-

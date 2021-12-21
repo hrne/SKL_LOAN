@@ -108,8 +108,7 @@ public class L6983 extends TradeBuffer {
 					CustMain tCustMain = new CustMain();
 
 					// 取戶名
-					tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(),
-							tmpForeclosureFee.getCustNo(), titaVo);
+					tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(), tmpForeclosureFee.getCustNo(), titaVo);
 
 					occursList.putParam("OOProcStatus", 0);
 					occursList.putParam("OOCustNo", tmpForeclosureFee.getCustNo());
@@ -181,11 +180,9 @@ public class L6983 extends TradeBuffer {
 					CustMain tCustMain = new CustMain();
 
 					// 取戶名
-					tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(),
-							titaVo);
+					tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(), titaVo);
 
-					tForeclosureFee = sForeclosureFeeService
-							.findById(parse.stringToInteger(tTxToDoDetail.getDtlValue()), titaVo);
+					tForeclosureFee = sForeclosureFeeService.findById(parse.stringToInteger(tTxToDoDetail.getDtlValue()), titaVo);
 					occursList.putParam("OOProcStatus", tTxToDoDetail.getStatus());
 					occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 					occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
@@ -195,8 +192,7 @@ public class L6983 extends TradeBuffer {
 					occursList.putParam("OOFeeCode", tForeclosureFee.getFeeCode()); // 科目名稱代號
 					occursList.putParam("OOTitaCrDb", 1); // 借貸
 					occursList.putParam("OOAcDate", tForeclosureFee.getReceiveDate()); // 收件日
-					occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
-							+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+					occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 					occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 					occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
 					occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());

@@ -28,17 +28,16 @@ public class L5024ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 創建程式碼後,檢查初始值
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
-	
+
 	// *** 折返控制相關 ***
 	private int index;
 
 	// *** 折返控制相關 ***
 	private int limit;
-	
-	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	
 
-	public List<Map<String, String>> FindData(int index, int limit,String DeptCode,String DistCode,String UnitCode,TitaVo titaVo) throws Exception{
+	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+
+	public List<Map<String, String>> FindData(int index, int limit, String DeptCode, String DistCode, String UnitCode, TitaVo titaVo) throws Exception {
 		Query query;
 		// *** 折返控制相關 ***
 		this.index = index;
@@ -46,40 +45,40 @@ public class L5024ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.limit = limit;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		String sql = "select \"UnitCode\", \"UnitItem\", \"DistCode\", \"DistItem\", \"DeptCode\", \"DeptItem\", \"EmpNo\", \"EmpName\", ";
-				sql +="\"DirectorCode\", \"DepartOfficer\", \"GoalCnt\", \"SumGoalCnt\", \"GoalAmt\", \"SumGoalAmt\" from \"PfDeparment\" ";
-				if(!DeptCode.equals("")||!DistCode.equals("")||!UnitCode.equals("")) {
-					sql +="where ";
-				}
-				if (!DeptCode.equals("")) {
-					sql += "\"DeptCode\" = \'"+DeptCode+"\' ";	
-				}
+		sql += "\"DirectorCode\", \"DepartOfficer\", \"GoalCnt\", \"SumGoalCnt\", \"GoalAmt\", \"SumGoalAmt\" from \"PfDeparment\" ";
+		if (!DeptCode.equals("") || !DistCode.equals("") || !UnitCode.equals("")) {
+			sql += "where ";
+		}
+		if (!DeptCode.equals("")) {
+			sql += "\"DeptCode\" = \'" + DeptCode + "\' ";
+		}
+		if (!DistCode.equals("")) {
+			if (!DeptCode.equals("")) {
+				sql += " and";
+			}
+			sql += " \"DistCode\" = \'" + DistCode + "\' ";
+		}
+		if (!UnitCode.equals("")) {
+			if (!DeptCode.equals("")) {
 				if (!DistCode.equals("")) {
-					if (!DeptCode.equals("")) {
-						sql += " and";
-					}
-					sql += " \"DistCode\" = \'"+DistCode+"\' ";
+					sql += " and";
 				}
-				if (!UnitCode.equals("")) {
-					if (!DeptCode.equals("")) {
-						if (!DistCode.equals("")) {
-							sql += " and";
-						}
-					}
-					sql += " \"UnitCode\" = \'"+UnitCode+"\' ";
-				}
-				sql += sqlRow;
-		logger.info("sql = "+sql); 
+			}
+			sql += " \"UnitCode\" = \'" + UnitCode + "\' ";
+		}
+		sql += sqlRow;
+		logger.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-		
+
 		logger.info("L5024Service FindData=" + query.toString());
 		return this.convertToMap(query.getResultList());
 	}

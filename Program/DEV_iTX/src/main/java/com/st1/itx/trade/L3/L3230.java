@@ -171,13 +171,13 @@ public class L3230 extends TradeBuffer {
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iTempItemCode = titaVo.getParam("TempItemCode");
 		iCurrencyCode = titaVo.getParam("CurrencyCode");
-		iRemoveNo = titaVo.getParam("RemoveNo"); // 銷帳編號
+		iRemoveNo = titaVo.getParam("RemoveNo").trim(); // 銷帳編號
 		iAcSubBookCode = titaVo.getParam("AcSubBookCode"); // 區隔帳冊
 
 		wkTempBal = iTempAmt;
 
 		// 檢查輸入資料
-		if (iTempReasonCode == 0 || iTempReasonCode > 4) {
+		if (iTempReasonCode == 0 || iTempReasonCode > 5) {
 			throw new LogicException(titaVo, "E0019", "暫收帳戶"); // 輸入資料錯誤
 		}
 		if (iFacmNo > 0) {
@@ -288,55 +288,67 @@ public class L3230 extends TradeBuffer {
 		this.info("   iTempReasonCode = " + iTempReasonCode);
 		this.info("   iFacmNo         = " + iFacmNo);
 
-		// 查詢會計銷帳檔
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, wkFacmNoStart,
-				wkFacmNoEnd, 0, Integer.MAX_VALUE);
-		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
-		if (lAcReceivable != null && lAcReceivable.size() > 0) {
-			for (AcReceivable ac : lAcReceivable) {
-				this.info("   wkTempBal   = " + wkTempBal);
-				this.info("   getAcctCode = " + ac.getAcctCode());
-				this.info("   getRvBal    = " + ac.getRvBal());
-				this.info("   getFacmNo   = " + ac.getFacmNo());
-				this.info("   wkTempBal   = " + wkTempBal);
-				if ((iTempReasonCode == 1 && (ac.getAcctCode().equals("TAV") || ac.getAcctCode().equals("TLD")))
-						|| (iTempReasonCode == 2 && ac.getAcctCode().substring(0, 2).equals("T1"))
-						|| (iTempReasonCode == 3 && ac.getAcctCode().substring(0, 2).equals("T2"))
-						|| (iTempReasonCode == 4 && ac.getAcctCode().equals("TAM"))) {
-					if ((iFacmNo == 0 || iFacmNo == ac.getFacmNo()) && ac.getRvBal().compareTo(new BigDecimal(0)) > 0
-							&& wkTempBal.compareTo(new BigDecimal(0)) > 0) {
-						// 借方 暫收及待結轉帳項-擔保放款
-						AcDetail acDetail = new AcDetail();
-						acDetail.setDbCr("D");
-						acDetail.setAcctCode(ac.getAcctCode());
-						acDetail.setCurrencyCode(iCurrencyCode);
-						acDetail.setCustNo(iCustNo);
-						acDetail.setFacmNo(ac.getFacmNo());
-						acDetail.setSlipNote(titaVo.getParam("Description"));
-						lAcDetail.add(acDetail);
-						this.info("   TempAcDetail   = " + acDetail.toString());
-						wkCustTempBal = wkCustTempBal.add(ac.getRvBal());
-						if (wkTempBal.compareTo(ac.getRvBal()) >= 0) {
-							acDetail.setTxAmt(ac.getRvBal());
-							wkTempBal = wkTempBal.subtract(ac.getRvBal());
-						} else {
-							acDetail.setTxAmt(wkTempBal);
-							wkTempBal = new BigDecimal(0);
+//		放款部專戶 
+		if (iCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+			// 借方 暫收及待結轉帳項-擔保放款
+			AcDetail acDetail = new AcDetail();
+			acDetail.setDbCr("D");
+			acDetail.setAcctCode("TLD");
+			acDetail.setCurrencyCode(iCurrencyCode);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setSlipNote(titaVo.getParam("Description"));
+			acDetail.setTxAmt(wkTempBal);
+			lAcDetail.add(acDetail);
+		} else {
+			// 查詢會計銷帳檔
+			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE);
+			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
+			if (lAcReceivable != null && lAcReceivable.size() > 0) {
+				for (AcReceivable ac : lAcReceivable) {
+					this.info("   wkTempBal   = " + wkTempBal);
+					this.info("   getAcctCode = " + ac.getAcctCode());
+					this.info("   getRvBal    = " + ac.getRvBal());
+					this.info("   getFacmNo   = " + ac.getFacmNo());
+					this.info("   wkTempBal   = " + wkTempBal);
+					if ((iTempReasonCode == 1 && (ac.getAcctCode().equals("TAV"))) || (iTempReasonCode == 2 && ac.getAcctCode().substring(0, 2).equals("T1"))
+							|| (iTempReasonCode == 3 && ac.getAcctCode().substring(0, 2).equals("T2")) || (iTempReasonCode == 4 && ac.getAcctCode().equals("TAM"))
+							|| (iTempReasonCode == 5 && ac.getAcctCode().equals("TSL"))) {
+						if ((iFacmNo == 0 || iFacmNo == ac.getFacmNo()) && ac.getRvBal().compareTo(new BigDecimal(0)) > 0 && wkTempBal.compareTo(new BigDecimal(0)) > 0) {
+							// 借方 暫收及待結轉帳項-擔保放款
+							AcDetail acDetail = new AcDetail();
+							acDetail.setDbCr("D");
+							acDetail.setAcctCode(ac.getAcctCode());
+							acDetail.setCurrencyCode(iCurrencyCode);
+							acDetail.setCustNo(iCustNo);
+							acDetail.setFacmNo(ac.getFacmNo());
+							acDetail.setSlipNote(titaVo.getParam("Description"));
+							wkCustTempBal = wkCustTempBal.add(ac.getRvBal());
+							if (wkTempBal.compareTo(ac.getRvBal()) >= 0) {
+								acDetail.setTxAmt(ac.getRvBal());
+								wkTempBal = wkTempBal.subtract(ac.getRvBal());
+							} else {
+								acDetail.setTxAmt(wkTempBal);
+								wkTempBal = new BigDecimal(0);
+							}
+							lAcDetail.add(acDetail);
 						}
 					}
 				}
 			}
+
+			if (wkTempBal.compareTo(new BigDecimal(0)) > 0) {
+				this.info("   E3060 wkTempBal      = " + wkTempBal);
+				this.info("         wkCustTempBal  = " + wkCustTempBal);
+				throw new LogicException(titaVo, "E3060", "目前客戶之暫收款 = " + wkCustTempBal); // 退還金額大於目前客戶之暫收款
+			}
 		}
-		if (wkTempBal.compareTo(new BigDecimal(0)) > 0) {
-			this.info("   E3060 wkTempBal      = " + wkTempBal);
-			this.info("         wkCustTempBal  = " + wkCustTempBal);
-			throw new LogicException(titaVo, "E3060", "目前客戶之暫收款 = " + wkCustTempBal); // 退還金額大於目前客戶之暫收款
-		}
+
 	}
 
 	// 貸: 作業項目對應的應繳費用，業務科目、金額需相同
 	private void settingUnPaid(String acctCode) throws LogicException {
 		ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
+		this.info("acctCode = " + acctCode);
 		try {
 			baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, iTempAmt, titaVo);
 		} catch (LogicException e) {
@@ -347,42 +359,58 @@ public class L3230 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0019", "無該項目未銷費用"); // 查詢資料不存在
 		}
 		BigDecimal totalAmt = BigDecimal.ZERO;
-		// 單筆相同金額
+		// 單筆相同金額，銷帳編號相同
 		boolean isFind = false;
 		for (BaTxVo ba : baTxList) {
 			if (acctCode.equals(ba.getAcctCode()) || "F09".equals(acctCode) && "TMI".equals(ba.getAcctCode())) {
-				totalAmt = totalAmt.add(ba.getAcctAmt());
-				if (iTempAmt.compareTo(ba.getUnPaidAmt()) == 0
-						&& ("0000000".equals(iRemoveNo) || iRemoveNo.equals(ba.getRvNo()))) {
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode(ba.getAcctCode());
-					acDetail.setTxAmt(ba.getAcctAmt());
-					acDetail.setCustNo(ba.getCustNo());
-					acDetail.setFacmNo(ba.getFacmNo());
-					acDetail.setReceivableFlag(ba.getReceivableFlag());
-					acDetail.setRvNo(ba.getRvNo());
-					lAcDetail.add(acDetail);
-					addFeeRoutine(ba);
-					isFind = true;
-					break;
+				if (iTempAmt.compareTo(ba.getUnPaidAmt()) == 0) {
+					if ((iRemoveNo.isEmpty()) || (iRemoveNo.length() > 0 && ba.getRvNo().length() >= iRemoveNo.length() && ba.getRvNo().substring(0, iRemoveNo.length()).equals(iRemoveNo))) {
+						acDetail = new AcDetail();
+						acDetail.setDbCr("C");
+						acDetail.setAcctCode(ba.getAcctCode());
+						acDetail.setTxAmt(ba.getUnPaidAmt());
+						acDetail.setCustNo(ba.getCustNo());
+						acDetail.setFacmNo(ba.getFacmNo());
+						acDetail.setReceivableFlag(ba.getReceivableFlag());
+						acDetail.setRvNo(ba.getRvNo());
+						lAcDetail.add(acDetail);
+						addFeeRoutine(ba);
+						isFind = true;
+						break;
+					}
 				}
 			}
 		}
-		if (!isFind && iTempAmt.compareTo(totalAmt) == 0) {
+		// 多筆總金額金額，銷帳編號相同
+		if (!isFind) {
 			for (BaTxVo ba : baTxList) {
+				this.info("ba.getRvNo().substring = " + ba.getRvNo().substring(0, iRemoveNo.length()));
+				this.info("iRemoveNo = " + iRemoveNo);
 				if (acctCode.equals(ba.getAcctCode()) || "F09".equals(acctCode) && "TMI".equals(ba.getAcctCode())) {
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode(ba.getAcctCode());
-					acDetail.setTxAmt(ba.getAcctAmt());
-					acDetail.setCustNo(ba.getCustNo());
-					acDetail.setFacmNo(ba.getFacmNo());
-					acDetail.setReceivableFlag(ba.getReceivableFlag());
-					acDetail.setRvNo(ba.getRvNo());
-					lAcDetail.add(acDetail);
-					addFeeRoutine(ba);
-					isFind = true;
+					if ((iRemoveNo.isEmpty()) || (iRemoveNo.length() > 0 && ba.getRvNo().length() >= iRemoveNo.length() && ba.getRvNo().substring(0, iRemoveNo.length()).equals(iRemoveNo))) {
+						totalAmt = totalAmt.add(ba.getUnPaidAmt());
+
+					}
+				}
+			}
+			if (iTempAmt.compareTo(totalAmt) == 0) {
+				for (BaTxVo ba : baTxList) {
+					if (acctCode.equals(ba.getAcctCode()) || "F09".equals(acctCode) && "TMI".equals(ba.getAcctCode())) {
+						if ((iRemoveNo.isEmpty()) || (iRemoveNo.length() > 0 && ba.getRvNo().length() >= iRemoveNo.length() && ba.getRvNo().substring(0, iRemoveNo.length()).equals(iRemoveNo))) {
+
+							acDetail = new AcDetail();
+							acDetail.setDbCr("C");
+							acDetail.setAcctCode(ba.getAcctCode());
+							acDetail.setTxAmt(ba.getUnPaidAmt());
+							acDetail.setCustNo(ba.getCustNo());
+							acDetail.setFacmNo(ba.getFacmNo());
+							acDetail.setReceivableFlag(ba.getReceivableFlag());
+							acDetail.setRvNo(ba.getRvNo());
+							lAcDetail.add(acDetail);
+							addFeeRoutine(ba);
+							isFind = true;
+						}
+					}
 				}
 			}
 		}
@@ -393,14 +421,6 @@ public class L3230 extends TradeBuffer {
 
 	// 借:暫收可抵繳 貸:利息收入(3200億專案息)
 	private void subsidyInterest() throws LogicException {
-		AcDetail acDetail = new AcDetail();
-		acDetail.setDbCr("D");
-		acDetail.setAcctCode("TAV");
-		acDetail.setCurrencyCode(iCurrencyCode);
-		acDetail.setTxAmt(iTempAmt);
-		acDetail.setCustNo(iCustNo);
-		acDetail.setSlipNote(titaVo.getParam("Description"));
-		lAcDetail.add(acDetail);
 
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
@@ -417,16 +437,16 @@ public class L3230 extends TradeBuffer {
 	private void addFeeRoutine(BaTxVo ba) throws LogicException {
 		switch (ba.getRepayType()) {
 		case 4: // 04-帳管費
-			this.acctFee = this.acctFee.add(ba.getAcctAmt());
+			this.acctFee = this.acctFee.add(ba.getUnPaidAmt());
 			break;
 		case 5: // 05-火險費
-			this.fireFee = this.fireFee.add(ba.getAcctAmt());
+			this.fireFee = this.fireFee.add(ba.getUnPaidAmt());
 			break;
 		case 6: // 06-契變手續費
-			this.modifyFee = this.modifyFee.add(ba.getAcctAmt());
+			this.modifyFee = this.modifyFee.add(ba.getUnPaidAmt());
 			break;
 		case 7: // 07-法務費
-			this.lawFee = this.lawFee.add(ba.getAcctAmt());
+			this.lawFee = this.lawFee.add(ba.getUnPaidAmt());
 			break;
 		}
 	}
@@ -465,8 +485,7 @@ public class L3230 extends TradeBuffer {
 		List<Integer> lStatus = new ArrayList<Integer>(); // 1:催收 2:部分轉呆 3:呆帳 4:催收回復
 		lStatus.add(2);
 		lStatus.add(3);
-		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, 1,
-				900, 1, 999, lStatus, 0, Integer.MAX_VALUE);
+		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, 1, 900, 1, 999, lStatus, 0, Integer.MAX_VALUE);
 		lLoanOverdue = slLoanOverdue == null ? null : slLoanOverdue.getContent();
 		if (lLoanOverdue == null || lLoanOverdue.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "催收呆帳檔"); // 查詢資料不存在
@@ -497,8 +516,7 @@ public class L3230 extends TradeBuffer {
 			}
 			tTxTemp = new TxTemp();
 			tTxTempId = new TxTempId();
-			loanCom.setTxTemp(tTxTempId, tTxTemp, od.getCustNo(), od.getFacmNo(), od.getBormNo(), od.getOvduNo(),
-					titaVo);
+			loanCom.setTxTemp(tTxTempId, tTxTemp, od.getCustNo(), od.getFacmNo(), od.getBormNo(), od.getOvduNo(), titaVo);
 			tTempVo.clear();
 			tTempVo.putParam("BadDebtBal", wkBadDebtBal);
 			tTempVo.putParam("ZeroBadDebtBal", od.getBadDebtBal().compareTo(BigDecimal.ZERO) == 0 ? "Y" : "N");
@@ -511,8 +529,7 @@ public class L3230 extends TradeBuffer {
 			try {
 				loanOverdueService.update(od);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "催收呆帳檔 戶號 = " + od.getCustNo() + " 額度編號 = " + od.getFacmNo()
-						+ " 撥款序號 = " + od.getBormNo() + " 催收序號 = " + od.getOvduNo()); // 更新資料時，發生錯誤
+				throw new LogicException(titaVo, "E0007", "催收呆帳檔 戶號 = " + od.getCustNo() + " 額度編號 = " + od.getFacmNo() + " 撥款序號 = " + od.getBormNo() + " 催收序號 = " + od.getOvduNo()); // 更新資料時，發生錯誤
 			}
 		}
 		if (wkTotalBadAmt.compareTo(BigDecimal.ZERO) == 0) {
@@ -528,12 +545,10 @@ public class L3230 extends TradeBuffer {
 
 		BigDecimal wkBadDebtBal = BigDecimal.ZERO;
 
-		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
-				titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE);
+		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE);
 		lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
 		if (lTxTemp == null || lTxTemp.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = "
-					+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = " + titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
 		}
 		for (TxTemp tx : lTxTemp) {
 			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
@@ -550,16 +565,14 @@ public class L3230 extends TradeBuffer {
 			// 還原催收檔
 			tLoanOverdue = loanOverdueService.holdById(new LoanOverdueId(wkCustNo, wkFacmNo, wkBormNo, wkOvduNo));
 			if (tLoanOverdue == null) {
-				throw new LogicException(titaVo, "E0006", "催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = "
-						+ wkBormNo + " 催收序號 = " + wkOvduNo); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006", "催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo + " 催收序號 = " + wkOvduNo); // 鎖定資料時，發生錯誤
 			}
 			wkBadDebtBal = this.parse.stringToBigDecimal(tTempVo.get("BadDebtBal"));
 			tLoanOverdue.setBadDebtBal(tLoanOverdue.getBadDebtBal().add(wkBadDebtBal));
 			try {
 				loanOverdueService.update(tLoanOverdue);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = "
-						+ wkBormNo + " 催收序號 = " + wkOvduNo); // 更新資料時，發生錯誤
+				throw new LogicException(titaVo, "E0007", "催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo + " 催收序號 = " + wkOvduNo); // 更新資料時，發生錯誤
 			}
 			if (tTempVo.get("ZeroBadDebtBal").equals("Y")) {
 				ZeroBadDebtBal();

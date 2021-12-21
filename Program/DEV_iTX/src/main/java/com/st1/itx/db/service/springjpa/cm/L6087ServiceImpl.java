@@ -29,7 +29,7 @@ public class L6087ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	
+
 	public List<Map<String, String>> findDistinct(TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

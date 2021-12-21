@@ -97,8 +97,7 @@ public class L4941 extends TradeBuffer {
 					DateFormat sdftime = new SimpleDateFormat("HHmmss");
 
 					updateTime = sdftime.format(ts);
-					updateTime = updateTime.substring(0, 2) + ":" + updateTime.substring(2, 4) + ":"
-							+ updateTime.substring(4, 6);
+					updateTime = updateTime.substring(0, 2) + ":" + updateTime.substring(2, 4) + ":" + updateTime.substring(4, 6);
 
 				}
 				this.info("updateTime = " + updateTime);

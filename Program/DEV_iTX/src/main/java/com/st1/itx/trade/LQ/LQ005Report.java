@@ -80,8 +80,7 @@ public class LQ005Report extends MakeReport {
 	private void exportExcel(List<Map<String, String>> listLQ005, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ005", "表A18_會計部申報表", "LQ005表A18_會計部申報表",
-				"表A18_會計部申報表.xlsx", "108.03.31");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ005", "表A18_會計部申報表", "LQ005表A18_會計部申報表", "表A18_會計部申報表.xlsx", "108.03.31");
 
 		makeExcel.setSheet("108.03.31", this.showRocDate(titaVo.getEntDyI(), 6));
 

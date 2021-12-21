@@ -35,13 +35,13 @@ public class LC010 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public TxLockService txLockService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
-	
+
 	@Autowired
 	public CdBranchService cdBranchService;
-	
+
 	@Autowired
 	public TxTranCodeService txTranCodeService;
 
@@ -66,7 +66,7 @@ public class LC010 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OLockNo", tTxLock.getLockNo());
 				occursList.putParam("OCustNo", tTxLock.getCustNo());
-				
+
 				String tranno = tTxLock.getTranNo();
 				TxTranCode txTranCode = txTranCodeService.findById(tTxLock.getTranNo(), titaVo);
 				if (txTranCode != null) {
@@ -80,14 +80,14 @@ public class LC010 extends TradeBuffer {
 					brno += " " + cdBranch.getBranchShort();
 				}
 				occursList.putParam("OBrNo", brno);
-				
+
 				String tlrno = tTxLock.getCreateEmpNo();
 				CdEmp cdEmp = cdEmpService.findById(tTxLock.getCreateEmpNo(), titaVo);
 				if (cdEmp != null) {
 					tlrno += " " + cdEmp.getFullname();
 				}
 				occursList.putParam("OTlrNo", tlrno);
-				
+
 //				this.info("tTxLock.getCreateDate() = " + tTxLock.getCreateDate().toString());
 				occursList.putParam("OTxDate", DbDateToRocDate(tTxLock.getCreateDate().toString()));
 				occursList.putParam("OTxTime", DbDateToRocTime(tTxLock.getCreateDate().toString()));

@@ -20,7 +20,8 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM034Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM034Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LM034Report.class);
 
 	@Autowired
 	LM034ServiceImpl lM034ServiceImpl;
@@ -43,8 +44,7 @@ public class LM034Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM034) throws LogicException {
 		this.info("LM034Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM034", "新增逾放案件明細", "LM034-新增逾放案件明細",
-				"LM034-新增逾放案件明細.xlsx", "工作表1", "D9701212");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM034", "新增逾放案件明細", "LM034-新增逾放案件明細", "LM034-新增逾放案件明細.xlsx", "工作表1", "D9701212");
 
 		// 今日
 		if (listLM034 != null && listLM034.size() != 0) {
@@ -55,7 +55,7 @@ public class LM034Report extends MakeReport {
 				for (int i = 0; i < tLDVo.size(); i++) {
 					ad = "F" + String.valueOf(col);
 					col++;
-					switch(i) {
+					switch (i) {
 					case 4:
 					case 5:
 					case 6:

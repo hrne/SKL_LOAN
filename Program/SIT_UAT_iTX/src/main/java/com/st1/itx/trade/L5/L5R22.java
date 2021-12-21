@@ -79,7 +79,7 @@ public class L5R22 extends TradeBuffer {
 			totaVo.putParam("L5R22EditEmpNo", iCollRemind.getLastUpdateEmpNo());
 			String tU = iCollRemind.getLastUpdate().toString();
 			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
-			String uTime = tU.substring(11,13) + tU.substring(14,16);
+			String uTime = tU.substring(11, 13) + tU.substring(14, 16);
 			totaVo.putParam("L5R22EditDate", uDate);
 			totaVo.putParam("L5R22EditTime", uTime);
 		} else {

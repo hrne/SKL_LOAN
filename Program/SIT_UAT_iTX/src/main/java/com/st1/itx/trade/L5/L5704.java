@@ -101,21 +101,20 @@ public class L5704 extends TradeBuffer {
 				NegAppr dNegAppr = new NegAppr();
 				dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, tNegAppr.getKindCode()));
 
-				if (dNegAppr==null) {
+				if (dNegAppr == null) {
 					throw new LogicException(titaVo, "E0006", "撥付日期設定檔"); // 鎖定資料不存在
 				}
 
-				mExportDate = parse.stringToInteger(titaVo.getParam("ExportDate" + dNegAppr.getKindCode())) ;	//製檔日
-				mBringUpDate = parse.stringToInteger(titaVo.getParam("BringUpDate" + dNegAppr.getKindCode())) ;	//提兌日
-				mApprAcDate = parse.stringToInteger(titaVo.getParam("ApprAcDate" + dNegAppr.getKindCode())) ;	//傳票日
-				if (dNegAppr.getExportMark() == 1 ) {
-					if (dNegAppr.getExportDate() != mExportDate
-							|| dNegAppr.getBringUpDate() != mBringUpDate || dNegAppr.getApprAcDate() != mApprAcDate) {
+				mExportDate = parse.stringToInteger(titaVo.getParam("ExportDate" + dNegAppr.getKindCode())); // 製檔日
+				mBringUpDate = parse.stringToInteger(titaVo.getParam("BringUpDate" + dNegAppr.getKindCode())); // 提兌日
+				mApprAcDate = parse.stringToInteger(titaVo.getParam("ApprAcDate" + dNegAppr.getKindCode())); // 傳票日
+				if (dNegAppr.getExportMark() == 1) {
+					if (dNegAppr.getExportDate() != mExportDate || dNegAppr.getBringUpDate() != mBringUpDate || dNegAppr.getApprAcDate() != mApprAcDate) {
 						throw new LogicException(titaVo, "E0015", "已製檔不可修改，類別＝" + dNegAppr.getKindCode());
 					}
-					continue;	//已製檔不刪除
+					continue; // 已製檔不刪除
 				}
-				
+
 				try {
 					this.info("FunctionCode=2 delete");
 					sNegApprService.delete(dNegAppr);
@@ -145,9 +144,7 @@ public class L5704 extends TradeBuffer {
 				if (dNegAppr == null) {
 					throw new LogicException(titaVo, "E0004", "撥付日期設定檔"); // 刪除資料不存在
 				}
-				if (dNegAppr.getExportMark() != dNegAppr.getApprAcMark()
-						|| dNegAppr.getApprAcMark() != dNegAppr.getBringUpMark()
-						|| dNegAppr.getBringUpMark() != dNegAppr.getExportMark()) {
+				if (dNegAppr.getExportMark() != dNegAppr.getApprAcMark() || dNegAppr.getApprAcMark() != dNegAppr.getBringUpMark() || dNegAppr.getBringUpMark() != dNegAppr.getExportMark()) {
 					throw new LogicException(titaVo, "E0015", "製檔日傳票日提兌日記號不一致，類別＝" + dNegAppr.getKindCode());
 				}
 
@@ -174,26 +171,24 @@ public class L5704 extends TradeBuffer {
 			mExportDate = titaVo.getParam("ExportDate" + i);
 			mApprAcDate = titaVo.getParam("ApprAcDate" + i);
 			mBringUpDate = titaVo.getParam("BringUpDate" + i);
-			this.info(
-					"mExportDate==" + mExportDate + ",mApprAcDate==" + mApprAcDate + ",mBringUpDate==" + mBringUpDate);
+			this.info("mExportDate==" + mExportDate + ",mApprAcDate==" + mApprAcDate + ",mBringUpDate==" + mBringUpDate);
 
 			NegAppr tNegAppr = new NegAppr();
 			NegApprId tNegApprId = new NegApprId();
-			if (Integer.valueOf(mExportDate) == 0 && Integer.valueOf(mApprAcDate) == 0
-					&& Integer.valueOf(mBringUpDate) == 0) {
+			if (Integer.valueOf(mExportDate) == 0 && Integer.valueOf(mApprAcDate) == 0 && Integer.valueOf(mBringUpDate) == 0) {
 				continue;
 			}
 
 			tNegApprId.setYyyyMm(mWorkMonth);
 			tNegApprId.setKindCode(i);
-			if (("2").equals(mFuncCode)){	
+			if (("2").equals(mFuncCode)) {
 				NegAppr sNegAppr = new NegAppr();
 				sNegAppr = sNegApprService.findById(tNegApprId, titaVo);
-				if (sNegAppr != null) {	//已存在不新增
-						continue;
+				if (sNegAppr != null) { // 已存在不新增
+					continue;
 				}
 			}
-			
+
 			tNegAppr.setNegApprId(tNegApprId);
 			tNegAppr.setExportDate(Integer.valueOf(mExportDate));
 			tNegAppr.setApprAcDate(Integer.valueOf(mApprAcDate));

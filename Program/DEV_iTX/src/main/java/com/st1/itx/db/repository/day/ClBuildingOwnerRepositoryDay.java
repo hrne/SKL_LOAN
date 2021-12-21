@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.ClBuildingOwnerId;
  */
 public interface ClBuildingOwnerRepositoryDay extends JpaRepository<ClBuildingOwner, ClBuildingOwnerId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClBuildingOwner> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Slice<ClBuildingOwner> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // OwnerCustUKey = 
-  public Slice<ClBuildingOwner> findAllByOwnerCustUKeyIsOrderByClCode1AscClCode2AscClNoAsc(String ownerCustUKey_0, Pageable pageable);
+	// OwnerCustUKey =
+	public Slice<ClBuildingOwner> findAllByOwnerCustUKeyIsOrderByClCode1AscClCode2AscClNoAsc(String ownerCustUKey_0, Pageable pageable);
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Optional<ClBuildingOwner> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByOwnerRelCodeAsc(int clCode1_0, int clCode2_1, int clNo_2);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Optional<ClBuildingOwner> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByOwnerRelCodeAsc(int clCode1_0, int clCode2_1, int clNo_2);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClBuildingOwner> findByClBuildingOwnerId(ClBuildingOwnerId clBuildingOwnerId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClBuildingOwner> findByClBuildingOwnerId(ClBuildingOwnerId clBuildingOwnerId);
 
 }
-

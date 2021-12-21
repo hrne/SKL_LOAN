@@ -19,18 +19,19 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class L9721Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9721Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L9721Report.class);
 
 	@Autowired
 	L9721ServiceImpl l9721ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	String TXCD = "L9721";
 	String TXName = "員工房貸利率明細";
 	String SheetName = "D109052107";
-	
+
 	// pivot position for data inputs
 	int pivotRow = 3; // 1-based
 	int pivotCol = 1; // 1-based
@@ -49,41 +50,38 @@ public class L9721Report extends MakeReport {
 		}
 
 		exportExcel(titaVo, lL9721);
-		
+
 		return true;
 
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList) throws LogicException {
 
-		
-		this.info(TXCD +"Report exportExcel");	
-		
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName,
-				TXCD + "_" + TXName,
-				TXCD + "_底稿_" + TXName + ".xlsx",
-				1, SheetName);
+		this.info(TXCD + "Report exportExcel");
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		if (lList != null && lList.size() != 0) {
-			
+
 			int rowShift = 0;
 
 			for (Map<String, String> tLDVo : lList) {
-				
+
 				int colShift = 0;
-				
+
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					int col = i + pivotCol + colShift; // 1-based
 					int row = pivotRow + rowShift; // 1-based
-					
-					// Query received will have column names in the format of F0, even if no alias is set in SQL
+
+					// Query received will have column names in the format of F0, even if no alias
+					// is set in SQL
 					// notice it's 0-based for those names
-					String tmpValue = tLDVo.get("F" + i); 
-					
+					String tmpValue = tLDVo.get("F" + i);
+
 					// switch by code of Column; i.e. Col A, Col B...
 					// breaks if more than 26 columns!
-					switch (String.valueOf((char)(65+i))) {
+					switch (String.valueOf((char) (65 + i))) {
 					// if specific column needs special treatment, insert case here.
 					case "D":
 						makeExcel.setValue(row, col, tmpValue, "L");
@@ -107,11 +105,11 @@ public class L9721Report extends MakeReport {
 						makeExcel.setValue(row, col, tmpValue.equals("") ? "" : Integer.parseInt(tmpValue), "L");
 						break;
 					}
-					
+
 				} // for
-				
+
 				rowShift++;
-				
+
 			} // for
 		} else {
 			makeExcel.setValue(pivotRow, pivotCol, "本月無資料");

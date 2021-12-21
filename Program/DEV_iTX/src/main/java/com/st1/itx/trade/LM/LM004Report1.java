@@ -91,7 +91,7 @@ public class LM004Report1 extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 	}
 
 	private String showDate(String date, int iType) {

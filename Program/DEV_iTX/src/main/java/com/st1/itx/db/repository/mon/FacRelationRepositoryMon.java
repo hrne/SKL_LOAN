@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.FacRelationId;
  */
 public interface FacRelationRepositoryMon extends JpaRepository<FacRelation, FacRelationId> {
 
-  // CreditSysNo = 
-  public Slice<FacRelation> findAllByCreditSysNoIsOrderByCustUKeyAsc(int creditSysNo_0, Pageable pageable);
+	// CreditSysNo =
+	public Slice<FacRelation> findAllByCreditSysNoIsOrderByCustUKeyAsc(int creditSysNo_0, Pageable pageable);
 
-  // CustUKey =  
-  public Slice<FacRelation> findAllByCustUKeyIsOrderByCustUKeyAsc(String custUKey_0, Pageable pageable);
+	// CustUKey =
+	public Slice<FacRelation> findAllByCustUKeyIsOrderByCustUKeyAsc(String custUKey_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacRelation> findByFacRelationId(FacRelationId facRelationId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacRelation> findByFacRelationId(FacRelationId facRelationId);
 
 }
-

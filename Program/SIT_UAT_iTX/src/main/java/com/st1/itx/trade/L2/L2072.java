@@ -38,10 +38,10 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2072 extends TradeBuffer {
-	
+
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public CustRmkService sCustRmkService;
@@ -81,7 +81,7 @@ public class L2072 extends TradeBuffer {
 		// new ArrayList
 		List<CustRmk> lCustRmk = new ArrayList<CustRmk>();
 		Slice<CustRmk> slCustRmk = null;
-		
+
 		// PK
 //		CustRmkId CustRmkId = new CustRmkId();
 		// 測試該戶號是否有資料存在顧客控管警訊檔
@@ -102,9 +102,9 @@ public class L2072 extends TradeBuffer {
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
-		
+
 		CdEmp tCdEmp = new CdEmp();
-		
+
 		for (CustRmk tCustRmk : lCustRmk) {
 			this.info("tCustRmk---->" + tCustRmk);
 			// new occurs
@@ -114,31 +114,28 @@ public class L2072 extends TradeBuffer {
 			occurslist.putParam("OORmkNo", tCustRmk.getRmkNo());
 			occurslist.putParam("OORmkCode", tCustRmk.getRmkCode());
 			occurslist.putParam("OORmkDesc", tCustRmk.getRmkDesc());
-			
+
 			String tempEmpNo = tCustRmk.getCreateEmpNo() == "" ? tCustRmk.getLastUpdateEmpNo() : tCustRmk.getCreateEmpNo();
 			String updateEmpNo = tCustRmk.getLastUpdateEmpNo() == "" ? tCustRmk.getCreateEmpNo() : tCustRmk.getLastUpdateEmpNo();
-			
 
-			occurslist.putParam("OOEmpNo",tempEmpNo);
-			
+			occurslist.putParam("OOEmpNo", tempEmpNo);
+
 			occurslist.putParam("OOEmpName", ""); // 建檔人員姓名
-			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);	
-		
-			if( tCdEmp != null) {
+			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);
+
+			if (tCdEmp != null) {
 				occurslist.putParam("OOEmpName", tCdEmp.getFullname()); // 建檔人員姓名
 			}
-			
-			
-			
-			occurslist.putParam("OOUpdateEmpNo",updateEmpNo);
-			
+
+			occurslist.putParam("OOUpdateEmpNo", updateEmpNo);
+
 			occurslist.putParam("OOUpdateEmpName", ""); // 更新人員姓名
-			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);	
-			
-			if( tCdEmp != null) {
+			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);
+
+			if (tCdEmp != null) {
 				occurslist.putParam("OOUpdateEmpName", tCdEmp.getFullname()); // 更新人員姓名
 			}
-			
+
 			// 宣告
 			ts = tCustRmk.getCreateDate();
 			uts = tCustRmk.getLastUpdate();
@@ -148,16 +145,15 @@ public class L2072 extends TradeBuffer {
 
 			createDate = sdfdate.format(ts);
 			updateDate = sdfdate.format(uts);
-			
+
 			createDate = parse.IntegerToString(parse.stringToInteger(createDate) - 19110000, 8);
 			updateDate = parse.IntegerToString(parse.stringToInteger(updateDate) - 19110000, 8);
 			this.info("createDate = " + createDate);
 			this.info("updateDate = " + updateDate);
-			
-			occurslist.putParam("OOCreateDate",createDate);
-			occurslist.putParam("OOLastUpdate",updateDate);
-			
-			
+
+			occurslist.putParam("OOCreateDate", createDate);
+			occurslist.putParam("OOLastUpdate", updateDate);
+
 //			occurslist.putParam("OOEmpName", tCustRmk.get
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);

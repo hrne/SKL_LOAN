@@ -55,7 +55,7 @@ public class L2042 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingOwnerService sClBuildingOwnerService;
-	
+
 	@Autowired
 	public CustMainService custMainService;
 

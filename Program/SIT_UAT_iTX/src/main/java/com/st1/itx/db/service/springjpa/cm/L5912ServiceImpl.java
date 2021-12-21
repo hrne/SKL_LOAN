@@ -38,9 +38,7 @@ public class L5912ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ " left join \"BankAuthAct\" b on a.\"CustNo\" = b.\"CustNo\" and a.\"FacmNo\" = b.\"FacmNo\" " + " left join \"CdEmp\" c on c.\"EmployeeNo\" = a.\"BsOfficer\" "
 				+ " left join \"LoanBorMain\" d on a.\"CustNo\" = d.\"CustNo\" and a.\"FacmNo\" = d.\"FacmNo\" and a.\"BormNo\" = d.\"BormNo\" "
 				+ " left join \"PfBsOfficer\" e on a.\"WorkMonth\" = e.\"WorkMonth\" and a.\"BsOfficer\" = e.\"EmpNo\"" + " where b.\"Status\" != '1' "
-				+ "      and a.\"DrawdownDate\" between :StartDate and :EndDate" + "      and a.\"BsOfficer\" is not null"
-				+ " and b.\"AuthType\" in ('00','01')"
-				+ " order by a.\"DrawdownDate\" ASC";
+				+ "      and a.\"DrawdownDate\" between :StartDate and :EndDate" + "      and a.\"BsOfficer\" is not null" + " and b.\"AuthType\" in ('00','01')" + " order by a.\"DrawdownDate\" ASC";
 		this.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);

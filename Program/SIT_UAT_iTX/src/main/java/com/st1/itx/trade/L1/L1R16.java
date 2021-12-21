@@ -35,7 +35,7 @@ public class L1R16 extends TradeBuffer {
 		String iCustId = titaVo.getParam("RimCustId");
 		String iCustName = titaVo.getParam("RimCustName").toString().trim();
 
-		BankRelationVo vo = iBankRelationCom.getBankRelation(iCustId,iCustName, titaVo);
+		BankRelationVo vo = iBankRelationCom.getBankRelation(iCustId, iCustName, titaVo);
 
 		if ("Y".equals(vo.getIsLimit())) {
 			totaVo.putParam("L1R16IsLimitYn", "Y");
@@ -53,13 +53,13 @@ public class L1R16 extends TradeBuffer {
 			totaVo.putParam("L1R16IsLnrelNearYn", "N");
 		}
 
-		//2021.8.31 by eric
+		// 2021.8.31 by eric
 		if ("Y".equals(vo.getIsSuspected())) {
 			totaVo.putParam("L1R16IsSuspectedYn", "Y");
 		} else {
 			totaVo.putParam("L1R16IsSuspectedYn", "N");
 		}
-		
+
 		totaVo.putParam("L1R16DataDate", vo.getDataDate());
 
 		this.addList(this.totaVo);

@@ -52,16 +52,16 @@ public class L2R15 extends TradeBuffer {
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		String iReltId = titaVo.getParam("RimReltId");
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFuncCode"));
-		
+
 		String Ukey = "";
 		CustMain lCustMain = new CustMain();
-		
+
 		lCustMain = sCustMainService.custIdFirst(iReltId, titaVo);
-		
-		if( lCustMain == null ) {
+
+		if (lCustMain == null) {
 			throw new LogicException("E0001", "客戶資料主檔");
 		}
-		
+
 		Ukey = lCustMain.getCustUKey();
 		ReltMainId iReltMainId = new ReltMainId();
 		iReltMainId.setCaseNo(iCaseNo);

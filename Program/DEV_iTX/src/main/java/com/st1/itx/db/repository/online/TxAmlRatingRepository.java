@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,13 +20,12 @@ import com.st1.itx.db.domain.TxAmlRating;
  */
 public interface TxAmlRatingRepository extends JpaRepository<TxAmlRating, Long> {
 
-  // CaseNo = ,
-  public Slice<TxAmlRating> findAllByCaseNoIsOrderByCaseNoAsc(String caseNo_0, Pageable pageable);
+	// CaseNo = ,
+	public Slice<TxAmlRating> findAllByCaseNoIsOrderByCaseNoAsc(String caseNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAmlRating> findByLogNo(Long logNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAmlRating> findByLogNo(Long logNo);
 
 }
-

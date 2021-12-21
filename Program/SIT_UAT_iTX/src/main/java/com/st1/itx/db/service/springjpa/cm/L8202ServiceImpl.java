@@ -293,8 +293,6 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	
-	
 	public List<Map<String, String>> findAll3(TitaVo titaVo) throws Exception {
 //		String iFactor1TotLimit = titaVo.getParam("Factor1TotLimit"); // 洗錢樣態一金額合計超過
 //		String iFactor2Count = titaVo.getParam("Factor2Count"); // 洗錢樣態二次數
@@ -416,6 +414,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		return this.convertToMap(query);
 	}
+
 	public List<Map<String, String>> findChkDtl12(TitaVo titaVo) throws Exception {
 		String iFactorDays = titaVo.getParam("FactorDays"); // 統計期間天數
 		String iFactor2AmtStart = titaVo.getParam("Factor2AmtStart"); // 洗錢樣態二單筆起始金額
@@ -538,7 +537,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findChkDtl3(TitaVo titaVo) throws Exception {
 		String iFactorDays = titaVo.getParam("FactorDays"); // 統計期間天數
 		String iFactorDays3 = titaVo.getParam("FactorDays3"); // 統計期間天數

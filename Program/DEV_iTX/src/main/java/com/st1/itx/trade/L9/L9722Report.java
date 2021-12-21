@@ -64,8 +64,7 @@ public class L9722Report extends MakeReport {
 
 		this.info(txcd + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName,
-				txcd + "_底稿_" + txName + ".xlsx", 1, sheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, txcd + "_底稿_" + txName + ".xlsx", 1, sheetName);
 
 		if (lList != null && lList.size() != 0) {
 

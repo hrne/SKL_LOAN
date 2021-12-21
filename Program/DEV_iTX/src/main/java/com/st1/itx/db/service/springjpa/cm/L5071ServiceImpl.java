@@ -31,13 +31,13 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// *** 折返控制相關 ***
-		private int index;
+	private int index;
 
-		// *** 折返控制相關 ***
-		private int limit;
+	// *** 折返控制相關 ***
+	private int limit;
 
-		private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-		
+	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo, int index, int limit) throws Exception {
 		logger.info("L5071ServiceImpl.findAll ");
@@ -46,9 +46,9 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		
+
 		String sql = " ";
-		
+
 		sql += " SELECT C.\"CustId\"                                                     "; // -- F0 身分證字號
 		sql += "      , N.\"CaseKindCode\"                                               "; // -- F1 案件種類
 		sql += "      , N.\"CustLoanKind\"                                               "; // -- F2 債權戶別
@@ -64,60 +64,59 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"IsMainFin\"                                                  "; // -- F12 最大債權
 		sql += "      , N.\"MainFinCode\"                                                "; // -- F13 最大債權機構
 		sql += "      , N.\"TotalContrAmt\"                                              "; // -- F14 總金額
-	
-	
+
 		sql += " FROM \"NegMain\" N";
 		sql += "   LEFT JOIN \"CustMain\" C";
-		sql += "          ON C.\"CustNo\" = N.\"CustNo\"";		
-		
-		if(!"".equals(titaVo.getParam("CustId").trim())) {
-			sql += "         AND C.\"CustId\" = :CustId";			
-		} 
-		
-		sql += "  WHERE C.\"CustId\" IS NOT NULL";
-		
-		if(!"".equals(titaVo.getParam("CaseKindCode").trim())) {
-			sql += "   AND N.\"CaseKindCode\" = :CaseKindCode";
-		} 
-			
-		if(!"".equals(titaVo.getParam("CustLoanKind").trim())) {
-			 sql += "     AND N.\"CustLoanKind\" = :CustLoanKind";
-		} 
+		sql += "          ON C.\"CustNo\" = N.\"CustNo\"";
 
-		if(!"".equals(titaVo.getParam("Status").trim())) {
+		if (!"".equals(titaVo.getParam("CustId").trim())) {
+			sql += "         AND C.\"CustId\" = :CustId";
+		}
+
+		sql += "  WHERE C.\"CustId\" IS NOT NULL";
+
+		if (!"".equals(titaVo.getParam("CaseKindCode").trim())) {
+			sql += "   AND N.\"CaseKindCode\" = :CaseKindCode";
+		}
+
+		if (!"".equals(titaVo.getParam("CustLoanKind").trim())) {
+			sql += "     AND N.\"CustLoanKind\" = :CustLoanKind";
+		}
+
+		if (!"".equals(titaVo.getParam("Status").trim())) {
 			sql += "     AND N.\"Status\" = :Status";
 
-		} 
+		}
 
 		sql += "   ORDER BY  C.\"CustId\", N.\"CaseSeq\" ";
 		sql += sqlRow;
-		
+
 		logger.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		if(!"".equals(titaVo.getParam("CustId").trim())) {
-		  query.setParameter("CustId", titaVo.getParam("CustId").trim());
+		if (!"".equals(titaVo.getParam("CustId").trim())) {
+			query.setParameter("CustId", titaVo.getParam("CustId").trim());
 		}
-		if(!"".equals(titaVo.getParam("CaseKindCode").trim())) {
-		  query.setParameter("CaseKindCode", titaVo.getParam("CaseKindCode").trim());
+		if (!"".equals(titaVo.getParam("CaseKindCode").trim())) {
+			query.setParameter("CaseKindCode", titaVo.getParam("CaseKindCode").trim());
 		}
-		if(!"".equals(titaVo.getParam("CustLoanKind").trim())) {
-		  query.setParameter("CustLoanKind", titaVo.getParam("CustLoanKind").trim());
+		if (!"".equals(titaVo.getParam("CustLoanKind").trim())) {
+			query.setParameter("CustLoanKind", titaVo.getParam("CustLoanKind").trim());
 		}
-		if(!"".equals(titaVo.getParam("Status").trim())) {
-		  query.setParameter("Status", titaVo.getParam("Status").trim());
+		if (!"".equals(titaVo.getParam("Status").trim())) {
+			query.setParameter("Status", titaVo.getParam("Status").trim());
 		}
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-		
+
 		return this.convertToMap(query.getResultList());
 	}
 }

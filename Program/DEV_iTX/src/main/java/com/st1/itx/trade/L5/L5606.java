@@ -44,7 +44,7 @@ public class L5606 extends TradeBuffer {
 		String iLegalArea = titaVo.getParam("LegalArea");
 		String iLegalNo = titaVo.getParam("LegalNo");
 		String iLegalExt = titaVo.getParam("LegalExt");
-		
+
 		CdCity iCdCity = new CdCity();
 		CdCity uCdCity = new CdCity();
 		iCdCity = iCdCityService.holdById(iCityCode, titaVo);
@@ -64,7 +64,7 @@ public class L5606 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

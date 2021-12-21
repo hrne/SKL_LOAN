@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,19 +20,18 @@ import com.st1.itx.db.domain.FacShareAppl;
  */
 public interface FacShareApplRepositoryMon extends JpaRepository<FacShareAppl, Integer> {
 
-  // MainApplNo = 
-  public Slice<FacShareAppl> findAllByMainApplNoIsOrderByKeyinSeqAsc(int mainApplNo_0, Pageable pageable);
+	// MainApplNo =
+	public Slice<FacShareAppl> findAllByMainApplNoIsOrderByKeyinSeqAsc(int mainApplNo_0, Pageable pageable);
 
-  // CustNo = 
-  public Slice<FacShareAppl> findAllByCustNoIsOrderByMainApplNoAscKeyinSeqAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<FacShareAppl> findAllByCustNoIsOrderByMainApplNoAscKeyinSeqAsc(int custNo_0, Pageable pageable);
 
-  // MainApplNo = 
-  public Optional<FacShareAppl> findTopByMainApplNoIsOrderByKeyinSeqDesc(int mainApplNo_0);
+	// MainApplNo =
+	public Optional<FacShareAppl> findTopByMainApplNoIsOrderByKeyinSeqDesc(int mainApplNo_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacShareAppl> findByApplNo(int applNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacShareAppl> findByApplNo(int applNo);
 
 }
-

@@ -143,20 +143,16 @@ public class L3120 extends TradeBuffer {
 		// 鎖定放款主檔
 		tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo));
 		if (tLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0006",
-					"放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 鎖定資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006", "放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 鎖定資料時，發生錯誤
 		}
 		if (tLoanBorMain.getStatus() == 97) {
-			throw new LogicException(titaVo, "E0011",
-					"放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料已被刪除
+			throw new LogicException(titaVo, "E0011", "放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料已被刪除
 		}
 		if (tLoanBorMain.getStatus() == 98) {
-			throw new LogicException(titaVo, "E3054",
-					"放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆預約撥款資料已撥款
+			throw new LogicException(titaVo, "E3054", "放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆預約撥款資料已撥款
 		}
 		if (tLoanBorMain.getStatus() != 99) {
-			throw new LogicException(titaVo, "E3055",
-					"放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料非預約撥款
+			throw new LogicException(titaVo, "E3055", "放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料非預約撥款
 		}
 
 		wkBorxNo = tLoanBorMain.getLastBorxNo() + 1;
@@ -165,13 +161,11 @@ public class L3120 extends TradeBuffer {
 
 		// 更新放款主檔
 		try {
-			tLoanBorMain.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tLoanBorMain.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tLoanBorMain.setLastUpdateEmpNo(titaVo.getTlrNo());
 			loanBorMainService.update(tLoanBorMain);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008",
-					"放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+			throw new LogicException(titaVo, "E0008", "放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
 		}
 	}
 
@@ -182,13 +176,11 @@ public class L3120 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo); // 鎖定資料時，發生錯誤
 		}
 		if (tFacMain.getActFg() == 1) {
-			throw new LogicException(titaVo, "E0021",
-					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+			throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
 		// 更新額度檔
 		try {
-			tFacMain.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tFacMain.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tFacMain.setLastUpdateEmpNo(titaVo.getTlrNo());
 			facMainService.update(tFacMain);
 		} catch (DBException e) {

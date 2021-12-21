@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.ClOtherId;
  */
 public interface ClOtherRepositoryHist extends JpaRepository<ClOther, ClOtherId> {
 
-  // ClCode1 = 
-  public Slice<ClOther> findAllByClCode1Is(int clCode1_0, Pageable pageable);
+	// ClCode1 =
+	public Slice<ClOther> findAllByClCode1Is(int clCode1_0, Pageable pageable);
 
-  // ClCode1 = ,AND ClCode2 = 
-  public Slice<ClOther> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 =
+	public Slice<ClOther> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
 
-  // IssuingId = ,AND DocNo = ,AND OwnerCustUKey =
-  public Slice<ClOther> findAllByIssuingIdIsAndDocNoIsAndOwnerCustUKeyIs(String issuingId_0, String docNo_1, String ownerCustUKey_2, Pageable pageable);
+	// IssuingId = ,AND DocNo = ,AND OwnerCustUKey =
+	public Slice<ClOther> findAllByIssuingIdIsAndDocNoIsAndOwnerCustUKeyIs(String issuingId_0, String docNo_1, String ownerCustUKey_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClOther> findByClOtherId(ClOtherId clOtherId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClOther> findByClOtherId(ClOtherId clOtherId);
 
 }
-

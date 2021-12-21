@@ -48,7 +48,7 @@ public class L1908 extends TradeBuffer {
 
 	@Autowired
 	public CdReportService iCdReportService;
-	
+
 	@Autowired
 	public CdEmpService iCdEmpService;
 
@@ -157,7 +157,7 @@ public class L1908 extends TradeBuffer {
 			} else {
 				if (iCdEmp == null) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
-				}else {
+				} else {
 					occursList.putParam("OOLastUpdateEmpNoName", iCdEmp.getFullname());
 				}
 			}

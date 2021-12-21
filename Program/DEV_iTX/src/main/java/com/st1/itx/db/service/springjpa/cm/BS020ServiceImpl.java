@@ -47,8 +47,8 @@ public class BS020ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "FROM ";
 		sql += "( SELECT";
 		sql += "   a.\"CustNo\"             as \"CustNo\" ";
-		sql += "  ,max (case when NVL(f.\"RepayCode\",0) = 2 then 2  else 0 end)";  
-		sql += "                            as \"RepayCode\"  "; 
+		sql += "  ,max (case when NVL(f.\"RepayCode\",0) = 2 then 2  else 0 end)";
+		sql += "                            as \"RepayCode\"  ";
 		sql += "  ,sum (case when a.\"AcctCode\" = 'TAV' then a.\"RvBal\" else 0 end)  as TAV ";
 		sql += "  ,sum (case when a.\"AcctCode\" <> 'TAV' then a.\"RvBal\" else 0 end) as FEE ";
 		sql += "  FROM \"AcReceivable\" a ";
@@ -56,7 +56,7 @@ public class BS020ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                          AND f.\"FacmNo\" = a.\"FacmNo\" ";
 		sql += "  WHERE a.\"AcctFlag\" = 0 ";
 		sql += "    and a.\"ClsFlag\" = 0 ";
-	    sql += "  GROUP BY a.\"CustNo\"     ";
+		sql += "  GROUP BY a.\"CustNo\"     ";
 		sql += ") t ";
 		sql += "Left join";
 		sql += "( SELECT";
@@ -64,7 +64,7 @@ public class BS020ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ,1                          as \"RepayType\" ";
 		sql += "  FROM \"LoanBorMain\" l ";
 		sql += "  WHERE l.\"Status\" = 0 ";
-		sql += "    and ( l.\"NextPayIntDate\" <= " + nextPayIntDate + " or l.\"MaturityDate\" <= "  + nextPayIntDate + ")";
+		sql += "    and ( l.\"NextPayIntDate\" <= " + nextPayIntDate + " or l.\"MaturityDate\" <= " + nextPayIntDate + ")";
 		sql += "  GROUP BY l.\"CustNo\"     ";
 		sql += " ) b  on b.\"CustNo\"    = t.\"CustNo\" ";
 		sql += "WHERE t.TAV > 0 ";

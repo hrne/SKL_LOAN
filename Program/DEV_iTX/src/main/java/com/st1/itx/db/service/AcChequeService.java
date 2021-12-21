@@ -16,107 +16,107 @@ import com.st1.itx.db.domain.AcChequeId;
  */
 public interface AcChequeService {
 
-  /**
-   * findByPrimaryKey
-   *
-   * @param acChequeId PK
-   * @param titaVo Variable-Length Argument
-   * @return AcCheque AcCheque
-   */
-  public AcCheque findById(AcChequeId acChequeId, TitaVo... titaVo);
+	/**
+	 * findByPrimaryKey
+	 *
+	 * @param acChequeId PK
+	 * @param titaVo     Variable-Length Argument
+	 * @return AcCheque AcCheque
+	 */
+	public AcCheque findById(AcChequeId acChequeId, TitaVo... titaVo);
 
-  /**
-   * findAll
-   *
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice AcCheque AcCheque of List
-   */
-  public Slice<AcCheque> findAll(int index, int limit, TitaVo... titaVo);
+	/**
+	 * findAll
+	 *
+	 * @param index  Page Index
+	 * @param limit  Page Data Limit
+	 * @param titaVo Variable-Length Argument
+	 * @return Slice AcCheque AcCheque of List
+	 */
+	public Slice<AcCheque> findAll(int index, int limit, TitaVo... titaVo);
 
-  /**
-   * hold By AcCheque
-   * 
-   * @param acChequeId key
-   * @param titaVo Variable-Length Argument
-   * @return AcCheque AcCheque
-   */
-  public AcCheque holdById(AcChequeId acChequeId, TitaVo... titaVo);
+	/**
+	 * hold By AcCheque
+	 * 
+	 * @param acChequeId key
+	 * @param titaVo     Variable-Length Argument
+	 * @return AcCheque AcCheque
+	 */
+	public AcCheque holdById(AcChequeId acChequeId, TitaVo... titaVo);
 
-  /**
-   * hold By AcCheque
-   * 
-   * @param acCheque key
-   * @param titaVo Variable-Length Argument
-   * @return AcCheque AcCheque
-   */
-  public AcCheque holdById(AcCheque acCheque, TitaVo... titaVo);
+	/**
+	 * hold By AcCheque
+	 * 
+	 * @param acCheque key
+	 * @param titaVo   Variable-Length Argument
+	 * @return AcCheque AcCheque
+	 */
+	public AcCheque holdById(AcCheque acCheque, TitaVo... titaVo);
 
-  /**
-   * Insert
-   * 
-   * @param acCheque Entity
-   * @param titaVo Variable-Length Argument
-   * @return AcCheque Entity
-   * @throws DBException exception
-   */
-  public AcCheque insert(AcCheque acCheque, TitaVo... titaVo) throws DBException;
+	/**
+	 * Insert
+	 * 
+	 * @param acCheque Entity
+	 * @param titaVo   Variable-Length Argument
+	 * @return AcCheque Entity
+	 * @throws DBException exception
+	 */
+	public AcCheque insert(AcCheque acCheque, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update
-   * 
-   * @param acCheque Entity
-   * @param titaVo Variable-Length Argument
-   * @return AcCheque Entity
-   * @throws DBException exception
-   */
-  public AcCheque update(AcCheque acCheque, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update
+	 * 
+	 * @param acCheque Entity
+	 * @param titaVo   Variable-Length Argument
+	 * @return AcCheque Entity
+	 * @throws DBException exception
+	 */
+	public AcCheque update(AcCheque acCheque, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update2
-   * 
-   * @param acCheque Entity
-   * @param titaVo Variable-Length Argument
-   * @return AcCheque Entity
-   * @throws DBException exception
-   */
-  public AcCheque update2(AcCheque acCheque, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update2
+	 * 
+	 * @param acCheque Entity
+	 * @param titaVo   Variable-Length Argument
+	 * @return AcCheque Entity
+	 * @throws DBException exception
+	 */
+	public AcCheque update2(AcCheque acCheque, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Delete
-   * 
-   * @param acCheque Entity
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void delete(AcCheque acCheque, TitaVo... titaVo) throws DBException;
+	/**
+	 * Delete
+	 * 
+	 * @param acCheque Entity
+	 * @param titaVo   Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void delete(AcCheque acCheque, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Insert All For List
-   * 
-   * @param acCheque Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void insertAll(List<AcCheque> acCheque, TitaVo... titaVo) throws DBException;
+	/**
+	 * Insert All For List
+	 * 
+	 * @param acCheque Entity of List
+	 * @param titaVo   Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void insertAll(List<AcCheque> acCheque, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update All For List
-   * 
-   * @param acCheque Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void updateAll(List<AcCheque> acCheque, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update All For List
+	 * 
+	 * @param acCheque Entity of List
+	 * @param titaVo   Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void updateAll(List<AcCheque> acCheque, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Delete All For List
-   * 
-   * @param acCheque Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void deleteAll(List<AcCheque> acCheque, TitaVo... titaVo) throws DBException;
+	/**
+	 * Delete All For List
+	 * 
+	 * @param acCheque Entity of List
+	 * @param titaVo   Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void deleteAll(List<AcCheque> acCheque, TitaVo... titaVo) throws DBException;
 
 }

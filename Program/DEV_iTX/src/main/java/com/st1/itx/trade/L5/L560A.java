@@ -20,17 +20,17 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class L560A extends TradeBuffer {
-	
+
 	@Autowired
 	public L560AReport txReport;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L560A ");
 		this.totaVo.init(titaVo);
-		String adjFlag = titaVo.getBtnIndex(); //0-存證信函;1-延遲繳款通知函;2-繳款通知函
-		this.info("按鈕編號==="+adjFlag);
-		txReport.exec(titaVo,this.txBuffer);
+		String adjFlag = titaVo.getBtnIndex(); // 0-存證信函;1-延遲繳款通知函;2-繳款通知函
+		this.info("按鈕編號===" + adjFlag);
+		txReport.exec(titaVo, this.txBuffer);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

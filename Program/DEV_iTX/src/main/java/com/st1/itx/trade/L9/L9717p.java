@@ -33,7 +33,7 @@ public class L9717p extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
-	
+
 	String TXCD = "L9717";
 	String TXName = "逾期及轉催收件統計表";
 
@@ -46,22 +46,21 @@ public class L9717p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9717Report.setParentTranCode(parentTranCode);
-		
+
 		boolean isFinish = false;
-		
-		for (OutputSortBy o : OutputSortBy.values())
-		{
+
+		for (OutputSortBy o : OutputSortBy.values()) {
 			isFinish = l9717Report.exec(titaVo, o);
-			
-			if (!isFinish) { break; }
+
+			if (!isFinish) {
+				break;
+			}
 		}
-		
+
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

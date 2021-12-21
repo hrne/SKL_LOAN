@@ -24,7 +24,7 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @author Fegie
  * @version 1.0.0
  */
-public class L6R43 extends TradeBuffer {	
+public class L6R43 extends TradeBuffer {
 	@Autowired
 	public CdEmpService iCdEmpService;
 	@Autowired
@@ -35,40 +35,40 @@ public class L6R43 extends TradeBuffer {
 
 		this.info("active L6R43 ");
 		this.totaVo.init(titaVo);
-		
+
 		Slice<CdPfParms> iCdPfParams = null;
 		int i = 1;
 		iCdPfParams = iCdPfParmsService.findCode1AndCode2Eq("4", " ", 0, Integer.MAX_VALUE, titaVo);
 		if (iCdPfParams == null) {
-			while(i<=30) {
-				totaVo.putParam("L6R43EmpNo"+i, "");
-				totaVo.putParam("L6R43Email"+i, "");
-				totaVo.putParam("L6R43WorkMonthS"+i, "");
-				totaVo.putParam("L6R43WorkMonthE"+i, "");
+			while (i <= 30) {
+				totaVo.putParam("L6R43EmpNo" + i, "");
+				totaVo.putParam("L6R43Email" + i, "");
+				totaVo.putParam("L6R43WorkMonthS" + i, "");
+				totaVo.putParam("L6R43WorkMonthE" + i, "");
 				i++;
 			}
-		}else {
-			for (CdPfParms rCdPfParms:iCdPfParams) {
-				if (i>30) {
+		} else {
+			for (CdPfParms rCdPfParms : iCdPfParams) {
+				if (i > 30) {
 					break;
 				}
-				totaVo.putParam("L6R43EmpNo"+i, rCdPfParms.getCondition());
+				totaVo.putParam("L6R43EmpNo" + i, rCdPfParms.getCondition());
 				CdEmp iCdEmp = new CdEmp();
 				iCdEmp = iCdEmpService.findById(rCdPfParms.getCondition(), titaVo);
 				if (iCdEmp == null) {
-					totaVo.putParam("L6R43Email"+i, "");
-				}else {
-					totaVo.putParam("L6R43Email"+i, iCdEmp.getEmail());
+					totaVo.putParam("L6R43Email" + i, "");
+				} else {
+					totaVo.putParam("L6R43Email" + i, iCdEmp.getEmail());
 				}
-				totaVo.putParam("L6R43WorkMonthS"+i, Integer.valueOf(rCdPfParms.getWorkMonthStart())-191100);
-				totaVo.putParam("L6R43WorkMonthE"+i, Integer.valueOf(rCdPfParms.getWorkMonthEnd())-191100);
+				totaVo.putParam("L6R43WorkMonthS" + i, Integer.valueOf(rCdPfParms.getWorkMonthStart()) - 191100);
+				totaVo.putParam("L6R43WorkMonthE" + i, Integer.valueOf(rCdPfParms.getWorkMonthEnd()) - 191100);
 				i++;
 			}
-			while(i<=30) {
-				totaVo.putParam("L6R43EmpNo"+i, "");
-				totaVo.putParam("L6R43Email"+i, "");
-				totaVo.putParam("L6R43WorkMonthS"+i, "");
-				totaVo.putParam("L6R43WorkMonthE"+i, "");
+			while (i <= 30) {
+				totaVo.putParam("L6R43EmpNo" + i, "");
+				totaVo.putParam("L6R43Email" + i, "");
+				totaVo.putParam("L6R43WorkMonthS" + i, "");
+				totaVo.putParam("L6R43WorkMonthE" + i, "");
 				i++;
 			}
 		}

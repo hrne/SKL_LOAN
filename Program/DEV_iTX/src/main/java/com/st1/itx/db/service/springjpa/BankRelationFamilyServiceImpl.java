@@ -35,353 +35,342 @@ import com.st1.itx.eum.ThreadVariable;
 @Service("bankRelationFamilyService")
 @Repository
 public class BankRelationFamilyServiceImpl extends ASpringJpaParm implements BankRelationFamilyService, InitializingBean {
-  @Autowired
-  private BaseEntityManager baseEntityManager;
+	@Autowired
+	private BaseEntityManager baseEntityManager;
 
-  @Autowired
-  private BankRelationFamilyRepository bankRelationFamilyRepos;
+	@Autowired
+	private BankRelationFamilyRepository bankRelationFamilyRepos;
 
-  @Autowired
-  private BankRelationFamilyRepositoryDay bankRelationFamilyReposDay;
+	@Autowired
+	private BankRelationFamilyRepositoryDay bankRelationFamilyReposDay;
 
-  @Autowired
-  private BankRelationFamilyRepositoryMon bankRelationFamilyReposMon;
+	@Autowired
+	private BankRelationFamilyRepositoryMon bankRelationFamilyReposMon;
 
-  @Autowired
-  private BankRelationFamilyRepositoryHist bankRelationFamilyReposHist;
+	@Autowired
+	private BankRelationFamilyRepositoryHist bankRelationFamilyReposHist;
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    org.junit.Assert.assertNotNull(bankRelationFamilyRepos);
-    org.junit.Assert.assertNotNull(bankRelationFamilyReposDay);
-    org.junit.Assert.assertNotNull(bankRelationFamilyReposMon);
-    org.junit.Assert.assertNotNull(bankRelationFamilyReposHist);
-  }
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		org.junit.Assert.assertNotNull(bankRelationFamilyRepos);
+		org.junit.Assert.assertNotNull(bankRelationFamilyReposDay);
+		org.junit.Assert.assertNotNull(bankRelationFamilyReposMon);
+		org.junit.Assert.assertNotNull(bankRelationFamilyReposHist);
+	}
 
-  @Override
-  public BankRelationFamily findById(BankRelationFamilyId bankRelationFamilyId, TitaVo... titaVo) {
-    String dbName = "";
+	@Override
+	public BankRelationFamily findById(BankRelationFamilyId bankRelationFamilyId, TitaVo... titaVo) {
+		String dbName = "";
 
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + bankRelationFamilyId);
-    Optional<BankRelationFamily> bankRelationFamily = null;
-    if (dbName.equals(ContentName.onDay))
-      bankRelationFamily = bankRelationFamilyReposDay.findById(bankRelationFamilyId);
-    else if (dbName.equals(ContentName.onMon))
-      bankRelationFamily = bankRelationFamilyReposMon.findById(bankRelationFamilyId);
-    else if (dbName.equals(ContentName.onHist))
-      bankRelationFamily = bankRelationFamilyReposHist.findById(bankRelationFamilyId);
-    else 
-      bankRelationFamily = bankRelationFamilyRepos.findById(bankRelationFamilyId);
-    BankRelationFamily obj = bankRelationFamily.isPresent() ? bankRelationFamily.get() : null;
-      if(obj != null) {
-        EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
-        em.detach(obj);
-em = null;
-}
-    return obj;
-  }
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("findById " + dbName + " " + bankRelationFamilyId);
+		Optional<BankRelationFamily> bankRelationFamily = null;
+		if (dbName.equals(ContentName.onDay))
+			bankRelationFamily = bankRelationFamilyReposDay.findById(bankRelationFamilyId);
+		else if (dbName.equals(ContentName.onMon))
+			bankRelationFamily = bankRelationFamilyReposMon.findById(bankRelationFamilyId);
+		else if (dbName.equals(ContentName.onHist))
+			bankRelationFamily = bankRelationFamilyReposHist.findById(bankRelationFamilyId);
+		else
+			bankRelationFamily = bankRelationFamilyRepos.findById(bankRelationFamilyId);
+		BankRelationFamily obj = bankRelationFamily.isPresent() ? bankRelationFamily.get() : null;
+		if (obj != null) {
+			EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
+			em.detach(obj);
+			em = null;
+		}
+		return obj;
+	}
 
-  @Override
-  public Slice<BankRelationFamily> findAll(int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BankRelationFamily> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = null;
-    if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "RelationId"));
-    else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "RelationId"));
-    this.info("findAll " + dbName);
-    if (dbName.equals(ContentName.onDay))
-      slice = bankRelationFamilyReposDay.findAll(pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = bankRelationFamilyReposMon.findAll(pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = bankRelationFamilyReposHist.findAll(pageable);
-    else 
-      slice = bankRelationFamilyRepos.findAll(pageable);
+	@Override
+	public Slice<BankRelationFamily> findAll(int index, int limit, TitaVo... titaVo) {
+		String dbName = "";
+		Slice<BankRelationFamily> slice = null;
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		Pageable pageable = null;
+		if (limit == Integer.MAX_VALUE)
+			pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "RelationId"));
+		else
+			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustName", "CustId", "RelationId"));
+		this.info("findAll " + dbName);
+		if (dbName.equals(ContentName.onDay))
+			slice = bankRelationFamilyReposDay.findAll(pageable);
+		else if (dbName.equals(ContentName.onMon))
+			slice = bankRelationFamilyReposMon.findAll(pageable);
+		else if (dbName.equals(ContentName.onHist))
+			slice = bankRelationFamilyReposHist.findAll(pageable);
+		else
+			slice = bankRelationFamilyRepos.findAll(pageable);
 
-		if (slice != null) 
+		if (slice != null)
 			this.baseEntityManager.clearEntityManager(dbName);
 
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
+		return slice != null && !slice.isEmpty() ? slice : null;
+	}
 
-  @Override
-  public Slice<BankRelationFamily> findRelationIdEq(String relationId_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BankRelationFamily> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
+	@Override
+	public Slice<BankRelationFamily> findRelationIdEq(String relationId_0, int index, int limit, TitaVo... titaVo) {
+		String dbName = "";
+		Slice<BankRelationFamily> slice = null;
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		Pageable pageable = null;
 
-    if(limit == Integer.MAX_VALUE)
+		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findRelationIdEq " + dbName + " : " + "relationId_0 : " + relationId_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = bankRelationFamilyReposDay.findAllByRelationIdIs(relationId_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = bankRelationFamilyReposMon.findAllByRelationIdIs(relationId_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = bankRelationFamilyReposHist.findAllByRelationIdIs(relationId_0, pageable);
-    else 
-      slice = bankRelationFamilyRepos.findAllByRelationIdIs(relationId_0, pageable);
+		else
+			pageable = PageRequest.of(index, limit);
+		this.info("findRelationIdEq " + dbName + " : " + "relationId_0 : " + relationId_0);
+		if (dbName.equals(ContentName.onDay))
+			slice = bankRelationFamilyReposDay.findAllByRelationIdIs(relationId_0, pageable);
+		else if (dbName.equals(ContentName.onMon))
+			slice = bankRelationFamilyReposMon.findAllByRelationIdIs(relationId_0, pageable);
+		else if (dbName.equals(ContentName.onHist))
+			slice = bankRelationFamilyReposHist.findAllByRelationIdIs(relationId_0, pageable);
+		else
+			slice = bankRelationFamilyRepos.findAllByRelationIdIs(relationId_0, pageable);
 
-		if (slice != null) 
+		if (slice != null)
 			this.baseEntityManager.clearEntityManager(dbName);
 
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
+		return slice != null && !slice.isEmpty() ? slice : null;
+	}
 
-  @Override
-  public BankRelationFamily holdById(BankRelationFamilyId bankRelationFamilyId, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + bankRelationFamilyId);
-    Optional<BankRelationFamily> bankRelationFamily = null;
-    if (dbName.equals(ContentName.onDay))
-      bankRelationFamily = bankRelationFamilyReposDay.findByBankRelationFamilyId(bankRelationFamilyId);
-    else if (dbName.equals(ContentName.onMon))
-      bankRelationFamily = bankRelationFamilyReposMon.findByBankRelationFamilyId(bankRelationFamilyId);
-    else if (dbName.equals(ContentName.onHist))
-      bankRelationFamily = bankRelationFamilyReposHist.findByBankRelationFamilyId(bankRelationFamilyId);
-    else 
-      bankRelationFamily = bankRelationFamilyRepos.findByBankRelationFamilyId(bankRelationFamilyId);
-    return bankRelationFamily.isPresent() ? bankRelationFamily.get() : null;
-  }
+	@Override
+	public BankRelationFamily holdById(BankRelationFamilyId bankRelationFamilyId, TitaVo... titaVo) {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Hold " + dbName + " " + bankRelationFamilyId);
+		Optional<BankRelationFamily> bankRelationFamily = null;
+		if (dbName.equals(ContentName.onDay))
+			bankRelationFamily = bankRelationFamilyReposDay.findByBankRelationFamilyId(bankRelationFamilyId);
+		else if (dbName.equals(ContentName.onMon))
+			bankRelationFamily = bankRelationFamilyReposMon.findByBankRelationFamilyId(bankRelationFamilyId);
+		else if (dbName.equals(ContentName.onHist))
+			bankRelationFamily = bankRelationFamilyReposHist.findByBankRelationFamilyId(bankRelationFamilyId);
+		else
+			bankRelationFamily = bankRelationFamilyRepos.findByBankRelationFamilyId(bankRelationFamilyId);
+		return bankRelationFamily.isPresent() ? bankRelationFamily.get() : null;
+	}
 
-  @Override
-  public BankRelationFamily holdById(BankRelationFamily bankRelationFamily, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
-    Optional<BankRelationFamily> bankRelationFamilyT = null;
-    if (dbName.equals(ContentName.onDay))
-      bankRelationFamilyT = bankRelationFamilyReposDay.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
-    else if (dbName.equals(ContentName.onMon))
-      bankRelationFamilyT = bankRelationFamilyReposMon.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
-    else if (dbName.equals(ContentName.onHist))
-      bankRelationFamilyT = bankRelationFamilyReposHist.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
-    else 
-      bankRelationFamilyT = bankRelationFamilyRepos.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
-    return bankRelationFamilyT.isPresent() ? bankRelationFamilyT.get() : null;
-  }
+	@Override
+	public BankRelationFamily holdById(BankRelationFamily bankRelationFamily, TitaVo... titaVo) {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Hold " + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+		Optional<BankRelationFamily> bankRelationFamilyT = null;
+		if (dbName.equals(ContentName.onDay))
+			bankRelationFamilyT = bankRelationFamilyReposDay.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
+		else if (dbName.equals(ContentName.onMon))
+			bankRelationFamilyT = bankRelationFamilyReposMon.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
+		else if (dbName.equals(ContentName.onHist))
+			bankRelationFamilyT = bankRelationFamilyReposHist.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
+		else
+			bankRelationFamilyT = bankRelationFamilyRepos.findByBankRelationFamilyId(bankRelationFamily.getBankRelationFamilyId());
+		return bankRelationFamilyT.isPresent() ? bankRelationFamilyT.get() : null;
+	}
 
-  @Override
-  public BankRelationFamily insert(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public BankRelationFamily insert(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Insert..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
-    if (this.findById(bankRelationFamily.getBankRelationFamilyId()) != null)
-      throw new DBException(2);
+		this.info("Insert..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+		if (this.findById(bankRelationFamily.getBankRelationFamilyId()) != null)
+			throw new DBException(2);
 
-    if (!empNot.isEmpty())
-      bankRelationFamily.setCreateEmpNo(empNot);
+		if (!empNot.isEmpty())
+			bankRelationFamily.setCreateEmpNo(empNot);
 
-    if(bankRelationFamily.getLastUpdateEmpNo() == null || bankRelationFamily.getLastUpdateEmpNo().isEmpty())
-      bankRelationFamily.setLastUpdateEmpNo(empNot);
+		if (bankRelationFamily.getLastUpdateEmpNo() == null || bankRelationFamily.getLastUpdateEmpNo().isEmpty())
+			bankRelationFamily.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      return bankRelationFamilyReposDay.saveAndFlush(bankRelationFamily);	
-    else if (dbName.equals(ContentName.onMon))
-      return bankRelationFamilyReposMon.saveAndFlush(bankRelationFamily);
-    else if (dbName.equals(ContentName.onHist))
-      return bankRelationFamilyReposHist.saveAndFlush(bankRelationFamily);
-    else 
-    return bankRelationFamilyRepos.saveAndFlush(bankRelationFamily);
-  }
+		if (dbName.equals(ContentName.onDay))
+			return bankRelationFamilyReposDay.saveAndFlush(bankRelationFamily);
+		else if (dbName.equals(ContentName.onMon))
+			return bankRelationFamilyReposMon.saveAndFlush(bankRelationFamily);
+		else if (dbName.equals(ContentName.onHist))
+			return bankRelationFamilyReposHist.saveAndFlush(bankRelationFamily);
+		else
+			return bankRelationFamilyRepos.saveAndFlush(bankRelationFamily);
+	}
 
-  @Override
-  public BankRelationFamily update(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public BankRelationFamily update(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
-    if (!empNot.isEmpty())
-      bankRelationFamily.setLastUpdateEmpNo(empNot);
+		this.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+		if (!empNot.isEmpty())
+			bankRelationFamily.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      return bankRelationFamilyReposDay.saveAndFlush(bankRelationFamily);	
-    else if (dbName.equals(ContentName.onMon))
-      return bankRelationFamilyReposMon.saveAndFlush(bankRelationFamily);
-    else if (dbName.equals(ContentName.onHist))
-      return bankRelationFamilyReposHist.saveAndFlush(bankRelationFamily);
-    else 
-    return bankRelationFamilyRepos.saveAndFlush(bankRelationFamily);
-  }
+		if (dbName.equals(ContentName.onDay))
+			return bankRelationFamilyReposDay.saveAndFlush(bankRelationFamily);
+		else if (dbName.equals(ContentName.onMon))
+			return bankRelationFamilyReposMon.saveAndFlush(bankRelationFamily);
+		else if (dbName.equals(ContentName.onHist))
+			return bankRelationFamilyReposHist.saveAndFlush(bankRelationFamily);
+		else
+			return bankRelationFamilyRepos.saveAndFlush(bankRelationFamily);
+	}
 
-  @Override
-  public BankRelationFamily update2(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public BankRelationFamily update2(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
-    if (!empNot.isEmpty())
-      bankRelationFamily.setLastUpdateEmpNo(empNot);
+		this.info("Update..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+		if (!empNot.isEmpty())
+			bankRelationFamily.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      bankRelationFamilyReposDay.saveAndFlush(bankRelationFamily);	
-    else if (dbName.equals(ContentName.onMon))
-      bankRelationFamilyReposMon.saveAndFlush(bankRelationFamily);
-    else if (dbName.equals(ContentName.onHist))
-        bankRelationFamilyReposHist.saveAndFlush(bankRelationFamily);
-    else 
-      bankRelationFamilyRepos.saveAndFlush(bankRelationFamily);	
-    return this.findById(bankRelationFamily.getBankRelationFamilyId());
-  }
+		if (dbName.equals(ContentName.onDay))
+			bankRelationFamilyReposDay.saveAndFlush(bankRelationFamily);
+		else if (dbName.equals(ContentName.onMon))
+			bankRelationFamilyReposMon.saveAndFlush(bankRelationFamily);
+		else if (dbName.equals(ContentName.onHist))
+			bankRelationFamilyReposHist.saveAndFlush(bankRelationFamily);
+		else
+			bankRelationFamilyRepos.saveAndFlush(bankRelationFamily);
+		return this.findById(bankRelationFamily.getBankRelationFamilyId());
+	}
 
-  @Override
-  public void delete(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
-    if (dbName.equals(ContentName.onDay)) {
-      bankRelationFamilyReposDay.delete(bankRelationFamily);	
-      bankRelationFamilyReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      bankRelationFamilyReposMon.delete(bankRelationFamily);	
-      bankRelationFamilyReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      bankRelationFamilyReposHist.delete(bankRelationFamily);
-      bankRelationFamilyReposHist.flush();
-    }
-    else {
-      bankRelationFamilyRepos.delete(bankRelationFamily);
-      bankRelationFamilyRepos.flush();
-    }
-   }
+	@Override
+	public void delete(BankRelationFamily bankRelationFamily, TitaVo... titaVo) throws DBException {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Delete..." + dbName + " " + bankRelationFamily.getBankRelationFamilyId());
+		if (dbName.equals(ContentName.onDay)) {
+			bankRelationFamilyReposDay.delete(bankRelationFamily);
+			bankRelationFamilyReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			bankRelationFamilyReposMon.delete(bankRelationFamily);
+			bankRelationFamilyReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			bankRelationFamilyReposHist.delete(bankRelationFamily);
+			bankRelationFamilyReposHist.flush();
+		} else {
+			bankRelationFamilyRepos.delete(bankRelationFamily);
+			bankRelationFamilyRepos.flush();
+		}
+	}
 
-  @Override
-  public void insertAll(List<BankRelationFamily> bankRelationFamily, TitaVo... titaVo) throws DBException {
-    if (bankRelationFamily == null || bankRelationFamily.size() == 0)
-      throw new DBException(6);
-     String dbName = "";
+	@Override
+	public void insertAll(List<BankRelationFamily> bankRelationFamily, TitaVo... titaVo) throws DBException {
+		if (bankRelationFamily == null || bankRelationFamily.size() == 0)
+			throw new DBException(6);
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("InsertAll...");
-    for (BankRelationFamily t : bankRelationFamily){ 
-      if (!empNot.isEmpty())
-        t.setCreateEmpNo(empNot);
-      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
-        t.setLastUpdateEmpNo(empNot);
-}		
+		this.info("InsertAll...");
+		for (BankRelationFamily t : bankRelationFamily) {
+			if (!empNot.isEmpty())
+				t.setCreateEmpNo(empNot);
+			if (t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+				t.setLastUpdateEmpNo(empNot);
+		}
 
-    if (dbName.equals(ContentName.onDay)) {
-      bankRelationFamily = bankRelationFamilyReposDay.saveAll(bankRelationFamily);	
-      bankRelationFamilyReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      bankRelationFamily = bankRelationFamilyReposMon.saveAll(bankRelationFamily);	
-      bankRelationFamilyReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      bankRelationFamily = bankRelationFamilyReposHist.saveAll(bankRelationFamily);
-      bankRelationFamilyReposHist.flush();
-    }
-    else {
-      bankRelationFamily = bankRelationFamilyRepos.saveAll(bankRelationFamily);
-      bankRelationFamilyRepos.flush();
-    }
-    }
+		if (dbName.equals(ContentName.onDay)) {
+			bankRelationFamily = bankRelationFamilyReposDay.saveAll(bankRelationFamily);
+			bankRelationFamilyReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			bankRelationFamily = bankRelationFamilyReposMon.saveAll(bankRelationFamily);
+			bankRelationFamilyReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			bankRelationFamily = bankRelationFamilyReposHist.saveAll(bankRelationFamily);
+			bankRelationFamilyReposHist.flush();
+		} else {
+			bankRelationFamily = bankRelationFamilyRepos.saveAll(bankRelationFamily);
+			bankRelationFamilyRepos.flush();
+		}
+	}
 
-  @Override
-  public void updateAll(List<BankRelationFamily> bankRelationFamily, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public void updateAll(List<BankRelationFamily> bankRelationFamily, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("UpdateAll...");
-    if (bankRelationFamily == null || bankRelationFamily.size() == 0)
-      throw new DBException(6);
+		this.info("UpdateAll...");
+		if (bankRelationFamily == null || bankRelationFamily.size() == 0)
+			throw new DBException(6);
 
-    for (BankRelationFamily t : bankRelationFamily) 
-    if (!empNot.isEmpty())
-        t.setLastUpdateEmpNo(empNot);
-		
+		for (BankRelationFamily t : bankRelationFamily)
+			if (!empNot.isEmpty())
+				t.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay)) {
-      bankRelationFamily = bankRelationFamilyReposDay.saveAll(bankRelationFamily);	
-      bankRelationFamilyReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      bankRelationFamily = bankRelationFamilyReposMon.saveAll(bankRelationFamily);	
-      bankRelationFamilyReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      bankRelationFamily = bankRelationFamilyReposHist.saveAll(bankRelationFamily);
-      bankRelationFamilyReposHist.flush();
-    }
-    else {
-      bankRelationFamily = bankRelationFamilyRepos.saveAll(bankRelationFamily);
-      bankRelationFamilyRepos.flush();
-    }
-    }
+		if (dbName.equals(ContentName.onDay)) {
+			bankRelationFamily = bankRelationFamilyReposDay.saveAll(bankRelationFamily);
+			bankRelationFamilyReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			bankRelationFamily = bankRelationFamilyReposMon.saveAll(bankRelationFamily);
+			bankRelationFamilyReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			bankRelationFamily = bankRelationFamilyReposHist.saveAll(bankRelationFamily);
+			bankRelationFamilyReposHist.flush();
+		} else {
+			bankRelationFamily = bankRelationFamilyRepos.saveAll(bankRelationFamily);
+			bankRelationFamilyRepos.flush();
+		}
+	}
 
-  @Override
-  public void deleteAll(List<BankRelationFamily> bankRelationFamily, TitaVo... titaVo) throws DBException {
-    this.info("DeleteAll...");
-    String dbName = "";
-    
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    if (bankRelationFamily == null || bankRelationFamily.size() == 0)
-      throw new DBException(6);
-    if (dbName.equals(ContentName.onDay)) {
-      bankRelationFamilyReposDay.deleteAll(bankRelationFamily);	
-      bankRelationFamilyReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      bankRelationFamilyReposMon.deleteAll(bankRelationFamily);	
-      bankRelationFamilyReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      bankRelationFamilyReposHist.deleteAll(bankRelationFamily);
-      bankRelationFamilyReposHist.flush();
-    }
-    else {
-      bankRelationFamilyRepos.deleteAll(bankRelationFamily);
-      bankRelationFamilyRepos.flush();
-    }
-  }
+	@Override
+	public void deleteAll(List<BankRelationFamily> bankRelationFamily, TitaVo... titaVo) throws DBException {
+		this.info("DeleteAll...");
+		String dbName = "";
+
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		if (bankRelationFamily == null || bankRelationFamily.size() == 0)
+			throw new DBException(6);
+		if (dbName.equals(ContentName.onDay)) {
+			bankRelationFamilyReposDay.deleteAll(bankRelationFamily);
+			bankRelationFamilyReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			bankRelationFamilyReposMon.deleteAll(bankRelationFamily);
+			bankRelationFamilyReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			bankRelationFamilyReposHist.deleteAll(bankRelationFamily);
+			bankRelationFamilyReposHist.flush();
+		} else {
+			bankRelationFamilyRepos.deleteAll(bankRelationFamily);
+			bankRelationFamilyRepos.flush();
+		}
+	}
 
 }

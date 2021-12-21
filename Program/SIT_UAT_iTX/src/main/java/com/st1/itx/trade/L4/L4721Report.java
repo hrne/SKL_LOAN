@@ -40,7 +40,7 @@ public class L4721Report extends MakeReport {
 
 	@Autowired
 	public BaTxCom baTxCom;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -160,8 +160,7 @@ public class L4721Report extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 2,
-				this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -208,7 +207,7 @@ public class L4721Report extends MakeReport {
 
 			// 有資料產表
 			cnt = cnt + 1;
-			
+
 			if (cnt >= 2) {
 				this.newPage();
 			}
@@ -292,8 +291,7 @@ public class L4721Report extends MakeReport {
 		this.toPdf(sno);
 	}
 
-	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
-			throws NumberFormatException, LogicException {
+	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate) throws NumberFormatException, LogicException {
 		this.info("L4721Report.setHead" + custNo + "-" + facmNo + "" + effectDate);
 		headerCustName = headerBankStatement.get("CustName");
 		headerCustNo = headerBankStatement.get("CustNo");
@@ -303,8 +301,7 @@ public class L4721Report extends MakeReport {
 		headerLoanBal = headerBankStatement.get("LoanBal");
 		baTxCom.getDueAmt(effectDate, custNo, facmNo, 0, titaVo);
 		headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
-		headerExcessive = ""+baTxCom.getExcessive().subtract(baTxCom.getShortfall());
-	
+		headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
 
 	}
 

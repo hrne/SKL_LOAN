@@ -43,7 +43,7 @@ public class L2914 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClOtherService sClOtherService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -142,7 +142,7 @@ public class L2914 extends TradeBuffer {
 		this.totaVo.putParam("OPledgeEndDate", tClOther.getPledgeEndDate());
 		this.totaVo.putParam("OPledgeBankCode", tClOther.getPledgeBankCode());
 		this.totaVo.putParam("OPledgeNO", tClOther.getPledgeNO());
-		
+
 		CustMain custMain = sCustMainService.findById(tClOther.getOwnerCustUKey(), titaVo);
 		if (custMain != null) {
 			this.totaVo.putParam("OOwnerId", custMain.getCustId());

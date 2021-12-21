@@ -69,7 +69,7 @@ public class L6752 extends TradeBuffer {
 				int iMonth = this.parse.stringToInteger(titaVo.getParam("Month" + i));
 				int iStartDate = this.parse.stringToInteger(titaVo.getParam("StartDate" + i));
 				int iEndDate = this.parse.stringToInteger(titaVo.getParam("EndDate" + i));
-				int iBonusDate = this.parse.stringToInteger(titaVo.getParam("BonusDate" + i)); 
+				int iBonusDate = this.parse.stringToInteger(titaVo.getParam("BonusDate" + i));
 
 				// 若該筆無資料就離開迴圈
 				if (iMonth == 0) {

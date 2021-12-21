@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,17 +21,16 @@ import com.st1.itx.db.domain.MonthlyLM036Portfolio;
  */
 public interface MonthlyLM036PortfolioRepositoryHist extends JpaRepository<MonthlyLM036Portfolio, Integer> {
 
-  // DataMonth >= , AND DataMonth <= 
-  public Slice<MonthlyLM036Portfolio> findAllByDataMonthGreaterThanEqualAndDataMonthLessThanEqualOrderByDataMonthAsc(int dataMonth_0, int dataMonth_1, Pageable pageable);
+	// DataMonth >= , AND DataMonth <=
+	public Slice<MonthlyLM036Portfolio> findAllByDataMonthGreaterThanEqualAndDataMonthLessThanEqualOrderByDataMonthAsc(int dataMonth_0, int dataMonth_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MonthlyLM036Portfolio> findByDataMonth(int dataMonth);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MonthlyLM036Portfolio> findByDataMonth(int dataMonth);
 
-  // 維護 MonthlyLM036Portfolio LM036Portfolio
-  @Procedure(value = "\"Usp_L9_MonthlyLM036Portfolio_Ins\"")
-  public void uspL9Monthlylm036portfolioIns(int TBSDYF, String EmpNo);
+	// 維護 MonthlyLM036Portfolio LM036Portfolio
+	@Procedure(value = "\"Usp_L9_MonthlyLM036Portfolio_Ins\"")
+	public void uspL9Monthlylm036portfolioIns(int TBSDYF, String EmpNo);
 
 }
-

@@ -29,24 +29,18 @@ public class L5813 extends TradeBuffer {
 	@Autowired
 	public DataLog iDataLog;
 
-
-
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5813 ");
 		this.totaVo.init(titaVo);
-		
+
 		// 執行交易
 		MySpring.newTask("L5813Batch", this.txBuffer, titaVo);
 
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
-
-
 
 }

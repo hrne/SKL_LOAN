@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,28 +21,28 @@ import com.st1.itx.db.domain.JcicZ446Id;
  */
 public interface JcicZ446RepositoryHist extends JpaRepository<JcicZ446, JcicZ446Id> {
 
-  // CustId=
-  public Slice<JcicZ446> findAllByCustIdIsOrderByCustIdAscApplyDateDesc(String custId_0, Pageable pageable);
+	// CustId=
+	public Slice<JcicZ446> findAllByCustIdIsOrderByCustIdAscApplyDateDesc(String custId_0, Pageable pageable);
 
-  // ApplyDate=
-  public Slice<JcicZ446> findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(int applyDate_0, Pageable pageable);
+	// ApplyDate=
+	public Slice<JcicZ446> findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(int applyDate_0, Pageable pageable);
 
-  // CustId= , AND ApplyDate=
-  public Slice<JcicZ446> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
+	// CustId= , AND ApplyDate=
+	public Slice<JcicZ446> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
 
-  // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode=
-  public Slice<JcicZ446> findAllBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, Pageable pageable);
+	// SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode=
+	public Slice<JcicZ446> findAllBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3,
+			Pageable pageable);
 
-  // Ukey=
-  public Optional<JcicZ446> findTopByUkeyIs(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ446> findTopByUkeyIs(String ukey_0);
 
-  // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= 
-  public Optional<JcicZ446> findTopBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3);
+	// SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode=
+	public Optional<JcicZ446> findTopBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ446> findByJcicZ446Id(JcicZ446Id jcicZ446Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ446> findByJcicZ446Id(JcicZ446Id jcicZ446Id);
 
 }
-

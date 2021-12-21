@@ -46,8 +46,7 @@ public class LD010Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> dataList) throws LogicException {
 		this.info("exportExcel ... ");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD010", "介紹人換算業績報酬檢核表", "LD010介紹人換算業績報酬檢核表",
-				"LD010_底稿_介紹人換算業績報酬檢核表.xlsx", "介紹人換算業績報酬檢核表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD010", "介紹人換算業績報酬檢核表", "LD010介紹人換算業績報酬檢核表", "LD010_底稿_介紹人換算業績報酬檢核表.xlsx", "介紹人換算業績報酬檢核表");
 
 		// 有標題列，從第二列開始塞值
 		int row = 2;

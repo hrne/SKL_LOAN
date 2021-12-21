@@ -30,15 +30,15 @@ public class L6070 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdLoanNotYetService cdLoanNotYetService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6070 ");
 		this.totaVo.init(titaVo);
-		
+
 		String iNotYetCode = titaVo.getParam("NotYetCode");
 
-		this.info("NotYetCode="+iNotYetCode);
+		this.info("NotYetCode=" + iNotYetCode);
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -47,7 +47,7 @@ public class L6070 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		Slice<CdLoanNotYet> slCdLoanNotYet = cdLoanNotYetService.codeLike(iNotYetCode+"%", this.index, this.limit, titaVo);
+		Slice<CdLoanNotYet> slCdLoanNotYet = cdLoanNotYetService.codeLike(iNotYetCode + "%", this.index, this.limit, titaVo);
 		List<CdLoanNotYet> lCdLoanNotYet = slCdLoanNotYet == null ? null : slCdLoanNotYet.getContent();
 
 		if (lCdLoanNotYet == null) {

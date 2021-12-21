@@ -84,7 +84,7 @@ public class L5053ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "a.\"LastUpdate\", " // 最後更新日期時間
 				+ "a.\"LastUpdateEmpNo\"," // 最後更新人員
 				+ "c.\"Fullname\" as \"LastUpdateEmpName\" " // 最後更新人員
-				+ "FROM \"PfRewardMedia\" a "; 
+				+ "FROM \"PfRewardMedia\" a ";
 		sql += "LEFT JOIN \"CdEmp\" b ON b.\"EmployeeNo\"=a.\"EmployeeNo\" ";
 		sql += "LEFT JOIN \"CdEmp\" c ON c.\"EmployeeNo\"=a.\"LastUpdateEmpNo\" ";
 		sql += "LEFT JOIN \"TxControl\" d ON d.\"Code\"=:Code ";
@@ -104,7 +104,7 @@ public class L5053ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		query.setParameter("ThisIndex", index);
 //		query.setParameter("ThisLimit", limit);
 		query.setParameter("WorkYM", iWorkYM);
-		query.setParameter("Code", "L5511."+iWorkYM+".2");
+		query.setParameter("Code", "L5511." + iWorkYM + ".2");
 
 		if (iBonusType != 9) {
 			query.setParameter("BonusType", iBonusType);

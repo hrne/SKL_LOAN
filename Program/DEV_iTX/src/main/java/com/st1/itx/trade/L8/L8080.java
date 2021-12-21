@@ -78,8 +78,7 @@ public class L8080 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("oLogNo", result.get("LogNo"));
-				if (parse.stringToInteger(result.get("Entdy")) > 0
-						&& parse.stringToInteger(result.get("Entdy")) > 19110000) {
+				if (parse.stringToInteger(result.get("Entdy")) > 0 && parse.stringToInteger(result.get("Entdy")) > 19110000) {
 
 					wkAcDate = parse.stringToInteger(result.get("Entdy")) - 19110000;
 				} else {

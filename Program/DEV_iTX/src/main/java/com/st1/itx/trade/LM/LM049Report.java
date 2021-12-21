@@ -78,8 +78,7 @@ public class LM049Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM049) throws LogicException {
 		this.info("LM049Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM049", "放款金控法第44條利害關係人放款餘額表",
-				"LM049放款金控法第44條利害關係人放款餘額表_限額控管", "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx", "108.04金控子公司表7-1");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM049", "放款金控法第44條利害關係人放款餘額表", "LM049放款金控法第44條利害關係人放款餘額表_限額控管", "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx", "108.04金控子公司表7-1");
 
 		String entdy = titaVo.getEntDy();
 
@@ -212,8 +211,7 @@ public class LM049Report extends MakeReport {
 
 		// 寫簽核
 		makeExcel.setMergedRegion(rowCursorTotal + 2, rowCursorTotal + 2, 2, 16);
-		makeExcel.setValue(rowCursorTotal + 2, 2,
-				"經 辦：                      經理：                       風險管理人：                       協理：", efsVo);
+		makeExcel.setValue(rowCursorTotal + 2, 2, "經 辦：                      經理：                       風險管理人：                       協理：", efsVo);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);

@@ -22,7 +22,8 @@ import java.text.DecimalFormat;
 @Scope("prototype")
 
 public class L7901Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L7901Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L7901Report.class);
 
 	@Autowired
 	public L7901ServiceImpl L7901ServiceImpl;

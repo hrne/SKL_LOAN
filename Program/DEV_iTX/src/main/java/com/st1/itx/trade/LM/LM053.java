@@ -24,12 +24,12 @@ public class LM053 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	public LM053Report LM053report;
-	 
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
 	}
- 
+
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		// logger = LoggerFactory.getLogger(LM053.class);

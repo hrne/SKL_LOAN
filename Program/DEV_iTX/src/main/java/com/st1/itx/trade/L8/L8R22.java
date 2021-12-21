@@ -44,7 +44,7 @@ public class L8R22 extends TradeBuffer {
 			totaVo.putParam("L8r22PayAmt", iJcicZ050.getPayAmt());
 			totaVo.putParam("L8r22SumRepayActualAmt", iJcicZ050.getSumRepayActualAmt());
 			totaVo.putParam("L8r22SumRepayShouldAmt", iJcicZ050.getSumRepayShouldAmt());
-			totaVo.putParam("L8r22SecondRepayYM", iJcicZ050.getSecondRepayYM()-191100);
+			totaVo.putParam("L8r22SecondRepayYM", iJcicZ050.getSecondRepayYM() - 191100);
 			totaVo.putParam("L8r22TranKey", iJcicZ050.getTranKey());
 			totaVo.putParam("L8r22OutJcicTxtDate", iJcicZ050.getOutJcicTxtDate());
 		}

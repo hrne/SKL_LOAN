@@ -36,10 +36,8 @@ public class L2903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ,\"FinalFg\"      ";
 		sql += "     FROM \"ReltMain\"           ";
 		sql += "     WHERE \"CustNo\" = :custno  ";
-		sql += "       AND \"FinalFg\" = 'Y'     "; 
+		sql += "       AND \"FinalFg\" = 'Y'     ";
 		sql += "     GROUP BY \"CustNo\", \"ReltUKey\", \"FinalFg\"";
-
-		
 
 		this.info("sql=" + sql);
 		Query query;
@@ -47,8 +45,8 @@ public class L2903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("custno", CustNo);
-		
+
 		return this.convertToMap(query);
 	}
-	
+
 }

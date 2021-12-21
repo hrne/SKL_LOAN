@@ -34,7 +34,7 @@ public class L6R20 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public TxTellerService sTxTellerService;
-	
+
 	@Autowired
 	public TxTellerAuthService sTxTellerAuthService;
 
@@ -60,25 +60,25 @@ public class L6R20 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
-		
+
 		TxTeller tTxTeller = sTxTellerService.findById(iTlrNo, titaVo);
-		
-		for(int i=1;i<=40;i++) {
-			this.totaVo.putParam("AuthNo"+i, "");
+
+		for (int i = 1; i <= 40; i++) {
+			this.totaVo.putParam("AuthNo" + i, "");
 		}
-		
+
 		if (tTxTeller == null) {
 			if ("2".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0003", "使用者:" + iTlrNo);
 			} else if ("4".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0004", "使用者:" + iTlrNo);
 			}
-			MoveTota(iTlrNo, new TxTeller());
+			MoveTota(iTlrNo, new TxTeller(), titaVo);
 		} else {
 			if ("1".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0002", "使用者:" + iTlrNo);
 			}
-			MoveTota(iTlrNo, tTxTeller);
+			MoveTota(iTlrNo, tTxTeller, titaVo);
 			MoveGroup(iTlrNo, titaVo);
 		}
 
@@ -86,7 +86,7 @@ public class L6R20 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void MoveTota(String iTlrNo, TxTeller tTxTeller) {
+	private void MoveTota(String iTlrNo, TxTeller tTxTeller, TitaVo titaVo) {
 		this.info("L6R20 MoveTota");
 
 		this.totaVo.putParam("BrNo", tTxTeller.getBrNo());
@@ -103,19 +103,34 @@ public class L6R20 extends TradeBuffer {
 		this.totaVo.putParam("Desc", tTxTeller.getDesc());
 		this.totaVo.putParam("TlrItem", tTxTeller.getTlrItem());
 		this.totaVo.putParam("AmlHighFg", tTxTeller.getAmlHighFg());
-		
+		this.totaVo.putParam("LastDate", tTxTeller.getLastDate());
+		this.totaVo.putParam("LastTime", tTxTeller.getLastTime());
+
+		this.totaVo.putParam("LastUpdate", parse.timeStampToString(tTxTeller.getLastUpdate()));
+		String LastUpdateEmpNo = tTxTeller.getLastUpdateEmpNo();
+		this.totaVo.putParam("LastUpdateEmpNo", LastUpdateEmpNo);
+
+		String name = "";
+		TxTeller sTxTeller = sTxTellerService.findById(LastUpdateEmpNo, titaVo);
+		if (sTxTeller != null) {
+			name = sTxTeller.getTlrItem();
+		}
+
+		this.totaVo.putParam("LastUpdateEmpNoX", name);
+
 	}
+
 	private void MoveGroup(String iTlrNo, TitaVo titaVo) {
 		this.info("L6R20 MoveGroup");
 		int i = 1;
-		Slice <TxTellerAuth> tTxTellerAuth = sTxTellerAuthService.findByTlrNo(iTlrNo, this.index, this.limit, titaVo);
+		Slice<TxTellerAuth> tTxTellerAuth = sTxTellerAuthService.findByTlrNo(iTlrNo, this.index, this.limit, titaVo);
 		List<TxTellerAuth> lTxTellerAuth = tTxTellerAuth == null ? null : tTxTellerAuth.getContent();
-		
-		if(lTxTellerAuth!=null) {
-			for(TxTellerAuth mTxTellerAuth : lTxTellerAuth) {
-				this.totaVo.putParam("AuthNo"+i, mTxTellerAuth.getAuthNo());
+
+		if (lTxTellerAuth != null) {
+			for (TxTellerAuth mTxTellerAuth : lTxTellerAuth) {
+				this.totaVo.putParam("AuthNo" + i, mTxTellerAuth.getAuthNo());
 				i++;
 			}
 		}
-	}	
+	}
 }

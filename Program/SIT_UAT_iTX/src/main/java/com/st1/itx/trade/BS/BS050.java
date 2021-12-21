@@ -103,8 +103,7 @@ public class BS050 extends TradeBuffer {
 //				取額度建檔所列[房貸專員/企金人員]
 				if (tFacMain != null && !"".equals(tFacMain.getBusinessOfficer())) {
 
-					bodyText += " 案件編號 " + tFacMain.getCreditSysNo() + " 核准號碼 " + tFacMain.getApplNo() + " 初貸日 "
-							+ tFacMain.getFirstDrawdownDate() + " 房貸專員 " + tFacMain.getBusinessOfficer();
+					bodyText += " 案件編號 " + tFacMain.getCreditSysNo() + " 核准號碼 " + tFacMain.getApplNo() + " 初貸日 " + tFacMain.getFirstDrawdownDate() + " 房貸專員 " + tFacMain.getBusinessOfficer();
 					if (!"".equals(tFacMain.getBusinessOfficer())) {
 
 						tEmpNo = tFacMain.getBusinessOfficer();
@@ -113,8 +112,7 @@ public class BS050 extends TradeBuffer {
 					}
 
 				}
-				slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(), 0, 900, 0,
-						Integer.MAX_VALUE, titaVo);
+				slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
 				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 				if (lLoanBorMain != null && lLoanBorMain.size() > 0) {
 //				取「L3100撥款」登錄經辦
@@ -131,8 +129,7 @@ public class BS050 extends TradeBuffer {
 					}
 				}
 
-				String subject = "未齊件到期通知 借戶 " + FormatUtil.pad9("" + t.getCustNo(), 7) + "-"
-						+ FormatUtil.pad9("" + t.getFacmNo(), 3) + " 說明 :  " + wkNotYetItem;
+				String subject = "未齊件到期通知 借戶 " + FormatUtil.pad9("" + t.getCustNo(), 7) + "-" + FormatUtil.pad9("" + t.getFacmNo(), 3) + " 說明 :  " + wkNotYetItem;
 
 				bodyText += " 齊件到期日 " + t.getYetDate() + " 備註 " + t.getReMark();
 

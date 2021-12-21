@@ -134,7 +134,7 @@ public class L4703 extends TradeBuffer {
 //		1.個別
 		case 1:
 			tempVo = new TempVo();
-			tempVo = custNoticeCom. getCustNotice("L9703", custNo, facmNo, titaVo);
+			tempVo = custNoticeCom.getCustNotice("L9703", custNo, facmNo, titaVo);
 
 			noticeFlag = parse.stringToInteger(tempVo.getParam("ReportCode"));
 			noticePhoneNo = tempVo.getParam("ReportPhoneNo");

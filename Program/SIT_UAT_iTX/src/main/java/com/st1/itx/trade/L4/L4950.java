@@ -85,8 +85,7 @@ public class L4950 extends TradeBuffer {
 							CdEmp tCdEmp = new CdEmp();
 							tCdEmp = cdEmpService.findById(tCustMain.getEmpNo());
 							if (tCdEmp != null) {
-								if ("0".equals(tCdEmp.getAgType1()) || "2".equals(tCdEmp.getAgType1())
-										|| "3".equals(tCdEmp.getAgType1()) || "5".equals(tCdEmp.getAgType1())) {
+								if ("0".equals(tCdEmp.getAgType1()) || "2".equals(tCdEmp.getAgType1()) || "3".equals(tCdEmp.getAgType1()) || "5".equals(tCdEmp.getAgType1())) {
 								} else {
 									errCnt = errCnt + 1;
 									setreport(tFacMain, tCustMain, 2);

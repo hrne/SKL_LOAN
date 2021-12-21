@@ -44,10 +44,10 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// *** 折返控制相關 ***
 	private int limit;
-	
+
 	// *** 折返控制相關 ***
 	private int cnt;
-	
+
 	// *** 折返控制相關 ***
 	private int size;
 
@@ -128,7 +128,7 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		cnt = query.getResultList().size();
 		logger.info("Total cnt ..." + cnt);
-		
+
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
 		query.setFirstResult(this.index * this.limit);
@@ -136,7 +136,7 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-		
+
 		List<Object> result = query.getResultList();
 
 		size = result.size();
@@ -148,10 +148,10 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
 		this.index = index;
 		this.limit = limit;
-		
+
 		return findAll(titaVo);
 	}
-	
+
 	public int getSize() {
 		return cnt;
 	}

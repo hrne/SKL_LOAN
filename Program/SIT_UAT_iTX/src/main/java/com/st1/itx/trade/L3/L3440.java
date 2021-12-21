@@ -132,7 +132,7 @@ public class L3440 extends TradeBuffer {
 	private BigDecimal iShortfall;
 	private int iOverRpFg; // 1.短收 2.溢收
 	private BigDecimal iOverAmt; // 短溢收金額
-	private BigDecimal iTmpAmt =  BigDecimal.ZERO; // 暫收抵繳金額
+	private BigDecimal iTmpAmt = BigDecimal.ZERO; // 暫收抵繳金額
 
 	// work area
 	private int wkCustNo;
@@ -719,7 +719,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTx.setDelayInt(wkDelayInt);
 		tLoanBorTx.setBreachAmt(wkBreachAmt);
 		tLoanBorTx.setCloseBreachAmt(wkCloseBreachAmt);
-		tLoanBorTx.setTempAmt(this.compTempAmt());	// 暫收款金額	
+		tLoanBorTx.setTempAmt(this.compTempAmt()); // 暫收款金額
 		// 繳息首筆、繳息次筆
 		if (isFirstOvdu) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
@@ -857,19 +857,19 @@ public class L3440 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
-		
+
 		// 貸方：費用、短繳期金
 		lAcDetail.addAll(lAcDetailFee);
 
 	}
+
 	// 貸方：費用、短繳期金
 	private void batxSettleUnpaid() throws LogicException {
 		this.baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 99, BigDecimal.ZERO, titaVo); // //
 																												// 99-費用全部(含未到期)
-		wkTotalFee = baTxCom.getShortfall().add(baTxCom.getModifyFee()).add(baTxCom.getAcctFee())
-				.add(baTxCom.getFireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollFireFee())
+		wkTotalFee = baTxCom.getShortfall().add(baTxCom.getModifyFee()).add(baTxCom.getAcctFee()).add(baTxCom.getFireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollFireFee())
 				.add(baTxCom.getCollLawFee());
 		if (baTxCom.getExcessive().compareTo(wkTotalFee) < 0) {
 			throw new LogicException(titaVo, "E3071", "暫收金額=" + baTxCom.getExcessive() + ",未收費用 = " + wkTotalFee); // 金額不足
@@ -900,8 +900,7 @@ public class L3440 extends TradeBuffer {
 		if (this.baTxList != null) {
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					if ((ba.getRepayType() == 1 && (ba.getFacmNo() == wkFacmNo || ba.getFacmNo() == 0)
-							&& (ba.getBormNo() == wkBormNo || ba.getBormNo() == 0)) || ba.getRepayType() > 1) {
+					if ((ba.getRepayType() == 1 && (ba.getFacmNo() == wkFacmNo || ba.getFacmNo() == 0) && (ba.getBormNo() == wkBormNo || ba.getBormNo() == 0)) || ba.getRepayType() > 1) {
 						acDetail = new AcDetail();
 						acDetail.setDbCr("C");
 						acDetail.setAcctCode(ba.getAcctCode());
@@ -1008,10 +1007,11 @@ public class L3440 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", "催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo + " 催收序號 = " + wkOvduNo); // 更新資料時，發生錯誤
 		}
 	}
+
 	// 計算暫收款金額
 	private BigDecimal compTempAmt() throws LogicException {
 		// 還款總金額
-		BigDecimal wkAcTotal = BigDecimal.ZERO;		
+		BigDecimal wkAcTotal = BigDecimal.ZERO;
 		for (AcDetail ac : lAcDetail) {
 			if ("C".equals(ac.getDbCr())) {
 				wkAcTotal = wkAcTotal.add(ac.getTxAmt());

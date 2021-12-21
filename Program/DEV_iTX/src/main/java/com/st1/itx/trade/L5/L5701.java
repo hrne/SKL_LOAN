@@ -118,7 +118,7 @@ public class L5701 extends TradeBuffer {
 	public NegFinShareLogService sNegFinShareLogService;
 
 	@Autowired
-	public DataLog iDataLog;	
+	public DataLog iDataLog;
 
 	@Autowired
 	NegCom negCom;
@@ -190,14 +190,14 @@ public class L5701 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		checkstatus(intCustNo , FunctionCode , IntCaseSeq , Status, titaVo);	//戶況檢核
+		checkstatus(intCustNo, FunctionCode, IntCaseSeq, Status, titaVo); // 戶況檢核
 
 		NegMainId.setCustNo(intCustNo);
 		NegMainId.setCaseSeq(IntCaseSeq);
 
 		NegMain InputNegMain = InputNegMain(NegMainId);// 畫面上的資料
 		NegMain NegMainVO = sNegMainService.findById(NegMainId);
-		if (NegMainVO != null) {//修改內容使用InputNegMain時須補畫面上與程式內沒有更新的欄位
+		if (NegMainVO != null) {// 修改內容使用InputNegMain時須補畫面上與程式內沒有更新的欄位
 			if (("02").equals(FunctionCode) || ("10").equals(FunctionCode)) {
 				InputNegMain.setAccuTempAmt(NegMainVO.getAccuTempAmt());
 				InputNegMain.setAccuOverAmt(NegMainVO.getAccuOverAmt());
@@ -222,7 +222,7 @@ public class L5701 extends TradeBuffer {
 				InputNegMain.setLastUpdateEmpNo(NegMainVO.getLastUpdateEmpNo());
 			}
 		}
-		
+
 		switch (FunctionCode) {
 		case "01":
 			// 新增
@@ -241,9 +241,9 @@ public class L5701 extends TradeBuffer {
 			// 毀諾
 			// InputNegMain.setStatus("2");
 			if (NegMainVO != null) {
-				int Today = (parse.stringToInteger(titaVo.getCalDy()) + 19110000) / 100 ;// 日曆日-轉西元年月
-				if ( NegMainVO.getDeferYMStart() != 0) {		//毀諾日期檢查
-					if ( Today >= NegMainVO.getDeferYMStart() && Today <= NegMainVO.getDeferYMEnd() ) {		
+				int Today = (parse.stringToInteger(titaVo.getCalDy()) + 19110000) / 100;// 日曆日-轉西元年月
+				if (NegMainVO.getDeferYMStart() != 0) { // 毀諾日期檢查
+					if (Today >= NegMainVO.getDeferYMStart() && Today <= NegMainVO.getDeferYMEnd()) {
 						throw new LogicException(titaVo, "E0015", "該案件尚在延期繳款期間，不可設定毀諾");
 					}
 				}
@@ -292,7 +292,7 @@ public class L5701 extends TradeBuffer {
 			break;
 		case "06":
 			// 註銷
-			//計算總本金餘額
+			// 計算總本金餘額
 			if (NegMainVO != null) {
 				UpdInsertNegMain(NegMainId, NegMainVO, FunctionCode);
 			} else {
@@ -337,14 +337,14 @@ public class L5701 extends TradeBuffer {
 		case "10":
 			// 喘息期
 			// 喘息期最多六個月
-			//if (NegMainVO.getDeferYMStart() > 0) {
-			//	int deferYMStart = InputNegMain.getDeferYMStart() * 100 + 1;
-			//	int deferYMEnd = InputNegMain.getDeferYMEnd() * 100 + 1;
-			//	int DeferYM = negCom.DiffMonth(1 , deferYMStart , deferYMEnd ) + 1 ;// 月份差異
-			//	if (DeferYM > 6) {
-			//		throw new LogicException(titaVo, "E0015", "喘息期超過六個月");
-			//	}
-			//}
+			// if (NegMainVO.getDeferYMStart() > 0) {
+			// int deferYMStart = InputNegMain.getDeferYMStart() * 100 + 1;
+			// int deferYMEnd = InputNegMain.getDeferYMEnd() * 100 + 1;
+			// int DeferYM = negCom.DiffMonth(1 , deferYMStart , deferYMEnd ) + 1 ;// 月份差異
+			// if (DeferYM > 6) {
+			// throw new LogicException(titaVo, "E0015", "喘息期超過六個月");
+			// }
+			// }
 			UpdInsertNegMain(NegMainId, InputNegMain, FunctionCode);
 			break;
 		case "11":
@@ -354,13 +354,13 @@ public class L5701 extends TradeBuffer {
 			// 檢查舊的是否已經結案
 			// 若未結案 新的NEGMAIN-Status為未生效
 			// 已結案則是正常
-			if ( ("N").equals(NegMainVO.getTwoStepCode()) ) {
+			if (("N").equals(NegMainVO.getTwoStepCode())) {
 				throw new LogicException(titaVo, "E0015", "二階段註記為Ｎ，不可執行二階段新增");
 			}
-			if ( ("1").equals(NegMainVO.getCaseKindCode()) ) {
+			if (("1").equals(NegMainVO.getCaseKindCode())) {
 				throw new LogicException(titaVo, "E0015", "案件種類為債協，不可執行二階段新增");
 			}
-			
+
 			IntCaseSeq = MaxIntCaseSeq(CustNo);
 			NegMainId.setCaseSeq(IntCaseSeq);
 			if (NegMainVO.getStatus().equals("3")) {
@@ -404,21 +404,21 @@ public class L5701 extends TradeBuffer {
 		return IntCaseSeq + 1;
 	}
 
-	public void checkstatus(int custno ,String functioncode,int caseseq,String status, TitaVo titaVo) throws LogicException {
+	public void checkstatus(int custno, String functioncode, int caseseq, String status, TitaVo titaVo) throws LogicException {
 		// 一個戶號只可有一個戶況為0正常
 		Slice<NegMain> slNegMain = sNegMainService.custNoEq(custno, this.index, this.limit, titaVo);
 		List<NegMain> lNegMain = slNegMain == null ? null : slNegMain.getContent();
 
 		if (lNegMain == null) {
 			return;
-		} 
+		}
 
 		NegMain tNegMain = new NegMain();
 		for (int i = 0; i < lNegMain.size(); i++) {
 			tNegMain = lNegMain.get(i);
-			if ( !("0").equals(tNegMain.getStatus()) ) {	//戶況非0正常,則不需檢查
+			if (!("0").equals(tNegMain.getStatus())) { // 戶況非0正常,則不需檢查
 				continue;
-			}	
+			}
 			if (("01").equals(functioncode) || ("08").equals(functioncode)) { // 新增,取消毀諾
 				throw new LogicException(titaVo, "E0015", "尚有正常繳款的債權資料");
 			}
@@ -427,11 +427,10 @@ public class L5701 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0015", "尚有正常繳款的債權資料");
 				}
 			}
-			
+
 		}
 	}
-	
-	
+
 	public NegMain InputNegMain(NegMainId NegMainIdVO) throws LogicException {
 		int DeferYMStart = parse.stringToInteger(titaVo.getParam("DeferYMStart").trim()); // 延期繳款年月(起)
 		int DeferYMEnd = parse.stringToInteger(titaVo.getParam("DeferYMEnd").trim()); // 延期繳款年月(訖)
@@ -463,7 +462,6 @@ public class L5701 extends TradeBuffer {
 			InputNegMain.setDeferYMEnd(DeferYMEnd + 191100);// 延期繳款年月(parse.stringToInteger(訖)
 		}
 
-
 		InputNegMain.setCaseKindCode(CaseKindCode);// 案件種類
 		InputNegMain.setStatus(Status);// 戶況
 		InputNegMain.setCustLoanKind(CustLoanKind);// 債權戶別
@@ -492,25 +490,24 @@ public class L5701 extends TradeBuffer {
 		}
 		InputNegMain.setNegMainId(NegMainIdVO);
 		NegMain NegMainVO = sNegMainService.findById(NegMainIdVO);
-		
+
 		BigDecimal cPrincipalBal = BigDecimal.ZERO;
-		
-		if(!Code09 && ("09").equals(FunctionCode)) { //變更還款條件第一次只更新戶況,所以總本金餘額為原來的
-			Code09 =true;
-			
+
+		if (!Code09 && ("09").equals(FunctionCode)) { // 變更還款條件第一次只更新戶況,所以總本金餘額為原來的
+			Code09 = true;
+
 		} else {
-			if(("01").equals(FunctionCode) || ("09").equals(FunctionCode) || ("11").equals(FunctionCode)) {
+			if (("01").equals(FunctionCode) || ("09").equals(FunctionCode) || ("11").equals(FunctionCode)) {
 				cPrincipalBal = InputNegMain.getTotalContrAmt();
 			} else {
 				cPrincipalBal = NegMainVO.getPrincipalBal();
 			}
-			
-			
+
 			for (int i = 0; i < NegFinShareL; i++) {
 				int Row = i + 1;
 				NegFinShareCancelAmt[i] = titaVo.getParam("NegFinShareCancelAmt" + Row + "").trim(); // 註銷本金
-				
-				if(NegFinShareCancelAmt[i]!=null && NegFinShareCancelAmt[i].length()>0) {
+
+				if (NegFinShareCancelAmt[i] != null && NegFinShareCancelAmt[i].length() > 0) {
 					cPrincipalBal = cPrincipalBal.subtract(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 				}
 			}
@@ -521,18 +518,16 @@ public class L5701 extends TradeBuffer {
 			InputNegMain.setNextPayDate(InputNegMain.getFirstDueDate());
 		}
 
-		
 		if (NegMainVO != null) {
 			// UPDATE
 			NegMain sNegMsain = sNegMainService.holdById(NegMainVO.getNegMainId());
 
 			if (InputNegMain.getDeferYMStart() > 0) {// 設定喘息期一併異動下次繳款日與還款結束日
-				if (sNegMsain.getDeferYMStart() != InputNegMain.getDeferYMStart()
-						|| sNegMsain.getDeferYMEnd() != InputNegMain.getDeferYMEnd()) {
+				if (sNegMsain.getDeferYMStart() != InputNegMain.getDeferYMStart() || sNegMsain.getDeferYMEnd() != InputNegMain.getDeferYMEnd()) {
 					int daystart = InputNegMain.getDeferYMStart() * 100 - 19110000 + 01;
 					int dayend = InputNegMain.getDeferYMEnd() * 100 - 19110000 + 01;
 					int period = negCom.DiffMonth(1, daystart, dayend) + 1;
-					int odaystart = sNegMsain.getDeferYMStart() ;
+					int odaystart = sNegMsain.getDeferYMStart();
 					int odayend = sNegMsain.getDeferYMEnd();
 					int operiod = 0;
 					if (odaystart > 0) {
@@ -540,8 +535,8 @@ public class L5701 extends TradeBuffer {
 						odayend = odayend * 100 - 19110000 + 01;
 						operiod = negCom.DiffMonth(1, odaystart, odayend) + 1;
 					}
-					if (daystart <= sNegMsain.getPayIntDate() ) {
-						throw new LogicException(titaVo, "E0015", "延期繳款年月區間設定有誤,繳款迄日="+sNegMsain.getPayIntDate());
+					if (daystart <= sNegMsain.getPayIntDate()) {
+						throw new LogicException(titaVo, "E0015", "延期繳款年月區間設定有誤,繳款迄日=" + sNegMsain.getPayIntDate());
 					}
 
 					if (daystart <= odayend) {// 已設定-修改區間
@@ -549,30 +544,24 @@ public class L5701 extends TradeBuffer {
 							if (daystart != odaystart) {
 								throw new LogicException(titaVo, "E0015", "下次繳款日與還款結束日已異動,只可修改延期繳款[迄]");
 							} else {
-								InputNegMain.setNextPayDate(
-										negCom.getRepayDate(sNegMsain.getNextPayDate(), period - operiod, titaVo));
-								InputNegMain.setLastDueDate(
-										negCom.getRepayDate(sNegMsain.getLastDueDate(), period - operiod, titaVo));
+								InputNegMain.setNextPayDate(negCom.getRepayDate(sNegMsain.getNextPayDate(), period - operiod, titaVo));
+								InputNegMain.setLastDueDate(negCom.getRepayDate(sNegMsain.getLastDueDate(), period - operiod, titaVo));
 							}
 						} else {// 未異動下次應繳日+還款結束日=>下次繳款日在喘息期區間內才異動
 							if (InputNegMain.getNextPayDate() >= daystart && InputNegMain.getNextPayDate() <= dayend) {
-								InputNegMain.setNextPayDate(
-										negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
-								InputNegMain.setLastDueDate(
-										negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
+								InputNegMain.setNextPayDate(negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
+								InputNegMain.setLastDueDate(negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
 							}
 						}
 					} else {// 新增設定區間- 下次繳款日在喘息期區間內才異動
 						if (InputNegMain.getNextPayDate() >= daystart && InputNegMain.getNextPayDate() <= dayend) {
-							InputNegMain
-									.setNextPayDate(negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
-							InputNegMain
-									.setLastDueDate(negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
+							InputNegMain.setNextPayDate(negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
+							InputNegMain.setLastDueDate(negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
 						}
 					}
 				}
 			}
-			
+
 			NegMain beforeNegMain = (NegMain) iDataLog.clone(sNegMsain);
 			try {
 				sNegMsain = sNegMainService.update(InputNegMain);
@@ -583,17 +572,17 @@ public class L5701 extends TradeBuffer {
 			iDataLog.exec();
 		} else {
 			// INSERT
-			if(("01").equals(FunctionCode)) {//新增時繳息迄日=協商申請日
+			if (("01").equals(FunctionCode)) {// 新增時繳息迄日=協商申請日
 				InputNegMain.setPayIntDate(InputNegMain.getApplDate());
 			}
-			if(("09").equals(FunctionCode)) {//變更還款時繳息迄日=申請變更還款條件日
+			if (("09").equals(FunctionCode)) {// 變更還款時繳息迄日=申請變更還款條件日
 				InputNegMain.setPayIntDate(InputNegMain.getChgCondDate());
 				InputNegMain.setChgCondDate(0);
 			}
-			if(("11").equals(FunctionCode)) {//二階段新增時繳息迄日=首次繳款日前一個月
+			if (("11").equals(FunctionCode)) {// 二階段新增時繳息迄日=首次繳款日前一個月
 				InputNegMain.setPayIntDate(negCom.getRepayDate(InputNegMain.getFirstDueDate(), -1, titaVo));
 			}
-			
+
 			try {
 				this.info("InputNegMain==" + InputNegMain);
 				sNegMainService.insert(InputNegMain);
@@ -746,7 +735,7 @@ public class L5701 extends TradeBuffer {
 			NegFinShareFinCode[i] = titaVo.getParam("NegFinShareFinCode" + Row + "").trim(); // 債權機構
 			NegFinShareContractAmt[i] = titaVo.getParam("NegFinShareContractAmt" + Row + "").trim(); // 簽約金額
 			NegFinShareCancelDate[i] = titaVo.getParam("NegFinShareCancelDate" + Row + "").trim(); // 註銷日期
-			NegFinShareCancelAmt[i] = titaVo.getParam("NegFinShareCancelAmt"+Row+"").trim();//註銷金額
+			NegFinShareCancelAmt[i] = titaVo.getParam("NegFinShareCancelAmt" + Row + "").trim();// 註銷金額
 			if (NegFinShareFinCode[i].length() != 0) {
 				InArraylist.add(NegFinShareFinCode[i]);
 				InArraylist.add(NegFinShareContractAmt[i]);
@@ -835,12 +824,12 @@ public class L5701 extends TradeBuffer {
 //					}
 					NegFinShareLogId.setCustNo(mCustNo);
 					NegFinShareLogId.setCaseSeq(mCaseSeq);
-					if(("09").equals(tFunctionCode) ||("11").equals(tFunctionCode)) {
+					if (("09").equals(tFunctionCode) || ("11").equals(tFunctionCode)) {
 						NegFinShareLogId.setSeq(oldSeq);
 					} else {
-						NegFinShareLogId.setSeq(oldSeq+1);
+						NegFinShareLogId.setSeq(oldSeq + 1);
 					}
-					
+
 					NegFinShareLogId.setFinCode(NegFinShareFinCode[i]);
 					NegFinShareLog.setNegFinShareLogId(NegFinShareLogId);
 					NegFinShareLog.setContractAmt(parse.stringToBigDecimal(NegFinShareContractAmt[i]));
@@ -850,7 +839,7 @@ public class L5701 extends TradeBuffer {
 					NegFinShareLog.setCancelAmt(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 
 					try {
-						sNegFinShareLogService.insert(NegFinShareLog,titaVo);
+						sNegFinShareLogService.insert(NegFinShareLog, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 

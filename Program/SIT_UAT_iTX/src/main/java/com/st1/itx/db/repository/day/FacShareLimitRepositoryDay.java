@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.FacShareLimit;
  */
 public interface FacShareLimitRepositoryDay extends JpaRepository<FacShareLimit, Integer> {
 
-  // MainApplNo =  
-  public Slice<FacShareLimit> findAllByMainApplNoIsOrderByKeyinSeqAsc(int mainApplNo_0, Pageable pageable);
+	// MainApplNo =
+	public Slice<FacShareLimit> findAllByMainApplNoIsOrderByKeyinSeqAsc(int mainApplNo_0, Pageable pageable);
 
-  // CustNo = 
-  public Slice<FacShareLimit> findAllByCustNoIsOrderByMainApplNoAscKeyinSeqAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<FacShareLimit> findAllByCustNoIsOrderByMainApplNoAscKeyinSeqAsc(int custNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacShareLimit> findByApplNo(int applNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacShareLimit> findByApplNo(int applNo);
 
 }
-

@@ -58,7 +58,6 @@ public class L5801Report2 extends MakeReport {
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
 
-		
 		makeExcel.setValue(1, 1, "種類", fontStyleVo);
 		makeExcel.setValue(1, 2, "戶號額度", fontStyleVo);
 		makeExcel.setValue(1, 3, "商品代碼", fontStyleVo);
@@ -79,7 +78,6 @@ public class L5801Report2 extends MakeReport {
 		makeExcel.setWidth(8, 24);
 		makeExcel.setWidth(9, 7);
 
-		
 		int printRow = 2; // 從第三行開始印
 
 		if (listL5801 == null || listL5801.isEmpty()) {
@@ -127,7 +125,7 @@ public class L5801Report2 extends MakeReport {
 					Kind = "增撥新台幣四千億元優惠購屋專案貸款(補貼 0.7%，不得重購)";
 					break;
 				}
-				
+
 				makeExcel.setValue(printRow, 4, Kind, fontStyleVo);
 
 				// F5 借款人戶名
@@ -135,7 +133,7 @@ public class L5801Report2 extends MakeReport {
 
 				makeExcel.setValue(printRow, 5, CustName, fontStyleVo);
 
-				// F6 借款人身份證字號	
+				// F6 借款人身份證字號
 				String CustId = mapL5801.get("F6");
 
 				makeExcel.setValue(printRow, 6, CustId, fontStyleVo);
@@ -157,7 +155,7 @@ public class L5801Report2 extends MakeReport {
 				printRow++;
 			}
 			// 畫框線
-			makeExcel.setAddRengionBorder("A", 1, "I", printRow-1, 1);
+			makeExcel.setAddRengionBorder("A", 1, "I", printRow - 1, 1);
 
 		}
 

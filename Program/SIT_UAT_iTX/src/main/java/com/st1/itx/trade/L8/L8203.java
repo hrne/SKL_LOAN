@@ -78,10 +78,10 @@ public class L8203 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L8203"); // 功能選擇錯誤
 		}
 
-		if (iFuncCode==4) {
+		if (iFuncCode == 4) {
 			titaVo.put("RELCD", "1");
 		}
-		
+
 		// 更新疑似洗錢交易合理性明細檔
 		MlaundryDetail tMlaundryDetail = new MlaundryDetail();
 		MlaundryDetailId tMlaundryDetailId = new MlaundryDetailId();
@@ -110,31 +110,30 @@ public class L8203 extends TradeBuffer {
 
 			try {
 				moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo, iManagerCheck, iFManagerDate, titaVo);
-				tMlaundryDetail = sMlaundryDetailService.update2(tMlaundryDetail,titaVo); ////
+				tMlaundryDetail = sMlaundryDetailService.update2(tMlaundryDetail, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tMlaundryDetail2, tMlaundryDetail); ////
-			if(iLevel==1) {
+			if (iLevel == 1) {
 				dataLog.exec("主管覆核");
 			} else {
 				dataLog.exec("經辦修改合理性");
 			}
-			 
+
 			break;
 		case 4: // 刪除
 			tMlaundryDetail = sMlaundryDetailService.holdById(new MlaundryDetailId(iFEntryDate, iFactor, iCustNo));
 			this.info("L8203 del : " + iFuncCode + "-" + iFEntryDate + "-" + iFactor + "-" + iCustNo);
-			
+
 			// 刷主管卡後始可刪除
 			// 交易需主管核可
 			if (!titaVo.getHsupCode().equals("1")) {
 				// titaVo.getSupCode();
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
-			if (tMlaundryDetail != null) {
 
+			if (tMlaundryDetail != null) {
 
 				try {
 					sMlaundryDetailService.delete(tMlaundryDetail);
@@ -146,7 +145,7 @@ public class L8203 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0004", titaVo.getParam("CustNo")); // 刪除資料不存在
 			}
 			dataLog.setEnv(titaVo, tMlaundryDetail, tMlaundryDetail); ////
-			dataLog.exec("刪除疑似洗錢交易合理性"); 
+			dataLog.exec("刪除疑似洗錢交易合理性");
 			break;
 		}
 		this.info("3");
@@ -161,15 +160,15 @@ public class L8203 extends TradeBuffer {
 		mMlaundryDetailId.setFactor(mFactor);
 		mMlaundryDetailId.setCustNo(mCustNo);
 		mMlaundryDetail.setMlaundryDetailId(mMlaundryDetailId);
-		
-		mMlaundryDetail.setManagerDate(iFManagerDate);//主管同意日期
-		
+
+		mMlaundryDetail.setManagerDate(iFManagerDate);// 主管同意日期
+
 		int iManagerCheckDate = 0;
-		if(Integer.valueOf(titaVo.getParam("ManagerCheckDate"))!=0) {
-			iManagerCheckDate = Integer.valueOf(titaVo.getParam("ManagerCheckDate"))+19110000;
+		if (Integer.valueOf(titaVo.getParam("ManagerCheckDate")) != 0) {
+			iManagerCheckDate = Integer.valueOf(titaVo.getParam("ManagerCheckDate")) + 19110000;
 		}
-		this.info("ManagerCheckDate="+iManagerCheckDate);
-		mMlaundryDetail.setManagerCheckDate(iManagerCheckDate);//主管覆核日期
+		this.info("ManagerCheckDate=" + iManagerCheckDate);
+		mMlaundryDetail.setManagerCheckDate(iManagerCheckDate);// 主管覆核日期
 		mMlaundryDetail.setManagerCheck(iManagerCheck);
 
 		mMlaundryDetail.setTotalAmt(this.parse.stringToBigDecimal(titaVo.getParam("TotalAmt")));
@@ -184,6 +183,6 @@ public class L8203 extends TradeBuffer {
 //		}
 		mMlaundryDetail.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mMlaundryDetail.setLastUpdateEmpNo(titaVo.getTlrNo());
-		this.info("getTlrNo=="+titaVo.getTlrNo());
+		this.info("getTlrNo==" + titaVo.getTlrNo());
 	}
 }

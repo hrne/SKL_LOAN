@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.LoanSyndItemId;
  */
 public interface LoanSyndItemRepositoryHist extends JpaRepository<LoanSyndItem, LoanSyndItemId> {
 
-  // SyndNo =
-  public Slice<LoanSyndItem> findAllBySyndNoIsOrderBySyndSeqAsc(int syndNo_0, Pageable pageable);
+	// SyndNo =
+	public Slice<LoanSyndItem> findAllBySyndNoIsOrderBySyndSeqAsc(int syndNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<LoanSyndItem> findByLoanSyndItemId(LoanSyndItemId loanSyndItemId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<LoanSyndItem> findByLoanSyndItemId(LoanSyndItemId loanSyndItemId);
 
 }
-

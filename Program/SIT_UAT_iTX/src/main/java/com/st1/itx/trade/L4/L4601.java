@@ -77,8 +77,7 @@ public class L4601 extends TradeBuffer {
 			totaA.putParam("MSGID", "L461A");
 			totaB.putParam("MSGID", "L461B");
 			totaC.putParam("MSGID", "L461C");
-			Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService
-					.fireInsuMonthRg(iInsuEndMonth + "", iInsuEndMonth + "", 0, Integer.MAX_VALUE, titaVo);
+			Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(iInsuEndMonth + "", iInsuEndMonth + "", 0, Integer.MAX_VALUE, titaVo);
 			if (slInsuRenewMediaTemp != null) {
 				for (InsuRenewMediaTemp t : slInsuRenewMediaTemp.getContent()) {
 					if (!"".equals(reportA) && !"".equals(t.getCheckResultA())) {
@@ -167,8 +166,7 @@ public class L4601 extends TradeBuffer {
 		occursListReport.putParam("ReportBPrevInsuNo", t.getInsuNo());
 		occursListReport.putParam("ReportBInsuStartDate", t.getInsuStartDate());
 		occursListReport.putParam("ReportBInsuEndDate", t.getInsuEndDate());
-		ClBuilding tClBuilding = clBuildingService.findById(new ClBuildingId(parse.stringToInteger(t.getClCode1()),
-				parse.stringToInteger(t.getClCode2()), parse.stringToInteger(t.getClNo())), titaVo);
+		ClBuilding tClBuilding = clBuildingService.findById(new ClBuildingId(parse.stringToInteger(t.getClCode1()), parse.stringToInteger(t.getClCode2()), parse.stringToInteger(t.getClNo())), titaVo);
 
 		if (tClBuilding != null) {
 			occursListReport.putParam("ReportBAddress", tClBuilding.getBdLocation().trim());

@@ -36,6 +36,7 @@
 //	}
 //}
 package com.st1.itx.trade.LQ;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -47,7 +48,6 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
-
 
 @Service("LQ002")
 @Scope("step")
@@ -82,4 +82,3 @@ public class LQ002 extends BatchBase implements Tasklet, InitializingBean {
 	}
 
 }
-

@@ -36,7 +36,7 @@ public class L6R02 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdBranchService sCdBranchService;
-	@Autowired 
+	@Autowired
 	public CdBranchGroupService sCdBranchGroupService;
 	@Autowired
 	Parse parse;
@@ -58,7 +58,7 @@ public class L6R02 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
-		
+
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {
 			throw new LogicException(titaVo, "E0009", "L6R02"); // 交易代號不可為空白
@@ -69,16 +69,14 @@ public class L6R02 extends TradeBuffer {
 
 		// 初始值Tota
 		moveTotaCdBranch(new CdBranch());
-		
-		for(int i=1;i<=10;i++) {
-			this.totaVo.putParam("L6R02Group"+i, "");
+
+		for (int i = 1; i <= 10; i++) {
+			this.totaVo.putParam("L6R02Group" + i, "");
 		}
-		
 
 		// 查詢營業單位對照檔
 		CdBranch tCdBranch = sCdBranchService.findById(iRimBranchNo, titaVo);
-		
-		
+
 		/* 如有找到資料 */
 		if (tCdBranch != null) {
 			if (iRimTxCode.equals("L6702") && iRimFuncCode == 1) {
@@ -96,12 +94,9 @@ public class L6R02 extends TradeBuffer {
 			}
 		}
 
-		//查詢營業單位客組別檔
+		// 查詢營業單位客組別檔
 		moveTotaCdBranchGroup(iRimBranchNo, titaVo);
-			
-		
-		
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -135,20 +130,20 @@ public class L6R02 extends TradeBuffer {
 //		this.totaVo.putParam("L6R02Group10", mCdBranch.getGroup10());
 
 	}
+
 	private void moveTotaCdBranchGroup(String mRimBranchNo, TitaVo titaVo) throws LogicException {
-		int i =1;
+		int i = 1;
 		Slice<CdBranchGroup> tCdBranchGroup = sCdBranchGroupService.findByBranchNo(mRimBranchNo, this.index, this.limit, titaVo);
 		List<CdBranchGroup> lCdBranchGroup = tCdBranchGroup == null ? null : tCdBranchGroup.getContent();
-		
-		if(lCdBranchGroup != null) {
-			for(CdBranchGroup mlCdBranchGroup : lCdBranchGroup) {
-					this.totaVo.putParam("L6R02Group"+i, mlCdBranchGroup.getGroupItem());
-					i++;
+
+		if (lCdBranchGroup != null) {
+			for (CdBranchGroup mlCdBranchGroup : lCdBranchGroup) {
+				this.totaVo.putParam("L6R02Group" + i, mlCdBranchGroup.getGroupItem());
+				i++;
 			}
-			
+
 		}
-		
-		
+
 	}
 
 }

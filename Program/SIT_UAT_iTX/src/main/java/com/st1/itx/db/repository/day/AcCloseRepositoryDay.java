@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.AcCloseId;
  */
 public interface AcCloseRepositoryDay extends JpaRepository<AcClose, AcCloseId> {
 
-  // AcDate = ,AND BranchNo = ,AND SecNo >=  
-  public Slice<AcClose> findAllByAcDateIsAndBranchNoIsAndSecNoGreaterThanEqualOrderBySecNoDesc(int acDate_0, String branchNo_1, String secNo_2, Pageable pageable);
+	// AcDate = ,AND BranchNo = ,AND SecNo >=
+	public Slice<AcClose> findAllByAcDateIsAndBranchNoIsAndSecNoGreaterThanEqualOrderBySecNoDesc(int acDate_0, String branchNo_1, String secNo_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<AcClose> findByAcCloseId(AcCloseId acCloseId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<AcClose> findByAcCloseId(AcCloseId acCloseId);
 
 }
-

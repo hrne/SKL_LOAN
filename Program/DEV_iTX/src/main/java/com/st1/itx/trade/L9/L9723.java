@@ -29,7 +29,7 @@ public class L9723 extends TradeBuffer {
 
 	@Autowired
 	public L9723ServiceImpl l9723ServiceImpl;
-	
+
 	private String count;
 
 	@Override
@@ -37,12 +37,12 @@ public class L9723 extends TradeBuffer {
 		this.info("active L9723 ");
 		this.totaVo.init(titaVo);
 
-			try {
-				count = l9723ServiceImpl.findAll(titaVo);
-			} catch (Exception e) {
-				this.error("l9723ServiceImpl findByCondition " + e.getMessage());
-				throw new LogicException("E0013", e.getMessage());
-			}
+		try {
+			count = l9723ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			this.error("l9723ServiceImpl findByCondition " + e.getMessage());
+			throw new LogicException("E0013", e.getMessage());
+		}
 
 		this.totaVo.putParam("Count", count);
 

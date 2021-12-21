@@ -46,7 +46,7 @@ public class L5502 extends TradeBuffer {
 	public PfBsDetailAdjustService pfBsDetailAdjustService;
 
 	PfBsDetail pfBsDetail = new PfBsDetail();
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5502 ");
@@ -81,8 +81,7 @@ public class L5502 extends TradeBuffer {
 		if (adjLogNo > 0) {
 			pfBsDetailAdjust = pfBsDetailAdjustService.findById(adjLogNo, titaVo);
 		} else {
-			pfBsDetailAdjust = pfBsDetailAdjustService.findCustBormFirst(custNo, facmNo, bormNo,
-					titaVo);
+			pfBsDetailAdjust = pfBsDetailAdjustService.findCustBormFirst(custNo, facmNo, bormNo, titaVo);
 		}
 
 		if (pfBsDetailAdjust == null) {
@@ -106,11 +105,11 @@ public class L5502 extends TradeBuffer {
 			if (pfBsDetailAdjust == null) {
 				throw new LogicException(titaVo, "E0006", "");
 			}
-            if (pfBsDetailAdjust.getWorkMonth() == 0) {
-            	pfBsDetailAdjust.setWorkMonth(pfBsDetail.getWorkMonth());
-            	pfBsDetailAdjust.setAdjPerfAmt(pfBsDetail.getPerfAmt());
-    			pfBsDetailAdjust.setAdjPerfCnt(pfBsDetail.getPerfCnt());
-            }
+			if (pfBsDetailAdjust.getWorkMonth() == 0) {
+				pfBsDetailAdjust.setWorkMonth(pfBsDetail.getWorkMonth());
+				pfBsDetailAdjust.setAdjPerfAmt(pfBsDetail.getPerfAmt());
+				pfBsDetailAdjust.setAdjPerfCnt(pfBsDetail.getPerfCnt());
+			}
 		}
 
 		PfBsDetailAdjust pfBsDetailAdjust2 = (PfBsDetailAdjust) dataLog.clone(pfBsDetailAdjust);

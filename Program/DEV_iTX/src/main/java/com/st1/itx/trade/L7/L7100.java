@@ -63,8 +63,8 @@ public class L7100 extends TradeBuffer {
 			TradeBuffer x = (TradeBuffer) MySpring.getBean((String) m.get("TranCode"));
 			x.setLoggerFg("1", "com.st1.itx.trade." + ((String) m.get("TranCode")).substring(0, 2) + "." + m.get("TranCode"));
 			x.setTxBuffer(this.txBuffer);
-			tempVo.put(ContentName.txcd,(String) m.get("TranCode"));
-			tempVo.put(ContentName.txCode,(String) m.get("TranCode"));
+			tempVo.put(ContentName.txcd, (String) m.get("TranCode"));
+			tempVo.put(ContentName.txCode, (String) m.get("TranCode"));
 			try {
 				if (num != null) {
 					for (String occursName : this.occursName[Integer.parseInt(num)]) {
@@ -83,7 +83,7 @@ public class L7100 extends TradeBuffer {
 					}
 
 				}
-				
+
 				ArrayList<TotaVo> ls = x.run(tempVo);
 				this.addAllList(ls);
 //					for (TotaVo l : ls)

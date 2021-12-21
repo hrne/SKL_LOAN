@@ -126,8 +126,7 @@ public class BS020 extends TradeBuffer {
 			dStatusCode.add("2");
 			dStatusCode.add("3");
 			dStatusCode.add("4");
-			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode,
-					this.index, Integer.MAX_VALUE);
+			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode, this.index, Integer.MAX_VALUE);
 			lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 			if (lBatxDetail != null) {
 				detailSeq = lBatxDetail.size();
@@ -145,8 +144,7 @@ public class BS020 extends TradeBuffer {
 			if (tBatxHead == null)
 				this.batchNo = "BATX01";
 			else
-				this.batchNo = "BATX"
-						+ parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+				this.batchNo = "BATX" + parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
 		}
 	}
 
@@ -182,8 +180,7 @@ public class BS020 extends TradeBuffer {
 				continue;
 			}
 			try {
-				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, 0, 0, repayCode, repayType, BigDecimal.ZERO,
-						titaVo);
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, 0, 0, repayCode, repayType, BigDecimal.ZERO, titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());
 				continue;

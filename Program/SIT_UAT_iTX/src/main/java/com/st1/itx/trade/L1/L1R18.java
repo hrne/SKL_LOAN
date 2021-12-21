@@ -32,27 +32,26 @@ public class L1R18 extends TradeBuffer {
 		this.info("active L1R18 ");
 
 		this.totaVo.init(titaVo);
-		
+
 		String iCustId = titaVo.getParam("RimCustId");
 		int iCustNo = Integer.valueOf(titaVo.getParam("RimCustNo"));
 		CustMain iCustMain = new CustMain();
 		if (iCustNo == 0) {
 			iCustMain = iCustMainService.custIdFirst(iCustId, titaVo);
-		}else {
+		} else {
 			iCustMain = iCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 		}
-		
-		if (iCustMain==null) {
+
+		if (iCustMain == null) {
 			if (iCustNo == 0) {
 				throw new LogicException("E0001", "客戶檔查無此統一編號:" + iCustId); // 查無資料
-			}else {
+			} else {
 				throw new LogicException("E0001", "客戶檔查無此戶號:" + iCustNo); // 查無資料
 			}
 		}
-		
-		
+
 		totaVo.putParam("L1R18CustName", iCustMain.getCustName());
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -38,7 +38,6 @@ public class L2036 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2036 ");
@@ -52,48 +51,48 @@ public class L2036 extends TradeBuffer {
 		this.limit = 100; // 38 * 500 = 19000
 
 		// 取tita戶號
-		int iCustNo =Integer.valueOf(titaVo.getParam("CustNo"));
+		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		// 取tita案件編號
-		int iCaseNo =Integer.valueOf(titaVo.getParam("CaseNo"));
-		
+		int iCaseNo = Integer.valueOf(titaVo.getParam("CaseNo"));
+
 		CustMain lCustMain = new CustMain();
-		
+
 		String Ukey = "";
-		
+
 		Slice<ReltMain> iReltMain = null;
 		if (iCustNo != 0) {
 			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);
-		}else {
+		} else {
 			iReltMain = iReltMainService.caseNoEq(iCaseNo, this.index, this.limit, titaVo);
 		}
-		
+
 		if (iReltMain == null) {
 			throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
 		}
-		
-		for (ReltMain rReltMain :iReltMain) {
+
+		for (ReltMain rReltMain : iReltMain) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCaseNo", rReltMain.getCaseNo());
 			occursList.putParam("OOCustNo", rReltMain.getCustNo());
-			
+
 			Ukey = rReltMain.getReltUKey();
-			
-			lCustMain  = sCustMainService.findById(Ukey, titaVo);
-			
-			if( lCustMain == null ) {
+
+			lCustMain = sCustMainService.findById(Ukey, titaVo);
+
+			if (lCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
 			}
-			
+
 			occursList.putParam("OOReltId", lCustMain.getCustId());
 			occursList.putParam("OORelName", lCustMain.getCustName());
-			
+
 			occursList.putParam("OOPosInd", rReltMain.getReltCode());
 			occursList.putParam("OORemarkType", rReltMain.getRemarkType());
 			occursList.putParam("OORemark", rReltMain.getReltmark());
 			occursList.putParam("OOApplDate", rReltMain.getApplDate());
 			this.totaVo.addOccursList(occursList);
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -25,7 +25,6 @@ public class L8R16 extends TradeBuffer {
 	@Autowired
 	public JcicZ045Service iJcicZ045Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r16 ");
@@ -33,18 +32,18 @@ public class L8R16 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ045 iJcicZ045 = new JcicZ045();
 		iJcicZ045 = iJcicZ045Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ045 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r16CustId", iJcicZ045.getCustId());
 			totaVo.putParam("L8r16SubmitKey", iJcicZ045.getSubmitKey());
-			totaVo.putParam("L8r16RcDate",iJcicZ045.getRcDate());
+			totaVo.putParam("L8r16RcDate", iJcicZ045.getRcDate());
 			totaVo.putParam("L8r16MaxMainCode", iJcicZ045.getMaxMainCode());
-			totaVo.putParam("L8r16AgreeCode",iJcicZ045.getAgreeCode()); 
-			totaVo.putParam("L8r16TranKey", iJcicZ045.getTranKey());	
+			totaVo.putParam("L8r16AgreeCode", iJcicZ045.getAgreeCode());
+			totaVo.putParam("L8r16TranKey", iJcicZ045.getTranKey());
 			totaVo.putParam("L8r16OutJcicTxtDate", iJcicZ045.getOutJcicTxtDate());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -65,8 +65,7 @@ public class LM077Report extends MakeReport {
 		int entdy = date - 19110000; // expects date to be in BC Date format.
 		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM077", "B043金融機構承作「餘屋貸款」統計表",
-				"LM077_B043金融機構承作「餘屋貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM077", "B043金融機構承作「餘屋貸款」統計表", "LM077_B043金融機構承作「餘屋貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
 				"LM077_底稿_B043金融機構承作「餘屋貸款」統計表.xlsx", 1, "FOA");
 
 		// 資料期間 C2
@@ -97,18 +96,15 @@ public class LM077Report extends MakeReport {
 						break;
 					case 1:
 						// Newly Drawdown Amount: hundred million
-						makeExcel.setValue(row + rowShift, col + colShift,
-								computeDivide(getBigDecimal(value), hundredMillion, 2), "R");
+						makeExcel.setValue(row + rowShift, col + colShift, computeDivide(getBigDecimal(value), hundredMillion, 2), "R");
 						break;
 					case 2:
 						// Weighted Average of Loan: Percent
-						makeExcel.setValue(row + rowShift, col + colShift,
-								getBigDecimal(value).setScale(2, BigDecimal.ROUND_HALF_UP), "R");
+						makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_HALF_UP), "R");
 						break;
 					case 3:
 						// Weighted Average of Loan Rate: Percent
-						makeExcel.setValue(row + rowShift, col + colShift,
-								getBigDecimal(value).setScale(2, BigDecimal.ROUND_HALF_UP), "R");
+						makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_HALF_UP), "R");
 						break;
 					default:
 						makeExcel.setValue(row + rowShift, col + colShift, value, "R");

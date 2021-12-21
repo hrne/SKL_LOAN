@@ -61,8 +61,7 @@ public class L2R41 extends TradeBuffer {
 			wkShareCompAmt = iEvaAmt;
 		}
 
-		wkShareTotal = wkShareCompAmt.multiply(iLoanToValue).divide(new BigDecimal(100)).setScale(0,
-				BigDecimal.ROUND_HALF_UP);
+		wkShareTotal = wkShareCompAmt.multiply(iLoanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 
 		// 分配金額和設定金額比較 較低的為可分配金額
 		this.info("分配金額和設定金額比較 = " + wkShareTotal + "," + iSettingAmt);

@@ -62,7 +62,7 @@ public class L1R03 extends TradeBuffer {
 
 	@Autowired
 	public FinReportQualityService finReportQualityService;
-	
+
 	@Autowired
 	public FinReportReviewService finReportReviewService;
 
@@ -202,13 +202,13 @@ public class L1R03 extends TradeBuffer {
 			this.totaVo.putParam("EPS", 0);
 		} else {
 			this.info("L1R03 finReportProfit found");
-			
+
 			this.totaVo.putParam("BusIncome", finReportProfit.getBusIncome());
 
-			//this.totaVo.putParam("GrowRate", finReportProfit.getGrowRate());
+			// this.totaVo.putParam("GrowRate", finReportProfit.getGrowRate());
 			int lastYear = finReportDebt.getStartYY() - 1;
 			BigDecimal lastBusIncome = new BigDecimal("0");
-			FinReportDebt finReportDebt2 = finReportDebtService.findCustUKeyYearFirst(finReportDebt.getCustUKey(), lastYear,titaVo);
+			FinReportDebt finReportDebt2 = finReportDebtService.findCustUKeyYearFirst(finReportDebt.getCustUKey(), lastYear, titaVo);
 			if (finReportDebt2 != null) {
 				FinReportProfitId finReportProfitId2 = new FinReportProfitId();
 				finReportProfitId2.setCustUKey(finReportDebt2.getCustUKey());
@@ -230,7 +230,7 @@ public class L1R03 extends TradeBuffer {
 			}
 			this.info("L1R03 GrowRate  = " + growRate);
 			this.totaVo.putParam("GrowRate", growRate);
-			
+
 			this.totaVo.putParam("BusCost", finReportProfit.getBusCost());
 			this.totaVo.putParam("BusGrossProfit", finReportProfit.getBusGrossProfit());
 			this.totaVo.putParam("ManageFee", finReportProfit.getManageFee());
@@ -368,7 +368,7 @@ public class L1R03 extends TradeBuffer {
 		// 審比率
 
 		this.info("active L1R03 FinReportReview");
-		
+
 		FinReportReviewId finReportReviewId = new FinReportReviewId();
 		finReportReviewId.setCustUKey(iCustUKey);
 		finReportReviewId.setUKey(iUKey);
@@ -428,7 +428,7 @@ public class L1R03 extends TradeBuffer {
 			this.totaVo.putParam("ReviewLongFitRatio", finReportReview.getLongFitRatio());
 			this.totaVo.putParam("ReviewNetProfitRatio", finReportReview.getNetProfitRatio());
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

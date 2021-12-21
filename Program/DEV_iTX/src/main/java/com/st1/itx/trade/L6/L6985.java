@@ -179,8 +179,8 @@ public class L6985 extends TradeBuffer {
 				occursList.putParam("OOAcBookCode", AcBookCode + "/" + AcSubBookCode); // 帳冊別
 				occursList.putParam("OORmk", SlipNote); // 摘要
 				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
-				occursList.putParam("OOAcDate",AcDate); // 會計日期
-				occursList.putParam("OOSlipBatNo",SlipBatNo); // 會計日期
+				occursList.putParam("OOAcDate", AcDate); // 會計日期
+				occursList.putParam("OOSlipBatNo", SlipBatNo); // 會計日期
 				occursList.putParam("OODbAmt", TxAmt); // 金額
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());

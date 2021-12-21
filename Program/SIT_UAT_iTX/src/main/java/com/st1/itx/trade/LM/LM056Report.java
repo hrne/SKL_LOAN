@@ -94,8 +94,7 @@ public class LM056Report extends MakeReport {
 		List<Map<String, String>> findList2 = new ArrayList<>();
 		List<Map<String, String>> findList3 = new ArrayList<>();
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表",
-				"LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表", "LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
 
 		try {
 
@@ -119,7 +118,7 @@ public class LM056Report extends MakeReport {
 		reportExcel14_2(findList3);
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void reportExcel(List<Map<String, String>> listData) throws LogicException {

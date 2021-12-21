@@ -123,8 +123,7 @@ public class L4602Batch extends TradeBuffer {
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
 		// 刪除暫存檔
-		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth,
-				"" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth, "" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenewMediaTemp != null) {
 			try {
 				insuRenewMediaTempService.deleteAll(slInsuRenewMediaTemp.getContent(), titaVo);
@@ -166,26 +165,26 @@ public class L4602Batch extends TradeBuffer {
 				throw new LogicException("E0005", "InsuRenew : " + e.getErrorMsg());
 			}
 		}
-			for (InsuRenewMediaTemp t :slInsuRenewMediaTemp.getContent()) {
-				OccursList occursListReport = new OccursList();
-				occursListReport.putParam("OOClCode1", t.getClCode1());
-				occursListReport.putParam("OOClCode2", t.getClCode2());
-				occursListReport.putParam("OOClNo", t.getClNo());
-				occursListReport.putParam("OOPrevInsuNo", t.getInsuNo());
-				occursListReport.putParam("OOCustNo", t.getCustNo());
-				occursListReport.putParam("OOFacmNo", t.getFacmNo());
-	//			occursListReport.putParam("OORepayCodeX", getRepayCode(t.getRepayCode()));
-				occursListReport.putParam("OOCustName", t.getLoanCustName());
-	//			occursListReport.putParam("OONewInsuStartDate", InsuStartDate);
-	//			occursListReport.putParam("OONewInsuEndDate", InsuEndDate);
-				occursListReport.putParam("OOFireAmt", t.getNewEqInsuAmt());
-				occursListReport.putParam("OOFireFee", t.getNewFireInsuFee());
-				occursListReport.putParam("OOEthqAmt", t.getNewEqInsuAmt());
-				occursListReport.putParam("OOEthqFee", t.getNewEqInsuFee());
-				occursListReport.putParam("OOTotlFee", t.getNewTotalFee());
-	//			occursListReport.putParam("OONoticeWay", getNoticeWay(t.getNoticeFlag());
+		for (InsuRenewMediaTemp t : slInsuRenewMediaTemp.getContent()) {
+			OccursList occursListReport = new OccursList();
+			occursListReport.putParam("OOClCode1", t.getClCode1());
+			occursListReport.putParam("OOClCode2", t.getClCode2());
+			occursListReport.putParam("OOClNo", t.getClNo());
+			occursListReport.putParam("OOPrevInsuNo", t.getInsuNo());
+			occursListReport.putParam("OOCustNo", t.getCustNo());
+			occursListReport.putParam("OOFacmNo", t.getFacmNo());
+			// occursListReport.putParam("OORepayCodeX", getRepayCode(t.getRepayCode()));
+			occursListReport.putParam("OOCustName", t.getLoanCustName());
+			// occursListReport.putParam("OONewInsuStartDate", InsuStartDate);
+			// occursListReport.putParam("OONewInsuEndDate", InsuEndDate);
+			occursListReport.putParam("OOFireAmt", t.getNewEqInsuAmt());
+			occursListReport.putParam("OOFireFee", t.getNewFireInsuFee());
+			occursListReport.putParam("OOEthqAmt", t.getNewEqInsuAmt());
+			occursListReport.putParam("OOEthqFee", t.getNewEqInsuFee());
+			occursListReport.putParam("OOTotlFee", t.getNewTotalFee());
+			// occursListReport.putParam("OONoticeWay", getNoticeWay(t.getNoticeFlag());
 
-				this.totaVo.addOccursList(occursListReport);
+			this.totaVo.addOccursList(occursListReport);
 		}
 
 		// 把明細資料容器裝到檔案資料容器內
@@ -193,8 +192,7 @@ public class L4602Batch extends TradeBuffer {
 		// 轉換資料格式
 		ArrayList<String> file = insuRenewFileVo.toFile();
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔",
-				"LNM01P.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -205,11 +203,9 @@ public class L4602Batch extends TradeBuffer {
 		this.info("sno : " + sno);
 
 		makeFile.toFile(sno);
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"L4602 已產生火險到期檔", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4602 已產生火險到期檔", titaVo);
 
 		return null;
 	}
-	
 
 }

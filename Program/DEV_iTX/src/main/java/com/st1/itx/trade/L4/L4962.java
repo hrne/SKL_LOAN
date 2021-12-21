@@ -205,8 +205,7 @@ public class L4962 extends TradeBuffer {
 
 		if (!"N".equals(CommericalFlag)) {
 
-			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit,
-					titaVo);
+			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit, titaVo);
 
 			lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
 
@@ -241,8 +240,7 @@ public class L4962 extends TradeBuffer {
 
 			iInsuEndMonthFrom1 = iInsuEndMonthFrom1 * 100 + 1;
 			iInsuEndMonthTo1 = iInsuEndMonthTo1 * 100 + 31;
-			sInsuOrignal = insuOrignalService.insuEndDateRange(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index,
-					this.limit, titaVo);
+			sInsuOrignal = insuOrignalService.insuEndDateRange(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit, titaVo);
 
 			lInsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
 
@@ -301,9 +299,7 @@ public class L4962 extends TradeBuffer {
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo());
 
 		OccursList occursListReport = new OccursList();
-		occursListReport.putParam("ReportAInsuEndMonth",
-				tInsuRenew.getInsuYearMonth() > 191100 ? tInsuRenew.getInsuYearMonth() - 191100
-						: tInsuRenew.getInsuYearMonth());
+		occursListReport.putParam("ReportAInsuEndMonth", tInsuRenew.getInsuYearMonth() > 191100 ? tInsuRenew.getInsuYearMonth() - 191100 : tInsuRenew.getInsuYearMonth());
 		occursListReport.putParam("ReportAPrevInsuNo", tInsuRenew.getPrevInsuNo());
 		occursListReport.putParam("ReportACustNo", tInsuRenew.getCustNo());
 		occursListReport.putParam("ReportAFacmNo", tInsuRenew.getFacmNo());
@@ -334,12 +330,9 @@ public class L4962 extends TradeBuffer {
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo());
 
 		OccursList occursListReport = new OccursList();
-		occursListReport.putParam("ReportCInsuEndMonth",
-				tInsuRenew.getInsuYearMonth() > 191100 ? tInsuRenew.getInsuYearMonth() - 191100
-						: tInsuRenew.getInsuYearMonth());
+		occursListReport.putParam("ReportCInsuEndMonth", tInsuRenew.getInsuYearMonth() > 191100 ? tInsuRenew.getInsuYearMonth() - 191100 : tInsuRenew.getInsuYearMonth());
 
-		CdCode tCdCode = sCdCodeDefService.findById(new CdCodeId("CommericalFlag", tInsuRenew.getCommericalFlag()),
-				titaVo);
+		CdCode tCdCode = sCdCodeDefService.findById(new CdCodeId("CommericalFlag", tInsuRenew.getCommericalFlag()), titaVo);
 		String CommericalFlagX = "";
 		if (tCdCode != null) {
 			CommericalFlagX = tCdCode.getItem();
@@ -375,8 +368,7 @@ public class L4962 extends TradeBuffer {
 	private void errorReportC2(InsuOrignal tInsuOrignal, TitaVo titaVo) {
 		cntC = cntC + 1;
 
-		Slice<ClFac> sClFac = sClFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(),
-				tInsuOrignal.getClNo(), this.index, this.limit, titaVo);
+		Slice<ClFac> sClFac = sClFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(), tInsuOrignal.getClNo(), this.index, this.limit, titaVo);
 
 		int custno = 0;
 		int facmno = 0;
@@ -398,8 +390,7 @@ public class L4962 extends TradeBuffer {
 		OccursList occursListReport = new OccursList();
 		occursListReport.putParam("ReportCInsuEndMonth", (tInsuOrignal.getInsuEndDate() / 100));
 
-		CdCode tCdCode = sCdCodeDefService.findById(new CdCodeId("CommericalFlag", tInsuOrignal.getCommericalFlag()),
-				titaVo);
+		CdCode tCdCode = sCdCodeDefService.findById(new CdCodeId("CommericalFlag", tInsuOrignal.getCommericalFlag()), titaVo);
 		String CommericalFlagX = "";
 		if (tCdCode != null) {
 			CommericalFlagX = tCdCode.getItem();

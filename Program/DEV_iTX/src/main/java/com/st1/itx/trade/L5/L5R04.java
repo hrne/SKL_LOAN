@@ -39,7 +39,7 @@ public class L5R04 extends TradeBuffer {
 
 	@Autowired
 	public NegReportCom NegReportCom;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -47,29 +47,29 @@ public class L5R04 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("Run L5R04");
 		this.info("active L5R04 ");
 		this.totaVo.init(titaVo);
-		
-		String RimFinCode = titaVo.getParam("RimFinCode").trim();//債權機構
-		NegFinAcct NegFinAcctVO=new NegFinAcct();
-		NegFinAcctVO=sNegFinAcctService.findById(RimFinCode,titaVo);
-		if(NegFinAcctVO!=null) {
-			totaVo.putParam("L5r04FinCode",NegFinAcctVO.getFinCode());
-			totaVo.putParam("L5r04FinCodeX",NegFinAcctVO.getFinItem());
-			totaVo.putParam("L5r04RemitBank",NegFinAcctVO.getRemitBank());
-			totaVo.putParam("L5r04RemitAcct",NegFinAcctVO.getRemitAcct());
-			totaVo.putParam("L5r04DataSendSection",NegFinAcctVO.getDataSendSection());
-		}else {
+
+		String RimFinCode = titaVo.getParam("RimFinCode").trim();// 債權機構
+		NegFinAcct NegFinAcctVO = new NegFinAcct();
+		NegFinAcctVO = sNegFinAcctService.findById(RimFinCode, titaVo);
+		if (NegFinAcctVO != null) {
+			totaVo.putParam("L5r04FinCode", NegFinAcctVO.getFinCode());
+			totaVo.putParam("L5r04FinCodeX", NegFinAcctVO.getFinItem());
+			totaVo.putParam("L5r04RemitBank", NegFinAcctVO.getRemitBank());
+			totaVo.putParam("L5r04RemitAcct", NegFinAcctVO.getRemitAcct());
+			totaVo.putParam("L5r04DataSendSection", NegFinAcctVO.getDataSendSection());
+		} else {
 			String RemitBank = RimFinCode;
-			totaVo.putParam("L5r04FinCode",RimFinCode);
-			totaVo.putParam("L5r04FinCodeX","");
-			totaVo.putParam("L5r04RemitBank",RemitBank);//七碼
-			totaVo.putParam("L5r04RemitAcct","");
-			totaVo.putParam("L5r04DataSendSection","");
+			totaVo.putParam("L5r04FinCode", RimFinCode);
+			totaVo.putParam("L5r04FinCodeX", "");
+			totaVo.putParam("L5r04RemitBank", RemitBank);// 七碼
+			totaVo.putParam("L5r04RemitAcct", "");
+			totaVo.putParam("L5r04DataSendSection", "");
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

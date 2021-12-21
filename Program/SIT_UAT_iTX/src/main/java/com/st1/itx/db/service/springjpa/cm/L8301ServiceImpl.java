@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 @Service("L8301ServiceImpl")
-public class L8301ServiceImpl  extends ASpringJpaParm implements InitializingBean {
+public class L8301ServiceImpl extends ASpringJpaParm implements InitializingBean {
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
@@ -37,11 +37,11 @@ public class L8301ServiceImpl  extends ASpringJpaParm implements InitializingBea
 		// *** 折返控制相關 ***
 		this.limit = limit;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql  = "select \"FinCode\" from  \"NegFinAcct\" ";
-		
-		this.info("sql===="+sql);
+		String sql = "select \"FinCode\" from  \"NegFinAcct\" ";
+
+		this.info("sql====" + sql);
 		query = em.createNativeQuery(sql);
-		
+
 		this.info("L8301Service FindData=" + query.toString());
 		return query.getResultList();
 	}

@@ -19,11 +19,10 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L5409")
 @Scope("prototype")
 /**
- * 案件品質排行表(列印) 
+ * 案件品質排行表(列印)
  * 
  * @author Fegie
  * @version 1.0.0
@@ -40,18 +39,18 @@ public class L5409 extends TradeBuffer {
 	public DateUtil dateUtil;
 
 	@Autowired
-	public L5409ServiceImpl	iL5409ServiceImpl;
+	public L5409ServiceImpl iL5409ServiceImpl;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5409 ");
 		this.totaVo.init(titaVo);
-		//撈期間內所有資料，並統計一個專員所有的金額，以擔保品戶號+額度進colllist找是否有逾期>=4，再將逾期比數金額相加為逾期金額，再以高排到低
-		String iEndDate = titaVo.getParam("EndDate"); //截止日期
-		String iStartDate = titaVo.getParam("StartDate"); //起始日期
-		int iiEndDate = Integer.valueOf(iEndDate)+19110000;
-		int iiStartDate = Integer.valueOf(iStartDate)+19110000;
-		List<Map<String, String>> iL5409SqlReturn = new ArrayList<Map<String,String>>();
+		// 撈期間內所有資料，並統計一個專員所有的金額，以擔保品戶號+額度進colllist找是否有逾期>=4，再將逾期比數金額相加為逾期金額，再以高排到低
+		String iEndDate = titaVo.getParam("EndDate"); // 截止日期
+		String iStartDate = titaVo.getParam("StartDate"); // 起始日期
+		int iiEndDate = Integer.valueOf(iEndDate) + 19110000;
+		int iiStartDate = Integer.valueOf(iStartDate) + 19110000;
+		List<Map<String, String>> iL5409SqlReturn = new ArrayList<Map<String, String>>();
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -59,30 +58,30 @@ public class L5409 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		
+
 		try {
-			iL5409SqlReturn = iL5409ServiceImpl.FindData(iiStartDate,iiEndDate,titaVo);
-		}catch (Exception e) {
-			//E5004 讀取DB語法發生問題
-			this.info("L5409 ErrorForSql="+e);
-			throw new LogicException(titaVo, "E5004","");
+			iL5409SqlReturn = iL5409ServiceImpl.FindData(iiStartDate, iiEndDate, titaVo);
+		} catch (Exception e) {
+			// E5004 讀取DB語法發生問題
+			this.info("L5409 ErrorForSql=" + e);
+			throw new LogicException(titaVo, "E5004", "");
 		}
-		for (Map<String, String> r5409SqlReturn:iL5409SqlReturn) {
+		for (Map<String, String> r5409SqlReturn : iL5409SqlReturn) {
 			OccursList occursList = new OccursList();
-			if(r5409SqlReturn.get("F0").equals("")) {
+			if (r5409SqlReturn.get("F0").equals("")) {
 				continue;
 			}
 			occursList.putParam("OOBsOfficerX", r5409SqlReturn.get("F0"));
 			occursList.putParam("OOTotal", r5409SqlReturn.get("F1"));
 			if (r5409SqlReturn.get("F2").equals("")) {
-				occursList.putParam("OOOvduTotal", 0);	
-			}else {
+				occursList.putParam("OOOvduTotal", 0);
+			} else {
 				occursList.putParam("OOOvduTotal", r5409SqlReturn.get("F2"));
 			}
-			occursList.putParam("OOPercent",r5409SqlReturn.get("F3"));
+			occursList.putParam("OOPercent", r5409SqlReturn.get("F3"));
 			this.totaVo.addOccursList(occursList);
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

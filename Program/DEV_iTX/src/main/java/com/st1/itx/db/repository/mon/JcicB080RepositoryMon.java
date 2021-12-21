@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.JcicB080Id;
  */
 public interface JcicB080RepositoryMon extends JpaRepository<JcicB080, JcicB080Id> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicB080> findByJcicB080Id(JcicB080Id jcicB080Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicB080> findByJcicB080Id(JcicB080Id jcicB080Id);
 
-  // (月底日日終批次)維護 JcicB080 每月聯徵授信額度資料檔
-  @Procedure(value = "\"Usp_L8_JcicB080_Upd\"")
-  public void uspL8Jcicb080Upd(int TBSDYF, String EmpNo);
+	// (月底日日終批次)維護 JcicB080 每月聯徵授信額度資料檔
+	@Procedure(value = "\"Usp_L8_JcicB080_Upd\"")
+	public void uspL8Jcicb080Upd(int TBSDYF, String EmpNo);
 
 }
-

@@ -54,14 +54,11 @@ public class LB204ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// B204 聯徵授信餘額日報檔
 		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"DataDate\" " + "     , M.\"AcctNo\" " + "     , M.\"CustId\" " + "     , M.\"AcctCode\" "
 				+ "     , M.\"SubAcctCode\" " + "     , M.\"SubTranCode\" " + "     , M.\"LineAmt\" " + "     , M.\"DrawdownAmt\" " + "     , M.\"DBR22Amt\" " + "     , M.\"SeqNo\" "
-				+ "     , M.\"Filler13\" " 
-				+ " FROM  \"JcicB204\" M " 
-				+ " WHERE ( M.\"DataYMD\" = " + acctDate + " )"
-				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"DataDate\", M.\"AcctNo\", M.\"CustId\" " 
-				+ "        , M.\"AcctCode\", M.\"SubAcctCode\", M.\"SeqNo\" ";
+				+ "     , M.\"Filler13\" " + " FROM  \"JcicB204\" M " + " WHERE ( M.\"DataYMD\" = " + acctDate + " )"
+				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"DataDate\", M.\"AcctNo\", M.\"CustId\" " + "        , M.\"AcctCode\", M.\"SubAcctCode\", M.\"SeqNo\" ";
 
 		logger.info("sql=" + sql);
-		
+
 		Query query;
 		EntityManager em;
 

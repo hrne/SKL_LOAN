@@ -75,14 +75,14 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
 		// iAuthApplCode 1.新增授權 2.再次授權 3.取消授權
 		switch (iFunctionCode) {
-		// 篩選資料 
+		// 篩選資料
 		case 1:
 			switch (iAuthApplCode) {
 			case 1: // 1.申請
 				searchstatus = " in (' ')";
 				searchMediaCode = " is null ";
 				break;
-			case 2: //2.終止
+			case 2: // 2.終止
 				searchstatus = " not in  (' ', '00')";
 				searchMediaCode = " = 'Y' ";
 				break;
@@ -169,7 +169,7 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) p                            ";
 		sql += " where seq = 1                ";
 
-		sql += "   and nvl(\"AuthErrorCode\", ' ')"  + searchstatus ;
+		sql += "   and nvl(\"AuthErrorCode\", ' ')" + searchstatus;
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
 		// iAuthApplCode 1.新增授權 2.再次授權 3.取消授權
 		switch (iFunctionCode) {

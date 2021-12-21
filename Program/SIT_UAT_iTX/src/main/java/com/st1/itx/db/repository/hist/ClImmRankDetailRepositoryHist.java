@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.ClImmRankDetailId;
  */
 public interface ClImmRankDetailRepositoryHist extends JpaRepository<ClImmRankDetail, ClImmRankDetailId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClImmRankDetail> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Slice<ClImmRankDetail> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClImmRankDetail> findByClImmRankDetailId(ClImmRankDetailId clImmRankDetailId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClImmRankDetail> findByClImmRankDetailId(ClImmRankDetailId clImmRankDetailId);
 
 }
-

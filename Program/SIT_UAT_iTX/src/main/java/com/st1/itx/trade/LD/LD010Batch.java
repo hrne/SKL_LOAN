@@ -28,7 +28,7 @@ public class LD010Batch extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LD010Report lD010Report;
-	
+
 	@Autowired
 	CdWorkMonthService sCdWorkMonthService;
 

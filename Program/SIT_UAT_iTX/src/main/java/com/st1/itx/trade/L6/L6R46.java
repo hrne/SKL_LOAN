@@ -33,21 +33,20 @@ public class L6R46 extends TradeBuffer {
 		int iRepayCode = this.parse.stringToInteger(titaVo.getParam("RimRepayCode"));
 
 		CdAcCode tCdAcCode = new CdAcCode();
-		if(iRepayCode == 5) {
+		if (iRepayCode == 5) {
 			tCdAcCode = sCdAcCodeService.acCodeAcctFirst("OPL", titaVo);
-		} else if(iRepayCode == 6) {
+		} else if (iRepayCode == 6) {
 			tCdAcCode = sCdAcCodeService.acCodeAcctFirst("C02", titaVo);
-		} else if(iRepayCode == 11) {
+		} else if (iRepayCode == 11) {
 			tCdAcCode = sCdAcCodeService.acCodeAcctFirst("P03", titaVo);
 		}
-		
+
 		this.totaVo.putParam("L6R46AcNoCode", tCdAcCode.getAcNoCode());
 		this.totaVo.putParam("L6R46AcSubCode", tCdAcCode.getAcSubCode());
 		this.totaVo.putParam("L6R46AcDtlCode", tCdAcCode.getAcDtlCode());
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 }

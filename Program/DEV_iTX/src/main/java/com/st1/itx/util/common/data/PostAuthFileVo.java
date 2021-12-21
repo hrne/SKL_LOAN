@@ -81,7 +81,7 @@ public class PostAuthFileVo extends FileVo {
 //				 戶號(7)
 				occursList.putParam("CustNo", thisLine.substring(52, 59));
 //				郵局存款別(1)
-				occursList.putParam("PostDepCode", thisLine.substring(26, 27));			
+				occursList.putParam("PostDepCode", thisLine.substring(26, 27));
 //				儲金帳號(14)
 				occursList.putParam("RepayAcct", thisLine.substring(27, 41));
 

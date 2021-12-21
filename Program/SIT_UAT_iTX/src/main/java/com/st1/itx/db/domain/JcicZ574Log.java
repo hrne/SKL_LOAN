@@ -24,296 +24,293 @@ import com.st1.itx.Exception.LogicException;
 @Table(name = "`JcicZ574Log`")
 public class JcicZ574Log implements Serializable {
 
-
-  /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2254634531609475777L;
 
-@EmbeddedId
-  private JcicZ574LogId jcicZ574LogId;
+	@EmbeddedId
+	private JcicZ574LogId jcicZ574LogId;
 
-  // 流水號
-  @Column(name = "`Ukey`", length = 32, insertable = false, updatable = false)
-  private String ukey;
+	// 流水號
+	@Column(name = "`Ukey`", length = 32, insertable = false, updatable = false)
+	private String ukey;
 
-  // 交易序號
-  @Column(name = "`TxSeq`", length = 18, insertable = false, updatable = false)
-  private String txSeq;
+	// 交易序號
+	@Column(name = "`TxSeq`", length = 18, insertable = false, updatable = false)
+	private String txSeq;
 
-  // 交易代碼
-  /* A:新增;C:異動;D:刪除 */
-  @Column(name = "`TranKey`", length = 1)
-  private String tranKey;
+	// 交易代碼
+	/* A:新增;C:異動;D:刪除 */
+	@Column(name = "`TranKey`", length = 1)
+	private String tranKey;
 
-  // 結案日期
-  @Column(name = "`CloseDate`")
-  private int closeDate = 0;
+	// 結案日期
+	@Column(name = "`CloseDate`")
+	private int closeDate = 0;
 
-  // 結案原因
-  /* 01:債務人主動撤案02:債務人申請更生統收統付前未依約履行更生方案03:更生款項統一收復申請生效後債務人未依約履行04:Key值欄位輸入錯誤，本行結案05:債權金融機構未全數回報債權99:主辦行停止辦理更生統一收付作業 */
-  @Column(name = "`CloseMark`", length = 2)
-  private String closeMark;
+	// 結案原因
+	/*
+	 * 01:債務人主動撤案02:債務人申請更生統收統付前未依約履行更生方案03:更生款項統一收復申請生效後債務人未依約履行04:Key值欄位輸入錯誤，
+	 * 本行結案05:債權金融機構未全數回報債權99:主辦行停止辦理更生統一收付作業
+	 */
+	@Column(name = "`CloseMark`", length = 2)
+	private String closeMark;
 
-  // 通訊電話
-  /* 限16碼 */
-  @Column(name = "`PhoneNo`", length = 16)
-  private String phoneNo;
+	// 通訊電話
+	/* 限16碼 */
+	@Column(name = "`PhoneNo`", length = 16)
+	private String phoneNo;
 
-  // 轉JCIC文字檔日期
-  @Column(name = "`OutJcicTxtDate`")
-  private int outJcicTxtDate = 0;
+	// 轉JCIC文字檔日期
+	@Column(name = "`OutJcicTxtDate`")
+	private int outJcicTxtDate = 0;
 
-  // 建檔日期時間
-  @CreatedDate
-  @Column(name = "`CreateDate`")
-  private java.sql.Timestamp createDate;
+	// 建檔日期時間
+	@CreatedDate
+	@Column(name = "`CreateDate`")
+	private java.sql.Timestamp createDate;
 
-  // 建檔人員
-  @Column(name = "`CreateEmpNo`", length = 6)
-  private String createEmpNo;
+	// 建檔人員
+	@Column(name = "`CreateEmpNo`", length = 6)
+	private String createEmpNo;
 
-  // 最後更新日期時間
-  @LastModifiedDate
-  @Column(name = "`LastUpdate`")
-  private java.sql.Timestamp lastUpdate;
+	// 最後更新日期時間
+	@LastModifiedDate
+	@Column(name = "`LastUpdate`")
+	private java.sql.Timestamp lastUpdate;
 
-  // 最後更新人員
-  @Column(name = "`LastUpdateEmpNo`", length = 6)
-  private String lastUpdateEmpNo;
+	// 最後更新人員
+	@Column(name = "`LastUpdateEmpNo`", length = 6)
+	private String lastUpdateEmpNo;
 
+	public JcicZ574LogId getJcicZ574LogId() {
+		return this.jcicZ574LogId;
+	}
 
-  public JcicZ574LogId getJcicZ574LogId() {
-    return this.jcicZ574LogId;
-  }
+	public void setJcicZ574LogId(JcicZ574LogId jcicZ574LogId) {
+		this.jcicZ574LogId = jcicZ574LogId;
+	}
 
-  public void setJcicZ574LogId(JcicZ574LogId jcicZ574LogId) {
-    this.jcicZ574LogId = jcicZ574LogId;
-  }
+	/**
+	 * 流水號<br>
+	 * 
+	 * @return String
+	 */
+	public String getUkey() {
+		return this.ukey == null ? "" : this.ukey;
+	}
 
-/**
-	* 流水號<br>
-	* 
-	* @return String
-	*/
-  public String getUkey() {
-    return this.ukey == null ? "" : this.ukey;
-  }
+	/**
+	 * 流水號<br>
+	 * 
+	 *
+	 * @param ukey 流水號
+	 */
+	public void setUkey(String ukey) {
+		this.ukey = ukey;
+	}
 
-/**
-	* 流水號<br>
-	* 
-  *
-  * @param ukey 流水號
-	*/
-  public void setUkey(String ukey) {
-    this.ukey = ukey;
-  }
+	/**
+	 * 交易序號<br>
+	 * 
+	 * @return String
+	 */
+	public String getTxSeq() {
+		return this.txSeq == null ? "" : this.txSeq;
+	}
 
-/**
-	* 交易序號<br>
-	* 
-	* @return String
-	*/
-  public String getTxSeq() {
-    return this.txSeq == null ? "" : this.txSeq;
-  }
+	/**
+	 * 交易序號<br>
+	 * 
+	 *
+	 * @param txSeq 交易序號
+	 */
+	public void setTxSeq(String txSeq) {
+		this.txSeq = txSeq;
+	}
 
-/**
-	* 交易序號<br>
-	* 
-  *
-  * @param txSeq 交易序號
-	*/
-  public void setTxSeq(String txSeq) {
-    this.txSeq = txSeq;
-  }
+	/**
+	 * 交易代碼<br>
+	 * A:新增;C:異動;D:刪除
+	 * 
+	 * @return String
+	 */
+	public String getTranKey() {
+		return this.tranKey == null ? "" : this.tranKey;
+	}
 
-/**
-	* 交易代碼<br>
-	* A:新增;C:異動;D:刪除
-	* @return String
-	*/
-  public String getTranKey() {
-    return this.tranKey == null ? "" : this.tranKey;
-  }
+	/**
+	 * 交易代碼<br>
+	 * A:新增;C:異動;D:刪除
+	 *
+	 * @param tranKey 交易代碼
+	 */
+	public void setTranKey(String tranKey) {
+		this.tranKey = tranKey;
+	}
 
-/**
-	* 交易代碼<br>
-	* A:新增;C:異動;D:刪除
-  *
-  * @param tranKey 交易代碼
-	*/
-  public void setTranKey(String tranKey) {
-    this.tranKey = tranKey;
-  }
+	/**
+	 * 結案日期<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getCloseDate() {
+		return StaticTool.bcToRoc(this.closeDate);
+	}
 
-/**
-	* 結案日期<br>
-	* 
-	* @return Integer
-	*/
-  public int getCloseDate() {
-    return StaticTool.bcToRoc(this.closeDate);
-  }
+	/**
+	 * 結案日期<br>
+	 * 
+	 *
+	 * @param closeDate 結案日期
+	 * @throws LogicException when Date Is Warn
+	 */
+	public void setCloseDate(int closeDate) throws LogicException {
+		this.closeDate = StaticTool.rocToBc(closeDate);
+	}
 
-/**
-	* 結案日期<br>
-	* 
-  *
-  * @param closeDate 結案日期
-  * @throws LogicException when Date Is Warn	*/
-  public void setCloseDate(int closeDate) throws LogicException {
-    this.closeDate = StaticTool.rocToBc(closeDate);
-  }
+	/**
+	 * 結案原因<br>
+	 * 01:債務人主動撤案 02:債務人申請更生統收統付前未依約履行更生方案 03:更生款項統一收復申請生效後債務人未依約履行
+	 * 04:Key值欄位輸入錯誤，本行結案 05:債權金融機構未全數回報債權 99:主辦行停止辦理更生統一收付作業
+	 * 
+	 * @return String
+	 */
+	public String getCloseMark() {
+		return this.closeMark == null ? "" : this.closeMark;
+	}
 
-/**
-	* 結案原因<br>
-	* 01:債務人主動撤案
-02:債務人申請更生統收統付前未依約履行更生方案
-03:更生款項統一收復申請生效後債務人未依約履行
-04:Key值欄位輸入錯誤，本行結案
-05:債權金融機構未全數回報債權
-99:主辦行停止辦理更生統一收付作業
-	* @return String
-	*/
-  public String getCloseMark() {
-    return this.closeMark == null ? "" : this.closeMark;
-  }
+	/**
+	 * 結案原因<br>
+	 * 01:債務人主動撤案 02:債務人申請更生統收統付前未依約履行更生方案 03:更生款項統一收復申請生效後債務人未依約履行
+	 * 04:Key值欄位輸入錯誤，本行結案 05:債權金融機構未全數回報債權 99:主辦行停止辦理更生統一收付作業
+	 *
+	 * @param closeMark 結案原因
+	 */
+	public void setCloseMark(String closeMark) {
+		this.closeMark = closeMark;
+	}
 
-/**
-	* 結案原因<br>
-	* 01:債務人主動撤案
-02:債務人申請更生統收統付前未依約履行更生方案
-03:更生款項統一收復申請生效後債務人未依約履行
-04:Key值欄位輸入錯誤，本行結案
-05:債權金融機構未全數回報債權
-99:主辦行停止辦理更生統一收付作業
-  *
-  * @param closeMark 結案原因
-	*/
-  public void setCloseMark(String closeMark) {
-    this.closeMark = closeMark;
-  }
+	/**
+	 * 通訊電話<br>
+	 * 限16碼
+	 * 
+	 * @return String
+	 */
+	public String getPhoneNo() {
+		return this.phoneNo == null ? "" : this.phoneNo;
+	}
 
-/**
-	* 通訊電話<br>
-	* 限16碼
-	* @return String
-	*/
-  public String getPhoneNo() {
-    return this.phoneNo == null ? "" : this.phoneNo;
-  }
+	/**
+	 * 通訊電話<br>
+	 * 限16碼
+	 *
+	 * @param phoneNo 通訊電話
+	 */
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
+	}
 
-/**
-	* 通訊電話<br>
-	* 限16碼
-  *
-  * @param phoneNo 通訊電話
-	*/
-  public void setPhoneNo(String phoneNo) {
-    this.phoneNo = phoneNo;
-  }
+	/**
+	 * 轉JCIC文字檔日期<br>
+	 * 
+	 * @return Integer
+	 */
+	public int getOutJcicTxtDate() {
+		return StaticTool.bcToRoc(this.outJcicTxtDate);
+	}
 
-/**
-	* 轉JCIC文字檔日期<br>
-	* 
-	* @return Integer
-	*/
-  public int getOutJcicTxtDate() {
-    return StaticTool.bcToRoc(this.outJcicTxtDate);
-  }
+	/**
+	 * 轉JCIC文字檔日期<br>
+	 * 
+	 *
+	 * @param outJcicTxtDate 轉JCIC文字檔日期
+	 * @throws LogicException when Date Is Warn
+	 */
+	public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
+		this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
+	}
 
-/**
-	* 轉JCIC文字檔日期<br>
-	* 
-  *
-  * @param outJcicTxtDate 轉JCIC文字檔日期
-  * @throws LogicException when Date Is Warn	*/
-  public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
-    this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
-  }
+	/**
+	 * 建檔日期時間<br>
+	 * 
+	 * @return java.sql.Timestamp
+	 */
+	public java.sql.Timestamp getCreateDate() {
+		return this.createDate;
+	}
 
-/**
-	* 建檔日期時間<br>
-	* 
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getCreateDate() {
-    return this.createDate;
-  }
+	/**
+	 * 建檔日期時間<br>
+	 * 
+	 *
+	 * @param createDate 建檔日期時間
+	 */
+	public void setCreateDate(java.sql.Timestamp createDate) {
+		this.createDate = createDate;
+	}
 
-/**
-	* 建檔日期時間<br>
-	* 
-  *
-  * @param createDate 建檔日期時間
-	*/
-  public void setCreateDate(java.sql.Timestamp createDate) {
-    this.createDate = createDate;
-  }
+	/**
+	 * 建檔人員<br>
+	 * 
+	 * @return String
+	 */
+	public String getCreateEmpNo() {
+		return this.createEmpNo == null ? "" : this.createEmpNo;
+	}
 
-/**
-	* 建檔人員<br>
-	* 
-	* @return String
-	*/
-  public String getCreateEmpNo() {
-    return this.createEmpNo == null ? "" : this.createEmpNo;
-  }
+	/**
+	 * 建檔人員<br>
+	 * 
+	 *
+	 * @param createEmpNo 建檔人員
+	 */
+	public void setCreateEmpNo(String createEmpNo) {
+		this.createEmpNo = createEmpNo;
+	}
 
-/**
-	* 建檔人員<br>
-	* 
-  *
-  * @param createEmpNo 建檔人員
-	*/
-  public void setCreateEmpNo(String createEmpNo) {
-    this.createEmpNo = createEmpNo;
-  }
+	/**
+	 * 最後更新日期時間<br>
+	 * 
+	 * @return java.sql.Timestamp
+	 */
+	public java.sql.Timestamp getLastUpdate() {
+		return this.lastUpdate;
+	}
 
-/**
-	* 最後更新日期時間<br>
-	* 
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getLastUpdate() {
-    return this.lastUpdate;
-  }
+	/**
+	 * 最後更新日期時間<br>
+	 * 
+	 *
+	 * @param lastUpdate 最後更新日期時間
+	 */
+	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 
-/**
-	* 最後更新日期時間<br>
-	* 
-  *
-  * @param lastUpdate 最後更新日期時間
-	*/
-  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-    this.lastUpdate = lastUpdate;
-  }
+	/**
+	 * 最後更新人員<br>
+	 * 
+	 * @return String
+	 */
+	public String getLastUpdateEmpNo() {
+		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+	}
 
-/**
-	* 最後更新人員<br>
-	* 
-	* @return String
-	*/
-  public String getLastUpdateEmpNo() {
-    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-  }
+	/**
+	 * 最後更新人員<br>
+	 * 
+	 *
+	 * @param lastUpdateEmpNo 最後更新人員
+	 */
+	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+		this.lastUpdateEmpNo = lastUpdateEmpNo;
+	}
 
-/**
-	* 最後更新人員<br>
-	* 
-  *
-  * @param lastUpdateEmpNo 最後更新人員
-	*/
-  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-    this.lastUpdateEmpNo = lastUpdateEmpNo;
-  }
-
-
-  @Override
-  public String toString() {
-    return "JcicZ574Log [jcicZ574LogId=" + jcicZ574LogId + ", tranKey=" + tranKey + ", closeDate=" + closeDate + ", closeMark=" + closeMark + ", phoneNo=" + phoneNo
-           + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-  }
+	@Override
+	public String toString() {
+		return "JcicZ574Log [jcicZ574LogId=" + jcicZ574LogId + ", tranKey=" + tranKey + ", closeDate=" + closeDate + ", closeMark=" + closeMark + ", phoneNo=" + phoneNo + ", outJcicTxtDate="
+				+ outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+	}
 }

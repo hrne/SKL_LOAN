@@ -30,36 +30,36 @@ public class L3R15 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService custMainService;
-	
+
 	@Autowired
 	public LoanBorMainService loanBorMainService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L3R15 ");
 		this.totaVo.init(titaVo);
-		
+
 		int iCustNo = Integer.valueOf(titaVo.get("CustNo").trim());
 		int iFacmNo = Integer.valueOf(titaVo.get("FacmNo").trim());
 		int iBormNo = Integer.valueOf(titaVo.get("BormNo").trim());
-		
+
 		LoanBorMainId loanBorMainId = new LoanBorMainId();
 		loanBorMainId.setCustNo(iCustNo);
 		loanBorMainId.setFacmNo(iFacmNo);
 		loanBorMainId.setBormNo(iBormNo);
-		
+
 		LoanBorMain loanBorMain = loanBorMainService.findById(loanBorMainId, titaVo);
 		if (loanBorMain == null) {
 			throw new LogicException("E0001", "放款資料");
 		}
-		
+
 		CustMain custMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 		if (custMain == null) {
 			throw new LogicException("E0001", "客戶資料");
 		}
-		
+
 		this.totaVo.putParam("CustName", custMain.getCustName());
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

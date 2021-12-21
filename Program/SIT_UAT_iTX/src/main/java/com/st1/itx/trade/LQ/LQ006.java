@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
 
-
-
 @Service("LQ006")
 @Scope("step")
 /**

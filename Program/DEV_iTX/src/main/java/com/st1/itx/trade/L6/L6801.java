@@ -53,7 +53,7 @@ public class L6801 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "銷帳檔無該放款戶資料"); // E0010 功能選擇錯誤
 		}
 		if (iNewAcSubBookCode.equals(tAcReceivable.getAcSubBookCode())) {
- 			throw new LogicException(titaVo, "E0010", "新區隔帳冊別相同" + tAcReceivable.toString()); // 功能選擇錯誤
+			throw new LogicException(titaVo, "E0010", "新區隔帳冊別相同" + tAcReceivable.toString()); // 功能選擇錯誤
 		}
 
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();

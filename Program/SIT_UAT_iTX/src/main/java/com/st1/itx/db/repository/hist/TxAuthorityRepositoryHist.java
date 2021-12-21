@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.TxAuthorityId;
  */
 public interface TxAuthorityRepositoryHist extends JpaRepository<TxAuthority, TxAuthorityId> {
 
-  // AuthNo =
-  public Slice<TxAuthority> findAllByAuthNoIsOrderByTranNoAsc(String authNo_0, Pageable pageable);
+	// AuthNo =
+	public Slice<TxAuthority> findAllByAuthNoIsOrderByTranNoAsc(String authNo_0, Pageable pageable);
 
-  // AuthNo = ,AND TranNo <>%
-  public Slice<TxAuthority> findAllByAuthNoIsAndTranNoNotLikeOrderByTranNoAsc(String authNo_0, String tranNo_1, Pageable pageable);
+	// AuthNo = ,AND TranNo <>%
+	public Slice<TxAuthority> findAllByAuthNoIsAndTranNoNotLikeOrderByTranNoAsc(String authNo_0, String tranNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAuthority> findByTxAuthorityId(TxAuthorityId txAuthorityId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAuthority> findByTxAuthorityId(TxAuthorityId txAuthorityId);
 
 }
-

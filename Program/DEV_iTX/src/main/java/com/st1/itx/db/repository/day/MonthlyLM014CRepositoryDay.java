@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.MonthlyLM014CId;
  */
 public interface MonthlyLM014CRepositoryDay extends JpaRepository<MonthlyLM014C, MonthlyLM014CId> {
 
-  // DataYM = 
-  public Slice<MonthlyLM014C> findAllByDataYMIs(int dataYM_0, Pageable pageable);
+	// DataYM =
+	public Slice<MonthlyLM014C> findAllByDataYMIs(int dataYM_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MonthlyLM014C> findByMonthlyLM014CId(MonthlyLM014CId monthlyLM014CId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MonthlyLM014C> findByMonthlyLM014CId(MonthlyLM014CId monthlyLM014CId);
 
 }
-

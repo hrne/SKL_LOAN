@@ -65,15 +65,14 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY ALIfirst.\"Aging\" ";
 		sql += "         ,LPAD(ALIfirst.\"CustNo\", 7, '0') ";
 		sql += "         ,ALIfirst.\"IntStartDate\" ";
-		
+
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		String inputYearMonth = Integer.toString(Integer.parseInt(titaVo.getParam("inputYear")) + 1911)
-				+ titaVo.getParam("inputMonth");
+		String inputYearMonth = Integer.toString(Integer.parseInt(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth");
 		this.info("LM084ServiceImpl input");
 		this.info("inputYearMonth: " + inputYearMonth);
 		query.setParameter("inputYearMonth", inputYearMonth);

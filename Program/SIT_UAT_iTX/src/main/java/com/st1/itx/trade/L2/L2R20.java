@@ -67,12 +67,10 @@ public class L2R20 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2R20 ");
 		this.totaVo.init(titaVo);
-
 
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("RimClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
@@ -103,7 +101,6 @@ public class L2R20 extends TradeBuffer {
 		if (tClMain == null) {
 			throw new LogicException(titaVo, "E2003", "擔保品主檔"); // 查無資料
 		}
-
 
 		// 查詢保險公司資料檔
 		Slice<CdInsurer> slCdInsurer;
@@ -155,7 +152,7 @@ public class L2R20 extends TradeBuffer {
 		this.totaVo.putParam("L2r20SettingAmt", tClImm.getSettingAmt());
 		this.totaVo.putParam("L2r20ClaimDate", tClImm.getClaimDate());
 		this.totaVo.putParam("L2r20SettingSeq", tClImm.getSettingSeq());
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

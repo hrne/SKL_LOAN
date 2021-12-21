@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.TxAttachType;
  */
 public interface TxAttachTypeRepositoryHist extends JpaRepository<TxAttachType, Long> {
 
-  // TranNo = 
-  public Slice<TxAttachType> findAllByTranNoIsOrderByTypeItemAsc(String tranNo_0, Pageable pageable);
+	// TranNo =
+	public Slice<TxAttachType> findAllByTranNoIsOrderByTypeItemAsc(String tranNo_0, Pageable pageable);
 
-  // TranNo = ,AND TypeItem =
-  public Optional<TxAttachType> findTopByTranNoIsAndTypeItemIs(String tranNo_0, String typeItem_1);
+	// TranNo = ,AND TypeItem =
+	public Optional<TxAttachType> findTopByTranNoIsAndTypeItemIs(String tranNo_0, String typeItem_1);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAttachType> findByTypeNo(Long typeNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAttachType> findByTypeNo(Long typeNo);
 
 }
-

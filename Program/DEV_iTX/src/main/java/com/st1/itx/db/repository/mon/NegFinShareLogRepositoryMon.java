@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.NegFinShareLogId;
  */
 public interface NegFinShareLogRepositoryMon extends JpaRepository<NegFinShareLog, NegFinShareLogId> {
 
-  // CustNo = , AND CaseSeq = 
-  public Slice<NegFinShareLog> findAllByCustNoIsAndCaseSeqIsOrderByCustNoAscCaseSeqAscSeqDescFinCodeAsc(int custNo_0, int caseSeq_1, Pageable pageable);
+	// CustNo = , AND CaseSeq =
+	public Slice<NegFinShareLog> findAllByCustNoIsAndCaseSeqIsOrderByCustNoAscCaseSeqAscSeqDescFinCodeAsc(int custNo_0, int caseSeq_1, Pageable pageable);
 
-  // CustNo = , AND CaseSeq = ,AND Seq =
-  public Slice<NegFinShareLog> findAllByCustNoIsAndCaseSeqIsAndSeqIs(int custNo_0, int caseSeq_1, int seq_2, Pageable pageable);
+	// CustNo = , AND CaseSeq = ,AND Seq =
+	public Slice<NegFinShareLog> findAllByCustNoIsAndCaseSeqIsAndSeqIs(int custNo_0, int caseSeq_1, int seq_2, Pageable pageable);
 
-  // CustNo =
-  public Slice<NegFinShareLog> findAllByCustNoIsOrderByCaseSeqDescSeqDescFinCodeAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<NegFinShareLog> findAllByCustNoIsOrderByCaseSeqDescSeqDescFinCodeAsc(int custNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<NegFinShareLog> findByNegFinShareLogId(NegFinShareLogId negFinShareLogId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<NegFinShareLog> findByNegFinShareLogId(NegFinShareLogId negFinShareLogId);
 
 }
-

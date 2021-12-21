@@ -47,7 +47,6 @@ public class L2R06 extends TradeBuffer {
 		this.info("active L2R06 ");
 		this.totaVo.init(titaVo);
 
-		
 		// 取得輸入資料
 		String iTxCode = titaVo.getParam("RimTxCode").trim();
 		String iCurrencyCode = titaVo.getParam("RimCurrencyCode").trim();
@@ -65,13 +64,13 @@ public class L2R06 extends TradeBuffer {
 			this.totaVo.putParam("OBaseRate", 0);
 			this.totaVo.putParam("ORemark", "");
 		} else {
-			
-			Slice<CdBaseRate> lCdBaseRate = cdBaseRateService.baseRateCodeEq2(iCurrencyCode, iBaseRateCode,this.index, this.limit, titaVo);
-			
-			if(lCdBaseRate == null) {
+
+			Slice<CdBaseRate> lCdBaseRate = cdBaseRateService.baseRateCodeEq2(iCurrencyCode, iBaseRateCode, this.index, this.limit, titaVo);
+
+			if (lCdBaseRate == null) {
 				throw new LogicException(titaVo, "E0001", "L2R06 指標利率檔"); // 查無資料
 			}
-			
+
 			CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(iCurrencyCode, iBaseRateCode, 19110101,
 //					CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(iCurrencyCode, iBaseRateCode, 10101,
 					iEffectDate + 19110000, titaVo);

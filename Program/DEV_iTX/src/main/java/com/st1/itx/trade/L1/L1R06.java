@@ -71,7 +71,7 @@ public class L1R06 extends TradeBuffer {
 			}
 		}
 		// 抓子公司名稱
-		iCdCode = iCdCodeService.getCodeList(1, "SubCompanyCode", 0,Integer.MAX_VALUE, titaVo);
+		iCdCode = iCdCodeService.getCodeList(1, "SubCompanyCode", 0, Integer.MAX_VALUE, titaVo);
 		if (iCdCode == null) {
 			throw new LogicException(titaVo, "E0001", "共用代碼檔查無子公司選項"); // 查無資料
 		}

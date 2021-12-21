@@ -36,19 +36,19 @@ public class L8415 extends TradeBuffer {
 
 	@Autowired
 	public L8403File iL8403File;
-	
+
 	@Autowired
-	public JcicZ052Service sJcicZ052Service; 
+	public JcicZ052Service sJcicZ052Service;
 	@Autowired
-	public JcicZ052LogService sJcicZ052LogService; 
+	public JcicZ052LogService sJcicZ052LogService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");
 		this.totaVo.init(titaVo);
-		
+
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
-		
+
 		switch (iSubmitType) {
 		case 1:
 			doFile(titaVo);
@@ -57,7 +57,6 @@ public class L8415 extends TradeBuffer {
 			doRemoveJcicDate(titaVo);
 			break;
 		}
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -78,7 +77,7 @@ public class L8415 extends TradeBuffer {
 		iL8403File.toFile(fileNo, fileNname);
 
 	}
-	
+
 	public void doRemoveJcicDate(TitaVo titaVo) throws LogicException {
 		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 		int count = 0;
@@ -86,15 +85,15 @@ public class L8415 extends TradeBuffer {
 		JcicZ052 uJcicZ052 = new JcicZ052();
 		JcicZ052 oldJcicZ052 = new JcicZ052();
 		iJcicZ052 = sJcicZ052Service.findAll(this.index, this.limit, titaVo);
-		for (JcicZ052 iiJcicZ052: iJcicZ052) {
+		for (JcicZ052 iiJcicZ052 : iJcicZ052) {
 			if (iiJcicZ052.getOutJcicTxtDate() == iJcicDate) {
-				count ++;
+				count++;
 				uJcicZ052 = sJcicZ052Service.holdById(iiJcicZ052.getJcicZ052Id(), titaVo);
 				oldJcicZ052 = (JcicZ052) iDataLog.clone(uJcicZ052);
 				uJcicZ052.setOutJcicTxtDate(0);
 				try {
 					sJcicZ052Service.update(uJcicZ052, titaVo);
-				}catch(DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 				}
 				iDataLog.setEnv(titaVo, oldJcicZ052, uJcicZ052);

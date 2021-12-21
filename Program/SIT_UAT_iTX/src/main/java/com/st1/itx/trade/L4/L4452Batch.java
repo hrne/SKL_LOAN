@@ -151,8 +151,7 @@ public class L4452Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", sendMsg, titaVo);
 		}
@@ -175,12 +174,10 @@ public class L4452Batch extends TradeBuffer {
 		Slice<BankDeductDtl> slBankDeductDtl = null;
 		switch (iOpItem) {
 		case 1: // ach
-			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit,
-					titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
 			break;
 		case 2: // post
-			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit,
-					titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
 			break;
 		default: // all
 			slBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate, iEntryDate, this.index, this.limit, titaVo);
@@ -232,13 +229,11 @@ public class L4452Batch extends TradeBuffer {
 		case 1:
 			deleteOldAchMedia(mediaDate, "1", titaVo);
 			deleteOldAchMedia(mediaDate, "2", titaVo);
-			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit,
-					titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
 			break;
 		case 2:
 			deleteOldPostMedia(mediaDate, titaVo);
-			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit,
-					titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
 			break;
 		default:
 			deleteOldAchMedia(mediaDate, "1", titaVo);
@@ -405,12 +400,10 @@ public class L4452Batch extends TradeBuffer {
 				// 右靠左補空白
 
 				if (tBankDeductDtl.getRepayAcctSeq().trim().isEmpty()) {
-					tPostDeductMedia.setPostUserNo("  " + FormatUtil.padX(tCustMain.getCustId(), 10)
-							+ tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7));
+					tPostDeductMedia.setPostUserNo("  " + FormatUtil.padX(tCustMain.getCustId(), 10) + tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7));
 				} else {
-					tPostDeductMedia.setPostUserNo(FormatUtil.padX(tCustMain.getCustId(), 10)
-							+ tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7)
-							+ tBankDeductDtl.getRepayAcctSeq());
+					tPostDeductMedia.setPostUserNo(
+							FormatUtil.padX(tCustMain.getCustId(), 10) + tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7) + tBankDeductDtl.getRepayAcctSeq());
 				}
 
 // 				計息迄日+額度編號+入帳扣款別
@@ -418,8 +411,7 @@ public class L4452Batch extends TradeBuffer {
 				if (tBankDeductDtl.getIntEndDate() != 0) {
 					entryDate = tBankDeductDtl.getIntEndDate() + 19110000;
 				}
-				tPostDeductMedia.setOutsrcRemark(FormatUtil.padX(FormatUtil.pad9("" + entryDate, 8)
-						+ FormatUtil.pad9("" + tBankDeductDtl.getFacmNo(), 3) + OccRepayType, 20));
+				tPostDeductMedia.setOutsrcRemark(FormatUtil.padX(FormatUtil.pad9("" + entryDate, 8) + FormatUtil.pad9("" + tBankDeductDtl.getFacmNo(), 3) + OccRepayType, 20));
 
 				lPostDeductMedia.add(tPostDeductMedia);
 			}
@@ -608,8 +600,7 @@ public class L4452Batch extends TradeBuffer {
 
 		sPostDeductMedia = postDeductMediaService.mediaDateEq(mediaDate, this.index, this.limit, titaVo);
 
-		lPostDeductMedia = sPostDeductMedia == null ? null
-				: new ArrayList<PostDeductMedia>(sPostDeductMedia.getContent());
+		lPostDeductMedia = sPostDeductMedia == null ? null : new ArrayList<PostDeductMedia>(sPostDeductMedia.getContent());
 
 //		postMediaSorting()
 
@@ -730,8 +721,7 @@ public class L4452Batch extends TradeBuffer {
 
 //			String outputFilePath53N = outFolder + "PWBCP4CS_53N扣出.txt";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-郵局扣款提出媒體檔_53N", "PWBCP4CS_53N扣出.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局扣款提出媒體檔_53N", "PWBCP4CS_53N扣出.txt", 2);
 
 			for (String line : file53N) {
 				makeFile.put(line);
@@ -774,8 +764,7 @@ public class L4452Batch extends TradeBuffer {
 
 //				String outputFilePath846 = outFolder + "PWBCP4CS_846扣出.txt";
 
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-						titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
 
 				for (String line : file8460001) {
 					makeFile.put(line);
@@ -808,8 +797,7 @@ public class L4452Batch extends TradeBuffer {
 				ArrayList<String> file8460002 = tmp8460002PostDeductFileVo.toFile();
 
 				if (cnt8460001 == 0) {
-					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-							titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
+					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
 				}
 
 				for (String line : file8460002) {
@@ -883,8 +871,7 @@ public class L4452Batch extends TradeBuffer {
 //			String outputFilePath11 = outFolder + "AHP11P_扣出.txt";
 
 			if (cnt11 >= 1) {
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-						titaVo.getTxCode() + "-銀行扣款提出媒體檔_新光", "AHP11P_扣出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-銀行扣款提出媒體檔_新光", "AHP11P_扣出.txt", 2);
 				this.batchTransaction.commit();
 
 				for (String line : file11) {
@@ -945,8 +932,7 @@ public class L4452Batch extends TradeBuffer {
 //			String outputFilePath12 = outFolder + "AHP12P_扣出.txt";
 
 			if (cnt12 >= 1) {
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-						titaVo.getTxCode() + "-銀行扣款提出媒體檔_他行", "AHP12P_扣出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-銀行扣款提出媒體檔_他行", "AHP12P_扣出.txt", 2);
 				this.batchTransaction.commit();
 
 				for (String line : file12) {
@@ -969,8 +955,7 @@ public class L4452Batch extends TradeBuffer {
 	}
 
 //	table資料寫入File明細
-	private ArrayList<OccursList> setAchOccurs(List<AchDeductMedia> lAchDeductMedia, TitaVo titaVo)
-			throws LogicException {
+	private ArrayList<OccursList> setAchOccurs(List<AchDeductMedia> lAchDeductMedia, TitaVo titaVo) throws LogicException {
 		this.info("setAchOccurs ...");
 		ArrayList<OccursList> tmp = new ArrayList<>();
 		if (lAchDeductMedia != null && lAchDeductMedia.size() != 0) {
@@ -998,16 +983,14 @@ public class L4452Batch extends TradeBuffer {
 				}
 
 				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tAchDeductMedia.getCustNo(), tAchDeductMedia.getCustNo(),
-						titaVo);
+				tCustMain = custMainService.custNoFirst(tAchDeductMedia.getCustNo(), tAchDeductMedia.getCustNo(), titaVo);
 
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("OccTransType", "N");
 				occursList.putParam("OccTransCate", "SD");
 				occursList.putParam("OccTransCode", "801");
-				occursList.putParam("OccTransSeq",
-						FormatUtil.pad9("" + tAchDeductMedia.getAchDeductMediaId().getMediaSeq(), 6));
+				occursList.putParam("OccTransSeq", FormatUtil.pad9("" + tAchDeductMedia.getAchDeductMediaId().getMediaSeq(), 6));
 				occursList.putParam("OccSenderNo", "1030116");
 				occursList.putParam("OccSenderAcct", "00116101001006");
 				if ("812".equals(tAchDeductMedia.getRepayBank())) {
@@ -1029,8 +1012,7 @@ public class L4452Batch extends TradeBuffer {
 				occursList.putParam("OccOTransDate", FormatUtil.pad9("", 8));
 				occursList.putParam("OccOTransSeq", FormatUtil.pad9("", 6));
 				occursList.putParam("OccOTransOrder", FormatUtil.padX("", 1));
-				occursList.putParam("OccCustSeq",
-						FormatUtil.padX("" + FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7), 20));
+				occursList.putParam("OccCustSeq", FormatUtil.padX("" + FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7), 20));
 
 				int prevIntDate = 0;
 
@@ -1039,12 +1021,8 @@ public class L4452Batch extends TradeBuffer {
 				}
 
 //				戶號7+額度3+入帳扣款別1+繳息迄日8 左靠右補空白
-				occursList.putParam("OccSenderRemarker",
-						FormatUtil.padX(
-								FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7)
-										+ FormatUtil.pad9("" + tAchDeductMedia.getFacmNo(), 3)
-										+ tAchDeductMedia.getAchRepayCode() + FormatUtil.pad9("" + prevIntDate, 8),
-								20));
+				occursList.putParam("OccSenderRemarker", FormatUtil.padX(FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7) + FormatUtil.pad9("" + tAchDeductMedia.getFacmNo(), 3)
+						+ tAchDeductMedia.getAchRepayCode() + FormatUtil.pad9("" + prevIntDate, 8), 20));
 				occursList.putParam("OccAbstract", FormatUtil.padX("801", 10));
 				occursList.putParam("OccNote", FormatUtil.padX("", 2));
 
@@ -1115,8 +1093,7 @@ public class L4452Batch extends TradeBuffer {
 		}
 	}
 
-	private void updateBankDeductDtl(BankDeductDtl t2BankDeductDtl, int mediaDate, String mediaKind, int mediaSeq,
-			String mediaCode, TitaVo titaVo) throws LogicException {
+	private void updateBankDeductDtl(BankDeductDtl t2BankDeductDtl, int mediaDate, String mediaKind, int mediaSeq, String mediaCode, TitaVo titaVo) throws LogicException {
 		this.info("updateBankDeductDtl Start...");
 
 		BankDeductDtl tBankDeductDtl = new BankDeductDtl();
@@ -1192,8 +1169,7 @@ public class L4452Batch extends TradeBuffer {
 			repayTypeInt = tBankDeductDtl.getRepayType();
 		}
 
-		CdCode t2CdCode = cdCodeService.getItemFirst(4, "RepayTypeSearch", FormatUtil.pad9("" + repayTypeInt, 2),
-				titaVo);
+		CdCode t2CdCode = cdCodeService.getItemFirst(4, "RepayTypeSearch", FormatUtil.pad9("" + repayTypeInt, 2), titaVo);
 
 		if (t2CdCode != null) {
 			repayType = t2CdCode.getItem();
@@ -1302,8 +1278,7 @@ public class L4452Batch extends TradeBuffer {
 
 		@Override
 		public String toString() {
-			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", repayType=" + repayType + ", payIntDate="
-					+ payIntDate + "]";
+			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", repayType=" + repayType + ", payIntDate=" + payIntDate + "]";
 		}
 
 		@Override

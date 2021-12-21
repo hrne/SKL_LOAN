@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.JcicAtomDetailId;
  */
 public interface JcicAtomDetailRepositoryDay extends JpaRepository<JcicAtomDetail, JcicAtomDetailId> {
 
-  // FunctionCode = 
-  public Slice<JcicAtomDetail> findAllByFunctionCodeIsOrderByFunctionCodeAscDataOrderAsc(String functionCode_0, Pageable pageable);
+	// FunctionCode =
+	public Slice<JcicAtomDetail> findAllByFunctionCodeIsOrderByFunctionCodeAscDataOrderAsc(String functionCode_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicAtomDetail> findByJcicAtomDetailId(JcicAtomDetailId jcicAtomDetailId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicAtomDetail> findByJcicAtomDetailId(JcicAtomDetailId jcicAtomDetailId);
 
 }
-

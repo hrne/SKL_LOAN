@@ -66,8 +66,7 @@ public class L4604 extends TradeBuffer {
 
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
-		String slipNote = titaVo.getParam("InsuEndMonth").substring(0, 3) + "年"
-				+ titaVo.getParam("InsuEndMonth").substring(3, 5) + "月已繳火險保費轉應付費用";
+		String slipNote = titaVo.getParam("InsuEndMonth").substring(0, 3) + "年" + titaVo.getParam("InsuEndMonth").substring(3, 5) + "月已繳火險保費轉應付費用";
 // 與新光產險對帳後，列應付費用
 // 一、正常繳款(放款系統出帳)
 //  　　借:20232010 暫收及待結轉帳項-火險保費
@@ -77,8 +76,7 @@ public class L4604 extends TradeBuffer {
 //  　　貸:20210391 應付費用-待匯
 
 		// 已繳
-		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index,
-				this.limit);
+		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index, this.limit);
 		List<InsuRenew> lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
 		if (lInsuRenew != null) {
 			BigDecimal txAmt = BigDecimal.ZERO;

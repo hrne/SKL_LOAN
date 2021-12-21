@@ -58,7 +58,7 @@ public class LCR08 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
 
-			//this.totaVo.setWarnMsg("已成功加入常用附件類別");
+			// this.totaVo.setWarnMsg("已成功加入常用附件類別");
 		} else {
 			if (txAttachType == null) {
 				throw new LogicException(titaVo, "E0004", "移除附件類別:" + iTranNo + "/" + iTypeItem);
@@ -68,23 +68,23 @@ public class LCR08 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
-			//this.totaVo.setWarnMsg("已成功從常用附件類別移除");
+			// this.totaVo.setWarnMsg("已成功從常用附件類別移除");
 		}
-		
+
 		totaVo.putParam("TypeItemHelp", getTxAttachType(iTranNo));
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String getTxAttachType(String tranNo) {
 		String s = "";
-				
+
 		this.info("XXR99 getTxAttachType TranNo= " + tranNo);
-		
+
 		Slice<TxAttachType> slTxAttachType = txAttachTypeService.findByTranNo(tranNo, 0, Integer.MAX_VALUE);
 		List<TxAttachType> lTxAttachType = slTxAttachType == null ? null : slTxAttachType.getContent();
-		
+
 		if (lTxAttachType != null && lTxAttachType.size() > 0) {
 			for (TxAttachType txAttachType : lTxAttachType) {
 				if (!"".equals(s)) {

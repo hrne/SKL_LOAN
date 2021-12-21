@@ -130,7 +130,7 @@ public class LM004Report2 extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private String showDate(String date, int iType) {

@@ -85,7 +85,7 @@ public class L4R24 extends TradeBuffer {
 			String createFlag = titaVo.getParam("RimCreateFlag");
 			if ("Z".equals(createFlag)) {
 				createFlag = "A";
-			}else if("Y".equals(createFlag)) {
+			} else if ("Y".equals(createFlag)) {
 				createFlag = "A";
 			}
 

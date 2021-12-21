@@ -128,7 +128,6 @@ public class L2500 extends TradeBuffer {
 			tCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
 			tCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
 
-
 			try {
 				// 修改
 				tCustRmk = sCustRmkService.update2(tCustRmk);

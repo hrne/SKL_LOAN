@@ -73,7 +73,7 @@ public class L2015 extends TradeBuffer {
 
 		int wkFacmNo1;
 		int wkFacmNo2;
-		
+
 		if (iFacmNo == 0) {
 			wkFacmNo1 = 1;
 			wkFacmNo2 = 999;
@@ -88,20 +88,19 @@ public class L2015 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 70 * 500 = 35000
 
-		if(!"".equals(iCustId)) {
-			
+		if (!"".equals(iCustId)) {
+
 			CustMain tCustMain = custMainService.custIdFirst(iCustId, titaVo);
-				if (tCustMain != null) {
-					wkCustNoSt = tCustMain.getCustNo();
-					wkCustNoEd = tCustMain.getCustNo();
-				} else {
-					throw new LogicException(titaVo, "E2003", "客戶資料主檔"); // 查無資料
-				}
-		
-		} 
+			if (tCustMain != null) {
+				wkCustNoSt = tCustMain.getCustNo();
+				wkCustNoEd = tCustMain.getCustNo();
+			} else {
+				throw new LogicException(titaVo, "E2003", "客戶資料主檔"); // 查無資料
+			}
+
+		}
 		// 查詢額度主檔
-		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(wkCustNoSt, wkCustNoEd, wkFacmNo1, wkFacmNo2, this.index,
-				this.limit, titaVo);
+		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(wkCustNoSt, wkCustNoEd, wkFacmNo1, wkFacmNo2, this.index, this.limit, titaVo);
 		if (lFacMain == null || lFacMain.isEmpty()) {
 			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
 		}

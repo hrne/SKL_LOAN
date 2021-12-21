@@ -33,13 +33,13 @@ public class L2R18 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String StockCode = titaVo.getParam("RimStockCode");
-		
+
 		CdCode tCdCode = sCdCodeDefService.getItemFirst(2, "StockCode", StockCode, titaVo);
-		
-		if(tCdCode != null) {
-		  this.totaVo.putParam("L2r18StockCodeX", tCdCode.getItem());
+
+		if (tCdCode != null) {
+			this.totaVo.putParam("L2r18StockCodeX", tCdCode.getItem());
 		} else {
-		  this.totaVo.putParam("L2r18StockCodeX", "");
+			this.totaVo.putParam("L2r18StockCodeX", "");
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -190,7 +190,7 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductMediaId.setMediaKind(iMediaKind);
 			tEmpDeductMediaId.setMediaSeq(iMediaSeq);
 			tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMediaId, titaVo);
-			
+
 			if (tEmpDeductMedia == null) {
 				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
 			}
@@ -199,7 +199,7 @@ public class L4512 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0008", "EmpDeductMedia : " + e.getErrorMsg());
 			}
-			
+
 //			// delete EmpDeductDtl
 //			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(iMediaDate + 19110000, iMediaKind, iMediaSeq, this.index, Integer.MAX_VALUE, titaVo);
 //			if (slEmpDeductDtl == null) {

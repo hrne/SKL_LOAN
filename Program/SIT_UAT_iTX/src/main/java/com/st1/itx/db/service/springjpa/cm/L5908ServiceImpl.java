@@ -31,17 +31,17 @@ public class L5908ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	public List<Map<String, String>> FindData(int index, int limit, int workMonth1, int workMonth2, TitaVo titaVo) throws Exception {
-				
+
 		Query query;
 		// *** 折返控制相關 ***
 		this.limit = limit;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		String sql = "select a.\"WorkMonth\",";
-		sql += "a.\"DeptCode\","; 
-		sql += "b.\"UnitItem\","; 
-		sql += "a.\"BsOfficer\","; 
-		sql += "c.\"Fullname\","; 
-		sql += "count(*) as \"Total\" "; 
+		sql += "a.\"DeptCode\",";
+		sql += "b.\"UnitItem\",";
+		sql += "a.\"BsOfficer\",";
+		sql += "c.\"Fullname\",";
+		sql += "count(*) as \"Total\" ";
 		sql += "from \"PfBsDetail\" a ";
 //		sql += "left join \"PfBsOfficer\" b on a.\"WorkMonth\" = b.\"WorkMonth\" and a.\"BsOfficer\" = b.\"EmpNo\" " 
 		sql += "LEFT JOIN \"CdBcm\" b ON b.\"UnitCode\"=a.\"DeptCode\" ";
@@ -53,11 +53,11 @@ public class L5908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "order by a.\"WorkMonth\",a.\"BsOfficer\",a.\"DeptCode\" ";
 //		sql += sqlRow;
 		this.info("sql = " + sql);
-		
+
 		query = em.createNativeQuery(sql);
 		query.setParameter("WorkMonth1", workMonth1);
 		query.setParameter("WorkMonth2", workMonth2);
-		
+
 //		query.setParameter("ThisIndex", index);
 //		query.setParameter("ThisLimit", limit);
 

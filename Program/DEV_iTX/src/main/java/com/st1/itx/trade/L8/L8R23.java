@@ -40,7 +40,7 @@ public class L8R23 extends TradeBuffer {
 			totaVo.putParam("L8r23SubmitKey", iJcicZ051.getSubmitKey());
 			totaVo.putParam("L8r23RcDate", iJcicZ051.getRcDate());
 			totaVo.putParam("L8r23DelayCode", iJcicZ051.getDelayCode());
-			totaVo.putParam("L8r23DelayYM", iJcicZ051.getDelayYM()-191100);
+			totaVo.putParam("L8r23DelayYM", iJcicZ051.getDelayYM() - 191100);
 			totaVo.putParam("L8r23DelayDesc", iJcicZ051.getDelayDesc());
 			totaVo.putParam("L8r23TranKey", iJcicZ051.getTranKey());
 			totaVo.putParam("L8r23OutJcicTxtDate", iJcicZ051.getOutJcicTxtDate());

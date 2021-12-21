@@ -97,7 +97,7 @@ public class L8309 extends TradeBuffer {
 		iJcicZ048Id.setRcDate(iRcDate);
 		JcicZ048 chJcicZ048 = new JcicZ048();
 
-		//無檢核項目 removed by Fegie 2021/10/25
+		// 無檢核項目 removed by Fegie 2021/10/25
 
 		switch (iTranKey_Tmp) {
 		case "1":

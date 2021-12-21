@@ -26,10 +26,10 @@ public class LD003Report extends MakeReport {
 	@Autowired
 	// 在Spring管理的Bean，能夠找到，可允許找不到時設定為null，也可以指定required=fails
 	LD003ServiceImpl lD003ServiceImpl;
- 
+
 	@Autowired
 	DateUtil dateUtil;
- 
+
 	// 自訂明細標題
 	@Override
 	public void printHeader() {
@@ -43,8 +43,7 @@ public class LD003Report extends MakeReport {
 		this.print(-3, 5, "報　表：" + this.getRptCode());
 		this.print(-3, 60, "放款明細餘額總表（日）", "C");
 		this.print(-2, 100, "日　期：" + this.showBcDate(dateUtil.getNowStringBc(), 1));
-		this.print(-3, 100, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 100, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 100, "頁　數：" + this.getNowPage());
 		this.print(-5, 60, getshowRocDate(this.getReportDate()), "C");
 		this.print(-6, 100, "單位：元");
@@ -69,7 +68,6 @@ public class LD003Report extends MakeReport {
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD003", "放款明細餘額總表(日)", "機密", "A4", "P");
 
 		this.print(1, 1, "");
-
 
 		int i = 0;
 
@@ -201,7 +199,7 @@ public class LD003Report extends MakeReport {
 
 		long sno = this.close();
 
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 
 	}
 
@@ -292,7 +290,7 @@ public class LD003Report extends MakeReport {
 		}
 		long sno = this.close();
 
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 
 	}
 

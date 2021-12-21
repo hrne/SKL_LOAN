@@ -44,26 +44,23 @@ public class L5811Batch extends TradeBuffer {
 	@Autowired
 	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
 
-	
 	@Autowired
 	Parse parse;
 
 	private Boolean checkFlag = true;
 	private String sendMsg = " ";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
-		
-		
+
 		this.info("L5811 titaVo.getTxcd() = " + titaVo.getTxcd());
-		
+
 		String iYear = titaVo.getParam("Year");
-		
-		
-		
+
 		try {
-			checkAll(iYear,titaVo);
-			doJsonField(iYear,titaVo);
+			checkAll(iYear, titaVo);
+			doJsonField(iYear, titaVo);
 		} catch (LogicException e) {
 			checkFlag = false;
 			sendMsg = e.getErrorMsg();
@@ -74,23 +71,21 @@ public class L5811Batch extends TradeBuffer {
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
-		
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 		totaVo.put("ExcelSnoM", "" + sno);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
-		
+
 	}
 
-	public void checkAll(String iYear, TitaVo titaVo) throws LogicException{
-		
-		
+	public void checkAll(String iYear, TitaVo titaVo) throws LogicException {
 
 		int ExcelYear = Integer.parseInt(iYear) + 1;
 		List<Map<String, String>> resultList = null;
-		
+
 		try {
 			resultList = l5811ServiceImpl.checkAll(iYear, titaVo);
 		} catch (Exception e) {
@@ -161,75 +156,70 @@ public class L5811Batch extends TradeBuffer {
 
 			String UsageCode = result.get("F31");
 			String UsageCodeItem = "";
-			if((UsageCode).equals("310")) {
+			if ((UsageCode).equals("310")) {
 				UsageCodeItem = "短期擔保放款";
-			} else if((UsageCode).equals("320")) {
+			} else if ((UsageCode).equals("320")) {
 				UsageCodeItem = "中期擔保放款";
-			} else if((UsageCode).equals("330")) {
+			} else if ((UsageCode).equals("330")) {
 				UsageCodeItem = "長期擔保放款";
-			} else if((UsageCode).equals("340")) {
+			} else if ((UsageCode).equals("340")) {
 				UsageCodeItem = "三十年房貸";
 			}
 			makeExcel.setValue(i, 36, UsageCodeItem);// 科子細目代號暨說明
-			
+
 			i++;
 
 		}
-		
-		
+
 	}
 
-	public void doJsonField(String iYear, TitaVo titaVo) throws LogicException{
-		
+	public void doJsonField(String iYear, TitaVo titaVo) throws LogicException {
+
 		List<Map<String, String>> resultList = null;
-		
+
 		try {
 			resultList = l5811ServiceImpl.doJsonField(iYear, titaVo);
 		} catch (Exception e) {
 			throw new LogicException("E0013", e.getMessage());
 		}
-		
+
 		TempVo tTempVo = new TempVo();
-		
+
 		for (Map<String, String> result : resultList) {
 			YearlyHouseLoanIntId tYearlyHouseLoanIntId = new YearlyHouseLoanIntId();
 			YearlyHouseLoanInt tYearlyHouseLoanInt = new YearlyHouseLoanInt();
-			
+
 			tYearlyHouseLoanIntId.setYearMonth(Integer.parseInt(result.get("F9")));
 			tYearlyHouseLoanIntId.setCustNo(Integer.parseInt(result.get("F2")));
 			tYearlyHouseLoanIntId.setFacmNo(Integer.parseInt(result.get("F3")));
 			tYearlyHouseLoanIntId.setUsageCode(result.get("F12"));
 			tYearlyHouseLoanInt = sYearlyHouseLoanIntService.findById(tYearlyHouseLoanIntId, titaVo);
-			if(tYearlyHouseLoanInt == null) {
+			if (tYearlyHouseLoanInt == null) {
 				continue;
 			}
-			tTempVo.putParam("F0",result.get("F0"));// 戶名
-			tTempVo.putParam("F1",result.get("F1"));// 統編
+			tTempVo.putParam("F0", result.get("F0"));// 戶名
+			tTempVo.putParam("F1", result.get("F1"));// 統編
 //			tTempVo.putParam("F2",result.get("F2"));
 //			tTempVo.putParam("F3",result.get("F3"));
 //			tTempVo.putParam("F4",result.get("F4"));
-			tTempVo.putParam("F5",result.get("F5"));//核准額度
+			tTempVo.putParam("F5", result.get("F5"));// 核准額度
 //			tTempVo.putParam("F6",result.get("F6"));
 //			tTempVo.putParam("F7",result.get("F7"));
 //			tTempVo.putParam("F8",result.get("F8"));
 //			tTempVo.putParam("F9",result.get("F9"));
 //			tTempVo.putParam("F10",result.get("F10"));
 //			tTempVo.putParam("F11",result.get("F11"));
-			tTempVo.putParam("F21",result.get("F21"));
+			tTempVo.putParam("F21", result.get("F21"));
 			tYearlyHouseLoanInt.setYearlyHouseLoanIntId(tYearlyHouseLoanIntId);
 			tYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
-			
+
 			try {
-				sYearlyHouseLoanIntService.update(tYearlyHouseLoanInt,titaVo);
+				sYearlyHouseLoanIntService.update(tYearlyHouseLoanInt, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007",e.getErrorMsg());
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
+
 		}
 	}
-
-	
-
-
 
 }

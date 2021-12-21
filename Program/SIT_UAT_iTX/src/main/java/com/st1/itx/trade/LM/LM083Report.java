@@ -63,8 +63,7 @@ public class LM083Report extends MakeReport {
 
 		this.info(txcd + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName,
-				txcd + "_底稿_" + txName + ".xlsx", sheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, txcd + "_底稿_" + txName + ".xlsx", sheetName);
 
 		String inputYearMonth = titaVo.getParam("InputYear") + titaVo.getParam("InputMonth");
 

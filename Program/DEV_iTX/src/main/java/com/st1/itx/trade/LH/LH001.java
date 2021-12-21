@@ -50,8 +50,7 @@ public class LH001 extends BatchBase implements Tasklet, InitializingBean {
 		lH001Report.setTxBuffer(this.getTxBuffer());
 		lH001Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LH001表A07_會計部申報表", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LH001表A07_會計部申報表", titaVo);
 	}
 
 }

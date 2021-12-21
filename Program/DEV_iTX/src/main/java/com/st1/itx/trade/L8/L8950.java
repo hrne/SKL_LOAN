@@ -47,7 +47,7 @@ public class L8950 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String iEmpId = titaVo.getParam("EmpId");
-		int iDataDate = Integer.valueOf(titaVo.getParam("DataDate"))+19110000;
+		int iDataDate = Integer.valueOf(titaVo.getParam("DataDate")) + 19110000;
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -76,7 +76,7 @@ public class L8950 extends TradeBuffer {
 				iCdBank = iCdBankService.bankCodeLike(aTbJcicMu01.getHeadOfficeCode(), 0, Integer.MAX_VALUE, titaVo);
 				if (iCdBank == null) {
 					occursList.putParam("OOHeadOfficeCodeX", "");
-				}else {
+				} else {
 					occursList.putParam("OOHeadOfficeCodeX", iCdBank.getContent().get(0).getBankItem());
 				}
 				occursList.putParam("OOBranchCode", aTbJcicMu01.getBranchCode());
@@ -93,7 +93,7 @@ public class L8950 extends TradeBuffer {
 				String tU = "";
 				if (aTbJcicMu01.getLastUpdate().toString().trim().isEmpty()) {
 					tU = aTbJcicMu01.getCreateDate().toString();
-				}else {
+				} else {
 					tU = aTbJcicMu01.getLastUpdate().toString();
 				}
 				String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
@@ -105,10 +105,10 @@ public class L8950 extends TradeBuffer {
 					CdEmp aCdEmp = iCdEmpService.findById(aTbJcicMu01.getLastUpdateEmpNo(), titaVo);
 					if (aCdEmp == null) {
 						occursList.putParam("OOLastUpdateEmpName", "");
-					}else {
+					} else {
 						occursList.putParam("OOLastUpdateEmpName", aCdEmp.getFullname());
 					}
-				}else {
+				} else {
 					occursList.putParam("OOLastUpdateEmpName", "");
 				}
 				this.totaVo.addOccursList(occursList);

@@ -14,7 +14,6 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.JcicZ575Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
-
 @Service("L8R38")
 @Scope("prototype")
 /**
@@ -36,10 +35,10 @@ public class L8R38 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ575 iJcicZ575 = new JcicZ575();
 		iJcicZ575 = iJcicZ575Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ575 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r38TranKey", iJcicZ575.getTranKey());
 			totaVo.putParam("L8r38CustId", iJcicZ575.getCustId());
 			totaVo.putParam("L8r38SubmitKey", iJcicZ575.getSubmitKey());
@@ -49,14 +48,13 @@ public class L8R38 extends TradeBuffer {
 			tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", iJcicZ575.getBankId(), titaVo);
 			if (tCdCode == null) {
 				totaVo.putParam("L8r38BankIdX", "");
-			}else {
+			} else {
 				totaVo.putParam("L8r38BankIdX", tCdCode.getItem());
 			}
 			totaVo.putParam("L8r38ModifyType", iJcicZ575.getModifyType());
-			totaVo.putParam("L8r38OutJcicTxtDate", iJcicZ575.getOutJcicTxtDate());		
+			totaVo.putParam("L8r38OutJcicTxtDate", iJcicZ575.getOutJcicTxtDate());
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

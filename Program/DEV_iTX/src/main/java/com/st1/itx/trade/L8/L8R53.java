@@ -47,7 +47,7 @@ public class L8R53 extends TradeBuffer {
 
 	@Autowired
 	CdBranchGroupService cdBranchGroupService;
-	
+
 	@Autowired
 	CdEmpService cdEmpService;
 
@@ -88,14 +88,14 @@ public class L8R53 extends TradeBuffer {
 		this.totaVo.putParam("LastProcessDate", txAmlCredit.getProcessDate());
 
 		this.totaVo.putParam("LastProcessBrNo", txAmlCredit.getProcessBrNo());
-		
+
 		String brNoX = "";
 		CdBranch cdBranch = cdBranchService.findById(txAmlCredit.getProcessBrNo(), titaVo);
 		if (cdBranch != null) {
 			brNoX = cdBranch.getBranchShort();
 		}
 		this.totaVo.putParam("LastProcessBrNoX", brNoX);
-		
+
 		String groupNoX = "";
 		CdBranchGroupId cdBranchGroupId = new CdBranchGroupId();
 		cdBranchGroupId.setBranchNo(txAmlCredit.getProcessBrNo());

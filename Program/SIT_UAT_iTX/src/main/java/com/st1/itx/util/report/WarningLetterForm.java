@@ -31,7 +31,7 @@ public class WarningLetterForm extends MakeReport {
 		String iCustNo = titaVo.getParam("OOCustNo");
 		String iFacmNo = titaVo.getParam("OOFacmNo");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "催收存證信函"+iCustNo+"-"+iFacmNo, "", "郵局存證信函2021格式.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "催收存證信函" + iCustNo + "-" + iFacmNo, "", "郵局存證信函2021格式.pdf");
 
 		newP(titaVo, map);
 
@@ -49,7 +49,6 @@ public class WarningLetterForm extends MakeReport {
 
 			row++;
 			col = 0;
-			
 
 			for (int i = 0; i < text.length(); i++) {
 				String s = text.substring(i, i + 1);
@@ -73,7 +72,6 @@ public class WarningLetterForm extends MakeReport {
 
 		long sno = this.close();
 
-		
 		toPdf(sno);
 	}
 

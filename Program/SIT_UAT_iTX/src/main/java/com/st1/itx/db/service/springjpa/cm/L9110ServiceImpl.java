@@ -511,7 +511,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             WHEN '1' THEN '日' ";
 		sql += "             WHEN '2' THEN '月' ";
 		sql += "             WHEN '3' THEN '週' ";
-		sql += "           ELSE '' "; 
+		sql += "           ELSE '' ";
 		sql += "           END                         AS F40繳息週期 ";
 		sql += "      , FAC.\"RateCode\" || \"Fn_GetCdCode\"('FacmRateCode',FAC.\"RateCode\") ";
 		sql += "                                       AS F41利率區分 ";

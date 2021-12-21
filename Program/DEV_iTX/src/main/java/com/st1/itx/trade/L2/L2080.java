@@ -32,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
 public class L2080 extends TradeBuffer {
 	// private static final Logger logger = LoggerFactory.getLogger(L2080.class);
 
-
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -45,12 +44,12 @@ public class L2080 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2080 ");
 		this.totaVo.init(titaVo);
-		
+
 		// 取tita戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		// 取tita統編
 		String iCustId = titaVo.getParam("CustId").trim();
-		
+
 		this.totaVo.putParam("OTEST", "123");
 
 		this.addList(this.totaVo);

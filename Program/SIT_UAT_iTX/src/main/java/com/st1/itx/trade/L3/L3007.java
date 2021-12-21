@@ -94,7 +94,6 @@ public class L3007 extends TradeBuffer {
 		int wkChequeDateStart = 0;
 		int wkChequeDateEnd = 99991231;
 
-
 		if (iChequeDateStart > 0) {
 			wkChequeDateStart = iChequeDateStart + 19110000;
 		}
@@ -123,8 +122,7 @@ public class L3007 extends TradeBuffer {
 		this.limit = 100; // 113 * 500 = 56500
 
 		// 查詢放款主檔
-		slLoanCheque = loanChequeService.custNoChequeRange(wkCustNoSt, wkCustNoEd, lStatusCode, wkChequeNoSt,
-				wkChequeNoEd, wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
+		slLoanCheque = loanChequeService.custNoChequeRange(wkCustNoSt, wkCustNoEd, lStatusCode, wkChequeNoSt, wkChequeNoEd, wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
 
 		lLoanCheque = slLoanCheque == null ? null : slLoanCheque.getContent();
 		if (lLoanCheque == null || lLoanCheque.size() == 0) {

@@ -36,7 +36,7 @@ public class LM034ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		
+
 //		int entdy = titaVo.getEntDyI() + 19110000;
 
 //		dDateUtil.setDate_1(entdy);

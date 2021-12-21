@@ -62,8 +62,7 @@ public class LY002Report extends MakeReport {
 			this.info("LY002ServiceImpl.exportExcel error = " + errors.toString());
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表",
-				"LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表", "LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
 
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
@@ -238,7 +237,7 @@ public class LY002Report extends MakeReport {
 		Iterator<Map<String, Object>> iter = mergeEva.iterator();
 
 		Map<String, Object> itData = null;
-		
+
 		while (iter.hasNext()) {
 
 			itData = iter.next();
@@ -348,8 +347,7 @@ public class LY002Report extends MakeReport {
 	 * 
 	 */
 
-	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt,
-			BigDecimal lineAmt) {
+	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt, BigDecimal lineAmt) {
 
 		String tempCustNo = "";
 		String tempFacmNo = "";

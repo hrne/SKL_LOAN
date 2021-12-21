@@ -68,8 +68,7 @@ public class LNM004Report extends MakeReport {
 
 		// 清單4：放款與AR-估計回收率用
 		inf = "戶號;借款人ID/統編;額度編號;撥款序號;會計科目;案件狀態;初貸日期;貸放日期;到期日;核准金額(台幣);撥款金額(台幣);本金餘額(撥款)(台幣);應收利息(台幣);法拍及火險費用(台幣);逾期繳款天數;轉催收款日期;轉銷呆帳日期;轉銷呆帳金額;stage3發生日期;上述發生日期前之最近一次利率;上述發生日期時之本金餘額(台幣);上述發生日期時之應收利息(台幣);上述發生日期時之法拍及火險費用(台幣);stage3發生後第一年本金回收金額(台幣);stage3發生後第二年本金回收金額(台幣);stage3發生後第三年本金回收金額(台幣);stage3發生後第四年本金回收金額(台幣);stage3發生後第五年本金回收金額(台幣);stage3發生後第一年應收利息回收金額(台幣);stage3發生後第二年應收利息回收金額(台幣);stage3發生後第三年應收利息回收金額(台幣);stage3發生後第四年應收利息回收金額(台幣);stage3發生後第五年應收利息回收金額(台幣);stage3發生後第一年法拍及火險費用回收金額(台幣);stage3發生後第二年法拍及火險費用回收金額(台幣);stage3發生後第三年法拍及火險費用回收金額(台幣);stage3發生後第四年法拍及火險費用回收金額(台幣);stage3發生後第五年法拍及火險費用回收金額(台幣);授信行業別;擔保品類別;擔保品地區別;商品利率代碼;企業戶/個人戶;產品別";
-		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;" + "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;"
-				+ "F40;F41;F42;F43";
+		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;" + "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;" + "F40;F41;F42;F43";
 
 		// 自訂標題列寫入記號
 		boolean infFg = true;
@@ -119,21 +118,21 @@ public class LNM004Report extends MakeReport {
 
 			// 設定欄位寬度
 			if (LNList != null) {
-				makeExcel.setWidth(1,  9 );
-				makeExcel.setWidth(2,  12);
-				makeExcel.setWidth(3,  5 );
-				makeExcel.setWidth(4,  5 );
-				makeExcel.setWidth(5,  10);
-				makeExcel.setWidth(6,  3 );
-				makeExcel.setWidth(7,  10);
-				makeExcel.setWidth(8,  10);
-				makeExcel.setWidth(9,  10);
+				makeExcel.setWidth(1, 9);
+				makeExcel.setWidth(2, 12);
+				makeExcel.setWidth(3, 5);
+				makeExcel.setWidth(4, 5);
+				makeExcel.setWidth(5, 10);
+				makeExcel.setWidth(6, 3);
+				makeExcel.setWidth(7, 10);
+				makeExcel.setWidth(8, 10);
+				makeExcel.setWidth(9, 10);
 				makeExcel.setWidth(10, 15);
 				makeExcel.setWidth(11, 15);
 				makeExcel.setWidth(12, 15);
 				makeExcel.setWidth(13, 15);
 				makeExcel.setWidth(14, 15);
-				makeExcel.setWidth(15, 6 );
+				makeExcel.setWidth(15, 6);
 				makeExcel.setWidth(16, 10);
 				makeExcel.setWidth(17, 10);
 				makeExcel.setWidth(18, 15);
@@ -157,12 +156,12 @@ public class LNM004Report extends MakeReport {
 				makeExcel.setWidth(36, 15);
 				makeExcel.setWidth(37, 15);
 				makeExcel.setWidth(38, 15);
-				makeExcel.setWidth(39, 8 );
-				makeExcel.setWidth(40, 4 );
-				makeExcel.setWidth(41, 3 );
-				makeExcel.setWidth(42, 4 );
-				makeExcel.setWidth(43, 3 );
-				makeExcel.setWidth(44, 3 );
+				makeExcel.setWidth(39, 8);
+				makeExcel.setWidth(40, 4);
+				makeExcel.setWidth(41, 3);
+				makeExcel.setWidth(42, 4);
+				makeExcel.setWidth(43, 3);
+				makeExcel.setWidth(44, 3);
 			}
 
 			long sno = makeExcel.close();

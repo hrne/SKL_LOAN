@@ -77,8 +77,7 @@ public class L2078 extends TradeBuffer {
 		List<ForeclosureFee> lForeclosureFee = new ArrayList<ForeclosureFee>();
 
 		// 依tita值查詢
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.selectForL2078(iReceiveDateStart,
-				iReceiveDateEnd, iCustNoStart, CustNoEnd, this.index, this.limit,titaVo);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.selectForL2078(iReceiveDateStart, iReceiveDateEnd, iCustNoStart, CustNoEnd, this.index, this.limit, titaVo);
 
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		// 查無資料 拋錯

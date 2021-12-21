@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L6;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6044 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6044.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -55,13 +55,28 @@ public class L6044 extends TradeBuffer {
 		this.info("active L6044 ");
 		this.totaVo.init(titaVo);
 
-		int iEntdy = this.parse.stringToInteger(titaVo.getParam("Entdy"));
-		int iFEntdy = iEntdy + 19110000;
+		int iEntdyS = this.parse.stringToInteger(titaVo.getParam("EntdyS"));
+		int iEntdyE = this.parse.stringToInteger(titaVo.getParam("EntdyE"));
+		int iTxDateS = this.parse.stringToInteger(titaVo.getParam("TxDateS"));
+		int iTxDateE = this.parse.stringToInteger(titaVo.getParam("TxDateE"));
+		Timestamp ts1 = null;
+		Timestamp ts2 = null;
 		String iSupNo = titaVo.getParam("SupNo");
 		String iTlrItem = "";
 		String iTranItem = "";
 		String DateTime; // YYY/MM/DD hh:mm:ss
 
+		if (iTxDateS > 0) {
+			String sTxDateS = String.valueOf(iTxDateS + 19110000);
+			String sTxDateE = String.valueOf(iTxDateE + 19110000);
+			sTxDateS = sTxDateS.substring(0, 4) + "-" + sTxDateS.substring(4, 6) + "-" + sTxDateS.substring(6, 8) + " 00:00:00.0";
+			sTxDateE = sTxDateE.substring(0, 4) + "-" + sTxDateE.substring(4, 6) + "-" + sTxDateE.substring(6, 8) + " 23:59:59.0";
+
+			ts1 = Timestamp.valueOf(sTxDateS);
+			ts2 = Timestamp.valueOf(sTxDateE);
+			this.info("ts1=" + ts1);
+			this.info("ts2=" + ts2);
+		}
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -69,12 +84,13 @@ public class L6044 extends TradeBuffer {
 		this.limit = 100; // 395 * 100 = 39,500
 
 		// 查詢主管授權紀錄
-		Slice<TxAuthorize> slTxAuthorize;
-		if (iSupNo.isEmpty()) {
-			slTxAuthorize = sTxAuthorizeService.findEntdy(iFEntdy, iFEntdy, this.index, this.limit, titaVo);
-		} else {
-			slTxAuthorize = sTxAuthorizeService.findSupNo(iFEntdy, iSupNo, this.index, this.limit, titaVo);
+		Slice<TxAuthorize> slTxAuthorize = null;
+		if (iEntdyS > 0) {
+			slTxAuthorize = sTxAuthorizeService.findEntdy(iEntdyS + 19110000, iEntdyE + 19110000, iSupNo + "%", this.index, this.limit, titaVo);
+		} else if (iTxDateS > 0) {
+			slTxAuthorize = sTxAuthorizeService.findCreatDate(ts1, ts2, iSupNo + "%", this.index, this.limit, titaVo);
 		}
+
 		List<TxAuthorize> lTxAuthorize = slTxAuthorize == null ? null : slTxAuthorize.getContent();
 
 		if (lTxAuthorize == null || lTxAuthorize.size() == 0) {

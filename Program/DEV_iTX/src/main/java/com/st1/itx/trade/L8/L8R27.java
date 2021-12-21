@@ -41,7 +41,7 @@ public class L8R27 extends TradeBuffer {
 			totaVo.putParam("L8r27CaseStatus", iJcicZ055.getCaseStatus());
 			totaVo.putParam("L8r27ClaimDate", iJcicZ055.getClaimDate());
 			totaVo.putParam("L8r27CourtCode", iJcicZ055.getCourtCode());
-			totaVo.putParam("L8r27Year", iJcicZ055.getYear()-1911);
+			totaVo.putParam("L8r27Year", iJcicZ055.getYear() - 1911);
 			totaVo.putParam("L8r27CourtDiv", iJcicZ055.getCourtDiv());
 			totaVo.putParam("L8r27CourtCaseNo", iJcicZ055.getCourtCaseNo());
 			totaVo.putParam("L8r27PayDate", iJcicZ055.getPayDate());

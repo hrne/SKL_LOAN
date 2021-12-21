@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import java.util.List;
@@ -23,19 +22,19 @@ import com.st1.itx.db.domain.TxFlowId;
  */
 public interface TxFlowRepositoryDay extends JpaRepository<TxFlow, TxFlowId> {
 
-  // Entdy = ,AND FlowBrNo =
-  public Slice<TxFlow> findAllByEntdyIsAndFlowBrNoIsOrderByFlowNoAsc(int entdy_0, String flowBrNo_1, Pageable pageable);
+	// Entdy = ,AND FlowBrNo =
+	public Slice<TxFlow> findAllByEntdyIsAndFlowBrNoIsOrderByFlowNoAsc(int entdy_0, String flowBrNo_1, Pageable pageable);
 
-  // Entdy = ,AND FlowBrNo = ,AND FlowMode = ,AND TranNo % ,AND FlowGroupNo ^i
-  public Slice<TxFlow> findAllByEntdyIsAndFlowBrNoIsAndFlowModeIsAndTranNoLikeAndFlowGroupNoInOrderByFlowNoAsc(int entdy_0, String flowBrNo_1, int flowMode_2, String tranNo_3, List<String> flowGroupNo_4, Pageable pageable);
+	// Entdy = ,AND FlowBrNo = ,AND FlowMode = ,AND TranNo % ,AND FlowGroupNo ^i
+	public Slice<TxFlow> findAllByEntdyIsAndFlowBrNoIsAndFlowModeIsAndTranNoLikeAndFlowGroupNoInOrderByFlowNoAsc(int entdy_0, String flowBrNo_1, int flowMode_2, String tranNo_3,
+			List<String> flowGroupNo_4, Pageable pageable);
 
-  // Entdy = ,AND SecNo =
-  public Slice<TxFlow> findAllByEntdyIsAndSecNoIs(int entdy_0, String secNo_1, Pageable pageable);
+	// Entdy = ,AND SecNo =
+	public Slice<TxFlow> findAllByEntdyIsAndSecNoIs(int entdy_0, String secNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxFlow> findByTxFlowId(TxFlowId txFlowId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxFlow> findByTxFlowId(TxFlowId txFlowId);
 
 }
-

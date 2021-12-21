@@ -65,10 +65,10 @@ public class L4030 extends TradeBuffer {
 
 	@Autowired
 	public FacMainService facMainService;
-	
+
 	@Autowired
 	public FacProdService facProdService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
 
@@ -172,17 +172,17 @@ public class L4030 extends TradeBuffer {
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 				int custno = tTxToDoDetail.getCustNo();
 				int facmno = tTxToDoDetail.getFacmNo();
-				
+
 				tmpFacm tmp = new tmpFacm(custno, facmno);
 
 				CustMain tCustMain = new CustMain();
 				tCustMain = custMainService.custNoFirst(custno, custno);
 				String CustTypeCode = "";
-				
+
 				if (tCustMain != null && tCustMain.getCustTypeCode() != null) {
 					CustTypeCode = tCustMain.getCustTypeCode();
 				}
-				
+
 				CdEmp tCdEmp = new CdEmp();
 				if (tCustMain != null && tCustMain.getEmpNo() != null) {
 					tCdEmp = cdEmpService.findById(tCustMain.getEmpNo());
@@ -191,19 +191,19 @@ public class L4030 extends TradeBuffer {
 				FacMainId tFacMainId = new FacMainId();
 				tFacMainId.setCustNo(custno);
 				tFacMainId.setFacmNo(facmno);
-				
+
 				FacMain tFacMain = facMainService.findById(tFacMainId, titaVo);
-				
+
 				String prodno = "";
 				String prodname = "";
-				if(tFacMain != null && tFacMain.getProdNo() != null) {
+				if (tFacMain != null && tFacMain.getProdNo() != null) {
 					prodno = tFacMain.getProdNo();
 					FacProd tFacProd = facProdService.findById(prodno, titaVo);
-					if(tFacProd != null && tFacProd.getProdName() != null) {
+					if (tFacProd != null && tFacProd.getProdName() != null) {
 						prodname = tFacProd.getProdName();
 					}
 				}
-				
+
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOStatus", tTxToDoDetail.getStatus());
 				occursList.putParam("OOProcessDate", tTxToDoDetail.getDataDate());
@@ -221,7 +221,7 @@ public class L4030 extends TradeBuffer {
 					occursList.putParam("OOQuitDate", " ");
 					occursList.putParam("OOOriAgType2X", " ");
 				}
-				
+
 				occursList.putParam("OOOriRateKind", prodno + "  " + prodname);
 				occursList.putParam("OONewAgType2", CustTypeCode);
 				occursList.putParam("OONewRateKind", " ");

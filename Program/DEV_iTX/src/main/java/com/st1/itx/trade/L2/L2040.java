@@ -23,7 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2040")
 @Scope("prototype")
 
@@ -32,13 +31,13 @@ public class L2040 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClNoMapService sClNoMapService;
-	
+
 	@Autowired
 	public ClFacService sClFacService;
-	
+
 	@Autowired
 	public ClBuildingService sClBuildingService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -69,72 +68,68 @@ public class L2040 extends TradeBuffer {
 		List<ClFac> lClFac = new ArrayList<ClFac>();
 		Slice<ClNoMap> sClNoMap = null;
 		Slice<ClFac> slClFac = null;
-		if(iFunCd == 1) { // 原擔保品 查新的
-		  sClNoMap = sClNoMapService.findGdrNum(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);	
+		if (iFunCd == 1) { // 原擔保品 查新的
+			sClNoMap = sClNoMapService.findGdrNum(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		} else { // 新擔保品 查舊的
-		  sClNoMap = sClNoMapService.findNewClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+			sClNoMap = sClNoMapService.findNewClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		}
-		
-		lClNoMap = sClNoMap == null ? null : sClNoMap.getContent();
-		
-		if(lClNoMap != null) {
-			for(ClNoMap tClNoMap : lClNoMap) {
-			  OccursList occurslist = new OccursList();
-			  
-			  if(iFunCd == 1) { // 新的
-				  occurslist.putParam("OOClCode1", tClNoMap.getClCode1());
-				  occurslist.putParam("OOClCode2", tClNoMap.getClCode2());
-				  occurslist.putParam("OOClNo", tClNoMap.getClNo());
-			  } else { // 舊的
-				  occurslist.putParam("OOClCode1", tClNoMap.getGdrId1());
-				  occurslist.putParam("OOClCode2", tClNoMap.getGdrId2());
-				  occurslist.putParam("OOClNo", tClNoMap.getGdrNum());
-			  }
-			  
-			  int tClCode1 = tClNoMap.getClCode1();
-			  int tClCode2 = tClNoMap.getClCode2();
-			  int tClNo = tClNoMap.getClNo();
-			  
-			  slClFac = sClFacService.clNoEq(tClCode1, tClCode2, tClNo, this.index, this.limit, titaVo);
-			  lClFac = slClFac == null ? null : new ArrayList<ClFac>(slClFac.getContent());
-			  
-			  if(lClFac!= null) {
-				occurslist.putParam("OOCustNo", lClFac.get(0).getCustNo()); 
-				occurslist.putParam("OOFacmNo", lClFac.get(0).getFacmNo()); 
-			  } else {
-				occurslist.putParam("OOCustNo", ""); 
-			    occurslist.putParam("OOFacmNo", ""); 
-			  }
-			  
-			  if(tClCode1 == 1) {
-				  ClBuildingId clBuildingId = new ClBuildingId();
-				  clBuildingId.setClCode1(tClCode1);
-				  clBuildingId.setClCode2(tClCode2);
-				  clBuildingId.setClNo(tClNo);
-				  ClBuilding tClBuilding = new ClBuilding();
-				  tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 
-				  if (tClBuilding != null) {
-					occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
-				  } else {
+		lClNoMap = sClNoMap == null ? null : sClNoMap.getContent();
+
+		if (lClNoMap != null) {
+			for (ClNoMap tClNoMap : lClNoMap) {
+				OccursList occurslist = new OccursList();
+
+				if (iFunCd == 1) { // 新的
+					occurslist.putParam("OOClCode1", tClNoMap.getClCode1());
+					occurslist.putParam("OOClCode2", tClNoMap.getClCode2());
+					occurslist.putParam("OOClNo", tClNoMap.getClNo());
+				} else { // 舊的
+					occurslist.putParam("OOClCode1", tClNoMap.getGdrId1());
+					occurslist.putParam("OOClCode2", tClNoMap.getGdrId2());
+					occurslist.putParam("OOClNo", tClNoMap.getGdrNum());
+				}
+
+				int tClCode1 = tClNoMap.getClCode1();
+				int tClCode2 = tClNoMap.getClCode2();
+				int tClNo = tClNoMap.getClNo();
+
+				slClFac = sClFacService.clNoEq(tClCode1, tClCode2, tClNo, this.index, this.limit, titaVo);
+				lClFac = slClFac == null ? null : new ArrayList<ClFac>(slClFac.getContent());
+
+				if (lClFac != null) {
+					occurslist.putParam("OOCustNo", lClFac.get(0).getCustNo());
+					occurslist.putParam("OOFacmNo", lClFac.get(0).getFacmNo());
+				} else {
+					occurslist.putParam("OOCustNo", "");
+					occurslist.putParam("OOFacmNo", "");
+				}
+
+				if (tClCode1 == 1) {
+					ClBuildingId clBuildingId = new ClBuildingId();
+					clBuildingId.setClCode1(tClCode1);
+					clBuildingId.setClCode2(tClCode2);
+					clBuildingId.setClNo(tClNo);
+					ClBuilding tClBuilding = new ClBuilding();
+					tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
+
+					if (tClBuilding != null) {
+						occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
+					} else {
+						occurslist.putParam("OOAddress", "");
+					}
+
+				} else {
 					occurslist.putParam("OOAddress", "");
-				  }
-				  
-			  } else {
-				  occurslist.putParam("OOAddress", ""); 
-			  } // else 
-			  
-			  
-			  /* 將每筆資料放入Tota的OcList */
+				} // else
+
+				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occurslist);
 			}
-			
-			
-			
+
 		} else {
 			throw new LogicException(titaVo, "E0001", "");
 		}
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

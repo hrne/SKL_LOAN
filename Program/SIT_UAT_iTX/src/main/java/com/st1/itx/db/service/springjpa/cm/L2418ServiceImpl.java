@@ -60,7 +60,6 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String iCityCode = titaVo.getParam("CityCode");
 
-
 		sql += " select distinct                            ";
 		sql += "    \"LandOfficeCode\"                      ";
 		sql += "  , \"Item\"                                ";
@@ -72,7 +71,6 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   s.\"LandOfficeCode\" = c.\"Code\"        ";
 		sql += " where                                      ";
 		sql += "   c.\"DefCode\" = " + "'LandOfficeCode'    ";
-		
 
 //		switch (iCityCode) {
 //		//台北含新北
@@ -110,7 +108,7 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findCityEq(TitaVo titaVo) throws Exception {
 
@@ -123,7 +121,6 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iCityCode = titaVo.getParam("CityCode");
 
 		this.info("iCityCode = " + iCityCode);
-
 
 		sql += " select distinct                            ";
 		sql += "    \"LandOfficeCode\"                      ";
@@ -138,7 +135,6 @@ public class L2418ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   s.\"CityCode\" = " + "'" + iCityCode + "'";
 		sql += " and                                        ";
 		sql += "   c.\"DefCode\" = " + "'LandOfficeCode'    ";
-		
 
 //		switch (iCityCode) {
 //		//台北含新北

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,13 +20,12 @@ import com.st1.itx.db.domain.CdCashFlow;
  */
 public interface CdCashFlowRepositoryHist extends JpaRepository<CdCashFlow, Integer> {
 
-  // DataYearMonth >= ,AND DataYearMonth <=
-  public Slice<CdCashFlow> findAllByDataYearMonthGreaterThanEqualAndDataYearMonthLessThanEqualOrderByDataYearMonthAsc(int dataYearMonth_0, int dataYearMonth_1, Pageable pageable);
+	// DataYearMonth >= ,AND DataYearMonth <=
+	public Slice<CdCashFlow> findAllByDataYearMonthGreaterThanEqualAndDataYearMonthLessThanEqualOrderByDataYearMonthAsc(int dataYearMonth_0, int dataYearMonth_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdCashFlow> findByDataYearMonth(int dataYearMonth);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdCashFlow> findByDataYearMonth(int dataYearMonth);
 
 }
-

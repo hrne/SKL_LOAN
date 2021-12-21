@@ -25,7 +25,6 @@ import com.st1.itx.db.service.CustMainService;
  */
 public class L5R47 extends TradeBuffer {
 
-	
 	@Autowired
 	public SpecInnReCheckService iSpecInnReCheckService;
 	@Autowired
@@ -45,24 +44,23 @@ public class L5R47 extends TradeBuffer {
 		iSpecInnReCheckId.setCustNo(iCustNo);
 		iSpecInnReCheckId.setFacmNo(iFacmNo);
 		iSpecInnReCheck = iSpecInnReCheckService.findById(iSpecInnReCheckId, titaVo);
-		
+
 		if (iSpecInnReCheck == null) {
 			throw new LogicException(titaVo, "E0001", "指定覆審名單"); // 查無資料
 		}
 		iCustMain = iCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-		if(iCustMain == null) {
+		if (iCustMain == null) {
 			totaVo.putParam("L5R47CustName", "");
-		}else {
+		} else {
 			totaVo.putParam("L5R47CustName", iCustMain.getCustName());
 		}
-		if (iSpecInnReCheck.getReChkYearMonth()==0) {
+		if (iSpecInnReCheck.getReChkYearMonth() == 0) {
 			totaVo.putParam("L5R47ReCheckYearMonth", 0);
-		}else {
-			totaVo.putParam("L5R47ReCheckYearMonth", iSpecInnReCheck.getReChkYearMonth()-191100);
+		} else {
+			totaVo.putParam("L5R47ReCheckYearMonth", iSpecInnReCheck.getReChkYearMonth() - 191100);
 		}
 		totaVo.putParam("L5R47Cycle", iSpecInnReCheck.getCycle());
 		totaVo.putParam("L5R47Remark", iSpecInnReCheck.getRemark());
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

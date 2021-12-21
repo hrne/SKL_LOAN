@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,22 +21,21 @@ import com.st1.itx.db.domain.NegApprId;
  */
 public interface NegApprRepositoryHist extends JpaRepository<NegAppr, NegApprId> {
 
-  // YyyyMm>= , AND YyyyMm<=
-  public Slice<NegAppr> findAllByYyyyMmGreaterThanEqualAndYyyyMmLessThanEqualOrderByYyyyMmAscKindCodeAsc(int yyyyMm_0, int yyyyMm_1, Pageable pageable);
+	// YyyyMm>= , AND YyyyMm<=
+	public Slice<NegAppr> findAllByYyyyMmGreaterThanEqualAndYyyyMmLessThanEqualOrderByYyyyMmAscKindCodeAsc(int yyyyMm_0, int yyyyMm_1, Pageable pageable);
 
-  // YyyyMm=
-  public Slice<NegAppr> findAllByYyyyMmIsOrderByYyyyMmAscKindCodeAsc(int yyyyMm_0, Pageable pageable);
+	// YyyyMm=
+	public Slice<NegAppr> findAllByYyyyMmIsOrderByYyyyMmAscKindCodeAsc(int yyyyMm_0, Pageable pageable);
 
-  // ExportDate = , OR ApprAcDate = , OR BringUpDate = 
-  public Slice<NegAppr> findAllByExportDateIsOrApprAcDateIsOrBringUpDateIsOrderByYyyyMmAscKindCodeAsc(int exportDate_0, int apprAcDate_1, int bringUpDate_2, Pageable pageable);
+	// ExportDate = , OR ApprAcDate = , OR BringUpDate =
+	public Slice<NegAppr> findAllByExportDateIsOrApprAcDateIsOrBringUpDateIsOrderByYyyyMmAscKindCodeAsc(int exportDate_0, int apprAcDate_1, int bringUpDate_2, Pageable pageable);
 
-  // BringUpDate =
-  public Slice<NegAppr> findAllByBringUpDateIsOrderByYyyyMmAscKindCodeAsc(int bringUpDate_0, Pageable pageable);
+	// BringUpDate =
+	public Slice<NegAppr> findAllByBringUpDateIsOrderByYyyyMmAscKindCodeAsc(int bringUpDate_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<NegAppr> findByNegApprId(NegApprId negApprId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<NegAppr> findByNegApprId(NegApprId negApprId);
 
 }
-

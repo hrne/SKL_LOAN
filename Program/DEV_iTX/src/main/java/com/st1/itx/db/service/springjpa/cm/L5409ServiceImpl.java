@@ -29,18 +29,18 @@ public class L5409ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	public List<Map<String, String>> FindData(int startDate,int endDate,TitaVo titaVo) throws Exception{
+	public List<Map<String, String>> FindData(int startDate, int endDate, TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		String sql = "select x.\"Fullname\", sum(c.\"DrawdownAmt\") as \"TotalDrawdownAmt\" , sum(i.\"BadDebtBal\") as \"TotalBadDebtBal\" ";
-			   sql += " ,case when sum(c.\"DrawdownAmt\") = 0 then 0";
-			   sql += " else round(sum(i.\"BadDebtBal\")/sum(c.\"DrawdownAmt\"),4)*100 end as \"Percent\" ";
-			   sql += " from \"PfBsDetail\" c " ;
-			   sql += " left join \"CdEmp\" x on x.\"EmployeeNo\" = c.\"BsOfficer\"";
-			   sql += " left join \"CollList\" i on i.\"CustNo\" = c.\"CustNo\" and i.\"FacmNo\" = c.\"FacmNo\" and i.\"OvduTerm\" >=4";
-			   sql += " and c.\"PerfDate\" between '"+startDate+"' and '"+endDate+"' group by x.\"Fullname\"";
-			   sql += " order by \"Percent\" desc , sum(c.\"DrawdownAmt\") desc , sum(i.\"BadDebtBal\") desc";
-		logger.info("sql = "+sql); 
+		sql += " ,case when sum(c.\"DrawdownAmt\") = 0 then 0";
+		sql += " else round(sum(i.\"BadDebtBal\")/sum(c.\"DrawdownAmt\"),4)*100 end as \"Percent\" ";
+		sql += " from \"PfBsDetail\" c ";
+		sql += " left join \"CdEmp\" x on x.\"EmployeeNo\" = c.\"BsOfficer\"";
+		sql += " left join \"CollList\" i on i.\"CustNo\" = c.\"CustNo\" and i.\"FacmNo\" = c.\"FacmNo\" and i.\"OvduTerm\" >=4";
+		sql += " and c.\"PerfDate\" between '" + startDate + "' and '" + endDate + "' group by x.\"Fullname\"";
+		sql += " order by \"Percent\" desc , sum(c.\"DrawdownAmt\") desc , sum(i.\"BadDebtBal\") desc";
+		logger.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		logger.info("L5409Service FindData=" + query.toString());

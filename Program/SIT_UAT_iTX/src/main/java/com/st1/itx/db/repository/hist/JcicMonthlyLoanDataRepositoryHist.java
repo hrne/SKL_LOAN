@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.JcicMonthlyLoanDataId;
  */
 public interface JcicMonthlyLoanDataRepositoryHist extends JpaRepository<JcicMonthlyLoanData, JcicMonthlyLoanDataId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicMonthlyLoanData> findByJcicMonthlyLoanDataId(JcicMonthlyLoanDataId jcicMonthlyLoanDataId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicMonthlyLoanData> findByJcicMonthlyLoanDataId(JcicMonthlyLoanDataId jcicMonthlyLoanDataId);
 
-  // (月底日日終批次)維護 JcicMonthlyLoanData 聯徵放款月報資料檔
-  @Procedure(value = "\"Usp_L8_JcicMonthlyLoanData_Upd\"")
-  public void uspL8JcicmonthlyloandataUpd(int TBSDYF, String EmpNo);
+	// (月底日日終批次)維護 JcicMonthlyLoanData 聯徵放款月報資料檔
+	@Procedure(value = "\"Usp_L8_JcicMonthlyLoanData_Upd\"")
+	public void uspL8JcicmonthlyloandataUpd(int TBSDYF, String EmpNo);
 
 }
-

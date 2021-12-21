@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.CdBranchGroupId;
  */
 public interface CdBranchGroupRepositoryMon extends JpaRepository<CdBranchGroup, CdBranchGroupId> {
 
-  // BranchNo = 
-  public Slice<CdBranchGroup> findAllByBranchNoIsOrderByBranchNoAscGroupNoAsc(String branchNo_0, Pageable pageable);
+	// BranchNo =
+	public Slice<CdBranchGroup> findAllByBranchNoIsOrderByBranchNoAscGroupNoAsc(String branchNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdBranchGroup> findByCdBranchGroupId(CdBranchGroupId cdBranchGroupId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdBranchGroup> findByCdBranchGroupId(CdBranchGroupId cdBranchGroupId);
 
 }
-

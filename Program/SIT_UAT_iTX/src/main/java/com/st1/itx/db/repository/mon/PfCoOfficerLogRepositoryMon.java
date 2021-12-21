@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.PfCoOfficerLogId;
  */
 public interface PfCoOfficerLogRepositoryMon extends JpaRepository<PfCoOfficerLog, PfCoOfficerLogId> {
 
-  // EmpNo= ,AND EffectiveDate=
-  public Slice<PfCoOfficerLog> findAllByEmpNoIsAndEffectiveDateIsOrderBySerialNoAsc(String empNo_0, int effectiveDate_1, Pageable pageable);
+	// EmpNo= ,AND EffectiveDate=
+	public Slice<PfCoOfficerLog> findAllByEmpNoIsAndEffectiveDateIsOrderBySerialNoAsc(String empNo_0, int effectiveDate_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<PfCoOfficerLog> findByPfCoOfficerLogId(PfCoOfficerLogId pfCoOfficerLogId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<PfCoOfficerLog> findByPfCoOfficerLogId(PfCoOfficerLogId pfCoOfficerLogId);
 
 }
-

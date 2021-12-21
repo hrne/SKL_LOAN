@@ -42,17 +42,16 @@ public class L2R47 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2R47 ");
 		this.totaVo.init(titaVo);
-		
+
 		String iCustId = titaVo.getParam("Rim2R47CustId");
-		
 
 		CustMain iCustMain = new CustMain();
-		
+
 		iCustMain = iCustMainService.custIdFirst(iCustId, titaVo);
-		
-		if (iCustMain==null) {
-			throw new LogicException(titaVo, "E0001", "查無此編號"); //查無資料錯誤
-		}else {
+
+		if (iCustMain == null) {
+			throw new LogicException(titaVo, "E0001", "查無此編號"); // 查無資料錯誤
+		} else {
 			totaVo.putParam("L2R47CustNo", iCustMain.getCustNo());
 		}
 

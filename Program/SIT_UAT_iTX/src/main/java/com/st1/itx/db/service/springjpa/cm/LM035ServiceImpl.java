@@ -28,7 +28,7 @@ public class LM035ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearSeason) throws Exception {
-		
+
 		this.info("yearSeason = " + yearSeason);
 		this.info("lM035.findAll ");
 

@@ -51,7 +51,7 @@ public class L5R23 extends TradeBuffer {
 		this.limit = 500;
 
 //		iCustTelNo = sCustTelNoService.findCustUKey(iRimCustUKey, this.index, this.limit, titaVo);
-		iCustTelNo = sCustTelNoService.findAll(0,Integer.MAX_VALUE, titaVo);
+		iCustTelNo = sCustTelNoService.findAll(0, Integer.MAX_VALUE, titaVo);
 		iCustMain = iCustMainService.findById(iRimCustUKey, titaVo);
 		String iTelArea = "";
 		String iTelNo = "";

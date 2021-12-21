@@ -53,8 +53,7 @@ public class LC710 extends TradeBuffer {
 			slJobDetail = jobDetailService.findExecDateIn(inputStartDate, inputEndDate, this.index, this.limit, titaVo);
 		} else {
 			// 只查成功或失敗
-			slJobDetail = jobDetailService.findStatusExecDateIn(inputStartDate, inputEndDate, choice == 1 ? "S" : "F",
-					this.index, this.limit, titaVo);
+			slJobDetail = jobDetailService.findStatusExecDateIn(inputStartDate, inputEndDate, choice == 1 ? "S" : "F", this.index, this.limit, titaVo);
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
@@ -64,8 +63,7 @@ public class LC710 extends TradeBuffer {
 			this.totaVo.setMsgEndToAuto();
 		}
 
-		ArrayList<JobDetail> lJobDetail = slJobDetail == null ? null
-				: new ArrayList<JobDetail>(slJobDetail.getContent());
+		ArrayList<JobDetail> lJobDetail = slJobDetail == null ? null : new ArrayList<JobDetail>(slJobDetail.getContent());
 
 		if (lJobDetail != null && !lJobDetail.isEmpty()) {
 

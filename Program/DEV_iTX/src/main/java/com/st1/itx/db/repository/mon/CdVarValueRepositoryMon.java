@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.CdVarValue;
  */
 public interface CdVarValueRepositoryMon extends JpaRepository<CdVarValue, Integer> {
 
-  // YearMonth >= ,AND YearMonth <= 
-  public Slice<CdVarValue> findAllByYearMonthGreaterThanEqualAndYearMonthLessThanEqualOrderByYearMonthAsc(int yearMonth_0, int yearMonth_1, Pageable pageable);
+	// YearMonth >= ,AND YearMonth <=
+	public Slice<CdVarValue> findAllByYearMonthGreaterThanEqualAndYearMonthLessThanEqualOrderByYearMonthAsc(int yearMonth_0, int yearMonth_1, Pageable pageable);
 
-  // YearMonth <= 
-  public Optional<CdVarValue> findTopByYearMonthLessThanEqualOrderByYearMonthDesc(int yearMonth_0);
+	// YearMonth <=
+	public Optional<CdVarValue> findTopByYearMonthLessThanEqualOrderByYearMonthDesc(int yearMonth_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdVarValue> findByYearMonth(int yearMonth);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdVarValue> findByYearMonth(int yearMonth);
 
 }
-

@@ -91,8 +91,7 @@ public class L2918 extends TradeBuffer {
 
 		// new ArrayList
 		List<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
-		Slice<ClOtherRights> slClOtherRights = sClOtherRightsService.findClCodeRange(wkClCode1St, wkClCode1Ed,
-				wkClCode2St, wkClCode2Ed, wkClNoSt, wkClNoEd, this.index, this.limit, titaVo);
+		Slice<ClOtherRights> slClOtherRights = sClOtherRightsService.findClCodeRange(wkClCode1St, wkClCode1Ed, wkClCode2St, wkClCode2Ed, wkClNoSt, wkClNoEd, this.index, this.limit, titaVo);
 
 		lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 		// 該統編查無擔保品主檔
@@ -143,8 +142,7 @@ public class L2918 extends TradeBuffer {
 			occurslist.putParam("OORecYear", t.getRecYear());
 			// 找 收件字名稱
 			if ("".equals(t.getOtherRecWord())) {
-				CdLandOffice tCdLandOffice = cdLandOfficeService
-						.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
+				CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
 				if (tCdLandOffice != null) {
 					wkRecWordItem = tCdLandOffice.getRecWordItem();
 				}

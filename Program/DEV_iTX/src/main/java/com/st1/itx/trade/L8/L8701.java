@@ -61,7 +61,7 @@ public class L8701 extends TradeBuffer {
 	public MakeFile makeFile;
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8701 ");
@@ -69,11 +69,11 @@ public class L8701 extends TradeBuffer {
 
 		// 執行背景交易
 		MySpring.newTask("L8701Batch", this.txBuffer, titaVo);
-		
+
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	}
+}

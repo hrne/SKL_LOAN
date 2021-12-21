@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import java.util.List;
@@ -23,16 +22,16 @@ import com.st1.itx.db.domain.MlaundryDetailId;
  */
 public interface MlaundryDetailRepository extends JpaRepository<MlaundryDetail, MlaundryDetailId> {
 
-  // EntryDate >= ,AND EntryDate <= ,AND Rational ^i
-  public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, List<String> rational_2, Pageable pageable);
+	// EntryDate >= ,AND EntryDate <= ,AND Rational ^i
+	public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, List<String> rational_2,
+			Pageable pageable);
 
-  // EntryDate >= ,AND EntryDate <= ,
-  public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, Pageable pageable);
+	// EntryDate >= ,AND EntryDate <= ,
+	public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MlaundryDetail> findByMlaundryDetailId(MlaundryDetailId mlaundryDetailId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MlaundryDetail> findByMlaundryDetailId(MlaundryDetailId mlaundryDetailId);
 
 }
-

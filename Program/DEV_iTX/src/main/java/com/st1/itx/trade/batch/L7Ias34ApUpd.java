@@ -48,11 +48,11 @@ public class L7Ias34ApUpd extends BatchBase implements Tasklet, InitializingBean
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-		//int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
 
 		String empNo = titaVo.getTlrNo();
 
-		int newAcFg = 0;  // 新會計科目記號：0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
+		int newAcFg = 0; // 新會計科目記號：0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
 
 		this.info("active L7Ias34ApUpd tbsdyf=" + tbsdyf);
 		this.info("active L7Ias34ApUpd empNo =" + empNo);

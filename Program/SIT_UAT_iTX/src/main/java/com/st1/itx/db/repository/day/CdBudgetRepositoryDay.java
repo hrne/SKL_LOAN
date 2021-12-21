@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,13 @@ import com.st1.itx.db.domain.CdBudgetId;
  */
 public interface CdBudgetRepositoryDay extends JpaRepository<CdBudget, CdBudgetId> {
 
-  // Year >= ,AND Year <= ,AND Month >= ,AND Month <= 
-  public Slice<CdBudget> findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(int year_0, int year_1, int month_2, int month_3, Pageable pageable);
+	// Year >= ,AND Year <= ,AND Month >= ,AND Month <=
+	public Slice<CdBudget> findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(int year_0, int year_1, int month_2, int month_3,
+			Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdBudget> findByCdBudgetId(CdBudgetId cdBudgetId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdBudget> findByCdBudgetId(CdBudgetId cdBudgetId);
 
 }
-

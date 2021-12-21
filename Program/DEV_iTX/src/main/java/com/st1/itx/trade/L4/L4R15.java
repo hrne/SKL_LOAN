@@ -59,8 +59,7 @@ public class L4R15 extends TradeBuffer {
 		Slice<EmpDeductSchedule> sEmpDeductSchedule = null;
 		List<EmpDeductSchedule> lEmpDeductSchedule = new ArrayList<EmpDeductSchedule>();
 
-		sEmpDeductSchedule = empDeductScheduleService.findL4R15B(empDeductM1, empDeductM2, agType1, this.index,
-				this.limit, titaVo);
+		sEmpDeductSchedule = empDeductScheduleService.findL4R15B(empDeductM1, empDeductM2, agType1, this.index, this.limit, titaVo);
 
 		lEmpDeductSchedule = sEmpDeductSchedule == null ? null : sEmpDeductSchedule.getContent();
 

@@ -64,7 +64,7 @@ public class L6R25 extends TradeBuffer {
 			// txcd(子選單代號/交易代號)
 			// Desc(子選單說明/交易明稱)
 			// AuthFg(權限記號):0.無權限 1.有權限
-			
+
 			logger.info("L6R25 put = " + type + "/" + txcd + "/" + authfg);
 			this.cnt++;
 			int clen = clength(desc);

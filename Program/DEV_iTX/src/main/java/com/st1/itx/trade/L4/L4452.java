@@ -41,16 +41,13 @@ public class L4452 extends TradeBuffer {
 			Slice<BankDeductDtl> slBankDeductDtl = null;
 			switch (iOpItem) {
 			case 1: // ach
-				slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index,
-						this.limit, titaVo);
+				slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
 				break;
 			case 2: // post
-				slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index,
-						this.limit, titaVo);
+				slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
 				break;
 			default: // all
-				slBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate, iEntryDate, this.index, this.limit,
-						titaVo);
+				slBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate, iEntryDate, this.index, this.limit, titaVo);
 				break;
 			}
 

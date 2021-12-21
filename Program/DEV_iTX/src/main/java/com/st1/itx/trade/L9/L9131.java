@@ -63,7 +63,7 @@ public class L9131 extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9131Report.setParentTranCode(parentTranCode);
-		
+
 		// 撈資料組報表
 		l9131Report.exec(titaVo);
 

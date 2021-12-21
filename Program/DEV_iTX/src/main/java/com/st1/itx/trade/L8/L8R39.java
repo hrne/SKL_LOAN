@@ -50,7 +50,7 @@ public class L8R39 extends TradeBuffer {
 		} else {
 			String jcicBankCode = "";
 			CdCode tCdCode = new CdCode();
-			
+
 			totaVo.putParam("L8r39TranKey", iJcicZ440.getTranKey());
 			totaVo.putParam("L8r39CustId", iJcicZ440.getCustId());
 			totaVo.putParam("L8r39SubmitKey", iJcicZ440.getSubmitKey());
@@ -61,7 +61,7 @@ public class L8R39 extends TradeBuffer {
 			totaVo.putParam("L8r39RemindDate", iJcicZ440.getRemindDate());
 			totaVo.putParam("L8r39ApplyType", iJcicZ440.getApplyType());
 			totaVo.putParam("L8r39ReportYn", iJcicZ440.getReportYn());
-		
+
 			totaVo.putParam("L8r39NotBankId1", iJcicZ440.getNotBankId1());
 			jcicBankCode = iJcicZ440.getNotBankId1();
 			if (jcicBankCode.trim().isEmpty() || jcicBankCode.equals("")) {

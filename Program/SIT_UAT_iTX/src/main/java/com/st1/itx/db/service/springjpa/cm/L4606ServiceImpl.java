@@ -56,7 +56,6 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    and NVL(I.\"MediaCode\",'N') = 'Y'                             ";
 		sql += "  ORDER BY I.\"EmpId\",I.\"NowInsuNo\", I.\"InsuCate\"                ";
 
-
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);

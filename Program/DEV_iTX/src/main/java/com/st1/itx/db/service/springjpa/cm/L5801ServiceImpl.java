@@ -91,35 +91,35 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            END)                             AS \"Remark\"";
 
 		sql += " FROM \"MonthlyLoanBal\" T";
-		sql += " LEFT JOIN ("; 
-		sql += "                 SELECT" ; 
-		sql += "                    cf.\"CustNo\"," ; 
-		sql += "                    cf.\"FacmNo\"," ; 
-		sql += "                    clb.\"SellerId\"," ; 
-		sql += "                    clb.\"SellerName\"," ; 
-		sql += "                    ROW_NUMBER() OVER(" ; 
-		sql += "                        PARTITION BY cf.\"CustNo\", cf.\"FacmNo\"" ; 
-		sql += "                        ORDER BY" ; 
-		sql += "                            clb.\"SellerId\", clb.\"SellerName\"" ; 
-		sql += "                    ) AS \"Seq\"" ; 
-		sql += "                FROM" ; 
-		sql += "                    \"ClFac\"        cf" ; 
-		sql += "                    LEFT JOIN \"ClBuilding\"   clb ON clb.\"ClCode1\" = cf.\"ClCode1\"" ; 
-		sql += "                                                  AND clb.\"ClCode2\" = cf.\"ClCode2\"" ; 
-		sql += "                                                  AND clb.\"ClNo\" = cf.\"ClNo\"" ; 
-		sql += "                WHERE" ; 
-		sql += "                    cf.\"MainFlag\" = 'Y'" ; 
-		sql += "                    AND" ; 
-		sql += "                    CASE" ; 
-		sql += "                            WHEN nvl(clb.\"SellerId\", ' ') != ' '   THEN" ; 
-		sql += "                                1" ; 
-		sql += "                            WHEN nvl(clb.\"SellerName\", ' ') != ' ' THEN" ; 
-		sql += "                                1" ; 
-		sql += "        else 0" ; 
-		sql += "                        END" ; 
-		sql += "                    = 1" ; 
-		sql += "            ) c ON c.\"CustNo\" = t.\"CustNo\"" ; 
-		sql += "                   AND c.\"FacmNo\" = t.\"FacmNo\"" ; 
+		sql += " LEFT JOIN (";
+		sql += "                 SELECT";
+		sql += "                    cf.\"CustNo\",";
+		sql += "                    cf.\"FacmNo\",";
+		sql += "                    clb.\"SellerId\",";
+		sql += "                    clb.\"SellerName\",";
+		sql += "                    ROW_NUMBER() OVER(";
+		sql += "                        PARTITION BY cf.\"CustNo\", cf.\"FacmNo\"";
+		sql += "                        ORDER BY";
+		sql += "                            clb.\"SellerId\", clb.\"SellerName\"";
+		sql += "                    ) AS \"Seq\"";
+		sql += "                FROM";
+		sql += "                    \"ClFac\"        cf";
+		sql += "                    LEFT JOIN \"ClBuilding\"   clb ON clb.\"ClCode1\" = cf.\"ClCode1\"";
+		sql += "                                                  AND clb.\"ClCode2\" = cf.\"ClCode2\"";
+		sql += "                                                  AND clb.\"ClNo\" = cf.\"ClNo\"";
+		sql += "                WHERE";
+		sql += "                    cf.\"MainFlag\" = 'Y'";
+		sql += "                    AND";
+		sql += "                    CASE";
+		sql += "                            WHEN nvl(clb.\"SellerId\", ' ') != ' '   THEN";
+		sql += "                                1";
+		sql += "                            WHEN nvl(clb.\"SellerName\", ' ') != ' ' THEN";
+		sql += "                                1";
+		sql += "        else 0";
+		sql += "                        END";
+		sql += "                    = 1";
+		sql += "            ) c ON c.\"CustNo\" = t.\"CustNo\"";
+		sql += "                   AND c.\"FacmNo\" = t.\"FacmNo\"";
 		sql += "                   AND C.\"Seq\" = 1";
 		sql += "   LEFT JOIN \"MonthlyLoanBal\" B";
 		sql += "          ON B.\"YearMonth\" = :lastMonth ";
@@ -297,7 +297,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"ThisMonthBalCount\"                                                   "; // -- F9 D.本月貸款餘額(次數)
 		sql += "      , N.\"ThisMonthBal\"                                                        "; // -- F10 D.本月貸款餘額
 		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)  AS \"F11\"       "; // -- F11 補貼息"
-		
+
 		sql += "      FROM (SELECT MAX(CASE T.\"ProdNo\"";
 		sql += "                            WHEN 'IA' THEN 1";
 		sql += "                            WHEN 'IB' THEN 2";
@@ -332,7 +332,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       END)                           AS \"LastMonthBal\"";
 
 		sql += "                 , SUM(CASE  WHEN t.\"AcctCode\" != '990' AND (nvl(b.\"AcctCode\", '*') = '*' OR ";
-		sql += "                    nvl(b.\"AcctCode\", '*') = '990') THEN 1" ; 
+		sql += "                    nvl(b.\"AcctCode\", '*') = '990') THEN 1";
 		sql += "                    ELSE 0 ";
 		sql += "                       END)                            AS \"OpenAmountCount\"";
 		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990'";
@@ -345,12 +345,12 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       END)                            AS \"OpenAmount\"";
 
 		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990' AND NVL(B.\"LoanBalance\",0) != 0";
-		sql += "                                 THEN 1        "; 
+		sql += "                                 THEN 1        ";
 		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
 		sql += "                                 THEN 0";
 		sql += "                            WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth  ";
 		sql += "                                 THEN 0";
-		sql += "                            WHEN NVL(B.\"LoanBalance\",0) > 0         "; 
+		sql += "                            WHEN NVL(B.\"LoanBalance\",0) > 0         ";
 		sql += "                                 THEN 1";
 		sql += "                            ELSE 0";
 		sql += "                       END)                             AS \"CloseAmountCount\"   "; // --還款+結清+轉催收
@@ -463,7 +463,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"MaturityAmount\"                                             "; // -- F9 C2.屆期不再申撥補貼息 --超過到期日
 		sql += "      , N.\"ThisMonthBal\"                                               "; // -- F10 D.本月貸款餘額
 		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)   AS \"F11\" "; // -- F11 補貼息
-		
+
 		sql += "      FROM (";
 		sql += "            SELECT T.\"CustNo\"                           AS \"CustNo\"";
 		sql += "                 , T.\"FacmNo\"                           AS \"FacmNo\"";
@@ -556,7 +556,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "             GROUP BY T.\"CustNo\", T.\"FacmNo\"";
 		sql += "             ) N";
-		sql += "  WHERE n.\"ThisMonthBal\" != 0 " ;
+		sql += "  WHERE n.\"ThisMonthBal\" != 0 ";
 		sql += " ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 		this.info("sql=" + sql);
 		Query query;

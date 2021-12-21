@@ -39,8 +39,7 @@ public class LM084Report extends MakeReport {
 		today = dDateUtil.getNowStringBc();
 		nowTime = dDateUtil.getNowStringTime();
 
-		String inputDate = Integer.toString(Integer.parseInt(titaVo.getParam("inputYear")) + 1911)
-				+ titaVo.getParam("inputMonth") + "01";
+		String inputDate = Integer.toString(Integer.parseInt(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth") + "01";
 
 		getMonthEndDate(inputDate);
 

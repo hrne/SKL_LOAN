@@ -74,15 +74,15 @@ public class LC100 extends TradeBuffer {
 				if (tCdBranch == null) {
 					throw new LogicException("EC001", "營業單位:" + tTxTeller.getBrNo());
 				}
-				
-				CdBranchGroup tCdBranchGroup = sCdBranchGroupService.findById(new CdBranchGroupId(tTxTeller.getBrNo(),tTxTeller.getGroupNo()), titaVo);
+
+				CdBranchGroup tCdBranchGroup = sCdBranchGroupService.findById(new CdBranchGroupId(tTxTeller.getBrNo(), tTxTeller.getGroupNo()), titaVo);
 				if (tCdBranchGroup == null) {
 					throw new LogicException("EC001", "營業單位課組別檔:" + tTxTeller.getGroupNo());
 				}
-				
+
 				String s = "";
 				s = tCdBranchGroup.getGroupItem();
-				
+
 				s = s.trim();
 				this.totaVo.putParam("BRNAME", tCdBranch.getBranchItem());
 				this.totaVo.putParam("BANKNO", "");

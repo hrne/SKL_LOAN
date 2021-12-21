@@ -17,34 +17,26 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 @Service("l5411ServiceImpl")
-public class L5411ServiceImpl extends ASpringJpaParm implements InitializingBean{
+public class L5411ServiceImpl extends ASpringJpaParm implements InitializingBean {
 	private static final Logger logger = LoggerFactory.getLogger(L5411ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// 創建程式碼後,檢查初始值
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
-	
-	public List<Map<String, String>> FindData(int dateSt, int dateTo ,TitaVo titaVo) throws Exception{
+
+	public List<Map<String, String>> FindData(int dateSt, int dateTo, TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
-		String sql = "select a.\"ApplNo\", "
-					+ "a.\"LineAmt\", "
-					+ "a.\"CustNo\", "
-					+ "a.\"FirstDrawdownDate\", "
-					+ "a.\"BusinessOfficer\", "
-					+ "a.\"Supervisor\""
-					+ "count(a.\"CustNo\",a.\"FacmNo\") as \"TotalCount\""
-					+ "from \"FacMain\" a where a.\"FirstDrawdownDate\" between "
-					+ dateSt +"and"+dateTo
-					+ "group by a.\"CustNo\",a.\"FacmNo\" "; 
-		logger.info("sql = "+sql);
-		
-		
+
+		String sql = "select a.\"ApplNo\", " + "a.\"LineAmt\", " + "a.\"CustNo\", " + "a.\"FirstDrawdownDate\", " + "a.\"BusinessOfficer\", " + "a.\"Supervisor\""
+				+ "count(a.\"CustNo\",a.\"FacmNo\") as \"TotalCount\"" + "from \"FacMain\" a where a.\"FirstDrawdownDate\" between " + dateSt + "and" + dateTo + "group by a.\"CustNo\",a.\"FacmNo\" ";
+		logger.info("sql = " + sql);
+
 		query = em.createNativeQuery(sql);
 		logger.info("L5411Service FindData=" + query.toString());
 		return this.convertToMap(query.getResultList());

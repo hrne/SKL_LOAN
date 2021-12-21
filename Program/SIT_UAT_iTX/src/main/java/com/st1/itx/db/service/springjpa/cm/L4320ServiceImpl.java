@@ -279,7 +279,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iAdjustDate > 0 && iAdjustDateC == 2) {
 			sql += "   and r.\"EffectDate\"  >= " + iAdjustDate;
 		}
-		
+
 		// 團體戶 ....... 9999999999 + => 團體戶統編 , 5.按商品別調整
 		if (iTxKind == 5 && !iGroupUKey.isEmpty()) {
 			sql += "   and a.\"GroupUKey\" = '" + iGroupUKey + "' ";

@@ -149,7 +149,7 @@ public class L4960 extends TradeBuffer {
 						selfInsuCode = 2;
 					}
 				}
-				
+
 				this.info("EndoInsuNo ... '" + tInsuRenew.getInsuRenewId().getEndoInsuNo() + "'");
 
 				OccursList occursList = new OccursList();

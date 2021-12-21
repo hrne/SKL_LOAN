@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.HlAreaLnYg6PtId;
  */
 public interface HlAreaLnYg6PtRepository extends JpaRepository<HlAreaLnYg6Pt, HlAreaLnYg6PtId> {
 
-  // WorkYM = 
-  public Slice<HlAreaLnYg6Pt> findAllByWorkYMIsOrderByWorkYMAscAreaUnitNoAsc(String workYM_0, Pageable pageable);
+	// WorkYM =
+	public Slice<HlAreaLnYg6Pt> findAllByWorkYMIsOrderByWorkYMAscAreaUnitNoAsc(String workYM_0, Pageable pageable);
 
-  // AreaUnitNo = 
-  public Slice<HlAreaLnYg6Pt> findAllByAreaUnitNoIsOrderByWorkYMAscAreaUnitNoAsc(String areaUnitNo_0, Pageable pageable);
+	// AreaUnitNo =
+	public Slice<HlAreaLnYg6Pt> findAllByAreaUnitNoIsOrderByWorkYMAscAreaUnitNoAsc(String areaUnitNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<HlAreaLnYg6Pt> findByHlAreaLnYg6PtId(HlAreaLnYg6PtId hlAreaLnYg6PtId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<HlAreaLnYg6Pt> findByHlAreaLnYg6PtId(HlAreaLnYg6PtId hlAreaLnYg6PtId);
 
 }
-

@@ -32,7 +32,7 @@ public class L9724p extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
-	
+
 	String TXCD = "L9724";
 	String TXName = "應收利息之帳齡分析表";
 
@@ -49,11 +49,9 @@ public class L9724p extends TradeBuffer {
 		boolean isFinish = l9724Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

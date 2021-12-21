@@ -23,7 +23,7 @@ public class L4R27 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public BankDeductDtlService bankDeductDtlService;
-	
+
 	@Autowired
 	public Parse parse;
 
@@ -39,7 +39,6 @@ public class L4R27 extends TradeBuffer {
 		int iEntryDate = parse.stringToInteger(titaVo.getParam("RimEntryDate"));
 		int iPayIntDate = parse.stringToInteger(titaVo.getParam("RimPayIntDate"));
 		int RepayType = parse.stringToInteger(titaVo.getParam("RimRepayType"));
-		
 
 		BankDeductDtlId tBankDeductDtlId = new BankDeductDtlId();
 		tBankDeductDtlId.setCustNo(iCustNo);
@@ -47,17 +46,17 @@ public class L4R27 extends TradeBuffer {
 		tBankDeductDtlId.setEntryDate(iEntryDate);
 		tBankDeductDtlId.setPayIntDate(iPayIntDate);
 		tBankDeductDtlId.setRepayType(RepayType);
-		
+
 		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findById(tBankDeductDtlId, titaVo);
-		
-		if(tBankDeductDtl != null) {
+
+		if (tBankDeductDtl != null) {
 			this.totaVo.putParam("L4r27RepayBank", tBankDeductDtl.getRepayBank());
 			this.totaVo.putParam("L4r27RepayAcctNo", tBankDeductDtl.getRepayAcctNo());
 			this.totaVo.putParam("L4r27AcctCode", tBankDeductDtl.getAcctCode());
 			this.totaVo.putParam("L4r27TitaTxtNo", tBankDeductDtl.getTitaTxtNo());
 			this.totaVo.putParam("L4r27IntStartDate", tBankDeductDtl.getIntStartDate());
 			this.totaVo.putParam("L4r27IntEndDate", tBankDeductDtl.getIntEndDate());
-			this.totaVo.putParam("L4r27BatchNo", String.valueOf(tBankDeductDtl.getRepayAcctNo()).substring(0,2));
+			this.totaVo.putParam("L4r27BatchNo", String.valueOf(tBankDeductDtl.getRepayAcctNo()).substring(0, 2));
 		} else {
 			this.totaVo.putParam("L4r27RepayBank", "");
 			this.totaVo.putParam("L4r27RepayAcctNo", "");
@@ -67,8 +66,7 @@ public class L4R27 extends TradeBuffer {
 			this.totaVo.putParam("L4r27IntEndDate", "");
 			this.totaVo.putParam("L4r27BatchNo", "");
 		}
-		
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -109,9 +109,9 @@ public class L2980Report extends MakeReport {
 			break;
 		}
 		this.print(2, 10, "繳息狀況 . . . .  " + titaVo.getParam("Status") + "  " + StatusName);
-		
+
 		int Reason = parse.stringToInteger(titaVo.getParam("Reason"));
-		switch(Reason) {
+		switch (Reason) {
 		case 1:
 			this.print(1, 10, "調整原因 . . . .  1  調降利率");
 			this.print(1, 10, "客戶要求利率 . .");
@@ -121,27 +121,25 @@ public class L2980Report extends MakeReport {
 			this.print(1, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		case 2:
-			this.print(1, 10, "調整原因 . . . .  2  變更還款方式"  );
+			this.print(1, 10, "調整原因 . . . .  2  變更還款方式");
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		case 3:
-			this.print(1, 10, "調整原因 . . . .  3  延長寬限期 " + titaVo.getParam("GracePeriod") );
+			this.print(1, 10, "調整原因 . . . .  3  延長寬限期 " + titaVo.getParam("GracePeriod"));
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		case 4:
-			this.print(1, 10, "調整原因 . . . .  4  縮短年限 " + titaVo.getParam("ShortenYear")  );
+			this.print(1, 10, "調整原因 . . . .  4  縮短年限 " + titaVo.getParam("ShortenYear"));
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		case 5:
-			this.print(1, 10, "調整原因 . . . .  5  延長年限 " + titaVo.getParam("ExtendYear")  );
+			this.print(1, 10, "調整原因 . . . .  5  延長年限 " + titaVo.getParam("ExtendYear"));
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		default:
 			break;
 		}
-		
-		
-		
+
 		this.print(10, 16, "職業：  _____________ ");
 		this.print(1, 16, "收入：  _____________ ");
 		this.print(1, 16, "地區：  _____________ ");

@@ -51,8 +51,7 @@ public class LM028Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<MonthlyLM028> lMonthlyLM028) throws LogicException {
 		this.info("LM028Report exportExcel start ...");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM028", "預估現金流量", "LM028預估現金流量", "預估現金流量.xlsx",
-				"DEL5");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM028", "預估現金流量", "LM028預估現金流量", "預估現金流量.xlsx", "DEL5");
 		if (lMonthlyLM028 == null || lMonthlyLM028.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料");
 		} else {

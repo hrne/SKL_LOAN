@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.BankRelationSuspectedId;
  */
 public interface BankRelationSuspectedRepositoryHist extends JpaRepository<BankRelationSuspected, BankRelationSuspectedId> {
 
-  // RepCusName =
-  public Slice<BankRelationSuspected> findAllByRepCusNameIs(String repCusName_0, Pageable pageable);
+	// RepCusName =
+	public Slice<BankRelationSuspected> findAllByRepCusNameIs(String repCusName_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<BankRelationSuspected> findByBankRelationSuspectedId(BankRelationSuspectedId bankRelationSuspectedId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<BankRelationSuspected> findByBankRelationSuspectedId(BankRelationSuspectedId bankRelationSuspectedId);
 
 }
-

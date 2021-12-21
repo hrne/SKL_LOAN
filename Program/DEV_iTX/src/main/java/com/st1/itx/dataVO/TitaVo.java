@@ -463,7 +463,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public boolean isActfgSuprele() {
 		return this.get(ContentName.actfg) != null && (this.get(ContentName.actfg).equals("2") || this.get(ContentName.actfg).equals("4"));
 	}
-	
+
 	/**
 	 * NBSDY
 	 * 
@@ -481,7 +481,6 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getNnbsDy() {
 		return Objects.isNull(this.get("NNBSDY")) ? "0" : this.get("NNBSDY");
 	}
-
 
 	/**
 	 * chk nbsdy and nnbsdy

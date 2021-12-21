@@ -35,22 +35,23 @@ public class L4603Report extends MakeReport {
 
 	@Autowired
 	public CustMainService custMainService;
-	
+
 	@Autowired
 	public ClBuildingService clBuildingService;
-	
+
 	@Autowired
 	public LoanBorMainService loanBorMainService;
-	
+
 	private int reporttype = 0;
+
 	@Override
 	public void printHeader() {
 
-		if(reporttype == 1) {
-			printHeaderP1();			
+		if (reporttype == 1) {
+			printHeaderP1();
 		} else {
 			printHeaderP();
-		}	
+		}
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(5);
 
@@ -63,19 +64,19 @@ public class L4603Report extends MakeReport {
 		this.print(-2, 48, "火險通知作業明細", "C");
 		this.print(-4, 1, "  戶號           擔保品代碼        原保單號碼        戶名                  通知種類");
 	}
-	
+
 	public void printHeaderP1() {
 		this.print(-2, 48, "續保資料錯誤明細表", "C");
 		this.print(-4, 1, " 擔保品號碼     原保單號碼       戶號   額度 戶名                 新保險起日 新保險迄日           火險保額           火線保費         地震險保額         地震險保費             總保費  錯誤說明");
 	}
-	
-	public void exec(TitaVo titaVo, List<OccursList> reportlist,int reporttype) throws LogicException {
+
+	public void exec(TitaVo titaVo, List<OccursList> reportlist, int reporttype) throws LogicException {
 		this.info("L4603Report exec");
-		
+
 		this.reporttype = reporttype;
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4603", "續保資料錯誤明細表", "續保資料錯誤明細表", "A4", "P");
-		
-		for(OccursList t : reportlist) {
+
+		for (OccursList t : reportlist) {
 			this.print(1, 3, t.get("ReportCClCode1"));
 			this.print(0, 8, t.get("ReportCClCode2"));
 			this.print(0, 12, t.get("ReportCClNo"));
@@ -92,31 +93,31 @@ public class L4603Report extends MakeReport {
 			this.print(0, 50, t.get("ReportCTotlFee"));
 			this.print(0, 50, t.get("ReportCErrMsg"));
 		}
-		
+
 		long sno = this.close();
 		this.toPdf(sno);
 	}
-	
-	public void exec1(TitaVo titaVo, List<OccursList> reportlist,int reporttype) throws LogicException {
+
+	public void exec1(TitaVo titaVo, List<OccursList> reportlist, int reporttype) throws LogicException {
 		this.info("L4603Report exec1");
-		
+
 		this.reporttype = reporttype;
-		
+
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4603", "火險通知作業明細", "火險通知作業明細", "A4", "P");
-		
+
 		String OOLableA = "";
-		for(OccursList t : reportlist) {
-			this.print(1, 3, FormatUtil.pad9(t.get("OOCustNo"),7) + "-" + FormatUtil.pad9(t.get("OOFacmNo"), 3));
-			this.print(0, 18, t.get("OOClCode1") + "-"+ FormatUtil.pad9(t.get("OOClCode2"),2) + "-" +FormatUtil.pad9(t.get("OOClNo"),7));
+		for (OccursList t : reportlist) {
+			this.print(1, 3, FormatUtil.pad9(t.get("OOCustNo"), 7) + "-" + FormatUtil.pad9(t.get("OOFacmNo"), 3));
+			this.print(0, 18, t.get("OOClCode1") + "-" + FormatUtil.pad9(t.get("OOClCode2"), 2) + "-" + FormatUtil.pad9(t.get("OOClNo"), 7));
 			this.print(0, 35, t.get("OOInsuNo"));
-			
+
 			int nameLength = 20;
 			if (t.get("OOCustName").length() < 20) {
 				nameLength = t.get("OOCustName").length();
 			}
 			this.print(0, 52, t.get("OOCustName").substring(0, nameLength));// 員工姓名
-			
-			switch(t.get("OOLableA")) {
+
+			switch (t.get("OOLableA")) {
 			case "0":
 				OOLableA = "火險通知單";
 				break;
@@ -134,15 +135,15 @@ public class L4603Report extends MakeReport {
 				break;
 			default:
 				break;
-				
+
 			}
 			this.print(0, 74, OOLableA);
 		}
-		
+
 		long sno = this.close();
 		this.toPdf(sno);
 	}
-	
+
 //	// 押品號碼 原保單號碼 戶號 額度 戶名 新保險起日 新保險迄日 火險保額 火線保費 地震險保額 地震險保費 總保費 錯誤說明
 //	OccursList occursListReport = new OccursList();
 //	occursListReport.putParam("ReportCClCode1", t.getClCode1());

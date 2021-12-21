@@ -117,8 +117,7 @@ public class L4940 extends TradeBuffer {
 						if (wksubBankAuth.length() > 1) {
 							wksubBankAuth = tBankAuthAct.getAuthType().substring(1, 2);
 						}
-						tPostAuthLog = postAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(),
-								tBankAuthAct.getPostDepCode(), tBankAuthAct.getRepayAcct(), wksubBankAuth, titaVo);
+						tPostAuthLog = postAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getPostDepCode(), tBankAuthAct.getRepayAcct(), wksubBankAuth, titaVo);
 						if (tPostAuthLog != null) {
 							wkCustId = tPostAuthLog.getCustId();
 //							本人時用戶號查客戶主檔取戶名
@@ -140,9 +139,7 @@ public class L4940 extends TradeBuffer {
 						wkAcctSeq = tBankAuthAct.getAcctSeq();
 						wkCustNoSeq = wkCustId + wkPostDepCode + wkCustNo + wkAcctSeq;
 					} else {
-						tAchAuthLog = achAuthLogService.facmNoRepayAcctFirst(tBankAuthAct.getCustNo(),
-								tBankAuthAct.getFacmNo(), tBankAuthAct.getRepayBank(), tBankAuthAct.getRepayAcct(),
-								titaVo);
+						tAchAuthLog = achAuthLogService.facmNoRepayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getFacmNo(), tBankAuthAct.getRepayBank(), tBankAuthAct.getRepayAcct(), titaVo);
 						if (tAchAuthLog != null) {
 							if ("00".equals(tAchAuthLog.getRelationCode())) {
 //								有資料時塞入 否則放空白

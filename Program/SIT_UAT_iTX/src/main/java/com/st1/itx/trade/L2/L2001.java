@@ -110,11 +110,9 @@ public class L2001 extends TradeBuffer {
 		// 空白為全部 Y企金可使用
 		if ("Y".equals(iEnterpriseFg)) {
 			lEnterpriseFg.add("Y");
-			slFacProd = facProdService.fildProdNo(iProdNo.trim() + "%", lStatusCode, lEnterpriseFg, lGovOfferFlag,
-					lFinancialFlag, lEmpFlag, this.index, this.limit, titaVo);
+			slFacProd = facProdService.fildProdNo(iProdNo.trim() + "%", lStatusCode, lEnterpriseFg, lGovOfferFlag, lFinancialFlag, lEmpFlag, this.index, this.limit, titaVo);
 		} else {
-			slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, lGovOfferFlag, lFinancialFlag,
-					lEmpFlag, this.index, this.limit, titaVo);
+			slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, lGovOfferFlag, lFinancialFlag, lEmpFlag, this.index, this.limit, titaVo);
 		}
 
 		// 查詢商品參數檔
@@ -126,19 +124,16 @@ public class L2001 extends TradeBuffer {
 		for (FacProd tFacProd : lFacProd) {
 			// 當商品狀態輸入1生效時,生效日>日曆日(未生效) 或 截止日>0時,截止日<日曆日的跳過(
 			if ("1".equals(iStatusCode)
-					&& (parse.stringToInteger(titaVo.getCalDy()) < tFacProd.getStartDate() || (tFacProd.getEndDate() > 0
-							&& tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
+					&& (parse.stringToInteger(titaVo.getCalDy()) < tFacProd.getStartDate() || (tFacProd.getEndDate() > 0 && tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
 				this.info("非生效");
 				continue;
 			}
-			if ("2".equals(iStatusCode) && (parse.stringToInteger(titaVo.getCalDy()) >= tFacProd.getStartDate()
-					|| (tFacProd.getEndDate() > 0
-							&& tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
+			if ("2".equals(iStatusCode)
+					&& (parse.stringToInteger(titaVo.getCalDy()) >= tFacProd.getStartDate() || (tFacProd.getEndDate() > 0 && tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
 				this.info("非未生效");
 				continue;
 			}
-			if ("3".equals(iStatusCode) && !((tFacProd.getEndDate() > 0)
-					&& (tFacProd.getEndDate() < parse.stringToInteger(titaVo.getCalDy())))) {
+			if ("3".equals(iStatusCode) && !((tFacProd.getEndDate() > 0) && (tFacProd.getEndDate() < parse.stringToInteger(titaVo.getCalDy())))) {
 				this.info("非已截止");
 				continue;
 			}

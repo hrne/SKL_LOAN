@@ -88,7 +88,7 @@ public class L8312 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"))+191100;
+		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM")) + 191100;
 		String iDelayCode = titaVo.getParam("DelayCode");
 		String iDelayDesc = titaVo.getParam("DelayDesc");
 		String iKey = "";

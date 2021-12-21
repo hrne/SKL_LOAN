@@ -17,7 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 @Service("l5R33ServiceImpl")
-public class L5R33ServiceImpl extends ASpringJpaParm implements InitializingBean{
+public class L5R33ServiceImpl extends ASpringJpaParm implements InitializingBean {
 	private static final Logger logger = LoggerFactory.getLogger(L5R33ServiceImpl.class);
 
 	@Autowired
@@ -28,21 +28,21 @@ public class L5R33ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 創建程式碼後,檢查初始值
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
-	
-	public List<Map<String, String>> getSeq(int CustNo,TitaVo titaVo) throws Exception{
+
+	public List<Map<String, String>> getSeq(int CustNo, TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = " "; 
-		 sql += " select c.\"CustName\"                       ";
-		 sql += " , max(i.\"ApplSeq\") as \"MaxApplSeq\"      ";
-		 sql += " from \"CustMain\" c                         ";
-		 sql += " left join \"InnDocRecord\" i                ";
-		 sql += " on i.\"CustNo\" = c.\"CustNo\"              ";
-		 sql += " where c.\"CustNo\" = " + CustNo;
-		 sql += " group by c.\"CustName\", i.\"ApplSeq\"      ";	
-		 sql += " order by c.\"CustName\", i.\"ApplSeq\" DESC ";	
-			
-		logger.info("sql = "+sql); 
+		String sql = " ";
+		sql += " select c.\"CustName\"                       ";
+		sql += " , max(i.\"ApplSeq\") as \"MaxApplSeq\"      ";
+		sql += " from \"CustMain\" c                         ";
+		sql += " left join \"InnDocRecord\" i                ";
+		sql += " on i.\"CustNo\" = c.\"CustNo\"              ";
+		sql += " where c.\"CustNo\" = " + CustNo;
+		sql += " group by c.\"CustName\", i.\"ApplSeq\"      ";
+		sql += " order by c.\"CustName\", i.\"ApplSeq\" DESC ";
+
+		logger.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		logger.info("LL5R33Service FindData=" + query.toString());

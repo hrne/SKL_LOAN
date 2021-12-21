@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,16 @@ import com.st1.itx.db.domain.Ias39LossId;
  */
 public interface Ias39LossRepositoryMon extends JpaRepository<Ias39Loss, Ias39LossId> {
 
-  // CustNo = ,AND FacmNo >= ,AND FacmNo <= 
-  public Slice<Ias39Loss> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByFacmNoAscMarkDateAsc(int custNo_0, int facmNo_1, int facmNo_2, Pageable pageable);
+	// CustNo = ,AND FacmNo >= ,AND FacmNo <=
+	public Slice<Ias39Loss> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByFacmNoAscMarkDateAsc(int custNo_0, int facmNo_1, int facmNo_2, Pageable pageable);
 
-  // CustNo >= ,AND CustNo <= ,AND FacmNo >= ,AND FacmNo <= 
-  public Slice<Ias39Loss> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByCustNoAscFacmNoAscMarkDateAsc(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, Pageable pageable);
+	// CustNo >= ,AND CustNo <= ,AND FacmNo >= ,AND FacmNo <=
+	public Slice<Ias39Loss> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByCustNoAscFacmNoAscMarkDateAsc(int custNo_0, int custNo_1,
+			int facmNo_2, int facmNo_3, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Ias39Loss> findByIas39LossId(Ias39LossId ias39LossId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Ias39Loss> findByIas39LossId(Ias39LossId ias39LossId);
 
 }
-

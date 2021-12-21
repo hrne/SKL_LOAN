@@ -40,7 +40,7 @@ public class L8R47 extends TradeBuffer {
 			totaVo.putParam("L8r47SubmitKey", iJcicZ451.getSubmitKey());
 			totaVo.putParam("L8r47ApplyDate", iJcicZ451.getApplyDate());
 			totaVo.putParam("L8r47CourtCode", iJcicZ451.getCourtCode());
-			totaVo.putParam("L8r47DelayYM", iJcicZ451.getDelayYM()-191100);
+			totaVo.putParam("L8r47DelayYM", iJcicZ451.getDelayYM() - 191100);
 			totaVo.putParam("L8r47DelayCode", iJcicZ451.getDelayCode());
 			totaVo.putParam("L8r47OutJcicTxtDate", iJcicZ451.getOutJcicTxtDate());
 		}

@@ -51,7 +51,7 @@ public class L8046 extends TradeBuffer {
 			String iLastUpdateEmpNo = rJcicZ055.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursListA.putParam("OOTranKey", rJcicZ055.getTranKey());
-			occursListA.putParam("OOYear", rJcicZ055.getYear()-1911);
+			occursListA.putParam("OOYear", rJcicZ055.getYear() - 1911);
 			occursListA.putParam("OOCourtDiv", rJcicZ055.getCourtDiv());
 			occursListA.putParam("OOCourtCaseNo", rJcicZ055.getCourtCaseNo());
 			occursListA.putParam("OOPayDate", rJcicZ055.getPayDate());
@@ -94,7 +94,7 @@ public class L8046 extends TradeBuffer {
 			String iLastUpdateEmpNo = rrJcicZ055Log.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursList.putParam("OOTranKey", rrJcicZ055Log.getTranKey());
-			occursList.putParam("OOYear", rrJcicZ055Log.getYear()-1911);
+			occursList.putParam("OOYear", rrJcicZ055Log.getYear() - 1911);
 			occursList.putParam("OOCourtDiv", rrJcicZ055Log.getCourtDiv());
 			occursList.putParam("OOCourtCaseNo", rrJcicZ055Log.getCourtCaseNo());
 			occursList.putParam("OOPayDate", rrJcicZ055Log.getPayDate());

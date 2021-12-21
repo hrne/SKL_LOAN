@@ -27,10 +27,10 @@ public class LM046Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	static final BigDecimal thousand = new BigDecimal("1000");
 	static final BigDecimal hundred = new BigDecimal("100");
 
@@ -61,7 +61,7 @@ public class LM046Report extends MakeReport {
 		}
 		exportExcel(titaVo, LM046List);
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
@@ -72,41 +72,30 @@ public class LM046Report extends MakeReport {
 		}
 
 		int count = 0;
-		StringBuilder sb = new StringBuilder(); // defined out here for setLength() instead of new StringBuilder() every iteration
+		StringBuilder sb = new StringBuilder(); // defined out here for setLength() instead of new StringBuilder() every
+												// iteration
 
 		for (Map<String, String> tLDVo : LDList) {
 			// 第一區塊
-			
+
 			BigDecimal[] bd = new BigDecimal[13];
-			
+
 			sb.setLength(0);
-			
+
 			// F0 is formatted date string, hence not used in bd[]
-			for (int i = 1; i <= 12; i++)
-			{
+			for (int i = 1; i <= 12; i++) {
 				bd[i] = getBigDecimal(tLDVo.get("F" + i));
 				sb.append("F" + i + ": " + bd[i].toString() + "; ");
 			}
-			
+
 			this.info("LM046 result check: ");
 			this.info(sb.toString());
-			
+
 			makeExcel.setValue(4 + count, 1, tLDVo.get("F0"));
 			makeExcel.setValue(4 + count, 3, computeDivide(bd[2].add(bd[8]), thousand, 0), "#,##0");
-			makeExcel.setValue(4 + count, 6,
-					computeDivide(
-					 bd[4].add(bd[6]).add(bd[10]).add(bd[12])
-					,thousand
-					,0),
-					"#,##0");
-			makeExcel.setValue(4 + count, 9,
-					bd[3].add(bd[5]).add(bd[9]).add(bd[11]), "#,##0");
-			makeExcel.setValue(4 + count, 11,
-					computeDivide(
-  							  bd[4].add(bd[6]).add(bd[10]).add(bd[12])
-							, bd[2].add(bd[8])
-							, 5),
-					"0.00%");
+			makeExcel.setValue(4 + count, 6, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), thousand, 0), "#,##0");
+			makeExcel.setValue(4 + count, 9, bd[3].add(bd[5]).add(bd[9]).add(bd[11]), "#,##0");
+			makeExcel.setValue(4 + count, 11, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), bd[2].add(bd[8]), 5), "0.00%");
 
 			// 第二區塊
 
@@ -140,9 +129,8 @@ public class LM046Report extends MakeReport {
 //			totals[0] = new BigDecimal(tLDVo.get("F1")).add(new BigDecimal(tLDVo.get("F7")));
 //          ...
 //			totals[5] = new BigDecimal(tLDVo.get("F6")).add(new BigDecimal(tLDVo.get("F12")));			
-			for (int i = 0; i <= 5; i++)
-			{
-				totals[i] = bd[1+i].add(bd[7+i]);
+			for (int i = 0; i <= 5; i++) {
+				totals[i] = bd[1 + i].add(bd[7 + i]);
 			}
 
 			makeExcel.setValue(19 + count * 3 + 2, 3, totals[0], "#,##0");

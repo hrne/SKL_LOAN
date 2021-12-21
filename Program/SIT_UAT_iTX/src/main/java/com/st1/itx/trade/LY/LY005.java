@@ -48,8 +48,7 @@ public class LY005 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("active LY005 ");
 		ly005report.setTxBuffer(this.getTxBuffer());
 		ly005report.exec(titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LY005非RBC_表20_會計部年度檢查報表", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LY005非RBC_表20_會計部年度檢查報表", titaVo);
 	}
 
 }

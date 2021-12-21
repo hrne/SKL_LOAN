@@ -32,8 +32,6 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private Parse parse;
 
-	
-
 	// *** 折返控制相關 ***
 	private int index;
 
@@ -53,16 +51,16 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		
+
 		this.index = titaVo.getReturnIndex();
 		this.limit = 200; // 45 * 200 = 9000
 
 		// 取得輸入資料
 		int iYearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth"));
-		if(iYearMonth!=0) {
-			iYearMonth = iYearMonth+191100;
+		if (iYearMonth != 0) {
+			iYearMonth = iYearMonth + 191100;
 		}
-		int iCustNo=this.parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iCondition = Integer.parseInt(titaVo.getParam("Condition"));
 		int iUsageCode = Integer.parseInt(titaVo.getParam("UsageCode"));
 		String sql = "";
@@ -85,40 +83,40 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"FacMain\" F							 	  \n";
 		sql += "on F.\"CustNo\" = Y.\"CustNo\"					  	  \n";
 		sql += "and F.\"FacmNo\" = Y.\"FacmNo\"					  	  \n";
-		
-		if(iYearMonth!=0 && iCustNo!=0) {
+
+		if (iYearMonth != 0 && iCustNo != 0) {
 			sql += "where Y.\"YearMonth\" = :yearMonth and  Y.\"CustNo\" = :custNo";
-		} else if(iYearMonth!=0) {
+		} else if (iYearMonth != 0) {
 			sql += "where Y.\"YearMonth\" = :yearMonth";
-		} else if(iCustNo!=0) {
+		} else if (iCustNo != 0) {
 			sql += "where Y.\"CustNo\" = :custNo";
 		} else {
 			sql += "where Y.\"YearMonth\" >0 and Y.\"YearMonth\" <999912";
 		}
-		if(iUsageCode>0) {
+		if (iUsageCode > 0) {
 			sql += " and (Y.\"UsageCode\" = '02' or Y.\"UsageCode\" = '2')    \n";
 		}
-		if(iCondition==1) {//借戶姓名空白
+		if (iCondition == 1) {// 借戶姓名空白
 			sql += " and C.\"CustName\" = ''     				  \n";
-		} else if(iCondition==2) {//統一編號空白 
+		} else if (iCondition == 2) {// 統一編號空白
 			sql += " and C.\"CustId\" = ''     				  \n";
-		} else if(iCondition==3) {//貸款帳號空白
+		} else if (iCondition == 3) {// 貸款帳號空白
 			sql += " and Y.\"CustNo\" = 0 OR  Y.\"FacmNo\" = 0	  \n";
-		} else if(iCondition==4) {//初貸金額為0
+		} else if (iCondition == 4) {// 初貸金額為0
 			sql += " and Y.\"LoanAmt\" = 0 		                  \n";
-		} else if(iCondition==5) {//初貸金額>核准和度
+		} else if (iCondition == 5) {// 初貸金額>核准和度
 			sql += " and Y.\"LoanAmt\" > F.\"LineAmt\"			  \n";
-		} else if(iCondition==6) {//初貸款金額<放款餘額
+		} else if (iCondition == 6) {// 初貸款金額<放款餘額
 			sql += " and Y.\"LoanAmt\" < Y.\"LoanBal\"			  \n";
-		} else if(iCondition==7) {//貸款起日空白
+		} else if (iCondition == 7) {// 貸款起日空白
 			sql += " and Y.\"FirstDrawdownDate\" = 0			  \n";
-		} else if(iCondition==8) {//貸款訖日空白
+		} else if (iCondition == 8) {// 貸款訖日空白
 			sql += " and Y.\"MaturityDate\" = 0			  		  \n";
-		} else if(iCondition==9) {//繳息所屬年月空白
+		} else if (iCondition == 9) {// 繳息所屬年月空白
 			sql += " and Y.\"YearMonth\" = 0			  		  \n";
-		} else if(iCondition==10) {//繳息金額為 0	
+		} else if (iCondition == 10) {// 繳息金額為 0
 			sql += " and Y.\"YearlyInt\" = 0			  		  \n";
-		} else if(iCondition==11) {//科子細目代號暨說明空白
+		} else if (iCondition == 11) {// 科子細目代號暨說明空白
 			sql += " and Y.\"AcctCode\"= ' '			  		  \n";
 		}
 		sql += " order by Y.\"YearMonth\", Y.\"CustNo\",Y.\"FacmNo\"";
@@ -128,15 +126,13 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		if(iYearMonth!=0) {
+		if (iYearMonth != 0) {
 			query.setParameter("yearMonth", iYearMonth);
 		}
-		if(iCustNo!=0) {
+		if (iCustNo != 0) {
 			query.setParameter("custNo", iCustNo);
 		}
-		
-		
-		
+
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 
@@ -155,8 +151,6 @@ public class L5982ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-
-
 
 	public int getSize() {
 		return cnt;

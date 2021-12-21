@@ -48,24 +48,24 @@ public class L5R44 extends TradeBuffer {
 		totaVo.putParam("L5R44AccCollPsn", iCdCity.getAccCollPsn());
 		if (iEmpNo.trim().isEmpty()) {
 			totaVo.putParam("L5R44AccCollPsnX", "");
-		}else {
+		} else {
 			CdEmp iCdEmp = iCdEmpService.findById(iEmpNo, titaVo);
 			if (iCdEmp == null) {
 				totaVo.putParam("L5R44AccCollPsnX", "");
-			}else {
+			} else {
 				totaVo.putParam("L5R44AccCollPsnX", iCdEmp.getFullname());
 			}
 		}
-		
+
 		totaVo.putParam("L5R44LegalPsn", iCdCity.getLegalPsn());
 		iEmpNo = iCdCity.getLegalPsn();
 		if (iEmpNo.trim().isEmpty()) {
 			totaVo.putParam("L5R44LegalPsnX", "");
-		}else {
+		} else {
 			CdEmp iCdEmp = iCdEmpService.findById(iEmpNo, titaVo);
 			if (iCdEmp == null) {
 				totaVo.putParam("L5R44LegalPsnX", "");
-			}else {
+			} else {
 				totaVo.putParam("L5R44LegalPsnX", iCdEmp.getFullname());
 			}
 		}

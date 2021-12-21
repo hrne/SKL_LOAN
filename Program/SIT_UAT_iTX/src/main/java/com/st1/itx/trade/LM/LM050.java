@@ -47,8 +47,7 @@ public class LM050 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LM050 ");
 		lM050Report.exec(titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LM050放款保險法第3條利害關係人放款餘額表_限額控管已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM050放款保險法第3條利害關係人放款餘額表_限額控管已完成", titaVo);
 
 	}
 }

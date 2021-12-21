@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.BankRelationCompanyId;
  */
 public interface BankRelationCompanyRepositoryDay extends JpaRepository<BankRelationCompany, BankRelationCompanyId> {
 
-  // CompanyId =
-  public Slice<BankRelationCompany> findAllByCompanyIdIs(String companyId_0, Pageable pageable);
+	// CompanyId =
+	public Slice<BankRelationCompany> findAllByCompanyIdIs(String companyId_0, Pageable pageable);
 
-  // CustId = 
-  public Optional<BankRelationCompany> findTopByCustIdIs(String custId_0);
+	// CustId =
+	public Optional<BankRelationCompany> findTopByCustIdIs(String custId_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<BankRelationCompany> findByBankRelationCompanyId(BankRelationCompanyId bankRelationCompanyId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<BankRelationCompany> findByBankRelationCompanyId(BankRelationCompanyId bankRelationCompanyId);
 
 }
-

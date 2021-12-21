@@ -20,7 +20,6 @@ import com.st1.itx.db.domain.CdSyndFee;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdSyndFeeService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L2064")
@@ -33,10 +32,6 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L2064 extends TradeBuffer {
 	private static final Logger logger = LoggerFactory.getLogger(L2064.class);
-
-	// 銷帳處理
-	@Autowired
-	public AcReceivableCom acReceivableCom;
 
 	@Autowired
 	public CdSyndFeeService sCdSyndFeeService;
@@ -67,17 +62,29 @@ public class L2064 extends TradeBuffer {
 		if (slAcReceivable == null) {
 			throw new LogicException(titaVo, "E2003", "銷帳檔"); // 查無資料
 		}
+		String wkRvNo = "";// 銷帳編號
+		String tSyndFeeCode = "";// 費用代碼
+		String wkCdSyndItem = "";// 費用代碼中文
+		String wkAcctCode = ""; // 業務科目
+		BigDecimal wkClsAmt = BigDecimal.ZERO; // 已銷金額
+		BigDecimal wkSyndFeeAmt = BigDecimal.ZERO; // 費用金額
+		BigDecimal wkEntryAmt = BigDecimal.ZERO;// 已入帳金額
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
+		int i = 1;
 		for (AcReceivable t : lAcReceivable) {
-
-			String tSyndFeeCode = "";
-			String wkCdSyndItem = "";
-			String wkAcctCode = "";
-			BigDecimal wkClsAmt = BigDecimal.ZERO;
-			// RvNo = SL+費用代碼(2)+流水號(3)
-			if (!("".equals(t.getRvNo())) && t.getRvNo().length() >= 7 && "SL".equals(t.getRvNo().substring(0, 2))) {
+			this.info("wkRvNo = " + wkRvNo);
+			this.info("t.getRvNo = " + t.getRvNo().substring(0, 9));
+//			不同筆時清值
+			if (!wkRvNo.equals(t.getRvNo().substring(0, 9))) {
+				wkRvNo = t.getRvNo().substring(0, 9);
+				wkClsAmt = BigDecimal.ZERO;
+				wkSyndFeeAmt = BigDecimal.ZERO;
+				wkEntryAmt = BigDecimal.ZERO;
+			}
+			// RvNo = SL+-+費用代碼(2)+-+流水號(3)
+			if (!("".equals(t.getRvNo())) && t.getRvNo().length() >= 9 && "SL".equals(t.getRvNo().substring(0, 2))) {
 				// 取費用代碼
-				tSyndFeeCode = t.getRvNo().substring(2, 4);
+				tSyndFeeCode = t.getRvNo().substring(3, 5);
 			}
 			this.info("tSyndFeeCode = " + tSyndFeeCode);
 
@@ -90,20 +97,35 @@ public class L2064 extends TradeBuffer {
 			}
 			if (t.getRvAmt().compareTo(t.getRvBal()) >= 0) {
 
-				wkClsAmt = t.getRvAmt().subtract(t.getRvBal());
+				wkClsAmt = wkClsAmt.add(t.getRvAmt().subtract(t.getRvBal()));
 			}
-			OccursList occursList = new OccursList();
+			wkSyndFeeAmt = wkSyndFeeAmt.add(t.getRvAmt());
+			// 已入帳金額邏輯
+			if (t.getReceivableFlag() == 5) {
+				wkEntryAmt = wkEntryAmt.add(t.getRvAmt());
+			}
+			if (t.getReceivableFlag() == 3) {
+				wkEntryAmt = wkEntryAmt.add(t.getRvAmt().subtract(t.getRvBal()));
+			}
+			// 最後一筆 或 與下筆不同資料時塞入tota
+			if (i == lAcReceivable.size() || !wkRvNo.equals(lAcReceivable.get(i).getRvNo().substring(0, 9))) {
 
-			occursList.putParam("OOCustNo", t.getCustNo());// 戶號
-			occursList.putParam("OOFacmNo", t.getFacmNo()); // 額度
-			occursList.putParam("OOSyndFeeItem", tSyndFeeCode + "-" + wkCdSyndItem); // 聯貸費用代碼+說明
-			occursList.putParam("OOSyndFee", t.getRvAmt());// 費用金額
-			occursList.putParam("OOClsAmt", wkClsAmt);// 已銷金額
-			occursList.putParam("OORmk", t.getSlipNote());// 備註
-			occursList.putParam("OORvNo", t.getRvNo()); // rvno
-			occursList.putParam("OOAcctCode", t.getAcctCode()); // 業務科目
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
+				OccursList occursList = new OccursList();
+
+				occursList.putParam("OOCustNo", t.getCustNo());// 戶號
+				occursList.putParam("OOFacmNo", t.getFacmNo()); // 額度
+				occursList.putParam("OOSyndFeeItem", tSyndFeeCode + "-" + wkCdSyndItem); // 聯貸費用代碼+說明
+				occursList.putParam("OOSyndFee", wkSyndFeeAmt);// 費用金額
+				occursList.putParam("OOClsAmt", wkClsAmt);// 已銷金額
+				occursList.putParam("OORmk", t.getSlipNote());// 備註
+				occursList.putParam("OORvNo", wkRvNo); // 銷帳編號
+				occursList.putParam("OOAcctCode", t.getAcctCode()); // 業務科目
+				occursList.putParam("OOEntryAmt", wkEntryAmt); // 已入帳金額
+//				新增顯示已入帳 Y 時不可刪除
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
+			}
+			i++;
 		}
 
 		this.addList(this.totaVo);

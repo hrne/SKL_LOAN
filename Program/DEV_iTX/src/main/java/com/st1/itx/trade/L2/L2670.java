@@ -43,7 +43,7 @@ public class L2670 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	// 銷帳處理
 	@Autowired
 	public AcReceivableCom acReceivableCom;
@@ -179,7 +179,7 @@ public class L2670 extends TradeBuffer {
 			tAcReceivable = acReceivableService.holdById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo));
 
 			tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
-			int PrintCode = 0; 
+			int PrintCode = 0;
 			if (!"1".equals(tTempVo.getParam("PrintCode"))) {
 
 				tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
@@ -228,17 +228,16 @@ public class L2670 extends TradeBuffer {
 			this.totaVo.putParam("OAcDate", 0);
 			this.totaVo.putParam("OTitaTxtNo", 0);
 		}
-		
-		
+
 		this.totaVo.putParam("OTlrNo", tmpAcReceivable.getTitaTlrNo());
 		this.totaVo.putParam("OEmpName", "");
-		
-		CdEmp tCdEmp = new CdEmp();	
-		tCdEmp = sCdEmpService.findById(tmpAcReceivable.getTitaTlrNo(), titaVo);	
-		if( tCdEmp != null) {
+
+		CdEmp tCdEmp = new CdEmp();
+		tCdEmp = sCdEmpService.findById(tmpAcReceivable.getTitaTlrNo(), titaVo);
+		if (tCdEmp != null) {
 			this.totaVo.putParam("OEmpName", tCdEmp.getFullname()); // 建檔人員姓名
 		}
-		
+
 		this.totaVo.putParam("OModifyDate", parse.stringToInteger(createDate) - 19110000);
 		this.totaVo.putParam("OModifyTime", createTime);
 		this.totaVo.putParam("PdfSno", doRpt);

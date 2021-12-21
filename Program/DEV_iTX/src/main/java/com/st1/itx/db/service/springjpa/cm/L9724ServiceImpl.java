@@ -22,7 +22,7 @@ public class L9724ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -55,11 +55,11 @@ public class L9724ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		query = em.createNativeQuery(sql);
 		int inputYearMonth = parse.stringToInteger(titaVo.getParam("inputYear") + titaVo.getParam("inputMonth")) + 191100;
-		
+
 		this.info("l9724 input");
 		this.info("inputYearMonth: " + inputYearMonth);
 		this.info("aging: " + aging);
-		
+
 		query.setParameter("inputYearMonth", inputYearMonth);
 		query.setParameter("aging", parse.IntegerToString(aging, 1)); // 9 代表出全部資料
 

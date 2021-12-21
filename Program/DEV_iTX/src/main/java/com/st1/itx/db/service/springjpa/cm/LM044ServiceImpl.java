@@ -22,7 +22,7 @@ public class LM044ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -36,7 +36,7 @@ public class LM044ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iYEAR = iENTDY / 100000;
 		int iEYYMM = iENTDY / 100; // n月
 		int iMM = iEYYMM % 100;
-		
+
 		int iLYYMM = 0; // n-1月
 		int iSYYMM = 0; // n-2月
 		if (iMM == 1) {
@@ -57,7 +57,7 @@ public class LM044ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,SUM(M.\"LoanBal\") + SUM(M.\"ColBal\") \"LoanBal\"";
 		sql += "            ,SUM(M.\"OvduBal\") \"OvduBal\"";
 		sql += "            ,SUM(M.\"ColBal\") \"ColBal\"";
-		sql += "            ,CASE WHEN (SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")) > 0 "; 
+		sql += "            ,CASE WHEN (SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")) > 0 ";
 		sql += "                  THEN ROUND((SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")) / (SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")), 4) ";
 		sql += "             ELSE 0 END \"sRatio\"";
 		sql += "            ,CASE WHEN (SUM(M.\"lLoanBal\") + SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\")) > 0";
@@ -334,11 +334,11 @@ public class LM044ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("syymm", iSYYMM);
 		query.setParameter("lyymm", iLYYMM);
 		query.setParameter("eyymm", iEYYMM);
-		
+
 		return this.convertToMap(query);
 	}
 

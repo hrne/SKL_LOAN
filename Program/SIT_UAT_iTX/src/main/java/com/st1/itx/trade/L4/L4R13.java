@@ -98,8 +98,8 @@ public class L4R13 extends TradeBuffer {
 				this.totaVo.putParam("L4r13FacmNo" + j, tBatxRateChange.getBatxRateChangeId().getFacmNo());
 				this.totaVo.putParam("L4r13BormNo" + j, tBatxRateChange.getBatxRateChangeId().getBormNo());
 				String custName = tCustMain.getCustName();
-				if (custName.length() > 10)  {
-					 custName =  tCustMain.getCustName().substring(0, 10);
+				if (custName.length() > 10) {
+					custName = tCustMain.getCustName().substring(0, 10);
 				}
 				this.totaVo.putParam("L4r13CustName" + j, custName);
 				this.totaVo.putParam("L4r13ProdNo" + j, tBatxRateChange.getProdNo());

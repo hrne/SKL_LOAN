@@ -31,29 +31,29 @@ public class L5R12 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String strBankCode = titaVo.getParam("RimBankCode");// 銀行代碼
 		String iFunctionCode = titaVo.getParam("FunctionCode");
-		
+
 		this.totaVo.putParam("L5r12BankItem", "");
 		this.totaVo.putParam("L5r12BranchItem", "");
-		
+
 		this.info("Run L5R12 strBankCode=[" + strBankCode + "]");
 		checkBankCode(strBankCode, titaVo);
 		if (strBankCode != null && strBankCode.length() != 0) {
 			String BankCodeItem[] = sNegCom.FindNegFinAcc(strBankCode, titaVo);
-			if(BankCodeItem[0].trim().length()!=0) {
-				if (BankCodeItem != null && BankCodeItem.length!=0) {
+			if (BankCodeItem[0].trim().length() != 0) {
+				if (BankCodeItem != null && BankCodeItem.length != 0) {
 					this.totaVo.putParam("L5r12BankItem", BankCodeItem[0]);
 					this.totaVo.putParam("L5r12BranchItem", BankCodeItem[1]);
 				}
 			} else {
-				this.info("iFunctionCode="+iFunctionCode);
-				if(("01").equals(iFunctionCode) || ("02").equals(iFunctionCode) || ("09").equals(iFunctionCode) || ("11").equals(iFunctionCode)) {
-					
+				this.info("iFunctionCode=" + iFunctionCode);
+				if (("01").equals(iFunctionCode) || ("02").equals(iFunctionCode) || ("09").equals(iFunctionCode) || ("11").equals(iFunctionCode)) {
+
 					throw new LogicException(titaVo, "E0001", ""); // 查無資料
-			}
+				}
 			}
 
 		} else {
-			
+
 			this.totaVo.putParam("L5r12BankItem", strBankCode);
 			this.totaVo.putParam("L5r12BranchItem", strBankCode);
 			// throw new LogicException(titaVo, "E0001", "銀行代碼未輸入"); // 查詢資料不存在

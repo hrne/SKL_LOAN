@@ -35,7 +35,7 @@ public class L6R44 extends TradeBuffer {
 	public CdClService sCdClService;
 	@Autowired
 	public CdBranchGroupService sCdBranchGroupService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -68,12 +68,12 @@ public class L6R44 extends TradeBuffer {
 		ArrayList<String> groupHelpList = new ArrayList<String>();
 
 		this.info("L6R44 listCdBranchGroup.size() = " + listCdBranchGroup.size());
-		
+
 		for (CdBranchGroup tCdBranchGroup : listCdBranchGroup) {
 			String GroupItem = String.valueOf(tCdBranchGroup.getGroupItem());
 			String GroupNo = String.valueOf(tCdBranchGroup.getGroupNo());
-			
-			GroupItem = GroupNo +": "+ GroupItem;
+
+			GroupItem = GroupNo + ": " + GroupItem;
 			groupHelpList.add(GroupItem);
 		}
 

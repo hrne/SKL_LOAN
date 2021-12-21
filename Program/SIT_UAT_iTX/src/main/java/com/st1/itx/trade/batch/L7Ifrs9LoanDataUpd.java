@@ -48,7 +48,7 @@ public class L7Ifrs9LoanDataUpd extends BatchBase implements Tasklet, Initializi
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-		//int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
 
 		String empNo = titaVo.getTlrNo();
 

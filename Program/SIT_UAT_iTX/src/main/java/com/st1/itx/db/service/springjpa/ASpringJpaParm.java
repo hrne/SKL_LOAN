@@ -38,7 +38,7 @@ public class ASpringJpaParm extends SysLogger {
 		this.info("result:" + result.size());
 		return result;
 	}
-	
+
 	public List<Map<String, String>> convertToMap(Query query, boolean isUpdate) {
 		if (isUpdate) {
 			query.executeUpdate();
@@ -79,8 +79,8 @@ public class ASpringJpaParm extends SysLogger {
 				} else if (row.get(key) != null)
 					value = row.get(key).toString();
 
-				m.put("F" + Integer.toString(i), value);
 				m.put(key, value);
+				m.put("F" + Integer.toString(i), value);
 				i++;
 			}
 			result.add(m);

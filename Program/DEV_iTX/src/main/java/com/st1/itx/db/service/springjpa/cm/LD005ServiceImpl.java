@@ -22,10 +22,10 @@ public class LD005ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
@@ -34,14 +34,14 @@ public class LD005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lD005.findAll ");
 
 		String sql = "";
-		sql += " SELECT L.\"CustNo\" AS F0 ";     // 借款人戶頭
+		sql += " SELECT L.\"CustNo\" AS F0 "; // 借款人戶頭
 		sql += "       ,L.\"ChequeName\" AS F1 "; // 發票人姓名
 		sql += "       ,L.\"ChequeAcct\" AS F2 "; // 支票帳號
-		sql += "       ,L.\"ChequeNo\" AS F3 ";   // 支票號碼
-		sql += "       ,L.\"ChequeAmt\" AS F4 ";  // 支票金額
+		sql += "       ,L.\"ChequeNo\" AS F3 "; // 支票號碼
+		sql += "       ,L.\"ChequeAmt\" AS F4 "; // 支票金額
 		sql += "       ,L.\"ReceiveDate\" AS F5 ";// 收票日
 		sql += "       ,L.\"ChequeDate\" AS F6 "; // 支票到期日
-		sql += "       ,B.\"BankItem\" AS F7 ";   // 行庫名稱
+		sql += "       ,B.\"BankItem\" AS F7 "; // 行庫名稱
 		sql += "       ,B.\"BranchItem\" AS F8 "; // 分行名稱
 		sql += " FROM \"LoanCheque\" L ";
 		sql += " LEFT JOIN \"CdBank\" B ON B.\"BankCode\" = SUBSTR(L.\"BankCode\", 1, 3) ";

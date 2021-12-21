@@ -30,8 +30,7 @@ public class L5951ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	public List<String[]> findData(int workMonthFm, int workMonthTo, String sumByFacm, int index, int limit,
-			TitaVo titaVo) throws LogicException {
+	public List<String[]> findData(int workMonthFm, int workMonthTo, String sumByFacm, int index, int limit, TitaVo titaVo) throws LogicException {
 		String sqlL5951 = "";
 		sqlL5951 += "SELECT BSOF.\"DepItem\" AS \"部室別\" ";
 		sqlL5951 += ",EBS.\"Fullname\" AS \"房貸專員姓名\" ";
@@ -64,7 +63,7 @@ public class L5951ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5951 += ",I.\"PerfAmt\" AS \"業績金額\" ";
 		sqlL5951 += ",I.\"WorkMonth\" AS \"工作月\" ";
 		sqlL5951 += ",I.\"PerfDate\" AS \"業績日期\" ";
-		sqlL5951 += ",L.\"RenewFlag\" AS \"展期/借新還舊\" ";		
+		sqlL5951 += ",L.\"RenewFlag\" AS \"展期/借新還舊\" ";
 		sqlL5951 += "FROM ( SELECT ";
 		sqlL5951 += " \"CustNo\" ";
 		sqlL5951 += ",\"FacmNo\" ";

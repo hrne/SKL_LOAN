@@ -88,8 +88,7 @@ public class L4R10 extends TradeBuffer {
 				for (BatxHead t2BatxHead : lBatxHead) {
 					if (txCode.equals(t2BatxHead.getTitaTxCd())) {
 //						20210414 不同櫃員建立不同批號 by 賴桑
-						if (!"8".equals(t2BatxHead.getBatxExeCode())
-								&& t2BatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
+						if (!"8".equals(t2BatxHead.getBatxExeCode()) && t2BatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
 							batchno = t2BatxHead.getBatchNo();
 							break;
 						} else {

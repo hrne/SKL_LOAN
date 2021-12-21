@@ -117,7 +117,7 @@ public class LQ001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		AND DLB.\"DataDate\" = :nowed ";// 本季底
 		sql += "	  GROUP BY CM.\"CityCode\") A1";
 		sql += "	  ON A1.\"CityCode\" = CC.\"CityCode\"";
-		// A2 本季核准金額 C2  筆數 C3
+		// A2 本季核准金額 C2 筆數 C3
 		sql += "	  LEFT JOIN(SELECT CM.\"CityCode\"";
 		sql += "					  ,SUM(FM.\"LineAmt\") \"C2\"";
 		sql += "					  ,COUNT(*) \"C3\"";
@@ -136,7 +136,7 @@ public class LQ001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				  AND FCA.\"ApproveDate\" <= :nowed "; // 本季底
 		sql += "				  GROUP BY CM.\"CityCode\") A2";
 		sql += "	  ON A2.\"CityCode\" = CC.\"CityCode\"";
-		// A3 季末平均利率 C4  季末總利息 C5
+		// A3 季末平均利率 C4 季末總利息 C5
 		sql += "	  LEFT JOIN(SELECT CM.\"CityCode\"";
 		sql += "					  ,ROUND(SUM(DLB.\"StoreRate\") / COUNT(*), 4) \"C4\"";
 		sql += "					  ,SUM(DLB.\"IntAmtRcv\") \"C5\"";

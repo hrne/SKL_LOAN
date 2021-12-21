@@ -37,9 +37,9 @@ public class L8R56 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String iRimHeadOfficeCode = titaVo.getParam("RimHeadOfficeCode");
 		String iRimBranchCode = titaVo.getParam("RimBranchCode");
-		int iRimDataDate = Integer.valueOf(titaVo.getParam("RimDataDate"))+19110000;
+		int iRimDataDate = Integer.valueOf(titaVo.getParam("RimDataDate")) + 19110000;
 		String iRimEmpId = titaVo.getParam("RimEmpId");
-		
+
 		TbJcicMu01 iTbJcicMu01 = new TbJcicMu01();
 		TbJcicMu01Id iTbJcicMu01Id = new TbJcicMu01Id();
 		iTbJcicMu01Id.setBranchCode(iRimBranchCode);
@@ -50,12 +50,12 @@ public class L8R56 extends TradeBuffer {
 		if (iTbJcicMu01 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 主檔無資料錯誤訊息
 		}
-		
+
 		CdEmp iCdEmp = new CdEmp();
-		iCdEmp = iCdEmpService.findById(iRimEmpId,titaVo);
+		iCdEmp = iCdEmpService.findById(iRimEmpId, titaVo);
 		if (iCdEmp == null) {
 			throw new LogicException(titaVo, "E0001", "員工檔");
-		}else {
+		} else {
 			this.totaVo.putParam("L8R56EmpName", iCdEmp.getFullname());
 		}
 		this.totaVo.putParam("L8R56Title", iTbJcicMu01.getTitle());
@@ -65,32 +65,32 @@ public class L8R56 extends TradeBuffer {
 		this.totaVo.putParam("L8R56AuthItemReview", iTbJcicMu01.getAuthItemReview());
 		this.totaVo.putParam("L8R56AuthItemOther", iTbJcicMu01.getAuthItemOther());
 		this.totaVo.putParam("L8R56AuthStartDay", iTbJcicMu01.getAuthStartDay());
-		
+
 		String iAuthMgrIdS = iTbJcicMu01.getAuthMgrIdS();
 		if (iAuthMgrIdS.trim().isEmpty()) {
 			this.totaVo.putParam("L8R56AuthMgrIdS", "");
 			this.totaVo.putParam("L8R56AuthMgrNameS", "");
-		}else {
+		} else {
 			this.totaVo.putParam("L8R56AuthMgrIdS", iAuthMgrIdS);
-			iCdEmp = iCdEmpService.findById(iAuthMgrIdS,titaVo);
+			iCdEmp = iCdEmpService.findById(iAuthMgrIdS, titaVo);
 			if (iCdEmp == null) {
 				throw new LogicException(titaVo, "E0001", "員工檔");
-			}else {
+			} else {
 				this.totaVo.putParam("L8R56AuthMgrNameS", iCdEmp.getFullname());
 			}
 		}
 		this.totaVo.putParam("L8R56AuthEndDay", iTbJcicMu01.getAuthEndDay());
-		
+
 		String iAuthMgrIdE = iTbJcicMu01.getAuthMgrIdE();
 		if (iAuthMgrIdE.trim().isEmpty()) {
 			this.totaVo.putParam("L8R56AuthMgrIdE", "");
 			this.totaVo.putParam("L8R56AuthMgrNameE", "");
-		}else {
+		} else {
 			this.totaVo.putParam("L8R56AuthMgrIdE", iAuthMgrIdE);
-			iCdEmp = iCdEmpService.findById(iAuthMgrIdE,titaVo);
+			iCdEmp = iCdEmpService.findById(iAuthMgrIdE, titaVo);
 			if (iCdEmp == null) {
 				throw new LogicException(titaVo, "E0001", "員工檔");
-			}else {
+			} else {
 				this.totaVo.putParam("L8R56AuthMgrNameE", iCdEmp.getFullname());
 			}
 		}

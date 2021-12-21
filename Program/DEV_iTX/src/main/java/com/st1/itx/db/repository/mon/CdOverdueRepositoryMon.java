@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,22 +21,22 @@ import com.st1.itx.db.domain.CdOverdueId;
  */
 public interface CdOverdueRepositoryMon extends JpaRepository<CdOverdue, CdOverdueId> {
 
-  // OverdueSign = 
-  public Slice<CdOverdue> findAllByOverdueSignIs(String overdueSign_0, Pageable pageable);
+	// OverdueSign =
+	public Slice<CdOverdue> findAllByOverdueSignIs(String overdueSign_0, Pageable pageable);
 
-  // OverdueCode =
-  public Slice<CdOverdue> findAllByOverdueCodeIs(String overdueCode_0, Pageable pageable);
+	// OverdueCode =
+	public Slice<CdOverdue> findAllByOverdueCodeIs(String overdueCode_0, Pageable pageable);
 
-  // Enable = 
-  public Slice<CdOverdue> findAllByEnableIs(String enable_0, Pageable pageable);
+	// Enable =
+	public Slice<CdOverdue> findAllByEnableIs(String enable_0, Pageable pageable);
 
-  // OverdueSign >= ,AND OverdueSign <= ,AND OverdueCode >= ,AND OverdueCode <= 
-  public Slice<CdOverdue> findAllByOverdueSignGreaterThanEqualAndOverdueSignLessThanEqualAndOverdueCodeGreaterThanEqualAndOverdueCodeLessThanEqualOrderByOverdueSignAscOverdueCodeAsc(String overdueSign_0, String overdueSign_1, String overdueCode_2, String overdueCode_3, Pageable pageable);
+	// OverdueSign >= ,AND OverdueSign <= ,AND OverdueCode >= ,AND OverdueCode <=
+	public Slice<CdOverdue> findAllByOverdueSignGreaterThanEqualAndOverdueSignLessThanEqualAndOverdueCodeGreaterThanEqualAndOverdueCodeLessThanEqualOrderByOverdueSignAscOverdueCodeAsc(
+			String overdueSign_0, String overdueSign_1, String overdueCode_2, String overdueCode_3, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdOverdue> findByCdOverdueId(CdOverdueId cdOverdueId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdOverdue> findByCdOverdueId(CdOverdueId cdOverdueId);
 
 }
-

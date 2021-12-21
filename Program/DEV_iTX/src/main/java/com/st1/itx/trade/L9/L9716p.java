@@ -32,7 +32,7 @@ public class L9716p extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
-	
+
 	String TXCD = "L9716";
 	String TXName = "逾放處理催收明細表";
 
@@ -49,11 +49,9 @@ public class L9716p extends TradeBuffer {
 		boolean isFinish = l9716Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

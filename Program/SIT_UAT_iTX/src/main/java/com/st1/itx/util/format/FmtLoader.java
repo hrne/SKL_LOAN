@@ -47,7 +47,7 @@ public class FmtLoader extends SysLogger {
 		String fullPath = null;
 		if (fileName.endsWith("Label.tim"))
 			fullPath = urlTim + fileName;
-		else if (fileName.endsWith("Label.tom") || fileName.equals("ERROR.tom")|| fileName.equals("NOTICE.tom"))
+		else if (fileName.endsWith("Label.tom") || fileName.equals("ERROR.tom") || fileName.equals("NOTICE.tom"))
 			fullPath = urlTom + fileName;
 		else if (fileName.endsWith(".tim"))
 			fullPath = urlTim + fileName.substring(0, 2) + File.separator + fileName;

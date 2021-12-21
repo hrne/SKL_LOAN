@@ -100,7 +100,7 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and NVL(i2.\"CustNo\",0) = 0                             ";
 		}
 		sql += " order by  i.\"UsageCode\",i.\"ApplDate\",i.\"CustNo\"                          ";
-		
+
 		this.info("sql=" + sql);
 		Query query;
 

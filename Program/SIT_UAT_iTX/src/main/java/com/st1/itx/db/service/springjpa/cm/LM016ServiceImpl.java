@@ -31,7 +31,6 @@ public class LM016ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("lM016.findAll ");
 
-
 		// 戶號區間 Min
 		String custNoMin = titaVo.getParam("CustNoMin");
 

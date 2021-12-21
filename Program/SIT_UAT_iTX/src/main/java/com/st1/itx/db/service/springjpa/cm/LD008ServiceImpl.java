@@ -200,7 +200,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         LEFT JOIN ( SELECT S0.\"CustNo\" ";
 		sql += "                           ,S0.\"EntCode\" ";
 		sql += "                           ,CASE WHEN S0.\"IsRelated\" > 0 ";
-	    sql += "                                 THEN 'Y' ";
+		sql += "                                 THEN 'Y' ";
 		sql += "                            ELSE 'N' END AS \"IsRelated\" ";
 		sql += "                     FROM ( SELECT CM.\"CustNo\" ";
 		sql += "                                  ,NVL(CM.\"EntCode\",'0') AS \"EntCode\" ";

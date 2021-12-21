@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo,int endOfYearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int endOfYearMonth) throws Exception {
 		this.info("lY002.findAll ");
 
 		this.info("YYMM:" + endOfYearMonth);

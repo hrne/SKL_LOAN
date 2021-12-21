@@ -28,7 +28,7 @@ public class LM064 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
- 
+
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		// logger = LoggerFactory.getLogger(LM064.class);

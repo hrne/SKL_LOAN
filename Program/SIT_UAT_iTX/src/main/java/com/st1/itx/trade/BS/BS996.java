@@ -144,8 +144,7 @@ public class BS996 extends TradeBuffer {
 			CdPfParms tCdPfParms = cdPfParmsService.findById(new CdPfParmsId("R", " ", " "), titaVo);
 			if (tCdPfParms != null) {
 				if (tCdPfParms.getWorkMonthEnd() == 0) {
-					CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(
-							tCdPfParms.getWorkMonthStart() / 100 , tCdPfParms.getWorkMonthStart() % 100), titaVo);
+					CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(tCdPfParms.getWorkMonthStart() / 100, tCdPfParms.getWorkMonthStart() % 100), titaVo);
 					if (tCdWorkMonth != null) {
 						iAcdate = tCdWorkMonth.getStartDate();
 						updatePf(titaVo);
@@ -162,8 +161,7 @@ public class BS996 extends TradeBuffer {
 		} else {
 			updatePf(titaVo);
 			// 通知訊息
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "",
-					"更新業績明細檔，筆數 = " + cntTrans, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "更新業績明細檔，筆數 = " + cntTrans, titaVo);
 		}
 
 		this.batchTransaction.commit();
@@ -175,15 +173,13 @@ public class BS996 extends TradeBuffer {
 	}
 
 	private void updatePf(TitaVo titaVo) throws LogicException {
-		this.info("iAcdate=" + iAcdate + " , iEmpResetFg=" + iEmpResetFg + ", iCustNoS=" + iCustNoS + ", iCustNoE="
-				+ iCustNoE);
+		this.info("iAcdate=" + iAcdate + " , iEmpResetFg=" + iEmpResetFg + ", iCustNoS=" + iCustNoS + ", iCustNoE=" + iCustNoE);
 
 		// 清除業績明細檔的業績計算欄
 		clearPfDetail(iAcdate, iCustNoS, iCustNoE, titaVo);
 		cntTrans = 0;
 		// 重新計算業績，更新業績明細檔
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findAcDateRange(iAcdate + 19110000, 99991231,
-				Arrays.asList(new String[] { "0" }), 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findAcDateRange(iAcdate + 19110000, 99991231, Arrays.asList(new String[] { "0" }), 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx != null) {
 			for (LoanBorTx tx : slLoanBorTx.getContent()) {
 				if (tx.getCustNo() >= iCustNoS && tx.getCustNo() <= iCustNoE) {
@@ -206,8 +202,7 @@ public class BS996 extends TradeBuffer {
 		}
 		if ("L3701".equals(tx.getTitaTxCd())) {
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
-			if ("X".equals(tTempVo.getParam("PieceCodeY")) || "X".equals(tTempVo.getParam("PieceCodeSecondY"))
-					|| "X".equals(tTempVo.getParam("PieceCodeSecondAmt"))) {
+			if ("X".equals(tTempVo.getParam("PieceCodeY")) || "X".equals(tTempVo.getParam("PieceCodeSecondY")) || "X".equals(tTempVo.getParam("PieceCodeSecondAmt"))) {
 				repayType = 1; // 1.計件代碼變更
 			}
 		}
@@ -222,8 +217,7 @@ public class BS996 extends TradeBuffer {
 			return false;
 		}
 
-		LoanBorMain ln = loanBorMainService.findById(new LoanBorMainId(tx.getCustNo(), tx.getFacmNo(), tx.getBormNo()),
-				titaVo);
+		LoanBorMain ln = loanBorMainService.findById(new LoanBorMainId(tx.getCustNo(), tx.getFacmNo(), tx.getBormNo()), titaVo);
 		if (ln == null) {
 			this.info("LoanBorMain notfound " + tx.toString());
 			return false;
@@ -254,8 +248,7 @@ public class BS996 extends TradeBuffer {
 		case 2: // 部分償還
 		case 3: // 提前結案
 			pf.setDrawdownAmt(tx.getExtraRepay());// 追回金額
-			pf.setRepaidPeriod(loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-					ln.getSpecificDd(), tx.getIntEndDate())); // 已攤還期數
+			pf.setRepaidPeriod(loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), tx.getIntEndDate())); // 已攤還期數
 			break;
 		}
 
@@ -265,8 +258,7 @@ public class BS996 extends TradeBuffer {
 
 	private void clearPfDetail(int iAcdate, int iCustNoS, int iCustNoE, TitaVo titaVo) throws LogicException {
 		/* 業績明細計算檔 */
-		Slice<PfDetail> slPfDetail = pfDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<PfDetail> slPfDetail = pfDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0, Integer.MAX_VALUE, titaVo);
 		List<PfDetail> pfList = new ArrayList<PfDetail>();
 		if (slPfDetail != null) {
 			for (PfDetail pf : slPfDetail.getContent()) {
@@ -283,8 +275,7 @@ public class BS996 extends TradeBuffer {
 			}
 		}
 		// 介紹人業績明細檔
-		Slice<PfItDetail> slItDetail = pfItDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<PfItDetail> slItDetail = pfItDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0, Integer.MAX_VALUE, titaVo);
 		List<PfItDetail> itList = new ArrayList<PfItDetail>();
 		if (slItDetail != null) {
 			for (PfItDetail it : slItDetail.getContent()) {
@@ -309,8 +300,7 @@ public class BS996 extends TradeBuffer {
 		this.batchTransaction.commit();
 
 		// 房貸專員業績明細檔
-		Slice<PfBsDetail> slbsDetail = pfBsDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<PfBsDetail> slbsDetail = pfBsDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0, Integer.MAX_VALUE, titaVo);
 		List<PfBsDetail> bsList = new ArrayList<PfBsDetail>();
 		if (slbsDetail != null) {
 			for (PfBsDetail bs : slbsDetail.getContent()) {
@@ -333,8 +323,7 @@ public class BS996 extends TradeBuffer {
 		this.batchTransaction.commit();
 
 		// 介紹、協辦獎金發放檔
-		Slice<PfReward> slReward = pfRewardService.findByPerfDate(iAcdate + 19110000, 99991231, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<PfReward> slReward = pfRewardService.findByPerfDate(iAcdate + 19110000, 99991231, 0, Integer.MAX_VALUE, titaVo);
 		List<PfReward> rwList = new ArrayList<PfReward>();
 		if (slReward != null) {
 			for (PfReward rw : slReward.getContent()) {

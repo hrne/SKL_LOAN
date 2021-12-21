@@ -48,7 +48,7 @@ public class L2603 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -132,15 +132,15 @@ public class L2603 extends TradeBuffer {
 			occurslist.putParam("OOFeeCode", tmpForeclosureFee.getFeeCode());
 			occurslist.putParam("OOCloseNo", tmpForeclosureFee.getCloseNo());
 			occurslist.putParam("OOLegalStaff", tmpForeclosureFee.getLegalStaff());
-			
+
 			CdEmp tCdEmp = new CdEmp();
 			String tempEmpNo = tmpForeclosureFee.getLegalStaff();
-			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);	
+			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);
 			occurslist.putParam("OOName", ""); // 建檔人員姓名
-			if( tCdEmp != null) {
+			if (tCdEmp != null) {
 				occurslist.putParam("OOName", tCdEmp.getFullname()); // 建檔人員姓名
 			}
-			
+
 			occurslist.putParam("OORmk", tmpForeclosureFee.getRmk());
 
 			/* 將每筆資料放入Tota的OcList */

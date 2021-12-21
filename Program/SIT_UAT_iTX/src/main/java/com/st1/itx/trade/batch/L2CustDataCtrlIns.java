@@ -52,12 +52,11 @@ public class L2CustDataCtrlIns extends BatchBase implements Tasklet, Initializin
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-
 		String empNo = titaVo.getTlrNo();
 
 		this.info("L2CustDataCtrlIns tbsdyf = " + tbsdyf);
 		this.info("L2CustDataCtrlIns empNo = " + empNo);
-	
+
 		sJobMainService.Usp_L2_CustDataCtrl_Ins(tbsdyf, empNo, titaVo);
 	}
 

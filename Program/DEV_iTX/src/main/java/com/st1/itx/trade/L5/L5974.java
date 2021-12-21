@@ -68,8 +68,7 @@ public class L5974 extends TradeBuffer {
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = parse.stringToInteger(MaxDataRow);			
-		
+		this.limit = parse.stringToInteger(MaxDataRow);
 
 		String sql = l5974ServiceImpl.sqlL5974(FinCode);
 		this.info("L5974 sql=[" + sql + "]");

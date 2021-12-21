@@ -20,7 +20,6 @@ import com.st1.itx.util.MySpring;
 @Scope("prototype")
 public class L5811 extends TradeBuffer {
 
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5811 ");
@@ -30,10 +29,9 @@ public class L5811 extends TradeBuffer {
 		MySpring.newTask("L5811Batch", this.txBuffer, titaVo);
 
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
-	
+
 }

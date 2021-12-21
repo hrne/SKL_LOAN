@@ -69,8 +69,8 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("inputDateStart", Integer.toString(Integer.parseInt(titaVo.getParam("inputDateStart"))+19110000));
-		query.setParameter("inputDateEnd", Integer.toString(Integer.parseInt(titaVo.getParam("inputDateEnd"))+19110000));
+		query.setParameter("inputDateStart", Integer.toString(Integer.parseInt(titaVo.getParam("inputDateStart")) + 19110000));
+		query.setParameter("inputDateEnd", Integer.toString(Integer.parseInt(titaVo.getParam("inputDateEnd")) + 19110000));
 
 		return this.convertToMap(query.getResultList());
 	}

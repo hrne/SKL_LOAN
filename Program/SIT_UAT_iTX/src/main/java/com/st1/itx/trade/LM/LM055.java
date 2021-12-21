@@ -24,7 +24,6 @@ public class LM055 extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	public LM055Report lM055report;
 
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}

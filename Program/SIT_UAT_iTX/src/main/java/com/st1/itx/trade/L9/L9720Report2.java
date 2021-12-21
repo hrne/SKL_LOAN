@@ -75,10 +75,8 @@ public class L9720Report2 extends MakeReport {
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		this.print(-6, 1,
-				" 戶號    額度     姓名                                    核准額度    首次撥款日    到期日           餘額   商品代碼   火險保額   火險迄日   房貸專員");
-		this.print(-7, 1,
-				"====================================================================================================================================================================");
+		this.print(-6, 1, " 戶號    額度     姓名                                    核准額度    首次撥款日    到期日           餘額   商品代碼   火險保額   火險迄日   房貸專員");
+		this.print(-7, 1, "====================================================================================================================================================================");
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(8);
 
@@ -89,8 +87,7 @@ public class L9720Report2 extends MakeReport {
 
 	// 自訂表尾
 	private void printCloseFooter() {
-		this.print(-48, 1,
-				"                                                                         ===== 報　表　結　束 =====");
+		this.print(-48, 1, "                                                                         ===== 報　表　結　束 =====");
 
 	}
 
@@ -162,8 +159,7 @@ public class L9720Report2 extends MakeReport {
 
 	public void makePdf(TitaVo titaVo) throws LogicException {
 		String EntDy = Integer.toString(titaVo.getEntDyI() + 19110000);
-		LocalDate validDatePivot = LocalDate.of(Integer.parseInt(EntDy.substring(0, 4)),
-				Integer.parseInt(EntDy.substring(4, 6)), Integer.parseInt(EntDy.substring(6)));
+		LocalDate validDatePivot = LocalDate.of(Integer.parseInt(EntDy.substring(0, 4)), Integer.parseInt(EntDy.substring(4, 6)), Integer.parseInt(EntDy.substring(6)));
 		LocalDate validDateFirst = validDatePivot.minusMonths(10);
 		LocalDate validDateSecond = validDatePivot.minusMonths(22);
 
@@ -178,12 +174,9 @@ public class L9720Report2 extends MakeReport {
 		printCloseFooter();
 
 		this.toPdf(this.close(),
-				"L9720_" + Integer.toString(validDatePivot.getYear() - 1911)
-						+ String.format("%02d", validDatePivot.getMonthValue()) + "續約檢核結果("
-						+ Integer.toString(validDateFirst.getYear() - 1911)
-						+ String.format("%02d", validDateFirst.getMonthValue()) + "及"
-						+ Integer.toString(validDateSecond.getYear() - 1911)
-						+ String.format("%02d", validDateSecond.getMonthValue()) + "月)");
+				"L9720_" + Integer.toString(validDatePivot.getYear() - 1911) + String.format("%02d", validDatePivot.getMonthValue()) + "續約檢核結果(" + Integer.toString(validDateFirst.getYear() - 1911)
+						+ String.format("%02d", validDateFirst.getMonthValue()) + "及" + Integer.toString(validDateSecond.getYear() - 1911) + String.format("%02d", validDateSecond.getMonthValue())
+						+ "月)");
 
 	}
 

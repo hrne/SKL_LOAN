@@ -28,7 +28,8 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4454Report3 extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L4454Report3.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L4454Report3.class);
 
 	@Autowired
 	public MakeExcel makeExcel;
@@ -54,8 +55,7 @@ public class L4454Report3 extends MakeReport {
 
 		this.info("一年內新貸件扣款失敗表 Excel Start...");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "一年內新貸件扣款失敗表", "一年內新貸件扣款失敗表",
-				"一年內新貸件扣款失敗表-底稿.xlsx", "LAW7U1Pqp");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "一年內新貸件扣款失敗表", "一年內新貸件扣款失敗表", "一年內新貸件扣款失敗表-底稿.xlsx", "LAW7U1Pqp");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 

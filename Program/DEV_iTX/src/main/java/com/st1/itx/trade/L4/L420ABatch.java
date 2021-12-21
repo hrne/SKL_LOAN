@@ -88,8 +88,7 @@ public class L420ABatch extends TradeBuffer {
 		}
 
 		// findAll 整批入帳明細檔
-		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
-				Integer.MAX_VALUE);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, Integer.MAX_VALUE);
 		lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 		this.batchTransaction.commit();
 		if (lBatxDetail != null) {
@@ -97,8 +96,7 @@ public class L420ABatch extends TradeBuffer {
 			this.info("lBatxDetail, size=" + lBatxDetail.size());
 			for (BatxDetail tDetail : lBatxDetail) {
 				// 0.未檢核 2.人工處理 3.檢核錯誤
-				if ("0".equals(tDetail.getProcStsCode()) || "2".equals(tDetail.getProcStsCode())
-						|| "3".equals(tDetail.getProcStsCode())) {
+				if ("0".equals(tDetail.getProcStsCode()) || "2".equals(tDetail.getProcStsCode()) || "3".equals(tDetail.getProcStsCode())) {
 					if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
 						// 逐筆 call BaTxCom 計算並寫入提息明細檔 //
 						if (cntTrans > this.commitCnt) {
@@ -139,9 +137,7 @@ public class L420ABatch extends TradeBuffer {
 
 		// end
 		this.batchTransaction.commit();
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
-				iBatchNo + " 整批檢核, " + msg, titaVo);
-
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(), iBatchNo + " 整批檢核, " + msg, titaVo);
 
 		return null;
 

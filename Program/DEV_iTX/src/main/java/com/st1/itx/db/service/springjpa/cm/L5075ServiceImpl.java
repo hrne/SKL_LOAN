@@ -32,15 +32,15 @@ public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 創建程式碼後,檢查初始值
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
-	// *** 折返控制相關 ***
-		private int index;
 
-		// *** 折返控制相關 ***
-		private int limit;
-		
-		
+	// *** 折返控制相關 ***
+	private int index;
+
+	// *** 折返控制相關 ***
+	private int limit;
+
 	@SuppressWarnings("unchecked")
-	public List<NegMain> findData(TitaVo titaVo,int index, int limit) throws LogicException {
+	public List<NegMain> findData(TitaVo titaVo, int index, int limit) throws LogicException {
 		this.info("Run l5075ServiceImpl.findData ");
 		String WorkSubject = titaVo.getParam("WorkSubject").trim(); // 作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
 		String NextPayDate = titaVo.getParam("NextPayDate").trim(); // 1:滯繳- 逾期基準日;2:應繳-下次應繳日
@@ -72,8 +72,7 @@ public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql, NegMain.class);
-	
-		
+
 		switch (WorkSubject) {
 		case "1":
 			// 1:滯繳(時間到未繳)
@@ -98,16 +97,16 @@ public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (CustId != null && CustId.length() != 0) {
 			query.setParameter("CustId", CustId);
 		}
-		
+
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		 query.setFirstResult(this.index*this.limit);
+		query.setFirstResult(this.index * this.limit);
 //		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-				
+
 		return query.getResultList();
 	}
 
@@ -152,7 +151,7 @@ public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean
 			// E0010 功能選擇錯誤
 			throw new LogicException("E0010", "無效的[作業項目]");
 		}
- 
+
 		sql += "Order By \"CustNo\" Asc , \"CaseSeq\" Desc";
 		return sql;
 	}

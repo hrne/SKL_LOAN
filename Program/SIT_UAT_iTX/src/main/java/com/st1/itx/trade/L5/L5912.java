@@ -26,7 +26,6 @@ public class L5912 extends TradeBuffer {
 	@Autowired
 	public L5912Report iL5912Report;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5912 ");

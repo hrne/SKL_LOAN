@@ -44,7 +44,7 @@ public class LM025Report extends MakeReport {
 		exportExcel(titaVo, 1);
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	/**

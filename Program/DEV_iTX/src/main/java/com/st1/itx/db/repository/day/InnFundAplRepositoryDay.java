@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import java.math.BigDecimal;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.InnFundApl;
  */
 public interface InnFundAplRepositoryDay extends JpaRepository<InnFundApl, Integer> {
 
-  // AcDate >= ,AND AcDate <= 
-  public Slice<InnFundApl> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(int acDate_0, int acDate_1, Pageable pageable);
+	// AcDate >= ,AND AcDate <=
+	public Slice<InnFundApl> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(int acDate_0, int acDate_1, Pageable pageable);
 
-  // ResrvStndrd > 
-  public Optional<InnFundApl> findTopByResrvStndrdGreaterThanOrderByAcDateDesc(BigDecimal resrvStndrd_0);
+	// ResrvStndrd >
+	public Optional<InnFundApl> findTopByResrvStndrdGreaterThanOrderByAcDateDesc(BigDecimal resrvStndrd_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<InnFundApl> findByAcDate(int acDate);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<InnFundApl> findByAcDate(int acDate);
 
 }
-

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -19,10 +18,9 @@ import com.st1.itx.db.domain.CustomerAmlRating;
  */
 public interface CustomerAmlRatingRepository extends JpaRepository<CustomerAmlRating, String> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CustomerAmlRating> findByCustId(String custId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CustomerAmlRating> findByCustId(String custId);
 
 }
-

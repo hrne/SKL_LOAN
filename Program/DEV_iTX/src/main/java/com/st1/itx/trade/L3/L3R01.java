@@ -102,7 +102,7 @@ public class L3R01 extends TradeBuffer {
 		this.totaVo.putParam("OYetDate", wkYetDate);
 		this.totaVo.putParam("OCloseDate", wkCloseDate);
 
-		if(tLoanNotYet != null) {
+		if (tLoanNotYet != null) {
 			if (tLoanNotYet.getReMark() != null) {
 				this.totaVo.putParam("OReMark", tLoanNotYet.getReMark());
 			} else {
@@ -111,7 +111,6 @@ public class L3R01 extends TradeBuffer {
 		} else {
 			this.totaVo.putParam("OReMark", "");
 		}
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

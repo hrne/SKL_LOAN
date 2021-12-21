@@ -28,7 +28,7 @@ public class LC701 extends TradeBuffer {
 		this.info("LC701 執行月底日日終維護");
 
 //		titaVo.setBatchJobId("eomFlow");
-		
+
 		titaVo.setBatchJobId("jcicFlow");
 
 		this.info("LC701 exit.");

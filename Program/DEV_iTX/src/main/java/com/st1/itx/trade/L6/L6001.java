@@ -73,15 +73,15 @@ public class L6001 extends TradeBuffer {
 		for (TxToDoMain tTxToDoMain : lTxToDoMain) {
 			// eric 2021.2.4 for 定審
 			if ("AMLH".equals(tTxToDoMain.getItemCode())) {
-				//放款部.審查課
-				if (!("0000".equals(titaVo.get("KINBR")) && "4".equals(this.txBuffer.getTxCom().getTlrDept()) )) {
-					continue;	
+				// 放款部.審查課
+				if (!("0000".equals(titaVo.get("KINBR")) && "4".equals(this.txBuffer.getTxCom().getTlrDept()))) {
+					continue;
 				}
 			}
 			if ("AMLM".equals(tTxToDoMain.getItemCode()) || "AMLL".equals(tTxToDoMain.getItemCode())) {
-				//放款部.服務課
-				if (!("0000".equals(titaVo.get("KINBR")) && "2".equals(this.txBuffer.getTxCom().getTlrDept()) )) {
-					continue;	
+				// 放款部.服務課
+				if (!("0000".equals(titaVo.get("KINBR")) && "2".equals(this.txBuffer.getTxCom().getTlrDept()))) {
+					continue;
 				}
 			}
 

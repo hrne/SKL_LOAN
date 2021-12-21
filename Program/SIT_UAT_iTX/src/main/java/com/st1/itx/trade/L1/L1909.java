@@ -18,6 +18,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.BankRelationSuspected;
 import com.st1.itx.db.service.BankRelationSuspectedService;
+
 @Service("L1909")
 @Scope("prototype")
 /**
@@ -31,15 +32,15 @@ public class L1909 extends TradeBuffer {
 
 	@Autowired
 	public BankRelationSuspectedService bankRelationSuspectedService;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1909 ");
 		this.totaVo.init(titaVo);
-		
+
 		String repCustName = titaVo.getParam("repCustName").trim();
 		Slice<BankRelationSuspected> slbankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(repCustName, 0, Integer.MAX_VALUE, titaVo);
 		List<BankRelationSuspected> lBankRelationSuspected = slbankRelationSuspected == null ? null : slbankRelationSuspected.getContent();
@@ -50,18 +51,18 @@ public class L1909 extends TradeBuffer {
 
 		for (BankRelationSuspected bankRelationSuspected : lBankRelationSuspected) {
 			OccursList OccursList = new OccursList();
-			
+
 			OccursList.putParam("oRepCustName", bankRelationSuspected.getRepCusName());
 			OccursList.putParam("oCustId", bankRelationSuspected.getCustId());
 			OccursList.putParam("oCustName", bankRelationSuspected.getCustName());
 			OccursList.putParam("oSubCom", bankRelationSuspected.getSubCom());
 //			OccursList.putParam("oLastUpdate", this.parse.timeStampToString(bankRelationSuspected.getLastUpdate()));
 			OccursList.putParam("oLastUpdate", String.valueOf(titaVo.getEntDyI()));
-			
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(OccursList);
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

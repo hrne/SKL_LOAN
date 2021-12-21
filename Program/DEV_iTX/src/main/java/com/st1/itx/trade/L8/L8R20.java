@@ -25,7 +25,6 @@ public class L8R20 extends TradeBuffer {
 	@Autowired
 	public JcicZ048Service iJcicZ048Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r20 ");
@@ -33,21 +32,21 @@ public class L8R20 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ048 iJcicZ048 = new JcicZ048();
 		iJcicZ048 = iJcicZ048Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ048 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r20CustId", iJcicZ048.getCustId());
 			totaVo.putParam("L8r20SubmitKey", iJcicZ048.getSubmitKey());
-			totaVo.putParam("L8r20RcDate",iJcicZ048.getRcDate());
-			totaVo.putParam("L8r20CustRegAddr",iJcicZ048.getCustRegAddr());
-			totaVo.putParam("L8r20CustComAddr",iJcicZ048.getCustComAddr());
-			totaVo.putParam("L8r20CustRegTelNo",iJcicZ048.getCustRegTelNo());
-			totaVo.putParam("L8r20CustComTelNo",iJcicZ048.getCustComTelNo());
-			totaVo.putParam("L8r20CustMobilNo",iJcicZ048.getCustMobilNo());
-			totaVo.putParam("L8r20TranKey", iJcicZ048.getTranKey());	
+			totaVo.putParam("L8r20RcDate", iJcicZ048.getRcDate());
+			totaVo.putParam("L8r20CustRegAddr", iJcicZ048.getCustRegAddr());
+			totaVo.putParam("L8r20CustComAddr", iJcicZ048.getCustComAddr());
+			totaVo.putParam("L8r20CustRegTelNo", iJcicZ048.getCustRegTelNo());
+			totaVo.putParam("L8r20CustComTelNo", iJcicZ048.getCustComTelNo());
+			totaVo.putParam("L8r20CustMobilNo", iJcicZ048.getCustMobilNo());
+			totaVo.putParam("L8r20TranKey", iJcicZ048.getTranKey());
 			totaVo.putParam("L8r20OutJcicTxtDate", iJcicZ048.getOutJcicTxtDate());
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

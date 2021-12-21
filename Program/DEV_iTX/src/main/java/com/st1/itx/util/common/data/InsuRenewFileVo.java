@@ -12,6 +12,7 @@ import com.st1.itx.util.parse.Parse;
 
 /**
  * 火險詢價檔(LNM01P)
+ * 
  * @author Zi-Jun,Huang
  * @version 1.0.0
  */

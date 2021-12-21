@@ -35,12 +35,10 @@ public class L2023 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2023 ");
 		this.totaVo.init(titaVo);
-
 
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -50,7 +48,6 @@ public class L2023 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 50; // 9 * 15 * 376 = 50760 1次最多9筆occurs
 
-		
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
@@ -65,7 +62,7 @@ public class L2023 extends TradeBuffer {
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
-				if(parse.stringToInteger(result.get("CreditSysNo")) == 0) {
+				if (parse.stringToInteger(result.get("CreditSysNo")) == 0) {
 					occursList.putParam("oCreditSysNo", "");
 				} else {
 					occursList.putParam("oCreditSysNo", result.get("CreditSysNo"));
@@ -85,20 +82,18 @@ public class L2023 extends TradeBuffer {
 				occursList.putParam("oModify", result.get("Modify"));
 
 				this.totaVo.addOccursList(occursList);
-				
+
 			}
-			
+
 			chkOccursList = this.totaVo.getOccursList();
 
-			if (resultList.size() >= this.limit ) {
+			if (resultList.size() >= this.limit) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
 			}
 		}
-		
-		
-		
+
 		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
 			throw new LogicException("E2003", ""); // 查無資料
 		}
@@ -106,6 +101,5 @@ public class L2023 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 }

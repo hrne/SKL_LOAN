@@ -69,17 +69,17 @@ public class L6085 extends TradeBuffer {
 		// 查詢分公司資料檔
 		Slice<CdBcm> slCdBcm;
 		if (iInqFg == 1) {
-			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 2) {
-			slCdBcm = sCdBcmService.findDistCode1(iDistCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDistCode1(iDistCode + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 3) {
-			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 4) {
-			slCdBcm = sCdBcmService.findUnitManager(iUnitManager+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findUnitManager(iUnitManager + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 5) {
-			slCdBcm = sCdBcmService.findDistManager(iDistManager+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDistManager(iDistManager + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 6) {
-			slCdBcm = sCdBcmService.findDeptManager(iDeptManager+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDeptManager(iDeptManager + "%", this.index, this.limit, titaVo);
 		} else {
 			slCdBcm = sCdBcmService.findAll(this.index, this.limit, titaVo);
 		}

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.CustFinId;
  */
 public interface CustFinRepository extends JpaRepository<CustFin, CustFinId> {
 
-  // CustUKey = 
-  public Slice<CustFin> findAllByCustUKeyIsOrderByDataYearDesc(String custUKey_0, Pageable pageable);
+	// CustUKey =
+	public Slice<CustFin> findAllByCustUKeyIsOrderByDataYearDesc(String custUKey_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CustFin> findByCustFinId(CustFinId custFinId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CustFin> findByCustFinId(CustFinId custFinId);
 
 }
-

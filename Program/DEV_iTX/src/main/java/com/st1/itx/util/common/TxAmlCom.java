@@ -175,6 +175,7 @@ public class TxAmlCom extends TradeBuffer {
 
 	/**
 	 * 撥款匯款 Call By L3220 暫收款退還
+	 * 
 	 * @param titaVo TitaVo
 	 * @throws LogicException
 	 */
@@ -702,7 +703,7 @@ public class TxAmlCom extends TradeBuffer {
 		checkAmlVo.setRoleId("7"); // 保單角色 7.轉帳委託人
 		checkAmlVo.setRefNo(parse.IntegerToString(tLoanCheque.getCustNo(), 7)); // 相關編號
 		checkAmlVo.setAcctNo(parse.IntegerToString(tLoanCheque.getCustNo(), 7)); // 放款案號：戶號
-		checkAmlVo.setCaseNo(batchNo); // 案號：整批批號  'BATXnn'
+		checkAmlVo.setCaseNo(batchNo); // 案號：整批批號 'BATXnn'
 		checkAmlVo.setName(tLoanCheque.getChequeName()); // 姓名
 		// default 身份別 1:自然人 2:法人 性別 : 空白
 		checkAmlVo.setIdentityCd("1");
@@ -734,7 +735,7 @@ public class TxAmlCom extends TradeBuffer {
 			checkAmlVo.setRoleId("7");
 		checkAmlVo.setRefNo(parse.IntegerToString(tBankRmtf.getCustNo(), 7)); // 相關編號
 		checkAmlVo.setAcctNo(parse.IntegerToString(tBankRmtf.getCustNo(), 7)); // 放款案號：戶號
-		checkAmlVo.setCaseNo(tBankRmtf.getBatchNo()); // 案號：整批批號  'BATXnn'
+		checkAmlVo.setCaseNo(tBankRmtf.getBatchNo()); // 案號：整批批號 'BATXnn'
 		checkAmlVo.setName(traderName); // 姓名
 		// default 身份別 1:自然人 2:法人 性別 : 空白
 		checkAmlVo.setIdentityCd("1");

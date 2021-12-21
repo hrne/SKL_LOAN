@@ -25,6 +25,7 @@ public class L5R06 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdEmpService sCdEmpService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		// L5401調RIM用，資料來源為CdEmp

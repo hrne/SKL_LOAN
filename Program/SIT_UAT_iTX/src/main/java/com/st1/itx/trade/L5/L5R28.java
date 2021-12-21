@@ -27,22 +27,22 @@ public class L5R28 extends TradeBuffer {
 	private static final Logger logger = LoggerFactory.getLogger(L5R28.class);
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5R28 ");
-		
+
 		this.totaVo.init(titaVo);
 		String employeeNo = titaVo.getParam("RimEmployeeNo").trim();
-		this.info("Run L5R28 employeeNo=["+employeeNo+"]");
-		CdEmp CdEmpVo=sCdEmpService.findById(employeeNo, titaVo);
-		String FullName="";
+		this.info("Run L5R28 employeeNo=[" + employeeNo + "]");
+		CdEmp CdEmpVo = sCdEmpService.findById(employeeNo, titaVo);
+		String FullName = "";
 		if (CdEmpVo != null) {
-			FullName=CdEmpVo.getFullname();
+			FullName = CdEmpVo.getFullname();
 		}
-		
-		this.totaVo.putParam("L5r28FullName",FullName);
-		
+
+		this.totaVo.putParam("L5r28FullName", FullName);
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

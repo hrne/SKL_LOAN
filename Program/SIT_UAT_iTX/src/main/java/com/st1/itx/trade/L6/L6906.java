@@ -84,17 +84,13 @@ public class L6906 extends TradeBuffer {
 		Slice<AcDetail> slAcDetail = null;
 		// 戶號 or 經辦 or 整批批號 or 交易代號
 		if (!(iCustNo == 0)) {
-			slAcDetail = sAcDetailService.acdtlCustNo(iBranchNo, iCurrencyCode, iFAcDate, iCustNo, this.index,
-					this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlCustNo(iBranchNo, iCurrencyCode, iFAcDate, iCustNo, this.index, this.limit, titaVo);
 		} else if (!(iTitaTlrNo.isEmpty())) {
-			slAcDetail = sAcDetailService.acdtlTitaTlrNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaTlrNo, this.index,
-					this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlTitaTlrNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaTlrNo, this.index, this.limit, titaVo);
 		} else if (!(iTitaBatchNo.isEmpty())) {
-			slAcDetail = sAcDetailService.acdtlTitaBatchNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaBatchNo, this.index,
-					this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlTitaBatchNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaBatchNo, this.index, this.limit, titaVo);
 		} else if (!(iTitaTxCd.isEmpty())) {
-			slAcDetail = sAcDetailService.acdtlTitaTxCd(iBranchNo, iCurrencyCode, iFAcDate, iTitaTxCd, this.index,
-					this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlTitaTxCd(iBranchNo, iCurrencyCode, iFAcDate, iTitaTxCd, this.index, this.limit, titaVo);
 		} else {
 			throw new LogicException(titaVo, "E6011", "戶號或經辦或整批批號或交易代號擇一輸入"); // 查詢資料不可為空白
 		}
@@ -147,9 +143,7 @@ public class L6906 extends TradeBuffer {
 			}
 
 			// 查詢會計科子細目設定檔
-			CdAcCode tCdAcCode = sCdAcCodeService.findById(
-					new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()),
-					titaVo);
+			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()), titaVo);
 			if (tCdAcCode == null) {
 				occursList.putParam("OOAcNoItem", "");
 			} else {

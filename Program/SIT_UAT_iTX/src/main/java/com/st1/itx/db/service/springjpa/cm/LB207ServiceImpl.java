@@ -57,9 +57,7 @@ public class LB207ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "     , M.\"Birthday\"" + "     , M.\"RegAddr\"" + "     , M.\"CurrZip\"" + "     , M.\"CurrAddr\"" + "     , M.\"Tel\"" + "     , M.\"Mobile\"" + "     , M.\"Filler14\""
 				+ "     , M.\"EduCode\"" + "     , M.\"OwnedHome\"" + "     , M.\"CurrCompName\"" + "     , M.\"CurrCompId\"" + "     , M.\"JobCode\"" + "     , M.\"CurrCompTel\""
 				+ "     , M.\"JobTitle\"" + "     , M.\"JobTenure\"" + "     , M.\"IncomeOfYearly\"" + "     , M.\"IncomeDataDate\"" + "     , M.\"Sex\"" + "     , M.\"NationalityCode\""
-				+ "     , M.\"PassportNo\"" + "     , M.\"PreTaxNo\"" + "     , M.\"FullCustName\"" + "     , M.\"Filler30\"" 
-				+ " FROM  \"JcicB207\" M" 
-				+ " WHERE M.\"DataYM\" = " + dateMonth
+				+ "     , M.\"PassportNo\"" + "     , M.\"PreTaxNo\"" + "     , M.\"FullCustName\"" + "     , M.\"Filler30\"" + " FROM  \"JcicB207\" M" + " WHERE M.\"DataYM\" = " + dateMonth
 				+ " ORDER BY M.\"BankItem\", M.\"CustId\" ";
 
 		logger.info("sql=" + sql);

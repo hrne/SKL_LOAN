@@ -30,7 +30,7 @@ public class L9720ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		return findAll(titaVo, 0);
 	}
-	
+
 	@Autowired
 	private DateUtil dUtil;
 
@@ -132,21 +132,21 @@ public class L9720ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String EntDy = Integer.toString(titaVo.getEntDyI() + 19110000);
 		query.setParameter("makeDate", EntDy);
-		
+
 		// 10 個月前
-		
+
 		dUtil.init();
 		dUtil.setDate_1(EntDy);
 		dUtil.setMons(-10);
 		int minus10 = dUtil.getCalenderDay();
 		this.info("validYearMonthFirst = " + minus10);
 		query.setParameter("validYearMonthFirst", minus10);
-		
+
 		// 22 個月前
-		
+
 		dUtil.init();
 		dUtil.setDate_1(EntDy);
-		dUtil.setMons(-22);		
+		dUtil.setMons(-22);
 		int minus22 = dUtil.getCalenderDay();
 		this.info("validYearMonthSecond = " + minus22);
 		query.setParameter("validYearMonthSecond", minus22);

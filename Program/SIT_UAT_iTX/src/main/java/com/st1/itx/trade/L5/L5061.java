@@ -44,16 +44,16 @@ public class L5061 extends TradeBuffer {
 		long sno1 = 0;
 		switch (chooseFlag) {
 		case 1:
-			 sno1 = iL5061TelReport.exec(titaVo);
+			sno1 = iL5061TelReport.exec(titaVo);
 			break;
 		case 2:
-			 sno1 = iL5061MeetReport.exec(titaVo);
+			sno1 = iL5061MeetReport.exec(titaVo);
 			break;
 		case 3:
-			 sno1 = iL5061LetterReport.exec(titaVo);
+			sno1 = iL5061LetterReport.exec(titaVo);
 			break;
 		case 5:
-			 sno1 = iL5061AllReport.exec(titaVo);
+			sno1 = iL5061AllReport.exec(titaVo);
 			break;
 		}
 		totaVo.put("ExcelSnoM", "" + sno1);

@@ -27,10 +27,10 @@ public class LM040Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public void printTitle() {
 
@@ -56,8 +56,7 @@ public class LM040Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LMList) throws LogicException {
 		this.info("LM040Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM040", "地區別正常戶金額", "LM040地區別正常戶金額",
-				"LM040地區別正常戶金額.xlsx", "D960717");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM040", "地區別正常戶金額", "LM040地區別正常戶金額", "LM040地區別正常戶金額.xlsx", "D960717");
 		if (LMList == null || LMList.isEmpty()) {
 			makeExcel.setValue(3, 1, "本日無資料");
 		} else {
@@ -73,7 +72,7 @@ public class LM040Report extends MakeReport {
 
 					String value = tLDVo.get("F" + i);
 					int col = i + 1;
-					
+
 					switch (col) {
 					case 1:
 						if (row == 3) {
@@ -136,9 +135,9 @@ public class LM040Report extends MakeReport {
 			makeExcel.setValue(row, 3, thirdTotal.add(secondTotal.add(firstTotal)), "#,##0");
 
 		}
-		
+
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 }

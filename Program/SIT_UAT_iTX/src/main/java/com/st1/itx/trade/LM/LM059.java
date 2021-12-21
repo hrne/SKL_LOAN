@@ -21,7 +21,7 @@ import com.st1.itx.tradeService.BatchBase;
  * @version 1.0.0
  */
 public class LM059 extends BatchBase implements Tasklet, InitializingBean {
- 
+
 	@Autowired
 	LM059Report lm059report;
 

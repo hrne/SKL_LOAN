@@ -61,7 +61,7 @@ public class L5712 extends TradeBuffer {
 		int bringUpDate = Integer.parseInt(titaVo.getParam("OOEntryDate")) + 19110000;
 		String finCode = titaVo.getParam("FinCode");
 		String txSeq = titaVo.getParam("TxSeq");
-		
+
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
@@ -86,35 +86,35 @@ public class L5712 extends TradeBuffer {
 		// 正常交易新增、訂正交易要刪除
 		if (titaVo.isHcodeNormal()) {
 
-			if (tNegAppr02.getAcDate() == 0 || tNegAppr02.getTxStatus() != 0 ) {
+			if (tNegAppr02.getAcDate() == 0 || tNegAppr02.getTxStatus() != 0) {
 				throw new LogicException(titaVo, "E0015", "一般債權撥付資料檔條件不符 " + tNegAppr02Id);
 			}
-			
+
 			NegMain tNegMain = new NegMain();
 			tNegMain = sNegMainService.statusFirst("0", tNegAppr02.getCustNo(), titaVo); // 0-正常
 			if (tNegMain == null) {
 				throw new LogicException(titaVo, "E0001", "債務協商案件主檔戶號: " + tNegAppr02.getCustNo());
 			}
 
-			tNegTransId.setAcDate(titaVo.getOrgEntdyI()+19110000);
+			tNegTransId.setAcDate(titaVo.getOrgEntdyI() + 19110000);
 			tNegTransId.setTitaTlrNo(titaVo.getParam("TLRNO"));
 			tNegTransId.setTitaTxtNo(Integer.parseInt(titaVo.getParam("TXTNO")));
 			tNegTrans.setNegTransId(tNegTransId);
-			
+
 			tNegTrans.setCustNo(tNegAppr02.getCustNo()); // 戶號
 			tNegTrans.setCaseSeq(tNegMain.getCaseSeq()); // 案件序號
 			tNegTrans.setEntryDate(bringUpDate); // 入帳日期
 			tNegTrans.setTxStatus(0); // 交易狀態 0:未入帳
 			tNegTrans.setTxKind("9"); // 交易別 9:未處理
 			tNegTrans.setTxAmt(tNegAppr02.getTxAmt()); // 交易金額
-			
+
 			try {
 				sNegTransService.insert(tNegTrans, titaVo); // insert
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "債務協商交易檔 " + tNegTransId + e.getErrorMsg());
 			}
 			tNegAppr02.setTxStatus(1);// 已入客戶暫收
-			tNegAppr02.setNegTransAcDate(titaVo.getOrgEntdyI()+19110000);
+			tNegAppr02.setNegTransAcDate(titaVo.getOrgEntdyI() + 19110000);
 			tNegAppr02.setNegTransTlrNo(titaVo.getParam("TLRNO"));
 			tNegAppr02.setNegTransTxtNo(Integer.parseInt(titaVo.getParam("TXTNO")));
 			try {
@@ -125,7 +125,7 @@ public class L5712 extends TradeBuffer {
 
 		} else {
 
-			tNegTransId.setAcDate(tNegAppr02.getNegTransAcDate()+19110000);
+			tNegTransId.setAcDate(tNegAppr02.getNegTransAcDate() + 19110000);
 			tNegTransId.setTitaTlrNo(tNegAppr02.getNegTransTlrNo());
 			tNegTransId.setTitaTxtNo(tNegAppr02.getNegTransTxtNo());
 			tNegTrans.setNegTransId(tNegTransId);
@@ -137,7 +137,7 @@ public class L5712 extends TradeBuffer {
 			if (tNegTrans.getTxStatus() == 2) { // 2:已入帳
 				throw new LogicException(titaVo, "E0015", "債務協商交易檔已入帳不可訂正 " + tNegTransId);
 			}
-			if (tNegAppr02.getAcDate() == 0 || tNegAppr02.getTxStatus() != 1 ) {
+			if (tNegAppr02.getAcDate() == 0 || tNegAppr02.getTxStatus() != 1) {
 				throw new LogicException(titaVo, "E0015", "一般債權撥付資料檔條件不符 " + tNegAppr02Id);
 			}
 
@@ -146,7 +146,7 @@ public class L5712 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "債務協商交易檔" + tNegTransId + e.getErrorMsg());
 			}
-			
+
 			tNegAppr02.setTxStatus(0);// 未入專戶
 			tNegAppr02.setNegTransAcDate(0);
 			tNegAppr02.setNegTransTlrNo("");

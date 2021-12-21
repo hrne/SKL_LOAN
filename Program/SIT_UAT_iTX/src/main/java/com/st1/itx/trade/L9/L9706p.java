@@ -52,8 +52,7 @@ public class L9706p extends TradeBuffer {
 			content = "L9706貸款餘額證明書查無資料";
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), content, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

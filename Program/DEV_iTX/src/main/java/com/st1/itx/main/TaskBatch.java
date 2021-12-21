@@ -35,7 +35,6 @@ public class TaskBatch extends CommBuffer implements Runnable {
 		boolean isOK = true;
 		this.setLog();
 		this.info("TaskBatch exec...");
-		
 
 		BatchTransaction batchTransaction = (BatchTransaction) MySpring.getBean("batchTransaction");
 

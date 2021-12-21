@@ -86,9 +86,8 @@ public class L6908 extends TradeBuffer {
 		this.limit = 100; // 316 * 100 = 31,600
 
 		// 查詢會計帳務明細檔
-		Slice<AcDetail> slAcDetail = sAcDetailService.findL6908(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
-				iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo, iFacmNo, iFAcDateSt, iFAcDateEd, this.index,
-				this.limit, titaVo);
+		Slice<AcDetail> slAcDetail = sAcDetailService.findL6908(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo, iFacmNo, iFAcDateSt,
+				iFAcDateEd, this.index, this.limit, titaVo);
 
 		if (slAcDetail == null) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
@@ -97,10 +96,9 @@ public class L6908 extends TradeBuffer {
 		for (AcDetail tAcDetail : slAcDetail.getContent()) {
 
 			this.info("L6908 iRvNo : " + iRvNo + "-" + tAcDetail.getRvNo());
-			this.info("L6908 AcNoCode : " + iAcBookCode + "-" + iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode + "-"
-					+ tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-" + tAcDetail.getAcDtlCode() + "-"
-					+ tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-"
-					+ tAcDetail.getEntAc() + "-" + tAcDetail.getCustNo() + "-" + tAcDetail.getFacmNo());
+			this.info("L6908 AcNoCode : " + iAcBookCode + "-" + iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode + "-" + tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-"
+					+ tAcDetail.getAcDtlCode() + "-" + tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-" + tAcDetail.getEntAc() + "-"
+					+ tAcDetail.getCustNo() + "-" + tAcDetail.getFacmNo());
 
 			// 不含未入帳,例如:未放行之交易
 			// 0:未入帳 1:已入帳 2:被沖正(隔日訂正) 3.沖正(隔日訂正)
@@ -177,7 +175,7 @@ public class L6908 extends TradeBuffer {
 			if (tCdAcCode == null) {
 				throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
 			}
-			// 
+			//
 			int clsFlag = 1;
 			if (tCdAcCode.getReceivableFlag() > 0 && tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
 				clsFlag = 0;

@@ -142,7 +142,7 @@ public class L8308 extends TradeBuffer {
 						throw new LogicException("E0007", "最大債權金融機構未曾報送過(44)請求同意債務清償方案通知資料.");
 					}
 				} // 1.3 end
-				
+
 				// 1.4 start 第7欄期數，第8欄利率需與最近一次'44':請求同意債務清償方案通知資料"對應值一致
 				else if (iPeriod != iJcicZ044.getPeriod() || iRate.compareTo(iJcicZ044.getRate()) != 0) {
 					if ("A".equals(iTranKey)) {
@@ -150,9 +150,9 @@ public class L8308 extends TradeBuffer {
 					} else {
 						throw new LogicException("E0007", "期數，利率需與(44)請求同意債務清償方案通知資料最近一筆報送的資料對應值一致.");
 					}
-				}// 1.4 end
+				} // 1.4 end
 			}
-			
+
 			// 1.5 檢核第9~14欄若與所有原債權金融機構回報'42':「回報無擔保債權金額資料」債權金額不同時，則予剔退.***J
 
 //			// 1.6.1 start 第15欄「依民法第323條計算之債務總金額」需等於信用貸款+現金卡+信用卡依民法第323條計算之債務金額合計

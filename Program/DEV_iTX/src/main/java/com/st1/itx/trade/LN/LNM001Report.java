@@ -23,7 +23,8 @@ import java.text.SimpleDateFormat;
 @Scope("prototype")
 
 public class LNM001Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LNM001Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LNM001Report.class);
 
 	Date dateNow = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -117,15 +118,15 @@ public class LNM001Report extends MakeReport {
 
 			// 設定欄位寬度
 			if (LNList != null) {
-				makeExcel.setWidth(1,  9 );
-				makeExcel.setWidth(2,  12);
-				makeExcel.setWidth(3,  5 );
-				makeExcel.setWidth(4,  9 );
-				makeExcel.setWidth(5,  5 );
-				makeExcel.setWidth(6,  10);
-				makeExcel.setWidth(7,  3 );
-				makeExcel.setWidth(8,  10);
-				makeExcel.setWidth(9,  10);
+				makeExcel.setWidth(1, 9);
+				makeExcel.setWidth(2, 12);
+				makeExcel.setWidth(3, 5);
+				makeExcel.setWidth(4, 9);
+				makeExcel.setWidth(5, 5);
+				makeExcel.setWidth(6, 10);
+				makeExcel.setWidth(7, 3);
+				makeExcel.setWidth(8, 10);
+				makeExcel.setWidth(9, 10);
 				makeExcel.setWidth(10, 10);
 				makeExcel.setWidth(11, 10);
 				makeExcel.setWidth(12, 15);
@@ -135,33 +136,33 @@ public class LNM001Report extends MakeReport {
 				makeExcel.setWidth(16, 15);
 				makeExcel.setWidth(17, 15);
 				makeExcel.setWidth(18, 11);
-				makeExcel.setWidth(19, 6 );
+				makeExcel.setWidth(19, 6);
 				makeExcel.setWidth(20, 10);
 				makeExcel.setWidth(21, 10);
 				makeExcel.setWidth(22, 15);
-				makeExcel.setWidth(23, 5 );
+				makeExcel.setWidth(23, 5);
 				makeExcel.setWidth(24, 10);
-				makeExcel.setWidth(25, 3 );
-				makeExcel.setWidth(26, 3 );
-				makeExcel.setWidth(27, 4 );
-				makeExcel.setWidth(28, 4 );
-				makeExcel.setWidth(29, 8 );
-				makeExcel.setWidth(30, 4 );
-				makeExcel.setWidth(31, 3 );
-				makeExcel.setWidth(32, 4 );
-				makeExcel.setWidth(33, 3 );
-				makeExcel.setWidth(34, 3 );
-				makeExcel.setWidth(35, 3 );
+				makeExcel.setWidth(25, 3);
+				makeExcel.setWidth(26, 3);
+				makeExcel.setWidth(27, 4);
+				makeExcel.setWidth(28, 4);
+				makeExcel.setWidth(29, 8);
+				makeExcel.setWidth(30, 4);
+				makeExcel.setWidth(31, 3);
+				makeExcel.setWidth(32, 4);
+				makeExcel.setWidth(33, 3);
+				makeExcel.setWidth(34, 3);
+				makeExcel.setWidth(35, 3);
 				makeExcel.setWidth(36, 15);
 				makeExcel.setWidth(37, 10);
-				makeExcel.setWidth(38, 5 );
+				makeExcel.setWidth(38, 5);
 				makeExcel.setWidth(39, 15);
-				makeExcel.setWidth(40, 3 );
-				makeExcel.setWidth(41, 3 );
+				makeExcel.setWidth(40, 3);
+				makeExcel.setWidth(41, 3);
 				makeExcel.setWidth(42, 15);
-				makeExcel.setWidth(43, 3 );
-				makeExcel.setWidth(44, 3 );
-				makeExcel.setWidth(45, 6 );
+				makeExcel.setWidth(43, 3);
+				makeExcel.setWidth(44, 3);
+				makeExcel.setWidth(45, 6);
 				makeExcel.setWidth(46, 11);
 				makeExcel.setWidth(47, 15);
 				makeExcel.setWidth(48, 15);

@@ -56,8 +56,7 @@ public class LB096ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"OwnerId\"" + "     , M.\"CityJCICCode\""
 				+ "     , M.\"AreaJCICCode\"" + "     , M.\"IrCode\"" + "     , M.\"LandNo1\"" + "     , M.\"LandNo2\"" + "     , M.\"LandCode\"" + "     , M.\"Area\"" + "     , M.\"LandZoningCode\""
 				+ "     , M.\"LandUsageType\"" + "     , M.\"PostedLandValue\"" + "     , M.\"PostedLandValueYearMonth\"" + "     , M.\"Filler18\"" + "     , M.\"JcicDataYM\""
-				+ " FROM  \"JcicB096\" M" + " WHERE M.\"DataYM\" = " + dateMonth 
-				+ " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"LandNo1\", \"LandNo2\"";
+				+ " FROM  \"JcicB096\" M" + " WHERE M.\"DataYM\" = " + dateMonth + " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"LandNo1\", \"LandNo2\"";
 
 		logger.info("sql=" + sql);
 

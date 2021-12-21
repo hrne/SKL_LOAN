@@ -22,7 +22,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -69,7 +69,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          AND NVL(FP.\"ProdNo\", 'XXX') != 'XXX' ";
 		sql += " ) ";
 		sql += " WHERE \"DataType\" != 0 ";
-		sql += " GROUP BY \"Year\" ";     // 為了DRY，把GROUP BY拉出來外層做，否則DataType條件會需要寫兩次
+		sql += " GROUP BY \"Year\" "; // 為了DRY，把GROUP BY拉出來外層做，否則DataType條件會需要寫兩次
 		sql += "         ,\"DataType\" "; // 對於效能並無顯著影響
 		sql += "         ,\"Month\" ";
 

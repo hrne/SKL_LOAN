@@ -93,8 +93,7 @@ public class L4031 extends TradeBuffer {
 // 				grp1 (Group by 作業項目 )
 				setCount(tBatxRateChange, grp1, 1);
 
-				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(),
-						tBatxRateChange.getRateKeyInCode(), 2);
+				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(), tBatxRateChange.getRateKeyInCode(), 2);
 // 				grp2 (Group by 作業項目，調整記號, 輸入記號 )
 				setCount(tBatxRateChange, grp2, 2);
 

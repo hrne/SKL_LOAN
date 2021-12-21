@@ -34,7 +34,7 @@ public class L9725p extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
-	
+
 	String TXCD = "L9725";
 	String TXName = "防制洗錢機構風險評估(IRA)定期量化撈件";
 
@@ -51,11 +51,9 @@ public class L9725p extends TradeBuffer {
 		boolean isFinish = l9725Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

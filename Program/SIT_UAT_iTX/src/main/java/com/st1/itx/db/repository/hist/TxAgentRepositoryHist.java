@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.TxAgentId;
  */
 public interface TxAgentRepositoryHist extends JpaRepository<TxAgent, TxAgentId> {
 
-  // AgentTlrNo =
-  public Slice<TxAgent> findAllByAgentTlrNoIsOrderByTlrNoAsc(String agentTlrNo_0, Pageable pageable);
+	// AgentTlrNo =
+	public Slice<TxAgent> findAllByAgentTlrNoIsOrderByTlrNoAsc(String agentTlrNo_0, Pageable pageable);
 
-  // TlrNo =
-  public Slice<TxAgent> findAllByTlrNoIsOrderByAgentTlrNoAsc(String tlrNo_0, Pageable pageable);
+	// TlrNo =
+	public Slice<TxAgent> findAllByTlrNoIsOrderByAgentTlrNoAsc(String tlrNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAgent> findByTxAgentId(TxAgentId txAgentId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAgent> findByTxAgentId(TxAgentId txAgentId);
 
 }
-

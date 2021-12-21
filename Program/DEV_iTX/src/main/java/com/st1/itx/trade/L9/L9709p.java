@@ -44,8 +44,7 @@ public class L9709p extends TradeBuffer {
 
 		l9709Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"L9709暫收放貸核心傳票檔資料已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L9709暫收放貸核心傳票檔資料已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

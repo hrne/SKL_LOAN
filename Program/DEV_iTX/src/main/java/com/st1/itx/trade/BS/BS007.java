@@ -29,45 +29,44 @@ import com.st1.itx.db.domain.TxToDoDetail;
 public class BS007 extends TradeBuffer {
 	@Autowired
 	public TxToDoCom txToDoCom;
-	
+
 	@Autowired
 	public LoanNotYetService loanNotYetService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active BS007 ");
 
-		
-		txToDoCom.delByItemCode("L2921",titaVo);
-		
+		txToDoCom.delByItemCode("L2921", titaVo);
+
 		dateUtil.setDate_1(titaVo.getCalDy());
 		dateUtil.setDays(3);
 		int tbsdy = dateUtil.getCalenderDay() + 19110000;
 		this.info("active tbsdy = " + tbsdy);
-		
-		Slice<LoanNotYet> slLoanNotYet = loanNotYetService.allNoClose(0, tbsdy , 0, Integer.MAX_VALUE, titaVo);
+
+		Slice<LoanNotYet> slLoanNotYet = loanNotYetService.allNoClose(0, tbsdy, 0, Integer.MAX_VALUE, titaVo);
 		List<LoanNotYet> lLoanNotYet = slLoanNotYet == null ? null : slLoanNotYet.getContent();
-		
+
 		txToDoCom.setTxBuffer(this.getTxBuffer());
-		
+
 		if (lLoanNotYet != null && lLoanNotYet.size() > 0) {
 			for (LoanNotYet loanNotYet : lLoanNotYet) {
-			  TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-			  tTxToDoDetail.setItemCode("L2921");
-			  tTxToDoDetail.setCustNo(loanNotYet.getCustNo());
-			  tTxToDoDetail.setFacmNo(loanNotYet.getFacmNo());
-			  tTxToDoDetail.setDtlValue(loanNotYet.getNotYetCode());
-			  tTxToDoDetail.setProcessNote(loanNotYet.getNotYetItem());			
-			  txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo); //  addDetail	
+				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+				tTxToDoDetail.setItemCode("L2921");
+				tTxToDoDetail.setCustNo(loanNotYet.getCustNo());
+				tTxToDoDetail.setFacmNo(loanNotYet.getFacmNo());
+				tTxToDoDetail.setDtlValue(loanNotYet.getNotYetCode());
+				tTxToDoDetail.setProcessNote(loanNotYet.getNotYetItem());
+				txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo); // addDetail
 			}
 		}
 
 		this.batchTransaction.commit();
-	
+
 		return null;
 	}
 }

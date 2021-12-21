@@ -55,7 +55,7 @@ public class L4925 extends TradeBuffer {
 
 	@Autowired
 	public L4925ServiceImpl sL4925ServiceImpl;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4925 ");
@@ -76,30 +76,30 @@ public class L4925 extends TradeBuffer {
 
 		}
 
-		List<LinkedHashMap<String, String>> chkOccursList = null; 
-		
+		List<LinkedHashMap<String, String>> chkOccursList = null;
+
 		if (resultList != null && resultList.size() > 0) {
-			
+
 			for (Map<String, String> result : resultList) {
-		
-			    this.info("L4925 result = " + result.toString());
-			    // new occurs
-			  
-			    TempVo tempVo = new TempVo();
-			    OccursList occursList = new OccursList();
-			    
-			    occursList.putParam("OOAcDate", 0);
-			    if(parse.stringToInteger(result.get("F0")) > 0) {
-			      occursList.putParam("OOAcDate", parse.stringToInteger(result.get("F0")) - 19110000);
-			    } 
+
+				this.info("L4925 result = " + result.toString());
+				// new occurs
+
+				TempVo tempVo = new TempVo();
+				OccursList occursList = new OccursList();
+
+				occursList.putParam("OOAcDate", 0);
+				if (parse.stringToInteger(result.get("F0")) > 0) {
+					occursList.putParam("OOAcDate", parse.stringToInteger(result.get("F0")) - 19110000);
+				}
 				occursList.putParam("OOBatchNo", result.get("F1"));
 				occursList.putParam("OODetailSeq", result.get("F2"));
 				occursList.putParam("OORepayCode", result.get("F3"));
-				
+
 				occursList.putParam("OOEntryDate", 0);
-				if(parse.stringToInteger(result.get("F4")) > 0) {
-				  occursList.putParam("OOEntryDate", parse.stringToInteger(result.get("F4")) - 19110000);
-				} 
+				if (parse.stringToInteger(result.get("F4")) > 0) {
+					occursList.putParam("OOEntryDate", parse.stringToInteger(result.get("F4")) - 19110000);
+				}
 				occursList.putParam("OOCustNo", result.get("F5"));
 				occursList.putParam("OOFacmNo", result.get("F6"));
 				occursList.putParam("OORepayType", result.get("F7"));
@@ -109,11 +109,10 @@ public class L4925 extends TradeBuffer {
 				occursList.putParam("OODisacctAmt", result.get("F11"));
 				occursList.putParam("OOProcStsCode", result.get("F12"));
 				occursList.putParam("OOProcCode", result.get("F13"));
-				
-				
+
 				String procNote = "";
 				if (result.get("F16") != null) {
-					tempVo = tempVo.getVo(result.get("F16") );
+					tempVo = tempVo.getVo(result.get("F16"));
 
 					if (tempVo.get("CheckMsg") != null && tempVo.get("CheckMsg").length() > 0) {
 						procNote = " 檢核訊息:" + tempVo.get("CheckMsg") + " ";
@@ -126,44 +125,42 @@ public class L4925 extends TradeBuffer {
 					}
 //					當吃檔進去時不會寫入還款類別，檢核後才會寫入。
 //					若該筆無還款類別且為數字型態，顯示虛擬帳號
-					if (tempVo.get("VirtualAcctNo") != null && parse.stringToInteger(result.get("F7")) == 0
-							&& isNumeric(tempVo.get("VirtualAcctNo"))) {
+					if (tempVo.get("VirtualAcctNo") != null && parse.stringToInteger(result.get("F7")) == 0 && isNumeric(tempVo.get("VirtualAcctNo"))) {
 						procNote = procNote + " 虛擬帳號:" + tempVo.get("VirtualAcctNo");
 					}
 					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
 						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
 					}
 				} // if
-				
+
 				occursList.putParam("OOProcNote", procNote);
 
 				occursList.putParam("OOTitaTlrNo", result.get("F14"));
 				occursList.putParam("OOTitaTxtNo", result.get("F15"));
-				occursList.putParam("OOTxSn",
-						titaVo.getKinbr() + result.get("F14") + result.get("F15"));
+				occursList.putParam("OOTxSn", titaVo.getKinbr() + result.get("F14") + result.get("F15"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
-				
+
 			} // for
-			
+
 			chkOccursList = this.totaVo.getOccursList();
-			  
+
 			if (resultList.size() == this.limit && hasNext()) {
-				 titaVo.setReturnIndex(this.setIndexNext());
-					/* 手動折返 */
-				 this.totaVo.setMsgEndToEnter();
-			}  // if
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			} // if
 
 		} // if
-		
-		if ( chkOccursList == null  && titaVo.getReturnIndex() == 0 ) {
+
+		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
-		
+
 	}
 
 	public static boolean isNumeric(String str) {
@@ -175,7 +172,7 @@ public class L4925 extends TradeBuffer {
 		}
 		return true;
 	}
-	
+
 	private Boolean hasNext() {
 		Boolean result = true;
 
@@ -195,5 +192,5 @@ public class L4925 extends TradeBuffer {
 
 		return result;
 	}
-	
+
 }

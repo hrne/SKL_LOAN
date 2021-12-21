@@ -95,12 +95,12 @@ public class L8315 extends TradeBuffer {
 		iJcicZ054Id.setMaxMainCode(iMaxMainCode);
 		iJcicZ054Id.setPayOffDate(iPayOffDate);
 		JcicZ054 chJcicZ054 = new JcicZ054();
-		
 
 		// 檢核項目(D-31)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-			// 2 KEY值(IDN+報送單位代號+協商申請日+最大債權金融機構代號)未曾報送過'47':金融機構無擔保債務協議資料，予以剔退處理.***1014會議(不做檢核)
+			// 2
+			// KEY值(IDN+報送單位代號+協商申請日+最大債權金融機構代號)未曾報送過'47':金融機構無擔保債務協議資料，予以剔退處理.***1014會議(不做檢核)
 			// 檢核項目 end
 		}
 

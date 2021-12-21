@@ -29,27 +29,27 @@ public class L5943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	public List<Map<String, String>> FindData(int YyyMm,TitaVo titaVo) throws Exception{
+	public List<Map<String, String>> FindData(int YyyMm, TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		String sql = "select p.\"EmpNo\" ";
-				sql +=" ,c.\"Fullname\" ";
-				sql +=" ,p.\"DistItem\" ";
-				sql +=" ,p.\"DepItem\" ";
-				sql +=" ,p.\"GoalAmt\" ";
-				sql +=" ,sum(d.\"DrawdownAmt\") as \"TotalDrawdownAmt\" ";
-				sql +=", sum(d.\"PerfCnt\") as \"TotalPerfCnt\" ";
-				sql +=", case ";
-				sql +="when p.\"GoalAmt\"=0 then 0 ";
-				sql +="else round(sum(d.\"DrawdownAmt\")/p.\"GoalAmt\",4)*100 end as \"Count\" ";
-				sql +=" from \"PfBsOfficer\" p ";
-				sql +="left join \"CdEmp\" c on c.\"EmployeeNo\" = p.\"EmpNo\" ";
-				sql +="left join \"PfBsDetail\" d on p.\"EmpNo\" = d.\"BsOfficer\" and ";
-				sql +="d.\"WorkMonth\" = p.\"WorkMonth\" where p.\"WorkMonth\" = "+YyyMm;
-				sql +=" group by p.\"EmpNo\",c.\"Fullname\",p.\"DistItem\",p.\"DepItem\",p.\"GoalAmt\"";
-				sql +=" order by \"Count\" desc";
-		
-		logger.info("sql = "+sql);
+		sql += " ,c.\"Fullname\" ";
+		sql += " ,p.\"DistItem\" ";
+		sql += " ,p.\"DepItem\" ";
+		sql += " ,p.\"GoalAmt\" ";
+		sql += " ,sum(d.\"DrawdownAmt\") as \"TotalDrawdownAmt\" ";
+		sql += ", sum(d.\"PerfCnt\") as \"TotalPerfCnt\" ";
+		sql += ", case ";
+		sql += "when p.\"GoalAmt\"=0 then 0 ";
+		sql += "else round(sum(d.\"DrawdownAmt\")/p.\"GoalAmt\",4)*100 end as \"Count\" ";
+		sql += " from \"PfBsOfficer\" p ";
+		sql += "left join \"CdEmp\" c on c.\"EmployeeNo\" = p.\"EmpNo\" ";
+		sql += "left join \"PfBsDetail\" d on p.\"EmpNo\" = d.\"BsOfficer\" and ";
+		sql += "d.\"WorkMonth\" = p.\"WorkMonth\" where p.\"WorkMonth\" = " + YyyMm;
+		sql += " group by p.\"EmpNo\",c.\"Fullname\",p.\"DistItem\",p.\"DepItem\",p.\"GoalAmt\"";
+		sql += " order by \"Count\" desc";
+
+		logger.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		logger.info("L5943Service FindData=" + query.toString());

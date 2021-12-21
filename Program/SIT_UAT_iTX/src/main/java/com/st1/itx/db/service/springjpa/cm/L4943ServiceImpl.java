@@ -118,14 +118,14 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ,SUM(\"RepayAmt\") as \"RepayAmt\"                   ";
 			sql += "     from \"BankDeductDtl\"                               ";
 			sql += "     where \"RepayBank\" = 700                            ";
-			sql += "       and \"EntryDate\" >= :entryDateFm" ;
-			sql += "       and \"EntryDate\" <= :entryDateTo" ;
+			sql += "       and \"EntryDate\" >= :entryDateFm";
+			sql += "       and \"EntryDate\" <= :entryDateTo";
 			sql += "     group by \"CustNo\"                                  ";
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
-		sql += " where BDD.\"EntryDate\" >= :entryDateFm" ;
-		sql += "   and BDD.\"EntryDate\" <= :entryDateTo" ;
+		sql += " where BDD.\"EntryDate\" >= :entryDateFm";
+		sql += "   and BDD.\"EntryDate\" <= :entryDateTo";
 		switch (repayBank) {
 		case "": // none
 			break;
@@ -200,26 +200,26 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entryDateFm", entryDateFm);
 		query.setParameter("entryDateTo", entryDateTo);
-		if(!"".equals(repayBank) && !"999".equals(repayBank) && !"998".equals(repayBank)) {
+		if (!"".equals(repayBank) && !"999".equals(repayBank) && !"998".equals(repayBank)) {
 			query.setParameter("repayBank", repayBank);
 		}
-		
-		if(repayType != 0 && repayType != 99) {
+
+		if (repayType != 0 && repayType != 99) {
 			query.setParameter("repayType", repayType);
 		}
-		
-		if(functionCode == 1) {
+
+		if (functionCode == 1) {
 			query.setParameter("custNo", custNo);
-		} else if(functionCode == 2) {
+		} else if (functionCode == 2) {
 			query.setParameter("postLimitAmt", postLimitAmt);
 			query.setParameter("singleLimitAmt", singleLimitAmt);
-		} else if(functionCode == 3) {
+		} else if (functionCode == 3) {
 			query.setParameter("lowLimitAmt", lowLimitAmt);
 		}
-		
+
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 

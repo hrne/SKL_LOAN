@@ -142,8 +142,7 @@ public class L9701Report2 extends MakeReport {
 		String feeNM = "";
 		for (BaTxVo tBaTxVo : listBaTxVo) {
 			if (tBaTxVo.getFacmNo() == Integer.valueOf(this.facmNo)) {
-				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getReceivableFlag() != 4
-						&& tBaTxVo.getUnPaidAmt().intValue() > 0) {
+				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getReceivableFlag() != 4 && tBaTxVo.getUnPaidAmt().intValue() > 0) {
 					if (ptfg == 0) {
 						printFaHead();
 						ptfg = 1;

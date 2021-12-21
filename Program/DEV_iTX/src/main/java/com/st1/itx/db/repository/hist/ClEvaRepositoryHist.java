@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.ClEvaId;
  */
 public interface ClEvaRepositoryHist extends JpaRepository<ClEva, ClEvaId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClEva> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Slice<ClEva> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Optional<ClEva> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoDesc(int clCode1_0, int clCode2_1, int clNo_2);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Optional<ClEva> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoDesc(int clCode1_0, int clCode2_1, int clNo_2);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClEva> findByClEvaId(ClEvaId clEvaId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClEva> findByClEvaId(ClEvaId clEvaId);
 
 }
-

@@ -55,8 +55,7 @@ public class L9132 extends TradeBuffer {
 
 		doRpt(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"L9132傳票媒體明細表(核心)已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L9132傳票媒體明細表(核心)已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

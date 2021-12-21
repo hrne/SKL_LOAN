@@ -68,28 +68,26 @@ public class L2919 extends TradeBuffer {
 			throw new LogicException("E0013", "L2919");
 
 		}
-		
+
 		if (resultList != null && resultList.size() > 0) {
-			
+
 			if (resultList.size() == this.limit && hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
 			}
-			
-			
+
 			for (Map<String, String> result : resultList) {
 				this.info("L2919 result = " + result.toString());
 				// new occurs
 				OccursList occurslist = new OccursList();
-			
+
 				occurslist.putParam("OOClCode1", result.get("F0"));
 				occurslist.putParam("OOClCode2", result.get("F1"));
-				occurslist.putParam("OOClNo", result.get("F2"));				
+				occurslist.putParam("OOClNo", result.get("F2"));
 				occurslist.putParam("OOClTypeCode", result.get("F3"));
 				occurslist.putParam("OOCustName", result.get("F6"));
 				occurslist.putParam("OOCustNo", result.get("F7"));
-				
 
 				String cityCode = result.get("F4");
 				this.info("縣市 = " + cityCode);
@@ -104,25 +102,21 @@ public class L2919 extends TradeBuffer {
 					}
 					this.info("戶籍縣市   " + tCdCity.getCityItem());
 				}
-	
+
 				occurslist.putParam("OOCityItem", tCdCity.getCityItem());
-					
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occurslist);
-					
 
 			} // for
-			
-			  
+
 		} // if
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
-		
+
 	}
-		
-	
+
 	private Boolean hasNext() {
 		Boolean result = true;
 
@@ -142,5 +136,5 @@ public class L2919 extends TradeBuffer {
 
 		return result;
 	}
-	
+
 }

@@ -175,10 +175,10 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
-			
+
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-			
+
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());

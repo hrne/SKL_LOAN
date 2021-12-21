@@ -27,13 +27,13 @@ import com.st1.itx.util.data.DataLog;
 public class L1110 extends TradeBuffer {
 	@Autowired
 	public CustMainService custMainService;
-	
+
 	@Autowired
 	public DataLog iDataLog;
-	
+
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1110 ");
@@ -49,11 +49,11 @@ public class L1110 extends TradeBuffer {
 		if (custMain.getDataStatus() != 0) {
 			throw new LogicException(titaVo, "E0015", "請先完成客戶資料建檔");
 		}
-		
+
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "");
 		}
-				
+
 		custMain = custMainService.holdById(custMain, titaVo);
 		CustMain custMain2 = (CustMain) iDataLog.clone(custMain);
 		custMain.setAllowInquire(titaVo.getParam("AllowInquireAft").toString());
@@ -62,7 +62,6 @@ public class L1110 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException("E0007", "客戶主檔");
 		}
-		
 
 		// 紀錄變更前變更後
 		iDataLog.setEnv(titaVo, custMain2, custMain);

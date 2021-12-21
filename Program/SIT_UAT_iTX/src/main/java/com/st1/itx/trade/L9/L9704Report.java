@@ -195,7 +195,7 @@ public class L9704Report extends MakeReport {
 		makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	// 印小計

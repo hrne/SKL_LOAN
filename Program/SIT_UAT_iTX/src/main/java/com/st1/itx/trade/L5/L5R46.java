@@ -84,9 +84,8 @@ public class L5R46 extends TradeBuffer {
 				this.totaVo.putParam("IntroducerName", "");
 			}
 
-			PfBsDetail pfBsDetail = pfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(),
-					pfItDetail.getBormNo(), pfItDetail.getPerfDate() + 19110000, pfItDetail.getRepayType(),
-					pfItDetail.getPieceCode(), titaVo);
+			PfBsDetail pfBsDetail = pfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), pfItDetail.getPerfDate() + 19110000,
+					pfItDetail.getRepayType(), pfItDetail.getPieceCode(), titaVo);
 			if (pfBsDetail == null) {
 				this.totaVo.putParam("BsOfficer", "");
 				this.totaVo.putParam("BsOfficerName", "");
@@ -105,8 +104,7 @@ public class L5R46 extends TradeBuffer {
 				}
 			}
 
-			PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
-					pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
+			PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
 			if (pfItDetailAdjust != null && pfItDetailAdjust.getWorkMonth() > 0) {
 				this.totaVo.putParam("PerfAmt", pfItDetailAdjust.getAdjPerfAmt());
 			} else {

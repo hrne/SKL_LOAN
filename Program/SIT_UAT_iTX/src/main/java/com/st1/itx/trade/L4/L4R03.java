@@ -40,11 +40,11 @@ public class L4R03 extends TradeBuffer {
 
 		// RimCustNo=9,7
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo").trim());
-		
+
 		CustMain tCustMain = new CustMain();
-		
+
 		tCustMain = custMainService.custNoFirst(iCustNo, iCustNo);
-		
+
 		if (tCustMain != null) {
 			this.totaVo.putParam("L4r03CustName", tCustMain.getCustName());
 			this.totaVo.putParam("L4r03CustId", tCustMain.getCustId());
@@ -52,9 +52,9 @@ public class L4R03 extends TradeBuffer {
 			this.totaVo.putParam("L4r03Gender", tCustMain.getSex());
 			this.totaVo.putParam("L4r03EmpNo", tCustMain.getEmpNo());
 		} else {
-			throw new LogicException(titaVo, "E0001", " 此戶號不存在");	
+			throw new LogicException(titaVo, "E0001", " 此戶號不存在");
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

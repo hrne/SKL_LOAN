@@ -31,9 +31,9 @@ public class L5106 extends TradeBuffer {
 		this.info("active L5106 ");
 		this.totaVo.init(titaVo);
 
-		// 執行交易 
+		// 執行交易
 		MySpring.newTask("L5106Batch", this.txBuffer, titaVo);
-				
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

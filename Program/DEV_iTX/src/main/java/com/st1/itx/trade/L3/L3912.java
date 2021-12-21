@@ -68,8 +68,7 @@ public class L3912 extends TradeBuffer {
 		if (iCustNo == 0) {
 			tLoanBorTx = loanBorTxService.borxTxtNoFirst(iAcctDate + 19110000, iTellerNo, iTxtNo, titaVo);
 		} else {
-			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, iBormNo, iAcctDate + 19110000, iTellerNo,
-					iTxtNo, titaVo);
+			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, iBormNo, iAcctDate + 19110000, iTellerNo, iTxtNo, titaVo);
 		}
 		if (tLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
@@ -137,9 +136,8 @@ public class L3912 extends TradeBuffer {
 		BigDecimal wkFireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
 		BigDecimal wkLawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
 
-		BigDecimal wkRepayAmt = tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest()).add(tLoanBorTx.getDelayInt())
-				.add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()).add(wkAcctFee).add(wkModifyFee)
-				.add(wkFireFee).add(wkLawFee);
+		BigDecimal wkRepayAmt = tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest()).add(tLoanBorTx.getDelayInt()).add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()).add(wkAcctFee)
+				.add(wkModifyFee).add(wkFireFee).add(wkLawFee);
 
 		this.totaVo.putParam("ORPTFG", RPTFG); // rptfg
 		this.totaVo.putParam("OCustNo", tLoanBorTx.getCustNo());

@@ -94,7 +94,7 @@ public class L8311 extends TradeBuffer {
 		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt"));
 		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt"));
 		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
-		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM"))+191100;
+		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM")) + 191100;
 		String iStatus = titaVo.getParam("Status");
 		String iKey = "";
 		int sPayAmt = iPayAmt;// 該IDN所有已報送本檔案資料之第8欄繳款金額之合計

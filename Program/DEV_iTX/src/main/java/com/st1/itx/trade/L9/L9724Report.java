@@ -27,10 +27,10 @@ public class L9724Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Autowired
 	DateUtil dUtil;
 
@@ -72,28 +72,16 @@ public class L9724Report extends MakeReport {
 		this.info("L9724Report exportExcel");
 
 		if (newExcel == true) {
-			makeExcel.open(titaVo
-					, titaVo.getEntDyI()
-					, titaVo.getKinbr()
-					, TXCD
-					, TXName
-					, TXCD + "_" + TXName
-					, TXCD + "_底稿_" + TXName + ".xlsx"
-					, SheetName
-					, SheetName);
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", SheetName, SheetName);
 		} else {
 			makeExcel.setSheet(SheetName);
 		}
 
 		// fill in inputDate with proper format
 		String targetDate = parse.IntegerToString(parse.stringToInteger(titaVo.getParam("inputEndOfMonthDate")) + 19110000, 1); // YYYYMMDD
-		
+
 		// at F1
-		makeExcel.setValue(1, 6, String.format("月差 %s/%s/%s"
-				                               , targetDate.substring(0, 4)
-				                               , targetDate.substring(4, 6)
-				                               , targetDate.substring(6)
-				                               ));
+		makeExcel.setValue(1, 6, String.format("月差 %s/%s/%s", targetDate.substring(0, 4), targetDate.substring(4, 6), targetDate.substring(6)));
 
 		if (lList != null && !lList.isEmpty()) {
 
@@ -106,7 +94,7 @@ public class L9724Report extends MakeReport {
 
 				// for later date difference calculation uses.
 				// make LocalDates
-				
+
 				dUtil.init();
 				dUtil.setDate_1(tLDVo.get("F4"));
 				dUtil.setDate_2(targetDate);
@@ -116,7 +104,7 @@ public class L9724Report extends MakeReport {
 				// month too.
 				long monthsBetween = dUtil.getMons();
 				long daysDiffTotal = dUtil.getDays();
-				int daysDiffSameMonth = ( dUtil.getDate_2Integer() % 100 ) - (dUtil.getDate_1Integer() % 100);
+				int daysDiffSameMonth = (dUtil.getDate_2Integer() % 100) - (dUtil.getDate_1Integer() % 100);
 
 				// switch by Column: there're more Column than actual query result.
 				for (int col = 0; col < 8; col++) {

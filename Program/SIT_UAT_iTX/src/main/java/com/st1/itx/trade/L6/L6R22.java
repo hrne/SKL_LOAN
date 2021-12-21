@@ -49,29 +49,28 @@ public class L6R22 extends TradeBuffer {
 		// 取得輸入資料
 		int iRimFuncCode = this.parse.stringToInteger(titaVo.getParam("RimFuncCode"));
 		String iRimTxCode = titaVo.getParam("RimTxCode");
-		
+
 		String iRimWorkMonth = titaVo.getParam("RimWorkMonth");
 		this.info("L6R22 1 iRimWorkMonth : " + iRimWorkMonth);
-		for(int i =0 ; iRimWorkMonth.length() <5;i++) {
-			iRimWorkMonth = 0+iRimWorkMonth;
-			this.info("L6R22 1 iRimWorkMonth"+i+" : " + iRimWorkMonth);
+		for (int i = 0; iRimWorkMonth.length() < 5; i++) {
+			iRimWorkMonth = 0 + iRimWorkMonth;
+			this.info("L6R22 1 iRimWorkMonth" + i + " : " + iRimWorkMonth);
 		}
-		
-		
-		String iRimYear = iRimWorkMonth.substring(0,3);
-		String iRimMonth = iRimWorkMonth.substring(3,5);
-		this.info("L6R22 1 iRimYear : " + iRimYear+ "iRimMonth:"+iRimMonth);
-		
+
+		String iRimYear = iRimWorkMonth.substring(0, 3);
+		String iRimMonth = iRimWorkMonth.substring(3, 5);
+		this.info("L6R22 1 iRimYear : " + iRimYear + "iRimMonth:" + iRimMonth);
+
 		int iWorkYear = this.parse.stringToInteger(iRimYear) + 1911;
-		String WorkMonth = iWorkYear+iRimMonth;
+		String WorkMonth = iWorkYear + iRimMonth;
 		int iWorkMonth = this.parse.stringToInteger(WorkMonth);
-		
-		//FuncCode=複製用記號
+
+		// FuncCode=複製用記號
 		int iRimMark = 0;
-		if(titaVo.getParam("RimMark")!=""||titaVo.getParam("RimMark")!=null) {
+		if (titaVo.getParam("RimMark") != "" || titaVo.getParam("RimMark") != null) {
 			iRimMark = this.parse.stringToInteger(titaVo.getParam("RimMark"));
 		}
-		
+
 		this.info("L6R22 1 iWorkMonth : " + iWorkMonth);
 
 		// 檢查輸入資料
@@ -111,8 +110,8 @@ public class L6R22 extends TradeBuffer {
 			if (iRimTxCode.equals("L6751") && iRimFuncCode == 1) {
 				throw new LogicException(titaVo, "E0002", iRimYear + "/" + iRimMonth); // 新增資料已存在
 			}
-			//FuncCode=複製時
-			if (iRimTxCode.equals("L6751") && iRimFuncCode == 3 && iRimMark ==1) {
+			// FuncCode=複製時
+			if (iRimTxCode.equals("L6751") && iRimFuncCode == 3 && iRimMark == 1) {
 				throw new LogicException(titaVo, "E0002", iRimYear + "/" + iRimMonth); // 新增資料已存在
 			}
 		}

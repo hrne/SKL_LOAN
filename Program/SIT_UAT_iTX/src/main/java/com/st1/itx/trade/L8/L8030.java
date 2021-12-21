@@ -261,6 +261,7 @@ public class L8030 extends TradeBuffer {
 	public CdCodeService iCdCodeService;
 	@Autowired
 	public CdCityService iCdCityService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8030 ");
@@ -1520,7 +1521,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCustId", xJcicZ051.getCustId());
 				occursListB.putParam("OORcDate", xJcicZ051.getRcDate());
 				occursListB.putParam("OOSubmitKey", xJcicZ051.getSubmitKey());
-				occursListB.putParam("OODelayYM", xJcicZ051.getDelayYM()-191100);
+				occursListB.putParam("OODelayYM", xJcicZ051.getDelayYM() - 191100);
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ051.getSubmitKey(), titaVo));
 				occursListB.putParam("OOTranKey", xJcicZ051.getTranKey());
 				int iOutJcicTxtDate = 0;
@@ -3309,7 +3310,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OORcDate", xJcicZ451.getApplyDate());
 				occursListB.putParam("OOCourtCode", xJcicZ451.getCourtCode());
 				occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ451.getCourtCode(), titaVo));
-				occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM()-191100);
+				occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM() - 191100);
 				occursListB.putParam("OOTranKey", xJcicZ451.getTranKey());
 				int iOutJcicTxtDate = 0;
 				iOutJcicTxtDate = xJcicZ451.getOutJcicTxtDate();
@@ -4083,17 +4084,17 @@ public class L8030 extends TradeBuffer {
 //	}
 	public String dealCourtName(String CourtId, TitaVo titaVo) throws LogicException {
 		String JcicCourtName = "";// 80碼長度
-		
+
 		CdCodeId iCdCodeId = new CdCodeId();
 		iCdCodeId.setDefCode("CourtCode");
 		iCdCodeId.setCode(CourtId);
 		CdCode iCdCode = iCdCodeService.findById(iCdCodeId, titaVo);
 		if (iCdCode == null) {
 			CdCity iCdCity = iCdCityService.findById(CourtId, titaVo);
-			if (iCdCity !=null) {
+			if (iCdCity != null) {
 				JcicCourtName = iCdCity.getCityItem();
 			}
-		}else {
+		} else {
 			JcicCourtName = iCdCode.getItem();
 		}
 		return JcicCourtName;

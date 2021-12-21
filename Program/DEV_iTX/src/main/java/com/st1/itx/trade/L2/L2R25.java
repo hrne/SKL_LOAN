@@ -31,7 +31,7 @@ public class L2R25 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClStockService sClStockService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -107,10 +107,10 @@ public class L2R25 extends TradeBuffer {
 		this.totaVo.putParam("L2r25YdClosingPrice", tClStock.getYdClosingPrice());
 		this.totaVo.putParam("L2r25ThreeMonthAvg", tClStock.getThreeMonthAvg());
 		this.totaVo.putParam("L2r25EvaUnitPrice", tClStock.getEvaUnitPrice());
-		
+
 //		this.totaVo.putParam("L2r25OwnerId", tClStock.getOwnerId());
 //		this.totaVo.putParam("L2r25OwnerName", tClStock.getOwnerName());
-		
+
 		CustMain custMain = sCustMainService.findById(tClStock.getOwnerCustUKey(), titaVo);
 		if (custMain != null) {
 			this.totaVo.putParam("L2r25OwnerId", custMain.getCustId());
@@ -119,7 +119,7 @@ public class L2R25 extends TradeBuffer {
 			this.totaVo.putParam("L2r25OwnerId", "");
 			this.totaVo.putParam("L2r25OwnerName", "");
 		}
-		
+
 		this.totaVo.putParam("L2r25InsiderJobTitle", tClStock.getInsiderJobTitle());
 		this.totaVo.putParam("L2r25InsiderPosition", tClStock.getInsiderPosition());
 		this.totaVo.putParam("L2r25LegalPersonId", tClStock.getLegalPersonId());

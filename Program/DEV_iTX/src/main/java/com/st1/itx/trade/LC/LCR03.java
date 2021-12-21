@@ -95,11 +95,10 @@ public class LCR03 extends TradeBuffer {
 				tita2.put("ORGTLR", tTxRecord.getTlrNo());
 				tita2.put("ORGTNO", tTxRecord.getTxSeq());
 				tita2.put("ACTFG", actfg);
-				
+
 				TxTeller txTeller = txTellerService.findById(tTxRecord.getTlrNo());
 				tita2.put("ORGEMPNM", txTeller.getTlrItem().trim());
-				
-				
+
 				this.info("txtranCode == " + tTxTranCode.getSubmitFg());
 				if (1 == tTxTranCode.getSubmitFg()) {
 					tita2.put("HCODE", "8");

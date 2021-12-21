@@ -31,8 +31,6 @@ import com.st1.itx.util.parse.Parse;
 public class L5976 extends TradeBuffer {
 	/* DB服務注入 */
 
-	
-
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -41,12 +39,10 @@ public class L5976 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
-
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("Run L5976");
 		this.info("active L5976 ");
 		this.totaVo.init(titaVo);
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

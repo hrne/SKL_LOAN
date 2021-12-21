@@ -87,8 +87,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 		this.info("lM054.findAll nowDate=" + nowDate + ",ymd=" + thisMonthEndDate);
 
-		this.info("lM054.findAll yymm=" + (iYear * 100 + iMonth) + ",lyymm=" + lastMonthEndDate / 100 + ",ymd="
-				+ thisMonthEndDate + ",ymd=" + lastMonthEndDate);
+		this.info("lM054.findAll yymm=" + (iYear * 100 + iMonth) + ",lyymm=" + lastMonthEndDate / 100 + ",ymd=" + thisMonthEndDate + ",ymd=" + lastMonthEndDate);
 
 		// 當年月
 		String iYearMonth = iYear * 100 + iMonth + "";
@@ -101,8 +100,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 月初
 		String sYmd = iYear * 100 + iMonth + "01";
 
-		this.info("lM054.findAll iYearMonth=" + iYearMonth + ",iYearMonth=" + lYearMonth + "sYmd=" + sYmd + ",eYmd="
-				+ eYmd);
+		this.info("lM054.findAll iYearMonth=" + iYearMonth + ",iYearMonth=" + lYearMonth + "sYmd=" + sYmd + ",eYmd=" + eYmd);
 
 		String sql = "";
 		if (acctCode.equals("N")) {

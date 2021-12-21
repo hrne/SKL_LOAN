@@ -73,8 +73,7 @@ public class L5R29 extends TradeBuffer {
 		totaVo.putParam("L5r29BsOfficer", pfBsDetail.getBsOfficer());
 		totaVo.putParam("L5r29BsOfficerName", FindEmpName(pfBsDetail.getBsOfficer(), titaVo));
 
-		PfItDetail pfItDetail = pfItDetailService.findByTxFirst(pfBsDetail.getCustNo(), pfBsDetail.getFacmNo(),
-				pfBsDetail.getBormNo(), pfBsDetail.getPerfDate() + 19110000, pfBsDetail.getRepayType(),
+		PfItDetail pfItDetail = pfItDetailService.findByTxFirst(pfBsDetail.getCustNo(), pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), pfBsDetail.getPerfDate() + 19110000, pfBsDetail.getRepayType(),
 				pfBsDetail.getPieceCode(), titaVo);
 		if (pfItDetail != null) {
 			totaVo.putParam("L5r29Introducer", pfItDetail.getIntroducer());
@@ -87,8 +86,7 @@ public class L5R29 extends TradeBuffer {
 		totaVo.putParam("L5r29PerfCnt", pfBsDetail.getPerfCnt());
 		totaVo.putParam("L5r29PerfAmt", pfBsDetail.getPerfAmt());
 
-		PfBsDetailAdjust pfBsDetailAdjust = pfBsDetailAdjustService.findCustBormFirst(pfBsDetail.getCustNo(),
-				pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), titaVo);
+		PfBsDetailAdjust pfBsDetailAdjust = pfBsDetailAdjustService.findCustBormFirst(pfBsDetail.getCustNo(), pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), titaVo);
 
 		if (pfBsDetailAdjust == null) {
 			totaVo.putParam("L5r29AdjLogNo", 0);

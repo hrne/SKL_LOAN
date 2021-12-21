@@ -100,8 +100,7 @@ public class L8335 extends TradeBuffer {
 					}
 				} else {
 					for (JcicZ573 xJcicZ573 : sJcicZ573) {
-						if (!"D".equals(xJcicZ573.getTranKey())
-								&& !titaVo.getParam("Ukey").equals(xJcicZ573.getUkey())) {
+						if (!"D".equals(xJcicZ573.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ573.getUkey())) {
 							sPayAmt += xJcicZ573.getPayAmt();
 						}
 					}

@@ -47,7 +47,7 @@ public class L2903 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ReltMainService sReltMainService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public LoanBorMainService sLoanBorMainService;
@@ -59,7 +59,6 @@ public class L2903 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public FacMainService sFacMainService;
-
 
 	/* 日期工具 */
 	@Autowired
@@ -85,34 +84,33 @@ public class L2903 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		String iCustName = titaVo.getParam("CustName");
 		// new table
-		
+
 		FacMain tFacMain = new FacMain();
-		
+
 		CustMain tCustMain = new CustMain();
-		
+
 		// new ArrayList
 		List<CustMain> tmplCustMain = new ArrayList<CustMain>();
 		List<LoanBorMain> tmplLoanBorMain = new ArrayList<LoanBorMain>();
-		
+
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		ArrayList<String> temp = new ArrayList<String>();
 		Boolean checkfg = true;
 		if ("".equals(iCustId)) {
 			Slice<CustMain> slCustMain = sCustMainService.custNameLike(iCustName + "%", index, limit, titaVo);
 			tmplCustMain = slCustMain == null ? null : slCustMain.getContent();
-			
-			if(tmplCustMain == null) {
+
+			if (tmplCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
 			}
-			
-			for(CustMain ttCustMain : tmplCustMain) {
+
+			for (CustMain ttCustMain : tmplCustMain) {
 				String tCustId = ttCustMain.getCustId();
-				
+
 				tCustMain = sCustMainService.custIdFirst(tCustId, titaVo);
-				
+
 				int tCustNo = tCustMain.getCustNo();
-				
-				
+
 				try {
 					// *** 折返控制相關 ***
 					resultList = sL2903ServiceImpl.findAll(tCustNo, this.index, this.limit, titaVo);
@@ -121,15 +119,14 @@ public class L2903 extends TradeBuffer {
 					throw new LogicException("E0013", "L2903");
 
 				}
-				
 
-				for(Map<String, String> result : resultList) {
-					if(!temp.contains(result.get("F2"))) {
+				for (Map<String, String> result : resultList) {
+					if (!temp.contains(result.get("F2"))) {
 						temp.add(result.get("F2"));
-					}	
+					}
 				}
 			} // for
-			
+
 			for (String result : temp) {
 
 				String ReltUKey = result;
@@ -137,28 +134,28 @@ public class L2903 extends TradeBuffer {
 				if (tmpCustMain == null) {
 					continue;
 				} // if
-					
+
 				// 存在檢查放款主檔
 				int custNo = tmpCustMain.getCustNo();
-		
+
 				if (custNo > 0) {
 					// 取放款主檔所有該戶號資料
 					Slice<LoanBorMain> stmplLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
 					tmplLoanBorMain = stmplLoanBorMain == null ? null : stmplLoanBorMain.getContent();
 				}
-		
+
 				// 查無資料拋錯
 				if (tmplLoanBorMain == null || custNo == 0) {
 					continue;
 				}
-		
+
 				this.info("custNo = " + custNo);
 				this.info("tmplLoanBorMain SIZE  = " + tmplLoanBorMain.size());
 				for (LoanBorMain tmpLoanBorMain : tmplLoanBorMain) {
 					checkfg = false;
 					// new TABLE
 					tCustMain = new CustMain();
-		
+
 					// 取額度主檔資料
 					tFacMain = sFacMainService.findById(new FacMainId(tmpLoanBorMain.getCustNo(), tmpLoanBorMain.getFacmNo()), titaVo);
 					if (tFacMain == null) {
@@ -169,10 +166,10 @@ public class L2903 extends TradeBuffer {
 					if (tCustMain == null) {
 						tCustMain = new CustMain();
 					}
-		
+
 					// new occurs
 					OccursList occurslist = new OccursList();
-		
+
 					occurslist.putParam("OOCustId", tmpCustMain.getCustId());
 					occurslist.putParam("OOCustName", tmpCustMain.getCustName());
 					occurslist.putParam("OOApplNo", tFacMain.getApplNo());
@@ -182,19 +179,19 @@ public class L2903 extends TradeBuffer {
 					occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());
 					occurslist.putParam("OORate", tmpLoanBorMain.getApproveRate());
 					occurslist.putParam("OOLoanBal", tmpLoanBorMain.getLoanBal());
-		
+
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occurslist);
 				} // for
-					
+
 			} // for
-			
+
 		} else {
-			
+
 			tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-			
+
 			int tCustNo = tCustMain.getCustNo();
-						
+
 			try {
 				// *** 折返控制相關 ***
 				resultList = sL2903ServiceImpl.findAll(tCustNo, this.index, this.limit, titaVo);
@@ -203,42 +200,41 @@ public class L2903 extends TradeBuffer {
 				throw new LogicException("E0013", "L2903");
 
 			}
-			
-			
-			for(Map<String, String> result : resultList) {
-				if(!temp.contains(result.get("F2"))) {
+
+			for (Map<String, String> result : resultList) {
+				if (!temp.contains(result.get("F2"))) {
 					temp.add(result.get("F2"));
-				}	
+				}
 			}
-			
+
 			for (String result : temp) {
 				String ReltUKey = result;
 				CustMain tmpCustMain = sCustMainService.findById(ReltUKey, titaVo);
 				if (tmpCustMain == null) {
 					continue;
 				} // if
-				
+
 				// 存在檢查放款主檔
 				int custNo = tmpCustMain.getCustNo();
-	
+
 				if (custNo > 0) {
 					// 取放款主檔所有該戶號資料
 					Slice<LoanBorMain> stmplLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
 					tmplLoanBorMain = stmplLoanBorMain == null ? null : stmplLoanBorMain.getContent();
 				}
-	
+
 				// 查無資料拋錯
 				if (tmplLoanBorMain == null || custNo == 0) {
 					continue;
 				}
-	
+
 				this.info("custNo = " + custNo);
 				this.info("tmplLoanBorMain SIZE  = " + tmplLoanBorMain.size());
 				for (LoanBorMain tmpLoanBorMain : tmplLoanBorMain) {
 					// new TABLE
 					checkfg = false;
 					tCustMain = new CustMain();
-	
+
 					// 取額度主檔資料
 					tFacMain = sFacMainService.findById(new FacMainId(tmpLoanBorMain.getCustNo(), tmpLoanBorMain.getFacmNo()), titaVo);
 					if (tFacMain == null) {
@@ -249,10 +245,10 @@ public class L2903 extends TradeBuffer {
 					if (tCustMain == null) {
 						tCustMain = new CustMain();
 					}
-	
+
 					// new occurs
 					OccursList occurslist = new OccursList();
-	
+
 					occurslist.putParam("OOCustId", tmpCustMain.getCustId());
 					occurslist.putParam("OOCustName", tmpCustMain.getCustName());
 					occurslist.putParam("OOApplNo", tFacMain.getApplNo());
@@ -262,19 +258,18 @@ public class L2903 extends TradeBuffer {
 					occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());
 					occurslist.putParam("OORate", tmpLoanBorMain.getApproveRate());
 					occurslist.putParam("OOLoanBal", tmpLoanBorMain.getLoanBal());
-	
+
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occurslist);
 				} // for
-				
+
 			} // for
-		} // else 
-		
-		if(checkfg) {
+		} // else
+
+		if (checkfg) {
 			throw new LogicException("E0001", "放款主檔");
 		}
-		
-		
+
 //		if ("".equals(iCustId)) {
 //
 //			tReltMain = sReltMainService.reltnameFirst(iCustName, titaVo);

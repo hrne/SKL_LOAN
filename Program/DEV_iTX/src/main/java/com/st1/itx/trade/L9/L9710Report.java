@@ -111,17 +111,16 @@ public class L9710Report extends MakeReport {
 		List<Map<String, String>> l9710List = null;
 
 		try {
-			
+
 			l9710List = l9710ServiceImpl.findAll(titaVo);
-			
+
 		} catch (Exception e) {
-			
+
 			this.info("L9710ServiceImpl.LoanBorTx error = " + e.toString());
-		
+
 		}
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "寬限到期明細表", "", "A4", "L");
-
 
 		if (l9710List != null && l9710List.size() != 0) {
 
@@ -154,7 +153,7 @@ public class L9710Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 		return l9710List;
 
 	}

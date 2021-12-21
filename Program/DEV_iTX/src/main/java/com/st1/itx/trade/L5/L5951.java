@@ -62,8 +62,7 @@ public class L5951 extends TradeBuffer {
 
 		this.limit = iMaxDataRow;
 
-		List<String[]> dataL5951 = l5951ServiceImpl.findData(iWorkMonthFm, iWorkMonthTo, iSumByFacm, this.index,
-				this.limit, titaVo);
+		List<String[]> dataL5951 = l5951ServiceImpl.findData(iWorkMonthFm, iWorkMonthTo, iSumByFacm, this.index, this.limit, titaVo);
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (dataL5951 != null && dataL5951.size() == this.limit) {
@@ -148,7 +147,8 @@ public class L5951 extends TradeBuffer {
 			occursList1.putParam("OOPerfAmt", OOPerfAmt);// 已用額度
 			occursList1.putParam("OOWorkMonth", OOWorkMonth);// 工作月
 			occursList1.putParam("OOPerfDate", OOPerfDate);// 業績日期
-			String OOReMark =  "1".equals(renewFlag) ? "展期" : ("2".equals(renewFlag) ? "借新還舊" : "");;
+			String OOReMark = "1".equals(renewFlag) ? "展期" : ("2".equals(renewFlag) ? "借新還舊" : "");
+			;
 			occursList1.putParam("OOReMark", OOReMark);// 備註
 
 			this.totaVo.addOccursList(occursList1);

@@ -334,25 +334,23 @@ public class AcNegCom extends TradeBuffer {
 	 * @return TempVo
 	 * @throws LogicException LogicException
 	 */
-	public List<AcDetail> getNegAppr02CustNo(int entryDate, BigDecimal txAmt, int custNo, TitaVo titaVo)
-			throws LogicException {
+	public List<AcDetail> getNegAppr02CustNo(int entryDate, BigDecimal txAmt, int custNo, TitaVo titaVo) throws LogicException {
 		this.info("NegAppr02 entryDate=" + entryDate + ", txAmt=" + txAmt);
 		BigDecimal appr02Amt = BigDecimal.ZERO;
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		TempVo tTempVo = new TempVo();
 		// NegAppr02一般債權撥付資料檔，提兌日 = 入帳日，金額相同，會計日=0，檢核成功
-		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 		if (slNegAppr02 != null) {
 			for (NegAppr02 tNegAppr02 : slNegAppr02.getContent()) {
-				if ( tNegAppr02.getAcDate() == 0 && ("4001".equals(tNegAppr02.getStatusCode()))) {//須為檢核成功之資料才累加
+				if (tNegAppr02.getAcDate() == 0 && ("4001".equals(tNegAppr02.getStatusCode()))) {// 須為檢核成功之資料才累加
 					appr02Amt = appr02Amt.add(tNegAppr02.getTxAmt());
 				}
 			}
-			this.info("NegAppr02 txAmt="+txAmt +",appr02Amt="+appr02Amt);
+			this.info("NegAppr02 txAmt=" + txAmt + ",appr02Amt=" + appr02Amt);
 			if (appr02Amt.compareTo(txAmt) == 0) {
 				for (NegAppr02 tNegAppr02 : slNegAppr02.getContent()) {
-					if ( tNegAppr02.getAcDate() == 0 && "4001".equals(tNegAppr02.getStatusCode())) {
+					if (tNegAppr02.getAcDate() == 0 && "4001".equals(tNegAppr02.getStatusCode())) {
 						AcDetail acDetail = new AcDetail();
 						acDetail.setDbCr("C");
 						acDetail.setSumNo("094"); // 094 :轉債協暫收款

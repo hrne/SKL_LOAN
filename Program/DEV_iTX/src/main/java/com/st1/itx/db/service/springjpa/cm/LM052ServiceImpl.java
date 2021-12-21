@@ -72,7 +72,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		this.info("diff=" + diff);
 		calendar.add(Calendar.DATE, diff);
-		//矯正月底日
+		// 矯正月底日
 		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
 		// 確認是否為1月

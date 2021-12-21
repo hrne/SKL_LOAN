@@ -36,7 +36,6 @@ public class LD003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		logger.info("LD003.findAll ");
 		int entdy = titaVo.getEntDyI() + 19110000;
 
-
 //		目前AcSubBookCode只有分一般帳戶(00A)和利變A(201)?
 		String sql = " ";
 		sql += " SELECT S.\"ColCount\"";
@@ -102,7 +101,7 @@ public class LD003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		logger.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
+
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("entdy", entdy);
@@ -110,7 +109,6 @@ public class LD003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 }
-
 
 //String sql = "SELECT F1"; // 開頭查詢所有表格
 //sql += "            ,F2";

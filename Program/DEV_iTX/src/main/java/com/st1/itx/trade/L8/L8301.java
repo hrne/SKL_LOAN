@@ -158,11 +158,9 @@ public class L8301 extends TradeBuffer {
 							}
 							if (flagFind == 0) {
 								if ("A".equals(iTranKey)) {
-									throw new LogicException(titaVo, "E0005",
-											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+									throw new LogicException(titaVo, "E0005", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
 								} else {
-									throw new LogicException(titaVo, "E0007",
-											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+									throw new LogicException(titaVo, "E0007", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
 								}
 							}
 						}

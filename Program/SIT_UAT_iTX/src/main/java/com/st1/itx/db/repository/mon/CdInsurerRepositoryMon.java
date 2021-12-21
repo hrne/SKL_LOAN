@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,16 @@ import com.st1.itx.db.domain.CdInsurerId;
  */
 public interface CdInsurerRepositoryMon extends JpaRepository<CdInsurer, CdInsurerId> {
 
-  // InsurerItem %
-  public Slice<CdInsurer> findAllByInsurerItemLike(String insurerItem_0, Pageable pageable);
+	// InsurerItem %
+	public Slice<CdInsurer> findAllByInsurerItemLike(String insurerItem_0, Pageable pageable);
 
-  // InsurerType >= ,AND InsurerType <= ,AND InsurerCode >= ,AND InsurerCode <= 
-  public Slice<CdInsurer> findAllByInsurerTypeGreaterThanEqualAndInsurerTypeLessThanEqualAndInsurerCodeGreaterThanEqualAndInsurerCodeLessThanEqualOrderByInsurerTypeAscInsurerCodeAsc(String insurerType_0, String insurerType_1, String insurerCode_2, String insurerCode_3, Pageable pageable);
+	// InsurerType >= ,AND InsurerType <= ,AND InsurerCode >= ,AND InsurerCode <=
+	public Slice<CdInsurer> findAllByInsurerTypeGreaterThanEqualAndInsurerTypeLessThanEqualAndInsurerCodeGreaterThanEqualAndInsurerCodeLessThanEqualOrderByInsurerTypeAscInsurerCodeAsc(
+			String insurerType_0, String insurerType_1, String insurerCode_2, String insurerCode_3, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdInsurer> findByCdInsurerId(CdInsurerId cdInsurerId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdInsurer> findByCdInsurerId(CdInsurerId cdInsurerId);
 
 }
-

@@ -22,7 +22,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -37,11 +37,11 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,C.\"AcNoItem\"";
 		sql += "            ,A.\"AcDate\"";
 		sql += "            ,SUM(CASE WHEN A.\"DbCr\" = 'C' ";
-		sql += "                      THEN A.\"TxAmt\" "; 
+		sql += "                      THEN A.\"TxAmt\" ";
 		sql += "                 ELSE - A.\"TxAmt\" END";
 		sql += "                 + CASE WHEN A.\"DbCr\" = 'C' ";
 		sql += "                        THEN NVL(-TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) ";
-		sql += "                   ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END "; 
+		sql += "                   ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END ";
 		sql += "                ) AS \"TxAmt\" ";
 		sql += "      FROM \"AcDetail\" A";
 		sql += "      LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = A.\"AcNoCode\"";
@@ -80,11 +80,11 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      FROM (SELECT A.\"AcNoCode\"";
 		sql += "                  ,A.\"AcDate\"";
 		sql += "                  ,SUM(CASE WHEN A.\"DbCr\" = 'C' ";
-		sql += "                            THEN A.\"TxAmt\" "; 
+		sql += "                            THEN A.\"TxAmt\" ";
 		sql += "                       ELSE - A.\"TxAmt\" END";
 		sql += "                       + CASE WHEN A.\"DbCr\" = 'C' ";
 		sql += "                              THEN NVL(-TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) ";
-		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END "; 
+		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END ";
 		sql += "                      ) AS \"TxAmt\" ";
 		sql += "            FROM \"AcDetail\" A";
 		sql += "            WHERE A.\"AcNoCode\" IN ('40241100000'";
@@ -134,11 +134,11 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      FROM (SELECT A.\"AcNoCode\" AS \"F1\"";
 		sql += "                  ,C.\"AcNoItem\" AS \"F2\"";
 		sql += "                  ,SUM(CASE WHEN A.\"DbCr\" = 'C' ";
-		sql += "                            THEN A.\"TxAmt\" "; 
+		sql += "                            THEN A.\"TxAmt\" ";
 		sql += "                       ELSE - A.\"TxAmt\" END";
 		sql += "                       + CASE WHEN A.\"DbCr\" = 'C' ";
 		sql += "                              THEN NVL(-TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) ";
-		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END "; 
+		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END ";
 		sql += "                      ) AS \"F3\" ";
 		sql += "                  ,0 \"F4\"";
 		sql += "                  ,0 AS \"F5\"";
@@ -172,11 +172,11 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            FROM (SELECT A.\"AcNoCode\"";
 		sql += "                        ,A.\"AcDate\"";
 		sql += "                  ,SUM(CASE WHEN A.\"DbCr\" = 'C' ";
-		sql += "                            THEN A.\"TxAmt\" "; 
+		sql += "                            THEN A.\"TxAmt\" ";
 		sql += "                       ELSE - A.\"TxAmt\" END";
 		sql += "                       + CASE WHEN A.\"DbCr\" = 'C' ";
 		sql += "                              THEN NVL(-TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) ";
-		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END "; 
+		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END ";
 		sql += "                      ) AS \"TxAmt\" ";
 		sql += "                  FROM \"AcDetail\" A";
 		sql += "                  WHERE A.\"AcNoCode\" IN ('40241100000'";
@@ -203,11 +203,11 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,0 AS \"F4\"";
 		sql += "                  ,0 AS \"F5\"";
 		sql += "                  ,SUM(CASE WHEN A.\"DbCr\" = 'C' ";
-		sql += "                            THEN A.\"TxAmt\" "; 
+		sql += "                            THEN A.\"TxAmt\" ";
 		sql += "                       ELSE - A.\"TxAmt\" END";
 		sql += "                       + CASE WHEN A.\"DbCr\" = 'C' ";
 		sql += "                              THEN NVL(-TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) ";
-		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END "; 
+		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END ";
 		sql += "                      ) AS \"F6\" ";
 		sql += "                  ,0 AS \"F7\"";
 		sql += "            FROM \"AcDetail\" A";
@@ -234,11 +234,11 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,0 AS \"F5\"";
 		sql += "                  ,0 AS \"F6\"";
 		sql += "                  ,SUM(CASE WHEN A.\"DbCr\" = 'C' ";
-		sql += "                            THEN A.\"TxAmt\" "; 
+		sql += "                            THEN A.\"TxAmt\" ";
 		sql += "                       ELSE - A.\"TxAmt\" END";
 		sql += "                       + CASE WHEN A.\"DbCr\" = 'C' ";
 		sql += "                              THEN NVL(-TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) ";
-		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END "; 
+		sql += "                         ELSE NVL(TO_NUMBER(JSON_VALUE(A.\"JsonFields\", '$.StampTaxFreeAmt')), 0) END ";
 		sql += "                      ) AS \"F7\" ";
 		sql += "            FROM \"AcDetail\" A";
 		sql += "            LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = A.\"AcNoCode\"";

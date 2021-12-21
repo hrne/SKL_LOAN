@@ -48,8 +48,7 @@ public class L9727p extends TradeBuffer {
 		boolean isFinish = l9727Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					txcd + txname + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), txcd + txname + "已完成", titaVo);
 		}
 
 		this.addList(this.totaVo);

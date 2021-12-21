@@ -71,7 +71,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (txDate1 > 0) {
 			sql += "WHERE A.\"TxDate\" >= :TxDate1 AND A.\"TxDate\" <= :TxDate2 ";
 		} else {
-			sql += "WHERE A.\"LastUpdate\" >= to_date(:TrDate1,'yyyymmdd hh24:mi:ss') AND A.\"LastUpdate\" <= to_date(:TrDate2,'yyyymmdd hh24:mi:ss') ";		
+			sql += "WHERE A.\"LastUpdate\" >= to_date(:TrDate1,'yyyymmdd hh24:mi:ss') AND A.\"LastUpdate\" <= to_date(:TrDate2,'yyyymmdd hh24:mi:ss') ";
 		}
 		if (CustNo > 0) {
 			sql += "AND A.\"CustNo\" = :CustNo ";
@@ -90,13 +90,12 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (!"".equals(TranNo)) {
 			sql += "AND A.\"TranNo\" = :TranNo ";
 		}
-		
+
 		if (!"".equals(iMrKey)) {
 			sql += "AND A.\"MrKey\" = :Mrkey ";
 		}
-		
-		sql += "ORDER BY A.\"LastUpdate\" DESC ";
 
+		sql += "ORDER BY A.\"LastUpdate\" DESC ";
 
 		sql += sqlRow;
 
@@ -142,7 +141,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (!"".equals(TranNo)) {
 			query.setParameter("TranNo", TranNo);
 		}
-		
+
 		if (!"".equals(iMrKey)) {
 			query.setParameter("Mrkey", iMrKey);
 		}

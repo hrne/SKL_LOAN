@@ -23,7 +23,7 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -32,7 +32,7 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> doQuery(TitaVo titaVo) throws Exception {
-		
+
 		this.info("LM003ServiceImpl doQuery()");
 		this.info("inputDateStart - inputDateEnd:");
 		this.info(titaVo.getParam("inputDateStart") + " - " + titaVo.getParam("inputDateEnd"));

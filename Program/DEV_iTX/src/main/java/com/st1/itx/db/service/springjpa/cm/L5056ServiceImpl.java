@@ -50,11 +50,9 @@ public class L5056ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "SELECT A.\"LogNo\",A.\"CustNo\",A.\"FacmNo\",A.\"BormNo\",A.\"SumAmt\",A.\"SumCnt\""
 				+ ",DECODE(A.\"WorkMonth\",0,0,A.\"WorkMonth\"-191100) AS YM,A.\"CreateDate\",A.\"CreateEmpNo\",A.\"LastUpdate\",A.\"LastUpdateEmpNo\""
-				+ ",B.\"CustName\",C.\"Fullname\" AS \"CreateEmpName\",D.\"Fullname\" AS \"LastUpdateEmpName\" "
-				+ "FROM \"PfIntranetAdjust\" A "
-				+ "LEFT JOIN \"CustMain\" B ON B.\"CustNo\" = A.\"CustNo\" "
-		        + "LEFT JOIN \"CdEmp\" C ON C.\"EmployeeNo\" = A.\"CreateEmpNo\" "
-		        + "LEFT JOIN \"CdEmp\" D ON D.\"EmployeeNo\" = A.\"LastUpdateEmpNo\" "; 
+				+ ",B.\"CustName\",C.\"Fullname\" AS \"CreateEmpName\",D.\"Fullname\" AS \"LastUpdateEmpName\" " + "FROM \"PfIntranetAdjust\" A "
+				+ "LEFT JOIN \"CustMain\" B ON B.\"CustNo\" = A.\"CustNo\" " + "LEFT JOIN \"CdEmp\" C ON C.\"EmployeeNo\" = A.\"CreateEmpNo\" "
+				+ "LEFT JOIN \"CdEmp\" D ON D.\"EmployeeNo\" = A.\"LastUpdateEmpNo\" ";
 
 		// 1:業績日期
 		sql += "WHERE \"LogNo\" > 0 ";

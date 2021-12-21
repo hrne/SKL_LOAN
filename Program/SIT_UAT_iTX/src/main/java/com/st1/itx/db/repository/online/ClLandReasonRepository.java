@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.ClLandReasonId;
  */
 public interface ClLandReasonRepository extends JpaRepository<ClLandReason, ClLandReasonId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Optional<ClLandReason> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscReasonSeqDesc(int clCode1_0, int clCode2_1, int clNo_2);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Optional<ClLandReason> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscReasonSeqDesc(int clCode1_0, int clCode2_1, int clNo_2);
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClLandReason> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscReasonSeqAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Slice<ClLandReason> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscReasonSeqAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClLandReason> findByClLandReasonId(ClLandReasonId clLandReasonId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClLandReason> findByClLandReasonId(ClLandReasonId clLandReasonId);
 
 }
-

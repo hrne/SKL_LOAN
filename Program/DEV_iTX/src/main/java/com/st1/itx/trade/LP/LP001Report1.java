@@ -17,7 +17,8 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LP001Report1 extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LP001Report1.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LP001Report1.class);
 
 	@Autowired
 	public LP001ServiceImpl LP001ServiceImpl;

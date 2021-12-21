@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.FacShareMainId;
  */
 public interface FacShareMainRepository extends JpaRepository<FacShareMain, FacShareMainId> {
 
-  // CreditSysNo = 
-  public Slice<FacShareMain> findAllByCreditSysNoIsOrderByCustNoAsc(int creditSysNo_0, Pageable pageable);
+	// CreditSysNo =
+	public Slice<FacShareMain> findAllByCreditSysNoIsOrderByCustNoAsc(int creditSysNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacShareMain> findByFacShareMainId(FacShareMainId facShareMainId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacShareMain> findByFacShareMainId(FacShareMainId facShareMainId);
 
 }
-

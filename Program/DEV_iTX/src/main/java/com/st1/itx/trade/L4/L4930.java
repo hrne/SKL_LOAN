@@ -78,21 +78,17 @@ public class L4930 extends TradeBuffer {
 
 		if (iFunctionCode == 2) {
 			if (iCustNo > 0) {
-				sBatxDetail = batxDetailService.findL4930CAEq(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit,
-						titaVo);
+				sBatxDetail = batxDetailService.findL4930CAEq(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit, titaVo);
 			} else if (!"".equals(iReconCode)) {
-				sBatxDetail = batxDetailService.findL4930RAEq(iAcDate, iBatchNo, iReconCode, func2, this.index,
-						this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930RAEq(iAcDate, iBatchNo, iReconCode, func2, this.index, this.limit, titaVo);
 			} else {
 				sBatxDetail = batxDetailService.findL4930BAEq(iAcDate, iBatchNo, func2, this.index, this.limit, titaVo);
 			}
 		} else if (iFunctionCode == 1) {
 			if (iCustNo > 0) {
-				sBatxDetail = batxDetailService.findL4930CHEq(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit,
-						titaVo);
+				sBatxDetail = batxDetailService.findL4930CHEq(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit, titaVo);
 			} else if (!"".equals(iReconCode)) {
-				sBatxDetail = batxDetailService.findL4930RHEq(iAcDate, iBatchNo, iReconCode, func1, this.index,
-						this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930RHEq(iAcDate, iBatchNo, iReconCode, func1, this.index, this.limit, titaVo);
 			} else {
 				sBatxDetail = batxDetailService.findL4930BHEq(iAcDate, iBatchNo, func1, this.index, this.limit, titaVo);
 			}
@@ -148,8 +144,7 @@ public class L4930 extends TradeBuffer {
 					}
 //					當吃檔進去時不會寫入還款類別，檢核後才會寫入。
 //					若該筆無還款類別且為數字型態，顯示虛擬帳號
-					if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0
-							&& isNumeric(tempVo.get("VirtualAcctNo"))) {
+					if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0 && isNumeric(tempVo.get("VirtualAcctNo"))) {
 						procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
 					}
 				}
@@ -159,8 +154,7 @@ public class L4930 extends TradeBuffer {
 				if ("".equals(tBatxDetail.getTitaTxtNo())) {
 					occursList.putParam("OOTxSn", "");
 				} else {
-					occursList.putParam("OOTxSn",
-							titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
+					occursList.putParam("OOTxSn", titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
 				}
 
 				this.totaVo.addOccursList(occursList);

@@ -125,8 +125,7 @@ public class L3916 extends TradeBuffer {
 		if (tLoanBorMain == null) {
 			throw new LogicException(titaVo, "E0001", "放款主檔  借款人戶號 = " + wkCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + iBormNo); // 查詢資料不存在
 		}
-		LoanRateChange tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(wkCustNo, iFacmNo, iBormNo,
-				titaVo.getEntDyI() + 19110000, titaVo);
+		LoanRateChange tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(wkCustNo, iFacmNo, iBormNo, titaVo.getEntDyI() + 19110000, titaVo);
 		if (tLoanRateChange == null) {
 			throw new LogicException(titaVo, "E0001", "放款利率變動檔  借款人戶號 = " + wkCustNo + "-" + iFacmNo + "-" + iBormNo); // 查詢資料不存在
 		}

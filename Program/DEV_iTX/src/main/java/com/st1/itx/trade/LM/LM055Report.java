@@ -96,8 +96,7 @@ public class LM055Report extends MakeReport {
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表",
-				"LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表", "LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
 
 		makeExcel.setValue(2, 3, iYear * 100 + iMonth);
 
@@ -115,7 +114,7 @@ public class LM055Report extends MakeReport {
 		exportExcel(fnAllList);
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 
 	}
 
@@ -154,9 +153,7 @@ public class LM055Report extends MakeReport {
 
 				// 依放款種類 區分列數
 				// (自訂 FIVE=五類資產、AL=備呆子目)
-				row = lM055Vo.get("F1").equals("C") ? 10
-						: (lM055Vo.get("F1").equals("D") ? 11
-								: (lM055Vo.get("F1").equals("FIVE") || lM055Vo.get("F1").equals("AL") ? 16 : 12));
+				row = lM055Vo.get("F1").equals("C") ? 10 : (lM055Vo.get("F1").equals("D") ? 11 : (lM055Vo.get("F1").equals("FIVE") || lM055Vo.get("F1").equals("AL") ? 16 : 12));
 
 				// 放款金額
 				if (!lM055Vo.get("F0").equals("99")) {
@@ -173,8 +170,7 @@ public class LM055Report extends MakeReport {
 
 				} else if (lM055Vo.get("F0").equals("99")) {
 
-					specificAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO
-							: new BigDecimal(lM055Vo.get("F3"));
+					specificAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
 
 					allowAmount = specificAmount.add(normalAmount);
 

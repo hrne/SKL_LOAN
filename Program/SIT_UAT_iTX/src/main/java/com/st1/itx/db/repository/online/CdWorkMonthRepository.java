@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,16 @@ import com.st1.itx.db.domain.CdWorkMonthId;
  */
 public interface CdWorkMonthRepository extends JpaRepository<CdWorkMonth, CdWorkMonthId> {
 
-  // Year >= ,AND Year <= ,AND Month >= ,AND Month <= 
-  public Slice<CdWorkMonth> findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(int year_0, int year_1, int month_2, int month_3, Pageable pageable);
+	// Year >= ,AND Year <= ,AND Month >= ,AND Month <=
+	public Slice<CdWorkMonth> findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(int year_0, int year_1, int month_2, int month_3,
+			Pageable pageable);
 
-  // StartDate <= ,AND EndDate >= 
-  public Optional<CdWorkMonth> findTopByStartDateLessThanEqualAndEndDateGreaterThanEqual(int startDate_0, int endDate_1);
+	// StartDate <= ,AND EndDate >=
+	public Optional<CdWorkMonth> findTopByStartDateLessThanEqualAndEndDateGreaterThanEqual(int startDate_0, int endDate_1);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdWorkMonth> findByCdWorkMonthId(CdWorkMonthId cdWorkMonthId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdWorkMonth> findByCdWorkMonthId(CdWorkMonthId cdWorkMonthId);
 
 }
-

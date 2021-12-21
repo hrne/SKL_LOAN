@@ -35,8 +35,7 @@ public class LM070Report extends MakeReport {
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LM070Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM070", "介紹人加碼獎勵津貼明細", "LM070介紹人加碼獎勵津貼明細",
-				"LM070_底稿_介紹人加碼獎勵津貼明細.xlsx", "Q2573_13");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM070", "介紹人加碼獎勵津貼明細", "LM070介紹人加碼獎勵津貼明細", "LM070_底稿_介紹人加碼獎勵津貼明細.xlsx", "Q2573_13");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
@@ -91,7 +90,7 @@ public class LM070Report extends MakeReport {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 
 		if (fnAllList.size() > 0) {
 			return true;

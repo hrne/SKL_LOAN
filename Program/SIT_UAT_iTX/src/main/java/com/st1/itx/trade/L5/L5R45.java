@@ -64,8 +64,7 @@ public class L5R45 extends TradeBuffer {
 			int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo").trim());
 			int iBormNo = Integer.valueOf(titaVo.getParam("BormNo").trim());
 
-			Slice<PfDetail> slPfDetail = pfDetailService.FindByBormNo(iCustNo, iFacmNo, iBormNo, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<PfDetail> slPfDetail = pfDetailService.FindByBormNo(iCustNo, iFacmNo, iBormNo, 0, Integer.MAX_VALUE, titaVo);
 			List<PfDetail> lPfDetail = slPfDetail == null ? null : slPfDetail.getContent();
 			if (lPfDetail != null && lPfDetail.size() > 0) {
 				for (PfDetail pfDetail : lPfDetail) {
@@ -76,7 +75,7 @@ public class L5R45 extends TradeBuffer {
 						this.totaVo.putParam("CustNo", pfDetail.getCustNo());
 						this.totaVo.putParam("FacmNo", pfDetail.getFacmNo());
 						this.totaVo.putParam("BormNo", pfDetail.getBormNo());
-						
+
 						CustMain custMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 
 						if (custMain == null) {
@@ -161,17 +160,17 @@ public class L5R45 extends TradeBuffer {
 					}
 				}
 			}
-			
+
 			if (!found) {
 				throw new LogicException("E0001", "業績資料");
 			}
-			
+
 			PfIntranetAdjust pfIntranetAdjust = pfIntranetAdjustService.findByBormFirst(iCustNo, iFacmNo, iBormNo, titaVo);
-			
+
 			if (pfIntranetAdjust != null) {
 				throw new LogicException("E0002", "業績資料");
 			}
-			
+
 		} else {
 			long iLogNo = Long.valueOf(titaVo.getParam("LogNo").trim());
 
@@ -180,11 +179,11 @@ public class L5R45 extends TradeBuffer {
 			if (pfIntranetAdjust == null) {
 				throw new LogicException(titaVo, "E0001", "");
 			}
-			
+
 			this.totaVo.putParam("CustNo", pfIntranetAdjust.getCustNo());
 			this.totaVo.putParam("FacmNo", pfIntranetAdjust.getFacmNo());
 			this.totaVo.putParam("BormNo", pfIntranetAdjust.getBormNo());
-			
+
 			CustMain custMain = custMainService.custNoFirst(pfIntranetAdjust.getCustNo(), pfIntranetAdjust.getCustNo(), titaVo);
 
 			if (custMain == null) {
@@ -275,7 +274,7 @@ public class L5R45 extends TradeBuffer {
 			}
 			this.totaVo.putParam("SumAmtSign", signAmt);
 			this.totaVo.putParam("SumAmt", sumAmt);
-			
+
 			BigDecimal SumCnt = pfIntranetAdjust.getSumCnt();
 			String signCnt = "";
 			if (pfIntranetAdjust.getSumCnt().compareTo(bigZero) > 0) {

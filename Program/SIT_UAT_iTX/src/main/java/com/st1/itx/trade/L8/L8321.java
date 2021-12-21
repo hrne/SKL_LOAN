@@ -67,7 +67,6 @@ public class L8321 extends TradeBuffer {
 		String iClosedResult = titaVo.getParam("ClosedResult");
 		String iKey = "";
 
-
 		// JcicZ063, JcicZ062
 		JcicZ063 iJcicZ063 = new JcicZ063();
 		JcicZ063Id iJcicZ063Id = new JcicZ063Id();
@@ -87,8 +86,8 @@ public class L8321 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.2 KEY值為IDN+報送單位wakg+dr前置協商申請日+申請變更還款條件日.***J
 
-			// 1.3  同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日，也不可晚於本檔案資料報送日期--->(前端檢核)
-			
+			// 1.3 同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日，也不可晚於本檔案資料報送日期--->(前端檢核)
+
 			// 1.4 報送本結案檔案後，同一KEY值不可再報送相關檔案之異動.***J
 
 			// 1.5 start 第9欄「結案原因」為'C'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須有值.

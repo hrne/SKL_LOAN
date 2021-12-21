@@ -134,7 +134,7 @@ public class L2041 extends TradeBuffer {
 			String areaCode = parse.IntegerToString(parse.stringToInteger(tClLand2.getAreaCode()), 2);
 			/* table-參數3:AreaCode */
 			String Land = parse.IntegerToString(parse.stringToInteger(tClLand2.getIrCode()), 4);
-			
+
 			// new PK
 			CdLandSectionId CdLandSectionId = new CdLandSectionId();
 			CdLandSectionId.setCityCode(cityCode);
@@ -151,7 +151,6 @@ public class L2041 extends TradeBuffer {
 
 			/* 取行政區名稱 */
 
-
 			CdArea tCdArea = cdAreaService.findById(new CdAreaId(cityCode, areaCode), titaVo);
 			String wkCdArea = "";
 			if (tCdArea != null) {
@@ -163,11 +162,10 @@ public class L2041 extends TradeBuffer {
 
 			String wkIrItem = "";
 			if (tCdLandSection != null) {
-				wkIrItem =   tCdLandSection.getIrItem();
+				wkIrItem = tCdLandSection.getIrItem();
 			}
 			this.info("L2041 tCdLandSection " + tCdLandSection);
 
-			
 			// new occurs
 			OccursList occurslist = new OccursList();
 

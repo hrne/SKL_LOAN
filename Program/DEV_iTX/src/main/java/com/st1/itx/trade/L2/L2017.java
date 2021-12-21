@@ -168,11 +168,9 @@ public class L2017 extends TradeBuffer {
 		Slice<ClFac> slClFac = null;
 		// 處理邏輯 二擇一輸入
 		if (iCustNo != 0) {
-			slClFac = sClFacService.selectForL2017CustNo(iCustNo, iFacmNoStartAt, iFacmNoEndAt, this.index, this.limit,
-					titaVo);
+			slClFac = sClFacService.selectForL2017CustNo(iCustNo, iFacmNoStartAt, iFacmNoEndAt, this.index, this.limit, titaVo);
 		} else if (iClCode1 != 0 || iClCode2 != 0 || iClNo != 0) {
-			slClFac = sClFacService.selectForL2049(ClCode1St, ClCode1Ed, ClCode2St, ClCode2Ed, ClNoSt, ClNoEd, 0,
-					9999999, 0, 999, 0, 9999999, this.index, this.limit, titaVo);
+			slClFac = sClFacService.selectForL2049(ClCode1St, ClCode1Ed, ClCode2St, ClCode2Ed, ClNoSt, ClNoEd, 0, 9999999, 0, 999, 0, 9999999, this.index, this.limit, titaVo);
 		} else {
 			slClFac = sClFacService.findAll(this.index, this.limit, titaVo);
 		}
@@ -224,14 +222,12 @@ public class L2017 extends TradeBuffer {
 			}
 
 			// 取鑑價總值
-			tClMain = sClMainService
-					.findById(new ClMainId(tmpClFac.getClCode1(), tmpClFac.getClCode2(), tmpClFac.getClNo()), titaVo);
+			tClMain = sClMainService.findById(new ClMainId(tmpClFac.getClCode1(), tmpClFac.getClCode2(), tmpClFac.getClNo()), titaVo);
 			if (tClMain == null) {
 				tClMain = new ClMain();
 			}
 			// 取保險單號碼初保檔
-			tInsuOrignal = sInsuOrignalService.clNoFirst(tmpClFac.getClCode1(), tmpClFac.getClCode2(),
-					tmpClFac.getClNo(), titaVo);
+			tInsuOrignal = sInsuOrignalService.clNoFirst(tmpClFac.getClCode1(), tmpClFac.getClCode2(), tmpClFac.getClNo(), titaVo);
 			if (tInsuOrignal == null) {
 				tInsuOrignal = new InsuOrignal();
 			}
@@ -255,12 +251,10 @@ public class L2017 extends TradeBuffer {
 			int loanStatus = 99;
 			String loanStatusX = "";
 
-			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(thisCustNo, thisFacmNo, thisFacmNo, 0,
-					900, 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(thisCustNo, thisFacmNo, thisFacmNo, 0, 900, 0, Integer.MAX_VALUE, titaVo);
 
 			if (slLoanBorMain != null) {
-				loanStatus = facStatusCom.settingStatus(slLoanBorMain.getContent(),
-						this.txBuffer.getTxBizDate().getTbsDy());
+				loanStatus = facStatusCom.settingStatus(slLoanBorMain.getContent(), this.txBuffer.getTxBizDate().getTbsDy());
 				// 含結案為N時跳掉結案戶
 				if (iSearchClsFg.equals("N")) {
 					if (loanStatus == 1 || loanStatus == 3 || loanStatus == 8 || loanStatus == 9) {
@@ -281,7 +275,7 @@ public class L2017 extends TradeBuffer {
 			if (loanStatus == 99) {
 				loanStatusX = "未撥款";
 			} else {
-				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("Status",parse.IntegerToString(loanStatus, 2)), titaVo);
+				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("Status", parse.IntegerToString(loanStatus, 2)), titaVo);
 				if (tCdCode != null) {
 					loanStatusX = tCdCode.getItem();
 				}
@@ -289,8 +283,7 @@ public class L2017 extends TradeBuffer {
 
 			// 同一擔保品編號只顯示第一筆
 			String wkOrigInsuNo = "";
-			if (wkClCode1 == tmpClFac.getClCode1() && wkClCode2 == tmpClFac.getClCode2()
-					&& wkClNo == tmpClFac.getClNo()) {
+			if (wkClCode1 == tmpClFac.getClCode1() && wkClCode2 == tmpClFac.getClCode2() && wkClNo == tmpClFac.getClNo()) {
 				wkOrigInsuNo = "";
 			} else {
 				wkOrigInsuNo = tInsuOrignal.getOrigInsuNo();
@@ -302,8 +295,7 @@ public class L2017 extends TradeBuffer {
 			// new occurs
 			OccursList occurslist = new OccursList();
 
-			String custNo = FormatUtil.pad9(String.valueOf(thisCustNo), 7) + "-"
-					+ FormatUtil.pad9(String.valueOf(thisFacmNo), 3);
+			String custNo = FormatUtil.pad9(String.valueOf(thisCustNo), 7) + "-" + FormatUtil.pad9(String.valueOf(thisFacmNo), 3);
 
 			occurslist.putParam("OOCustNo", custNo);
 			occurslist.putParam("OCustNo", thisCustNo);
@@ -311,9 +303,7 @@ public class L2017 extends TradeBuffer {
 
 			occurslist.putParam("OOCustName", tCustMain.getCustName());
 			occurslist.putParam("OOCreditSysNo", tFacCaseAppl.getCreditSysNo());
-			String clNo = String.valueOf(tmpClFac.getClCode1()) + "-"
-					+ FormatUtil.pad9(String.valueOf(tmpClFac.getClCode2()), 2) + "-"
-					+ FormatUtil.pad9(String.valueOf(tmpClFac.getClNo()), 7);
+			String clNo = String.valueOf(tmpClFac.getClCode1()) + "-" + FormatUtil.pad9(String.valueOf(tmpClFac.getClCode2()), 2) + "-" + FormatUtil.pad9(String.valueOf(tmpClFac.getClNo()), 7);
 
 			occurslist.putParam("OOClNo", clNo);
 			occurslist.putParam("OClCode1", tmpClFac.getClCode1());

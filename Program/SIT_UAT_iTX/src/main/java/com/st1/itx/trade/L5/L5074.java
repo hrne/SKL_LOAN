@@ -155,8 +155,8 @@ public class L5074 extends TradeBuffer {
 						throw new LogicException(titaVo, "E5004", "");
 					}
 					// 前日匯入(總筆數)-(未入帳,待處理)
-					//TodayWorkCnt = Data[0];// 筆數
-					//TodayWorkAmt = Data[1];// 金額
+					// TodayWorkCnt = Data[0];// 筆數
+					// TodayWorkAmt = Data[1];// 金額
 					TodayWorkCnt = "0";// 筆數
 					TodayWorkAmt = "0";// 金額
 

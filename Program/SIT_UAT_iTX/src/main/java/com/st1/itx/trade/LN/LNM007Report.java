@@ -118,25 +118,25 @@ public class LNM007Report extends MakeReport {
 
 			// 設定欄位寬度
 			if (LNList != null) {
-				makeExcel.setWidth(1,  9 );
-				makeExcel.setWidth(2,  12);
-				makeExcel.setWidth(3,  5 );
-				makeExcel.setWidth(4,  9 );
-				makeExcel.setWidth(5,  5 );
-				makeExcel.setWidth(6,  3 );
-				makeExcel.setWidth(7,  3 );
-				makeExcel.setWidth(8,  10);
-				makeExcel.setWidth(9,  3 );
-				makeExcel.setWidth(10, 3 );
-				makeExcel.setWidth(11, 3 );
-				makeExcel.setWidth(12, 3 );
-				makeExcel.setWidth(13, 5 );
-				makeExcel.setWidth(14, 3 );
-				makeExcel.setWidth(15, 3 );
-				makeExcel.setWidth(16, 3 );
-				makeExcel.setWidth(17, 3 );
-				makeExcel.setWidth(18, 3 );
-				makeExcel.setWidth(19, 3 );
+				makeExcel.setWidth(1, 9);
+				makeExcel.setWidth(2, 12);
+				makeExcel.setWidth(3, 5);
+				makeExcel.setWidth(4, 9);
+				makeExcel.setWidth(5, 5);
+				makeExcel.setWidth(6, 3);
+				makeExcel.setWidth(7, 3);
+				makeExcel.setWidth(8, 10);
+				makeExcel.setWidth(9, 3);
+				makeExcel.setWidth(10, 3);
+				makeExcel.setWidth(11, 3);
+				makeExcel.setWidth(12, 3);
+				makeExcel.setWidth(13, 5);
+				makeExcel.setWidth(14, 3);
+				makeExcel.setWidth(15, 3);
+				makeExcel.setWidth(16, 3);
+				makeExcel.setWidth(17, 3);
+				makeExcel.setWidth(18, 3);
+				makeExcel.setWidth(19, 3);
 			}
 
 			long sno = makeExcel.close();

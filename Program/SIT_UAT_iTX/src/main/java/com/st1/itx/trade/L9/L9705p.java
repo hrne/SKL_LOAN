@@ -36,7 +36,7 @@ public class L9705p extends TradeBuffer {
 
 	@Autowired
 	L9705Form l9705Form;
-	
+
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -60,9 +60,9 @@ public class L9705p extends TradeBuffer {
 		}
 		l9705Report.exec(l9705List, titaVo, txbuffer);
 
-		//by eric 2021.12.10
+		// by eric 2021.12.10
 		l9705Form.exec(l9705List, titaVo, txbuffer);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

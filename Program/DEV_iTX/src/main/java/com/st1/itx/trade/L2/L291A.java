@@ -81,8 +81,7 @@ public class L291A extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "共同借款人資料檔 核准號碼 = " + iApplNo); // 查詢資料不存在
 		}
 
-		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
 		List<FacShareAppl> lFacShareAppl = slFacShareAppl == null ? null : slFacShareAppl.getContent();
 
 		if (lFacShareAppl != null) {

@@ -84,8 +84,6 @@ public class LM023ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-
-
 		String sql = "SELECT CASE";
 		sql += "               WHEN T1.\"Year\" = :thisYear ";
 		sql += "               THEN 0";

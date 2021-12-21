@@ -35,7 +35,7 @@ public class L2980 extends TradeBuffer {
 
 	@Autowired
 	L2980Report l2980report;
-	
+
 	@Autowired
 	WebClient webClient;
 
@@ -50,16 +50,15 @@ public class L2980 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2980 ");
 		this.totaVo.init(titaVo);
-		
+
 		this.info("L2980 titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
-		
+
 		l2980report.setParentTranCode(parentTranCode);
 
-		l2980report.exec(titaVo,this.getTxBuffer());
+		l2980report.exec(titaVo, this.getTxBuffer());
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "L2980個人房貸調整案已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L2980個人房貸調整案已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

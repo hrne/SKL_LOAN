@@ -92,7 +92,7 @@ public class L5R19 extends TradeBuffer {
 			totaVo.putParam("L5R19ReMark", iCollMeet.getRemark());
 			String tU = iCollMeet.getLastUpdate().toString();
 			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
-			String uTime = tU.substring(11,13) + tU.substring(14,16);
+			String uTime = tU.substring(11, 13) + tU.substring(14, 16);
 			totaVo.putParam("L5R19EditDate", uDate);
 			totaVo.putParam("L5R19EditTime", uTime);
 		} else {

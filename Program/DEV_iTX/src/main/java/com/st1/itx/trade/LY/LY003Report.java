@@ -36,8 +36,7 @@ public class LY003Report extends MakeReport {
 
 		this.info("LY003.exportExcel active");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY003", "非RBC_表14-2_會計部年度檢查報表",
-				"LY003-非RBC_表14-2_會計部年度檢查報表", "LY003_底稿_非RBC_表14-2_會計部年度檢查報表.xlsx", "表14-2");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY003", "非RBC_表14-2_會計部年度檢查報表", "LY003-非RBC_表14-2_會計部年度檢查報表", "LY003_底稿_非RBC_表14-2_會計部年度檢查報表.xlsx", "表14-2");
 
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
@@ -51,7 +50,7 @@ public class LY003Report extends MakeReport {
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
 		try {
-			//暫時先產前3
+			// 暫時先產前3
 			for (int f = 1; f <= 3; f++) {
 
 				lY003List = lY003ServiceImpl.findAll(titaVo, f, endOfYearMonth);
@@ -98,12 +97,10 @@ public class LY003Report extends MakeReport {
 				row = tLDVo.get("F0").equals("C") ? 8 : tLDVo.get("F0").equals("D") ? 9 : 10;
 				break;
 			case 2:
-				row = tLDVo.get("F0").equals("A") ? 14
-						: tLDVo.get("F0").equals("B") ? 15 : tLDVo.get("F0").equals("C") ? 16 : 17;
+				row = tLDVo.get("F0").equals("A") ? 14 : tLDVo.get("F0").equals("B") ? 15 : tLDVo.get("F0").equals("C") ? 16 : 17;
 				break;
 			case 3:
-				row = tLDVo.get("F0").equals("A") ? 19
-						: tLDVo.get("F0").equals("B") ? 20 : tLDVo.get("F0").equals("C") ? 21 : 22;
+				row = tLDVo.get("F0").equals("A") ? 19 : tLDVo.get("F0").equals("B") ? 20 : tLDVo.get("F0").equals("C") ? 21 : 22;
 				break;
 			case 4:
 				row = 23;

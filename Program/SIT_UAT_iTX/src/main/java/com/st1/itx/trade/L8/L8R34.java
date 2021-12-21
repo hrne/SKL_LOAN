@@ -14,12 +14,11 @@ import com.st1.itx.db.domain.JcicZ571;
 import com.st1.itx.db.service.JcicZ571Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
-
 @Service("L8R34")
 @Scope("prototype")
 /**
  * 
- * @author Fegie  / Mata
+ * @author Fegie / Mata
  * @version 1.0.0
  */
 public class L8R34 extends TradeBuffer {
@@ -34,12 +33,12 @@ public class L8R34 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		logger.info("L8r34rimstart");
 		String iUkey = titaVo.getParam("RimUkey");
-        JcicZ571 iJcicZ571 = new JcicZ571();
+		JcicZ571 iJcicZ571 = new JcicZ571();
 		iJcicZ571 = iJcicZ571Service.ukeyFirst(iUkey, titaVo);
 
 		if (iJcicZ571 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			logger.info("L8R34update");
 			totaVo.putParam("L8r34TranKey", iJcicZ571.getTranKey());// 交易代碼
 			totaVo.putParam("L8r34CustId", iJcicZ571.getCustId());// 債務人IDN
@@ -47,10 +46,10 @@ public class L8R34 extends TradeBuffer {
 			totaVo.putParam("L8r34ApplyDate", iJcicZ571.getApplyDate());// 更生款項統一收付申請日
 			totaVo.putParam("L8r34BankId", iJcicZ571.getBankId());// 受理款項統一收付之債權金融機構代號
 			totaVo.putParam("L8r34OwnerYn", iJcicZ571.getOwnerYn());// 是否為更生債權人
-			totaVo.putParam("L8r34PayYn", iJcicZ571.getPayYn());//債務人是否仍依更生方案正常還款予本金融機構
+			totaVo.putParam("L8r34PayYn", iJcicZ571.getPayYn());// 債務人是否仍依更生方案正常還款予本金融機構
 			totaVo.putParam("L8r34OwnerAmt", iJcicZ571.getOwnerAmt());// 本金融機構更生債權總金額
 			totaVo.putParam("L8r34AllotAmt", iJcicZ571.getAllotAmt());// 參與分配債權金額
-			totaVo.putParam("L8r34UnallotAmt", iJcicZ571.getUnallotAmt());//未參與分配債權金額
+			totaVo.putParam("L8r34UnallotAmt", iJcicZ571.getUnallotAmt());// 未參與分配債權金額
 			totaVo.putParam("L8r34OutJcicTxtDate", iJcicZ571.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);

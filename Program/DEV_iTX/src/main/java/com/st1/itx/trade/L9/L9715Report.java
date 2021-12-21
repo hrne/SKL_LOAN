@@ -62,12 +62,10 @@ public class L9715Report extends MakeReport {
 		this.print(-3, 8, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 100, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
-		this.print(-3, 184, "日　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/"
-				+ dDateUtil.getNowStringBc().substring(2, 4));
+		this.print(-3, 184, "日　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
 		this.print(-4, 8, "報　表：" + this.getRptCode());
 		this.print(-4, 100, "業務專辦照顧十八個月明細表", "C");
-		this.print(-4, 184, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-4, 184, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-5, 184, "頁　數：　" + this.getNowPage());
 		this.print(-6, 6, "經辦：");
 		this.print(-6, 100, "撥款日期　" + showBcDate(approDay, 0) + "　起", "C");
@@ -232,8 +230,7 @@ public class L9715Report extends MakeReport {
 				// 繳款方式 F2
 				this.print(0, 14, tL9715.get("F2"));
 				// 戶號 F3 + F4
-				this.print(0, 24, String.format("%07d", Integer.parseInt(tL9715.get("F3"))) + "-"
-						+ String.format("%03d", Integer.parseInt(tL9715.get("F4"))));
+				this.print(0, 24, String.format("%07d", Integer.parseInt(tL9715.get("F3"))) + "-" + String.format("%03d", Integer.parseInt(tL9715.get("F4"))));
 				// 戶名 F5
 				this.print(0, 37, tL9715.get("F5"));
 

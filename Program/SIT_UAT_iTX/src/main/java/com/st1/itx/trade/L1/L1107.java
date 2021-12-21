@@ -212,7 +212,7 @@ public class L1107 extends TradeBuffer {
 				throw new LogicException("E0008", "財報品質(FinReportQuality)");
 			}
 
-            //覆審比率
+			// 覆審比率
 
 			FinReportReviewId finReportReviewId = new FinReportReviewId();
 			finReportReviewId.setCustUKey(iCustUKey);

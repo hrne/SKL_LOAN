@@ -123,8 +123,7 @@ public class L8303 extends TradeBuffer {
 		int iCreditCardPena = Integer.valueOf(titaVo.getParam("CreditCardPena"));
 		int iCreditCardOther = Integer.valueOf(titaVo.getParam("CreditCardOther"));
 		String iKey = "";
-		int sTotalAmt = iExpLoanAmt + iCivil323ExpAmt + iCashCardAmt + iCivil323CashAmt + iCreditCardAmt
-				+ iCivil323CreditAmt;// 信用貸款+現金卡放款+信用卡 本息餘額
+		int sTotalAmt = iExpLoanAmt + iCivil323ExpAmt + iCashCardAmt + iCivil323CashAmt + iCreditCardAmt + iCivil323CreditAmt;// 信用貸款+現金卡放款+信用卡 本息餘額
 		// JcicZ042, JcicZ040, JcicZ043, JcicZ045
 		JcicZ042 iJcicZ042 = new JcicZ042();
 		JcicZ042Id iJcicZ042Id = new JcicZ042Id();
@@ -191,8 +190,7 @@ public class L8303 extends TradeBuffer {
 			// 5 end-->(前端已有檢核，但錯誤信息提示不明確)
 
 			// 6 start 有擔保債權筆數需等於報送'43':回報有擔保債權金額資料之筆數
-			Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(iCustId, iRcDate + 19110000, iSubmitKey,
-					iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
+			Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(iCustId, iRcDate + 19110000, iSubmitKey, iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ043 == null) {
 				if (iGuarLoanCnt != 0) {
 					if ("A".equals(iTranKey)) {

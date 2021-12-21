@@ -20,7 +20,8 @@ import com.st1.itx.util.common.MakeReport;
 @Component("L9720Report")
 @Scope("prototype")
 public class L9720Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9720Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L9720Report.class);
 
 	@Autowired
 	L9720ServiceImpl l9720ServiceImpl;
@@ -64,18 +65,14 @@ public class L9720Report extends MakeReport {
 		// YYYMM續約檢核結果(YYYMM及YYYMM月).xlsx
 
 		String EntDy = Integer.toString(titaVo.getEntDyI() + 19110000);
-		LocalDate validDatePivot = LocalDate.of(Integer.parseInt(EntDy.substring(0, 4)),
-				Integer.parseInt(EntDy.substring(4, 6)), Integer.parseInt(EntDy.substring(6)));
+		LocalDate validDatePivot = LocalDate.of(Integer.parseInt(EntDy.substring(0, 4)), Integer.parseInt(EntDy.substring(4, 6)), Integer.parseInt(EntDy.substring(6)));
 		LocalDate validDateFirst = validDatePivot.minusMonths(10);
 		LocalDate validDateSecond = validDatePivot.minusMonths(22);
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName,
-				TXCD + "_" + Integer.toString(validDatePivot.getYear() - 1911)
-						+ String.format("%02d", validDatePivot.getMonthValue()) + "續約檢核結果("
-						+ Integer.toString(validDateFirst.getYear() - 1911)
-						+ String.format("%02d", validDateFirst.getMonthValue()) + "及"
-						+ Integer.toString(validDateSecond.getYear() - 1911)
-						+ String.format("%02d", validDateSecond.getMonthValue()) + "月)",
+				TXCD + "_" + Integer.toString(validDatePivot.getYear() - 1911) + String.format("%02d", validDatePivot.getMonthValue()) + "續約檢核結果(" + Integer.toString(validDateFirst.getYear() - 1911)
+						+ String.format("%02d", validDateFirst.getMonthValue()) + "及" + Integer.toString(validDateSecond.getYear() - 1911) + String.format("%02d", validDateSecond.getMonthValue())
+						+ "月)",
 				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		if (lList != null && lList.size() != 0) {

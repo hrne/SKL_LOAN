@@ -145,14 +145,11 @@ public class L6932 extends TradeBuffer {
 		if (!iTxtNo.isEmpty()) {
 			slTxDataLog = txDataLogService.findTxSeq(sdt, edt, iTxtNo, this.index, this.limit, titaVo);
 		} else if (CustNo > 0 && FacmNo > 0 && BormNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo3(sdt, edt, TranNo + "%", CustNo, FacmNo, BormNo, this.index,
-					this.limit, titaVo);
+			slTxDataLog = txDataLogService.findByCustNo3(sdt, edt, TranNo + "%", CustNo, FacmNo, BormNo, this.index, this.limit, titaVo);
 		} else if (CustNo > 0 && FacmNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo2(sdt, edt, TranNo + "%", CustNo, FacmNo, this.index, this.limit,
-					titaVo);
+			slTxDataLog = txDataLogService.findByCustNo2(sdt, edt, TranNo + "%", CustNo, FacmNo, this.index, this.limit, titaVo);
 		} else if (CustNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo1(sdt, edt, TranNo + "%", CustNo, this.index, this.limit,
-					titaVo);
+			slTxDataLog = txDataLogService.findByCustNo1(sdt, edt, TranNo + "%", CustNo, this.index, this.limit, titaVo);
 		} else {
 			slTxDataLog = txDataLogService.findByCustNo0(sdt, edt, TranNo + "%", this.index, this.limit, titaVo);
 		}
@@ -260,8 +257,7 @@ public class L6932 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private OccursList addOccurs(TxDataLog txDataLog, String fld, String oval, String nval, TitaVo titaVo)
-			throws LogicException {
+	private OccursList addOccurs(TxDataLog txDataLog, String fld, String oval, String nval, TitaVo titaVo) throws LogicException {
 		OccursList occursList = new OccursList();
 		occursList.putParam("OO_TRN_DTTM", parse.timeStampToString(txDataLog.getCreateDate()));
 		occursList.putParam("OO_TxDate", txDataLog.getTxDate());

@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -23,6 +26,7 @@ import com.st1.itx.db.repository.hist.TxAuthorizeRepositoryHist;
 import com.st1.itx.db.service.TxAuthorizeService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -33,7 +37,6 @@ import com.st1.itx.eum.ContentName;
 @Service("txAuthorizeService")
 @Repository
 public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthorizeService, InitializingBean {
-
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
@@ -88,9 +91,11 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		Slice<TxAuthorize> slice = null;
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AutoSeq"));
+		Pageable pageable = null;
 		if (limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+			pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AutoSeq"));
+		else
+			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AutoSeq"));
 		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAuthorizeReposDay.findAll(pageable);
@@ -101,6 +106,9 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		else
 			slice = txAuthorizeRepos.findAll(pageable);
 
+		if (slice != null)
+			this.baseEntityManager.clearEntityManager(dbName);
+
 		return slice != null && !slice.isEmpty() ? slice : null;
 	}
 
@@ -110,9 +118,12 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		Slice<TxAuthorize> slice = null;
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = PageRequest.of(index, limit);
+		Pageable pageable = null;
+
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
+		else
+			pageable = PageRequest.of(index, limit);
 		this.info("findSupNo " + dbName + " : " + "entdy_0 : " + entdy_0 + " supNo_1 : " + supNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAuthorizeReposDay.findAllByEntdyIsAndSupNoIsOrderBySupNoAsc(entdy_0, supNo_1, pageable);
@@ -123,27 +134,64 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		else
 			slice = txAuthorizeRepos.findAllByEntdyIsAndSupNoIsOrderBySupNoAsc(entdy_0, supNo_1, pageable);
 
+		if (slice != null)
+			this.baseEntityManager.clearEntityManager(dbName);
+
 		return slice != null && !slice.isEmpty() ? slice : null;
 	}
 
 	@Override
-	public Slice<TxAuthorize> findEntdy(int entdy_0, int entdy_1, int index, int limit, TitaVo... titaVo) {
+	public Slice<TxAuthorize> findEntdy(int entdy_0, int entdy_1, String supNo_2, int index, int limit, TitaVo... titaVo) {
 		String dbName = "";
 		Slice<TxAuthorize> slice = null;
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = PageRequest.of(index, limit);
+		Pageable pageable = null;
+
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		this.info("findEntdy " + dbName + " : " + "entdy_0 : " + entdy_0 + " entdy_1 : " + entdy_1);
-		if (dbName.equals(ContentName.onDay))
-			slice = txAuthorizeReposDay.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByEntdyAsc(entdy_0, entdy_1, pageable);
-		else if (dbName.equals(ContentName.onMon))
-			slice = txAuthorizeReposMon.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByEntdyAsc(entdy_0, entdy_1, pageable);
-		else if (dbName.equals(ContentName.onHist))
-			slice = txAuthorizeReposHist.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByEntdyAsc(entdy_0, entdy_1, pageable);
 		else
-			slice = txAuthorizeRepos.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByEntdyAsc(entdy_0, entdy_1, pageable);
+			pageable = PageRequest.of(index, limit);
+		this.info("findEntdy " + dbName + " : " + "entdy_0 : " + entdy_0 + " entdy_1 : " + entdy_1 + " supNo_2 : " + supNo_2);
+		if (dbName.equals(ContentName.onDay))
+			slice = txAuthorizeReposDay.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+		else if (dbName.equals(ContentName.onMon))
+			slice = txAuthorizeReposMon.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+		else if (dbName.equals(ContentName.onHist))
+			slice = txAuthorizeReposHist.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+		else
+			slice = txAuthorizeRepos.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+
+		if (slice != null)
+			this.baseEntityManager.clearEntityManager(dbName);
+
+		return slice != null && !slice.isEmpty() ? slice : null;
+	}
+
+	@Override
+	public Slice<TxAuthorize> findCreatDate(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, int index, int limit, TitaVo... titaVo) {
+		String dbName = "";
+		Slice<TxAuthorize> slice = null;
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		Pageable pageable = null;
+
+		if (limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+		else
+			pageable = PageRequest.of(index, limit);
+		this.info("findCreatDate " + dbName + " : " + "createDate_0 : " + createDate_0 + " createDate_1 : " + createDate_1 + " supNo_2 : " + supNo_2);
+		if (dbName.equals(ContentName.onDay))
+			slice = txAuthorizeReposDay.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+		else if (dbName.equals(ContentName.onMon))
+			slice = txAuthorizeReposMon.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+		else if (dbName.equals(ContentName.onHist))
+			slice = txAuthorizeReposHist.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+		else
+			slice = txAuthorizeRepos.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+
+		if (slice != null)
+			this.baseEntityManager.clearEntityManager(dbName);
 
 		return slice != null && !slice.isEmpty() ? slice : null;
 	}
@@ -192,13 +240,19 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Insert..." + dbName + " " + txAuthorize.getAutoSeq());
 		if (this.findById(txAuthorize.getAutoSeq()) != null)
 			throw new DBException(2);
 
 		if (!empNot.isEmpty())
 			txAuthorize.setCreateEmpNo(empNot);
+
+		if (txAuthorize.getLastUpdateEmpNo() == null || txAuthorize.getLastUpdateEmpNo().isEmpty())
+			txAuthorize.setLastUpdateEmpNo(empNot);
 
 		if (dbName.equals(ContentName.onDay))
 			return txAuthorizeReposDay.saveAndFlush(txAuthorize);
@@ -218,7 +272,9 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + txAuthorize.getAutoSeq());
 		if (!empNot.isEmpty())
 			txAuthorize.setLastUpdateEmpNo(empNot);
@@ -241,7 +297,9 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + txAuthorize.getAutoSeq());
 		if (!empNot.isEmpty())
 			txAuthorize.setLastUpdateEmpNo(empNot);
@@ -288,11 +346,17 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("InsertAll...");
-		for (TxAuthorize t : txAuthorize)
+		for (TxAuthorize t : txAuthorize) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
+			if (t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+				t.setLastUpdateEmpNo(empNot);
+		}
 
 		if (dbName.equals(ContentName.onDay)) {
 			txAuthorize = txAuthorizeReposDay.saveAll(txAuthorize);
@@ -317,7 +381,9 @@ public class TxAuthorizeServiceImpl extends ASpringJpaParm implements TxAuthoriz
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("UpdateAll...");
 		if (txAuthorize == null || txAuthorize.size() == 0)
 			throw new DBException(6);

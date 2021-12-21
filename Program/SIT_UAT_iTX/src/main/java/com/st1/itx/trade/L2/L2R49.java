@@ -34,17 +34,16 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L2R49 extends TradeBuffer {
 
-
 	/* DB服務注入 */
 	@Autowired
 	public FacShareApplService facShareApplService;
-	
+
 	@Autowired
 	public FacShareRelationService facShareRelationService;
-	
+
 	@Autowired
 	public FacMainService facMainService;
-	
+
 	@Autowired
 	public CustMainService custMainService;
 
@@ -66,7 +65,6 @@ public class L2R49 extends TradeBuffer {
 
 		slFacShareAppl = facShareApplService.findMainApplNo(iApplNo, 0, Integer.MAX_VALUE, titaVo);
 		lFacShareAppl = slFacShareAppl == null ? null : new ArrayList<>(slFacShareAppl.getContent());
-		
 
 		if (iFunCd == 1) {
 			if (lFacShareAppl != null) {
@@ -133,25 +131,24 @@ public class L2R49 extends TradeBuffer {
 				this.totaVo.putParam("L2r49LineAmt" + i, tFacMain.getLineAmt());
 
 				i++;
-				
+
 				Slice<FacShareRelation> slFacShareRelation = facShareRelationService.ApplNoAll(t.getApplNo(), 0, Integer.MAX_VALUE, titaVo);
 				List<FacShareRelation> lFacShareRelation = slFacShareRelation == null ? null : slFacShareRelation.getContent();
 				if (lFacShareRelation != null && lFacShareRelation.size() > 0) {
 					for (FacShareRelation tFacShareRelation : lFacShareRelation) {
 						OccursList occursList = new OccursList();
-						
+
 						occursList.putParam("L2r49ApplNoA", tFacShareRelation.getApplNo());
 						occursList.putParam("L2r49ApplNoB", tFacShareRelation.getRelApplNo());
 						occursList.putParam("L2r49RelCode", tFacShareRelation.getRelCode());
-						
+
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursList);
 					}
 				}
-				
+
 			}
 		}
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

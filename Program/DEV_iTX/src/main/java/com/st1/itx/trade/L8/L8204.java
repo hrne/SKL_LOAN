@@ -47,7 +47,7 @@ public class L8204 extends TradeBuffer {
 	SendRsp sendRsp;
 
 //	private List<String> lStatusCode = new ArrayList<String>();
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8204 ");
@@ -94,7 +94,7 @@ public class L8204 extends TradeBuffer {
 			MlaundryRecord tMlaundryRecord2 = (MlaundryRecord) dataLog.clone(tMlaundryRecord); ////
 			try {
 				moveMlaundryRecord(tMlaundryRecord, tMlaundryRecordId, iFuncCode, iFRecordDate, iCustNo, iFacmNo, iBormNo, titaVo);
-				tMlaundryRecord = sMlaundryRecordService.update2(tMlaundryRecord,titaVo); ////
+				tMlaundryRecord = sMlaundryRecordService.update2(tMlaundryRecord, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
@@ -104,14 +104,14 @@ public class L8204 extends TradeBuffer {
 		case 4: // 刪除
 			tMlaundryRecord = sMlaundryRecordService.holdById(new MlaundryRecordId(iFRecordDate, iCustNo, iFacmNo, iBormNo));
 			this.info("L8204 del : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-			
-				// 刷主管卡後始可刪除
-				// 交易需主管核可
-				if (!titaVo.getHsupCode().equals("1")) {
-					// titaVo.getSupCode();
-					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-				}
-						
+
+			// 刷主管卡後始可刪除
+			// 交易需主管核可
+			if (!titaVo.getHsupCode().equals("1")) {
+				// titaVo.getSupCode();
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+
 			if (tMlaundryRecord != null) {
 				try {
 					sMlaundryRecordService.delete(tMlaundryRecord);

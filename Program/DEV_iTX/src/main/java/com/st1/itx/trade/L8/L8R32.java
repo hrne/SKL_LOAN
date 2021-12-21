@@ -25,7 +25,6 @@ public class L8R32 extends TradeBuffer {
 	@Autowired
 	public JcicZ063Service iJcicZ063Service;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r32 ");
@@ -33,18 +32,18 @@ public class L8R32 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		JcicZ063 iJcicZ063 = new JcicZ063();
 		iJcicZ063 = iJcicZ063Service.ukeyFirst(iUkey, titaVo);
-		
+
 		if (iJcicZ063 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
-		}else {
+		} else {
 			totaVo.putParam("L8r32TranKey", iJcicZ063.getTranKey());
 			totaVo.putParam("L8r32CustId", iJcicZ063.getCustId());
 			totaVo.putParam("L8r32SubmitKey", iJcicZ063.getSubmitKey());
 			totaVo.putParam("L8r32RcDate", iJcicZ063.getRcDate());
 			totaVo.putParam("L8r32ChangePayDate", iJcicZ063.getChangePayDate());
 			totaVo.putParam("L8r32ClosedDate", iJcicZ063.getClosedDate());
-			totaVo.putParam("L8r32ClosedResult", iJcicZ063.getClosedResult());			
-			totaVo.putParam("L8r32OutJcicTxtDate", iJcicZ063.getOutJcicTxtDate());		
+			totaVo.putParam("L8r32ClosedResult", iJcicZ063.getClosedResult());
+			totaVo.putParam("L8r32OutJcicTxtDate", iJcicZ063.getOutJcicTxtDate());
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

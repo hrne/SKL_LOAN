@@ -109,7 +109,7 @@ public class L6603 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0004", titaVo.getParam("ClCode1") + titaVo.getParam("ClCode2")); // 刪除資料不存在
 			}
 			dataLog.setEnv(titaVo, tCdCl, tCdCl);
-			dataLog.exec("刪除擔保品代號資料"); 
+			dataLog.exec("刪除擔保品代號資料");
 			break;
 
 		case 5: // inq
@@ -121,12 +121,12 @@ public class L6603 extends TradeBuffer {
 	}
 
 	private void moveCdCl(CdCl mCdCl, CdClId mCdClId, int mFuncCode, int mClCode1, int mClCode2, TitaVo titaVo) throws LogicException {
-		String tCdClIItem="";
-		CdCode tCdCode = sCdCodeService.findById(new CdCodeId("ClCode1",String.valueOf(mClCode1)), titaVo);
-		if(tCdCode!=null) {
+		String tCdClIItem = "";
+		CdCode tCdCode = sCdCodeService.findById(new CdCodeId("ClCode1", String.valueOf(mClCode1)), titaVo);
+		if (tCdCode != null) {
 			tCdClIItem = tCdCode.getItem();
 		}
-		
+
 		mCdClId.setClCode1(mClCode1);
 		mCdClId.setClCode2(mClCode2);
 		mCdCl.setCdClId(mCdClId);

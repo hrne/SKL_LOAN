@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,22 +21,23 @@ import com.st1.itx.db.domain.LoanNotYetId;
  */
 public interface LoanNotYetRepositoryMon extends JpaRepository<LoanNotYet, LoanNotYetId> {
 
-  // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND YetDate>= ,AND YetDate<= ,AND CloseDate>= ,AND CloseDate<=
-  public Slice<LoanNotYet> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndYetDateGreaterThanEqualAndYetDateLessThanEqualAndCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscFacmNoAscNotYetCodeAsc(int custNo_0, int facmNo_1, int facmNo_2, int yetDate_3, int yetDate_4, int closeDate_5, int closeDate_6, Pageable pageable);
+	// CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND YetDate>= ,AND YetDate<= ,AND
+	// CloseDate>= ,AND CloseDate<=
+	public Slice<LoanNotYet> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndYetDateGreaterThanEqualAndYetDateLessThanEqualAndCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscFacmNoAscNotYetCodeAsc(
+			int custNo_0, int facmNo_1, int facmNo_2, int yetDate_3, int yetDate_4, int closeDate_5, int closeDate_6, Pageable pageable);
 
-  // CustNo =
-  public Slice<LoanNotYet> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<LoanNotYet> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND NotYetCode =
-  public Slice<LoanNotYet> findAllByCustNoIsAndFacmNoIsAndNotYetCodeIs(int custNo_0, int facmNo_1, String notYetCode_2, Pageable pageable);
+	// CustNo = ,AND FacmNo = ,AND NotYetCode =
+	public Slice<LoanNotYet> findAllByCustNoIsAndFacmNoIsAndNotYetCodeIs(int custNo_0, int facmNo_1, String notYetCode_2, Pageable pageable);
 
-  // CloseDate = ,AND YetDate <=
-  public Slice<LoanNotYet> findAllByCloseDateIsAndYetDateLessThanEqualOrderByCustNoAscFacmNoAscYetDateAsc(int closeDate_0, int yetDate_1, Pageable pageable);
+	// CloseDate = ,AND YetDate <=
+	public Slice<LoanNotYet> findAllByCloseDateIsAndYetDateLessThanEqualOrderByCustNoAscFacmNoAscYetDateAsc(int closeDate_0, int yetDate_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<LoanNotYet> findByLoanNotYetId(LoanNotYetId loanNotYetId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<LoanNotYet> findByLoanNotYetId(LoanNotYetId loanNotYetId);
 
 }
-

@@ -35,341 +35,330 @@ import com.st1.itx.eum.ThreadVariable;
 @Service("loanIfrsDpService")
 @Repository
 public class LoanIfrsDpServiceImpl extends ASpringJpaParm implements LoanIfrsDpService, InitializingBean {
-  @Autowired
-  private BaseEntityManager baseEntityManager;
+	@Autowired
+	private BaseEntityManager baseEntityManager;
 
-  @Autowired
-  private LoanIfrsDpRepository loanIfrsDpRepos;
+	@Autowired
+	private LoanIfrsDpRepository loanIfrsDpRepos;
 
-  @Autowired
-  private LoanIfrsDpRepositoryDay loanIfrsDpReposDay;
+	@Autowired
+	private LoanIfrsDpRepositoryDay loanIfrsDpReposDay;
 
-  @Autowired
-  private LoanIfrsDpRepositoryMon loanIfrsDpReposMon;
+	@Autowired
+	private LoanIfrsDpRepositoryMon loanIfrsDpReposMon;
 
-  @Autowired
-  private LoanIfrsDpRepositoryHist loanIfrsDpReposHist;
+	@Autowired
+	private LoanIfrsDpRepositoryHist loanIfrsDpReposHist;
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    org.junit.Assert.assertNotNull(loanIfrsDpRepos);
-    org.junit.Assert.assertNotNull(loanIfrsDpReposDay);
-    org.junit.Assert.assertNotNull(loanIfrsDpReposMon);
-    org.junit.Assert.assertNotNull(loanIfrsDpReposHist);
-  }
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		org.junit.Assert.assertNotNull(loanIfrsDpRepos);
+		org.junit.Assert.assertNotNull(loanIfrsDpReposDay);
+		org.junit.Assert.assertNotNull(loanIfrsDpReposMon);
+		org.junit.Assert.assertNotNull(loanIfrsDpReposHist);
+	}
 
-  @Override
-  public LoanIfrsDp findById(LoanIfrsDpId loanIfrsDpId, TitaVo... titaVo) {
-    String dbName = "";
+	@Override
+	public LoanIfrsDp findById(LoanIfrsDpId loanIfrsDpId, TitaVo... titaVo) {
+		String dbName = "";
 
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + loanIfrsDpId);
-    Optional<LoanIfrsDp> loanIfrsDp = null;
-    if (dbName.equals(ContentName.onDay))
-      loanIfrsDp = loanIfrsDpReposDay.findById(loanIfrsDpId);
-    else if (dbName.equals(ContentName.onMon))
-      loanIfrsDp = loanIfrsDpReposMon.findById(loanIfrsDpId);
-    else if (dbName.equals(ContentName.onHist))
-      loanIfrsDp = loanIfrsDpReposHist.findById(loanIfrsDpId);
-    else 
-      loanIfrsDp = loanIfrsDpRepos.findById(loanIfrsDpId);
-    LoanIfrsDp obj = loanIfrsDp.isPresent() ? loanIfrsDp.get() : null;
-      if(obj != null) {
-        EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
-        em.detach(obj);
-em = null;
-}
-    return obj;
-  }
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("findById " + dbName + " " + loanIfrsDpId);
+		Optional<LoanIfrsDp> loanIfrsDp = null;
+		if (dbName.equals(ContentName.onDay))
+			loanIfrsDp = loanIfrsDpReposDay.findById(loanIfrsDpId);
+		else if (dbName.equals(ContentName.onMon))
+			loanIfrsDp = loanIfrsDpReposMon.findById(loanIfrsDpId);
+		else if (dbName.equals(ContentName.onHist))
+			loanIfrsDp = loanIfrsDpReposHist.findById(loanIfrsDpId);
+		else
+			loanIfrsDp = loanIfrsDpRepos.findById(loanIfrsDpId);
+		LoanIfrsDp obj = loanIfrsDp.isPresent() ? loanIfrsDp.get() : null;
+		if (obj != null) {
+			EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
+			em.detach(obj);
+			em = null;
+		}
+		return obj;
+	}
 
-  @Override
-  public Slice<LoanIfrsDp> findAll(int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<LoanIfrsDp> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = null;
-    if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
-    else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
-    this.info("findAll " + dbName);
-    if (dbName.equals(ContentName.onDay))
-      slice = loanIfrsDpReposDay.findAll(pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = loanIfrsDpReposMon.findAll(pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = loanIfrsDpReposHist.findAll(pageable);
-    else 
-      slice = loanIfrsDpRepos.findAll(pageable);
+	@Override
+	public Slice<LoanIfrsDp> findAll(int index, int limit, TitaVo... titaVo) {
+		String dbName = "";
+		Slice<LoanIfrsDp> slice = null;
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		Pageable pageable = null;
+		if (limit == Integer.MAX_VALUE)
+			pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
+		else
+			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
+		this.info("findAll " + dbName);
+		if (dbName.equals(ContentName.onDay))
+			slice = loanIfrsDpReposDay.findAll(pageable);
+		else if (dbName.equals(ContentName.onMon))
+			slice = loanIfrsDpReposMon.findAll(pageable);
+		else if (dbName.equals(ContentName.onHist))
+			slice = loanIfrsDpReposHist.findAll(pageable);
+		else
+			slice = loanIfrsDpRepos.findAll(pageable);
 
-		if (slice != null) 
+		if (slice != null)
 			this.baseEntityManager.clearEntityManager(dbName);
 
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
+		return slice != null && !slice.isEmpty() ? slice : null;
+	}
 
-  @Override
-  public LoanIfrsDp holdById(LoanIfrsDpId loanIfrsDpId, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + loanIfrsDpId);
-    Optional<LoanIfrsDp> loanIfrsDp = null;
-    if (dbName.equals(ContentName.onDay))
-      loanIfrsDp = loanIfrsDpReposDay.findByLoanIfrsDpId(loanIfrsDpId);
-    else if (dbName.equals(ContentName.onMon))
-      loanIfrsDp = loanIfrsDpReposMon.findByLoanIfrsDpId(loanIfrsDpId);
-    else if (dbName.equals(ContentName.onHist))
-      loanIfrsDp = loanIfrsDpReposHist.findByLoanIfrsDpId(loanIfrsDpId);
-    else 
-      loanIfrsDp = loanIfrsDpRepos.findByLoanIfrsDpId(loanIfrsDpId);
-    return loanIfrsDp.isPresent() ? loanIfrsDp.get() : null;
-  }
+	@Override
+	public LoanIfrsDp holdById(LoanIfrsDpId loanIfrsDpId, TitaVo... titaVo) {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Hold " + dbName + " " + loanIfrsDpId);
+		Optional<LoanIfrsDp> loanIfrsDp = null;
+		if (dbName.equals(ContentName.onDay))
+			loanIfrsDp = loanIfrsDpReposDay.findByLoanIfrsDpId(loanIfrsDpId);
+		else if (dbName.equals(ContentName.onMon))
+			loanIfrsDp = loanIfrsDpReposMon.findByLoanIfrsDpId(loanIfrsDpId);
+		else if (dbName.equals(ContentName.onHist))
+			loanIfrsDp = loanIfrsDpReposHist.findByLoanIfrsDpId(loanIfrsDpId);
+		else
+			loanIfrsDp = loanIfrsDpRepos.findByLoanIfrsDpId(loanIfrsDpId);
+		return loanIfrsDp.isPresent() ? loanIfrsDp.get() : null;
+	}
 
-  @Override
-  public LoanIfrsDp holdById(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
-    Optional<LoanIfrsDp> loanIfrsDpT = null;
-    if (dbName.equals(ContentName.onDay))
-      loanIfrsDpT = loanIfrsDpReposDay.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
-    else if (dbName.equals(ContentName.onMon))
-      loanIfrsDpT = loanIfrsDpReposMon.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
-    else if (dbName.equals(ContentName.onHist))
-      loanIfrsDpT = loanIfrsDpReposHist.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
-    else 
-      loanIfrsDpT = loanIfrsDpRepos.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
-    return loanIfrsDpT.isPresent() ? loanIfrsDpT.get() : null;
-  }
+	@Override
+	public LoanIfrsDp holdById(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Hold " + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
+		Optional<LoanIfrsDp> loanIfrsDpT = null;
+		if (dbName.equals(ContentName.onDay))
+			loanIfrsDpT = loanIfrsDpReposDay.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
+		else if (dbName.equals(ContentName.onMon))
+			loanIfrsDpT = loanIfrsDpReposMon.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
+		else if (dbName.equals(ContentName.onHist))
+			loanIfrsDpT = loanIfrsDpReposHist.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
+		else
+			loanIfrsDpT = loanIfrsDpRepos.findByLoanIfrsDpId(loanIfrsDp.getLoanIfrsDpId());
+		return loanIfrsDpT.isPresent() ? loanIfrsDpT.get() : null;
+	}
 
-  @Override
-  public LoanIfrsDp insert(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public LoanIfrsDp insert(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Insert..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
-    if (this.findById(loanIfrsDp.getLoanIfrsDpId()) != null)
-      throw new DBException(2);
+		this.info("Insert..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
+		if (this.findById(loanIfrsDp.getLoanIfrsDpId()) != null)
+			throw new DBException(2);
 
-    if (!empNot.isEmpty())
-      loanIfrsDp.setCreateEmpNo(empNot);
+		if (!empNot.isEmpty())
+			loanIfrsDp.setCreateEmpNo(empNot);
 
-    if(loanIfrsDp.getLastUpdateEmpNo() == null || loanIfrsDp.getLastUpdateEmpNo().isEmpty())
-      loanIfrsDp.setLastUpdateEmpNo(empNot);
+		if (loanIfrsDp.getLastUpdateEmpNo() == null || loanIfrsDp.getLastUpdateEmpNo().isEmpty())
+			loanIfrsDp.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      return loanIfrsDpReposDay.saveAndFlush(loanIfrsDp);	
-    else if (dbName.equals(ContentName.onMon))
-      return loanIfrsDpReposMon.saveAndFlush(loanIfrsDp);
-    else if (dbName.equals(ContentName.onHist))
-      return loanIfrsDpReposHist.saveAndFlush(loanIfrsDp);
-    else 
-    return loanIfrsDpRepos.saveAndFlush(loanIfrsDp);
-  }
+		if (dbName.equals(ContentName.onDay))
+			return loanIfrsDpReposDay.saveAndFlush(loanIfrsDp);
+		else if (dbName.equals(ContentName.onMon))
+			return loanIfrsDpReposMon.saveAndFlush(loanIfrsDp);
+		else if (dbName.equals(ContentName.onHist))
+			return loanIfrsDpReposHist.saveAndFlush(loanIfrsDp);
+		else
+			return loanIfrsDpRepos.saveAndFlush(loanIfrsDp);
+	}
 
-  @Override
-  public LoanIfrsDp update(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public LoanIfrsDp update(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
-    if (!empNot.isEmpty())
-      loanIfrsDp.setLastUpdateEmpNo(empNot);
+		this.info("Update..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
+		if (!empNot.isEmpty())
+			loanIfrsDp.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      return loanIfrsDpReposDay.saveAndFlush(loanIfrsDp);	
-    else if (dbName.equals(ContentName.onMon))
-      return loanIfrsDpReposMon.saveAndFlush(loanIfrsDp);
-    else if (dbName.equals(ContentName.onHist))
-      return loanIfrsDpReposHist.saveAndFlush(loanIfrsDp);
-    else 
-    return loanIfrsDpRepos.saveAndFlush(loanIfrsDp);
-  }
+		if (dbName.equals(ContentName.onDay))
+			return loanIfrsDpReposDay.saveAndFlush(loanIfrsDp);
+		else if (dbName.equals(ContentName.onMon))
+			return loanIfrsDpReposMon.saveAndFlush(loanIfrsDp);
+		else if (dbName.equals(ContentName.onHist))
+			return loanIfrsDpReposHist.saveAndFlush(loanIfrsDp);
+		else
+			return loanIfrsDpRepos.saveAndFlush(loanIfrsDp);
+	}
 
-  @Override
-  public LoanIfrsDp update2(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public LoanIfrsDp update2(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
-    if (!empNot.isEmpty())
-      loanIfrsDp.setLastUpdateEmpNo(empNot);
+		this.info("Update..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
+		if (!empNot.isEmpty())
+			loanIfrsDp.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay))
-      loanIfrsDpReposDay.saveAndFlush(loanIfrsDp);	
-    else if (dbName.equals(ContentName.onMon))
-      loanIfrsDpReposMon.saveAndFlush(loanIfrsDp);
-    else if (dbName.equals(ContentName.onHist))
-        loanIfrsDpReposHist.saveAndFlush(loanIfrsDp);
-    else 
-      loanIfrsDpRepos.saveAndFlush(loanIfrsDp);	
-    return this.findById(loanIfrsDp.getLoanIfrsDpId());
-  }
+		if (dbName.equals(ContentName.onDay))
+			loanIfrsDpReposDay.saveAndFlush(loanIfrsDp);
+		else if (dbName.equals(ContentName.onMon))
+			loanIfrsDpReposMon.saveAndFlush(loanIfrsDp);
+		else if (dbName.equals(ContentName.onHist))
+			loanIfrsDpReposHist.saveAndFlush(loanIfrsDp);
+		else
+			loanIfrsDpRepos.saveAndFlush(loanIfrsDp);
+		return this.findById(loanIfrsDp.getLoanIfrsDpId());
+	}
 
-  @Override
-  public void delete(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
-    if (dbName.equals(ContentName.onDay)) {
-      loanIfrsDpReposDay.delete(loanIfrsDp);	
-      loanIfrsDpReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      loanIfrsDpReposMon.delete(loanIfrsDp);	
-      loanIfrsDpReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      loanIfrsDpReposHist.delete(loanIfrsDp);
-      loanIfrsDpReposHist.flush();
-    }
-    else {
-      loanIfrsDpRepos.delete(loanIfrsDp);
-      loanIfrsDpRepos.flush();
-    }
-   }
+	@Override
+	public void delete(LoanIfrsDp loanIfrsDp, TitaVo... titaVo) throws DBException {
+		String dbName = "";
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		this.info("Delete..." + dbName + " " + loanIfrsDp.getLoanIfrsDpId());
+		if (dbName.equals(ContentName.onDay)) {
+			loanIfrsDpReposDay.delete(loanIfrsDp);
+			loanIfrsDpReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			loanIfrsDpReposMon.delete(loanIfrsDp);
+			loanIfrsDpReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			loanIfrsDpReposHist.delete(loanIfrsDp);
+			loanIfrsDpReposHist.flush();
+		} else {
+			loanIfrsDpRepos.delete(loanIfrsDp);
+			loanIfrsDpRepos.flush();
+		}
+	}
 
-  @Override
-  public void insertAll(List<LoanIfrsDp> loanIfrsDp, TitaVo... titaVo) throws DBException {
-    if (loanIfrsDp == null || loanIfrsDp.size() == 0)
-      throw new DBException(6);
-     String dbName = "";
+	@Override
+	public void insertAll(List<LoanIfrsDp> loanIfrsDp, TitaVo... titaVo) throws DBException {
+		if (loanIfrsDp == null || loanIfrsDp.size() == 0)
+			throw new DBException(6);
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = empNot.isEmpty() ? "System" : empNot;
+		} else
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("InsertAll...");
-    for (LoanIfrsDp t : loanIfrsDp){ 
-      if (!empNot.isEmpty())
-        t.setCreateEmpNo(empNot);
-      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
-        t.setLastUpdateEmpNo(empNot);
-}		
+		this.info("InsertAll...");
+		for (LoanIfrsDp t : loanIfrsDp) {
+			if (!empNot.isEmpty())
+				t.setCreateEmpNo(empNot);
+			if (t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+				t.setLastUpdateEmpNo(empNot);
+		}
 
-    if (dbName.equals(ContentName.onDay)) {
-      loanIfrsDp = loanIfrsDpReposDay.saveAll(loanIfrsDp);	
-      loanIfrsDpReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      loanIfrsDp = loanIfrsDpReposMon.saveAll(loanIfrsDp);	
-      loanIfrsDpReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      loanIfrsDp = loanIfrsDpReposHist.saveAll(loanIfrsDp);
-      loanIfrsDpReposHist.flush();
-    }
-    else {
-      loanIfrsDp = loanIfrsDpRepos.saveAll(loanIfrsDp);
-      loanIfrsDpRepos.flush();
-    }
-    }
+		if (dbName.equals(ContentName.onDay)) {
+			loanIfrsDp = loanIfrsDpReposDay.saveAll(loanIfrsDp);
+			loanIfrsDpReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			loanIfrsDp = loanIfrsDpReposMon.saveAll(loanIfrsDp);
+			loanIfrsDpReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			loanIfrsDp = loanIfrsDpReposHist.saveAll(loanIfrsDp);
+			loanIfrsDpReposHist.flush();
+		} else {
+			loanIfrsDp = loanIfrsDpRepos.saveAll(loanIfrsDp);
+			loanIfrsDpRepos.flush();
+		}
+	}
 
-  @Override
-  public void updateAll(List<LoanIfrsDp> loanIfrsDp, TitaVo... titaVo) throws DBException {
-     String dbName = "";
+	@Override
+	public void updateAll(List<LoanIfrsDp> loanIfrsDp, TitaVo... titaVo) throws DBException {
+		String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-       empNot = ThreadVariable.getEmpNot();
+			empNot = ThreadVariable.getEmpNot();
 
-    this.info("UpdateAll...");
-    if (loanIfrsDp == null || loanIfrsDp.size() == 0)
-      throw new DBException(6);
+		this.info("UpdateAll...");
+		if (loanIfrsDp == null || loanIfrsDp.size() == 0)
+			throw new DBException(6);
 
-    for (LoanIfrsDp t : loanIfrsDp) 
-    if (!empNot.isEmpty())
-        t.setLastUpdateEmpNo(empNot);
-		
+		for (LoanIfrsDp t : loanIfrsDp)
+			if (!empNot.isEmpty())
+				t.setLastUpdateEmpNo(empNot);
 
-    if (dbName.equals(ContentName.onDay)) {
-      loanIfrsDp = loanIfrsDpReposDay.saveAll(loanIfrsDp);	
-      loanIfrsDpReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      loanIfrsDp = loanIfrsDpReposMon.saveAll(loanIfrsDp);	
-      loanIfrsDpReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      loanIfrsDp = loanIfrsDpReposHist.saveAll(loanIfrsDp);
-      loanIfrsDpReposHist.flush();
-    }
-    else {
-      loanIfrsDp = loanIfrsDpRepos.saveAll(loanIfrsDp);
-      loanIfrsDpRepos.flush();
-    }
-    }
+		if (dbName.equals(ContentName.onDay)) {
+			loanIfrsDp = loanIfrsDpReposDay.saveAll(loanIfrsDp);
+			loanIfrsDpReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			loanIfrsDp = loanIfrsDpReposMon.saveAll(loanIfrsDp);
+			loanIfrsDpReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			loanIfrsDp = loanIfrsDpReposHist.saveAll(loanIfrsDp);
+			loanIfrsDpReposHist.flush();
+		} else {
+			loanIfrsDp = loanIfrsDpRepos.saveAll(loanIfrsDp);
+			loanIfrsDpRepos.flush();
+		}
+	}
 
-  @Override
-  public void deleteAll(List<LoanIfrsDp> loanIfrsDp, TitaVo... titaVo) throws DBException {
-    this.info("DeleteAll...");
-    String dbName = "";
-    
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    if (loanIfrsDp == null || loanIfrsDp.size() == 0)
-      throw new DBException(6);
-    if (dbName.equals(ContentName.onDay)) {
-      loanIfrsDpReposDay.deleteAll(loanIfrsDp);	
-      loanIfrsDpReposDay.flush();
-    }
-    else if (dbName.equals(ContentName.onMon)) {
-      loanIfrsDpReposMon.deleteAll(loanIfrsDp);	
-      loanIfrsDpReposMon.flush();
-    }
-    else if (dbName.equals(ContentName.onHist)) {
-      loanIfrsDpReposHist.deleteAll(loanIfrsDp);
-      loanIfrsDpReposHist.flush();
-    }
-    else {
-      loanIfrsDpRepos.deleteAll(loanIfrsDp);
-      loanIfrsDpRepos.flush();
-    }
-  }
+	@Override
+	public void deleteAll(List<LoanIfrsDp> loanIfrsDp, TitaVo... titaVo) throws DBException {
+		this.info("DeleteAll...");
+		String dbName = "";
 
-  @Override
-  public void Usp_L7_LoanIfrsDp_Upd(int TBSDYF, String EmpNo, TitaVo... titaVo) {
-    String dbName = "";
-    
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    if (dbName.equals(ContentName.onDay))
-      loanIfrsDpReposDay.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
-    else if (dbName.equals(ContentName.onMon))
-      loanIfrsDpReposMon.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
-    else if (dbName.equals(ContentName.onHist))
-      loanIfrsDpReposHist.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
-   else
-      loanIfrsDpRepos.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
-  }
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		if (loanIfrsDp == null || loanIfrsDp.size() == 0)
+			throw new DBException(6);
+		if (dbName.equals(ContentName.onDay)) {
+			loanIfrsDpReposDay.deleteAll(loanIfrsDp);
+			loanIfrsDpReposDay.flush();
+		} else if (dbName.equals(ContentName.onMon)) {
+			loanIfrsDpReposMon.deleteAll(loanIfrsDp);
+			loanIfrsDpReposMon.flush();
+		} else if (dbName.equals(ContentName.onHist)) {
+			loanIfrsDpReposHist.deleteAll(loanIfrsDp);
+			loanIfrsDpReposHist.flush();
+		} else {
+			loanIfrsDpRepos.deleteAll(loanIfrsDp);
+			loanIfrsDpRepos.flush();
+		}
+	}
+
+	@Override
+	public void Usp_L7_LoanIfrsDp_Upd(int TBSDYF, String EmpNo, TitaVo... titaVo) {
+		String dbName = "";
+
+		if (titaVo.length != 0)
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+		if (dbName.equals(ContentName.onDay))
+			loanIfrsDpReposDay.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
+		else if (dbName.equals(ContentName.onMon))
+			loanIfrsDpReposMon.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
+		else if (dbName.equals(ContentName.onHist))
+			loanIfrsDpReposHist.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
+		else
+			loanIfrsDpRepos.uspL7LoanifrsdpUpd(TBSDYF, EmpNo);
+	}
 
 }

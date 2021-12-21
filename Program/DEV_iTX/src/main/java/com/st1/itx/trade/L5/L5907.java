@@ -19,7 +19,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 @Service("L5907")
 @Scope("prototype")
 /**
- *指定覆審名單查詢
+ * 指定覆審名單查詢
  *
  * @author Fegie
  * @version 1.0.0
@@ -32,17 +32,16 @@ public class L5907 extends TradeBuffer {
 	public SpecInnReCheckService iSpecInnReCheckService;
 	@Autowired
 	public CustMainService iCustMainService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		
-	
+
 		this.info("active L5907 ");
 		this.totaVo.init(titaVo);
-		
+
 		this.index = titaVo.getReturnIndex();
 		this.limit = 100;
-		
+
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 
@@ -50,31 +49,31 @@ public class L5907 extends TradeBuffer {
 		CustMain iCustMain = new CustMain();
 		if (iFacmNo == 0) {
 			iSpecInnReCheck = iSpecInnReCheckService.findCustNo(iCustNo, this.index, this.limit, titaVo);
-		}else {
+		} else {
 			iSpecInnReCheck = iSpecInnReCheckService.findCustFacmNo(iCustNo, iFacmNo, this.index, this.limit, titaVo);
 		}
-		
-		if (iSpecInnReCheck==null) {
+
+		if (iSpecInnReCheck == null) {
 			throw new LogicException(titaVo, "E0001", "指定覆審名單"); // 查無資料
 		}
-		
-		for (SpecInnReCheck rSpecInnReCheck:iSpecInnReCheck) {
+
+		for (SpecInnReCheck rSpecInnReCheck : iSpecInnReCheck) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCustNo", rSpecInnReCheck.getCustNo());
 			occursList.putParam("OOFacmNo", rSpecInnReCheck.getFacmNo());
 			iCustMain = iCustMainService.custNoFirst(rSpecInnReCheck.getCustNo(), rSpecInnReCheck.getCustNo(), titaVo);
 			if (iCustMain == null) {
 				occursList.putParam("OOCustName", "");
-			}else {
+			} else {
 				occursList.putParam("OOCustName", iCustMain.getCustName());
 			}
 			occursList.putParam("OORemark", rSpecInnReCheck.getRemark());
 			occursList.putParam("OOCycle", rSpecInnReCheck.getCycle());
-			
-			if (rSpecInnReCheck.getReChkYearMonth()==0) {
+
+			if (rSpecInnReCheck.getReChkYearMonth() == 0) {
 				occursList.putParam("OOReChkYearMonth", 0);
-			}else {
-				occursList.putParam("OOReChkYearMonth", rSpecInnReCheck.getReChkYearMonth()-191100);
+			} else {
+				occursList.putParam("OOReChkYearMonth", rSpecInnReCheck.getReChkYearMonth() - 191100);
 			}
 
 			this.totaVo.addOccursList(occursList);
@@ -84,7 +83,7 @@ public class L5907 extends TradeBuffer {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

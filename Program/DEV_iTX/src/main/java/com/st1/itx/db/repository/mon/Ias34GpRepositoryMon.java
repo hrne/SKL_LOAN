@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.Ias34GpId;
  */
 public interface Ias34GpRepositoryMon extends JpaRepository<Ias34Gp, Ias34GpId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Ias34Gp> findByIas34GpId(Ias34GpId ias34GpId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Ias34Gp> findByIas34GpId(Ias34GpId ias34GpId);
 
-  // (月底日日終批次)維護 IAS34 欄位清單G檔
-  @Procedure(value = "\"Usp_L7_Ias34Gp_Upd\"")
-  public void uspL7Ias34gpUpd(int TBSDYF, String EmpNo);
+	// (月底日日終批次)維護 IAS34 欄位清單G檔
+	@Procedure(value = "\"Usp_L7_Ias34Gp_Upd\"")
+	public void uspL7Ias34gpUpd(int TBSDYF, String EmpNo);
 
 }
-

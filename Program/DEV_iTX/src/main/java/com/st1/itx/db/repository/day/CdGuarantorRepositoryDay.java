@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.CdGuarantor;
  */
 public interface CdGuarantorRepositoryDay extends JpaRepository<CdGuarantor, String> {
 
-  // GuaRelJcic >= ,AND GuaRelJcic <=
-  public Optional<CdGuarantor> findTopByGuaRelJcicGreaterThanEqualAndGuaRelJcicLessThanEqual(String guaRelJcic_0, String guaRelJcic_1);
+	// GuaRelJcic >= ,AND GuaRelJcic <=
+	public Optional<CdGuarantor> findTopByGuaRelJcicGreaterThanEqualAndGuaRelJcicLessThanEqual(String guaRelJcic_0, String guaRelJcic_1);
 
-  // GuaRelCode >= ,AND GuaRelCode <= 
-  public Slice<CdGuarantor> findAllByGuaRelCodeGreaterThanEqualAndGuaRelCodeLessThanEqualOrderByGuaRelCodeAsc(String guaRelCode_0, String guaRelCode_1, Pageable pageable);
+	// GuaRelCode >= ,AND GuaRelCode <=
+	public Slice<CdGuarantor> findAllByGuaRelCodeGreaterThanEqualAndGuaRelCodeLessThanEqualOrderByGuaRelCodeAsc(String guaRelCode_0, String guaRelCode_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdGuarantor> findByGuaRelCode(String guaRelCode);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdGuarantor> findByGuaRelCode(String guaRelCode);
 
 }
-

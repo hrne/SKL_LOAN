@@ -33,21 +33,21 @@ public class L1111 extends TradeBuffer {
 	public CustMainService iCustMainService;
 	@Autowired
 	public CdCodeService iCdCodeService;
-	
+
 	@Autowired
 	public DataLog iDataLog;
-	
+
 	@Autowired
 	public SendRsp sendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
-		
+
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "身份證號／統一編號變更");
 		}
-		
+
 		String iCustIdBefore = titaVo.getParam("CustIdBefore");
 		String iCustIdAfter = titaVo.getParam("CustIdAfter");
 		String iMark = titaVo.getParam("Mark");
@@ -59,12 +59,12 @@ public class L1111 extends TradeBuffer {
 		if (iCustMain == null) {
 			throw new LogicException(titaVo, "E0003", "查無身份證號/統一編號 : " + iCustIdBefore);
 		}
-		
+
 		CustMain iCustMain2 = iCustMainService.custIdFirst(iCustIdAfter, titaVo);
 		if (iCustMain2 != null) {
 			throw new LogicException(titaVo, "E0012", "變更後身份證號/統一編號 : " + iCustIdAfter);
 		}
-		
+
 		CustMain uCustMain = iCustMainService.holdById(iCustMain.getCustUKey(), titaVo);
 		CustMain beforeCustMain = (CustMain) iDataLog.clone(iCustMain);
 		uCustMain.setCustId(iCustIdAfter);
@@ -73,7 +73,7 @@ public class L1111 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException("E0007", "客戶主檔");
 		}
-		
+
 //		iCdCode = iCdCodeService.getItemFirst(1, "CustMark", iMark, titaVo);
 //		if (iCdCode != null) {
 //			iItem = iCdCode.getItem();	

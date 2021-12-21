@@ -56,12 +56,12 @@ public class L5703 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		
+
 		this.info("Run L5703");
 		this.info("active L5703 ");
-		
+
 		this.totaVo.init(titaVo);
-		
+
 		String FunCode = titaVo.getParam("FunCode").trim(); // 功能
 		String FinCode = titaVo.getParam("FinCode").trim(); // 債權機構
 		String FinCodeX = titaVo.getParam("FinCodeX").trim(); // 債權機構名稱
@@ -70,16 +70,16 @@ public class L5703 extends TradeBuffer {
 		String DataSendSection = titaVo.getParam("DataSendSection").trim(); // 資料傳送單位
 
 		NegFinAcct NegFinAcctVO = new NegFinAcct();
-		
-		switch(FunCode) {
-		
+
+		switch (FunCode) {
+
 		case "1":
 			NegFinAcctVO = sNegFinAcctService.findById(FinCode);
-			
-			if(NegFinAcctVO != null) {
+
+			if (NegFinAcctVO != null) {
 				throw new LogicException(titaVo, "E0002", "債務協商債權機構帳戶檔");
 			}
-			
+
 			NegFinAcct tNegFinAcct = new NegFinAcct();
 			tNegFinAcct.setFinCode(FinCode);
 			tNegFinAcct.setFinItem(FinCodeX);
@@ -97,24 +97,24 @@ public class L5703 extends TradeBuffer {
 				// E0005 新增資料時，發生錯誤
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
-			
+
 			break;
-			
+
 		case "2":
-			
+
 			NegFinAcctVO = sNegFinAcctService.holdById(FinCode);
-			
-			if(NegFinAcctVO == null) {
+
+			if (NegFinAcctVO == null) {
 				throw new LogicException(titaVo, "E0003", "債務協商債權機構帳戶檔");
 			}
-			
+
 			NegFinAcctVO.setFinItem(FinCodeX);
 			NegFinAcctVO.setRemitBank(RemitBank);
 			NegFinAcctVO.setRemitAcct(RemitAcct);
 			NegFinAcctVO.setDataSendSection(DataSendSection);
 			NegFinAcctVO.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));
-			
+
 			try {
 				sNegFinAcctService.update(NegFinAcctVO);
 			} catch (DBException e) {
@@ -122,17 +122,17 @@ public class L5703 extends TradeBuffer {
 				// E0007 更新資料時，發生錯誤
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
+
 			break;
-			
+
 		case "4":
-			
+
 			NegFinAcctVO = sNegFinAcctService.holdById(FinCode);
-			
-			if(NegFinAcctVO == null) {
+
+			if (NegFinAcctVO == null) {
 				throw new LogicException(titaVo, "E0004", "債務協商債權機構帳戶檔");
 			}
-			
+
 			try {
 				sNegFinAcctService.delete(NegFinAcctVO);
 			} catch (DBException e) {
@@ -141,12 +141,10 @@ public class L5703 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
 			break;
-			
+
 		default:
 			break;
 		}
-
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

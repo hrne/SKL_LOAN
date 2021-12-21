@@ -54,7 +54,7 @@ public class L8040 extends TradeBuffer {
 			occursListA.putParam("OOClaimStatus", rJcicZ049.getClaimStatus());
 			occursListA.putParam("OOApplyDate", rJcicZ049.getApplyDate());
 			occursListA.putParam("OOCourtCode", rJcicZ049.getCourtCode());
-			occursListA.putParam("OOYear", rJcicZ049.getYear()-1911);
+			occursListA.putParam("OOYear", rJcicZ049.getYear() - 1911);
 			occursListA.putParam("OOCourtDiv", rJcicZ049.getCourtDiv());
 			occursListA.putParam("OOCourtCaseNo", rJcicZ049.getCourtCaseNo());
 			occursListA.putParam("OOApprove", rJcicZ049.getApprove());
@@ -89,7 +89,7 @@ public class L8040 extends TradeBuffer {
 			occursList.putParam("OOClaimStatus", rrJcicZ049Log.getClaimStatus());
 			occursList.putParam("OOApplyDate", rrJcicZ049Log.getApplyDate());
 			occursList.putParam("OOCourtCode", rrJcicZ049Log.getCourtCode());
-			occursList.putParam("OOYear", rrJcicZ049Log.getYear()-1911);
+			occursList.putParam("OOYear", rrJcicZ049Log.getYear() - 1911);
 			occursList.putParam("OOCourtDiv", rrJcicZ049Log.getCourtDiv());
 			occursList.putParam("OOCourtCaseNo", rrJcicZ049Log.getCourtCaseNo());
 			occursList.putParam("OOApprove", rrJcicZ049Log.getApprove());

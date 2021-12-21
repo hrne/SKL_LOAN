@@ -40,7 +40,7 @@ public class L6R05 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdClService sCdClService;
-	
+
 	@Autowired
 	public CdCodeService sCdCodeService;
 	@Autowired
@@ -67,10 +67,10 @@ public class L6R05 extends TradeBuffer {
 
 		// 初始值Tota
 		moveTotaCdCl(new CdCl());
-		String ClCode1Item="";
-		//查共用代碼檔名稱
-		CdCode tCdCode = sCdCodeService.findById(new CdCodeId("ClCode1","1"), titaVo);
-		if(tCdCode!=null) {
+		String ClCode1Item = "";
+		// 查共用代碼檔名稱
+		CdCode tCdCode = sCdCodeService.findById(new CdCodeId("ClCode1", "1"), titaVo);
+		if (tCdCode != null) {
 			ClCode1Item = tCdCode.getItem();
 		}
 		// 查詢擔保品代號資料檔
@@ -79,7 +79,7 @@ public class L6R05 extends TradeBuffer {
 		/* 如有找到資料 */
 		if (tCdCl != null) {
 			if (iRimTxCode.equals("L6603") && iRimFuncCode == 1) {
-				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimClCode1")+"-"+titaVo.getParam("RimClCode2")+"/"+ClCode1Item+"-"+tCdCl.getClItem()); // 新增資料已存在
+				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimClCode1") + "-" + titaVo.getParam("RimClCode2") + "/" + ClCode1Item + "-" + tCdCl.getClItem()); // 新增資料已存在
 			} else {
 				/* 將每筆資料放入Tota */
 				moveTotaCdCl(tCdCl);

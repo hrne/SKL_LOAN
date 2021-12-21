@@ -80,7 +80,8 @@ public class L5972 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
-		this.index = titaVo.getReturnIndex();;
+		this.index = titaVo.getReturnIndex();
+		;
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100; // 313 * 100 = 31300
 
@@ -173,7 +174,7 @@ public class L5972 extends TradeBuffer {
 				slNegTrans = sNegTransService.custNoEq(iCustNo, this.index, this.limit, titaVo);
 				lNegTrans = slNegTrans == null ? null : slNegTrans.getContent();
 			}
-			
+
 		}
 
 		if (lNegTrans != null && lNegTrans.size() != 0) {
@@ -213,7 +214,7 @@ public class L5972 extends TradeBuffer {
 				titaVo.setReturnIndex(this.setIndexNext());
 				this.totaVo.setMsgEndToEnter();// 手動折返
 			}
-			
+
 		} else {
 			// 查詢資料不存在
 			throw new LogicException(titaVo, "E0001", "債務協商交易檔");

@@ -30,46 +30,47 @@ public class L575A extends TradeBuffer {
 	public NegQueryCustService sNegQueryCustService;
 	@Autowired
 	DateUtil dateUtil;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5705File ");
 		this.totaVo.init(titaVo);
-		String strToday=titaVo.getCalDy();//日曆日
-		
-		int Today=0;
-		String CustId = titaVo.getParam("TxCustId").trim();//身份證字號
-		String btnIndex=titaVo.getBtnIndex();//0~N第幾個按鈕
+		String strToday = titaVo.getCalDy();// 日曆日
+
+		int Today = 0;
+		String CustId = titaVo.getParam("TxCustId").trim();// 身份證字號
+		String btnIndex = titaVo.getBtnIndex();// 0~N第幾個按鈕
 		switch (btnIndex) {
 		case "0":
-			//產生請求檔
-			this.info("L5705File Today=["+Today+"],CustId=["+CustId+"]");
-			if(String.valueOf(Integer.parseInt(strToday)).length()!=8) {
-				Today=Integer.parseInt(strToday)+19110000;
+			// 產生請求檔
+			this.info("L5705File Today=[" + Today + "],CustId=[" + CustId + "]");
+			if (String.valueOf(Integer.parseInt(strToday)).length() != 8) {
+				Today = Integer.parseInt(strToday) + 19110000;
 			}
-			NegQueryCustId NegQueryCustIdVo=new NegQueryCustId();
+			NegQueryCustId NegQueryCustIdVo = new NegQueryCustId();
 			NegQueryCustIdVo.setAcDate(Today);
 			NegQueryCustIdVo.setCustId(CustId);
-			
-			NegQueryCust NegQueryCustVo=sNegQueryCustService.findById(NegQueryCustIdVo, titaVo);
-			if(NegQueryCustVo!=null) {
-				if(("Y").equals(NegQueryCustVo.getFileYN())) {
+
+			NegQueryCust NegQueryCustVo = sNegQueryCustService.findById(NegQueryCustIdVo, titaVo);
+			if (NegQueryCustVo != null) {
+				if (("Y").equals(NegQueryCustVo.getFileYN())) {
 					NegQueryCustVo.setFileYN("N");
-					NegQueryCustVo.setSeqNo(NegQueryCustVo.getSeqNo()+1);
+					NegQueryCustVo.setSeqNo(NegQueryCustVo.getSeqNo() + 1);
 					try {
-						sNegQueryCustService.update(NegQueryCustVo, titaVo);//資料異動
+						sNegQueryCustService.update(NegQueryCustVo, titaVo);// 資料異動
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "");
 					}
 				}
-			}else {
-				NegQueryCustVo=new NegQueryCust();
+			} else {
+				NegQueryCustVo = new NegQueryCust();
 				NegQueryCustVo.setNegQueryCustId(NegQueryCustIdVo);
 				NegQueryCustVo.setFileYN("N");
 				NegQueryCustVo.setSeqNo(1);
 				try {
 					sNegQueryCustService.insert(NegQueryCustVo, titaVo);
 				} catch (DBException e) {
-					//E0005	新增資料時，發生錯誤
+					// E0005 新增資料時，發生錯誤
 					throw new LogicException(titaVo, "E0005", "");
 				}
 			}

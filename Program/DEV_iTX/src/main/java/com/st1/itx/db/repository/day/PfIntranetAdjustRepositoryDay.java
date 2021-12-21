@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,15 @@ import com.st1.itx.db.domain.PfIntranetAdjust;
  */
 public interface PfIntranetAdjustRepositoryDay extends JpaRepository<PfIntranetAdjust, Long> {
 
-  // CustNo = ,AND FacmNo = ,AND BormNo =
-  public Optional<PfIntranetAdjust> findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByCustNoAscFacmNoAscBormNoAsc(int custNo_0, int facmNo_1, int bormNo_2);
+	// CustNo = ,AND FacmNo = ,AND BormNo =
+	public Optional<PfIntranetAdjust> findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByCustNoAscFacmNoAscBormNoAsc(int custNo_0, int facmNo_1, int bormNo_2);
 
-  // WorkMonth =
-  public Slice<PfIntranetAdjust> findAllByWorkMonthIsOrderByCustNoAscFacmNoAscBormNoAsc(int workMonth_0, Pageable pageable);
+	// WorkMonth =
+	public Slice<PfIntranetAdjust> findAllByWorkMonthIsOrderByCustNoAscFacmNoAscBormNoAsc(int workMonth_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<PfIntranetAdjust> findByLogNo(Long logNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<PfIntranetAdjust> findByLogNo(Long logNo);
 
 }
-

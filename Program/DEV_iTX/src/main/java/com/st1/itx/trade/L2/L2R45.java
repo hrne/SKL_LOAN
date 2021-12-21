@@ -69,7 +69,7 @@ public class L2R45 extends TradeBuffer {
 		if (tFacClose == null) {
 			throw new LogicException(titaVo, "E2003", "查無清償作業檔資料"); // 查無資料
 		}
-		if (!("3".equals(iFunCode)||"2".equals(iFunCode))) {
+		if (!("3".equals(iFunCode) || "2".equals(iFunCode))) {
 			if (!(tFacClose.getCloseDate() > 0)) {
 				throw new LogicException(titaVo, "E0010", "(需做結案登錄)"); // 查無資料
 			}

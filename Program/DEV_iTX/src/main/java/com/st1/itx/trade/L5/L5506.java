@@ -80,7 +80,7 @@ public class L5506 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0003", "");
 			} else {
 				PfIntranetAdjust pfIntranetAdjust2 = (PfIntranetAdjust) dataLog.clone(pfIntranetAdjust);
-				
+
 				pfIntranetAdjust.setSumAmt(BigDecimal.ZERO);
 				pfIntranetAdjust.setSumCnt(BigDecimal.ZERO);
 
@@ -113,7 +113,6 @@ public class L5506 extends TradeBuffer {
 		BigDecimal iPerfCnt = new BigDecimal(titaVo.getParam("PerfCnt").trim());
 		BigDecimal iPerfAmt = new BigDecimal(titaVo.getParam("PerfAmt").trim());
 
-
 		pfIntranetAdjust.setCustNo(iCustNo);
 		pfIntranetAdjust.setFacmNo(iFacmNo);
 		pfIntranetAdjust.setBormNo(iBormNo);
@@ -135,12 +134,12 @@ public class L5506 extends TradeBuffer {
 
 		if ("-".equals(titaVo.getParam("SumAmtSign").trim())) {
 			iSumAmt = iSumAmt.multiply(bigNeg);
-		} 
-		
+		}
+
 		if ("-".equals(titaVo.getParam("SumCntSign").trim())) {
 			iSumCnt = iSumCnt.multiply(bigNeg);
-		} 
-		
+		}
+
 		pfIntranetAdjust.setSumAmt(iSumAmt);
 		pfIntranetAdjust.setSumCnt(iSumCnt);
 

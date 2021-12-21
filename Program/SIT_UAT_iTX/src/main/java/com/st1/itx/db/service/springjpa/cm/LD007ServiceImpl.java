@@ -31,12 +31,12 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		
+
 		Boolean useWorkMonth = parse.stringToInteger(titaVo.getParam("workMonthStart")) > 0;
 		Boolean useCustNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0;
 		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
 		Boolean useBsOfficer = !titaVo.getParam("bsOfficer").trim().isEmpty();
-		
+
 		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useBfOfficer:%s", useWorkMonth, useCustNo, useFacmNo, useBsOfficer));
 
 		String sql = "";
@@ -76,23 +76,18 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND F.\"FacmNo\" = B.\"FacmNo\" ";
 		sql += " WHERE B.\"DrawdownAmt\" > 0 ";
 		sql += "   AND B.\"PerfAmt\" > 0 ";
-		if (useWorkMonth)
-		{
+		if (useWorkMonth) {
 			sql += "   AND B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
-		} else
-		{
+		} else {
 			sql += "   AND B.\"PerfDate\" BETWEEN :perfDateStart AND :perfDateEnd";
 		}
-		if (useCustNo)
-		{
+		if (useCustNo) {
 			sql += "   AND B.\"CustNo\" = :custNo";
 		}
-		if (useFacmNo)
-		{
+		if (useFacmNo) {
 			sql += "   AND B.\"CustNo\" = :facmNo";
 		}
-		if (useBsOfficer)
-		{
+		if (useBsOfficer) {
 			sql += "   AND B.\"BsOfficer\" = :bsOfficer";
 		}
 
@@ -102,28 +97,23 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		if (useWorkMonth)
-		{
-		query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
-		query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
-		} else
-		{
-		query.setParameter("perfDateStart", parse.stringToInteger(titaVo.getParam("perfDateStart")) + 19110000);
-		query.setParameter("perfDateEnd", parse.stringToInteger(titaVo.getParam("perfDateEnd")) + 19110000);
+		if (useWorkMonth) {
+			query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
+			query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
+		} else {
+			query.setParameter("perfDateStart", parse.stringToInteger(titaVo.getParam("perfDateStart")) + 19110000);
+			query.setParameter("perfDateEnd", parse.stringToInteger(titaVo.getParam("perfDateEnd")) + 19110000);
 		}
-		
-		if (useCustNo)
-		{
+
+		if (useCustNo) {
 			query.setParameter("custNo", titaVo.getParam("custNo"));
 		}
-		
-		if (useFacmNo)
-		{
+
+		if (useFacmNo) {
 			query.setParameter("facmNo", titaVo.getParam("facmNo"));
 		}
-		
-		if (useBsOfficer)
-		{
+
+		if (useBsOfficer) {
 			query.setParameter("bsOfficer", titaVo.getParam("bsOfficer"));
 		}
 

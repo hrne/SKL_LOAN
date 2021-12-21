@@ -32,7 +32,7 @@ public class LC104 extends TradeBuffer {
 	// 檔案輸出路徑
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
-	
+
 	@Autowired
 	public FileCom fileCom;
 
@@ -42,45 +42,44 @@ public class LC104 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	ZLibUtils zLibUtils;
-	
+
 	@Autowired
 	public TxAttachmentService txAttachmentService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC104 ");
 		this.totaVo.init(titaVo);
 
 		String fileItem = titaVo.getParam("FileItem");
-		
-		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-		+ File.separatorChar + fileItem;
-		
+
+		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + fileItem;
+
 		this.info("LC104 filename = " + fileName);
-		
+
 		TxAttachment txAttachment = new TxAttachment();
-		
+
 		txAttachment.setTranNo(titaVo.getParam("TranNo"));
 		txAttachment.setCustNo(Integer.valueOf(titaVo.getParam("CustNo")));
 		txAttachment.setFacmNo(Integer.valueOf(titaVo.getParam("FacmNo")));
-		txAttachment.setBormNo(Integer.valueOf(titaVo.getParam("BormNo")));		
+		txAttachment.setBormNo(Integer.valueOf(titaVo.getParam("BormNo")));
 		txAttachment.setMrKey(titaVo.getParam("MrKey"));
 		txAttachment.setTypeItem(titaVo.getParam("TypeItem"));
 		txAttachment.setFileItem(titaVo.getParam("FileItem"));
 		txAttachment.setDesc(titaVo.getParam("Desc"));
 		txAttachment.setStatus(0);
-		
+
 		txAttachment.setFileData(zLibUtils.compress(new File(fileName)));
-		
+
 		try {
 			txAttachmentService.insert(txAttachment, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

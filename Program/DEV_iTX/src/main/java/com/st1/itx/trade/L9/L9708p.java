@@ -41,14 +41,14 @@ public class L9708p extends TradeBuffer {
 		this.info("L9708p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
-		String content="";
-		
+		String content = "";
+
 		l9708Report.setParentTranCode(parentTranCode);
 
-		if(l9708Report.exec(titaVo)) {
-			content="L9708貸款自動轉帳申請書明細表已完成";
-		}else{
-			content="L9708貸款自動轉帳申請書明細表查無資料";
+		if (l9708Report.exec(titaVo)) {
+			content = "L9708貸款自動轉帳申請書明細表已完成";
+		} else {
+			content = "L9708貸款自動轉帳申請書明細表查無資料";
 		}
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), content, titaVo);

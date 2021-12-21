@@ -102,12 +102,11 @@ public class ReportCom extends CommBuffer {
 		// run batchJob
 		if (backgroundJobs.length() > 0) {
 			this.info("ReportCom: executing BatchJobs (" + txcd + ")");
-			
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), backgroundJobs.length()/7 + " 支報表正在背景產製，完成後可於＂報表及製檔＂存取", titaVo);
+
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), backgroundJobs.length() / 7 + " 支報表正在背景產製，完成後可於＂報表及製檔＂存取", titaVo);
 			// jL0001;jL0002;jL0003...
 			// each job is 7 chars long, hence /7
-			
+
 			backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
 			titaVo.setBatchJobId(backgroundJobs.toString());
 		}
@@ -116,10 +115,10 @@ public class ReportCom extends CommBuffer {
 			this.info("ReportCom: sending popups about NeedInputJobs (" + txcd + ")");
 
 			// send popup about reports that need further input
-			// after batchJob to make sure that users click through jobs that need inputs first
+			// after batchJob to make sure that users click through jobs that need inputs
+			// first
 			for (NeedInputJob j : needInputJobs) {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", j.code,
-						titaVo.getParam("TLRNO"), j.code + j.name + "須填寫查詢條件", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", j.code, titaVo.getParam("TLRNO"), j.code + j.name + "須填寫查詢條件", titaVo);
 			}
 		}
 

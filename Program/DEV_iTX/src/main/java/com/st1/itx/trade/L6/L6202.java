@@ -57,7 +57,6 @@ public class L6202 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6607"); // 功能選擇錯誤
 		}
 
-
 		CdSyndFee tCdSyndFee = new CdSyndFee();
 		switch (iFunCd) {
 		case 1: // 新增

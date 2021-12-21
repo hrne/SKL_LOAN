@@ -94,12 +94,11 @@ public class L3009 extends TradeBuffer {
 		// 查詢放款主檔
 		if (!iStatusCode.isEmpty()) {
 			this.info("有輸入支票狀況");
-			slLoanCheque = loanChequeService.forStatusCodeSelect(iChequeDateSt + 19110000, iChequeDateEd + 19110000,
-					iChequeAcct, iChequeAcctEd, iChequeNo, iChequeNoEd, iStatusCode, this.index, this.limit, titaVo);
+			slLoanCheque = loanChequeService.forStatusCodeSelect(iChequeDateSt + 19110000, iChequeDateEd + 19110000, iChequeAcct, iChequeAcctEd, iChequeNo, iChequeNoEd, iStatusCode, this.index,
+					this.limit, titaVo);
 		} else {
 			this.info("無輸入支票狀況");
-			slLoanCheque = loanChequeService.chequeDateRange(iChequeDateSt + 19110000, iChequeDateEd + 19110000,
-					iChequeAcct, iChequeAcctEd, iChequeNo, iChequeNoEd, this.index, this.limit, titaVo);
+			slLoanCheque = loanChequeService.chequeDateRange(iChequeDateSt + 19110000, iChequeDateEd + 19110000, iChequeAcct, iChequeAcctEd, iChequeNo, iChequeNoEd, this.index, this.limit, titaVo);
 		}
 
 		lLoanCheque = slLoanCheque == null ? null : slLoanCheque.getContent();

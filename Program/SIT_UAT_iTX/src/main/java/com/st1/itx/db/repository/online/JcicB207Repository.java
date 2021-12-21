@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,14 +20,13 @@ import com.st1.itx.db.domain.JcicB207Id;
  */
 public interface JcicB207Repository extends JpaRepository<JcicB207, JcicB207Id> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicB207> findByJcicB207Id(JcicB207Id jcicB207Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicB207> findByJcicB207Id(JcicB207Id jcicB207Id);
 
-  // (每月日終批次)維護 JcicB207 聯徵授信戶基本資料檔
-  @Procedure(value = "\"Usp_L8_JcicB207_Upd\"")
-  public void uspL8Jcicb207Upd(int TBSDYF, String EmpNo);
+	// (每月日終批次)維護 JcicB207 聯徵授信戶基本資料檔
+	@Procedure(value = "\"Usp_L8_JcicB207_Upd\"")
+	public void uspL8Jcicb207Upd(int TBSDYF, String EmpNo);
 
 }
-

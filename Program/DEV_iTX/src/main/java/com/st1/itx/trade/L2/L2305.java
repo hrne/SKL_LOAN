@@ -45,41 +45,40 @@ public class L2305 extends TradeBuffer {
 
 		int iOriginCaseNo = Integer.valueOf(titaVo.getParam("OriginCaseNo"));
 		int iTargetCaseNo = Integer.valueOf(titaVo.getParam("TargetCaseNo"));
-		
-		int iOriginCustNo = Integer.valueOf(titaVo.getParam("OriginCustNo")); //若戶號可修改時使用
+
+		int iOriginCustNo = Integer.valueOf(titaVo.getParam("OriginCustNo")); // 若戶號可修改時使用
 		int iTargetCustNo = Integer.valueOf(titaVo.getParam("TargetCustNo"));
-		
+
 		Slice<ReltMain> iReltMain = null;
-		
+
 		CustMain lCustMain = new CustMain();
-		
+
 		String Ukey = "";
-		
+
 		iReltMain = iReltMainService.caseNoEq(iOriginCaseNo, 0, Integer.MAX_VALUE, titaVo);
-		
+
 		if (iReltMain == null) {
 			throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
 		}
-		
-		
+
 		for (ReltMain rReltMain : iReltMain) {
 			ReltMain nReltMain = new ReltMain();
 			ReltMain tReltMain = new ReltMain();
-			
+
 			Ukey = rReltMain.getReltUKey();
 			lCustMain = sCustMainService.findById(Ukey, titaVo);
-			
-			if( lCustMain == null ) {
+
+			if (lCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
 			}
-			
+
 			ReltMainId nReltMainId = new ReltMainId();
 			nReltMainId.setCaseNo(iTargetCaseNo);
-			nReltMainId.setCustNo(iTargetCustNo);			
+			nReltMainId.setCustNo(iTargetCustNo);
 			nReltMainId.setReltUKey(Ukey);
 			tReltMain = iReltMainService.findById(nReltMainId, titaVo);
-			if (tReltMain !=null) {
-				throw new LogicException(titaVo, "E0005", "案件編號"+iTargetCaseNo+"已有相同資料(戶號: "+rReltMain.getCustNo()+"，關係人客戶識別碼: "+rReltMain.getReltUKey()+")"); 
+			if (tReltMain != null) {
+				throw new LogicException(titaVo, "E0005", "案件編號" + iTargetCaseNo + "已有相同資料(戶號: " + rReltMain.getCustNo() + "，關係人客戶識別碼: " + rReltMain.getReltUKey() + ")");
 			}
 			nReltMain.setReltMainId(nReltMainId);
 			nReltMain.setApplDate(rReltMain.getApplDate());
@@ -93,7 +92,7 @@ public class L2305 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

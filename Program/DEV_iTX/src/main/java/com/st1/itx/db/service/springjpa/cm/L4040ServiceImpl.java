@@ -178,7 +178,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += "   and a.\"PropDate\" != " + propDate;
 			}
 			if (iCreateFlag == 3) {
-				sql += "   and a.\"CreateFlag\" = 'A'";				
+				sql += "   and a.\"CreateFlag\" = 'A'";
 			}
 			break;
 		case 2:

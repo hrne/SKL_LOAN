@@ -68,8 +68,7 @@ public class L618D extends TradeBuffer {
 		List<AcDetail> acDetailList = new ArrayList<AcDetail>();
 		AcDetail acDetail = new AcDetail();
 		TempVo tTempVo = new TempVo();
-		TxToDoDetail tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId(iItemCode, 0, 0, 0, iTxDtlValue),
-				titaVo);
+		TxToDoDetail tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId(iItemCode, 0, 0, 0, iTxDtlValue), titaVo);
 		if (tTxToDoDetail == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料
 		}
@@ -77,8 +76,7 @@ public class L618D extends TradeBuffer {
 		txToDoCom.updDetailStatus(2, tTxToDoDetail.getTxToDoDetailId(), titaVo);
 
 		if (titaVo.isHcodeNormal()) {
-			Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index,
-					Integer.MAX_VALUE, titaVo);
+			Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index, Integer.MAX_VALUE, titaVo);
 			if (slTxToDoDetail == null) {
 				isSendMsg = true;
 			}
@@ -136,8 +134,7 @@ public class L618D extends TradeBuffer {
 
 // BroadCast L6102
 		if (isSendMsg) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6102",
-					titaVo.getParam("TxAcDate") + titaVo.getParam("TxSlipBatNo"),
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6102", titaVo.getParam("TxAcDate") + titaVo.getParam("TxSlipBatNo"),
 					"請執行L6102-核心傳票相關單獨作業，傳票批號: " + iSlipBatNo, titaVo);
 		}
 

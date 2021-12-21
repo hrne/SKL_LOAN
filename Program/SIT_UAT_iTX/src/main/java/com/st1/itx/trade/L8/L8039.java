@@ -22,96 +22,94 @@ import com.st1.itx.tradeService.TradeBuffer;
 
 @Service("L8039")
 @Scope("prototype")
-public class L8039 extends TradeBuffer  {
-		@Autowired
-		public CdEmpService iCdEmpService;
-		@Autowired
-		public JcicZ048Service iJcicZ048Service;
-		@Autowired
-		public JcicZ048LogService iJcicZ048LogService;
-		@Override
-		public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-			this.info("active L8039 ");
-			this.totaVo.init(titaVo);
-			String iUkey = titaVo.getParam("Ukey");
-			
-			this.index = titaVo.getReturnIndex();
-			this.limit = 500;
+public class L8039 extends TradeBuffer {
+	@Autowired
+	public CdEmpService iCdEmpService;
+	@Autowired
+	public JcicZ048Service iJcicZ048Service;
+	@Autowired
+	public JcicZ048LogService iJcicZ048LogService;
 
-			Slice<JcicZ048Log> rJcicZ048Log = null;
-			rJcicZ048Log = iJcicZ048LogService.ukeyEq(iUkey, this.index, this.limit, titaVo);
-			JcicZ048 rJcicZ048 = new JcicZ048();
-			rJcicZ048 = iJcicZ048Service.ukeyFirst(iUkey, titaVo);
-			if (rJcicZ048 == null) {
-				throw new LogicException(titaVo, "E0001", ""); 
-			}
-			if (!rJcicZ048.getTranKey().equals("A")&&rJcicZ048.getOutJcicTxtDate()==0) {
-				OccursList occursListA = new OccursList();
-				String iLastUpdateEmpNo = rJcicZ048.getLastUpdateEmpNo();
-				CdEmp iCdEmp = new CdEmp();
-				occursListA.putParam("OOTranKey", rJcicZ048.getTranKey());
-				occursListA.putParam("OOCustId", rJcicZ048.getCustId());
-				occursListA.putParam("OORcDate", rJcicZ048.getRcDate());
-				occursListA.putParam("OOCustRegAddr", rJcicZ048.getCustRegAddr());
-				occursListA.putParam("OOCustComAddr", rJcicZ048.getCustComAddr());
-				occursListA.putParam("OOCustRegTelNo", rJcicZ048.getCustRegTelNo());
-				occursListA.putParam("OOCustComTelNo", rJcicZ048.getCustComTelNo());
-				occursListA.putParam("OOCustMobilNo", rJcicZ048.getCustMobilNo());
-				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
-				if (iLastUpdateEmpNo.equals("")) {
-					occursListA.putParam("OOLastUpdateEmpNoName", "");
-				}else {
-					if (iCdEmp == null) {
-						occursListA.putParam("OOLastUpdateEmpNoName", "");
-					}else {
-						occursListA.putParam("OOLastUpdateEmpNoName", iCdEmp.getFullname());
-					}
-				}
-				String taU = rJcicZ048.getLastUpdate().toString();
-				String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0,10).replace("-", ""))-19110000), 7,'0');
-				uaDate = uaDate.substring(0,3)+"/"+uaDate.substring(3, 5)+"/"+uaDate.substring(5);
-				String uTime = taU.substring(11,19);
-				occursListA.putParam("OOLastUpdate",uaDate+" "+uTime);
-				occursListA.putParam("OOLastUpdateEmpNo",iLastUpdateEmpNo);
-				occursListA.putParam("OOOutJcicTxtDate", rJcicZ048.getOutJcicTxtDate());
-				this.totaVo.addOccursList(occursListA);
-			}
-			if (rJcicZ048Log == null) {
-				throw new LogicException(titaVo, "E0001", ""); 
-			}
-			for (JcicZ048Log rrJcicZ048Log:rJcicZ048Log) {
-				OccursList occursList = new OccursList();
-				String iLastUpdateEmpNo = rrJcicZ048Log.getLastUpdateEmpNo();
-				CdEmp iCdEmp = new CdEmp();
-				occursList.putParam("OOTranKey", rrJcicZ048Log.getTranKey());
-				occursList.putParam("OOCustRegAddr", rrJcicZ048Log.getCustRegAddr());
-				occursList.putParam("OOCustComAddr", rrJcicZ048Log.getCustComAddr());
-				occursList.putParam("OOCustRegTelNo", rrJcicZ048Log.getCustRegTelNo());
-				occursList.putParam("OOCustComTelNo", rrJcicZ048Log.getCustComTelNo());
-				occursList.putParam("OOCustMobilNo", rrJcicZ048Log.getCustMobilNo());
-				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
-				if (iLastUpdateEmpNo.equals("")) {
-					occursList.putParam("OOLastUpdateEmpNoName", "");
-				}else {
-					if (iCdEmp == null) {
-						occursList.putParam("OOLastUpdateEmpNoName", "");
-					}else {
-						occursList.putParam("OOLastUpdateEmpNoName", iCdEmp.getFullname());
-					}
-				}
-				String taU = rrJcicZ048Log.getLastUpdate().toString();
-				String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0,10).replace("-", ""))-19110000), 7,'0');
-				uaDate = uaDate.substring(0,3)+"/"+uaDate.substring(3, 5)+"/"+uaDate.substring(5);
-				String uTime = taU.substring(11,19);
-				occursList.putParam("OOLastUpdate",uaDate+" "+uTime);
-				occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
-				occursList.putParam("OOOutJcicTxtDate", rrJcicZ048Log.getOutJcicTxtDate());
-				this.totaVo.addOccursList(occursList);
-			}		
-			this.addList(this.totaVo);
-			return this.sendList();
+	@Override
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		this.info("active L8039 ");
+		this.totaVo.init(titaVo);
+		String iUkey = titaVo.getParam("Ukey");
+
+		this.index = titaVo.getReturnIndex();
+		this.limit = 500;
+
+		Slice<JcicZ048Log> rJcicZ048Log = null;
+		rJcicZ048Log = iJcicZ048LogService.ukeyEq(iUkey, this.index, this.limit, titaVo);
+		JcicZ048 rJcicZ048 = new JcicZ048();
+		rJcicZ048 = iJcicZ048Service.ukeyFirst(iUkey, titaVo);
+		if (rJcicZ048 == null) {
+			throw new LogicException(titaVo, "E0001", "");
 		}
+		if (!rJcicZ048.getTranKey().equals("A") && rJcicZ048.getOutJcicTxtDate() == 0) {
+			OccursList occursListA = new OccursList();
+			String iLastUpdateEmpNo = rJcicZ048.getLastUpdateEmpNo();
+			CdEmp iCdEmp = new CdEmp();
+			occursListA.putParam("OOTranKey", rJcicZ048.getTranKey());
+			occursListA.putParam("OOCustId", rJcicZ048.getCustId());
+			occursListA.putParam("OORcDate", rJcicZ048.getRcDate());
+			occursListA.putParam("OOCustRegAddr", rJcicZ048.getCustRegAddr());
+			occursListA.putParam("OOCustComAddr", rJcicZ048.getCustComAddr());
+			occursListA.putParam("OOCustRegTelNo", rJcicZ048.getCustRegTelNo());
+			occursListA.putParam("OOCustComTelNo", rJcicZ048.getCustComTelNo());
+			occursListA.putParam("OOCustMobilNo", rJcicZ048.getCustMobilNo());
+			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
+			if (iLastUpdateEmpNo.equals("")) {
+				occursListA.putParam("OOLastUpdateEmpNoName", "");
+			} else {
+				if (iCdEmp == null) {
+					occursListA.putParam("OOLastUpdateEmpNoName", "");
+				} else {
+					occursListA.putParam("OOLastUpdateEmpNoName", iCdEmp.getFullname());
+				}
+			}
+			String taU = rJcicZ048.getLastUpdate().toString();
+			String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
+			String uTime = taU.substring(11, 19);
+			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
+			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
+			occursListA.putParam("OOOutJcicTxtDate", rJcicZ048.getOutJcicTxtDate());
+			this.totaVo.addOccursList(occursListA);
+		}
+		if (rJcicZ048Log == null) {
+			throw new LogicException(titaVo, "E0001", "");
+		}
+		for (JcicZ048Log rrJcicZ048Log : rJcicZ048Log) {
+			OccursList occursList = new OccursList();
+			String iLastUpdateEmpNo = rrJcicZ048Log.getLastUpdateEmpNo();
+			CdEmp iCdEmp = new CdEmp();
+			occursList.putParam("OOTranKey", rrJcicZ048Log.getTranKey());
+			occursList.putParam("OOCustRegAddr", rrJcicZ048Log.getCustRegAddr());
+			occursList.putParam("OOCustComAddr", rrJcicZ048Log.getCustComAddr());
+			occursList.putParam("OOCustRegTelNo", rrJcicZ048Log.getCustRegTelNo());
+			occursList.putParam("OOCustComTelNo", rrJcicZ048Log.getCustComTelNo());
+			occursList.putParam("OOCustMobilNo", rrJcicZ048Log.getCustMobilNo());
+			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
+			if (iLastUpdateEmpNo.equals("")) {
+				occursList.putParam("OOLastUpdateEmpNoName", "");
+			} else {
+				if (iCdEmp == null) {
+					occursList.putParam("OOLastUpdateEmpNoName", "");
+				} else {
+					occursList.putParam("OOLastUpdateEmpNoName", iCdEmp.getFullname());
+				}
+			}
+			String taU = rrJcicZ048Log.getLastUpdate().toString();
+			String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
+			String uTime = taU.substring(11, 19);
+			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
+			occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
+			occursList.putParam("OOOutJcicTxtDate", rrJcicZ048Log.getOutJcicTxtDate());
+			this.totaVo.addOccursList(occursList);
+		}
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
 }
-	
-
-

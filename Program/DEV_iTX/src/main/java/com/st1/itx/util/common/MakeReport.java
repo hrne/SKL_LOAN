@@ -162,7 +162,7 @@ public class MakeReport extends CommBuffer {
 	private String signOff = "$$$Sign off$$$";
 
 	private String rptPassword = "";
-	
+
 	private boolean formMode = false;
 
 	// 列印明細
@@ -180,37 +180,36 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem,
-			String PageSize, String pageOrientation) throws LogicException {
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize, String pageOrientation) throws LogicException {
 
 		formMode = true;
-		
+
 		this.checkParm(date, brno, rptCode, rptItem);
-		
+
 		this.titaVo = titaVo;
-		
+
 		this.date = date;
 		this.brno = brno;
 		this.rptCode = rptCode;
 		this.rptItem = rptItem;
 
 		this.rptSize = PageSize.toUpperCase();
-		
+
 		String[] ss = PageSize.split(",");
 
-        this.info("PageSize length = " + ss.length);
-		
-        if (ss.length != 1 && ss.length != 3) {
-        	throw new LogicException("EC004", "(MakeReport)報表尺寸錯誤=" + PageSize);
-        }
-        
+		this.info("PageSize length = " + ss.length);
+
+		if (ss.length != 1 && ss.length != 3) {
+			throw new LogicException("EC004", "(MakeReport)報表尺寸錯誤=" + PageSize);
+		}
+
 		pageOrientation = pageOrientation.toUpperCase();
 		if ("P".equals(pageOrientation)) {
 			this.pageOrientation = pageOrientation;
 		} else {
 			this.pageOrientation = "L";
 		}
-		
+
 		this.useDefault = false;
 
 		init();
@@ -229,8 +228,7 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String PageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String PageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -268,8 +266,7 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
-			throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -301,8 +298,7 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -993,7 +989,7 @@ public class MakeReport extends CommBuffer {
 		} else {
 			tTxFile.setFileType(1); // 固定1:PDF
 		}
-		
+
 		tTxFile.setFileFormat(1);
 		tTxFile.setFileCode(this.rptCode);
 		tTxFile.setFileItem(this.rptItem);
@@ -1062,7 +1058,7 @@ public class MakeReport extends CommBuffer {
 		if (tTxFile == null) {
 			throw new LogicException(titaVo, "EC001", "(MakeReport)輸出檔(TxFile)序號:" + pdfno);
 		}
-		
+
 		if (tTxFile.getFileType() != 1) {
 			throw new LogicException(titaVo, "E0015", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + "，不為PDF格式");
 		}
@@ -1165,7 +1161,7 @@ public class MakeReport extends CommBuffer {
 
 					Rectangle pagesize = PageSize.A4;
 
-					// this.info("B pagesize.getWidth()  = " + pagesize.getWidth());
+					// this.info("B pagesize.getWidth() = " + pagesize.getWidth());
 					// this.info("B pagesize.getHeight() = " + pagesize.getHeight());
 
 					if ("LETTER".equals(papersize)) {
@@ -1186,11 +1182,11 @@ public class MakeReport extends CommBuffer {
 						pagesize = new Rectangle(n1, n2);
 
 						// this.info("MakeReport pagesize =" + papersize);
-						// this.info("C pagesize.getWidth()  = " + pagesize.getWidth());
+						// this.info("C pagesize.getWidth() = " + pagesize.getWidth());
 						// this.info("C pagesize.getHeight() = " + pagesize.getHeight());
 					}
 
-					// this.info("A pagesize.getWidth()  = " + pagesize.getWidth());
+					// this.info("A pagesize.getWidth() = " + pagesize.getWidth());
 					// this.info("A pagesize.getHeight() = " + pagesize.getHeight());
 
 					String paperorientaton = map.get("paper.orientation").toString();
@@ -2084,8 +2080,7 @@ public class MakeReport extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString
-						+ "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -2104,8 +2099,7 @@ public class MakeReport extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble
-					+ "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -2341,7 +2335,7 @@ public class MakeReport extends CommBuffer {
 				String paperorientaton = map.get("paper.orientation").toString();
 
 				String[] ss = papersize.split(",");
-				
+
 				map2 = new HashMap<String, Object>();
 				if (ss.length == 3) {
 					map2.put("Action", 3);

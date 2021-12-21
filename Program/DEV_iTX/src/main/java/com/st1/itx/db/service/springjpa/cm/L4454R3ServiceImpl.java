@@ -111,7 +111,7 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 //
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entryDate",entryDate);
+		query.setParameter("entryDate", entryDate);
 		query.setParameter("lastYearEntryDate", lastYearEntryDate);
 		return this.convertToMap(query);
 	}

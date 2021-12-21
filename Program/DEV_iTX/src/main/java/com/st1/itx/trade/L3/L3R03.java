@@ -68,8 +68,7 @@ public class L3R03 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "功能 = " + iFuncCode); // 功能選擇錯誤
 		}
 		// 查詢放款約定還本檔
-		LoanBook tLoanBook = loanBookService.findById(new LoanBookId(iCustNo, iFacmNo, iBormNo, iBookDate + 19110000),
-				titaVo);
+		LoanBook tLoanBook = loanBookService.findById(new LoanBookId(iCustNo, iFacmNo, iBormNo, iBookDate + 19110000), titaVo);
 		if (tLoanBook == null) {
 			if (iTxCode.equals("L3130") && (iFuncCode == 1)) {
 				this.totaVo.putParam("OIncludeIntFlag", "");

@@ -45,21 +45,19 @@ public class L8202 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	public DataLog dataLog;
-	
+
 	@Autowired
 	SendRsp sendRsp;
-	
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8202 ");
 		this.totaVo.init(titaVo);
-		
-		//執行交易
-		MySpring.newTask("L8202Batch",this.txBuffer,titaVo);
-		this.addList(this.totaVo);
-		return this.sendList(); 
-	}
 
+		// 執行交易
+		MySpring.newTask("L8202Batch", this.txBuffer, titaVo);
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
 
 }

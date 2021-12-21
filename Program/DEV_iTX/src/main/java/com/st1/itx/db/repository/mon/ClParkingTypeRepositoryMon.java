@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.ClParkingTypeId;
  */
 public interface ClParkingTypeRepositoryMon extends JpaRepository<ClParkingType, ClParkingTypeId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClParkingType> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Slice<ClParkingType> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClParkingType> findByClParkingTypeId(ClParkingTypeId clParkingTypeId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClParkingType> findByClParkingTypeId(ClParkingTypeId clParkingTypeId);
 
 }
-

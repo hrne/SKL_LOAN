@@ -129,7 +129,7 @@ public class L8319 extends TradeBuffer {
 
 			// 5 start
 			// 檢核報送單位代號+債務人IDN+協商申請日曾報送「'42':回報無擔保債權金額資料」，且未報送「'46':結案通知資料」及「'54':單獨全數受清償資料」.
-			//@@@function 要改为：custRcSubEq
+			// @@@function 要改为：custRcSubEq
 			Slice<JcicZ042> sJcicZ042 = sJcicZ042Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ042 == null) {
 				if ("A".equals(iTranKey)) {
@@ -151,7 +151,7 @@ public class L8319 extends TradeBuffer {
 						throw new LogicException("E0005", "「報送單位代號+債務人IDN+協商申請日」已報送過(46)結案通知資料.");
 					}
 				}
-				//@@@function 要改为：custRcSubEq
+				// @@@function 要改为：custRcSubEq
 				Slice<JcicZ054> sJcicZ054 = sJcicZ054Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ054 != null) {
 					throw new LogicException("E0005", "「報送單位代號+債務人IDN+協商申請日」已報送過(54)單獨全數受清償資料.");

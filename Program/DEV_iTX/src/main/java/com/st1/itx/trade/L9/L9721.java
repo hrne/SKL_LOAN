@@ -21,15 +21,15 @@ import com.st1.itx.util.MySpring;
  */
 public class L9721 extends TradeBuffer {
 	// private static final Logger logger = LoggerFactory.getLogger(L9721.class);
-	
+
 	String TXCD = "L9721";
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active "+ TXCD);
+		this.info("active " + TXCD);
 		this.totaVo.init(titaVo);
 
-		MySpring.newTask(TXCD+"p", this.txBuffer, titaVo);
+		MySpring.newTask(TXCD + "p", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

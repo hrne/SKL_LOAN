@@ -103,8 +103,7 @@ public class L431A extends TradeBuffer {
 
 		tBatxRateChange = batxRateChangeService.holdById(tBatxRateChangeId);
 		if (tBatxRateChange == null) {
-			throw new LogicException("E0001", "L431A Couldn't Find CustNo : " + parse.IntegerToString(custNo, 7) + "-"
-					+ parse.IntegerToString(facmNo, 3) + "-" + parse.IntegerToString(bormNo, 3));
+			throw new LogicException("E0001", "L431A Couldn't Find CustNo : " + parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + "-" + parse.IntegerToString(bormNo, 3));
 		}
 
 		if (tBatxRateChange.getConfirmFlag() == 1) {
@@ -169,8 +168,7 @@ public class L431A extends TradeBuffer {
 
 	private String check(BatxRateChange t, TitaVo titaVo) throws LogicException {
 		String checkMsg = "";
-		LoanBorMain tLoanBorMain = loanBorMainService
-				.holdById(new LoanBorMainId(t.getCustNo(), t.getFacmNo(), t.getBormNo()));
+		LoanBorMain tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(t.getCustNo(), t.getFacmNo(), t.getBormNo()));
 		if (tLoanBorMain == null) {
 			throw new LogicException("E0006", "LoanBorMain ");
 		}

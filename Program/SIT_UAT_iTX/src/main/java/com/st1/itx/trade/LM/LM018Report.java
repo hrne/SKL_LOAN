@@ -30,36 +30,35 @@ public class LM018Report extends MakeReport {
 
 	@Autowired
 	Parse parse;
-	
-	
+
 	// 調整的訣竅:
 	// 先對準表格, 再對準字
 	// 字的位置會被表格Shift影響到
-	
+
 	// 字體大小
 	private int fontSize = 10;
-	
+
 	// 最左欄寬度
 	private int shiftFromLegends = 22;
-	
+
 	// 每季寬度
 	private int shiftPerSeason = 20;
-	
+
 	// 主表格與最後小計表格之間的留白
 	private int shiftBeforeSum = 14;
-	
+
 	// 主表格餘額shift (負數:因為是先向右畫好表格再回頭填數字)
 	private int shiftMainBal = -14;
-	
+
 	// 主表格利收shift (負數:因為是先向右畫好表格再回頭填數字)
 	private int shiftMainInt = -4;
-	
+
 	// 主表格年月shift
 	private int shiftYearMonth = 11;
-	
+
 	// 小計表格餘額shift
 	private int shiftSumBal = 9;
-	
+
 	// 小計表格利收shift
 	private int shiftSumInt = 25;
 
@@ -88,8 +87,7 @@ public class LM018Report extends MakeReport {
 	}
 
 	private static enum subject {
-		AA("AA", -17, false), IA("IA", -20, true), IB("IB", -23, true), IC("IC", -26, true), ID("ID", -29, true),
-		IF("IF", -32, true), IH("IH", -35, true), ZZ("ZZ", -38, true);
+		AA("AA", -17, false), IA("IA", -20, true), IB("IB", -23, true), IC("IC", -26, true), ID("ID", -29, true), IF("IF", -32, true), IH("IH", -35, true), ZZ("ZZ", -38, true);
 
 		String name;
 		int printY;
@@ -141,7 +139,7 @@ public class LM018Report extends MakeReport {
 
 		// draw start of the form
 
-		this.print(-9,  xPivot + xShift, "┌──────────");
+		this.print(-9, xPivot + xShift, "┌──────────");
 		this.print(-10, xPivot + xShift, "│　　　　　　　　　　");
 		this.print(-11, xPivot + xShift, "│　　　　　　　　　　");
 		this.print(-12, xPivot + xShift, "├──────────");
@@ -193,10 +191,7 @@ public class LM018Report extends MakeReport {
 						this.print(-9, xPivot + xShift, "┬─────────");
 						this.print(-10, xPivot + xShift, "│　　　　　　　　　");
 						this.print(-11, xPivot + xShift, "│　　　　　　　　　");
-						this.print(-11, xPivot + xShift + shiftYearMonth,
-								(parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年"
-										+ LM018Vo.get("F1").substring(4) + "月",
-								"C");
+						this.print(-11, xPivot + xShift + shiftYearMonth, (parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年" + LM018Vo.get("F1").substring(4) + "月", "C");
 						this.print(-12, xPivot + xShift, "┼────┬────");
 						this.print(-13, xPivot + xShift, "│　　　　│　　　　");
 						this.print(-14, xPivot + xShift, "│　餘額　│　利收　");
@@ -236,10 +231,7 @@ public class LM018Report extends MakeReport {
 						this.print(-9, xPivot + xShift, "┬─────────");
 						this.print(-10, xPivot + xShift, "│　　　　　　　　　");
 						this.print(-11, xPivot + xShift, "│　　　　　　　　　");
-						this.print(-11, xPivot + xShift + shiftYearMonth,
-								(parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年"
-										+ LM018Vo.get("F1").substring(4) + "月",
-								"C");
+						this.print(-11, xPivot + xShift + shiftYearMonth, (parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年" + LM018Vo.get("F1").substring(4) + "月", "C");
 						this.print(-12, xPivot + xShift, "┼────┬────");
 						this.print(-13, xPivot + xShift, "│　　　　│　　　　");
 						this.print(-14, xPivot + xShift, "│　餘額　│　利收　");
@@ -339,7 +331,7 @@ public class LM018Report extends MakeReport {
 
 		// draw the end of the form and right-side total
 
-		this.print(-9 , xPivot + xShift, "┐");
+		this.print(-9, xPivot + xShift, "┐");
 		this.print(-10, xPivot + xShift, "│");
 		this.print(-11, xPivot + xShift, "│");
 		this.print(-12, xPivot + xShift, "┤");

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,19 +20,19 @@ import com.st1.itx.db.domain.TxAmlLog;
  */
 public interface TxAmlLogRepository extends JpaRepository<TxAmlLog, Long> {
 
-  // BrNo = ,AND ConfirmStatus = ,AND Entdy >= ,AND Entdy <= 
-  public Slice<TxAmlLog> findAllByBrNoIsAndConfirmStatusIsAndEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByCreateDateAsc(String brNo_0, String confirmStatus_1, int entdy_2, int entdy_3, Pageable pageable);
+	// BrNo = ,AND ConfirmStatus = ,AND Entdy >= ,AND Entdy <=
+	public Slice<TxAmlLog> findAllByBrNoIsAndConfirmStatusIsAndEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByCreateDateAsc(String brNo_0, String confirmStatus_1, int entdy_2, int entdy_3,
+			Pageable pageable);
 
-  // BrNo = ,AND Entdy >= ,AND Entdy <= 
-  public Slice<TxAmlLog> findAllByBrNoIsAndEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByCreateDateAsc(String brNo_0, int entdy_1, int entdy_2, Pageable pageable);
+	// BrNo = ,AND Entdy >= ,AND Entdy <=
+	public Slice<TxAmlLog> findAllByBrNoIsAndEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByCreateDateAsc(String brNo_0, int entdy_1, int entdy_2, Pageable pageable);
 
-  // Entdy = ,AND TransactionId = 
-  public Optional<TxAmlLog> findTopByEntdyIsAndTransactionIdIsOrderByLogNoAsc(int entdy_0, String transactionId_1);
+	// Entdy = ,AND TransactionId =
+	public Optional<TxAmlLog> findTopByEntdyIsAndTransactionIdIsOrderByLogNoAsc(int entdy_0, String transactionId_1);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAmlLog> findByLogNo(Long logNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAmlLog> findByLogNo(Long logNo);
 
 }
-

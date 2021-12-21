@@ -63,7 +63,7 @@ public class L3932 extends TradeBuffer {
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 
 		int iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
-		
+
 		// work area
 		int wkFacmNoStart = 1;
 		int wkFacmNoEnd = 999;
@@ -163,8 +163,8 @@ public class L3932 extends TradeBuffer {
 				}
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOCustNo", r.getCustNo());
-				
-				if(iCustDataCtrl == 1) {
+
+				if (iCustDataCtrl == 1) {
 					occursList.putParam("OOCustNo", "");
 				}
 				occursList.putParam("OOFacmNo", r.getFacmNo());

@@ -36,6 +36,7 @@ public class L5R14 extends TradeBuffer {
 	public CdBcmService iCdBcmService;
 	@Autowired
 	public CdEmpService iCdEmpService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		// L5401交易內調RIM用,資料來源為CdBcm表

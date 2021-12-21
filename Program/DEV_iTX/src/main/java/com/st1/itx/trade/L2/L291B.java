@@ -74,8 +74,7 @@ public class L291B extends TradeBuffer {
 		if (tFacShareLimit == null) {
 			throw new LogicException(titaVo, "E0001", "合併額度控管資料檔 = " + iApplNo); // 查詢資料不存在
 		}
-		Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(tFacShareLimit.getMainApplNo(), 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(tFacShareLimit.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
 		List<FacShareLimit> lFacShareLimit = slFacShareLimit == null ? null : slFacShareLimit.getContent();
 
 		// 已動用額度餘額

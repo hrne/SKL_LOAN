@@ -45,8 +45,6 @@ public class LM051Report extends MakeReport {
 		// 格式
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-
-
 		Calendar calendar = Calendar.getInstance();
 
 		// 設當年月底日
@@ -62,11 +60,10 @@ public class LM051Report extends MakeReport {
 		calendar.set(Calendar.YEAR, iYear);
 		calendar.set(Calendar.MONTH, iMonth - 1);
 		calendar.set(Calendar.DATE, calendar.getActualMinimum(Calendar.DATE));
-		
+
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管",
-				"LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "10804工作表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管", "LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "10804工作表");
 
 		makeExcel.setSheet("10804工作表", titaVo.get("ENTDY").substring(1, 6) + "工作表");
 
@@ -129,7 +126,7 @@ public class LM051Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	// YYYMM工作表
@@ -163,8 +160,7 @@ public class LM051Report extends MakeReport {
 			// F1 額度：3
 			makeExcel.setValue(row, 3, Integer.valueOf(tLDVo.get("F1")), "C");
 			// F2 利變；4
-			makeExcel.setValue(row, 4, tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"),
-					"C");
+			makeExcel.setValue(row, 4, tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"), "C");
 			// F3 戶名；5
 			makeExcel.setValue(row, 5, tLDVo.get("F3"), "L");
 			// F4 本金餘額；6
@@ -194,13 +190,9 @@ public class LM051Report extends MakeReport {
 
 			makeExcel.setValue(row, 8, ovduText, "C");
 			// F7 地區別；9
-			makeExcel.setValue(row, 9,
-					tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")),
-					"C");
+			makeExcel.setValue(row, 9, tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")), "C");
 			// F8 繳息日期；10
-			makeExcel.setValue(row, 10,
-					tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")),
-					"C");
+			makeExcel.setValue(row, 10, tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")), "C");
 			// F9分類項目:11
 //				makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
 			// F4 五類金額(用F16區分F4)=；12~17

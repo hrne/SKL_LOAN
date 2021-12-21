@@ -34,8 +34,7 @@ public class LP003Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LP003Report exec");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003部專暨房專業績累計表",
-				"LP003_底稿_部專暨房專業績累計表.xlsx", "部專");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003部專暨房專業績累計表", "LP003_底稿_部專暨房專業績累計表.xlsx", "部專");
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 		try {
 			wkSsnList = lP003ServiceImpl.wkSsn(titaVo);
@@ -156,8 +155,7 @@ public class LP003Report extends MakeReport {
 	 * @param wkMonth     本工作月
 	 * @param lastWkMonth 上季末工作月
 	 */
-	private void setDept(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth)
-			throws LogicException {
+	private void setDept(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth) throws LogicException {
 		this.info("setDept start ...");
 		List<Map<String, String>> queryResultList = null;
 		try {
@@ -334,8 +332,7 @@ public class LP003Report extends MakeReport {
 			// 撥款件數
 			makeExcel.setValue(rowCursorOfTotal, columnCursor + 2, summaryTotal[1], "#,##0.0");
 			// 達成率
-			makeExcel.setValue(rowCursorOfTotal, columnCursor + 3, computeDivide(summaryTotal[2], summaryTotal[0], 4),
-					"#,##0%");
+			makeExcel.setValue(rowCursorOfTotal, columnCursor + 3, computeDivide(summaryTotal[2], summaryTotal[0], 4), "#,##0%");
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
 		}
@@ -349,8 +346,7 @@ public class LP003Report extends MakeReport {
 	 * @param wkMonth     本工作月
 	 * @param lastWkMonth 上季末工作月
 	 */
-	private void setEmp(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth)
-			throws LogicException {
+	private void setEmp(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth) throws LogicException {
 		this.info("setEmp start ...");
 		List<Map<String, String>> queryResultList = null;
 		try {
@@ -532,8 +528,7 @@ public class LP003Report extends MakeReport {
 			// 撥款件數
 			makeExcel.setValue(rowCursorOfTotal, columnCursor + 2, summaryTotal[1], "#,##0.0");
 			// 達成率
-			makeExcel.setValue(rowCursorOfTotal, columnCursor + 3, computeDivide(summaryTotal[2], summaryTotal[0], 4),
-					"#,##0%");
+			makeExcel.setValue(rowCursorOfTotal, columnCursor + 3, computeDivide(summaryTotal[2], summaryTotal[0], 4), "#,##0%");
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
 		}

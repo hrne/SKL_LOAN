@@ -106,8 +106,8 @@ public class L8333 extends TradeBuffer {
 			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
 			if (iJcicZ570 == null || "D".equals(iJcicZ570.getTranKey())) {
 				if ("A".equals(iTranKey)) {
-				throw new LogicException(titaVo, "E0005", "同一更生款項統一收付案件未曾報送(570)受理更生款項統一收付通知資料");
-				}else {
+					throw new LogicException(titaVo, "E0005", "同一更生款項統一收付案件未曾報送(570)受理更生款項統一收付通知資料");
+				} else {
 					throw new LogicException(titaVo, "E0007", "同一更生款項統一收付案件未曾報送(570)受理更生款項統一收付通知資料");
 				}
 			}

@@ -407,8 +407,7 @@ public class L1103 extends TradeBuffer {
 				if (titaVo.getParam("IncomedatadateAft").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate(
-							"" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
+					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
 				}
 
 			}
@@ -687,8 +686,7 @@ public class L1103 extends TradeBuffer {
 				if (titaVo.getParam("IncomedatadateBef").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate(
-							"" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBef")) + 191100));
+					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBef")) + 191100));
 				}
 
 			}

@@ -65,7 +65,7 @@ public class L6064 extends TradeBuffer {
 		Slice<CdCode> slCdCode = null;
 		if (iDefCode.length() > 0 || iDefType.equals("") || iDefItem.length() > 0) {
 			if (iDefItem.length() > 0) {
-				slCdCode = sCdCodeDefService.defItemEq("CodeType","%" + iDefItem + "%", this.index, this.limit, titaVo);
+				slCdCode = sCdCodeDefService.defItemEq("CodeType", "%" + iDefItem + "%", this.index, this.limit, titaVo);
 			} else if (("").equals(iCode)) {
 				slCdCode = sCdCodeDefService.defItemEq(iDefCode, "%" + iCodeItem + "%", index, limit, titaVo);
 			} else {
@@ -100,16 +100,16 @@ public class L6064 extends TradeBuffer {
 //				}
 
 //			} else {
-				OccursList occursList = new OccursList();
-				occursList.putParam("OODefCode", tCdCode.getDefCode());
-				occursList.putParam("OOCode", tCdCode.getCode());
-				occursList.putParam("OOItem", tCdCode.getItem());
-				occursList.putParam("OOType", tCdCode.getDefType());
-				occursList.putParam("OOEnable", tCdCode.getEnable());
-				this.totaVo.addOccursList(occursList);
-			}
+			OccursList occursList = new OccursList();
+			occursList.putParam("OODefCode", tCdCode.getDefCode());
+			occursList.putParam("OOCode", tCdCode.getCode());
+			occursList.putParam("OOItem", tCdCode.getItem());
+			occursList.putParam("OOType", tCdCode.getDefType());
+			occursList.putParam("OOEnable", tCdCode.getEnable());
+			this.totaVo.addOccursList(occursList);
+		}
 
-			/* 將每筆資料放入Tota的OcList */
+		/* 將每筆資料放入Tota的OcList */
 
 //		}
 

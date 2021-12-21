@@ -29,9 +29,9 @@ public class L4452Report extends MakeReport {
 	private ArrayList<OccursList> occursList = new ArrayList<>();
 
 	private String repayBank = "";
-    // 每頁筆數
+	// 每頁筆數
 	private int pageIndex = 38;
-	
+
 	@Override
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
@@ -74,7 +74,7 @@ public class L4452Report extends MakeReport {
 
 		// 排序資料 銀行別 戶號 額度 序號
 		sort(occursList);
-		
+
 		if (occursList.size() > 0) {
 
 			repayBank = occursList.get(0).get("OORepayBank");
@@ -99,11 +99,11 @@ public class L4452Report extends MakeReport {
 				this.print(0, 9, FormatUtil.pad9(occursList.get(i).get("OOFacmNo"), 3));// 額度
 //				this.print(0, 12, "-");
 //				this.print(0, 13, FormatUtil.pad9(occursList.get(i).get("OOBormNo"), 3));// 撥款
-				this.print(0, 20, limitLength(occursList.get(i).get("OOCustName"),20));// 戶名
+				this.print(0, 20, limitLength(occursList.get(i).get("OOCustName"), 20));// 戶名
 				this.print(0, 40, occursList.get(i).get("OORepayType"));// 還款類別
 				this.print(0, 70, df1.format(parse.stringToBigDecimal(occursList.get(i).get("OORepayAmt"))), "R");// 還款金額
 				this.print(0, 75, occursList.get(i).get("OONote"));// 摘要
-				
+
 				if (j != occursList.size()) {
 //					年月不同則跳頁，並且累計歸零
 					repayBank = occursList.get(j).get("OORepayBank");
@@ -126,8 +126,7 @@ public class L4452Report extends MakeReport {
 //					扣除總計合計的行數 +1 
 					this.print(pageIndex - pageCnt - 2, 70, "=====報表結束=====", "C");
 				}
-				
-			
+
 			}
 			long sno = this.close();
 			this.toPdf(sno);
@@ -140,28 +139,28 @@ public class L4452Report extends MakeReport {
 
 		this.exec(titaVo);
 	}
-	
+
 	public void sort(ArrayList<OccursList> doReportOccurs) throws LogicException {
-		
+
 		// RepayBank ,CustNo ,FacmNo ,BormNo
 		doReportOccurs.sort((c1, c2) -> {
-					int result = 0;
-					if (c1.get("OORepayBank") != c2.get("OORepayBank")) {
-						result = Integer.valueOf(c1.get("OORepayBank").compareTo(c2.get("OORepayBank")));
-					} else if (c1.get("OOCustNo") != c2.get("OOCustNo") ) {
-						result = Integer.valueOf(c1.get("OOCustNo").compareTo(c2.get("OOCustNo")));
-					} else if (c1.get("OOFacmNo") != c2.get("OOFacmNo")) {
-						result = Integer.valueOf(c1.get("OOFacmNo").compareTo(c2.get("OOFacmNo")));
-					} else {
-						result = 0;
-					}
+			int result = 0;
+			if (c1.get("OORepayBank") != c2.get("OORepayBank")) {
+				result = Integer.valueOf(c1.get("OORepayBank").compareTo(c2.get("OORepayBank")));
+			} else if (c1.get("OOCustNo") != c2.get("OOCustNo")) {
+				result = Integer.valueOf(c1.get("OOCustNo").compareTo(c2.get("OOCustNo")));
+			} else if (c1.get("OOFacmNo") != c2.get("OOFacmNo")) {
+				result = Integer.valueOf(c1.get("OOFacmNo").compareTo(c2.get("OOFacmNo")));
+			} else {
+				result = 0;
+			}
 
-					return result;
+			return result;
 		});
-				
+
 		this.occursList = doReportOccurs;
 	}
-	
+
 	private String limitLength(String str, int pos) {
 		byte[] input = str.getBytes();
 
@@ -187,5 +186,4 @@ public class L4452Report extends MakeReport {
 		return result;
 	}
 
-	
 }

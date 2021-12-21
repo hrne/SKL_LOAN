@@ -36,7 +36,7 @@ public class L6R36 extends TradeBuffer {
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("RimWorkMonth")) + 191100;
 
 		Slice<CdBonusCo> iCdBonusCo = null;
-		iCdBonusCo = iCdBonusCoService.findYearMonth(iWorkMonth, iWorkMonth, 0,Integer.MAX_VALUE, titaVo);
+		iCdBonusCo = iCdBonusCoService.findYearMonth(iWorkMonth, iWorkMonth, 0, Integer.MAX_VALUE, titaVo);
 
 		if (iCdBonusCo == null) {
 			throw new LogicException(titaVo, "E0001", "該工作月尚無資料");
@@ -57,7 +57,7 @@ public class L6R36 extends TradeBuffer {
 					totaVo.putParam("L6R36ConditionAmt", rCdBonusCo.getConditionAmt());
 				}
 				iPieceCode++;
-			} else if (rCdBonusCo.getConditionCode() == 2){
+			} else if (rCdBonusCo.getConditionCode() == 2) {
 				totaVo.putParam("L6R36Bonus" + String.valueOf(iCondition), rCdBonusCo.getBonus());
 				totaVo.putParam("L6R36ClassPassBonus" + String.valueOf(iCondition), rCdBonusCo.getClassPassBonus());
 				iCondition++;

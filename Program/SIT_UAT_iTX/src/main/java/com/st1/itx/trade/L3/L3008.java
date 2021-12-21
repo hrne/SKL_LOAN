@@ -93,18 +93,15 @@ public class L3008 extends TradeBuffer {
 		this.limit = 100; // 96 * 500 = 48000
 
 		// 查詢放款主檔
-		slLoanCheque = loanChequeService.chequeCustNoEq(iCustNo, lStatusCode, 0, 99991231, this.index, this.limit,
-				titaVo);
+		slLoanCheque = loanChequeService.chequeCustNoEq(iCustNo, lStatusCode, 0, 99991231, this.index, this.limit, titaVo);
 		lLoanCheque = slLoanCheque == null ? null : slLoanCheque.getContent();
 		if (lLoanCheque == null || lLoanCheque.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "支票檔"); // 查詢資料不存在
 		}
 		for (LoanCheque tLoanCheque : lLoanCheque) {
 			// 查詢會計銷帳檔
-			wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
-					+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
-			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", iCustNo, wkRvNo, 0,
-					Integer.MAX_VALUE, titaVo);
+			wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " " + FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
+			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", iCustNo, wkRvNo, 0, Integer.MAX_VALUE, titaVo);
 			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 			if (lAcReceivable != null && lAcReceivable.size() > 0) {
 				for (AcReceivable tAcReceivable : lAcReceivable) {

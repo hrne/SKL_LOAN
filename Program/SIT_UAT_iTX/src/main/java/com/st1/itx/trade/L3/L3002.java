@@ -67,7 +67,7 @@ public class L3002 extends TradeBuffer {
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iDrawdownDateS = this.parse.stringToInteger(titaVo.getParam("DrawdownDateS"));
 		int iDrawdownDateE = this.parse.stringToInteger(titaVo.getParam("DrawdownDateE"));
-		
+
 		int iCustDataCtrl = 0;
 		// work area
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
@@ -94,7 +94,7 @@ public class L3002 extends TradeBuffer {
 				lFacmNo.add(xFacMain.getFacmNo());
 			}
 			slLoanBorMain = loanBorMainService.bormFacmNoIn(iCustNo, lFacmNo, 1, 900, this.index, this.limit, titaVo);
-			
+
 			iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
 		} else if (iDrawdownDateS > 0) {
 
@@ -153,8 +153,8 @@ public class L3002 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOCustName", tCustMain.getCustName());
 			}
-			
-			if(iCustDataCtrl == 1 ) {
+
+			if (iCustDataCtrl == 1) {
 				occursList.putParam("OOCustNo", "");
 				occursList.putParam("OOCustName", "");
 			}

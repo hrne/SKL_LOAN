@@ -75,7 +75,7 @@ public class L3R12 extends TradeBuffer {
 		BigDecimal wkBadDebtAmt = BigDecimal.ZERO;
 		BigDecimal wkBadDebtBal = BigDecimal.ZERO;
 		BigDecimal wkReplyReduceAmt = BigDecimal.ZERO;
-		
+
 		try {
 			baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 		} catch (LogicException e) {
@@ -137,8 +137,6 @@ public class L3R12 extends TradeBuffer {
 		this.totaVo.putParam("OReplyReduceAmt", wkReplyReduceAmt);
 		this.totaVo.putParam("OBadDebtAmt", wkBadDebtAmt);
 		this.totaVo.putParam("OBadDebtBal", wkBadDebtBal);
-
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

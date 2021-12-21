@@ -50,9 +50,9 @@ public class L6787 extends TradeBuffer {
 		int iEntdy = titaVo.getEntDyI() + 19110000;
 		int iConditionCode = 0;
 		int nWorkMonth = 0; // 當前工作月
-		int maxWorkMonth = 0; //生效中工作月(CdBonusCo中<=當前工作月中之最大值)
+		int maxWorkMonth = 0; // 生效中工作月(CdBonusCo中<=當前工作月中之最大值)
 		List<Map<String, String>> wCdBonusCo = new ArrayList<Map<String, String>>();
-		//判斷是否為已生效工作月
+		// 判斷是否為已生效工作月
 		// 取當前工作月
 		CdWorkMonth iCdWorkMonth = new CdWorkMonth();
 		iCdWorkMonth = iCdWorkMonthService.findDateFirst(iEntdy, iEntdy, titaVo);
@@ -61,8 +61,8 @@ public class L6787 extends TradeBuffer {
 		}
 		String iYear = StringUtils.leftPad(String.valueOf(iCdWorkMonth.getYear() - 1911), 3, "0");
 		String iMonth = StringUtils.leftPad(String.valueOf(iCdWorkMonth.getMonth()), 2, "0");
-		nWorkMonth = Integer.valueOf(iYear + iMonth)+191100;
-		
+		nWorkMonth = Integer.valueOf(iYear + iMonth) + 191100;
+
 		try {
 			wCdBonusCo = iL6087ServiceImpl.findAllData(Integer.valueOf(nWorkMonth), titaVo);
 		} catch (Exception e) {
@@ -77,13 +77,13 @@ public class L6787 extends TradeBuffer {
 			}
 		}
 
-		//修改生效中工作月需主管授權
+		// 修改生效中工作月需主管授權
 		if (maxWorkMonth == iWorkMonth) {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 		}
-		
+
 		// 有值計件代碼list
 		ArrayList<String> iPieceCodeList = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
