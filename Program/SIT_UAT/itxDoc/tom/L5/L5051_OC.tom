@@ -29,3 +29,6 @@ OOWorkMonth=X,5
 OOCanModify=9,1
 OORepayType=X,1
 OOLog=9,1
+OOMediaDate=X,9
+OOLastUpdate=X,20
+OOLastEmp=X,20
