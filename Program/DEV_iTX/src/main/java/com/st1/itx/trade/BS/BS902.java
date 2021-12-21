@@ -91,7 +91,6 @@ public class BS902 extends TradeBuffer {
 				}
 			}
 		}
-
 		return null;
 	}
 
