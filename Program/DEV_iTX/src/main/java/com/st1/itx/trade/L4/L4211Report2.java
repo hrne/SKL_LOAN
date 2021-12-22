@@ -42,7 +42,7 @@ public class L4211Report2 extends MakeReport {
 	public CustMainService custMainService;
 
 //		每頁筆數
-	private int pageIndex = 40;
+	private int pageIndex = 45;
 
 	private String ReconCode = "";
 	private String entrydate = "";
@@ -243,7 +243,7 @@ public class L4211Report2 extends MakeReport {
 				
 //				每頁第42筆 跳頁 
 				if (pageCnt >= 40) {
-					this.print(1, 85, "=====續下頁=====", "C");
+					this.print(pageIndex - pageCnt - 2, 85, "=====續下頁=====", "C");
 //
 					pageCnt = 0;
 					this.newPage();

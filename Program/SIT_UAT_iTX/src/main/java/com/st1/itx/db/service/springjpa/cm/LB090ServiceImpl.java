@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,7 +24,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LB090ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,41 +32,39 @@ public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LB090.findAll ---------------");
-		logger.info("-----LB090 TitaVo=" + titaVo);
-		logger.info("-----LB090 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LB090.findAll ---------------");
+		this.info("-----LB090 TitaVo=" + titaVo);
+		this.info("-----LB090 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
-		// TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202003;
-//		}
-
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
 		// LB090 擔保品關聯檔資料檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"CustId\"" + " , M.\"ClActNo\"" + "     , M.\"FacmNo\""
-				+ " , M.\"GlOverseas\"" + "   , M.\"JcicDataYM\"" + " FROM  \"JcicB090\" M" + " WHERE M.\"DataYM\" = " + dateMonth + " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
+				+ "     , M.\"CustId\"" + " , M.\"ClActNo\"" + "     , M.\"FacmNo\"" + " , M.\"GlOverseas\""
+				+ "   , M.\"JcicDataYM\"" + " FROM  \"JcicB090\" M" + " WHERE M.\"DataYM\" = :dateMonth "
+				+ " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB090.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth); 
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

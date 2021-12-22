@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,7 +24,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LB207ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LB207ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,45 +32,45 @@ public class LB207ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LB207.findAll ---------------");
-		logger.info("-----LB207 TitaVo=" + titaVo);
-		logger.info("-----LB207 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LB207.findAll ---------------");
+		this.info("-----LB207 TitaVo=" + titaVo);
+		this.info("-----LB207 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
-		// TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202004;
-//		}
-
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
 		// LB207 授信戶基本資料檔
-		sql = "SELECT M.\"TranCode\"" + "     , M.\"BankItem\"" + "     , M.\"Filler3\"" + "     , M.\"DataDate\"" + "     , M.\"CustId\"" + "     , M.\"CustName\"" + "     , M.\"EName\""
-				+ "     , M.\"Birthday\"" + "     , M.\"RegAddr\"" + "     , M.\"CurrZip\"" + "     , M.\"CurrAddr\"" + "     , M.\"Tel\"" + "     , M.\"Mobile\"" + "     , M.\"Filler14\""
-				+ "     , M.\"EduCode\"" + "     , M.\"OwnedHome\"" + "     , M.\"CurrCompName\"" + "     , M.\"CurrCompId\"" + "     , M.\"JobCode\"" + "     , M.\"CurrCompTel\""
-				+ "     , M.\"JobTitle\"" + "     , M.\"JobTenure\"" + "     , M.\"IncomeOfYearly\"" + "     , M.\"IncomeDataDate\"" + "     , M.\"Sex\"" + "     , M.\"NationalityCode\""
-				+ "     , M.\"PassportNo\"" + "     , M.\"PreTaxNo\"" + "     , M.\"FullCustName\"" + "     , M.\"Filler30\"" + " FROM  \"JcicB207\" M" + " WHERE M.\"DataYM\" = " + dateMonth
-				+ " ORDER BY M.\"BankItem\", M.\"CustId\" ";
+		sql = "SELECT M.\"TranCode\"" + "     , M.\"BankItem\"" + "     , M.\"Filler3\"" + "     , M.\"DataDate\""
+				+ "     , M.\"CustId\"" + "     , M.\"CustName\"" + "     , M.\"EName\"" + "     , M.\"Birthday\""
+				+ "     , M.\"RegAddr\"" + "     , M.\"CurrZip\"" + "     , M.\"CurrAddr\"" + "     , M.\"Tel\""
+				+ "     , M.\"Mobile\"" + "     , M.\"Filler14\"" + "     , M.\"EduCode\"" + "     , M.\"OwnedHome\""
+				+ "     , M.\"CurrCompName\"" + "     , M.\"CurrCompId\"" + "     , M.\"JobCode\""
+				+ "     , M.\"CurrCompTel\"" + "     , M.\"JobTitle\"" + "     , M.\"JobTenure\""
+				+ "     , M.\"IncomeOfYearly\"" + "     , M.\"IncomeDataDate\"" + "     , M.\"Sex\""
+				+ "     , M.\"NationalityCode\"" + "     , M.\"PassportNo\"" + "     , M.\"PreTaxNo\""
+				+ "     , M.\"FullCustName\"" + "     , M.\"Filler30\"" + " FROM  \"JcicB207\" M"
+				+ " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"BankItem\", M.\"CustId\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB207.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth); 
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

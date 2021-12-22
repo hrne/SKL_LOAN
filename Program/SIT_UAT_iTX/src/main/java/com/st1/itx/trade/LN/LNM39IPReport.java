@@ -51,18 +51,31 @@ public class LNM39IPReport extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LNM39IP 欄位清單９
+		this.info("---------- LNM39IPReport exec titaVo: " + titaVo);
+
+		List<Map<String, String>> LNM39IPList = null;
 		try {
-			this.info("---------- LNM39IPReport exec titaVo: " + titaVo);
-			List<Map<String, String>> LNM39IPList = lNM39IPServiceImpl.findAll(titaVo);
-			genFile(titaVo, LNM39IPList);
-//			genExcel(titaVo, LNM39IPList);
+			LNM39IPList = lNM39IPServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LNM39IPServiceImpl.findAll error = " + errors.toString());
+			this.error("LNM39IPReport LNM39IPServiceImpl.findAll error = " + errors.toString());
+			return false;
 		}
+
+		try {
+			// txt
+			genFile(titaVo, LNM39IPList);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LNM39IPReport.genFile error = " + errors.toString());
+			return false;
+		}
+
+		return true;
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
@@ -125,17 +138,17 @@ public class LNM39IPReport extends MakeReport {
 							break; // 初貸日期
 						case 7:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額
 						case 8:
 							formatter.applyPattern("00000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 帳管費
 						case 9:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 法拍及火險費用
 						case 10:
@@ -147,15 +160,13 @@ public class LNM39IPReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 3, '0');
 							break; // 初貸時約定還本寬限期
 						case 12:
-							// formatter.applyPattern("0");
-							// strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ?
-							// "0" : strField)));
+							//formatter.applyPattern("0");
+							//strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 1, '0');
 							break; // 契約當時還款方式
 						case 13:
-							// formatter.applyPattern("0");
-							// strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ?
-							// "0" : strField)));
+							//formatter.applyPattern("0");
+							//strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 1, '0');
 							break; // 契約當時利率調整方式
 						case 14:
@@ -184,12 +195,12 @@ public class LNM39IPReport extends MakeReport {
 							break; // 產品別
 						case 22:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 原始鑑價金額
 						case 23:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(台幣)
 						case 24:
@@ -220,17 +231,17 @@ public class LNM39IPReport extends MakeReport {
 							break; // 報導日匯率
 						case 32:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(交易幣)
 						case 33:
 							formatter.applyPattern("00000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 帳管費(交易幣)
 						case 34:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 法拍及火險費用(交易幣)
 						default:

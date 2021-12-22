@@ -51,18 +51,31 @@ public class LNM39HPReport extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LNM39HP 欄位清單８
+		this.info("---------- LNM39HPReport exec titaVo: " + titaVo);
+
+		List<Map<String, String>> LNM39HPList = null;
 		try {
-			this.info("---------- LNM39HPReport exec titaVo: " + titaVo);
-			List<Map<String, String>> LNM39HPList = lNM39HPServiceImpl.findAll(titaVo);
-			genFile(titaVo, LNM39HPList);
-//			genExcel(titaVo, LNM39HPList);
+			LNM39HPList = lNM39HPServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LNM39HPServiceImpl.findAll error = " + errors.toString());
+			this.error("LNM39HPReport LNM39HPServiceImpl.findAll error = " + errors.toString());
+			return false;
 		}
+
+		try {
+			// txt
+			genFile(titaVo, LNM39HPList);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LNM39HPReport.genFile error = " + errors.toString());
+			return false;
+		}
+
+		return true;
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
@@ -123,7 +136,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 初貸日期
 						case 8:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(台幣)
 						case 9:
@@ -131,7 +144,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 產品別
 						case 10:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(台幣)
 						case 11:
@@ -141,7 +154,7 @@ public class LNM39HPReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 1, '0');
 							break; // 該筆額度是否為不可撤銷 1=是 0=否
 						case 13:
-							strField = strField.substring(1);
+							//strField = strField.substring(1);
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 主計處行業別代碼
 						case 14:
@@ -166,12 +179,12 @@ public class LNM39HPReport extends MakeReport {
 							break; // 違約損失率
 						case 20:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(交易幣)
 						case 21:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(交易幣)
 						default:

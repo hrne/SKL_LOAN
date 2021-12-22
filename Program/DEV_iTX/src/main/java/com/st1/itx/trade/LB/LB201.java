@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LB201")
 @Scope("step")
 /**
- * 
+ * LB201
  * 
  * @author Eric Chang
  * @version 1.0.0
@@ -25,6 +27,12 @@ public class LB201 extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	LB201Report lB201Report;
 
+	@Autowired
+	DateUtil dDateUtil; // 2021-12-20 智偉新增
+
+	@Autowired
+	WebClient webClient; // 2021-12-20 智偉新增
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -32,7 +40,6 @@ public class LB201 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LB201.class);
 		this.info("LB201 active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,36 +49,16 @@ public class LB201 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB201 active LB201 ");
 		this.info("LB201 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		String tranCode = "LB201";
+		String tranName = "聯徵授信餘額月報檔";
+
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
-		lB201Report.exec(titaVo); // 使用月報資料庫
+		// 2021-12-20 智偉修改
+		boolean isFinish = lB201Report.exec(titaVo); // 使用月報資料庫
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+
 	}
 
 }
-
-//@Service("LB201")
-//@Scope("prototype")
-///**
-// * 
-// * 
-// * @author Eric Chang
-// * @version 1.0.0
-// */
-//public class LB201 extends TradeBuffer {
-//	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LB201.class);
-//
-//	@Autowired
-//	public LB201Report lb201Report;
-//
-//	@Override
-//	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-//		this.info("active LB201 ");
-//		this.totaVo.init(titaVo);
-//
-//		lb201Report.exec(titaVo);
-//
-//		this.addList(this.totaVo);
-//		return this.sendList();
-//	}
-//
-//}

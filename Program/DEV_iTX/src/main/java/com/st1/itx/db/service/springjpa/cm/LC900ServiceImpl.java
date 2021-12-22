@@ -48,20 +48,20 @@ public class LC900ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findAuthNo(String authNo) throws Exception {
+	public List<Map<String, String>> findAuthNo(String authNo, String... txCode) throws Exception {
 
 		String sql = "(";
 		sql += "select \"Code\" f1,\"Code\" f2,\"Item\" f3,1 f4,0 f5 ";
 		sql += "from \"CdCode\" ";
-		sql += "where \"DefCode\" like 'Menu%' and \"Code\" like 'L%' ";
+		sql += "where \"DefCode\" like 'Menu%' and \"Code\" like 'L%'";
 		sql += "union all ";
 		sql += "select concat(substr(\"DefCode\",8,2),\"Code\") f1,concat(substr(\"DefCode\",8,2),\"Code\") f2,\"Item\" f3,1 f4,0 f5 ";
 		sql += "from \"CdCode\" ";
 		sql += "where \"DefCode\" like 'SubMenu%' ";
-		sql += "union all "; 
+		sql += "union all ";
 		sql += "select concat(\"MenuNo\",\"SubMenuNo\") f1,\"TranNo\" f2,\"TranItem\" f3,\"MenuFg\" f4,2 f5 ";
 		sql += "from \"TxTranCode\" ";
-		sql += "where \"TranNo\" in (select \"TranNo\" from \"TxAuthority\" where \"AuthNo\" = :AuthNo) and \"MenuFg\" = 1 ";
+		sql += "where \"TranNo\" in (select \"TranNo\" from \"TxAuthority\" where \"AuthNo\" = :AuthNo and \"TranNo\" like :txCode) and \"MenuFg\" = 1 ";
 		sql += ")";
 		sql += "order by f1,f5,f2";
 
@@ -69,9 +69,13 @@ public class LC900ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		
-		query.setParameter("AuthNo",authNo);
-		
+
+		query.setParameter("AuthNo", authNo);
+		if (txCode.length >= 1)
+			query.setParameter("txCode", txCode[0] + "%");
+		else
+			query.setParameter("txCode", "%");
+
 		// 設定參數
 //		query.setParameter("defno", defno);
 

@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39FP 清單6：(LNFFP 放款協商戶資訊(撥款層))
+ * LNM39FP 資料欄位清單6(放款與應收帳款-協商戶用)  LNFFP 放款協商戶資訊(撥款層)
  */
 
 public class LNM39FPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,19 +52,21 @@ public class LNM39FPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單6
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" " + " FROM  \"LoanIfrs9Fp\" " + " WHERE \"DataYM\" = " + dateMonth
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" "
+				+ " FROM  \"LoanIfrs9Fp\" " + " WHERE \"DataYM\"= :dateMonth "
 				+ " ORDER BY \"CustNo\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39FP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

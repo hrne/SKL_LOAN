@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * IFRS9 資料欄位清單9(表外放款與應收帳款-資產基本資料與計算原始有效利率用)) LNFIP 放款已核准未動撥額度(額度層)(LNFIP)
+ * LNM39IP 資料欄位清單9(表外放款與應收帳款-資產基本資料與計算原始有效利率用)) LNFIP 放款已核准未動撥額度(額度層)
  */
 
 public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,22 +52,26 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// IFRS9 資料欄位清單9
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", " + " \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", "
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", "
+				+ " \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", "
 				+ " \"ApproveRate\", \"GracePeriod\", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
-				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"Ifrs9ProdCode\", " + " \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", "
-				+ " \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", " + " \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " + " FROM  \"LoanIfrs9Ip\" "
-				+ " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"DrawdownFg\", \"CustNo\", \"FacmNo\" ";
+				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"Ifrs9ProdCode\", "
+				+ " \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", "
+				+ " \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", "
+				+ " \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " + " FROM  \"LoanIfrs9Ip\" "
+				+ " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"DrawdownFg\", \"CustNo\", \"FacmNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39IP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

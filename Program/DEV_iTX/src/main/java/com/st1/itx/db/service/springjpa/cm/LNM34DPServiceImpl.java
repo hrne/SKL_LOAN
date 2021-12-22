@@ -52,23 +52,29 @@ public class LNM34DPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// LNM34DP 資料欄位清單D
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"MaturityDate\" "
-				+ ", \"LineAmt\", \"DrawdownAmt\", \"LoanBal\", \"IntAmt\", \"Fee\" " + ", \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\" "
-				+ ", \"DerDate\", \"DerRate\", \"DerLoanBal\", \"DerIntAmt\", \"DerFee\" " + ", \"DerY1Amt\", \"DerY2Amt\", \"DerY3Amt\", \"DerY4Amt\", \"DerY5Amt\" "
-				+ ", \"DerY1Int\", \"DerY2Int\", \"DerY3Int\", \"DerY4Int\", \"DerY5Int\" " + ", \"DerY1Fee\", \"DerY2Fee\", \"DerY3Fee\", \"DerY4Fee\", \"DerY5Fee\" "
-				+ ", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\", \"ProdCode\", \"CustKind\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Dp\" " + " WHERE \"DataYM\" = " + dateMonth
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" "
+				+ ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"MaturityDate\" "
+				+ ", \"LineAmt\", \"DrawdownAmt\", \"LoanBal\", \"IntAmt\", \"Fee\" "
+				+ ", \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\" "
+				+ ", \"DerDate\", \"DerRate\", \"DerLoanBal\", \"DerIntAmt\", \"DerFee\" "
+				+ ", \"DerY1Amt\", \"DerY2Amt\", \"DerY3Amt\", \"DerY4Amt\", \"DerY5Amt\" "
+				+ ", \"DerY1Int\", \"DerY2Int\", \"DerY3Int\", \"DerY4Int\", \"DerY5Int\" "
+				+ ", \"DerY1Fee\", \"DerY2Fee\", \"DerY3Fee\", \"DerY4Fee\", \"DerY5Fee\" "
+				+ ", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\", \"ProdCode\", \"CustKind\", \"Ifrs9ProdCode\" "
+				+ " FROM  \"Ias34Dp\" " + " WHERE \"DataYM\"  = :dateMonth "
 				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM34DP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

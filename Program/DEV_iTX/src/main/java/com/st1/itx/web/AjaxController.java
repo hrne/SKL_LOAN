@@ -38,7 +38,6 @@ import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.data.Manufacture;
-import com.st1.itx.util.filter.FilterUtils;
 import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.menu.MenuBuilder;
@@ -65,6 +64,18 @@ public class AjaxController extends SysLogger {
 			map.put("data", menuBuilder.buildRootMenu());
 		else
 			map.put("data", menuBuilder.buildMenu(authNo));
+
+		map.put("status", true);
+		return makeJsonResponse(map, true);
+	}
+
+	@RequestMapping(value = "txcd/jsonp", method = RequestMethod.GET)
+	public ResponseEntity<String> getTxcdList(@RequestParam String authNo, @RequestParam String term, HttpSession session, HttpServletResponse response) {
+		ThreadVariable.setObject(ContentName.loggerFg, true);
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		if (!term.trim().isEmpty())
+			map.put("data", menuBuilder.buildAutoCP(authNo, term));
 
 		map.put("status", true);
 		return makeJsonResponse(map, true);
@@ -206,13 +217,6 @@ public class AjaxController extends SysLogger {
 		return result;
 	}
 
-	@RequestMapping(value = "txcd/jsonp", method = RequestMethod.GET)
-	public ResponseEntity<String> getTxcdList(@RequestParam String term, @RequestParam(required = false) String callback, HttpSession session, HttpServletResponse response) {
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
-
-		return makeJsonResponse(map, true);
-	}
-
 	@SuppressWarnings("unchecked")
 	private Map<String, String> stringToMap(String _d) {
 		Gson gson = new Gson();
@@ -234,7 +238,6 @@ public class AjaxController extends SysLogger {
 			if (isOtherNet)
 				responseHeaders.add("Access-Control-Allow-Origin", "*");
 			responseHeaders.add("Content-Type", "application/json; charset=utf-8");
-			this.info("return json: " + FilterUtils.escape(output));
 			return new ResponseEntity<String>(output, responseHeaders, HttpStatus.CREATED);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

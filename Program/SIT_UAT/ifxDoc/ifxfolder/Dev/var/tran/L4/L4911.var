@@ -1,0 +1,209 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4911)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,94)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4911" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4911]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@其他還款來源建檔查詢"],
+[#<->#,"@會計日期",#ACCTDATE],
+[#<->#,"@處理批號",#BATNO],
+[#<->#,"@還款來源",#RPTYP,#RPTYPX],
+[#<->#,"@交易序號",#TELLERID,#TXNSEQ,"空白:全部"],
+]
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+! 會計日期
+#ACCTDATE=D,7,I
+
+! 處理批號
+#BATNO=X,6,I
+
+! 還款來源
+#RPTYP=A,2,I
+C(3,#CHAIN,0,$,s)
+HELP(05:法院扣薪;
+     06:理賠金;
+     07:代收款-債權協商;
+     09:其他;
+     11:匯款轉帳預先作業;
+     99:全部)
+@V(1,05,06,07,09,11,99)
+
+! 還款來源中文
+#RPTYPX=X,16,L
+C(3,#CHAIN,0,$,s)
+SWITCH(#RPTYP,05,T(3,法院扣薪),
+              06,T(3,理賠金),
+              07,T(3,代收款-債權協商),
+              09,T(3,其他),
+              11,T(3,匯款轉帳預先作業),
+              99,T(3,全部))
+
+! 交易序號-櫃員代號
+#TELLERID=X,6,I
+
+! 交易序號-交易流水號
+#TXNSEQ=A,8,I
+
+! 系統參數-查詢
+#RPTFG=A,1,S
+E(0,0)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4911 -----------
+<sub type="FORM" name="L4911">
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 交易序號
+#OOTXSN=X,14,O
+
+! 明細序號
+#OORPSEQ=A,6,O
+
+! 來源
+#OORPTYP=A,2,O
+#OORPTYPX=X,16,O
+SWITCH(#OORPTYP,05,T(3,法院扣薪),
+                06,T(3,理賠金),
+                07,T(3,代收款-債權協商),
+                11,T(3,匯款轉帳預先作業),
+                09,T(3,其他))
+! 會科
+#OOACCTSUBJ=A,12,O
+
+! 來源統編
+#OORPCUSTID=X,10,O
+
+! 來源戶名
+#OORPCUSTNM=X,20,O
+
+! 銷帳碼
+#OOREMOVENO=A,12,O
+
+! 還款類別
+#OOREPCAT=A,1,O
+#OOREPCATX=X,10,O
+SWITCH(#OOREPCAT,1,T(3,期款),
+                 2,T(3,部分償還),
+                 3,T(3,結案),
+                 4,T(3,帳管費),
+                 5,T(3,火險費),
+                 6,T(3,契變手續費),
+                 7,T(3,法務費),
+                 9,T(3,其他),
+                   T(3, ))
+! 金額
+#OORPAMT=m,14.2,O
+! 借款人戶號
+#OOCUSTNO=A,7,O
+! 戶名
+#OOCUSTNM=X,20,O
+! 摘要
+#OOMEMO=X,60,O
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#ACCTDATE#BATNO#RPTYP#TELLERID#TXNSEQ
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4911
+#OOTXSN#OORPSEQ#OORPTYP#OOACCTSUBJ#OORPCUSTID#OORPCUSTNM#OOREMOVENO#OOREPCAT#OORPAMT#OOCUSTNO#OOCUSTNM#OOMEMO
+^
+</sub>
+
+<sub type="PART" name="L4911" layout="cols=1;screen.width=[130,870];printer.width=[15,30,15,30];order=1">
+[
+["[L4911]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@其他還款來源建檔查詢"],
+[#<->#,"@會計日期",#ACCTDATE],
+[#<->#,"@處理批號",#BATNO],
+[#<->#,"@還款來源",#RPTYP,#RPTYPX],
+[#<->#,"@交易序號",#TELLERID,#TXNSEQ,"空白:全部"],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+
+#RPTFG=0,QUERY.GRID,L4911
+#any={detail:true, header:'L4911.part', caption:'', width:1080, rowNum:20, rowList:[20,40,60]}
+
+! 交易序號
+#OOTXSN=交易序號
+{width:85,align:'center'}
+#OORPSEQ=明細序號
+{width:65,align:'center'}
+#OORPTYPX=來源
+{width:65,align:'center'}
+#OOACCTSUBJ=會科
+{width:85,align:'center'}
+#OORPCUSTID=來源統編
+{width:65,align:'center'}
+#OORPCUSTNM=來源戶名
+{width:85,align:'center'}
+#OOREMOVENO=銷帳碼
+{width:85,align:'center'}
+#OOREPCATX=還款類別
+{width:65,align:'center'}
+#OORPAMT=金額
+{width:95,align:'right'}
+#OOCUSTNO=借款人戶號
+{width:85,align:'center'}
+#OOCUSTNM=戶名
+{width:85,align:'center'}
+#OOMEMO=摘要
+{width:125,align:'center'}
+
+^
+<include src="PRT.icf::INQ04.sel" map="i=L4911;cpi=15"/>
+#ACCTDATE#BATNO#RPTYP#TELLERID#TXNSEQ
+%
+#OOTXSN#OORPSEQ#OORPTYP#OOACCTSUBJ#OORPCUSTID#OORPCUSTNM#OOREMOVENO#OOREPCAT#OORPAMT#OOCUSTNO#OOCUSTNM#OOMEMO
+@^
+</sub>

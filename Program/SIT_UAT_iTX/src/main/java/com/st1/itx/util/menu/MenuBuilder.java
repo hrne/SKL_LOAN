@@ -73,4 +73,27 @@ public class MenuBuilder extends SysLogger {
 		}
 		return res;
 	}
+
+	@Transactional(readOnly = true)
+	public List<String> buildAutoCP(String iAuthNo, String txcd) {
+		List<String> res = new ArrayList<String>();
+		try {
+			List<Map<String, String>> dList = sLC900ServiceImpl.findAuthNo(iAuthNo, txcd);
+			if (dList != null)
+				for (Map<String, String> dVo : dList) {
+					String s = "";
+					if (dVo.get("F1").trim().length() == 5) {
+						s += dVo.get("F1").trim() + " " + dVo.get("F2").trim();
+						res.add(s);
+					}
+				}
+
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			return null;
+		}
+		return res;
+	}
 }

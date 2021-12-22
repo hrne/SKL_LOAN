@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LB095")
 @Scope("step")
@@ -25,6 +27,12 @@ public class LB095 extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	public LB095Report lb095Report;
 
+	@Autowired
+	DateUtil dDateUtil; 
+
+	@Autowired
+	WebClient webClient;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -32,7 +40,6 @@ public class LB095 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LB095.class);
 		this.info("LB095 active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,8 +49,15 @@ public class LB095 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB095 active LB095 ");
 		this.info("LB095 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		String tranCode = "LB095";
+		String tranName = "動產擔保品明細－建號附加檔";
+
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
-		lb095Report.exec(titaVo); // 使用月報資料庫
+		boolean isFinish = lb095Report.exec(titaVo); // 使用月報資料庫
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }
@@ -58,7 +72,6 @@ public class LB095 extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LB095 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LB095.class);
 //
 //	@Autowired
 //	public LB095Report lb095Report;

@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39GP 清單7：(LNFGP 放款stage轉換分類(撥款層))
+ * LNM39GP 資料欄位清單7(放款與應收帳款-stage轉換用)  LNFGP 放款stage轉換分類(撥款層)
  */
 
 public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,20 +52,24 @@ public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單7
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", " + " \"CustKind\", \"Status\", \"OvduDate\", "
-				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", " + " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" " + " FROM  \"LoanIfrs9Gp\" "
-				+ " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", "
+				+ " \"CustKind\", \"Status\", \"OvduDate\", "
+				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", "
+				+ " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" "
+				+ " FROM  \"LoanIfrs9Gp\" " + " WHERE \"DataYM\"   = :dateMonth "
+				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39GP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

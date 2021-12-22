@@ -68,12 +68,12 @@ BEGIN
     INSERT INTO "Work_Ifrs9FacData"
     SELECT M."CustNo"              AS "CustNo"        -- 戶號
          , M."FacmNo"              AS "FacmNo"        -- 額度編號
-         , 1                       AS "DrawdownFg"    -- 已核撥
+         , 0                       AS "DrawdownFg"    -- 已核撥
          , 0                       AS "TotalLoanBal"  -- 本金餘額(撥款)合計
     FROM   "FacMain" M
       LEFT JOIN "Work_Ifrs9FacData" WK ON WK."CustNo" = M."CustNo"
                                       AND WK."FacmNo" = M."FacmNo"
-    WHERE  M."LastBormRvNo" > 899
+    WHERE  M."LastBormNo" = 0
       AND  TRUNC(NVL(M."UtilDeadline",0) / 100 ) >= YYYYMM   -- 已核貸未曾動撥且仍可動撥之放款額度編號
       AND  WK."CustNo" IS NULL
     GROUP BY M."CustNo", M."FacmNo"
@@ -109,7 +109,12 @@ BEGIN
                                                                           -- 1.優先取用對保日期
                                                                           -- 2.無對保日採用准駁日
          , NVL(F."UtilDeadline",0)              AS "UtilDeadline"      -- 動支期限
-         , NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate" -- 初貸日期
+         --, NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate" -- 初貸日期
+         , CASE
+             WHEN  M."DrawdownFg" = 0 AND F."LastBormRvNo" > 900
+                   THEN NVL(L."DrawdownDate",0)
+             ELSE  NVL(F."FirstDrawdownDate",0)
+           END                                  AS "FirstDrawdownDate" -- 初貸日期
          , NVL(F."MaturityDate",0)              AS "MaturityDate"      -- 到期日(額度)
          , NVL(F."LineAmt",0)                   AS "LineAmt"           -- 核准金額
          , NVL(F."AcctFee",0)                   AS "AcctFee"           -- 帳管費
@@ -133,13 +138,13 @@ BEGIN
          , NVL("FacProd"."AgreementFg", 'N')    AS "AgreementFg"       -- 是否為協議商品 (Y:是 N:否)
          , NVL("CustMain"."EntCode", ' ')       AS "EntCode"           -- 企金別  (0:個金 1:企金 2:企金自然人)
          , CASE WHEN NVL(MF."LawAmount", 0) > 0 THEN 5  -- 無擔保債權設定金額，資產分類一律為五
-                WHEN TRIM(NVL(MF."AssetClass", ' ')) = ''  THEN 0
+                WHEN TRIM(NVL(MF."AssetClass", ' ')) = ''  THEN 1  -- 預設=1
                 WHEN SUBSTR(MF."AssetClass", 1, 1)   = '1' THEN 1
                 WHEN SUBSTR(MF."AssetClass", 1, 1)   = '2' THEN 2
                 WHEN SUBSTR(MF."AssetClass", 1, 1)   = '3' THEN 3
                 WHEN SUBSTR(MF."AssetClass", 1, 1)   = '4' THEN 4
                 WHEN SUBSTR(MF."AssetClass", 1, 1)   = '5' THEN 5
-                ELSE 0
+                ELSE 1                                             -- 預設=1
            END                                  AS "AssetClass"        -- 資產五分類代號
          , NVL("FacProd"."Ifrs9ProdCode", ' ')  AS "Ifrs9ProdCode"     -- 產品別
          , CASE WHEN Cl."ClCode1" in (1)    THEN NVL(Eva1."EvaAmt",0)
@@ -170,6 +175,9 @@ BEGIN
     FROM   "Work_Ifrs9FacData" M
       LEFT JOIN "FacMain" F     ON F."CustNo"       = M."CustNo"
                                AND F."FacmNo"       = M."FacmNo"
+      LEFT JOIN "LoanBorMain" L ON L."CustNo"       = M."CustNo"
+                               AND L."FacmNo"       = M."FacmNo"
+                               AND L."BormNo"       = F."LastBormRvNo"
       LEFT JOIN "FacCaseAppl" ON "FacCaseAppl"."ApplNo"   =  F."ApplNo"
       LEFT JOIN "MonthlyFacBal" MF  ON MF."YearMonth" =  YYYYMM
                                    AND MF."CustNo"    =  M."CustNo"

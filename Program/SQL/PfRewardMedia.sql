@@ -34,6 +34,8 @@ create sequence "PfRewardMedia_SEQ" minvalue 1 maxvalue 2147483647 increment by 
 
 create index "PfRewardMedia_Index1" on "PfRewardMedia"("WorkMonth" asc, "BonusNo" asc);
 
+create index "PfRewardMedia_Index2" on "PfRewardMedia"("CustNo" asc, "FacmNo" asc, "BormNo" asc);
+
 comment on table "PfRewardMedia" is '獎金媒體發放檔';
 comment on column "PfRewardMedia"."BonusNo" is '系統序號';
 comment on column "PfRewardMedia"."BonusDate" is '獎金發放日';

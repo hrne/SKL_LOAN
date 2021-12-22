@@ -41,17 +41,16 @@ public class L4211Report extends MakeReport {
 	private int pageIndex = 38;
 	// 每頁筆數
 	private int reportkind = 0;
-
 	@Override
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
-
-		if (reportkind == 1) {
-			printHeaderP();
-		} else if (reportkind == 2) {
-			printHeaderP1();
+		
+		if(reportkind == 1) {
+		  printHeaderP();
+		} else if(reportkind == 2){
+		  printHeaderP1();
 		} else {
-			printHeaderP2();
+		  printHeaderP2();
 		}
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(9);
@@ -70,7 +69,7 @@ public class L4211Report extends MakeReport {
 	int allsum8 = 0;
 	int allsum9 = 0;
 	int allsum10 = 0;
-
+	
 	int totalsum = 0;
 	int totalsum2 = 0;
 	int totalsum3 = 0;
@@ -81,7 +80,7 @@ public class L4211Report extends MakeReport {
 	int totalsum8 = 0;
 	int totalsum9 = 0;
 	int totalsum10 = 0;
-
+	
 	int transferamt = 0;
 	int makeferamt = 0;
 	int principal = 0;
@@ -97,7 +96,6 @@ public class L4211Report extends MakeReport {
 	String year = "";
 	String month = "";
 	String date = "";
-
 	public void printHeaderP() {
 		this.setFont(1, 8);
 		this.print(-1, 150, "機密等級：密");
@@ -105,15 +103,17 @@ public class L4211Report extends MakeReport {
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //			月/日/年(西元後兩碼)
-		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 3, "報  表 ：" + "L4211A");
 		this.print(-3, 82, "匯款總傳票明細表 ----(									)", "C");
-		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
-
-		if (String.valueOf(acdate).length() == 7) {
+		
+		if(String.valueOf(acdate).length() == 7) {
 			year = String.valueOf(acdate).substring(0, 3);
 			month = String.valueOf(acdate).substring(3, 5);
 			date = String.valueOf(acdate).substring(5, 7);
@@ -122,14 +122,15 @@ public class L4211Report extends MakeReport {
 			month = String.valueOf(acdate).substring(2, 4);
 			date = String.valueOf(acdate).substring(4, 6);
 		}
-
+		
 		this.print(-5, 71, year);
 		this.print(-5, 78, month);
 		this.print(-5, 83, date);
-
+		
 		this.print(-5, 161, "單    位：元", "R");
 		this.print(-6, 0, "");
-		this.print(-7, 1, " 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
+		this.print(-7, 1,
+				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
@@ -141,15 +142,17 @@ public class L4211Report extends MakeReport {
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //			月/日/年(西元後兩碼)
-		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 3, "報  表 ：" + "L4211A");
 		this.print(-3, 77, "匯款總傳票明細表－以金額排序 ----(									)", "C");
-		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
-
-		if (String.valueOf(acdate).length() == 7) {
+		
+		if(String.valueOf(acdate).length() == 7) {
 			year = String.valueOf(acdate).substring(0, 3);
 			month = String.valueOf(acdate).substring(3, 5);
 			date = String.valueOf(acdate).substring(5, 7);
@@ -158,18 +161,19 @@ public class L4211Report extends MakeReport {
 			month = String.valueOf(acdate).substring(2, 4);
 			date = String.valueOf(acdate).substring(4, 6);
 		}
-
+		
 		this.print(-5, 71, year);
 		this.print(-5, 78, month);
 		this.print(-5, 83, date);
-
+		
 		this.print(-5, 161, "單    位：元", "R");
 		this.print(-6, 0, "");
-		this.print(-7, 1, " 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
+		this.print(-7, 1,
+				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
-
+	
 	public void printHeaderP2() {
 		this.setFont(1, 8);
 		this.print(-1, 150, "機密等級：密");
@@ -177,15 +181,17 @@ public class L4211Report extends MakeReport {
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //			月/日/年(西元後兩碼)
-		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 3, "報  表 ：" + "L4211A");
 		this.print(-3, 82, "匯款明細表－依戶號 ----(									)", "C");
-		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
-
-		if (String.valueOf(acdate).length() == 7) {
+		
+		if(String.valueOf(acdate).length() == 7) {
 			year = String.valueOf(acdate).substring(0, 3);
 			month = String.valueOf(acdate).substring(3, 5);
 			date = String.valueOf(acdate).substring(5, 7);
@@ -194,18 +200,19 @@ public class L4211Report extends MakeReport {
 			month = String.valueOf(acdate).substring(2, 4);
 			date = String.valueOf(acdate).substring(4, 6);
 		}
-
+		
 		this.print(-5, 71, year);
 		this.print(-5, 78, month);
 		this.print(-5, 83, date);
-
+		
 		this.print(-5, 161, "單    位：元", "R");
 		this.print(-6, 0, "");
-		this.print(-7, 1, " 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
+		this.print(-7, 1,
+				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
-
+	
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		long sno = 0;
@@ -221,15 +228,16 @@ public class L4211Report extends MakeReport {
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		if (fnAllList == null) {
-			throw new LogicException("E2003", "查無資料"); // 查無資料
+		if(fnAllList == null) {	
+				throw new LogicException("E2003", "查無資料"); // 查無資料
 		}
-
+		
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4211", "匯款總傳票明細表", "", "A4", "L");
 
 		reportkind = 1;
 		report1(fnAllList);
-
+		
+		
 		try {
 			fnAllList = l4211ARServiceImpl.findAll(titaVo, 2);
 		} catch (Exception e) {
@@ -237,11 +245,12 @@ public class L4211Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
-
+		
 		reportkind = 2;
 		newPage();
 		report2(fnAllList);
-
+		
+		
 		try {
 			fnAllList = l4211ARServiceImpl.findAll(titaVo, 3);
 		} catch (Exception e) {
@@ -249,15 +258,17 @@ public class L4211Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
-
+		
 		reportkind = 3;
 		newPage();
 		report3(fnAllList);
+		
 
 		sno = this.close();
 		this.toPdf(sno);
 	}
 
+	
 	private void report1(List<Map<String, String>> fnAllList) {
 		String msCode = ""; // 代號
 		String txCode = ""; // 代號名稱
@@ -267,7 +278,7 @@ public class L4211Report extends MakeReport {
 		int npcount = 0;
 		int tround = 0;
 		int pageCnt = 0;
-
+		
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
@@ -293,10 +304,11 @@ public class L4211Report extends MakeReport {
 			shortpayment = Integer.valueOf(tfnAllList.get("F16"));
 			others = Integer.valueOf(tfnAllList.get("F17"));
 			count++;
-
+			
+			
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("F0")) || !msNum.equals(tfnAllList.get("F1"))) {
-
+				
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -310,6 +322,7 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
+					
 					totalsum += allsum;
 					totalsum2 += allsum2;
 					totalsum3 += allsum3;
@@ -320,7 +333,7 @@ public class L4211Report extends MakeReport {
 					totalsum8 += allsum8;
 					totalsum9 += allsum9;
 					totalsum10 += allsum10;
-
+					
 					allsum = 0;
 					allsum2 = 0;
 					allsum3 = 0;
@@ -335,12 +348,12 @@ public class L4211Report extends MakeReport {
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					npcount = 0;
+					npcount = 0 ;
 					tround = 0;
 				} // if
-
+				
 				// 頁面設置配置
-
+				
 				this.setFont(1, 8);
 				String A17 = tfnAllList.get("F0");
 				if (A17.equals("P03")) {
@@ -353,11 +366,12 @@ public class L4211Report extends MakeReport {
 
 				msName = tfnAllList.get("F0");
 				msNum = tfnAllList.get("F1");
-			} else {
+			} else { 
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("F22").toString()) || !txCode.equals(tfnAllList.get("F23").toString())) {
+					if (!msCode.equals(tfnAllList.get("F22").toString())
+							|| !txCode.equals(tfnAllList.get("F23").toString())) {
 						this.info("msCode       = " + msCode);
 						this.info("22       = " + tfnAllList.get("F22").toString());
 
@@ -371,11 +385,11 @@ public class L4211Report extends MakeReport {
 						this.print(0, 14, " 小計 ");
 
 						atAll();
-
+						
 						this.print(1, 0, "");
-
+						
 						pageCnt = pageCnt + 2;
-
+						
 						totalsum += allsum;
 						totalsum2 += allsum2;
 						totalsum3 += allsum3;
@@ -386,7 +400,7 @@ public class L4211Report extends MakeReport {
 						totalsum8 += allsum8;
 						totalsum9 += allsum9;
 						totalsum10 += allsum10;
-
+						
 						allsum = 0;
 						allsum2 = 0;
 						allsum3 = 0;
@@ -402,7 +416,7 @@ public class L4211Report extends MakeReport {
 				}
 
 				if (pageCnt >= 30) { // 超過30筆自動換頁 並印出當前的代碼
-
+					
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
@@ -413,16 +427,16 @@ public class L4211Report extends MakeReport {
 					}
 					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
-
+				
 				}
-			} // else
+			} // else 
 
 			npcount++;
 			tround++;
-
+			
 //			每頁筆數相加
 			pageCnt++;
-
+			
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
 			msCode = tfnAllList.get("F22").toString();
 			// 當前代碼對應中文 當下一筆不同時取用
@@ -432,17 +446,17 @@ public class L4211Report extends MakeReport {
 
 			// 匯款日 * type = 1: yyy/mm/dd<BR>
 			this.print(1, 2, showRocDate((tfnAllList.get("F2")), 1));
-
-			if (!scode.equals(tfnAllList.get("F3"))) { // 匯款序號不同 印匯款金額
-				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號
+			
+			if(!scode.equals(tfnAllList.get("F3"))) {  // 匯款序號不同 印匯款金額
+				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號		
 				this.print(0, 29, df2, "R");// 匯款金額
-
+				
 				allsum += transferamt;
-
+				
 				scode = tfnAllList.get("F3");
-
+				
 			}
-
+			
 			this.print(0, 40, df3, "R");// 作帳金額
 			this.print(0, 41, tfnAllList.get("F6"));// 戶號
 			String name = tfnAllList.get("F7");
@@ -509,19 +523,20 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("F23"))) {
-					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, msCode);
-					}
+				if("".equals(tfnAllList.get("F23"))) {
+				  if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					this.print(1, 2, "暫收款");
+				  } else {
+					this.print(1, 2, msCode);
+				  }
 				} else {
-					this.print(1, 2, tfnAllList.get("F23"));
+				  this.print(1, 2, tfnAllList.get("F23"));
 				}
 				this.print(0, 14, " 小計 ");
-
+				
 				atAll();
 
+				
 				totalsum += allsum;
 				totalsum2 += allsum2;
 				totalsum3 += allsum3;
@@ -532,12 +547,12 @@ public class L4211Report extends MakeReport {
 				totalsum8 += allsum8;
 				totalsum9 += allsum9;
 				totalsum10 += allsum10;
-
+				
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 				this.print(1, 14, " 合計 ");
-
+				
 				totalAll();
 				pageCnt = pageCnt + 4;
 				allsum = 0;
@@ -550,7 +565,7 @@ public class L4211Report extends MakeReport {
 				allsum8 = 0;
 				allsum9 = 0;
 				allsum10 = 0;
-
+				
 				totalsum = 0;
 				totalsum2 = 0;
 				totalsum3 = 0;
@@ -561,18 +576,19 @@ public class L4211Report extends MakeReport {
 				totalsum8 = 0;
 				totalsum9 = 0;
 				totalsum10 = 0;
-
+				
+				
 				this.print(pageIndex - pageCnt - 2, 80, "=====報表結束=====", "C");
 				this.print(2, 80, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
 
 				pageCnt = 0;
-				npcount = 0;
+				npcount = 0 ;
 				tround = 0;
 			}
 
 		} // for
 	}
-
+	
 	private void report2(List<Map<String, String>> fnAllList) {
 		String msCode = ""; // 代號
 		String txCode = ""; // 代號名稱
@@ -582,7 +598,7 @@ public class L4211Report extends MakeReport {
 		int npcount = 0;
 		int tround = 0;
 		int pageCnt = 0;
-
+		
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
@@ -608,10 +624,11 @@ public class L4211Report extends MakeReport {
 			shortpayment = Integer.valueOf(tfnAllList.get("F16"));
 			others = Integer.valueOf(tfnAllList.get("F17"));
 			count++;
-
+			
+			
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("F0")) || !msNum.equals(tfnAllList.get("F1"))) {
-
+				
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -625,6 +642,7 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
+					
 					totalsum += allsum;
 					totalsum2 += allsum2;
 					totalsum3 += allsum3;
@@ -635,7 +653,7 @@ public class L4211Report extends MakeReport {
 					totalsum8 += allsum8;
 					totalsum9 += allsum9;
 					totalsum10 += allsum10;
-
+					
 					allsum = 0;
 					allsum2 = 0;
 					allsum3 = 0;
@@ -650,12 +668,12 @@ public class L4211Report extends MakeReport {
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					npcount = 0;
+					npcount = 0 ;
 					tround = 0;
 				} // if
-
+				
 				// 頁面設置配置
-
+				
 				this.setFont(1, 8);
 				String A17 = tfnAllList.get("F0");
 				if (A17.equals("P03")) {
@@ -668,11 +686,12 @@ public class L4211Report extends MakeReport {
 
 				msName = tfnAllList.get("F0");
 				msNum = tfnAllList.get("F1");
-			} else {
+			} else { 
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("F22").toString()) || !txCode.equals(tfnAllList.get("F23").toString())) {
+					if (!msCode.equals(tfnAllList.get("F22").toString())
+							|| !txCode.equals(tfnAllList.get("F23").toString())) {
 						this.info("msCode       = " + msCode);
 						this.info("22       = " + tfnAllList.get("F22").toString());
 
@@ -686,11 +705,11 @@ public class L4211Report extends MakeReport {
 						this.print(0, 14, " 小計 ");
 
 						atAll();
-
+						
 						this.print(1, 0, "");
-
+						
 						pageCnt = pageCnt + 2;
-
+						
 						totalsum += allsum;
 						totalsum2 += allsum2;
 						totalsum3 += allsum3;
@@ -701,7 +720,7 @@ public class L4211Report extends MakeReport {
 						totalsum8 += allsum8;
 						totalsum9 += allsum9;
 						totalsum10 += allsum10;
-
+						
 						allsum = 0;
 						allsum2 = 0;
 						allsum3 = 0;
@@ -717,7 +736,7 @@ public class L4211Report extends MakeReport {
 				}
 
 				if (pageCnt >= 30) { // 超過40筆自動換頁 並印出當前的代碼
-
+					
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
@@ -729,14 +748,14 @@ public class L4211Report extends MakeReport {
 					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}
-			} // else
+			} // else 
 
 			npcount++;
 			tround++;
-
+			
 //			每頁筆數相加
 			pageCnt++;
-
+			
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
 			msCode = tfnAllList.get("F22").toString();
 			// 當前代碼對應中文 當下一筆不同時取用
@@ -746,17 +765,17 @@ public class L4211Report extends MakeReport {
 
 			// 匯款日 * type = 1: yyy/mm/dd<BR>
 			this.print(1, 2, showRocDate((tfnAllList.get("F2")), 1));
-
-			if (!scode.equals(tfnAllList.get("F3"))) { // 匯款序號不同 印匯款金額
-				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號
+			
+			if(!scode.equals(tfnAllList.get("F3"))) {  // 匯款序號不同 印匯款金額
+				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號		
 				this.print(0, 29, df2, "R");// 匯款金額
-
+				
 				allsum += transferamt;
-
+				
 				scode = tfnAllList.get("F3");
-
+				
 			}
-
+			
 			this.print(0, 40, df3, "R");// 作帳金額
 			this.print(0, 41, tfnAllList.get("F6"));// 戶號
 			String name = tfnAllList.get("F7");
@@ -823,19 +842,20 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("F23"))) {
-					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, msCode);
-					}
+				if("".equals(tfnAllList.get("F23"))) {
+				  if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					this.print(1, 2, "暫收款");
+				  } else {
+					this.print(1, 2, msCode);
+				  }
 				} else {
-					this.print(1, 2, tfnAllList.get("F23"));
+				  this.print(1, 2, tfnAllList.get("F23"));
 				}
 				this.print(0, 14, " 小計 ");
-
+				
 				atAll();
 
+				
 				totalsum += allsum;
 				totalsum2 += allsum2;
 				totalsum3 += allsum3;
@@ -846,12 +866,12 @@ public class L4211Report extends MakeReport {
 				totalsum8 += allsum8;
 				totalsum9 += allsum9;
 				totalsum10 += allsum10;
-
+				
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 				this.print(1, 14, " 合計 ");
-
+				
 				totalAll();
 				pageCnt = pageCnt + 4;
 				allsum = 0;
@@ -864,7 +884,7 @@ public class L4211Report extends MakeReport {
 				allsum8 = 0;
 				allsum9 = 0;
 				allsum10 = 0;
-
+				
 				totalsum = 0;
 				totalsum2 = 0;
 				totalsum3 = 0;
@@ -875,14 +895,15 @@ public class L4211Report extends MakeReport {
 				totalsum8 = 0;
 				totalsum9 = 0;
 				totalsum10 = 0;
-
+				
+				
 				this.print(pageIndex - pageCnt - 2, 80, "=====報表結束=====", "C");
 				this.print(2, 80, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
 			}
 
 		} // for
 	}
-
+	
 	private void report3(List<Map<String, String>> fnAllList) {
 		String msCode = ""; // 代號
 		String txCode = ""; // 代號名稱
@@ -892,7 +913,7 @@ public class L4211Report extends MakeReport {
 		int npcount = 0;
 		int tround = 0;
 		int pageCnt = 0;
-
+		
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
@@ -918,10 +939,11 @@ public class L4211Report extends MakeReport {
 			shortpayment = Integer.valueOf(tfnAllList.get("F16"));
 			others = Integer.valueOf(tfnAllList.get("F17"));
 			count++;
-
+			
+			
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("F0")) || !msNum.equals(tfnAllList.get("F1"))) {
-
+				
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -935,6 +957,7 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
+					
 					totalsum += allsum;
 					totalsum2 += allsum2;
 					totalsum3 += allsum3;
@@ -945,7 +968,7 @@ public class L4211Report extends MakeReport {
 					totalsum8 += allsum8;
 					totalsum9 += allsum9;
 					totalsum10 += allsum10;
-
+					
 					allsum = 0;
 					allsum2 = 0;
 					allsum3 = 0;
@@ -960,12 +983,12 @@ public class L4211Report extends MakeReport {
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					npcount = 0;
+					npcount = 0 ;
 					tround = 0;
 				} // if
-
+				
 				// 頁面設置配置
-
+				
 				this.setFont(1, 8);
 				String A17 = tfnAllList.get("F0");
 				if (A17.equals("P03")) {
@@ -978,11 +1001,12 @@ public class L4211Report extends MakeReport {
 
 				msName = tfnAllList.get("F0");
 				msNum = tfnAllList.get("F1");
-			} else {
+			} else { 
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("F22").toString()) || !txCode.equals(tfnAllList.get("F23").toString())) {
+					if (!msCode.equals(tfnAllList.get("F22").toString())
+							|| !txCode.equals(tfnAllList.get("F23").toString())) {
 						this.info("msCode       = " + msCode);
 						this.info("22       = " + tfnAllList.get("F22").toString());
 
@@ -996,11 +1020,11 @@ public class L4211Report extends MakeReport {
 						this.print(0, 14, " 小計 ");
 
 						atAll();
-
+						
 						this.print(1, 0, "");
-
+						
 						pageCnt = pageCnt + 2;
-
+						
 						totalsum += allsum;
 						totalsum2 += allsum2;
 						totalsum3 += allsum3;
@@ -1011,7 +1035,7 @@ public class L4211Report extends MakeReport {
 						totalsum8 += allsum8;
 						totalsum9 += allsum9;
 						totalsum10 += allsum10;
-
+						
 						allsum = 0;
 						allsum2 = 0;
 						allsum3 = 0;
@@ -1027,7 +1051,7 @@ public class L4211Report extends MakeReport {
 				}
 
 				if (pageCnt >= 30) { // 超過40筆自動換頁 並印出當前的代碼
-
+					
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
@@ -1039,14 +1063,14 @@ public class L4211Report extends MakeReport {
 					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}
-			} // else
+			} // else 
 
 			npcount++;
 			tround++;
-
+			
 //			每頁筆數相加
 			pageCnt++;
-
+			
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
 			msCode = tfnAllList.get("F22").toString();
 			// 當前代碼對應中文 當下一筆不同時取用
@@ -1056,17 +1080,17 @@ public class L4211Report extends MakeReport {
 
 			// 匯款日 * type = 1: yyy/mm/dd<BR>
 			this.print(1, 2, showRocDate((tfnAllList.get("F2")), 1));
-
-			if (!scode.equals(tfnAllList.get("F3"))) { // 匯款序號不同 印匯款金額
-				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號
+			
+			if(!scode.equals(tfnAllList.get("F3"))) {  // 匯款序號不同 印匯款金額
+				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號		
 				this.print(0, 29, df2, "R");// 匯款金額
-
+				
 				allsum += transferamt;
-
+				
 				scode = tfnAllList.get("F3");
-
+				
 			}
-
+			
 			this.print(0, 40, df3, "R");// 作帳金額
 			this.print(0, 41, tfnAllList.get("F6"));// 戶號
 			String name = tfnAllList.get("F7");
@@ -1133,19 +1157,20 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("F23"))) {
-					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, msCode);
-					}
+				if("".equals(tfnAllList.get("F23"))) {
+				  if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					this.print(1, 2, "暫收款");
+				  } else {
+					this.print(1, 2, msCode);
+				  }
 				} else {
-					this.print(1, 2, tfnAllList.get("F23"));
+				  this.print(1, 2, tfnAllList.get("F23"));
 				}
 				this.print(0, 14, " 小計 ");
-
+				
 				atAll();
 
+				
 				totalsum += allsum;
 				totalsum2 += allsum2;
 				totalsum3 += allsum3;
@@ -1156,12 +1181,12 @@ public class L4211Report extends MakeReport {
 				totalsum8 += allsum8;
 				totalsum9 += allsum9;
 				totalsum10 += allsum10;
-
+				
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 				this.print(1, 14, " 合計 ");
-
+				
 				totalAll();
 				pageCnt = pageCnt + 4;
 				allsum = 0;
@@ -1174,7 +1199,7 @@ public class L4211Report extends MakeReport {
 				allsum8 = 0;
 				allsum9 = 0;
 				allsum10 = 0;
-
+				
 				totalsum = 0;
 				totalsum2 = 0;
 				totalsum3 = 0;
@@ -1185,16 +1210,17 @@ public class L4211Report extends MakeReport {
 				totalsum8 = 0;
 				totalsum9 = 0;
 				totalsum10 = 0;
-
+				
+				
 				this.print(pageIndex - pageCnt - 2, 80, "=====報表結束=====", "C");
 				this.print(2, 80, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
 			}
 
 		} // for
 	}
-
+	
 	private void atAll() {
-
+		
 		if (allsum != 0) {
 			this.print(0, 29, String.format("%,d", allsum), "R");
 		} else {
@@ -1246,11 +1272,11 @@ public class L4211Report extends MakeReport {
 		} else {
 			this.print(0, 145, "");
 		}
-
+		
 	}
-
+	
 	private void totalAll() {
-
+		
 		if (totalsum != 0) {
 			this.print(0, 29, String.format("%,d", totalsum), "R");
 		} else {
@@ -1302,7 +1328,7 @@ public class L4211Report extends MakeReport {
 		} else {
 			this.print(0, 145, "");
 		}
-
+		
 	}
 
 }

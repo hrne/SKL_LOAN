@@ -43,17 +43,31 @@ public class LNM34CPReport extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LNM34CP 資料欄位清單C
+		this.info("---------- LNM34CPReport exec titaVo: " + titaVo);
+
+		List<Map<String, String>> LNM34CPList = null;
 		try {
-			this.info("---------- LNM34CPReport exec titaVo: " + titaVo);
-			List<Map<String, String>> LNM34CPList = lNM34CPServiceImpl.findAll(titaVo);
+			LNM34CPList = lNM34CPServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LNM34CPReport LNM34CPServiceImpl.findAll error = " + errors.toString());
+			return false;
+		}
+
+		try {
+			// excel-CSV
 			genFile(titaVo, LNM34CPList);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LNM34CPServiceImpl.findAll error = " + errors.toString());
+			this.error("LNM34CPReport.genFile error = " + errors.toString());
+			return false;
 		}
+
+		return true;
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {

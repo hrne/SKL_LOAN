@@ -66,6 +66,7 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\" ";
 		sql += " WHERE BATX.\"RepayCode\" = '01' ";
 		sql += "  AND BATX.\"EntryDate\" = :iENTDY ";
+		sql += "  AND BATX.\"CustNo\" <> 0 ";
 		sql += " ORDER BY BATX.\"ReconCode\"  "; // 存摺代號(表頭)
 		sql += "       , BATX.\"BatchNo\"   "; // 批次號碼(表頭)
 		sql += "       , BATX.\"DetailSeq\" "; // 匯款序號

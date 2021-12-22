@@ -133,41 +133,41 @@ E(0,1)
 !------------ TXFORM = L4510 -----------
 <sub type="FORM" name="L4510" tota-mode="1">
 
-#OReportA=X,8,O
-#SnoA=A,8,S
-E(0,@SnoA,#OReportA)
-#PdfPrtA=A,1,S
-C(3,#SnoA,0,E(0,0),E(0,1))
+!#OReportA=X,8,O
+!#SnoA=A,8,S
+!E(0,@SnoA,#OReportA)
+!#PdfPrtA=A,1,S
+!C(3,#SnoA,0,E(0,0),E(0,1))
 
-#OReportB=X,8,O
-#SnoB=A,8,S
-E(0,@SnoB,#OReportB)
-#PdfPrtB=A,1,S
-C(3,#SnoB,0,E(0,0),E(0,1))
+!#OReportB=X,8,O
+!#SnoB=A,8,S
+!E(0,@SnoB,#OReportB)
+!#PdfPrtB=A,1,S
+!C(3,#SnoB,0,E(0,0),E(0,1))
 
-#OReportC=X,8,O
-#SnoC=A,8,S
-E(0,@SnoC,#OReportC)
-#PdfPrtC=A,1,S
-C(3,#SnoC,0,E(0,0),E(0,1))
+!#OReportC=X,8,O
+!#SnoC=A,8,S
+!E(0,@SnoC,#OReportC)
+!#PdfPrtC=A,1,S
+!C(3,#SnoC,0,E(0,0),E(0,1))
 
-#OReportD=X,8,O
-#SnoD=A,8,S
-E(0,@SnoD,#OReportD)
-#PdfPrtD=A,1,S
-C(3,#SnoD,0,E(0,0),E(0,1))
+!#OReportD=X,8,O
+!#SnoD=A,8,S
+!E(0,@SnoD,#OReportD)
+!#PdfPrtD=A,1,S
+!C(3,#SnoD,0,E(0,0),E(0,1))
 
-#OReportE=X,8,O
-#SnoE=A,8,S
-E(0,@SnoE,#OReportE)
-#PdfPrtE=A,1,S
-C(3,#SnoE,0,E(0,0),E(0,1))
+!#OReportE=X,8,O
+!#SnoE=A,8,S
+!E(0,@SnoE,#OReportE)
+!#PdfPrtE=A,1,S
+!C(3,#SnoE,0,E(0,0),E(0,1))
 
-#OReportF=X,8,O
-#SnoF=A,8,S
-E(0,@SnoF,#OReportF)
-#PdfPrtF=A,1,S
-C(3,#SnoF,0,E(0,0),E(0,1))
+!#OReportF=X,8,O
+!#SnoF=A,8,S
+!E(0,@SnoF,#OReportF)
+!#PdfPrtF=A,1,S
+!C(3,#SnoF,0,E(0,0),E(0,1))
 
 </sub>
 
@@ -184,12 +184,6 @@ C(3,#SnoF,0,E(0,0),E(0,1))
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L4510
-#OReportA
-#OReportB
-#OReportC
-#OReportD
-#OReportE
-#OReportF
 ^
 <include src="ROM.icf::L4R16.tom"/>
 
@@ -198,17 +192,4 @@ TXFORM=L4510
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
-#PdfPrtA=1,PDF,,,,,,,,,,,,,SnoA,非15日薪-火險費扣薪明細表
-^
-#PdfPrtB=1,PDF,,,,,,,,,,,,,SnoB,非15日薪-帳管費扣薪明細表
-^
-#PdfPrtC=1,PDF,,,,,,,,,,,,,SnoC,非15日薪-扣薪媒體明細表
-^
-#PdfPrtD=1,PDF,,,,,,,,,,,,,SnoD,15日薪-火險費扣薪明細表
-^
-#PdfPrtE=1,PDF,,,,,,,,,,,,,SnoE,15日薪-帳管費扣薪明細表
-^
-#PdfPrtF=1,PDF,,,,,,,,,,,,,SnoF,15日薪-扣薪媒體明細表
-^
-
 </sub>

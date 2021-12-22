@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LB204")
 @Scope("step")
@@ -24,6 +26,12 @@ public class LB204 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LB204Report lB204Report;
+
+	@Autowired
+	DateUtil dDateUtil; 
+
+	@Autowired
+	WebClient webClient; 
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -41,10 +49,16 @@ public class LB204 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB204 active LB204 ");
 		this.info("LB204 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		String tranCode = "LB204";
+		String tranName = "聯徵授信餘額日報檔";
+
 		titaVo.putParam("AcDateStart", Integer.parseInt(titaVo.getEntDy()));
 		titaVo.putParam("AcDateEnd", Integer.parseInt(titaVo.getEntDy()));
+		
+		boolean isFinish = lB204Report.exec(titaVo);
 
-		lB204Report.exec(titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
 	}
 
 }

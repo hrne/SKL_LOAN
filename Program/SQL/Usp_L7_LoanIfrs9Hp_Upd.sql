@@ -20,6 +20,7 @@ BEGIN
     LYYYYMM        INT;         -- 上月年月
     MM             INT;         -- 本月月份
     YYYY           INT;         -- 本月年度
+    TMNDYF         INT;         -- 本月月底日
   BEGIN
     INS_CNT := 0;
     UPD_CNT := 0;
@@ -37,6 +38,12 @@ BEGIN
     ELSE
        LYYYYMM := YYYYMM - 1;
     END IF;
+    -- 抓本月月底日
+    SELECT "TmnDyf"
+    INTO TMNDYF
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
+    ;
 
     -- 刪除舊資料
     DBMS_OUTPUT.PUT_LINE('DELETE LoanIfrs9Hp');
@@ -70,16 +77,10 @@ BEGIN
            UNION
            SELECT F."CustNo"                  AS "CustNo"
                 , F."FacmNo"                  AS "FacmNo"
-                --, 0                           AS "PreDrawdownAmt"
-                , CASE
-                    WHEN F."DrawdownFg" = 0   THEN 0
-                    ELSE NVL(F."UtilBal",0)
-                  END                         AS "PreDrawdownAmt"
+                , 0                           AS "PreDrawdownAmt"
                 , NVL(F."ApproveDate",0)      AS "ApproveDate"   -- 核准日期(額度)
            FROM   "Ifrs9FacData" F
-           --WHERE  F."DrawdownFg" = 0
-           WHERE F."DrawdownFg" = 0 OR ( F."DrawdownFg" = 1 
-             AND TRUNC(NVL(F."FirstDrawdownDate",0) / 100 ) > YYYYMM )
+           WHERE  F."DrawdownFg" = 0
          )   A
     WHERE TRUNC(A."ApproveDate" / 100 ) <= YYYYMM      -- 核准日期＞月底日時，此筆資料不計入
     GROUP BY A."CustNo", A."FacmNo", A."ApproveDate"
@@ -96,11 +97,21 @@ BEGIN
                 ELSE 2
            END                                  AS "CustKind"           -- 企業戶/個人戶
          , NVL(HP."ApproveDate",0)              AS "ApproveDate"        -- 核准日期(額度)
-         , NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate"  -- 初貸日期
+         --, NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate"  -- 初貸日期
+         , CASE
+             WHEN F."LastBormRvNo" > 900 AND F."LastBormNo" = 0
+                  THEN NVL(L."DrawdownDate",0)
+             ELSE NVL(F."FirstDrawdownDate",0)
+           END                                  AS "FirstDrawdownDate"  -- 初貸日期
          , NVL(F."LineAmt",0)                   AS "LineAmt"            -- 核准金額(台幣)
          , NVL("FacProd"."Ifrs9ProdCode", ' ')  AS "Ifrs9ProdCode"      -- 產品別
-         , CASE WHEN ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" ) < 0 THEN 0
-                ELSE ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
+         --, CASE WHEN ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" ) < 0 THEN 0
+         --       ELSE ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
+         , CASE WHEN NVL(F."RecycleCode",0) = 0 AND NVL(F."UtilDeadline",0) >= TMNDYF --非循環且動支期限>=月底日  
+                     THEN  ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
+                WHEN NVL(F."RecycleCode",0) = 1 AND NVL(F."RecycleDeadline",0) >= TMNDYF --循環且循環動支期限>=月底日    
+                     THEN  ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
+                ELSE 0     
            END                                  AS "AvblBal"            -- 可動用餘額(台幣)
                                                                            -- 核准額度 - 已動用額度餘額
                                                                            -- 撥款日＞月底日時，撥款金額要加回可動用餘額
@@ -108,9 +119,8 @@ BEGIN
          , CASE WHEN F."IrrevocableFlag" = 'Y' THEN 1
                 ELSE 0
            END                                  AS "IrrevocableFlag"    -- 該筆額度是否為不可撤銷  -- 1=是 0=否
-         , CASE WHEN TRIM(NVL(C."IndustryCode", ' ')) = '' THEN ' '
-                WHEN NVL(C."EntCode",' ') IN ('1','2') THEN        -- 企金 - 第一碼為CdIndustry.MainType	主計處大類
-                     CDI."MainType" || RPAD(TRIM(C."IndustryCode"),4,'0')       
+         , CASE WHEN NVL(C."EntCode",' ') IN ('1','2') THEN        -- 企金 - 第一碼為CdIndustry.MainType	主計處大類
+                     CDI."MainType" || SUBSTR(C."IndustryCode"),3,4)       
                 ELSE '60000'
            END                                  AS "IndustryCode"       -- 主計處行業別代碼 
          , ' '                                  AS "OriRating"          -- 原始認列時時信用評等
@@ -147,6 +157,9 @@ BEGIN
          LEFT JOIN "CustMain" C   ON  C."CustNo" = HP."CustNo"
          LEFT JOIN "FacMain"  F   ON  F."CustNo" = HP."CustNo"
                                  AND  F."FacmNo" = HP."FacmNo"
+        LEFT JOIN "LoanBorMain" L ON L."CustNo"  = F."CustNo"
+                                 AND L."FacmNo"  = F."FacmNo"
+                                 AND L."BormNo"  = F."LastBormRvNo"
          LEFT JOIN "FacProd"   ON "FacProd"."ProdNo"   =  F."ProdNo"
          LEFT JOIN "ClFac"     ON "ClFac"."ApproveNo"  =  F."ApplNo"
                               AND "ClFac"."MainFlag"   =  'Y'          -- 主要擔保品

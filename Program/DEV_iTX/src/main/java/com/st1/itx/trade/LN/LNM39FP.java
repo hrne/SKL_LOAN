@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LNM39FP")
 @Scope("step")
@@ -25,6 +27,12 @@ public class LNM39FP extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	public LNM39FPReport lnm39fpReport;
 
+	@Autowired
+	DateUtil dDateUtil; 
+
+	@Autowired
+	WebClient webClient;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -32,7 +40,6 @@ public class LNM39FP extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LNM39FP.class);
 		this.info("LNM39FP active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,8 +49,15 @@ public class LNM39FP extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LNM39FP active LNM39FP ");
 		this.info("LNM39FP titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		String tranCode = "LNM39FP";
+		String tranName = "LNM39FP 欄位清單６";
+
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
-		lnm39fpReport.exec(titaVo); // 使用月報資料庫
+		boolean isFinish = lnm39fpReport.exec(titaVo); // 使用月報資料庫
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }
@@ -58,7 +72,6 @@ public class LNM39FP extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LNM39FP extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LNM39FP.class);
 //
 //	@Autowired
 //	public LNM39FPReport lnm39fpReport;

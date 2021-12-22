@@ -55,23 +55,28 @@ public class LB204ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// B204 聯徵授信餘額日報檔
-		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"DataDate\" " + "     , M.\"AcctNo\" " + "     , M.\"CustId\" " + "     , M.\"AcctCode\" "
-				+ "     , M.\"SubAcctCode\" " + "     , M.\"SubTranCode\" " + "     , M.\"LineAmt\" " + "     , M.\"DrawdownAmt\" " + "     , M.\"DBR22Amt\" " + "     , M.\"SeqNo\" "
-				+ "     , M.\"Filler13\" " + " FROM  \"JcicB204\" M " + " WHERE ( M.\"DataYMD\" Between " + acdateStart + " AND " + acdateEnd + " )"
-				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"DataDate\", M.\"AcctNo\", M.\"CustId\" " + "        , M.\"AcctCode\", M.\"SubAcctCode\", M.\"SeqNo\" ";
+		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"DataDate\" " + "     , M.\"AcctNo\" "
+				+ "     , M.\"CustId\" " + "     , M.\"AcctCode\" " + "     , M.\"SubAcctCode\" "
+				+ "     , M.\"SubTranCode\" " + "     , M.\"LineAmt\" " + "     , M.\"DrawdownAmt\" "
+				+ "     , M.\"DBR22Amt\" " + "     , M.\"SeqNo\" " + "     , M.\"Filler13\" " + " FROM  \"JcicB204\" M "
+                + " WHERE ( M.\"DataYMD\" Between :acdateStart  AND :acdateEnd  )"
+				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"DataDate\", M.\"AcctNo\", M.\"CustId\" "
+				+ "        , M.\"AcctCode\", M.\"SubAcctCode\", M.\"SeqNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
 
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB201.java 帶入資料庫環境
 		}
 
 		query = em.createNativeQuery(sql);
+		query.setParameter("acdateStart", acdateStart); 
+		query.setParameter("acdateEnd", acdateEnd); 
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

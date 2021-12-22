@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LB087")
 @Scope("step")
@@ -25,6 +27,12 @@ public class LB087 extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	public LB087Report lb087Report;
 
+	@Autowired
+	DateUtil dDateUtil; 
+
+	@Autowired
+	WebClient webClient;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -32,7 +40,6 @@ public class LB087 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LB087.class);
 		this.info("LB087 active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,8 +49,15 @@ public class LB087 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB087 active LB087 ");
 		this.info("LB087 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		String tranCode = "LB087";
+		String tranName = "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔";
+
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
-		lb087Report.exec(titaVo); // 使用月報資料庫
+		boolean isFinish = lb087Report.exec(titaVo); // 使用月報資料庫
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+
 	}
 
 }
@@ -58,7 +72,6 @@ public class LB087 extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LB087 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LB087.class);
 //
 //	@Autowired
 //	public LB087Report lb087Report;

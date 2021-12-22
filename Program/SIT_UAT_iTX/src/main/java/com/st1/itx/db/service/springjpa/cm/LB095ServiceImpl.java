@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,7 +24,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LB095ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LB095ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,44 +32,44 @@ public class LB095ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LB095.findAll ---------------");
-		logger.info("-----LB095 TitaVo=" + titaVo);
-		logger.info("-----LB095 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LB095.findAll ---------------");
+		this.info("-----LB095 TitaVo=" + titaVo);
+		this.info("-----LB095 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
-		// TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202004;
-//		}
-
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
 		// LB095 不動產擔保品明細-建號附加檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"OwnerId\"" + "     , M.\"CityJCICCode\""
-				+ "     , M.\"AreaJCICCode\"" + "     , M.\"IrCode\"" + "     , M.\"BdNo1\"" + "     , M.\"BdNo2\"" + "     , M.\"CityName\"" + "     , M.\"AreaName\"" + "     , M.\"Addr\""
-				+ "     , M.\"BdMainUseCode\"" + "     , M.\"BdMtrlCode\"" + "     , M.\"BdSubUsageCode\"" + "     , M.\"TotalFloor\"" + "     , M.\"FloorNo\"" + "     , M.\"BdDate\""
-				+ "     , M.\"TotalArea\"" + "     , M.\"FloorArea\"" + "     , M.\"BdSubArea\"" + "     , M.\"PublicArea\"" + "     , M.\"Filler33\"" + "     , M.\"JcicDataYM\""
-				+ " FROM  \"JcicB095\" M" + " WHERE M.\"DataYM\" = " + dateMonth + " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"BdNo1\", \"BdNo2\"";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
+				+ "     , M.\"ClActNo\"" + "     , M.\"OwnerId\"" + "     , M.\"CityJCICCode\""
+				+ "     , M.\"AreaJCICCode\"" + "     , M.\"IrCode\"" + "     , M.\"BdNo1\"" + "     , M.\"BdNo2\""
+				+ "     , M.\"CityName\"" + "     , M.\"AreaName\"" + "     , M.\"Addr\"" + "     , M.\"BdMainUseCode\""
+				+ "     , M.\"BdMtrlCode\"" + "     , M.\"BdSubUsageCode\"" + "     , M.\"TotalFloor\""
+				+ "     , M.\"FloorNo\"" + "     , M.\"BdDate\"" + "     , M.\"TotalArea\"" + "     , M.\"FloorArea\""
+				+ "     , M.\"BdSubArea\"" + "     , M.\"PublicArea\"" + "     , M.\"Filler33\""
+				+ "     , M.\"JcicDataYM\"" + " FROM  \"JcicB095\" M" + " WHERE M.\"DataYM\"  = :dateMonth "
+				+ " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"BdNo1\", \"BdNo2\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB095.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth); 
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

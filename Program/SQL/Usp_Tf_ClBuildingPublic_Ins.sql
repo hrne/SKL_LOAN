@@ -25,17 +25,42 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "ClBuildingPublic"
+    WITH TMP_PHGP AS (
+      SELECT "GDRID1"
+           , "GDRID2"
+           , "GDRNUM"
+           , "LGTSEQ"
+           , "HGTPNM"
+           , "HGTPNM2"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "GDRID1"
+                          , "GDRID2"
+                          , "GDRNUM"
+                          , "LGTSEQ"
+               ORDER BY "HGTPNM"
+                      , "HGTPNM2"
+             ) AS "Seq"
+      FROM "LA$PHGP" PH
+    )
     SELECT CB."ClCode1"                   AS "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
           ,CB."ClCode2"                   AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
           ,CB."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 0
-          ,ROW_NUMBER() OVER (PARTITION BY CB."ClCode1"
-                                         , CB."ClCode2"
-                                         , CB."ClNo"
-                              ORDER BY NVL(PH."HGTPNM",0)
-                             )            AS "PublicSeq"                -- 擔保品編號 DECIMAL 7 0
+          ,ROW_NUMBER()
+           OVER (
+             PARTITION BY CB."ClCode1"
+                        , CB."ClCode2"
+                        , CB."ClNo"
+             ORDER BY NVL(PH."HGTPNM",0)
+                    , NVL(PH."HGTPNM2",0)
+                    , CNM."GDRID1"
+                    , CNM."GDRID2"
+                    , CNM."GDRNUM"
+                    , CNM."LGTSEQ"
+           )                              AS "PublicSeq"           -- 公設序號 DECIMAL 7 0
           ,NVL(PH."HGTPNM",0)             AS "PublicBdNo1"         -- 公設建號 DECIMAL 5 0
           ,NVL(PH."HGTPNM2",0)            AS "PublicBdNo2"         -- 公設建號(子號) DECIMAL 3 0
-          ,HG."HGTPSM"                    AS "Area"                -- 登記面積(坪) DECIMAL 16 2
+          ,NVL(HG."HGTPSM",0)             AS "Area"                -- 登記面積(坪) DECIMAL 16 2
         --   ,SUM(HG."HGTPSM")               AS "Area"                -- 登記面積(坪) DECIMAL 16 2
           ,''                             AS "OwnerId"             -- 所有權人統編 VARCHAR2 10 0
           ,u''                            AS "OwnerName"           -- 所有權人姓名 NVARCHAR2 100 0
@@ -47,20 +72,15 @@ BEGIN
     LEFT JOIN "ClNoMapping" CNM ON CNM."ClCode1" = CB."ClCode1"
                                AND CNM."ClCode2" = CB."ClCode2"
                                AND CNM."ClNo"    = CB."ClNo"
-    LEFT JOIN "LA$PHGP" PH ON PH."GDRID1" = CNM."GDRID1"
-                          AND PH."GDRID2" = CNM."GDRID2"
-                          AND PH."GDRNUM" = CNM."GDRNUM"
-                          AND PH."LGTSEQ" = CNM."LGTSEQ"
+    LEFT JOIN TMP_PHGP PH ON PH."GDRID1" = CNM."GDRID1"
+                         AND PH."GDRID2" = CNM."GDRID2"
+                         AND PH."GDRNUM" = CNM."GDRNUM"
+                         AND PH."LGTSEQ" = CNM."LGTSEQ"
     LEFT JOIN "LA$HGTP" HG ON HG."GDRID1" = CNM."GDRID1"
                           AND HG."GDRID2" = CNM."GDRID2"
                           AND HG."GDRNUM" = CNM."GDRNUM"
                           AND HG."LGTSEQ" = CNM."LGTSEQ"
-    -- WHERE NVL(PH."HGTPNM",0) > 0
-    -- GROUP BY CB."ClCode1"
-    --         ,CB."ClCode2"
-    --         ,CB."ClNo"
-    --         ,PH."HGTPNM"
-    --         ,PH."HGTPNM2"
+                          AND NVL(PH."Seq",1) = 1
     ;
 
     -- 記錄寫入筆數

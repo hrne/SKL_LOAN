@@ -412,6 +412,7 @@ C(3,#ApplNo,0,$,s)
 C(3,#TempItemCode,10,SHOW(#BTN5),HIDE(#BTN5))
 ! C(3,#TempItemCode,07,SHOW(#BTN6)HIDE(#BTN4,#BTN5),HIDE(#BTN6))
 C(3,#TempItemCode,07,SHOW(#BTN6),HIDE(#BTN6))
+C(3,#TempItemCode,10,$,C(3,#TempItemCode,07,$,SHOW(#BTN4)))
 IF(#TempReasonCode==2 || #TempReasonCode==3,S,$)
 
 

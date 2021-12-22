@@ -48,31 +48,51 @@ public class LB204Report extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LB204 聯徵授信餘額日報檔
+		this.info("-----strToday=" + strToday);
+		this.info("-----strTodayMM=" + strTodayMM);
+		this.info("-----strTodaydd=" + strTodaydd);
+
+		List<Map<String, String>> LBList = null;
+
 		try {
-			this.info("-----strToday=" + strToday);
-			this.info("-----strTodayMM=" + strTodayMM);
-			this.info("-----strTodaydd=" + strTodaydd);
+			LBList = lB204ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB204Report LB204ServiceImpl.findAll error = " + errors.toString());
+			return false;
+		}
 
-			List<Map<String, String>> LBList = lB204ServiceImpl.findAll(titaVo);
-//			this.info("-----------------" + LBList);
-			if (LBList == null) {
-				listCount = 0;
-			} else {
-				listCount = LBList.size();
-			}
-			this.info("--------LBList.size()=" + listCount);
+		if (LBList == null) {
+			listCount = 0;
+		} else {
+			listCount = LBList.size();
+		}
+		this.info("--------LBList.size()=" + listCount);
 
+		try {
 			// txt
 			genFile(titaVo, LBList);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB204Report.genFile error = " + errors.toString());
+			return false;
+		}
+
+		try {
 			// excel-CSV
 			genExcel(titaVo, LBList);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LB204ServiceImpl.findAll error = " + errors.toString());
+			this.error("LB204Report.genExcel error = " + errors.toString());
+			return false;
 		}
+
+		return true;
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> LBList) throws LogicException {
@@ -201,7 +221,8 @@ public class LB204Report extends MakeReport {
 		String txt = "";
 
 		// B204 聯徵授信餘額日報檔
-		inf = "總行代號(1~3),分行代號(4~7),新增核准額度日期／清償日期／額度到期或解約日期(8~14),額度控制編碼／帳號(15~64)," + "授信戶IDN/BAN(65~74),科目別(75),科目別註記(76),交易別(77),訂約金額(78~87),新增核准額度當日動撥／清償金額(88~97),"
+		inf = "總行代號(1~3),分行代號(4~7),新增核准額度日期／清償日期／額度到期或解約日期(8~14),額度控制編碼／帳號(15~64),"
+				+ "授信戶IDN/BAN(65~74),科目別(75),科目別註記(76),交易別(77),訂約金額(78~87),新增核准額度當日動撥／清償金額(88~97),"
 				+ "本筆新增核准額度應計入DBR22倍規範之金額(98~107),1~7欄資料值相同之交易序號(108),空白(109~128)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12";
 

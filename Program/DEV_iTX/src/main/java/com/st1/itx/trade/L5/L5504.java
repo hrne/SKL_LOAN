@@ -15,7 +15,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.PfRewardMedia;
+import com.st1.itx.db.domain.TxControl;
 import com.st1.itx.db.service.PfRewardMediaService;
+import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.common.SendRsp;
 
@@ -34,6 +36,9 @@ public class L5504 extends TradeBuffer {
 	public PfRewardMediaService pfRewardMediaService;
 
 	@Autowired
+	public TxControlService txControlService;
+	
+	@Autowired
 	public DataLog dataLog;
 
 	@Autowired
@@ -43,6 +48,14 @@ public class L5504 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5504 ");
 		this.totaVo.init(titaVo);
+
+		int workmonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
+
+		String controlCode = "L5512." + workmonth + ".2";
+		TxControl txControl = txControlService.findById(controlCode, titaVo);
+		if (txControl != null) {
+			throw new LogicException(titaVo, "E0010", "已產生媒體檔");
+		}
 
 		String iFunCode = titaVo.get("FunCode").trim();
 		if ("1".equals(iFunCode)) {

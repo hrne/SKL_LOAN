@@ -6,6 +6,7 @@ create table "PfItDetailAdjust" (
   "LogNo" decimal(11,0) not null,
   "CustNo" decimal(7, 0) default 0 not null,
   "FacmNo" decimal(3, 0) default 0 not null,
+  "BormNo" decimal(3, 0) default 0 not null,
   "WorkMonth" decimal(6, 0) default 0 not null,
   "WorkSeason" decimal(5, 0) default 0 not null,
   "AdjRange" decimal(1, 0) default 0 not null,
@@ -23,12 +24,13 @@ alter table "PfItDetailAdjust" add constraint "PfItDetailAdjust_PK" primary key(
 
 create sequence "PfItDetailAdjust_SEQ" minvalue 1 maxvalue 2147483647 increment by 1 start with 1 nocache cycle;
 
-create index "PfItDetailAdjust_Index1" on "PfItDetailAdjust"("CustNo" asc, "FacmNo" asc, "WorkMonth" asc);
+create index "PfItDetailAdjust_Index1" on "PfItDetailAdjust"("CustNo" asc, "FacmNo" asc, "Borm" asc);
 
 comment on table "PfItDetailAdjust" is '介紹人業績調整檔';
 comment on column "PfItDetailAdjust"."LogNo" is '序號';
 comment on column "PfItDetailAdjust"."CustNo" is '戶號';
 comment on column "PfItDetailAdjust"."FacmNo" is '額度編號';
+comment on column "PfItDetailAdjust"."BormNo" is '撥款序號';
 comment on column "PfItDetailAdjust"."WorkMonth" is '工作月';
 comment on column "PfItDetailAdjust"."WorkSeason" is '工作季';
 comment on column "PfItDetailAdjust"."AdjRange" is '調整記號';

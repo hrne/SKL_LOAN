@@ -49,31 +49,52 @@ public class LB211Report extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LB211 聯徵每日授信餘額變動資料檔
+		this.info("-----strToday=" + strToday);
+		this.info("-----strTodayMM=" + strTodayMM);
+		this.info("-----strTodaydd=" + strTodaydd);
+
+		List<Map<String, String>> LBList = null;
+
 		try {
-			this.info("-----strToday=" + strToday);
-			this.info("-----strTodayMM=" + strTodayMM);
-			this.info("-----strTodaydd=" + strTodaydd);
+			LBList = lB211ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB211Report LB211ServiceImpl.findAll error = " + errors.toString());
+			return false;
+		}
 
-			List<Map<String, String>> LBList = lB211ServiceImpl.findAll(titaVo);
-//			this.info("-----------------" + LBList);
-			if (LBList == null) {
-				listCount = 0;
-			} else {
-				listCount = LBList.size();
-			}
-			this.info("--------LBList.size()=" + listCount);
+		if (LBList == null) {
+			listCount = 0;
+		} else {
+			listCount = LBList.size();
+		}
+		this.info("--------LBList.size()=" + listCount);
 
+		try {
 			// txt
 			genFile(titaVo, LBList);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB211Report.genFile error = " + errors.toString());
+			return false;
+		}
+
+		try {
 			// excel-CSV
 			genExcel(titaVo, LBList);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LB211ServiceImpl.findAll error = " + errors.toString());
+			this.error("LB211Report.genExcel error = " + errors.toString());
+			return false;
 		}
+
+		return true;
+
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> LBList) throws LogicException {
@@ -94,9 +115,10 @@ public class LB211Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B211", "聯徵每日授信餘額變動資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－" + L8ConstantEum.contact, 20, ' ')
-					+ makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ') + makeFile.fillStringR(" ", 20, ' ') + makeFile.fillStringR(" ", 16, ' ') + StringUtils.repeat(" ", 80)
-					+ StringUtils.repeat(" ", 43);
+			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－" + L8ConstantEum.contact, 20, ' ')
+					+ makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ') + makeFile.fillStringR(" ", 20, ' ')
+					+ makeFile.fillStringR(" ", 16, ' ') + StringUtils.repeat(" ", 80) + StringUtils.repeat(" ", 43);
 			makeFile.put(strContent);
 
 			// 欄位內容
@@ -209,7 +231,8 @@ public class LB211Report extends MakeReport {
 		String txt = "";
 
 		// B211 聯徵每日授信餘額變動資料檔
-		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),交易屬性(19),交易日期(20~26)," + "本筆撥款／還款帳號(27~76),本筆撥款／還款金額(77~86),本筆撥款／還款後餘額(87~96),本筆還款後之還款紀錄(97),本筆還款後之債權結案註記(98~100),"
+		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),交易屬性(19),交易日期(20~26),"
+				+ "本筆撥款／還款帳號(27~76),本筆撥款／還款金額(77~86),本筆撥款／還款後餘額(87~96),本筆還款後之還款紀錄(97),本筆還款後之債權結案註記(98~100),"
 				+ "科目別(101),科目別註記(102),呆帳轉銷年月(103~107),個人消費性貸款註記(108),融資業務分類(109),用途別(110),空白(111~240)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17";
 

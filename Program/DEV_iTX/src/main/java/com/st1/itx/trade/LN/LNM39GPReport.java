@@ -49,18 +49,31 @@ public class LNM39GPReport extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LNM39GP 欄位清單７
+		this.info("---------- LNM39GPReport exec titaVo: " + titaVo);
+
+		List<Map<String, String>> LNM39GPList = null;		
 		try {
-			this.info("---------- LNM39GPReport exec titaVo: " + titaVo);
-			List<Map<String, String>> LNM39GPList = lNM39GPServiceImpl.findAll(titaVo);
-			genFile(titaVo, LNM39GPList);
-//			genExcel(titaVo, LNM39GPList);
+			LNM39GPList = lNM39GPServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LNM39GPServiceImpl.findAll error = " + errors.toString());
+			this.error("LNM39GPReport LNM39GPServiceImpl.findAll error = " + errors.toString());
+			return false;
 		}
+
+		try {
+			// txt
+			genFile(titaVo, LNM39GPList);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LNM39GPReport.genFile error = " + errors.toString());
+			return false;
+		}
+
+		return true;
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {

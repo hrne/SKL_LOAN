@@ -45,17 +45,31 @@ public class LNM34APReport extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LNM34AP 資料欄位清單A
+		this.info("---------- LNM34APReport exec titaVo: " + titaVo);
+
+		List<Map<String, String>> LNM34APList = null;
 		try {
-			this.info("---------- LNM34APReport exec titaVo: " + titaVo);
-			List<Map<String, String>> LNM34APList = lNM34APServiceImpl.findAll(titaVo);
+			LNM34APList = lNM34APServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LNM34APReport LNM34APServiceImpl.findAll error = " + errors.toString());
+			return false;
+		}
+
+		try {
+			// excel-CSV
 			genFile(titaVo, LNM34APList);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LNM34APServiceImpl.findAll error = " + errors.toString());
+			this.error("LNM34APReport.genFile error = " + errors.toString());
+			return false;
 		}
+
+		return true;
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
@@ -130,32 +144,32 @@ public class LNM34APReport extends MakeReport {
 							break; // 到期日(撥款)
 						case 12:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額
 						case 13:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 撥款金額
 						case 14:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 帳管費
 						case 15:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 本金餘額(撥款)
 						case 16:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 應收利息
 						case 17:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 法拍及火險費用
 						case 18:
@@ -174,11 +188,11 @@ public class LNM34APReport extends MakeReport {
 							break; // 轉銷呆帳日期
 						case 22:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 轉銷呆帳金額
 						case 23:
-							strField = makeFile.fillStringL(strField, 1, '0');
+							strField = makeFile.fillStringL(strField, 2, '0');
 							break; // 符合減損客觀證據之條件
 						case 24:
 							strField = makeFile.fillStringL(strField, 3, '0');
@@ -223,7 +237,7 @@ public class LNM34APReport extends MakeReport {
 							break; // 產品別
 						case 37:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 原始鑑價金額
 						case 38:

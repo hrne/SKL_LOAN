@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * IFRS9 資料欄位清單1(表內放款與應收帳款-資產基本資料與計算原始有效利率用) LNFAP 放款與應收帳款(撥款層)
+ * LNM39AP 資料欄位清單1(表內放款與應收帳款-資產基本資料與計算原始有效利率用) LNFAP 放款與應收帳款(撥款層)
  */
 
 public class LNM39APServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,24 +52,29 @@ public class LNM39APServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// IFRS9 資料欄位清單1
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", " + " \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"FacLineDate\", \"MaturityDate\", "
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", "
+				+ " \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"FacLineDate\", \"MaturityDate\", "
 				+ " \"LineAmt\", \"DrawdownAmt\", \"AcctFee\", \"LoanBal\", \"IntAmt\", \"Fee\", \"Rate\", "
-				+ " \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\", \"GracePeriod\", \"ApproveRate\", " + " \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
+				+ " \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\", \"GracePeriod\", \"ApproveRate\", "
+				+ " \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
 				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"AssetClass\", \"Ifrs9ProdCode\", "
 				+ " \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", "
-				+ " \"TempAmt\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", " + " \"LineAmtCurr\", \"DrawdownAmtCurr\", \"AcctFeeCurr\", \"LoanBalCurr\", "
-				+ " \"IntAmtCurr\", \"FeeCurr\", \"AvblBalCurr\", \"TempAmtCurr\" " + " FROM  \"LoanIfrs9Ap\"" + " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+				+ " \"TempAmt\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", "
+				+ " \"LineAmtCurr\", \"DrawdownAmtCurr\", \"AcctFeeCurr\", \"LoanBalCurr\", "
+				+ " \"IntAmtCurr\", \"FeeCurr\", \"AvblBalCurr\", \"TempAmtCurr\" " + " FROM  \"LoanIfrs9Ap\""
+				+ " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39AP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

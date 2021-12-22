@@ -52,19 +52,22 @@ public class LNM34EPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// LNM34EP 資料欄位清單E
-		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
-				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" " + " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" "
+				+ ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
+				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" "
+				+ " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM34EP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

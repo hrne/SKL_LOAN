@@ -535,6 +535,7 @@ public class L4603p extends TradeBuffer {
 //	火險應繳日跟著期款->額度內>0、最小之應繳日
 	private void checkC(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
 		// 未撥款或已結案
+		specificDd = 01;
 		boolean isClose = true;
 		boolean isUnLoan = true;
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(custNo, facmNo, facmNo, 0, 900, this.index,
@@ -543,6 +544,7 @@ public class L4603p extends TradeBuffer {
 			isUnLoan = false;
 			for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
 				if (tLoanBorMain.getLoanBal().compareTo(BigDecimal.ZERO) > 0) {
+					specificDd = tLoanBorMain.getSpecificDd();
 					isClose = false;
 				}
 			}

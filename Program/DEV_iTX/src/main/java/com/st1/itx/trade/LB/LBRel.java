@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LBRel")
 @Scope("step")
@@ -25,6 +27,12 @@ public class LBRel extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	public LBRelReport lbRelReport;
 
+	@Autowired
+	DateUtil dDateUtil; 
+
+	@Autowired
+	WebClient webClient;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -32,7 +40,6 @@ public class LBRel extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LBRel.class);
 		this.info("LBRel active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,8 +49,15 @@ public class LBRel extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LBRel active LBRel ");
 		this.info("LBRel titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		String tranCode = "LBRel";
+		String tranName = "聯徵授信「同一關係企業及集團企業」資料報送檔";
+
 		this.titaVo.setDataBaseOnDay(); // 日報資料庫
-		lbRelReport.exec(titaVo);
+		boolean isFinish = lbRelReport.exec(titaVo);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }
@@ -58,7 +72,6 @@ public class LBRel extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LBRel extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LBRel.class);
 //
 //	@Autowired
 //	public LBRelReport lbRelReport;

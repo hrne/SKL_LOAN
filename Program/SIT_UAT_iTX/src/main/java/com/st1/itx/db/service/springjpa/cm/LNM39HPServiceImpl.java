@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39HP 清單8：(放款風險參數檔(額度層)(LNFHP))
+ * LNM39HP 資料欄位清單8(放款與應收帳款-風險參數用)   LNFHP 放款風險參數檔(額度層)
  */
 
 public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,20 +52,24 @@ public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單8
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", " + " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
-				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", " + " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", " + " \"LineAmtCurr\", \"AvblBalCurr\" "
-				+ " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\" = " + dateMonth + " ORDER BY \"CustNo\", \"FacmNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", "
+				+ " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
+				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", "
+				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", "
+				+ " \"LineAmtCurr\", \"AvblBalCurr\" " + " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\"   = :dateMonth "
+				+ " ORDER BY \"CustNo\", \"FacmNo\" ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39HP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

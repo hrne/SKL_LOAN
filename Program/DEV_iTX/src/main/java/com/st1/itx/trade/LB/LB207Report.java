@@ -50,30 +50,50 @@ public class LB207Report extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LB207 授信戶基本資料檔
+		this.info("-----strToday=" + strToday);
+		this.info("-----strTodayMM=" + strTodayMM);
+		this.info("-----strTodaydd=" + strTodaydd);
+
+		List<Map<String, String>> LBList = null;
 		try {
-			this.info("-----strToday=" + strToday);
-			this.info("-----strTodayMM=" + strTodayMM);
-			this.info("-----strTodaydd=" + strTodaydd);
+			LBList = lB207ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB207Report LB207ServiceImpl.findAll error = " + errors.toString());
+			return false;
+		}
 
-			List<Map<String, String>> LBList = lB207ServiceImpl.findAll(titaVo);
-			if (LBList == null) {
-				listCount = 0;
-			} else {
-				listCount = LBList.size();
-			}
-			this.info("--------LBList.size()=" + listCount);
+		if (LBList == null) {
+			listCount = 0;
+		} else {
+			listCount = LBList.size();
+		}
+		this.info("--------LBList.size()=" + listCount);
 
+		try {
 			// txt
 			genFile(titaVo, LBList);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB207Report.genFile error = " + errors.toString());
+			return false;
+		}
+
+		try {
 			// excel-CSV
 			genExcel(titaVo, LBList);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LB207ServiceImpl.findAll error = " + errors.toString());
+			this.error("LB207Report.genExcel error = " + errors.toString());
+			return false;
 		}
+
+		return true;
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> LBList) throws LogicException {
@@ -91,7 +111,8 @@ public class LB207Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B207", "授信戶基本資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B207-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B207-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 80, ' ') + StringUtils.repeat(" ", 459);
 			makeFile.put(strContent);
 
@@ -237,9 +258,11 @@ public class LB207Report extends MakeReport {
 		String txt = "";
 
 		// B207 授信戶基本資料檔
-		inf = "交易代碼(1),總行代號(2~4),空白(5~8),資料日期(9~15),授信戶IDN(16~25),中文姓名(26~45),英文姓名(46~65),出生日期(66~72)," + "戶籍地址(73~138),聯絡地址郵遞區號(139~143),聯絡地址(144~209),聯絡電話(210~225),行動電話(226~241),空白(242~246),"
+		inf = "交易代碼(1),總行代號(2~4),空白(5~8),資料日期(9~15),授信戶IDN(16~25),中文姓名(26~45),英文姓名(46~65),出生日期(66~72),"
+				+ "戶籍地址(73~138),聯絡地址郵遞區號(139~143),聯絡地址(144~209),聯絡電話(210~225),行動電話(226~241),空白(242~246),"
 				+ "教育程度代號(247),自有住宅有無(248),任職機構名稱(249~278),任職機構統一編號(279~286),職業類別(287~292),任職機構電話(293~308),"
-				+ "職位名稱(309~318),服務年資(319~320),年收入(321~326),年收入資料年月(327~331),性別(332),國籍(333~334),護照號碼(335~354)," + "舊有稅籍編號(355~364),中文姓名超逾10個字之全名(365~564),空白(565~600)";
+				+ "職位名稱(309~318),服務年資(319~320),年收入(321~326),年收入資料年月(327~331),性別(332),國籍(333~334),護照號碼(335~354),"
+				+ "舊有稅籍編號(355~364),中文姓名超逾10個字之全名(365~564),空白(565~600)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;F25;F26;F27;F28;F29";
 
 		String txt1[] = txt.split(";");

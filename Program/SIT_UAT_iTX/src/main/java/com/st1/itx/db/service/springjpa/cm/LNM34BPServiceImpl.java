@@ -1,11 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,7 +24,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LNM34BPServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LNM34BPServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,13 +32,13 @@ public class LNM34BPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LNM34BP.findAll ---------------");
-		logger.info("-----LNM34BP TitaVo=" + titaVo);
-		logger.info("-----LNM34BP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LNM34BP.findAll ---------------");
+		this.info("-----LNM34BP TitaVo=" + titaVo);
+		this.info("-----LNM34BP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
@@ -48,26 +47,28 @@ public class LNM34BPServiceImpl extends ASpringJpaParm implements InitializingBe
 //			dateMonth = 202003;
 //		}
 
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
 		// LNM34BP 資料欄位清單B
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"LoanRate\" " + ", \"RateCode\", \"EffectDate\" " + " FROM  \"Ias34Bp\" " + " WHERE \"DataYM\" = " + dateMonth
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"LoanRate\" "
+				+ ", \"RateCode\", \"EffectDate\" " + " FROM  \"Ias34Bp\" " + " WHERE \"DataYM\" = :dateMonth "
 				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM34BP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

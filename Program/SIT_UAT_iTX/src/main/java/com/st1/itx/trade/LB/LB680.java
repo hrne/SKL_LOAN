@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("LB680")
 @Scope("step")
@@ -25,6 +27,12 @@ public class LB680 extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	public LB680Report lb680Report;
 
+	@Autowired
+	DateUtil dDateUtil; 
+
+	@Autowired
+	WebClient webClient;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -32,7 +40,6 @@ public class LB680 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LB680.class);
 		this.info("LB680 active RepeatStatus execute ");
 		return this.exec(contribution, "M");
 	}
@@ -42,8 +49,15 @@ public class LB680 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB680 active LB680 ");
 		this.info("LB680 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		String tranCode = "LB680";
+		String tranName = "「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔";
+
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
-		lb680Report.exec(titaVo); // 使用月報資料庫
+		boolean isFinish = lb680Report.exec(titaVo); // 使用月報資料庫
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }
@@ -58,7 +72,6 @@ public class LB680 extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LB680 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LB680.class);
 //
 //	@Autowired
 //	public LB680Report lb680Report;

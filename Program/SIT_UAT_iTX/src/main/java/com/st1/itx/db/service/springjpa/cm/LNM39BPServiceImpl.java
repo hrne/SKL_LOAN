@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39BP 清單2：台幣放款-計算原始有效利率用
+ * LNM39BP 資料欄位清單2(台幣放款-計算原始有效利率用)   LNFBP
  */
 
 public class LNM39BPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,19 +52,21 @@ public class LNM39BPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單2：台幣放款-計算原始有效利率用
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"LoanRate\", \"RateCode\", \"EffectDate\"" + " FROM  \"LoanIfrs9Bp\"" + " WHERE \"DataYM\" = " + dateMonth
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"LoanRate\", \"RateCode\", \"EffectDate\""
+				+ " FROM  \"LoanIfrs9Bp\"" + " WHERE \"DataYM\"  = :dateMonth "
 				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\" DESC";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;
-		if (onLineMode == true) {
+		if (onLineMode) {
 			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
 		} else {
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39BP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

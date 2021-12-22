@@ -48,29 +48,50 @@ public class LB087Report extends MakeReport {
 		this.info("printTitle nowRow = " + this.NowRow);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LB087 聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔
+		this.info("-----strToday=" + strToday);
+		this.info("-----strTodayMM=" + strTodayMM);
+		this.info("-----strTodaydd=" + strTodaydd);
+
+		List<Map<String, String>> LBList = null;
 		try {
-			this.info("-----strToday=" + strToday);
-			this.info("-----strTodayMM=" + strTodayMM);
-			this.info("-----strTodaydd=" + strTodaydd);
+//			LBList = lB087ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB087Report LB087ServiceImpl.findAll error = " + errors.toString());
+			return false;
+		}
 
-//			List<HashMap<String, String>> LBList = lB087ServiceImpl.findAll(titaVo);
-			List<Map<String, String>> LBList = null;
-			if (LBList == null)
-				listCount = 0;
+		if (LBList == null) {
+			listCount = 0;
+		}
 
-			this.info("--------LBList.size()=" + listCount);
+		this.info("--------LBList.size()=" + listCount);
 
+		try {
 			// txt
 			genFile(titaVo, LBList);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LB087Report.genFile error = " + errors.toString());
+			return false;
+		}
+
+		try {
 			// excel-CSV
 			genExcel(titaVo, LBList);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LB087ServiceImpl.findAll error = " + errors.toString());
+			this.error("LB087Report.genExcel error = " + errors.toString());
+			return false;
 		}
+
+		return true;
+
 	}
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> LBList) throws LogicException {
@@ -85,7 +106,8 @@ public class LB087Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B087-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B087-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 89, ' ');
 			makeFile.put(strContent);
 
@@ -136,7 +158,8 @@ public class LB087Report extends MakeReport {
 		String txt = "";
 
 		// B087 帳號轉換資料檔
-		inf = "資料別(1~2),交易代碼(3),報送單位代號(4~6),註記對象統一編號(7~14),發生違約日(15~21),註記對象屬性(22),註記內容(23~120)," + "空白(103~122),授信戶IDN/BAN(123~132),空白(133~150)";
+		inf = "資料別(1~2),交易代碼(3),報送單位代號(4~6),註記對象統一編號(7~14),發生違約日(15~21),註記對象屬性(22),註記內容(23~120),"
+				+ "空白(103~122),授信戶IDN/BAN(123~132),空白(133~150)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9";
 
 		String txt1[] = txt.split(";");
@@ -146,7 +169,8 @@ public class LB087Report extends MakeReport {
 			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".087.CSV"; // 458+月日+序號(1)+.087.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔",
+					strFileName, 2);
 
 			// 標題列
 			strContent = inf;
