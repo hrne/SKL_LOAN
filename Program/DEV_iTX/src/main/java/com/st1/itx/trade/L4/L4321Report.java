@@ -2,7 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L4321Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L4321Report.class);
 
 	@Autowired
 	public L4321ServiceImpl L4321ServiceImpl;
@@ -71,10 +68,10 @@ public class L4321Report extends MakeReport {
 			fileNm = "定期機動利率變動資料確認";
 			break;
 		case 2:
-			fileNm = "指數型利率變動資料確認";
+			fileNm = "機動指數利率變動資料確認";
 			break;
 		case 3:
-			fileNm = "機動利率變動資料確認";
+			fileNm = "機動非指數利率變動資料確認";
 			break;
 		case 4:
 			fileNm = "員工利率變動資料確認";
@@ -165,17 +162,5 @@ public class L4321Report extends MakeReport {
 		makeExcel.toExcel(sno);
 
 		return sno;
-	}
-
-	private double cpRate(String iamt) {
-		this.info("cprate iamt=" + iamt);
-		if (iamt == null || iamt.equals("") || iamt.equals("0")) {
-			return 0.00;
-		} else {
-			BigDecimal gal = new BigDecimal("1000000");
-			BigDecimal amt = new BigDecimal(iamt);
-			amt = amt.divide(gal, 2, 2);
-			return amt.doubleValue();
-		}
 	}
 }

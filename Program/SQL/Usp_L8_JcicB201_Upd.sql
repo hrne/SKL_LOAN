@@ -25,6 +25,7 @@ BEGIN
     YYYY           INT;         -- 本月年度
     YYYYMMDD       INT;         -- 本日
     OccursNum      NUMBER;
+    TMNDYF         INT;         -- 本月月底日
   BEGIN
     INS_CNT := 0;
     UPD_CNT := 0;
@@ -43,7 +44,12 @@ BEGIN
     ELSE
        LYYYYMM := YYYYMM - 1;
     END IF;
-
+    -- 抓本月月底日
+    SELECT "TmnDyf"
+    INTO TMNDYF
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
+    ;
 
     -- 寫入資料 "Work_B201_Guarantor" 保證人/所有權人
     INSERT INTO "Work_B201_Guarantor"
@@ -449,12 +455,12 @@ BEGIN
                  , NVL(M."RepayDelayMon",0) AS "RepayDelayMon"
                  , NVL(M."RepaidEndMon",0)  AS "RepaidEndMon"
                  , CASE WHEN NVL(M."OvduDate", 0) <  19110000
-                          OR NVL(M."OvduDate", 0) >= TBSDYF THEN 0
-                        ELSE TRUNC(months_between(TO_DATE(TBSDYF,'yyyy-mm-dd'), TO_DATE(M."OvduDate",'yyyy-mm-dd')))
+                          OR NVL(M."OvduDate", 0) >= TMNDYF THEN 0
+                        ELSE TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE(M."OvduDate",'yyyy-mm-dd')))
                    END                      AS "OvduMon"       -- 催收月數
                  , CASE WHEN NVL(M."BadDebtDate", 0) <  19110000
-                          OR NVL(M."BadDebtDate", 0) >= TBSDYF THEN 0
-                        ELSE TRUNC(months_between(TO_DATE(TBSDYF,'yyyy-mm-dd'), TO_DATE(M."BadDebtDate",'yyyy-mm-dd')))
+                          OR NVL(M."BadDebtDate", 0) >= TMNDYF THEN 0
+                        ELSE TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE(M."BadDebtDate",'yyyy-mm-dd')))
                    END                      AS "BadDebtMon"    -- 呆帳月數
             FROM "JcicMonthlyLoanData" M
             WHERE M."DataYM" = YYYYMM

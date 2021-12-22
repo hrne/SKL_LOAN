@@ -153,19 +153,6 @@ C(3,#CHAIN,0,$,s)
 #CustNo=A,7,L
 E(0,#CUST_NO)
 
-#RimL1r09=X,1,S
-C(3,#CUST_NO,0,s,$)
-E(0,@RimFunCd,1)
-T(2,@RimCustId,)
-E(0,@RimCustNo,#CUST_NO)
-RESET_RIM(#RimL1r09,L1R09)
-S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
-R(1,L1R09)
-T(2,@CustName,#L1r09CustName)
-
-#CustName=x,2.50,L
-
-
 #MRKEY=_,_,S
 C(3,#CHAIN_AcDAte,0,S,$)
 T(2,#CHAIN_AcDAte+-+#CHAIN_Factor+-+#CHAIN_CutNo)
@@ -174,7 +161,6 @@ T(2,#CHAIN_AcDAte+-+#CHAIN_Factor+-+#CHAIN_CutNo)
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
-<include src="ROM.icf::L1R09.dec"/>
 
 </sub>
 
@@ -226,6 +212,8 @@ T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 !明細序號
 #OTxSno=A,2,S
 
+#OCustName=X,100,S
+
 #BufA=X,50,S
 T(2,#OTxDate+#OTxSeq+#OTxSno)
 
@@ -248,7 +236,6 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L8925; ntxbuf=#BufA})
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
-<include src="ROM.icf::L1R09.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L8924
 #OTranName
@@ -262,6 +249,7 @@ TXFORM=L8924
 #OTxDate
 #OTxSeq
 #OTxSno
+#OCustName
 ^
 </sub>
 
@@ -270,8 +258,6 @@ TXFORM=L8924
 <sub type="PART" name="L8924" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];">
 [
 ["[L8924]                                 疑似洗錢資料變更查詢                                                                  "],
-!["戶號",#CustNo],
-!["戶名",#CustName],
 ]
 </sub>
 
@@ -287,8 +273,8 @@ TXFORM=L8924
 {width:250,align:'left'}
 #OCustNoX=戶號
 {width:100,align:'center'}
-#CustName=戶名
-{width:150,align:'center'}
+#OCustName=戶名
+{width:150,align:'left'}
 #OMrKey=參考編號
 {width:150,align:'left'}
 #OReason=修改原因

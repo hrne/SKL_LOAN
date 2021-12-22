@@ -242,7 +242,11 @@ public class L4603p extends TradeBuffer {
 				if (specificDd > dDateUtil.getDays()) {
 					specificDd = dDateUtil.getDays();
 				}
-				iEntryDate = parse.stringToInteger("" + iInsuEndMonth + specificDd);
+				
+				String sInsuEndMonth = Integer.toString(iInsuEndMonth);
+				String sspecificDd = FormatUtil.pad9(Integer.toString(specificDd),2);
+				
+				iEntryDate = parse.stringToInteger(sInsuEndMonth + sspecificDd);
 
 				sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
 						+ ("" + iEntryDate).substring(6);
@@ -329,7 +333,7 @@ public class L4603p extends TradeBuffer {
 					+ FormatUtil.padX(getRepayCode(tInsuRenew, titaVo), 10) + ", "
 					+ FormatUtil.padX(tCustMain.getCustName().trim(), 42) + ", "
 					+ FormatUtil.padX(getBdLocation(tInsuRenew, titaVo), 58) + ","
-					+ FormatUtil.padX(tInsuRenew.getNowInsuNo(), 16) + ","
+					+ FormatUtil.padX(tInsuRenew.getOrigInsuNo(), 16) + ","
 					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + ","
 					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + "," + FormatUtil.padX("-", 1) + ","
 					+ FormatUtil.pad9("" + tInsuRenew.getInsuEndDate(), 8) + ","

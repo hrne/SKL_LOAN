@@ -264,7 +264,7 @@ public class L6403Batch extends TradeBuffer {
 				tTxAuthority.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 				tTxAuthority.setCreateEmpNo(titaVo.getTlrNo());
 //				this.info("L6403 > Txauthority = " + tTxAuthority.getAuthNo() + "/" + tTxAuthority.getTranNo() + "/" + tTxAuthority.getAuthFg());
-				sTxAuthorityService.insert(tTxAuthority);
+				sTxAuthorityService.insert(tTxAuthority,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}

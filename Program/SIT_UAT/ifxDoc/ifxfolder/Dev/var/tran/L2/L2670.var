@@ -276,8 +276,8 @@ E(0,@ContractChgCode,#L2r37ContractChgCode)
 T(2,@CurrencyCode,#L2r37CurrencyCode)
 E(0,@TwFeeAmt,#L2r37FeeAmt)
 E(0,@UsFeeAmt,#L2r37FeeAmt)
-E(0,@AcDate,#L2r37AcDate)
-E(0,@TitaTxtNo,#L2r37TitaTxtNo)
+!E(0,@AcDate,#L2r37AcDate)
+!E(0,@TitaTxtNo,#L2r37TitaTxtNo)
 T(2,@TlrNo,#L2r37TLR_NO)
 E(0,@ModifyDate,#L2r37MODIFY_DT)
 T(2,@ModifyTime,#L2r37WKTIME)
@@ -427,14 +427,15 @@ E(2,@ModifyDate,#OModifyDate)
 C(3,#FunCd,4,S,$)
 C(3,#FunCd,5,S,$)
 C(3,#FunCd,7,S,$)
-T(2,@AcDate,#OAcDate)
+ALERT(#OAcDate)
+E(0,@AcDate,#OAcDate)
 
 
 #OTitaTxtNo=A,7,S
 C(3,#FunCd,4,S,$)
 C(3,#FunCd,5,S,$)
 C(3,#FunCd,7,S,$)
-T(2,@TitaTxtNo,#OTitaTxtNo)
+E(0,@TitaTxtNo,#OTitaTxtNo)
 
 
 

@@ -284,7 +284,7 @@ C(3,#OOCanModify,1,$,BIND(grid,cancel))
 C(4,#OOWorkMonth,BIND(grid,cancel),$)
 
 #OOBufD=x,100,S
-T(2,L5502+#OOCustNo+-+#OOFacmNo+-+#OOCustNo)
+T(2,L5502+#OOCustNo+-+#OOFacmNo+-+#OOWorkMonth)
 
 #OOBtnD=A,1,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L6933; ntxbuf=#OOBufD})

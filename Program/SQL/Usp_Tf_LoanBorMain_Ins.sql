@@ -259,7 +259,7 @@ BEGIN
                LEFT JOIN "LA$IRTP" IRTP ON IRTP."LMSACN" = LM."LMSACN"
                                        AND IRTP."LMSAPN" = LM."LMSAPN"
                                        AND IRTP."LMSASQ" = LM."LMSASQ"
-                                       AND IRTP."IRTADT" <= LM."LMSLPD" -- 上繳日
+                                       AND IRTP."IRTADT" < LM."LMSLPD" -- 上繳日
               ) IRTP ON IRTP."LMSACN" = "LA$LMSP"."LMSACN"
                     AND IRTP."LMSAPN" = "LA$LMSP"."LMSAPN"
                     AND IRTP."LMSASQ" = "LA$LMSP"."LMSASQ"

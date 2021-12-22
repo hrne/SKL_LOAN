@@ -45,13 +45,13 @@ public class L8923 extends TradeBuffer {
 	public CustMainService sCustMainService;
 	@Autowired
 	Parse parse;
-
-	@Autowired
+	
+	@Autowired 
 	L8923ServiceImpl l8923Servicelmpl;
 	private int recorddate = 0;
 	private int repaydate = 0;
 	private int actualrepaydate = 0;
-
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8923 ");
@@ -61,20 +61,21 @@ public class L8923 extends TradeBuffer {
 		String DateTime; // YYY/MM/DD hh:mm:ss
 		String Date = "";
 		int sCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
-
+		
+		
 		List<Map<String, String>> resultList = null;
 		try {
-			resultList = l8923Servicelmpl.queryresult(this.index, this.limit, titaVo);
-
+			resultList = l8923Servicelmpl.queryresult(this.index,this.limit,titaVo);
+	
 		} catch (Exception e) {
 			this.error("l8923Servicelmpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
-
+		
 		int iFacmNo = 0;
 		int iBormNo = 0;
 		MlaundryRecord iMlaundryRecord = null;
-
+		
 		// 如有找到資料
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
@@ -85,11 +86,12 @@ public class L8923 extends TradeBuffer {
 				int iCustNo = Integer.parseInt(result.get("F2"));
 				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 				if (tCustMain != null) {
-					occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+					occursList.putParam("OOCustName", tCustMain.getCustName().replace("$n", "")); // 戶名
 				} else {
 					occursList.putParam("OOCustName", ""); // 戶名
 				}
-
+			
+			
 				occursList.putParam("OORecordDate", recorddate); // 訪談日期
 				occursList.putParam("OOCustNo", result.get("F2")); // 戶號
 				occursList.putParam("OOFacmNo", result.get("F3")); // 額度編號
@@ -101,35 +103,35 @@ public class L8923 extends TradeBuffer {
 				occursList.putParam("OOIncome", result.get("F7")); // 年收入(萬)
 				occursList.putParam("OORepaySource", result.get("F8")); // 還款來源
 				occursList.putParam("OORepayBank", result.get("F9")); // 代償銀行
-				occursList.putParam("OODescription", result.get("F13").replace("$n", "\n")); // 其他說明
+				occursList.putParam("OODescription", result.get("F13").replace("$n", "")); // 其他說明
 				occursList.putParam("OOEmpNo", result.get("F10")); // 經辦
-
+			
 				iFacmNo = parse.stringToInteger(result.get("F3"));
 				iBormNo = parse.stringToInteger(result.get("F4"));
-
-				iMlaundryRecord = sMlaundryRecordService.findById(new MlaundryRecordId(recorddate + 19110000, iCustNo, iFacmNo, iBormNo), titaVo);
-				if (iMlaundryRecord != null) {
+			
+				iMlaundryRecord = sMlaundryRecordService.findById(new MlaundryRecordId(recorddate+19110000,iCustNo,iFacmNo,iBormNo), titaVo);
+				if(iMlaundryRecord!=null) {
 					DateTime = this.parse.timeStampToString(iMlaundryRecord.getLastUpdate()); // 異動日期
-					this.info("DateTime=" + DateTime);
+					this.info("DateTime="+DateTime);
 					Date = FormatUtil.left(DateTime, 9);
-					this.info("Date=" + Date);
+					this.info("Date="+Date);
 				} else {
 					Date = "";
 				}
-
+			
 				occursList.putParam("OOUpdate", Date);// 異動日期
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
-			}
+		 }
 
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		 /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
-			if (resultList.size() == this.limit && hasNext()) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
-			}
+		 if (resultList.size() == this.limit && hasNext()) {
+	 		 titaVo.setReturnIndex(this.setIndexNext());
+		 	 /* 手動折返 */
+		 	 this.totaVo.setMsgEndToEnter();
+		 }
 		} else {
 			throw new LogicException(titaVo, "E0001", "");
 		}
@@ -137,7 +139,7 @@ public class L8923 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
+	
 	private Boolean hasNext() {
 		Boolean result = true;
 
@@ -157,22 +159,21 @@ public class L8923 extends TradeBuffer {
 
 		return result;
 	}
-
 	private void setData(Map<String, String> result) throws LogicException {
-
+		
 		recorddate = parse.stringToInteger(result.get("F0"));
 		repaydate = parse.stringToInteger(result.get("F12"));
 		actualrepaydate = parse.stringToInteger(result.get("F1"));
-		this.info("recorddate=" + recorddate + ",repaydate=" + repaydate + ",actualrepaydate=" + actualrepaydate);
-
-		if (recorddate > 19110000) {
-			recorddate = recorddate - 19110000;
+		this.info("recorddate="+recorddate+",repaydate="+repaydate+",actualrepaydate="+actualrepaydate);
+		
+		if(recorddate>19110000) {
+			recorddate = recorddate-19110000;
 		}
-		if (repaydate > 19110000) {
-			repaydate = repaydate - 19110000;
+		if(repaydate>19110000) {
+			repaydate = repaydate-19110000;
 		}
-		if (actualrepaydate > 19110000) {
-			actualrepaydate = actualrepaydate - 19110000;
+		if(actualrepaydate>19110000) {
+			actualrepaydate = actualrepaydate-19110000;
 		}
 	}
 }

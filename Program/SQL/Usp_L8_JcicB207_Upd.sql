@@ -20,6 +20,7 @@ BEGIN
     LYYYYMM        INT;         -- 上月年月
     MM             INT;         -- 本月月份
     YYYY           INT;         -- 本月年度
+    TMNDYF         INT;         -- 本月月底日
   BEGIN
     INS_CNT := 0;
     UPD_CNT := 0;
@@ -37,6 +38,12 @@ BEGIN
     ELSE
        LYYYYMM := YYYYMM - 1;
     END IF;
+    -- 抓本月月底日
+    SELECT "TmnDyf"
+    INTO TMNDYF
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
+    ;
 
     -- 刪除舊資料
     DBMS_OUTPUT.PUT_LINE('DELETE JcicB207');
@@ -59,7 +66,7 @@ BEGIN
     FROM   "JcicMonthlyLoanData" M
     WHERE  M."DataYM"   =  YYYYMM
       AND  M."CustId"   IS NOT NULL
-      AND  M."DrawdownDate" <= TBSDYF
+      AND  M."DrawdownDate" <= TMNDYF
       AND  M."LoanBal"  >  0           -- 有餘額
       AND  M."EntCode"  IN ('0', '2')  -- 自然人
       )
@@ -70,15 +77,19 @@ BEGIN
          , 'C'                                   AS "TranCode"          -- 交易代碼   A:新增 C:異動(全部整檔報送時可使用此代號) D:刪除
          , '458'                                 AS "BankItem"          -- 總行代號
          , '0001'                                AS "Filler3"           -- 空白(填分行代號)
-         , TBSDYF - 19110000                     AS "DataDate"          -- 資料日期 (民國)
+         , TMNDYF - 19110000                     AS "DataDate"          -- 資料日期 (民國)
          , C."CustId"                            AS "CustId"            -- 授信戶IDN
-         , RPAD(C."CustName",20,'　')            AS "CustName"          -- 中文姓名
+         , CASE
+             WHEN TRIM(NVL(C."CustName", ' ')) = ''  THEN TO_NCHAR('　　　　　　　　　')
+             ELSE RPAD(C."CustName",18,TO_NCHAR('　'))   
+           END                                   AS "CustName"          -- 中文姓名
+         --, RPAD(C."CustName",18,'　')            AS "CustName"          -- 中文姓名
          , SUBSTR(NVL(C."EName",' '),1,20)       AS "EName"             -- 英文姓名
          , CASE
              WHEN NVL(C."Birthday",0) < 19110000 THEN NVL(C."Birthday",0)
              ELSE C."Birthday" - 19110000
            END                                   AS "Birthday"          -- 出生日期 (民國)
-         , RPAD("Fn_GetCustAddr"(C."CustUKey",0),60,'　') AS "RegAddr"  -- 戶籍地址
+         , RPAD("Fn_GetCustAddr"(C."CustUKey",0),60,TO_NCHAR('　')) AS "RegAddr"  -- 戶籍地址
 --         , SUBSTRB(NVL(
 --             CASE
 --               WHEN RegCity."CityItem" IS NOT NULL THEN RegCity."CityItem"
@@ -108,7 +119,7 @@ BEGIN
                WHEN C."CurrZip2" IS NOT NULL THEN SUBSTR(C."CurrZip2",1,2)
              END
            , ' ')                                AS "CurrZip"           -- 聯絡地址郵遞區號
-         , RPAD("Fn_GetCustAddr"(C."CustUKey",1),60,'　') AS "CurrAddr" -- 聯絡地址
+         , RPAD("Fn_GetCustAddr"(C."CustUKey",1),60,TO_NCHAR('　')) AS "CurrAddr" -- 聯絡地址
 --         , SUBSTRB(NVL(
 --             CASE
 --               WHEN MailCity."CityItem" IS NOT NULL THEN MailCity."CityItem"
@@ -173,7 +184,11 @@ BEGIN
              ELSE                           '6'
            END                                   AS "EduCode"           -- 教育程度代號 1:博士 2:碩士 3:大學 4:專科 5:高中高職 6:其他
          , NVL(C."OwnedHome",' ')                AS "OwnedHome"         -- 自有住宅有無 Y:有 N:無
-         , RPAD(C."CurrCompName",28,'　')        AS "CurrCompName"      -- 任職機構名稱
+         , CASE 
+             WHEN TRIM(NVL(C."CurrCompName", ' ')) = ''  THEN TO_NCHAR('　　　　　　　　　　　　　　')
+             ELSE RPAD(C."CurrCompName",28,TO_NCHAR('　')) 
+           END                                   AS "CurrCompName"      -- 任職機構名稱
+         --, RPAD(C."CurrCompName",28,'　')        AS "CurrCompName"      -- 任職機構名稱
 --       , NVL(C."CurrCompId",' ')               AS "CurrCompId"        -- 任職機構統一編號
          , CASE WHEN TRIM(NVL(C."CurrCompId",'0')) = '0' THEN '00000000'
          --       ELSE NVL(C."CurrCompId",'00000000')                   -- 右靠左補0
@@ -182,7 +197,11 @@ BEGIN
 --       , LPAD(NVL(C."IndustryCode",'0'),6,'0') AS "JobCode"           -- 職業類別
          , '060000'                              AS "JobCode"           -- 職業類別  (ref:LN15J1 (#M4019 1))
          , NVL(C."CurrCompTel",' ')              AS "CurrCompTel"       -- 任職機構電話
-         , RPAD(C."JobTitle",8,'　')             AS "JobTitle"          -- 職位名稱
+         , CASE 
+             WHEN TRIM(NVL(C."JobTitle", ' ')) = ''  THEN TO_NCHAR('　　　　')
+             ELSE RPAD(C."JobTitle",8,TO_NCHAR('　')) 
+           END                                   AS "JobTitle"          -- 職位名稱
+         --, RPAD(C."JobTitle",8,'　')             AS "JobTitle"          -- 職位名稱
          , NVL(C."JobTenure",' ')                AS "JobTenure"         -- 服務年資
          , CASE
              WHEN TRUNC(NVL(C."IncomeOfYearly",0) / 1000,0) = 0 THEN 600  -- (ref:LN15J1 (#M4023 1))

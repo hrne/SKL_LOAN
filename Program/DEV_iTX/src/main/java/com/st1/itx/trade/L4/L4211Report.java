@@ -228,7 +228,7 @@ public class L4211Report extends MakeReport {
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		if(fnAllList == null) {	
+		if(fnAllList.size() == 0) {	
 				throw new LogicException("E2003", "查無資料"); // 查無資料
 		}
 		

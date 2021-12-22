@@ -135,7 +135,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	private int wkCalcVoCount; // 計息明細總筆數(從0開始)
 	private int wkTermIndex;
 	private BigDecimal wkAmt;
-	private BigDecimal wkBaseRate; // 指標利率
+	private BigDecimal wkFitRate; // 適用利率
 	private int wkNextEffectDate; // 下一個指標利率生效日
 	private int wkProcessCode; // 1:指定收息止日 2:週期為月 3:週期為週
 	private boolean isFirstTermMonth; // 是否為首月
@@ -348,8 +348,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkMonthLimit = 0; // 當月日數
 		wkStoreRate = iStoreRate; // 上次收息利率
 		wkBeforeStoreRate = iStoreRate;
-		wkRateIncr = iRateIncr; // 加碼利率
-		wkIndividualIncr = iIndividualIncr; // 個別加碼利率
 		wkFreqCode = iFreqBase; // 週期基準 1:日 2:月 3:週
 		wkTerms = iTerms; // 繳息期數
 		wkNextRepayDate = iNextRepayDate; // 下次還本日,應還本日,預定還本日
@@ -359,7 +357,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkType = 0;
 		wkCalcVoIndex = -1;
 		wkTermIndex = 0;
-		wkBaseRate = BigDecimal.ZERO;
+		wkFitRate = BigDecimal.ZERO;
 		wkNextEffectDate = 0;
 		wkProcessCode = 0;
 		isRateChange = false;
@@ -779,7 +777,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			if (wkIntEndDate >= iMaturityDate) {
 				break;
 			}
-			wkDueAmt = oDueAmt; // 新期金
 		}
 
 		this.info("specifyTermsRoutine end ");
@@ -829,12 +826,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				wkIntEndDateX = 0;
 				isRateChange = false;
 			}
-
-			if (iIncrFlag.equals("Y")) {
-				wkStoreRate = wkBaseRate.add(wkRateIncr);
-			} else {
-				wkStoreRate = wkBaseRate.add(wkIndividualIncr);
-			}
+			wkStoreRate = wkFitRate;
 
 			execRepayDateRoutine();
 
@@ -1093,20 +1085,17 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			throw new LogicException(titaVo, "E3926",
 					iCustNo + "-" + iFacmNo + "-" + iBormNo + " 無放款利率變動資料 = " + wkIntStartDate); // 計算利息錯誤，放款利率變動檔查無資料
 		}
+
+		wkFitRate = tLoanRateChange.getFitRate(); // 適用利率
 		wkRateIncr = tLoanRateChange.getRateIncr(); // 加碼利率
 		wkIndividualIncr = tLoanRateChange.getIndividualIncr(); // 個別加碼利率
 
-		if (iIncrFlag.equals("Y")) {
-			wkBaseRate = tLoanRateChange.getFitRate().subtract(wkRateIncr);
-		} else {
-			wkBaseRate = tLoanRateChange.getFitRate().subtract(wkIndividualIncr);
+		if (tLoanRateChange.getEffectDate() == iDrawdownDate) {
+			wkBeforeStoreRate = tLoanRateChange.getFitRate();
 		}
 
 		this.info("   EffectDate        = " + tLoanRateChange.getEffectDate());
 		this.info("   FitRate           = " + tLoanRateChange.getFitRate());
-		this.info("   wkBaseRate        = " + wkBaseRate);
-		this.info("   wkRateIncr        = " + wkRateIncr);
-		this.info("   wkIndividualIncr  = " + wkIndividualIncr);
 
 		dDateUtil.init();
 		dDateUtil.setDate_1(tLoanRateChange.getEffectDate());
@@ -1184,7 +1173,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		vCalcRepayIntVo.setExtraRepayFlag(0); // 部分償還金額記號 0:否 1:是
 		// 預設分段計息記號 0:按日計息(零星日) 2:利率分段計息
 		vCalcRepayIntVo.setDuraFlag(isRateChange ? 2 : 0); // 分段計息記號 0: 未滿期 1:按週/月計息(滿期) 2:利率分段計息
-		vCalcRepayIntVo.setDueAmt(oDueAmt); // 期金(調整後)
+		vCalcRepayIntVo.setDueAmt(iDueAmt); // 期金
 		vCalcRepayIntVo.setRateCode(iRateCode); // 利率區分 1: 機動 2: 固定 3: 定期機動
 		lCalcRepayIntVo.add(vCalcRepayIntVo);
 		oCalcCount = wkCalcVoIndex + 1;
@@ -1319,8 +1308,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   Before Principal  = " + lCalcRepayIntVo.get(wkIndex).getPrincipal());
 
 		BigDecimal wkInterest = BigDecimal.ZERO;
-		int wkRestPeriod = 0;
-		int wkGracePeriod = 0;
 		vCalcRepayIntVo = lCalcRepayIntVo.get(wkIndex);
 
 		// 期數不同，中間息清零
@@ -1337,25 +1324,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		} else {
 			vCalcRepayIntVo.setAmount(BigDecimal.ZERO);
 		}
-		// 調整期金 => 攤還方式 3.本息平均法(期金)
+		// 還本金額=期金減利息 => 攤還方式 3.本息平均法(期金)
 		if (iAmortizedCode == 3) {
-			// 利率有變動且攤還額異動碼=1: 變 ==> 須調整期金
-			// 過了寬限期，用剩餘期數計算；寬緩期內用總期數期減寬限期數計算
-			if (vCalcRepayIntVo.getStoreRate().compareTo(wkBeforeStoreRate) != 0 && "1".equals(iExtraRepayCode)) {
-				if (vCalcRepayIntVo.getTermNo() > iGracePeriod) {
-					wkRestPeriod = iTotalPeriod - vCalcRepayIntVo.getTermNo() + 1;
-					wkGracePeriod = 0;
-				} else {
-					wkRestPeriod = iTotalPeriod;
-					wkGracePeriod = iGracePeriod;
-				}
-				oDueAmt = loanDueAmtCom.getDueAmt(vCalcRepayIntVo.getAmount(), vCalcRepayIntVo.getStoreRate(), "3",
-						iFreqBase, wkRestPeriod, wkGracePeriod, iPayIntFreq, iFinalBal, titaVo);
-				wkBeforeStoreRate = vCalcRepayIntVo.getStoreRate();
-				this.info(" new DueAmt = " + oDueAmt);
-			}
-
-			// 還本金額=期金減利息
+			vCalcRepayIntVo.setDueAmt(oDueAmt);
 			if (vCalcRepayIntVo.getPrincipalFlag() == 1) { // 還本記號 0:不還本 1:要還
 				if (vCalcRepayIntVo.getEndDate() >= iMaturityDate) {
 					vCalcRepayIntVo.setPrincipal(vCalcRepayIntVo.getAmount());
@@ -1386,10 +1357,48 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 		lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
 
+		// 期數不同調整期金
+		if (wkIndex == wkCalcVoCount || vCalcRepayIntVo.getTermNo() != lCalcRepayIntVo.get(wkIndex + 1).getTermNo()) {
+			adjustDueAmtRoutine();
+		}
+
 		this.info("   after getInterestFlag = " + vCalcRepayIntVo.getInterestFlag());
 		this.info("   after getAmount       = " + vCalcRepayIntVo.getAmount());
 		this.info("   after getPrincipal    = " + vCalcRepayIntVo.getPrincipal());
 		this.info("adjustAmtRoutine end ");
+	}
+
+	// 調整期金
+	private void adjustDueAmtRoutine() throws LogicException {
+		// 攤還方式=3.本息平均法 且 攤還額異動碼=1:變 且利率有變動
+		if (iAmortizedCode != 3 || !"1".equals(iExtraRepayCode)
+				|| vCalcRepayIntVo.getStoreRate().compareTo(wkBeforeStoreRate) == 0) {
+			return;
+		}
+		// 有餘額
+		BigDecimal wkBal = vCalcRepayIntVo.getAmount().subtract(vCalcRepayIntVo.getPrincipal());
+		if (wkBal.compareTo(BigDecimal.ZERO) == 0) {
+			return;
+		}
+
+		int wkRestPeriod = 0;
+		int wkGracePeriod = 0;
+
+		// 期數不同且利率有變動 ==> 須調整期金
+		if (vCalcRepayIntVo.getStoreRate().compareTo(wkBeforeStoreRate) != 0) {
+			// 過了寬限期，用剩餘期數計算；寬緩期內用總期數期減寬限期數計算
+			if (vCalcRepayIntVo.getTermNo() > iGracePeriod) {
+				wkRestPeriod = iTotalPeriod - vCalcRepayIntVo.getTermNo();
+				wkGracePeriod = 0;
+			} else {
+				wkRestPeriod = iTotalPeriod;
+				wkGracePeriod = iGracePeriod;
+			}
+			oDueAmt = loanDueAmtCom.getDueAmt(wkBal, vCalcRepayIntVo.getStoreRate(), "3", iFreqBase, wkRestPeriod,
+					wkGracePeriod, iPayIntFreq, iFinalBal, titaVo);
+			wkBeforeStoreRate = vCalcRepayIntVo.getStoreRate();
+			this.info(" new DueAmt = " + oDueAmt);
+		}
 	}
 
 	// 計算利息

@@ -60,8 +60,8 @@ public class L4510R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += " left join \"CdAcCode\" a on a.\"AcctCode\" = d.\"AcctCode\"         ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\"             ";
 		sql += " where d.\"ErrMsg\" is null                                          ";
-		sql += "   and d.\"MediaDate\" = :mediaDate";
-		sql += "   and d.\"ProcCode\" in (:procCode) ";
+		sql += "   and d.\"MediaDate\" = :mediaDate" ;
+		sql += "   and d.\"ProcCode\" in (" + procCode + ") ";
 		sql += "   and d.\"AchRepayCode\" = 1                                        ";
 		sql += "   order by d.\"PerfMonth\",d.\"ProcCode\",d.\"AchRepayCode\",d.\"AcctCode\",d.\"CustNo\",d.\"FacmNo\",d.\"BormNo\" ";
 
@@ -71,7 +71,6 @@ public class L4510R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("mediaDate", mediaDate);
-		query.setParameter("procCode", procCode);
 
 		return this.convertToMap(query);
 	}

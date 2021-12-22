@@ -180,7 +180,8 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize, String pageOrientation) throws LogicException {
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize,
+			String pageOrientation) throws LogicException {
 
 		formMode = true;
 
@@ -228,7 +229,8 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String PageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String PageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -266,7 +268,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
+			throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -298,7 +301,8 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -1265,17 +1269,28 @@ public class MakeReport extends CommBuffer {
 
 					document.open();
 
-//					baos = new ByteArrayOutputStream();
-//					reader = new PdfReader(defaultname);
-//					stamper = new PdfStamper(reader, baos);
-//					fields = stamper.getAcroFields();
+					// 讀取頁的長寛
+					page = copy.getPageSize();
 
-					this.nowPage = 0;
+					// 設定要輸出的Stream
 
-//					this.xPoints = stamper.getWriter().getPageSize().getWidth();
-//					this.yPoints = stamper.getWriter().getPageSize().getHeight();
+					baos = new ByteArrayOutputStream();
+					reader = new PdfReader(defaultname);
+					stamper = new PdfStamper(reader, baos);
+					fields = stamper.getAcroFields();
+					cb = stamper.getOverContent(1);
 //
-//					cb = stamper.getOverContent(1);
+					String font = map.get("font").toString();
+					baseFont = setBaseFont(font);
+					fontsize = Integer.valueOf(map.get("font.size").toString());
+					fontwidth = fontsize / 2 + charSpaces;
+					fonthigh = fontsize + lineSpaces + 2;
+
+					this.nowPage = 1;
+					this.info("open = " + this.nowPage);
+
+					this.xPoints = stamper.getWriter().getPageSize().getWidth();
+					this.yPoints = stamper.getWriter().getPageSize().getHeight();
 
 				} else if ("1".equals(type)) {
 					// 新頁
@@ -1286,7 +1301,7 @@ public class MakeReport extends CommBuffer {
 							reader.close();
 							reader = new PdfReader(baos.toByteArray());
 							copy.addDocument(reader);
-							reader.close();
+//							reader.close();
 						}
 						this.nowPage++;
 						// new
@@ -1294,6 +1309,7 @@ public class MakeReport extends CommBuffer {
 						reader = new PdfReader(defaultname);
 						stamper = new PdfStamper(reader, baos);
 						fields = stamper.getAcroFields();
+						cb = stamper.getOverContent(this.nowPage - 1);
 					} else {
 						document.newPage();
 					}
@@ -2080,7 +2096,8 @@ public class MakeReport extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString
+						+ "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -2099,7 +2116,8 @@ public class MakeReport extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble
+					+ "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;

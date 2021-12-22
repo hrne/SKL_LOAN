@@ -204,7 +204,7 @@ C(3,#CHAIN,1,s,$)
 ! 交易代號
 #TRN_CODE=X,5,I
 C(3,#CHAIN,1,s,$)
-C(4,#TxtNo,$,S)
+!C(4,#TxtNo,$,S)
 !INVOKEJS(SHOW,p1,3,4,1)
 
 #TRN_CODE2=X,5,S
@@ -215,23 +215,25 @@ C(4,#TxtNo,$,S)
 ! 戶號
 #CUST_NO=A,7,I
 C(3,#CHAIN,1,s,$)
-C(4,#TxtNo,$,S)
-C(3,#TRN_CODE,0,$,S)
+!C(4,#TxtNo,$,S)
+!C(3,#TRN_CODE,0,$,S)
+
 #FACM_NO=A,3,I
 C(3,#CHAIN,1,s,$)
-C(4,#TxtNo,$,S)
-C(3,#TRN_CODE,0,$,S)
+!C(4,#TxtNo,$,S)
+!C(3,#TRN_CODE,0,$,S)
 C(3,#CUST_NO,0,S,$)
+
 #BORM_SEQ=A,3,I
 C(3,#CHAIN,1,s,$)
-C(4,#TxtNo,$,S)
-C(3,#TRN_CODE,0,$,S)
+!C(4,#TxtNo,$,S)
+!C(3,#TRN_CODE,0,$,S)
 C(3,#FACM_NO,0,S,$)
 
 #MrKey=x,20,I
 C(3,#CHAIN,1,s,$)
-C(4,#TxtNo,$,S)
-C(3,#CUST_NO,0,$,S)
+!C(4,#TxtNo,$,S)
+!C(3,#CUST_NO,0,$,S)
 
 #MRKEY=_,_,S
 C(3,#CUST_NO,0,S,$)
@@ -315,6 +317,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6934; ntxbuf=#BufA})
 #BORM_SEQ
 #TxtNo
 #CHAINFlag
+#MrKey
 #END
 </sub>
 

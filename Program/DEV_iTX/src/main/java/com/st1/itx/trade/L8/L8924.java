@@ -14,8 +14,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
@@ -46,7 +48,10 @@ public class L8924 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
-
+	
+	@Autowired
+	public CustMainService sCustMainService;
+	
 	@Autowired
 	Parse parse;
 
@@ -75,71 +80,84 @@ public class L8924 extends TradeBuffer {
 		} else if (("2").equals(TranNo)) {
 			iTranNo.add("L8204");
 			TranNo = "L8204";
-		}
+		} 
 
 		int CustNo = Integer.parseInt(titaVo.getParam("CUST_NO").toString());
 		int iDateStart = Integer.parseInt(titaVo.getParam("CDATESTART").toString());
 		int iDateEnd = Integer.parseInt(titaVo.getParam("CDATEEND").toString());
 		iDateStart = iDateStart + 19110000;
 		iDateEnd = iDateEnd + 19110000;
-
+		
 		String iMrkey = titaVo.getMrKey().trim();
+		
 
-		Slice<TxDataLog> slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo, CustNo, this.index, this.limit, titaVo);
+		 Slice<TxDataLog> slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo, CustNo, this.index, this.limit, titaVo);
 
-		List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
+
+		 List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
 
 		if (lTxDataLog == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
+		
+			for (TxDataLog txDataLog : lTxDataLog) {
 
-		for (TxDataLog txDataLog : lTxDataLog) {
+			
+				OccursList occursList = new OccursList();
 
-			OccursList occursList = new OccursList();
-
-			if (!iMrkey.isEmpty()) {
-				this.info("iMrkey==" + iMrkey);
-				if (!(iMrkey).equals(txDataLog.getMrKey())) {
-					continue;
+				if(!iMrkey.isEmpty()) {
+					this.info("iMrkey=="+iMrkey);
+					if(!(iMrkey).equals(txDataLog.getMrKey())) {
+						continue;					}
 				}
-			}
 
-			String tranName = txDataLog.getTranNo();
-
-			TxTranCode txTranCode = sTxTranCodeService.findById(txDataLog.getTranNo(), titaVo);
-
-			if (txTranCode != null) {
-				tranName += " " + txTranCode.getTranItem();
-			}
-
-			occursList.putParam("OTranName", tranName);
-
-			occursList.putParam("OCustNo", txDataLog.getCustNo());
-			occursList.putParam("OFacmNo", txDataLog.getFacmNo());
-			occursList.putParam("OBormNo", txDataLog.getBormNo());
-			occursList.putParam("OMrKey", txDataLog.getMrKey());
-
-			occursList.putParam("OReason", txDataLog.getReason());
-
-			String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
-
-			occursList.putParam("OLastUpdate", lastUpdate);
-
-			String lastEmp = txDataLog.getLastUpdateEmpNo();
-			if (txDataLog.getLastUpdateEmpNo() != null && txDataLog.getLastUpdateEmpNo().toString().length() > 0) {
-				CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
-				if (cdEmp != null) {
-					lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
+				String tranName = txDataLog.getTranNo();
+				
+				TxTranCode txTranCode = sTxTranCodeService.findById(txDataLog.getTranNo(), titaVo);
+				
+				if (txTranCode != null) {
+					tranName += " " + txTranCode.getTranItem();
 				}
-			}
+				
+				occursList.putParam("OTranName", tranName);
 
-			occursList.putParam("OLastEmp", lastEmp);
-			occursList.putParam("OTxDate", txDataLog.getTxDate());
-			occursList.putParam("OTxSeq", txDataLog.getTxSeq());
-			occursList.putParam("OTxSno", txDataLog.getTxSno());
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
-		}
+				occursList.putParam("OCustNo", txDataLog.getCustNo());
+				occursList.putParam("OFacmNo", txDataLog.getFacmNo());
+				occursList.putParam("OBormNo", txDataLog.getBormNo());
+				
+				// 查詢客戶資料主檔
+				CustMain tCustMain = new CustMain();
+				int iCustNo = txDataLog.getCustNo();
+				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+				if (tCustMain != null) {
+					occursList.putParam("OCustName", tCustMain.getCustName().replace("$n", "")); // 戶名
+				} else {
+					occursList.putParam("OCustName", ""); // 戶名
+				}
+				
+				occursList.putParam("OMrKey", txDataLog.getMrKey());
+
+				occursList.putParam("OReason", txDataLog.getReason());
+
+				String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
+
+				occursList.putParam("OLastUpdate", lastUpdate);
+
+				String lastEmp = txDataLog.getLastUpdateEmpNo();
+				if (txDataLog.getLastUpdateEmpNo() != null && txDataLog.getLastUpdateEmpNo().toString().length() > 0) {
+					CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
+					if (cdEmp != null) {
+						lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
+					}
+				}
+
+				occursList.putParam("OLastEmp", lastEmp);
+				occursList.putParam("OTxDate", txDataLog.getTxDate());
+				occursList.putParam("OTxSeq", txDataLog.getTxSeq());
+				occursList.putParam("OTxSno", txDataLog.getTxSno());
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
+			}
 
 //		}
 

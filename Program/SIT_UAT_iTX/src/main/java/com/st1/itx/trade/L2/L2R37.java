@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R37 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R37.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -56,8 +53,7 @@ public class L2R37 extends TradeBuffer {
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		// 額度
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("RimFacmNo"));
-		// 契變序號
-		int iContractChgNo = parse.stringToInteger(titaVo.getParam("RimContractChgNo"));
+		parse.stringToInteger(titaVo.getParam("RimContractChgNo"));
 
 		String iRvNo = iContractChgDate + titaVo.getParam("RimContractChgNo");
 
@@ -100,12 +96,17 @@ public class L2R37 extends TradeBuffer {
 		this.totaVo.putParam("L2r37ContractChgCode", tTempVo.get("ContractChgCode")); // 契變項目代碼
 		this.totaVo.putParam("L2r37CurrencyCode", tAcReceivable.getCurrencyCode()); // 幣別
 		this.totaVo.putParam("L2r37FeeAmt", tAcReceivable.getRvAmt()); // 契變手續費
-		this.totaVo.putParam("L2r37AcDate", tAcReceivable.getLastAcDate()); // 會計日期
-		this.totaVo.putParam("L2r37TitaTxtNo", tAcReceivable.getTitaTxtNo()); // 交易序號
+
+		if(tAcReceivable.getClsFlag() == 1) {
+			this.totaVo.putParam("L2r37AcDate", tAcReceivable.getLastAcDate()); // 會計日期
+			this.totaVo.putParam("L2r37TitaTxtNo", tAcReceivable.getTitaTxtNo()); // 交易序號			
+		} else {
+			this.totaVo.putParam("L2r37AcDate", 0); // 會計日期
+			this.totaVo.putParam("L2r37TitaTxtNo", 0); // 交易序號		
+		}
 		this.totaVo.putParam("L2r37TLR_NO", tAcReceivable.getTitaTlrNo()); // 經辦編號
 		this.totaVo.putParam("L2r37MODIFY_DT", CreateDate); // 作業日期
 		this.totaVo.putParam("L2r37WKTIME", CreateTime); // 作業時間
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
