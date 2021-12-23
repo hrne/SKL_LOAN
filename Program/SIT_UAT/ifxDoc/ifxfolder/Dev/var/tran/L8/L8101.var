@@ -45,6 +45,12 @@ K(MODIFYBUTTON,通知)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+!自動更新L8081/L8082/L8083機制
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
 #Fd=X,2,L
 
 #NTXBUF=x,36,S
@@ -151,6 +157,8 @@ C(3,#ProcessType,1,E(0,1),E(0,0))
 !C(3,#ProcessType,2,T(3,N),T(3,Y))
 T(3,Y)
 
+#BatchNo=x,10,S
+
 ![確定傳送]自動或手動
 #TXMT=A,1,S
 !C(3,#CHAIN,0,$,C(2,#FunCode,$,$,XMT(),$,$,XMT()))
@@ -216,6 +224,7 @@ K(MODIFYBUTTON,1,上傳附件)
 #ProcessTlrNo
 #ProcessNote
 #LogFlag
+#BatchNo
 #END
 </sub>
 
@@ -261,6 +270,6 @@ TXFORM=L8R53
 #spaces
 #CustName
 ^
-#PdfPrt=1,PDF,,,,,,,,,,,,,PdfSno, 放款本息攤還表暨息通知單
+#PdfPrt=1,REPORT,,,,,,,,,,,,,PdfSno, 放款本息攤還表暨息通知單
 ^
 </sub>
