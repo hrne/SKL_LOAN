@@ -1,0 +1,17 @@
+DataDt=9,7
+CustKey=X,10
+RRSeq=9,10
+ReviewType=X,1
+Unit=X,6
+UnitItem=X,20
+IsStatus=X,2
+ConfirmStatus=9,1
+ProcessType=X,1
+ProcessCount=9,2
+LastProcessDate=9,7
+LastProcessBrNo=X,4
+LastProcessBrNo=X,30
+LastGroupNoX=X,20
+LastProcessTlrNo=X,6
+LastProcessTlrNoX=X,20
+LastProcessNote=X,100

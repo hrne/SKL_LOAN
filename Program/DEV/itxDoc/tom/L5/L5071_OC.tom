@@ -1,0 +1,17 @@
+OOCustId=X,10
+OOCustName=X,100
+OOCaseKindCode=X,1
+OOCustLoanKind=X,1
+OOStatus=X,1
+OOCustNo=9,7
+OOCaseSeq=9,3
+OOApplDate=9,7
+OODueAmt=9,14
+OOTotalPeriod=9,3
+OOIntRate=9,2.2
+OOFirstDueDate=9,7
+OOLastDueDate=9,7
+OOIsMainFin=X,1
+OOTotalContrAmt=9,14
+OOMainFinCode=X,8
+OOMainFinCodeName=X,100

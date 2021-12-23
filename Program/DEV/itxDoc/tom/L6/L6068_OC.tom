@@ -1,0 +1,11 @@
+OOFormNo=X,10
+OOFormName=X,80
+OOCycle=9,2
+OOSendCode=9,1
+OOLetter=9,1
+OOMessage=9,1
+OOEmail=9,1
+OOUsageDesc=X,80
+OOSignCode=9,1
+OOWatermarkFlag=9,1
+OOEnable=X,1

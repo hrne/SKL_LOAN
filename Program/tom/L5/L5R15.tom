@@ -1,0 +1,14 @@
+L5R15CustName=X,100,S
+L5R15AccCollPsn=X,6,S
+L5R15LegalPsn=X,6,S
+L5R15AccCollPsnX=X,40,S
+L5R15LegalPsnX=X,40,S
+L5R15DrawDownDate=9,7,S
+L5R15LoanAmt=9,14,S
+L5R15PrevIntDate=9,7,S
+L5R15LoanBal=9,14,S
+L5R15NextIntDate=9,7,S
+L5R15CustUKey=X,32,S
+L5R15ClNo=9,7,S
+L5R15ClCode1=9,1,S
+L5R15ClCode2=9,2,S

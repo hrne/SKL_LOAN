@@ -1,0 +1,10 @@
+oLogNo=9,8
+oEntdy=9,7
+oTransactionId=X,40
+oAcctNo=X,20
+oCaseNo=X,20
+oName=X,100
+oConfirmStatus=X,1
+oConfirmCode=X,1
+oConfirmEmpNo=X,6
+oConfirmTranCode=X,10
