@@ -270,7 +270,7 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
 
     -- 記錄程式結束時間
-    JOB_END_TIME := SYSTIMESTAMP
+    JOB_END_TIME := SYSTIMESTAMP;
 
     commit;
 

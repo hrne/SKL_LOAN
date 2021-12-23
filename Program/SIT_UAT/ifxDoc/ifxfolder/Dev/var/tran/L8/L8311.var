@@ -38,7 +38,7 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,200,300];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,400,200,300];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8311]                                 (50)債務人繳款資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
@@ -219,7 +219,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 ![報送單位代號]
 #SubmitKey=X,3,I

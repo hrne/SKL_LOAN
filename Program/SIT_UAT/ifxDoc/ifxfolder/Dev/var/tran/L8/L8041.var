@@ -39,7 +39,7 @@ K(NOBUTTON,CLOSEY)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,900];printer.width=[20,20];">
 [
 ["[L8041]                                 消債條列JCIC報送資料歷程查詢(050)"],
 ["#FdCustId+身分證字號",#CustId,#CustIdX],
@@ -95,7 +95,7 @@ T(1,@Ukey,#NTXBUF,6,32)
 
 #CustId=X,10,L
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 #SubmitKey=X,3,L
 #SubmitKeyX=X,80,L

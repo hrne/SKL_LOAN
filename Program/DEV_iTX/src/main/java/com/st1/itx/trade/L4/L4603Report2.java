@@ -124,27 +124,33 @@ public class L4603Report2 extends MakeReport {
 		String InsuStartDate = "";
 		String InsuEndDate = "";
 		
-		if(String.valueOf(tInsuRenew.getInsuStartDate()).length() == 7) {
+		if(tInsuRenew.getInsuStartDate() != 0) {
+		  if(String.valueOf(tInsuRenew.getInsuStartDate()).length() == 7) {
 			InsuStartDate = String.valueOf(tInsuRenew.getInsuStartDate()).substring(0,3) + "/" +
 		    String.valueOf(tInsuRenew.getInsuStartDate()).substring(3,5) + "/" +
 		    String.valueOf(tInsuRenew.getInsuStartDate()).substring(5,7);
-		} else {
+		  } else {
 			InsuStartDate = String.valueOf(tInsuRenew.getInsuStartDate()).substring(0,2) + "/" +
 		 	String.valueOf(tInsuRenew.getInsuStartDate()).substring(2,4) + "/" +
 			String.valueOf(tInsuRenew.getInsuStartDate()).substring(4,6);
+		  }
 		}
-		
-		if(String.valueOf(tInsuRenew.getInsuEndDate()).length() == 7) {
+		if(tInsuRenew.getInsuEndDate() != 0) {
+		  if(String.valueOf(tInsuRenew.getInsuEndDate()).length() == 7) {
 			InsuEndDate = String.valueOf(tInsuRenew.getInsuEndDate()).substring(0,3) + "/" +
 		    String.valueOf(tInsuRenew.getInsuEndDate()).substring(3,5) + "/" +
 		    String.valueOf(tInsuRenew.getInsuEndDate()).substring(5,7);
-		} else {
+		  } else {
 			InsuEndDate = String.valueOf(tInsuRenew.getInsuEndDate()).substring(0,2) + "/" +
 		 	String.valueOf(tInsuRenew.getInsuEndDate()).substring(2,4) + "/" +
 			String.valueOf(tInsuRenew.getInsuEndDate()).substring(4,6);
+		  }
 		}
+
 		this.print(2, 9,"保單到期日：" + InsuStartDate);
-		this.print(2, 9,"續保期間：" + InsuStartDate +  " - "  + InsuEndDate);
+		this.print(2, 9,"續保期間：           - ");
+		this.print(0, 20,InsuStartDate);
+		this.print(0, 31,InsuEndDate);
 		
 		this.print(0, 40,"火險保費：");
 		this.print(0, 60, df1.format(tInsuRenew.getFireInsuPrem()), "R");

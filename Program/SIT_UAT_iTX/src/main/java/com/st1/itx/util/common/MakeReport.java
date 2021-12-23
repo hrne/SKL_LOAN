@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
@@ -51,6 +53,7 @@ import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.filter.SafeClose;
 
 /**
  * 
@@ -165,6 +168,9 @@ public class MakeReport extends CommBuffer {
 
 	private boolean formMode = false;
 
+	// 批號(控制分別出表,但記錄在同一TxFile)
+	private String batchNo = "";
+
 	// 列印明細
 	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 
@@ -180,8 +186,7 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize,
-			String pageOrientation) throws LogicException {
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize, String pageOrientation) throws LogicException {
 
 		formMode = true;
 
@@ -214,6 +219,7 @@ public class MakeReport extends CommBuffer {
 		this.useDefault = false;
 
 		init();
+
 	}
 
 	/**
@@ -229,8 +235,7 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String PageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String PageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -268,8 +273,7 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
-			throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -301,8 +305,7 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -1113,29 +1116,29 @@ public class MakeReport extends CommBuffer {
 			this.info("MakeReport Files.delete error =" + e.getMessage());
 		}
 
+		// 輸出檔名
+		FileOutputStream fos = null;
+
+		// 建立一個Document物件，並設定頁面大小及左、右、上、下的邊界，rotate()橫印
+		Document document = null;
+		// 設定要輸出的Stream
+		PdfWriter writer = null;
+
+		// 套底稿用
+		PdfStamper stamper = null;
+		AcroFields fields = null;
+		PdfReader reader = null;
+		ByteArrayOutputStream baos = null;
+		PdfCopy copy = null;
+		String defaultname = null;
+
+		// 讀取頁的長寛
+		Rectangle page = null;
+
+		// 設定要輸出的Stream
+		PdfContentByte cb = null;
+
 		try {
-
-			// 輸出檔名
-			FileOutputStream fos = null;
-
-			// 建立一個Document物件，並設定頁面大小及左、右、上、下的邊界，rotate()橫印
-			Document document = null;
-			// 設定要輸出的Stream
-			PdfWriter writer = null;
-
-			// 套底稿用
-			PdfStamper stamper = null;
-			AcroFields fields = null;
-			PdfReader reader = null;
-			ByteArrayOutputStream baos = null;
-			PdfCopy copy = null;
-			String defaultname = null;
-
-			// 讀取頁的長寛
-			Rectangle page = null;
-
-			// 設定要輸出的Stream
-			PdfContentByte cb = null;
 
 			int frameX = 5;
 			int frameY = -5;
@@ -1556,12 +1559,19 @@ public class MakeReport extends CommBuffer {
 				document.close();
 				fos.close();
 			}
-		} catch (
-
-		IOException e) {
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
 			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",輸出PDF " + e.getMessage());
-		} catch (DocumentException e) {
-			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料PDF " + e.getMessage());
+		} finally {
+			SafeClose.close(document);
+			SafeClose.close(writer);
+			SafeClose.close(reader);
+			SafeClose.close(copy);
+			SafeClose.close(stamper);
+			SafeClose.close(baos);
+			SafeClose.close(fos);
 		}
 
 	}
@@ -2096,8 +2106,7 @@ public class MakeReport extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString
-						+ "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -2116,8 +2125,7 @@ public class MakeReport extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble
-					+ "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -2443,4 +2451,17 @@ public class MakeReport extends CommBuffer {
 
 		return rmap;
 	}
+
+	public int getPrintCnt() {
+		return printCnt;
+	}
+
+	public String getBatchNo() {
+		return batchNo;
+	}
+
+	public void setBatchNo(String batchNo) {
+		this.batchNo = batchNo;
+	}
+
 }

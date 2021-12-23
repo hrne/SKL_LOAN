@@ -38,13 +38,14 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[350,850];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8319]                                 (61)回報協商剩餘債權金額資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdRcDate+原前置協商申請日",#RcDate],["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
+[#<->#,"#FdRcDate+原前置協商申請日",#RcDate],
+[#<->#,"#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 [#<->#,"#FdMaxMainNote+最大債權金融機構報送註記",#MaxMainNote,#MaxMainNoteX],
 [#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 [#<->#,"#FdExpBalanceAmt+信用貸款協商剩餘債權餘額",#ExpBalanceAmt],
@@ -226,7 +227,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 ![報送單位代號]
 #SubmitKey=X,3,L

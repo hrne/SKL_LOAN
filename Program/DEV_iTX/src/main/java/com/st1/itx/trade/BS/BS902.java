@@ -59,8 +59,7 @@ public class BS902 extends TradeBuffer {
 		this.tbsDyf = this.getTxBuffer().getMgBizDate().getTbsDyf();
 
 		// 取本年月份
-		String entryDateMm = parse.IntegerToString(this.txBuffer.getMgBizDate().getTbsDy() / 100, 5);
-		this.info("取年本月份 = " + parse.stringToInteger(entryDateMm));
+		int entryDateMm = this.txBuffer.getMgBizDate().getTbsDy() / 100;
 
 		// 月底營業日(西元)
 		this.mfbsDyf = this.getTxBuffer().getMgBizDate().getMfbsDyf();
@@ -68,21 +67,32 @@ public class BS902 extends TradeBuffer {
 		// find data
 		// SL 聯貸費用
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 6, "SL" + "%", 0,
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 5, "SL" + "%", 0,
 				Integer.MAX_VALUE, titaVo);
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
 		// data size > 0 -> 新增應處理明細
 		TxToDoDetail tTxToDoDetail;
 		if (lAcReceivable != null) {
+			this.info("取年本月份 = " + entryDateMm);
 			for (AcReceivable rv : lAcReceivable) {
-//				相同月份寫入應處理清單
-				if (rv.getRvNo().length() > 10 && rv.getRvNo().substring(10, 15).equals(entryDateMm)) { // SL-XX-000-YYYMM
+				// 不為另收費用或已銷帳者不寫入
+				this.info("rv =" + rv);
+				this.info("rv.getReceivableFlag() =" + rv.getReceivableFlag());
+				this.info("rv.getClsFlag() =" + rv.getClsFlag());
+				if (rv.getReceivableFlag() != 5 || rv.getClsFlag() == 1) {
+					continue;
+				}
+//				相同月份與小於本月份資料寫入應處理清單
+				this.info("rv.getRvNo().length()" + rv.getRvNo().length());
+				this.info("rv.getRvNo().substring(10, 15)" + rv.getRvNo().substring(10, 15));
+				if (rv.getRvNo().length() > 10
+						&& parse.stringToInteger(rv.getRvNo().substring(10, 15)) <= entryDateMm) { // SL-XX-000-YYYMM
 					tTxToDoDetail = new TxToDoDetail();
 					TempVo tTempVo = new TempVo();
 					tTempVo.clear();
 					tTempVo.putParam("AcctCode", rv.getAcctCode());
-					tTxToDoDetail.setItemCode("TSL"); // 聯貸費用攤提
+					tTxToDoDetail.setItemCode("ACCL04"); // 聯貸費用攤提
 					tTxToDoDetail.setCustNo(rv.getCustNo());
 					tTxToDoDetail.setFacmNo(rv.getFacmNo());
 					tTxToDoDetail.setDtlValue(rv.getRvNo());

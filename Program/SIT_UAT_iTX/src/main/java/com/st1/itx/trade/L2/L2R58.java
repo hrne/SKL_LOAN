@@ -54,6 +54,7 @@ public class L2R58 extends TradeBuffer {
 		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iRvNo + "%", 0, Integer.MAX_VALUE,
 				titaVo);
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
+		//無資料 顯示錯誤訊息 
 		if (lAcReceivable == null) {
 			switch (iFunCd) {
 			case 1:
@@ -64,6 +65,7 @@ public class L2R58 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2003", "此筆資料不存在銷帳檔"); // 查無資料
 			}
 		}
+		//只有一筆為一般非攤提者
 		if (lAcReceivable.size() == 1) {
 
 			this.totaVo.putParam("OCustNo", lAcReceivable.get(0).getCustNo());
@@ -77,9 +79,12 @@ public class L2R58 extends TradeBuffer {
 			this.totaVo.putParam("OAllocationFreq", "0");
 			this.totaVo.putParam("OAllocationTimes", "0");
 
-		} else {
+		} 
+		// 多筆為攤提者
+		else {
 
 			BigDecimal wkSyndFeeAmt = BigDecimal.ZERO; // 費用金額
+			String wkRmk = "";
 			for (AcReceivable t : lAcReceivable) {
 
 				wkSyndFeeAmt = wkSyndFeeAmt.add(t.getRvAmt());
@@ -89,7 +94,7 @@ public class L2R58 extends TradeBuffer {
 				occursList.putParam("OOAllocationAmt", t.getRvAmt());// 費用年月
 				occursList.putParam("OOCloseFg", t.getClsFlag() == 1 ? "Y" : "");// 已銷記號
 				occursList.putParam("OOReceivableFg", t.getReceivableFlag());// 已銷記號
-
+				wkRmk = t.getSlipNote();
 				this.totaVo.addOccursList(occursList);
 			}
 
@@ -97,7 +102,7 @@ public class L2R58 extends TradeBuffer {
 			this.totaVo.putParam("OFacmNo", lAcReceivable.get(0).getFacmNo());
 			this.totaVo.putParam("OSyndFeeCode", lAcReceivable.get(0).getRvNo().substring(3, 5));
 			this.totaVo.putParam("OSyndFee", wkSyndFeeAmt);
-			this.totaVo.putParam("ORmk", lAcReceivable.get(0).getSlipNote());
+			this.totaVo.putParam("ORmk", wkRmk);
 			this.totaVo.putParam("OAcctCode", lAcReceivable.get(0).getAcctCode());
 			this.totaVo.putParam("OIsAllocation", "Y");// 是否攤提
 			this.totaVo.putParam("OSyndFeeYearMonth", lAcReceivable.get(0).getRvNo().substring(10, 15));// 年月

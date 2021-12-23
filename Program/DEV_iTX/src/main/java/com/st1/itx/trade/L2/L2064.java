@@ -66,6 +66,7 @@ public class L2064 extends TradeBuffer {
 		String tSyndFeeCode = "";// 費用代碼
 		String wkCdSyndItem = "";// 費用代碼中文
 		String wkAcctCode = ""; // 業務科目
+		String wkMrk = "";
 		BigDecimal wkClsAmt = BigDecimal.ZERO; // 已銷金額
 		BigDecimal wkSyndFeeAmt = BigDecimal.ZERO; // 費用金額
 		BigDecimal wkEntryAmt = BigDecimal.ZERO;// 已入帳金額
@@ -80,6 +81,7 @@ public class L2064 extends TradeBuffer {
 				wkClsAmt = BigDecimal.ZERO;
 				wkSyndFeeAmt = BigDecimal.ZERO;
 				wkEntryAmt = BigDecimal.ZERO;
+				wkMrk = "";
 			}
 			// RvNo = SL+-+費用代碼(2)+-+流水號(3)
 			if (!("".equals(t.getRvNo())) && t.getRvNo().length() >= 9 && "SL".equals(t.getRvNo().substring(0, 2))) {
@@ -107,6 +109,9 @@ public class L2064 extends TradeBuffer {
 			if (t.getReceivableFlag() == 3) {
 				wkEntryAmt = wkEntryAmt.add(t.getRvAmt().subtract(t.getRvBal()));
 			}
+			if (t.getSlipNote() != null && !"".equals(t.getSlipNote())) {
+				wkMrk = t.getSlipNote();
+			}
 			// 最後一筆 或 與下筆不同資料時塞入tota
 			if (i == lAcReceivable.size() || !wkRvNo.equals(lAcReceivable.get(i).getRvNo().substring(0, 9))) {
 
@@ -117,7 +122,7 @@ public class L2064 extends TradeBuffer {
 				occursList.putParam("OOSyndFeeItem", tSyndFeeCode + "-" + wkCdSyndItem); // 聯貸費用代碼+說明
 				occursList.putParam("OOSyndFee", wkSyndFeeAmt);// 費用金額
 				occursList.putParam("OOClsAmt", wkClsAmt);// 已銷金額
-				occursList.putParam("OORmk", t.getSlipNote());// 備註
+				occursList.putParam("OORmk", wkMrk);// 備註
 				occursList.putParam("OORvNo", wkRvNo); // 銷帳編號
 				occursList.putParam("OOAcctCode", t.getAcctCode()); // 業務科目
 				occursList.putParam("OOEntryAmt", wkEntryAmt); // 已入帳金額

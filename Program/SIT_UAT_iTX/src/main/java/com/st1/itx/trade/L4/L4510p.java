@@ -147,7 +147,7 @@ public class L4510p extends TradeBuffer {
 	private HashMap<tmpFacm, Integer> bormMap = new HashMap<>();
 
 	private int mediaDate = 0;
-	private int entryDate = 0;
+//	private int entryDate = 0;
 	private int cnt = 0;
 
 	private HashMap<String, Integer> perfMonth = new HashMap<>();
@@ -219,11 +219,11 @@ public class L4510p extends TradeBuffer {
 //				1.15日薪 2.非15日薪
 				if (iOpItem == 1 && "1".equals(tCdCode.getItem().substring(0, 1))) {
 					procCodeIs15.add(tEmpDeductSchedule.getAgType1());
-					entryDate = tEmpDeductSchedule.getEntryDate();
+//					entryDate = tEmpDeductSchedule.getEntryDate();
 				}
 				if (iOpItem == 2 && "2".equals(tCdCode.getItem().substring(0, 1))) {
 					procCodeUn15.add(tEmpDeductSchedule.getAgType1());
-					entryDate = tEmpDeductSchedule.getEntryDate();
+//					entryDate = tEmpDeductSchedule.getEntryDate();
 				}
 			}
 
@@ -639,10 +639,10 @@ public class L4510p extends TradeBuffer {
 			// MediaDate, MediaKind由最後update移至 
 			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
 				tEmpDeductDtlId.setRepayCode("3");
-				tEmpDeductDtl.setMediaKind("4");
+				tEmpDeductDtl.setMediaKind("5");
 			} else {
 				tEmpDeductDtlId.setRepayCode("1"); // ???
-				tEmpDeductDtl.setMediaKind("5");
+				tEmpDeductDtl.setMediaKind("4");
 			}
 			tEmpDeductDtlId.setAcctCode(facmAcctCode.get(tmp3));
 			tEmpDeductDtlId.setFacmNo(tmp.getFacmNo());

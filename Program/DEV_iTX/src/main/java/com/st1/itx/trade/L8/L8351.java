@@ -53,22 +53,23 @@ public class L8351 extends TradeBuffer {
 		String iSubmitType = titaVo.getParam("SubmitType");
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iTxtDate = titaVo.getParam("TxtDate");
-
+		long fileNo = 0;
 		if (iSubmitType.equals("1")) {
 			// 檔名
 			String filename = iSubmitKey + iTxtDate.substring(3) + ".MU1";
-
+	
 			iL8351File.exec(titaVo);
-			long fileNo = iL8351File.close();
+			fileNo = iL8351File.close();
 			iL8351File.toFile(fileNo, filename);
-		} else {
+			totaVo.put("ExcelSnoM", "" + fileNo);
+		}else {
 			Slice<TbJcicMu01> xTbJcicMu01 = null;
 			xTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			if (xTbJcicMu01 != null) {
 				int aTxDate = Integer.valueOf(iTxtDate);
-
+				
 				for (TbJcicMu01 xxTbJcicMu01 : xTbJcicMu01) {
-					this.info("TESTTT=" + xxTbJcicMu01.getOutJcictxtDate());
+					this.info("TESTTT="+xxTbJcicMu01.getOutJcictxtDate());
 					if (xxTbJcicMu01.getOutJcictxtDate() == aTxDate) {
 						xxTbJcicMu01.setOutJcictxtDate(0);
 						try {
@@ -79,7 +80,9 @@ public class L8351 extends TradeBuffer {
 					}
 				}
 			}
+			totaVo.put("ExcelSnoM", "" + fileNo);
 		}
+
 
 		this.addList(this.totaVo);
 		return this.sendList();

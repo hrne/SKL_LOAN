@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -18,12 +19,13 @@ import com.st1.itx.db.domain.TxToDoMain;
  */
 public interface TxToDoMainRepositoryHist extends JpaRepository<TxToDoMain, String> {
 
-	// AutoFg = ,AND ExcuteTxcd =
-	public Optional<TxToDoMain> findTopByAutoFgIsAndExcuteTxcdIs(String autoFg_0, String excuteTxcd_1);
+  // AutoFg = ,AND ExcuteTxcd = 
+  public Optional<TxToDoMain> findTopByAutoFgIsAndExcuteTxcdIs(String autoFg_0, String excuteTxcd_1);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxToDoMain> findByItemCode(String itemCode);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxToDoMain> findByItemCode(String itemCode);
 
 }
+

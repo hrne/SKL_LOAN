@@ -44,7 +44,7 @@ E(0,0)
 [#<->#,"#FdFunCd+功能",#FunCdX],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,#CustNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
-[#<->#,"#FdSyndFeeCode+費用項別",#SyndFeeCode,#BTN1,#SyndFeeCodeX],
+[#<->#,"#FdSyndFeeCode+費用項別",#SyndFeeCode,#SyndFeeCodeX],
 [#<->#,"#FdIsAllocation+是否攤提",#IsAllocation,#IsAllocationX],
 [#<->#,"#FdSyndFeeYearMonth+費用年月",#SyndFeeYearMonth],
 ["#FdAllocationFreq+攤提週期（月）",#AllocationFreq],["#FdAllocationTimes+攤提次數",#AllocationTimes],
@@ -54,12 +54,12 @@ E(0,0)
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:聯貸費用代碼查詢;enable:1;tabbable:0
+! #BTN1=X,15,I,ui:button;value:聯貸費用代碼查詢;enable:1;tabbable:0
 
-#BUF1=X,100,S
+! #BUF1=X,100,S
 
-#BIND1=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6022; ntxbuf=#BUF1;ntxbuf5=type<-1:SyndFeeCode<-OOSyndFeeCode:SyndFeeCodeX<-OOSyndFeeItem})
+! #BIND1=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6022; ntxbuf=#BUF1;ntxbuf5=type<-1:SyndFeeCode<-OOSyndFeeCode:SyndFeeCodeX<-OOSyndFeeItem})
 
 
 #Submit=A,1,S
@@ -69,6 +69,9 @@ K(MODIFYBUTTON,新增)
 #INIT=X,1,S
 HIDE(#UsSyndFee)
 INVOKEJS(SHOW,p1,6,7,0)INVOKEJS(SHOW,p2,0)
+##loop{times:50,n:1}
+INVOKEJS(SHOW,grd2_{n},0)
+##end
 
 #FdFunCd=X,2,L
 #FdCustNo=X,2,L
@@ -176,20 +179,21 @@ E(0,@TwSyndFee,#L2r58SyndFee)
 E(0,@UsSyndFee,#L2r58SyndFee)
 E(0,@TimSyndFee,#L2r58SyndFee)
 T(2,@Rmk,#L2r58Rmk)
-##loop{times:10,n:1}
+##loop{times:50,n:1}
 T(2,@YearMonth{n},#L2r58OYearMonth{n})
 E(0,@AllocationAmt{n},#L2r58OAllocationAmt{n})
 T(2,@CloseFg{n},#L2r58OCloseFg{n})
 E(0,@ReceivableFg{n},#L2r58OReceivableFg{n})
 C(5,#L2r58OCloseFg{n},Y,E(0,@checkClsFg,1),$)
 ##end
+C(5,#L2r58IsAllocation,Y,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
 
-##loop{times:10,n:1}
+##loop{times:50,n:1}
 #checkout{n}=X,1,S
+C(3,#FunCd,1,S,$)
+IF({n}<=#L2r58AllocationTimes,INVOKEJS(SHOW,grd2_{n},1),INVOKEJS(SHOW,grd2_{n},0))
 C(3,#FunCd,2,$,S)
-C(5,#CloseFg{n},Y,$,S)
-T(F,@YearMonth{n},0)
-T(F,@AllocationAmt{n},0)
+C(5,#CloseFg{n},Y,T(F,@YearMonth{n},0)T(F,@AllocationAmt{n},0),$)
 ##end
 
 !功能
@@ -198,7 +202,7 @@ T(F,@AllocationAmt{n},0)
 #FunCdX=X,10,L
 T(3,)T(H,#FunCd,#FuncCodeHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,複製),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
-C(3,#FunCd,1,SHOW(#BTN1),HIDE(#BTN1))
+! C(3,#FunCd,1,SHOW(#BTN1),HIDE(#BTN1))
 
 #UpdateCode=N,1,S
 IF(#FunCd==1 || #FunCd==2 || #FunCd==3,E(0,1),E(0,0))
@@ -231,7 +235,7 @@ T(F,@AllocationFreq,0)
 T(F,@AllocationTimes,0)
 T(F,@TwSyndFee,0)T(F,@UsSyndFee,0)
 T(F,@Rmk,0)
-##loop{times:10,n:1}
+##loop{times:50,n:1}
 T(F,@YearMonth{n},0)
 T(F,@AllocationAmt{n},0)
 ##end
@@ -300,6 +304,9 @@ C(3,#FunCd,1,$,s)
 HELP(#YNHelp)
 @V(H,#YNHelp)
 
+!為攤提者顯示下方費用grid
+!修改且攤提者顯示費用年月
+!新增且攤提者顯示費用年月.攤提週期.攤提次數
 #IsAllocationX=X,2,L
 T(3,)
 T(H,#IsAllocation,#YNHelp)
@@ -327,7 +334,6 @@ E(0,@OldAllocationTimes,#AllocationTimes)
 #OldAllocationTimes=n,2,S
 
 !金額
-
 #TwSyndFee=m,14,I
 C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,$,s)
@@ -352,18 +358,27 @@ C(3,#UpdateCode,1,$,s)
 #MRKEY=_,_,S
 T(2,#CustNo+-+#FacmNo)
 
+!年月初 方便下方D(7)function運算
 #WKYMD=D,7,S
 T(2,#SyndFeeYearMonth+01)
 E(0,@wkd7ym0,#WKYMD)
 
+!均值 總金額/次數 
 #WKAMT=m,14,S
 E(0,#TimSyndFee/#AllocationTimes)
 
+!金額運算使用
+#WKAMTX=m,14,S
+E(0,0)
+#WKAMTEND=m,14,S
+E(0,0)
 
 #wkd7ym0=D,8,S
 
-! 計算
-##loop{times:10,m:0,n:1}
+! ! ! !計算! ! ! !
+
+!清除值
+##loop{times:50,m:0,n:1}
 #Clear{n}=X,1,S
 C(3,#UpdateCode,1,$,s)
 C(3,#FunCd,1,$,S)
@@ -373,6 +388,7 @@ IF(#OldAllocationTimes==#AllocationTimes,S,$)
 T(2,@YearMonth{n},)
 E(0,@AllocationAmt{n},0)
 
+!運算費用年月+週期
 #wkd7ym{n}=D,8,S
 C(3,#UpdateCode,1,$,s)
 C(3,#FunCd,1,$,S)
@@ -380,18 +396,31 @@ IF(#AllocationFreq ==0||#AllocationTimes==0,S,$)
 IF({n}>#AllocationTimes,S,$)
 IF({n}==1,E(0,#wkd7ym{m}),D(7,2,#wkd7ym{m},#AllocationFreq,0))
 
+!塞值
+!年月為費用年月+週期
+!金額為總金額/次數 最後一筆為總金額-前筆金額加總 解決除不盡
 #set{n}=X,1,S
 C(3,#UpdateCode,1,$,s)
 C(3,#FunCd,1,$,S)
 IF(#AllocationFreq ==0||#AllocationTimes==0,S,$)
 IF({n}>#AllocationTimes,S,$)
 E(0,@YearMonth{n},#wkd7ym{n}/100)
-E(0,@AllocationAmt{n},#WKAMT)
+IF({n}<#AllocationTimes,E(0,@AllocationAmt{n},#WKAMT)E(0,@WKAMTX,#WKAMTX+#WKAMT),$)
+IF({n}==#AllocationTimes,E(0,@WKAMTEND,#TimSyndFee-#WKAMTX),$)
+IF({n}==#AllocationTimes,E(0,@AllocationAmt{n},#WKAMTEND),$)
+
+!攤提控制grid 依次數顯示幾列
+#showgrd{n}=X,1,S
+C(3,#UpdateCode,1,$,s)
+C(5,#IsAllocation,N,S,$)
+C(3,#FunCd,1,IF(#AllocationFreq ==0||#AllocationTimes==0,S,$),$)
+IF({n}>#AllocationTimes,INVOKEJS(SHOW,grd2_{n},0),INVOKEJS(SHOW,grd2_{n},1))
+
 
 ##end
 #YearMonth0=X,5,S
 
-##loop{times:10,m:0,n:1}
+##loop{times:50,m:0,n:1}
 
 #check{n}=X,1,S
 C(3,#FunCd,2,$,S)
@@ -399,26 +428,31 @@ C(5,#CloseFg{n},Y,$,S)
 T(F,@YearMonth{n},0)
 T(F,@AllocationAmt{n},0)
 
+!年月必須有值且需大於前筆年月
 #YearMonth{n}=X,5,I
 C(3,#UpdateCode,1,$,s)
 C(5,#CloseFg{n},Y,s,$)
-IF(#OldAllocationTimes==#AllocationTimes,S,$)
+IF({n}>#AllocationTimes,s,$)
 @
+IF({n}>#AllocationTimes,s,V(7))
 C(4,#YearMonth{n},S,$)
 IF({n}==1,$,IF(#YearMonth{n}<=#YearMonth{m},V(P,不可<=前筆年月),$))
 A(YM,1,#YearMonth{n})
 
 #YearMonthX{n}=A,5,S
 C(3,#UpdateCode,1,$,s)
-IF(#OldAllocationTimes==#AllocationTimes,S,$)
+IF({n}>#AllocationTimes,s,$)
 C(4,#YearMonth{n},S,$)
 E(0,#YearMonth{n})
 T(2,@YearMonth{n},#YearMonthX{n})
 
+!金額必須有值且不為0
 #AllocationAmt{n}=m,14,I
 C(3,#UpdateCode,1,$,s)
 C(5,#CloseFg{n},Y,s,$)
-IF(#OldAllocationTimes==#AllocationTimes,S,$)
+IF({n}>#AllocationTimes,s,$)
+@
+IF({n}>#AllocationTimes,s,V(2,0))
 
 #CloseFg{n}=X,1,L
 
@@ -431,11 +465,20 @@ C(4,#YearMonth{n},INVOKEJS(SHOW,grd2_{n},0),INVOKEJS(SHOW,grd2_{n},1))
 
 ##end
 
-#gridAmt=m,14,S
-E(0,#AllocationAmt1+#AllocationAmt2+#AllocationAmt3+#AllocationAmt4+#AllocationAmt5+#AllocationAmt6+#AllocationAmt7+#AllocationAmt8+#AllocationAmt9+#AllocationAmt10)
+#wkAllocationSum=m,14,S
+E(0,0)
+!金額加總
+##loop{times:50,n:1}
+#wkgridAmt{n}=X,1,S
+E(0,@wkAllocationSum,#wkAllocationSum+#AllocationAmt{n})
+##end
 
+!新增修改且為攤提者
+!檢查金額家總是否符合總金額
 #checkAmt=X,1,S
-IF(#gridAmt==#TimSyndFee,$,V(P,金額不符))
+C(3,#UpdateCode,1,$,s)
+C(5,#IsAllocation,N,S,$)
+IF(#wkAllocationSum==#TimSyndFee,$,V(P,金額不符))
 
 
 
@@ -454,7 +497,7 @@ IF(#gridAmt==#TimSyndFee,$,V(P,金額不符))
 <sub type="DC" name="p2" layout="cols=1;screen.width=[250,300];printer.width=[40,60];">
 [
 ["<font color=red>@費用　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 "],
-["#grid#,{id:2,expand:true,loop:10,row_height:1,s_cols:[70,200], p_cols:[20,20]}","","",
+["#grid#,{id:2,expand:true,loop:50,row_height:1,s_cols:[70,200], p_cols:[20,20]}","","",
 ["@@年月@@","@@@@@攤提金額@@@@@","@@已攤銷@@"],
 [[#YearMonth1],[#AllocationAmt1],[#CloseFg1]],
 ],
@@ -506,7 +549,7 @@ T(3,[L2604] 聯貸費用維護)
 #OldFacmNo
 #OldRvNo
 #OldAcctCode
-##loop{times:10,n:1}
+##loop{times:50,n:1}
 #YearMonth{n}
 #AllocationAmt{n}
 #CloseFg{n}

@@ -38,17 +38,19 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[50,50,600,300];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[350,900];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8333]                                 (571)更生款項統一收付回報債權資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+申請日期",#ApplyDate],["#FdBankId+受理款項統一收付之債權金融機構代號",#BankId,#BankIdX],
-["#FdOwnerYn+是否為更生債權人",#OwnerYn,#OwnerYnX],["#FdPayYn+債務人是否仍依更生方案正常還款予本金融機構",#PayYn,#PayYnX],
-["#FdAllotAmt+參與分配債權金額",#AllotAmt],
-["#FdUnallotAmt+未參與分配債權金額",#UnallotAmt],
-["#FdOwnerAmt+本金融機構更生債權總金額",#OwnerAmt],
+[#<->#,"#FdApplyDate+申請日期",#ApplyDate],
+[#<->#,"#FdBankId+受理款項統一收付之債權金融機構代號",#BankId,#BankIdX],
+[#<->#,"#FdOwnerYn+是否為更生債權人",#OwnerYn,#OwnerYnX],
+[#<->#,"#FdPayYn+債務人是否仍依更生方案正常還款予本金融機構",#PayYn,#PayYnX],
+[#<->#,"#FdAllotAmt+參與分配債權金額",#AllotAmt],
+[#<->#,"#FdUnallotAmt+未參與分配債權金額",#UnallotAmt],
+[#<->#,"#FdOwnerAmt+本金融機構更生債權總金額",#OwnerAmt],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -207,7 +209,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 ![債權金融機構代號]
 #SubmitKey=X,3,L

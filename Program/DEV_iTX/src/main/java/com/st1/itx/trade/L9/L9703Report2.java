@@ -163,10 +163,11 @@ public class L9703Report2 extends MakeReport {
 //			this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 //			this.print(1, 20, "*******    查無資料   ******");
 			
-//			this.setRptItem("放款本息攤還表暨繳息通知單(無符合資料)");
-//			setFont(1, 14);
-//			printCm(1, 4, "【無符合資料】");
-//		}
+		if (this.getPrintCnt() == 0) {
+			this.setRptItem("放款本息攤還表暨繳息通知單(無符合資料)");
+			setFont(1, 14);
+			printCm(1, 4, "【無符合資料】");
+		}
 
 		long sno = this.close();
 
@@ -190,13 +191,17 @@ public class L9703Report2 extends MakeReport {
 			termEnd = 6;
 		}
 
+		int tbsdy = titaVo.getEntDyI();
+		
 		dBaTxCom.setTxBuffer(txbuffer);
 		this.info("entdy = " + entdy);
 
 		try {
-			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9703Vo.get("F4")), parse.stringToInteger(tL9703Vo.get("F5")), 0, termEnd,
-					titaVo);
+//			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
+//					parse.stringToInteger(tL9703Vo.get("F4")), parse.stringToInteger(tL9703Vo.get("F5")), 0, termEnd,
+//					titaVo);
+			listBaTxVo = dBaTxCom.settingUnPaid(tbsdy, parse.stringToInteger(tL9703Vo.get("F4")), 
+					parse.stringToInteger(tL9703Vo.get("F5")), 0, 1, BigDecimal.ZERO, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -380,7 +385,7 @@ public class L9703Report2 extends MakeReport {
 			if (listBaTxVo.get(i).getRepayType() == 4 || listBaTxVo.get(i).getRepayType() == 6) {
 				acctFee = acctFee.add(listBaTxVo.get(i).getUnPaidAmt());
 			}
-		}
+		} // for
 
 		intRate = listBaTxVo.get(0).getIntRate();
 
@@ -442,6 +447,8 @@ public class L9703Report2 extends MakeReport {
 		printCm(1, y, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		String BreachDate = "";
+		int size = 0 ;
+		String fsPayIntDate = "";
 		for (int i = 0; i < listBaTxVo.size(); i++) {
 			// 本金、利息
 			if (listBaTxVo.get(i).getDataKind() != 2) {
@@ -458,7 +465,11 @@ public class L9703Report2 extends MakeReport {
 				continue;
 			}
 
+			size++;
 			String sPayIntDate = FormatUtil.pad9("" + payIntDate, 7);
+			if(fsPayIntDate == "") {
+			  fsPayIntDate = sPayIntDate;
+			}
 			// 違約金
 			// 本金
 			// 利息
@@ -511,10 +522,30 @@ public class L9703Report2 extends MakeReport {
 //			this.print(0, 100, df1.format(bSummry), "R");
 			printCm(19, y, df1.format(bSummry), "R");
 
+			this.info("bBreachAmt = " + bBreachAmt);
 			if (bBreachAmt.compareTo(new BigDecimal("0")) == 0 && "".equals(BreachDate)) {
 				BreachDate = sPayIntDate;
+				this.info("BreachDate = " + BreachDate);
+			}
+			
+			if(i == listBaTxVo.size() - 1 && "".equals(BreachDate)) {
+				
+				dDateUtil.init();
+				dDateUtil.setDate_1(sPayIntDate);
+				dDateUtil.setMons(1);
+				dDateUtil.setDays(0);
+				
+				BreachDate = "" + dDateUtil.getCalenderDay();
 			}
 		} // loop -- batxCom
+		
+		dDateUtil.init();
+		dDateUtil.setDate_1(entdy);
+		dDateUtil.setMons(0);
+		dDateUtil.setDays(1);
+		
+		int nextday = dDateUtil.getCalenderDay();
+		
 
 		l++;
 		y = top + yy + (++l) * h;
@@ -523,13 +554,16 @@ public class L9703Report2 extends MakeReport {
 //		this.print(1, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
 		y = top + yy + (++l) * h;
 		printCm(1, y, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
-		if (!"".equals(BreachDate)) {
+		// 第一筆應繳日違約金就為0時不列印 
+		if (fsPayIntDate != BreachDate  && !"".equals(BreachDate)) {
 //			this.print(1, 8, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢" + "　該違約金金額");
 			y = top + yy + (++l) * h;
 			printCm(1, y, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢" + "　該違約金金額");
 //			this.print(1, 8, "＊＊截至　" + " 　　　　　　　　　" + "，貸款尚欠   期。請撥空盡速繳納");
 			y = top + yy + (++l) * h;
-			printCm(1, y, "＊＊截至　" + " 　　　　　　　　　" + "，貸款尚欠   期。請撥空盡速繳納");
+			printCm(1, y, "＊＊截至" + showDate(""+nextday, 2) + "，貸款尚欠" + FormatUtil.pad9("" + size, 3) + "期。請撥空盡速繳納");
+//			this.print(0, 18, showDate(""+nextday, 2));
+//			this.print(0, 49, FormatUtil.pad9("" + size, 3),"R");
 		}
 //		if (tL9703Vo.get("F8").equals("0")) {
 //			this.print(1, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");

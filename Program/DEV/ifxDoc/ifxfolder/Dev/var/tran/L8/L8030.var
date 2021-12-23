@@ -38,7 +38,7 @@ K(MODIFYBUTTON,查詢)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,900];printer.width=[20,20];">
 [
 ["[L8030]                                 消債條列JCIC報送資料"],
 ["#FdTranCode+報送檔代碼",#TranCode,#TranCodeX],
@@ -144,7 +144,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=X,100,L
 
 ! 0->L
 ! 2->2

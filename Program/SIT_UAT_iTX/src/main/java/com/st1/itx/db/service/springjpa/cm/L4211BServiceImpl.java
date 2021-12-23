@@ -37,10 +37,15 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 	int iENTDY;
+	String inputReconCode;
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		
+		inputReconCode =  String.valueOf(titaVo.get("ReconCode")).trim();
+		if(inputReconCode.equals("A7")) {
+			inputReconCode = "P03";
+		}
 		iENTDY = Integer.valueOf(titaVo.get("EntryDate")) + 19110000;
 		
+		this.info("ReconCode     = "+ inputReconCode);
 		this.info("ENTDY ==>" + iENTDY);
 		
 		// 匯款轉帳失敗表 - 明細
@@ -68,6 +73,11 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "                       AND BATX.\"CustNo\" <> 0 ";
 		sql += " WHERE BATX.\"RepayCode\" = '01' ";
 		sql += "  AND BATX.\"EntryDate\" = :iENTDY ";
+		sql += " AND CASE";
+		sql += "       WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
+		sql += "       THEN :inputReconCode";
+		sql += "     ELSE BATX.\"ReconCode\" ";
+		sql += "     END = BATX.\"ReconCode\"";
 		sql += " ORDER BY BATX.\"ReconCode\"  "; // 存摺代號(表頭)
 		sql += "       , BATX.\"BatchNo\"   "; // 批次號碼(表頭)
 		sql += "       , BATX.\"DetailSeq\" "; // 匯款序號
@@ -79,6 +89,7 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iENTDY", iENTDY);
+		query.setParameter("inputReconCode", inputReconCode);
 		return this.convertToMap(query);
 	}
 

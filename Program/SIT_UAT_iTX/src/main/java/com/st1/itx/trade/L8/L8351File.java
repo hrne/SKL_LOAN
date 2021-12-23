@@ -15,6 +15,7 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TbJcicMu01Service;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 
 @Component("L8351File")
 @Scope("prototype")
@@ -43,9 +44,9 @@ public class L8351File extends MakeFile {
 		// 檔名
 		String filename = iSubmitKey + iTxtDate.substring(3) + ".MU1";
 
-		this.open(titaVo, date, brno, filecode, fileitem, filename, 2);
+		this.open(titaVo, date, brno, filecode, fileitem, filename,2);
 		// 用String.format()
-		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0,Integer.MAX_VALUE, titaVo);
 
 		// 第一行
 		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s%s          02-23895858#7064放款部聯絡人-陳仕賢", iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
@@ -61,15 +62,15 @@ public class L8351File extends MakeFile {
 					iTotalCount += 1;
 
 					// 產檔內容
-
+					
 					int iDataDate = Integer.valueOf(aTbJcicMu01.getDataDate());
 					int iAuthStartDay = Integer.valueOf(aTbJcicMu01.getAuthStartDay());
 					int iAuthEndDay = Integer.valueOf(aTbJcicMu01.getAuthEndDay());
-
+					
 					String sDataDate = "";
 					String sAuthStartDay = "";
 					String sAuthEndDay = "";
-
+					
 					String iEmpId = aTbJcicMu01.getEmpId();
 					String iAuthMgrIdS = aTbJcicMu01.getAuthMgrIdS();
 					String iAuthMgrIdE = aTbJcicMu01.getAuthMgrIdE();
@@ -91,7 +92,7 @@ public class L8351File extends MakeFile {
 					if (iAuthEndDay > 0) {
 						sAuthEndDay = String.valueOf(iAuthEndDay);
 					}
-
+					
 					if (dCdEmp != null) {
 						iEmpIdX = dCdEmp.getFullname();
 					}
@@ -101,7 +102,7 @@ public class L8351File extends MakeFile {
 					if (eCdEmp != null) {
 						iAuthMgrIdEX = dCdEmp.getFullname();
 					}
-
+					
 					if (!aTbJcicMu01.getAuthItemQuery().trim().isEmpty()) {
 						iQuery = "A";
 					}
@@ -111,18 +112,35 @@ public class L8351File extends MakeFile {
 					if (!aTbJcicMu01.getAuthItemOther().trim().isEmpty()) {
 						iOther = "C";
 					}
-
-					String iContent = " " + StringUtils.rightPad(aTbJcicMu01.getHeadOfficeCode(), 3, " ") + StringUtils.rightPad(aTbJcicMu01.getBranchCode(), 4, " ")
-							+ StringUtils.rightPad(sDataDate, 7, " ")
-							// 員工代號40
-							+ StringUtils.rightPad(iEmpIdX, 40, " ") + StringUtils.rightPad(iEmpId, 8, " ") + StringUtils.rightPad(aTbJcicMu01.getTitle(), 50, "　")
-							+ StringUtils.rightPad(aTbJcicMu01.getAuthQryType(), 1, " ") + StringUtils.rightPad(aTbJcicMu01.getQryUserId(), 8, " ") + "          "
-							+ StringUtils.rightPad(iQuery, 1, " ") + StringUtils.rightPad(iReview, 1, " ") + StringUtils.rightPad(iOther, 1, " ") + StringUtils.rightPad(sAuthStartDay, 7, " ")
-							// 主管姓名起40
-							+ StringUtils.rightPad(iAuthMgrIdSX, 40, " ") + StringUtils.rightPad(iAuthMgrIdS, 8, " ") + StringUtils.rightPad(sAuthEndDay, 7, " ")
-							// 主管姓名起240
-							+ StringUtils.rightPad(iAuthMgrIdEX, 20, " ") + StringUtils.rightPad(iAuthMgrIdE, 8, " ") + StringUtils.rightPad(aTbJcicMu01.getEmailAccount(), 50, " ")
-							+ StringUtils.rightPad(aTbJcicMu01.getModifyUserId(), 25, " ");// update by Hedy (2021/11/3)
+					
+					//補空白
+					String iHeadOfficeCode = FormatUtil.padX(aTbJcicMu01.getHeadOfficeCode(),3);
+					String iBranchCode = FormatUtil.padX(aTbJcicMu01.getBranchCode(),4);
+					iEmpIdX = FormatUtil.padX(iEmpIdX,40);
+					iEmpId = FormatUtil.padX(iEmpId,8);
+					String iTitle = FormatUtil.padX(aTbJcicMu01.getTitle(),50);
+					String iAuthQryType = FormatUtil.padX(aTbJcicMu01.getAuthQryType(),1);
+					String iQryUserId = FormatUtil.padX(aTbJcicMu01.getQryUserId(),8);
+					iQuery = FormatUtil.padX(iQuery,1);
+					iReview = FormatUtil.padX(iReview,1);
+					iOther = FormatUtil.padX(iOther,1);
+					iAuthMgrIdSX = FormatUtil.padX(iAuthMgrIdSX,40);
+					iAuthMgrIdS = FormatUtil.padX(iAuthMgrIdS,8);
+					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX,40);
+					iAuthMgrIdE = FormatUtil.padX(iAuthMgrIdE,8);
+					String iEmailAccount = FormatUtil.padX(aTbJcicMu01.getEmailAccount(),50);
+					String iContent = " "
+					        + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ")
+							+ iEmpIdX+iEmpId+iTitle+iAuthQryType+iQryUserId
+							+ "          "
+							+ iQuery + iReview + iOther 
+							+ StringUtils.rightPad(sAuthStartDay, 7, " ")
+							+ iAuthMgrIdSX+iAuthMgrIdS
+							+ StringUtils.rightPad(sAuthEndDay, 7, " ")
+							+ iAuthMgrIdEX+iAuthMgrIdE
+							+ iEmailAccount
+//							+ StringUtils.rightPad(aTbJcicMu01.getModifyUserId(), 25, " ");
+							+ "                         ";
 					this.put(iContent);
 					// 修改Jcic日期為今天日期
 					TbJcicMu01 bTbJcicMu01 = iTbJcicMu01Service.holdById(aTbJcicMu01.getTbJcicMu01Id());
@@ -134,13 +152,13 @@ public class L8351File extends MakeFile {
 					}
 				}
 			}
-			if (iTotalCount == 0) {
-				throw new LogicException(titaVo, "E0001", "無可轉出資料");
-			}
-			// 最後一行
-			String sCount = String.valueOf(iTotalCount);// update by Hedy (2021/11/3)
-			String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
-			this.put(footText);
+		if (iTotalCount == 0) {
+			throw new LogicException(titaVo, "E0001", "無可轉出資料");
+		}
+		// 最後一行
+		String sCount = String.valueOf(iTotalCount);// update by Hedy (2021/11/3)
+		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
+		this.put(footText);
 		}
 	}
 }

@@ -109,11 +109,19 @@ public class AcReceivableCom extends TradeBuffer {
 		// 2.銷帳科目記號 <> 0 0－非銷帳科目 1－會計銷帳科目 2－業務銷帳科目 3-未收款, 4-短繳期金,
 		// 5-另收欠款,8-核心銷帳碼科目(不寫銷帳檔)
 		for (int i = 0; i < this.txBuffer.getAcDetailList().size(); i++) {
-			if (AcHCode == 0)
+			if (AcHCode == 0) {
 				idx = i;
-			else
+			} else {
 				idx = this.txBuffer.getAcDetailList().size() - 1 - i;
+			}
+
+			wkRvFg = 0;
+			wkOpenAcDate = 0;
+			wkTxAmt = BigDecimal.ZERO;
+			wkRvNo = "";
+			wkAcctCode = "";
 			ac = this.txBuffer.getAcDetailList().get(idx);
+			tTempVo.clear();
 			tTempVo = tTempVo.getVo(ac.getJsonFields());
 			if ((ac.getAcctFlag() == 1 && !"L6801".equals(titaVo.getTxcd()))
 					|| (ac.getReceivableFlag() > 0 && ac.getReceivableFlag() < 8)) {

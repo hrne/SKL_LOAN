@@ -158,7 +158,8 @@ public class TxToDoCom extends TradeBuffer {
 //		this.info("upd "+tDetail.toString());
 		// 新增與處理交易序號需不相同
 		if (tDetail != null && tDetail.getStatus() <= 2) {
-			if (tDetail.getTitaTlrNo() == null || titaVo.getTlrNo() == null || !tDetail.getTitaTlrNo().equals(titaVo.getTlrNo())
+			if (tDetail.getTitaTlrNo() == null || titaVo.getTlrNo() == null
+					|| !tDetail.getTitaTlrNo().equals(titaVo.getTlrNo())
 					|| parse.stringToInteger(titaVo.getTxtNo()) != tDetail.getTitaTxtNo()) {
 				updDetailStatus(2, tDetailId, titaVo); // 2.已處理
 			}
@@ -278,7 +279,8 @@ public class TxToDoCom extends TradeBuffer {
 			throw new LogicException(titaVo, "E0013", "toDoList empty ");
 		for (int i = 0; i < detailList.size(); i++) {
 			if (!detailList.get(i).getItemCode().equals(detailList.get(0).getItemCode())) {
-				throw new LogicException(titaVo, "E0013", "每筆項目需相同 " + detailList.get(0).getItemCode() + " " + detailList.get(i).getItemCode());
+				throw new LogicException(titaVo, "E0013",
+						"每筆項目需相同 " + detailList.get(0).getItemCode() + " " + detailList.get(i).getItemCode());
 			}
 		}
 	}
@@ -292,7 +294,8 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param titaVo     TitaVo
 	 * @throws LogicException ...
 	 */
-	public void addByDetailList(boolean dupSkip, int HCode, List<TxToDoDetail> detailList, TitaVo titaVo) throws LogicException {
+	public void addByDetailList(boolean dupSkip, int HCode, List<TxToDoDetail> detailList, TitaVo titaVo)
+			throws LogicException {
 		this.info("TxToDoCom ... addByDetailList" + detailList.size());
 		// check Detail List
 		checkDetailList(detailList, titaVo);
@@ -464,11 +467,12 @@ public class TxToDoCom extends TradeBuffer {
 	 * @return 刪除筆數
 	 * @throws LogicException ...
 	 */
-	public int delDetailByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo, TitaVo titaVo) throws LogicException {
+	public int delDetailByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo,
+			TitaVo titaVo) throws LogicException {
 		int size = 0;
 		this.info("TxToDoCom ... delByDetailList ...");
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.findTxNoEq(ItemCode, TitaEntdy + 19110000, TitaKinbr, TitaTlrNo, parse.stringToInteger(TitaTxtNo), this.index, Integer.MAX_VALUE,
-				titaVo);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.findTxNoEq(ItemCode, TitaEntdy + 19110000, TitaKinbr,
+				TitaTlrNo, parse.stringToInteger(TitaTxtNo), this.index, Integer.MAX_VALUE, titaVo);
 		if (slTxToDoDetail != null) {
 			size = slTxToDoDetail.getContent().size();
 			delByDetailList(slTxToDoDetail.getContent(), titaVo);
@@ -493,7 +497,8 @@ public class TxToDoCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", "TxToDoMain" + e.getErrorMsg());
 			}
 		}
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(itemCode, 0, 9, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(itemCode, 0, 9, this.index,
+				Integer.MAX_VALUE, titaVo);
 		if (slTxToDoDetail != null) {
 			try {
 				txToDoDetailService.deleteAll(slTxToDoDetail.getContent(), titaVo);
@@ -552,11 +557,13 @@ public class TxToDoCom extends TradeBuffer {
 	 * @return 刪除筆數
 	 * @throws LogicException ...
 	 */
-	public int delReserveByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo, TitaVo titaVo) throws LogicException {
+	public int delReserveByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo,
+			TitaVo titaVo) throws LogicException {
 		int size = 0;
 
 		this.info("TxToDoCom ... delByDetailList ...");
-		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.findTxNoEq(ItemCode, TitaEntdy + 19110000, TitaKinbr, TitaTlrNo, parse.stringToInteger(TitaTxtNo), this.index,
+		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.findTxNoEq(ItemCode,
+				TitaEntdy + 19110000, TitaKinbr, TitaTlrNo, parse.stringToInteger(TitaTxtNo), this.index,
 				Integer.MAX_VALUE, titaVo);
 		if (slTxToDoDetailReserve != null) {
 			size = slTxToDoDetailReserve.getContent().size();
@@ -594,9 +601,11 @@ public class TxToDoCom extends TradeBuffer {
 				// delete txToDoDetail depending on YdReserveF
 				// 昨日留存 == Y => 刪除 資料狀態 = 2.已處理, 3.已刪 (不含 0.未處理 1.已保留)，else 刪除全部
 				if ("Y".equals(tMain.getYdReserveFg()))
-					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 2, 3, this.index, Integer.MAX_VALUE, titaVo);
+					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 2, 3, this.index,
+							Integer.MAX_VALUE, titaVo);
 				else
-					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 9, this.index, Integer.MAX_VALUE, titaVo);
+					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 9, this.index,
+							Integer.MAX_VALUE, titaVo);
 				if (detailList != null) {
 					try {
 						txToDoDetailService.deleteAll(detailList.getContent(), titaVo);
@@ -606,7 +615,8 @@ public class TxToDoCom extends TradeBuffer {
 				}
 				// if YdReserveFg = 'Y' find all remaining detail list
 				if ("Y".equals(tMain.getYdReserveFg())) {
-					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 1, this.index, Integer.MAX_VALUE, titaVo);
+					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 1, this.index,
+							Integer.MAX_VALUE, titaVo);
 					if (detailList != null) {
 						TxToDoMain tTxToDoMain = new TxToDoMain();
 						mntMainFixValue(tTxToDoMain, tMain.getItemCode(), titaVo);
@@ -741,6 +751,9 @@ public class TxToDoCom extends TradeBuffer {
 			break;
 		case "ACCL03":
 			settingValue = "ACCL03;Y;Y;-;-;-;L6985;L6985;L618D;Y;放款承諾提存入帳";
+			break;
+		case "ACCL04":
+			settingValue = "ACCL04;Y;C;-;-;-;L6989;L6989;L3230;Y;聯貸費用攤提入帳";
 			break;
 		case "RVTX00":
 			settingValue = "RVTX00;-;C;-;-;Y;L698A;L6984;L3100;Y;預約撥款到期";

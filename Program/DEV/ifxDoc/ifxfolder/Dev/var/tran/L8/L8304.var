@@ -258,7 +258,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 
 ![報送單位代號]

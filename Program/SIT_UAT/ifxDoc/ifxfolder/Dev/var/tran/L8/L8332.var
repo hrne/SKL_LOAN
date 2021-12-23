@@ -38,13 +38,14 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,250,250];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,900];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8332]                                 (570)受理更生款項統一收付通知"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+申請日期",#ApplyDate],["#FdAdjudicateDate+更生方案認可裁定日",#AdjudicateDate],
+[#<->#,"#FdApplyDate+申請日期",#ApplyDate],
+[#<->#,"#FdAdjudicateDate+更生方案認可裁定日",#AdjudicateDate],
 [#<->#,"#FdBankCount+更生債權金融機構家數",#BankCount],
 [#<->#,"#FdBank1+債權金融機構代號1",#Bank1,#BankX1],[#<->#,"#FdBank2+債權金融機構代號2",#Bank2,#BankX2],
 [#<->#,"#FdBank3+債權金融機構代號3",#Bank3,#BankX3],[#<->#,"#FdBank4+債權金融機構代號4",#Bank4,#BankX4],
@@ -337,7 +338,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 ![債權金融機構代號]
 #SubmitKey=X,3,L

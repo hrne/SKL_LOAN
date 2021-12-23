@@ -45,7 +45,7 @@ E(0,0)
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCaseStatus+案件狀態",#CaseStatus,#CaseStatusX],[#ClaimDateName,#ClaimDate],
-["#FdCourtCode+承審法院代碼",#CourtCode,#CourtCodeX],
+[#<->#,"#FdCourtCode+承審法院代碼",#CourtCode,#CourtCodeX],
 [#<->#,"#FdYear+年度別",#Year,"</br>","以＂YYY表示＂。 
 年度別是以法院發文時之案號前段為主，例如105年度消債更字第221號，發文日期106/01/20，年度別應報送105。
 "],
@@ -276,7 +276,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 
 ![報送單位代號]

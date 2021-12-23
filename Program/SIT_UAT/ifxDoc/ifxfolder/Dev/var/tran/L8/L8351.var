@@ -50,7 +50,7 @@ E(0,0)
 
 !---------- AP Button AREA ----------
 #FdSubmitType=X,2,L
-T(2, )
+T(2,*)
 #FdFuleOption=X,2,L
 T(2, )
 #FdSubmitKey=X,2,L
@@ -133,12 +133,15 @@ E(0,0)
 !C(5,#TXFORM,L8351,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L8351] 債務人繳款資料檔案)
+T(3,[L8351] 聯徵產品檔案匯出作業)
 
-!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#ExcelSnoM=X,8,S
+E(2,@SnoM,#ExcelSnoM)
+#SnoM=A,8,S
 
-!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#ExcelPrtF=A,1,S
+C(3,#SnoM,0,E(0,0),E(0,1))
 
 </sub>
 
@@ -154,22 +157,15 @@ T(3,[L8351] 債務人繳款資料檔案)
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L8351^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L8351
+#ExcelSnoM
+^
 </sub>
 
-<sub type="PART" name="L8351" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
-[
-["[L8351]                                 債務人繳款資料檔案"],
-[#<->#,"@案件編號"],
-[#<->#,"@統一編號"],
-["@借款人戶號"],
-["@核准編號"],
-]
-</sub>
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-
-<include src="PRT.icf::INQ01.sel"/>
+#ExcelPrtF=1,PDF,,,,,,,,,,,,,ExcelSnoM;2,Mu1檔案
+^
 </sub>

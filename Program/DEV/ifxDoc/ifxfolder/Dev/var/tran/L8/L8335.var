@@ -38,14 +38,16 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[300,350,150,150];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,900];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8335]                                 (573)債務人繳款資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+申請日期",#ApplyDate],["#FdPayDate+繳款日期",#PayDate],
-["#FdPayAmt+本日繳款金額",#PayAmt],["#FdTotalPayAmt+累計繳款金額",#TotalPayAmt],
+[#<->#,"#FdApplyDate+申請日期",#ApplyDate],
+[#<->#,"#FdPayDate+繳款日期",#PayDate],
+[#<->#,"#FdPayAmt+本日繳款金額",#PayAmt],
+[#<->#,"#FdTotalPayAmt+累計繳款金額",#TotalPayAmt],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 !---------- AP Button AREA ----------
@@ -186,7 +188,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 ![報送單位代號]
 #SubmitKey=X,3,L
@@ -214,14 +216,14 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PayAmt,#L8r36PayAmt),$)
 C(5,#TranKey,D,s,$)
-@V(2,0)
+
 !累計繳款金額
 #TotalPayAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@TotalPayAmt,#L8r36TotalPayAmt),$)
 C(5,#TranKey,D,s,$)
-@V(2,0)
+
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

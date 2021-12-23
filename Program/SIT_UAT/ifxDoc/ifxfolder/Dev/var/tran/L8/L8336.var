@@ -38,13 +38,14 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,350,150,300];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,950];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8336]                                 (574)更生款項統一收付結案通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+申請日期",#ApplyDate],["#FdCloseDate+結案日期",#CloseDate],
+[#<->#,"#FdApplyDate+申請日期",#ApplyDate],
+[#<->#,"#FdCloseDate+結案日期",#CloseDate],
 [#<->#,"#FdCloseMark+結案原因",#CloseMark,#CloseMarkX],
 [#<->#,"#FdPhoneNo+通訊電話",#PhoneNo],
 [#<->#,"#FdTranKey","室內電話與行動電話請擇一填報。<font color=red>室內電話建議格式：02－28225252","＃1688。行動電話建議","格式：0951－123456"],
@@ -194,7 +195,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 ![報送單位代號]
 #SubmitKey=X,3,L

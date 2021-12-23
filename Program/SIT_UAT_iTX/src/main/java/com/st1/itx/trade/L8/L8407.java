@@ -48,21 +48,22 @@ public class L8407 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
-
+		long sno1 = 0;
 		switch (iSubmitType) {
 		case 1:
-			doFile(titaVo);
+			sno1 = doFile(titaVo);
 			break;
 		case 2:
 			doRemoveJcicDate(titaVo);
 			break;
 		}
+		totaVo.put("ExcelSnoM", "" + sno1);
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	public void doFile(TitaVo titaVo) throws LogicException {
+	public long doFile(TitaVo titaVo) throws LogicException {
 
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iReportDate = titaVo.getParam("ReportDate");
@@ -75,7 +76,7 @@ public class L8407 extends TradeBuffer {
 		iL8403File.exec(titaVo);
 		long fileNo = iL8403File.close();
 		iL8403File.toFile(fileNo, fileNname);
-
+		return fileNo;
 	}
 
 	public void doRemoveJcicDate(TitaVo titaVo) throws LogicException {

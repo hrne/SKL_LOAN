@@ -9,11 +9,11 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,47)ASGN(INQHD$)
+E(0,57)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,75)ASGN(INQLEN$)
+E(0,0)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -276,8 +276,8 @@ E(0,@ContractChgCode,#L2r37ContractChgCode)
 T(2,@CurrencyCode,#L2r37CurrencyCode)
 E(0,@TwFeeAmt,#L2r37FeeAmt)
 E(0,@UsFeeAmt,#L2r37FeeAmt)
-!E(0,@AcDate,#L2r37AcDate)
-!E(0,@TitaTxtNo,#L2r37TitaTxtNo)
+E(0,@AcDate,#L2r37AcDate)
+E(0,@TitaTxtNo,#L2r37TitaTxtNo)
 T(2,@TlrNo,#L2r37TLR_NO)
 E(0,@ModifyDate,#L2r37MODIFY_DT)
 T(2,@ModifyTime,#L2r37WKTIME)
@@ -421,13 +421,12 @@ E(0,@ContractChgNo,#OContractChgNo)
 C(3,#FunCd,4,S,$)
 C(3,#FunCd,5,S,$)
 C(3,#FunCd,7,S,$)
-E(2,@ModifyDate,#OModifyDate)
+E(0,@ModifyDate,#OModifyDate)
 
 #OAcDate=D,7,S
 C(3,#FunCd,4,S,$)
 C(3,#FunCd,5,S,$)
 C(3,#FunCd,7,S,$)
-ALERT(#OAcDate)
 E(0,@AcDate,#OAcDate)
 
 

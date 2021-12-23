@@ -38,17 +38,18 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,900];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8322]                                 (440)前置調解受理申請暨請求回報債權通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],
+[#<->#,"#FdApplyDate+調解申請日",#ApplyDate],
 [#<->#,"#FdApplyType+受理方式",#ApplyType,#ApplyTypeX],
 [#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
-["#FdAgreeDate+同意書取得日期",#AgreeDate],["#FdStartDate+首次調解日",#StartDate],
-["#FdRemindDate+債權計算基準日",#RemindDate],
+[#<->#,"#FdAgreeDate+同意書取得日期",#AgreeDate],
+[#<->#,"#FdStartDate+首次調解日",#StartDate],
+[#<->#,"#FdRemindDate+債權計算基準日",#RemindDate],
 [#<->#,"#FdReportYn+協辦行是否需自行回報債權",#ReportYn,#ReportYnX],
 [#<->#,"#FdNotBankId1+未揭露債權機構代號1",#NotBankId1,#NotBankIdX1],
 [#<->#,"#FdNotBankId2+未揭露債權機構代號2",#NotBankId2,#NotBankIdX2],
@@ -263,7 +264,7 @@ S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
 
-#CustIdX=X,2.50,L
+#CustIdX=x,100,L
 
 ![報送單位代號]
 #SubmitKey=X,3,I
