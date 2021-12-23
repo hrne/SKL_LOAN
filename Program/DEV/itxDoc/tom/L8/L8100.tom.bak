@@ -1,0 +1,11 @@
+LogNo=9,8
+Status=X,10
+StatusCode=X,10
+StatusDesc=X,100
+IsSimilar=X,1
+IsSan=X,1
+IsBanNation=X,1
+ConfirmStatus=X,1
+ConFirmCode=X,1
+ConfrimEmpNo=X,6
+ConfirmTranCode=X,5

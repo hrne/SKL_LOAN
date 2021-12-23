@@ -1,0 +1,11 @@
+ReportBCustNo=9,7
+ReportBFacmNo=9,3
+ReportBCustName=X,40
+ReportBFirstDrDwDate=9,7
+ReportBClCode1=9,1
+ReportBClCode2=9,2
+ReportBClNo=9,7
+ReportBNowInsuNo=X,20
+ReportBInsuStartDate=9,7
+ReportBInsuEndDAte=9,7
+ReportBErrMsg=X,20

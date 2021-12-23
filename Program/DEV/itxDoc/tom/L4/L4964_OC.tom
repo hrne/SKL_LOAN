@@ -1,0 +1,15 @@
+OOSelfInsuCode=9,1
+OOPrevInsuNo=X,16
+OOEndoInsuNo=X,16
+OOBdLocation=X,60
+OONowInsuNo=X,16
+OOInsuCompany=9,2
+OOInsuStartDate=9,7
+OOInsuEndDate=9,7
+OOInsuTypeCode=9,2
+OOFireInsuCovrg=9,14
+OOEthqInsuCovrg=9,14
+OOFireInsuPrem=9,14
+OOEthqInsuPrem=9,14
+OOInsuYearMonth=9,5
+OOBtnFlag=9,1

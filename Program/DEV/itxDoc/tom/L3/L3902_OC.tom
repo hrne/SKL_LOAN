@@ -1,0 +1,7 @@
+OLoanTerm=9,3
+ODuePayAmt=9,14
+OBalance=9,14
+OInterest=9,14
+OUnpaidInt=9,14
+OSumUnpaidInt=9,14
+ORealPayAmt=9,14

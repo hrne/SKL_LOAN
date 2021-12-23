@@ -1,0 +1,16 @@
+ItemCode=X,6
+ItemDesc=X,30
+ChainInqTxcd=X,5
+ChainUpdTxcd=X,5
+YdReserveFg=X,1
+YdReserve=9,5
+TdNew=9,5
+TotalCnt=9,5
+TdProcess=9,5
+TdDelete=9,5
+DeleteFg=X,1
+ReserveCnt=9,5
+ReserveFg=X,1
+UnProcessCnt=9,5
+AcClsCheck=X,1
+AutoFg=X,1

@@ -1,0 +1,14 @@
+OOProcStatus=9,1
+OOAccruedType=X,20
+OOAcctCode=X,3
+OOAcctItem=X,40
+OOAcDate=9,7
+OOAcBookCode=X,7
+OORmk=X,300
+OOSlipBatNo=9,2
+OORelNo=X,26
+OODbAmt=9,14
+OOCustNo=9,7
+OOFacmNo=9,3
+OOItemCode=X,6
+OODtlValue=X,30

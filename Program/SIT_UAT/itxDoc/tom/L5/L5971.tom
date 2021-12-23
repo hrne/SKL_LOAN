@@ -1,0 +1,12 @@
+OCustNo=9,7
+OCaseSeq=9,3
+OCaseKindCode=9,1
+OMainPrincipalBal=9,14
+OAccuOverAmt=9,14
+ODueAmt=9,14
+OCustLoanKind=X,1
+OAccuTempAmt=9,14
+OAccuDueAmt=9,14
+ORemainPeriod=9,3
+OCustStatus=X,1
+OAccuSklShareAmt=9,14

@@ -1,0 +1,12 @@
+ReportBInsuNo=X,20
+ReportBInsuType=9,2
+ReportBInsuFee=9,14
+ReportBInsuStartDate=9,7
+ReportBInsuEndDate=9,7
+ReportBInsuredAddress=X,60
+ReportBCustNo=9,7
+ReportBFacmNo=9,3
+ReportBTelId=X,10
+ReportBTelCode=X,10
+ReportBTelName=X,12
+ReportBCommAmt=9,14
