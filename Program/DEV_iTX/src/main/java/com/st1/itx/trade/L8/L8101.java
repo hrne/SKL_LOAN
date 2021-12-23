@@ -128,7 +128,8 @@ public class L8101 extends TradeBuffer {
 			txToDoCom.setTxBuffer(this.getTxBuffer());
 
 			String dataLines = "<" + custMobile + ">";
-			dataLines += "\"H1\",\"" + custMain.getCustId() + "\",\"" + custMobile + "\",\"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。\"";
+			dataLines += "\"H1\",\"" + custMain.getCustId() + "\",\"" + custMobile
+					+ "\",\"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。\"";
 
 			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setCustNo(custMain.getCustNo());
@@ -212,7 +213,8 @@ public class L8101 extends TradeBuffer {
 
 		Long pdfSno = 0L;
 
-		if ("2".equals(txAmlCredit.getProcessType()) && custMain.getCustNo() > 0 && "N".equals(titaVo.get("LogFlag").trim())) {
+//		if ("2".equals(txAmlCredit.getProcessType()) && custMain.getCustNo() > 0 && "N".equals(titaVo.get("LogFlag").trim())) {
+		if ("2".equals(txAmlCredit.getProcessType()) && custMain.getCustNo() > 0) {
 //			#AcctDate     會計日期
 //			#CustNo       戶號-1
 //			#FacmNo       戶號-2

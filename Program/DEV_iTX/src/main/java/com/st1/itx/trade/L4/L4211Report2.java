@@ -113,7 +113,7 @@ public class L4211Report2 extends MakeReport {
 		this.print(-3, 165, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 148, "頁    數：" + this.getNowPage());
-		this.print(-5, 64, "入帳日期 :           ---");
+		this.print(-5, 64, "入帳日期 :           ");
 		
 		if(String.valueOf(entrydate).length() == 7) {
 			year = String.valueOf(entrydate).substring(0, 3);
@@ -126,10 +126,8 @@ public class L4211Report2 extends MakeReport {
 		}
 		
 		this.print(-5, 74, year + "/" + month + "/" + date);
-		this.print(-5, 88, year + "/" + month + "/" + date);
 		
 		this.print(-5, 159, "單    位：元", "R");
-		this.print(-6, 64, "會計日期 :								---");
 		this.print(-8, 1,
 				"    匯款日    匯款序號  		          匯款金額     	 匯款銀行      戶號      戶名         	     連絡電話       	       會計日期         交易序號  	     備註 ");
 		this.print(-9, 0,

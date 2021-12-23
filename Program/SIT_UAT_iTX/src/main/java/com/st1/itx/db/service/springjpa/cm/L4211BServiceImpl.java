@@ -52,9 +52,10 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "     , BATX.\"RepayAmt\""; // 匯款金額 4 
 		sql += "     , BR.\"RemintBank\""; // 匯款銀行 5 
 		sql += "     , BATX.\"CustNo\""; // 戶號 6
-		sql += "     , CM.\"CustName\""; // 戶名 7 
-		sql += "     , \"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)";
-		sql += "          AS \"CustTel\""; // 聯絡電話 8
+		sql += "     , CASE WHEN BATX.\"CustNo\" <> 0 THEN CM.\"CustName\"";
+		sql += "            ELSE N''  END AS \"CustName\""; // 戶名 7 
+		sql += "     , CASE WHEN BATX.\"CustNo\" <> 0 THEN \"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)";
+		sql += "            ELSE null  END AS \"CustTel\""; // 聯絡電話 8
 		sql += "     , BATX.\"AcDate\""; // 會計日期 9 
 		sql += "     , BATX.\"TitaTxtNo\""; // 交易序號 10  	
 		sql += "     , BATX.\"ProcCode\""; // 備註 11
@@ -64,9 +65,9 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "                       AND BR.\"BatchNo\" = BATX.\"BatchNo\" ";
 		sql += "                       AND BR.\"DetailSeq\" = BATX.\"DetailSeq\" ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\" ";
+		sql += "                       AND BATX.\"CustNo\" <> 0 ";
 		sql += " WHERE BATX.\"RepayCode\" = '01' ";
 		sql += "  AND BATX.\"EntryDate\" = :iENTDY ";
-		sql += "  AND BATX.\"CustNo\" <> 0 ";
 		sql += " ORDER BY BATX.\"ReconCode\"  "; // 存摺代號(表頭)
 		sql += "       , BATX.\"BatchNo\"   "; // 批次號碼(表頭)
 		sql += "       , BATX.\"DetailSeq\" "; // 匯款序號
