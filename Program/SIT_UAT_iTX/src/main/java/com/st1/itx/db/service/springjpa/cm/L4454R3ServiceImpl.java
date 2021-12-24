@@ -93,7 +93,7 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "     and bd.\"RepayType\" = 1                                                ";
 		sql += "     and NVL(bd.\"ReturnCode\",'  ') not in ('  ','00')                      ";
 		sql += "     and (fm.\"FirstDrawdownDate\" >= :lastYearEntryDate";
-		sql += "           and  fm.\"FirstDrawdownDate\" <= :entdy ";
+		sql += "           and  fm.\"FirstDrawdownDate\" <= :entryDate";
 		sql += "           )                                                                 ";
 		sql += "   group by CASE WHEN                                                        ";
 		sql += "                 lbm.\"PrevPayIntDate\" < 19110000 ";

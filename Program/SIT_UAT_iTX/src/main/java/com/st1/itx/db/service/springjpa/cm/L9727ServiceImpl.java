@@ -26,13 +26,29 @@ public class L9727ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(int inputDrawdownDateStart, int inputDrawdownDateEnd, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int inputDrawdownDateStart, int inputDrawdownDateEnd, TitaVo titaVo)
+			throws Exception {
 		this.info("L9727ServiceImpl.findAll ");
 
 		this.info("inputDrawdownDateStart = " + inputDrawdownDateStart);
 		this.info("inputDrawdownDateEnd = " + inputDrawdownDateEnd);
 
 		String sql = " ";
+		sql += " WITH TX AS ( ";
+		sql += "     SELECT \"CustNo\" ";
+		sql += "          , \"FacmNo\" ";
+		sql += "          , \"BormNo\" ";
+		sql += "          , \"AcDate\"   AS \"LastAcDate\" ";
+		sql += "          , \"TitaTxCd\" AS \"LastTxCd\" ";
+		sql += "          , ROW_NUMBER() ";
+		sql += "            OVER ( ";
+		sql += "                PARTITION BY \"CustNo\" ";
+		sql += "                           , \"FacmNo\" ";
+		sql += "                           , \"BormNo\" ";
+		sql += "                ORDER BY \"AcDate\" DESC ";
+		sql += "            ) AS \"Seq\" ";
+		sql += "     FROM \"LoanBorTx\" ";
+		sql += " ) ";
 		sql += " SELECT CE.\"CenterCode2Name\" "; // F0 專員部門
 		sql += "      , CE.\"CenterCode1Name\" "; // F1 專員區部
 		sql += "      , CE.\"CenterCodeName\" "; // F2 專員單位
@@ -61,9 +77,13 @@ public class L9727ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CLM.\"ClCode2\" "; // F25 擔保品代號2
 		sql += "      , CLM.\"ClNo\" "; // F26 擔保品號碼
 		sql += "      , LBM.\"GraceDate\" "; // F27 寬限到期日
-		// F28 寬限區分
-		// F29 更新會計日期
-		// F30 更新交易代號
+		sql += "      , CASE ";
+		sql += "          WHEN LBM.\"GraceDate\" != 0 ";
+		sql += "          THEN 1 "; // 有寬限期
+		sql += "        ELSE 0 "; // 無寬限期
+		sql += "        END AS \"GraceFg\" "; // F28 寬限區分
+		sql += "      , TX.\"LastAcDate\" "; // F29 更新會計日期
+		sql += "      , TX.\"LastTxCd\" "; // F30 更新交易代號
 		sql += " FROM \"LoanBorMain\" LBM ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                        AND FAC.\"FacmNo\" = LBM.\"FacmNo\" ";
@@ -76,6 +96,10 @@ public class L9727ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"ClMain\" CLM ON CLM.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                       AND CLM.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                       AND CLM.\"ClNo\" = CF.\"ClNo\" ";
+		sql += " LEFT JOIN TX ON TX.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "             AND TX.\"FacmNo\" = LBM.\"FacmNo\" ";
+		sql += "             AND TX.\"BormNo\" = LBM.\"BormNo\" ";
+		sql += "             AND TX.\"Seq\" = 1 ";
 		sql += " WHERE LBM.\"DrawdownDate\" >= :inputDrawdownDateStart ";
 		sql += "   AND LBM.\"DrawdownDate\" <= :inputDrawdownDateEnd ";
 		sql += " ORDER BY LBM.\"CustNo\" ";

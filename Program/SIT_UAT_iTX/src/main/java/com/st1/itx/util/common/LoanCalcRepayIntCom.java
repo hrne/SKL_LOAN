@@ -2017,111 +2017,51 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 	private void logInputRoutine() {
 		this.info("logInputRoutine ... ");
-		this.info("   CustNo-FacmNo-BormNo Input = " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-		this.info("   CaseCloseFlag     結案記號   = " + iCaseCloseFlag); // 結案記號 Y:是 N:否
-		this.info("   ExtraRepay        部分償還本金   = " + iExtraRepay); // 部分償還本金
-		this.info("   ExtraRepayFlag 部分償還本金是否內含利息   = " + iExtraRepayFlag); // 部分償還本金是否內含利息 Y:是 N:否
-		this.info("   Terms             本次繳息期數       = " + iTerms); // 本次繳息期數
-		this.info("   IntStartDate      計算起日           = " + iIntStartDate); // 計算起日
-		this.info("   IntEndDate        計算止日           = " + iIntEndDate); // 計算止日
-		this.info("   CurrencyCode      幣別               = " + iCurrencyCode); // 幣別
-		this.info("   ProdNo            商品代碼           = " + iProdNo); // 商品代碼
-		this.info("   BaseRateCode      指標利率代碼       = " + iBaseRateCode); // 指標利率代碼
-		this.info("   RateCode          利率區分           = " + iRateCode); // 利率區分 1:機動 2:固動 3:定期機動
-		this.info("   RateAdjFreq       利率調整週期       = " + iRateAdjFreq); // 利率調整週期
-		this.info("   NextAdjRateDate   下次利率調整日     = " + iNextAdjRateDate); // 下次利率調整日
-		this.info("   Principal         計息本金(放款餘額) = " + iPrincipal); // 計息本金
-		this.info("   IncrFlag          加減碼是否依合約   = " + iIncrFlag); // 加減碼是否依合約 Y:是 N:否
-		this.info("   StoreRate         上次收息利率       = " + iStoreRate); // 上次收息利率
-		this.info("   RateIncr          加碼利率           = " + iRateIncr); // 加碼利率
-		this.info("   IndividualIncr    個別加碼利率       = " + iIndividualIncr); // 個別加碼利率
-		this.info("   FreqBase          週期基準           = " + iFreqBase); // 週期基準 1:日 2:月 3:週
-		this.info("   PayIntFreq        繳息週期           = " + iPayIntFreq); // 繳息週期
-		this.info("   RepayFreq         還本週期           = " + iRepayFreq); // 還本週期
-		this.info("   PaidTerms         已繳息期數         = " + iPaidTerms); // 已繳息期數
-		this.info("   DrawdownDate      貸放起日           = " + iDrawdownDate); // 貸放起日
-		this.info("   MaturityDate      貸放止日           = " + iMaturityDate); // 貸放止日
-		this.info("   BreachValidDate   違約金生效日       = " + iBreachValidDate); // 違約金生效日
-		this.info("   PrevPaidIntDate   上次繳息日         = " + iPrevPaidIntDate); // 上次繳息日
-		this.info("   PrevRepaidDate    上次還本日         = " + iPrevRepaidDate); // 上次還本日
-		this.info("   NextPayIntDate    下次繳息日         = " + iNextPayIntDate); // 下次繳息日,應繳息日,預定收息日
-		this.info("   NextRepayDate     下次還本日         = " + iNextRepayDate); // 下次還本日,應還本日,預定還本日
-		this.info("   SpecificDate      指定基準日期       = " + iSpecificDate); // 指定基準日期, 利息基準日
-		this.info("   SpecificDd        指定應繳日          = " + iSpecificDd); // 指定應繳日
-		this.info("   FirstDueDate      首次應繳日          = " + iFirstDueDate); // 首次應繳日
-		this.info("   GraceDate         寬限到期日         = " + iGraceDate); // 寬限到期日
-		this.info("   BreachGraceDays   違約寬限天數     = " + iBreachGraceDays); // 違約寬限天數(營業日)
-		this.info("   ExtraRepayCode    攤還額異動碼      = " + iExtraRepayCode); // 攤還額異動碼 0: 不變 1: 變
-		this.info("   DueAmt            每期攤還金額       = " + iDueAmt); // 每期攤還金額
-		this.info("   BreachRate        違約金之利率       = " + iBreachRate); // 違約金之利率
-		this.info("   DelayRate         遲延息之利率       = " + iDelayRate); // 遲延息之利率
-		this.info("   UnpaidFlag        未繳清記號         = " + iUnpaidFlag); // 未繳清記號
-		this.info("   IntCalcCode       計息方式            = " + iIntCalcCode); // 計息方式 1:按日計息 2:按月計息
-		this.info("   AmortizedCode     攤還方式           = " + iAmortizedCode); // 攤還方式,還本方式 1.按月繳息(按期繳息到期還本)
-																				// 2.到期取息(到期繳息還本) 3.本息平均法(期金) 4.本金平均法
-																				// 5.按月撥款收息(逆向貸款)
-		this.info("   DelayFlag         收遲延息           = " + iDelayFlag); // 0:收遲延息 1: 不收
-		this.info("   NonePrincipalFlag 契約到期還本記號   = " + iNonePrincipalFlag); // 0:契約到期要還本 1:契約到期不還本記號
-		this.info("   UsageCode         資金用途別 = " + iUsageCode); // 資金用途別 01: 週轉金02: 購置不動產03: 營業用資產04: 固定資產05: 企業投資06:
-																	// 購置動產09: 其他
-		this.info("   SyndFlag          聯貸案件   = " + iSyndFlag); // 聯貸案件 Y:是 N:否
-		this.info("   BreachReliefFlag  減免違約金 = " + iBreachReliefFlag); // 減免違約金 Y:是 N:否
-		this.info("   TbsDy             營業日期 = " + iTbsDy); // 營業日期
-		this.info("   EntryDate         入帳日期 = " + iEntryDate); // 入帳日期
-		this.info("   FinalBal    最後一期本金餘額 = " + iFinalBal); // 最後一期本金餘額
-		this.info("   GracePeriod          寬限期 = " + iGracePeriod); // 寬限期
-		this.info("   TotalPeriod          總期數 = " + iTotalPeriod); // 總期數
-		this.info("   iIntEndCode     計算止日代碼 = " + iIntEndCode); // 0.無計算止日 1.至計算止日 2:利息提存
-		this.info("   iFirstDrawdownDate 初貸日      = " + iFirstDrawdownDate);
+		this.info("   CustNo-FacmNo-BormNo Input = " + iCustNo + "-" + iFacmNo + "-" + iBormNo + " , 結案記號 = "
+				+ iCaseCloseFlag + " , 部分償還本金 = " + iExtraRepay + " , 部分償還本金是否內含利息 = " + iExtraRepayFlag
+				+ " , 本次繳息期數 = " + iTerms + " , 計算起日 = " + iIntStartDate + " , 計算止日 = " + iIntEndDate + " , 幣別 = "
+				+ iCurrencyCode + " , 商品代碼 = " + iProdNo + " , 指標利率代碼 = " + iBaseRateCode + " , 利率區分 = " + iRateCode
+				+ " , 利率調整週期 = " + iRateAdjFreq + " , 下次利率調整日 = " + iNextAdjRateDate + " , 計息本金(放款餘額) = " + iPrincipal
+				+ " , 加減碼是否依合約 = " + iIncrFlag + " , 上次收息利率 = " + iStoreRate + " , 加碼利率 = " + iRateIncr + " , 個別加碼利率 = "
+				+ iIndividualIncr + " , 週期基準 = " + iFreqBase + " , 繳息週期 = " + iPayIntFreq + " , 還本週期 = " + iRepayFreq
+				+ " , 已繳息期數 = " + iPaidTerms + " , 貸放起日 = " + iDrawdownDate + " , 貸放止日 = " + iMaturityDate
+				+ " , 違約金生效日 = " + iBreachValidDate + " , 上次繳息日 = " + iPrevPaidIntDate + " , 上次還本日 = " + iPrevRepaidDate
+				+ " , 下次繳息日 = " + iNextPayIntDate + " , 下次還本日 = " + iNextRepayDate + " , 指定基準日期 = " + iSpecificDate
+				+ " , 指定應繳日 = " + iSpecificDd + " , 首次應繳日 = " + iFirstDueDate + " , 寬限到期日 = " + iGraceDate
+				+ " , 違約寬限天數 = " + iBreachGraceDays + " , 攤還額異動碼 = " + iExtraRepayCode + " , 每期攤還金額 = " + iDueAmt
+				+ " , 違約金之利率 = " + iBreachRate + " , 遲延息之利率 = " + iDelayRate + " , 未繳清記號 = " + iUnpaidFlag
+				+ " , 計息方式 = " + iIntCalcCode + " , 攤還方式 = " + iAmortizedCode + " , 收遲延息 = " + iDelayFlag
+				+ " , 契約到期還本記號 = " + iNonePrincipalFlag + " , 資金用途別 = " + iUsageCode + " , 聯貸案件   = " + iSyndFlag
+				+ " , 減免違約金 = " + iBreachReliefFlag + " , 營業日期 = " + iTbsDy + " , 入帳日期 = " + iEntryDate
+				+ " , 最後一期本金餘額 = " + iFinalBal + " , 寬限期 = " + iGracePeriod + " , 總期數 = " + iTotalPeriod
+				+ " , 計算止日代碼 = " + iIntEndCode + " , 初貸日 = " + iFirstDrawdownDate);
 
 	}
 
 	private void logOutputRoutine() {
 		this.info("logOutputRoutine ... ");
-		this.info("   CustNo-FacmNo-BormNo Output = " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-		this.info("   StoreRate       適用利率       = " + oStoreRate);
-		this.info("   RateIncr        加碼利率       = " + oRateIncr);
-		this.info("   IndividualIncr  個別加碼利率   = " + oIndividualIncr);
-		this.info("   PrevRepaidDate  上次還本日     = " + oPrevRepaidDate);
-		this.info("   NextRepayDate   下次還本日     = " + oNextRepayDate);
-		this.info("   DueAmt          期金                = " + oDueAmt);
-		this.info("   Principal       應還本金總額   = " + oPrincipal);
-		this.info("   Interest        利息總金額     = " + oInterest);
-		this.info("   DelayInt        延遲息總額     = " + oDelayInt);
-		this.info("   BreachAmt       違約金總額       = " + oBreachAmt);
-		this.info("   ExtraAmt        部分償還金額   = " + oExtraAmt);
-		this.info("   RepaidPeriod    本次還本期數   = " + oRepaidPeriod);
-		this.info("   PaidTerms       已繳息期數     = " + oPaidTerms);
-		this.info("   PrevPaidIntDate 上次收息日     = " + oPrevPaidIntDate);
-		this.info("   NextPayIntDate  下次收息日     = " + oNextPayIntDate);
-		this.info("   CalcCount       計息筆數       = " + oCalcCount);
-		this.info("   LoanBal         計息後餘額     = " + oLoanBal);
+		this.info(" CustNo-FacmNo-BormNo Output = " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
+		this.info(" 適用利率 = " + oStoreRate + " , 加碼利率 = " + oRateIncr + " , 個別加碼利率 = " + oIndividualIncr + " , 上次還本日 = "
+				+ oPrevRepaidDate + " , 下次還本日 = " + oNextRepayDate + " , 期金 = " + oDueAmt + " , 應還本金總額 = " + oPrincipal
+				+ " , 利息總金額 = " + oInterest + " , 延遲息總額 = " + oDelayInt + " , 違約金總額 = " + oBreachAmt + " , 部分償還金額 = "
+				+ oExtraAmt + " , 本次還本期數 = " + oRepaidPeriod + " , 已繳息期數 = " + oPaidTerms + " , 上次收息日 = "
+				+ oPrevPaidIntDate + " ,  下次收息日 = " + oNextPayIntDate + " , 計息筆數 = " + oCalcCount + " , 計息後餘額 = "
+				+ oLoanBal);
 
 		for (int i = 0; i <= wkCalcVoCount; i++) {
-			this.info("   i=" + i);
-			this.info("   termNo          期數編號           = " + lCalcRepayIntVo.get(i).getTermNo()); // 期數編號
-			this.info("   type            種類               = " + lCalcRepayIntVo.get(i).getType()); // 種類
-			this.info("   amount          計算金額           = " + lCalcRepayIntVo.get(i).getAmount()); // 計算金額
-			this.info("   startDate       計算起日           = " + lCalcRepayIntVo.get(i).getStartDate()); // 計算起日
-			this.info("   endDate         計算止日           = " + lCalcRepayIntVo.get(i).getEndDate()); // 計算止日
-			this.info("   days            計算日數           = " + lCalcRepayIntVo.get(i).getDays()); // 計算日數
-			this.info("   storeRate       計算利率           = " + lCalcRepayIntVo.get(i).getStoreRate()); // 計算利率
-			this.info("   rateIncr        加碼利率           = " + lCalcRepayIntVo.get(i).getRateIncr()); // 加碼利率
-			this.info("   individualIncr  個別加碼利率       = " + lCalcRepayIntVo.get(i).getIndividualIncr()); // 個別加碼利率
-			this.info("   principal       應還本金           = " + lCalcRepayIntVo.get(i).getPrincipal()); // 應還本金
-			this.info("   interest        利息               = " + lCalcRepayIntVo.get(i).getInterest()); // 利息
-			this.info("   breachAmt       違約金             = " + lCalcRepayIntVo.get(i).getBreachAmt()); // 違約金
-			this.info("   odDays          違約日數           = " + lCalcRepayIntVo.get(i).getOdDays()); // 違約日數
-			this.info("   delayInt        延遲息             = " + lCalcRepayIntVo.get(i).getDelayInt()); // 遲延息,延滯息
-			this.info("   dueAmt          期金               = " + lCalcRepayIntVo.get(i).getDueAmt()); // 期金
-			this.info("   loanBal         放款餘額           = " + lCalcRepayIntVo.get(i).getLoanBal()); // 放款餘額
-			this.info("   duraFlag        分段計息記號       = " + lCalcRepayIntVo.get(i).getDuraFlag()); // 分段計息記號
-			this.info("   principalFlag   還本記號           = " + lCalcRepayIntVo.get(i).getPrincipalFlag()); // 還本記號
-			this.info("   monthLimit      當月天數           = " + lCalcRepayIntVo.get(i).getMonthLimit()); // 當月天數
-			this.info("   interestFlag    計息記號           = " + lCalcRepayIntVo.get(i).getInterestFlag()); // 計息記號
-																											// 1:按日計息
-																											// 2:按月計息
-			this.info("   extraRepayFlag  部分償還金額記號   = " + lCalcRepayIntVo.get(i).getExtraRepayFlag()); // 部分償還金額記號
+			CalcRepayIntVo tCalcRepayIntVo = lCalcRepayIntVo.get(i);
+			this.info("i=" + i);
+			this.info("期數編號 = " + tCalcRepayIntVo.getTermNo() + ", 種類 = " + tCalcRepayIntVo.getType() + ", 計算金額 = "
+					+ tCalcRepayIntVo.getAmount() + ", 計算起日 = " + tCalcRepayIntVo.getStartDate() + ", 計算止日 = "
+					+ tCalcRepayIntVo.getEndDate() + ", 計算日數 = " + tCalcRepayIntVo.getDays() + ", 計算利率 = "
+					+ tCalcRepayIntVo.getStoreRate() + ", 加碼利率 = " + tCalcRepayIntVo.getRateIncr() + ", 個別加碼利率 = "
+					+ tCalcRepayIntVo.getIndividualIncr() + ", 應還本金 = " + tCalcRepayIntVo.getPrincipal() + ", 利息 = "
+					+ tCalcRepayIntVo.getInterest() + ", 違約金 = " + tCalcRepayIntVo.getBreachAmt() + ", 違約日數 = "
+					+ tCalcRepayIntVo.getOdDays() + ", 延遲息 = " + tCalcRepayIntVo.getDelayInt() + ", 期金 = "
+					+ tCalcRepayIntVo.getDueAmt() + ", 放款餘額 = " + tCalcRepayIntVo.getLoanBal() + ", 分段計息記號 = "
+					+ tCalcRepayIntVo.getDuraFlag() + ", 還本記號 = " + tCalcRepayIntVo.getPrincipalFlag() + ", 當月天數 = "
+					+ tCalcRepayIntVo.getMonthLimit() + ", 計息記號 = " + tCalcRepayIntVo.getInterestFlag()
+					+ ", 部分償還金額記號 = " + tCalcRepayIntVo.getExtraRepayFlag());
 		}
 	}
 

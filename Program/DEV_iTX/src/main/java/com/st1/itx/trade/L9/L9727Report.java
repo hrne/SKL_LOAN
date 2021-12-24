@@ -54,7 +54,8 @@ public class L9727Report extends MakeReport {
 
 		this.info("L9727Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txname, txcd + "_" + txname, txcd + "_底稿_" + txname + ".xlsx", sheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txname, txcd + "_" + txname,
+				txcd + "_底稿_" + txname + ".xlsx", sheetName);
 
 		// 更新SheetName
 		makeExcel.setSheet(sheetName, this.showRocDate(titaVo.getEntDyI(), 6));
@@ -122,11 +123,11 @@ public class L9727Report extends MakeReport {
 				// 寬限到期日
 				makeExcel.setValue(rowCursor, 28, showRocDate(m.get("F27"), 1));
 				// 寬限區分
-//			makeExcel.setValue(rowCursor, 29, m.get("F28"));
+				makeExcel.setValue(rowCursor, 29, m.get("F28"));
 				// 更新會計日期
-//			makeExcel.setValue(rowCursor, 30, m.get("F29"));
+				makeExcel.setValue(rowCursor, 30, showRocDate(m.get("F29"), 1));
 				// 更新交易代號
-//			makeExcel.setValue(rowCursor, 31, m.get("F30"));
+				makeExcel.setValue(rowCursor, 31, m.get("F30"));
 
 				rowCursor++;
 			}
