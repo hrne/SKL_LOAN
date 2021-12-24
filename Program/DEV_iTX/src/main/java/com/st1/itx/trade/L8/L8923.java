@@ -57,11 +57,15 @@ public class L8923 extends TradeBuffer {
 		this.info("active L8923 ");
 		this.totaVo.init(titaVo);
 
+		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		this.index = titaVo.getReturnIndex();
+
+		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
+		this.limit = 50; // 507 *  50= 
+				
 		// 取得輸入資料
 		String DateTime; // YYY/MM/DD hh:mm:ss
-		String Date = "";
-		int sCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
-		
+		String Date = "";		
 		
 		List<Map<String, String>> resultList = null;
 		try {
@@ -99,7 +103,7 @@ public class L8923 extends TradeBuffer {
 				occursList.putParam("OORepayDate", repaydate); // 預定還款日期
 				occursList.putParam("OOActualRepayDate", actualrepaydate); // 實際還款日期
 				occursList.putParam("OORepayAmt", result.get("F5")); // 還款金額
-				occursList.putParam("OOCareer", result.get("F6")); // 職業別
+				occursList.putParam("OOCareer", result.get("F6").replace(" ", "")); // 職業別
 				occursList.putParam("OOIncome", result.get("F7")); // 年收入(萬)
 				occursList.putParam("OORepaySource", result.get("F8")); // 還款來源
 				occursList.putParam("OORepayBank", result.get("F9")); // 代償銀行
@@ -127,7 +131,7 @@ public class L8923 extends TradeBuffer {
 
 		 /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
-		 if (resultList.size() == this.limit && hasNext()) {
+		 if (resultList != null &&  resultList.size() >= this.limit) {
 	 		 titaVo.setReturnIndex(this.setIndexNext());
 		 	 /* 手動折返 */
 		 	 this.totaVo.setMsgEndToEnter();
@@ -140,25 +144,25 @@ public class L8923 extends TradeBuffer {
 		return this.sendList();
 	}
 	
-	private Boolean hasNext() {
-		Boolean result = true;
-
-		int times = this.index + 1;
-		int cnt = l8923Servicelmpl.getSize();
-		int size = times * this.limit;
-
-		this.info("index ..." + this.index);
-		this.info("times ..." + times);
-		this.info("cnt ..." + cnt);
-		this.info("size ..." + size);
-
-		if (size == cnt) {
-			result = false;
-		}
-		this.info("result ..." + result);
-
-		return result;
-	}
+//	private Boolean hasNext() {
+//		Boolean result = true;
+//
+//		int times = this.index + 1;
+//		int cnt = l8923Servicelmpl.getSize();
+//		int size = times * this.limit;
+//
+//		this.info("index ..." + this.index);
+//		this.info("times ..." + times);
+//		this.info("cnt ..." + cnt);
+//		this.info("size ..." + size);
+//
+//		if (size == cnt) {
+//			result = false;
+//		}
+//		this.info("result ..." + result);
+//
+//		return result;
+//	}
 	private void setData(Map<String, String> result) throws LogicException {
 		
 		recorddate = parse.stringToInteger(result.get("F0"));

@@ -189,7 +189,7 @@ public class L6403Batch extends TradeBuffer {
 
 		}
 		// L6
-		for (int i = 1; i <= 120; i++) {
+		for (int i = 1; i <= 130; i++) {
 			String iTranNo = titaVo.get("ApfCode" + i);
 			if (iTranNo != null) {
 

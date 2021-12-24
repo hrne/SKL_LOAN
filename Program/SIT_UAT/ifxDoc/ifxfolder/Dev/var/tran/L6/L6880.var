@@ -1,0 +1,76 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+</sub>
+
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,880];printer.width=[15,45];order=1;">
+[
+["[L6880] 系統換日"],
+[#<->#,"日期類別",#iType,#iTypeX],
+[#<->#,"系統日期",#iEntday],
+]
+
+!---------- AP Button AREA ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(2,#CHAIN,$,T(F,@FunCode,0))
+
+#NTXBUF=X,6,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+T(1,@TranNo,#NTXBUF,2,5)
+T(2,@FKEY,7)
+
+
+!---------- AP TEXT AREA Variables ----------
+
+#TypeH=X,100,S
+T(3,1:連線日期檔;2:批次日期檔)
+
+#iType=A,1,I
+HELP(#TypeH)
+@V(H,#TypeH)
+
+#iTypeX=X,20,L
+T(H,#iType,#TypeH)
+
+![功能選項]
+#iEntday=D,7,I
+E(0,#SYSNDATE)
+D(8)
+@V(7)A(DATE,0,#iEntday)
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#iEntday
+#iType
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L6880^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

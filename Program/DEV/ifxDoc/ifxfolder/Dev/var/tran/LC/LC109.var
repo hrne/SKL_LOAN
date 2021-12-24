@@ -23,7 +23,7 @@ K(MODIFYBUTTON,簽核)
 ["報表序號",#FileNo],
 ["報表代號",#FileCode],
 ["報表名稱",#FileItem],
-["報表日期",#FileDate],
+["製表日期",#FileDate],
 ]
 !---------- AP Button AREA ----------
 

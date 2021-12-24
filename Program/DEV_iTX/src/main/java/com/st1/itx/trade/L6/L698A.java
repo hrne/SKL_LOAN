@@ -55,6 +55,7 @@ public class L698A extends TradeBuffer {
 	public Parse parse;
 
 	private int selectCode = 0;
+	private int cnt = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -176,13 +177,17 @@ public class L698A extends TradeBuffer {
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
 				occursList.putParam("OOCustId", custId);
-
+				cnt++;
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 
 			}
 
 		}
+		if (cnt == 0) {
+			throw new LogicException(titaVo, "E0001", ""); // 查詢資料不存在
+		}
+
 
 		this.addList(this.totaVo);
 		return this.sendList();

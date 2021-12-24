@@ -18,6 +18,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanOverdue;
@@ -26,6 +27,7 @@ import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanOverdueService;
@@ -84,6 +86,8 @@ public class L3230 extends TradeBuffer {
 	public LoanOverdueService loanOverdueService;
 	@Autowired
 	public LoanBorTxService loanBorTxService;
+	@Autowired
+	public CustMainService custMainService;
 
 	@Autowired
 	Parse parse;
@@ -184,7 +188,9 @@ public class L3230 extends TradeBuffer {
 			wkFacmNoStart = iFacmNo;
 			wkFacmNoEnd = iFacmNo;
 		}
-
+		if ("06".equals(iTempItemCode)) {
+			Checktransfer();
+		}
 		// 催收檔處理
 		if (iTempItemCode.equals("08")) { // 08: 收回呆帳
 			if (titaVo.isHcodeNormal()) {
@@ -683,5 +689,56 @@ public class L3230 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
+	}
+
+//	1.收款人必須存在客戶主檔
+//	2.專戶可轉專戶 其他戶號可轉專戶 專戶可轉其他戶號
+//	3.同戶號可轉其他額度
+	private void Checktransfer() throws LogicException {
+
+		boolean wkCustSpecial = false;
+		for (int i = 1; i <= 50; i++) {
+
+			// 檢查轉入暫收款
+			if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0
+					|| parse.stringToInteger(titaVo.getParam("RpCode" + i)) != 92) {
+				break;
+			}
+			int iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
+
+			// 檢查轉入戶號是否為專戶
+			if (iRpCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
+					|| iRpCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				continue;
+			}
+			// 0610940戶號(放款部專戶)
+			// 0601776戶號(前置協商收款專戶)
+			// 檢查轉出是否為專戶
+			if (iCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
+					|| iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				wkCustSpecial = true;
+			}
+
+			// 必須輸入轉入戶號
+			if (parse.stringToInteger(titaVo.getParam("RpCustNo" + i)) == 0) {
+				throw new LogicException(titaVo, "E1002", "必須輸入轉入戶號"); // E1002,戶號不得為0
+			}
+			CustMain tCustMain = new CustMain();
+			tCustMain = custMainService.custNoFirst(parse.stringToInteger(titaVo.getParam("RpCustNo" + i)),
+					parse.stringToInteger(titaVo.getParam("RpCustNo" + i)), titaVo);
+			// 轉入戶號必須存在客戶主檔
+			if (tCustMain == null) {
+				throw new LogicException(titaVo, "E1004", "轉入戶號 : " + iRpCustNo); // E1004 此戶號不存在客戶主檔
+			}
+//			專戶可轉專戶 其他戶號可轉專戶 專戶可轉其他戶號
+//			不同戶號時檢查是否為專戶 不為專戶顯示錯誤訊息
+			if (iCustNo != iRpCustNo) {
+				if (!wkCustSpecial) {
+					throw new LogicException(titaVo, "E6002", "不可轉至不同戶號"); // E6002 收付欄檢核有誤
+				}
+			}
+
+		}
+
 	}
 }
