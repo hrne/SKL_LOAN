@@ -447,7 +447,7 @@ public class ApControl extends SysLogger {
 			if (tita.indexOf("\"TLRNO\":\"E-LOAN\"") != -1)
 				this.titaVo = this.eloanConver.exec(tita);
 			else {
-				this.titaVo = this.titaVo.getVo(tita.replaceAll("$n", "\n"));
+				this.titaVo = this.titaVo.getVo(tita.replaceAll("\\$n", "\n"));
 
 				if ("XXR99".equals(this.titaVo.getTxCode()))
 					this.titaVo.remove("IP");

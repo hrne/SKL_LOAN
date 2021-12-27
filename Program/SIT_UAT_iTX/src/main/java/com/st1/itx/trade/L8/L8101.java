@@ -1,6 +1,10 @@
 package com.st1.itx.trade.L8;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +25,8 @@ import com.st1.itx.db.domain.TxAmlNoticeId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.TxAmlNoticeService;
 import com.st1.itx.db.service.TxFileService;
-import com.st1.itx.trade.L9.L9703Report2;
+import com.st1.itx.db.service.springjpa.cm.L9705ServiceImpl;
+import com.st1.itx.trade.L9.L9705Report;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
 
@@ -63,8 +68,14 @@ public class L8101 extends TradeBuffer {
 	@Autowired
 	public TxToDoCom txToDoCom;
 
+//	@Autowired
+//	L9703Report2 l9703report2;
+	
 	@Autowired
-	L9703Report2 l9703report2;
+	private L9705ServiceImpl l9705ServiceImpl;
+
+	@Autowired
+	L9705Report l9705Report;
 
 	@Autowired
 	CustNoticeCom custNoticeCom;
@@ -226,21 +237,51 @@ public class L8101 extends TradeBuffer {
 //			#RepayType    繳款方式
 //			#CustType     戶別
 
-			titaVo.putParam("AcctDate", Integer.toString(this.getTxBuffer().getTxCom().getTbsdyf()));
-			titaVo.putParam("CustNo", Integer.toString(custMain.getCustNo()));
-			titaVo.putParam("FacmNo", "0");
-			titaVo.putParam("UnpaidCond", "1");
-			titaVo.putParam("UnpaidTermSt", "01");
-			titaVo.putParam("UnpaidTermEd", "02");
-			titaVo.putParam("UnpaidDaySt", "001");
-			titaVo.putParam("UnpaidDayEd", "001");
-			titaVo.putParam("RepayType", "0");
-			titaVo.putParam("CustType", "0");
+//			titaVo.putParam("AcctDate", Integer.toString(this.getTxBuffer().getTxCom().getTbsdyf()));
+//			titaVo.putParam("CustNo", Integer.toString(custMain.getCustNo()));
+//			titaVo.putParam("FacmNo", "0");
+//			titaVo.putParam("UnpaidCond", "1");
+//			titaVo.putParam("UnpaidTermSt", "01");
+//			titaVo.putParam("UnpaidTermEd", "02");
+//			titaVo.putParam("UnpaidDaySt", "001");
+//			titaVo.putParam("UnpaidDayEd", "001");
+//			titaVo.putParam("RepayType", "0");
+//			titaVo.putParam("CustType", "0");
+			
+//			String acctDateStart = titaVo.getParam("ACCTDATE_ST");
+//			String acctDateEnd = titaVo.getParam("ACCTDATE_ED");
+//			String custNoStart = titaVo.getParam("CUSTNO");
+//			String custNoEnd = titaVo.getParam("CUSTNOB");
+//			String condition1 = titaVo.getParam("CONDITION1");
+//			String condition2 = titaVo.getParam("CONDITION2");
+//			String idType = titaVo.getParam("ID_TYPE");
+//			String corpInd = titaVo.getParam("CORP_IND");
+//			String apNo = titaVo.getParam("APNO");
+			
+//			l9703report2.setParentTranCode(titaVo.get("TXCD"));
+//			pdfSno = l9703report2.exec(titaVo, this.txBuffer);
 
-			String batchno = titaVo.getParam("BatchNo");
-
-			l9703report2.setParentTranCode(titaVo.get("TXCD"));
-			pdfSno = l9703report2.exec(titaVo, this.txBuffer);
+			titaVo.putParam("ACCTDATE_ST", this.getTxBuffer().getTxCom().getTbsdyf());
+			titaVo.putParam("ACCTDATE_ED", this.getTxBuffer().getTxCom().getTbsdyf());
+			titaVo.putParam("CUSTNO", custMain.getCustNo());
+			titaVo.putParam("CUSTNOB", custMain.getCustNo());
+			titaVo.putParam("CONDITION1", 0);
+			titaVo.putParam("CONDITION2", 0);
+			titaVo.putParam("ID_TYPE", 0);
+			titaVo.putParam("CORP_IND", 0);
+			titaVo.putParam("APNO", 0);
+			titaVo.putParam("Terms", 2); //只印2期
+			
+			l9705Report.setParentTranCode(titaVo.getTxcd());
+			List<Map<String, String>> l9705List = null;
+			try {
+				l9705List = l9705ServiceImpl.findAll(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("l9705ServiceImpl.findAll error = " + errors.toString());
+			}
+			pdfSno = l9705Report.exec(l9705List, titaVo, this.getTxBuffer());
 
 		}
 

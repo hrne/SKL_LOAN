@@ -1,0 +1,6 @@
+
+ALTER TABLE "LoanIfrs9Dp" MODIFY "DerRate" NUMBER(8,6);
+ALTER TABLE "Ias39Loan34Data" MODIFY "Rate" NUMBER(8,6);
+ALTER TABLE "Ias39Loan34Data" MODIFY "ApproveRate" NUMBER(8,6);
+ALTER TABLE "Ifrs9LoanData" MODIFY "ApproveRate" NUMBER(8,6);
+COMMIT;

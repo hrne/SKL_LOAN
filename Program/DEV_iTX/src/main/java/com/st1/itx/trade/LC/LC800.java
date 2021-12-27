@@ -1,22 +1,27 @@
 package com.st1.itx.trade.LC;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.domain.TxBizDate;
+import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxBizDateService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.AcMainCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -29,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class LC800 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC800.class);
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -40,6 +44,10 @@ public class LC800 extends TradeBuffer {
 	public TxBizDateService sTxBizDateService;
 	@Autowired
 	public SystemParasService systemParasService;
+	@Autowired
+	public AcMainService acMainService;
+	@Autowired
+	public AcMainCom acMainCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -49,9 +57,21 @@ public class LC800 extends TradeBuffer {
 //		改getForTxBizDate
 		String iType = titaVo.get("iType").trim();
 		String iEntday = titaVo.get("iEntday").trim();
+		acMainCom.setTxBuffer(this.txBuffer);
 
 		if ("2".equals(iType)) {
 			proc(titaVo, "BATCH", iEntday);
+
+			// 往前跳開批次日期需過總帳(測試時)，連線日期 -> 批次日期
+			if (parse.stringToInteger(iEntday) > this.txBuffer.getTxBizDate().getTbsDy()) {
+				Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(),
+						this.index, Integer.MAX_VALUE);
+				List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
+				if (lAcMain != null) {
+					acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday),
+							lAcMain, titaVo);
+				}
+			}
 		} else {
 			// 連線日期應為批次系統日期的下營業日
 			TxBizDate batchTxBizDate = sTxBizDateService.holdById("BATCH", titaVo);

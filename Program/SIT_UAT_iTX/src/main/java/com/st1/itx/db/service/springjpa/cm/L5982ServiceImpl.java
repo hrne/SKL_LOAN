@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
