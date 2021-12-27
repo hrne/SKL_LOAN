@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,23 +21,22 @@ import com.st1.itx.db.domain.TxFile;
  */
 public interface TxFileRepositoryMon extends JpaRepository<TxFile, Long> {
 
-	// FileDate = ,AND BrNo =
-	public Slice<TxFile> findAllByFileDateIsAndBrNoIsOrderByFileNoAsc(int fileDate_0, String brNo_1, Pageable pageable);
+  // FileDate = ,AND BrNo =
+  public Slice<TxFile> findAllByFileDateIsAndBrNoIsOrderByFileNoAsc(int fileDate_0, String brNo_1, Pageable pageable);
 
-	// FileDate >= ,AND FileDate <= ,AND BrNo = ,AND CreateEmpNo % ,AND FileCode %
-	// ,AND FileItem %
-	public Slice<TxFile> findAllByFileDateGreaterThanEqualAndFileDateLessThanEqualAndBrNoIsAndCreateEmpNoLikeAndFileCodeLikeAndFileItemLikeOrderByCreateDateDesc(int fileDate_0, int fileDate_1,
-			String brNo_2, String createEmpNo_3, String fileCode_4, String fileItem_5, Pageable pageable);
+  // FileDate >= ,AND FileDate <= ,AND BrNo = ,AND CreateEmpNo % ,AND FileCode % ,AND FileItem %
+  public Slice<TxFile> findAllByFileDateGreaterThanEqualAndFileDateLessThanEqualAndBrNoIsAndCreateEmpNoLikeAndFileCodeLikeAndFileItemLikeOrderByCreateDateDesc(int fileDate_0, int fileDate_1, String brNo_2, String createEmpNo_3, String fileCode_4, String fileItem_5, Pageable pageable);
 
-	// FileDate >= ,AND FileDate <= ,AND BrNo = ,AND CreateEmpNo % ,AND FileCode %
-	// ,AND FileItem %,AND CreateDate >=,AND CreateDate <
-	public Slice<TxFile> findAllByFileDateGreaterThanEqualAndFileDateLessThanEqualAndBrNoIsAndCreateEmpNoLikeAndFileCodeLikeAndFileItemLikeAndCreateDateGreaterThanEqualAndCreateDateLessThanOrderByCreateDateDesc(
-			int fileDate_0, int fileDate_1, String brNo_2, String createEmpNo_3, String fileCode_4, String fileItem_5, java.sql.Timestamp createDate_6, java.sql.Timestamp createDate_7,
-			Pageable pageable);
+  // FileDate >= ,AND FileDate <= ,AND BrNo = ,AND CreateEmpNo % ,AND FileCode % ,AND FileItem %,AND CreateDate >=,AND CreateDate <  
+  public Slice<TxFile> findAllByFileDateGreaterThanEqualAndFileDateLessThanEqualAndBrNoIsAndCreateEmpNoLikeAndFileCodeLikeAndFileItemLikeAndCreateDateGreaterThanEqualAndCreateDateLessThanOrderByCreateDateDesc(int fileDate_0, int fileDate_1, String brNo_2, String createEmpNo_3, String fileCode_4, String fileItem_5, java.sql.Timestamp createDate_6, java.sql.Timestamp createDate_7, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxFile> findByFileNo(Long fileNo);
+  // BatchNo =
+  public Optional<TxFile> findTopByBatchNoIsOrderByCreateDateDesc(String batchNo_0);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxFile> findByFileNo(Long fileNo);
 
 }
+

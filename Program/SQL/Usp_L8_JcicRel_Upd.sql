@@ -64,31 +64,33 @@ BEGIN
     WITH "Temp_Work_Rel_1" AS (
       -- Temp_Work_Rel_1  A:新貸 B:續貸
       SELECT C."CustId"                     AS "CustId"
-           , TRUNC(M."DrawdownDate" / 100)  AS "RelYM" -- 客戶填表年月 ???
+           , TRUNC(M."DrawdownDate" / 100)  AS "RelYM" -- 客戶填表年月 
            , CASE
                WHEN NVL(F."FirstDrawdownDate",0) = M."DrawdownDate" 
                THEN 'A'
              ELSE 'B'
-             END                            AS "TranCode" -- 報送時機  -- A:新貸 B:續貸 ???
+             END                            AS "TranCode" -- 報送時機  -- A:新貸 B:續貸 
       FROM "LoanBorMain" M
       LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                            AND F."FacmNo" = M."FacmNo"
       LEFT JOIN "CustMain" C ON C."CustNo" = M."CustNo"
       WHERE C."EntCode" IN (1) -- 1:企金
-        AND M."DrawdownDate" > L7YMD
-        AND M."DrawdownDate" <= YYYYMMDD -- 撥款日期 天數判斷 最近七日撥款 ??????
+      --  AND M."DrawdownDate" > L7YMD
+      --  AND M."DrawdownDate" <= YYYYMMDD -- 撥款日期 天數判斷 最近七日撥款 ??????
+        AND TRUNC(NVL(M."DrawdownDate",0) / 100) = YYYYMM  -- 撥款日期:限本月資料 
     )
     , "Temp_Work_Rel_2" AS (
       -- Temp_Work_Rel_2  C:更新  
       SELECT C1."CustId"                    AS "CustId"
           , TRUNC(to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) / 100)
-                                            AS "RelYM" -- 客戶填表年月 ???
+                                            AS "RelYM" -- 客戶填表年月 
           , 'C'                             AS "TranCode" -- 報送時機  C:更新
       FROM "ReltMain" RM
       LEFT JOIN "CustMain" C1 ON C1."CustNo"  = RM."CustNo"
       LEFT JOIN "CustMain" C2 ON C2."CustUKey"  = RM."ReltUKey"
-      WHERE to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) >  L7YMD
-        AND to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) <= YYYYMMDD  -- 天數判斷 最近七日有異動 ???
+      WHERE --to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) >  L7YMD
+      --  AND to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) <= YYYYMMDD  -- 天數判斷 最近七日有異動 ??? 
+            TRUNC(to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) / 100) =  YYYYMM   --  異動判斷:限本月異動資料
         AND C1."EntCode" IN (1) -- 1:企金
         AND C2."EntCode" IN (1) -- 1:企金
     )

@@ -90,8 +90,30 @@ public class L9705Report extends MakeReport {
 
 		this.info("L9705Report exec Terms = " + terms);
 
+		String rptitem = "";
+		if ("L8101".equals(titaVo.getTxCode())) {
+			String dataDt = titaVo.get("DataDt").trim();
+			String custKey = titaVo.get("CustKey").trim();
+			String batchNo = titaVo.get("BatchNo");
+			String ReviewType = "定審" + titaVo.get("ReviewTypeX");
+			if (batchNo == null) {
+				batchNo = "";
+			} else {
+				batchNo = batchNo.trim();
+			}
+
+			if (batchNo.isEmpty()) {
+				rptitem = "放款本息攤還表暨繳息通知單(" + ReviewType + "/" + dataDt + "/" + custKey + ")";
+			} else {
+				rptitem = "放款本息攤還表暨繳息通知單(" + ReviewType + "/" + titaVo.getParam("CALDY") + "整批)";
+				this.setBatchNo(batchNo);
+			}
+		} else {
+			rptitem = "放款本息攤還表暨繳息通知單(" + String.format("%07d", Integer.valueOf(titaVo.get("CUSTNO"))) + ")";
+		}
+
 		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單("+ String.format("%07d", Integer.valueOf(titaVo.get("CUSTNO"))) + ")", "inch,8.5,12", "P");
+				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode(), rptitem, "inch,8.5,12", "P");
 
 		String entdy = titaVo.getEntDy();
 
@@ -224,7 +246,7 @@ public class L9705Report extends MakeReport {
 						this.newPage();
 					}
 
-					cnt = cnt + 1;
+					cnt++;
 
 					intRate = listBaTxVo.get(0).getIntRate();
 
@@ -366,12 +388,12 @@ public class L9705Report extends MakeReport {
 						printCm(14.5, y, df1.format(loanBal), "R");
 						printCm(16.5, y, "0", "R");
 						printCm(19, y, df1.format(bSummry), "R");
-						
+
 					} // loop -- batxCom
 
 					l++;
 					y = top + yy + (++l) * h;
-					
+
 					printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 
 					// 滯繳通知單
@@ -418,7 +440,6 @@ public class L9705Report extends MakeReport {
 					y = top + yy + (++l) * h;
 					this.printCm(14, y, "製表人 " + empName);
 
-					
 					if ("C".equals(conditionCode)) {
 
 						String EntryDate = tL9Vo.get("EntryDate"); // 入帳日期
@@ -426,7 +447,8 @@ public class L9705Report extends MakeReport {
 
 						if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
 							y = top + yy + (++l) * h;
-							this.printCm(1, y, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + "業已入帳無誤。");
+							this.printCm(1, y, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt)
+									+ "業已入帳無誤。");
 						}
 					}
 					printCm(4, 29.5, payIntAcct);
@@ -443,10 +465,11 @@ public class L9705Report extends MakeReport {
 		// 關閉報表
 		long sno = this.close();
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"),
-				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "放款本息攤還表暨繳息通知單已完成", titaVo);
-		
+		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"),
+					titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "放款本息攤還表暨繳息通知單已完成", titaVo);
+		}
 		return sno;
 	}
 

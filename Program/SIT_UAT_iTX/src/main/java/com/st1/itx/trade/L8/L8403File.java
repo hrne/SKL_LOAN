@@ -425,7 +425,8 @@ public class L8403File extends MakeFile {
 
 		// 頭筆資料
 		// JCIC-DAT-Z040-V01
-		String headText = "JCIC-DAT-Z" + iTranCode + "-V01-458     " + iReportDate + "01          02-23895858#7076放款部聯絡人-邱怡婷";
+		String iContactX =  FormatUtil.padX("放款部聯絡人-邱怡婷", 80);
+		String headText = "JCIC-DAT-Z" + iTranCode + "-V01-458     " + iReportDate + "01          02-23895858#7076"+iContactX;
 		this.put(headText);
 
 		int iCount = 0; // 總筆數

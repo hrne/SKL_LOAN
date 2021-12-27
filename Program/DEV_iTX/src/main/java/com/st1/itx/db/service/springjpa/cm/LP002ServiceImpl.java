@@ -27,7 +27,6 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> wkSsn(TitaVo titaVo) {
 
 		String iENTDY = String.valueOf(titaVo.getEntDyI() + 19110000);
@@ -44,10 +43,9 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iday", iENTDY);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	// 部室
 	public List<Map<String, String>> findDept(TitaVo titaVo, Map<String, String> wkVo) {
 
@@ -66,7 +64,9 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMM = Integer.parseInt(wkVo.get("F1")) - 1;
 		}
 
-		this.info("lp002.findDept ENTDY=" + iENTDY + ",iyear=" + iYEAR + ", imm=" + iYEAR * 100 + iMM);
+		int wkm = iYEAR * 100 + iMM;
+		
+		this.info("lp002.findDept ENTDY=" + iENTDY + ",iyear=" + iYEAR + ", wkm=" + wkm);
 		String sql = " ";
 		sql += " SELECT B.\"UnitItem\"  AS F0 ";
 		sql += "      , E.\"Fullname\"  AS F1 ";
@@ -87,6 +87,7 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHERE TRUNC(I.\"WorkMonth\" / 100) = :iyear ";
 		sql += "                 AND I.\"PerfDate\" <= :iday ";
 		sql += "                 AND I.\"DeptCode\" IS NOT NULL ";
+		sql += "                 AND I.\"PerfAmt\" >= 0 ";
 		sql += "               UNION ALL";
 		sql += "               SELECT B.\"DeptCode\"                 AS \"DeptCode\" ";
 		sql += "                    , W.\"Year\" * 100 + W.\"Month\" AS \"WorkMonth\" ";
@@ -124,12 +125,11 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("iyear", iYEAR);
 		query.setParameter("iday", iENTDY);
-		query.setParameter("wkm", iYEAR * 100 + iMM);
+		query.setParameter("wkm", wkm);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	// 區部
 	public List<Map<String, String>> findDist(TitaVo titaVo, Map<String, String> wkVo) {
 
@@ -218,10 +218,9 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("imm", iMM);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	// 營管 營推 業推 業開
 	public List<Map<String, String>> findUnit(TitaVo titaVo, Map<String, String> wkVo, String unitCode) {
 
@@ -308,6 +307,6 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iday", iENTDY);
 		query.setParameter("imm", iMM);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

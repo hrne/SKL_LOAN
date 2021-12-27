@@ -49,7 +49,8 @@ public class L8351File extends MakeFile {
 		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0,Integer.MAX_VALUE, titaVo);
 
 		// 第一行
-		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s%s          02-23895858#7076放款部聯絡人-程慧娟", iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
+		String iContactX =  FormatUtil.padX("放款部聯絡人-程慧娟", 80);
+		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s%s          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
 		this.put(iFirstLine);
 
 		if (iTbJcicMu01 == null) {

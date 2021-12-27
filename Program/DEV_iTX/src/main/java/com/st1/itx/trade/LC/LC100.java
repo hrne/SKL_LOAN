@@ -24,6 +24,7 @@ import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Service("LC100")
 @Scope("prototype")
@@ -47,6 +48,9 @@ public class LC100 extends TradeBuffer {
 
 	@Autowired
 	DateUtil dDateUtil;
+
+	@Autowired
+	Parse parse;
 
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
@@ -144,7 +148,7 @@ public class LC100 extends TradeBuffer {
 //				int loginDate = Integer.parseInt(dt.format(date));
 
 				tTxTeller.setLogonFg(1);
-				tTxTeller.setLastDate(txBuffer.getTxBizDate().getTbsDyf());
+				tTxTeller.setLastDate(parse.stringToInteger(titaVo.getCalDy()));
 				tTxTeller.setLastTime(loginTime);
 //
 				txTellerService.update(tTxTeller);

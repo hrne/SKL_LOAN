@@ -246,7 +246,7 @@ BEGIN
                        , SUM(NVL("AcLoanInt"."Interest",0))   AS  "Interest"
                   FROM "AcLoanInt"
                   WHERE "AcLoanInt"."YearMonth"  = YYYYMM
-                    AND TRUNC(NVL("AcLoanInt"."PayIntDate",0) / 100 ) <= YYYYMM
+                  --  AND TRUNC(NVL("AcLoanInt"."PayIntDate",0) / 100 ) <= YYYYMM
                   GROUP BY "AcLoanInt"."YearMonth", "AcLoanInt"."CustNo", "AcLoanInt"."FacmNo", "AcLoanInt"."BormNo"
                 ) AC    ON AC."CustNo"     = M."CustNo"
                        AND AC."FacmNo"     = M."FacmNo"

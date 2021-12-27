@@ -1,11 +1,10 @@
+CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Ep_Upd"
+(
 -- 程式功能：維護 Ias34Ep 每月IAS34資料欄位清單E檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L7_Ias34Ep_Upd"(20201231,'System',0);
 --
 
-
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Ep_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2,   -- 經辦

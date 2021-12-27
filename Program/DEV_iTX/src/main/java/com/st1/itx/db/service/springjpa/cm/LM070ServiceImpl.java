@@ -42,7 +42,7 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	      ,NVL(PDA.\"AdjCntingCode\",I.\"CntingCode\") AS \"CntingCode\"";
 		sql += "	      ,NVL(L.\"totalDrawdownAmt\",'0') AS \"DrawAmt\"";
 		sql += "	      ,NVL(I.\"Introducer\", C.\"Introducer\") AS \"Introducer\"";
-		sql += "	      ,C.\"CustId\"";
+		sql += "	      ,C.\"CustId\" AS \"CustId\"";
 		sql += "	      ,NVL(I.\"DeptCode\", E4.\"CenterCode2\") AS \"DeptCode\"";
 		sql += "	      ,NVL(I.\"DistCode\", E4.\"CenterCode1\") AS \"DistCode\"";
 		sql += "	      ,NVL(I.\"UnitCode\", E4.\"CenterCode\") AS \"UnitCode\"";
@@ -51,16 +51,18 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	      ,NVL(B1.\"UnitItem\", E4.\"CenterCodeName\") AS \"ItUnitIem\"";
 		sql += "	      ,F.\"FirstDrawdownDate\"";
 		sql += "	      ,I.\"ProdCode\"";
-		sql += "	      ,NVL(PDA.\"AdjPerfEqAmt\",I.\"PerfEqAmt\") AS \"PerfEqAmt\"";
-		sql += " 	      ,NVL(PDA.\"AdjPerfReward\",I.\"PerfReward\") AS \"PerfReward\"";
+		sql += "	      ,NVL(PDA.\"AdjPerfEqAmt\",IM.\"PerfEqAmt\") AS \"PerfEqAmt\"";
+		sql += " 	      ,NVL(PDA.\"AdjPerfReward\",IM.\"PerfReward\") AS \"PerfReward\"";
 		sql += " 	      ,NVL(E2.\"AgentId\", E5.\"AgentId\") AS \"UnitAgentId\"";
 		sql += "	      ,NVL(E3.\"AgentId\", E6.\"AgentId\") AS \"DistAgentId\"";
 		sql += "	      ,NVL(PDA.\"AdjPerfAmt\",R.\"IntroducerAddBonus\") AS \"IntroAddBonus\"";
+		sql += "	      ,NVL(E1.\"Fullname\",E11\"Fullname\") AS \"IntName\"";
+		sql += "	      ,C.\"CustName\" AS \"CustName\"";
 		sql += "	FROM(SELECT I.\"CustNo\"";
 		sql += " 	           ,I.\"FacmNo\"";
 		sql += "			   ,SUM(I.\"DrawdownAmt\") AS \"DrawdownAmt\"";
-		sql += "	           ,SUM(I.\"PerfEqAmt\")";
-		sql += "	           ,SUM(I.\"PerfReward\")";
+		sql += "	           ,SUM(I.\"PerfEqAmt\") AS \"PerfEqAmt\"";
+		sql += "	           ,SUM(I.\"PerfReward\") AS \"PerfReward\"";
 		sql += "	    FROM \"PfItDetail\" I";
 		sql += "		WHERE I.\"WorkMonth\" = :inputYear * 100 + :inputMonth ";
 		sql += "	      AND I.\"PieceCode\" IN ('A','1')";
@@ -90,6 +92,7 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	 ON L.\"CustNo\" = I.\"CustNo\"";
 		sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = I.\"CustNo\"";
 		sql += "	LEFT JOIN \"CdEmp\" E1 ON E1.\"EmployeeNo\" = I.\"Introducer\""; // 取介紹人姓名
+		sql += "	LEFT JOIN \"CdEmp\" E11 ON E11.\"EmployeeNo\" = C.\"Introducer\""; // 取介紹人姓名
 		sql += "	LEFT JOIN \"CdEmp\" E2 ON E2.\"EmployeeNo\" = I.\"UnitManager\""; // 取處經理姓名(介紹人)
 		sql += "	LEFT JOIN \"CdEmp\" E3 ON E3.\"EmployeeNo\" = I.\"DistManager\""; // 取區經理姓名(介紹人)
 		sql += "	LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"UnitCode\""; // 取單位中文(介紹人)

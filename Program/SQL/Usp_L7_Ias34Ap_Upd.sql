@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Ap_Upd"
 (
 -- 程式功能：維護 Ias34Ap 每月IAS34資料欄位清單A檔
@@ -97,7 +96,15 @@ BEGIN
            END                                       AS "DerCode"           -- 符合減損客觀證據之條件
          , NVL(F."GracePeriod", 0)                   AS "GracePeriod"       -- 初貸時約定還本寬限期
          , ROUND(NVL(M."ApproveRate", 0) / 100, 6)   AS "ApproveRate"       -- 核准利率
-         , NVL(M."AmortizedCode", 0)                 AS "AmortizedCode"     -- 契約當時還款方式  -- 1=按期繳息(到期還本)；2=平均攤還本息；3=平均攤還本金；4=到期繳息還本
+--         , NVL(M."AmortizedCode", 0)                 AS "AmortizedCode"     -- 契約當時還款方式  -- 1=按期繳息(到期還本)；2=平均攤還本息；3=平均攤還本金；4=到期繳息還本
+         , CASE
+             WHEN NVL(M."AmortizedCode",'0') = '1' THEN '1'  -- 1.按月繳息(按期繳息到期還本)
+             WHEN NVL(M."AmortizedCode",'0') = '2' THEN '4'  -- 2.到期取息(到期繳息還本)
+             WHEN NVL(M."AmortizedCode",'0') = '3' THEN '2'  -- 3.本息平均法(期金)
+             WHEN NVL(M."AmortizedCode",'0') = '4' THEN '3'  -- 4.本金平均法
+             WHEN NVL(M."AmortizedCode",'0') = '5' THEN '4'  -- 5.按月撥款收息(逆向貸款)  --???
+             ELSE '3'
+           END                                       AS "AmortizedCode"     -- 契約當時還款方式
          , CASE
              WHEN NVL(F."Ifrs9StepProdCode",' ') = 'B' THEN 4  -- 浮動階梯
              WHEN NVL(F."Ifrs9StepProdCode",' ') = 'A' THEN 3  -- 固定階梯
@@ -105,14 +112,21 @@ BEGIN
              WHEN NVL(M."RateCode", '0')  = '2'           THEN 2  -- 固定
              ELSE to_number(NVL(M."RateCode", '0'))
            END                                       AS "RateCode"          -- 契約當時利率調整方式（1=機動；2=固定；3=固定階梯；4=浮動階梯）
-         , NVL(M."RepayFreq", 0)                     AS "RepayFreq"         -- 契約約定當時還本週期
-         , NVL(M."PayIntFreq", 0)                    AS "PayIntFreq"        -- 契約約定當時繳息週期
+--         , NVL(M."RepayFreq", 0)                     AS "RepayFreq"         -- 契約約定當時還本週期
+         , CASE WHEN NVL(M."AmortizedCode", '0') IN ('1', '2') THEN 0  -- 到期還本
+                ELSE NVL(M."RepayFreq", 0)
+           END                                       AS "RepayFreq"         -- 契約約定當時還本週期
+--         , NVL(M."PayIntFreq", 0)                    AS "PayIntFreq"        -- 契約約定當時繳息週期
+         , CASE WHEN NVL(M."AmortizedCode",'0') = '2' THEN 0  -- 到期繳息還本
+                ELSE NVL(M."PayIntFreq",0)
+           END                                       AS "PayIntFreq"        -- 契約約定當時繳息週期
          , NVL(F."IndustryCode", ' ')                AS "IndustryCode"      -- 授信行業別
          , NVL(F."ClTypeJCIC", ' ')                  AS "ClTypeJCIC"        -- 擔保品類別
          , NVL(F."Zip3", ' ')                        AS "Zip3"              -- 擔保品地區別 (郵遞區號)
          , NVL(F."ProdNo", ' ')                      AS "ProdNo"            -- 商品利率代碼
          , CASE
-             WHEN F."EntCode" IN ('1') THEN 1  -- 企金
+--             WHEN F."EntCode" IN ('1') THEN 1  -- 企金
+             WHEN F."EntCode" IN ('1','2') THEN 1  -- 企金
              ELSE 2
            END                                       AS "CustKind"          -- 企業戶/個人戶 (1=企業戶 2=個人戶)
          , NVL(F."AssetClass", 0)                    AS "AssetClass"        -- 五類資產分類

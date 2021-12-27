@@ -86,26 +86,8 @@ public class L9703Report2 extends MakeReport {
 //		String f4 = "";
 //		String f5 = "";
 
-		String rptitem = "";
-		if ("L8101".equals(titaVo.getTxCode())) {
-			String dataDt = titaVo.get("DataDt").trim();
-			String custKey = titaVo.get("CustKey").trim();
-			String batchNo = titaVo.get("BatchNo");
-			if (batchNo == null) {
-				batchNo = "";
-			} else {
-				batchNo = batchNo.trim();
-			}
-			
-			if (batchNo.isEmpty()) {
-				rptitem = "放款本息攤還表暨繳息通知單("+dataDt+"/"+custKey+")";
-			} else {
-				rptitem = "放款本息攤還表暨繳息通知單("+titaVo.getParam("CALDY")+")";
-				this.setBatchNo(batchNo);
-			}			
-		} else {
-			rptitem = "放款本息攤還表暨繳息通知單";
-		}
+		String rptitem = "放款本息攤還表暨繳息通知單";
+
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703A", "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
 		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
 				titaVo.getTxCode().isEmpty() ? "L9703A" : titaVo.getTxCode(), rptitem, "inch,8.5,12", "P");

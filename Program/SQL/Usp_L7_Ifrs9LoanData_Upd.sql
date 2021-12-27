@@ -72,7 +72,7 @@ BEGIN
          , NVL(M."MaturityDate", 0)             AS "MaturityDate"      -- 到期日(撥款)
          , NVL(M."DrawdownAmt", 0)              AS "DrawdownAmt"       -- 撥款金額
          , NVL(M."LoanBal", 0)                  AS "LoanBal"           -- 本金餘額(撥款)
-         , NVL(M1."IntAmt", 0)                  AS "IntAmt"            -- 應收利息
+         , NVL(M1."IntAmtAcc", 0)               AS "IntAmt"            -- 應收利息
          , NVL(M."StoreRate", 0)                AS "Rate"              -- 利率(撥款)
          , CASE WHEN M."Status" IN (2, 7) THEN  -- 用 "下次繳息日"
                   CASE

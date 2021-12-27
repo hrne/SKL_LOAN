@@ -242,7 +242,7 @@ TXFORM=LC009
 #any={detail:true, header:'LC009.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #BTN=開啟/套印
-{width:70,search:false,formatter:'cust:bind-button:開啟',canExport:false,align:'center'}
+{width:80,search:false,formatter:'cust:bind-button:開啟',canExport:false,align:'center'}
 
 #BTN2=簽核
 {width:60,search:false,formatter:'cust:bind-button:#BTN2',align:'center',canExport:false}
@@ -254,10 +254,10 @@ TXFORM=LC009
 {width:80,align:'center'}
 
 #Code=代碼
-{width:150,align:'lefg'}
+{width:100,align:'lefg'}
 
 #Item=說明
-{width:400,align:'left'}
+{width:500,align:'left'}
 
 #TypeX=格式
 {width:60,align:'center'}

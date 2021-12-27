@@ -177,7 +177,7 @@ public class AjaxController extends SysLogger {
 
 		long reportNo = Long.parseLong(_m.get("reportNo").trim());
 		String printer = _m.get("printer");
-		int pageNo = 0;
+		int pageNo = 1;
 
 		MakeReport makeReport = MySpring.getBean("makeReport", MakeReport.class);
 
