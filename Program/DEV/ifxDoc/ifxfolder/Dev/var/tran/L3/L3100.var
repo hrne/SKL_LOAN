@@ -627,7 +627,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0 || #FKEY==7,$,s)
 C(3,#ApplNo,0,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#CustNo)
@@ -1141,7 +1141,7 @@ E(0,#DrawdownDate+19110000)
 #WKEND1=F,8,S
 E(0,#MaturityDate+19110000)
 
-#WKDAYCNT=A,5,S
+#WKDAYCNT=+n,5,S
 D(6,1,#WKBEG1,#WKEND1)
 
 #WKBASEDAY=A,1,S
@@ -2010,7 +2010,8 @@ IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,INVOKEJS(SHOW,p7,1),IN
 
 
 
-#RPTITLEtt=X,20,L
+
+#RPTITLEtt=X,26,L
 IF(#RP_AmlCheckName==#TimCustNoX,T(3,匯款人資料（本人）)
                                  T(3,@INITp7, ),$)
 IF(#RP_AmlCheckName==#RelationName,T(3,匯款人資料（同銀扣第三人）)

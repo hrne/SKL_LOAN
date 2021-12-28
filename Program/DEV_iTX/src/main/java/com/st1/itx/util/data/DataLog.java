@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.modelmapper.ModelMapper;
@@ -57,7 +58,11 @@ public class DataLog extends CommBuffer {
 
 	private int txsno = 0;
 
+	private List<HashMap<String, Object>> otherList = null;
+
 	public static AtomicInteger atomNext = new AtomicInteger(0);
+
+	private Map<String, Object> oldnewMap = new TreeMap<String, Object>();
 
 	/**
 	 * set parameters
@@ -67,10 +72,105 @@ public class DataLog extends CommBuffer {
 	 * @param aft    After data
 	 */
 	public void setEnv(TitaVo titaVo, Object bef, Object aft) {
+//		this.setTitaVo(titaVo);
+//		this.bef = bef;
+//		this.aft = aft;
+//		objectName = bef.getClass().getSimpleName();
+		setEnv(titaVo, bef, aft, null);
+	}
+
+	/**
+	 * set parameters
+	 * 
+	 * @param titaVo   TitaVo
+	 * @param bef      Before data
+	 * @param aft      After data
+	 * @param otrList 其他變更項目一次放入
+	 */
+	public void setEnv(TitaVo titaVo, Object bef, Object aft, List<HashMap<String, Object>> otrList) {
 		this.setTitaVo(titaVo);
 		this.bef = bef;
 		this.aft = aft;
 		objectName = bef.getClass().getSimpleName();
+		if (otrList != null) {
+			otherList.addAll(otrList);
+		}
+	}
+
+	/**
+	 * 逐一放入其他變更項目
+	 * 
+	 * @param key key
+	 * @param bef before value
+	 * @param aft after value
+	 */
+	public void setLog(String key, Object bef, Object aft) {
+//		this.info("setLog = " + key + "/" + bef + "/" + aft);
+		if (otherList == null) {
+			otherList = new ArrayList<HashMap<String, Object>>();
+		}
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("f", key);
+		map.put("o", bef);
+		map.put("n", aft);
+		otherList.add(map);
+	}
+
+	/**
+	 * 針對多筆式明細檔比對用,放入原值
+	 * 
+	 * @param key key
+	 * @param val value
+	 */
+	public void putOld(String key, Object val) {
+		oldnewMap.put(key + "_O", val);
+	}
+
+	/**
+	 * 針對多筆式明細檔比對用,放入新值
+	 * 
+	 * @param key key
+	 * @param val value
+	 */
+	public void putNew(String key, Object val) {
+		oldnewMap.put(key + "_N", val);
+	}
+
+	/**
+	 * 記錄oldnewMap新舊有差異者
+	 */
+
+	/**
+	 * 記錄oldnewMap新舊有差異者
+	 * 
+	 * @param dVal 預設值
+	 */
+	public void compareOldNew(Object dVal) {
+		String oKey = "";
+		Object oVal = dVal;
+		Object nVal = dVal;
+		boolean newfg = false;
+		for (Map.Entry<String, Object> entry : oldnewMap.entrySet()) {
+//			this.info("key:" + entry.getKey() + ",value:" + entry.getValue());
+			String mapKey = entry.getKey().trim();
+			mapKey = mapKey.substring(0, mapKey.length() - 2);
+
+			if (!oKey.isEmpty() && !oKey.equals(mapKey)) {
+				// add difference
+				if (oVal != nVal) {
+					this.setLog(oKey, oVal, nVal);
+				}
+				oVal = dVal;
+				nVal = dVal;
+			}
+
+			oKey = mapKey;
+			if ("_O".equals(entry.getKey().substring(entry.getKey().length() - 2))) {
+				oVal = entry.getValue();
+			} else {
+				nVal = entry.getValue();
+			}
+		}
 	}
 
 	@Override
@@ -162,6 +262,10 @@ public class DataLog extends CommBuffer {
 			this.info("物件1與物件2的屬性值無差異！");
 		}
 
+		if (otherList != null) {
+			listMap.addAll(otherList);
+		}
+
 		txDataLog.setReason(reason);
 
 		try {
@@ -172,7 +276,7 @@ public class DataLog extends CommBuffer {
 		}
 
 		try {
-			txDataLogService.insert(txDataLog);
+			txDataLogService.insert(txDataLog, titaVo);
 		} catch (DBException e) {
 			if (e.getErrorId() == 2)
 				while (true) {
@@ -183,7 +287,7 @@ public class DataLog extends CommBuffer {
 					txDataLogId.setTxSno(this.txsno);
 					txDataLog.setTxDataLogId(txDataLogId);
 					try {
-						txDataLogService.insert(txDataLog);
+						txDataLogService.insert(txDataLog, titaVo);
 					} catch (DBException e1) {
 						if (e1.getErrorId() == 2)
 							this.warn("TxDataLog Key Duplicate : " + txDataLogId);

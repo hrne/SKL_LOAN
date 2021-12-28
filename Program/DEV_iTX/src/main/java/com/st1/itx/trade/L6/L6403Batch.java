@@ -2,6 +2,8 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -13,13 +15,16 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.TxAuthGroup;
 import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.TxAuthority;
 import com.st1.itx.db.domain.TxAuthorityId;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxAuthorityService;
+import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.util.http.WebClient;
 
 @Service("L6403Batch")
@@ -41,6 +46,12 @@ public class L6403Batch extends TradeBuffer {
 	public TxAuthorityService sTxAuthorityService;
 
 	@Autowired
+	public TxTranCodeService sTxTranCodeService;
+	
+	@Autowired
+	public DataLog dataLog;
+
+	@Autowired
 	DateUtil dDateUtil;
 
 	@Autowired
@@ -48,6 +59,8 @@ public class L6403Batch extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
+
+	private Map<String, Integer> authMap = new TreeMap<String, Integer>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -68,7 +81,8 @@ public class L6403Batch extends TradeBuffer {
 
 			tTxAuthGroup = new TxAuthGroup();
 			tTxAuthGroup = MoveToAuthGroup(iAuthNo, tTxAuthGroup, titaVo);
-			tTxAuthGroup.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tTxAuthGroup.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tTxAuthGroup.setCreateEmpNo(titaVo.getTlrNo());
 			try {
 				this.info("TxAuthGroup Authno = " + tTxAuthGroup.getAuthNo());
@@ -84,12 +98,20 @@ public class L6403Batch extends TradeBuffer {
 			}
 			try {
 				if ("2".equals(iFunCode)) {
+					TxAuthGroup tTxAuthGroup2 = (TxAuthGroup) dataLog.clone(tTxAuthGroup);
+
 					tTxAuthGroup = MoveToAuthGroup(iAuthNo, tTxAuthGroup, titaVo);
-					tTxAuthGroup.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-					tTxAuthGroup.setLastUpdateEmpNo(titaVo.getTlrNo());
-					sTxAuthGroupService.update(tTxAuthGroup);
+					tTxAuthGroup = sTxAuthGroupService.update2(tTxAuthGroup);
+
 					DeleteAllAuthority(iAuthNo, titaVo);
 					InsertAllAuthority(iAuthNo, titaVo);
+
+					dataLog.compareOldNew("無權限");
+					
+					dataLog.setEnv(titaVo, tTxAuthGroup2, tTxAuthGroup);
+					dataLog.exec("修改權限群組 " + tTxAuthGroup.getAuthNo());
+
+					
 				} else if ("4".equals(iFunCode)) {
 					sTxAuthGroupService.delete(tTxAuthGroup);
 					DeleteAllAuthority(iAuthNo, titaVo);
@@ -103,7 +125,8 @@ public class L6403Batch extends TradeBuffer {
 			}
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "已成功更新權限群組" + iAuthNo + "交易權限", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "",
+				"已成功更新權限群組" + iAuthNo + "交易權限", titaVo);
 
 		return null;
 	}
@@ -244,7 +267,8 @@ public class L6403Batch extends TradeBuffer {
 
 	}
 
-	private void InserOnetAuthority(String AuthNo, String TranNo, String CanFg, String InqFg, TitaVo titaVo) throws LogicException {
+	private void InserOnetAuthority(String AuthNo, String TranNo, String CanFg, String InqFg, TitaVo titaVo)
+			throws LogicException {
 //		this.info("L6403 > InserOnetAuthority = " + AuthNo + "/" + TranNo + "/" + CanFg + "/" + InqFg);
 		TxAuthority tTxAuthority = new TxAuthority();
 		int AuthFg = 0;
@@ -256,15 +280,20 @@ public class L6403Batch extends TradeBuffer {
 			AuthFg = 0;
 		}
 
+		TxTranCode txTranCode = sTxTranCodeService.findById(TranNo, titaVo);
+		if (txTranCode != null) {
+			dataLog.putNew(txTranCode.getTranNo() + " " + txTranCode.getTranItem(), authFgX(AuthFg));
+		}
+
 		if (AuthFg != 0) {
 			try {
 				TxAuthorityId tTxAuthorityId = new TxAuthorityId(AuthNo, TranNo);
 				tTxAuthority.setTxAuthorityId(tTxAuthorityId);
 				tTxAuthority.setAuthFg(AuthFg);
-				tTxAuthority.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tTxAuthority.setCreateDate(
+						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 				tTxAuthority.setCreateEmpNo(titaVo.getTlrNo());
-//				this.info("L6403 > Txauthority = " + tTxAuthority.getAuthNo() + "/" + tTxAuthority.getTranNo() + "/" + tTxAuthority.getAuthFg());
-				sTxAuthorityService.insert(tTxAuthority,titaVo);
+				sTxAuthorityService.insert(tTxAuthority, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
@@ -282,7 +311,6 @@ public class L6403Batch extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
-//		Slice<TxAuthority> slTxauthority = sTxAuthorityService.findByAuthNo(AuthNo, this.index, this.limit);
 		Slice<TxAuthority> slTxauthority = sTxAuthorityService.findByAuthNo2(AuthNo, "LC%", this.index, this.limit);
 		List<TxAuthority> lTxauthority = slTxauthority == null ? null : slTxauthority.getContent();
 
@@ -292,7 +320,25 @@ public class L6403Batch extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
+
+			for (TxAuthority txAuthority : lTxauthority) {
+				TxTranCode txTranCode = sTxTranCodeService.findById(txAuthority.getTranNo(), titaVo);
+				if (txTranCode != null) {
+					dataLog.putOld(txTranCode.getTranNo() + " " + txTranCode.getTranItem(), authFgX(txAuthority.getAuthFg()));
+				}
+			}
 		}
 	}
 
+	private String authFgX(int authfg) {
+		String r = "";
+		if (authfg == 0) {
+			r = "無權限";
+		} else if (authfg == 1) {
+			r = "僅查詢權限";
+		} else if (authfg == 2) {
+			r = "全部權限";
+		}
+		return r;
+	}
 }

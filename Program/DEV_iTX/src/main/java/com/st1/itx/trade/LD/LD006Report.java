@@ -31,7 +31,7 @@ public class LD006Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -78,6 +78,11 @@ public class LD006Report extends MakeReport {
 					case 10: // K欄:撥款金額
 						total = total.add(getBigDecimal(tmpValue));
 						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue, "#,##0");
+						break;
+					case 11: // L, M, N欄: 部室/區部/單位代號
+					case 12:
+					case 13:
+						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue, "L");
 						break;
 					case 17: // 員工代號
 						makeExcel.setValue(row, col, tmpValue);

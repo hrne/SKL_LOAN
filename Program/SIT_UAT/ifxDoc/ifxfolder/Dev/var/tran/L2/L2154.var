@@ -1019,7 +1019,7 @@ E(0,@RateAdjNoticeCode,#L2r05RateAdjNoticeCode)
 E(0,@RepayCode,#L2r05RepayCode)
 E(0,@OldRepayCode,#L2r05RepayCode)
 T(2,@RepayBank,#L2r05RepayBank)
-E(0,@OldRepayBank,#L2r05RepayBank)
+T(2,@OldRepayBank,#L2r05RepayBank)
 E(0,@RepayAcctNo,#L2r05RepayAcctNo)
 E(0,@OldAcctNo,#L2r05RepayAcctNo)
 T(2,@PostCode,#L2r05PostCode)
@@ -2587,7 +2587,7 @@ T(H,#RepayCode,#RepayCodeHelp)
 #MainStatus=X,1,S
 #OldRepayCode=A,2,S
 #OldAcctNo=A,14,S
-#OldRepayBank=A,3,S
+#OldRepayBank=X,3,S
 #OldPostCode=X,1,S
 #OldRelationCode=X,2,S
 #OldRelationName=x,100,S
@@ -2609,7 +2609,7 @@ R(1,L2R44)
 IF(#FKEY==0,$,s)
 C(3,#RepayCode,2,$,S)
 T(2,@RepayBank,#L2r44RepayBank)
-E(0,@OldRepayBank,#L2r44RepayBank)
+T(2,@OldRepayBank,#L2r44RepayBank)
 E(0,@RepayAcctNo,#L2r44RepayAcctNo)
 E(0,@OldAcctNo,#L2r44RepayAcctNo)
 T(2,@PostCode,#L2r44PostCode)
