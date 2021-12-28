@@ -27,6 +27,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
+
 	private int intStartDate = 0;
 	private int intEndDate = 0;
 	private int flag = 0;

@@ -38,9 +38,9 @@ E(0,0)
 !["#FdBranchStatusCode+單位控制碼",#BranchStatusCode],
 !["#FdRSOCode+稽核機關代號",#RSOCode],
 !["#FdMediaUnitCode+媒體單位代號",#MediaUnitCode],
-["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","","",
-["課組別名稱"],
-[[#Group1]],
+["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[], p_cols:[]}","","",
+["課組別","課組別名稱"],
+[[#GroupNo1],[#Group1]],
 ],
 ]
 !---------- AP Button AREA ----------
@@ -154,8 +154,8 @@ C(3,#FuncCode,1,INVOKEJS(SHOW,grd1,2,50,0),$)
 IF (#FuncCode==1 || #FuncCode==2 ,T(F,@CRH,1)T(F,@BranchShort,1)T(F,@BranchItem,1)T(F,@Zip3,1)T(F,@Zip2,1)T(F,@BranchAddress,1)T(F,@Owner,1)T(F,@BusinessID,1)T(F,@BranchStatusCode,1)T(F,@RSOCode,1)T(F,@MediaUnitCode,1),
                                   T(F,@CRH,0)T(F,@BranchShort,0)T(F,@BranchItem,0)T(F,@Zip3,0)T(F,@Zip2,0)T(F,@BranchAddress,0)T(F,@Owner,0)T(F,@BusinessID,0)T(F,@BranchStatusCode,0)T(F,@RSOCode,0)T(F,@MediaUnitCode,0))
 IF (#FuncCode==1 ,T(F,@BranchNo,1),T(F,@BranchNo,0))
-##loop{times:50,i:1}
-IF (#FuncCode==1 || #FuncCode==2 ,T(F,@Group{i},1),T(F,@Group{i},0))
+##loop{times:20,i:1}
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@Group{i},1)T(F,@GroupNo{i},1),T(F,@Group{i},0)T(F,@GroupNo{i},0))
 ##end
 
 #WKPSC=X,2,S
@@ -224,9 +224,10 @@ T(2,@BusinessID,#L6R02BusinessID)
 T(2,@BranchStatusCode,#L6R02BranchStatusCode)
 T(2,@RSOCode,#L6R02RSOCode)
 T(2,@MediaUnitCode,#L6R02MediaUnitCode)
+T(2,@GroupNo1,#L6R02GroupNo1)
 T(2,@Group1,#L6R02Group1)
-##loop{times:9,i:2}
-C(4,#L6R02Group{i},INVOKEJS(SHOW,grd1,{i},{i},0),T(2,@Group{i},#L6R02Group{i}))
+##loop{times:19,i:2}
+C(4,#L6R02Group{i},INVOKEJS(SHOW,grd1,{i},{i},0),T(2,@Group{i},#L6R02Group{i})T(2,@GroupNo{i},#L6R02GroupNo{i}))
 ##end
 
 
@@ -307,22 +308,56 @@ C(2,#FuncCode,$,$,$,$,s,s)
 C(2,#FuncCode,$,$,$,$,s,s)
 @V(7)
 
+!編號
+#GroupNo1=X,1,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)V(NL)
+
 ! 課組別名稱
 #Group1=x,20,I
 C(2,#FuncCode,$,$,$,$,s,s)
 @V(7)
 
-##loop{times:9,i:2,j:1}
+##loop{times:19,i:2,j:1}
+
+!編號
+#GroupNo{i}=X,1,I
+C(4,#GroupNo{j},S,$)
+!T(2,#L6R02GroupNo{i})
+C(4,#GroupNo{j},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+C(2,#FuncCode,$,$,$,$,s,s)
+@C(4,#GroupNo{i},S,$)
+V(NL)
+C(3,{i},2,V(4,#GroupNo1),$)
+C(3,{i},3,V(4,#GroupNo1,#GroupNo2),$)
+C(3,{i},4,V(4,#GroupNo1,#GroupNo2,#GroupNo3),$)
+C(3,{i},5,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4),$)
+C(3,{i},6,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5),$)
+C(3,{i},7,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6),$)
+C(3,{i},8,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7),$)
+C(3,{i},9,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8),$)
+C(3,{i},10,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9),$)
+C(3,{i},11,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10),$)
+C(3,{i},12,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11),$)
+C(3,{i},13,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12),$)
+C(3,{i},14,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12,#GroupNo13),$)
+C(3,{i},15,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12,#GroupNo13,#GroupNo14),$)
+C(3,{i},16,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12,#GroupNo13,#GroupNo14,#GroupNo15),$)
+C(3,{i},17,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12,#GroupNo13,#GroupNo14,#GroupNo15,#GroupNo16),$)
+C(3,{i},18,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12,#GroupNo13,#GroupNo14,#GroupNo15,#GroupNo16,#GroupNo17),$)
+C(3,{i},19,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12,#GroupNo13,#GroupNo14,#GroupNo15,#GroupNo16,#GroupNo17,#GroupNo18),$)
+C(3,{i},20,V(4,#GroupNo1,#GroupNo2,#GroupNo3,#GroupNo4,#GroupNo5,#GroupNo6,#GroupNo7,#GroupNo8,#GroupNo9,#GroupNo10,#GroupNo11,#GroupNo12,#GroupNo13,#GroupNo14,#GroupNo15,#GroupNo16,#GroupNo17,#GroupNo18,#GroupNo19),$)
 
 ! 課組別名稱
 #Group{i}=x,20,I
-C(4,#Group{j},S,$)
-C(4,#Group{j},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
-T(2,#L6R02Group{i})
+C(4,#GroupNo{i},S,$)
+!T(2,#L6R02Group{i})
 C(2,#FuncCode,$,$,$,$,s,s)
+@C(4,#GroupNo{i},S,$)
+V(7)
 
 #showGroup{i}=X,1,S
-C(4,#Group{i},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+C(4,#GroupNo{i},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
 
 ##end
 
@@ -362,7 +397,8 @@ T(3,[L6702] 營業單位對照檔維護)
 <sub type="TIM">
 
 #FuncCode#BranchNo#CRH#BranchShort#BranchItem#Zip3#Zip2#BranchAddress#Owner#BusinessID#BranchStatusCode#RSOCode#MediaUnitCode
-##loop{times:10,i:1}
+##loop{times:20,i:1}
+#GroupNo{i}
 #Group{i}
 ##end
 #END

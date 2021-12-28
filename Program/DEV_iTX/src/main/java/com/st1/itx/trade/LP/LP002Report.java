@@ -454,6 +454,8 @@ public class LP002Report extends MakeReport {
 				// 月份
 				dmm = Integer.valueOf(tLDVo.get("F3").substring(4, 6));
 
+				this.info("dmm = " + dmm);
+
 				if (wkMonth <= 3) {
 
 					makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
@@ -486,7 +488,8 @@ public class LP002Report extends MakeReport {
 
 						// 第一次 建立累計欄位
 						if (firstCreate) {
-							this.info("建立累計欄位, tRow = " + tRow + " , scol = " + scol);
+							this.info("建立累計欄位, tRow = " + tRow + " , scol = " + scol + " ,cntTotal = " + cntTotal
+									+ " ,amtTotal = " + amtTotal);
 
 							makeExcel.setValue(tRow, scol, cntTotal, "#,##0", "R");
 							makeExcel.setValue(tRow, scol + 1, amtTotal, "#,##0", "R");
@@ -499,8 +502,9 @@ public class LP002Report extends MakeReport {
 						cntRowTotal = cntRowTotal.add(tmpCnt);
 						amtRowTotal = amtRowTotal.add(tmpAmt);
 
-						this.info("累計+陸續工作月的 總計, tRow = " + tRow + " , scol = " + scol);
-						
+						this.info("累計+陸續工作月的 總計, tRow = " + tRow + " , scol = " + scol + " ,tmpCnt = " + tmpCnt
+								+ " ,tmpAmt = " + tmpAmt);
+
 						makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
 						makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
 						scol += 2;

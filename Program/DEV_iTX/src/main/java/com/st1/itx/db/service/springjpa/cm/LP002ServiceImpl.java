@@ -61,7 +61,7 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMM = 13;
 		} else {
 			iYEAR = Integer.parseInt(wkVo.get("F0"));
-			iMM = Integer.parseInt(wkVo.get("F1")) - 1;
+			iMM = Integer.parseInt(wkVo.get("F1"));
 		}
 
 		int wkm = iYEAR * 100 + iMM;
@@ -142,7 +142,7 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMM = 13;
 		} else {
 			iYEAR = Integer.parseInt(wkVo.get("F0"));
-			iMM = Integer.parseInt(wkVo.get("F1")) - 1;
+			iMM = Integer.parseInt(wkVo.get("F1"));
 		}
 		this.info("lp002.findDist ENTDY=" + iENTDY + ",iyear=" + iYEAR + ", imm=" + iMM);
 
@@ -233,7 +233,7 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMM = 13;
 		} else {
 			iYEAR = Integer.parseInt(wkVo.get("F0"));
-			iMM = Integer.parseInt(wkVo.get("F1")) - 1;
+			iMM = Integer.parseInt(wkVo.get("F1"));
 		}
 		this.info("lP002.findUnit ENTDY=" + iENTDY + ",iyear=" + iYEAR + ", imm=" + iMM);
 

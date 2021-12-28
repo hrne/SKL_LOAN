@@ -291,6 +291,12 @@ T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 
 #OOTxtNo=X,8,O
 
+#OOPayCode=X,1,O
+#OOPayCodeX=x,30,O
+
+#OOPayCodeXX=X,35,O
+T(2,#OOPayCode+-+#OOPayCodeX)
+
 #OOBUF_A=X,37,S
 T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OOCustNo+#OOFacmNo+#OOBormNo)
 
@@ -326,6 +332,8 @@ TXFORM=L4901
 #OORemitAmt
 #OOTellerNo
 #OOTxtNo
+#OOPayCode
+#OOPayCodeX
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -359,6 +367,8 @@ TXFORM=L4901
 {width:95}
 #OOStatusCodeX=狀態
 {width:95}
+#OOPayCodeX=匯款狀態
+{width:110}
 #OORemitBankX=匯款銀行
 {width:110}
 #OORemitBranchX=匯款分行
@@ -390,6 +400,8 @@ TXFORM=L4901
 {width:150}
 #OOStatusCodeX=狀態
 {width:95}
+#OOPayCodeX=匯款狀態
+{width:110}
 #OORemitBankX=匯款銀行
 {width:120}
 #OORemitBranchX=匯款分行

@@ -162,22 +162,6 @@ public class L6702 extends TradeBuffer {
 		mCdBranch.setBranchStatusCode(titaVo.getParam("BranchStatusCode"));
 		mCdBranch.setRSOCode(titaVo.getParam("RSOCode"));
 		mCdBranch.setMediaUnitCode(titaVo.getParam("MediaUnitCode"));
-//		mCdBranch.setGroup1(titaVo.getParam("Group1"));
-//		mCdBranch.setGroup2(titaVo.getParam("Group2"));
-//		mCdBranch.setGroup3(titaVo.getParam("Group3"));
-//		mCdBranch.setGroup4(titaVo.getParam("Group4"));
-//		mCdBranch.setGroup5(titaVo.getParam("Group5"));
-//		mCdBranch.setGroup6(titaVo.getParam("Group6"));
-//		mCdBranch.setGroup7(titaVo.getParam("Group7"));
-//		mCdBranch.setGroup8(titaVo.getParam("Group8"));
-//		mCdBranch.setGroup9(titaVo.getParam("Group9"));
-//		mCdBranch.setGroup10(titaVo.getParam("Group10"));
-//		if (mFuncCode != 2) {
-//			mCdBranch.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//			mCdBranch.setCreateEmpNo(titaVo.getTlrNo());
-//		}
-//		mCdBranch.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//		mCdBranch.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
 
 	private void moveCdBranchGroup(String mBranchNo, int mFuncCode, TitaVo titaVo) throws LogicException {
@@ -197,23 +181,17 @@ public class L6702 extends TradeBuffer {
 		}
 
 		if (mFuncCode == 1 || mFuncCode == 2) {
-			for (int i = 1; i <= 10; i++) {
-
+			for (int i = 1; i <= 20; i++) {
 				if (titaVo.getParam("Group" + i) != null && titaVo.getParam("Group" + i).length() > 0) {
 					CdBranchGroup tCdBranchGroup = new CdBranchGroup();
 					CdBranchGroupId tCdBranchGroupId = new CdBranchGroupId();
 
-					if (i == 10) {
+					
 						tCdBranchGroupId.setBranchNo(mBranchNo);
-						tCdBranchGroupId.setGroupNo("A");
+						tCdBranchGroupId.setGroupNo(titaVo.getParam("GroupNo"+i));
 						tCdBranchGroup.setCdBranchGroupId(tCdBranchGroupId);
 						tCdBranchGroup.setGroupItem(titaVo.getParam("Group" + i));
-					} else {
-						tCdBranchGroupId.setBranchNo(mBranchNo);
-						tCdBranchGroupId.setGroupNo(String.valueOf(i));
-						tCdBranchGroup.setCdBranchGroupId(tCdBranchGroupId);
-						tCdBranchGroup.setGroupItem(titaVo.getParam("Group" + i));
-					}
+					
 
 					try {
 						sCdBranchGroupService.insert(tCdBranchGroup, titaVo);

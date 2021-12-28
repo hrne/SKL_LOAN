@@ -17,8 +17,11 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdBankService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
@@ -59,6 +62,8 @@ public class L4901 extends TradeBuffer {
 
 	@Autowired
 	public CdBankService cdBankService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	DataLog datalog;
@@ -95,10 +100,12 @@ public class L4901 extends TradeBuffer {
 			slBankRemit = bankRemitService.findL4901A(iCustNo, this.index, this.limit);
 			break;
 		case 2: // 批號
-			slBankRemit = bankRemitService.findL4901B(iAcDate, batchNo, drawdownCodeS, drawdownCodeE, 0, 9, this.index, this.limit, titaVo);
+			slBankRemit = bankRemitService.findL4901B(iAcDate, batchNo, drawdownCodeS, drawdownCodeE, 0, 9, this.index,
+					this.limit, titaVo);
 			break;
 		case 3: // 全部批號
-			slBankRemit = bankRemitService.findL4901C(iAcDate, drawdownCodeS, drawdownCodeE, 0, 9, this.index, this.limit, titaVo);
+			slBankRemit = bankRemitService.findL4901C(iAcDate, drawdownCodeS, drawdownCodeE, 0, 9, this.index,
+					this.limit, titaVo);
 			break;
 		}
 
@@ -178,7 +185,8 @@ public class L4901 extends TradeBuffer {
 
 			CdBank tCdBank = new CdBank();
 			if (!tBankRemit.getRemitBranch().isEmpty()) {
-				tCdBank = cdBankService.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()), titaVo);
+				tCdBank = cdBankService.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()),
+						titaVo);
 			}
 			String ckItem = "";
 			String brItem = "";
@@ -186,6 +194,11 @@ public class L4901 extends TradeBuffer {
 			if (tCdBank != null) {
 				ckItem = tCdBank.getBankItem();
 				brItem = tCdBank.getBranchItem();
+			}
+			String payCodeItem = "";
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("PayCode", tBankRemit.getPayCode()), titaVo);
+			if (tCdCode != null) {
+				payCodeItem = tCdCode.getItem();
 			}
 
 			occursList.putParam("OORemitBankX", ckItem);
@@ -200,6 +213,8 @@ public class L4901 extends TradeBuffer {
 			occursList.putParam("OORemitAmt", tBankRemit.getRemitAmt());
 			occursList.putParam("OOTellerNo", tBankRemit.getTitaTlrNo());
 			occursList.putParam("OOTxtNo", tBankRemit.getTitaTxtNo());
+			occursList.putParam("OOPayCode", tBankRemit.getPayCode());
+			occursList.putParam("OOPayCodeX", payCodeItem);
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

@@ -27,6 +27,7 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
+
 	private int mediaDate = 0;
 	private String procCode = "";
 

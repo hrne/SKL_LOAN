@@ -70,13 +70,10 @@ T(3,CdCode.CurrPrecision)
 
 #CurrPrecisionHelp=x,1024,S
 
-
-
 #CDCODEBatchRepayCode=x,30,S                  
 T(3,CdCode.BatchRepayCode)                  
                                       
 #RepayCodeHelp=x,1024,S  
-
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -100,7 +97,6 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
-
 
 #CHAINTXCD=_,_,S
 C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
@@ -134,7 +130,8 @@ C(4,#CustNo,HIDE(#BTN1),SHOW(#BTN1))
 ! C(4,#CustNo,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
 
 #BUF1B=X,18,S
-T(2,#CustNo+9999999000)
+C(4,#CustNo,T(3,00000009999999000),T(2,#CustNo+9999999000))
+
 
 #BIND1B=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
@@ -556,7 +553,7 @@ TXFORM=L3911
 #any={detail:true, header:'L3911.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 
 #OOBTN1=內容查詢
-{width:80,search:false,formatter:'cust:bind-button:內容查詢;L3912 交易內容查詢',align:'center',canExport:false}
+{width:80,search:false,formatter:'cust:bind-button:內容查詢;L3917 繳息明細查詢',align:'center',canExport:false}
 
 #OOFacmNo=額度編號 
 {width:85,align:'center'}

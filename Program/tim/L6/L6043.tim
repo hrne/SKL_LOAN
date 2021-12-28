@@ -48,4 +48,5 @@ NBSDY=9,8
 NNBSDY=9,8
 BranchNo=X,4
 AuthNo=X,6
+Status=9,1
 END=X,1

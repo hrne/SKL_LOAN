@@ -16,3 +16,5 @@ OOCurrencyCode=X,3
 OORemitAmt=9,14.2
 OOTellerNo=X,6
 OOTxtNo=X,8
+OOPayCode=X,1
+OOPayCodeX=X,30

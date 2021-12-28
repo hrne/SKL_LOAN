@@ -56,7 +56,7 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	      ,NVL(E2.\"AgentId\", E5.\"AgentId\") AS \"UnitAgentId\"";
 		sql += "	      ,NVL(E3.\"AgentId\", E6.\"AgentId\") AS \"DistAgentId\"";
 		sql += "	      ,NVL(PDA.\"AdjPerfAmt\",R.\"IntroducerAddBonus\") AS \"IntroAddBonus\"";
-		sql += "	      ,NVL(E1.\"Fullname\",E11\"Fullname\") AS \"IntName\"";
+		sql += "	      ,NVL(E1.\"Fullname\",E11.\"Fullname\") AS \"IntName\"";
 		sql += "	      ,C.\"CustName\" AS \"CustName\"";
 		sql += "	FROM(SELECT I.\"CustNo\"";
 		sql += " 	           ,I.\"FacmNo\"";

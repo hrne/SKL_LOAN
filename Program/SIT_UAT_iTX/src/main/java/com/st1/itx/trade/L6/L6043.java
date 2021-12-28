@@ -1,11 +1,10 @@
+
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -30,7 +29,6 @@ import com.st1.itx.db.service.CdBranchService;
  * @version 1.0.0
  */
 public class L6043 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6043.class);
 
 	/* DB服務注入 */
 
@@ -40,7 +38,7 @@ public class L6043 extends TradeBuffer {
 	@Autowired
 	public CdBranchService cdBranchService;
 
-	HashMap branchItems = new HashMap();
+	HashMap<String, String> branchItems = new HashMap<String, String>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -49,7 +47,12 @@ public class L6043 extends TradeBuffer {
 
 		String iBranchNo = titaVo.getParam("BranchNo");
 		String iAuthNo = titaVo.getParam("AuthNo") + "%";
-
+		int iStatus1 = Integer.parseInt(titaVo.getParam("Status"));
+		int iStatus2 = 0;
+		if(iStatus1==9) {
+			iStatus1=0;
+			iStatus2=1;
+		}
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -61,9 +64,9 @@ public class L6043 extends TradeBuffer {
 		Slice<TxAuthGroup> slTxAuthGroup = null;
 
 		if ("".equals(iBranchNo)) {
-			slTxAuthGroup = txAuthGroupService.AuthNoLike(iAuthNo, this.index, this.limit);
+			slTxAuthGroup = txAuthGroupService.AuthNoLike(iAuthNo, iStatus1, iStatus2, this.index, this.limit);
 		} else {
-			slTxAuthGroup = txAuthGroupService.BranchAuthNo(iBranchNo, iAuthNo, this.index, this.limit);
+			slTxAuthGroup = txAuthGroupService.BranchAuthNo(iBranchNo, iAuthNo, iStatus1, iStatus2, this.index, this.limit);
 
 		}
 		List<TxAuthGroup> lTxAuthGroup = slTxAuthGroup == null ? null : slTxAuthGroup.getContent();
@@ -73,12 +76,20 @@ public class L6043 extends TradeBuffer {
 		} else {
 			for (TxAuthGroup tTxAuthGroup : lTxAuthGroup) {
 				OccursList occursList = new OccursList();
+				int log =0;
 				occursList.putParam("OAuthNo", tTxAuthGroup.getAuthNo());
 				occursList.putParam("OAuthItem", tTxAuthGroup.getAuthItem());
 				occursList.putParam("ODesc", tTxAuthGroup.getDesc());
 				occursList.putParam("OBranchNo", tTxAuthGroup.getBranchNo());
 				occursList.putParam("OBranchItem", getBranchItem(tTxAuthGroup.getBranchNo().trim(), titaVo));
 				occursList.putParam("OLevelFg", tTxAuthGroup.getLevelFg());
+				this.info("CreateDate="+tTxAuthGroup.getCreateDate());
+				this.info("LastUpdate="+tTxAuthGroup.getLastUpdate());
+				if(!tTxAuthGroup.getCreateDate().equals(tTxAuthGroup.getLastUpdate())) {
+					log = 1;
+				}
+				occursList.putParam("OLog", log);
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

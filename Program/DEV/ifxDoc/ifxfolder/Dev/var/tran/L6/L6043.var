@@ -49,6 +49,7 @@ T(3,0: ;1:主管;3:經辦)
 ["[L6043]                                 權限群組查詢"],
 ["#Fd+使用單位",#BranchNo,#BranchNoX],
 ["#Fd+權限群組",#AuthNo],
+["#Fd+權限狀態",#Status,#StatusX],
 ]
 !---------- AP Button AREA ----------
 
@@ -80,6 +81,7 @@ T(2,@BrHelp,#HelpDesc1)
 
 !YesNoHelp
 #StatusHelp=X,50,S
+T(3,0:正常;1:停用;9:全部)
 
 !#RPTFG=A,1,S
 !E(0,0)
@@ -94,6 +96,13 @@ T(H,#BranchNo,#BrHelp)
 
 !權限群組
 #AuthNo=X,6,I
+
+!權限狀態
+#Status=A,1,I
+HELP(#StatusHelp)
+
+#StatusX=X,10,L
+T(H,#Status,#StatusHelp)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -148,6 +157,8 @@ T(2,#OBranchNo+ +#OBranchItem)
 #OLevelFgX=X,4,S
 T(H,#OLevelFg,#LevelHelp)
 
+#OLog=A,1,S
+
 ! 修改的按鈕
 #OFunc2=A,1,S
 E(0,2)
@@ -158,16 +169,22 @@ T(2,#OFunc2+#OAuthNo)
 #OBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6403;text=修改;ntxbuf=#OBUF2})
 
+!複製
+#OBUF3=X,65,S
+T(2,3+#OAuthNo)
+
+#OBTN3=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6403;text=複製;ntxbuf=#OBUF3})
+
 ! 刪除的按鈕
 #OFunc4=A,1,S
 E(0,4)
 
 #OBUF4=X,65,S
-T(2,#OFunc4+#OAuthNo)
+T(2,L6403+#OAuthNo)
 
 #OBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6403;text=刪除;ntxbuf=#OBUF4})
-
+C(3,#OLog,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF4}))
 </sub>
 
 
@@ -175,6 +192,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6403;text=刪除;ntxbuf=#OBUF4})
 <sub type="TIM">
 #BranchNo
 #AuthNo
+#Status
 #END
 </sub>
 
@@ -189,6 +207,7 @@ TXFORM=L6043
 #OBranchNo
 #OBranchItem
 #OLevelFg
+#OLog
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
@@ -210,7 +229,10 @@ TXFORM=L6043
 #OBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OBTN2',align:'center',canExport:false}
 
-#OBTN4=刪除
+#OBTN3=複製
+{width:50,search:false,formatter:'cust:bind-button:#OBTN3',align:'center',canExport:false}
+
+#OBTN4=歷程
 {width:50,search:false,formatter:'cust:bind-button:#OBTN4',align:'center',canExport:false}
 
 #OAuthNo=權限群組</br>編號

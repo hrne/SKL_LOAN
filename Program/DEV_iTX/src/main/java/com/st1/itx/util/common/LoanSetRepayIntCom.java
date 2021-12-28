@@ -135,12 +135,12 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setIntCalcCode(t.getIntCalcCode());// 計息方式 1:按日計息 2:按月計息
 		// 利息提存
 		// 1.業務科目=310直接以日計算
-		// 2.中長擔按月繳息者(不看是否以日計息)，完整一個月((當月月底日-繳息迄日)+1=月底日)為以月計算，否則以日計算
+		// 2.中長擔(不看是否以日計息)，完整一個月((當月月底日-繳息迄日)+1=月底日)為以月計算，否則以日計算
 		if (iIntEndCode == 2) {
 			if (tFacMain.getAcctCode().equals("310")) {
 				loanCalcRepayIntCom.setIntCalcCode("1");
 			} else {
-				if ("1".equals(t.getAmortizedCode())) {
+				if (tFacMain.getAcctCode().equals("320") || tFacMain.getAcctCode().equals("330")) {
 					if (prevPayIntDate / 100 == this.txBuffer.getTxCom().getTbsdy() / 100
 							&& prevPayIntDate % 100 == 1) {
 						loanCalcRepayIntCom.setIntCalcCode("2");

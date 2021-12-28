@@ -193,7 +193,7 @@ TXFORM=L2023
 #oCustNoX=戶號
 {width:100,align:'center'}
 
-#oName=借戶戶名
+#oCustName=借戶戶名
 {width:200,align:'left'}
 
 #oType=類別
