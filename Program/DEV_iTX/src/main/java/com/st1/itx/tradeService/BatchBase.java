@@ -10,11 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
-
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
@@ -54,10 +51,7 @@ public abstract class BatchBase {
 			else
 				logger = LoggerFactory.getLogger(getClass().getName());
 
-			if ("true".equals(this.getLogFg())) {
-				ThreadVariable.setObject(ContentName.loggerFg, true);
-				loggerFg = ThreadVariable.isLogger();
-			}
+			loggerFg = ThreadVariable.isLogger();
 
 			this.titaVo = new TitaVo();
 			this.titaVo.init();
@@ -194,23 +188,13 @@ public abstract class BatchBase {
 			this.run();
 			sc.setExitStatus(ExitStatus.COMPLETED);
 			return RepeatStatus.FINISHED;
-		} catch (BeansException e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			logger.error(errors.toString());
-		} catch (InvalidDataAccessResourceUsageException e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			logger.error(errors.toString());
 		} catch (Throwable e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			logger.error(errors.toString());
+			this.error(errors.toString());
+			sc.setExitStatus(ExitStatus.FAILED);
+			return RepeatStatus.FINISHED;
 		}
-
-//		return ExitStatus.FAILED;
-		sc.setExitStatus(ExitStatus.FAILED);
-		return RepeatStatus.FINISHED;
 	}
 
 }

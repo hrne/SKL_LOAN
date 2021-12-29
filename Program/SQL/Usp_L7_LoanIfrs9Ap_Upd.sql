@@ -83,7 +83,10 @@ BEGIN
                    + NVL(F."FireFee", 0) * NVL(M."LoanBal", 0) / NVL(F."TotalLoanBal", 0)
            END                                       AS "Fee"               -- 法拍及火險費用
          , ROUND(NVL(M."Rate", 0) / 100, 6)          AS "Rate"              -- 利率(撥款)        --抓取月底時適用利率
-         , NVL(M."OvduDays", 0)                      AS "OvduDays"          -- 逾期繳款天數      --抓取月底日資料，並以天數表示
+         , CASE
+             WHEN M."Status" IN (3)   THEN 0
+             ELSE NVL(M."OvduDays", 0)    
+           END                                       AS "OvduDays"          -- 逾期繳款天數      --抓取月底日資料，並以天數表示
          , NVL(M."OvduDate", 0)                      AS "OvduDate"          -- 轉催收款日期
          , NVL(M."BadDebtDate", 0)                   AS "BadDebtDate"       -- 轉銷呆帳日期
          , NVL(M."BadDebtAmt", 0)                    AS "BadDebtAmt"        -- 轉銷呆帳金額

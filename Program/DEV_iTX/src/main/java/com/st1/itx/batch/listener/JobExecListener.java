@@ -2,10 +2,14 @@ package com.st1.itx.batch.listener;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,7 @@ import com.st1.itx.db.domain.JobMain;
 import com.st1.itx.db.domain.JobMainId;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.parse.Parse;
 
@@ -23,13 +28,22 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 public class JobExecListener extends SysLogger implements JobExecutionListener {
 	@Autowired
-	JobMainService jobMainService;
+	private JobMainService jobMainService;
 
 	@Autowired
 	Parse parse;
 
+	private static int maxHostTranC = 9999999;
+	public static AtomicInteger atomNext = new AtomicInteger(0);
+
 	@Override
 	public void beforeJob(JobExecution jobExecution) {
+		jobExecution.getExecutionContext().put(ContentName.threadName, Thread.currentThread().getName());
+
+		if ("true".equals(jobExecution.getJobParameters().getString("loogerFg")))
+			ThreadVariable.setObject(ContentName.loggerFg, true);
+		ThreadVariable.setObject(ContentName.empnot, jobExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
+
 		String jobId = jobExecution.getJobParameters().getString(ContentName.jobId);
 		String jobIdC = jobExecution.getJobConfigurationName();
 		Date time = jobExecution.getJobParameters().getDate(ContentName.batchDate);
@@ -51,14 +65,13 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 		Date time = jobExecution.getJobParameters().getDate(ContentName.batchDate);
 		int execDate = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(time));
 		Timestamp endTime = new Timestamp(jobExecution.getEndTime().getTime());
-		String jobStatus = jobExecution.getExitStatus().getExitCode();
 
 		this.info("batch JobConfiguration Name : " + jobIdC);
 		this.info("batch Job Name    : " + jobId);
 		this.info("batch execDate    : " + execDate);
 		this.info("batch endTime    : " + endTime);
-		this.info("jobStatus    : " + jobStatus);
 
+		ThreadVariable.clearThreadLocal();
 		this.updtaeJobMain(jobId, execDate, endTime, false, jobExecution);
 	}
 
@@ -77,6 +90,14 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 
 		titaVo.putParam(ContentName.empnot, jobExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
 
+		String txSeq = jobExecution.getJobParameters().getString(ContentName.txSeq);
+		txSeq = Objects.isNull(txSeq) ? jobExecution.getExecutionContext().getString(ContentName.txSeq) : txSeq;
+
+		if (Objects.isNull(txSeq)) {
+			jobMainId.setTxSeq(new Date().getTime() + this.getNextHostTranC());
+			jobExecution.getExecutionContext().put(ContentName.txSeq, jobMainId.getTxSeq());
+		} else
+			jobMainId.setTxSeq(txSeq);
 		jobMainId.setExecDate(execDate);
 		jobMainId.setJobCode(jobId);
 
@@ -89,22 +110,40 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 					jobMainService.delete(jobMain, titaVo);
 					jobMain.setJobMainId(jobMainId);
 					jobMain.setStartTime(time);
+					jobMain.setStatus("U");
 					jobMainService.insert(jobMain, titaVo);
 				} else {
 					jobMain = new JobMain();
 					jobMain.setJobMainId(jobMainId);
 					jobMain.setStartTime(time);
+					jobMain.setStatus("U");
 					jobMainService.insert(jobMain, titaVo);
 				}
 
 			} else {
+				boolean status = true;
+				Collection<StepExecution> stepEli = jobExecution.getStepExecutions();
+				for (StepExecution se : stepEli)
+					status = !se.getExitStatus().getExitCode().equals("COMPLETED") ? !status : status;
+
 				jobMain = jobMainService.holdById(jobMainId);
 				jobMain.setEndTime(time);
+				if (!status)
+					jobMain.setStatus("F");
+				else
+					jobMain.setStatus("S");
 				jobMainService.update(jobMain, titaVo);
 			}
 		} catch (DBException e) {
 			this.error(e.getErrorId() + " " + e.getErrorMsg());
 		}
+	}
+
+	protected String getNextHostTranC() {
+		atomNext.compareAndSet(maxHostTranC, 0); // 如果到底了 就歸零
+		int hosttranc = atomNext.incrementAndGet();
+		this.info("TranC : " + String.format("%07d", hosttranc));
+		return String.format("%07d", hosttranc);
 	}
 
 }

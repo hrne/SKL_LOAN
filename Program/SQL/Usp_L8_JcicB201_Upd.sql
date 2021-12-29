@@ -432,8 +432,10 @@ BEGIN
                ( OccursNum > 1  AND WK1."ApplNo" IS NOT NULL )
              )
         AND  NVL(M."BadDebtSkipFg",' ') NOT IN ('Y')  -- 呆帳不報送記號
-        AND  ( ( M."Status" IN (0, 1, 2, 4, 6, 7) ) OR
-               ( M."Status" IN (3, 5, 9)  AND  M."UtilAmt" = 0  AND Tx."CustNo" IS NOT NULL  )
+--        AND  ( ( M."Status" IN (0, 1, 2, 4, 6, 7) ) OR
+--               ( M."Status" IN (3, 5, 9)  AND  M."UtilAmt" = 0  AND Tx."CustNo" IS NOT NULL  )
+        AND  ( ( M."Status" IN (0, 2, 6 , 7) ) OR
+               ( M."Status" IN (3, 5)  AND  M."UtilAmt" = 0  AND Tx."CustNo" IS NOT NULL  )
              )
         ;
     END LOOP;

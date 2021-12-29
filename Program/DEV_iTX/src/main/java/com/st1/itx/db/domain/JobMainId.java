@@ -15,86 +15,111 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class JobMainId implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 5042747557821051943L;
+	private static final long serialVersionUID = -2821264237950133459L;
 
-// 批次執行日期
-	/* 執行日期 */
-	@Column(name = "`ExecDate`")
-	private int execDate = 0;
+// 交易序號
+  /* 交易序號 */
+  @Column(name = "`TxSeq`", length = 20)
+  private String txSeq = " ";
 
-	// 批次代號
-	/* 批次代號 */
-	@Column(name = "`JobCode`", length = 10)
-	private String jobCode = " ";
+  // 批次執行日期
+  /* 執行日期 */
+  @Column(name = "`ExecDate`")
+  private int execDate = 0;
 
-	public JobMainId() {
-	}
+  // 批次代號
+  /* 批次代號 */
+  @Column(name = "`JobCode`", length = 10)
+  private String jobCode = " ";
 
-	public JobMainId(int execDate, String jobCode) {
-		this.execDate = execDate;
-		this.jobCode = jobCode;
-	}
+  public JobMainId() {
+  }
 
-	/**
-	 * 批次執行日期<br>
-	 * 執行日期
-	 * 
-	 * @return Integer
-	 */
-	public int getExecDate() {
-		return this.execDate;
-	}
+  public JobMainId(String txSeq, int execDate, String jobCode) {
+    this.txSeq = txSeq;
+    this.execDate = execDate;
+    this.jobCode = jobCode;
+  }
 
-	/**
-	 * 批次執行日期<br>
-	 * 執行日期
-	 *
-	 * @param execDate 批次執行日期
-	 */
-	public void setExecDate(int execDate) {
-		this.execDate = execDate;
-	}
+/**
+	* 交易序號<br>
+	* 交易序號
+	* @return String
+	*/
+  public String getTxSeq() {
+    return this.txSeq == null ? "" : this.txSeq;
+  }
 
-	/**
-	 * 批次代號<br>
-	 * 批次代號
-	 * 
-	 * @return String
-	 */
-	public String getJobCode() {
-		return this.jobCode == null ? "" : this.jobCode;
-	}
+/**
+	* 交易序號<br>
+	* 交易序號
+  *
+  * @param txSeq 交易序號
+	*/
+  public void setTxSeq(String txSeq) {
+    this.txSeq = txSeq;
+  }
 
-	/**
-	 * 批次代號<br>
-	 * 批次代號
-	 *
-	 * @param jobCode 批次代號
-	 */
-	public void setJobCode(String jobCode) {
-		this.jobCode = jobCode;
-	}
+/**
+	* 批次執行日期<br>
+	* 執行日期
+	* @return Integer
+	*/
+  public int getExecDate() {
+    return this.execDate;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(execDate, jobCode);
-	}
+/**
+	* 批次執行日期<br>
+	* 執行日期
+  *
+  * @param execDate 批次執行日期
+	*/
+  public void setExecDate(int execDate) {
+    this.execDate = execDate;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		JobMainId jobMainId = (JobMainId) obj;
-		return execDate == jobMainId.execDate && jobCode.equals(jobMainId.jobCode);
-	}
+/**
+	* 批次代號<br>
+	* 批次代號
+	* @return String
+	*/
+  public String getJobCode() {
+    return this.jobCode == null ? "" : this.jobCode;
+  }
 
-	@Override
-	public String toString() {
-		return "JobMainId [execDate=" + execDate + ", jobCode=" + jobCode + "]";
-	}
+/**
+	* 批次代號<br>
+	* 批次代號
+  *
+  * @param jobCode 批次代號
+	*/
+  public void setJobCode(String jobCode) {
+    this.jobCode = jobCode;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(txSeq, execDate, jobCode);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj)
+      return true;
+    if(obj == null || getClass() != obj.getClass())
+      return false;
+    JobMainId jobMainId = (JobMainId) obj;
+    return txSeq.equals(jobMainId.txSeq) && execDate == jobMainId.execDate && jobCode.equals(jobMainId.jobCode);
+  }
+
+  @Override
+  public String toString() {
+    return "JobMainId [txSeq=" + txSeq + ", execDate=" + execDate + ", jobCode=" + jobCode + "]";
+  }
 }

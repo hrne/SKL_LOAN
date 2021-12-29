@@ -76,12 +76,8 @@ public class LB201ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "     , M.\"BankruptDate\"" + "     , M.\"BdLoanFg\"" + "     , M.\"SmallAmt\""
 				+ "     , M.\"ExtraAttrCode\"" + "     , M.\"ExtraStatusCode\"" + "     , M.\"Filler74A\""
 				+ "     , M.\"JcicDataYM\"" + "     , M.\"DataEnd\"" + " FROM  \"JcicB201\" M"
-				+ "      LEFT JOIN \"LoanBorMain\"  L   ON L.\"CustNo\"   = SUBSTR(M.\"AcctNo\",1,7)  " // 增加篩選條件
-				+ "                    AND L.\"FacmNo\"   = SUBSTR(M.\"AcctNo\",8,3) "
-				+ "                   AND L.\"BormNo\"   = SUBSTR(M.\"AcctNo\",11,3) "
 				+ " WHERE M.\"DataYM\" = :dateMonth " // 2021-12-20 智偉修改
 				+ " AND M.\"TranCode\" = 'A' "
-				+ " AND  (  L.\"Status\" IN (0, 2, 7)  OR  ( L.\"Status\" IN (3, 5) AND NVL(L.\"AcDate\",0)/100 = :dateMonth ) ) " // 增加篩選條件
 				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"TranCode\", M.\"AcctNo\" ";
 
 		this.info("sql=" + sql);

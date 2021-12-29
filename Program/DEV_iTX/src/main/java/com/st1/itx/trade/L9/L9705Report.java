@@ -109,11 +109,13 @@ public class L9705Report extends MakeReport {
 				this.setBatchNo(batchNo);
 			}
 		} else {
-			rptitem = "放款本息攤還表暨繳息通知單(" + String.format("%07d", Integer.valueOf(titaVo.get("CUSTNO"))) + ")";
+			rptitem = "放款本息攤還表暨繳息通知單";
 		}
 
-		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode(), rptitem, "inch,8.5,12", "P");
+		String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
+		
+		
+		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "A", rptitem, "inch,8.5,12", "P");
 
 		String entdy = titaVo.getEntDy();
 

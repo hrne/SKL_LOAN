@@ -3,6 +3,7 @@ package com.st1.itx.batch.listener;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
@@ -17,12 +18,14 @@ import com.st1.itx.db.domain.JobDetail;
 import com.st1.itx.db.domain.JobDetailId;
 import com.st1.itx.db.service.JobDetailService;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.parse.Parse;
 
 @Service
 @Scope("prototype")
 public class StepExecListener extends SysLogger implements StepExecutionListener {
+
 	@Autowired
 	JobDetailService jobDetailService;
 
@@ -31,6 +34,10 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
+		if ("true".equals(stepExecution.getJobExecution().getJobParameters().getString("loogerFg")))
+			ThreadVariable.setObject(ContentName.loggerFg, true);
+		ThreadVariable.setObject(ContentName.empnot, stepExecution.getJobExecution().getJobParameters().getString(ContentName.tlrno, "BAT001"));
+
 		String jobId = stepExecution.getJobExecution().getJobParameters().getString(ContentName.jobId);
 		String stepId = stepExecution.getStepName();
 		Date time = stepExecution.getJobExecution().getJobParameters().getDate(ContentName.batchDate);
@@ -60,9 +67,12 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("StepExecListener.afterStep : " + stepId);
 		this.info("batch execDate     : " + execDate);
 		this.info("step endTime       : " + endTime);
-		this.info("step stepStatus   : " + stepStatus);
+		this.info("step stepStatus   : " + stepExecution.getExitStatus().getExitCode());
 
 		this.updtaeJobDetail(jobId, stepId, execDate, endTime, false, stepExecution, stepStatus);
+
+		if (!Thread.currentThread().getName().equals(stepExecution.getJobExecution().getExecutionContext().getString(ContentName.threadName)))
+			ThreadVariable.clearThreadLocal();
 
 		return stepExecution.getExitStatus();
 	}
@@ -83,8 +93,15 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		TitaVo titaVo = new TitaVo();
 		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
 
-		try {
+		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
+		txSeq = Objects.isNull(txSeq) ? stepExecution.getJobExecution().getExecutionContext().getString(ContentName.txSeq) : txSeq;
+		if (Objects.isNull(txSeq)) {
+			this.info("txSeq is Null..");
+			return;
+		} else
+			jobDetailId.setTxSeq(txSeq);
 
+		try {
 			if (seFg) {
 				jobDetailId.setExecDate(execDate);
 				jobDetailId.setJobCode(jobId);

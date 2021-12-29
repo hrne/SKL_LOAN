@@ -102,9 +102,10 @@ BEGIN
          , NVL(L."TotalPeriod", 0)              AS "TotalPeriod"       -- 總期數
          , NVL(Renew."OldFacmNo", 0)            AS "AgreeBefFacmNo"    -- 協議前之額度編號
          , NVL(Renew."OldBormNo", 0)            AS "AgreeBefBormNo"    -- 協議前之撥款序號
-         , CASE WHEN M."AcBookCode" IS NULL THEN '1'
-                WHEN M."AcBookCode" IN ('000', '10H') THEN '1'
-                WHEN M."AcBookCode" IN ('201') THEN '3'
+--         , CASE WHEN M."AcBookCode" IS NULL THEN '1'
+--                WHEN M."AcBookCode" IN ('000', '10H') THEN '1'
+--                WHEN M."AcBookCode" IN ('201') THEN '3'
+         , CASE WHEN M."AcSubBookCode" IN ('201') THEN '3'
                 ELSE '1'
            END                                  AS "AcBookCode"        -- 帳冊別
          , NVL(M."PrevPayIntDate", 0)           AS "PrevPayIntDate"    -- 上次繳息日(繳息迄日)

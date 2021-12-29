@@ -140,7 +140,8 @@ public class BS010 extends TradeBuffer {
 		baTxCom.setTxBuffer(this.getTxBuffer());
 
 		// find data
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate + 19110000, 0, this.index, Integer.MAX_VALUE);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate + 19110000, 0, this.index,
+				Integer.MAX_VALUE);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		// size > 0 -> 新增應處理明細
 		TxToDoDetail tTxToDoDetail;
@@ -212,7 +213,8 @@ public class BS010 extends TradeBuffer {
 		this.info("火險費轉列催收日期 < " + payDate);
 		// find data
 		// F09 暫付火險保費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index,
+				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 //test	lAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, 99999999); // acctCode=, clsFlag=, openAcDate <
 		// data size > 0 -> 新增應處理明細
@@ -241,7 +243,8 @@ public class BS010 extends TradeBuffer {
 		this.info("法務費轉列催收日期 < " + payDate);
 		// find data
 		// F07 暫付法務費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index,
+				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 		// acctCode=, clsFlag=, openAcDate <
 		// data size > 0 -> 新增應處理明細
@@ -272,33 +275,35 @@ public class BS010 extends TradeBuffer {
 		lAcctCode.add("F24"); // 催收法務費
 		// find data
 		slAcReceivable = acReceivableService.UseL5074(0, lAcctCode, 0, Integer.MAX_VALUE, titaVo);
-		lAcReceivableAll = slAcReceivable == null ? null : slAcReceivable.getContent();
-
-		for (AcReceivable rv : new ArrayList<>(lAcReceivableAll)) {
-			// 同一戶號非呆帳戶或呆帳結案戶直接刪除
-			if (wkCustNo != rv.getCustNo()) {
-				wkDBFg = true;
-				wkCustNo = rv.getCustNo();
-			} else {
+		lAcReceivableAll = slAcReceivable == null ? null : new ArrayList<AcReceivable>(slAcReceivable.getContent());
+		if (lAcReceivableAll != null) {
+			for (AcReceivable rv : new ArrayList<>(lAcReceivableAll)) {
+				// 同一戶號非呆帳戶或呆帳結案戶直接刪除
+				if (wkCustNo != rv.getCustNo()) {
+					wkDBFg = true;
+					wkCustNo = rv.getCustNo();
+				} else {
+					if (!wkDBFg) {
+						lAcReceivableAll.remove(rv);
+					}
+					continue;
+				}
+				Slice<LoanBorMain> slLoanBorMain = null;
+				List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+				slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE,
+						titaVo);
+				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+				// 檢查戶號下全額度撥款 只要有一筆非呆帳戶或呆帳結案戶 即跳開並刪除
+				for (LoanBorMain t : lLoanBorMain) {
+					if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
+						wkDBFg = false;
+						break;
+					}
+				}
 				if (!wkDBFg) {
 					lAcReceivableAll.remove(rv);
+					continue;
 				}
-				continue;
-			}
-			Slice<LoanBorMain> slLoanBorMain = null;
-			List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-			slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
-			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-			// 檢查戶號下全額度撥款 只要有一筆非呆帳戶或呆帳結案戶 即跳開並刪除
-			for (LoanBorMain t : lLoanBorMain) {
-				if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
-					wkDBFg = false;
-					break;
-				}
-			}
-			if (!wkDBFg) {
-				lAcReceivableAll.remove(rv);
-				continue;
 			}
 		}
 

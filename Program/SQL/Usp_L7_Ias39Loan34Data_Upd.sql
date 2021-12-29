@@ -1,10 +1,10 @@
+CREATE OR REPLACE PROCEDURE "Usp_L7_Ias39Loan34Data_Upd"
+(
 -- 程式功能：維護 Ias39Loan34Data 每月IAS39放款34號公報資料檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L7_Ias39Loan34Data_Upd"(20200420,'');
 --
 
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias39Loan34Data_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦

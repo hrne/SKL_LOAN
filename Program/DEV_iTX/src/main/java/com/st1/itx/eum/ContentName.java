@@ -51,15 +51,16 @@ public class ContentName {
 	public static final String reload = "RELOAD";
 	public static final String batchno = "BATCHNO";
 	public static final String batchSeq = "BATCHSEQ";
+	public static final String jobTxSeq = "jobTxSeq";
 	public static final String delay = "DELAY";
 	public static final String fmtchk = "FMTCHK";
 	public static final String frommq = "FROMMQ";
 	public static final String funcind = "FUNCIND";
-
 	public static final String reasonFg = "ReasonFG";
 	public static final String reason = "Reason";
 
 	public static final String brno = "BRNO";
+	public static final String txSeq = "txSeq";
 	public static final String txrseq = "TXRSEQ";
 	public static final String msgEnd = "MSGEND";
 	public static final String txrsut = "TXRSUT";
@@ -113,6 +114,8 @@ public class ContentName {
 
 	public static final String jobMode = "jobMode";
 	public static final String loggerFg = "loogerFg";
+
+	public static final String threadName = "threadName";
 
 	/* custno Area */
 	public static final int negDepartmentCustNo = 601776; // 戶號(前置協商收款專戶) ;

@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,24 +22,25 @@ import com.st1.itx.db.domain.JobDetailId;
  */
 public interface JobDetailRepositoryHist extends JpaRepository<JobDetail, JobDetailId> {
 
-	// ExecDate = ,AND JobCode =
-	public Slice<JobDetail> findAllByExecDateIsAndJobCodeIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, String jobCode_1, Pageable pageable);
+  // ExecDate = ,AND JobCode = 
+  public Slice<JobDetail> findAllByExecDateIsAndJobCodeIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, String jobCode_1, Pageable pageable);
 
-	// ExecDate =
-	public Slice<JobDetail> findAllByExecDateIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, Pageable pageable);
+  // ExecDate = 
+  public Slice<JobDetail> findAllByExecDateIsOrderByExecDateAscJobCodeAscStepIdAsc(int execDate_0, Pageable pageable);
 
-	// ExecDate >=
-	public Optional<JobDetail> findTopByExecDateGreaterThanEqualOrderByExecDateDesc(int execDate_0);
+  // ExecDate >=
+  public Optional<JobDetail> findTopByExecDateGreaterThanEqualOrderByExecDateDesc(int execDate_0);
 
-	// ExecDate >= ,AND ExecDate <=
-	public Slice<JobDetail> findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualOrderByStepStartTimeDesc(int execDate_0, int execDate_1, Pageable pageable);
+  // ExecDate >= ,AND ExecDate <= 
+  public Slice<JobDetail> findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualOrderByStepStartTimeDesc(int execDate_0, int execDate_1, Pageable pageable);
 
-	// ExecDate >= ,AND ExecDate <= ,AND Status =
-	public Slice<JobDetail> findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(int execDate_0, int execDate_1, String status_2, Pageable pageable);
+  // ExecDate >= ,AND ExecDate <= ,AND Status =
+  public Slice<JobDetail> findAllByExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(int execDate_0, int execDate_1, String status_2, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<JobDetail> findByJobDetailId(JobDetailId jobDetailId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<JobDetail> findByJobDetailId(JobDetailId jobDetailId);
 
 }
+

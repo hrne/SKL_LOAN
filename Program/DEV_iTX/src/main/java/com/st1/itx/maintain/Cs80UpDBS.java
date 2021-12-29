@@ -1,5 +1,9 @@
 package com.st1.itx.maintain;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -18,13 +22,14 @@ import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxFlowId;
 import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.TxCruiser;
+import com.st1.itx.db.domain.TxCruiserId;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.TxCruiserService;
 import com.st1.itx.tradeService.CommBuffer;
-import com.st1.itx.util.common.AcEnterCom;
 import com.st1.itx.util.common.LockControl;
 import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.common.TxBatchCom;
-import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.CustRmkCom;
 import com.st1.itx.dataVO.TotaVo;
@@ -33,37 +38,40 @@ import com.st1.itx.dataVO.TotaVo;
 @Scope("prototype")
 public class Cs80UpDBS extends CommBuffer {
 	@Autowired
-	public TxTellerService txTellerService;
+	private TxTellerService txTellerService;
 
 	@Autowired
-	public TxFlowService txFlowService;
+	private TxFlowService txFlowService;
 
 	@Autowired
-	public TxRecordService txRecordService;
+	private TxRecordService txRecordService;
 
 	@Autowired
-	public CustMainService custMainService;
+	private CustMainService custMainService;
 
 	@Autowired
-	public LockControl lockControl;
+	private TxCruiserService txCruiserService;
 
 	@Autowired
-	public AcEnterCom acEnterCom;
+	private LockControl lockControl;
+
+//	@Autowired
+//	private AcEnterCom acEnterCom;
+//
+//	@Autowired
+//	private TxToDoCom txToDoCom;
 
 	@Autowired
-	public TxToDoCom txToDoCom;
+	private TxBatchCom txBatchCom;
 
 	@Autowired
-	public TxBatchCom txBatchCom;
+	private TxAmlCom txAmlCom;
 
 	@Autowired
-	public TxAmlCom txAmlCom;
+	private CustRmkCom custRmkCom;
 
 	@Autowired
-	CustRmkCom custRmkCom;
-
-	@Autowired
-	public Parse parse;
+	private Parse parse;
 
 	private int AcCnt = 0;
 
@@ -161,6 +169,8 @@ public class Cs80UpDBS extends CommBuffer {
 			this.txAmlCom.nameCheckInsert(titaVo);
 		}
 
+		// JobList存入巡邏車
+		this.hasJob();
 	}
 
 	// 2021.10.13 by eric
@@ -470,6 +480,32 @@ public class Cs80UpDBS extends CommBuffer {
 			}
 		} catch (JsonProcessingException e) {
 			throw new LogicException("EC009", "MtRecord titaVo 轉換失敗");
+		}
+	}
+
+	private void hasJob() {
+		String tlrNo = this.titaVo.getTlrNo();
+		String jobList = this.titaVo.getBatchJobId();
+		String txSeq = new Date().getTime() + "-" + tlrNo;
+
+		if (jobList.isEmpty())
+			return;
+
+		TxCruiserId txCruiserId = new TxCruiserId(txSeq, tlrNo);
+		TxCruiser txCruiser = new TxCruiser();
+
+		txCruiser.setTxCruiserId(txCruiserId);
+		txCruiser.setTxCode(this.titaVo.getTxCode());
+		txCruiser.setJobList(jobList);
+		txCruiser.setStatus("U");
+
+		try {
+			txCruiserService.insert(txCruiser);
+			this.titaVo.setJobTxSeq(txSeq);
+		} catch (DBException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
 		}
 	}
 

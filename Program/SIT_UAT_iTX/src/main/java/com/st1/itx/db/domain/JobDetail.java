@@ -22,344 +22,371 @@ import javax.persistence.Column;
 @Table(name = "`JobDetail`")
 public class JobDetail implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3283012416465519062L;
+	private static final long serialVersionUID = 4412108688576351192L;
 
-	@EmbeddedId
-	private JobDetailId jobDetailId;
+@EmbeddedId
+  private JobDetailId jobDetailId;
 
-	// 批次執行日期
-	/* 執行日期 */
-	@Column(name = "`ExecDate`", insertable = false, updatable = false)
-	private int execDate = 0;
+  // 交易序號
+  /* 交易序號 */
+  @Column(name = "`TxSeq`", length = 20, insertable = false, updatable = false)
+  private String txSeq;
 
-	// 批次代號
-	/* 批次代號 */
-	@Column(name = "`JobCode`", length = 10, insertable = false, updatable = false)
-	private String jobCode;
+  // 批次執行日期
+  /* 執行日期 */
+  @Column(name = "`ExecDate`", insertable = false, updatable = false)
+  private int execDate = 0;
 
-	// StepId
-	/* 步驟代號 */
-	@Column(name = "`StepId`", length = 30, insertable = false, updatable = false)
-	private String stepId;
+  // 批次代號
+  /* 批次代號 */
+  @Column(name = "`JobCode`", length = 10, insertable = false, updatable = false)
+  private String jobCode;
 
-	// 類別
-	/* 日批-D月批-M */
-	@Column(name = "`BatchType`", length = 1)
-	private String batchType;
+  // StepId
+  /* 步驟代號 */
+  @Column(name = "`StepId`", length = 30, insertable = false, updatable = false)
+  private String stepId;
 
-	// 執行結果
-	/* 成功-S失敗-F */
-	@Column(name = "`Status`", length = 1)
-	private String status;
+  // 類別
+  /* 日批-D月批-M */
+  @Column(name = "`BatchType`", length = 1)
+  private String batchType;
 
-	// 錯誤碼
-	/* 五碼 : 一般交易錯誤DB000 : DB異常LG000 : 邏輯錯誤 */
-	@Column(name = "`ErrCode`", length = 15)
-	private String errCode;
+  // 執行結果
+  /* 成功-S失敗-F */
+  @Column(name = "`Status`", length = 1)
+  private String status;
 
-	// 錯誤內容
-	/* 除了一般錯誤,其他皆會儲存Exception內容 */
-	@Column(name = "`ErrContent`", length = 3000)
-	private String errContent;
+  // 錯誤碼
+  /* 五碼  : 一般交易錯誤DB000 : DB異常LG000 : 邏輯錯誤 */
+  @Column(name = "`ErrCode`", length = 15)
+  private String errCode;
 
-	// 啟動時間
-	/* 啟動時間 */
-	@Column(name = "`StepStartTime`")
-	private java.sql.Timestamp stepStartTime;
+  // 錯誤內容
+  /* 除了一般錯誤,其他皆會儲存Exception內容 */
+  @Column(name = "`ErrContent`", length = 3000)
+  private String errContent;
 
-	// 結束時間
-	/* 結束時間 */
-	@Column(name = "`StepEndTime`")
-	private java.sql.Timestamp stepEndTime;
+  // 啟動時間
+  /* 啟動時間 */
+  @Column(name = "`StepStartTime`")
+  private java.sql.Timestamp stepStartTime;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 結束時間
+  /* 結束時間 */
+  @Column(name = "`StepEndTime`")
+  private java.sql.Timestamp stepEndTime;
 
-	// 建檔日期
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	// 最後維護人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 建檔日期
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 最後維護日期
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 最後維護人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	public JobDetailId getJobDetailId() {
-		return this.jobDetailId;
-	}
+  // 最後維護日期
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	public void setJobDetailId(JobDetailId jobDetailId) {
-		this.jobDetailId = jobDetailId;
-	}
 
-	/**
-	 * 批次執行日期<br>
-	 * 執行日期
-	 * 
-	 * @return Integer
-	 */
-	public int getExecDate() {
-		return this.execDate;
-	}
+  public JobDetailId getJobDetailId() {
+    return this.jobDetailId;
+  }
 
-	/**
-	 * 批次執行日期<br>
-	 * 執行日期
-	 *
-	 * @param execDate 批次執行日期
-	 */
-	public void setExecDate(int execDate) {
-		this.execDate = execDate;
-	}
+  public void setJobDetailId(JobDetailId jobDetailId) {
+    this.jobDetailId = jobDetailId;
+  }
 
-	/**
-	 * 批次代號<br>
-	 * 批次代號
-	 * 
-	 * @return String
-	 */
-	public String getJobCode() {
-		return this.jobCode == null ? "" : this.jobCode;
-	}
+/**
+	* 交易序號<br>
+	* 交易序號
+	* @return String
+	*/
+  public String getTxSeq() {
+    return this.txSeq == null ? "" : this.txSeq;
+  }
 
-	/**
-	 * 批次代號<br>
-	 * 批次代號
-	 *
-	 * @param jobCode 批次代號
-	 */
-	public void setJobCode(String jobCode) {
-		this.jobCode = jobCode;
-	}
+/**
+	* 交易序號<br>
+	* 交易序號
+  *
+  * @param txSeq 交易序號
+	*/
+  public void setTxSeq(String txSeq) {
+    this.txSeq = txSeq;
+  }
 
-	/**
-	 * StepId<br>
-	 * 步驟代號
-	 * 
-	 * @return String
-	 */
-	public String getStepId() {
-		return this.stepId == null ? "" : this.stepId;
-	}
+/**
+	* 批次執行日期<br>
+	* 執行日期
+	* @return Integer
+	*/
+  public int getExecDate() {
+    return this.execDate;
+  }
 
-	/**
-	 * StepId<br>
-	 * 步驟代號
-	 *
-	 * @param stepId StepId
-	 */
-	public void setStepId(String stepId) {
-		this.stepId = stepId;
-	}
+/**
+	* 批次執行日期<br>
+	* 執行日期
+  *
+  * @param execDate 批次執行日期
+	*/
+  public void setExecDate(int execDate) {
+    this.execDate = execDate;
+  }
 
-	/**
-	 * 類別<br>
-	 * 日批-D 月批-M
-	 * 
-	 * @return String
-	 */
-	public String getBatchType() {
-		return this.batchType == null ? "" : this.batchType;
-	}
+/**
+	* 批次代號<br>
+	* 批次代號
+	* @return String
+	*/
+  public String getJobCode() {
+    return this.jobCode == null ? "" : this.jobCode;
+  }
 
-	/**
-	 * 類別<br>
-	 * 日批-D 月批-M
-	 *
-	 * @param batchType 類別
-	 */
-	public void setBatchType(String batchType) {
-		this.batchType = batchType;
-	}
+/**
+	* 批次代號<br>
+	* 批次代號
+  *
+  * @param jobCode 批次代號
+	*/
+  public void setJobCode(String jobCode) {
+    this.jobCode = jobCode;
+  }
 
-	/**
-	 * 執行結果<br>
-	 * 成功-S 失敗-F
-	 * 
-	 * @return String
-	 */
-	public String getStatus() {
-		return this.status == null ? "" : this.status;
-	}
+/**
+	* StepId<br>
+	* 步驟代號
+	* @return String
+	*/
+  public String getStepId() {
+    return this.stepId == null ? "" : this.stepId;
+  }
 
-	/**
-	 * 執行結果<br>
-	 * 成功-S 失敗-F
-	 *
-	 * @param status 執行結果
-	 */
-	public void setStatus(String status) {
-		this.status = status;
-	}
+/**
+	* StepId<br>
+	* 步驟代號
+  *
+  * @param stepId StepId
+	*/
+  public void setStepId(String stepId) {
+    this.stepId = stepId;
+  }
 
-	/**
-	 * 錯誤碼<br>
-	 * 五碼 : 一般交易錯誤 DB000 : DB異常 LG000 : 邏輯錯誤
-	 * 
-	 * @return String
-	 */
-	public String getErrCode() {
-		return this.errCode == null ? "" : this.errCode;
-	}
+/**
+	* 類別<br>
+	* 日批-D
+月批-M
+	* @return String
+	*/
+  public String getBatchType() {
+    return this.batchType == null ? "" : this.batchType;
+  }
 
-	/**
-	 * 錯誤碼<br>
-	 * 五碼 : 一般交易錯誤 DB000 : DB異常 LG000 : 邏輯錯誤
-	 *
-	 * @param errCode 錯誤碼
-	 */
-	public void setErrCode(String errCode) {
-		this.errCode = errCode;
-	}
+/**
+	* 類別<br>
+	* 日批-D
+月批-M
+  *
+  * @param batchType 類別
+	*/
+  public void setBatchType(String batchType) {
+    this.batchType = batchType;
+  }
 
-	/**
-	 * 錯誤內容<br>
-	 * 除了一般錯誤,其他皆會儲存Exception內容
-	 * 
-	 * @return String
-	 */
-	public String getErrContent() {
-		return this.errContent == null ? "" : this.errContent;
-	}
+/**
+	* 執行結果<br>
+	* 成功-S
+失敗-F
+	* @return String
+	*/
+  public String getStatus() {
+    return this.status == null ? "" : this.status;
+  }
 
-	/**
-	 * 錯誤內容<br>
-	 * 除了一般錯誤,其他皆會儲存Exception內容
-	 *
-	 * @param errContent 錯誤內容
-	 */
-	public void setErrContent(String errContent) {
-		this.errContent = errContent;
-	}
+/**
+	* 執行結果<br>
+	* 成功-S
+失敗-F
+  *
+  * @param status 執行結果
+	*/
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
-	/**
-	 * 啟動時間<br>
-	 * 啟動時間
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getStepStartTime() {
-		return this.stepStartTime;
-	}
+/**
+	* 錯誤碼<br>
+	* 五碼  : 一般交易錯誤
+DB000 : DB異常
+LG000 : 邏輯錯誤
+	* @return String
+	*/
+  public String getErrCode() {
+    return this.errCode == null ? "" : this.errCode;
+  }
 
-	/**
-	 * 啟動時間<br>
-	 * 啟動時間
-	 *
-	 * @param stepStartTime 啟動時間
-	 */
-	public void setStepStartTime(java.sql.Timestamp stepStartTime) {
-		this.stepStartTime = stepStartTime;
-	}
+/**
+	* 錯誤碼<br>
+	* 五碼  : 一般交易錯誤
+DB000 : DB異常
+LG000 : 邏輯錯誤
+  *
+  * @param errCode 錯誤碼
+	*/
+  public void setErrCode(String errCode) {
+    this.errCode = errCode;
+  }
 
-	/**
-	 * 結束時間<br>
-	 * 結束時間
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getStepEndTime() {
-		return this.stepEndTime;
-	}
+/**
+	* 錯誤內容<br>
+	* 除了一般錯誤,其他皆會儲存Exception內容
+	* @return String
+	*/
+  public String getErrContent() {
+    return this.errContent == null ? "" : this.errContent;
+  }
 
-	/**
-	 * 結束時間<br>
-	 * 結束時間
-	 *
-	 * @param stepEndTime 結束時間
-	 */
-	public void setStepEndTime(java.sql.Timestamp stepEndTime) {
-		this.stepEndTime = stepEndTime;
-	}
+/**
+	* 錯誤內容<br>
+	* 除了一般錯誤,其他皆會儲存Exception內容
+  *
+  * @param errContent 錯誤內容
+	*/
+  public void setErrContent(String errContent) {
+    this.errContent = errContent;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 啟動時間<br>
+	* 啟動時間
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getStepStartTime() {
+    return this.stepStartTime;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 啟動時間<br>
+	* 啟動時間
+  *
+  * @param stepStartTime 啟動時間
+	*/
+  public void setStepStartTime(java.sql.Timestamp stepStartTime) {
+    this.stepStartTime = stepStartTime;
+  }
 
-	/**
-	 * 建檔日期<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 結束時間<br>
+	* 結束時間
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getStepEndTime() {
+    return this.stepEndTime;
+  }
 
-	/**
-	 * 建檔日期<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 結束時間<br>
+	* 結束時間
+  *
+  * @param stepEndTime 結束時間
+	*/
+  public void setStepEndTime(java.sql.Timestamp stepEndTime) {
+    this.stepEndTime = stepEndTime;
+  }
 
-	/**
-	 * 最後維護人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
 
-	/**
-	 * 最後維護人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後維護人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
 
-	/**
-	 * 最後維護日期<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 建檔日期<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	/**
-	 * 最後維護日期<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後維護日期
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 建檔日期<br>
+	* 
+  *
+  * @param createDate 建檔日期
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
 
-	@Override
-	public String toString() {
-		return "JobDetail [jobDetailId=" + jobDetailId + ", batchType=" + batchType + ", status=" + status + ", errCode=" + errCode + ", errContent=" + errContent + ", stepStartTime=" + stepStartTime
-				+ ", stepEndTime=" + stepEndTime + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
-	}
+/**
+	* 最後維護人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後維護人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後維護人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+/**
+	* 最後維護日期<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後維護日期<br>
+	* 
+  *
+  * @param lastUpdate 最後維護日期
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+
+  @Override
+  public String toString() {
+    return "JobDetail [jobDetailId=" + jobDetailId + ", batchType=" + batchType + ", status=" + status
+           + ", errCode=" + errCode + ", errContent=" + errContent + ", stepStartTime=" + stepStartTime + ", stepEndTime=" + stepEndTime + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
+  }
 }

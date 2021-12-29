@@ -15,112 +15,136 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class JobDetailId implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5817094027288050692L;
+	private static final long serialVersionUID = -5410080741249288032L;
 
-// 批次執行日期
-	/* 執行日期 */
-	@Column(name = "`ExecDate`")
-	private int execDate = 0;
+// 交易序號
+  /* 交易序號 */
+  @Column(name = "`TxSeq`", length = 20)
+  private String txSeq = " ";
 
-	// 批次代號
-	/* 批次代號 */
-	@Column(name = "`JobCode`", length = 10)
-	private String jobCode = " ";
+  // 批次執行日期
+  /* 執行日期 */
+  @Column(name = "`ExecDate`")
+  private int execDate = 0;
 
-	// StepId
-	/* 步驟代號 */
-	@Column(name = "`StepId`", length = 30)
-	private String stepId = " ";
+  // 批次代號
+  /* 批次代號 */
+  @Column(name = "`JobCode`", length = 10)
+  private String jobCode = " ";
 
-	public JobDetailId() {
-	}
+  // StepId
+  /* 步驟代號 */
+  @Column(name = "`StepId`", length = 30)
+  private String stepId = " ";
 
-	public JobDetailId(int execDate, String jobCode, String stepId) {
-		this.execDate = execDate;
-		this.jobCode = jobCode;
-		this.stepId = stepId;
-	}
+  public JobDetailId() {
+  }
 
-	/**
-	 * 批次執行日期<br>
-	 * 執行日期
-	 * 
-	 * @return Integer
-	 */
-	public int getExecDate() {
-		return this.execDate;
-	}
+  public JobDetailId(String txSeq, int execDate, String jobCode, String stepId) {
+    this.txSeq = txSeq;
+    this.execDate = execDate;
+    this.jobCode = jobCode;
+    this.stepId = stepId;
+  }
 
-	/**
-	 * 批次執行日期<br>
-	 * 執行日期
-	 *
-	 * @param execDate 批次執行日期
-	 */
-	public void setExecDate(int execDate) {
-		this.execDate = execDate;
-	}
+/**
+	* 交易序號<br>
+	* 交易序號
+	* @return String
+	*/
+  public String getTxSeq() {
+    return this.txSeq == null ? "" : this.txSeq;
+  }
 
-	/**
-	 * 批次代號<br>
-	 * 批次代號
-	 * 
-	 * @return String
-	 */
-	public String getJobCode() {
-		return this.jobCode == null ? "" : this.jobCode;
-	}
+/**
+	* 交易序號<br>
+	* 交易序號
+  *
+  * @param txSeq 交易序號
+	*/
+  public void setTxSeq(String txSeq) {
+    this.txSeq = txSeq;
+  }
 
-	/**
-	 * 批次代號<br>
-	 * 批次代號
-	 *
-	 * @param jobCode 批次代號
-	 */
-	public void setJobCode(String jobCode) {
-		this.jobCode = jobCode;
-	}
+/**
+	* 批次執行日期<br>
+	* 執行日期
+	* @return Integer
+	*/
+  public int getExecDate() {
+    return this.execDate;
+  }
 
-	/**
-	 * StepId<br>
-	 * 步驟代號
-	 * 
-	 * @return String
-	 */
-	public String getStepId() {
-		return this.stepId == null ? "" : this.stepId;
-	}
+/**
+	* 批次執行日期<br>
+	* 執行日期
+  *
+  * @param execDate 批次執行日期
+	*/
+  public void setExecDate(int execDate) {
+    this.execDate = execDate;
+  }
 
-	/**
-	 * StepId<br>
-	 * 步驟代號
-	 *
-	 * @param stepId StepId
-	 */
-	public void setStepId(String stepId) {
-		this.stepId = stepId;
-	}
+/**
+	* 批次代號<br>
+	* 批次代號
+	* @return String
+	*/
+  public String getJobCode() {
+    return this.jobCode == null ? "" : this.jobCode;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(execDate, jobCode, stepId);
-	}
+/**
+	* 批次代號<br>
+	* 批次代號
+  *
+  * @param jobCode 批次代號
+	*/
+  public void setJobCode(String jobCode) {
+    this.jobCode = jobCode;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		JobDetailId jobDetailId = (JobDetailId) obj;
-		return execDate == jobDetailId.execDate && jobCode.equals(jobDetailId.jobCode) && stepId.equals(jobDetailId.stepId);
-	}
+/**
+	* StepId<br>
+	* 步驟代號
+	* @return String
+	*/
+  public String getStepId() {
+    return this.stepId == null ? "" : this.stepId;
+  }
 
-	@Override
-	public String toString() {
-		return "JobDetailId [execDate=" + execDate + ", jobCode=" + jobCode + ", stepId=" + stepId + "]";
-	}
+/**
+	* StepId<br>
+	* 步驟代號
+  *
+  * @param stepId StepId
+	*/
+  public void setStepId(String stepId) {
+    this.stepId = stepId;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(txSeq, execDate, jobCode, stepId);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj)
+      return true;
+    if(obj == null || getClass() != obj.getClass())
+      return false;
+    JobDetailId jobDetailId = (JobDetailId) obj;
+    return txSeq.equals(jobDetailId.txSeq) && execDate == jobDetailId.execDate && jobCode.equals(jobDetailId.jobCode) && stepId.equals(jobDetailId.stepId);
+  }
+
+  @Override
+  public String toString() {
+    return "JobDetailId [txSeq=" + txSeq + ", execDate=" + execDate + ", jobCode=" + jobCode + ", stepId=" + stepId + "]";
+  }
 }

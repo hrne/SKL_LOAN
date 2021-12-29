@@ -350,13 +350,108 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
 
     -- TAV : 暫收款-可抵繳
+    INSERT INTO "AcReceivable"
+    WITH ACT AS (
+      SELECT ROW_NUMBER() OVER (PARTITION BY ACTP.LMSACN ORDER BY ACTP.BKPDAT DESC) AS "Seq"
+            ,ACTP.BKPDAT
+            ,ACTP.LMSACN
+            ,ACTP.LMSTOA
+      FROM LADACTP ACTP
+      WHERE ACTP.LMSACN != 601776
+    )
+    , LOAN AS (
+      SELECT LMSACN
+           , LMSAPN
+           , SUM(LMSLBL) AS LMSLBL
+      FROM LA$LMSP
+      GROUP BY LMSACN
+             , LMSAPN
+    )
+    , TMP AS (
+      SELECT ACT.BKPDAT
+           , ACT.LMSACN
+           , LOAN.LMSAPN
+           , ROUND(ACT.LMSTOA / LOAN.LMSLBL,0) AS "NewLMSTOA"
+           , ACT.LMSTOA
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY ACT.LMSACN
+               ORDER BY LOAN.LMSAPN
+             ) AS "Seq"
+      FROM ACT
+      LEFT JOIN LOAN ON LOAN.LMSACN = ACT.LMSACN
+      WHERE ACT."Seq" = 1
+        AND ACT.LMSTOA > 0
+    )
+    , M AS ( -- 取得最大序號
+      SELECT LMSACN
+           , MAX("Seq") AS "MaxSeq"
+      FROM TMP
+      GROUP BY LMSACN
+    )
+    , S AS ( -- 取得非最大序號之金額加總
+      SELECT M.LMSACN
+           , SUM(TMP."NewLMSTOA") AS "OthersLMSTOA"
+      FROM M
+      LEFT JOIN TMP ON TMP.LMSACN = M.LMSACN
+                   AND TMP."Seq" < M."MaxSeq"
+      GROUP BY M.LMSACN
+    )
+    , S1 AS (
+      SELECT TMP.BKPDAT
+           , TMP.LMSACN
+           , TMP.LMSAPN
+           , CASE
+               WHEN TMP."Seq" = M."MaxSeq" -- 如果是最後一筆
+               THEN TMP.LMSTOA - S."OthersLMSTOA" -- 用總金額 - 前幾筆的加總
+             ELSE TMP."NewLMSTOA"
+             END AS "LMSTOA"
+      FROM TMP
+      LEFT JOIN M ON M.LMSACN = TMP.LMSACN
+      LEFT JOIN S ON S.LMSACN = TMP.LMSACN
+    )
+    SELECT 'TAV'               AS "AcctCode"         -- 業務科目代號
+          ,LPAD(S1."LMSACN",7,0)
+                               AS "CustNo"           -- 戶號
+          ,LPAD(S1."LMSAPN",3,0)
+                               AS "FacmNo"           -- 額度編號
+          ,' '                 AS "RvNo"             -- 銷帳編號
+          ,S2."AcNoCode"       AS "AcNoCode"         -- 科目代號
+          ,S2."AcSubCode"      AS "AcSubCode"        -- 子目代號
+          ,S2."AcDtlCode"      AS "AcDtlCode"        -- 細目代號
+          ,'0000'              AS "BranchNo"         -- 單位別
+          ,'TWD'               AS "CurrencyCode"     -- 幣別
+          ,0                   AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
+          ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
+          ,2                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
+          ,S1."LMSTOA"         AS "RvAmt"            -- 起帳總額
+          ,S1."LMSTOA"         AS "RvBal"            -- 未銷餘額
+          ,S1."LMSTOA"         AS "AcBal"            -- 會計日餘額
+          ,''                  AS "SlipNote"         -- 傳票摘要
+          ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
+          ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
+          ,S1."BKPDAT"         AS "OpenAcDate"       -- 起帳日期
+          ,0                   AS "LastAcDate"       -- 最後作帳日
+          ,0                   AS "LastTxDate"       -- 最後交易日
+          ,''                  AS "TitaTxCd"         -- 交易代號
+          ,''                  AS "TitaKinBr"        -- 
+          ,''                  AS "TitaTlrNo"        -- 經辦
+          ,0                   AS "TitaTxtNo"        -- 交易序號
+          ,''                  AS "JsonFields"       -- jason格式紀錄
+          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
+          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+    FROM  S1
+    LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = 'TAV'
+    ;
+
+    -- 記錄寫入筆數
+    INS_CNT := INS_CNT + sql%rowcount;
+
     -- T10 : 債協暫收款-收款專戶
     INSERT INTO "AcReceivable"
-    SELECT CASE
-             WHEN S1."LMSACN" = 601776 -- T10 : 債協暫收款-收款專戶
-             THEN 'T10'
-           ELSE 'TAV'
-           END               AS "AcctCode"         -- 業務科目代號
+    SELECT 'T10'               AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."LMSACN",7,0)
                                AS "CustNo"           -- 戶號
           ,LPAD(S1."LMSAPN",3,0)
@@ -400,8 +495,9 @@ BEGIN
                       WHERE APLUAM > 0
                       GROUP BY LMSACN
                     ) APLP ON APLP.LMSACN = ACTP.LMSACN
+          WHERE ACTP.LMSACN = 601776
          ) S1
-    LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = 'TAV'
+    LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = 'T10'
     WHERE S1."Seq" = 1
       AND S1."LMSTOA" > 0
     ;

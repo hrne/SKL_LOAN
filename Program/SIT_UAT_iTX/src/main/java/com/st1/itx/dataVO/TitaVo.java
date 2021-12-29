@@ -470,7 +470,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return NBSDY String
 	 */
 	public String getNbsDy() {
-		return Objects.isNull(this.get("NBSDY")) ? "0" : this.get("NBSDY");
+		return Objects.isNull(this.get("NBSDY")) ? "" : this.get("NBSDY");
 	}
 
 	/**
@@ -479,7 +479,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return NNBSDY String
 	 */
 	public String getNnbsDy() {
-		return Objects.isNull(this.get("NNBSDY")) ? "0" : this.get("NNBSDY");
+		return Objects.isNull(this.get("NNBSDY")) ? "" : this.get("NNBSDY");
 	}
 
 	/**
@@ -1233,6 +1233,24 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 */
 	public String getBatchJobParm() {
 		return this.get("jobParm") == null ? "" : this.get("jobParm");
+	}
+
+	/**
+	 * get jobTxSeq
+	 * 
+	 * @return String
+	 */
+	public String getJobTxSeq() {
+		return this.get(ContentName.jobTxSeq) == null ? "" : this.get(ContentName.jobTxSeq);
+	}
+
+	/**
+	 * set JobTxSeq
+	 * 
+	 * @param jobTxSeq String
+	 */
+	public void setJobTxSeq(String jobTxSeq) {
+		this.putParam(ContentName.jobTxSeq, jobTxSeq);
 	}
 
 	/**
