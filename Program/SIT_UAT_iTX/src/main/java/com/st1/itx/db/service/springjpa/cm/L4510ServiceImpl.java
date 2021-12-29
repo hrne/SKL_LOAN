@@ -38,17 +38,21 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4510.findAll");
 
 		String sql = " select                                                   ";
-		sql += "  l.\"CustNo\"            as F0                                 ";
-		sql += " ,l.\"FacmNo\"            as F1                                 ";
-		sql += " ,f.\"AcctCode\"          as F2                                 ";
-		sql += " ,substr(d.\"Item\",0,1)  as F3                                 ";
-		sql += " ,l.\"BormNo\"            as F4                                 ";
+		sql += "  l.\"CustNo\"            as \"CustNo\"                         ";
+		sql += " ,l.\"FacmNo\"            as \"FacmNo\"                         ";
+		sql += " ,f.\"AcctCode\"          as \"AcctCode\"                       ";
+		sql += " ,substr(d.\"Item\",0,1)  as \"Flag\"                           ";
+		sql += " ,l.\"BormNo\"            as \"BormNo\"                         ";
+		if ("1".equals(flag)) {
+			sql += " , 4                  as \"AgType1\" ";
+		} else {
+			sql += " , 1                  as \"AgType1\" ";
+		}
 		sql += " from \"LoanBorMain\" l                                         ";
 		sql += " left join \"FacMain\"  f on f.\"CustNo\"     = l.\"CustNo\"    ";
 		sql += "                       and f.\"FacmNo\"       = l.\"FacmNo\"    ";
@@ -82,9 +86,8 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("intEndDate", intEndDate);
 		query.setParameter("flag", flag);
 		query.setParameter("AgType1", AgType1);
-		List<Object> result = query.getResultList();
 
-		return this.convertToMap(result);
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findAll(int iIntStartDate, int iIntEndDate, int iFlag, TitaVo titaVo) throws Exception {

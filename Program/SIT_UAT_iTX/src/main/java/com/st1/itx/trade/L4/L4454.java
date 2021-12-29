@@ -243,7 +243,7 @@ public class L4454 extends TradeBuffer {
 		custNo = parse.stringToInteger(t.get("CustNo"));
 		facmNo = parse.stringToInteger(t.get("FacmNo"));
 		repayType = parse.stringToInteger(t.get("RepayType"));
-		repayAmt = parse.stringToBigDecimal(t.get("RepayType"));
+		repayAmt = parse.stringToBigDecimal(t.get("RepayAmt"));
 		prevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
 		tTempVo = tTempVo.getVo(t.get("JsonFields"));
 		this.info(t.toString());

@@ -345,44 +345,45 @@ public class L4510p extends TradeBuffer {
 //			F2 AcctCode
 //			F3 1.15日薪 2.非15日薪
 //			F4 BormNo (逾兩期需指到撥款，無需扣費用)
-
-			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("F0")), parse.stringToInteger(result.get("F1")),
-					0, 0);
+//			F5 ProcCode (流程別)
+			
+			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")),
+					0, 0, parse.stringToInteger(result.get("Flag")), parse.stringToInteger(result.get("AgType1")));
 
 //			非15日僅抓取逾兩期之撥款
 //			Ex.若當月n-1-1逾一期，n-1-2撥款，下個月僅收n-1-1
 //			20210409修改為抓取全部撥款且費用，by淑薇電話確認
 			if (flagMap2.containsKey(tmp2)) {
-				this.info("custNo = " + parse.stringToInteger(result.get("F0")) + " facmNo = "
-						+ parse.stringToInteger(result.get("F1")) + " 同戶號額度僅進入計算一次 continue...");
+				this.info("custNo = " + parse.stringToInteger(result.get("CustNo")) + " facmNo = "
+						+ parse.stringToInteger(result.get("FacmNo")) + " 同戶號額度僅進入計算一次 continue...");
 				continue;
 			} else {
 				flagMap2.put(tmp2, 1);
 			}
 
 			// 業務科目(額度)
-			facmAcctCode.put(tmp2, result.get("F2"));
+			facmAcctCode.put(tmp2, result.get("AcctCode"));
 
 			// 業務科目(戶號第一筆)
-			if (!custAcctCode.containsKey(parse.stringToInteger(result.get("F0")))) {
-				custAcctCode.put(parse.stringToInteger(result.get("F0")), result.get("F2"));
+			if (!custAcctCode.containsKey(parse.stringToInteger(result.get("CustNo")))) {
+				custAcctCode.put(parse.stringToInteger(result.get("CustNo")), result.get("AcctCode"));
 			}
 
 			
 			// 應繳試算
-			if ("2".equals(result.get("F3"))) {
-				iN15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
-				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate, parse.stringToInteger(result.get("F0")),
-						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
+			if ("2".equals(result.get("Flag"))) {
+				iN15EntryDate = getList(slEmpDeductSchedule,result.get("Flag"));
+				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate, parse.stringToInteger(result.get("CustNo")),
+						parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
 			} else {
-				iY15EntryDate = getList(slEmpDeductSchedule,result.get("F3"));
-				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate, parse.stringToInteger(result.get("F0")),
-						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
+				iY15EntryDate = getList(slEmpDeductSchedule,result.get("Flag"));
+				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate, parse.stringToInteger(result.get("CustNo")),
+						parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
 			}
 			this.info("iN15EntryDate = " + iN15EntryDate);
 			this.info("iY15EntryDate = " + iY15EntryDate);
 			this.info("listBaTxVo =" + listBaTxVo);
-			setBatxValue(listBaTxVo, result.get("F3") );
+			setBatxValue(listBaTxVo, parse.stringToInteger(result.get("Flag")), parse.stringToInteger(result.get("AgType1")));
 		} // for
 
 //		各個repaycode寫入BankDeductDtl
@@ -403,22 +404,26 @@ public class L4510p extends TradeBuffer {
 	 */
 	private class tmpFacm {
 
-		public tmpFacm(int custNo, int facmNo, int bormNo, int achRepayCode) {
+		public tmpFacm(int custNo, int facmNo, int bormNo, int achRepayCode, int flag ,int procCode) {
 			this.setCustNo(custNo);
 			this.setFacmNo(facmNo);
 			this.setBormNo(bormNo);
 			this.setAchRepayCode(achRepayCode);
+			this.setFlag(flag);
+			this.setProcCode(procCode);
 		}
 
 		private int custNo = 0;
 		private int facmNo = 0;
 		private int BormNo = 0;
 		private int achRepayCode = 0;
-
+		private int flag = 0;
+		private int procCode = 0;
+		
 		@Override
 		public String toString() {
 			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", BormNo=" + BormNo + ", achRepayCode="
-					+ achRepayCode + "]";
+					+ achRepayCode + ", flag=" + flag + ", procCode=" + procCode + "]";
 		}
 
 		@Override
@@ -430,6 +435,8 @@ public class L4510p extends TradeBuffer {
 			result = prime * result + achRepayCode;
 			result = prime * result + custNo;
 			result = prime * result + facmNo;
+			result = prime * result + flag;
+			result = prime * result + procCode;
 			return result;
 		}
 
@@ -451,6 +458,10 @@ public class L4510p extends TradeBuffer {
 			if (custNo != other.custNo)
 				return false;
 			if (facmNo != other.facmNo)
+				return false;
+			if (flag != other.flag)
+				return false;
+			if (procCode != other.procCode)
 				return false;
 			return true;
 		}
@@ -487,6 +498,22 @@ public class L4510p extends TradeBuffer {
 			this.achRepayCode = achRepayCode;
 		}
 
+		private int getFlag() {
+			return flag;
+		}
+
+		private void setFlag(int flag) {
+			this.flag = flag;
+		}
+		
+		private int getProcCode() {
+			return procCode;
+		}
+
+		private void setProcCode(int procCode) {
+			this.procCode = procCode;
+		}
+		
 		private L4510p getEnclosingInstance() {
 			return L4510p.this;
 		}
@@ -538,20 +565,22 @@ public class L4510p extends TradeBuffer {
 
 //			欠繳金額根據AcReceivable.RvNo放入撥款
 //			暫收抵繳放入欠款之第一個撥款
-
+//
 			CustMain tCustMain = new CustMain();
 			tCustMain = custMainService.custNoFirst(tmp.getCustNo(), tmp.getCustNo(), titaVo);
 
 			CdEmp tCdEmp = new CdEmp();
-			tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);
-			this.info("tCdEmp.getAgType1() : " + tCdEmp.getAgType1());
-
-			CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tCdEmp.getAgType1(), titaVo);
+			if(tCustMain.getEmpNo() != null) {
+				tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);				
+			}
+//			this.info("tCdEmp.getAgType1() : " + tCdEmp.getAgType1());
+//
+//			CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tCdEmp.getAgType1(), titaVo);
 
 			int month = 0;
 
-			if (perfMonth.get(tCdEmp.getAgType1()) != null) {
-				month = perfMonth.get(tCdEmp.getAgType1());
+			if (perfMonth.get(""+tmp.getProcCode()) != null) {
+				month = perfMonth.get(""+tmp.getProcCode());
 			}
 
 			if (month == 0) {
@@ -572,8 +601,8 @@ public class L4510p extends TradeBuffer {
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 
-			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0);
-			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0);
+			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(), tmp.getProcCode());
+			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
 
 			this.info("tmp ... " + tmp);
 			this.info("tmp2 ... " + tmp2);
@@ -622,7 +651,7 @@ public class L4510p extends TradeBuffer {
 			}
 
 //			1.15日薪 2.非15日薪
-			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
+			if (tmp.getFlag() == 2) {
 				this.info("entrydate ... iN15EntryDate = " + iN15EntryDate);
 				tEmpDeductDtlId.setEntryDate(iN15EntryDate + 19110000);
 			} else {
@@ -633,11 +662,11 @@ public class L4510p extends TradeBuffer {
 			tEmpDeductDtlId.setAchRepayCode(tmp.getAchRepayCode());
 
 			tEmpDeductDtlId.setPerfMonth(month);
-			tEmpDeductDtlId.setProcCode(tCdEmp.getAgType1());
+			tEmpDeductDtlId.setProcCode("" + tmp.getProcCode());
 
 //			QC.623 非15薪扣款代碼應為滯繳件
 			// MediaDate, MediaKind由最後update移至 
-			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
+			if (tmp.getFlag() == 2) {
 				tEmpDeductDtlId.setRepayCode("3");
 				tEmpDeductDtl.setMediaKind("5");
 			} else {
@@ -661,7 +690,9 @@ public class L4510p extends TradeBuffer {
 			tEmpDeductDtl.setFacmNo(tEmpDeductDtlId.getFacmNo());
 			tEmpDeductDtl.setBormNo(tEmpDeductDtlId.getBormNo());
 
-			tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());
+			if(tCdEmp != null ) {
+				tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());
+			}
 			tEmpDeductDtl.setCustId(tCustMain.getCustId());
 
 			this.info("tmp.getAchRepayCode() : " + tmp.getAchRepayCode());
@@ -694,14 +725,17 @@ public class L4510p extends TradeBuffer {
 			tEmpDeductDtl.setTitaTxtNo("");
 			tEmpDeductDtl.setTitaTlrNo("");
 			tEmpDeductDtl.setBatchNo("");
-			tEmpDeductDtl.setResignCode(tCdEmp.getAgStatusCode());
-			tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCodeAcc2());
-			tEmpDeductDtl.setUnitCode(tCdEmp.getCenterCodeAcc());
+			if(tCdEmp != null ) {
+			  tEmpDeductDtl.setResignCode(tCdEmp.getAgStatusCode());
+			  tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCodeAcc2());
+			  tEmpDeductDtl.setUnitCode(tCdEmp.getCenterCodeAcc());
+			  tEmpDeductDtl.setPositCode(tCdEmp.getAgPost());
+			}
 			if (intStartDate.get(tmp) != null)
 				tEmpDeductDtl.setIntStartDate(intStartDate.get(tmp));
 			if (intEndDate.get(tmp) != null)
 				tEmpDeductDtl.setIntEndDate(intEndDate.get(tmp));
-			tEmpDeductDtl.setPositCode(tCdEmp.getAgPost());
+			
 			if (rpAmt10Map.get(tmp) != null) {
 				tEmpDeductDtl.setPrincipal(rpAmt10Map.get(tmp));
 				tEmpDeductDtl.setCurrPrinAmt(rpAmt10Map.get(tmp));
@@ -1020,16 +1054,16 @@ public class L4510p extends TradeBuffer {
 	}
 	
 //	flag 1:15日薪 2:非15日薪
-	private void setBatxValue(List<BaTxVo> listBaTxVo, String flag) throws LogicException {
+	private void setBatxValue(List<BaTxVo> listBaTxVo, int flag, int procCode) throws LogicException {
 		this.info("setBatxValue Start ...");
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
 
 				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
-						tBaTxVo.getRepayType());
+						tBaTxVo.getRepayType(), flag, procCode);
 
-				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0);
+				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag, procCode);
 
 //				20210409修改為抓取全部撥款且費用，by淑薇電話確認
 //				非15日僅製作期款媒體

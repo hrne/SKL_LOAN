@@ -154,7 +154,7 @@ public class LP005Report extends MakeReport {
 			// 撥款金額
 			makeExcel.setValue(rowCursor, 3, getBigDecimal(m.get("F2")), "#,##0");
 			// 計件代碼
-			makeExcel.setValue(rowCursor, 4, Integer.valueOf(m.get("F3")));
+			makeExcel.setValue(rowCursor, 4, m.get("F3"), "L");
 			// 員工代碼
 			makeExcel.setValue(rowCursor, 5, m.get("F4"), "L");
 			// 員工姓名

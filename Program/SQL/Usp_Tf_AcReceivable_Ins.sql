@@ -271,12 +271,21 @@ BEGIN
           ,'  '                AS "AcDtlCode"        -- 細目代號
           ,'0000'              AS "BranchNo"         -- 單位別
           ,'TWD'               AS "CurrencyCode"     -- 幣別
-          ,0                   AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
+          ,CASE
+             WHEN S1."TRXDAT" = 0 -- 會計日期為0者未銷
+             THEN 0
+           ELSE 1 END          AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
           ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
           ,3                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
           ,S1."ACTFEE"         AS "RvAmt"            -- 起帳總額
-          ,S1."ACTFEE"         AS "RvBal"            -- 未銷餘額
-          ,S1."ACTFEE"         AS "AcBal"            -- 會計日餘額
+          ,CASE
+             WHEN S1."TRXDAT" = 0 -- 會計日期為0者未銷
+             THEN S1."ACTFEE"
+           ELSE 0 END          AS "RvBal"            -- 未銷餘額
+          ,CASE
+             WHEN S1."TRXDAT" = 0 -- 會計日期為0者未銷
+             THEN S1."ACTFEE"
+           ELSE 0 END          AS "AcBal"            -- 會計日餘額
           ,''                  AS "SlipNote"         -- 傳票摘要
           ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
@@ -293,7 +302,6 @@ BEGIN
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LN$ACFP" S1
-    WHERE S1."TRXDAT" = 0 -- 會計日期為0者未銷
     ;
 
     -- 記錄寫入筆數
@@ -352,6 +360,9 @@ BEGIN
     -- TAV : 暫收款-可抵繳
     INSERT INTO "AcReceivable"
     WITH ACT AS (
+      -- 篩選出基本資料
+      -- 條件1:排除戶號為601776
+      -- 條件2:取BKPDAT最新的第一筆
       SELECT ROW_NUMBER() OVER (PARTITION BY ACTP.LMSACN ORDER BY ACTP.BKPDAT DESC) AS "Seq"
             ,ACTP.BKPDAT
             ,ACTP.LMSACN
@@ -359,7 +370,8 @@ BEGIN
       FROM LADACTP ACTP
       WHERE ACTP.LMSACN != 601776
     )
-    , LOAN AS (
+    , L1 AS (
+      -- 加總各額度放款餘額
       SELECT LMSACN
            , LMSAPN
            , SUM(LMSLBL) AS LMSLBL
@@ -367,29 +379,41 @@ BEGIN
       GROUP BY LMSACN
              , LMSAPN
     )
+    , L2 AS (
+      -- 加總各戶號放款餘額
+      SELECT LMSACN
+           , SUM(LMSLBL) AS LMSLBL
+      FROM LA$LMSP
+      GROUP BY LMSACN
+    )
     , TMP AS (
+      -- 依照額度放款餘額佔戶號放款餘額的比例
+      -- 將費用分配到各個額度
       SELECT ACT.BKPDAT
            , ACT.LMSACN
-           , LOAN.LMSAPN
-           , ROUND(ACT.LMSTOA / LOAN.LMSLBL,0) AS "NewLMSTOA"
+           , L1.LMSAPN
+           , ROUND(ACT.LMSTOA * L1.LMSLBL / L2.LMSLBL ,0) AS "NewLMSTOA"
            , ACT.LMSTOA
            , ROW_NUMBER()
              OVER (
                PARTITION BY ACT.LMSACN
-               ORDER BY LOAN.LMSAPN
+               ORDER BY L1.LMSAPN
              ) AS "Seq"
       FROM ACT
-      LEFT JOIN LOAN ON LOAN.LMSACN = ACT.LMSACN
-      WHERE ACT."Seq" = 1
-        AND ACT.LMSTOA > 0
+      LEFT JOIN L1 ON L1.LMSACN = ACT.LMSACN
+      LEFT JOIN L2 ON L2.LMSACN = ACT.LMSACN
+      WHERE ACT."Seq" = 1 -- 取BKPDAT最新的第一筆
+        AND ACT.LMSTOA > 0 -- 有費用的才做
     )
-    , M AS ( -- 取得最大序號
+    , M AS (
+      -- 判斷最後一筆
       SELECT LMSACN
            , MAX("Seq") AS "MaxSeq"
       FROM TMP
       GROUP BY LMSACN
     )
-    , S AS ( -- 取得非最大序號之金額加總
+    , S AS (
+      -- 計算前幾筆已分配金額的加總
       SELECT M.LMSACN
            , SUM(TMP."NewLMSTOA") AS "OthersLMSTOA"
       FROM M
@@ -398,6 +422,8 @@ BEGIN
       GROUP BY M.LMSACN
     )
     , S1 AS (
+      -- 處理分配費用除不盡時的尾數差
+      -- 最後一筆 用 總費用 減去 前幾筆已分配金額的加總
       SELECT TMP.BKPDAT
            , TMP.LMSACN
            , TMP.LMSAPN

@@ -36,7 +36,6 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int flag, TitaVo titaVo) throws Exception {
 
 		this.info("L4454A.findAll");
@@ -123,7 +122,7 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,c.\"CustId\"                   AS \"CustId\"          ";
 			sql += " ,c.\"CustName\"                 AS \"CustName\"        ";
 			sql += " ,2                              AS \"RepayCode\" ";
-			sql += " ,NVL(d.\"RepayType\",0)         AS \"FireFeeSuccess\"  "; // 5-火險費成功、期款失敗
+			sql += " ,decode(nvl(d.\"RepayType\", 0),5,'Y',' ') AS \"FireFeeSuccess\"  "; // Y-火險費成功、期款失敗
 			sql += " ,ROW_NUMBER() OVER (Partition By b.\"CustNo\", b.\"FacmNo\", b.\"RepayType\" ORDER BY b.\"PayIntDate\") AS \"RowNumber\"  ";
 			sql += " from \"BankDeductDtl\" b                               ";
 			sql += " left join \"CustMain\" c on c.\"CustNo\" = b.\"CustNo\"";
@@ -133,7 +132,7 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      and d.\"EntryDate\" = b.\"EntryDate\"	            ";
 			sql += "      and b.\"RepayType\" =  1                          ";
 			sql += "      and d.\"RepayType\" = 5	                        ";
-			sql += "      and NVL(b.\"ReturnCode\",'  ') in ('00')          ";
+			sql += "      and d.\"ReturnCode\" in ('00')                    ";
 			sql += " where b.\"MediaCode\" = 'Y'                            ";
 			sql += "   and NVL(b.\"ReturnCode\",'  ') not in ('  ','00')    ";
 			sql += "   and b.\"EntryDate\" = " + entryDate;

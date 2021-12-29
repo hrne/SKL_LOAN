@@ -6,6 +6,7 @@ create or replace PROCEDURE "Usp_L9_MonthlyLM028_Upd"
 )
 AS
 BEGIN
+  -- EXEC "Usp_L9_MonthlyLM028_Upd"(20211130,'999999');
   DECLARE
     INS_CNT        INT;        -- 新增筆數
     UPD_CNT        INT;        -- 更新筆數
@@ -120,30 +121,49 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
 
     MERGE INTO "MonthlyLM028" M
-    USING (select  R."CustNo", R."FacmNo", R."BormNo"
-                , SUM(DECODE(R."SEQ", 1, R."FitRate", 0)) "FitRate1"
-                , SUM(DECODE(R."SEQ", 2, R."FitRate", 0)) "FitRate2"
-                , SUM(DECODE(R."SEQ", 3, R."FitRate", 0)) "FitRate3"
-                , SUM(DECODE(R."SEQ", 4, R."FitRate", 0)) "FitRate4"
-                , SUM(DECODE(R."SEQ", 5, R."FitRate", 0)) "FitRate5"
-                , SUM(DECODE(R."SEQ2", 1, R."FitRate", 0)) "LFitRate"
-                , SUM(DECODE(R."SEQ2", 1, R."EffectDate", 0)) "LIRTDAY"
-           FROM (SELECT M."CustNo", M."FacmNo", M."BormNo", R."FitRate"
-                       ,R."EffectDate"
-                       ,ROW_NUMBER() OVER (PARTITION BY M."CustNo", M."FacmNo", M."BormNo"
-                                           ORDER BY R."EffectDate") AS SEQ
-                       ,ROW_NUMBER() OVER (PARTITION BY M."CustNo", M."FacmNo", M."BormNo"
-                                           ORDER BY R."EffectDate" DESC ) AS SEQ2
-                   FROM "LoanBorMain" M
-                   LEFT JOIN "LoanRateChange" R ON R."CustNo" = M."CustNo"
-                                               AND R."FacmNo" = M."FacmNo"
-                                               AND R."BormNo" = M."BormNo"
-                   WHERE R."EffectDate" <= M."FirstAdjRateDate"
-                 ) R
-          GROUP BY R."CustNo", R."FacmNo", R."BormNo") R
-     ON (   M."CustNo"    = R."CustNo"
-        AND M."FacmNo"    = R."FacmNo"
-        AND M."BormNo"    = R."BormNo")
+    USING (
+      SELECT R."CustNo"
+           , R."FacmNo"
+           , R."BormNo"
+           , SUM(DECODE(R."SEQ", 1, R."FitRate", 0)) "FitRate1"
+           , SUM(DECODE(R."SEQ", 2, R."FitRate", 0)) "FitRate2"
+           , SUM(DECODE(R."SEQ", 3, R."FitRate", 0)) "FitRate3"
+           , SUM(DECODE(R."SEQ", 4, R."FitRate", 0)) "FitRate4"
+           , SUM(DECODE(R."SEQ", 5, R."FitRate", 0)) "FitRate5"
+           , SUM(DECODE(R."SEQ2", 1, R."FitRate", 0)) "LFitRate"
+           , SUM(DECODE(R."SEQ2", 1, R."EffectDate", 0)) "LIRTDAY"
+      FROM (
+        SELECT M."CustNo"
+             , M."FacmNo"
+             , M."BormNo"
+             , R."FitRate"
+             , R."EffectDate"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY M."CustNo", M."FacmNo", M."BormNo"
+                 ORDER BY R."EffectDate"
+               )                         AS SEQ
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY M."CustNo", M."FacmNo", M."BormNo"
+                 ORDER BY R."EffectDate" DESC
+               )                         AS SEQ2
+        FROM "LoanBorMain" M
+        LEFT JOIN "LoanRateChange" R ON R."CustNo" = M."CustNo"
+                                    AND R."FacmNo" = M."FacmNo"
+                                    AND R."BormNo" = M."BormNo"
+        WHERE R."EffectDate" <= M."FirstAdjRateDate"
+      ) R
+      GROUP BY R."CustNo"
+             , R."FacmNo"
+             , R."BormNo"
+    ) R
+    ON (  
+      M."DataMonth" = YYYYMM 
+      AND M."CustNo" = R."CustNo"
+      AND M."FacmNo" = R."FacmNo"
+      AND M."BormNo" = R."BormNo"
+    )
     WHEN MATCHED THEN UPDATE
       SET M."FitRate1" = R."FitRate1"
          ,M."FitRate2" = R."FitRate2"
@@ -156,22 +176,29 @@ BEGIN
     UPD_CNT := UPD_CNT + sql%rowcount;
 
     MERGE INTO "MonthlyLM028" M
-    USING (SELECT  M."CustNo"
-                 , M."FacmNo"
-                 , M."BormNo" 
-                 , M."StoreRate"
-                 , DECODE(L."FirstAdjRateDate", 0, L."DrawdownDate", L."FirstAdjRateDate") AS "LIRTDAY" 
-           FROM "MonthlyLM028" M
-           LEFT JOIN "LoanBorMain" L ON L."CustNo" = M."CustNo"
-                                    AND L."FacmNo" = M."FacmNo"
-                                    AND L."BormNo" = M."BormNo"
-           WHERE M."LastestRate" = 0) D
-     ON (   M."CustNo"    = D."CustNo"
-        AND M."FacmNo"    = D."FacmNo"
-        AND M."BormNo"    = D."BormNo")
-    WHEN MATCHED THEN UPDATE
-      SET M."LastestRate" = D."StoreRate"
-         ,M."LastestRateStartDate"   = D."LIRTDAY";
+    USING (
+      SELECT  M."DataMonth"
+            , M."CustNo"
+            , M."FacmNo"
+            , M."BormNo" 
+            , M."StoreRate"
+            , DECODE(L."FirstAdjRateDate", 0, L."DrawdownDate", L."FirstAdjRateDate") AS "LIRTDAY" 
+      FROM "MonthlyLM028" M
+      LEFT JOIN "LoanBorMain" L ON L."CustNo" = M."CustNo"
+                               AND L."FacmNo" = M."FacmNo"
+                               AND L."BormNo" = M."BormNo"
+      WHERE M."DataMonth" = YYYYMM
+        AND M."LastestRate" = 0
+    ) D
+    ON (   
+      M."DataMonth" = D."DataMonth"
+      AND M."CustNo" = D."CustNo"
+      AND M."FacmNo" = D."FacmNo"
+      AND M."BormNo" = D."BormNo"
+    )
+    WHEN MATCHED THEN UPDATE SET
+      M."LastestRate" = D."StoreRate"
+    , M."LastestRateStartDate" = D."LIRTDAY";
 
     UPD_CNT := UPD_CNT + sql%rowcount;
 
