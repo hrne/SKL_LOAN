@@ -46,6 +46,10 @@
 	</bean>
 	
 	<task:executor id="taskExecutor"  keep-alive="3600" pool-size="25-50" queue-capacity="10" />
+	
+	<task:annotation-driven scheduler="myScheduler"/>
+	
+	<task:scheduler id="myScheduler" pool-size="20"/>
 
   <!--
   <tx:annotation-driven transaction-manager="transactionManagerb" proxy-target-class="true" />
