@@ -250,7 +250,7 @@ public class L9705Report extends MakeReport {
 
 					cnt++;
 
-					intRate = listBaTxVo.get(0).getIntRate();
+					intRate = dBaTxCom.getFitRate();
 
 					String unPaidAmtX = "";
 					String acctFeeX = "";

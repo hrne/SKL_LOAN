@@ -84,7 +84,7 @@ public class L9711Report extends MakeReport {
 		int rowNum = -6;
 
 		// 各項目 位置
-		this.print(rowNum, startPos, "押品地區別", "L");
+		this.print(rowNum, startPos - 2 , "擔保品地區別", "L");
 		this.print(rowNum, startPos + 12, "房貸專員", "L");
 		this.print(rowNum, startPos + 22, "戶號", "L");
 		this.print(rowNum, startPos + 34, "戶名", "L");
@@ -153,9 +153,9 @@ public class L9711Report extends MakeReport {
 
 		}
 
-//		long sno = this.close();
+		long sno = this.close();
 
-		//this.toPdf(sno);
+		this.toPdf(sno);
 
 		return l9711List;
 
@@ -164,7 +164,7 @@ public class L9711Report extends MakeReport {
 	private void printData(Map<String, String> tL9711Vo) {
 
 		// 押品地區別
-		this.print(1, startPos, tL9711Vo.get("F1") == null || tL9711Vo.get("F1").length() == 0 ? ""
+		this.print(1, startPos - 2, tL9711Vo.get("F1") == null || tL9711Vo.get("F1").length() == 0 ? ""
 				: tL9711Vo.get("F1") + " " + tL9711Vo.get("F2"), "L");
 
 		// 房貸專員

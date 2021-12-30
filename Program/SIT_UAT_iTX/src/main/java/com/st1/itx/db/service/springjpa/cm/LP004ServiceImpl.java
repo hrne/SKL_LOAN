@@ -52,21 +52,23 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	//放款審查
 	public List<Map<String, String>> findArea(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
-		int year = Integer.parseInt(wkVo.get("F0"));
-		int month = Integer.parseInt(wkVo.get("F1"));
 
-		int thisYearMonth = Integer.parseInt(wkVo.get("F2"));
+		int inputYear = Integer.parseInt(wkVo.get("F0"));
 
-		if (month == 1) {
-			year = year - 1;
-			month = 13;
+		int iMM = Integer.parseInt(wkVo.get("F1"));
+
+		int inputYearMonth = (inputYear * 100) + iMM;
+
+		if (iMM == 1) {
+			inputYear = inputYear - 1;
+			iMM = 13;
 		} else {
-			month = month - 1;
+			iMM = iMM - 1;
 		}
 
-		int lastYearMonth = year * 100 + month;
+		int lastYearMonth = inputYear * 100 + iMM;
 
-		this.info("LP004ServiceImpl.findArea thisYearMonth = " + thisYearMonth + " ,lastYearMonth = " + lastYearMonth);
+		this.info("LP004ServiceImpl.findArea thisYearMonth = " + inputYearMonth + " ,lastYearMonth = " + lastYearMonth);
 
 		String sql = " ";
 		sql += " SELECT CASE ";
@@ -121,7 +123,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", thisYearMonth);
+		query.setParameter("iyymm", inputYearMonth);
 		query.setParameter("liyymm", lastYearMonth);
 
 		return this.convertToMap(query);

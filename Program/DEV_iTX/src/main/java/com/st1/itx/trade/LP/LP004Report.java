@@ -55,7 +55,7 @@ public class LP004Report extends MakeReport {
 					+ titaVo.get("ENTDY").substring(6, 8);
 			String iYYMM = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911) + "." + wkSsnVo.get("F1");
 
-			makeExcel.setSheet("放款審查課各區");
+			makeExcel.setSheet("放款審查各區");
 			makeExcel.setValue(1, 1, iYYMM + "工作月　放款審查各區業績統計報表");
 			makeExcel.setValue(2, 1, "結算日期：" + iENTDY, "R");
 			setArea(titaVo, wkSsnVo);

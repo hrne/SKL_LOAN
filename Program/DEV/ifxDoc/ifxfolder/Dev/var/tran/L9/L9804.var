@@ -9,11 +9,11 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,0)ASGN(INQHD$)
+E(0,27)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,0)ASGN(INQLEN$)
+E(0,75)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -48,7 +48,7 @@ E(0,0)
 ["@",[#BtnAllShell1,"@全選"]],"",
 ], 
 
-["#grid#,{id:2,expand:false,loop:6,row_height:0}","","",
+["#grid#,{id:2,expand:false,loop:4,row_height:0}","","",
 [],[#BtnShell1,#TradeCode1,#TradeName1],
 ], 
 
@@ -73,9 +73,9 @@ E(0,0)
 
 ! 4. 這裡的 TotalItem 與 TotalCat 作修改
 
-! 總項目數 6
+! 總項目數 4
 #TotalItem=N,3,S
-E(0,6)
+E(0,4)
 
 ! 總分類數 1
 #TotalCat=N,1,S
@@ -123,17 +123,13 @@ V(5,0,#DT2)
 ! 並且每種種類依序放在一起
 ! 也不可以跳號
 
-#TradeDic1=X,36,S
-T(3,1/LQ001/營造署季報─購置住宅貸款餘額)
-#TradeDic2=X,26,S
-T(3,1/LQ002/營建署季報貸款成數)
-#TradeDic3=X,37,S
-T(3,1/LQ003/住宅違約統計季報_服務課申報表)
-#TradeDic4=X,32,S
+#TradeDic1=X,32,S
 T(3,1/LP005/房貸協辦人員考核核算底稿)
-#TradeDic5=X,26,S
+#TradeDic2=X,37,S
+T(3,1/LQ003/住宅違約統計季報_服務課申報表)
+#TradeDic3=X,26,S
 T(3,1/LQ005/表A18_會計部申報表)
-#TradeDic6=X,29,S
+#TradeDic4=X,29,S
 T(3,1/LQ006/已逾期未減損-帳齡分析)
 
 
@@ -141,7 +137,7 @@ T(3,1/LQ006/已逾期未減損-帳齡分析)
 !---------- TRADE DICTIONARY SPLIT AND ASSIGN -----------
 
 ! 修改這裡的 loop times
-##loop{times:6,i:1}
+##loop{times:4,i:1}
 
 ! TradeCat: 1st byte of TradeDic. Trade's category.
 #TradeCat{i}=X,1,S
@@ -166,7 +162,7 @@ T(1,#TradeDic{i},9,48)
 ! How many trades are there, how many buttons should be made.
 
 ! 修改這裡的 loop times
-##loop{times:6,i:1}
+##loop{times:4,i:1}
 
 
 !---------- BUTTON VISUAL -----------
@@ -291,7 +287,7 @@ C(5,#BtnExpShell{i},＋,CALL(#FuncFoldCat),CALL(#FuncExpandCat))
 
 ! 修改這裡的 2 個 loop times
 #FuncSelectEverything=@,1,S
-##loop{times:6,i:1}
+##loop{times:4,i:1}
 C(5,#BtnAllShell0,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},　),$)
 ##end
 ##loop{times:1,i:1}
@@ -304,7 +300,7 @@ C(5,#BtnAllShell0,V,T(3,@BtnAllShell{i},V),T(3,@BtnAllShell{i},　))
 
 ! 修改這裡的 loop times
 #FuncSelectCat=@,1,S
-##loop{times:6,k:1}
+##loop{times:4,k:1}
 C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
 ##end
 
@@ -312,7 +308,7 @@ C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
 
 ! 修改這裡的 loop times
 #FuncUnselectCat=@,1,S
-##loop{times:6,i:1}
+##loop{times:4,i:1}
 C(5,#TradeCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
 ##end
 
@@ -363,7 +359,7 @@ T(3,@BtnAllShell0,　)
 ! 修改這裡的 loop times
 <sub type="TIM">
 #TotalItem
-##loop{times:6,i:1}
+##loop{times:4,i:1}
 #BtnShell{i}
 #TradeName{i}
 #TradeCode{i}

@@ -393,7 +393,7 @@ public class L9703Report2 extends MakeReport {
 			}
 		} // for
 
-		intRate = listBaTxVo.get(0).getIntRate();
+		intRate = dBaTxCom.getFitRate();
 
 		String unPaidAmtX = "";
 		String acctFeeX = "";

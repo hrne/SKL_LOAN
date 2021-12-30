@@ -103,7 +103,7 @@ public class LC100 extends TradeBuffer {
 				if (tTxTeller.getTxtNo() > 990000) {
 					tTxTeller.setTxtNo(1);
 				}
-				this.totaVo.putParam("TXTNO", tTxTeller.getTxtNo());
+				this.totaVo.putParam("TXTNO", tTxTeller.getTxtNo() + 50);
 				// MODE 0.本日 1.次日
 //				if (tTxTeller.getEntdy() == this.txBuffer.getMgBizDate().getNbsDy()) {
 //				this.totaVo.putParam("MODE", "1");
