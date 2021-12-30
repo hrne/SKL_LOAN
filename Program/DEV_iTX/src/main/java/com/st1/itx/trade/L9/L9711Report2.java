@@ -12,7 +12,10 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
@@ -22,6 +25,12 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L9711Report2 extends MakeReport {
+
+	@Autowired
+	public CustMainService custMainService;
+
+	@Autowired
+	CustNoticeCom custNoticeCom;
 
 //	L9711ServiceImpl L9711ServiceImlㄤ‧
 	@Autowired
@@ -60,7 +69,9 @@ public class L9711Report2 extends MakeReport {
 		String f5 = "";
 		int count = 0;
 		// 製表人
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
+		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
+				titaVo.getTxCode().isEmpty() ? "L9711" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "inch,8.5,12", "P");
 
 		if (L9711List.size() > 0) {
 
@@ -96,44 +107,48 @@ public class L9711Report2 extends MakeReport {
 
 	private void reportEmpty() throws LogicException {
 
-		this.print(-4, 10, "【限定本人拆閱，若無此人，請寄回本公司】");
+//		this.print(-4, 10, "【限定本人拆閱，若無此人，請寄回本公司】");
+//
+//		this.setFontSize(14);
+//		this.print(-15, 37, "放款本息攤還表暨繳息通知單", "C");
+//
+//		this.setFontSize(10);
+//
+//		this.print(-22, 10, "製發日期：");
+//		this.print(-22, 20, ENTDY.substring(0, 3) + "/" + ENTDY.substring(3, 5) + "/" + ENTDY.substring(5, 7));
+//		this.print(-23, 10, "戶號：　　　　　　　目前利率：　　　　%");
+//
+//		this.print(-24, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
+//
+//		this.print(-25, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　管帳費：");
+//
+//		this.print(-26, 10, "　　　　　　　　　　　　　每期應攤還　　　　　　　　　　　　未　　還　　暫　付");
+//		this.print(-27, 10, "應繳日　　違約金　　　　本金　　　　　利息　　　應繳合計　　本金餘額　　所得稅　　應繳淨額");
+//		this.print(-28, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+//		this.print(-29, 7, "本日無資料");
+//
+//		this.print(-31, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
+//		this.print(-32, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
+//
+//		this.print(-33, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
+//		this.print(-34, 8, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+//
+//		this.print(-35, 8, "＊＊新光銀行　　分行代號：");
+//
+//		this.print(-36, 82, "製表人 ");
+//		this.print(1, 1, " ");
 
-		this.setFontSize(14);
-		this.print(-15, 37, "放款本息攤還表暨繳息通知單", "C");
+		this.setRptItem("放款本息攤還表暨繳息通知單(查無資料)");
 
-		this.setFontSize(10);
-
-		this.print(-22, 10, "製發日期：");
-		this.print(-22, 20, ENTDY.substring(0, 3) + "/" + ENTDY.substring(3, 5) + "/" + ENTDY.substring(5, 7));
-		this.print(-23, 10, "戶號：　　　　　　　目前利率：　　　　%");
-
-		this.print(-24, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
-
-		this.print(-25, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　管帳費：");
-
-		this.print(-26, 10, "　　　　　　　　　　　　　每期應攤還　　　　　　　　　　　　未　　還　　暫　付");
-		this.print(-27, 10, "應繳日　　違約金　　　　本金　　　　　利息　　　應繳合計　　本金餘額　　所得稅　　應繳淨額");
-		this.print(-28, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-		this.print(-29, 7, "本日無資料");
-
-		this.print(-31, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
-		this.print(-32, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
-
-		this.print(-33, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
-		this.print(-34, 8, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
-
-		this.print(-35, 8, "＊＊新光銀行　　分行代號：");
-
-		this.print(-36, 82, "製表人 ");
-		this.print(1, 1, " ");
-
+		this.printCm(1, 4, "*******    查無資料   ******");
 	}
 
 	private void report(Map<String, String> tL9711Vo, TxBuffer txbuffer) throws LogicException {
 		List<BaTxVo> listBaTxVo = new ArrayList<>();
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
-			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, titaVo);
+			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
+					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, titaVo);
 
 		} catch (LogicException e) {
 			this.info("baTxCom.setTxBuffer ErrorMsg :" + e.getMessage());
@@ -141,6 +156,9 @@ public class L9711Report2 extends MakeReport {
 
 		this.info("listBaTxVo.size()-------->" + listBaTxVo.size());
 		this.info("listBaTxVo-------->" + listBaTxVo.toString());
+		if (listBaTxVo.size() == 0) {
+			return;
+		}
 
 		int Principal = 0;
 		int Interest = 0;
@@ -157,38 +175,89 @@ public class L9711Report2 extends MakeReport {
 		UnPaidAmt = UnPaidAmt + listBaTxVo.get(0).getUnPaidAmt().intValue();
 		IntRate = listBaTxVo.get(0).getIntRate().doubleValue();
 
-		this.print(1, 1, " ");
-		this.print(-4, 10, "【限定本人拆閱，若無此人，請寄回本公司】");
+		int custNo = Integer.valueOf(tL9711Vo.get("F4"));
 
-		this.print(-7, 10, tranNum(tL9711Vo.get("F17")) + tranNum(tL9711Vo.get("F18")));
+		CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
+
+		setFont(1, 14);
+
+//		this.print(1, 1, " ");
+//		this.print(-4, 10, "【限定本人拆閱，若無此人，請寄回本公司】");
+		printCm(1, 4, "【限定本人拆閱，若無此人，請寄回本公司】");
+
+//		this.print(-7, 10, tranNum(tL9711Vo.get("F17")) + tranNum(tL9711Vo.get("F18")));
+		printCm(2, 5, tranNum(tL9711Vo.get("F17")) + tranNum(tL9711Vo.get("F18")));
 
 		String tmp = "";
 
-		this.print(-9, 10, tL9711Vo.get("F19"));
+//		this.print(-9, 10, tL9711Vo.get("F19"));
+		String addr = custNoticeCom.getCurrAddress(custMain, titaVo);
+		printCm(2, 6, addr);
 
-		this.print(-11, 10, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "   " + tL9711Vo.get("F6"));
+//		this.print(-11, 10, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "   " + tL9711Vo.get("F6"));
+		printCm(2, 7, String.format("%07d", custNo) + "   " + tL9711Vo.get("F6"));
 
-		this.setFontSize(14);
-		this.print(-15, 37, "放款本息攤還表暨繳息通知單", "C");
+//		this.setFontSize(14);
+//		this.print(-15, 37, "放款本息攤還表暨繳息通知單", "C");
 
-		this.setFontSize(10);
+		this.setFontSize(11);
 
-		this.print(-22, 10, "製發日期：");
-		this.print(-22, 20, ENTDY.substring(0, 3) + "/" + ENTDY.substring(3, 5) + "/" + ENTDY.substring(5, 7));
+		int top = 0;// 上下微調用
+		double yy = 21;// 開始Y軸
+		double h = 0.4;// 列高
+		double l = 0;// 列數
 
-		this.print(-22, 83, tL9711Vo.get("F20"));
+//		this.print(-22, 10, "製發日期：");
+//		this.print(-22, 20, ENTDY.substring(0, 3) + "/" + ENTDY.substring(3, 5) + "/" + ENTDY.substring(5, 7));
+		double y = top + yy;
+		printCm(1.5, y, "製發日期：" + ENTDY.substring(0, 3) + "/" + ENTDY.substring(3, 5) + "/" + ENTDY.substring(5, 7));
 
-		this.print(-23, 10, "戶號：　　　　　　　目前利率：　　　　%");
-		this.print(-23, 16, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-" + String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))));
-		this.print(-23, 47, String.format("%.4f", IntRate), "R");
-		this.print(-24, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
-		this.print(-24, 20, tL9711Vo.get("F6"));
-		this.print(-24, 70, String.format("%,d", UnPaidAmt));
-		this.print(-25, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　管帳費：");
-		this.print(-25, 78, "");
-		this.print(-26, 10, "　　　　　　　　　　　　　每期應攤還　　　　　　　　　　　　未　　還　　暫　付");
-		this.print(-27, 10, "應繳日　　違約金　　　　本金　　　　　利息　　　應繳合計　　本金餘額　　所得稅　　應繳淨額");
-		this.print(-28, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+//		this.print(-22, 83, tL9711Vo.get("F20"));
+		printCm(16, y, tL9711Vo.get("F20"));
+
+//		this.print(-23, 10, "戶號：　　　　　　　目前利率：　　　　%");
+//		this.print(-23, 16, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-"
+//				+ String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))));
+//		this.print(-23, 47, String.format("%.4f", IntRate), "R");
+		y = top + yy + (++l) * h;
+		printCm(1.5, y,
+				"戶    號：" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-"
+						+ String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))) + "  目前利率："
+						+ padStart(6, "" + IntRate) + "%");
+
+//		this.print(-24, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
+//		this.print(-24, 20, tL9711Vo.get("F6"));
+//		this.print(-24, 70, String.format("%,d", UnPaidAmt));
+		y = top + yy + (++l) * h;
+		printCm(1.5, y, "客戶名稱：" + tL9711Vo.get("F6"));
+		printCm(12, y, "溢短繳：", "R");
+		printCm(14, y, String.format("%,d", UnPaidAmt), "R");
+
+//		this.print(-25, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　管帳費：");
+//		this.print(-25, 78, "");
+		y = top + yy + (++l) * h;
+		printCm(12, y, "帳管費：", "R");
+
+//		this.print(-26, 10, "　　　　　　　　　　　　　每期應攤還　　　　　　　　　　　　未　　還　　暫　付");
+		y = top + yy + (++l) * h;
+		printCm(8.8, y, "每期應攤還", "R");
+		printCm(14.5, y, "未　　還", "R");
+		printCm(16.5, y, "暫　付", "R");
+
+//		this.print(-27, 10, "應繳日　　違約金　　　　本金　　　　　利息　　　應繳合計　　本金餘額　　所得稅　　應繳淨額");
+		y = top + yy + (++l) * h;
+		printCm(1, y, "應繳日");
+		printCm(4.5, y, "違約金", "R");
+		printCm(7, y, "本金", "R");
+		printCm(9.5, y, "利息", "R");
+		printCm(12, y, "應繳合計", "R");
+		printCm(14.5, y, "本金餘額", "R");
+		printCm(16.5, y, "所得稅", "R");
+		printCm(19, y, "應繳淨額", "R");
+
+//		this.print(-28, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		y = top + yy + (++l) * h;
+		printCm(1, y, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		String tempDate = "";
 
@@ -286,22 +355,42 @@ public class L9711Report2 extends MakeReport {
 
 				tempDate = listData.get("pday").toString();
 				if (!tempDate.equals("0")) {
+					y = top + yy + (++l) * h;
+
 					// 應繳日
-					this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
+//					this.print(dataRow, 7,
+//							tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
+					printCm(1, y,
+							tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
 					// 違約金
-					this.print(dataRow, 26, String.format("%,d", listData.get("bAmt")), "R");
+//					this.print(dataRow, 26, String.format("%,d", listData.get("bAmt")), "R");
+					printCm(4.5, y, String.format("%,d", listData.get("bAmt")), "R");
 					// 本金
-					this.print(dataRow, 38, String.format("%,d", listData.get("pAmt")), "R");
+//					this.print(dataRow, 38, String.format("%,d", listData.get("pAmt")), "R");
+					printCm(7, y, String.format("%,d", listData.get("pAmt")), "R");
 					// 利息
-					this.print(dataRow, 52, String.format("%,d", listData.get("iAmt")), "R");
+//					this.print(dataRow, 52, String.format("%,d", listData.get("iAmt")), "R");
+					printCm(9.5, y, String.format("%,d", listData.get("iAmt")), "R");
 					// 應繳合計
-					this.print(dataRow, 66, String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))), "R");
+//					this.print(dataRow, 66,
+//							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+//							"R");
+					printCm(12, y,
+							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+							"R");
 					// 未還 本金餘額
-					this.print(dataRow, 78, String.format("%,d", listData.get("lAmt")), "R");
+//					this.print(dataRow, 78, String.format("%,d", listData.get("lAmt")), "R");
+					printCm(14.5, y, String.format("%,d", listData.get("lAmt")), "R");
 					// 暫付 所得稅
-					this.print(dataRow, 88, "0", "R");
+//					this.print(dataRow, 88, "0", "R");
+					printCm(16.5, y, "0", "R");
 					// 應繳淨額
-					this.print(dataRow, 100, String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))), "R");
+//					this.print(dataRow, 100,
+//							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+//							"R");
+					printCm(19, y,
+							String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+							"R");
 
 					dataRow--;
 				}
@@ -310,23 +399,31 @@ public class L9711Report2 extends MakeReport {
 
 		dataRow--;
 
-		this.print(dataRow--, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
-		this.print(dataRow--, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
+		l++;
+		y = top + yy + (++l) * h;
+		printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
+		y = top + yy + (++l) * h;
+		printCm(1, y, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
 		if (tL9711Vo.get("F8").equals("0")) {
-			this.print(dataRow--, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
-			this.print(dataRow--, 8, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+			y = top + yy + (++l) * h;
+			printCm(1, y, "＊＊本額度自　　　年　　月　　日起本利均攤");
+			y = top + yy + (++l) * h;
+			printCm(1, y, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
 		} else {
-			this.print(dataRow--, 8, "　　貴戶所貸上列款項。於　" + showDate(tL9711Vo.get("F8"), 2) + "到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+			y = top + yy + (++l) * h;
+			printCm(1, y, "　　貴戶所貸上列款項。於　" + showDate(tL9711Vo.get("F8"), 2) + "到期，請依約到本公司辦理清償或展期手續，請勿延誤");
 		}
 
 		// SQL尚缺分行代號
-		this.print(dataRow--, 8, "＊＊新光銀行城內分行代號： 1030116");
+		y = top + yy + (++l) * h;
+		printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
 		tmp = tL9711Vo.get("F3");
 		if (tmp == null) {
 			tmp = "";
 		}
-
-		this.print(dataRow--, 82, "製表人 " + tmp);
+		y = top + yy + (++l) * h;
+		printCm(1, y, "製表人 " + tmp);
+		
 		dataRow = dataRow - 2;
 
 		String payIntAcct = "";
@@ -342,8 +439,8 @@ public class L9711Report2 extends MakeReport {
 				payPriAcct = "9510100" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4")));
 			}
 		}
-		this.print(dataRow, 18, payIntAcct);
-		this.print(dataRow, 75, payPriAcct);
+		printCm(4, 29.5, payIntAcct);
+		printCm(14, 29.5, payPriAcct);
 
 //		this.newPage();
 
@@ -369,9 +466,11 @@ public class L9711Report2 extends MakeReport {
 			}
 		} else if (iType == 2) {
 			if (rocdatex.length() == 6) {
-				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6) + " 日";
+				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6)
+						+ " 日";
 			} else {
-				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7) + " 日";
+				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7)
+						+ " 日";
 			}
 		} else {
 			return rocdatex;
@@ -406,6 +505,15 @@ public class L9711Report2 extends MakeReport {
 		}
 
 		return tmp2;
+	}
+
+	private String padStart(int size, String input) {
+		for (int i = 0; i < size; i++) {
+			if (input.length() < size) {
+				input = input + "0";
+			}
+		}
+		return input;
 	}
 }
 

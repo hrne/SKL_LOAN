@@ -16,11 +16,8 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L9703ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.format.FormatUtil;
@@ -38,16 +35,10 @@ public class L9703Report2 extends MakeReport {
 
 	@Autowired
 	L9703ServiceImpl l9703ServiceImpl;
-	
-	@Autowired
-	public CustMainService custMainService;
 
 	@Autowired
 	BaTxCom dBaTxCom;
 
-	@Autowired
-	CustNoticeCom custNoticeCom;
-	
 	@Autowired
 	Parse parse;
 
@@ -75,7 +66,7 @@ public class L9703Report2 extends MakeReport {
 		this.setBeginRow(3);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(50);
+		this.setMaxRows(35);
 
 	}
 
@@ -86,8 +77,20 @@ public class L9703Report2 extends MakeReport {
 //		String f4 = "";
 //		String f5 = "";
 
-		String rptitem = "放款本息攤還表暨繳息通知單";
-
+		String rptitem = "";
+		if ("L8101".equals(titaVo.getTxCode())) {
+			String dataDt = titaVo.get("DataDt").trim();
+			String custKey = titaVo.get("CustKey").trim();
+			String batchno = titaVo.getParam("BatchNo").trim();
+			
+			if (batchno.isEmpty()) {
+				rptitem = "放款本息攤還表暨繳息通知單("+dataDt+"/"+custKey+")";
+			} else {
+				rptitem = "放款本息攤還表暨繳息通知單("+titaVo.getParam("CALDY")+")";
+			}			
+		} else {
+			rptitem = "放款本息攤還表暨繳息通知單";
+		}
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703A", "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
 		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
 				titaVo.getTxCode().isEmpty() ? "L9703A" : titaVo.getTxCode(), rptitem, "inch,8.5,12", "P");
@@ -188,13 +191,17 @@ public class L9703Report2 extends MakeReport {
 			termEnd = 6;
 		}
 
+		int tbsdy = titaVo.getEntDyI();
+		
 		dBaTxCom.setTxBuffer(txbuffer);
 		this.info("entdy = " + entdy);
 
 		try {
-			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9703Vo.get("F4")), parse.stringToInteger(tL9703Vo.get("F5")), 0, termEnd,
-					titaVo);
+//			listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
+//					parse.stringToInteger(tL9703Vo.get("F4")), parse.stringToInteger(tL9703Vo.get("F5")), 0, termEnd,
+//					titaVo);
+			listBaTxVo = dBaTxCom.settingUnPaid(tbsdy, parse.stringToInteger(tL9703Vo.get("F4")), 
+					parse.stringToInteger(tL9703Vo.get("F5")), 0, 1, BigDecimal.ZERO, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -238,45 +245,39 @@ public class L9703Report2 extends MakeReport {
 //		this.print(1, 1, "");
 		printCm(2, 5, tranNum(tL9703Vo.get("F17")) + tranNum(tL9703Vo.get("F18")));
 
-//		String tmp = "";
-//		if (tL9703Vo.get("F19") != null) {
-//			tmp = tmp + tL9703Vo.get("F19");
-//		}
-//		if (tL9703Vo.get("F20") != null) {
-//			tmp = tmp + tL9703Vo.get("F20");
-//		}
-//		if (tL9703Vo.get("F21") != null) {
-//			tmp = tmp + tL9703Vo.get("F21") + "路";
-//		}
-//		if (tL9703Vo.get("F22") != null) {
-//			tmp = tmp + tL9703Vo.get("F22") + "段";
-//		}
-//		if (tL9703Vo.get("F23") != null) {
-//			tmp = tmp + tL9703Vo.get("F23") + "巷";
-//		}
-//		if (tL9703Vo.get("F24") != null) {
-//			tmp = tmp + tL9703Vo.get("F24") + "弄";
-//		}
-//		if (tL9703Vo.get("F25") != null) {
-//			tmp = tmp + tL9703Vo.get("F25") + "號";
-//		}
-//		if (tL9703Vo.get("F26") != null && !"".equals(tL9703Vo.get("F26").trim())) {
-//			tmp = tmp + "之" + tL9703Vo.get("F26") + "，";
-//		}
-//		if (tL9703Vo.get("F27") != null) {
-//			tmp = tmp + tL9703Vo.get("F27") + "樓";
-//		}
-//		if (tL9703Vo.get("F28") != null && !"".equals(tL9703Vo.get("F28").trim())) {
-//			tmp = tmp + "之" + tL9703Vo.get("F28");
-//		}
-		
-		int custNo = Integer.valueOf(tL9703Vo.get("F4"));
-		
-		CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
-		String addr = custNoticeCom.getCurrAddress(custMain, titaVo);
-		
+		String tmp = "";
+		if (tL9703Vo.get("F19") != null) {
+			tmp = tmp + tL9703Vo.get("F19");
+		}
+		if (tL9703Vo.get("F20") != null) {
+			tmp = tmp + tL9703Vo.get("F20");
+		}
+		if (tL9703Vo.get("F21") != null) {
+			tmp = tmp + tL9703Vo.get("F21") + "路";
+		}
+		if (tL9703Vo.get("F22") != null) {
+			tmp = tmp + tL9703Vo.get("F22") + "段";
+		}
+		if (tL9703Vo.get("F23") != null) {
+			tmp = tmp + tL9703Vo.get("F23") + "巷";
+		}
+		if (tL9703Vo.get("F24") != null) {
+			tmp = tmp + tL9703Vo.get("F24") + "弄";
+		}
+		if (tL9703Vo.get("F25") != null) {
+			tmp = tmp + tL9703Vo.get("F25") + "號";
+		}
+		if (tL9703Vo.get("F26") != null && !"".equals(tL9703Vo.get("F26").trim())) {
+			tmp = tmp + "之" + tL9703Vo.get("F26") + "，";
+		}
+		if (tL9703Vo.get("F27") != null) {
+			tmp = tmp + tL9703Vo.get("F27") + "樓";
+		}
+		if (tL9703Vo.get("F28") != null && !"".equals(tL9703Vo.get("F28").trim())) {
+			tmp = tmp + "之" + tL9703Vo.get("F28");
+		}
 //		this.print(1, 10, tmp);
-		printCm(2, 6, addr);
+		printCm(2, 6, tmp);
 
 //		this.print(1, 1, "");
 //		this.print(1, 10, String.format("%07d", Integer.valueOf(tL9703Vo.get("F4"))) + "   " + tL9703Vo.get("F6"));
@@ -288,7 +289,13 @@ public class L9703Report2 extends MakeReport {
 //		this.print(1, 1, "");
 //		this.print(1, 1, "");
 //		this.print(1, 1, "");
-		printCm(2, 7, String.format("%07d", custNo) + "   " + tL9703Vo.get("F6"));
+		
+		int nameLength = 20;
+		if (tL9703Vo.get("F6").length() < 20) {
+			nameLength = tL9703Vo.get("F6").length();
+		}
+		
+		printCm(2, 7, String.format("%07d", Integer.valueOf(tL9703Vo.get("F4"))) + "   " + tL9703Vo.get("F6").substring(0, nameLength));
 
 		// this.setFontSize(14);
 //		this.print(1, 45, "放款本息攤還表暨繳息通知單", "C");
@@ -302,14 +309,14 @@ public class L9703Report2 extends MakeReport {
 		setFont(1, 11);
 
 		int top = 0;// 上下微調用
-		double yy = 21;// 開始Y軸
+		double yy = 19;// 開始Y軸
 		double h = 0.4;// 列高
 		double l = 0;// 列數
 
 		double y = top + yy;
 		printCm(1.5, y, "製發日期：" + this.showRocDate(entdy, 1));
 
-		String tmp = "";
+		tmp = "";
 		switch (tL9703Vo.get("F29")) {
 		case "1":
 			tmp = "匯款轉帳";
@@ -384,7 +391,7 @@ public class L9703Report2 extends MakeReport {
 			if (listBaTxVo.get(i).getRepayType() == 4 || listBaTxVo.get(i).getRepayType() == 6) {
 				acctFee = acctFee.add(listBaTxVo.get(i).getUnPaidAmt());
 			}
-		}
+		} // for
 
 		intRate = listBaTxVo.get(0).getIntRate();
 
@@ -404,17 +411,20 @@ public class L9703Report2 extends MakeReport {
 //				+ String.format("%03d", Integer.valueOf(tL9703Vo.get("F5"))));
 //		this.print(0, 47, padStart(6, "" + intRate), "R");
 
+		Double dintRate = intRate.doubleValue();
+		
 		y = top + yy + (++l) * h;
 		printCm(1.5, y,
 				"戶    號：" + String.format("%07d", Integer.valueOf(tL9703Vo.get("F4"))) + "-"
 						+ String.format("%03d", Integer.valueOf(tL9703Vo.get("F5"))) + "  目前利率："
-						+ padStart(6, "" + intRate) + "%");
+						+ padStart(6, "" + dintRate) + "%");
 
 //		this.print(1, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
 //		this.print(0, 20, tL9703Vo.get("F6"));
 //		this.print(0, 78, unPaidAmtX, "R");
+		
 		y = top + yy + (++l) * h;
-		printCm(1.5, y, "客戶名稱：" + tL9703Vo.get("F6"));
+		printCm(1.5, y, "客戶名稱：" + tL9703Vo.get("F6").substring(0, nameLength) );
 		printCm(12, y, "溢短繳：","R");
 		printCm(14, y, unPaidAmtX, "R");
 
@@ -443,10 +453,11 @@ public class L9703Report2 extends MakeReport {
 
 //		this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		y = top + yy + (++l) * h;
-		printCm(1, y, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-
+		printCm(1, y, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		
 		String BreachDate = "";
 		int size = 0 ;
+		String fsPayIntDate = "";
 		for (int i = 0; i < listBaTxVo.size(); i++) {
 			// 本金、利息
 			if (listBaTxVo.get(i).getDataKind() != 2) {
@@ -465,6 +476,9 @@ public class L9703Report2 extends MakeReport {
 
 			size++;
 			String sPayIntDate = FormatUtil.pad9("" + payIntDate, 7);
+			if(fsPayIntDate == "") {
+			  fsPayIntDate = sPayIntDate;
+			}
 			// 違約金
 			// 本金
 			// 利息
@@ -517,11 +531,22 @@ public class L9703Report2 extends MakeReport {
 //			this.print(0, 100, df1.format(bSummry), "R");
 			printCm(19, y, df1.format(bSummry), "R");
 
+			this.info("bBreachAmt = " + bBreachAmt);
 			if (bBreachAmt.compareTo(new BigDecimal("0")) == 0 && "".equals(BreachDate)) {
 				BreachDate = sPayIntDate;
+				this.info("BreachDate = " + BreachDate);
+			}
+			
+			if(i == listBaTxVo.size() - 1 && "".equals(BreachDate)) {
+				
+				dDateUtil.init();
+				dDateUtil.setDate_1(sPayIntDate);
+				dDateUtil.setMons(1);
+				dDateUtil.setDays(0);
+				
+				BreachDate = "" + dDateUtil.getCalenderDay();
 			}
 		} // loop -- batxCom
-
 		
 		dDateUtil.init();
 		dDateUtil.setDate_1(entdy);
@@ -530,6 +555,7 @@ public class L9703Report2 extends MakeReport {
 		
 		int nextday = dDateUtil.getCalenderDay();
 		
+
 		l++;
 		y = top + yy + (++l) * h;
 //		this.print(2, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
@@ -537,7 +563,8 @@ public class L9703Report2 extends MakeReport {
 //		this.print(1, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
 		y = top + yy + (++l) * h;
 		printCm(1, y, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
-		if (!"".equals(BreachDate)) {
+		// 第一筆應繳日違約金就為0時不列印 
+		if (fsPayIntDate != BreachDate  && !"".equals(BreachDate)) {
 //			this.print(1, 8, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢" + "　該違約金金額");
 			y = top + yy + (++l) * h;
 			printCm(1, y, "＊＊註：違約金暫計到" + showDate(BreachDate, 2) + " ,　若提前或延後繳款 , 請電話查詢" + "　該違約金金額");
@@ -584,10 +611,8 @@ public class L9703Report2 extends MakeReport {
 			}
 		}
 
-//		this.print(2, 8, payIntAcct);
-		printCm(4, 29.5, payIntAcct);
-//		this.print(0, 65, payPriAcct);
-		printCm(14, 29.5, payPriAcct);
+		printCm(4, 27, payIntAcct);
+		printCm(14, 27, payPriAcct);
 	}
 
 	// 顯示民國年

@@ -18,8 +18,6 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.springjpa.cm.L4702ServiceImpl;
-import com.st1.itx.db.service.springjpa.cm.L9705ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
@@ -38,11 +36,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 public class L9705Report extends MakeReport {
 
-	@Autowired
-	private L9705ServiceImpl l9705ServiceImpl;
-
-	@Autowired
-	private L4702ServiceImpl l4702ServiceImpl;
 
 	@Autowired
 	private BaTxCom dBaTxCom;
@@ -148,7 +141,6 @@ public class L9705Report extends MakeReport {
 				int facmNo = 0;
 				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
 				String repayCode = "";
-				String custName = "";
 				String payIntAcct = "";
 				String payPriAcct = "";
 				if (tL9Vo.get("CustNo") != null) {
@@ -161,9 +153,9 @@ public class L9705Report extends MakeReport {
 					repayCode = tL9Vo.get("RepayCode");
 				}
 
-				if (tL9Vo.get("CustName") != null) {
-					custName = tL9Vo.get("CustName");
-				}
+//				if (tL9Vo.get("CustName") != null) {
+//					custName = tL9Vo.get("CustName");
+//				}
 
 				CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 				String currAddress = custNoticeCom.getCurrAddress(custMain, titaVo);
@@ -189,8 +181,9 @@ public class L9705Report extends MakeReport {
 					HashMap<Integer, BigDecimal> principal = new HashMap<>();
 					HashMap<Integer, BigDecimal> interest = new HashMap<>();
 					HashMap<Integer, BigDecimal> breachAmt = new HashMap<>();
+					HashMap<Integer, BigDecimal> delayInt = new HashMap<>();
 					HashMap<Integer, Integer> flag = new HashMap<>();
-					BigDecimal intRate;
+					BigDecimal intRate = BigDecimal.ZERO;
 					BigDecimal loanBal = BigDecimal.ZERO;
 					BigDecimal unPaidAmt = BigDecimal.ZERO;
 					BigDecimal acctFee = BigDecimal.ZERO;
@@ -223,6 +216,13 @@ public class L9705Report extends MakeReport {
 							} else {
 								breachAmt.put(payIntDate, ba.getBreachAmt());
 							}
+							
+							if (delayInt.containsKey(payIntDate)) {
+								delayInt.put(payIntDate, delayInt.get(payIntDate).add(ba.getDelayInt()));
+							} else {
+								delayInt.put(payIntDate, ba.getDelayInt());
+							}
+							
 //					本金為總和
 							loanBal = loanBal.add(ba.getLoanBal());
 						}
@@ -268,7 +268,13 @@ public class L9705Report extends MakeReport {
 					printCm(1, 4, "【限定本人拆閱，若無此人，請寄回本公司】");
 					printCm(2, 5, custMain.getCurrZip3().trim() + custMain.getCurrZip2().trim());
 					printCm(2, 6, currAddress);
-					printCm(2, 7, String.format("%07d", custNo) + "   " + custMain.getCustName());
+					
+					int nameLength = 20;
+					if (custMain.getCustName().length() < 20) {
+						nameLength = custMain.getCustName().length();
+					}
+					
+					printCm(2, 7, String.format("%07d", custNo) + "   " + custMain.getCustName().substring(0, nameLength));
 
 					//
 //					this.print(1, 45, "放款本息攤還表暨繳息通知單", "C");
@@ -294,7 +300,7 @@ public class L9705Report extends MakeReport {
 					setFont(1, 11);
 
 					int top = 0;// 上下微調用
-					double yy = 21;// 開始Y軸
+					double yy = 19;// 開始Y軸
 					double h = 0.4;// 列高
 					double l = 0;// 列數
 
@@ -303,13 +309,16 @@ public class L9705Report extends MakeReport {
 					printCm(16, y, repayCodeX(repayCode));
 
 					y = top + yy + (++l) * h;
+					
+					Double dintRate = intRate.doubleValue();
 					printCm(1.5, y,
 							"戶    號：" + String.format("%07d", Integer.valueOf(custNo)) + "-"
 									+ String.format("%03d", Integer.valueOf(facmNo)) + "  目前利率："
-									+ padStart(6, "" + intRate) + "%");
+									+ padStart(6, "" + dintRate) + "%");
 
 					y = top + yy + (++l) * h;
-					printCm(1.5, y, "客戶名稱：" + custMain.getCustName());
+					
+					printCm(1.5, y, "客戶名稱：" + custMain.getCustName().substring(0, nameLength));
 					printCm(12, y, "溢短繳：", "R");
 					printCm(14, y, unPaidAmtX, "R");
 
@@ -333,7 +342,7 @@ public class L9705Report extends MakeReport {
 					printCm(19, y, "應繳淨額", "R");
 
 					y = top + yy + (++l) * h;
-					printCm(1, y, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+					printCm(1, y, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 					for (BaTxVo ba : listBaTxVo) {
 						// 本金、利息
@@ -356,11 +365,27 @@ public class L9705Report extends MakeReport {
 						// 本金
 						// 利息
 						// 未還本金餘額
-						BigDecimal bBreachAmt = breachAmt.get(payIntDate);
-						BigDecimal bPrincipal = principal.get(payIntDate);
-						BigDecimal bInterest = interest.get(payIntDate);
-						BigDecimal bSummry = bBreachAmt.add(bPrincipal.add(bInterest));
 
+						BigDecimal bBreachAmt = BigDecimal.ZERO;
+						BigDecimal bPrincipal = BigDecimal.ZERO;
+						BigDecimal bInterest = BigDecimal.ZERO;
+						BigDecimal bSummry = BigDecimal.ZERO;
+						
+						if (breachAmt.get(payIntDate) != null) {
+							bBreachAmt = breachAmt.get(payIntDate);
+						}
+						if (delayInt.get(payIntDate) != null) {
+							bBreachAmt = bBreachAmt.add(delayInt.get(payIntDate));
+						}
+						if (principal.get(payIntDate) != null) {
+							bPrincipal = principal.get(payIntDate);
+						}
+						if (interest.get(payIntDate) != null) {
+							bInterest = interest.get(payIntDate);
+						}
+						
+						bSummry = bBreachAmt.add(bPrincipal.add(bInterest));
+						
 						loanBal = loanBal.subtract(bPrincipal);
 
 //						this.print(1, 1,
@@ -442,19 +467,20 @@ public class L9705Report extends MakeReport {
 					y = top + yy + (++l) * h;
 					this.printCm(14, y, "製表人 " + empName);
 
+					printCm(4, 27, payIntAcct);
+					printCm(14, 27, payPriAcct);
+
 					if ("C".equals(conditionCode)) {
 
 						String EntryDate = tL9Vo.get("EntryDate"); // 入帳日期
 						BigDecimal RepayAmt = parse.stringToBigDecimal(tL9Vo.get("RepayAmt"));
 
 						if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
-							y = top + yy + (++l) * h;
-							this.printCm(1, y, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt)
+//							y = top + yy + (++l) * h;
+							this.printCm(1, 28, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt)
 									+ "業已入帳無誤。");
 						}
 					}
-					printCm(4, 29.5, payIntAcct);
-					printCm(14, 29.5, payPriAcct);
 
 				} else {
 					if (cnt == 0) {

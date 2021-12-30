@@ -27,8 +27,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
-
-	@SuppressWarnings("unchecked")
+	//工作月
 	public List<Map<String, String>> wkSsn(TitaVo titaVo) {
 
 		String iENTDY = String.valueOf(titaVo.getEntDyI() + 19110000);
@@ -39,48 +38,42 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += " SELECT W.\"Year\"  AS F0 ";
 		sql += "      , W.\"Month\" AS F1 ";
-		sql += "      , W.\"Year\" * 100 + W.\"Month\" AS F2";
 		sql += " FROM \"CdWorkMonth\" W ";
 		sql += " WHERE W.\"StartDate\" <= :iday ";
 		sql += "   AND W.\"EndDate\" >= :iday ";
+		this.info("sql=" + sql);
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iday", iENTDY);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-
-	@SuppressWarnings({ "unchecked" })
+	//放款審查
 	public List<Map<String, String>> findArea(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
-		int iYEAR = Integer.valueOf(wkVo.get("F0"));
-		int iMM = Integer.valueOf(wkVo.get("F1"));
-		int iYYMM = Integer.valueOf(wkVo.get("F2"));
+		int year = Integer.parseInt(wkVo.get("F0"));
+		int month = Integer.parseInt(wkVo.get("F1"));
 
-		int lastyymm = 0;
-		String iWKSSN = "";
-		// EX:工作月為202001 上個工作月 201913
-//        if (iMM == 1) {
-//            lastyymm = (iYEAR - 1) * 100 + 13;
-//        } else {
-//            // 202012-1=202011
-//            lastyymm = iYYMM - 1;
-//        }
-//        if (iMM < 4) {
-//            iWKSSN = iYEAR + "1";
-//        } else if (iMM < 7) {
-//            iWKSSN = iYEAR + "2";
-//        } else if (iMM < 10) {
-//            iWKSSN = iYEAR + "3";
-//        } else {
-//            iWKSSN = iYEAR + "4";
-//        }
+		int thisYearMonth = Integer.parseInt(wkVo.get("F2"));
 
-//        this.info("LP004.findArea iyymm=" + iYYMM + ",liyymm=" + iWKSSN);
+		if (month == 1) {
+			year = year - 1;
+			month = 13;
+		} else {
+			month = month - 1;
+		}
+
+		int lastYearMonth = year * 100 + month;
+
+		this.info("LP004ServiceImpl.findArea thisYearMonth = " + thisYearMonth + " ,lastYearMonth = " + lastYearMonth);
 
 		String sql = " ";
-		sql += " SELECT tab1.\"UnitItem\" ";
+		sql += " SELECT CASE ";
+		sql += " 		  WHEN tab1.\"UnitCode\" = '10HC00' THEN '放款審查課-北區' ";
+		sql += " 		  WHEN tab1.\"UnitCode\" = '10HJ00' THEN '放款審查課-中區' ";
+		sql += " 		  WHEN tab1.\"UnitCode\" = '10HL00' THEN '放款審查課-南部' ";
+		sql += "		END AS \"UnitItem\"";
 		sql += "      , tab1.\"Fullname\" ";
 		sql += "      , CASE WHEN tab2.\"PerfCnt\" >= 0 THEN tab2.\"PerfCnt\" ELSE 0 END AS \"lastPerfCnt\" ";
 		sql += "      , CASE WHEN tab2.\"PerfAmt\" >= 0 THEN tab2.\"PerfAmt\" ELSE 0 END AS \"lastPerfAmt\" ";
@@ -99,15 +92,12 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  , SUM(\"PerfAmt\") AS \"PerfAmt\" ";
 		sql += "             FROM ( SELECT \"PerfCnt\" ";
 		sql += "                         , \"PerfAmt\" ";
-		sql += "                         , CASE ";
-		sql += "                             WHEN \"DeptCode\"='A0B000' THEN '10HC00' ";
-		sql += "                             WHEN \"DeptCode\"='A0F000' THEN '10HC00' ";
-		sql += "                             WHEN \"DeptCode\"='A0E000' THEN '10HJ00' ";
-		sql += "                             WHEN \"DeptCode\"='A0M000' THEN '10HL00' ";
-		sql += "                           ELSE NULL END AS \"unitArea\" ";
-		sql += "                    FROM \"PfItDetail\" ";
-		sql += "                    WHERE \"WorkMonth\"= :liyymm";
-		sql += "                      AND \"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += "                         , PO.\"AreaCode\" AS \"unitArea\" ";
+		sql += "                    FROM \"PfBsDetail\" PD";
+		sql += "                    LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
+		sql += "                                                AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
+		sql += "                    WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
+		sql += "                      AND PD.\"WorkMonth\"= :liyymm";
 		sql += "                  ) ";
 		sql += "             GROUP BY \"unitArea\" ";
 		sql += "           ) tab2 ON tab2.\"unitArea\" = tab1.\"UnitCode\" ";
@@ -116,323 +106,361 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  , SUM(\"PerfAmt\") AS \"PerfAmt\" ";
 		sql += "             FROM ( SELECT \"PerfCnt\" ";
 		sql += "                         , \"PerfAmt\" ";
-		sql += "                         , CASE ";
-		sql += "                             WHEN \"DeptCode\"='A0B000' THEN '10HC00' ";
-		sql += "                             WHEN \"DeptCode\"='A0F000' THEN '10HC00' ";
-		sql += "                             WHEN \"DeptCode\"='A0E000' THEN '10HJ00' ";
-		sql += "                             WHEN \"DeptCode\"='A0M000' THEN '10HL00' ";
-		sql += "                           ELSE NULL END AS \"unitArea\" ";
-		sql += "                    FROM \"PfItDetail\" ";
-		sql += "                    WHERE \"WorkMonth\"= :iyymm ";
-		sql += "                      AND \"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += "                         , PO.\"AreaCode\" AS \"unitArea\" ";
+		sql += "                    FROM \"PfBsDetail\" PD";
+		sql += "                    LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
+		sql += "                                                AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
+		sql += "                    WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
+		sql += "                      AND PD.\"WorkMonth\"= :iyymm ";
 		sql += "                  ) ";
 		sql += "             GROUP BY \"unitArea\" ";
 		sql += "           ) tab3 ON tab3.\"unitArea\"=tab1.\"UnitCode\" ";
+		sql += " ORDER BY tab1.\"UnitCode\" ASC";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", iYYMM);
-		query.setParameter("liyymm", lastyymm);
-		return this.convertToMap(query.getResultList());
+		query.setParameter("iyymm", thisYearMonth);
+		query.setParameter("liyymm", lastYearMonth);
 
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findBsOfficer(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
+	//房貸部專
+	public List<Map<String, String>> setDeptSpecialist(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
-		String iYEAR = wkVo.get("F0");
-		int iMM = Integer.valueOf(wkVo.get("F1"));
-		String iYYMM = wkVo.get("F2");
-//        String iWKSSN = "";
-//        if (iMM < 4) {
-//            iWKSSN = iYEAR + "1";
-//        } else if (iMM < 7) {
-//            iWKSSN = iYEAR + "2";
-//        } else if (iMM < 10) {
-//            iWKSSN = iYEAR + "3";
-//        } else {
-//            iWKSSN = iYEAR + "4";
-//        }
+		int inputYear = Integer.parseInt(wkVo.get("F0"));
 
-//        this.info("LP004.findBsOfficer iyymm=" + iYYMM + ",iWKSSN=" + iWKSSN);
+		int iMM = Integer.parseInt(wkVo.get("F1"));
+
+		int inputYearMonth = (inputYear * 100) + iMM;
+
+		this.info("LP004ServiceImpl.findAllDept inputYear =" + inputYear);
+		this.info("LP004ServiceImpl.findAllDept inputYearMonth =" + inputYearMonth);
 
 		String sql = " ";
-		sql += " SELECT PBO.\"Fullname\" ";
-		sql += "      , PBO.\"EmpNo\" ";
-		sql += "      , PBO.\"GoalAmt\" ";
-		sql += "      , NVL(BO.\"PerfAmt\",0) AS \"PerfAmt\" ";
-		sql += "      , NVL(BO.\"PerfCnt\",0) AS \"PerfCnt\" ";
-		sql += "      , PBO.\"DepItem\" ";
-		sql += "      , PBO.\"DistItem\" ";
-		sql += " FROM ( SELECT \"Fullname\" ";
-		sql += "             , \"EmpNo\" ";
-		sql += "             , \"GoalAmt\" ";
-		sql += "             , \"DepItem\" ";
-		sql += "             , \"DistItem\" ";
-		sql += "             , \"WorkMonth\" ";
-		sql += "        FROM \"PfBsOfficer\" ";
-		sql += "        WHERE \"WorkMonth\"= :iyymm ";
-		sql += "      ) PBO";
-		sql += " LEFT JOIN ( SELECT \"BsOfficer\" ";
-		sql += "                  , \"WorkMonth\" ";
-		sql += "                  , SUM(\"PerfCnt\") AS \"PerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") AS \"PerfAmt\" ";
-		sql += "             FROM \"PfBsDetail\" ";
-		sql += "             WHERE \"WorkMonth\"= :iyymm ";
-		sql += "             GROUP BY \"BsOfficer\" ";
-		sql += "                    , \"WorkMonth\" ";
-		sql += "           ) BO ON PBO.\"EmpNo\" = BO.\"BsOfficer\" ";
-		sql += " ORDER BY \"PerfAmt\" DESC ";
+		sql += " WITH \"DeptTarget\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , \"WorkMonth\" ";
+		sql += "          , SUM(\"GoalAmt\") AS \"GoalAmt\" ";
+		sql += "     FROM \"PfBsOfficer\" ";
+		sql += "     WHERE TRUNC(\"WorkMonth\" / 100) = :inputYear ";
+		sql += "       AND \"WorkMonth\" <= :inputYearMonth ";
+		sql += "       AND \"DeptCode\" IN ('A0E000','A0F000','A0M000','A0B000') ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += "            , \"WorkMonth\" ";
+		sql += " ) ";
+		sql += " , \"DeptEmpName\" AS ( ";
+		sql += "      SELECT \"DeptCode\" ";
+		sql += "           , \"Fullname\" ";
+		sql += "           , \"EmpNo\" ";
+		sql += "      FROM \"PfBsOfficer\" ";
+		sql += "      WHERE \"WorkMonth\" = :inputYearMonth ";
+		sql += "        AND \"DeptCode\" IN ('A0E000','A0F000','A0M000','A0B000') ";
+		sql += "        AND \"DistItem\" = '房貸部專' ";
+		sql += " ) ";
+		sql += " , \"DeptTargetSummary\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , SUM(\"GoalAmt\") AS \"GoalAmtTotal\" ";
+		sql += "     FROM \"DeptTarget\" ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += " ) ";
+		sql += " , \"DeptPf\" AS ( ";
+		sql += "     SELECT O.\"DeptCode\" ";
+		sql += "          , O.\"WorkMonth\" ";
+		sql += "          , D.\"CustNo\" ";
+		sql += "          , D.\"FacmNo\" ";
+		sql += "          , D.\"BormNo\" ";
+		sql += "          , D.\"PerfDate\" ";
+		sql += "          , D.\"PerfCnt\" ";
+		sql += "          , D.\"PerfAmt\" ";
+		sql += "     FROM \"PfBsOfficer\" O ";
+		sql += "     LEFT JOIN \"PfBsDetail\" D ON D.\"BsOfficer\" = O.\"EmpNo\" ";
+		sql += "                             AND D.\"WorkMonth\" = O.\"WorkMonth\" ";
+		sql += "     WHERE TRUNC(O.\"WorkMonth\" / 100) = :inputYear ";
+		sql += "       AND O.\"WorkMonth\" <= :inputYearMonth ";
+		sql += "       AND O.\"DeptCode\" IN ('A0E000','A0F000','A0M000','A0B000') ";
+		sql += "       AND D.\"PerfAmt\" >= 0 ";
+		sql += " ) ";
+		sql += " , \"DeptPfSummary\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , SUM(\"PerfAmt\") AS \"PerfAmtTotal\" ";
+		sql += "     FROM \"DeptPf\" ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += " ) ";
+		sql += " , \"DeptPfMonthlySummary\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , \"WorkMonth\" ";
+		sql += "          , SUM(\"PerfCnt\") AS \"PerfCntMonthlyTotal\" ";
+		sql += "          , SUM(\"PerfAmt\") AS \"PerfAmtMonthlyTotal\" ";
+		sql += "     FROM \"DeptPf\" ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += "            , \"WorkMonth\" ";
+		sql += " ) ";
+		sql += " SELECT DENSE_RANK() OVER (ORDER BY ROUND(NVL(DPS.\"PerfAmtTotal\",0) / DTS.\"GoalAmtTotal\",4) * 100 DESC ";
+		sql += "                                  , DT.\"DeptCode\" ";
+		sql += "                          ) AS \"SEQ\" ";// F0
+		sql += "	  , CASE ";
+		sql += "          WHEN DPMS.\"DeptCode\"='A0B000' THEN '台北'";
+		sql += "          WHEN DPMS.\"DeptCode\"='A0F000' THEN '台北'";
+		sql += "          WHEN DPMS.\"DeptCode\"='A0E000' THEN '台中'";
+		sql += "          WHEN DPMS.\"DeptCode\"='A0M000' THEN '高雄'";
+		sql += "        END     AS \"DeptCity\" ";// F1
+		sql += "      , DE.\"Fullname\" "; // F2
+		sql += "      , DE.\"EmpNo\" "; // F3
+		sql += "      , DT.\"GoalAmt\" "; // F4
+		sql += "      , NVL(DPMS.\"PerfAmtMonthlyTotal\",0) AS \"PerfAmtMonthlyTotal\" "; // F5
+		sql += "      , NVL(DPMS.\"PerfCntMonthlyTotal\",0) AS \"PerfCntMonthlyTotal\" "; // F6
+		sql += "      , SUBSTR(B.\"UnitItem\",1,1) ";
+		sql += "        || SUBSTR(B.\"UnitItem\",3,1) ";
+		sql += "        || SUBSTR(B.\"UnitItem\",5,1) AS \"UnitItem\" "; // F7
+		sql += " FROM \"DeptTarget\" DT ";
+		sql += " LEFT JOIN \"DeptEmpName\" DE ON DE.\"DeptCode\" = DT.\"DeptCode\" ";
+		sql += " LEFT JOIN \"DeptTargetSummary\" DTS ON DTS.\"DeptCode\" = DT.\"DeptCode\" ";
+		sql += " LEFT JOIN \"DeptPfSummary\" DPS ON DPS.\"DeptCode\" = DT.\"DeptCode\" ";
+		sql += " LEFT JOIN \"DeptPfMonthlySummary\" DPMS ON DPMS.\"DeptCode\" = Dt.\"DeptCode\" ";
+		sql += "                                      AND DPMS.\"WorkMonth\" = DT.\"WorkMonth\" ";
+		sql += " LEFT JOIN \"CdBcm\" B ON B.\"UnitCode\" = DT.\"DeptCode\" ";
+		sql += " WHERE DT.\"WorkMonth\" = :inputYearMonth";
+		sql += " ORDER BY \"SEQ\" ";
+
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", iYYMM);
 
-		return this.convertToMap(query.getResultList());
+		query.setParameter("inputYear", inputYear);
+		query.setParameter("inputYearMonth", inputYearMonth);
+
+		return this.convertToMap(query);
 
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
+	//房貸專員
+	public List<Map<String, String>> findPfBsOfficer(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
-		String iYEAR = wkVo.get("F0");
-		int iMM = Integer.valueOf(wkVo.get("F1"));
-		String iYYMM = wkVo.get("F2");
-//        String iWKSSN = "";
-//        if (iMM < 4) {
-//            iWKSSN = iYEAR + "1";
-//        } else if (iMM < 7) {
-//            iWKSSN = iYEAR + "2";
-//        } else if (iMM < 10) {
-//            iWKSSN = iYEAR + "3";
-//        } else {
-//            iWKSSN = iYEAR + "4";
-//        }
+		int inputYear = Integer.parseInt(wkVo.get("F0"));
 
-//        this.info("LP004.findAllDept iyymm=" + iYYMM + ",iWKSSN=" + iWKSSN);
+		int iMM = Integer.parseInt(wkVo.get("F1"));
+
+		int inputYearMonth = (inputYear * 100) + iMM;
+
+		this.info("LP004ServiceImpl.findDist inputYear =" + inputYear);
+		this.info("LP004ServiceImpl.findDist inputYearMonth =" + inputYearMonth);
 
 		String sql = " ";
-		sql += " SELECT CASE ";
-		sql += "          WHEN tab1.\"DeptCode\" IN ('A0B000','A0F000')";
-		sql += "          THEN '台北' ";
-		sql += "          WHEN tab1.\"DepItem\" like '營%' AND tab1.\"DepItem\" like '%管%' ";
-		sql += "          THEN '台北' ";
-		sql += "          WHEN tab1.\"DepItem\" like '營%' AND tab1.\"DepItem\" like '%推%' ";
-		sql += "          THEN '台北' ";
-		sql += "          WHEN tab1.\"DeptCode\"='A0E000' ";
-		sql += "          THEN '台中' ";
-		sql += "          WHEN tab1.\"DepItem\" like '業%' AND tab1.\"DepItem\" like '%推%' ";
-		sql += "          THEN '台中' ";
-		sql += "          WHEN tab1.\"DeptCode\"='A0M000'  ";
-		sql += "          THEN '高雄' ";
-		sql += "          WHEN tab1.\"DepItem\" like '業%' AND tab1.\"DepItem\" like '%開%' ";
-		sql += "          THEN '高雄' ";
-		sql += "        ELSE NULL END       AS \"area\" ";
-		sql += "      , tab1.\"Fullname\"";
-		sql += "      , tab1.\"EmpNo\"";
-		sql += "      , tab1.\"GoalAmt\"";
-		sql += "      , CASE WHEN tab2.\"PerfAmt\" > 0 THEN tab2.\"PerfAmt\" ELSE 0 END AS \"PerfAmt\" ";
-		sql += "      , CASE WHEN tab2.\"PerfCnt\" > 0 THEN tab2.\"PerfCnt\" ELSE 0 END AS \"PerfCnt\" ";
-		sql += "      , CASE ";
-		sql += "          WHEN tab1.\"GoalAmt\" >0 AND tab2.\"PerfAmt\">0 ";
-		sql += "          THEN ROUND(tab2.\"PerfAmt\"/tab1.\"GoalAmt\",4) ";
-		sql += "        ELSE 0 END AS \"rate\" ";
-		sql += "      , tab1.\"DepItem\" ";
-		sql += " FROM ( SELECT \"DeptCode\" ";
-		sql += "             , \"DepItem\" ";
-		sql += "             , \"EmpNo\" ";
-		sql += "             , \"Fullname\" ";
-		sql += "             , \"DistItem\" ";
-		sql += "             , \"AreaCode\" AS \"sDeptCode\" ";
-		sql += "             , \"GoalAmt\" ";
-		sql += "        FROM \"PfBsOfficer\" ";
-		sql += "        WHERE \"WorkMonth\"= :iyymm ";
-		sql += "          AND \"DistItem\" = '房貸部專' ";
-		sql += "      ) tab1 ";
-		sql += " LEFT JOIN ( SELECT \"BsOfficer\" ";
-		sql += "                  , SUM(\"PerfCnt\") AS \"PerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") AS \"PerfAmt\" ";
-		sql += "             FROM \"PfBsDetail\" ";
-		sql += "             WHERE \"WorkMonth\" = :iyymm ";
-		sql += "             GROUP BY \"BsOfficer\" ";
-		sql += "           ) tab2 ON tab1.\"EmpNo\" = tab2.\"BsOfficer\" ";
-		sql += " ORDER BY \"rate\" DESC ";
+		sql += " WITH \"DistTarget\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , \"EmpNo\" ";
+		sql += "          , \"WorkMonth\" ";
+		sql += "          , SUM(\"GoalAmt\") AS \"GoalAmt\" ";
+		sql += "     FROM \"PfBsOfficer\" ";
+		sql += "     WHERE TRUNC(\"WorkMonth\" / 100) = :inputYear ";
+		sql += "       AND \"WorkMonth\" <= :inputYearMonth ";
+		sql += "       AND \"DeptCode\" IN ('A0E000','A0F000','A0M000','A0B000') ";
+		sql += "       AND NVL(\"DistItem\",' ') != '房貸部專'  ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += "            , \"EmpNo\" ";
+		sql += "            , \"WorkMonth\" ";
+		sql += " ) ";
+		sql += " , \"DistTargetSummary\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , \"EmpNo\" ";
+		sql += "          , SUM(\"GoalAmt\") AS \"GoalAmtTotal\" ";
+		sql += "     FROM \"DistTarget\" ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += "            , \"EmpNo\" ";
+		sql += " ) ";
+		sql += " , \"DistPf\" AS ( ";
+		sql += "     SELECT O.\"DeptCode\" ";
+		sql += "          , O.\"EmpNo\" ";
+		sql += "          , O.\"WorkMonth\" ";
+		sql += "          , D.\"CustNo\" ";
+		sql += "          , D.\"FacmNo\" ";
+		sql += "          , D.\"BormNo\" ";
+		sql += "          , D.\"PerfDate\" ";
+		sql += "          , D.\"PerfCnt\" ";
+		sql += "          , D.\"PerfAmt\" ";
+		sql += "     FROM \"PfBsOfficer\" O ";
+		sql += "     LEFT JOIN \"PfBsDetail\" D ON D.\"BsOfficer\" = O.\"EmpNo\" ";
+		sql += "                             AND D.\"WorkMonth\" = O.\"WorkMonth\" ";
+		sql += "     WHERE TRUNC(O.\"WorkMonth\" / 100) = :inputYear ";
+		sql += "       AND O.\"WorkMonth\" <= :inputYearMonth ";
+		sql += "       AND O.\"DeptCode\" IN ('A0E000','A0F000','A0M000','A0B000') ";
+		sql += "       AND NVL(O.\"DistItem\",' ') != '房貸部專'  ";
+		sql += "       AND D.\"PerfAmt\" >= 0 ";
+		sql += " ) ";
+		sql += " , \"DistPfSummary\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , \"EmpNo\" ";
+		sql += "          , SUM(\"PerfAmt\") AS \"PerfAmtTotal\" ";
+		sql += "     FROM \"DistPf\" ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += "            , \"EmpNo\" ";
+		sql += " ) ";
+		sql += " , \"DistPfMonthlySummary\" AS ( ";
+		sql += "     SELECT \"DeptCode\" ";
+		sql += "          , \"EmpNo\" ";
+		sql += "          , \"WorkMonth\" ";
+		sql += "          , SUM(\"PerfCnt\") AS \"PerfCntMonthlyTotal\" ";
+		sql += "          , SUM(\"PerfAmt\") AS \"PerfAmtMonthlyTotal\" ";
+		sql += "     FROM \"DistPf\" ";
+		sql += "     GROUP BY \"DeptCode\" ";
+		sql += "            , \"EmpNo\" ";
+		sql += "            , \"WorkMonth\" ";
+		sql += " ) ";
+		sql += " SELECT DENSE_RANK() OVER (ORDER BY ROUND(NVL(DPS.\"PerfAmtTotal\",0) / DTS.\"GoalAmtTotal\",4) * 100 DESC ";
+		sql += "                                  , DT.\"DeptCode\" ";
+		sql += "                                  , PBO.\"DistItem\" ";
+		sql += "                          ) AS \"SEQ\" ";// F0
+		sql += "      , PBO.\"Fullname\" ";// F1
+		sql += "      , DT.\"EmpNo\" ";// F2
+		sql += "      , DT.\"GoalAmt\" ";// F3
+		sql += "      , NVL(DP.\"PerfAmtMonthlyTotal\",0) AS \"PerfAmtMonthlyTotal\" ";// F4
+		sql += "      , NVL(DP.\"PerfCntMonthlyTotal\",0) AS \"PerfCntMonthlyTotal\" ";// F5
+		sql += "      , SUBSTR(B.\"UnitItem\",1,1) ";
+		sql += "        || SUBSTR(B.\"UnitItem\",3,1) ";
+		sql += "        || SUBSTR(B.\"UnitItem\",5,1) AS \"UnitItem\" ";// F6
+		sql += "      , PBO.\"DistItem\" ";// F7
+		sql += " FROM \"DistTarget\" DT ";
+		sql += " LEFT JOIN \"DistTargetSummary\" DTS ON DTS.\"DeptCode\" = DT.\"DeptCode\" ";
+		sql += "                                  AND DTS.\"EmpNo\" = DT.\"EmpNo\" ";
+		sql += " LEFT JOIN \"DistPfSummary\" DPS ON DPS.\"DeptCode\" = DT.\"DeptCode\" ";
+		sql += "                              AND DPS.\"EmpNo\" = Dt.\"EmpNo\" ";
+		sql += " LEFT JOIN \"DistPfMonthlySummary\" DP ON DP.\"DeptCode\" = DT.\"DeptCode\" ";
+		sql += "                                    AND DP.\"EmpNo\" = DT.\"EmpNo\" ";
+		sql += "                                    AND DP.\"WorkMonth\" = DT.\"WorkMonth\" ";
+		sql += " LEFT JOIN \"CdBcm\" B ON B.\"UnitCode\" = DT.\"DeptCode\" ";
+		sql += " LEFT JOIN \"PfBsOfficer\" PBO ON PBO.\"WorkMonth\" = DT.\"WorkMonth\" ";
+		sql += "                            AND PBO.\"EmpNo\" = DT.\"EmpNo\" ";
+		sql += " WHERE DT.\"WorkMonth\" = :inputYearMonth";
+		sql += " ORDER BY \"SEQ\" ";
+
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", iYYMM);
-//        query.setParameter("iwkssn", iWKSSN);
 
-		return this.convertToMap(query.getResultList());
+		query.setParameter("inputYear", inputYear);
+		query.setParameter("inputYearMonth", inputYearMonth);
 
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findDist(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
+	// 部室
+	public List<Map<String, String>> findDept(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
-		String iYEAR = wkVo.get("F0");
-		int iMM = Integer.valueOf(wkVo.get("F1"));
-		String iYYMM = wkVo.get("F2");
+		int inputYear = Integer.parseInt(wkVo.get("F0"));
+
+		int iMM = Integer.parseInt(wkVo.get("F1"));
+
+		int inputYearMonth = (inputYear * 100) + iMM;
+
 		// 季初的工作月
 		String iWKs = "";
 		// 季末的工作月
 		String iWKe = "";
+		if (iMM < 4) {
+			iWKs = inputYear + "01";
+			iWKe = inputYear + String.format("%02d", iMM);
+		} else if (iMM < 7) {
+			iWKs = inputYear + "04";
+			iWKe = inputYear + String.format("%02d", iMM);
+		} else if (iMM < 10) {
+			iWKs = inputYear + "07";
+			iWKe = inputYear + String.format("%02d", iMM);
+		} else {
+			iWKs = inputYear + "10";
+			iWKe = inputYear + String.format("%02d", iMM);
+		}
 
-//        if (iMM < 4) {
-//            iWKs = iYEAR + "01";
-//            iWKe = iYEAR + String.format("%02d", iMM);
-//        } else if (iMM < 7) {
-//            iWKs = iYEAR + "04";
-//            iWKe = iYEAR + String.format("%02d", iMM);
-//        } else if (iMM < 10) {
-//            iWKs = iYEAR + "07";
-//            iWKe = iYEAR + String.format("%02d", iMM);
-//        } else {
-//            iWKs = iYEAR + "10";
-//            iWKe = iYEAR + String.format("%02d", iMM);
-//        }
-
-//        this.info("LP004.findDist iYYMM=" + iYYMM + ",iWKSSN=" + iWKs + "~" + iWKe);
+		this.info("LP004.findDept iYYMM=" + inputYearMonth + ",iWKSSN=" + iWKs + "~" + iWKe);
 
 		String sql = " ";
-		sql += " SELECT CASE ";
-		sql += "          WHEN tab1.\"DeptCode\"='A0B000' ";
-		sql += "          THEN '營管部' ";
-		sql += "          WHEN tab1.\"DeptCode\"='A0F000' ";
-		sql += "          THEN '營推部' ";
-		sql += "          WHEN tab1.\"DeptCode\"='A0E000' ";
-		sql += "          THEN '業推部' ";
-		sql += "          WHEN tab1.\"DeptCode\"='A0M000' ";
-		sql += "          THEN '業開部' ";
-		sql += "          WHEN tab1.\"DeptCode\"='A0X000' ";
-		sql += "          THEN '專業行銷課' ";
-		sql += "        ELSE null END     AS \"DeptName\" ";
-		sql += "      , tab1.\"Fullname\" ";
-		sql += "      , tab4.\"Fullname\" AS \"sFullname\" ";
-		sql += "      , CASE ";
-		sql += "          WHEN tab2.\"sumPerfCnt\" > 0 ";
-		sql += "          THEN tab2.\"sumPerfCnt\" ";
-		sql += "        ELSE 0 END        AS \"wmCnt\" ";
-		sql += "      , CASE ";
-		sql += "          WHEN tab2.\"sumPerfAmt\" > 0 ";
-		sql += "          THEN tab2.\"sumPerfAmt\" ";
-		sql += "        ELSE 0 END        AS \"wmAmt\" ";
-		sql += "      , CASE ";
-		sql += "          WHEN tab3.\"sumPerfCnt\" > 0 ";
-		sql += "          THEN tab3.\"sumPerfCnt\" ";
-		sql += "        ELSE 0 END        AS \"QCnt\" ";
-		sql += "      , CASE ";
-		sql += "          WHEN tab3.\"sumPerfAmt\" > 0 ";
-		sql += "          THEN tab3.\"sumPerfAmt\" ";
-		sql += "        ELSE 0 END        AS \"QAmt\" ";
-		sql += " FROM ( SELECT DISTINCT CB.\"DeptManager\" ";
+		sql += " SELECT DENSE_RANK() OVER (ORDER BY tab2.\"sumPerfAmt\" DESC ) AS \"SEQ\" ";// F0
+		sql += "      , tab1.\"UnitItem\" ";//F1
+		sql += "      , tab1.\"DeptName\" ";//F2
+		sql += "      , tab1.\"BsName\" ";//F3
+		sql += "      , tab2.\"sumPerfCnt\" ";//F4
+		sql += "      , tab2.\"sumPerfAmt\" ";//F5
+		sql += "      , tab3.\"sumPerfCnt\" ";//F6
+		sql += "      , tab3.\"sumPerfAmt\" ";//F7
+		sql += " FROM ( SELECT DISTINCT ";
+		sql += "               CB.\"DeptManager\" ";
+		sql += "             , CE.\"Fullname\" AS \"DeptName\" ";
+		sql += "             , PB.\"Fullname\" AS \"BsName\" ";
+		sql += "      		 , SUBSTR(CB.\"UnitItem\",1,1) ";
+		sql += "            || SUBSTR(CB.\"UnitItem\",3,1) ";
+		sql += "        	|| SUBSTR(CB.\"UnitItem\",5,1) AS \"UnitItem\" ";
 		sql += "             , CB.\"DeptCode\" ";
-		sql += "             , CB.\"DeptItem\" ";
-		sql += "             , CE.\"Fullname\" ";
-		sql += "        FROM \"CdBcm\" CB ";
+		sql += "        FROM \"PfBsOfficer\" PB ";
+		sql += "        LEFT JOIN \"CdBcm\" CB ON CB.\"DeptCode\" = PB.\"DeptCode\" ";
 		sql += "        LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = CB.\"DeptManager\" ";
-		sql += "        WHERE CB.\"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += "        WHERE PB.\"WorkMonth\" = :iyymm ";
+		sql += "          AND NVL(PB.\"DistItem\",' ') = '房貸部專' ";
 		sql += "      ) tab1 ";
-		sql += " LEFT JOIN ( SELECT \"DeptManager\" ";
+		sql += " LEFT JOIN ( SELECT \"DeptCode\" ";
 		sql += "                  , SUM(\"PerfCnt\") AS \"sumPerfCnt\" ";
 		sql += "                  , SUM(\"PerfAmt\") AS \"sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\"= :iyymm ";
-		sql += "               AND \"DeptCode\" IN('A0B000','A0F000','A0E000','A0M000') ";
-		sql += "               AND \"DistManager\" is not null ";
-		sql += "             GROUP BY \"DeptManager\" ";
-		sql += "           ) tab2 ON tab1.\"DeptManager\" = tab2.\"DeptManager\" ";
-		sql += " LEFT JOIN ( SELECT \"DeptManager\" ";
+		sql += "               AND \"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += "             GROUP BY \"DeptCode\" ";
+		sql += "           ) tab2 ON tab1.\"DeptCode\" = tab2.\"DeptCode\" ";
+		sql += " LEFT JOIN ( SELECT \"DeptCode\" ";
 		sql += "                  , SUM(\"PerfCnt\") AS \"sumPerfCnt\" ";
 		sql += "                  , SUM(\"PerfAmt\") AS \"sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\">= :iWKs ";
 		sql += "               AND \"WorkMonth\"<= :iWKe ";
 		sql += "               AND \"DeptCode\" IN('A0B000','A0F000','A0E000','A0M000') ";
-		sql += "               AND \"DeptManager\" IS NOT NULL ";
-		sql += "             GROUP BY \"DeptManager\" ";
-		sql += "           ) tab3 ON tab1.\"DeptManager\" = tab3.\"DeptManager\" ";
-		sql += " LEFT JOIN ( SELECT \"Fullname\" ";
-		sql += "                  , \"EmpNo\" ";
-		sql += "                  , \"DeptCode\" ";
-		sql += "                  , \"DepItem\" ";
-		sql += "                  , \"DistItem\" ";
-		sql += "                  , \"AreaCode\" AS \"sDeptCode\" ";
-		sql += "                  , \"GoalAmt\" ";
-		sql += "             FROM \"PfBsOfficer\" ";
-		sql += "             WHERE \"WorkMonth\"= :iyymm ";
-		sql += "               AND \"DistItem\" = '房貸部專' ";
-		sql += "           ) tab4 ON tab4.\"DeptCode\" = tab1.\"DeptCode\" ";
-		sql += " ORDER BY \"wmAmt\" DESC ";
+		sql += "             GROUP BY \"DeptCode\" ";
+		sql += "           ) tab3 ON tab1.\"DeptCode\" = tab3.\"DeptCode\" ";
+		sql += " ORDER BY \"SEQ\" ASC ";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", iYYMM);
+		query.setParameter("iyymm", inputYearMonth);
 		query.setParameter("iWKs", iWKs);
 		query.setParameter("iWKe", iWKe);
 
-		return this.convertToMap(query.getResultList());
-	}
-
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findMortgageSpecialist(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
-
-		String iYYMM = wkVo.get("F2");
-
-		this.info("LP004.findAsDept iYYMM=" + iYYMM);
-
-		String sql = " ";
-		sql += " SELECT \"Fullname\" ";
-		sql += "      , \"DeptCode\" ";
-		sql += "      , \"DistItem\" ";
-		sql += " FROM \"PfBsOfficer\"";
-		sql += " WHERE \"WorkMonth\"= :iyymm ";
-		sql += "   AND \"DistItem\" not like '%部專' ";
-
-		this.info("sql=" + sql);
-
-		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", iYYMM);
-
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAsDept(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
+	// 區部
+	public List<Map<String, String>> findDist(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
-		String iYEAR = wkVo.get("F0");
-		int iMM = Integer.valueOf(wkVo.get("F1"));
-		String iYYMM = wkVo.get("F2");
+		int inputYear = Integer.parseInt(wkVo.get("F0"));
+
+		int iMM = Integer.parseInt(wkVo.get("F1"));
+
+		int inputYearMonth = (inputYear * 100) + iMM;
+
 		// 季初的工作月
 		String iWKs = "";
 		// 季末的工作月
 		String iWKe = "";
 		if (iMM < 4) {
-			iWKs = iYEAR + "01";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "01";
+			iWKe = inputYear + String.format("%02d", iMM);
 		} else if (iMM < 7) {
-			iWKs = iYEAR + "04";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "04";
+			iWKe = inputYear + String.format("%02d", iMM);
 		} else if (iMM < 10) {
-			iWKs = iYEAR + "07";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "07";
+			iWKe = inputYear + String.format("%02d", iMM);
 		} else {
-			iWKs = iYEAR + "10";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "10";
+			iWKe = inputYear + String.format("%02d", iMM);
 		}
 
-		this.info("LP004.findAsDept iYYMM=" + iYYMM + ",iWKSSN=" + iWKs + "~" + iWKe);
+		this.info("LP004.findAsDept iYYMM=" + inputYearMonth + ",iWKSSN=" + iWKs + "~" + iWKe);
 
 		String sql = " ";
 		sql += " SELECT CASE ";
@@ -503,45 +531,51 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", iYYMM);
+		query.setParameter("iyymm", inputYearMonth);
 		query.setParameter("iWKs", iWKs);
 		query.setParameter("iWKe", iWKe);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll(TitaVo titaVo, Map<String, String> wkVo, String deptCode) throws Exception {
+	// 營管、營推、業推、業開、單位
+	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo, String deptCode)
+			throws Exception {
 		String sdeptCode = "";
-		String iYEAR = wkVo.get("F0");
-		int iMM = Integer.valueOf(wkVo.get("F1"));
-		String iYYMM = wkVo.get("F2");
+
+		int inputYear = Integer.parseInt(wkVo.get("F0"));
+
+		int iMM = Integer.parseInt(wkVo.get("F1"));
+
+		int inputYearMonth = (inputYear * 100) + iMM;
+
 		// 季初的工作月
 		String iWKs = "";
 		// 季末的工作月
 		String iWKe = "";
 		if (iMM < 4) {
-			iWKs = iYEAR + "01";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "01";
+			iWKe = inputYear + String.format("%02d", iMM);
 		} else if (iMM < 7) {
-			iWKs = iYEAR + "04";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "04";
+			iWKe = inputYear + String.format("%02d", iMM);
 		} else if (iMM < 10) {
-			iWKs = iYEAR + "07";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "07";
+			iWKe = inputYear + String.format("%02d", iMM);
 		} else {
-			iWKs = iYEAR + "10";
-			iWKe = iYEAR + String.format("%02d", iMM);
+			iWKs = inputYear + "10";
+			iWKe = inputYear + String.format("%02d", iMM);
 		}
 
-		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000" || deptCode == "A0X000") {
+		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000"
+				|| deptCode == "A0X000") {
 			sdeptCode = "'" + deptCode + "'";
 		} else {
 			sdeptCode = "'A0B000','A0F000','A0E000','A0M000'";
 		}
 
-		this.info("LP004.findAll iYYMM=" + iYYMM + ",iWKSSN=" + iWKs + "~" + iWKe);
+		this.info("LP004.findAll iYYMM=" + inputYearMonth + ",iWKSSN=" + iWKs + "~" + iWKe);
 
 		String sql = " ";
 		sql += " SELECT CASE ";
@@ -590,36 +624,35 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          AND CB.\"DistCode\" is not null ";
 		sql += "          AND CB.\"DistCode\" <> CB.\"UnitCode\" ";
 		sql += "      ) tab1 ";
-		sql += " LEFT JOIN ( SELECT \"UnitManager\" ";
+		sql += " LEFT JOIN ( SELECT \"UnitCode\" ";
 		sql += "                  , SUM(\"PerfCnt\") AS \"sumPerfCnt\" ";
 		sql += "                  , SUM(\"PerfAmt\") AS \"sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\"= :iyymm ";
 		sql += "               AND \"DeptCode\" IN(" + sdeptCode + ") ";
-		sql += "               AND \"UnitManager\" is not null ";
-		sql += "             GROUP BY \"UnitManager\" ";
-		sql += "           ) tab2 ON tab1.\"UnitManager\" = tab2.\"UnitManager\" ";
-		sql += " LEFT JOIN ( SELECT \"UnitManager\" ";
+		sql += "             GROUP BY \"UnitCode\" ";
+		sql += "           ) tab2 ON tab1.\"UnitCode\" = tab2.\"UnitCode\" ";
+		sql += " LEFT JOIN ( SELECT \"UnitCode\" ";
 		sql += "                  , SUM(\"PerfCnt\") AS \"sumPerfCnt\" ";
 		sql += "                  , SUM(\"PerfAmt\") AS \"sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\">= :iWKs ";
 		sql += "               AND \"WorkMonth\"<= :iWKe ";
 		sql += "               AND \"DeptCode\" IN(" + sdeptCode + ") ";
-		sql += "               AND \"UnitManager\" is not null ";
-		sql += "            GROUP BY \"UnitManager\" ";
-		sql += "           ) tab3 ON tab1.\"UnitManager\" = tab3.\"UnitManager\" ";
+		sql += "            GROUP BY \"UnitCode\" ";
+		sql += "           ) tab3 ON tab1.\"UnitCode\" = tab3.\"UnitCode\" ";
 		sql += " ORDER BY \"wmAmt\" DESC ";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iyymm", iYYMM);
+		query.setParameter("iyymm", inputYearMonth);
 		query.setParameter("iWKs", iWKs);
 		query.setParameter("iWKe", iWKe);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 
 	}
+	
 }

@@ -33,8 +33,6 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	public Parse parse;
 
-	// *** 折返控制相關 ***
-	private int index;
 
 	// *** 折返控制相關 ***
 	private int limit;
@@ -45,6 +43,8 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int size;
 
+	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
@@ -85,20 +85,20 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " SELECT                 ";
-		sql += "      fm.\"CreditSysNo\",";
-		sql += "      cm.\"CustNo\",";
-		sql += "      cm.\"CustName\",";
-		sql += "      cm.\"CustId\",";
-		sql += "      fm.\"ApplNo\",";
-		sql += "      lo.\"FacmNo\",";
-		sql += "      fm.\"FirstDrawdownDate\",";
-		sql += "      fm.\"BusinessOfficer\",";
-		sql += "      ce.\"Fullname\",";
-		sql += "      lo.\"NotYetCode\",";
-		sql += "      lo.\"NotYetItem\",";
-		sql += "      lo.\"YetDate\",";
-		sql += "      lo.\"CloseDate\",";
-		sql += "      lo.\"ReMark\"";
+		sql += "      fm.\"CreditSysNo\"        AS \"CaseNo\",          ";
+		sql += "      cm.\"CustNo\"             AS \"CustNo\",               ";
+		sql += "      cm.\"CustName\"           AS \"CustName\",             ";
+		sql += "      cm.\"CustId\"             AS \"CustId\",               ";
+		sql += "      fm.\"ApplNo\"             AS \"ApplNo\",               ";
+		sql += "      lo.\"FacmNo\"             AS \"FacmNo\",               ";
+		sql += "      fm.\"FirstDrawdownDate\"  AS \"FirstDrawdownDate\",    ";
+		sql += "      fm.\"BusinessOfficer\"    AS \"BusinessOfficer\",      ";
+		sql += "      ce.\"Fullname\"           AS \"Fullname\",             ";
+		sql += "      lo.\"NotYetCode\"         AS \"NotYetCode\",           ";
+		sql += "      lo.\"NotYetItem\"         AS \"NotYetItem\",           ";
+		sql += "      lo.\"YetDate\"            AS \"YetDate\",              ";
+		sql += "      lo.\"CloseDate\"          AS \"CloseDate\",            ";
+		sql += "      lo.\"ReMark\"             AS \"ReMark\"                ";
 		sql += "  FROM";
 		sql += "      \"LoanNotYet\"   lo";
 		sql += "      LEFT JOIN \"FacMain\"      fm ON fm.\"CustNo\" = lo.\"CustNo\"";
@@ -135,7 +135,8 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "      ORDER BY lo.\"FacmNo\" , lo.\"NotYetCode\" , cm.\"CustNo\"";
-
+		sql += " " + sqlRow;
+		
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
@@ -162,23 +163,25 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("CloseDate2", CloseDate2);
 		}
 
+		query.setParameter("ThisIndex", index);
+		query.setParameter("ThisLimit", limit);
+		
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
+//		query.setFirstResult(this.index * this.limit);
+		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-
 		List<Object> result = query.getResultList();
 
 		size = result.size();
 		this.info("Total size ..." + size);
 
-		return this.convertToMap(result);
+		return this.convertToMap(query);
 	}
 
 	public int getSize() {

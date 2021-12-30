@@ -227,9 +227,7 @@ public class L4510p extends TradeBuffer {
 				}
 			}
 
-		} else {
-			throw new LogicException("E0001", "查無資料");
-		}
+		} 
 
 //		刪除舊資料
 		if (iOpItem == 1) {
@@ -372,11 +370,11 @@ public class L4510p extends TradeBuffer {
 			
 			// 應繳試算
 			if ("2".equals(result.get("Flag"))) {
-				iN15EntryDate = getList(slEmpDeductSchedule,result.get("Flag"));
+				iN15EntryDate = getList(slEmpDeductSchedule,result.get("AgType1"));
 				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate, parse.stringToInteger(result.get("CustNo")),
 						parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
 			} else {
-				iY15EntryDate = getList(slEmpDeductSchedule,result.get("Flag"));
+				iY15EntryDate = getList(slEmpDeductSchedule,result.get("AgType1"));
 				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate, parse.stringToInteger(result.get("CustNo")),
 						parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
 			}

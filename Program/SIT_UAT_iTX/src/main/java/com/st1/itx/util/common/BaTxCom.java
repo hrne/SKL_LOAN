@@ -111,6 +111,8 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal breachAmt = BigDecimal.ZERO; // 違約金
 	private BigDecimal tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
 	private BigDecimal repayTotal = BigDecimal.ZERO; // 還款總金額
+	private int rateEffectDate = 0; // 目前利率生效日
+	private BigDecimal fitRate = BigDecimal.ZERO; // 目前利率
 	private int repayIntDate = 0; // 還款應繳日
 	private int ovduTerms = 0; // 逾期數
 	private int ovduDays = 0; // 逾期天數
@@ -161,6 +163,9 @@ public class BaTxCom extends TradeBuffer {
 		this.repayIntDate = 0; // repayIntDate 還款應繳日
 		this.ovduTerms = 0; // 逾期數
 		this.ovduDays = 0; // 逾期天數
+		this.rateEffectDate = 0; // 目前利率生效日
+		this.fitRate = BigDecimal.ZERO; // 目前利率
+		
 		// 部分還款
 		this.extraRepayAmt = BigDecimal.ZERO; // 部分還款金額
 		this.includeIntFlag = "Y";// 是否內含利息
@@ -517,11 +522,11 @@ public class BaTxCom extends TradeBuffer {
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = false;
 
-		// 計算放款本息
-		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 01, BigDecimal.ZERO, iTerms, titaVo);
-
 		// STEP 3: Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
 		loadUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 1, titaVo);
+
+		// 計算放款本息
+		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 01, BigDecimal.ZERO, iTerms, titaVo);
 
 		// END
 		if (this.baTxList != null) {
@@ -597,6 +602,94 @@ public class BaTxCom extends TradeBuffer {
 		// END
 		return this.baTxList;
 
+	}
+
+	/* 本金利息(按應繳日加總至額度) */
+	public ArrayList<BaTxVo> addByPayintDate(ArrayList<BaTxVo> iBatxList, TitaVo titaVo) throws LogicException {
+		this.baTxList = new ArrayList<BaTxVo>();
+		// 按額度、資料類型、還款類別、應繳日，小至大排序
+		Collections.sort(iBatxList, new Comparator<BaTxVo>() {
+			public int compare(BaTxVo c1, BaTxVo c2) {
+				if (c1.getFacmNo() != c2.getFacmNo()) {
+					return c1.getFacmNo() - c1.getFacmNo();
+				}
+				if (c1.getDataKind() != c2.getDataKind()) {
+					return c1.getDataKind() - c1.getDataKind();
+				}
+				if (c1.getRepayType() != c2.getRepayType()) {
+					return c1.getDataKind() - c1.getDataKind();
+				}
+				if (c1.getPayIntDate() != c2.getPayIntDate()) {
+					return c1.getPayIntDate() - c1.getPayIntDate();
+				}
+				return 0;
+			}
+		});
+
+		int dataKind = 0;
+		int repayTyp = 0;
+		int facmNo = 0;
+		int payIntDate = 0;
+
+		for (BaTxVo ba : iBatxList) {
+			if (ba.getFacmNo() != facmNo || ba.getDataKind() != dataKind || ba.getRepayType() != repayTyp
+					|| ba.getPayIntDate() != payIntDate) {
+				baTxVo = new BaTxVo();
+				baTxVo.setDataKind(ba.getDataKind());
+				baTxVo.setRepayType(ba.getRepayType());
+				baTxVo.setReceivableFlag(ba.getReceivableFlag());
+				baTxVo.setCustNo(ba.getCustNo()); // 借款人戶號
+				baTxVo.setFacmNo(ba.getFacmNo()); // 額度編號
+				baTxVo.setBormNo(0); // 撥款序號
+				baTxVo.setRvNo(ba.getRvNo()); // 銷帳編號
+				baTxVo.setPaidTerms(ba.getPaidTerms()); // 繳息期數
+				baTxVo.setPayIntDate(ba.getPayIntDate()); // 應繳息日
+				baTxVo.setAcctCode(ba.getAcctCode()); // 業務科目
+				baTxVo.setPrincipal(ba.getPrincipal()); // 本金
+				baTxVo.setInterest(ba.getInterest()); // // 利息
+				baTxVo.setDelayInt(ba.getDelayInt()); // 延滯息
+				baTxVo.setBreachAmt(ba.getBreachAmt()); // 違約金
+				baTxVo.setLoanBalPaid(ba.getLoanBalPaid()); // 還款後餘額
+				baTxVo.setUnPaidAmt(ba.getUnPaidAmt());
+				baTxVo.setAcctAmt(ba.getAcctAmt()); // 出帳金額
+				baTxVo.setLoanBal(ba.getLoanBal()); // 放款餘額(還款前、只放第一期)
+				baTxVo.setExtraAmt(ba.getExtraAmt()); // 提前償還金額
+				baTxVo.setIntStartDate(ba.getIntStartDate()); // 計息起日
+				baTxVo.setIntEndDate(ba.getIntEndDate()); // 計息止日
+				baTxVo.setAmount(ba.getAmount()); // 計息本金
+				baTxVo.setIntRate(ba.getIntRate()); // 計息利率
+				baTxVo.setRateIncr(ba.getRateIncr()); // 加碼利率
+				baTxVo.setIndividualIncr(ba.getIndividualIncr()); // 個別加碼利率 }
+				baTxVo.setCloseFg(ba.getCloseFg());
+				dataKind = ba.getDataKind();
+				repayTyp = ba.getRepayType();
+				facmNo = ba.getFacmNo();
+				payIntDate = ba.getPayIntDate();
+				this.baTxList.add(baTxVo);
+			} else {
+				baTxVo.setPrincipal(baTxVo.getPrincipal().add(ba.getPrincipal())); // 本金
+				baTxVo.setInterest(baTxVo.getInterest().add(ba.getInterest())); // // 利息
+				baTxVo.setDelayInt(baTxVo.getDelayInt().add(ba.getDelayInt())); // 延滯息
+				baTxVo.setBreachAmt(baTxVo.getBreachAmt().add(ba.getBreachAmt())); // 違約金
+				baTxVo.setLoanBalPaid(baTxVo.getLoanBalPaid().add(ba.getLoanBalPaid())); // 還款後餘額
+				baTxVo.setUnPaidAmt(baTxVo.getPrincipal().add(ba.getUnPaidAmt()));
+				baTxVo.setAcctAmt(baTxVo.getPrincipal().add(ba.getAcctAmt())); // 出帳金額
+				baTxVo.setLoanBal(baTxVo.getPrincipal().add(ba.getLoanBal())); // 放款餘額(還款前、只放第一期)
+				baTxVo.setExtraAmt(baTxVo.getPrincipal().add(ba.getExtraAmt())); // 提前償還金額
+				if (ba.getIntStartDate() < baTxVo.getIntStartDate()) {
+					baTxVo.setIntStartDate(ba.getIntStartDate()); // 計息起日
+				}
+				if (ba.getIntEndDate() > baTxVo.getIntEndDate()) {
+					baTxVo.setIntEndDate(ba.getIntEndDate()); // 計息止日
+				}
+				baTxVo.setAmount(baTxVo.getPrincipal().add(ba.getAmount())); // 計息本金
+				if (ba.getCloseFg() < baTxVo.getCloseFg()) {
+					baTxVo.setCloseFg(ba.getCloseFg());
+				}
+			}
+		}
+		// END
+		return this.baTxList;
 	}
 
 	/* 計算放款還款金額 */
@@ -930,7 +1023,7 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setInterest(loanCalcRepayIntCom.getInterest()); // // 利息
 		baTxVo.setDelayInt(loanCalcRepayIntCom.getDelayInt()); // 延滯息
 		baTxVo.setBreachAmt(loanCalcRepayIntCom.getBreachAmt()); // 違約金
-
+		baTxVo.setLoanBalPaid(loanCalcRepayIntCom.getLoanBal()); // 還款後餘額
 		this.principal = this.principal.add(wkPrincipal);
 		this.interest = this.interest.add(loanCalcRepayIntCom.getInterest());
 		this.delayInt = this.delayInt.add(loanCalcRepayIntCom.getDelayInt());
@@ -962,6 +1055,15 @@ public class BaTxCom extends TradeBuffer {
 						baTxVo.setCloseFg(2); // 2.提前結案
 					}
 				}
+				// 目前利率
+				if (this.rateEffectDate == 0) {
+					this.rateEffectDate = baTxVo.getIntStartDate();
+					this.fitRate = ca.getStoreRate();
+				}
+				if (baTxVo.getIntStartDate() > rateEffectDate && baTxVo.getIntStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+					this.rateEffectDate = baTxVo.getIntStartDate();
+					this.fitRate = ca.getStoreRate();
+				}
 			}
 		}
 
@@ -979,6 +1081,7 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setBormNo(ln.getBormNo()); // 撥款序號
 		baTxVo.setRvNo(" "); // 銷帳編號
 		baTxVo.setAcctCode(loanCalcRepayIntCom.getAcctCode()); // 業務科目
+		baTxVo.setLoanBalPaid(this.loanBal); // 還款後餘額
 		baTxVo.setLoanBal(this.loanBal); // 放款餘額(還款前、只放第一期)
 		this.loanBal = BigDecimal.ZERO;
 		this.baTxList.add(baTxVo);
@@ -1089,6 +1192,10 @@ public class BaTxCom extends TradeBuffer {
 		this.info("settlePayintDateAmt PayIntDate=" + payIntDate + ", FacmNo=" + facmNo);
 	}
 
+	/*
+	 * // 結案時還款本金已含短繳本金，回收金額須扣除 BigDecimal wkPrincipal =
+	 * 
+	 */
 	/* 計算暫收抵繳作帳金額 */
 	private void settleTmpAcctAmt() {
 		// 回收餘額不足->需暫收抵繳
@@ -1669,6 +1776,15 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public int getOvduDays() {
 		return ovduDays;
+	}
+
+	/**
+	 * 目前利率
+	 * 
+	 * @return 目前利率
+	 */
+	public BigDecimal getFitRate() {
+		return fitRate;
 	}
 
 }

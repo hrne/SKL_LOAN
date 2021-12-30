@@ -147,6 +147,11 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 短繳清償違約金
 	 */
 	private BigDecimal closeBreachAmt = BigDecimal.ZERO;
+	
+	/**
+	 * 還款後餘額
+	 */
+	private BigDecimal loanBalPaid = BigDecimal.ZERO;
 
 	/**
 	 * 加碼利率
@@ -165,11 +170,14 @@ public class BaTxVo implements Comparable<BaTxVo> {
 
 	@Override
 	public String toString() {
-		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo="
-				+ rvNo + ", payIntDate=" + payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority=" + repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr
-				+ ", acctAmt=" + acctAmt + ", loanBal=" + loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", amount=" + amount + ", intRate="
-				+ intRate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", rateIncr="
-				+ rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
+		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo
+				+ ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo=" + rvNo + ", payIntDate="
+				+ payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority="
+				+ repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", acctAmt=" + acctAmt + ", loanBal="
+				+ loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate
+				+ ", amount=" + amount + ", intRate=" + intRate + ", principal=" + principal + ", interest=" + interest
+				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt
+				+ ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
 	}
 
 	public int getDataKind() {
@@ -370,6 +378,14 @@ public class BaTxVo implements Comparable<BaTxVo> {
 
 	public void setCloseBreachAmt(BigDecimal closeBreachAmt) {
 		this.closeBreachAmt = closeBreachAmt;
+	}
+
+	public BigDecimal getLoanBalPaid() {
+		return loanBalPaid;
+	}
+
+	public void setLoanBalPaid(BigDecimal loanBalPaid) {
+		this.loanBalPaid = loanBalPaid;
 	}
 
 	public BigDecimal getRateIncr() {

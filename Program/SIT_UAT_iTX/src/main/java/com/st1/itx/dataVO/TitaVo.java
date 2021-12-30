@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -155,7 +156,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 */
 	public TitaVo getVo(String msg) throws JsonParseException, JsonMappingException, IOException {
 		this.setOrgTitaVO(msg);
-		return new ObjectMapper().readValue(msg, TitaVo.class);
+		return new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).readValue(msg, TitaVo.class);
 	}
 
 	/**
