@@ -219,7 +219,7 @@ C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 @V(7)V(2,0)
 
 ! 戶名
-#CustName=c,2.50,L
+#CustName=c,100,L
 !C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 
 #DATE=D,8,S

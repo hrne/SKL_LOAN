@@ -90,6 +90,15 @@ public interface TxFileService {
   public TxFile findByBatchNoFirst(String batchNo_0, TitaVo... titaVo);
 
   /**
+   * FileCode = 
+   *
+   * @param fileCode_0 fileCode_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxFile TxFile of List
+   */
+  public TxFile findByFileCodeFirst(String fileCode_0, TitaVo... titaVo);
+
+  /**
    * hold By TxFile
    * 
    * @param fileNo key

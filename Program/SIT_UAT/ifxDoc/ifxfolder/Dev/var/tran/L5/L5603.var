@@ -281,7 +281,7 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 #CustNo=A,7,L
 
 ! 戶名----調RIM
-#CustNoX=X,20,L
+#CustNoX=X,100,L
 
 ! 額度編號
 #FacmNo=A,3,L
@@ -360,7 +360,7 @@ T(2,00000000000000+          +#ApplNo+000)
 #BTNFBIND=X,1,S
 BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L2020; ntxbuf=#BTNFBUF;ntxbuf5=type<-1:MailCustName<-OOGuarantor})
 
-#MailCustName=X,2.50,I
+#MailCustName=X,100,I,maxWidth:50
 C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#MailObj,1,s,$)
 @V(7)

@@ -1104,6 +1104,9 @@ INVOKEJS(SHOW,grd1,{i},{i},0)
 
 ##end
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#CustNo+#CaseSeq)
 
 
 </sub>

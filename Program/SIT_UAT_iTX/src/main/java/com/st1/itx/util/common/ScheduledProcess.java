@@ -2,6 +2,8 @@ package com.st1.itx.util.common;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.Timestamp;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -35,7 +37,7 @@ public class ScheduledProcess extends SysLogger {
 	private WebClient webClient;
 
 	@Autowired
-	public DateUtil dateUtil;
+	private DateUtil dateUtil;
 
 	@Scheduled(fixedDelay = 60000)
 	private void lookUpTxCruiser() {
@@ -67,6 +69,17 @@ public class ScheduledProcess extends SysLogger {
 						}
 
 						if (isBroken) {
+							txs.setStatus("F");
+							txCruiserService.update(txs);
+						}
+
+						Timestamp startTime = txs.getCreateDate();
+						Timestamp endTime = new Timestamp(new Date().getTime());
+						int hours = (int) ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60));
+//						int minutes = (int) (((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60)) / 60);
+//						int second = (int) ((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60) - minutes * 60);
+
+						if (hours >= 12) {
 							txs.setStatus("F");
 							txCruiserService.update(txs);
 						}

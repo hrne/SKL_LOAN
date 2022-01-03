@@ -137,7 +137,7 @@ RESET_RIM(#RimL1r09,L1R09)
 S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R09)
 T(2,@CustName,#L1r09CustName)
-#CustName=x,2.50,L
+#CustName=x,100,L
 
 
 ! 額度編號

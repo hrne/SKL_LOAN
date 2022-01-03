@@ -94,9 +94,10 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
 
 		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
-		txSeq = Objects.isNull(txSeq) ? stepExecution.getJobExecution().getExecutionContext().getString(ContentName.txSeq) : txSeq;
-		if (Objects.isNull(txSeq)) {
-			this.info("txSeq is Null..");
+		txSeq = Objects.isNull(txSeq) || txSeq.trim().isEmpty() ? stepExecution.getJobExecution().getExecutionContext().getString(ContentName.txSeq, "") : txSeq;
+
+		if (Objects.isNull(txSeq) || txSeq.trim().isEmpty()) {
+			this.info("txSeq is Null or Empty..");
 			return;
 		} else
 			jobDetailId.setTxSeq(txSeq);

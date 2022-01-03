@@ -569,7 +569,7 @@ public class L5701 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 			iDataLog.setEnv(titaVo, beforeNegMain, sNegMsain);
-			iDataLog.exec();
+			iDataLog.exec("修改債權主檔");
 		} else {
 			// INSERT
 			if (("01").equals(FunctionCode)) {// 新增時繳息迄日=協商申請日

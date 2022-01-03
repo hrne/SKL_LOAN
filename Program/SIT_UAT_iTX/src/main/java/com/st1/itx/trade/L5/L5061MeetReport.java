@@ -20,6 +20,7 @@ import com.st1.itx.db.service.springjpa.cm.L5061ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -112,12 +113,15 @@ public class L5061MeetReport extends MakeReport {
 			for (int col = 0; col < i5061SqlReturn.size(); col++) {
 				String colName = "F" + String.valueOf(col);
 				switch (col) {
-				// 處裡左右靠
+				// 處理左右靠
 				case 0:
 					makeExcel.setValue(row, col + 1, Integer.valueOf(i5061SqlReturn.get(colName)));
 					break;
 				case 1:
 					makeExcel.setValue(row, col + 1, Integer.valueOf(i5061SqlReturn.get(colName)));
+					break;
+				case 2: // 戶名
+					makeExcel.setValue(row, col + 1, StringCut.replaceLineUp(i5061SqlReturn.get(colName)));
 					break;
 				case 3:
 					int status = Integer.valueOf(i5061SqlReturn.get(colName));

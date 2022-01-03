@@ -281,7 +281,7 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 #CustNo=A,7,L
 
 ! 戶名----調RIM
-#CustName=X,20,L
+#CustName=X,100,L
 
 ! 額度編號
 #FacmNo=A,3,L

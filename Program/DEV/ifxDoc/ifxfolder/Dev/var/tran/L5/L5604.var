@@ -25,7 +25,7 @@ E(0,0)
 ["#FdAccCollPsn+催收人員",#AccCollPsn,#AccCollPsnX],["#FdLegalPsn+法務人員",#LegalPsn,#LegalPsnX],
 ["#FdPrevIntDate+繳息迄日",#PrevIntDate],["#FdLoanBal+放款餘額",#LoanBal],
 ["#FdNextIntDate+下次應繳日",#NextIntDate],
-[#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
+[#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN,#BTNI,#BTNJ],
 [#<->#,"@",#BTNX,#BTNG,#BTNH],
 [#<->#,"#FdClCode+擔保品編號",#ClCode1,"-",#ClCode2,"-",#ClNo,#ClX],
 [#<->#,"#FdRecordDate+記錄日期",#RecordDate],
@@ -46,6 +46,8 @@ E(0,0)
 #BTNX=X,1,I,ui:button;value:不動產查詢;enable:1;tabbable:0
 #BTNG=X,1,I,ui:button;value:其他擔保品查詢;enable:1;tabbable:0
 #BTNH=X,1,I,ui:button;value:擔保品內容查詢;enable:1;tabbable:0
+#BTNI=X,1,I,ui:button;value:上傳附件;enable:1;tabbable:0
+#BTNJ=X,1,I,ui:button;value:上傳附件查詢;enable:1;tabbable:0
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
@@ -255,13 +257,14 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 T(2,1 000000000+#FacmNo+0000000+          +#CustNo)
 #BUFG=X,38,S
 T(2,  000000000+#FacmNo+0000000+          +#CustNo)
+
 ! 戶號
 #CustNo=A,7,L
 C(3,#CHAIN,0,$,s)
 C(2,#FunctionCd,S,$,$,s,s,s)
 
 ! 戶名----調RIM
-#CustName=X,20,L
+#CustName=X,100,L
 
 ! 額度編號
 #FacmNo=A,3,L
@@ -321,6 +324,25 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 C(2,#FunctionCd,S,T(1,#RecordDateX,2,7),$,T(1,#RecordDateX,2,7),s,s)
 D(8)
 @V(7)A(DATE,0,#RecordDate)
+
+!上傳附件
+#LC014Mrkey=x,100,S
+T(2,#RecordDate+-+#CustNo+-+#FacmNo)
+#LC014Note=x,100,S
+T(2,記錄日期:+#RecordDate+/戶號:+#CustNo+額度:+#FacmNo+ 法務進度附件)
+#BufLC014=X,200,S
+T(2,L5604+#CustNo+#FacmNo+000+#LC014Mrkey+#LC014Note)
+!#Button=x,100,S
+!T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+!K(MODIFYBUTTON,1,上傳附件)
+!#Button2=x,100,S
+!T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+!K(MODIFYBUTTON,2,上傳附件查詢)
+#BINDI=X,1,S
+BIND(#BTNI,click, {cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})
+#BINDJ=X,1,S
+BIND(#BTNJ,click, {cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})
+
 
 ! 法務進度
 #LegalProg=A,3,I

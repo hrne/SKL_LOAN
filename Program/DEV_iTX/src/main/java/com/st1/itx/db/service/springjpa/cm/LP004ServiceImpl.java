@@ -386,17 +386,17 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , tab1.\"UnitItem\" ";//F1
 		sql += "      , tab1.\"DeptName\" ";//F2
 		sql += "      , tab1.\"BsName\" ";//F3
-		sql += "      , tab2.\"sumPerfCnt\" ";//F4
-		sql += "      , tab2.\"sumPerfAmt\" ";//F5
-		sql += "      , tab3.\"sumPerfCnt\" ";//F6
-		sql += "      , tab3.\"sumPerfAmt\" ";//F7
+		sql += "      , tab2.\"t2sumPerfCnt\" ";//F4
+		sql += "      , tab2.\"t2sumPerfAmt\" ";//F5
+		sql += "      , tab3.\"t3sumPerfCnt\" ";//F6
+		sql += "      , tab3.\"t3sumPerfAmt\" ";//F7
 		sql += " FROM ( SELECT DISTINCT ";
 		sql += "               CB.\"DeptManager\" ";
 		sql += "             , CE.\"Fullname\" AS \"DeptName\" ";
 		sql += "             , PB.\"Fullname\" AS \"BsName\" ";
-		sql += "      		 , SUBSTR(CB.\"UnitItem\",1,1) ";
-		sql += "            || SUBSTR(CB.\"UnitItem\",3,1) ";
-		sql += "        	|| SUBSTR(CB.\"UnitItem\",5,1) AS \"UnitItem\" ";
+		sql += "      		 , SUBSTR(CB.\"DeptItem\",1,1) ";
+		sql += "            || SUBSTR(CB.\"DeptItem\",3,1) ";
+		sql += "        	|| SUBSTR(CB.\"DeptItem\",5,1) AS \"UnitItem\" ";
 		sql += "             , CB.\"DeptCode\" ";
 		sql += "        FROM \"PfBsOfficer\" PB ";
 		sql += "        LEFT JOIN \"CdBcm\" CB ON CB.\"DeptCode\" = PB.\"DeptCode\" ";
@@ -405,16 +405,16 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          AND NVL(PB.\"DistItem\",' ') = '房貸部專' ";
 		sql += "      ) tab1 ";
 		sql += " LEFT JOIN ( SELECT \"DeptCode\" ";
-		sql += "                  , SUM(\"PerfCnt\") AS \"sumPerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") AS \"sumPerfAmt\" ";
+		sql += "                  , SUM(\"PerfCnt\") AS \"t2sumPerfCnt\" ";
+		sql += "                  , SUM(\"PerfAmt\") AS \"t2sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\"= :iyymm ";
 		sql += "               AND \"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
 		sql += "             GROUP BY \"DeptCode\" ";
 		sql += "           ) tab2 ON tab1.\"DeptCode\" = tab2.\"DeptCode\" ";
 		sql += " LEFT JOIN ( SELECT \"DeptCode\" ";
-		sql += "                  , SUM(\"PerfCnt\") AS \"sumPerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") AS \"sumPerfAmt\" ";
+		sql += "                  , SUM(\"PerfCnt\") AS \"t3sumPerfCnt\" ";
+		sql += "                  , SUM(\"PerfAmt\") AS \"t3sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\">= :iWKs ";
 		sql += "               AND \"WorkMonth\"<= :iWKe ";

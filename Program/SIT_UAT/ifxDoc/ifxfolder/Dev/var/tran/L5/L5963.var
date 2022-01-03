@@ -125,7 +125,7 @@ T(H,#CaseCode,#CaseCodeHelp)
 @V(2,0)
 
 ! 借款人戶名----調RIM
-#CustNoX=X,20,L
+#CustNoX=X,100,L
 
 !抓戶名
 #oCustNo=A,7,L
@@ -144,7 +144,7 @@ RESET_RIM(#RimL1r09,L1R09)
 S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R09)
 T(2,@CustName,#L1r09CustName)
-#CustName=x,2.50,L
+#CustName=x,100,L
 
 ! 額度編號
 #FacmNo=A,3,I
@@ -197,7 +197,7 @@ C(1,#OOMailObj,S,S,$)
 T(H,#OOMailObj,#MailObjHelp)
 
 ! 姓名
-#OOCustName=X,2.50,O
+#OOCustName=X,100,O
 ! 送達否
 #OODelvrYet=A,1,O
 #OODelvrYetX=X,6,O

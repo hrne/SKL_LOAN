@@ -91,9 +91,9 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 		titaVo.putParam(ContentName.empnot, jobExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
 
 		String txSeq = jobExecution.getJobParameters().getString(ContentName.txSeq);
-		txSeq = Objects.isNull(txSeq) ? jobExecution.getExecutionContext().getString(ContentName.txSeq) : txSeq;
+		txSeq = Objects.isNull(txSeq) || txSeq.trim().isEmpty() ? jobExecution.getExecutionContext().getString(ContentName.txSeq, "") : txSeq;
 
-		if (Objects.isNull(txSeq)) {
+		if (Objects.isNull(txSeq) || txSeq.trim().isEmpty()) {
 			jobMainId.setTxSeq(new Date().getTime() + this.getNextHostTranC());
 			jobExecution.getExecutionContext().put(ContentName.txSeq, jobMainId.getTxSeq());
 		} else

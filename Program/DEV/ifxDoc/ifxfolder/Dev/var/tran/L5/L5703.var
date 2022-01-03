@@ -201,6 +201,11 @@ T(2,@DataSendSectionX,#L5r12BankItem)
 IF(#FunCode==1 || #FunCode==2,IF(#DataSendSection==#FinCode,T(2,#FinCodeX),$),$)
 
 #RPTFG=A,1,S
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#FinCode)
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

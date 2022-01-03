@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,334)ASGN(INQLEN$)
+E(0,329)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -33,6 +33,11 @@ E(0,40)ASGN(INQPRT$)
 #button=x,1,S
 K(MODIFYBUTTON,查詢)
 
+#BufLC015=X,3,S
+
+#Button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LC015; ntxbuf=#BufLC015})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,套印預設印表機查詢)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -47,6 +52,9 @@ K(MODIFYBUTTON,查詢)
 ["#FdItem+說@@@@明",#iItem,"@（關鍵字）"],
 ]
 !---------- AP Button AREA ----------
+
+#StanIp=x,15,S
+T(4,IP$)
 
 #FdBrNo=X,2,L
 #FdEntdy=X,2,L
@@ -173,8 +181,8 @@ T(3,[LC009] 報表及檔案查詢)
 T(3,1)ASGN(LOOP$)
 
 #Ymd=D,7,S
-#Code=X,80,S
-#Item=X,160,S
+#Code=X,40,S
+#Item=X,80,S
 #TlrNo=X,20,S
 #SupNo=X,20,S
 #CreTlrNo=X,20,S
@@ -186,9 +194,16 @@ T(3,1)ASGN(LOOP$)
 C(2,#Type,$,T(3,PDF),T(3,EXCEL),T(3,TXT),T(3,DBF),T(3,CSV),T(3,套印),$)
 #SignCode=9,1,S
 
+#ServerIp=x,15,S
+#Printer=x,100,S
+
+#Buf=x,1000,S
+T(2,#StanIp+#Code+#Item+#ServerIp+#Printer)
+
+
 !套印printReport
 #BTN=X,1,S
-C(3,#Type,6,BIND(grid,{cmd=printReport;sno=#Sno;fileType=#Type;item=#Item;text=套印}),BIND(grid,{cmd=viewPdf;sno=#Sno;fileType=#Type;item=#Item}))
+C(3,#Type,6,C(4,#ServerIp,BIND(grid,{ cmd=CHAIN; ntxcd=LC115; ntxbuf=#Buf ;text=設定印表機}),BIND(grid,{cmd=printReport;sno=#Sno;fileType=#Type;item=#Item;text=套印})),BIND(grid,{cmd=viewPdf;sno=#Sno;fileType=#Type;item=#Item}))
 
 ! 簽核按鈕
 
@@ -229,6 +244,8 @@ TXFORM=LC009
 #Sno
 #Type
 #SignCode
+#ServerIp
+#Printer
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

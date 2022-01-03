@@ -85,7 +85,7 @@ S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R09)
 T(2,@CustName,#L1r09CustName)
 
-#CustName=x,2.50,L
+#CustName=x,100,L
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)

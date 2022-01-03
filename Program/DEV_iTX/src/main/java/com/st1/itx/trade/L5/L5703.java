@@ -20,6 +20,7 @@ import com.st1.itx.db.service.NegFinAcctService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.data.DataLog;
 
 /**
  * Tita<br>
@@ -38,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5703 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5703.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegFinAcctService sNegFinAcctService;
@@ -50,6 +50,9 @@ public class L5703 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	Parse parse;
+
+	@Autowired
+	public DataLog dataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -104,13 +107,13 @@ public class L5703 extends TradeBuffer {
 			if (NegFinAcctVO == null) {
 				throw new LogicException(titaVo, "E0003", "債務協商債權機構帳戶檔");
 			}
-
+			NegFinAcct beforeNegFinAcct = (NegFinAcct) dataLog.clone(NegFinAcctVO);
 			NegFinAcctVO.setFinItem(FinCodeX);
 			NegFinAcctVO.setRemitBank(RemitBank);
 			NegFinAcctVO.setRemitAcct(RemitAcct);
 			NegFinAcctVO.setDataSendSection(DataSendSection);
-			NegFinAcctVO.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));
+			//NegFinAcctVO.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			//NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));
 
 			try {
 				sNegFinAcctService.update(NegFinAcctVO);
@@ -119,6 +122,8 @@ public class L5703 extends TradeBuffer {
 				// E0007 更新資料時，發生錯誤
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
+			dataLog.setEnv(titaVo, beforeNegFinAcct,NegFinAcctVO);
+			dataLog.exec("修改債務協商債權機構帳戶檔");
 
 			break;
 

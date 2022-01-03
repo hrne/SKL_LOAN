@@ -188,7 +188,7 @@ C(3,#Identity,1,$,S)
 T(2,#CustNo)
 
 ! 借款人姓名
-#CustName=X,100,I
+#CustName=X,100,I,maxWidth:50
 C(3,#Identity,2,$,S)
 @V(7)
 ! 借款人身分證
@@ -251,7 +251,7 @@ C(3,#OprionCd,2,$,s)
 E(0,#Ovddayto)
 IF(#TmpOvddayto<#TmpOvddayfm,V(P,結束天數不可小於起始天數),$)
 
-! 戶況 ---待確認
+! 戶況
 #Status=A,2,I
 E(0,04)
 HELP(#StatusHelp,cols:2)
@@ -322,7 +322,7 @@ T(H,#OOTxCode,#TxCodeHelp)
 ! 姓名
 #OOCUSTNM=X,20,O
 !戶名
-#OOCustName=X,2.50,O
+#OOCustName=X,100,O
 
 ! 繳息迄日
 #OOPrevIntDate=D,7,O

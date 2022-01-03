@@ -33,6 +33,9 @@ public interface TxFileRepositoryHist extends JpaRepository<TxFile, Long> {
   // BatchNo =
   public Optional<TxFile> findTopByBatchNoIsOrderByCreateDateDesc(String batchNo_0);
 
+  // FileCode = 
+  public Optional<TxFile> findTopByFileCodeIsOrderByCreateDateDesc(String fileCode_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -213,6 +213,25 @@ em = null;
   }
 
   @Override
+  public TxFile findByFileCodeFirst(String fileCode_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findByFileCodeFirst " + dbName + " : " + "fileCode_0 : " + fileCode_0);
+    Optional<TxFile> txFileT = null;
+    if (dbName.equals(ContentName.onDay))
+      txFileT = txFileReposDay.findTopByFileCodeIsOrderByCreateDateDesc(fileCode_0);
+    else if (dbName.equals(ContentName.onMon))
+      txFileT = txFileReposMon.findTopByFileCodeIsOrderByCreateDateDesc(fileCode_0);
+    else if (dbName.equals(ContentName.onHist))
+      txFileT = txFileReposHist.findTopByFileCodeIsOrderByCreateDateDesc(fileCode_0);
+    else 
+      txFileT = txFileRepos.findTopByFileCodeIsOrderByCreateDateDesc(fileCode_0);
+
+    return txFileT.isPresent() ? txFileT.get() : null;
+  }
+
+  @Override
   public TxFile holdById(Long fileNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
