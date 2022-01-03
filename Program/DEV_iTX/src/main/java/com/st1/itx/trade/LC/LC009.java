@@ -51,12 +51,11 @@ public class LC009 extends TradeBuffer {
 
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active LC009 " + this.getTxBuffer().getTxCom().getTlrLevel() + "/"
-				+ this.getTxBuffer().getTxCom().getTlrDept());
-		
+		this.info("active LC009 " + this.getTxBuffer().getTxCom().getTlrLevel() + "/" + this.getTxBuffer().getTxCom().getTlrDept());
+		titaVo.setDataBaseOnLine();
 		this.totaVo.init(titaVo);
 
 		/*
@@ -68,13 +67,13 @@ public class LC009 extends TradeBuffer {
 		this.limit = 40;
 
 		List<Map<String, String>> dList = null;
-		
+
 		try {
 			dList = lc009ServiceImpl.findAll(titaVo, index, limit);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", e.toString());
 		}
-		
+
 		if (dList == null || dList.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "報表及檔案");
 		}
@@ -90,28 +89,30 @@ public class LC009 extends TradeBuffer {
 			occursList.putParam("TlrNo", dVo.get("TlrNo") + ' ' + dVo.get("TlrName"));
 			occursList.putParam("SupNo", dVo.get("SupNo") + ' ' + dVo.get("SupName"));
 			occursList.putParam("SignCode", dVo.get("SignCode"));
-			occursList.putParam("CalDate", parse.stringToStringDate(dVo.get("CreateDate"))); 
-			occursList.putParam("CalTime", parse.stringToStringTime(dVo.get("CreateDate"))); 
+			occursList.putParam("CalDate", parse.stringToStringDate(dVo.get("CreateDate")));
+			occursList.putParam("CalTime", parse.stringToStringTime(dVo.get("CreateDate")));
 			occursList.putParam("ServerIp", dVo.get("ServerIp"));
 			occursList.putParam("Printer", dVo.get("Printer"));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
-		
+
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (dList != null && dList.size() >= this.limit) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
+
+		titaVo.setDataBaseOnOrg();
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
 	public ArrayList<TotaVo> run2(TitaVo titaVo) throws LogicException {
-		this.info("active LC009 " + this.getTxBuffer().getTxCom().getTlrLevel() + "/"
-				+ this.getTxBuffer().getTxCom().getTlrDept());
+		this.info("active LC009 " + this.getTxBuffer().getTxCom().getTlrLevel() + "/" + this.getTxBuffer().getTxCom().getTlrDept());
+		titaVo.setDataBaseOnLine();
 		this.totaVo.init(titaVo);
 
 		// 2021-04-05 Wei 修改: 日期欄位修改為範圍
@@ -149,8 +150,7 @@ public class LC009 extends TradeBuffer {
 
 			// 轉java.sql.Timestamp格式
 			// yyyy-[m]m-[d]d hh:mm:ss[.f...]
-			String timestampFormat = xCreateDateStart.substring(0, 4) + "-" + xCreateDateStart.substring(4, 6) + "-"
-					+ xCreateDateStart.substring(6, 8) + " 00:00:00.000000";
+			String timestampFormat = xCreateDateStart.substring(0, 4) + "-" + xCreateDateStart.substring(4, 6) + "-" + xCreateDateStart.substring(6, 8) + " 00:00:00.000000";
 
 			this.info("timestampFormat = " + timestampFormat);
 
@@ -172,8 +172,7 @@ public class LC009 extends TradeBuffer {
 
 			// 轉java.sql.Timestamp格式
 			// yyyy-[m]m-[d]d hh:mm:ss[.f...]
-			String timestampFormat2 = xCreateDateEnd.substring(0, 4) + "-" + xCreateDateEnd.substring(4, 6) + "-"
-					+ xCreateDateEnd.substring(6, 8) + " 00:00:00.000000";
+			String timestampFormat2 = xCreateDateEnd.substring(0, 4) + "-" + xCreateDateEnd.substring(4, 6) + "-" + xCreateDateEnd.substring(6, 8) + " 00:00:00.000000";
 
 			this.info("timestampFormat2 = " + timestampFormat2);
 
@@ -192,21 +191,17 @@ public class LC009 extends TradeBuffer {
 		Slice<TxFile> slTxFile;
 
 		if (iCreateDateStart > 0) {
-			slTxFile = txFileService.findByLC009WithCreateDate(iEntdyStart, iEntdyEnd, iBrNo, iTlrNo + "%", iCode + "%",
-					"%" + iItem + "%", createDateStart, createDateEnd, this.index, this.limit);
+			slTxFile = txFileService.findByLC009WithCreateDate(iEntdyStart, iEntdyEnd, iBrNo, iTlrNo + "%", iCode + "%", "%" + iItem + "%", createDateStart, createDateEnd, this.index, this.limit);
 		} else {
-			slTxFile = txFileService.findByLC009(iEntdyStart, iEntdyEnd, iBrNo, iTlrNo + "%", iCode + "%",
-					"%" + iItem + "%", this.index, this.limit);
+			slTxFile = txFileService.findByLC009(iEntdyStart, iEntdyEnd, iBrNo, iTlrNo + "%", iCode + "%", "%" + iItem + "%", this.index, this.limit);
 		}
 		List<TxFile> lTxFile = slTxFile == null ? null : new ArrayList<>(slTxFile.getContent());
 
 		// 按分配順序排序
 		Collections.sort(lTxFile, new Comparator<TxFile>() {
 			public int compare(TxFile c1, TxFile c2) {
-				String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate()) + c1.getFileCode()
-						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
-				String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate()) + c2.getFileCode()
-						+ new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());
+				String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate()) + c1.getFileCode() + new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
+				String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate()) + c2.getFileCode() + new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());
 				return 0 - c1OrderKey.compareTo(c2OrderKey);
 			}
 		});
@@ -262,8 +257,7 @@ public class LC009 extends TradeBuffer {
 
 				if (this.txBuffer.getTxCom().getTlrLevel() == 3 && "".equals(tTxFile.getTlrNo())) {
 					occursList.putParam("SignCode", "1");
-				} else if (this.txBuffer.getTxCom().getTlrLevel() < 3 && !"".equals(tTxFile.getTlrNo())
-						&& this.txBuffer.getTxCom().getTlrDept().equals(tTxFile.getGroupNo())) {
+				} else if (this.txBuffer.getTxCom().getTlrLevel() < 3 && !"".equals(tTxFile.getTlrNo()) && this.txBuffer.getTxCom().getTlrDept().equals(tTxFile.getGroupNo())) {
 					occursList.putParam("SignCode", "1");
 				}
 			}
@@ -278,6 +272,7 @@ public class LC009 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
 
+		titaVo.setDataBaseOnOrg();
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
