@@ -126,6 +126,10 @@ public class MainProcess extends SysLogger {
 			else
 				this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
+			// LC開頭交易固定onLine
+			if (this.titaVo.getTxcd().startsWith("LC") && this.titaVo.getTxCode().startsWith("LC"))
+				this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
+
 			this.titaVo.putParam(ContentName.orgDataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);

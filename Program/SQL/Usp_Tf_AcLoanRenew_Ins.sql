@@ -43,10 +43,8 @@ BEGIN
              WHEN NVL(S2."LMSACN",0) <> 0 THEN '2'  -- 協議
            ELSE '1' -- 一般
            END                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
-          ,CASE
-             WHEN S1."Seq" = 1 -- 新撥款對到舊撥款 最早的一筆 為Y
-             THEN 'Y'
-           ELSE 'N' END                   AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
+          -- 2022-01-03 智偉修改:最後統一更新
+          ,'N'                            AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
           ,NVL(S3."TRXDAT",0)             AS "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期 -- 2021-12-23 綺萍要求改為交易明細檔做撥款的會計日期
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
@@ -57,8 +55,6 @@ BEGIN
                 ,"LMSASQ"
                 ,"LMSAPN1"
                 ,"LMSASQ1"
-                ,ROW_NUMBER() OVER (PARTITION BY "LMSACN","LMSAPN","LMSASQ"
-                                    ORDER BY "LMSAPN1","LMSASQ1") AS "Seq"
           FROM "LNACNP"
           GROUP BY "LMSACN"
                   ,"LMSAPN"
@@ -125,10 +121,8 @@ BEGIN
             ,S1."OLD_LMSAPN"                AS "OldFacmNo"           -- 舊額度編號 DECIMAL 6
             ,S1."OLD_LMSASQ"                AS "OldBormNo"           -- 舊撥款序號 DECIMAL 6
             ,'2'                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
-            ,CASE
-              WHEN S1."Seq" = 1 -- 新撥款對到舊撥款 最早的一筆 為Y
-              THEN 'Y'
-            ELSE 'N' END                    AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
+            -- 2022-01-03 智偉修改:最後統一更新
+            ,'N'                            AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
             ,NVL(S3."LMSLLD",0)             AS "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期
             ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
             ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
@@ -175,6 +169,36 @@ BEGIN
       , SOURCE_TABLE."LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
       , SOURCE_TABLE."LastUpdate"      -- 最後更新日期時間 DATE  
     )
+    ;
+
+    MERGE INTO "AcLoanRenew" ALR
+    USING (
+      SELECT "CustNo"              -- 戶號 DECIMAL 3
+           , "NewFacmNo"           -- 新額度編號 DECIMAL 3
+           , "NewBormNo"           -- 新撥款序號 DECIMAL 3
+           , "OldFacmNo"           -- 舊額度編號 DECIMAL 6
+           , "OldBormNo"           -- 舊撥款序號 DECIMAL 6
+           -- 2022-01-03 智偉修改:最後統一更新
+           -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "CustNo"
+                          , "NewFacmNo"
+                          , "NewBormNo"
+               ORDER BY "OldFacmNo"
+                      , "OldBormNo"
+             ) AS "Seq"
+    ) N
+    ON (
+      N."CustNo" = ALR."CustNo"
+      AND N."NewFacmNo" = ALR."NewFacmNo"
+      AND N."NewBormNo" = ALR."NewBormNo"
+      AND N."OldFacmNo" = ALR."OldFacmNo"
+      AND N."OldBormNo" = ALR."OldBormNo"
+      AND N."Seq" = 1
+    )
+    WHEN MATCHED THEN UPDATE SET
+    "MainFlag" = 'Y' -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
     ;
 
     -- 記錄程式結束時間

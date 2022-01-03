@@ -382,7 +382,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LP004.findDept iYYMM=" + inputYearMonth + ",iWKSSN=" + iWKs + "~" + iWKe);
 
 		String sql = " ";
-		sql += " SELECT DENSE_RANK() OVER (ORDER BY tab2.\"sumPerfAmt\" DESC ) AS \"SEQ\" ";// F0
+		sql += " SELECT DENSE_RANK() OVER (ORDER BY tab2.\"t2sumPerfAmt\" DESC ) AS \"SEQ\" ";// F0
 		sql += "      , tab1.\"UnitItem\" ";//F1
 		sql += "      , tab1.\"DeptName\" ";//F2
 		sql += "      , tab1.\"BsName\" ";//F3

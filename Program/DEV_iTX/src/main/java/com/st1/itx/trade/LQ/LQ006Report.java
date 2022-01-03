@@ -2,7 +2,6 @@ package com.st1.itx.trade.LQ;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -35,11 +34,13 @@ public class LQ006Report extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		List<Map<String, String>> lQ006List = null;
-
+		List<Map<String, String>> lQ006List_Total = null;
+		
 		try {
 			lQ006List = lQ006ServiceImpl.findAll(titaVo);
+			lQ006List_Total = lQ006ServiceImpl.findTotal(titaVo);
 
-			exportExcel(titaVo, lQ006List);
+			exportExcel(titaVo, lQ006List, lQ006List_Total);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -48,7 +49,7 @@ public class LQ006Report extends MakeReport {
 		}
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList, List<Map<String, String>> LDListTotal) throws LogicException {
 		this.info("exportExcel---------");
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ006", "已逾期未減損-帳齡分析", "LQ006已逾期未減損-帳齡分析", "LQ006已逾期未減損-帳齡分析.xlsx", "已逾期未減損-帳齡分析");
 
@@ -56,40 +57,55 @@ public class LQ006Report extends MakeReport {
 		int row = 2;
 
 		// 有無資料
-		if (LDList.size() > 0) {
-			BigDecimal loanBal = BigDecimal.ZERO;
-			BigDecimal interest = BigDecimal.ZERO;
-			BigDecimal foreclosureFire = BigDecimal.ZERO;
-			BigDecimal total = BigDecimal.ZERO;
-			BigDecimal days = BigDecimal.ZERO;
+		if (LDList != null && !LDList.isEmpty()) {
 			for (Map<String, String> tLDVo : LDList) {
 
 				// 帳號
 				makeExcel.setValue(row, 1, tLDVo.get("F0").toString());
 				// 本金餘額
-				loanBal = tLDVo.get("F1") == null || tLDVo.get("F1").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
-				makeExcel.setValue(row, 2, loanBal, "#,##0", "R");
+				makeExcel.setValue(row, 2, getBigDecimal(tLDVo.get("F1")), "#,##0", "R");
 				// 應收利息
-				interest = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
-				makeExcel.setValue(row, 3, interest.equals(BigDecimal.ZERO) ? "  -  " : interest, "#,##0", "R");
+				// format: show - if 0
+				makeExcel.setValue(row, 3, getBigDecimal(tLDVo.get("F2")), "_-* #,##0_-;-* #,##0_-;_-* \"-\"??_-;_-@_-", "R");
 				// 法拍及火險費用
-				foreclosureFire = tLDVo.get("F3") == null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3"));
-				makeExcel.setValue(row, 4, foreclosureFire.equals(BigDecimal.ZERO) ? "  -  " : foreclosureFire, "#,##0", "R");
+				// format: show - if 0
+				makeExcel.setValue(row, 4, getBigDecimal(tLDVo.get("F3")), "_-* #,##0_-;-* #,##0_-;_-* \"-\"??_-;_-@_-", "R");
 				// 三項總計
-				total = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4"));
-				makeExcel.setValue(row, 5, total, "#,##0", "R");
+				makeExcel.setValue(row, 5, getBigDecimal(tLDVo.get("F4")), "#,##0", "R");
 				// 逾期繳款天數
-				days = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F5"));
-				makeExcel.setValue(row, 6, days, "##0", "R");
+				makeExcel.setValue(row, 6, getBigDecimal(tLDVo.get("F5")), "##0", "R");
 
 				// 換列
 				row++;
 
 			}
-
+		
+		makeExcel.formulaCaculate(1, 5);
+			
+		// 換去做 Sheet1
+		if (LDListTotal != null && !LDListTotal.isEmpty())
+		{
+			makeExcel.setSheet("Sheet1");
+			
+			row = 4; // 開始行, 1-based
+			
+			for (Map<String, String> tLDVo : LDListTotal)
+			{
+				// 日期
+				makeExcel.setValue(row, 1, tLDVo.get("F0"), "L");
+				// 31-60 天金額
+				makeExcel.setValue(row, 2, getBigDecimal(tLDVo.get("F1")), "#,##0", "R");
+				// 61-90 天金額
+				makeExcel.setValue(row, 3, getBigDecimal(tLDVo.get("F2")), "#,##0", "R");
+				// 合計
+				makeExcel.setValue(row, 4, getBigDecimal(tLDVo.get("F3")), "#,##0", "R");
+				
+				row++;
+			}
+		}
+		
 		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
-			makeExcel.formulaCaculate(5, 1);
 		}
 
 		long sno = makeExcel.close();

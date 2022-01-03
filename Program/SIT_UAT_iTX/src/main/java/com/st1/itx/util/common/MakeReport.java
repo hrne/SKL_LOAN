@@ -730,6 +730,7 @@ public class MakeReport extends CommBuffer {
 	}
 
 	public void printCm(double x, double y, String string) {
+
 		int xx = (int) Math.ceil(x / 2.54 * 72);
 		int yy = (int) Math.ceil(y / 2.54 * 72);
 		printXY(xx, yy, string, "L");
