@@ -179,8 +179,8 @@ public class AjaxController extends SysLogger {
 		long reportNo = Long.parseLong(Objects.isNull(_m.get("reportNo")) ? "0" : _m.get("reportNo").trim());
 //		String printer = Objects.isNull(_m.get("printer")) ? "" : _m.get("printer").trim();
 		String localIp = Objects.isNull(_m.get("localIp")) ? "" : _m.get("localIp").trim();
-		boolean isHasPrt = true;
-		boolean isHasPrtIp = true;
+		String prt = "";
+		String prtIp = "";
 		int pageNo = 1;
 
 		MakeReport makeReport = MySpring.getBean("makeReport", MakeReport.class);
@@ -188,21 +188,21 @@ public class AjaxController extends SysLogger {
 		List<List<Map<String, ?>>> pLi = new ArrayList<List<Map<String, ?>>>();
 		while (true) {
 			try {
-				Map<String, ?> p = makeReport.toPrint(reportNo, pageNo++, localIp);
+				Map<String, ?> p = makeReport.toPrint(reportNo, pageNo, localIp);
 				if (p.get("printJson") != null)
 					pLi.add((List<Map<String, ?>>) p.get("printJson"));
 
 				this.info("morePage : " + "1".equals(p.get("morePage").toString()));
 				this.info("pageNo   : " + pageNo);
 
-				if (!Objects.isNull(p.get("ServerIp")) && p.get("ServerIp").toString().trim().isEmpty())
-					isHasPrtIp = false;
-
-				if (!Objects.isNull(p.get("Printer")) && p.get("Printer").toString().trim().isEmpty())
-					isHasPrt = false;
-
-				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100 || !isHasPrtIp || !isHasPrt)
+				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100)
 					break;
+
+				if (pageNo == 1) {
+					prt = (String) p.get("Printer");
+					prtIp = (String) p.get("ServerIp");
+				}
+				pageNo++;
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
@@ -215,17 +215,19 @@ public class AjaxController extends SysLogger {
 		if (map.get("success") == null)
 			map.put("success", true);
 
-		if (!isHasPrtIp) {
+		if (Objects.isNull(prtIp) || prtIp.isEmpty()) {
 			map.put("success", false);
 			map.put("msg", "請設定印表機服務IP");
 		}
 
-		if (!isHasPrt) {
+		if (Objects.isNull(prt) || prt.isEmpty()) {
 			map.put("success", false);
 			String msg = Objects.isNull(map.get("msg")) ? "" : (String) map.get("msg");
 			map.put("msg", msg + "請設定印表機");
 		}
 
+		map.put("ServerIp", prtIp);
+		map.put("Printer", prt);
 		map.put("pageNo", pageNo);
 		map.put("printList", pLi);
 		ResponseEntity<String> result = null;

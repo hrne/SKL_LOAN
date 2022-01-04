@@ -2365,6 +2365,9 @@ public class MakeReport extends CommBuffer {
 	public HashMap<String, Object> toPrint(long pdfno, int pageno, String localIp) throws LogicException {
 		this.info("MakeReport.toPrint = " + pdfno + "/" + pageno + "/" + localIp);
 
+		if (pageno == 0)
+			pageno = 1;
+
 		TxFile tTxFile = txFileService.findById(pdfno);
 
 		if (tTxFile == null) {
@@ -2382,14 +2385,11 @@ public class MakeReport extends CommBuffer {
 
 		String ServerIp = "";
 		String Printer = "";
-		TxPrinter txPrinter = txPrinterService.findById(txPrinterId, titaVo);
+
+		TxPrinter txPrinter = txPrinterService.findById(txPrinterId);
 		if (txPrinter != null) {
 			ServerIp = txPrinter.getServerIp();
 			Printer = txPrinter.getPrinter();
-		}
-
-		if (pageno == 0) {
-			pageno = 1;
 		}
 
 		List<HashMap<String, Object>> pMap = new ArrayList<HashMap<String, Object>>();
