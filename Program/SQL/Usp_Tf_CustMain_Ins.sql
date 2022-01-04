@@ -135,9 +135,19 @@ BEGIN
           ,'N'                            AS "IsSuspectedCheckType"-- 是否為金控疑似準利害關係人_確認狀態 VARCHAR2 1 
           ,0                              AS "DataStatus"          -- 資料狀態 DECIMAL 1 
           ,0                              AS "TypeCode"            -- 建檔身分別 DECIMAL 1 
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
+          -- 2022-01-04 智偉修改:若原檔案的建檔日期有值,使用該值,否則用轉換時的日期
+          ,CASE
+             WHEN CUSP."CUSCDT" > 0
+             THEN TO_DATE(CUSP."CUSCDT",'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          -- 2022-01-04 智偉修改:若原檔案的建檔日期有值,使用該值,否則用轉換時的日期
+          ,CASE
+             WHEN CUSP."CUSMDT" > 0
+             THEN TO_DATE(CUSP."CUSMDT",'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "CU$CUSP" CUSP
     LEFT JOIN "CU$CUAP" CUAP ON CUAP."CUSID1" = CUSP."CUSID1"

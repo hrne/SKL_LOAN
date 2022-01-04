@@ -181,10 +181,10 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6403;text=複製;ntxbuf=#OBUF3})
 E(0,4)
 
 #OBUF4=X,65,S
-T(2,L6403+#OAuthNo)
+T(2,L6403+CODE:+#OAuthNo)
 
 #OBTN4=X,4,S
-C(3,#OLog,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF4}))
+BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF4})
 </sub>
 
 
@@ -207,7 +207,6 @@ TXFORM=L6043
 #OBranchNo
 #OBranchItem
 #OLevelFg
-#OLog
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

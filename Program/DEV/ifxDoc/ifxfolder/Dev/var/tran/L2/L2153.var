@@ -386,27 +386,27 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 #BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
 #BTN2=X,15,I,ui:button;value:申請案件查詢;enable:0;tabbable:0;title:L2010 申請案件明細資料查詢;
 !#BTN3=X,15,I,ui:button;value:行庫資料查詢;enable:1;tabbable:0;title: L6071 行庫資料查詢;
-#BTN11=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BTN12=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BTN13=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BTN14=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-! #BTN15=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BTN16=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BTN17=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
+#BTN11=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN12=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN13=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN14=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+! #BTN15=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN16=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN17=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BTN18=X,15,I,ui:button;value:協辦人員等級查詢;enable:1;tabbable:0;title:L5022 協辦人員等級明細資料查詢 ;
 
 #BIND11A=X,1,S
-BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF11A;ntxbuf5=type<-1:Introducer<-OOEmployeeNo})
+BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF11A;ntxbuf5=type<-1:Introducer<-OOEmployeeNo})
 #BIND12A=X,1,S
-BIND(#BTN12,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF12A;ntxbuf5=type<-1:FireOfficer<-OOEmployeeNo})
+BIND(#BTN12,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF12A;ntxbuf5=type<-1:FireOfficer<-OOEmployeeNo})
 #BIND13A=X,1,S
-BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF13A;ntxbuf5=type<-1:Estimate<-OOEmployeeNo})
+BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF13A;ntxbuf5=type<-1:Estimate<-OOEmployeeNo})
 #BIND14A=X,1,S
-BIND(#BTN14,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF14A;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo})
+BIND(#BTN14,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF14A;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo})
 #BIND16A=X,1,S
-BIND(#BTN16,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF16A;ntxbuf5=type<-1:BusinessOfficer<-OOEmployeeNo})
+BIND(#BTN16,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF16A;ntxbuf5=type<-1:BusinessOfficer<-OOEmployeeNo})
 #BIND17A=X,1,S
-BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF17A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
+BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF17A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
 #BIND18A=X,1,S
 BIND(#BTN18,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BUF18A;ntxbuf5=type<-1:Coorgnizer<-OOEmpNo:CoorgnizerX<-OOFullname})
 
@@ -2020,7 +2020,7 @@ T(3,      Y)
 T(2,#Introducer+Y)
 
 #BIND11B=X,1,S
-BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF11B;ntxbuf5=type<-1:Introducer<-OOEmployeeNo})
+BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF11B;ntxbuf5=type<-1:Introducer<-OOEmployeeNo})
 
 #SendL2r08A=X,1,S
 C(4,#Introducer,S,$)
@@ -2059,7 +2059,7 @@ T(3,      Y)
 T(2,#FireOfficer+Y)
 
 #BIND12B=X,1,S
-BIND(#BTN12,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF12B;ntxbuf5=type<-1:FireOfficer<-OOEmployeeNo})
+BIND(#BTN12,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF12B;ntxbuf5=type<-1:FireOfficer<-OOEmployeeNo})
 
 #SendL2r08B=X,1,S
 C(4,#FireOfficer,S,$)
@@ -2086,7 +2086,7 @@ T(3,      Y)
 T(2,#Estimate+Y)
 
 #BIND13B=X,1,S
-BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF13B;ntxbuf5=type<-1:Estimate<-OOEmployeeNo})
+BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF13B;ntxbuf5=type<-1:Estimate<-OOEmployeeNo})
 
 #SendL2r08C=X,1,S
 C(4,#Estimate,S,$)
@@ -2114,7 +2114,7 @@ T(3,      Y)
 T(2,#CreditOfficer+Y)
 
 #BIND14B=X,1,S
-BIND(#BTN14,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF14B;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo})
+BIND(#BTN14,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF14B;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo})
 
 #SendL2r08D=X,1,S
 C(4,#CreditOfficer,S,$)
@@ -2142,7 +2142,7 @@ T(3,      Y)
 T(2,#BusinessOfficer+Y)
 
 #BIND16B=X,1,S
-BIND(#BTN16,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF16B;ntxbuf5=type<-1:BusinessOfficer<-OOEmployeeNo})
+BIND(#BTN16,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF16B;ntxbuf5=type<-1:BusinessOfficer<-OOEmployeeNo})
 
 #SendL2r08F=X,1,S
 C(4,#BusinessOfficer,S,$)
@@ -2186,7 +2186,7 @@ C(3,#ApprovedLevel,9,S,$)
 T(2,#Supervisor+Y)
 
 #BIND17B=X,1,S
-BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF17B;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
+BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF17B;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
 
 #SendL2r08G=X,1,S
 C(4,#Supervisor,S,$)

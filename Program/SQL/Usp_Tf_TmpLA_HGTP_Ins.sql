@@ -55,7 +55,7 @@ BEGIN
                     -- AND NVL(S2.CUSCIF,0) <> 0 -- 2021-04-06 智偉修改: 放寬條件
                     AND NVL(S3.LMSACN,0) <> 0
                     AND S1.GDRID1 = 1
-                    AND S1.GDRNUM2 = 0
+                    AND S1.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
                   GROUP BY S1.LGTCIF
                           ,TRANSLATE(S1.HGTAD3,'一二三四五六七八九－','１２３４５６７８９之')
                           ,NVL(S1.HGTAD1,' ')
@@ -74,7 +74,7 @@ BEGIN
                          AND NVL(SS1.LGTCIF,0) <> 0
                         --  AND NVL(SS2.cuscif,0) <> 0 -- 2021-04-06 智偉修改: 放寬條件 只需要有LGTCIF不存在於客戶主檔也進來
                          AND NVL(SS3.LMSACN,0) <> 0
-                         AND SS1.GDRNUM2 = 0
+                         AND SS1.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
                      ) S2 on S2.LGTCIF = S1.LGTCIF
                          AND (  -- 地址相同
                              TRANSLATE(S2.HGTAD3,'一二三四五六七八九－','１２３４５６７８９之') = S1.HGTAD3 -- 門牌地址
@@ -146,7 +146,7 @@ BEGIN
            WHERE NVL(S3.LMSACN,0) <> 0
              AND S1.GDRID1 = 1
              AND NVL(S1.LGTADR,' ') = ' '
-             AND S1.GDRNUM2 = 0
+             AND S1.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
          ) S1
         , "GetGroupNoMax" M
     ;
@@ -186,7 +186,7 @@ BEGIN
     ,(SELECT MAX("GroupNo") AS "MaxGroupNo"
       FROM "TmpLA$HGTP"
      ) S6
-    WHERE S1.GDRNUM2 > 0 -- 有被設定過唯一性
+    WHERE S1.GDRNUM2 > 0 -- 新光做過唯一性處理的直接寫入
       AND S1.GDRID1 = 1 -- 只取房地
       AND S2.GDRID1 IS NULL -- 未被寫入唯一性處理工作檔
     ;
@@ -216,7 +216,8 @@ BEGIN
            LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
                                     AND S2.GDRMRK = 1 -- 組長
                                     AND S2.LGTCIF = S1.LGTCIF
-           WHERE S1.GDRNUM2 > 0 -- 有被設定過唯一性
+                                    AND S2.HGTCIP = NVL(S1.HGTCIP,0)
+           WHERE S1.GDRNUM2 > 0 -- 新光做過唯一性處理的直接寫入
              AND S1.GDRMRK = 0
           ) SC1
     ON (    SC1."LMSACN"  = T1."LMSACN"
@@ -246,6 +247,7 @@ BEGIN
            FROM "TmpLA$HGTP" S1 -- 組員
            LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
                                     AND S2.GDRMRK = 1 -- 組長
+                                    AND S2.HGTCIP = NVL(S1.HGTCIP,0)
            WHERE S1.GDRNUM2 > 0 -- 有被設定過唯一性
              AND S1.GDRMRK = 0
              AND S1."GroupNo" IS NULL

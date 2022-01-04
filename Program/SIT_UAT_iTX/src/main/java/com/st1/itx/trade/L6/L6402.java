@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -34,7 +35,8 @@ public class L6402 extends TradeBuffer {
 	DateUtil dDateUtil;
 	@Autowired
 	Parse parse;
-
+	@Autowired
+	public DataLog dataLog;
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6402 ");
@@ -68,10 +70,16 @@ public class L6402 extends TradeBuffer {
 			}
 			try {
 				if ("2".equals(iFunCode)) {
+					TxTranCode tTxTranCode2 = (TxTranCode) dataLog.clone(tTxTranCode);
+					
 					tTxTranCode = MoveToDb(iTranNo, tTxTranCode, titaVo);
 					tTxTranCode.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 					tTxTranCode.setLastUpdateEmpNo(titaVo.getTlrNo());
-					txTranCodeService.update(tTxTranCode);
+					txTranCodeService.update2(tTxTranCode,titaVo);
+					
+					dataLog.setEnv(titaVo, tTxTranCode2, tTxTranCode); ////
+					dataLog.exec("修改交易控制檔"); ////
+					
 				} else if ("4".equals(iFunCode)) {
 					txTranCodeService.delete(tTxTranCode);
 				}

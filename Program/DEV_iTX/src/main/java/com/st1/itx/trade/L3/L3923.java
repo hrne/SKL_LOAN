@@ -53,7 +53,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3923")
 @Scope("prototype")
 public class L3923 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3923.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -136,7 +135,8 @@ public class L3923 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 400; // 100 + 122 * 500 = 48900
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -156,21 +156,26 @@ public class L3923 extends TradeBuffer {
 			wkPayIntDate = ln.getPrevPayIntDate() == 0 ? ln.getSpecificDate() : ln.getPrevPayIntDate();
 
 			if (iEntryDate > wkPayIntDate) {
-				wkTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
+				wkTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+						ln.getSpecificDd(), iEntryDate);
 				if (wkTermNo > 0) {
-					wkPayIntDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), wkTermNo, ln.getMaturityDate());
+					wkPayIntDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+							ln.getSpecificDd(), wkTermNo, ln.getMaturityDate());
 				}
 			}
 
 			// 以新指定基準日期計算至應繳日的期數
 			wkNextPayIntDate = wkNewSpecificDate;
-			wkTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), wkNewSpecificDate, iNewSpecificDd, wkPayIntDate);
+			wkTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), wkNewSpecificDate, iNewSpecificDd,
+					wkPayIntDate);
 			if (wkTermNo > 0) {
-				wkNextPayIntDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), wkNewSpecificDate, iNewSpecificDd, wkTermNo, ln.getMaturityDate());
+				wkNextPayIntDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), wkNewSpecificDate,
+						iNewSpecificDd, wkTermNo, ln.getMaturityDate());
 			}
 			// 如新應繳日 < 原應繳日，則期數 + 1;
 			if (wkNextPayIntDate < wkPayIntDate) {
-				wkNextPayIntDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), wkNewSpecificDate, iNewSpecificDd, wkTermNo + 1, ln.getMaturityDate());
+				wkNextPayIntDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), wkNewSpecificDate,
+						iNewSpecificDd, wkTermNo + 1, ln.getMaturityDate());
 			}
 			// 計算應繳金額
 			loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, wkNextPayIntDate, 1, iEntryDate, titaVo);
@@ -185,12 +190,14 @@ public class L3923 extends TradeBuffer {
 			oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
 
 			// 重算期金(log only)
-			wkRestPeriod = loanCom.getTermNo(1, ln.getFreqBase(), ln.getRepayFreq(), wkNextPayIntDate, iNewSpecificDd, ln.getMaturityDate());
+			wkRestPeriod = loanCom.getTermNo(1, ln.getFreqBase(), ln.getRepayFreq(), wkNextPayIntDate, iNewSpecificDd,
+					ln.getMaturityDate());
 
 			//
 			wkGracePeriod = ln.getRepaidPeriod() > 0 ? 0 : ln.getGracePeriod();
-			wkDueAmt = loanDueAmtCom.getDueAmt(loanCalcRepayIntCom.getLoanBal(), loanCalcRepayIntCom.getStoreRate(), ln.getAmortizedCode(), ln.getFreqBase(), wkRestPeriod, wkGracePeriod,
-					ln.getPayIntFreq(), ln.getFinalBal(), titaVo);
+			wkDueAmt = loanDueAmtCom.getDueAmt(loanCalcRepayIntCom.getLoanBal(), loanCalcRepayIntCom.getStoreRate(),
+					ln.getAmortizedCode(), ln.getFreqBase(), wkRestPeriod, wkGracePeriod, ln.getPayIntFreq(),
+					ln.getFinalBal(), titaVo);
 			this.info("   wkOldSpecificDate = " + ln.getSpecificDate());
 			this.info("   wkNewSpecificDate = " + wkNewSpecificDate);
 			this.info("   wknewPayIntDate = " + iNewPayIntDate);
@@ -227,8 +234,10 @@ public class L3923 extends TradeBuffer {
 		this.totaVo.putParam("OIntStartDate", oIntStartDate == 9991231 ? 0 : oIntStartDate);
 		this.totaVo.putParam("OIntEndDate", oIntEndDate);
 		this.totaVo.putParam("ORate", oRate);
+		this.totaVo.putParam("OPrincipal", oPrincipal); // 本金
 		this.totaVo.putParam("OInterest", oInterest);
 		this.totaVo.putParam("ODelayInt", oDelayInt);
+		this.totaVo.putParam("OBreachAmt", oBreachAmt); // 違約金
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OShortfallInt", baTxCom.getShortfallInterest());
 		this.totaVo.putParam("OShortfallPrin", baTxCom.getShortfallPrincipal());

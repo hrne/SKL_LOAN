@@ -50,7 +50,7 @@ public class L9711Report2 extends MakeReport {
 	public TxBuffer txBuffer;
 
 	String ENTDY = "";
-
+	Boolean printtimes = false ;
 	@Override
 	public void printHeader() {
 
@@ -84,19 +84,30 @@ public class L9711Report2 extends MakeReport {
 				if (f4.equals(tL9711Vo.get("F4")) && f5.equals(tL9711Vo.get("F5"))) {
 
 					report(tL9711Vo, txbuffer);
+					if(printtimes) {
+						count++;
+					}
 
 				} else {
 					if (count != 0) {
 						this.newPage();
+						count = 0;
 					}
+					printtimes = false;
 					report(tL9711Vo, txbuffer);
-
+					if(printtimes) {
+						count++;
+					}
 				}
-				count++;
 				f4 = tL9711Vo.get("F4");
 				f5 = tL9711Vo.get("F5");
 
+			} // for 
+			
+			if(count == 0) {
+				this.printCm(1, 4, "*******    查無資料   ******");
 			}
+ 
 		} else {
 			this.info("L9711List.reportEmpty");
 			reportEmpty();
@@ -266,6 +277,8 @@ public class L9711Report2 extends MakeReport {
 			if (UnPaidAmt == 0) {
 				continue;
 			}
+			
+			printtimes = true;
 			if (excessive < 0) {
 				UnPaidAmt = UnPaidAmt - excessive;
 				excessive = 0;

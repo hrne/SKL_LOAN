@@ -235,7 +235,7 @@ T(H,#FeeCode,#FeeCodeHelp)
 T(2,      Y)
 
 #BIND1=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF1;ntxbuf5=type<-1:LegalStaff<-OOEmployeeNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF1;ntxbuf5=type<-1:LegalStaff<-OOEmployeeNo})
 
 !法務人員 必須輸入
 #LegalStaff=X,6,I

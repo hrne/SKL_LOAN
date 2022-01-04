@@ -9,7 +9,7 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,164)ASGN(INQHD$)
+E(0,196)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -65,7 +65,7 @@ T(3,@FdRptFg,*)
 #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
 #BTN4=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
 #BUF1=X,42,S
-HIDE(#BTN1,#BTN2,#BTN3)
+HIDE(#BTN1,#BTN2,#BTN3,#BTN4)
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -114,23 +114,22 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 !借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
-#CustNo=A,7,I
+#CustNo=X,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
 C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,3,1)
-SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+SHOW(#BTN1)HIDE(#BTN2,#BTN3,#BTN4)
+@
+HIDE(#BTN1)
 
-#WKBTN1=X,1,S
-! C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
+#CustNo2=A,7,S
+C(4,#CustNo,S,$)
+E(0,#CustNo)
+T(2,@CustNo,#CustNo2)
 
-#BUF1B=X,18,S
-T(2,#CustNo+9999999000)
-
-#BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:TimCustNo<-OOCustNo:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
 
 #SendL2r07A=X,1,S
-C(3,#CustNo,0,S,$)
+C(4,#CustNo,S,$)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07A,L2R07)
@@ -138,7 +137,7 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #CustNoX=X,100,L
-C(3,#CustNo,0,S,T(2,#L2r07CustName))
+C(4,#CustNo,S,T(2,#L2r07CustName))
 
 #BUF2A=X,100,S
 
@@ -150,10 +149,13 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<
 
 #CustId=X,10,I
 T(3,@FdApplNo, )
-C(3,#CustNo,0,$,s)
-! INVOKEJS(SHOW,p1,2,3,1)
-SHOW(#BTN2)HIDE(#BTN3)
-@C(4,#CustId,S,$)V(7)
+C(4,#CustNo,$,s)
+SHOW(#BTN2)HIDE(#BTN1,#BTN3,#BTN4)
+@
+HIDE(#BTN2)
+C(4,#CustId,S,$)
+V(7)
+A(ID_UNINO,0,#CustId)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -165,9 +167,6 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<
 C(4,#CustId,S,$)
 A(ID_UNINO,0,#CustId)
 
-#WKBTN2=X,1,S
-C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
-! C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,3,0))
 
 #SendL2r07B=X,1,S
 C(4,#CustId,S,$)
@@ -189,25 +188,25 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<
 
 ![核准編號]
 #FdApplNo=X,2,L
-C(3,#CustNo,0,$,S)
+C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 T(3,*)
 
-#ApplNo=A,7,I
-C(3,#CustNo,0,$,S)
+#ApplNo=X,7,I
+C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 ! INVOKEJS(SHOW,p1,3,3,1)
-SHOW(#BTN3)
-@C(3,#ApplNo,0,V(P,需擇一輸入),$)
+SHOW(#BTN3)HIDE(#BTN1,#BTN2,#BTN4)
+@
+C(3,#ApplNo,0,V(P,需擇一輸入),$)
+HIDE(#BTN3)
 
-#WKBTN3=X,1,S
-C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
+#ApplNo2=A,7,S
+C(4,#ApplNo,S,$)
+E(0,#ApplNo)
+T(2,@ApplNo,#ApplNo2)
 
-#BUF3B=X,18,S
-T(2,#ApplNo+99999990)
 
-#BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
 
 #HIDEALLBTN=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -215,7 +214,7 @@ HIDE(#BTN1,#BTN2,#BTN3)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
-C(3,#ApplNo,0,S,$)
+C(4,#ApplNo,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,0)
@@ -235,13 +234,13 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
 R(1,L2R07)
 
 #ApplNoX=X,100,L
-C(3,#ApplNo,0,S,T(2,#L2r07CustName))
+C(4,#ApplNo,S,T(2,#L2r07CustName))
 
 #TimCustNo=A,7,S
 E(0,0)
-C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
-C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+C(4,#ApplNo,$,E(0,#L2r05CustNo))
 
 #BUF4A=X,50,S
 T(2,0000000+#CustNo+#CustId+#ApplNo+000)
@@ -252,13 +251,15 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<
 ![額度編號]
 !可不輸入
 #FdFacmNo=X,2,L
-C(3,#ApplNo,0,T(3,*)T(F,@FacmNo,1),T(3, )T(F,@FacmNo,0))
+C(4,#ApplNo,T(3,*)T(F,@FacmNo,1),T(3, )T(F,@FacmNo,0))
 
 #FacmNo=A,3,I
 C(3,#CHAIN,1,T(1,#NTXBUF,13,3),$)
 C(3,#CHAIN,1,s,$)
-C(3,#ApplNo,0,$,s)
+C(4,#ApplNo,$,s)
+SHOW(#BTN4)
 @V(2,0)
+HIDE(#BTN4)
 
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
@@ -453,9 +454,9 @@ E(0,#FacmNo)
 E(0,#BormNo)
 
 #OCustNoX=X,100,L
-C(3,#CustNo,0,$,T(2,#CustNoX))
+C(4,#CustNo,$,T(2,#CustNoX))
 C(4,#CustId,$,T(2,#CustIdX))
-C(3,#ApplNo,0,$,T(2,#ApplNoX))
+C(4,#ApplNo,$,T(2,#ApplNoX))
 
 #OCurrencyCode=X,3,S
 T(2,#CurrencyCode)
@@ -479,6 +480,11 @@ X(#ORate)
 T(B,#ORateX+%)
 P(L,#ORateX)
 
+#OPrincipal=m,14.2,S
+
+#OPrincipalX=X,22,L
+CALL2(#ADJUSTDOT,#PRECISION,#OPrincipal,#OPrincipalX)
+
 #OInterest=m,14.2,S
 
 #OInterestX=X,22,L
@@ -488,6 +494,11 @@ CALL2(#ADJUSTDOT,#PRECISION,#OInterest,#OInterestX)
 
 #ODelayIntX=X,22,L
 CALL2(#ADJUSTDOT,#PRECISION,#ODelayInt,#ODelayIntX)
+
+#OBreachAmt=m,14.2,S
+
+#OBreachAmtX=X,22,L
+CALL2(#ADJUSTDOT,#PRECISION,#OBreachAmt,#OBreachAmtX)
 
 #OShortfall=m,14.2,S
 
@@ -632,7 +643,11 @@ P(R,#OOLoanBalX)
 
 TXFORM=L3923
 #OLoanBal#OIntStartDate#OIntEndDate#ORate
-#OInterest#ODelayInt#OShortfall#OShortfallInt#OShortfallPrin#OShortCloseBreach
+#OPrincipal
+#OInterest
+#ODelayInt
+#OBreachAmt
+#OShortfall#OShortfallInt#OShortfallPrin#OShortCloseBreach
 #OExcessive#OTempTax
 #OOFacmNo#OOBormNo#OOIntStartDate#OOIntEndDate#OOAmount#OORate
 #OOPrincipal#OOInterest#OODelayInt#OOBreachAmt#OOLoanBal
@@ -653,8 +668,10 @@ TXFORM=L3923
 ["@放款餘額",#OLoanBalX],
 ["@計息期間",#OIntStartDate,"@-",#OIntEndDate],
 ["@利率",#ORateX],
+[#<->#,"@本金",#OPrincipalX],
 [#<->#,"@利息",#OInterestX],
 [#<->#,"@延遲息",#ODelayIntX],
+[#<->#,"@違約金",#OBreachAmtX],
 [#<->#,"@累短收",#OShortfallX,#OShortfallXX],
 [#<->#,"@累溢收",#OExcessiveX],
 [#<->#,"@暫付所得稅",#OTempTaxX],
@@ -703,14 +720,20 @@ TXFORM=L3923
 ^
 
 <include src="PRT.icf::INQ01.sel" map="i=L3923;cpi=15"/>
-#TimCustNo#FacmNo#BormNo#CustNoX#CurrencyCode
-#OLoanBalX#OIntStartDate#OIntEndDate#ORateX
+#OCustNo#OFacmNo#OBormNo#OCustNoX
+#CurrencyCode
+#OLoanBalX
+#OIntStartDate#OIntEndDate
+#ORateX
+#OPrincipalX
 #OInterestX
+#ODelayIntX
+#OBreachAmtX
 #OShortfallX#OShortfallXX
 #OExcessiveX
 #OTempTaxX
 #OSumX
 %
-#OOFacmNo#OOBormNo#OOIntStartDate#OOIntEndDate#OOAmountX#OORateX#OOInterestX
+#OOFacmNo#OOBormNo#OOIntStartDate#OOIntEndDate#OOAmountX#OORateX#OOPrincipalX#OOInterestX#OODelayIntX#OOBreachAmtX#OOLoanBalX
 @^
 </sub>

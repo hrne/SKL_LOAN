@@ -210,6 +210,12 @@ T(2,#OFunc5+#OTlrNo)
 #OBTN5=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6401;text=查詢;ntxbuf=#OBUF5})
 
+#OBUF6=X,65,S
+T(2,L6401+CODE:+#OTlrNo)
+
+#OBTN6=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6})
+
 ! 修改的按鈕
 #OFunc2=A,1,S
 E(0,2)
@@ -291,6 +297,9 @@ TXFORM=L6041
 
 #OBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:#OBTN5',align:'center',canExport:false}
+
+#OBTN6=歷程
+{width:50,search:false,formatter:'cust:bind-button:#OBTN6',align:'center',canExport:false}
 
 #OTlrNo=使用者
 {width:70,align:'center'}

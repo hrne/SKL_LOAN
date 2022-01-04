@@ -76,19 +76,14 @@ public class L6043 extends TradeBuffer {
 		} else {
 			for (TxAuthGroup tTxAuthGroup : lTxAuthGroup) {
 				OccursList occursList = new OccursList();
-				int log =0;
+
 				occursList.putParam("OAuthNo", tTxAuthGroup.getAuthNo());
 				occursList.putParam("OAuthItem", tTxAuthGroup.getAuthItem());
 				occursList.putParam("ODesc", tTxAuthGroup.getDesc());
 				occursList.putParam("OBranchNo", tTxAuthGroup.getBranchNo());
 				occursList.putParam("OBranchItem", getBranchItem(tTxAuthGroup.getBranchNo().trim(), titaVo));
 				occursList.putParam("OLevelFg", tTxAuthGroup.getLevelFg());
-				this.info("CreateDate="+tTxAuthGroup.getCreateDate());
-				this.info("LastUpdate="+tTxAuthGroup.getLastUpdate());
-				if(!tTxAuthGroup.getCreateDate().equals(tTxAuthGroup.getLastUpdate())) {
-					log = 1;
-				}
-				occursList.putParam("OLog", log);
+
 				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

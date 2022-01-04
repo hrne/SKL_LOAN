@@ -127,7 +127,7 @@ public class LQ006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        ,SUM(\"Interest\") \"Interest\" ";
 		sql += "                  FROM \"AcLoanInt\" ";
 		sql += "                  WHERE \"YearMonth\" = :inputYearMonth ";
-		sql += "                    AND \"IntStartDate\" = 0 ";
+		sql += "                    AND \"IntStartDate\" > 0 ";
 		sql += "                  GROUP BY \"YearMonth\" ";
 		sql += "                          ,\"CustNo\" ";
 		sql += "                          ,\"FacmNo\" ) ALI ON ALI.\"YearMonth\" = MFB.\"YearMonth\" ";

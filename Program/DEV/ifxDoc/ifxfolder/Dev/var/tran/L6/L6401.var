@@ -176,7 +176,7 @@ C(2,#CHAIN,$,C(3,#FunCode,1,$,s))
 @V(7)V(NL)V(8,6,6)
 
 #MRKEY=_,_,S
-T(2,#TlrNo)
+T(2,CODE:+#TlrNo)
 
 #RIM_L6R20=A,1,S
 RESET_RIM(#RIM_L6R20,L6R20)

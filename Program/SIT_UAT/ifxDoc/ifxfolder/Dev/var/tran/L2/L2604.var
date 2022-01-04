@@ -252,8 +252,6 @@ C(3,#FunCd,2,C(5,#OldCheck,Y,T(F,@TwSyndFee,0)T(F,@UsSyndFee,0)T(3,@FdSyndFee,),
 C(3,#checkClsFg,1,T(F,@TwSyndFee,0)T(F,@UsSyndFee,0),$)
 C(3,#checkClsFg,1,T(3,@FdSyndFee,),$)
 
-
-
 !借戶戶號 必須輸入
 #CustNo=A,7,I
 C(3,#FunCd,1,$,s)
@@ -270,7 +268,6 @@ T(2,@CustNoX,#L1r09CustName)
 
 #CustNoX=x,100,L
 
-
 ![額度編號]
 #FacmNo=A,3,I
 C(3,#FunCd,1,$,s)
@@ -286,7 +283,6 @@ E(0,@RimCaseNo,0)
 RESET_RIM(#SendL2r05A,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
-
 
 !費用項別
 #SyndFeeCode=X,2,I
@@ -314,6 +310,9 @@ C(5,#IsAllocation,N,INVOKEJS(SHOW,p1,6,6,0),INVOKEJS(SHOW,p1,6,6,1))
 C(5,#IsAllocation,N,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
 C(3,#FunCd,1,$,s)
 C(5,#IsAllocation,N,INVOKEJS(SHOW,p1,7,7,0),INVOKEJS(SHOW,p1,7,7,1))
+C(5,#IsAllocation,N,T(3,@FdSyndFeeYearMonth, )T(3,@FdAllocationFreq, ),T(3,@FdSyndFeeYearMonth,*)T(3,@FdAllocationFreq,*))
+
+
 
 !費用年月
 #SyndFeeYearMonth=A,5,I
@@ -325,11 +324,13 @@ A(YM,1,#SyndFeeYearMonth)
 #AllocationFreq=n,2,I
 C(3,#FunCd,1,$,s)
 C(5,#IsAllocation,N,S,$)
+@V(2,0)
 !攤提次數
 #AllocationTimes=n,2,I
 C(3,#FunCd,1,$,s)
 C(5,#IsAllocation,N,S,$)
 E(0,@OldAllocationTimes,#AllocationTimes)
+@V(2,0)
 
 #OldAllocationTimes=n,2,S
 

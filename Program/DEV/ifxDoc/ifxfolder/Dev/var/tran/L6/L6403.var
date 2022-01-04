@@ -1335,6 +1335,10 @@ HELP(#LevelHelp)
 #LevelFgX=X,4,L
 T(H,#LevelFg,#LevelHelp)
 
+!參考編號
+#MRKEY=_,_,S
+T(2,CODE:+#AuthNo)
+
 </sub>
 
 <sub type="DC" name="p1" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
