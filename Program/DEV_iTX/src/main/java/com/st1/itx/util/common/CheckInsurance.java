@@ -81,6 +81,7 @@ public class CheckInsurance extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("CheckInsurance run ... ");
 

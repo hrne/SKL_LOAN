@@ -13,7 +13,7 @@ E(0,43)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,154)ASGN(INQLEN$)
+E(0,157)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -482,11 +482,11 @@ T(H,#OOTitaHCode,#TitaHCodeHelp)
 !交易代號
 #OOTxCd=X,5,S
 
-#16sp=X,16,S
+#5sp=X,5,S
 
 !查詢
 #OOBUF1=X,61,S
-IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#16sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo))
+IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#5sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo))
 
 #OOchain=X,5,S
 IF(#OOTxCd=="L3701",T(3,L6932),T(3,L3912))

@@ -90,8 +90,8 @@ public class FormatUtil {
 	public static void dumpMap(HashMap<String, String> map) {
 		Iterator<String> iter = map.keySet().iterator();
 		while (iter.hasNext()) {
-			String k = (String) iter.next();
-			String v = (String) map.get(k);
+			String k = iter.next();
+			String v = map.get(k);
 			if (ThreadVariable.isLogger())
 				logger.info(FilterUtils.escape(k + ":" + v));
 		}

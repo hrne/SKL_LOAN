@@ -47,16 +47,12 @@ public class LB207ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB207 授信戶基本資料檔
-		sql = "SELECT M.\"TranCode\"" + "     , M.\"BankItem\"" + "     , M.\"Filler3\"" + "     , M.\"DataDate\""
-				+ "     , M.\"CustId\"" + "     , M.\"CustName\"" + "     , M.\"EName\"" + "     , M.\"Birthday\""
-				+ "     , M.\"RegAddr\"" + "     , M.\"CurrZip\"" + "     , M.\"CurrAddr\"" + "     , M.\"Tel\""
-				+ "     , M.\"Mobile\"" + "     , M.\"Filler14\"" + "     , M.\"EduCode\"" + "     , M.\"OwnedHome\""
-				+ "     , M.\"CurrCompName\"" + "     , M.\"CurrCompId\"" + "     , M.\"JobCode\""
-				+ "     , M.\"CurrCompTel\"" + "     , M.\"JobTitle\"" + "     , M.\"JobTenure\""
-				+ "     , M.\"IncomeOfYearly\"" + "     , M.\"IncomeDataDate\"" + "     , M.\"Sex\""
-				+ "     , M.\"NationalityCode\"" + "     , M.\"PassportNo\"" + "     , M.\"PreTaxNo\""
-				+ "     , M.\"FullCustName\"" + "     , M.\"Filler30\"" + " FROM  \"JcicB207\" M"
-				+ " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"BankItem\", M.\"CustId\" ";
+		sql = "SELECT M.\"TranCode\"" + "     , M.\"BankItem\"" + "     , M.\"Filler3\"" + "     , M.\"DataDate\"" + "     , M.\"CustId\"" + "     , M.\"CustName\"" + "     , M.\"EName\""
+				+ "     , M.\"Birthday\"" + "     , M.\"RegAddr\"" + "     , M.\"CurrZip\"" + "     , M.\"CurrAddr\"" + "     , M.\"Tel\"" + "     , M.\"Mobile\"" + "     , M.\"Filler14\""
+				+ "     , M.\"EduCode\"" + "     , M.\"OwnedHome\"" + "     , M.\"CurrCompName\"" + "     , M.\"CurrCompId\"" + "     , M.\"JobCode\"" + "     , M.\"CurrCompTel\""
+				+ "     , M.\"JobTitle\"" + "     , M.\"JobTenure\"" + "     , M.\"IncomeOfYearly\"" + "     , M.\"IncomeDataDate\"" + "     , M.\"Sex\"" + "     , M.\"NationalityCode\""
+				+ "     , M.\"PassportNo\"" + "     , M.\"PreTaxNo\"" + "     , M.\"FullCustName\"" + "     , M.\"Filler30\"" + " FROM  \"JcicB207\" M" + " WHERE M.\"DataYM\" = :dateMonth "
+				+ " ORDER BY M.\"BankItem\", M.\"CustId\" ";
 
 		this.info("sql=" + sql);
 
@@ -68,7 +64,7 @@ public class LB207ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB207.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth); 
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

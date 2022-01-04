@@ -2077,7 +2077,7 @@ TXFORM=L3912
 ["@欠繳利息",#OUnpaidInterestX],["@結案區分",#OCaseCloseCode,#OCaseCloseCodeX],
 ["@欠繳本金",#OUnpaidPrinciPalX],["@匯款分行",#ORemitBank,#ORemitBankX],
 [#CloseBreachX,#OUnpaidAmt],["@匯款帳號",#ORemitAcctNo],
-["@溢短收",#OShortFallX],["@累溢短收",#OOverflowX],
+["@短收金額",#OShortFallX],["@溢收金額",#OOverflowX],
 ["@主管編號",#OSupperNo,#OSupperNoX],["@減免金額",#OReduceAmt],
 ["@作業日期",#OTxDate,#OTxTimeX],["@免印花稅金額",#OStampFreeAmtX],
 ["@批次號碼",#OBatchNo],["@匯款序號",#ORemitSeq],
@@ -2256,7 +2256,7 @@ TXFORM=L3912
 ["@延遲息",#L3410DelayIntX],["@法務費",#L3420LawFeeX],
 ["@違約金",#L3410BreachAmtX],["@清償違約金",#L3200CloseBreachAmtX],
 ["@累溢短收",#L3410OverflowX],["@主管編號",#L3410SupperNo,#L3410SupperNoX],
-["@法拍費用",#L3410LawFeeX],["@作業日期",#L3410TxDate,#L3410TxTimeX],
+["@作業日期",#L3410TxDate,#L3410TxTimeX],
 ]
 </sub>
 

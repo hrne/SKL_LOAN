@@ -47,15 +47,11 @@ public class LB094ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB094 股票擔保品明細檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
-				+ "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\"" + "     , M.\"EvaAmt\""
-				+ "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\""
-				+ "     , M.\"CompanyId\"" + "     , M.\"CompanyCountry\"" + "     , M.\"StockCode\""
-				+ "     , M.\"StockType\"" + "     , M.\"Currency\"" + "     , M.\"SettingBalance\""
-				+ "     , M.\"LoanBal\"" + "     , M.\"InsiderJobTitle\"" + "     , M.\"InsiderPosition\""
-				+ "     , M.\"LegalPersonId\"" + "     , M.\"DispPrice\"" + "     , M.\"Filler19\""
-				+ "     , M.\"JcicDataYM\"" + " FROM  \"JcicB094\" M" + " WHERE M.\"DataYM\" = :dateMonth "
-				+ " ORDER BY M.\"ClActNo\" ";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\""
+				+ "     , M.\"EvaAmt\"" + "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\"" + "     , M.\"CompanyId\"" + "     , M.\"CompanyCountry\""
+				+ "     , M.\"StockCode\"" + "     , M.\"StockType\"" + "     , M.\"Currency\"" + "     , M.\"SettingBalance\"" + "     , M.\"LoanBal\"" + "     , M.\"InsiderJobTitle\""
+				+ "     , M.\"InsiderPosition\"" + "     , M.\"LegalPersonId\"" + "     , M.\"DispPrice\"" + "     , M.\"Filler19\"" + "     , M.\"JcicDataYM\"" + " FROM  \"JcicB094\" M"
+				+ " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"ClActNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -67,7 +63,7 @@ public class LB094ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB094.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth); 
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

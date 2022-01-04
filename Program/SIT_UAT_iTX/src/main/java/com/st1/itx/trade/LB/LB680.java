@@ -28,7 +28,7 @@ public class LB680 extends BatchBase implements Tasklet, InitializingBean {
 	public LB680Report lb680Report;
 
 	@Autowired
-	DateUtil dDateUtil; 
+	DateUtil dDateUtil;
 
 	@Autowired
 	WebClient webClient;
@@ -49,15 +49,16 @@ public class LB680 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB680 active LB680 ");
 		this.info("LB680 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		String tranCode = "LB680";
-		String tranName = "「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔";
+		// String tranCode = "LB680";
+		// String tranName = "「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔";
 
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb680Report.exec(titaVo); // 使用月報資料庫
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-		
+		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
+		// "Y", "LC009", titaVo.getTlrNo(),
+		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+
 	}
 
 }

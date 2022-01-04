@@ -326,14 +326,14 @@ public class L3701 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		if (iPieceCodeY.equals("X") || iPieceCodeSecondY.equals("X") || (iPieceCodeSecondAmtY.equals("X")) && iBormNo == 0) {
+		if ((iPieceCodeY.equals("X") || iPieceCodeSecondY.equals("X") || (iPieceCodeSecondAmtY.equals("X"))) && iBormNo == 0) {
 			throw new LogicException(titaVo, "E0019", "變更計件代碼相關欄位需輸入撥款序號"); // E0019 輸入資料錯誤
 		}
 
 		if (iAcctCodeY.equals("X") && iBormNo != 0) {
 			throw new LogicException(titaVo, "E0019", "變更業務科目需全額度，請勿輸入撥款序號"); // E0019 輸入資料錯誤
 		}
-
+		this.info("iFacmOnlyFlag = " + iFacmOnlyFlag);
 		if (iFacmOnlyFlag.equals("Y")) {
 			FacmOnlyEntryNormalRoutine();
 		} else {
@@ -342,6 +342,7 @@ public class L3701 extends TradeBuffer {
 		if (wkTotaCount == 0) {
 			throw new LogicException(titaVo, "E3084", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無資料可內容變更
 		}
+
 		if (updFacMain == false && updLoanBorMain == false && updLoanOverdue == false) {
 			throw new LogicException(titaVo, "E3086", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 放款內容變更，必須至少變更一個項目
 		}

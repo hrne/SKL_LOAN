@@ -27,7 +27,8 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
-	//工作月
+
+	// 工作月
 	public List<Map<String, String>> wkSsn(TitaVo titaVo) {
 
 		String iENTDY = String.valueOf(titaVo.getEntDyI() + 19110000);
@@ -49,9 +50,9 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iday", iENTDY);
 		return this.convertToMap(query);
 	}
-	//放款審查
-	public List<Map<String, String>> findArea(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
+	// 放款審查
+	public List<Map<String, String>> findArea(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
 		int inputYear = Integer.parseInt(wkVo.get("F0"));
 
@@ -129,7 +130,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	//房貸部專
+	// 房貸部專
 	public List<Map<String, String>> setDeptSpecialist(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
 		int inputYear = Integer.parseInt(wkVo.get("F0"));
@@ -240,7 +241,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	//房貸專員
+	// 房貸專員
 	public List<Map<String, String>> findPfBsOfficer(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
 
 		int inputYear = Integer.parseInt(wkVo.get("F0"));
@@ -383,13 +384,13 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 		sql += " SELECT DENSE_RANK() OVER (ORDER BY tab2.\"t2sumPerfAmt\" DESC ) AS \"SEQ\" ";// F0
-		sql += "      , tab1.\"UnitItem\" ";//F1
-		sql += "      , tab1.\"DeptName\" ";//F2
-		sql += "      , tab1.\"BsName\" ";//F3
-		sql += "      , tab2.\"t2sumPerfCnt\" ";//F4
-		sql += "      , tab2.\"t2sumPerfAmt\" ";//F5
-		sql += "      , tab3.\"t3sumPerfCnt\" ";//F6
-		sql += "      , tab3.\"t3sumPerfAmt\" ";//F7
+		sql += "      , tab1.\"UnitItem\" ";// F1
+		sql += "      , tab1.\"DeptName\" ";// F2
+		sql += "      , tab1.\"BsName\" ";// F3
+		sql += "      , tab2.\"t2sumPerfCnt\" ";// F4
+		sql += "      , tab2.\"t2sumPerfAmt\" ";// F5
+		sql += "      , tab3.\"t3sumPerfCnt\" ";// F6
+		sql += "      , tab3.\"t3sumPerfAmt\" ";// F7
 		sql += " FROM ( SELECT DISTINCT ";
 		sql += "               CB.\"DeptManager\" ";
 		sql += "             , CE.\"Fullname\" AS \"DeptName\" ";
@@ -542,8 +543,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// 營管、營推、業推、業開、單位
-	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo, String deptCode)
-			throws Exception {
+	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo, String deptCode) throws Exception {
 		String sdeptCode = "";
 
 		int inputYear = Integer.parseInt(wkVo.get("F0"));
@@ -570,8 +570,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iWKe = inputYear + String.format("%02d", iMM);
 		}
 
-		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000"
-				|| deptCode == "A0X000") {
+		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000" || deptCode == "A0X000") {
 			sdeptCode = "'" + deptCode + "'";
 		} else {
 			sdeptCode = "'A0B000','A0F000','A0E000','A0M000'";
@@ -656,5 +655,5 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 
 	}
-	
+
 }

@@ -110,8 +110,7 @@ public class BS410 extends TradeBuffer {
 			initialFileVoOccursList();
 //TODO: 回銷檔名稱待訂
 			if (filename.indexOf("TEST") >= 0) {
-				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
+				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
 				this.info("回銷檔 Start With -> " + filePath1);
 
 				ArrayList<String> dataLineList1 = new ArrayList<>();
@@ -131,11 +130,9 @@ public class BS410 extends TradeBuffer {
 
 //		執行無誤者連結查詢清單
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4101", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4101", titaVo.getTlrNo(), sendMsg, titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4104", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4104", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);

@@ -80,6 +80,7 @@ public class BS600 extends TradeBuffer {
 		}
 		// 按分配順序排序
 		Collections.sort(lCdAcBook, new Comparator<CdAcBook>() {
+			@Override
 			public int compare(CdAcBook c1, CdAcBook c2) {
 				if (c1.getAssignSeq() != c2.getAssignSeq()) {
 					return c1.getAssignSeq() - c2.getAssignSeq();

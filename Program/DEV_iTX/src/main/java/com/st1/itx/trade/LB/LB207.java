@@ -28,7 +28,7 @@ public class LB207 extends BatchBase implements Tasklet, InitializingBean {
 	public LB207Report lb207Report;
 
 	@Autowired
-	DateUtil dDateUtil; 
+	DateUtil dDateUtil;
 
 	@Autowired
 	WebClient webClient;
@@ -49,15 +49,16 @@ public class LB207 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB207 active LB207 ");
 		this.info("LB207 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		String tranCode = "LB207";
-		String tranName = "授信戶基本資料檔";
+		// String tranCode = "LB207";
+		// String tranName = "授信戶基本資料檔";
 
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb207Report.exec(titaVo); // 使用月報資料庫
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-		
+		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
+		// "Y", "LC009", titaVo.getTlrNo(),
+		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+
 	}
 
 }

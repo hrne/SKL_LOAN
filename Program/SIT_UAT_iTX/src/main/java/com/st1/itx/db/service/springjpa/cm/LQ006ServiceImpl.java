@@ -23,7 +23,7 @@ public class LQ006ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -102,12 +102,12 @@ public class LQ006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entdy", entdy);
-		
+
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findTotal(TitaVo titaVo) throws Exception {
 		this.info("lQ006.findTotal");
 
@@ -141,7 +141,7 @@ public class LQ006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  GROUP BY \"YearMonth\" ";
 		sql += "                          ,\"CustNo\" ) MFBGroup ON MFBGroup.\"YearMonth\" = MFB.\"YearMonth\" ";
 		sql += "                                                AND MFBGroup.\"CustNo\"    = MFB.\"CustNo\" ";
-		sql += "      WHERE MFB.\"YearMonth\" IN (  :inputYearMonth ";       // 今年本月
+		sql += "      WHERE MFB.\"YearMonth\" IN (  :inputYearMonth "; // 今年本月
 		sql += "                                  , :inputYearMonth - 100 "; // 去年本月
 		sql += "                                  , SUBSTR(:inputYearMonth - 100, 1, 4) || 12 "; // 去年年底
 		sql += "                                  , SUBSTR(:inputYearMonth - 200, 1, 4) || 12 "; // 前年年底
@@ -163,15 +163,14 @@ public class LQ006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " GROUP BY \"OutputDate\" ";
 		sql += " ORDER BY \"OutputDate\" ";
 
-
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("inputYearMonth", inputYearMonth);
-		
+
 		return this.convertToMap(query);
 	}
 }

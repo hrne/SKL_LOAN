@@ -55,7 +55,8 @@ E(0,0)
 ["@","@變更前"],["@","@變更後"],
 ["#FdCustId2+統一編號",#CustIdBef],[#CustIdInd,#CustIdAfter],
 ["#FdTypeCode+建檔身分別",#TypeCodeBef,#TypeCodeXBef],[#TypeCodeInd,#TypeCodeAft,#TypeCodeXAft],
-["#FdCustName+公司名稱",#CustNameBef],[#CustNameInd,#CustNameAft],
+[#<->#,"#FdCustName1+修改前-公司名稱",#CustNameBef],
+[#<->#,"#FdCustName2+修改後-公司名稱@@@+#CustNameInd",#CustNameAft],
 ["#FdEname+英文姓名",#EnameBef],[#EnameInd,#EnameAft],
 ["#FdBirthday+設立日期",#BirthdayBef],[#BirthdayInd,#BirthdayAft],
 ["#FdCustType+客戶別",#CustTypeBef,#CustTypeBefX],[#CustTypeInd,#CustTypeAft,#CustTypeAftX],
@@ -64,14 +65,15 @@ E(0,0)
 ["#FdNationalityCode+公司註冊地",#NationalityCodeBef,#NationalityCodeX],[#NationalityCodeInd,#NationalityCodeAft,#NationalityCodeXAft],
 ["#FdBussNationalityCode+營業地國籍",#BussNationalityCodeBef,#BussNationalityCodeX],[#BussNationalityCodeInd,#BussNationalityCodeAft,#BussNationalityCodeXAft],
 ["#FdSpouseId+負責人身分證",#SpouseIdBef],[#SpouseIdInd,#SpouseIdAft],
-["#FdSpouseName+負責人姓名",#SpouseNameBef],[#SpouseNameInd,#SpouseNameAft],
-[#<->#,"#FdRegAdrBef+修改前公司-地址",#RegAddressBef],
-[#<->#,"#FdRegAdrAft+修改後公司-地址",#RegCityCodeAft,#RegCityItemAft,#RegAreaCodeAft,#RegAreaItemAft,"</br>",#RegRoadAft,"</br>",#RegSectionAft,"段",#RegAlleyAft,"巷",#RegLaneAft,"弄",#RegNumAft,"號","之",#RegNumDashAft,",",#RegFloorAft,"樓","之",#RegFloorDashAft],
+[#<->#,"#FdSpouseName1+修改前-負責人姓名",#SpouseNameBef],
+[#<->#,"#FdSpouseName2+修改後-負責人姓名@+#SpouseNameInd",#SpouseNameAft],
+[#<->#,"#FdRegAdrBef+修改前-公司地址",#RegAddressBef],
+[#<->#,"#FdRegAdrAft+修改後-公司地址",#RegCityCodeAft,#RegCityItemAft,#RegAreaCodeAft,#RegAreaItemAft,"</br>",#RegRoadAft,"</br>",#RegSectionAft,"段",#RegAlleyAft,"巷",#RegLaneAft,"弄",#RegNumAft,"號","之",#RegNumDashAft,",",#RegFloorAft,"樓","之",#RegFloorDashAft],
 [#<->#,"#RegAddressInd",#RegAddressAft],
 ["#FdRegZipBef+公司-郵遞區號",#RegZip3Bef,#RegZip2Bef],
 ["#RegZip2Ind",#RegZip3Aft,#RegZip2Aft],
-[#<->#,"#FdCurrAdrBef+修改前通訊-地址",#CurrAddressBef],
-[#<->#,"#FdCurrAdrAft+修改後通訊-地址",#SameReg,#SameRegX,"</br>",#CurrCityCodeAft,#CurrCityItemAft,#CurrAreaCodeAft,#CurrAreaItemAft,"</br>",#CurrRoadAft,"</br>",#CurrSectionAft,"段",#CurrAlleyAft,"巷",#CurrLaneAft,"弄",#CurrNumAft,"號","之",#CurrNumDashAft,",",#CurrFloorAft,"樓","之",#CurrFloorDashAft],
+[#<->#,"#FdCurrAdrBef+修改前-通訊地址",#CurrAddressBef],
+[#<->#,"#FdCurrAdrAft+修改後-通訊地址",#SameReg,#SameRegX,"</br>",#CurrCityCodeAft,#CurrCityItemAft,#CurrAreaCodeAft,#CurrAreaItemAft,"</br>",#CurrRoadAft,"</br>",#CurrSectionAft,"段",#CurrAlleyAft,"巷",#CurrLaneAft,"弄",#CurrNumAft,"號","之",#CurrNumDashAft,",",#CurrFloorAft,"樓","之",#CurrFloorDashAft],
 [#<->#,"#CurrAddressInd",#CurrAddressAft],
 ["#FdCurrZipBef+通訊-郵遞區號",#CurrZip3Bef,#CurrZip2Bef],
 ["#CurrZip2Ind",#CurrZip3Aft,#CurrZip2Aft],
@@ -184,9 +186,14 @@ C(2,#TemFuncd,$,$,E(0,1),$,E(0,1))
 ASGN(AGAIN$)
 
 !統一編號
-#CustId=X,8,I
-C(3,#CHAIN,1,s,$)
-@V(7)A(ID_UNINO,0,#CustId)
+#CustId=X,8,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(7)
+A(ID_UNINO,0,#CustId)
+
+#MRKEY=_,_,S
+T(2,#CustId)
 
 #checkchain=X,1,S
 C(3,#CHAIN,1,T(F,@CustId,0),T(F,@CustId,1))
@@ -398,7 +405,8 @@ IF(#TypeCodeAft==#TypeCodeBef,T(3,),T(3,X))
 
 !Fd
 
-#FdCustName=X,2,L
+#FdCustName1=X,2,L
+#FdCustName2=X,2,L
 T(3,*)
 #FdEname=X,2,L
 #FdBirthday=X,2,L
@@ -420,7 +428,9 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 #FdSpouseId=X,2,L
 C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
-#FdSpouseName=X,2,L
+#FdSpouseName1=X,2,L
+
+#FdSpouseName2=X,2,L
 C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdRegAdrBef=X,2,L
@@ -438,11 +448,11 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 #FdIncomeDataDate=X,2,L
 
 !公司名稱
-#CustNameBef=c,2.50,L
+#CustNameBef=x,100,L
 
 #CustNameInd=X,1,L
 
-#CustNameAft=c,2.50,I
+#CustNameAft=x,100,I
 @V(7)
 
 #CustNameInd=_,_,L
@@ -625,11 +635,11 @@ C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
 IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))
 
 !負責人姓名
-#SpouseNameBef=x,2.50,L
+#SpouseNameBef=x,100,L
 
 #SpouseNameInd=X,1,L
 
-#SpouseNameAft=x,2.50,I
+#SpouseNameAft=x,100,I
 @
 C(5,#FdSpouseId,*,V(7),$)
 
@@ -1085,7 +1095,7 @@ R(1,L1R12)
 T(2,@CurrAddressAft,#L1r12Address)
 
 #CurrAddressInd=X,27,L
-IF(#CurrAddressAft==#CurrAddressBef,T(3,),T(3,                          X))
+IF(#CurrAddressAft==#CurrAddressBef,T(3,),T(3,                         X))
 
 !通訊-郵遞區號前三碼
 #CurrZip3Bef=A,3,L

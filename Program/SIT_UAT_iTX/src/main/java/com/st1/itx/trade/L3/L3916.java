@@ -20,13 +20,11 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
-import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanOverdueService;
-import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.BaTxCom;
@@ -63,8 +61,6 @@ public class L3916 extends TradeBuffer {
 	@Autowired
 	public LoanOverdueService loanOverdueService;
 	@Autowired
-	public LoanRateChangeService loanRateChangeService;
-	@Autowired
 	public CdBankService cdBankService;
 	@Autowired
 	public AuthLogCom authLogCom;
@@ -97,6 +93,8 @@ public class L3916 extends TradeBuffer {
 		String wkOvduSituaction = "";
 		BigDecimal wkOvduAmt = BigDecimal.ZERO;
 		BigDecimal wkNplRepay = BigDecimal.ZERO;
+		BigDecimal wkBadDebtAmt = BigDecimal.ZERO;
+		BigDecimal wkBadDebtBal = BigDecimal.ZERO;
 		FacMain tFacMain;
 		LoanOverdue tLoanOverdue;
 
@@ -124,10 +122,6 @@ public class L3916 extends TradeBuffer {
 		LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(wkCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
 			throw new LogicException(titaVo, "E0001", "放款主檔  借款人戶號 = " + wkCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + iBormNo); // 查詢資料不存在
-		}
-		LoanRateChange tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(wkCustNo, iFacmNo, iBormNo, titaVo.getEntDyI() + 19110000, titaVo);
-		if (tLoanRateChange == null) {
-			throw new LogicException(titaVo, "E0001", "放款利率變動檔  借款人戶號 = " + wkCustNo + "-" + iFacmNo + "-" + iBormNo); // 查詢資料不存在
 		}
 
 		tempVo = authLogCom.exec(wkCustNo, iFacmNo, titaVo);
@@ -158,6 +152,8 @@ public class L3916 extends TradeBuffer {
 			wkOvduDate = tLoanOverdue.getOvduDate();
 			wkOvduAmt = tLoanOverdue.getOvduAmt();
 			wkNplRepay = tLoanOverdue.getOvduAmt().subtract(tLoanOverdue.getOvduBal());
+			wkBadDebtAmt = wkBadDebtAmt.add(tLoanOverdue.getBadDebtAmt());
+			wkBadDebtBal = wkBadDebtBal.add(tLoanOverdue.getBadDebtBal());
 			wkOvduSituaction = tLoanOverdue.getOvduSituaction();
 
 		}
@@ -210,7 +206,7 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("RepayFreq", tLoanBorMain.getRepayFreq());
 		this.totaVo.putParam("PayIntFreq", tLoanBorMain.getPayIntFreq());
 		this.totaVo.putParam("GraceDate", tLoanBorMain.getGraceDate());
-		this.totaVo.putParam("StoreRate", tLoanRateChange.getFitRate());
+		this.totaVo.putParam("StoreRate", tLoanBorMain.getStoreRate());
 		this.totaVo.putParam("RateCode", tLoanBorMain.getRateCode());
 		this.totaVo.putParam("RateIncr", tLoanBorMain.getRateIncr());
 		this.totaVo.putParam("FirstAdjRateDate", tLoanBorMain.getFirstAdjRateDate());
@@ -233,6 +229,8 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("NplTrfDate", wkOvduDate);
 		this.totaVo.putParam("NplTrfAmt", wkOvduAmt);
 		this.totaVo.putParam("NplProcSitu", wkOvduSituaction);
+		this.totaVo.putParam("BadDebtAmt", wkBadDebtAmt);
+		this.totaVo.putParam("BadDebtBal", wkBadDebtBal);
 		this.totaVo.putParam("Remark", tLoanBorMain.getRemark());
 		this.totaVo.putParam("RelationCode", tLoanBorMain.getRelationCode());
 		this.totaVo.putParam("RelationName", tLoanBorMain.getRelationName());

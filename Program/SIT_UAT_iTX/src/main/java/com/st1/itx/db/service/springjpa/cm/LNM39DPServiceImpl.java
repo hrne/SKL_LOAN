@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39DP 資料欄位清單4(放款與AR-估計回收率用)   LNFDP
+ * LNM39DP 資料欄位清單4(放款與AR-估計回收率用) LNFDP
  */
 
 public class LNM39DPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,16 +52,11 @@ public class LNM39DPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// LNM39DP 欄位清單D
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" "
-				+ ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"MaturityDate\" "
-				+ ", \"LineAmt\", \"DrawdownAmt\", \"LoanBal\", \"IntAmt\", \"Fee\" "
-				+ ", \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\" "
-				+ ", \"DerDate\", \"DerRate\", \"DerLoanBal\", \"DerIntAmt\", \"DerFee\" "
-				+ ", \"DerY1Amt\", \"DerY2Amt\", \"DerY3Amt\", \"DerY4Amt\", \"DerY5Amt\" "
-				+ ", \"DerY1Int\", \"DerY2Int\", \"DerY3Int\", \"DerY4Int\", \"DerY5Int\" "
-				+ ", \"DerY1Fee\", \"DerY2Fee\", \"DerY3Fee\", \"DerY4Fee\", \"DerY5Fee\" "
-				+ ", \"IndustryCode\", \"ClTypeJCIC\", \"AreaCode\", \"ProdCode\", \"CustKind\", \"Ifrs9ProdCode\" "
-				+ " FROM  \"LoanIfrs9Dp\" " + " WHERE \"DataYM\" = :dateMonth "
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"MaturityDate\" "
+				+ ", \"LineAmt\", \"DrawdownAmt\", \"LoanBal\", \"IntAmt\", \"Fee\" " + ", \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\" "
+				+ ", \"DerDate\", \"DerRate\", \"DerLoanBal\", \"DerIntAmt\", \"DerFee\" " + ", \"DerY1Amt\", \"DerY2Amt\", \"DerY3Amt\", \"DerY4Amt\", \"DerY5Amt\" "
+				+ ", \"DerY1Int\", \"DerY2Int\", \"DerY3Int\", \"DerY4Int\", \"DerY5Int\" " + ", \"DerY1Fee\", \"DerY2Fee\", \"DerY3Fee\", \"DerY4Fee\", \"DerY5Fee\" "
+				+ ", \"IndustryCode\", \"ClTypeJCIC\", \"AreaCode\", \"ProdCode\", \"CustKind\", \"Ifrs9ProdCode\" " + " FROM  \"LoanIfrs9Dp\" " + " WHERE \"DataYM\" = :dateMonth "
 				+ " ORDER BY \"DataFg\", \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);

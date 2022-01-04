@@ -223,7 +223,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 [#<->#,"#FdMain+條件","@借戶戶號、統一編號、核准編號，需擇一輸入"],
 [#<->#,"#FdActFg+登放記號",#ACTFGX],
 [#<->#,"#FdCustNo+．借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
-[#<->#,"#FdCustId+．統一編號",#CustId,"@",#BTN2,#CustIdX],
+[#<->#,"#FdCustId+．統一編號",#CustId,"@@@",#BTN2,#CustIdX],
 [#<->#,"#FdApplNo+．核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4],
 [#<->#,"#FdBormNo+撥款序號",#BormNo],
@@ -399,6 +399,7 @@ C(3,#FKEY,0,$,s)
 C(3,#CustNo,0,S,$)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,0)
 RESET_RIM(#SendL2r07A,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#RimFacmNo)
 R(1,L2R07)
@@ -444,6 +445,7 @@ C(3,#FKEY,0,$,s)
 C(4,#CustId,S,$)
 T(2,@RimCustId,#CustId)
 E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
 RESET_RIM(#SendL2r07B,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#RimFacmNo)
 R(1,L2R07)
@@ -1164,7 +1166,6 @@ C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 !撥款之業務科目與額度之業務科目,期限,區分需相同
 #AcctCode2=X,3,L
 C(5,#ChackBormNoFg,Y,S,$)
-HELP(#AcctCodeHelp)
 @C(4,#AcctCode2,S,$)
 V(E,0,L2DEF,FacmAcctCodeDef)
 V(2,#AcctCode1)

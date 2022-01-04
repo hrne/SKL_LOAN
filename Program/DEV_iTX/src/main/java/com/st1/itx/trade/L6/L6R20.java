@@ -73,12 +73,12 @@ public class L6R20 extends TradeBuffer {
 			} else if ("4".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0004", "使用者:" + iTlrNo);
 			}
-			MoveTota(iTlrNo, new TxTeller(),titaVo);
+			MoveTota(iTlrNo, new TxTeller(), titaVo);
 		} else {
 			if ("1".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0002", "使用者:" + iTlrNo);
 			}
-			MoveTota(iTlrNo, tTxTeller,titaVo);
+			MoveTota(iTlrNo, tTxTeller, titaVo);
 			MoveGroup(iTlrNo, titaVo);
 		}
 
@@ -86,7 +86,7 @@ public class L6R20 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void MoveTota(String iTlrNo, TxTeller tTxTeller,TitaVo titaVo) {
+	private void MoveTota(String iTlrNo, TxTeller tTxTeller, TitaVo titaVo) {
 		this.info("L6R20 MoveTota");
 
 		this.totaVo.putParam("BrNo", tTxTeller.getBrNo());
@@ -105,21 +105,19 @@ public class L6R20 extends TradeBuffer {
 		this.totaVo.putParam("AmlHighFg", tTxTeller.getAmlHighFg());
 		this.totaVo.putParam("LastDate", tTxTeller.getLastDate());
 		this.totaVo.putParam("LastTime", tTxTeller.getLastTime());
-		
+
 		this.totaVo.putParam("LastUpdate", parse.timeStampToString(tTxTeller.getLastUpdate()));
 		String LastUpdateEmpNo = tTxTeller.getLastUpdateEmpNo();
 		this.totaVo.putParam("LastUpdateEmpNo", LastUpdateEmpNo);
-		
+
 		String name = "";
 		TxTeller sTxTeller = sTxTellerService.findById(LastUpdateEmpNo, titaVo);
-		if(sTxTeller!=null) {
+		if (sTxTeller != null) {
 			name = sTxTeller.getTlrItem();
 		}
-		
+
 		this.totaVo.putParam("LastUpdateEmpNoX", name);
-		
-		
-		
+
 	}
 
 	private void MoveGroup(String iTlrNo, TitaVo titaVo) {

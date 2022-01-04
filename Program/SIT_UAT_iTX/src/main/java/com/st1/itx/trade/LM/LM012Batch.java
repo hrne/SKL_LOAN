@@ -30,11 +30,11 @@ public class LM012Batch extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-	
+
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lM012Report.setParentTranCode(this.getParent());
@@ -44,17 +44,17 @@ public class LM012Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM012Batch ");
-		
+
 		// 利率上限下限: 1~6 (參照樣張)
 		titaVo.putParam("RateMinimum", 1);
 		titaVo.putParam("RateMaximum", 6);
-		
+
 		// 利率區間: 0.25 (參照樣張)
 		titaVo.putParam("RateRange", new BigDecimal("0.25"));
-		
+
 		// 年月: 當日 YYY / MM
 		titaVo.putParam("DataYear", titaVo.getEntDyI() / 10000);
-		titaVo.putParam("DataMonth", titaVo.getEntDyI() / 100 % 100);		
+		titaVo.putParam("DataMonth", titaVo.getEntDyI() / 100 % 100);
 
 		lM012Report.exec(titaVo);
 	}

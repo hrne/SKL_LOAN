@@ -55,9 +55,9 @@ K(MODIFYBUTTON,1,LD006 三階放款明細統計檔)
 <include src="ROM.icf::L2R08.dec"/>
 
 ![Buttom資料查詢]
-#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
+#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BindCdEmp=X,1,S
-BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:Introducer2<-OOEmployeeNo:IntroducerX<-OOFullname})
+BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:Introducer2<-OOEmployeeNo:IntroducerX<-OOFullname})
 
 #FdCustNo=X,2,L
 T(3, )

@@ -752,26 +752,26 @@ TXFORM=L3926
 #OOIntEndDate=計息迄日 
 {width:80,align:'center'}
 
-#OOAmount=計息金額
-{width:100}
+#OOAmountX=計息金額
+{width:160,align:'right'}
 
 #OORateX=利率
 {width:80,align:'right'}
 
-#OOPrincipal=本金
-{width:100}
+#OOPrincipalX=本金
+{width:160,align:'right'}
 
-#OOInterest=利息
-{width:100}
+#OOInterestX=利息
+{width:160,align:'right'}
 
-#OODelayInt=延遲息
-{width:100}
+#OODelayIntX=延遲息
+{width:160,align:'right'}
 
-#OOBreachAmt=違約金
-{width:100}
+#OOBreachAmtX=違約金
+{width:160,align:'right'}
 
-#OOLoanBal=放款餘額
-{width:100}
+#OOLoanBalX=放款餘額
+{width:160,align:'right'}
 
 ^
 
@@ -790,26 +790,26 @@ TXFORM=L3926
 #OOIntEndDate=計息迄日 
 {width:80,align:'center'}
 
-#OOAmount=計息金額
-{width:100}
+#OOAmountX=計息金額
+{width:160,align:'right'}
 
 #OORateX=利率
 {width:80,align:'right'}
 
-#OOPrincipal=本金
-{width:100}
+#OOPrincipalX=本金
+{width:160,align:'right'}
 
-#OOInterest=利息
-{width:100}
+#OOInterestX=利息
+{width:160,align:'right'}
 
-#OODelayInt=延遲息
-{width:100}
+#OODelayIntX=延遲息
+{width:160,align:'right'}
 
-#OOBreachAmt=違約金
-{width:100}
+#OOBreachAmtX=違約金
+{width:160,align:'right'}
 
-#OOLoanBal=放款餘額
-{width:100}
+#OOLoanBalX=放款餘額
+{width:160,align:'right'}
 
 ^
 

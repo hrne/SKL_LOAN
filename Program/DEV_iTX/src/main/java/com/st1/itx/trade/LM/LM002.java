@@ -35,6 +35,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		return this.exec(contribution, "M");
 	}
 
+	@Override
 	public void run() throws LogicException {
 		this.info("active LM002 ");
 		lm002report.setTxBuffer(this.getTxBuffer());

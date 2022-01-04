@@ -49,8 +49,6 @@ public class L3917 extends TradeBuffer {
 		// 取得輸入資料
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
-		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
-		int iIntStartDate = this.parse.stringToInteger(titaVo.getParam("IntStartDate"));
 		int iIntEndDate = this.parse.stringToInteger(titaVo.getParam("IntEndDate"));
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		String iTellerNo = titaVo.getParam("TellerNo");
@@ -73,6 +71,8 @@ public class L3917 extends TradeBuffer {
 		BigDecimal wkCloseBreachAmt = new BigDecimal("0");// 清償違約金
 		BigDecimal wkTempAmt = new BigDecimal("0");// 暫收金額
 		BigDecimal wkTempRepay = new BigDecimal("0");// 暫收抵繳
+		int entryDate = 0;
+		int intStartDate = 0;
 
 		List<LoanBorTx> lLoanBorTx;
 		// 查詢放款交易內容檔
@@ -106,7 +106,10 @@ public class L3917 extends TradeBuffer {
 
 			wkRepayAmt = wkRepayAmt.add(TempRepayAmt); // 回收金額
 			wkTempRepayAmt = wkTempRepayAmt.add(t.getTempAmt());
-
+			entryDate = t.getEntryDate();
+			if (intStartDate == 0 || intStartDate > t.getIntStartDate()) {
+				intStartDate = t.getIntStartDate();
+			}
 			if (t.getTempAmt().compareTo(BigDecimal.ZERO) > 0) {
 				wkTempAmt = wkTempAmt.add(t.getTempAmt());
 				wkOverflow = wkOverflow.add(t.getTempAmt()); // 溢收金額
@@ -124,6 +127,7 @@ public class L3917 extends TradeBuffer {
 			wkModifyFee = wkModifyFee.add(TempModifyFee); // 契變手續費
 			wkFireFee = wkFireFee.add(TempFireFee); // 火險費
 			wkCloseBreachAmt = wkCloseBreachAmt.add(t.getCloseBreachAmt()); // 清償違約金
+
 		}
 
 		this.totaVo.putParam("OCustNo", iCustNo); // 戶號
@@ -132,8 +136,8 @@ public class L3917 extends TradeBuffer {
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode); // 幣別
 
 		this.totaVo.putParam("OAcDate", iAcDate); // 會計日期
-		this.totaVo.putParam("OEntryDate", iEntryDate); // 入帳日期
-		this.totaVo.putParam("OIntStartDate", iIntStartDate); // 計息起日
+		this.totaVo.putParam("OEntryDate", entryDate); // 入帳日期
+		this.totaVo.putParam("OIntStartDate", intStartDate); // 計息起日
 		this.totaVo.putParam("OIntEndDate", iIntEndDate); // 計息迄日
 		this.totaVo.putParam("OTellerNo", iTellerNo); // 經辦
 

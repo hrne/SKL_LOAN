@@ -300,7 +300,6 @@ C(4,#NTXBUF5,T(3,@RPTFG2,1),T(3,@RPTFG2,2))
 C(3,#CHAIN,1,T(1,#NTXBUF,16,3),$)
 C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,S,$)
-C(3,#BormNo,0,$,s)
 
 
 #MRKEY=_,_,S

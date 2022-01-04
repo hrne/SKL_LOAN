@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
@@ -175,8 +176,11 @@ public class AjaxController extends SysLogger {
 		this.info("printReport Active!");
 		this.info("Param : " + _d);
 
-		long reportNo = Long.parseLong(_m.get("reportNo").trim());
-		String printer = _m.get("printer");
+		long reportNo = Long.parseLong(Objects.isNull(_m.get("reportNo")) ? "0" : _m.get("reportNo").trim());
+//		String printer = Objects.isNull(_m.get("printer")) ? "" : _m.get("printer").trim();
+		String localIp = Objects.isNull(_m.get("localIp")) ? "" : _m.get("localIp").trim();
+		boolean isHasPrt = true;
+		boolean isHasPrtIp = true;
 		int pageNo = 1;
 
 		MakeReport makeReport = MySpring.getBean("makeReport", MakeReport.class);
@@ -184,14 +188,20 @@ public class AjaxController extends SysLogger {
 		List<List<Map<String, ?>>> pLi = new ArrayList<List<Map<String, ?>>>();
 		while (true) {
 			try {
-				Map<String, ?> p = makeReport.toPrint(reportNo, pageNo++, printer);
+				Map<String, ?> p = makeReport.toPrint(reportNo, pageNo++, localIp);
 				if (p.get("printJson") != null)
 					pLi.add((List<Map<String, ?>>) p.get("printJson"));
 
 				this.info("morePage : " + "1".equals(p.get("morePage").toString()));
 				this.info("pageNo   : " + pageNo);
 
-				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100)
+				if (!Objects.isNull(p.get("ServerIp")) && p.get("ServerIp").toString().trim().isEmpty())
+					isHasPrtIp = false;
+
+				if (!Objects.isNull(p.get("Printer")) && p.get("Printer").toString().trim().isEmpty())
+					isHasPrt = false;
+
+				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100 || !isHasPrtIp || !isHasPrt)
 					break;
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
@@ -204,6 +214,18 @@ public class AjaxController extends SysLogger {
 
 		if (map.get("success") == null)
 			map.put("success", true);
+
+		if (!isHasPrtIp) {
+			map.put("success", false);
+			map.put("msg", "請設定印表機服務IP");
+		}
+
+		if (!isHasPrt) {
+			map.put("success", false);
+			String msg = Objects.isNull(map.get("msg")) ? "" : (String) map.get("msg");
+			map.put("msg", msg + "請設定印表機");
+		}
+
 		map.put("pageNo", pageNo);
 		map.put("printList", pLi);
 		ResponseEntity<String> result = null;

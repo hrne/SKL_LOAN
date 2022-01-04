@@ -37,7 +37,7 @@ public class L5504 extends TradeBuffer {
 
 	@Autowired
 	public TxControlService txControlService;
-	
+
 	@Autowired
 	public DataLog dataLog;
 

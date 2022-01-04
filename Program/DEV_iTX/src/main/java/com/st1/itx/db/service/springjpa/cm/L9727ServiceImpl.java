@@ -26,8 +26,7 @@ public class L9727ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(int inputDrawdownDateStart, int inputDrawdownDateEnd, TitaVo titaVo)
-			throws Exception {
+	public List<Map<String, String>> findAll(int inputDrawdownDateStart, int inputDrawdownDateEnd, TitaVo titaVo) throws Exception {
 		this.info("L9727ServiceImpl.findAll ");
 
 		this.info("inputDrawdownDateStart = " + inputDrawdownDateStart);

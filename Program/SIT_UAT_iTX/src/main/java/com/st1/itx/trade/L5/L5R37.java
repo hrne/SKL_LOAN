@@ -87,8 +87,7 @@ public class L5R37 extends TradeBuffer {
 			int facmNo = Integer.valueOf(titaVo.getParam("FacmNo").trim());
 			int bormNo = Integer.valueOf(titaVo.getParam("BormNo").trim());
 			int bonusType = Integer.valueOf(titaVo.getParam("BonusType").trim());
-			Slice<PfDetail> slPfDetail = pfDetailService.FindByBormNo(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<PfDetail> slPfDetail = pfDetailService.FindByBormNo(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, titaVo);
 			List<PfDetail> lPfDetail = slPfDetail == null ? null : slPfDetail.getContent();
 			if (lPfDetail == null || lPfDetail.size() == 0) {
 				throw new LogicException(titaVo, "E0001", "業績資料");
@@ -106,8 +105,7 @@ public class L5R37 extends TradeBuffer {
 				}
 
 				this.totaVo.putParam("BonusNo", 0);
-				CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(pfDetail.getPerfDate() + 19110000,
-						pfDetail.getPerfDate() + 19110000, titaVo);
+				CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(pfDetail.getPerfDate() + 19110000, pfDetail.getPerfDate() + 19110000, titaVo);
 				if (cdWorkMonth == null) {
 					throw new LogicException("E0001", "放款業績工作月對照檔");
 				}
@@ -159,8 +157,7 @@ public class L5R37 extends TradeBuffer {
 				this.totaVo.putParam("LastUpdate", "");
 				this.totaVo.putParam("LastEmpName", "");
 
-				PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(pfDetail.getCustNo(),
-						pfDetail.getFacmNo(), pfDetail.getBormNo(), bonusType, titaVo);
+				PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(pfDetail.getCustNo(), pfDetail.getFacmNo(), pfDetail.getBormNo(), bonusType, titaVo);
 				if (pfRewardMedia != null) {
 					String s = "";
 					if (bonusType == 1) {
@@ -250,8 +247,7 @@ public class L5R37 extends TradeBuffer {
 				}
 
 				if (pfRewardMedia.getBonusType() != 6) {
-					CustMain custMain = custMainService.custNoFirst(pfRewardMedia.getCustNo(),
-							pfRewardMedia.getCustNo(), titaVo);
+					CustMain custMain = custMainService.custNoFirst(pfRewardMedia.getCustNo(), pfRewardMedia.getCustNo(), titaVo);
 					if (custMain == null) {
 						throw new LogicException("E0001", "客戶資料");
 					}

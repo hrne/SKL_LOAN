@@ -339,7 +339,7 @@ public class L4453Batch extends TradeBuffer {
 		int tranTemp = 0;
 
 		for (int i = 0; i < chars.length; i++) {
-			tranTemp = (int) chars[i];
+			tranTemp = chars[i];
 			if (tranTemp != 45) // ASCII碼:45 是減號 -
 				tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 			outStr += (char) tranTemp;

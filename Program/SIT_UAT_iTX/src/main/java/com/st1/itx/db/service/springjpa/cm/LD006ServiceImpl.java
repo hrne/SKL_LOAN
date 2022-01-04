@@ -30,15 +30,15 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {		
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		Boolean useWorkMonth = parse.stringToInteger(titaVo.getParam("workMonthStart")) > 0;
 		Boolean useCustNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0;
 		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
 		Boolean useIntroducer = !titaVo.getParam("Introducer").trim().isEmpty();
-		
+
 		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useIntroducer:%s", useWorkMonth, useCustNo, useFacmNo, useIntroducer));
 		// check titaVo for input values
-		
+
 		String sql = "";
 		sql += " SELECT B0.\"UnitItem\" AS \"BsDeptItem\" "; // 部室中文(房貸專員)
 		sql += "       ,E0.\"Fullname\" AS \"BsName\" "; // 房貸專員姓名
@@ -87,23 +87,18 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
 		sql += "                                    AND I.\"AdjRange\" IN (1,2)               ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
-		if (useWorkMonth)
-		{
+		if (useWorkMonth) {
 			sql += "   AND I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
-		} else
-		{
+		} else {
 			sql += "   AND I.\"PerfDate\" BETWEEN :perfDateStart AND :perfDateEnd";
 		}
-		if (useCustNo)
-		{
+		if (useCustNo) {
 			sql += "   AND I.\"CustNo\" = :custNo";
 		}
-		if (useFacmNo)
-		{
+		if (useFacmNo) {
 			sql += "   AND I.\"FacmNo\" = :facmNo";
 		}
-		if (useIntroducer)
-		{
+		if (useIntroducer) {
 			sql += "   AND I.\"Introducer\" = :introducer";
 		}
 		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=FRENCH') ";
@@ -117,32 +112,27 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
-		if (useWorkMonth)
-		{
-		query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
-		query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
-		} else
-		{
-		query.setParameter("perfDateStart", parse.stringToInteger(titaVo.getParam("perfDateStart")) + 19110000);
-		query.setParameter("perfDateEnd", parse.stringToInteger(titaVo.getParam("perfDateEnd")) + 19110000);
+
+		if (useWorkMonth) {
+			query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
+			query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
+		} else {
+			query.setParameter("perfDateStart", parse.stringToInteger(titaVo.getParam("perfDateStart")) + 19110000);
+			query.setParameter("perfDateEnd", parse.stringToInteger(titaVo.getParam("perfDateEnd")) + 19110000);
 		}
-		
-		if (useCustNo)
-		{
+
+		if (useCustNo) {
 			query.setParameter("custNo", titaVo.getParam("custNo"));
 		}
-		
-		if (useFacmNo)
-		{
+
+		if (useFacmNo) {
 			query.setParameter("facmNo", titaVo.getParam("facmNo"));
 		}
-		
-		if (useIntroducer)
-		{
+
+		if (useIntroducer) {
 			query.setParameter("introducer", titaVo.getParam("Introducer"));
 		}
-		
+
 		return this.convertToMap(query);
 	}
 

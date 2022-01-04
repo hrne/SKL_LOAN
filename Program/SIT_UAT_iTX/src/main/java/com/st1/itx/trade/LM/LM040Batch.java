@@ -25,7 +25,7 @@ public class LM040Batch extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LM040Report lM040Report;
-	
+
 	@Autowired
 	DateUtil dateUtil;
 
@@ -42,7 +42,7 @@ public class LM040Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM040Batch ");
-		
+
 		// InputDate: 日曆日 YYYMMDD
 		titaVo.putParam("InputDate", dateUtil.getNowIntegerRoc());
 

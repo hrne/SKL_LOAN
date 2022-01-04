@@ -39,7 +39,7 @@ public class L9711Report2 extends MakeReport {
 
 	@Autowired
 	private CdEmpService cdEmpService;
-	
+
 	@Autowired
 	BaTxCom dBaTxCom;
 
@@ -50,7 +50,8 @@ public class L9711Report2 extends MakeReport {
 	public TxBuffer txBuffer;
 
 	String ENTDY = "";
-	Boolean printtimes = false ;
+	Boolean printtimes = false;
+
 	@Override
 	public void printHeader() {
 
@@ -74,8 +75,7 @@ public class L9711Report2 extends MakeReport {
 		int count = 0;
 		// 製表人
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
-		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-				titaVo.getTxCode().isEmpty() ? "L9711" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "inch,8.5,12", "P");
+		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode().isEmpty() ? "L9711" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "inch,8.5,12", "P");
 
 		if (L9711List.size() > 0) {
 
@@ -84,7 +84,7 @@ public class L9711Report2 extends MakeReport {
 				if (f4.equals(tL9711Vo.get("F4")) && f5.equals(tL9711Vo.get("F5"))) {
 
 					report(tL9711Vo, txbuffer);
-					if(printtimes) {
+					if (printtimes) {
 						count++;
 					}
 
@@ -95,19 +95,19 @@ public class L9711Report2 extends MakeReport {
 					}
 					printtimes = false;
 					report(tL9711Vo, txbuffer);
-					if(printtimes) {
+					if (printtimes) {
 						count++;
 					}
 				}
 				f4 = tL9711Vo.get("F4");
 				f5 = tL9711Vo.get("F5");
 
-			} // for 
-			
-			if(count == 0) {
+			} // for
+
+			if (count == 0) {
 				this.printCm(1, 4, "*******    查無資料   ******");
 			}
- 
+
 		} else {
 			this.info("L9711List.reportEmpty");
 			reportEmpty();
@@ -162,8 +162,7 @@ public class L9711Report2 extends MakeReport {
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
-			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, titaVo);
+			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
 			this.info("baTxCom.setTxBuffer ErrorMsg :" + e.getMessage());
@@ -190,7 +189,6 @@ public class L9711Report2 extends MakeReport {
 
 		printCm(2, 5, tranNum(tL9711Vo.get("F17")) + tranNum(tL9711Vo.get("F18")));
 
-
 		String addr = custNoticeCom.getCurrAddress(custMain, titaVo);
 		printCm(2, 6, addr);
 
@@ -212,18 +210,16 @@ public class L9711Report2 extends MakeReport {
 		printCm(16, y, tL9711Vo.get("F20"));
 
 		y = top + yy + (++l) * h;
-		printCm(1.5, y,
-				"戶    號：" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-"
-						+ String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))) + "  目前利率："
-						+ padStart(6, "" + IntRate) + "%");
+		printCm(1.5, y, "戶    號：" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-" + String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))) + "  目前利率："
+				+ padStart(6, "" + IntRate) + "%");
 
 		y = top + yy + (++l) * h;
-		
+
 		int nameLength = 20;
 		if (tL9711Vo.get("F6").length() < 20) {
 			nameLength = tL9711Vo.get("F6").length();
 		}
-		
+
 		printCm(1.5, y, "客戶名稱：" + tL9711Vo.get("F6").substring(0, nameLength));
 		printCm(12, y, "溢短繳：", "R");
 		printCm(14, y, String.format("%,d", excessive), "R");
@@ -277,7 +273,7 @@ public class L9711Report2 extends MakeReport {
 			if (UnPaidAmt == 0) {
 				continue;
 			}
-			
+
 			printtimes = true;
 			if (excessive < 0) {
 				UnPaidAmt = UnPaidAmt - excessive;
@@ -338,7 +334,7 @@ public class L9711Report2 extends MakeReport {
 //		if (tmp == null) {
 //			tmp = "";
 //		}
-		
+
 		String iTLRNO = "";
 
 		if (titaVo.getTlrNo() != null) {
@@ -352,7 +348,7 @@ public class L9711Report2 extends MakeReport {
 		if (tCdEmp != null) {
 			empName = tCdEmp.getFullname();
 		}
-		
+
 		y = top + yy + (++l) * h;
 		printCm(14, y, "製表人 " + empName);
 
@@ -398,11 +394,9 @@ public class L9711Report2 extends MakeReport {
 			}
 		} else if (iType == 2) {
 			if (rocdatex.length() == 6) {
-				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6)
-						+ " 日";
+				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6) + " 日";
 			} else {
-				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7)
-						+ " 日";
+				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7) + " 日";
 			}
 		} else {
 			return rocdatex;
@@ -428,7 +422,7 @@ public class L9711Report2 extends MakeReport {
 			this.info("tranDate X = " + tmp1.substring(i, i + 1));
 			tmp = tmp1.charAt(i);
 
-			tranTemp = (int) tmp;
+			tranTemp = tmp;
 
 			tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 

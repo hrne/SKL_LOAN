@@ -33,7 +33,6 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	public Parse parse;
 
-
 	// *** 折返控制相關 ***
 	private int limit;
 
@@ -44,7 +43,7 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private int size;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
@@ -136,7 +135,7 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "      ORDER BY lo.\"FacmNo\" , lo.\"NotYetCode\" , cm.\"CustNo\"";
 		sql += " " + sqlRow;
-		
+
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
@@ -165,7 +164,7 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 

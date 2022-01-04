@@ -39,6 +39,7 @@ public class L5976 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("Run L5976");
 		this.info("active L5976 ");

@@ -47,15 +47,11 @@ public class LB095ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB095 不動產擔保品明細-建號附加檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
-				+ "     , M.\"ClActNo\"" + "     , M.\"OwnerId\"" + "     , M.\"CityJCICCode\""
-				+ "     , M.\"AreaJCICCode\"" + "     , M.\"IrCode\"" + "     , M.\"BdNo1\"" + "     , M.\"BdNo2\""
-				+ "     , M.\"CityName\"" + "     , M.\"AreaName\"" + "     , M.\"Addr\"" + "     , M.\"BdMainUseCode\""
-				+ "     , M.\"BdMtrlCode\"" + "     , M.\"BdSubUsageCode\"" + "     , M.\"TotalFloor\""
-				+ "     , M.\"FloorNo\"" + "     , M.\"BdDate\"" + "     , M.\"TotalArea\"" + "     , M.\"FloorArea\""
-				+ "     , M.\"BdSubArea\"" + "     , M.\"PublicArea\"" + "     , M.\"Filler33\""
-				+ "     , M.\"JcicDataYM\"" + " FROM  \"JcicB095\" M" + " WHERE M.\"DataYM\"  = :dateMonth "
-				+ " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"BdNo1\", \"BdNo2\"";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"OwnerId\"" + "     , M.\"CityJCICCode\""
+				+ "     , M.\"AreaJCICCode\"" + "     , M.\"IrCode\"" + "     , M.\"BdNo1\"" + "     , M.\"BdNo2\"" + "     , M.\"CityName\"" + "     , M.\"AreaName\"" + "     , M.\"Addr\""
+				+ "     , M.\"BdMainUseCode\"" + "     , M.\"BdMtrlCode\"" + "     , M.\"BdSubUsageCode\"" + "     , M.\"TotalFloor\"" + "     , M.\"FloorNo\"" + "     , M.\"BdDate\""
+				+ "     , M.\"TotalArea\"" + "     , M.\"FloorArea\"" + "     , M.\"BdSubArea\"" + "     , M.\"PublicArea\"" + "     , M.\"Filler33\"" + "     , M.\"JcicDataYM\""
+				+ " FROM  \"JcicB095\" M" + " WHERE M.\"DataYM\"  = :dateMonth " + " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"BdNo1\", \"BdNo2\"";
 
 		this.info("sql=" + sql);
 
@@ -67,7 +63,7 @@ public class LB095ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB095.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth); 
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

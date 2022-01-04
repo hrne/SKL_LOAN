@@ -82,9 +82,9 @@ public class DataLog extends CommBuffer {
 	/**
 	 * set parameters
 	 * 
-	 * @param titaVo   TitaVo
-	 * @param bef      Before data
-	 * @param aft      After data
+	 * @param titaVo  TitaVo
+	 * @param bef     Before data
+	 * @param aft     After data
 	 * @param otrList 其他變更項目一次放入
 	 */
 	public void setEnv(TitaVo titaVo, Object bef, Object aft, List<HashMap<String, Object>> otrList) {

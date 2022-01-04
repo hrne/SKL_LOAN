@@ -199,6 +199,7 @@ public class LC009 extends TradeBuffer {
 
 		// 按分配順序排序
 		Collections.sort(lTxFile, new Comparator<TxFile>() {
+			@Override
 			public int compare(TxFile c1, TxFile c2) {
 				String c1OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c1.getCreateDate()) + c1.getFileCode() + new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c1.getCreateDate());
 				String c2OrderKey = new SimpleDateFormat("yyyyMMdd-HH:mm").format(c2.getCreateDate()) + c2.getFileCode() + new SimpleDateFormat("yyyyMMdd-HH:mm:ss").format(c2.getCreateDate());

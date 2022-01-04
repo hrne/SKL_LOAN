@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L4;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -184,7 +186,8 @@ public class L4450Batch extends TradeBuffer {
 			int iAchSpecificDdTo = parse.stringToInteger(titaVo.getParam("AchSpecificDdTo")) + 19110000;
 			int iAchSecondSpecificDdFrom = parse.stringToInteger(titaVo.getParam("AchSecondSpecificDdFrom")) + 19110000;
 			int iAchSecondSpecificDdTo = parse.stringToInteger(titaVo.getParam("AchSecondSpecificDdTo")) + 19110000;
-			int iDeductDate = parse.stringToInteger(titaVo.getParam("DeductDate")) + 19110000;
+			int iDeductDateStart = parse.stringToInteger(titaVo.getParam("DeductDateStart")) + 19110000;
+			int iDeductDateEnd = parse.stringToInteger(titaVo.getParam("DeductDateEnd")) + 19110000;
 			int iOpItem = parse.stringToInteger(titaVo.getParam("OpItem"));
 
 //		若特定輸入日為0者代表不與營業日相同，即不需輸入扣帳檔
@@ -202,7 +205,8 @@ public class L4450Batch extends TradeBuffer {
 			this.info("iAchSecondSpecificDdTo : " + iAchSecondSpecificDdTo);
 			this.info("today1 : " + today1);
 			this.info("today2 : " + today2);
-			this.info("iDeductDate : " + iDeductDate);
+			this.info("iDeductDateStart : " + iDeductDateStart);
+			this.info("iDeductDateEnd : " + iDeductDateEnd);
 
 			String ddp1 = ("" + today1).substring(6);
 			String ddp2 = ("" + today2).substring(6);
@@ -220,6 +224,9 @@ public class L4450Batch extends TradeBuffer {
 				try {
 					fnAllList = l4450ServiceImpl.findAll(titaVo);
 				} catch (Exception e) {
+					StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					this.error("l4450ServiceImpl.findAll error = " + errors.toString());
 					checkMsg = e.getMessage();
 					checkFlag = false;
 				}

@@ -152,6 +152,7 @@ public class L3921 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
+			@Override
 			public int compare(LoanBorMain c1, LoanBorMain c2) {
 				// status
 				if (c1.getStatus() != c2.getStatus()) {

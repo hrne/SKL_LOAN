@@ -43,7 +43,7 @@ public class UpdateBankRemitFileVo extends FileVo {
 	public void setValueFromFile(ArrayList<String> lineList) throws LogicException {
 
 		// 總行數
-		int LastIndex = lineList.size() ;
+		int LastIndex = lineList.size();
 
 		int i = 0;
 		// 依照行數擷取明細資料
@@ -125,10 +125,8 @@ public class UpdateBankRemitFileVo extends FileVo {
 //			8	OccReceiveDate兌領日期	 	        96-103  X(7)
 //			9	OccPaymentDate開票日期/匯款日期	 	103-110 X(7)
 
-			String thisLine = "" + occursList.get("OccSeq") + occursList.get("OccNum") + occursList.get("OccPayStatus")
-					+ occursList.get("OccPayModifyDate") + occursList.get("OccRelNum") + occursList.get("OccPayName")
-					+ occursList.get("OccChequeNum") + occursList.get("OccReceiveDate")
-					+ occursList.get("OccPaymentDate");
+			String thisLine = "" + occursList.get("OccSeq") + occursList.get("OccNum") + occursList.get("OccPayStatus") + occursList.get("OccPayModifyDate") + occursList.get("OccRelNum")
+					+ occursList.get("OccPayName") + occursList.get("OccChequeNum") + occursList.get("OccReceiveDate") + occursList.get("OccPaymentDate");
 			result.add(thisLine);
 		}
 

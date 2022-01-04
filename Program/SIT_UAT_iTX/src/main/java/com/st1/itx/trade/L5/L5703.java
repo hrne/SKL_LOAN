@@ -112,8 +112,9 @@ public class L5703 extends TradeBuffer {
 			NegFinAcctVO.setRemitBank(RemitBank);
 			NegFinAcctVO.setRemitAcct(RemitAcct);
 			NegFinAcctVO.setDataSendSection(DataSendSection);
-			//NegFinAcctVO.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			//NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));
+			// NegFinAcctVO.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(),
+			// dDateUtil.getNowIntegerTime()));
+			// NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));
 
 			try {
 				sNegFinAcctService.update(NegFinAcctVO);
@@ -122,7 +123,7 @@ public class L5703 extends TradeBuffer {
 				// E0007 更新資料時，發生錯誤
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			dataLog.setEnv(titaVo, beforeNegFinAcct,NegFinAcctVO);
+			dataLog.setEnv(titaVo, beforeNegFinAcct, NegFinAcctVO);
 			dataLog.exec("修改債務協商債權機構帳戶檔");
 
 			break;

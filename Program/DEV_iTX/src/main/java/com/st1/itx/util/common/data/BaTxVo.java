@@ -147,7 +147,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 短繳清償違約金
 	 */
 	private BigDecimal closeBreachAmt = BigDecimal.ZERO;
-	
+
 	/**
 	 * 還款後餘額
 	 */
@@ -170,14 +170,11 @@ public class BaTxVo implements Comparable<BaTxVo> {
 
 	@Override
 	public String toString() {
-		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo
-				+ ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo=" + rvNo + ", payIntDate="
-				+ payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority="
-				+ repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", acctAmt=" + acctAmt + ", loanBal="
-				+ loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate
-				+ ", amount=" + amount + ", intRate=" + intRate + ", principal=" + principal + ", interest=" + interest
-				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt
-				+ ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
+		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo="
+				+ rvNo + ", payIntDate=" + payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority=" + repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr
+				+ ", acctAmt=" + acctAmt + ", loanBal=" + loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", amount=" + amount + ", intRate="
+				+ intRate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", rateIncr="
+				+ rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
 	}
 
 	public int getDataKind() {
@@ -421,7 +418,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		if (getClass() != o.getClass())
 			return 0;
 
-		BaTxVo other = (BaTxVo) o;
+		BaTxVo other = o;
 
 		/**
 		 * 排序優先度(由小到大) payIntDate 應繳日

@@ -29,7 +29,7 @@ public class L6872 extends TradeBuffer {
 		titaVo.setBatchJobId("eoyFlow");
 
 		this.info("L6872 exit.");
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

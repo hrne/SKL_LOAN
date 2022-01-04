@@ -45,11 +45,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.TxFile;
-import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.TxPrinterId;
+import com.st1.itx.db.domain.TxPrinter;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.TxFileService;
-import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.db.service.TxPrinterService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -80,10 +81,10 @@ public class MakeReport extends CommBuffer {
 	TxFileService txFileService;
 
 	@Autowired
-	TxTellerService txTellerService;
+	CdReportService cdReportService;
 
 	@Autowired
-	CdReportService cdReportService;
+	TxPrinterService txPrinterService;
 
 	@Autowired
 	CdEmpService cdEmpService;
@@ -186,8 +187,7 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize,
-			String pageOrientation) throws LogicException {
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize, String pageOrientation) throws LogicException {
 
 		formMode = true;
 
@@ -236,8 +236,7 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String PageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String PageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -275,8 +274,7 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
-			throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -308,8 +306,7 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -1000,8 +997,7 @@ public class MakeReport extends CommBuffer {
 		try {
 			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
 		} catch (IOException e) {
-			throw new LogicException("EC009",
-					"(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
+			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
 		}
 
 		orgMap.addAll(listMap);
@@ -1397,17 +1393,17 @@ public class MakeReport extends CommBuffer {
 						String supna = "";
 
 						if (!"".equals(tTxFile.getTlrNo())) {
-							TxTeller tTxTeller = txTellerService.findById(tTxFile.getTlrNo());
+							CdEmp cdEmp = cdEmpService.findById(tTxFile.getTlrNo(), titaVo);
 
-							if (tTxTeller != null) {
-								tlrna = tTxTeller.getTlrItem();
+							if (cdEmp != null) {
+								tlrna = cdEmp.getFullname();
 							}
 						}
 						if (!"".equals(tTxFile.getSupNo())) {
-							TxTeller tTxTeller = txTellerService.findById(tTxFile.getTlrNo());
+							CdEmp cdEmp = cdEmpService.findById(tTxFile.getTlrNo(), titaVo);
 
-							if (tTxTeller != null) {
-								supna = tTxTeller.getTlrItem();
+							if (cdEmp != null) {
+								supna = cdEmp.getFullname();
 							}
 						}
 						txt = "經辦：" + tlrna + "                  主管：" + supna;
@@ -2164,8 +2160,7 @@ public class MakeReport extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString
-						+ "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -2184,8 +2179,7 @@ public class MakeReport extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble
-					+ "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -2368,8 +2362,8 @@ public class MakeReport extends CommBuffer {
 	}
 
 	@SuppressWarnings("unchecked")
-	public HashMap<String, Object> toPrint(long pdfno, int pageno, String printer) throws LogicException {
-		this.info("MakeReport.toPrint = " + pdfno + "/" + pageno + "/" + printer);
+	public HashMap<String, Object> toPrint(long pdfno, int pageno, String localIp) throws LogicException {
+		this.info("MakeReport.toPrint = " + pdfno + "/" + pageno + "/" + localIp);
 
 		TxFile tTxFile = txFileService.findById(pdfno);
 
@@ -2379,6 +2373,19 @@ public class MakeReport extends CommBuffer {
 
 		if (tTxFile.getFileType() != 6) {
 			throw new LogicException(titaVo, "E0015", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + "，不為套印格式");
+		}
+
+		TxPrinterId txPrinterId = new TxPrinterId();
+
+		txPrinterId.setStanIp(localIp);
+		txPrinterId.setFileCode(tTxFile.getFileCode());
+
+		String ServerIp = "";
+		String Printer = "";
+		TxPrinter txPrinter = txPrinterService.findById(txPrinterId, titaVo);
+		if (txPrinter != null) {
+			ServerIp = txPrinter.getServerIp();
+			Printer = txPrinter.getPrinter();
 		}
 
 		if (pageno == 0) {
@@ -2413,7 +2420,7 @@ public class MakeReport extends CommBuffer {
 				// mew report
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put("Action", 2);
-				map2.put("Printer", printer);
+				map2.put("Printer", Printer);
 				map2.put("ReportNo", tTxFile.getFileItem());
 				pMap.add(map2);
 
@@ -2504,6 +2511,8 @@ public class MakeReport extends CommBuffer {
 
 		HashMap<String, Object> rmap = new HashMap<String, Object>();
 
+		rmap.put("ServerIp", ServerIp);
+		rmap.put("Printer", Printer);
 		rmap.put("morePage", morePage);
 		rmap.put("printJson", pMap);
 //		try {

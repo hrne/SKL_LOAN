@@ -59,6 +59,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 	private int iNewBormNo = 0;
 
 	/*----------- 更新會計借新還舊檔 -------------- */
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("AcLoanRenewCom ... ");
 

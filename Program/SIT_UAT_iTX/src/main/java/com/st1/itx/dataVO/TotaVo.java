@@ -55,7 +55,7 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 		else if (param instanceof BigDecimal)
 			this.put(key, ((BigDecimal) (param == null ? 0 : param)).toPlainString());
 		else
-			this.put(key, (String) (param == null ? "" : param));
+			this.put(key, param == null ? "" : param);
 	}
 
 	public TotaVo() {

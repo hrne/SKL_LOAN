@@ -53,5 +53,6 @@ AchSpecificDdFrom=9,7
 AchSpecificDdTo=9,7
 AchSecondSpecificDdFrom=9,7
 AchSecondSpecificDdTo=9,7
-DeductDate=9,7
+DeductDateStart=9,7
+DeductDateEnd=9,7
 OpItem=9,1

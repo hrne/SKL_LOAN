@@ -49,9 +49,9 @@ public class L6043 extends TradeBuffer {
 		String iAuthNo = titaVo.getParam("AuthNo") + "%";
 		int iStatus1 = Integer.parseInt(titaVo.getParam("Status"));
 		int iStatus2 = 0;
-		if(iStatus1==9) {
-			iStatus1=0;
-			iStatus2=1;
+		if (iStatus1 == 9) {
+			iStatus1 = 0;
+			iStatus2 = 1;
 		}
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -84,7 +84,6 @@ public class L6043 extends TradeBuffer {
 				occursList.putParam("OBranchItem", getBranchItem(tTxAuthGroup.getBranchNo().trim(), titaVo));
 				occursList.putParam("OLevelFg", tTxAuthGroup.getLevelFg());
 
-				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

@@ -39,17 +39,17 @@ public class L6R25Vo {
 		if (menuFg == null) {
 			this.MenuFg = 0;
 		} else {
-			this.MenuFg = (int) menuFg;
+			this.MenuFg = menuFg;
 		}
 		if (typeFg == null) {
 			this.TypeFg = 0;
 		} else {
-			this.TypeFg = (int) typeFg;
+			this.TypeFg = typeFg;
 		}
 		if (authFg == null) {
 			this.AuthFg = 0;
 		} else {
-			this.AuthFg = (int) authFg;
+			this.AuthFg = authFg;
 		}
 	}
 

@@ -144,32 +144,32 @@ public class LNM34APReport extends MakeReport {
 							break; // 到期日(撥款)
 						case 12:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額
 						case 13:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 撥款金額
 						case 14:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 帳管費
 						case 15:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 本金餘額(撥款)
 						case 16:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 應收利息
 						case 17:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 法拍及火險費用
 						case 18:
@@ -188,7 +188,7 @@ public class LNM34APReport extends MakeReport {
 							break; // 轉銷呆帳日期
 						case 22:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 轉銷呆帳金額
 						case 23:
@@ -237,7 +237,7 @@ public class LNM34APReport extends MakeReport {
 							break; // 產品別
 						case 37:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 原始鑑價金額
 						case 38:

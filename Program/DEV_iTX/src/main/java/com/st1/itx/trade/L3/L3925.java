@@ -142,6 +142,7 @@ public class L3925 extends TradeBuffer {
 		}
 		// 排序,依應繳日順序由小到大
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
+			@Override
 			public int compare(LoanBorMain c1, LoanBorMain c2) {
 				return c1.getNextPayIntDate() - c2.getNextPayIntDate();
 			}

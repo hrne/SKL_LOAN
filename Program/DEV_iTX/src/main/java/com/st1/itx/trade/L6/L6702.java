@@ -118,11 +118,11 @@ public class L6702 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
-			
+
 			dataLog.compareOldNew("無權限");
-			
+
 			dataLog.setEnv(titaVo, tCdBranch2, tCdBranch);
-			dataLog.exec("修改營業單位對照檔 "+tCdBranch.getBranchNo()+" "+tCdBranch.getBranchItem());
+			dataLog.exec("修改營業單位對照檔 " + tCdBranch.getBranchNo() + " " + tCdBranch.getBranchItem());
 
 			break;
 
@@ -165,16 +165,16 @@ public class L6702 extends TradeBuffer {
 		mCdBranch.setBranchStatusCode(titaVo.getParam("BranchStatusCode"));
 		mCdBranch.setRSOCode(titaVo.getParam("RSOCode"));
 		mCdBranch.setMediaUnitCode(titaVo.getParam("MediaUnitCode"));
-		
+
 		return mCdBranch;
 	}
 
 	private void moveCdBranchGroup(String mBranchNo, int mFuncCode, TitaVo titaVo) throws LogicException {
 		this.info("into moveCdBranchGroup");
-		//原本課組別
+		// 原本課組別
 		Slice<CdBranchGroup> mCdBranchGroup = sCdBranchGroupService.findByBranchNo(mBranchNo, this.index, this.limit, titaVo);
 		List<CdBranchGroup> dCdBranchGroup = mCdBranchGroup == null ? null : mCdBranchGroup.getContent();
-		
+
 		if (mFuncCode == 2 || mFuncCode == 4) {
 			if (dCdBranchGroup != null) {
 				try {
@@ -182,62 +182,56 @@ public class L6702 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 				}
-				
-				for (CdBranchGroup sCdBranchGroup : dCdBranchGroup) {//刪除時將原本的記為有權限
-					dataLog.putOld(sCdBranchGroup.getGroupNo()+" "+sCdBranchGroup.getGroupItem(),"有權限");
-					this.info("putOld "+sCdBranchGroup.getGroupNo()+":"+sCdBranchGroup.getGroupItem()+"有權限");
+
+				for (CdBranchGroup sCdBranchGroup : dCdBranchGroup) {// 刪除時將原本的記為有權限
+					dataLog.putOld(sCdBranchGroup.getGroupNo() + " " + sCdBranchGroup.getGroupItem(), "有權限");
+					this.info("putOld " + sCdBranchGroup.getGroupNo() + ":" + sCdBranchGroup.getGroupItem() + "有權限");
 				}
-				
-				dataLog.putOld("","");//最後放一筆空資料
+
+				dataLog.putOld("", "");// 最後放一筆空資料
 			}
 		}
 
-		
-		
-		
 		if (mFuncCode == 1 || mFuncCode == 2) {
-			
-			if(mFuncCode == 2 ) {
-				for (int j = 1; j <= 20; j++) {//修改時時將TITA傳入的記為有權限
+
+			if (mFuncCode == 2) {
+				for (int j = 1; j <= 20; j++) {// 修改時時將TITA傳入的記為有權限
 					if (titaVo.getParam("GroupNo" + j) != null && titaVo.getParam("GroupNo" + j).length() > 0) {
-						dataLog.putNew(titaVo.getParam("GroupNo" + j)+" "+titaVo.getParam("Group" + j),"有權限");
-						this.info("putNew "+titaVo.getParam("GroupNo" + j)+":"+titaVo.getParam("Group" + j)+"有權限");
+						dataLog.putNew(titaVo.getParam("GroupNo" + j) + " " + titaVo.getParam("Group" + j), "有權限");
+						this.info("putNew " + titaVo.getParam("GroupNo" + j) + ":" + titaVo.getParam("Group" + j) + "有權限");
 					}
 				}
-				
-				if(dCdBranchGroup != null) {
-					for(CdBranchGroup deCdBranchGroup : dCdBranchGroup) {
+
+				if (dCdBranchGroup != null) {
+					for (CdBranchGroup deCdBranchGroup : dCdBranchGroup) {
 						int type = 0;
-						for (int k = 1; k <= 20; k++) {//修改時時將TITA傳入之外的記為無權限
-							if((deCdBranchGroup.getGroupNo()).equals(titaVo.getParam("GroupNo" + k)) 
-									&& (deCdBranchGroup.getGroupItem()).equals(titaVo.getParam("Group" + k))) {
-								type=1;
+						for (int k = 1; k <= 20; k++) {// 修改時時將TITA傳入之外的記為無權限
+							if ((deCdBranchGroup.getGroupNo()).equals(titaVo.getParam("GroupNo" + k)) && (deCdBranchGroup.getGroupItem()).equals(titaVo.getParam("Group" + k))) {
+								type = 1;
 								break;
 							}
 						}
-						if(type==0) {
-							dataLog.putNew(deCdBranchGroup.getGroupNo()+" "+deCdBranchGroup.getGroupItem(),"無權限");
-							this.info("putNew "+deCdBranchGroup.getGroupNo()+":"+deCdBranchGroup.getGroupItem()+"無權限");
+						if (type == 0) {
+							dataLog.putNew(deCdBranchGroup.getGroupNo() + " " + deCdBranchGroup.getGroupItem(), "無權限");
+							this.info("putNew " + deCdBranchGroup.getGroupNo() + ":" + deCdBranchGroup.getGroupItem() + "無權限");
 						}
-						
+
 					}
-					dataLog.putNew("",""); //最後放一筆空資料
+					dataLog.putNew("", ""); // 最後放一筆空資料
 				}
-				
-			
+
 			}
-			
-			
+
 			for (int i = 1; i <= 20; i++) {
 				if (titaVo.getParam("GroupNo" + i) != null && titaVo.getParam("GroupNo" + i).length() > 0) {
-					
-						CdBranchGroup tCdBranchGroup = new CdBranchGroup();
-						CdBranchGroupId tCdBranchGroupId = new CdBranchGroupId();
 
-						tCdBranchGroupId.setBranchNo(mBranchNo);
-						tCdBranchGroupId.setGroupNo(titaVo.getParam("GroupNo"+i));
-						tCdBranchGroup.setCdBranchGroupId(tCdBranchGroupId);
-						tCdBranchGroup.setGroupItem(titaVo.getParam("Group" + i));
+					CdBranchGroup tCdBranchGroup = new CdBranchGroup();
+					CdBranchGroupId tCdBranchGroupId = new CdBranchGroupId();
+
+					tCdBranchGroupId.setBranchNo(mBranchNo);
+					tCdBranchGroupId.setGroupNo(titaVo.getParam("GroupNo" + i));
+					tCdBranchGroup.setCdBranchGroupId(tCdBranchGroupId);
+					tCdBranchGroup.setGroupItem(titaVo.getParam("Group" + i));
 
 					try {
 						sCdBranchGroupService.insert(tCdBranchGroup, titaVo);

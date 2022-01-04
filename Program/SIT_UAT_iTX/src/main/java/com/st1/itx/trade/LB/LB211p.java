@@ -13,7 +13,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
-
 /**
  * 
  * 
@@ -30,10 +29,10 @@ public class LB211p extends TradeBuffer {
 	public LB211Report lb211Report;
 
 	@Autowired
-	DateUtil dDateUtil; 
+	DateUtil dDateUtil;
 
 	@Autowired
-	WebClient webClient; 
+	WebClient webClient;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -45,8 +44,7 @@ public class LB211p extends TradeBuffer {
 
 		boolean isFinish = lb211Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

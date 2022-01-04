@@ -103,6 +103,7 @@ public class MailService extends CommBuffer {
 		properties.setProperty(mailServer, mailHost);
 		this.session = Session.getInstance(properties, new javax.mail.Authenticator() {
 //		this.session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
+			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password);
 			}

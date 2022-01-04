@@ -101,9 +101,15 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<
 !借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
-#CustNo=A,7,I
-INVOKEJS(SHOW,p1,1,3,1)
+#CustNo=X,7,I
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+@C(4,#CustNo,S,$)
+V(9)
+
+#TmpCustNo=A,7,S
+C(4,#CustNo,S,$)
+E(0,@TmpCustNo,#CustNo)
+T(2,@CustNo,#TmpCustNo)
 
 #InitFdB=X,1,S
 T(3,@FdApplNo, )
@@ -122,10 +128,9 @@ C(3,#CustNo,0,S,$)
 
 #WKBTN1=X,1,S
 C(3,#CustNo,0,HIDE(#BTN1),SHOW(#BTN1))
-C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
 
 #BUF1B=X,30,S
-T(2,#CustNo+9999999000)
+C(4,#CustNo,T(3,00000009999999000),T(2,#CustNo+9999999000))
 
 #BIND1B=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo})
@@ -141,7 +146,6 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
 C(3,#CustNo,0,$,S)
-INVOKEJS(SHOW,p1,2,2,1)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 @C(4,#CustId,S,$)
 V(7)
@@ -158,7 +162,6 @@ A(ID_UNINO,0,#CustId)
 
 #WKBTN2=X,1,S
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
-C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,3,0))
 
 #SendL2r07B=X,1,S
 C(4,#CustId,S,$)
@@ -189,13 +192,17 @@ C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
 T(3,*)
 
-#ApplNo=A,7,I
+#ApplNo=X,7,I
 C(3,#CHAIN,1,s,$)
 C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
-INVOKEJS(SHOW,p1,3,3,1)
 SHOW(#BTN3)HIDE(#BTN1,#BTN2)
 @C(3,#ApplNo,0,V(P,需擇一輸入),$)
+
+#TmpApplNo=A,7,S
+C(4,#ApplNo,S,$)
+E(0,@TmpApplNo,#ApplNo)
+T(2,@ApplNo,#TmpApplNo)
 
 #BUF3B=X,45,S
 T(2,0000000000000000000000000000          +#ApplNo)
@@ -249,9 +256,19 @@ C(3,#ApplNo,0,$,E(0,#L2r05FacmNo))
 C(3,#ApplNo,0,$,s)
 SHOW(#BTN4)
 
+!用CustNo,FacmNo調L2R05
+#SendL2r05B=X,1,S
+C(3,#FacmNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimApplNo,0)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05B,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
 
 !入帳日期
-
 #EntryDate=D,7,I
 @A(DATE,0,#EntryDate)
 

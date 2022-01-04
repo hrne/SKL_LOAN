@@ -47,18 +47,12 @@ public class LB092ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB092 不動產擔保品明細檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
-				+ "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\"" + "     , M.\"EvaAmt\""
-				+ "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\""
-				+ "     , M.\"MonthSettingAmt\"" + "     , M.\"SettingSeq\"" + "     , M.\"SettingAmt\""
-				+ "     , M.\"PreSettingAmt\"" + "     , M.\"DispPrice\"" + "     , M.\"IssueEndDate\""
-				+ "     , M.\"CityJCICCode\"" + "     , M.\"AreaJCICCode\"" + "     , M.\"IrCode\""
-				+ "     , M.\"LandNo1\"" + "     , M.\"LandNo2\"" + "     , M.\"BdNo1\"" + "     , M.\"BdNo2\""
-				+ "     , M.\"Zip\"" + "     , M.\"InsuFg\"" + "     , M.\"LVITax\"" + "     , M.\"LVITaxYearMonth\""
-				+ "     , M.\"ContractPrice\"" + "     , M.\"ContractDate\"" + "     , M.\"ParkingTypeCode\""
-				+ "     , M.\"Area\"" + "     , M.\"LandOwnedArea\"" + "     , M.\"BdTypeCode\""
-				+ "     , M.\"Filler33\"" + "     , M.\"JcicDataYM\"" + " FROM  \"JcicB092\" M"
-				+ " WHERE M.\"DataYM\" = :dateMonth "
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\""
+				+ "     , M.\"EvaAmt\"" + "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\"" + "     , M.\"MonthSettingAmt\"" + "     , M.\"SettingSeq\""
+				+ "     , M.\"SettingAmt\"" + "     , M.\"PreSettingAmt\"" + "     , M.\"DispPrice\"" + "     , M.\"IssueEndDate\"" + "     , M.\"CityJCICCode\"" + "     , M.\"AreaJCICCode\""
+				+ "     , M.\"IrCode\"" + "     , M.\"LandNo1\"" + "     , M.\"LandNo2\"" + "     , M.\"BdNo1\"" + "     , M.\"BdNo2\"" + "     , M.\"Zip\"" + "     , M.\"InsuFg\""
+				+ "     , M.\"LVITax\"" + "     , M.\"LVITaxYearMonth\"" + "     , M.\"ContractPrice\"" + "     , M.\"ContractDate\"" + "     , M.\"ParkingTypeCode\"" + "     , M.\"Area\""
+				+ "     , M.\"LandOwnedArea\"" + "     , M.\"BdTypeCode\"" + "     , M.\"Filler33\"" + "     , M.\"JcicDataYM\"" + " FROM  \"JcicB092\" M" + " WHERE M.\"DataYM\" = :dateMonth "
 				+ " ORDER BY M.\"ClActNo\",  M.\"OwnerId\",  M.\"CityJCICCode\",  M.\"AreaJCICCode\",  M.\"IrCode\",  M.\"LandNo1\",  M.\"LandNo2\",  M.\"BdNo1\",  M.\"BdNo2\"";
 
 		this.info("sql=" + sql);
@@ -71,7 +65,7 @@ public class LB092ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB092.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth); 
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

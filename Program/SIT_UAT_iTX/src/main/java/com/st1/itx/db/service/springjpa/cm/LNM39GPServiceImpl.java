@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39GP 資料欄位清單7(放款與應收帳款-stage轉換用)  LNFGP 放款stage轉換分類(撥款層)
+ * LNM39GP 資料欄位清單7(放款與應收帳款-stage轉換用) LNFGP 放款stage轉換分類(撥款層)
  */
 
 public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,12 +52,9 @@ public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單7
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", "
-				+ " \"CustKind\", \"Status\", \"OvduDate\", "
-				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", "
-				+ " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" "
-				+ " FROM  \"LoanIfrs9Gp\" " + " WHERE \"DataYM\"   = :dateMonth "
-				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", " + " \"CustKind\", \"Status\", \"OvduDate\", "
+				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", " + " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" " + " FROM  \"LoanIfrs9Gp\" "
+				+ " WHERE \"DataYM\"   = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 

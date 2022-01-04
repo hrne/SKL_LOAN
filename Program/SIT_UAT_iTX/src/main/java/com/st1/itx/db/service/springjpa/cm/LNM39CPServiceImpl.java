@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39CP 資料欄位清單3(台幣放款-計算原始有效利率用)  LNFCP 放款多段還款檔(撥款層)
+ * LNM39CP 資料欄位清單3(台幣放款-計算原始有效利率用) LNFCP 放款多段還款檔(撥款層)
  */
 
 public class LNM39CPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,8 +52,7 @@ public class LNM39CPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單3
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"AmortizedCode\", \"PayIntFreq\", \"RepayFreq\", \"EffectDate\""
-				+ " FROM  \"LoanIfrs9Cp\"" + " WHERE \"DataYM\"  = :dateMonth "
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"AmortizedCode\", \"PayIntFreq\", \"RepayFreq\", \"EffectDate\"" + " FROM  \"LoanIfrs9Cp\"" + " WHERE \"DataYM\"  = :dateMonth "
 				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\"";
 
 		this.info("sql=" + sql);

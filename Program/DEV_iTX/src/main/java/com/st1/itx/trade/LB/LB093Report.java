@@ -106,8 +106,7 @@ public class LB093Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B093", "動產及貴重物品擔保品明細檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B093-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B093-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 99, ' ');
 			makeFile.put(strContent);
 
@@ -218,10 +217,8 @@ public class LB093Report extends MakeReport {
 		String txt = "";
 
 		// B093 動產及貴重物品擔保品明細檔
-		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品類別(62~63),擔保品所有權人或代表人IDN/BAN(64~73),"
-				+ "鑑估值(74~81),鑑估日期(82~86),可放款值(87~94),設定日期(95~99),本行本月設定金額(100~107),本月設定抵押順位(108),"
-				+ "本行累計已設定總金額(109~116),其他債權人前已設定金額(117~124),處分價格(125~132),權利到期年月(133~137),是否有保險(138),"
-				+ "空白(139~155),資料所屬年月(156~160)";
+		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品類別(62~63),擔保品所有權人或代表人IDN/BAN(64~73)," + "鑑估值(74~81),鑑估日期(82~86),可放款值(87~94),設定日期(95~99),本行本月設定金額(100~107),本月設定抵押順位(108),"
+				+ "本行累計已設定總金額(109~116),其他債權人前已設定金額(117~124),處分價格(125~132),權利到期年月(133~137),是否有保險(138)," + "空白(139~155),資料所屬年月(156~160)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19";
 
 		String txt1[] = txt.split(";");

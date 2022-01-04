@@ -483,6 +483,7 @@ public class PfDetailCom extends TradeBuffer {
 		List<PfDetail> lReverse = new ArrayList<PfDetail>(lPfDetail);
 		// 排序 (後進先沖)
 		Collections.sort(lReverse, new Comparator<PfDetail>() {
+			@Override
 			public int compare(PfDetail c1, PfDetail c2) {
 				if (c1.getLogNo() != c2.getLogNo()) {
 					return (c1.getLogNo() > c2.getLogNo() ? -1 : 1);
@@ -518,6 +519,7 @@ public class PfDetailCom extends TradeBuffer {
 		}
 		// 排序 (介紹獎金、換算業績獎金)低的計件代碼者優先回沖
 		Collections.sort(lExtraRepay, new Comparator<PfDetail>() {
+			@Override
 			public int compare(PfDetail c1, PfDetail c2) {
 				if (c1.getItBonus().compareTo(c1.getItBonus()) != 0) {
 					return (c1.getItBonus().compareTo(c2.getItBonus()) < 0 ? -1 : 1);

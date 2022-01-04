@@ -274,8 +274,8 @@ public class L3220 extends TradeBuffer {
 		if (tLoanCheque == null) {
 			throw new LogicException(titaVo, "E0006", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 鎖定資料時，發生錯誤
 		}
-		if (!tLoanCheque.getStatusCode().equals("0")) {
-			throw new LogicException(titaVo, "E3058", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 該票據狀況碼非為未處理
+		if (!(tLoanCheque.getStatusCode().equals("0") || tLoanCheque.getStatusCode().equals("5"))) {
+			throw new LogicException(titaVo, "E3058", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 該票據狀況碼非未處理與即期票
 		}
 		// 期票未托收不可抽票
 		if (tLoanCheque.getReceiveDate() == this.txBuffer.getTxCom().getTbsdy()) {

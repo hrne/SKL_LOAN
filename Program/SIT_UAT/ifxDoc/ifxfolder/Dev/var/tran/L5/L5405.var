@@ -271,7 +271,7 @@ T(2,@EmpName,#L5R06FullName)
 #BTNBBUF=X,7,S
 T(3,      Y)
 #BINDB=X,1,S
-BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BTNBBUF;ntxbuf5=type<-1:DepartOfficer<-OOFullname})
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BTNBBUF;ntxbuf5=type<-1:DepartOfficer<-OOFullname})
 
 ! 專員姓名
 #DepartOfficer=X,8,I

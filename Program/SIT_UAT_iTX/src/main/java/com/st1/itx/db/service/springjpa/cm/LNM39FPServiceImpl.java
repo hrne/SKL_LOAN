@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39FP 資料欄位清單6(放款與應收帳款-協商戶用)  LNFFP 放款協商戶資訊(撥款層)
+ * LNM39FP 資料欄位清單6(放款與應收帳款-協商戶用) LNFFP 放款協商戶資訊(撥款層)
  */
 
 public class LNM39FPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,8 +52,7 @@ public class LNM39FPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單6
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" "
-				+ " FROM  \"LoanIfrs9Fp\" " + " WHERE \"DataYM\"= :dateMonth "
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" " + " FROM  \"LoanIfrs9Fp\" " + " WHERE \"DataYM\"= :dateMonth "
 				+ " ORDER BY \"CustNo\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);

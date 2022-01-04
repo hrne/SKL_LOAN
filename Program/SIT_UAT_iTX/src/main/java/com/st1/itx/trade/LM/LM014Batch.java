@@ -38,7 +38,7 @@ public class LM014Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM014Batch ");
-		
+
 		// 選項: 0 全部
 		titaVo.putParam("inputType", 0);
 

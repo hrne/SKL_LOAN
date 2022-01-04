@@ -217,10 +217,10 @@ public class ApControl extends SysLogger {
 				tota = FormatUtil.pad9(Integer.toString(tota.getBytes("UTF-8").length + 5), 5) + tota;
 			}
 			baseTransaction.commitEnd();
-			
+
 			if (!this.titaVo.getBatchJobId().isEmpty())
 				this.callBatchJob(this.titaVo.getBatchJobId());
-			
+
 			isDone = true;
 		} catch (LogicException e) {
 			this.totaVoList.clear();
@@ -251,7 +251,6 @@ public class ApControl extends SysLogger {
 
 		watch.stop();
 		this.mustInfo("Total execution time " + watch.getTotalTimeMillis() + " Millisecond");
-
 
 		return tota;
 	}

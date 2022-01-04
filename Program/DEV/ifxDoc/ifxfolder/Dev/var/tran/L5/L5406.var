@@ -125,7 +125,7 @@ C(3,#FunctionCd,1,$,s)
 #BUFA=X,7,S
 T(3,      Y)
 #BINDA=X,1,S
-BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUFA;ntxbuf5=type<-1:InterviewerA<-OOEmployeeNo:InterviewerAX<-OOFullname})
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFA;ntxbuf5=type<-1:InterviewerA<-OOEmployeeNo:InterviewerAX<-OOFullname})
 
 
 #InterviewerA=X,6,I
@@ -148,7 +148,7 @@ C(4,#InterviewerA,S,$)
 #BUFB=X,7,S
 T(3,      Y)
 #BINDB=X,1,S
-BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUFB;ntxbuf5=type<-1:InterviewerB<-OOEmployeeNo:InterviewerBX<-OOFullname})
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFB;ntxbuf5=type<-1:InterviewerB<-OOEmployeeNo:InterviewerBX<-OOFullname})
 
 C(4,#InterviewerB,$,C(2,#FunctionCd,S,$,$,$,s,s))
 #InterviewerB=X,6,I

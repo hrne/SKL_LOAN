@@ -196,6 +196,7 @@ class L4001Vo implements Comparable<L4001Vo> {
 		this.oStatusCode = oStatusCode;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -205,6 +206,7 @@ class L4001Vo implements Comparable<L4001Vo> {
 		return oAcDate == l4001Vo.getoAcDate() && oBatchNo.equals(l4001Vo.getoBatchNo()) && oDrawdownCode == l4001Vo.getoDrawdownCode() && oStatusCode == l4001Vo.getoStatusCode();
 	}
 
+	@Override
 	public int hashCode() {
 		return Objects.hash(oAcDate, oBatchNo, oDrawdownCode, oStatusCode);
 	}

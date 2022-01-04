@@ -33,8 +33,8 @@ public class LNM34EPServiceImpl extends ASpringJpaParm implements InitializingBe
 	}
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		boolean onLineMode = true;
-//		boolean onLineMode = false;
+//		boolean onLineMode = true;
+		boolean onLineMode = false;
 
 		this.info("----------- LNM34EP.findAll ---------------");
 		this.info("-----LNM34EP TitaVo=" + titaVo);
@@ -52,10 +52,8 @@ public class LNM34EPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// LNM34EP 資料欄位清單E
-		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" "
-				+ ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
-				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" "
-				+ " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
+				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" " + " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 

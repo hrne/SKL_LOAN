@@ -97,12 +97,12 @@ public class L2R37 extends TradeBuffer {
 		this.totaVo.putParam("L2r37CurrencyCode", tAcReceivable.getCurrencyCode()); // 幣別
 		this.totaVo.putParam("L2r37FeeAmt", tAcReceivable.getRvAmt()); // 契變手續費
 
-		if(tAcReceivable.getClsFlag() == 1) {
+		if (tAcReceivable.getClsFlag() == 1) {
 			this.totaVo.putParam("L2r37AcDate", tAcReceivable.getLastAcDate()); // 會計日期
-			this.totaVo.putParam("L2r37TitaTxtNo", tAcReceivable.getTitaTxtNo()); // 交易序號			
+			this.totaVo.putParam("L2r37TitaTxtNo", tAcReceivable.getTitaTxtNo()); // 交易序號
 		} else {
 			this.totaVo.putParam("L2r37AcDate", 0); // 會計日期
-			this.totaVo.putParam("L2r37TitaTxtNo", 0); // 交易序號		
+			this.totaVo.putParam("L2r37TitaTxtNo", 0); // 交易序號
 		}
 		this.totaVo.putParam("L2r37TLR_NO", tAcReceivable.getTitaTlrNo()); // 經辦編號
 		this.totaVo.putParam("L2r37MODIFY_DT", CreateDate); // 作業日期

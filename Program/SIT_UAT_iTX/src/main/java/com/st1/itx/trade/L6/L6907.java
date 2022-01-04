@@ -105,7 +105,7 @@ public class L6907 extends TradeBuffer {
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 45 * 200 = 9000
-		
+
 		new ArrayList<AcReceivable>();
 		Slice<AcReceivable> slAcReceivable = null;
 		// 輸入科子細目

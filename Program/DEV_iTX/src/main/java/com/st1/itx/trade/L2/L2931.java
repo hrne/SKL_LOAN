@@ -169,6 +169,7 @@ public class L2931 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
+			@Override
 			public int compare(LoanBorMain c1, LoanBorMain c2) {
 				// 部分償還金額 > 0時排序,依利率順序由大到小 else 依應繳日順序由小到大
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {

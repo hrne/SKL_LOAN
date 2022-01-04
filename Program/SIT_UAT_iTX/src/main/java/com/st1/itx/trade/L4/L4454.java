@@ -99,7 +99,7 @@ public class L4454 extends TradeBuffer {
 
 	@Autowired
 	L9705Form l9705Form;
-	
+
 	private int reportACnt = 0;
 	private HashMap<Integer, Integer> custLoanFlag = new HashMap<>();
 	private HashMap<Integer, Integer> custFireFlag = new HashMap<>();
@@ -141,14 +141,10 @@ public class L4454 extends TradeBuffer {
 		// 訂正交易處理 (刪除應處理明細)
 		if (titaVo.isHcodeErase()) {
 			String msg = "L4454產生銀扣失敗通知 訂正完畢。";
-			cntText = txToDoCom.delDetailByTxNo("TEXT00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
-			cntEmail = txToDoCom.delDetailByTxNo("MAIL00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
-			cntL9705 = txToDoCom.delReserveByTxNo("NOTI01", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
-			cntL4454 = txToDoCom.delReserveByTxNo("NOTI02", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntText = txToDoCom.delDetailByTxNo("TEXT00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntEmail = txToDoCom.delDetailByTxNo("MAIL00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntL9705 = txToDoCom.delReserveByTxNo("NOTI01", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntL4454 = txToDoCom.delReserveByTxNo("NOTI02", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
 			if (functionCode == 1 || functionCode == 2) {
 				msg += ", 刪除簡訊+eMail筆數：" + (cntText + cntEmail);
 				if (cntL4454 > 0) {
@@ -227,8 +223,7 @@ public class L4454 extends TradeBuffer {
 			}
 			msg += ", 繳息還本通知單份數：" + l9705ListA.size() + l9705ListB.size();
 			if (l4454List.size() > 0) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo(), msg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), msg, titaVo);
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", msg, titaVo);
 			}
@@ -330,15 +325,13 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-	private void sendText(String repayBank, Map<String, String> t, String phoneNo, int insuM, TitaVo titaVo)
-			throws LogicException {
+	private void sendText(String repayBank, Map<String, String> t, String phoneNo, int insuM, TitaVo titaVo) throws LogicException {
 		if (repayType == 1 || repayType == 3) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
 				cntText++;
 				String dataLines = "";
-				dataLines = "\"H1\",\"" + t.get("CustId") + "\",\"" + phoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\""
-						+ this.getTxBuffer().getTxCom().getTbsdy() + "\"";
+				dataLines = "\"H1\",\"" + t.get("CustId") + "\",\"" + phoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + this.getTxBuffer().getTxCom().getTbsdy() + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);
@@ -371,8 +364,7 @@ public class L4454 extends TradeBuffer {
 				this.info("sInsuMonth ... " + toFullWidth("" + insuM));
 
 				String dataLines = "";
-				dataLines = "\"H1\",\"" + t.get("CustId") + "\",\"" + phoneNo + "\",\"您好：提醒您" + sInsuMonth
-						+ "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
+				dataLines = "\"H1\",\"" + t.get("CustId") + "\",\"" + phoneNo + "\",\"您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
 						+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -399,8 +391,7 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-	private void sendEmail(String repayBank, Map<String, String> t, String emailAd, int insuM, TitaVo titaVo)
-			throws LogicException {
+	private void sendEmail(String repayBank, Map<String, String> t, String emailAd, int insuM, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
 		if (repayType == 1 || repayType == 3) {
@@ -471,18 +462,15 @@ public class L4454 extends TradeBuffer {
 	private int fistDeductCheck(TitaVo titaVo) throws LogicException {
 		int result = 1;
 		// 銀扣檔有相同繳息迄日的期款扣款失敗資料
-		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo, 
-				prevIntDate + 19110000, titaVo);
+		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo, prevIntDate + 19110000, titaVo);
 		if (tBankDeductDtl != null) {
 			if ((tBankDeductDtl.getEntryDate() < entryDate && tBankDeductDtl.getRepayType() == 1)) {
-				if ("Y".equals(tBankDeductDtl.getMediaCode().trim())
-						|| !("00".equals(tBankDeductDtl.getReturnCode().trim())
-								&& "".equals(tBankDeductDtl.getReturnCode().trim()))) {
+				if ("Y".equals(tBankDeductDtl.getMediaCode().trim()) || !("00".equals(tBankDeductDtl.getReturnCode().trim()) && "".equals(tBankDeductDtl.getReturnCode().trim()))) {
 					result = 2;
 				}
 			}
 		}
-		this.info("fistDeductCheck="+ result );
+		this.info("fistDeductCheck=" + result);
 		return result;
 	}
 
@@ -508,18 +496,18 @@ public class L4454 extends TradeBuffer {
 //	還本繳息通知單(出火險成功期款失敗通知)
 	private void reportB(TitaVo titaVo) throws LogicException {
 		this.info("ReportB Start...");
-		
-		if(l9705ListA.size() > 0) {
-		  titaVo.putParam("CONDITION1", "A");	
-		  this.info("go l9705ListA");
-		  l9705Report.exec(l9705ListA, titaVo, this.getTxBuffer());
-		} 
-		
-		if(l9705ListB.size() > 0) {
-		  titaVo.putParam("CONDITION1", "B");
-		  this.info("go l9705ListB");
-		  l9705Report.exec(l9705ListB, titaVo, this.getTxBuffer());
-		  l9705Form.exec(l9705ListB, titaVo, this.getTxBuffer());
+
+		if (l9705ListA.size() > 0) {
+			titaVo.putParam("CONDITION1", "A");
+			this.info("go l9705ListA");
+			l9705Report.exec(l9705ListA, titaVo, this.getTxBuffer());
+		}
+
+		if (l9705ListB.size() > 0) {
+			titaVo.putParam("CONDITION1", "B");
+			this.info("go l9705ListB");
+			l9705Report.exec(l9705ListB, titaVo, this.getTxBuffer());
+			l9705Form.exec(l9705ListB, titaVo, this.getTxBuffer());
 		}
 	}
 
@@ -626,7 +614,7 @@ public class L4454 extends TradeBuffer {
 		int tranTemp = 0;
 
 		for (int i = 0; i < chars.length; i++) {
-			tranTemp = (int) chars[i];
+			tranTemp = chars[i];
 			if (tranTemp != 45) // ASCII碼:45 是減號 -
 				tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 			outStr += (char) tranTemp;

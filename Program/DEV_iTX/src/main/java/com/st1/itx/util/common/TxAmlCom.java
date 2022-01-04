@@ -125,6 +125,7 @@ public class TxAmlCom extends TradeBuffer {
 	private int custNo = 0;
 
 	/*---------- run ----------*/
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		return null;
 	}

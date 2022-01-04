@@ -203,12 +203,17 @@ T(2,#StanIp+#Code+#Item+#ServerIp+#Printer)
 
 !套印printReport
 #BTN=X,1,S
-C(3,#Type,6,C(4,#ServerIp,BIND(grid,{ cmd=CHAIN; ntxcd=LC115; ntxbuf=#Buf ;text=設定印表機}),BIND(grid,{cmd=printReport;sno=#Sno;fileType=#Type;item=#Item;text=套印})),BIND(grid,{cmd=viewPdf;sno=#Sno;fileType=#Type;item=#Item}))
+C(3,#Type,6,C(4,#ServerIp,BIND(grid,{ cmd=CHAIN; ntxcd=LC115; ntxbuf=#Buf ;text=設定印表機}),BIND(grid,{cmd=printReport;sno=#Sno;fileType=#Type;item=#Item;ServerIp=#ServerIp;Printer=#Printer;text=套印})),BIND(grid,{cmd=viewPdf;sno=#Sno;fileType=#Type;item=#Item}))
 
 ! 簽核按鈕
+#CodeX=x,80,S
+T(2,#Code)
+
+#ItemX=x,160,S
+T(2,#Item)
 
 #BUF2=X,255,S
-T(2,#Sno+#Code+#Item+#Ymd)
+T(2,#Sno+#CodeX+#ItemX+#Ymd)
 
 #BTN2=X,4,S
 C(3,#SignCode,1,BIND(grid,{cmd=CHAIN;ntxcd=LC109;text=簽核;ntxbuf=#BUF2}),BIND(grid,cancel))

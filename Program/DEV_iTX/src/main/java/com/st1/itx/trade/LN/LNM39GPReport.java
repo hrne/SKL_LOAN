@@ -53,7 +53,7 @@ public class LNM39GPReport extends MakeReport {
 		// LNM39GP 欄位清單７
 		this.info("---------- LNM39GPReport exec titaVo: " + titaVo);
 
-		List<Map<String, String>> LNM39GPList = null;		
+		List<Map<String, String>> LNM39GPList = null;
 		try {
 			LNM39GPList = lNM39GPServiceImpl.findAll(titaVo);
 		} catch (Exception e) {

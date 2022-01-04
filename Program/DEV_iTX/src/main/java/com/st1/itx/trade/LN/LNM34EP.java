@@ -28,7 +28,7 @@ public class LNM34EP extends BatchBase implements Tasklet, InitializingBean {
 	public LNM34EPReport lnm34epReport;
 
 	@Autowired
-	DateUtil dDateUtil; 
+	DateUtil dDateUtil;
 
 	@Autowired
 	WebClient webClient;
@@ -49,15 +49,16 @@ public class LNM34EP extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LNM34EP active LNM34EP ");
 		this.info("LNM34EP titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		String tranCode = "LNM34EP";
-		String tranName = "IAS39 資料欄位清單E";
+		// String tranCode = "LNM34EP";
+		// String tranName = "IAS39 資料欄位清單E";
 
 		this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lnm34epReport.exec(titaVo); // 使用月報資料庫
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-		
+		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
+		// "Y", "LC009", titaVo.getTlrNo(),
+		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+
 	}
 
 }

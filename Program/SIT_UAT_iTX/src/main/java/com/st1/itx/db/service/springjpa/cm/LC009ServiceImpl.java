@@ -72,7 +72,7 @@ public class LC009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and A.\"BrNo\"=:brno";
 
 		if (iCreateDate1 > 0) {
-			sql += "   and A.\"CreateDate\" >= to_date(:createdate1,'yyyymmdd hh24:mi:ss') AND A.\"CreateDate\" <= to_date(:createdate2,'yyyymmdd hh24:mi:ss') ";		
+			sql += "   and A.\"CreateDate\" >= to_date(:createdate1,'yyyymmdd hh24:mi:ss') AND A.\"CreateDate\" <= to_date(:createdate2,'yyyymmdd hh24:mi:ss') ";
 		}
 		if (!"".equals(iTlrNo)) {
 			sql += "   and A.\"CreateEmpNo\" = :tlrno";
@@ -98,7 +98,7 @@ public class LC009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("filedate2", iFiledate2);
 		query.setParameter("brno", iBrNo);
 		query.setParameter("stanip", titaVo.getParam("IP"));
-		
+
 		if (iCreateDate1 > 0) {
 			query.setParameter("createdate1", iCreateDate1 + " 00:00:00");
 			query.setParameter("createdate2", iCreateDate2 + " 23:59:59");

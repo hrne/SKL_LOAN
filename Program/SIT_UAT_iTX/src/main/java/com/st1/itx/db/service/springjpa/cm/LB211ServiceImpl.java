@@ -57,14 +57,10 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// B211 聯徵每日授信餘額變動資料檔
-		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"TranCode\" " + "     , M.\"CustId\" "
-				+ "     , M.\"SubTranCode\" " + "     , M.\"AcDate\" " + "     , M.\"AcctNo\" " + "     , M.\"TxAmt\" "
-				+ "     , M.\"LoanBal\" " + "     , M.\"RepayCode\" " + "     , M.\"NegStatus\" "
-				+ "     , M.\"AcctCode\" " + "     , M.\"SubAcctCode\" " + "     , M.\"BadDebtDate\" "
-				+ "     , M.\"ConsumeFg\" " + "     , M.\"FinCode\" " + "     , M.\"UsageCode\" "
-				+ "     , M.\"Filler18\" " + " FROM  \"JcicB211\" M " 
-                + " WHERE ( M.\"DataYMD\" Between :acdateStart  AND :acdateEnd  )"
-				+ " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"TranCode\", M.\"LoanBal\"  ";
+		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"TranCode\" " + "     , M.\"CustId\" " + "     , M.\"SubTranCode\" " + "     , M.\"AcDate\" " + "     , M.\"AcctNo\" "
+				+ "     , M.\"TxAmt\" " + "     , M.\"LoanBal\" " + "     , M.\"RepayCode\" " + "     , M.\"NegStatus\" " + "     , M.\"AcctCode\" " + "     , M.\"SubAcctCode\" "
+				+ "     , M.\"BadDebtDate\" " + "     , M.\"ConsumeFg\" " + "     , M.\"FinCode\" " + "     , M.\"UsageCode\" " + "     , M.\"Filler18\" " + " FROM  \"JcicB211\" M "
+				+ " WHERE ( M.\"DataYMD\" Between :acdateStart  AND :acdateEnd  )" + " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"TranCode\", M.\"LoanBal\"  ";
 
 		this.info("sql=" + sql);
 
@@ -78,8 +74,8 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		query = em.createNativeQuery(sql);
-		query.setParameter("acdateStart", acdateStart); 
-		query.setParameter("acdateEnd", acdateEnd); 
+		query.setParameter("acdateStart", acdateStart);
+		query.setParameter("acdateEnd", acdateEnd);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

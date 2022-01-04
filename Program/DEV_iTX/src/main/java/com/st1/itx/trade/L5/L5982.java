@@ -41,43 +41,40 @@ public class L5982 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
-	
+
 	@Autowired
 	Parse parse;
-	
-	@Autowired 
+
+	@Autowired
 	L5982ServiceImpl l5982ServiceImpl;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		logger.info("active L5982 ");
 		this.totaVo.init(titaVo);
-		
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 85 *  100= 
-				
+		this.limit = 100; // 85 * 100=
+
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
 			// *** 折返控制相關 ***
-			resultList = l5982ServiceImpl.findAll(this.index,this.limit,titaVo);
+			resultList = l5982ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l5982ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
-		
 
-		
-		
 		if (resultList != null && resultList.size() > 0) {
-			
-				for (Map<String, String> result : resultList) {
+
+			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
-			
-				occursList.putParam("OOYearMonth", Integer.parseInt(result.get("F0"))-191100);
+
+				occursList.putParam("OOYearMonth", Integer.parseInt(result.get("F0")) - 191100);
 				occursList.putParam("OOCustNo", result.get("F1"));
 				occursList.putParam("OOFacmNo", result.get("F2"));
 				occursList.putParam("OOUsageCode", result.get("F3"));
@@ -85,44 +82,42 @@ public class L5982 extends TradeBuffer {
 				occursList.putParam("OORepayCode", result.get("F5"));
 				occursList.putParam("OOLoanAmt", result.get("F6"));
 				occursList.putParam("OOLoanBal", result.get("F7"));
-				
-				int iFirstDrawdownDate=0;
-				if(Integer.parseInt(result.get("F8"))!=0) {
-					iFirstDrawdownDate=Integer.parseInt(result.get("F8"))-19110000;
+
+				int iFirstDrawdownDate = 0;
+				if (Integer.parseInt(result.get("F8")) != 0) {
+					iFirstDrawdownDate = Integer.parseInt(result.get("F8")) - 19110000;
 				}
 				occursList.putParam("OOFirstDrawdownDate", iFirstDrawdownDate);
-				
-				int iMaturityDate=0;
-				if(Integer.parseInt(result.get("F9"))!=0) {
-					iMaturityDate=Integer.parseInt(result.get("F9"))-19110000;
+
+				int iMaturityDate = 0;
+				if (Integer.parseInt(result.get("F9")) != 0) {
+					iMaturityDate = Integer.parseInt(result.get("F9")) - 19110000;
 				}
 				occursList.putParam("OOMaturityDate", iMaturityDate);
 				occursList.putParam("OOYearlyInt", result.get("F10"));
-				
-				int iHouseBuyDate=0;
-				if(Integer.parseInt(result.get("F11"))!=0) {
-					iHouseBuyDate=Integer.parseInt(result.get("F11"))-19110000;
+
+				int iHouseBuyDate = 0;
+				if (Integer.parseInt(result.get("F11")) != 0) {
+					iHouseBuyDate = Integer.parseInt(result.get("F11")) - 19110000;
 				}
 				occursList.putParam("OOHouseBuyDate", iHouseBuyDate);
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
-				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-				if (resultList != null &&  resultList.size() >= this.limit) {
-					titaVo.setReturnIndex(this.setIndexNext());
-					/* 手動折返 */
-					this.totaVo.setMsgEndToEnter();
-				}
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			if (resultList != null && resultList.size() >= this.limit) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "每年房屋擔保借款繳息工作檔"); // 查無資料
 		}
-		
-
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 //	private Boolean hasNext() {
 //		Boolean result = true;
 //
@@ -142,5 +137,5 @@ public class L5982 extends TradeBuffer {
 //
 //		return result;
 //	}
-	
+
 }

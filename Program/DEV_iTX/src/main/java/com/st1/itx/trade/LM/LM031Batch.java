@@ -25,7 +25,7 @@ public class LM031Batch extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LM031Report lM031Report;
-	
+
 	@Autowired
 	DateUtil dateUtil;
 
@@ -42,11 +42,11 @@ public class LM031Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM031Batch ");
-		
+
 		dateUtil.init();
 		dateUtil.setDate_1(dateUtil.getNowIntegerRoc());
 		dateUtil.setDate_2(dateUtil.getDate_1Integer() / 100 * 100 + dateUtil.getMonLimit() + 30000);
-	
+
 		// 循環動用日期期限: 此月月底日+三年 (不確定 - 參考樣張推測而來) YYYMMDD
 		titaVo.putParam("inputDate", dateUtil.getDate_2Integer());
 

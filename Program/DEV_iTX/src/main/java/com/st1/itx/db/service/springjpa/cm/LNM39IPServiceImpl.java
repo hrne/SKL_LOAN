@@ -52,13 +52,10 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// IFRS9 資料欄位清單9
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", "
-				+ " \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", "
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", " + " \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", "
 				+ " \"ApproveRate\", \"GracePeriod\", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
-				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"Ifrs9ProdCode\", "
-				+ " \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", "
-				+ " \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", "
-				+ " \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " + " FROM  \"LoanIfrs9Ip\" "
+				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"Ifrs9ProdCode\", " + " \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", "
+				+ " \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", " + " \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " + " FROM  \"LoanIfrs9Ip\" "
 				+ " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"DrawdownFg\", \"CustNo\", \"FacmNo\" ";
 
 		this.info("sql=" + sql);

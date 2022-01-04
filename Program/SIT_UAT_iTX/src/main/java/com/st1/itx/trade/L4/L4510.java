@@ -32,12 +32,12 @@ public class L4510 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	public EmpDeductScheduleService empDeductScheduleService;
-	
+
 	Slice<EmpDeductSchedule> slEmpDeductSchedule = null;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4510 ");
@@ -47,12 +47,11 @@ public class L4510 extends TradeBuffer {
 		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
 
 //		抓取媒體日為今日者
-		 slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate,
-				this.index, this.limit, titaVo);
+		slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate, this.index, this.limit, titaVo);
 		if (slEmpDeductSchedule == null) {
 			throw new LogicException("E0001", "查無資料");
-		} 
-		MySpring.newTask("L4510p", this.txBuffer, titaVo); 
+		}
+		MySpring.newTask("L4510p", this.txBuffer, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

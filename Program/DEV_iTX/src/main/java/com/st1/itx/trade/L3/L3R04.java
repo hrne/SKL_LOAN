@@ -36,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R04")
 @Scope("prototype")
 public class L3R04 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3R04.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -106,7 +105,7 @@ public class L3R04 extends TradeBuffer {
 			if (iFuncCode == 1 && iTxCode.equals("L3210")) { // 暫收款登錄
 				throw new LogicException(titaVo, "E0012", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 該筆資料已存在
 			}
-			if (iFuncCode == 5 && iTxCode.equals("L3220") && !tLoanCheque.getStatusCode().equals("0")) { // 暫收款退還
+			if (iFuncCode == 5 && iTxCode.equals("L3220") && !(tLoanCheque.getStatusCode().equals("0") || tLoanCheque.getStatusCode().equals("5"))) { // 暫收款退還
 				String sErr = "";
 				switch (tLoanCheque.getStatusCode()) {
 				case "1":
@@ -122,7 +121,7 @@ public class L3R04 extends TradeBuffer {
 					sErr = "已兌現入帳";
 					break;
 				}
-				throw new LogicException(titaVo, "E3058", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo + " 票據狀況碼 = " + sErr); // 該票據狀況碼非為未處理
+				throw new LogicException(titaVo, "E3058", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo + " 票據狀況碼 = " + sErr); // 該票據狀況碼非未處理與即期票
 			}
 			this.totaVo.putParam("OCustNo", tLoanCheque.getCustNo());
 			this.totaVo.putParam("OChequeName", tLoanCheque.getChequeName());

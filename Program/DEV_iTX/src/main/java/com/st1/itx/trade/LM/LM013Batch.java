@@ -38,13 +38,13 @@ public class LM013Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM013Batch ");
-		
+
 		// 金檢日期: 當日 YYYMMDD
 		titaVo.putParam("inputDate", titaVo.getEntDyI());
-		
-		// 核貸總值分界: 一億(參照樣張) 
+
+		// 核貸總值分界: 一億(參照樣張)
 		titaVo.putParam("inputAmount", 100000000);
-		
+
 		lM013Report.exec(titaVo);
 	}
 }

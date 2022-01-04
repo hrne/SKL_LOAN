@@ -51,7 +51,7 @@ public class L5R27 extends TradeBuffer {
 
 	@Autowired
 	public PfItDetailAdjustService pfItDetailAdjustService;
-	
+
 	@Autowired
 	public TxControlService txControlService;
 
@@ -64,7 +64,6 @@ public class L5R27 extends TradeBuffer {
 		int funCode = Integer.valueOf(titaVo.getParam("FunCode"));
 		long logNo = Long.valueOf(titaVo.getParam("LogNo"));
 
-		
 		PfItDetail pfItDetail = sPfItDetailService.findById(logNo, titaVo);
 
 		if (pfItDetail == null) {
@@ -92,9 +91,8 @@ public class L5R27 extends TradeBuffer {
 
 		totaVo.putParam("L5r27CustNm", CustNm);
 
-		PfBsDetail pfBsItDetail = sPfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(),
-				pfItDetail.getBormNo(), pfItDetail.getPerfDate(), pfItDetail.getRepayType(), pfItDetail.getPieceCode(),
-				titaVo);
+		PfBsDetail pfBsItDetail = sPfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), pfItDetail.getPerfDate(), pfItDetail.getRepayType(),
+				pfItDetail.getPieceCode(), titaVo);
 
 		if (pfBsItDetail == null) {
 			totaVo.putParam("L5r27BsOfficer", "");
@@ -113,8 +111,7 @@ public class L5R27 extends TradeBuffer {
 		totaVo.putParam("L5r27IntroducerName", IntroducerName);
 		totaVo.putParam("L5r27UtilBal", pfItDetail.getDrawdownAmt());
 
-		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
-				pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
+		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
 
 		if (pfItDetailAdjust == null || pfItDetailAdjust.getAdjRange() == 0) {
 			totaVo.putParam("L5r27AdjPerfEqAmt", pfItDetail.getPerfEqAmt());

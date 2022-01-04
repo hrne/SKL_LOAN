@@ -28,24 +28,24 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4603 extends TradeBuffer {
-	
+
 	@Autowired
 	WebClient webClient;
-	
+
 	@Autowired
 	DateUtil dDateUtil;
-	
+
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	public InsuRenewService insuRenewService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4603 ");
 		this.totaVo.init(titaVo);
-		
+
 		int iInsuEndMonth = 0;
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 		Slice<InsuRenew> slInsuRenew = insuRenewService.selectC(iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
@@ -63,7 +63,7 @@ public class L4603 extends TradeBuffer {
 		if (lInsuRenew.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "");// 查無資料
 		}
-		
+
 		if (titaVo.isHcodeNormal()) {
 			for (InsuRenew t : lInsuRenew) {
 				if ("Y".equals(t.getNotiTempFg())) {
@@ -71,12 +71,11 @@ public class L4603 extends TradeBuffer {
 				}
 			} // for
 		}
-		
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "", "",
-				titaVo.getParam("TLRNO"), "批次作業啟動請稍等", titaVo);
-		MySpring.newTask("L4603p", this.txBuffer, titaVo); 
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "", "", titaVo.getParam("TLRNO"), "批次作業啟動請稍等", titaVo);
+		MySpring.newTask("L4603p", this.txBuffer, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-			
+
 }

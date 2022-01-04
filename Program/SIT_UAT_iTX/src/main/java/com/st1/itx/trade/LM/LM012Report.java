@@ -84,6 +84,7 @@ public class LM012Report extends MakeReport {
 		this.setMaxRows(30);
 	}
 
+	@Override
 	public void printFooter() {
 		this.print(0, 1, "└─────────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┘");
 	}

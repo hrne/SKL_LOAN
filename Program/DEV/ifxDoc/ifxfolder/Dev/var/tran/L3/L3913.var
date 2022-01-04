@@ -44,7 +44,7 @@ E(0,0)
 ["[L3913]                                 計息明細查詢"],
 ["戶號",#CustNo,"-",#FacmNo,"-",#BormNo],
 ["會計日期",#AcDate],
-["經辦",#TellerNo],
+["經辦",#TellerNo,#TellerName],
 ["交易序號",#TxtNo],
 ]
 !---------- AP Button AREA ----------
@@ -134,6 +134,19 @@ C(3,#CHAIN,1,s,$)
 #TellerNo=X,6,S
 C(3,#CHAIN,1,s,$)
 
+
+#SendL2r08=X,1,S
+C(4,#TellerNo,S,$)
+T(2,@RimEmployeeNo,#TellerNo)
+T(3,@RimErrorSkip,Y)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@TellerName,#L2r08FullName)
+
+#TellerName=x,100,L
+C(4,#TellerNo,S,$)
+
+
 #TxtNo=X,8,S
 C(3,#CHAIN,1,s,$)
 
@@ -145,6 +158,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 
 <include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R08.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 </sub>
@@ -273,6 +287,7 @@ TXFORM=L3913
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
 </sub>
 
 <sub type="PART" name="L3913" layout="cols=1;screen.width=[100,900];printer.width=[15,30,15,30];">

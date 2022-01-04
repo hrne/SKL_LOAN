@@ -41,7 +41,7 @@ public class L4702 extends TradeBuffer {
 
 	@Autowired
 	public L4702ServiceImpl l4702ServiceImpl;
-	
+
 	@Autowired
 	L9705Report l9705Report;
 

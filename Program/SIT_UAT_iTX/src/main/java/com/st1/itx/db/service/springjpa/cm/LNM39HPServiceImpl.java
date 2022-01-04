@@ -20,7 +20,7 @@ import com.st1.itx.eum.ContentName;
 @Repository
 
 /*
- * LNM39HP 資料欄位清單8(放款與應收帳款-風險參數用)   LNFHP 放款風險參數檔(額度層)
+ * LNM39HP 資料欄位清單8(放款與應收帳款-風險參數用) LNFHP 放款風險參數檔(額度層)
  */
 
 public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBean {
@@ -52,12 +52,9 @@ public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單8
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", "
-				+ " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
-				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", "
-				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", "
-				+ " \"LineAmtCurr\", \"AvblBalCurr\" " + " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\"   = :dateMonth "
-				+ " ORDER BY \"CustNo\", \"FacmNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", " + " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
+				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", " + " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", " + " \"LineAmtCurr\", \"AvblBalCurr\" "
+				+ " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\"   = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\" ";
 
 		this.info("sql=" + sql);
 

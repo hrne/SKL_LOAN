@@ -43,7 +43,7 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int entDy = parse.stringToInteger(titaVo.get("ACCTDATE_ED")) + 19110000;
 		this.info("entDy = " + entDy);
-        // 本日匯款轉帳且有逾期未繳
+		// 本日匯款轉帳且有逾期未繳
 		String sql = " select                                            ";
 		sql += "  l.\"CustNo\"                          AS \"CustNo\"    ";
 		sql += " ,NVL(l.\"FacmNo\", x.\"FacmNo\")       AS \"FacmNo\"    ";
@@ -70,10 +70,10 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) l   on l.\"CustNo\" = d.\"CustNo\"                    ";
 		sql += "      and l.\"NextPayIntDate\" <= d.\"EntryDate\"        "; // 有逾期
 		sql += " where d.\"RepayCode\" = 1                               "; // 01.匯款轉帳
-		sql += "   and d.\"ProcStsCode\" <> 'D'                          "; 
+		sql += "   and d.\"ProcStsCode\" <> 'D'                          ";
 		sql += "   and d.\"RepayType\" = 1                               ";
 		sql += "   and d.\"CustNo\" <> 0                                 ";
-		sql += "   and d.\"AcDate\" = :entDy                             "; 
+		sql += "   and d.\"AcDate\" = :entDy                             ";
 		sql += "   and l.\"CustNo\" is not null                          "; // 有逾期
 		sql += "   and (l.\"NextPayIntDate\" <= d.\"EntryDate\" or x.\"FacmNo\" is not null) ";
 		sql += " order by l.\"CustNo\", NVL(l.\"FacmNo\", x.\"FacmNo\")  ";

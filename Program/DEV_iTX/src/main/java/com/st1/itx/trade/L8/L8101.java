@@ -70,7 +70,7 @@ public class L8101 extends TradeBuffer {
 
 //	@Autowired
 //	L9703Report2 l9703report2;
-	
+
 	@Autowired
 	private L9705ServiceImpl l9705ServiceImpl;
 
@@ -139,8 +139,7 @@ public class L8101 extends TradeBuffer {
 			txToDoCom.setTxBuffer(this.getTxBuffer());
 
 			String dataLines = "<" + custMobile + ">";
-			dataLines += "\"H1\",\"" + custMain.getCustId() + "\",\"" + custMobile
-					+ "\",\"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。\"";
+			dataLines += "\"H1\",\"" + custMain.getCustId() + "\",\"" + custMobile + "\",\"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。\"";
 
 			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setCustNo(custMain.getCustNo());
@@ -247,7 +246,7 @@ public class L8101 extends TradeBuffer {
 //			titaVo.putParam("UnpaidDayEd", "001");
 //			titaVo.putParam("RepayType", "0");
 //			titaVo.putParam("CustType", "0");
-			
+
 //			String acctDateStart = titaVo.getParam("ACCTDATE_ST");
 //			String acctDateEnd = titaVo.getParam("ACCTDATE_ED");
 //			String custNoStart = titaVo.getParam("CUSTNO");
@@ -257,7 +256,7 @@ public class L8101 extends TradeBuffer {
 //			String idType = titaVo.getParam("ID_TYPE");
 //			String corpInd = titaVo.getParam("CORP_IND");
 //			String apNo = titaVo.getParam("APNO");
-			
+
 //			l9703report2.setParentTranCode(titaVo.get("TXCD"));
 //			pdfSno = l9703report2.exec(titaVo, this.txBuffer);
 
@@ -270,8 +269,8 @@ public class L8101 extends TradeBuffer {
 			titaVo.putParam("ID_TYPE", 0);
 			titaVo.putParam("CORP_IND", 0);
 			titaVo.putParam("APNO", 0);
-			titaVo.putParam("Terms", 2); //只印2期
-			
+			titaVo.putParam("Terms", 2); // 只印2期
+
 			l9705Report.setParentTranCode(titaVo.getTxcd());
 			List<Map<String, String>> l9705List = null;
 			try {

@@ -47,10 +47,8 @@ public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB090 擔保品關聯檔資料檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
-				+ "     , M.\"CustId\"" + " , M.\"ClActNo\"" + "     , M.\"FacmNo\"" + " , M.\"GlOverseas\""
-				+ "   , M.\"JcicDataYM\"" + " FROM  \"JcicB090\" M" + " WHERE M.\"DataYM\" = :dateMonth "
-				+ " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"CustId\"" + " , M.\"ClActNo\"" + "     , M.\"FacmNo\""
+				+ " , M.\"GlOverseas\"" + "   , M.\"JcicDataYM\"" + " FROM  \"JcicB090\" M" + " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -62,7 +60,7 @@ public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB090.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth); 
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

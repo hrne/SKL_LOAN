@@ -25,7 +25,7 @@ public class LM033Batch extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LM033Report lM033Report;
-	
+
 	@Autowired
 	DateUtil dateUtil;
 
@@ -42,7 +42,7 @@ public class LM033Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM033Batch ");
-		
+
 		dateUtil.init();
 		dateUtil.setDate_1(dateUtil.getNowIntegerRoc() / 100 * 100 + 1);
 		dateUtil.setDate_2(dateUtil.getNowIntegerRoc() / 100 * 100 + dateUtil.getMonLimit());

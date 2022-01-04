@@ -96,6 +96,7 @@ public class AcReceivableCom extends TradeBuffer {
 	private List<AcReceivable> mntRvList = new ArrayList<AcReceivable>();
 
 	/*----------- 會計分錄更新銷帳檔 -------------- */
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("AcReceivableCom ... ");
 		wkOpenAcDate = 0;
@@ -123,16 +124,14 @@ public class AcReceivableCom extends TradeBuffer {
 			ac = this.txBuffer.getAcDetailList().get(idx);
 			tTempVo.clear();
 			tTempVo = tTempVo.getVo(ac.getJsonFields());
-			if ((ac.getAcctFlag() == 1 && !"L6801".equals(titaVo.getTxcd()))
-					|| (ac.getReceivableFlag() > 0 && ac.getReceivableFlag() < 8)) {
+			if ((ac.getAcctFlag() == 1 && !"L6801".equals(titaVo.getTxcd())) || (ac.getReceivableFlag() > 0 && ac.getReceivableFlag() < 8)) {
 				// 銷帳記號 0-起帳 1-銷帳
 				// 1.ReceivableFlag >= 3 銷帳
 				// 2.借方科目借方 ("1", "5","6","9") or 貸方科目貸方 -> 0-起帳, else 1-銷帳
 				// 3.TRO借新還舊->相反(貸方科目，先借後貸)
 				if (ac.getReceivableFlag() >= 3)
 					wkRvFg = 1;
-				else if ((debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("D"))
-						|| (!debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("C")))
+				else if ((debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("D")) || (!debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("C")))
 					wkRvFg = 0;
 				else
 					wkRvFg = 1;
@@ -170,8 +169,7 @@ public class AcReceivableCom extends TradeBuffer {
 
 				// 設定
 				procSetting(AcHCode);
-				this.info("AcReceivable RvFg=" + wkRvFg + ", RvAmt=" + wkTxAmt + ", RvNo=" + wkRvNo
-						+ ", ReceivableFlag=" + ac.getReceivableFlag());
+				this.info("AcReceivable RvFg=" + wkRvFg + ", RvAmt=" + wkTxAmt + ", RvNo=" + wkRvNo + ", ReceivableFlag=" + ac.getReceivableFlag());
 
 				// 銷帳編號
 				this.txBuffer.getAcDetailList().get(idx).setRvNo(wkRvNo);
@@ -182,8 +180,7 @@ public class AcReceivableCom extends TradeBuffer {
 				// TMI 暫收款－火險保費 F09 暫付款－火險保費 F25 催收款項－火險費用
 				// 收款不含L618B 火險保費催收作業
 				if (!titaVo.getTxcd().equals("L618B") && ac.getDbCr().equals("C")) {
-					if (ac.getAcctCode().equals("TMI") || ac.getAcctCode().equals("F09")
-							|| ac.getAcctCode().equals("F25")) {
+					if (ac.getAcctCode().equals("TMI") || ac.getAcctCode().equals("F09") || ac.getAcctCode().equals("F25")) {
 						updInsuRenew(AcHCode, bizTbsdy);
 					}
 				}
@@ -227,14 +224,12 @@ public class AcReceivableCom extends TradeBuffer {
 			this.info("AcReceivableCom mnt " + rv);
 
 			if (rv.getReceivableFlag() < 2 || rv.getReceivableFlag() > 5) { // 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
-				throw new LogicException(titaVo, "E6003",
-						"AcReceivable  ReceivableFlag must be 3,4,5 ->" + rv.getReceivableFlag());
+				throw new LogicException(titaVo, "E6003", "AcReceivable  ReceivableFlag must be 3,4,5 ->" + rv.getReceivableFlag());
 			}
 
 			// 核心出帳不可變更
 			if (RvFg == 3 && rv.getReceivableFlag() == 2) {
-				throw new LogicException(titaVo, "E6003",
-						"AcReceivable  ReceivableFlag can not be 2 ->" + rv.getReceivableFlag());
+				throw new LogicException(titaVo, "E6003", "AcReceivable  ReceivableFlag can not be 2 ->" + rv.getReceivableFlag());
 			}
 			// 帳冊別
 			if (rv.getAcBookCode().isEmpty()) {
@@ -263,8 +258,7 @@ public class AcReceivableCom extends TradeBuffer {
 						acReceivableService.delete(tAcReceivable, titaVo); // delete
 					} catch (DBException e) {
 						e.printStackTrace();
-						throw new LogicException(titaVo, "E6003",
-								"AcReceivable.mnt delete " + tAcReceivableId + e.getErrorMsg());
+						throw new LogicException(titaVo, "E6003", "AcReceivable.mnt delete " + tAcReceivableId + e.getErrorMsg());
 					}
 				} else {
 					beforeAcReceivable = (AcReceivable) dataLog.clone(tAcReceivable);
@@ -276,8 +270,7 @@ public class AcReceivableCom extends TradeBuffer {
 						acReceivableService.update2(tAcReceivable, titaVo); // update
 					} catch (DBException e) {
 						e.printStackTrace();
-						throw new LogicException(titaVo, "E6003",
-								"AcReceivable.mnt update2 " + tAcReceivableId + e.getErrorMsg());
+						throw new LogicException(titaVo, "E6003", "AcReceivable.mnt update2 " + tAcReceivableId + e.getErrorMsg());
 					}
 					// [契變手續費紀錄]變更前變更後
 					if ("F29".equals(rv.getAcctCode())) {
@@ -405,10 +398,9 @@ public class AcReceivableCom extends TradeBuffer {
 			wkRvFg = 2;
 		}
 
-		this.info("procSetting EntAc =" + ac.getEntAc() + ",ReceivableFlag = " + ac.getReceivableFlag() + ",AcHcode="
-				+ AcHcode + ",wkRvFg=" + wkRvFg + ",wkTxAmt=" + wkTxAmt + ",AcctCode=" + ac.getAcctCode());
-		this.info("debitsList.contains " + debitsList.contains(ac.getAcNoCode().substring(0, 1)) + "AcNoCode="
-				+ ac.getAcNoCode() + ",DbCr=" + ac.getDbCr());
+		this.info("procSetting EntAc =" + ac.getEntAc() + ",ReceivableFlag = " + ac.getReceivableFlag() + ",AcHcode=" + AcHcode + ",wkRvFg=" + wkRvFg + ",wkTxAmt=" + wkTxAmt + ",AcctCode="
+				+ ac.getAcctCode());
+		this.info("debitsList.contains " + debitsList.contains(ac.getAcNoCode().substring(0, 1)) + "AcNoCode=" + ac.getAcNoCode() + ",DbCr=" + ac.getDbCr());
 
 		// 銷帳編號wkRvNo primary key 不可有null, 放 " "
 		if (wkRvNo.isEmpty()) {
@@ -420,8 +412,7 @@ public class AcReceivableCom extends TradeBuffer {
 			// 編號日期, 編號方式=1:年度編號, 業務類別, 交易種類
 			else if (ac.getReceivableFlag() == 1 && wkRvFg == 0)
 				// AC+西元年後兩碼+流水號六碼
-				wkRvNo = "AC" + parse.IntegerToString(ac.getAcDate() + 19110000, 8).substring(2, 4)
-						+ parse.IntegerToString(gSeqCom.getSeqNo(ac.getAcDate(), 1, "L6", "RvNo", 999999, titaVo), 6);
+				wkRvNo = "AC" + parse.IntegerToString(ac.getAcDate() + 19110000, 8).substring(2, 4) + parse.IntegerToString(gSeqCom.getSeqNo(ac.getAcDate(), 1, "L6", "RvNo", 999999, titaVo), 6);
 		}
 
 	}
@@ -472,8 +463,7 @@ public class AcReceivableCom extends TradeBuffer {
 					acReceivableService.insert(tAcReceivable, titaVo); // insert
 				} catch (DBException e) {
 					e.printStackTrace();
-					throw new LogicException(titaVo, "E6003",
-							"AcReceivable insert " + tAcReceivableId + e.getErrorMsg());
+					throw new LogicException(titaVo, "E6003", "AcReceivable insert " + tAcReceivableId + e.getErrorMsg());
 				}
 			} else
 				throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
@@ -486,23 +476,20 @@ public class AcReceivableCom extends TradeBuffer {
 			} else {
 				updAcReceivable(AcHCode, bizTbsdy);
 			}
-			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1
-					&& tAcReceivable.getTitaTlrNo() == this.titaVo.getTlrNo()
+			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1 && tAcReceivable.getTitaTlrNo() == this.titaVo.getTlrNo()
 					&& tAcReceivable.getTitaTxtNo() == parse.stringToInteger(this.titaVo.getOrgTno())) {
 				try {
 					acReceivableService.delete(tAcReceivable, titaVo); // update
 				} catch (DBException e) {
 					e.printStackTrace();
-					throw new LogicException(titaVo, "E6003",
-							"AcReceivable delete " + tAcReceivableId + e.getErrorMsg());
+					throw new LogicException(titaVo, "E6003", "AcReceivable delete " + tAcReceivableId + e.getErrorMsg());
 				}
 			} else {
 				try {
 					acReceivableService.update(tAcReceivable, titaVo); // update
 				} catch (DBException e) {
 					e.printStackTrace();
-					throw new LogicException(titaVo, "E6003",
-							"AcReceivable update " + tAcReceivableId + e.getErrorMsg());
+					throw new LogicException(titaVo, "E6003", "AcReceivable update " + tAcReceivableId + e.getErrorMsg());
 				}
 			}
 		}
@@ -573,8 +560,7 @@ public class AcReceivableCom extends TradeBuffer {
 		}
 
 //6.檢查銷帳金額		
-		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) < 0
-				|| tAcReceivable.getAcBal().compareTo(BigDecimal.ZERO) < 0) {
+		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) < 0 || tAcReceivable.getAcBal().compareTo(BigDecimal.ZERO) < 0) {
 			this.info("銷帳金額超過原入帳金額 :" + ", bizTbsdy=" + bizTbsdy + ", AcBal=" + tAcReceivable.getRvBal());
 			throw new LogicException(titaVo, "E6003", "AcReceivable update " + tAcReceivableId + "銷帳金額超過原入帳金額");
 		}
@@ -666,8 +652,7 @@ public class AcReceivableCom extends TradeBuffer {
 		tInsuRenew = insuRenewService.prevInsuNoFirst(ac.getCustNo(), ac.getFacmNo(), wkRvNo, titaVo);
 
 		if (tInsuRenew == null)
-			throw new LogicException(titaVo, "E6003", "AcReceivableCom updInsuRenew notfound " + ac.getCustNo() + "-"
-					+ ac.getFacmNo() + "," + ac.getRvNo());
+			throw new LogicException(titaVo, "E6003", "AcReceivableCom updInsuRenew notfound " + ac.getCustNo() + "-" + ac.getFacmNo() + "," + ac.getRvNo());
 		else {
 			tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
 			if (AcHCode == 0) {
@@ -683,8 +668,7 @@ public class AcReceivableCom extends TradeBuffer {
 				insuRenewService.update(tInsuRenew, titaVo);
 			} catch (DBException e) {
 				e.printStackTrace();
-				throw new LogicException(titaVo, "E6003",
-						"AcReceivableCom updInsuRenew " + tAcReceivableId + e.getErrorMsg());
+				throw new LogicException(titaVo, "E6003", "AcReceivableCom updInsuRenew " + tAcReceivableId + e.getErrorMsg());
 			}
 		}
 	}
@@ -706,8 +690,7 @@ public class AcReceivableCom extends TradeBuffer {
 				foreclosureFeeService.update(tForeclosureFee, titaVo);
 			} catch (DBException e) {
 				e.printStackTrace();
-				throw new LogicException(titaVo, "E6003",
-						"AcReceivableCom updForeclosureFee " + tAcReceivableId + e.getErrorMsg());
+				throw new LogicException(titaVo, "E6003", "AcReceivableCom updForeclosureFee " + tAcReceivableId + e.getErrorMsg());
 			}
 		}
 	}

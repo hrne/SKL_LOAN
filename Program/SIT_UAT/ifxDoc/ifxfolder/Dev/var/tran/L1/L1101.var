@@ -7,6 +7,10 @@
 !#TXCD
 !T(3,L1101)
 
+!打開暫存
+#Binit=X,1,S
+K(MODIFYBUTTON,acsave)
+
 ![資料表頭(HEADER)長度]
 #INQHD=n,4,S
 E(0,1076)ASGN(INQHD$)
@@ -109,9 +113,9 @@ INVOKEJS(SHOW,p3,0)
 ! ENABLE(#BTN1)
 
 ![Buttom資料查詢]
-#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
+#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BindCdEmp=X,1,S
-BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:EmpNo<-OOEmployeeNo:EmpNo2<-OOEmployeeNo:EmployeeName<-OOFullname})
+BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:EmpNo<-OOEmployeeNo:EmpNo2<-OOEmployeeNo:EmployeeName<-OOFullname})
 
 
 ! 複製戶籍地址
@@ -415,8 +419,8 @@ T(2,@RimCustId,#CustId)
 RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
-T(2,@CustName,#L1r01CustName)
-T(2,@TypeCode,#L1r01TypeCode)
+C(4,#L1r01CustName,$,T(2,@CustName,#L1r01CustName))
+C(4,#L1r01CustName,$,T(2,@TypeCode,#L1r01TypeCode))
 
 #TypeCode=A,1,I
 C(3,#FunCd,5,s,$)
@@ -565,7 +569,7 @@ E(0,1)
 T(4,BRN$)
 
 !戶名
-#CustName=x,2.50,I
+#CustName=x,100,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @V(7)
@@ -705,7 +709,7 @@ C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
 C(4,#SpouseId,$,T(3,@FdSpouseName,*))
 
 !配偶姓名
-#SpouseName=x,2.50,I
+#SpouseName=x,100,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
@@ -1266,7 +1270,7 @@ C(4,#AMLGroup,$,V(H,#AMLCodeHelp))
 T(H,#AMLGroup,#AMLCodeHelp)
 
 !原住民姓名
-#IndigenousName=x,2.50,I
+#IndigenousName=x,100,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 

@@ -1,5 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,11 +43,17 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// ACH扣款應繳日止日
 		int iAchSpecificDdTo = 0;
 
+		// ACH扣款應繳日的應繳日(2碼)
+		List<Integer> iAchSpecificDays = new ArrayList<>();
+
 		// ACH二扣應繳日起日
 		int iAchSecondSpecificDdFrom = 0;
 
 		// ACH二扣應繳日止日
 		int iAchSecondSpecificDdTo = 0;
+
+		// ACH二扣應繳日的應繳日(2碼)
+		List<Integer> iAchSecondSpecificDays = new ArrayList<>();
 
 		// 郵局扣款應繳日
 		int iPostSpecificDd = 0;
@@ -60,7 +67,8 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 郵局二扣應繳日的應繳日(2碼)
 		int iPostSecondSpecificDay = 0;
 
-		int iDeductDate = 0; // 追繳
+		int iDeductDateStart = 0; // 追繳
+		int iDeductDateEnd = 0; // 追繳
 		int iOpItem = Integer.parseInt(titaVo.getParam("OpItem"));
 
 		if (Integer.parseInt(titaVo.getParam("AchSpecificDdFrom")) > 0) {
@@ -69,12 +77,70 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (Integer.parseInt(titaVo.getParam("AchSpecificDdTo")) > 0) {
 			iAchSpecificDdTo = Integer.parseInt(titaVo.getParam("AchSpecificDdTo")) + 19110000;
 		}
+
+		// 處理iAchSpecificDays
+		if (iAchSpecificDdFrom > 0 && iAchSpecificDdTo > 0) {
+
+			int startMonth = iAchSpecificDdFrom / 100;
+			int endMonth = iAchSpecificDdTo / 100;
+
+			int startDay = iAchSpecificDdFrom % 100;
+			int endDay = iAchSpecificDdTo % 100;
+
+			iAchSpecificDays.add(startDay);
+
+			// 跨月情況
+			if (startMonth < endMonth) {
+				for (int i = startDay + 1; i <= 31; i++) {
+					iAchSpecificDays.add(i);
+				}
+				for (int i = 1; i <= endDay; i++) {
+					iAchSpecificDays.add(i);
+				}
+			} else {
+				for (int i = startDay + 1; i <= endDay; i++) {
+					iAchSpecificDays.add(i);
+				}
+			}
+		} else {
+			iAchSpecificDays.add(0);
+		}
+
 		if (Integer.parseInt(titaVo.getParam("AchSecondSpecificDdFrom")) > 0) {
 			iAchSecondSpecificDdFrom = Integer.parseInt(titaVo.getParam("AchSecondSpecificDdFrom")) + 19110000;
 		}
 		if (Integer.parseInt(titaVo.getParam("AchSecondSpecificDdTo")) > 0) {
 			iAchSecondSpecificDdTo = Integer.parseInt(titaVo.getParam("AchSecondSpecificDdTo")) + 19110000;
 		}
+
+		// 處理iAchSecondSpecificDays
+		if (iAchSecondSpecificDdFrom > 0 && iAchSecondSpecificDdTo > 0) {
+
+			int startMonth = iAchSecondSpecificDdFrom / 100;
+			int endMonth = iAchSecondSpecificDdTo / 100;
+
+			int startDay = iAchSecondSpecificDdFrom % 100;
+			int endDay = iAchSecondSpecificDdTo % 100;
+
+			iAchSecondSpecificDays.add(startDay);
+
+			// 跨月情況
+			if (startMonth < endMonth) {
+				for (int i = startDay + 1; i <= 31; i++) {
+					iAchSecondSpecificDays.add(i);
+				}
+				for (int i = 1; i <= endDay; i++) {
+					iAchSecondSpecificDays.add(i);
+				}
+			} else {
+				for (int i = startDay + 1; i <= endDay; i++) {
+					iAchSecondSpecificDays.add(i);
+				}
+			}
+		} else {
+			iAchSecondSpecificDays.add(0);
+		}
+
 		if (Integer.parseInt(titaVo.getParam("PostSpecificDd")) > 0) {
 			iPostSpecificDd = Integer.parseInt(titaVo.getParam("PostSpecificDd")) + 19110000;
 			iPostSpecificDay = iPostSpecificDd % 100;
@@ -83,8 +149,11 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iPostSecondSpecificDd = Integer.parseInt(titaVo.getParam("PostSecondSpecificDd")) + 19110000;
 			iPostSecondSpecificDay = iPostSecondSpecificDd % 100;
 		}
-		if (Integer.parseInt(titaVo.getParam("DeductDate")) > 0) {
-			iDeductDate = Integer.parseInt(titaVo.getParam("DeductDate")) + 19110000;
+		if (Integer.parseInt(titaVo.getParam("DeductDateStart")) > 0) {
+			iDeductDateStart = Integer.parseInt(titaVo.getParam("DeductDateStart")) + 19110000;
+		}
+		if (Integer.parseInt(titaVo.getParam("DeductDateEnd")) > 0) {
+			iDeductDateEnd = Integer.parseInt(titaVo.getParam("DeductDateEnd")) + 19110000;
 		}
 
 		String sql = "  select ";
@@ -143,8 +212,6 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
 		sql += "                            and  a.seq = 1 ";
 		sql += "  where b.\"Status\"= 0 ";
-//		追加逾期
-		sql += "    and b.\"NextPayIntDate\" >= :iDeductDate ";
 		sql += "    and f.\"RepayCode\" = 2 ";
 		sql += "    and case ";
 		sql += "          when b.\"AmortizedCode\" IN (3,4) ";
@@ -166,25 +233,33 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    and case ";
 		// RepayBank = 700 = 郵局
 		// 條件1: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd)
-		// 且 下繳日的應繳日(2碼dd) = 郵局扣款應繳日的應繳日(2碼dd)
+		// 且 指定應繳日(2碼dd) = 郵局扣款應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and b.\"NextPayIntDate\" <= :iPostSpecificDd ";
-		sql += "               and MOD(b.\"NextPayIntDate\",100) = :iPostSpecificDay ";
+		sql += "               and b.\"SpecificDd\" = :iPostSpecificDay ";
 		sql += "          then 1 ";
 		// 條件2: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd)
-		// 且 下繳日的應繳日(2碼dd) = 郵局二扣應繳日的應繳日(2碼dd)
+		// 且 指定應繳日(2碼dd) = 郵局二扣應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and b.\"NextPayIntDate\" <= :iPostSecondSpecificDd ";
-		sql += "               and MOD(b.\"NextPayIntDate\",100) = :iPostSecondSpecificDay ";
+		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
 		sql += "          then 1 ";
 		// RepayBank not in (null,700) = ACH
-		// 條件1: 下繳日(8碼yyyymmdd) 在 ACH扣款應繳日(8碼yyyymmdd) 的區間
+		// 條件1: 下繳日(8碼yyyymmdd) <= ACH扣款應繳日止日(8碼yyyymmdd)
+		// 且 指定應繳日(2碼dd) IN ACH扣款應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-		sql += "               and b.\"NextPayIntDate\" between :iAchSpecificDdFrom  and :iAchSpecificDdTo ";
+		sql += "               and b.\"NextPayIntDate\" <= :iAchSpecificDdTo ";
+		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
 		sql += "          then 1 ";
-		// 條件2: 下繳日(8碼yyyymmdd) 在 ACH二扣應繳日(8碼yyyymmdd) 的區間
+		// 條件2: 下繳日(8碼yyyymmdd) <= ACH二扣應繳日止日(8碼yyyymmdd)
+		// 且 指定應繳日(2碼dd) IN ACH二扣應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-		sql += "               and b.\"NextPayIntDate\" between :iAchSecondSpecificDdFrom and :iAchSecondSpecificDdTo ";
+		sql += "               and b.\"NextPayIntDate\" <= :iAchSecondSpecificDdTo ";
+		sql += "               and b.\"SpecificDd\" IN :iAchSecondSpecificDays ";
+		sql += "          then 1 ";
+		// 追加逾期期數
+		sql += "          when b.\"NextPayIntDate\" >= :iDeductDateStart ";
+		sql += "               and b.\"NextPayIntDate\" <= :iDeductDateEnd ";
 		sql += "          then 1 ";
 		sql += "        else 0 ";
 		sql += "        end = 1 ";
@@ -195,18 +270,19 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("iDeductDate", iDeductDate);
+		query.setParameter("iDeductDateStart", iDeductDateStart);
+		query.setParameter("iDeductDateEnd", iDeductDateEnd);
 
-		query.setParameter("iAchSpecificDdFrom", iAchSpecificDdFrom);
 		query.setParameter("iAchSpecificDdTo", iAchSpecificDdTo);
+		query.setParameter("iAchSpecificDays", iAchSpecificDays);
 
-		query.setParameter("iAchSecondSpecificDdFrom", iAchSecondSpecificDdFrom);
 		query.setParameter("iAchSecondSpecificDdTo", iAchSecondSpecificDdTo);
+		query.setParameter("iAchSecondSpecificDays", iAchSecondSpecificDays);
 
 		query.setParameter("iPostSpecificDd", iPostSpecificDd);
-		query.setParameter("iPostSecondSpecificDd", iPostSecondSpecificDd);
-
 		query.setParameter("iPostSpecificDay", iPostSpecificDay);
+
+		query.setParameter("iPostSecondSpecificDd", iPostSecondSpecificDd);
 		query.setParameter("iPostSecondSpecificDay", iPostSecondSpecificDay);
 
 		return this.convertToMap(query);

@@ -52,10 +52,8 @@ public class LB680ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB680 「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔
-		sql = "SELECT M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"TranCode\"" + "     , M.\"CustId\""
-				+ "     , M.\"CustIdErr\"" + "     , M.\"Filler6\"" + "     , M.\"Amt\"" + " , M.\"JcicDataYM\""
-				+ "     , M.\"Filler9\"" + " FROM  \"JcicB680\" M" + " WHERE M.\"DataYM\" = :dateMonth "
-				+ " ORDER BY M.\"CustId\" ";
+		sql = "SELECT M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"TranCode\"" + "     , M.\"CustId\"" + "     , M.\"CustIdErr\"" + "     , M.\"Filler6\"" + "     , M.\"Amt\""
+				+ " , M.\"JcicDataYM\"" + "     , M.\"Filler9\"" + " FROM  \"JcicB680\" M" + " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"CustId\" ";
 
 		this.info("sql=" + sql);
 
@@ -67,7 +65,7 @@ public class LB680ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB680.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth); 
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

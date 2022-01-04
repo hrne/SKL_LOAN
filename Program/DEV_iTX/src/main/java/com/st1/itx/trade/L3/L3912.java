@@ -165,9 +165,11 @@ public class L3912 extends TradeBuffer {
 		if (tLoanBorTx.getTempAmt().compareTo(BigDecimal.ZERO) > 0) {
 			this.totaVo.putParam("OTempAmt", tLoanBorTx.getTempAmt());
 			this.totaVo.putParam("OTempRepay", BigDecimal.ZERO);
+			this.totaVo.putParam("OOverflow", tLoanBorTx.getTempAmt());
 		} else {
 			this.totaVo.putParam("OTempAmt", BigDecimal.ZERO);
 			this.totaVo.putParam("OTempRepay", BigDecimal.ZERO.subtract(tLoanBorTx.getTempAmt()));
+			this.totaVo.putParam("OOverflow", BigDecimal.ZERO);
 		}
 		this.totaVo.putParam("OIntStartDate", tLoanBorTx.getIntStartDate());
 		this.totaVo.putParam("OIntEndDate", tLoanBorTx.getIntEndDate());
@@ -178,8 +180,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("ORemitBankX", loanCom.getBranchItemByBankCode(tTempVo.getParam("RemitBank")));
 		this.totaVo.putParam("OUnpaidBreach", tLoanBorTx.getUnpaidCloseBreach());
 		this.totaVo.putParam("ORemitAcctNo", tTempVo.getParam("RemitAcctNo"));
-		this.totaVo.putParam("OShortFall", tLoanBorTx.getShortfall());
-		this.totaVo.putParam("OOverflow", tLoanBorTx.getUnpaidInterest().add(tLoanBorTx.getUnpaidPrincipal()));
+		this.totaVo.putParam("OShortFall", tLoanBorTx.getUnpaidInterest().add(tLoanBorTx.getUnpaidPrincipal()));
 		this.totaVo.putParam("OSupperNo", tLoanBorTx.getTitaEmpNoS());
 		this.totaVo.putParam("OSupperNoX", loanCom.getEmpFullnameByEmpNo(tLoanBorTx.getTitaEmpNoS()));
 		this.totaVo.putParam("OReduceAmt", wkReduceAmt);

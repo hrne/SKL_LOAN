@@ -65,7 +65,7 @@ public class LP002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		int wkm = iYEAR * 100 + iMM;
-		
+
 		this.info("lp002.findDept ENTDY=" + iENTDY + ",iyear=" + iYEAR + ", wkm=" + wkm);
 		String sql = " ";
 		sql += " SELECT B.\"UnitItem\"  AS F0 ";

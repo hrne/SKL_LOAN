@@ -52,10 +52,8 @@ public class LBRelServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LBRel 聯徵授信「同一關係企業及集團企業」資料報送檔
-		sql = "SELECT " + "  \"BankItem\", \"BranchItem\", \"RelYM\", \"TranCode\" "
-				+ ", \"CustId\", \"Filler6\", \"RelId\", \"Filler8\", \"RelationCode\" "
-				+ ", \"Filler10\", \"EndCode\" " + " FROM  \"JcicRel\" " + " WHERE \"DataYMD\" = : acctDate "
-				+ " ORDER BY \"BankItem\", \"BranchItem\", \"TranCode\", \"CustId\", \"RelId\" ";
+		sql = "SELECT " + "  \"BankItem\", \"BranchItem\", \"RelYM\", \"TranCode\" " + ", \"CustId\", \"Filler6\", \"RelId\", \"Filler8\", \"RelationCode\" " + ", \"Filler10\", \"EndCode\" "
+				+ " FROM  \"JcicRel\" " + " WHERE \"DataYMD\" = : acctDate " + " ORDER BY \"BankItem\", \"BranchItem\", \"TranCode\", \"CustId\", \"RelId\" ";
 
 		this.info("sql=" + sql);
 
@@ -67,7 +65,7 @@ public class LBRelServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LBRel.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("acctDate", acctDate); 
+		query.setParameter("acctDate", acctDate);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

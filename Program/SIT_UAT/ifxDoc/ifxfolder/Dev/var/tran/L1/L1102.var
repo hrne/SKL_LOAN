@@ -465,7 +465,7 @@ E(0,1)
 T(4,BRN$)
 
 !公司名稱
-#CustName=x,2.50,I
+#CustName=x,100,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
@@ -580,7 +580,7 @@ C(5,#FdSpouseId,*,V(7),$)
 C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
 
 !負責人姓名
-#SpouseName=x,2.50,I
+#SpouseName=x,100,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @

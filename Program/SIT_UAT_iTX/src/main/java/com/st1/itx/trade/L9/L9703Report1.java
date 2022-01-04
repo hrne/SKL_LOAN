@@ -115,7 +115,7 @@ public class L9703Report1 extends MakeReport {
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		this.info("L9703Report1 exec");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703", "滯繳客戶明細表", "密", "A4", "");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode().isEmpty() ? "L9703A" : titaVo.getTxCode() + "A", "滯繳客戶明細表", "密", "A4", "");
 
 		bcAcDate = String.valueOf(titaVo.getEntDyI() + 19110000);
 

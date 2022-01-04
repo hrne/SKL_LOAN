@@ -76,6 +76,7 @@ public class CheckAml extends TradeBuffer {
 	// connect AML status
 	private boolean connectSuccess;
 
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("CheckAml run ... ");
 

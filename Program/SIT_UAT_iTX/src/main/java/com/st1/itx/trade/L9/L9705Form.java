@@ -36,7 +36,7 @@ public class L9705Form extends MakeReport {
 
 	@Autowired
 	private Parse parse;
-	
+
 	@Autowired
 	WebClient webClient;
 
@@ -49,9 +49,9 @@ public class L9705Form extends MakeReport {
 	}
 
 	public void exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
-		
+
 		String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
-		
+
 		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "B", "存入憑條", "cm,20,9.31333", "P");
 
 		if (l9705List.size() > 0) {
@@ -200,10 +200,9 @@ public class L9705Form extends MakeReport {
 
 						setFont(1, 14);
 
-						printCm(4, 4, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/"
-								+ sPayIntDate.substring(5, 7));
+						printCm(4, 4, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/" + sPayIntDate.substring(5, 7));
 
-						printCm(4,4.8,custName);
+						printCm(4, 4.8, custName);
 						String custnoX = String.format("%07d", custNo);
 
 						for (int i = 0; i < 7; i++) {
@@ -223,18 +222,18 @@ public class L9705Form extends MakeReport {
 						}
 
 						printCm(16, 6.2, titaVo.getTlrNo());
-						
+
 						break;
 					} // loop -- batxCom
 				}
 
 			}
 		}
-		
+
 		long sno = this.close();
-		
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成", titaVo);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"),
+				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成", titaVo);
 	}
 
 	private String toChinese(String s) {
@@ -263,7 +262,7 @@ public class L9705Form extends MakeReport {
 		}
 		return rs;
 	}
-	
+
 	private String toChinese2(String s) {
 		String rs = "";
 

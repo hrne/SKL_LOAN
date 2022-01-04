@@ -54,7 +54,8 @@ E(0,0)
 ["@","@修改前"],["@","@修改後"],
 ["#FdCustIdBef+身分證字號",#CustIdBef],[#CustIdInd,#CustIdAft],
 ["#FdTypeCode+建檔身分別",#TypeCodeBef,#TypeCodeXBef],[#TypeCodeInd,#TypeCodeAft,#TypeCodeXAft],
-["#FdCustNameBef1+戶名",#CustNameBef],[#CustNameInd,#CustNameAft],
+[#<->#,"#FdCustNameBef1+修改前-戶名",#CustNameBef],
+[#<->#,"#FdCustNameBef2+修改後-戶名@@@@@@+#CustNameInd",#CustNameAft],
 ["#FdEnameBef+英文姓名",#EnameBef],[#EnameInd,#EnameAft],
 ["#FdBirthdayBef+出生年月日",#BirthdayBef],[#BirthdayInd,#BirthdayAft],
 ["#FdGenderBef+性別",#GenderBef,#SexBefX],[#GenderInd,#GenderAft,#SexAftX],
@@ -65,16 +66,17 @@ E(0,0)
 ["#FdCountryBef+出生地國籍",#CountryBef,#CountryX],[#CountryInd,#CountryAft,#CountryXAft],
 ["#FdBussNationalityCode+居住地國籍",#BussNationalityCodeBef,#BussNationalityCodeBefX],[#BussNationalityCodeInd,#BussNationalityCodeAft,#BussNationalityCodeAftX],
 ["#FdSpouseIdBef+配偶身分證字號",#SpouseIdBef],[#SpouseIdInd,#SpouseIdAft],
-["#FdSpouseNmBef1+配偶姓名",#SpouseNmBef],[#SpouseNmInd,#SpouseNmAft],
-![#<->#,"#FdRegAdrBef+修改前戶籍-地址",#RegCityCodeBef,#RegCityItemBef,#RegAreaCodeBef,#RegAreaItemBef,"</br>",#RegRoadBef,"</br>",#RegSectionBef,"段",#RegAlleyBef,"巷",#RegLaneBef,"弄",#RegNumBef,"號","之",#RegNumDashBef,",",#RegFloorBef,"樓","之",#RegFloorDashBef],
-[#<->#,"#FdRegAdrBef+修改前戶籍-地址",#RegAddressBef],
-[#<->#,"#FdRegAdrAft+修改後戶籍-地址",#RegCityCodeAft,#RegCityItemAft,#RegAreaCodeAft,#RegAreaItemAft,"</br>",#RegRoadAft,"</br>",#RegSectionAft,"段",#RegAlleyAft,"巷",#RegLaneAft,"弄",#RegNumAft,"號","之",#RegNumDashAft,",",#RegFloorAft,"樓","之",#RegFloorDashAft],
+[#<->#,"#FdSpouseNmBef1+修改前-配偶姓名",#SpouseNmBef],
+[#<->#,"#FdSpouseNmBef2+修改後-配偶姓名@@@+#SpouseNmInd",#SpouseNmAft],
+![#<->#,"#FdRegAdrBef+修改前-戶籍地址",#RegCityCodeBef,#RegCityItemBef,#RegAreaCodeBef,#RegAreaItemBef,"</br>",#RegRoadBef,"</br>",#RegSectionBef,"段",#RegAlleyBef,"巷",#RegLaneBef,"弄",#RegNumBef,"號","之",#RegNumDashBef,",",#RegFloorBef,"樓","之",#RegFloorDashBef],
+[#<->#,"#FdRegAdrBef+修改前-戶籍地址",#RegAddressBef],
+[#<->#,"#FdRegAdrAft+修改後-戶籍地址",#RegCityCodeAft,#RegCityItemAft,#RegAreaCodeAft,#RegAreaItemAft,"</br>",#RegRoadAft,"</br>",#RegSectionAft,"段",#RegAlleyAft,"巷",#RegLaneAft,"弄",#RegNumAft,"號","之",#RegNumDashAft,",",#RegFloorAft,"樓","之",#RegFloorDashAft],
 [#<->#,"#RegAddressInd",#RegAddressAft],
 ["#FdRegZipBef+戶籍-郵遞區號",#RegZip3Bef,#RegZip2Bef],
 ["#RegZip2Ind",#RegZip3Aft,#RegZip2Aft],
 ![#<->#,"#FdCurrAdrBef+修改前通訊-地址",#CurrCityCodeBef,#CurrCityItemBef,#CurrAreaCodeBef,#CurrAreaItemBef,"</br>",#CurrRoadBef,"</br>",#CurrSectionBef,"段",#CurrAlleyBef,"巷",#CurrLaneBef,"弄",#CurrNumBef,"號","之",#CurrNumDashBef,",",#CurrFloorBef,"樓","之",#CurrFloorDashBef],
-[#<->#,"#FdCurrAdrBef+修改前通訊-地址",#CurrAddressBef],
-[#<->#,"#FdCurrAdrAft+修改後通訊-地址",#SameReg,#SameRegX,"</br>",#CurrCityCodeAft,#CurrCityItemAft,#CurrAreaCodeAft,#CurrAreaItemAft,"</br>",#CurrRoadAft,"</br>",#CurrSectionAft,"段",#CurrAlleyAft,"巷",#CurrLaneAft,"弄",#CurrNumAft,"號","之",#CurrNumDashAft,",",#CurrFloorAft,"樓","之",#CurrFloorDashAft],
+[#<->#,"#FdCurrAdrBef+修改前-通訊地址",#CurrAddressBef],
+[#<->#,"#FdCurrAdrAft+修改後-通訊地址",#SameReg,#SameRegX,"</br>",#CurrCityCodeAft,#CurrCityItemAft,#CurrAreaCodeAft,#CurrAreaItemAft,"</br>",#CurrRoadAft,"</br>",#CurrSectionAft,"段",#CurrAlleyAft,"巷",#CurrLaneAft,"弄",#CurrNumAft,"號","之",#CurrNumDashAft,",",#CurrFloorAft,"樓","之",#CurrFloorDashAft],
 [#<->#,"#CurrAddressInd",#CurrAddressAft],
 ["#FdCurrZipBef+通訊-郵遞區號",#CurrZip3Bef,#CurrZip2Bef],
 ["#CurrZip2Ind",#CurrZip3Aft,#CurrZip2Aft],
@@ -91,7 +93,8 @@ E(0,0)
 ["#FdPassportnoBef+護照號碼",#PassportnoBef],[#PassportnoInd,#PassportnoAft],
 ["#FdAmljobcodeBef+AML職業別",#AmljobcodeBef,#AmljobcodeBefX],[#AmljobcodeInd,#AmljobcodeAft,#AmljobcodeAftX],
 ["#FdAmlgroupBef+AML組織",#AmlgroupBef,#AmlgroupBefX],[#AmlgroupInd,#AmlgroupAft,#AmlgroupAftX],
-["#FdIndigenousnameBef1+原住民姓名",#IndigenousnameBef],[#IndigenousnameInd,#IndigenousnameAft],
+[#<->#,"#FdIndigenousnameBef1+修改前-原住民姓名",#IndigenousnameBef],
+[#<->#,"#FdIndigenousnameBef2+修改後-原住民姓名@+#IndigenousnameInd",#IndigenousnameAft],
 ]
 !["#FdIsLimit+是否為授信限制對象",#IsLimitX],[#IsLimitXInd,#IsLimitXAft],
 !["#FdIsRelated+是否為利害關係人",#IsRelatedX],[#IsRelatedXInd,#IsRelatedXAft],
@@ -105,9 +108,9 @@ E(0,0)
 !ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
 
 ![Buttom資料查詢]
-#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
+#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BindCdEmp=X,1,S
-BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:EmpnoAft<-OOEmployeeNo:EmpnameAft<-OOFullname})
+BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:EmpnoAft<-OOEmployeeNo:EmpnameAft<-OOFullname})
 
 #Submit=A,1,S
 K(MODIFYBUTTON,修改)
@@ -234,9 +237,14 @@ ASGN(AGAIN$)
 #CustUKey=x,32,S
 
 !身分證字號
-#CustId=X,10,I
-C(3,#CHAIN,1,s,$)
-@V(7)A(ID_UNINO,0,#CustId)
+#CustId=X,10,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(7)
+A(ID_UNINO,0,#CustId)
+
+#MRKEY=_,_,S
+T(2,#CustId)
 
 #checkchain=X,1,S
 C(3,#CHAIN,1,T(F,@CustId,0),T(F,@CustId,1))
@@ -507,6 +515,7 @@ T(H,#TypeCodeAft,#TypeCodeHelp)
 IF(#TypeCodeAft==#TypeCodeBef,T(3,),T(3,X))
 
 #FdCustNameBef1=X,2,L
+#FdCustNameBef2=X,2,L
 T(3,*)
 #FdBirthdayBef=X,2,L
 T(3,*)
@@ -523,6 +532,7 @@ T(3,*)
 T(3,*)
 #FdSpouseIdBef=X,2,L
 #FdSpouseNmBef1=X,2,L
+#FdSpouseNmBef2=X,2,L
 
 #FdRegAdrBef=X,2,L
 #FdRegZipBef=X,2,L
@@ -565,17 +575,18 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdIndigenousnameBef1=X,2,L
+#FdIndigenousnameBef2=X,2,L
 #FdIsLimit=X,2,L
 #FdIsRelated=X,2,L
 #FdIsLnrelNear=X,2,L
 
 !戶名
-#CustNameBef=x,2.50,L
+#CustNameBef=x,100,L
 
 
 #CustNameInd=X,1,L
 
-#CustNameAft=x,2.50,I
+#CustNameAft=x,100,I
 @
 V(7)
 
@@ -816,11 +827,11 @@ IF(#BussNationalityCodeBef==#BussNationalityCodeAft || #BussNationalityCodeAft =
 IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))
 
 !配偶姓名
-#SpouseNmBef=x,2.50,L
+#SpouseNmBef=x,100,L
 
 #SpouseNmInd=X,1,L
 
-#SpouseNmAft=x,2.50,I
+#SpouseNmAft=x,100,I
 @
 C(5,#SpouseIdAft,#SpouseIdBef,C(5,#SpouseNmAft,#SpouseNmBef,s,$),$)
 C(4,#SpouseIdAft,$,V(7))
@@ -1306,7 +1317,7 @@ R(1,L1R12)
 T(2,@CurrAddressAft,#L1r12Address)
 
 #CurrAddressInd=X,27,L
-IF(#CurrAddressAft==#CurrAddressBef,T(3,),T(3,                          X))
+IF(#CurrAddressAft==#CurrAddressBef,T(3,),T(3,                         X))
 
 !通訊-郵遞區號前三碼
 #CurrZip3Bef=X,3,L
@@ -1531,12 +1542,12 @@ T(H,#AmlgroupAft,#AMLCodeHelp)
 IF(#AmlgroupAft==#AmlgroupBef,T(3,),T(3,X))
 
 !原住民姓名
-#IndigenousnameBef=x,2.50,L
+#IndigenousnameBef=x,100,L
 
 
 #IndigenousnameInd=X,1,L
 
-#IndigenousnameAft=x,2.50,I
+#IndigenousnameAft=x,100,I
 
 #IndigenousnameInd=_,_,L
 C(5,#IndigenousnameAft,#IndigenousnameBef,T(3,),T(3,X))

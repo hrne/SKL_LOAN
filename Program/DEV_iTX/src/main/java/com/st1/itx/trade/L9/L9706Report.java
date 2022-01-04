@@ -219,7 +219,7 @@ public class L9706Report extends MakeReport {
 //			this.info("idata X = " + idata.substring(i, i + 1));
 			tmp = idata.charAt(i);
 
-			tranTemp = (int) tmp;
+			tranTemp = tmp;
 
 			tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 

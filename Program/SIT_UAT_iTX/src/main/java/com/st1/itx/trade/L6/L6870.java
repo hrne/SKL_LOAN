@@ -22,7 +22,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 public class L6870 extends TradeBuffer {
 	@Autowired
 	L6880 sL6880;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6870 ");

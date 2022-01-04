@@ -38,8 +38,7 @@ public class LC015 extends TradeBuffer {
 		this.info("active LC015 ");
 		this.totaVo.init(titaVo);
 
-		Slice<TxPrinter> slTxPrinter = txPrinterService.findByStanIp(titaVo.getParam("StanIp"), 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<TxPrinter> slTxPrinter = txPrinterService.findByStanIp(titaVo.getParam("StanIp"), 0, Integer.MAX_VALUE, titaVo);
 
 		List<TxPrinter> lTxPrinter = slTxPrinter == null ? null : slTxPrinter.getContent();
 
@@ -63,7 +62,7 @@ public class LC015 extends TradeBuffer {
 
 			occursList.putParam("OServerIp", txPrinter.getServerIp());
 			occursList.putParam("OPrinter", txPrinter.getPrinter());
-			
+
 			this.totaVo.addOccursList(occursList);
 		}
 

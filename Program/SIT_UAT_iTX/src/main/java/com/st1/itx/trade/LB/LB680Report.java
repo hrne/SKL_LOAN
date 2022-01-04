@@ -106,8 +106,7 @@ public class LB680Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B680", "「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B680-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B680-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 67, ' ');
 			makeFile.put(strContent);
 
@@ -186,8 +185,7 @@ public class LB680Report extends MakeReport {
 		String txt = "";
 
 		// B680 「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔
-		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),上欄IDN或BAN錯誤註記(19),空白(20~59),"
-				+ "貸款餘額扣除擔保品鑑估值之金額(60~69),資料所屬年月(70~74),空白(75~128)";
+		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),上欄IDN或BAN錯誤註記(19),空白(20~59)," + "貸款餘額扣除擔保品鑑估值之金額(60~69),資料所屬年月(70~74),空白(75~128)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8";
 
 		String txt1[] = txt.split(";");
@@ -267,6 +265,5 @@ public class LB680Report extends MakeReport {
 			this.info("LB680ServiceImpl.genExcel error = " + errors.toString());
 		}
 	}
-
 
 }

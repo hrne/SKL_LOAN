@@ -125,6 +125,8 @@ INVOKEJS(SHOW,p1,1)
 #FdNplTrfDateX=X,2,L
 #FdNplTrfAmtX=X,2,L
 #FdNplProcSitu=X,2,L
+#FdBadDebtAmt=X,2,L
+#FdBadDebtBal=X,2,L
 #FdRemark=X,2,L
 #FdPaymentBank=X,2,L
 
@@ -462,7 +464,9 @@ T(3,*)
 C(3,#CHAIN,1,T(1,#NTXBUF,35,3),$)
 C(3,#CHAIN,1,s,$)
 HIDE(#BTN2,#BTN3,#BTN4,#BTN5)
-@V(2,0)
+@IF(#BormNo>900,V(P,不可輸入預約撥款序號),$)
+V(2,0)
+
 
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
@@ -787,7 +791,14 @@ CALL2(#ADJUSTDOT,#Precision,#NplTrfAmt,#NplTrfAmtX)
 
 ![催收處理情形]
 #NplProcSitu=X,30,L
-
+!轉呆帳金額
+#BadDebtAmt=m,14.2,S
+#BadDebtAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#BadDebtAmt,#BadDebtAmtX)
+!呆帳餘額
+#BadDebtBal=m,14.2,S
+#BadDebtBalX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#BadDebtBal,#BadDebtBalX)
 ![附言]
 #Remark=X,60,L
 
@@ -851,7 +862,7 @@ TXFORM=L3916
 #IntCalcCode#AmortizedCode#DueAmt#FreqBase#RepayFreq#PayIntFreq#GraceDate#StoreRate
 #RateCode#RateIncr#FirstAdjRateDate#IndividualIncr#RateAdjFreq#RepayBank#RepayBankItem
 #RepayAcctNo#PrevIntDate#Shortfall#ShortfallInt#ShortfallPrin
-#PrevRepayDate#NextRepayDate#NplRepay#NplTrfDate#NplTrfAmt#NplProcSitu#Remark
+#PrevRepayDate#NextRepayDate#NplRepay#NplTrfDate#NplTrfAmt#NplProcSitu#BadDebtAmt#BadDebtBal#Remark
 #RelationCode#RelationName#RelationId#RelationBirthday#RelationGender
 ^
 
@@ -923,6 +934,8 @@ TXFORM=L3916
 ["#FdNplTrfDateX+催收開始日",#NplTrfDateX],
 ["#FdNplTrfAmtX+轉催收金額",#NplTrfAmtX],
 ["#FdNplProcSitu+催收處理情形",#NplProcSitu],
+["#FdBadDebtAmt+轉呆帳金額",#BadDebtAmtX],
+["#FdBadDebtBal+呆帳餘額",#BadDebtBalX],
 ]
 </sub>
 

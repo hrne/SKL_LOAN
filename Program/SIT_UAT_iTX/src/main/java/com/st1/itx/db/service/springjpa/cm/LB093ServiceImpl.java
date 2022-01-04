@@ -47,13 +47,10 @@ public class LB093ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB093 動產及貴重物品擔保品明細檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
-				+ "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\"" + "     , M.\"EvaAmt\""
-				+ "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\""
-				+ "     , M.\"MonthSettingAmt\"" + "     , M.\"SettingSeq\"" + "     , M.\"SettingAmt\""
-				+ "     , M.\"PreSettingAmt\"" + "     , M.\"DispPrice\"" + "     , M.\"IssueEndDate\""
-				+ "     , M.\"InsuFg\"" + "     , M.\"Filler19\"" + "     , M.\"JcicDataYM\"" + " FROM  \"JcicB093\" M"
-				+ " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"ClActNo\" ";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\""
+				+ "     , M.\"EvaAmt\"" + "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\"" + "     , M.\"MonthSettingAmt\"" + "     , M.\"SettingSeq\""
+				+ "     , M.\"SettingAmt\"" + "     , M.\"PreSettingAmt\"" + "     , M.\"DispPrice\"" + "     , M.\"IssueEndDate\"" + "     , M.\"InsuFg\"" + "     , M.\"Filler19\""
+				+ "     , M.\"JcicDataYM\"" + " FROM  \"JcicB093\" M" + " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"ClActNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -65,7 +62,7 @@ public class LB093ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB093.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth); 
+		query.setParameter("dateMonth", dateMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

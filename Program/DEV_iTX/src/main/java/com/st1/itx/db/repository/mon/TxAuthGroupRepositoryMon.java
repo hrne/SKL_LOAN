@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,19 +20,19 @@ import com.st1.itx.db.domain.TxAuthGroup;
  */
 public interface TxAuthGroupRepositoryMon extends JpaRepository<TxAuthGroup, String> {
 
-  // AuthNo % ,AND Status>= ,AND Status<=
-  public Slice<TxAuthGroup> findAllByAuthNoLikeAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByAuthNoAsc(String authNo_0, int status_1, int status_2, Pageable pageable);
+	// AuthNo % ,AND Status>= ,AND Status<=
+	public Slice<TxAuthGroup> findAllByAuthNoLikeAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByAuthNoAsc(String authNo_0, int status_1, int status_2, Pageable pageable);
 
-  // BranchNo = ,AND LevelFg = 
-  public Slice<TxAuthGroup> findAllByBranchNoIsAndLevelFgIsOrderByAuthNoAsc(String branchNo_0, int levelFg_1, Pageable pageable);
+	// BranchNo = ,AND LevelFg =
+	public Slice<TxAuthGroup> findAllByBranchNoIsAndLevelFgIsOrderByAuthNoAsc(String branchNo_0, int levelFg_1, Pageable pageable);
 
-  // BranchNo = ,AND AuthNo % ,AND Status>= ,AND Status<=
-  public Slice<TxAuthGroup> findAllByBranchNoIsAndAuthNoLikeAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByAuthNoAsc(String branchNo_0, String authNo_1, int status_2, int status_3, Pageable pageable);
+	// BranchNo = ,AND AuthNo % ,AND Status>= ,AND Status<=
+	public Slice<TxAuthGroup> findAllByBranchNoIsAndAuthNoLikeAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByAuthNoAsc(String branchNo_0, String authNo_1, int status_2, int status_3,
+			Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAuthGroup> findByAuthNo(String authNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAuthGroup> findByAuthNo(String authNo);
 
 }
-

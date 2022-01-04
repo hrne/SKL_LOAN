@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.TxPrinterId;
  */
 public interface TxPrinterRepositoryDay extends JpaRepository<TxPrinter, TxPrinterId> {
 
-  // StanIp = 
-  public Slice<TxPrinter> findAllByStanIpIsOrderByStanIpAscFileCodeAsc(String stanIp_0, Pageable pageable);
+	// StanIp =
+	public Slice<TxPrinter> findAllByStanIpIsOrderByStanIpAscFileCodeAsc(String stanIp_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxPrinter> findByTxPrinterId(TxPrinterId txPrinterId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxPrinter> findByTxPrinterId(TxPrinterId txPrinterId);
 
 }
-

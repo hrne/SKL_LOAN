@@ -27,7 +27,6 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-
 	private int intStartDate = 0;
 	private int intEndDate = 0;
 	private String flag = "";
@@ -60,7 +59,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"CdEmp\"    e on e.\"EmployeeNo\" = c.\"EmpNo\"     ";
 		sql += " left join \"CdCode\"   d on d.\"DefType\"    = 4               ";
 		sql += "                         and d.\"DefCode\"    = 'EmpDeductType' ";
-		sql += "                         and d.\"Code\"       = :AgType1"  ;
+		sql += "                         and d.\"Code\"       = :AgType1";
 		sql += " where l.\"NextPayIntDate\" >= :intStartDate";
 		sql += "   and l.\"NextPayIntDate\" <= :intEndDate";
 		sql += "   and l.\"Status\" = 0                                         ";
@@ -71,12 +70,13 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		// EmployeeCom
-		//sql += " ,CASE WHEN ( e.\"CommLineCode\" = 21 AND ( substr(e.\"AgLevel\", 0, 1) IN ( 'F','G','J','Z') )) "; 
+		// sql += " ,CASE WHEN ( e.\"CommLineCode\" = 21 AND ( substr(e.\"AgLevel\", 0,
+		// 1) IN ( 'F','G','J','Z') )) ";
 //		sql += "             OR (e.\"CommLineCode\" = 31 AND ( substr(e.\"AgLevel\", 0, 1) IN ('K','Z') )) "; 
 //		sql += "             OR (e.\"AgLevel\" NOT IN ('21','31','1C' ) AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097') ) ";
 //		sql += "       THEN  5"; 
 //		sql += "       ELSE  1";
-		
+
 		this.info("sql=" + sql);
 		Query query;
 
@@ -94,7 +94,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		intStartDate = iIntStartDate;
 		intEndDate = iIntEndDate;
 		flag = "" + iFlag;
-		AgType1 = "1".equals(flag) ? "5" : "1" ;
+		AgType1 = "1".equals(flag) ? "5" : "1";
 		return findAll(titaVo);
 	}
 }
