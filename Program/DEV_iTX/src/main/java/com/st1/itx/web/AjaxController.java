@@ -195,13 +195,14 @@ public class AjaxController extends SysLogger {
 				this.info("morePage : " + "1".equals(p.get("morePage").toString()));
 				this.info("pageNo   : " + pageNo);
 
-				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100)
-					break;
-
 				if (pageNo == 1) {
 					prt = (String) p.get("Printer");
 					prtIp = (String) p.get("ServerIp");
 				}
+				
+				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100)
+					break;
+				
 				pageNo++;
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
