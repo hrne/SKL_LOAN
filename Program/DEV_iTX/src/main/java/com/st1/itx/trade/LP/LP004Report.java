@@ -33,7 +33,8 @@ public class LP004Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP004", "內網業績統計報表", "LP004單位成績(內部網站)", "LP004_底稿_單位成績(內部網站).xlsx", "放款審查各區");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP004", "內網業績統計報表", "LP004單位成績(內部網站)",
+				"LP004_底稿_單位成績(內部網站).xlsx", "放款審查各區");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 		Map<String, String> wkSsnVo = null;
@@ -50,7 +51,8 @@ public class LP004Report extends MakeReport {
 
 		if (wkSsnList.size() > 0) {
 
-			String iENTDY = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "." + titaVo.get("ENTDY").substring(6, 8);
+			String iENTDY = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "."
+					+ titaVo.get("ENTDY").substring(6, 8);
 			String iYYMM = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911) + "." + wkSsnVo.get("F1");
 
 			makeExcel.setSheet("放款審查各區");
@@ -130,6 +132,7 @@ public class LP004Report extends MakeReport {
 			// 季累計金額 總計
 			BigDecimal namtBDTotal = BigDecimal.ZERO;
 
+
 			for (Map<String, String> tLDVo : findList) {
 
 				row++;
@@ -144,7 +147,7 @@ public class LP004Report extends MakeReport {
 				makeExcel.setValue(row, 3, lcntBD, "0.0", "R");
 
 				// 上月金額
-				BigDecimal lamtBD = getBigDecimal(tLDVo.get("F3"));
+				BigDecimal lamtBD =getBigDecimal(tLDVo.get("F3"));
 
 				makeExcel.setValue(row, 4, lamtBD, "#,##0", "R");
 
@@ -166,8 +169,11 @@ public class LP004Report extends MakeReport {
 				makeExcel.setValue(row, 8, namtBD.subtract(lamtBD), "#,##0", "R");
 
 				// 金額/件數
-				makeExcel.setValue(row, 9, namtBD.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : ncntBD.divide(namtBD), "#,##0", "R");
-
+//				makeExcel.setValue(row, 9, namtBD.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : ncntBD.divide(namtBD,0,BigDecimal.ROUND_HALF_UP),
+//						"#,##0", "R");
+				makeExcel.setValue(row, 9, this.computeDivide(ncntBD, namtBD, 0),
+						"#,##0", "R");
+				
 				lcntBDTotal = lcntBDTotal.add(lcntBD);
 				lamtBDTotal = lamtBDTotal.add(lamtBD);
 				ncntBDTotal = ncntBDTotal.add(ncntBD);
@@ -182,8 +188,8 @@ public class LP004Report extends MakeReport {
 			makeExcel.setValue(row, 6, namtBDTotal, "#,##0", "R");
 			makeExcel.setValue(row, 7, ncntBDTotal.subtract(lcntBDTotal), "0.0", "R");
 			makeExcel.setValue(row, 8, namtBDTotal.subtract(lamtBDTotal), "#,##0", "R");
-
-			makeExcel.setValue(row, 9, ncntBDTotal.equals(BigDecimal.ZERO) || namtBDTotal.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : ncntBDTotal.divide(namtBDTotal), "#,##0", "R");
+			
+			makeExcel.setValue(row, 9, this.computeDivide(ncntBDTotal, namtBDTotal, 0), "#,##0", "R");
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
 		}
@@ -476,7 +482,7 @@ public class LP004Report extends MakeReport {
 				makeExcel.setValue(row, 4, tLDVo.get("F2"));
 
 				makeExcel.setValue(row, 5, mortgageSpecialist);
-
+				
 				// 達成件數
 				BigDecimal lcntBD = getBigDecimal(tLDVo.get("F3"));
 				makeExcel.setValue(row, 6, lcntBD, "##0", "R");
@@ -497,15 +503,15 @@ public class LP004Report extends MakeReport {
 				i++;
 
 			}
-
+			
 			row++;
-
+			
 			if (findList.size() == (i - 1)) {
-				makeExcel.setValue(row, 5, "合計");
+				makeExcel.setValue(row , 5, "合計");
 				makeExcel.setValue(row, 6, lcntBDTotal, "##0");
-				makeExcel.setValue(row, 7, lamtBDTotal, "#,##0");
+				makeExcel.setValue(row , 7, lamtBDTotal, "#,##0");
 				makeExcel.setValue(row, 8, ncntBDTotal, "##0");
-				makeExcel.setValue(row, 9, namtBDTotal, "#,##0");
+				makeExcel.setValue(row , 9, namtBDTotal, "#,##0");
 			}
 		} else {
 			makeExcel.setValue(3, 1, "本日無資料");
@@ -515,7 +521,8 @@ public class LP004Report extends MakeReport {
 	/**
 	 * 各單位
 	 */
-	private void exportExcelUnitTable(TitaVo titaVo, Map<String, String> wkSsnVo, String deptCode) throws LogicException {
+	private void exportExcelUnitTable(TitaVo titaVo, Map<String, String> wkSsnVo, String deptCode)
+			throws LogicException {
 		this.info("===========exportExcelUnitTable");
 
 		try {

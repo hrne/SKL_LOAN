@@ -211,7 +211,7 @@ T(3,)T(H,#ReconCode,#ReconCodeHelp)
 !                  TCK,T(3,支票),T(3, ))
 
 ! 檔名
-#FileName=x,30,I
+#FileName=x,40,I
 C(3,#CHAIN,0,$,s)
 
 ! 處理狀態

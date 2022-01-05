@@ -14,6 +14,7 @@ T(3,LC110)
 #button=x,100,S
 K(MODIFYBUTTON,解除鎖定)
 
+
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -33,6 +34,9 @@ K(MODIFYBUTTON,解除鎖定)
 
 ! 必輸欄位
 
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S

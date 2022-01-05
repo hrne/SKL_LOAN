@@ -267,7 +267,7 @@ T(3,*)
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 @V(2,0)
 T(2,@LockCustNo,#CustNo)
-! <include src="COM.icf::LockControl.rtn"/>
+<include src="COM.icf::LockControl.rtn"/>
 
 #BUF1B=X,18,S
 C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))

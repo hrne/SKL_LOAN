@@ -178,30 +178,6 @@ C(5,#rimtxtype,L4,s,$)
 T(1,@BormNo,#NTXBUF,33,3)
 T(1,@EffectDate1,#NTXBUF,43,7)
 T(1,@CheckChangFg,#NTXBUF,82,1)
-! T(1,@NextRateAdjDate1,#NTXBUF,36,7)
-! T(1,@BaseRate1,#NTXBUF,50,6)
-! T(1,@FitRate1,#NTXBUF,56,6)
-! T(1,@RateIncr1,#NTXBUF,62,6)
-! T(1,@IndividualIncr1,#NTXBUF,68,6)
-! T(1,@RateCode1,#NTXBUF,50,1)
-! T(1,@ProdNo1,#NTXBUF,51,5)
-! T(1,@BaseRateCode1,#NTXBUF,56,2)
-! T(1,@chainbaserate2,#NTXBUF,58,2)
-! T(1,@chainbaserate4,#NTXBUF,60,4)
-! T(B,@chainbaserate6,#chainbaserate2+.+#chainbaserate4)
-! T(1,@chainFitRate2,#NTXBUF,64,2)
-! T(1,@chainFitRate4,#NTXBUF,66,4)
-! T(B,@chainFitRate6,#chainFitRate2+.+#chainFitRate4)
-! T(1,@chainRateIncr2,#NTXBUF,70,2)
-! T(1,@chainRateIncr4,#NTXBUF,72,4)
-! T(B,@chainRateIncr6,#chainRateIncr2+.+#chainRateIncr4)
-! T(1,@chainIndividualIncr2,#NTXBUF,76,2)
-! T(1,@chainIndividualIncr4,#NTXBUF,78,4)
-! T(B,@chainIndividualIncr6,#chainIndividualIncr2+.+#chainIndividualIncr4)
-! E(0,@BaseRate1,#chainbaserate6)
-! E(0,@FitRate1,#chainFitRate6)
-! E(0,@RateIncr1,#chainRateIncr6)
-! E(0,@IndividualIncr1,#chainIndividualIncr6)
 
 #chainbaserate2=X,2,S
 #chainbaserate4=X,4,S
@@ -217,21 +193,6 @@ T(1,@CheckChangFg,#NTXBUF,82,1)
 #chainIndividualIncr6=X,7,S
 
 #CheckChangFg=X,1,S
-
-! 借戶戶號7
-! 統一編號10
-! 核准編號7
-! 額度編號3
-! 下次利率調整日7
-! 生效日期7
-! 利率區分1
-! 商品代碼5
-! 指標利率代碼2
-! 指標利率6
-! 適用利率6
-! 加碼利率6
-! 個別加碼利率6
-
 
 #CHAINTXCD=_,_,S
 C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
@@ -373,6 +334,7 @@ C(3,#CustNo,0,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
+<include src="COM.icf::LockControl.rtn"/>
 
 #BUF4A=X,35,S
 T(2,#WkCaseNo+#CustNo+#CustId+#ApplNo+#WkFacmNo)
@@ -895,7 +857,6 @@ IF(#NextRateAdjDate2<=#EffectDate2,V(P,下次利率調整日不可小於等於�
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L3R02.dec"/>
 <include src="ROM.icf::L3R09.dec"/>
-! <include src="COM.icf::LockControl.rtn"/>
 
 </sub>
 !---------- 輸出共用變數宣告區 ----------

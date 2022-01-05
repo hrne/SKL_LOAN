@@ -690,7 +690,7 @@ C(3,#CustNo,0,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
-! <include src="COM.icf::LockControl.rtn"/>
+<include src="COM.icf::LockControl.rtn"/>
 
 #TimCustNoX=X,100,S
 E(0,0)

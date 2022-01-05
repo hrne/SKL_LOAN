@@ -63,7 +63,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3712")
 @Scope("prototype")
 public class L3712 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3712.class);
 
 	/* DB服務注入 */
 	@Autowired

@@ -50,7 +50,7 @@ T(1,#SYSDATE,2,5)
 @A(YM,1,#PerfMonth)
 
 #ProcCode=A,1,I
-@V(1,1,2,3,4,5,6,7,8,9)
+!@V(1,1,2,3,4,5,6,7,8,9)
 
 #BatchNoFm=A,2,I
 E(0,0)

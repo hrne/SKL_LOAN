@@ -224,13 +224,17 @@ public class L3220 extends TradeBuffer {
 
 		if (titaVo.isHcodeNormal()) {
 			// 查詢會計銷帳檔
-			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, wkFacmNoS, wkFacmNoE, 0, Integer.MAX_VALUE);
+			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, wkFacmNoS,
+					wkFacmNoE, 0, Integer.MAX_VALUE);
 			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 			if (lAcReceivable != null && lAcReceivable.size() > 0) {
 				for (AcReceivable ac : lAcReceivable) {
-					if ((iTempReasonCode == 1 && (ac.getAcctCode().equals("TAV") || ac.getAcctCode().equals("TLD"))) || (iTempReasonCode == 2 && ac.getAcctCode().substring(0, 2).equals("T1"))
-							|| (iTempReasonCode == 3 && ac.getAcctCode().substring(0, 2).equals("T2")) || (iTempReasonCode == 4 && ac.getAcctCode().equals("TAM"))) {
-						if (ac.getRvBal().compareTo(new BigDecimal(0)) > 0 && wkTempBal.compareTo(new BigDecimal(0)) > 0) {
+					if ((iTempReasonCode == 1 && (ac.getAcctCode().equals("TAV") || ac.getAcctCode().equals("TLD")))
+							|| (iTempReasonCode == 2 && ac.getAcctCode().substring(0, 2).equals("T1"))
+							|| (iTempReasonCode == 3 && ac.getAcctCode().substring(0, 2).equals("T2"))
+							|| (iTempReasonCode == 4 && ac.getAcctCode().equals("TAM"))) {
+						if (ac.getRvBal().compareTo(new BigDecimal(0)) > 0
+								&& wkTempBal.compareTo(new BigDecimal(0)) > 0) {
 							// 借方 暫收及待結轉帳項-擔保放款
 							AcDetail acDetail = new AcDetail();
 							acDetail.setDbCr("D");
@@ -294,7 +298,8 @@ public class L3220 extends TradeBuffer {
 			tLoanCheque.setStatusCode("3");
 		}
 		try {
-			tLoanCheque.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tLoanCheque.setLastUpdate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tLoanCheque.setLastUpdateEmpNo(titaVo.getTlrNo());
 			loanChequeService.update(tLoanCheque);
 		} catch (DBException e) {
@@ -316,7 +321,8 @@ public class L3220 extends TradeBuffer {
 		wkChequeAmt = tLoanCheque.getChequeAmt();
 		tLoanCheque.setStatusCode("0"); // 0: 未處理
 		try {
-			tLoanCheque.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tLoanCheque.setLastUpdate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tLoanCheque.setLastUpdateEmpNo(titaVo.getTlrNo());
 			loanChequeService.update(tLoanCheque);
 		} catch (DBException e) {

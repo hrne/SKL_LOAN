@@ -263,7 +263,7 @@ C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
-! <include src="COM.icf::LockControl.rtn"/>
+<include src="COM.icf::LockControl.rtn"/>
 
 #TimFacmNo=A,3,S
 C(4,#ApplNo,E(0,0),E(0,#L2r05FacmNo))

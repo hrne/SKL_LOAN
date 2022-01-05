@@ -121,7 +121,7 @@ public class L9719Report extends MakeReport {
 		String F12 = "0";
 		String F13 = "0";
 
-		if (lL9719 != null && lL9719.size() != 0) {
+		if (lL9719 != null && !lL9719.isEmpty()) {
 
 			// should only have 1 result in this query!
 
@@ -150,11 +150,11 @@ public class L9719Report extends MakeReport {
 			for (Map<String, String> tLDVo : lL9719) {
 				this.info("lL9719:" + lL9719.get(0));
 				for (int i = 0; i <= 2; i++) {
-					print(-10 - i * 2, 26, tLDVo.get("F" + Integer.toString(2 + i * 4)), "C");
-					print(-10 - i * 2, 50, tLDVo.get("F" + Integer.toString(3 + i * 4)), "C");
-					print(-10 - i * 2, 99, formatAmt(tLDVo.get("F" + (0 + i * 4)), 0), "R");
-					print(-10 - i * 2, 124, formatAmt(tLDVo.get("F" + (1 + i * 4)), 0), "R");
-					print(-10 - i * 2, 143, tLDVo.get("F14"), "C");
+					print(-(10 + i * 2), 26, tLDVo.get("F" + Integer.toString(2 + i * 4)), "C");
+					print(-(10 + i * 2), 50, tLDVo.get("F" + Integer.toString(3 + i * 4)), "C");
+					print(-(10 + i * 2), 99, formatAmt(tLDVo.get("F" + (0 + i * 4)), 0), "R");
+					print(-(10 + i * 2), 124, formatAmt(tLDVo.get("F" + (1 + i * 4)), 0), "R");
+					print(-(10 + i * 2), 143, tLDVo.get("F14"), "C");
 				}
 
 				print(-16, 99, formatAmt(getBigDecimal(tLDVo.get("F0")).add(getBigDecimal(tLDVo.get("F4"))).add(getBigDecimal(tLDVo.get("F8"))), 0), "R");
@@ -164,6 +164,9 @@ public class L9719Report extends MakeReport {
 				F13 = formatAmt(tLDVo.get("F13"), 0);
 			}
 
+		} else
+		{
+			print(-2, 4, "本月無資料!!");
 		}
 
 		print(-23, 4, "一、至" + rocYear + "." + rocMonth + ".止，累積");

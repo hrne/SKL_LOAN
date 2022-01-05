@@ -315,7 +315,7 @@ C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
-! <include src="COM.icf::LockControl.rtn"/>
+<include src="COM.icf::LockControl.rtn"/>
 
 ![暫收帳戶]
 #FdTempReasonCode=X,2,L

@@ -11,8 +11,6 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
@@ -78,10 +76,7 @@ public class L3120 extends TradeBuffer {
 	private int iBormNo;
 	private int wkBorxNo;
 	private int wkTbsDy;
-	private FacMain tFacMain;
-	private FacMainId tFacMainId;
 	private LoanBorMain tLoanBorMain;
-	private LoanBorMainId tLoanBorMainId;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
 
@@ -166,25 +161,6 @@ public class L3120 extends TradeBuffer {
 			loanBorMainService.update(tLoanBorMain);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0008", "放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
-		}
-	}
-
-	private void FacMainRoutine() throws LogicException {
-		// 鎖定額度主檔
-		tFacMain = facMainService.holdById(new FacMainId(iCustNo, iFacmNo));
-		if (tFacMain == null) {
-			throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo); // 鎖定資料時，發生錯誤
-		}
-		if (tFacMain.getActFg() == 1) {
-			throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
-		}
-		// 更新額度檔
-		try {
-			tFacMain.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			tFacMain.setLastUpdateEmpNo(titaVo.getTlrNo());
-			facMainService.update(tFacMain);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "額度主檔"); // 更新資料時，發生錯誤
 		}
 	}
 
