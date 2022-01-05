@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -995,7 +996,7 @@ public class MakeReport extends CommBuffer {
 		List<HashMap<String, Object>> orgMap = new ArrayList<HashMap<String, Object>>();
 
 		try {
-			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
+			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), new TypeReference<List<Map<String, Object>>>() {});
 		} catch (IOException e) {
 			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
 		}

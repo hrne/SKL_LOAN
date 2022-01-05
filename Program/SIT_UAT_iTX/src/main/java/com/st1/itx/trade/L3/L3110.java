@@ -592,8 +592,8 @@ public class L3110 extends TradeBuffer {
 		tLoanBorMain.setLastTxtNo(titaVo.getTxtNo());
 		tLoanBorMain.setRemitBank(titaVo.getParam("RemitBank"));
 		tLoanBorMain.setRemitBranch(titaVo.getParam("RemitBranch"));
-		int paymentBank = parse.stringToInteger(titaVo.getParam("RpRemitBank")) * 10000;
-		int paymentBranch = parse.stringToInteger(titaVo.getParam("RpRemitBranch"));
+		int paymentBank = parse.stringToInteger(titaVo.getParam("RemitBank")) * 10000;
+		int paymentBranch = parse.stringToInteger(titaVo.getParam("RemitBranch"));
 		tLoanBorMain.setPaymentBank(parse.IntegerToString(paymentBank + paymentBranch, 7));
 		tLoanBorMain.setRemitAcctNo(this.parse.stringToBigDecimal(titaVo.getParam("RemitAcctNo")));
 		tLoanBorMain.setCompensateAcct(titaVo.getParam("CompensateAcct"));

@@ -75,11 +75,12 @@ T(2,#StanIp+-+#FileCode)
 #ServerIp=X,15,I
 
 #printerList=x,500,S
+C(4,#ServerIp,S,$)
 K(PLIST,#ServerIp)
 
 #Printer=x,100,I
-HELP(#printerList)
 C(4,#ServerIp,S,$)
+HELP(#printerList)
 @
 V(7)
 </sub>

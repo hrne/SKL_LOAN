@@ -44,6 +44,7 @@ import com.st1.itx.db.service.PfRewardService;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.springjpa.cm.L5500ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -56,7 +57,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5500 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5500.class);
 	/* DB服務注入 */
 	@Autowired
 	public SystemParasService systemParasService;
@@ -113,23 +113,38 @@ public class L5500 extends TradeBuffer {
 	Integer UpNo = 0;
 	String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 	// {"資料庫TB縮寫","DB Column","DB Column Name","DB Column Type AND Length"}
-	private String sqlColumn[][] = { { "PID", "PerfDate", "業績日期", "DecimalD(8)" }, { "PID", "CustNo", "戶號", "DECIMAL(7)" }, { "PID", "FacmNo", "額度編號", "DECIMAL(3)" },
-			{ "PID", "BormNo", "撥款序號", "DECIMAL(3)" }, { "PID", "RepayType", "還款類別", "DECIMAL(1)" }, { "PID", "DrawdownDate", "撥款日/還款日", "DecimalD(8)" }, { "PID", "ProdCode", "商品代碼", "VARCHAR2(5)" },
-			{ "PID", "PieceCode", "計件代碼", "VARCHAR2(1)" }, { "PID", "CntingCode", "是否計件", "VARCHAR2(1)" }, { "PID", "DrawdownAmt", "撥款金額/追回金額", "DECIMAL(16.2)" },
-			{ "PID", "UnitCode", "單位代號", "VARCHAR2(6)" }, { "PID", "DistCode", "區部代號", "VARCHAR2(6)" }, { "PID", "DeptCode", "部室代號", "VARCHAR2(6)" }, { "PID", "Introducer", "介紹人", "NVARCHAR2(8)" },
-			{ "PID", "UnitManager", "處經理代號", "NVARCHAR2(8)" }, { "PID", "DistManager", "區經理代號", "NVARCHAR2(8)" }, { "PID", "DeptManager", "部經理代號", "NVARCHAR2(8)" },
-			{ "PID", "PerfCnt", "件數", "DECIMAL(5.1)" }, { "PID", "PerfEqAmt", "換算業績", "DECIMAL(16.2)" }, { "PID", "PerfReward", "業務報酬", "DECIMAL(16.2)" },
-			{ "PID", "PerfAmt", "業績金額", "DECIMAL(16.2)" }, { "PID", "WorkMonth", "工作月", "DECIMAL(6)" }, { "PID", "WorkSeason", "工作季", "DECIMAL(5)" }, { "PID", "CreateDate", "建檔日期時間", "DATE" },
-			{ "PID", "CreateEmpNo", "建檔人員", "VARCHAR2(6)" }, { "PID", "LastUpdate", "最後更新日期時間", "DATE" }, { "PID", "LastUpdateEmpNo", "最後更新人員", "VARCHAR2(6)" },
-			{ "PR", "Introducer", "介紹人員編", "VARCHAR2(6)" }, { "PR", "Coorgnizer", "協辦人員編", "VARCHAR2(6)" }, { "PR", "InterviewerA", "晤談一員編", "VARCHAR2(6)" },
-			{ "PR", "InterviewerB", "晤談二員編", "VARCHAR2(6)" }, { "PR", "IntroducerBonus", "介紹人介紹獎金", "DECIMAL(16.2)" }, { "PR", "IntroducerBonusDate", "介紹獎金發放日", "DecimalD(8)" },
-			{ "PR", "IntroducerAddBonus", "介紹人加碼獎勵津貼", "DECIMAL(16.2)" }, { "PR", "IntroducerAddBonusDate", "獎勵津貼發放日", "DecimalD(8)" }, { "PR", "CoorgnizerBonus", "協辦人員協辦獎金", "DECIMAL(16.2)" },
-			{ "PR", "CoorgnizerBonusDate", "協辦獎金發放日", "DecimalD(8)" }, { "PR", "WorkMonth", "工作月", "DECIMAL(6)" }, { "PR", "WorkSeason", "工作季", "DECIMAL(5)" },
-			{ "PR", "CreateDate", "建檔日期時間", "DATE" }, { "PR", "CreateEmpNo", "建檔人員", "VARCHAR2(6)" }, { "PR", "LastUpdate", "最後更新日期時間", "DATE" }, { "PR", "LastUpdateEmpNo", "最後更新人員", "VARCHAR2(6)" },
-			{ "PBD", "BsOfficer", "房貸專員", "VARCHAR2(6)" }, { "PBD", "DeptCode", "部室代號", "VARCHAR2(6)" }, { "PBD", "DrawdownDate", "撥款日", "DecimalD(8)" }, { "PBD", "ProdCode", "商品代碼", "VARCHAR2(5)" },
-			{ "PBD", "PieceCode", "計件代碼", "VARCHAR2(1)" }, { "PBD", "DrawdownAmt", "撥款金額", "" }, { "PBD", "PerfCnt", "件數", "DECIMAL(5.1)" }, { "PBD", "PerfAmt", "業績金額", "DECIMAL(16.2)" },
-			{ "PBD", "WorkMonth", "工作月", "DECIMAL(6)" }, { "PBD", "WorkSeason", "工作季", "DECIMAL(5)" }, { "PBD", "CreateDate", "建檔日期時間", "DATE()" }, { "PBD", "CreateEmpNo", "建檔人員", "VARCHAR2(6)" },
-			{ "PBD", "LastUpdate", "最後更新日期時間", "DATE()" }, { "PBD", "LastUpdateEmpNo", "最後更新人員", "VARCHAR2(6)" } };
+	private String sqlColumn[][] = { { "PID", "PerfDate", "業績日期", "DecimalD(8)" },
+			{ "PID", "CustNo", "戶號", "DECIMAL(7)" }, { "PID", "FacmNo", "額度編號", "DECIMAL(3)" },
+			{ "PID", "BormNo", "撥款序號", "DECIMAL(3)" }, { "PID", "RepayType", "還款類別", "DECIMAL(1)" },
+			{ "PID", "DrawdownDate", "撥款日/還款日", "DecimalD(8)" }, { "PID", "ProdCode", "商品代碼", "VARCHAR2(5)" },
+			{ "PID", "PieceCode", "計件代碼", "VARCHAR2(1)" }, { "PID", "CntingCode", "是否計件", "VARCHAR2(1)" },
+			{ "PID", "DrawdownAmt", "撥款金額/追回金額", "DECIMAL(16.2)" }, { "PID", "UnitCode", "單位代號", "VARCHAR2(6)" },
+			{ "PID", "DistCode", "區部代號", "VARCHAR2(6)" }, { "PID", "DeptCode", "部室代號", "VARCHAR2(6)" },
+			{ "PID", "Introducer", "介紹人", "NVARCHAR2(8)" }, { "PID", "UnitManager", "處經理代號", "NVARCHAR2(8)" },
+			{ "PID", "DistManager", "區經理代號", "NVARCHAR2(8)" }, { "PID", "DeptManager", "部經理代號", "NVARCHAR2(8)" },
+			{ "PID", "PerfCnt", "件數", "DECIMAL(5.1)" }, { "PID", "PerfEqAmt", "換算業績", "DECIMAL(16.2)" },
+			{ "PID", "PerfReward", "業務報酬", "DECIMAL(16.2)" }, { "PID", "PerfAmt", "業績金額", "DECIMAL(16.2)" },
+			{ "PID", "WorkMonth", "工作月", "DECIMAL(6)" }, { "PID", "WorkSeason", "工作季", "DECIMAL(5)" },
+			{ "PID", "CreateDate", "建檔日期時間", "DATE" }, { "PID", "CreateEmpNo", "建檔人員", "VARCHAR2(6)" },
+			{ "PID", "LastUpdate", "最後更新日期時間", "DATE" }, { "PID", "LastUpdateEmpNo", "最後更新人員", "VARCHAR2(6)" },
+			{ "PR", "Introducer", "介紹人員編", "VARCHAR2(6)" }, { "PR", "Coorgnizer", "協辦人員編", "VARCHAR2(6)" },
+			{ "PR", "InterviewerA", "晤談一員編", "VARCHAR2(6)" }, { "PR", "InterviewerB", "晤談二員編", "VARCHAR2(6)" },
+			{ "PR", "IntroducerBonus", "介紹人介紹獎金", "DECIMAL(16.2)" },
+			{ "PR", "IntroducerBonusDate", "介紹獎金發放日", "DecimalD(8)" },
+			{ "PR", "IntroducerAddBonus", "介紹人加碼獎勵津貼", "DECIMAL(16.2)" },
+			{ "PR", "IntroducerAddBonusDate", "獎勵津貼發放日", "DecimalD(8)" },
+			{ "PR", "CoorgnizerBonus", "協辦人員協辦獎金", "DECIMAL(16.2)" },
+			{ "PR", "CoorgnizerBonusDate", "協辦獎金發放日", "DecimalD(8)" }, { "PR", "WorkMonth", "工作月", "DECIMAL(6)" },
+			{ "PR", "WorkSeason", "工作季", "DECIMAL(5)" }, { "PR", "CreateDate", "建檔日期時間", "DATE" },
+			{ "PR", "CreateEmpNo", "建檔人員", "VARCHAR2(6)" }, { "PR", "LastUpdate", "最後更新日期時間", "DATE" },
+			{ "PR", "LastUpdateEmpNo", "最後更新人員", "VARCHAR2(6)" }, { "PBD", "BsOfficer", "房貸專員", "VARCHAR2(6)" },
+			{ "PBD", "DeptCode", "部室代號", "VARCHAR2(6)" }, { "PBD", "DrawdownDate", "撥款日", "DecimalD(8)" },
+			{ "PBD", "ProdCode", "商品代碼", "VARCHAR2(5)" }, { "PBD", "PieceCode", "計件代碼", "VARCHAR2(1)" },
+			{ "PBD", "DrawdownAmt", "撥款金額", "" }, { "PBD", "PerfCnt", "件數", "DECIMAL(5.1)" },
+			{ "PBD", "PerfAmt", "業績金額", "DECIMAL(16.2)" }, { "PBD", "WorkMonth", "工作月", "DECIMAL(6)" },
+			{ "PBD", "WorkSeason", "工作季", "DECIMAL(5)" }, { "PBD", "CreateDate", "建檔日期時間", "DATE()" },
+			{ "PBD", "CreateEmpNo", "建檔人員", "VARCHAR2(6)" }, { "PBD", "LastUpdate", "最後更新日期時間", "DATE()" },
+			{ "PBD", "LastUpdateEmpNo", "最後更新人員", "VARCHAR2(6)" } };
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -175,12 +190,13 @@ public class L5500 extends TradeBuffer {
 		queryKey.put("PerfDate", String.valueOf(PerfDate));
 		this.info("L5500 QueryPerfDate=[" + PerfDate + "]");
 
-		DataInsertUpdateAreaData(this.index, this.limit, queryKey, titaVo);
-		DataInsertUpdateHlThreeLaqhcp(this.index, this.limit, queryKey, titaVo);
-		DataInsertUpdateHlThreeDetail(this.index, this.limit, queryKey, titaVo);
-		DataInsertUpdateHlEmpLnYg5Pt(this.index, this.limit, queryKey, titaVo);
-		DataInsertUpdateHlCusData(this.index, this.limit, queryKey, titaVo);
-		DataInsertUpdateHlAreaLnYg6Pt(this.index, this.limit, queryKey, titaVo);
+		MySpring.newTask("L5500Batch", this.txBuffer, titaVo);
+//		DataInsertUpdateAreaData(this.index, this.limit, queryKey, titaVo);
+//		DataInsertUpdateHlThreeLaqhcp(this.index, this.limit, queryKey, titaVo);
+//		DataInsertUpdateHlThreeDetail(this.index, this.limit, queryKey, titaVo);
+//		DataInsertUpdateHlEmpLnYg5Pt(this.index, this.limit, queryKey, titaVo);
+//		DataInsertUpdateHlCusData(this.index, this.limit, queryKey, titaVo);
+//		DataInsertUpdateHlAreaLnYg6Pt(this.index, this.limit, queryKey, titaVo);
 
 //		List<String[]> dataL5500=l5500ServiceImpl.FindData(this.index, this.limit, sqlL5500, queryKey, titaVo);
 //		if(dataL5500!=null && dataL5500.size()!=0) {
@@ -189,11 +205,14 @@ public class L5500 extends TradeBuffer {
 //			}
 //		}
 
+		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	public void DataInsertUpdateHlAreaLnYg6Pt(int index, int limit, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
+	public void DataInsertUpdateHlAreaLnYg6Pt(int index, int limit, Map<String, String> queryKey, TitaVo titaVo)
+			throws LogicException {
 		String sqlHlAreaLnYg6Pt = "";
 		if (sqlHlAreaLnYg6Pt != null && sqlHlAreaLnYg6Pt.length() != 0) {
 			List<String[]> dataHlAreaLnYg6Pt = l5500ServiceImpl.FindData(index, limit, sqlHlAreaLnYg6Pt, null, titaVo);
@@ -226,11 +245,13 @@ public class L5500 extends TradeBuffer {
 		}
 	}
 
-	public void DataInsertUpdateHlEmpLnYg5Pt(int index, int limit, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
+	public void DataInsertUpdateHlEmpLnYg5Pt(int index, int limit, Map<String, String> queryKey, TitaVo titaVo)
+			throws LogicException {
 		String sqlHlEmpLnYg5Pt = "SELECT \"WorkMonth\",\"EmpNo\",\"Fullname\",\"AreaCode\",\"AreaItem\",\"DeptCode\",\"DepItem\",\"DistCode\",\"DistItem\",\"GoalAmt\" FROM \"PfBsOfficer\" WHERE (\"WorkMonth\"!=0 AND \"EmpNo\" IS NOT NULL AND \"AreaCode\" IS NOT NULL) AND \"LastUpdate\">=to_date(:PerfDate,'YYYYMMDD') ";
 		sqlHlEmpLnYg5Pt = sqlHlEmpLnYg5Pt + sqlRow;
 		if (sqlHlEmpLnYg5Pt != null && sqlHlEmpLnYg5Pt.length() != 0) {
-			List<String[]> dataHlEmpLnYg5Pt = l5500ServiceImpl.FindData(index, limit, sqlHlEmpLnYg5Pt, queryKey, titaVo);
+			List<String[]> dataHlEmpLnYg5Pt = l5500ServiceImpl.FindData(index, limit, sqlHlEmpLnYg5Pt, queryKey,
+					titaVo);
 			List<HlEmpLnYg5Pt> lHlEmpLnYg5Pt = new ArrayList<HlEmpLnYg5Pt>();
 			List<HlEmpLnYg5PtId> lHlEmpLnYg5PtId = new ArrayList<HlEmpLnYg5PtId>();
 			if (dataHlEmpLnYg5Pt != null && dataHlEmpLnYg5Pt.size() != 0) {
@@ -272,7 +293,8 @@ public class L5500 extends TradeBuffer {
 		}
 	}
 
-	public void DataInsertUpdateHlCusData(int index, int limit, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
+	public void DataInsertUpdateHlCusData(int index, int limit, Map<String, String> queryKey, TitaVo titaVo)
+			throws LogicException {
 		String sqlHlCusData = "SELECT \"CustNo\",\"CustName\",to_char(\"LastUpdate\",'YYYYMMDD') AS \"ProcessDate\" FROM \"CustMain\" WHERE (\"CustNo\"!=0 AND \"CustName\" IS NOT NULL) AND \"LastUpdate\">=to_date(:PerfDate,'YYYYMMDD') ";
 		sqlHlCusData = sqlHlCusData + sqlRow;
 		if (sqlHlCusData != null && sqlHlCusData.length() != 0) {
@@ -300,7 +322,8 @@ public class L5500 extends TradeBuffer {
 		}
 	}
 
-	public void DataInsertUpdateHlThreeDetail(int index, int limit, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
+	public void DataInsertUpdateHlThreeDetail(int index, int limit, Map<String, String> queryKey, TitaVo titaVo)
+			throws LogicException {
 		String sqlHlThreeDetail = "";
 		if (sqlHlThreeDetail != null && sqlHlThreeDetail.length() != 0) {
 			List<String[]> dataHlThreeDetail = l5500ServiceImpl.FindData(index, limit, sqlHlThreeDetail, null, titaVo);
@@ -328,7 +351,8 @@ public class L5500 extends TradeBuffer {
 		}
 	}
 
-	public void DataInsertUpdateHlThreeLaqhcp(int index, int limit, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
+	public void DataInsertUpdateHlThreeLaqhcp(int index, int limit, Map<String, String> queryKey, TitaVo titaVo)
+			throws LogicException {
 		String sqlHlThreeLaqhcp = "";
 		if (sqlHlThreeLaqhcp != null && sqlHlThreeLaqhcp.length() != 0) {
 			List<String[]> dataHlThreeLaqhcp = l5500ServiceImpl.FindData(index, limit, sqlHlThreeLaqhcp, null, titaVo);
@@ -361,39 +385,60 @@ public class L5500 extends TradeBuffer {
 		}
 	}
 
-	public void DataInsertUpdateAreaData(int index, int limit, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
-		String sqlAreaData = "SELECT NVL(\"UnitCode\",' ') AS \"區域代碼\",NVL(\"UnitItem\",' ') AS \"區域名稱\",NVL(\"EmpNo\",' ') AS \"員工代號\",NVL(\"EmpName\",' ') AS \"員工姓名\" FROM \"PfDeparment\" ";
-		sqlAreaData = sqlAreaData + sqlRow;
-		if (sqlAreaData != null && sqlAreaData.length() != 0) {
-			List<String[]> dataAreaData = l5500ServiceImpl.FindData(index, limit, sqlAreaData, null, titaVo);
-			List<HlAreaData> lHlAreaData = new ArrayList<HlAreaData>();
-			List<String> key = new ArrayList<String>();
-			if (dataAreaData != null && dataAreaData.size() != 0) {
-				for (String[] lDdataAreaData : dataAreaData) {
-					HlAreaData tHlAreaData = new HlAreaData();
-					String AreaUnitNo = lDdataAreaData[0];
-					String AreaChiefName = lDdataAreaData[3];
-					tHlAreaData.setAreaUnitNo(AreaUnitNo);// 區域代碼--VARCHAR2(6)
-					tHlAreaData.setAreaName("");// 區域名稱--VARCHAR2(20)
-					tHlAreaData.setAreaChiefEmpNo(lDdataAreaData[2]);// 區域主管員編--VARCHAR2(6)
-					tHlAreaData.setAreaChiefName(avoidTolong(AreaChiefName, 15));// 區域主管名稱--NVARCHAR2(15)
-					if (!key.contains(AreaUnitNo)) {
-						key.add(AreaUnitNo);
-						if (tHlAreaData != null && !lHlAreaData.contains(tHlAreaData)) {
-							lHlAreaData.add(tHlAreaData);
-						}
-					}
-				}
+	public void DataInsertUpdateAreaData(int index, int limit, Map<String, String> queryKey, TitaVo titaVo)
+			throws LogicException {
+		this.info("L5500 DataInsertUpdateAreaData");
+//		String sqlAreaData = "SELECT NVL(\"UnitCode\",' ') AS \"區域代碼\",NVL(\"UnitItem\",' ') AS \"區域名稱\",NVL(\"EmpNo\",' ') AS \"員工代號\",NVL(\"EmpName\",' ') AS \"員工姓名\" FROM \"PfDeparment\" ";
+		String sql = "select A.\"UnitCode\",";
+		sql += "A.\"UnitItem\",";
+		sql += "A.\"UnitManager\",";
+		sql += "B.\"Fullname\" ";
+		sql += "from \"CdBcm\" A ";
+		sql += "left join \"CdEmp\" B ON B.\"EmployeeNo\"=A.\"UnitManager\" ";
+		
+//		sqlAreaData = sqlAreaData + sqlRow;
+//		if (sqlAreaData != null && sqlAreaData.length() != 0) {
+//		List<String[]> dataAreaData = l5500ServiceImpl.FindData(index, limit, sqlAreaData, null, titaVo);
+		List<Map<String, String>> dataAreaData = l5500ServiceImpl.findData(index, limit, sql, null, titaVo);
+		List<HlAreaData> lHlAreaData = new ArrayList<HlAreaData>();
+//		List<String> key = new ArrayList<String>();
+//		if (dataAreaData != null && dataAreaData.size() != 0) {
+		if (dataAreaData != null && dataAreaData.size() > 0) {
+//			for (String[] lDdataAreaData : dataAreaData) {
+			for (Map<String, String> d : dataAreaData) {
+				this.info(d.get("UnitCode") + "=" + d.get("UnitItem") + "/" + d.get("UnitItem").toString().length());
+				HlAreaData tHlAreaData = new HlAreaData();
+//				String AreaUnitNo = lDdataAreaData[0];
+//				String AreaChiefName = lDdataAreaData[3];
+				tHlAreaData.setAreaUnitNo(d.get("UnitCode"));// 區域代碼--VARCHAR2(6)
+				tHlAreaData.setAreaName(d.get("UnitItem"));// 區域名稱--VARCHAR2(20)
+				tHlAreaData.setAreaChiefEmpNo(d.get("UnitManager"));// 區域主管員編--VARCHAR2(6)
+				tHlAreaData.setAreaChiefName(d.get("Fullname"));// 區域主管名稱--NVARCHAR2(15)
+//				if (!key.contains(AreaUnitNo)) {
+//					key.add(AreaUnitNo);
+//					if (tHlAreaData != null && !lHlAreaData.contains(tHlAreaData)) {
+//						lHlAreaData.add(tHlAreaData);
+//					}
+//				}
+				lHlAreaData.add(tHlAreaData);
 			}
-			if (lHlAreaData != null && lHlAreaData.size() != 0) {
-				try {
-					sHlAreaDataService.insertAll(lHlAreaData, titaVo);
-				} catch (DBException e) {
-					this.info("L5500 HlAreaData[" + e.getErrorMsg() + "]");
-					throw new LogicException(titaVo, "E0005", "HlAreaData");
-				}
+			try {
+				sHlAreaDataService.insertAll(lHlAreaData, titaVo);
+			} catch (DBException e) {
+				this.info("L5500 HlAreaData[" + e.getErrorMsg() + "]");
+				throw new LogicException(titaVo, "E0005", "HlAreaData");
+			}		}
+		
+		if (lHlAreaData != null && lHlAreaData.size() != 0) {
+			this.info("lHlAreaData = " + lHlAreaData.size());
+			try {
+				sHlAreaDataService.insertAll(lHlAreaData, titaVo);
+			} catch (DBException e) {
+				this.info("L5500 HlAreaData[" + e.getErrorMsg() + "]");
+				throw new LogicException(titaVo, "E0005", "HlAreaData");
 			}
 		}
+//		}
 	}
 
 	public String avoidTolong(String str, int length) {

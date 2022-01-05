@@ -55,7 +55,7 @@ public class Parse {
 		value = value == null || value.trim().isEmpty() ? "0" : value.trim();
 		int res = 0;
 		try {
-			res = Integer.parseInt(value.replaceAll(",", ""));
+			res = Integer.parseInt(value.replaceAll(",", "").replaceAll("/", ""));
 		} catch (NumberFormatException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

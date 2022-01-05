@@ -137,13 +137,17 @@ public class L4520Report extends MakeReport {
 			for (Map<String, String> tEmpDeductMedia : fnAllList) {
 				if (tEmpDeductMedia.get("ErrorCode") == null) {
 					continue;
-				} else if ("01".equals(tEmpDeductMedia.get("ErrorCode")) && "4".equals(tEmpDeductMedia.get("MediaKind"))) {
+				} else if ("01".equals(tEmpDeductMedia.get("ErrorCode")) && "4".equals(tEmpDeductMedia.get("MediaKind")) 
+						 || "17".equals(tEmpDeductMedia.get("ErrorCode")) && "4".equals(tEmpDeductMedia.get("MediaKind"))) {
 					lEmpDeductMediaA.add(tEmpDeductMedia);
-				} else if ("01".equals(tEmpDeductMedia.get("ErrorCode")) && "5".equals(tEmpDeductMedia.get("MediaKind"))) {	
+				} else if ("01".equals(tEmpDeductMedia.get("ErrorCode")) && "5".equals(tEmpDeductMedia.get("MediaKind"))
+						|| "17".equals(tEmpDeductMedia.get("ErrorCode")) && "5".equals(tEmpDeductMedia.get("MediaKind"))) {	
 					lEmpDeductMediaC.add(tEmpDeductMedia);
-				} else if(!"01".equals(tEmpDeductMedia.get("ErrorCode")) && "4".equals(tEmpDeductMedia.get("MediaKind"))) {
+				} else if(!"01".equals(tEmpDeductMedia.get("ErrorCode")) && !"17".equals(tEmpDeductMedia.get("ErrorCode")) 
+						 && "4".equals(tEmpDeductMedia.get("MediaKind"))) {
 					lEmpDeductMediaB.add(tEmpDeductMedia);
-				} else if(!"01".equals(tEmpDeductMedia.get("ErrorCode")) && "5".equals(tEmpDeductMedia.get("MediaKind"))) {
+				} else if(!"01".equals(tEmpDeductMedia.get("ErrorCode")) && !"17".equals(tEmpDeductMedia.get("ErrorCode")) 
+						 && "5".equals(tEmpDeductMedia.get("MediaKind"))) {
 					lEmpDeductMediaD.add(tEmpDeductMedia);
 				}
 			} // for
@@ -155,19 +159,24 @@ public class L4520Report extends MakeReport {
 			
 			if (Asize != 0) {
 				setReportA(lEmpDeductMediaA, titaVo1); // 15 成功
+				this.info("Asize =" + Asize);
 			}
 
 			if (Csize != 0) {
 				setReportA(lEmpDeductMediaC, titaVo1); // 非15 成功
+				this.info("Csize =" + Csize);
 			}
 			
 			if (Bsize != 0) {
 				header = 1;
 				setReportB(lEmpDeductMediaB, titaVo1); // 15 失敗
+				this.info("Bsize =" + Bsize);
 			}
 			
 			if (Dsize != 0) {
+				header = 1;
 				setReportB(lEmpDeductMediaD, titaVo1); // 非15 失敗	
+				this.info("Dsize =" + Dsize);
 			}
 			
 		} else {
