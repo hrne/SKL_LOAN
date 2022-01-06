@@ -90,34 +90,28 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\"=CB.\"UnitManager\" ";
 		sql += "        WHERE \"UnitCode\" IN('10HC00','10HJ00','10HL00') ";
 		sql += "      ) tab1 ";
-		sql += " LEFT JOIN ( SELECT \"unitArea\" ";
-		sql += "                  , SUM(\"PerfCnt\") AS \"PerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") AS \"PerfAmt\" ";
-		sql += "             FROM ( SELECT \"PerfCnt\" ";
-		sql += "                         , \"PerfAmt\" ";
-		sql += "                         , PO.\"AreaCode\" AS \"unitArea\" ";
-		sql += "                    FROM \"PfBsDetail\" PD";
-		sql += "                    LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
-		sql += "                                                AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
-		sql += "                    WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
-		sql += "                      AND PD.\"WorkMonth\"= :liyymm";
-		sql += "                  ) ";
-		sql += "             GROUP BY \"unitArea\" ";
-		sql += "           ) tab2 ON tab2.\"unitArea\" = tab1.\"UnitCode\" ";
-		sql += " LEFT JOIN ( SELECT \"unitArea\" ";
-		sql += "                  , SUM(\"PerfCnt\") AS \"PerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") AS \"PerfAmt\" ";
-		sql += "             FROM ( SELECT \"PerfCnt\" ";
-		sql += "                         , \"PerfAmt\" ";
-		sql += "                         , PO.\"AreaCode\" AS \"unitArea\" ";
-		sql += "                    FROM \"PfBsDetail\" PD";
-		sql += "                    LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
-		sql += "                                                AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
-		sql += "                    WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
-		sql += "                      AND PD.\"WorkMonth\"= :iyymm ";
-		sql += "                  ) ";
-		sql += "             GROUP BY \"unitArea\" ";
-		sql += "           ) tab3 ON tab3.\"unitArea\"=tab1.\"UnitCode\" ";
+		sql += " LEFT JOIN ( SELECT PO.\"AreaCode\" AS \"UnitCode\"";
+		sql += "                  , SUM(PD.\"PerfCnt\") AS \"PerfCnt\" ";
+		sql += "                  , SUM(PD.\"PerfAmt\") AS \"PerfAmt\" ";
+		sql += "             FROM \"PfBsDetail\" PD";
+		sql += "             LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
+		sql += "                                         AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
+		sql += "             WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
+		sql += "               AND PD.\"WorkMonth\" = :liyymm ";
+		sql += "               AND PD.\"PerfAmt\" >= 0 ";
+		sql += "             GROUP BY PO.\"AreaCode\" ";
+		sql += "           ) tab2 ON tab2.\"UnitCode\" = tab1.\"UnitCode\" ";
+		sql += " LEFT JOIN ( SELECT PO.\"AreaCode\" AS \"UnitCode\"";
+		sql += "                  , SUM(PD.\"PerfCnt\") AS \"PerfCnt\" ";
+		sql += "                  , SUM(PD.\"PerfAmt\") AS \"PerfAmt\" ";
+		sql += "             FROM \"PfBsDetail\" PD";
+		sql += "             LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
+		sql += "                                         AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
+		sql += "             WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
+		sql += "               AND PD.\"WorkMonth\" = :iyymm ";
+		sql += "               AND PD.\"PerfAmt\" >= 0 ";
+		sql += "             GROUP BY PO.\"AreaCode\" ";
+		sql += "           ) tab3 ON tab3.\"UnitCode\"=tab1.\"UnitCode\" ";
 		sql += " ORDER BY tab1.\"UnitCode\" ASC";
 		this.info("sql=" + sql);
 
@@ -201,7 +195,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     GROUP BY \"DeptCode\" ";
 		sql += "            , \"WorkMonth\" ";
 		sql += " ) ";
-		sql += " SELECT DENSE_RANK() OVER (ORDER BY ROUND(NVL(DPS.\"PerfAmtTotal\",0) / DTS.\"GoalAmtTotal\",4) * 100 DESC ";
+		sql += " SELECT DENSE_RANK() OVER (ORDER BY ROUND(NVL(DPMS.\"PerfAmtMonthlyTotal\",0) / DT.\"GoalAmt\",4) * 100 DESC ";
 		sql += "                                  , DT.\"DeptCode\" ";
 		sql += "                          ) AS \"SEQ\" ";// F0
 		sql += "	  , CASE ";
@@ -314,7 +308,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , \"EmpNo\" ";
 		sql += "            , \"WorkMonth\" ";
 		sql += " ) ";
-		sql += " SELECT DENSE_RANK() OVER (ORDER BY ROUND(NVL(DPS.\"PerfAmtTotal\",0) / DTS.\"GoalAmtTotal\",4) * 100 DESC ";
+		sql += " SELECT DENSE_RANK() OVER (ORDER BY ROUND(NVL(DP.\"PerfAmtMonthlyTotal\",0) / DT.\"GoalAmt\",4) * 100 DESC ";
 		sql += "                                  , DT.\"DeptCode\" ";
 		sql += "                                  , PBO.\"DistItem\" ";
 		sql += "                          ) AS \"SEQ\" ";// F0
@@ -407,7 +401,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ) tab1 ";
 		sql += " LEFT JOIN ( SELECT \"DeptCode\" ";
 		sql += "                  , SUM(\"PerfCnt\") AS \"t2sumPerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") AS \"t2sumPerfAmt\" ";
+		sql += "                  , SUM(\"PerfAmt\") ASs \"t2sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\"= :iyymm ";
 		sql += "               AND \"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
@@ -543,7 +537,8 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// 營管、營推、業推、業開、單位
-	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo, String deptCode) throws Exception {
+	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo, String deptCode)
+			throws Exception {
 		String sdeptCode = "";
 
 		int inputYear = Integer.parseInt(wkVo.get("F0"));
@@ -570,7 +565,8 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iWKe = inputYear + String.format("%02d", iMM);
 		}
 
-		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000" || deptCode == "A0X000") {
+		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000"
+				|| deptCode == "A0X000") {
 			sdeptCode = "'" + deptCode + "'";
 		} else {
 			sdeptCode = "'A0B000','A0F000','A0E000','A0M000'";

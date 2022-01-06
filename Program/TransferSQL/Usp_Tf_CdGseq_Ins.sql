@@ -126,12 +126,12 @@ BEGIN
           ,'L2'                           AS "GseqType"            -- 業務類別 VARCHAR2 2 (業務自行編制 例:L2 = 業務作業) 
           ,'2601'                         AS "GseqKind"            -- 交易種類 VARCHAR2 4 (業務自行編制 例:GseqType = L2 AND GseqKind = 0001 為 戶號)
           ,9999999                        AS "Offset"              -- 有效值 DECIMAL 8 (例:有效值=999,流水號為999時,下一個為001)
-          ,MAX("RecordNo")                AS "SeqNo"               -- 流水號 DECIMAL 8 (目前已編到第幾號)
+          ,MAX(RECNUM)                    AS "SeqNo"               -- 流水號 DECIMAL 8 (目前已編到第幾號)
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM "ForeclosureFee"
+    FROM LN$LGFP
     ;
 
     -- 記錄寫入筆數

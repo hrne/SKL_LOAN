@@ -116,7 +116,6 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       + TX2.\"DelayInt\"";
 		sql += "       + TX2.\"BreachAmt\"";
 		sql += "       + TX2.\"CloseBreachAmt\"";
-		sql += "       + TX2.\"Shortfall\"";
 		sql += "       + TX2.\"AcctFee\"";
 		sql += "       + TX2.\"ModifyFee\"";
 		sql += "       + TX2.\"FireFee\"";

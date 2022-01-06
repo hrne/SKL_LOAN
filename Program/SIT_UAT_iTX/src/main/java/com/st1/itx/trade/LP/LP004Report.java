@@ -36,6 +36,8 @@ public class LP004Report extends MakeReport {
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP004", "內網業績統計報表", "LP004單位成績(內部網站)",
 				"LP004_底稿_單位成績(內部網站).xlsx", "放款審查各區");
 
+		
+	
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 		Map<String, String> wkSsnVo = null;
 		try {
@@ -171,7 +173,7 @@ public class LP004Report extends MakeReport {
 				// 金額/件數
 //				makeExcel.setValue(row, 9, namtBD.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : ncntBD.divide(namtBD,0,BigDecimal.ROUND_HALF_UP),
 //						"#,##0", "R");
-				makeExcel.setValue(row, 9, this.computeDivide(ncntBD, namtBD, 0),
+				makeExcel.setValue(row, 9, this.computeDivide(namtBD,ncntBD,  0),
 						"#,##0", "R");
 				
 				lcntBDTotal = lcntBDTotal.add(lcntBD);
@@ -189,7 +191,7 @@ public class LP004Report extends MakeReport {
 			makeExcel.setValue(row, 7, ncntBDTotal.subtract(lcntBDTotal), "0.0", "R");
 			makeExcel.setValue(row, 8, namtBDTotal.subtract(lamtBDTotal), "#,##0", "R");
 			
-			makeExcel.setValue(row, 9, this.computeDivide(ncntBDTotal, namtBDTotal, 0), "#,##0", "R");
+			makeExcel.setValue(row, 9, this.computeDivide(namtBDTotal,ncntBDTotal,  0), "#,##0", "R");
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
 		}

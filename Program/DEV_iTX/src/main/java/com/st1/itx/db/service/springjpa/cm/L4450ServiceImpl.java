@@ -16,6 +16,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.date.DateUtil;
 
 /**
  * L4450ServiceImpl
@@ -29,6 +30,9 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+
+	@Autowired
+	private DateUtil l4450DateUtil;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -89,6 +93,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 			iAchSpecificDays.add(startDay);
 
+			// iAchSpecificDdFrom 若為當月月底日(例如2/28),iAchSpecificDays需滾到31日
+			if (isEndOfMonth(iAchSpecificDdFrom)) {
+				for (int i = startDay + 1; i <= 31; i++) {
+					iAchSpecificDays.add(i);
+				}
+			}
+
 			// 跨月情況
 			if (startMonth < endMonth) {
 				for (int i = startDay + 1; i <= 31; i++) {
@@ -123,6 +134,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 			int endDay = iAchSecondSpecificDdTo % 100;
 
 			iAchSecondSpecificDays.add(startDay);
+
+			// iAchSpecificDdFrom 若為當月月底日(例如2/28),iAchSecondSpecificDays需滾到31日
+			if (isEndOfMonth(iAchSecondSpecificDdFrom)) {
+				for (int i = startDay + 1; i <= 31; i++) {
+					iAchSecondSpecificDays.add(i);
+				}
+			}
 
 			// 跨月情況
 			if (startMonth < endMonth) {
@@ -312,6 +330,33 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iPostSecondSpecificDay", iPostSecondSpecificDay);
 
 		return this.convertToMap(query);
+	}
+
+	/**
+	 * 判斷是否為月底日
+	 * 
+	 * @param date1 西元日期YYYYMMDD
+	 * @return 是否為月底日
+	 * @throws LogicException exception
+	 */
+	private boolean isEndOfMonth(int date1) throws LogicException {
+		
+		int day1 = date1;
+
+		// 若隔天就不同月份,則為月底日
+		l4450DateUtil.init();
+		l4450DateUtil.setDate_1(day1);
+		l4450DateUtil.setDays(1);
+		l4450DateUtil.getCalenderDay();
+
+		int day2 = l4450DateUtil.getDate_2Integer();
+
+		int day1Month = day1 / 100;
+
+		int day2Month = day2 / 100;
+
+		// 回傳是否為月底日
+		return day1Month != day2Month; // 若月份不同，則為月底日，回傳是
 	}
 
 	public List<Map<String, String>> findSingle(TitaVo titaVo) throws Exception {
