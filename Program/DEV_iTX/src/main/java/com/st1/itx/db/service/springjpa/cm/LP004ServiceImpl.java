@@ -569,7 +569,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 				|| deptCode == "A0X000") {
 			sdeptCode = "'" + deptCode + "'";
 		} else {
-			sdeptCode = "'A0B000','A0F000','A0E000','A0M000'";
+			sdeptCode = "'A0B000','A0F000','A0E000','A0M000','A0X000'";
 		}
 
 		this.info("LP004.findAll iYYMM=" + inputYearMonth + ",iWKSSN=" + iWKs + "~" + iWKe);
@@ -639,6 +639,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            GROUP BY \"UnitCode\" ";
 		sql += "           ) tab3 ON tab1.\"UnitCode\" = tab3.\"UnitCode\" ";
 		sql += " ORDER BY \"wmAmt\" DESC ";
+		sql += " 		 ,\"QAmt\" ASC ";
 		this.info("sql=" + sql);
 
 		Query query;

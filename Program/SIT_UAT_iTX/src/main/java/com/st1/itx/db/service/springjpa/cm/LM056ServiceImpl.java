@@ -97,7 +97,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,C.\"CustId\"";
 		sql += "		  ,SUM(MLB.\"LoanBalance\") AS \"LoanBalance\"";
 		sql += "		  ,(CASE";
-		sql += "			  WHEN L.\"SyndNo\" <> 0 THEN '聯貸'";
+		sql += "			  WHEN FCA.\"SyndNo\" <> 0 THEN '聯貸'";
 		sql += "			  WHEN MLB2.\"CustNo\" IS NOT NULL THEN '**'";
 		sql += "			  WHEN R.\"ReltCode\" IS NOT NULL THEN '*'";
 		sql += "			ELSE ' ' END ) AS \"KIND\"";
@@ -120,6 +120,10 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "							   AND L.\"FacmNo\" = MLB.\"FacmNo\"";
 		sql += "							   AND L.\"BormNo\" = MLB.\"BormNo\"";
+		sql += "	LEFT JOIN \"FacMain\" F2 ON F2.\"CustNo\" = MLB.\"CustNo\"";
+		sql += "						    AND F2.\"FacmNo\" = MLB.\"FacmNo\"";
+		sql += "						    AND F2.\"LastBormNo\" = MLB.\"BormNo\"";
+		sql += "	LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = F2.\"ApplNo\"";
 		sql += "	LEFT JOIN \"ReltMain\" R ON R.\"CustNo\" = C.\"CustNo\"";
 		sql += "	WHERE MLB.\"YearMonth\" = :yymm";
 		sql += "	  AND MLB.\"LoanBalance\" > 0 ";
@@ -130,7 +134,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		    ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "		    ,C.\"CustId\"";
 		sql += "		    ,(CASE";
-		sql += "			    WHEN L.\"SyndNo\" <> 0 THEN '聯貸'";
+		sql += "			    WHEN FCA.\"SyndNo\" <> 0 THEN '聯貸'";
 		sql += "			    WHEN MLB2.\"CustNo\" IS NOT NULL THEN '**'";
 		sql += "			    WHEN R.\"ReltCode\" IS NOT NULL THEN '*'";
 		sql += "			  ELSE ' ' END )";

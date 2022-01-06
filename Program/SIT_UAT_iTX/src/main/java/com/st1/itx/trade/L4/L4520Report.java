@@ -179,9 +179,7 @@ public class L4520Report extends MakeReport {
 				this.info("Dsize =" + Dsize);
 			}
 			
-		} else {
-//			throw new LogicException("E0001", "查無資料");
-		}
+		} 
 	}
 
 	private void setReportA(List<Map<String, String>> tEmpDeductMedia, TitaVo titaVo) throws LogicException {
@@ -318,7 +316,8 @@ public class L4520Report extends MakeReport {
 			}
 		}
 		sno = this.close();
-		this.toPdf(sno);
+//		this.toPdf(sno);
+		this.toPdf(sno, "成功明細表");
 
 	}
 
@@ -458,8 +457,8 @@ public class L4520Report extends MakeReport {
 			}
 		}
 		sno = this.close();
-		this.toPdf(sno);
-
+//		this.toPdf(sno);
+		this.toPdf(sno, "失敗明細表");
 	}
 
 }

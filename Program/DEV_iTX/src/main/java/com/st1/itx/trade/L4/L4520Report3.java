@@ -104,29 +104,31 @@ public class L4520Report3 extends MakeReport {
 			
 			BigDecimal sumA1 = BigDecimal.ZERO;
 			BigDecimal sumA2 = BigDecimal.ZERO;
+			BigDecimal sumA3 = BigDecimal.ZERO;
 			
 			for(int j = 1; j <= fnAllList.size(); j++) {
 //			1.每筆先印出明細
 		      i = j - 1;
-		      BatchNo = fnAllList.get(i).get("F0");
+		      BatchNo = fnAllList.get(i).get("BatchNo");
 		      
 			  this.print(1, 1,"                                                                                                                                                                               ");
-	  		  this.print(0, 2, FormatUtil.pad9(fnAllList.get(i).get("F1"), 7));// 戶號
-	  		  this.print(0, 11, String.valueOf(parse.stringToInteger(fnAllList.get(i).get("F2"))-191100)); // 年月
-	  		  this.print(0, 19, fnAllList.get(i).get("F3")); // 原保單號碼
-	  		  this.print(0, 36, fnAllList.get(i).get("F4")); // 戶名
-	  		  this.print(0, 50, fnAllList.get(i).get("F5")); // 員工代號
-	  		  this.print(0, 60, fnAllList.get(i).get("F6")); // 身份證字號
-	  		  this.print(0, 73, fnAllList.get(i).get("F7")); // 交易序號
-	  		  if(parse.stringToInteger(fnAllList.get(i).get("F9")) > 0) {
-	  			  this.print(0, 98, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
-	  			  this.print(0, 116, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
-	  			  sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")));
-	  			  sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")));
+	  		  this.print(0, 2, FormatUtil.pad9(fnAllList.get(i).get("CustNo"), 7));// 戶號
+	  		  this.print(0, 11, String.valueOf(parse.stringToInteger(fnAllList.get(i).get("PerfMonth"))-191100)); // 年月
+	  		  this.print(0, 19, fnAllList.get(i).get("PrevInsuNo")); // 原保單號碼
+	  		  this.print(0, 36, fnAllList.get(i).get("FullName")); // 戶名
+	  		  this.print(0, 50, fnAllList.get(i).get("EmployeeNo")); // 員工代號
+	  		  this.print(0, 60, fnAllList.get(i).get("CustId")); // 身份證字號
+	  		  this.print(0, 73, fnAllList.get(i).get("TitaTxtNo")); // 交易序號
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("AcDate")) > 0) {
+	  			  this.print(0, 98, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem"))), "R");// 沖火險費
+	  			  this.print(0, 116, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem"))), "R");// 沖火險費
+	  			  sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem")));
+	  			  sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem")));
 	  		  } else {
-	  			  this.print(0, 116, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
-	  			  this.print(0, 135, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
-	  			  sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")));
+	  			  this.print(0, 116, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem"))), "R");// 沖火險費
+	  			  this.print(0, 135, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem"))), "R");// 沖火險費
+	  			  sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem")));
+	  			  sumA3 = sumA3.add(parse.stringToBigDecimal(fnAllList.get(i).get("TotInsuPrem")));
 	  		  }
 	  		                    
 	  		  this.print(1, 0, "-------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -137,13 +139,13 @@ public class L4520Report3 extends MakeReport {
 			  total++;	
 	  		  if (j != fnAllList.size()) {
 	  			
-	  			if (!fnAllList.get(i).get("F0").equals(fnAllList.get(j).get("F0"))){
+	  			if (!fnAllList.get(i).get("BatchNo").equals(fnAllList.get(j).get("BatchNo"))){
 	  				this.info("BatchNo Not Match...");
 	  				
 //					扣除合計的行數
 					this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
 	  				pageCnt = 0;
-	  				BatchNo = fnAllList.get(j).get("F0");
+	  				BatchNo = fnAllList.get(j).get("BatchNo");
 					this.newPage();
 					continue;
 	  			}
@@ -161,8 +163,17 @@ public class L4520Report3 extends MakeReport {
 			  } else {
 				  if (total == fnAllList.size()) {
 						this.print(1, 1, "   總　計：                                                                                                             ");
-						this.print(0, 98, df1.format(sumA1), "R");// 沖火險費
-						this.print(0, 116, df1.format(sumA2), "R");// 沖火險費
+						if(sumA1.intValue() != 0) {
+							this.print(0, 98, df1.format(sumA1), "R");// 沖火險費							
+						}
+						
+						if(sumA2.intValue() != 0) {
+						  this.print(0, 116, df1.format(sumA2), "R");// 沖火險費
+						}
+						
+						if(sumA3.intValue() != 0) {							
+							this.print(0, 135, df1.format(sumA3), "R");// 沖火險費
+						}
 //						扣除總計合計的行數 +1 
 						this.print(pageIndex - pageCnt - 2, 70, "=====報表結束=====", "C");
 				  } 

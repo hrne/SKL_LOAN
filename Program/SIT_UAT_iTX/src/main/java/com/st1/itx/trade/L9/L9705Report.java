@@ -217,7 +217,7 @@ public class L9705Report extends MakeReport {
 					setFont(1, 11);
 
 					int top = 0;// 上下微調用
-					double yy = 19;// 開始Y軸
+					double yy = 20;// 開始Y軸
 					double h = 0.4;// 列高
 					double l = 0;// 列數
 
@@ -366,8 +366,8 @@ public class L9705Report extends MakeReport {
 					y = top + yy + (++l) * h;
 					this.printCm(14, y, "製表人 " + empName);
 
-					printCm(4, 27, payIntAcct);
-					printCm(14, 27, payPriAcct);
+					printCm(4, 28, payIntAcct);
+					printCm(14, 28, payPriAcct);
 
 					if ("C".equals(conditionCode)) {
 
@@ -376,7 +376,7 @@ public class L9705Report extends MakeReport {
 
 						if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
 //							y = top + yy + (++l) * h;
-							this.printCm(1, 28, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt)
+							this.printCm(1, 29, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt)
 									+ "業已入帳無誤。");
 						}
 					}

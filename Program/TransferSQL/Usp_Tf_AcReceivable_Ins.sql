@@ -369,6 +369,7 @@ BEGIN
             ,ACTP.LMSTOA
       FROM LADACTP ACTP
       WHERE ACTP.LMSACN != 601776
+        AND ACTP.LMSTOA > 0
     )
     , L1 AS (
       -- 加總各額度放款餘額
@@ -376,6 +377,7 @@ BEGIN
            , LMSAPN
            , SUM(LMSLBL) AS LMSLBL
       FROM LA$LMSP
+      WHERE LMSLBL > 0
       GROUP BY LMSACN
              , LMSAPN
     )
@@ -384,6 +386,7 @@ BEGIN
       SELECT LMSACN
            , SUM(LMSLBL) AS LMSLBL
       FROM LA$LMSP
+      WHERE LMSLBL > 0
       GROUP BY LMSACN
     )
     , TMP AS (
@@ -404,6 +407,8 @@ BEGIN
       LEFT JOIN L2 ON L2.LMSACN = ACT.LMSACN
       WHERE ACT."Seq" = 1 -- 取BKPDAT最新的第一筆
         AND ACT.LMSTOA > 0 -- 有費用的才做
+        AND L1.LMSLBL > 0
+        AND L2.LMSLBL > 0 
     )
     , M AS (
       -- 判斷最後一筆

@@ -240,7 +240,7 @@ public class L9703Report2 extends MakeReport {
 		setFont(1, 11);
 
 		int top = 0;// 上下微調用
-		double yy = 19;// 開始Y軸
+		double yy = 20;// 開始Y軸
 		double h = 0.4;// 列高
 		double l = 0;// 列數
 
@@ -411,8 +411,8 @@ public class L9703Report2 extends MakeReport {
 			}
 		}
 
-		printCm(4, 27, payIntAcct);
-		printCm(14, 27, payPriAcct);
+		printCm(4, 28, payIntAcct);
+		printCm(14, 28, payPriAcct);
 	}
 
 	// 顯示民國年

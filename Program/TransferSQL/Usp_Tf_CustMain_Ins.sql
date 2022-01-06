@@ -41,9 +41,10 @@ BEGIN
              WHEN TRIM(CUSP."CUSSEX") IN ('0','6') THEN '0'
            ELSE CASE
                   WHEN LENGTHB(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')) = 10
-                       AND SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')) IN ('1','2')
-                  THEN SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''))
+                       AND SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''),0,1) IN ('1','2')
+                  THEN SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''),0,1)
                 ELSE '0'
+                END
            END                            AS "Sex"                 -- 性別 VARCHAR2 1 
           ,CASE
              WHEN TRIM(CUSP."CUSECD") IN ('@','0','8','A','B','C','D','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y')

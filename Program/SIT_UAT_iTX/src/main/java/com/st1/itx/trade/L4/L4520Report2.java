@@ -188,72 +188,75 @@ public class L4520Report2 extends MakeReport {
 			for(int j = 1; j <= fnAllList.size(); j++) {
 //			1.每筆先印出明細
 		      i = j - 1;
-		      BatchNo = fnAllList.get(i).get("F0");
-		      RepayCode = fnAllList.get(i).get("F15");
-		      AcctCode = fnAllList.get(i).get("F16");
-		      ProcCode = fnAllList.get(i).get("F17");
+		      BatchNo = fnAllList.get(i).get("BaTxNo");
+		      RepayCode = fnAllList.get(i).get("RepayCode");
+		      AcctCode = fnAllList.get(i).get("AcctCode");
+		      ProcCode = fnAllList.get(i).get("ProcCode");
 			  this.print(1, 1,"                                                                                                                                                                               ");
-	  		  this.print(0, 1, FormatUtil.pad9(fnAllList.get(i).get("F1"), 7));// 戶號
-	  		  if(parse.stringToInteger(fnAllList.get(i).get("F2")) != 0 ) {
-	  		    this.print(0, 11, String.valueOf(parse.stringToInteger(fnAllList.get(i).get("F2"))-191100)); // 計息起日
-//	  		  this.print(0, 9, "109/05/21"); // 計息起日
+	  		  this.print(0, 1, FormatUtil.pad9(fnAllList.get(i).get("CustNo"), 7));// 戶號
+	  		  
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("IntStartDate")) != 0 ) {
+	  		    this.print(0, 11, String.valueOf(parse.stringToInteger(fnAllList.get(i).get("IntStartDate"))-19110000)); // 計息起日
 	  		  }
-	  		  if(parse.stringToInteger(fnAllList.get(i).get("F3")) != 0 ) {
-	  		    this.print(0, 19, String.valueOf(parse.stringToInteger(fnAllList.get(i).get("F3"))-191100)); // 計息迄日
-//	  		  this.print(0, 19, "109/05/21"); // 計息起日
-	  		  }	  		  
-	  		  this.print(0, 30, fnAllList.get(i).get("F4")); // 姓名
+	  		  
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("IntEndDate")) != 0 ) {
+	  		    this.print(0, 21, String.valueOf(parse.stringToInteger(fnAllList.get(i).get("IntEndDate"))-19110000)); // 計息迄日
+	  		  }	  		
+	  		  
+	  		  this.print(0, 30, fnAllList.get(i).get("Fullname")); // 姓名
 	  		
 	  		  
 	  		  
-	  		  sum = sum.add(parse.stringToBigDecimal(fnAllList.get(i).get("F6")))
-	  				  .add(parse.stringToBigDecimal(fnAllList.get(i).get("F7")))
-	  				  .add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")))
-	  						  .add(parse.stringToBigDecimal(fnAllList.get(i).get("F10")))
-	  						  .add(parse.stringToBigDecimal(fnAllList.get(i).get("F11")));
+	  		  sum = sum.add(parse.stringToBigDecimal(fnAllList.get(i).get("Principal")))  // 扣款金額
+	  				  .add(parse.stringToBigDecimal(fnAllList.get(i).get("Interest")))
+	  				  .add(parse.stringToBigDecimal(fnAllList.get(i).get("BreachAmt")))
+	  						  .add(parse.stringToBigDecimal(fnAllList.get(i).get("Shortfall")))
+	  						  .add(parse.stringToBigDecimal(fnAllList.get(i).get("OtherAmt")));
 	  		  
-//	  		  if(sum.intValue() > 0) {
+	  		  if(sum.intValue() > 0) {
 	  			this.print(0, 53, df1.format(sum),"R"); // 扣款金額
-	  			sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("F6")));
-//	  		  }
+	  			sumA1 = sumA1.add(sum);
+	  			sum = new BigDecimal("0");
+	  		  }
 	  		  
-//	  		  if(parse.stringToInteger(fnAllList.get(i).get("F7")) > 0) {
-	  			this.print(0, 65, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))),"R"); // 本金
-	  			sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("F6")));
-//	  		  }
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("Principal")) > 0) {
+	  			this.print(0, 65, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("Principal"))),"R"); // 本金
+	  			sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("Principal")));
+	  		  }
 	  		  
-//	  		  if(parse.stringToInteger(fnAllList.get(i).get("F8")) > 0) {
-	  			this.print(0, 78, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F7"))),"R"); // 利息
-	  			sumA3 = sumA3.add(parse.stringToBigDecimal(fnAllList.get(i).get("F7")));
-//	  		  }
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("Interest")) > 0) {
+	  			this.print(0, 78, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("Interest"))),"R"); // 利息
+	  			sumA3 = sumA3.add(parse.stringToBigDecimal(fnAllList.get(i).get("Interest")));
+	  		  }
 	  		  
-//	  		  if(parse.stringToInteger(fnAllList.get(i).get("F9")) > 0) {
-	  			this.print(0, 90, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))),"R"); // 違約金
-	  			sumA4 = sumA4.add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")));
-//	  		  }
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("BreachAmt")) > 0) {
+	  			this.print(0, 90, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("BreachAmt"))),"R"); // 違約金
+	  			sumA4 = sumA4.add(parse.stringToBigDecimal(fnAllList.get(i).get("BreachAmt")));
+	  		  }
 	  		 
-//	  		  if(parse.stringToInteger(fnAllList.get(i).get("F10")) > 0) {
-	  			this.print(0, 102, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F9"))),"R"); // 暫收借
-	  			sumA5 = sumA5.add(parse.stringToBigDecimal(fnAllList.get(i).get("F9")));
-//	  		  }
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempAmt")) > 0) {
+	  			this.print(0, 102, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt"))),"R"); // 暫收借
+	  			sumA5 = sumA5.add(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt")));
+	  		  }
 	  		 
-//	  		  if(parse.stringToInteger(fnAllList.get(i).get("F10")) < 0) {
-	  			this.print(0, 113, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F9"))),"R"); // 暫收貸
-	  			sumA6 = sumA6.add(parse.stringToBigDecimal(fnAllList.get(i).get("F9")));
-//	  		  }
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempAmt")) < 0) {
+	  			this.print(0, 113, df1.format(new BigDecimal("0").subtract(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt")))),"R"); // 暫收貸
+	  			sumA6 = sumA6.add(new BigDecimal("0").subtract(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt"))));
+	  		  }
 	  		  
-//	  		  if(parse.stringToInteger(fnAllList.get(i).get("F11")) > 0) {
-	  			this.print(0, 123, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F10"))),"R"); // 短繳
-	  			sumA7 = sumA7.add(parse.stringToBigDecimal(fnAllList.get(i).get("F10")));
-//	  		  }
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("Shortfall")) > 0) {
+	  			this.print(0, 123, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("Shortfall"))),"R"); // 短繳
+	  			sumA7 = sumA7.add(parse.stringToBigDecimal(fnAllList.get(i).get("Shortfall")));
+	  		  }
 	  		                    
-//		  	  if(parse.stringToInteger(fnAllList.get(i).get("F11")) > 0) {
-		  		this.print(0, 132, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F11"))),"R"); // 帳管費及其他
-		  		sumA8 = sumA8.add(parse.stringToBigDecimal(fnAllList.get(i).get("F11")));
-//		  	  }
-	  		  this.print(0, 139, fnAllList.get(i).get("F12")); // 單位
-	  		  this.print(0, 147, fnAllList.get(i).get("F13")); // 員工
-	  		  this.print(0, 155, fnAllList.get(i).get("F14")); // 身分證號碼
+		  	  if(parse.stringToInteger(fnAllList.get(i).get("OtherAmt")) > 0) {
+		  		this.print(0, 132, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("OtherAmt"))),"R"); // 帳管費及其他
+		  		sumA8 = sumA8.add(parse.stringToBigDecimal(fnAllList.get(i).get("OtherAmt")));
+		  	  }
+		  	  
+	  		  this.print(0, 139, fnAllList.get(i).get("CenterCode")); // 單位
+	  		  this.print(0, 147, fnAllList.get(i).get("EmployeeNo")); // 員工
+	  		  this.print(0, 155, fnAllList.get(i).get("CustId")); // 身分證號碼
 	  		
 //			  每頁筆數相加
 	  		  pageCnt++;
@@ -261,19 +264,19 @@ public class L4520Report2 extends MakeReport {
 			  total++;	
 	  		  if (j != fnAllList.size()) {
 	  			// 批號 或 扣款代碼 或 流程別 或 科目 不同
-	  			if (!fnAllList.get(i).get("F0").equals(fnAllList.get(j).get("F0")) 
-	  					|| !fnAllList.get(i).get("F15").equals(fnAllList.get(j).get("F15"))
-	  					|| !fnAllList.get(i).get("F16").equals(fnAllList.get(j).get("F16")) 
-	  					|| !fnAllList.get(i).get("F17").equals(fnAllList.get(j).get("F17"))){
+	  			if (!fnAllList.get(i).get("BaTxNo").equals(fnAllList.get(j).get("BaTxNo")) 
+	  					|| !fnAllList.get(i).get("RepayCode").equals(fnAllList.get(j).get("RepayCode"))
+	  					|| !fnAllList.get(i).get("AcctCode").equals(fnAllList.get(j).get("AcctCode")) 
+	  					|| !fnAllList.get(i).get("ProcCode").equals(fnAllList.get(j).get("ProcCode"))){
 	  				this.info("BatchNo or RepayCode or AcctCode or ProcCode Not Match...");
 	  				
 //					扣除合計的行數
 					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 	  				pageCnt = 0;
-	  				BatchNo = fnAllList.get(j).get("F0");	
-	  				RepayCode = fnAllList.get(j).get("F15");
-	  		        AcctCode = fnAllList.get(j).get("F16");
-	  		        ProcCode = fnAllList.get(j).get("F17");
+	  				BatchNo = fnAllList.get(j).get("BaTxNo");	
+	  				RepayCode = fnAllList.get(j).get("RepayCode");
+	  		        AcctCode = fnAllList.get(j).get("AcctCode");
+	  		        ProcCode = fnAllList.get(j).get("ProcCode");
 					this.newPage();
 					continue;
 	  			}
@@ -294,31 +297,37 @@ public class L4520Report2 extends MakeReport {
 						this.print(1, 1, "總　計：               件                                                                                              ");
 						this.print(0, 20, total+ "");
 						
-//						if(sumA1.intValue() != 0) {
+						if(sumA1.intValue() != 0) {
 							this.print(0, 53, df1.format(sumA1),"R"); // 扣款金額							
-//						}
+						}
 						
-//						if(sumA2.intValue() != 0) {
+						if(sumA2.intValue() != 0) {
 					  		this.print(0, 65, df1.format(sumA2),"R"); // 本金						
-//						}
-//						if(sumA3.intValue() != 0) {
+						}
+						
+						if(sumA3.intValue() != 0) {
 					  		this.print(0, 78, df1.format(sumA3),"R"); // 利息						
-//						}
-//						if(sumA4.intValue() != 0) {
+						}
+						
+						if(sumA4.intValue() != 0) {
 							this.print(0, 90, df1.format(sumA4),"R"); // 違約金							
-//						}
-//						if(sumA5.intValue() != 0) {
+						}
+						
+						if(sumA5.intValue() != 0) {
 							this.print(0, 102, df1.format(sumA5),"R"); // 暫收借						
-//						}
-//						if(sumA6.intValue() != 0) {
+						}
+						
+						if(sumA6.intValue() != 0) {
 							this.print(0, 113, df1.format(sumA6),"R"); // 暫收貸							
-//						}
-//						if(sumA7.intValue() != 0) {
+						}
+						
+						if(sumA7.intValue() != 0) {
 							this.print(0, 123, df1.format(sumA7),"R"); // 短繳						
-//						}
-//						if(sumA8.intValue() != 0) {
+						}
+						
+						if(sumA8.intValue() != 0) {
 							this.print(0, 132, df1.format(sumA8),"R"); // 帳管費及其他				
-//						}
+						}
 						this.print(1, 0, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 //						扣除總計合計的行數 +1 
 						this.print(pageIndex - pageCnt - 2, 80, "=====報表結束=====", "C");

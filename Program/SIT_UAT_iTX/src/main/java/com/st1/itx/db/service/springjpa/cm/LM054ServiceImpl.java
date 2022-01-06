@@ -133,7 +133,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,(CASE";
 			sql += "			  WHEN REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]') OR MFB.\"FacAcctCode\" = 340 THEN 'Y'";
 			sql += "			ELSE 'N' END ) AS F5";
-			sql += "		  ,DECODE(L.\"SyndNo\",0,'N','Y') AS F6";
+			sql += "		  ,DECODE(FCA.\"SyndNo\",0,'N','Y') AS F6";
 			sql += "		  ,'TWD' AS F7";
 			sql += "		  ,L.\"DrawdownDate\" AS F8";
 			sql += "		  ,L.\"MaturityDate\" AS F9";
@@ -184,6 +184,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	LEFT JOIN \"FacMain\" F2 ON F2.\"CustNo\" = MLB.\"CustNo\"";
 			sql += "						    AND F2.\"FacmNo\" = MLB.\"FacmNo\"";
 			sql += "						    AND F2.\"LastBormNo\" = MLB.\"BormNo\"";
+			sql += "	LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = F2.\"ApplNo\"";
 			sql += "	LEFT JOIN \"ReltMain\" R ON R.\"CustNo\" = C.\"CustNo\"";
 			sql += "	LEFT JOIN ( SELECT \"CustNo\"";
 			sql += "					  ,\"FacmNo\"";

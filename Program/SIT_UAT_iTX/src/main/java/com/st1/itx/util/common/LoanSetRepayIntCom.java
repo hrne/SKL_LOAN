@@ -60,7 +60,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 	 * @return loanCalcRepayIntCom
 	 * @throws LogicException LogicException
 	 */
-	public LoanCalcRepayIntCom setRepayInt(LoanBorMain t, int iRepayTerms, int iIntEndDate, int iIntEndCode, int iEntryDate, TitaVo titaVo) throws LogicException {
+	public LoanCalcRepayIntCom setRepayInt(LoanBorMain t, int iRepayTerms, int iIntEndDate, int iIntEndCode,
+			int iEntryDate, TitaVo titaVo) throws LogicException {
 		this.info("active setRepayInt ");
 		this.info("   RepayTerms = " + iRepayTerms);
 		this.info("   IntEndDate = " + iIntEndDate);
@@ -111,7 +112,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setIntStartDate(prevPayIntDate); // 計算起日
 		loanCalcRepayIntCom.setIntEndCode(iIntEndCode); // 計算止日代碼 0.無計算止日 1.至計算止日 2:利息提存
 		// 計算止日小於上次繳息日，則以上次繳息日為計算止日
-		loanCalcRepayIntCom.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
+		loanCalcRepayIntCom
+				.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
 		loanCalcRepayIntCom.setFirstDrawdownDate(tFacMain.getFirstDrawdownDate()); // 初貸日
 		loanCalcRepayIntCom.setDrawdownDate(t.getDrawdownDate()); // 貸放起日
 		loanCalcRepayIntCom.setMaturityDate(t.getMaturityDate()); // 貸放止日
@@ -139,7 +141,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				loanCalcRepayIntCom.setIntCalcCode("1");
 			} else {
 				if (tFacMain.getAcctCode().equals("320") || tFacMain.getAcctCode().equals("330")) {
-					if (prevPayIntDate / 100 == this.txBuffer.getTxCom().getTbsdy() / 100 && prevPayIntDate % 100 == 1) {
+					if (prevPayIntDate / 100 == this.txBuffer.getTxCom().getTbsdy() / 100
+							&& prevPayIntDate % 100 == 1) {
 						loanCalcRepayIntCom.setIntCalcCode("2");
 					} else {
 						loanCalcRepayIntCom.setIntCalcCode("1");
@@ -163,7 +166,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setBreachReliefFlag(t.getNextPayIntDate() > t.getMaturityDate() ? "Y" : "N"); // 減免違約金 Y:是
 																											// N:否
 		// 聯貸案件 Y:是 N:否
-		if (t.getSyndNo() > 0) { // 聯貸案序號
+		if (tFacCaseAppl.getSyndNo() > 0) { // 聯貸案編號
 			loanCalcRepayIntCom.setSyndFlag("Y");
 		} else {
 			loanCalcRepayIntCom.setSyndFlag("N");
@@ -171,7 +174,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setFinalBal(t.getFinalBal()); // 最後一期本金餘額
 
 		// 重新計算寬限期數
-		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(t.getAmortizedCode(), t.getFreqBase(), t.getPayIntFreq(), t.getSpecificDate(), t.getSpecificDd(), t.getGraceDate()));
+		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(t.getAmortizedCode(), t.getFreqBase(),
+				t.getPayIntFreq(), t.getSpecificDate(), t.getSpecificDd(), t.getGraceDate()));
 		loanCalcRepayIntCom.setTotalPeriod(t.getTotalPeriod()); // 總期數
 
 		this.info("   setRepayInt iRepayTerms = " + loanCalcRepayIntCom.getRepayTerms());

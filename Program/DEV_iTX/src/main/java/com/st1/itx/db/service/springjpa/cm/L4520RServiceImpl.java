@@ -41,9 +41,8 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int PerfMonth = parse.stringToInteger(titaVo.getParam("PerfMonth")) + 191100;
-//		String BatchNo = parse.stringToStringDate(titaVo.getParam("BatchNo"));
-		String BatchNoFm = titaVo.getParam("BatchNoFm");
-		String BatchNoTo = titaVo.getParam("BatchNoTo");
+		String BatchNoFm = "BATX" + titaVo.getParam("BatchNoFm");
+		String BatchNoTo = "BATX" + titaVo.getParam("BatchNoTo");
 		this.info("L4520.Fire");
 
 		String sql = "    SELECT                      ";
@@ -60,6 +59,9 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    FROM                    ";
 		sql += "    \"EmpDeductDtl\"   ed   ";
 		sql += "    LEFT JOIN \"InsuRenew\"      ir ON ir.\"CustNo\" = ed.\"CustNo\" ";
+		sql += "                                   AND ir.\"AcDate\" = ed.\"Acdate\""; 
+		sql += "                                   AND ir.\"TitaTlrNo\" = ed.\"TitaTlrNo\"";  
+		sql += "                                   AND ir.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "    LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\" ";
 		sql += "    LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"TitaTlrNo\" ";
 		sql += "    WHERE                   ";
@@ -67,6 +69,10 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    AND ed.\"AchRepayCode\" = 5   ";
 		sql += "    AND ed.\"BatchNo\" >= :BatchNoFm ";
 		sql += "    AND ed.\"BatchNo\" <= :BatchNoTo ";
+		sql += "    AND ir.\"CustNo\" = ed.\"CustNo\"";
+	    sql += "    AND ir.\"AcDate\" = ed.\"Acdate\"";
+	    sql += "    AND ir.\"TitaTlrNo\" = ed.\"TitaTlrNo\"";
+	    sql += "    AND ir.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "     ORDER BY \"BatchNo\",\"CustNo\"   ";
 		this.info("sql=" + sql);
 		Query query;
