@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -34,333 +37,344 @@ import com.st1.itx.eum.ThreadVariable;
 @Service("pfItDetailAdjustService")
 @Repository
 public class PfItDetailAdjustServiceImpl extends ASpringJpaParm implements PfItDetailAdjustService, InitializingBean {
-	@Autowired
-	private BaseEntityManager baseEntityManager;
+  @Autowired
+  private BaseEntityManager baseEntityManager;
 
-	@Autowired
-	private PfItDetailAdjustRepository pfItDetailAdjustRepos;
+  @Autowired
+  private PfItDetailAdjustRepository pfItDetailAdjustRepos;
 
-	@Autowired
-	private PfItDetailAdjustRepositoryDay pfItDetailAdjustReposDay;
+  @Autowired
+  private PfItDetailAdjustRepositoryDay pfItDetailAdjustReposDay;
 
-	@Autowired
-	private PfItDetailAdjustRepositoryMon pfItDetailAdjustReposMon;
+  @Autowired
+  private PfItDetailAdjustRepositoryMon pfItDetailAdjustReposMon;
 
-	@Autowired
-	private PfItDetailAdjustRepositoryHist pfItDetailAdjustReposHist;
+  @Autowired
+  private PfItDetailAdjustRepositoryHist pfItDetailAdjustReposHist;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		org.junit.Assert.assertNotNull(pfItDetailAdjustRepos);
-		org.junit.Assert.assertNotNull(pfItDetailAdjustReposDay);
-		org.junit.Assert.assertNotNull(pfItDetailAdjustReposMon);
-		org.junit.Assert.assertNotNull(pfItDetailAdjustReposHist);
-	}
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    org.junit.Assert.assertNotNull(pfItDetailAdjustRepos);
+    org.junit.Assert.assertNotNull(pfItDetailAdjustReposDay);
+    org.junit.Assert.assertNotNull(pfItDetailAdjustReposMon);
+    org.junit.Assert.assertNotNull(pfItDetailAdjustReposHist);
+  }
 
-	@Override
-	public PfItDetailAdjust findById(Long logNo, TitaVo... titaVo) {
-		String dbName = "";
+  @Override
+  public PfItDetailAdjust findById(Long logNo, TitaVo... titaVo) {
+    String dbName = "";
 
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("findById " + dbName + " " + logNo);
-		Optional<PfItDetailAdjust> pfItDetailAdjust = null;
-		if (dbName.equals(ContentName.onDay))
-			pfItDetailAdjust = pfItDetailAdjustReposDay.findById(logNo);
-		else if (dbName.equals(ContentName.onMon))
-			pfItDetailAdjust = pfItDetailAdjustReposMon.findById(logNo);
-		else if (dbName.equals(ContentName.onHist))
-			pfItDetailAdjust = pfItDetailAdjustReposHist.findById(logNo);
-		else
-			pfItDetailAdjust = pfItDetailAdjustRepos.findById(logNo);
-		PfItDetailAdjust obj = pfItDetailAdjust.isPresent() ? pfItDetailAdjust.get() : null;
-		if (obj != null) {
-			EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
-			em.detach(obj);
-			em = null;
-		}
-		return obj;
-	}
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findById " + dbName + " " + logNo);
+    Optional<PfItDetailAdjust> pfItDetailAdjust = null;
+    if (dbName.equals(ContentName.onDay))
+      pfItDetailAdjust = pfItDetailAdjustReposDay.findById(logNo);
+    else if (dbName.equals(ContentName.onMon))
+      pfItDetailAdjust = pfItDetailAdjustReposMon.findById(logNo);
+    else if (dbName.equals(ContentName.onHist))
+      pfItDetailAdjust = pfItDetailAdjustReposHist.findById(logNo);
+    else 
+      pfItDetailAdjust = pfItDetailAdjustRepos.findById(logNo);
+    PfItDetailAdjust obj = pfItDetailAdjust.isPresent() ? pfItDetailAdjust.get() : null;
+      if(obj != null) {
+        EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
+        em.detach(obj);
+em = null;
+}
+    return obj;
+  }
 
-	@Override
-	public Slice<PfItDetailAdjust> findAll(int index, int limit, TitaVo... titaVo) {
-		String dbName = "";
-		Slice<PfItDetailAdjust> slice = null;
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = null;
-		if (limit == Integer.MAX_VALUE)
-			pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "LogNo"));
-		else
-			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LogNo"));
-		this.info("findAll " + dbName);
-		if (dbName.equals(ContentName.onDay))
-			slice = pfItDetailAdjustReposDay.findAll(pageable);
-		else if (dbName.equals(ContentName.onMon))
-			slice = pfItDetailAdjustReposMon.findAll(pageable);
-		else if (dbName.equals(ContentName.onHist))
-			slice = pfItDetailAdjustReposHist.findAll(pageable);
-		else
-			slice = pfItDetailAdjustRepos.findAll(pageable);
+  @Override
+  public Slice<PfItDetailAdjust> findAll(int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<PfItDetailAdjust> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    Pageable pageable = null;
+    if(limit == Integer.MAX_VALUE)
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "LogNo"));
+    else
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LogNo"));
+    this.info("findAll " + dbName);
+    if (dbName.equals(ContentName.onDay))
+      slice = pfItDetailAdjustReposDay.findAll(pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = pfItDetailAdjustReposMon.findAll(pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = pfItDetailAdjustReposHist.findAll(pageable);
+    else 
+      slice = pfItDetailAdjustRepos.findAll(pageable);
 
-		if (slice != null)
+		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
 
-		return slice != null && !slice.isEmpty() ? slice : null;
-	}
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
 
-	@Override
-	public PfItDetailAdjust findCustFacmBormFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo) {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("findCustFacmBormFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " + facmNo_1 + " bormNo_2 : " + bormNo_2);
-		Optional<PfItDetailAdjust> pfItDetailAdjustT = null;
-		if (dbName.equals(ContentName.onDay))
-			pfItDetailAdjustT = pfItDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
-		else if (dbName.equals(ContentName.onMon))
-			pfItDetailAdjustT = pfItDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
-		else if (dbName.equals(ContentName.onHist))
-			pfItDetailAdjustT = pfItDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
-		else
-			pfItDetailAdjustT = pfItDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+  @Override
+  public PfItDetailAdjust findCustFacmBormFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findCustFacmBormFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2);
+    Optional<PfItDetailAdjust> pfItDetailAdjustT = null;
+    if (dbName.equals(ContentName.onDay))
+      pfItDetailAdjustT = pfItDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+    else if (dbName.equals(ContentName.onMon))
+      pfItDetailAdjustT = pfItDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+    else if (dbName.equals(ContentName.onHist))
+      pfItDetailAdjustT = pfItDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+    else 
+      pfItDetailAdjustT = pfItDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
 
-		return pfItDetailAdjustT.isPresent() ? pfItDetailAdjustT.get() : null;
-	}
+    return pfItDetailAdjustT.isPresent() ? pfItDetailAdjustT.get() : null;
+  }
 
-	@Override
-	public PfItDetailAdjust holdById(Long logNo, TitaVo... titaVo) {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("Hold " + dbName + " " + logNo);
-		Optional<PfItDetailAdjust> pfItDetailAdjust = null;
-		if (dbName.equals(ContentName.onDay))
-			pfItDetailAdjust = pfItDetailAdjustReposDay.findByLogNo(logNo);
-		else if (dbName.equals(ContentName.onMon))
-			pfItDetailAdjust = pfItDetailAdjustReposMon.findByLogNo(logNo);
-		else if (dbName.equals(ContentName.onHist))
-			pfItDetailAdjust = pfItDetailAdjustReposHist.findByLogNo(logNo);
-		else
-			pfItDetailAdjust = pfItDetailAdjustRepos.findByLogNo(logNo);
-		return pfItDetailAdjust.isPresent() ? pfItDetailAdjust.get() : null;
-	}
+  @Override
+  public PfItDetailAdjust holdById(Long logNo, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Hold " + dbName + " " + logNo);
+    Optional<PfItDetailAdjust> pfItDetailAdjust = null;
+    if (dbName.equals(ContentName.onDay))
+      pfItDetailAdjust = pfItDetailAdjustReposDay.findByLogNo(logNo);
+    else if (dbName.equals(ContentName.onMon))
+      pfItDetailAdjust = pfItDetailAdjustReposMon.findByLogNo(logNo);
+    else if (dbName.equals(ContentName.onHist))
+      pfItDetailAdjust = pfItDetailAdjustReposHist.findByLogNo(logNo);
+    else 
+      pfItDetailAdjust = pfItDetailAdjustRepos.findByLogNo(logNo);
+    return pfItDetailAdjust.isPresent() ? pfItDetailAdjust.get() : null;
+  }
 
-	@Override
-	public PfItDetailAdjust holdById(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("Hold " + dbName + " " + pfItDetailAdjust.getLogNo());
-		Optional<PfItDetailAdjust> pfItDetailAdjustT = null;
-		if (dbName.equals(ContentName.onDay))
-			pfItDetailAdjustT = pfItDetailAdjustReposDay.findByLogNo(pfItDetailAdjust.getLogNo());
-		else if (dbName.equals(ContentName.onMon))
-			pfItDetailAdjustT = pfItDetailAdjustReposMon.findByLogNo(pfItDetailAdjust.getLogNo());
-		else if (dbName.equals(ContentName.onHist))
-			pfItDetailAdjustT = pfItDetailAdjustReposHist.findByLogNo(pfItDetailAdjust.getLogNo());
-		else
-			pfItDetailAdjustT = pfItDetailAdjustRepos.findByLogNo(pfItDetailAdjust.getLogNo());
-		return pfItDetailAdjustT.isPresent() ? pfItDetailAdjustT.get() : null;
-	}
+  @Override
+  public PfItDetailAdjust holdById(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Hold " + dbName + " " + pfItDetailAdjust.getLogNo());
+    Optional<PfItDetailAdjust> pfItDetailAdjustT = null;
+    if (dbName.equals(ContentName.onDay))
+      pfItDetailAdjustT = pfItDetailAdjustReposDay.findByLogNo(pfItDetailAdjust.getLogNo());
+    else if (dbName.equals(ContentName.onMon))
+      pfItDetailAdjustT = pfItDetailAdjustReposMon.findByLogNo(pfItDetailAdjust.getLogNo());
+    else if (dbName.equals(ContentName.onHist))
+      pfItDetailAdjustT = pfItDetailAdjustReposHist.findByLogNo(pfItDetailAdjust.getLogNo());
+    else 
+      pfItDetailAdjustT = pfItDetailAdjustRepos.findByLogNo(pfItDetailAdjust.getLogNo());
+    return pfItDetailAdjustT.isPresent() ? pfItDetailAdjustT.get() : null;
+  }
 
-	@Override
-	public PfItDetailAdjust insert(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+  @Override
+  public PfItDetailAdjust insert(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-			empNot = empNot.isEmpty() ? "System" : empNot;
-		} else
-			empNot = ThreadVariable.getEmpNot();
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
 
-		this.info("Insert..." + dbName + " " + pfItDetailAdjust.getLogNo());
-		if (this.findById(pfItDetailAdjust.getLogNo()) != null)
-			throw new DBException(2);
+    this.info("Insert..." + dbName + " " + pfItDetailAdjust.getLogNo());
+    if (this.findById(pfItDetailAdjust.getLogNo()) != null)
+      throw new DBException(2);
 
-		if (!empNot.isEmpty())
-			pfItDetailAdjust.setCreateEmpNo(empNot);
+    if (!empNot.isEmpty())
+      pfItDetailAdjust.setCreateEmpNo(empNot);
 
-		if (pfItDetailAdjust.getLastUpdateEmpNo() == null || pfItDetailAdjust.getLastUpdateEmpNo().isEmpty())
-			pfItDetailAdjust.setLastUpdateEmpNo(empNot);
+    if(pfItDetailAdjust.getLastUpdateEmpNo() == null || pfItDetailAdjust.getLastUpdateEmpNo().isEmpty())
+      pfItDetailAdjust.setLastUpdateEmpNo(empNot);
 
-		if (dbName.equals(ContentName.onDay))
-			return pfItDetailAdjustReposDay.saveAndFlush(pfItDetailAdjust);
-		else if (dbName.equals(ContentName.onMon))
-			return pfItDetailAdjustReposMon.saveAndFlush(pfItDetailAdjust);
-		else if (dbName.equals(ContentName.onHist))
-			return pfItDetailAdjustReposHist.saveAndFlush(pfItDetailAdjust);
-		else
-			return pfItDetailAdjustRepos.saveAndFlush(pfItDetailAdjust);
-	}
+    if (dbName.equals(ContentName.onDay))
+      return pfItDetailAdjustReposDay.saveAndFlush(pfItDetailAdjust);	
+    else if (dbName.equals(ContentName.onMon))
+      return pfItDetailAdjustReposMon.saveAndFlush(pfItDetailAdjust);
+    else if (dbName.equals(ContentName.onHist))
+      return pfItDetailAdjustReposHist.saveAndFlush(pfItDetailAdjust);
+    else 
+    return pfItDetailAdjustRepos.saveAndFlush(pfItDetailAdjust);
+  }
 
-	@Override
-	public PfItDetailAdjust update(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
-		String dbName = "";
-		String empNot = "";
-
-		if (titaVo.length != 0) {
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		} else
-			empNot = ThreadVariable.getEmpNot();
-
-		this.info("Update..." + dbName + " " + pfItDetailAdjust.getLogNo());
-		if (!empNot.isEmpty())
-			pfItDetailAdjust.setLastUpdateEmpNo(empNot);
-
-		if (dbName.equals(ContentName.onDay))
-			return pfItDetailAdjustReposDay.saveAndFlush(pfItDetailAdjust);
-		else if (dbName.equals(ContentName.onMon))
-			return pfItDetailAdjustReposMon.saveAndFlush(pfItDetailAdjust);
-		else if (dbName.equals(ContentName.onHist))
-			return pfItDetailAdjustReposHist.saveAndFlush(pfItDetailAdjust);
-		else
-			return pfItDetailAdjustRepos.saveAndFlush(pfItDetailAdjust);
-	}
-
-	@Override
-	public PfItDetailAdjust update2(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+  @Override
+  public PfItDetailAdjust update(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-			empNot = ThreadVariable.getEmpNot();
+       empNot = ThreadVariable.getEmpNot();
 
-		this.info("Update..." + dbName + " " + pfItDetailAdjust.getLogNo());
-		if (!empNot.isEmpty())
-			pfItDetailAdjust.setLastUpdateEmpNo(empNot);
+    this.info("Update..." + dbName + " " + pfItDetailAdjust.getLogNo());
+    if (!empNot.isEmpty())
+      pfItDetailAdjust.setLastUpdateEmpNo(empNot);
 
-		if (dbName.equals(ContentName.onDay))
-			pfItDetailAdjustReposDay.saveAndFlush(pfItDetailAdjust);
-		else if (dbName.equals(ContentName.onMon))
-			pfItDetailAdjustReposMon.saveAndFlush(pfItDetailAdjust);
-		else if (dbName.equals(ContentName.onHist))
-			pfItDetailAdjustReposHist.saveAndFlush(pfItDetailAdjust);
-		else
-			pfItDetailAdjustRepos.saveAndFlush(pfItDetailAdjust);
-		return this.findById(pfItDetailAdjust.getLogNo());
-	}
+    if (dbName.equals(ContentName.onDay))
+      return pfItDetailAdjustReposDay.saveAndFlush(pfItDetailAdjust);	
+    else if (dbName.equals(ContentName.onMon))
+      return pfItDetailAdjustReposMon.saveAndFlush(pfItDetailAdjust);
+    else if (dbName.equals(ContentName.onHist))
+      return pfItDetailAdjustReposHist.saveAndFlush(pfItDetailAdjust);
+    else 
+    return pfItDetailAdjustRepos.saveAndFlush(pfItDetailAdjust);
+  }
 
-	@Override
-	public void delete(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("Delete..." + dbName + " " + pfItDetailAdjust.getLogNo());
-		if (dbName.equals(ContentName.onDay)) {
-			pfItDetailAdjustReposDay.delete(pfItDetailAdjust);
-			pfItDetailAdjustReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			pfItDetailAdjustReposMon.delete(pfItDetailAdjust);
-			pfItDetailAdjustReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			pfItDetailAdjustReposHist.delete(pfItDetailAdjust);
-			pfItDetailAdjustReposHist.flush();
-		} else {
-			pfItDetailAdjustRepos.delete(pfItDetailAdjust);
-			pfItDetailAdjustRepos.flush();
-		}
-	}
-
-	@Override
-	public void insertAll(List<PfItDetailAdjust> pfItDetailAdjust, TitaVo... titaVo) throws DBException {
-		if (pfItDetailAdjust == null || pfItDetailAdjust.size() == 0)
-			throw new DBException(6);
-		String dbName = "";
-		String empNot = "";
-
-		if (titaVo.length != 0) {
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-			empNot = empNot.isEmpty() ? "System" : empNot;
-		} else
-			empNot = ThreadVariable.getEmpNot();
-
-		this.info("InsertAll...");
-		for (PfItDetailAdjust t : pfItDetailAdjust) {
-			if (!empNot.isEmpty())
-				t.setCreateEmpNo(empNot);
-			if (t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
-				t.setLastUpdateEmpNo(empNot);
-		}
-
-		if (dbName.equals(ContentName.onDay)) {
-			pfItDetailAdjust = pfItDetailAdjustReposDay.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			pfItDetailAdjust = pfItDetailAdjustReposMon.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			pfItDetailAdjust = pfItDetailAdjustReposHist.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustReposHist.flush();
-		} else {
-			pfItDetailAdjust = pfItDetailAdjustRepos.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustRepos.flush();
-		}
-	}
-
-	@Override
-	public void updateAll(List<PfItDetailAdjust> pfItDetailAdjust, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+  @Override
+  public PfItDetailAdjust update2(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		} else
-			empNot = ThreadVariable.getEmpNot();
+       empNot = ThreadVariable.getEmpNot();
 
-		this.info("UpdateAll...");
-		if (pfItDetailAdjust == null || pfItDetailAdjust.size() == 0)
-			throw new DBException(6);
+    this.info("Update..." + dbName + " " + pfItDetailAdjust.getLogNo());
+    if (!empNot.isEmpty())
+      pfItDetailAdjust.setLastUpdateEmpNo(empNot);
 
-		for (PfItDetailAdjust t : pfItDetailAdjust)
-			if (!empNot.isEmpty())
-				t.setLastUpdateEmpNo(empNot);
+    if (dbName.equals(ContentName.onDay))
+      pfItDetailAdjustReposDay.saveAndFlush(pfItDetailAdjust);	
+    else if (dbName.equals(ContentName.onMon))
+      pfItDetailAdjustReposMon.saveAndFlush(pfItDetailAdjust);
+    else if (dbName.equals(ContentName.onHist))
+        pfItDetailAdjustReposHist.saveAndFlush(pfItDetailAdjust);
+    else 
+      pfItDetailAdjustRepos.saveAndFlush(pfItDetailAdjust);	
+    return this.findById(pfItDetailAdjust.getLogNo());
+  }
 
-		if (dbName.equals(ContentName.onDay)) {
-			pfItDetailAdjust = pfItDetailAdjustReposDay.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			pfItDetailAdjust = pfItDetailAdjustReposMon.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			pfItDetailAdjust = pfItDetailAdjustReposHist.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustReposHist.flush();
-		} else {
-			pfItDetailAdjust = pfItDetailAdjustRepos.saveAll(pfItDetailAdjust);
-			pfItDetailAdjustRepos.flush();
-		}
-	}
+  @Override
+  public void delete(PfItDetailAdjust pfItDetailAdjust, TitaVo... titaVo) throws DBException {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Delete..." + dbName + " " + pfItDetailAdjust.getLogNo());
+    if (dbName.equals(ContentName.onDay)) {
+      pfItDetailAdjustReposDay.delete(pfItDetailAdjust);	
+      pfItDetailAdjustReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      pfItDetailAdjustReposMon.delete(pfItDetailAdjust);	
+      pfItDetailAdjustReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      pfItDetailAdjustReposHist.delete(pfItDetailAdjust);
+      pfItDetailAdjustReposHist.flush();
+    }
+    else {
+      pfItDetailAdjustRepos.delete(pfItDetailAdjust);
+      pfItDetailAdjustRepos.flush();
+    }
+   }
 
-	@Override
-	public void deleteAll(List<PfItDetailAdjust> pfItDetailAdjust, TitaVo... titaVo) throws DBException {
-		this.info("DeleteAll...");
-		String dbName = "";
+  @Override
+  public void insertAll(List<PfItDetailAdjust> pfItDetailAdjust, TitaVo... titaVo) throws DBException {
+    if (pfItDetailAdjust == null || pfItDetailAdjust.size() == 0)
+      throw new DBException(6);
+     String dbName = "";
+		String empNot = "";
 
-		if (titaVo.length != 0)
+		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		if (pfItDetailAdjust == null || pfItDetailAdjust.size() == 0)
-			throw new DBException(6);
-		if (dbName.equals(ContentName.onDay)) {
-			pfItDetailAdjustReposDay.deleteAll(pfItDetailAdjust);
-			pfItDetailAdjustReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			pfItDetailAdjustReposMon.deleteAll(pfItDetailAdjust);
-			pfItDetailAdjustReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			pfItDetailAdjustReposHist.deleteAll(pfItDetailAdjust);
-			pfItDetailAdjustReposHist.flush();
-		} else {
-			pfItDetailAdjustRepos.deleteAll(pfItDetailAdjust);
-			pfItDetailAdjustRepos.flush();
-		}
-	}
+			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
+    for (PfItDetailAdjust t : pfItDetailAdjust){ 
+      if (!empNot.isEmpty())
+        t.setCreateEmpNo(empNot);
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
+
+    if (dbName.equals(ContentName.onDay)) {
+      pfItDetailAdjust = pfItDetailAdjustReposDay.saveAll(pfItDetailAdjust);	
+      pfItDetailAdjustReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      pfItDetailAdjust = pfItDetailAdjustReposMon.saveAll(pfItDetailAdjust);	
+      pfItDetailAdjustReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      pfItDetailAdjust = pfItDetailAdjustReposHist.saveAll(pfItDetailAdjust);
+      pfItDetailAdjustReposHist.flush();
+    }
+    else {
+      pfItDetailAdjust = pfItDetailAdjustRepos.saveAll(pfItDetailAdjust);
+      pfItDetailAdjustRepos.flush();
+    }
+    }
+
+  @Override
+  public void updateAll(List<PfItDetailAdjust> pfItDetailAdjust, TitaVo... titaVo) throws DBException {
+     String dbName = "";
+		String empNot = "";
+
+		if (titaVo.length != 0) {
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
+    if (pfItDetailAdjust == null || pfItDetailAdjust.size() == 0)
+      throw new DBException(6);
+
+    for (PfItDetailAdjust t : pfItDetailAdjust) 
+    if (!empNot.isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+		
+
+    if (dbName.equals(ContentName.onDay)) {
+      pfItDetailAdjust = pfItDetailAdjustReposDay.saveAll(pfItDetailAdjust);	
+      pfItDetailAdjustReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      pfItDetailAdjust = pfItDetailAdjustReposMon.saveAll(pfItDetailAdjust);	
+      pfItDetailAdjustReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      pfItDetailAdjust = pfItDetailAdjustReposHist.saveAll(pfItDetailAdjust);
+      pfItDetailAdjustReposHist.flush();
+    }
+    else {
+      pfItDetailAdjust = pfItDetailAdjustRepos.saveAll(pfItDetailAdjust);
+      pfItDetailAdjustRepos.flush();
+    }
+    }
+
+  @Override
+  public void deleteAll(List<PfItDetailAdjust> pfItDetailAdjust, TitaVo... titaVo) throws DBException {
+    this.info("DeleteAll...");
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (pfItDetailAdjust == null || pfItDetailAdjust.size() == 0)
+      throw new DBException(6);
+    if (dbName.equals(ContentName.onDay)) {
+      pfItDetailAdjustReposDay.deleteAll(pfItDetailAdjust);	
+      pfItDetailAdjustReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      pfItDetailAdjustReposMon.deleteAll(pfItDetailAdjust);	
+      pfItDetailAdjustReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      pfItDetailAdjustReposHist.deleteAll(pfItDetailAdjust);
+      pfItDetailAdjustReposHist.flush();
+    }
+    else {
+      pfItDetailAdjustRepos.deleteAll(pfItDetailAdjust);
+      pfItDetailAdjustRepos.flush();
+    }
+  }
 
 }

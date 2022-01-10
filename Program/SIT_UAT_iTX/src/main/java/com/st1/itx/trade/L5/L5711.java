@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegAppr01Id;
+import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
 /* DB容器 */
