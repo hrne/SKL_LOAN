@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,12 +21,16 @@ import com.st1.itx.db.domain.TxAttachment;
  */
 public interface TxAttachmentRepositoryHist extends JpaRepository<TxAttachment, Long> {
 
-	// TranNo = ,AND MrKey =
-	public Slice<TxAttachment> findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(String tranNo_0, String mrKey_1, Pageable pageable);
+  // TranNo = ,AND MrKey =
+  public Slice<TxAttachment> findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(String tranNo_0, String mrKey_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxAttachment> findByFileNo(Long fileNo);
+  // TranNo = 
+  public Slice<TxAttachment> findAllByTranNoIsOrderByFileNoDesc(String tranNo_0, Pageable pageable);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxAttachment> findByFileNo(Long fileNo);
 
 }
+

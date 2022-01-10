@@ -36,6 +36,44 @@ T(3,*)
 #FdAmount=X,2,L
 #FdRemark=X,2,L
 
+<include src="ROM.icf::L5R49.dec"/>  
+#RimL5R49=X,1,S 
+#RimFunCd=X,1,S
+T(2,1)
+RESET_RIM(#RimL5R49,L5R49)
+S(L5R49,1,#RimFunCd)
+R(1,L5R49)
+T(2,@FileNo,#L5R49FileNo)
+
+#FileNo=A,8,S
+
+#TODAY1=A,7,S
+T(1,#SYSCDATE,2,7)
+
+#Space1=X,1,S
+T(2,@LC014Mrkey,#TODAY1+-+#FileNo)
+
+#LC014Mrkey=X,100,S
+#LC014MrkeyS=X,100,S
+
+#LC014Note=X,100,S
+T(B,授信審議委員會會議紀錄)
+
+#BufLC014=X,250,S
+T(2,L5102+0000000+000+000+#LC014Mrkey+#LC014Note)
+
+#BufLC014S=X,250,S
+T(2,L5102+0000000+000+000+#LC014MrkeyS+#LC014Note)
+
+
+#button2=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,上傳附件)
+
+#button3=x,100,S
+T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014S})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,上傳附件查詢)
+
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -149,6 +187,7 @@ T(1,#SYSCDATE,2,7)
 C(2,#FunctionCode,s,$,s,s,s,s)
 E(0,@MeetingDate,#TODAY)
 
+
 ! 日期
 #MeetingDate=D,7,I
 ! C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
@@ -206,6 +245,7 @@ C(2,#FunctionCode,s,$,$,s,s,s,s)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R49.tom"/>
 TXFORM=L5102
 
 ^

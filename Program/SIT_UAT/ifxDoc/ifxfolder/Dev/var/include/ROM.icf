@@ -9356,3 +9356,13 @@ TXFORM=L5R48
 ##end
 ^
 </L5R48.tom>
+
+<L5R49.dec>
+#L5R49FileNo=9,8,S
+</L5R49.dec>
+
+<L5R49.tom>
+TXFORM=L5R49
+#L5R49FileNo
+^
+</L5R49.tom>

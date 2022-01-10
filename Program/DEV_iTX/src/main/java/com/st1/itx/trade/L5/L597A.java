@@ -21,6 +21,7 @@ import com.st1.itx.db.service.springjpa.cm.L597AServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -310,7 +311,7 @@ public class L597A extends TradeBuffer {
 						occursList1.putParam("OOCustId", lData[2]);// 身分證號
 						occursList1.putParam("OOCaseSeq", lData[3]);// 案件序號
 						occursList1.putParam("OOCustNo", lData[4]);// 戶號
-						occursList1.putParam("OOCustName", lData[5]);// 戶名
+						occursList1.putParam("OOCustName", StringCut.replaceLineUp(lData[5]));// 戶名
 						occursList1.putParam("OOTxSts", TxKind);// 交易別
 						occursList1.putParam("OORemark", lData[7]);// 備註
 						occursList1.putParam("OOAcctDate", DcToRoc(lData[8]));// 會計日
@@ -431,7 +432,7 @@ public class L597A extends TradeBuffer {
 					occursList1.putParam("OOCustId", lData[2]);// 身分證號
 					occursList1.putParam("OOCaseSeq", lData[3]);// 案件序號
 					occursList1.putParam("OOCustNo", lData[4]);// 戶號
-					occursList1.putParam("OOCustName", lData[5]);// 戶名
+					occursList1.putParam("OOCustName", StringCut.replaceLineUp(lData[5]));// 戶名
 					occursList1.putParam("OOTxSts", TxKind);// 交易別
 					occursList1.putParam("OORemark", lData[7]);// 備註
 					occursList1.putParam("OOAcctDate", DcToRoc(lData[8]));// 會計日

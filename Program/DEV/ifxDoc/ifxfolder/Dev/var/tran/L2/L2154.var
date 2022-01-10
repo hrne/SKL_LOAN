@@ -1403,7 +1403,7 @@ BIND(#BTNExpand,click, {cmd=CALLSEND;DOCODE=Expand})
 
 #FDP2=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
-T(2,@FdProdNo, )
+T(2,@FdProdNo,#WkStar)
 ! T(2,@FdBaseRateCode,#WkStar)
 T(2,@FdBaseRate, )
 T(2,@FdProdRate, )
@@ -1472,7 +1472,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF2;ntxbuf5=type<-1:ProdNo<-
 #ProdNo=X,5,I
 C(3,#UpdateCode,1,$,s)
 @
-C(5,#ProdNo,#L2r05ProdNo,$,C(3,#L2r05UtilAmt,0,$,V(P,尚有放款餘額，不可變更商品代碼)))
+V(7)C(5,#ProdNo,#L2r05ProdNo,$,C(3,#L2r05UtilAmt,0,$,V(P,尚有放款餘額，不可變更商品代碼)))
 
 #SendL2r01A=X,1,S
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r01A,L2R01),$)

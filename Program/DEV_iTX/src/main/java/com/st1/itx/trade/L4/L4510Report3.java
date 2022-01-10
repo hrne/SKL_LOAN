@@ -185,7 +185,7 @@ public class L4510Report3 extends MakeReport {
 				this.print(0, 51, "-");
 				this.print(0, 53, formatDate(parse.stringToInteger(fnAllList.get(i).get("F12"))));// 計息迄
 				this.print(0, 72, format4Amt(parse.stringToBigDecimal(fnAllList.get(i).get("F13"))), "R");// 扣款金額
-				this.print(0, 82, format4Amt(parse.stringToBigDecimal(fnAllList.get(i).get("F14"))), "R");// 本金
+				this.print(0, 83, format4Amt(parse.stringToBigDecimal(fnAllList.get(i).get("F14"))), "R");// 本金
 				this.print(0, 92, format4Amt(parse.stringToBigDecimal(fnAllList.get(i).get("F15"))), "R");// 利息
 //				僅期款需顯示
 				this.print(0, 102, format4Amt(breach), "R");// 違約金
@@ -232,7 +232,7 @@ public class L4510Report3 extends MakeReport {
 //						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 //						this.print(1, 51, FormatUtil.pad9("" + timeAs, 7));
 //						this.print(0, 72, format4Amt(sumA1), "R");// 扣款金額
-//						this.print(0, 82, format4Amt(sumA2), "R");// 本金
+//						this.print(0, 83, format4Amt(sumA2), "R");// 本金
 //						this.print(0, 92, format4Amt(sumA3), "R");// 利息
 //						this.print(0, 102, format4Amt(sumA4), "R");// 違約金
 //						this.print(0, 112, format4Amt(sumA5), "R");// 欠繳本金
@@ -246,7 +246,7 @@ public class L4510Report3 extends MakeReport {
 						this.print(0, 25, procCode);
 						this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
 						this.print(0, 72, format4Amt(sumB1), "R");// 扣款金額
-						this.print(0, 82, format4Amt(sumB2), "R");// 本金
+						this.print(0, 83, format4Amt(sumB2), "R");// 本金
 						this.print(0, 92, format4Amt(sumB3), "R");// 利息
 						this.print(0, 102, format4Amt(sumB4), "R");// 違約金
 						this.print(0, 112, format4Amt(sumB5), "R");// 欠繳本金
@@ -275,7 +275,7 @@ public class L4510Report3 extends MakeReport {
 //							this.print(0, 25, procCode);
 //							this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
 //							this.print(0, 72, format4Amt(sumB1), "R");// 扣款金額
-//							this.print(0, 82, format4Amt(sumB2), "R");// 本金
+//							this.print(0, 83, format4Amt(sumB2), "R");// 本金
 //							this.print(0, 92, format4Amt(sumB3), "R");// 利息
 //							this.print(0, 102, format4Amt(sumB4), "R");// 違約金
 //							this.print(0, 112, format4Amt(sumB5), "R");// 欠繳本金
@@ -321,7 +321,7 @@ public class L4510Report3 extends MakeReport {
 						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 51, FormatUtil.pad9("" + timeAs, 7));
 						this.print(0, 72, format4Amt(sumA1), "R");// 扣款金額
-						this.print(0, 82, format4Amt(sumA2), "R");// 本金
+						this.print(0, 83, format4Amt(sumA2), "R");// 本金
 						this.print(0, 92, format4Amt(sumA3), "R");// 利息
 						this.print(0, 102, format4Amt(sumA4), "R");// 違約金
 						this.print(0, 112, format4Amt(sumA5), "R");// 欠繳本金
@@ -334,7 +334,7 @@ public class L4510Report3 extends MakeReport {
 						this.print(0, 25, procCode);
 						this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
 						this.print(0, 72, format4Amt(sumB1), "R");// 扣款金額
-						this.print(0, 82, format4Amt(sumB2), "R");// 本金
+						this.print(0, 83, format4Amt(sumB2), "R");// 本金
 						this.print(0, 92, format4Amt(sumB3), "R");// 利息
 						this.print(0, 102, format4Amt(sumB4), "R");// 違約金
 						this.print(0, 112, format4Amt(sumB5), "R");// 欠繳本金

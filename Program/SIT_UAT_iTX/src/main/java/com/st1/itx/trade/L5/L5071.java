@@ -27,6 +27,7 @@ import com.st1.itx.db.service.springjpa.cm.L5071ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -106,7 +107,7 @@ public class L5071 extends TradeBuffer {
 				tCustMain = sCustMainService.custIdFirst(t5071.get("F0"), titaVo);
 
 				if (tCustMain != null) {
-					CustName = tCustMain.getCustName();
+					CustName = StringCut.replaceLineUp(tCustMain.getCustName());
 				}
 				occursList.putParam("OOCustName", CustName);
 				occursList.putParam("OOCaseKindCode", t5071.get("F1"));

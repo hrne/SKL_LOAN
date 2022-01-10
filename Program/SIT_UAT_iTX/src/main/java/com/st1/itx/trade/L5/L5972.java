@@ -24,6 +24,7 @@ import com.st1.itx.db.service.NegTransService;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 /* DB容器 */
@@ -185,7 +186,7 @@ public class L5972 extends TradeBuffer {
 
 				occursList.putParam("OOCustId", CustMainVO.getCustId());// 身分證號
 				occursList.putParam("OOCustNo", ThisCustNo);// 戶號
-				occursList.putParam("OOCustNM", CustMainVO.getCustName());// 戶名
+				occursList.putParam("OOCustNM", StringCut.replaceLineUp(CustMainVO.getCustName()));// 戶名
 				occursList.putParam("OOEntryDate", NegTransVO.getEntryDate());// 入帳日期
 				occursList.putParam("OOTxKind", NegTransVO.getTxKind());// 交易別
 				occursList.putParam("OOTxAmt", NegTransVO.getTxAmt());// 交易金額

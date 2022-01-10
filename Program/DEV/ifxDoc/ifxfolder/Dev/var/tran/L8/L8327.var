@@ -98,7 +98,7 @@ T(2,@CourtCodeHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic447連動進入),$)
-T(F,@TranKey,0)T(F,@SubmitKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)   
+T(F,@TranKey,0)T(F,@SubmitKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(F,@SignDate,0)  
 #AutoReFresh=A,1,S
 C(3,#CHAIN,1,$,S)
 E(0,1)
@@ -142,14 +142,15 @@ T(3,@TranKeyHelp,C:異動;D:刪除))
 C(5,#TranKey_Tmp,5,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(NOBUTTON,CLOSEY)
-!T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+
 
 ! 刪除進入
 #Deal_Delete=X,1,S
 C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
-T(F,@SignDate,0)
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -188,7 +189,14 @@ E(0,@MonthPayAmt,#L8r44MonthPayAmt)
 T(2,@PayAccount,#L8r44PayAccount)
 E(0,@OutJcicTxtDate,#L8r44OutJcicTxtDate)
 T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
-
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r44TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(2,@RimJcicBankCode,#CourtCode)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 ! 調Rim相關 結束
 
 ![交易代碼]

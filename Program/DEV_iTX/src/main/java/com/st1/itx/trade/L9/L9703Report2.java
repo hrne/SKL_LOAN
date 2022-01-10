@@ -318,11 +318,12 @@ public class L9703Report2 extends MakeReport {
 		int BreachAmt = 0;
 		int UnPaidAmt = 0;
 		int LoanBal = 0;
-		int size = 0;
+		int terms = 0;
 		for (BaTxVo baTxVo : listBaTxVo) {
 			if (baTxVo.getDataKind() != 2) {
 				continue;
 			}
+			terms++;
 			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 
 			// 違約金
@@ -386,7 +387,7 @@ public class L9703Report2 extends MakeReport {
 		y = top + yy + (++l) * h;
 		printCm(1, y, "＊＊註：違約金暫計到" + showDate(titaVo.getParam("ENTDY"), 2) + " ,　若提前或延後繳款 , 請電話查詢" + "　該違約金金額");
 		y = top + yy + (++l) * h;
-		printCm(1, y, "＊＊截至" + showDate("" + nextday, 2) + "，貸款尚欠" + FormatUtil.pad9("" + size, 3) + "期。請撥空盡速繳納");
+		printCm(1, y, "＊＊截至" + showDate("" + nextday, 2) + "，貸款尚欠" + FormatUtil.pad9("" + terms, 3) + "期。請撥空盡速繳納");
 		y = top + yy + (++l) * h;
 		printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
 

@@ -32,6 +32,7 @@ import com.st1.itx.util.common.NegCom;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -101,7 +102,7 @@ public class L5075 extends TradeBuffer {
 				int ThisCustNo = NegMainVO.getCustNo();
 				CustMain CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
 				String ThisCustId = CustMainVO.getCustId();
-				String ThisCustName = CustMainVO.getCustName();
+				String ThisCustName = StringCut.replaceLineUp(CustMainVO.getCustName());
 
 				NegTrans NegTransVO = new NegTrans();
 

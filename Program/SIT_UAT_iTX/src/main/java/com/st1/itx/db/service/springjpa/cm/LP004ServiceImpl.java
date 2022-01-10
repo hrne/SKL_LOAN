@@ -401,7 +401,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ) tab1 ";
 		sql += " LEFT JOIN ( SELECT \"DeptCode\" ";
 		sql += "                  , SUM(\"PerfCnt\") AS \"t2sumPerfCnt\" ";
-		sql += "                  , SUM(\"PerfAmt\") ASs \"t2sumPerfAmt\" ";
+		sql += "                  , SUM(\"PerfAmt\") AS \"t2sumPerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" ";
 		sql += "             WHERE \"WorkMonth\"= :iyymm ";
 		sql += "               AND \"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";

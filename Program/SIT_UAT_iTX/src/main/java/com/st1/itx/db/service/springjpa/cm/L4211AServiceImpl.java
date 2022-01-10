@@ -105,7 +105,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "      + TX2.\"DelayInt\"";
 		sql += "      + TX2.\"BreachAmt\"";
 		sql += "      + TX2.\"CloseBreachAmt\"";
-		sql += "      + TX2.\"Shortfall\"";
 		sql += "      + TX2.\"AcctFee\"";
 		sql += "      + TX2.\"ModifyFee\"";
 		sql += "      + TX2.\"FireFee\"";

@@ -103,14 +103,19 @@ public class BS410 extends TradeBuffer {
 			filena = filena + ";";
 		}
 
+
+//		檢核檔名、檔案格式
+		checkFile(filena, titaVo);
+		
 		String[] filelist = filena.split(";");
 		for (String filename : filelist) {
 			this.info("fileName : " + filename);
 //				重製VO的OccursList
 			initialFileVoOccursList();
 //TODO: 回銷檔名稱待訂
-			if (filename.indexOf("TEST") >= 0) {
-				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
+			if (filename.indexOf("LNM24r") >= 0) {
+				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+						+ File.separatorChar + filename;
 				this.info("回銷檔 Start With -> " + filePath1);
 
 				ArrayList<String> dataLineList1 = new ArrayList<>();
@@ -130,9 +135,11 @@ public class BS410 extends TradeBuffer {
 
 //		執行無誤者連結查詢清單
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4101", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4001", titaVo.getTlrNo(),
+					"上傳完成", titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4104", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4104", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -194,16 +201,20 @@ public class BS410 extends TradeBuffer {
 					this.info("tBankRemit =" + tBankRemit);
 					this.info("OccPayStatus =" + OccPayStatus);
 
-//					tBankRemit.setPayCode(OccPayStatus);
 
+				} else {
+
+					throw new LogicException("E2003", "相關號碼 = " + OccRelNum);// 查無資料
 				}
+
+				tBankRemit.setPayCode(OccPayStatus);
 			}
 
 			try {
 				bankRemitService.update(tBankRemit, titaVo);
 			} catch (DBException e) {
 				e.printStackTrace();
-				throw new LogicException("E0005", "BankRemit Insert Fail");
+				throw new LogicException("E0005", "BankRemit update Fail");
 			}
 
 //			}
@@ -217,5 +228,58 @@ public class BS410 extends TradeBuffer {
 		ArrayList<OccursList> occursList = new ArrayList<OccursList>();
 		updateBankRemitFileVo.setOccursList(occursList);
 	}
+	private void checkFile(String fileName, TitaVo titaVo) throws LogicException {
+		this.info("checkFile Start...");
+//		1.檢核檔名，不為下列區間者為False
+//		2.檢核檔案內容，若格式不合，此階段先提出錯誤
 
+		this.info("fileName ..." + fileName);
+
+		String[] filelist = fileName.split(";");
+
+		if (filelist == null || filelist.length == 0) {
+			sendMsg = sendMsg + "請輸入檔案。";
+			checkFlag = false;
+		}
+
+		for (String filename : filelist) {
+//			每次執行setValue後，需初始化occursList
+			initialFileVoOccursList();
+
+			this.info("filename ..." + filename);
+
+			String filePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
+
+			ArrayList<String> dataLineList1 = new ArrayList<>();
+			try {
+				dataLineList1 = fileCom.intputTxt(filePath, "big5");
+			} catch (IOException e) {
+				this.info("BS410(" + filePath + ") : " + e.getMessage());
+			}
+
+			if (filename.indexOf("LNM24r") >= 0) {
+				try {
+					updateBankRemitFileVo.setValueFromFile(dataLineList1);
+				} catch (LogicException e) {
+					sendMsg = sendMsg + removeDot(filename) + ": " + e.getErrorMsg();
+					checkFlag = false;
+					break;
+				}
+			}  else {
+				sendMsg = sendMsg + removeDot(filename) + "，檔名不符本交易處理範圍。";
+				checkFlag = false;
+				break;
+			}
+
+
+		}
+	}
+	private String removeDot(String input) {
+
+		if (input.indexOf(".") >= 0) {
+			input = input.substring(0, input.indexOf("."));
+		}
+
+		return input;
+	}
 }

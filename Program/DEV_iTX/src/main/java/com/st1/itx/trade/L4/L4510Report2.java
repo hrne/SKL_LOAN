@@ -93,9 +93,9 @@ public class L4510Report2 extends MakeReport {
 			entryDate = parse.stringToInteger(fnAllList.get(0).get("F2")) - 19110000;
 
 			if (flag == 1) {
-				this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4510", "15日薪-帳管費扣薪明細表", "", "A4", "L");
+				this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4510", "15日薪-帳管費及其他扣薪明細表", "", "A4", "L");
 			} else {
-				this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4510", "非15日薪-帳管費扣薪明細表", "", "A4", "L");
+				this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4510", "非15日薪-帳管費及其他扣薪明細表", "", "A4", "L");
 			}
 
 			DecimalFormat df1 = new DecimalFormat("#,##0");

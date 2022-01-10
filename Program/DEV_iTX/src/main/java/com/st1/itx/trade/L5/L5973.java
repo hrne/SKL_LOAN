@@ -25,6 +25,7 @@ import com.st1.itx.db.service.NegAppr01Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 /* DB容器 */
@@ -153,7 +154,7 @@ public class L5973 extends TradeBuffer {
 				occursList.putParam("OOCaseKindCode", NegAppr01VO.getCaseKindCode());
 				occursList.putParam("OOCustId", CustMainVO.getCustId());
 				occursList.putParam("OOCustNo", NegAppr01VO.getCustNo());
-				occursList.putParam("OOCustName", CustMainVO.getCustName());
+				occursList.putParam("OOCustName", StringCut.replaceLineUp(CustMainVO.getCustName()));
 				occursList.putParam("OOFinCodeName", NegAppr01VO.getFinCode());
 				occursList.putParam("OOFinCodeNameNM", sNegCom.FindNegFinAcc(NegAppr01VO.getFinCode(), titaVo)[0]);// 債權機構名稱
 				occursList.putParam("OOApprAmt", NegAppr01VO.getApprAmt());

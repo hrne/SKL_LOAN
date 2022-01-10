@@ -27,6 +27,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
+
 	private int intStartDate = 0;
 	private int intEndDate = 0;
 	private String flag = "";
@@ -45,38 +46,53 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  l.\"CustNo\"            as \"CustNo\"                         ";
 		sql += " ,l.\"FacmNo\"            as \"FacmNo\"                         ";
 		sql += " ,f.\"AcctCode\"          as \"AcctCode\"                       ";
-		sql += " ,substr(d.\"Item\",0,1)  as \"Flag\"                           ";
+		
+//		sql += " ,substr(d.\"Item\",0,1)  as \"Flag\"                           ";
+		
+		if ("1".equals(flag)) {
+			sql += " , 1                  as \"Flag\" ";
+		} else {
+			sql += " , 2                  as \"Flag\" ";
+		}
+		
 		sql += " ,l.\"BormNo\"            as \"BormNo\"                         ";
+		
 		if ("1".equals(flag)) {
 			sql += " , 5                  as \"AgType1\" ";
 		} else {
 			sql += " , 1                  as \"AgType1\" ";
 		}
+		
 		sql += " from \"LoanBorMain\" l                                         ";
 		sql += " left join \"FacMain\"  f on f.\"CustNo\"     = l.\"CustNo\"    ";
 		sql += "                       and f.\"FacmNo\"       = l.\"FacmNo\"    ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\"     = l.\"CustNo\"    ";
 		sql += " left join \"CdEmp\"    e on e.\"EmployeeNo\" = c.\"EmpNo\"     ";
-		sql += " left join \"CdCode\"   d on d.\"DefType\"    = 4               ";
-		sql += "                         and d.\"DefCode\"    = 'EmpDeductType' ";
-		sql += "                         and d.\"Code\"       = :AgType1";
+//		sql += " left join \"CdCode\"   d on d.\"DefType\"    = 4               ";
+//		sql += "                         and d.\"DefCode\"    = 'EmpDeductType' ";
+//		sql += "                         and d.\"Code\"       = :AgType1"  ;
 		sql += " where l.\"NextPayIntDate\" >= :intStartDate";
 		sql += "   and l.\"NextPayIntDate\" <= :intEndDate";
 		sql += "   and l.\"Status\" = 0                                         ";
-		sql += "   and substr(d.\"Item\",0,1) = :flag"; // c."EmpNo" is not null && d.Item = flag
+//		sql += "   and substr(d.\"Item\",0,1) = :flag"; // c."EmpNo" is not null && d.Item = flag
+		sql += "   and nvl(e.\"EmployeeNo\", ' ') <> ' ' ";
+		
 //		15日薪-員工扣薪
 		if ("1".equals(flag)) {
 			sql += "   and f.\"RepayCode\" = 3                                  ";
 		}
 
 		// EmployeeCom
-		// sql += " ,CASE WHEN ( e.\"CommLineCode\" = 21 AND ( substr(e.\"AgLevel\", 0,
-		// 1) IN ( 'F','G','J','Z') )) ";
-//		sql += "             OR (e.\"CommLineCode\" = 31 AND ( substr(e.\"AgLevel\", 0, 1) IN ('K','Z') )) "; 
-//		sql += "             OR (e.\"AgLevel\" NOT IN ('21','31','1C' ) AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097') ) ";
-//		sql += "       THEN  5"; 
-//		sql += "       ELSE  1";
-
+		sql += " AND CASE WHEN ( e.\"CommLineCode\" = 21 AND ( substr(e.\"AgLevel\", 0, 1) IN ( 'F','G','J','Z') )) "; 
+		sql += "             OR (e.\"CommLineCode\" = 31 AND ( substr(e.\"AgLevel\", 0, 1) IN ('K','Z') )) "; 
+		sql += "             OR (e.\"AgLevel\" NOT IN ('21','31','1C' ) AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097') ) ";
+		sql += "       THEN  5"; 
+		sql += "       ELSE  1";
+		sql += "       END = :AgType1";
+		
+    // 非員工扣款者判斷員工須在職  (AgStatusCode  任用狀況碼 =  1-在職)
+		sql += " AND (f.\"RepayCode\" = 3 OR nvl(e.\"AgStatusCode\",'') = '1') ";
+		
 		this.info("sql=" + sql);
 		Query query;
 
@@ -84,7 +100,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("intStartDate", intStartDate);
 		query.setParameter("intEndDate", intEndDate);
-		query.setParameter("flag", flag);
+//		query.setParameter("flag", flag);
 		query.setParameter("AgType1", AgType1);
 
 		return this.convertToMap(query);
@@ -94,7 +110,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		intStartDate = iIntStartDate;
 		intEndDate = iIntEndDate;
 		flag = "" + iFlag;
-		AgType1 = "1".equals(flag) ? "5" : "1";
+		AgType1 = "1".equals(flag) ? "5" : "1" ;
 		return findAll(titaVo);
 	}
 }

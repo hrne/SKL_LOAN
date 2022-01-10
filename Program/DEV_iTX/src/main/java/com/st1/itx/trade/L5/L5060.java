@@ -20,6 +20,7 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L5060ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 @Component("L5060")
@@ -46,6 +47,7 @@ public class L5060 extends TradeBuffer {
 
 	@Autowired
 	public CustMainService sCustMainService;
+
 
 	@Override
 	/* 應處理清單 放款轉列催收 */
@@ -101,11 +103,11 @@ public class L5060 extends TradeBuffer {
 			if (iOprionCd.equals("1")) {
 				lL5060Vo = l5060ServiceImpl.load(this.index, this.limit, titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovdtrmfm")), Integer.valueOf(titaVo.getParam("Ovdtrmto")),
 						titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")), this.getTxBuffer().getTxBizDate().getTbsDyf(), iIdentity, iCustNo,
-						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode, titaVo);
+						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode , titaVo);
 			} else {
 				lL5060Vo = l5060ServiceImpl.load(this.index, this.limit, titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovddayfm")), Integer.valueOf(titaVo.getParam("Ovddayto")),
 						titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")), this.getTxBuffer().getTxBizDate().getTbsDyf(), iIdentity, iCustNo,
-						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode, titaVo);
+						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode , titaVo);
 			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -211,9 +213,9 @@ public class L5060 extends TradeBuffer {
 			occursList.putParam("OOCustNo", thisL5060Vo.get("F0"));
 			CustMain tCustMain = new CustMain();
 			String CustName = "";
-			tCustMain = sCustMainService.custNoFirst(Integer.valueOf(thisL5060Vo.get("F0")), Integer.valueOf(thisL5060Vo.get("F0")), titaVo);
+			tCustMain = sCustMainService.custNoFirst(Integer.valueOf(thisL5060Vo.get("F0")),Integer.valueOf(thisL5060Vo.get("F0")), titaVo);
 			if (tCustMain != null) {
-				CustName = tCustMain.getCustName();
+				CustName = StringCut.replaceLineUp(tCustMain.getCustName());
 			}
 			occursList.putParam("OOCustName", CustName);
 			occursList.putParam("OOFacmNo", thisL5060Vo.get("F1"));

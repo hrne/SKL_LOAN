@@ -27,6 +27,7 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
+
 	private int mediaDate = 0;
 	private String procCode = "";
 
@@ -38,7 +39,7 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4510R2.findAll");
-
+		this.info("L4510R2.procCode= " +  procCode);
 		String sql = " select                                                           ";
 		sql += "  d.\"PerfMonth\"            AS F0                                      ";
 		sql += " ,d.\"ProcCode\"             AS F1                                      ";
@@ -49,13 +50,13 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += " ,c.\"CustName\"             AS F6                                      ";
 		sql += " ,d.\"FacmNo\"               AS F7                                      ";
 		sql += " ,d.\"BormNo\"               AS F8                                      ";
-		sql += " ,d.\"TxAmt\"                AS F9                                      ";
+		sql += " ,d.\"RepayAmt\"             AS F9                                      ";
 		sql += " from \"EmpDeductDtl\" d                                                ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\"                ";
 		sql += " where d.\"ErrMsg\" is null                                             ";
 		sql += "   and d.\"MediaDate\" = :mediaDate ";
-		sql += "   and d.\"ProcCode\" in (:procCode) ";
-		sql += "   and d.\"AchRepayCode\" = 4                                           ";
+		sql += "   and d.\"ProcCode\" in (" + procCode + ") ";
+		sql += "   and d.\"AchRepayCode\" >= 4 and  d.\"AchRepayCode\" <> 5             ";
 		sql += " order by d.\"CustNo\",d.\"FacmNo\"                                     ";
 
 		this.info("sql=" + sql);
@@ -64,7 +65,7 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("mediaDate", mediaDate);
-		query.setParameter("procCode", procCode);
+//		query.setParameter("procCode", procCode);
 		return this.convertToMap(query);
 	}
 
