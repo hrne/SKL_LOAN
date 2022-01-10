@@ -73,15 +73,92 @@ BEGIN
       LEFT JOIN "Ifrs9FacData" F  ON F."DataYM"  = M."DataYM"
                                  AND F."CustNo"  = M."CustNo"
                                  AND F."FacmNo"  = M."FacmNo"
-      LEFT JOIN "LoanRateChange" C     ON C."CustNo"  = M."CustNo"
-                                      AND C."FacmNo"  = M."FacmNo"
-                                      AND C."BormNo"  = M."BormNo"
+      LEFT JOIN (
+        SELECT "CustNo"
+             , "FacmNo"
+             , "BormNo"
+             , "FitRate"
+             , "EffectDate"
+        FROM "LoanRateChange"
+        UNION
+        SELECT LBM."CustNo"
+             , LBM."FacmNo"
+             , LBM."BormNo"
+             -- 利率= Ifrs9FacData.ProdNo 對應FacProd.ProdNo 找BaseRateCode => 
+             -- 再找 生效日<=月底日且最接近的一筆(CdBaseRate.BaseRate 基本利率) + LoanBorMain."RateIncr" 加碼利率          
+             , NVL(CBR."BaseRate",0)
+               + LBM."RateIncr"       AS "FitRate"
+             , LBM."FirstAdjRateDate" AS "EffectDate"
+        FROM "LoanBorMain" LBM
+        LEFT JOIN "LoanRateChange" LRC ON LRC."CustNo" = LBM."CustNo"
+                                      AND LRC."FacmNo" = LBM."FacmNo"
+                                      AND LRC."BormNo" = LBM."BormNo"
+                                      AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
+        LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
+                               AND FAC."FacmNo" = LBM."FacmNo"
+        LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
+        LEFT JOIN (
+          SELECT "BaseRateCode"
+               , "BaseRate"
+               , ROW_NUMBER()
+                 OVER (
+                   PARTITION BY "BaseRateCode"
+                   ORDER BY "EffectDate" DESC
+                 ) AS "Seq"
+          FROM "CdBaseRate" 
+          WHERE TRUNC("EffectDate"/100) <= YYYYMM
+        ) CBR ON CBR."BaseRateCode" = PROD."BaseRateCode"
+             AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
+        WHERE TRUNC(NVL(LBM."FirstAdjRateDate",0) / 100) > YYYYMM
+          AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
+        UNION
+        SELECT LBM."CustNo"
+             , LBM."FacmNo"
+             , LBM."BormNo"
+             -- 利率= Ifrs9FacData.ProdNo 對應FacProd.ProdNo 找BaseRateCode => 
+             -- 再找 生效日<=月底日且最接近的一筆(CdBaseRate.BaseRate 基本利率) + LoanBorMain."RateIncr" 加碼利率          
+             , NVL(CBR."BaseRate",0)
+               + LBM."RateIncr"       AS "FitRate"
+             , LBM."NextAdjRateDate" AS "EffectDate"
+        FROM "LoanBorMain" LBM
+        LEFT JOIN "LoanRateChange" LRC ON LRC."CustNo" = LBM."CustNo"
+                                      AND LRC."FacmNo" = LBM."FacmNo"
+                                      AND LRC."BormNo" = LBM."BormNo"
+                                      AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
+        LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
+                               AND FAC."FacmNo" = LBM."FacmNo"
+        LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
+        LEFT JOIN (
+          SELECT "BaseRateCode"
+               , "BaseRate"
+               , ROW_NUMBER()
+                 OVER (
+                   PARTITION BY "BaseRateCode"
+                   ORDER BY "EffectDate" DESC
+                 ) AS "Seq"
+          FROM "CdBaseRate" 
+          WHERE TRUNC("EffectDate"/100) <= YYYYMM
+        ) CBR ON CBR."BaseRateCode" = PROD."BaseRateCode"
+             AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
+        WHERE TRUNC(NVL(LBM."NextAdjRateDate",0) / 100) > YYYYMM
+          AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
+      ) C ON C."CustNo"  = M."CustNo"
+         AND C."FacmNo"  = M."FacmNo"
+         AND C."BormNo"  = M."BormNo"
     WHERE  M."DataYM"  =  YYYYMM
       AND  M."Status" IN (0, 2, 7)   -- 正常件, 催收, 部分轉呆
-      AND  ( ( F."Ifrs9StepProdCode" IN ('B') ) OR
-             ( F."Ifrs9StepProdCode" NOT IN ('B') AND TRUNC(NVL(C."EffectDate",0) / 100) <= YYYYMM )  -- 非浮動階梯, skip 尚未生效者
-           )
-      ;
+      AND CASE
+            WHEN F."Ifrs9StepProdCode" IN ('B')
+            THEN 1
+            WHEN F."Ifrs9StepProdCode" NOT IN ('B')
+                 AND TRUNC(NVL(C."EffectDate",0) / 100) <= YYYYMM -- 非浮動階梯, skip 尚未生效者
+            THEN 1
+          ELSE 0
+          END = 1
+      -- AND  ( ( F."Ifrs9StepProdCode" IN ('B') ) OR
+      --        ( F."Ifrs9StepProdCode" NOT IN ('B') AND TRUNC(NVL(C."EffectDate",0) / 100) <= YYYYMM )  -- 非浮動階梯, skip 尚未生效者
+      --      )
+    ;
 
     INS_CNT := INS_CNT + sql%rowcount;
     DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp LoanRateChange END');

@@ -55,6 +55,18 @@ D(8)
 <include src="PRT.icf::PRTHEAD.rtn"/>
 </sub>
 
+!---------- TXFORM = L6880 ----------
+<sub type="FORM" name="L6880">
+
+#SCRTIL=_,_,S
+T(3,[L6880] 系統換日)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+
+</sub>
+
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
 #iEntday
@@ -66,7 +78,8 @@ D(8)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
-TXFORM=L6880^
+TXFORM=L6880
+^
 
 </sub>
 

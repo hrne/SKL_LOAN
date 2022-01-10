@@ -116,7 +116,7 @@ BEGIN
                 ELSE SUBSTR('000000' || TRIM("CustMain"."IndustryCode"), -6)
            END                                  AS "IndustryCode"       -- 授信行業別
          , NVL("CdCl"."ClTypeJCIC", ' ')        AS "ClTypeJCIC"         -- 擔保品類別
-         , NVL("CdArea"."Zip3", ' ')            AS "Zip3"               -- 擔保品地區別(郵遞區號)
+         , NVL("CdArea"."Zip3", TCA."Zip3")     AS "Zip3"               -- 擔保品地區別(郵遞區號)
          , NVL("FacMain"."ProdNo", ' ')         AS "ProdNo"             -- 商品利率代碼
          , CASE
              WHEN "CustMain"."EntCode" = 0 THEN 2
@@ -159,6 +159,18 @@ BEGIN
                       AND "CdCl"."ClCode2"     = CFl."ClCode2"
       LEFT JOIN "CdArea"   ON "CdArea"."CityCode"   = "ClMain"."CityCode"
                           AND "CdArea"."AreaCode"   = "ClMain"."AreaCode"
+      -- 串不到CdArea時,用ClMain.CityCode串取後取第一筆
+      LEFT JOIN (
+        SELECT "CityCode" 
+             , "Zip3"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY "CityCode"
+                 ORDER BY "AreaCode"
+               )                         AS "Seq"
+        FROM "CdArea"
+      ) TCA ON TCA."CityCode" = "ClMain"."CityCode"
+           AND TCA."Seq" = 1
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;
@@ -176,7 +188,10 @@ BEGIN
                  , W."BormNo"
                  , NVL(F."ProdNo", ' ')      AS "ProdNo"
                  , NVL(L."OvduDays", 0)      AS "OvduDays"
-                 , NVL(F."AgreementFg", 'N') AS "AgreementFg"  -- 是否為協議商品 Y:是 N:否
+                 --, NVL(F."AgreementFg", 'N') AS "AgreementFg"  -- 是否為協議商品 Y:是 N:否
+                 , CASE WHEN NVL(F."ProdNo", ' ')  IN '60' THEN 'Y'
+                        ELSE 'N'
+                   END                       AS "AgreementFg"  -- 是否為協議商品 Y:是 N:否
                  , CASE WHEN LOS."CustNo" IS NULL THEN 'N'
                         ELSE 'Y'
                    END                       AS "LossFg"       -- 是否符合特殊客觀減損狀況檔 Y:是 N:否

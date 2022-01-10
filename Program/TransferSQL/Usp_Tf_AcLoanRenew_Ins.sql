@@ -80,7 +80,7 @@ BEGIN
     LEFT JOIN TX ON TX."LMSACN" = S1."LMSACN"
                 AND TX."LMSAPN" = S1."LMSAPN"
                 AND TX."LMSASQ" = S1."LMSASQ"
-                AND TX."Seq"
+                AND TX."Seq" = 1
     ;
 
     -- 記錄寫入筆數

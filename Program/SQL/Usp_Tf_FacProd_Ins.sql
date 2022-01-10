@@ -120,7 +120,7 @@ BEGIN
              WHEN NVL("TB$TBLP"."PSNBCD",0) = 2 THEN 0.1  -- 11/18 Wei修改
            ELSE 0 END                     AS "BreachDecrease"      -- 分段遞減百分比 DECIMAL 2 0
           ,0                              AS "BreachStartPercent"  -- 還款起算比例% decimal 5 2
-          ,NVL("TB$TBLP"."STRFLG",' ')    AS "Ifrs9StepProdCode"   -- IFRS階梯商品別 varchar2 1
+          ,NVL("TB$TBLP"."STRFLG",'N')    AS "Ifrs9StepProdCode"   -- IFRS階梯商品別 varchar2 1
           ,TRIM("TB$TBLP"."PRDGRP")       AS "Ifrs9ProdCode"       -- IFRS產品別 varchar2 2
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0

@@ -52,6 +52,184 @@ BEGIN
     INS_CNT := 0;
 
     INSERT INTO "LoanIfrs9Ap"
+    WITH Total AS (
+      -- 各戶號放款餘額加總
+      SELECT "DataYM"                 AS "DataYM"
+           , "CustNo"                 AS "CustNo"
+           , SUM("LoanBal")           AS "LoanBalTotal"
+      FROM "JcicMonthlyLoanData"
+      WHERE "DataYM" =  YYYYMM
+      GROUP BY "DataYM"
+             , "CustNo"
+    )
+    , FacTotal AS (
+      -- 各額度放款餘額加總
+      SELECT "DataYM"                 AS "DataYM"
+           , "CustNo"                 AS "CustNo"
+           , "FacmNo"                 AS "FacmNo"
+           , SUM("LoanBal")           AS "LoanBalTotal"
+      FROM "Ifrs9LoanData"
+      WHERE "DataYM" =  YYYYMM
+      GROUP BY "DataYM"
+             , "CustNo"
+             , "FacmNo"
+    )
+    , Law AS (
+      -- 把本月各戶號法拍費用餘額撈出來
+      SELECT "CustNo"
+           , SUM("Fee") AS "Fee"
+      FROM "ForeclosureFee"
+      WHERE TRUNC("OpenAcDate" / 100) <= YYYYMM
+        AND CASE
+              WHEN "CloseDate" = 0 -- 未銷直接計入
+              THEN 1
+              WHEN TRUNC("CloseDate" / 100) > YYYYMM -- 銷帳日期大於本月,計入
+              THEN 1
+            ELSE 0
+            END = 1
+      GROUP BY "CustNo"
+    )
+    , Insu AS (
+      -- 把本月各額度火險費餘額撈出來
+      SELECT "CustNo"
+           , "FacmNo"
+           , SUM("TotInsuPrem") AS "Fee"
+      FROM "InsuRenew"
+      WHERE TRUNC("InsuStartDate" / 100) <= YYYYMM
+        AND CASE
+              WHEN "AcDate" = 0 -- 未銷直接計入
+              THEN 1
+              WHEN TRUNC("AcDate" / 100) > YYYYMM -- 銷帳日期大於本月,計入
+              THEN 1
+            ELSE 0
+            END = 1
+      GROUP BY "CustNo"
+             , "FacmNo"
+    )
+    , FeeData AS (
+      SELECT M."DataYM"
+           , M."CustNo"
+           , M."FacmNo"
+           , M."BormNo"
+           , M."LoanBal"
+           , T."LoanBalTotal"
+           , FT."LoanBalTotal" AS "FacLoanBalTotal"
+           , NVL(L."Fee",0) AS "LawFee"
+           , NVL(I."Fee",0) AS "InsuFee"
+      FROM "JcicMonthlyLoanData" M
+      LEFT JOIN Total T ON T."DataYM" = M."DataYM"
+                       AND T."CustNo" = M."CustNo"
+      LEFT JOIN FacTotal FT ON FT."DataYM" = M."DataYM"
+                           AND FT."CustNo" = M."CustNo"
+                           AND FT."FacmNo" = M."FacmNo"
+      LEFT JOIN Law L ON L."CustNo" = M."CustNo"
+      LEFT JOIN Insu I ON I."CustNo" = M."CustNo"
+                      AND I."FacmNo" = M."FacmNo"
+      WHERE M."DataYM" = YYYYMM
+    )
+    , AvgFeeDataBase AS (
+      -- 以撥款層的放款餘額與佔總戶號放款餘額比例
+      -- 分配法拍及火險費用
+      SELECT "DataYM"
+           , "CustNo"
+           , "FacmNo"
+           , "BormNo"
+           , "LoanBal"
+           , "LoanBalTotal"
+           , "FacLoanBalTotal"
+           , "LawFee"
+           , "InsuFee"
+           , ROUND("LawFee" * "LoanBal" / "LoanBalTotal",0) AS "AvgLawFee"
+           , ROUND("InsuFee" * "LoanBal" / "FacLoanBalTotal",0) AS "AvgInsuFee"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "DataYM"
+                          , "CustNo"
+               ORDER BY "FacmNo"
+                      , "BormNo"
+             )                                  AS "Seq"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "DataYM"
+                          , "CustNo"
+                          , "FacmNo"
+               ORDER BY "BormNo"
+             )                                  AS "FacSeq"
+      FROM FeeData
+      WHERE "LawFee" + "InsuFee" > 0
+        AND "LoanBal" > 0
+        AND "LoanBalTotal" > 0
+        AND "FacLoanBalTotal" > 0
+    )
+    , GetMaxSeq AS (
+      SELECT "DataYM"
+           , "CustNo"
+           , MAX("Seq") AS "MaxSeq"
+      FROM AvgFeeDataBase
+      GROUP BY "DataYM"
+             , "CustNo"
+    )
+    , GetFacMaxSeq AS (
+      SELECT "DataYM"
+           , "CustNo"
+           , "FacmNo"
+           , MAX("FacSeq") AS "MaxSeq"
+      FROM AvgFeeDataBase
+      GROUP BY "DataYM"
+             , "CustNo"
+             , "FacmNo"
+    )
+    , AvgFeeDataFinal AS (
+      -- 最後一筆用總費用減去其他筆費用
+      SELECT B."DataYM"
+           , B."CustNo"
+           , B."FacmNo"
+           , B."BormNo"
+           , CASE
+               WHEN B."Seq" = G1."MaxSeq"
+               THEN B."LawFee" - NVL(O1."OtherLawFee",0)
+             ELSE B."AvgLawFee"
+             END                                AS "AvgLawFee"
+           , CASE
+               WHEN B."FacSeq" = G2."MaxSeq"
+               THEN B."InsuFee" - NVL(O2."OtherInsuFee",0)
+             ELSE B."AvgInsuFee"
+             END                                AS "AvgInsuFee"
+      FROM AvgFeeDataBase B
+      LEFT JOIN (
+        SELECT B."DataYM"
+             , B."CustNo"
+             , SUM(B."AvgLawFee") AS "OtherLawFee"
+        FROM AvgFeeDataBase B
+        LEFT JOIN GetMaxSeq G ON G."DataYM" = B."DataYM"
+                             AND G."CustNo" = B."CustNo"
+        WHERE B."Seq" < G."MaxSeq"
+        GROUP BY B."DataYM"
+               , B."CustNo"
+      ) O1 ON O1."DataYM" = B."DataYM"
+          AND O1."CustNo" = B."CustNo"
+      LEFT JOIN (
+        SELECT B."DataYM"
+             , B."CustNo"
+             , B."FacmNo"
+             , SUM(B."AvgInsuFee") AS "OtherInsuFee"
+        FROM AvgFeeDataBase B
+        LEFT JOIN GetFacMaxSeq G ON G."DataYM" = B."DataYM"
+                                AND G."CustNo" = B."CustNo"
+                                AND G."FacmNo" = B."FacmNo"
+        WHERE B."FacSeq" < G."MaxSeq"
+        GROUP BY B."DataYM"
+               , B."CustNo"
+               , B."FacmNo"
+      ) O2 ON O2."DataYM" = B."DataYM"
+          AND O2."CustNo" = B."CustNo"
+          AND O2."FacmNo" = B."FacmNo"
+      LEFT JOIN GetMaxSeq G1 ON G1."DataYM" = B."DataYM"
+                            AND G1."CustNo" = B."CustNo"
+      LEFT JOIN GetFacMaxSeq G2 ON G2."DataYM" = B."DataYM"
+                               AND G2."CustNo" = B."CustNo"
+                               AND G2."FacmNo" = B."FacmNo"
+    )    
     SELECT
            YYYYMM                                    AS "DataYM"            -- 資料年月
          , M."CustNo"                                AS "CustNo"            -- 戶號
@@ -76,12 +254,8 @@ BEGIN
          , CASE WHEN M."Status" IN (0) THEN NVL(M."IntAmt", 0)
                 ELSE 0
            END                                       AS "IntAmt"            -- 應收利息          --計算至每月月底之撥款應收利息
-         , CASE WHEN (NVL(F."LawFee", 0) + NVL(F."FireFee", 0)) = 0 THEN 0
-                WHEN NVL(M."LoanBal", 0) = 0                        THEN 0
-                WHEN NVL(F."TotalLoanBal", 0) = 0                   THEN 0
-                ELSE NVL(F."LawFee",  0) * NVL(M."LoanBal", 0) / NVL(F."TotalLoanBal", 0)
-                   + NVL(F."FireFee", 0) * NVL(M."LoanBal", 0) / NVL(F."TotalLoanBal", 0)
-           END                                       AS "Fee"               -- 法拍及火險費用
+         , NVL(AF."AvgLawFee",0)
+           + NVL(AF."AvgInsuFee",0)                  AS "Fee"               -- 法拍及火險費用
          , ROUND(NVL(M."Rate", 0) / 100, 6)          AS "Rate"              -- 利率(撥款)        --抓取月底時適用利率
          , CASE
              WHEN M."Status" IN (3)   THEN 0
@@ -90,9 +264,26 @@ BEGIN
          , NVL(M."OvduDate", 0)                      AS "OvduDate"          -- 轉催收款日期
          , NVL(M."BadDebtDate", 0)                   AS "BadDebtDate"       -- 轉銷呆帳日期
          , NVL(M."BadDebtAmt", 0)                    AS "BadDebtAmt"        -- 轉銷呆帳金額
-         , NVL(F."GracePeriod", 0)                   AS "GracePeriod"       -- 初貸時約定還本寬限期
+         , CASE 
+             WHEN NVL(LM."GraceDate", 0) = 0  THEN 0
+--             ELSE TRUNC( MONTHS_BETWEEN(
+--                                  TO_DATE(NVL(LM."GraceDate", 0),'yyyymmdd'),
+--                                  TO_DATE(NVL(LM."DrawdownDate", 0),'yyyymmdd') 
+--                                )
+             WHEN ( MOD( NVL(LM."GraceDate", 0) , 100) - MOD( NVL(LM."DrawdownDate", 0) , 100) ) >= 15 THEN
+                    ( TRUNC(NVL(LM."GraceDate", 0) / 10000 ) - TRUNC(NVL(LM."DrawdownDate", 0) / 10000 ) ) *12 +         
+                    ( MOD( TRUNC(NVL(LM."GraceDate", 0) / 100 ),100) - 
+                      MOD( TRUNC(NVL(LM."DrawdownDate", 0) / 100 ),100)   )   + 1
+             WHEN ( MOD( NVL(LM."GraceDate", 0) , 100) - MOD( NVL(LM."DrawdownDate", 0) , 100) ) < (-15) THEN
+                    ( TRUNC(NVL(LM."GraceDate", 0) / 10000 ) - TRUNC(NVL(LM."DrawdownDate", 0) / 10000 ) ) *12 +         
+                    ( MOD( TRUNC(NVL(LM."GraceDate", 0) / 100 ),100) - 
+                      MOD( TRUNC(NVL(LM."DrawdownDate", 0) / 100 ),100)   )   - 1
+             ELSE
+                  ( TRUNC(NVL(LM."GraceDate", 0) / 10000 ) - TRUNC(NVL(LM."DrawdownDate", 0) / 10000 ) ) *12 +         
+                  ( MOD( TRUNC(NVL(LM."GraceDate", 0) / 100 ),100) - 
+                    MOD( TRUNC(NVL(LM."DrawdownDate", 0) / 100 ),100)   )      
+           END                                       AS "GracePeriod"       -- 初貸時約定還本寬限期:寬限到期日至撥款日計算月差
          , ROUND(NVL(M."ApproveRate", 0) / 100, 6)   AS "ApproveRate"       -- 核准利率
---         , to_number(NVL(M."AmortizedCode", 0))      AS "AmortizedCode"     -- 契約當時還款方式  -- 1=按期繳息(到期還本)；2=平均攤還本息；3=平均攤還本金；4=到期繳息還本
          , CASE
              WHEN NVL(M."AmortizedCode",'0') = '1' THEN '1'  -- 1.按月繳息(按期繳息到期還本)
              WHEN NVL(M."AmortizedCode",'0') = '2' THEN '4'  -- 2.到期取息(到期繳息還本)
@@ -108,17 +299,14 @@ BEGIN
              WHEN NVL(M."RateCode", '0')  = '2'           THEN 2  -- 固定
              ELSE to_number(NVL(M."RateCode", '0'))
            END                                       AS "RateCode"          -- 契約當時利率調整方式（1=機動；2=固定；3=固定階梯；4=浮動階梯）
---         , NVL(M."RepayFreq", 0)                     AS "RepayFreq"         -- 契約約定當時還本週期
          , CASE WHEN NVL(M."AmortizedCode", '0') IN ('1', '2') THEN 0  -- 到期還本
                 ELSE NVL(M."RepayFreq", 0)
            END                                       AS "RepayFreq"         -- 契約約定當時還本週期
---         , NVL(M."PayIntFreq", 0)                    AS "PayIntFreq"        -- 契約約定當時繳息週期
          , CASE WHEN NVL(M."AmortizedCode",'0') = '2' THEN 0  -- 到期繳息還本
                 ELSE NVL(M."PayIntFreq",0)
            END                                       AS "PayIntFreq"        -- 契約約定當時繳息週期
          , NVL(F."IndustryCode", ' ')                AS "IndustryCode"      -- 授信行業別
          , NVL(F."ClTypeJCIC", ' ')                  AS "ClTypeJCIC"        -- 擔保品類別
---         , NVL("CdCity"."JcicCityCode", ' ')         AS "CityCode"          -- 擔保品地區別
          , CASE 
              WHEN NVL(F."CityCode", ' ') = '05' THEN 'A'
              WHEN NVL(F."CityCode", ' ') = '10' THEN 'B' 
@@ -165,6 +353,13 @@ BEGIN
                                  AND F."CustNo"      =  M."CustNo"
                                  AND F."FacmNo"      =  M."FacmNo"
       LEFT JOIN "CdCity" ON to_number("CdCity"."CityCode") = to_number(NVL(trim(F."CityCode"), 0))
+      LEFT JoIN "LoanBorMain" LM  ON LM."CustNo"     =  M."CustNo"
+                                 AND LM."FacmNo"     =  M."FacmNo"
+                                 AND LM."BormNo"     =  M."BormNo"
+      LEFT JOIN AvgFeeDataFinal AF ON AF."DataYM" = M."DataYM"
+                                  AND AF."CustNo" = M."CustNo"
+                                  AND AF."FacmNo" = M."FacmNo"
+                                  AND AF."BormNo" = M."BormNo"
     WHERE  M."DataYM"  =  YYYYMM
       AND  TRUNC(NVL(M."DrawdownDate", 0) / 100 ) <= YYYYMM
       ;

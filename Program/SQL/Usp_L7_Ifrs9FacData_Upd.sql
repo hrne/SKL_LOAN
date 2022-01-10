@@ -133,7 +133,7 @@ BEGIN
          , NVL("CdCl"."ClTypeJCIC", ' ')        AS "ClTypeJCIC"        -- 擔保品類別
          , NVL("ClMain"."CityCode", ' ')        AS "CityCode"          -- 擔保品地區別
          , NVL("ClMain"."AreaCode", ' ')        AS "AreaCode"          -- 擔保品鄉鎮區
-         , NVL("CdArea"."Zip3", ' ')            AS "Zip3"              -- 擔保品郵遞區號
+         , NVL("CdArea"."Zip3", TCA."Zip3")     AS "Zip3"              -- 擔保品郵遞區號
          , NVL(F."ProdNo", ' ')                 AS "ProdNo"            -- 商品利率代碼
          , NVL("FacProd"."AgreementFg", 'N')    AS "AgreementFg"       -- 是否為協議商品 (Y:是 N:否)
          , NVL("CustMain"."EntCode", ' ')       AS "EntCode"           -- 企金別  (0:個金 1:企金 2:企金自然人)
@@ -195,23 +195,53 @@ BEGIN
                              AND "CdCl"."ClCode2"    = Cl."ClCode2"
       LEFT JOIN "CdArea"      ON "CdArea"."CityCode"      = "ClMain"."CityCode"
                              AND "CdArea"."AreaCode"      = "ClMain"."AreaCode"
+      -- 2022-01-04 智偉新增:串不到CdArea時,用ClMain.CityCode串取後取第一筆
+      LEFT JOIN (
+        SELECT "CityCode" 
+             , "Zip3"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY "CityCode"
+                 ORDER BY "AreaCode"
+               )                         AS "Seq"
+        FROM "CdArea"
+      ) TCA ON TCA."CityCode" = "ClMain"."CityCode"
+           AND TCA."Seq" = 1
       LEFT JOIN ( SELECT F."CustNo"
                       , F."FacmNo"
                       , F."ApplNo"
                       , SUM( NVL(B."EvaUnitPrice",0) *
-                             ( NVL(B."FloorArea",0) + NVL(P."Area",0) + NVL(C."ParkingArea",0) )
+                             ( NVL(B."FloorArea",0) + NVL(P."PublicAreaTotal",0) + NVL(C."ParkingAreaTotal",0) )
                            ) AS "EvaAmt"
                  FROM   "FacMain" F
                    LEFT JOIN "ClFac" CL  ON CL."ApproveNo" = F."ApplNo"
                    LEFT JOIN "ClBuilding" B  ON B."ClCode1"   = CL."ClCode1"
                                             AND B."ClCode2"   = CL."ClCode2"
                                             AND B."ClNo"      = CL."ClNo"
-                   LEFT JOIN "ClBuildingPublic" P  ON p."ClCode1"   = CL."ClCode1"
-                                                  AND P."ClCode2"   = CL."ClCode2"
-                                                  AND P."ClNo"      = CL."ClNo"
-                   LEFT JOIN "ClParking" C  ON C."ClCode1"  = CL."ClCode1"
-                                                   AND C."ClCode2"  = CL."ClCode2"
-                                                   AND C."ClNo"     = CL."ClNo"
+                   LEFT JOIN (
+                     SELECT "ClCode1"
+                          , "ClCode2"
+                          , "ClNo"
+                          , SUM("Area") AS "PublicAreaTotal"
+                     FROM "ClBuildingPublic"
+                     GROUP BY "ClCode1"
+                            , "ClCode2"
+                            , "ClNo"
+                   ) P ON p."ClCode1"   = CL."ClCode1"
+                      AND P."ClCode2"   = CL."ClCode2"
+                      AND P."ClNo"      = CL."ClNo"
+                   LEFT JOIN (
+                     SELECT "ClCode1"
+                          , "ClCode2"
+                          , "ClNo"
+                          , SUM("ParkingArea") AS "ParkingAreaTotal"
+                     FROM "ClParking"
+                     GROUP BY "ClCode1"
+                            , "ClCode2"
+                            , "ClNo"
+                   ) C  ON C."ClCode1"  = CL."ClCode1"
+                       AND C."ClCode2"  = CL."ClCode2"
+                       AND C."ClNo"     = CL."ClNo"
                  WHERE  CL."ClCode1"  IN (1)
                  GROUP BY F."CustNo", F."FacmNo", F."ApplNo"
                ) Eva1   ON Eva1."CustNo"  =  F."CustNo"

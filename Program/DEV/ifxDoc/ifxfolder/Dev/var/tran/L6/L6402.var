@@ -181,14 +181,16 @@ T(1,#TranNo,1,1)
 ! 2021-04-27 智偉增加判斷,LH LP LW LY 放L9
 #Aptype2=X,1,S
 T(1,#TranNo,2,1)
-@V(3,1,2,3,4,5,6,7,8,9,C,M)
+@
 SWITCH(#Aptype2,M,T(3,9),
                 D,T(3,9),
                 H,T(3,9),
                 P,T(3,9),
+                Q,T(3,9),
                 W,T(3,9),
                 Y,T(3,9),
                 $)
+V(3,1,2,3,4,5,6,7,8,9,C,M)
 
 #Aptype3=X,1,S
 T(1,#TranNo,3,1)
@@ -210,6 +212,7 @@ SWITCH(#Aptype,LM,T(3,L9),
                LD,T(3,L9),
                LH,T(3,L9),
                LP,T(3,L9),
+               LQ,T(3,L9),
                LW,T(3,L9),
                LY,T(3,L9),
                $)

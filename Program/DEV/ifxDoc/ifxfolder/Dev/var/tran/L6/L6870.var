@@ -43,7 +43,7 @@ E(0,#SYSDATE)
 <include src="PRT.icf::PRTHEAD.rtn"/>
 </sub>
 
-!---------- TXFORM = LC710 ----------
+!---------- TXFORM = L6870 ----------
 <sub type="FORM" name="L6870">
 
 #SCRTIL=_,_,S
