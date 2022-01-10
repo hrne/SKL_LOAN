@@ -47,7 +47,7 @@ public class L6403Batch extends TradeBuffer {
 
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
-
+	
 	@Autowired
 	public DataLog dataLog;
 
@@ -81,7 +81,8 @@ public class L6403Batch extends TradeBuffer {
 
 			tTxAuthGroup = new TxAuthGroup();
 			tTxAuthGroup = MoveToAuthGroup(iAuthNo, tTxAuthGroup, titaVo);
-			tTxAuthGroup.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tTxAuthGroup.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tTxAuthGroup.setCreateEmpNo(titaVo.getTlrNo());
 			try {
 				this.info("TxAuthGroup Authno = " + tTxAuthGroup.getAuthNo());
@@ -106,10 +107,11 @@ public class L6403Batch extends TradeBuffer {
 					InsertAllAuthority(iAuthNo, titaVo);
 
 					dataLog.compareOldNew("無權限");
-
+					
 					dataLog.setEnv(titaVo, tTxAuthGroup2, tTxAuthGroup);
 					dataLog.exec("修改權限群組 " + tTxAuthGroup.getAuthNo());
 
+					
 				} else if ("4".equals(iFunCode)) {
 					sTxAuthGroupService.delete(tTxAuthGroup);
 					DeleteAllAuthority(iAuthNo, titaVo);
@@ -123,7 +125,8 @@ public class L6403Batch extends TradeBuffer {
 			}
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "已成功更新權限群組" + iAuthNo + "交易權限", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "",
+				"已成功更新權限群組" + iAuthNo + "交易權限", titaVo);
 
 		return null;
 	}
@@ -249,7 +252,7 @@ public class L6403Batch extends TradeBuffer {
 
 		}
 		// L9
-		for (int i = 1; i <= 50; i++) {
+		for (int i = 1; i <= 80; i++) {
 			String iTranNo = titaVo.get("ApiCode" + i);
 
 			if (iTranNo != null) {
@@ -264,7 +267,8 @@ public class L6403Batch extends TradeBuffer {
 
 	}
 
-	private void InserOnetAuthority(String AuthNo, String TranNo, String CanFg, String InqFg, TitaVo titaVo) throws LogicException {
+	private void InserOnetAuthority(String AuthNo, String TranNo, String CanFg, String InqFg, TitaVo titaVo)
+			throws LogicException {
 //		this.info("L6403 > InserOnetAuthority = " + AuthNo + "/" + TranNo + "/" + CanFg + "/" + InqFg);
 		TxAuthority tTxAuthority = new TxAuthority();
 		int AuthFg = 0;
@@ -286,7 +290,8 @@ public class L6403Batch extends TradeBuffer {
 				TxAuthorityId tTxAuthorityId = new TxAuthorityId(AuthNo, TranNo);
 				tTxAuthority.setTxAuthorityId(tTxAuthorityId);
 				tTxAuthority.setAuthFg(AuthFg);
-				tTxAuthority.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tTxAuthority.setCreateDate(
+						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 				tTxAuthority.setCreateEmpNo(titaVo.getTlrNo());
 				sTxAuthorityService.insert(tTxAuthority, titaVo);
 			} catch (DBException e) {

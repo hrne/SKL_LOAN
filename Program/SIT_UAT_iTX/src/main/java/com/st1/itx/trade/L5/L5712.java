@@ -26,6 +26,7 @@ import com.st1.itx.db.service.NegMainService;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -48,7 +49,8 @@ public class L5712 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
-
+	@Autowired
+	public DataLog dataLog;
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -77,7 +79,8 @@ public class L5712 extends TradeBuffer {
 		if (tNegAppr02 == null) {
 			throw new LogicException(titaVo, "E0001", "一般債權撥付資料檔 ");
 		}
-
+		NegAppr02 bNegAppr02 = (NegAppr02) dataLog.clone(tNegAppr02); 
+		
 		BigDecimal OOPayAmt = tNegAppr02.getTxAmt();
 		titaVo.setTxAmt(OOPayAmt);
 		NegTransId tNegTransId = new NegTransId();
@@ -122,6 +125,8 @@ public class L5712 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "一般債權撥付資料檔 " + tNegAppr02Id + e.getErrorMsg());
 			}
+			dataLog.setEnv(titaVo, bNegAppr02, tNegAppr02); ////
+			dataLog.exec("修改一般債權撥付資料檔"); ////
 
 		} else {
 
@@ -157,7 +162,8 @@ public class L5712 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "一般債權撥付資料檔 " + tNegAppr02Id + e.getErrorMsg());
 			}
-
+			dataLog.setEnv(titaVo, bNegAppr02, tNegAppr02); ////
+			dataLog.exec("訂正一般債權撥付資料檔"); ////
 		}
 
 		this.addList(this.totaVo);

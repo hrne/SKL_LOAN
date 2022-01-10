@@ -55,7 +55,7 @@ C(3,#FunCode,3,SHOW(#AuthNoFd2,#AuthNo2),HIDE(#AuthNoFd2,#AuthNo2))
 !Ap6: 130
 !Ap7: 20
 !Ap8: 150
-!Ap9: 50
+!Ap9: 80
 
 #ApL=X,26000,S  
 
@@ -102,7 +102,7 @@ INVOKEJS(SHOW,grd7_{i},0)
 ##loop {times:150,i:1}
 INVOKEJS(SHOW,grd8_{i},0)
 ##end
-##loop {times:50,i:1}
+##loop {times:80,i:1}
 INVOKEJS(SHOW,grd9_{i},0)
 ##end
 
@@ -1072,7 +1072,7 @@ C(2,#AphType{i},$,$,C(5,#AphBtn{i},V,C(3,#AphSno{i},#it1,T(2,@OihBtn{i},#it2),$)
 #Ap9ProcA=@,1,S
 T(1,@ApCount,#ApL9,1,3)
 E(0,@ApIdx,4)
-##loop {times:50,i:1,j:0}
+##loop {times:80,i:1,j:0}
 T(1,@ApiType{i},#ApL9,#ApIdx,1)
 E(0,@ApIdx,#ApIdx+1)
 T(1,@ApiSno{i},#ApL9,#ApIdx,2)
@@ -1089,7 +1089,7 @@ C(3,#ApCount,{i},s,$)
 ##end
 
 #Ap9ProcB=@,1,S
-##loop {times:50,i:1,j:0}
+##loop {times:80,i:1,j:0}
 C(2,#ApiAuth{i},T(3,@ApiBtn{i}, ),T(3,@ApiBtn{i},V),T(3,@ApiBtn{i},V))
 C(2,#ApiAuth{i},T(3,@OiiBtn{i}, ),T(3,@OiiBtn{i},V),T(3,@OiiBtn{i}, ))
 C(2,#ApiType{i},T(3,@ApiTypeX{i},子選單),T(3,@ApiTypeX{i},查詢交易),T(3,@ApiTypeX{i},維護交易),$)
@@ -1106,7 +1106,7 @@ BIND(#ApiBtn0,click, {cmd=CALLSEND;DOCODE=ApiBtnProc0})
 #ApiBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#ApiBtn0,V,T(3,@ApiBtn0, ),T(3,@ApiBtn0,V))
-##loop {times:50,i:1}
+##loop {times:80,i:1}
 T(2,@ApiBtn{i},#ApiBtn0)
 C(5,#ApiBtn{i},V,C(3,#ApiType{i},1,T(3,@OiiBtn{i},V),$),T(3,@OiiBtn{i}, ))
 ##end
@@ -1119,12 +1119,12 @@ BIND(#OiiBtn0,click, {cmd=CALLSEND;DOCODE=OiiBtnProc0})
 #OiiBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#OiiBtn0,V,T(3,@OiiBtn0, ),T(3,@OiiBtn0,V))
-##loop {times:50,i:1}
+##loop {times:80,i:1}
 C(2,#ApiType{i},T(2,@OiiBtn{i},#OiiBtn0),$,C(5,#ApiBtn{i},V,T(2,@OiiBtn{i},#OiiBtn0),$)) 
 ##end
 
 !
-##loop {times:50,i:1}
+##loop {times:80,i:1}
 !權限勾選按鈕
 #ApiBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
 !限查詢按鈕
@@ -1164,13 +1164,13 @@ C(3,#ApiType{i},0,CALL(#OiiSub,#ApiSno{i},#OiiBtn{i}),$)
 ##end
 
 #ApiSub=@,1,S
-##loop {times:50,i:1}
+##loop {times:80,i:1}
 C(3,#ApiSno{i},#it1,T(2,@ApiBtn{i},#it2),$)
 C(5,#ApiBtn{i},V,C(3,#ApiType{i},1,T(3,@OiiBtn{i},V),$),T(3,@OiiBtn{i}, ))
 ##end
 
 #OiiSub=@,1,S
-##loop {times:50,i:1}
+##loop {times:80,i:1}
 C(2,#ApiType{i},$,$,C(5,#ApiBtn{i},V,C(3,#ApiSno{i},#it1,T(2,@OiiBtn{i},#it2),$),$)) 
 ##end
 
@@ -1466,7 +1466,7 @@ T(2,CODE:+#AuthNo)
 [
 [],
 [#<->#,"L9.報表作業"],
-["#grid#,{id:9,expand:true,loop:50,row_height:1}","　",
+["#grid#,{id:9,expand:true,loop:80,row_height:1}","　",
 [[#ApiBtn0,"執行權限"],[#OiiBtn0,"限查詢"],"代號","名稱","類別"],
 [#ApiBtn1,#OiiBtn1,#ApiCode1,#ApiDesc1,#ApiTypeX1]
 ],
@@ -1524,7 +1524,7 @@ T(2,CODE:+#AuthNo)
 #AphBtn{i}
 #OihBtn{i}
 ##end
-##loop {times:50,i:1}
+##loop {times:80,i:1}
 #ApiCode{i}
 #ApiBtn{i}
 #OiiBtn{i}

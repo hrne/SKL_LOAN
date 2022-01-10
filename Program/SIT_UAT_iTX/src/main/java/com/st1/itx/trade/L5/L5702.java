@@ -24,6 +24,7 @@ import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
 /*DB服務*/
 import com.st1.itx.util.common.NegCom;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.db.service.NegTransService;
 import com.st1.itx.db.service.NegAppr02Service;
 import com.st1.itx.db.service.NegMainService;
@@ -70,6 +71,8 @@ public class L5702 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
+	@Autowired
+	public DataLog dataLog;
 	@Autowired
 	public NegAppr02Service sNegAppr02Service;
 
@@ -136,6 +139,8 @@ public class L5702 extends TradeBuffer {
 				updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02
 
 			} else {
+				NegTrans bNegTrans = (NegTrans) dataLog.clone(tNegTrans); ////
+				
 				if (tNegTrans.getTxStatus() == 0) {
 					tNegTrans.setTxStatus(1); // 交易狀態0:未入帳;1:待處理;2:已入帳
 
@@ -150,6 +155,9 @@ public class L5702 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());// E0007 更新資料時，發生錯誤
 				}
+				dataLog.setEnv(titaVo, bNegTrans, tNegTrans); ////
+				dataLog.exec("修改債務協商交易檔"); ////
+				
 			}
 		} else { // 訂正
 
@@ -243,17 +251,19 @@ public class L5702 extends TradeBuffer {
 			for (NegAppr02 cNegAppr02 : lNegAppr02) {// 應該只有一筆
 
 				tNegAppr02 = sNegAppr02Service.holdById(cNegAppr02.getNegAppr02Id(), titaVo);
+				NegAppr02 bNegAppr02 = (NegAppr02) dataLog.clone(tNegAppr02); ////
 				if (titaVo.isHcodeNormal()) {
 					tNegAppr02.setTxStatus(2);
 				} else {
 					tNegAppr02.setTxStatus(1);
 				}
 				try {
-					sNegAppr02Service.update(tNegAppr02);
+					sNegAppr02Service.update(tNegAppr02,titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔 + tNegAppr02Id)"); // 更新資料時，發生錯誤
 				}
-
+				dataLog.setEnv(titaVo, bNegAppr02, tNegAppr02); ////
+				dataLog.exec("修改一般債權撥付資料檔"); ////
 				break;
 			}
 		}

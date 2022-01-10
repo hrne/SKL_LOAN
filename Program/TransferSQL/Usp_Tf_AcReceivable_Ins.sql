@@ -434,7 +434,7 @@ BEGIN
            , TMP.LMSAPN
            , CASE
                WHEN TMP."Seq" = M."MaxSeq" -- 如果是最後一筆
-               THEN TMP.LMSTOA - S."OthersLMSTOA" -- 用總金額 - 前幾筆的加總
+               THEN TMP.LMSTOA - NVL(S."OthersLMSTOA",0) -- 用總金額 - 前幾筆的加總
              ELSE TMP."NewLMSTOA"
              END AS "LMSTOA"
       FROM TMP

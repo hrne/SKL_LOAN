@@ -26,6 +26,7 @@ import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
 /*DB服務*/
 import com.st1.itx.util.common.NegCom;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.db.service.NegTransService;
 import com.st1.itx.db.service.NegAppr01Service;
 import com.st1.itx.db.service.NegMainService;
@@ -55,6 +56,8 @@ public class L5711 extends TradeBuffer {
 	public NegCom sNegCom;
 	@Autowired
 	public AcNegCom acNegCom;
+	@Autowired
+	public DataLog dataLog;
 	@Autowired
 	public AcDetailCom acDetailCom;
 	/* 日期工具 */
@@ -105,7 +108,7 @@ public class L5711 extends TradeBuffer {
 				if (mNegAppr01 == null) {
 					throw new LogicException(titaVo, "E0003", "會計日=" + iAcDAte + ",經辦=" + iTlrNo + ",交易序號=" + iTxtNo + ",債權機構=" + iFinCode); // 修改資料不存在
 				}
-
+				NegAppr01 bNegAppr01 = (NegAppr01) dataLog.clone(mNegAppr01); 
 				try {
 					SumApprAmt = SumApprAmt.add(parse.stringToBigDecimal(titaVo.getParam("ApprAmt" + i)));
 
@@ -116,6 +119,8 @@ public class L5711 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
+				dataLog.setEnv(titaVo, bNegAppr01, mNegAppr01); ////
+				dataLog.exec("修改最大債權撥付資料檔,債權機構:"+iFinCode); ////
 			}
 		}
 
@@ -136,7 +141,7 @@ public class L5711 extends TradeBuffer {
 				return;
 			}
 			BigDecimal oldSklShareAmt = iNegTrans.getSklShareAmt();
-
+			NegTrans bNegTrans = (NegTrans) dataLog.clone(iNegTrans); ////
 			try {
 				iNegTrans.setSklShareAmt(mApprAmt);
 				iNegTrans.setApprAmt(SumApprAmt);
@@ -145,6 +150,8 @@ public class L5711 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "債務協商交易檔"); // 更新資料時，發生錯誤
 			}
+			dataLog.setEnv(titaVo, bNegTrans, iNegTrans); ////
+			dataLog.exec("修改債務協商交易檔"); ////
 
 			if (this.txBuffer.getTxCom().isBookAcYes()) {
 				List<AcDetail> acDetailList = new ArrayList<AcDetail>();
@@ -201,7 +208,8 @@ public class L5711 extends TradeBuffer {
 			if (mAccuApprAmt.compareTo(tNegMain.getAccuSklShareAmt()) == 0) {
 				return;
 			}
-
+			NegMain bNegMain = (NegMain) dataLog.clone(tNegMain); 
+			
 			try {
 				this.info("mAccuApprAmt==" + mAccuApprAmt);
 				tNegMain.setAccuSklShareAmt(mAccuApprAmt);
@@ -210,6 +218,9 @@ public class L5711 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
+			dataLog.setEnv(titaVo, bNegMain, tNegMain); ////
+			dataLog.exec("修改債務協商案件主檔"); ////
+			
 		}
 	}
 
