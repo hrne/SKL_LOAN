@@ -140,15 +140,23 @@ public class Cs80UpDBS extends CommBuffer {
 			}
 
 			// 2021.10.13 by eric
-			this.info("CS80 before custRmk = " + this.titaVo.isTrmtypBatch() + "/" + tota.isError() + "/" + titaVo.getReturnIndex());
-			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
-				this.custRmk();
-			}
+//			this.info("CS80 before custRmk = " + this.titaVo.isTrmtypBatch() + "/" + tota.isError() + "/" + titaVo.getReturnIndex());
+//			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
+//				this.custRmk();
+//			}
 
 			if (!(this.titaVo.isTrmtypBatch() && this.titaVo.isHcodeErase()) && !this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
 				this.insTxRecord(tota);
 			}
 
+		}
+
+		// 2022.1.11 by eric
+		if (!this.titaVo.isTxcdSpecial()) {
+			TotaVo tota = this.totaVoList.get(0);
+			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
+				this.custRmk();
+			}
 		}
 
 		if (this.totaVoList.size() > 0 && this.totaVoList.get(0).isError()) {

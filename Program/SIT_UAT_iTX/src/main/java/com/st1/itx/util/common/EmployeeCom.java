@@ -53,8 +53,8 @@ public class EmployeeCom extends TradeBuffer {
 //         業務線代號        業務人員職等           內階職務
 //         等於 21    &&     第一碼不等於 F,G,J,Z
 //     or  等於  31       &&         第一碼不等於   K,Z
-//     or  不等於                    不等於 21,31,1C   
-// and     不等於   TU0036,TU0097
+//     or  不等於 21,31,1C   
+// and                                              不等於   TU0036,TU0097
 //
 //	     and( (AgLineCode = '21')
 //	    	     and (AgLevel NOT LIKE 'F%')

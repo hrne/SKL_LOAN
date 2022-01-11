@@ -234,7 +234,8 @@ V(7)A(DATE,0,#EntryDateFm)
 ! 入帳日期
 #EntryDateTo=D,7,I
 E(0,#EntryDateFm)
-@IF(#EntryDateTo<#EntryDateFm,V(P,起日不可大於迄日),$)
+@V(7)A(DATE,0,#EntryDateTo)
+IF(#EntryDateTo<#EntryDateFm,V(P,起日不可大於迄日),$)
 
 #OpItem=A,1,I
 IF(#FunctionCode == 2 || #FunctionCode == 3 ,$,S)

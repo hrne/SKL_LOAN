@@ -750,7 +750,7 @@ CALL2(#ADJUSTDOT,#Precision,#ChequeAmt,#ChequeAmtX)
 #BUF5A=X,7,S
 
 #BIND5A=X,1,S
-BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF5A;ntxbuf5=type<-1:BankCode<-OOTBankCode})
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF5A;ntxbuf5=type<-1:BankCode<-OOTBankCode:BankItem<-OOItem})
 
 ![行庫代號]
 #FdBankCode=X,2,L
