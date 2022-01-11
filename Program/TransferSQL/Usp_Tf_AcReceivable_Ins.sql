@@ -289,9 +289,9 @@ BEGIN
           ,''                  AS "SlipNote"         -- 傳票摘要
           ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
-          ,0                   AS "OpenAcDate"       -- 起帳日期
-          ,0                   AS "LastAcDate"       -- 最後作帳日
-          ,0                   AS "LastTxDate"       -- 最後交易日
+          ,NVL(S2."LMSLLD")    AS "OpenAcDate"       -- 起帳日期
+          ,S1."TRXDAT"         AS "LastAcDate"       -- 最後作帳日
+          ,S1."TRXDAT"         AS "LastTxDate"       -- 最後交易日
           ,''                  AS "TitaTxCd"         -- 交易代號
           ,''                  AS "TitaKinBr"        -- 
           ,''                  AS "TitaTlrNo"        -- 經辦
@@ -302,6 +302,9 @@ BEGIN
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LN$ACFP" S1
+    LEFT JOIN "LA$LMSP" S2 ON S2."LMSACN" = S1."LMSACN"
+                          AND S2."LMSAPN" = S1."LMSAPN"
+                          AND S2."LMSASQ" = S1."LMSASQ"
     ;
 
     -- 記錄寫入筆數
