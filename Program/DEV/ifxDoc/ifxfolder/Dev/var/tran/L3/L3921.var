@@ -121,7 +121,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,2),S)
 T(3,00000009999999000)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 
 
@@ -157,7 +157,7 @@ C(4,#CustNo,S,T(2,#L2r07CustName))
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #BUF6A=X,15,S
 T(2,10000000+#CustNo)

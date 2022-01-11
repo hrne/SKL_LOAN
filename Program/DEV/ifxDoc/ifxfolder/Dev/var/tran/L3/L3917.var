@@ -125,7 +125,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
 T(3,00000009999999000)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入

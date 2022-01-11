@@ -65,7 +65,7 @@ public class L3R01 extends TradeBuffer {
 		// 查詢額度主檔
 		FacMain tFacMain = facMainService.findById(new FacMainId(iRimCustNo, iRimFacmNo), titaVo);
 		if (tFacMain == null) {
-			throw new LogicException(titaVo, "E0001", "L3R01 額度主檔 借款人戶 = " + iRimCustNo + " 額度編號 = " + iRimFacmNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶 = " + iRimCustNo + " 額度編號 = " + iRimFacmNo); // 查詢資料不存在
 		}
 		// 查詢未齊件代碼檔
 		CdLoanNotYet cdLoanNotYet = cdLoanNotYetService.findById(iRimNotYetCode, titaVo);

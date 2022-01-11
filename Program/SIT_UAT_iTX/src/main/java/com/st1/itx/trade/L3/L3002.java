@@ -84,7 +84,8 @@ public class L3002 extends TradeBuffer {
 
 		// 查詢放款主檔
 		if (iCaseNo > 0) {
-			Slice<FacMain> slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacMain> slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, 0,
+					Integer.MAX_VALUE, titaVo);
 			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			if (lFacMain == null || lFacMain.size() == 0) {
 				throw new LogicException(titaVo, "E0001", "額度主檔 案件編號 = " + iCaseNo); // 查詢資料不存在
@@ -111,7 +112,8 @@ public class L3002 extends TradeBuffer {
 			lBormStatus.add(8); // 8: 債權轉讓戶
 			lBormStatus.add(9); // 9: 呆帳結案戶
 
-			slLoanBorMain = loanBorMainService.bormDrawdownDateRange(iDrawdownDateS + 19110000, iDrawdownDateE + 19110000, 1, 900, lBormStatus, this.index, this.limit, titaVo);
+			slLoanBorMain = loanBorMainService.bormDrawdownDateRange(iDrawdownDateS + 19110000,
+					iDrawdownDateE + 19110000, 1, 900, lBormStatus, this.index, this.limit, titaVo);
 
 		} else {
 
@@ -123,7 +125,8 @@ public class L3002 extends TradeBuffer {
 				wkFacmNoStart = 1;
 				wkFacmNoEnd = 999;
 			}
-			slLoanBorMain = loanBorMainService.bormCustNoEq(wkCustNo, wkFacmNoStart, wkFacmNoEnd, 1, 900, this.index, this.limit, titaVo);
+			slLoanBorMain = loanBorMainService.bormCustNoEq(wkCustNo, wkFacmNoStart, wkFacmNoEnd, 1, 900, this.index,
+					this.limit, titaVo);
 			iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
 		}
 
@@ -139,9 +142,11 @@ public class L3002 extends TradeBuffer {
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
 			OccursList occursList = new OccursList();
 			// 查詢額度檔
-			tFacMain = facMainService.findById(new FacMainId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo()), titaVo);
+			tFacMain = facMainService.findById(new FacMainId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo()),
+					titaVo);
 			if (tFacMain == null) {
-				throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + tLoanBorMain.getCustNo() + "額度編號 = " + tLoanBorMain.getFacmNo()); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001",
+						"額度主檔 借款人戶號 = " + tLoanBorMain.getCustNo() + "額度編號 = " + tLoanBorMain.getFacmNo()); // 查詢資料不存在
 			}
 			occursList.putParam("OOCaseNo", tFacMain.getCreditSysNo());
 			occursList.putParam("OOApplNo", tFacMain.getApplNo());
@@ -172,12 +177,25 @@ public class L3002 extends TradeBuffer {
 			occursList.putParam("OOStoreRate", tLoanBorMain.getStoreRate());
 			occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode());
 			occursList.putParam("OOLoanBal", tLoanBorMain.getLoanBal());
-			// 查詢放款約定還本檔
-			tLoanBook = loanBookService.bookBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), titaVo);
+			// 查詢放款約定還本檔 若有撥款序號為0者 額度下所有正常戶顯示按鈕
+			tLoanBook = new LoanBook();
+			tLoanBook = loanBookService.bookBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),
+					tLoanBorMain.getBormNo(), titaVo);
 			if (tLoanBook == null) {
 				occursList.putParam("OOBookFlag", 0);
 			} else {
 				occursList.putParam("OOBookFlag", 1);
+			}
+			LoanBook tLoanBook2 = new LoanBook();
+			tLoanBook2 = loanBookService.bookBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), 000,
+					titaVo);
+			if (tLoanBook2 != null && tLoanBorMain.getStatus() == 0) {
+				occursList.putParam("OOBookFlag", 2);
+			}
+			// 若為展期件
+			occursList.putParam("OORenewFlag", 0);
+			if (!"".equals(tLoanBorMain.getRenewFlag()) && !tLoanBorMain.getRenewFlag().equals("0")) {
+				occursList.putParam("OORenewFlag", tLoanBorMain.getRenewFlag());
 			}
 
 			// 將每筆資料放入Tota的OcList

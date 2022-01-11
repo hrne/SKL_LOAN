@@ -95,7 +95,8 @@ public class L3001 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0001", "額度主檔 案件編號 = " + iCaseNo); // 查詢資料不存在
 				}
 				tFacMain.getCustNo();
-				slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit, titaVo);
+				slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit,
+						titaVo);
 				lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			} else {
 				if (iFacmNo > 0) {
@@ -105,7 +106,8 @@ public class L3001 extends TradeBuffer {
 					wkFacmNoStart = 1;
 					wkFacmNoEnd = 999;
 				}
-				slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index, this.limit, titaVo);
+				slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index,
+						this.limit, titaVo);
 				lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			}
 			if (lFacMain == null || lFacMain.size() == 0) {
@@ -154,7 +156,8 @@ public class L3001 extends TradeBuffer {
 				wkFacmNoStart = 1;
 				wkFacmNoEnd = 999;
 			}
-			slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index, this.limit, titaVo);
+			slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index,
+					this.limit, titaVo);
 			lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		}
 
@@ -196,11 +199,11 @@ public class L3001 extends TradeBuffer {
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
+		
 		// 顧客控管警訊通知訊息
-
 		if (titaVo.getReturnIndex() == 0) {
-//			custRmkCom.getCustRmk(wkCustNo, titaVo);
-//			this.addAllList(custRmkCom.getCustRmk(titaVo, wkCustNo));
+//			custRmkCom.getCustRmk(titaVo, iCustNo);
+//			this.addAllList(custRmkCom.getCustRmk(titaVo, iCustNo));
 		}
 
 		// end

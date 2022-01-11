@@ -48,7 +48,6 @@ public class L2R07 extends TradeBuffer {
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo = 0;
 	private String iTxCode = "";
-	private String iCustId = "";
 	private String wkCurrencyCode = "TWD";
 
 	@Override
@@ -64,11 +63,11 @@ public class L2R07 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (iTxCode.isEmpty()) {
-			throw new LogicException(titaVo, "E0009", "L2R07"); // 交易代號不可為空白
+			throw new LogicException(titaVo, "E0009", ""); // 交易代號不可為空白
 		}
 
 		if (iCustId.isEmpty() && iCustNo == 0) {
-			throw new LogicException(titaVo, "E2051", "L2R07"); // 統一編號,戶號須擇一輸入
+			throw new LogicException(titaVo, "E2051", ""); // 統一編號,戶號須擇一輸入
 		}
 		/*
 		 * 設定第幾分頁 titaVo.getParamReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -115,7 +114,7 @@ public class L2R07 extends TradeBuffer {
 			this.totaVo.putParam("ORemitBirthday", tCustMain.getBirthday());// 出生日期
 
 		} else {
-			throw new LogicException(titaVo, "E0001", "L2R07 客戶資料主檔"); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 客戶資料主檔"); // 查詢資料不存在
 		}
 		switch (iTxCode) {
 		case "L3711":
@@ -176,7 +175,7 @@ public class L2R07 extends TradeBuffer {
 		}
 		if (wkBormCount == 0) {
 			if (iTxCode.equals("L3711") || iTxCode.equals("L3712")) {
-				throw new LogicException(titaVo, "E0001", "L2R07 查無該戶號的最近繳息日"); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", " 查無該戶號的最近繳息日"); // 查詢資料不存在
 			}
 		}
 	}
@@ -237,7 +236,7 @@ public class L2R07 extends TradeBuffer {
 
 		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, iFacmNo, FacmNoEnd, this.index, this.limit, titaVo);
 		if (lFacMain == null || lFacMain.isEmpty()) {
-			throw new LogicException(titaVo, "E3085", "L2R07 額度主檔"); // 該戶號沒有額度編號，不可做內容變更
+			throw new LogicException(titaVo, "E3085", " 額度主檔"); // 該戶號沒有額度編號，不可做內容變更
 		}
 		for (FacMain fac : lFacMain.getContent()) {
 			wkFacmCount++;

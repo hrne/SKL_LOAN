@@ -79,14 +79,15 @@ public class L4001 extends TradeBuffer {
 
 		// put
 		for (BankRemit tBankRemit : slBankRemit.getContent()) {
-			// 作業項目為1.撥款時把退款篩選掉
+			//作業項目為1.撥款時把退款篩選掉
 			if (iItemCode == 1) {
-				if (tBankRemit.getDrawdownCode() == 4 || tBankRemit.getDrawdownCode() == 5 || tBankRemit.getDrawdownCode() == 11) {
+				if (tBankRemit.getDrawdownCode() == 4 || tBankRemit.getDrawdownCode() == 5
+						|| tBankRemit.getDrawdownCode() == 11) {
 					continue;
 				}
 			}
 
-			// 作業項目為2.退款時把撥款篩選掉
+			//作業項目為2.退款時把撥款篩選掉
 			if (iItemCode == 2) {
 				if (tBankRemit.getDrawdownCode() == 1 || tBankRemit.getDrawdownCode() == 2) {
 					continue;
@@ -94,7 +95,7 @@ public class L4001 extends TradeBuffer {
 			}
 
 			if (tBankRemit.getActFg() == 1) {
-				add(3, tBankRemit, titaVo);
+				add(1, tBankRemit, titaVo);
 			} else {
 				add(tBankRemit.getStatusCode(), tBankRemit, titaVo);
 			}
@@ -135,7 +136,8 @@ public class L4001 extends TradeBuffer {
 	private void add(int statusCode, BankRemit tBankRemit, TitaVo titaVo) throws LogicException {
 		oRemitAmt = tBankRemit.getRemitAmt();
 
-		L4001Vo tmpL4001 = new L4001Vo(tBankRemit.getAcDate(), tBankRemit.getBatchNo(), tBankRemit.getDrawdownCode(), statusCode);
+		L4001Vo tmpL4001 = new L4001Vo(tBankRemit.getAcDate(), tBankRemit.getBatchNo(), tBankRemit.getDrawdownCode(),
+				statusCode);
 
 		if (L4001VoCnt.containsKey(tmpL4001)) {
 			L4001VoCnt.put(tmpL4001, L4001VoCnt.get(tmpL4001) + 1);
@@ -196,17 +198,16 @@ class L4001Vo implements Comparable<L4001Vo> {
 		this.oStatusCode = oStatusCode;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null || getClass() != obj.getClass())
 			return false;
 		L4001Vo l4001Vo = (L4001Vo) obj;
-		return oAcDate == l4001Vo.getoAcDate() && oBatchNo.equals(l4001Vo.getoBatchNo()) && oDrawdownCode == l4001Vo.getoDrawdownCode() && oStatusCode == l4001Vo.getoStatusCode();
+		return oAcDate == l4001Vo.getoAcDate() && oBatchNo.equals(l4001Vo.getoBatchNo())
+				&& oDrawdownCode == l4001Vo.getoDrawdownCode() && oStatusCode == l4001Vo.getoStatusCode();
 	}
 
-	@Override
 	public int hashCode() {
 		return Objects.hash(oAcDate, oBatchNo, oDrawdownCode, oStatusCode);
 	}

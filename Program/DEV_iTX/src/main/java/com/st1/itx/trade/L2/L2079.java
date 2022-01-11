@@ -26,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2079 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2079.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -93,7 +92,7 @@ public class L2079 extends TradeBuffer {
 
 		this.info("yearMonthStart = " + yearMonthStart + "yearMonthEnd = " + yearMonthEnd);
 		// 查會計借新還舊檔
-		Slice<AcLoanRenew> slAcLoanRenew = sAcLoanRenewService.findL2079(iCustNo, custNoEnd, iOldFacmNo, oldFacmNoEnd, iOldFacmNo, newFacmNoEnd, yearMonthStart, yearMonthEnd, 0, Integer.MAX_VALUE);
+		Slice<AcLoanRenew> slAcLoanRenew = sAcLoanRenewService.findL2079(iCustNo, custNoEnd, iOldFacmNo, oldFacmNoEnd, iNewFacmNo, newFacmNoEnd, yearMonthStart, yearMonthEnd, 0, Integer.MAX_VALUE);
 		lAcLoanRenew = slAcLoanRenew == null ? null : slAcLoanRenew.getContent();
 
 		// 查無資料處理

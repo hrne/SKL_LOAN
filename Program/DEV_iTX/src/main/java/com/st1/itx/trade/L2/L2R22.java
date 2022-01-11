@@ -31,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R22 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R22.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -84,28 +83,28 @@ public class L2R22 extends TradeBuffer {
 			}
 			case 2:
 				// 若為修改，但資料不存在，拋錯
-				throw new LogicException("E0003", "L2R22(tClMain)");
+				throw new LogicException("E0003", ""); //修改資料不存在
 			case 4:
 				// 若為刪除，但資料不存在，拋錯
-				throw new LogicException("E0004", "L2R22(tClMain)");
+				throw new LogicException("E0004", ""); // 刪除資料不存在
 			case 5:
 				// 若為查詢，但資料不存在，拋錯
-				throw new LogicException("E0001", "擔保品號碼不存在擔保品主檔");
+				throw new LogicException("E0001", "擔保品號碼不存在擔保品主檔"); //查詢資料不存在
 			default:
 				// funch不在以上範圍，拋錯
-				throw new LogicException("E0010", "L2R22(tClMain)");
+				throw new LogicException("E0010", ""); //功能選擇錯誤
 			}
 
 		} else {
 			if (iFunCd == 1) {
 				// 若為新增，但資料已存在，拋錯
-				throw new LogicException("E0002", "L2R22(tClMain)");
+				throw new LogicException("E0002", ""); //新增資料已存在
 			} else if (iFunCd == 4) {
 				// 若為刪除,額度與關聯檔有資料不可刪除,拋錯
 				Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 				List<ClFac> lClFac = slClFac == null ? null : new ArrayList<ClFac>(slClFac.getContent());
 				if (lClFac != null && lClFac.size() > 0) {
-					throw new LogicException("E2035", "L2R22(ClFac)");
+					throw new LogicException("E2035", ""); //額度與擔保品關聯不可刪除
 				}
 			}
 		}

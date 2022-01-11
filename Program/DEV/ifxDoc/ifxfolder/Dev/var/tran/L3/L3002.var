@@ -117,7 +117,6 @@ C(3,#CHAIN,1,s,$)
 D(8)
 @C(3,#DrawdownDateS,0,S,$)
 A(DATE,0,#DrawdownDateS)
-V(5,0010101,#SYSDATE)
 
 #DrawdownDateE=D,7,I
 HIDE(#BTN2,#BTN3,#BTN4)
@@ -166,7 +165,7 @@ C(3,#CaseNo,0,S,T(2,#L2r07CustName))
 T(3,00000019999999000)
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 
 ![借戶戶號]
@@ -190,7 +189,7 @@ C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
 ! T(2,#CustNo+9999999000)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustNo<-OOCustNo})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 
 #SendL2r07B=X,1,S
@@ -207,7 +206,7 @@ C(3,#CustNo,0,S,T(2,#L2r07CustName))
 #BUF3A=X,100,S
 
 #BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 ![統一編號]
 
@@ -227,7 +226,7 @@ V(7)
 T(2,0000000+#CustId)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -252,7 +251,7 @@ C(4,#CustId,S,T(2,#L2r07CustName))
 T(3,000000199999990)
 
 #BIND4A=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4A;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4A;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
 
 ![核准編號]
 
@@ -278,7 +277,7 @@ C(3,#ApplNo,0,T(3,000000199999990),T(2,#ApplNo+99999990))
 ! T(2,#ApplNo+99999990)
 
 #BIND4B=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4B;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
 
 #HIDEALLBTN=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -453,6 +452,8 @@ P(R,#OOLoanBalX)
 
 #OOBookFlag=A,1,S
 
+#OORenewFlag=X,1,S
+
 #OOBUF1=X,37,S
 T(2,#ZRO07+#ZRO07+#SPC10+#OOApplNo+#OOFacmNo+#OOBormNo)
 
@@ -460,10 +461,19 @@ T(2,#ZRO07+#ZRO07+#SPC10+#OOApplNo+#OOFacmNo+#OOBormNo)
 BIND(grid,{ cmd=CHAIN; ntxcd=L3916; ntxbuf=#OOBUF1})
 
 #OOBUF2=X,50,S
-T(2,0000000          +#OOApplNo+#OOFacmNo+#OOBormNo)
+IF(#OOBookFlag==2,T(2,0000000          +#OOApplNo+#OOFacmNo+000),T(2,0000000          +#OOApplNo+#OOFacmNo+#OOBormNo))
+
 
 #OOBTN2=X,1,S
 C(3,#OOBookFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L3004; ntxbuf=#OOBUF2}))
+
+#OOBUF3=X,50,S
+C(3,#OOStatus,1,T(2,#OOCustNo+00000+00000+#OOFacmNo+000),T(2,#OOCustNo+00000+00000+000+#OOFacmNo))
+
+
+#OOBTN3=X,1,S
+C(3,#OORenewFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2079; ntxbuf=#OOBUF3}))
+C(3,#OOStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=L2079; ntxbuf=#OOBUF3}),$)
 
 </sub>
 
@@ -481,7 +491,7 @@ C(3,#OOBookFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L3004; ntxbuf=#
 
 TXFORM=L3002
 #OOCaseNo#OOApplNo#OOCustNo#OOCustName#OOFacmNo#OOBormNo#OODrawdownDate#OOMaturityDate
-#OOStatus#OOPrevIntDate#OOStoreRate#OOCurrencyCode#OOLoanBal#OOBookFlag
+#OOStatus#OOPrevIntDate#OOStoreRate#OOCurrencyCode#OOLoanBal#OOBookFlag#OORenewFlag
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -547,6 +557,9 @@ TXFORM=L3002
  
 #OOLoanBalX=放款餘額
 {width:170}
+
+#OOBTN3=展期件
+{width:70,search:false,formatter:'cust:bind-button:展期件;L2079 展期件新舊對照查詢',align:'center',canExport:false}
 
 ^
 #RPTFG2=2,QUERY.GRID,L3002

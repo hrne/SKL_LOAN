@@ -97,9 +97,6 @@ public class L2R28 extends TradeBuffer {
 		// new pk
 		ClLandId ClLandId = new ClLandId();
 		ClMainId ClMainId = new ClMainId();
-		// new 年月
-		String year = "";
-		String month = "";
 		// 塞pk
 		ClLandId.setClCode1(iClCode1);
 		ClLandId.setClCode2(iClCode2);
@@ -126,16 +123,16 @@ public class L2R28 extends TradeBuffer {
 			switch (iFunCd) {
 			case 1:
 				// 若為新增且資料不存在主檔
-				throw new LogicException("E2003", "(擔保品主檔)");
+				throw new LogicException("E2003", "(擔保品主檔)"); //查無資料
 			case 2:
 				// 若為修改，但資料不存在，拋錯
-				throw new LogicException("E0003", "L2R28(ClLand)");
+				throw new LogicException("E0003", ""); //修改資料不存在
 			case 4:
 				// 若為刪除，但資料不存在，拋錯
-				throw new LogicException("E0004", "L2R28(ClLand)");
+				throw new LogicException("E0004", ""); //刪除資料不存在
 			default:
 				// funch不在以上範圍，拋錯
-				throw new LogicException("E0010", "L2R28(ClLand)");
+				throw new LogicException("E0010", ""); //功能選擇錯誤
 			}
 		} else {
 
@@ -146,7 +143,7 @@ public class L2R28 extends TradeBuffer {
 				switch (iFunCd) {
 				case 1:
 
-					ClLand tLastClLand = sClLandService.findClNoFirst(iClCode1, iClCode2, iClNo, titaVo);
+					sClLandService.findClNoFirst(iClCode1, iClCode2, iClNo, titaVo);
 //remark by eric 2021.4.22 新增改由L2416.java編號
 //					if (tLastClLand == null) {
 //						this.totaVo.putParam("L2r28LandSeq", 1);
@@ -164,13 +161,13 @@ public class L2R28 extends TradeBuffer {
 					break;
 				case 2:
 					// 若為修改，但資料不存在，拋錯
-					throw new LogicException("E0003", "L2R28(ClLand)");
+					throw new LogicException("E0003", ""); //修改資料不存在
 				case 4:
 					// 若為刪除，但資料不存在，拋錯
-					throw new LogicException("E0004", "L2R28(ClLand)");
+					throw new LogicException("E0004", ""); //刪除資料不存在
 				default:
 					// funch不在以上範圍，拋錯
-					throw new LogicException("E0010", "L2R28(ClLand)");
+					throw new LogicException("E0010", ""); //功能選擇錯誤
 				}
 
 			} else {
@@ -182,7 +179,7 @@ public class L2R28 extends TradeBuffer {
 						lClLandReason = new ArrayList<ClLandReason>();
 					} else {
 						// 新增房地，但資料已存在，拋錯
-						throw new LogicException("E0002", "L2R26(ClOther)");
+						throw new LogicException("E0002", ""); //新增資料已存在
 					}
 				}
 			}

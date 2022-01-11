@@ -59,7 +59,12 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 每月月底日才執行
 		if (tbsdyf == mfbsdyf) {
 			this.info("EodFinal 本日為月底日,執行月底日日終維護.");
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC701", titaVo.getTlrNo(), "本日為月底日,執行LC701月底日日終維護", titaVo);
+            
+			titaVo.setBatchJobId("eomFlow");
+			
+			// titaVo.setBatchJobId("jcicFlow");
+			
+			// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "L6871", titaVo.getTlrNo(), "本日為月底日,執行L6871月底日日終維護", titaVo);
 
 			String yearMonth = String.valueOf((tbsdyf / 100));
 
@@ -69,7 +74,10 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 				// 每年年底日才執行
 				if (yearMonth.equals("12")) {
 					this.info("EodFinal 本日為年底日,執行年底日日終維護.");
-					webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC702", titaVo.getTlrNo(), "本日為年底日,執行LC702年底日日終維護", titaVo);
+            
+					titaVo.setBatchJobId("eoyFlow");
+
+					// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "L6872", titaVo.getTlrNo(), "本日為年底日,執行L6872年底日日終維護", titaVo);
 				}
 			}
 		}

@@ -16,6 +16,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -37,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2015")
 @Scope("prototype")
 public class L2015 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2015.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -46,6 +46,8 @@ public class L2015 extends TradeBuffer {
 	public FacMainService facMainService;
 	@Autowired
 	public LoanBorMainService sLoanBorMainService;
+	@Autowired
+	public LoanCom loanCom;
 
 	@Autowired
 	Parse parse;
@@ -100,7 +102,8 @@ public class L2015 extends TradeBuffer {
 
 		}
 		// 查詢額度主檔
-		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(wkCustNoSt, wkCustNoEd, wkFacmNo1, wkFacmNo2, this.index, this.limit, titaVo);
+		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(wkCustNoSt, wkCustNoEd, wkFacmNo1, wkFacmNo2,
+				this.index, this.limit, titaVo);
 		if (lFacMain == null || lFacMain.isEmpty()) {
 			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
 		}
@@ -117,6 +120,7 @@ public class L2015 extends TradeBuffer {
 
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCustNo", tFacMain.getCustNo());
+			occursList.putParam("OOCustName", loanCom.getCustNameByNo(tFacMain.getCustNo()));
 			occursList.putParam("OOFacmNo", tFacMain.getFacmNo());
 			occursList.putParam("OOApplNo", tFacMain.getApplNo());
 			occursList.putParam("OOCurrencyCode", tFacMain.getCurrencyCode());

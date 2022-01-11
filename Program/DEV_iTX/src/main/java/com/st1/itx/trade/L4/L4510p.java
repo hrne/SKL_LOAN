@@ -103,9 +103,7 @@ public class L4510p extends TradeBuffer {
 	@Autowired
 	public WebClient webClient;
 
-	private int iY15EntryDate = 0;
-	private int iN15EntryDate = 0;
-	private int delayDate = 0;
+	private int iEntryDate = 0;
 
 //	繳息迄日 minNextPayIntDateList
 	private HashMap<tmpFacm, Integer> minNextPayIntDateList = new HashMap<>();
@@ -151,7 +149,7 @@ public class L4510p extends TradeBuffer {
 	private int cnt = 0;
 
 	private HashMap<String, Integer> perfMonth = new HashMap<>();
-	
+
 	private HashMap<tmpFacm, String> errMsg = new HashMap<>();
 
 	private HashMap<tmpFacm, String> facmAcctCode = new HashMap<>();
@@ -159,8 +157,6 @@ public class L4510p extends TradeBuffer {
 	private TempVo tempVo = new TempVo();
 	private HashMap<tmpFacm, String> jsonField = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mapSetFlag = new HashMap<>();
-//	重複註記
-	private HashMap<tmpFacm, Integer> flagMap2 = new HashMap<>();
 
 	Slice<EmpDeductSchedule> slEmpDeductSchedule = null;
 	private long reportA = 0;
@@ -176,13 +172,13 @@ public class L4510p extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4510p ");
 		this.totaVo.init(titaVo);
-		
+
 		String parentTranCode = titaVo.getTxcd();
-		
+
 		l4510Report.setParentTranCode(parentTranCode);
 		l4510Report2.setParentTranCode(parentTranCode);
 		l4510Report3.setParentTranCode(parentTranCode);
-		
+
 		baTxCom.setTxBuffer(this.getTxBuffer());
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		int iOpItem = parse.stringToInteger(titaVo.getParam("OpItem")); // 作業項目 1.15日薪 2.非15日薪
@@ -197,7 +193,7 @@ public class L4510p extends TradeBuffer {
 
 //		List<String> dateIs15 = new ArrayList<String>();
 //		List<String> dateUn15 = new ArrayList<String>();
-		
+
 //		1.清除原扣款檔
 //		2.從主檔撈資料
 //		3.BatxCom算金額
@@ -209,8 +205,8 @@ public class L4510p extends TradeBuffer {
 		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
 
 //		抓取媒體日為今日者
-		 slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate,
-				this.index, this.limit, titaVo);
+		slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate, this.index, this.limit,
+				titaVo);
 		if (slEmpDeductSchedule != null) {
 			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 				perfMonth.put(tEmpDeductSchedule.getAgType1(), tEmpDeductSchedule.getWorkMonth());
@@ -227,17 +223,18 @@ public class L4510p extends TradeBuffer {
 				}
 			}
 
-		} 
+		}
 
 //		刪除舊資料
 		if (iOpItem == 1) {
-			
+
 			deleEmpDeductDtl("4", mediaDate, titaVo);
 			deleEmpDeductMedia("4", mediaDate, titaVo);
 			// 還款試算
 			calculateY15BaTxCom(titaVo);
 			List<EmpDeductDtl> is15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
-			Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "4", this.index, this.limit, titaVo);
+			Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "4", this.index,
+					this.limit, titaVo);
 			is15EmpDeductDtl = sis15EmpDeductDtl == null ? null : sis15EmpDeductDtl.getContent();
 			this.info("Is15 Dtl Start...");
 //		4.寫入EmpDeductMedia (彙總by戶號) 4:15日
@@ -269,7 +266,8 @@ public class L4510p extends TradeBuffer {
 			calculateN15BaTxCom(titaVo);
 			List<EmpDeductDtl> un15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
 
-			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "5", this.index, this.limit, titaVo);
+			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "5", this.index,
+					this.limit, titaVo);
 			un15EmpDeductDtl = sun15EmpDeductDtl == null ? null : sun15EmpDeductDtl.getContent();
 			this.info("Un15 Dtl Start...");
 //			4.寫入EmpDeductMedia (彙總by戶號) 5:非15日
@@ -317,22 +315,22 @@ public class L4510p extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private int getList(Slice<EmpDeductSchedule> slEmpDeductSchedule,String AgType1) throws LogicException {
+	private int getList(Slice<EmpDeductSchedule> slEmpDeductSchedule, String AgType1) throws LogicException {
 		int entryday = 0;
-		 this.info("slEmpDeductSchedule = "+ slEmpDeductSchedule);
+		this.info("slEmpDeductSchedule = " + slEmpDeductSchedule);
 		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
-			
-		  if(AgType1.equals(""+tEmpDeductSchedule.getAgType1())) {
-			  this.info("tEmpDeductSchedule = "+ tEmpDeductSchedule);
-			  return tEmpDeductSchedule.getEntryDate();
-		  }
-		  
+
+			if (AgType1.equals("" + tEmpDeductSchedule.getAgType1())) {
+				this.info("tEmpDeductSchedule = " + tEmpDeductSchedule);
+				return tEmpDeductSchedule.getEntryDate();
+			}
+
 		}
 		return entryday;
 	}
-	
+
 //	用既有之List for each 找出RepayCode 1.期款  4.帳管 5.火險 6.契變手續費 
-	private void doBaTxCom(List<Map<String, String>> resultList, TitaVo titaVo) throws LogicException {
+	private void doBaTxCom(int flag, List<Map<String, String>> resultList, TitaVo titaVo) throws LogicException {
 		List<BaTxVo> listBaTxVo = new ArrayList<>();
 
 		baTxCom.setTxBuffer(this.getTxBuffer());
@@ -344,21 +342,28 @@ public class L4510p extends TradeBuffer {
 //			F3 1.15日薪 2.非15日薪
 //			F4 BormNo (逾兩期需指到撥款，無需扣費用)
 //			F5 ProcCode (流程別)
-			
-			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")),
-					0, 0, parse.stringToInteger(result.get("Flag")), parse.stringToInteger(result.get("AgType1")));
+			iEntryDate = getList(slEmpDeductSchedule, result.get("AgType1"));
+			if (parse.stringToInteger(result.get("NextPayIntDate")) > (iEntryDate + 19110000)) {
+				this.info("skip NextPayIntDate > iEntryDate " + result);
+				continue;
+			}
+			// 應繳試算
+			listBaTxVo = baTxCom.settingUnPaid(iEntryDate, parse.stringToInteger(result.get("CustNo")),
+					parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
+			this.info("Terms=" + baTxCom.getTerms() + ", " + result);
 
-//			非15日僅抓取逾兩期之撥款
+//			非15日僅抓取逾兩期之撥款(非員工扣款)
 //			Ex.若當月n-1-1逾一期，n-1-2撥款，下個月僅收n-1-1
 //			20210409修改為抓取全部撥款且費用，by淑薇電話確認
-			if (flagMap2.containsKey(tmp2)) {
-				this.info("custNo = " + parse.stringToInteger(result.get("CustNo")) + " facmNo = "
-						+ parse.stringToInteger(result.get("FacmNo")) + " 同戶號額度僅進入計算一次 continue...");
-				continue;
-			} else {
-				flagMap2.put(tmp2, 1);
+			if (!"3".equals(result.get("RepayCode"))) {
+				if (baTxCom.getTerms() < 2) {
+					this.info("skip Terms=" + baTxCom.getTerms() + ", " + result);
+				}
 			}
 
+			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")),
+					parse.stringToInteger(result.get("FacmNo")), 0, 0, flag,
+					parse.stringToInteger(result.get("AgType1")));
 			// 業務科目(額度)
 			facmAcctCode.put(tmp2, result.get("AcctCode"));
 
@@ -367,21 +372,8 @@ public class L4510p extends TradeBuffer {
 				custAcctCode.put(parse.stringToInteger(result.get("CustNo")), result.get("AcctCode"));
 			}
 
-			
-			// 應繳試算
-			if ("2".equals(result.get("Flag"))) {
-				iN15EntryDate = getList(slEmpDeductSchedule,result.get("AgType1"));
-				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate, parse.stringToInteger(result.get("CustNo")),
-						parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
-			} else {
-				iY15EntryDate = getList(slEmpDeductSchedule,result.get("AgType1"));
-				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate, parse.stringToInteger(result.get("CustNo")),
-						parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
-			}
-			this.info("iN15EntryDate = " + iN15EntryDate);
-			this.info("iY15EntryDate = " + iY15EntryDate);
 			this.info("listBaTxVo =" + listBaTxVo);
-			setBatxValue(listBaTxVo, parse.stringToInteger(result.get("Flag")), parse.stringToInteger(result.get("AgType1")));
+			setBatxValue(listBaTxVo, flag, parse.stringToInteger(result.get("AgType1")));
 		} // for
 
 //		各個repaycode寫入BankDeductDtl
@@ -402,7 +394,7 @@ public class L4510p extends TradeBuffer {
 	 */
 	private class tmpFacm {
 
-		public tmpFacm(int custNo, int facmNo, int bormNo, int achRepayCode, int flag ,int procCode) {
+		public tmpFacm(int custNo, int facmNo, int bormNo, int achRepayCode, int flag, int procCode) {
 			this.setCustNo(custNo);
 			this.setFacmNo(facmNo);
 			this.setBormNo(bormNo);
@@ -417,7 +409,7 @@ public class L4510p extends TradeBuffer {
 		private int achRepayCode = 0;
 		private int flag = 0;
 		private int procCode = 0;
-		
+
 		@Override
 		public String toString() {
 			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", BormNo=" + BormNo + ", achRepayCode="
@@ -503,7 +495,7 @@ public class L4510p extends TradeBuffer {
 		private void setFlag(int flag) {
 			this.flag = flag;
 		}
-		
+
 		private int getProcCode() {
 			return procCode;
 		}
@@ -511,7 +503,7 @@ public class L4510p extends TradeBuffer {
 		private void setProcCode(int procCode) {
 			this.procCode = procCode;
 		}
-		
+
 		private L4510p getEnclosingInstance() {
 			return L4510p.this;
 		}
@@ -568,8 +560,8 @@ public class L4510p extends TradeBuffer {
 			tCustMain = custMainService.custNoFirst(tmp.getCustNo(), tmp.getCustNo(), titaVo);
 
 			CdEmp tCdEmp = new CdEmp();
-			if(tCustMain.getEmpNo() != null) {
-				tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);				
+			if (tCustMain.getEmpNo() != null) {
+				tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);
 			}
 //			this.info("tCdEmp.getAgType1() : " + tCdEmp.getAgType1());
 //
@@ -577,8 +569,8 @@ public class L4510p extends TradeBuffer {
 
 			int month = 0;
 
-			if (perfMonth.get(""+tmp.getProcCode()) != null) {
-				month = perfMonth.get(""+tmp.getProcCode());
+			if (perfMonth.get("" + tmp.getProcCode()) != null) {
+				month = perfMonth.get("" + tmp.getProcCode());
 			}
 
 			if (month == 0) {
@@ -599,7 +591,8 @@ public class L4510p extends TradeBuffer {
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 
-			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(), tmp.getProcCode());
+			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(),
+					tmp.getProcCode());
 			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
 
 			this.info("tmp ... " + tmp);
@@ -648,14 +641,7 @@ public class L4510p extends TradeBuffer {
 				jsonField.put(tmp2, tempVo.getJsonString());
 			}
 
-//			1.15日薪 2.非15日薪
-			if (tmp.getFlag() == 2) {
-				this.info("entrydate ... iN15EntryDate = " + iN15EntryDate);
-				tEmpDeductDtlId.setEntryDate(iN15EntryDate + 19110000);
-			} else {
-				this.info("entrydate ... iY15EntryDate = " + iY15EntryDate);
-				tEmpDeductDtlId.setEntryDate(iY15EntryDate + 19110000);
-			}
+			tEmpDeductDtlId.setEntryDate(iEntryDate + 19110000);
 			tEmpDeductDtlId.setCustNo(tmp.getCustNo());
 			tEmpDeductDtlId.setAchRepayCode(tmp.getAchRepayCode());
 
@@ -663,7 +649,7 @@ public class L4510p extends TradeBuffer {
 			tEmpDeductDtlId.setProcCode("" + tmp.getProcCode());
 
 //			QC.623 非15薪扣款代碼應為滯繳件
-			// MediaDate, MediaKind由最後update移至 
+			// MediaDate, MediaKind由最後update移至
 			if (tmp.getFlag() == 2) {
 				tEmpDeductDtlId.setRepayCode("3");
 				tEmpDeductDtl.setMediaKind("5");
@@ -676,7 +662,7 @@ public class L4510p extends TradeBuffer {
 			tEmpDeductDtlId.setBormNo(tmp.getBormNo());
 
 			tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
-			
+
 			tEmpDeductDtl.setMediaDate(mediaDate);
 			tEmpDeductDtl.setEntryDate(tEmpDeductDtlId.getEntryDate());
 			tEmpDeductDtl.setCustNo(tEmpDeductDtlId.getCustNo());
@@ -688,7 +674,7 @@ public class L4510p extends TradeBuffer {
 			tEmpDeductDtl.setFacmNo(tEmpDeductDtlId.getFacmNo());
 			tEmpDeductDtl.setBormNo(tEmpDeductDtlId.getBormNo());
 
-			if(tCdEmp != null ) {
+			if (tCdEmp != null) {
 				tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());
 			}
 			tEmpDeductDtl.setCustId(tCustMain.getCustId());
@@ -723,17 +709,17 @@ public class L4510p extends TradeBuffer {
 			tEmpDeductDtl.setTitaTxtNo("");
 			tEmpDeductDtl.setTitaTlrNo("");
 			tEmpDeductDtl.setBatchNo("");
-			if(tCdEmp != null ) {
-			  tEmpDeductDtl.setResignCode(tCdEmp.getAgStatusCode());
-			  tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCodeAcc2());
-			  tEmpDeductDtl.setUnitCode(tCdEmp.getCenterCodeAcc());
-			  tEmpDeductDtl.setPositCode(tCdEmp.getAgPost());
+			if (tCdEmp != null) {
+				tEmpDeductDtl.setResignCode(tCdEmp.getAgStatusCode());
+				tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCodeAcc2());
+				tEmpDeductDtl.setUnitCode(tCdEmp.getCenterCodeAcc());
+				tEmpDeductDtl.setPositCode(tCdEmp.getAgPost());
 			}
 			if (intStartDate.get(tmp) != null)
 				tEmpDeductDtl.setIntStartDate(intStartDate.get(tmp));
 			if (intEndDate.get(tmp) != null)
 				tEmpDeductDtl.setIntEndDate(intEndDate.get(tmp));
-			
+
 			if (rpAmt10Map.get(tmp) != null) {
 				tEmpDeductDtl.setPrincipal(rpAmt10Map.get(tmp));
 				tEmpDeductDtl.setCurrPrinAmt(rpAmt10Map.get(tmp));
@@ -758,14 +744,14 @@ public class L4510p extends TradeBuffer {
 				this.info("jsonField ... " + jsonField.toString());
 				tEmpDeductDtl.setJsonFields(jsonField.get(tmp2));
 			}
-			
+
 			try {
 				empDeductDtlService.insert(tEmpDeductDtl, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "員工扣薪檔新增失敗 :" + e.getErrorMsg());
 			}
-			if(tmp.getAchRepayCode() == 1 || tmp.getAchRepayCode() == 5) {
-			  cnt++;
+			if (tmp.getAchRepayCode() == 1 || tmp.getAchRepayCode() == 5) {
+				cnt++;
 			}
 		}
 	}
@@ -847,7 +833,7 @@ public class L4510p extends TradeBuffer {
 				repayAmt.put(tmp, tEmpDeductDtl.getRepayAmt());
 			}
 			this.info("repayAmt : " + repayAmt.get(tmp));
-		} // for 
+		} // for
 		List<EmpDeductMedia> deleEmpDeductMedia = new ArrayList<EmpDeductMedia>();
 
 		Slice<EmpDeductMedia> delesEmpDeductMedia = null;
@@ -868,7 +854,6 @@ public class L4510p extends TradeBuffer {
 			}
 		}
 
-		
 		HashMap<tmpCustRpCd, Integer> empCnt = new HashMap<>();
 		int seq = 0;
 		for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
@@ -931,8 +916,7 @@ public class L4510p extends TradeBuffer {
 		}
 	}
 
-	private void updateEmpDeductDtl(EmpDeductDtlId tEmpDeductDtlId, int seq, TitaVo titaVo)
-			throws LogicException {
+	private void updateEmpDeductDtl(EmpDeductDtlId tEmpDeductDtlId, int seq, TitaVo titaVo) throws LogicException {
 		this.info("updateEmpDeductDtl.tEmpDeductDtlId = " + tEmpDeductDtlId);
 		EmpDeductDtl t2EmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtlId, titaVo);
 		t2EmpDeductDtl.setMediaSeq(seq);
@@ -951,7 +935,7 @@ public class L4510p extends TradeBuffer {
 		private int custNo = 0;
 		private String repayFlag = "";
 
-		public tmpCustRpCd(int mediaDate,int custNo, String repayFlag) {
+		public tmpCustRpCd(int mediaDate, int custNo, String repayFlag) {
 //			this.setEntryDate(entryDate);
 			this.setMediaDate(mediaDate);
 			this.setCustNo(custNo);
@@ -965,7 +949,7 @@ public class L4510p extends TradeBuffer {
 		private void setMediaDate(int mediaDate) {
 			this.mediaDate = mediaDate;
 		}
-		
+
 		private void setCustNo(int custNo) {
 			this.custNo = custNo;
 		}
@@ -1019,15 +1003,15 @@ public class L4510p extends TradeBuffer {
 	}
 
 	private void deleEmpDeductDtl(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
-		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaDateRng(iMediaDate, MediaKind,
-				this.index, this.limit, titaVo);
+		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaDateRng(iMediaDate, MediaKind, this.index,
+				this.limit, titaVo);
 
 		if (slEmpDeductDtl != null) {
 			for (EmpDeductDtl tEmpDeductDtl : slEmpDeductDtl.getContent()) {
 				tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtl.getEmpDeductDtlId(), titaVo);
 				try {
 					empDeductDtlService.delete(tEmpDeductDtl, titaVo);
-					this.info("deleEmpDeductDtl =" + tEmpDeductDtl) ;
+					this.info("deleEmpDeductDtl =" + tEmpDeductDtl);
 				} catch (DBException e) {
 					throw new LogicException("E0008", "員工扣薪檔刪除失敗 :" + e.getErrorMsg());
 				}
@@ -1045,14 +1029,14 @@ public class L4510p extends TradeBuffer {
 				tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMedia.getEmpDeductMediaId(), titaVo);
 				try {
 					empDeductMediaService.delete(tEmpDeductMedia, titaVo);
-					this.info("deleEmpDeductMedia =" + tEmpDeductMedia) ;
+					this.info("deleEmpDeductMedia =" + tEmpDeductMedia);
 				} catch (DBException e) {
 					throw new LogicException("E0008", "員工媒體檔刪除失敗 :" + e.getErrorMsg());
 				}
 			}
 		}
 	}
-	
+
 //	flag 1:15日薪 2:非15日薪
 	private void setBatxValue(List<BaTxVo> listBaTxVo, int flag, int procCode) throws LogicException {
 		this.info("setBatxValue Start ...");
@@ -1063,7 +1047,8 @@ public class L4510p extends TradeBuffer {
 				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
 						tBaTxVo.getRepayType(), flag, procCode);
 
-				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag, procCode);
+				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag,
+						procCode);
 
 //				20210409修改為抓取全部撥款且費用，by淑薇電話確認
 //				非15日僅製作期款媒體
@@ -1197,32 +1182,18 @@ public class L4510p extends TradeBuffer {
 		}
 	}
 
-	private int delayTerms(int terms, int date) throws LogicException {
-		terms = 0 - terms;
-
-		dateUtil.init();
-		dateUtil.setDate_1(date);
-		dateUtil.setDate_2(date);
-		dateUtil.setMons(terms);
-		dateUtil.setDays(-1);
-
-		date = dateUtil.getCalenderDay();
-
-		return date;
-	}
-
 	private void calculateY15BaTxCom(TitaVo titaVo) throws LogicException {
 		if (mediaDate > 19110000) {
 			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 			try {
-				resultList = l4510ServiceImpl.findAll(0, mediaDate, 1, titaVo);
+				resultList = l4510ServiceImpl.findAll(1, titaVo);
 			} catch (Exception e) {
 				throw new LogicException("E0013", e.getMessage());
 			}
 
 			if (resultList != null && resultList.size() != 0) {
-				doBaTxCom(resultList, titaVo);
+				doBaTxCom(1, resultList, titaVo);
 			}
 		}
 	}
@@ -1230,17 +1201,16 @@ public class L4510p extends TradeBuffer {
 	private void calculateN15BaTxCom(TitaVo titaVo) throws LogicException {
 		if (mediaDate > 19110000) {
 //			QC.616 非15扣薪 滯繳兩期者，而非全部
-			delayDate = delayTerms(2, mediaDate);
 			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 			try {
-				resultList = l4510ServiceImpl.findAll(0, delayDate, 2, titaVo);
+				resultList = l4510ServiceImpl.findAll(2, titaVo);
 			} catch (Exception e) {
 				throw new LogicException("E0013", e.getMessage());
 			}
 
 			if (resultList != null && resultList.size() != 0) {
-				doBaTxCom(resultList, titaVo);
+				doBaTxCom(2, resultList, titaVo);
 			}
 		}
 	}

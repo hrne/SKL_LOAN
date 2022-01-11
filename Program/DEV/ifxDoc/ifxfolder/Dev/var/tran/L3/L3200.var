@@ -123,17 +123,17 @@ INVOKEJS(SHOW,p1,13,18,0)
 #BTN7=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢;
 
 #BIND1AS=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo:CustNoX<-OOCustName})
 #BIND2AS=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 #BUF3A=X,18,S
 T(3,000000199999990)
 #BIND3AS=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 #BUF6A=X,18,S
 T(2,00000019999999000)
 #BIND6AS=X,1,S
-BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 #BIND7AS=X,1,S
 BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF7A;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
@@ -241,7 +241,7 @@ C(4,#CustNo,T(2,00000019999999000),T(2,#CustNo+#CustNo+000))
 
 
 #BIND6B=X,1,S
-BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF6B;ntxbuf5=type<-1:CustNo<-OOCustNo})
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF6B;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 #SendL2r07A=X,1,S
 C(4,#CustNo,S,$)
@@ -273,7 +273,7 @@ V(7)
 T(2,0000000+#CustId)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -321,7 +321,7 @@ C(4,#ApplNo,HIDE(#BTN3),SHOW(#BTN3))
 T(2,#ApplNo+99999990)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 #HIDEALLBTN=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -484,7 +484,7 @@ T(2,#TimCustNo+#TimCustNo+000)
 
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 ![額度編號]
 !可不輸入

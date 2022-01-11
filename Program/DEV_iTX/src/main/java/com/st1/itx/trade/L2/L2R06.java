@@ -31,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R06")
 @Scope("prototype")
 public class L2R06 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R06.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -54,7 +53,7 @@ public class L2R06 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (iTxCode.isEmpty()) {
-			throw new LogicException(titaVo, "E0009", "L2R06"); // 交易代號不可為空白
+			throw new LogicException(titaVo, "E0009", ""); // 交易代號不可為空白
 		}
 
 		// 查詢指標利率檔
@@ -66,7 +65,7 @@ public class L2R06 extends TradeBuffer {
 			Slice<CdBaseRate> lCdBaseRate = cdBaseRateService.baseRateCodeEq2(iCurrencyCode, iBaseRateCode, this.index, this.limit, titaVo);
 
 			if (lCdBaseRate == null) {
-				throw new LogicException(titaVo, "E0001", "L2R06 指標利率檔"); // 查無資料
+				throw new LogicException(titaVo, "E0001", " 指標利率檔"); // 查無資料
 			}
 
 			CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(iCurrencyCode, iBaseRateCode, 19110101,
@@ -76,7 +75,7 @@ public class L2R06 extends TradeBuffer {
 				this.totaVo.putParam("OBaseRate", tCdBaseRate.getBaseRate());
 				this.totaVo.putParam("ORemark", tCdBaseRate.getRemark());
 			} else {
-				throw new LogicException(titaVo, "E6019", "L2R06 指標利率檔"); // 生效日期未生效
+				throw new LogicException(titaVo, "E6019", " 指標利率檔"); // 生效日期未生效
 			}
 		}
 

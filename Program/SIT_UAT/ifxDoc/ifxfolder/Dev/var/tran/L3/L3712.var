@@ -114,7 +114,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
 T(3,00000019999999000)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
@@ -132,7 +132,7 @@ CALL(#InitValue)
 T(2,#CustNo+9999999000)
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
@@ -148,7 +148,7 @@ C(3,#CustNo,0,S,T(2,#L2r07CustName))
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 ![統一編號]
 #FdCustId=X,2,L
@@ -167,7 +167,7 @@ V(7)
 T(2,0000000+#CustId)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -192,7 +192,7 @@ C(4,#CustId,S,T(2,#L2r07CustName))
 T(3,000000199999990)
 
 #BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 ![核准編號]
 #FdApplNo=X,2,L
@@ -217,7 +217,7 @@ C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
 T(2,#ApplNo+99999990)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 #HIDEALLBTN=X,1,S
 C(3,#CHAIN,1,$,S)

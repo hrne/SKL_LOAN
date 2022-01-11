@@ -91,8 +91,8 @@ T(3,CdCode.TitaHCode)
 #TitaHCodeHelp=x,1024,S
 
 !RepayCode 還款來源
-#CDDEF02=x,20,S
-T(3,CdCode.RepayCode)
+#CDDEF02=x,25,S
+T(3,CdCode.BatchRepayCode)
 
 #RepayCodeHelp=x,1024,S
 
@@ -603,9 +603,6 @@ T(2,@L3100RemitCustName,#ORemitCustName)
 !匯款附言
 #ORemitRemark=x,60,L
 T(2,@L3100RemitRemark,#ORemitRemark)
-
-
-
 
 ![溢短收]
 #OShortFall=+m,14.2,S

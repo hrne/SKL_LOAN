@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2079 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2079.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -95,7 +92,7 @@ public class L2079 extends TradeBuffer {
 
 		this.info("yearMonthStart = " + yearMonthStart + "yearMonthEnd = " + yearMonthEnd);
 		// 查會計借新還舊檔
-		Slice<AcLoanRenew> slAcLoanRenew = sAcLoanRenewService.findL2079(iCustNo, custNoEnd, iOldFacmNo, oldFacmNoEnd, iOldFacmNo, newFacmNoEnd, yearMonthStart, yearMonthEnd, 0, Integer.MAX_VALUE);
+		Slice<AcLoanRenew> slAcLoanRenew = sAcLoanRenewService.findL2079(iCustNo, custNoEnd, iOldFacmNo, oldFacmNoEnd, iNewFacmNo, newFacmNoEnd, yearMonthStart, yearMonthEnd, 0, Integer.MAX_VALUE);
 		lAcLoanRenew = slAcLoanRenew == null ? null : slAcLoanRenew.getContent();
 
 		// 查無資料處理

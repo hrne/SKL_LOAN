@@ -127,7 +127,7 @@ public class L3916 extends TradeBuffer {
 
 		tempVo = authLogCom.exec(wkCustNo, iFacmNo, titaVo);
 		if (tempVo == null) {
-			throw new LogicException(titaVo, "E0001", "L2R05 額度主檔 借款人戶號 = " + wkCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + wkCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 		}
 
 		// 查詢行庫代號檔

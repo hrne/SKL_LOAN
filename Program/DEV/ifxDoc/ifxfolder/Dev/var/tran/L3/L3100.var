@@ -271,7 +271,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 
 #WKHIDE=X,1,S
 HIDE(#Wait,#Wait2,#Wait3)
-IF(#FKEY==0 || #FKEY==7,SHOW(#BTN1)HIDE(#BTN2,#BTN3,#BTN4)INVOKEJS(SHOW,p1,1,4,1),$)
+IF(#FKEY==0 || #FKEY==7,SHOW(#BTN1)HIDE(#BTN2,#BTN3,#BTN4),$)
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -461,24 +461,24 @@ T(2,@FdProdNo, )
 T(2,@FdBaseRateCode, ) 
 T(2,@FdBaseRate, ) 
 T(2,@FdProdRate, )
-T(2,@FdRateIncr, )                  
+T(2,@FdRateIncr, )
 T(2,@FdApproveRate, )
 T(2,@FdRateCode, )
 T(2,@FdRateAdjFreq, )
-T(2,@FdAcctCode, )　       
+T(2,@FdAcctCode, )
 T(2,@FdDrawdownCode,#WkStar)
 T(2,@FdCurrencyCode, )
 T(2,@FdDrawdownAmt,#WkStar)
 T(2,@FdDrawdownDate,#WkStar)
 T(2,@FdLoanTerm, )
-T(2,@FdMaturityDate, )             
+T(2,@FdMaturityDate, )
 T(2,@FdAmortizedCode,)
 T(2,@FdFreqBase,)
-T(2,@FdPayIntFreq,)               
+T(2,@FdPayIntFreq,)
 T(2,@FdRepayFreq,)
 T(2,@FdGracePeriod, )
 T(2,@FdGraceDate, )
-T(2,@FdSpecificDd,#WkStar)       
+T(2,@FdSpecificDd, )
 T(2,@FdCompensateFlag,#WkStar)           
 T(2,@FdFirstDueDate,#WkStar)
 T(2,@FdFirstAdjRateDate,)
@@ -486,14 +486,14 @@ T(2,@FdAcctFee, )
 T(2,@FdFinalBal, )
 T(2,@FdRepayCode, )
 T(2,@FdRepayAcctNo, )
-T(2,@FdRepayBank, )           
+T(2,@FdRepayBank, )
 T(2,@FdPostCode, )
 T(2,@FdRelationCode, )
 T(2,@FdRelationName, )
 T(2,@FdRelationId, )
 T(2,@FdRelationBirthday, )
 T(2,@FdRelationGender, )
-T(2,@FdCustTypeCode, )
+! T(2,@FdCustTypeCode, )
 T(2,@FdRenewFlag,#WkStar)
 T(2,@FdNotYetFlag, )
 T(2,@FdPieceCode,#WkStar)
@@ -504,37 +504,39 @@ T(2,@FdSyndNo, )
 T(3,00000019999999000)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
 
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
-#CustNo=A,7,I
+#CustNo=X,7,I
 CALL(#CLOSEALL)
-INVOKEJS(SHOW,p1,1,5,1)
 C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
 C(3,#FKEY,0,$,s)
-SHOW(#BTN1)
+SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 T(2,@FdApplNo, )
 
+#CustNo2=A,7,S
+C(4,#CustNo,S,$)
+E(0,#CustNo)
+T(2,@CustNo,#CustNo2)
 
 #WKBTN1=X,1,S
-C(3,#CustNo,0,HIDE(#BTN1),SHOW(#BTN1))
-C(3,#CustNo,0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
+C(4,#CustNo,HIDE(#BTN1),SHOW(#BTN1))
 
 #BUF1B=X,18,S
-C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
+C(4,#CustNo,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
 ! T(2,#CustNo+#CustNo+000)
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
 
 #WKIDNO=X,10,S
 
 #SendL2r07A=X,1,S
 C(3,#FKEY,0,$,s)
-C(3,#CustNo,0,S,$)
+C(4,#CustNo,S,$)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07A,L2R07)
@@ -543,23 +545,22 @@ R(1,L2R07)
 
 #CustNoX=x,2.50,L
 C(3,#FKEY,0,$,s)
-C(3,#CustNo,0,S,$)
+C(4,#CustNo,S,$)
 T(2,#L2r07CustName)
 
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 ![統一編號]
 #FdCustId=X,2,L
 
 #CustId=X,10,I
 CALL(#CLOSEALL)
-C(3,#CustNo,0,$,S)
-INVOKEJS(SHOW,p1,3,3,1)
+C(4,#CustNo,$,S)
 C(3,#FKEY,0,$,s)
-SHOW(#BTN2)
+SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 T(2,@FdApplNo, )
 @C(4,#CustId,S,$)
 V(7)
@@ -568,7 +569,7 @@ V(7)
 T(2,0000000+#CustId)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -576,7 +577,6 @@ A(ID_UNINO,0,#CustId)
 
 #WKBTN2=X,1,S
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
-C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
 
 #SendL2r07B=X,1,S
 C(3,#FKEY,0,$,s)
@@ -589,6 +589,7 @@ R(1,L2R07)
 T(2,@CustIdX,#L2r07CustName)
 
 #CustIdX=x,2.50,L
+C(4,#CustId,S,$)
 
 #WkCustNo=A,7,S
 IF(#FKEY==0 || #FKEY==7,$,s)
@@ -598,37 +599,43 @@ C(4,#CustId,E(0,#CustNo),E(0,#L2r07CustNo))
 T(3,000000199999990)
 
 #BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 ![核准編號]
 #FdApplNo=X,2,L
 C(3,#FKEY,0,$,s)
-C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
+C(4,#CustNo,$,S)
+C(4,#CustId,$,S)
 T(2,#WkStar)
 
-#ApplNo=A,7,I
+#ApplNo=X,7,I
 CALL(#CLOSEALL)
-C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
-INVOKEJS(SHOW,p1,4,4,1)
+C(4,#CustNo,$,S)
+C(4,#CustId,$,S)
 C(3,#FKEY,0,$,s)
-SHOW(#BTN3)
-@V(2,0)
+SHOW(#BTN3)HIDE(#BTN2,#BTN1)
+@C(4,#ApplNo,V(P,需擇一輸入),$)
+
+#ApplNo2=A,7,S
+C(4,#ApplNo,S,$)
+E(0,#ApplNo)
+T(2,@ApplNo,#ApplNo2)
 
 #WKBTN3=X,1,S
 C(3,#FKEY,0,$,s)
-C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
+C(4,#ApplNo,HIDE(#BTN3),SHOW(#BTN3))
 
 #BUF3B=X,18,S
-C(3,#ApplNo,0,T(3,000000199999990),T(2,#ApplNo+99999990))
+C(4,#ApplNo,T(3,000000199999990),T(2,#ApplNo+99999990))
 ! T(2,#ApplNo+99999990)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
-C(3,#ApplNo,0,S,$)
+C(4,#ApplNo,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,0)
@@ -641,7 +648,8 @@ T(2,@FacmNo,#L2r05FacmNo)
 
 #SendL2r07C=X,1,S
 C(3,#FKEY,0,$,s)
-C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
+C(4,#CustNo,$,S)
+C(4,#CustId,$,S)
 T(2,@RimCustId,#L2r05CustId)
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07C,L2R07)
@@ -650,6 +658,7 @@ R(1,L2R07)
 T(2,@ApplNoX,#L2r07CustName)
 
 #ApplNoX=x,2.50,L
+C(4,#ApplNo,S,$)
 
 #SendL6r28=X,1,S
 E(0,@RimFuncCode,5)
@@ -660,17 +669,16 @@ R(1,L6R28)
 
 #TimCustNo=A,7,S
 E(0,0)
-C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
-C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
 
 #TimCustNoX=X,100,S
-E(0,0)
-C(3,#CustNo,0,$,T(2,#CustNoX))
+C(4,#CustNo,$,T(2,#CustNoX))
 C(4,#CustId,$,T(2,#CustIdX))
-C(3,#ApplNo,0,$,T(2,#ApplNoX))
+C(4,#ApplNo,$,T(2,#ApplNoX))
 
 #WkCaseNo=A,7,S
 
@@ -685,26 +693,26 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3001; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<
 ![額度編號]
 !必須輸入
 #FdFacmNo=X,2,L
-C(3,#ApplNo,0,T(3,*),T(3,))
-C(3,#ApplNo,0,T(F,@FacmNo,1),T(F,@FacmNo,0))
+C(4,#ApplNo,T(3,*),T(3,))
+C(4,#ApplNo,T(F,@FacmNo,1),T(F,@FacmNo,0))
 
 #FacmNo=A,3,I
 CALL(#CLOSEALL)
-C(3,#ApplNo,0,$,s)
+C(4,#ApplNo,$,s)
 C(3,#FKEY,0,$,s)
 SHOW(#BTN4)
 ! @V(2,0)
 
 #WKBTN4=X,1,S
 C(3,#FKEY,0,$,s)
-C(3,#ApplNo,0,SHOW(#BTN4),HIDE(#BTN4))
+C(4,#ApplNo,SHOW(#BTN4),HIDE(#BTN4))
 
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
-C(3,#ApplNo,0,$,S)
+C(4,#ApplNo,$,S)
 E(0,@RimFuncCode,5)
-E(0,@RimCustNo,#WkCustNo)
+E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimApplNo,#ApplNo)
 E(0,@RimCaseNo,0)
@@ -732,7 +740,7 @@ E(0,@LoanTermDd,#L2r05LoanTermDd)
 E(0,@RateCode,#L2r05RateCode)
 T(2,@IntCalcCode,#L2r05IntCalcCode)
 E(0,@AcctCode,#L2r05AcctCode)
-T(2,@CustTypeCode,#L2r05CustTypeCode)
+! T(2,@CustTypeCode,#L2r05CustTypeCode)
 E(0,@RepayCode,#L2r05RepayCode)
 E(0,@RepayAcctNo,#L2r05RepayAcctNo)
 T(2,@RepayBank,#L2r05RepayBank)
@@ -783,7 +791,7 @@ T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
 T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
 T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp) 
 T(H,@FreqBaseX,#FreqBase,#FreqBase2Help) 
-T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeCodeHelp)
+! T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeCodeHelp)
 T(H,@NotYetFlagX,#NotYetFlag,#YNHelp)
 T(H,@CompensateFlagX,#CompensateFlag,#YNHelp)
 T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
@@ -1051,14 +1059,14 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 #FdAmortizedCode=X,2,L
 !2021/8/30 額度資料改為不可修改純顯示
 #AmortizedCode=A,1,L
-C(5,#L2r01CharCode,2,s,$)
+! C(5,#L2r01CharCode,2,s,$)
+! C(3,#AmortizedCode,2,HIDE(#SpecificDd),SHOW(#SpecificDd))
 ! HELP(#FacmAmortizedCodeHelp)
 ! @V(H,#FacmAmortizedCodeHelp)
 ! C(3,#AcctCode,330,V(2,1),$)
 ! C(3,#AcctCode,340,V(2,1),$)
 ! !利率為0,攤還方式不可為本息平均法
 ! C(3,#ApproveRate,0,V(2,3),$)
-
 
 #AmortizedCodeX=X,12,L
 C(3,#AmortizedCode,0,S,$)
@@ -1071,12 +1079,13 @@ T(H,#AmortizedCode,#FacmAmortizedCodeHelp)
 
 !2021/8/30 額度資料改為不可修改純顯示
 #FreqBase=A,1,L
+C(3,#AmortizedCode,2,HIDE(#SpecificDd),C(3,#FreqBase,2,SHOW(#SpecificDd)T(2,@FdSpecificDd,*),HIDE(#SpecificDd))))
 ! HELP(#FreqBaseHelp)
 !到期取息者,週期基準固定為月不必輸入
-C(3,#AmortizedCode,2,E(0,2),$)
-C(3,#AmortizedCode,2,s,$)  
-C(3,#FreqBase,0,E(0,2),$)
-C(5,#L2r01CharCode,2,s,$)
+! C(3,#AmortizedCode,2,E(0,2),$)
+! C(3,#AmortizedCode,2,s,$)  
+! C(3,#FreqBase,0,E(0,2),$)
+! C(5,#L2r01CharCode,2,s,$)
 ! @V(H,#FreqBaseHelp)
 ! !本息平均法者,週期基準只能是月或週
 ! C(3,#AmortizedCode,3,V(1,2,3),$) 
@@ -1101,11 +1110,11 @@ T(3,)T(H,#FreqBase,#FreqBase2Help)
 !週期基準為週者，繳息週期固定為雙週
 !2021/8/30 額度資料改為不可修改純顯示
 #PayIntFreq=A,2,L
-C(3,#AmortizedCode,2,S,$)     
-C(3,#FreqBase,3,E(0,2),$)
-C(3,#FreqBase,3,s,$)
-C(3,#PayIntFreq,0,E(0,1),$)
-C(5,#L2r01CharCode,2,s,$)
+! C(3,#AmortizedCode,2,S,$)     
+! C(3,#FreqBase,3,E(0,2),$)
+! C(3,#FreqBase,3,s,$)
+! C(3,#PayIntFreq,0,E(0,1),$)
+! C(5,#L2r01CharCode,2,s,$)
 ! @V(5,1,12)
 
 ![還本週期]
@@ -1114,21 +1123,21 @@ C(5,#L2r01CharCode,2,s,$)
 
 !2021/8/30 額度資料改為不可修改純顯示
 #RepayFreq=A,2,L
-C(5,#L2r01CharCode,2,S,$)
-!按月繳息者是到期還本，因此沒有還本週期
-C(3,#AmortizedCode,1,S,$)    
-!到期取息者是到期還本繳息，因此沒有還本週期                
-C(3,#AmortizedCode,2,S,$)     
-!攤還方式為本息平均法時，還本週期須等於繳息週期               
-IF(#AmortizedCode==3,E(0,#PayIntFreq),$)     
-IF(#AmortizedCode==3,s,$)
-!繳息週期不等於１時，還本週期須等於繳息週期
-IF(#FreqBase==2 && #PayIntFreq > 1,E(0,#PayIntFreq),$)   
-IF(#FreqBase==2 && #PayIntFreq > 1,s,$)
-!繳息週期不等於１時，還本週期須等於繳息週期
-IF(#FreqBase==3 && #PayIntFreq > 2,E(0,#PayIntFreq),$)   
-IF(#FreqBase==3 && #PayIntFreq > 2,s,$)
-C(3,#RepayFreq,0,E(0,1),$)
+! C(5,#L2r01CharCode,2,S,$)
+! !按月繳息者是到期還本，因此沒有還本週期
+! C(3,#AmortizedCode,1,S,$)    
+! !到期取息者是到期還本繳息，因此沒有還本週期                
+! C(3,#AmortizedCode,2,S,$)     
+! !攤還方式為本息平均法時，還本週期須等於繳息週期               
+! IF(#AmortizedCode==3,E(0,#PayIntFreq),$)     
+! IF(#AmortizedCode==3,s,$)
+! !繳息週期不等於１時，還本週期須等於繳息週期
+! IF(#FreqBase==2 && #PayIntFreq > 1,E(0,#PayIntFreq),$)   
+! IF(#FreqBase==2 && #PayIntFreq > 1,s,$)
+! !繳息週期不等於１時，還本週期須等於繳息週期
+! IF(#FreqBase==3 && #PayIntFreq > 2,E(0,#PayIntFreq),$)   
+! IF(#FreqBase==3 && #PayIntFreq > 2,s,$)
+! C(3,#RepayFreq,0,E(0,1),$)
 ! @V(5,#PayIntFreq,12)V(5,#PayIntFreq,99)
 
 #WKMM=N,3,S
@@ -1318,15 +1327,6 @@ T(1,@VirtualDiffDD,#VirtualDiff,007,002)
 C(3,#FreqBase,2,$,S)
 C(1,#VirtualDiffDD,E(0,#VirtualDiffYY*12+#VirtualDiffMM),E(0,#VirtualDiffYY*12+#VirtualDiffMM),E(0,#VirtualDiffYY*12+#VirtualDiffMM+1))
 E(0,#VirtualDiffMons-#TotalPeriod*#PayIntFreq)
-
-
-!改 原是C(1,#WKSP2DD,E(0,#WKEND2YYMM*100+#SpecificDd),E(0,MaturityDate),E(0,#WKEND2YYMM*100+#SpecificDd))
-!造成首次應繳日的日不對 等於時日會跑成16
-! #WKEND2DATE=D,8,S
-! ! E(0,#WKMATYYJanspdd)
-! C(1,#WKSP2DD,E(0,#WKEND2YYMM*100+#SpecificDd),E(0,#WKEND2YYMM*100+#SpecificDd),E(0,#WKEND2YYMM*100+#SpecificDd))
-! C(1,#WKSP2DD,D(7,2,#WKEND2DATE,1,0),$,$)
-! A(DATE,0,#WKEND2DATE)
 
 
 !貸款期間的年換算成月+貸款期間的月
@@ -1521,7 +1521,7 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L2921; ntxbuf=#BUF5A})
 SHOW(#RenewFlag)
 T(F,@SyndNo,1)
 C(5,#L2r01CharCode,2,$,S)
-T(3,@RenewFlag,N)
+T(3,@RenewFlag,0)
 HIDE(#RenewFlag)
 T(H,@RenewFlagX,#RenewFlag,#RenewFlagHelp)
 E(0,@SyndNo,0)
@@ -1530,12 +1530,12 @@ T(F,@SyndNo,0)
 
 ![客戶別]
 !依核准額度自動顯示不必輸入 L2R05
-#FdCustTypeCode=X,2,L
+! #FdCustTypeCode=X,2,L
 
-#CustTypeCode=X,2,S
+! #CustTypeCode=X,2,S
 
-#CustTypeCodeX=X,20,L
-T(H,#CustTypeCode,#CustTypeCodeHelp)
+! #CustTypeCodeX=X,20,L
+! T(H,#CustTypeCode,#CustTypeCodeHelp)
 
 ![未齊件]
 !必須輸入
@@ -1683,8 +1683,9 @@ T(2,#L2r01ProdName)
 #BaseRateCodeX=X,30,L
 C(3,#BaseRateCode,0,S,$)T(H,#BaseRateCode,#BaseRateCodeHelp)            
 
+! 系統日
 #wksysdate=D,7,S
-E(0,#SYSDATE)
+E(0,#SYSCDATE)
 
 ![指標利率]
 !L2R01
@@ -2061,7 +2062,7 @@ T(H,#RpRemitGender,#SexHelp)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 C(4,#RpRemitGender,S,$)
 @A(DATE,0,#RpRemitBirthday)
-IF(#RpRemitBirthday>#wksysdate,V(P,出生日期不可大於今日),$)
+IF(#RpRemitBirthday>#wksysdate,V(P,出生日期不可大於日曆日),$)
 
 
 !AML處理
@@ -2169,7 +2170,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 [
 ![其他]
 ["<font color=red>@其他"],
-["#FdCustTypeCode+客戶別",#CustTypeCodeX],
+! ["#FdCustTypeCode+客戶別",#CustTypeCodeX],
 ["#FdNotYetFlag+未齊件",#NotYetFlag,#NotYetFlagX,#BTN5],
 ["#FdRenewFlag+展期／借新還舊",#RenewFlag,#RenewFlagX],  
 ["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],

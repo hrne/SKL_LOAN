@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -47,7 +45,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R08")
 @Scope("prototype")
 public class L3R08 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3R08.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -128,22 +125,22 @@ public class L3R08 extends TradeBuffer {
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "L3R08 放款主檔"); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 放款主檔"); // 查詢資料不存在
 		}
 		for (LoanBorMain ln : lLoanBorMain) {
 			wkLoanPrevIntDate = ln.getPrevPayIntDate() == 0 ? ln.getDrawdownDate() : ln.getPrevPayIntDate();
 			if (ln.getStatus() != 0) {
 				if (iFacmNo > 0 && iBormNo > 0) {
-					throw new LogicException(titaVo, "E3063", "L3R08"); // 該筆放款戶況非正常戶
+					throw new LogicException(titaVo, "E3063", ""); // 該筆放款戶況非正常戶
 				} else {
 					continue;
 				}
 			}
 			if (ln.getActFg() == 1 && iFKey == 0) {
-				throw new LogicException(titaVo, "E0021", "L3R08 放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
+				throw new LogicException(titaVo, "E0021", " 放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
 			}
 			if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
-				throw new LogicException(titaVo, "E3062", "L3R08 應繳息日 = " + ln.getNextPayIntDate()); // 有1期(含)以上期款未繳,不可變更繳款日
+				throw new LogicException(titaVo, "E3062", " 應繳息日 = " + ln.getNextPayIntDate()); // 有1期(含)以上期款未繳,不可變更繳款日
 			}
 			// 應收息迄日iNewSpecificDate>上次繳息日且小於下次繳息日
 			if (iNewSpecificDate < wkLoanPrevIntDate || iNewSpecificDate >= ln.getNextPayIntDate()) {
@@ -157,7 +154,7 @@ public class L3R08 extends TradeBuffer {
 			wkTotaCount++;
 		}
 		if (wkTotaCount == 0) {
-			throw new LogicException(titaVo, "E3076", "L3R08"); // 查無可變更應繳日的資料
+			throw new LogicException(titaVo, "E3076", ""); // 查無可變更應繳日的資料
 		}
 
 		this.totaVo.putParam("OInterest", oTotalInterest);

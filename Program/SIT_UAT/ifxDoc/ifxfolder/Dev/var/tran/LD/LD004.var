@@ -56,12 +56,14 @@ V(5,0,#SYSDATE)
 #inputSlipNoStart=N,6,I
 
 #inputSlipNoEnd=N,6,I
+E(0,999999)
 @V(5,#inputSlipNoStart,999999)
 V(2,0)
 
 #inputTitaTxtNoStart=N,8,I
 
 #inputTitaTxtNoEnd=N,8,I
+E(0,99999999)
 @V(5,#inputTitaTxtNoStart,99999999)
 V(2,0)
 

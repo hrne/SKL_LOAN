@@ -76,16 +76,16 @@ public class L2R23 extends TradeBuffer {
 			}
 			case 2:
 				// 若為修改，但資料不存在，拋錯
-				throw new LogicException("E0003", "L2R23(ClImm)");
+				throw new LogicException("E0003", ""); //修改資料不存在
 			case 4:
 				// 若為刪除，但資料不存在，拋錯
-				throw new LogicException("E0004", "L2R23(ClImm)");
+				throw new LogicException("E0004", ""); //刪除資料不存在
 			case 5:
 				// 若為查詢，但資料不存在，拋錯
-				throw new LogicException("E0001", "L2R23(ClImm)");
+				throw new LogicException("E0001", "");//查詢資料不存在
 			default:
 				// funch不在以上範圍，拋錯
-				throw new LogicException("E0010", "L2R23(ClImm)");
+				throw new LogicException("E0010", ""); //功能選擇錯誤
 			}
 
 		} else {

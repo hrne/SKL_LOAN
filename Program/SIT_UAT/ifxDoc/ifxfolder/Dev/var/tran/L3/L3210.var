@@ -184,7 +184,7 @@ T(1,@FacmNo,#NTXBUF,8,3)
 T(3,00000019999999000)
 
 #BIND6A=X,1,S
-BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 #InitFdA=X,1,S
 T(3,@FdEntryDate,*)
@@ -225,7 +225,7 @@ E(0,@FacmNo,0)
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 ![統一編號]
 #FdCustId=X,2,L
@@ -244,7 +244,7 @@ V(7)
 T(2,0000000+#CustId)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -269,7 +269,7 @@ E(0,#SYSDATE)
 T(3,000000199999990)
 
 #BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 ![核准編號]
 #FdApplNo=X,2,L
@@ -532,7 +532,7 @@ V(P,入帳日期及額度編號必須有值，請按[已入帳未還款查]選�
 T(2,#TimCustNo+#TimCustNo+000)
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo:CustNoX<-OOCustName})
 
 
 ![已入帳未還款-額度編號]

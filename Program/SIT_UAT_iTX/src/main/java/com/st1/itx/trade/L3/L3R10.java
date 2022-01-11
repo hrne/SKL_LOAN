@@ -62,10 +62,10 @@ public class L3R10 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {
-			throw new LogicException(titaVo, "E0009", "L3R10"); // 交易代號不可為空白
+			throw new LogicException(titaVo, "E0009", ""); // 交易代號不可為空白
 		}
 		if (!(iRimFuncCode >= 1 && iRimFuncCode <= 5)) {
-			throw new LogicException(titaVo, "E0010", "L3R10"); // 功能選擇錯誤
+			throw new LogicException(titaVo, "E0010", ""); // 功能選擇錯誤
 		}
 
 		initTotaLoanSynd();

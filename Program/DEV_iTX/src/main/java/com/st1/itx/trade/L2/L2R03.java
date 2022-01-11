@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R03")
 @Scope("prototype")
 public class L2R03 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R03.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -53,10 +52,10 @@ public class L2R03 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {
-			throw new LogicException(titaVo, "E0009", "L2R03"); // 交易代號不可為空白
+			throw new LogicException(titaVo, "E0009", ""); // 交易代號不可為空白
 		}
 		if (!(iRimFuncCode == 1 || iRimFuncCode == 2 || iRimFuncCode == 4 || iRimFuncCode == 5)) {
-			throw new LogicException(titaVo, "E0010", "L2R03"); // 功能選擇錯誤
+			throw new LogicException(titaVo, "E0010", ""); // 功能選擇錯誤
 		}
 
 		// 查詢客戶資料主檔
@@ -65,7 +64,7 @@ public class L2R03 extends TradeBuffer {
 		if (tCustMain != null) {
 			wkGroupUkey = tCustMain.getCustUKey().trim();
 		} else {
-			throw new LogicException(titaVo, "E0001", "L2R03 客戶資料主檔"); // 查無資料
+			throw new LogicException(titaVo, "E0001", " 客戶資料主檔"); // 查無資料
 		}
 
 		FacCaseAppl tFacCaseAppl = facCaseApplService.caseApplGroupUKeyFirst(wkGroupUkey, 1, 9999999, titaVo);
@@ -76,7 +75,7 @@ public class L2R03 extends TradeBuffer {
 			if (iRimTxCode.equals("L2112")) {
 				moveTotaCaseAppl(new FacCaseAppl());
 			} else {
-				throw new LogicException(titaVo, "E0001", "L2R03 案件申請檔"); // 查無資料
+				throw new LogicException(titaVo, "E0001", " 案件申請檔"); // 查無資料
 			}
 		}
 

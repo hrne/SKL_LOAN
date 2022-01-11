@@ -7,9 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -18,7 +15,6 @@ import javax.persistence.Query;
 
 @Service("bS720ServiceImpl")
 public class BS720ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(BS720ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -29,24 +25,33 @@ public class BS720ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	public String FindBS720(int YearMonth, int YearMonthLast) throws Exception {
-		String sql = "SELECT \r\n" + " T.\"YearMonth\"\r\n" + ",SUM(CASE WHEN NVL(TF.\"AcctCode\",' ') = '990' then T.\"AccumDPAmortized\" ELSE 0 END) AS \"OvAmortized\"\r\n"
-				+ ",SUM(CASE WHEN  NVL(TF.\"AcctCode\",' ') <> '990' then T.\"AccumDPAmortized\" ELSE 0 END) AS \"LnAmortized\"\r\n" + "FROM \"Ias39IntMethod\" T\r\n"
-				+ "LEFT JOIN \"MonthlyFacBal\" TF\r\n" + "       ON  TF.\"YearMonth\" = T.\"YearMonth\"\r\n" + "      AND  TF.\"CustNo\" = T.\"CustNo\"\r\n"
-				+ "      AND  TF.\"FacmNo\" = T.\"FacmNo\"\r\n" + "WHERE T.\"YearMonth\" = " + YearMonth + " " + "GROUP BY T.\"YearMonth\"\r\n" + "UNION ALL\r\n" + "SELECT \r\n"
-				+ " L.\"YearMonth\"\r\n" + ",SUM(CASE WHEN NVL(LF.\"AcctCode\",' ') = '990' then L.\"AccumDPAmortized\" ELSE 0 END)    AS \"OvAmortizedLast\" \r\n"
-				+ ",SUM(CASE WHEN  NVL(LF.\"AcctCode\",' ') <> '990' then L.\"AccumDPAmortized\" ELSE 0 END) AS \"LnAmortizedLast\" \r\n" + "FROM \"Ias39IntMethod\" L\r\n"
-				+ "LEFT JOIN \"MonthlyFacBal\" LF\r\n" + "       ON  LF.\"YearMonth\" = L.\"YearMonth\"\r\n" + "      AND  LF.\"CustNo\" = L.\"CustNo\"\r\n"
-				+ "      AND  LF.\"FacmNo\" = L.\"FacmNo\"\r\n" + "WHERE  L.\"YearMonth\" = " + YearMonthLast + " " + "GROUP BY L.\"YearMonth\"\r\n" + "";
-		logger.info("sql = " + sql);
-		return sql;
-	}
+	public List<Map<String, String>> FindAll(TitaVo titaVo, int YearMonth, int YearMonthLast) throws Exception {
+		String sql = "";
+		sql += " SELECT IIM.\"YearMonth\" ";
+		sql += "       ,ROUND(SUM(CASE WHEN NVL(MFB.\"AcctCode\",' ') = '990' ";
+		sql += "                       THEN IIM.\"AccumDPAmortized\" ";
+		sql += "                  ELSE 0 END)) AS \"OvAmortized\" ";
+		sql += "       ,ROUND(SUM(CASE WHEN NVL(MFB.\"AcctCode\",' ') <> '990' ";
+		sql += "                       THEN IIM.\"AccumDPAmortized\" ";
+		sql += "                  ELSE 0 END)) AS \"LnAmortized\" ";
+		sql += " FROM \"Ias39IntMethod\" IIM ";
+		sql += " LEFT JOIN \"MonthlyFacBal\" MFB ON MFB.\"YearMonth\" = IIM.\"YearMonth\" ";
+		sql += "                                AND MFB.\"CustNo\"    = IIM.\"CustNo\" ";
+		sql += "                                AND MFB.\"FacmNo\"    = IIM.\"FacmNo\" ";
+		sql += " WHERE IIM.\"YearMonth\" IN (:YearMonth, :YearMonthLast) ";
+		sql += " GROUP BY IIM.\"YearMonth\" ";
+		sql += " ORDER BY IIM.\"YearMonth\" DESC "; // Makes sure YearMonthLast output being the last one
 
-	public List<Map<String, String>> FindData(String sql, TitaVo titaVo) throws Exception {
-		Query query;
+		this.info("sql=" + sql);
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
+		Query query;
 		query = em.createNativeQuery(sql);
-		logger.info("BS720Service FindData=" + query.toString());
-		return this.convertToMap(query.getResultList());
+
+		query.setParameter("YearMonth", YearMonth);
+		query.setParameter("YearMonthLast", YearMonthLast);
+		
+		return this.convertToMap(query);
 	}
 }

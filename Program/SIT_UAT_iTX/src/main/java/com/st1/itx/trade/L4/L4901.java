@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L4;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +67,8 @@ public class L4901 extends TradeBuffer {
 	@Autowired
 	DataLog datalog;
 
+	private List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4901 ");
@@ -100,66 +101,48 @@ public class L4901 extends TradeBuffer {
 			slBankRemit = bankRemitService.findL4901A(iCustNo, this.index, this.limit);
 			break;
 		case 2: // 批號
-			slBankRemit = bankRemitService.findL4901B(iAcDate, batchNo, drawdownCodeS, drawdownCodeE, 0, 9, this.index, this.limit, titaVo);
+			slBankRemit = bankRemitService.findL4901B(iAcDate, batchNo, drawdownCodeS, drawdownCodeE, 0, 9, this.index,
+					this.limit, titaVo);
 			break;
 		case 3: // 全部批號
-			slBankRemit = bankRemitService.findL4901C(iAcDate, drawdownCodeS, drawdownCodeE, 0, 9, this.index, this.limit, titaVo);
+			slBankRemit = bankRemitService.findL4901C(iAcDate, drawdownCodeS, drawdownCodeE, 0, 9, this.index,
+					this.limit, titaVo);
 			break;
 		}
 
-		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		if (slBankRemit != null) {
 			for (BankRemit t : slBankRemit.getContent()) {
 				this.info(t.toString());
+
 				switch (iStatusCode) {
+				// 正常
 				case 0:
 					if (t.getActFg() == 0 || t.getActFg() == 2) {
 						lBankRemit.add(t);
 					}
 					break;
+				// 未放行
 				case 1:
-					if (t.getStatusCode() == 1) {
-						TempVo tTempVo = new TempVo();
-						tTempVo = tTempVo.getVo(t.getModifyContent());
-						BankRemit t2 = new BankRemit();
-						t2 = (BankRemit) datalog.clone(t);
-						t.setStatusCode(0);
+					if (t.getActFg() == 1) {
 						lBankRemit.add(t);
-						if (!tTempVo.getParam("DrawdownCode").isEmpty()) {
-							t2.setDrawdownCode(parse.stringToInteger(tTempVo.getParam("DrawdownCode")));
-						}
-						if (!tTempVo.getParam("RemitAmt").isEmpty()) {
-							t2.setRemitAmt(BigDecimal.ZERO);
-						} else {
-							t2.setRemitAmt(parse.stringToBigDecimal(tTempVo.getParam("RemitAmt")));
-						}
-						if (!tTempVo.getParam("RemitBank").isEmpty()) {
-							t2.setRemitBank(tTempVo.getParam("RemitBank"));
-							t2.setRemitBranch(t.getRemitBranch());
-						}
-						if (!tTempVo.getParam("RemitBranch").isEmpty()) {
-							t2.setRemitBranch(tTempVo.getParam("RemitBranch"));
-						}
-						if (!tTempVo.getParam("CustName").isEmpty()) {
-							t2.setCustName(tTempVo.getParam("CustName"));
-						}
-						if (!tTempVo.getParam("RemitAcctNo").isEmpty()) {
-							t2.setRemitAcctNo(tTempVo.getParam("RemitAcctNo"));
-						}
-						if (!tTempVo.getParam("Remark").isEmpty()) {
-							t2.setRemark(tTempVo.getParam("Remark"));
-						}
-						lBankRemit.add(t2);
 					}
 					break;
+				// 產檔後訂正
 				case 2:
 					if (t.getStatusCode() == 2) {
 						lBankRemit.add(t);
 					}
 					break;
+				// 產檔後修正
 				case 3:
-					if (t.getActFg() == 1) {
-						lBankRemit.add(t);
+					if (t.getStatusCode() == 3) {
+						addDetail(t);
+					}
+					break;
+				// 產檔後改單筆匯款
+				case 4:
+					if (t.getStatusCode() == 4) {
+						addDetail(t);
 					}
 					break;
 				case 9:
@@ -183,7 +166,8 @@ public class L4901 extends TradeBuffer {
 
 			CdBank tCdBank = new CdBank();
 			if (!tBankRemit.getRemitBranch().isEmpty()) {
-				tCdBank = cdBankService.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()), titaVo);
+				tCdBank = cdBankService.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()),
+						titaVo);
 			}
 			String ckItem = "";
 			String brItem = "";
@@ -219,4 +203,41 @@ public class L4901 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
+	private void addDetail(BankRemit t) throws LogicException {
+
+		TempVo tTempVo = new TempVo();
+		tTempVo = tTempVo.getVo(t.getModifyContent());
+		BankRemit t2 = new BankRemit();
+		t2 = (BankRemit) datalog.clone(t);
+		t.setStatusCode(0);
+		lBankRemit.add(t);
+
+		if (tTempVo.get("DrawdownCode") != null) {
+			t2.setDrawdownCode(parse.stringToInteger(tTempVo.getParam("DrawdownCode")));
+		}
+		if (tTempVo.get("RemitAmt") != null) {
+			t2.setRemitAmt(parse.stringToBigDecimal(tTempVo.getParam("RemitAmt")));
+		}
+
+		if (tTempVo.get("RemitBank") != null) {
+			t2.setRemitBank(tTempVo.getParam("RemitBank"));
+			t2.setRemitBranch(t.getRemitBranch());
+		}
+		if (tTempVo.get("RemitBranch") != null) {
+			t2.setRemitBranch(tTempVo.getParam("RemitBranch"));
+		}
+		if (tTempVo.getParam("CustName") != null) {
+			t2.setCustName(tTempVo.getParam("CustName"));
+		}
+		if (tTempVo.getParam("RemitAcctNo") != null) {
+			t2.setRemitAcctNo(tTempVo.getParam("RemitAcctNo"));
+		}
+		if (tTempVo.getParam("Remark") != null) {
+			t2.setRemark(tTempVo.getParam("Remark"));
+		}
+		lBankRemit.add(t2);
+
+	}
+
 }

@@ -53,7 +53,7 @@ public class L2R04 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {
-			throw new LogicException(titaVo, "E0009", "L2R04"); // 交易代號不可為空白
+			throw new LogicException(titaVo, "E0009", ""); // 交易代號不可為空白
 		}
 
 		// 查詢商品參數檔
@@ -63,18 +63,18 @@ public class L2R04 extends TradeBuffer {
 			// 檢查商品參數檔
 
 			if (!(tFacProd.getStartDate() <= parse.stringToInteger(titaVo.getCalDy()))) {
-				throw new LogicException(titaVo, "E2053", "L2R04"); // 此商品尚未生效
+				throw new LogicException(titaVo, "E2053", ""); // 此商品尚未生效
 			}
 			if (tFacProd.getEndDate() > 0) {
 				if (tFacProd.getEndDate() < this.txBuffer.getTxCom().getTbsdy()) {
-					throw new LogicException(titaVo, "E2054", "L2R04" + iRimProdNo + tFacProd.getEndDate()); // 此商品已截止
+					throw new LogicException(titaVo, "E2054", "" + iRimProdNo + tFacProd.getEndDate()); // 此商品已截止
 				}
 			}
 			if (!tFacProd.getStatusCode().equals("0")) {
-				throw new LogicException(titaVo, "E2054", "L2R04"); // 此商品已停用
+				throw new LogicException(titaVo, "E2054", ""); // 此商品已停用
 			}
 		} else {
-			throw new LogicException(titaVo, "E0001", "L2R04 商品參數檔"); // 查無資料
+			throw new LogicException(titaVo, "E0001", " 商品參數檔"); // 查無資料
 		}
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值

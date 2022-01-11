@@ -56,10 +56,10 @@ public class L2R02 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {
-			throw new LogicException(titaVo, "E0009", "L2R02"); // 交易代號不可為空白
+			throw new LogicException(titaVo, "E0009", ""); // 交易代號不可為空白
 		}
 		if (!(iRimFuncCode >= 1 && iRimFuncCode <= 7)) {
-			throw new LogicException(titaVo, "E0010", "L2R02"); // 功能選擇錯誤
+			throw new LogicException(titaVo, "E0010", ""); // 功能選擇錯誤
 		}
 
 		// 查詢客戶檔
@@ -70,7 +70,7 @@ public class L2R02 extends TradeBuffer {
 			if (tCustMain != null) {
 				wkCustUkey = tCustMain.getCustUKey().trim();
 			} else {
-				throw new LogicException(titaVo, "E0001", "L2R02 客戶資料主檔" + iRimCustId); // 查無資料
+				throw new LogicException(titaVo, "E0001", " 客戶資料主檔" + iRimCustId); // 查無資料
 			}
 		}
 		// 查詢案件申請檔
@@ -83,22 +83,22 @@ public class L2R02 extends TradeBuffer {
 				if (iRimFuncCode != 3 && !tFacCaseAppl.getCustUKey().trim().equals(wkCustUkey)) {
 					this.info("L2R02 CustUkey=" + wkCustUkey);
 					this.info("L2R02 ApplUkey=" + tFacCaseAppl.getCustUKey().trim());
-					throw new LogicException(titaVo, "E2061", "L2R02"); // 統一編號與申請案件不符
+					throw new LogicException(titaVo, "E2061", ""); // 統一編號與申請案件不符
 				}
 				if (iRimFuncCode == 1) {
-					throw new LogicException(titaVo, "E2062", "L2R02"); // 申請案件檔，資料已存在
+					throw new LogicException(titaVo, "E2062", ""); // 申請案件檔，資料已存在
 				}
 				if (iRimFuncCode == 4 && !tFacCaseAppl.getProcessCode().equals("0")) {
-					throw new LogicException(titaVo, "E2063", "L2R02"); // 已作過准駁處理之案件不可刪除
+					throw new LogicException(titaVo, "E2063", ""); // 已作過准駁處理之案件不可刪除
 				}
 				break;
 			case "L2151": // 駁回額度登錄
 				if (iRimFuncCode == 6 || iRimFuncCode == 7) {
 					if (tFacCaseAppl.getProcessCode().equals("1")) {
-						throw new LogicException(titaVo, "E2064", "L2R02"); // 申請案件已核准
+						throw new LogicException(titaVo, "E2064", ""); // 申請案件已核准
 					}
 					if (tFacCaseAppl.getProcessCode().equals("2")) {
-						throw new LogicException(titaVo, "E2065", "L2R02"); // 申請案件已駁回
+						throw new LogicException(titaVo, "E2065", ""); // 申請案件已駁回
 					}
 				}
 				break;
@@ -106,14 +106,14 @@ public class L2R02 extends TradeBuffer {
 				if (!tFacCaseAppl.getCustUKey().trim().equals(wkCustUkey)) {
 					this.info("L2R02 CustUkey=" + wkCustUkey);
 					this.info("L2R02 ApplUkey=" + tFacCaseAppl.getCustUKey().trim());
-					throw new LogicException(titaVo, "E2061", "L2R02"); // 統一編號與申請案件不符
+					throw new LogicException(titaVo, "E2061", ""); // 統一編號與申請案件不符
 				}
 				if (iRimFuncCode == 6 || iRimFuncCode == 7) {
 					if (tFacCaseAppl.getProcessCode().equals("1") && iFKey == 0) {
-						throw new LogicException(titaVo, "E2064", "L2R02"); // 申請案件已核准
+						throw new LogicException(titaVo, "E2064", ""); // 申請案件已核准
 					}
 					if (tFacCaseAppl.getProcessCode().equals("2")) {
-						throw new LogicException(titaVo, "E2065", "L2R02"); // 申請案件已駁回
+						throw new LogicException(titaVo, "E2065", ""); // 申請案件已駁回
 					}
 				}
 				break;
@@ -124,7 +124,7 @@ public class L2R02 extends TradeBuffer {
 			if (tCustMain != null) {
 				this.totaVo.putParam("OCustId", tCustMain.getCustId());
 			} else {
-				throw new LogicException(titaVo, "E0001", "L2R02 客戶資料主檔" + tFacCaseAppl.getCustUKey()); // 查無資料
+				throw new LogicException(titaVo, "E0001", " 客戶資料主檔" + tFacCaseAppl.getCustUKey()); // 查無資料
 			}
 			this.totaVo.putParam("OCreditSysNo", tFacCaseAppl.getCreditSysNo());
 			this.totaVo.putParam("OSyndNo", tFacCaseAppl.getSyndNo());
@@ -153,12 +153,12 @@ public class L2R02 extends TradeBuffer {
 				if (tCustMain != null) {
 					this.totaVo.putParam("OGroupId", tCustMain.getCustId());
 				} else {
-					throw new LogicException(titaVo, "E0001", "L2R02 客戶資料主檔" + tFacCaseAppl.getGroupUKey()); // 查無資料
+					throw new LogicException(titaVo, "E0001", " 客戶資料主檔" + tFacCaseAppl.getGroupUKey()); // 查無資料
 				}
 			}
 		} else {
 			if (!(iRimTxCode.equals("L2111") && iRimFuncCode == 1)) {
-				throw new LogicException(titaVo, "E0001", "L2R02 案件申請檔"); // 查無資料
+				throw new LogicException(titaVo, "E0001", " 案件申請檔"); // 查無資料
 			}
 		}
 

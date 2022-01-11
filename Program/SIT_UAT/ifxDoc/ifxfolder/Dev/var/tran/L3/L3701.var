@@ -374,7 +374,7 @@ T(3,)T(H,#ACTFG,#ActFgHelp)
 T(3,00000019999999000)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
@@ -392,7 +392,7 @@ SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 T(2,#CustNo+9999999000)
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 #SendL2r07A=X,1,S
 C(3,#FKEY,0,$,s)
@@ -411,7 +411,7 @@ C(3,#CustNo,0,S,T(2,#L2r07CustName))
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #init=X,1,S
 T(F,@Remark,0)
@@ -433,7 +433,7 @@ SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 T(2,0000000+#CustId)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(3,#FKEY,0,$,s)
@@ -458,7 +458,7 @@ C(4,#CustId,S,T(2,#L2r07CustName))
 T(3,000000199999990)
 
 #BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 ![核准編號]
 #FdApplNo=X,2,L
@@ -479,7 +479,7 @@ SHOW(#BTN3)HIDE(#BTN1,#BTN2)
 T(2,#ApplNo+99999990)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
@@ -1762,6 +1762,7 @@ C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 ![計件代碼]
 #PieceCode2=X,1,I
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+C(5,#ChackBormNoFg,Y,$,S)
 HELP(#PieceCodeHelp,cols:2)
 @C(4,#PieceCode2,S,V(H,#PieceCodeHelp))
 V(4,#PieceCode1)
@@ -1846,7 +1847,6 @@ C(4,#Remark2,S,T(3,X))
 #ProcessDate2=D,7,I
 C(5,#FacmOnlyFlag,Y,S,$)
 C(5,#OvduFlag,Y,$,S)
-C(5,#ChackBormNoFg,Y,S,$)
 C(3,#ProcessDate2,0,E(0,#SYSDATE),$)
 @V(2,#FirstDueDate1)
 A(DATE,0,#ProcessDate2)
@@ -1905,7 +1905,7 @@ T(F,@Remark,1)
 
 #ReasonX=X,100,L
 T(3,)T(H,#Reason,#ReasonHelp)
-IF(#Reason==99,T(3,@Remark,)SHOW(#Remark),T(2,@Remark,#ReasonX)HIDE(#Remark))
+! IF(#Reason==99,T(3,@Remark,)SHOW(#Remark),T(2,@Remark,#ReasonX)HIDE(#Remark))
 
 
 #Remark=x,100,I

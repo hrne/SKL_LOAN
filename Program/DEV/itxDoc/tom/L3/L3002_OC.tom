@@ -12,3 +12,4 @@ OOStoreRate=9,2.4
 OOCurrencyCode=X,3
 OOLoanBal=9,14.2
 OOBookFlag=9,1
+OORenewFlag=X,1

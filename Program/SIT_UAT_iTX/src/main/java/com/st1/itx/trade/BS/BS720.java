@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -22,9 +20,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.Ias39IntMethod;
 import com.st1.itx.db.domain.Ias39IntMethodId;
-import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.Ias39IntMethodService;
 import com.st1.itx.db.service.springjpa.cm.BS720ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -44,7 +42,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS720 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(BS720.class);
 
 	@Autowired
 	public Ias39IntMethodService ias39IntMethodService;
@@ -98,10 +95,10 @@ public class BS720 extends TradeBuffer {
 		this.batchTransaction.commit();
 
 // 2021/2/24 考慮四捨五入差額，只出表、不入帳(維持至核心會計系統輸入)		
-		// 寫入應處理清單 ACCL00-各項提存作業(折溢價攤銷)
-//		procTxToDo(iYearMonth, titaVo);
-//		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
-//				"請執行 各項提存入帳作業(折溢價攤銷)", titaVo);
+		// 寫入應處理清單 ACCL04-折溢價攤銷入帳
+		procTxToDo(iYearMonth, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
+				"請執行 各項提存入帳作業(折溢價攤銷)", titaVo);
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L9719", titaVo.getTlrNo(), "請列印 放款利息法折溢價攤銷表", titaVo);
 
 		this.batchTransaction.commit();
@@ -189,17 +186,9 @@ public class BS720 extends TradeBuffer {
 	private void procFindData(int iYearMonth, int iYearMonthLast, TitaVo titaVo) throws LogicException {
 
 		List<Map<String, String>> lBS720Sql = new ArrayList<Map<String, String>>();
-		String bS720Sql = "";
-
+		
 		try {
-			bS720Sql = bS720ServiceImpl.FindBS720(iYearMonth, iYearMonthLast);
-		} catch (Exception e) {
-			// E5003 組建SQL語法發生問題
-			this.info("BS720 ErrorForSql=" + e);
-			throw new LogicException(titaVo, "E5003", "");
-		}
-		try {
-			lBS720Sql = bS720ServiceImpl.FindData(bS720Sql, titaVo);
+			lBS720Sql = bS720ServiceImpl.FindAll(titaVo, iYearMonth, iYearMonthLast);
 		} catch (Exception e) {
 			// E5004 讀取DB語法發生問題
 			this.info("BS720 ErrorForSql=" + e);
@@ -226,14 +215,24 @@ public class BS720 extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		int iDb = 0;
 		int iCr = 0;
+		int iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
+		String acBookCode = this.txBuffer.getSystemParas().getAcBookCode();
+		String acSubBookCode = this.txBuffer.getSystemParas().getAcSubBookCode();
+		//String acctCode = ;
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-		tTxToDoDetail.setItemCode("ACCL00"); // ACCL00-各項提存作業
+		tTxToDoDetail.setItemCode("ACCL04"); // ACCL04-折溢價攤銷入帳
 		// 借：AII 利息收入－折溢價
 		// 貸：AIL 擔保放款－折溢價 AIO 催收款項－折溢價
 		TempVo tTempVo = new TempVo();
 		tTempVo.clear();
 		tTempVo.putParam("AcclType", "折溢價攤銷");
-		tTempVo.putParam("AcBookCode", "000");
+
+		tTempVo.putParam("AcDate", iAcDate);
+		tTempVo.putParam("SlipBatNo", "93");
+		tTempVo.putParam("AcBookCode", acBookCode);
+		tTempVo.putParam("AcSubBookCode", acSubBookCode);
+		tTempVo.putParam("AcctCode", "AII");
+		
 		tTempVo.putParam("SlipNote", iYearMonth / 100 + "年" + iYearMonth % 100 + "月" + "折溢價攤銷");
 		BigDecimal lnAmt = loanAmt.subtract(loanAmtLast);
 		BigDecimal ovAmt = loanAmt.subtract(ovduAmtLast);
@@ -268,4 +267,5 @@ public class BS720 extends TradeBuffer {
 		tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 		txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo); // DupSkip = false ->重複 error
 	}
+
 }

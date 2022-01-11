@@ -76,7 +76,8 @@ public class L3R02 extends TradeBuffer {
 
 		// 查詢放款主檔
 		if (iBormNo == 0) {
-			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900, this.index, this.limit, titaVo);
+			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900,
+					this.index, this.limit, titaVo);
 			if (lLoanBorMain != null) {
 				for (LoanBorMain ln : lLoanBorMain.getContent()) {
 					if (ln.getStatus() == 0 || ln.getStatus() == 4) { // 0: 正常戶 4: 逾期戶
@@ -89,18 +90,23 @@ public class L3R02 extends TradeBuffer {
 		LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
 			if (iBormNo > 900) {
-				throw new LogicException(titaVo, "E0001", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001",
+						" 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 查詢資料不存在
 			} else {
-				throw new LogicException(titaVo, "E0001", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001",
+						" 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
 			}
 		}
 		if (tLoanBorMain.getActFg() == 1 && iFKey == 0) {
-			throw new LogicException(titaVo, "E0021", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 該筆資料待放行中
+			throw new LogicException(titaVo, "E0021",
+					" 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 該筆資料待放行中
 		}
 		if (iBormNo <= 900) {
-			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo, titaVo.getEntDyI() + 19110000, titaVo);
+			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
+					titaVo.getEntDyI() + 19110000, titaVo);
 			if (tLoanRateChange == null) {
-				throw new LogicException(titaVo, "E0001", "放款利率變動檔  借款人戶號 = " + iCustNo + "-" + iFacmNo + "-" + iBormNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001",
+						"放款利率變動檔  借款人戶號 = " + iCustNo + "-" + iFacmNo + "-" + iBormNo); // 查詢資料不存在
 			}
 
 		}
@@ -117,13 +123,16 @@ public class L3R02 extends TradeBuffer {
 		case "L3120": // 預約撥款刪除
 			if (iFuncCode.equals("4")) {
 				if (tLoanBorMain.getStatus() == 97) {
-					throw new LogicException(titaVo, "E0011", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料已被刪除
+					throw new LogicException(titaVo, "E0011",
+							" 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料已被刪除
 				}
 				if (tLoanBorMain.getStatus() == 98) {
-					throw new LogicException(titaVo, "E3054", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆預約撥款資料已撥款
+					throw new LogicException(titaVo, "E3054",
+							" 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆預約撥款資料已撥款
 				}
 				if (tLoanBorMain.getStatus() != 99) {
-					throw new LogicException(titaVo, "E3055", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料非預約撥款
+					throw new LogicException(titaVo, "E3055",
+							" 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料非預約撥款
 				}
 			}
 			break;
@@ -131,25 +140,25 @@ public class L3R02 extends TradeBuffer {
 		case "L3712": // 應繳日變更-可欠繳
 		case "L3923": // 應繳日試算
 			if ("2".equals(tFacMain.getAmortizedCode())) {
-				throw new LogicException(titaVo, "E0010", "L3R02攤還方式為到期取息時,不可做應繳日試算"); // 攤還方式為2時不可做應繳日試算
+				throw new LogicException(titaVo, "E0010", "攤還方式為到期取息時,不可做應繳日試算"); // 攤還方式為2時不可做應繳日試算
 			}
 			if ("3".equals(tFacMain.getFreqBase())) {
-				throw new LogicException(titaVo, "E0010", "L3R02週期基準為週時,不可做應繳日試算"); // 週期基準為週時不可做應繳日試算
+				throw new LogicException(titaVo, "E0010", "週期基準為週時,不可做應繳日試算"); // 週期基準為週時不可做應繳日試算
 			}
 
 			if (tLoanBorMain.getStatus() != 0) {
-				throw new LogicException(titaVo, "E3063", "L3R02"); // 該筆放款戶況非正常戶
+				throw new LogicException(titaVo, "E3063", ""); // 該筆放款戶況非正常戶
 			}
 			if (tLoanBorMain.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
-				throw new LogicException(titaVo, "E3062", "L3R02 應繳息日 = " + tLoanBorMain.getNextPayIntDate()); // 有1期(含)以上期款未繳,不可變更繳款日
+				throw new LogicException(titaVo, "E3062", " 應繳息日 = " + tLoanBorMain.getNextPayIntDate()); // 有1期(含)以上期款未繳,不可變更繳款日
 			}
 			break;
 		case "L3926": // 變更期款試算
 			if (tLoanBorMain.getStatus() != 0) {
-				throw new LogicException(titaVo, "E3063", "L3R02"); // 該筆放款戶況非正常戶
+				throw new LogicException(titaVo, "E3063", ""); // 該筆放款戶況非正常戶
 			}
 			if (!(tLoanBorMain.getAmortizedCode().equals("3") || tLoanBorMain.getAmortizedCode().equals("4"))) {
-				throw new LogicException(titaVo, "E3066", "L3R02 攤還方式 = " + tLoanBorMain.getAmortizedCode()); // 該筆放款攤還方式非本息平均法及本金平均法
+				throw new LogicException(titaVo, "E3066", " 攤還方式 = " + tLoanBorMain.getAmortizedCode()); // 該筆放款攤還方式非本息平均法及本金平均法
 			}
 			break;
 		}

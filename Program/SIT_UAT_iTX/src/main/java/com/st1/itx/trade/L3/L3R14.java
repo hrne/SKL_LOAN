@@ -5,8 +5,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -59,7 +57,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R14")
 @Scope("prototype")
 public class L3R14 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3R14.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -96,7 +93,6 @@ public class L3R14 extends TradeBuffer {
 	private BigDecimal oPrincipal = BigDecimal.ZERO;
 	private BigDecimal oInterest = BigDecimal.ZERO;
 	private BigDecimal oOpenInterest = BigDecimal.ZERO;
-	private BigDecimal oSumOpenInterest = BigDecimal.ZERO;
 	private BigDecimal oRealPayAmt = BigDecimal.ZERO;
 	private BigDecimal oRepayAmt = BigDecimal.ZERO;
 	private FacMain tFacMain;
@@ -127,7 +123,7 @@ public class L3R14 extends TradeBuffer {
 
 		tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
 		if (tFacMain == null) {
-			throw new LogicException(titaVo, "E0001", "L2R05 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 		}
 
 		if (tFacMain.getActFg() == 1 && iFKey == 0) {

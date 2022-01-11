@@ -28,7 +28,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Service("L2R09")
 @Scope("prototype")
 public class L2R09 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R09.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -53,7 +52,7 @@ public class L2R09 extends TradeBuffer {
 		// 查詢行庫代號檔
 		CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode, branchCode), titaVo);
 		if (tCdBank == null) {
-			throw new LogicException(titaVo, "E0001", "L2R09 行庫代號檔  行庫代號=" + iBankCode); // 查無資料
+			throw new LogicException(titaVo, "E0001", " 行庫代號檔  行庫代號=" + iBankCode); // 查無資料
 		}
 
 		this.totaVo.putParam("OBankItem", tCdBank.getBankItem());

@@ -27,7 +27,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R10")
 @Scope("prototype")
 public class L2R10 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R10.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -48,7 +47,7 @@ public class L2R10 extends TradeBuffer {
 
 		FacMain tFacMain = facMainService.facmCreditSysNoFirst(iRimCaseNo, iRimCaseNo, 1, 999, titaVo);
 		if (tFacMain == null) {
-			throw new LogicException(titaVo, "E0001", "L2R10 額度主檔 案件編號 = " + iRimCaseNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 額度主檔 案件編號 = " + iRimCaseNo); // 查詢資料不存在
 		}
 
 		this.totaVo.putParam("OCustNo", tFacMain.getCustNo());

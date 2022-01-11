@@ -91,7 +91,7 @@ C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
 T(3,00000019999999000)
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 #FdMain=X,2,L
 T(3,*) 
 
@@ -99,25 +99,31 @@ T(3,*)
 !借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
-#CustNo=A,7,I
+#CustNo=X,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,8,7),$)
 C(3,#CHAIN,1,s,$)
 !INVOKEJS(SHOW,p1,1,4,1)
 !SHOW(#BTN2)
+
+#CustNo2=A,7,S
+C(4,#CustNo,S,$)
+E(0,#CustNo)
+T(2,@CustNo,#CustNo2)
+
 
 #WKBTN2=X,1,S
 !C(3,#CustNo,0,HIDE(#BTN2),SHOW(#BTN2))
 !C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,4,0))
 
 #BUF2B=X,18,S
-C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
+C(4,#CustNo,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
 ! T(2,#CustNo+#CustNo+000)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustNo<-OOCustNo})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 #SendL2r07B=X,1,S
-C(3,#CustNo,0,S,$)
+C(4,#CustNo,S,$)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07B,L2R07)
@@ -125,12 +131,12 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #CustNoX=x,2.50,L
-C(3,#CustNo,0,S,T(2,#L2r07CustName))
+C(4,#CustNo,S,T(2,#L2r07CustName))
 
 #BUF3A=X,100,S
 
 #BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 ![統一編號]
 #FdCustId=X,2,L
@@ -139,7 +145,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:CustId<
 T(3,@FdApplNo, )
 C(3,#CHAIN,1,T(1,#NTXBUF,15,10),$)
 C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,S)
+C(4,#CustNo,$,S)
 !INVOKEJS(SHOW,p1,2,4,1)
 !SHOW(#BTN3)
 @C(4,#CustId,S,$)V(7)
@@ -148,7 +154,7 @@ C(3,#CustNo,0,$,S)
 T(2,0000000+#CustId)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -173,33 +179,40 @@ C(4,#CustId,S,T(2,#L2r07CustName))
 T(3,000000199999990)
 
 #BIND4A=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4A;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4A;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
 
 
 ![核准編號]
 #FdApplNo=X,2,L
 C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,S)
+C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 
-#ApplNo=A,7,I
+#ApplNo=X,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,25,7),$)
 C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,S)
+C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 !INVOKEJS(SHOW,p1,3,4,1)
 !SHOW(#BTN4)
+
+#ApplNo2=A,7,S
+C(4,#ApplNo,S,$)
+E(0,#ApplNo)
+T(2,@ApplNo,#ApplNo2)
+
+
 
 #WKBTN4=X,1,S
 !C(3,#ApplNo,0,HIDE(#BTN4),SHOW(#BTN4))
 !C(3,#ApplNo,0,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
 
 #BUF4B=X,18,S
-C(3,#ApplNo,0,T(3,000000199999990),T(2,#ApplNo+99999990))
+C(4,#ApplNo,T(3,000000199999990),T(2,#ApplNo+99999990))
 ! T(2,#ApplNo+99999990)
 
 #BIND4B=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4B;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
 
 #HIDEALLBTN=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -207,7 +220,7 @@ C(3,#CHAIN,1,$,S)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05=X,1,S
-C(3,#ApplNo,0,S,$)
+C(4,#ApplNo,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,0)
@@ -218,7 +231,7 @@ S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#Rim
 R(1,L2R05)
 
 #SendL2r07D=X,1,S
-C(3,#ApplNo,0,S,$)
+C(4,#ApplNo,S,$)
 T(2,@RimCustId,#L2r05CustId)
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07D,L2R07)
@@ -226,7 +239,7 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #ApplNoX=x,2.50,L
-C(3,#ApplNo,0,S,T(2,#L2r07CustName))
+C(4,#ApplNo,S,T(2,#L2r07CustName))
 
 
 
@@ -234,24 +247,30 @@ C(3,#ApplNo,0,S,T(2,#L2r07CustName))
 #FdCaseNo=X,2,L
 !T(3,*)
 
-#CaseNo=A,7,I
+#CaseNo=X,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
 C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,S)
+C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
-C(3,#ApplNo,0,$,S)
+C(4,#ApplNo,$,S)
 !INVOKEJS(SHOW,p1,4,4,1)
-@C(3,#CaseNo,0,V(P,需擇一輸入查詢條件),$)
+@C(4,#CaseNo,V(P,需擇一輸入查詢條件),$)
+
+#CaseNo2=A,7,S
+C(4,#CaseNo,S,$)
+E(0,#CaseNo)
+T(2,@CaseNo,#CaseNo2)
+
 
 #SendL2r10=X,1,S
-C(3,#CaseNo,0,S,$)
+C(4,#CaseNo,S,$)
 E(0,@RimCaseNo,#CaseNo)
 RESET_RIM(#SendL2r10,L2R10)
 S(L2R10,1,#RimCaseNo)
 R(1,L2R10)
 
 #SendL2r07A=X,1,S
-C(3,#CaseNo,0,S,$)
+C(4,#CaseNo,S,$)
 T(2,@RimCustId, )
 E(0,@RimCustNo,#L2r10CustNo)
 RESET_RIM(#SendL2r07A,L2R07)
@@ -262,7 +281,7 @@ R(1,L2R07)
 !C(3,#CaseNo,0,INVOKEJS(SHOW,p1,4,4,0),$)
 
 #CaseNoX=x,2.50,L
-C(3,#CaseNo,0,S,T(2,#L2r07CustName))
+C(4,#CaseNo,S,T(2,#L2r07CustName))
 
 
 !額度編號
@@ -271,18 +290,18 @@ C(3,#CaseNo,0,S,T(2,#L2r07CustName))
 #FacmNo=A,3,S
 C(3,#CHAIN,1,T(1,#NTXBUF,32,3),$)
 C(3,#CHAIN,1,s,$)
-C(3,#ApplNo,0,E(0,0),E(0,#L2r05FacmNo))
+C(4,#ApplNo,E(0,0),E(0,#L2r05FacmNo))
 
 #TimCustId=X,10,S
-C(3,#CustNo,0,$,T(2,#L2r07CustId))
+C(4,#CustNo,$,T(2,#L2r07CustId))
 C(4,#CustId,$,T(2,#CustId))
-C(3,#ApplNo,0,$,T(2,#L2r05CustId))
+C(4,#ApplNo,$,T(2,#L2r05CustId))
 
 #TimCustNo=A,7,S
-C(3,#CaseNo,0,$,E(0,#L2r10CustNo))
-C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CaseNo,$,E(0,#L2r10CustNo))
+C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
-C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+C(4,#ApplNo,$,E(0,#L2r05CustNo))
 
 #VAlidFacm=9,3,S
 
@@ -331,7 +350,7 @@ E(0,#EntryDate*100+1)
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #OCaseNo=X,7,L
-C(3,#CaseNo,0,S,T(2,#CaseNo))
+C(4,#CaseNo,S,T(2,#CaseNo))
 
 #OCaseNoX=X,50,L
 T(2,#CaseNoX)
@@ -343,13 +362,13 @@ T(2,#TimCustNo)
 T(2,#L2r07CustName)
 
 #OCustId=X,10,L
-T(2,#CustId)
+T(2,#TimCustId)
 
 #OCustIdX=X,50,L
 T(2,#CustIdX)
 
 #OApplNo=X,7,L
-C(3,#ApplNo,0,S,T(2,#ApplNo))
+C(4,#ApplNo,S,T(2,#ApplNo))
 
 #OApplNoX=X,50,L
 T(2,#ApplNoX)
@@ -456,7 +475,7 @@ T(2,#TimCustId)
 BIND(grid,{ cmd=CHAIN; ntxcd=L2902; ntxbuf=#OOBUF4})
 
 #OOBUF5=X,25,S
-T(2,#CustNo)
+T(2,#OOCustNo)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2035; ntxbuf=#OOBUF5})
@@ -546,7 +565,7 @@ TXFORM=L3001
 ["[L3001]                                 放款明細資料查詢"],
 ![#<->#,"@案件編號",#OCaseNo,#OCaseNoX],
 [#<->#,"@借戶戶號",#OCustNo,#OCustNoX],
-![#<->#,"@統一編號",#OCustId,#OCustIdX],
+[#<->#,"@統一編號",#OCustId],
 ![#<->#,"@核准編號",#OApplNo,#OApplNoX],
 ["@尚餘有效額度",#OValidFacm,"@筆"],
 ["@","@"],

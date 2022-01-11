@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.trade.L9.L9131Report;
 import com.st1.itx.tradeService.BatchBase;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -30,14 +28,11 @@ public class LM009 extends BatchBase implements Tasklet, InitializingBean {
 	LM009Report lM009report;
 
 	@Autowired
-	L9131Report l9131Report;
-
-	@Autowired
 	WebClient webClient;
-
+	
 	@Autowired
 	DateUtil dDateUtil;
-
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -55,31 +50,5 @@ public class LM009 extends BatchBase implements Tasklet, InitializingBean {
 		lM009report.exec(titaVo);
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM009應收利息總表已完成", titaVo);
-
-		String acDate = titaVo.getEntDy();
-
-		// 此處putParam給L9131用
-
-		titaVo.putParam("AcDate", acDate);
-		titaVo.putParam("BatchNo", "01");
-		titaVo.putParam("MediaSeq", "001");
-
-		doRpt(titaVo);
-	}
-
-	public void doRpt(TitaVo titaVo) throws LogicException {
-		this.info("L9131 doRpt started.");
-
-		// 撈資料組報表
-		l9131Report.exec(titaVo);
-
-		// 寫產檔記錄到TxReport
-		long rptNo = l9131Report.close();
-
-		// 產生PDF檔案
-		l9131Report.toPdf(rptNo);
-
-		this.info("L9131 doRpt finished.");
-
 	}
 }

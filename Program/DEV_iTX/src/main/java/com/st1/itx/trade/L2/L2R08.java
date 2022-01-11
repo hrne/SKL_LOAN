@@ -34,7 +34,7 @@ public class L2R08 extends TradeBuffer {
 
 	@Autowired
 	public TxTellerService txTellerService;
-
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2R08 ");
@@ -62,12 +62,12 @@ public class L2R08 extends TradeBuffer {
 				this.totaVo.putParam("OCenterCode2", "");
 				this.totaVo.putParam("OCenterCode2Name", "");
 			} else {
-				throw new LogicException(titaVo, "E0001", "L2R08 員工資料檔  員工編號=" + iEmployeeNo); // 查無資料
+				throw new LogicException(titaVo, "E0001", " 員工資料檔  員工編號=" + iEmployeeNo); // 查無資料
 			}
 		} else {
 			if (!tCdEmp.getAgCurInd().equals("Y")) {
 				if (!iErrorSkip.equals("Y")) {
-					throw new LogicException(titaVo, "E2081", "L2R08 員工編號=" + iEmployeeNo); // 該員工非現職人員
+					throw new LogicException(titaVo, "E2081", " 員工編號=" + iEmployeeNo); // 該員工非現職人員
 				}
 			}
 			this.totaVo.putParam("OFullName", tCdEmp.getFullname());
@@ -80,7 +80,7 @@ public class L2R08 extends TradeBuffer {
 		TxTeller tTxTeller = txTellerService.findById(iEmployeeNo, titaVo);
 		this.totaVo.putParam("OGroupNo", "");
 		this.totaVo.putParam("OBrno", "");
-		if (tTxTeller != null) {
+		if(tTxTeller!=null) {
 			this.totaVo.putParam("OGroupNo", tTxTeller.getGroupNo());
 			this.totaVo.putParam("OBrno", tTxTeller.getBrNo());
 		}

@@ -226,7 +226,7 @@ C(3,#FKEY,0,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P7E,0),$)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[150,350,170,400];printer.width=[15,35,15,35];order=1">
 [
-["[L3120]                                 預約撥款刪除"],
+["[L3120]                                 預約撥款維護"],
 [#<->#,"#FdFuncFg+功能",#FuncFgX],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
 [#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
@@ -533,7 +533,7 @@ T(2,#L2r07CustName)
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 ![統一編號]
 #FdCustId=X,2,L
@@ -552,7 +552,7 @@ V(7)
 T(2,0000000+#CustId)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -1259,7 +1259,7 @@ BIND(#BTNEXPAND,click, {cmd=CALLSEND;DOCODE=EXPAND})
 C(5,#TXFORM,L3120,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L3120] 預約撥款刪除)
+T(3,[L3120] 預約撥款維護)
 
 </sub>
 

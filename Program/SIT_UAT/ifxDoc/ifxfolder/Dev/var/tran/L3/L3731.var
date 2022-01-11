@@ -54,24 +54,25 @@ E(0,0)
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@",#CustNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdBormNo+撥款序號",#BormNo],
-[#<->#,"#FdSupervisor+核決主管",#Supervisor,#SupervisorX],
+[#<->#,"#FdSupervisor+核決主管",#Supervisor,#BTN1,#SupervisorX],
 [#<->#,"#FdRemark+備註",#Remark],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 !#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
 !#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
 !#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
-#BUF1=X,42,S
 !ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
 
 !---------- AP TEXT AREA Variables ----------
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-T(2,@RimTxCode,#TXCD) 
+T(2,@RimTxCode,#TXCD)
 
 #FdCustNo=X,2,L
+HIDE(#BTN1)
 #FdFacmNo=X,2,L
 #FdBormNo=X,2,L
 #FdSupervisor=X,2,L
@@ -110,10 +111,9 @@ E(0,@RimCustNo,#CustNo)
 RESET_RIM(#L2r07A,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
+T(2,@CustNoX,#L2r07CustName)
 
 #CustNoX=x,100,L
-T(2,#L2r07CustName)
-E(0,@TimCustNo,#CustNo)
 
 !額度編號
 #FacmNo=A,3,I
@@ -125,9 +125,19 @@ C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,S,$)
 
 #TimCustNo=A,7,S
+E(0,@TimCustNo,#CustNo)
+
+#BUF1=X,7,S
+T(2,      +Y)
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF1;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
 
 !核決主管
 #Supervisor=X,6,I
+SHOW(#BTN1)
+@
+HIDE(#BTN1)
 
 #L2r08A=X,1,S
 C(4,#Supervisor,S,$)

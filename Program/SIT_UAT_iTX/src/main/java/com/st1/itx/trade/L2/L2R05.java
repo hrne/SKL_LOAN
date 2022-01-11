@@ -135,7 +135,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		initset();
-
+		
 		// 取得輸入資料
 		iFuncCode = this.parse.stringToInteger(titaVo.getParam("RimFuncCode"));
 		iTxCode = titaVo.getParam("RimTxCode");
@@ -149,13 +149,13 @@ public class L2R05 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (iTxCode.isEmpty()) {
-			throw new LogicException(titaVo, "E0009", "L2R05"); // 交易代號不可為空白
+			throw new LogicException(titaVo, "E0009", ""); // 交易代號不可為空白
 		}
 		if (!(iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 4 || iFuncCode == 5)) {
-			throw new LogicException(titaVo, "E0010", "L2R05"); // 功能選擇錯誤
+			throw new LogicException(titaVo, "E0010", ""); // 功能選擇錯誤
 		}
 		if (iApplNo == 0 && iCustNo == 0 && iCaseNo == 0) {
-			throw new LogicException(titaVo, "E0019", "L2R05 核准號碼, 借款人戶號, 案件編號不可皆為0"); // 輸入資料錯誤
+			throw new LogicException(titaVo, "E0019", " 核准號碼, 借款人戶號, 案件編號不可皆為0"); // 輸入資料錯誤
 		}
 
 		// 查詢額度主檔
@@ -167,30 +167,30 @@ public class L2R05 extends TradeBuffer {
 					this.addList(this.totaVo);
 					return this.sendList();
 				}
-				throw new LogicException(titaVo, "E0001", "L2R05 額度主檔 核准編號 = " + iApplNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", " 額度主檔 核准編號 = " + iApplNo); // 查詢資料不存在
 			}
 			if ((iTxCode.equals("L3410") || iTxCode.equals("L3420")) && iCustNo > 0) {
 				if (iCustNo != tFacMain.getCustNo()) {
-					throw new LogicException(titaVo, "E3077", "L2R05 新核准號碼 戶號 = " + tFacMain.getCustNo()); // 新核准號碼與原核准號碼，非屬於同一人
+					throw new LogicException(titaVo, "E3077", " 新核准號碼 戶號 = " + tFacMain.getCustNo()); // 新核准號碼與原核准號碼，非屬於同一人
 				}
 			}
 			// L2118新增時檢查 撥款後不可再建檔 TODO:測試期間暫不控管
 //			if (iTxCode.equals("L2118") & iFuncCode == 1) {
 //				if (tFacMain.getLastBormNo() > 0) {
-//					throw new LogicException(titaVo, "E2066", "L2R05 核准號碼  = " + tFacMain.getApplNo()); // 已撥款不可再建檔
+//					throw new LogicException(titaVo, "E2066", " 核准號碼  = " + tFacMain.getApplNo()); // 已撥款不可再建檔
 //				}
 //			}
 		} else {
 			if (iCustNo > 0) {
 				tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
 				if (tFacMain == null) {
-					throw new LogicException(titaVo, "E0001", "L2R05 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+					throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 				}
 			}
 			if (iCaseNo > 0) {
 				tFacMain = facMainService.facmCreditSysNoFirst(iCaseNo, iCaseNo, iFacmNo, iFacmNo, titaVo);
 				if (tFacMain == null) {
-					throw new LogicException(titaVo, "E0001", "L2R05 額度主檔 案件編號 = " + iCaseNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+					throw new LogicException(titaVo, "E0001", " 額度主檔 案件編號 = " + iCaseNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 				}
 			}
 		}
@@ -206,7 +206,7 @@ public class L2R05 extends TradeBuffer {
 		if (tFacMain.getRepayCode() == 02) {
 			tempVo = authLogCom.exec(wkCustNo, wkFacmNo, titaVo);
 			if (tempVo == null) {
-				throw new LogicException(titaVo, "E0001", "L2R05 額度主檔 借款人戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 查詢資料不存在
 			}
 			wkRepayBank = tempVo.getParam("RepayBank");
 			wkRepayAcctNo = tempVo.getParam("RepayAcctNo");
@@ -223,24 +223,27 @@ public class L2R05 extends TradeBuffer {
 		this.info("tempVo =" + tempVo);
 
 		if (tFacMain.getActFg() == 1 && iFKey == 0) {
-			throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+			throw new LogicException(titaVo, "E0021",
+					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
 		if (iTxCode.equals("L3100") || iTxCode.equals("L3110")) {
 			if (iFKey != 7) {
 				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) <= 0) {
-					throw new LogicException(titaVo, "E2072", "L2R05 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = " + tFacMain.getFacmNo() + " 核准額度 = " + df.format(tFacMain.getLineAmt())
-							+ " 已動用額度餘額 = " + df.format(tFacMain.getUtilBal())); // 該筆額度編號沒有可用額度
+					throw new LogicException(titaVo, "E2072",
+							" 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = " + tFacMain.getFacmNo()
+									+ " 核准額度 = " + df.format(tFacMain.getLineAmt()) + " 已動用額度餘額 = "
+									+ df.format(tFacMain.getUtilBal())); // 該筆額度編號沒有可用額度
 				}
 			}
 //			if (tFacProd.getCharCode().equals("2") && tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {   //TODO 已房養老刪除
-//				throw new LogicException(titaVo, "E3099", "L2R05 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = "
+//				throw new LogicException(titaVo, "E3099", " 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = "
 //						+ tFacMain.getFacmNo() + " 已動用額度 = " + df.format(tFacMain.getUtilAmt())); // 該筆額度(以房養老)已撥款
 //			}
 		}
 
 		tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
 		if (tCustMain == null) {
-			throw new LogicException(titaVo, "E2003", "L2R05 客戶資料主檔 UKey=" + tFacMain.getCustNo()); // 查無資料
+			throw new LogicException(titaVo, "E2003", " 客戶資料主檔 UKey=" + tFacMain.getCustNo()); // 查無資料
 		}
 		wkCustId = tCustMain.getCustId();
 		// 查詢案件申請檔
@@ -260,14 +263,17 @@ public class L2R05 extends TradeBuffer {
 
 		// 查詢清償金類型
 		SetTotaBreach();
-		wkBreachNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7) + FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
+		wkBreachNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
+				+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
 		wkBreachCode = tFacProd.getBreachCode();
-		slFacProdBreach = facProdBreachService.breachNoEq(wkBreachNo, wkBreachCode, wkBreachCode, this.index, this.limit, titaVo);
+		slFacProdBreach = facProdBreachService.breachNoEq(wkBreachNo, wkBreachCode, wkBreachCode, this.index,
+				this.limit, titaVo);
 		if (!(slFacProdBreach == null || slFacProdBreach.isEmpty())) {
 			SetTotaBreach();
 		}
 		// 檢查是否未齊件
-		Slice<LoanNotYet> slLoanNotYet = sLoanNotYetService.notYetCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 99991231, 0, 99991231, this.index, this.limit, titaVo);
+		Slice<LoanNotYet> slLoanNotYet = sLoanNotYetService.notYetCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 99991231, 0,
+				99991231, this.index, this.limit, titaVo);
 		lLoanNotYet = slLoanNotYet == null ? null : slLoanNotYet.getContent();
 		if (lLoanNotYet != null) {
 			for (LoanNotYet tLoanNotYet : lLoanNotYet) {
@@ -279,7 +285,8 @@ public class L2R05 extends TradeBuffer {
 
 		// 預定撥款序號 (LoanBorMain戶況為99筆數)+(FacMain最後撥款序號)+1
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, iFacmNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, iFacmNo, iFacmNo,
+				0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorMain != null) {
 			for (LoanBorMain rv : slLoanBorMain.getContent()) {
 				wkRvCnt++;
@@ -324,7 +331,8 @@ public class L2R05 extends TradeBuffer {
 			this.totaVo.putParam("StepRateIncr" + i, 0);
 		}
 
-		sProdNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7) + FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
+		sProdNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
+				+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
 
 		// 查詢階梯式利率
 		slFacProdStepRate = facProdStepRateService.stepRateProdNoEq(sProdNo, 0, 999, this.index, this.limit, titaVo);
@@ -342,7 +350,8 @@ public class L2R05 extends TradeBuffer {
 	// 額度主檔
 	private void MoveTotaFacMain() throws LogicException {
 		wkAcctFee = tFacMain.getAcctFee();
-		if ((iTxCode.equals("L3100") || iTxCode.equals("L3110")) && (tFacMain.getLastBormNo() > 0 || tFacMain.getLastBormRvNo() > 900)) {
+		if ((iTxCode.equals("L3100") || iTxCode.equals("L3110"))
+				&& (tFacMain.getLastBormNo() > 0 || tFacMain.getLastBormRvNo() > 900)) {
 			wkAcctFee = BigDecimal.ZERO;
 		}
 		this.info("tempVo =   " + tempVo);
@@ -496,7 +505,8 @@ public class L2R05 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(wkCustNo, wkFacmNo, wkFacmNo, 1, 900, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(wkCustNo, wkFacmNo, wkFacmNo, 1, 900,
+				this.index, this.limit, titaVo);
 		if (!(lLoanBorMain == null || lLoanBorMain.isEmpty())) {
 			for (LoanBorMain ln : lLoanBorMain.getContent()) {
 				if (ln.getStatus() == 0 || ln.getStatus() == 4) { // 0: 正常戶 4: 逾期戶
@@ -526,7 +536,7 @@ public class L2R05 extends TradeBuffer {
 		this.info("   wkBormCount = " + wkBormCount);
 		if (wkBormCount == 0) {
 			if (iTxCode.equals("L3711") || iTxCode.equals("L3712")) {
-				throw new LogicException(titaVo, "E0001", "L2R05 查無該額度的最近繳息日"); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", " 查無該額度的最近繳息日"); // 查詢資料不存在
 			}
 		}
 
@@ -571,7 +581,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("OLoanTermYy", 0);
 		this.totaVo.putParam("OLoanTermMm", 0);
 		this.totaVo.putParam("OLoanTermDd", 0);
-		this.totaVo.putParam("OFirstDrawdownDate", 0);
+		this.totaVo.putParam("OFirstDrawdownDate",0);
 		this.totaVo.putParam("OMaturityDate", 0);
 		this.totaVo.putParam("OIntCalcCode", "");
 		this.totaVo.putParam("OAmortizedCode", "");
@@ -645,10 +655,10 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("OLoanBal", "");
 		this.totaVo.putParam("OBormCount", "");
 		this.totaVo.putParam("ODueAmt", "");
-		this.totaVo.putParam("OBaseRate", 0);
-		this.totaVo.putParam("OCloseFg", "");
-		this.totaVo.putParam("ORvBormNo", 0);
-		this.totaVo.putParam("ORvDrawdownAmt", 0);
+		this.totaVo.putParam("OBaseRate", 0); 
+		this.totaVo.putParam("OCloseFg", ""); 
+		this.totaVo.putParam("ORvBormNo", 0); 
+		this.totaVo.putParam("ORvDrawdownAmt", 0); 
 		for (int i = 1; i <= 10; i++) {
 			this.totaVo.putParam("BreachbMmA" + i, 0);
 			this.totaVo.putParam("BreachbMmB" + i, 0);

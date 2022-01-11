@@ -72,18 +72,22 @@ T(3,CdCode.DrawdownCode2)
 
 #DrawdownCodeHelp=x,1024,S 
 
+#CDDEF02=x,26,S
+T(3,CdCode.DrawdownStatus)
+
+#StatusCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01)
+S(XXR99,01,#CDDEF01,#CDDEF02)
 R(1,XXR99)
 CALL(#HelpProc) 
 T(B,@DrawdownCodeHelp,#HelpDesc1+;99:全部)
+T(B,@StatusCodeHelp,#HelpDesc2+;9:全部)
 
 #SearchFlagHelp=x,30,S
 T(3,1:戶號;2:整批批號;3:全部批號)
 
-#StatusCodeHelp=x,50,S
-T(3,0:正常;1:產檔後修正;2:產檔後更正;3:未放行;9:全部)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -215,7 +219,7 @@ HELP(#StatusCodeHelp)
 !@V(1,0,1,2,9)
 
 ![狀態中文]
-#StatusCodeX=X,10,L
+#StatusCodeX=X,20,L
 C(3,#SearchFlagFg,0,$,S)  
 T(H,#StatusCode,#StatusCodeHelp)
 !SWITCH(#StatusCode,0,T(3,正常),
@@ -256,7 +260,7 @@ T(H,#OODrawdownCode,#DrawdownCodeHelp)
 
 #OOStatusCode=A,1,O
 
-#OOStatusCodeX=X,10,O
+#OOStatusCodeX=X,20,O
 T(3,)T(H,#OOStatusCode,#StatusCodeHelp)
 !SWITCH(#OOStatusCode,0,T(3,正常),1,T(3,產檔後修正),2,T(3,產檔後訂正),9,T(3,全部))
 

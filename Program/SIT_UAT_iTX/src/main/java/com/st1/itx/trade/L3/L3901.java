@@ -109,7 +109,7 @@ public class L3901 extends TradeBuffer {
 			}
 			break;
 		case 2: // 到期取息
-			for (int i = 1; i <= 3; i++) {
+			for (int i = 1; i <= 10; i++) {
 				if (parse.stringToInteger(titaVo.getParam("STerm" + i)) != 0) {
 					iRate = parse.stringToBigDecimal(titaVo.getParam("Rate" + i));
 					wkTerm = parse.stringToInteger(titaVo.getParam("ETerm" + i)) - parse.stringToInteger(titaVo.getParam("STerm" + i)) + 1;
@@ -186,7 +186,7 @@ public class L3901 extends TradeBuffer {
 
 	private BigDecimal getInterestRate(int termNo, TitaVo titaVo) throws LogicException {
 		BigDecimal wkRate = BigDecimal.ZERO;
-		for (int i = 1; i <= 3; i++) {
+		for (int i = 1; i <= 10; i++) {
 			if (termNo >= parse.stringToInteger(titaVo.getParam("STerm" + i)) && termNo <= parse.stringToInteger(titaVo.getParam("ETerm" + i))) {
 				wkRate = parse.stringToBigDecimal(titaVo.getParam("Rate" + i));
 			}

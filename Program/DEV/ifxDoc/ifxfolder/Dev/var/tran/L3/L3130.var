@@ -243,7 +243,7 @@ IF(#FuncCode ==1 || #FuncCode ==3,E(0,0)ASGN(AGAIN$),$)
 T(3,00000019999999000)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
 
 #BUF2A=X,30,S
 T(3,0000000          0000000000000)
@@ -274,7 +274,7 @@ C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
 ! T(2,#CustNo+9999999000)
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
 
 #BUF2B=X,30,S
 T(2,#CustNo+#WkCustId+#WkApplNo+#FacmNo+#BormNo)

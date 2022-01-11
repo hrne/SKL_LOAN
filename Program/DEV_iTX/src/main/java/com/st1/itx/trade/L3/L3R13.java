@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R13")
 @Scope("prototype")
 public class L3R13 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3R13.class);
 
 	@Autowired
 	Parse parse;
@@ -54,19 +53,19 @@ public class L3R13 extends TradeBuffer {
 		int wkAdjRateDate = 0;
 
 		if (iFixAdjDd == 0 || iFixAdjDd > 31) {
-			throw new LogicException(titaVo, "E0019", "L3R13 利率調整固定日期 = " + iFixAdjDd); // 輸入資料錯誤
+			throw new LogicException(titaVo, "E0019", " 利率調整固定日期 = " + iFixAdjDd); // 輸入資料錯誤
 		}
 
 		if (iRateAdjFreq == 0 || iRateAdjFreq > 12) {
-			throw new LogicException(titaVo, "E0019", "L3R13 利率調整週期 = " + iRateAdjFreq); // 輸入資料錯誤
+			throw new LogicException(titaVo, "E0019", " 利率調整週期 = " + iRateAdjFreq); // 輸入資料錯誤
 		}
 
 		if ((12 % iRateAdjFreq) > 0) {
-			throw new LogicException(titaVo, "E0019", "L3R13 利率調整週期 = " + iRateAdjFreq); // 輸入資料錯誤
+			throw new LogicException(titaVo, "E0019", " 利率調整週期 = " + iRateAdjFreq); // 輸入資料錯誤
 		}
 
 		if (iDrawdownDate == 0) {
-			throw new LogicException(titaVo, "E0019", "L3R13 撥款日期 =  " + iDrawdownDate); // 輸入資料錯誤
+			throw new LogicException(titaVo, "E0019", " 撥款日期 =  " + iDrawdownDate); // 輸入資料錯誤
 		}
 
 		wkYear = iDrawdownDate / 10000;
@@ -80,7 +79,7 @@ public class L3R13 extends TradeBuffer {
 		dDateUtil.init();
 		dDateUtil.setDate_1(wkDate);
 		if (iFixAdjDd > dDateUtil.getMonLimit()) {
-			throw new LogicException(titaVo, "E0019", "L2R12 利率調整固定日期 = " + iFixAdjDd); // 輸入資料錯誤
+			throw new LogicException(titaVo, "E0019", " 利率調整固定日期 = " + iFixAdjDd); // 輸入資料錯誤
 		}
 		wkAdjRateDate = wkYear * 10000 + wkMonth * 100 + iFixAdjDd;
 		this.info("   wkAdjRateDate = " + wkAdjRateDate);

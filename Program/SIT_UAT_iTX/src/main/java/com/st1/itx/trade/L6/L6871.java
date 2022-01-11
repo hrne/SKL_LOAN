@@ -26,8 +26,8 @@ public class L6871 extends TradeBuffer {
 
 		this.info("L6871 執行月底日日終維護");
 
-//		titaVo.setBatchJobId("eomFlow");
-
+		titaVo.setBatchJobId("eomFlow");
+		
 		titaVo.setBatchJobId("jcicFlow");
 
 		this.info("L6871 exit.");
