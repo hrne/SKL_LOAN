@@ -106,6 +106,15 @@ BEGIN
       GROUP BY "CustNo"
              , "FacmNo"
     )
+    , TempAmt AS (
+      -- 全戶暫收款金額
+      SELECT "CustNo"
+           , SUM("RvBal") AS "TempAmt"
+      FROM "AcReceivable"
+      WHERE "AcctCode" = 'TAV'
+        AND "RvBal" > 0
+      GROUP BY "CustNo"
+    )
     , FeeData AS (
       SELECT M."DataYM"
            , M."CustNo"
@@ -116,6 +125,7 @@ BEGIN
            , FT."LoanBalTotal" AS "FacLoanBalTotal"
            , NVL(L."Fee",0) AS "LawFee"
            , NVL(I."Fee",0) AS "InsuFee"
+           , NVL(TP."TempAmt",0) AS "TempAmt"
       FROM "JcicMonthlyLoanData" M
       LEFT JOIN Total T ON T."DataYM" = M."DataYM"
                        AND T."CustNo" = M."CustNo"
@@ -125,6 +135,7 @@ BEGIN
       LEFT JOIN Law L ON L."CustNo" = M."CustNo"
       LEFT JOIN Insu I ON I."CustNo" = M."CustNo"
                       AND I."FacmNo" = M."FacmNo"
+      LEFT JOIN TempAmt TP ON TP."CustNo" = M."CustNo"
       WHERE M."DataYM" = YYYYMM
     )
     , AvgFeeDataBase AS (
@@ -139,8 +150,10 @@ BEGIN
            , "FacLoanBalTotal"
            , "LawFee"
            , "InsuFee"
+           , "TempAmt"
            , ROUND("LawFee" * "LoanBal" / "LoanBalTotal",0) AS "AvgLawFee"
            , ROUND("InsuFee" * "LoanBal" / "FacLoanBalTotal",0) AS "AvgInsuFee"
+           , ROUND("TempAmt" * "LoanBal" / "LoanBalTotal",0) AS "AvgTempAmt"
            , ROW_NUMBER()
              OVER (
                PARTITION BY "DataYM"
@@ -195,11 +208,17 @@ BEGIN
                THEN B."InsuFee" - NVL(O2."OtherInsuFee",0)
              ELSE B."AvgInsuFee"
              END                                AS "AvgInsuFee"
+           , CASE
+               WHEN B."Seq" = G1."MaxSeq"
+               THEN B."TempAmt" - NVL(O1."OtherTempAmt",0)
+             ELSE B."AvgTempAmt"
+             END                                AS "AvgTempAmt"
       FROM AvgFeeDataBase B
       LEFT JOIN (
         SELECT B."DataYM"
              , B."CustNo"
              , SUM(B."AvgLawFee") AS "OtherLawFee"
+             , SUM(B."AvgTempAmt") AS "OtherTempAmt"
         FROM AvgFeeDataBase B
         LEFT JOIN GetMaxSeq G ON G."DataYM" = B."DataYM"
                              AND G."CustNo" = B."CustNo"
@@ -229,7 +248,19 @@ BEGIN
       LEFT JOIN GetFacMaxSeq G2 ON G2."DataYM" = B."DataYM"
                                AND G2."CustNo" = B."CustNo"
                                AND G2."FacmNo" = B."FacmNo"
-    )    
+    )
+    , AcctFeeData AS (
+      SELECT "CustNo"           -- 戶號
+           , "FacmNo"           -- 額度編號
+           , "RvNo"             -- 銷帳編號
+           , SUM("RvAmt") AS "AcctFee"
+      FROM "AcReceivable"
+      WHERE "AcctCode" = 'F10'
+        AND "RvAmt" > 0
+      GROUP BY "CustNo"
+             , "FacmNo"
+             , "RvNo"
+    )
     SELECT
            YYYYMM                                    AS "DataYM"            -- 資料年月
          , M."CustNo"                                AS "CustNo"            -- 戶號
@@ -249,7 +280,7 @@ BEGIN
          , NVL(M."MaturityDate", 0)                  AS "MaturityDate"      -- 到期日(撥款)
          , NVL(F."LineAmt",0)                        AS "LineAmt"           -- 核准金額
          , NVL(M."DrawdownAmt", 0)                   AS "DrawdownAmt"       -- 撥款金額
-         , NVL(F."AcctFee", 0)                       AS "AcctFee"           -- 帳管費
+         , NVL(ACF."AcctFee", 0)                     AS "AcctFee"           -- 帳管費
          , NVL(M."LoanBal", 0)                       AS "LoanBal"           -- 本金餘額(撥款)
          , CASE WHEN M."Status" IN (0) THEN NVL(M."IntAmt", 0)
                 ELSE 0
@@ -331,7 +362,7 @@ BEGIN
            END                                       AS "AvblBal"           -- 可動用餘額(台幣)
          , NVL(F."RecycleCode", 0)                   AS "RecycleCode"       -- 該筆額度是否可循環動用 (0=非循環動用 1=循環動用)
          , NVL(F."IrrevocableFlag", 0)               AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷 (1=是 0=否)
-         , NVL(F."TempAmt", 0)                       AS "TempAmt"           -- 暫收款金額(台幣)
+         , NVL(AF."AvgTempAmt",0)                    AS "TempAmt"           -- 暫收款金額(台幣)
          , 1                                         AS "AcCurcd"           -- 記帳幣別 (1=台幣)
          , NVL(M."AcBookCode", ' ')                  AS "AcBookCode"        -- 會計帳冊 (1=一般 2=分紅 3=利變 4=OIU)
          , 'NTD'                                     AS "CurrencyCode"      -- 交易幣別
@@ -360,6 +391,9 @@ BEGIN
                                   AND AF."CustNo" = M."CustNo"
                                   AND AF."FacmNo" = M."FacmNo"
                                   AND AF."BormNo" = M."BormNo"
+      LEFT JOIN AcctFeeData ACF ON ACF."CustNo" = LPAD(M."CustNo",7,'0')
+                               AND ACF."FacmNo" = LPAD(M."FacmNo",3,'0')
+                               AND ACF."RvNo"   = LPAD(M."BormNo",3,'0')
     WHERE  M."DataYM"  =  YYYYMM
       AND  TRUNC(NVL(M."DrawdownDate", 0) / 100 ) <= YYYYMM
       ;

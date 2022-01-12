@@ -155,7 +155,7 @@ BEGIN
           ,''                             AS "PieceCodeSecond"
           ,0                              AS "PieceCodeSecondAmt"
           ,LPAD(APLP."APLUSG",2,'0')      AS "UsageCode"           -- 資金用途別 VARCHAR2 2 
-          ,0                              AS "SyndNo"              -- 聯貸案序號 DECIMAL 3 
+          ,0                              AS "SyndNo"              -- 聯貸案序號 DECIMAL 6
           ,''                             AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
           ,"LA$LMSP"."LMSPAN"             AS "RelationName"        -- 第三人帳戶戶名 NVARCHAR2 100 
           ,"LA$LMSP"."LMSPID"             AS "RelationId"          -- 第三人身份證字號 VARCHAR2 10 

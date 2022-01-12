@@ -49,6 +49,26 @@ public class ScheduledProcess extends SysLogger {
 			for (TxCruiser txs : txCruiserSi.getContent()) {
 				this.mustInfo(txs.toString());
 
+				Timestamp startTime = txs.getCreateDate();
+				Timestamp endTime = new Timestamp(new Date().getTime());
+				int hours = (int) ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60));
+//				int minutes = (int) (((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60)) / 60);
+//				int second = (int) ((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60) - minutes * 60);
+
+				if (hours >= 3) {
+					txs.setStatus("F");
+					try {
+						txCruiserService.update(txs);
+						continue;
+					} catch (DBException e) {
+						this.error(e.getErrorMsg());
+					} catch (Exception e) {
+						StringWriter errors = new StringWriter();
+						e.printStackTrace(new PrintWriter(errors));
+						this.error(errors.toString());
+					}
+				}
+
 				Slice<JobMain> jobMainSi = jobMainService.findAllByTxSeq(txs.getTxSeq(), 0, Integer.MAX_VALUE);
 				boolean isFinish = true;
 				boolean isBroken = false;
@@ -72,18 +92,6 @@ public class ScheduledProcess extends SysLogger {
 							txs.setStatus("F");
 							txCruiserService.update(txs);
 						}
-
-						Timestamp startTime = txs.getCreateDate();
-						Timestamp endTime = new Timestamp(new Date().getTime());
-						int hours = (int) ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60));
-//						int minutes = (int) (((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60)) / 60);
-//						int second = (int) ((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60) - minutes * 60);
-
-						if (hours >= 12) {
-							txs.setStatus("F");
-							txCruiserService.update(txs);
-						}
-
 					} catch (DBException e) {
 						StringWriter errors = new StringWriter();
 						e.printStackTrace(new PrintWriter(errors));
@@ -95,11 +103,8 @@ public class ScheduledProcess extends SysLogger {
 						if (isBroken)
 							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "LC710", txs.getTxSeq(), txs.getTxCode() + " 執行失敗, 請至LC710查看", new TitaVo());
 					}
-
 				}
-
 			}
-
 		ThreadVariable.clearThreadLocal();
 	}
 }

@@ -166,8 +166,12 @@ BEGIN
                 ELSE 1
            END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷
          , NVL(Tav."TempAmt",0)                 AS "TempAmt"           -- 暫收款金額(台幣)
-         , MF."AcBookCode"                      AS "AcBookCode"        -- 帳冊別
-         , MF."AcSubBookCode"                   AS "AcSubBookCode"     -- 區隔帳冊
+         , CASE WHEN MF."AcBookCode"  IS NULL  THEN '000'
+                ELSE MF."AcBookCode"     
+           END                                  AS "AcBookCode"        -- 帳冊別
+         , CASE WHEN MF."AcSubBookCode"  IS NULL THEN '00A'
+                ELSE MF."AcSubBookCode"                   
+           END                                  AS "AcSubBookCode"     -- 區隔帳冊
          , JOB_START_TIME                       AS "CreateDate"        -- 建檔日期時間
          , EmpNo                                AS "CreateEmpNo"       -- 建檔人員
          , JOB_START_TIME                       AS "LastUpdate"        -- 最後更新日期時間

@@ -200,6 +200,8 @@ T(3,)T(H,#RepayCode,#RepayCodeHelp)
 #ReconCode=X,3,I
 C(3,#CHAIN,0,$,s)
 HELP(#ReconCodeHelp)
+@C(4,#ReconCode,S,$)
+V(H,#ReconCodeHelp)
 
 #ReconCodeX=X,15,L
 T(3,)T(H,#ReconCode,#ReconCodeHelp)

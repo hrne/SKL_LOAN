@@ -1,10 +1,10 @@
+CREATE OR REPLACE PROCEDURE "Usp_L7_Ias39LoanCommit_Upd"
+(
 -- 程式功能：維護 Ias39LoanCommit 每月IAS39放款承諾明細檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L7_Ias39LoanCommit_Upd"(20200521,'999999');
 --
 
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias39LoanCommit_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦

@@ -228,7 +228,19 @@ BEGIN
       LEFT JOIN GetFacMaxSeq G2 ON G2."DataYM" = B."DataYM"
                                AND G2."CustNo" = B."CustNo"
                                AND G2."FacmNo" = B."FacmNo"
-    )    
+    )
+    , AcctFeeData AS (
+      SELECT "CustNo"           -- 戶號
+           , "FacmNo"           -- 額度編號
+           , "RvNo"             -- 銷帳編號
+           , SUM("RvAmt") AS "AcctFee"
+      FROM "AcReceivable"
+      WHERE "AcctCode" = 'F10'
+        AND "RvAmt" > 0
+      GROUP BY "CustNo"
+             , "FacmNo"
+             , "RvNo"
+    )
     SELECT
            YYYYMM                                    AS "DataYM"            -- 資料年月
          , M."CustNo"                                AS "CustNo"            -- 戶號
@@ -248,7 +260,7 @@ BEGIN
          , NVL(M."MaturityDate", 0)                  AS "MaturityDate"      -- 到期日(撥款)
          , NVL(F."LineAmt",0)                        AS "LineAmt"           -- 核准金額
          , NVL(M."DrawdownAmt", 0)                   AS "DrawdownAmt"       -- 撥款金額
-         , NVL(F."AcctFee", 0)                       AS "AcctFee"           -- 帳管費
+         , NVL(ACF."AcctFee", 0)                     AS "AcctFee"           -- 帳管費
          , NVL(M."LoanBal", 0)                       AS "LoanBal"           -- 本金餘額(撥款)
          , CASE WHEN M."Status" IN (0) THEN NVL(M."IntAmt", 0)
                 ELSE 0
@@ -347,6 +359,9 @@ BEGIN
                                   AND AF."CustNo" = M."CustNo"
                                   AND AF."FacmNo" = M."FacmNo"
                                   AND AF."BormNo" = M."BormNo"
+      LEFT JOIN AcctFeeData ACF ON ACF."CustNo" = LPAD(M."CustNo",7,'0')
+                               AND ACF."FacmNo" = LPAD(M."FacmNo",3,'0')
+                               AND ACF."RvNo"   = LPAD(M."BormNo",3,'0')
     WHERE  M."DataYM"          =  YYYYMM
       AND  M."Status" IN (0, 2, 7)   -- 正常件, 催收, 部分轉呆
       ;
@@ -391,43 +406,3 @@ BEGIN
 
   END;
 END;
-
-
-        --  , ' '          AS "CustId"            -- 借款人ID / 統編
-        --  , 0            AS "ApplNo"            -- 核准號碼
-        --  , ' '          AS "AcCode"            -- 會計科目(8碼)
-        --  , 0            AS "Status"            -- 戶況 (1=正常 2=催收)
-        --  , 0            AS "FirstDrawdownDate" -- 初貸日期
-        --  , 0            AS "DrawdownDate"      -- 撥款日期
-        --  , 0            AS "FacLineDate"       -- 到期日(額度)
-        --  , 0            AS "MaturityDate"      -- 到期日(撥款)
-        --  , 0            AS "LineAmt"           -- 核准金額
-        --  , 0            AS "DrawdownAmt"       -- 撥款金額
-        --  , 0            AS "AcctFee"           -- 帳管費
-        --  , 0            AS "LoanBal"           -- 本金餘額(撥款)
-        --  , 0            AS "IntAmt"            -- 應收利息          --計算至每月月底之撥款應收利息
-        --  , 0            AS "Fee"               -- 法拍及火險費用
-        --  , 0            AS "Rate"              -- 利率(撥款)        --抓取月底時適用利率
-        --  , 0            AS "OvduDays"          -- 逾期繳款天數      --抓取月底日資料，並以天數表示
-        --  , 0            AS "OvduDate"          -- 轉催收款日期
-        --  , 0            AS "BadDebtDate"       -- 轉銷呆帳日期
-        --  , 0            AS "BadDebtAmt"        -- 轉銷呆帳金額
-        --  , 0            AS "DerCode"           -- 符合減損客觀證據之條件 (後面再處理)
-        --  , 0            AS "GracePeriod"       -- 初貸時約定還本寬限期
-        --  , 0            AS "ApproveRate"       -- 核准利率
-        --  , 0            AS "AmortizedCode"     -- 契約當時還款方式      -- 1=按期繳息(到期還本)；2=平均攤還本息；3=平均攤還本金；4=到期繳息還本
-        --  , 0            AS "RateCode"          -- 契約當時利率調整方式
-        --  , 0            AS "RepayFreq"         -- 契約約定當時還本週期
-        --  , 0            AS "PayIntFreq"        -- 契約約定當時繳息週期
-        --  , ' '          AS "IndustryCode"      -- 授信行業別
-        --  , ' '          AS "ClTypeJCIC"        -- 擔保品類別
-        --  , ' '          AS "Zip3"              -- 擔保品郵遞區號
-        --  , ' '          AS "ProdNo"            -- 商品利率代碼
-        --  , 0            AS "CustKind"          -- 企業戶/個人戶
-        --  , 0            AS "AssetClass"        -- 五類資產分類
-        --  , ' '          AS "Ifrs9ProdCode"     -- 產品別
-        --  , 0            AS "EvaAmt"            -- 原始鑑價金額
-        --  , 0            AS "FirstDueDate"      -- 首次應繳日
-        --  , 0            AS "TotalPeriod"       -- 總期數
-        --  , 0            AS "AgreeBefFacmNo"    -- 協議前之額度編號
-        --  , 0            AS "AgreeBefBormNo"    -- 協議前之撥款序號

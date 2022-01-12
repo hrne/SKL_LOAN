@@ -453,21 +453,6 @@ BEGIN
                                        AND J."FacmNo" = F."FacmNo"
       GROUP BY F."MainApplNo"
     )
-    , SeqData AS (
-      SELECT S."ApplNo"
-           , ROW_NUMBER()
-             OVER (
-               PARTITION BY "MainApplNo"
-               ORDER BY "ApplNo"
-             ) AS "Seq"
-      FROM (
-        SELECT DISTINCT
-               "ApplNo"
-             , "MainApplNo"
-        FROM "FacShareAppl" 
-        WHERE "ApplNo" != "MainApplNo"
-      ) S
-    )
     , MainData AS (
       SELECT J."DataYM"
            , J."CustNo"
@@ -490,8 +475,7 @@ BEGIN
     SELECT JS."DataYM"            -- 資料年月
          , JM."CustNo"            -- 戶號
          , JM."FacmNo"            -- 額度編號
-         -- TODO: + ROW_NUMBER * 50
-         , S."Seq" * 50
+         , (FS."KeyinSeq" - 1) * 50
            + JS."BormNo"
            AS "BormNo"            -- 撥款序號
          , JM."CustId"            -- 借款人ID / 統編
@@ -574,8 +558,6 @@ BEGIN
                                       AND JS."FacmNo" = FS."FacmNo"
     -- T 合計資料
     LEFT JOIN TOTAL T ON T."MainApplNo" = FM."MainApplNo"
-    -- S 序號資料
-    LEFT JOIN SeqData S ON S."ApplNo" = FS."ApplNo"
     WHERE FM."ApplNo" = FM."MainApplNo" -- Main
       AND NVL(FM."JcicMergeFlag",' ') = 'Y' -- 需合併申報者
       AND JM."CustNo" != 0 -- 有串到主要共同借款人資料

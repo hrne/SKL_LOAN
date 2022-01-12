@@ -469,15 +469,25 @@ public class DateUtil extends SysLogger {
 			return (this.date_2.getYear() * 10000 + this.date_2.getMonthOfYear() * 100 + this.date_2.getDayOfMonth()) - 19110000;
 	}
 
-	public TxBizDate getForTxBizDate() throws LogicException {
+	public TxBizDate getForTxBizDate(boolean... isThrowError) throws LogicException {
 		int year = this.date_1.getYear();
 		int mon = this.date_1.getMonthOfYear();
 		int day = this.date_1.getDayOfMonth();
 		int bcDate = year * 10000 + mon * 100 + day;
 
 		this.date_2 = this.date_1;
-		if (this.isHoliDay())
+		if (this.isHoliDay() && isThrowError.length == 0)
 			throw new LogicException("CE000", "DateUtil 日期為假日!!");
+		else if (isThrowError.length != 0 && isThrowError[0]) {
+			while (true) {
+				this.init();
+				this.setDate_1(bcDate);
+				this.setDays(1);
+				bcDate = this.getCalenderDay();
+				if (!this.isHoliDay()) 
+					break;
+			}
+		}
 
 		TxBizDate txBizDate = new TxBizDate();
 		txBizDate.setTbsDyf(bcDate);
