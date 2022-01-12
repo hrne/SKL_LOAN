@@ -1,4 +1,4 @@
-package com.st1.itx.trade.LM;
+package com.st1.itx.trade.L7;
 
 import java.util.ArrayList;
 
@@ -10,11 +10,13 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.Ias39LoanCommitService;
+import com.st1.itx.trade.LM.LM011Report;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
-@Service("LM011p")
+@Service("L7201")
 @Scope("prototype")
 /**
  * 
@@ -22,7 +24,7 @@ import com.st1.itx.util.http.WebClient;
  * @author ChihWei
  * @version 1.0.0
  */
-public class LM011p extends TradeBuffer {
+public class L7201 extends TradeBuffer {
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -38,7 +40,7 @@ public class LM011p extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active LM011p");
+		this.info("active L7021");
 		this.totaVo.init(titaVo);
 
 		String dateYear = titaVo.getParam("Year");
@@ -49,12 +51,14 @@ public class LM011p extends TradeBuffer {
 
 		// IF RemakeYN = "Y" THEN 更新table
 
-		//if (titaVo.getParam("RemakeYN").equals("Y")) {
-		//	this.info("LM011p: RemakeYN == Y. Update the table.");
-		//	sIas39LoanCommitService.Usp_L7_Ias39LoanCommit_Upd(dateSent, empNo, titaVo);
-		//}
+		if (titaVo.getParam("RemakeYN").equals("Y")) {
+			this.info("L7201: RemakeYN == Y. Update the table.");
+			sIas39LoanCommitService.Usp_L7_Ias39LoanCommit_Upd(dateSent, empNo, titaVo);
+		}
+		// 整批處理：月底放款承諾提存
+		MySpring.newTask("BS910", this.txBuffer, titaVo);
 
-		this.info("LM011p titaVo.getTxcd() = " + titaVo.getTxcd());
+		this.info("L7201 titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
 		lM011Report.setParentTranCode(parentTranCode);

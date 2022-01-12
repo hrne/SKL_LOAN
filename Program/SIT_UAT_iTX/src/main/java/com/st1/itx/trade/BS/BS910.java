@@ -72,16 +72,21 @@ public class BS910 extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("BS910 ......");// IAS39放款承諾明細檔
-		int yearMonth = this.getTxBuffer().getTxBizDate().getTbsDyf() / 100; // 提存年月
 		txToDoCom.setTxBuffer(this.getTxBuffer());
-		iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
 
-		// 迴轉上個月底營業日
+		String dateYear = titaVo.getParam("Year");
+		String dateMonth = titaVo.getParam("Month");
+		int dateSent = Integer.parseInt(dateYear + dateMonth + "01") ;
+		int yearMonth = Integer.parseInt(dateYear + dateMonth) + 191100 ; // 提存年月
 		dateUtil.init();
-		dateUtil.setDate_1(this.getTxBuffer().getMgBizDate().getLmnDy());
-		TxBizDate tTxBizDate = dateUtil.getForTxBizDate();
-		iAcDateReverse = tTxBizDate.getMfbsDy();
+		dateUtil.setDate_1(dateSent);
+		TxBizDate tTxBizDate = dateUtil.getForTxBizDate(true);// 若1號為假日,參數true則會找次一營業日,不會踢錯誤訊息
 
+		iAcDate = tTxBizDate.getMfbsDy();// 畫面輸入年月的月底營業日
+		// 迴轉上個月底營業日
+		iAcDateReverse = tTxBizDate.getLmnDy();
+		this.info("BS910 iAcDate = " + iAcDate + ",iAcDateReverse=" + iAcDateReverse);		
+		
 		// 1.刪除處理清單 ACCL03-放款承諾提存入帳 //
 		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL03", 0, 3, this.index, Integer.MAX_VALUE);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();

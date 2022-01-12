@@ -235,6 +235,11 @@
 					<tasklet ref="L8JcicB096Upd" />
 				</step>
 			</flow>
+			<flow>
+				<step id="l8JcicRelUpd" parent="parentStep">
+					<tasklet ref="L8JcicRelUpd" />
+				</step>
+			</flow>
 		</split>
 
 		<!-- 34號公報 月檔 -->

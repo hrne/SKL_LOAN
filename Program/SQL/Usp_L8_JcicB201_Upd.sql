@@ -53,87 +53,89 @@ BEGIN
 
     -- 寫入資料 "Work_B201_Guarantor" 保證人/所有權人
     INSERT INTO "Work_B201_Guarantor"
+    WITH RawData AS (
+      -- 取得保證人檔資料
+      SELECT FCA."ApplNo"      -- 授信戶案件申請號碼
+           , CM."CustId"       -- 保證人統編
+           , G."GuaRelCode"    -- 保證人與授信戶關係
+           , CDG."GuaRelJcic"  -- 保證人與授信戶關係JCIC代碼
+           , G."GuaTypeCode"   -- 保證類別
+           , 1 AS "DataSource" -- 資料源
+      FROM "FacCaseAppl" FCA
+      LEFT JOIN "Guarantor" G ON G."ApproveNo" = FCA."ApplNo"
+      LEFT JOIN "CustMain" CM ON CM."CustUKey" = G."GuaUKey"
+      LEFT JOIN "CdGuarantor" CDG ON CDG."GuaRelCode" = G."GuaRelCode"
+      WHERE NVL(G."GuaRelCode",'00') != '00'
+      UNION ALL
+      -- 取得擔保品所有權人與授信戶關係檔資料
+      SELECT FCA."ApplNo"          -- 授信戶案件申請號碼
+           , CM."CustId"           -- 擔保品所有權人統編
+           , COR."OwnerRelCode"    -- 擔保品所有權人與授信戶關係
+           , CDG."GuaRelJcic"      -- 擔保品所有權人與授信戶關係JCIC代碼
+           , '05' AS "GuaTypeCode" -- 保證類別
+           , 2 AS "DataSource"     -- 資料源
+      FROM "FacCaseAppl" FCA
+      LEFT JOIN "ClOwnerRelation" COR ON COR."CreditSysNo" = FCA."CreditSysNo"
+      LEFT JOIN "CustMain" CM ON CM."CustUKey" = COR."OwnerCustUKey"
+      LEFT JOIN "CdGuarantor" CDG ON CDG."GuaRelCode" = COR."OwnerRelCode"
+      WHERE NVL(COR."OwnerRelCode",'00') != '00'
+      UNION ALL
+      -- 取得共同借款人闗係檔資料
+      SELECT FCA."ApplNo"          -- 授信戶案件申請號碼
+           , CM."CustId"           -- 共同借款人統編
+           , FSR."RelCode"         -- 共同借款人與授信戶關係
+           , CDG."GuaRelJcic"      -- 共同借款人與授信戶關係JCIC代碼
+           , '06' AS "GuaTypeCode" -- 保證類別
+           , 3 AS "DataSource"     -- 資料源
+      FROM "FacCaseAppl" FCA
+      LEFT JOIN "FacShareRelation" FSR ON FSR."ApplNo" = FCA."ApplNo"
+      LEFT JOIN "FacCaseAppl" FCA2 ON FCA2."ApplNo" = FSR."RelApplNo"
+      LEFT JOIN "CustMain" CM ON CM."CustUKey" = FCA2."CustUKey"
+      LEFT JOIN "CdGuarantor" CDG ON CDG."GuaRelCode" = FSR."RelCode"
+      WHERE NVL(FSR."RelCode",'00') != '00'
+    )
+    , OrderedData AS (
+      SELECT "ApplNo"
+           , "CustId"
+           , "GuaRelCode"
+           , "GuaRelJcic"
+           , "GuaTypeCode"
+           , "DataSource"
+           , DENSE_RANK()
+             OVER (
+               PARTITION BY "ApplNo"
+               ORDER BY "CustId"
+             ) AS "Seq"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "ApplNo"
+                          , "CustId"
+               ORDER BY "DataSource"
+                      , "GuaRelCode"
+             ) AS "DetailSeq"
+      FROM RawData
+    )
     SELECT YYYYMM                              AS "DataYM"
          , G."ApplNo"                          AS "ApplNo"        -- 核准號碼
-         , NVL("CustMain"."CustId",' ')        AS "CustId"        -- 保證人身份統一編號
-         , ROW_NUMBER()
-             Over (Partition By G."ApplNo"
-                   Order     By G."ApplNo", NVL("CustMain"."CustId",' '), G."Source" )
-                                               AS "ROW_NUM"       -- 序號（同一核准號碼編列流水號）
+         , G."CustId"                          AS "CustId"        -- 保證人身份統一編號
+         , G."Seq"                             AS "ROW_NUM"       -- 序號（同一核准號碼編列流水號）
          , 0                                   AS "ApplNoCount"   -- 筆數（同一核准號碼）
-         , G."Source"                          AS "Source"        -- 資料來源(1=保證人檔 2=所有權人檔)
+         , G."DataSource"                      AS "Source"        -- 資料來源(1=保證人檔 2=擔保品提供人與授信戶關係檔 3=共同借款人關係檔)
+         , G."GuaRelCode"                      AS "GuaRelCode"    -- 保證人關係代碼
+         , G."GuaRelJcic"                      AS "GuaRelJcic"    -- 保證人關係ＪＣＩＣ代碼
+         , G."GuaTypeCode"                     AS "GuaTypeCode"   -- 保證類別代碼
          , CASE
-             WHEN G."Source" = 1 THEN NVL(GU."GuaRelCode",' ')
-             WHEN G."Source" = 2 THEN NVL(O."OwnerRelCode",' ')
-             ELSE ' '
-           END                                 AS "GuaRelCode"    -- 保證人關係代碼
-         , CASE
-             WHEN G."Source" = 1 THEN NVL(CD1."GuaRelJcic",' ')
-             WHEN G."Source" = 2 THEN NVL(CD2."GuaRelJcic",' ')
-             ELSE ' '
-           END                                 AS "GuaRelJcic"    -- 保證人關係ＪＣＩＣ代碼
-         , CASE
-             WHEN G."Source" = 1 THEN NVL(GU."GuaTypeCode",' ')
-             WHEN G."Source" = 2 THEN '05' -- 擔保品提供人
-             ELSE ' '
-           END                                 AS "GuaTypeCode"   -- 保證類別代碼
-         , ' '                                 AS "GuaTypeJcic"   -- 保證類別ＪＣＩＣ代碼
-    FROM (
-           SELECT A."ApplNo"         AS "ApplNo"
-                , A."UKey"           AS "UKey"
-                , MIN(A."Source")    AS "Source"  -- (1=保證人檔 優先)
-           FROM (
-             -- 保證人檔
-                  SELECT G."GuaUKey"                AS "UKey"
-                       , NVL(G."ApproveNo",0)       AS "ApplNo"
-                       , 1                          AS "Source"  -- 1=保證人檔
-                  FROM   "Guarantor" G
-                  WHERE  G."GuaStatCode" IN ('1')  -- 保證狀況碼 1=設定
-             -- 擔保品所有權人與授信戶關係檔
-                UNION
-                  SELECT Owner."OwnerCustUKey"      AS "UKey"
-                       , Owner."CreditSysNo"        AS "ApplNo"
-                       , 2                          AS "Source"  -- 2=所有權人檔
-                  FROM   "ClOwnerRelation" Owner
-                ) A
-           GROUP BY A."ApplNo", A."UKey"
-         ) G
-      LEFT JOIN "CustMain"     ON "CustMain"."CustUKey"      = G."UKey"
-      LEFT JOIN "Guarantor" GU ON G."Source"     =  1
-                              AND GU."ApproveNo" =  G."ApplNo"
-                              AND GU."GuaUKey"   =  G."UKey"
-      LEFT JOIN "CdGuarantor" CD1 ON CD1."GuaRelCode" = GU."GuaRelCode"
-      LEFT JOIN "ClOwnerRelation" O
-                               ON G."Source"        =  2
-                              AND O."CreditSysNo"   =  G."ApplNo"
-                              AND O."OwnerCustUKey" =  G."UKey"
-      LEFT JOIN "CdGuarantor" CD2 ON CD2."GuaRelCode" = O."OwnerRelCode"
-    ORDER BY G."ApplNo", NVL("CustMain"."CustId",' ')
-      ;
-
-    -- "Work_B201_Guarantor" ApplNoCount 統計筆數（同一核准號碼）, GuaTypeJcic 
-    MERGE INTO "Work_B201_Guarantor" M
-    USING ( SELECT WK."DataYM"  AS "DataYM"
-                 , WK."ApplNo"  AS "ApplNo"
-                 , COUNT(*)     AS "ApplNoCount"
-            FROM "Work_B201_Guarantor" WK
-            WHERE WK."DataYM" = YYYYMM
-            GROUP BY WK."DataYM", WK."ApplNo"
-          ) WK
-    ON (    WK."DataYM"    = YYYYMM
-        AND WK."ApplNo"    = M."ApplNo" )
-    WHEN MATCHED THEN UPDATE
-      SET M."ApplNoCount" = WK."ApplNoCount"
-        , M."GuaTypeJcic" = CASE WHEN M."GuaTypeCode" IN ('01','02')      THEN 'G' 
-                                 WHEN M."GuaTypeCode" IN ('03','04')      THEN 'N'
-                                 WHEN M."GuaTypeCode" IN ('05')           THEN 'S'
-                                 WHEN M."GuaTypeCode" IN ('06','07')      THEN 'C'
-                                 WHEN M."GuaTypeCode" IN ('08')           THEN 'E'
-                                 WHEN M."GuaTypeCode" IN ('09','10','11') THEN 'L'
-                                 ELSE ' '
-                            END
-     ;
-
+             WHEN G."GuaTypeCode" IN ('01','02')      THEN 'G' 
+             WHEN G."GuaTypeCode" IN ('03','04')      THEN 'N'
+             WHEN G."GuaTypeCode" IN ('05')           THEN 'S'
+             WHEN G."GuaTypeCode" IN ('06','07')      THEN 'C'
+             WHEN G."GuaTypeCode" IN ('08')           THEN 'E'
+             WHEN G."GuaTypeCode" IN ('09','10','11') THEN 'L'
+           ELSE ' '
+           END                               AS "GuaTypeJcic"   -- 保證類別ＪＣＩＣ代碼
+    FROM OrderedData G
+    WHERE G."DetailSeq" = 1
+    ;
 
     -- 刪除舊資料
     DBMS_OUTPUT.PUT_LINE('DELETE JcicB201');
@@ -238,8 +240,12 @@ BEGIN
                ELSE 'Y'
              END                                   AS "IrrevocableFlag"   -- 額度可否撤銷 'Y':可撤銷 'N':不可撤銷
            , CASE
-               WHEN M."Status" IN (6)  THEN LPAD('9', 50, '9')  -- 呆帳
-               ELSE TRIM(to_char(M."CustNo",'0000000')) || TRIM(to_char(M."FacmNo",'000'))
+               WHEN M."Status" IN (6)  
+               THEN LPAD('9', 50, '9')  -- 呆帳
+               -- 2022-01-12 智偉新增: 串共同借款人檔組上階共同額度控制編碼
+               WHEN NVL(FSAM."CustNo",0) != 0
+               THEN LPAD(FSAM."CustNo",7,'0') || LPAD(FSAM."FacmNo",3,'0')
+             ELSE TRIM(to_char(M."CustNo",'0000000')) || TRIM(to_char(M."FacmNo",'000'))
              END                                   AS "FacmNo"            -- 上階共用額度控制編碼
            , CASE
                WHEN M."Status" IN (2, 6, 7) THEN 0   -- 催呆
@@ -369,6 +375,12 @@ BEGIN
       FROM   "JcicMonthlyLoanData" M
           LEFT JOIN "FacMain" F   ON F."CustNo"   = M."CustNo"
                                  AND F."FacmNo"   = M."FacmNo"
+          -- 2022-01-12 智偉新增: 串共同借款人檔組上階共同額度控制編碼
+          LEFT JOIN "FacShareAppl" FSA ON FSA."ApplNo" = F."ApplNo"
+                                      AND FSA."JcicMergeFlag" = 'N'
+                                      AND FSA."KeyinSeq" != 1 -- 非主要共同借款人
+          LEFT JOIN "FacShareAppl" FSAM ON FSAM."MainApplNo" = FSA."MainApplNo"
+                                       AND FSAM."KeyinSeq" = 1 -- 主要共同借款人
           LEFT JOIN "LoanBorMain" L     ON L."CustNo"   = M."CustNo"
                                        AND L."FacmNo"   = M."FacmNo"
                                        AND L."BormNo"   = M."BormNo"
