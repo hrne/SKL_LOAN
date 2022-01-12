@@ -445,6 +445,8 @@ IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 !新火險保費
 #NewFireInsuPrem=m,14,I
 IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
+C(3,#NewFireInsuCovrg,0,S,$)
+@C(3,#NewFireInsuPrem,0,V(P,請輸入金額),$)
 
 !地震險保額
 #EthqInsuCovrg=m,14,L
@@ -469,6 +471,8 @@ IF(#CHECK_AMT==0,V(P,保險金額不可皆為0),$)
 !新地震險保費
 #NewEthqInsuPrem=m,14,I
 IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
+C(3,#NewEthqInsuCovrg,0,S,$)
+@C(3,#NewEthqInsuPrem,0,V(P,請輸入金額),$)
 
 !檢查 地震險保費 + 火災險保費 > 0
 #CHECK_FEE=m,14,S

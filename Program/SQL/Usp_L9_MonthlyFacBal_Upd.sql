@@ -153,8 +153,6 @@ BEGIN
     ) B ON B."CustNo" = L."CustNo"
        AND B."FacmNo" = L."FacmNo"
     WHERE L."CaseCode" = 1
-      AND (L."Status" IN (0, 2, 4, 6, 7)
-           OR (L."Status" IN (3, 5, 8, 9) AND TRUNC(L."AcDate"/100) = YYYYMM))
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;
@@ -166,7 +164,7 @@ BEGIN
     MERGE INTO "MonthlyFacBal" M
     USING (SELECT M."CustNo"
                 , M."FacmNo"
-                , MAX(A."AcSubBookCode") AS "AcSubBookCode" 
+                , MAX(NVL(A."AcSubBookCode",'00A')) AS "AcSubBookCode" 
             FROM "MonthlyFacBal" M
            LEFT JOIN "AcReceivable" A
             ON  A."AcctCode" = M."AcctCode"

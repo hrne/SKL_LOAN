@@ -56,6 +56,7 @@ K(MODIFYBUTTON,查詢)
 
 #FdCustNo=X,2,L
 #FdApplDateFrom=X,2,L
+T(3,*)
 #FdUsageCode=X,2,L
 T(3,*)
 #FdApplCode=X,2,L
@@ -114,8 +115,11 @@ C(3,#CustNo,0,S,T(2,#CustNo))
 ! 借閱日期
 #ApplDateFrom=D,7,I
 C(3,#CHAIN,0,$,s)
+@V(7)A(DATE,0,#ApplDateFrom)
 #ApplDateTo=D,7,I
 C(3,#CHAIN,0,$,s)
+@V(7)A(DATE,0,#ApplDateTo)
+V(5,#ApplDateFrom,#TODAY)
 
 ! 用途
 #UsageCode=A,2,I
@@ -169,6 +173,9 @@ E(0,1)ASGN(LOOP$)
 #OOApplDate=D,7,O
 ! 歸還日期
 #OOReturnDate=D,7,O
+
+#OOReturnDateX=D,7,O
+C(3,#OOReturnDate,0,s,E(0,#OOReturnDate))
 ! 歸還人
 #OOReturnEmpName=x,20,O
 ! 用途
@@ -210,7 +217,20 @@ T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
 #OOBTN_RETURN=A,2,O
 IF(#OOReturnDate>0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}))
 
+#LC014Mrkey=x,100,S
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOApplSeq)
 
+#LC014Text=X,10,S
+!T(H,#ApplCode,#ApplCodeHelp)
+
+#LC014Note=x,100,S
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOApplSeq+ 檔案借閱+#LC014Text)
+
+#BufLC014=X,200,S
+T(2,L5103+#OOCustNo+#OOFacmNo+000+#LC014Mrkey+#LC014Note)
+
+#BTN=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -262,8 +282,11 @@ TXFORM=L5903
 #RPTFG=0,QUERY.GRID,L5903
 #any={detail:true, header:'L5903.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN_RETURN=
+#OOBTN_RETURN=歸還
 {search:false,formatter:'cust:bind-button:歸還',align:'center',canExport:false,width:35}
+
+#BTN=附件查詢
+{search:false,formatter:'cust:bind-button:附件查詢',align:'center',canExport:false,width:70}
 
 ! 戶號
 #OOCustNo=戶號
@@ -287,7 +310,7 @@ TXFORM=L5903
 #OOApplDate=借閱日期
 {width:85,align:'center'}
 ! 歸還日期
-#OOReturnDate=歸還日期
+#OOReturnDateX=歸還日期
 {width:85,align:'center'}
 ! 歸還人
 #OReturnEmpNoX=歸還人

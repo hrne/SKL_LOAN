@@ -613,6 +613,7 @@ INVOKEJS(SHOW,grd1,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTA{j},0,S,$))
 HELP(#ApplicationCodeHelp)
 @
+C(3,#OPTA{i},0,$,V(H,#ApplicationCodeHelp))
 C(3,{i},2,C(3,#OPTA2,0,$,V(2,#OPTA1)),$)
 C(3,{i},3,C(3,#OPTA3,0,$,V(2,#OPTA1,#OPTA2)),$)
 C(3,{i},4,C(3,#OPTA4,0,$,V(2,#OPTA1,#OPTA2,#OPTA3)),$)
@@ -641,7 +642,7 @@ C(3,{i},25,C(3,#OPTA25,0,$,V(2,#OPTA1,#OPTA2,#OPTA3,#OPTA4,#OPTA5,#OPTA6,#OPTA7,
 #FILENMA{i}=X,20,L
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
-T(H,#OPTA{i},#ApplicationCodeHelp)
+C(3,#OPTA{i},0,S,T(H,#OPTA{i},#ApplicationCodeHelp))
 
 
 #AMTA{i}=A,2,I
@@ -699,7 +700,7 @@ C(3,{i},25,C(3,#OPTB25,0,$,V(2,#OPTB1,#OPTB2,#OPTB3,#OPTB4,#OPTB5,#OPTB6,#OPTB7,
 #FILENMB{i}=X,20,L
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
-T(H,#OPTB{i},#SettingCodeHelp#GuaranteedCodeHelp)
+C(3,#OPTB{i},0,S,T(H,#OPTB{i},#SettingCodeHelp))
 
 #AMTB{i}=A,2,I
 C(3,#ApplObj,4,$,S)
@@ -756,7 +757,7 @@ C(3,{i},25,C(3,#OPTC25,0,$,V(2,#OPTC1,#OPTC2,#OPTC3,#OPTC4,#OPTC5,#OPTC6,#OPTC7,
 #FILENMC{i}=X,20,L
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
-T(H,#OPTC{i},#GuaranteedCodeHelp)
+C(3,#OPTC{i},0,S,T(H,#OPTC{i},#GuaranteedCodeHelp))
 
 #AMTC{i}=A,2,I
 C(3,#ApplObj,4,$,S)

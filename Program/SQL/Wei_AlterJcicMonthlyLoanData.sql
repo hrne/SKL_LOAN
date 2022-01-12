@@ -1,0 +1,1 @@
+alter table "JcicMonthlyLoanData" modify "SyndNo" DECIMAL(6,0) DEFAULT 0;

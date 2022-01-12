@@ -123,19 +123,16 @@ BEGIN
          , NVL("LoanBorMain"."NextPayIntDate", 0) AS "NextPayIntDate"    -- 下次繳息日
          , NVL("LoanBorMain"."NextRepayDate", 0)  AS "NextRepayDate"     -- 下次還本日
          , CASE
---           WHEN  NVL("LoanBorMain"."NextPayIntDate", 0) = 0
              WHEN  NVL("LoanBorMain"."NextPayIntDate", 0) <  19110000
                 OR NVL("LoanBorMain"."NextPayIntDate", 0) >= TMNDYF THEN 0
              ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextPayIntDate",'yyyy-mm-dd')))
            END                                    AS "IntDelayMon"       -- 利息逾期月數
          , CASE
---           WHEN  NVL("LoanBorMain"."NextRepayDate", 0) = 0
              WHEN  NVL("LoanBorMain"."NextRepayDate", 0) <  19110000
                 OR NVL("LoanBorMain"."NextRepayDate", 0) >= TMNDYF THEN 0
              ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextRepayDate",'yyyy-mm-dd')))
            END                                     AS "RepayDelayMon"     -- 本金逾期月數
          , CASE
---           WHEN  NVL("LoanBorMain"."MaturityDate", 0) =  0
              WHEN  NVL("LoanBorMain"."MaturityDate", 0) <  19110000
                 OR NVL("LoanBorMain"."MaturityDate", 0) >= TMNDYF THEN 0
              ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."MaturityDate",'yyyy-mm-dd')))
@@ -144,10 +141,6 @@ BEGIN
          , NVL(C."ClCode2", 0)                    AS "ClCode2"           -- 主要擔保品代號2
          , NVL(C."ClNo", 0)                       AS "ClNo"              -- 主要擔保品編號
          , NVL("CdCl"."ClTypeJCIC",' ')           AS "ClTypeCode"        -- 主要擔保品類別代碼(JCIC)
----      , CASE WHEN Cl."CNT" > 1 THEN '3'
----             ELSE '1'
----        END                                    AS "ClType"            -- 擔保品組合型態  0:純信用 1:單一擔保品(或保證) 2:多種擔保品含股票 3:多種擔保品不含股票
----                                                                      --                 若為多種擔保品，後面再判斷是否含股票
          , '1'                                    AS "ClType"            -- 擔保品組合型態  1:單一擔保品(或保證)    (ref:AS400 LN15F1 (#M3102 92 01))
          , CASE WHEN NVL(C."ClCode1", 0) = 1 THEN 0                            -- 建物 (後面再處理)
                 WHEN NVL(C."ClCode1", 0) = 2 THEN 0                            -- 土地 (後面再處理)
@@ -181,9 +174,6 @@ BEGIN
       LEFT JOIN "LoanBorMain" ON "LoanBorMain"."CustNo"   = M."CustNo"
                              AND "LoanBorMain"."FacmNo"   = M."FacmNo"
                              AND "LoanBorMain"."BormNo"   = M."BormNo"
-   -- LEFT JOIN "ClFac"       ON "ClFac"."CustNo"         = "FacMain"."CustNo"
-   --                        AND "ClFac"."FacmNo"         = "FacMain"."FacmNo"
-   --                        AND "ClFac"."MainFlag"       = 'Y'
       LEFT JOIN ( SELECT C."ClCode1"
                        , C."ClCode2"
                        , C."ClNo"
@@ -207,13 +197,6 @@ BEGIN
                              AND "ClMovables"."ClCode2"   = C."ClCode2"
                              AND "ClMovables"."ClNo"      = C."ClNo"
                              AND NVL(C."ClCode1",0)       = 9
---    LEFT JOIN ( SELECT "ClFac"."CustNo"
---                     , "ClFac"."FacmNo"
---                     , COUNT(*)   AS  "CNT"
---                FROM   "ClFac"
---                GROUP BY "ClFac"."CustNo", "ClFac"."FacmNo"
---              ) Cl          ON M."CustNo"    = Cl."CustNo"
---                           AND M."FacmNo"    = Cl."FacmNo"
       LEFT JOIN "FacCaseAppl" FCA ON FCA."ApplNo" = "FacMain"."ApplNo"
       LEFT JOIN "LoanSynd"    ON "LoanSynd"."SyndNo"      = FCA."SyndNo"
       LEFT JOIN ( SELECT L2."CustNo"            AS  "CustNo"
@@ -246,7 +229,6 @@ BEGIN
                        , SUM(NVL("AcLoanInt"."Interest",0))   AS  "Interest"
                   FROM "AcLoanInt"
                   WHERE "AcLoanInt"."YearMonth"  = YYYYMM
-                  --  AND TRUNC(NVL("AcLoanInt"."PayIntDate",0) / 100 ) <= YYYYMM
                   GROUP BY "AcLoanInt"."YearMonth", "AcLoanInt"."CustNo", "AcLoanInt"."FacmNo", "AcLoanInt"."BormNo"
                 ) AC    ON AC."CustNo"     = M."CustNo"
                        AND AC."FacmNo"     = M."FacmNo"
@@ -289,29 +271,6 @@ BEGIN
     UPD_CNT := UPD_CNT + sql%rowcount;
     DBMS_OUTPUT.PUT_LINE('UPDATE BadDebtSkipFg 不報送呆帳記號 End');
 
-
--- 更新 ClType  擔保品組合型態   -- 判斷 多種擔保品是否含股票 2:多種擔保品含股票 3:多種擔保品不含股票
---  MERGE INTO "JcicMonthlyLoanData" M
---  USING ( SELECT "ClFac"."CustNo"
---               , "ClFac"."FacmNo"
---          FROM   "ClFac"
---            LEFT JOIN "ClStock" ON "ClFac"."ClCode1" = "ClStock"."ClCode1"
---                               AND "ClFac"."ClCode2" = "ClStock"."ClCode2"
---                               AND "ClFac"."ClNo"    = "ClStock"."ClNo"
---          WHERE  "ClStock"."SettingStat" IN ('1')            -- 1: 設定 2: 解除
---            AND  "ClStock"."ClStat"      IN ('0', '2', '3')  -- 0: 正常 1: 塗銷 2: 處分 3: 抵押權確定 ???
---          GROUP BY "ClFac"."CustNo", "ClFac"."FacmNo"
---        ) T
---  ON (    M."DataYM"    = YYYYMM
---      AND M."CustNo"    = T."CustNo"
---      AND M."FacmNo"    = T."FacmNo"
---     )
---  WHEN MATCHED THEN UPDATE SET M."ClType" = CASE WHEN M."ClType" = '3' THEN '2'  -- 2:多種擔保品含股票
---                                                 ELSE M."ClType"
---                                            END
---   ;
---
---  UPD_CNT := UPD_CNT + sql%rowcount;
 
 
 -- 更新 EvaAmt 鑑估總值 (建物 & 土地)
@@ -388,31 +347,26 @@ BEGIN
               LEFT JOIN ( SELECT Tx."CustNo"
                                , Tx."FacmNo"
                                , Tx."BormNo"
-                               --, SUM ( NVL(Tx."Principal", 0) )      AS "Principal"
                                , SUM ( CASE 
                                          WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
                                               NVL(Tx."Principal", 0)  * (-1)  
                                          ELSE NVL(Tx."Principal", 0) 
                                        END )                           AS "Principal"
-                               --, SUM ( NVL(Tx."Interest", 0) )       AS "Interest"
                                , SUM ( CASE 
                                          WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
                                               NVL(Tx."Interest", 0)  * (-1)  
                                          ELSE NVL(Tx."Interest", 0) 
                                        END )                           AS "Interest"
-                               --, SUM ( NVL(Tx."DelayInt", 0) )       AS "DelayInt"
                                , SUM ( CASE 
                                          WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
                                               NVL(Tx."DelayInt", 0)  * (-1)  
                                          ELSE NVL(Tx."DelayInt", 0) 
                                        END )                           AS "DelayInt"
-                               --, SUM ( NVL(Tx."BreachAmt", 0) )      AS "BreachAmt"
                                , SUM ( CASE 
                                          WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
                                               NVL(Tx."BreachAmt", 0)  * (-1)  
                                          ELSE NVL(Tx."BreachAmt", 0) 
                                        END )                           AS "BreachAmt"
-                               --, SUM ( NVL(Tx."CloseBreachAmt", 0) ) AS "CloseBreachAmt"
                                , SUM ( CASE 
                                          WHEN NVL(Tx."TitaHCode",' ') IN ('1','3') THEN  --減掉金額
                                               NVL(Tx."CloseBreachAmt", 0)  * (-1)  
@@ -442,67 +396,6 @@ BEGIN
 
     UPD_CNT := UPD_CNT + sql%rowcount;
     DBMS_OUTPUT.PUT_LINE('UPDATE Rcv 本月實收金額 END: UPD_CNT=' || UPD_CNT);
-
-
--- -- JOIN "AcDetail"
--- -- 更新 PrevAmtRcv, IntAmtRcv, FeeAmtRcv   本月實收  (ref: LN15F1 (費用含逾期息,違約金:#M3102 36 7))
---     DBMS_OUTPUT.PUT_LINE('UPDATE Rcv 本月實收金額 End');
---     UPD_CNT := 0;
-
---     MERGE INTO "JcicMonthlyLoanData" M
---     USING ( SELECT M."CustNo"
---                  , M."FacmNo"
---                  , M."BormNo"
---                  , Ac."PrevAmtRcv"    AS  "PrevAmtRcv"
---                  , Ac."IntAmtRcv"     AS  "IntAmtRcv"
---                  , Ac."FeeAmtRcv"     AS  "FeeAmtRcv"
---             FROM "JcicMonthlyLoanData" M
---               LEFT JOIN ( SELECT Ac."CustNo"
---                                , Ac."FacmNo"
---                                , Ac."BormNo"
---                                , SUM ( CASE WHEN Ac."AcctCode" IN ('310', '320', '330', '340') THEN
---                                               CASE WHEN Ac."DbCr" = 'D' THEN 0 - Ac."TxAmt"
---                                                    ELSE Ac."TxAmt"
---                                               END
---                                             ELSE  0
---                                        END )       AS "PrevAmtRcv"
---                                , SUM ( CASE WHEN Ac."AcctCode" IN ('IC1', 'IC2', 'IC3', 'IC4') THEN
---                                               CASE WHEN Ac."DbCr" = 'D' THEN 0 - Ac."TxAmt"
---                                                    ELSE Ac."TxAmt"
---                                               END
---                                             ELSE  0
---                                        END )       AS "IntAmtRcv"
---                                , SUM ( CASE WHEN Ac."AcctCode" IN ('IOV', 'IOP') THEN
---                                               CASE WHEN Ac."DbCr" = 'D' THEN 0 - Ac."TxAmt"
---                                                    ELSE Ac."TxAmt"
---                                               END
---                                             ELSE  0
---                                        END )       AS "FeeAmtRcv"
---                           FROM   "AcDetail" Ac            -- 會計帳務明細檔
---                           WHERE  TRUNC(Ac."AcDate" / 100)  = YYYYMM
---                             AND  SUBSTR(NVL(Ac."TitaTxCd",' '), 1, 2) = 'L3'
---                             AND  NVL(Ac."AcctCode",' ') IN ('310', '320', '330', '340',  -- 本金
---                                                             'IC1', 'IC2', 'IC3', 'IC4',  -- 利息
---                                                             'IOV', 'IOP' )               -- 逾期息,違約金 (費用)  (ref: LN15F1 (#M3102 36 7))
---                           GROUP  BY  Ac."CustNo", Ac."FacmNo", Ac."BormNo"
---                         ) Ac   ON Ac."CustNo"  =  M."CustNo"
---                               AND Ac."FacmNo"  =  M."FacmNo"
---                               AND Ac."BormNo"  =  M."BormNo"
---             WHERE  M."DataYM"   =  YYYYMM
---               AND  M."Status"   IN (0, 1, 4)   -- 非結案,催收,呆帳
---           ) T
---     ON (    M."DataYM"   = YYYYMM
---         AND M."CustNo"   = T."CustNo"
---         AND M."FacmNo"   = T."FacmNo"
---         AND M."BormNo"   = T."BormNo"
---        )
---     WHEN MATCHED THEN UPDATE SET M."PrevAmtRcv" = NVL(T."PrevAmtRcv",0)
---                                , M."IntAmtRcv"  = NVL(T."IntAmtRcv",0)
---                                , M."FeeAmtRcv"  = NVL(T."FeeAmtRcv",0)
---       ;
-
---     UPD_CNT := UPD_CNT + sql%rowcount;
---     DBMS_OUTPUT.PUT_LINE('UPDATE Rcv 本月實收金額 END: UPD_CNT=' || UPD_CNT);
 
 
 -- 更新 FeeAmtRcv 本月收取費用
@@ -544,60 +437,168 @@ BEGIN
     UPD_CNT := UPD_CNT + sql%rowcount;
     DBMS_OUTPUT.PUT_LINE('UPDATE FeeAmtRcv 本月收取費用 END: UPD_CNT=' || UPD_CNT);
 
+    -- 共同借款人合併申報
+    -- "非主要共同借款人"的資料,部分申報欄位以"主要借款人"資料申報
+    INSERT INTO "JcicMonthlyLoanData"
+    WITH TOTAL AS (
+      -- 合計資料
+      SELECT F."MainApplNo"
+           , SUM(NVL(J."UtilAmt",0)) AS "UtilAmt"
+           , SUM(NVL(J."UtilBal",0)) AS "UtilBal"
+      -- F 共同借款人
+      FROM "FacShareAppl" F
+      -- J 資料
+      LEFT JOIN "JcicMonthlyLoanData" J ON J."DataYM" = YYYYMM
+                                       AND J."CustNo" = F."CustNo"
+                                       AND J."FacmNo" = F."FacmNo"
+      GROUP BY F."MainApplNo"
+    )
+    , SeqData AS (
+      SELECT S."ApplNo"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "MainApplNo"
+               ORDER BY "ApplNo"
+             ) AS "Seq"
+      FROM (
+        SELECT DISTINCT
+               "ApplNo"
+             , "MainApplNo"
+        FROM "FacShareAppl" 
+        WHERE "ApplNo" != "MainApplNo"
+      ) S
+    )
+    , MainData AS (
+      SELECT J."DataYM"
+           , J."CustNo"
+           , J."FacmNo"
+           , J."BormNo"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY J."DataYM"
+                          , J."CustNo"
+                          , J."FacmNo"
+               ORDER BY J."BormNo"
+             ) AS "Seq"
+      FROM "FacShareAppl" F
+      LEFT JOIN "JcicMonthlyLoanData" J ON J."DataYM" = YYYYMM
+                                       AND J."CustNo" = F."CustNo"
+                                       AND J."FacmNo" = F."FacmNo"
+      WHERE F."ApplNo" = F."MainApplNo"
+        AND NVL(J."BormNo",0) != 0
+    )
+    SELECT JS."DataYM"            -- 資料年月
+         , JM."CustNo"            -- 戶號
+         , JM."FacmNo"            -- 額度編號
+         -- TODO: + ROW_NUMBER * 50
+         , S."Seq" * 50
+           + JS."BormNo"
+           AS "BormNo"            -- 撥款序號
+         , JM."CustId"            -- 借款人ID / 統編
+         , JS."Status"            -- 戶況
+         , JM."EntCode"           -- 企金別
+         , JM."SuvId"             -- 負責人IDN/負責之事業體BAN
+         , JM."OverseasId"        -- 外僑兼具中華民國國籍IDN
+         , JM."IndustryCode"      -- 授信戶行業別
+         , JS."AcctCode"          -- 科目別
+         , JS."SubAcctCode"       -- 科目別註記
+         , JS."OrigAcctCode"      -- 轉催收款(或呆帳)前原科目別
+         , T."UtilAmt"            -- (額度)貸出金額
+         , T."UtilBal"            -- (額度)已動用額度餘額
+         , JS."RecycleCode"       -- 循環動用
+         , JS."RecycleDeadline"   -- 循環動用期限
+         , JS."IrrevocableFlag"   -- 不可撤銷
+         , JS."FinCode"           -- 融資分類
+         , JS."ProjCode"          -- 政府專業補助貸款分類
+         , JS."NonCreditCode"     -- 不計入授信項目
+         , JS."UsageCode"         -- 用途別
+         , JS."ApproveRate"       -- 本筆撥款利率
+         , JS."StoreRate"         -- 計息利率
+         , JS."DrawdownDate"      -- 撥款日期
+         , JS."MaturityDate"      -- 到期日
+         , JS."AmortizedCode"     -- 攤還方式
+         , JS."CurrencyCode"      -- 幣別
+         , JS."DrawdownAmt"       -- 撥款金額
+         , JS."LoanBal"           -- 放款餘額
+         , JS."PrevAmt"           -- 本月應收本金
+         , JS."IntAmt"            -- 本月應收利息
+         , JS."PrevAmtRcv"        -- 本月實收本金
+         , JS."IntAmtRcv"         -- 本月實收利息
+         , JS."FeeAmtRcv"         -- 本月收取費用
+         , JS."PrevPayIntDate"    -- 上次繳息日
+         , JS."PrevRepaidDate"    -- 上次還本日
+         , JS."NextPayIntDate"    -- 下次繳息日
+         , JS."NextRepayDate"     -- 下次還本日
+         , JS."IntDelayMon"       -- 利息逾期月數
+         , JS."RepayDelayMon"     -- 本金逾期月數
+         , JS."RepaidEndMon"      -- 本金逾到期日(清償期)月數
+         , JS."ClCode1"           -- 主要擔保品代號1
+         , JS."ClCode2"           -- 主要擔保品代號2
+         , JS."ClNo"              -- 主要擔保品編號
+         , JS."ClTypeCode"        -- 主要擔保品類別代碼(JCIC)
+         , JS."ClType"            -- 擔保品組合型態
+         , JS."EvaAmt"            -- 鑑估總值
+         , JS."DispDate"          -- 擔保品處分日期
+         , JS."SyndNo"            -- 聯貸案序號
+         , JS."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , JS."SigningDate"       -- 聯貸合約訂定日期
+         , JS."SyndAmt"           -- 聯貸總金額
+         , JS."PartAmt"           -- 參貸金額
+         , JS."OvduDate"          -- 轉催收日期
+         , JS."BadDebtDate"       -- 轉呆帳日期
+         , JS."BadDebtSkipFg"     -- 不報送呆帳記號
+         , JS."AcBookCode"        -- 帳冊別
+         , JS."AcSubBookCode"     -- 區隔帳冊
+         , JS."CreateDate"        -- 建檔日期時間
+         , JS."CreateEmpNo"       -- 建檔人員
+         , JS."LastUpdate"        -- 最後更新日期時間
+         , JS."LastUpdateEmpNo"   -- 最後更新人員
+    -- FM 主要共同借款人
+    FROM "FacShareAppl" FM
+    -- FS 非主要共同借款人
+    LEFT JOIN "FacShareAppl" FS ON FS."MainApplNo" = FM."MainApplNo"
+                              AND FS."ApplNo" != FS."MainApplNo"
+    -- MD 主要共同借款人只取一筆
+    LEFT JOIN MainData MD ON MD."DataYM" = YYYYMM
+                         AND MD."CustNo" = FM."CustNo"
+                         AND MD."FacmNo" = FM."FacmNo"
+                         AND MD."Seq" = 1
+    -- JM 主要共同借款人資料
+    LEFT JOIN "JcicMonthlyLoanData" JM ON JM."DataYM" = MD."DataYM"
+                                      AND JM."CustNo" = MD."CustNo"
+                                      AND JM."FacmNo" = MD."FacmNo"
+                                      AND JM."BormNo" = MD."BormNo"
+    -- JS 非主要共同借款人資料
+    LEFT JOIN "JcicMonthlyLoanData" JS ON JS."DataYM" = YYYYMM
+                                      AND JS."CustNo" = FS."CustNo"
+                                      AND JS."FacmNo" = FS."FacmNo"
+    -- T 合計資料
+    LEFT JOIN TOTAL T ON T."MainApplNo" = FM."MainApplNo"
+    -- S 序號資料
+    LEFT JOIN SeqData S ON S."ApplNo" = FS."ApplNo"
+    WHERE FM."ApplNo" = FM."MainApplNo" -- Main
+      AND NVL(FM."JcicMergeFlag",' ') = 'Y' -- 需合併申報者
+      AND JM."CustNo" != 0 -- 有串到主要共同借款人資料
+      AND JS."CustNo" != 0 -- 有串到非主要共同借款人資料
+    ;
 
--- 更新 PrevAmtRcv, IntAmtRcv, FeeAmtRcv   本月實收
----- "AcctCode" ref: Project\common\BaTxCom.java  F10+...+F24
-----                 Project\common\AcDetailCom.java
---    DBMS_OUTPUT.PUT_LINE('UPDATE Rcv 本月實收金額');
---
---    MERGE INTO "JcicMonthlyLoanData" M
---    USING (SELECT "CustNo"
---                , "FacmNo"
---                , "BormNo"
---                , SUM ( CASE
---                          WHEN "AcctCode" IN ('310', '320', '330', '340') THEN
---                            CASE WHEN "DbCr" = 'C' THEN "TxAmt"
---                                 ELSE 0 - "TxAmt"
---                            END
---                          ELSE  0
---                        END )       AS "PrevAmtRcv"
---                , SUM ( CASE
---                          WHEN "AcctCode" IN ('IC1', 'IC2', 'IC3', 'IC4') THEN
---                            CASE WHEN "DbCr" = 'C' THEN "TxAmt"
---                                 ELSE 0 - "TxAmt"
---                            END
---                          ELSE  0
---                        END )       AS "IntAmtRcv"
---                , SUM ( CASE
---                          WHEN "AcctCode" IN ('F10', 'F29', 'TMI', 'F09', 'F25', 'F07', 'F24', 'IOV', 'IOP') THEN
---                            CASE WHEN "DbCr" = 'C' THEN "TxAmt"
---                                 ELSE 0 - "TxAmt"
---                            END
---                          ELSE  0
---                        END )       AS "FeeAmtRcv"
---            FROM "AcDetail"             -- 會計帳務明細檔
---            WHERE "CustNo"  > 0
---             AND  TRUNC("AcDate" / 100)  = YYYYMM
---             AND  SUBSTR("TitaTxCd",1,2) = 'L3'
---             AND  "AcctCode" IN ('310', '320', '330', '340',                                      -- 本金
---                                 'IC1', 'IC2', 'IC3', 'IC4',                                      -- 利息
---                                 'F10', 'F29', 'TMI', 'F09', 'F25', 'F07', 'F24', 'IOV', 'IOP'    -- 費用 (含逾期息,違約金)  (ref: LN15F1 (#M3102 36 7))
---                                )
---            GROUP BY "CustNo", "FacmNo", "BormNo"
---           ) T
---    ON (    M."DataYM"   = YYYYMM
---        AND M."CustNo"   = T."CustNo"
---        AND M."FacmNo"   = T."FacmNo"
---        AND M."BormNo"   = T."BormNo"
---       )
---    WHEN MATCHED THEN UPDATE SET M."PrevAmtRcv" = T."PrevAmtRcv"
---                               , M."IntAmtRcv"  = T."IntAmtRcv"
---                               , M."FeeAmtRcv"  = T."FeeAmtRcv"
---    ;
---
---    UPD_CNT := UPD_CNT + sql%rowcount;
---    DBMS_OUTPUT.PUT_LINE('UPDATE Rcv 本月實收金額 End');
-
+    -- 刪除非主要借款人原本寫入的資料
+    MERGE INTO "JcicMonthlyLoanData" J
+    USING (
+      SELECT "CustNo"
+           , "FacmNo"
+      FROM "FacShareAppl"
+      WHERE "ApplNo" != "MainApplNo"
+    ) F
+    ON (
+      J."DataYM" = YYYYMM
+      AND J."CustNo" = F."CustNo"
+      AND J."FacmNo" = F."FacmNo"
+    )
+    WHEN MATCHED THEN
+      UPDATE SET J."BormNo" = 0
+      DELETE WHERE J."BormNo" = 0
+    ;
 
 
 -- 記錄程式結束時間
@@ -606,96 +607,14 @@ BEGIN
     commit;
 
 -- 例外處理
---    Exception
---    WHEN OTHERS THEN
---   "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_MonthlyLoanBa_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
+   Exception
+   WHEN OTHERS THEN
+    "Usp_L9_UspErrorLog_Ins"(
+        'Usp_L8_JcicMonthlyLoanData_Upd' -- UspName 預存程序名稱
+      , SQLCODE -- Sql Error Code (固定值)
+      , SQLERRM -- Sql Error Message (固定值)
+      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+      , EmpNo -- 發動預存程序的員工編號
+    );
   END;
 END;
-
---       , ' '   AS "CustId"            -- 借款人ID / 統編
---       , 0     AS "Status"            -- 戶況 0:正常戶 1:展期 2: 催收戶 3: 結案戶 4: 逾期戶 5: 催收結案戶 6: 呆帳戶 7: 部分轉呆戶 8: 債權轉讓戶 9: 呆帳結案戶
---       , ' '   AS "EntCode"           -- 企金別  0:個金 1:企金 2:企金自然人
---       , ' '   AS "SuvId"             -- 負責人IDN/負責之事業體BAN
---       , ' '   AS "OverseasId"        -- 外僑兼具中華民國國籍IDN
---       , ' '   AS "IndustryCode"      -- 授信戶行業別
---       , ' '   AS "AcctCode"          -- 科目別
---       , ' '   AS "SubAcctCode"       -- 科目別註記  --???
---       , ' '   AS "OrigAcctCode"      -- 轉催收款(或呆帳)前原科目別
---       , 0     AS "UtilAmt"           -- (額度)貸出金額(放款餘額)
---       , 0     AS "UtilBal"           -- (額度)已動用額度餘額(循環動用還款時會減少,非循環動用還款時不會減少)
---       , ' '   AS "RecycleCode"       -- 循環動用 0: 非循環動用 1: 循環動用
---       , 0     AS "RecycleDeadline"   -- 循環動用期限
---       , ' '   AS "IrrevocableFlag"   -- 不可撤銷 Y:是  N:否
---       , ' '   AS "FinCode"           -- 融資分類  -- 法人:K其他
---       , ' '   AS "ProjCode"          -- 政府專業補助貸款分類   (ref:AS400 LN15F1)
---       , ' '   AS "NonCreditCode"     -- 不計入授信項目   (ref:AS400 LN15F1)
---       , ' '   AS "UsageCode"         -- 用途別
---       , 0     AS "ApproveRate"       -- 本筆撥款利率
---       , 0     AS "StoreRate"         -- 計息利率
---       , 0     AS "DrawdownDate"      -- 撥款日期
---       , 0     AS "MaturityDate"      -- 到期日
---       , ' '   AS "AmortizedCode"     -- 攤還方式 --1.按月繳息(按期繳息到期還本) 2.到期取息(到期繳息還本)
---       , ' '   AS "CurrencyCode"      -- 幣別
---       , 0     AS "DrawdownAmt"       -- 撥款金額
---       , 0     AS "LoanBal"           -- 放款餘額
---       , 0     AS "PrevAmt"           -- 本月應收本金
---       , 0     AS "IntAmt"            -- 本月應收利息
---       , 0     AS "PrevAmtRcv"        -- 本月實收本金   -- 後面才更新值
---       , 0     AS "IntAmtRcv"         -- 本月實收利息
---       , 0     AS "FeeAmtRcv"         -- 本月收取費用   -- 後面才更新值
---       , 0     AS "PrevPayIntDate"    -- 上次繳息日
---       , 0     AS "PrevRepaidDate"    -- 上次還本日
---       , 0     AS "NextPayIntDate"    -- 下次繳息日
---       , 0     AS "NextRepayDate"     -- 下次還本日
---       , 0     AS "IntDelayMon"       -- 利息逾期月數
---       , 0     AS "RepayDelayMon"     -- 本金逾期月數
---       , 0     AS "RepaidEndMon"      -- 本金逾到期日(清償期)月數
---       , 0     AS "ClCode1"           -- 主要擔保品代號1
---       , 0     AS "ClCode2"           -- 主要擔保品代號2
---       , 0     AS "ClNo"              -- 主要擔保品編號
---       , ' '   AS "ClTypeCode"        -- 主要擔保品類別代碼(JCIC)
---       , ' '   AS "ClType"            -- 擔保品組合型態  1:單一擔保品(或保證)    (ref:AS400 LN15F1 (#M3102 92 01))
---       , 0     AS "EvaAmt"            -- 鑑估總值  (若為0, 後面再處理搬 "核准額度") (ref:AS400 LN15F1 (#M3102 93 10))
---       , 0     AS "DispDate"          -- 擔保品處分日期
---       , 0     AS "SyndNo"            -- 聯貸案序號
---       , ' '   AS "SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
---       , 0     AS "SigningDate"       -- 聯貸合約訂定日期
---       , 0     AS "SyndAmt"           -- 聯貸總金額
---       , 0     AS "PartAmt"           -- 參貸金額
---       , 0     AS "OvduDate"          -- 轉催收日期
---       , 0     AS "BadDebtDate"       -- 轉呆帳日期 (最早之轉銷呆帳日期)
---       , ' '   AS "BadDebtSkipFg"     -- 不報送呆帳記號 (Y=呆帳不報送聯徵)
---       , ' '   AS "AcBookCode"        -- 帳冊別   (000：全公司)
---       , ' '   AS "AcSubBookCode"     -- 區隔帳冊 (00A:傳統帳冊 201:利變年金帳冊)
-
--- 以下刪除
---       , ' '   AS "GuaTypeCode1"      -- 共同債務人或債務關係人身份代號1
---       , ' '   AS "GuaId1"            -- 共同債務人或債務關係人身份統一編號1
---       , ' '   AS "GuaRelCode1"       -- 與主債務人關係1
---       , ' '   AS "GuaTypeCode2"      -- 共同債務人或債務關係人身份代號2
---       , ' '   AS "GuaId2"            -- 共同債務人或債務關係人身份統一編號2
---       , ' '   AS "GuaRelCode2"       -- 與主債務人關係2
---       , ' '   AS "GuaTypeCode3"      -- 共同債務人或債務關係人身份代號3
---       , ' '   AS "GuaId3"            -- 共同債務人或債務關係人身份統一編號3
---       , ' '   AS "GuaRelCode3"       -- 與主債務人關係3
---       , ' '   AS "GuaTypeCode4"      -- 共同債務人或債務關係人身份代號4
---       , ' '   AS "GuaId4"            -- 共同債務人或債務關係人身份統一編號4
---       , ' '   AS "GuaRelCode4"       -- 與主債務人關係4
---       , ' '   AS "GuaTypeCode5"      -- 共同債務人或債務關係人身份代號5
---       , ' '   AS "GuaId5"            -- 共同債務人或債務關係人身份統一編號5
---       , ' '   AS "GuaRelCode5"       -- 與主債務人關係5
---       , ' '   AS "GuaTypeCode6"      -- 共同債務人或債務關係人身份代號6
---       , ' '   AS "GuaId6"            -- 共同債務人或債務關係人身份統一編號6
---       , ' '   AS "GuaRelCode6"       -- 與主債務人關係6
---       , ' '   AS "GuaTypeCode7"      -- 共同債務人或債務關係人身份代號7
---       , ' '   AS "GuaId7"            -- 共同債務人或債務關係人身份統一編號7
---       , ' '   AS "GuaRelCode7"       -- 與主債務人關係7
---       , ' '   AS "GuaTypeCode8"      -- 共同債務人或債務關係人身份代號8
---       , ' '   AS "GuaId8"            -- 共同債務人或債務關係人身份統一編號8
---       , ' '   AS "GuaRelCode8"       -- 與主債務人關係8
---       , ' '   AS "GuaTypeCode9"      -- 共同債務人或債務關係人身份代號9
---       , ' '   AS "GuaId9"            -- 共同債務人或債務關係人身份統一編號9
---       , ' '   AS "GuaRelCode9"       -- 與主債務人關係9
---       , ' '   AS "GuaTypeCode10"     -- 共同債務人或債務關係人身份代號10
---       , ' '   AS "GuaId10"           -- 共同債務人或債務關係人身份統一編號10
---       , ' '   AS "GuaRelCode10"      -- 與主債務人關係10

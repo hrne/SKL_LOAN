@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanRateChangeService;
@@ -50,6 +52,8 @@ public class L3R02 extends TradeBuffer {
 
 	@Autowired
 	public LoanRateChangeService loanRateChangeService;
+	@Autowired
+	public FacCaseApplService facCaseApplService;
 
 	@Autowired
 	Parse parse;
@@ -73,7 +77,14 @@ public class L3R02 extends TradeBuffer {
 		LoanRateChange tLoanRateChange = new LoanRateChange();
 		// 查詢額度主檔
 		FacMain tFacMain = sFacMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
+		if (tFacMain == null) {
+			throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+		}
 
+		FacCaseAppl tFacCaseAppl = facCaseApplService.findById(tFacMain.getApplNo(), titaVo);
+		if (tFacCaseAppl == null) {
+			throw new LogicException(titaVo, "E0001", " 案件申請檔"); // 查無資料
+		}
 		// 查詢放款主檔
 		if (iBormNo == 0) {
 			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900,
@@ -212,7 +223,7 @@ public class L3R02 extends TradeBuffer {
 		this.totaVo.putParam("OPieceCodeSecond", tLoanBorMain.getPieceCodeSecond());
 		this.totaVo.putParam("OPieceCodeSecondAmt", tLoanBorMain.getPieceCodeSecondAmt());
 		this.totaVo.putParam("OUsageCode", tLoanBorMain.getUsageCode());
-		this.totaVo.putParam("OSyndNo", tLoanBorMain.getSyndNo());
+		this.totaVo.putParam("OSyndNo", tFacCaseAppl.getSyndNo());
 		this.totaVo.putParam("ORelationCode", tLoanBorMain.getRelationCode());
 		this.totaVo.putParam("ORelationName", tLoanBorMain.getRelationName());
 		this.totaVo.putParam("ORelationId", tLoanBorMain.getRelationId());

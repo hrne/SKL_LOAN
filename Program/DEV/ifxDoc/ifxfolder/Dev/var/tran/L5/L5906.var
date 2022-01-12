@@ -68,6 +68,7 @@ C(3,#CustNoS,0,$,T(2,@Chain_L5116,1+#CustNoS+000))
 @
 T(2,@Chain_L5116,1+#CustNoS+000)
 #CustNoE=A,7,I
+@V(5,#CustNoS,9999999)
 #RPTFG=A,1,S
 
 </sub>

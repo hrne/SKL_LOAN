@@ -593,26 +593,36 @@ BEGIN
       SELECT M."CustNo"
            , M."FacmNo"
            , M."BormNo"
-           , CASE
-               WHEN MLB."YearMonth" = M."StartMonth2"
-               THEN MLB."LoanBalance"
-             ELSE 0 END              AS "LoanBal1" -- 發生日後第一年餘額
-           , CASE
-               WHEN MLB."YearMonth" = M."StartMonth3"
-               THEN MLB."LoanBalance"
-             ELSE 0 END              AS "LoanBal2" -- 發生日後第二年餘額
-           , CASE
-               WHEN MLB."YearMonth" = M."StartMonth4"
-               THEN MLB."LoanBalance"
-             ELSE 0 END              AS "LoanBal3" -- 發生日後第三年餘額
-           , CASE
-               WHEN MLB."YearMonth" = M."StartMonth5"
-               THEN MLB."LoanBalance"
-             ELSE 0 END              AS "LoanBal4" -- 發生日後第四年餘額
-           , CASE
-               WHEN MLB."YearMonth" = M."StartMonth6"
-               THEN MLB."LoanBalance"
-             ELSE 0 END              AS "LoanBal5" -- 發生日後第五年餘額
+           , SUM (
+               CASE
+                 WHEN MLB."YearMonth" = M."StartMonth2"
+                 THEN MLB."LoanBalance"
+               ELSE 0 END
+             )                       AS "LoanBal1" -- 發生日後第一年餘額
+           , SUM (
+               CASE
+                 WHEN MLB."YearMonth" = M."StartMonth3"
+                 THEN MLB."LoanBalance"
+               ELSE 0 END
+             )                       AS "LoanBal2" -- 發生日後第二年餘額
+           , SUM (
+               CASE
+                 WHEN MLB."YearMonth" = M."StartMonth4"
+                 THEN MLB."LoanBalance"
+               ELSE 0 END
+             )                       AS "LoanBal3" -- 發生日後第三年餘額
+           , SUM (
+               CASE
+                 WHEN MLB."YearMonth" = M."StartMonth5"
+                 THEN MLB."LoanBalance"
+               ELSE 0 END
+             )                       AS "LoanBal4" -- 發生日後第四年餘額
+           , SUM (
+               CASE
+                 WHEN MLB."YearMonth" = M."StartMonth6"
+                 THEN MLB."LoanBalance"
+               ELSE 0 END
+             )                       AS "LoanBal5" -- 發生日後第五年餘額
            , M."Seq"
            , M."FacSeq"
       FROM MonthData M
@@ -626,6 +636,11 @@ BEGIN
                                           , M."StartMonth5"
                                           , M."StartMonth6"
                                         )
+      GROUP BY M."CustNo"
+             , M."FacmNo"
+             , M."BormNo"
+             , M."Seq"
+             , M."FacSeq"
     )
     , CustTotal AS (
       SELECT "CustNo"

@@ -1652,6 +1652,7 @@ TXFORM=L2R01
 !尋找案件申請檔資料
 <L2R02.dec>
 #L2r02CreditSysNo=A,7,S
+#L2r02SyndNo=A,6,S
 #L2r02ApplNo=A,7,S
 #L2r02CustId=X,10,S
 #L2r02ApplDate=D,7,S
@@ -1678,6 +1679,7 @@ TXFORM=L2R01
 <L2R02.tom>
 TXFORM=L2R02
 #L2r02CreditSysNo
+#L2r02SyndNo
 #L2r02ApplNo
 #L2r02CustId
 #L2r02ApplDate

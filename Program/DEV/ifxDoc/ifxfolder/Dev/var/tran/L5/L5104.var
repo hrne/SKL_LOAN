@@ -53,9 +53,11 @@ E(0,@EndDate,#TODAY)
 ! 開始日期
 #StartDate=D,7,I
 C(3,#CHAIN,0,$,s)
+@V(5,0000000,#TODAY)V(7)
 
 ! 終止日期
 #EndDate=D,7,I
+@V(5,#StartDate,#TODAY)V(7)
 
 ! 報表種類
 #ReportFlag=A,1,I

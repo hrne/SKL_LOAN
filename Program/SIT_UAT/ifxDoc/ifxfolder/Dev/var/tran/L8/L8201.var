@@ -113,6 +113,8 @@ C(3,#L8R49FactorDays,0,E(0,#FuncCode,1),E(0,#FuncCode,2))
 
 !統計期間天數
 #FactorDays3=N,3,I
+@V(2,0)
+
 ! 樣態三-金額合計超過
 #Factor3TotLimit=m,14,I
 @V(2,0)

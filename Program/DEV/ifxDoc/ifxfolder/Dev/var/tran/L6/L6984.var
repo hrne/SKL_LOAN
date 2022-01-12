@@ -16,7 +16,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,696)ASGN(INQLEN$)
+E(0,699)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -362,7 +362,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3916;text=撥款內容查詢;ntxbuf=#DTL_BUF})
 #NotYetFlag=X,1,S
 #PieceCode=X,1,S
 #UsageCode=A,2,S
-#SyndNo=A,3,S
+#SyndNo=A,6,S
 #RenewFlag=X,1,S
 #CompensateFlag=X,1,S
 #IntCalcCode=X,1,S
