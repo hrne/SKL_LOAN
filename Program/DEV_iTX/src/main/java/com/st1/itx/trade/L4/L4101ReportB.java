@@ -153,7 +153,8 @@ public class L4101ReportB extends MakeReport {
 		reportCode = reportCode + "-" + batchNo;
 		// 批號查全部
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
+				titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
@@ -217,8 +218,11 @@ public class L4101ReportB extends MakeReport {
 //
 //				this.newPage();
 //			}
-			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate, titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), acDate, 0, Integer.MAX_VALUE, titaVo);
-			FacMain tFacMain = facMainService.findById(new FacMainId(tBankRemit.getCustNo(), tBankRemit.getFacmNo()), titaVo);
+			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
+					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0, Integer.MAX_VALUE,
+					titaVo);
+			FacMain tFacMain = facMainService.findById(new FacMainId(tBankRemit.getCustNo(), tBankRemit.getFacmNo()),
+					titaVo);
 			CdBcm tCdBcm = new CdBcm();
 			if (tFacMain != null) {
 				tCdBcm = cdBcmService.distCodeFirst(tFacMain.getDistrict(), titaVo);
@@ -313,7 +317,8 @@ public class L4101ReportB extends MakeReport {
 
 //			戶號額度最後一筆印小計
 //			list最後一筆直接印小計
-			if (i == lBankRemit.size() || (oldCustNo != lBankRemit.get(i).getCustNo() || oldFacmNo != lBankRemit.get(i).getFacmNo())) {
+			if (i == lBankRemit.size()
+					|| (oldCustNo != lBankRemit.get(i).getCustNo() || oldFacmNo != lBankRemit.get(i).getFacmNo())) {
 
 				print(0, 151, formatAmt(subTotal, 0), "R");// 核貸金額
 

@@ -469,6 +469,12 @@ public class DateUtil extends SysLogger {
 			return (this.date_2.getYear() * 10000 + this.date_2.getMonthOfYear() * 100 + this.date_2.getDayOfMonth()) - 19110000;
 	}
 
+	/**
+	 * 營業日期相關資料
+	 * 
+	 * @return TxBizDate
+	 * @throws LogicException when isHolidySkip Non or False Date_1 is Holiday
+	 */
 	public TxBizDate getForTxBizDate(boolean... isThrowError) throws LogicException {
 		int year = this.date_1.getYear();
 		int mon = this.date_1.getMonthOfYear();

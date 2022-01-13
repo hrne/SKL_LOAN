@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -32,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6901 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6901.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -63,8 +60,8 @@ public class L6901 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// tita 登放日期 RelDy
-		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		int iRelDy = parse.stringToInteger(titaVo.getParam("RelDy")) + 19110000;
+		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate"));
+		int iRelDy = parse.stringToInteger(titaVo.getParam("RelDy"));
 		// tita 登放序號 RelTxseq
 		String iRelTxseq = titaVo.getParam("RelTxseq");
 		if (iRelTxseq.length() < 18) {
@@ -86,14 +83,22 @@ public class L6901 extends TradeBuffer {
 		// new TABLE acDetail
 		// AcDetail tacDetail = new AcDetail();
 		// 登放日期,登放序號找AcDetail資料
-		if (iRelDy == 19110000) {
-			slAcDetailList = sAcDetailService.findTxtNoEq(iAcDate, iRelTxseq.substring(0, 4), iRelTxseq.substring(4, 10), parse.stringToInteger(iRelTxseq.substring(10, 18)), this.index,
+		if (iRelDy == 0) {
+			slAcDetailList = sAcDetailService.findTxtNoEq(iAcDate + 19110000, iRelTxseq.substring(0, 4),
+					iRelTxseq.substring(4, 10), parse.stringToInteger(iRelTxseq.substring(10, 18)), this.index,
 					Integer.MAX_VALUE, titaVo);
+			lAcDetailList = slAcDetailList == null ? null : slAcDetailList.getContent();
 		} else {
-			slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy, iRelTxseq, iAcDate, this.index, Integer.MAX_VALUE, titaVo);
+			slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy + 19110000, iRelTxseq, this.index,
+					Integer.MAX_VALUE, titaVo);
+			if (slAcDetailList != null) {
+				for (AcDetail ac : slAcDetailList.getContent()) {				
+					if (iAcDate == 0 || ac.getAcDate() == iAcDate) {
+						lAcDetailList.add(ac);
+					}
+				}
+			}
 		}
-
-		lAcDetailList = slAcDetailList == null ? null : slAcDetailList.getContent();
 
 		if (lAcDetailList == null || lAcDetailList.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料

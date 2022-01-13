@@ -215,7 +215,9 @@ T(2,#YearMonth)
 A(YM,1,#EffectMonth)
 
 #BaseRateCode=A,2,I
+HELP(#BaseRateHelp)
 IF(#TxKind==1,E(0,1),IF(#TxKind==2,E(0,2),s))
+@V(H,#BaseRateHelp)
 !IF(#TxKind==2,$,s)
 !@V(2,1,99)
 

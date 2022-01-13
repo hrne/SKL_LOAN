@@ -119,11 +119,15 @@ T(3,)T(H,#FunctionCode,#FunctionHelp)
 
 #ColDisplay=A,1,S
 C(3,#CHAIN,0,
-C(3,#FunctionCode,2,INVOKEJS(SHOW,L4702,2,8,0)
+C(3,#FunctionCode,2,INVOKEJS(SHOW,L4702,3,8,0)
 T(F,@ACCTDATE_ED,0)
 T(F,@CUSTNO,0)
 T(F,@CUSTNOB,0)
-HIDE(#BTNA,#BTNB),INVOKEJS(SHOW,L4702,2,8,1)),
+HIDE(#BTNA,#BTNB),INVOKEJS(SHOW,L4702,2,8,1)
+T(F,@ACCTDATE_ED,1)
+T(F,@CUSTNO,1)
+T(F,@CUSTNOB,1)
+SHOW(#BTNA,#BTNB)),
 INVOKEJS(SHOW,L4702,2,8,0)
 T(F,@ACCTDATE_ED,0)
 T(F,@CUSTNO,0)
@@ -151,16 +155,17 @@ E(0,@CUSTNOB,9999999)
 
 !會計日期 必須輸入，不可大於本營業日
 #ACCTDATE_ST=D,7,I
-C(3,#FunctionCode,2,s,$)
 C(3,#CHAIN,0,T(2,#DT_YM+01),T(2,#DT2))
+C(3,#FunctionCode,2,T(2,#DT2),$)
 C(3,#CHAIN,0,$,s)
 @V(7)
 V(5,0,#DT2)
 A(DATE,0,#ACCTDATE_ST)
 
 #ACCTDATE_ED=D,7,I
-C(3,#FunctionCode,2,s,$)
 T(2,#DT2)
+C(3,#FunctionCode,2,T(2,#ACCTDATE_ST),$)
+C(3,#FunctionCode,2,s,$)
 C(3,#CHAIN,0,$,s)
 @V(7)
 V(5,#ACCTDATE_ST,#DT2)
@@ -190,6 +195,7 @@ C(3,#CUSTNO,1,E(0,@CUSTNOB,9999999),E(0,@CUSTNOB,#CUSTNO))
 C(3,#FunctionCode,2,s,$)
 C(3,#CHAIN,0,$,s)
 @V(2,0)
+V(5,#CUSTNO,9999999)
 
 !選擇條件一
 #CONDITION1=A,1,I

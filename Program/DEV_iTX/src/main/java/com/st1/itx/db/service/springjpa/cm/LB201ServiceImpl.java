@@ -59,8 +59,12 @@ public class LB201ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "     , M.\"PayablesFg\"" + "     , M.\"NegFg\"" + "     , M.\"Filler533\"" + "     , M.\"GuaTypeCode1\"" + "     , M.\"GuaId1\"" + "     , M.\"GuaIdErr1\""
 				+ "     , M.\"GuaRelCode1\"" + "     , M.\"GuaTypeCode2\"" + "     , M.\"GuaId2\"" + "     , M.\"GuaIdErr2\"" + "     , M.\"GuaRelCode2\"" + "     , M.\"GuaTypeCode3\""
 				+ "     , M.\"GuaId3\"" + "     , M.\"GuaIdErr3\"" + "     , M.\"GuaRelCode3\"" + "     , M.\"GuaTypeCode4\"" + "     , M.\"GuaId4\"" + "     , M.\"GuaIdErr4\""
-				+ "     , M.\"GuaRelCode4\"" + "     , M.\"GuaTypeCode5\"" + "     , M.\"GuaId5\"" + "     , M.\"GuaIdErr5\"" + "     , M.\"GuaRelCode5\"" + "     , M.\"Filler741\""
-				+ "     , M.\"Filler742\"" + "     , M.\"BadDebtDate\"" + "     , M.\"SyndCode\"" + "     , M.\"BankruptDate\"" + "     , M.\"BdLoanFg\"" + "     , M.\"SmallAmt\""
+				+ "     , M.\"GuaRelCode4\"" + "     , M.\"GuaTypeCode5\"" + "     , M.\"GuaId5\""
+				+ "     , M.\"GuaIdErr5\"" + "     , M.\"GuaRelCode5\"" + "     , M.\"Filler741\""
+				+ "     , M.\"GraceStartYM\"" + "     , M.\"GraceEndYM\"" + "     , M.\"GreenFg\""
+				+ "     , M.\"GreenCode\"" + "     , M.\"SustainFg\"" + "     , M.\"SustainCode\""
+				+ "     , M.\"SustainNoReachFg\"" + "     , M.\"BadDebtDate\"" + "     , M.\"SyndCode\""
+				+ "     , M.\"BankruptDate\"" + "     , M.\"BdLoanFg\"" + "     , M.\"SmallAmt\""
 				+ "     , M.\"ExtraAttrCode\"" + "     , M.\"ExtraStatusCode\"" + "     , M.\"Filler74A\"" + "     , M.\"JcicDataYM\"" + "     , M.\"DataEnd\"" + " FROM  \"JcicB201\" M"
 				+ " WHERE M.\"DataYM\" = :dateMonth " // 2021-12-20 智偉修改
 				+ " AND M.\"TranCode\" = 'A' " + " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"TranCode\", M.\"AcctNo\" ";

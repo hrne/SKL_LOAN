@@ -40,6 +40,14 @@ public class ThreadVariable {
 			return false;
 		return (boolean) threadLocal.get().get(ContentName.loggerFg);
 	}
+	
+	public static void setLoggerOn() {
+		setObject(ContentName.loggerFg, true);
+	}
+
+	public static void setLoggerOff() {
+		setObject(ContentName.loggerFg, false);
+	}
 
 	public static String getEmpNot() {
 		if (threadLocal.get() == null || threadLocal.get().get(ContentName.empnot) == null)
