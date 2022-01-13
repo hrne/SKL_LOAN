@@ -82,7 +82,7 @@ T(2,@FdCustTypeCode, )
 T(2,@FdNotYetFlag, )
 T(2,@FdPieceCode,*)
 T(2,@FdUsageCode, )
-T(2,@FdSyndNo, )
+! T(2,@FdSyndNo, )
 !T(2,@FdRenewFlag,*)  
 </sub>
 
@@ -745,6 +745,21 @@ E(0,@RimCaseNo,0)
 RESET_RIM(#SendL2r05B,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
+
+
+
+!取案件申請資料
+#SendL2r02A=X,1,S
+E(0,@RimApplNo,#L2r05ApplNo)
+E(0,@RimFuncCode,5)
+T(2,@RimCustId,#L2r05CustId)
+RESET_RIM(#SendL2r02A,L2R02)
+S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
+R(1,L2R02)
+
+#RcvL2r02A=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+E(0,@SyndNo,#L2r02SyndNo)
 
 
 ![預定撥款序號]
@@ -1508,13 +1523,13 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2921; ntxbuf=#BUF6A})
 
 #WkCharCodeP6=X,1,S
 !SHOW(#RenewFlag)
-T(F,@SyndNo,1)
+! T(F,@SyndNo,1)
 C(5,#L2r01CharCode,2,$,S)
 !T(3,@RenewFlag,N)
 !HIDE(#RenewFlag)
 !T(A,@RenewFlagX,#RenewFlag,L3DEF,YesNoDef,YesNo,YesNoX)
-E(0,@SyndNo,0)
-T(F,@SyndNo,0)
+! E(0,@SyndNo,0)
+! T(F,@SyndNo,0)
 
 ![客戶別]
 !依核准額度自動顯示不必輸入 L2R05
@@ -1605,9 +1620,9 @@ T(3,)T(H,#UsageCode,#UsageCodeHelp)
 ![聯貸案序號]
 #FdSyndNo=X,2,L
 
-#SyndNo=A,3,I
-C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
-C(5,#L2r01CharCode,2,S,$)
+#SyndNo=A,6,L
+! C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+! C(5,#L2r01CharCode,2,S,$)
 ! E(0,0)
 
 ![借新還舊]
@@ -2067,6 +2082,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L2R02.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R06.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
@@ -2254,6 +2270,7 @@ TXFORM=L3110
 <include src="COM.icf::TRCTL.tom"/>
 <include src="COM.icf::LockControl.tom"/>
 <include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R02.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R06.tom"/>
 <include src="ROM.icf::L2R07.tom"/>

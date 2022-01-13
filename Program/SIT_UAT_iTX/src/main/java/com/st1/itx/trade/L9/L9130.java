@@ -58,21 +58,24 @@ public class L9130 extends TradeBuffer {
 
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		int iMediaSeq = Integer.valueOf(titaVo.getParam("MediaSeq"));
-
-		if (iAcDate != titaVo.getEntDyI()) {
-			this.info("L9130 iAcDate = " + iAcDate);
-			this.info("L9130 titaVo.getEntDyI() = " + titaVo.getEntDyI());
-
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[會計日期]不等於系統會計日期", titaVo);
-
-			this.addList(this.totaVo);
-			return this.sendList();
-		}
+		
+		// 2022-01-13 智偉修改為不檢核,from 賴桑:L6102會產生不同日期的傳票
+//		if (iAcDate != titaVo.getEntDyI()) {
+//			this.info("L9130 iAcDate = " + iAcDate);
+//			this.info("L9130 titaVo.getEntDyI() = " + titaVo.getEntDyI());
+//
+//			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+//					titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[會計日期]不等於系統會計日期", titaVo);
+//
+//			this.addList(this.totaVo);
+//			return this.sendList();
+//		}
 
 		if (iBatchNo == 0) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[傳票批號]不得為0", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[傳票批號]不得為0", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -81,7 +84,8 @@ public class L9130 extends TradeBuffer {
 		if (iBatchNo > 99) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[傳票批號]不得大於99", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[傳票批號]不得大於99", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -90,7 +94,8 @@ public class L9130 extends TradeBuffer {
 		if (iMediaSeq == 0) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[核心傳票媒體上傳序號]不得為0", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[核心傳票媒體上傳序號]不得為0", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -99,7 +104,8 @@ public class L9130 extends TradeBuffer {
 		if (iMediaSeq > 999) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[核心傳票媒體上傳序號]不得大於999", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130核心傳票媒體檔產生,傳入參數[核心傳票媒體上傳序號]不得大於999", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -107,15 +113,16 @@ public class L9130 extends TradeBuffer {
 
 		doRpt(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L9130核心傳票媒體檔產生已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				"L9130核心傳票媒體檔產生已完成", titaVo);
 
 		tranL9131.run(titaVo);
 
 		tranL9132.run(titaVo);
 
 		String doL9133 = "N";
-
-		if (titaVo.containsKey("DoL9133")) {
+		
+	    if (titaVo.containsKey("DoL9133")){
 			this.info("titaVo.containsKey : DoL9133 , value = " + titaVo.getParam("DoL9133"));
 			doL9133 = titaVo.getParam("DoL9133");
 		}

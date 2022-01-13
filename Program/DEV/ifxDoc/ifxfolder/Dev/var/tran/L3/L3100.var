@@ -720,6 +720,21 @@ RESET_RIM(#SendL2r05B,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
 
+
+
+!取案件申請資料
+#SendL2r02A=X,1,S
+E(0,@RimApplNo,#L2r05ApplNo)
+E(0,@RimFuncCode,5)
+T(2,@RimCustId,#L2r05CustId)
+RESET_RIM(#SendL2r02A,L2R02)
+S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
+R(1,L2R02)
+
+#RcvL2r02A=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+E(0,@SyndNo,#L2r02SyndNo)
+
 ![撥款序號]
 #FdBormNo=X,2,L
 
@@ -1519,13 +1534,13 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L2921; ntxbuf=#BUF5A})
 
 #WkCharCodeP6=X,1,S
 SHOW(#RenewFlag)
-T(F,@SyndNo,1)
+! T(F,@SyndNo,1)
 C(5,#L2r01CharCode,2,$,S)
 T(3,@RenewFlag,0)
 HIDE(#RenewFlag)
 T(H,@RenewFlagX,#RenewFlag,#RenewFlagHelp)
-E(0,@SyndNo,0)
-T(F,@SyndNo,0)
+! E(0,@SyndNo,0)
+! T(F,@SyndNo,0)
 
 
 ![客戶別]
@@ -1635,10 +1650,10 @@ T(H,#UsageCode,#UsageCodeHelp)
 ![聯貸案序號]
 #FdSyndNo=X,2,L
 
-#SyndNo=A,3,I
-C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
-E(0,0)
-C(5,#L2r01CharCode,2,S,$)
+#SyndNo=A,6,L
+! C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+! E(0,0)
+! C(5,#L2r01CharCode,2,S,$)
 
 
 !是否為代償案件
@@ -2118,6 +2133,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L2R02.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R06.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
@@ -2309,7 +2325,7 @@ C(3,#Sno,0,E(0,0),E(0,1))
 #MaturityDate#IntCalcCode#AmortizedCode#FreqBase#PayIntFreq#RepayFreq
 #GracePeriod#GraceDate#SpecificDd#SpecificDate#FirstDueDate#FirstAdjRateDate
 #NextIntDate#NextRepayDate#TotalPeriod#TimAcctFee#TimHandlingFee#TimFinalBal
-#NotYetFlag#PieceCode#PieceCodeSecond#TimPieceCodeSecondAmt#UsageCode#SyndNo#RenewFlag#CompensateFlag
+#NotYetFlag#PieceCode#PieceCodeSecond#TimPieceCodeSecondAmt#UsageCode#RenewFlag#SyndNo#CompensateFlag
 #RelationCode#RelationBirthday#RelationGender
 #TxBormNo
 
@@ -2330,6 +2346,7 @@ C(3,#Sno,0,E(0,0),E(0,1))
 <include src="COM.icf::LockControl.tom"/>
 <include src="PRT.icf::FM101.tom"/>
 <include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R02.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R06.tom"/>
 <include src="ROM.icf::L2R07.tom"/>

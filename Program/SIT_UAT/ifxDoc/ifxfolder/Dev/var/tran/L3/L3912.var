@@ -1827,7 +1827,7 @@ T(3,[L3912] 交易內容查詢)
 ![借戶戶號]
 #L3600CustNo=A,7,L
 
-#L3600SyndNo=A,3,L
+#L3600SyndNo=A,6,L
 
 #L3600CustNoX=X,100,L
 
@@ -1910,7 +1910,7 @@ T(3,[L3912] 交易內容查詢)
 ![借戶戶號]
 #L3610CustNo=A,7,L
 
-#L3610SyndNo=A,3,L
+#L3610SyndNo=A,6,L
 
 #L3610CustNoX=X,100,L
 

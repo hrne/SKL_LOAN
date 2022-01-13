@@ -27,6 +27,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Service("BS910")
@@ -63,6 +64,8 @@ public class BS910 extends TradeBuffer {
 
 	@Autowired
 	public GSeqCom gSeqCom;
+	@Autowired
+	public WebClient webClient;
 
 	private int iAcDate;
 	private int iAcDateReverse;
@@ -163,6 +166,9 @@ public class BS910 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", "TxToDoDetailReserve insertAll " + e.getErrorMsg());
 			}
 		}
+
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
+				"請執行 各項提存入帳作業(放款承諾)", titaVo);
 
 		// END
 		this.batchTransaction.commit();

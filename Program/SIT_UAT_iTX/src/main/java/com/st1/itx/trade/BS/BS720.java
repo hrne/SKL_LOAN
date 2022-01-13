@@ -23,10 +23,13 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.Ias39IntMethod;
 import com.st1.itx.db.domain.Ias39IntMethodId;
+import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.service.Ias39IntMethodService;
+import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.springjpa.cm.BS720ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.Ias39IntMethodFileVo;
 import com.st1.itx.util.date.DateUtil;
@@ -59,11 +62,16 @@ public class BS720 extends TradeBuffer {
 	public Ias39IntMethodFileVo Ias39IntMethodFileVo;
 	@Autowired
 	public WebClient webClient;
+	@Autowired
+	public TxToDoDetailService txToDoDetailService;
+	@Autowired
+	public GSeqCom gSeqCom;
 
 	private BigDecimal ovduAmt = BigDecimal.ZERO;
 	private BigDecimal loanAmt = BigDecimal.ZERO;
 	private BigDecimal ovduAmtLast = BigDecimal.ZERO;
 	private BigDecimal loanAmtLast = BigDecimal.ZERO;
+	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
 
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
@@ -72,6 +80,7 @@ public class BS720 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active BS720 ");
 		this.totaVo.init(titaVo);
+		txToDoCom.setTxBuffer(this.getTxBuffer());
 		int iYearMonth = parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
 		int iYearMonthLast = iYearMonth - 1;
@@ -94,8 +103,16 @@ public class BS720 extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
-// 2021/2/24 考慮四捨五入差額，只出表、不入帳(維持至核心會計系統輸入)		
+// 2021/2/24 考慮四捨五入差額，只出表、不入帳(維持至核心會計系統輸入)	=> 2022/01改回要入帳	
 		// 寫入應處理清單 ACCL04-折溢價攤銷入帳
+
+		// 1.刪除處理清單  ACCL04-折溢價攤銷入帳 //
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL04", 0, 3, this.index, Integer.MAX_VALUE);
+		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
+		if (lTxToDoDetail != null) {
+			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
+		}
+		
 		procTxToDo(iYearMonth, titaVo);
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
 				"請執行 各項提存入帳作業(折溢價攤銷)", titaVo);
@@ -212,15 +229,24 @@ public class BS720 extends TradeBuffer {
 
 	private void procTxToDo(int iYearMonth, TitaVo titaVo) throws LogicException {
 		// AIL 擔保放款－折溢價 AIO 催收款項－折溢價 AII 利息收入－折溢價
-		txToDoCom.setTxBuffer(this.getTxBuffer());
 		int iDb = 0;
 		int iCr = 0;
-		int iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
+		int dateSent = (iYearMonth * 100 ) + 01  ;
+		dateUtil.init();
+		dateUtil.setDate_1(dateSent);
+		TxBizDate tTxBizDate = dateUtil.getForTxBizDate(true);// 若1號為假日,參數true則會找次一營業日,不會踢錯誤訊息
+
+		int iAcDate = tTxBizDate.getMfbsDy();// 畫面輸入年月的月底營業日
+		
 		String acBookCode = this.txBuffer.getSystemParas().getAcBookCode();
 		String acSubBookCode = this.txBuffer.getSystemParas().getAcSubBookCode();
 		//String acctCode = ;
+		// 銷帳編號：AC+民國年後兩碼+流水號六碼
+		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setItemCode("ACCL04"); // ACCL04-折溢價攤銷入帳
+		tTxToDoDetail.setDtlValue(rvNo);
 		// 借：AII 利息收入－折溢價
 		// 貸：AIL 擔保放款－折溢價 AIO 催收款項－折溢價
 		TempVo tTempVo = new TempVo();
@@ -235,7 +261,7 @@ public class BS720 extends TradeBuffer {
 		
 		tTempVo.putParam("SlipNote", iYearMonth / 100 + "年" + iYearMonth % 100 + "月" + "折溢價攤銷");
 		BigDecimal lnAmt = loanAmt.subtract(loanAmtLast);
-		BigDecimal ovAmt = loanAmt.subtract(ovduAmtLast);
+		BigDecimal ovAmt = ovduAmt.subtract(ovduAmtLast);
 		BigDecimal intAmt = loanAmt.add(ovduAmt);
 		if (lnAmt.compareTo(BigDecimal.ZERO) >= 0) {
 			iCr++;

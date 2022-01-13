@@ -101,7 +101,7 @@ public class ScheduledProcess extends SysLogger {
 							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "LC009", txs.getTlrNo(), txs.getTxCode() + " 執行成功", new TitaVo());
 
 						if (isBroken)
-							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "LC710", txs.getTxSeq(), txs.getTxCode() + " 執行失敗, 請至LC710查看", new TitaVo());
+							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "L6970", txs.getTxSeq(), txs.getTxCode() + " 執行失敗, 請至L6970查看", new TitaVo());
 					}
 				}
 			}
