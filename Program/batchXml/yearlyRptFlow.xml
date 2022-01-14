@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<!-- 作業名稱 -->
+	<job id="yearlyRptFlow" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<!-- 年底報表產表批次 -->
+		<split id="yearlyRptSplit" task-executor="taskExecutor">
+			<!-- TODO: 待補LY002 LY003 -->
+			<flow>
+				<step id="sLY004" parent="parentStep">
+					<tasklet ref="LY004" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLY005" parent="parentStep">
+					<tasklet ref="LY005" />
+				</step>
+			</flow>
+		</split>
+	</job>
+
+</beans>

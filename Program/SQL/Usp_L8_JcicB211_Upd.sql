@@ -79,7 +79,7 @@ BEGIN
              ON   M."CustNo"    =  T."CustNo"
             AND   M."FacmNo"    =  T."FacmNo"
             AND   M."BormNo"    =  T."BormNo"
-     WHERE  NVL(M."RenewFlag",' ') NOT IN ('Y', '1')  -- 非借新還舊
+     WHERE  NVL(M."RenewFlag",' ') NOT IN ( '1' , '2' , 'Y')  -- 非借新還舊
 
      UNION
 
@@ -115,13 +115,13 @@ BEGIN
                          WHEN  M."NextPayIntDate" >= T3."AcDate" OR M."NextPayIntDate" = 0 THEN 0
                          ELSE  TO_DATE(T3."AcDate",'yyyy-mm-dd')
                              - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') END "OvduDay"
-                  , CASE WHEN  M."Status" = 2 OR M."Status" = 6 THEN 0
+                  , CASE WHEN  M."Status" = 2 OR M."Status" = 6 THEN 6
                          WHEN  M."NextPayIntDate" >= T3."AcDate" OR M."NextPayIntDate" = 0 THEN 0
                          ELSE  TRUNC(MONTHS_BETWEEN(TO_DATE(T3."AcDate",'YYYY-MM-DD')
-                             , TO_DATE(M."NextPayIntDate",'YYYY-MM-DD'))) END "OvduMon"
+                             , TO_DATE(M."NextPayIntDate",'YYYY-MM-DD')))  END "OvduMon"
                   , M."Status", M."LastOvduNo"
              FROM ( SELECT  T1."CustNo", T1."FacmNo", T1."BormNo", T1."BorxNo"
-                          , ( T1."Principal" + T1."ExtraRepay" ) AS "Principal"
+                          , ( T1."Principal"  ) AS "Principal"
                           , T1."LoanBal", T1."TitaHCode", T1."TitaTxCd", T1."AcDate"
                           , CASE WHEN T1."TitaHCode" = 3 AND T1."CorrectSeq" IS NOT NULL THEN
                                       CAST(SUBSTR(T1."CorrectSeq", 1, 8) AS decimal(8, 0))
@@ -130,22 +130,25 @@ BEGIN
                       FROM  "LoanBorTx" T1
                      WHERE  T1."AcDate"    =  TBSDYF
                        AND  T1."TitaHCode" IN (0, 3)
-                       AND  ( T1."Principal" + T1."ExtraRepay" ) <> 0
+                       AND  T1."Principal"  <> 0
                        AND  T1."TitaTxCd"  NOT IN ('L3410','L3420')
                     UNION
                     SELECT  T2."CustNo", T2."FacmNo", T2."BormNo", T2."BorxNo"
-                          , ( T2."Principal" + T2."ExtraRepay" ) AS "Principal"
+                          , T2."Principal"  AS "Principal"
                           , T2."LoanBal", T2."TitaHCode", T2."TitaTxCd", T2."AcDate"
                           , CASE WHEN T2."TitaHCode" = 3 AND T2."CorrectSeq" IS NOT NULL THEN
                                       CAST(SUBSTR(T2."CorrectSeq", 1, 8) AS decimal(8, 0))
                                  ELSE 0
                             END  AS "OrigAcDate"   -- 原交易會計日期
-                      FROM  "LoanBorTx" T2
-                     WHERE  T2."AcDate"    =  TBSDYF
-                       AND  T2."TitaHCode" IN (0, 3)
-                       AND  ( T2."Principal" + T2."ExtraRepay" ) <> 0
-                       AND  T2."TitaTxCd"  IN ('L3410','L3420')
-                       AND  JSON_VALUE (T2."OtherFields", '$.CaseCloseCode') = 0
+                    FROM  "LoanBorTx" T2
+                    LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T2."CustNo"
+                                                AND  M."FacmNo"    =  T2."FacmNo"
+                                                AND  M."BormNo"    =  T2."BormNo"
+                    WHERE  T2."AcDate"    =  TBSDYF
+                      AND  T2."TitaHCode" IN (0, 3)
+                      AND  T2."Principal"  <> 0
+                      AND  T2."TitaTxCd"  IN ('L3420')
+                      AND  M."Status" = 3
                   ) T3
              LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T3."CustNo"
                                          AND  M."FacmNo"    =  T3."FacmNo"

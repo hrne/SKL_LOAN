@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<!-- 作業名稱 -->
+	<job id="dailyRptFlow" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<!-- 日報批次 -->
+		<split id="dailyRptSplit" task-executor="taskExecutor">
+			<flow>
+				<step id="sLD003" parent="parentStep">
+					<tasklet ref="LD003" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD004Batch" parent="parentStep">
+					<tasklet ref="LD004Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD005Batch" parent="parentStep">
+					<tasklet ref="LD005Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD006Batch" parent="parentStep">
+					<tasklet ref="LD006Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD007Batch" parent="parentStep">
+					<tasklet ref="LD007Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD008Batch" parent="parentStep">
+					<tasklet ref="LD008Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD009" parent="parentStep">
+					<tasklet ref="LD009" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLD010Batch" parent="parentStep">
+					<tasklet ref="LD010Batch" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLW003" parent="parentStep">
+					<tasklet ref="LW003" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLB204" parent="parentStep">
+					<tasklet ref="LB204" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLB211" parent="parentStep">
+					<tasklet ref="LB211" />
+				</step>
+			</flow>
+		</split>
+	</job>
+</beans>

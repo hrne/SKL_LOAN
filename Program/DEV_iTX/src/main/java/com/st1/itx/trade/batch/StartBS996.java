@@ -1,5 +1,8 @@
 package com.st1.itx.trade.batch;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -10,6 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.buffer.TxBuffer;
+import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
@@ -51,11 +56,32 @@ public class StartBS996 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active StartBS996 ");
 
-		String parm = "0,N,0,0";
+		TitaVo titaVo = new TitaVo();
+		
+		try {
+			titaVo.init();
+			titaVo.putParam(ContentName.kinbr, "0000");
+			titaVo.putParam(ContentName.tlrno, "BAT001");
+			titaVo.putParam(ContentName.empnot, "BAT001");
 
-		titaVo.putParam("Parm", parm);
+			TxBuffer txBuffer = MySpring.getBean("txBuffer", TxBuffer.class);
+			txBuffer.init(titaVo);
 
-		MySpring.newTask("BS996", this.txBuffer, titaVo);
+			String parm = "0,N,0,0";
+
+			titaVo.putParam("Parm", parm);
+
+			MySpring.newTask("BS996", this.txBuffer, titaVo);
+
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("StartBS996 error :" + errors.toString());
+		} finally {
+			titaVo.clear();
+			titaVo = null;
+			this.info("StartBS996 finished.");
+		}
 	}
 
 }

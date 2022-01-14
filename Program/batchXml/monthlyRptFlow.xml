@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<!-- 作業名稱 -->
+	<job id="monthlyRptFlow" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<!-- 月底報表產表批次 -->
+		<split id="monthlyRptSplit" task-executor="taskExecutor">
+			<flow>
+				<step id="sLM001" parent="parentStep">
+					<tasklet ref="LM001" />
+				</step>
+			</flow>
+			<flow>
+				<step id="sLM002" parent="parentStep">
+					<tasklet ref="LM002" />
+				</step>
+			</flow>
+			<!-- Batch step for LM003 -->
+			<flow>
+				<step id="sLM003Batch" parent="parentStep">
+					<tasklet ref="LM003Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM004 -->
+			<flow>
+				<step id="sLM004Batch" parent="parentStep">
+					<tasklet ref="LM004Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM011 -->
+			<flow>
+				<step id="sLM011Batch" parent="parentStep">
+					<tasklet ref="LM011Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM012 -->
+			<flow>
+				<step id="sLM012Batch" parent="parentStep">
+					<tasklet ref="LM012Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM013 -->
+			<flow>
+				<step id="sLM013Batch" parent="parentStep">
+					<tasklet ref="LM013Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM014 -->
+			<flow>
+				<step id="sLM014Batch" parent="parentStep">
+					<tasklet ref="LM014Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM016 -->
+			<flow>
+				<step id="sLM016Batch" parent="parentStep">
+					<tasklet ref="LM016Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM030 -->
+			<flow>
+				<step id="sLM030Batch" parent="parentStep">
+					<tasklet ref="LM030Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM031 -->
+			<flow>
+				<step id="sLM031Batch" parent="parentStep">
+					<tasklet ref="LM031Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM033 -->
+			<flow>
+				<step id="sLM033Batch" parent="parentStep">
+					<tasklet ref="LM033Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM040 -->
+			<flow>
+				<step id="sLM040Batch" parent="parentStep">
+					<tasklet ref="LM040Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LM070 -->
+			<flow>
+				<step id="sLM070Batch" parent="parentStep">
+					<tasklet ref="LM070Batch" />
+				</step>
+			</flow>
+			<!-- Batch step for LB201 -->
+			<flow>
+				<step id="sLB201" parent="parentStep">
+					<tasklet ref="LB201" />
+				</step>
+			</flow>
+			<!-- Batch step for LB207 -->
+			<flow>
+				<step id="sLB207" parent="parentStep">
+					<tasklet ref="LB207" />
+				</step>
+			</flow>
+			<!-- Batch step for LB080 -->
+			<flow>
+				<step id="sLB080" parent="parentStep">
+					<tasklet ref="LB080" />
+				</step>
+			</flow>
+			<!-- Batch step for LB085 -->
+			<flow>
+				<step id="sLB085" parent="parentStep">
+					<tasklet ref="LB085" />
+				</step>
+			</flow>
+			<!-- Batch step for LB087 -->
+			<flow>
+				<step id="sLB087" parent="parentStep">
+					<tasklet ref="LB087" />
+				</step>
+			</flow>
+			<!-- Batch step for LB090 -->
+			<flow>
+				<step id="sLB090" parent="parentStep">
+					<tasklet ref="LB090" />
+				</step>
+			</flow>
+			<!-- Batch step for LB092 -->
+			<flow>
+				<step id="sLB092" parent="parentStep">
+					<tasklet ref="LB092" />
+				</step>
+			</flow>
+			<!-- Batch step for LB093 -->
+			<flow>
+				<step id="sLB093" parent="parentStep">
+					<tasklet ref="LB093" />
+				</step>
+			</flow>
+			<!-- Batch step for LB094 -->
+			<flow>
+				<step id="sLB094" parent="parentStep">
+					<tasklet ref="LB094" />
+				</step>
+			</flow>
+			<!-- Batch step for LB095 -->
+			<flow>
+				<step id="sLB095" parent="parentStep">
+					<tasklet ref="LB095" />
+				</step>
+			</flow>
+			<!-- Batch step for LB096 -->
+			<flow>
+				<step id="sLB096" parent="parentStep">
+					<tasklet ref="LB096" />
+				</step>
+			</flow>
+			<!-- Batch step for LB680 -->
+			<flow>
+				<step id="sLB680" parent="parentStep">
+					<tasklet ref="LB680" />
+				</step>
+			</flow>
+			<!-- Batch step for LBRel -->
+			<flow>
+				<step id="sLBRel" parent="parentStep">
+					<tasklet ref="LBRel" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM34AP -->
+			<flow>
+				<step id="sLNM34AP" parent="parentStep">
+					<tasklet ref="LNM34AP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM34BP -->
+			<flow>
+				<step id="sLNM34BP" parent="parentStep">
+					<tasklet ref="LNM34BP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM34CP -->
+			<flow>
+				<step id="sLNM34CP" parent="parentStep">
+					<tasklet ref="LNM34CP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM34DP -->
+			<flow>
+				<step id="sLNM34DP" parent="parentStep">
+					<tasklet ref="LNM34DP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM34EP -->
+			<flow>
+				<step id="sLNM34EP" parent="parentStep">
+					<tasklet ref="LNM34EP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM34GP -->
+			<flow>
+				<step id="sLNM34GP" parent="parentStep">
+					<tasklet ref="LNM34GP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39AP -->
+			<flow>
+				<step id="sLNM39AP" parent="parentStep">
+					<tasklet ref="LNM39AP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39BP -->
+			<flow>
+				<step id="sLNM39BP" parent="parentStep">
+					<tasklet ref="LNM39BP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39CP -->
+			<flow>
+				<step id="sLNM39CP" parent="parentStep">
+					<tasklet ref="LNM39CP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39DP -->
+			<flow>
+				<step id="sLNM39DP" parent="parentStep">
+					<tasklet ref="LNM39DP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39FP -->
+			<flow>
+				<step id="sLNM39FP" parent="parentStep">
+					<tasklet ref="LNM39FP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39GP -->
+			<flow>
+				<step id="sLNM39GP" parent="parentStep">
+					<tasklet ref="LNM39GP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39HP -->
+			<flow>
+				<step id="sLNM39HP" parent="parentStep">
+					<tasklet ref="LNM39HP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39IP -->
+			<flow>
+				<step id="sLNM39IP" parent="parentStep">
+					<tasklet ref="LNM39IP" />
+				</step>
+			</flow>
+			<!-- Batch step for LNM39JP -->
+			<flow>
+				<step id="sLNM39JP" parent="parentStep">
+					<tasklet ref="LNM39JP" />
+				</step>
+			</flow>
+		</split>
+	</job>
+
+</beans>

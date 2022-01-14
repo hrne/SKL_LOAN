@@ -9,16 +9,14 @@
 	<job id="eomFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<!-- Usp_L9_MonthlyLoanBal_Upd -->
-		<step id="l9MonthlyLoanBalUpd" parent="parentStep"
-			next="l9MonthlyFacBalUpd">
+		<step id="l9MonthlyLoanBalUpd" parent="parentStep" next="l9MonthlyFacBalUpd">
 			<tasklet ref="L9MonthlyLoanBalUpd" />
 		</step>
 		<!-- Usp_L9_MonthlyFacBal_Upd -->
-		<step id="l9MonthlyFacBalUpd" parent="parentStep" next="split2">
+		<step id="l9MonthlyFacBalUpd" parent="parentStep" next="split1">
 			<tasklet ref="L9MonthlyFacBalUpd" />
 		</step>
-		<!-- 月底報表檔批次 -->
-		<split id="split2" task-executor="taskExecutor" next="split3">
+		<split id="split1" task-executor="taskExecutor" next="l8JcicMonthlyLoanDataUpd">
 			<flow>
 				<!-- Usp_L9_MonthlyLM028_Upd -->
 				<step id="l9MonthlyLM028Upd" parent="parentStep">
@@ -56,100 +54,11 @@
 				</step>
 			</flow>
 		</split>
-		<!-- 月底報表產表批次 -->
-		<split id="split3" task-executor="taskExecutor"
-			next="l8JcicMonthlyLoanDataUpd">
-			<flow>
-				<step id="sLM001" parent="parentStep">
-					<tasklet ref="LM001" />
-				</step>
-			</flow>
-			<flow>
-				<step id="sLM002" parent="parentStep">
-					<tasklet ref="LM002" />
-				</step>
-			</flow>
-			<!-- Batch step for LM003 -->
-			<flow>
-				<step id="sLM003Batch" parent="parentStep">
-					<tasklet ref="LM003Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM004 -->
-			<flow>
-				<step id="sLM004Batch" parent="parentStep">
-					<tasklet ref="LM004Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM011 -->
-			<flow>
-				<step id="sLM011Batch" parent="parentStep">
-					<tasklet ref="LM011Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM012 -->
-			<flow>
-				<step id="sLM012Batch" parent="parentStep">
-					<tasklet ref="LM012Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM013 -->
-			<flow>
-				<step id="sLM013Batch" parent="parentStep">
-					<tasklet ref="LM013Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM014 -->
-			<flow>
-				<step id="sLM014Batch" parent="parentStep">
-					<tasklet ref="LM014Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM016 -->
-			<flow>
-				<step id="sLM016Batch" parent="parentStep">
-					<tasklet ref="LM016Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM030 -->
-			<flow>
-				<step id="sLM030Batch" parent="parentStep">
-					<tasklet ref="LM030Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM031 -->
-			<flow>
-				<step id="sLM031Batch" parent="parentStep">
-					<tasklet ref="LM031Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM033 -->
-			<flow>
-				<step id="sLM033Batch" parent="parentStep">
-					<tasklet ref="LM033Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM040 -->
-			<flow>
-				<step id="sLM040Batch" parent="parentStep">
-					<tasklet ref="LM040Batch" />
-				</step>
-			</flow>
-			<!-- Batch step for LM070 -->
-			<flow>
-				<step id="sLM070Batch" parent="parentStep">
-					<tasklet ref="LM070Batch" />
-				</step>
-			</flow>
-		</split>
-
-
 		<step id="l8JcicMonthlyLoanDataUpd" parent="parentStep">
 			<tasklet ref="L8JcicMonthlyLoanDataUpd" />
 			<end on="FAILED" />
 			<next on="COMPLETED" to="l7Ifrs9LoanDataUpd" />
 		</step>
-
 		<step id="l7Ifrs9LoanDataUpd" parent="parentStep">
 			<tasklet ref="L7Ifrs9LoanDataUpd" />
 			<end on="FAILED" />
@@ -181,11 +90,6 @@
 					<tasklet ref="L8JcicB207Upd" />
 				</step>
 			</flow>
-			<flow>
-				<step id="l8JcicB680Upd" parent="parentStep">
-					<tasklet ref="L8JcicB680Upd" />
-				</step>
-			</flow>
 		</split>
 
 		<split id="splitJcic2" task-executor="taskExecutor"
@@ -198,6 +102,11 @@
 			<flow>
 				<step id="l8JcicB085Upd" parent="parentStep">
 					<tasklet ref="L8JcicB085Upd" />
+				</step>
+			</flow>
+			<flow>
+				<step id="l8JcicB680Upd" parent="parentStep">
+					<tasklet ref="L8JcicB680Upd" />
 				</step>
 			</flow>
 		</split>
@@ -329,7 +238,5 @@
 		<step id="eomFinal" parent="parentStep">
 			<tasklet ref="EomFinal" />
 		</step>
-
 	</job>
-
 </beans>
