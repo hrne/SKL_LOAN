@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -22,13 +20,11 @@ import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L618C")
@@ -40,17 +36,10 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L618C extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L618C.class);
 
 	@Autowired
 	public Parse parse;
 
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	@Autowired
-	public TxToDoDetailService txToDoDetailService;
 
 	@Autowired
 	public TxToDoCom txToDoCom;

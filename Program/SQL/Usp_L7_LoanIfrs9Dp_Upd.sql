@@ -812,56 +812,66 @@ BEGIN
       SELECT B."CustNo"
            , B."FacmNo"
            , B."BormNo"
-           , CASE
+           , SUM(
+             CASE
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee1" - NVL(O1."OtherLawFee1",0)
              ELSE B."AvgLawFee1"
-             END                                AS "AvgLawFee1"
-           , CASE
+             END)                               AS "AvgLawFee1"
+           , SUM(
+             CASE
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee2" - NVL(O1."OtherLawFee2",0)
              ELSE B."AvgLawFee2"
-             END                                AS "AvgLawFee2"
-           , CASE
+             END)                               AS "AvgLawFee2"
+           , SUM(
+             CASE
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee3" - NVL(O1."OtherLawFee3",0)
              ELSE B."AvgLawFee3"
-             END                                AS "AvgLawFee3"
-           , CASE
+             END)                               AS "AvgLawFee3"
+           , SUM(
+             CASE
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee4" - NVL(O1."OtherLawFee4",0)
              ELSE B."AvgLawFee4"
-             END                                AS "AvgLawFee4"
-           , CASE
+             END)                               AS "AvgLawFee4"
+           , SUM(
+             CASE
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee5" - NVL(O1."OtherLawFee5",0)
              ELSE B."AvgLawFee5"
-             END                                AS "AvgLawFee5"
-           , CASE
+             END)                               AS "AvgLawFee5"
+           , SUM(
+             CASE
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee1" - NVL(O2."OtherInsuFee1",0)
              ELSE B."AvgInsuFee1"
-             END                                AS "AvgInsuFee1"
-           , CASE
+             END)                               AS "AvgInsuFee1"
+           , SUM(
+             CASE
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee2" - NVL(O2."OtherInsuFee2",0)
              ELSE B."AvgInsuFee2"
-             END                                AS "AvgInsuFee2"
-           , CASE
+             END)                               AS "AvgInsuFee2"
+           , SUM(
+             CASE
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee3" - NVL(O2."OtherInsuFee3",0)
              ELSE B."AvgInsuFee3"
-             END                                AS "AvgInsuFee3"
-           , CASE
+             END)                               AS "AvgInsuFee3"
+           , SUM(
+             CASE
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee4" - NVL(O2."OtherInsuFee4",0)
              ELSE B."AvgInsuFee4"
-             END                                AS "AvgInsuFee4"
-           , CASE
+             END)                               AS "AvgInsuFee4"
+           , SUM(
+             CASE
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee5" - NVL(O2."OtherInsuFee5",0)
              ELSE B."AvgInsuFee5"
-             END                                AS "AvgInsuFee5"
+             END)                               AS "AvgInsuFee5"
       FROM AvgFeeDataBase B
       LEFT JOIN (
         SELECT B."CustNo"
@@ -894,6 +904,9 @@ BEGIN
       LEFT JOIN GetMaxSeq G1 ON G1."CustNo" = B."CustNo"
       LEFT JOIN GetFacMaxSeq G2 ON G2."CustNo" = B."CustNo"
                                AND G2."FacmNo" = B."FacmNo"
+      GROUP BY B."CustNo"
+             , B."FacmNo"
+             , B."BormNo"
     )
     SELECT M."CustNo"                      AS  "CustNo"          -- 戶號
          , M."FacmNo"                      AS  "FacmNo"          -- 額度編號
@@ -1090,86 +1103,6 @@ BEGIN
                 ) INT5  ON  INT5."CustNo"     = M."CustNo"
                        AND  INT5."FacmNo"     = M."FacmNo"
                        AND  INT5."BormNo"     = M."BormNo"
-      -- 減損發生日第一年法拍及火險費用回收金額 (額度)
-      LEFT JOIN ( SELECT M."CustNo"                 AS  "CustNo"
-                       , M."FacmNo"                 AS  "FacmNo"
-                       , SUM(NVL(MF."FireFee",0))   AS  "FireFee"
-                       , SUM(NVL(MF."LawFee",0))    AS  "LawFee"
-                  FROM   "LoanIfrs9Dp" M
-                    LEFT JOIN "MonthlyFacBal" MF
-                           ON MF."YearMonth"  >  TRUNC(M."DerDate" / 100)
-                          AND MF."YearMonth"  <= TRUNC(M."DerDate" / 100) + 100
-                          AND MF."CustNo"     =  M."CustNo"
-                          AND MF."FacmNo"     =  M."FacmNo"
-                  WHERE  M."DataYM"      = YYYYMM
-                    AND  M."DataFg"      =  2
-                  GROUP BY  M."CustNo", M."FacmNo"
-                ) FEE1  ON  FEE1."CustNo"     = M."CustNo"
-                       AND  FEE1."FacmNo"     = M."FacmNo"
-      -- 減損發生日第二年法拍及火險費用回收金額 (額度)
-      LEFT JOIN ( SELECT M."CustNo"                 AS  "CustNo"
-                       , M."FacmNo"                 AS  "FacmNo"
-                       , SUM(NVL(MF."FireFee",0))   AS  "FireFee"
-                       , SUM(NVL(MF."LawFee",0))    AS  "LawFee"
-                  FROM   "LoanIfrs9Dp" M
-                    LEFT JOIN "MonthlyFacBal" MF
-                           ON MF."YearMonth"  >  TRUNC(M."DerDate" / 100) + 100
-                          AND MF."YearMonth"  <= TRUNC(M."DerDate" / 100) + 200
-                          AND MF."CustNo"     =  M."CustNo"
-                          AND MF."FacmNo"     =  M."FacmNo"
-                  WHERE  M."DataYM"      = YYYYMM
-                    AND  M."DataFg"      =  2
-                  GROUP BY  M."CustNo", M."FacmNo"
-                ) FEE2  ON  FEE2."CustNo"     = M."CustNo"
-                       AND  FEE2."FacmNo"     = M."FacmNo"
-      -- 減損發生日第三年法拍及火險費用回收金額 (額度)
-      LEFT JOIN ( SELECT M."CustNo"                 AS  "CustNo"
-                       , M."FacmNo"                 AS  "FacmNo"
-                       , SUM(NVL(MF."FireFee",0))   AS  "FireFee"
-                       , SUM(NVL(MF."LawFee",0))    AS  "LawFee"
-                  FROM   "LoanIfrs9Dp" M
-                    LEFT JOIN "MonthlyFacBal" MF
-                           ON MF."YearMonth"  >  TRUNC(M."DerDate" / 100) + 200
-                          AND MF."YearMonth"  <=  TRUNC(M."DerDate" / 100) + 300
-                          AND MF."CustNo"     =  M."CustNo"
-                          AND MF."FacmNo"     =  M."FacmNo"
-                  WHERE  M."DataYM"      = YYYYMM
-                    AND  M."DataFg"      =  2
-                  GROUP BY  M."CustNo", M."FacmNo"
-                ) FEE3  ON  FEE3."CustNo"     = M."CustNo"
-                       AND  FEE3."FacmNo"     = M."FacmNo"
-      -- 減損發生日第四年法拍及火險費用回收金額 (額度)
-      LEFT JOIN ( SELECT M."CustNo"                 AS  "CustNo"
-                       , M."FacmNo"                 AS  "FacmNo"
-                       , SUM(NVL(MF."FireFee",0))   AS  "FireFee"
-                       , SUM(NVL(MF."LawFee",0))    AS  "LawFee"
-                  FROM   "LoanIfrs9Dp" M
-                    LEFT JOIN "MonthlyFacBal" MF
-                           ON MF."YearMonth"  >  TRUNC(M."DerDate" / 100) + 300
-                          AND MF."YearMonth"  <=  TRUNC(M."DerDate" / 100) + 400
-                          AND MF."CustNo"     =  M."CustNo"
-                          AND MF."FacmNo"     =  M."FacmNo"
-                  WHERE  M."DataYM"      = YYYYMM
-                    AND  M."DataFg"      =  2
-                  GROUP BY  M."CustNo", M."FacmNo"
-                ) FEE4  ON  FEE4."CustNo"     = M."CustNo"
-                       AND  FEE4."FacmNo"     = M."FacmNo"
-      -- 減損發生日第五年法拍及火險費用回收金額 (額度)
-      LEFT JOIN ( SELECT M."CustNo"                 AS  "CustNo"
-                       , M."FacmNo"                 AS  "FacmNo"
-                       , SUM(NVL(MF."FireFee",0))   AS  "FireFee"
-                       , SUM(NVL(MF."LawFee",0))    AS  "LawFee"
-                  FROM   "LoanIfrs9Dp" M
-                    LEFT JOIN "MonthlyFacBal" MF
-                           ON MF."YearMonth"  >  TRUNC(M."DerDate" / 100) + 400
-                          AND MF."YearMonth"  <=  TRUNC(M."DerDate" / 100) + 500
-                          AND MF."CustNo"     =  M."CustNo"
-                          AND MF."FacmNo"     =  M."FacmNo"
-                  WHERE  M."DataYM"      = YYYYMM
-                    AND  M."DataFg"      =  2
-                  GROUP BY  M."CustNo", M."FacmNo"
-                ) FEE5  ON  FEE5."CustNo"     = M."CustNo"
-                       AND  FEE5."FacmNo"     = M."FacmNo"
       -- 減損發生日時之計息利率
       LEFT JOIN LR ON LR."CustNo"  = M."CustNo"
                   AND LR."FacmNo"  = M."FacmNo"

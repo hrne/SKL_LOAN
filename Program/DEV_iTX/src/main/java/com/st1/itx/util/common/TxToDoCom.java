@@ -705,9 +705,9 @@ public class TxToDoCom extends TradeBuffer {
 //   R-寫入'應處理明細留存檔'
 //		
 // 3.處理功能 
-//   Y-有自動處理功能，由該交易程式將明細檔狀態更改為已處理
-//   C-連結處理交易，交易處理後由TxToDoCom共用程式將明細檔狀態更改為已處理
-//   M-人工自行處理，明細檔狀態不會變動
+//   C-連結處理交易，執行交易處理後由TxToDoCom共用程式將明細檔狀態更改為已處理
+//   Y-有自動處理功能，由該執行交易程式將明細檔狀態更改為已處理
+//   M-人工自行處理，執行交易不會變動明細檔狀態(訂定執行交易僅用於經辦權限判讀)
 		switch (itemCode) {
 //                            1    2 3 4 5 6 7     8     9     A B
 		case "TRLN00":
@@ -743,14 +743,11 @@ public class TxToDoCom extends TradeBuffer {
 		case "CHCK00":
 			settingValue = "CHCK00;-;M;-;-;-;L698A;     ;L4200;-;支票兌現檢核";
 			break;
-		case "CHRE00":
-			settingValue = "CHRE00;-;C;-;-;-;L698A;L698A;L2306;-;關係人資料撿核";
-			break;
 		case "ACCL01":
 			settingValue = "ACCL01;Y;Y;-;-;-;L6985;L6985;L618D;Y;應收利息提存入帳";
 			break;
 		case "ACCL02":
-			settingValue = "ACCL02;Y;Y;-;-;-;L4961;L6985;L618D;Y;未付火險費提存入帳";
+			settingValue = "ACCL02;Y;Y;-;-;-;L6985;L6985;L618D;Y;未付火險費提存入帳";
 			break;
 		case "ACCL03":
 			settingValue = "ACCL03;Y;Y;-;-;-;L6985;L6985;L618D;Y;放款承諾提存入帳";
@@ -759,7 +756,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "ACCL04;Y;Y;Y;Y;-;L6985;L6985;L618D;Y;折溢價攤銷入帳";
 			break;
 		case "RVTX00":
-			settingValue = "RVTX00;-;C;-;-;Y;L698A;L6984;L3100;Y;預約撥款到期";
+			settingValue = "RVTX00;-;C;-;-;Y;L6984;L6984;L3100;Y;預約撥款到期";
 			break;
 		case "TEXT00":
 			settingValue = "TEXT00;Y;Y;Y;Y;-;L698A;     ;L4710;-;簡訊通知";
@@ -797,26 +794,26 @@ public class TxToDoCom extends TradeBuffer {
 		case "L9711":
 			settingValue = "L9711 ;-;C;-;-;-;L698A;L9711;L9711;-;產生放款到期明細表及通知單";
 			break;
-		case "PFCL00":
+		case "PFCL00":  // L6101 寫入，提醒經辦
 			settingValue = "PFCL00;-;M;-;-;-;L698A;     ;L5500;-;業績工作月結算啟動通知";
 			break;
-		case "NOTI01":
+		case "NOTI01": // L4454 寫入應處理明細留存檔，紀錄列印日期
 			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;L4454;-;銀扣失敗繳息還本通知單";
 			break;
-		case "NOTI02":
-			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;L4454;-;銀扣二扣失敗明信片";
+		case "NOTI02": // L4454 寫入應處理明細留存檔，紀錄列印日期
+			settingValue = "NOTI02;R;-;Y;-;-;     ;     ;L4454;-;銀扣二扣失敗明信片";
 			break;
 		case "L2921":
-			settingValue = "L2921;-;M;-;-;-;L2921;     ;     ;-;未齊件到期通知";
+			settingValue = "L2921 ;-;M;-;-;-;L2921;     ;L2921;-;未齊件到期通知";
 			break;
 		case "AMLH":
-			settingValue = "AMLH  ;-;C;-;-;-;L8081;L8081;L8081;Y;AML定審高風險處理";
+			settingValue = "AMLH  ;-;Y;-;-;-;L8081;L8081;L8101;Y;AML定審高風險處理";
 			break;
 		case "AMLM":
-			settingValue = "AMLM  ;-;C;-;-;-;L8082;L8082;L8082;Y;AML定審中風險處理";
+			settingValue = "AMLM  ;-;Y;-;-;-;L8082;L8082;L8101;Y;AML定審中風險處理";
 			break;
 		case "AMLL":
-			settingValue = "AMLL  ;-;C;-;-;-;L8083;L8083;L8083;Y;AML定審低風險處理";
+			settingValue = "AMLL  ;-;Y;-;-;-;L8083;L8083;L8101;Y;AML定審低風險處理";
 			break;
 		default:
 			throw new LogicException(titaVo, "E0013", "項目代號有誤" + itemCode);

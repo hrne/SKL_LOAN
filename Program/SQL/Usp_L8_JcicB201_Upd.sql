@@ -350,7 +350,19 @@ BEGIN
            , ' '                                   AS "GuaIdErr5"         -- 上欄IDN或BAN錯誤註記
            , NVL(WK5."GuaRelJcic",' ')             AS "GuaRelCode5"       -- 與主債務人關係5
            , ' '                                   AS "Filler741"         -- 空白
-           , ' '                                   AS "Filler742"         -- 空白
+           , CASE WHEN M."FinCode" NOT IN ('L','M','2')    THEN ' '
+                  WHEN NVL(L."GraceDate",0) = 0            THEN '00000'
+                  ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."DrawdownDate",0) / 100) -191100 ) ),5,'0') 
+             END                                   AS "GraceStartYM"      -- 房貸寬限期起始年月
+           , CASE WHEN M."FinCode" NOT IN ('L','M','2') THEN ' '
+                  WHEN NVL(L."GraceDate",0) = 0    THEN '00000'
+                  ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."GraceDate",0) / 100) - 191100 )  ) ,5,'0')   
+             END                                   AS "GraceEndYM"        -- 房貸寬限期截止年月
+           , ' '                                   AS "GreenFg"           -- 綠色授信註記
+           , ' '                                   AS "GreenCode"         -- 綠色支出類別
+           , ' '                                   AS "SustainFg"         -- 永續績效連結授信註記
+           , ' '                                   AS "SustainCode"       -- 永續績效連結授信類別
+           , ' '                                   AS "SustainNoReachFg"  -- 永續績效連結授信約定條件全部未達成通報
            , CASE
                WHEN M."CustNo" IN (0269376) AND M."FacmNo" IN (003) AND M."BormNo" IN (001) THEN 09912  -- 特例 (ref: LN15H1)
                WHEN TRUNC(NVL(M."BadDebtDate",0) / 100) < 191100 THEN TRUNC(NVL(M."BadDebtDate",0) / 100)

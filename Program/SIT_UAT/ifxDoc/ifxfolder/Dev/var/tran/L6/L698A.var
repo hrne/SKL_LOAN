@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,487)ASGN(INQLEN$)
+E(0,497)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -41,6 +41,9 @@ E(0,1)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L698A]                                 應處理明細                                                            "],
+["@",#SelectCode],
+["@",#ItemCode],
+["@",#AutoFg],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -227,6 +230,7 @@ T(2,2+#OOCustId)
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=#OOExcuteTxcd;ntxbuf=#OOBUF5})
 C(5,#OOExcuteTxcd,L1103,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=修改;ntxbuf=#OOBUFL1}),$)
+C(5,#OOExcuteTxcd,L3731,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=改呆帳結案戶;ntxbuf=#OOBUF5}),$)
 
 
 
@@ -418,7 +422,6 @@ ifxBatch:{
 
 #OODtlValue=明細值
 {width:300,align:'left'}
-
 
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}

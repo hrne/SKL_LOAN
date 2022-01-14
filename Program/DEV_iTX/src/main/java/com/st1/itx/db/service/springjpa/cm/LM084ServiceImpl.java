@@ -43,18 +43,24 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"AcLoanInt\" ALIfirst ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = ALIfirst.\"CustNo\" ";
 		sql += " LEFT JOIN (SELECT \"YearMonth\" ";
+		sql += "                  ,\"IntStartDate\" ";
+		sql += "                  ,\"PayIntDate\" ";
 		sql += "                  ,\"CustNo\" ";
 		sql += "                  ,\"FacmNo\" ";
 		sql += "                  ,\"BormNo\" ";
-		sql += "                  ,SUM(\"Interest\") \"Interest\" ";
+		sql += "                  ,SUM(\"Interest\") \"Interest\" "; // 每月利息還有分TermNo, 所以要用Sum的
 		sql += "            FROM \"AcLoanInt\" ";
 		sql += "            GROUP BY \"YearMonth\" ";
+		sql += "                    ,\"IntStartDate\" ";
+		sql += "                    ,\"PayIntDate\" ";
 		sql += "                    ,\"CustNo\" ";
 		sql += "                    ,\"FacmNo\" ";
-		sql += "                    ,\"BormNo\") ALI ON ALI.\"YearMonth\" = ALIfirst.\"YearMonth\" ";
-		sql += "                                    AND ALI.\"CustNo\"    = ALIfirst.\"CustNo\" ";
-		sql += "                                    AND ALI.\"FacmNo\"    = ALIfirst.\"FacmNo\" ";
-		sql += "                                    AND ALI.\"BormNo\"    = ALIfirst.\"BormNo\" ";
+		sql += "                    ,\"BormNo\") ALI ON ALI.\"YearMonth\"    = ALIfirst.\"YearMonth\" ";
+		sql += "                                    AND ALI.\"CustNo\"       = ALIfirst.\"CustNo\" ";
+		sql += "                                    AND ALI.\"FacmNo\"       = ALIfirst.\"FacmNo\" ";
+		sql += "                                    AND ALI.\"BormNo\"       = ALIfirst.\"BormNo\" ";
+		sql += "                                    AND ALI.\"IntStartDate\" = ALIfirst.\"IntStartDate\" ";
+		sql += "                                    AND ALI.\"PayIntDate\"   = ALIfirst.\"PayIntDate\" ";
 		sql += " WHERE ALIfirst.\"IntStartDate\" != 0 "; // 確保繳息迄日不會顯示為0 (滯繳息)
 		sql += "   AND ALI.\"Interest\"           > 0 "; // 樣張未顯示總利息為0者
 		sql += "   AND ALIfirst.\"YearMonth\" = :inputYearMonth";

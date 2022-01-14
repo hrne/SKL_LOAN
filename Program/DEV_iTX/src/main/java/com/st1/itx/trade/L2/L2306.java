@@ -170,7 +170,7 @@ public class L2306 extends TradeBuffer {
 				}
 
 			} // else
-
+			
 			// 修改
 		} else if (iFunCd == 2) {
 
@@ -242,6 +242,19 @@ public class L2306 extends TradeBuffer {
 			}
 
 		}
+		
+		if("02".equals(titaVo.getParam("PosInd"))) {  // 判斷同一戶號案件編號只能有一個配偶
+			Slice<ReltMain> slReltMain = sReltMainService.findByBoth(iCaseNo, iCustNo, index, limit, titaVo);
+			tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
+			if (tmplReltMain != null) {
+				for (ReltMain ttReltMain : tmplReltMain) {
+					if("02".equals(ttReltMain.getReltCode())) {
+						throw new LogicException("E0010", "同一戶號案件只能有一個配偶");
+					}
+				}
+			} // if
+		}
+		
 		// 抓該戶號所有資料更新Finalfg
 
 		int CreatDate = 0;
