@@ -65,8 +65,10 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		// EmployeeCom
-		sql += "   AND CASE WHEN (    (e.\"CommLineCode\" = 21 AND substr(e.\"AgLevel\", 0, 1) NOT IN ( 'F','G','J','Z') ) "; 
-		sql += "                   OR (e.\"CommLineCode\" = 31 AND substr(e.\"AgLevel\", 0, 1) NOT IN ('K','Z') ) "; 
+		// 2022-01-14 智偉修改: CommLineCode有非數值資料,比對時應以字串型態比較
+		// ex : e.\"CommLineCode\" = 21 修改為 e.\"CommLineCode\" = '21'
+		sql += "   AND CASE WHEN (    (e.\"CommLineCode\" = '21' AND substr(e.\"AgLevel\", 0, 1) NOT IN ( 'F','G','J','Z') ) "; 
+		sql += "                   OR (e.\"CommLineCode\" = '31' AND substr(e.\"AgLevel\", 0, 1) NOT IN ('K','Z') ) "; 
 		sql += "                   OR (e.\"CommLineCode\" NOT IN ('21','31','1C' )) )";
 		sql += "             AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097')  ";
 		sql += "       THEN  5"; 

@@ -147,10 +147,13 @@ BEGIN
           ,0                              AS "FinalBal"            -- 最後一期本金餘額 DECIMAL 16 2
           ,'N'                            AS "NotYetFlag"          -- 未齊件 VARCHAR2 1 
           /* 2021-03-19 智偉修改:原欄位值為0、1，新系統為Y/N */
+          /* 2022-01-14 智偉修改:新系統修改欄位定義 0:正常 1.展期(不同額度) 2.借新還舊(同額度) */
           ,CASE
+             WHEN NVL(T2."RenewFlag",0) != 0
+             THEN T2."RenewFlag"
              WHEN "LA$LMSP"."LMSNEW" = '1'
-             THEN 'Y' 
-           ELSE 'N' END                   AS "RenewFlag"           -- 借新還舊 VARCHAR2 1 
+             THEN 1
+           ELSE 0 END                     AS "RenewFlag"           -- 借新還舊 DECIMAL 1 
           ,NVL(APLP."CASCDE",' ')         AS "PieceCode"           -- 計件代碼 VARCHAR2 1 
           ,''                             AS "PieceCodeSecond"
           ,0                              AS "PieceCodeSecondAmt"
@@ -187,19 +190,13 @@ BEGIN
                       S1."LMSACN"
                      ,S1."LMSAPN1" -- 原額度號碼
                      ,S1."LMSASQ1" -- 原撥款序號
-               FROM (SELECT "LMSACN"
+               FROM (SELECT DISTINCT
+                            "LMSACN"
                            ,"LMSAPN" -- 新額度號碼
                            ,"LMSASQ" -- 新撥款序號
                            ,"LMSAPN1" -- 原額度號碼
                            ,"LMSASQ1" -- 原撥款序號
-                           ,ROW_NUMBER() OVER (PARTITION BY "LMSACN","LMSAPN","LMSASQ"
-                                               ORDER BY "LMSAPN1","LMSASQ1") AS "Seq"
-                     FROM "LNACNP"
-                     GROUP BY "LMSACN"
-                             ,"LMSAPN"
-                             ,"LMSASQ"
-                             ,"LMSAPN1"
-                             ,"LMSASQ1") S1
+                     FROM "LNACNP") S1
                LEFT JOIN "LA$LMSP" S2 ON S2."LMSACN" = S1."LMSACN"
                                      AND S2."LMSAPN" = S1."LMSAPN"
                                      AND S2."LMSASQ" = S1."LMSASQ"
@@ -207,6 +204,27 @@ BEGIN
               ) T1 ON T1."LMSACN" = "LA$LMSP"."LMSACN"
                   AND T1."LMSAPN1" = "LA$LMSP"."LMSAPN"
                   AND T1."LMSASQ1" = "LA$LMSP"."LMSASQ"
+    LEFT JOIN (SELECT S1."LMSACN"
+                     ,S1."LMSAPN" -- 新額度號碼
+                     ,S1."LMSASQ" -- 新撥款序號
+                     ,MIN(S1."RenewFlag") AS "RenewFlag"
+               FROM (SELECT DISTINCT
+                            "LMSACN"
+                           ,"LMSAPN" -- 新額度號碼
+                           ,"LMSASQ" -- 新撥款序號
+                           ,"LMSAPN1" -- 原額度號碼
+                           ,"LMSASQ1" -- 原撥款序號
+                           ,CASE
+                              WHEN "LMSAPN1" = "LMSAPN" -- 0:正常 1.展期(不同額度) 2.借新還舊(同額度)
+                              THEN 2
+                            ELSE 1 END AS "RenewFlag"
+                     FROM "LNACNP") S1
+               GROUP BY S1."LMSACN"
+                      , S1."LMSAPN" -- 新額度號碼
+                      , S1."LMSASQ" -- 新撥款序號
+              ) T2 ON T2."LMSACN" = "LA$LMSP"."LMSACN"
+                  AND T2."LMSAPN" = "LA$LMSP"."LMSAPN"
+                  AND T2."LMSASQ" = "LA$LMSP"."LMSASQ"
     LEFT JOIN "LA$APLP" APLP
                ON APLP."LMSACN" = "LA$LMSP"."LMSACN"
               AND APLP."LMSAPN" = "LA$LMSP"."LMSAPN"

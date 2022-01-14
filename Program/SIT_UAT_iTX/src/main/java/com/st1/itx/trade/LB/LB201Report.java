@@ -277,7 +277,7 @@ public class LB201Report extends MakeReport {
 							// } else if (Float.parseFloat(strField) == 0) {
 							// strField = makeFile.fillStringL("0", 11, '0');
 						} else if (Float.parseFloat(strField) == 0) {
-							formatter.applyPattern("0000000000000");
+							formatter.applyPattern("00000000000");
 							strField = formatter.format(Float.parseFloat(strField));
 						} else {
 							formatter.applyPattern("0000000.000");
@@ -291,7 +291,7 @@ public class LB201Report extends MakeReport {
 							// } else if (Float.parseFloat(strField) == 0) {
 							// strField = makeFile.fillStringL("0", 11, '0');
 						} else if (Float.parseFloat(strField) == 0) {
-							formatter.applyPattern("0000000000000");
+							formatter.applyPattern("00000000000");
 							strField = formatter.format(Float.parseFloat(strField));
 						} else {
 							formatter.applyPattern("0000000.000");
@@ -305,7 +305,7 @@ public class LB201Report extends MakeReport {
 							// } else if (Float.parseFloat(strField) == 0) {
 							// strField = makeFile.fillStringL("0", 11, '0');
 						} else if (Float.parseFloat(strField) == 0) {
-							formatter.applyPattern("0000000000000");
+							formatter.applyPattern("00000000000");
 							strField = formatter.format(Float.parseFloat(strField));
 						} else {
 							formatter.applyPattern("0000000.000");

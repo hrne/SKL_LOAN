@@ -278,7 +278,7 @@
 		</split>
 
 		<!-- IFRS9 月檔 -->
-		<split id="splitIfrs9" task-executor="taskExecutor">
+		<split id="splitIfrs9" task-executor="taskExecutor" next="eomFinal">
 			<flow>
 				<step id="l7LoanIfrs9ApUpd" parent="parentStep">
 					<tasklet ref="L7LoanIfrs9ApUpd" />
@@ -325,6 +325,10 @@
 				</step>
 			</flow>
 		</split>
+		<!-- 每月批次結束，判斷是否需要執行年批 -->
+		<step id="eomFinal" parent="parentStep">
+			<tasklet ref="EomFinal" />
+		</step>
 
 	</job>
 

@@ -5,31 +5,22 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.http.WebClient;
 
-@Service("EodFinal")
-@Scope("step")
 /**
- * (日終批次) 判斷是否為月底日,若是,執行LC701 月底日日終維護
+ * 日終批次
  * 
  * @author Chih Wei
  * @version 1.0.0
  */
+@Service("EodFinal")
+@Scope("step")
 public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
-
-	@Autowired
-	DateUtil dDateUtil;
-
-	@Autowired
-	WebClient webClient;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -59,28 +50,12 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 每月月底日才執行
 		if (tbsdyf == mfbsdyf) {
 			this.info("EodFinal 本日為月底日,執行月底日日終維護.");
-            
 			titaVo.setBatchJobId("eomFlow");
-			
-			// titaVo.setBatchJobId("jcicFlow");
-			
-			// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "L6871", titaVo.getTlrNo(), "本日為月底日,執行L6871月底日日終維護", titaVo);
+		} else {
+			// TODO: 非月底日,發動Oracle DB鏡像備份
 
-			String yearMonth = String.valueOf((tbsdyf / 100));
-
-			if (yearMonth.length() >= 2) {
-				yearMonth = yearMonth.substring(yearMonth.length() - 2);
-
-				// 每年年底日才執行
-				if (yearMonth.equals("12")) {
-					this.info("EodFinal 本日為年底日,執行年底日日終維護.");
-            
-					titaVo.setBatchJobId("eoyFlow");
-
-					// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "L6872", titaVo.getTlrNo(), "本日為年底日,執行L6872年底日日終維護", titaVo);
-				}
-			}
 		}
+
 		this.info("EodFinal exit.");
 	}
 }

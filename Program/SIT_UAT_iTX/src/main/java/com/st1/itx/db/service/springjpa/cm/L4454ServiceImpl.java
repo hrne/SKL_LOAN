@@ -215,6 +215,7 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "            ,\"FacmNo\"                                 ";
 			sql += "            ,MAX(to_number(to_char(\"CreateDate\", 'YYYYMMDD'))) AS  \"FailNoticeDate\" ";
 			sql += "            FROM \"TxToDoDetailReserve\"                ";
+			sql += "            WHERE \"ItemCode\" in ('NOTI01','NOTI02')   ";
 			sql += "            GROUP BY \"CustNo\", \"FacmNo\"             ";
 			sql += "      ) r ON r.\"CustNo\" = b.\"CustNo\"                ";
 			sql += "         AND r.\"FacmNo\" = b.\"FacmNo\"	            ";
@@ -223,7 +224,7 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  AND NVL(b.\"ReturnCode\",'  ') not in ('  ','00')     ";
 			sql += "  AND b.\"RepayType\" = 1                               ";
 			if (sendDateS > 0) {
-				sql += "   and r.\"FailNoticeDate\" < " + sendDateS + 19110000; // 上次寄發日
+				sql += "   and r.\"FailNoticeDate\" < " + (sendDateS + 19110000); // 上次寄發日
 			}
 			break;
 		}

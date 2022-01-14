@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,10 @@ import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.mail.MailService;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4711")
@@ -30,19 +33,28 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L4711 extends TradeBuffer {
 
+	@Value("${iTXOutFolder}")
+	private String outFolder = "";
+
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
+	private Parse parse;
 
 	/* 日期工具 */
 	@Autowired
-	DateUtil dateUtil;
+	private DateUtil dateUtil;
 
 	@Autowired
-	TxToDoDetailService txToDoDetailService;
+	private TxToDoDetailService txToDoDetailService;
 
 	@Autowired
-	public MakeFile makeFile;
+	private MakeFile makeFile;
+
+	@Autowired
+	private MailService mailService;
+
+	@Autowired
+	private MakeReport makeReport;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -61,7 +73,8 @@ public class L4711 extends TradeBuffer {
 
 //		temp path = D:\\tmp\\LNM56OP.txt
 //		檔名暫定
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-電子郵件媒體檔", "LNM56OP_eMail.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+				titaVo.getTxCode() + "-電子郵件媒體檔", "LNM56OP_eMail.txt", 2);
 
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 
@@ -72,8 +85,34 @@ public class L4711 extends TradeBuffer {
 		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 				TxToDoCom tTxToDoCom = new TxToDoCom();
-//				1.產出
-				makeFile.put(tTxToDoDetail.getProcessNote());
+
+//				tTxToDoDetail.setDtlValue("<火險保費>" + tInsuRenew.getPrevInsuNo());
+
+				String dtlValue = tTxToDoDetail.getDtlValue();
+
+				if (dtlValue.startsWith("<火險保費>")) {
+					String subject = "火險及地震險保費-繳款通知單 ";
+					String bodyText = "親愛的客戶，繳款通知" + "\n" + "新光人壽關心您。";
+
+					// 附件是PDF時
+					String[] processNotes = tTxToDoDetail.getProcessNote().split(",");
+					String email = processNotes[2];
+					long pdfno = Long.parseLong(processNotes[3]);
+
+					mailService.setParams(email, subject, bodyText);
+
+					// 先設好參數,後面發送Email時才會讀取
+					mailService.setParams("", outFolder + pdfno + "-火險及地震險保費-繳款通知單.pdf");
+
+					// 製作暫存表
+					makeReport.toPdf(pdfno, "" + pdfno + "-火險及地震險保費-繳款通知單");
+
+					// 發送Email
+					mailService.exec();
+				} else {
+					// 1.產出
+					makeFile.put(tTxToDoDetail.getProcessNote());
+				}
 
 //				2.回寫狀態
 				TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();

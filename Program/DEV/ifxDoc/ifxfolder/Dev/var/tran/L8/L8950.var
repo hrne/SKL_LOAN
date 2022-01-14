@@ -71,7 +71,7 @@ T(4,CHAIN$)
 
 !員工代號
 #EmpId=X,6,I
-
+@V(NL)
 !資料日期
 #DataDate=D,7,I
 @C(4,#DataDate,$,A(DATE,0,#DataDate))
