@@ -673,7 +673,7 @@ BEGIN
           ,'TWD'                AS "CurrencyCode"     -- 幣別
           ,0                    AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
           ,0                    AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
-          ,C1."ReceivableFlag"  AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
+          ,4                    AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
           ,ABS(ACT."LMSLPN")    AS "RvAmt"            -- 起帳總額
           ,ABS(ACT."LMSLPN")    AS "RvBal"            -- 未銷餘額
           ,ABS(ACT."LMSLPN")    AS "AcBal"            -- 會計日餘額
@@ -753,7 +753,7 @@ BEGIN
           ,'TWD'                AS "CurrencyCode"     -- 幣別
           ,0                    AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
           ,0                    AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
-          ,C1."ReceivableFlag"  AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
+          ,4                    AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
           ,LMSP."LMSLIN"        AS "RvAmt"            -- 起帳總額
           ,LMSP."LMSLIN"        AS "RvBal"            -- 未銷餘額
           ,LMSP."LMSLIN"        AS "AcBal"            -- 會計日餘額

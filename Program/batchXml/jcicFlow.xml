@@ -141,47 +141,47 @@
 		<split id="splitIfrs9" task-executor="taskExecutor">
 			<flow>
 				<step id="l7LoanIfrsApUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsApUpd" />
+					<tasklet ref="L7LoanIfrs9ApUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsBpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsBpUpd" />
+					<tasklet ref="L7LoanIfrs9BpUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsCpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsCpUpd" />
+					<tasklet ref="L7LoanIfrs9CpUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsDpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsDpUpd" />
+					<tasklet ref="L7LoanIfrs9DpUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsFpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsFpUpd" />
+					<tasklet ref="L7LoanIfrs9FpUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsGpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsGpUpd" />
+					<tasklet ref="L7LoanIfrs9GpUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsHpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsHpUpd" />
+					<tasklet ref="L7LoanIfrs9HpUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsIpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsIpUpd" />
+					<tasklet ref="L7LoanIfrs9IpUpd" />
 				</step>
 			</flow>
 			<flow>
 				<step id="l7LoanIfrsJpUpd" parent="parentStep">
-					<tasklet ref="L7LoanIfrsJpUpd" />
+					<tasklet ref="L7LoanIfrs9JpUpd" />
 				</step>
 			</flow>
 		</split>

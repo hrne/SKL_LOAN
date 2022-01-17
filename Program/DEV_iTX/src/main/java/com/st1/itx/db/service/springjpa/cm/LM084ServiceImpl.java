@@ -34,43 +34,47 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		 */
 
 		String sql = "";
-		sql += " SELECT ALIfirst.\"Aging\"                AS F0 "; // 帳齡
-		sql += "       ,LPAD(ALIfirst.\"CustNo\", 7, '0') AS F1 "; // 戶號
-		sql += "       ,SUBSTR(CM.\"CustName\", 0, 20)    AS F2 "; // 戶名
-		sql += "       ,ALIfirst.\"IntStartDate\"         AS F3 "; // 繳息迄日
-		sql += "       ,MIN(ALIfirst.\"PayIntDate\")      AS F4 "; // 應繳息日
-		sql += "       ,SUM(ALI.\"Interest\")             AS F5 "; // 應收利息
-		sql += " FROM \"AcLoanInt\" ALIfirst ";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = ALIfirst.\"CustNo\" ";
-		sql += " LEFT JOIN (SELECT \"YearMonth\" ";
-		sql += "                  ,\"IntStartDate\" ";
-		sql += "                  ,\"PayIntDate\" ";
-		sql += "                  ,\"CustNo\" ";
-		sql += "                  ,\"FacmNo\" ";
-		sql += "                  ,\"BormNo\" ";
-		sql += "                  ,SUM(\"Interest\") \"Interest\" "; // 每月利息還有分TermNo, 所以要用Sum的
-		sql += "            FROM \"AcLoanInt\" ";
-		sql += "            GROUP BY \"YearMonth\" ";
-		sql += "                    ,\"IntStartDate\" ";
-		sql += "                    ,\"PayIntDate\" ";
-		sql += "                    ,\"CustNo\" ";
-		sql += "                    ,\"FacmNo\" ";
-		sql += "                    ,\"BormNo\") ALI ON ALI.\"YearMonth\"    = ALIfirst.\"YearMonth\" ";
-		sql += "                                    AND ALI.\"CustNo\"       = ALIfirst.\"CustNo\" ";
-		sql += "                                    AND ALI.\"FacmNo\"       = ALIfirst.\"FacmNo\" ";
-		sql += "                                    AND ALI.\"BormNo\"       = ALIfirst.\"BormNo\" ";
-		sql += "                                    AND ALI.\"IntStartDate\" = ALIfirst.\"IntStartDate\" ";
-		sql += "                                    AND ALI.\"PayIntDate\"   = ALIfirst.\"PayIntDate\" ";
-		sql += " WHERE ALIfirst.\"IntStartDate\" != 0 "; // 確保繳息迄日不會顯示為0 (滯繳息)
-		sql += "   AND ALI.\"Interest\"           > 0 "; // 樣張未顯示總利息為0者
-		sql += "   AND ALIfirst.\"YearMonth\" = :inputYearMonth";
-		sql += " GROUP BY ALIfirst.\"Aging\" ";
-		sql += "         ,LPAD(ALIfirst.\"CustNo\", 7, '0') ";
-		sql += "         ,SUBSTR(CM.\"CustName\", 0, 20) ";
-		sql += "         ,ALIfirst.\"IntStartDate\" ";
-		sql += " ORDER BY ALIfirst.\"Aging\" ";
-		sql += "         ,LPAD(ALIfirst.\"CustNo\", 7, '0') ";
-		sql += "         ,ALIfirst.\"IntStartDate\" ";
+		sql += " SELECT ALI.\"Aging\"        "; // 帳齡
+		sql += "       ,ALI.\"CustNoShow\"   "; // 戶名（顯示）
+		sql += "       ,ALI.\"CustName\"     "; // 姓名（顯示）
+		sql += "       ,ALI.\"IntStartDate\" "; // 繳息迄日
+		sql += "       ,ALI.\"PayIntDate\"   "; // 應繳息日
+		sql += "       ,SUM(ALI.\"Interest\" ";
+		sql += "            + NVL(ALIDelayed.\"Interest\", 0)) ";
+		sql += "        AS \"Interest\"      "; // 應收利息
+		sql += " FROM ( SELECT ALI.\"YearMonth\" ";
+		sql += "              ,ALI.\"Aging\" ";
+		sql += "              ,ALI.\"CustNo\" ";
+		sql += "              ,LPAD(ALI.\"CustNo\", 7, 0) \"CustNoShow\" ";
+		sql += "              ,SUBSTR(CM.\"CustName\", 0, 20) \"CustName\" ";
+		sql += "              ,ALI.\"IntStartDate\" ";
+		sql += "              ,ALI.\"PayIntDate\" ";
+		sql += "              ,ALI.\"Interest\" ";
+		sql += "              ,ROW_NUMBER() OVER (PARTITION BY ALI.\"CustNo\" ";
+		sql += "                                  ORDER BY ALI.\"TermNo\" DESC) \"Seq\" ";
+		sql += "        FROM \"AcLoanInt\" ALI ";
+		sql += "        LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = ALI.\"CustNo\" ";
+		sql += "        WHERE ALI.\"IntStartDate\" > 0 "; // 非滯繳息
+		sql += "          AND ALI.\"Interest\"     > 0 "; // 只顯示利息大於0者
+		sql += "          AND ALI.\"YearMonth\"    = :inputYearMonth ) ALI ";
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                   ,SUM(\"Interest\") \"Interest\" ";
+		sql += "             FROM \"AcLoanInt\" ";
+		sql += "             WHERE \"IntStartDate\" = 0 "; // 滯繳息
+		sql += "               AND \"YearMonth\"    = :inputYearMonth ";
+		sql += "             GROUP BY \"CustNo\" ) ALIDelayed ON ALIDelayed.\"CustNo\" = ALI.\"CustNo\" ";
+		sql += "                                             AND ALI.\"Seq\"           = 1 ";
+		sql += " GROUP BY ALI.\"Aging\" ";
+		sql += "         ,ALI.\"CustNoShow\" ";
+		sql += "         ,ALI.\"CustName\" ";
+		sql += "         ,ALI.\"IntStartDate\" ";
+		sql += "         ,ALI.\"PayIntDate\" ";
+		sql += " ORDER BY \"Aging\" ";
+		sql += "         ,\"CustNoShow\" ";
+		sql += "         ,\"CustName\" ";
+		sql += "         ,\"IntStartDate\" ";
+		sql += "         ,\"PayIntDate\" ";
+		
 
 		this.info("sql=" + sql);
 

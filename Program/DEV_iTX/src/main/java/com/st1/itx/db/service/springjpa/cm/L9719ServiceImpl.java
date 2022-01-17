@@ -54,7 +54,7 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       LEFT JOIN \"MonthlyLoanBal\" MLB ON IIM.\"YearMonth\" = MLB.\"YearMonth\" ";
 		sql += "                                       AND IIM.\"CustNo\"    = MLB.\"CustNo\" ";
 		sql += "                                       AND IIM.\"FacmNo\"    = MLB.\"FacmNo\" ";
-		sql += "                                       AND IIm.\"BormNo\"    = MLB.\"BormNo\" ";
+		sql += "                                       AND IIM.\"BormNo\"    = MLB.\"BormNo\" ";
 		sql += "       WHERE IIM.\"YearMonth\" IN (:lastYearMonth, :thisYearMonth) ";
 		sql += "         AND NVL(MLB.\"CurrencyCode\", ' ') = 'TWD' ";
 		sql += "       GROUP BY DECODE(NVL(MLB.\"AcctCode\", ' '), '990', 'OV', 'LN') ";
@@ -63,7 +63,7 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ThisMonthData AS ( ";
 		sql += "       SELECT this.\"YearMonth\" ";
 		sql += "             ,this.\"Type\" ";
-		sql += "             ,this.\"Amt\" - last.\"Amt\" AS \"AmtMonthly\" ";
+		sql += "             ,this.\"Amt\" - NVL(last.\"Amt\",0) AS \"AmtMonthly\" ";
 		sql += "       FROM TotalData this "; // "YearMonth" = :thisYearMonth in WHERE section
 		sql += "       LEFT JOIN TotalData last ON last.\"YearMonth\" = :lastYearMonth ";
 		sql += "                               AND last.\"Type\"      = this.\"Type\" ";

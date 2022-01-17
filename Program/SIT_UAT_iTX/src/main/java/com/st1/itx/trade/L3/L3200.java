@@ -295,6 +295,7 @@ public class L3200 extends TradeBuffer {
 	private boolean isSettleUnpaid = false;
 	private boolean isLoanClose = false; // 最後一期期款/部分償還結案
 	private boolean isRepayPart = false; // 整批入帳、部分繳款
+	private boolean isRepayPrincipal = false; // 回收本金
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -357,7 +358,7 @@ public class L3200 extends TradeBuffer {
 		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
 		iRealRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("RealRepayAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
-		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收  2->溢收 3->溢收(整批入帳、部分繳款)
+		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 		if (iOverRpFg == 1) {
 			iShortAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
 			iOverAmt = BigDecimal.ZERO;
@@ -607,7 +608,7 @@ public class L3200 extends TradeBuffer {
 //					5            企業投資  
 //					6            購置動產
 //					9            其他					
-				if (iRepayType ==2) {
+				if (iRepayType == 2) {
 					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
 						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
@@ -733,24 +734,13 @@ public class L3200 extends TradeBuffer {
 						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkInterest);
 					}
 				} else {
-					switch (ln.getAmortizedCode()) {
-					case "1": // 1.按月繳息(按期繳息到期還本)
-						wkShortAmtLimit = wkInterest
-								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
-								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-						wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
-						if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
-							wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
-							wkUnpaidAmtRemaind = BigDecimal.ZERO;
-						} else {
-							wkUnpaidInt = wkUnpaidInt.add(wkShortAmtLimit);
-							wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
-						}
-						break;
-					case "2": // 2.到期取息(到期繳息還本)
+					// 到期取息(到期繳息還本)
+					if ("2".equals(ln.getAmortizedCode())) {
 						throw new LogicException(titaVo, "E3094", "到期繳息還本， 不可有短繳金額");
-					case "3": // 3.本息平均法(期金)
-					case "4": // 4.本金平均法
+
+					}
+					// 依 1.還本金額 2.還息金額
+					if (isRepayPrincipal) {
 						wkShortAmtLimit = wkPrincipal
 								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
 								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
@@ -762,7 +752,18 @@ public class L3200 extends TradeBuffer {
 							wkUnpaidPrin = wkUnpaidPrin.add(wkShortAmtLimit);
 							wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
 						}
-						break;
+					} else {
+						wkShortAmtLimit = wkInterest
+								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
+								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+						wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
+						if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
+							wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
+							wkUnpaidAmtRemaind = BigDecimal.ZERO;
+						} else {
+							wkUnpaidInt = wkUnpaidInt.add(wkShortAmtLimit);
+							wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
+						}
 					}
 				}
 			}
@@ -857,6 +858,7 @@ public class L3200 extends TradeBuffer {
 		checkMsg = " 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo();
 		isCalcRepayInt = false;
 		isLoanClose = false; // 最後一期期款
+		isRepayPrincipal = false; // 回收本金
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan + ", 試算償還本利:" + iRepayLoan);
 
@@ -947,11 +949,11 @@ public class L3200 extends TradeBuffer {
 
 			// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
 			wkTerms = wkTermNo - wkPrevTermNo;
-			
+
 			// 整批入帳、部分繳款(少繳一期)
-            if (isRepayPart) {
-            	wkTerms --;	
-            }
+			if (isRepayPart) {
+				wkTerms--;
+			}
 			// 應繳之期數不可大於可回收期數
 			if (wkTerms <= 0) {
 				checkMsg += ", 可預收迄日:" + wkPreRepayDate + ", 試算收息日:" + wkIntEndDate + ",可回收期數= " + wkTerms;
@@ -988,6 +990,11 @@ public class L3200 extends TradeBuffer {
 		// 最後一期期款/部分償還結案
 		if (loanCalcRepayIntCom.getLoanBal().compareTo(BigDecimal.ZERO) == 0) {
 			isLoanClose = true;
+		}
+
+		// 回收本金
+		if (wkPrincipal.compareTo(BigDecimal.ZERO) > 0) {
+			isRepayPrincipal = true;
 		}
 
 		// 有計息
@@ -1578,9 +1585,13 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		if (iRepayType == 2) {
-			tLoanBorTx.setDesc("回收登錄-部分償還");
+			tLoanBorTx.setDesc("部分償還本金");
 		} else {
-			tLoanBorTx.setDesc("回收登錄");
+			if (isRepayPrincipal) {
+				tLoanBorTx.setDesc("回收登錄");
+			} else {
+				tLoanBorTx.setDesc("回收利息");
+			}
 		}
 
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
