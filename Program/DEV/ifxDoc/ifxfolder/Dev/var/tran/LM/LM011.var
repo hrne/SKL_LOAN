@@ -41,7 +41,7 @@ T(3,LM011)
 T(1,#SYSDATE,5,2)
 
 #MonthOfTomorrow=X,2,S
-T(1,#SYSNDATE,4,2)
+T(1,#SYSNDATE,5,2)
 
 #DateOfLastMonth=D,8,S
 D(7,3,#SYSDATE,1,0)

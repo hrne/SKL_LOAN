@@ -93,7 +93,7 @@ BIND(#BTN,click, {cmd=CHAIN; ntxcd=L4943; ntxbuf=#BUF})
 
 ! 提回日期--不可改 下一營業日
 #EntryDate=D,7,I
-@A(DATE,2,#EntryDate)
+@V(7)A(DATE,2,#EntryDate)
 
 #LabelA=X,8,L
 T(2, 應繳日)
@@ -133,7 +133,7 @@ C(3,#OpItem,2,s,$)
 ! 應繳日尾
 #AchSpecificDdTo=D,7,I
 C(3,#OpItem,2,s,$)
-@A(DATE,2,#AchSpecificDdTo)
+@A(DATE,2,#AchSpecificDdTo)V(5,#AchSpecificDdFrom,9991231)
 
 ! 每日扣款二扣頭
 #AchSecondSpecificDdFrom=D,7,I
@@ -143,14 +143,14 @@ C(3,#OpItem,2,s,$)
 ! 每日扣款二扣尾
 #AchSecondSpecificDdTo=D,7,I
 C(3,#OpItem,2,s,$)
-@A(DATE,2,#AchSecondSpecificDdTo)
+@A(DATE,2,#AchSecondSpecificDdTo)V(5,#AchSecondSpecificDdFrom,9991231)
 
 #Terms=A,1,I
 E(0,0)
 @
 C(3,#Terms,0,HIDE(#LabelC,#DeductDateStart,#LabelD,#DeductDateEnd),SHOW(#LabelC,#DeductDateStart,#LabelD,#DeductDateEnd))
 
-! 若#Terms有輸入值,用入帳日期往前推#Terms個月
+! 若#Terms有輸入值,用入帳日期往前推 1 + #Terms 個月
 ! 再找出當月月初日與月底日,即為逾期應繳日-起日、逾期應繳日-止日
 #GetOverdueDateBetween=D,8,S
 C(3,#Terms,0,s,$)

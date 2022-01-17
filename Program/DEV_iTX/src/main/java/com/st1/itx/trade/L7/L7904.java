@@ -17,6 +17,7 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.Ias39LossService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -105,7 +106,7 @@ public class L7904 extends TradeBuffer {
 			if (tCustMain == null) {
 				tCustMain = new CustMain();
 			}
-			occursList.putParam("OOCustName", tCustMain.getCustName());
+			occursList.putParam("OOCustName", StringCut.replaceLineUp(tCustMain.getCustName()));
 
 			occursList.putParam("OOMarkDate", tIas39Loss.getMarkDate());
 			occursList.putParam("OOMarkCode", tIas39Loss.getMarkCode());

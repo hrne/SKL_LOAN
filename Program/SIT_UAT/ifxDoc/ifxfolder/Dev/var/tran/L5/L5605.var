@@ -278,7 +278,7 @@ C(2,#FunctionCd,S,$,$,s,s,s,s)
 T(1,#SYSCDATE,2,7)
 #RemindDate=D,7,I
 C(2,#FunctionCd,S,T(2,#CDate),$,T(2,#CDate),s,s,s)
-@A(DATE,0,#RemindDate)
+@V(7)A(DATE,0,#RemindDate)
 ! D(8)
 ! 狀態
 #CondCode=A,1,I
