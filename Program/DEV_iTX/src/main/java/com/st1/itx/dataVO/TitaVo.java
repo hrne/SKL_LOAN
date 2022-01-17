@@ -471,7 +471,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return NBSDY String
 	 */
 	public String getNbsDy() {
-		return Objects.isNull(this.get("NBSDY")) ? "" : this.get("NBSDY");
+		return Objects.isNull(this.get("NBSDY")) ? "0" : this.get("NBSDY");
 	}
 
 	/**
@@ -480,7 +480,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return NNBSDY String
 	 */
 	public String getNnbsDy() {
-		return Objects.isNull(this.get("NNBSDY")) ? "" : this.get("NNBSDY");
+		return Objects.isNull(this.get("NNBSDY")) ? "0" : this.get("NNBSDY");
 	}
 
 	/**
