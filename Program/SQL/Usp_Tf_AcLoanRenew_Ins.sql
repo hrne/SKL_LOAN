@@ -41,6 +41,20 @@ BEGIN
       WHERE TRXTRN IN ('3025','3087')
         AND TRXCRC = 0
     )
+    , ACNP AS (
+      SELECT "LMSACN"
+            ,"LMSAPN"
+            ,"LMSASQ"
+            ,"ADTYMT" * 100 + 1 AS "AcDate"
+            ,ROW_NUMBER()
+             OVER (
+               PARTITION BY "LMSACN"
+                           ,"LMSAPN"
+                           ,"LMSASQ"
+               ORDER BY "ADTYMT"
+             ) AS "Seq"
+      FROM "LNACNP"
+    )
     SELECT S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 3
           ,S1."LMSAPN"                    AS "NewFacmNo"           -- 新額度編號 DECIMAL 3
           ,S1."LMSASQ"                    AS "NewBormNo"           -- 新撥款序號 DECIMAL 3
@@ -52,7 +66,7 @@ BEGIN
            END                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
           -- 2022-01-03 智偉修改:最後統一更新
           ,'N'                            AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
-          ,NVL(TX."TRXDAT",0)             AS "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期 -- 2021-12-23 綺萍要求改為交易明細檔做撥款的會計日期
+          ,NVL(TX."TRXDAT",ACNP."AcDate") AS "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期 -- 2021-12-23 綺萍要求改為交易明細檔做撥款的會計日期
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
@@ -81,6 +95,10 @@ BEGIN
                 AND TX."LMSAPN" = S1."LMSAPN"
                 AND TX."LMSASQ" = S1."LMSASQ"
                 AND TX."Seq" = 1
+    LEFT JOIN ACNP ON ACNP."LMSACN" = S1."LMSACN"
+                  AND ACNP."LMSAPN" = S1."LMSAPN"
+                  AND ACNP."LMSASQ" = S1."LMSASQ"
+                  AND ACNP."Seq" = 1
     ;
 
     -- 記錄寫入筆數

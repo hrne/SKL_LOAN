@@ -50,10 +50,9 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 每月月底日才執行
 		if (tbsdyf == mfbsdyf) {
 			this.info("EodFinal 本日為月底日,執行月底日日終維護.");
-			titaVo.setBatchJobId("eomFlow");
 		} else {
 			// TODO: 非月底日,發動Oracle DB鏡像備份
-
+			throw new LogicException("S0001", "本日非月底日,啟動備份.");
 		}
 
 		this.info("EodFinal exit.");

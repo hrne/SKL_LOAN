@@ -824,7 +824,8 @@ IF(#BussNationalityCodeBef==#BussNationalityCodeAft || #BussNationalityCodeAft =
 @C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
 
 #SpouseIdInd=_,_,L
-IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))
+IF(#SpouseIdAft==#SpouseIdBef,T(3,),T(3,X))
+IF(#SpouseIdAft==#SpouseIdBef,T(3,@FdSpouseNmBef2,),C(4,#SpouseIdAft,T(3,@FdSpouseNmBef2,),T(3,@FdSpouseNmBef2,X)))
 
 !配偶姓名
 #SpouseNmBef=x,100,L

@@ -78,7 +78,6 @@ public class L4940 extends TradeBuffer {
 		PostAuthLog tPostAuthLog = new PostAuthLog();
 
 		sBankAuthAct = bankAuthActService.authCheck(custNo, repayAcct, 0, 999, this.index, this.limit, titaVo);
-//		sBankAuthAct = bankAuthActService.findCustNoEq(custNo, this.index, this.limit, titaVo);
 		lBankAuthAct = sBankAuthAct == null ? null : sBankAuthAct.getContent();
 
 		tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
@@ -98,67 +97,68 @@ public class L4940 extends TradeBuffer {
 				tCustMain = new CustMain();
 				tPostAuthLog = new PostAuthLog();
 				tAchAuthLog = new AchAuthLog();
-				if (repayAcct.equals(tBankAuthAct.getRepayAcct())) {
 
-					OccursList occursList = new OccursList();
+				OccursList occursList = new OccursList();
 
-					occursList.putParam("OOCustNo", tBankAuthAct.getCustNo());
-					occursList.putParam("OOFacmNo", tBankAuthAct.getFacmNo());
-					occursList.putParam("OOAuthType", tBankAuthAct.getAuthType());
-					occursList.putParam("OORepayAcct", tBankAuthAct.getRepayAcct());
-					occursList.putParam("OORepayBank", tBankAuthAct.getRepayBank());
-					occursList.putParam("OOStatus", tBankAuthAct.getStatus());
-					occursList.putParam("OODepCode", tBankAuthAct.getPostDepCode());
+				occursList.putParam("OOCustNo", tBankAuthAct.getCustNo());
+				occursList.putParam("OOFacmNo", tBankAuthAct.getFacmNo());
+				occursList.putParam("OOAuthType", tBankAuthAct.getAuthType());
+				occursList.putParam("OORepayAcct", tBankAuthAct.getRepayAcct());
+				occursList.putParam("OORepayBank", tBankAuthAct.getRepayBank());
+				occursList.putParam("OOStatus", tBankAuthAct.getStatus());
+				occursList.putParam("OODepCode", tBankAuthAct.getPostDepCode());
 
-					tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
+				tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 
-					if ("700".equals(tBankAuthAct.getRepayBank())) {
-						wksubBankAuth = tBankAuthAct.getAuthType();
-						if (wksubBankAuth.length() > 1) {
-							wksubBankAuth = tBankAuthAct.getAuthType().substring(1, 2);
-						}
-						tPostAuthLog = postAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getPostDepCode(), tBankAuthAct.getRepayAcct(), wksubBankAuth, titaVo);
-						if (tPostAuthLog != null) {
-							wkCustId = tPostAuthLog.getCustId();
+				if ("700".equals(tBankAuthAct.getRepayBank())) {
+					wksubBankAuth = tBankAuthAct.getAuthType();
+					if (wksubBankAuth.length() > 1) {
+						wksubBankAuth = tBankAuthAct.getAuthType().substring(1, 2);
+					}
+					tPostAuthLog = postAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(),
+							tBankAuthAct.getPostDepCode(), tBankAuthAct.getRepayAcct(), wksubBankAuth, titaVo);
+					if (tPostAuthLog != null) {
+						wkCustId = tPostAuthLog.getCustId();
 //							本人時用戶號查客戶主檔取戶名
-							if ("00".equals(tPostAuthLog.getRelationCode())) {
+						if ("00".equals(tPostAuthLog.getRelationCode())) {
 //								有資料時塞入 否則放空白
-								if (tCustMain != null) {
-									wkRelAcctName = tCustMain.getCustName();
-								} else {
-									wkRelAcctName = "";
-								}
-//								非本人時放入扣款人姓名
+							if (tCustMain != null) {
+								wkRelAcctName = tCustMain.getCustName();
 							} else {
-								wkRelAcctName = tPostAuthLog.getRelAcctName();
+								wkRelAcctName = "";
 							}
-						}
-
-						wkPostDepCode = tBankAuthAct.getPostDepCode();
-						wkCustNo = FormatUtil.pad9("" + tBankAuthAct.getCustNo(), 7);
-						wkAcctSeq = tBankAuthAct.getAcctSeq();
-						wkCustNoSeq = wkCustId + wkPostDepCode + wkCustNo + wkAcctSeq;
-					} else {
-						tAchAuthLog = achAuthLogService.facmNoRepayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getFacmNo(), tBankAuthAct.getRepayBank(), tBankAuthAct.getRepayAcct(), titaVo);
-						if (tAchAuthLog != null) {
-							if ("00".equals(tAchAuthLog.getRelationCode())) {
-//								有資料時塞入 否則放空白
-								if (tCustMain != null) {
-									wkRelAcctName = tCustMain.getCustName();
-								} else {
-									wkRelAcctName = "";
-								}
 //								非本人時放入扣款人姓名
-							} else {
-								wkRelAcctName = tAchAuthLog.getRelAcctName();
-							}
+						} else {
+							wkRelAcctName = tPostAuthLog.getRelAcctName();
 						}
 					}
-					occursList.putParam("OOAcctNoSeq", wkCustNoSeq);
-					occursList.putParam("OORepayAcctName", wkRelAcctName);
 
-					totaVo.addOccursList(occursList);
+					wkPostDepCode = tBankAuthAct.getPostDepCode();
+					wkCustNo = FormatUtil.pad9("" + tBankAuthAct.getCustNo(), 7);
+					wkAcctSeq = tBankAuthAct.getAcctSeq();
+					wkCustNoSeq = wkCustId + wkPostDepCode + wkCustNo + wkAcctSeq;
+				} else {
+					tAchAuthLog = achAuthLogService.facmNoRepayAcctFirst(tBankAuthAct.getCustNo(),
+							tBankAuthAct.getFacmNo(), tBankAuthAct.getRepayBank(), tBankAuthAct.getRepayAcct(), titaVo);
+					if (tAchAuthLog != null) {
+						if ("00".equals(tAchAuthLog.getRelationCode())) {
+//								有資料時塞入 否則放空白
+							if (tCustMain != null) {
+								wkRelAcctName = tCustMain.getCustName();
+							} else {
+								wkRelAcctName = "";
+							}
+//								非本人時放入扣款人姓名
+						} else {
+							wkRelAcctName = tAchAuthLog.getRelAcctName();
+						}
+					}
 				}
+				occursList.putParam("OOAcctNoSeq", wkCustNoSeq);
+				occursList.putParam("OORepayAcctName", wkRelAcctName);
+
+				totaVo.addOccursList(occursList);
+
 			}
 
 		} else {

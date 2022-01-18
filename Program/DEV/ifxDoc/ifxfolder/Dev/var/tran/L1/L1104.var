@@ -641,7 +641,7 @@ IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))
 
 #SpouseNameAft=x,100,I
 @
-C(5,#FdSpouseId,*,V(7),$)
+C(5,#FdSpouseName2,*,V(7),$)
 
 #SpouseNameInd=_,_,L
 C(5,#SpouseNameAft,#SpouseNameBef,T(3,),T(3,X))

@@ -52,10 +52,9 @@ public class EomFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 每年年底日才執行
 		if (yearMonth.length() >= 2 && yearMonth.substring(yearMonth.length() - 2).equals("12")) {
 			this.info("EomFinal 本日為年底日,執行年底日日終維護.");
-			titaVo.setBatchJobId("eoyFlow");
 		} else {
 			// TODO: 非年底日,發動Oracle DB鏡像備份
-
+			throw new LogicException("S0001", "本日非年底日,啟動備份.");
 		}
 		
 		this.info("EomFinal exit.");

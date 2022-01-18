@@ -188,6 +188,15 @@ public abstract class BatchBase {
 			this.run();
 			sc.setExitStatus(ExitStatus.COMPLETED);
 			return RepeatStatus.FINISHED;
+		} catch (LogicException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			if (e.getErrorMsgId().equals("S0001"))
+				sc.setExitStatus(ExitStatus.STOPPED);
+			else
+				sc.setExitStatus(ExitStatus.FAILED);
+			return RepeatStatus.FINISHED;
 		} catch (Throwable e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

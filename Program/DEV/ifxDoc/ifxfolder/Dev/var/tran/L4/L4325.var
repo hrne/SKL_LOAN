@@ -215,7 +215,7 @@ IF(#CustNo{i}==0,s,$)
 IF(#AdjustedRate{i}==0,$,s)
 SHOW(#TextA{i},#KeyInColA{i})
 HELP(Y: )
-@C(4,#KeyInColA{i},HIDE(#TextA{i},#KeyInColA{i}),SHOW(#TextA{i},#KeyInColA{i}))
+@V(3,Y)C(4,#KeyInColA{i},HIDE(#TextA{i},#KeyInColA{i}),SHOW(#TextA{i},#KeyInColA{i}))
 
 
 #LableA{i}=x,13,L

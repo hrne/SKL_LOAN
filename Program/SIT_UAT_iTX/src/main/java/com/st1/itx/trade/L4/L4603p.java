@@ -39,7 +39,6 @@ import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
-import com.st1.itx.util.mail.MailService;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -57,9 +56,6 @@ public class L4603p extends TradeBuffer {
 
 	@Autowired
 	private CustNoticeCom custNoticeCom;
-
-	@Autowired
-	private MailService mailService;
 
 	@Autowired
 	private LoanBorMainService loanBorMainService;
@@ -617,7 +613,7 @@ public class L4603p extends TradeBuffer {
 			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
 			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
+			acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
 			lAcReceivable.add(acReceivable);
 		}
 	}
@@ -633,7 +629,7 @@ public class L4603p extends TradeBuffer {
 				acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 				acReceivable.setFacmNo(tInsuRenew.getFacmNo());
 				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-				acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
+				acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
 				lAcReceivable.add(acReceivable);
 			}
 			tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);

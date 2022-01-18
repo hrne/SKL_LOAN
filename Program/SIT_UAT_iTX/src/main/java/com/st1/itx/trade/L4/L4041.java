@@ -202,7 +202,8 @@ public class L4041 extends TradeBuffer {
 						tempFacmNo = FormatUtil.pad9(result.get("F6"), 3);
 					} else {
 						if (!tempCheckAcctNo.equals(result.get("F4"))) {
-							throw new LogicException(titaVo, "E0014", "戶號:" + tempCustNo + "，額度:" + tempFacmNo + "，期款與火險需同時授權");
+							throw new LogicException(titaVo, "E0014",
+									"戶號:" + tempCustNo + "，額度:" + tempFacmNo + "，期款與火險需同時授權");
 						} else {
 							checkFlag = 0;
 						}
@@ -245,15 +246,16 @@ public class L4041 extends TradeBuffer {
 						occursList.putParam("OccApprCode", result.get("F1"));
 						occursList.putParam("OccAcctType", result.get("F3"));
 						occursList.putParam("OccRepayAcct", FormatUtil.pad9("" + result.get("F4"), 14));
-//						扣款人ID+郵局存款別+戶號+(new)帳號碼(文字2位) 舊: null : 兩個空白
-//						                                                                                                  新: 從01起編
+//						(new)帳號碼(文字2位) + 扣款人ID+郵局存款別+戶號
 						String acctSeq = "";
 						if (result.get("F8") != null && !"".equals(result.get("F8").trim())) {
 							acctSeq = FormatUtil.pad9("" + result.get("F8"), 2);
 						} else {
 							acctSeq = FormatUtil.padX("", 2);
 						}
-						occursList.putParam("OccCustNo", FormatUtil.padLeft(FormatUtil.padX(result.get("F7"), 10) + result.get("F3") + FormatUtil.pad9(result.get("F2"), 7) + acctSeq, 20));
+						occursList.putParam("OccCustNo",
+								FormatUtil.padLeft(acctSeq + FormatUtil.padX(result.get("F7"), 10) + result.get("F3")
+										+ FormatUtil.pad9(result.get("F2"), 7), 20));
 						occursList.putParam("OccCustId", FormatUtil.padX(result.get("F7"), 10));
 						occursList.putParam("OccStatusCode", FormatUtil.padX("", 2));
 						occursList.putParam("OccCheckInd", FormatUtil.padX("", 1));
@@ -409,7 +411,8 @@ public class L4041 extends TradeBuffer {
 //				String outputFilePath11 = outFolder + "PO$P11P_846授權出.txt";
 //				String outputFilePath12 = outFolder + "PO$P12P_53N授權出.txt";
 
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+						titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權.txt", 2);
 
 				for (String line : aFile) {
 					makeFile.put(line);
@@ -442,7 +445,8 @@ public class L4041 extends TradeBuffer {
 				// 轉換資料格式
 				ArrayList<String> bFile = postAuthFileVo53N.toFile();
 
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局授權提出媒體檔53N", "PO$P12P_53N授權出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+						titaVo.getTxCode() + "-郵局授權提出媒體檔53N", "PO$P12P_53N授權出.txt", 2);
 
 				for (String line : bFile) {
 					makeFile.put(line);
@@ -495,7 +499,9 @@ public class L4041 extends TradeBuffer {
 						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-						newPostAuthLog.setPropDate(0);
+						if (result.get("F1").equals("1")) {
+							newPostAuthLog.setPropDate(0);
+						}
 						newPostAuthLog.setPostMediaCode("");
 						newPostAuthLog.setFileSeq(0);
 

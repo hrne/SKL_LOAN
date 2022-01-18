@@ -175,10 +175,10 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
-
+			
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-
+			
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
@@ -382,7 +382,7 @@ public class L4611 extends TradeBuffer {
 		acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 		acReceivable.setFacmNo(tInsuRenew.getFacmNo());
 		acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-		acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
+		acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
 		acReceivableList.add(acReceivable);
 		acReceivableCom.setTxBuffer(this.getTxBuffer());
 		acReceivableCom.mnt(flag, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除

@@ -74,21 +74,10 @@ BEGIN
          , NVL(M."LoanBal", 0)                  AS "LoanBal"           -- 本金餘額(撥款)
          , NVL(M1."IntAmtAcc", 0)               AS "IntAmt"            -- 應收利息
          , NVL(M."StoreRate", 0)                AS "Rate"              -- 利率(撥款)
-         , CASE WHEN M."Status" IN (2, 7) THEN  -- 用 "下次繳息日"
-                  CASE
-                    WHEN NVL(M."NextPayIntDate",0) = 0 THEN 0
-                    WHEN M."NextPayIntDate" >= TMNDYF  THEN 0
---                    WHEN ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(NVL(M."NextPayIntDate",0),'yyyy-mm-dd') ) > 999 THEN 999
-                    ELSE ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
-                  END
+         , CASE                                                        -- 用 "下次繳息日"
                 WHEN NVL(M."NextPayIntDate",0) = 0 THEN 0
                 WHEN M."NextPayIntDate" >= TMNDYF  THEN 0
---                WHEN ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') ) > 999 THEN 999
---                ELSE ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
-                WHEN M."NextRepayDate"  >  TMNDYF  THEN
-                     ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
---                WHEN ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextRepayDate",'yyyy-mm-dd') ) > 999 THEN 999
-                ELSE ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextRepayDate",'yyyy-mm-dd') )
+                ELSE ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
            END                                  AS "OvduDays"          -- 逾期繳款天數
          , NVL(M."OvduDate", 0)                 AS "OvduDate"          -- 轉催收款日期
          , NVL(M."BadDebtDate", 0)              AS "BadDebtDate"       -- 轉銷呆帳日期

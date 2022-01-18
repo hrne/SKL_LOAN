@@ -83,7 +83,11 @@ public class L4412 extends TradeBuffer {
 
 			// FunCode 4 刪除
 		} else if ("4".equals(iFunCode)) {
-			bankAuthActCom.del("A", titaVo);
+			if (iAuthApplCode.equals("2")) {
+				bankAuthActCom.del("D", titaVo);
+			} else {
+				bankAuthActCom.del("A", titaVo);
+			}
 		} else {
 
 		}

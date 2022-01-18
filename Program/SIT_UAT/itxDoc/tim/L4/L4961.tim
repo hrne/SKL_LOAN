@@ -48,6 +48,7 @@ NBSDY=9,8
 NNBSDY=9,8
 SearchFlag=9,1
 InsuYearMonth=9,5
+InsuYearMonthEnd=9,5
 SearchOption=9,1
 RepayCode=9,2
 END=X,1

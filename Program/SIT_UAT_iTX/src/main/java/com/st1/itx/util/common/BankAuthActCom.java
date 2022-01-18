@@ -136,9 +136,6 @@ public class BankAuthActCom extends TradeBuffer {
 	@Autowired
 	DataLog datalog;
 
-	private String iCreateFlag = "A";
-
-	private String iAuthApplCode = "1";
 	private String iPostDepCode = " ";
 	private int iRepayCode = 0;
 	private String iRepayAcct = "";
@@ -278,7 +275,8 @@ public class BankAuthActCom extends TradeBuffer {
 		this.info("bankAuthActCom updPostAcct ...");
 		BankAuthAct tBankAuthAct = null;
 		if ("1".equals(t.getAuthApplCode()) || "2".equals(t.getAuthApplCode())) {
-			tBankAuthAct = bankAuthActService.findById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "0" + t.getAuthCode()), titaVo);
+			tBankAuthAct = bankAuthActService
+					.findById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "0" + t.getAuthCode()), titaVo);
 			if (tBankAuthAct == null) {
 				throw new LogicException("E0015", "此筆授權 帳號檔找不到" + t.getCustNo() + t.getFacmNo() + t.getAuthCode()); // 檢查錯誤
 			}
@@ -294,7 +292,8 @@ public class BankAuthActCom extends TradeBuffer {
 				isUpdFac = true;
 			} else {
 				status = "8"; // 8.授權失敗
-				if (t.getRepayAcct().equals(tBankAuthAct.getRepayAcct()) && t.getPostDepCode().equals(tBankAuthAct.getPostDepCode())) {
+				if (t.getRepayAcct().equals(tBankAuthAct.getRepayAcct())
+						&& t.getPostDepCode().equals(tBankAuthAct.getPostDepCode())) {
 					isUpdFac = true;
 				}
 			}
@@ -335,10 +334,11 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 
 		if (isUpdAct) {
-			Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(t.getCustNo(), t.getRepayAcct(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(t.getCustNo(), t.getRepayAcct(), "700", 0,
+					999, 0, Integer.MAX_VALUE, titaVo);
 			if (slBankAuthAct != null) {
 				for (BankAuthAct t1 : slBankAuthAct.getContent()) {
-					if ("700".equals(t1.getRepayBank()) && t1.getPostDepCode().equals(t.getPostDepCode())) {
+					if (t1.getPostDepCode().equals(t.getPostDepCode())) {
 						tBankAuthAct = bankAuthActService.holdById(t1, titaVo);
 						tBankAuthAct.setStatus(status);
 						try {
@@ -413,24 +413,24 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 
 		if (isUpdAct) {
-			Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(t.getCustNo(), t.getRepayAcct(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(t.getCustNo(), t.getRepayAcct(),
+					t.getRepayBank(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
 			if (slBankAuthAct != null) {
 				for (BankAuthAct t1 : slBankAuthAct.getContent()) {
-					if (t1.getRepayBank().equals(t.getRepayBank())) {
-						tBankAuthAct = bankAuthActService.holdById(t1, titaVo);
-						tBankAuthAct.setStatus(status);
-						try {
-							bankAuthActService.update(tBankAuthAct, titaVo);
-						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
-						}
-
-						insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
-
-						if ("0".equals(status)) {
-							updAchAcctDelPost(tBankAuthAct, titaVo); // ACH授權成功刪除舊郵局帳號檔
-						}
+					tBankAuthAct = bankAuthActService.holdById(t1, titaVo);
+					tBankAuthAct.setStatus(status);
+					try {
+						bankAuthActService.update(tBankAuthAct, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 					}
+
+					insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
+
+					if ("0".equals(status)) {
+						updAchAcctDelPost(tBankAuthAct, titaVo); // ACH授權成功刪除舊郵局帳號檔
+					}
+
 				}
 			}
 		}
@@ -537,27 +537,28 @@ public class BankAuthActCom extends TradeBuffer {
 		insertPostHistory(tPostAuthLog, "1".equals(iStatus) ? "9" : "8", titaVo);
 
 		// 更新授權帳號檔
-		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(iCustNo, iRepayAcct, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(iCustNo, iRepayAcct, iRepayBank, 0, 999, 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slBankAuthAct != null) {
 			for (BankAuthAct t : slBankAuthAct.getContent()) {
-				if (iRepayBank.equals(t.getRepayBank())) {
-					// 有有效額度使用則不允許暫停
-					if ("1".equals(iStatus)) {
-						FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
-						if (tFacMain != null && tFacMain.getRepayCode() == 2 && tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
-							throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許暫停"); // 檢查錯誤
-						}
+				// 有有效額度使用則不允許暫停
+				if ("1".equals(iStatus)) {
+					FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+					if (tFacMain != null && tFacMain.getRepayCode() == 2
+							&& tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
+						throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許暫停"); // 檢查錯誤
 					}
-					// 更新授權帳號檔
-					BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
-					tBankAuthAct.setStatus(iStatus);
-					try {
-						bankAuthActService.update(tBankAuthAct, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
-					}
-					insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
 				}
+				// 更新授權帳號檔
+				BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
+				tBankAuthAct.setStatus(iStatus);
+				try {
+					bankAuthActService.update(tBankAuthAct, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+				}
+				insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
+
 			}
 		}
 	}
@@ -603,27 +604,28 @@ public class BankAuthActCom extends TradeBuffer {
 		insertAchHistory(tAchAuthLog, "0".equals(iStatus) ? "Y" : "Z", titaVo);
 
 		// 更新授權帳號檔
-		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(iCustNo, iRepayAcct, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(iCustNo, iRepayAcct, iRepayBank, 0, 999, 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slBankAuthAct != null) {
 			for (BankAuthAct t : slBankAuthAct.getContent()) {
-				if (iRepayBank.equals(t.getRepayBank())) {
-					// 有有效額度使用則不允許暫停
-					if ("1".equals(iStatus)) {
-						FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
-						if (tFacMain != null && tFacMain.getRepayCode() == 2 && tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
-							throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許暫停"); // 檢查錯誤
-						}
+				// 有有效額度使用則不允許暫停
+				if ("1".equals(iStatus)) {
+					FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+					if (tFacMain != null && tFacMain.getRepayCode() == 2
+							&& tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
+						throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許暫停"); // 檢查錯誤
 					}
-					// 更新授權帳號檔
-					BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
-					tBankAuthAct.setStatus(iStatus);
-					try {
-						bankAuthActService.update(tBankAuthAct, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
-					}
-					insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
 				}
+				// 更新授權帳號檔
+				BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
+				tBankAuthAct.setStatus(iStatus);
+				try {
+					bankAuthActService.update(tBankAuthAct, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+				}
+				insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
+
 			}
 		}
 	}
@@ -651,7 +653,8 @@ public class BankAuthActCom extends TradeBuffer {
 		String acctSeq = "  ";
 		if (tBankAuthAct == null) {
 			if ("700".equals(iRepayBank)) {
-				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, "1", titaVo);
+				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, "1",
+						titaVo);
 				if (tPostAuthLog == null) {
 					this.isNewLog = true;
 					acctSeq = getNewAcctSeq(titaVo); // 新帳號碼
@@ -788,21 +791,30 @@ public class BankAuthActCom extends TradeBuffer {
 	private void addCancel(TitaVo titaVo) throws LogicException {
 		// 更新帳號檔狀態
 		this.info("addCancel ...");
-		// 同戶扣款帳號
-		BankAuthAct tBankAuthAct = getRepayAcct(titaVo);
-		if (tBankAuthAct == null || tBankAuthAct.getFacmNo() != iFacmNo) {
+		String acctSeq = "";
+		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(iCustNo, iRepayAcct, iRepayBank, 0, 999, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slBankAuthAct == null) {
 			throw new LogicException("E0015", "此筆授權資料不存在"); // 檢查錯誤
 		}
-		if (!"0".equals(tBankAuthAct.getStatus())) {
-			throw new LogicException("E0015", "此扣款帳須為授權成功");
+
+		for (BankAuthAct t : slBankAuthAct.getContent()) {
+			acctSeq = t.getAcctSeq();
+			// 有有效額度使用則不允許刪除
+			FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+			if (tFacMain != null && tFacMain.getRepayCode() == 2
+					&& tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
+				throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許刪除"); // 檢查錯誤
+			}
+
 		}
 		this.isNewLog = true;
 		if ("700".equals(iRepayBank)) {
 			if (this.isNewLog) {
-				insertPostLog("2", "1", tBankAuthAct.getAcctSeq(), titaVo);
+				insertPostLog("2", "1", acctSeq, titaVo);
 			}
 			if (this.isNewLog) {
-				insertPostLog("2", "2", tBankAuthAct.getAcctSeq(), titaVo);
+				insertPostLog("2", "2", acctSeq, titaVo);
 			}
 		} else {
 			if (this.isNewLog) {
@@ -814,14 +826,7 @@ public class BankAuthActCom extends TradeBuffer {
 	// 取消授權帳號刪除
 	private void addCancelDelete(TitaVo titaVo) throws LogicException {
 		this.info("addCancelDelete ...");
-		// 同戶扣款帳號
-		BankAuthAct tBankAuthAct = getRepayAcct(titaVo);
-		if (tBankAuthAct == null || tBankAuthAct.getFacmNo() != iFacmNo) {
-			throw new LogicException("E0015", "此筆授權資料不存在"); // 檢查錯誤
-		}
-		if (!"0".equals(tBankAuthAct.getStatus())) {
-			throw new LogicException("E0015", "此扣款帳須為授權成功");
-		}
+
 		this.isDelLog = true;
 		if ("700".equals(iRepayBank)) {
 			deletePostAuthLog("2", "1", titaVo);
@@ -832,10 +837,12 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	// 新增授權記錄檔
-	private void insertPostLog(String authApplCode, String authCode, String acctSeq, TitaVo titaVo) throws LogicException {
+	private void insertPostLog(String authApplCode, String authCode, String acctSeq, TitaVo titaVo)
+			throws LogicException {
 		this.info("insertPostLog ....");
 		boolean isInsert = true;
-		PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, authCode, titaVo);
+		PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, authCode,
+				titaVo);
 		if (tPostAuthLog != null) {
 			if (authApplCode.equals(tPostAuthLog.getAuthApplCode())) {
 				if ("".equals(tPostAuthLog.getAuthErrorCode().trim())) {
@@ -923,12 +930,15 @@ public class BankAuthActCom extends TradeBuffer {
 
 	private void deletePostAuthLog(String authApplCode, String authCode, TitaVo titaVo) throws LogicException {
 		this.info("deletePostAuthLog ... ");
-		PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, authCode, titaVo);
+		PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, authCode,
+				titaVo);
 		if (tPostAuthLog == null) {
 			throw new LogicException("E0015", "此筆授權資料找不到"); // 檢查錯誤
 		}
-		if (tPostAuthLog.getPropDate() > 0) {
-			throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+		if (authApplCode.equals("1")) {
+			if (tPostAuthLog.getPropDate() > 0) {
+				throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+			}
 		}
 		if (!authApplCode.equals(tPostAuthLog.getAuthApplCode())) {
 			throw new LogicException("E0015", "最後一筆授權資料記號不符" + authApplCode + "/" + tPostAuthLog.getAuthApplCode()); // 檢查錯誤
@@ -947,10 +957,13 @@ public class BankAuthActCom extends TradeBuffer {
 		if (tAchAuthLog == null) {
 			throw new LogicException("E0015", "此筆授權資料找不到"); // 檢查錯誤
 		}
-		if (tAchAuthLog.getPropDate() > 0) {
-			throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+		if (createFlag.equals("A")) {
+			if (tAchAuthLog.getPropDate() > 0) {
+				throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+			}
 		}
-		if (("A".equals(createFlag) && !"A".equals(tAchAuthLog.getCreateFlag())) || ("D".equals(createFlag) && !"D".equals(tAchAuthLog.getCreateFlag()))) {
+		if (("A".equals(createFlag) && !"A".equals(tAchAuthLog.getCreateFlag()))
+				|| ("D".equals(createFlag) && !"D".equals(tAchAuthLog.getCreateFlag()))) {
 			throw new LogicException("E0015", "最後一筆授權資料記號不符" + createFlag + "/" + tAchAuthLog.getCreateFlag()); // 檢查錯誤
 		}
 		achAuthLogService.holdById(tAchAuthLog, titaVo);
@@ -962,7 +975,8 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	// 新增授權帳號檔
-	private BankAuthAct inserBankAuthAct(String authType, String acctSeq, String status, TitaVo titaVo) throws LogicException {
+	private BankAuthAct inserBankAuthAct(String authType, String acctSeq, String status, TitaVo titaVo)
+			throws LogicException {
 		BankAuthAct tBankAuthAct = new BankAuthAct();
 		BankAuthActId tBankAuthActId = new BankAuthActId();
 		tBankAuthActId.setCustNo(iCustNo);
@@ -1012,7 +1026,7 @@ public class BankAuthActCom extends TradeBuffer {
 			this.error(errors.toString());
 		}
 
-//		同戶號、同帳號，計算筆數
+//		同戶號，計算帳號個數
 		if (resultList != null && resultList.size() > 0) {
 			seq = parse.stringToInteger(resultList.get(0).get("F1"));
 		}
@@ -1028,17 +1042,16 @@ public class BankAuthActCom extends TradeBuffer {
 	private BankAuthAct getRepayAcct(TitaVo titaVo) throws LogicException {
 		int minfacmNo = 999;
 		BankAuthAct tBankAuthAct = null;
-		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(iCustNo, iRepayAcct, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(iCustNo, iRepayAcct, iRepayBank, 0, 999, 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slBankAuthAct != null) {
 			for (BankAuthAct t : slBankAuthAct.getContent()) {
-				if (iRepayBank.equals(t.getRepayBank())) {
-					if (t.getFacmNo() == iFacmNo) {
+				if (t.getFacmNo() == iFacmNo) {
+					tBankAuthAct = t;
+					break;
+				} else {
+					if (t.getFacmNo() < minfacmNo) {
 						tBankAuthAct = t;
-						break;
-					} else {
-						if (t.getFacmNo() < minfacmNo) {
-							tBankAuthAct = t;
-						}
 					}
 				}
 			}
@@ -1139,7 +1152,8 @@ public class BankAuthActCom extends TradeBuffer {
 	// 刪除還款帳號變更(含還款方式)紀錄檔
 	private void addRepayActChangeLogDelete(TitaVo titaVo) throws LogicException {
 		this.info("addRepayActChangeLogDelete ...");
-		RepayActChangeLog tRepayActChangeLog = repayActChangeLogService.findRelTxseqFirst(this.txBuffer.getTxCom().getReldy() + 19110000, this.txBuffer.getTxCom().getRelNo(), titaVo);
+		RepayActChangeLog tRepayActChangeLog = repayActChangeLogService.findRelTxseqFirst(
+				this.txBuffer.getTxCom().getReldy() + 19110000, this.txBuffer.getTxCom().getRelNo(), titaVo);
 		if (tRepayActChangeLog == null) {
 			return;
 		}
@@ -1215,14 +1229,6 @@ public class BankAuthActCom extends TradeBuffer {
 			iFuncCode = parse.stringToInteger(titaVo.get("FuncCode"));
 		}
 
-		if ("L4410".equals(titaVo.getTxcd())) {
-			iCreateFlag = titaVo.getParam("CreateFlag");
-		}
-		if ("L4412".equals(titaVo.getTxcd())) {
-			iAuthApplCode = titaVo.get("AuthApplCode");
-			iCustId = titaVo.getParam("CustId");
-		}
-
 		if (titaVo.getTxcd() != null && titaVo.getTxcd().length() >= 2) {
 			txType = titaVo.getTxcd().substring(1, 2);
 		}
@@ -1231,12 +1237,10 @@ public class BankAuthActCom extends TradeBuffer {
 	private void showLog() throws LogicException {
 		this.info("showLog ...");
 		this.info("iFuncCode : " + iFuncCode);
-		this.info("iCreateFlag : " + iCreateFlag);
 		this.info("iCustId : " + iCustId);
 		this.info("iCustNo : " + iCustNo);
 		this.info("iFacmNo : " + iFacmNo);
 		this.info("iRepayBank : " + iRepayBank);
-		this.info("iAuthApplCode : " + iAuthApplCode);
 		this.info("iPostDepCode : " + iPostDepCode);
 		this.info("iRepayAcct : " + iRepayAcct);
 		this.info("iRelationCode : " + iRelationCode);

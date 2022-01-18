@@ -191,7 +191,9 @@ public class L4040 extends TradeBuffer {
 						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
 
 						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-						tAchAuthLog.setPropDate(0);
+						if ("A".equals(result.get("F5"))) {
+							tAchAuthLog.setPropDate(0);
+						}
 						tAchAuthLog.setMediaCode("");
 
 						try {
@@ -265,7 +267,8 @@ public class L4040 extends TradeBuffer {
 //							6.OccCustId				委繳戶統一編號	X	10	50	身分證字號
 						occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
 //							7.OccCustNo				用戶號碼		X	20	70	借款人戶號
-						occursList.putParam("OccCustNo", FormatUtil.padX(FormatUtil.pad9("" + result.get("F2"), 7), 20));
+						occursList.putParam("OccCustNo",
+								FormatUtil.padX(FormatUtil.pad9("" + result.get("F2"), 7), 20));
 //							8.OccCreateFlag			新增或取消		X	1	71	A：新增(人工紙本)
 //																			O：舊檔轉換用"
 						occursList.putParam("OccCreateFlag", result.get("F5"));
@@ -274,7 +277,9 @@ public class L4040 extends TradeBuffer {
 //							10.OccSnederNo			提出行代號		9	7	86	1030116
 						occursList.putParam("OccSnederNo", "1030116");
 //							11.OccSenderRemarker	發動者專用區	X	20	106	戶號+額度
-						occursList.putParam("OccSenderRemarker", FormatUtil.padX(FormatUtil.pad9("" + result.get("F2"), 7) + FormatUtil.pad9("" + result.get("F6"), 3), 20));
+						occursList.putParam("OccSenderRemarker", FormatUtil.padX(
+								FormatUtil.pad9("" + result.get("F2"), 7) + FormatUtil.pad9("" + result.get("F6"), 3),
+								20));
 //							12.OccTxType			交易型態		X	1	107	N：提出
 						occursList.putParam("OccTxType", "N");
 //							13.OccAuthStatus		回覆訊息		X	1	108	提出時填入空白
@@ -401,7 +406,8 @@ public class L4040 extends TradeBuffer {
 					// 轉換資料格式
 					ArrayList<String> aFile = achAuthFileVo.toFile();
 
-					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-ACH授權提出媒體檔-新光", "AHP21P_授出-新光.txt", 2);
+					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+							titaVo.getTxCode() + "-ACH授權提出媒體檔-新光", "AHP21P_授出-新光.txt", 2);
 
 					for (String line : aFile) {
 						makeFile.put(line);
@@ -447,7 +453,8 @@ public class L4040 extends TradeBuffer {
 					// 轉換資料格式
 					ArrayList<String> bFile = achAuthFileVo.toFile();
 
-					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-ACH授權提出媒體檔-他行", "AHP22P_授出-他行.txt", 2);
+					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+							titaVo.getTxCode() + "-ACH授權提出媒體檔-他行", "AHP22P_授出-他行.txt", 2);
 
 					for (String line : bFile) {
 						makeFile.put(line);
