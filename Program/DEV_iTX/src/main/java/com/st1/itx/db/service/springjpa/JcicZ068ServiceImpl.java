@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("jcicZ068Service")
 @Repository
-public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(JcicZ068ServiceImpl.class);
+public class JcicZ068ServiceImpl extends ASpringJpaParm implements JcicZ068Service, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + jcicZ068Id);
+		this.info("findById " + dbName + " " + jcicZ068Id);
 		Optional<JcicZ068> jcicZ068 = null;
 		if (dbName.equals(ContentName.onDay))
 			jcicZ068 = jcicZ068ReposDay.findById(jcicZ068Id);
@@ -95,7 +92,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "SubmitKey", "CustId", "ApplyDate"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = jcicZ068ReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +114,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
+		this.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = jcicZ068ReposDay.findAllByCustIdIsOrderByCustIdAscApplyDateDesc(custId_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -139,7 +136,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("RcDateEq " + dbName + " : " + "applyDate_0 : " + applyDate_0);
+		this.info("RcDateEq " + dbName + " : " + "applyDate_0 : " + applyDate_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = jcicZ068ReposDay.findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(applyDate_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -161,7 +158,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " + applyDate_1);
+		this.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " + applyDate_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = jcicZ068ReposDay.findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(custId_0, applyDate_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -179,7 +176,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + jcicZ068Id);
+		this.info("Hold " + dbName + " " + jcicZ068Id);
 		Optional<JcicZ068> jcicZ068 = null;
 		if (dbName.equals(ContentName.onDay))
 			jcicZ068 = jcicZ068ReposDay.findByJcicZ068Id(jcicZ068Id);
@@ -197,7 +194,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + jcicZ068.getJcicZ068Id());
+		this.info("Hold " + dbName + " " + jcicZ068.getJcicZ068Id());
 		Optional<JcicZ068> jcicZ068T = null;
 		if (dbName.equals(ContentName.onDay))
 			jcicZ068T = jcicZ068ReposDay.findByJcicZ068Id(jcicZ068.getJcicZ068Id());
@@ -219,7 +216,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + jcicZ068.getJcicZ068Id());
+		this.info("Insert..." + dbName + " " + jcicZ068.getJcicZ068Id());
 		if (this.findById(jcicZ068.getJcicZ068Id()) != null)
 			throw new DBException(2);
 
@@ -245,7 +242,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + jcicZ068.getJcicZ068Id());
+		this.info("Update..." + dbName + " " + jcicZ068.getJcicZ068Id());
 		if (!empNot.isEmpty())
 			jcicZ068.setLastUpdateEmpNo(empNot);
 
@@ -268,7 +265,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + jcicZ068.getJcicZ068Id());
+		this.info("Update..." + dbName + " " + jcicZ068.getJcicZ068Id());
 		if (!empNot.isEmpty())
 			jcicZ068.setLastUpdateEmpNo(empNot);
 
@@ -288,7 +285,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + jcicZ068.getJcicZ068Id());
+		this.info("Delete..." + dbName + " " + jcicZ068.getJcicZ068Id());
 		if (dbName.equals(ContentName.onDay)) {
 			jcicZ068ReposDay.delete(jcicZ068);
 			jcicZ068ReposDay.flush();
@@ -315,7 +312,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (JcicZ068 t : jcicZ068)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -344,7 +341,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (jcicZ068 == null || jcicZ068.size() == 0)
 			throw new DBException(6);
 
@@ -369,7 +366,7 @@ public class JcicZ068ServiceImpl implements JcicZ068Service, InitializingBean {
 
 	@Override
 	public void deleteAll(List<JcicZ068> jcicZ068, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

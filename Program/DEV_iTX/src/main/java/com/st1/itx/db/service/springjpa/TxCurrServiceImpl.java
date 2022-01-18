@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txCurrService")
 @Repository
-public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxCurrServiceImpl.class);
+public class TxCurrServiceImpl extends ASpringJpaParm implements TxCurrService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + curCd);
+		this.info("findById " + dbName + " " + curCd);
 		Optional<TxCurr> txCurr = null;
 		if (dbName.equals(ContentName.onDay))
 			txCurr = txCurrReposDay.findById(curCd);
@@ -94,7 +91,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CurCd"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txCurrReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -112,7 +109,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + curCd);
+		this.info("Hold " + dbName + " " + curCd);
 		Optional<TxCurr> txCurr = null;
 		if (dbName.equals(ContentName.onDay))
 			txCurr = txCurrReposDay.findByCurCd(curCd);
@@ -130,7 +127,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txCurr.getCurCd());
+		this.info("Hold " + dbName + " " + txCurr.getCurCd());
 		Optional<TxCurr> txCurrT = null;
 		if (dbName.equals(ContentName.onDay))
 			txCurrT = txCurrReposDay.findByCurCd(txCurr.getCurCd());
@@ -152,7 +149,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txCurr.getCurCd());
+		this.info("Insert..." + dbName + " " + txCurr.getCurCd());
 		if (this.findById(txCurr.getCurCd()) != null)
 			throw new DBException(2);
 
@@ -178,7 +175,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txCurr.getCurCd());
+		this.info("Update..." + dbName + " " + txCurr.getCurCd());
 		if (!empNot.isEmpty())
 			txCurr.setLastUpdateEmpNo(empNot);
 
@@ -201,7 +198,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txCurr.getCurCd());
+		this.info("Update..." + dbName + " " + txCurr.getCurCd());
 		if (!empNot.isEmpty())
 			txCurr.setLastUpdateEmpNo(empNot);
 
@@ -221,7 +218,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txCurr.getCurCd());
+		this.info("Delete..." + dbName + " " + txCurr.getCurCd());
 		if (dbName.equals(ContentName.onDay)) {
 			txCurrReposDay.delete(txCurr);
 			txCurrReposDay.flush();
@@ -248,7 +245,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxCurr t : txCurr)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -277,7 +274,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txCurr == null || txCurr.size() == 0)
 			throw new DBException(6);
 
@@ -302,7 +299,7 @@ public class TxCurrServiceImpl implements TxCurrService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<TxCurr> txCurr, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

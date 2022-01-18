@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("relsCompanyService")
 @Repository
-public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(RelsCompanyServiceImpl.class);
+public class RelsCompanyServiceImpl extends ASpringJpaParm implements RelsCompanyService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + relsCompanyId);
+		this.info("findById " + dbName + " " + relsCompanyId);
 		Optional<RelsCompany> relsCompany = null;
 		if (dbName.equals(ContentName.onDay))
 			relsCompany = relsCompanyReposDay.findById(relsCompanyId);
@@ -95,7 +92,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "RelsUKey", "CompanyId"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsCompanyReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +114,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("RelsUKeyEq " + dbName + " : " + "relsUKey_0 : " + relsUKey_0);
+		this.info("RelsUKeyEq " + dbName + " : " + "relsUKey_0 : " + relsUKey_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsCompanyReposDay.findAllByRelsUKeyIs(relsUKey_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -139,7 +136,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findCompanyIdEq " + dbName + " : " + "companyId_0 : " + companyId_0);
+		this.info("findCompanyIdEq " + dbName + " : " + "companyId_0 : " + companyId_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsCompanyReposDay.findAllByCompanyIdIs(companyId_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -161,7 +158,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findCompanyNameEq " + dbName + " : " + "companyName_0 : " + companyName_0);
+		this.info("findCompanyNameEq " + dbName + " : " + "companyName_0 : " + companyName_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsCompanyReposDay.findAllByCompanyNameIs(companyName_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -179,7 +176,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + relsCompanyId);
+		this.info("Hold " + dbName + " " + relsCompanyId);
 		Optional<RelsCompany> relsCompany = null;
 		if (dbName.equals(ContentName.onDay))
 			relsCompany = relsCompanyReposDay.findByRelsCompanyId(relsCompanyId);
@@ -197,7 +194,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + relsCompany.getRelsCompanyId());
+		this.info("Hold " + dbName + " " + relsCompany.getRelsCompanyId());
 		Optional<RelsCompany> relsCompanyT = null;
 		if (dbName.equals(ContentName.onDay))
 			relsCompanyT = relsCompanyReposDay.findByRelsCompanyId(relsCompany.getRelsCompanyId());
@@ -219,7 +216,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + relsCompany.getRelsCompanyId());
+		this.info("Insert..." + dbName + " " + relsCompany.getRelsCompanyId());
 		if (this.findById(relsCompany.getRelsCompanyId()) != null)
 			throw new DBException(2);
 
@@ -245,7 +242,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + relsCompany.getRelsCompanyId());
+		this.info("Update..." + dbName + " " + relsCompany.getRelsCompanyId());
 		if (!empNot.isEmpty())
 			relsCompany.setLastUpdateEmpNo(empNot);
 
@@ -268,7 +265,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + relsCompany.getRelsCompanyId());
+		this.info("Update..." + dbName + " " + relsCompany.getRelsCompanyId());
 		if (!empNot.isEmpty())
 			relsCompany.setLastUpdateEmpNo(empNot);
 
@@ -288,7 +285,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + relsCompany.getRelsCompanyId());
+		this.info("Delete..." + dbName + " " + relsCompany.getRelsCompanyId());
 		if (dbName.equals(ContentName.onDay)) {
 			relsCompanyReposDay.delete(relsCompany);
 			relsCompanyReposDay.flush();
@@ -315,7 +312,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (RelsCompany t : relsCompany)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -344,7 +341,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (relsCompany == null || relsCompany.size() == 0)
 			throw new DBException(6);
 
@@ -369,7 +366,7 @@ public class RelsCompanyServiceImpl implements RelsCompanyService, InitializingB
 
 	@Override
 	public void deleteAll(List<RelsCompany> relsCompany, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

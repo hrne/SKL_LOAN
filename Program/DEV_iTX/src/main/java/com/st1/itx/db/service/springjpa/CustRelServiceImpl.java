@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("custRelService")
 @Repository
-public class CustRelServiceImpl implements CustRelService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(CustRelServiceImpl.class);
+public class CustRelServiceImpl extends ASpringJpaParm implements CustRelService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + custRelId);
+		this.info("findById " + dbName + " " + custRelId);
 		Optional<CustRel> custRel = null;
 		if (dbName.equals(ContentName.onDay))
 			custRel = custRelReposDay.findById(custRelId);
@@ -97,7 +94,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustUKey", "RelUKey"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = custRelReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -122,7 +119,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("custUKeyEq " + dbName + " : " + "custUKey_0 : " + custUKey_0);
+		this.info("custUKeyEq " + dbName + " : " + "custUKey_0 : " + custUKey_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = custRelReposDay.findAllByCustUKeyIs(custUKey_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -147,7 +144,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("relUKeyEq " + dbName + " : " + "relUKey_0 : " + relUKey_0);
+		this.info("relUKeyEq " + dbName + " : " + "relUKey_0 : " + relUKey_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = custRelReposDay.findAllByRelUKeyIs(relUKey_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -172,7 +169,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("RelCodeLike " + dbName + " : " + "relCode_0 : " + relCode_0);
+		this.info("RelCodeLike " + dbName + " : " + "relCode_0 : " + relCode_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = custRelReposDay.findAllByRelCodeLikeOrderByRelCodeAsc(relCode_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -197,7 +194,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findRelUKeyEq " + dbName + " : " + "custUKey_0 : " + custUKey_0 + " enable_1 : " + enable_1);
+		this.info("findRelUKeyEq " + dbName + " : " + "custUKey_0 : " + custUKey_0 + " enable_1 : " + enable_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = custRelReposDay.findAllByCustUKeyIsAndEnableIs(custUKey_0, enable_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -215,7 +212,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + custRelId);
+		this.info("Hold " + dbName + " " + custRelId);
 		Optional<CustRel> custRel = null;
 		if (dbName.equals(ContentName.onDay))
 			custRel = custRelReposDay.findByCustRelId(custRelId);
@@ -233,7 +230,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + custRel.getCustRelId());
+		this.info("Hold " + dbName + " " + custRel.getCustRelId());
 		Optional<CustRel> custRelT = null;
 		if (dbName.equals(ContentName.onDay))
 			custRelT = custRelReposDay.findByCustRelId(custRel.getCustRelId());
@@ -256,7 +253,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + custRel.getCustRelId());
+		this.info("Insert..." + dbName + " " + custRel.getCustRelId());
 		if (this.findById(custRel.getCustRelId()) != null)
 			throw new DBException(2);
 
@@ -285,7 +282,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + custRel.getCustRelId());
+		this.info("Update..." + dbName + " " + custRel.getCustRelId());
 		if (!empNot.isEmpty())
 			custRel.setLastUpdateEmpNo(empNot);
 
@@ -308,7 +305,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + custRel.getCustRelId());
+		this.info("Update..." + dbName + " " + custRel.getCustRelId());
 		if (!empNot.isEmpty())
 			custRel.setLastUpdateEmpNo(empNot);
 
@@ -328,7 +325,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + custRel.getCustRelId());
+		this.info("Delete..." + dbName + " " + custRel.getCustRelId());
 		if (dbName.equals(ContentName.onDay)) {
 			custRelReposDay.delete(custRel);
 			custRelReposDay.flush();
@@ -356,7 +353,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (CustRel t : custRel) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -388,7 +385,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (custRel == null || custRel.size() == 0)
 			throw new DBException(6);
 
@@ -413,7 +410,7 @@ public class CustRelServiceImpl implements CustRelService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<CustRel> custRel, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

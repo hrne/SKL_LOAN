@@ -91,11 +91,12 @@ public class MySpring extends SysLogger implements ApplicationContextAware {
 		}
 		if (!name.equals("apControl")) {
 			TradeBuffer trade = (TradeBuffer) appCtx.getBean(name);
-			trade.setLoggerFg(titaVo.getLoggerFg(), "com.st1.itx.trade." + titaVo.getTxCode().substring(0, 2) + "." + titaVo.getTxCode());
+//			trade.setLoggerFg(titaVo.getLoggerFg(), "com.st1.itx.trade." + titaVo.getTxCode().substring(0, 2) + "." + titaVo.getTxCode());
 			trade.setTxBuffer(txBuffer);
 
 			if (ThreadVariable.isLogger())
 				logger.info(batchTransaction.length + "");
+
 			if (batchTransaction.length != 0)
 				trade.setBatchTransaction(batchTransaction[0]);
 

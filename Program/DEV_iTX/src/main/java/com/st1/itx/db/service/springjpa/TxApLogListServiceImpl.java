@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txApLogListService")
 @Repository
-public class TxApLogListServiceImpl implements TxApLogListService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxApLogListServiceImpl.class);
+public class TxApLogListServiceImpl extends ASpringJpaParm implements TxApLogListService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + txCode);
+		this.info("findById " + dbName + " " + txCode);
 		Optional<TxApLogList> txApLogList = null;
 		if (dbName.equals(ContentName.onDay))
 			txApLogList = txApLogListReposDay.findById(txCode);
@@ -94,7 +91,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "TxCode"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txApLogListReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -112,7 +109,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txCode);
+		this.info("Hold " + dbName + " " + txCode);
 		Optional<TxApLogList> txApLogList = null;
 		if (dbName.equals(ContentName.onDay))
 			txApLogList = txApLogListReposDay.findByTxCode(txCode);
@@ -130,7 +127,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txApLogList.getTxCode());
+		this.info("Hold " + dbName + " " + txApLogList.getTxCode());
 		Optional<TxApLogList> txApLogListT = null;
 		if (dbName.equals(ContentName.onDay))
 			txApLogListT = txApLogListReposDay.findByTxCode(txApLogList.getTxCode());
@@ -152,7 +149,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txApLogList.getTxCode());
+		this.info("Insert..." + dbName + " " + txApLogList.getTxCode());
 		if (this.findById(txApLogList.getTxCode()) != null)
 			throw new DBException(2);
 
@@ -178,7 +175,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txApLogList.getTxCode());
+		this.info("Update..." + dbName + " " + txApLogList.getTxCode());
 		if (!empNot.isEmpty())
 			txApLogList.setLastUpdateEmpNo(empNot);
 
@@ -201,7 +198,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txApLogList.getTxCode());
+		this.info("Update..." + dbName + " " + txApLogList.getTxCode());
 		if (!empNot.isEmpty())
 			txApLogList.setLastUpdateEmpNo(empNot);
 
@@ -221,7 +218,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txApLogList.getTxCode());
+		this.info("Delete..." + dbName + " " + txApLogList.getTxCode());
 		if (dbName.equals(ContentName.onDay)) {
 			txApLogListReposDay.delete(txApLogList);
 			txApLogListReposDay.flush();
@@ -248,7 +245,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxApLogList t : txApLogList)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -277,7 +274,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txApLogList == null || txApLogList.size() == 0)
 			throw new DBException(6);
 
@@ -302,7 +299,7 @@ public class TxApLogListServiceImpl implements TxApLogListService, InitializingB
 
 	@Override
 	public void deleteAll(List<TxApLogList> txApLogList, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

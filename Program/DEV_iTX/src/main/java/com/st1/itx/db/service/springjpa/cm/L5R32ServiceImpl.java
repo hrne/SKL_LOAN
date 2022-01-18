@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L5R32ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5R32ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -42,7 +39,7 @@ public class L5R32ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int acDate = Integer.valueOf(titaVo.get("RimAcDate")) + 19110000;
 
-		logger.info("L5R32.findAll AcDate=" + acDate);
+		this.info("L5R32.findAll AcDate=" + acDate);
 
 //		sql = " SELECT SUM(\"TdBal\")    AS F0                         ";
 		sql = " SELECT  \"TdBal\"        AS F0                         ";
@@ -53,7 +50,7 @@ public class L5R32ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND \"AcctCode\" in ('310','320','330','340','990') ";
 		sql += "   AND \"AcBookCode\" = '000'                          ";
 //		sql += "   GROUP BY \"AcDate\"                                 ";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

@@ -7,9 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -18,7 +15,6 @@ import javax.persistence.Query;
 
 @Service("l5911ServiceImpl")
 public class L5911ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5911ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -78,7 +74,7 @@ public class L5911ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "order by a.\"CustNo\" asc ";
 		sql += sqlRow;
 
-		logger.info("sql = " + sql);
+		this.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		query.setParameter("ThisIndex", index);
@@ -87,7 +83,7 @@ public class L5911ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 
 		query.setMaxResults(this.limit);
-		logger.info("L5911Service FindData=" + query.toString());
+		this.info("L5911Service FindData=" + query.toString());
 		return this.convertToMap(query.getResultList());
 	}
 }

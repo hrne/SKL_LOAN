@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txHolidayService")
 @Repository
-public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxHolidayServiceImpl.class);
+public class TxHolidayServiceImpl extends ASpringJpaParm implements TxHolidayService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + txHolidayId);
+		this.info("findById " + dbName + " " + txHolidayId);
 		Optional<TxHoliday> txHoliday = null;
 		if (dbName.equals(ContentName.onDay))
 			txHoliday = txHolidayReposDay.findById(txHolidayId);
@@ -97,7 +94,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Country", "Holiday"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txHolidayReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -122,7 +119,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findHoliday " + dbName + " : " + "country_0 : " + country_0 + " holiday_1 : " + holiday_1 + " holiday_2 : " + holiday_2);
+		this.info("findHoliday " + dbName + " : " + "country_0 : " + country_0 + " holiday_1 : " + holiday_1 + " holiday_2 : " + holiday_2);
 		if (dbName.equals(ContentName.onDay))
 			slice = txHolidayReposDay.findAllByCountryIsAndHolidayGreaterThanEqualAndHolidayLessThanEqualOrderByHolidayAsc(country_0, holiday_1, holiday_2, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -140,7 +137,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txHolidayId);
+		this.info("Hold " + dbName + " " + txHolidayId);
 		Optional<TxHoliday> txHoliday = null;
 		if (dbName.equals(ContentName.onDay))
 			txHoliday = txHolidayReposDay.findByTxHolidayId(txHolidayId);
@@ -158,7 +155,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txHoliday.getTxHolidayId());
+		this.info("Hold " + dbName + " " + txHoliday.getTxHolidayId());
 		Optional<TxHoliday> txHolidayT = null;
 		if (dbName.equals(ContentName.onDay))
 			txHolidayT = txHolidayReposDay.findByTxHolidayId(txHoliday.getTxHolidayId());
@@ -181,7 +178,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + txHoliday.getTxHolidayId());
+		this.info("Insert..." + dbName + " " + txHoliday.getTxHolidayId());
 		if (this.findById(txHoliday.getTxHolidayId()) != null)
 			throw new DBException(2);
 
@@ -210,7 +207,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txHoliday.getTxHolidayId());
+		this.info("Update..." + dbName + " " + txHoliday.getTxHolidayId());
 		if (!empNot.isEmpty())
 			txHoliday.setLastUpdateEmpNo(empNot);
 
@@ -233,7 +230,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txHoliday.getTxHolidayId());
+		this.info("Update..." + dbName + " " + txHoliday.getTxHolidayId());
 		if (!empNot.isEmpty())
 			txHoliday.setLastUpdateEmpNo(empNot);
 
@@ -253,7 +250,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txHoliday.getTxHolidayId());
+		this.info("Delete..." + dbName + " " + txHoliday.getTxHolidayId());
 		if (dbName.equals(ContentName.onDay)) {
 			txHolidayReposDay.delete(txHoliday);
 			txHolidayReposDay.flush();
@@ -281,7 +278,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxHoliday t : txHoliday) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -313,7 +310,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txHoliday == null || txHoliday.size() == 0)
 			throw new DBException(6);
 
@@ -338,7 +335,7 @@ public class TxHolidayServiceImpl implements TxHolidayService, InitializingBean 
 
 	@Override
 	public void deleteAll(List<TxHoliday> txHoliday, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

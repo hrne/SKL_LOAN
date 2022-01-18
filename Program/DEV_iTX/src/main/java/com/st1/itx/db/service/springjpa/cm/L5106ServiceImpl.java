@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L5106ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5106ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -119,7 +116,7 @@ public class L5106ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "                              AND CC.\"Code\"    = C.\"CustTypeCode\"\r\n" + "         WHERE M.\"Status\" = 0                                    --全戶催收則跳過\r\n"
 				+ "          AND  M.\"Land\"   = 1                                    -- 土地\r\n" + "       )";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);

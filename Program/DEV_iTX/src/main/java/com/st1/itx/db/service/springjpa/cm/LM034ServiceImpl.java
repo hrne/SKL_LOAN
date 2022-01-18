@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.util.date.DateUtil;
 @Repository
 /* 逾期放款明細 */
 public class LM034ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM034ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -49,8 +46,8 @@ public class LM034ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		String thisYearMonth = String.valueOf(entdy / 100);
 		String endDate = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000));
 		String startDate = String.valueOf(Integer.parseInt(endDate) / 100) + "01";
-		logger.info("lM034.findAll ");
-		logger.info("startDate = " + startDate + ", endDate = " + endDate);
+		this.info("lM034.findAll ");
+		this.info("startDate = " + startDate + ", endDate = " + endDate);
 
 		String sql = "SELECT A.\"ApplDate\"";
 		sql += "            ,A.\"ApproveDate\"";
@@ -133,7 +130,7 @@ public class LM034ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "                                   AND M.\"CustNo\"    = I.\"CustNo\"";
 //		sql += "                                   AND M.\"FacmNo\"    = I.\"FacmNo\"";
 //		sql += "      WHERE F.\"PieceCode\" NOT IN ('3', '5', '7', 'C', 'E')  ";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

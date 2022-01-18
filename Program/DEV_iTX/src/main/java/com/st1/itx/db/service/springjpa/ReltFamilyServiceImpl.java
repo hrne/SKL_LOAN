@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("reltFamilyService")
 @Repository
-public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(ReltFamilyServiceImpl.class);
+public class ReltFamilyServiceImpl extends ASpringJpaParm implements ReltFamilyService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + reltFamilyId);
+		this.info("findById " + dbName + " " + reltFamilyId);
 		Optional<ReltFamily> reltFamily = null;
 		if (dbName.equals(ContentName.onDay))
 			reltFamily = reltFamilyReposDay.findById(reltFamilyId);
@@ -95,7 +92,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ReltUKey", "ReltSeq"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = reltFamilyReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +114,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("ReltUKeyEq " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
+		this.info("ReltUKeyEq " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = reltFamilyReposDay.findAllByReltUKeyIsOrderByReltSeqAsc(reltUKey_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -135,7 +132,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("maxReltSeqFirst " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
+		this.info("maxReltSeqFirst " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
 		Optional<ReltFamily> reltFamilyT = null;
 		if (dbName.equals(ContentName.onDay))
 			reltFamilyT = reltFamilyReposDay.findTopByReltUKeyIsOrderByReltSeqDesc(reltUKey_0);
@@ -153,7 +150,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + reltFamilyId);
+		this.info("Hold " + dbName + " " + reltFamilyId);
 		Optional<ReltFamily> reltFamily = null;
 		if (dbName.equals(ContentName.onDay))
 			reltFamily = reltFamilyReposDay.findByReltFamilyId(reltFamilyId);
@@ -171,7 +168,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + reltFamily.getReltFamilyId());
+		this.info("Hold " + dbName + " " + reltFamily.getReltFamilyId());
 		Optional<ReltFamily> reltFamilyT = null;
 		if (dbName.equals(ContentName.onDay))
 			reltFamilyT = reltFamilyReposDay.findByReltFamilyId(reltFamily.getReltFamilyId());
@@ -193,7 +190,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + reltFamily.getReltFamilyId());
+		this.info("Insert..." + dbName + " " + reltFamily.getReltFamilyId());
 		if (this.findById(reltFamily.getReltFamilyId()) != null)
 			throw new DBException(2);
 
@@ -219,7 +216,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + reltFamily.getReltFamilyId());
+		this.info("Update..." + dbName + " " + reltFamily.getReltFamilyId());
 		if (!empNot.isEmpty())
 			reltFamily.setLastUpdateEmpNo(empNot);
 
@@ -242,7 +239,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + reltFamily.getReltFamilyId());
+		this.info("Update..." + dbName + " " + reltFamily.getReltFamilyId());
 		if (!empNot.isEmpty())
 			reltFamily.setLastUpdateEmpNo(empNot);
 
@@ -262,7 +259,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + reltFamily.getReltFamilyId());
+		this.info("Delete..." + dbName + " " + reltFamily.getReltFamilyId());
 		if (dbName.equals(ContentName.onDay)) {
 			reltFamilyReposDay.delete(reltFamily);
 			reltFamilyReposDay.flush();
@@ -289,7 +286,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (ReltFamily t : reltFamily)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -318,7 +315,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (reltFamily == null || reltFamily.size() == 0)
 			throw new DBException(6);
 
@@ -343,7 +340,7 @@ public class ReltFamilyServiceImpl implements ReltFamilyService, InitializingBea
 
 	@Override
 	public void deleteAll(List<ReltFamily> reltFamily, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

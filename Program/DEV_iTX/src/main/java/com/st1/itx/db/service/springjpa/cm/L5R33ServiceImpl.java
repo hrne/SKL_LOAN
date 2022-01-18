@@ -7,9 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -18,7 +15,6 @@ import javax.persistence.Query;
 
 @Service("l5R33ServiceImpl")
 public class L5R33ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5R33ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -42,10 +38,10 @@ public class L5R33ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " group by c.\"CustName\", i.\"ApplSeq\"      ";
 		sql += " order by c.\"CustName\", i.\"ApplSeq\" DESC ";
 
-		logger.info("sql = " + sql);
+		this.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
-		logger.info("LL5R33Service FindData=" + query.toString());
+		this.info("LL5R33Service FindData=" + query.toString());
 		return this.convertToMap(query.getResultList());
 	}
 }

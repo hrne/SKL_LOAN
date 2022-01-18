@@ -260,6 +260,18 @@ public class TitaVo extends LinkedHashMap<String, String> {
 		bodyNameList = null;
 	}
 
+	/**
+	 * clear BodyFld
+	 */
+	public void clearBodyFld() {
+		int i = 1;
+		while (true) {
+			if (Objects.isNull(this.remove("BodyFld" + i)))
+				break;
+			i++;
+		}
+	}
+
 	private boolean checkAnOther(String name) {
 		if ("rim".equals(name) || "TXCODE".equals(name) || "BRTLRNO".equals(name) || "RQSP".equals(name) || "SUPNO".equals(name) || "LEVEL".equals(name) || "PBRNO".equals(name))
 			return false;

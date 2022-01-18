@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("relsFamilyService")
 @Repository
-public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(RelsFamilyServiceImpl.class);
+public class RelsFamilyServiceImpl extends ASpringJpaParm implements RelsFamilyService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + relsFamilyId);
+		this.info("findById " + dbName + " " + relsFamilyId);
 		Optional<RelsFamily> relsFamily = null;
 		if (dbName.equals(ContentName.onDay))
 			relsFamily = relsFamilyReposDay.findById(relsFamilyId);
@@ -95,7 +92,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "RelsUKey", "RelsSeq"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsFamilyReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +114,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("RelsUKeyEq " + dbName + " : " + "relsUKey_0 : " + relsUKey_0);
+		this.info("RelsUKeyEq " + dbName + " : " + "relsUKey_0 : " + relsUKey_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsFamilyReposDay.findAllByRelsUKeyIsOrderByRelsSeqAsc(relsUKey_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -135,7 +132,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("maxRelsSeqFirst " + dbName + " : " + "relsUKey_0 : " + relsUKey_0);
+		this.info("maxRelsSeqFirst " + dbName + " : " + "relsUKey_0 : " + relsUKey_0);
 		Optional<RelsFamily> relsFamilyT = null;
 		if (dbName.equals(ContentName.onDay))
 			relsFamilyT = relsFamilyReposDay.findTopByRelsUKeyIsOrderByRelsSeqDesc(relsUKey_0);
@@ -157,7 +154,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findFamilyIdEq " + dbName + " : " + "familyId_0 : " + familyId_0);
+		this.info("findFamilyIdEq " + dbName + " : " + "familyId_0 : " + familyId_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsFamilyReposDay.findAllByFamilyIdIs(familyId_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -179,7 +176,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findFamilyNameEq " + dbName + " : " + "familyName_0 : " + familyName_0);
+		this.info("findFamilyNameEq " + dbName + " : " + "familyName_0 : " + familyName_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsFamilyReposDay.findAllByFamilyNameIs(familyName_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -197,7 +194,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + relsFamilyId);
+		this.info("Hold " + dbName + " " + relsFamilyId);
 		Optional<RelsFamily> relsFamily = null;
 		if (dbName.equals(ContentName.onDay))
 			relsFamily = relsFamilyReposDay.findByRelsFamilyId(relsFamilyId);
@@ -215,7 +212,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + relsFamily.getRelsFamilyId());
+		this.info("Hold " + dbName + " " + relsFamily.getRelsFamilyId());
 		Optional<RelsFamily> relsFamilyT = null;
 		if (dbName.equals(ContentName.onDay))
 			relsFamilyT = relsFamilyReposDay.findByRelsFamilyId(relsFamily.getRelsFamilyId());
@@ -237,7 +234,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + relsFamily.getRelsFamilyId());
+		this.info("Insert..." + dbName + " " + relsFamily.getRelsFamilyId());
 		if (this.findById(relsFamily.getRelsFamilyId()) != null)
 			throw new DBException(2);
 
@@ -263,7 +260,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + relsFamily.getRelsFamilyId());
+		this.info("Update..." + dbName + " " + relsFamily.getRelsFamilyId());
 		if (!empNot.isEmpty())
 			relsFamily.setLastUpdateEmpNo(empNot);
 
@@ -286,7 +283,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + relsFamily.getRelsFamilyId());
+		this.info("Update..." + dbName + " " + relsFamily.getRelsFamilyId());
 		if (!empNot.isEmpty())
 			relsFamily.setLastUpdateEmpNo(empNot);
 
@@ -306,7 +303,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + relsFamily.getRelsFamilyId());
+		this.info("Delete..." + dbName + " " + relsFamily.getRelsFamilyId());
 		if (dbName.equals(ContentName.onDay)) {
 			relsFamilyReposDay.delete(relsFamily);
 			relsFamilyReposDay.flush();
@@ -333,7 +330,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (RelsFamily t : relsFamily)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -362,7 +359,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (relsFamily == null || relsFamily.size() == 0)
 			throw new DBException(6);
 
@@ -387,7 +384,7 @@ public class RelsFamilyServiceImpl implements RelsFamilyService, InitializingBea
 
 	@Override
 	public void deleteAll(List<RelsFamily> relsFamily, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

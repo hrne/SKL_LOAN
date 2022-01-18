@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("relsMainService")
 @Repository
-public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(RelsMainServiceImpl.class);
+public class RelsMainServiceImpl extends ASpringJpaParm implements RelsMainService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + relsUKey);
+		this.info("findById " + dbName + " " + relsUKey);
 		Optional<RelsMain> relsMain = null;
 		if (dbName.equals(ContentName.onDay))
 			relsMain = relsMainReposDay.findById(relsUKey);
@@ -94,7 +91,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "RelsUKey"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsMainReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -112,7 +109,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("RelsIdFirst " + dbName + " : " + "relsId_0 : " + relsId_0);
+		this.info("RelsIdFirst " + dbName + " : " + "relsId_0 : " + relsId_0);
 		Optional<RelsMain> relsMainT = null;
 		if (dbName.equals(ContentName.onDay))
 			relsMainT = relsMainReposDay.findTopByRelsIdIs(relsId_0);
@@ -134,7 +131,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("RelsPerson " + dbName + " : " + "relsType_0 : " + relsType_0);
+		this.info("RelsPerson " + dbName + " : " + "relsType_0 : " + relsType_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsMainReposDay.findAllByRelsTypeIs(relsType_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -152,7 +149,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("RelsNameFirst " + dbName + " : " + "relsName_0 : " + relsName_0);
+		this.info("RelsNameFirst " + dbName + " : " + "relsName_0 : " + relsName_0);
 		Optional<RelsMain> relsMainT = null;
 		if (dbName.equals(ContentName.onDay))
 			relsMainT = relsMainReposDay.findTopByRelsNameIs(relsName_0);
@@ -174,7 +171,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("RelsNameEq " + dbName + " : " + "relsName_0 : " + relsName_0);
+		this.info("RelsNameEq " + dbName + " : " + "relsName_0 : " + relsName_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsMainReposDay.findAllByRelsNameIs(relsName_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -196,7 +193,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("RelsIdEq " + dbName + " : " + "relsId_0 : " + relsId_0);
+		this.info("RelsIdEq " + dbName + " : " + "relsId_0 : " + relsId_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = relsMainReposDay.findAllByRelsIdIs(relsId_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -214,7 +211,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + relsUKey);
+		this.info("Hold " + dbName + " " + relsUKey);
 		Optional<RelsMain> relsMain = null;
 		if (dbName.equals(ContentName.onDay))
 			relsMain = relsMainReposDay.findByRelsUKey(relsUKey);
@@ -232,7 +229,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + relsMain.getRelsUKey());
+		this.info("Hold " + dbName + " " + relsMain.getRelsUKey());
 		Optional<RelsMain> relsMainT = null;
 		if (dbName.equals(ContentName.onDay))
 			relsMainT = relsMainReposDay.findByRelsUKey(relsMain.getRelsUKey());
@@ -254,7 +251,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + relsMain.getRelsUKey());
+		this.info("Insert..." + dbName + " " + relsMain.getRelsUKey());
 		if (this.findById(relsMain.getRelsUKey()) != null)
 			throw new DBException(2);
 
@@ -280,7 +277,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + relsMain.getRelsUKey());
+		this.info("Update..." + dbName + " " + relsMain.getRelsUKey());
 		if (!empNot.isEmpty())
 			relsMain.setLastUpdateEmpNo(empNot);
 
@@ -303,7 +300,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + relsMain.getRelsUKey());
+		this.info("Update..." + dbName + " " + relsMain.getRelsUKey());
 		if (!empNot.isEmpty())
 			relsMain.setLastUpdateEmpNo(empNot);
 
@@ -323,7 +320,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + relsMain.getRelsUKey());
+		this.info("Delete..." + dbName + " " + relsMain.getRelsUKey());
 		if (dbName.equals(ContentName.onDay)) {
 			relsMainReposDay.delete(relsMain);
 			relsMainReposDay.flush();
@@ -350,7 +347,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (RelsMain t : relsMain)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -379,7 +376,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (relsMain == null || relsMain.size() == 0)
 			throw new DBException(6);
 
@@ -404,7 +401,7 @@ public class RelsMainServiceImpl implements RelsMainService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<RelsMain> relsMain, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

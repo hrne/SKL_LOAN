@@ -47,7 +47,6 @@ public class ASpringJpaParm extends SysLogger {
 			return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Map<String, String>> convertToMap(Query query) {
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("loanBorHistoryService")
 @Repository
-public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LoanBorHistoryServiceImpl.class);
+public class LoanBorHistoryServiceImpl extends ASpringJpaParm implements LoanBorHistoryService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + loanBorHistoryId);
+		this.info("findById " + dbName + " " + loanBorHistoryId);
 		Optional<LoanBorHistory> loanBorHistory = null;
 		if (dbName.equals(ContentName.onDay))
 			loanBorHistory = loanBorHistoryReposDay.findById(loanBorHistoryId);
@@ -95,7 +92,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo", "BormNo"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +114,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("bormCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " + facmNo_1 + " facmNo_2 : " + facmNo_2 + " bormNo_3 : " + bormNo_3 + " bormNo_4 : " + bormNo_4);
+		this.info("bormCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " + facmNo_1 + " facmNo_2 : " + facmNo_2 + " bormNo_3 : " + bormNo_3 + " bormNo_4 : " + bormNo_4);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByFacmNoAscBormNoAsc(custNo_0, facmNo_1,
 					facmNo_2, bormNo_3, bormNo_4, pageable);
@@ -143,7 +140,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("bormFacmNoIn " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " + facmNo_1 + " bormNo_2 : " + bormNo_2 + " bormNo_3 : " + bormNo_3);
+		this.info("bormFacmNoIn " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " + facmNo_1 + " bormNo_2 : " + bormNo_2 + " bormNo_3 : " + bormNo_3);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay.findAllByCustNoIsAndFacmNoInAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByFacmNoAscBormNoAsc(custNo_0, facmNo_1, bormNo_2, bormNo_3, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -165,7 +162,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("bormDrawdownDateRange " + dbName + " : " + "drawdownDate_0 : " + drawdownDate_0 + " drawdownDate_1 : " + drawdownDate_1 + " bormNo_2 : " + bormNo_2 + " bormNo_3 : " + bormNo_3
+		this.info("bormDrawdownDateRange " + dbName + " : " + "drawdownDate_0 : " + drawdownDate_0 + " drawdownDate_1 : " + drawdownDate_1 + " bormNo_2 : " + bormNo_2 + " bormNo_3 : " + bormNo_3
 				+ " status_4 : " + status_4);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay
@@ -196,7 +193,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("nextPayIntDateRange " + dbName + " : " + "nextPayIntDate_0 : " + nextPayIntDate_0 + " nextPayIntDate_1 : " + nextPayIntDate_1 + " status_2 : " + status_2);
+		this.info("nextPayIntDateRange " + dbName + " : " + "nextPayIntDate_0 : " + nextPayIntDate_0 + " nextPayIntDate_1 : " + nextPayIntDate_1 + " status_2 : " + status_2);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay.findAllByNextPayIntDateGreaterThanEqualAndNextPayIntDateLessThanEqualAndStatusIsOrderByCustNoAscFacmNoAscBormNoAscNextPayIntDateAsc(nextPayIntDate_0,
 					nextPayIntDate_1, status_2, pageable);
@@ -222,7 +219,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findStatusRange " + dbName + " : " + "status_0 : " + status_0 + " drawdownDate_1 : " + drawdownDate_1 + " drawdownDate_2 : " + drawdownDate_2);
+		this.info("findStatusRange " + dbName + " : " + "status_0 : " + status_0 + " drawdownDate_1 : " + drawdownDate_1 + " drawdownDate_2 : " + drawdownDate_2);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay.findAllByStatusInAndDrawdownDateGreaterThanEqualAndDrawdownDateLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(status_0, drawdownDate_1, drawdownDate_2,
 					pageable);
@@ -248,7 +245,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("AmortizedCodeEq " + dbName + " : " + "amortizedCode_0 : " + amortizedCode_0 + " status_1 : " + status_1 + " nextPayIntDate_2 : " + nextPayIntDate_2 + " nextPayIntDate_3 : "
+		this.info("AmortizedCodeEq " + dbName + " : " + "amortizedCode_0 : " + amortizedCode_0 + " status_1 : " + status_1 + " nextPayIntDate_2 : " + nextPayIntDate_2 + " nextPayIntDate_3 : "
 				+ nextPayIntDate_3 + " bormNo_4 : " + bormNo_4 + " bormNo_5 : " + bormNo_5);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay
@@ -279,7 +276,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findStatusEq " + dbName + " : " + "status_0 : " + status_0 + " custNo_1 : " + custNo_1 + " facmNo_2 : " + facmNo_2 + " facmNo_3 : " + facmNo_3);
+		this.info("findStatusEq " + dbName + " : " + "status_0 : " + status_0 + " custNo_1 : " + custNo_1 + " facmNo_2 : " + facmNo_2 + " facmNo_3 : " + facmNo_3);
 		if (dbName.equals(ContentName.onDay))
 			slice = loanBorHistoryReposDay.findAllByStatusInAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByFacmNoAscBormNoAsc(status_0, custNo_1, facmNo_2, facmNo_3, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -297,7 +294,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + loanBorHistoryId);
+		this.info("Hold " + dbName + " " + loanBorHistoryId);
 		Optional<LoanBorHistory> loanBorHistory = null;
 		if (dbName.equals(ContentName.onDay))
 			loanBorHistory = loanBorHistoryReposDay.findByLoanBorHistoryId(loanBorHistoryId);
@@ -315,7 +312,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + loanBorHistory.getLoanBorHistoryId());
+		this.info("Hold " + dbName + " " + loanBorHistory.getLoanBorHistoryId());
 		Optional<LoanBorHistory> loanBorHistoryT = null;
 		if (dbName.equals(ContentName.onDay))
 			loanBorHistoryT = loanBorHistoryReposDay.findByLoanBorHistoryId(loanBorHistory.getLoanBorHistoryId());
@@ -337,7 +334,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
+		this.info("Insert..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
 		if (this.findById(loanBorHistory.getLoanBorHistoryId()) != null)
 			throw new DBException(2);
 
@@ -363,7 +360,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
+		this.info("Update..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
 		if (!empNot.isEmpty())
 			loanBorHistory.setLastUpdateEmpNo(empNot);
 
@@ -386,7 +383,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
+		this.info("Update..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
 		if (!empNot.isEmpty())
 			loanBorHistory.setLastUpdateEmpNo(empNot);
 
@@ -406,7 +403,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
+		this.info("Delete..." + dbName + " " + loanBorHistory.getLoanBorHistoryId());
 		if (dbName.equals(ContentName.onDay)) {
 			loanBorHistoryReposDay.delete(loanBorHistory);
 			loanBorHistoryReposDay.flush();
@@ -433,7 +430,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (LoanBorHistory t : loanBorHistory)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -462,7 +459,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (loanBorHistory == null || loanBorHistory.size() == 0)
 			throw new DBException(6);
 
@@ -487,7 +484,7 @@ public class LoanBorHistoryServiceImpl implements LoanBorHistoryService, Initial
 
 	@Override
 	public void deleteAll(List<LoanBorHistory> loanBorHistory, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

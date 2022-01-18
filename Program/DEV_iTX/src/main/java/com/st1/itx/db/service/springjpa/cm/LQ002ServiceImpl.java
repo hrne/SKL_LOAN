@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LQ002ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LQ002ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -34,11 +31,11 @@ public class LQ002ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yy, int mm) throws Exception {
-		logger.info("lQ002.findAll ");
-//		logger.info("impl002." + Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
+		this.info("lQ002.findAll ");
+//		this.info("impl002." + Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
 //		1090420+19110000=20200420
 		String iENTDY = String.valueOf((Integer.valueOf(titaVo.get("ENTDY")) + 19110000));
-		logger.info("" + iENTDY);
+		this.info("" + iENTDY);
 		int sMM = 0;
 		int eMM = 0;
 
@@ -55,7 +52,7 @@ public class LQ002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sMM = yy * 100 + 10;
 			eMM = yy * 100 + 12;
 		}
-		logger.info("sMM" + sMM + "~" + "eMM" + eMM);
+		this.info("sMM" + sMM + "~" + "eMM" + eMM);
 //		2021/04/19 Ted 	
 		String sql = "SELECT CM.\"ClCode1\" AS F0";
 		sql += "			,CM.\"ClCode2\" AS F1";
@@ -99,7 +96,7 @@ public class LQ002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  ORDER BY CC.\"CityCode\"";
 		sql += "	          ,MLB.\"CustNo\"";
 		sql += "	          ,MLB.\"FacmNo\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 //		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
@@ -113,10 +110,10 @@ public class LQ002ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findTotal(TitaVo titaVo, int yy, int mm) throws Exception {
-		logger.info("lQ002.findTotal ");
+		this.info("lQ002.findTotal ");
 
 		String iENTDY = String.valueOf((Integer.valueOf(titaVo.get("ENTDY")) + 19110000));
-		logger.info("" + iENTDY);
+		this.info("" + iENTDY);
 
 		int sMM = 0;
 		int eMM = 0;
@@ -134,7 +131,7 @@ public class LQ002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sMM = yy * 100 + 10;
 			eMM = yy * 100 + 12;
 		}
-		logger.info("sMM" + sMM + "~" + "eMM" + eMM);
+		this.info("sMM" + sMM + "~" + "eMM" + eMM);
 //		2021/04/19 Ted 	
 		String sql = " ";
 		sql += "	SELECT CC.\"CityItem\"";
@@ -184,7 +181,7 @@ public class LQ002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,RES.\"F3\"";
 		sql += "      ORDER BY RES.\"F3\" ASC";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 

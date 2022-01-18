@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("reltCompanyService")
 @Repository
-public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(ReltCompanyServiceImpl.class);
+public class ReltCompanyServiceImpl extends ASpringJpaParm implements ReltCompanyService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + reltCompanyId);
+		this.info("findById " + dbName + " " + reltCompanyId);
 		Optional<ReltCompany> reltCompany = null;
 		if (dbName.equals(ContentName.onDay))
 			reltCompany = reltCompanyReposDay.findById(reltCompanyId);
@@ -95,7 +92,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ReltUKey", "CompanyId"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = reltCompanyReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +114,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("ReltUKeyEq " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
+		this.info("ReltUKeyEq " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = reltCompanyReposDay.findAllByReltUKeyIs(reltUKey_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -135,7 +132,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + reltCompanyId);
+		this.info("Hold " + dbName + " " + reltCompanyId);
 		Optional<ReltCompany> reltCompany = null;
 		if (dbName.equals(ContentName.onDay))
 			reltCompany = reltCompanyReposDay.findByReltCompanyId(reltCompanyId);
@@ -153,7 +150,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + reltCompany.getReltCompanyId());
+		this.info("Hold " + dbName + " " + reltCompany.getReltCompanyId());
 		Optional<ReltCompany> reltCompanyT = null;
 		if (dbName.equals(ContentName.onDay))
 			reltCompanyT = reltCompanyReposDay.findByReltCompanyId(reltCompany.getReltCompanyId());
@@ -175,7 +172,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + reltCompany.getReltCompanyId());
+		this.info("Insert..." + dbName + " " + reltCompany.getReltCompanyId());
 		if (this.findById(reltCompany.getReltCompanyId()) != null)
 			throw new DBException(2);
 
@@ -201,7 +198,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + reltCompany.getReltCompanyId());
+		this.info("Update..." + dbName + " " + reltCompany.getReltCompanyId());
 		if (!empNot.isEmpty())
 			reltCompany.setLastUpdateEmpNo(empNot);
 
@@ -224,7 +221,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + reltCompany.getReltCompanyId());
+		this.info("Update..." + dbName + " " + reltCompany.getReltCompanyId());
 		if (!empNot.isEmpty())
 			reltCompany.setLastUpdateEmpNo(empNot);
 
@@ -244,7 +241,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + reltCompany.getReltCompanyId());
+		this.info("Delete..." + dbName + " " + reltCompany.getReltCompanyId());
 		if (dbName.equals(ContentName.onDay)) {
 			reltCompanyReposDay.delete(reltCompany);
 			reltCompanyReposDay.flush();
@@ -271,7 +268,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (ReltCompany t : reltCompany)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -300,7 +297,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (reltCompany == null || reltCompany.size() == 0)
 			throw new DBException(6);
 
@@ -325,7 +322,7 @@ public class ReltCompanyServiceImpl implements ReltCompanyService, InitializingB
 
 	@Override
 	public void deleteAll(List<ReltCompany> reltCompany, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

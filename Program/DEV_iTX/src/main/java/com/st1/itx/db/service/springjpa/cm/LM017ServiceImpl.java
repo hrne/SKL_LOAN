@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM017ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM017ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,7 +30,7 @@ public class LM017ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lM017.findAll ");
+		this.info("lM017.findAll ");
 		String sql = "SELECT \"F1\"";
 		sql += "            , SUM(F2)";
 		sql += "            , SUM(F3)";
@@ -52,7 +49,7 @@ public class LM017ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHERE  M.\"Status\"= 0 AND F.\"ProdNo\" IN ('ER','ES'))";
 		sql += "        GROUP BY \"F1\"";
 		sql += "        ORDER BY \"F1\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

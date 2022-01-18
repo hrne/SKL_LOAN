@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LD003ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LD003ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,7 +30,7 @@ public class LD003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("LD003.findAll ");
+		this.info("LD003.findAll ");
 		int entdy = titaVo.getEntDyI() + 19110000;
 
 //		目前AcSubBookCode只有分一般帳戶(00A)和利變A(201)?
@@ -98,7 +95,7 @@ public class LD003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " GROUP BY S.\"ColCount\"";
 		sql += " ORDER BY S.\"ColCount\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 

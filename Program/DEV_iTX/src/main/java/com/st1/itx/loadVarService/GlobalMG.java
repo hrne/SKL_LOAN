@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -28,6 +30,8 @@ import com.st1.itx.util.date.DateUtil;
 @Service("globalMG")
 @Scope("prototype")
 public class GlobalMG {
+	private static final Logger logger = LoggerFactory.getLogger(GlobalMG.class);
+
 	@Autowired
 	TxBizDateService txBizDateService;
 
@@ -42,6 +46,7 @@ public class GlobalMG {
 
 	@PostConstruct
 	public void init() throws IOException, LogicException {
+		logger.info("GlobalMG init()...");
 		this.findAndSetMGBuffer();
 	}
 

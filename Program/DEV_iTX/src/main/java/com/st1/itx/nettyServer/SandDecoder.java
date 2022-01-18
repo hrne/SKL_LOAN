@@ -13,16 +13,17 @@ import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.main.ApControl;
 import com.st1.itx.util.MySpring;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.util.CharsetUtil;
 
 public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 	private static final Logger logger = LoggerFactory.getLogger(SandDecoder.class);
 
-	private final Charset charset;
 	private int length = 0;
 	private int recLen = 0;
-	private String buffer = "";
+	private int rSeq = 0;
 	private boolean lenFlag = false;
 	private ByteArrayOutputStream baos = null;
 
@@ -37,50 +38,50 @@ public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 		if (charset == null) {
 			throw new NullPointerException("charset");
 		}
-		this.charset = charset;
 		baos = new ByteArrayOutputStream();
 	}
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-		// TODO Auto-generated method stub
+
 		if (!msg.isReadable()) {
 			logger.info("UnReadable...");
 			return;
 		}
 
-		logger.info("len = " + msg.readableBytes());
+		logger.info("readableBytesLen = " + msg.readableBytes());
 		logger.info("from : " + ctx.channel().remoteAddress().toString());
 
 		if (!lenFlag) {
-			String bufLen = msg.toString(0, 5, charset);
-			length = Integer.valueOf(bufLen) + 5;
+			this.rSeq = msg.readInt();
+			this.length = msg.readInt();
 			lenFlag = true;
+			logger.info("rSeq : [" + this.rSeq + "]");
+			logger.info("rLen : [" + this.length + "]");
 		}
 
 		recLen += msg.readableBytes();
-		buffer += msg.toString(charset);
-
 		byte[] req = new byte[msg.readableBytes()];
 		msg.readBytes(req);
 		baos.write(req);
 
+		logger.info("recLen : [" + recLen + "]");
+		logger.info("length : [" + length + "]");
 		if (recLen < length) {
 			return;
 		}
 
-		out.add(buffer);
-//		logger.info("msg : " + buffer);
-		this.tita = buffer.substring(5);
-		this.tita = new String(baos.toByteArray(), "UTF-8").substring(5);
-
+		this.tita = new String(baos.toByteArray(), CharsetUtil.UTF_8);
+		out.add(baos.toByteArray());
 		// init redo
-		buffer = "";
+
 		recLen = 0;
 		lenFlag = false;
 		length = 0;
+		baos.close();
 		baos = null;
 		this.ReadComplete(ctx);
+//		msg.release();
 	}
 
 	public void ReadComplete(ChannelHandlerContext ctx) throws java.lang.Exception {
@@ -97,8 +98,14 @@ public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 			logger.error(errors.toString());
 		}
 
-//		logger.info("server send message :" + this.tota);
-		ctx.channel().writeAndFlush(this.tota);
+		UnpooledByteBufAllocator allocator = new UnpooledByteBufAllocator(false, false, false);
+		ByteBuf bytesAll = allocator.buffer(this.tota.getBytes(CharsetUtil.UTF_8).length + 8);
+		bytesAll.writeInt(this.rSeq);
+		bytesAll.writeInt(this.tota.getBytes(CharsetUtil.UTF_8).length);
+		bytesAll.writeBytes(this.tota.getBytes(CharsetUtil.UTF_8));
+
+		ctx.channel().writeAndFlush(bytesAll);
+		ctx.channel().close();
 		ctx.close();
 		ThreadVariable.clearThreadLocal();
 	}
