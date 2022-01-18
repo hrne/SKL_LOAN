@@ -24,7 +24,7 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -47,41 +47,58 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "";
 		sql += " WITH TotalData AS ( ";
-		sql += "       SELECT DECODE(NVL(MLB.\"AcctCode\", ' '), '990', 'OV', 'LN') AS \"Type\" ";
-		sql += "             ,IIM.\"YearMonth\" AS \"YearMonth\" ";
-		sql += "             ,ROUND(SUM(IIM.\"AccumDPAmortized\")) AS \"Amt\" ";
-		sql += "       FROM \"Ias39IntMethod\" IIM ";
-		sql += "       LEFT JOIN \"MonthlyLoanBal\" MLB ON IIM.\"YearMonth\" = MLB.\"YearMonth\" ";
-		sql += "                                       AND IIM.\"CustNo\"    = MLB.\"CustNo\" ";
-		sql += "                                       AND IIM.\"FacmNo\"    = MLB.\"FacmNo\" ";
-		sql += "                                       AND IIM.\"BormNo\"    = MLB.\"BormNo\" ";
-		sql += "       WHERE IIM.\"YearMonth\" IN (:lastYearMonth, :thisYearMonth) ";
-		sql += "         AND NVL(MLB.\"CurrencyCode\", ' ') = 'TWD' ";
-		sql += "       GROUP BY DECODE(NVL(MLB.\"AcctCode\", ' '), '990', 'OV', 'LN') ";
-		sql += "               ,IIM.\"YearMonth\" ";
+		sql += " SELECT DECODE(NVL(MLB.\"AcctCode\", ' '), '990', 'OV', 'LN') AS \"Type\" ";
+		sql += "       ,IIM.\"YearMonth\" AS \"YearMonth\" ";
+		sql += "       ,ROUND(SUM(IIM.\"AccumDPAmortized\")) AS \"Amt\" ";
+		sql += " FROM \"Ias39IntMethod\" IIM ";
+		sql += " LEFT JOIN \"MonthlyLoanBal\" MLB ON IIM.\"YearMonth\" = MLB.\"YearMonth\" ";
+		sql += "                                 AND IIM.\"CustNo\"    = MLB.\"CustNo\" ";
+		sql += "                                 AND IIM.\"FacmNo\"    = MLB.\"FacmNo\" ";
+		sql += "                                 AND IIM.\"BormNo\"    = MLB.\"BormNo\" ";
+		sql += " WHERE IIM.\"YearMonth\" IN (:lastYearMonth, :thisYearMonth) ";
+		sql += "   AND NVL(MLB.\"CurrencyCode\", ' ') = 'TWD' ";
+		sql += " GROUP BY DECODE(NVL(MLB.\"AcctCode\", ' '), '990', 'OV', 'LN') ";
+		sql += "         ,IIM.\"YearMonth\" ";
 		sql += " ), ";
 		sql += " ThisMonthData AS ( ";
-		sql += "       SELECT this.\"YearMonth\" ";
-		sql += "             ,this.\"Type\" ";
-		sql += "             ,this.\"Amt\" - NVL(last.\"Amt\",0) AS \"AmtMonthly\" ";
-		sql += "       FROM TotalData this "; // "YearMonth" = :thisYearMonth in WHERE section
-		sql += "       LEFT JOIN TotalData last ON last.\"YearMonth\" = :lastYearMonth ";
-		sql += "                               AND last.\"Type\"      = this.\"Type\" ";
-		sql += "       WHERE this.\"YearMonth\" = :thisYearMonth ";
+		sql += " SELECT \"YearMonth\" ";
+		sql += "       ,\"Type\" ";
+		sql += "       ,SUM(\"AmtMonthly\") \"AmtMonthly\" ";
+		sql += " FROM ( ";
+		sql += " SELECT this.\"YearMonth\" ";
+		sql += "       ,this.\"Type\" ";
+		sql += "       ,this.\"Amt\" - NVL(last.\"Amt\", 0) AS \"AmtMonthly\" ";
+		sql += " FROM TotalData this "; // "YearMonth" = :thisYearMonth in WHERE section
+		sql += " LEFT JOIN TotalData last ON last.\"YearMonth\" = :lastYearMonth ";
+		sql += "                         AND last.\"Type\"      = this.\"Type\" ";
+		sql += " WHERE this.\"YearMonth\" = :thisYearMonth ";
+		sql += " UNION ALL "; // UNION ALLs for making sure these always output 
+		sql += " SELECT TO_NUMBER(:thisYearMonth) ";
+		sql += "       ,'OV' ";
+		sql += "       ,0 ";
+		sql += " FROM DUAL ";
+		sql += " UNION ALL ";
+		sql += " SELECT TO_NUMBER(:thisYearMonth) ";
+		sql += "       ,'LN' ";
+		sql += "       ,0 ";
+		sql += " FROM DUAL ";
+		sql += " ) ";
+		sql += " GROUP BY \"YearMonth\" ";
+		sql += "         ,\"Type\" ";
 		sql += " ) ";
 		sql += " SELECT GREATEST(0, LoanThis.\"AmtMonthly\") AS \"LnAmt-Bor\" "; // only when > 0
 		sql += "       ,-LEAST(0, LoanThis.\"AmtMonthly\") AS \"LnAmt-Loan\" "; // only when < 0, ABS
 		sql += "       ,LoanCode.\"AcNoCode\" AS \"LnAmt-AcNoCode\" ";
 		sql += "       ,LoanCode.\"AcNoItem\" AS \"LnAmt-AcNoItem\" ";
-		sql += "       ,GREATEST(0, OvduThis.\"AmtMonthly\") AS \"OvAmt-Bor\" "; // only when > 0
-		sql += "       ,-LEAST(0, OvduThis.\"AmtMonthly\") AS \"OvAmt-Loan\" "; // only when < 0, ABS
+		sql += "       ,GREATEST(0, OvduThis.\"AmtMonthly\", 0) AS \"OvAmt-Bor\" "; // only when > 0
+		sql += "       ,-LEAST(0, OvduThis.\"AmtMonthly\", 0) AS \"OvAmt-Loan\" "; // only when < 0, ABS
 		sql += "       ,OvduCode.\"AcNoCode\" AS \"OvAmt-AcNoCode\" ";
 		sql += "       ,OvduCode.\"AcNoItem\" AS \"OvAmt-AcNoItem\" ";
-		sql += "       ,-LEAST(0, LoanThis.\"AmtMonthly\" + OvduThis.\"AmtMonthly\") AS \"IntAmt-Bor\" "; // only when < 0, ABS
-		sql += "       ,GREATEST(0, LoanThis.\"AmtMonthly\" + OvduThis.\"AmtMonthly\") AS \"IntAmt-Loan\" "; // only when > 0
+		sql += "       ,-LEAST(0, LoanThis.\"AmtMonthly\" + OvduThis.\"AmtMonthly\", 0) AS \"IntAmt-Bor\" "; // only when < 0, ABS
+		sql += "       ,GREATEST(0, LoanThis.\"AmtMonthly\" + OvduThis.\"AmtMonthly\", 0) AS \"IntAmt-Loan\" "; // only when > 0
 		sql += "       ,IntCode.\"AcNoCode\" AS \"IntAmt-AcNoCode\" ";
 		sql += "       ,IntCode.\"AcNoItem\" AS \"IntAmt-AcNoItem\" ";
-		sql += "       ,OvduTotal.\"Amt\" AS \"OvduAccum\" ";
+		sql += "       ,NVL(OvduTotal.\"Amt\", 0) AS \"OvduAccum\" "; // 'OV' is joined so it's not always present
 		sql += "       ,LoanTotal.\"Amt\" AS \"LoanAccum\" ";
 		sql += "       ,SUBSTR(:thisYearMonth, 1, 4) ";
 		sql += "        || '年' ";
@@ -95,8 +112,9 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND OvduTotal.\"YearMonth\" = OvduThis.\"YearMonth\" ";
 		sql += " LEFT JOIN \"CdAcCode\" LoanCode ON LoanCode.\"AcctCode\" = 'AIL' ";
 		sql += " LEFT JOIN \"CdAcCode\" OvduCode ON OvduCode.\"AcctCode\" = 'AIO' ";
-		sql += " LEFT JOIN \"CdAcCode\" IntCode ON IntCode.\"AcctCode\" = 'AII' ";
+		sql += " LEFT JOIN \"CdAcCode\" IntCode ON IntCode.\"AcctCode\"   = 'AII' ";
 		sql += " WHERE LoanThis.\"Type\" = 'LN' ";
+
 
 		this.info("sql=" + sql);
 

@@ -456,7 +456,9 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"ProdNo\"                                                     "; // -- F2 商品代碼
 		sql += "      , N.\"ProjectKind\"                                                "; // -- F3 專案融資種類
 		sql += "      , N.\"SubsidyRate\"                                                "; // -- F4 補貼利率
-		sql += "      , N.\"AcBookCode\" + '/' + N.\"AcSubBookCode\"              AS \"F5\" "; // -- F5 帳冊別
+		sql += "      , CASE WHEN NVL(N.\"AcBookCode\", '')  = N.\"AcBookCode\" AND NVL(N.\"AcSubBookCode\", '')  = N.\"AcSubBookCode\" "
+				+ "THEN N.\"AcBookCode\" || '/' || N.\"AcSubBookCode\" ELSE '' END AS \"F5\" "    ;                              
+//		sql += "      , N.\"AcBookCode\" || '/' || N.\"AcSubBookCode\"              AS \"F5\" "; // -- F5 帳冊別
 		sql += "      , N.\"LastMonthBal\"                                               "; // -- F6 A.上月貸款餘額
 		sql += "      , N.\"OpenAmount\"                                                 "; // -- F7 B.本月貸出數
 		sql += "      , N.\"CloseAmount\"                                                "; // -- F8 C1.本月收回數 --還款+結清+轉催收

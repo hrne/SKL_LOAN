@@ -29,7 +29,6 @@ import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
 
-import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.service.CustTelNoService;
 
 import com.st1.itx.db.domain.CdBcm;
@@ -102,13 +101,20 @@ public class L8102 extends TradeBuffer {
 
 	CustMain custMain = null;
 
+	String messagePhone = "";
+
+	int dataDt7 = 0;
+	int dataDt8 = 0;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8102 ");
 		this.totaVo.init(titaVo);
 
-		int dataDt7 = parse.stringToInteger(titaVo.get("DataDt"));
-		int dataDt = dataDt7 + 19110000;
+		int dataSource = parse.stringToInteger(titaVo.get("DataSource"));
+
+		dataDt7 = parse.stringToInteger(titaVo.get("DataDt"));
+		dataDt8 = dataDt7 + 19110000;
 
 		// delete TxAmlCredit
 
@@ -118,42 +124,38 @@ public class L8102 extends TradeBuffer {
 
 		Slice<TxAmlCredit> slTxAmlCredit = null;
 
-		slTxAmlCredit = txAmlCreditService.dataDtAll(dataDt, this.index, this.limit, titaVo);
+		slTxAmlCredit = txAmlCreditService.dataDtAll(dataDt8, this.index, Integer.MAX_VALUE, titaVo);
 
 		List<TxAmlCredit> lTxAmlCredit = slTxAmlCredit == null ? null : slTxAmlCredit.getContent();
 
 //		this.info("L8102 lTxAmlCredit count = " + lTxAmlCredit.size());
 
-		if (lTxAmlCredit != null) {
-			for (TxAmlCredit txAmlCredit : lTxAmlCredit) {
-				try {
-					txAmlCreditService.delete(txAmlCredit, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", "TxAmlCredit=" + e.getErrorMsg());
-				}
-
-			}
-		}
-
 		// delete TxAmlNotice
 		Slice<TxAmlNotice> slTxAmlNotice = null;
 
-		slTxAmlNotice = txAmlNoticeService.dataDtAll(dataDt, this.index, this.limit, titaVo);
+		slTxAmlNotice = txAmlNoticeService.dataDtAll(dataDt8, this.index, this.limit, titaVo);
 
 		List<TxAmlNotice> lTxAmlNotice = slTxAmlNotice == null ? null : slTxAmlNotice.getContent();
 
 //		this.info("L8102 lTxAmlNotice count = " + lTxAmlNotice.size());
 
-		if (lTxAmlNotice != null) {
-			for (TxAmlNotice txAmlNotice : lTxAmlNotice) {
+		// 人工輸入測試資料,會刪除定審及通知資料
+		if (dataSource == 2) {
+			if (lTxAmlCredit != null) {
 				try {
-					txAmlNoticeService.delete(txAmlNotice, titaVo);
+					txAmlCreditService.deleteAll(lTxAmlCredit, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", "TxAmlCredit=" + e.getErrorMsg());
+				}
+			}
+
+			if (lTxAmlNotice != null) {
+				try {
+					txAmlNoticeService.deleteAll(lTxAmlNotice, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", "TxAmlNotice=" + e.getErrorMsg());
 				}
-
 			}
-
 		}
 
 		// must
@@ -164,63 +166,40 @@ public class L8102 extends TradeBuffer {
 		deleteTxToDoDetail("AMLM", "ReBuild Data", titaVo);
 		deleteTxToDoDetail("AMLL", "ReBuild Data", titaVo);
 
-		for (int i = 1; i < 10; i++) {
-			String custKey = titaVo.get("CustKey" + i).trim();
-			if (!"".equals(custKey)) {
+		if (dataSource == 2) {
+			for (int i = 1; i < 10; i++) {
+				String custKey = titaVo.get("CustKey" + i).trim();
+				if (!"".equals(custKey)) {
+					custMain = custMainService.custIdFirst(custKey);
+					if (custMain == null) {
+						this.info("L8102 SKIP " + custKey);
+						continue;
+					}
 
-				custMain = custMainService.custIdFirst(custKey);
-				if (custMain == null) {
-					this.info("L8102 SKIP " + custKey);
-					continue;
+					BigDecimal rrSeq = new BigDecimal(titaVo.get("RRSeq" + i));
+					String reviewType = titaVo.get("ReviewType" + i).trim();
+					String unit = titaVo.get("Unit" + i).trim();
+					int isStatus = parse.stringToInteger(titaVo.get("IsStatus" + i));
+					String ConfirmStatus = titaVo.get("ConfirmStatus" + i).trim();
+
+					TxAmlCredit txAmlCredit = new TxAmlCredit();
+					TxAmlCreditId txAmlCreditId = new TxAmlCreditId(dataDt8, custKey);
+					txAmlCredit.setTxAmlCreditId(txAmlCreditId);
+
+					txAmlCredit.setRRSeq(rrSeq);
+					txAmlCredit.setReviewType(reviewType);
+					txAmlCredit.setUnit(unit);
+					txAmlCredit.setIsStatus(isStatus);
+					txAmlCredit.setWlfConfirmStatus(ConfirmStatus);
+
+					processDetail(titaVo, txAmlCredit);
 				}
-
-				BigDecimal rrSeq = new BigDecimal(titaVo.get("RRSeq" + i));
-				String reviewType = titaVo.get("ReviewType" + i).trim();
-				String unit = titaVo.get("Unit" + i).trim();
-				int isStatus = parse.stringToInteger(titaVo.get("IsStatus" + i));
-				String ConfirmStatus = titaVo.get("ConfirmStatus" + i).trim();
-
-				TxAmlCredit txAmlCredit = new TxAmlCredit();
-				TxAmlCreditId txAmlCreditId = new TxAmlCreditId(dataDt, custKey);
-				txAmlCredit.setTxAmlCreditId(txAmlCreditId);
-				txAmlCredit.setDataDt(dataDt);
-				txAmlCredit.setCustKey(custKey);
-				txAmlCredit.setRRSeq(rrSeq);
-				txAmlCredit.setReviewType(reviewType);
-				txAmlCredit.setUnit(unit);
-				txAmlCredit.setIsStatus(isStatus);
-				txAmlCredit.setWlfConfirmStatus(ConfirmStatus);
-				txAmlCredit = checkProcessType(custKey, txAmlCredit);
-				txAmlCredit.setProcessCount(0);
-
-				try {
-					txAmlCreditService.insert(txAmlCredit, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "TxAmlCredit=" + e.getErrorMsg());
+			}
+		} else {
+			if (lTxAmlCredit == null) {
+				for (TxAmlCredit txAmlCredit : lTxAmlCredit) {
+					processDetail(titaVo, txAmlCredit);
 				}
-
-				// 高風險EXCEL名單
-				if ("H".equals(txAmlCredit.getReviewType())) {
-					toExcle(titaVo, dataDt7, txAmlCredit);
-				}
-
-				// 發送簡訊內容,待處理
-				if ("3".equals(txAmlCredit.getProcessType())) {
-//					dataLines = "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp)
-//					+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
-				}
-
-				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-				tTxToDoDetail.setCustNo(0);
-				tTxToDoDetail.setFacmNo(0);
-				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue(dataDt + "-" + custKey);
-				tTxToDoDetail.setItemCode("AML" + txAmlCredit.getReviewType());
-				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote("AML定審");
-
-				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
-
 			}
 		}
 
@@ -233,13 +212,60 @@ public class L8102 extends TradeBuffer {
 		return this.sendList();
 	}
 
+	private void processDetail(TitaVo titaVo, TxAmlCredit txAmlCredit) throws LogicException {
+
+		txAmlCredit = checkProcessType(titaVo, txAmlCredit.getCustKey(), txAmlCredit);
+		txAmlCredit.setProcessCount(0);
+
+		try {
+			txAmlCreditService.insert(txAmlCredit, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "TxAmlCredit=" + e.getErrorMsg());
+		}
+
+		// 高風險EXCEL名單
+		if ("H".equals(txAmlCredit.getReviewType())) {
+			toExcle(titaVo, txAmlCredit);
+		}
+
+		// 發送簡訊內容,待處理
+		if ("3".equals(txAmlCredit.getProcessType())) {
+			String dataLines = "<" + messagePhone + ">";
+			dataLines += "\"H1\",\"" + custMain.getCustId() + "\",\"" + messagePhone
+					+ "\",\"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。\"";
+
+			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+			tTxToDoDetail.setCustNo(custMain.getCustNo());
+			tTxToDoDetail.setFacmNo(0);
+			tTxToDoDetail.setBormNo(0);
+			tTxToDoDetail.setDtlValue("<AML定審簡訊通知>");
+			tTxToDoDetail.setItemCode("TEXT00");
+			tTxToDoDetail.setStatus(0);
+			tTxToDoDetail.setProcessNote(dataLines);
+
+			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+		}
+
+		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+		tTxToDoDetail.setCustNo(0);
+		tTxToDoDetail.setFacmNo(0);
+		tTxToDoDetail.setBormNo(0);
+		tTxToDoDetail.setDtlValue(dataDt7 + "-" + txAmlCredit.getCustKey());
+		tTxToDoDetail.setItemCode("AML" + txAmlCredit.getReviewType());
+		tTxToDoDetail.setStatus(0);
+		tTxToDoDetail.setProcessNote("AML定審");
+
+		txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+
+	}
+
 //  產製高風險定期審查郵寄名單.xlsx , 高風險定期審查明細.xlsx
-	private void toExcle(TitaVo titaVo, int dataDt7, TxAmlCredit txAmlCredit) throws LogicException {
+	private void toExcle(TitaVo titaVo, TxAmlCredit txAmlCredit) throws LogicException {
 
-		int dataDt8 = dataDt7 + 19110000;
-		String dataDt = String.valueOf(dataDt7);
+//		int dataDt8 = dataDt7 + 19110000;
+		String dataDtX = String.valueOf(dataDt7);
 
-		this.info("L8102.toExcle = " + dataDt);
+		this.info("L8102.toExcle = " + dataDt7);
 
 		if (excelRow == 0) {
 			makeExcel1 = (MakeExcel) MySpring.getBean("makeExcel");
@@ -247,10 +273,10 @@ public class L8102 extends TradeBuffer {
 			makeExcel1.open(titaVo, dataDt8, "0000", "L8101A", "高風險定期審查郵寄名單", "高風險定期審查郵寄名單");
 
 			String s = "";
-			if (dataDt.length() >= 5) {
-				s = dataDt.substring(0, 3) + "年" + dataDt.substring(3, 5) + "月定審名單";
+			if (dataDtX.length() >= 5) {
+				s = dataDtX.substring(0, 3) + "年" + dataDtX.substring(3, 5) + "月定審名單";
 			} else {
-				s = dataDt + "定審名單";
+				s = dataDtX + "定審名單";
 			}
 
 			makeExcel1.setMergedRegionValue(1, 1, 1, 10, s, "", "C");
@@ -354,14 +380,14 @@ public class L8102 extends TradeBuffer {
 		Slice<TxToDoDetail> sTxToDoDetail = null;
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 //		刪除未處理且為今天的
-		sTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0, this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index, this.limit,
-				titaVo);
+		sTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0,
+				this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index,
+				this.limit, titaVo);
 
 		lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
 
 		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 			try {
-				logger.info("DeleteAll...");
 				txToDoCom.addByDetailList(false, 1, lTxToDoDetail, titaVo);
 			} catch (LogicException e) {
 				logger.info("DeleteAll Error : " + e.getErrorMsg());
@@ -369,7 +395,7 @@ public class L8102 extends TradeBuffer {
 		}
 	}
 
-	private TxAmlCredit checkProcessType(String custKey, TxAmlCredit txAmlCredit) {
+	private TxAmlCredit checkProcessType(TitaVo titaVo, String custKey, TxAmlCredit txAmlCredit) {
 		this.info("L8102.checkProcessType CustKey = " + custKey + "/" + txAmlCredit.getReviewType());
 
 //		custMain = custMainService.custIdFirst(custKey);
@@ -390,8 +416,8 @@ public class L8102 extends TradeBuffer {
 				this.info("L8102.checkProcessType 3");
 				txAmlCredit.setProcessType("2");
 			} else {
-				CustTelNo custTelNo = custTelNoService.custUKeyFirst(custMain.getCustUKey(), "03");
-				if (custTelNo == null) {
+				messagePhone = custNoticeCom.getPhone(custMain, titaVo);
+				if (messagePhone.isEmpty()) {
 					this.info("L8102.checkProcessType 4");
 					txAmlCredit.setProcessType("2");
 				} else {

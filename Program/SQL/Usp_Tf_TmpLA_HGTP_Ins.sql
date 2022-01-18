@@ -216,7 +216,7 @@ BEGIN
            LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
                                     AND S2.GDRMRK = 1 -- 組長
                                     AND S2.LGTCIF = S1.LGTCIF
-                                    AND S2.HGTCIP = NVL(S1.HGTCIP,0)
+                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
            WHERE S1.GDRNUM2 > 0 -- 新光做過唯一性處理的直接寫入
              AND S1.GDRMRK = 0
           ) SC1
@@ -247,7 +247,7 @@ BEGIN
            FROM "TmpLA$HGTP" S1 -- 組員
            LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
                                     AND S2.GDRMRK = 1 -- 組長
-                                    AND S2.HGTCIP = NVL(S1.HGTCIP,0)
+                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
            WHERE S1.GDRNUM2 > 0 -- 有被設定過唯一性
              AND S1.GDRMRK = 0
              AND S1."GroupNo" IS NULL

@@ -35,7 +35,7 @@ BEGIN
         EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyFacBal" ENABLE PRIMARY KEY';
 
         -- 寫入資料
-        INSERT INTO "Bal"
+        INSERT INTO "MonthlyFacBal"
         SELECT DLY."ADTYMT"                   AS "YearMonth"           -- 資料年月 DECIMAL 6 0
               ,DLY."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
               ,DLY."LMSAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0

@@ -61,20 +61,20 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					 ,DECODE(T.\"TelArea\",NULL,T.\"TelNo\",T.\"TelArea\" || '-' || T.\"TelNo\") F14";
 		sql += "                     , T.\"LiaisonName\" F15";
 		sql += "                     , M.\"NextRepayDate\" F16";
-		sql += "                     , C.\"CurrZip3\" F17";
-		sql += "                     , C.\"CurrZip2\" F18";
-		sql += "                     , C2.\"CityItem\" F19"; // 城市名
-		sql += "                     , C3.\"AreaItem\" F20"; // 市區
-		sql += "                     , C.\"CurrRoad\" F21"; // 路名
-		sql += "                     , C.\"CurrSection\" F22"; // 段
-		sql += "                     , C.\"CurrAlley\" F23"; // 巷
-		sql += "                     , C.\"CurrLane\" F24"; // 弄
-		sql += "                     , C.\"CurrNum\" F25"; // 號
-		sql += "                     , C.\"CurrNumDash\" F26"; // 號之
-		sql += "                     , C.\"CurrFloor\" F27"; // 樓
-		sql += "                     , C.\"CurrFloorDash\" F28";// 樓之
-		sql += "                     , F.\"RepayCode\" F29";
-//		sql += "                     , M.\"BormNo\" T1";
+		sql += "        			 ,C.\"CurrZip3\" F17";
+		sql += "        			 ,C.\"CurrZip2\" F18";
+		sql += "        			 ,C2.\"CityItem\"";
+		sql += "        			 || C3.\"AreaItem\"";
+		sql += "        			 || C.\"CurrRoad\"";
+		sql += "        			 || DECODE(C.\"CurrSection\",NULL,'',C.\"CurrSection\" || '段')";
+		sql += "        			 || DECODE(C.\"CurrAlley\",NULL,'',C.\"CurrAlley\" || '巷')";
+		sql += "        			 || DECODE(C.\"CurrLane\",NULL,'',C.\"CurrLane\" || '弄')";
+		sql += "        			 || DECODE(C.\"CurrNumDash\",NULL";
+		sql += "								   ,DECODE(C.\"CurrNum\",NULL,'',C.\"CurrNum\" || '號')";
+		sql += "								   ,DECODE(C.\"CurrNum\",NULL,'',C.\"CurrNum\" || '之') || C.\"CurrNumDash\" || '號')";
+		sql += "        			 || DECODE(C.\"CurrFloor\",NULL,'',C.\"CurrFloor\" || '樓')";
+		sql += "        			 || DECODE(C.\"CurrFloorDash\",NULL,'','之' || C.\"CurrFloorDash\") AS F19";
+		sql += "        			 ,CC.\"Item\" F20";
 		sql += "                     , ROW_NUMBER() OVER ( PARTITION BY M.\"CustNo\", M.\"FacmNo\"";
 		sql += "                                               ORDER BY T.\"TelTypeCode\") AS SEQ";
 		sql += "              FROM ( SELECT  M.\"CustNo\"";
@@ -122,6 +122,8 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              LEFT JOIN \"CdArea\" C3 ON C3.\"CityCode\" =  C.\"CurrCityCode\"";
 		sql += "                                     AND C3.\"AreaCode\" =  C.\"CurrAreaCode\"";
 		sql += "              LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" =  F.\"BusinessOfficer\"";
+		sql += "			  LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'RepayCode'";
+		sql += "						   		     AND CC.\"Code\" = F.\"RepayCode\"";
 		sql += "              LEFT JOIN \"CustTelNo\" T ON T.\"CustUKey\" =  C.\"CustUKey\"";
 		sql += "                                       AND T.\"Enable\"   = 'Y' ) D";
 		sql += "       WHERE D.\"SEQ\" = 1 ";

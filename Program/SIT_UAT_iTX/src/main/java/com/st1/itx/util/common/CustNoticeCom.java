@@ -441,7 +441,7 @@ public class CustNoticeCom extends TradeBuffer {
 		return regAddress;
 	}
 
-	private void getPhone(CustMain tCustMain, TitaVo titaVo) {
+	public String getPhone(CustMain tCustMain, TitaVo titaVo) {
 		String messPhone = "";
 		String cellPhone = "";
 
@@ -478,6 +478,8 @@ public class CustNoticeCom extends TradeBuffer {
 		if (!messPhone.isEmpty()) {
 			messagePhoneNo = messPhone;
 		}
+		
+		return messagePhoneNo;
 	}
 
 	private void getEmail(CustMain tCustMain, TitaVo titaVo) {

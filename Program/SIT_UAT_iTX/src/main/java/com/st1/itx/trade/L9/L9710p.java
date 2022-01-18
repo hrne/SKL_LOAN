@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.service.springjpa.cm.L9710ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -26,10 +26,15 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9710p extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L9710p.class);
 
 	@Autowired
 	L9710Report l9710Report;
+
+	@Autowired
+	L9711Report2 l9710NoticeTol9711;
+
+	@Autowired
+	L9710ServiceImpl l9710ServiceImpl;
 
 //	@Autowired
 //	L9710Report2 l9710Report1;
@@ -43,7 +48,7 @@ public class L9710p extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L9710p ");
-//		TxBuffer txbuffer = this.getTxBuffer();
+		TxBuffer txbuffer = this.getTxBuffer();
 		String infoNotification = "";
 
 		this.totaVo.init(titaVo);
@@ -54,19 +59,45 @@ public class L9710p extends TradeBuffer {
 
 		l9710Report.setParentTranCode(parentTranCode);
 
-		List<Map<String, String>> l9710List = l9710Report.exec(titaVo);
+//		List<Map<String, String>> l9710List = l9710Report.exec(titaVo);
+		List<Map<String, String>> l9710List = null;
 
-		if (l9710List != null && !l9710List.isEmpty()) {
+		try {
 
-			infoNotification = "L9710寬限到期明細表已完成";
+			l9710List = l9710ServiceImpl.findAll(titaVo);
 
-		} else {
+		} catch (Exception e) {
 
-			infoNotification = "L9710寬限到期明細表查無資料";
+			this.info("L9710ServiceImpl.LoanBorTx error = " + e.toString());
 
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), infoNotification, titaVo);
+		if (l9710List != null && !l9710List.isEmpty()) {
+
+			String iCUSTNO = titaVo.get("CustNo");
+
+			// 0000000為查列印明細以外，皆列印通知單
+			if (!iCUSTNO.equals("0000000")) {
+				this.info("active L9710report(form type by l9711) notice");
+
+				l9710NoticeTol9711.exec(titaVo, txbuffer, l9710List);
+
+				infoNotification = "L9710 通知單已完成";
+
+			} else {
+				this.info("active L9710report data detail");
+				l9710Report.exec(titaVo);
+
+				infoNotification = "L9710寬限到期明細表已完成";
+			}
+
+		} else {
+
+			infoNotification = "L9710 查無資料";
+
+		}
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), infoNotification, titaVo);
 
 		this.addList(this.totaVo);
 

@@ -47,7 +47,7 @@ public class L6880 extends TradeBuffer {
 	public AcMainService acMainService;
 	@Autowired
 	public AcMainCom acMainCom;
-
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6880 ");
@@ -62,17 +62,19 @@ public class L6880 extends TradeBuffer {
 			proc(titaVo, "BATCH", iEntday);
 			// 往前跳開批次日期需過總帳(測試時)，連線日期 -> 批次日期
 			if (parse.stringToInteger(iEntday) > this.txBuffer.getTxBizDate().getTbsDy()) {
-				Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(), this.index, Integer.MAX_VALUE);
+				Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(),
+						this.index, Integer.MAX_VALUE);
 				List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 				if (lAcMain != null) {
-					acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday), lAcMain, titaVo);
+					acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday),
+							lAcMain, titaVo);
 				}
 			}
 		} else {
 			// 連線日期應為批次系統日期的下營業日
 			TxBizDate batchTxBizDate = sTxBizDateService.holdById("BATCH", titaVo);
 			if (parse.stringToInteger(iEntday) != batchTxBizDate.getNbsDy()) {
-				throw new LogicException(titaVo, "E0010", "須執行LC700-夜間批次"); // E0010 功能選擇錯誤
+				throw new LogicException(titaVo, "E0015", "須執行L6870-夜間批次"); // E0010 功能選擇錯誤
 			}
 
 			// 更改連線日期

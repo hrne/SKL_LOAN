@@ -98,6 +98,9 @@ public class L2614 extends TradeBuffer {
 			String rvNo = parse.IntegerToString(tForeclosureFee.getRecordNo(), 7);
 			Slice<AcDetail> slAcDetail = acDetailService.findL2613("F24", Custno, rvNo, this.index, this.limit);
 			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
+			if (lAcDetail== null) {
+				continue;
+			}
 
 			this.info("lAcDetail = " + lAcDetail);
 			for (AcDetail tmpAcDetail : lAcDetail) {

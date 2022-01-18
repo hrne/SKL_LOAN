@@ -150,6 +150,208 @@ BEGIN
     FOR OccursNum IN 1 .. 5
     LOOP
       INSERT INTO "JcicB201"
+      
+    WITH TOTAL AS (
+      -- 合計資料
+      SELECT F."MainApplNo"
+           , SUM(NVL(J."UtilAmt",0)) AS "UtilAmt"
+           , SUM(NVL(J."UtilBal",0)) AS "UtilBal"
+      -- F 共同借款人
+      FROM "FacShareAppl" F
+      -- J 資料
+      LEFT JOIN "JcicMonthlyLoanData" J ON J."DataYM" = YYYYMM
+                                       AND J."CustNo" = F."CustNo"
+                                       AND J."FacmNo" = F."FacmNo"
+      GROUP BY F."MainApplNo"
+    )
+    , MainData AS (
+      SELECT J."DataYM"
+           , J."CustNo"
+           , J."FacmNo"
+           , J."BormNo"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY J."DataYM"
+                          , J."CustNo"
+                          , J."FacmNo"
+               ORDER BY J."BormNo"
+             ) AS "Seq"
+      FROM "FacShareAppl" F
+      LEFT JOIN "JcicMonthlyLoanData" J ON J."DataYM" = YYYYMM
+                                       AND J."CustNo" = F."CustNo"
+                                       AND J."FacmNo" = F."FacmNo"
+      WHERE F."ApplNo" = F."MainApplNo"
+        AND NVL(J."BormNo",0) != 0
+    )
+    , TmpMainData AS (
+    -- 共同借款人合併申報
+    -- "非主要共同借款人"的資料,部分申報欄位以"主要借款人"資料申報
+    SELECT JS."DataYM"            -- 資料年月
+         , JM."CustNo"            -- 戶號
+         , JM."FacmNo"            -- 額度編號
+         , (FS."KeyinSeq" - 1) * 50
+           + JS."BormNo"
+           AS "BormNo"            -- 撥款序號
+         , JM."CustId"            -- 借款人ID / 統編
+         , JS."Status"            -- 戶況
+         , JM."EntCode"           -- 企金別
+         , JM."SuvId"             -- 負責人IDN/負責之事業體BAN
+         , JM."OverseasId"        -- 外僑兼具中華民國國籍IDN
+         , JM."IndustryCode"      -- 授信戶行業別
+         , JS."AcctCode"          -- 科目別
+         , JS."SubAcctCode"       -- 科目別註記
+         , JS."OrigAcctCode"      -- 轉催收款(或呆帳)前原科目別
+         , T."UtilAmt"            -- (額度)貸出金額
+         , T."UtilBal"            -- (額度)已動用額度餘額
+         , JS."RecycleCode"       -- 循環動用
+         , JS."RecycleDeadline"   -- 循環動用期限
+         , JS."IrrevocableFlag"   -- 不可撤銷
+         , JS."FinCode"           -- 融資分類
+         , JS."ProjCode"          -- 政府專業補助貸款分類
+         , JS."NonCreditCode"     -- 不計入授信項目
+         , JS."UsageCode"         -- 用途別
+         , JS."ApproveRate"       -- 本筆撥款利率
+         , JS."StoreRate"         -- 計息利率
+         , JS."DrawdownDate"      -- 撥款日期
+         , JS."MaturityDate"      -- 到期日
+         , JS."AmortizedCode"     -- 攤還方式
+         , JS."CurrencyCode"      -- 幣別
+         , JS."DrawdownAmt"       -- 撥款金額
+         , JS."LoanBal"           -- 放款餘額
+         , JS."PrevAmt"           -- 本月應收本金
+         , JS."IntAmt"            -- 本月應收利息
+         , JS."PrevAmtRcv"        -- 本月實收本金
+         , JS."IntAmtRcv"         -- 本月實收利息
+         , JS."FeeAmtRcv"         -- 本月收取費用
+         , JS."PrevPayIntDate"    -- 上次繳息日
+         , JS."PrevRepaidDate"    -- 上次還本日
+         , JS."NextPayIntDate"    -- 下次繳息日
+         , JS."NextRepayDate"     -- 下次還本日
+         , JS."IntDelayMon"       -- 利息逾期月數
+         , JS."RepayDelayMon"     -- 本金逾期月數
+         , JS."RepaidEndMon"      -- 本金逾到期日(清償期)月數
+         , JS."ClCode1"           -- 主要擔保品代號1
+         , JS."ClCode2"           -- 主要擔保品代號2
+         , JS."ClNo"              -- 主要擔保品編號
+         , JS."ClTypeCode"        -- 主要擔保品類別代碼(JCIC)
+         , JS."ClType"            -- 擔保品組合型態
+         , JS."EvaAmt"            -- 鑑估總值
+         , JS."DispDate"          -- 擔保品處分日期
+         , JS."SyndNo"            -- 聯貸案序號
+         , JS."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , JS."SigningDate"       -- 聯貸合約訂定日期
+         , JS."SyndAmt"           -- 聯貸總金額
+         , JS."PartAmt"           -- 參貸金額
+         , JS."OvduDate"          -- 轉催收日期
+         , JS."BadDebtDate"       -- 轉呆帳日期
+         , JS."BadDebtSkipFg"     -- 不報送呆帳記號
+         , JS."AcBookCode"        -- 帳冊別
+         , JS."AcSubBookCode"     -- 區隔帳冊
+         , JS."CreateDate"        -- 建檔日期時間
+         , JS."CreateEmpNo"       -- 建檔人員
+         , JS."LastUpdate"        -- 最後更新日期時間
+         , JS."LastUpdateEmpNo"   -- 最後更新人員
+    -- FM 主要共同借款人
+    FROM "FacShareAppl" FM
+    -- FS 非主要共同借款人
+    LEFT JOIN "FacShareAppl" FS ON FS."MainApplNo" = FM."MainApplNo"
+                              AND FS."ApplNo" != FS."MainApplNo"
+    -- MD 主要共同借款人只取一筆
+    LEFT JOIN MainData MD ON MD."DataYM" = YYYYMM
+                         AND MD."CustNo" = FM."CustNo"
+                         AND MD."FacmNo" = FM."FacmNo"
+                         AND MD."Seq" = 1
+    -- JM 主要共同借款人資料
+    LEFT JOIN "JcicMonthlyLoanData" JM ON JM."DataYM" = MD."DataYM"
+                                      AND JM."CustNo" = MD."CustNo"
+                                      AND JM."FacmNo" = MD."FacmNo"
+                                      AND JM."BormNo" = MD."BormNo"
+    -- JS 非主要共同借款人資料
+    LEFT JOIN "JcicMonthlyLoanData" JS ON JS."DataYM" = YYYYMM
+                                      AND JS."CustNo" = FS."CustNo"
+                                      AND JS."FacmNo" = FS."FacmNo"
+    -- T 合計資料
+    LEFT JOIN TOTAL T ON T."MainApplNo" = FM."MainApplNo"
+    WHERE FM."ApplNo" = FM."MainApplNo" -- Main
+      AND NVL(FM."JcicMergeFlag",' ') = 'Y' -- 需合併申報者
+      AND JM."CustNo" != 0 -- 有串到主要共同借款人資料
+      AND JS."CustNo" != 0 -- 有串到非主要共同借款人資料
+    UNION
+    SELECT JM."DataYM"            -- 資料年月
+         , JM."CustNo"            -- 戶號
+         , JM."FacmNo"            -- 額度編號
+         , JM."BormNo"            -- 撥款序號
+         , JM."CustId"            -- 借款人ID / 統編
+         , JM."Status"            -- 戶況
+         , JM."EntCode"           -- 企金別
+         , JM."SuvId"             -- 負責人IDN/負責之事業體BAN
+         , JM."OverseasId"        -- 外僑兼具中華民國國籍IDN
+         , JM."IndustryCode"      -- 授信戶行業別
+         , JM."AcctCode"          -- 科目別
+         , JM."SubAcctCode"       -- 科目別註記
+         , JM."OrigAcctCode"      -- 轉催收款(或呆帳)前原科目別
+         , JM."UtilAmt"            -- (額度)貸出金額
+         , JM."UtilBal"            -- (額度)已動用額度餘額
+         , JM."RecycleCode"       -- 循環動用
+         , JM."RecycleDeadline"   -- 循環動用期限
+         , JM."IrrevocableFlag"   -- 不可撤銷
+         , JM."FinCode"           -- 融資分類
+         , JM."ProjCode"          -- 政府專業補助貸款分類
+         , JM."NonCreditCode"     -- 不計入授信項目
+         , JM."UsageCode"         -- 用途別
+         , JM."ApproveRate"       -- 本筆撥款利率
+         , JM."StoreRate"         -- 計息利率
+         , JM."DrawdownDate"      -- 撥款日期
+         , JM."MaturityDate"      -- 到期日
+         , JM."AmortizedCode"     -- 攤還方式
+         , JM."CurrencyCode"      -- 幣別
+         , JM."DrawdownAmt"       -- 撥款金額
+         , JM."LoanBal"           -- 放款餘額
+         , JM."PrevAmt"           -- 本月應收本金
+         , JM."IntAmt"            -- 本月應收利息
+         , JM."PrevAmtRcv"        -- 本月實收本金
+         , JM."IntAmtRcv"         -- 本月實收利息
+         , JM."FeeAmtRcv"         -- 本月收取費用
+         , JM."PrevPayIntDate"    -- 上次繳息日
+         , JM."PrevRepaidDate"    -- 上次還本日
+         , JM."NextPayIntDate"    -- 下次繳息日
+         , JM."NextRepayDate"     -- 下次還本日
+         , JM."IntDelayMon"       -- 利息逾期月數
+         , JM."RepayDelayMon"     -- 本金逾期月數
+         , JM."RepaidEndMon"      -- 本金逾到期日(清償期)月數
+         , JM."ClCode1"           -- 主要擔保品代號1
+         , JM."ClCode2"           -- 主要擔保品代號2
+         , JM."ClNo"              -- 主要擔保品編號
+         , JM."ClTypeCode"        -- 主要擔保品類別代碼(JCIC)
+         , JM."ClType"            -- 擔保品組合型態
+         , JM."EvaAmt"            -- 鑑估總值
+         , JM."DispDate"          -- 擔保品處分日期
+         , JM."SyndNo"            -- 聯貸案序號
+         , JM."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , JM."SigningDate"       -- 聯貸合約訂定日期
+         , JM."SyndAmt"           -- 聯貸總金額
+         , JM."PartAmt"           -- 參貸金額
+         , JM."OvduDate"          -- 轉催收日期
+         , JM."BadDebtDate"       -- 轉呆帳日期
+         , JM."BadDebtSkipFg"     -- 不報送呆帳記號
+         , JM."AcBookCode"        -- 帳冊別
+         , JM."AcSubBookCode"     -- 區隔帳冊
+         , JM."CreateDate"        -- 建檔日期時間
+         , JM."CreateEmpNo"       -- 建檔人員
+         , JM."LastUpdate"        -- 最後更新日期時間
+         , JM."LastUpdateEmpNo"   -- 最後更新人員
+    FROM "JcicMonthlyLoanData" JM
+    LEFT JOIN "FacShareAppl" FSA ON FSA."CustNo" = JM."CustNo"
+                                AND FSA."FacmNo" = JM."FacmNo"
+    WHERE JM."DataYM" = YYYYMM
+      AND CASE
+            WHEN FSA."ApplNo" = FSA."MainApplNo" -- 主要借款人資料
+            THEN 1
+            WHEN NVL(FSA."ApplNo",0) = 0 -- 非共同借款人
+            THEN 1
+          ELSE 0
+          END = 1
+    )
       SELECT
              YYYYMM                                AS "DataYM"            -- 資料年月
            , '458'                                 AS "BankItem"          -- 總行代號
@@ -352,10 +554,12 @@ BEGIN
            , ' '                                   AS "Filler741"         -- 空白
            , CASE WHEN M."FinCode" NOT IN ('L','M','2')    THEN ' '
                   WHEN NVL(L."GraceDate",0) = 0            THEN '00000'
+                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
                   ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."DrawdownDate",0) / 100) -191100 ) ),5,'0') 
              END                                   AS "GraceStartYM"      -- 房貸寬限期起始年月
            , CASE WHEN M."FinCode" NOT IN ('L','M','2') THEN ' '
                   WHEN NVL(L."GraceDate",0) = 0    THEN '00000'
+                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
                   ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."GraceDate",0) / 100) - 191100 )  ) ,5,'0')   
              END                                   AS "GraceEndYM"        -- 房貸寬限期截止年月
            , ' '                                   AS "GreenFg"           -- 綠色授信註記
@@ -384,7 +588,7 @@ BEGIN
            , EmpNo                                 AS "CreateEmpNo"       -- 建檔人員
            , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
            , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
-      FROM   "JcicMonthlyLoanData" M
+      FROM TmpMainData M
           LEFT JOIN "FacMain" F   ON F."CustNo"   = M."CustNo"
                                  AND F."FacmNo"   = M."FacmNo"
           -- 2022-01-12 智偉新增: 串共同借款人檔組上階共同額度控制編碼
@@ -451,16 +655,24 @@ BEGIN
           LEFT JOIN "Work_B201_Guarantor" WK5  ON WK5."DataYM"   = M."DataYM"
                                               AND WK5."ROW_NUM"  = OccursNum * 5 - 0
                                               AND WK5."ApplNo"   = F."ApplNo"
-      WHERE  M."DataYM"     =  YYYYMM
-        AND  ( ( OccursNum = 1 ) OR
-               ( OccursNum > 1  AND WK1."ApplNo" IS NOT NULL )
-             )
-        AND  NVL(M."BadDebtSkipFg",' ') NOT IN ('Y')  -- 呆帳不報送記號
---        AND  ( ( M."Status" IN (0, 1, 2, 4, 6, 7) ) OR
---               ( M."Status" IN (3, 5, 9)  AND  M."UtilAmt" = 0  AND Tx."CustNo" IS NOT NULL  )
-        AND  ( ( M."Status" IN (0, 2, 6 , 7) ) OR
-               ( M."Status" IN (3, 5)  AND  M."UtilAmt" = 0  AND Tx."CustNo" IS NOT NULL  )
-             )
+      WHERE NVL(M."BadDebtSkipFg",' ') NOT IN ('Y')  -- 呆帳不報送記號
+        AND CASE
+              WHEN OccursNum = 1
+              THEN 1
+              WHEN OccursNum > 1
+                   AND WK1."ApplNo" IS NOT NULL
+              THEN 1
+            ELSE 0
+            END = 1
+        AND CASE
+              WHEN M."Status" IN (0, 2, 6, 7)
+              THEN 1
+              WHEN M."Status" IN (3, 5)
+                   AND M."UtilAmt" = 0
+                   AND Tx."CustNo" IS NOT NULL -- 是結案戶
+              THEN 1
+            ELSE 0
+            END = 1
         ;
     END LOOP;
 

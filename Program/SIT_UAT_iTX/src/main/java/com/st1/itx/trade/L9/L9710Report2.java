@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L9710Report2 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9710Report2.class);
 
 	@Autowired
 	BaTxCom dBaTxCom;
@@ -52,7 +49,12 @@ public class L9710Report2 extends MakeReport {
 		String f4 = "";
 		String f5 = "";
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
+		
+		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
+				titaVo.getTxCode().isEmpty() ? "L9710" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "inch,8.5,12", "P");
+
+		
 		this.info("l9710List-------->" + l9710List.size());
 		if (l9710List != null && l9710List.size() != 0) {
 			for (Map<String, String> tL9710Vo : l9710List) {
@@ -105,7 +107,7 @@ public class L9710Report2 extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	private void report(Map<String, String> tL9710Vo, TxBuffer txbuffer) throws LogicException {
@@ -330,7 +332,7 @@ public class L9710Report2 extends MakeReport {
 			this.info("tranDate X = " + tmp1.substring(i, i + 1));
 			tmp = tmp1.charAt(i);
 
-			tranTemp = tmp;
+			tranTemp = (int) tmp;
 
 			tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 
