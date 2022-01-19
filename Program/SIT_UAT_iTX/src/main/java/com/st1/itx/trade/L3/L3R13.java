@@ -84,7 +84,7 @@ public class L3R13 extends TradeBuffer {
 		wkAdjRateDate = wkYear * 10000 + wkMonth * 100 + iFixAdjDd;
 		this.info("   wkAdjRateDate = " + wkAdjRateDate);
 
-		this.totaVo.putParam("OAdjRateDate", wkAdjRateDate);
+		this.totaVo.putParam("L3r13AdjRateDate", wkAdjRateDate);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -557,6 +557,10 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6062; ntxbuf=#BUF2;ntxbuf5=type<-1:Industry
 #IndustryInd=X,1,L
 
 #IndustryAft=X,6,I
+@
+C(5,#TypeCodeInd,X,$,C(5,#IndustryAft,#IndustryBef,s,$))
+C(5,#FdIndustry,*,V(7),$)
+V(4,060000)
 
 #SendL6R06B=X,1,S
 E(0,@RimFuncCode,5)
@@ -665,8 +669,8 @@ C(5,#SpouseNameAft,#SpouseNameBef,T(3,),T(3,X))
 #RegCityCodeAft=X,2,I
 HELP(#CityHelp,cols:5)
 @
-C(5,#RegCityCodeAft,#RegCityCodeBef,s,C(5,#FdRegAdrAft,*,V(7),$))
-C(4,#RegCityCodeAft,$,V(H,#CityHelp))
+C(5,#TypeCodeInd,X,C(5,#FdRegAdrAft,*,V(7),$),C(5,#RegCityCodeAft,#RegCityCodeBef,$,C(5,#FdRegAdrAft,*,V(7),$)))
+C(4,#RegCityCodeAft,T(3,@RegAddressAft,)T(3,@RegZip3Aft,),C(5,#RegCityCodeAft,#RegCityCodeBef,$,V(H,#CityHelp)))
 
 
 ! 縣市代碼對應名稱
@@ -911,8 +915,8 @@ T(2,@CurrFloorDashAft,#RegFloorDashAft)
 C(5,#SameReg,Y,s,$)
 HELP(#CityHelp,cols:5)
 @
-C(5,#CurrCityCodeAft,#CurrCityCodeAft,s,C(5,#FdCurrAdrAft,*,V(7),$))
-C(4,#CurrCityCodeAft,$,V(H,#CityHelp))
+C(5,#TypeCodeInd,X,C(5,#FdCurrAdrAft,*,V(7),$),C(5,#CurrCityCodeAft,#CurrCityCodeBef,$,C(5,#FdCurrAdrAft,*,V(7),$)))
+C(4,#CurrCityCodeAft,T(3,@CurrAddressAft,)T(3,@CurrZip3Aft,),C(5,#CurrCityCodeAft,#CurrCityCodeBef,$,V(H,#CityHelp)))
 
 !通訊-縣市代碼對應名稱
 #CurrCityItemAft=X,10,L
@@ -924,6 +928,7 @@ IF(#CurrCityCodeAft==#CurrCityCodeBef,T(3,),T(3,X))
 ! 調RIM取鄉鎮市區代碼
 #RimL6r03Area1=X,1,S
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCodeAft,S,$)
 E(0,@RimFunCd,2)
 T(2,@RimCityCode,#CurrCityCodeAft)
 T(2,@RimAreaCode,)
@@ -1098,7 +1103,7 @@ T(2,@CurrAddressAft,#L1r12Address)
 IF(#CurrAddressAft==#CurrAddressBef,T(3,),T(3,                         X))
 
 !通訊-郵遞區號前三碼
-#CurrZip3Bef=A,3,L
+#CurrZip3Bef=X,3,L
 
 #CurrZip3Ind=X,1,L
 

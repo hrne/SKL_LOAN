@@ -84,6 +84,31 @@ V(5,#InputStartDate,#SYSCDATE)
 #RPTFG=A,1,S
 E(0,0)
 
+
+! iCompensateFlag
+
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
 </sub>
 
 
@@ -119,6 +144,12 @@ SWITCH(#OOStatus,S,T(3,成功),
 !結束時間 yyyy-MM-dd hh:mm:ss
 #OOStepEndTime=x,20,L
 
+! use T(6A,...)
+! 勾選幾個就會sendback幾次, 所以不需要concats
+! 長度似乎要大於某個值, 但實際進Vo的欄位長度會切剛好, 並且能用其原本名字存取
+#Sendback=x,10000,S
+T(6A,#OOJobCode)
+
 </sub>
 
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
@@ -146,8 +177,22 @@ TXFORM=L6970
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-#RPTFG=0,QUERY.GRID,L6970
-#any={detail:true, header:'L6970.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60]}
+#batch-print=8,L6970.PFNX,NA,,,,,,1169:827
+^
+#RPTFG=9,QUERY.GRID,L6970
+#any={detail:true, header:'L6970.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'重新執行',
+	type:'5',
+	rim:'L6970',
+	txtno:'#Sendback',
+	pfnx:"L6970.PFNX",
+	col_captions:["步驟代號","批次執行日期","處理結果        "],
+	col_names:["#OOStepId","#OOExecDate","#batch-row-status"]
+	}
+}
+
+#Sendback
 
 #OOExecDate=批次執行日期
 {width:160,align:'center'}
@@ -167,4 +212,8 @@ TXFORM=L6970
 #OOStepEndTime=結束時間
 {width:120,align:'center'}
 ^
+
+
 </sub>
+
+

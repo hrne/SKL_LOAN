@@ -1,8 +1,8 @@
-OProdNo=X,5
-OCurrencyCode=X,3
-OAcctCode=9,3
-OApplDate=9,7
-OCreditOfficer=X,6
-OLoanOfficer=X,6
-OIntroducer=X,6
-OSupervisor=X,6
+L2r03ProdNo=X,5
+L2r03CurrencyCode=X,3
+L2r03AcctCode=9,3
+L2r03ApplDate=9,7
+L2r03CreditOfficer=X,6
+L2r03LoanOfficer=X,6
+L2r03Introducer=X,6
+L2r03Supervisor=X,6

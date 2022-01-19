@@ -85,33 +85,33 @@ public class L2R07 extends TradeBuffer {
 			tCustMain = custMainService.custIdFirst(iCustId, titaVo);
 		}
 		if (tCustMain != null) {
-			this.totaVo.putParam("OCustId", tCustMain.getCustId());
-			this.totaVo.putParam("OCustNo", tCustMain.getCustNo());
-			this.totaVo.putParam("OCustName", tCustMain.getCustName());
-			this.totaVo.putParam("OCustTypeCode", tCustMain.getCustTypeCode());
-			this.totaVo.putParam("OEntCode", tCustMain.getEntCode());
-			this.totaVo.putParam("OPrevPayIntDate", 0);
-			this.totaVo.putParam("ONextPayIntDate", 0);
-			this.totaVo.putParam("OSpecificDd", 0);
-			this.totaVo.putParam("OSpecificDate", 0);
-			this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-			this.totaVo.putParam("OLoanBal", 0);
-			this.totaVo.putParam("OFacmCount", 0);
-			this.totaVo.putParam("OBormCount", 0);
-			this.totaVo.putParam("OFacmNo", 0);
-			this.totaVo.putParam("OBormNo", 0);
+			this.totaVo.putParam("L2r07CustId", tCustMain.getCustId());
+			this.totaVo.putParam("L2r07CustNo", tCustMain.getCustNo());
+			this.totaVo.putParam("L2r07CustName", tCustMain.getCustName());
+			this.totaVo.putParam("L2r07CustTypeCode", tCustMain.getCustTypeCode());
+			this.totaVo.putParam("L2r07EntCode", tCustMain.getEntCode());
+			this.totaVo.putParam("L2r07PrevPayIntDate", 0);
+			this.totaVo.putParam("L2r07NextPayIntDate", 0);
+			this.totaVo.putParam("L2r07SpecificDd", 0);
+			this.totaVo.putParam("L2r07SpecificDate", 0);
+			this.totaVo.putParam("L2r07CurrencyCode", wkCurrencyCode);
+			this.totaVo.putParam("L2r07LoanBal", 0);
+			this.totaVo.putParam("L2r07FacmCount", 0);
+			this.totaVo.putParam("L2r07BormCount", 0);
+			this.totaVo.putParam("L2r07FacmNo", 0);
+			this.totaVo.putParam("L2r07BormNo", 0);
 			// AML使用
 			// 身分證長度8為法人
 			// 否則為自然人
 			if (tCustMain.getCustId().length() == 8) {
-				this.totaVo.putParam("ORemitIdKind", 2);// 身份別 1:自然人 2:法人
+				this.totaVo.putParam("L2r07RemitIdKind", 2);// 身份別 1:自然人 2:法人
 			} else {
-				this.totaVo.putParam("ORemitIdKind", 1);// 身份別 1:自然人 2:法人
+				this.totaVo.putParam("L2r07RemitIdKind", 1);// 身份別 1:自然人 2:法人
 			}
 
-			this.totaVo.putParam("ORemitId", tCustMain.getCustId());// 身份證/居留證號碼
-			this.totaVo.putParam("ORemitGender", tCustMain.getSex());// 性別
-			this.totaVo.putParam("ORemitBirthday", tCustMain.getBirthday());// 出生日期
+			this.totaVo.putParam("L2r07RemitId", tCustMain.getCustId());// 身份證/居留證號碼
+			this.totaVo.putParam("L2r07RemitGender", tCustMain.getSex());// 性別
+			this.totaVo.putParam("L2r07RemitBirthday", tCustMain.getBirthday());// 出生日期
 
 		} else {
 			throw new LogicException(titaVo, "E0001", " 客戶資料主檔"); // 查詢資料不存在
@@ -166,12 +166,12 @@ public class L2R07 extends TradeBuffer {
 					wkBormCount++;
 				}
 			}
-			this.totaVo.putParam("OPrevPayIntDate", wkPrevPayIntDate);
-			this.totaVo.putParam("ONextPayIntDate", wkNextPayIntDate);
-			this.totaVo.putParam("OSpecificDd", wkSpecificDd);
-			this.totaVo.putParam("OSpecificDate", wkSpecificDate);
-			this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-			this.totaVo.putParam("OLoanBal", wkLoanBal);
+			this.totaVo.putParam("L2r07PrevPayIntDate", wkPrevPayIntDate);
+			this.totaVo.putParam("L2r07NextPayIntDate", wkNextPayIntDate);
+			this.totaVo.putParam("L2r07SpecificDd", wkSpecificDd);
+			this.totaVo.putParam("L2r07SpecificDate", wkSpecificDate);
+			this.totaVo.putParam("L2r07CurrencyCode", wkCurrencyCode);
+			this.totaVo.putParam("L2r07LoanBal", wkLoanBal);
 		}
 		if (wkBormCount == 0) {
 			if (iTxCode.equals("L3711") || iTxCode.equals("L3712")) {
@@ -199,8 +199,8 @@ public class L2R07 extends TradeBuffer {
 					for (LoanBorMain k : lLoanBorMain.getContent()) {
 						if ((k.getStatus() == 0 || k.getStatus() == 4) && ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
 							wkFacmCount++;
-							this.totaVo.putParam("OFacmNo", k.getFacmNo());
-							this.totaVo.putParam("OBormNo", k.getBormNo());
+							this.totaVo.putParam("L2r07FacmNo", k.getFacmNo());
+							this.totaVo.putParam("L2r07BormNo", k.getBormNo());
 							break;
 						}
 					}
@@ -211,8 +211,8 @@ public class L2R07 extends TradeBuffer {
 					}
 				}
 			}
-			this.totaVo.putParam("OFacmCount", wkFacmCount);
-			this.totaVo.putParam("OBormCount", wkBormCount);
+			this.totaVo.putParam("L2r07FacmCount", wkFacmCount);
+			this.totaVo.putParam("L2r07BormCount", wkBormCount);
 		}
 	}
 
@@ -240,7 +240,7 @@ public class L2R07 extends TradeBuffer {
 		}
 		for (FacMain fac : lFacMain.getContent()) {
 			wkFacmCount++;
-			this.totaVo.putParam("OFacmNo", fac.getFacmNo());
+			this.totaVo.putParam("L2r07FacmNo", fac.getFacmNo());
 		}
 		for (FacMain fac : lFacMain.getContent()) {
 			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, fac.getFacmNo(), fac.getFacmNo(), 1, 900, this.index, this.limit, titaVo);
@@ -249,14 +249,14 @@ public class L2R07 extends TradeBuffer {
 					if (ln.getStatus() == 0 || ln.getStatus() == 2 || ln.getStatus() == 4 || ln.getStatus() == 7) {
 						wkBormCount++;
 						if (wkBormCount == 1) {
-							this.totaVo.putParam("OFacmNo", ln.getFacmNo());
-							this.totaVo.putParam("OBormNo", ln.getBormNo());
+							this.totaVo.putParam("L2r07FacmNo", ln.getFacmNo());
+							this.totaVo.putParam("L2r07BormNo", ln.getBormNo());
 						}
 					}
 				}
 			}
 		}
-		this.totaVo.putParam("OFacmCount", wkFacmCount);
-		this.totaVo.putParam("OBormCount", wkBormCount);
+		this.totaVo.putParam("L2r07FacmCount", wkFacmCount);
+		this.totaVo.putParam("L2r07BormCount", wkBormCount);
 	}
 }

@@ -66,7 +66,8 @@ public class L3R05 extends TradeBuffer {
 		} else {
 
 			// 查詢會計銷帳檔
-			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, 0,
+					Integer.MAX_VALUE, titaVo);
 			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 			if (lAcReceivable != null && lAcReceivable.size() > 0) {
 				for (AcReceivable tAcReceivable : lAcReceivable) {
@@ -100,7 +101,7 @@ public class L3R05 extends TradeBuffer {
 							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
 						}
 						break;
-					case 5: // 聯貸費攤提暫收款
+					case 5: // 聯貸費攤提暫收款	
 						if (tAcReceivable.getAcctCode().equals("TSL")) {
 							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
 						}
@@ -115,7 +116,7 @@ public class L3R05 extends TradeBuffer {
 			throw new LogicException(titaVo, "E3093", " 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查無暫收款(暫收款金額為零)
 		}
 
-		this.totaVo.putParam("OTempAmt", wkTempAmt);
+		this.totaVo.putParam("L3r05TempAmt", wkTempAmt);
 
 		this.addList(this.totaVo);
 		return this.sendList();

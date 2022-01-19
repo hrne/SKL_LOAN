@@ -63,7 +63,12 @@ BEGIN
          , JOB_START_TIME                              AS "LastUpdate"        -- 最後更新日期時間
          , EmpNo                                       AS "LastUpdateEmpNo"   -- 最後更新人員
     FROM   "AcLoanRenew" M
+      LEFT JOIN "LoanBorMain"  LM  ON  M."CustNo"    =  LM."CustNo"
+                                  AND  M."NewFacmNo" =  LM."FacmNo"
+                                  AND  M."NewBormNo" =  LM."BormNo"
+    
     WHERE  M."AcDate" > 20120831      -- 借新還舊之舊撥款序號資料檔資料從201209開始
+      AND  LM."Status"  NOT IN (3)    
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;

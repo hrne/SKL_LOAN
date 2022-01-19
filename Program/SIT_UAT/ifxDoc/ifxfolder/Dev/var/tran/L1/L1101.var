@@ -722,7 +722,7 @@ C(3,#FunCd,5,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @
 IF(#FdRegCityCode=="*",V(7),$)
-C(4,#RegCityCode,$,V(H,#L6r03ResultCity))
+C(4,#RegCityCode,T(3,@Regaddress,)T(3,@RegZip3,),V(H,#L6r03ResultCity))
 
 ! 縣市代碼對應名稱
 #RegCityItem=X,8,L
@@ -908,7 +908,7 @@ C(5,#SameReg,Y,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @
 C(5,FdCurrCityCode,*,V(7),$)
-C(4,#CurrCityCode,S,V(H,#L6r03ResultCity))
+C(4,#CurrCityCode,T(3,@Curraddress,)T(3,@CurrZip3,),V(H,#L6r03ResultCity))
 
 !通訊-縣市代碼對應名稱
 #CurrCityItem=X,8,L
@@ -961,6 +961,7 @@ R(1,L1R10)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,s,$)
 E(0,@CurrZip3,#L1r10Zip3)
 
 !通訊-路名
@@ -1342,6 +1343,7 @@ C(5,#SubCompanyFg,Y,$,S)
 ##loop{times:20,n:1}
 C(5,#CrossUse{n},Y,S,$)
 ##end
+@
 V(P,至少勾選一筆同意)
 
 #NTXBUF1=X,18,S
@@ -1506,7 +1508,7 @@ T(H,#OAMLGroup,#AMLCodeHelp)
 !原住民姓名
 #OIndigenousName=x,100,L
 !介紹人
-#OIntroducerX=X,20,L
+#OIntroducerX=X,50,L
 
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}=X,2,L

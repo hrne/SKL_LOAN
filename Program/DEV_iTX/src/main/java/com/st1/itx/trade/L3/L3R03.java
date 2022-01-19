@@ -72,11 +72,11 @@ public class L3R03 extends TradeBuffer {
 				titaVo);
 		if (tLoanBook == null) {
 			if (iTxCode.equals("L3130") && (iFuncCode == 1)) {
-				this.totaVo.putParam("OIncludeIntFlag", "");
-				this.totaVo.putParam("OUnpaidIntFlag", "");
-				this.totaVo.putParam("OBookAmt", 0);
-				this.totaVo.putParam("OPayMethod", "");
-				this.totaVo.putParam("OBookStatus", 0);
+				this.totaVo.putParam("L3r03IncludeIntFlag", "");
+				this.totaVo.putParam("L3r03UnpaidIntFlag", "");
+				this.totaVo.putParam("L3r03BookAmt", 0);
+				this.totaVo.putParam("L3r03PayMethod", "");
+				this.totaVo.putParam("L3r03BookStatus", 0);
 				this.addList(this.totaVo);
 				return this.sendList();
 			} else {
@@ -92,11 +92,11 @@ public class L3R03 extends TradeBuffer {
 			}
 		}
 
-		this.totaVo.putParam("OIncludeIntFlag", tLoanBook.getIncludeIntFlag());
-		this.totaVo.putParam("OUnpaidIntFlag", tLoanBook.getUnpaidIntFlag());
-		this.totaVo.putParam("OBookAmt", tLoanBook.getBookAmt());
-		this.totaVo.putParam("OPayMethod", tLoanBook.getPayMethod());
-		this.totaVo.putParam("OBookStatus", tLoanBook.getStatus());
+		this.totaVo.putParam("L3r03IncludeIntFlag", tLoanBook.getIncludeIntFlag());
+		this.totaVo.putParam("L3r03UnpaidIntFlag", tLoanBook.getUnpaidIntFlag());
+		this.totaVo.putParam("L3r03BookAmt", tLoanBook.getBookAmt());
+		this.totaVo.putParam("L3r03PayMethod", tLoanBook.getPayMethod());
+		this.totaVo.putParam("L3r03BookStatus", tLoanBook.getStatus());
 
 		this.addList(this.totaVo);
 		return this.sendList();

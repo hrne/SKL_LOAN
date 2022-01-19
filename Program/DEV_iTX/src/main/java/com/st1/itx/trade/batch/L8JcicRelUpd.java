@@ -57,7 +57,7 @@ public class L8JcicRelUpd extends BatchBase implements Tasklet, InitializingBean
 		// 此為月底日日終批次,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L8_JcicRel_Upd(tbsdyf, empNo);
+		sJobMainService.Usp_L8_JcicRel_Upd(tbsdyf, empNo, titaVo);
 	}
 
 }

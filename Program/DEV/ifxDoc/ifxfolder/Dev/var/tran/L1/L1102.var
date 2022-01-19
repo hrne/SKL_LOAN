@@ -519,7 +519,7 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
 C(5,#FdIndustryCode,*,V(7),$)
-C(4,#IndustryCode,$,V(2,60000)V(2,060000))
+C(4,#IndustryCode,$,V(4,060000))
 
 
 #SendL6R06=X,1,S
@@ -613,7 +613,7 @@ C(3,#FunCd,5,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @
 C(5,#FdRegCityCode,*,V(7),$)
-C(4,#RegCityCode,$,V(H,#L6r03ResultCity))
+C(4,#RegCityCode,T(3,@RegZip3,)T(3,@Regaddress,),V(H,#L6r03ResultCity))
 
 ! 縣市代碼對應名稱
 #RegCityItem=X,10,L
@@ -829,7 +829,7 @@ C(5,#SameReg,Y,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @
 C(5,#FdCurrCityCode,*,V(7),$)
-C(4,#CurrCityCode,$,V(H,#L6r03ResultCity))
+C(4,#CurrCityCode,T(3,@CurrZip3,)T(3,@Curraddress,),V(H,#L6r03ResultCity))
 
 !通訊-縣市代碼對應名稱
 #CurrCityItem=X,10,L
@@ -857,7 +857,7 @@ T(2,#L6r03Result)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 HELP(#L6r03ResultArea1,cols:5)
 @
 V(H,#L6r03ResultArea1)
@@ -871,7 +871,7 @@ T(H,#CurrAreaCode,#L6r03ResultArea1)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 T(2,@RimCityCode,#CurrCityCode)
 T(2,@RimAreaCode,#CurrAreaCode)
 RESET_RIM(#RimL1r10D,L1R10)
@@ -882,6 +882,7 @@ R(1,L1R10)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 E(0,@CurrZip3,#L1r10Zip3)
 
 !通訊-路名
@@ -890,56 +891,56 @@ TOOLTIP(請自行輸入完整路名，包含路／街／村)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 @V(7)
 !通訊-段
 #CurrSection=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-巷
 #CurrAlley=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-弄
 #CurrLane=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-號
 #CurrNum=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-號之
 #CurrNumDash=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-樓
 #CurrFloor=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-樓之
 #CurrFloorDash=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 
 #FdCurraddress=X,2,L
 
@@ -948,7 +949,7 @@ C(4,#CurrCityCode,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 T(2,@RimCityCode,#CurrCityCode)
 T(2,@RimAreaCode,#CurrAreaCode)
 T(2,@RimRoad,#CurrRoad)
@@ -968,20 +969,20 @@ R(1,L1R12)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 T(2,@Curraddress,#L1r12Address)
 
 #Curraddress=X,100,L
 
 !通訊-郵遞區號前三碼
-#CurrZip3=A,3,L
+#CurrZip3=X,3,L
 
 !通訊-郵遞區號後兩碼
 #CurrZip2=X,3,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-C(4,#CurrCityCode,s,$)
+C(4,#CurrCityCode,S,$)
 @
 C(4,#CurrZip2,S,$)
 V(9)
@@ -1161,6 +1162,7 @@ C(5,#SubCompanyFg,Y,$,S)
 ##loop{times:20,n:1}
 C(5,#CrossUse{n},Y,S,$)
 ##end
+@
 V(P,至少勾選一筆同意)
 
 #NTXBUF=X,18,S
@@ -1349,6 +1351,7 @@ T(H,#OOEnable,#EnableHelp)
 <sub type="TIM">
 #FunCd
 #CustId
+#TypeCode
 #OTypeCode
 #BranchNo
 #CustName

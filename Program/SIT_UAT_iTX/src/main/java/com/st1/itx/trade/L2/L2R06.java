@@ -58,8 +58,8 @@ public class L2R06 extends TradeBuffer {
 
 		// 查詢指標利率檔
 		if (iBaseRateCode.equals("99")) {
-			this.totaVo.putParam("OBaseRate", 0);
-			this.totaVo.putParam("ORemark", "");
+			this.totaVo.putParam("L2r06BaseRate", 0);
+			this.totaVo.putParam("L2r06Remark", "");
 		} else {
 
 			Slice<CdBaseRate> lCdBaseRate = cdBaseRateService.baseRateCodeEq2(iCurrencyCode, iBaseRateCode, this.index, this.limit, titaVo);
@@ -72,8 +72,8 @@ public class L2R06 extends TradeBuffer {
 //					CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(iCurrencyCode, iBaseRateCode, 10101,
 					iEffectDate + 19110000, titaVo);
 			if (tCdBaseRate != null) {
-				this.totaVo.putParam("OBaseRate", tCdBaseRate.getBaseRate());
-				this.totaVo.putParam("ORemark", tCdBaseRate.getRemark());
+				this.totaVo.putParam("L2r06BaseRate", tCdBaseRate.getBaseRate());
+				this.totaVo.putParam("L2r06Remark", tCdBaseRate.getRemark());
 			} else {
 				throw new LogicException(titaVo, "E6019", " 指標利率檔"); // 生效日期未生效
 			}

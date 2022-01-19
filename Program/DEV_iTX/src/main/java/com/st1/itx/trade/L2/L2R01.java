@@ -137,7 +137,7 @@ public class L2R01 extends TradeBuffer {
 		} else {
 			if (iRimTxCode.equals("L2101") && (iRimFuncCode == 1 || iRimFuncCode == 3)) {
 
-				this.totaVo.putParam("OUseProdFg", wkUseProdFg);
+				this.totaVo.putParam("L2r01UseProdFg", wkUseProdFg);
 				this.addList(this.totaVo);
 				return this.sendList();
 			} else {
@@ -196,7 +196,7 @@ public class L2R01 extends TradeBuffer {
 		if (!(tFacMain == null)) {
 			wkUseProdFg = "Y";
 		}
-		this.totaVo.putParam("OUseProdFg", wkUseProdFg);
+		this.totaVo.putParam("L2r01UseProdFg", wkUseProdFg);
 
 		this.info("totaVo = " + this.totaVo);
 
@@ -208,51 +208,51 @@ public class L2R01 extends TradeBuffer {
 	// 商品參數檔
 	private void SetTotaFacProd() throws LogicException {
 		this.info("tFacProd.getEndDate() = " + tFacProd.getEndDate());
-		this.totaVo.putParam("OProdNo", tFacProd.getProdNo());
-		this.totaVo.putParam("OProdName", tFacProd.getProdName());
-		this.totaVo.putParam("OStartDate", tFacProd.getStartDate());
-		this.totaVo.putParam("OEndDate", tFacProd.getEndDate());
-		this.totaVo.putParam("OStatusCode", tFacProd.getStatusCode());
-		this.totaVo.putParam("OAgreementFg", tFacProd.getAgreementFg());
-		this.totaVo.putParam("OEnterpriseFg", tFacProd.getEnterpriseFg());
-		this.totaVo.putParam("OCharCode", 1);
-		this.totaVo.putParam("OAcctCode", "");
-		this.totaVo.putParam("OAcctAcno", 0);
-		this.totaVo.putParam("OAcctSbno", 0);
-		this.totaVo.putParam("OCurrencyCode", tFacProd.getCurrencyCode());
-		this.totaVo.putParam("OLowAmt", 0);
-		this.totaVo.putParam("OHighAmt", 0);
-		this.totaVo.putParam("OBaseRateCode", tFacProd.getBaseRateCode());
-		this.totaVo.putParam("OProdIncr", tFacProd.getProdIncr());
-		this.totaVo.putParam("OGraceIncr", 0);
-		this.totaVo.putParam("OLowLimitRate", tFacProd.getLowLimitRate());
-		this.totaVo.putParam("ORateCode", tFacProd.getRateCode());
-		this.totaVo.putParam("OIncrFlag", tFacProd.getIncrFlag());
-		this.totaVo.putParam("OFirstRateAdjFreq", 0);
-		this.totaVo.putParam("ORateAdjFreq", 0);
-		this.totaVo.putParam("OFixAdjDd", 0);
-		this.totaVo.putParam("OAmortizedCode", 9);
-		this.totaVo.putParam("OIntCalcCode", 9);
-		this.totaVo.putParam("OExtraRepayCode", 9);
-		this.totaVo.putParam("ORecycleCode", 9);
-		this.totaVo.putParam("OFreqBase", 9);
-		this.totaVo.putParam("OPayIntFreq", 99);
-		this.totaVo.putParam("ORepayFreq", 99);
-		this.totaVo.putParam("OGracePeriod", 999);
-		this.totaVo.putParam("OBreachFlag", tFacProd.getBreachFlag());
-		this.totaVo.putParam("OBreachCode", tFacProd.getBreachCode());
-		this.totaVo.putParam("OBreachGetCode", tFacProd.getBreachGetCode());
-//		this.totaVo.putParam("ODecreaseFlag", tFacProd.getDecreaseFlag());
-		this.totaVo.putParam("OProhibitMonth", tFacProd.getProhibitMonth());
-		this.totaVo.putParam("OGovOfferFlag", tFacProd.getGovOfferFlag());
+		this.totaVo.putParam("L2r01ProdNo", tFacProd.getProdNo());
+		this.totaVo.putParam("L2r01ProdName", tFacProd.getProdName());
+		this.totaVo.putParam("L2r01StartDate", tFacProd.getStartDate());
+		this.totaVo.putParam("L2r01EndDate", tFacProd.getEndDate());
+		this.totaVo.putParam("L2r01StatusCode", tFacProd.getStatusCode());
+		this.totaVo.putParam("L2r01AgreementFg", tFacProd.getAgreementFg());
+		this.totaVo.putParam("L2r01EnterpriseFg", tFacProd.getEnterpriseFg());
+		this.totaVo.putParam("L2r01CharCode", 1);
+		this.totaVo.putParam("L2r01AcctCode", "");
+		this.totaVo.putParam("L2r01AcctAcno", 0);
+		this.totaVo.putParam("L2r01AcctSbno", 0);
+		this.totaVo.putParam("L2r01CurrencyCode", tFacProd.getCurrencyCode());
+		this.totaVo.putParam("L2r01LowAmt", 0);
+		this.totaVo.putParam("L2r01HighAmt", 0);
+		this.totaVo.putParam("L2r01BaseRateCode", tFacProd.getBaseRateCode());
+		this.totaVo.putParam("L2r01ProdIncr", tFacProd.getProdIncr());
+		this.totaVo.putParam("L2r01GraceIncr", 0);
+		this.totaVo.putParam("L2r01LowLimitRate", tFacProd.getLowLimitRate());
+		this.totaVo.putParam("L2r01RateCode", tFacProd.getRateCode());
+		this.totaVo.putParam("L2r01IncrFlag", tFacProd.getIncrFlag());
+		this.totaVo.putParam("L2r01FirstRateAdjFreq", 0);
+		this.totaVo.putParam("L2r01RateAdjFreq", 0);
+		this.totaVo.putParam("L2r01FixAdjDd", 0);
+		this.totaVo.putParam("L2r01AmortizedCode", 9);
+		this.totaVo.putParam("L2r01IntCalcCode", 9);
+		this.totaVo.putParam("L2r01ExtraRepayCode", 9);
+		this.totaVo.putParam("L2r01RecycleCode", 9);
+		this.totaVo.putParam("L2r01FreqBase", 9);
+		this.totaVo.putParam("L2r01PayIntFreq", 99);
+		this.totaVo.putParam("L2r01RepayFreq", 99);
+		this.totaVo.putParam("L2r01GracePeriod", 999);
+		this.totaVo.putParam("L2r01BreachFlag", tFacProd.getBreachFlag());
+		this.totaVo.putParam("L2r01BreachCode", tFacProd.getBreachCode());
+		this.totaVo.putParam("L2r01BreachGetCode", tFacProd.getBreachGetCode());
+//		this.totaVo.putParam("L2r01DecreaseFlag", tFacProd.getDecreaseFlag());
+		this.totaVo.putParam("L2r01ProhibitMonth", tFacProd.getProhibitMonth());
+		this.totaVo.putParam("L2r01GovOfferFlag", tFacProd.getGovOfferFlag());
 		this.totaVo.putParam("FinancialFlag", tFacProd.getFinancialFlag());
-		this.totaVo.putParam("OEmpFlag", tFacProd.getEmpFlag());
-		this.totaVo.putParam("OPayIntLimit", 0);
-		this.totaVo.putParam("OBreachPercent", tFacProd.getBreachPercent());
-		this.totaVo.putParam("OBreachDecreaseMonth", tFacProd.getBreachDecreaseMonth());
-		this.totaVo.putParam("OBreachDecrease", tFacProd.getBreachDecrease());
-		this.totaVo.putParam("OBreachStartPercent", tFacProd.getBreachStartPercent());
-		this.totaVo.putParam("OBreach", BreachDescription);
+		this.totaVo.putParam("L2r01EmpFlag", tFacProd.getEmpFlag());
+		this.totaVo.putParam("L2r01PayIntLimit", 0);
+		this.totaVo.putParam("L2r01BreachPercent", tFacProd.getBreachPercent());
+		this.totaVo.putParam("L2r01BreachDecreaseMonth", tFacProd.getBreachDecreaseMonth());
+		this.totaVo.putParam("L2r01BreachDecrease", tFacProd.getBreachDecrease());
+		this.totaVo.putParam("L2r01BreachStartPercent", tFacProd.getBreachStartPercent());
+		this.totaVo.putParam("L2r01Breach", BreachDescription);
 		for (int i = 1; i <= 10; i++) {
 			this.totaVo.putParam("StepMonths" + i, 0);
 			this.totaVo.putParam("StepMonthE" + i, 0);

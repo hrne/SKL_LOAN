@@ -56,11 +56,11 @@ public class L2R08 extends TradeBuffer {
 		if (tCdEmp == null) {
 			// X add by eric for L5503
 			if (iErrorSkip.equals("Y") || iErrorSkip.equals("Z")) {
-				this.totaVo.putParam("OFullName", "");
-				this.totaVo.putParam("OCenterCode1", "");
-				this.totaVo.putParam("OCenterCode1Name", "");
-				this.totaVo.putParam("OCenterCode2", "");
-				this.totaVo.putParam("OCenterCode2Name", "");
+				this.totaVo.putParam("L2r08FullName", "");
+				this.totaVo.putParam("L2r08CenterCode1", "");
+				this.totaVo.putParam("L2r08CenterCode1Name", "");
+				this.totaVo.putParam("L2r08CenterCode2", "");
+				this.totaVo.putParam("L2r08CenterCode2Name", "");
 			} else {
 				throw new LogicException(titaVo, "E0001", " 員工資料檔  員工編號=" + iEmployeeNo); // 查無資料
 			}
@@ -70,19 +70,19 @@ public class L2R08 extends TradeBuffer {
 					throw new LogicException(titaVo, "E2081", " 員工編號=" + iEmployeeNo); // 該員工非現職人員
 				}
 			}
-			this.totaVo.putParam("OFullName", tCdEmp.getFullname());
-			this.totaVo.putParam("OCenterCode1", tCdEmp.getCenterCode1());
-			this.totaVo.putParam("OCenterCode1Name", tCdEmp.getCenterCode1Name());
-			this.totaVo.putParam("OCenterCode2", tCdEmp.getCenterCode2());
-			this.totaVo.putParam("OCenterCode2Name", tCdEmp.getCenterCode2Name());
+			this.totaVo.putParam("L2r08FullName", tCdEmp.getFullname());
+			this.totaVo.putParam("L2r08CenterCode1", tCdEmp.getCenterCode1());
+			this.totaVo.putParam("L2r08CenterCode1Name", tCdEmp.getCenterCode1Name());
+			this.totaVo.putParam("L2r08CenterCode2", tCdEmp.getCenterCode2());
+			this.totaVo.putParam("L2r08CenterCode2Name", tCdEmp.getCenterCode2Name());
 		}
 
 		TxTeller tTxTeller = txTellerService.findById(iEmployeeNo, titaVo);
-		this.totaVo.putParam("OGroupNo", "");
-		this.totaVo.putParam("OBrno", "");
+		this.totaVo.putParam("L2r08GroupNo", "");
+		this.totaVo.putParam("L2r08Brno", "");
 		if(tTxTeller!=null) {
-			this.totaVo.putParam("OGroupNo", tTxTeller.getGroupNo());
-			this.totaVo.putParam("OBrno", tTxTeller.getBrNo());
+			this.totaVo.putParam("L2r08GroupNo", tTxTeller.getGroupNo());
+			this.totaVo.putParam("L2r08Brno", tTxTeller.getBrNo());
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -55,8 +55,8 @@ public class L2R09 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", " 行庫代號檔  行庫代號=" + iBankCode); // 查無資料
 		}
 
-		this.totaVo.putParam("OBankItem", tCdBank.getBankItem());
-		this.totaVo.putParam("OBranchItem", tCdBank.getBranchItem());
+		this.totaVo.putParam("L2r09BankItem", tCdBank.getBankItem());
+		this.totaVo.putParam("L2r09BranchItem", tCdBank.getBranchItem());
 
 		this.addList(this.totaVo);
 		return this.sendList();

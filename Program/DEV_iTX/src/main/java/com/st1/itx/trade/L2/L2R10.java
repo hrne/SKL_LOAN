@@ -50,8 +50,8 @@ public class L2R10 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", " 額度主檔 案件編號 = " + iRimCaseNo); // 查詢資料不存在
 		}
 
-		this.totaVo.putParam("OCustNo", tFacMain.getCustNo());
-		this.totaVo.putParam("OFacmNo", tFacMain.getFacmNo());
+		this.totaVo.putParam("L2r10CustNo", tFacMain.getCustNo());
+		this.totaVo.putParam("L2r10FacmNo", tFacMain.getFacmNo());
 
 		this.addList(this.totaVo);
 		return this.sendList();

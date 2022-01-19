@@ -209,22 +209,22 @@ public class L3R14 extends TradeBuffer {
 		}
 
 		// 契約終止代碼 0.正常 1.契約終止未結案戶 2.停止依約撥款戶
-//		this.totaVo.putParam("OCancelCode", tFacMain.getCancelCode()); // 契約終止代碼
-		this.totaVo.putParam("OBormNo", OBormNo); // 撥款序號
-		this.totaVo.putParam("OCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
-		this.totaVo.putParam("OPaidTerms", tLoanBorMain.getPaidTerms() + 2); // 本期期別
-		this.totaVo.putParam("OTotalPeriod", tLoanBorMain.getTotalPeriod()); // 總期數
-		this.totaVo.putParam("ODuePayAmt", oDuePayAmt); // 撥款金額
-		this.totaVo.putParam("OSumLoanBal", oLoanBal); // 累計撥款金額
-		this.totaVo.putParam("OInterest", oInterest); // 利息金額
-		this.totaVo.putParam("OOpenInterest", oOpenInterest); // 掛帳利息
-		this.totaVo.putParam("ORealPayAmt", oRealPayAmt); // 實撥金額
-		this.totaVo.putParam("ORemitBank", t2LoanBorMain.getRemitBank()); // 匯款銀行
-		this.totaVo.putParam("ORemitBranch", t2LoanBorMain.getRemitBranch()); // 匯款分行
-		this.totaVo.putParam("ORemitAcctNo", t2LoanBorMain.getRemitAcctNo()); // 匯款帳號
-		this.totaVo.putParam("OCompensateAcct", t2LoanBorMain.getCompensateAcct()); // 戶名
-		this.totaVo.putParam("ORemark", ORemk); // 附言
-		this.totaVo.putParam("ORemitBankItem", tCdBank.getBankItem() + tCdBank.getBranchItem()); // 匯款銀行匯款分行中文
+//		this.totaVo.putParam("L3r14CancelCode", tFacMain.getCancelCode()); // 契約終止代碼
+		this.totaVo.putParam("L3r14BormNo", OBormNo); // 撥款序號
+		this.totaVo.putParam("L3r14CurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
+		this.totaVo.putParam("L3r14PaidTerms", tLoanBorMain.getPaidTerms() + 2); // 本期期別
+		this.totaVo.putParam("L3r14TotalPeriod", tLoanBorMain.getTotalPeriod()); // 總期數
+		this.totaVo.putParam("L3r14DuePayAmt", oDuePayAmt); // 撥款金額
+		this.totaVo.putParam("L3r14SumLoanBal", oLoanBal); // 累計撥款金額
+		this.totaVo.putParam("L3r14Interest", oInterest); // 利息金額
+		this.totaVo.putParam("L3r14OpenInterest", oOpenInterest); // 掛帳利息
+		this.totaVo.putParam("L3r14RealPayAmt", oRealPayAmt); // 實撥金額
+		this.totaVo.putParam("L3r14RemitBank", t2LoanBorMain.getRemitBank()); // 匯款銀行
+		this.totaVo.putParam("L3r14RemitBranch", t2LoanBorMain.getRemitBranch()); // 匯款分行
+		this.totaVo.putParam("L3r14RemitAcctNo", t2LoanBorMain.getRemitAcctNo()); // 匯款帳號
+		this.totaVo.putParam("L3r14CompensateAcct", t2LoanBorMain.getCompensateAcct()); // 戶名
+		this.totaVo.putParam("L3r14Remark", ORemk); // 附言
+		this.totaVo.putParam("L3r14RemitBankItem", tCdBank.getBankItem() + tCdBank.getBranchItem()); // 匯款銀行匯款分行中文
 
 		this.addList(this.totaVo);
 		return this.sendList();

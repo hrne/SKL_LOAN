@@ -157,7 +157,7 @@ public class L3R08 extends TradeBuffer {
 			throw new LogicException(titaVo, "E3076", ""); // 查無可變更應繳日的資料
 		}
 
-		this.totaVo.putParam("OInterest", oTotalInterest);
+		this.totaVo.putParam("L3r08Interest", oTotalInterest);
 
 		this.addList(this.totaVo);
 		return this.sendList();

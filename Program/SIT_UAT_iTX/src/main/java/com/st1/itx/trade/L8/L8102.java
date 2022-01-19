@@ -170,11 +170,6 @@ public class L8102 extends TradeBuffer {
 			for (int i = 1; i < 10; i++) {
 				String custKey = titaVo.get("CustKey" + i).trim();
 				if (!"".equals(custKey)) {
-					custMain = custMainService.custIdFirst(custKey);
-					if (custMain == null) {
-						this.info("L8102 SKIP " + custKey);
-						continue;
-					}
 
 					BigDecimal rrSeq = new BigDecimal(titaVo.get("RRSeq" + i));
 					String reviewType = titaVo.get("ReviewType" + i).trim();
@@ -186,19 +181,21 @@ public class L8102 extends TradeBuffer {
 					TxAmlCreditId txAmlCreditId = new TxAmlCreditId(dataDt8, custKey);
 					txAmlCredit.setTxAmlCreditId(txAmlCreditId);
 
+					txAmlCredit.setCustKey(custKey);
 					txAmlCredit.setRRSeq(rrSeq);
 					txAmlCredit.setReviewType(reviewType);
 					txAmlCredit.setUnit(unit);
 					txAmlCredit.setIsStatus(isStatus);
 					txAmlCredit.setWlfConfirmStatus(ConfirmStatus);
 
-					processDetail(titaVo, txAmlCredit);
+					processDetail(titaVo, txAmlCredit,true);
 				}
 			}
 		} else {
-			if (lTxAmlCredit == null) {
+			if (lTxAmlCredit != null && lTxAmlCredit.size()>0) {
+				this.info("L8102 lTxAmlCredit.size = " + lTxAmlCredit.size());
 				for (TxAmlCredit txAmlCredit : lTxAmlCredit) {
-					processDetail(titaVo, txAmlCredit);
+					processDetail(titaVo, txAmlCredit,false);
 				}
 			}
 		}
@@ -212,13 +209,25 @@ public class L8102 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void processDetail(TitaVo titaVo, TxAmlCredit txAmlCredit) throws LogicException {
+	private void processDetail(TitaVo titaVo, TxAmlCredit txAmlCredit, boolean newflag) throws LogicException {
+
+		custMain = custMainService.custIdFirst(txAmlCredit.getCustKey());
+		if (custMain == null) {
+			this.info("L8102 CustMain not found = " + txAmlCredit.getCustKey());
+			return;
+		}
 
 		txAmlCredit = checkProcessType(titaVo, txAmlCredit.getCustKey(), txAmlCredit);
+		
+		this.info("TxAmlCredit.ProcessType = " + txAmlCredit.getProcessType());
 		txAmlCredit.setProcessCount(0);
 
 		try {
-			txAmlCreditService.insert(txAmlCredit, titaVo);
+			if (newflag) {
+				txAmlCreditService.insert(txAmlCredit, titaVo);
+			} else {
+				txAmlCredit = txAmlCreditService.update2(txAmlCredit, titaVo);
+			}
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "TxAmlCredit=" + e.getErrorMsg());
 		}

@@ -97,7 +97,7 @@ public class L2R56 extends TradeBuffer {
 		if ("".equals(wkBreachDescription)) {
 			wkBreachDescription = "無綁約條件";
 		}
-		this.totaVo.putParam("OBreach", wkBreachDescription);
+		this.totaVo.putParam("L2r56Breach", wkBreachDescription);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

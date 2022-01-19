@@ -115,8 +115,6 @@ public class L4611 extends TradeBuffer {
 		renewCode = parse.stringToInteger(titaVo.getParam("RenewCode"));
 
 		BigDecimal TotalPrem = new BigDecimal("0");
-		int checkfg = 0;
-		int res = 0;
 
 		// 已執行通知作業年月
 		InsuRenew t1InsuRenew = insuRenewService.findNotiTempFgFirst("Y", titaVo);
@@ -126,6 +124,7 @@ public class L4611 extends TradeBuffer {
 		if ("".equals(endoInsuNo)) {
 			endoInsuNo = " ";
 		}
+		this.info("noticeYearMonth=" + noticeYearMonth);
 		// 額度
 		FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
 		if (tFacMain == null) {
@@ -175,10 +174,10 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
-			
+
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-			
+
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
@@ -192,7 +191,8 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setStatusCode(0);
 			tInsuRenew.setOvduDate(0);
 			tInsuRenew.setOvduNo(BigDecimal.ZERO);
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
+					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			tInsuRenew.setRepayCode(tFacMain.getRepayCode());
 			try {
@@ -206,31 +206,18 @@ public class L4611 extends TradeBuffer {
 
 		case "2": // 修改
 
-			if (oldInsuRenew.getRenewCode() != parse.stringToInteger(titaVo.getParam("RenewCode"))) { // 保險狀態不同
-				checkfg = 1;
-			}
-
-			TotalPrem = TotalPrem.add(oldInsuRenew.getFireInsuPrem());
-			TotalPrem = TotalPrem.add(oldInsuRenew.getEthqInsuPrem());
-
-			res = TotalPrem.compareTo(parse.stringToBigDecimal(titaVo.getParam("TotalPrem"))); // // 總保費
-
-			if (res != 0) {
-				checkfg = 1;
-			}
-
-			if (tInsuRenew.getAcDate() > 0) {
-				if (checkfg != 0) {
+			TotalPrem = oldInsuRenew.getFireInsuPrem().add(oldInsuRenew.getEthqInsuPrem());
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("TotalPrem"));
+			// 保險狀態不同、 總保費不同
+			if (oldInsuRenew.getRenewCode() != parse.stringToInteger(titaVo.getParam("RenewCode"))
+					|| TotalPrem.compareTo(totPrem) != 0) {
+				if (tInsuRenew.getAcDate() > 0) {
 					throw new LogicException(titaVo, "E0015", "此筆已入帳，不可修改"); // 檢查錯誤
 				}
-			}
-			if (tInsuRenew.getStatusCode() == 1) {
-				if (checkfg != 0) {
+				if (tInsuRenew.getStatusCode() == 1) {
 					throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可修改"); // 檢查錯誤
 				}
-			}
-			if (tInsuRenew.getStatusCode() == 2) {
-				if (checkfg != 0) {
+				if (tInsuRenew.getStatusCode() == 2) {
 					throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可修改"); // 檢查錯誤
 				}
 			}
@@ -262,8 +249,20 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
+					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
+			if (tInsuRenew.getRenewCode() == 2) {
+				if (insuYearMonth <= noticeYearMonth) {
+					if ("Y".equals(oldInsuRenew.getNotiTempFg())) {
+						tInsuRenew.setNotiTempFg("Y"); // 已通知
+					} else {
+						tInsuRenew.setNotiTempFg("N"); // N:未入(通知作業後修改)
+					}
+				} else {
+					tInsuRenew.setNotiTempFg(""); // null:待通知
+				}
+			}
 
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
@@ -276,13 +275,13 @@ public class L4611 extends TradeBuffer {
 
 		case "4": // 刪除
 			if (tInsuRenew.getAcDate() > 0) {
-				throw new LogicException(titaVo, "E0015", "此筆已入帳，不可修改"); // 檢查錯誤
+				throw new LogicException(titaVo, "E0015", "此筆已入帳，不可刪除"); // 檢查錯誤
 			}
 			if (tInsuRenew.getStatusCode() == 1) {
-				throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可修改"); // 檢查錯誤
+				throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可刪除"); // 檢查錯誤
 			}
 			if (tInsuRenew.getStatusCode() == 2) {
-				throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可修改"); // 檢查錯誤
+				throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可刪除"); // 檢查錯誤
 			}
 
 			// 刪除須刷主管卡
@@ -297,34 +296,17 @@ public class L4611 extends TradeBuffer {
 			}
 			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
 			break;
+
 		case "6": // 自保
-
-			if (oldInsuRenew.getRenewCode() != parse.stringToInteger(titaVo.getParam("RenewCode"))) { // 保險狀態不同
-				checkfg = 1;
-			}
-
-			TotalPrem = TotalPrem.add(oldInsuRenew.getFireInsuPrem());
-			TotalPrem = TotalPrem.add(oldInsuRenew.getEthqInsuPrem());
-
-			res = TotalPrem.compareTo(parse.stringToBigDecimal(titaVo.getParam("TotalPrem"))); // // 總保費
-
-			if (res != 0) {
-				checkfg = 1;
-			}
-
-			if (tInsuRenew.getAcDate() > 0) {
-				if (checkfg != 0) {
-					throw new LogicException(titaVo, "E0015", "此筆已入帳，不可修改"); // 檢查錯誤
+			if (tInsuRenew.getRenewCode() == 2) {
+				if (tInsuRenew.getAcDate() > 0) {
+					throw new LogicException(titaVo, "E0015", "此筆已入帳，不可自保"); // 檢查錯誤
 				}
-			}
-			if (tInsuRenew.getStatusCode() == 1) {
-				if (checkfg != 0) {
-					throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可修改"); // 檢查錯誤
+				if (tInsuRenew.getStatusCode() == 1) {
+					throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可自保"); // 檢查錯誤
 				}
-			}
-			if (tInsuRenew.getStatusCode() == 2) {
-				if (checkfg != 0) {
-					throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可修改"); // 檢查錯誤
+				if (tInsuRenew.getStatusCode() == 2) {
+					throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可自保"); // 檢查錯誤
 				}
 			}
 			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
@@ -340,7 +322,8 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
+					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
@@ -352,6 +335,7 @@ public class L4611 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+
 	}
 
 	private void resetAcReceivable(int flag, InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
@@ -360,18 +344,19 @@ public class L4611 extends TradeBuffer {
 		if (noticeYearMonth == 0) {
 			return;
 		}
+
 		if (tInsuRenew.getRenewCode() != 2) {
-			this.info("resetAcReceivable RenewCode");
+			this.info("skip AcReceivable RenewCode" + tInsuRenew.getRenewCode());
 			return;
 		}
 
 		if (tInsuRenew.getStatusCode() > 0) {
-			this.info("resetAcReceivable StatusCode");
+			this.info("skip AcReceivable StatusCode= " + tInsuRenew.getStatusCode());
 			return;
 		}
 		// 尚未通知
-		if (insuYearMonth > noticeYearMonth) {
-			this.info("resetAcReceivable insuYearMonth");
+		if ("".equals(tInsuRenew.getNotiTempFg())) {
+			this.info("skip AcReceivable NotiTempFg=" + tInsuRenew.getNotiTempFg());
 			return;
 		}
 
@@ -390,7 +375,8 @@ public class L4611 extends TradeBuffer {
 
 	private String getOrigInsuNo(TitaVo titaVo) throws LogicException {
 		String result = "";
-		InsuOrignal tInsuOrignal = insuOrignalService.findById(new InsuOrignalId(clCode1, clCode2, clNo, prevInsuNo, " "), titaVo);
+		InsuOrignal tInsuOrignal = insuOrignalService
+				.findById(new InsuOrignalId(clCode1, clCode2, clNo, prevInsuNo, " "), titaVo);
 		if (tInsuOrignal == null) {
 			InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(clCode1, clCode2, clNo, prevInsuNo, titaVo);
 			if (t2InsuRenew == null) {

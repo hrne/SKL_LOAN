@@ -98,18 +98,18 @@ public class L3R01 extends TradeBuffer {
 			}
 		}
 
-		this.totaVo.putParam("OYetDays", wkYetDays);
-		this.totaVo.putParam("OYetDate", wkYetDate);
-		this.totaVo.putParam("OCloseDate", wkCloseDate);
+		this.totaVo.putParam("L3r01YetDays", wkYetDays);
+		this.totaVo.putParam("L3r01YetDate", wkYetDate);
+		this.totaVo.putParam("L3r01CloseDate", wkCloseDate);
 
 		if (tLoanNotYet != null) {
 			if (tLoanNotYet.getReMark() != null) {
-				this.totaVo.putParam("OReMark", tLoanNotYet.getReMark());
+				this.totaVo.putParam("L3r01ReMark", tLoanNotYet.getReMark());
 			} else {
-				this.totaVo.putParam("OReMark", "");
+				this.totaVo.putParam("L3r01ReMark", "");
 			}
 		} else {
-			this.totaVo.putParam("OReMark", "");
+			this.totaVo.putParam("L3r01ReMark", "");
 		}
 
 		this.addList(this.totaVo);

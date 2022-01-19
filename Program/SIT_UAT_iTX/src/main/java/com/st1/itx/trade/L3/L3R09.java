@@ -109,29 +109,29 @@ public class L3R09 extends TradeBuffer {
 		wkFitRate = tLoanRateChange.getRateCode().equals("2") ? tLoanRateChange.getFitRate()
 				: tCdBaseRate.getBaseRate().add(tLoanRateChange.getIncrFlag().equals("Y") ? tLoanRateChange.getRateIncr() : tLoanRateChange.getIndividualIncr());
 
-		this.totaVo.putParam("OEffectDate", tLoanRateChange.getEffectDate());
-		this.totaVo.putParam("OStatus", tLoanRateChange.getStatus());
-		this.totaVo.putParam("ORateCode", tLoanRateChange.getRateCode());
-		this.totaVo.putParam("OProdNo", tLoanRateChange.getProdNo());
-		this.totaVo.putParam("OProdName", tFacProd.getProdName());
-		this.totaVo.putParam("OProdRate", tCdBaseRate.getBaseRate().add(tFacProd.getProdIncr()));
-		this.totaVo.putParam("OBaseRateCode", tLoanRateChange.getBaseRateCode());
-		this.totaVo.putParam("OBaseRate", tCdBaseRate.getBaseRate());
-		this.totaVo.putParam("OIncrFlag", tLoanRateChange.getIncrFlag());
-		this.totaVo.putParam("ORateIncr", tLoanRateChange.getRateIncr());
-		this.totaVo.putParam("OIndividualIncr", tLoanRateChange.getIndividualIncr());
-		this.totaVo.putParam("OFitRate", wkFitRate);
-		this.totaVo.putParam("ORemark", tLoanRateChange.getRemark());
+		this.totaVo.putParam("L3r09EffectDate", tLoanRateChange.getEffectDate());
+		this.totaVo.putParam("L3r09Status", tLoanRateChange.getStatus());
+		this.totaVo.putParam("L3r09RateCode", tLoanRateChange.getRateCode());
+		this.totaVo.putParam("L3r09ProdNo", tLoanRateChange.getProdNo());
+		this.totaVo.putParam("L3r09ProdName", tFacProd.getProdName());
+		this.totaVo.putParam("L3r09ProdRate", tCdBaseRate.getBaseRate().add(tFacProd.getProdIncr()));
+		this.totaVo.putParam("L3r09BaseRateCode", tLoanRateChange.getBaseRateCode());
+		this.totaVo.putParam("L3r09BaseRate", tCdBaseRate.getBaseRate());
+		this.totaVo.putParam("L3r09IncrFlag", tLoanRateChange.getIncrFlag());
+		this.totaVo.putParam("L3r09RateIncr", tLoanRateChange.getRateIncr());
+		this.totaVo.putParam("L3r09IndividualIncr", tLoanRateChange.getIndividualIncr());
+		this.totaVo.putParam("L3r09FitRate", wkFitRate);
+		this.totaVo.putParam("L3r09Remark", tLoanRateChange.getRemark());
 		// 變更記號=Y時帶原本值
 		if (iChangFg.equals("Y")) {
-			this.totaVo.putParam("OFacProdNo", tLoanRateChange.getProdNo());
-			this.totaVo.putParam("OFacBaseRateCode", tLoanRateChange.getBaseRateCode());
+			this.totaVo.putParam("L3r09FacProdNo", tLoanRateChange.getProdNo());
+			this.totaVo.putParam("L3r09FacBaseRateCode", tLoanRateChange.getBaseRateCode());
 		} else {
-			this.totaVo.putParam("OFacProdNo", tFacMain.getProdNo());
-			this.totaVo.putParam("OFacBaseRateCode", tFacMain.getBaseRateCode());
+			this.totaVo.putParam("L3r09FacProdNo", tFacMain.getProdNo());
+			this.totaVo.putParam("L3r09FacBaseRateCode", tFacMain.getBaseRateCode());
 
 		}
-//		this.totaVo.putParam("ORemark", tLoanRateChange.get.getRemark());getNextAdjRateDate
+//		this.totaVo.putParam("L3r09Remark", tLoanRateChange.get.getRemark());getNextAdjRateDate
 
 		this.addList(this.totaVo);
 		return this.sendList();

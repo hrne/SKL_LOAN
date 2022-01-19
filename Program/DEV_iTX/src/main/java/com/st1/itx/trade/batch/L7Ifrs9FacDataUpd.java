@@ -34,7 +34,6 @@ public class L7Ifrs9FacDataUpd extends BatchBase implements Tasklet, Initializin
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// // logger = LoggerFactory.getLogger(L7Ifrs9FacDataUpd.class);
 
 		// 第二個參數
 		// D=日批
@@ -58,7 +57,7 @@ public class L7Ifrs9FacDataUpd extends BatchBase implements Tasklet, Initializin
 		// 此為月底日日終批次,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L7_Ifrs9FacData_Upd(tbsdyf, empNo);
+		sJobMainService.Usp_L7_Ifrs9FacData_Upd(tbsdyf, empNo, titaVo);
 	}
 
 }

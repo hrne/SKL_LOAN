@@ -1,5 +1,5 @@
-OIncludeIntFlag=X,1
-OUnpaidIntFlag=X,1
-OBookAmt=9,14.2
-OPayMethod=X,1
-OBookStatus=9,1
+L3r03IncludeIntFlag=X,1
+L3r03UnpaidIntFlag=X,1
+L3r03BookAmt=9,14.2
+L3r03PayMethod=X,1
+L3r03BookStatus=9,1

@@ -85,13 +85,13 @@ public class L2R03 extends TradeBuffer {
 
 	// 將每筆資料放入Tota
 	private void moveTotaCaseAppl(FacCaseAppl mFacCaseAppl) throws LogicException {
-		this.totaVo.putParam("OProdNo", mFacCaseAppl.getProdNo());
-		this.totaVo.putParam("OCurrencyCode", mFacCaseAppl.getCurrencyCode());
-		this.totaVo.putParam("OAcctCode", "");
-		this.totaVo.putParam("OApplDate", mFacCaseAppl.getApplDate());
-		this.totaVo.putParam("OCreditOfficer", mFacCaseAppl.getCreditOfficer());
-		this.totaVo.putParam("OIntroducer", mFacCaseAppl.getIntroducer());
-		this.totaVo.putParam("OLoanOfficer", mFacCaseAppl.getLoanOfficer());
-		this.totaVo.putParam("OSupervisor", mFacCaseAppl.getSupervisor());
+		this.totaVo.putParam("L2r03ProdNo", mFacCaseAppl.getProdNo());
+		this.totaVo.putParam("L2r03CurrencyCode", mFacCaseAppl.getCurrencyCode());
+		this.totaVo.putParam("L2r03AcctCode", "");
+		this.totaVo.putParam("L2r03ApplDate", mFacCaseAppl.getApplDate());
+		this.totaVo.putParam("L2r03CreditOfficer", mFacCaseAppl.getCreditOfficer());
+		this.totaVo.putParam("L2r03Introducer", mFacCaseAppl.getIntroducer());
+		this.totaVo.putParam("L2r03LoanOfficer", mFacCaseAppl.getLoanOfficer());
+		this.totaVo.putParam("L2r03Supervisor", mFacCaseAppl.getSupervisor());
 	}
 }

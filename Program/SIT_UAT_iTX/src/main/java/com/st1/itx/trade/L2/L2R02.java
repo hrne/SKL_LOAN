@@ -119,39 +119,39 @@ public class L2R02 extends TradeBuffer {
 				break;
 			}
 			// 將每筆資料放入Tota
-			this.totaVo.putParam("OApplNo", tFacCaseAppl.getApplNo());
+			this.totaVo.putParam("L2r02ApplNo", tFacCaseAppl.getApplNo());
 			tCustMain = custMainService.findById(tFacCaseAppl.getCustUKey(), titaVo);
 			if (tCustMain != null) {
-				this.totaVo.putParam("OCustId", tCustMain.getCustId());
+				this.totaVo.putParam("L2r02CustId", tCustMain.getCustId());
 			} else {
 				throw new LogicException(titaVo, "E0001", " 客戶資料主檔" + tFacCaseAppl.getCustUKey()); // 查無資料
 			}
-			this.totaVo.putParam("OCreditSysNo", tFacCaseAppl.getCreditSysNo());
-			this.totaVo.putParam("OSyndNo", tFacCaseAppl.getSyndNo());
-			this.totaVo.putParam("OApplDate", tFacCaseAppl.getApplDate());
-			this.totaVo.putParam("ODepartmentCode", tFacCaseAppl.getDepartmentCode());
-			this.totaVo.putParam("OProdNo", tFacCaseAppl.getProdNo());
-			this.totaVo.putParam("OAcctCode", "");
-			this.totaVo.putParam("OCurrencyCode", tFacCaseAppl.getCurrencyCode());
-			this.totaVo.putParam("OIsLimit", tFacCaseAppl.getIsLimit());
-			this.totaVo.putParam("OIsRelated", tFacCaseAppl.getIsRelated());
-			this.totaVo.putParam("OIsLnrelNear", tFacCaseAppl.getIsLnrelNear());
-			this.totaVo.putParam("OApplAmt", tFacCaseAppl.getApplAmt());
-			this.totaVo.putParam("OEstimate", tFacCaseAppl.getEstimate());
-			this.totaVo.putParam("OPieceCode", tFacCaseAppl.getPieceCode());
-			this.totaVo.putParam("OCreditOfficer", tFacCaseAppl.getCreditOfficer());
-			this.totaVo.putParam("OLoanOfficer", tFacCaseAppl.getLoanOfficer());
-			this.totaVo.putParam("OIntroducer", tFacCaseAppl.getIntroducer());
-			this.totaVo.putParam("OSupervisor", tFacCaseAppl.getSupervisor());
-			this.totaVo.putParam("OCoorgnizer", tFacCaseAppl.getCoorgnizer());
-			this.totaVo.putParam("OProcessCode", tFacCaseAppl.getProcessCode());
-			this.totaVo.putParam("OApproveDate", tFacCaseAppl.getApproveDate());
+			this.totaVo.putParam("L2r02CreditSysNo", tFacCaseAppl.getCreditSysNo());
+			this.totaVo.putParam("L2r02SyndNo", tFacCaseAppl.getSyndNo());
+			this.totaVo.putParam("L2r02ApplDate", tFacCaseAppl.getApplDate());
+			this.totaVo.putParam("L2r02DepartmentCode", tFacCaseAppl.getDepartmentCode());
+			this.totaVo.putParam("L2r02ProdNo", tFacCaseAppl.getProdNo());
+			this.totaVo.putParam("L2r02AcctCode", "");
+			this.totaVo.putParam("L2r02CurrencyCode", tFacCaseAppl.getCurrencyCode());
+			this.totaVo.putParam("L2r02IsLimit", tFacCaseAppl.getIsLimit());
+			this.totaVo.putParam("L2r02IsRelated", tFacCaseAppl.getIsRelated());
+			this.totaVo.putParam("L2r02IsLnrelNear", tFacCaseAppl.getIsLnrelNear());
+			this.totaVo.putParam("L2r02ApplAmt", tFacCaseAppl.getApplAmt());
+			this.totaVo.putParam("L2r02Estimate", tFacCaseAppl.getEstimate());
+			this.totaVo.putParam("L2r02PieceCode", tFacCaseAppl.getPieceCode());
+			this.totaVo.putParam("L2r02CreditOfficer", tFacCaseAppl.getCreditOfficer());
+			this.totaVo.putParam("L2r02LoanOfficer", tFacCaseAppl.getLoanOfficer());
+			this.totaVo.putParam("L2r02Introducer", tFacCaseAppl.getIntroducer());
+			this.totaVo.putParam("L2r02Supervisor", tFacCaseAppl.getSupervisor());
+			this.totaVo.putParam("L2r02Coorgnizer", tFacCaseAppl.getCoorgnizer());
+			this.totaVo.putParam("L2r02ProcessCode", tFacCaseAppl.getProcessCode());
+			this.totaVo.putParam("L2r02ApproveDate", tFacCaseAppl.getApproveDate());
 			if (tFacCaseAppl.getGroupUKey().isEmpty()) {
-				this.totaVo.putParam("OGroupId", "");
+				this.totaVo.putParam("L2r02GroupId", "");
 			} else {
 				tCustMain = custMainService.findById(tFacCaseAppl.getGroupUKey(), titaVo);
 				if (tCustMain != null) {
-					this.totaVo.putParam("OGroupId", tCustMain.getCustId());
+					this.totaVo.putParam("L2r02GroupId", tCustMain.getCustId());
 				} else {
 					throw new LogicException(titaVo, "E0001", " 客戶資料主檔" + tFacCaseAppl.getGroupUKey()); // 查無資料
 				}

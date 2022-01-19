@@ -77,17 +77,17 @@ public class L2R44 extends TradeBuffer {
 			wkAuthStatus = tempVo.getParam("AuthStatus");
 			wkMainStatus = tempVo.getParam("MainStatus");
 		}
-		this.totaVo.putParam("ORepayBank", wkRepayBank);
-		this.totaVo.putParam("ORepayAcctNo", wkRepayAcctNo);
-		this.totaVo.putParam("OPostCode", wkPostCode);
-		this.totaVo.putParam("OAchAuthCode", wkAchAuthCode);
-		this.totaVo.putParam("ORelationCode", wkRelationCode);
-		this.totaVo.putParam("ORelationName", wkRelationName);
-		this.totaVo.putParam("ORelationId", wkRelationId);
-		this.totaVo.putParam("ORelationBirthday", wkRelationBirthday);
-		this.totaVo.putParam("ORelationGender", wkRelationGender);
-		this.totaVo.putParam("OAuthStatus", wkAuthStatus);
-		this.totaVo.putParam("OMainStatus", wkMainStatus);
+		this.totaVo.putParam("L2r44RepayBank", wkRepayBank);
+		this.totaVo.putParam("L2r44RepayAcctNo", wkRepayAcctNo);
+		this.totaVo.putParam("L2r44PostCode", wkPostCode);
+		this.totaVo.putParam("L2r44AchAuthCode", wkAchAuthCode);
+		this.totaVo.putParam("L2r44RelationCode", wkRelationCode);
+		this.totaVo.putParam("L2r44RelationName", wkRelationName);
+		this.totaVo.putParam("L2r44RelationId", wkRelationId);
+		this.totaVo.putParam("L2r44RelationBirthday", wkRelationBirthday);
+		this.totaVo.putParam("L2r44RelationGender", wkRelationGender);
+		this.totaVo.putParam("L2r44AuthStatus", wkAuthStatus);
+		this.totaVo.putParam("L2r44MainStatus", wkMainStatus);
 		this.info("totaVo" + totaVo);
 		this.addList(this.totaVo);
 		return this.sendList();

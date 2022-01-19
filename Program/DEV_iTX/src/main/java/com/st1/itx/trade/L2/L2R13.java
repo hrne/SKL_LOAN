@@ -53,14 +53,14 @@ public class L2R13 extends TradeBuffer {
 		if (iFunCode == 4 || iFunCode == 5 || iFunCode == 7) {
 
 			if (tCdEmp == null) {
-				this.totaVo.putParam("OFullName", "");
-				this.totaVo.putParam("OCenterCode2", "");
-				this.totaVo.putParam("OCenterCode2Name", "");
+				this.totaVo.putParam("L2r13FullName", "");
+				this.totaVo.putParam("L2r13CenterCode2", "");
+				this.totaVo.putParam("L2r13CenterCode2Name", "");
 			} else {
 
-				this.totaVo.putParam("OFullName", tCdEmp.getFullname());
-				this.totaVo.putParam("OCenterCode2", tCdEmp.getCenterCode2());
-				this.totaVo.putParam("OCenterCode2Name", tCdEmp.getCenterCode2Name());
+				this.totaVo.putParam("L2r13FullName", tCdEmp.getFullname());
+				this.totaVo.putParam("L2r13CenterCode2", tCdEmp.getCenterCode2());
+				this.totaVo.putParam("L2r13CenterCode2Name", tCdEmp.getCenterCode2Name());
 
 			}
 
@@ -75,9 +75,9 @@ public class L2R13 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0001", "協辦人員檔  員工編號=" + tCdEmp.getEmployeeNo()); // 查無資料
 				}
 
-				this.totaVo.putParam("OFullName", tCdEmp.getFullname());
-				this.totaVo.putParam("OCenterCode2", tCdEmp.getCenterCode2());
-				this.totaVo.putParam("OCenterCode2Name", tCdEmp.getCenterCode2Name());
+				this.totaVo.putParam("L2r13FullName", tCdEmp.getFullname());
+				this.totaVo.putParam("L2r13CenterCode2", tCdEmp.getCenterCode2());
+				this.totaVo.putParam("L2r13CenterCode2Name", tCdEmp.getCenterCode2Name());
 
 			}
 		}

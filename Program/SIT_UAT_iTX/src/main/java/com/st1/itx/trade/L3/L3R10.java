@@ -94,28 +94,28 @@ public class L3R10 extends TradeBuffer {
 
 	private void initTotaLoanSynd() {
 
-		this.totaVo.putParam("OSyndNo", 0);
-		this.totaVo.putParam("OLeadingBank", "");
-		this.totaVo.putParam("OAgentBank", "");
-		this.totaVo.putParam("OSigningDate", 0);
-		this.totaVo.putParam("OSyndTypeCodeFlag", "");
-		this.totaVo.putParam("OPartRate", 0);
-		this.totaVo.putParam("OCurrencyCode", "");
-		this.totaVo.putParam("OSyndAmt", 0);
-		this.totaVo.putParam("OPartAmt", 0);
+		this.totaVo.putParam("L3r10SyndNo", 0);
+		this.totaVo.putParam("L3r10LeadingBank", "");
+		this.totaVo.putParam("L3r10AgentBank", "");
+		this.totaVo.putParam("L3r10SigningDate", 0);
+		this.totaVo.putParam("L3r10SyndTypeCodeFlag", "");
+		this.totaVo.putParam("L3r10PartRate", 0);
+		this.totaVo.putParam("L3r10CurrencyCode", "");
+		this.totaVo.putParam("L3r10SyndAmt", 0);
+		this.totaVo.putParam("L3r10PartAmt", 0);
 
 	}
 
 	private void moveTotaLoanSynd() throws LogicException {
-		this.totaVo.putParam("OSyndNo", tLoanSynd.getSyndNo());
-		this.totaVo.putParam("OLeadingBank", tLoanSynd.getLeadingBank());
-		this.totaVo.putParam("OAgentBank", tLoanSynd.getAgentBank());
-		this.totaVo.putParam("OSigningDate", tLoanSynd.getSigningDate());
-		this.totaVo.putParam("OSyndTypeCodeFlag", tLoanSynd.getSyndTypeCodeFlag());
-		this.totaVo.putParam("OPartRate", tLoanSynd.getPartRate());
-		this.totaVo.putParam("OCurrencyCode", tLoanSynd.getCurrencyCode());
-		this.totaVo.putParam("OSyndAmt", tLoanSynd.getSyndAmt());
-		this.totaVo.putParam("OPartAmt", tLoanSynd.getPartAmt());
+		this.totaVo.putParam("L3r10SyndNo", tLoanSynd.getSyndNo());
+		this.totaVo.putParam("L3r10LeadingBank", tLoanSynd.getLeadingBank());
+		this.totaVo.putParam("L3r10AgentBank", tLoanSynd.getAgentBank());
+		this.totaVo.putParam("L3r10SigningDate", tLoanSynd.getSigningDate());
+		this.totaVo.putParam("L3r10SyndTypeCodeFlag", tLoanSynd.getSyndTypeCodeFlag());
+		this.totaVo.putParam("L3r10PartRate", tLoanSynd.getPartRate());
+		this.totaVo.putParam("L3r10CurrencyCode", tLoanSynd.getCurrencyCode());
+		this.totaVo.putParam("L3r10SyndAmt", tLoanSynd.getSyndAmt());
+		this.totaVo.putParam("L3r10PartAmt", tLoanSynd.getPartAmt());
 
 	}
 }

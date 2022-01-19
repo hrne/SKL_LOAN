@@ -41,7 +41,7 @@ public class L2R11 extends TradeBuffer {
 	public ClFacService clFacService;
 	@Autowired
 	public ClBuildingService sClBuildingService;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -54,12 +54,12 @@ public class L2R11 extends TradeBuffer {
 		int iApplNo = this.parse.stringToInteger(titaVo.getParam("RimApplNo"));
 
 		for (int i = 1; i <= 20; i++) {
-			this.totaVo.putParam("OClKey" + i, "");
-			this.totaVo.putParam("OApplNo" + i, 0); // 核准號碼
-			this.totaVo.putParam("OClTypeCode" + i, ""); // 擔保品類別
-			this.totaVo.putParam("OMainFlag" + i, ""); // 主要擔保品記號
-			this.totaVo.putParam("OEvaAmt" + i, 0);
-			this.totaVo.putParam("OBdLocation" + i, ""); // 門牌坐落
+			this.totaVo.putParam("L2r11ClKey" + i, "");
+			this.totaVo.putParam("L2r11ApplNo" + i, 0); // 核准號碼
+			this.totaVo.putParam("L2r11ClTypeCode" + i, ""); // 擔保品類別
+			this.totaVo.putParam("L2r11MainFlag" + i, ""); // 主要擔保品記號
+			this.totaVo.putParam("L2r11EvaAmt" + i, 0);
+			this.totaVo.putParam("L2r11BdLocation" + i, ""); // 門牌坐落
 		}
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -74,12 +74,12 @@ public class L2R11 extends TradeBuffer {
 			for (ClFac cl : lClFac.getContent()) {
 				ClMain tClMain = clMainService.findById(new ClMainId(cl.getClCode1(), cl.getClCode2(), cl.getClNo()), titaVo);
 				if (tClMain != null) {
-					this.totaVo.putParam("OClKey" + i, cl.getClCode1() + "-" + this.parse.IntegerToString(cl.getClCode2(), 2) + "-" + this.parse.IntegerToString(cl.getClNo(), 7));
-					this.totaVo.putParam("OApplNo" + i, cl.getApproveNo()); // 核准號碼
-					this.totaVo.putParam("OClTypeCode" + i, tClMain.getClTypeCode()); // 擔保品類別
-					this.totaVo.putParam("OMainFlag" + i, cl.getMainFlag()); // 主要擔保品記號
-					this.totaVo.putParam("OEvaAmt" + i, tClMain.getEvaAmt()); // 鑑價總值
-
+					this.totaVo.putParam("L2r11ClKey" + i, cl.getClCode1() + "-" + this.parse.IntegerToString(cl.getClCode2(), 2) + "-" + this.parse.IntegerToString(cl.getClNo(), 7));
+					this.totaVo.putParam("L2r11ApplNo" + i, cl.getApproveNo()); // 核准號碼
+					this.totaVo.putParam("L2r11ClTypeCode" + i,tClMain.getClTypeCode() ); // 擔保品類別
+					this.totaVo.putParam("L2r11MainFlag" + i, cl.getMainFlag()); // 主要擔保品記號
+					this.totaVo.putParam("L2r11EvaAmt" + i, tClMain.getEvaAmt()); // 鑑價總值
+					
 					ClBuildingId clBuildingId = new ClBuildingId();
 					clBuildingId.setClCode1(cl.getClCode1());
 					clBuildingId.setClCode2(cl.getClCode2());
@@ -88,11 +88,11 @@ public class L2R11 extends TradeBuffer {
 					tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 
 					if (tClBuilding != null) { // 建物門牌
-						this.totaVo.putParam("OBdLocation" + i, tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2()); // 門牌坐落
+					  this.totaVo.putParam("L2r11BdLocation" + i, tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2()); // 門牌坐落
 					} else {
-						this.totaVo.putParam("OBdLocation", "");
+					  this.totaVo.putParam("L2r11BdLocation","");
 					}
-
+					
 					i++;
 				}
 			}

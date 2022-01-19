@@ -150,32 +150,32 @@ public class L3R06 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", " iFuncCode = " + iFuncCode); // 功能選擇錯誤
 		}
 
-		this.totaVo.putParam("OLoanBal", oLoanBal);
-		this.totaVo.putParam("OIntStartDate", oIntStartDate);
-		this.totaVo.putParam("OIntEndDate", oIntEndDate);
-		this.totaVo.putParam("ORate", oRate);
-		this.totaVo.putParam("OCurrencyCode", oCurrencyCode);
-		this.totaVo.putParam("OPrincipal", oPrincipal);
-		this.totaVo.putParam("OInterest", oInterest);
-		this.totaVo.putParam("ODelayInt", oDelayInt);
-		this.totaVo.putParam("OBreachAmt", oBreachAmt);
-		this.totaVo.putParam("OCloseBreachAmt", oCloseBreachAmt);
-		this.totaVo.putParam("OShortfall", oShortfall);
-		this.totaVo.putParam("OShortfallInt", oShortfallInt);
-		this.totaVo.putParam("OShortfallPrin", oShortfallPrin);
-		this.totaVo.putParam("OShortCloseBreach", oShortCloseBreach);
-		this.totaVo.putParam("OExcessive", oExcessive);
-		this.totaVo.putParam("OTempTax", oTempTax);
-		this.totaVo.putParam("OModifyFee", oModifyFee);
-		this.totaVo.putParam("OAcctFee", oAcctFee);
-		this.totaVo.putParam("OFireFee", oFireFee);
-		this.totaVo.putParam("OCollFireFee", oCollFireFee);
-		this.totaVo.putParam("OLawFee", oLawFee);
-		this.totaVo.putParam("OCollLawFee", oCollLawFee);
-		this.totaVo.putParam("ORepayAmt", oRepayAmt);
-		this.totaVo.putParam("OTotalFee", oTotalFee);
-		this.totaVo.putParam("ORpFacmNo", oRpFacmNo);
-		this.totaVo.putParam("OCloseBreachAmtUnpaid", oCloseBreachAmtUnpaid);
+		this.totaVo.putParam("L3r06LoanBal", oLoanBal);
+		this.totaVo.putParam("L3r06IntStartDate", oIntStartDate);
+		this.totaVo.putParam("L3r06IntEndDate", oIntEndDate);
+		this.totaVo.putParam("L3r06Rate", oRate);
+		this.totaVo.putParam("L3r06CurrencyCode", oCurrencyCode);
+		this.totaVo.putParam("L3r06Principal", oPrincipal);
+		this.totaVo.putParam("L3r06Interest", oInterest);
+		this.totaVo.putParam("L3r06DelayInt", oDelayInt);
+		this.totaVo.putParam("L3r06BreachAmt", oBreachAmt);
+		this.totaVo.putParam("L3r06CloseBreachAmt", oCloseBreachAmt);
+		this.totaVo.putParam("L3r06Shortfall", oShortfall);
+		this.totaVo.putParam("L3r06ShortfallInt", oShortfallInt);
+		this.totaVo.putParam("L3r06ShortfallPrin", oShortfallPrin);
+		this.totaVo.putParam("L3r06ShortCloseBreach", oShortCloseBreach);
+		this.totaVo.putParam("L3r06Excessive", oExcessive);
+		this.totaVo.putParam("L3r06TempTax", oTempTax);
+		this.totaVo.putParam("L3r06ModifyFee", oModifyFee);
+		this.totaVo.putParam("L3r06AcctFee", oAcctFee);
+		this.totaVo.putParam("L3r06FireFee", oFireFee);
+		this.totaVo.putParam("L3r06CollFireFee", oCollFireFee);
+		this.totaVo.putParam("L3r06LawFee", oLawFee);
+		this.totaVo.putParam("L3r06CollLawFee", oCollLawFee);
+		this.totaVo.putParam("L3r06RepayAmt", oRepayAmt);
+		this.totaVo.putParam("L3r06TotalFee", oTotalFee);
+		this.totaVo.putParam("L3r06RpFacmNo", oRpFacmNo);
+		this.totaVo.putParam("L3r06CloseBreachAmtUnpaid", oCloseBreachAmtUnpaid);
 
 		this.addList(this.totaVo);
 		return this.sendList();

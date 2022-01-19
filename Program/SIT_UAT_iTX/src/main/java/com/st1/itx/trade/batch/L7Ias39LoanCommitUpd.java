@@ -34,7 +34,6 @@ public class L7Ias39LoanCommitUpd extends BatchBase implements Tasklet, Initiali
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(L7Ias39LoanCommitUpd.class);
 
 		// 第二個參數
 		// D=日批
@@ -58,7 +57,7 @@ public class L7Ias39LoanCommitUpd extends BatchBase implements Tasklet, Initiali
 		// 此為月底日日終批次,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L7_Ias39LoanCommit_Upd(tbsdyf, empNo);
+		sJobMainService.Usp_L7_Ias39LoanCommit_Upd(tbsdyf, empNo, titaVo);
 	}
 
 }

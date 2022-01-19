@@ -51,9 +51,10 @@ public class L2R58 extends TradeBuffer {
 		AcReceivable tAcReceivable = new AcReceivable();
 		Slice<AcReceivable> slAcReceivable = null;
 
-		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iRvNo + "%", 0, Integer.MAX_VALUE, titaVo);
+		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iRvNo + "%", 0, Integer.MAX_VALUE,
+				titaVo);
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
-		// 無資料 顯示錯誤訊息
+		//無資料 顯示錯誤訊息 
 		if (lAcReceivable == null) {
 			switch (iFunCd) {
 			case 1:
@@ -64,21 +65,21 @@ public class L2R58 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2003", "此筆資料不存在銷帳檔"); // 查無資料
 			}
 		}
-		// 只有一筆為一般非攤提者
+		//只有一筆為一般非攤提者
 		if (lAcReceivable.size() == 1) {
 
-			this.totaVo.putParam("OCustNo", lAcReceivable.get(0).getCustNo());
-			this.totaVo.putParam("OFacmNo", lAcReceivable.get(0).getFacmNo());
-			this.totaVo.putParam("OSyndFeeCode", lAcReceivable.get(0).getRvNo().substring(3, 5));
-			this.totaVo.putParam("OSyndFee", lAcReceivable.get(0).getRvAmt());
-			this.totaVo.putParam("ORmk", lAcReceivable.get(0).getSlipNote());
-			this.totaVo.putParam("OAcctCode", lAcReceivable.get(0).getAcctCode());
-			this.totaVo.putParam("OIsAllocation", "N");
-			this.totaVo.putParam("OSyndFeeYearMonth", "0");
-			this.totaVo.putParam("OAllocationFreq", "0");
-			this.totaVo.putParam("OAllocationTimes", "0");
+			this.totaVo.putParam("L2r58CustNo", lAcReceivable.get(0).getCustNo());
+			this.totaVo.putParam("L2r58FacmNo", lAcReceivable.get(0).getFacmNo());
+			this.totaVo.putParam("L2r58SyndFeeCode", lAcReceivable.get(0).getRvNo().substring(3, 5));
+			this.totaVo.putParam("L2r58SyndFee", lAcReceivable.get(0).getRvAmt());
+			this.totaVo.putParam("L2r58Rmk", lAcReceivable.get(0).getSlipNote());
+			this.totaVo.putParam("L2r58AcctCode", lAcReceivable.get(0).getAcctCode());
+			this.totaVo.putParam("L2r58IsAllocation", "N");
+			this.totaVo.putParam("L2r58SyndFeeYearMonth", "0");
+			this.totaVo.putParam("L2r58AllocationFreq", "0");
+			this.totaVo.putParam("L2r58AllocationTimes", "0");
 
-		}
+		} 
 		// 多筆為攤提者
 		else {
 
@@ -89,24 +90,24 @@ public class L2R58 extends TradeBuffer {
 				wkSyndFeeAmt = wkSyndFeeAmt.add(t.getRvAmt());
 				OccursList occursList = new OccursList();
 
-				occursList.putParam("OOYearMonth", t.getRvNo().substring(10, 15));// 費用年月
-				occursList.putParam("OOAllocationAmt", t.getRvAmt());// 費用年月
-				occursList.putParam("OOCloseFg", t.getClsFlag() == 1 ? "Y" : "");// 已銷記號
-				occursList.putParam("OOReceivableFg", t.getReceivableFlag());// 已銷記號
+				occursList.putParam("L2r58OYearMonth", t.getRvNo().substring(10, 15));// 費用年月
+				occursList.putParam("L2r58OAllocationAmt", t.getRvAmt());// 費用年月
+				occursList.putParam("L2r58OCloseFg", t.getClsFlag() == 1 ? "Y" : "");// 已銷記號
+				occursList.putParam("L2r58OReceivableFg", t.getReceivableFlag());// 已銷記號
 				wkRmk = t.getSlipNote();
 				this.totaVo.addOccursList(occursList);
 			}
 
-			this.totaVo.putParam("OCustNo", lAcReceivable.get(0).getCustNo());
-			this.totaVo.putParam("OFacmNo", lAcReceivable.get(0).getFacmNo());
-			this.totaVo.putParam("OSyndFeeCode", lAcReceivable.get(0).getRvNo().substring(3, 5));
-			this.totaVo.putParam("OSyndFee", wkSyndFeeAmt);
-			this.totaVo.putParam("ORmk", wkRmk);
-			this.totaVo.putParam("OAcctCode", lAcReceivable.get(0).getAcctCode());
-			this.totaVo.putParam("OIsAllocation", "Y");// 是否攤提
-			this.totaVo.putParam("OSyndFeeYearMonth", lAcReceivable.get(0).getRvNo().substring(10, 15));// 年月
-			this.totaVo.putParam("OAllocationFreq", "0");// 攤提週期
-			this.totaVo.putParam("OAllocationTimes", lAcReceivable.size());// 攤提次數
+			this.totaVo.putParam("L2r58CustNo", lAcReceivable.get(0).getCustNo());
+			this.totaVo.putParam("L2r58FacmNo", lAcReceivable.get(0).getFacmNo());
+			this.totaVo.putParam("L2r58SyndFeeCode", lAcReceivable.get(0).getRvNo().substring(3, 5));
+			this.totaVo.putParam("L2r58SyndFee", wkSyndFeeAmt);
+			this.totaVo.putParam("L2r58Rmk", wkRmk);
+			this.totaVo.putParam("L2r58AcctCode", lAcReceivable.get(0).getAcctCode());
+			this.totaVo.putParam("L2r58IsAllocation", "Y");// 是否攤提
+			this.totaVo.putParam("L2r58SyndFeeYearMonth", lAcReceivable.get(0).getRvNo().substring(10, 15));// 年月
+			this.totaVo.putParam("L2r58AllocationFreq", "0");// 攤提週期
+			this.totaVo.putParam("L2r58AllocationTimes", lAcReceivable.size());// 攤提次數
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

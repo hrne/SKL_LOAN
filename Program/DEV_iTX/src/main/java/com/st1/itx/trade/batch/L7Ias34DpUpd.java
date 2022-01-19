@@ -34,7 +34,6 @@ public class L7Ias34DpUpd extends BatchBase implements Tasklet, InitializingBean
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// // logger = LoggerFactory.getLogger(L7Ias34DpUpd.class);
 
 		// 第二個參數
 		// D=日批
@@ -60,7 +59,7 @@ public class L7Ias34DpUpd extends BatchBase implements Tasklet, InitializingBean
 		// 此為月底日日終批次,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L7_Ias34Dp_Upd(tbsdyf, empNo, newAcFg);
+		sJobMainService.Usp_L7_Ias34Dp_Upd(tbsdyf, empNo, newAcFg, titaVo);
 	}
 
 }

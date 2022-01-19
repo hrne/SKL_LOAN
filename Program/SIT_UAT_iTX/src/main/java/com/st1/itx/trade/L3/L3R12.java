@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R12")
 @Scope("prototype")
 public class L3R12 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3R12.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -119,24 +116,24 @@ public class L3R12 extends TradeBuffer {
 			wkReplyReduceAmt = wkReplyReduceAmt.add(od.getReplyReduceAmt());
 		}
 
-		this.totaVo.putParam("OOvduDate", wkOvduDate);
-		this.totaVo.putParam("OOvduPrinAmt", wkOvduPrinAmt);
-		this.totaVo.putParam("OOvduIntAmt", wkOvduIntAmt);
-		this.totaVo.putParam("OOvduBreachAmt", wkOvduBreachAmt);
-		this.totaVo.putParam("OOvduAmt", wkOvduAmt);
-		this.totaVo.putParam("OOvduPrinBal", wkOvduPrinBal);
-		this.totaVo.putParam("OOvduIntBal", wkOvduIntBal);
-		this.totaVo.putParam("OOvduBreachBal", wkOvduBreachBal);
-		this.totaVo.putParam("OOvduBal", wkOvduBal);
-		this.totaVo.putParam("OFireFee", baTxCom.getFireFee());
-		this.totaVo.putParam("OLawFee", baTxCom.getLawFee());
-		this.totaVo.putParam("OCollFireFee", baTxCom.getCollFireFee());
-		this.totaVo.putParam("OCollLawFee", baTxCom.getCollLawFee());
-		this.totaVo.putParam("OReduceInt", wkReduceInt);
-		this.totaVo.putParam("OReduceBreach", wkReduceBreach);
-		this.totaVo.putParam("OReplyReduceAmt", wkReplyReduceAmt);
-		this.totaVo.putParam("OBadDebtAmt", wkBadDebtAmt);
-		this.totaVo.putParam("OBadDebtBal", wkBadDebtBal);
+		this.totaVo.putParam("L3r12OvduDate", wkOvduDate);
+		this.totaVo.putParam("L3r12OvduPrinAmt", wkOvduPrinAmt);
+		this.totaVo.putParam("L3r12OvduIntAmt", wkOvduIntAmt);
+		this.totaVo.putParam("L3r12OvduBreachAmt", wkOvduBreachAmt);
+		this.totaVo.putParam("L3r12OvduAmt", wkOvduAmt);
+		this.totaVo.putParam("L3r12OvduPrinBal", wkOvduPrinBal);
+		this.totaVo.putParam("L3r12OvduIntBal", wkOvduIntBal);
+		this.totaVo.putParam("L3r12OvduBreachBal", wkOvduBreachBal);
+		this.totaVo.putParam("L3r12OvduBal", wkOvduBal);
+		this.totaVo.putParam("L3r12FireFee", baTxCom.getFireFee());
+		this.totaVo.putParam("L3r12LawFee", baTxCom.getLawFee());
+		this.totaVo.putParam("L3r12CollFireFee", baTxCom.getCollFireFee());
+		this.totaVo.putParam("L3r12CollLawFee", baTxCom.getCollLawFee());
+		this.totaVo.putParam("L3r12ReduceInt", wkReduceInt);
+		this.totaVo.putParam("L3r12ReduceBreach", wkReduceBreach);
+		this.totaVo.putParam("L3r12ReplyReduceAmt", wkReplyReduceAmt);
+		this.totaVo.putParam("L3r12BadDebtAmt", wkBadDebtAmt);
+		this.totaVo.putParam("L3r12BadDebtBal", wkBadDebtBal);
 
 		this.addList(this.totaVo);
 		return this.sendList();

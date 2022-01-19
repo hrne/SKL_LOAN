@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JobDetail;
 import com.st1.itx.db.service.JobDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * 夜間批次控制檔查詢
@@ -25,17 +26,38 @@ import com.st1.itx.tradeService.TradeBuffer;
 @Service("L6970")
 @Scope("prototype")
 public class L6970 extends TradeBuffer {
+
 	@Autowired
 	JobDetailService jobDetailService;
+
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6970 ");
 		this.totaVo.init(titaVo);
 
-		int choice = Integer.parseInt(titaVo.getParam("Choice"));
-		int inputStartDate = Integer.parseInt(titaVo.getParam("InputStartDate")) + 19110000;
-		int inputEndDate = Integer.parseInt(titaVo.getParam("InputEndDate")) + 19110000;
+		// 如果OOJobCode有值, 表示是重新啟動JOB
+		// 如果沒有值, 表示是查詢
+		if (titaVo.containsKey("OOJobCode")) {
+			doExecution(titaVo, titaVo.getParam("OOJobCode"));
+		} else {
+			doInquiry(titaVo);
+		}
+
+		this.info("L6970 exit.");
+
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+
+	private void doInquiry(TitaVo titaVo) throws LogicException {
+		this.info("L6970 doInquiry ... ");
+
+		int choice = parse.stringToInteger(titaVo.getParam("Choice"));
+		int inputStartDate = parse.stringToInteger(titaVo.getParam("InputStartDate")) + 19110000;
+		int inputEndDate = parse.stringToInteger(titaVo.getParam("InputEndDate")) + 19110000;
 
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -47,20 +69,25 @@ public class L6970 extends TradeBuffer {
 
 		Slice<JobDetail> slJobDetail;
 
+		// 2022-01-19 智偉新增:查Online的JobDetail
+		TitaVo onlineTitaVo = (TitaVo) titaVo.clone();
+		onlineTitaVo.setDataBaseOnLine();
+
 		if (choice == 0) {
 			// 查全部
-			slJobDetail = jobDetailService.findExecDateIn(inputStartDate, inputEndDate, this.index, this.limit, titaVo);
+			slJobDetail = jobDetailService.findExecDateIn(inputStartDate, inputEndDate, this.index, this.limit,
+					onlineTitaVo); // 2022-01-19 智偉修改:查Online
 		} else {
 			// 只查成功或失敗
 			slJobDetail = jobDetailService.findStatusExecDateIn(inputStartDate, inputEndDate, choice == 1 ? "S" : "F",
-					this.index, this.limit, titaVo);
+					this.index, this.limit, onlineTitaVo); // 2022-01-19 智偉修改:查Online
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slJobDetail != null && slJobDetail.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			/* 手動折返 */
-			this.totaVo.setMsgEndToAuto();
+			this.totaVo.setMsgEndToEnter();
 		}
 
 		ArrayList<JobDetail> lJobDetail = slJobDetail == null ? null
@@ -77,18 +104,27 @@ public class L6970 extends TradeBuffer {
 				occursList.putParam("OOStepId", tJobDetail.getStepId());
 				occursList.putParam("OOStatus", tJobDetail.getStatus());
 				occursList.putParam("OOStepStartTime", format.format(tJobDetail.getStepStartTime()));
-				
+
 				// 2022-01-10 智偉修改: 批次執行中,StepEndTime可能為null
 				occursList.putParam("OOStepEndTime",
 						tJobDetail.getStepEndTime() == null ? "" : format.format(tJobDetail.getStepEndTime()));
 
 				this.totaVo.addOccursList(occursList);
 			}
+		} else {
+			// 查無資料
+			throw new LogicException("E0001", "JobDetail");
 		}
+	}
 
-		this.info("L6970 exit.");
+	private void doExecution(TitaVo titaVo, String jobName) throws LogicException {
+		this.info("L6970 doExecution ... jobName = " + (jobName == null ? "" : jobName));
 
-		this.addList(this.totaVo);
-		return this.sendList();
+		if (jobName == null || jobName.isEmpty()) {
+			this.error("L6970 doExecution() got empty jobName");
+			throw new LogicException("EC009", "欲發動的批次程式名稱為空白");
+		} else {
+			titaVo.setBatchJobId(jobName);
+		}
 	}
 }

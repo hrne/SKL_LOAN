@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R14")
 @Scope("prototype")
 public class L2R14 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R14.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -58,9 +55,9 @@ public class L2R14 extends TradeBuffer {
 		if (lClFac == null) {
 			throw new LogicException("E2003", "擔保品與額度關聯檔");
 		} else {
-			this.totaVo.putParam("OClCode1", lClFac.getClCode1());
-			this.totaVo.putParam("OClCode2", lClFac.getClCode2());
-			this.totaVo.putParam("OClNo", lClFac.getClNo());
+			this.totaVo.putParam("L2r14ClCode1", lClFac.getClCode1());
+			this.totaVo.putParam("L2r14ClCode2", lClFac.getClCode2());
+			this.totaVo.putParam("L2r14ClNo", lClFac.getClNo());
 		}
 
 		this.addList(this.totaVo);

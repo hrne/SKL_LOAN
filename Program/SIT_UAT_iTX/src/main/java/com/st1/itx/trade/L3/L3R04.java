@@ -71,36 +71,36 @@ public class L3R04 extends TradeBuffer {
 			if (!(iFuncCode == 1 && iTxCode.equals("L3210"))) { // 暫收款登錄
 				throw new LogicException(titaVo, "E0001", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 查詢資料不存在
 			}
-			this.totaVo.putParam("OCustNo", 0);
-			this.totaVo.putParam("OChequeName", "");
-			this.totaVo.putParam("OChequeAcct", 0);
-			this.totaVo.putParam("OEntryDate", 0);
-			this.totaVo.putParam("OChequeNo", 0);
-			this.totaVo.putParam("OAcDate", 0);
-			this.totaVo.putParam("OChequeDate", 0);
-			this.totaVo.putParam("OLastUpdate", "");
-			this.totaVo.putParam("OBankCode", "");
-			this.totaVo.putParam("OBankItem", "");
-			this.totaVo.putParam("OBranchItem", "");
-			this.totaVo.putParam("OAreaCode", 0);
-			this.totaVo.putParam("OOutsideCode", 0);
-			this.totaVo.putParam("OProcessCode", 0);
-			this.totaVo.putParam("OStatusCode", 0);
-			this.totaVo.putParam("OCurrencyCode", "");
-			this.totaVo.putParam("OChequeAmt", new BigDecimal(0));
-			this.totaVo.putParam("OBktwFlag", "");
-			this.totaVo.putParam("OTsibFlag", "");
-			this.totaVo.putParam("OMediaFlag", "");
-			this.totaVo.putParam("OUsageCode", 0);
-			this.totaVo.putParam("OServiceCenter", "");
-			this.totaVo.putParam("OCreditorId", "");
-			this.totaVo.putParam("OCreditorBankCode", "");
-			this.totaVo.putParam("OCreditorBankItem", "");
-			this.totaVo.putParam("OOtherAcctCode", "");
-			this.totaVo.putParam("OReceiptNo", "");
-			this.totaVo.putParam("OKinbr", "");
-			this.totaVo.putParam("OTellerNo", "");
-			this.totaVo.putParam("OTxtNo", 0);
+			this.totaVo.putParam("L3r04CustNo", 0);
+			this.totaVo.putParam("L3r04ChequeName", "");
+			this.totaVo.putParam("L3r04ChequeAcct", 0);
+			this.totaVo.putParam("L3r04EntryDate", 0);
+			this.totaVo.putParam("L3r04ChequeNo", 0);
+			this.totaVo.putParam("L3r04AcDate", 0);
+			this.totaVo.putParam("L3r04ChequeDate", 0);
+			this.totaVo.putParam("L3r04LastUpdate", "");
+			this.totaVo.putParam("L3r04BankCode", "");
+			this.totaVo.putParam("L3r04BankItem", "");
+			this.totaVo.putParam("L3r04BranchItem", "");
+			this.totaVo.putParam("L3r04AreaCode", 0);
+			this.totaVo.putParam("L3r04OutsideCode", 0);
+			this.totaVo.putParam("L3r04ProcessCode", 0);
+			this.totaVo.putParam("L3r04StatusCode", 0);
+			this.totaVo.putParam("L3r04CurrencyCode", "");
+			this.totaVo.putParam("L3r04ChequeAmt", new BigDecimal(0));
+			this.totaVo.putParam("L3r04BktwFlag", "");
+			this.totaVo.putParam("L3r04TsibFlag", "");
+			this.totaVo.putParam("L3r04MediaFlag", "");
+			this.totaVo.putParam("L3r04UsageCode", 0);
+			this.totaVo.putParam("L3r04ServiceCenter", "");
+			this.totaVo.putParam("L3r04CreditorId", "");
+			this.totaVo.putParam("L3r04CreditorBankCode", "");
+			this.totaVo.putParam("L3r04CreditorBankItem", "");
+			this.totaVo.putParam("L3r04OtherAcctCode", "");
+			this.totaVo.putParam("L3r04ReceiptNo", "");
+			this.totaVo.putParam("L3r04Kinbr", "");
+			this.totaVo.putParam("L3r04TellerNo", "");
+			this.totaVo.putParam("L3r04TxtNo", 0);
 		} else {
 			if (iFuncCode == 1 && iTxCode.equals("L3210")) { // 暫收款登錄
 				throw new LogicException(titaVo, "E0012", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 該筆資料已存在
@@ -125,55 +125,55 @@ public class L3R04 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3058",
 						"支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo + " 票據狀況碼 = " + sErr); // 該票據狀況碼非未處理與即期票
 			}
-			this.totaVo.putParam("OCustNo", tLoanCheque.getCustNo());
-			this.totaVo.putParam("OChequeName", tLoanCheque.getChequeName());
-			this.totaVo.putParam("OChequeAcct", tLoanCheque.getChequeAcct());
-			this.totaVo.putParam("OEntryDate", tLoanCheque.getEntryDate());
-			this.totaVo.putParam("OChequeNo", tLoanCheque.getChequeNo());
-			this.totaVo.putParam("OAcDate", tLoanCheque.getAcDate());
-			this.totaVo.putParam("OChequeDate", tLoanCheque.getChequeDate());
-			this.totaVo.putParam("OLastUpdate", this.parse.timeStampToString(tLoanCheque.getLastUpdate()));
-			this.totaVo.putParam("OBankCode", tLoanCheque.getBankCode());
+			this.totaVo.putParam("L3r04CustNo", tLoanCheque.getCustNo());
+			this.totaVo.putParam("L3r04ChequeName", tLoanCheque.getChequeName());
+			this.totaVo.putParam("L3r04ChequeAcct", tLoanCheque.getChequeAcct());
+			this.totaVo.putParam("L3r04EntryDate", tLoanCheque.getEntryDate());
+			this.totaVo.putParam("L3r04ChequeNo", tLoanCheque.getChequeNo());
+			this.totaVo.putParam("L3r04AcDate", tLoanCheque.getAcDate());
+			this.totaVo.putParam("L3r04ChequeDate", tLoanCheque.getChequeDate());
+			this.totaVo.putParam("L3r04LastUpdate", this.parse.timeStampToString(tLoanCheque.getLastUpdate()));
+			this.totaVo.putParam("L3r04BankCode", tLoanCheque.getBankCode());
 			// 查詢行庫代號檔
 			String iBankCode1 = FormatUtil.padX(tLoanCheque.getBankCode().trim(), 7);
 			String bankCode1 = FormatUtil.padX(iBankCode1, 3);
 			String branchCode1 = FormatUtil.right(iBankCode1, 4);
 			CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode1, branchCode1), titaVo);
 			if (tCdBank == null) {
-				this.totaVo.putParam("OBankItem", "");
-				this.totaVo.putParam("OBranchItem", "");
+				this.totaVo.putParam("L3r04BankItem", "");
+				this.totaVo.putParam("L3r04BranchItem", "");
 			} else {
-				this.totaVo.putParam("OBankItem", tCdBank.getBankItem());
-				this.totaVo.putParam("OBranchItem", tCdBank.getBranchItem());
+				this.totaVo.putParam("L3r04BankItem", tCdBank.getBankItem());
+				this.totaVo.putParam("L3r04BranchItem", tCdBank.getBranchItem());
 			}
-			this.totaVo.putParam("OAreaCode", tLoanCheque.getAreaCode());
-			this.totaVo.putParam("OOutsideCode", tLoanCheque.getOutsideCode());
-			this.totaVo.putParam("OProcessCode", tLoanCheque.getProcessCode());
-			this.totaVo.putParam("OStatusCode", tLoanCheque.getStatusCode());
-			this.totaVo.putParam("OCurrencyCode", tLoanCheque.getCurrencyCode());
-			this.totaVo.putParam("OChequeAmt", tLoanCheque.getChequeAmt());
-			this.totaVo.putParam("OBktwFlag", tLoanCheque.getBktwFlag());
-			this.totaVo.putParam("OTsibFlag", tLoanCheque.getTsibFlag());
-			this.totaVo.putParam("OMediaFlag", tLoanCheque.getMediaFlag());
-			this.totaVo.putParam("OUsageCode", tLoanCheque.getUsageCode());
-			this.totaVo.putParam("OServiceCenter", tLoanCheque.getServiceCenter());
-			this.totaVo.putParam("OCreditorId", tLoanCheque.getCreditorId());
-			this.totaVo.putParam("OCreditorBankCode", tLoanCheque.getCreditorBankCode());
+			this.totaVo.putParam("L3r04AreaCode", tLoanCheque.getAreaCode());
+			this.totaVo.putParam("L3r04OutsideCode", tLoanCheque.getOutsideCode());
+			this.totaVo.putParam("L3r04ProcessCode", tLoanCheque.getProcessCode());
+			this.totaVo.putParam("L3r04StatusCode", tLoanCheque.getStatusCode());
+			this.totaVo.putParam("L3r04CurrencyCode", tLoanCheque.getCurrencyCode());
+			this.totaVo.putParam("L3r04ChequeAmt", tLoanCheque.getChequeAmt());
+			this.totaVo.putParam("L3r04BktwFlag", tLoanCheque.getBktwFlag());
+			this.totaVo.putParam("L3r04TsibFlag", tLoanCheque.getTsibFlag());
+			this.totaVo.putParam("L3r04MediaFlag", tLoanCheque.getMediaFlag());
+			this.totaVo.putParam("L3r04UsageCode", tLoanCheque.getUsageCode());
+			this.totaVo.putParam("L3r04ServiceCenter", tLoanCheque.getServiceCenter());
+			this.totaVo.putParam("L3r04CreditorId", tLoanCheque.getCreditorId());
+			this.totaVo.putParam("L3r04CreditorBankCode", tLoanCheque.getCreditorBankCode());
 			// 查詢行庫代號檔
 			String iBankCode2 = FormatUtil.padX(tLoanCheque.getCreditorBankCode().trim(), 7);
 			String bankCode2 = FormatUtil.padX(iBankCode2, 3);
 			String branchCode2 = FormatUtil.right(iBankCode2, 4);
 			tCdBank = cdBankService.findById(new CdBankId(bankCode2, branchCode2), titaVo);
 			if (tCdBank == null) {
-				this.totaVo.putParam("OCreditorBankItem", " ");
+				this.totaVo.putParam("L3r04CreditorBankItem", " ");
 			} else {
-				this.totaVo.putParam("OCreditorBankItem", tCdBank.getBankItem());
+				this.totaVo.putParam("L3r04CreditorBankItem", tCdBank.getBankItem());
 			}
-			this.totaVo.putParam("OOtherAcctCode", tLoanCheque.getOtherAcctCode());
-			this.totaVo.putParam("OReceiptNo", tLoanCheque.getReceiptNo());
-			this.totaVo.putParam("OKinbr", tLoanCheque.getKinbr());
-			this.totaVo.putParam("OTellerNo", tLoanCheque.getTellerNo());
-			this.totaVo.putParam("OTxtNo", tLoanCheque.getTxtNo());
+			this.totaVo.putParam("L3r04OtherAcctCode", tLoanCheque.getOtherAcctCode());
+			this.totaVo.putParam("L3r04ReceiptNo", tLoanCheque.getReceiptNo());
+			this.totaVo.putParam("L3r04Kinbr", tLoanCheque.getKinbr());
+			this.totaVo.putParam("L3r04TellerNo", tLoanCheque.getTellerNo());
+			this.totaVo.putParam("L3r04TxtNo", tLoanCheque.getTxtNo());
 		}
 
 		this.addList(this.totaVo);

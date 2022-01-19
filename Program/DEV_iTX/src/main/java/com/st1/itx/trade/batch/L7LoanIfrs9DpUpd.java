@@ -59,7 +59,7 @@ public class L7LoanIfrs9DpUpd extends BatchBase implements Tasklet, Initializing
 		// 此為月底日日終批次,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L7_LoanIfrs9Dp_Upd(tbsdyf, empNo, newAcFg);
+		sJobMainService.Usp_L7_LoanIfrs9Dp_Upd(tbsdyf, empNo, newAcFg, titaVo);
 	}
 
 }

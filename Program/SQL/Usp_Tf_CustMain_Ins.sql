@@ -56,8 +56,10 @@ BEGIN
            ELSE TRIM(CUSP."CUSECD") END
                                           AS "CustTypeCode"        -- 客戶別 VARCHAR2 2 
           ,LPAD(CUSP."CUSOCD",6,'0')      AS "IndustryCode"        -- 行業別 VARCHAR2 6 -- 2021-07-22修改: 位數不足6碼者，前補零
-          ,CUAP."CUSNAT"                  AS "NationalityCode"     -- 自然人:出生地國籍 / 法人:註冊地國籍 VARCHAR2 2 
-          ,''                             AS "BussNationalityCode" -- 法人:營業地國籍 VARCHAR2 2 
+          -- 2022-01-19 智偉一併修改:null時擺TW,有請清河確認此邏輯是否正確
+          ,NVL(CUAP."CUSNAT",'TW')        AS "NationalityCode"     -- 自然人:出生地國籍 / 法人:註冊地國籍 VARCHAR2 2 
+          -- 2022-01-19 新壽IT清河:目前轉入客戶主檔(CustMain)的居住地國籍是空的，因該欄位為新增欄位且必填，轉換時直接將該欄位寫入TW(中華民國)，謝謝。
+          ,'TW'                           AS "BussNationalityCode" -- 自然人:居住地國籍 / 法人:營業地國籍 VARCHAR2 2 
           ,TRIM(CUSP."CUSID2")            AS "SpouseId"            -- 配偶身份證號/負責人身分證 VARCHAR2 10 
           ,REPLACE(CUSP."CUSNA2",'○','o') AS "SpouseName"          -- 配偶姓名/負責人姓名 NVARCHAR2 100 
           ,CASE 

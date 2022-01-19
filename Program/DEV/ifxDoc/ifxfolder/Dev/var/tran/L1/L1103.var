@@ -869,8 +869,8 @@ T(H,#RegCityCodeBef,#L6r03ResultAreaBef)
 #RegCityCodeAft=X,2,I
 HELP(#CityHelp,cols:5)
 @
-C(5,#TypeCodeInd,X,$,C(5,#RegCityCodeAft,#RegCityCodeBef,s,$))
-V(H,#CityHelp)
+C(5,#TypeCodeInd,X,C(5,#FdRegAdrAft,*,V(7),$),C(5,#RegCityCodeAft,#RegCityCodeBef,$,C(5,#FdRegAdrAft,*,V(7),$)))
+C(4,#RegCityCodeAft,T(3,@RegAddressAft,)T(3,@RegZip3Aft,),C(5,#RegCityCodeAft,#RegCityCodeBef,$,V(H,#CityHelp)))
 
 ! 縣市代碼對應名稱
 #RegCityItemAft=X,10,L
@@ -907,7 +907,7 @@ IF(#RegCityCodeInd=="X",T(3,X),$)
 C(4,#RegCityCodeAft,S,$)
 HELP(#L6r03ResultArea,cols:5)
 @   
-C(5,#RegAreaCodeBef,#RegAreaCodeAft,s,$)
+C(5,#RegCityCodeAft,#RegCityCodeBef,C(5,#RegAreaCodeBef,#RegAreaCodeAft,s,$),$)
 V(H,#L6r03ResultArea)
 
 ! 鄉鎮市區代碼的對應名稱
@@ -1132,8 +1132,8 @@ T(2,@CurrFloorDashAft,#RegFloorDashAft)
 C(5,#SameReg,Y,s,$)
 HELP(#CityHelp,cols:5)
 @
-C(5,#TypeCodeInd,X,$,C(5,#CurrCityCodeAft,#CurrCityCodeBef,s,$))
-V(H,#CityHelp)
+C(5,#TypeCodeInd,X,C(5,#FdCurrAdrAft,*,V(7),$),C(5,#CurrCityCodeAft,#CurrCityCodeBef,$,C(5,#FdCurrAdrAft,*,V(7),$)))
+C(4,#CurrCityCodeAft,T(3,@CurrAddressAft,)T(3,@CurrZip3Aft,),C(5,#CurrCityCodeAft,#CurrCityCodeBef,$,V(H,#CityHelp)))
 
 !通訊-縣市代碼對應名稱
 #CurrCityItemAft=X,10,L
@@ -1173,7 +1173,9 @@ T(2,#L6r03Result)
 C(5,#SameReg,Y,s,$)
 C(4,#CurrCityCodeAft,S,$)
 HELP(#L6r03ResultArea1,cols:5)
-@V(H,#L6r03ResultArea1)
+@
+C(5,#CurrCityCodeAft,#CurrCityCodeBef,C(5,#CurrAreaCodeBef,#CurrAreaCodeAft,s,$),$)
+V(H,#L6r03ResultArea)
 
 !通訊 鄉鎮市區代碼的對應名稱
 #CurrAreaItemAft=X,20,L
