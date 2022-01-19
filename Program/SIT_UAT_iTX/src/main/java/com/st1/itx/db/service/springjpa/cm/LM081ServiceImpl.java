@@ -26,9 +26,12 @@ public class LM081ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth, int ApplDateStart, int ApplDateEnd, String... RuleCode) throws Exception {
 		this.info("LM081.findAll ");
 		this.info("LM081ServiceImpl RptMonth: " + RptMonth);
+		this.info("LM081ServiceImpl ApplDateStart: " + ApplDateStart);
+		this.info("LM081ServiceImpl ApplDateEnd: " + ApplDateEnd);
+		this.info("LM081ServiceImpl RuleCode: " + RuleCode);
 
 		String sql = "WITH tmp AS ( SELECT CASE nvl(cm.\"CityCode\", '05')";
 		sql += "                           WHEN '05' THEN 1";
@@ -68,9 +71,15 @@ public class LM081ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AND cm.\"FacmNo\" = fac.\"FacmNo\"";
 		sql += "                    LEFT JOIN \"CdCode\" cd ON cd.\"DefCode\" = 'RuleCode'";
 		sql += "                                           AND cd.\"Code\" = fac.\"RuleCode\"";
+		sql += "                    LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = FAC.\"ApplNo\" ";
 		sql += "                    WHERE trunc(fac.\"FirstDrawdownDate\" / 100) = :RptMonth";
 		sql += "                      AND fac.\"FirstDrawdownDate\" >= 20210319";
-		sql += "                      AND fac.\"RuleCode\" IN ('01','03')";
+		sql += "                      AND ( ";
+		sql += "                               fac.\"RuleCode\" = :RuleCode0 ";
+		for (int i = 1; i < RuleCode.length; i++)
+			sql += "                        OR fac.\"RuleCode\" = :RuleCode" + i;
+		sql += "                          ) ";
+		sql += "                      AND FCA.\"ApplDate\" BETWEEN :ApplDateStart AND :ApplDateEnd ";
 		sql += "                    GROUP BY CASE nvl(cm.\"CityCode\", '05')";
 		sql += "                             WHEN '05' THEN 1";
 		sql += "                             WHEN '10' THEN 2";
@@ -95,7 +104,11 @@ public class LM081ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("RptMonth", RptMonth);
+		query.setParameter("RptMonth", RptMonth); // YYYYMM
+		query.setParameter("ApplDateStart", ApplDateStart); // YYYYMMDD
+		query.setParameter("ApplDateEnd", ApplDateEnd); // YYYYMMDD
+		for (int i = 0; i < RuleCode.length; i++)
+			query.setParameter("RuleCode"+i, RuleCode[i]);
 
 		return this.convertToMap(query);
 	}

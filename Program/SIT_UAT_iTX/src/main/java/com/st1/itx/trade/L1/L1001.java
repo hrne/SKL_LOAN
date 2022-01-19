@@ -110,7 +110,7 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	public CustDataCtrlService custDataCtrlService;
-
+	
 	@Autowired
 	public GraceConditionService iGraceConditionService;
 
@@ -227,11 +227,11 @@ public class L1001 extends TradeBuffer {
 //						continue;
 //					}
 //				}
-
+				
 				if (iCustType > 0 && Integer.valueOf(bCustMain.getCuscCd()) != iCustType) {
 					continue;
 				}
-
+				
 				totaList(titaVo, bCustMain);
 
 			}
@@ -290,7 +290,7 @@ public class L1001 extends TradeBuffer {
 //						continue;
 //					}
 //				}
-
+				
 				if (iCustType > 0 && Integer.valueOf(eCustMain.getCuscCd()) != iCustType) {
 					continue;
 				}
@@ -349,7 +349,7 @@ public class L1001 extends TradeBuffer {
 		if ("1".equals(aCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(aCustMain.getBranchNo())) {
 			allowInquiry = false;
 		}
-
+		
 		CustDataCtrl custDataCtrl = custDataCtrlService.findById(aCustMain.getCustNo(), titaVo);
 		if (custDataCtrl != null && custDataCtrl.getApplMark() == 1) {
 			custDataControl = true;
@@ -376,8 +376,9 @@ public class L1001 extends TradeBuffer {
 		// 財報按鈕fg
 //		Slice<CustFin> stmpCustFin = sCustFinService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 //		tmpCustFin = stmpCustFin == null ? null : stmpCustFin.getContent();
-		if (!custDataControl) {
-			Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
+		if (!custDataControl && allowInquiry) {
+			Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(),
+					this.index, this.limit, titaVo);
 			List<FinReportDebt> lFinReportDebt = slFinReportDebt == null ? null : slFinReportDebt.getContent();
 
 			if (lFinReportDebt != null) {
@@ -386,7 +387,8 @@ public class L1001 extends TradeBuffer {
 		}
 		// 放款按鈕fg
 		if (aCustMain.getCustNo() != 0) {
-			Slice<FacMain> stmpFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacMain> stmpFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(),
+					0, 999, 0, Integer.MAX_VALUE, titaVo);
 			tmpFacMain = stmpFacMain == null ? null : stmpFacMain.getContent();
 //			this.info("放款按鈕" + tmpFacMain);
 			if (tmpFacMain != null) {
@@ -395,7 +397,8 @@ public class L1001 extends TradeBuffer {
 		}
 
 		if (!custDataControl) {
-			Slice<FacCaseAppl> stmplFacCaseAppl = sFacCaseApplService.caseApplCustUKeyEq(aCustMain.getCustUKey(), "0", "2", 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacCaseAppl> stmplFacCaseAppl = sFacCaseApplService.caseApplCustUKeyEq(aCustMain.getCustUKey(), "0",
+					"2", 0, Integer.MAX_VALUE, titaVo);
 			tmplFacCaseAppl = stmplFacCaseAppl == null ? null : stmplFacCaseAppl.getContent();
 //		this.info("案件=" + tmpLoanNotYet);
 			// 案件按鈕
@@ -406,7 +409,8 @@ public class L1001 extends TradeBuffer {
 
 		// 未齊件按鈕fg
 		if (!custDataControl) {
-			Slice<LoanNotYet> stmpLoanNotYet = sLoanNotYetService.findCustNoEq(aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanNotYet> stmpLoanNotYet = sLoanNotYetService.findCustNoEq(aCustMain.getCustNo(), 0,
+					Integer.MAX_VALUE, titaVo);
 			tmpLoanNotYet = stmpLoanNotYet == null ? null : stmpLoanNotYet.getContent();
 //		this.info("未齊件=" + tmpLoanNotYet);
 			if (tmpLoanNotYet != null) {
@@ -415,16 +419,19 @@ public class L1001 extends TradeBuffer {
 		}
 
 		// 保證人按鈕fg
-		if (!custDataControl) {
-			Slice<FacMain> slFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+		if (!custDataControl && allowInquiry) {
+			Slice<FacMain> slFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(), 0,
+					999, 0, Integer.MAX_VALUE, titaVo);
 			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			if (lFacMain != null) {
 				for (FacMain tFacMain : lFacMain) {
 					listApproveNo.add(tFacMain.getApplNo());
 				}
 				for (int approveNo : listApproveNo) {
-					Slice<Guarantor> stmpListGuarantor = sGuarantorService.approveNoEq(approveNo, 0, Integer.MAX_VALUE, titaVo);
-					List<Guarantor> tmpListGuarantor = stmpListGuarantor == null ? null : stmpListGuarantor.getContent();
+					Slice<Guarantor> stmpListGuarantor = sGuarantorService.approveNoEq(approveNo, 0, Integer.MAX_VALUE,
+							titaVo);
+					List<Guarantor> tmpListGuarantor = stmpListGuarantor == null ? null
+							: stmpListGuarantor.getContent();
 					if (tmpListGuarantor != null) {
 //					this.info("保證人=" + tmpListGuarantor);
 						GuarantorBTNFg = 1;
@@ -434,7 +441,7 @@ public class L1001 extends TradeBuffer {
 		}
 
 		// 擔保品按鈕fg
-		if (!custDataControl) {
+		if (!custDataControl && allowInquiry) {
 			Slice<ClFac> stmpClFac1 = sClFacService.custNoEq(aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
 			tmpClFac1 = stmpClFac1 == null ? null : stmpClFac1.getContent();
 //		this.info("擔保品=" + tmpClFac1);
@@ -444,15 +451,16 @@ public class L1001 extends TradeBuffer {
 		}
 
 		// 共同借款人
-		if (!custDataControl) {
-			Slice<FacShareAppl> stmpFacShareAppl = sFacShareApplService.findCustNoEq(aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+		if (!custDataControl && allowInquiry) {
+			Slice<FacShareAppl> stmpFacShareAppl = sFacShareApplService.findCustNoEq(aCustMain.getCustNo(), 0,
+					Integer.MAX_VALUE, titaVo);
 			if (stmpFacShareAppl != null) {
 				FacShareApplBTNFg = 1;
 			}
 		}
 
 		// 關聯戶按鈕fg
-		if (!custDataControl) {
+		if (!custDataControl && allowInquiry) {
 			ReltMain stmpReltMain = iReltMainService.ReltUKeyFirst(aCustMain.getCustUKey(), titaVo);
 //		this.info("關聯戶 =" + stmpReltMain);
 			if (stmpReltMain != null && !custDataControl) {
@@ -465,8 +473,9 @@ public class L1001 extends TradeBuffer {
 			}
 		}
 		// 交互運用按鈕fg
-		if (!custDataControl) {
-			Slice<CustCross> stmpCustCross = sCustCrossService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
+		if (!custDataControl && allowInquiry) {
+			Slice<CustCross> stmpCustCross = sCustCrossService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
+					titaVo);
 			tmpCustCross = stmpCustCross == null ? null : stmpCustCross.getContent();
 			if (tmpCustCross != null) {
 				CustCrossBTNFg = 1;
@@ -477,7 +486,8 @@ public class L1001 extends TradeBuffer {
 
 		// 客戶電話按鈕fg
 		if (!custDataControl && allowInquiry) {
-			Slice<CustTelNo> stmpCustTelNo = iCustTelNoService.findCustUKey(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
+			Slice<CustTelNo> stmpCustTelNo = iCustTelNoService.findCustUKey(aCustMain.getCustUKey(), this.index,
+					this.limit, titaVo);
 			tmpCustTelNo = stmpCustTelNo == null ? null : stmpCustTelNo.getContent();
 			if (tmpCustTelNo != null) {
 				CustTleNoBTNFg = 1;
@@ -485,18 +495,23 @@ public class L1001 extends TradeBuffer {
 		} else {
 			CustTleNoBTNFg = 2;
 		}
-
-		// 寬限條件控管 0:未設定; 1:已設定
-		if (!custDataControl) {
-			Slice<GraceCondition> sGraceConditon = iGraceConditionService.custNoEq(aCustMain.getCustNo(), aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
-			if (sGraceConditon != null) {
-				iGraceCondition = 1;
+		
+		//寬限條件控管 0:未設定; 1:Y;2:N
+		if (!custDataControl && allowInquiry) {
+			Slice<GraceCondition> sGraceCondition = iGraceConditionService.custNoEq(aCustMain.getCustNo(),aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			if (sGraceCondition != null) {
+				iGraceCondition = 2;
+				for (GraceCondition rGraceCondition :sGraceCondition) {
+					if (!rGraceCondition.getActUse().trim().isEmpty() && rGraceCondition.getActUse().equals("Y")) {
+						iGraceCondition = 1;
+					}
+				}
 			}
 		}
-
-		// 開放查詢 1:不開放;2:開放
+		
+		//開放查詢  1:不開放;2:開放
 		if (!custDataControl) {
-			if (!aCustMain.getAllowInquire().isEmpty()) {
+			if (!aCustMain.getAllowInquire().isEmpty()){
 				iAllowInquire = Integer.valueOf(aCustMain.getAllowInquire());
 			}
 		}

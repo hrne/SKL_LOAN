@@ -26,9 +26,11 @@ public class LM077ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth, int ApplDateStart, int ApplDateEnd) throws Exception {
 		this.info("LM077.findAll ");
 		this.info("LM077ServiceImpl RptMonth: " + RptMonth);
+		this.info("LM077ServiceImpl ApplDateStart: " + ApplDateStart);
+		this.info("LM077ServiceImpl ApplDateEnd: " + ApplDateEnd);
 
 		String sql = "WITH tmp AS ( SELECT CASE nvl(cm.\"CityCode\", '05')";
 		sql += "                           WHEN '05' THEN 1";
@@ -76,8 +78,10 @@ public class LM077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AND cm.\"FacmNo\" = fac.\"FacmNo\"";
 		sql += "                    LEFT JOIN \"CdCode\" cd ON cd.\"DefCode\" = 'RuleCode'";
 		sql += "                                           AND cd.\"Code\" = fac.\"RuleCode\"";
+		sql += "      LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = Fac.\"ApplNo\" ";
 		sql += "                    WHERE trunc(fac.\"FirstDrawdownDate\" / 100) = :RptMonth";
 		sql += "                      AND fac.\"RuleCode\" = '09'";
+		sql += "                      AND FCA.\"ApplDate\" BETWEEN :ApplDateStart AND :ApplDateEnd ";
 		sql += "                    GROUP BY CASE nvl(cm.\"CityCode\", '05')";
 		sql += "                             WHEN '05' THEN 1";
 		sql += "                             WHEN '10' THEN 2";
@@ -98,7 +102,10 @@ public class LM077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("RptMonth", RptMonth);
+		query.setParameter("RptMonth", RptMonth); // YYYYMM
+		query.setParameter("ApplDateStart", ApplDateStart); // YYYYMMDD
+		query.setParameter("ApplDateEnd", ApplDateEnd); // YYYYMMDD
+
 
 		return this.convertToMap(query);
 	}

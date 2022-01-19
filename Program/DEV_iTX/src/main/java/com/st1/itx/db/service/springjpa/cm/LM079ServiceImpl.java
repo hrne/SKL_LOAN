@@ -26,9 +26,11 @@ public class LM079ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth, boolean beforeSeptember) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth, int ApplDateStart, int ApplDateEnd) throws Exception {
 		this.info("LM079.findAll ");
 		this.info("LM079ServiceImpl RptMonth: " + RptMonth);
+		this.info("LM079ServiceImpl ApplDateStart: " + ApplDateStart);
+		this.info("LM079ServiceImpl ApplDateEnd: " + ApplDateEnd);
 
 		String sql = "WITH tmp AS ( SELECT CASE nvl(cm.\"CityCode\", '05')";
 		sql += "                           WHEN '05' THEN 1";
@@ -46,7 +48,6 @@ public class LM079ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                ELSE 0 END) e1";
 		sql += "                          ,SUM(fac.\"ApproveRate\" * fac.\"LineAmt\") e2";
 		sql += "                    FROM \"FacMain\" fac";
-		sql += "                    LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = FAC.\"ApplNo\" ";
 		sql += "                    LEFT JOIN ( SELECT cf.\"CustNo\"";
 		sql += "                                      ,cf.\"FacmNo\"";
 		sql += "                                      ,MAX(CASE WHEN CF.\"MainFlag\" = 'Y'";
@@ -67,13 +68,10 @@ public class LM079ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AND cm.\"FacmNo\" = fac.\"FacmNo\"";
 		sql += "                    LEFT JOIN \"CdCode\" cd ON cd.\"DefCode\" = 'RuleCode'";
 		sql += "                                           AND cd.\"Code\" = fac.\"RuleCode\"";
+		sql += "                    LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = FAC.\"ApplNo\" ";
 		sql += "                    WHERE trunc(fac.\"FirstDrawdownDate\" / 100) = :RptMonth";
 		sql += "                      AND fac.\"RuleCode\" IN ('06','07','10')";
-		if (beforeSeptember) {
-			sql += "                  AND FCA.\"ApplDate\" BETWEEN 20201208 AND 20210923 ";
-		} else {
-			sql += "                  AND FCA.\"ApplDate\" >= 20210924";
-		}
+		sql += "                      AND FCA.\"ApplDate\" BETWEEN :ApplDateStart AND :ApplDateEnd ";
 		sql += "                    GROUP BY CASE nvl(cm.\"CityCode\", '05')";
 		sql += "                             WHEN '05' THEN 1";
 		sql += "                             WHEN '10' THEN 2";
@@ -94,7 +92,9 @@ public class LM079ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("RptMonth", RptMonth);
+		query.setParameter("RptMonth", RptMonth); // YYYYMM
+		query.setParameter("ApplDateStart", ApplDateStart); // YYYYMMDD
+		query.setParameter("ApplDateEnd", ApplDateEnd); // YYYYMMDD
 
 		return this.convertToMap(query);
 	}

@@ -182,7 +182,11 @@ C(4,#CustId,$,S)
 
 !手機號碼
 #Mobile=X,10,I
-@C(4,#Mobile,$,V(9))
+C(3,#CustNoEd,0,$,S)
+C(4,#CustId,$,S)
+C(4,#CustName,$,S)
+@
+C(4,#Mobile,$,V(9))
 !T(3,@FdMobile,*)
 
 ! 行業別
@@ -293,7 +297,7 @@ T(3,1)ASGN(LOOP$)
 T(H,#OOCustTypeCode,#CustTypeCodeHelp)
 #OOCustName=x,200,L
 
-#OODataStatus=A,1,S
+#OODataStatus=X,1,S
 
 #custidlen=X,2,S
 P(1,#OOCustId)
@@ -409,10 +413,11 @@ BIND(grid,cancel))
 T(2,#OOCustNo)
 
 #OOBTN15=X,1,S
+C(5,#OODataStatus,X,BIND(grid,cancel),
 C(2,#OOGraceConditionFg,BIND(grid,{ cmd=CHAIN; ntxcd=L5906; text=未設定; ntxbuf=#OOBUF15}),
 BIND(grid,{ cmd=CHAIN; ntxcd=L5906;text=控管; ntxbuf=#OOBUF15}),
 BIND(grid,{ cmd=CHAIN; ntxcd=L5906;text=不控管; ntxbuf=#OOBUF15}),
-BIND(grid,cancel))
+BIND(grid,cancel)))
 
 !變更修改
 
@@ -428,14 +433,16 @@ C(5,#OODataStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; text=補建; ntxbu
 T(2,#OOCustId)
 
 #OOBTN16=X,1,S
-C(2,#OOAllowInquire,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1110; text=不開放; ntxbuf=#OOBUF16}),BIND(grid,{ cmd=CHAIN; ntxcd=L1110; text=開放; ntxbuf=#OOBUF16}))
+C(5,#OODataStatus,X,BIND(grid,cancel),
+C(2,#OOAllowInquire,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1110; text=不開放; ntxbuf=#OOBUF16}),BIND(grid,{ cmd=CHAIN; ntxcd=L1110; text=開放; ntxbuf=#OOBUF16})))
 
 !統一編號變更
 #OOBUF17=X,10,S
 T(2,#OOCustId)
 
 #OOBTN17=X,1,S
-C(4,#OOCustId,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1111;text=變更; ntxbuf=#OOBUF17}))
+C(5,#OODataStatus,X,BIND(grid,cancel),
+C(4,#OOCustId,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1111;text=變更; ntxbuf=#OOBUF17})))
 
 </sub>
 

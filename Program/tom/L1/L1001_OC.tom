@@ -14,5 +14,5 @@ OOCustId=X,10
 OOCustNo=9,7
 OOCustTypeCode=9,2
 OOCustName=X,200
-OODataStatus=X,1
+OODataStatus=9,1
 OOAllowInquire=X,1

@@ -3,6 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +28,13 @@ public class LM079Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
-
-	private static final BigDecimal billion = new BigDecimal("100000000");
+	
+	boolean hasOutputted = false;
+	
+	private static BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LM079Report exec start ...");
@@ -39,55 +42,66 @@ public class LM079Report extends MakeReport {
 		int iAcDate = titaVo.getEntDyI() + 19110000;
 		this.info("LM079Report exec AcDate = " + iAcDate);
 
-		List<Map<String, String>> lLM079Before = null;
-		List<Map<String, String>> lLM079After = null;
-
+		List<List<Map<String, String>>> lLM079List = new ArrayList<List<Map<String, String>>>();
+		
 		try {
-			lLM079Before = lM079ServiceImpl.findAll(titaVo, iAcDate / 100, true);
-			lLM079After = lM079ServiceImpl.findAll(titaVo, iAcDate / 100, false);
+			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate/100, 20210319, 20210923));
+			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate/100, 20210924, 20211216));
+			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate/100, 20211217, 99999999));
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("LM079ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		exportExcel(titaVo, lLM079Before, lLM079After, iAcDate);
+		exportExcel(titaVo, lLM079List, iAcDate);
 
 		return true;
 
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lListBefore, List<Map<String, String>> lListAfter, int date) throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<List<Map<String, String>>> foundList, int date) throws LogicException {
 
 		// pivot position for data inputs
-
+		
 		this.info("LM079Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
+		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM079", "B045金融機構承作「工業區閒置土地抵押貸款」統計表", "LM079_B045金融機構承作「工業區閒置土地抵押貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
 				"LM079_底稿_B045金融機構承作「工業區閒置土地抵押貸款」統計表.xlsx", 1, "FOA");
 
 		// 資料期間 C2
-		makeExcel.setValue(3, 4, "民國 " + YearMonth, "R");
+		makeExcel.setValue(3, 6, "民國 " + YearMonth, "R");
 
-		if ((lListBefore != null && !lListBefore.isEmpty()) || (lListAfter != null && !lListAfter.isEmpty())) {
-
-			doOutput(lListBefore, 3);
-			doOutput(lListAfter, 6);
-
-			for (int i = 3; i < 9; i++) {
+		if (foundList != null && !foundList.isEmpty()) {
+			
+			for (int i = 0; i < foundList.size(); i++)
+			{
+				doOutput(foundList.get(i), 3 + 3*i);
+			}
+			for (int i = 3; i < 3 + foundList.size() * 3; i++) {
 				makeExcel.formulaCaculate(12, i);
 			}
-		} else {
-			makeExcel.setValue(3, 1, "本月無資料");
 		}
-
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		
+		if (!hasOutputted)
+			makeExcel.setValue(4, 1, "本月無資料");
+		else
+			makeExcel.formulaRangeCalculate(7,14,14,32);
+		
+		// long sno = 
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
-
-	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException {
+	
+	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException
+	{
+		if (list == null || list.isEmpty())
+			return;
+		
+		hasOutputted = true;
+		
 		for (Map<String, String> tLDVo : list) {
 			int colShift = 0;
 			int rowShift = 0;
@@ -110,8 +124,8 @@ public class LM079Report extends MakeReport {
 					colShift--; // doesn't write
 					break;
 				case 1:
-					// Newly Drawdown Amount: hundred million
-					makeExcel.setValue(row + rowShift, col + colShift, computeDivide(getBigDecimal(value), billion, 2), "R");
+					// Newly Drawdown Amount: hundred million 10^8
+					makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).divide(hundredMillion, 2, BigDecimal.ROUND_UP), "R");
 					break;
 				case 2:
 					// Weighted Average of Loan: Percent
@@ -122,7 +136,7 @@ public class LM079Report extends MakeReport {
 					makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_UP), "R");
 					break;
 				default:
-					makeExcel.setValue(row + rowShift, col + colShift, value, "R");
+					makeExcel.setValue(row + rowShift, col + colShift, parse.isNumeric(value) ? getBigDecimal(value) : value, "R");
 					break;
 				}
 			} // for
