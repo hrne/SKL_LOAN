@@ -132,10 +132,8 @@ public class GlobalMG {
 		List<TxCurr> txCurr = stxCurr == null ? null : stxCurr.getContent();
 		if (txCurr != null && txCurr.size() > 0)
 			for (TxCurr c : txCurr) {
-				mgCurr.putParam(String.valueOf(c.getCurCd() < 10 ? "0" + c.getCurCd() : c.getCurCd()), c.getCurNm());
-				if (c.getCurCd() < 10)
-					mgCurr.putParam(String.valueOf(c.getCurCd()), c.getCurNm());
-				mgCurr.putParam(c.getCurNm(), String.valueOf(c.getCurCd() < 10 ? "0" + c.getCurCd() : c.getCurCd()));
+				mgCurr.putParam(c.getCurCd() < 10 ? "0" + String.valueOf(c.getCurCd()) : String.valueOf(c.getCurCd()), c.getCurNm());
+				mgCurr.putParam(c.getCurNm(), c.getCurCd() < 10 ? "0" + String.valueOf(c.getCurCd()) : String.valueOf(c.getCurCd()));
 			}
 		mgBuffer.setMgCurr(mgCurr);
 

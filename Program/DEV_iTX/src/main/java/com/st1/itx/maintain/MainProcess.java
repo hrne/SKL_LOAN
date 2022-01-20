@@ -368,7 +368,7 @@ public class MainProcess extends SysLogger {
 		}
 
 		//
-		if (this.titaVo.getCurName().isEmpty() && this.titaVo.getCurCodeS().equals("00"))
+		if (this.titaVo.getCurName().trim().isEmpty() && this.titaVo.getCurCodeS().equals("00"))
 			this.titaVo.putParam(ContentName.curnm, "TWD");
 		else
 			this.titaVo.putParam(ContentName.curnm, txBuffer.getMgCurr().getCurnm(titaVo.getCurCodeS()));
