@@ -244,11 +244,11 @@ public class L2412 extends TradeBuffer {
 
 				// 紀錄變更前變更後 擔保品主檔
 				dataLog.setEnv(titaVo, beforeClMain, tClMain);
-				dataLog.exec();
+				dataLog.exec("修改擔保品主檔資料");
 
 				// 紀錄變更前變更後 動產檔
 				dataLog.setEnv(titaVo, beforeClMovables, tClMovables);
-				dataLog.exec();
+				dataLog.exec("修改擔保品動產檔資料");
 
 				if (iApplNo > 0) {
 					String iOwnerId = titaVo.getParam("OwnerId");

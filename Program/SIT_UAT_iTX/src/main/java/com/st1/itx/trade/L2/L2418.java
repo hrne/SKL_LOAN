@@ -107,6 +107,7 @@ public class L2418 extends TradeBuffer {
 				tClOtherRights = new ClOtherRights();
 				tClOtherRights.setClOtherRightsId(tClOtherRightsId);
 
+
 				setClOtherRights(titaVo);
 
 				try {
@@ -123,8 +124,10 @@ public class L2418 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0002", "擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 新增資料已存在
 			} else if (iFunCd == 2) { // 修改
 
+
 				// 變更前
 				ClOtherRights beforeClOtherRights = (ClOtherRights) dataLog.clone(tClOtherRights);
+
 
 				setClOtherRights(titaVo);
 
@@ -136,7 +139,7 @@ public class L2418 extends TradeBuffer {
 
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClOtherRights, tClOtherRights);
-				dataLog.exec();
+				dataLog.exec("修改擔保品他項權利資料");
 			} else if (iFunCd == 4) { // 刪除
 //				tClOtherRights = sClOtherRightsService.holdById(tClOtherRightsId, titaVo);
 				try {

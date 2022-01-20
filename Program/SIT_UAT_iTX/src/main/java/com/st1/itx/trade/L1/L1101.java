@@ -517,9 +517,9 @@ public class L1101 extends TradeBuffer {
 
 	// by eric 2021.7.31
 	private void setCustCross(TitaVo titaVo, CustMain custMain) throws LogicException {
-		String SubCompanyFg = titaVo.getParam("SubCompanyFg");
-		this.info("active SubCompanyFg=" + SubCompanyFg + "/" + custMain.getCustUKey());
-		if ("Y".equals(SubCompanyFg)) {
+		String SubCompanyFg = titaVo.get("SubCompanyFg");
+//		this.info("active SubCompanyFg=" + SubCompanyFg + "/" + custMain.getCustUKey());
+		if (SubCompanyFg != null && "Y".equals(SubCompanyFg)) {
 			for (int i = 1; i <= 20; i++) {
 				String iSubCompanyCode = titaVo.get("SubCompanyCode" + i);
 				this.info("active iSubCompanyCode=" + i + "/" + iSubCompanyCode);

@@ -254,9 +254,8 @@ public class LM064Report extends MakeReport {
 					case 13:
 						// M欄 評等
 						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm) == "0" ? ""
-										: tLDVo.get(fdnm).equals("0") ? "" : tLDVo.get(fdnm),
-								"C");
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0") ? ""
+										: tLDVo.get(fdnm),"C");
 						break;
 					default:
 

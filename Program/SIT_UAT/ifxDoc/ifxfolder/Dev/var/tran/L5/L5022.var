@@ -92,6 +92,7 @@ INVOKEJS(SHOW,p1,02,02,1)
 C(3,#CHAIN,0,$,s)
 ! #NewEmpNo=X,7,S
 ! T(2,1+#EmpNo)
+@V(NL)
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 

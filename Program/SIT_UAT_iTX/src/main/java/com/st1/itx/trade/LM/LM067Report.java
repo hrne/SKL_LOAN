@@ -93,7 +93,8 @@ public class LM067Report extends MakeReport {
 
 		this.info("yymm=" + iYearMonth);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM067", "06-土地追蹤-" + iYearMonth, "LM067_06-土地追蹤-" + iYearMonth, "LM067_底稿_土地追蹤.xls", "簡表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM067", "06-土地追蹤-" + iYearMonth,
+				"LM067_06-土地追蹤-" + iYearMonth, "LM067_底稿_土地追蹤.xls", "簡表");
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
@@ -164,7 +165,10 @@ public class LM067Report extends MakeReport {
 						// B欄 戶號(數字右靠)
 						if (!tempNo.equals(tLDVo.get(fdnm))) {
 							tempNo = tLDVo.get(fdnm);
-							makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.valueOf(tLDVo.get(fdnm)), "R");
+							makeExcel.setValue(row, i,
+									tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+											: Integer.valueOf(tLDVo.get(fdnm)),
+									"R");
 						} else {
 							makeExcel.setValue(row, i, "", "R");
 						}
@@ -172,31 +176,39 @@ public class LM067Report extends MakeReport {
 						break;
 					case 3:
 						// C欄 額度
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.valueOf(tLDVo.get(fdnm)), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: Integer.valueOf(tLDVo.get(fdnm)),
+								"C");
 						break;
 					case 4:
 						// D欄 戶名
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
 						break;
 					case 5:
 						// E欄 客戶別
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
 						break;
 					case 6:
 						// F欄 用途別
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
 
 						break;
 
 					case 7:
 						// G欄位 地區別
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 
 						break;
 
 					case 8:
 						// H欄 覆審月份
-						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0 : Integer.valueOf(tLDVo.get(fdnm));
+						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
+								: Integer.valueOf(tLDVo.get(fdnm));
 						day = day % 100;
 
 						makeExcel.setValue(row, i, day, "C");
@@ -204,7 +216,10 @@ public class LM067Report extends MakeReport {
 						break;
 					case 9:
 						// I欄 撥款日期
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.parseInt(tLDVo.get(fdnm)), "R");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: Integer.parseInt(tLDVo.get(fdnm)),
+								"R");
 
 						// 與前一筆是否相同
 						if (!date.equals(tLDVo.get(fdnm))) {
@@ -221,7 +236,8 @@ public class LM067Report extends MakeReport {
 						break;
 					case 10:
 						// J欄 放款餘額
-						BigDecimal f10 = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm));
+						BigDecimal f10 = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+								: new BigDecimal(tLDVo.get(fdnm));
 						makeExcel.setValue(row, i, f10, "#,##0", "R");
 						// 所有金額總計
 
@@ -231,28 +247,37 @@ public class LM067Report extends MakeReport {
 
 					case 11:
 						// K欄 全戶餘額
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0", "R");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: new BigDecimal(tLDVo.get(fdnm)),
+								"#,##0", "R");
 						break;
 					case 12:
 						// L欄 展期記號
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 
 					case 13:
 						// M欄 是否追蹤
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					case 14:
 						// N欄 應覆審單位
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					case 15:
 						// O欄 評等
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm).equals("0") ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0") ? ""
+										: tLDVo.get(fdnm),"C");
 						break;
 					case 16:
 						// P欄 1備註
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
 						break;
 					default:
 
@@ -274,7 +299,7 @@ public class LM067Report extends MakeReport {
 		}
 
 		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 	}
 }

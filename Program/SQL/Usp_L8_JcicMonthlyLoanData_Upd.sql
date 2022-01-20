@@ -127,6 +127,7 @@ BEGIN
            END                                    AS "NextPayIntDate"    -- 下次繳息日
          , NVL(LM."NextRepayDate", 0)             AS "NextRepayDate"     -- 下次還本日
          , CASE
+             WHEN  LM."Status"  IN (6)          THEN 6
              WHEN  NVL(LM."LoanBal", 0)         =    0    THEN 0
              WHEN  NVL(LM."NextPayIntDate", 0)  > NVL(LM."MaturityDate", 0)  THEN  
               CASE     

@@ -114,9 +114,11 @@ BEGIN
          , NVL(
              CASE
                WHEN C."CurrZip3" IS NOT NULL THEN C."CurrZip3"
+               ELSE '000'
              END ||
              CASE
                WHEN C."CurrZip2" IS NOT NULL THEN SUBSTR(C."CurrZip2",1,2)
+               ELSE '00'
              END
            , ' ')                                AS "CurrZip"           -- 聯絡地址郵遞區號
          , RPAD("Fn_GetCustAddr"(C."CustUKey",1),60,TO_NCHAR('　')) AS "CurrAddr" -- 聯絡地址

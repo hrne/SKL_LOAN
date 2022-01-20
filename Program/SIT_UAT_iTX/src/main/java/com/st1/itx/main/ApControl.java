@@ -530,4 +530,36 @@ public class ApControl extends SysLogger {
 			MySpring.jobLaunch(jobId, params);
 		}
 	}
+	
+	public void clearV() {
+		jsonConvert = null;
+		eloanConver = null;
+		baseTransaction = null;
+
+		titaVo.clear();
+		titaVo = null;
+
+		totaVo.getOccursList().clear();
+		totaVo.clear();
+		totaVo = null;
+
+		mainProcess = null;
+		cs70UpDBS = null;
+		cs80UpDBS = null;
+		txToDoCom = null;
+		acEnterCom = null;
+		txAmlCom = null;
+
+		txBuffer.getAcDetailList().clear();
+		txBuffer.getAmlList().clear();
+		txBuffer.getMgCurr().clear();
+		txBuffer.getReasonLi().clear();
+		txBuffer.getRspList().clear();
+		txBuffer = null;
+
+		totaVoList.clear();
+
+		totaVoList = null;
+		tota = null;
+	}
 }

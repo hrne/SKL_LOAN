@@ -87,6 +87,20 @@ T(3,*)
 
 
 !---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!NotYetCode
+#CDDEF0001=x,30,S
+T(3,CdLoanNotYet)
+
+#NotYetCodeHelpRim=X,1,S
+RESET_RIM(#NotYetCodeHelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@NotYetCodeHelp,#HelpDesc1) 
+
+#NotYetCodeHelp=x,1024,S
+
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
@@ -386,8 +400,11 @@ IF(#OOFirstDrawdownDate==0,E(0,0),D(6,1,#FirstDateF,#DATEf))
 
 #OONotYetItemX=X,40,L
 
+#NotYetItem=X,40,L
+T(H,#OONotYetCode,#NotYetCodeHelp)
+
 #OONotYet=X,43,L
-T(2,#OONotYetCode+-+#OONotYetItemX)
+T(2,#OONotYetCode+-+#NotYetItem)
 
 #OOYetDate=D,7,L
 
@@ -467,6 +484,7 @@ TXFORM=L2921
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 <sub type="PART" name="L2921" layout="cols=1;screen.width=[100,1000];printer.width=[15,30]">

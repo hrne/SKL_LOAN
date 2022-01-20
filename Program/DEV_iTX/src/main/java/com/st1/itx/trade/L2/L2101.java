@@ -285,7 +285,7 @@ public class L2101 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "商品代碼 = " + iProdNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			datalog.setEnv(titaVo, beforeFacProd, tFacProd);
-			datalog.exec();
+			datalog.exec("修改商品參數主檔");
 			break;
 		case 4: // 刪除 商品參數生效後禁止刪除
 			try {

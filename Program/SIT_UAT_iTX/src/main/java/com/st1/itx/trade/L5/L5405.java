@@ -12,8 +12,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.PfDeparment;
 import com.st1.itx.db.domain.PfDeparmentId;
+import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.PfDeparmentService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.BcmCom;
+import com.st1.itx.util.data.DataLog;
 
 @Component("L5405")
 @Scope("prototype")
@@ -29,6 +32,12 @@ public class L5405 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public PfDeparmentService iPfDeparmentService;
+	@Autowired
+	public CdBcmService iCdBcmService;
+	@Autowired
+	public DataLog iDataLog;
+	@Autowired
+	public BcmCom iBcmCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -62,26 +71,25 @@ public class L5405 extends TradeBuffer {
 		BigDecimal iSumGoalAmt = new BigDecimal(titaVo.getParam("SumGoalAmt"));
 		PfDeparmentId iPfDeparmentId = new PfDeparmentId();
 		PfDeparment iPfDeparment = new PfDeparment();
-//		iPfDeparmentId.setWorkMonth(iworkmonth); //改為非Id
 		iPfDeparmentId.setDistCode(iDistCode);
 		iPfDeparmentId.setDeptCode(iDeptCode);
 		iPfDeparmentId.setUnitCode(iUnitCode);
-		iPfDeparment.setEmpNo(iEmpNo);
-		iPfDeparment.setPfDeparmentId(iPfDeparmentId);
-		iPfDeparment.setUnitItem(iUnitItem);
-		iPfDeparment.setDistItem(iDistItem);
-		iPfDeparment.setDeptItem(iDeptItem);
-		iPfDeparment.setDirectorCode(iDirectorCode);
-		iPfDeparment.setEmpName(iEmpName);
-		iPfDeparment.setDepartOfficer(iDepartOfficer);
-		iPfDeparment.setGoalCnt(iGoalCnt);
-		iPfDeparment.setSumGoalCnt(iSumGoalCnt);
-		iPfDeparment.setGoalAmt(iGoalAmt);
-		iPfDeparment.setSumGoalAmt(iSumGoalAmt);
 		PfDeparment xPfDeparment = iPfDeparmentService.findById(iPfDeparmentId);
 		switch (iFunctionCd) {
 		case 1:
 			if (xPfDeparment == null) {
+				iPfDeparment.setEmpNo(iEmpNo);
+				iPfDeparment.setPfDeparmentId(iPfDeparmentId);
+				iPfDeparment.setUnitItem(iUnitItem);
+				iPfDeparment.setDistItem(iDistItem);
+				iPfDeparment.setDeptItem(iDeptItem);
+				iPfDeparment.setDirectorCode(iDirectorCode);
+				iPfDeparment.setEmpName(iEmpName);
+				iPfDeparment.setDepartOfficer(iDepartOfficer);
+				iPfDeparment.setGoalCnt(iGoalCnt);
+				iPfDeparment.setSumGoalCnt(iSumGoalCnt); 
+				iPfDeparment.setGoalAmt(iGoalAmt);
+				iPfDeparment.setSumGoalAmt(iSumGoalAmt);
 				try {
 					iPfDeparmentService.insert(iPfDeparment, titaVo);
 				} catch (DBException e) {
@@ -96,8 +104,25 @@ public class L5405 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "");
 			} else {
 				try {
-					iPfDeparmentService.holdById(iPfDeparmentId);
-					iPfDeparmentService.update(iPfDeparment, titaVo);
+					PfDeparment hPfDeparment = iPfDeparmentService.holdById(iPfDeparmentId);
+					PfDeparment oldPfDeparment = (PfDeparment) iDataLog.clone(hPfDeparment);
+					hPfDeparment.setEmpNo(iEmpNo);
+					hPfDeparment.setPfDeparmentId(iPfDeparmentId);
+					hPfDeparment.setUnitItem(iUnitItem);
+					hPfDeparment.setDistItem(iDistItem);
+					hPfDeparment.setDeptItem(iDeptItem);
+					hPfDeparment.setDirectorCode(iDirectorCode);
+					hPfDeparment.setEmpName(iEmpName);
+					hPfDeparment.setDepartOfficer(iDepartOfficer);
+					hPfDeparment.setGoalCnt(iGoalCnt);
+					hPfDeparment.setSumGoalCnt(iSumGoalCnt); 
+					hPfDeparment.setGoalAmt(iGoalAmt);
+					hPfDeparment.setSumGoalAmt(iSumGoalAmt);
+					iPfDeparmentService.update(hPfDeparment, titaVo);
+					// 紀錄變更前變更後
+					iDataLog.setEnv(titaVo, oldPfDeparment, hPfDeparment);
+					iDataLog.exec();
+					iBcmCom.checkDiff(oldPfDeparment,hPfDeparment,titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料更新錯誤
 				}
@@ -108,8 +133,8 @@ public class L5405 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0004", "");
 			} else {
 				try {
-					iPfDeparmentService.holdById(iPfDeparmentId);
-					iPfDeparmentService.delete(iPfDeparment);
+					PfDeparment hPfDeparment = iPfDeparmentService.holdById(iPfDeparmentId);
+					iPfDeparmentService.delete(hPfDeparment);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 資料刪除錯誤
 				}

@@ -99,7 +99,8 @@ public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 
 //		logger.info("server send message :" + this.tota);
 		ctx.channel().writeAndFlush(this.tota);
-		ctx.close();
+		ctx.close();apControl.clearV();
+		this.tota = null;
 		ThreadVariable.clearThreadLocal();
 	}
 }
