@@ -56,8 +56,8 @@ T(3,2:郵寄放款本息攤還表暨息通知單;3:簡訊通知;9:全部)
 #Time=A,6,L
 T(4,TIME$)
 
-#BatchNo=X,20,L
-T(2,#TLRNO+#SYSCDATE+#Time)
+#BatchNo=X,50,L
+T(2,L8101+#TLRNO+#SYSCDATE+#Time)
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -212,7 +212,7 @@ T(3,1)ASGN(LOOP$)
 
 #oDataDt=D,7,S
 #oCustKey=X,10,S
-#oRRSeq=A,10,S
+#oRRSeq=X,20,S
 #oReviewType=X,1,S
 #oReviewTypeX=X,6,S
 T(H,#oReviewType,#AMLReviewTypeHelp)
@@ -251,7 +251,7 @@ T(3,B)
 T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
 
 #oBUF2b=x,1000,S
-T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag+#BatchNo)
+T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag+#BatchNo+#ReviewTypeX)
 	
 #oBtnText=X,8,S
 C(2,#oProcessType,T(3,處理),T(3,郵寄通知),T(3,郵寄通知),T(3,簡訊通知))

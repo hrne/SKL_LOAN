@@ -64,6 +64,8 @@ T(3,1:郵寄通知;2:郵寄通知;3:簡訊通知)
 !],
 !---------- AP Button AREA ----------
 
+#BatchNo=X,50,L
+T(2,L8101+#TLRNO+#SYSCDATE+#Time)
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -218,7 +220,7 @@ T(3,1)ASGN(LOOP$)
 
 #oDataDt=D,7,S
 #oCustKey=X,10,S
-#oRRSeq=A,10,S
+#oRRSeq=X,20,S
 #oReviewType=X,1,S
 #oReviewTypeX=X,6,S
 T(H,#oReviewType,#AMLReviewTypeHelp)
@@ -257,7 +259,7 @@ T(3,B)
 T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
 
 #oBUF2b=x,1000,S
-T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag)
+T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag+#BatchNo+#ReviewTypeX))
 	
 #oBtnText=X,8,S
 C(2,#oProcessType,T(3,處理),T(3,郵寄通知),T(3,郵寄通知),T(3,簡訊通知))

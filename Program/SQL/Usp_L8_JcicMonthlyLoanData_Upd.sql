@@ -63,7 +63,7 @@ BEGIN
          , M."FacmNo"                             AS "FacmNo"            -- 額度編號
          , M."BormNo"                             AS "BormNo"            -- 撥款序號
          , "CustMain"."CustId"                    AS "CustId"            -- 借款人ID / 統編
-         , NVL("LoanBorMain"."Status",0)          AS "Status"            -- 戶況 0:正常戶 1:展期 2: 催收戶 3: 結案戶 4: 逾期戶 5: 催收結案戶 6: 呆帳戶 7: 部分轉呆戶 8: 債權轉讓戶 9: 呆帳結案戶
+         , NVL(LM."Status",0)                     AS "Status"            -- 戶況 0:正常戶 1:展期 2: 催收戶 3: 結案戶 4: 逾期戶 5: 催收結案戶 6: 呆帳戶 7: 部分轉呆戶 8: 債權轉讓戶 9: 呆帳結案戶
          , M."EntCode"                            AS "EntCode"           -- 企金別  0:個金 1:企金 2:企金自然人
          , CASE
              WHEN M."EntCode" IN ('1') THEN NVL("CustMain"."SpouseId",' ')
@@ -84,7 +84,7 @@ BEGIN
            END                                    AS "IrrevocableFlag"   -- 不可撤銷 Y:是  N:否
          , CASE
              WHEN M."EntCode" IN ('1') THEN 'K'
-             WHEN NVL("CdCl"."ClTypeJCIC",' ') IN ('25') AND TRIM(NVL("LoanBorMain"."UsageCode", ' ')) IN ('02','03','04') THEN 'M'
+             WHEN NVL("CdCl"."ClTypeJCIC",' ') IN ('25') AND TRIM(NVL(LM."UsageCode", ' ')) IN ('02','03','04') THEN 'M'
              ELSE '1'
            END                                    AS "FinCode"           -- 融資分類  -- 法人:K其他
                                                                                       -- 個人:M購買住宅貸款(自用) 1個人投資理財貸款
@@ -103,39 +103,53 @@ BEGIN
              WHEN M."FacAcctCode" IN ('340')                 THEN '1'
              ELSE ' '
            END                                    AS "NonCreditCode"     -- 不計入授信項目   (ref:AS400 LN15F1)
-         , "LoanBorMain"."UsageCode"              AS "UsageCode"         -- 用途別
-         , NVL("LoanBorMain"."ApproveRate",0)     AS "ApproveRate"       -- 本筆撥款利率
+         , LM."UsageCode"                         AS "UsageCode"         -- 用途別
+         , NVL(LM."ApproveRate",0)                AS "ApproveRate"       -- 本筆撥款利率
          , NVL(M."StoreRate",0)                   AS "StoreRate"         -- 計息利率
-         , NVL("LoanBorMain"."DrawdownDate",0)    AS "DrawdownDate"      -- 撥款日期
-         , NVL("LoanBorMain"."MaturityDate",0)    AS "MaturityDate"      -- 到期日
-         , "LoanBorMain"."AmortizedCode"          AS "AmortizedCode"     -- 攤還方式 --1.按月繳息(按期繳息到期還本) 2.到期取息(到期繳息還本)
+         , NVL(LM."DrawdownDate",0)               AS "DrawdownDate"      -- 撥款日期
+         , NVL(LM."MaturityDate",0)               AS "MaturityDate"      -- 到期日
+         , LM."AmortizedCode"                     AS "AmortizedCode"     -- 攤還方式 --1.按月繳息(按期繳息到期還本) 2.到期取息(到期繳息還本)
                                                                          --            3.本息平均法(期金)           4.本金平均法
          , M."CurrencyCode"                       AS "CurrencyCode"      -- 幣別
-         , NVL("LoanBorMain"."DrawdownAmt",0)     AS "DrawdownAmt"       -- 撥款金額
+         , NVL(LM."DrawdownAmt",0)                AS "DrawdownAmt"       -- 撥款金額
          , NVL(M."LoanBalance",0)                 AS "LoanBal"           -- 放款餘額
          , NVL(AC."Principal",0)                  AS "PrevAmt"           -- 本月應收本金
          , NVL(AC."Interest",0)                   AS "IntAmt"            -- 本月應收利息
          , 0                                      AS "PrevAmtRcv"        -- 本月實收本金   -- 後面才更新值
          , 0                                      AS "IntAmtRcv"         -- 本月實收利息   -- 後面才更新值
          , 0                                      AS "FeeAmtRcv"         -- 本月收取費用   -- 後面才更新值
-         , NVL("LoanBorMain"."PrevPayIntDate", 0) AS "PrevPayIntDate"    -- 上次繳息日
-         , NVL("LoanBorMain"."PrevRepaidDate", 0) AS "PrevRepaidDate"    -- 上次還本日
-         , NVL("LoanBorMain"."NextPayIntDate", 0) AS "NextPayIntDate"    -- 下次繳息日
-         , NVL("LoanBorMain"."NextRepayDate", 0)  AS "NextRepayDate"     -- 下次還本日
+         , NVL(LM."PrevPayIntDate", 0)            AS "PrevPayIntDate"    -- 上次繳息日
+         , NVL(LM."PrevRepaidDate", 0)            AS "PrevRepaidDate"    -- 上次還本日
          , CASE
-             WHEN  NVL("LoanBorMain"."NextPayIntDate", 0) <  19110000
-                OR NVL("LoanBorMain"."NextPayIntDate", 0) >= TMNDYF THEN 0
-             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextPayIntDate",'yyyy-mm-dd')))
+             WHEN NVL(LM."NextPayIntDate", 0) > NVL(LM."MaturityDate", 0) 
+                                                  THEN LM."MaturityDate" 
+             ELSE NVL(LM."NextPayIntDate", 0) 
+           END                                    AS "NextPayIntDate"    -- 下次繳息日
+         , NVL(LM."NextRepayDate", 0)             AS "NextRepayDate"     -- 下次還本日
+         , CASE
+             WHEN  NVL(LM."LoanBal", 0)         =    0    THEN 0
+             WHEN  NVL(LM."NextPayIntDate", 0)  > NVL(LM."MaturityDate", 0)  THEN  
+              CASE     
+                WHEN  NVL(LM."MaturityDate", 0) <  19110000
+                   OR NVL(LM."MaturityDate", 0) >= TMNDYF THEN 0
+                ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE(LM."MaturityDate",'yyyy-mm-dd')))
+              END 
+             ELSE
+              CASE    
+                WHEN  NVL(LM."NextPayIntDate", 0) <  19110000
+                   OR NVL(LM."NextPayIntDate", 0) >= TMNDYF THEN 0
+                ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE(LM."NextPayIntDate",'yyyy-mm-dd')))
+              END 
            END                                    AS "IntDelayMon"       -- 利息逾期月數
          , CASE
-             WHEN  NVL("LoanBorMain"."NextRepayDate", 0) <  19110000
-                OR NVL("LoanBorMain"."NextRepayDate", 0) >= TMNDYF THEN 0
-             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."NextRepayDate",'yyyy-mm-dd')))
+             WHEN  NVL(LM."NextRepayDate", 0) <  19110000
+                OR NVL(LM."NextRepayDate", 0) >= TMNDYF THEN 0
+             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE(LM."NextRepayDate",'yyyy-mm-dd')))
            END                                     AS "RepayDelayMon"     -- 本金逾期月數
          , CASE
-             WHEN  NVL("LoanBorMain"."MaturityDate", 0) <  19110000
-                OR NVL("LoanBorMain"."MaturityDate", 0) >= TMNDYF THEN 0
-             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE("LoanBorMain"."MaturityDate",'yyyy-mm-dd')))
+             WHEN  NVL(LM."MaturityDate", 0) <  19110000
+                OR NVL(LM."MaturityDate", 0) >= TMNDYF THEN 0
+             ELSE  TRUNC(months_between(TO_DATE(TMNDYF,'yyyy-mm-dd'), TO_DATE(LM."MaturityDate",'yyyy-mm-dd')))
            END                                    AS "RepaidEndMon"      -- 本金逾到期日(清償期)月數
          , NVL(C."ClCode1", 0)                    AS "ClCode1"           -- 主要擔保品代號1
          , NVL(C."ClCode2", 0)                    AS "ClCode2"           -- 主要擔保品代號2
@@ -171,9 +185,9 @@ BEGIN
       LEFT JOIN "FacMain"     ON "FacMain"."CustNo"       = M."CustNo"
                              AND "FacMain"."FacmNo"       = M."FacmNo"
       LEFT JOIN "CustMain"    ON "CustMain"."CustNo"      = M."CustNo"
-      LEFT JOIN "LoanBorMain" ON "LoanBorMain"."CustNo"   = M."CustNo"
-                             AND "LoanBorMain"."FacmNo"   = M."FacmNo"
-                             AND "LoanBorMain"."BormNo"   = M."BormNo"
+      LEFT JOIN "LoanBorMain"  LM ON LM."CustNo"   = M."CustNo"
+                                 AND LM."FacmNo"   = M."FacmNo"
+                                 AND LM."BormNo"   = M."BormNo"
       LEFT JOIN ( SELECT C."ClCode1"
                        , C."ClCode2"
                        , C."ClNo"
@@ -241,7 +255,7 @@ BEGIN
                     GROUP BY C."SpouseId"
                 ) C2    ON C2."SpouseId"    = "CustMain"."CustId"
      WHERE  M."YearMonth"  =  YYYYMM
-       AND  "LoanBorMain"."CustNo" IS NOT NULL
+       AND  LM."CustNo" IS NOT NULL
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;

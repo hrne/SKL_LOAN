@@ -84,7 +84,6 @@ SettingStat=9,1
 ClStat=9,1
 SettingDate=9,7
 SettingBalance=9,14
-SettingAmt=9,14
 EvaDate=9,7
 EvaAmt=9,14
 MtgDate=9,7

@@ -138,10 +138,13 @@ public class TxToDoCom extends TradeBuffer {
 			bormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
 		}
 
-		if (titaVo.get("TxBormNo") != null) {
+		if ("L3100".equals(titaVo.getTxcd())) {
 			tTempVo = new TempVo();
 			tTempVo.clear();
 			tTempVo.putParam("BormNo", bormNo);
+		}
+
+		if (titaVo.get("TxBormNo") != null) {
 			bormNo = this.parse.stringToInteger(titaVo.getParam("TxBormNo"));
 		}
 
@@ -346,11 +349,12 @@ public class TxToDoCom extends TradeBuffer {
 					// 訂正交易 2.已處理 --> 0.未處理
 					tDetail.setStatus(status);
 					// 合併銷帳檔及會計分錄的jsonFields
-					TempVo rTempVo = new TempVo();
-					rTempVo = rTempVo.getVo(tDetail.getProcessNote());
-					rTempVo.putAll(tTempVo);
-					tDetail.setProcessNote(rTempVo.getJsonString());
-
+					if ("L3100".equals(titaVo.getTxcd())) {
+						TempVo rTempVo = new TempVo();
+						rTempVo = rTempVo.getVo(tDetail.getProcessNote());
+						rTempVo.putAll(tTempVo);
+						tDetail.setProcessNote(rTempVo.getJsonString());
+					}
 					// 加新資料狀態筆數，正常交易執行
 					addMainCntValue(tMain, tDetail, titaVo);
 
@@ -794,7 +798,7 @@ public class TxToDoCom extends TradeBuffer {
 		case "L9711":
 			settingValue = "L9711 ;-;C;-;-;-;L698A;L9711;L9711;-;產生放款到期明細表及通知單";
 			break;
-		case "PFCL00":  // L6101 寫入，提醒經辦
+		case "PFCL00": // L6101 寫入，提醒經辦
 			settingValue = "PFCL00;-;M;-;-;-;L698A;     ;L5500;-;業績工作月結算啟動通知";
 			break;
 		case "NOTI01": // L4454 寫入應處理明細留存檔，紀錄列印日期

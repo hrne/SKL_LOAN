@@ -88,7 +88,7 @@ public class LM081Report extends MakeReport {
 		if (!hasOutputted)
 			makeExcel.setValue(4, 1, "本月無資料");
 		else
-			makeExcel.formulaRangeCalculate(8,15,17,41);
+			makeExcel.formulaRangeCalculate(8,15,15,41);
 		
 		// long sno =
 		makeExcel.close();

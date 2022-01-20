@@ -853,6 +853,7 @@ V(H,#JobTitleHelp)
 
 
 #InsiderJobTitleX=X,30,L
+C(4,#InsiderJobTitle,S,$)
 T(H,#InsiderJobTitle,#JobTitleHelp)
 
 ! [公司內部人身分註記]
@@ -869,6 +870,7 @@ V(H,#PositionHelp)
 
 
 #InsiderPositionX=X,20,L
+C(4,#InsiderPosition,S,$)
 T(H,#InsiderPosition,#PositionHelp)
 
 ! [法定關係人統編]
@@ -1141,7 +1143,6 @@ IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
 #ClStat
 #SettingDate
 #SettingBalance
-#SettingAmt
 #EvaDate
 #EvaAmt
 #MtgDate

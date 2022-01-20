@@ -355,9 +355,10 @@ public class BS900 extends TradeBuffer {
 				}
 				// 帳齡 以放款主檔的下次應繳日~本營業日計算 0.一個月以下 1.一~三個月 2.三~六個月3.六個月以上
 				int aging = 0;
-				if (ln.getNextPayIntDate() < tmnDyf) {
+				int nextPayIntDate = ln.getNextPayIntDate() + 19110000;
+				if (nextPayIntDate < tmnDyf) {
 					dateUtil.init();
-					dateUtil.setDate_1(ln.getNextPayIntDate());
+					dateUtil.setDate_1(nextPayIntDate);
 					dateUtil.setDate_2(tmnDyf);
 					dateUtil.dateDiff();
 					if (dateUtil.getMons() < 1)

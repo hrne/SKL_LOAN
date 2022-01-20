@@ -81,6 +81,19 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,34,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(3,#CHAIN,1,T(1,@ChainCustNo,#NTXBUF,8,7),$)
+C(3,#CHAIN,1,T(1,@ChainApplNo,#NTXBUF,25,7),$)
+C(3,#CHAIN,1,T(1,@ChainCaseNo,#NTXBUF,1,7),$)
+
+#ChainCustNo=A,7,S
+
+#ChainApplNo=A,7,S
+
+#ChainCaseNo=A,7,S
+
+
+
+
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
@@ -100,7 +113,7 @@ T(3,*)
 #FdCustNo=X,2,L
 
 #CustNo=X,7,I
-C(3,#CHAIN,1,T(1,#NTXBUF,8,7),$)
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
 !INVOKEJS(SHOW,p1,1,4,1)
 !SHOW(#BTN2)
@@ -189,7 +202,7 @@ C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 
 #ApplNo=X,7,I
-C(3,#CHAIN,1,T(1,#NTXBUF,25,7),$)
+C(3,#CHAIN,1,C(3,#ChainApplNo,0,$,E(0,#ChainApplNo)),$)
 C(3,#CHAIN,1,s,$)
 C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
@@ -248,7 +261,7 @@ C(4,#ApplNo,S,T(2,#L2r07CustName))
 !T(3,*)
 
 #CaseNo=X,7,I
-C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
+C(3,#CHAIN,1,C(3,#ChainCaseNo,0,$,E(0,#ChainCaseNo)),$)
 C(3,#CHAIN,1,s,$)
 C(4,#CustNo,$,S)
 C(4,#CustId,$,S)

@@ -87,7 +87,6 @@ SettingStat=9,1
 ClStat=9,1
 SettingDate=9,7
 SettingBal=9,14
-SettingAmt=9,14
 Synd=X,1
 SyndCode=X,1
 DispPrice=9,14

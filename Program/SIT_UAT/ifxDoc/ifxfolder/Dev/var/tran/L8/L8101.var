@@ -81,7 +81,7 @@ T(2,@ConfirmStatusH,#HelpDesc2)
 S(L8R53,01,#DataDt,#CustKey,#END)
 R(1,L8R53)
 
-#RRSeq=A,10,L
+#RRSeq=X,20,L
 #ReviewType=X,1,L
 #ReviewTypeX=X,6,L
 T(H,#ReviewType,#ReviewTypeH)
@@ -157,7 +157,7 @@ C(3,#ProcessType,1,E(0,1),E(0,0))
 !C(3,#ProcessType,2,T(3,N),T(3,Y))
 T(3,Y)
 
-#BatchNo=x,10,S
+#BatchNo=x,50,S
 
 ![確定傳送]自動或手動
 #TXMT=A,1,S
@@ -217,6 +217,7 @@ K(MODIFYBUTTON,1,上傳附件)
 #CustKey
 #RRSeq
 #ReviewType
+#ReviewTypeX
 #Unit
 #IsStatus
 #ProcessType

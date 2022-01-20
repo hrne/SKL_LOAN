@@ -374,8 +374,8 @@ public class L2414 extends TradeBuffer {
 //			3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)"
 
 			shareTotal = evaAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-			if (parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).compareTo(shareTotal) < 0) {
-				shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
+			if (parse.stringToBigDecimal(titaVo.getParam("SettingBal")).compareTo(shareTotal) < 0) {
+				shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingBal"));
 			}
 
 			if ("1".equals(titaVo.getParam("ClStat")) || "2".equals(titaVo.getParam("SettingStat"))) {

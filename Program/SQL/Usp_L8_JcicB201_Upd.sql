@@ -380,6 +380,12 @@ BEGIN
            , CASE
                WHEN M."Status"   IN (2, 7)         THEN 'A' -- 催收款項
                WHEN M."Status"   IN (6)            THEN 'B' -- 呆帳
+               WHEN M."Status"   IN (5, 9)         THEN 
+                 CASE WHEN M."OrigAcctCode" IN ('310')        THEN 'E' -- 其他短期放款
+                      WHEN M."OrigAcctCode" IN ('320')        THEN 'H' -- 中期放款
+                      WHEN M."OrigAcctCode" IN ('330', '340') THEN 'I' -- 長期放款
+                      ELSE 'I'
+                 END     
                WHEN M."AcctCode" IN ('310')        THEN 'E' -- 其他短期放款
                WHEN M."AcctCode" IN ('320')        THEN 'H' -- 中期放款
                WHEN M."AcctCode" IN ('330', '340') THEN 'I' -- 長期放款

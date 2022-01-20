@@ -199,7 +199,7 @@ public class L9710Report extends MakeReport {
 		this.print(0, 47, String.format("%07d", Integer.valueOf(tL9710Vo.get("F7"))));
 
 		// 寬限到期日
-		this.print(0, 58, showRocDate(tL9710Vo.get("F8"), 1));
+		this.print(0, 67, showRocDate(tL9710Vo.get("F8"), 1),"R");
 
 		// 核准額度
 		this.print(0, 80, showAmt(tL9710Vo.get("F9")), "R");
@@ -208,10 +208,10 @@ public class L9710Report extends MakeReport {
 		this.print(0, 92, showAmt(tL9710Vo.get("F10")), "R");
 
 		// 首次撥款日
-		this.print(0, 95, showRocDate(tL9710Vo.get("F11"), 1));
+		this.print(0, 104, showRocDate(tL9710Vo.get("F11"), 1),"R");
 
 		// 上次繳息日
-		this.print(0, 108, showRocDate(tL9710Vo.get("F12"), 1));
+		this.print(0, 117, showRocDate(tL9710Vo.get("F12"), 1),"R");
 
 		// 計息利率
 		this.print(0, 128, String.format("%.4f", Double.valueOf(tL9710Vo.get("F13"))), "R");
@@ -223,7 +223,7 @@ public class L9710Report extends MakeReport {
 		this.print(0, 145, substr(tL9710Vo.get("F15"), 5));
 
 		// 下次還本日
-		this.print(0, 156, showRocDate(tL9710Vo.get("F16"), 1));
+		this.print(0, 164, showRocDate(tL9710Vo.get("F16"), 1),"R");
 
 		cnt += 1;
 		amt += Integer.valueOf(tL9710Vo.get("F10"));
