@@ -52,9 +52,10 @@ public class ScheduledProcess extends SysLogger {
 				Timestamp startTime = txs.getCreateDate();
 				Timestamp endTime = new Timestamp(new Date().getTime());
 				int hours = (int) ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60));
-//				int minutes = (int) (((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60)) / 60);
-//				int second = (int) ((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60) - minutes * 60);
+				int minutes = (int) (((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60)) / 60);
+				int second = (int) ((endTime.getTime() - startTime.getTime()) / 1000 - hours * (60 * 60) - minutes * 60);
 
+				this.mustInfo(txs.getTxCruiserId() + "Has Been " + hours + " Hours " + minutes + " Minutes " + second + " Second..");
 				if (hours >= 3) {
 					txs.setStatus("F");
 					try {
@@ -98,7 +99,7 @@ public class ScheduledProcess extends SysLogger {
 						this.error(errors.toString());
 					} finally {
 						if (isFinish)
-							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "LC009", txs.getTlrNo(), txs.getTxCode() + " 執行成功", new TitaVo());
+							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "", txs.getTlrNo(), txs.getTxCode() + " 執行成功", new TitaVo());
 
 						if (isBroken)
 							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "L6970", txs.getTxSeq(), txs.getTxCode() + " 執行失敗, 請至L6970查看", new TitaVo());
