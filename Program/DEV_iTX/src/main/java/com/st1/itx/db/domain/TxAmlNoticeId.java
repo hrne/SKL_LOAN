@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * TxAmlNotice AML定審通知紀錄檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class TxAmlNoticeId implements Serializable {
 
 
-  // 定審日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7539626935227166494L;
+
+// 定審日期
   @Column(name = "`DataDt`")
   private int dataDt = 0;
 

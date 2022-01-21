@@ -49,15 +49,22 @@ public class LP003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findDept(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
+	public List<Map<String, String>> findDept(TitaVo titaVo, Map<String, String> wkSsnVo) throws Exception {
 
-		int inputYear = Integer.parseInt(wkVo.get("F0"));
+		int iYEAR = 0;
+		int iMM = 0;
+		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0")) - 1;
+			iMM = 13;
+		} else {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0"));
+			iMM = Integer.parseInt(wkSsnVo.get("F1"));
+		}
 
-		int iMM = Integer.parseInt(wkVo.get("F1"));
+		int inputYearMonth = (iYEAR * 100) + iMM;
 
-		int inputYearMonth = (inputYear * 100) + iMM;
-
-		this.info("LP003ServiceImpl.findDept inputYear =" + inputYear);
+		this.info("LP003ServiceImpl.findDept iYEAR =" + iYEAR);
+		this.info("LP003ServiceImpl.findDept iMM =" + iMM);
 		this.info("LP003ServiceImpl.findDept inputYearMonth =" + inputYearMonth);
 
 		String sql = " ";
@@ -146,21 +153,28 @@ public class LP003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("inputYear", inputYear);
+		query.setParameter("inputYear", iYEAR);
 		query.setParameter("inputYearMonth", inputYearMonth);
 
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findEmp(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
+	public List<Map<String, String>> findEmp(TitaVo titaVo, Map<String, String> wkSsnVo) throws Exception {
 
-		int inputYear = Integer.parseInt(wkVo.get("F0"));
+		int iYEAR = 0;
+		int iMM = 0;
+		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0")) - 1;
+			iMM = 13;
+		} else {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0"));
+			iMM = Integer.parseInt(wkSsnVo.get("F1"));
+		}
 
-		int iMM = Integer.parseInt(wkVo.get("F1"));
+		int inputYearMonth = (iYEAR * 100) + iMM;
 
-		int inputYearMonth = (inputYear * 100) + iMM;
-
-		this.info("LP003ServiceImpl.findEmp inputYear =" + inputYear);
+		this.info("LP003ServiceImpl.findEmp iYEAR =" + iYEAR);
+		this.info("LP003ServiceImpl.findEmp iMM =" + iMM);
 		this.info("LP003ServiceImpl.findEmp inputYearMonth =" + inputYearMonth);
 
 		String sql = " ";
@@ -257,7 +271,7 @@ public class LP003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("inputYear", inputYear);
+		query.setParameter("inputYear", iYEAR);
 		query.setParameter("inputYearMonth", inputYearMonth);
 
 		return this.convertToMap(query);
@@ -265,11 +279,20 @@ public class LP003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findDeptThisWKM(TitaVo titaVo, Map<String, String> wkSsnVo) {
 
-		int inputYear = Integer.parseInt(wkSsnVo.get("F0"));
+		int iYEAR = 0;
+		int iMM = 0;
+		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0")) - 1;
+			iMM = 13;
+		} else {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0"));
+			iMM = Integer.parseInt(wkSsnVo.get("F1"));
+		}
 
-		int iMM = Integer.parseInt(wkSsnVo.get("F1"));
+		int inputYearMonth = (iYEAR * 100) + iMM;
 
-		int inputYearMonth = (inputYear * 100) + iMM;
+		this.info("LP003ServiceImpl.findEmp iYEAR =" + iYEAR);
+		this.info("LP003ServiceImpl.findEmp iMM =" + iMM);
 
 		this.info("LP003ServiceImpl.findDeptThisWKM inputYearMonth =" + inputYearMonth);
 
@@ -374,11 +397,20 @@ public class LP003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findEmpThisWKM(TitaVo titaVo, Map<String, String> wkSsnVo) {
 
-		int inputYear = Integer.parseInt(wkSsnVo.get("F0"));
+		int iYEAR = 0;
+		int iMM = 0;
+		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0")) - 1;
+			iMM = 13;
+		} else {
+			iYEAR = Integer.parseInt(wkSsnVo.get("F0"));
+			iMM = Integer.parseInt(wkSsnVo.get("F1"));
+		}
 
-		int iMM = Integer.parseInt(wkSsnVo.get("F1"));
+		int inputYearMonth = (iYEAR * 100) + iMM;
 
-		int inputYearMonth = (inputYear * 100) + iMM;
+		this.info("LP003ServiceImpl.findEmp iYEAR =" + iYEAR);
+		this.info("LP003ServiceImpl.findEmp iMM =" + iMM);
 
 		this.info("LP003ServiceImpl.findEmpThisWKM inputYearMonth =" + inputYearMonth);
 
