@@ -59,8 +59,17 @@ public class LP003Report extends MakeReport {
 		String rocYear;
 		// 當前工作月
 		int wkMonth;
-		rocYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
-		wkMonth = Integer.parseInt(wkSsnVo.get("F1"));
+		
+		// 找上個工作月
+		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
+			rocYear = String.valueOf(Integer.parseInt(wkSsnVo.get("F0")) - 1912);
+			wkMonth = 13;
+			monthHead = "13";
+		} else {
+			rocYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
+			wkMonth = Integer.parseInt(wkSsnVo.get("F1"));
+			monthHead = String.valueOf(Integer.parseInt(wkSsnVo.get("F1")));
+		}
 		monthHead = String.valueOf(wkMonth);
 		// 起始欄位
 		int col = 0;

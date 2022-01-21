@@ -9,18 +9,22 @@
 	<job id="eodFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<!-- Usp_L2_CustDataCtrl_Ins -->
-		<step id="l2CustDataCtrlIns" parent="parentStep"
-			next="l5CollListUpd">
+		<step id="l2CustDataCtrlIns" parent="parentStep">
 			<tasklet ref="L2CustDataCtrlIns" />
+			<next on="COMPLETED" to="l5CollListUpd" />
+			<end on="FAILED" />
 		</step>
 		<!-- Usp_L5_CollList_Upd -->
-		<step id="l5CollListUpd" parent="parentStep"
-			next="l9DailyLoanBalUpd">
+		<step id="l5CollListUpd" parent="parentStep">
 			<tasklet ref="L5CollListUpd" />
+			<next on="COMPLETED" to="l9DailyLoanBalUpd" />
+			<end on="FAILED" />
 		</step>
 		<!-- Usp_L9_DailyLoanBal_Upd -->
-		<step id="l9DailyLoanBalUpd" parent="parentStep" next="split2">
+		<step id="l9DailyLoanBalUpd" parent="parentStep">
 			<tasklet ref="L9DailyLoanBalUpd" />
+			<next on="COMPLETED" to="split2" />
+			<end on="FAILED" />
 		</step>
 		<split id="split2" task-executor="taskExecutor"
 			next="startBS996">
@@ -42,22 +46,20 @@
 			<tasklet ref="StartBS996" />
 		</step>
 		<!-- 每日批次結束，判斷是否需要執行月批 -->
-		<step id="eodFinal" parent="parentStep">
+		<step id="eodFinal" parent="parentStep" next="startEomFlow">
 			<tasklet ref="EodFinal" />
-			<next on="COMPLETED" to="startEom" />
-			<!-- 
-			<next on="FAILED" to="startDbBackup" />
-		 	-->
-		 	<end on="FAILED" />
+			<!-- <next on="COMPLETED" to="startEomFlow" /> -->
+			<!-- <next on="FAILED" to="startDbBackup" /> -->
+			<!-- <end on="FAILED" /> -->
 		</step>
 		<step id="startEomFlow" parent="parentStep">
 			<job ref="eomFlow" job-launcher="jobLauncher" />
 		</step>
-		<!-- 
-		<step id="startDbBackup" parent="parentStep">
-			<job ref="dbBackUp" job-launcher="jobLauncher" />
+		<!-- <step id="startDbBackup" parent="parentStep"> <job ref="dbBackUp" 
+			job-launcher="jobLauncher" /> </step> -->
+		<step id="startDailyRptFlow" parent="parentStep">
+			<job ref="dailyRptFlow" job-launcher="jobLauncher" />
 		</step>
-		 -->
 	</job>
 
 </beans>

@@ -84,6 +84,8 @@ BEGIN
                 WHEN M."NextPayIntDate" >= TMNDYF  THEN 0
                 WHEN M."NextRepayDate"  >  TMNDYF  THEN
                      ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
+                WHEN M."NextRepayDate"  >  M."NextPayIntDate" THEN
+                     ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
                 ELSE ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextRepayDate",'yyyy-mm-dd') )
            END                                  AS "OvduDays"          -- 逾期繳款天數
          , NVL(M."OvduDate", 0)                 AS "OvduDate"          -- 轉催收款日期

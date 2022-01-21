@@ -49,6 +49,16 @@ public class LP005Report extends MakeReport {
 		// 業績月份
 		int pfMonth = tCdWorkMonth.getMonth();
 
+		// 若為工作月月底日,取當工作月,若非月底日,取上個工作月
+		if (iEntdy != tCdWorkMonth.getEndDate()) {
+			if (pfMonth == 1) {
+				pfYear = pfYear - 1;
+				pfMonth = 13;
+			} else {
+				pfMonth = pfMonth - 1;
+			}
+		}
+
 		int pfSeason = 0;
 
 		// 判斷季度
@@ -80,9 +90,11 @@ public class LP005Report extends MakeReport {
 
 		if (pfSeason == 4) {
 			maxOfLoops = 4;
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿", "LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算_第四季特別版.xlsx", "1月件數");
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿",
+					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算_第四季特別版.xlsx", "1月件數");
 		} else {
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿", "LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算.xlsx", "1月件數");
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿",
+					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算.xlsx", "1月件數");
 		}
 
 		for (int i = 1; i <= maxOfLoops; i++) {
@@ -108,7 +120,8 @@ public class LP005Report extends MakeReport {
 		setEmpClassList(listEmpClass, pfYear, pfSeason, 1);
 	}
 
-	private List<Map<String, String>> putDataToListEmpClass(List<Map<String, String>> listEmpClass, Map<String, String> m, String deptSheetName, String oriEmpClass, String afterEmpClass) {
+	private List<Map<String, String>> putDataToListEmpClass(List<Map<String, String>> listEmpClass,
+			Map<String, String> m, String deptSheetName, String oriEmpClass, String afterEmpClass) {
 		this.info("putDataToListEmpClass ... ");
 
 		Map<String, String> mapEmpClass = new HashMap<>();
@@ -214,7 +227,8 @@ public class LP005Report extends MakeReport {
 		}
 	}
 
-	private List<Map<String, String>> setDept(List<Map<String, String>> listEmpClass, String deptCode, String deptSheetName, int pfYear, int pfSeason, TitaVo titaVo) throws LogicException {
+	private List<Map<String, String>> setDept(List<Map<String, String>> listEmpClass, String deptCode,
+			String deptSheetName, int pfYear, int pfSeason, TitaVo titaVo) throws LogicException {
 		this.info("setDept ... ");
 		this.info("setDept deptCode = " + deptCode);
 		this.info("setDept deptSheetName = " + deptSheetName);
@@ -344,7 +358,8 @@ public class LP005Report extends MakeReport {
 		return listEmpClass;
 	}
 
-	private void setEmpClassList(List<Map<String, String>> listEmpClass, int pfYear, int pfSeason, int type) throws LogicException {
+	private void setEmpClassList(List<Map<String, String>> listEmpClass, int pfYear, int pfSeason, int type)
+			throws LogicException {
 		this.info("setEmpClassList ... ");
 
 		String sheetName = "職級名冊";

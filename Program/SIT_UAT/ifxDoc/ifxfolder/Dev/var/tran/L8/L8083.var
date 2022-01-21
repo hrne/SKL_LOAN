@@ -64,6 +64,9 @@ T(3,1:郵寄通知;2:郵寄通知;3:簡訊通知)
 !],
 !---------- AP Button AREA ----------
 
+#Time=A,6,L
+T(4,TIME$)
+
 #BatchNo=X,50,L
 T(2,L8101+#TLRNO+#SYSCDATE+#Time)
 
@@ -176,6 +179,7 @@ E(0,#SYSDATE)
 @
 V(7)
 A(DATE,0,#AcDate1)
+V(5,0010101,#SYSDATE)
 
 #AcDate2=D,7,I
 C(3,#AutoSubmit,1,s,$)
@@ -183,6 +187,7 @@ E(0,#SYSDATE)
 @
 V(7)
 A(DATE,0,#AcDate2)
+V(5,#AcDate1,#SYSDATE)
 
 #RPTFG=A,1,S
 E(0,0)

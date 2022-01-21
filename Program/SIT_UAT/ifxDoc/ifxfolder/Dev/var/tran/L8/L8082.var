@@ -44,7 +44,7 @@ T(3,2:郵寄放款本息攤還表暨息通知單;3:簡訊通知;9:全部)
 ["[L8082]                                 AML定審中風險資料查詢"],
 ["#FdProcessType+通知類別",#ProcessType,#ProcessTypeX],
 ["#FdStatus+狀　　態",#Status,#StatusX],
-["#FdAcDate+定審日期",#AcDate1,'~',#AcDate2,#BatchNo],
+["#FdAcDate+定審日期",#AcDate1,'~',#AcDate2],
 ]
 !["#FdReviewType+評　　級",#ReviewType,#ReviewTypeX],
 !["@顯示方式",
@@ -56,7 +56,7 @@ T(3,2:郵寄放款本息攤還表暨息通知單;3:簡訊通知;9:全部)
 #Time=A,6,L
 T(4,TIME$)
 
-#BatchNo=X,50,L
+#BatchNo=X,50,S
 T(2,L8101+#TLRNO+#SYSCDATE+#Time)
 
 !---------- AP TEXT AREA Variables ----------
@@ -168,6 +168,7 @@ E(0,#SYSDATE)
 @
 V(7)
 A(DATE,0,#AcDate1)
+V(5,0010101,#SYSDATE)
 
 #AcDate2=D,7,I
 C(3,#AutoSubmit,1,s,$)
@@ -175,6 +176,7 @@ E(0,#SYSDATE)
 @
 V(7)
 A(DATE,0,#AcDate2)
+V(5,#AcDate1,#SYSDATE)
 
 #RPTFG=A,1,S
 E(0,0)
