@@ -81,18 +81,25 @@ public class BankRelationCom extends TradeBuffer {
 	public BankRelationVo getBankRelation(String iCustId, String iCustName, TitaVo titaVo) throws LogicException {
 		logger.info("getBankRelation  ... ");
 		BankRelationVo vo = new BankRelationVo();
-		Slice<BankRelationCompany> slBankRelationCompany = bankRelationCompanyService.findCompanyIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-		List<BankRelationCompany> lBankRelationCompany = slBankRelationCompany == null ? null : slBankRelationCompany.getContent();
-		Slice<BankRelationSelf> slBankRelationSelf = bankRelationSelfService.findCustIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankRelationCompany> slBankRelationCompany = bankRelationCompanyService.findCompanyIdEq(iCustId, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<BankRelationCompany> lBankRelationCompany = slBankRelationCompany == null ? null
+				: slBankRelationCompany.getContent();
+		Slice<BankRelationSelf> slBankRelationSelf = bankRelationSelfService.findCustIdEq(iCustId, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<BankRelationSelf> lBankRelationSelf = slBankRelationSelf == null ? null : slBankRelationSelf.getContent();
-		Slice<BankRelationFamily> slBankRelationFamily = bankRelationFamilyService.findRelationIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-		List<BankRelationFamily> lBankRelationFamily = slBankRelationFamily == null ? null : slBankRelationFamily.getContent();
-		Slice<BankRelationSuspected> slBankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(iCustName, 0, Integer.MAX_VALUE, titaVo);
-		List<BankRelationSuspected> lBankRelationSuspected = slBankRelationSuspected == null ? null : slBankRelationSuspected.getContent();
+		Slice<BankRelationFamily> slBankRelationFamily = bankRelationFamilyService.findRelationIdEq(iCustId, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<BankRelationFamily> lBankRelationFamily = slBankRelationFamily == null ? null
+				: slBankRelationFamily.getContent();
+		Slice<BankRelationSuspected> slBankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(iCustName, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<BankRelationSuspected> lBankRelationSuspected = slBankRelationSuspected == null ? null
+				: slBankRelationSuspected.getContent();
 		if (lBankRelationCompany != null) {
 			for (BankRelationCompany t : lBankRelationCompany) {
 				if ("".equals(vo.getDataDate())) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 				if ("1".equals(t.getLAW001())) {
 					vo.setLAW001("Y");
@@ -114,7 +121,7 @@ public class BankRelationCom extends TradeBuffer {
 		if (lBankRelationSelf != null) {
 			for (BankRelationSelf t : lBankRelationSelf) {
 				if ("".equals(vo.getDataDate())) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 				if ("1".equals(t.getLAW001())) {
 					vo.setLAW001("Y");
@@ -137,7 +144,7 @@ public class BankRelationCom extends TradeBuffer {
 		if (lBankRelationFamily != null) {
 			for (BankRelationFamily t : lBankRelationFamily) {
 				if ("".equals(vo.getDataDate())) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 				if ("1".equals(t.getLAW001())) {
 					vo.setLAW001("Y");
@@ -160,7 +167,7 @@ public class BankRelationCom extends TradeBuffer {
 		if (lBankRelationSuspected != null) {
 			if ("".equals(vo.getDataDate())) {
 				for (BankRelationSuspected t : lBankRelationSuspected) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 			}
 			vo.setIsSuspected("Y");
@@ -192,7 +199,7 @@ public class BankRelationCom extends TradeBuffer {
 			lBankRelationCompany = slBankRelationCompany == null ? null : slBankRelationCompany.getContent();
 			if (lBankRelationCompany != null) {
 				for (BankRelationCompany t : lBankRelationCompany) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 			}
 		}
@@ -202,7 +209,7 @@ public class BankRelationCom extends TradeBuffer {
 			lBankRelationSelf = slBankRelationSelf == null ? null : slBankRelationSelf.getContent();
 			if (lBankRelationSelf != null) {
 				for (BankRelationSelf t : lBankRelationSelf) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 			}
 		}
@@ -212,7 +219,7 @@ public class BankRelationCom extends TradeBuffer {
 			lBankRelationFamily = slBankRelationFamily == null ? null : slBankRelationFamily.getContent();
 			if (lBankRelationFamily != null) {
 				for (BankRelationFamily t : lBankRelationFamily) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 
 			}
@@ -223,16 +230,21 @@ public class BankRelationCom extends TradeBuffer {
 			lBankRelationSuspected = slBankRelationSuspected == null ? null : slBankRelationSuspected.getContent();
 			if (lBankRelationSuspected != null) {
 				for (BankRelationSuspected t : lBankRelationSuspected) {
-					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					this.info("BankRelationSuspected.LastUpdate 1 = " + t.getLastUpdate());
+					this.info("BankRelationSuspected.LastUpdate 2 = " + this.parse.timeStampToStringDate(t.getLastUpdate()));
+					vo.setDataDate(this.parse.timeStampToStringDate(t.getLastUpdate()));
 				}
 			}
 		}
 
-		// if ("".equals(vo.getDataDate().trim())) {
-		vo.setDataDate(String.valueOf(titaVo.getEntDyI()));
-		// }
+		//無資料時放系統日
+		if (vo.getDataDate().trim().isEmpty()) {
+			vo.setDataDate(titaVo.getCalDy());
+		} else {
+			vo.setDataDate(vo.getDataDate().replace("/", ""));
+		}
 
-		logger.info(iCustId + " BankRelationVo=" + vo.toString());
+		this.info(iCustId + " BankRelationVo=" + vo.toString());
 
 		return vo;
 	}

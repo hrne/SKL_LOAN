@@ -69,6 +69,10 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      group by \"CustNo\", \"FacmNo\"                    ";
 		sql += " ) l   on l.\"CustNo\" = d.\"CustNo\"                    ";
 		sql += "      and l.\"NextPayIntDate\" <= d.\"EntryDate\"        "; // 有逾期
+		sql += " left join \"CustNotice\" n                              "; //客戶通知設定檔
+		sql += "        on \"FormNo\" = 'L4702'                          ";
+		sql += "       and n.\"CustNo\" = l.\"CustNo\"                   ";
+		sql += "       and n.\"FacmNo\" = l.\"FacmNo\"                   ";  
 		sql += " where d.\"RepayCode\" = 1                               "; // 01.匯款轉帳
 		sql += "   and d.\"ProcStsCode\" <> 'D'                          ";
 		sql += "   and d.\"RepayType\" = 1                               ";
@@ -76,6 +80,7 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and d.\"AcDate\" = :entDy                             ";
 		sql += "   and l.\"CustNo\" is not null                          "; // 有逾期
 		sql += "   and (l.\"NextPayIntDate\" <= d.\"EntryDate\" or x.\"FacmNo\" is not null) ";
+		sql += "   and nvl(n.\"PaperNotice\",'Y') = 'Y'                  "; // 發送
 		sql += " order by l.\"CustNo\", NVL(l.\"FacmNo\", x.\"FacmNo\")  ";
 
 		this.info("sql=" + sql);

@@ -20,6 +20,7 @@ import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.format.StringCut;
 
 @Service("L1R13")
 @Scope("prototype")
@@ -90,7 +91,7 @@ public class L1R13 extends TradeBuffer {
 				}
 			}
 		}
-		this.totaVo.putParam("L1R13CustName", iCustMain.getCustName());
+		this.totaVo.putParam("L1R13CustName", StringCut.replaceLineUp(iCustMain.getCustName()));
 		this.totaVo.putParam("L1R13MsgFg", iMsgFg);
 		this.totaVo.putParam("L1R13EmailFg", iEmailFg);
 		this.addList(this.totaVo);

@@ -386,8 +386,13 @@ public class L9705Report extends MakeReport {
 						printCm(1, 4, "*******    查無資料   ******");
 					}
 				}
+			} // for
+			
+			if (cnt == 0) {
+				printCm(1, 4, "*******    查無資料   ******");
 			}
-		}
+			
+		} // else 
 
 		// 關閉報表
 		long sno = this.close();

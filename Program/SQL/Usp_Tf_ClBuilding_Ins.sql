@@ -205,12 +205,29 @@ BEGIN
                  ,S1."ClCode2"
                  ,S1."ClNo"
                  ,S1."CityCode"
+                 ,S1."AreaCode"
            FROM "ClBuilding" S1
            LEFT JOIN "ClMain" CM ON CM."ClCode1" = S1."ClCode1"
                                 AND CM."ClCode2" = S1."ClCode2"
                                 AND CM."ClNo"    = S1."ClNo"
-           WHERE NVL(S1."CityCode",' ') != ' '
-             AND NVL(CM."CityCode",' ') = ' ' -- ClMain的CityCode為空,才更新
+           WHERE CASE
+                   WHEN NVL(S1."CityCode",' ') != ' '
+                        AND NVL(CM."CityCode",' ') = ' ' -- ClMain的CityCode為空,更新
+                   THEN 1
+                   WHEN S1."ClCode1" = 2 -- 若是土地資料 下列條件跳過
+                   THEN 0
+                   WHEN NVL(S1."CityCode",' ') != ' '
+                        AND NVL(CM."CityCode",' ') != ' ' 
+                        AND NVL(S1."CityCode",' ') != NVL(CM."CityCode",' ') -- ClMain的CityCode與ClBuilding不一致,更新
+                   THEN 1 
+                   WHEN NVL(S1."CityCode",' ') != ' '
+                        AND NVL(CM."CityCode",' ') != ' ' 
+                        AND NVL(S1."CityCode",' ') = NVL(CM."CityCode",' ') 
+                        AND NVL(S1."AreaCode",' ') != ' ' 
+                        AND NVL(S1."AreaCode",' ') != NVL(CM."AreaCode",' ') -- ClMain的AreaCode與ClBuilding不一致,更新
+                   THEN 1 
+                 ELSE 0
+                 END = 1
           ) SC1
     ON (    SC1."ClCode1" = T1."ClCode1"
         AND SC1."ClCode2" = T1."ClCode2"
@@ -218,6 +235,7 @@ BEGIN
       )
     WHEN MATCHED THEN UPDATE SET
     T1."CityCode" = SC1."CityCode"
+    , T1."AreaCode" = SC1."AreaCode"
     ;
 
     -- 記錄程式結束時間

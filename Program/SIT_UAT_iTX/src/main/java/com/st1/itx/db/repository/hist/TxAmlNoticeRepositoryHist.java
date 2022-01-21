@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,18 +22,19 @@ import com.st1.itx.db.domain.TxAmlNoticeId;
  */
 public interface TxAmlNoticeRepositoryHist extends JpaRepository<TxAmlNotice, TxAmlNoticeId> {
 
-	// DataDt = ,AND CustKey =
-	public Slice<TxAmlNotice> findAllByDataDtIsAndCustKeyIsOrderByProcessSnoAsc(int dataDt_0, String custKey_1, Pageable pageable);
+  // DataDt = ,AND CustKey =
+  public Slice<TxAmlNotice> findAllByDataDtIsAndCustKeyIsOrderByProcessSnoAsc(int dataDt_0, String custKey_1, Pageable pageable);
 
-	// DataDt =
-	public Slice<TxAmlNotice> findAllByDataDtIsOrderByDataDtAscCustKeyAscProcessSnoAsc(int dataDt_0, Pageable pageable);
+  // DataDt =
+  public Slice<TxAmlNotice> findAllByDataDtIsOrderByDataDtAscCustKeyAscProcessSnoAsc(int dataDt_0, Pageable pageable);
 
-	// ProcessDate = ,
-	public Slice<TxAmlNotice> findAllByProcessDateIsOrderByDataDtAscCustKeyAscProcessSnoAsc(int processDate_0, Pageable pageable);
+  // ProcessDate = ,
+  public Slice<TxAmlNotice> findAllByProcessDateIsOrderByDataDtAscCustKeyAscProcessSnoAsc(int processDate_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxAmlNotice> findByTxAmlNoticeId(TxAmlNoticeId txAmlNoticeId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxAmlNotice> findByTxAmlNoticeId(TxAmlNoticeId txAmlNoticeId);
 
 }
+

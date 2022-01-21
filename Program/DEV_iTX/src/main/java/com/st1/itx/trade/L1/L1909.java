@@ -46,7 +46,7 @@ public class L1909 extends TradeBuffer {
 		List<BankRelationSuspected> lBankRelationSuspected = slbankRelationSuspected == null ? null : slbankRelationSuspected.getContent();
 
 		if (lBankRelationSuspected == null) {
-			throw new LogicException("E0001", "");
+			throw new LogicException("E0000", "此人非疑似準利害關係人");
 		}
 
 		for (BankRelationSuspected bankRelationSuspected : lBankRelationSuspected) {

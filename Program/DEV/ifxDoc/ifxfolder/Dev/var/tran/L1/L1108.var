@@ -226,11 +226,17 @@ T(2,@MsgFg,#L1R13MsgFg)
 T(2,@EmailFg,#L1R13EmailFg)
 ! ! ! ! ! ! ! ! ! ! ! ! !
 
+! 若需要修改無簡訊電話或email時，會自動把不發送設為Y的功能請修改此處
+! 0:關閉 1:開啟
+#IsCheck=A,1,S
+E(0,1)
+
 !  申請日期
 #DATE=D,8,S
 T(4,#SYSCDATE)
+
 #ApplyDt=D,7,I
-T(1,#DATE,2,7)
+C(3,#ApplyDt,0,T(1,#DATE,2,7),$)
 @V(5,0010101,#SYSCDATE)
 A(DATE,0,#ApplyDt)
 
@@ -285,9 +291,9 @@ C(4,#FormNo{i},S,$)
 ! 不列印記號-簡訊
 #Msg{i}=X,1,I,ui:checkbox;value:;
 C(4,#FormNo{i},S,$)
-C(5,#MsgFg,0,T(3,Y),$)
+C(3,#IsCheck,0,$,C(5,#MsgFg,0,T(3,Y),$))
 @
-C(5,#MsgFg,0,C(4,#Msg{i},V(P,此客戶尚未設定簡訊電話，故不可設定為發送),$),$)
+C(3,#IsCheck,0,$,C(5,#MsgFg,0,C(4,#Msg{i},V(P,此客戶尚未設定簡訊電話，故不可設定為發送),$),$))
 C(4,#Msg{i},$,IF(#Msg{i} == #CheckY,$,V(P,限輸入Y或空白)))
 
 #Err{i}=x,200,S
@@ -296,9 +302,9 @@ T(B,#NoticeX{i}+，不可申請全部不寄送)
 ! 不列印記號-EMail
 #EMail{i}=X,1,I,ui:checkbox;value:;
 C(4,#FormNo{i},S,$)
-C(5,#EmailFg,0,T(3,Y),$)
+C(3,#IsCheck,0,$,C(5,#EmailFg,0,T(3,Y),$))
 @
-C(5,#EmailFg,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$)
+C(3,#IsCheck,0,$,C(5,#EmailFg,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$))
 C(4,#EMail{i},$,IF(#EMail{i} == #CheckY,$,V(P,限輸入Y或空白)))
 C(5,#SendCode{i},1,$,s)
 !C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,不可申請全部不寄送))))

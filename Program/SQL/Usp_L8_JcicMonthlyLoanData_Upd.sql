@@ -120,11 +120,7 @@ BEGIN
          , 0                                      AS "FeeAmtRcv"         -- 本月收取費用   -- 後面才更新值
          , NVL(LM."PrevPayIntDate", 0)            AS "PrevPayIntDate"    -- 上次繳息日
          , NVL(LM."PrevRepaidDate", 0)            AS "PrevRepaidDate"    -- 上次還本日
-         , CASE
-             WHEN NVL(LM."NextPayIntDate", 0) > NVL(LM."MaturityDate", 0) 
-                                                  THEN LM."MaturityDate" 
-             ELSE NVL(LM."NextPayIntDate", 0) 
-           END                                    AS "NextPayIntDate"    -- 下次繳息日
+         , NVL(LM."NextPayIntDate", 0)            AS "NextPayIntDate"    -- 下次繳息日
          , NVL(LM."NextRepayDate", 0)             AS "NextRepayDate"     -- 下次還本日
          , CASE
              WHEN  LM."Status"  IN (6)          THEN 6

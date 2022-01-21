@@ -403,6 +403,8 @@ BEGIN
                    WHEN NVL(S1."CityCode",' ') != ' '
                         AND NVL(CM."CityCode",' ') = ' ' -- ClMain的CityCode為空,更新
                    THEN 1
+                   WHEN S1."ClCode1" = 1 -- 若是建物資料 下列條件跳過
+                   THEN 0
                    WHEN NVL(S1."CityCode",' ') != ' '
                         AND NVL(CM."CityCode",' ') != ' ' 
                         AND NVL(S1."CityCode",' ') != NVL(CM."CityCode",' ') -- ClMain的CityCode與ClLand不一致,更新

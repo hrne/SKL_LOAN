@@ -50,10 +50,11 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,B.\"FacmNo\"                                          "; // 額度
 		sql += "       ,C.\"CustName\"                                        "; // 戶名
 		sql += "       ,B.\"SpecificDd\"                                      "; // 應繳日
-		sql += "       ,CD.\"Item\"                         AS \"RepayCodeX\" "; // 繳款方式
+		sql += "       ,CD.\"Item\"                      AS \"RepayCodeX\"    "; // 繳款方式
 		sql += "       ,B.\"LoanBal\"                                         "; // 貸放餘額
 		sql += "       ,B.\"NextPayIntDate\"                                  "; // 下繳日
-		sql += "       ,NVL(CB.\"BdLocation\", ' ')         AS \"Location\"   "; // 押品地址
+		sql += "       ,NVL(CB.\"BdLocation\", ' ')      AS \"Location\"      "; // 押品地址
+		sql += "       ,NVL(CN.\"PaperNotice\", 'Y')     AS \"PaperNotice\"   "; // 書面通知與否 Y:寄送 N:不寄送
 		sql += "  FROM (SELECT \"CustNo\"                                             ";
 		sql += "                   ,\"FacmNo\"                                             ";
 		sql += "                   ,SUM(\"LoanBal\")             AS \"LoanBal\"            ";
@@ -65,6 +66,10 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND \"Status\" = 0                                           ";
 		sql += "             GROUP By \"CustNo\", \"FacmNo\"                                ";
 		sql += "             ) B                                                            ";
+		sql += " left join \"CustNotice\" CN                             "; //客戶通知設定檔
+		sql += "        on CN.\"FormNo\" = 'L4721'                       ";
+		sql += "       and CN.\"CustNo\" = B.\"CustNo\"                  ";
+		sql += "       and CN.\"FacmNo\" = B.\"FacmNo\"                  ";  
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\"   = B.\"CustNo\"                            ";
 		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\"  = B.\"CustNo\"                            ";
 		sql += "                         AND FM.\"FacmNo\"  = B.\"FacmNo\"                            ";
