@@ -82,13 +82,18 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@CustNo,#NTXBUF,1,7)
+T(1,@ChainCustNo,#NTXBUF,1,7)
 T(1,@CustId,#NTXBUF,8,10)
-T(1,@ApplNo,#NTXBUF,18,7)
+T(1,@ChainApplNo,#NTXBUF,18,7)
 T(1,@FacmNo,#NTXBUF,25,3)
 T(1,@EntryDate,#NTXBUF,28,7)
 T(1,@IntStartDate,#NTXBUF,35,7)
 T(1,@IntEndDate,#NTXBUF,42,7)
+
+#ChainCustNo=A,7,S
+
+#ChainApplNo=A,7,S
+
 
 #BUF1A=X,30,S
 T(3,00000019999999000)
@@ -102,6 +107,8 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<
 #FdCustNo=X,2,L
 
 #CustNo=X,7,I
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
+C(3,#CHAIN,1,s,$)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 @C(4,#CustNo,S,$)
 V(9)
@@ -193,6 +200,7 @@ C(4,#CustId,$,S)
 T(3,*)
 
 #ApplNo=X,7,I
+C(3,#CHAIN,1,C(3,#ChainApplNo,0,$,E(0,#ChainApplNo)),$)
 C(3,#CHAIN,1,s,$)
 C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
@@ -208,7 +216,7 @@ T(2,@ApplNo,#TmpApplNo)
 T(2,0000000000000000000000000000          +#ApplNo)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L3003; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
 
 
 !用核准號碼(ApplNo)調L2R05
@@ -288,6 +296,8 @@ IF(#IntEndDate<#IntStartDate,V(P,計息迄日不可小於計息起日),$)
 #FdAcDate=X,2,L
 
 #AcDate=D,7,I
+@
+A(DATE,0,#AcDate)
 !經辦
 #FdTellerNo=X,2,L
 

@@ -102,12 +102,13 @@ E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L3911進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@CustNo,#NTXBUF,6,7)
+T(1,@ChainCustNo,#NTXBUF,6,7)
 T(1,@FacmNo,#NTXBUF,13,3)
 T(1,@EntryDate,#NTXBUF,16,7)
 T(1,@IntStartDate,#NTXBUF,23,7)
@@ -116,6 +117,7 @@ T(1,@AcDate,#NTXBUF,37,7)
 T(1,@TellerNo,#NTXBUF,44,6)
 T(1,@TxtNo,#NTXBUF,50,8)
 
+#ChainCustNo=A,7,S
 
 
 #CHAINTXCD=_,_,S
@@ -131,6 +133,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 !借戶戶號, 統一編號或核准編號擇一輸入
 
 #CustNo=X,7,I
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
 SHOW(#BTN1)
 @

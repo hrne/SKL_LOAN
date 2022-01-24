@@ -26,12 +26,12 @@ import com.st1.itx.util.MySpring;
  */
 public class L7100 extends TradeBuffer {
 
-	private final String[] tranCode = { "L2153", "L2411", "L2416", "L2415", "L2101" };
+	private final String[] tranCode = { "L1109", "L2153", "L2411", "L2416", "L2415", "L2417", "L2101" };
 
-	private final String[][] occursName = { { "L2153StepOccurs" }, { "L2411Occurs" },
-			{ "L2416OwnerOccurs", "L2416ReasonOccurs" },
-			{ "L2415PublicOccurs", "L2415ParkingOccurs", "L2415ReasonOccurs" },
-			{ "L2101StepOccurs", "L2101PremiumOccurs", "L2101AcctFeeOccurs" } };
+	private final String[][] occursName = { { "L1109Occurs" }, { "L2153StepOccurs" },
+			{ "L2411FirstOccurs", "L2411Occurs" }, { "L2416OwnerOccurs", "L2416ReasonOccurs" },
+			{ "L2415PublicOccurs", "L2415ReasonOccurs", "L2415ParkingTotalOccurs", "L2415ParkingDetailOccurs" },
+			{ "L2417Occurs" }, { "L2101StepOccurs", "L2101PremiumOccurs", "L2101AcctFeeOccurs" } };
 
 //	private static final String[][] occursfld = { { "StepMonths", "StepMonthE", "StepRateCode", "StepRateIncr", "BreachbMmB", "BreachbPercent" },
 //	{ "OwnerId_", "OwnerName_", "OwnerRelCode_", "OwnerPart_", "OwnerTotal_" },
@@ -73,15 +73,18 @@ public class L7100 extends TradeBuffer {
 						this.info("occursName=" + occursName);
 						List<Map<String, Object>> list = (List<Map<String, Object>>) m.get(occursName);
 						int i = 1;
-						for (Map<String, Object> m2 : list) {
-							for (Entry<String, Object> fld : m2.entrySet()) {
-								tempVo.put(fld.getKey() + i, fld.getValue() + "");
+						if (list != null && list.size() > 0) {
+							for (Map<String, Object> m2 : list) {
+								for (Entry<String, Object> fld : m2.entrySet()) {
+									tempVo.put(fld.getKey() + i, fld.getValue() + "");
 
-								for (int n = i + 1; n < 11; n++)
-									tempVo.put(fld.getKey() + n, "");
+									for (int n = i + 1; n < 11; n++)
+										tempVo.put(fld.getKey() + n, "");
+								}
+								i++;
 							}
-							i++;
 						}
+
 					}
 
 				}

@@ -78,7 +78,7 @@ RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF0001,#CDDEF0002)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@ChequeStatusCodeHelp,#HelpDesc1)
+T(2,@ChequeStatusCodeHelp,:全部;+#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2) 
 
 
@@ -304,8 +304,9 @@ D(8)
 
 #ChequeDateEnd=D,7,I
 C(3,#CHAIN,1,s,$)
+C(3,#ChequeDateStart,0,S,$)
 D(8)
-@IF(#ChequeDateStart==0 && #ChequeDateEnd==0,S,$)
+@
 V(7)V(5,#ChequeDateStart,9991231)A(DATE,0,#ChequeDateEnd)
 
 
@@ -319,7 +320,6 @@ V(H,#ChequeStatusCodeHelp)
 
 
 #StatusCodeX=X,20,L
-C(4,#StatusCode,S,$)
 T(H,#StatusCode,#ChequeStatusCodeHelp)
 
 

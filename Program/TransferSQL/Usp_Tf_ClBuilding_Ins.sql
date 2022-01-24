@@ -29,7 +29,8 @@ BEGIN
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 
           ,"CdCity"."CityCode"            AS "CityCode"            -- 縣市 VARCHAR2 2 
-          ,"CdArea"."AreaCode"            AS "AreaCode"            -- 鄉鎮市區 VARCHAR2 3 
+          ,NVL("CdArea"."AreaCode",CA2."AreaCode")
+                                          AS "AreaCode"            -- 鄉鎮市區 VARCHAR2 3 
           ,''                             AS "IrCode"              -- 段小段代碼 VARCHAR2 4 
           ,TRIM(TO_SINGLE_BYTE(S2."HGTAD3"))
                                           AS "Road"                -- 路名 NVARCHAR2 40 
@@ -193,6 +194,9 @@ BEGIN
     LEFT JOIN "CdArea" ON "CdArea"."CityCode" = "CdCity"."CityCode"
                       AND "CdArea"."AreaItem" = S2."HGTAD2"
                       AND NVL("CdCity"."CityCode",' ') != ' '
+    LEFT JOIN "CdArea" CA2 ON CA2."CityCode" = "CdCity"."CityCode"
+                          AND SUBSTR(CA2."AreaItem",0,2) = SUBSTR(S2."HGTAD2",0,2) 
+                          AND NVL("CdCity"."CityCode",' ') != ' '
     WHERE S1."GDRID1" = '1' -- 只撈建物
     ;
 

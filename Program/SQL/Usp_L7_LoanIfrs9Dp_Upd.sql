@@ -513,6 +513,7 @@ BEGIN
                                    AND LR."BormNo"  = M."BormNo"
                                    AND LR."EffectDate" <= M."DerDate"
       WHERE NVL(LR."EffectDate",0) != 0
+        AND M."DataYM" = YYYYMM
     )
     , RawData AS (
       SELECT "CustNo"
@@ -521,6 +522,7 @@ BEGIN
            , TRUNC("DerDate" / 100) AS "IssueMonth" -- 減損發生年月
       FROM "LoanIfrs9Dp"
       WHERE "DerDate" > 0
+        AND "DataYM" = YYYYMM
     )
     , MonthData AS (
       SELECT "CustNo"
@@ -553,6 +555,7 @@ BEGIN
            , SUM("Fee")                AS "LawFee"
       FROM "ForeclosureFee"
       WHERE "CloseDate" > 0
+        AND "FeeCode" NOT IN ('11','15') -- 排除全額沖銷、催收沖銷資料
       GROUP BY "CustNo"
              , TRUNC("CloseDate" / 100)
     )
@@ -1194,44 +1197,3 @@ BEGIN
 
   END;
 END;
-
---    , ' '    AS "AcCode"             -- 會計科目
---    , 0      AS "Status"             -- 案件狀態
---    , 0      AS "FirstDrawdownDate"  -- 初貸日期
---    , 0      AS "DrawdownDate"       -- 貸放日期
---    , 0      AS "MaturityDate"       -- 到期日
---    , 0      AS "LineAmt"            -- 核准金額         --每額度編號項下之放款帳號皆同
---    , 0      AS "DrawdownAmt"        -- 撥款金額
---    , 0      AS "LoanBal"            -- 本金餘額(撥款)
---    , 0      AS "IntAmt"             -- 應收利息
---    , 0      AS "Fee"                -- 法拍及火險費用
---    , 0      AS "OvduDays"           -- 逾期繳款天數
---    , 0      AS "OvduDate"           -- 轉催收款日期
---    , 0      AS "BadDebtDate"        -- 轉銷呆帳日期     --最早之轉銷呆帳日期
---    , 0      AS "BadDebtAmt"         -- 轉銷呆帳金額
---    , 0      AS "DerDate"            -- 個案減損客觀證據發生日期
---    , 0      AS "DerRate"            -- 上述發生日期前之最近一次利率
---    , 0      AS "DerLoanBal"         -- 上述發生日期時之本金餘額
---    , 0      AS "DerIntAmt"          -- 上述發生日期時之應收利息
---    , 0      AS "DerFee"             -- 上述發生日期時之法拍及火險費用
---    , 0      AS "DerY1Amt"           -- 個案減損客觀證據發生後第一年本金回收金額
---    , 0      AS "DerY2Amt"           -- 個案減損客觀證據發生後第二年本金回收金額
---    , 0      AS "DerY3Amt"           -- 個案減損客觀證據發生後第三年本金回收金額
---    , 0      AS "DerY4Amt"           -- 個案減損客觀證據發生後第四年本金回收金額
---    , 0      AS "DerY5Amt"           -- 個案減損客觀證據發生後第五年本金回收金額
---    , 0      AS "DerY1Int"           -- 個案減損客觀證據發生後第一年應收利息回收金額
---    , 0      AS "DerY2Int"           -- 個案減損客觀證據發生後第二年應收利息回收金額
---    , 0      AS "DerY3Int"           -- 個案減損客觀證據發生後第三年應收利息回收金額
---    , 0      AS "DerY4Int"           -- 個案減損客觀證據發生後第四年應收利息回收金額
---    , 0      AS "DerY5Int"           -- 個案減損客觀證據發生後第五年應收利息回收金額
---    , 0      AS "DerY1Fee"           -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
---    , 0      AS "DerY2Fee"           -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
---    , 0      AS "DerY3Fee"           -- 個案減損客觀證據發生後第三年法拍及火險費用回收金額
---    , 0      AS "DerY4Fee"           -- 個案減損客觀證據發生後第四年法拍及火險費用回收金額
---    , 0      AS "DerY5Fee"           -- 個案減損客觀證據發生後第五年法拍及火險費用回收金額
---    , ' '    AS "IndustryCode"       -- 授信行業別
---    , ' '    AS "ClTypeJCIC"         -- 擔保品類別
---    , ' '    AS "AreaCode"           -- 擔保品地區別
---    , ' '    AS "ProdCode"           -- 商品利率代碼
---    , 0      AS "CustKind"           -- 企業戶/個人戶  -- 1=企業戶；2=個人戶
---    , ' '    AS "Ifrs9ProdCode"      -- 產品別

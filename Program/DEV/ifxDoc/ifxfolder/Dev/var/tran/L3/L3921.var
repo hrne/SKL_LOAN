@@ -108,7 +108,9 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(3,#CHAIN,1,T(1,@ChainCustNo,#NTXBUF,6,7),$)
 
+#ChainCustNo=A,7,S
 
 #CHAINTXCD=_,_,S
 C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
@@ -131,7 +133,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 
 #CustNo=X,7,I
 CALL(#InitValue)
-C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 @
@@ -371,7 +373,7 @@ C(3,#Precision,0,SHOW(#TwExtraRepay)HIDE(#UsExtraRepay)
                 ,SHOW(#UsExtraRepay)HIDE(#TwExtraRepay))
 
 #WKREPAY=m,14.2,S
-E(0,#LoanBal-1) 
+E(0,#LoanBal-1)
 
 ![部分償還本金]
 !可不輸入,部份償還本金需＜放款餘額
@@ -386,7 +388,7 @@ C(3,#CHAIN,1,s,$)
 ! C(3,#BormNo,0,S,$) 改為不檢核
 @
 C(3,#LoanBal,0,V(P,此戶已結案),$)
-IF(#TwExtraRepay==#LoanBal,V(P,部分償還金額=放款餘額，請改由L3420結案試算),$)
+IF(#TwExtraRepay==#LoanBal,V(P,部分償還金額=放款餘額，請改由L3922結案試算),$)
 V(5,0,#WKREPAY)
 
 #UsExtraRepay=m,14.2,I
@@ -398,7 +400,7 @@ C(3,#FacmNo,0,S,$)
 C(3,#BormNo,0,S,$)
 @
 C(3,#LoanBal,0,V(P,此戶已結案),$)
-IF(#UsExtraRepay==#LoanBal,V(P,"部分償還金額=放款餘額，請改由結案試算"),$)
+IF(#UsExtraRepay==#LoanBal,V(P,"部分償還金額=放款餘額，請改由L3922結案試算"),$)
 V(5,0,#WKREPAY)
 
 #TimExtraRepay=m,14.2,S

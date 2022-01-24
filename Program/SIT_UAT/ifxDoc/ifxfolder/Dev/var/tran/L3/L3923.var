@@ -100,9 +100,12 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(3,#CHAIN,1,T(1,@ChainCustNo,#NTXBUF,6,7),$)
 
 #CHAINTXCD=_,_,S
 C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
+
+#ChainCustNo=A,7,S
 
 #BUF1A=X,18,S
 T(3,00000019999999000)
@@ -115,7 +118,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 #FdCustNo=X,2,L
 
 #CustNo=X,7,I
-C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,3,1)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3,#BTN4)

@@ -197,7 +197,7 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@CustNo,#NTXBUF,6,7)
+T(1,@ChainCustNo,#NTXBUF,6,7)
 T(1,@FacmNo,#NTXBUF,13,3)
 T(1,@BormNo,#NTXBUF,16,3)
 T(1,@EntryDate,#NTXBUF,19,7)
@@ -205,6 +205,8 @@ T(1,@TwExtraRepay,#NTXBUF,26,16)
 T(1,@UsExtraRepay,#NTXBUF,26,16)
 T(1,@IncludeIntFlag,#NTXBUF,42,1)
 T(1,@RepayTerms,#NTXBUF,43,3),$)
+
+#ChainCustNo=A,7,S
 
 #CHAINTXCD=_,_,S
 C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
@@ -224,6 +226,7 @@ T(3,1)
 
 
 #CustNo=X,7,I
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
 SHOW(#BTN6)HIDE(#BTN1,#BTN2,#BTN3,#BTN7)
 @

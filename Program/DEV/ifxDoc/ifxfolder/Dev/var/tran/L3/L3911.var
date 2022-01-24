@@ -93,6 +93,9 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(3,#CHAIN,1,T(1,@ChainCustNo,#NTXBUF,6,7),$)
+
+#ChainCustNo=A,7,S
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
@@ -113,7 +116,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 
 #CustNo=X,7,I
 T(3,#FdApplNo, )
-C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,3,1)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
@@ -328,6 +331,7 @@ C(3,#CHAIN,1,s,$)
 E(0,#SYSDATE)
 C(3,#CHAIN,1,s,$)
 @A(DATE,0,#EntryEndDate)
+C(3,#EntryStartDate,0,$,V(5,#EntryStartDate,9991231))
 ! V(5,#EntryStartDate,#SYSDATE)
 
 #RPTFG=A,1,S

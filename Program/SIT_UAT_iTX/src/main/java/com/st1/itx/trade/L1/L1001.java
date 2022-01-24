@@ -2,6 +2,7 @@ package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.db.service.ReltMainService;
-
+import com.st1.itx.db.service.springjpa.cm.L1001ServiceImpl;
 import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.service.CustDataCtrlService;
 
@@ -110,9 +111,12 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	public CustDataCtrlService custDataCtrlService;
-	
+
 	@Autowired
 	public GraceConditionService iGraceConditionService;
+
+	@Autowired
+	private L1001ServiceImpl l1001ServiceImpl;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -129,7 +133,7 @@ public class L1001 extends TradeBuffer {
 		String iCustNm = titaVo.get("CustName").trim();
 		String iMobile = titaVo.get("Mobile").trim();
 		String iIndustryCode = titaVo.getParam("IndustryCode");
-		int iCustType = iParse.stringToInteger(titaVo.getParam("IdKind"));
+		String iCustType = titaVo.getParam("IdKind");
 		int iKind = 0;
 		if (iCustNoSt != 0 && iCustNoEd != 0) {
 			// find by custno
@@ -157,7 +161,64 @@ public class L1001 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 40; // 232 * 40 = 9280
+		this.limit = 10; // 232 * 40 = 9280
+
+		List<Map<String, String>> dList = null;
+		try {
+			dList = l1001ServiceImpl.FindData(titaVo, iKind, this.index, this.limit);
+		} catch (Exception e) {
+			throw new LogicException(titaVo, "E0001", "客戶檔查詢錯誤");
+		}
+
+		if (dList == null || dList.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "客戶檔查無資料");
+		}
+
+		for (Map<String, String> d : dList) {
+			CustMain custMain = iCustMainService.findById(d.get("CustUKey"), titaVo);
+
+			totaList(titaVo, custMain);
+		}
+
+		if (dList != null && dList.size() >= this.limit) {
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();// 手動折返
+		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+
+	public ArrayList<TotaVo> run2(TitaVo titaVo) throws LogicException {
+		int iCustNoSt = iParse.stringToInteger(titaVo.get("CustNoSt"));
+		int iCustNoEd = iParse.stringToInteger(titaVo.get("CustNoEd"));
+		String iCustId = titaVo.getParam("CustId");
+		String iCustNm = titaVo.get("CustName").trim();
+		String iMobile = titaVo.get("Mobile").trim();
+		String iIndustryCode = titaVo.getParam("IndustryCode");
+		String iCustType = titaVo.getParam("IdKind");
+		int iKind = 0;
+		if (iCustNoSt != 0 && iCustNoEd != 0) {
+			// find by custno
+			iKind = 1;
+		} else if (iCustNoSt == 0 && iCustNoEd != 0) {
+			// find by custno
+			iKind = 1;
+		} else if (!iCustId.equals("")) {
+			// find by custid
+			iKind = 2;
+		} else if (!iCustNm.equals("")) {
+			// find by custname
+			iKind = 3;
+		} else if (!iMobile.equals("")) {
+			// find by telno
+			iKind = 4;
+		} else if (!iIndustryCode.equals("")) {
+			iKind = 5;
+		} else {
+			throw new LogicException(titaVo, "E0001", "查詢功能選擇錯誤");
+		}
 
 		switch (iKind) {
 		case 1:
@@ -177,7 +238,7 @@ public class L1001 extends TradeBuffer {
 //						continue;
 //					}
 //				}
-				if (iCustType > 0 && Integer.valueOf(aCustMain.getCuscCd()) != iCustType) {
+				if (!"0".equals(iCustType) && !iCustType.equals(aCustMain.getCuscCd())) {
 					continue;
 				}
 
@@ -203,7 +264,7 @@ public class L1001 extends TradeBuffer {
 //					throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
 //				}
 //			}
-			if (iCustType > 0 && Integer.valueOf(iCustMain2.getCuscCd()) != iCustType) {
+			if (!"0".equals(iCustType) && !iCustType.equals(iCustMain2.getCuscCd())) {
 				throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
 			}
 
@@ -227,11 +288,11 @@ public class L1001 extends TradeBuffer {
 //						continue;
 //					}
 //				}
-				
-				if (iCustType > 0 && Integer.valueOf(bCustMain.getCuscCd()) != iCustType) {
+
+				if (!"0".equals(iCustType) && !iCustType.equals(bCustMain.getCuscCd())) {
 					continue;
 				}
-				
+
 				totaList(titaVo, bCustMain);
 
 			}
@@ -262,7 +323,7 @@ public class L1001 extends TradeBuffer {
 //						continue;
 //					}
 //				}
-				if (iCustType > 0 && Integer.valueOf(dCustMain.getCuscCd()) != iCustType) {
+				if (!"0".equals(iCustType) && !iCustType.equals(dCustMain.getCuscCd())) {
 					continue;
 				}
 
@@ -290,8 +351,8 @@ public class L1001 extends TradeBuffer {
 //						continue;
 //					}
 //				}
-				
-				if (iCustType > 0 && Integer.valueOf(eCustMain.getCuscCd()) != iCustType) {
+
+				if (!"0".equals(iCustType) && !iCustType.equals(eCustMain.getCuscCd())) {
 					continue;
 				}
 
@@ -346,10 +407,11 @@ public class L1001 extends TradeBuffer {
 		boolean custDataControl = false;
 
 		boolean allowInquiry = true;
-		if ("1".equals(aCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(aCustMain.getBranchNo())) {
+		if ("1".equals(aCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000")
+				&& !titaVo.getKinbr().equals(aCustMain.getBranchNo())) {
 			allowInquiry = false;
 		}
-		
+
 		CustDataCtrl custDataCtrl = custDataCtrlService.findById(aCustMain.getCustNo(), titaVo);
 		if (custDataCtrl != null && custDataCtrl.getApplMark() == 1) {
 			custDataControl = true;
@@ -495,23 +557,24 @@ public class L1001 extends TradeBuffer {
 		} else {
 			CustTleNoBTNFg = 2;
 		}
-		
-		//寬限條件控管 0:未設定; 1:Y;2:N
+
+		// 寬限條件控管 0:未設定; 1:Y;2:N
 		if (!custDataControl && allowInquiry) {
-			Slice<GraceCondition> sGraceCondition = iGraceConditionService.custNoEq(aCustMain.getCustNo(),aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<GraceCondition> sGraceCondition = iGraceConditionService.custNoEq(aCustMain.getCustNo(),
+					aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
 			if (sGraceCondition != null) {
 				iGraceCondition = 2;
-				for (GraceCondition rGraceCondition :sGraceCondition) {
+				for (GraceCondition rGraceCondition : sGraceCondition) {
 					if (!rGraceCondition.getActUse().trim().isEmpty() && rGraceCondition.getActUse().equals("Y")) {
 						iGraceCondition = 1;
 					}
 				}
 			}
 		}
-		
-		//開放查詢  1:不開放;2:開放
+
+		// 開放查詢 1:不開放;2:開放
 		if (!custDataControl) {
-			if (!aCustMain.getAllowInquire().isEmpty()){
+			if (!aCustMain.getAllowInquire().isEmpty()) {
 				iAllowInquire = Integer.valueOf(aCustMain.getAllowInquire());
 			}
 		}

@@ -1004,6 +1004,8 @@ E(0,@UtilDeadline,#L2r05UtilDeadline)
 E(0,@GracePeriod,#L2r05GracePeriod)
 E(0,@TwAcctFee,#L2r05AcctFee)
 E(0,@UsAcctFee,#L2r05AcctFee)
+E(0,@TwHandlingFee,#L2r05HandlingFee)
+E(0,@UsHandlingFee,#L2r05HandlingFee)
 E(0,@ExtraRepayCode,#L2r05ExtraRepayCode)
 E(0,@IntCalcCode,#L2r05IntCalcCode)
 T(2,@CustTypeCode,#L2r05CustTypeCode)
@@ -1085,8 +1087,8 @@ E(0,@StepMonthELb{n},#L2r05StepRateMonthE{n})
 E(0,@StepRateIncrLb{n},#L2r05StepRateIncr{n})
 T(3,@StepRatePer{n},%)
 ##end
-C(3,#DepartmentCode,1,E(0,@TwHandlingFee,#L2r05HandlingFee),$)
-C(3,#DepartmentCode,1,E(0,@UsHandlingFee,#L2r05HandlingFee),$)
+!C(3,#DepartmentCode,1,E(0,@TwHandlingFee,#L2r05HandlingFee),$)
+!C(3,#DepartmentCode,1,E(0,@UsHandlingFee,#L2r05HandlingFee),$)
 
 
 

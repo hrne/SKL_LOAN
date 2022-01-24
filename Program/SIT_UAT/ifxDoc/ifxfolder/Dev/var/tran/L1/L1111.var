@@ -42,7 +42,7 @@ E(0,0)
 [
 ["[L1111]                                 顧客基本資料維護-身份證號／統一編號變更"],
 ["@","@修改前"],["@","@修改後"],
-["#FdAfter+身份證號／統一編號",#CustIdBefore],["@",#CustIdAfter],
+["#FdAfter+身份證號／統一編號",#CustIdBefore,#IdStatBef],["@",#CustIdAfter,#IdStatAft],
 [#<->#,"#FdCustName+戶名",#CustName],
 [#<->#,"#FdMark+註記",#Mark,#MarkX],
 ]
@@ -90,6 +90,7 @@ C(3,#CHAIN,1,s,$)
 A(ID_UNINO,0,#CustIdBefore)
 
 #IdStatBef=A,1,S
+C(3,#CHAIN,1,A(ID_UNINO,0,#CustIdBefore),$)
 T(4,STAT$)
 
 #RimL1R18=X,1,S
@@ -113,6 +114,9 @@ A(ID_UNINO,0,#CustIdAfter)
 
 #IdStatAft=A,1,S
 T(4,STAT$)
+
+#Chk=A,1,S
+@
 IF(#IdStatBef==2 && #IdStatAft!=2,V(P,請輸入正確統一編號),$)
 IF(#IdStatBef!=2 && #IdStatAft==2,V(P,不可變更為統一編號),$)
 

@@ -93,10 +93,21 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,45,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(3,#CHAIN,1,T(1,@ChainCaseNo,#NTXBUF,15,7),$)
+C(3,#CHAIN,1,T(1,@ChainCustNo,#NTXBUF,22,7),$)
+C(3,#CHAIN,1,T(1,@ChainApplNo,#NTXBUF,39,7),$)
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+
+#ChainCustNo=A,7,S
+
+#ChainApplNo=A,7,S
+
+#ChainCaseNo=A,7,S
+
 
 #WkEndDate=D,8,S
 D(7,2,#SYSDATE,1,0)
@@ -112,7 +123,7 @@ C(3,#CHAIN,1,s,$)
 D(8)
 @C(3,#RvStartDate,0,S,$)
 A(DATE,0,#RvStartDate)
-V(5,0010101,#SYSDATE)
+V(5,0010101,9991231)
 
 #RvEndDate=D,7,I
 ! INVOKEJS(SHOW,p1,1,5,1)
@@ -122,7 +133,10 @@ C(3,#CHAIN,1,s,$)
 C(3,#RvStartDate,0,S,$)
 C(3,#RvEndDate,0,E(0,#WkEndDate),$)
 D(8)
-@V(7)V(5,#RvStartDate,#WkEndDate)
+@V(7)
+A(DATE,0,#RvEndDate)
+V(5,#RvStartDate,9991231)
+
 
 #WKHIDE1=X,1,S
 ! C(3,#RvStartDate,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,5,0))
@@ -131,9 +145,9 @@ D(8)
 #FdCaseNo=X,2,L
 
 #CaseNo=X,7,I
+C(3,#CHAIN,1,C(3,#ChainCaseNo,0,$,E(0,#ChainCaseNo)),$)
 ! INVOKEJS(SHOW,p1,2,5,1)
 HIDE(#BTN2,#BTN3,#BTN4)
-C(3,#CHAIN,1,T(1,#NTXBUF,15,7),$)
 C(3,#CHAIN,1,s,$)
 C(3,#RvStartDate,0,$,S)
 
@@ -178,8 +192,8 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<
 #FdCustNo=X,2,L
 
 #CustNo=X,7,I
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 HIDE(#BTN3,#BTN4)
-C(3,#CHAIN,1,T(1,#NTXBUF,22,7),$)
 C(3,#CHAIN,1,s,$)
 C(3,#RvStartDate,0,$,S)
 C(4,#CaseNo,$,S)
@@ -276,7 +290,7 @@ C(4,#CustId,$,S)
 T(3,*)
 
 #ApplNo=X,7,I
-C(3,#CHAIN,1,T(1,#NTXBUF,39,7),$)
+C(3,#CHAIN,1,C(3,#ChainApplNo,0,$,E(0,#ChainApplNo)),$)
 C(3,#CHAIN,1,s,$)
 C(3,#RvStartDate,0,$,S)
 C(4,#CaseNo,$,S)

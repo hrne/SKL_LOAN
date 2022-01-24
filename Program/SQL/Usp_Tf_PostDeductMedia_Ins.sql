@@ -45,11 +45,7 @@ BEGIN
              WHEN '4' THEN '6' -- 契變手續費
            ELSE '0' END                   AS "RepayType"           -- 還款類別 DECIMAL 2 
           ,MBK."MBKAMT"                   AS "RepayAmt"            -- 扣款金額,還款金額 DECIMAL 14 
-          ,CASE
-             WHEN NVL(MBK."MBKRSN",' ') = ' '
-             THEN ' '
-           ELSE '003' || LPAD(MBK."MBKRSN",2,'0')
-           END                            AS "ProcNoteCode"        -- 處理說明 VARCHAR2 單格空白:成功 其他:參照需求書
+          ,LPAD(MBK."MBKRSN",2,'0')       AS "ProcNoteCode"        -- 處理說明 VARCHAR2 單格空白:成功 其他:參照需求書
           ,APLP."POSCDE"                  AS "PostDepCode"         -- 帳戶別 VARCHAR2 1 P:存簿 G:劃撥
           ,CASE
              WHEN MBK."MBKTRX" = '2' -- 期款

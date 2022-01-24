@@ -325,7 +325,8 @@ BEGIN
                                   AND AF."CustNo" = M."CustNo"
                                   AND AF."FacmNo" = M."FacmNo"
 
-    WHERE  TRUNC(NVL(M."ApproveDate",0) / 100) <= YYYYMM     -- 核准日期＞月底日時，不選入
+    WHERE  M."DataYM" = YYYYMM
+      AND TRUNC(NVL(M."ApproveDate",0) / 100) <= YYYYMM     -- 核准日期＞月底日時，不選入
       AND  (    ( M."DrawdownFg" = 0 AND TRUNC(NVL(M."UtilDeadline",0) / 100 ) >= YYYYMM )
              OR ( M."DrawdownFg" = 1 AND TRUNC(NVL(M."FirstDrawdownDate",0) / 100) > YYYYMM AND
                   TRUNC(NVL(M."UtilDeadline",0) / 100) >= YYYYMM

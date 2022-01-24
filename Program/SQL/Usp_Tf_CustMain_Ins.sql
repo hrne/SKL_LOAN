@@ -96,7 +96,14 @@ BEGIN
           ,''                             AS "CurrNumDash"         -- 通訊-號之 VARCHAR2 5 
           ,''                             AS "CurrFloor"           -- 通訊-樓 VARCHAR2 5 
           ,''                             AS "CurrFloorDash"       -- 通訊-樓之 VARCHAR2 5 
-          ,CUSP."CUSCCD"                  AS "CuscCd"              -- 身份別 VARCHAR2 1 
+          ,CASE
+             WHEN NVL(CUSP."CUSCCD",'0') != '0'
+             THEN CUSP."CUSCCD"
+             WHEN LENGTHB(CUSP."CUSID1") = 8
+             THEN '2'
+             WHEN LENGTHB(CUSP."CUSID1") = 10
+             THEN '1'
+           ELSE '1'                       AS "CuscCd"              -- 身份別 VARCHAR2 1 
           ,CASE
              -- 在企金自然人檔有值者，且啟用記號為Y者，為企金自然人
              WHEN NVL(ENPP."ENPUSE",' ') = 'Y'         THEN '2'

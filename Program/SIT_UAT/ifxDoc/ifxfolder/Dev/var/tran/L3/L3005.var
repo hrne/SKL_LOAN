@@ -291,6 +291,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,14,7),$)
 C(3,#CHAIN,1,s,$)
 E(0,#SYSDATE/100)
 E(0,#AcDate*100+1)
+@A(DATE,0,#AcDate)
 
 
 ![入帳日期]

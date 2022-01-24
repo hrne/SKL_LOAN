@@ -77,6 +77,7 @@ BEGIN
                , '03'               AS "TelTypeCode" -- 手機
                , "CUSNA4"
           FROM "CU$CUSP"
+          UNION ALL
           SELECT TRIM("CUSID1")     AS "CUSTID"
                , TRIM("CUSTLA")     AS "CUSTEL"
                , '02'               AS "TelTypeCode" -- 住家電話(戶籍)
@@ -105,7 +106,8 @@ BEGIN
                     THEN TRIM("CUSBBC")
                     WHEN REGEXP_LIKE(TRIM("CUSFX1"),'^09\d{8}$')
                     THEN TRIM("CUSFX1")
-                 ELSE 'X'           AS "CUSTEL"
+                 ELSE 'X'
+                 END                AS "CUSTEL"
                , '05'               AS "TelTypeCode" -- 05:簡訊
                , "CUSNA4"
           FROM "CU$CUSP"

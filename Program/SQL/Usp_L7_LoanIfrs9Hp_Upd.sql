@@ -73,6 +73,7 @@ BEGIN
            FROM   "Ifrs9LoanData" M
              LEFT JOIN "Ifrs9FacData"  F   ON  F."CustNo" = M."CustNo"
                                           AND  F."FacmNo" = M."FacmNo"
+           WHERE M."DataYM" =  YYYYMM                              
            -- 尚未撥款的資料 (已核撥記號=0 & 動支期限>=月底日)
            UNION
            SELECT F."CustNo"                  AS "CustNo"
@@ -81,6 +82,7 @@ BEGIN
                 , NVL(F."ApproveDate",0)      AS "ApproveDate"   -- 核准日期(額度)
            FROM   "Ifrs9FacData" F
            WHERE  F."DrawdownFg" = 0
+             AND  F."DataYM" =  YYYYMM
          )   A
     WHERE TRUNC(A."ApproveDate" / 100 ) <= YYYYMM      -- 核准日期＞月底日時，此筆資料不計入
     GROUP BY A."CustNo", A."FacmNo", A."ApproveDate"
@@ -97,7 +99,6 @@ BEGIN
                 ELSE 2
            END                                  AS "CustKind"           -- 企業戶/個人戶
          , NVL(HP."ApproveDate",0)              AS "ApproveDate"        -- 核准日期(額度)
-         --, NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate"  -- 初貸日期
          , CASE
              WHEN F."LastBormRvNo" > 900 AND F."LastBormNo" = 0
                   THEN NVL(L."DrawdownDate",0)
@@ -105,8 +106,6 @@ BEGIN
            END                                  AS "FirstDrawdownDate"  -- 初貸日期
          , NVL(F."LineAmt",0)                   AS "LineAmt"            -- 核准金額(台幣)
          , NVL("FacProd"."Ifrs9ProdCode", ' ')  AS "Ifrs9ProdCode"      -- 產品別
-         --, CASE WHEN ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" ) < 0 THEN 0
-         --       ELSE ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
          , CASE WHEN NVL(F."RecycleCode",0) = 0 AND NVL(F."UtilDeadline",0) >= TMNDYF --非循環且動支期限>=月底日  
                      THEN  ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
                 WHEN NVL(F."RecycleCode",0) = 1 AND NVL(F."RecycleDeadline",0) >= TMNDYF --循環且循環動支期限>=月底日    

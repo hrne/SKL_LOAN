@@ -124,7 +124,9 @@ C(3,#CHAIN,1,s,$)
 C(3,#DrawdownDateS,0,S,$)
 C(3,#DrawdownDateE,0,E(0,#DrawdownDateS),$)
 D(8)
-@V(7)V(5,#DrawdownDateS,9991231)
+@V(7)
+A(DATE,0,#DrawdownDateE)
+V(5,#DrawdownDateS,9991231)
 
 
 

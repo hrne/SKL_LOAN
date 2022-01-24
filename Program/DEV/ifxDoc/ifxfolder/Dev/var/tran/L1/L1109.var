@@ -200,6 +200,7 @@ C(5,#SubCompanyFg,Y,$,S)
 ##loop{times:20,n:1}
 C(5,#CrossUse{n},Y,S,$)
 ##end
+@
 V(P,至少勾選一筆同意)
 
 

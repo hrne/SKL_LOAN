@@ -3,30 +3,6 @@
 </sub>
 
 <sub type="SYS" name="label">
-
-!#TXCD
-!T(3,L1001)
-
-![資料表頭(HEADER)長度]
-#INQHD=n,3,S
-E(0,0)ASGN(INQHD$)
-
-![每筆資料明細(OCCURS)長度]
-#INQLEN=n,3,S
-E(0,233)ASGN(INQLEN$)
-
-![多筆查詢之一個畫面有N筆資料]
-#INQREC=n,2,S
-E(0,10)ASGN(INQREC$)
-
-![畫面顯示的明細間的高度]
-#LOOPH=n,3,S
-E(0,1)ASGN(LOOPHEIGHT$)
-
-![每張印錄單列印的筆數]
-#INQPRT=n,2,S
-E(0,40)ASGN(INQPRT$)
-
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -212,6 +188,7 @@ C(4,#IndustryCode,S,$)
 T(2,@IndustryCodeX,#L6R06IndustryItem)
 
 #IndustryCodeX=x,2.50,L
+C(4,#IndustryCode,S,$)
 
 #IdKind=A,1,I
 HELP(#IdKindHelp)
@@ -295,7 +272,7 @@ T(3,1)ASGN(LOOP$)
 #OOCustTypeCode=A,2,S
 #OOCustTypeItem=X,10,S
 T(H,#OOCustTypeCode,#CustTypeCodeHelp)
-#OOCustName=x,200,L
+#OOCustName=x,100,L
 
 #OODataStatus=X,1,S
 
