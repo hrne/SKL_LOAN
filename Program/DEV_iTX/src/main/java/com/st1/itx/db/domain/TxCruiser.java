@@ -22,236 +22,266 @@ import javax.persistence.Column;
 @Table(name = "`TxCruiser`")
 public class TxCruiser implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 267234327391683322L;
+	private static final long serialVersionUID = -3136955254791342167L;
 
-	@EmbeddedId
-	private TxCruiserId txCruiserId;
+@EmbeddedId
+  private TxCruiserId txCruiserId;
 
-	// 交易序號
-	@Column(name = "`TxSeq`", length = 20, insertable = false, updatable = false)
-	private String txSeq;
+  // 交易序號
+  @Column(name = "`TxSeq`", length = 20, insertable = false, updatable = false)
+  private String txSeq;
 
-	// 發動經辦
-	@Column(name = "`TlrNo`", length = 6, insertable = false, updatable = false)
-	private String tlrNo;
+  // 發動經辦
+  @Column(name = "`TlrNo`", length = 6, insertable = false, updatable = false)
+  private String tlrNo;
 
-	// 發動交易
-	@Column(name = "`TxCode`", length = 10)
-	private String txCode;
+  // 發動交易
+  @Column(name = "`TxCode`", length = 10)
+  private String txCode;
 
-	// 批次執行清單
-	@Column(name = "`JobList`", length = 800)
-	private String jobList;
+  // 批次執行清單
+  @Column(name = "`JobList`", length = 800)
+  private String jobList;
 
-	// 執行狀態
-	/* U:執行中S:完成F:失敗 */
-	@Column(name = "`Status`", length = 1)
-	private String status;
+  // 執行狀態
+  /* U:執行中S:完成F:失敗 */
+  @Column(name = "`Status`", length = 1)
+  private String status;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 關閉訊息通知交易記號
+  /* 1:無連動交易 */
+  @Column(name = "`SendMSgChainOff`", length = 1)
+  private String sendMSgChainOff;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	public TxCruiserId getTxCruiserId() {
-		return this.txCruiserId;
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	public void setTxCruiserId(TxCruiserId txCruiserId) {
-		this.txCruiserId = txCruiserId;
-	}
 
-	/**
-	 * 交易序號<br>
-	 * 
-	 * @return String
-	 */
-	public String getTxSeq() {
-		return this.txSeq == null ? "" : this.txSeq;
-	}
+  public TxCruiserId getTxCruiserId() {
+    return this.txCruiserId;
+  }
 
-	/**
-	 * 交易序號<br>
-	 * 
-	 *
-	 * @param txSeq 交易序號
-	 */
-	public void setTxSeq(String txSeq) {
-		this.txSeq = txSeq;
-	}
+  public void setTxCruiserId(TxCruiserId txCruiserId) {
+    this.txCruiserId = txCruiserId;
+  }
 
-	/**
-	 * 發動經辦<br>
-	 * 
-	 * @return String
-	 */
-	public String getTlrNo() {
-		return this.tlrNo == null ? "" : this.tlrNo;
-	}
+/**
+	* 交易序號<br>
+	* 
+	* @return String
+	*/
+  public String getTxSeq() {
+    return this.txSeq == null ? "" : this.txSeq;
+  }
 
-	/**
-	 * 發動經辦<br>
-	 * 
-	 *
-	 * @param tlrNo 發動經辦
-	 */
-	public void setTlrNo(String tlrNo) {
-		this.tlrNo = tlrNo;
-	}
+/**
+	* 交易序號<br>
+	* 
+  *
+  * @param txSeq 交易序號
+	*/
+  public void setTxSeq(String txSeq) {
+    this.txSeq = txSeq;
+  }
 
-	/**
-	 * 發動交易<br>
-	 * 
-	 * @return String
-	 */
-	public String getTxCode() {
-		return this.txCode == null ? "" : this.txCode;
-	}
+/**
+	* 發動經辦<br>
+	* 
+	* @return String
+	*/
+  public String getTlrNo() {
+    return this.tlrNo == null ? "" : this.tlrNo;
+  }
 
-	/**
-	 * 發動交易<br>
-	 * 
-	 *
-	 * @param txCode 發動交易
-	 */
-	public void setTxCode(String txCode) {
-		this.txCode = txCode;
-	}
+/**
+	* 發動經辦<br>
+	* 
+  *
+  * @param tlrNo 發動經辦
+	*/
+  public void setTlrNo(String tlrNo) {
+    this.tlrNo = tlrNo;
+  }
 
-	/**
-	 * 批次執行清單<br>
-	 * 
-	 * @return String
-	 */
-	public String getJobList() {
-		return this.jobList == null ? "" : this.jobList;
-	}
+/**
+	* 發動交易<br>
+	* 
+	* @return String
+	*/
+  public String getTxCode() {
+    return this.txCode == null ? "" : this.txCode;
+  }
 
-	/**
-	 * 批次執行清單<br>
-	 * 
-	 *
-	 * @param jobList 批次執行清單
-	 */
-	public void setJobList(String jobList) {
-		this.jobList = jobList;
-	}
+/**
+	* 發動交易<br>
+	* 
+  *
+  * @param txCode 發動交易
+	*/
+  public void setTxCode(String txCode) {
+    this.txCode = txCode;
+  }
 
-	/**
-	 * 執行狀態<br>
-	 * U:執行中 S:完成 F:失敗
-	 * 
-	 * @return String
-	 */
-	public String getStatus() {
-		return this.status == null ? "" : this.status;
-	}
+/**
+	* 批次執行清單<br>
+	* 
+	* @return String
+	*/
+  public String getJobList() {
+    return this.jobList == null ? "" : this.jobList;
+  }
 
-	/**
-	 * 執行狀態<br>
-	 * U:執行中 S:完成 F:失敗
-	 *
-	 * @param status 執行狀態
-	 */
-	public void setStatus(String status) {
-		this.status = status;
-	}
+/**
+	* 批次執行清單<br>
+	* 
+  *
+  * @param jobList 批次執行清單
+	*/
+  public void setJobList(String jobList) {
+    this.jobList = jobList;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 執行狀態<br>
+	* U:執行中
+S:完成
+F:失敗
+	* @return String
+	*/
+  public String getStatus() {
+    return this.status == null ? "" : this.status;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 執行狀態<br>
+	* U:執行中
+S:完成
+F:失敗
+  *
+  * @param status 執行狀態
+	*/
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 關閉訊息通知交易記號<br>
+	* 1:無連動交易
+	* @return String
+	*/
+  public String getSendMSgChainOff() {
+    return this.sendMSgChainOff == null ? "" : this.sendMSgChainOff;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 關閉訊息通知交易記號<br>
+	* 1:無連動交易
+  *
+  * @param sendMSgChainOff 關閉訊息通知交易記號
+	*/
+  public void setSendMSgChainOff(String sendMSgChainOff) {
+    this.sendMSgChainOff = sendMSgChainOff;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
 
-	@Override
-	public String toString() {
-		return "TxCruiser [txCruiserId=" + txCruiserId + ", txCode=" + txCode + ", jobList=" + jobList + ", status=" + status + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-				+ ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "TxCruiser [txCruiserId=" + txCruiserId + ", txCode=" + txCode + ", jobList=" + jobList + ", status=" + status + ", sendMSgChainOff=" + sendMSgChainOff
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

@@ -149,6 +149,11 @@ public class L1104 extends TradeBuffer {
 				tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("BirthdayAft")));
 			}
 
+			// 建檔客戶別
+			if (titaVo.getParam("TypeCodeInd").equals("X")) {
+				tCustMain.setTypeCode(iParse.stringToInteger(titaVo.getParam("TypeCodeAft")));
+			}
+
 			// 客戶別
 			if (titaVo.getParam("CustTypeInd").equals("X")) {
 				tCustMain.setCustTypeCode(titaVo.getParam("CustTypeAft"));
@@ -324,7 +329,8 @@ public class L1104 extends TradeBuffer {
 				if (titaVo.getParam("IncomeDataDateAft").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateAft")) + 191100));
+					tCustMain.setIncomeDataDate(
+							"" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateAft")) + 191100));
 				}
 
 			}
@@ -528,7 +534,8 @@ public class L1104 extends TradeBuffer {
 				if (titaVo.getParam("IncomeDataDateBef").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateBef")) + 191100));
+					tCustMain.setIncomeDataDate(
+							"" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateBef")) + 191100));
 				}
 
 			}

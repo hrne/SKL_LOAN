@@ -232,8 +232,8 @@ C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
 C(3,#ApplNo,0,$,S)
 
-@V(7)
-!@IF(#CaseNo == 0 && #CustNo == 0 &&#CustId == 0 &&#ApplNo == 0 &&#Teller == 0 ,V(P,案件編號、借戶戶號、統一編號、核准編號、房貸專員擇一輸入),$)
+!@V(7)
+@IF(#CaseNo == 0 && #CustNo == 0 &&#CustId == 0 &&#ApplNo == 0 &&#Teller == 0 ,V(P,案件編號、借戶戶號、統一編號、核准編號、房貸專員擇一輸入),$)
 
 
 ![額度編號]

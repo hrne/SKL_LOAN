@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +77,20 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 		this.putParam(ContentName.mrKey, "");
 		this.putParam(ContentName.filler, "");
 		this.put("occursList", this.occursList);
+	}
+
+	public void clearButLabel(TitaVo titaVo) {
+		String[] labelName = { ContentName.sendTo, ContentName.msgLen, ContentName.txrseq, ContentName.brno, ContentName.tlrno, ContentName.txtno, ContentName.caldy, ContentName.caltm,
+				ContentName.msgEnd, ContentName.txrsut, ContentName.txcd, ContentName.msgId, ContentName.mldry, ContentName.mrKey, ContentName.filler };
+		Map<String, String> m = new LinkedHashMap<String, String>();
+
+		for (String s : labelName)
+			m.put(s, (String) this.get(s));
+		this.clear();
+		titaVo.clearBodyFld();
+
+		this.putAll(titaVo);
+		this.putAll(m);
 	}
 
 	/**
@@ -194,6 +210,19 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 	}
 
 	/**
+	 * pull out occursLlist and add number then put to TotaVo
+	 */
+	public void pullOcLiAndCls() {
+		int i = 1;
+		for (Map<String, String> m : this.getOccursList()) {
+			for (Map.Entry<String, String> entry : m.entrySet())
+				this.putParam(entry.getKey() + i, entry.getValue());
+			i++;
+		}
+		this.occursList.clear();
+	}
+
+	/**
 	 * set Txrsut to Error
 	 */
 	public void setTxrsutE() {
@@ -263,6 +292,15 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 	}
 
 	/**
+	 * set Reentry Tita
+	 * 
+	 * @param titaVo titaVo
+	 */
+	public void setRtryTitaVo(TitaVo titaVo) {
+		this.put("Reentry", titaVo);
+	}
+
+	/**
 	 * set EC TitaVo
 	 * 
 	 * @param titaVo EC TitaVo
@@ -277,6 +315,15 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 		tita.putParam(ContentName.mldry, "");
 		tita.putParam(ContentName.filler, "");
 		this.put("EC", tita);
+	}
+
+	/**
+	 * is has ec tita?
+	 * 
+	 * @return boolean
+	 */
+	public boolean isHasEc() {
+		return Objects.isNull(this.get("EC")) ? false : true;
 	}
 
 	/**

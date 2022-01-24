@@ -250,14 +250,14 @@ public class L1101 extends TradeBuffer {
 			}
 			
 			// 主管刷卡
-			if (titaVo.getEmpNos().trim().isEmpty()) {
-				this.info("主管 = " + titaVo.getEmpNos().trim());
-				iChkFg = 0;
-				iChkFg = inqLoanBorMain(tCustMain.getCustNo(), iChkFg, titaVo);
-				if (iChkFg != 0) {
-					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
-				}
-			}
+//			if (titaVo.getEmpNos().trim().isEmpty()) {
+//				this.info("主管 = " + titaVo.getEmpNos().trim());
+//				iChkFg = 0;
+//				iChkFg = inqLoanBorMain(tCustMain.getCustNo(), iChkFg, titaVo);
+//				if (iChkFg != 0) {
+//					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
+//				}
+//			}
 
 			BankRelationVo vo = bankRelationCom.getBankRelation(iCustId, titaVo);
 

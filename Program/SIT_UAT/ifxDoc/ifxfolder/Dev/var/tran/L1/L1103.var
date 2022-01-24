@@ -1016,6 +1016,7 @@ IF(#RegFloorAft==#RegFloorBef,T(3,),T(3,X))
 
 #RegFloorDashAft=X,5,I
 C(4,#RegCityCodeAft,S,$)
+C(4,#RegFloorAft,S,$)
 
 #RegFloorDashInd=_,_,L
 IF(#RegFloorDashAft==#RegFloorDashBef,T(3,),T(3,X))
@@ -1293,6 +1294,7 @@ IF(#CurrFloorAft==#CurrFloorBef,T(3,),T(3,X))
 #CurrFloorDashAft=X,5,I
 C(5,#SameReg,Y,s,$)
 C(4,#CurrCityCodeAft,S,$)
+C(4,#CurrFloorAft,S,$)
 
 #CurrFloorDashInd=_,_,L
 IF(#CurrFloorDashAft==#CurrFloorDashBef,T(3,),T(3,X))

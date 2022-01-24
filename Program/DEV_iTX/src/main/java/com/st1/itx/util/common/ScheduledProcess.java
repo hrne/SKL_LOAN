@@ -98,9 +98,12 @@ public class ScheduledProcess extends SysLogger {
 						e.printStackTrace(new PrintWriter(errors));
 						this.error(errors.toString());
 					} finally {
-						if (isFinish)
-							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "", txs.getTlrNo(), txs.getTxCode() + " 執行成功", new TitaVo());
-
+						if (isFinish) {
+							if ("1".equals(txs.getSendMSgChainOff()))
+								webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "N", "LC009", txs.getTlrNo(), txs.getTxCode() + " 執行成功", new TitaVo());
+							else
+								webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "LC009", txs.getTlrNo(), txs.getTxCode() + " 執行成功", new TitaVo());
+						}
 						if (isBroken)
 							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "L6970", txs.getTxSeq(), txs.getTxCode() + " 執行失敗, 請至L6970查看", new TitaVo());
 					}

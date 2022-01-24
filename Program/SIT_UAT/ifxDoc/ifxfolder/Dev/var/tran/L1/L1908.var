@@ -1,0 +1,306 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L1908)
+
+![資料表頭(HEADER)長度](tota-body-非occurs的長度)
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度](tota-body-occurs的長度)
+#INQLEN=n,3,S
+E(0,136)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#FirstIn=A,1,S
+E(0,0)
+
+
+
+#BTNADDBUF=X,11,S
+T(2,1+0000000+000)
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L1108; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,880];printer.width=[20,20];">
+[
+["[L1908]                                 申請不列印書面通知書查詢"],
+["#FdMain+查詢條件","@(戶號、統一編號，需擇一輸入)"],
+["#FdCustNo+．戶號",#CustNo,"-",#FacmNo,"（000=全部額度）",#BTN2,#CustNameA],
+["#FdCustId+．統一編號",#CustId,#BTN3,#CustNameB],
+]
+#FdMain=X,2,L
+T(3,*)
+#FdCustNo=X,2,L
+#FdCustId=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+!---------- AP TEXT AREA Variables ----------
+<include src="ROM.icf::L1R18.dec"/>
+#RimCustId=X,10,S
+#RimCustNo=A,7,S
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#BUFA=X,1,S
+
+#BINDA=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:CustNo<-OOCustNo})
+
+#BUFB=X,1,S
+
+#BINDB=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:CustId<-OOCustId})
+
+!戶號
+#CustNo=A,7,I
+@C(3,#CustNo,0,T(2,@BTNADDBUF,1+0000000+000+          )T(2,@CustNameA, ),T(2,@BTNADDBUF,1+#CustNo+000+          )T(2,@CustNameB, )T(2,@CustId, ))
+
+#RimL1R18=X,1,S
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1R18,L1R18)
+C(3,#CustNo,0,S,$)
+S(L1R18,1,#RimCustNo,#RimCustId)
+R(1,L1R18)
+T(2,@CustNameA,#L1R18CustName)
+!戶名
+#CustNameA=X,100,L
+
+!額度編號
+#FacmNo=A,3,I
+C(3,#CustNo,0,S,$)
+@C(3,#FacmNo,0,T(2,@BTNADDBUF,1+#CustNo+000+          ),T(2,@BTNADDBUF,1+#CustNo+#FacmNo+          ))
+! 統編
+#CustId=X,10,I
+C(3,#CustNo,0,$,S)
+@
+C(3,#CustNo,0,C(4,#CustId,V(P,需擇一輸入查詢條件),$),S)
+C(3,#CustNo,0,V(7)A(ID_UNINO,0,#CustId)T(2,@CustNameB, ),$)
+
+#Space=X,1,S
+T(2,@RimCustId,#CustId)
+RESET_RIM(#RimL1R18,L1R18)
+C(4,#CustId,S,$)
+S(L1R18,1,#RimCustNo,#RimCustId)
+R(1,L1R18)
+T(2,@CustNameB,#L1R18CustName)
+!戶名
+#CustNameB=X,100,L
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
+
+#RETURN=A,1,S
+E(0,0)
+
+![折返KEY]
+#RTNTXT=X,9,S
+
+
+!<include src="COM.icf::RPTFG.dec"/>
+#RPTFG=A,1,S
+E(0,0)
+
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L1908 ----------
+<sub type="FORM" name="L1908">
+
+#SCRTIL=_,_,S
+T(3,[L1908] 申請不列印書面通知書)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#OCustNo=A,7,L
+T(2,#CustNo)
+
+#OFacmNo=A,3,L
+T(2,#FacmNo)
+
+#OCustName=X,100,L
+C(3,#CustNo,0,T(2,#CustNameB),$)
+C(4,#CustId,T(2,#CustNameA),$)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+!戶號
+#OOCustNo=A,7,L
+
+! 額度號碼
+#OOFacmNo=A,3,L
+
+! 不列印記號-書面
+#OOPaper=X,1,S
+#PaperLb=X,6,L
+SWITCH(#OOPaper,N,T(3,不寄送),
+                ,T(3,寄送))
+! 不列印記號-簡訊
+#OOMsg=X,1,S
+#MsgLb=X,6,L
+SWITCH(#OOMsg,N,T(3,不發送),
+                ,T(3,發送))
+! 不列印記號-EMail
+#OOEMail=X,1,S
+#EMailLb=X,6,L
+SWITCH(#OOEMail,N,T(3,不發送),
+                ,T(3,發送))
+
+#OOFormNo=X,10,S
+
+#OOFormName=X,40,S
+
+#OOFormNameX=X,50,S
+T(2,#OOFormNo+#OOFormName)
+
+#OOApplyDt=D,7,L
+
+#OOLastUpdateEmpNo=X,6,S
+
+#OOLastUpdateEmpNoName=X,50,S
+
+#OOLastUpdate_Combine=X,57,L
+T(2,#OOLastUpdateEmpNo+ +#OOLastUpdateEmpNoName)
+
+#OOLastUpdate=X,10,L
+
+!修改
+#OOBUF1=X,11,S
+T(2,2+#OOCustNo+#OOFacmNo)
+!複製
+#OOBUF2=X,11,S
+T(2,3+#OOCustNo+#OOFacmNo)
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1108; ntxbuf=#OOBUF1})
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1108; ntxbuf=#OOBUF2})
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustNo
+#FacmNo
+#CustId
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R18.tom"/>
+TXFORM=L1908
+#OOCustNo
+#OOFacmNo
+#OOPaper
+#OOMsg
+#OOEMail
+#OOFormNo
+#OOFormName
+#OOApplyDt
+#OOLastUpdateEmpNo
+#OOLastUpdateEmpNoName
+#OOLastUpdate
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L1908" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L1908]                                 申請不列印書面通知書查詢"],
+[" "],
+! ["@戶號",#OCustNo,"-",#OFacmNo,#OCustName],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#RPTFG=0,QUERY.GRID,L1908
+#any={detail:true, header:'L1908.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+
+#OOBTN2=複製
+{width:50,search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false}
+
+#OOCustNo=戶號
+{width:80,align:'center'}
+
+#OOFacmNo=額度號碼
+{width:80,align:'center'}
+
+#PaperLb=書面
+{width:80,align:'center'}
+
+#MsgLb=簡訊
+{width:80,align:'center'}
+
+#EMailLb=EMail
+{width:80,align:'center'}
+
+#OOFormNameX=通知書名稱
+{width:400,align:'left'}
+
+#OOApplyDt=申請日期
+{width:80,align:'center'}
+
+#OOLastUpdate_Combine=修改人員
+{width:100,align:'center'}
+
+#OOLastUpdate=修改日期
+{width:80,align:'center'}
+^
+<include src="PRT.icf::INQ01.sel" map="i=L1908;cpi=15"/>
+
+%
+#OOCustNo#OOFacmNo#PaperLb#MsgLb#EMailLb#OOFormName#OOApplyDt
+@^
+
+</sub>

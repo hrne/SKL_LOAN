@@ -1437,7 +1437,7 @@ T(H,#OBussNationalityCode,#NationalityCodeHelp)
 
 
 !通訊-郵遞區號前三碼
-#OCurrZip3=A,3,L
+#OCurrZip3=X,3,L
 !通訊-郵遞區號後兩碼
 #OCurrZip2=X,3,L
 !通訊地址

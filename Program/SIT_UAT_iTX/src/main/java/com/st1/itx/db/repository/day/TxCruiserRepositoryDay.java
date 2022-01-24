@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,12 +22,13 @@ import com.st1.itx.db.domain.TxCruiserId;
  */
 public interface TxCruiserRepositoryDay extends JpaRepository<TxCruiser, TxCruiserId> {
 
-	// Status =
-	public Slice<TxCruiser> findAllByStatusIsOrderByTxSeqAsc(String status_0, Pageable pageable);
+  // Status =
+  public Slice<TxCruiser> findAllByStatusIsOrderByTxSeqAsc(String status_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxCruiser> findByTxCruiserId(TxCruiserId txCruiserId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxCruiser> findByTxCruiserId(TxCruiserId txCruiserId);
 
 }
+

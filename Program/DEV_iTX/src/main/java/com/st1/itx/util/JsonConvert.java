@@ -51,7 +51,7 @@ public class JsonConvert extends SysLogger {
 	public String deserializationJsonString(TitaVo titaVo, List<TotaVo> totaVoLi) throws LogicException, IOException {
 		this.info("deserializationJsonString...");
 		String tota = "";
-		// try {
+
 		/* 排序 isWarn擺在最後 */
 		Collections.sort(totaVoLi, new Comparator<TotaVo>() {
 			@Override
@@ -65,7 +65,7 @@ public class JsonConvert extends SysLogger {
 					return -1;
 			}
 		});
-		
+
 		TotaVo totaVo = null;
 
 		if (totaVoLi.get(totaVoLi.size() - 1).isReentry())
@@ -73,7 +73,7 @@ public class JsonConvert extends SysLogger {
 
 		if (totaVoLi.get(totaVoLi.size() - 1).isHasEc())
 			totaVoLi.get(totaVoLi.size() - 1).getEcTitaVo().clearBodyFld();
-		
+
 		if (titaVo.isRim() && totaVoLi.get(totaVoLi.size() - 1).getOccursList().size() > 0)
 			totaVoLi.get(totaVoLi.size() - 1).pullOcLiAndCls();
 
@@ -86,13 +86,14 @@ public class JsonConvert extends SysLogger {
 		this.setStatus(true);
 		return tota;
 
-//		for (TotaVo t : totaVo) {
-//			if (totaVo.size() == 1 && (t.getMsgId().equals("LC100") || t.getMsgId().equals("LC013"))) {
+//		for (TotaVo t : totaVoLi) {
+//			if (totaVoLi.size() == 1 && (t.getMsgId().equals("LC100") || t.getMsgId().equals("LC013"))) {
 //				tota = t.getJsonString();
 //				tota = FormatUtil.pad9(Integer.toString(tota.getBytes("UTF-8").length + 5), 5) + tota;
-//
+////				tota = new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).writeValueAsString(totaVoLi);
 //				return tota;
 //			}
+//
 //			if (!t.isError() && !t.isWarn()) {
 //				if (t.getEcTitaVo() != null) {
 //					TitaVo titaVoEC = t.getEcTitaVo();
@@ -126,8 +127,6 @@ public class JsonConvert extends SysLogger {
 //					tota += FormatUtil.pad9(msglen, 5) + totat.substring(5);
 //
 //					if (t.isReentry()) {
-////					hostFormatter.init(t.getMsgId() + ".tim");
-////					String tita = "00000" + hostFormatter.format(true, titaVo).substring(180);
 //						String tita = tota.substring(0, 71) + this.getJsonString(titaVo);
 //						msglen = StringCut.countLen(tita);
 //						tota += FormatUtil.pad9(msglen, 5) + tita.substring(5);
@@ -146,7 +145,7 @@ public class JsonConvert extends SysLogger {
 //		}
 //		this.setStatus(true);
 //		tota = FormatUtil.pad9(Integer.toString(tota.getBytes("UTF-8").length + 5), 5) + tota;
-//		return tota;
+//		return tota;	
 	}
 
 	public boolean isStatus() {

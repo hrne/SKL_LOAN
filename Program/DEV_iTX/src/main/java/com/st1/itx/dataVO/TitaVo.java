@@ -1267,6 +1267,22 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	}
 
 	/**
+	 * is off true
+	 * 
+	 * @return boolean
+	 */
+	public boolean isJobSendMsgChainOff() {
+		return !Objects.isNull(this.get("sendMsgChainOff")) && this.get("sendMsgChainOff").equals("1") ? true : false;
+	}
+
+	/**
+	 * set Msg Off For batchJob
+	 */
+	public void setJobSendMsgChainOff() {
+		this.put("sendMsgChainOff", "1");
+	}
+
+	/**
 	 * setMonOrdailyFg<br>
 	 * M = Monthly<br>
 	 * D = Daily

@@ -1,6 +1,8 @@
 package com.st1.itx.util.common;
 
 import java.util.HashMap;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -62,23 +64,24 @@ public class SendRsp extends CommBuffer {
 
 		this.txBuffer = txBuffer;
 
-		if (no == null || "".equals(no)) {
+		if (no == null || "".equals(no))
 			throw new LogicException(titaVo, "EC004", "主管援權理由代碼不可空白");
-		}
 
 		if (!"9999".equals(no)) {
 			CdSupv cdSupv = cdSupvService.findById(no);
-			if (cdSupv == null) {
+			if (cdSupv == null)
 				throw new LogicException(titaVo, "EC001", "主管授權理由檔(CdSupv):" + no);
-			}
-			if (msg == null || "".equals(msg)) {
-				msg = cdSupv.getSupvReasonItem();
-			} else {
-				msg = cdSupv.getSupvReasonItem() + "，" + msg;
-			}
-		} else if (msg == null || "".equals(msg)) {
+
+			String reasonItem = cdSupv.getSupvReasonItem();
+			reasonItem = Objects.isNull(reasonItem) ? "" : reasonItem.trim();
+
+			if (msg == null || "".equals(msg))
+				msg = reasonItem;
+			else
+				msg = reasonItem.isEmpty() ? msg : reasonItem + "，" + msg;
+
+		} else if (msg == null || "".equals(msg))
 			throw new LogicException(titaVo, "EC004", "主管援權理由代碼9999，理由說明不可空白");
-		}
 
 		String nmsg = msg.replace(";", "；");
 

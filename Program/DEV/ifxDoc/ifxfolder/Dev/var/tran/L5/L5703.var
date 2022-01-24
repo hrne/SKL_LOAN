@@ -177,7 +177,7 @@ R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
 
 #RemitBankX=X,100,L
-
+IF(#FunCode==1 || #FunCode==2,IF(#RemitBank==#FinCode,T(2,#FinCodeX),$),$)
 
 ! 匯款帳號
 #RemitAcct=X,16,I

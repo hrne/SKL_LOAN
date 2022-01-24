@@ -31,7 +31,7 @@ public class L7100 extends TradeBuffer {
 	private final String[][] occursName = { { "L1109Occurs" }, { "L2153StepOccurs" },
 			{ "L2411FirstOccurs", "L2411Occurs" }, { "L2416OwnerOccurs", "L2416ReasonOccurs" },
 			{ "L2415PublicOccurs", "L2415ReasonOccurs", "L2415ParkingTotalOccurs", "L2415ParkingDetailOccurs" },
-			{ "L2417Occurs" }, { "L2101StepOccurs", "L2101PremiumOccurs", "L2101AcctFeeOccurs" } };
+			{ "L2417Occurs" }, { "L2101StepOccurs", "L2101PremiumOccurs", "L2101AcctFeeOccurs" ,"L2101HandlingFeeOccurs"} };
 
 //	private static final String[][] occursfld = { { "StepMonths", "StepMonthE", "StepRateCode", "StepRateIncr", "BreachbMmB", "BreachbPercent" },
 //	{ "OwnerId_", "OwnerName_", "OwnerRelCode_", "OwnerPart_", "OwnerTotal_" },

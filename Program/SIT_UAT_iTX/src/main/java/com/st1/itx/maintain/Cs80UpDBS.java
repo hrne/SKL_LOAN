@@ -506,6 +506,11 @@ public class Cs80UpDBS extends CommBuffer {
 		txCruiser.setTxCode(this.titaVo.getTxCode());
 		txCruiser.setJobList(jobList);
 		txCruiser.setStatus("U");
+		
+		if (this.titaVo.isJobSendMsgChainOff())
+			txCruiser.setSendMSgChainOff("1");
+		else
+			txCruiser.setSendMSgChainOff("0");
 
 		try {
 			txCruiserService.insert(txCruiser);

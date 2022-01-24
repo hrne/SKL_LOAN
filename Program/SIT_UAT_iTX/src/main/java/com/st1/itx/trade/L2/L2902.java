@@ -2,10 +2,9 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -45,7 +44,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2902 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2902.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -77,6 +75,9 @@ public class L2902 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+	/**
+	 *
+	 */
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2902 ");
@@ -90,44 +91,36 @@ public class L2902 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100; // 159 * 300 = 47700
 
-		// tita
-		// 統編
 		String iCustId = titaVo.getParam("CustId");
-		// 借戶否
-		String iBorrower = titaVo.getParam("Borrower");
-
-		// 宣告
 		BigDecimal GuaAmt = BigDecimal.ZERO;
 		// new ArrayList
 		List<Guarantor> lGuarantor = new ArrayList<Guarantor>();
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-		// new table
+
 		CustMain tCustMain = new CustMain();
 		FacMain tFacMain = new FacMain();
-		LoanBorMain tLoanBorMain = new LoanBorMain();
+		
 		// 測試該統編是否存在保證人檔
+		
 		tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		if (tCustMain == null) {
 			throw new LogicException("E2003", "該統編不存在客戶主檔 L2902(CustMain)");
 		}
+		
+		List<LinkedHashMap<String, String>> chkOccursList = null;
+		
 		Slice<Guarantor> slGuarantor = sGuarantorService.guaUKeyEq(tCustMain.getCustUKey(), this.index, this.limit, titaVo);
 		lGuarantor = slGuarantor == null ? null : slGuarantor.getContent();
-		if (lGuarantor == null) {
-			throw new LogicException("E2003", "該統編不存在保證人檔 L2902(Guarantor)");
-		}
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slGuarantor != null && slGuarantor.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			/* 手動折返 */
-			this.totaVo.setMsgEndToEnter();
-		}
-		for (Guarantor tGuarantor : lGuarantor) {
+
+		if (lGuarantor != null) {
+			
+		  for (Guarantor tGuarantor : lGuarantor) {
 			// new occurs
 			OccursList occurslist = new OccursList();
 			// new Table
 			tCustMain = new CustMain();
 			tFacMain = new FacMain();
-			tLoanBorMain = new LoanBorMain();
+
 			lLoanBorMain = new ArrayList<LoanBorMain>();
 			GuaAmt = BigDecimal.ZERO;
 			int[] test = { 0, 0 };
@@ -171,11 +164,27 @@ public class L2902 extends TradeBuffer {
 			occurslist.putParam("OOHighGuaAmt", tGuarantor.getGuaAmt());
 			occurslist.putParam("OOGuaAmt", GuaAmt);
 			occurslist.putParam("OOPayIntDate", test[1]);
+			occurslist.putParam("OOGuaStatCode",tGuarantor.getGuaStatCode());
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
+		  } // for
+		  
+		  chkOccursList = this.totaVo.getOccursList();
+			
+		  /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		  if (slGuarantor != null && slGuarantor.hasNext()) {
+			  titaVo.setReturnIndex(this.setIndexNext());
+			  /* 手動折返 */
+			  this.totaVo.setMsgEndToEnter();
+		  }
+		} // if
+		
+		
+		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
+			throw new LogicException("E2003", ""); // 查無資料
 		}
-
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

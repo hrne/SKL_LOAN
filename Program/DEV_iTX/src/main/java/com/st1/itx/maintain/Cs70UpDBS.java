@@ -1,10 +1,19 @@
 package com.st1.itx.maintain;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.st1.itx.Exception.DBException;
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.db.domain.TxAuthorize;
 import com.st1.itx.db.service.TxAuthorizeService;
@@ -33,13 +42,23 @@ public class Cs70UpDBS extends CommBuffer {
 		else
 			return;
 
-		String supNo = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? this.titaVo.getTlrNo() : this.titaVo.getSupNo();
-		String tlrNo = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? this.titaVo.getEmpNot() : this.titaVo.getTlrNo();
-		String reasonCode = this.titaVo.getRqsp() != null && this.titaVo.getRqsp().length() >= 5 ? this.titaVo.getRqsp().substring(0, 5) : "";
-		String reason = !reasonCode.isEmpty() && this.titaVo.getRqsp().length() >= 6 ? this.titaVo.getRqsp().substring(5) : "";
+		String supNo = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? this.titaVo.getEmpNos().trim() : this.titaVo.getSupNo().trim();
+		String tlrNo = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? this.titaVo.getEmpNot().trim() : this.titaVo.getTlrNo().trim();
 
-		reasonCode = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? "00000" : reasonCode;
-		reason = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? "交易主管放行" : reason;
+		if (supNo.equals(tlrNo) || supNo.isEmpty() || tlrNo.isEmpty())
+			throw new LogicException("EC000", supNo.equals(tlrNo) ? "授權記錄檔錯誤,交易與授權人員一致" : "授權記錄檔錯誤,交易或授權人員錯誤");
+
+		String reason = Objects.isNull(this.titaVo.getRqsp()) ? "" : this.titaVo.getRqsp();
+		List<Map<String, String>> reasonLi = new ArrayList<Map<String, String>>();
+		for (String s : reason.split(";")) {
+			String no = s.substring(0, 5).trim();
+			String msg = s.substring(5).trim();
+
+			Map<String, String> m = new LinkedHashMap<String, String>();
+			m.put("NO", no);
+			m.put("MSG", msg);
+			reasonLi.add(m);
+		}
 
 		String txcd = this.titaVo.getTxcd();
 		String txSeq = this.titaVo.getTxSeq();
@@ -51,18 +70,22 @@ public class Cs70UpDBS extends CommBuffer {
 		TxAuthorize txAuthorize = new TxAuthorize();
 		txAuthorize.setSupNo(supNo);
 		txAuthorize.setTlrNo(tlrNo);
-		txAuthorize.setReasonCode(reasonCode);
-		txAuthorize.setReason(reason);
+		txAuthorize.setReasonCode("");
+		txAuthorize.setReason("");
 		txAuthorize.setEntdy(entdy);
 		txAuthorize.setTxcd(txcd);
 		txAuthorize.setTxSeq(txSeq);
 
 		try {
+			txAuthorize.setReasonJson(new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).writeValueAsString(reasonLi));
 			this.txAuthorizeService.insert(txAuthorize, titaVo);
-			this.titaVo.putParam(ContentName.dataBase, temp);
-		} catch (DBException e) {
-			this.titaVo.putParam(ContentName.dataBase, temp);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
 			throw new LogicException("EC000", "授權記錄檔錯誤");
+		} finally {
+			this.titaVo.putParam(ContentName.dataBase, temp);
 		}
 	}
 }

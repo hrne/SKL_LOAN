@@ -1,0 +1,327 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2902)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,159)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,1100];printer.width=[20,20];">
+[
+["[L2902]                                 保證人保證資料查詢"],
+["#FdCustId+保證人統編",#CustId,#BTN1,#CustName],
+["#FdBorrowerx+借戶否",#Borrower],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+#BUF1=X,42,S
+ENABLE(#BTN1)
+
+! 必輸欄位
+#FdBorrowerx=X,2,L
+
+
+! 永遠為必輸欄位
+#FdCustId=X,2,L
+T(3,*)
+!---------- AP TEXT AREA Variables ----------
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF01=x,30,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+#CDDEF02=x,30,S
+T(3,CdCode.Status)
+
+#StatusHelp=x,1024,S
+
+#CDDEF03=x,20,S
+T(3,CdCode.GuaStatCode)
+
+#GuaStatCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CurrPrecisionHelp,#HelpDesc1)
+T(2,@StatusHelp,#HelpDesc2)
+T(2,@GuaStatCodeHelp,#HelpDesc3)
+
+#YNHelp=x,10,S
+T(3,Y:是;N:否)
+
+#RimTxCode=X,5,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+
+#NTXBUF=X,57,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustId,#NTXBUF,1,10)
+
+#BUF=X,134,S
+T(2,0000000+          +                                                                                                                    0)
+#BUF5=X,134,S
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF;ntxbuf5=type<-1:CustId<-OOCustId})
+
+!統一編號
+#CustId=X,10,I
+C(3,#CHAIN,1,s,$)
+@T(2,@BUF5,0000000+#CustId+                                                                                                                    0)
+V(7)A(ID_UNINO,0,#CustId)
+
+#BIND5=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF5;ntxbuf5=type<-1:CustId<-OOCustId})
+
+
+<include src="ROM.icf::L1R07.dec"/>
+
+!調rim用參數
+#RimCustId=X,10,S
+
+#rimZL1R07=X,1,S
+T(2,@RimCustId,#CustId)
+RESET_RIM(#rimL1R07,L1R07)
+S(L1R07,1,#RimCustId)
+R(1,L1R07)
+
+#checkL1r07=X,1,S
+T(2,@Borrower,#L1r07Borrower)
+
+!身分證找戶號
+<include src="ROM.icf::L2R47.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+#Rim2R47CustId=X,10,S
+
+#RimL2R47=X,1,S
+T(2,@Rim2R47CustId,#CustId)
+RESET_RIM(#RimL2R47,L2R47)
+C(4,#CustId,s,$)
+S(L2R47,1,#Rim2R47CustId)
+R(1,L2R47)
+
+#CustNo=A,7,L
+T(2,#L2R47CustNo)
+
+#RimCustNo=A,7,L
+
+#SendL2r07A=X,1,S
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#CustName=X,100,L
+T(2,#L2r07CustName)
+
+
+#MRKEY=_,_,S
+T(2,#L2R47CustNo)
+
+!借戶否
+#Borrower=X,1,L
+
+
+!#Borrowerx=X,2,L
+!T(H,#Borrower,#YNHelp) 
+
+#RPTFG=A,1,S
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2902 ----------
+<sub type="FORM" name="L2902">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2902,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2902] 保證人保證資料)
+
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#CurrencyCode=X,3,S
+T(3,TWD)
+
+#PRECISION=N,1,S
+T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+
+#OCustNo=A,7,S
+#OFacmNo=A,3,S
+#OOCustNo=X,11,L
+T(2,#OCustNo+-+#OFacmNo)
+
+#OOCustName=X,100,L
+
+#OOCustStat=A,2,L
+
+#OOStat=A,1,L
+
+#OOCustStatX=X,14,L
+C(3,#OOStat,1,T(H,#OOCustStat,#StatusHelp),T(3,尚未撥款))
+
+#OOHighGuaAmt=m,14.2,S
+
+#OOHighGuaAmtX=X,22,L
+CALL2(#ADJUSTDOT,#PRECISION,#OOHighGuaAmt,#OOHighGuaAmtX)
+P(R,#OOHighGuaAmtX)
+
+#OOGuaAmt=m,14.2,S
+
+#OOGuaAmtX=X,22,L
+CALL2(#ADJUSTDOT,#PRECISION,#OOGuaAmt,#OOGuaAmtX)
+P(R,#OOGuaAmtX)
+
+#OOPayIntDate=D,7,S
+
+#WkA=X,3,S
+T(1,#OOPayIntDate,1,3)
+
+#WkB=X,2,S
+T(1,#OOPayIntDate,4,2)
+
+#WkC=X,2,S
+T(1,#OOPayIntDate,6,2)
+
+#OOPayIntDateX=X,9,O
+C(3,#OOPayIntDate,0,T(3,無),T(2,#WkA+/+#WkB+/+#WkC))
+
+#OOGuaStatCode=A,1,L
+
+#OOGuaStatCodeX=X,10,L
+T(H,#OOGuaStatCode,#GuaStatCodeHelp)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustId
+#Borrower
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2902
+#OCustNo
+#OFacmNo
+#OOHighGuaAmt
+#OOGuaAmt
+#OOCustName
+#OOCustStat
+#OOStat
+#OOPayIntDate
+#OOGuaStatCode
+^
+<include src="ROM.icf::L1R07.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R47.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2902" layout="cols=1;screen.width=[100,1000];printer.width=[15,30]">
+[
+["[L2902]                                 保證人保證資料查詢"],
+["戶號",#CustNo],
+["戶名",#CustName],
+["借戶否",#Borrower],
+]
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L2902
+#any={detail:true, header:'L2902.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOCustNo=保證戶號
+{width:100,align:'center'}
+
+#OOCustName=戶名
+{width:120,align:'left'}
+
+#OOCustStatX=戶況
+{width:80,align:'left'}
+
+#OOHighGuaAmtX=保證金額
+{width:160,align:'right'}
+
+#OOGuaAmtX=放款餘額
+{width:160,align:'right'}
+
+#OOPayIntDateX=繳息迄日
+{width:120,align:'center'}
+
+#OOGuaStatCodeX=保證狀況碼
+{width:100,align:'center'}
+^
+
+<include src="PRT.icf::INQ01.sel" map="i=L2902;cpi=15"/>
+
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

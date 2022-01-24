@@ -190,14 +190,15 @@ public class L1102 extends TradeBuffer {
 				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
 			}
 
-			if (titaVo.getEmpNos().trim().isEmpty()) {
-				this.info("主管 = " + titaVo.getEmpNos().trim());
-
-				iChkFg = 0;
-				iChkFg = inqLoanBorMain(tCustMain.getCustNo(), iChkFg, titaVo);
-				if (iChkFg != 0)
-					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
-			}
+//			if (titaVo.getEmpNos().trim().isEmpty()) {
+//				this.info("主管 = " + titaVo.getEmpNos().trim());
+//
+//				iChkFg = 0;
+//				iChkFg = inqLoanBorMain(tCustMain.getCustNo(), iChkFg, titaVo);
+//				if (iChkFg != 0)
+//					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
+//			}
+			
 			BankRelationVo vo = bankRelationCom.getBankRelation(CustId, titaVo);
 
 			if ("Y".equals(vo.getIsLimit())) {

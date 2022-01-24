@@ -103,7 +103,8 @@ BEGIN
              THEN '2'
              WHEN LENGTHB(CUSP."CUSID1") = 10
              THEN '1'
-           ELSE '1'                       AS "CuscCd"              -- 身份別 VARCHAR2 1 
+           ELSE '1'
+           END                            AS "CuscCd"              -- 身份別 VARCHAR2 1 
           ,CASE
              -- 在企金自然人檔有值者，且啟用記號為Y者，為企金自然人
              WHEN NVL(ENPP."ENPUSE",' ') = 'Y'         THEN '2'

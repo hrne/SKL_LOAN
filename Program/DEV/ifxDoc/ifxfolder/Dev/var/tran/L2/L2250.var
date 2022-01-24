@@ -127,7 +127,7 @@ R(1,L2R35)
 
 #checkL2R35A=X,1,S
 C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
-E(0,@RelInd,#L2r35RelInd)
+T(2,@RelInd,#L2r35RelInd)
 E(0,@GuaAmt,#L2r35GuaAmt)
 E(0,@GuaType,#L2r35GuaType)
 E(0,@GuaDt,#L2r35GuaDt)
@@ -353,7 +353,7 @@ R(1,L2R35)
 #checkL2R35B=X,1,S
 C(3,#CHAIN,1,S,$)
 C(3,#FunCd,1,S,$)
-E(0,@RelInd,#L2r35RelInd)
+T(2,@RelInd,#L2r35RelInd)
 E(0,@GuaAmt,#L2r35GuaAmt)
 E(0,@GuaType,#L2r35GuaType)
 E(0,@GuaDt,#L2r35GuaDt)

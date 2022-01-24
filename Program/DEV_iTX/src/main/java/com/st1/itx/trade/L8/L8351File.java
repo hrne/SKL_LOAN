@@ -37,20 +37,21 @@ public class L8351File extends MakeFile {
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iTxtDate = titaVo.getParam("TxtDate");
 		String iTxtCount = titaVo.getParam("TxtCount");
+		String iReportTime = titaVo.getParam("ReportTime");
 		int date = Integer.valueOf(titaVo.getEntDy());
 		String brno = titaVo.getBrno();
 		String filecode = "L8351";
 		String fileitem = "暫定每月產檔";
 		// 檔名
-		String filename = iSubmitKey + iTxtDate.substring(3) + ".MU1";
+		String filename = iSubmitKey + iTxtDate.substring(3) + iReportTime + ".MU1";
 
-		this.open(titaVo, date, brno, filecode, fileitem, filename, 2);
+		this.open(titaVo, date, brno, filecode, fileitem, filename,2);
 		// 用String.format()
-		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0,Integer.MAX_VALUE, titaVo);
 
 		// 第一行
-		String iContactX = FormatUtil.padX("放款部聯絡人-程慧娟", 80);
-		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s%s          02-23895858#7076" + iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
+		String iContactX =  FormatUtil.padX("放款部聯絡人-程慧娟", 80);
+		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s%s          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
 		this.put(iFirstLine);
 
 		if (iTbJcicMu01 == null) {
@@ -63,15 +64,15 @@ public class L8351File extends MakeFile {
 					iTotalCount += 1;
 
 					// 產檔內容
-
+					
 					int iDataDate = Integer.valueOf(aTbJcicMu01.getDataDate());
 					int iAuthStartDay = Integer.valueOf(aTbJcicMu01.getAuthStartDay());
 					int iAuthEndDay = Integer.valueOf(aTbJcicMu01.getAuthEndDay());
-
+					
 					String sDataDate = "";
 					String sAuthStartDay = "";
 					String sAuthEndDay = "";
-
+					
 					String iEmpId = aTbJcicMu01.getEmpId();
 					String iAuthMgrIdS = aTbJcicMu01.getAuthMgrIdS();
 					String iAuthMgrIdE = aTbJcicMu01.getAuthMgrIdE();
@@ -93,7 +94,7 @@ public class L8351File extends MakeFile {
 					if (iAuthEndDay > 0) {
 						sAuthEndDay = String.valueOf(iAuthEndDay);
 					}
-
+					
 					if (dCdEmp != null) {
 						iEmpIdX = dCdEmp.getFullname();
 					}
@@ -103,7 +104,7 @@ public class L8351File extends MakeFile {
 					if (eCdEmp != null) {
 						iAuthMgrIdEX = dCdEmp.getFullname();
 					}
-
+					
 					if (!aTbJcicMu01.getAuthItemQuery().trim().isEmpty()) {
 						iQuery = "A";
 					}
@@ -113,25 +114,32 @@ public class L8351File extends MakeFile {
 					if (!aTbJcicMu01.getAuthItemOther().trim().isEmpty()) {
 						iOther = "C";
 					}
-
-					// 補空白
-					String iHeadOfficeCode = FormatUtil.padX(aTbJcicMu01.getHeadOfficeCode(), 3);
-					String iBranchCode = FormatUtil.padX(aTbJcicMu01.getBranchCode(), 4);
-					iEmpIdX = FormatUtil.padX(iEmpIdX, 40);
-					iEmpId = FormatUtil.padX(iEmpId, 8);
-					String iTitle = FormatUtil.padX(aTbJcicMu01.getTitle(), 50);
-					String iAuthQryType = FormatUtil.padX(aTbJcicMu01.getAuthQryType(), 1);
-					String iQryUserId = FormatUtil.padX(aTbJcicMu01.getQryUserId(), 8);
-					iQuery = FormatUtil.padX(iQuery, 1);
-					iReview = FormatUtil.padX(iReview, 1);
-					iOther = FormatUtil.padX(iOther, 1);
-					iAuthMgrIdSX = FormatUtil.padX(iAuthMgrIdSX, 40);
-					iAuthMgrIdS = FormatUtil.padX(iAuthMgrIdS, 8);
-					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX, 40);
-					iAuthMgrIdE = FormatUtil.padX(iAuthMgrIdE, 8);
-					String iEmailAccount = FormatUtil.padX(aTbJcicMu01.getEmailAccount(), 50);
-					String iContent = " " + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ") + iEmpIdX + iEmpId + iTitle + iAuthQryType + iQryUserId + "          " + iQuery
-							+ iReview + iOther + StringUtils.rightPad(sAuthStartDay, 7, " ") + iAuthMgrIdSX + iAuthMgrIdS + StringUtils.rightPad(sAuthEndDay, 7, " ") + iAuthMgrIdEX + iAuthMgrIdE
+					
+					//補空白
+					String iHeadOfficeCode = FormatUtil.padX(aTbJcicMu01.getHeadOfficeCode(),3);
+					String iBranchCode = FormatUtil.padX(aTbJcicMu01.getBranchCode(),4);
+					iEmpIdX = FormatUtil.padX(iEmpIdX,40);
+					iEmpId = FormatUtil.padX(iEmpId,8);
+					String iTitle = FormatUtil.padX(aTbJcicMu01.getTitle(),50);
+					String iAuthQryType = FormatUtil.padX(aTbJcicMu01.getAuthQryType(),1);
+					String iQryUserId = FormatUtil.padX(aTbJcicMu01.getQryUserId(),8);
+					iQuery = FormatUtil.padX(iQuery,1);
+					iReview = FormatUtil.padX(iReview,1);
+					iOther = FormatUtil.padX(iOther,1);
+					iAuthMgrIdSX = FormatUtil.padX(iAuthMgrIdSX,40);
+					iAuthMgrIdS = FormatUtil.padX(iAuthMgrIdS,8);
+					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX,40);
+					iAuthMgrIdE = FormatUtil.padX(iAuthMgrIdE,8);
+					String iEmailAccount = FormatUtil.padX(aTbJcicMu01.getEmailAccount(),50);
+					String iContent = " "
+					        + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ")
+							+ iEmpIdX+iEmpId+iTitle+iAuthQryType+iQryUserId
+							+ "          "
+							+ iQuery + iReview + iOther 
+							+ StringUtils.rightPad(sAuthStartDay, 7, " ")
+							+ iAuthMgrIdSX+iAuthMgrIdS
+							+ StringUtils.rightPad(sAuthEndDay, 7, " ")
+							+ iAuthMgrIdEX+iAuthMgrIdE
 							+ iEmailAccount
 //							+ StringUtils.rightPad(aTbJcicMu01.getModifyUserId(), 25, " ");
 							+ "                         ";
@@ -146,13 +154,13 @@ public class L8351File extends MakeFile {
 					}
 				}
 			}
-			if (iTotalCount == 0) {
-				throw new LogicException(titaVo, "E0001", "無可轉出資料");
-			}
-			// 最後一行
-			String sCount = String.valueOf(iTotalCount);// update by Hedy (2021/11/3)
-			String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
-			this.put(footText);
+		if (iTotalCount == 0) {
+			throw new LogicException(titaVo, "E0001", "無可轉出資料");
+		}
+		// 最後一行
+		String sCount = String.valueOf(iTotalCount);// update by Hedy (2021/11/3)
+		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
+		this.put(footText);
 		}
 	}
 }

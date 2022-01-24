@@ -119,7 +119,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustId,#NTXBUF,2,8)
 
 #TypeCodeHelp=x,100,S
-T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人)
+T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係人／關係企業)
 
 !Fd
 
@@ -394,7 +394,8 @@ C(2,#TypeCodeBef,s,$,$,$)
 HELP(#TypeCodeHelp)
 @
 C(3,#TypeCodeBef,#TypeCodeAft,s,$)
-C(2,#TypeCodeBef,$,V(1,0),V(1,0,1,3),V(1,0,1,2))
+!C(2,#TypeCodeBef,$,V(1,0),V(1,0,1,3),V(1,0,1,2))
+C(2,#TypeCodeBef,V(1,0),V(1,0,1),V(1,0,1,2,3,4),V(1,0,1,2,3,4),V(1,0,1,2,3,4))
 !V(H,#TypeCodeHelp)
 
 #TypeCodeXAft=x,20,L
@@ -818,7 +819,7 @@ IF(#RegFloorAft==#RegFloorBef,T(3,),T(3,X))
 
 #RegFloorDashAft=X,5,I
 C(4,#RegCityCodeAft,S,$)
-C(4,#RegFloorDashAft,S,$)
+C(4,#RegFloorAft,S,$)
 
 #RegFloorDashInd=_,_,L
 IF(#RegFloorDashAft==#RegFloorDashBef,T(3,),T(3,X))
@@ -1175,9 +1176,11 @@ IF(#IncomeofyearlyAft==#IncomeofyearlyBef,T(3,),T(3,X))
 #MANU_MM=A,2,S
 
 #IncomeDataDateAft=X,5,I
-@C(4,#IncomeDataDateAft,S,V(9))
-T(1,@MANU_MM,#IncomeDataDateAft,4,5)
-IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式yyyMM),$)
+@
+A(YM,0,#IncomeDataDateAft)
+!C(4,#IncomeDataDateAft,S,V(9))
+!T(1,@MANU_MM,#IncomeDataDateAft,4,5)
+!IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式yyyMM),$)
 
 
 #IncomeDataDateInd=_,_,L
@@ -1218,6 +1221,8 @@ T(3,[L1104] 顧客基本資料變更-法人)
 !------ 上行電文 ------
 <sub type="TIM">
 #CustId
+#TypeCodeInd
+#TypeCodeAft
 #BranchNoBef
 #BranchNo
 #BranchNoInd

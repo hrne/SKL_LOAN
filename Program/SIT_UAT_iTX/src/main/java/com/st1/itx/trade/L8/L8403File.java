@@ -260,9 +260,10 @@ public class L8403File extends MakeFile {
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iReportDate = titaVo.getParam("ReportDate");
 		String iTranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
+		String iReportTime = titaVo.getParam("ReportTime");
 		// 檔名
 		// 金融機構總行代號+月份+日期+次數.檔案類別
-		String fileName = iSubmitKey + iReportDate.substring(3) + "." + iTranCode;
+		String fileName = iSubmitKey + iReportDate.substring(3) + iReportTime + "." + iTranCode;
 
 		int date = Integer.valueOf(titaVo.getEntDy());
 		String brno = titaVo.getBrno();
