@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.main.ApControl;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.dump.HexDump;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -53,6 +55,10 @@ public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 		logger.info("from : " + ctx.channel().remoteAddress().toString());
 
 		if (!lenFlag) {
+			byte[] dumb = new byte[msg.readableBytes()];
+			msg.readBytes(dumb);
+			logger.info(HexDump.dumpHexString(dumb));
+			msg.resetReaderIndex();
 			this.rSeq = msg.readInt();
 			this.length = msg.readInt();
 			lenFlag = true;

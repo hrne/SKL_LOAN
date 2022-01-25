@@ -36,22 +36,26 @@ public class Cs70UpDBS extends CommBuffer {
 	private void authorizeRecord() throws LogicException {
 		this.info("Cs70UpDBS authorizeRecord..");
 
-		/* 主管授權 && 主管放行 */
-		if ((this.titaVo.getSupNo() != null && !this.titaVo.getSupNo().isEmpty() && this.titaVo.getEmpNos() != null && !this.titaVo.getEmpNos().isEmpty()) || this.titaVo.getActFgI() == 2)
+		/* 主管授權 */
+		if ((this.titaVo.getSupNo() != null && !this.titaVo.getSupNo().isEmpty() && this.titaVo.getEmpNos() != null && !this.titaVo.getEmpNos().isEmpty()))
 			;
 		else
 			return;
 
-		String supNo = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? this.titaVo.getEmpNos().trim() : this.titaVo.getSupNo().trim();
-		String tlrNo = this.titaVo.isActfgRelease() && !this.titaVo.isHcodeErase() ? this.titaVo.getEmpNot().trim() : this.titaVo.getTlrNo().trim();
+		/* 更正&放行跳過 */
+		if (this.titaVo.getActFgI() == 2 || this.titaVo.isHcodeErase())
+			return;
+
+		String supNo = this.titaVo.getSupNo().trim().isEmpty() ? this.titaVo.getEmpNos().trim() : this.titaVo.getSupNo().trim();
+		String tlrNo = this.titaVo.getTlrNo().trim().isEmpty() ? this.titaVo.getEmpNot().trim() : this.titaVo.getTlrNo().trim();
 
 		if (supNo.equals(tlrNo) || supNo.isEmpty() || tlrNo.isEmpty())
 			throw new LogicException("EC000", supNo.equals(tlrNo) ? "授權記錄檔錯誤,交易與授權人員一致" : "授權記錄檔錯誤,交易或授權人員錯誤");
 
 		String reason = Objects.isNull(this.titaVo.getRqsp()) ? "" : this.titaVo.getRqsp();
 		List<Map<String, String>> reasonLi = new ArrayList<Map<String, String>>();
+
 		for (String s : reason.split(";")) {
-			this.info(s);
 			String no = s.substring(0, 5).trim();
 			String msg = s.substring(5).trim();
 
