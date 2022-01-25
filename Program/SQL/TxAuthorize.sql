@@ -6,9 +6,8 @@ create table "TxAuthorize" (
   "AutoSeq" decimal(11,0) not null,
   "SupNo" varchar2(6),
   "TlrNo" varchar2(6),
-  "ReasonCode" varchar2(10),
-  "Reason" nvarchar2(100),
-  "ReasonJson" varchar2(1200),
+  "TradeReason" nvarchar2(100),
+  "ReasonFAJson" varchar2(1200),
   "Entdy" decimal(8, 0) default 0 not null,
   "Txcd" varchar2(10),
   "TxSeq" varchar2(18),
@@ -28,9 +27,8 @@ comment on table "TxAuthorize" is '主管授權紀錄';
 comment on column "TxAuthorize"."AutoSeq" is '序號';
 comment on column "TxAuthorize"."SupNo" is '授權主管編號';
 comment on column "TxAuthorize"."TlrNo" is '交易人員';
-comment on column "TxAuthorize"."ReasonCode" is '授權理由代碼';
-comment on column "TxAuthorize"."Reason" is '授權理由';
-comment on column "TxAuthorize"."ReasonJson" is '授權編號和理由';
+comment on column "TxAuthorize"."TradeReason" is '交易理由';
+comment on column "TxAuthorize"."ReasonFAJson" is '授權編號和理由';
 comment on column "TxAuthorize"."Entdy" is '會計日';
 comment on column "TxAuthorize"."Txcd" is '交易代號';
 comment on column "TxAuthorize"."TxSeq" is '交易序號';

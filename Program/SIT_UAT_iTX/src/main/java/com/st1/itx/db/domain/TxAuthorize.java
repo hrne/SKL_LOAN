@@ -31,7 +31,7 @@ public class TxAuthorize implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2519036541103148223L;
+	private static final long serialVersionUID = -7533718110193861301L;
 
 // 序號
   @Id
@@ -48,17 +48,13 @@ public class TxAuthorize implements Serializable {
   @Column(name = "`TlrNo`", length = 6)
   private String tlrNo;
 
-  // 授權理由代碼
-  @Column(name = "`ReasonCode`", length = 10)
-  private String reasonCode;
-
-  // 授權理由
-  @Column(name = "`Reason`", length = 100)
-  private String reason;
+  // 交易理由
+  @Column(name = "`TradeReason`", length = 100)
+  private String tradeReason;
 
   // 授權編號和理由
-  @Column(name = "`ReasonJson`", length = 1200)
-  private String reasonJson;
+  @Column(name = "`ReasonFAJson`", length = 1200)
+  private String reasonFAJson;
 
   // 會計日
   @Column(name = "`Entdy`")
@@ -150,41 +146,22 @@ public class TxAuthorize implements Serializable {
   }
 
 /**
-	* 授權理由代碼<br>
+	* 交易理由<br>
 	* 
 	* @return String
 	*/
-  public String getReasonCode() {
-    return this.reasonCode == null ? "" : this.reasonCode;
+  public String getTradeReason() {
+    return this.tradeReason == null ? "" : this.tradeReason;
   }
 
 /**
-	* 授權理由代碼<br>
+	* 交易理由<br>
 	* 
   *
-  * @param reasonCode 授權理由代碼
+  * @param tradeReason 交易理由
 	*/
-  public void setReasonCode(String reasonCode) {
-    this.reasonCode = reasonCode;
-  }
-
-/**
-	* 授權理由<br>
-	* 
-	* @return String
-	*/
-  public String getReason() {
-    return this.reason == null ? "" : this.reason;
-  }
-
-/**
-	* 授權理由<br>
-	* 
-  *
-  * @param reason 授權理由
-	*/
-  public void setReason(String reason) {
-    this.reason = reason;
+  public void setTradeReason(String tradeReason) {
+    this.tradeReason = tradeReason;
   }
 
 /**
@@ -192,18 +169,18 @@ public class TxAuthorize implements Serializable {
 	* 
 	* @return String
 	*/
-  public String getReasonJson() {
-    return this.reasonJson == null ? "" : this.reasonJson;
+  public String getReasonFAJson() {
+    return this.reasonFAJson == null ? "" : this.reasonFAJson;
   }
 
 /**
 	* 授權編號和理由<br>
 	* 
   *
-  * @param reasonJson 授權編號和理由
+  * @param reasonFAJson 授權編號和理由
 	*/
-  public void setReasonJson(String reasonJson) {
-    this.reasonJson = reasonJson;
+  public void setReasonFAJson(String reasonFAJson) {
+    this.reasonFAJson = reasonFAJson;
   }
 
 /**
@@ -342,8 +319,8 @@ public class TxAuthorize implements Serializable {
 
   @Override
   public String toString() {
-    return "TxAuthorize [autoSeq=" + autoSeq + ", supNo=" + supNo + ", tlrNo=" + tlrNo + ", reasonCode=" + reasonCode + ", reason=" + reason + ", reasonJson=" + reasonJson
-           + ", entdy=" + entdy + ", txcd=" + txcd + ", txSeq=" + txSeq + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "TxAuthorize [autoSeq=" + autoSeq + ", supNo=" + supNo + ", tlrNo=" + tlrNo + ", tradeReason=" + tradeReason + ", reasonFAJson=" + reasonFAJson + ", entdy=" + entdy
+           + ", txcd=" + txcd + ", txSeq=" + txSeq + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

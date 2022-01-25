@@ -277,7 +277,7 @@ T(3,[L6932] 資料變更交易)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
-#OTranName=X,40,S
+#OTranName=X,80,S
 #OCustNo=A,7,S
 #OFacmNo=A,3,S
 #OBormNo=A,3,S

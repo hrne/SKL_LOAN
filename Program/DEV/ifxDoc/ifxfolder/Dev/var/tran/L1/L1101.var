@@ -84,7 +84,7 @@ E(0,0)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L1001 顧客明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 
 #NTXBUF=X,11,S

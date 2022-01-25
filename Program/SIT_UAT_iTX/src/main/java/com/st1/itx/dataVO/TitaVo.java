@@ -870,6 +870,14 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getHsupCode() {
 		return this.get(ContentName.hsupcd) == null ? "" : this.get(ContentName.hsupcd);
 	}
+	
+	/**
+	 * 
+	 * @return boolean 授權記號 1 return true
+	 */
+	public boolean isHsupCodeOn() {
+		return "1".equals(this.getHsupCode().trim());
+	}
 
 	/**
 	 * 

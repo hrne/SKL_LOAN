@@ -113,17 +113,17 @@ public class LD005Report extends MakeReport {
 
 				BigDecimal f4 = getBigDecimal(LD005List.get(i).get("F4"));
 
-				this.print(0, 45, formatAmt(f4, 0), "R");
+				this.print(0, 46, formatAmt(f4, 0), "R");
 
-				this.print(0, 52, this.showRocDate(LD005List.get(i).get("F5"), 1));
-				this.print(0, 68, this.showRocDate(LD005List.get(i).get("F6"), 1));
+				this.print(0, 60, this.showRocDate(LD005List.get(i).get("F5"), 1), "R");
+				this.print(0, 76, this.showRocDate(LD005List.get(i).get("F6"), 1), "R");
 
 				if (LD005List.get(i).get("F7") != null && LD005List.get(i).get("F7").length() >= 4) {
-					this.print(0, 82, LD005List.get(i).get("F7").substring(0, 4));
+					this.print(0, 92, LD005List.get(i).get("F7").substring(0, 4), "R");
 				} else {
-					this.print(0, 82, LD005List.get(i).get("F7"));
+					this.print(0, 92, LD005List.get(i).get("F7"), "R");
 				}
-				this.print(0, 98, LD005List.get(i).get("F8"));
+				this.print(0, 107, LD005List.get(i).get("F8"), "R");
 				temp++;
 
 				CheckRow();
@@ -161,10 +161,6 @@ public class LD005Report extends MakeReport {
 	private void CheckRow() {
 		if (this.NowRow >= 30) {
 			newPage();
-			this.print(-7, 1, " 借款人戶號  . . . ");
-			this.print(-7, 25, CustNo, "R");
-			this.print(-7, 27, ChequeName);
-			this.print(-9, 1, "支票帳號　　支票號碼　　　　支票 額　　　　收票日　　　　到期日　　支票銀行　　支票分行");
 		}
 
 	}

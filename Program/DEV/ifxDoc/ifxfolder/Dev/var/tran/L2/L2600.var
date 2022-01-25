@@ -92,6 +92,7 @@ C(3,#FuncCode,3,INVOKEJS(SHOW,p1,3,3,1),INVOKEJS(SHOW,p1,3,3,0))
 ![Buttom資料查詢]
 ##loop{times:50,n:1}
 #BtnA{n}=X,15,I,ui:button;value:保證人明細資料;enable:1;tabbable:0;title: L2020 保證人明細資料查詢;
+#SLBTN{n}=X,15,I,ui:button;value:查詢;enable:1;tabbable:0;title: L2064 聯貸費用明細資料查詢;
 ##end
 #Btn2=X,15,I,ui:button;value:行庫資料查詢;enable:1;tabbable:0;title: L6071 行庫資料查詢;
 #Btn3=X,15,I,ui:button;value:行庫資料查詢;enable:1;tabbable:0;title: L6071 行庫資料查詢;
@@ -138,7 +139,7 @@ T(3,%)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2060進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2060聯貸案訂約明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 C(3,#CHAIN,1,$,s)
 !HIDE(#FuncCode,#Btn1,#UsSyndAmt,#UsPartAmt)
@@ -469,6 +470,12 @@ T(2,#L2r54CustName{n})
 #CustName{n}=x,50,L
 T(2,#CustNameX{n})
 
+#SLBUF{n}=X,100,S
+T(2,#TXCD+#CustNo{n})
+#SLBTNX{n}=X,1,S
+BIND(#SLBTN{n},click, {cmd=CHAIN; ntxcd=L2064; ntxbuf=#SLBUF{n}})
+C(3,#CustNo{n},0,HIDE(#SLBTN{n}),SHOW(#SLBTN{n}))
+
 #FacCustNo{n}=A,7,S
 E(0,#L2r55CustNo{n})
 #FacmNo{n}=A,3,S
@@ -516,9 +523,9 @@ C(3,#FacmNo{n},0,INVOKEJS(SHOW,grd3_{n},0),INVOKEJS(SHOW,grd3_{n},1))
 <sub type="DC" name="p2" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
 [
 [""],
-["#grid#,{id:2,expand:true,loop:50,row_height:1,s_cols:[100,100,100,100,200], p_cols:[20,20,20,20,20]}","","<font color=red>@@@@@@@相關案件明細　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 　　  　　 　 　　  　　　 　 　　  　",
-["核准號碼","案件編號","借款人統編","戶號","戶名"],
-[[#ApplNo1],[#CreditSysNo1],[#CustId1],[#CustNo1],[#CustName1]],
+["#grid#,{id:2,expand:true,loop:50,row_height:1,s_cols:[100,100,100,100,200,80], p_cols:[20,20,20,20,20]}","","<font color=red>@@@@@@@相關案件明細　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 　　  　　 　 　　  　　　 　 　　  　",
+["核准號碼","案件編號","借款人統編","戶號","戶名","聯貸費用"],
+[[#ApplNo1],[#CreditSysNo1],[#CustId1],[#CustNo1],[#CustName1],[#SLBTN1]],
 ],
 ]
 </sub>

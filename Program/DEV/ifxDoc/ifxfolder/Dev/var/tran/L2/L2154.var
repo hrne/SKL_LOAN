@@ -778,7 +778,7 @@ T(3,1:新增;2:修改;4:刪除;5:查詢)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2015進入),$),$)
+C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2015額度明細資料查詢]進入),$),$)
 C(3,#CHAIN,1,$,S)
 HIDE(#BTN1,#FuncCode)
 T(F,@CustNo,0)

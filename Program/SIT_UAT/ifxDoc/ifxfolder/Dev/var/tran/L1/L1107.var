@@ -254,7 +254,7 @@ E(0,@ReviewNetProfitRatio,#C1)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=X,12,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1907進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L1907 公司戶財務報表查詢]進入),$)
 
 #NTXBUF=X,65,S
 C(3,#CHAIN,1,$,S)

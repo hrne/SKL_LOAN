@@ -92,7 +92,7 @@ T(2,@RmkCodeHelp,#HelpDesc1)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2072進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2072顧客控管警訊明細資料查詢]進入),$)
 
 #NTXBUF=X,156,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)

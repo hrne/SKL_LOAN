@@ -171,6 +171,8 @@ IF(#FunCode==4,s,$)
 @V(7)
 
 #RimL5r12D=X,1,S
+IF(#RemitBank!="",$,s)
+IF(#FunCode==1,IF(#RemitBank==#FinCode,s,$),$)
 T(2,@RimBankCode,#RemitBank)
 S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)

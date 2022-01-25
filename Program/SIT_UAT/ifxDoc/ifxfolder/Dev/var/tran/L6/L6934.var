@@ -91,7 +91,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 T(3,[L6934] 資料變更交易)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-#OTranName=X,40,L
+#OTranName=X,80,L
 
 #OCustNo=A,7,L
 #OFacmNo=A,3,L

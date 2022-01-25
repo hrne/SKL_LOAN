@@ -51,6 +51,7 @@ public class Cs70UpDBS extends CommBuffer {
 		String reason = Objects.isNull(this.titaVo.getRqsp()) ? "" : this.titaVo.getRqsp();
 		List<Map<String, String>> reasonLi = new ArrayList<Map<String, String>>();
 		for (String s : reason.split(";")) {
+			this.info(s);
 			String no = s.substring(0, 5).trim();
 			String msg = s.substring(5).trim();
 
@@ -70,14 +71,14 @@ public class Cs70UpDBS extends CommBuffer {
 		TxAuthorize txAuthorize = new TxAuthorize();
 		txAuthorize.setSupNo(supNo);
 		txAuthorize.setTlrNo(tlrNo);
-		txAuthorize.setReasonCode("");
-		txAuthorize.setReason("");
+		if (!titaVo.getReason().isEmpty())
+			txAuthorize.setTradeReason(titaVo.getReason());
 		txAuthorize.setEntdy(entdy);
 		txAuthorize.setTxcd(txcd);
 		txAuthorize.setTxSeq(txSeq);
 
 		try {
-			txAuthorize.setReasonJson(new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).writeValueAsString(reasonLi));
+			txAuthorize.setReasonFAJson(new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).writeValueAsString(reasonLi));
 			this.txAuthorizeService.insert(txAuthorize, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

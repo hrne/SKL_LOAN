@@ -138,7 +138,7 @@ T(2,#L2r57Help1)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2010進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2010申請案件明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 C(5,#EMPNOT,ELTEST,INVOKEJS(SHOW,p4,1),INVOKEJS(SHOW,p4,0))
@@ -1204,19 +1204,17 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 <sub type="TIM">
 #FuncCode
 #CustId
-#ApplNo
-#CreditSysNo
-#SyndNo
-#ApplDate
 #DepartmentCode
+#ApplNo
+#ApplDate
 #ProdNo
 #CurrencyCode
+#TimApplAmt
 #IsLimit
 #IsRelated
 #IsLnrelNear
-#TimApplAmt
-#Estimate
 #PieceCode
+#Estimate
 #CreditOfficer
 #LoanOfficer
 #Introducer
@@ -1224,11 +1222,13 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 #Coorgnizer
 #ProcessCode
 #GroupId
+#FacShareApplNo
+#JcicMergeFlag
+#CreditSysNo
 #IsSuspected
 #IsSuspectedCheck
 #IsSuspectedCheckType
-#FacShareApplNo
-#JcicMergeFlag
+#SyndNo
 #END
 </sub>
 

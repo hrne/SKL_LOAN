@@ -540,7 +540,8 @@ public class MainProcess extends SysLogger {
 			}
 			if (tCustDataCtrl != null) {
 				if (tCustDataCtrl.getApplMark() == 2) {
-					throw new LogicException("EC998", "查詢結清滿五年客戶資料");
+					if (titaVo.getReason().isEmpty())
+						throw new LogicException("EC998", "查詢結清滿五年客戶資料");
 				} else if (tCustDataCtrl.getApplMark() == 1) {
 					if ("L3".equals(this.titaVo.getTxcd().substring(0, 2))) {
 						txCom.setCustDataCtrl(1);

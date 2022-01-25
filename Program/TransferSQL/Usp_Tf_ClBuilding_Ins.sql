@@ -195,6 +195,7 @@ BEGIN
                       AND "CdArea"."AreaItem" = S2."HGTAD2"
                       AND NVL("CdCity"."CityCode",' ') != ' '
     LEFT JOIN "CdArea" CA2 ON CA2."CityCode" = "CdCity"."CityCode"
+                          AND NVL(S2."HGTAD2",' ') != ' '
                           AND SUBSTR(CA2."AreaItem",0,2) = SUBSTR(S2."HGTAD2",0,2) 
                           AND NVL("CdCity"."CityCode",' ') != ' '
     WHERE S1."GDRID1" = '1' -- 只撈建物

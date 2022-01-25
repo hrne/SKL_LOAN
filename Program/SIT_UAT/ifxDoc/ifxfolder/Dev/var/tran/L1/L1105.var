@@ -81,7 +81,7 @@ E(0,0)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1905進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L1905 顧客聯絡電話查詢]進入),$)
 
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)

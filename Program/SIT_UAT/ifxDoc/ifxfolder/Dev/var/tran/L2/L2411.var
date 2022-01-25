@@ -378,7 +378,7 @@ T(3,0:無;1:有)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2038進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2038擔保品明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
@@ -1982,13 +1982,6 @@ K(MODIFYBUTTON,3,保險單)
 #LandNo1
 #LandNo2
 #LandLocation
-##loop{times:10,i:1}
-#OwnerId{i}
-#OwnerName{i}
-#OwnerRelCode{i}
-#OwnerPart{i}
-#OwnerTotal{i}
-##end
 #EvaDate
 #EvaAmt
 #EvaNetWorth
@@ -1996,7 +1989,6 @@ K(MODIFYBUTTON,3,保險單)
 #RentEvaValue
 #RentPrice
 #EvaCompany
-#EvaCompanyX
 #OwnershipCode
 #MtgCode
 #MtgCheck
@@ -2029,6 +2021,15 @@ K(MODIFYBUTTON,3,保險單)
 #FirstAmt{i}
 #FirstCreditor{i}
 ##end
+##loop{times:10,i:1}
+#OwnerId{i}
+#OwnerName{i}
+#OwnerRelCode{i}
+#OwnerPart{i}
+#OwnerTotal{i}
+#EvaCompanyX
+##end
+
 #END
 </sub>
 

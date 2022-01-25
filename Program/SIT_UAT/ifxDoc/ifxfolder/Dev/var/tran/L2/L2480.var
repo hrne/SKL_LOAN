@@ -170,7 +170,7 @@ T(2,@EvaReasonHelp,#HelpDesc3)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2039進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2039擔保品重評明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 
 #NTXBUF=X,200,S

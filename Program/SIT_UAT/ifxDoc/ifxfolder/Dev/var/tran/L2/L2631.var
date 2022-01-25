@@ -149,7 +149,7 @@ T(3,Y:是;N:否)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2077進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2077清償作業明細資料查詢]進入),$)
 
 
 #NTXBUF=X,60,S
@@ -288,6 +288,31 @@ T(H,#FunCode,#FunCodHelp)
 C(3,#FunCode,0,$,T(3,@CollectFlag,Y))
 C(3,#FunCode,0,T(F,@CollectFlag,1),T(F,@CollectFlag,0))
 C(3,#FunCode,2,T(3,@FdCloseReasonCode, ),$)
+
+
+!調rim參數
+#RimCloseNo=A,3,S
+!    L2R36B : 尋找清償作業檔資料
+#RimL2r36B=X,1,S
+C(3,#CHAIN,1,$,S)
+C(3,#FunCode,2,$,S)
+E(0,@RimCustNo,#CustNo)
+T(2,@RimCloseNo,#CloseNo)
+RESET_RIM(#RimL2r36B,L2R36)
+S(L2R36,1,#RimCustNo,#RimCloseNo)
+R(1,L2R36)
+
+#CheckL2r36B=X,1,S
+C(3,#CHAIN,1,$,S)
+C(3,#FunCode,2,$,S)
+T(2,@Rmk1,#L2r36Rmk)
+T(2,@TelNo1,#L2r36TelNo1)
+T(2,@TelNo2,#L2r36TelNo2)
+T(2,@TelNo3,#L2r36TelNo3)
+T(2,@CloseReasonCode,#L2r36CloseReasonCode)
+T(H,@CloseReasonCodeX,#CloseReasonCode,#AdvanceCloseCodeHelp)
+
+
 
 ![入帳日期]
 !必須輸入
@@ -507,7 +532,6 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 #OOClNo=A,7,S
 #OOSeq=X,8,S
 
-
 #NTXBUF1=X,25,S
 C(3,#FunCode,2,$,S)
 IF(#CloseAmt>0,$,S)
@@ -529,6 +553,7 @@ IF(#FunCode == 2,ASGN(NTXCD$),$)
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L2R32.dec"/>
+<include src="ROM.icf::L2R36.dec"/>
 <include src="ROM.icf::L3R07.dec"/>
 <include src="ROM.icf::L3R11.dec"/>
 </sub>
@@ -603,6 +628,7 @@ TXFORM=L2631
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L2R32.tom"/>
+<include src="ROM.icf::L2R36.tom"/>
 <include src="ROM.icf::L3R07.tom"/>
 <include src="ROM.icf::L3R11.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

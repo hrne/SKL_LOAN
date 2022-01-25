@@ -103,8 +103,8 @@ public class L6044 extends TradeBuffer {
 			occursList.putParam("OOEntdy", tTxAuthorize.getEntdy());
 			occursList.putParam("OOSupNo", tTxAuthorize.getSupNo());
 			occursList.putParam("OOTlrNo", tTxAuthorize.getTlrNo());
-			occursList.putParam("OOReasonCode", tTxAuthorize.getReasonCode());
-			occursList.putParam("OOReason", tTxAuthorize.getReason());
+			occursList.putParam("OOTradeReason", tTxAuthorize.getTradeReason());
+			occursList.putParam("OOReasonAuth", tTxAuthorize.getReasonFAJson());
 			occursList.putParam("OOTxcd", tTxAuthorize.getTxcd());
 			occursList.putParam("OOTxSeq", tTxAuthorize.getTxSeq());
 
