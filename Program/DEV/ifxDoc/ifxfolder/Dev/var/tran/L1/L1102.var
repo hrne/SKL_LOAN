@@ -486,8 +486,9 @@ C(3,#FunCd,5,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
-C(5,#FdBirthday,*,V(7),$)
-C(3,#Birthday,0,$,A(DATE,0,#Birthday))
+V(7)
+A(DATE,0,#Birthday)
+V(5,0010101,#SYSCDATE)
 
 
 !客戶別

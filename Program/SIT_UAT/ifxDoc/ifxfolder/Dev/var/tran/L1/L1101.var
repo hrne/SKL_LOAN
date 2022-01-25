@@ -82,6 +82,8 @@ E(0,0)
 <include src="ROM.icf::L2R08.dec"/>
 <include src="ROM.icf::L6R06.dec"/>
 
+HIDE(#FdEmpNo,#EmpNo,#EmployeeName,#BtnCdEmp)
+
 #CHAIN=A,1,S
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L1001 顧客明細資料查詢]進入),$)
@@ -179,7 +181,7 @@ IF(#RegFg==0,$,s)
 #FdIsSuspected2=X,2,L
 #FdEntCode=X,2,L
 #FdEmpNo=X,14,L
-T(3,     員工代號)
+T(3, *    員工代號)
 #FdEName=X,2,L
 #FdEduCode=X,2,L
 #FdOwnedHome=X,2,L
@@ -600,6 +602,7 @@ C(3,#FunCd,5,s,$)
 @
 IF(#FdBirthday=="*",V(7),$)
 A(DATE,0,#Birthday)
+V(5,0010101,#SYSCDATE)
 
 !性別
 #Sex=A,1,I

@@ -262,7 +262,7 @@ public class BS720 extends TradeBuffer {
 		tTempVo.putParam("SlipNote", iYearMonth / 100 + "年" + iYearMonth % 100 + "月" + "折溢價攤銷");
 		BigDecimal lnAmt = loanAmt.subtract(loanAmtLast);
 		BigDecimal ovAmt = ovduAmt.subtract(ovduAmtLast);
-		BigDecimal intAmt = loanAmt.add(ovduAmt);
+		BigDecimal intAmt = lnAmt.add(ovAmt);
 		if (lnAmt.compareTo(BigDecimal.ZERO) >= 0) {
 			iCr++;
 			tTempVo.putParam("CrAcctCode" + iCr, "AIL");

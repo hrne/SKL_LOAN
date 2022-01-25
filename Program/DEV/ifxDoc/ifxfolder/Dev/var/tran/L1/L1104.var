@@ -486,7 +486,7 @@ T(1,#DATE,2,7)
 @
 V(7)
 A(DATE,0,#BirthdayAft)
-
+V(5,0010101,#SYSCDATE)
 
 !設立日期比較
 #BirthdayBef8=N,8,S

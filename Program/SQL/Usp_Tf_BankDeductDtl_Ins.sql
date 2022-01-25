@@ -69,6 +69,15 @@ BEGIN
               ,"MBKTRX"
       HAVING COUNT(*) >= 2
     )
+    , rawData AS (
+      SELECT MAX(TRXIDT) AS LastTRXIDT
+      FROM "LA$MBKP" MBK
+    )
+    , tmpData AS (
+      SELECT "Fn_GetBusinessDate"(LastTRXIDT,-2) AS NewTRXIDT -- 找前二營業日
+           , LastTRXIDT 
+      FROM rawData
+    )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -101,7 +110,11 @@ BEGIN
           ,MBK."LMSPID"                   AS "RelCustId"           -- 第三人身分證字號 VARCHAR2 10 0
           ,0                              AS "RelAcctBirthday"     -- 第三人出生日期 decimal 8 0
           ,''                             AS "RelAcctGender"       -- 第三人性別 varchar2 1
-          ,MBK."TRXIDT"                   AS "MediaDate"           -- 媒體日期 DECIMAL 8 0
+          ,CASE
+             WHEN NVL(t.LastTRXIDT,0) != 0
+             THEN t.NewTRXIDT
+           ELSE MBK."TRXIDT"
+           END                            AS "MediaDate"           -- 媒體日期 DECIMAL 8 
           ,CASE
              WHEN MBK."LMSPBK" = 4 THEN '1'
              WHEN MBK."LMSPBK" = 3 THEN '3'
@@ -138,11 +151,13 @@ BEGIN
                                                WHEN '3' THEN '4' -- 帳管費
                                                WHEN '4' THEN '6' -- 契變手續費
                                              ELSE '0' END
+    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     WHERE NVL(S2."TRXIDT",0) = 0
       AND NVL(S2."LMSACN",0) = 0
       AND NVL(S2."MBKAPN",0) = 0
       AND NVL(S2."LMSLPD",0) = 0
       AND NVL(S2."MBKTRX",0) = 0
+      AND MBK."TRXIDT" >= 20190101
     ;
 
     -- 記錄寫入筆數
@@ -194,6 +209,15 @@ BEGIN
               ,"MAKTRX"
       HAVING COUNT(*) >= 2
     )
+    , rawData AS (
+      SELECT MAX(TRXIDT) AS LastTRXIDT
+      FROM "AH$MBKP" MBK
+    )
+    , tmpData AS (
+      SELECT "Fn_GetBusinessDate"(LastTRXIDT,-2) AS NewTRXIDT -- 找前二營業日
+           , LastTRXIDT 
+      FROM rawData
+    )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -231,7 +255,11 @@ BEGIN
           ,MBK."LMSPID"                   AS "RelCustId"           -- 第三人身分證字號 VARCHAR2 10 0
           ,0                              AS "RelAcctBirthday"     -- 第三人出生日期 decimal 8 0
           ,''                             AS "RelAcctGender"       -- 第三人性別 varchar2 1
-          ,MBK."TRXIDT"                   AS "MediaDate"           -- 媒體日期 DECIMAL 8 0
+          ,CASE
+             WHEN NVL(t.LastTRXIDT,0) != 0
+             THEN t.NewTRXIDT
+           ELSE MBK."TRXIDT"
+           END                            AS "MediaDate"           -- 媒體日期 DECIMAL 8 
           ,CASE
              WHEN MBK."LMSPBK" = 4 THEN '1'
              WHEN MBK."LMSPBK" = 3 THEN '3'
@@ -278,12 +306,14 @@ BEGIN
                                                          WHEN '4' THEN '6' -- 契變手續費
                                                        ELSE '0' END
                                  AND BDD."PayIntDate" = MBK."LMSLPD" 
+    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     WHERE NVL(S2."TRXIDT",0) = 0
       AND NVL(S2."LMSACN",0) = 0
       AND NVL(S2."MBKAPN",0) = 0
       AND NVL(S2."LMSLPD",0) = 0
       AND NVL(S2."MAKTRX",0) = 0
       AND NVL(BDD."EntryDate",0) = 0
+      AND MBK."TRXIDT" >= 20190101
     ;
 
     -- 記錄寫入筆數

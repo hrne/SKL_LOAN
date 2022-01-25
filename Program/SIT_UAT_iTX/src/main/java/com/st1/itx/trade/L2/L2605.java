@@ -371,7 +371,6 @@ public class L2605 extends TradeBuffer {
 			if (tmpLoanBorMain.getStatus() > 1 && tmpLoanBorMain.getStatus() < 90) {
 				int thisStatus = tmpLoanBorMain.getStatus();
 				int thisPriorty;
-				loandate = tmpLoanBorMain.getDrawdownDate();
 				switch (thisStatus) {
 				case 6:
 					thisPriorty = 1;

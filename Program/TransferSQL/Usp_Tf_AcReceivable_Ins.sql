@@ -324,12 +324,24 @@ BEGIN
           ,'  '                AS "AcDtlCode"        -- 細目代號
           ,'0000'              AS "BranchNo"         -- 單位別
           ,'TWD'               AS "CurrencyCode"     -- 幣別
-          ,0                   AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
+          ,CASE
+             WHEN S1."TRXDAT" != 0
+             THEN 1
+           ELSE 0
+           END                 AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
           ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
           ,3                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
           ,S1."CFRAMT"         AS "RvAmt"            -- 起帳總額
-          ,S1."CFRAMT"         AS "RvBal"            -- 未銷餘額
-          ,S1."CFRAMT"         AS "AcBal"            -- 會計日餘額
+          ,CASE
+             WHEN S1."TRXDAT" != 0
+             THEN 0
+           ELSE S1."CFRAMT"
+           END                 AS "RvBal"            -- 未銷餘額
+          ,CASE
+             WHEN S1."TRXDAT" != 0
+             THEN 0
+           ELSE S1."CFRAMT"
+           END                 AS "AcBal"            -- 會計日餘額
           ,CASE TRIM(TO_CHAR(S1.CFRCOD,'00'))
              WHEN '01' THEN '寬限與年期'
              WHEN '02' THEN '變利率週期'
@@ -354,7 +366,6 @@ BEGIN
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
     FROM "LN$CFRP" S1
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = S1."CFPMEM"
-    WHERE S1."TRXDAT" = 0
     ;
 
     -- 記錄寫入筆數

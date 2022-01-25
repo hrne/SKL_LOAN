@@ -40,7 +40,7 @@ E(0,40)ASGN(INQPRT$)
 [
 ["[L6041]                                 使用者資料查詢"],
 ["#FdBrNo+使用單位",#BrNo,#BrNoX],
-["#FdTlrNo+使用者代號",#TlrNo],
+["#FdTlrNo+使用者代號",#TlrNo,#TlrItem],
 ["#FdGroupNo+課組別",#GroupNo,#GroupNoX],
 ["#FdLevelFg+權限等級",#LevelFg,#LevelFgX],
 ]
@@ -92,6 +92,8 @@ C(3,#CHAIN,1,S,K(MODIFYBUTTON,1,新增使用者))
 #LevelHelp=X,100,S
 T(3,0:全部;1:主管;3:經辦)
 
+#FunCode=A,1,S
+E(0,5)
 
 !使用單位
 #BrNo=X,4,L
@@ -127,6 +129,15 @@ C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
 @
 C(4,#TlrNo,s,$)
 V(8,6,6)
+
+#RIM_L6R20=A,1,S
+C(4,#TlrNo,S,$)
+RESET_RIM(#RIM_L6R20,L6R20)
+S(L6R20,01,#FunCode,#TlrNo,#END)
+R(1,L6R20)
+
+#TlrItem=X,50,L
+
 
 #GroupHelp=x,50000,S
 
@@ -272,6 +283,12 @@ TXFORM=L6041
 ^
 <include src="ROM.icf::L6R44.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+
+TXFORM=L6R20
+#TlrItem
+
+^
+
 </sub>
 
 !--------- OUTPUT畫面 --------

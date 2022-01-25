@@ -81,7 +81,7 @@ T(3,*)
 #CodeBTN=X,15,I,ui:button;value:代碼檔代號查詢;enable:1;tabbable:0;title:L6069 代碼檔代號查詢;
 
 #b1=X,1,S
-BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefCode<-OOCode:DefItemX<-OOItem})
+BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode:DefItemX<-OOItem})
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>

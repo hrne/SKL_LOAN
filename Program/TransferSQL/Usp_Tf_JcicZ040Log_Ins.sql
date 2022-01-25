@@ -23,25 +23,25 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "JcicZ040Log"
-    SELECT "Ukey"                -- 流水號 VARCHAR2 32
-          ,1          AS "TxSeq" -- 交易序號 VARCHAR2 18
-          ,"TranKey"             -- 交易代碼 VARCHAR2 1 0
-          ,"RbDate"              -- 止息基準日 Decimald 8 0
-          ,"ApplyType"           -- 受理方式 VARCHAR2 1 0
-          ,"RefBankId"           -- 轉借金融機構代號 NVARCHAR2 3 0
-          ,"NotBankId1"          -- 未揭露債權機構代號1 NVARCHAR2 3 0
-          ,"NotBankId2"          -- 未揭露債權機構代號2 NVARCHAR2 3 0
-          ,"NotBankId3"          -- 未揭露債權機構代號3 NVARCHAR2 3 0
-          ,"NotBankId4"          -- 未揭露債權機構代號4 NVARCHAR2 3 0
-          ,"NotBankId5"          -- 未揭露債權機構代號5 NVARCHAR2 3 0
-          ,"NotBankId6"          -- 未揭露債權機構代號6 NVARCHAR2 3 0
-          ,"OutJcictxtDate"      -- 轉出JCIC文字檔日期 Decimald 8 0
-          ,"CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,"CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,"LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,"LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    SELECT "Ukey"              AS "Ukey"                 -- 流水號 VARCHAR2 32 0
+          ,LPAD('1', 18, '0')  AS "TxSeq"                -- 交易序號 VARCHAR2 18 0
+          ,"TranKey"           AS "TranKey"              -- 交易代碼 VARCHAR2 1 0
+          ,"RbDate"            AS "RbDate"               -- 止息基準日 Decimald 8 0
+          ,"ApplyType"         AS "ApplyType"            -- 受理方式 VARCHAR2 1 0
+          ,"RefBankId"         AS "RefBankId"            -- 轉介金融機構代號 NVARCHAR2 3 0
+          ,"NotBankId1"        AS "NotBankId1"           -- 未揭露債權機構代號1 NVARCHAR2 3 0
+          ,"NotBankId2"        AS "NotBankId2"           -- 未揭露債權機構代號2 NVARCHAR2 3 0
+          ,"NotBankId3"        AS "NotBankId3"           -- 未揭露債權機構代號3 NVARCHAR2 3 0
+          ,"NotBankId4"        AS "NotBankId4"           -- 未揭露債權機構代號4 NVARCHAR2 3 0
+          ,"NotBankId5"        AS "NotBankId5"           -- 未揭露債權機構代號5 NVARCHAR2 3 0
+          ,"NotBankId6"        AS "NotBankId6"           -- 未揭露債權機構代號6 NVARCHAR2 3 0
+          ,"OutJcicTxtDate"    AS "OutJcicTxtDate"       -- 轉出JCIC文字檔日期 Decimald 8 0
+          ,JOB_START_TIME      AS "CreateDate"           -- 建檔日期時間 DATE 8 0
+          ,'999999'            AS "CreateEmpNo"          -- 建檔人員 VARCHAR2 6 0
+          ,JOB_START_TIME      AS "LastUpdate"           -- 最後更新日期時間 DATE 8 0
+          ,'999999'            AS "LastUpdateEmpNo"      -- 最後更新人員 VARCHAR2 6 0
     FROM "JcicZ040"
-    WHERE "OutJcictxtDate" > 0
+    WHERE "OutJcicTxtDate" > 0
     ;
 
     -- 記錄寫入筆數

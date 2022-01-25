@@ -124,8 +124,18 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
+		
+		// BatxDetail 處理狀態 ProcStsCode 不為 刪除 'D' 2022/1/25
+		sql += " left join \"BatxDetail\" BTL on BTL.\"CustNo\" = BDD.\"CustNo\"";
+		sql += "                             and BTL.\"FacmNo\" = BDD.\"FacmNo\"";
+		sql += "                             and BTL.\"EntryDate\" = BDD.\"EntryDate\"";
+		sql += "                             and BTL.\"MediaSeq\" = BDD.\"MediaSeq\"";
+		
+		
 		sql += " where BDD.\"EntryDate\" >= :entryDateFm";
 		sql += "   and BDD.\"EntryDate\" <= :entryDateTo";
+		// 2022/1/25
+		sql += "   and BTL.\"ProcStsCode\" <> 'D'";
 		switch (repayBank) {
 		case "": // none
 			break;

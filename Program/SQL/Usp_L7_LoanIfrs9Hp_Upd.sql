@@ -119,7 +119,7 @@ BEGIN
                 ELSE 0
            END                                  AS "IrrevocableFlag"    -- 該筆額度是否為不可撤銷  -- 1=是 0=否
          , CASE WHEN NVL(C."EntCode",' ') IN ('1','2') THEN        -- 企金 - 第一碼為CdIndustry.MainType	主計處大類
-                     CDI."MainType" || SUBSTR(C."IndustryCode"),3,4)       
+                     CDI."MainType" || SUBSTR(C."IndustryCode",3,4)       
                 ELSE '60000'
            END                                  AS "IndustryCode"       -- 主計處行業別代碼 
          , ' '                                  AS "OriRating"          -- 原始認列時時信用評等

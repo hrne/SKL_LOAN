@@ -149,6 +149,8 @@ T(3,[L2062] 貸後契變手續費明細資料)
 #OCUSTNO=A,7,L
 T(2,#CustNo)
 
+#OFACMNO=A,3,L
+T(2,#FacmNo)
 
 !修改
 #FUNC2=A,1,S
@@ -262,10 +264,11 @@ TXFORM=L2062
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
-<sub type="PART" name="L2062" layout="cols=3;screen.width=[130,870];printer.width=[15,30];order=1">
+<sub type="PART" name="L2062" layout="cols=1;screen.width=[150,1050];printer.width=[20,20];order=1">
 [
 ["[L2062]                                 貸後契變手續費明細資料查詢"],
 ["@借戶戶號",#OCUSTNO],
+["@額度編號",#OFACMNO],
 ]
 </sub>
 !---------- 單據輸出組合 ----------

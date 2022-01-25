@@ -25,7 +25,21 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "PostDeductMedia"
-    SELECT MBK."TRXIDT"                   AS "MediaDate"           -- 媒體日期 DECIMAL 8 
+    WITH rawData AS (
+      SELECT MAX(TRXIDT) AS LastTRXIDT
+      FROM "LA$MBKP" MBK
+      WHERE MBK."LMSPBK" = '3' -- 只抓郵局
+    )
+    , tmpData AS (
+      SELECT "Fn_GetBusinessDate"(LastTRXIDT,-2) AS NewTRXIDT -- 找前二營業日
+           , LastTRXIDT 
+      FROM rawData
+    )
+    SELECT CASE
+             WHEN NVL(t.LastTRXIDT,0) != 0
+             THEN t.NewTRXIDT
+           ELSE MBK."TRXIDT"
+           END                            AS "MediaDate"           -- 媒體日期 DECIMAL 8 
           ,ROW_NUMBER() OVER (PARTITION BY MBK."TRXIDT"
                               ORDER BY MBK."LMSACN"
                                       ,MBK."MBKAPN"
@@ -67,16 +81,30 @@ BEGIN
            END                            AS "DistCode"            -- 區處代號 VARCHAR 4
           ,MBK."TRXIDT"                   AS "TransDate"           -- 轉帳日期 DECIMAL 8
           ,LPAD(MBK."LMSPCN",14,'0')      AS "RepayAcctNo"         -- 儲金帳號 VARCHAR2 14 0
-          ,LPAD(NVL(MBK."LMSPID",'0') || APLP."POSCDE" || LPAD(MBK."LMSACN",6,'0'),20,' ')
+          ,LPAD(NVL(MBK."LMSPID",' ') || APLP."POSCDE" || LPAD(MBK."LMSACN",7,'0'),20,' ')
                                           AS "PostUserNo"          -- 用戶編號 VARCHAR2 20 0 右靠左補空，大寫英數字，不得填寫中文(扣款人ID+郵局存款別(POSCDE)+戶號)預計補2位帳號碼
           ,LPAD(MBK."TRXIED",8,'0')
            || LPAD(MBK."MBKAPN",3,'0')
            || LPAD(MBK."MBKTRX",1,'0')    AS "OutsrcRemark"        -- 委託機構使用欄 NVARCHAR2 20 預計為計息迄日+額度編號+入帳扣款別
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 DECIMAL 8 
-          ,'BATX01'                       AS "BatchNo"             -- 批號 VARCHAR2 6 
-          ,ROW_NUMBER() OVER (PARTITION BY MBK."TRXIDT"
-                              ORDER BY MBK."LMSACN",MBK."MBKAPN")
-                                          AS "DetailSeq"           -- 明細序號 DECIMAL 6 
+          ,CASE
+             WHEN NVL(MBK."MBKRSN",' ') != ' '
+             THEN 'BATX01'
+           ELSE '' END                    AS "BatchNo"             -- 批號 VARCHAR2 6 
+          ,CASE
+             WHEN NVL(MBK."MBKRSN",' ') != ' '
+             THEN ROW_NUMBER()
+                  OVER (
+                    PARTITION BY MBK."TRXIDT"
+                    ORDER BY MBK."LMSACN"
+                           , MBK."MBKAPN"
+                           , MBK."LMSPCN"
+                           , MBK."TRXIDT"
+                           , MBK."LMSLPD"
+                           , MBK."TRXISD"
+                           , MBK."ACTACT"
+                           , MBK."MBKAMT")
+           ELSE 0 END                     AS "DetailSeq"           -- 明細序號 DECIMAL 6 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -84,6 +112,7 @@ BEGIN
     FROM "LA$MBKP" MBK
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
                             AND APLP."LMSAPN" = MBK."MBKAPN"
+    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局
     ;
 

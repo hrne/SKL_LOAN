@@ -45,14 +45,24 @@ public class L6069 extends TradeBuffer {
 
 		String iDefType = titaVo.getParam("DefType");
 		String iCode = titaVo.getParam("Code");
-
+		String iItem = titaVo.getParam("Item");
+		int iDefType9 = 0;
+		if(!iDefType.isEmpty()) {
+		 iDefType9 =Integer.parseInt(iDefType);
+		}
 		Slice<CdCode> slCdCode = null;
-		if ("".equals(iDefType)) {
+		if ("".equals(iDefType) && iCode.length() == 0 && iItem.length()==0 ||"".equals(iDefType) && iCode.length() > 0) {
 			slCdCode = sCdCodeDefService.defCodeEq("CodeType", iCode + "%", this.index, this.limit, titaVo);
-		} else {
-			int iDefType9 = Integer.parseInt(iDefType);
+		}else if (iItem.length() > 0 && iDefType.length()>0 && iCode.length()>0) {
+			slCdCode = sCdCodeDefService.defItemEq2(iCode ,iDefType9 ,"%" + iItem + "%", this.index, this.limit, titaVo);
+		}else if (iItem.length() > 0 && iDefType.length()>0) {
+			slCdCode = sCdCodeDefService.defItemEq2("CodeType",iDefType9 ,"%" + iItem + "%", this.index, this.limit, titaVo);
+		}else if (iItem.length() > 0) {
+			slCdCode = sCdCodeDefService.defItemEq("CodeType","%" + iItem + "%", this.index, this.limit, titaVo);
+		}else if(iDefType9!=0){			
 			slCdCode = sCdCodeDefService.defCodeEq2("CodeType", iDefType9, iCode + "%", this.index, this.limit, titaVo);
 		}
+		
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
 		if (lCdCode == null) {
