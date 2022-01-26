@@ -405,7 +405,7 @@ TXFORM=L1905
 #OOTEL_PHONE=電話號碼
 {width:150,align:'left'}
 
-#OORelationItem=與借款人關係
+#OORelationItem=與顧客關係
 {width:150,align:'center'}
 
 #OOLiaisonName=聯絡人姓名
@@ -441,7 +441,7 @@ TXFORM=L1905
 #OOTEL_PHONE=電話號碼
 {width:150,align:'left'}
 
-#OORelationItem=與借款人關係
+#OORelationItem=與顧客關係
 {width:150,align:'center'}
 
 #OOLiaisonName=聯絡人姓名

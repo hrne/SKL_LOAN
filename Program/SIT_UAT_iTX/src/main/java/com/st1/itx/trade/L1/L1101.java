@@ -22,7 +22,6 @@ import com.st1.itx.db.domain.CustCrossId;
 import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustTelNo;
-import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
@@ -249,11 +248,12 @@ public class L1101 extends TradeBuffer {
 				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
 			}
 			
-			// 主管刷卡
+			// 主管刷卡,改由MainProcess處理 by eric 2022.1.26
 //			if (titaVo.getEmpNos().trim().isEmpty()) {
 //				this.info("主管 = " + titaVo.getEmpNos().trim());
 //				iChkFg = 0;
 //				iChkFg = inqLoanBorMain(tCustMain.getCustNo(), iChkFg, titaVo);
+//				iChkFg = 1;//for test only
 //				if (iChkFg != 0) {
 //					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
 //				}
@@ -564,40 +564,40 @@ public class L1101 extends TradeBuffer {
 	}
 
 	// 查詢放款主檔
-	private int inqLoanBorMain(int cCustNo, int cChkFg, TitaVo titaVo) throws LogicException {
-
-		Slice<LoanBorMain> slLoanBorMain = null;
-		slLoanBorMain = sLoanBorMainService.bormCustNoEq(cCustNo, 0, 999, 0, 999, 0, Integer.MAX_VALUE, titaVo);
-		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-
-		if (lLoanBorMain == null || lLoanBorMain.isEmpty()) {
-			cChkFg = 0;
-			return cChkFg;
-		}
-
-		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
-
-			// 0:正常戶 2:催收戶 4:逾期戶 6:呆帳戶 7:部分轉呆戶 => 不需授權
-			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
-				cChkFg = 0;
-				return cChkFg;
-			}
-
-			// 3:結案戶 5:催收結案戶 8:債權轉讓戶 9:呆帳結案戶 => 滿5年需授權
-			this.info("tLoanBorMain.getAcDate() = " + tLoanBorMain.getAcDate());
-			this.info("this.txBuffer.getTxCom().getTbsdy() = " + this.txBuffer.getTxCom().getTbsdy());
-			if (tLoanBorMain.getAcDate() + 50000 <= this.txBuffer.getTxCom().getTbsdy()) {
-				cChkFg = 1;
-				this.info("  > 5 year = " + cChkFg);
-			} else {
-				cChkFg = 0;
-				this.info("  < 5 year = " + cChkFg);
-				return cChkFg;
-			}
-		}
-
-		return cChkFg;
-
-	}
+//	private int inqLoanBorMain(int cCustNo, int cChkFg, TitaVo titaVo) throws LogicException {
+//
+//		Slice<LoanBorMain> slLoanBorMain = null;
+//		slLoanBorMain = sLoanBorMainService.bormCustNoEq(cCustNo, 0, 999, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+//		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+//
+//		if (lLoanBorMain == null || lLoanBorMain.isEmpty()) {
+//			cChkFg = 0;
+//			return cChkFg;
+//		}
+//
+//		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
+//
+//			// 0:正常戶 2:催收戶 4:逾期戶 6:呆帳戶 7:部分轉呆戶 => 不需授權
+//			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
+//				cChkFg = 0;
+//				return cChkFg;
+//			}
+//
+//			// 3:結案戶 5:催收結案戶 8:債權轉讓戶 9:呆帳結案戶 => 滿5年需授權
+//			this.info("tLoanBorMain.getAcDate() = " + tLoanBorMain.getAcDate());
+//			this.info("this.txBuffer.getTxCom().getTbsdy() = " + this.txBuffer.getTxCom().getTbsdy());
+//			if (tLoanBorMain.getAcDate() + 50000 <= this.txBuffer.getTxCom().getTbsdy()) {
+//				cChkFg = 1;
+//				this.info("  > 5 year = " + cChkFg);
+//			} else {
+//				cChkFg = 0;
+//				this.info("  < 5 year = " + cChkFg);
+//				return cChkFg;
+//			}
+//		}
+//
+//		return cChkFg;
+//
+//	}
 
 }

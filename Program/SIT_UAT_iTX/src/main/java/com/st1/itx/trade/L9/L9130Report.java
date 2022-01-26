@@ -154,7 +154,7 @@ public class L9130Report extends MakeReport {
 		// jori 999
 
 		// name 輸出檔案名稱
-		String name = "jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
+		String name = "核心傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
 
 		// format 輸出檔案格式 1.UTF8 2.BIG5
 		int format = 2;

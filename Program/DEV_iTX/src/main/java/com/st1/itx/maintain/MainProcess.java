@@ -126,7 +126,12 @@ public class MainProcess extends SysLogger {
 			else
 				this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
+			// LC開頭交易固定onLine
+//			if (this.titaVo.getTxcd().startsWith("LC") && this.titaVo.getTxCode().startsWith("LC"))
+//				this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
+
 			this.titaVo.putParam(ContentName.orgDataBase, this.titaVo.getDataBase());
+
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
 			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
@@ -274,6 +279,7 @@ public class MainProcess extends SysLogger {
 
 		if (txTeller != null && txTeller.getReportDb() != 0 && !this.titaVo.isTxcdInq() && !this.titaVo.isFuncindInquire() && !this.titaVo.isTxcdSpecial())
 			throw new LogicException("EC000", "非OnLine資料庫 不得更新!!");
+
 	}
 
 	private TxCom setFlowNo(TxCom txCom, int entday, String no) throws LogicException {
@@ -367,13 +373,12 @@ public class MainProcess extends SysLogger {
 			this.titaVo.checkFlow();
 		}
 
-		//
 		if (this.titaVo.getCurName().trim().isEmpty() && this.titaVo.getCurCodeS().equals("00"))
 			this.titaVo.putParam(ContentName.curnm, "TWD");
 		else
 			this.titaVo.putParam(ContentName.curnm, txBuffer.getMgCurr().getCurnm(titaVo.getCurCodeS()));
 
-		if (this.titaVo.isHolidayChange(this.txBuffer.getTxBizDate().getNbsDy(), this.txBuffer.getTxBizDate().getNnbsDy()) && !this.getTitaVo().isEloan())
+		if (this.titaVo.isHolidayChange(this.txBuffer.getTxBizDate().getNbsDy(), this.txBuffer.getTxBizDate().getNnbsDy()) && !this.titaVo.isEloan())
 			this.mustInfo("CE000,下營業日或下下營業日不符,請重新登入系統");
 //			throw new LogicException("CE000", "下營業日或下下營業日不符,請重新登入系統");
 
@@ -451,21 +456,19 @@ public class MainProcess extends SysLogger {
 
 			// 端末交易檢核
 			if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTrmtypTerminal()) {
-				if (!this.titaVo.isTxcdInq() && Integer.parseInt(this.titaVo.getTxtNo().trim()) < tTxTeller.getTxtNo()) {
+
+				if (!this.titaVo.isTxcdInq() && Integer.parseInt(this.titaVo.getTxtNo().trim()) < tTxTeller.getTxtNo())
 					throw new LogicException("EC004", "使用者(" + this.titaVo.getTlrNo() + ")交易序號錯誤,請重新登入系統");
-				}
 
-				if (tTxTeller.getEntdy() == 0) {
+				if (tTxTeller.getEntdy() == 0)
 					tTxTeller.setEntdy(this.txBuffer.getMgBizDate().getTbsDy());
-				}
 
-				if (this.titaVo.getEntDyI() != tTxTeller.getEntdy()) {
+				if (this.titaVo.getEntDyI() != tTxTeller.getEntdy())
 					throw new LogicException("EC004", "櫃員本、次日作業模式不一致，,請重新登入系統");
-				}
 
-				if (tTxTeller.getLogonFg() != 1) {
+				if (tTxTeller.getLogonFg() != 1)
 					throw new LogicException("EC007", "請重新登入系統!");
-				}
+
 			}
 
 			txCom.setAuthNo(tTxTeller.getAuthNo());
@@ -521,7 +524,8 @@ public class MainProcess extends SysLogger {
 			txCom.setCustRmkFg(tTxTranCode.getCustRmkFg());
 		}
 
-		if (txCom.isTxTypeInq() && tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && this.titaVo.getReason().isEmpty()) {
+//		if (txCom.isTxTypeInq() && tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && this.titaVo.getReason().isEmpty()) {
+		if (txCom.isTxTypeInq() && tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1) {
 			CustDataCtrl tCustDataCtrl = null;
 			if (titaVo.getMrKey().length() >= 7 && parse.isNumeric(titaVo.getMrKey().substring(0, 7))) {
 				tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
@@ -540,8 +544,11 @@ public class MainProcess extends SysLogger {
 			}
 			if (tCustDataCtrl != null) {
 				if (tCustDataCtrl.getApplMark() == 2) {
-					if (titaVo.getReason().isEmpty())
+					if (titaVo.getReason().isEmpty()) {
 						throw new LogicException("EC998", "查詢結清滿五年客戶資料");
+					} else if (titaVo.getEmpNos().trim().isEmpty()) {
+						sendRsp.addvReason(this.txBuffer, titaVo, "0004", "查詢結清滿五年客戶資料,理由:" + titaVo.getReason());
+					}
 				} else if (tCustDataCtrl.getApplMark() == 1) {
 					if ("L3".equals(this.titaVo.getTxcd().substring(0, 2))) {
 						txCom.setCustDataCtrl(1);

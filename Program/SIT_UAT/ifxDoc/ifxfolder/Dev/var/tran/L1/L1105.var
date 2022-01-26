@@ -48,7 +48,7 @@ E(0,0)
 ["#FdTelArea+電話號碼",#TelArea,#TelNo,#TelExt],
 ["#FdTelOther+電話號碼",#TelOther],
 ["#FdTelChgRsnCode+異動原因",#TelChgRsnCode,#TelChgRsnItem],
-["#FdRelationCode+與借款人關係",#RelationCode,#RelationItem],
+["#FdRelationCode+與顧客關係",#RelationCode,#RelationItem],
 ["#FdLiaisonNam+聯絡人姓名",#LiaisonName],
 ["#FdRmk+備註",#Rmk],
 ["#FdEnable+啟用記號",#Enable,#EnableX],

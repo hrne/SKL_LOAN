@@ -33,7 +33,8 @@ public class LM004Report2 extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
 		String entdy = titaVo.get("ENTDY").toString();
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表",
+				"LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
 
 		int row = 3;
 //		this.info("-----------------" + LDList);
@@ -86,12 +87,13 @@ public class LM004Report2 extends MakeReport {
 					makeExcel.setValue(row, col, tLDVo.get("F6"));
 					break;
 				case 8:
+
 					// 到期日
-					makeExcel.setValue(row, col, tLDVo.get("F8"));
+					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F8")) + 19110000);
 					break;
 				case 9:
 					// 應完成日
-					makeExcel.setValue(row, col, tLDVo.get("F9"));
+					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F9")) + 19110000);
 					break;
 				case 10:
 					// 金額

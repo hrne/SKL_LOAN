@@ -72,6 +72,7 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"CdCity\" C2 ON C2.\"CityCode\" = C1.\"CityCode\"";
 		sql += "        WHERE M.\"Status\" IN (0,4)";
 		sql += "          AND M.\"MaturityDate\" " + (kind.equals("excel") ? "<" : "") + "= :dueDate";
+//		sql += "          AND M.\"MaturityDate\" " + (kind.equals("excel") ? "<" : "") + "= :dueDate";
 		sql += "          AND M.\"LoanBal\" >= :prinBal";
 		sql += "		GROUP BY";
 		sql += "    		   DECODE（M.\"AmortizedCode\", 3, 'Y', 'N') ";
