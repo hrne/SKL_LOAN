@@ -81,7 +81,7 @@ BEGIN
            END                            AS "DistCode"            -- 區處代號 VARCHAR 4
           ,MBK."TRXIDT"                   AS "TransDate"           -- 轉帳日期 DECIMAL 8
           ,LPAD(MBK."LMSPCN",14,'0')      AS "RepayAcctNo"         -- 儲金帳號 VARCHAR2 14 0
-          ,LPAD(NVL(MBK."LMSPID",' ') || APLP."POSCDE" || LPAD(MBK."LMSACN",7,'0'),20,' ')
+          ,LPAD(NVL(MBK."LMSPID",NVL(CUSP."CUSID1",' ')) || APLP."POSCDE" || LPAD(MBK."LMSACN",7,'0'),20,' ')
                                           AS "PostUserNo"          -- 用戶編號 VARCHAR2 20 0 右靠左補空，大寫英數字，不得填寫中文(扣款人ID+郵局存款別(POSCDE)+戶號)預計補2位帳號碼
           ,LPAD(MBK."TRXIED",8,'0')
            || LPAD(MBK."MBKAPN",3,'0')
@@ -112,6 +112,7 @@ BEGIN
     FROM "LA$MBKP" MBK
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
                             AND APLP."LMSAPN" = MBK."MBKAPN"
+    LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = MBK."LMSACN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局
     ;

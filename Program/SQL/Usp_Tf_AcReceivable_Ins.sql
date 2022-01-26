@@ -289,7 +289,7 @@ BEGIN
           ,''                  AS "SlipNote"         -- 傳票摘要
           ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
-          ,NVL(S2."LMSLLD")    AS "OpenAcDate"       -- 起帳日期
+          ,NVL(S2."LMSLLD",0)  AS "OpenAcDate"       -- 起帳日期
           ,S1."TRXDAT"         AS "LastAcDate"       -- 最後作帳日
           ,S1."TRXDAT"         AS "LastTxDate"       -- 最後交易日
           ,''                  AS "TitaTxCd"         -- 交易代號

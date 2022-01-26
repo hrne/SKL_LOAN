@@ -552,7 +552,6 @@ public class ApControl extends SysLogger {
 
 		txBuffer.getAcDetailList().clear();
 		txBuffer.getAmlList().clear();
-		txBuffer.getMgCurr().clear();
 		txBuffer.getReasonLi().clear();
 		txBuffer.getRspList().clear();
 		txBuffer = null;

@@ -358,7 +358,7 @@ TXFORM=L6932
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:70}
 
 #OTranName=交易名稱
-{width:250,align:'left'}
+{width:350,align:'left'}
 #OCustNoX=戶號
 {width:100,align:'center'}
 #OMrKey=參考編號

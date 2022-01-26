@@ -143,7 +143,7 @@ public class L9130Report extends MakeReport {
 		// brno 單位
 		String brno = titaVo.getBrno();
 		// date 檔案日期
-		int date = Integer.parseInt(titaVo.getEntDy());
+		int date = iAcDate + 19110000;
 		// no 檔案編號
 		String no = "L9130";
 		// desc 檔案說明

@@ -136,7 +136,6 @@ public class L2801 extends TradeBuffer {
 		tLoanNotYet.setFacmNo(iFacmNo);
 		tLoanNotYet.setNotYetCode(wkNotYetCode);
 		tLoanNotYet.setLoanNotYetId(tLoanNotYetId);
-		tLoanNotYet.setNotYetItem(iTitaVo.getParam("NotYetCodeX"));
 		tLoanNotYet.setYetDate(this.parse.stringToInteger(iTitaVo.getParam("YetDate")));
 		tLoanNotYet.setCloseDate(this.parse.stringToInteger(iTitaVo.getParam("CloseDate")));
 		tLoanNotYet.setReMark(iTitaVo.getParam("ReMark"));

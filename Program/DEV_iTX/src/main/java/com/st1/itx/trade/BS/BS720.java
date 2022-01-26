@@ -263,32 +263,32 @@ public class BS720 extends TradeBuffer {
 		BigDecimal lnAmt = loanAmt.subtract(loanAmtLast);
 		BigDecimal ovAmt = ovduAmt.subtract(ovduAmtLast);
 		BigDecimal intAmt = lnAmt.add(ovAmt);
-		if (lnAmt.compareTo(BigDecimal.ZERO) >= 0) {
+		if (lnAmt.compareTo(BigDecimal.ZERO) < 0) {
 			iCr++;
 			tTempVo.putParam("CrAcctCode" + iCr, "AIL");
-			tTempVo.putParam("CrTxAmt" + iCr, lnAmt);
+			tTempVo.putParam("CrTxAmt" + iCr, BigDecimal.ZERO.subtract(lnAmt));
 		} else {
 			iDb++;
 			tTempVo.putParam("DbAcctCode" + iDb, "AIL");
-			tTempVo.putParam("DbTxAmt" + iDb, BigDecimal.ZERO.subtract(lnAmt));
+			tTempVo.putParam("DbTxAmt" + iDb, lnAmt);
 		}
-		if (ovAmt.compareTo(BigDecimal.ZERO) >= 0) {
+		if (ovAmt.compareTo(BigDecimal.ZERO) < 0) {
 			iCr++;
 			tTempVo.putParam("CrAcctCode" + iCr, "AIO");
-			tTempVo.putParam("CrTxAmt" + iCr, ovAmt);
+			tTempVo.putParam("CrTxAmt" + iCr, BigDecimal.ZERO.subtract(ovAmt));
 		} else {
 			iDb++;
 			tTempVo.putParam("DbAcctCode" + iDb, "AIO");
-			tTempVo.putParam("DbTxAmt" + iDb, BigDecimal.ZERO.subtract(ovAmt));
+			tTempVo.putParam("DbTxAmt" + iDb, ovAmt);
 		}
-		if (intAmt.compareTo(BigDecimal.ZERO) >= 0) {
+		if (intAmt.compareTo(BigDecimal.ZERO) < 0) {
 			iDb++;
 			tTempVo.putParam("DbAcctCode" + iDb, "AII");
-			tTempVo.putParam("DbTxAmt" + iDb, intAmt);
+			tTempVo.putParam("DbTxAmt" + iDb, BigDecimal.ZERO.subtract(intAmt));
 		} else {
 			iCr++;
 			tTempVo.putParam("CrAcctCode" + iCr, "AII");
-			tTempVo.putParam("CrTxAmt" + iCr, BigDecimal.ZERO.subtract(intAmt));
+			tTempVo.putParam("CrTxAmt" + iCr, intAmt);
 		}
 		tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 		txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo); // DupSkip = false ->重複 error

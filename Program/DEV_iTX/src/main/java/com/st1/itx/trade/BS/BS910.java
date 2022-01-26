@@ -185,9 +185,9 @@ public class BS910 extends TradeBuffer {
 			for (Ias39LoanCommit ac : lIas39LoanCommit) {
 				String key = ac.getAcBookCode() + "," + ac.getAcSubBookCode();
 				if (map.containsKey(key)) {
-					map.put(key, map.get(key).add(ac.getExpLimitAmt())); // 表外曝險金額
+					map.put(key, map.get(key).add(ac.getAvblBal())); // 可動用餘額
 				} else {
-					map.put(key, ac.getExpLimitAmt());
+					map.put(key, ac.getAvblBal());
 				}
 			}
 			for (Map.Entry<String, BigDecimal> entry : map.entrySet()) {

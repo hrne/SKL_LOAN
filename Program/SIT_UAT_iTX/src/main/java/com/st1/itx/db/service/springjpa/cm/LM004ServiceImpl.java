@@ -40,7 +40,7 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 本金餘額
 		String prinBal = titaVo.getParam("PrinBal");
 
-		String sql = "SELECT DECODE（M.\"AmortizedCode\", 3, 'Y', 'N') F0";
+		String sql = "SELECT DECODE（M.\"AmortizedCode\", 3, 'Y', 'N') AS F0";
 		sql += "              ,F.\"ProdNo\" AS F1";
 		sql += "              ,C1.\"CityCode\" AS F2";
 		sql += "              ,C2.\"CityItem\" AS F3";
@@ -50,7 +50,7 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F7";
 		sql += "              ,M.\"MaturityDate\" AS F8";
 		sql += "              ,TO_CHAR(TO_DATE(M.\"MaturityDate\", 'YYYYMMDD') - 15, 'YYYYMMDD') AS F9";
-		sql += "              ,M.\"LoanBal\" AS F10";
+		sql += "              ,SUM(F.\"UtilAmt\") / COUNT(F.\"UtilAmt\") AS F10";
 		sql += "              ,M.\"PrevPayIntDate\" AS F11";
 		sql += "              ,E1.\"Fullname\" AS F12";
 		sql += "              ,F.\"Introducer\" AS F13";
@@ -73,6 +73,22 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        WHERE M.\"Status\" IN (0,4)";
 		sql += "          AND M.\"MaturityDate\" " + (kind.equals("excel") ? "<" : "") + "= :dueDate";
 		sql += "          AND M.\"LoanBal\" >= :prinBal";
+		sql += "		GROUP BY";
+		sql += "    		   DECODE（M.\"AmortizedCode\", 3, 'Y', 'N') ";
+		sql += "              ,F.\"ProdNo\" ";
+		sql += "              ,C1.\"CityCode\" ";
+		sql += "              ,C2.\"CityItem\" ";
+		sql += "              ,E0.\"Fullname\" ";
+		sql += "              ,M.\"CustNo\" ";
+		sql += "              ,M.\"FacmNo\" ";
+		sql += "              ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
+		sql += "              ,M.\"MaturityDate\" ";
+		sql += "              ,M.\"PrevPayIntDate\" ";
+		sql += "              ,E1.\"Fullname\" ";
+		sql += "              ,F.\"Introducer\" ";
+		sql += "              ,E1.\"CenterCode2Short\" ";
+		sql += "              ,E1.\"CenterCode1Short\" ";
+		sql += "              ,E1.\"CenterShortName\" ";
 		sql += "		ORDER BY F8";
 
 		this.info("sql=" + sql);

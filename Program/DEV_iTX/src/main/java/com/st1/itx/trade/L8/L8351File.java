@@ -36,14 +36,13 @@ public class L8351File extends MakeFile {
 
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iTxtDate = titaVo.getParam("TxtDate");
-		String iTxtCount = titaVo.getParam("TxtCount");
-		String iReportTime = titaVo.getParam("ReportTime");
+		String iTxtCount = String.valueOf(Integer.valueOf(titaVo.getParam("TxtCount")));
 		int date = Integer.valueOf(titaVo.getEntDy());
 		String brno = titaVo.getBrno();
 		String filecode = "L8351";
 		String fileitem = "暫定每月產檔";
 		// 檔名
-		String filename = iSubmitKey + iTxtDate.substring(3) + iReportTime + ".MU1";
+		String filename = iSubmitKey + iTxtDate.substring(3) + iTxtCount + ".MU1";
 
 		this.open(titaVo, date, brno, filecode, fileitem, filename,2);
 		// 用String.format()

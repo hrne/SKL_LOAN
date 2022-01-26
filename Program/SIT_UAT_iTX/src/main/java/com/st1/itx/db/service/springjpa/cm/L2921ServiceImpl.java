@@ -94,7 +94,6 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      fm.\"BusinessOfficer\"    AS \"BusinessOfficer\",      ";
 		sql += "      ce.\"Fullname\"           AS \"Fullname\",             ";
 		sql += "      lo.\"NotYetCode\"         AS \"NotYetCode\",           ";
-		sql += "      lo.\"NotYetItem\"         AS \"NotYetItem\",           ";
 		sql += "      lo.\"YetDate\"            AS \"YetDate\",              ";
 		sql += "      lo.\"CloseDate\"          AS \"CloseDate\",            ";
 		sql += "      lo.\"ReMark\"             AS \"ReMark\"                ";
