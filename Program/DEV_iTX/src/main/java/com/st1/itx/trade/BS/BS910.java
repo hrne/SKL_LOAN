@@ -183,11 +183,13 @@ public class BS910 extends TradeBuffer {
 
 		if (lIas39LoanCommit != null) {
 			for (Ias39LoanCommit ac : lIas39LoanCommit) {
-				String key = ac.getAcBookCode() + "," + ac.getAcSubBookCode();
-				if (map.containsKey(key)) {
-					map.put(key, map.get(key).add(ac.getAvblBal())); // 可動用餘額
-				} else {
-					map.put(key, ac.getAvblBal());
+				if (ac.getDrawdownFg() == 0) {
+					String key = ac.getAcBookCode() + "," + ac.getAcSubBookCode();
+					if (map.containsKey(key)) {
+						map.put(key, map.get(key).add(ac.getAvblBal())); // 可動用餘額
+					} else {
+						map.put(key, ac.getAvblBal());
+					}
 				}
 			}
 			for (Map.Entry<String, BigDecimal> entry : map.entrySet()) {

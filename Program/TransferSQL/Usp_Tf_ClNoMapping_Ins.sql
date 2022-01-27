@@ -68,6 +68,7 @@ BEGIN
                  ELSE 9000000 END
     ;
 
+    /* 獨立產權車位資料 */
     MERGE INTO "ClNoMapping" T1
     USING ( SELECT TPM."GDRID1"
                  , TPM."GDRID2"

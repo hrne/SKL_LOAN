@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L6;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -49,12 +52,36 @@ public class L6933 extends TradeBuffer {
 		this.info("active L6933 ");
 		this.totaVo.init(titaVo);
 
-		Slice<TxDataLog> slTxDataLog = txDataLogService.findByTranNo(titaVo.getParam("TranNo"), titaVo.getParam("MrKey"), 0, Integer.MAX_VALUE, titaVo);
+		String TranNo = titaVo.getParam("TranNo").trim();
+		Slice<TxDataLog> slTxDataLog = txDataLogService.findByTranNo(TranNo, titaVo.getParam("MrKey"), 0,
+				Integer.MAX_VALUE, titaVo);
 		List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
 
 		boolean first = true;
 		if (lTxDataLog != null && lTxDataLog.size() > 0) {
 			for (TxDataLog txDataLog : lTxDataLog) {
+				if (("L5701").equals(TranNo)) {
+					List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+					try {
+						this.info("txDataLog.getContent()=" + txDataLog.getContent());
+						listMap = new ObjectMapper().readValue(txDataLog.getContent(), ArrayList.class);
+					} catch (IOException e) {
+						throw new LogicException("EC009", "資料格式");
+					}
+					boolean skip = true;
+					for (HashMap<String, Object> map : listMap) {
+						String fld = "";
+						if(map.get("f") !=null) {
+							fld = map.get("f").toString();
+						}
+						if ("延期繳款年月(起)".equals(fld) || "延期繳款年月(訖)".equals(fld)) {
+							skip = false;
+						}
+					}
+					if (skip) {
+						continue;
+					}
+				}
 				if (first) {
 					first = false;
 					this.totaVo.putParam("OCustNo", txDataLog.getCustNo());

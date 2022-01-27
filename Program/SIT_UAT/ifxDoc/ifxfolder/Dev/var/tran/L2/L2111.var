@@ -773,7 +773,7 @@ C(3,#ApproveFlag,1,s,$)
 HELP(#PieceCodeHelp)
 @V(H,#PieceCodeHelp)
 
-#PieceCodeX=X,20,L
+#PieceCodeX=X,50,L
 T(H,#PieceCode,#PieceCodeHelp)
 
 <include src="ROM.icf::L1R16.dec"/>

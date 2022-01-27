@@ -96,7 +96,7 @@ public class LC100 extends TradeBuffer {
 				this.totaVo.putParam("FINBRNO", tTxTeller.getBrNo());
 				this.totaVo.putParam("OBUBRNO", tTxTeller.getBrNo());
 				this.totaVo.putParam("LEVEL", tTxTeller.getLevelFg());
-				this.totaVo.putParam("NAME", tTxTeller.getTlrItem());
+				this.totaVo.putParam("NAME", tCdEmp.getFullname());
 
 				this.totaVo.putParam("EMPNO", "");
 				this.totaVo.putParam("TXGRP", "1");

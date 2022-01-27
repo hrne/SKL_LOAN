@@ -34,7 +34,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({ })
 	public List<Map<String, String>> findAll(TitaVo titaVo, int groupNum) throws Exception {
 
 		this.info("lM051.findAll ");
@@ -217,7 +217,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({ })
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int formNum) throws Exception {
 
 		this.info("lM051.findAll2");

@@ -12,11 +12,12 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
-import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxFlowId;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxFlowService;
 
 import com.st1.itx.db.domain.TxTranCode;
@@ -31,7 +32,6 @@ import com.st1.itx.db.service.TxTranCodeService;
  * @version 1.0.0
  */
 public class LCR03 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LCR03.class);
 
 	@Autowired
 	public TxRecordService txRecordService;
@@ -44,6 +44,9 @@ public class LCR03 extends TradeBuffer {
 
 	@Autowired
 	public TxTellerService txTellerService;
+	
+	@Autowired
+	public CdEmpService cdEmpService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -96,8 +99,15 @@ public class LCR03 extends TradeBuffer {
 				tita2.put("ORGTNO", tTxRecord.getTxSeq());
 				tita2.put("ACTFG", actfg);
 
-				TxTeller txTeller = txTellerService.findById(tTxRecord.getTlrNo());
-				tita2.put("ORGEMPNM", txTeller.getTlrItem().trim());
+//				TxTeller txTeller = txTellerService.findById(tTxRecord.getTlrNo());
+				
+				CdEmp cdEmp = cdEmpService.findById(tTxRecord.getTlrNo());
+				
+				if (cdEmp == null) {
+					throw new LogicException("EC001", "員工資料檔員編不存在::" + tTxRecord.getTlrNo());
+				}
+				
+				tita2.put("ORGEMPNM", cdEmp.getFullname().trim());
 
 				this.info("txtranCode == " + tTxTranCode.getSubmitFg());
 				if (1 == tTxTranCode.getSubmitFg()) {

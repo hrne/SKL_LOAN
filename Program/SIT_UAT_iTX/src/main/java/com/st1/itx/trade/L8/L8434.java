@@ -84,7 +84,7 @@ public class L8434 extends TradeBuffer {
 		Slice<JcicZ570> iJcicZ570 = null;
 		JcicZ570 uJcicZ570 = new JcicZ570();
 		JcicZ570 oldJcicZ570 = new JcicZ570();
-		iJcicZ570 = sJcicZ570Service.findAll(this.index, this.limit, titaVo);
+		iJcicZ570 = sJcicZ570Service.findAll(0,Integer.MAX_VALUE, titaVo);
 		for (JcicZ570 iiJcicZ570 : iJcicZ570) {
 			if (iiJcicZ570.getOutJcicTxtDate() == iJcicDate) {
 				count++;

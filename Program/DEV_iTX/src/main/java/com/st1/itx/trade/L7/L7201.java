@@ -49,22 +49,22 @@ public class L7201 extends TradeBuffer {
 
 		String empNo = titaVo.getTlrNo();
 
-		// IF RemakeYN = "Y" THEN 更新table
+		// IF RemakeYN = "Y" THEN 更新table, 重新產表
 
 		if (titaVo.getParam("RemakeYN").equals("Y")) {
 			this.info("L7201: RemakeYN == Y. Update the table.");
 			sIas39LoanCommitService.Usp_L7_Ias39LoanCommit_Upd(dateSent, empNo, titaVo);
+			this.info("L7201 titaVo.getTxcd() = " + titaVo.getTxcd());
+			String parentTranCode = titaVo.getTxcd();
+
+			lM011Report.setParentTranCode(parentTranCode);
+			lM011Report.exec(titaVo);
+
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), "LM011表外放款承諾資料產出已完成", titaVo);
 		}
 		// 整批處理：月底放款承諾提存
 		MySpring.newTask("BS910", this.txBuffer, titaVo);
-
-		this.info("L7201 titaVo.getTxcd() = " + titaVo.getTxcd());
-		String parentTranCode = titaVo.getTxcd();
-
-		lM011Report.setParentTranCode(parentTranCode);
-		lM011Report.exec(titaVo);
-
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM011表外放款承諾資料產出已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

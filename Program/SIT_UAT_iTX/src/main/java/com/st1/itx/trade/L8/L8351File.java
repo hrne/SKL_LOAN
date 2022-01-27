@@ -50,7 +50,8 @@ public class L8351File extends MakeFile {
 
 		// 第一行
 		String iContactX =  FormatUtil.padX("放款部聯絡人-程慧娟", 80);
-		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s%s          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
+//		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s01          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
+		String iFirstLine = "JCIC-DAT-MU01-V01-458     " + iTxtDate + "01          02-23895858#7075"+iContactX;
 		this.put(iFirstLine);
 
 		if (iTbJcicMu01 == null) {
@@ -158,7 +159,8 @@ public class L8351File extends MakeFile {
 		}
 		// 最後一行
 		String sCount = String.valueOf(iTotalCount);// update by Hedy (2021/11/3)
-		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
+//		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
+		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0');
 		this.put(footText);
 		}
 	}

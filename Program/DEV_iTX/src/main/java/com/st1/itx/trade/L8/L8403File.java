@@ -1669,12 +1669,12 @@ public class L8403File extends MakeFile {
 					iCloseCode = FormatUtil.padX(iCloseCode, 2);
 					String ixCloseCode = sJcicZ046.getCloseCode();
 					String iBreakCode = sJcicZ046.getBreakCode();
-					String nBreakCode = FormatUtil.padX(iBreakCode, 10);
+
 					String iCloseDate = String.valueOf(sJcicZ046.getCloseDate());
 					String iUkey = sJcicZ046.getUkey();
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "46" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0')
-							+ nBreakCode + StringUtils.rightPad("", 3) + iCloseCode + StringUtils.leftPad(iCloseDate, 7, '0')
+							+ StringUtils.leftPad(iBreakCode, 2,"") + StringUtils.rightPad("", 3) + iCloseCode + StringUtils.leftPad(iCloseDate, 7, '0')
 							+ StringUtils.rightPad("", 43);
 					this.put(text);
 

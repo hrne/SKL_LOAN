@@ -17,7 +17,9 @@ import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.domain.TxAuthGroup;
 import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.TxTeller;
@@ -68,6 +70,9 @@ public class XXR99 extends TradeBuffer {
 
 	@Autowired
 	public TxAttachTypeService txAttachTypeService;
+
+	@Autowired
+	public CdEmpService cdEmpService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -524,7 +529,8 @@ public class XXR99 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
+		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index,
+				this.limit);
 		List<TxAuthGroup> lTxAuthGroup = slTxAuthGroup == null ? null : slTxAuthGroup.getContent();
 
 		if (lTxAuthGroup != null) {
@@ -579,10 +585,16 @@ public class XXR99 extends TradeBuffer {
 					}
 				}
 
+				CdEmp cdEmp = cdEmpService.findById(txTeller.getTlrNo());
+
+				if (cdEmp == null) {
+					continue;
+				}
+
 				if (!"".equals(s)) {
 					s += ";";
 				}
-				s += txTeller.getTlrNo().trim() + ":" + txTeller.getTlrItem().trim();
+				s += txTeller.getTlrNo().trim() + ":" + cdEmp.getFullname().trim();
 			}
 		}
 
