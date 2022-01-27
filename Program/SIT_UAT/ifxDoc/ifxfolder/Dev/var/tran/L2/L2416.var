@@ -861,7 +861,9 @@ IF(#FunCd==4,C(4,#Reason{i},CALL(#HIDE_ROW_{i}),CALL(#SHOW_ROW_{i})),$)
 IF(#FunCd==4,s,$)
 C(4,#Reason{j},s,$)
 HELP(#ReasonHelp)
-@C(4,#Reason{i},CALL(#HIDE_ROW_{i}),$)
+@
+IF({i} == 1,V(H,#ReasonHelp),$)
+C(4,#Reason{i},CALL(#HIDE_ROW_{i}),$)
 C(4,#Reason{i},s,$)
 V(H,#ReasonHelp)
 

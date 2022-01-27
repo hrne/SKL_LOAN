@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,165)ASGN(INQLEN$)
+E(0,168)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -299,7 +299,10 @@ T(3,1)ASGN(LOOP$)
 T(2,#OOCustNo+-+#OOFacmNo)
 
 ! 業務科目
+#OOAcctCode=X,3,L
 #OOAcctItem=x,40,L
+#OOAcctCodeX=x,50,L
+T(2,#OOAcctCode+ +#OOAcctItem)
 
 ! 銷帳編號
 #OORvNo=X,30,L
@@ -337,8 +340,8 @@ X(#OO_SUM1)
 #OOAcSubBookCode=X,3,L
 
 !明細
-#OOBUF5=X,89,S
-T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#OOCustNo+#OOFacmNo+000+#OORvNo+#OOOpenAcDate+#OOLastTxDate)
+#OOBUF5=X,92,S
+T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#OOCustNo+#OOFacmNo+000+#OORvNo+#OOOpenAcDate+#OOLastTxDate+#OOAcctCode)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5})
@@ -372,9 +375,10 @@ TXFORM=L6907
 #OOAcNoCode
 #OOAcSubCode
 #OOAcDtlCode
+#OOAcctCode
+#OOAcctItem
 #OOCustNo
 #OOFacmNo
-#OOAcctItem
 #OORvNo
 #OOOpenAcDate
 #OORvAmt
@@ -412,7 +416,7 @@ TXFORM=L6907
 #OOCustNoX=戶號
 {width:100,align:'center'}
 
-#OOAcctItem=業務科目
+#OOAcctCodeX=業務科目
 {width:200,align:'left'}
 
 #OORvNo=銷帳編號
@@ -447,7 +451,7 @@ TXFORM=L6907
 #OOCustNoX=戶號
 {width:100,align:'center'}
 
-#OOAcctItem=業務科目
+#OOAcctCodeX=業務科目
 {width:200,align:'left'}
 
 #OORvNo=銷帳編號

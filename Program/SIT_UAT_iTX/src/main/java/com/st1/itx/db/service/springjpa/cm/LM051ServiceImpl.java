@@ -34,7 +34,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings({ })
+	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo, int groupNum) throws Exception {
 
 		this.info("lM051.findAll ");
@@ -91,7 +91,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT M.\"CustNo\""; // F0
 		sql += "			,M.\"FacmNo\""; // F1
 		sql += "			,DECODE(M.\"AcSubBookCode\",' ',' ','00A','A') AS \"AcSubBookCode\""; // F2
-		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0)"; // F3
+		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\""; // F3
 		sql += "			,M.\"PrinBalance\""; // F4
 		sql += "			,M.\"FacAcctCode\""; // F5
 		sql += "			,M.\"OvduTerm\""; // F6
@@ -217,7 +217,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ })
+	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int formNum) throws Exception {
 
 		this.info("lM051.findAll2");

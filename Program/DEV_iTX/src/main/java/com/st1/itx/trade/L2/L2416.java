@@ -124,19 +124,22 @@ public class L2416 extends TradeBuffer {
 		}
 
 		boolean clLandFlag = true;
-
+		
 		// clLand
 		// 房地 && 新增
 		if (iClCode1 == 1 && iFunCd == 1) {
+
+			// eloan判斷是否已存在
 			if (this.isEloan) {
-				// 土地序號有值時,改為修改
-				if (iLandSeq > 0) {
+				
+				clLandId.setClCode1(iClCode1);
+				clLandId.setClCode2(iClCode2);
+				clLandId.setClNo(iClNo);
+				clLandId.setLandSeq(iLandSeq);
+				
+				ClLand tLastClLand = sClLandService.findById(clLandId, titaVo);
+				if (tLastClLand != null) {
 					iFunCd = 2;
-				} else {
-					iLandSeq = eLoanUnique(titaVo);
-					if (iLandSeq > 0) {
-						iFunCd = 2;
-					}
 				}
 			}
 
@@ -148,8 +151,9 @@ public class L2416 extends TradeBuffer {
 					iLandSeq = 1;
 				} else {
 					iLandSeq = tLastClLand.getLandSeq() + 1;
-				}
-			}
+				} // else
+			} // if
+
 		}
 
 		clLandId.setClCode1(iClCode1);
@@ -159,7 +163,7 @@ public class L2416 extends TradeBuffer {
 		if (clLandFlag) {
 			tClLand = sClLandService.holdById(clLandId, titaVo);
 		}
-
+		
 		// 房地
 		if (iClCode1 == 1) {
 			if (iFunCd == 1) {
@@ -275,26 +279,6 @@ public class L2416 extends TradeBuffer {
 
 	}
 
-	private int eLoanUnique(TitaVo titaVo) throws LogicException {
-		int landSeq = 0;
-
-		sClLandService.findClNoFirst(iClCode1, iClCode2, iClNo);
-
-		Slice<ClLand> slClLand = sClLandService.findClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
-		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
-		if (lClLand != null) {
-			for (ClLand clLand : lClLand) {
-				if (clLand.getCityCode().equals(titaVo.getParam("CityCode")) && clLand.getAreaCode().equals(titaVo.getParam("AreaCode")) && clLand.getIrCode().equals(titaVo.getParam("IrCode"))
-						&& clLand.getLandNo1().equals(titaVo.getParam("LandNo1")) && clLand.getLandNo2().equals(titaVo.getParam("LandNo2"))) {
-					landSeq = clLand.getLandSeq();
-					break;
-				}
-
-			}
-		}
-		return landSeq;
-	}
-
 	// 土地資料
 	private void setClLand(TitaVo titaVo) throws LogicException {
 		this.info("L2416.setClLand = " + iFunCd);
@@ -333,8 +317,9 @@ public class L2416 extends TradeBuffer {
 			tClLand.setLandZoningCode(titaVo.getParam("LandZoningCode"));
 			tClLand.setLandUsageType(titaVo.getParam("LandUsageType"));
 			tClLand.setPostedLandValue(parse.stringToBigDecimal(titaVo.getParam("PostedLandValue")));
-			tClLand.setPostedLandValueYearMonth(
-					parse.stringToInteger(parse.IntegerToString(parse.stringToInteger(titaVo.getParam("PostedLandValueYear")) + 1911, 4) + (titaVo.getParam("PostedLandValueMonth"))));
+			tClLand.setPostedLandValueYearMonth(parse.stringToInteger(
+					parse.IntegerToString(parse.stringToInteger(titaVo.getParam("PostedLandValueYear")) + 1911, 4)
+							+ (titaVo.getParam("PostedLandValueMonth"))));
 			tClLand.setTransferedYear(parse.stringToInteger(titaVo.getParam("TransferedYear")) + 1911);
 			tClLand.setLastTransferedAmt(parse.stringToBigDecimal(titaVo.getParam("LastTransferedAmt")));
 			tClLand.setEvaUnitPrice(parse.stringToBigDecimal(titaVo.getParam("EvaUnitPrice")));
@@ -403,7 +388,8 @@ public class L2416 extends TradeBuffer {
 
 	// delete 土地所有權人檔
 	private void deleteClLandOwner(TitaVo titaVo) throws LogicException {
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
+				Integer.MAX_VALUE);
 		lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 
 		if (lClLandOwner != null && lClLandOwner.size() > 0) {
@@ -453,7 +439,8 @@ public class L2416 extends TradeBuffer {
 	// insert 土地修改原因檔
 	private void deleteClLandReason(TitaVo titaVo) throws LogicException {
 
-		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
+		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE);
 		lClLandReason = slClLandReason == null ? null : slClLandReason.getContent();
 		if (lClLandReason != null && lClLandReason.size() > 0) {
 			try {

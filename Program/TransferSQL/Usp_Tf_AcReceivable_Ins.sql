@@ -72,16 +72,22 @@ BEGIN
           ,NVL(C1."AcctFlag",0) AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
           ,C1."ReceivableFlag"  AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
           ,CASE
+             WHEN L1."Status" = 99
+             THEN 0
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduAmt"
            ELSE L1."DrawdownAmt" END
                                 AS "RvAmt"            -- 起帳總額
           ,CASE
+             WHEN L1."Status" = 99
+             THEN 0
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduBal"
            ELSE L1."LoanBal" END
                                 AS "RvBal"            -- 未銷餘額
           ,CASE
+             WHEN L1."Status" = 99
+             THEN 0
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduBal"
            ELSE L1."LoanBal" END
@@ -92,16 +98,22 @@ BEGIN
              WHEN NVL(ACT."ACTFSC",' ') = 'A' THEN '201' -- 利變A
            ELSE '00A' END       AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
           ,CASE
+             WHEN L1."Status" = 99
+             THEN "TbsDyF"
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduDate"
            ELSE L1."DrawdownDate" END
                                 AS "OpenAcDate"       -- 起帳日期
           ,CASE
+             WHEN L1."Status" = 99
+             THEN "TbsDyF"
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."AcDate"
            ELSE L1."LastEntDy" END
                                 AS "LastAcDate"       -- 最後作帳日
           ,CASE
+             WHEN L1."Status" = 99
+             THEN "TbsDyF"
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."AcDate"
            ELSE L1."LastEntDy" END
@@ -127,7 +139,7 @@ BEGIN
     LEFT JOIN "LA$ACTP" ACT ON ACT."LMSACN" = F1."CustNo"
     WHERE F1."LastBormNo" >= 1
       AND NVL(NVL(L2."OvduNo",L1."BormNo"),0) > 0
-      AND L1."Status" != 99 -- 排除預約撥款
+      -- AND L1."Status" != 99 -- 排除預約撥款
     ;
 
     -- 記錄寫入筆數
@@ -546,47 +558,6 @@ BEGIN
     WHERE S1."Seq" = 1
       AND S1."LMSTOA" > 0
     ;
-
-    -- 記錄寫入筆數
-    INS_CNT := INS_CNT + sql%rowcount;
-
-    -- T10 : 債協暫收款-收款專戶
-    -- INSERT INTO "AcReceivable"
-    -- SELECT 'T10'               AS "AcctCode"         -- 業務科目代號
-    --       ,601776              AS "CustNo"           -- 戶號
-    --       ,0                   AS "FacmNo"           -- 額度編號
-    --       ,' '                 AS "RvNo"             -- 銷帳編號
-    --       ,S2."AcNoCode"       AS "AcNoCode"         -- 科目代號
-    --       ,S2."AcSubCode"      AS "AcSubCode"        -- 子目代號
-    --       ,S2."AcDtlCode"      AS "AcDtlCode"        -- 細目代號
-    --       ,'0000'              AS "BranchNo"         -- 單位別
-    --       ,'TWD'               AS "CurrencyCode"     -- 幣別
-    --       ,0                   AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
-    --       ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
-    --       ,2                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
-    --       ,S1."LORAMT"         AS "RvAmt"            -- 起帳總額
-    --       ,S1."LORAMT"         AS "RvBal"            -- 未銷餘額
-    --       ,S1."LORAMT"         AS "AcBal"            -- 會計日餘額
-    --       ,''                  AS "SlipNote"         -- 傳票摘要
-    --       ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
-    --       ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
-    --       ,0                   AS "OpenAcDate"       -- 起帳日期
-    --       ,0                   AS "LastAcDate"       -- 最後作帳日
-    --       ,0                   AS "LastTxDate"       -- 最後交易日
-    --       ,''                  AS "TitaTxCd"         -- 交易代號
-    --       ,''                  AS "TitaKinBr"        -- 
-    --       ,''                  AS "TitaTlrNo"        -- 經辦
-    --       ,0                   AS "TitaTxtNo"        -- 交易序號
-    --       ,''                  AS "JsonFields"       -- jason格式紀錄
-    --       ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-    --       ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-    --       ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    --       ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
-    -- FROM (SELECT SUM("LORAMT") AS "LORAMT"
-    --       FROM "LN$LORP"
-    --       GROUP BY "TRXIDT") S1
-    -- LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = 'T10'
-    -- ;
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;

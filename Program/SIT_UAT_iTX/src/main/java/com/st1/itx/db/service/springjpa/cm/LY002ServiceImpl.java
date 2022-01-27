@@ -72,7 +72,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,MFB.\"AssetClass\" AS F20";
 		sql += "		  ,MLB.\"FacmNo\" AS F21";
 		sql += "		  ,MLB.\"ClNo\" AS F22";
-
+		sql += "		  ,MLB.\"BormNo\" AS F23";
 		sql += "	FROM \"MonthlyLoanBal\" MLB";
 		sql += "	LEFT JOIN \"MonthlyFacBal\" MFB ON MFB.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "								   AND MFB.\"FacmNo\" = MLB.\"FacmNo\"";

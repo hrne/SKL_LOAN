@@ -62,7 +62,8 @@ public class LY002Report extends MakeReport {
 			this.info("LY002ServiceImpl.exportExcel error = " + errors.toString());
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表", "LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表",
+				"LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
 
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
@@ -114,6 +115,7 @@ public class LY002Report extends MakeReport {
 
 		String custNo = "";
 		String facmNo = "";
+		String bormNo = "";
 		String clNo = "";
 
 		for (Map<String, String> tLDVo : lDList) {
@@ -185,6 +187,10 @@ public class LY002Report extends MakeReport {
 			// F22 擔保品號碼
 			clNo = tLDVo.get("F22");
 
+			bormNo = tLDVo.get("F23");
+
+			makeExcel.setValue(row, 1, custNo + facmNo + bormNo, "L");
+
 			// 合併另外做處理
 			checkMergeRegionValue(custNo, facmNo, clNo, tempEvaAmt, tempLineAmt);
 
@@ -209,7 +215,7 @@ public class LY002Report extends MakeReport {
 			makeExcel.setValue(row, 22, 0, "#,##0");
 
 			// F19 應收利息
-			tempLoanAmt = tLDVo.get("F18").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F18"));
+			tempLoanAmt = tLDVo.get("F19").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F19"));
 			makeExcel.setValue(row, 23, tempLoanAmt, "#,##0");
 
 			// F20 資產分類
@@ -347,7 +353,8 @@ public class LY002Report extends MakeReport {
 	 * 
 	 */
 
-	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt, BigDecimal lineAmt) {
+	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt,
+			BigDecimal lineAmt) {
 
 		String tempCustNo = "";
 		String tempFacmNo = "";

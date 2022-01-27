@@ -110,15 +110,18 @@ public class L6907 extends TradeBuffer {
 		Slice<AcReceivable> slAcReceivable = null;
 		// 輸入科子細目
 		if (!iAcNoCode.isEmpty()) {
-			slAcReceivable = sAcReceivableService.acrvClsFlagSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNoStartAt,
-					iCustNoEndAt, this.index, this.limit, titaVo);
+			slAcReceivable = sAcReceivableService.acrvClsFlagSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%",
+					iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNoStartAt, iCustNoEndAt,
+					this.index, this.limit, titaVo);
 
 			// 業務科目有輸入
 		} else if (!iAcctCode.isEmpty()) {
-			slAcReceivable = sAcReceivableService.acctCodeSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%", iAcctCode, iCustNoStartAt, iCustNoEndAt, this.index, this.limit, titaVo);
+			slAcReceivable = sAcReceivableService.acctCodeSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%",
+					iAcctCode, iCustNoStartAt, iCustNoEndAt, this.index, this.limit, titaVo);
 
 		} else {
-			slAcReceivable = sAcReceivableService.acrvFacmNoSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%", iCustNoStartAt, 0, iFacmNo, 999, this.index, this.limit, titaVo);
+			slAcReceivable = sAcReceivableService.acrvFacmNoSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%",
+					iCustNoStartAt, 0, iFacmNo, 999, this.index, this.limit, titaVo);
 		}
 
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
@@ -162,6 +165,7 @@ public class L6907 extends TradeBuffer {
 			occurslist.putParam("OOAcSubCode", tAcReceivable.getAcSubCode());
 			occurslist.putParam("OOAcDtlCode", tAcReceivable.getAcDtlCode());
 
+			occurslist.putParam("OOAcctCode", tAcReceivable.getAcctCode());
 			occurslist.putParam("OOAcctItem", getAcctItem(tAcReceivable, titaVo));
 			occurslist.putParam("OOCustNo", tAcReceivable.getCustNo());
 			occurslist.putParam("OOFacmNo", tAcReceivable.getFacmNo());

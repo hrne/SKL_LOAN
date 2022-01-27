@@ -392,7 +392,7 @@ public class L2R05 extends TradeBuffer {
 //		this.totaVo.putParam("L2r05DuePayLimit", tFacMain.getDuePayLimit());
 //		this.totaVo.putParam("L2r05PayIntLimit", tFacMain.getPayIntLimit());
 		this.totaVo.putParam("L2r05ExtraRepayCode", tFacMain.getExtraRepayCode());
-		this.totaVo.putParam("L2r05CustomerCode", tFacMain.getCustTypeCode());
+		this.totaVo.putParam("L2r05CustTypeCode", tFacMain.getCustTypeCode());
 		this.totaVo.putParam("L2r05RuleCode", tFacMain.getRuleCode());
 		this.totaVo.putParam("L2r05RecycleCode", tFacMain.getRecycleCode());
 		this.totaVo.putParam("L2r05RecycleDeadline", tFacMain.getRecycleDeadline());

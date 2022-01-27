@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_BankDeductDtl_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_BankDeductDtl_Ins" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_Tf_BankDeductDtl_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -25,53 +20,30 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "BankDeductDtl"
-    WITH "TmpAchDeductMedia" AS (
+    WITH "ADM" AS (
       SELECT "MediaDate"
-            ,"MediaKind"
+            ,"MediaSeq"
             ,"CustNo"
             ,"FacmNo"
             ,"RepayType"
-            ,"MediaSeq"
-            ,ROW_NUMBER() OVER (PARTITION BY "MediaDate"
-                                            ,"MediaKind"
-                                            ,"CustNo"
-                                            ,"FacmNo"
-                                            ,"RepayType"
-                                ORDER BY "MediaDate"
-                                        ,"MediaKind"
-                                        ,"CustNo"
-                                        ,"FacmNo"
-                                        ,"RepayType"
-                                        ,"MediaSeq") AS "Seq"
-      FROM "AchDeductMedia"
-    )
-    , "ADM" AS (
-      SELECT "MediaDate"
-            ,"MediaKind"
-            ,"CustNo"
-            ,"FacmNo"
-            ,"RepayType"
-            ,"MediaSeq"
-      FROM "TmpAchDeductMedia"
-      WHERE "Seq" = 1
-    )
-    , "DupData" AS (
-      SELECT "TRXIDT"
-            ,"LMSACN"
-            ,"MBKAPN"
-            ,"LMSLPD"
-            ,"MBKTRX"
-      FROM "LA$MBKP"
-      GROUP BY "TRXIDT"
-              ,"LMSACN"
-              ,"MBKAPN"
-              ,"LMSLPD"
-              ,"MBKTRX"
-      HAVING COUNT(*) >= 2
+            ,"TransDate"
+            ,"RepayAcctNo"
+            ,"RepayAmt"
+            ,"AcDate"
+            ,ROW_NUMBER() OVER (
+                 PARTITION BY "CustNo"
+                            , "FacmNo"
+                            , "RepayType"
+                            , "TransDate"
+                 ORDER BY "MediaDate" desc
+                        , "MediaSeq" desc
+             ) AS "Seq"
+      FROM "PostDeductMedia"
     )
     , rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
       FROM "LA$MBKP" MBK
+      WHERE NVL(MBK.MBKCDE,' ') = 'Y'
     )
     , tmpData AS (
       SELECT "Fn_GetBusinessDate"(LastTRXIDT,-2) AS NewTRXIDT -- 找前二營業日
@@ -133,16 +105,12 @@ BEGIN
     FROM "LA$MBKP" MBK
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
                             AND APLP."LMSAPN" = MBK."MBKAPN"
-    LEFT JOIN "DupData" S2 ON S2."TRXIDT" = MBK."TRXIDT"
-                          AND S2."LMSACN" = MBK."LMSACN"
-                          AND S2."MBKAPN" = MBK."MBKAPN"
-                          AND S2."LMSLPD" = MBK."LMSLPD"
-                          AND S2."MBKTRX" = MBK."MBKTRX"
-    LEFT JOIN "ADM" ADM ON ADM."MediaDate" = MBK."TRXIDT"
-                       AND ADM."MediaKind" = CASE
-                                               WHEN MBK."LMSPBK" = 4 THEN '1'
-                                               WHEN MBK."LMSPBK" = 3 THEN '3'
-                                             ELSE '2' END 
+    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
+    LEFT JOIN "ADM" ADM ON ADM."MediaDate" = CASE
+                                               WHEN NVL(t.LastTRXIDT,0) != 0
+                                               THEN t.NewTRXIDT
+                                             ELSE MBK."TRXIDT"
+                                             END
                        AND ADM."CustNo" = MBK."LMSACN"
                        AND ADM."FacmNo" = MBK."MBKAPN"
                        AND ADM."RepayType" = CASE MBK."MBKTRX"
@@ -151,13 +119,14 @@ BEGIN
                                                WHEN '3' THEN '4' -- 帳管費
                                                WHEN '4' THEN '6' -- 契變手續費
                                              ELSE '0' END
-    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
-    WHERE NVL(S2."TRXIDT",0) = 0
-      AND NVL(S2."LMSACN",0) = 0
-      AND NVL(S2."MBKAPN",0) = 0
-      AND NVL(S2."LMSLPD",0) = 0
-      AND NVL(S2."MBKTRX",0) = 0
-      AND MBK."TRXIDT" >= 20190101
+                       AND ADM."TransDate" = MBK."TRXIDT" 
+                       AND ADM."RepayAcctNo" = LPAD(MBK."LMSPCN",14,'0')
+                       AND ADM."RepayAmt" = MBK."MBKAMT"
+                       AND ADM."AcDate" = MBK."TRXDAT"
+                       AND ADM."Seq" = 1
+    WHERE MBK."TRXIDT" >= 20190101
+      AND MBK."LMSPBK" = '3' -- 只抓郵局
+      AND NVL(MBK.MBKCDE,' ') = 'Y'
     ;
 
     -- 記錄寫入筆數
@@ -165,53 +134,29 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "BankDeductDtl"
-    WITH "TmpAchDeductMedia" AS (
+    WITH "ADM" AS (
       SELECT "MediaDate"
             ,"MediaKind"
             ,"CustNo"
             ,"FacmNo"
             ,"RepayType"
+            ,"RepayAmt"
+            ,"RepayAcctNo"
             ,"MediaSeq"
-            ,ROW_NUMBER() OVER (PARTITION BY "MediaDate"
-                                            ,"MediaKind"
-                                            ,"CustNo"
-                                            ,"FacmNo"
-                                            ,"RepayType"
-                                ORDER BY "MediaDate"
-                                        ,"MediaKind"
-                                        ,"CustNo"
-                                        ,"FacmNo"
-                                        ,"RepayType"
-                                        ,"MediaSeq") AS "Seq"
+            ,ROW_NUMBER() OVER (
+                 PARTITION BY "CustNo"
+                            , "FacmNo"
+                            , "RepayType"
+                 ORDER BY "MediaDate" desc
+                        , "MediaKind"
+                        , "MediaSeq" desc
+             ) AS "Seq"
       FROM "AchDeductMedia"
-    )
-    , "ADM" AS (
-      SELECT "MediaDate"
-            ,"MediaKind"
-            ,"CustNo"
-            ,"FacmNo"
-            ,"RepayType"
-            ,"MediaSeq"
-      FROM "TmpAchDeductMedia"
-      WHERE "Seq" = 1
-    )
-    , "DupData" AS (
-      SELECT "TRXIDT"
-            ,"LMSACN"
-            ,"MBKAPN"
-            ,"LMSLPD"
-            ,"MAKTRX"
-      FROM "AH$MBKP"
-      GROUP BY "TRXIDT"
-              ,"LMSACN"
-              ,"MBKAPN"
-              ,"LMSLPD"
-              ,"MAKTRX"
-      HAVING COUNT(*) >= 2
     )
     , rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
       FROM "AH$MBKP" MBK
+      WHERE NVL(MBK.MBKCDE,' ') = 'Y'
     )
     , tmpData AS (
       SELECT "Fn_GetBusinessDate"(LastTRXIDT,-2) AS NewTRXIDT -- 找前二營業日
@@ -278,12 +223,12 @@ BEGIN
     FROM "AH$MBKP" MBK
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
                             AND APLP."LMSAPN" = MBK."MBKAPN"
-    LEFT JOIN "DupData" S2 ON S2."TRXIDT" = MBK."TRXIDT"
-                         AND S2."LMSACN" = MBK."LMSACN"
-                         AND S2."MBKAPN" = MBK."MBKAPN"
-                         AND S2."LMSLPD" = MBK."LMSLPD"
-                         AND S2."MAKTRX" = MBK."MAKTRX"
-    LEFT JOIN "ADM" ADM ON ADM."MediaDate" = MBK."TRXIDT"
+    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
+    LEFT JOIN "ADM" ADM ON ADM."MediaDate" = CASE
+                                               WHEN NVL(t.LastTRXIDT,0) != 0
+                                               THEN t.NewTRXIDT
+                                             ELSE MBK."TRXIDT"
+                                             END
                        AND ADM."MediaKind" = CASE
                                                WHEN MBK."LMSPBK" = 4 THEN '1'
                                                WHEN MBK."LMSPBK" = 3 THEN '3'
@@ -296,24 +241,11 @@ BEGIN
                                                WHEN '3' THEN '1' -- 期款
                                                WHEN '4' THEN '6' -- 契變手續費
                                              ELSE '0' END
-    LEFT JOIN "BankDeductDtl" BDD ON BDD."EntryDate" = MBK."TRXIDT" 
-                                 AND BDD."CustNo" = MBK."LMSACN" 
-                                 AND BDD."FacmNo" = MBK."MBKAPN" 
-                                 AND BDD."RepayType" = CASE MBK."MAKTRX"
-                                                         WHEN '1' THEN '5' -- 保險費
-                                                         WHEN '2' THEN '4' -- 帳管費
-                                                         WHEN '3' THEN '1' -- 期款
-                                                         WHEN '4' THEN '6' -- 契變手續費
-                                                       ELSE '0' END
-                                 AND BDD."PayIntDate" = MBK."LMSLPD" 
-    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
-    WHERE NVL(S2."TRXIDT",0) = 0
-      AND NVL(S2."LMSACN",0) = 0
-      AND NVL(S2."MBKAPN",0) = 0
-      AND NVL(S2."LMSLPD",0) = 0
-      AND NVL(S2."MAKTRX",0) = 0
-      AND NVL(BDD."EntryDate",0) = 0
-      AND MBK."TRXIDT" >= 20190101
+                       AND ADM."RepayAmt" = MBK."MBKAMT"
+                       AND ADM."RepayAcctNo" = MBK."LMSPCN"
+                       AND ADM."Seq" = 1
+    WHERE MBK."TRXIDT" >= 20190101
+      AND NVL(MBK.MBKCDE,' ') = 'Y'
     ;
 
     -- 記錄寫入筆數
@@ -329,8 +261,3 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_BankDeductDtl_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-
-/

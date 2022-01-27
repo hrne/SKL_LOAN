@@ -1400,9 +1400,8 @@ public class L8403File extends MakeFile {
 					String iLastPayAmt = String.valueOf(sJcicZ043.getLastPayAmt()); // 最後繳款金額
 					String iOutstandAmt = String.valueOf(sJcicZ043.getOutstandAmt()); // 已到期尚未償還金額
 					String iRepayPerMonday = String.valueOf(sJcicZ043.getRepayPerMonDay()); // 每月應還款日
-					String iContractStartYM = String.valueOf(sJcicZ043.getContractStartYM()); // 契約起始年月
-					String iContractEndYM = String.valueOf(sJcicZ043.getContractEndYM()); // 契約截止年月
-
+					String iContractStartYM = FormateYM(sJcicZ043.getContractStartYM()); // 契約起始年月									
+					String iContractEndYM = FormateYM(sJcicZ043.getContractEndYM()) ;// 契約截止年月
 					BigDecimal ixOriginLoanAmt = new BigDecimal(iOriginLoanAmt);
 					BigDecimal ixCreditBalance = new BigDecimal(iCreditBalance);
 					BigDecimal ixPerPeriordAmt = new BigDecimal(iPerPeriordAmt);
@@ -1485,11 +1484,11 @@ public class L8403File extends MakeFile {
 					int ixMonthPayAmt = Integer.valueOf(sJcicZ044.getMonthPayAmt());
 					String iReceYearIncome = String.valueOf(sJcicZ044.getReceYearIncome());
 					int ixReceYearIncome = Integer.valueOf(sJcicZ044.getReceYearIncome());
-					String iReceYear = String.valueOf(sJcicZ044.getReceYear());
+					String iReceYear = FormateYear(sJcicZ044.getReceYear());
 					int ixReceYear = Integer.valueOf(sJcicZ044.getReceYear());
 					String iReceYear2Income = String.valueOf(sJcicZ044.getReceYear2Income());
 					int ixReceYear2Income = Integer.valueOf(sJcicZ044.getReceYear2Income());
-					String iReceYear2 = String.valueOf(sJcicZ044.getReceYear2());
+					String iReceYear2 = FormateYear(sJcicZ044.getReceYear2());
 					int ixReceYear2 = Integer.valueOf(sJcicZ044.getReceYear2());
 					String iCurrentMonthIncome = String.valueOf(sJcicZ044.getCurrentMonthIncome());
 					int ixCurrentMonthIncome = Integer.valueOf(sJcicZ044.getCurrentMonthIncome());
@@ -1521,8 +1520,21 @@ public class L8403File extends MakeFile {
 					String iPayLastAmt = String.valueOf(sJcicZ044.getPayLastAmt());
 					int ixPayLastAmt = Integer.valueOf(sJcicZ044.getPayLastAmt());
 					String iPeriod2 = String.valueOf(sJcicZ044.getPeriod2());
+					String outPeriod2 = "";
+					if (iPeriod2.equals("0")) {
+						outPeriod2 = StringUtils.leftPad(outPeriod2,3," ");
+					}else {
+						outPeriod2 = StringUtils.leftPad(iPeriod2, 3, '0');
+					}
+					
 					int ixPeriod2 = Integer.valueOf(sJcicZ044.getMouthCnt());
 					String iRate2 = String.valueOf(sJcicZ044.getRate2());
+					String outRate2 = "";
+					if (iRate2.equals("0")) {
+						outRate2 = StringUtils.leftPad(outRate2,5," ");
+					}else {
+						outRate2 = StringUtils.leftPad(FormatRate(iRate2, 2), 5, '0');
+					}
 					BigDecimal ixRate2 = sJcicZ044.getRate2();
 					String iMonthPayAmt2 = String.valueOf(sJcicZ044.getMonthPayAmt2());
 					int ixMonthPayAmt2 = Integer.valueOf(sJcicZ044.getMonthPayAmt2());
@@ -1531,15 +1543,15 @@ public class L8403File extends MakeFile {
 					String iUkey = sJcicZ044.getUkey();
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "44" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
-							+ iDebtCode + StringUtils.leftPad(iNonGageAmt, 9, '0') + StringUtils.rightPad(iPeriod, 3, "")
+							+ iDebtCode + StringUtils.leftPad(iNonGageAmt, 9, '0') + StringUtils.rightPad(iPeriod, 3, "0")
 							+ StringUtils.leftPad(FormatRate(iRate, 2), 5, '0') + StringUtils.leftPad(iMonthPayAmt, 9, '0') + StringUtils.rightPad("", 10)
 							+ StringUtils.leftPad(iReceYearIncome, 9, '0') + StringUtils.leftPad(iReceYear, 3, '0') + StringUtils.leftPad(iReceYear2Income, 9, '0')
 							+ StringUtils.leftPad(iReceYear2, 3, '0') + StringUtils.leftPad(iCurrentMonthIncome, 9, '0') + StringUtils.leftPad(iLivingCost, 9, '0')
 							+ iCompName + iCompId + StringUtils.rightPad("", 10) + StringUtils.leftPad(iCarCnt, 2, '0')
 							+ StringUtils.leftPad(iHouseCnt, 2, '0') + StringUtils.leftPad(iLandCnt, 2, '0') + StringUtils.leftPad(iChildCnt, 2, '0')
-							+ StringUtils.leftPad(FormatRate(iChildRate, 1), 5, '0') + StringUtils.leftPad(iParentCnt, 2, '0') + StringUtils.leftPad(FormatRate(iParentRate, 1), 5, '0')
-							+ StringUtils.leftPad(iMouthCnt, 2, '0') + StringUtils.leftPad(FormatRate(iMouthRate, 1), 5, '0') + StringUtils.rightPad(iGradeType, 1, "")
-							+ StringUtils.leftPad(iPayLastAmt, 9, '0') + StringUtils.leftPad(iPeriod2, 3, '0') + StringUtils.leftPad(FormatRate(iRate2, 2), 5, '0')
+							+ StringUtils.leftPad(FormatRate2(iChildRate, 1), 5, '0') + StringUtils.leftPad(iParentCnt, 2, '0') + StringUtils.leftPad(FormatRate2(iParentRate, 1), 5, '0')
+							+ StringUtils.leftPad(iMouthCnt, 2, '0') + StringUtils.leftPad(FormatRate2(iMouthRate, 1), 5, '0') + StringUtils.rightPad(iGradeType, 1, "")
+							+ StringUtils.leftPad(iPayLastAmt, 9, '0') + outPeriod2 + outRate2
 							+ StringUtils.leftPad(iMonthPayAmt2, 9, '0') + StringUtils.leftPad(iPayLastAmt2, 9, '0') + StringUtils.rightPad("", 21);
 					this.put(text);
 
@@ -1760,8 +1772,20 @@ public class L8403File extends MakeFile {
 					String iPayLastAmt = String.valueOf(sJcicZ047.getPayLastAmt());
 					int ixPayLastAmt = Integer.valueOf(sJcicZ047.getPayLastAmt());
 					String iPeriod2 = String.valueOf(sJcicZ047.getPeriod2());
+					String outPeriod2 = "";
+					if (iPeriod2.equals("0")) {
+						outPeriod2 = StringUtils.leftPad(outPeriod2,3," ");
+					}else {
+						outPeriod2 = StringUtils.leftPad(iPeriod2, 3, '0');
+					}
 					int ixPeriod2 = Integer.valueOf(sJcicZ047.getPayLastAmt());
 					String iRate2 = String.valueOf(sJcicZ047.getRate2());
+					String outRate2 = "";
+					if (iRate2.equals("0")) {
+						outRate2 = StringUtils.leftPad(outRate2,5," ");
+					}else {
+						outRate2 = StringUtils.leftPad(FormatRate(iRate2, 2), 5, '0');
+					}
 					BigDecimal ixRate2 = sJcicZ047.getRate2();
 					String iMonthPayAmt2 = String.valueOf(sJcicZ047.getMonthPayAmt2());
 					int ixMonthPayAmt2 = Integer.valueOf(sJcicZ047.getMonthPayAmt2());
@@ -1777,7 +1801,7 @@ public class L8403File extends MakeFile {
 							+ StringUtils.leftPad(iTotalAmt, 10, '0') + StringUtils.leftPad(iPassDate, 7, '0') + StringUtils.leftPad(iInterviewDate, 7, "") + StringUtils.leftPad(iSignDate, 7, "")
 							+ StringUtils.leftPad(iLimitDate, 7, '0') + StringUtils.leftPad(iFirstPayDate, 7, '0') + StringUtils.leftPad(iMonthPayAmt, 9, '0')
 							+ StringUtils.rightPad(iPayAccount, 20, "") + nPostAddr + StringUtils.rightPad(iGradeType, 1, "") + StringUtils.leftPad(iPayLastAmt, 9, '0')
-							+ StringUtils.leftPad(iPeriod2, 3, '0') + StringUtils.leftPad(FormatRate(iRate2, 2), 5, '0') + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
+							+ outPeriod2 + outRate2 + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
 							+ StringUtils.leftPad(iPayLastAmt2, 9, '0') + StringUtils.rightPad("", 14);
 					this.put(text);
 
@@ -1984,7 +2008,7 @@ public class L8403File extends MakeFile {
 					String iSumRepayActualAmt = String.valueOf(sJcicZ050.getSumRepayActualAmt());
 					String iSumRepayShouldAmt = String.valueOf(sJcicZ050.getSumRepayShouldAmt());
 					String iStatus = sJcicZ050.getStatus();
-					String iSecondRepayYM = String.valueOf(sJcicZ050.getSecondRepayYM()-191100);
+					String iSecondRepayYM = FormateYM(sJcicZ050.getSecondRepayYM());
 					int ixSecondRepayYM = Integer.valueOf(sJcicZ050.getSecondRepayYM());
 					int ixPayAmt = Integer.valueOf(sJcicZ050.getPayAmt());
 					int ixSumRepayActualAmt = Integer.valueOf(sJcicZ050.getSumRepayActualAmt());
@@ -2044,7 +2068,7 @@ public class L8403File extends MakeFile {
 					iCustId = FormatUtil.padX(iCustId, 10);
 					String iRcDate = String.valueOf(sJcicZ051.getRcDate());
 					String iDelayCode = sJcicZ051.getDelayCode();
-					String iDelayYM = String.valueOf(sJcicZ051.getDelayYM());
+					String iDelayYM = FormateYM(sJcicZ051.getDelayYM());
 					String iDelayDesc = sJcicZ051.getDelayDesc();
 					String nDelayDesc = FormatUtil.padX(iDelayDesc, 40);
 					String iUkey = sJcicZ051.getUkey();
@@ -2475,11 +2499,11 @@ public class L8403File extends MakeFile {
 					iCustId = FormatUtil.padX(iCustId, 10);
 					String iRcDate = String.valueOf(sJcicZ060.getRcDate());
 					String iChangePayDate = String.valueOf(sJcicZ060.getChangePayDate());
-					int iYM = Integer.valueOf(sJcicZ060.getYM())-191100;
+					String iYM = FormateYM(sJcicZ060.getYM());
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String iUkey = sJcicZ060.getUkey();
 					String text = "60" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
-							+ StringUtils.leftPad(iChangePayDate, 7, '0') + StringUtils.leftPad(String.valueOf(iYM), 5, '0') + StringUtils.rightPad("", 30);
+							+ StringUtils.leftPad(iChangePayDate, 7, '0') + StringUtils.leftPad(iYM, 5, '0') + StringUtils.rightPad("", 30);
 					this.put(text);
 
 					// 檔案產生後，回填JcicDate
@@ -2496,7 +2520,7 @@ public class L8403File extends MakeFile {
 					iJcicZ060LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ060LogId.setUkey(iUkey);
 					iJcicZ060Log.setJcicZ060LogId(iJcicZ060LogId);
-					iJcicZ060Log.setYM(iYM+191100);
+					iJcicZ060Log.setYM(Integer.valueOf(iYM)+191100);
 					iJcicZ060Log.setTranKey(iTranKey);
 					iJcicZ060Log.setOutJcicTxtDate(iDate);
 
@@ -2622,8 +2646,20 @@ public class L8403File extends MakeFile {
 					int ixMonthPayAmt = Integer.valueOf(sJcicZ062.getMonthPayAmt());
 					String iGradeType = String.valueOf(sJcicZ062.getGradeType());
 					String iPeriod2 = String.valueOf(sJcicZ062.getPeriod());
+					String outPeriod2 = "";
+					if (iPeriod2.equals("0")) {
+						outPeriod2 = StringUtils.leftPad(outPeriod2,3," ");
+					}else {
+						outPeriod2 = StringUtils.leftPad(iPeriod2, 3, '0');
+					}
 					int ixPeriod2 = Integer.valueOf(sJcicZ062.getPeriod());
 					String iRate2 = String.valueOf(sJcicZ062.getRate2());
+					String outRate2 = "";
+					if (iRate2.equals("0")) {
+						outRate2 = StringUtils.leftPad(outRate2,5," ");
+					}else {
+						outRate2 = StringUtils.leftPad(FormatRate(iRate2, 2), 5, '0');
+					}
 					BigDecimal ixRate2 = sJcicZ062.getRate2();
 					String iMonthPayAmt2 = String.valueOf(sJcicZ062.getMonthPayAmt2());
 					int ixMonthPayAmt2 = Integer.valueOf(sJcicZ062.getMonthPayAmt2());
@@ -2636,7 +2672,7 @@ public class L8403File extends MakeFile {
 							+ StringUtils.leftPad(iCreditBalanceAmt, 9, '0') + StringUtils.leftPad(iChaRepayAmt, 10, '0') + StringUtils.leftPad(iChaRepayAgreeDate, 7, '0')
 							+ StringUtils.leftPad(iChaRepayViewDate, 7, '0') + StringUtils.leftPad(iChaRepayEndDate, 7, '0') + StringUtils.leftPad(iChaRepayFirstDate, 7, '0')
 							+ StringUtils.rightPad(iPayAccount, 20, "") + iPostAddr + StringUtils.leftPad(iMonthPayAmt, 9, '0') + StringUtils.rightPad(iGradeType, 1, "")
-							+ StringUtils.leftPad(iPeriod2, 3, '0') + StringUtils.leftPad(FormatRate(iRate2, 2), 5, '0') + StringUtils.leftPad(iMonthPayAmt2, 9, '0') + StringUtils.rightPad("", 66);
+							+ outPeriod2 + outRate2 + StringUtils.leftPad(iMonthPayAmt2, 9, '0') + StringUtils.rightPad("", 66);
 					this.put(text);
 
 					// 檔案產生後，回填JcicDate
@@ -2996,9 +3032,9 @@ public class L8403File extends MakeFile {
 					int iMothPayDay = Integer.valueOf(sJcicZ443.getMothPayDay());
 					String ixMothPayDay = String.valueOf(sJcicZ443.getMothPayDay());
 					int iBeginDate = Integer.valueOf(sJcicZ443.getBeginDate())-191100;
-					String ixBeginDate = String.valueOf(sJcicZ443.getBeginDate());
+					String ixBeginDate = FormateYM(sJcicZ443.getBeginDate());
 					int iEndDate = Integer.valueOf(sJcicZ443.getEndDate())-191100;
-					String ixEndDate = String.valueOf(sJcicZ443.getEndDate());
+					String ixEndDate = FormateYM(sJcicZ443.getEndDate());
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String iUkey = sJcicZ443.getUkey();
 					String text = "443" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iApplyDate, 7, '0') + StringUtils.rightPad(iCourtCode, 3, "")
@@ -3390,7 +3426,7 @@ public class L8403File extends MakeFile {
 					iCustId = FormatUtil.padX(iCustId, 10);
 					String iApplyDate = String.valueOf(sJcicZ451.getApplyDate());
 					String iCourtCode = sJcicZ451.getCourtCode();
-					String iDelayYM = String.valueOf(sJcicZ451.getDelayYM()-191100);
+					String iDelayYM = FormateYM(sJcicZ451.getDelayYM());
 					String iDelayCode = sJcicZ451.getDelayCode();
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String iUkey = sJcicZ451.getUkey();
@@ -3900,5 +3936,38 @@ public class L8403File extends MakeFile {
 			formatRate = StringUtils.substringBefore(iRate, ".") + "." + StringUtils.rightPad(StringUtils.substringAfter(iRate, "."), decimal, "0");
 		}
 		return formatRate;
+	}
+	
+	private String FormatRate2(String iRate, int decimal) {
+		String formatRate = "";
+		int indexPoint = iRate.indexOf(".");
+		if (indexPoint == -1) {
+			formatRate = iRate + ".0";
+		} else {
+			formatRate = StringUtils.substringBefore(iRate, ".") + "." + StringUtils.rightPad(StringUtils.substringAfter(iRate, "."), decimal, "0");
+		}
+		return formatRate;
+	}
+	
+	private String FormateYM(int YM) {
+		
+		String reYm = "";
+		if (YM == 0) {
+			reYm = String.valueOf(YM);
+		}else {
+			reYm = String.valueOf(YM-191100);
+		}
+		return reYm;
+	}
+	
+	private String FormateYear(int Year) {
+	
+		String reYear = "";
+		if (Year == 0) {
+			reYear = String.valueOf(Year);
+		}else {
+			reYear = String.valueOf(Year-1911);
+		}
+		return reYear;
 	}
 }

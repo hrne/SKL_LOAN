@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_AchDeductMedia_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_AchDeductMedia_Ins" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_Tf_AchDeductMedia_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -28,6 +23,7 @@ BEGIN
     WITH rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
       FROM "AH$MBKP" MBK
+      WHERE NVL(MBK.MBKCDE,' ') = 'Y'
     )
     , tmpData AS (
       SELECT "Fn_GetBusinessDate"(LastTRXIDT,-2) AS NewTRXIDT -- 找前二營業日
@@ -37,64 +33,70 @@ BEGIN
     SELECT CASE
              WHEN NVL(t.LastTRXIDT,0) != 0
              THEN t.NewTRXIDT
-           ELSE "AH$MBKP"."TRXIDT"
+           ELSE MBK."TRXIDT"
            END                            AS "MediaDate"           -- 媒體日期 DECIMAL 8 
           ,CASE
-             WHEN "AH$MBKP"."LMSPBK" = 4 THEN '1'
-             WHEN "AH$MBKP"."LMSPBK" = 3 THEN '3'
+             WHEN MBK."LMSPBK" = 4 THEN '1'
+             WHEN MBK."LMSPBK" = 3 THEN '3'
            ELSE '2' END                   AS "MediaKind"           -- 媒體別 VARCHAR2 1 
-          ,ROW_NUMBER() OVER (PARTITION BY "AH$MBKP"."TRXIDT"
+          ,ROW_NUMBER() OVER (PARTITION BY CASE
+                                             WHEN NVL(t.LastTRXIDT,0) != 0
+                                             THEN t.NewTRXIDT
+                                           ELSE MBK."TRXIDT"
+                                           END 
                                           ,CASE
-                                             WHEN "AH$MBKP"."LMSPBK" = 4 THEN '1'
-                                             WHEN "AH$MBKP"."LMSPBK" = 3 THEN '3'
+                                             WHEN MBK."LMSPBK" = 4 THEN '1'
+                                             WHEN MBK."LMSPBK" = 3 THEN '3'
                                            ELSE '2' END
-                              ORDER BY "AH$MBKP"."LMSACN"
-                                      ,"AH$MBKP"."MBKAPN"
-                                      ,"AH$MBKP"."LMSPCN"
-                                      ,"AH$MBKP"."TRXIDT"
-                                      ,"AH$MBKP"."TRXISD"
-                                      ,"AH$MBKP"."TRXIED"
-                                      ,"AH$MBKP"."ACTACT"
-                                      ,"AH$MBKP"."MBKAMT")
+                              ORDER BY MBK."LMSACN"
+                                      ,MBK."MBKAPN"
+                                      ,MBK."LMSPCN"
+                                      ,MBK."TRXIDT"
+                                      ,MBK."TRXISD"
+                                      ,MBK."TRXIED"
+                                      ,MBK."ACTACT"
+                                      ,MBK."MBKAMT")
                                           AS "MediaSeq"            -- 媒體序號 DECIMAL 6 
-          ,"AH$MBKP"."LMSACN"             AS "CustNo"              -- 戶號 DECIMAL 7 
-          ,"AH$MBKP"."MBKAPN"             AS "FacmNo"              -- 額度號碼 DECIMAL 3 
-          ,CASE "AH$MBKP"."MAKTRX"
+          ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 
+          ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度號碼 DECIMAL 3 
+          ,CASE MBK."MAKTRX"
              WHEN '1' THEN '5' -- 火險費
              WHEN '2' THEN '4' -- 帳管費
              WHEN '3' THEN '1' -- 期款
              WHEN '4' THEN '6' -- 契變手續費
            ELSE '0' END                   AS "RepayType"           -- 還款類別 DECIMAL 2 
-          ,"AH$MBKP"."MBKAMT"             AS "RepayAmt"            -- 扣款金額,還款金額 DECIMAL 14 
-          ,"AH$MBKP"."MBKRSN"             AS "ReturnCode"          -- 退件理由代號 VARCHAR2 2 
-          ,"AH$MBKP"."TRXIDT"             AS "EntryDate"           -- 入帳日期 DECIMAL 8 
-          ,"AH$MBKP"."LMSLPD"             AS "PrevIntDate"         -- 繳息迄日 DECIMAL 8 
-          ,"AH$MBKP"."LMSPBK"             AS "RepayBank"           -- 扣款銀行 VARCHAR2 3 
-          ,"AH$MBKP"."LMSPCN"             AS "RepayAcctNo"         -- 扣款帳號 VARCHAR2 14 
-          ,"AH$MBKP"."MAKTRX"             AS "AchRepayCode"        -- 入帳扣款別 VARCHAR2 1 
-          ,"AH$MBKP"."ACTACT"             AS "AcctCode"            -- 科目 VARCHAR2 3 
-          ,"AH$MBKP"."TRXISD"             AS "IntStartDate"        -- 計息起日 DECIMAL 8 
-          ,"AH$MBKP"."TRXIED"             AS "IntEndDate"          -- 計息迄日 DECIMAL 8 
-          ,"AH$MBKP"."DPSATC"             AS "DepCode"             -- 存摺代號 VARCHAR2 2 
-          ,"AH$MBKP"."LMSPRL"             AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
-          ,"AH$MBKP"."LMSPAN"             AS "RelCustName"         -- 帳戶戶名 NVARCHAR2 100 
-          ,"AH$MBKP"."LMSPID"             AS "RelCustId"           -- 身分證字號 VARCHAR2 10 
-          ,"AH$MBKP"."TRXDAT"             AS "AcDate"              -- 會計日期 DECIMAL 8 
+          ,MBK."MBKAMT"                   AS "RepayAmt"            -- 扣款金額,還款金額 DECIMAL 14 
+          ,MBK."MBKRSN"                   AS "ReturnCode"          -- 退件理由代號 VARCHAR2 2 
+          ,MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 DECIMAL 8 
+          ,MBK."LMSLPD"                   AS "PrevIntDate"         -- 繳息迄日 DECIMAL 8 
+          ,MBK."LMSPBK"                   AS "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+          ,MBK."LMSPCN"                   AS "RepayAcctNo"         -- 扣款帳號 VARCHAR2 14 
+          ,MBK."MAKTRX"                   AS "AchRepayCode"        -- 入帳扣款別 VARCHAR2 1 
+          ,MBK."ACTACT"                   AS "AcctCode"            -- 科目 VARCHAR2 3 
+          ,MBK."TRXISD"                   AS "IntStartDate"        -- 計息起日 DECIMAL 8 
+          ,MBK."TRXIED"                   AS "IntEndDate"          -- 計息迄日 DECIMAL 8 
+          ,MBK."DPSATC"                   AS "DepCode"             -- 存摺代號 VARCHAR2 2 
+          ,MBK."LMSPRL"                   AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+          ,MBK."LMSPAN"                   AS "RelCustName"         -- 帳戶戶名 NVARCHAR2 100 
+          ,MBK."LMSPID"                   AS "RelCustId"           -- 身分證字號 VARCHAR2 10 
+          ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 DECIMAL 8 
           ,CASE
-             WHEN NVL("AH$MBKP"."MBKRSN",' ') != ' '
+             WHEN NVL(MBK."MBKRSN",' ') != ' '
              THEN 'BATX01'
            ELSE '' END                    AS "BatchNo"             -- 批號 VARCHAR2 6 
           ,CASE
-             WHEN NVL("AH$MBKP"."MBKRSN",' ') != ' '
-             THEN ROW_NUMBER() OVER (PARTITION BY "AH$MBKP"."TRXIDT"
-                                     ORDER BY "AH$MBKP"."LMSACN","AH$MBKP"."MBKAPN")
+             WHEN NVL(MBK."MBKRSN",' ') != ' '
+             THEN ROW_NUMBER() OVER (PARTITION BY MBK."TRXIDT"
+                                     ORDER BY MBK."LMSACN",MBK."MBKAPN")
            ELSE 0 END                     AS "DetailSeq"           -- 明細序號 DECIMAL 6 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM "AH$MBKP"
-    LEFT JOIN tmpData t on t.LastTRXIDT = "AH$MBKP"."TRXIDT"
+    FROM "AH$MBKP" MBK
+    LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
+    WHERE MBK."TRXIDT" >= 20190101
+      AND NVL(MBK.MBKCDE,' ') = 'Y'
     ;
 
     -- 記錄寫入筆數
@@ -111,6 +113,3 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_AchDeductMedia_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-/

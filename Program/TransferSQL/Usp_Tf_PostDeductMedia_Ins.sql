@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_PostDeductMedia_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_PostDeductMedia_Ins" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_Tf_PostDeductMedia_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -29,6 +24,7 @@ BEGIN
       SELECT MAX(TRXIDT) AS LastTRXIDT
       FROM "LA$MBKP" MBK
       WHERE MBK."LMSPBK" = '3' -- 只抓郵局
+        AND NVL(MBK.MBKCDE,' ') = 'Y'
     )
     , tmpData AS (
       SELECT "Fn_GetBusinessDate"(LastTRXIDT,-2) AS NewTRXIDT -- 找前二營業日
@@ -40,7 +36,11 @@ BEGIN
              THEN t.NewTRXIDT
            ELSE MBK."TRXIDT"
            END                            AS "MediaDate"           -- 媒體日期 DECIMAL 8 
-          ,ROW_NUMBER() OVER (PARTITION BY MBK."TRXIDT"
+          ,ROW_NUMBER() OVER (PARTITION BY CASE
+                                             WHEN NVL(t.LastTRXIDT,0) != 0
+                                             THEN t.NewTRXIDT
+                                           ELSE MBK."TRXIDT"
+                                           END
                               ORDER BY MBK."LMSACN"
                                       ,MBK."MBKAPN"
                                       ,MBK."LMSPCN"
@@ -81,11 +81,12 @@ BEGIN
            END                            AS "DistCode"            -- 區處代號 VARCHAR 4
           ,MBK."TRXIDT"                   AS "TransDate"           -- 轉帳日期 DECIMAL 8
           ,LPAD(MBK."LMSPCN",14,'0')      AS "RepayAcctNo"         -- 儲金帳號 VARCHAR2 14 0
-          ,LPAD(NVL(MBK."LMSPID",NVL(CUSP."CUSID1",' ')) || APLP."POSCDE" || LPAD(MBK."LMSACN",7,'0'),20,' ')
+          ,LPAD(NVL(MBK."LMSPID",NVL(CUSP.CUSID1,' ')) || APLP."POSCDE" || LPAD(MBK."LMSACN",7,'0'),20,' ')
                                           AS "PostUserNo"          -- 用戶編號 VARCHAR2 20 0 右靠左補空，大寫英數字，不得填寫中文(扣款人ID+郵局存款別(POSCDE)+戶號)預計補2位帳號碼
-          ,LPAD(MBK."TRXIED",8,'0')
-           || LPAD(MBK."MBKAPN",3,'0')
-           || LPAD(MBK."MBKTRX",1,'0')    AS "OutsrcRemark"        -- 委託機構使用欄 NVARCHAR2 20 預計為計息迄日+額度編號+入帳扣款別
+          ,RPAD(LPAD(MBK."TRXIED",8,'0')
+                || LPAD(MBK."MBKAPN",3,'0')
+                || LPAD(MBK."MBKTRX",1,'0')
+               ,20,' ')                   AS "OutsrcRemark"        -- 委託機構使用欄 NVARCHAR2 20 預計為計息迄日+額度編號+入帳扣款別
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 DECIMAL 8 
           ,CASE
              WHEN NVL(MBK."MBKRSN",' ') != ' '
@@ -115,6 +116,7 @@ BEGIN
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = MBK."LMSACN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局
+      AND NVL(MBK.MBKCDE,' ') = 'Y'
     ;
 
     -- 記錄寫入筆數
@@ -131,6 +133,3 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_PostDeductMedia_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-/

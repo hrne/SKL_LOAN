@@ -200,7 +200,7 @@ public class BS910 extends TradeBuffer {
 		}
 	}
 
-	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal intAmt, TitaVo titaVo) throws LogicException {
+	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal avblBal, TitaVo titaVo) throws LogicException {
 		// 借：不可撤銷放款承諾 貸：待抵銷不可撤銷放款承諾
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
 		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
@@ -216,10 +216,10 @@ public class BS910 extends TradeBuffer {
 		tTempVo.putParam("AcBookCode", acBookCode); // 帳冊別
 		tTempVo.putParam("AcSubBookCode", acSubBookCode);// 區隔帳冊
 		tTempVo.putParam("SlipNote", "");
-		tTempVo.putParam("DbTxAmt1", intAmt);
+		tTempVo.putParam("DbTxAmt1", avblBal);
 		tTempVo.putParam("DbAcctCode1", "LC1");
 		tTempVo.putParam("DbRvNo1", rvNo);
-		tTempVo.putParam("CrTxAmt1", intAmt);
+		tTempVo.putParam("CrTxAmt1", avblBal);
 		tTempVo.putParam("CrAcctCode1", "LC2");
 		tTempVo.putParam("CrRvNo1", rvNo);
 		tTxToDoDetail.setProcessNote(tTempVo.getJsonString());

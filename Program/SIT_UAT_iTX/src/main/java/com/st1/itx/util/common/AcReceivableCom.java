@@ -478,16 +478,10 @@ public class AcReceivableCom extends TradeBuffer {
 			} else
 				throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
 		} else {
-			if (wkRvFg == 0 && tAcReceivable.getClsFlag() == 1 && AcHCode == 0) { // 已銷帳，重新起帳
-				tAcReceivable = new AcReceivable();
-				tAcReceivable.setAcReceivableId(tAcReceivableId);
-				newAcReceivable(bizTbsdy);
-				updAcReceivable(AcHCode, bizTbsdy);
-			} else {
-				updAcReceivable(AcHCode, bizTbsdy);
-			}
+			updAcReceivable(AcHCode, bizTbsdy);
+			// 訂正後為已銷帳則刪除，否則更新
 			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1
-					&& tAcReceivable.getTitaTlrNo() == this.titaVo.getTlrNo()
+					&& tAcReceivable.getTitaTlrNo().equals(this.titaVo.getOrgTlr())
 					&& tAcReceivable.getTitaTxtNo() == parse.stringToInteger(this.titaVo.getOrgTno())) {
 				try {
 					acReceivableService.delete(tAcReceivable, titaVo); // update
@@ -497,6 +491,10 @@ public class AcReceivableCom extends TradeBuffer {
 							"AcReceivable delete " + tAcReceivableId + e.getErrorMsg());
 				}
 			} else {
+				tAcReceivable.setTitaTxCd(ac.getTitaTxCd());
+				tAcReceivable.setTitaKinBr(ac.getTitaKinbr());
+				tAcReceivable.setTitaTlrNo(ac.getTitaTlrNo());
+				tAcReceivable.setTitaTxtNo(ac.getTitaTxtNo());
 				try {
 					acReceivableService.update(tAcReceivable, titaVo); // update
 				} catch (DBException e) {

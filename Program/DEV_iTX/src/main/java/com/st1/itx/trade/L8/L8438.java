@@ -13,9 +13,9 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.JcicZ575;
-import com.st1.itx.db.service.JcicZ575LogService;
-import com.st1.itx.db.service.JcicZ575Service;
+import com.st1.itx.db.domain.JcicZ574;
+import com.st1.itx.db.service.JcicZ574LogService;
+import com.st1.itx.db.service.JcicZ574Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
@@ -23,7 +23,7 @@ import com.st1.itx.util.data.DataLog;
 @Service("L8438")
 @Scope("prototype")
 /**
- * 聯徵產品檔案匯出作業(575)
+ * 聯徵產品檔案匯出作業(574)
  * 
  * @author Fegie
  * @version 1.0.0
@@ -36,9 +36,9 @@ public class L8438 extends TradeBuffer {
 	public L8403File iL8403File;
 
 	@Autowired
-	public JcicZ575Service sJcicZ575Service;
+	public JcicZ574Service sJcicZ574Service;
 	@Autowired
-	public JcicZ575LogService sJcicZ575LogService;
+	public JcicZ574LogService sJcicZ574LogService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -81,22 +81,22 @@ public class L8438 extends TradeBuffer {
 	public void doRemoveJcicDate(TitaVo titaVo) throws LogicException {
 		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 		int count = 0;
-		Slice<JcicZ575> iJcicZ575 = null;
-		JcicZ575 uJcicZ575 = new JcicZ575();
-		JcicZ575 oldJcicZ575 = new JcicZ575();
-		iJcicZ575 = sJcicZ575Service.findAll(0,Integer.MAX_VALUE, titaVo);
-		for (JcicZ575 iiJcicZ575 : iJcicZ575) {
-			if (iiJcicZ575.getOutJcicTxtDate() == iJcicDate) {
+		Slice<JcicZ574> iJcicZ574 = null;
+		JcicZ574 uJcicZ574 = new JcicZ574();
+		JcicZ574 oldJcicZ574 = new JcicZ574();
+		iJcicZ574 = sJcicZ574Service.findAll(0,Integer.MAX_VALUE, titaVo);
+		for (JcicZ574 iiJcicZ574 : iJcicZ574) {
+			if (iiJcicZ574.getOutJcicTxtDate() == iJcicDate) {
 				count++;
-				uJcicZ575 = sJcicZ575Service.holdById(iiJcicZ575.getJcicZ575Id(), titaVo);
-				oldJcicZ575 = (JcicZ575) iDataLog.clone(uJcicZ575);
-				uJcicZ575.setOutJcicTxtDate(0);
+				uJcicZ574 = sJcicZ574Service.holdById(iiJcicZ574.getJcicZ574Id(), titaVo);
+				oldJcicZ574 = (JcicZ574) iDataLog.clone(uJcicZ574);
+				uJcicZ574.setOutJcicTxtDate(0);
 				try {
-					sJcicZ575Service.update(uJcicZ575, titaVo);
+					sJcicZ574Service.update(uJcicZ574, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 				}
-				iDataLog.setEnv(titaVo, oldJcicZ575, uJcicZ575);
+				iDataLog.setEnv(titaVo, oldJcicZ574, uJcicZ574);
 				iDataLog.exec();
 			}
 		}

@@ -108,7 +108,7 @@ T(3,*)
 #chainHIDE=X,1,S
 C(3,#FunCd,1,$,HIDE(#BTN2)HIDE(#BTN5))
 !CHAIN進時隱藏輸入框
-IF(#FunCd == 1,T(2,@FdCustNo,#ShowFd)T(2,@FdCustNo,#ShowFd)T(2,@FdFacmNo,#ShowFd)T(2,@FdNotYetCode,#ShowFd)T(2,@FdYetDate,#ShowFd),$)
+IF(#FunCd == 1,T(2,@FdCustNo,#ShowFd)T(2,@FdCustNo,#ShowFd)T(2,@FdFacmNo,#ShowFd)T(2,@FdNotYetCode,#ShowFd)T(2,@FdYetDate,#ShowFd)T(F,@CloseDate,0),$)
 IF(#FunCd == 2,T(F,@NotYetCode,0)T(2,@FdYetDate,#ShowFd),$)
 IF(#FunCd >= 2,T(F,@CaseNo,0)T(F,@CustNo,0)T(F,@CustNo,0)T(F,@CustId,0)T(F,@ApplNo,0)T(F,@FacmNo,0),$)
 IF(#FunCd >= 3,T(F,@NotYetCode,0)T(F,@YetDate,0)T(F,@CloseDate,0)T(F,@ReMark,0),$)
@@ -329,7 +329,7 @@ C(3,#FunCd,1,E(0,#AYetDate),$)
 
 ![銷號日期]
 #CloseDate=D,7,I
-IF(#FunCd == 1 || #FunCd == 2,$,s)
+IF(#FunCd == 2,$,s)
 @A(DATE,0,#CloseDate)
 
 #ReMark=x,80,I

@@ -245,7 +245,7 @@ public class L2R01 extends TradeBuffer {
 //		this.totaVo.putParam("L2r01DecreaseFlag", tFacProd.getDecreaseFlag());
 		this.totaVo.putParam("L2r01ProhibitMonth", tFacProd.getProhibitMonth());
 		this.totaVo.putParam("L2r01GovOfferFlag", tFacProd.getGovOfferFlag());
-		this.totaVo.putParam("FinancialFlag", tFacProd.getFinancialFlag());
+		this.totaVo.putParam("L2r01FinancialFlag", tFacProd.getFinancialFlag());
 		this.totaVo.putParam("L2r01EmpFlag", tFacProd.getEmpFlag());
 		this.totaVo.putParam("L2r01PayIntLimit", 0);
 		this.totaVo.putParam("L2r01BreachPercent", tFacProd.getBreachPercent());

@@ -2,7 +2,7 @@
 --  DDL for Procedure Usp_Tf_AcDetail_Ins
 --------------------------------------------------------
 set define off;
-
+ 
   CREATE OR REPLACE PROCEDURE "Usp_Tf_AcDetail_Ins" 
 (
     -- 參數
