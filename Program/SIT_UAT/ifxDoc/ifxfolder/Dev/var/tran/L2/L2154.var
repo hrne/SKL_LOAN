@@ -780,7 +780,7 @@ T(3,1:新增;2:修改;4:刪除;5:查詢)
 T(4,CHAIN$)
 C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2015額度明細資料查詢]進入),$),$)
 C(3,#CHAIN,1,$,S)
-HIDE(#BTN1,#FuncCode)
+HIDE(#BTN1,#FuncCode,#LbBreach)
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
 
@@ -1163,6 +1163,7 @@ T(H,@RecycleCodeX,#RecycleCode,#FacmRecycleCodeHelp)
 C(3,#L2r01GracePeriod,999,$,E(0,@GracePeriod,#L2r01GracePeriod))
 T(2,@ProdBreachFlag,#L2r05ProdBreachFlag)
 C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r01Breach))
+C(5,#L2r05ProdBreachFlag,N,T(2,@LbBreach,#L2r05Breach),T(2,@LbBreach,#L2r01Breach))
 C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r01Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
 ! T(2,@BreachFlag,#L2r01BreachFlag)
 ! T(2,@Breach,#L2r01Breach)
@@ -1171,6 +1172,7 @@ C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y
 
 #RcvL2r01B=X,1,S
 C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r01Breach))
+C(5,#L2r05ProdBreachFlag,N,T(2,@LbBreach,#L2r05Breach),T(2,@LbBreach,#L2r01Breach))
 C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r01Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
 ! T(2,@BreachFlag,#L2r01BreachFlag)
 ! T(2,@Breach,#L2r01Breach)
@@ -1297,26 +1299,30 @@ C(3,#UpdateCode,1,
     ,#PayIntFreqX,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate
     ,#GuaranteeDateX,#RepayCode,#RepayCodeX,#RepayBank,#RepayBankX,#RepayAcctNo,#PostCode,#PostCodeX,#RelationCode
     ,#RelationCodeX,#RelationName,#RelationId,#RelationBirthday,#RelationGender,#RelationGenderX
-    ,#Introducer,#IntroducerX,#District,#DistrictX,#FireOfficer,#BTN12,#FireOfficerX,#Estimate,#EstimateX,#CreditOfficer,#CreditOfficerX,#BusinessOfficer,
-    #BusinessOfficerX,#Supervisor,#SupervisorX,#InvestigateOfficer,#InvestigateOfficerX,#EstimateReview,#EstimateReviewX,#Coorgnizer,#CoorgnizerX)
+    ,#Introducer,#IntroducerX,#District,#DistrictX,#FireOfficer,#BTN12,#FireOfficerX,#Estimate,#EstimateX,#CreditOfficer
+    ,#CreditOfficerX,#BusinessOfficer,#BusinessOfficerX,#Supervisor,#SupervisorX,#InvestigateOfficer,#InvestigateOfficerX
+    ,#EstimateReview,#EstimateReviewX,#Coorgnizer,#CoorgnizerX)
     SHOW(#BTN11,#BTN12,#BTN13,#BTN14,#BTN16,#BTN17,#BTN19,#BTN20,#BTN21)
-    HIDE(#LbRateIncrX,#LbIndividualIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee,#LbCreditSysNo
-    ,#LbApplAmt,#UsApplAmt,#LbApplAmt,#LbLoanTermYyX,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq
+    HIDE(#LbRateIncrX,#LbIndividualIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee
+    ,#LbCreditSysNo,#LbApplAmt,#UsApplAmt,#LbApplAmt,#LbLoanTermYyX,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq
     ,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline,#LbRepayBank,#LbPostCode,#LbRepayAcctNo
-    ,#LbRelationName,#LbRelationId,#LbRelationBirthday,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb,
-    #SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb)
+    ,#LbRelationName,#LbRelationId,#LbRelationBirthday,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb
+    ,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb,#LbBreach)
+    C(3,#DepartmentCode,0,HIDE(#BreachFlag,#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#BreachFlag,#ProdBreachFlag,#Breach)HIDE(#LbBreach))
    ,SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX
    ,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbHandlingFee,#LbCreditSysNo,#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX
-   ,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline,#RepayCodeX
-   ,#RepayBankX,#LbRepayAcctNo,#PostCodeX,#RelationCodeX,#LbRelationName,#LbRelationId,#LbRelationBirthday,#RelationGenderX
-   ,#IntroducerX,#District,#DistrictX,#FireOfficerX,#EstimateX,#CreditOfficerX,#BusinessOfficerX,#SupervisorX,#InvestigateOfficerX,#EstimateReviewX,#CoorgnizerX,
-   #IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb)
+   ,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline
+   ,#RepayCodeX,#RepayBankX,#LbRepayAcctNo,#PostCodeX,#RelationCodeX,#LbRelationName,#LbRelationId,#LbRelationBirthday
+   ,#RelationGenderX,#IntroducerX,#District,#DistrictX,#FireOfficerX,#EstimateX,#CreditOfficerX,#BusinessOfficerX,#SupervisorX
+   ,#InvestigateOfficerX,#EstimateReviewX,#CoorgnizerX,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb
+   ,#BusinessOfficerLb,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb,#LbBreach)
     HIDE(#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX,#ApproveRate,#ApproveRateX,#RateCode
-    ,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#TwHandlingFee,#UsHandlingFee,#CreditSysNo,#AmortizedCode
-    ,#TwApplAmt,#UsApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX,#RepayFreq,#RepayFreqX
-    ,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX,#RepayCode,#RepayBank
-    ,#RepayAcctNo,#PostCode,#RelationCode,#RelationName,#RelationId,#RelationBirthday,#RelationGender
-    ,#Introducer,#District,#FireOfficer,#Estimate,#CreditOfficer,#BusinessOfficer,#Supervisor,#InvestigateOfficer,#EstimateReview,#Coorgnizer)
+    ,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#TwHandlingFee,#UsHandlingFee
+    ,#CreditSysNo,#AmortizedCode,#TwApplAmt,#UsApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX
+    ,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX,#RepayCode
+    ,#RepayBank,#RepayAcctNo,#PostCode,#RelationCode,#RelationName,#RelationId,#RelationBirthday,#RelationGender
+    ,#Introducer,#District,#FireOfficer,#Estimate,#CreditOfficer,#BusinessOfficer,#Supervisor,#InvestigateOfficer
+    ,#EstimateReview,#Coorgnizer,#Breach)
     HIDE(#BTN11,#BTN12,#BTN13,#BTN14,#BTN16,#BTN17,#BTN19,#BTN20,#BTN21))
 ##loop{times:10,i:1}
 C(3,#UpdateCode,1,
@@ -3298,7 +3304,7 @@ C(3,#Hide8Fg,0,CALL(#HideP8),$)
 
 #ShowP7A=X,1,S
 C(3,#UpdateCode,1,$,s)
-SHOW(#BreachFlag,#BreachFlagX,#ProdBreachFlag,#ProdBreachFlagX,#Breach)
+SHOW(#BreachFlagX,#ProdBreachFlagX)
 
 #ShowP7B=X,1,S
 C(3,#UpdateCode,1,S,$)
@@ -3351,6 +3357,8 @@ IF(#BreachFlag=="N",S,$)
 IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r01Breach),$)
 C(5,#ProdBreachFlag,Y,s,$)
 C(4,#ProdBreachFlag,s,$)
+
+#LbBreach=X,4.50,L
 
 ! #Breach2=x,130,L
 
@@ -3681,7 +3689,7 @@ C(3,#CheckCode,0,$,S)
 ["<font color=red>清償金類型　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 [#<->#,"#FdBreachFlag+是否限制清償",#BreachFlag,#BreachFlagX],
 [#<->#,"#FdProdBreachFlag+違約適用方式是否按商品設定",#ProdBreachFlag,#ProdBreachFlagX],
-[#<->#,"@",#Breach],
+[#<->#,"@",#Breach,#LbBreach],
 ]
 </sub>
 

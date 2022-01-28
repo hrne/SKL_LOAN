@@ -15,6 +15,7 @@ import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.menu.MenuBuilder;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6402")
@@ -33,10 +34,15 @@ public class L6402 extends TradeBuffer {
 
 	@Autowired
 	DateUtil dDateUtil;
+
 	@Autowired
 	Parse parse;
+
 	@Autowired
 	public DataLog dataLog;
+
+	@Autowired
+	MenuBuilder menuBuilder;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -93,6 +99,10 @@ public class L6402 extends TradeBuffer {
 			}
 		}
 
+		// 清除選單快取 Adam
+		menuBuilder.evict();
+		
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

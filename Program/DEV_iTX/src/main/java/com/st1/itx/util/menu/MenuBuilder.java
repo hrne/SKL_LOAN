@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
@@ -21,7 +23,7 @@ import com.st1.itx.util.log.SysLogger;
 
 @Component("menuBuilder")
 @Scope("prototype")
-@CacheConfig
+//@CacheConfig
 public class MenuBuilder extends SysLogger {
 
 	@Autowired
@@ -31,6 +33,7 @@ public class MenuBuilder extends SysLogger {
 	private CdCodeService cdCodeService;
 
 	@Transactional(readOnly = true)
+	@Cacheable("rootMenu")
 	public List<String> buildRootMenu() {
 		Slice<CdCode> cdCodeLi = cdCodeService.defCodeLikeAndCodeLike("Menu%", "L%", 0, Integer.MAX_VALUE);
 		List<String> res = new ArrayList<String>();
@@ -43,6 +46,7 @@ public class MenuBuilder extends SysLogger {
 	}
 
 	@Transactional(readOnly = true)
+	@Cacheable("menu")
 	public List<String> buildMenu(String iAuthNo) {
 		// TXCD 0L1001202112202L11 00 顧客明細資料查詢 1
 		List<String> res = new ArrayList<String>();
@@ -75,6 +79,7 @@ public class MenuBuilder extends SysLogger {
 	}
 
 	@Transactional(readOnly = true)
+	@Cacheable("autoCp")
 	public List<String> buildAutoCP(String iAuthNo, String txcd) {
 		List<String> res = new ArrayList<String>();
 		try {
@@ -95,5 +100,10 @@ public class MenuBuilder extends SysLogger {
 			return null;
 		}
 		return res;
+	}
+	
+	@CacheEvict(value = { "rootMenu", "menu", "autoCp" }, allEntries = true)
+	public void evict() {
+		this.mustInfo("evict menuBuilder");
 	}
 }

@@ -123,6 +123,84 @@ BEGIN
       AND "AcDate" IN (20201231,20210531)
     ;
 
+    MERGE INTO "AcMain" AM
+    USING (
+      SELECT AR."AcctCode"
+           , AR."AcBookCode"
+           , AR."AcSubBookCode"
+           , CA."AcNoCode"
+           , CA."AcSubCode"
+           , CA."AcDtlCode"
+           , SUM(AR."RvBal") AS "RvBal"
+      FROM "AcReceivable" AR
+      LEFT JOIN "CdAcCode" CA ON CA."AcctCode" = AR."AcctCode"
+      WHERE AR."ReceivableFlag" = '2'
+      GROUP BY AR."AcctCode"
+             , AR."AcBookCode"
+             , AR."AcSubBookCode"
+             , CA."AcNoCode"
+             , CA."AcSubCode"
+             , CA."AcDtlCode"
+    ) AR
+    ON (
+      AM."AcctCode" = AR."AcctCode"
+      AND AM."AcDate" = "TbsDyf"
+    )
+    WHEN MATCHED THEN UPDATE SET
+      "YdBal" = AR."RvBal"
+    , "TdBal" = AR."RvBal"
+    , "DbAmt" = 0
+    , "CrAmt" = 0
+    WHEN NOT MATCHED THEN INSERT (
+        "AcBookCode"          -- 帳冊別 VARCHAR2 3 0
+      , "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增
+      , "BranchNo"            -- 單位別 VARCHAR2 4 0
+      , "CurrencyCode"        -- 幣別 VARCHAR2 3 0
+      , "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改 取11碼會科
+      , "AcSubCode"           -- 子目代號 VARCHAR2 5 0
+      , "AcDtlCode"           -- 細目代號 VARCHAR2 2 0
+      , "AcDate"              -- 會計日期 Decimald 8 0
+      , "YdBal"               -- 前日餘額 DECIMAL 16 2
+      , "TdBal"               -- 本日餘額 DECIMAL 16 2
+      , "DbCnt"               -- 借方筆數 DECIMAL 8 0
+      , "DbAmt"               -- 借方金額 DECIMAL 16 2
+      , "CrCnt"               -- 貸方筆數 DECIMAL 8 0
+      , "CrAmt"               -- 貸方金額 DECIMAL 16 2
+      , "CoreDbCnt"           -- 核心借方筆數 DECIMAL 8 0
+      , "CoreDbAmt"           -- 核心借方金額 DECIMAL 16 2
+      , "CoreCrCnt"           -- 核心貸方筆數 DECIMAL 8 0
+      , "CoreCrAmt"           -- 核心貸方金額 DECIMAL 16 2
+      , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
+      , "MonthEndYm"          -- 月底年月 DECIMAL 6 0
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    ) VALUES (
+        AR."AcBookCode"
+      , AR."AcSubBookCode"
+      , '0000' -- "BranchNo"
+      , 'TWD' -- "CurrencyCode"
+      , AR."AcNoCode"
+      , AR."AcSubCode"
+      , AR."AcDtlCode"
+      , "TbsDyf" -- "AcDate"
+      , AR."RvBal" -- "DbCnt"
+      , AR."RvBal" -- "DbAmt"
+      , 0 -- "CrCnt"
+      , 0 -- "CrAmt"
+      , 0 -- "CoreDbCnt"
+      , 0 -- "CoreDbAmt"
+      , 0 -- "CoreCrCnt"
+      , 0 -- "CoreCrAmt"
+      , AR."AcctCode"
+      , TRUNC("TbsDyf" / 100)
+      , JOB_START_TIME
+      , '999999'
+      , JOB_START_TIME
+      , '999999'
+    )
+    ;
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 

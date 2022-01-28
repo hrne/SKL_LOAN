@@ -22,7 +22,7 @@
 
 
 	<import resource="classpath:spring/application-config.xml" />
-	
+	<import resource="classpath:spring/cache/iTX-Cache.xml" />
 
     <!-- 
     <import resource="classpath:spring/itx-database-Online.xml" />

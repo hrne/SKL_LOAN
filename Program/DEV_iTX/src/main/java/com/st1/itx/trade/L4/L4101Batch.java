@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
@@ -34,9 +33,9 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BankRemitFileVo;
+import com.st1.itx.util.common.data.L4101Vo;
 import com.st1.itx.util.common.data.RemitFormVo;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.report.RemitForm;
@@ -102,6 +101,8 @@ public class L4101Batch extends TradeBuffer {
 	L4101ReportB l4101ReportB;
 	@Autowired
 	L4101ReportC l4101ReportC;
+	@Autowired
+	L4101Vo l4101Vo;
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
@@ -249,53 +250,54 @@ public class L4101Batch extends TradeBuffer {
 
 //		String path = outFolder + "LNM24p.txt";
 
-		ArrayList<OccursList> tmp = new ArrayList<>();
-
-		int seq = 0;
-
-		for (BankRemit tBankRemit : lBankRemit) {
-
-			if (tBankRemit.getDrawdownCode() == 2 || tBankRemit.getDrawdownCode() == 4
-					|| tBankRemit.getDrawdownCode() == 11) {
-				this.info("Continue... DrawdownCode = " + tBankRemit.getDrawdownCode());
-				continue;
-			}
-			seq = seq + 1;
-
-			OccursList occursList = new OccursList();
-
-//			DataSeq		序號			4	0	4
-//			AcctNo		帳號			X	14	4	18
-//			Amount		金額			X	13	18	31
-//			UnitCode	解付單位代號	X	7	31	38
-//			RemitName	代償專戶		X	59	38	97
-//			ColumnA	新光人壽保險股份有限公司─放款服務課	X	35	97	132
-//			ColumnB		space		X	59	132	191
-//			ColumnC		00174		X	5	191	196
-//			RemitDate	匯款日期		X	8	196	204
-//			BatchNo		批號			X	2	204	206
-
-			occursList.putParam("DataSeq", FormatUtil.pad9("" + seq, 4));
-			occursList.putParam("AcctNo", FormatUtil.padX(tBankRemit.getRemitAcctNo(), 14));
-			occursList.putParam("Amount", FormatUtil.pad9("" + tBankRemit.getRemitAmt(), 13));
-			occursList.putParam("UnitCode", "" + FormatUtil.pad9("" + tBankRemit.getRemitBank(), 3)
-					+ FormatUtil.pad9("" + tBankRemit.getRemitBranch(), 4));
-			occursList.putParam("RemitName", FormatUtil.padX(tBankRemit.getCustName(), 59));
-			occursList.putParam("ColumnA", "新光人壽保險股份有限公司─放款服務課");
-			occursList.putParam("ColumnB", FormatUtil.padX("", 59));
-			occursList.putParam("ColumnC", "00174");
-			occursList.putParam("RemitDate", tBankRemit.getAcDate() + 19110000);
-			occursList.putParam("BatchNo", tBankRemit.getBatchNo().substring(4, 6));
-
-			tmp.add(occursList);
-		}
-		// 把明細資料容器裝到檔案資料容器內
-		bankRemitFileVo.setOccursList(tmp);
+		l4101Vo.setOccursList(lBankRemit,titaVo);
+//		ArrayList<OccursList> tmp = new ArrayList<>();
+//
+//		int seq = 0;
+//
+//		for (BankRemit tBankRemit : lBankRemit) {
+//
+//			if (tBankRemit.getDrawdownCode() == 2 || tBankRemit.getDrawdownCode() == 4
+//					|| tBankRemit.getDrawdownCode() == 11) {
+//				this.info("Continue... DrawdownCode = " + tBankRemit.getDrawdownCode());
+//				continue;
+//			}
+//			seq = seq + 1;
+//
+//			OccursList occursList = new OccursList();
+//
+////			DataSeq		序號			4	0	4
+////			AcctNo		帳號			X	14	4	18
+////			Amount		金額			X	13	18	31
+////			UnitCode	解付單位代號	X	7	31	38
+////			RemitName	代償專戶		X	59	38	97
+////			ColumnA	新光人壽保險股份有限公司─放款服務課	X	35	97	132
+////			ColumnB		space		X	59	132	191
+////			ColumnC		00174		X	5	191	196
+////			RemitDate	匯款日期		X	8	196	204
+////			BatchNo		批號			X	2	204	206
+//
+//			occursList.putParam("DataSeq", FormatUtil.pad9("" + seq, 4));
+//			occursList.putParam("AcctNo", FormatUtil.padX(tBankRemit.getRemitAcctNo(), 14));
+//			occursList.putParam("Amount", FormatUtil.pad9("" + tBankRemit.getRemitAmt(), 13));
+//			occursList.putParam("UnitCode", "" + FormatUtil.pad9("" + tBankRemit.getRemitBank(), 3)
+//					+ FormatUtil.pad9("" + tBankRemit.getRemitBranch(), 4));
+//			occursList.putParam("RemitName", FormatUtil.padX(tBankRemit.getCustName(), 59));
+//			occursList.putParam("ColumnA", "新光人壽保險股份有限公司─放款服務課");
+//			occursList.putParam("ColumnB", FormatUtil.padX("", 59));
+//			occursList.putParam("ColumnC", "00174");
+//			occursList.putParam("RemitDate", tBankRemit.getAcDate() + 19110000);
+//			occursList.putParam("BatchNo", tBankRemit.getBatchNo().substring(4, 6));
+//
+//			tmp.add(occursList);
+//		}
+//		// 把明細資料容器裝到檔案資料容器內
+//		bankRemitFileVo.setOccursList(tmp);
 		// 轉換資料格式
-		ArrayList<String> file = bankRemitFileVo.toFile();
-
+		ArrayList<String> file = l4101Vo.toFile();
+		
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + "-撥款匯款媒體檔", "LNM24p.txt", 2);
+				titaVo.getTxCode() + "-撥款匯款媒體檔", "LNM24p.csv", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
