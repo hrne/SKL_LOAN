@@ -128,11 +128,12 @@ public class L4101ReportA extends MakeReport {
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
-		reportCode = reportCode + "-" + batchNo;
+		reportCode = reportCode + "-" + batchNo + "-A";
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		this.info("L4101ReportA BatchNo = " + batchNo);
-		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
+				batchNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
@@ -189,8 +190,10 @@ public class L4101ReportA extends MakeReport {
 		cnt = 0;
 		if (lAcDetail.size() > 0) {
 			for (AcDetail tAcDetail : lAcDetail) {
-				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + FormatUtil.padX(tAcDetail.getAcSubCode(), 5);
-				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2) + parse.IntegerToString(tAcDetail.getSlipNo(), 6);
+				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11)
+						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5);
+				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2)
+						+ parse.IntegerToString(tAcDetail.getSlipNo(), 6);
 
 				if (dbAmt.containsKey(acNo) || crAmt.containsKey(acNo)) {
 					if ("D".equals(tAcDetail.getDbCr())) {

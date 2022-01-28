@@ -1,6 +1,7 @@
 package com.st1.itx.util.common.data;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 public class RemitFormVo extends LinkedHashMap<String, String> {
 
@@ -327,6 +328,14 @@ public class RemitFormVo extends LinkedHashMap<String, String> {
 	 */
 	public void setReportItem(String reportItem) {
 		this.reportItem = reportItem;
+	}
+
+	public void setNewPageFg() {
+		this.put("newPageFg", "1");
+	}
+
+	public boolean isNewPage() {
+		return Objects.isNull(this.get("newPageFg")) ? false : "1".equals(this.get("newPageFg"));
 	}
 
 }

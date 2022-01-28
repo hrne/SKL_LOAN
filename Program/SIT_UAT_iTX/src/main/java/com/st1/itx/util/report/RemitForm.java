@@ -45,7 +45,8 @@ public class RemitForm extends MakeReport {
 	public void addpage(TitaVo titaVo, RemitFormVo remitFormVo) throws LogicException {
 		this.info("RemitForm.addpage=" + this.getNowPage());
 
-		this.newPage();
+		if (remitFormVo.isNewPage())
+			this.newPage();
 
 		// 微 軟正黑體
 		this.setFont(3);

@@ -135,7 +135,7 @@ public class L4101ReportC extends MakeReport {
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
-		reportCode = reportCode + "-" + batchNo;
+		reportCode = reportCode + "-" + batchNo + "-C";
 		// 退款名稱
 		if ("BCK".equals(batchNo)) {
 			reportItem = "抽退票傳票明細表";
@@ -149,7 +149,8 @@ public class L4101ReportC extends MakeReport {
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 
-		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
+				batchNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
@@ -191,13 +192,11 @@ public class L4101ReportC extends MakeReport {
 			CustMain c = custMainService.custNoFirst(tAcDetail.getCustNo(), tAcDetail.getCustNo(), titaVo);
 			CdBank t = cdBankService.findById(new CdBankId(wkBankCode, wkBranchCode), titaVo);
 			if (t != null) {
-
 				wkBankItem = t.getBankItem();
 				wkBranchItem = t.getBranchItem();
 			} else {
 				wkBankItem = wkBankCode;
 				wkBranchItem = wkBranchCode;
-
 			}
 
 			// 明細資料第一行
