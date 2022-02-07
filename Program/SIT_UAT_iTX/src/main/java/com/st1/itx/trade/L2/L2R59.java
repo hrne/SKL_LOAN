@@ -75,7 +75,7 @@ public class L2R59 extends TradeBuffer {
 			outs = s;
 		}
 
-		this.totaVo.putParam("HelpDesc", outs);
+		this.totaVo.putParam("L2r59Help1", outs);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -308,11 +308,10 @@ T(F,@CreateDate{i},#LabelControlFlag)
 #AFTER_FUNCD_1_2=@,1,S
 T(3,@FdClTypeCode,*)
 T(3,@FdLD_1,*)
-T(3,@FdLD_TYPE,*)
 T(3,@FdAREA,*)
-T(3,@FdLD_ZONING,*)
-T(3,@FdLD_USAGE_TYPE,*)
+T(3,@FdTRANS_YEAR,*)
 T(3,@FdCURRENT_LD_VALUE,*)
+T(3,@FdLD_USAGE_IND,*)
 T(3,@FdCLV_YYYY,*)
 T(3,@FdOWNER,*)
 
@@ -622,11 +621,14 @@ IF(#FunCd == 4,T(3,    土地座落),$)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 HELP(#LandCodeHelp)
-@V(H,#LandCodeHelp)
+@
+C(3,#LandCode,0,S,$)
+V(H,#LandCodeHelp)
 
 #FdLD_TYPE=X,2,L
 
 #LandCodeX=X,8,L
+C(3,#LandCode,0,S,$)
 T(H,#LandCode,#LandCodeHelp)
 
 ! [面積]
@@ -642,11 +644,14 @@ IF(#PageFg==2,$,CALL(#SHOW_2))
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 HELP(#LandZoningCodeHelp,cols:5)
-@V(H,#LandZoningCodeHelp)
+@
+C(3,#LandZoningCode,0,S,$)
+V(H,#LandZoningCodeHelp)
 
 #FdLD_ZONING=X,2,L
 
 #LandZoningCodeX=X,20,L
+C(3,#LandZoningCode,0,S,$)
 T(H,#LandZoningCode,#LandZoningCodeHelp)
 
 ! [使用地類別]
@@ -654,11 +659,14 @@ T(H,#LandZoningCode,#LandZoningCodeHelp)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 HELP(#LandUsageTypeHelp,cols:2)
-@V(H,#LandUsageTypeHelp)
+@
+C(3,#LandUsageType,0,S,$)
+V(H,#LandUsageTypeHelp)
 
 #FdLD_USAGE_TYPE=X,2,L
 
 #LandUsageTypeX=X,20,L
+C(3,#LandUsageType,0,S,$)
 T(H,#LandUsageType,#LandUsageTypeHelp)
 
 ! [公告土地現值]
@@ -689,7 +697,7 @@ T(2,#PostedLandValueYear+#PostedLandValueMonth)
 #TransferedYear=A,3,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
-@C(4,#TransferedYear,S,$)
+@V(2,0)V(7)
 V(9)
 
 #FdTRANS_YEAR=X,2,L
@@ -714,11 +722,10 @@ IF(#PageFg==2,$,CALL(#SHOW_2))
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 HELP(#LandUsageCodeHelp)
-@C(4,#LandUsageCode,S,$)
+@
 V(H,#LandUsageCodeHelp)
 
 #FdLD_USAGE_IND=X,2,L
-T(3,*)
 
 #LandUsageCodeX=X,15,L
 T(H,#LandUsageCode,#LandUsageCodeHelp)
@@ -919,7 +926,7 @@ IF(#FunCd == 4,INVOKEJS(SHOW,p2,1,1,0),$)
 [
 ["土地資料"],
 ["#FdLD_TYPE+地目",#LandCode,#LandCodeX],["#FdAREA+面積",#Area,"坪"],
-["#FdLD_ZONING+使用區分",#LandZoningCode,#LandZoningCodeX],["#FdLD_USAGE_TYPE+使用地類別",#LandUsageType,#LandUsageTypeX],
+["#FdLD_ZONING+使用分區",#LandZoningCode,#LandZoningCodeX],["#FdLD_USAGE_TYPE+使用地類別",#LandUsageType,#LandUsageTypeX],
 ["#FdCURRENT_LD_VALUE+公告土地現值",#PostedLandValue,"元"],["#FdCLV_YYYY+公告土地現值年月",#PostedLandValueYear,#PostedLandValueMonth],
 ["#FdTRANS_YEAR+移轉年度",#TransferedYear],["#FdLAST_TRANS_AMT+前次移轉金額",#LastTransferedAmt,"元"],
 [#<->#,"#FdAREA_AMT+鑑價單價",#EvaUnitPrice,"元／坪"],

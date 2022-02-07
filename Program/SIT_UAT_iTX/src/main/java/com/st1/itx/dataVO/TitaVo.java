@@ -1362,6 +1362,24 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getBtnIndex() throws LogicException {
 		return this.getParam("btnIndex");
 	}
+	
+	/**
+	 * when trade is not gridBatch or value is null return 0
+	 * 
+	 * @return selectTotal
+	 */
+	public int getSelectTotal() {
+		return Objects.isNull(this.get("selectTotal")) ? 0 : Integer.parseInt(this.get("selectTotal"));
+	}
+
+	/**
+	 * when trade is not gridBatch or value is null return 0
+	 * 
+	 * @return selectIndex
+	 */
+	public int getSelectIndex() {
+		return Objects.isNull(this.get("selectIndex")) ? 0 : Integer.parseInt(this.get("selectIndex"));
+	}
 
 	// flowtype = 0,1 / flowstep = 0,1
 	// flowtype = 2 / flowstep = 1,2
