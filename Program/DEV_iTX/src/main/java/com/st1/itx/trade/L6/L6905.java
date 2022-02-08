@@ -15,9 +15,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
@@ -50,6 +51,8 @@ public class L6905 extends TradeBuffer {
 	public TxTellerService sTxTellerService;
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
+	@Autowired
+	CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -266,12 +269,12 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOSumNo", tAcDetail.getSumNo());
 
 			iTlrItem = "";
-			iTlrItem = inqTxTeller(tAcDetail.getTitaSupNo(), iTlrItem, titaVo);
+			iTlrItem = inqCdEmp(tAcDetail.getTitaSupNo(), iTlrItem, titaVo);
 			occursList.putParam("OOSupItem", iTlrItem);
 			occursList.putParam("OOTitaSupNo", tAcDetail.getTitaSupNo());
 
 			iTlrItem = "";
-			iTlrItem = inqTxTeller(tAcDetail.getTitaTlrNo(), iTlrItem, titaVo);
+			iTlrItem = inqCdEmp(tAcDetail.getTitaTlrNo(), iTlrItem, titaVo);
 			occursList.putParam("OOTlrItem", iTlrItem);
 			occursList.putParam("OOTitaTlrNo", tAcDetail.getTitaTlrNo());
 
@@ -323,7 +326,6 @@ public class L6905 extends TradeBuffer {
 	private String inqTxTranCode(String uTranNo, String uTranItem, TitaVo titaVo) throws LogicException {
 
 		TxTranCode tTxTranCode = new TxTranCode();
-
 		tTxTranCode = sTxTranCodeService.findById(uTranNo, titaVo);
 
 		if (tTxTranCode == null) {
@@ -337,16 +339,16 @@ public class L6905 extends TradeBuffer {
 	}
 
 	// 查詢使用者設定檔
-	private String inqTxTeller(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
+	private String inqCdEmp(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
 
-		TxTeller tTxTeller = new TxTeller();
+		CdEmp tCdEmp = new CdEmp();
 
-		tTxTeller = sTxTellerService.findById(uTlrNo, titaVo);
+		tCdEmp = cdEmpService.findById(uTlrNo, titaVo);
 
-		if (tTxTeller == null) {
+		if (tCdEmp == null) {
 			uTlrItem = uTlrNo;
 		} else {
-			uTlrItem = tTxTeller.getTlrItem();
+			uTlrItem = tCdEmp.getFullname();
 		}
 
 		return uTlrItem;

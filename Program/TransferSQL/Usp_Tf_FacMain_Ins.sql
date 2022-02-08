@@ -145,8 +145,8 @@ BEGIN
              WHEN APLP."APLPYF" = 2 THEN 'Y' -- 代償平轉件
            ELSE 'N' END                   AS "CompensateFlag"      -- 代償碼 VARCHAR2 1 
           ,CASE
-             WHEN APLP."APLILC" = 1 THEN 'Y'
-           ELSE 'N' END                   AS "IrrevocableFlag"     -- 不可撤銷 VARCHAR2 1 
+             WHEN APLP."APLILC" = 1 THEN 'N'
+           ELSE 'Y' END                   AS "IrrevocableFlag"     -- 不可撤銷 VARCHAR2 1 
           ,CASE
              WHEN NVL(CUSP."CUSNOT",' ') != ' '
              THEN CUSP."CUSNOT"

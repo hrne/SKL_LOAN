@@ -1108,7 +1108,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Section,s,$)
-V(9)V(2,0)
+
 
 ! 巷
 #Alley=X,5,I
@@ -1116,7 +1116,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Alley,s,$)
-V(9)V(2,0)
+
 
 ! 弄
 #Lane=X,5,I
@@ -1124,7 +1124,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Lane,s,$)
-V(9)V(2,0)
+
 
 ! 號
 #Num=X,5,I
@@ -1132,7 +1132,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Num,s,$)
-V(9)V(2,0)
+
 
 #NumDash=X,5,I
 C(3,#ClCode1,1,$,S)
@@ -1140,7 +1140,7 @@ IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 IF(#Num=="",S,$)
 @C(4,#NumDash,s,$)
-V(9)V(2,0)
+
 
 ! 樓
 #Floor=X,5,I
@@ -1148,7 +1148,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Floor,s,$)
-V(9)V(2,0)
+
 
 #FloorDash=X,5,I
 C(3,#ClCode1,1,$,S)
@@ -1156,7 +1156,7 @@ IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 IF(#Floor=="",S,$)
 @C(4,#FloorDash,s,$)
-V(9)V(2,0)
+
 
 ! 建號
 #BdNo1=A,5,I

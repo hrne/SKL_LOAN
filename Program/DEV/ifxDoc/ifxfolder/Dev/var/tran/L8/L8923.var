@@ -122,8 +122,6 @@ D(8)
 @A(DATE,0,#RecordDateEnd)
 V(5,#RecordDateStart,#CDATEX)
 
-
-
 !還款日期  起止
 #ActualRepayDateStart=D,7,I
 T(1,#DATE,2,7)
@@ -337,7 +335,7 @@ TXFORM=L8923
 {width:100,align:'left'}
 
 #OOIncome=年收入(萬)
-{width:80,align:'left'}
+{width:80,align:'right'}
 
 #OORepaySourceX=還款來源
 {width:100,align:'left'}

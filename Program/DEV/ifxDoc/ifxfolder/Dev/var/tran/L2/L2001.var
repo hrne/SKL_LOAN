@@ -157,6 +157,7 @@ T(3,)T(H,#EnterpriseFg,#EnterpriseFgHelp)
 
 !政府優惠房貸
 #GovOfferFlag=X,1,I
+C(3,#CHAIN,1,s,$)
 HELP(#YesNoHelp)
 @
 V(H,#YesNoHelp)
@@ -164,6 +165,7 @@ V(H,#YesNoHelp)
 T(3,)T(H,#GovOfferFlag,#YesNoHelp)
 !理財型房貸
 #FinancialFlag=X,1,I
+C(3,#CHAIN,1,s,$)
 HELP(#YesNoHelp)
 @
 V(H,#YesNoHelp)
@@ -171,6 +173,7 @@ V(H,#YesNoHelp)
 T(3,)T(H,#FinancialFlag,#YesNoHelp)
 !員工專案
 #EmpFlag=X,1,I
+C(3,#CHAIN,1,s,$)
 HELP(#YesNoHelp)
 @
 V(H,#YesNoHelp)
@@ -186,7 +189,7 @@ C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
 
 #CHAINXMT=X,1,S
-C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+C(3,#CHAIN,1,E(0,@CHAIN,0),$)
 
 </sub>
 
