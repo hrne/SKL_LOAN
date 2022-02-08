@@ -34,6 +34,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
+		ThreadVariable.setObject(ContentName.loggerFg, true);
 		if ("true".equals(stepExecution.getJobExecution().getJobParameters().getString("loogerFg")))
 			ThreadVariable.setObject(ContentName.loggerFg, true);
 		ThreadVariable.setObject(ContentName.empnot, stepExecution.getJobExecution().getJobParameters().getString(ContentName.tlrno, "BAT001"));

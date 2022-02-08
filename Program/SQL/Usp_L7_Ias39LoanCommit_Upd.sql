@@ -45,7 +45,7 @@ BEGIN
            ELSE 0
            END                                  AS "AvblBal"           -- 可動用餘額
          , M."RecycleCode"                      AS "RecycleCode"       -- 該筆額度是否可循環動用  0:非循環動用 1:循環動用
-         , M."IrrevocableFlag"                  AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  0:可撤銷     1:不可撤銷
+         , M."IrrevocableFlag"                  AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  0:不可撤銷   1:可撤銷
          , M."AcBookCode"                       AS "AcBookCode"        -- 帳冊別
          , M."AcSubBookCode"                    AS "AcSubBookCode"     -- 區隔帳冊
          , CASE

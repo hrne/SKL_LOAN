@@ -97,8 +97,8 @@ T(1,#BNAM,1,36)
 T(1,#SYSCDATE,2,7)
 
 ![表頭單位名稱]
-#H_BNAMM=X,10,S
-T(1,#BNAM,1,10)
+#H_BNAMM=x,24,S
+T(1,#BNAM,1,24)
 ! T(1,#BNAM,26,10)
 
 ![表頭交易序號]

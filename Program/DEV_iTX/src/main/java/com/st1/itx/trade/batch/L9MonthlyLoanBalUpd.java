@@ -34,7 +34,6 @@ public class L9MonthlyLoanBalUpd extends BatchBase implements Tasklet, Initializ
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// // logger = LoggerFactory.getLogger(L9MonthlyLoanBalUpd.class);
 
 		// 第二個參數
 		// D=日批
@@ -47,6 +46,8 @@ public class L9MonthlyLoanBalUpd extends BatchBase implements Tasklet, Initializ
 		this.info("active L9MonthlyLoanBalUpd ");
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+
+		this.info("L9MonthlyLoanBalUpd tbsdyf = " + tbsdyf);
 
 		// int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
 

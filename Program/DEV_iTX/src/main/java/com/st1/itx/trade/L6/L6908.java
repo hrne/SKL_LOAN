@@ -99,9 +99,9 @@ public class L6908 extends TradeBuffer {
 				iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo, iFacmNo, iFAcDateSt, iFAcDateEd, this.index,
 				this.limit, titaVo);
 
-		if (slAcDetail == null) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
-		}
+//		if (slAcDetail == null) {
+//			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
+//		}
 
 		BigDecimal rvAmt = BigDecimal.ZERO;
 		BigDecimal rvCls = BigDecimal.ZERO;
@@ -118,27 +118,30 @@ public class L6908 extends TradeBuffer {
 		if (tCdAcCode == null) {
 			throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
 		}
-		for (AcDetail tAcDetail : slAcDetail.getContent()) {
-			if (tAcDetail.getEntAc() != 1) {
-				continue;
-			}
-			// 銷帳編號有輸入時只查詢銷帳編號的資料，業務科目記號=1.資負明細科目（放款、催收款項..)時撥款序號為銷帳編號
-			if (tAcDetail.getAcctFlag() == 1) {
-				if (!(iRvNo.isEmpty()) && !(iRvNo.equals(parse.IntegerToString(tAcDetail.getBormNo(), 3)))) {
+		if(slAcDetail!=null) {
+			for (AcDetail tAcDetail : slAcDetail.getContent()) {
+				if (tAcDetail.getEntAc() != 1) {
 					continue;
 				}
-			} else {
-				if (!(iRvNo.isEmpty()) && !(iRvNo.equals(tAcDetail.getRvNo()))) {
-					continue;
+				// 銷帳編號有輸入時只查詢銷帳編號的資料，業務科目記號=1.資負明細科目（放款、催收款項..)時撥款序號為銷帳編號
+				if (tAcDetail.getAcctFlag() == 1) {
+					if (!(iRvNo.isEmpty()) && !(iRvNo.equals(parse.IntegerToString(tAcDetail.getBormNo(), 3)))) {
+						continue;
+					}
+				} else {
+					if (!(iRvNo.isEmpty()) && !(iRvNo.equals(tAcDetail.getRvNo()))) {
+						continue;
+					}
 				}
-			}
 
-			if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
-				rvAmt = rvAmt.subtract(tAcDetail.getTxAmt());
-			} else {
-				rvCls= rvCls.subtract(tAcDetail.getTxAmt());
+				if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
+					rvAmt = rvAmt.subtract(tAcDetail.getTxAmt());
+				} else {
+					rvCls= rvCls.subtract(tAcDetail.getTxAmt());
+				}
 			}
 		}
+		
 		this.info("rvAmt=" + rvAmt + ", rvCls=" + rvCls);
 		if (tAcReceivable != null) {
 			if (rvAmt.compareTo(BigDecimal.ZERO) != 0) {
@@ -169,6 +172,7 @@ public class L6908 extends TradeBuffer {
 			}
 		}
 		// 如有找到資料
+		if(slAcDetail!=null) {
 		for (AcDetail tAcDetail : slAcDetail.getContent()) {
 
 			this.info("AcDetail : " + tAcDetail.toString());
@@ -210,7 +214,7 @@ public class L6908 extends TradeBuffer {
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
-
+		}
 		if (this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}

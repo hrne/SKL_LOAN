@@ -445,7 +445,7 @@ BEGIN
           ,NVL(S2."TdExtCnt",0)             AS "TdExtCnt"        -- 本日展期件數 DECIMAL 8
           ,NVL(S2."TdExtAmt",0)             AS "TdExtAmt"        -- 本日展期金額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "ReceivableBal"   -- 銷帳檔餘額 DECIMAL 18 2
-          ,0                                AS "AcctMasterBal"   -- 業務檔餘額 DECIMAL 18 2
+          ,NVL(S2."ReceivableBal",0)        AS "AcctMasterBal"   -- 業務檔餘額 DECIMAL 18 2
           ,"EmpNo"                          AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6

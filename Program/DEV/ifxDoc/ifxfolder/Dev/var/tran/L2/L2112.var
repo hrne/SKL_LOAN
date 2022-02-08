@@ -186,8 +186,8 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF2;ntxbuf5=type<-1:ProdNo<-
 
 #ProdNo=X,5,I
 !C(3,#FuncCode,2,s,$)
-T(2,@ProdName,#Space60)
 @V(7)
+T(2,@ProdName,#Space60)
 
 
 
@@ -254,12 +254,10 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF3A;ntxbuf5=type<-1:CreditO
 #FdCreditOfficer=X,2,L
 
 #CreditOfficer=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
 T(2,@CreditOfficerX,#Space)
 
 #BUF3B=X,7,S
-! T(2,#CreditOfficer+Y)
-
 
 #BIND3B=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF3B;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo:CreditOfficerX<-OOFullname})
@@ -286,11 +284,10 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4A;ntxbuf5=type<-1:Introdu
 #FdIntroducer=X,2,L
 
 #Introducer=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
 T(2,@IntroducerX,#Space)
 
 #BUF4B=X,7,S
-! T(2,#Introducer+Y)
 
 #BIND4B=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4B;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:IntroducerX<-OOFullname})
@@ -316,11 +313,10 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5A;ntxbuf5=type<-1:LoanOff
 #FdLoanOfficer=X,2,L
 
 #LoanOfficer=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
 T(2,@LoanOfficerX,#Space)
 
 #BUF5B=X,7,S
-! T(2,#LoanOfficer+Y)
 
 #BIND5B=X,1,S
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5B;ntxbuf5=type<-1:LoanOfficer<-OOEmployeeNo:LoanOfficerX<-OOFullname})
@@ -346,11 +342,10 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6A;ntxbuf5=type<-1:Supervi
 #FdSupervisor=X,2,L
 
 #Supervisor=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
 T(2,@SupervisorX,#Space)
 
 #BUF6B=X,7,S
-! T(2,#Supervisor+Y)
 
 #BIND6B=X,1,S
 BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6B;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})

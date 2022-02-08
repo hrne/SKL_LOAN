@@ -18,6 +18,16 @@ BEGIN
     -- 記錄程式起始時間
     JOB_START_TIME := SYSTIMESTAMP;
 
+    DECLARE 
+        "TbsDyF" DECIMAL(8); --西元帳務日
+    BEGIN
+
+    SELECT "TbsDy" + 19110000
+    INTO "TbsDyF"
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
+    ;
+
     -- 刪除舊資料
     EXECUTE IMMEDIATE 'ALTER TABLE "ForeclosureFee" DISABLE PRIMARY KEY CASCADE';
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "ForeclosureFee" DROP STORAGE';
@@ -129,16 +139,19 @@ BEGIN
                                           -- 尚有餘額時,取有餘額的最早額度號碼
                                           -- 若皆無餘額時,直接取該戶號下最早的額度號碼
                                          ) "Seq"
-                FROM ( SELECT "CustNo"
-                             ,"FacmNo"
-                             ,SUM("LoanBal") AS "LoanBalTotal"
-                       FROM "LoanBorMain"
-                       GROUP BY "CustNo"
-                               ,"FacmNo"
+                FROM ( SELECT "LMSACN" AS "CustNo"
+                            , "LMSAPN" AS "FacmNo"
+                            , SUM(CASE
+                                    WHEN "LMSLLD" <= "TbsDyF" 
+                                    THEN "LMSLBL"
+                                  ELSE 0 END) AS "LoanBalTotal"
+                       FROM "LA$LMSP"
+                       GROUP BY "LMSACN"
+                              , "LMSAPN"
                      ) LM
               ) S3 ON S3."CustNo" = S1."LMSACN"
                   AND S3."Seq"    = 1
-    WHERE S1."TRXIDT" <> 0 -- 入帳日期
+    WHERE S1."TRXIDT" != 0 -- 入帳日期
     ;
 
     -- 記錄寫入筆數
@@ -151,6 +164,7 @@ BEGIN
 
     commit;
 
+    END;
     -- 例外處理
     Exception
     WHEN OTHERS THEN
