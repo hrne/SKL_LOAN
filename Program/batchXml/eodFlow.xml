@@ -48,18 +48,11 @@
 		<!-- 每日批次結束，判斷是否需要執行月批 -->
 		<step id="eodFinal" parent="parentStep" next="startEomFlow">
 			<tasklet ref="EodFinal" />
-			<!-- <next on="COMPLETED" to="startEomFlow" /> -->
-			<!-- <next on="FAILED" to="startDbBackup" /> -->
-			<!-- <end on="FAILED" /> -->
+			<next on="COMPLETED" to="startEomFlow" />
+			<end on="STOPPED" />
 		</step>
 		<step id="startEomFlow" parent="parentStep">
 			<job ref="eomFlow" job-launcher="jobLauncher" />
 		</step>
-		<!-- <step id="startDbBackup" parent="parentStep"> <job ref="dbBackUp" 
-			job-launcher="jobLauncher" /> </step> -->
-		<step id="startDailyRptFlow" parent="parentStep">
-			<job ref="dailyRptFlow" job-launcher="jobLauncher" />
-		</step>
 	</job>
-
 </beans>

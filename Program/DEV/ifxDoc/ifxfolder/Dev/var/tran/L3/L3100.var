@@ -1009,8 +1009,13 @@ E(0,#TimDrawdownAmt)
 C(3,#DrawdownDate,0,E(0,#SYSDATE),$)
 D(8)
 @V(7)A(DATE,0,#DrawdownDate)
-! V(5,0010101,#SYSDATE)
+V(5,0010101,#SYSDATE)
 
+#WKFADJDATE=D,8,S
+D(7,2,#DrawdownDate,#FirstRateAdjFreq,0)
+C(3,#RateCode,3,$,s)
+E(0,@FirstAdjRateDate,#L2r05FirstAdjRateDate)
+C(3,#L2r05FirstAdjRateDate,0,E(0,@FirstAdjRateDate,#WKFADJDATE),$)
 ![貸款期間]
 !必須輸入
 #FdLoanTerm=X,2,L
@@ -1246,7 +1251,6 @@ IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
 C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#GracePeriod,0),D(7,2,#L2r05FirstDrawdownDate,#GracePeriod,0))
 
 ![寬限到期日]
-!攤還方式為本息或本金平均戶時，才可輸入寬限到期日
 #FdGraceDate=X,2,L
 
 #GraceDate=D,7,L
@@ -1801,8 +1805,6 @@ C(3,#RateCode,3,$,S)
 
 #FirstRateAdjFreq=X,2,S
 
-#WKFADJDATE=D,8,S
-D(7,2,#DrawdownDate,#FirstRateAdjFreq,0)
 
 ! #WKADJ=D,8,S
 ! C(3,#BormNo,1,D(7,2,#DrawdownDate,#FirstRateAdjFreq,0),$)

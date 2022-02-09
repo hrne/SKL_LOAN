@@ -319,12 +319,18 @@ T(6A,#TimCustNo+#FacmNo+#BormNo+#RateIncr+#ApproveRate+#RateCode+#RateAdjFreq+#D
 #TXTNO=_,_,S
 
 
-! L3916撥款內容查詢按鈕
+! L3120預約內容查詢按鈕
 #DTL_BUF=X,100,S
-T(2,#OOCaseNo+#OOCustNo+#OOCustId+#OOApplNo+#OOFacmNo+#OORvBormNo)
+T(2,5+#OOCustNo+          +0000000+#OOFacmNo+#OOBormNo)
 #DTL_BTN=X,3,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L3916;text=撥款內容查詢;ntxbuf=#DTL_BUF})
+BIND(grid,{ cmd=CHAIN; ntxcd=L3120;text=預約內容查詢;ntxbuf=#DTL_BUF})
 
+
+! L3916已撥內容查詢按鈕
+#DTL_BUFB=X,100,S
+T(2,0000000+#OOCustNo+          +0000000+#OOFacmNo+#OORvBormNo)
+#DTL_BTNB=X,3,S
+C(4,#OORelNo,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L3916;text=已撥內容查詢;ntxbuf=#DTL_BUFB}))
 
 
 
@@ -509,7 +515,7 @@ ifxBatch:{
 
 #OODtlValue
 
-#OODrawdownDate=預約日期
+#OODrawdownDate=預約日期1
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -537,7 +543,7 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
-#DTL_BTN=
+#DTL_BTN=預約內容查詢
 {width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
 
 ^
@@ -562,7 +568,7 @@ ifxBatch:{
 
 #OODtlValue
 
-#OODrawdownDate=預約日期
+#OODrawdownDate=預約日期2
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -590,7 +596,7 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
-#DTL_BTN=
+#DTL_BTN=預約內容查詢
 {width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
 
 ^
@@ -598,7 +604,7 @@ ifxBatch:{
 #RPTFG=4,QUERY.GRID,O1
 #any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OODrawdownDate=預約日期
+#OODrawdownDate=預約日期3
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -626,15 +632,17 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
-#DTL_BTN=
+#DTL_BTN=預約內容查詢
 {width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
 
+#DTL_BTNB=已撥內容查詢
+{width:100,search:false,formatter:'cust:bind-button:#DTL_BTNB',align:'center',canExport:false}
 ^
 
 #RPTFG=5,QUERY.GRID,O1
 #any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OODrawdownDate=預約日期
+#OODrawdownDate=預約日期4
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -664,8 +672,11 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
-#DTL_BTN=
+#DTL_BTN=預約內容查詢
 {width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
+
+#DTL_BTNB=已撥內容查詢
+{width:100,search:false,formatter:'cust:bind-button:#DTL_BTNB',align:'center',canExport:false}
 
 ^
 
@@ -688,7 +699,7 @@ ifxBatch:{
 
 #OODtlValue
 
-#OODrawdownDate=預約日期
+#OODrawdownDate=預約日期5
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -715,7 +726,7 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
-#DTL_BTN=
+#DTL_BTN=預約內容查詢
 {width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
 
 ^
@@ -738,7 +749,7 @@ ifxBatch:{
 
 #OODtlValue
 
-#OODrawdownDate=預約日期
+#OODrawdownDate=預約日期6
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -765,7 +776,7 @@ ifxBatch:{
 #OORelNoX=登放序號
 {width:150,align:'left'}
 
-#DTL_BTN=
+#DTL_BTN=預約內容查詢
 {width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
 
 ^

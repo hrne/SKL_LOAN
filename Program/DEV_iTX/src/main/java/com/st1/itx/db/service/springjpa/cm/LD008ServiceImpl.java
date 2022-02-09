@@ -29,8 +29,6 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(int rptType, String acSubBookCode, TitaVo titaVo) throws Exception {
 		this.info("LD008 findAll rptType = " + rptType + " , acSubBookCode = " + acSubBookCode);
 
-		int entdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-
 		String sql = " ";
 		sql += " SELECT S.\"DetailSeq\"";
 		sql += "       ,SUM(S.\"Counts\")      AS \"Counts\"";
@@ -58,7 +56,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      ,SUM(D.\"LoanBalance\") AS \"LoanBalance\"";
 		sql += "                FROM \"DailyLoanBal\" D ";
 		sql += "                WHERE D.\"LoanBalance\" > 0";
-		sql += "                  AND D.\"DataDate\" = :entdy";
+		sql += "                  AND D.\"LatestFlag\" = 1";
 		sql += "                GROUP BY D.\"AcctCode\"";
 		sql += "                        ,D.\"FacAcctCode\"";
 		sql += "                        ,D.\"CustNo\"";
@@ -99,7 +97,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                                  AND A0.\"FacmNo\"   = D0.\"FacmNo\"";
 		sql += "                                                  AND SUBSTR(A0.\"RvNo\",0,3) = LPAD(D0.\"BormNo\",3,'0')";
 		sql += "                     WHERE D0.\"LoanBalance\" > 0";
-		sql += "                       AND D0.\"DataDate\" = :entdy";
+		sql += "                       AND D0.\"LatestFlag\" = 1";
 		sql += "                       AND A0.\"AcctCode\" IN ('310','320','330','340','990')";
 		sql += "                   ) A ON A.\"AcctCode\" = D.\"AcctCode\"";
 		sql += "                      AND A.\"CustNo\"   = D.\"CustNo\"";
@@ -131,7 +129,6 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("entdy", entdy);
 		if (rptType < 9) {
 			query.setParameter("acSubBookCode", acSubBookCode);
 		}
@@ -191,7 +188,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      ,SUM(D.\"LoanBalance\") AS \"LoanBalance\" ";
 		sql += "                FROM \"DailyLoanBal\" D  ";
 		sql += "                WHERE D.\"LoanBalance\" > 0 ";
-		sql += "                  AND D.\"DataDate\" = :entdy ";
+		sql += "                  AND D.\"LatestFlag\" = 1";
 		sql += "                GROUP BY D.\"AcctCode\" ";
 		sql += "                        ,D.\"FacAcctCode\" ";
 		sql += "                        ,D.\"CustNo\" ";
@@ -232,7 +229,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                                  AND A0.\"FacmNo\"   = D0.\"FacmNo\" ";
 		sql += "                                                  AND SUBSTR(A0.\"RvNo\",0,3) = LPAD(D0.\"BormNo\",3,'0') ";
 		sql += "                     WHERE D0.\"LoanBalance\" > 0 ";
-		sql += "                       AND D0.\"DataDate\" = :entdy ";
+		sql += "                       AND D0.\"LatestFlag\" = 1 ";
 		sql += "                       AND A0.\"AcctCode\" IN ('310','320','330','340','990') ";
 		sql += "                   ) A ON A.\"AcctCode\" = D.\"AcctCode\" ";
 		sql += "                      AND A.\"CustNo\"   = D.\"CustNo\" ";
@@ -263,7 +260,6 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("entdy", entdy);
 		if (rptType < 9) {
 			query.setParameter("acSubBookCode", acSubBookCode);
 		}

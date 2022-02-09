@@ -18,6 +18,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.TxAmlCredit;
 import com.st1.itx.db.domain.TxAuthGroup;
 import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.TxAuthority;

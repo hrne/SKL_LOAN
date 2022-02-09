@@ -180,8 +180,12 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo()); // 預約序號
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()
-						+ parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8)); // 登放序號
+				if (tTxToDoDetail.getStatus() == 2) {// 已處理顯示登放序號
+					occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()
+							+ parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8)); // 登放序號
+				} else {
+					occursList.putParam("OORelNo", ""); // 登放序號
+				}
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
