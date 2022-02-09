@@ -3021,7 +3021,7 @@ TXFORM=L2R34
 
 !    L2R35 : 依核准號碼,保證人統編尋找保證人資料
 <L2R35.dec>
-#L2r35RelInd=A,2,S
+#L2r35RelInd=X,2,S
 #L2r35GuaAmt=m,14,S
 #L2r35GuaType=A,2,S
 #L2r35GuaDt=D,7,S

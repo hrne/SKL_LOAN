@@ -51,7 +51,7 @@ BEGIN
           ,CASE
              WHEN NVL(L2."BormNo",0) > 0
              THEN LPAD(L2."BormNo",3,0)
-           ELSE LPAD(L1."BormNo",3,0) END
+           ELSE LPAD(NVL(L1."BormNo",0),3,0) END
                                 AS "RvNo"             -- 銷帳編號
           ,C1."AcNoCode"        AS "AcNoCode"         -- 科目代號
           ,C1."AcSubCode"       AS "AcSubCode"        -- 子目代號
@@ -76,21 +76,21 @@ BEGIN
              THEN 0
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduAmt"
-           ELSE L1."DrawdownAmt" END
+           ELSE NVL(L1."DrawdownAmt",0) END
                                 AS "RvAmt"            -- 起帳總額
           ,CASE
              WHEN L1."Status" = 99
              THEN 0
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduBal"
-           ELSE L1."LoanBal" END
+           ELSE NVL(L1."LoanBal",0) END
                                 AS "RvBal"            -- 未銷餘額
           ,CASE
              WHEN L1."Status" = 99
              THEN 0
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduBal"
-           ELSE L1."LoanBal" END
+           ELSE NVL(L1."LoanBal",0) END
                                 AS "AcBal"            -- 會計日餘額
           ,''                   AS "SlipNote"         -- 傳票摘要
           ,'000'                AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
@@ -102,21 +102,21 @@ BEGIN
              THEN "TbsDyF"
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."OvduDate"
-           ELSE L1."DrawdownDate" END
+           ELSE NVL(L1."DrawdownDate","TbsDyF") END
                                 AS "OpenAcDate"       -- 起帳日期
           ,CASE
              WHEN L1."Status" = 99
              THEN "TbsDyF"
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."AcDate"
-           ELSE L1."LastEntDy" END
+           ELSE NVL(L1."LastEntDy","TbsDyF") END
                                 AS "LastAcDate"       -- 最後作帳日
           ,CASE
              WHEN L1."Status" = 99
              THEN "TbsDyF"
              WHEN NVL(L2."BormNo",0) > 0 
              THEN L2."AcDate"
-           ELSE L1."LastEntDy" END
+           ELSE NVL(L1."LastEntDy","TbsDyF") END
                                 AS "LastTxDate"       -- 最後交易日
           ,''                   AS "TitaTxCd"         -- 交易代號
           ,''                   AS "TitaKinBr"        -- 
@@ -137,8 +137,14 @@ BEGIN
                               AND L1."Status" IN (2,6,7)
     LEFT JOIN "CdAcCode" C1 ON C1."AcctCode" = CASE WHEN NVL(L2."BormNo",0) > 0 THEN '990' ELSE F1."AcctCode" END
     LEFT JOIN "LA$ACTP" ACT ON ACT."LMSACN" = F1."CustNo"
-    WHERE F1."LastBormNo" >= 1
-      AND NVL(NVL(L2."OvduNo",L1."BormNo"),0) > 0
+    WHERE CASE
+            WHEN F1."LastBormNo" >= 1
+                 AND NVL(NVL(L2."OvduNo",L1."BormNo"),0) > 0 -- 已撥款
+            THEN 1
+            WHEN NVL(ACT."ACTFSC",' ') = 'A' -- 未撥款但區隔帳冊為利變A
+            THEN 1
+          ELSE 0 
+          END = 1
       -- AND L1."Status" != 99 -- 排除預約撥款
     ;
 
@@ -784,11 +790,5 @@ BEGIN
     Exception
     WHEN OTHERS THEN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
-    -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_AcReceivable_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-
-
 /

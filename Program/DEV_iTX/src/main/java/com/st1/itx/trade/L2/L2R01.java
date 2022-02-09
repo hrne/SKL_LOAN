@@ -18,7 +18,6 @@ import com.st1.itx.db.domain.FacProdPremium;
 import com.st1.itx.db.domain.FacProdStepRate;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdAcctFeeService;
-import com.st1.itx.db.service.FacProdBreachService;
 import com.st1.itx.db.service.FacProdPremiumService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.FacProdStepRateService;
@@ -52,8 +51,6 @@ public class L2R01 extends TradeBuffer {
 	public FacProdAcctFeeService facProdAcctFeeService;
 	@Autowired
 	public FacProdPremiumService facProdPremiumService;
-	@Autowired
-	public FacProdBreachService facProdBreachService;
 
 	@Autowired
 	Parse parse;
@@ -62,7 +59,6 @@ public class L2R01 extends TradeBuffer {
 	LoanCloseBreachCom loanCloseBreachCom;
 
 	// work area
-	private String wkBreachCode;
 	private String BreachDescription = "";
 	private FacProd tFacProd = new FacProd();
 	private Slice<FacProdStepRate> lFacProdStepRate;
@@ -96,7 +92,6 @@ public class L2R01 extends TradeBuffer {
 		SetTotaPremium();
 		SetTotaAcctFee();
 		SetTotaHandingFee();
-		SetTotaBreach();
 		wkUseProdFg = "";
 		// 查詢商品參數檔
 		tFacProd = facProdService.findById(iRimProdNo, titaVo);
@@ -185,12 +180,7 @@ public class L2R01 extends TradeBuffer {
 		if (!(lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty())) {
 			SetTotaHandingFee();
 		}
-		// 查詢清償金類型
-		wkBreachCode = tFacProd != null ? tFacProd.getBreachCode() : "0";
-		lFacProdBreach = facProdBreachService.breachNoEq(iRimProdNo, wkBreachCode, wkBreachCode, this.index, this.limit, titaVo);
-		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
-//			SetTotaBreach();
-		}
+
 
 		FacMain tFacMain = facMainService.findProdNoFirst(iRimProdNo, titaVo);
 		if (!(tFacMain == null)) {
@@ -319,33 +309,4 @@ public class L2R01 extends TradeBuffer {
 		}
 	}
 
-	// 清償金類型
-	private void SetTotaBreach() throws LogicException {
-		if (lFacProdBreach == null || lFacProdBreach.isEmpty()) {
-			for (int i = 1; i <= 10; i++) {
-				this.totaVo.putParam("BreachbMmA" + i, 0);
-				this.totaVo.putParam("BreachbMmB" + i, 0);
-				this.totaVo.putParam("BreachbPercent" + i, 0);
-				this.totaVo.putParam("BreachaYyA" + i, 0);
-				this.totaVo.putParam("BreachaYyB" + i, 0);
-				this.totaVo.putParam("BreachaPercent" + i, 0);
-			}
-		} else {
-			int i = 1;
-			for (FacProdBreach tFacProdBreach : lFacProdBreach.getContent()) {
-				if (wkBreachCode.equals("2")) {
-					this.totaVo.putParam("BreachbMmA" + i, tFacProdBreach.getMonthStart());
-					this.totaVo.putParam("BreachbMmB" + i, tFacProdBreach.getMonthEnd());
-					this.totaVo.putParam("BreachbPercent" + i, tFacProdBreach.getBreachPercent());
-				} else {
-					this.totaVo.putParam("BreachaYyA" + i, tFacProdBreach.getMonthStart() / 12);
-					this.totaVo.putParam("BreachaYyB" + i, tFacProdBreach.getMonthEnd() / 12);
-					this.totaVo.putParam("BreachaPercent" + i, tFacProdBreach.getBreachPercent());
-				}
-				i++;
-				if (i > 10)
-					break;
-			}
-		}
-	}
 }

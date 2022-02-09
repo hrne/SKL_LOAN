@@ -134,7 +134,7 @@ C(4,#CustId,C(3,#CustNo1,0,V(P,需擇一輸入查詢條件),$),S)
 C(3,#CHAIN,1,T(1,#NTXBUF,8,7),$)
 C(3,#CHAIN,1,s,$)
 C(4,#CustId,$,S)
-C(3,#CustNo1,0,s,E(0,#CustNo1))
+C(3,#CustNo1,0,s,$)
 @V(5,#CustNo1,9999999)
 
 

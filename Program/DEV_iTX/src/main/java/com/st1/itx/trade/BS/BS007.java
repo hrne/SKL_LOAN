@@ -11,12 +11,14 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdLoanNotYet;
+import com.st1.itx.db.domain.LoanNotYet;
+import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.service.CdLoanNotYetService;
+import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.TxToDoCom;
-import com.st1.itx.db.domain.LoanNotYet;
-import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.db.domain.TxToDoDetail;
 
 @Service("BS007")
 @Scope("prototype")
@@ -32,6 +34,9 @@ public class BS007 extends TradeBuffer {
 
 	@Autowired
 	public LoanNotYetService loanNotYetService;
+
+	@Autowired
+	public CdLoanNotYetService cdLoanNotYetService;
 
 	/* 日期工具 */
 	@Autowired
@@ -59,8 +64,20 @@ public class BS007 extends TradeBuffer {
 				tTxToDoDetail.setItemCode("L2921");
 				tTxToDoDetail.setCustNo(loanNotYet.getCustNo());
 				tTxToDoDetail.setFacmNo(loanNotYet.getFacmNo());
-				tTxToDoDetail.setDtlValue(loanNotYet.getNotYetCode());
-				tTxToDoDetail.setProcessNote(loanNotYet.getNotYetItem());
+				
+				/*
+				 * 未齊件代碼說明2022.2.9 by 昱衡
+				 */
+				String NotYetCode = loanNotYet.getNotYetCode();
+				CdLoanNotYet cdLoanNotYet = cdLoanNotYetService.findById(NotYetCode, titaVo);
+				if (cdLoanNotYet != null) {
+					tTxToDoDetail.setDtlValue(cdLoanNotYet.getNotYetCode());
+					tTxToDoDetail.setProcessNote(cdLoanNotYet.getNotYetItem());
+				} else {
+					tTxToDoDetail.setDtlValue("");
+					tTxToDoDetail.setProcessNote("");
+				}
+				
 				txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo); // addDetail
 			}
 		}

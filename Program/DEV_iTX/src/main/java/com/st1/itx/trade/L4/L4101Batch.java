@@ -168,8 +168,8 @@ public class L4101Batch extends TradeBuffer {
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		for (BankRemit tBankRemit : lBankRemit) {
 			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
-					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0,
-					Integer.MAX_VALUE, titaVo);
+					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0, Integer.MAX_VALUE,
+					titaVo);
 			if (slAcDetail != null) {
 				for (AcDetail tAcDetail : slAcDetail.getContent()) {
 					tAcDetail.setTitaBatchNo(batchNo);
@@ -247,10 +247,10 @@ public class L4101Batch extends TradeBuffer {
 	}
 
 	private void procBankRemitMedia(List<BankRemit> lBankRemit, TitaVo titaVo) throws LogicException {
-
+		this.info("procBankRemitMedia ...");
 //		String path = outFolder + "LNM24p.txt";
 
-		l4101Vo.setOccursList(lBankRemit,titaVo);
+		l4101Vo.setOccursList(lBankRemit, titaVo);
 //		ArrayList<OccursList> tmp = new ArrayList<>();
 //
 //		int seq = 0;
@@ -295,7 +295,7 @@ public class L4101Batch extends TradeBuffer {
 //		bankRemitFileVo.setOccursList(tmp);
 		// 轉換資料格式
 		ArrayList<String> file = l4101Vo.toFile();
-		
+
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
 				titaVo.getTxCode() + "-撥款匯款媒體檔", "LNM24p.csv", 2);
 
@@ -357,10 +357,8 @@ public class L4101Batch extends TradeBuffer {
 
 		long sno = 0;
 		int cnt = 0;
-
 		if (lBankRemit.size() > 0) {
 			RemitFormVo remitformVo = new RemitFormVo();
-
 			// 報表代號(交易代號)
 			remitformVo.setReportCode(titaVo.getTxCode());
 			// 報表說明(預設為"國內匯款申請書(兼取款憑條)")
@@ -368,8 +366,15 @@ public class L4101Batch extends TradeBuffer {
 
 			remitForm.open(titaVo, remitformVo);
 
+			this.info("lBankRemit.size =" + lBankRemit.size());
 			for (BankRemit tBankRemit : lBankRemit) {
+
 				remitformVo = new RemitFormVo();
+				// 第二筆
+				if (cnt > 0) {
+					remitformVo.setNewPageFg();
+				}
+				this.info("tBankRemit =" + tBankRemit);
 
 				CdBank tCdBank = new CdBank();
 				CdBankId tCdBankId = new CdBankId();
@@ -459,20 +464,17 @@ public class L4101Batch extends TradeBuffer {
 				remitformVo.setNote(tBankRemit.getRemark());
 
 				remitForm.addpage(titaVo, remitformVo);
+
 			}
 		}
 
 		if (cnt >= 0) {
 			sno = remitForm.close();
 
-			remitForm.toPdf(sno);
+//			remitForm.toPdf(sno);
 		}
 		return sno;
 	}
-
-
-
-
 
 	public void doRptA(TitaVo titaVo) throws LogicException {
 		this.info("L411A doRpt started.");

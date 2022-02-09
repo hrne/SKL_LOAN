@@ -28,7 +28,6 @@ import com.st1.itx.db.domain.LoanNotYet;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
-import com.st1.itx.db.service.FacProdBreachService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.FacProdStepRateService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -66,8 +65,6 @@ public class L2R05 extends TradeBuffer {
 	@Autowired
 	public FacProdService facProdService;
 	@Autowired
-	public FacProdBreachService facProdBreachService;
-	@Autowired
 	public FacProdStepRateService facProdStepRateService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
@@ -101,7 +98,6 @@ public class L2R05 extends TradeBuffer {
 	private String wkCurrencyCode = "TWD";
 	private String wkCustId = "";
 	private String wkGroupId = "";
-	private String wkBreachCode;
 	private String wkBreachNo;
 	private String sProdNo;
 	private String wkCloseFg = "N"; // 未齊件未消註記
@@ -261,16 +257,8 @@ public class L2R05 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 500;
 
-		// 查詢清償金類型
-		SetTotaBreach();
 		wkBreachNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
 				+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
-		wkBreachCode = tFacProd.getBreachCode();
-		slFacProdBreach = facProdBreachService.breachNoEq(wkBreachNo, wkBreachCode, wkBreachCode, this.index,
-				this.limit, titaVo);
-		if (!(slFacProdBreach == null || slFacProdBreach.isEmpty())) {
-			SetTotaBreach();
-		}
 		// 檢查是否未齊件
 		Slice<LoanNotYet> slLoanNotYet = sLoanNotYetService.notYetCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 99991231, 0,
 				99991231, this.index, this.limit, titaVo);
@@ -456,35 +444,6 @@ public class L2R05 extends TradeBuffer {
 
 	}
 
-	// 清償金類型
-	private void SetTotaBreach() throws LogicException {
-		if (slFacProdBreach == null || slFacProdBreach.isEmpty()) {
-			for (int i = 1; i <= 10; i++) {
-				this.totaVo.putParam("BreachbMmA" + i, 0);
-				this.totaVo.putParam("BreachbMmB" + i, 0);
-				this.totaVo.putParam("BreachbPercent" + i, 0);
-				this.totaVo.putParam("BreachaYyA" + i, 0);
-				this.totaVo.putParam("BreachaYyB" + i, 0);
-				this.totaVo.putParam("BreachaPercent" + i, 0);
-			}
-		} else {
-			int i = 1;
-			for (FacProdBreach tFacProdBreach : slFacProdBreach.getContent()) {
-				if (wkBreachCode.equals("002")) {
-					this.totaVo.putParam("BreachbMmA" + i, tFacProdBreach.getMonthStart());
-					this.totaVo.putParam("BreachbMmB" + i, tFacProdBreach.getMonthEnd());
-					this.totaVo.putParam("BreachbPercent" + i, tFacProdBreach.getBreachPercent());
-				} else {
-					this.totaVo.putParam("BreachaYyA" + i, tFacProdBreach.getMonthStart() / 12);
-					this.totaVo.putParam("BreachaYyB" + i, tFacProdBreach.getMonthEnd() / 12);
-					this.totaVo.putParam("BreachaPercent" + i, tFacProdBreach.getBreachPercent());
-				}
-				i++;
-				if (i > 10)
-					break;
-			}
-		}
-	}
 
 	private void PrevIntDateRoutine() throws LogicException {
 		this.info("PrevIntDateRoutine ...");

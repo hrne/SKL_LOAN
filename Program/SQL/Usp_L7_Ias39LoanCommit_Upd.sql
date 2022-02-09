@@ -67,7 +67,7 @@ BEGIN
     LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                          AND F."FacmNo" = M."FacmNo"
     WHERE M."DataYM" = YYYYMM
-      AND M."IrrevocableFlag" = 1   -- 該筆額度為不可徹銷
+      AND M."IrrevocableFlag" = 1   
       AND ( TRUNC(NVL(M."UtilDeadline", 0) / 100 )  > YYYYMM  OR 
             TRUNC(NVL(F."RecycleDeadline", 0) / 100 )  > YYYYMM )
       AND TRUNC(NVL(M."ApproveDate", 0) / 100 )  <= YYYYMM      

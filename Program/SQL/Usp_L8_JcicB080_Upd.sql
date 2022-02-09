@@ -115,10 +115,7 @@ BEGIN
                 WHEN F."RecycleCode" IN ('1')          THEN 'Y'
                 ELSE ' '
            END                                   AS "RecycleCode"       -- 循環信用註記 'Y':是，'N':否
-         , CASE WHEN F."IrrevocableFlag" IN ('N') THEN 'Y'
-                WHEN F."IrrevocableFlag" IN ('Y') THEN 'N'
-                ELSE 'Y'
-           END                                   AS "IrrevocableFlag"   -- 額度可否撤銷 'Y':可撤銷 'N':不可撤銷
+         , 'Y'                                   AS "IrrevocableFlag"   -- 額度可否撤銷,固定值= 'Y':可撤銷 
          , LPAD('9', 50, '9')                    AS "UpFacmNo"          -- 上階共用額度控制編碼
          , CASE
          --  WHEN MF."Status"      IN (2, 7)         THEN 'A' -- 催收款項   -- (ref:LN15E1 (#M3601 160 2))

@@ -109,6 +109,10 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "LNWLCAP"
+    LEFT JOIN "LNWLCTP" ON "LNWLCTP"."LMSACN" = "LNWLCAP"."LMSACN"
+                       AND "LNWLCTP"."LMSAPN" = "LNWLCAP"."LMSAPN"
+    WHERE NVL("LNWLCTP"."LMSACN",0) = 0 -- 2022-02-08 增加篩選條件:避免與下方SELECT重複
+    ;
     ;
 
     -- 記錄寫入筆數
