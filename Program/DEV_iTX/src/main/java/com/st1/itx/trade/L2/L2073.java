@@ -138,7 +138,7 @@ public class L2073 extends TradeBuffer {
 
 				createDate = sdfdate.format(ts);
 				createTime = sdftime.format(ts);
-				createDate = parse.IntegerToString(parse.stringToInteger(createDate) - 19110000, 8);
+				createDate = parse.IntegerToString(parse.stringToInteger(createDate) - 19110000, 7);
 				this.info("createDate = " + createDate);
 				this.info("createTime = " + createTime);
 

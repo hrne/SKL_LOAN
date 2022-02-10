@@ -19,7 +19,7 @@ public class SlipMedia2022Id implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1828069018445059553L;
 
 // 傳票號碼
   /* F10+民國年+月份(1碼)+日期+3碼序號 */

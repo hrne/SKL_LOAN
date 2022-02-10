@@ -26,7 +26,7 @@ public class CdCode implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2355529709863884981L;
+	private static final long serialVersionUID = -3129556042640092177L;
 
 @EmbeddedId
   private CdCodeId cdCodeId;
@@ -57,6 +57,16 @@ public class CdCode implements Serializable {
   /* 0:已放行1:未放行因應L6301放行新增記號 */
   @Column(name = "`EffectFlag`")
   private int effectFlag = 0;
+
+  // 代碼最小長度
+  /* 因應QC1297單，新增設置代碼長度 */
+  @Column(name = "`MinCodeLength`")
+  private int minCodeLength = 0;
+
+  // 代碼最大長度
+  /* 因應QC1297單，新增設置代碼長度 */
+  @Column(name = "`MaxCodeLength`")
+  private int maxCodeLength = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -222,6 +232,44 @@ N:未啟用
   }
 
 /**
+	* 代碼最小長度<br>
+	* 因應QC1297單，新增設置代碼長度
+	* @return Integer
+	*/
+  public int getMinCodeLength() {
+    return this.minCodeLength;
+  }
+
+/**
+	* 代碼最小長度<br>
+	* 因應QC1297單，新增設置代碼長度
+  *
+  * @param minCodeLength 代碼最小長度
+	*/
+  public void setMinCodeLength(int minCodeLength) {
+    this.minCodeLength = minCodeLength;
+  }
+
+/**
+	* 代碼最大長度<br>
+	* 因應QC1297單，新增設置代碼長度
+	* @return Integer
+	*/
+  public int getMaxCodeLength() {
+    return this.maxCodeLength;
+  }
+
+/**
+	* 代碼最大長度<br>
+	* 因應QC1297單，新增設置代碼長度
+  *
+  * @param maxCodeLength 代碼最大長度
+	*/
+  public void setMaxCodeLength(int maxCodeLength) {
+    this.maxCodeLength = maxCodeLength;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -301,6 +349,7 @@ N:未啟用
   @Override
   public String toString() {
     return "CdCode [cdCodeId=" + cdCodeId + ", defType=" + defType + ", item=" + item + ", enable=" + enable + ", effectFlag=" + effectFlag
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", minCodeLength=" + minCodeLength + ", maxCodeLength=" + maxCodeLength + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

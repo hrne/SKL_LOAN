@@ -38,7 +38,7 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9712.findAll");
 
 		String iAcDateMin = String.valueOf(Integer.valueOf(titaVo.get("AcDateMin")) + 19110000);
-		String iAcDateMax = String.valueOf(Integer.valueOf(titaVo.get("iAcDateMax")) + 19110000);
+		String iAcDateMax = String.valueOf(Integer.valueOf(titaVo.get("AcDateMax")) + 19110000);
 
 		String sql = "SELECT T.\"AcDate\" F0";
 		sql += "			,T.\"CustNo\" F1";
@@ -61,6 +61,7 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           WHERE T.\"AcDate\" >= :isday ";
 		sql += "             AND T.\"AcDate\" <= :ieday ";
 		sql += "             AND  T.\"TitaHCode\" = '0' ";
+		sql += "             AND  T.\"Interest\" > 0 ";
 		sql += "	         AND (JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt') > 0 ";
 		sql += "	         OR JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt') > 0) ";
 		sql += "		   GROUP BY T.\"AcDate\"";

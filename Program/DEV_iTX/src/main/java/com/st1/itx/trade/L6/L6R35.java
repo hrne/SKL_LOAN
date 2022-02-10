@@ -57,6 +57,8 @@ public class L6R35 extends TradeBuffer {
 		// 如有找到資料
 		for (CdCode tCdCode : lCdCode) {
 			this.totaVo.putParam("L6R35Item", tCdCode.getItem());
+			this.totaVo.putParam("L6R35MinCodeLength", tCdCode.getMinCodeLength());
+			this.totaVo.putParam("L6R35MaxCodeLength", tCdCode.getMaxCodeLength());
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

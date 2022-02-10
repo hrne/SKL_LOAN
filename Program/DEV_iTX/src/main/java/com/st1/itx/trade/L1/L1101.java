@@ -41,22 +41,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
 
 /**
- * Tita<br>
- * FunCd=9,1 CustId=X,10 CustName1=X,50 CustName2=X,50 Birthday=9,7 Sex=9,1
- * CustTypeCode=9,2 IndustryCode=9,6 NationalityCode=X,2 SpouseId=X,10
- * SpouseName=X,100 RegZip3=X,3 RegZip2=X,2 RegCityCode=X,2 RegAreaCode=X,3
- * RegIrCode=X,4 RegRoad=X,40 RegSection=X,5 RegAlley=X,5 RegLane=X,5 RegNum=X,5
- * RegNumDash=X,5 RegFloor=X,5 RegFloorDash=X,5 CurrZip3=X,3 CurrZip2=X,2
- * CurrCityCode=X,2 CurrAreaCode=X,3 CurrIrCode=X,4 CurrRoad=X,40
- * CurrSection=X,5 CurrAlley=X,5 CurrLane=X,5 CurrNum=X,5 CurrNumDash=X,5
- * CurrFloor=X,5 CurrFloorDash=X,5 IsLimit=X,1 IsRelated=X,1 IsLnrelNear=X,1
- * EntCode=X,1 EmpNo=X,6 EName=X,20 EduCode=X,1 OwnedHome=X,1 CurrCompName=X,60
- * CurrCompId=X,8 CurrCompTel=X,16 JobTitle=X,20 JobTenure=X,2
- * IncomeOfYearly=9,9 IncomeDataDate=X,6 PassportNo=X,20 AMLJobCode=X,3
- * AMLGroup=X,3 IndigenousName1=X,50 IndigenousName2=X,50
- */
-
-/**
  * 
  * 
  * @author YuJiaXing
@@ -259,6 +243,11 @@ public class L1101 extends TradeBuffer {
 //				}
 //			}
 
+
+			break;
+		}
+
+		if (!this.isEloan || "ELTEST".equals(titaVo.getTlrNo())) {
 			BankRelationVo vo = bankRelationCom.getBankRelation(iCustId, titaVo);
 
 			if ("Y".equals(vo.getIsLimit())) {
@@ -275,10 +264,6 @@ public class L1101 extends TradeBuffer {
 			}
 			wkIsDataDate = vo.getDataDate();
 
-			break;
-		}
-
-		if (!this.isEloan || "ELTEST".equals(titaVo.getTlrNo())) {
 			setTota(titaVo);
 		}
 		this.addList(this.totaVo);

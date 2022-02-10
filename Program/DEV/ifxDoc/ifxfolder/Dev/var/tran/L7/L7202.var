@@ -42,7 +42,7 @@ E(0,0)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 #CDCODEFuncCode2=x,20,S
-T(3,CdCode.FuncCode2)
+T(3,CdCode.FunctionCd)
 
 #FuncCode2HelpRim=X,1,S
 RESET_RIM(#FuncCode2HelpRim,XXR99)
@@ -216,7 +216,7 @@ C(3,#FuncCode,4,s)
 #Date{i}=D,7,I
 C(4,#Date{j},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
 C(4,#Date{j},S,$)
-C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
+C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,s,s,s),$)
 D(8)
 @A(DATE,0,#Date{i})
 @C(4,#Date{i},INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
@@ -226,7 +226,9 @@ D(8)
 C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
 C(4,#Date{i},S,$)
 C(3,#FuncCode,4,s)
-@V(7)
+HELP(#Ias39LGDTypeHelp)
+@V(H,#Ias39LGDTypeHelp)
+!@V(7)
 
 ! 類別型態
 #TypeDesc{i}=x,20,L

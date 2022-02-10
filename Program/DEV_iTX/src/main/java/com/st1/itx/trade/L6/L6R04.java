@@ -84,6 +84,8 @@ public class L6R04 extends TradeBuffer {
 		this.totaVo.putParam("L6R04Code", mCdCode.getCode());
 		this.totaVo.putParam("L6R04Item", mCdCode.getItem());
 		this.totaVo.putParam("L6R04Enable", mCdCode.getEnable());
+		this.totaVo.putParam("L6R04MinCodeLength", mCdCode.getMinCodeLength());
+		this.totaVo.putParam("L6R04MaxCodeLength", mCdCode.getMaxCodeLength());
 	}
 
 }

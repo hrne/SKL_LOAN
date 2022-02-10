@@ -8243,6 +8243,8 @@ TXFORM=L6R02
 #L6R04Code=x,20,S
 #L6R04Item=X,50,S
 #L6R04Enable=X,1,S
+#L6R04MinCodeLength=A,1,S
+#L6R04MaxCodeLength=A,1,S
 </L6R04.dec>
 
 <L6R04.tom>
@@ -8252,6 +8254,8 @@ TXFORM=L6R04
 #L6R04Code
 #L6R04Item
 #L6R04Enable
+#L6R04MinCodeLength
+#L6R04MaxCodeLength
 ^
 </L6R04.tom>
 
@@ -8996,11 +9000,15 @@ TXFORM=L6R34
 !尋找各類代碼檔
 <L6R35.dec>
 #L6R35Item=X,80,S
+#L6R35MinCodeLength=A,1,S
+#L6R35MaxCodeLength=A,1,S
 </L6R35.dec>
 
 <L6R35.tom>
 TXFORM=L6R35
 #L6R35Item
+#L6R35MinCodeLength
+#L6R35MaxCodeLength
 ^
 </L6R35.tom>
 

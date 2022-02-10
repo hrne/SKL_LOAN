@@ -489,7 +489,7 @@ public class L9130Report2022 extends MakeReport {
 
 		// 於借貸方各寫一筆10340000000 應收調撥款
 		String tempAcNoCode = "10340000000";
-		String tempAcSubNoCode = "";
+		String tempAcSubNoCode = "     ";
 
 		if (transferAmt.compareTo(BigDecimal.ZERO) != 0) {
 

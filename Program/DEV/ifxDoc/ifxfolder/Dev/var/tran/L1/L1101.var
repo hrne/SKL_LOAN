@@ -1361,7 +1361,7 @@ T(2,1+#CustId+0000000)ASGN(NTXBUF$)
 IF(#FunCd == 1,$,S)
 T(3,L1105)
 ASGN(NTXCD$)
-K(NEXTNOCLOSE,true)
+IF(#TypeCode==0||#TypeCode==1,K(NEXTNOCLOSE,true),$)
 
 #RPTFG=A,1,S
 C(3,#FunCd,1,E(0,0),$)

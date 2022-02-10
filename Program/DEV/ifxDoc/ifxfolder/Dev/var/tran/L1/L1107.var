@@ -4,8 +4,6 @@
 
 <sub type="SYS" name="label">
 
-!#TXCD
-!T(3,L1107)
 
 </sub>
 
@@ -194,15 +192,16 @@ CALL(#HomeLossProfitProc)
 #HomeLossProfitProc=@,1,S
 E(0,@HomeLossProfit,#BeforeTaxNet-#BusTax)
 CALL(#HomeComLossProfitProc)
+CALL(#ParentCompanyRightProc)
+CALL(#EPSProc)
 
 !本期綜合損益總額計算
 #HomeComLossProfitProc=@,1,S
 E(0,@HomeComLossProfit,#HomeLossProfit+#OtherComLossProfit)
-CALL(#ParentCompanyRightProc)
 
 !歸屬於母公司之權益計算
 #ParentCompanyRightProc=@,1,S
-E(0,@ParentCompanyRight,#HomeComLossProfit-#UncontrolRight)
+E(0,@ParentCompanyRight,#HomeLossProfit-#UncontrolRight)
 
 #EPSProc=@,1,S
 IF(#Capital==0,E(0,@EPS,0),E(0,@EPS,#HomeLossProfit/#Capital*10))
@@ -1011,6 +1010,7 @@ CALL(#DebtTotalProc)
 C(2,#FunCd,$,$,$,$,s,s)
 @
 CALL(#NetValueProc)
+CALL(#EPSProc)
 
 #CapitalSurplus=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
@@ -1244,55 +1244,55 @@ CALL(#FinBtnProc4)
 ]
 
 !債債能力
-#Flow=+m,18.4,I
+#Flow=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#Speed=+m,18.4,I
+#Speed=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#RateGuar=+m,18.4,I
+#RateGuar=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
 !財務結構
-#Debt=+m,18.4,I
+#Debt=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#Net=+m,18.4,I
+#Net=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#CashFlow=+m,18.4,I
+#CashFlow=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#FixLong=+m,18.4,I
+#FixLong=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
 !獲利能力
-#FinSpend=+m,18.4,I
+#FinSpend=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#GrossProfit=+m,18.4,I
+#GrossProfit=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#AfterTaxNet=+m,18.4,I
+#AfterTaxNet=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#NetReward=+m,18.4,I
+#NetReward=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#TotalAssetReward=+m,18.4,I
+#TotalAssetReward=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
 !經營效能
-#RateStock=+m,18.4,I
+#RateStock=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#RateReceiveAccount=+m,18.4,I
+#RateReceiveAccount=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#TotalAsset=+m,18.4,I
+#TotalAsset=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 
-#RatePayAccount=+m,18.4,I
+#RatePayAccount=+m,18.2,I
 C(2,#FunCd,$,$,$,$,s,s)
 @
 CALL(#FinBtnProc5)

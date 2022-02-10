@@ -75,7 +75,7 @@ public class L1R03 extends TradeBuffer {
 		this.info("active L1R03 ");
 		this.totaVo.init(titaVo);
 
-		String iFunCd = titaVo.getParam("FunCd");
+		titaVo.getParam("FunCd");
 //		String iCustId = titaVo.getParam("CustId");
 		String iCustUKey = titaVo.getParam("CustUKey");
 		String iUKey = titaVo.getParam("UKey");
@@ -88,8 +88,7 @@ public class L1R03 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "客戶資料主檔 ");
 		}
 
-		// 取得客戶識別碼
-		String custUKey = tCustMain.getCustUKey();
+		tCustMain.getCustUKey();
 
 		// 資產負債表
 		FinReportDebtId finReportDebtId = new FinReportDebtId();
@@ -226,7 +225,7 @@ public class L1R03 extends TradeBuffer {
 				// 成長率算法 (新-舊)/舊
 				BigDecimal iHundred = new BigDecimal("100");
 				BigDecimal iGap = finReportProfit.getBusIncome().subtract(lastBusIncome);
-				growRate = iGap.divide(lastBusIncome).setScale(4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
+				growRate = iGap.divide(lastBusIncome,4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
 			}
 			this.info("L1R03 GrowRate  = " + growRate);
 			this.totaVo.putParam("GrowRate", growRate);

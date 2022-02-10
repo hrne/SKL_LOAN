@@ -370,6 +370,11 @@ public class TxToDoCom extends TradeBuffer {
 						tDetail.setTitaKinbr(titaVo.getKinbr());
 						tDetail.setTitaTlrNo(titaVo.getTlrNo());
 						tDetail.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
+					} else {
+						tDetail.setTitaEntdy(0);
+						tDetail.setTitaKinbr("");
+						tDetail.setTitaTlrNo("");
+						tDetail.setTitaTxtNo(0);						
 					}
 					try {
 

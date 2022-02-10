@@ -29,7 +29,7 @@ public class SlipMedia2022 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3867938910759649320L;
 
 @EmbeddedId
   private SlipMedia2022Id slipMedia2022Id;
