@@ -91,7 +91,7 @@ T(2,@CityItem,#L6R12CityItem)
 
 ! 地區別名稱
 #CityItem=x,20,L
-C(3,#CityCode, ,S,$)
+C(3,#CityCode, ,T(2,全部),$)
 
 
 #LegalPsnX=X,100,I,maxWidth:50

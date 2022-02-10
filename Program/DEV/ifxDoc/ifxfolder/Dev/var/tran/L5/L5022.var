@@ -59,6 +59,9 @@ K(MODIFYBUTTON,查詢)
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #CDCODEClassType=x,20,S
 T(3,CdCode.ClassType)
@@ -93,8 +96,6 @@ C(3,#CHAIN,0,$,s)
 ! #NewEmpNo=X,7,S
 ! T(2,1+#EmpNo)
 @V(NL)
-#NTXBUF5=X,10,S
-C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 
 #StatusFlag=X,1,I
 HELP(#EffectiveStatusHelp)
@@ -113,7 +114,7 @@ C(4,#EffectiveDateE,$,A(DATE,0,#EffectiveDateE))
 IF(#EffectiveDateE<#EffectiveDateS,V(P,止日需大於起日),$)
 #RPTFG=A,1,S
 E(0,0)
-C(4,#NTXBUF5,C(4,#EmpNo,E(0,0),E(0,1)),T(3,2))
+C(4,#NTXBUF5,E(0,0),E(0,1))
 
 ! #Flag=A,1,I
 ! HELP(#EffectiveFlagHelp)
@@ -126,7 +127,6 @@ C(4,#NTXBUF5,C(4,#EmpNo,E(0,0),E(0,1)),T(3,2))
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
-
 
 </sub>
 
@@ -277,44 +277,6 @@ TXFORM=L5022
 {width:120,align:'center'}
 ^
 #RPTFG=1,QUERY.GRID,L5022
-#any={detail:true, header:'L5022.part', caption:'', width:1080, rowNum:20, rowList:[20,40,60]}
-
-#OOBTN_EDIT=修改
-{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
-#OOBTN_COPY=複製
-{search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false,width:40}
-#OOBTN_DELETE=刪除
-{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
-#OOBTN_SEARCH=歷程
-{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
-#OOEmpNo=員工代號
-{width:80,align:'center'}
-#OOFullname=員工姓名
-{width:85}
-#OOUnitCode=單位代號
-{width:85,align:'center'}
-#OOUnitCodeX=單位中文
-{width:95}
-#OODistCode=區部代號
-{width:85,align:'center'}
-#OODistCodeX=區部中文
-{width:95}
-#OODeptCode=部室代號
-{width:85,align:'center'}
-#OODeptCodeX=部室中文
-{width:95}
-#OOEffectiveDate=生效日期
-{width:85,align:'center'}
-#OOIneffectiveDate=停效日期
-{width:85,align:'center'}
-#OOEmpClassX=協辦等級
-{width:80,align:'center'}
-#OOClassPass=初階授信通過
-{width:120,align:'center'}
-#OOStatusFgX=目前狀態
-{width:120,align:'center'}
-^
-#RPTFG=2,QUERY.GRID,L5022
 #any={detail:true, header:'L5022.part', caption:'', width:1080, rowNum:20, rowList:[20,40,60]}
 
 #OOEmpNo=員工代號

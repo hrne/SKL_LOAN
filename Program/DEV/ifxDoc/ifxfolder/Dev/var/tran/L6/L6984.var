@@ -511,11 +511,11 @@ ifxBatch:{
 }
 
 #secret-no
-
+#OOCustNoX
 
 #OODtlValue
 
-#OODrawdownDate=預約日期1
+#OODrawdownDate=預約日期
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -564,11 +564,11 @@ ifxBatch:{
 }
 
 #secret-no
-
+#OOCustNoX
 
 #OODtlValue
 
-#OODrawdownDate=預約日期2
+#OODrawdownDate=預約日期
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -604,7 +604,7 @@ ifxBatch:{
 #RPTFG=4,QUERY.GRID,O1
 #any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OODrawdownDate=預約日期3
+#OODrawdownDate=預約日期
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -642,7 +642,7 @@ ifxBatch:{
 #RPTFG=5,QUERY.GRID,O1
 #any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OODrawdownDate=預約日期4
+#OODrawdownDate=預約日期
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -694,12 +694,14 @@ ifxBatch:{
 	}
 }
 
+#OOCustNoX
+
 #secret-no
 #secret-emend
 
 #OODtlValue
 
-#OODrawdownDate=預約日期5
+#OODrawdownDate=預約日期
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
@@ -745,11 +747,11 @@ ifxBatch:{
 }
 
 #forl3100
-
+#OOCustNoX
 
 #OODtlValue
 
-#OODrawdownDate=預約日期6
+#OODrawdownDate=預約日期
 {width:100,align:'center'}
 
 #OOCaseNo=案件編號
