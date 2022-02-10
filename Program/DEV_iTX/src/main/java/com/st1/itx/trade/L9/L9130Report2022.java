@@ -28,13 +28,17 @@ import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.FormatUtil;
 
 /**
- * 產製L9130Report2022<BR>
- * 2022年啟用新傳票格式<BR>
+ * 產製L9130Report2022 <BR>
+ * 2022年啟用新傳票格式 <BR>
  * <BR>
- * 2021-06-22 新增 智偉<BR>
+ * 2021-06-22 新增 智偉 <BR>
  * 說明:根據"ac034m 其他介面上傳格式_20210408.xlsx"建立傳票 <BR>
- * 2021-07-12 修改 智偉<BR>
- * 說明:傳票媒體檔以RESTful協定傳遞至EBS會計資訊系統
+ * 2021-07-12 修改 智偉 <BR>
+ * 說明:傳票媒體檔以RESTful協定傳遞至EBS會計資訊系統 <BR>
+ * 2022-02-09 修改 智偉 <BR>
+ * 說明:From 珮琪 新傳票媒體檔也要作應收調撥款特殊處理<BR>
+ * 2022-02-10 修改 智偉 <BR>
+ * 說明:修改應收調撥款的特殊處理
  * 
  * @author st1-ChihWei
  *
@@ -146,9 +150,12 @@ public class L9130Report2022 extends MakeReport {
 	// IFRS17群組
 	String ifrs17Group = " ";
 
-	BigDecimal drAmt;
+	String lastAcSubBookCode;
 
-	BigDecimal crAmt;
+	// 應收調撥款金額
+	BigDecimal transferAmt;
+
+	BigDecimal drAmtTotal;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9130Report2022 exec ...");
@@ -195,7 +202,8 @@ public class L9130Report2022 extends MakeReport {
 
 		makeFile.open(titaVo, date, brno, no, desc, name, format);
 
-		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo, iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
+				iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
 
 		if (sSlipMedia2022 != null && !sSlipMedia2022.isEmpty()) {
 			// 若已存在,將該筆舊傳票刪除
@@ -220,8 +228,11 @@ public class L9130Report2022 extends MakeReport {
 
 		int i = 1;
 
-		drAmt = BigDecimal.ZERO;
-		crAmt = BigDecimal.ZERO;
+		lastAcSubBookCode = "00A";
+
+		transferAmt = BigDecimal.ZERO;
+
+		drAmtTotal = BigDecimal.ZERO;
 
 		journalTbl = new JSONArray();
 
@@ -236,16 +247,23 @@ public class L9130Report2022 extends MakeReport {
 		 */
 		for (Map<String, String> l9130 : l9130List) {
 
+			acSubBookCode = l9130.get("F6"); // 區隔帳冊
+			// 此筆區隔帳冊與上一筆不同
+			if (!acSubBookCode.equals(lastAcSubBookCode)) {
+				// 特殊處理:同區隔帳冊借貸金額加總後，寫一筆反向10340000000 應收調撥款
+				i = specialHandling(i, titaVo);
+				// 特殊處理結束
+			}
+			
 			acBookCode = l9130.get("F0"); // 帳冊別
 			slipDate = l9130.get("F1"); // 會計日期
 			acNoCode = l9130.get("F2"); // 科目代號
 			acSubNoCode = l9130.get("F3"); // 子目代號
 			dbCr = l9130.get("F4"); // 借貸別
 			txAmt = l9130.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(l9130.get("F5")); // 金額
-			acSubBookCode = l9130.get("F6"); // 區隔帳冊
 
 			// 借方金額累加
-			drAmt = dbCr.equals("D") ? drAmt.add(txAmt) : drAmt;
+			drAmtTotal = dbCr.equals("D") ? drAmtTotal.add(txAmt) : drAmtTotal;
 
 			// 傳票媒體檔的金額處理,借方為正數,貸方為負數
 			txBal = dbCr.equals("D") ? txAmt.toString() : txAmt.negate().toString();
@@ -327,6 +345,7 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setAcNoCode(acNoCode);
 			tSlipMedia2022.setAcSubCode(acSubNoCode);
 			tSlipMedia2022.setCurrencyCode(currencyCode);
+			tSlipMedia2022.setAcSubBookCode(acSubBookCode);// 區隔帳冊
 			tSlipMedia2022.setDbCr(dbCr);
 			tSlipMedia2022.setTxAmt(txAmt);
 			tSlipMedia2022.setReceiveCode(acReceivableCode);
@@ -339,8 +358,22 @@ public class L9130Report2022 extends MakeReport {
 				throw new LogicException("E0005", "傳票媒體檔");
 			}
 
+			// 特殊處理:同區隔帳冊借貸金額加總後，寫一筆反向10340000000 應收調撥款
+			// 計算借貸方金額加總
+			if (dbCr.equals("D")) {
+				transferAmt = transferAmt.add(txAmt);
+			} else {
+				transferAmt = transferAmt.subtract(txAmt);
+			}
+			// 特殊處理結束
+
+			lastAcSubBookCode = acSubBookCode;
+
 			i++;
 		}
+
+		// 全部傳票印完，執行特殊處理
+		specialHandling(i, titaVo);
 
 		summaryTbl = new JSONArray();
 
@@ -352,7 +385,7 @@ public class L9130Report2022 extends MakeReport {
 			summaryMap.put("JE_SOURCE_NAME", "LN");
 			summaryMap.put("TOTAL_LINES", "");
 			summaryMap.put("CURRENCY_CODE", "NTD");
-			summaryMap.put("TOTAL_AMOUNT", drAmt);
+			summaryMap.put("TOTAL_AMOUNT", drAmtTotal);
 		} catch (JSONException e) {
 			this.error("L9130Report22 error = " + e.getMessage());
 		}
@@ -438,5 +471,99 @@ public class L9130Report2022 extends MakeReport {
 
 		this.info("L9130Report2022 getSlipNo slipNo : " + tmpSlipNo);
 		return tmpSlipNo;
+	}
+
+	/**
+	 * 特殊處理:同區隔帳冊借貸金額加總後，寫一筆反向10340000000 應收調撥款
+	 * 
+	 * @param i      印到第i筆
+	 * @param titaVo titaVo
+	 * @return 處理後的新筆數
+	 * @throws LogicException LogicException
+	 */
+	private int specialHandling(int i, TitaVo titaVo) throws LogicException {
+
+		this.info("L9130 specialHandling i = " + i);
+		this.info("L9130 specialHandling lastAcSubBookCode = " + lastAcSubBookCode);
+		this.info("L9130 specialHandling transferAmt = " + transferAmt);
+
+		// 於借貸方各寫一筆10340000000 應收調撥款
+		String tempAcNoCode = "10340000000";
+		String tempAcSubNoCode = "";
+
+		if (transferAmt.compareTo(BigDecimal.ZERO) != 0) {
+
+			String data = "";
+
+			data += acBookCode + ","; // 帳冊別
+			data += slipNo + ","; // 傳票號碼
+			data += i + ","; // 傳票明細序號
+			data += slipDate + ","; // 傳票日期
+			data += tempAcNoCode + ","; // 科目代號
+			data += tempAcSubNoCode + ","; // 子目代號
+			data += deptCode + ","; // 部門代號
+			// 傳票媒體檔的金額處理,借方為正數,貸方為負數
+			// 這裡無論如何，反向即可
+			data += transferAmt.negate().toString() + ","; // 金額
+			data += slipRmk + ","; // 傳票摘要
+			data += acReceivableCode + ","; // 會計科目銷帳碼
+			data += costMonth + ","; // 成本月份
+			data += insuNo + ","; // 保單號碼
+			data += salesmanCode + ","; // 業務員代號
+			data += salaryCode + ","; // 薪碼
+			data += currencyCode + ","; // 幣別
+			data += lastAcSubBookCode + ","; // 區隔帳冊
+			data += costUnit + ","; // 成本單位
+			data += salesChannelType + ","; // 通路別
+			data += ifrsType + ","; // 會計準則類型
+			data += relationId + ","; // 關係人ID
+			data += relateCode + ","; // 關聯方代號
+			data += ifrs17Group; // IFRS17群組
+
+			// 寫入一筆到報表檔
+			makeFile.put(data);
+
+			// 寫入一筆到SlipMedia2022
+			SlipMedia2022 tSlipMedia2022 = new SlipMedia2022();
+
+			SlipMedia2022Id tSlipMedia2022Id = new SlipMedia2022Id();
+
+			tSlipMedia2022Id.setMediaSlipNo(slipNo);
+			tSlipMedia2022Id.setSeq(i);
+
+			tSlipMedia2022.setSlipMedia2022Id(tSlipMedia2022Id);
+
+			tSlipMedia2022.setAcDate(iAcDate);
+			tSlipMedia2022.setBatchNo(iBatchNo);
+			tSlipMedia2022.setMediaSeq(iMediaSeq);
+			tSlipMedia2022.setMediaSlipNo(slipNo);
+			tSlipMedia2022.setAcBookCode(acBookCode);
+			tSlipMedia2022.setSeq(i);
+			tSlipMedia2022.setAcNoCode(tempAcNoCode);
+			tSlipMedia2022.setAcSubCode(tempAcSubNoCode);
+			tSlipMedia2022.setCurrencyCode(currencyCode);
+			tSlipMedia2022.setAcSubBookCode(lastAcSubBookCode);// 區隔帳冊
+			// 如果為正數要寫一筆貸方
+			// 如果為負數要寫一筆借方
+			tSlipMedia2022.setDbCr(transferAmt.compareTo(BigDecimal.ZERO) > 0 ? "C" : "D");
+			tSlipMedia2022.setTxAmt(transferAmt.abs());
+			tSlipMedia2022.setReceiveCode(acReceivableCode);
+			tSlipMedia2022.setSlipRmk(slipRmk);
+			tSlipMedia2022.setCostMonth(costMonth);
+
+			try {
+				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "傳票媒體檔");
+			}
+
+			i++;
+		}
+
+		// 此區隔帳冊的印完，歸零
+		transferAmt = BigDecimal.ZERO;
+		// 特殊處理結束
+
+		return i;
 	}
 }

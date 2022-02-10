@@ -25,10 +25,6 @@ public class L9130 extends TradeBuffer {
 
 	/* 報表服務注入 */
 	@Autowired
-	private L9130Report l9130Report;
-
-	/* 報表服務注入 */
-	@Autowired
 	private L9130Report2022 l9130Report2022;
 
 	@Autowired
@@ -51,13 +47,15 @@ public class L9130 extends TradeBuffer {
 
 		// 取出tita值
 		// 會計日期 #AcDate=D,7,I
-		int iAcDate = Integer.valueOf(titaVo.getParam("AcDate"));
+		int iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
 
+		this.info("L9130 iAcDate = " + iAcDate);
+		
 		// 傳票批號 #BatchNo=A,2,I
-		int iBatchNo = Integer.valueOf(titaVo.getParam("BatchNo"));
+		int iBatchNo = Integer.parseInt(titaVo.getParam("BatchNo"));
 
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
-		int iMediaSeq = Integer.valueOf(titaVo.getParam("MediaSeq"));
+		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
 		
 		// 2022-01-13 智偉修改為不檢核,from 賴桑:L6102會產生不同日期的傳票
 //		if (iAcDate != titaVo.getEntDyI()) {
@@ -140,12 +138,12 @@ public class L9130 extends TradeBuffer {
 	public void doRpt(TitaVo titaVo) throws LogicException {
 		this.info("L9130 doRpt started.");
 
-		String parentTranCode = titaVo.getTxcd();
+//		String parentTranCode = titaVo.getTxcd();
 
-		l9130Report.setParentTranCode(parentTranCode);
+//		l9130Report.setParentTranCode(parentTranCode);
 
 		// 撈資料組報表
-		l9130Report.exec(titaVo);
+//		l9130Report.exec(titaVo);
 		l9130Report2022.exec(titaVo);
 
 		this.info("L9130 doRpt finished.");

@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -550,11 +551,17 @@ public class ApControl extends SysLogger {
 		acEnterCom = null;
 		txAmlCom = null;
 
-		txBuffer.getAcDetailList().clear();
-		txBuffer.getAmlList().clear();
-		txBuffer.getReasonLi().clear();
-		txBuffer.getRspList().clear();
-		txBuffer = null;
+		if (!Objects.isNull(txBuffer)) {
+			if (!Objects.isNull(txBuffer.getAcDetailList()))
+				txBuffer.getAcDetailList().clear();
+			if (!Objects.isNull(txBuffer.getAmlList()))
+				txBuffer.getAmlList().clear();
+			if (!Objects.isNull(txBuffer.getReasonLi()))
+				txBuffer.getReasonLi().clear();
+			if (!Objects.isNull(txBuffer.getRspList()))
+				txBuffer.getRspList().clear();
+			txBuffer = null;
+		}
 
 		totaVoList.clear();
 		totaVoList = null;

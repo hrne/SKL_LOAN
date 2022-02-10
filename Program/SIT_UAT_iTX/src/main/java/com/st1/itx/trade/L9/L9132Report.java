@@ -117,7 +117,7 @@ public class L9132Report extends MakeReport {
 			// 本日無資料
 			print(1, 1, "傳票批號：");
 			print(1, 1, "會計科目：");
-			print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+			print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 			print(1, 1, "本日無資料");
 
@@ -222,7 +222,7 @@ public class L9132Report extends MakeReport {
 				print(1, 1, "會計科目：");
 				print(0, 13, acNoCode);
 				print(0, 26, acNoItem);
-				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 				print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 
 				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet().iterator(); detailIt.hasNext();) {
@@ -254,7 +254,7 @@ public class L9132Report extends MakeReport {
 							print(1, 1, "會計科目：");
 							print(0, 13, acNoCode);
 							print(0, 26, acNoItem);
-							print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+							print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 							print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 						}
 
@@ -263,8 +263,8 @@ public class L9132Report extends MakeReport {
 						print(0, 1, tmpAcDetail.getAcSubCode());
 						// 傳票號碼
 						print(0, 48, FormatUtil.pad9(String.valueOf(tmpAcDetail.getSlipNo()), 6));
-						// 帳冊別
-						print(0, 64, tmpAcDetail.getAcBookCode());
+						// 區隔帳冊
+						print(0, 64, tmpAcDetail.getAcSubBookCode());
 						// 戶號
 						print(0, 81, FormatUtil.pad9(String.valueOf(tmpAcDetail.getCustNo()), 7));
 
@@ -319,7 +319,7 @@ public class L9132Report extends MakeReport {
 						print(1, 1, "會計科目：");
 						print(0, 13, acNoCode);
 						print(0, 26, acNoItem);
-						print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+						print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 						print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 					}
 				}

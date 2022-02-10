@@ -10,8 +10,11 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.SlipMedia;
-import com.st1.itx.db.service.SlipMediaService;
+import com.st1.itx.db.domain.CdAcCode;
+import com.st1.itx.db.domain.SlipMedia2022;
+import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.FormatUtil;
 
@@ -22,7 +25,13 @@ public class L9131Report extends MakeReport {
 
 	/* DB服務注入 */
 	@Autowired
-	SlipMediaService sSlipMediaService;
+	SlipMedia2022Service sSlipMedia2022Service;
+
+	@Autowired
+	CdCodeService sCdCodeService;
+
+	@Autowired
+	CdAcCodeService sCdAcCodeService;
 
 	// ReportDate : 報表日期(帳務日)
 	// ReportCode : 報表編號
@@ -43,6 +52,10 @@ public class L9131Report extends MakeReport {
 	private String nowAcBookCode = "000";
 	private String nowAcBookItem = "全帳冊";
 	private String slipNo = "";
+
+	// 區隔帳冊
+	private String nowAcSubBookCode = "00A";
+	private String nowAcSubBookItem = "全帳冊";
 
 	// 製表日期
 	private String nowDate;
@@ -66,10 +79,14 @@ public class L9131Report extends MakeReport {
 		this.print(-4, 2, "帳冊別：");
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
 		this.print(-4, 85, "傳 票 日 期：" + showRocDate(this.reportDate), "C");
-
+		this.print(-5, 2, "區隔帳冊：");
 		// 頁首帳冊別判斷
 		print(-4, 10, this.nowAcBookCode);
 		print(-4, 14, this.nowAcBookItem);
+
+		// 頁首區隔帳冊
+		print(-5, 12, this.nowAcSubBookCode);
+		print(-5, 16, this.nowAcSubBookItem);
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(9);
@@ -81,7 +98,7 @@ public class L9131Report extends MakeReport {
 		 * ---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		print(2, 1, "傳票　會計科目代號　　　子目代號　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　銷帳碼／　　　　　　　　　　單位代號／");
+		print(1, 1, "傳票　會計科目代號　　　子目代號　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　銷帳碼／　　　　　　　　　　單位代號／");
 		print(1, 1, "序號　科目名稱　　　　　子目名稱　　　　　　　　　　　　　　幣別　　　　借方金額　　　　　　　貸方金額　　　　　　　　　摘要說明　　　　　　　　　　成本月份");
 		print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－－－－－－");
 
@@ -115,10 +132,11 @@ public class L9131Report extends MakeReport {
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
 
-		Slice<SlipMedia> sSlipMedia = sSlipMediaService.findMediaSeq(this.reportDate, iBatchNo, iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
-		List<SlipMedia> lSlipMedia = sSlipMedia == null ? null : sSlipMedia.getContent();
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(this.reportDate, iBatchNo, iMediaSeq,
+				0, Integer.MAX_VALUE, titaVo);
+		List<SlipMedia2022> lSlipMedia2022 = sSlipMedia2022 == null ? null : sSlipMedia2022.getContent();
 
-		if (lSlipMedia == null || lSlipMedia.isEmpty()) {
+		if (lSlipMedia2022 == null || lSlipMedia2022.isEmpty()) {
 			// 出空表
 			this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 			this.setCharSpaces(0);
@@ -129,23 +147,37 @@ public class L9131Report extends MakeReport {
 		// 合計容器(以借貸方區分)
 		BigDecimal dbAmt = BigDecimal.ZERO;
 		BigDecimal crAmt = BigDecimal.ZERO;
-		String currencyCode = lSlipMedia.get(0).getCurrencyCode();
+		String currencyCode = lSlipMedia2022.get(0).getCurrencyCode();
 
-		this.nowAcBookCode = lSlipMedia.get(0).getSlipMediaId().getAcBookCode();
-		this.nowAcBookItem = lSlipMedia.get(0).getAcBookItem();
-		this.slipNo = lSlipMedia.get(0).getSlipMediaId().getMediaSlipNo();
+		this.nowAcBookCode = lSlipMedia2022.get(0).getAcBookCode();
+		this.nowAcBookItem = sCdCodeService.defCodeEq("AcBookCode", this.nowAcBookCode, 0, 1, titaVo).getContent()
+				.get(0).getItem();
+
+		this.nowAcSubBookCode = lSlipMedia2022.get(0).getAcSubBookCode();
+		this.nowAcSubBookItem = sCdCodeService.defCodeEq("AcSubBookCode", this.nowAcSubBookCode, 0, 1, titaVo)
+				.getContent().get(0).getItem();
+
+		this.slipNo = lSlipMedia2022.get(0).getSlipMedia2022Id().getMediaSlipNo();
 
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
 
-		for (SlipMedia tSlipMedia : lSlipMedia) {
+		for (SlipMedia2022 tSlipMedia2022 : lSlipMedia2022) {
 
-			if (!this.nowAcBookCode.equals(tSlipMedia.getAcBookCode())) {
+			if (!this.nowAcBookCode.equals(tSlipMedia2022.getAcBookCode())
+					|| !this.nowAcSubBookCode.equals(tSlipMedia2022.getAcSubBookCode())) {
 				// 修改表頭的帳冊別欄位
-				this.nowAcBookCode = tSlipMedia.getAcBookCode();
-				this.nowAcBookItem = tSlipMedia.getAcBookItem();
-				this.slipNo = tSlipMedia.getSlipMediaId().getMediaSlipNo();
+				this.nowAcBookCode = tSlipMedia2022.getAcBookCode();
+				this.nowAcBookItem = sCdCodeService.defCodeEq("AcBookCode", this.nowAcBookCode, 0, 1, titaVo)
+						.getContent().get(0).getItem();
+
+				// 修改表頭的區隔帳冊欄位
+				this.nowAcSubBookCode = tSlipMedia2022.getAcSubBookCode();
+				this.nowAcSubBookItem = sCdCodeService.defCodeEq("AcSubBookCode", this.nowAcSubBookCode, 0, 1, titaVo)
+						.getContent().get(0).getItem();
+
+				this.slipNo = tSlipMedia2022.getSlipMedia2022Id().getMediaSlipNo();
 
 				print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－－－－－－");
 				print(1, 1, "　　　合計　TOTAL ：");
@@ -159,27 +191,39 @@ public class L9131Report extends MakeReport {
 				this.newPage();
 			}
 
-			BigDecimal txAmt = tSlipMedia.getTxAmt();
+			BigDecimal txAmt = tSlipMedia2022.getTxAmt();
 
 			// 明細資料第一行
 			print(1, 1, "　　");
-			print(0, 1, FormatUtil.pad9(String.valueOf(tSlipMedia.getSeq()), 3));
-			print(0, 7, tSlipMedia.getAcNoCode());
-			print(0, 19, tSlipMedia.getAcSubCode());
-			print(0, 61, tSlipMedia.getCurrencyCode());
+			print(0, 1, FormatUtil.pad9(String.valueOf(tSlipMedia2022.getSeq()), 3));
+			print(0, 7, tSlipMedia2022.getAcNoCode());
+			print(0, 19, tSlipMedia2022.getAcSubCode());
+			print(0, 61, tSlipMedia2022.getCurrencyCode());
 
-			if (tSlipMedia.getDbCr().equals("D")) {
+			if (tSlipMedia2022.getDbCr().equals("D")) {
 				print(0, 86, formatAmt(txAmt, 2), "R");
 				dbAmt = dbAmt.add(txAmt);
-			} else if (tSlipMedia.getDbCr().equals("C")) {
+			} else if (tSlipMedia2022.getDbCr().equals("C")) {
 				print(0, 108, formatAmt(txAmt, 2), "R");
 				crAmt = crAmt.add(txAmt);
 			}
 
+			Slice<CdAcCode> sCdAcCode = sCdAcCodeService.findAcCode(tSlipMedia2022.getAcNoCode(),
+					tSlipMedia2022.getAcNoCode(), tSlipMedia2022.getAcSubCode(), tSlipMedia2022.getAcSubCode(), "  ",
+					"  ", 0, 1, titaVo);
+
+			String acNoItem = "";
+
+			if (sCdAcCode != null) {
+				List<CdAcCode> lCdAcCode = sCdAcCode.getContent();
+				if (lCdAcCode != null && !lCdAcCode.isEmpty()) {
+					acNoItem = lCdAcCode.get(0).getAcNoItem();
+				}
+			}
+
 			// 明細資料第二行
 			print(1, 1, "　　");
-			print(0, 7, tSlipMedia.getAcNoItem());
-			print(0, 111, tSlipMedia.getSlipRmk());
+			print(0, 7, acNoItem);
 		}
 
 		print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－－－－－－");

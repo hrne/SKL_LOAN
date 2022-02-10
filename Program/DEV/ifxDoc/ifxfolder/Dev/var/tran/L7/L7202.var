@@ -22,10 +22,9 @@ E(0,0)
 ["[L7202]                    違約損失率登錄"],
 ["@功能",#FuncCodeX],
 ["#grid#,{id:1,expand:true,loop:100,row_height:1,s_cols:[], p_cols:[]}","","","","",
-["生效日期","類別","類別型態","違約損失率％"],
-!["生效日期","類別","類別型態","違約損失率％","啟用記號"],
+["生效日期","類別","違約損失率％"],
 [
-  [#Date1],[#Type1],[#TypeDesc1],[#LGDPercent1]
+  [#Date1],[#Type1,#TypeDesc1],[#LGDPercent1]
 !  [#Date1],[#Type1],[#TypeDesc1],[#LGDPercent1],[#Enable1],[#EnableX1]
 ],
 ],
@@ -90,20 +89,36 @@ T(1,#NTXBUF,2,7)
 #CHAIN_Type=X,2,S
 T(1,#NTXBUF,9,2)
 
-#CHAIN_TypeDesc=X,20,S
-T(1,#NTXBUF,11,20)
+!#CHAIN_TypeDesc=X,20,S
+!T(1,#NTXBUF,11,20)
 
 #CHAIN_LGDPercent_1=X,2,S
-T(1,#NTXBUF,31,2)
+T(1,#NTXBUF,11,2)
 
 #CHAIN_LGDPercent_2=X,5,S
-T(1,#NTXBUF,33,5)
+T(1,#NTXBUF,13,5)
 
 #CHAIN_LGDPercent=X,8,S
 T(2,#CHAIN_LGDPercent_1+.+#CHAIN_LGDPercent_2)
 
-#CHAIN_Enable=X,1,S
-T(1,#NTXBUF,38,1)
+!#CHAIN_Enable=X,1,S
+!T(1,#NTXBUF,38,1)
+
+! Ias39LGDType類別下拉選單1
+#Ias39LGDTypeCode=x,20,S
+T(3,CdCode.Ias39LGDType)
+#Ias39LGDTypeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#Ias39LGDTypeCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@Ias39LGDTypeHelp,#HelpDesc1)
+
+#Ias39LGDTypeX=x,20,S
+T(H,#CHAIN_Type,#Ias39LGDTypeHelp)
+
 
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -111,7 +126,7 @@ T(2,@FuncCode,#CHAIN_FuncCode)
 C(3,#FuncCode,1,S,$)
 E(0,@Date1,#CHAIN_Date)
 T(2,@Type1,#CHAIN_Type)
-T(2,@TypeDesc1,#CHAIN_TypeDesc)
+T(2,@TypeDesc1,#Ias39LGDTypeX)
 E(0,@LGDPercent1,#CHAIN_LGDPercent)
 !T(2,@Enable1,#CHAIN_Enable)
 
@@ -121,7 +136,7 @@ E(0,@LGDPercent1,#CHAIN_LGDPercent)
 !!                N,T(3,未啟用), ,T(3, ))
 !T(2,@EnableX1,#EnableTmp1)
 
-! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+! 功能 必須輸入(1:新增; 2:修改; 3:複製; 4:刪除)
 #FuncCode=A,1,S
 T(F,@FuncCode,0)
 C(3,#CHAIN,1,s,$)
@@ -130,7 +145,7 @@ HELP(#FuncCode2Help)
 
 #FuncCodeX=X,12,L
 T(H,#FuncCode,#FuncCode2Help)
-C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
 
 !刪除隱藏重新交易按鈕
 #AGAIN=X,1,S
@@ -144,11 +159,13 @@ E(0,#FuncCode)
 !FuncCode=1,2 顯示框線
 #WKTF=X,1,S
 ##loop {times:100,i:1}
-IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeDesc{i},1)T(F,#LGDPercent{i},1),
-                                  T(F,#TypeDesc{i},0)T(F,#LGDPercent{i},0))
+IF (#FuncCode==1 || #FuncCode==2 || #FuncCode==3 ,T(F,#LGDPercent{i},1),
+                                  T(F,#LGDPercent{i},0))
+!IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeDesc{i},1)T(F,#LGDPercent{i},1),
+!                                  T(F,#TypeDesc{i},0)T(F,#LGDPercent{i},0))
 !IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeDesc{i},1)T(F,#LGDPercent{i},1)T(F,#Enable{i},1),
 !                                  T(F,#TypeDesc{i},0)T(F,#LGDPercent{i},0)T(F,#Enable{i},0))
-IF (#FuncCode==1 ,T(F,#Date{i},1)T(F,#Type{i},1),
+IF (#FuncCode==1 || #FuncCode==3 ,T(F,#Date{i},1)T(F,#Type{i},1),
                   T(F,#Date{i},0)T(F,#Type{i},0))
 ##end
 
@@ -157,23 +174,27 @@ T(4,#SYSCDATE)
 !T(4,DATE$)
 
 
+
 ! 生效日期
 #Date1=D,7,I
-C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,C(3,#FuncCode,3,$,s)),$)
 !T(1,#DATE,2,7)
 D(8)
 @V(7)A(DATE,0,#Date1)
 
 ! 類別
 #Type1=A,2,I
-!C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-C(3,#FuncCode,1,$,s)
-@V(2,0)
+HELP(#Ias39LGDTypeHelp)
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,C(3,#FuncCode,3,$,s)),$)
+@V(H,#Ias39LGDTypeHelp)
+!C(3,#FuncCode,1,$,s)
+!@V(2,0)
 
-! 類別型態
-#TypeDesc1=x,20,I
-C(3,#FuncCode,4,s)
-@V(7)
+! 類別型態-改抓HELP中文
+#TypeDesc1=x,20,L
+T(H,#Type1,#Ias39LGDTypeHelp)
+!C(3,#FuncCode,4,s)
+!@V(7)
 
 ! 違約損失率％
 #LGDPercent1=n,2.5,I
@@ -208,11 +229,12 @@ C(3,#FuncCode,4,s)
 @V(7)
 
 ! 類別型態
-#TypeDesc{i}=x,20,I
+#TypeDesc{i}=x,20,L
 C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
 C(4,#Date{i},S,$)
-C(3,#FuncCode,4,s)
-@V(7)
+T(H,#Type{i},#Ias39LGDTypeHelp)
+!C(3,#FuncCode,4,s)
+!@V(7)
 
 ! 違約損失率％
 #LGDPercent{i}=m,2.5,I
@@ -267,7 +289,6 @@ T(3,[L7202] 違約損失率登錄)
 ##loop{times:100,i:1}
 #Date{i}
 #Type{i}
-#TypeDesc{i}
 #LGDPercent{i}
 ##end
 #END

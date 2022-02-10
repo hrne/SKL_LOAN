@@ -101,47 +101,49 @@ public class L9133Report2 extends MakeReport {
 		this.setCharSpaces(0);
 
 		// 查會計業務檢核檔
-		Slice<AcAcctCheckDetail> slAcAcctCheckDetail = sAcAcctCheckDetailService.findAcDate(this.reportDate, 0, Integer.MAX_VALUE, titaVo);
-		List<AcAcctCheckDetail> lAcAcctCheckDetail = slAcAcctCheckDetail == null ? null : slAcAcctCheckDetail.getContent();
+		Slice<AcAcctCheckDetail> slAcAcctCheckDetail = sAcAcctCheckDetailService.findAcDate(this.reportDate, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<AcAcctCheckDetail> lAcAcctCheckDetail = slAcAcctCheckDetail == null ? null
+				: slAcAcctCheckDetail.getContent();
 
 		if (lAcAcctCheckDetail == null || lAcAcctCheckDetail.size() == 0) {
 //			throw new LogicException("E0001", "會計業務檢核明細檔");
 			this.error("L9133Report2 lAcAcctCheckDetail IS NULL.");
+		} else {
+			for (AcAcctCheckDetail tAcAcctCheckDetail : lAcAcctCheckDetail) {
+
+				// 明細資料新的一行
+				print(1, 1, "　　");
+
+				// 區隔帳冊
+				String acSubBookCode = tAcAcctCheckDetail.getAcSubBookCode();
+				print(0, 1, acSubBookCode);
+
+				// 科目
+				String acctItem = tAcAcctCheckDetail.getAcctItem();
+				print(0, 11, acctItem);
+
+				// 戶號
+				String custNo = FormatUtil.pad9(String.valueOf(tAcAcctCheckDetail.getCustNo()), 7);
+				String facmNo = FormatUtil.pad9(String.valueOf(tAcAcctCheckDetail.getFacmNo()), 3);
+				String bormNo = FormatUtil.pad9(String.valueOf(tAcAcctCheckDetail.getBormNo()), 3);
+				print(0, 38, custNo + "-" + facmNo + "-" + bormNo, "C");
+
+				// 會計帳餘額
+				String acMainBal = formatAmt(tAcAcctCheckDetail.getAcBal(), 0);
+				print(0, 83, acMainBal, "R");
+
+				// 業務帳餘額
+				String masterBal = formatAmt(tAcAcctCheckDetail.getAcctMasterBal(), 0);
+				print(0, 119, masterBal, "R");
+
+				// 差額 (會計帳餘額-業務帳餘額)
+				String diffAmt = formatAmt(
+						tAcAcctCheckDetail.getAcBal().subtract(tAcAcctCheckDetail.getAcctMasterBal()), 0);
+				print(0, 155, diffAmt, "R");
+
+			}
 		}
-
-		for (AcAcctCheckDetail tAcAcctCheckDetail : lAcAcctCheckDetail) {
-
-			// 明細資料新的一行
-			print(1, 1, "　　");
-
-			// 區隔帳冊
-			String acSubBookCode = tAcAcctCheckDetail.getAcSubBookCode();
-			print(0, 1, acSubBookCode);
-
-			// 科目
-			String acctItem = tAcAcctCheckDetail.getAcctItem();
-			print(0, 11, acctItem);
-
-			// 戶號
-			String custNo = FormatUtil.pad9(String.valueOf(tAcAcctCheckDetail.getCustNo()), 7);
-			String facmNo = FormatUtil.pad9(String.valueOf(tAcAcctCheckDetail.getFacmNo()), 3);
-			String bormNo = FormatUtil.pad9(String.valueOf(tAcAcctCheckDetail.getBormNo()), 3);
-			print(0, 38, custNo + "-" + facmNo + "-" + bormNo, "C");
-
-			// 會計帳餘額
-			String acMainBal = formatAmt(tAcAcctCheckDetail.getAcBal(), 0);
-			print(0, 83, acMainBal, "R");
-
-			// 業務帳餘額
-			String masterBal = formatAmt(tAcAcctCheckDetail.getAcctMasterBal(), 0);
-			print(0, 119, masterBal, "R");
-
-			// 差額 (會計帳餘額-業務帳餘額)
-			String diffAmt = formatAmt(tAcAcctCheckDetail.getAcBal().subtract(tAcAcctCheckDetail.getAcctMasterBal()), 0);
-			print(0, 155, diffAmt, "R");
-
-		}
-
 	}
 
 }

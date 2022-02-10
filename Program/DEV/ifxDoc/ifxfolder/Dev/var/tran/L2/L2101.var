@@ -623,7 +623,7 @@ E(0,@BreachStartPercent,#L2r01BreachStartPercent)
 T(2,@GovOfferFlag,#L2r01GovOfferFlag)
 T(2,@FinancialFlag,#L2r01FinancialFlag)
 T(2,@EmpFlag,#L2r01EmpFlag)
-T(2,@Breach,#L2r01Breach)
+T(2,@Breach1,#L2r01Breach)
 C(3,#UpdateCode,0,T(2,@Breach1,#L2r01Breach),$)
 ! C(3,#UpdateCode,0,T(1,@Breach2,#L2r01Breach,51,50),$)
 ! C(3,#UpdateCode,0,T(1,@Breach3,#L2r01Breach,101,50),$)
@@ -918,7 +918,7 @@ E(0,0)
 IF(#StartDate <= #wksyscdate,E(0,1),E(0,0))
 ! C(3,#FuncCode,2,$,s)
 ! C(3,#StatusCode,0,$,s)
-C(3,#checkeffdate,1,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效))
+C(3,#checkeffdate1,1,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效))
 C(3,#EndDate,0,$,IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$))
 
 ![商品截止日期]
@@ -958,7 +958,7 @@ HELP(#StatusCodeHelp)
 #StatusCodeX=X,6,L
 ! T(H,#StatusCode,#StatusCodeHelp)
 C(3,#StatusCode,0,$,s)
-C(3,#checkeffdate,1,T(3,已生效),T(3,待生效))
+C(3,#checkeffdate1,1,T(3,已生效),T(3,待生效))
 C(3,#EndDate,0,s,$)
 IF(#EndDate < #wksyscdate,T(3,已失效),$)
 ! C(2,#StatusCode,T(3,啟用),T(3,停用),T(3, ))
@@ -2027,13 +2027,15 @@ V(5,0,100)
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
 C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
-@V(2,0)
+
 
 !分段遞減百分比
 #FdBreachDecrease=X,2,L
 
 #BreachDecrease=n,3.2,I
 C(5,#BreachFlag,N,S,$)
+C(3,#BreachDecreaseMonth,0,INVOKEJS(SHOW,p6,7,7,0),INVOKEJS(SHOW,p6,7,7,1))
+C(3,#BreachDecreaseMonth,0,S,$)
 C(3,#UpdateCode,1,$,s)
 C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(2,0)

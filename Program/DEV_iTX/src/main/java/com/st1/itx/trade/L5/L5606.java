@@ -1,8 +1,11 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
@@ -10,8 +13,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.CdCityService;
+import com.st1.itx.db.service.CollListService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CollList;
+import com.st1.itx.db.domain.CollListId;
 import com.st1.itx.util.data.DataLog;
 
 @Component("L5606")
@@ -29,6 +35,8 @@ public class L5606 extends TradeBuffer {
 	@Autowired
 	public CdCityService iCdCityService;
 	@Autowired
+	public CollListService iCollListService;
+	@Autowired
 	public DataLog iDataLog;
 
 	@Override
@@ -44,7 +52,7 @@ public class L5606 extends TradeBuffer {
 		String iLegalArea = titaVo.getParam("LegalArea");
 		String iLegalNo = titaVo.getParam("LegalNo");
 		String iLegalExt = titaVo.getParam("LegalExt");
-
+		
 		CdCity iCdCity = new CdCity();
 		CdCity uCdCity = new CdCity();
 		iCdCity = iCdCityService.holdById(iCityCode, titaVo);
@@ -64,7 +72,25 @@ public class L5606 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
-
+		
+		Slice<CollList> tCollist = iCollListService.findCityCode(iCityCode, 0, Integer.MAX_VALUE, titaVo);
+		
+		List<CollList> cCollist = tCollist == null ? null : tCollist.getContent();
+		CollList tCollList = new CollList();
+		
+		if(cCollist!=null) {
+			for(CollList iCollList : cCollist) {
+				tCollList = new CollList();
+				tCollList = iCollListService.holdById(new CollListId(iCollList.getCustNo(),iCollList.getFacmNo()), titaVo);
+				tCollList.setAccCollPsn(iAccCollPsn);
+				tCollList.setLegalPsn(iLegalPsn);
+				try {
+					iCollListService.update2(tCollList, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+				}
+			}
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -161,9 +161,9 @@ BEGIN
                 WHEN F."RecycleCode" IN ('1') THEN 1
                 ELSE 0
            END                                  AS "RecycleCode"       -- 該筆額度是否可循環動用
-         , CASE WHEN F."IrrevocableFlag" IS NULL  THEN 1
-                WHEN F."IrrevocableFlag" IN ('N') THEN 1               -- 可撤銷
-                ELSE 0                                                 -- 不可撤銷
+         , CASE WHEN F."IrrevocableFlag" IS NULL  THEN 0
+                WHEN F."IrrevocableFlag" IN ('Y') THEN 1               -- 不可撤銷
+                ELSE 0                                                 -- 可撤銷
            END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷
          , NVL(Tav."TempAmt",0)                 AS "TempAmt"           -- 暫收款金額(台幣)
          , CASE WHEN MF."AcBookCode"  IS NULL  THEN '000'
