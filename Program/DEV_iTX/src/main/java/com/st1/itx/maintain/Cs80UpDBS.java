@@ -432,7 +432,8 @@ public class Cs80UpDBS extends CommBuffer {
 		txRecord.setCurCode(this.titaVo.getCurCodeI());
 		txRecord.setCurName(this.titaVo.getCurName());
 		txRecord.setTxAmt(this.parse.stringToBigDecimal(this.titaVo.getTxAmt()));
-		txRecord.setLockNo(Long.valueOf(this.titaVo.get("LockNo").toString()));
+		// 2022-02-10 智偉修改:增加null判斷
+		txRecord.setLockNo(Long.valueOf(this.titaVo.get("LockNo") == null ? "0" : this.titaVo.get("LockNo").toString()));
 		txRecord.setLockCustNo(Integer.parseInt(this.titaVo.get("LockCustNo").toString()));
 		if (this.titaVo.isHcodeErase()) {
 			txRecord.setSupNo(this.titaVo.getSupCode());
