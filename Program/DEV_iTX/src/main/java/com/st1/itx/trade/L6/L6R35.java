@@ -47,7 +47,7 @@ public class L6R35 extends TradeBuffer {
 		this.limit = 200; // 217 * 200 = 43400
 
 		Slice<CdCode> slCdCode = null;
-		slCdCode = sCdCodeDefService.defCodeEq("CodeType", iDefCode + "%", this.index, this.limit, titaVo);
+		slCdCode = sCdCodeDefService.defCodeEq("CodeType", iDefCode, this.index, this.limit, titaVo);
 
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 

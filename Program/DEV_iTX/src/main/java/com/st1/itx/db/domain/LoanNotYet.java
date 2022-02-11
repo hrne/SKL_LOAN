@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class LoanNotYet implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6460110955196182511L;
+
+@EmbeddedId
   private LoanNotYetId loanNotYetId;
 
   // 借款人戶號

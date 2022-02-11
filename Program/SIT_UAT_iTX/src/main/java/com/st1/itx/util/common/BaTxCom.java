@@ -167,7 +167,7 @@ public class BaTxCom extends TradeBuffer {
 		this.terms = 0; // 繳期數
 		this.rateEffectDate = 0; // 目前利率生效日
 		this.fitRate = BigDecimal.ZERO; // 目前利率
-		
+
 		// 部分還款
 		this.extraRepayAmt = BigDecimal.ZERO; // 部分還款金額
 		this.includeIntFlag = "Y";// 是否內含利息
@@ -803,32 +803,27 @@ public class BaTxCom extends TradeBuffer {
 				if (iTerms == 0) {
 					int wkPrevTermNo = 0;
 					int wkRepayTermNo = 0;
-					// 應繳日
-					if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
-						wkTerms = 0;
-					} else {
-						// 計算至上次繳息日之期數
-						if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-							wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
-									ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
-						}
-						// 是否含提前繳期款
-						if (this.isTermAdvance) {
-							// 可回收期數 = 計算至入帳日/應繳日的應繳期數
-							wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
-									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-									wkPayIntDate);
-
-						} else {
-							// 可回收期數 = 可回收期數 + 批次預收期數
-							wkRepayTermNo = loanCom.getTermNo(
-									this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
-									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-									this.txBuffer.getTxCom().getTbsdy())
-									+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
-						}
-						wkTerms = wkRepayTermNo - wkPrevTermNo;
+					// 計算至上次繳息日之期數
+					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+						wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+								ln.getSpecificDd(), ln.getPrevPayIntDate());
 					}
+					// 是否含提前繳期款
+					if (this.isTermAdvance) {
+						// 可回收期數 = 計算至入帳日/應繳日的應繳期數
+						wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
+								ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+								wkPayIntDate);
+
+					} else {
+						// 可回收期數 = 可回收期數 + 批次預收期數
+						wkRepayTermNo = loanCom.getTermNo(
+								this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
+								ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+								this.txBuffer.getTxCom().getTbsdy())
+								+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+					}
+					wkTerms = wkRepayTermNo - wkPrevTermNo;
 				} else {
 					wkTerms = iTerms;
 				}
@@ -837,7 +832,7 @@ public class BaTxCom extends TradeBuffer {
 				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
 
 				// 無可計息， isEmptyLoanBaTxVo 是否放未計息餘額
-				if (wkTerms == 0 && isEmptyLoanBaTxVo) {
+				if (wkTerms <= 0 && isEmptyLoanBaTxVo) {
 					emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
 					break;
 				}
@@ -975,7 +970,7 @@ public class BaTxCom extends TradeBuffer {
 				break;
 			}
 			if (wkTerms > this.terms) {
-				this.terms = wkTerms ; // 繳期數		
+				this.terms = wkTerms; // 繳期數
 			}
 
 		}
@@ -1066,7 +1061,8 @@ public class BaTxCom extends TradeBuffer {
 					this.rateEffectDate = baTxVo.getIntStartDate();
 					this.fitRate = ca.getStoreRate();
 				}
-				if (baTxVo.getIntStartDate() > rateEffectDate && baTxVo.getIntStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+				if (baTxVo.getIntStartDate() > rateEffectDate
+						&& baTxVo.getIntStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 					this.rateEffectDate = baTxVo.getIntStartDate();
 					this.fitRate = ca.getStoreRate();
 				}
@@ -1792,9 +1788,10 @@ public class BaTxCom extends TradeBuffer {
 	public BigDecimal getFitRate() {
 		return fitRate;
 	}
-		
+
 	/**
-	 *  繳期數
+	 * 繳期數
+	 * 
 	 * @return 繳期數
 	 */
 	public int getTerms() {
