@@ -393,7 +393,7 @@ RESET_RIM(#SendL6R06A,L6R06)
 S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
 R(1,L6R06)
 #RL6R06AA=X,1,S
-T(2,@IndustryBefX,#L6R06IndustryItem) 
+T(2,@IndustryBefX,#L6R06IndustryItem)
 #SendL6R06BB=X,1,S
 E(0,@RimFuncCode,5)
 T(2,@RimIndustryCode,#IndustryAft)
@@ -630,7 +630,7 @@ E(0,#BirthdayBef)
 #BirthdayAft8=D,8,S
 E(0,#BirthdayAft)
 
-#Birthdaydiff=+n,8,S
+#Birthdaydiff=+n,8,L
 E(0,#BirthdayBef-#BirthdayAft)
 
 #BirthdayInd=_,_,L
@@ -911,7 +911,7 @@ IF(#RegCityCodeInd=="X",T(3,X),$)
 #RegAreaCodeAft=X,3,I
 C(4,#RegCityCodeAft,S,$)
 HELP(#L6r03ResultArea,cols:5)
-@   
+@
 C(5,#RegCityCodeAft,#RegCityCodeBef,C(5,#RegAreaCodeBef,#RegAreaCodeAft,s,$),$)
 V(H,#L6r03ResultArea)
 

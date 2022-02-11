@@ -1,9 +1,9 @@
 package com.st1.itx.trade.BS;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -56,7 +56,7 @@ public class BS990 extends TradeBuffer {
 				+ titaVo.getTlrNo() + File.separatorChar + "BS990TestData.txt";
 
 		try {
-			// 輸入 (txt):
+			// 輸入例 (txt):
 			// 39,1,1\n
 			// 2,2,1\n
 			// 1,1,1\n
@@ -64,16 +64,18 @@ public class BS990 extends TradeBuffer {
 
 			// 輸出:
 			// {"39,1,1","2,2,1","1,1,1","\n"}
-			this.info("BS990.getKeys getting file:" + pathToFile);
+			this.info("getKeys getting file:" + pathToFile);
 			return fileCom.intputTxt(inFolder + File.separatorChar + pathToFile, "UTF-8");
 		} catch (Exception e) {
-			this.error("BS990.getKeys error:");
+			this.error("getKeys error:");
 			e.printStackTrace();
 			return new ArrayList<String>();
 		}
 	}
 
 	private void doAcLoanInt(ArrayList<String> keys, TitaVo titaVo) {
+		// 輸入例:
+		// {"39,1,1","2,2,1","1,1,1","\n"}
 		try {
 			// baTxCom 需要這個
 			baTxCom.setTxBuffer(this.getTxBuffer());
@@ -91,33 +93,25 @@ public class BS990 extends TradeBuffer {
 
 				if (key.length == 3) // 只處理正確格式資料
 				{
-					this.info("BS990.doAcLoanInt: " + key[0] + "," + key[1] + "," + key[2]);
+					this.info("doAcLoanInt: " + key[0] + "," + key[1] + "," + key[2]);
 
 					baTxCom.acLoanInt(iEntryDate, intDate, parse.stringToInteger(key[0]), parse.stringToInteger(key[1]),
 							parse.stringToInteger(key[2]), titaVo);
 				}
 			}
 		} catch (Exception e) {
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(writer);
-			e.printStackTrace(printWriter);
-			printWriter.flush();
-
-			String stackTrace = writer.toString();
-			this.error("BS990.doAcLoanInt error:" + stackTrace);
+			this.error("BS990.doAcLoanInt error:" + ExceptionUtils.getStackTrace(e));
 		}
 	}
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		// 1. 取測資
-		// 2. Loop and do the function call
-
 		this.info("BS990 initiated...");
 		this.totaVo.init(titaVo);
 
+		// 1. 取測資
 		ArrayList<String> keysFromFile = getKeys(titaVo);
-
+		// 2. Loop and do the function call
 		doAcLoanInt(keysFromFile, titaVo);
 
 		return this.sendList();

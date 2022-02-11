@@ -152,10 +152,10 @@ public class Cs80UpDBS extends CommBuffer {
 		}
 
 		// 2022.2.9 by eric
-		if (this.titaVo.isTxcdInq() && !this.titaVo.isTxcdRim() && this.titaVo.getReturnIndex() <= 1) {
+		if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTxcdInq() && !this.titaVo.isTxcdRim() && this.titaVo.getReturnIndex() <= 1) {
 			TotaVo tota = this.totaVoList.get(0);
 			if (!tota.isError()) {
-//				this.insTxRecord(tota);
+				this.insTxRecord(tota);
 			}
 		}
 
@@ -432,7 +432,6 @@ public class Cs80UpDBS extends CommBuffer {
 		txRecord.setCurCode(this.titaVo.getCurCodeI());
 		txRecord.setCurName(this.titaVo.getCurName());
 		txRecord.setTxAmt(this.parse.stringToBigDecimal(this.titaVo.getTxAmt()));
-		// 2022-02-10 智偉修改:增加null判斷
 		txRecord.setLockNo(Long.valueOf(this.titaVo.get("LockNo") == null ? "0" : this.titaVo.get("LockNo").toString()));
 		txRecord.setLockCustNo(Integer.parseInt(this.titaVo.get("LockCustNo") == null ? "0" : this.titaVo.get("LockCustNo").toString()));
 		if (this.titaVo.isHcodeErase()) {
