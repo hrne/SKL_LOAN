@@ -1104,7 +1104,7 @@ public class TxBatchCom extends TradeBuffer {
 			// 回收金額 + 暫收可抵繳 - 全部應繳 < 期金
 			// 處理狀態:2.人工處理
 			// 處理說明:<不足利息>,<積欠期款> 999,999,999,999 期金:999,999,999,999 未繳費用:999,999,999,999
-			if (this.unPayLoan.compareTo(BigDecimal.ZERO) == 0) {
+			if (this.unPayLoan.compareTo(BigDecimal.ZERO) == 0 && this.repayLoan.compareTo(BigDecimal.ZERO) == 0) {
 				this.checkMsg = "需償還本利金額: 0";
 				apendcheckMsgAmounts(tBatxDetail, titaVo);
 				this.procStsCode = "2"; // 2.人工處理

@@ -134,23 +134,20 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setUnpaidFlag(0); // 未繳清記號
 		loanCalcRepayIntCom.setIntCalcCode(t.getIntCalcCode());// 計息方式 1:按日計息 2:按月計息
 		// 利息提存
-		// 1.業務科目=310直接以日計算
-		// 2.中長擔(不看是否以日計息)按月繳息者，完整一個月((當月月底日-繳息迄日)+1=月底日)為以月計算，否則以日計算
+		// 1.短擔以日計算
+		// 2.中長擔以月計算
 		if (iIntEndCode == 2) {
 			if (tFacMain.getAcctCode().equals("310")) {
 				loanCalcRepayIntCom.setIntCalcCode("1");
 			} else {
 				if (tFacMain.getAcctCode().equals("320") || tFacMain.getAcctCode().equals("330")) {
-					if ("1".equals(t.getAmortizedCode())) {
-						if (prevPayIntDate / 100 == this.txBuffer.getTxCom().getTbsdy() / 100
-								&& prevPayIntDate % 100 == 1) {
-							loanCalcRepayIntCom.setIntCalcCode("2");
-						} else {
-							loanCalcRepayIntCom.setIntCalcCode("1");
-						}
-					}
+					loanCalcRepayIntCom.setIntCalcCode("2");
 				}
 			}
+			this.info("Caculate log Set ... 戶號= " + t.getCustNo() + "-" + t.getFacmNo() + "-" + t.getBormNo()
+					+ ", AcctCode=" + tFacMain.getAcctCode() + ", CalcCode =" + t.getIntCalcCode() + ", AmortizedCode="
+					+ t.getAmortizedCode() + ", SpecificDate =" + t.getSpecificDate() + " ,prevPayIntDate ="
+					+ prevPayIntDate);
 		}
 
 		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(t.getAmortizedCode())); // 攤還方式,還本方式

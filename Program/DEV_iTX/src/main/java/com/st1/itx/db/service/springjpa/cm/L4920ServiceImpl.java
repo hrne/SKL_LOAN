@@ -72,7 +72,7 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iStatusCode = titaVo.get("StatusCode");
 		int iRepayCode = parse.stringToInteger(titaVo.get("RepayCode"));
 		String iFileName = titaVo.get("FileName").trim();
-		String iProcStsCode = titaVo.get("ProcStsCode");
+		String iProcStsCode = titaVo.get("ProcStatusCode");
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		String iReconCode = titaVo.get("ReconCode").trim();
 

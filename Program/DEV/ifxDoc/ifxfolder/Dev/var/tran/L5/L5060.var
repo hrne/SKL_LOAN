@@ -216,7 +216,7 @@ IF(#Ovdamtto<#Ovdamtfm,V(P,結束金額不可小於起始金額),$)
 #OprionCd=A,1,I
 HELP(#OprionCdHelp)
 @
-IF(#Identity==1 || #Identity==2 || #Identity==3,s,$)
+IF(#Identity==1 || #Identity==2 || #Identity==3,C(3,#OprionCd,0,s,$),$)
 V(H,#OprionCdHelp)
 
 #OprionCdX=X,4,L
@@ -263,7 +263,7 @@ IF(#TmpOvddayto<#TmpOvddayfm,V(P,結束天數不可小於起始天數),$)
 #Status=A,2,I
 IF(#Identity==1 || #Identity==2 || #Identity==3,E(0,99),E(0,04))
 HELP(#StatusHelp,cols:2)
-!C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s))
+IF(#Identity==1 || #Identity==2 || #Identity==3,$,C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s)))
 @V(H,#StatusHelp)
 #StatusX=X,22,L
 T(H,#Status,#StatusHelp)

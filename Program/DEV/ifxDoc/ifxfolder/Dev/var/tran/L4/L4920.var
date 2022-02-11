@@ -45,7 +45,7 @@ E(0,0)
 ["#FdRepayCode+還款來源",#RepayCode,#RepayCodeX],
 ["#FdReconCode+對帳類別",#ReconCode,#ReconCodeX],
 ["#FdFileName+檔名",#FileName],
-["#FdProcStsCode+處理狀態",#ProcStsCode,#ProcStsCodeX],
+["#FdProcStatusCode+處理狀態",#ProcStatusCode,#ProcStatusCodeX],
 ["#FdCustNo+戶號",#CustNo],
 ]
 
@@ -63,7 +63,7 @@ T(3,*)
 
 #FdFileName=X,2,L
 
-#FdProcStsCode=X,2,L
+#FdProcStatusCode=X,2,L
 T(3,*)
 
 #FdCustNo=X,2,L
@@ -119,7 +119,7 @@ T(3,0:未檢核;1:檢核有誤;2:檢核正常;3:入帳未完;4:入帳完成;5:�
 T(4,CHAIN$) 
 #NTXBUF=x,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@ProcStsCode,#NTXBUF,1,1)
+T(1,@ProcStatusCode,#NTXBUF,1,1)
 T(1,@AcDate,#NTXBUF,2,7)
 T(1,@BatchNo,#NTXBUF,9,6)
 T(1,@StatusCode,#NTXBUF,15,1)
@@ -212,12 +212,13 @@ T(3,)T(H,#ReconCode,#ReconCodeHelp)
 !                  TEM,T(3,員工扣薪),
 !                  TCK,T(3,支票),T(3, ))
 
+
 ! 檔名
 #FileName=x,40,I
 C(3,#CHAIN,0,$,s)
 
 ! 處理狀態
-#ProcStsCode=X,1,I
+#ProcStatusCode=X,1,I
 C(3,#CHAIN,0,$,s)
 HELP(#ProcStsCodeHelp)
 @V(H,#ProcStsCodeHelp)
@@ -235,8 +236,8 @@ HELP(#ProcStsCodeHelp)
 !@V(3,0,1,2,3,4,5,6,7,A,S,R)
 
 ! 處理狀態中文
-#ProcStsCodeX=X,10,L
-T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
+#ProcStatusCodeX=X,10,L
+T(3,)T(H,#ProcStatusCode,#ProcStsCodeHelp)
 !SWITCH(#ProcStsCode,0,T(3,未檢核),
 !                 1,T(3,不處理),
 !                 2,T(3,人工處理),
@@ -248,6 +249,13 @@ T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
 !                 A,T(3,全部),
 !                 S,T(3,已處理),
 !                 R,T(3,待處理))
+
+!對帳類別為A1且處理狀態為R待處理時顯示勾選畫面 送期款
+!對帳類別為A3且處理狀態為R待處理時顯示勾選畫面 送部分償還
+#checkReconCode=X,1,S
+C(5,#ProcStatusCode,R,$,S)
+C(5,#ReconCode,A1,E(0,@RPTFG,2),$)
+C(5,#ReconCode,A3,E(0,@RPTFG,3),$)
 
 ! 戶號
 #CustNo=A,7,I
@@ -408,6 +416,47 @@ SWITCH(#OOProcStsCode,5,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxb
 ! 07:代收款－債權協商
 ! 09:其他
 ! 11:匯款轉帳預先作業
+
+!送L4201
+
+#DetailSeq=A,6,S
+E(0,#OODetailSeq)
+
+#RepayTypeA=A,2,S
+C(5,#ReconCode,A1,E(0,1),$)
+C(5,#ReconCode,A3,E(0,2),$)
+
+#CustNoA=A,7,S
+E(0,#OOCustNo)
+
+#ProcStsCode=X,1,S
+T(2,0)
+
+#secret-no=x,1000,S
+T(6A,#AcDate+#BatchNo+#DetailSeq+#RepayTypeA+#CustNoA+#ProcStsCode)
+
+
+#batch-detail=x,100000,S
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -416,7 +465,7 @@ SWITCH(#OOProcStsCode,5,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxb
 #BatchNo
 #StatusCode
 #RepayCode
-#ProcStsCode
+#ProcStatusCode
 #ReconCode
 #FileName
 #CustNo
@@ -462,6 +511,11 @@ TXFORM=L4920
 
 <sub type="SELECT">
 
+#batch-print=2,L4201.PFNX,NA,,,,,,1169:827
+^
+#batch-print=3,L4201.PFNX,NA,,,,,,1169:827
+^
+
 #RPTFG=0,QUERY.GRID,L4920
 #any={detail:true, header:'L4920.part', caption:'', rowNum:20, rowList:[20,40,60]}
 
@@ -495,8 +549,102 @@ TXFORM=L4920
 #OOFileSeq=檔案序號
 {width:80}
 ^
+
+#RPTFG=2,QUERY.GRID,L4920
+#any={detail:true, header:'L4920.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'設定還款類別為期款',
+	type:'5',
+	rim:'L4201',
+	txtno:'#secret-no',
+	pfnx:"L4201.PFNX",
+	col_captions:["戶號","交易序號","處理結果                                             "],
+	col_names:["#OOCustNo","#batch-row-txtno","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#OOEntryDate=入帳日期
+{width:95,align:'center'}
+#OOCustNo=戶號
+{width:65}
+#OOFacmNo=額度
+{width:65,align:'center'}
+#OORepayTypeX=還款類別
+{width:95}
+#OOReconCodeX=對帳類別
+{width:95}
+#OORepayAmt=交易金額
+{width:95}
+#OOAcctAmt=已作帳金額
+{width:120}
+#OODisacctAmt=入暫收金額
+{width:120}
+#OOProcStsCodeX=處理狀態
+{width:95,align:'center'}
+#OOProcNote=備註
+{width:600}
+#OOBTN_A=
+{search:false,formatter:'cust:bind-button:#OOBTN_TXT',align:'center',canExport:false,width:35}
+
+#OODetailSeq=明細序號
+{width:80}
+#OOFileName=檔案名稱
+{width:95}
+#OOFileSeq=檔案序號
+{width:80}
+
+^
+
+#RPTFG=3,QUERY.GRID,L4920
+#any={detail:true, header:'L4920.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'設定還款類別為部分償還',
+	type:'5',
+	rim:'L4201',
+	txtno:'#secret-no',
+	pfnx:"L4201.PFNX",
+	col_captions:["戶號","交易序號","處理結果                                             "],
+	col_names:["#OOCustNo","#batch-row-txtno","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#OOEntryDate=入帳日期
+{width:95,align:'center'}
+#OOCustNo=戶號
+{width:65}
+#OOFacmNo=額度
+{width:65,align:'center'}
+#OORepayTypeX=還款類別
+{width:95}
+#OOReconCodeX=對帳類別
+{width:95}
+#OORepayAmt=交易金額
+{width:95}
+#OOAcctAmt=已作帳金額
+{width:120}
+#OODisacctAmt=入暫收金額
+{width:120}
+#OOProcStsCodeX=處理狀態
+{width:95,align:'center'}
+#OOProcNote=備註
+{width:600}
+#OOBTN_A=
+{search:false,formatter:'cust:bind-button:#OOBTN_TXT',align:'center',canExport:false,width:35}
+
+#OODetailSeq=明細序號
+{width:80}
+#OOFileName=檔案名稱
+{width:95}
+#OOFileSeq=檔案序號
+{width:80}
+
+^
 <include src="PRT.icf::INQ04.sel" map="i=L4920;cpi=15"/>
-#BatchNo#OOStatusCode#OORepayType#FileName#ProcStsCode#CustNo
+#BatchNo#OOStatusCode#OORepayType#FileName#ProcStatusCode#CustNo
 %
 #OSumPayAmt#OSumAccAmt#OSumDisAmt
 #OODetailSeq#OOEntryDate#OOCustNo#OOFacmNo#OORepayType#OORepayCode#OOReconCode#OORepayAmt#OOAcctAmt#OODisacctAmt#OOProcStsCode#OOProcCode#OOProcNote#OOTxSn
