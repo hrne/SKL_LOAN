@@ -170,8 +170,8 @@ public class BaTxCom extends TradeBuffer {
 
 		// 部分還款
 		this.extraRepayAmt = BigDecimal.ZERO; // 部分還款金額
-		this.includeIntFlag = "Y";// 是否內含利息
-		this.unpaidIntFlag = "N";// 利息是否可欠繳
+		this.includeIntFlag = "N";// 是否內含利息
+		this.unpaidIntFlag = "Y";// 利息是否可欠繳
 		this.payMethod = "0";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 	}
 

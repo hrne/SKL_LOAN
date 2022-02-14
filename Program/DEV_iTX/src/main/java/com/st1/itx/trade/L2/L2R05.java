@@ -313,10 +313,10 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05RvBormNo", wkRvBormNo); // 預定撥款序號
 		this.totaVo.putParam("L2r05RvDrawdownAmt", wkRvDrawdownAmt); // 已預約撥款金額
 		for (int i = 1; i <= 10; i++) {
-			this.totaVo.putParam("StepMonths" + i, 0);
-			this.totaVo.putParam("StepMonthE" + i, 0);
-			this.totaVo.putParam("StepRateType" + i, 0);
-			this.totaVo.putParam("StepRateIncr" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonths" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonthE" + i, 0);
+			this.totaVo.putParam("L2r05StepRateType" + i, 0);
+			this.totaVo.putParam("L2r05StepRateIncr" + i, 0);
 		}
 
 		sProdNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
@@ -509,10 +509,10 @@ public class L2R05 extends TradeBuffer {
 
 		int i = 1;
 		for (FacProdStepRate tFacProdStepRate : slFacProdStepRate.getContent()) {
-			this.totaVo.putParam("StepMonths" + i, tFacProdStepRate.getMonthStart());
-			this.totaVo.putParam("StepMonthE" + i, tFacProdStepRate.getMonthEnd());
-			this.totaVo.putParam("StepRateType" + i, tFacProdStepRate.getRateType());
-			this.totaVo.putParam("StepRateIncr" + i, tFacProdStepRate.getRateIncr());
+			this.totaVo.putParam("L2r05StepRateMonths" + i, tFacProdStepRate.getMonthStart());
+			this.totaVo.putParam("L2r05StepRateMonthE" + i, tFacProdStepRate.getMonthEnd());
+			this.totaVo.putParam("L2r05StepRateType" + i, tFacProdStepRate.getRateType());
+			this.totaVo.putParam("L2r05StepRateIncr" + i, tFacProdStepRate.getRateIncr());
 			i++;
 		}
 	}
@@ -619,16 +619,10 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05RvBormNo", 0); 
 		this.totaVo.putParam("L2r05RvDrawdownAmt", 0); 
 		for (int i = 1; i <= 10; i++) {
-			this.totaVo.putParam("BreachbMmA" + i, 0);
-			this.totaVo.putParam("BreachbMmB" + i, 0);
-			this.totaVo.putParam("BreachbPercent" + i, 0);
-			this.totaVo.putParam("BreachaYyA" + i, 0);
-			this.totaVo.putParam("BreachaYyB" + i, 0);
-			this.totaVo.putParam("BreachaPercent" + i, 0);
-			this.totaVo.putParam("StepMonths" + i, 0);
-			this.totaVo.putParam("StepMonthE" + i, 0);
-			this.totaVo.putParam("StepRateType" + i, "");
-			this.totaVo.putParam("StepRateIncr" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonths" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonthE" + i, 0);
+			this.totaVo.putParam("L2r05StepRateType" + i, "");
+			this.totaVo.putParam("L2r05StepRateIncr" + i, 0);
 		}
 	}
 }

@@ -154,10 +154,10 @@ public class L2R01 extends TradeBuffer {
 
 			int i = 1;
 			for (FacProdStepRate tFacProdStepRate : lFacProdStepRate.getContent()) {
-				this.totaVo.putParam("StepMonths" + i, tFacProdStepRate.getMonthStart());
-				this.totaVo.putParam("StepMonthE" + i, tFacProdStepRate.getMonthEnd());
-				this.totaVo.putParam("StepRateType" + i, tFacProdStepRate.getRateType());
-				this.totaVo.putParam("StepRateIncr" + i, tFacProdStepRate.getRateIncr());
+				this.totaVo.putParam("L2r01StepRateMonths" + i, tFacProdStepRate.getMonthStart());
+				this.totaVo.putParam("L2r01StepRateMonthE" + i, tFacProdStepRate.getMonthEnd());
+				this.totaVo.putParam("L2r01StepRateType" + i, tFacProdStepRate.getRateType());
+				this.totaVo.putParam("L2r01StepRateIncr" + i, tFacProdStepRate.getRateIncr());
 				i++;
 
 			}
@@ -244,10 +244,10 @@ public class L2R01 extends TradeBuffer {
 		this.totaVo.putParam("L2r01BreachStartPercent", tFacProd.getBreachStartPercent());
 		this.totaVo.putParam("L2r01Breach", BreachDescription);
 		for (int i = 1; i <= 10; i++) {
-			this.totaVo.putParam("StepMonths" + i, 0);
-			this.totaVo.putParam("StepMonthE" + i, 0);
-			this.totaVo.putParam("StepRateType" + i, 0);
-			this.totaVo.putParam("StepRateIncr" + i, 0);
+			this.totaVo.putParam("L2r01StepRateMonths" + i, 0);
+			this.totaVo.putParam("L2r01StepRateMonthE" + i, 0);
+			this.totaVo.putParam("L2r05StepRateType" + i, 0);
+			this.totaVo.putParam("L2r05StepRateIncr" + i, 0);
 		}
 
 	}

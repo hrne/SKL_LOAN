@@ -1,5 +1,7 @@
 package com.st1.itx.Exception;
 
+import java.util.Objects;
+
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxErrCode;
@@ -45,12 +47,12 @@ public class LogicException extends Exception {
 	}
 
 	private void setErrMsg() {
-		if (this.errorMsg.trim().isEmpty()) {
-			TxErrCodeService txErrCodeService = (TxErrCodeService) MySpring.getBean("txErrCodeService");
-			TxErrCode txErrCode = txErrCodeService.findById(this.errorMsgId);
-			if (txErrCode != null)
-				this.errorMsg = txErrCode.getErrContent();
-		}
+		TxErrCodeService txErrCodeService = (TxErrCodeService) MySpring.getBean("txErrCodeService");
+		TxErrCode txErrCode = txErrCodeService.findById(this.errorMsgId);
+		if (txErrCode != null)
+			this.errorMsg = !Objects.isNull(this.errorMsg) && !this.errorMsg.trim().isEmpty() ? txErrCode.getErrContent() + " (" + this.errorMsg + " )" : txErrCode.getErrContent();
+		if (Objects.isNull(this.errorMsg))
+			this.errorMsg = "";
 	}
 
 	public String getErrorMsgId() {

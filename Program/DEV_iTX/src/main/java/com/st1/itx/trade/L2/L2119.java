@@ -81,8 +81,13 @@ public class L2119 extends TradeBuffer {
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E0010", "iFuncCode = " + iFuncCode); // 功能選擇錯誤
 		}
+
+		if (!titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
+		}
 		switch (iFuncCode) {
 		case 1: // 新增
+
 			// insert "合併額度控管資料檔
 			insertFacShareLimit(titaVo);
 
@@ -92,7 +97,8 @@ public class L2119 extends TradeBuffer {
 
 			int iApplNo = parse.stringToInteger(titaVo.get("MApplNo1"));
 
-			Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(iApplNo, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(iApplNo, 0, Integer.MAX_VALUE,
+					titaVo);
 			List<FacShareLimit> lFacShareLimit = slFacShareLimit == null ? null : slFacShareLimit.getContent();
 			if (lFacShareLimit != null) {
 				try {
