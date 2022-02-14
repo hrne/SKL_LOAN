@@ -393,6 +393,8 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 ! #BTN15=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BTN16=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BTN17=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN19=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN20=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BTN18=X,15,I,ui:button;value:協辦人員等級查詢;enable:1;tabbable:0;title:L5022 協辦人員等級明細資料查詢 ;
 
 #BIND11A=X,1,S
@@ -409,6 +411,10 @@ BIND(#BTN16,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF16A;ntxbuf5=type<-1:Busin
 BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF17A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
 #BIND18A=X,1,S
 BIND(#BTN18,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BUF18A;ntxbuf5=type<-1:Coorgnizer<-OOEmpNo:CoorgnizerX<-OOFullname})
+#BIND19A=X,1,S
+BIND(#BTN19,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF19A;ntxbuf5=type<-1:InvestigateOfficer<-OOEmployeeNo})
+#BIND20A=X,1,S
+BIND(#BTN20,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF20A;ntxbuf5=type<-1:EstimateReview<-OOEmployeeNo})
 
 #BUF1=X,42,S
 ENABLE(#BTN1)ENABLE(#BTN2)
@@ -2005,6 +2011,8 @@ T(2,@FdCreditOfficer,#WkStar)
 ! T(3,@FdLoanOfficer, )
 T(3,@FdBusinessOfficer, )
 T(3,@FdSupervisor, )
+T(3,@FdInvestigateOfficer, )
+T(3,@FdEstimateReview, )
 
 #BUF11A=X,7,S
 T(3,      Y)
@@ -2200,6 +2208,66 @@ T(2,@SupervisorX,#L2r08FullName)
 C(4,#Supervisor,S,$)
 
 #BUF18A=X,7,S
+T(3,      Y)
+
+#BUF19A=X,7,S
+T(3,      Y)
+
+![徵信]
+#FdInvestigateOfficer=X,2,L
+
+#InvestigateOfficer=X,6,I
+C(3,#Hide6Flag,0,CALL(#HideP6),$)
+
+#InvestigateOfficerLb=X,6,L
+
+#BUF19B=X,7,S
+T(2,#InvestigateOfficer+Y)
+
+#BIND19B=X,1,S
+BIND(#BTN19,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF19B;ntxbuf5=type<-1:InvestigateOfficer<-OOEmployeeNo})
+
+#SendL2r08H=X,1,S
+C(4,#InvestigateOfficer,S,$)
+T(2,@RimEmployeeNo,#InvestigateOfficer)
+IF(#L2r05InvestigateOfficer==#InvestigateOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@InvestigateOfficerX,#L2r08FullName)
+
+#InvestigateOfficerX=X,20,L
+C(4,#InvestigateOfficer,S,$)
+
+#BUF20A=X,7,S
+T(3,      Y)
+
+
+![估價覆核]
+#FdEstimateReview=X,2,L
+
+#EstimateReview=X,6,I
+C(3,#Hide6Flag,0,CALL(#HideP6),$)
+
+#EstimateReviewLb=X,6,L
+
+#BUF20B=X,7,S
+T(2,#EstimateReview+Y)
+
+#BIND20B=X,1,S
+BIND(#BTN20,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF20B;ntxbuf5=type<-1:EstimateReview<-OOEmployeeNo})
+
+#SendL2r08I=X,1,S
+C(4,#EstimateReview,S,$)
+T(2,@RimEmployeeNo,#EstimateReview)
+IF(#L2r05EstimateReview==#EstimateReview,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@EstimateReviewX,#L2r08FullName)
+
+#EstimateReviewX=X,20,L
+C(4,#EstimateReview,S,$)
+
+#BUF21A=X,7,S
 T(3,      Y)
 
 
@@ -2512,6 +2580,8 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdBusinessOfficer+#BusinessOfficerItem",#BusinessOfficer,#BTN16,#BusinessOfficerX],
 ["#FdApprovedLevel+核准層級",#ApprovedLevel,#ApprovedLevelX],
 ["#FdSupervisor+@核決主管",#Supervisor,#BTN17,#SupervisorX],
+["#FdInvestigateOfficer+徵信人員",#InvestigateOfficer,#BTN19,#InvestigateOfficerLb,#InvestigateOfficerX],
+["#FdEstimateReview+@估價覆核人員",#EstimateReview,#BTN20,#EstimateReviewLb,#EstimateReviewX],
 ["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN18,#CoorgnizerX],
 ]
 </sub>
@@ -2611,6 +2681,8 @@ K(LIGHT,#FacmNo,TXTRED,0,1)
 #BusinessOfficer
 #ApprovedLevel
 #Supervisor
+#InvestigateOfficer
+#EstimateReview
 #Coorgnizer
 #GroupId
 #CreditScore

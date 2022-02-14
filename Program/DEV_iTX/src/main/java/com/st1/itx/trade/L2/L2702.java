@@ -103,6 +103,11 @@ public class L2702 extends TradeBuffer {
 			tCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
 			tCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
+			// 新增須刷主管卡 經理層級
+			if (titaVo.getEmpNos().trim().isEmpty()) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0703", "");
+			}
+			
 			/* 存入DB */
 			try {
 				sCustRmkService.insert(tCustRmk);
@@ -161,7 +166,7 @@ public class L2702 extends TradeBuffer {
 
 			// 刪除須刷主管卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0704", "");
 			}
 
 			try {

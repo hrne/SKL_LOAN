@@ -381,7 +381,7 @@ BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L5062; ntxbuf=#AccCollPsnNameBUF;ntxbuf5=typ
 ! 員工檔查詢
 #BTNR=X,1,I,ui:button;value:員工檔查詢;enable:1;tabbable:0
 #BTNBBUR=X,7,S
-T(3,      Y)
+!T(3,      Y)
 BIND(#BTNR,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BTNBBUR;ntxbuf5=type<-1:AccCollPsnName<-OOEmployeeNo})
 
 #AccCollPsnName=X,6,I

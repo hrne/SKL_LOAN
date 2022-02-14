@@ -214,11 +214,11 @@
 				<step id="sLM041" parent="parentStep">
 					<tasklet ref="LM041" />
 				</step>
-			</flow>
+			</flow>		
 			<!-- Step: LM042 RBC表 --> 
 			<flow>
-				<step id="sLM042" parent="parentStep">
-					<tasklet ref="LM042" />
+				<step id="sLM042Batch" parent="parentStep">
+					<tasklet ref="LM042Batch" />
 				</step>
 			</flow>
 			<!-- Step: LM043 地區放款數_內部控管 --> 

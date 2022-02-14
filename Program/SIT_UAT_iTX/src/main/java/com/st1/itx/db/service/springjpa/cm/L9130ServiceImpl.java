@@ -38,6 +38,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , RESULT.\"TxAmt\" ";
 		sql += "      , RESULT.\"SlipNote\" ";
 		sql += "      , RESULT.\"RvNo\" ";
+		sql += "      , RESULT.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += " FROM ( ";
 		sql += "     SELECT S0.\"AcDate\" ";
 		sql += "          , S0.\"SlipBatNo\" ";
@@ -48,6 +49,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , SUM(S0.\"TxAmt\")    AS \"TxAmt\" ";
 		sql += "          , MAX(S0.\"SlipNote\") AS \"SlipNote\" ";
 		sql += "          , S0.\"RvNo\" ";
+		sql += "          , S0.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "     FROM ( ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
@@ -58,6 +60,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , N' '                                AS \"SlipNote\" ";
 		sql += "              , ' '                                 AS \"RvNo\" ";
+		sql += "              , ACD.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -75,6 +78,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , N' '   AS \"SlipNote\" ";
 		sql += "              , ' '    AS \"RvNo\" ";
+		sql += "              , ACD.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -94,6 +98,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , ACD.\"SlipNote\" ";
 		sql += "              , ACD.\"RvNo\" ";
+		sql += "              , ACD.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -111,6 +116,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , ACD.\"SlipNote\" ";
 		sql += "              , ACD.\"RvNo\" ";
+		sql += "              , ACD.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -128,10 +134,12 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , S0.\"AcSubCode\" ";
 		sql += "            , S0.\"DbCr\" ";
 		sql += "            , S0.\"RvNo\" ";
+		sql += "            , S0.\"AcSubBookCode\" ";
 		sql += " ) RESULT ";
 		sql += " ORDER BY RESULT.\"AcDate\" ";
 		sql += "        , RESULT.\"SlipBatNo\" ";
 		sql += "        , RESULT.\"AcBookCode\" ";
+		sql += "        , RESULT.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "        , RESULT.\"AcNoCode\" ";
 		sql += "        , RESULT.\"AcSubCode\" ";
 		sql += "        , RESULT.\"DbCr\" DESC ";
@@ -157,7 +165,11 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , ACD.\"DbCr\"                           "; // 借貸別
 		sql += "      , SUM(NVL(ACD.\"TxAmt\",0)) AS \"TxAmt\" "; // 金額
 		sql += "      , ACD.\"AcSubBookCode\"                  "; // 區隔帳冊
+		sql += "      , RPAD(CDAC.\"AcNoItem\",40,' ') AS \"AcNoItem\" "; // 傳票摘要
 		sql += " FROM \"AcDetail\" ACD ";
+		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
+		sql += "                            AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
+		sql += "                            AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
 		sql += " WHERE \"AcDate\" = :acDate ";
 		sql += "   AND \"SlipBatNo\" = :slipBatNo ";
 		sql += " GROUP BY ACD.\"AcDate\"        "; // 會計日期
@@ -167,12 +179,14 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , ACD.\"AcNoCode\"      "; // 科目代號
 		sql += "        , ACD.\"AcSubCode\"     "; // 子目代號
 		sql += "        , ACD.\"DbCr\"          "; // 借貸別
+		sql += "        , RPAD(CDAC.\"AcNoItem\",40,' ') "; // 傳票摘要
 		sql += " ORDER BY ACD.\"AcDate\"        "; // 會計日期
 		sql += "        , ACD.\"AcBookCode\"    "; // 帳冊別: 000:全公司
 		sql += "        , ACD.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "        , ACD.\"AcNoCode\"      "; // 科目代號
 		sql += "        , ACD.\"AcSubCode\"     "; // 子目代號
 		sql += "        , ACD.\"DbCr\" DESC     "; // 借貸別
+		sql += "        , RPAD(CDAC.\"AcNoItem\",40,' ') "; // 傳票摘要
 
 		this.info("L9130ServiceImpl sql=" + sql);
 		Query query;

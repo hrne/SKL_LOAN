@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class L9130Report2022 extends MakeReport {
 
 	JSONArray summaryTbl;
 	JSONArray journalTbl;
-	int groupId;
+	BigInteger groupId;
 
 	// 會計日期 #AcDate=D,7,I
 	int iAcDate;
@@ -127,19 +128,19 @@ public class L9130Report2022 extends MakeReport {
 	String acSubBookCode = " ";
 
 	// 部門代號
-	String deptCode = " ";
+	String deptCode = "10H000";
 
 	// 業務員代號
 	String salesmanCode = " ";
 
 	// 成本單位
-	String costUnit = " ";
+	String costUnit = "10H000";
 
 	// 通路別
 	String salesChannelType = " ";
 
 	// 會計準則類型
-	String ifrsType = " ";
+	String ifrsType = "1";
 
 	// 關係人ID
 	String relationId = " ";
@@ -177,9 +178,10 @@ public class L9130Report2022 extends MakeReport {
 		this.info("L9130Report2022 iMediaSeq = " + iMediaSeq);
 		this.info("L9130Report2022 slipNo = " + slipNo);
 
-		groupId = iAcDate + 19110000;
-		groupId *= 1000;
-		groupId += iMediaSeq;
+		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
+				.add(new BigDecimal(iMediaSeq));
+
+		groupId = tmpGroupId.toBigInteger();
 
 		// brno 單位
 		String brno = titaVo.getBrno();
@@ -243,7 +245,8 @@ public class L9130Report2022 extends MakeReport {
 		 * AcSubCode F3 子目代號 <BR>
 		 * DbCr F4 借貸別 <BR>
 		 * TxAmt F5 金額 <BR>
-		 * AcSubBookCode F6 區隔帳冊
+		 * AcSubBookCode F6 區隔帳冊 <BR>
+		 * AcNoItem F7 科目名稱
 		 */
 		for (Map<String, String> l9130 : l9130List) {
 
@@ -254,13 +257,14 @@ public class L9130Report2022 extends MakeReport {
 				i = specialHandling(i, titaVo);
 				// 特殊處理結束
 			}
-			
+
 			acBookCode = l9130.get("F0"); // 帳冊別
 			slipDate = l9130.get("F1"); // 會計日期
 			acNoCode = l9130.get("F2"); // 科目代號
 			acSubNoCode = l9130.get("F3"); // 子目代號
 			dbCr = l9130.get("F4"); // 借貸別
 			txAmt = l9130.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(l9130.get("F5")); // 金額
+			slipRmk = l9130.get("F7"); // 科目名稱
 
 			// 借方金額累加
 			drAmtTotal = dbCr.equals("D") ? drAmtTotal.add(txAmt) : drAmtTotal;
@@ -275,22 +279,22 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("BATCH_DATE", slipDate);
 				dataJo.put("JE_SOURCE_NAME", "LN");
 				dataJo.put("USER_LEDGER_CODE", acBookCode);
-				dataJo.put("CONVENTION", "");
+				dataJo.put("CONVENTION", ifrsType);
 				dataJo.put("JOURNAL_NAME", slipNo);
 				dataJo.put("CURRENCY_CODE", currencyCode);
 				dataJo.put("ISSUED_BY", "");
 				dataJo.put("ACCOUNTING_DATE", slipDate);
 				dataJo.put("JE_LINE_NUM", "" + i);
-				dataJo.put("SEGREGATE_CODE", "");
+				dataJo.put("SEGREGATE_CODE", acSubBookCode);
 				dataJo.put("ACCOUNT_CODE", acNoCode);
 				dataJo.put("SUBACCOUNT_CODE", acSubNoCode);
-				dataJo.put("COSTCENTER_CODE", "");
-				dataJo.put("IFRS17_GROUP_CODE", "");
+				dataJo.put("COSTCENTER_CODE", costUnit);
+				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
 				dataJo.put("INTERCOMPANY_CODE", "");
-				dataJo.put("DEPARTMENT_CODE", "");
+				dataJo.put("DEPARTMENT_CODE", deptCode);
 				dataJo.put("ENTERED_AMOUNT", txBal);
-				dataJo.put("LINE_DESC", "");
-				dataJo.put("WRITE_OFF_CODE", "");
+				dataJo.put("LINE_DESC", slipRmk);
+				dataJo.put("WRITE_OFF_CODE", acReceivableCode);
 				dataJo.put("RELATIONSHIP", "");
 			} catch (JSONException e) {
 				this.error("L9130Report22 error = " + e.getMessage());
@@ -383,7 +387,7 @@ public class L9130Report2022 extends MakeReport {
 			summaryMap.put("GROUP_ID", groupId);
 			summaryMap.put("BATCH_DATE", slipDate);
 			summaryMap.put("JE_SOURCE_NAME", "LN");
-			summaryMap.put("TOTAL_LINES", "");
+			summaryMap.put("TOTAL_LINES", i);
 			summaryMap.put("CURRENCY_CODE", "NTD");
 			summaryMap.put("TOTAL_AMOUNT", drAmtTotal);
 		} catch (JSONException e) {
@@ -490,6 +494,10 @@ public class L9130Report2022 extends MakeReport {
 		// 於借貸方各寫一筆10340000000 應收調撥款
 		String tempAcNoCode = "10340000000";
 		String tempAcSubNoCode = "     ";
+		String slipDateROC = String.valueOf(Integer.parseInt(slipDate) - 19110000);
+		String tempAcReceivableCode = deptCode + slipDateROC + FormatUtil.pad9(String.valueOf(iBatchNo), 2);
+		this.info("tempAcReceivableCode = " + tempAcReceivableCode);
+		String tempSlipRmk = "應收調撥款";
 
 		if (transferAmt.compareTo(BigDecimal.ZERO) != 0) {
 
@@ -505,8 +513,8 @@ public class L9130Report2022 extends MakeReport {
 			// 傳票媒體檔的金額處理,借方為正數,貸方為負數
 			// 這裡無論如何，反向即可
 			data += transferAmt.negate().toString() + ","; // 金額
-			data += slipRmk + ","; // 傳票摘要
-			data += acReceivableCode + ","; // 會計科目銷帳碼
+			data += tempSlipRmk + ","; // 傳票摘要
+			data += tempAcReceivableCode + ","; // 會計科目銷帳碼
 			data += costMonth + ","; // 成本月份
 			data += insuNo + ","; // 保單號碼
 			data += salesmanCode + ","; // 業務員代號
@@ -547,8 +555,8 @@ public class L9130Report2022 extends MakeReport {
 			// 如果為負數要寫一筆借方
 			tSlipMedia2022.setDbCr(transferAmt.compareTo(BigDecimal.ZERO) > 0 ? "C" : "D");
 			tSlipMedia2022.setTxAmt(transferAmt.abs());
-			tSlipMedia2022.setReceiveCode(acReceivableCode);
-			tSlipMedia2022.setSlipRmk(slipRmk);
+			tSlipMedia2022.setReceiveCode(tempAcReceivableCode);
+			tSlipMedia2022.setSlipRmk(tempSlipRmk);
 			tSlipMedia2022.setCostMonth(costMonth);
 
 			try {

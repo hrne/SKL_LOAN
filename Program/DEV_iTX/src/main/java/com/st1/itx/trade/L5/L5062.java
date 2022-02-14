@@ -44,6 +44,7 @@ public class L5062 extends TradeBuffer {
 
 		// 取得輸入資料
 		String iCityCode = titaVo.getParam("CityCode");
+		String iLegalPsnNo = titaVo.getParam("LegalPsn");
 		String iLegalPsnName = titaVo.getParam("LegalPsnX");
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -66,7 +67,6 @@ public class L5062 extends TradeBuffer {
 			for (CdCity rCdCity : iCdCity) {
 				OccursList occursList = new OccursList();
 				CdEmp iCdEmp = new CdEmp();
-				String iEmpNo = "";
 				String iAccTelArea = "";
 				String iAccTelNo = "";
 				String iAccTelExt = "";
@@ -75,29 +75,37 @@ public class L5062 extends TradeBuffer {
 				String iLegalNo = "";
 				String iLegalExt = "";
 				String iLegalPsnX = "";
+				String iLegalPsn = "";
+				String iAccCollPsn = "";
 
-				iEmpNo = rCdCity.getLegalPsn();// 法務人員
-				if (!iEmpNo.trim().isEmpty() || !iEmpNo.equals("")) {
+				iLegalPsn = rCdCity.getLegalPsn();// 法務人員
+				if (!iLegalPsn.trim().isEmpty() || !iLegalPsn.equals("")) {
 					iLegalArea = rCdCity.getLegalArea();
 					iLegalNo = rCdCity.getLegalNo();
 					iLegalExt = rCdCity.getLegalExt();
-					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
+					iCdEmp = sCdEmpService.findById(iLegalPsn, titaVo);
 					if (iCdEmp != null) {
 						iLegalPsnX = iCdEmp.getFullname();
 					}
 				}
 				
-				iEmpNo = rCdCity.getAccCollPsn();// 催收人員
-				if (!iEmpNo.trim().isEmpty() || !iEmpNo.equals("")) {
+				iAccCollPsn = rCdCity.getAccCollPsn();// 催收人員
+				if (!iAccCollPsn.trim().isEmpty() || !iAccCollPsn.equals("")) {
 					iAccTelArea = rCdCity.getAccTelArea();
 					iAccTelNo = rCdCity.getAccTelNo();
 					iAccTelExt = rCdCity.getAccTelExt();
-					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
+					iCdEmp = sCdEmpService.findById(iAccCollPsn, titaVo);
 					if (iCdEmp != null) {
 						iAccCollPsnX = iCdEmp.getFullname();
 					}
 				}
 
+				if (!iLegalPsnNo.trim().isEmpty()) {// 畫面有輸入法務人員員編
+					if (!iLegalPsnNo.equals(iLegalPsn) && !iLegalPsnNo.equals(iAccCollPsn)) {
+						continue;
+					}
+				}
+				
 				if (!iLegalPsnName.trim().isEmpty()) {// 畫面有輸入法務人員姓名
 					if (!iLegalPsnName.equals(iLegalPsnX) && !iLegalPsnName.equals(iAccCollPsnX)) {
 						continue;

@@ -49,13 +49,15 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L5062]                                 法務催收人員查詢"],
 ["#FdCityCode+地區別",#CityCode,#CityItem],
-["#FdLegalPsnX+法催人員",#LegalPsnX],
+["#FdLegalPsn+法催人員員編",#LegalPsn,"(員編/姓名，可擇一輸入)"],
+["#FdLegalPsnX+法催人員姓名",#LegalPsnX],
 ]
 !---------- AP Button AREA ----------
 
 !---------- AP TEXT AREA Variables ----------
 
 #FdCityCode=X,2,L
+#FdLegalPsn=X,2,L
 #FdLegalPsnX=X,2,L
 #FdRPTFG=X,2,L
 T(3,*)
@@ -93,9 +95,11 @@ T(2,@CityItem,#L6R12CityItem)
 #CityItem=x,20,L
 C(3,#CityCode, ,T(2,全部),$)
 
+! 催收/法務人員員編
+#LegalPsn=X,6,I
 
 #LegalPsnX=X,100,I,maxWidth:50
-C(3,#CHAIN,1,s,$)
+C(4,#LegalPsn,$,S)
 
 
 #CHAINXMT=X,1,S
@@ -192,6 +196,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L5606;text=修改;ntxbuf=#OOBUF2})
 !------ 上行電文 ------
 <sub type="TIM">
 #CityCode
+#LegalPsn
 #LegalPsnX
 #END
 </sub>

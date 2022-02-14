@@ -158,6 +158,7 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 
 ! 項目
 #DateFlag=A,1,I
+E(0,9)
 HELP(#DateFlagHelp)
 @V(H,#DateFlagHelp)
 #DateFlagX=X,9,L

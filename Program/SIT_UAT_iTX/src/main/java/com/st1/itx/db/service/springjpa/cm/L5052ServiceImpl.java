@@ -15,12 +15,14 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 
+
 @Service("l5052ServiceImpl")
 @Repository
 public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -53,7 +55,7 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String FacmNo = titaVo.getParam("FacmNo").trim(); // 額度編號
 		String SumByFacm = titaVo.getParam("SumByFacm").trim();
 		String BsOfficer = titaVo.getParam("BsOfficer").trim();
-
+		
 		String sql = "SELECT A.\"LogNo\",";
 		sql += "E1.\"UnitItem\" AS \"BsDeptName\",";
 		sql += "F1.\"Fullname\" AS \"OfficerName\",";
@@ -99,7 +101,7 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (WorkMonthFm > 0) {
 			sql += "AND A.\"WorkMonth\" BETWEEN :WorkMonthFm AND :WorkMonthTo ";
 		} else {
-			sql += "AND A.\"PerfDate\" BETWEEN :PerfDateFm AND :PerfDateTo ";
+			sql += "AND A.\"DrawdownDate\" BETWEEN :PerfDateFm AND :PerfDateTo ";
 		}
 		if (CustNo != null && Integer.parseInt(CustNo) != 0) {
 			// 戶號
@@ -155,13 +157,13 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("FacmNo", Integer.parseInt(FacmNo));
 		}
 		if (!"".equals(BsOfficer)) {
-			query.setParameter("BsOfficer", BsOfficer);
+			query.setParameter("BsOfficer",BsOfficer);
 		}
-
+		
 		this.info("L5051Service FindData=" + query);
 
 		// *** 折返控制相關 ***
-
+		
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
 		// query.setFirstResult(this.index*this.limit);
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
@@ -196,5 +198,7 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		return str;
 	}
+
+
 
 }

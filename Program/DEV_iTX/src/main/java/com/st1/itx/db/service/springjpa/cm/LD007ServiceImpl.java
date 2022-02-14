@@ -79,7 +79,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useWorkMonth) {
 			sql += "   AND B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else {
-			sql += "   AND B.\"PerfDate\" BETWEEN :perfDateStart AND :perfDateEnd";
+			sql += "   AND B.\"DrawdownDate\" BETWEEN :drawdownDateStart AND :drawdownDateEnd";
 		}
 		if (useCustNo) {
 			sql += "   AND B.\"CustNo\" = :custNo";
@@ -90,6 +90,8 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useBsOfficer) {
 			sql += "   AND B.\"BsOfficer\" = :bsOfficer";
 		}
+		sql += " ORDER BY E0.\"DepItem\" ";
+		sql += "         ,E0.\"Fullname\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -101,8 +103,8 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
 			query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
 		} else {
-			query.setParameter("perfDateStart", parse.stringToInteger(titaVo.getParam("perfDateStart")) + 19110000);
-			query.setParameter("perfDateEnd", parse.stringToInteger(titaVo.getParam("perfDateEnd")) + 19110000);
+			query.setParameter("drawdownDateStart", parse.stringToInteger(titaVo.getParam("drawdownDateStart")) + 19110000);
+			query.setParameter("drawdownDateEnd", parse.stringToInteger(titaVo.getParam("drawdownDateEnd")) + 19110000);
 		}
 
 		if (useCustNo) {

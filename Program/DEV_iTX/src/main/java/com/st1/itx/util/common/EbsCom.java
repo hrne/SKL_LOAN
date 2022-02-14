@@ -15,20 +15,24 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.SystemParasService;
+import com.st1.itx.tradeService.CommBuffer;
 
 @Component("EbsCom")
 @Scope("prototype")
-public class EbsCom {
+public class EbsCom extends CommBuffer {
 
 	@Autowired
 	private SystemParasService sSystemParasService;
 
 	ObjectMapper objectMapper = new ObjectMapper();
 
-	public String sendSlipMediaToEbs(JSONArray summaryTbl, JSONArray journalTbl, TitaVo titaVo) throws IOException, JSONException {
+	public String sendSlipMediaToEbs(JSONArray summaryTbl, JSONArray journalTbl, TitaVo titaVo)
+			throws IOException, JSONException {
+		this.info("EbsCom sendSlipMediaToEbs.");
 
 		JSONObject requestJO = new JSONObject();
 		JSONObject main = new JSONObject();
@@ -70,6 +74,9 @@ public class EbsCom {
 
 		RestTemplate restTemplate = new RestTemplate();
 
+		this.info("slipMediaUrl = " + slipMediaUrl);
+		this.info("request = " + request.toString());
+
 		String resultAsJsonStr = restTemplate.postForObject(slipMediaUrl, request, String.class);
 
 		JsonNode root = objectMapper.readTree(resultAsJsonStr);
@@ -91,5 +98,10 @@ public class EbsCom {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		return new HttpEntity<String>(jsonString, headers);
+	}
+
+	@Override
+	public void exec() throws LogicException {
+		this.info("EbsCom exec .");
 	}
 }

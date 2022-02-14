@@ -27,7 +27,7 @@ T(3,LD006)
 ["[LD006]                                  LD006三階放款明細統計"],
 ["#FdMain+查詢條件","@(工作月期間、撥款起訖日，需擇一輸入)"],
 ["#FdWorkMonth+．工作月區間",#workMonthStart," ~ ",#workMonthEnd],
-["#FdPerfDate+．撥款起訖日",#perfDateStart,"~",#perfDateEnd],
+["#FddrawdownDate+．撥款起訖日",#drawdownDateStart,"~",#drawdownDateEnd],
 ["#FdCustNo+戶號",#custNo,"-",#facmNo],
 ["#FdIntroducer+介紹人",#Introducer,#BtnCdEmp,#IntroducerX],
 ]
@@ -51,7 +51,7 @@ T(3,*)
 #FdWorkMonth=X,2,L
 T(3, )
 
-#FdPerfDate=X,2,L
+#FddrawdownDate=X,2,L
 T(3, )
 
 #FdCustNo=X,2,L
@@ -73,24 +73,24 @@ A(YM13,1,#workMonthEnd)
 IF(#workMonthEnd<#workMonthStart,V(P,工作月訖起不得小於工作月起),$)
 
 ! 業績日期
-#perfDateStart=D,7,I
+#drawdownDateStart=D,7,I
 C(3,#workMonthStart,0,$,S)
-C(3,#perfDateStart,0,T(1,#SYSDATE,2,7),$)
+C(3,#drawdownDateStart,0,T(1,#SYSDATE,2,7),$)
 D(8)
 @
 V(7)
-A(DATE,0,#perfDateStart)
+A(DATE,0,#drawdownDateStart)
 
-#perfDateEnd=D,7,I
+#drawdownDateEnd=D,7,I
 C(3,#workMonthStart,0,$,S)
-C(3,#perfDateEnd,0,E(0,#perfDateStart),$)
+C(3,#drawdownDateEnd,0,E(0,#drawdownDateStart),$)
 D(8)
 @
 V(7)
-A(DATE,0,#perfDateEnd)
+A(DATE,0,#drawdownDateEnd)
 
-#checkPerfDate=X,1,S
-@IF(#perfDateEnd>=#perfDateStart,$,V(P,撥款訖日不得大於等於起日))
+#checkdrawdownDate=X,1,S
+@IF(#drawdownDateEnd>=#drawdownDateStart,$,V(P,撥款訖日不得大於等於起日))
 
 #custNo=A,7,I
 
@@ -166,8 +166,8 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 <sub type="TIM">
 #workMonthStart
 #workMonthEnd
-#perfDateStart
-#perfDateEnd
+#drawdownDateStart
+#drawdownDateEnd
 #custNo
 #facmNo
 #Introducer

@@ -9,55 +9,19 @@
 			<tasklet ref="LD003" />
 		</step>
 	</job>
-	
-	<!--
-	<job id="jLD004" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLD004" parent="parentStep">
-			<tasklet ref="LD004" />
-		</step>
-	</job>
-	-->
-	
-<!-- <job id="jLD005" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLD005" parent="parentStep">
-			<tasklet ref="LD005" />
-		</step>
-	</job> -->
-	<!--
-	<job id="jLD006" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLD006" parent="parentStep">
-			<tasklet ref="LD006" />
-		</step>
-	</job>
-	-->
-	
-	<!--
-	<job id="jLD007" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLD007" parent="parentStep">
-			<tasklet ref="LD007" />
-		</step>
-	</job>
-	-->
-	
-	<!-- 
-	<job id="jLD008" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLD008" parent="parentStep">
-			<tasklet ref="LD008" />
-		</step>
-	</job>
-	-->
-	
 	<job id="jLD009" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLD009" parent="parentStep">
 			<tasklet ref="LD009" />
 		</step>
 	</job>
-		<!-- 週報 -->
+
+	<!-- 週報 -->
 	<job id="jLW003" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLW003" parent="parentStep">
 			<tasklet ref="LW003" />
 		</step>
 	</job>
+
 	<!-- 月報 -->
 	<job id="jLM001" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM001" parent="parentStep">
@@ -69,22 +33,6 @@
 			<tasklet ref="LM002" />
 		</step>
 	</job>
-	
-	<!-- 
-	<job id="jLM003" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM003" parent="parentStep">
-			<tasklet ref="LM003" />
-		</step>
-	</job>	
-	-->
-	
-<!-- 
-	<job id="jLM004" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM004" parent="parentStep">
-			<tasklet ref="LM004" />
-		</step>
-	</job>
--->	
 	<job id="jLM007" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM007" parent="parentStep">
 			<tasklet ref="LM007" />
@@ -100,47 +48,11 @@
 			<tasklet ref="LM009" />
 		</step>
 	</job>	
-	<!-- 
-	<job id="jLM011" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM011" parent="parentStep">
-			<tasklet ref="LM011" />
-		</step>
-	</job>
-	-->
-	
-	<!--
-	<job id="jLM012" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM012" parent="parentStep">
-			<tasklet ref="LM012" />
-		</step>
-	</job>
-	-->		
-	<!--
-	<job id="jLM013" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM013" parent="parentStep">
-			<tasklet ref="LM013" />
-		</step>
-	</job>
-	-->	
-	<!--
-	<job id="jLM014" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM014" parent="parentStep">
-			<tasklet ref="LM014" />
-		</step>
-	</job>
-	-->	
 	<job id="jLM015" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM015" parent="parentStep">
 			<tasklet ref="LM015" />
 		</step>
 	</job>	
-	<!--
-	<job id="jLM016" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM016" parent="parentStep">
-			<tasklet ref="LM016" />
-		</step>
-	</job>
-	-->
 	<job id="jLM017" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM017" parent="parentStep">
 			<tasklet ref="LM017" />
@@ -156,13 +68,6 @@
 			<tasklet ref="LM019" />
 		</step>
 	</job>
-	<!--
-	<job id="jLM021" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM021" parent="parentStep">
-			<tasklet ref="LM021" />
-		</step>
-	</job>
-	-->
 	<job id="jLM022" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM022" parent="parentStep">
 			<tasklet ref="LM022" />
@@ -193,32 +98,11 @@
 			<tasklet ref="LM029" />
 		</step>
 	</job>
-	<!-- 
-	<job id="jLM030" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM030" parent="parentStep">
-			<tasklet ref="LM030" />
-		</step>
-	</job> 
-	-->
-	<!-- 
-	<job id="jLM031" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM031" parent="parentStep">
-			<tasklet ref="LM031" />
-		</step>
-	</job>
-	-->
 	<job id="jLM032" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM032" parent="parentStep">
 			<tasklet ref="LM032" />
 		</step>
 	</job>
-	<!--
-	<job id="jLM033" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM033" parent="parentStep">
-			<tasklet ref="LM033" />
-		</step>
-	</job> -->
-	
 	<job id="jLM034" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM034" parent="parentStep">
 			<tasklet ref="LM034" />
@@ -249,21 +133,9 @@
 			<tasklet ref="LM039" />
 		</step>
 	</job>
-<!--
-	<job id="jLM040" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM040" parent="parentStep">
-			<tasklet ref="LM040" />
-		</step>
-	</job>
--->
 	<job id="jLM041" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM041" parent="parentStep">
 			<tasklet ref="LM041" />
-		</step>
-	</job>
-	<job id="jLM042" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM042" parent="parentStep">
-			<tasklet ref="LM042" />
 		</step>
 	</job>
 	<job id="jLM043" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
@@ -291,11 +163,6 @@
 			<tasklet ref="LM047" />
 		</step>
 	</job>
-	<!-- <job id="jLM048" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM048" parent="parentStep">
-			<tasklet ref="LM048" />
-		</step>
-	</job> -->
 	<job id="jLM049" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM049" parent="parentStep">
 			<tasklet ref="LM049" />
@@ -391,11 +258,6 @@
 			<tasklet ref="LM067" />
 		</step>
 	</job>	
-	<!-- <job id="jLM070" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLM070" parent="parentStep">
-			<tasklet ref="LM070" />
-		</step>
-	</job>	-->
 	<job id="jLM071" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM071" parent="parentStep">
 			<tasklet ref="LM071" />
@@ -478,6 +340,7 @@
 			<tasklet ref="LP005" />
 		</step>
 	</job>	
+
 	<!-- 季報 -->
 	<job id="jLQ001" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLQ001" parent="parentStep">
@@ -504,23 +367,15 @@
 			<tasklet ref="LQ006" />
 		</step>
 	</job>
+
 	<!-- 半年報 -->
 	<job id="jLH001" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLH001" parent="parentStep">
 			<tasklet ref="LH001" />
 		</step>
 	</job>	
+
 	<!-- 年報 -->
-	<!--<job id="jLY002" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLY002" parent="parentStep">
-			<tasklet ref="LY002" />
-		</step>
-	</job>	
-	<job id="jLY003" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLY003" parent="parentStep">
-			<tasklet ref="LY003" />
-		</step>
-	</job>-->
 	<job id="jLY004" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLY004" parent="parentStep">
 			<tasklet ref="LY004" />

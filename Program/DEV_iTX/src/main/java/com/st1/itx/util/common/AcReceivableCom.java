@@ -479,8 +479,8 @@ public class AcReceivableCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
 		} else {
 			updAcReceivable(AcHCode, bizTbsdy);
-			// 訂正後為已銷帳則刪除，否則更新
-			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1
+			// 同交易序號訂正後為已銷帳則刪除，否則更新(短繳期金因同時會有起帳及銷帳因此除外)
+			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1 && tAcReceivable.getReceivableFlag() != 4
 					&& tAcReceivable.getTitaTlrNo().equals(this.titaVo.getOrgTlr())
 					&& tAcReceivable.getTitaTxtNo() == parse.stringToInteger(this.titaVo.getOrgTno())) {
 				try {

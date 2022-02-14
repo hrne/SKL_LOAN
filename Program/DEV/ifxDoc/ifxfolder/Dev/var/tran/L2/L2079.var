@@ -80,19 +80,31 @@ T(2,@RenewCodeHelp,#HelpDesc1)
 T(4,CHAIN$)
 
 
+#NTXBUF=X,34,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@YearStart,#NTXBUF,8,3)
+T(1,@MonthStart,#NTXBUF,11,2)
+T(1,@YearEnd,#NTXBUF,13,3)
+T(1,@MonthEnd,#NTXBUF,16,2)
+T(1,@OldFacmNo,#NTXBUF,18,3)
+T(1,@NewFacmNo,#NTXBUF,21,3)
 
 ! 戶號
 #CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
 
 #DATE=D,8,S
 T(4,DATE$)
 
 ! 年月起
 #YearStart=A,3,I
+C(3,#CHAIN,1,s,$)
 IF(#CustNo>0,S,$)
 T(1,#DATE,2,3)
 @V(2,0)
 #MonthStart=A,2,I
+C(3,#CHAIN,1,s,$)
 IF(#CustNo>0,S,$)
 E(0,1)
 @V(5,1,12)
@@ -103,11 +115,13 @@ T(2,#YearStart+#MonthStart)
 
 ! 年月迄
 #YearEnd=A,3,I
+C(3,#CHAIN,1,s,$)
 IF(#CustNo>0,S,$)
 E(0,#YearStart)
 @V(5,#YearStart,999)
 
 #MonthEnd=A,2,I
+C(3,#CHAIN,1,s,$)
 IF(#CustNo>0,S,$)
 E(0,#MonthStart)
 @IF(#YearStart == #YearEnd,V(5,#MonthStart,12),V(5,1,12))
@@ -117,13 +131,18 @@ T(2,#YearEnd+#MonthEnd)
 
 ! 原額度
 #OldFacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
 
 ! 新額度
 #NewFacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
 
 
 #RPTFG=A,1,S
 E(0,0)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0),$)
 
 </sub>
 
