@@ -56,6 +56,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<Map<String, String>> execSql(TitaVo titaVo) throws Exception {
 		this.info("L2038ServiceImpl.find");
 
@@ -214,7 +215,6 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
 
-		@SuppressWarnings("unchecked")
 		List<Object> result = query.getResultList();
 
 		size = result.size();
@@ -285,6 +285,13 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (clNo > 0) {
 			conditionList.add(" cm.\"ClNo\" = :clNo ");
 		}
+		
+		// ClTypeCode 擔保品類別
+		String ClTypeCode = titaVo.getParam("ClTypeCode");
+		if (ClTypeCode != null && !ClTypeCode.isEmpty()) {
+			conditionList.add(" cm.\"ClTypeCode\" = :ClTypeCode ");
+		}
+		
 		// ApproveNo 核准號碼
 		int approveNo = parse.stringToInteger(titaVo.getParam("ApproveNo"));
 		if (approveNo > 0) {
@@ -469,6 +476,11 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("clNo", clNo);
 		}
 
+		String ClTypeCode = titaVo.getParam("ClTypeCode");
+		if (ClTypeCode != null && !ClTypeCode.isEmpty()) {
+			query.setParameter("ClTypeCode", ClTypeCode);
+		}
+		
 		int approveNo = parse.stringToInteger(titaVo.getParam("ApproveNo"));
 		if (approveNo > 0) {
 			query.setParameter("approveNo", approveNo);

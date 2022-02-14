@@ -11,6 +11,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 
 @Service("L9131")
@@ -22,7 +23,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9131 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9131.class);
 
 	/* 報表服務注入 */
 	@Autowired
@@ -51,7 +51,12 @@ public class L9131 extends TradeBuffer {
 
 		doRpt(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L9131核心日結單代傳票已完成", titaVo);
+		// MSG帶入預設值
+		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9131", 60) + iAcDate;
+
+		this.info("ntxbuf = " + ntxbuf);
+		
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9131核心日結單代傳票已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -152,12 +152,12 @@ public class Cs80UpDBS extends CommBuffer {
 		}
 
 		// 2022.2.9 by eric
-		if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTxcdInq() && !this.titaVo.isTxcdRim() && this.titaVo.getReturnIndex() <= 1) {
-			TotaVo tota = this.totaVoList.get(0);
-			if (!tota.isError()) {
-				this.insTxRecord(tota);
-			}
-		}
+//		if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTxcdInq() && !this.titaVo.isTxcdRim() && this.titaVo.getReturnIndex() <= 1) {
+//			TotaVo tota = this.totaVoList.get(0);
+//			if (!tota.isError()) {
+//				this.insTxRecord(tota);
+//			}
+//		}
 
 		// 2022.1.11 by eric
 		if (!this.titaVo.isTxcdSpecial()) {

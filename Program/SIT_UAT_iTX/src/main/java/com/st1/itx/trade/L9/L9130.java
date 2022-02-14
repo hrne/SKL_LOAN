@@ -11,6 +11,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 
 /**
@@ -50,13 +51,13 @@ public class L9130 extends TradeBuffer {
 		int iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
 
 		this.info("L9130 iAcDate = " + iAcDate);
-		
+
 		// 傳票批號 #BatchNo=A,2,I
 		int iBatchNo = Integer.parseInt(titaVo.getParam("BatchNo"));
 
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
-		
+
 		// 2022-01-13 智偉修改為不檢核,from 賴桑:L6102會產生不同日期的傳票
 //		if (iAcDate != titaVo.getEntDyI()) {
 //			this.info("L9130 iAcDate = " + iAcDate);
@@ -111,7 +112,12 @@ public class L9130 extends TradeBuffer {
 
 		doRpt(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		// MSG帶入預設值
+		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9130", 60) + iAcDate;
+
+		this.info("ntxbuf = " + ntxbuf);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
 				"L9130核心傳票媒體檔產生已完成", titaVo);
 
 		tranL9131.run(titaVo);
@@ -119,8 +125,8 @@ public class L9130 extends TradeBuffer {
 		tranL9132.run(titaVo);
 
 		String doL9133 = "N";
-		
-	    if (titaVo.containsKey("DoL9133")){
+
+		if (titaVo.containsKey("DoL9133")) {
 			this.info("titaVo.containsKey : DoL9133 , value = " + titaVo.getParam("DoL9133"));
 			doL9133 = titaVo.getParam("DoL9133");
 		}

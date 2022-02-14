@@ -92,33 +92,35 @@ public class LM052 extends BatchBase implements Tasklet, InitializingBean {
 
 		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
 
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[day - 1]);
-		int diff = 0;
-		if (day == 1) {
-			diff = -2;
-		} else if (day == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
-		// 確認是否為1月
+//		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
+//		// 星期 X (排除六日用) 代號 0~6對應 日到六
+//		int day = calendar.get(Calendar.DAY_OF_WEEK);
+//		this.info("day = " + dayItem[day - 1]);
+//		int diff = 0;
+//		if (day == 1) {
+//			diff = -2;
+//		} else if (day == 6) {
+//			diff = 1;
+//		}
+//		this.info("diff=" + diff);
+//		calendar.add(Calendar.DATE, diff);
+//		// 矯正月底日
+//		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+//		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
+//		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
+//
+//		// 當前日期 比 當月底日期 前面 就取上個月底日
 		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
+ 
+
 
 		empNo = titaVo.getTlrNo();
 		yearMonth = (iYear * 100) + iMonth;
-		this.info("yearMonth=" + yearMonth);
+		this.info("yearMonth=" +yearMonth);
 		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
 		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
 		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);

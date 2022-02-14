@@ -70,9 +70,19 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "LoanBorTx"
+    WITH "TmpLMSP" AS (
+      SELECT "LMSACN"
+           , "LMSAPN"
+           , "LMSASQ"
+           , "LMSLLD"
+      FROM "LA$LMSP"
+      WHERE "LMSLLD" > "TbsDyF"
+    )
     SELECT TR1."LMSACN"                   AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,TR1."LMSAPN"                   AS "FacmNo"              -- 額度編號 DECIMAL 3 
-          ,TR1."LMSASQ"                   AS "BormNo"              -- 撥款序號 DECIMAL 3 
+          ,CASE
+             WHEN NVL(TL."LMSLLD",0) > "TbsDyF" THEN 900 + TR1."LMSASQ" -- 撥款日期>轉換日時,為預約撥款,撥款序號 + 900
+           ELSE TR1."LMSASQ" END          AS "BormNo"              -- 撥款序號 DECIMAL 3 
           ,ROW_NUMBER() OVER (PARTITION BY TR1."LMSACN"
                                           ,TR1."LMSAPN"
                                           ,TR1."LMSASQ"
@@ -256,6 +266,9 @@ BEGIN
                            AND TR1."TRXNMT" = TR."TRXNMT"
                            AND TR1."TRXNM2" = TR."TRXNM2"
                            AND TR1."TRXTRN" = TR."TRXTRN"
+    LEFT JOIN "TmpLMSP" TL ON TL."LMSACN" = TR1."LMSACN"
+                          AND TL."LMSAPN" = TR1."LMSAPN"
+                          AND TL."LMSASQ" = TR1."LMSASQ"
     LEFT JOIN (SELECT "LMSACN"
                      ,"LMSAPN"
                      ,"LMSASQ"

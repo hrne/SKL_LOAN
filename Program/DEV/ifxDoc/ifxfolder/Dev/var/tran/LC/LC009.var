@@ -68,11 +68,16 @@ T(3,*)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+! 2022-02-14 Wei修改:增加註解及新增欄位"MsgAcDate"
+! 連動交易資料
+! 後端使用webclient.post時以參數帶入的連動資料
+! Ref:L9130.java
 #NTXBUF=X,40,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@iTlrNo,#NTXBUF,1,6)
 T(1,@iCode,#NTXBUF,7,20)
 T(1,@iItem,#NTXBUF,27,40)
+T(1,@MsgAcDate,#NTXBUF,67,7)
 
 !顯示框線
 #ShowFrame=A,1,S
@@ -85,12 +90,14 @@ T(F,@iItem,#ShowFrame)
 #iBrNo=X,4,L
 T(2,#KINBR) 
 
+#MsgAcDate=D,7,S
 
 ! 2021-04-15 Wei修改
 ! 目的:修改日期為範圍
 ![會計日期起日]
 #iEntdyStart=D,7,I
 E(0,#SYSDATE)
+IF(#MsgAcDate!=0,E(0,#MsgAcDate),$)
 C(3,#CHAIN,0,$,s)
 D(8)
 @V(7)A(DATE,0,#iEntdyStart)
@@ -99,6 +106,7 @@ V(5,0010101,#SYSDATE)
 ![會計日期迄日]
 #iEntdyEnd=D,7,I
 E(0,#iEntdyStart)
+IF(#MsgAcDate!=0,E(0,#MsgAcDate),$)
 C(3,#CHAIN,0,$,s)
 D(8)
 @V(7)A(DATE,0,#iEntdyEnd)

@@ -11,6 +11,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 
 @Service("L9132")
@@ -55,7 +56,12 @@ public class L9132 extends TradeBuffer {
 
 		doRpt(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L9132傳票媒體明細表(核心)已完成", titaVo);
+		// MSG帶入預設值
+		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9132", 60) + iAcDate;
+
+		this.info("ntxbuf = " + ntxbuf);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9132傳票媒體明細表(核心)已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

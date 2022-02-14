@@ -71,14 +71,14 @@ public class L6101Excel extends MakeReport {
 				tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tTxRecord.getTranData());
 				
-				if(tTempVo.get("REASON") ==null || tTempVo.get("REASON").isEmpty()) {
+				if(tTempVo.get("TxReason") ==null || tTempVo.get("TxReason").isEmpty()) {
 					continue;
 				}
 				//交易代號
 				makeExcel.setValue(rowCursor, 1, tTempVo.get("TXCD"));
 				
 				//查詢理由
-				reason = tTempVo.get("REASON");
+				reason = tTempVo.get("TxReason");
 				makeExcel.setValue(rowCursor, 2, reason);
 				
 				//經辦

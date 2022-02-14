@@ -72,7 +72,7 @@ public class L6045 extends TradeBuffer {
 				tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tTxRecord.getTranData());
 
-				if(tTempVo.get("REASON")==null || tTempVo.get("REASON").isEmpty()) {
+				if(tTempVo.get("TxReason")==null || tTempVo.get("TxReason").isEmpty()) {
 					continue;
 				}
 				
@@ -83,7 +83,7 @@ public class L6045 extends TradeBuffer {
 				}
 				occursList.putParam("OOTranItem", tranItem);
 				
-				occursList.putParam("OOReason", tTempVo.get("REASON"));
+				occursList.putParam("OOReason", tTempVo.get("TxReason"));
 				occursList.putParam("OOTlrNo", tTempVo.get("TLRNO"));	
 				occursList.putParam("OOTlrItem", tTempVo.get("EMPNM"));
 				

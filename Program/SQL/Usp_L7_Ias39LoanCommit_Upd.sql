@@ -31,11 +31,11 @@ BEGIN
          , NVL(M."ApplNo",0)                    AS "ApplNo"            -- 核准號碼
          , NVL(M."ApproveDate",0)               AS "ApproveDate"       -- 核准日期
          , NVL(M."FirstDrawdownDate",0)         AS "FirstDrawdownDate" -- 初貸日期
-         , NVL(M."MaturityDate",0)              AS "MaturityDate"      -- 到期日
+         , NVL(F."MaturityDate",0)              AS "MaturityDate"      -- 到期日
          , NVL(F."LoanTermYy",0)                AS "LoanTermYy"        -- 貸款期間年
          , NVL(F."LoanTermMm",0)                AS "LoanTermMm"        -- 貸款期間月
          , NVL(F."LoanTermDd",0)                AS "LoanTermDd"        -- 貸款期間日
-         , NVL(M."UtilDeadline",0)              AS "UtilDeadline"      -- 動支期限
+         , NVL(F."UtilDeadline",0)              AS "UtilDeadline"      -- 動支期限
          , NVL(F."RecycleDeadline",0)           AS "RecycleDeadline"   -- 循環動用期限
          , NVL(M."LineAmt",0)                   AS "LineAmt"           -- 核准額度
          , NVL(M."UtilAmt",0)                   AS "UtilBal"           -- 放款餘額
@@ -44,8 +44,10 @@ BEGIN
              THEN NVL(M."LineAmt",0) - NVL(M."UtilBal",0)
            ELSE 0
            END                                  AS "AvblBal"           -- 可動用餘額
-         , M."RecycleCode"                      AS "RecycleCode"       -- 該筆額度是否可循環動用  0:非循環動用 1:循環動用
-         , M."IrrevocableFlag"                  AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  0:可撤銷     1:不可撤銷
+         , F."RecycleCode"                      AS "RecycleCode"       -- 該筆額度是否可循環動用  0:非循環動用 1:循環動用
+         , CASE WHEN F."IrrevocableFlag" IN ('Y') THEN 1
+                ELSE 0
+           END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  0:可撤銷     1:不可撤銷
          , M."AcBookCode"                       AS "AcBookCode"        -- 帳冊別
          , M."AcSubBookCode"                    AS "AcSubBookCode"     -- 區隔帳冊
          , CASE

@@ -1080,6 +1080,7 @@ public class L3100 extends TradeBuffer {
 		tLoanBorTx.setEntryDate(tLoanBorMain.getDrawdownDate());
 		tLoanBorTx.setTxAmt(this.parse.stringToBigDecimal(titaVo.getTxAmt()));
 		tLoanBorTx.setLoanBal(iDrawdownAmt);
+		tLoanBorTx.setRepayCode(tFacMain.getRepayCode());
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setDisplayflag("A");
 		// 其他欄位

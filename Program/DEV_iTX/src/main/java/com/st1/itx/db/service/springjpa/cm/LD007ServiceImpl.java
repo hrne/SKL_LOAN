@@ -90,8 +90,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useBsOfficer) {
 			sql += "   AND B.\"BsOfficer\" = :bsOfficer";
 		}
-		sql += " ORDER BY E0.\"DepItem\" ";
-		sql += "         ,E0.\"Fullname\" ";
+		sql += " ORDER BY NLSSORT(B.\"BsOfficer\", 'NLS_SORT=FRENCH') "; // 參考樣張，應是以此欄位排序；NLSSORT by FRENCH 效果為英文先於數字
 
 		this.info("sql=" + sql);
 		Query query;

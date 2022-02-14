@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L9_MonthlyLoanBal_Upd" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLoanBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -44,26 +44,57 @@ BEGIN
     -- DBMS_OUTPUT.PUT_LINE('INSERT MonthlyLoanBal');
 
     INSERT INTO "MonthlyLoanBal"
-    WITH "ClData" AS (
-      SELECT CF."CustNo"
-           , CF."FacmNo"
-           , CF."ClCode1"
-           , CF."ClCode2"
-           , CF."ClNo"
-           , CM."CityCode"
-           , ROW_NUMBER()
-             OVER (
-               PARTITION BY CF."CustNo"
-                          , CF."FacmNo"
-               ORDER BY CF."ClCode1"
-                      , CF."ClCode2"
-                      , CF."ClNo"
-             ) AS "ClSeq"
-      FROM "ClFac" CF
-      LEFT JOIN "ClMain" CM ON CM."ClCode1" = CF."ClCode1"
-                           AND CM."ClCode2" = CF."ClCode2"
-                           AND CM."ClNo" = CF."ClNo"
-      WHERE CF."MainFlag" = 'Y'
+    WITH "DailyData" AS (
+        SELECT D."MonthEndYm"             --AS "YearMonth"           -- 資料年月
+              ,D."CustNo"                 --AS "CustNo"              -- 戶號 
+              ,D."FacmNo"                 --AS "FacmNo"              -- 額度 
+              ,D."BormNo"                 --AS "BormNo"              -- 撥款序號 
+              ,D."AcctCode"               --AS "AcctCode"            -- 業務科目代號  
+              ,D."FacAcctCode"            --AS "FacAcctCode"         -- 額度業務科目
+              ,D."CurrencyCode"           --AS "CurrencyCode"        -- 幣別 
+              ,D."LoanBalance"            --AS "LoanBalance"         -- 放款餘額
+              ,D."StoreRate"              --AS "StoreRate"           -- 計息利率
+              ,D."ProdNo"                 --AS "ProdNo"              -- 商品代碼
+        FROM "DailyLoanBal" D
+        WHERE D."MonthEndYm" = YYYYMM
+    ) 
+    , "ClData" AS (
+        SELECT CF."CustNo"
+             , CF."FacmNo"
+             , CF."ClCode1"
+             , CF."ClCode2"
+             , CF."ClNo"
+             , CM."CityCode"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY CF."CustNo"
+                            , CF."FacmNo"
+                 ORDER BY CF."ClCode1"
+                        , CF."ClCode2"
+                        , CF."ClNo"
+               ) AS "ClSeq"
+        FROM "ClFac" CF
+        LEFT JOIN "ClMain" CM ON CM."ClCode1" = CF."ClCode1"
+                             AND CM."ClCode2" = CF."ClCode2"
+                             AND CM."ClNo" = CF."ClNo"
+        WHERE CF."MainFlag" = 'Y'
+    )
+    , AR AS (
+        SELECT A."AcctCode"
+              ,A."CustNo"
+              ,A."FacmNo"
+              ,A."AcBookCode"  
+              ,A."AcSubBookCode"  
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY A."AcctCode"
+                            , A."CustNo"
+                            , A."FacmNo"
+                 ORDER BY A."RvNo"
+               ) AS "ArSeq"
+        FROM "AcReceivable" A
+        WHERE A."AcctCode" LIKE '3%'
+           OR A."AcctCode" = '990' 
     )
     SELECT D."MonthEndYm"             AS "YearMonth"           -- 資料年月
           ,D."CustNo"                 AS "CustNo"              -- 戶號 
@@ -86,10 +117,10 @@ BEGIN
           ,C."EntCode"                AS "EntCode"             -- 企金別             
           ,NULL                       AS "RelsCode"            -- (準)利害關係人職稱      
           ,F."DepartmentCode"         AS "DepartmentCode"      -- 案件隸屬單位          
-          ,NVL(Cl."ClCode1",0)        AS "ClCode1"             -- 擔保品代號1            
-          ,NVL(Cl."ClCode2",0)        AS "ClCode2"             -- 擔保品代號2  
-          ,NVL(Cl."ClNo",0)           AS "ClNo"                -- 主要擔保品編號
-          ,Cl."CityCode"              AS "CityCode"            -- 主要擔保品地區別    
+          ,NVL(CL."ClCode1",0)        AS "ClCode1"             -- 擔保品代號1            
+          ,NVL(CL."ClCode2",0)        AS "ClCode2"             -- 擔保品代號2  
+          ,NVL(CL."ClNo",0)           AS "ClNo"                -- 主要擔保品編號
+          ,CL."CityCode"              AS "CityCode"            -- 主要擔保品地區別    
           ,0                          AS "OvduPrinAmt"         -- 轉催收本金 DECIMAL 16 2 
           ,0                          AS "OvduIntAmt"          -- 轉催收利息 DECIMAL 16 2 
           ,JOB_START_TIME             AS "CreateDate"          -- 建檔日期時間  
@@ -97,27 +128,17 @@ BEGIN
           ,JOB_START_TIME             AS "LastUpdate"          -- 最後更新日期時間  
           ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員 
           ,A."AcSubBookCode"          AS "AcSubBookCode"       -- 區隔帳冊       
-    FROM "DailyLoanBal" D
+    FROM "DailyData" D
     LEFT JOIN "FacMain" F ON F."CustNo" = D."CustNo"
                          AND F."FacmNo" = D."FacmNo"
     LEFT JOIN "CustMain" C ON  C."CustNo" = D."CustNo"
     LEFT JOIN "ClData" CL ON CL."CustNo" = D."CustNo"
                          AND CL."FacmNo" = D."FacmNo"
                          AND CL."ClSeq" = 1
-    LEFT JOIN ( SELECT A."AcctCode"
-                      ,A."CustNo"
-                      ,A."FacmNo"
-                      ,A."RvNo"
-                      ,A."AcBookCode"  
-                      ,A."AcSubBookCode"  
-                FROM "AcReceivable" A
-                WHERE A."AcctCode" LIKE '3%'
-                   OR A."AcctCode" = '990' 
-                     ) A ON A."AcctCode" = D."AcctCode"
-                        AND A."CustNo"   = D."CustNo"
-                        AND A."FacmNo"   = D."FacmNo"
-                        AND SUBSTR(A."RvNo", 0, 3) = LPAD(D."BormNo",3,'0')
-    WHERE D."MonthEndYm" = YYYYMM
+    LEFT JOIN AR A ON A."AcctCode" = D."AcctCode"
+                  AND A."CustNo"   = D."CustNo"
+                  AND A."FacmNo"   = D."FacmNo"
+                  AND A."ArSeq"    = 1
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;
@@ -245,4 +266,3 @@ BEGIN
     );
   END;
 END;
-
