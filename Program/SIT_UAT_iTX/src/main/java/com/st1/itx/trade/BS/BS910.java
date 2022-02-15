@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
@@ -19,7 +18,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.Ias39LoanCommit;
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
-import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.service.Ias39LoanCommitService;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.service.AcDetailService;

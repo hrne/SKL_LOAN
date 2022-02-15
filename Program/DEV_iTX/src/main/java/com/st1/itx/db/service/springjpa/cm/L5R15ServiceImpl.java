@@ -28,7 +28,9 @@ public class L5R15ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public String FindL5R15(int CustNo, int FacmNo) throws Exception {
 		String sql = "select " + "l.\"AccCollPsn\"," + "l.\"LegalPsn\"," + "l.\"PrevIntDate\"," + "l.\"PrinBalance\"," + "l.\"NextIntDate\"," + "l.\"ClNo\"," + "l.\"ClCode1\"," + "l.\"ClCode2\","
 				+ "m.\"CustName\"," + "m.\"CustUKey\"," + "f.\"FirstDrawdownDate\"," + "f.\"UtilAmt\"," + "c.\"Fullname\" as AccCollPsnX,"// 催收人員姓名
-				+ "d.\"Fullname\" as LegalPsnX " // 法務人員姓名
+				+ "d.\"Fullname\" as LegalPsnX ," // 法務人員姓名
+				+ "l.\"AccTelArea\"," + "l.\"AccTelNo\"," + "l.\"AccTelExt\","// 催收人員電話
+				+ "l.\"LegalArea\"," + "l.\"LegalNo\"," + "l.\"LegalExt\" "// 法務人員電話
 				+ "from \"CollList\" l " + "left join \"CustMain\" m on m.\"CustNo\" = l.\"CustNo\" " + "left join \"FacMain\" f on f.\"CustNo\" = l.\"CustNo\" and f.\"FacmNo\" = l.\"FacmNo\" "
 				+ "left join \"CdEmp\" c on c.\"EmployeeNo\" = l.\"AccCollPsn\" " + "left join \"CdEmp\" d on d.\"EmployeeNo\" = l.\"LegalPsn\" " + "where l.\"CustNo\" = " + CustNo
 				+ " and l.\"FacmNo\" = " + FacmNo;
@@ -42,6 +44,6 @@ public class L5R15ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		this.info("L5R15Service FindData=" + query.toString());
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

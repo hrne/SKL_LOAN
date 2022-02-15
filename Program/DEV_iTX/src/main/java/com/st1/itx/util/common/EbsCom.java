@@ -71,14 +71,14 @@ public class EbsCom extends CommBuffer {
 		String ebsAuth = tSystemParas.getEbsAuth();
 
 		HttpEntity<String> request = setRequest(ebsAuth, requestJO);
-
+		
 		RestTemplate restTemplate = new RestTemplate();
 
 		this.info("slipMediaUrl = " + slipMediaUrl);
 		this.info("request = " + request.toString());
-
+		
 		String resultAsJsonStr = restTemplate.postForObject(slipMediaUrl, request, String.class);
-
+				
 		JsonNode root = objectMapper.readTree(resultAsJsonStr);
 
 		return root.path("X_RETURN_STATUS").asText();
@@ -92,8 +92,11 @@ public class EbsCom extends CommBuffer {
 		String[] splitAuth = ebsAuth.split(":");
 
 		HttpHeaders headers = new HttpHeaders();
-
-		headers.setBasicAuth(splitAuth[0], splitAuth[1]);
+		
+		headers.add("username", splitAuth[0]);
+		headers.add("password", splitAuth[1]);
+						
+//		headers.setBasicAuth(splitAuth[0], splitAuth[1]);
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
 

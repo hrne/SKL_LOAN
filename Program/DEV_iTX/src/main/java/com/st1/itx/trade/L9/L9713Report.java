@@ -27,22 +27,22 @@ public class L9713Report extends MakeReport {
 	// excel底稿路徑
 	@Value("${iTXInFolder}")
 	private String iTXInFolder = "";
-//
-//	@Autowired
-//	TxCom txCom;
-	// 製表日期
-//	private String nowDate;
 
+	// 帳齡30日以下 金額
 	int t1 = 0;
+	// 帳齡30~60日 金額
 	int t2 = 0;
+	// 帳齡60~90日 金額
 	int t3 = 0;
+	// 帳齡4~6個月 金額
 	int t4 = 0;
+	// 帳齡7~12個月 金額
 	int t5 = 0;
+	// 帳齡1年以上 金額
 	int t6 = 0;
+	// 帳齡金額合計 金額
 	int t7 = 0;
-	int t = 0;
-	int p = 0;
-	int tp = 0;
+
 	String iday = "";
 	String iday0 = "";
 	String iday1 = "";
@@ -52,6 +52,9 @@ public class L9713Report extends MakeReport {
 	String iday5 = "";
 	String iday4_1 = "";
 	String iday5_1 = "";
+
+	// 最大金額的的區間
+	int maxAmtNo = 0;
 	// 表格起始行
 	int startCol = 8;
 	// 表格起始列
@@ -96,7 +99,7 @@ public class L9713Report extends MakeReport {
 
 		iday = (iYear - 1911) + String.format("%02d", iMonth);
 
-		// 以會計日區分級數
+		// 以會計日區分各區間
 		iday1 = addDate(iday, 1);
 		iday2 = addDate(iday, 2);
 		iday3 = addDate(iday, 3);
@@ -128,7 +131,12 @@ public class L9713Report extends MakeReport {
 		int tamt = 0;
 		String tmpAmt = "";
 
-		this.info(" makeExcel.getListMap:" + makeExcel.getListMap());
+		if (makeExcel.getListMap().size() == 0) {
+			return false;
+		}
+
+//		this.info(" count:" + makeExcel.getListMap().size());
+//		this.info(" makeExcel.getListMap:" + makeExcel.getListMap());
 
 		for (Map<String, Object> map : makeExcel.getListMap()) {
 
@@ -140,15 +148,15 @@ public class L9713Report extends MakeReport {
 			if (cnt > 1) {
 
 				tmpAmt = map.get("f6").toString();
-				//去除雙引號和單引號
+				// 去除雙引號和單引號
 				tmpAmt = tmpAmt.replace("\"", "");
 				tmpAmt = tmpAmt.replace("\'", "");
-				
+
 				// 取得支票日期
-				if (!Integer.valueOf(tmpAmt).equals(t7)) {
+				if (!"0".equals(tmpAmt)) {
 
 					tmp = (String) map.get("f7");
-					//去除雙引號和單引號
+					// 去除雙引號和單引號
 					tmp = tmp.replace("\"", "");
 					tmp = tmp.replace("\'", "");
 
@@ -167,7 +175,7 @@ public class L9713Report extends MakeReport {
 
 					t7 += tamt;
 					// 排除低於當月份的
-
+//					this.info("total=" + t7);
 					/* 結論：CSV上有當月份以前的都算低於30日以下的帳齡 */
 					// 當月+1的交換日+
 					if (tday < Integer.valueOf(iday1)) {
@@ -196,38 +204,51 @@ public class L9713Report extends MakeReport {
 
 			}
 		}
-		// print的row至少要大於0，才能讓getNowpage()=1，才可以newPage()換頁
-		report();
 
-//		this.info("this.getNowPage()=" + this.getNowPage());
+		// 暫存金額
+		int[] tempAmtPos = { t1, t2, t3, t4, t5, t6 };
+		int[] rank = { 1, 2, 3, 4, 5, 6 };
 
-//		this.setParentTranCode("P");
-
-		this.setFontSize(12);
-//		this.print(1, 0, "");
-//		newPage();
-
-		long sno = this.close();
-
-		// this.toPdf(sno);
-
-		if (makeExcel.getListMap().size() > 0) {
-			return true;
-		} else {
-			return false;
-
+		//判斷各區帳齡金額 由大到小排列
+		for (int i = 0; i < tempAmtPos.length; i++) {
+			for (int j = 0; j < tempAmtPos.length; j++) {
+				if (tempAmtPos[i] > tempAmtPos[j]) {
+//					int temp = tempAmtPos[i];
+//					tempAmtPos[i] = tempAmtPos[j];
+//					tempAmtPos[j] = temp;
+					int rankTemp = rank[i];
+					rank[i] = rank[j];
+					rank[j] = rankTemp;
+				}
+			}
 		}
-	}
 
-	private void report() {
+		// print的row至少要大於0，才能讓getNowpage()=1，才可以newPage()換頁
+		// this.print(1, 0, "");
+		// newPage();
+
+		// 輸出報表
+		report(rank);
+
+		// 輸出結束
+		this.close();
+
+		return true;
+
+	}
+	/**
+	 * 輸出報表
+	 * @param rank 帳齡排序
+	 * */
+	private void report(int[] rank) {
 		String tmp = "";
 		String iCALDY = String.valueOf(Integer.valueOf(titaVo.get("CALDY")) + 19110000);
 		this.setCharSpaces(0);
 
 		// 以下為字體大小12 以12字體 橫的最右為140
 		this.setFontSize(12);
-		this.print(-2, 138, "機密等級：密", "R");
 
+		this.print(-2, 138, "機密等級：密", "R");
 		this.print(-3, 138, "製表日期：" + iCALDY.substring(0, 4) + "/" + iCALDY.substring(4, 6) + "/" + iCALDY.substring(6),
 				"R");
 		this.print(-9, 128, "單位：元", "R");
@@ -274,43 +295,70 @@ public class L9713Report extends MakeReport {
 			return;
 		}
 
-		t = 0;
-		tp = 0;
-		// 百分比
-		int percent = 0;
-		tot(t1);
+		// 印製各區間金額
 		this.print(-9 - startRow, 58, showAmt(t1), "R");
-		percent += p;
-		this.print(-9 - startRow, 68, showP(p), "C");
-
-		tot(t2);
 		this.print(-11 - startRow, 58, showAmt(t2), "R");
-		percent += p;
-		this.print(-11 - startRow, 68, showP(p), "C");
-
-		tot(t3);
 		this.print(-13 - startRow, 58, showAmt(t3), "R");
-		percent += p;
-		this.print(-13 - startRow, 68, showP(p), "C");
-
-		tot(t4);
 		this.print(-15 - startRow, 58, showAmt(t4), "R");
-		percent += p;
-		this.print(-15 - startRow, 68, showP(p), "C");
-
-		tot(t5);
 		this.print(-17 - startRow, 58, showAmt(t5), "R");
-		percent += p;
-		this.print(-17 - startRow, 68, showP(p), "C");
-
-		tot(t6);
 		this.print(-19 - startRow, 58, showAmt(t6), "R");
-		percent += p;
-		this.print(-19 - startRow, 68, showP(p), "C");
-
 		this.print(-21 - startRow, 58, showAmt(t7), "R");
 
-		this.print(-21 - startRow, 68, showP(percent), "C");
+		// 各帳齡區間比例
+		int pt1 = (int) Math.floor(t1 * 100.00 / t7);// 30日以下
+		int pt2 = (int) Math.floor(t2 * 100.00 / t7);// 30~60日
+		int pt3 = (int) Math.floor(t3 * 100.00 / t7);// 60~90日
+		int pt4 = (int) Math.floor(t4 * 100.00 / t7);// 4~6個月
+		int pt5 = (int) Math.floor(t5 * 100.00 / t7);// 7~12個月
+		int pt6 = (int) Math.floor(t6 * 100.00 / t7);// 1年以上
+
+		// 比例總和 暫存
+		int t = 0;
+
+		t = pt1 + pt2 + pt3 + pt4 + pt5 + pt6;
+
+		int tempT = 0;
+
+		// 如果% 總和不滿100%
+		if (t != 100) {
+			tempT = 100 - t;
+			//根據排序分配餘數
+			for (int no = 0; no < tempT; no++) {
+				switch (rank[no]) {
+				case 1:
+					pt1 = pt1 + 1;
+					break;
+				case 2:
+					pt2 = pt2 + 1;
+					break;
+				case 3:
+					pt3 = pt3 + 1;
+					break;
+				case 4:
+					pt4 = pt4 + 1;
+					break;
+				case 5:
+					pt5 = pt5 + 1;
+					break;
+				case 6:
+					pt6 = pt6 + 1;
+					break;
+				default:
+					break;
+				}
+			}
+			// 再所有%總和
+			t = pt1 + pt2 + pt3 + pt4 + pt5 + pt6;
+		}
+
+		// 印製各區間比例
+		this.print(-9 - startRow, 68, showP(pt1), "C");
+		this.print(-11 - startRow, 68, showP(pt2), "C");
+		this.print(-13 - startRow, 68, showP(pt3), "C");
+		this.print(-15 - startRow, 68, showP(pt4), "C");
+		this.print(-17 - startRow, 68, showP(pt5), "C");
+		this.print(-19 - startRow, 68, showP(pt6), "C");
+		this.print(-21 - startRow, 68, showP(t), "C");
 	}
 
 	/**
@@ -336,18 +384,19 @@ public class L9713Report extends MakeReport {
 
 	}
 
-	private void tot(int amt) {
-		double d = 0.00;
-
-		t += amt;
-		if (t == t7) {
-			p = 100 - tp;
-		} else {
-			d = Math.round(amt * 100.00 / t7);
-			p = (int) d;
-		}
-		tp += p;
-	}
+//	private void tot(int amt) {
+//		double d = 0.00;
+//
+//		t += amt;
+//		// t7為總金額
+//		if (t == t7) {
+//			p = 100 - tp;
+//		} else {
+//			d = Math.round(amt * 100.00 / t7);
+//			p = (int) d;
+//		}
+//		tp += p;
+//	}
 
 	private String showAmt(int amt) {
 		if (amt == 0) {
@@ -359,112 +408,5 @@ public class L9713Report extends MakeReport {
 	private String showP(int p) {
 		return String.valueOf(p) + "％";
 	}
-
-//	public void printHeaderP12321() {
-//		this.setFontSize(8);
-//		this.setCharSpaces(0);
-//
-//		this.print(-1, 147, "機密案件：密");
-//		this.print(-2, 3, "程式ID：" + this.getParentTranCode());
-//
-//		this.print(-2, 3, "報表名稱：" + this.getParentTranCode());
-//		this.print(-2, 60, "新光人壽保險股份有限公司");
-//		this.print(-2, 147, "製表者：");
-//		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
-//		this.print(-2, 165, "日　　期： " + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/"
-//				+ dDateUtil.getNowStringBc().substring(2, 4), "R");
-//
-//		this.print(-3, 3, "報　表：" + this.getRptCode());
-//		this.print(-3, 61, "長中短期放款到期明細表");
-//		this.print(-3, 165, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-//				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6),
-//				"R");
-//		this.print(-4, 147, "頁　　次：　" + this.getNowPage());
-//		this.print(-5, 50, "到期起訖日...　" + showRocDate(titaVo.get("ACCTDATE_ST"), 1) + " -  "
-//				+ showRocDate(titaVo.get("ACCTDATE_ED"), 1));
-//		this.print(-5, 147, "單位：元");
-//		this.print(-7, 0, "　 站別　　 押品地區別　房貸專員　　　戶號　　　　　戶名　　　　核准號碼　　　　到期日　　　　貸放餘額　 上次繳息日　 計息利率　聯絡電話　　　　　聯絡人　　　是否本利攤");
-//		this.print(-8, 0,
-//				"-------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-//
-//	}
-
-//	private void reportDetail() {
-//
-//		String tmp = "";
-//		String iCALDY = String.valueOf(Integer.valueOf(titaVo.get("CALDY")) + 19110000);
-//		this.setCharSpaces(0);
-//		this.print(-2, 80, "機密等級：密");
-////		this.print(-3, 72, "製表日期：" + showDate(this.nowDate));
-//		this.print(-3, 72, "製表日期：" + iCALDY.substring(0, 4) + "/" + iCALDY.substring(4, 6) + "/" + iCALDY.substring(6));
-//		this.print(-6, 23, "放款部應收票據之帳齡分析表─ " + iday.substring(0, 3) + "年" + iday.substring(3, 5) + "月份");
-//		this.print(-7, 77, "單位：元");
-//
-//		this.print(-8, startCol, "┌─────────────────┬───────────┬───────────┐");
-//		this.print(-9, startCol, "│          帳          齡          │      金       額     │         比例         │");
-//		this.print(-10, startCol, "├─────────────────┼───────────┼───────────┤");
-//		this.print(-11, startCol, "│              30日以下            │                      │                      │");
-//		this.print(-12, startCol, "├─────────────────┼───────────┼───────────┤");
-//		this.print(-13, startCol, "│        30日~60日(        )       │                      │                      │");
-//		this.print(-14, startCol, "├─────────────────┼───────────┼───────────┤");
-//		this.print(-15, startCol, "│        60日~90日(        )       │                      │                      │");
-//		this.print(-16, startCol, "├─────────────────┼───────────┼───────────┤");
-//		this.print(-17, startCol, "│      4~6個月(               )    │                      │                      │");
-//		this.print(-18, startCol, "├─────────────────┼───────────┼───────────┤");
-//		this.print(-19, startCol, "│     7~12個月(               )    │                      │                      │");
-//		this.print(-20, startCol, "├─────────────────┼───────────┼───────────┤");
-//		this.print(-21, startCol, "│             1年以上              │                      │                      │");
-//		this.print(-22, startCol, "├─────────────────┼───────────┼───────────┤");
-//		this.print(-23, startCol, "│          合           計         │                      │                      │");
-//		this.print(-24, startCol, "└─────────────────┴───────────┴───────────┘");
-//
-//		this.print(-26, 39, "經理：                  經辦：");
-//
-//		tmp = iday2.substring(0, 3) + "/" + iday2.substring(3, 5) + "月";
-//		this.print(-13, 21, tmp);
-//		tmp = iday3.substring(0, 3) + "/" + iday3.substring(3, 5) + "月";
-//		this.print(-15, 21, tmp);
-//		tmp = iday4_1.substring(0, 3) + "/" + iday4_1.substring(3, 5) + "~" + iday4.substring(0, 3) + "/"
-//				+ iday4.substring(3, 5) + "月";
-//		this.print(-17, 17, tmp);
-//		tmp = iday5_1.substring(0, 3) + "/" + iday5_1.substring(3, 5) + "~" + iday5.substring(0, 3) + "/"
-//				+ iday5.substring(3, 5) + "月";
-//		this.print(-19, 17, tmp);
-//
-//		if (t7 == 0) {
-//			return;
-//		}
-//
-//		t = 0;
-//		tp = 0;
-//
-//		tot(t1);
-//		this.print(-11, 60, showAmt(t1), "R");
-//		this.print(-11, 76, showP(p), "R");
-//
-//		tot(t2);
-//		this.print(-13, 60, showAmt(t2), "R");
-//		this.print(-13, 76, showP(p), "R");
-//
-//		tot(t3);
-//		this.print(-15, 60, showAmt(t3), "R");
-//		this.print(-15, 76, showP(p), "R");
-//
-//		tot(t4);
-//		this.print(-17, 60, showAmt(t4), "R");
-//		this.print(-17, 76, showP(p), "R");
-//
-//		tot(t5);
-//		this.print(-19, 60, showAmt(t5), "R");
-//		this.print(-19, 76, showP(p), "R");
-//
-//		tot(t6);
-//		this.print(-21, 60, showAmt(t6), "R");
-//		this.print(-21, 76, showP(p), "R");
-//
-//		this.print(-23, 60, showAmt(t7), "R");
-//		this.print(-23, 76, showP(100), "R");
-//
-//	}
 
 }

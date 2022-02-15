@@ -24,7 +24,7 @@ import com.st1.itx.util.data.DataLog;
 @Scope("prototype")
 
 /**
- * 提醒資料登錄
+ * 法務催收人員維護
  * 
  * @author Fegie
  * @version 1.0.0
@@ -80,6 +80,11 @@ public class L5606 extends TradeBuffer {
 		
 		if(cCollist!=null) {
 			for(CollList iCollList : cCollist) {
+
+				if (iCollList.getIsSpecify().equals("Y")) {// 若為個案指派則不同步維護
+					continue;
+				}
+				
 				tCollList = new CollList();
 				tCollList = iCollListService.holdById(new CollListId(iCollList.getCustNo(),iCollList.getFacmNo()), titaVo);
 				tCollList.setAccCollPsn(iAccCollPsn);

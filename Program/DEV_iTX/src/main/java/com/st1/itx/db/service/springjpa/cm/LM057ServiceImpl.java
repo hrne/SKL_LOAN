@@ -141,6 +141,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("l4mdy", last4Month);
 
 		return this.convertToMap(query);
+		
 	}
 
 }

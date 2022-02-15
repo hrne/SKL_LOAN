@@ -385,6 +385,9 @@ T(1,#OOAlertDate,6,2)
 #XXAlertDate=X,9,O
 T(2,#AlertDateYYY+/+#AlertDateMM+/+#AlertDateDD)
 
+#XXIsSpecify=X,1,O
+T(2,#OOIsSpecify)
+
 ! 1+7+3+1 +1+7+7+5+2+160+6+20=220
 #OOBufEntry=X,12,S
 T(2,#OOCustNo+#OOFacmNo+#CaseCode)
@@ -392,6 +395,8 @@ T(2,#OOCustNo+#OOFacmNo+#CaseCode)
 #OOBufAlert=X,13,S
 T(2,#CaseCode+#OOCustNo+#OOFacmNo+1)
 
+#OOBufIsSpecify=X,13,S
+T(2,#OOCustNo+#OOFacmNo+#OOCityCode+#OOIsSpecify)
 
 #XXCustNo=A,10,S
 T(2,#OOCustNo+#OOFacmNo)
@@ -418,6 +423,9 @@ C(3,#OOClFlagA,0,BIND(grid,cancel),
 !         BIND(grid,cancel))
 C(3,#OOClFlagB,0,BIND(grid,cancel),
                         BIND(grid,{ cmd=CHAIN; ntxcd=L5965; text=#XXAlertDate; ntxbuf=#OOBufAlert}))
+
+#OOBtnIsSpecify=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5607; text=#XXIsSpecify; ntxbuf=#OOBufIsSpecify})
 
 #secret-no=x,99,S
 T(6A,#OOCustNo+#OOFacmNo+#OOPrinBalance+#OOOverDueterm)
@@ -555,8 +563,8 @@ ifxBatch:{
 {width:95}
 #OOBtnEntryB=同擔保品
 {search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:95}
-#OOIsSpecify=是否指定
-{width:95,align:'center'}
+#OOBtnIsSpecify=是否指定
+{search:false,formatter:'cust:bind-button:#XXIsSpecify',align:'center',canExport:false,width:80}
 #OOStatusX=戶況
 {width:45}
 #OOCityCodeX=擔保品地區別
@@ -605,8 +613,8 @@ ifxBatch:{
 {width:95}
 #OOBtnEntryB=同擔保品
 {search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:95}
-#OOIsSpecify=是否指定
-{width:95,align:'center'}
+#OOBtnIsSpecify=是否指定
+{search:false,formatter:'cust:bind-button:#XXIsSpecify',align:'center',canExport:false,width:80}
 #OOStatusX=戶況
 {width:45}
 #OOCityCodeX=擔保品地區別

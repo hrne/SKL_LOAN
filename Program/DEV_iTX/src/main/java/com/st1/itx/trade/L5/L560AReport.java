@@ -195,27 +195,43 @@ public class L560AReport extends MakeReport {
 			if (iCollList == null) {
 				throw new LogicException(titaVo, "E0001", "法催紀錄清單檔無資料，戶號:\" + iCustNo + \"額度:\" + iFacmNo");
 			}
-			iCityCode = iCollList.getCityCode();// 法催地區
 			iAccCollPsn = iCollList.getAccCollPsn();// 催收人員
-			if (!iCityCode.trim().isEmpty() || !iCityCode.equals("")) {
-				CdCity iCdCity = null;
-				iCdCity = iCdCityService.findById(iCityCode, titaVo);
-				if (iCdCity == null) {
-					throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
-				}
-				if (!iCdCity.getAccTelArea().trim().isEmpty() || !iCdCity.getAccTelArea().equals("")) {
-					iAccTel = iCdCity.getAccTelArea().trim() + "-";
-				}
-				if (!iCdCity.getAccTelNo().trim().isEmpty() || !iCdCity.getAccTelNo().equals("")) {
-					iAccTel = iAccTel + iCdCity.getAccTelNo().trim();
-				}
-				if (!iCdCity.getAccTelExt().trim().isEmpty() || !iCdCity.getAccTelExt().equals("")) {
-					iAccTel = iAccTel + "-" + iCdCity.getAccTelExt().trim();
-				}
-
+			if (!iAccCollPsn.trim().isEmpty() || !iAccCollPsn.equals("")) {
 				iCdEmp = iCdEmpService.findById(iAccCollPsn, titaVo);
 				if (iCdEmp != null) {
 					iAccCollPsnX = iCdEmp.getFullname();
+				}
+			}
+			if (iCollList.getIsSpecify().equals("Y")) {//個案人員指派則使用CollList電話資料
+				if (!iCollList.getAccTelArea().trim().isEmpty() || !iCollList.getAccTelArea().equals("")) {
+					iAccTel = iCollList.getAccTelArea().trim() + "-";
+				}
+				if (!iCollList.getAccTelNo().trim().isEmpty() || !iCollList.getAccTelNo().equals("")) {
+					iAccTel = iAccTel + iCollList.getAccTelNo().trim();
+				}
+				if (!iCollList.getAccTelExt().trim().isEmpty() || !iCollList.getAccTelExt().equals("")) {
+					iAccTel = iAccTel + "-" + iCollList.getAccTelExt().trim();
+				}
+				
+			} else {
+
+				iCityCode = iCollList.getCityCode();// 法催地區
+				if (!iCityCode.trim().isEmpty() || !iCityCode.equals("")) {
+					CdCity iCdCity = null;
+					iCdCity = iCdCityService.findById(iCityCode, titaVo);
+					if (iCdCity == null) {
+						throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
+					}
+					if (!iCdCity.getAccTelArea().trim().isEmpty() || !iCdCity.getAccTelArea().equals("")) {
+						iAccTel = iCdCity.getAccTelArea().trim() + "-";
+					}
+					if (!iCdCity.getAccTelNo().trim().isEmpty() || !iCdCity.getAccTelNo().equals("")) {
+						iAccTel = iAccTel + iCdCity.getAccTelNo().trim();
+					}
+					if (!iCdCity.getAccTelExt().trim().isEmpty() || !iCdCity.getAccTelExt().equals("")) {
+						iAccTel = iAccTel + "-" + iCdCity.getAccTelExt().trim();
+					}
+
 				}
 			}
 		}

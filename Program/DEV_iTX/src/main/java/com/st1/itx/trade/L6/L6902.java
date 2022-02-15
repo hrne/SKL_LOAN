@@ -14,7 +14,6 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcMain;
-import com.st1.itx.db.domain.AcMainId;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.service.AcMainService;

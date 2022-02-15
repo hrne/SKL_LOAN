@@ -29,7 +29,7 @@ public class CollList implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 688892043961502566L;
+	private static final long serialVersionUID = -8237985579283474028L;
 
 @EmbeddedId
   private CollListId collListId;
@@ -85,10 +85,12 @@ public class CollList implements Serializable {
   private BigDecimal badDebtBal = new BigDecimal("0");
 
   // 催收員
+  /* 若[是否指定]=Y,則由連線交易維護此欄 */
   @Column(name = "`AccCollPsn`", length = 6)
   private String accCollPsn;
 
   // 法務人員
+  /* 若[是否指定]=Y,則由連線交易維護此欄 */
   @Column(name = "`LegalPsn`", length = 6)
   private String legalPsn;
 
@@ -151,6 +153,36 @@ public class CollList implements Serializable {
   /* 地區別與鄉鎮區對照檔CdArea */
   @Column(name = "`CityCode`", length = 2)
   private String cityCode;
+
+  // 催收人員電話-區碼
+  /* 由連線交易維護此欄 */
+  @Column(name = "`AccTelArea`", length = 5)
+  private String accTelArea;
+
+  // 催收人員電話
+  /* 由連線交易維護此欄 */
+  @Column(name = "`AccTelNo`", length = 10)
+  private String accTelNo;
+
+  // 催收人員電話-分機
+  /* 由連線交易維護此欄 */
+  @Column(name = "`AccTelExt`", length = 5)
+  private String accTelExt;
+
+  // 法務人員電話-區碼
+  /* 由連線交易維護此欄 */
+  @Column(name = "`LegalArea`", length = 5)
+  private String legalArea;
+
+  // 法務人員電話
+  /* 由連線交易維護此欄 */
+  @Column(name = "`LegalNo`", length = 10)
+  private String legalNo;
+
+  // 法務人員電話-分機
+  /* 由連線交易維護此欄 */
+  @Column(name = "`LegalExt`", length = 5)
+  private String legalExt;
 
   // 建檔日期時間
   @CreatedDate
@@ -411,7 +443,7 @@ public class CollList implements Serializable {
 
 /**
 	* 催收員<br>
-	* 
+	* 若[是否指定]=Y,則由連線交易維護此欄
 	* @return String
 	*/
   public String getAccCollPsn() {
@@ -420,7 +452,7 @@ public class CollList implements Serializable {
 
 /**
 	* 催收員<br>
-	* 
+	* 若[是否指定]=Y,則由連線交易維護此欄
   *
   * @param accCollPsn 催收員
 	*/
@@ -430,7 +462,7 @@ public class CollList implements Serializable {
 
 /**
 	* 法務人員<br>
-	* 
+	* 若[是否指定]=Y,則由連線交易維護此欄
 	* @return String
 	*/
   public String getLegalPsn() {
@@ -439,7 +471,7 @@ public class CollList implements Serializable {
 
 /**
 	* 法務人員<br>
-	* 
+	* 若[是否指定]=Y,則由連線交易維護此欄
   *
   * @param legalPsn 法務人員
 	*/
@@ -735,6 +767,120 @@ N:否
   }
 
 /**
+	* 催收人員電話-區碼<br>
+	* 由連線交易維護此欄
+	* @return String
+	*/
+  public String getAccTelArea() {
+    return this.accTelArea == null ? "" : this.accTelArea;
+  }
+
+/**
+	* 催收人員電話-區碼<br>
+	* 由連線交易維護此欄
+  *
+  * @param accTelArea 催收人員電話-區碼
+	*/
+  public void setAccTelArea(String accTelArea) {
+    this.accTelArea = accTelArea;
+  }
+
+/**
+	* 催收人員電話<br>
+	* 由連線交易維護此欄
+	* @return String
+	*/
+  public String getAccTelNo() {
+    return this.accTelNo == null ? "" : this.accTelNo;
+  }
+
+/**
+	* 催收人員電話<br>
+	* 由連線交易維護此欄
+  *
+  * @param accTelNo 催收人員電話
+	*/
+  public void setAccTelNo(String accTelNo) {
+    this.accTelNo = accTelNo;
+  }
+
+/**
+	* 催收人員電話-分機<br>
+	* 由連線交易維護此欄
+	* @return String
+	*/
+  public String getAccTelExt() {
+    return this.accTelExt == null ? "" : this.accTelExt;
+  }
+
+/**
+	* 催收人員電話-分機<br>
+	* 由連線交易維護此欄
+  *
+  * @param accTelExt 催收人員電話-分機
+	*/
+  public void setAccTelExt(String accTelExt) {
+    this.accTelExt = accTelExt;
+  }
+
+/**
+	* 法務人員電話-區碼<br>
+	* 由連線交易維護此欄
+	* @return String
+	*/
+  public String getLegalArea() {
+    return this.legalArea == null ? "" : this.legalArea;
+  }
+
+/**
+	* 法務人員電話-區碼<br>
+	* 由連線交易維護此欄
+  *
+  * @param legalArea 法務人員電話-區碼
+	*/
+  public void setLegalArea(String legalArea) {
+    this.legalArea = legalArea;
+  }
+
+/**
+	* 法務人員電話<br>
+	* 由連線交易維護此欄
+	* @return String
+	*/
+  public String getLegalNo() {
+    return this.legalNo == null ? "" : this.legalNo;
+  }
+
+/**
+	* 法務人員電話<br>
+	* 由連線交易維護此欄
+  *
+  * @param legalNo 法務人員電話
+	*/
+  public void setLegalNo(String legalNo) {
+    this.legalNo = legalNo;
+  }
+
+/**
+	* 法務人員電話-分機<br>
+	* 由連線交易維護此欄
+	* @return String
+	*/
+  public String getLegalExt() {
+    return this.legalExt == null ? "" : this.legalExt;
+  }
+
+/**
+	* 法務人員電話-分機<br>
+	* 由連線交易維護此欄
+  *
+  * @param legalExt 法務人員電話-分機
+	*/
+  public void setLegalExt(String legalExt) {
+    this.legalExt = legalExt;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -817,7 +963,8 @@ N:否
            + ", nextIntDate=" + nextIntDate + ", ovduTerm=" + ovduTerm + ", ovduDays=" + ovduDays + ", currencyCode=" + currencyCode + ", prinBalance=" + prinBalance + ", badDebtBal=" + badDebtBal
            + ", accCollPsn=" + accCollPsn + ", legalPsn=" + legalPsn + ", status=" + status + ", acctCode=" + acctCode + ", facAcctCode=" + facAcctCode + ", clCustNo=" + clCustNo
            + ", clFacmNo=" + clFacmNo + ", clRowNo=" + clRowNo + ", clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", renewCode=" + renewCode
-           + ", acDate=" + acDate + ", isSpecify=" + isSpecify + ", cityCode=" + cityCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", acDate=" + acDate + ", isSpecify=" + isSpecify + ", cityCode=" + cityCode + ", accTelArea=" + accTelArea + ", accTelNo=" + accTelNo + ", accTelExt=" + accTelExt
+           + ", legalArea=" + legalArea + ", legalNo=" + legalNo + ", legalExt=" + legalExt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
            + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -5755,6 +5755,12 @@ TXFORM=L5R14
 #L5R15ClNo=9,7,S
 #L5R15ClCode1=9,1,S
 #L5R15ClCode2=9,2,S
+#L5R15AccTelArea=X,5,S
+#L5R15AccTelNo=X,10,S
+#L5R15AccTelExt=X,5,S
+#L5R15LegalArea=X,5,S
+#L5R15LegalNo=X,10,S
+#L5R15LegalExt=X,5,S
 </L5R15.dec>
 
 <L5R15.tom>
@@ -5773,6 +5779,12 @@ TXFORM=L5R15
 #L5R15ClNo
 #L5R15ClCode1
 #L5R15ClCode2
+#L5R15AccTelArea
+#L5R15AccTelNo
+#L5R15AccTelExt
+#L5R15LegalArea
+#L5R15LegalNo
+#L5R15LegalExt
 ^
 </L5R15.tom>
 
@@ -9321,6 +9333,22 @@ TXFORM=L6R47
 #L6r47RecWordItem
 </L6R47.tom>
 ^
+
+<L6R48Rim.dec>
+#RimFunCode=9,1,S
+#RimErrCode=X,8,S
+</L6R48Rim.dec>
+
+<L6R48.dec>
+#L6R48ErrContent=X,125,S
+</L6R48.dec>
+
+<L6R48.tom>
+TXFORM=L6R48
+#L6R48ErrContent
+^
+</L6R48.tom>
+
 
 <L5R47.dec>
 #L5R47CustName=x,100,S

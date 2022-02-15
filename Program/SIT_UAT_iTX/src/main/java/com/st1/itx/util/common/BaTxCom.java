@@ -1260,6 +1260,10 @@ public class BaTxCom extends TradeBuffer {
 		if (this.baTxList == null || this.baTxList.size() == 0) {
 			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, CustNo, 1, 0, 999, 0,
 					Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 1:資負明細科目
+			// 1-已銷
+			if (srvList == null) {
+				srvList = acReceivableService.acrvFacmNoRange(1, CustNo, 1, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			}
 			if (srvList != null) {
 				rpFacmNo = srvList.getContent().get(0).getFacmNo();
 			}

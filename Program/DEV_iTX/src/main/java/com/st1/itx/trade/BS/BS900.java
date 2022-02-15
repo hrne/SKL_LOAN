@@ -19,7 +19,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcLoanInt;
 import com.st1.itx.db.domain.AcLoanIntId;
 import com.st1.itx.db.domain.LoanBorMain;
-import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.service.AcLoanIntService;

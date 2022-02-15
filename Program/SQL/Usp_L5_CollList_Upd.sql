@@ -473,30 +473,64 @@ BEGIN
                   ,C1."LastUpdate"            AS "LastUpdate"          -- 最後更新日期時間  
                   ,C1."LastUpdateEmpNo"       AS "LastUpdateEmpNo"     -- 最後更新人員 
                   ,S1."CityCode"              AS "CityCode"            -- 地區別
+                  ,NVL(Ori."IsSpecify",'N')   AS "IsSpecify"           -- 是否指定 VARCHAR2 1 "空白 Y:是 N:否 若催收或法務人員非CdCity裡設定的人，則此欄位為Y，否則預設N"
+                  ,CASE
+                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+                     THEN Ori."AccTelArea"
+                   ELSE S1."AccTelArea" END   AS "AccTelArea"          -- 催收人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+                  ,CASE
+                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+                     THEN Ori."AccTelNo"
+                   ELSE S1."AccTelNo" END     AS "AccTelNo"            -- 催收人員電話 VARCHAR2 10 由連線交易維護此欄
+                  ,CASE
+                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+                     THEN Ori."AccTelExt"
+                   ELSE S1."AccTelExt" END    AS "AccTelExt"           -- 催收人員電話-分機 VARCHAR2 5 由連線交易維護此欄
+                  ,CASE
+                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+                     THEN Ori."LegalArea"
+                   ELSE S1."LegalArea" END    AS "LegalArea"           -- 法務人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+                  ,CASE
+                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+                     THEN Ori."LegalNo"
+                   ELSE S1."LegalNo" END      AS "LegalNo"             -- 法務人員電話 VARCHAR2 10 由連線交易維護此欄
+                  ,CASE
+                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+                     THEN Ori."LegalExt"
+                   ELSE S1."LegalExt" END     AS "LegalExt"            -- 法務人員電話-分機 VARCHAR2 5 由連線交易維護此欄
             FROM "CollListTmp" C1
-            LEFT JOIN ( SELECT CF."CustNo"
-                              ,CF."FacmNo"
-                              ,NVL(CM."ClCode1",0)      AS "ClCode1"
-                              ,NVL(CM."ClCode2",0)      AS "ClCode2"
-                              ,NVL(CM."ClNo",0)         AS "ClNo"
-                              ,CM."CityCode"            AS "CityCode" 
-                              ,NVL(CC."AccCollPsn",' ') AS "AccCollPsn"
-                              ,NVL(CC."LegalPsn",' ')   AS "LegalPsn"
-                              ,ROW_NUMBER() OVER (PARTITION BY CF."CustNo"
-                                                              ,CF."FacmNo"
-                                                  ORDER BY NVL(CM."ClCode1",0)
-                                                          ,NVL(CM."ClCode2",0)
-                                                          ,NVL(CM."ClNo",0))
-                                                        AS "Seq"
-                        FROM "ClFac" CF
-                        LEFT JOIN "ClMain" CM ON CM."ClCode1"  = CF."ClCode1"
-                                             AND CM."ClCode1"  = CF."ClCode2"
-                                             AND CM."ClNo"     = CF."ClNo"
-                        LEFT JOIN "CdCity" CC ON CC."CityCode" = NVL(CM."CityCode",'A')
-                        WHERE CF."MainFlag" = 'Y'
+            LEFT JOIN ( 
+              SELECT CF."CustNo"
+                    ,CF."FacmNo"
+                    ,NVL(CM."ClCode1",0)      AS "ClCode1"
+                    ,NVL(CM."ClCode2",0)      AS "ClCode2"
+                    ,NVL(CM."ClNo",0)         AS "ClNo"
+                    ,CM."CityCode"            AS "CityCode" 
+                    ,NVL(CC."AccCollPsn",' ') AS "AccCollPsn"
+                    ,NVL(CC."LegalPsn",' ')   AS "LegalPsn"
+                    ,NVL(CC."AccTelArea",' ') AS "AccTelArea"
+                    ,NVL(CC."AccTelNo",' ')   AS "AccTelNo"
+                    ,NVL(CC."AccTelExt",' ')  AS "AccTelExt"
+                    ,NVL(CC."LegalArea",' ')  AS "LegalArea"
+                    ,NVL(CC."LegalNo",' ')    AS "LegalNo"
+                    ,NVL(CC."LegalExt",' ')   AS "LegalExt"
+                    ,ROW_NUMBER() OVER (PARTITION BY CF."CustNo"
+                                                    ,CF."FacmNo"
+                                        ORDER BY NVL(CM."ClCode1",0)
+                                                ,NVL(CM."ClCode2",0)
+                                                ,NVL(CM."ClNo",0))
+                                              AS "Seq"
+              FROM "ClFac" CF
+              LEFT JOIN "ClMain" CM ON CM."ClCode1"  = CF."ClCode1"
+                                   AND CM."ClCode1"  = CF."ClCode2"
+                                   AND CM."ClNo"     = CF."ClNo"
+              LEFT JOIN "CdCity" CC ON CC."CityCode" = NVL(CM."CityCode",'A')
+              WHERE CF."MainFlag" = 'Y'
             ) S1 ON S1."CustNo" = C1."CustNo"
                 AND S1."FacmNo" = C1."FacmNo"
                 AND S1."Seq" = 1
+            LEFT JOIN "CollList" Ori ON Ori."CustNo" = C1."CustNo"
+                                    AND Ori."FacmNo" = C1."FacmNo"
     ) T    
     ON  (     C."CustNo" = T."CustNo"
           AND C."FacmNo" = T."FacmNo"
@@ -522,8 +556,14 @@ BEGIN
                                 ,C."RenewCode"       = T."RenewCode"
                                 ,C."LastUpdate"      = T."LastUpdate"
                                 ,C."LastUpdateEmpNo" = T."LastUpdateEmpNo"
-                                ,C."IsSpecify" = 'N'
-                                ,C."CityCode"        =  T."CityCode"
+                                ,C."IsSpecify"       = T."IsSpecify"
+                                ,C."CityCode"        = T."CityCode"
+                                ,C."AccTelArea"      = T."AccTelArea"          -- 催收人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+                                ,C."AccTelNo"        = T."AccTelNo"            -- 催收人員電話 VARCHAR2 10 由連線交易維護此欄
+                                ,C."AccTelExt"       = T."AccTelExt"           -- 催收人員電話-分機 VARCHAR2 5 由連線交易維護此欄
+                                ,C."LegalArea"       = T."LegalArea"           -- 法務人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+                                ,C."LegalNo"         = T."LegalNo"             -- 法務人員電話 VARCHAR2 10 由連線交易維護此欄
+                                ,C."LegalExt"        = T."LegalExt"            -- 法務人員電話-分機 VARCHAR2 5 由連線交易維護此欄
     WHEN NOT MATCHED THEN INSERT ( "CustNo"              -- '戶號';
                                   ,"FacmNo"              -- '額度';
                                   ,"CaseCode"            -- '案件種類';
@@ -555,6 +595,12 @@ BEGIN
                                   ,"LastUpdateEmpNo"     -- 最後更新人員
                                   ,"IsSpecify"
                                   ,"CityCode"
+                                  ,"AccTelArea"          -- 催收人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+                                  ,"AccTelNo"            -- 催收人員電話 VARCHAR2 10 由連線交易維護此欄
+                                  ,"AccTelExt"           -- 催收人員電話-分機 VARCHAR2 5 由連線交易維護此欄
+                                  ,"LegalArea"           -- 法務人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+                                  ,"LegalNo"             -- 法務人員電話 VARCHAR2 10 由連線交易維護此欄
+                                  ,"LegalExt"            -- 法務人員電話-分機 VARCHAR2 5 由連線交易維護此欄
     ) VALUES ( T."CustNo"
               ,T."FacmNo"
               ,T."CaseCode"
@@ -586,6 +632,12 @@ BEGIN
               ,T."LastUpdateEmpNo"
               ,'N'
               ,T."CityCode"
+              ,T."AccTelArea"
+              ,T."AccTelNo"
+              ,T."AccTelExt"
+              ,T."LegalArea"
+              ,T."LegalNo"
+              ,T."LegalExt"
     );
 
     UPD_CNT := UPD_CNT + sql%rowcount;

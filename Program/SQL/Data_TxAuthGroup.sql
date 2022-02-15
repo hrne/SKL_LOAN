@@ -1,4 +1,9 @@
-delete from "TxAuthGroup";
+--------------------------------------------------------
+--  已建立檔案 - 星期二-二月-15-2022   
+--------------------------------------------------------
+REM INSERTING into "TxAuthGroup"
+SET DEFINE OFF;
+DELETE FROM "TxAuthGroup";
 Insert into "TxAuthGroup" ("AuthNo","AuthItem","Desc","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","BranchNo","LevelFg") values ('0000T1','放款部經辦','限放款部經辦',0,to_timestamp('2021-11-30 10:35:38.000000000','YYYY-MM-DD HH24:MI:SS.FF'),'001709',to_timestamp('2021-12-23 18:01:25.220000000','YYYY-MM-DD HH24:MI:SS.FF'),'001715','0000',3);
 Insert into "TxAuthGroup" ("AuthNo","AuthItem","Desc","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","BranchNo","LevelFg") values ('0000S1','放款部主管','限放款部主管',0,to_timestamp('2021-11-03 18:34:57.000000000','YYYY-MM-DD HH24:MI:SS.FF'),'001709',to_timestamp('2021-11-03 18:34:57.000000000','YYYY-MM-DD HH24:MI:SS.FF'),'001709','0000',1);
 Insert into "TxAuthGroup" ("AuthNo","AuthItem","Desc","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","BranchNo","LevelFg") values ('0025S1','信託部主管','限信託部主管',0,to_timestamp('2021-11-01 15:54:57.000000000','YYYY-MM-DD HH24:MI:SS.FF'),'001709',to_timestamp('2021-12-23 18:10:23.405000000','YYYY-MM-DD HH24:MI:SS.FF'),'001715','0025',1);

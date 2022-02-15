@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * JobMain 批次工作主檔<br>
@@ -30,7 +26,7 @@ public class JobMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -5514439016490269734L;
 
 @EmbeddedId
   private JobMainId jobMainId;
