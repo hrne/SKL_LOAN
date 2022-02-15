@@ -11,6 +11,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 
 @Service("LM016p")
@@ -22,7 +23,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class LM016p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM016p.class);
 
 	@Autowired
 	LM016Report lM016Report;
@@ -43,12 +43,20 @@ public class LM016p extends TradeBuffer {
 
 		lM016Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = lM016Report.exec(titaVo);
+		int iAcDate = Integer.parseInt(titaVo.getEntDy());
 
+		// MSG帶入預設值
+		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("LM042", 60) + iAcDate;
+
+		this.info("ntxbuf = " + ntxbuf);
+		
+		boolean isFinish = lM016Report.exec(titaVo);
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM016寬限條件控管繳息表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"LM016寬限條件控管繳息表 已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM016寬限條件控管繳息表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"LM016寬限條件控管繳息表 查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

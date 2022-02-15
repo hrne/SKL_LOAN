@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.JobMain;
@@ -213,16 +215,6 @@ public interface JobMainService {
    *
    */
   public void Usp_L9_MonthlyFacBal_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
-
-  /**
-   * Stored Procedure<br>
-   * (月底日日終批次)維護 Ias39Loan34Data 每月IAS39放款34號公報資料檔
-   * @param  tbsdyf int
-   * @param  empNo String
-   * @param titaVo Variable-Length Argument
-   *
-   */
-  public void Usp_L7_Ias39Loan34Data_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>

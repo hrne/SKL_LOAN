@@ -18,6 +18,7 @@ import com.st1.itx.db.domain.MonthlyLM042RBCId;
 import com.st1.itx.db.service.MonthlyLM042RBCService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -56,30 +57,35 @@ public class LM042p extends TradeBuffer {
 
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
-
 		int tYMD = this.txBuffer.getTxCom().getMfbsdy();
 		int lYMD = this.txBuffer.getTxCom().getLmndy();
-		
+
 		checkAndUpdateData(titaVo, yearMonth);
 
 		this.info("LM042p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 		LM042Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = LM042Report.exec(titaVo,lYMD,tYMD);
+		int iAcDate = Integer.parseInt(titaVo.getEntDy());
+
+		// MSG帶入預設值
+		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("LM042", 60) + iAcDate;
+
+		this.info("ntxbuf = " + ntxbuf);
+
+		boolean isFinish = LM042Report.exec(titaVo, lYMD, tYMD);
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "LM042RBC報表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"LM042RBC表_會計部報表 已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "LM042RBC報表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"LM042RBC表_會計部報表 查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-//TitaVo titaVo, int yearMonth, String loanType, String loanItem, String relatedCode,BigDecimal risk, BigDecimal amt
 	private void checkAndUpdateData(TitaVo titaVo, int yearMonth) throws LogicException {
 
 		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
@@ -114,7 +120,6 @@ public class LM042p extends TradeBuffer {
 				break;
 			}
 
-
 		}
 
 //		this.info("lMonthlyLM042RBC=" + lMonthlyLM042RBC.toString());
@@ -125,7 +130,7 @@ public class LM042p extends TradeBuffer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.info("update finish");
+		this.info("update done");
 	}
 
 	public void insertData(TitaVo titaVo, int yearMonth) throws LogicException {
@@ -134,7 +139,7 @@ public class LM042p extends TradeBuffer {
 		MonthlyLM042RBC mMonthlyLM042RBC = new MonthlyLM042RBC();
 		MonthlyLM042RBCId monthlyLM042RBCId = new MonthlyLM042RBCId();
 
-		this.info("insert data");
+		
 		for (int i = 1; i <= 2; i++) {
 			mMonthlyLM042RBC = new MonthlyLM042RBC();
 			monthlyLM042RBCId = new MonthlyLM042RBCId();
@@ -210,6 +215,8 @@ public class LM042p extends TradeBuffer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		this.info("insert done");
 
 	}
 }

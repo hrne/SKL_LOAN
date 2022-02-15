@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -80,7 +81,7 @@ public class AcDetail implements Serializable {
   private String acctCode;
 
   // 借貸別
-  /* D-借，C-貸 */
+  /* D:借C:貸 */
   @Column(name = "`DbCr`", length = 1)
   private String dbCr;
 
@@ -89,7 +90,7 @@ public class AcDetail implements Serializable {
   private BigDecimal txAmt = new BigDecimal("0");
 
   // 入總帳記號
-  /* 0:未入帳 1:已入帳  2:被沖正(隔日訂正) 3.沖正(隔日訂正) */
+  /* 0:未入帳1:已入帳2:被沖正(隔日訂正)3.沖正(隔日訂正) */
   @Column(name = "`EntAc`")
   private int entAc = 0;
 
@@ -111,17 +112,17 @@ public class AcDetail implements Serializable {
   private String rvNo;
 
   // 業務科目記號
-  /* 0: 非業務科目1: 資負明細科目（放款、催收款項..) */
+  /* 0:非業務科目1:資負明細科目（放款、催收款項..) */
   @Column(name = "`AcctFlag`")
   private int acctFlag = 0;
 
   // 銷帳科目記號
-  /* 0－非銷帳科目(會計科子細目設定檔帶入)1－會計銷帳科目(會計科子細目設定檔帶入)2－業務銷帳科目(會計科子細目設定檔帶入)3－未收費用、4-短繳期金、5-另收欠款(銷帳檔帶入)8－核心銷帳碼科目，須以銷帳編號(銷帳碼彙總)上傳核心(會計科子細目設定檔帶入) */
+  /* 0:非銷帳科目(會計科子細目設定檔帶入)1:會計銷帳科目(會計科子細目設定檔帶入)2:業務銷帳科目(會計科子細目設定檔帶入)3:未收費用、4-短繳期金、5-另收欠款(銷帳檔帶入)8:核心銷帳碼科目，須以銷帳編號(銷帳碼彙總)上傳核心(會計科子細目設定檔帶入) */
   @Column(name = "`ReceivableFlag`")
   private int receivableFlag = 0;
 
   // 帳冊別記號
-  /* CdAcCode會計科子細目設定檔帶入(0,1,2)0: 不細分，區隔帳冊固定為00A:傳統帳冊1: 細分，區隔帳冊By戶號設定(AcBookCom)2: 中介，應收調撥款科目   ※明細檔無(只寫入總帳檔)，應收調撥款之核心傳票媒體檔，係自動產生。3: 指定帳冊，區隔帳冊由業務交易指定   ※L6201:其他傳票輸入、L618D各項提存 */
+  /* CdAcCode會計科子細目設定檔帶入(0,1,2)0:不細分，區隔帳冊固定為00A:傳統帳冊1:細分，區隔帳冊By戶號設定(AcBookCom)2:中介，應收調撥款科目  ※明細檔無(只寫入總帳檔)，應收調撥款之核心傳票媒體檔，係自動產生。3:指定帳冊，區隔帳冊由業務交易指定  ※L6201:其他傳票輸入、L618D各項提存 */
   @Column(name = "`AcBookFlag`")
   private int acBookFlag = 0;
 
@@ -131,12 +132,12 @@ public class AcDetail implements Serializable {
   private String acBookCode;
 
   // 區隔帳冊
-  /* 00A:傳統帳冊;201:利變年金帳冊帳冊別記號=0時，不須處理帳冊別記號=1時，由帳冊別處理公用程式設定帳冊別記號=3時，由業務交易帶入 */
+  /* 00A:傳統帳冊201:利變年金帳冊帳冊別記號=0時，不須處理帳冊別記號=1時，由帳冊別處理公用程式設定帳冊別記號=3時，由業務交易帶入 */
   @Column(name = "`AcSubBookCode`", length = 3)
   private String acSubBookCode;
 
   // 彙總別
-  /* 撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx)090.暫收抵繳091:借新還舊092:暫收轉帳093:抽退票094:轉債協暫收款095:轉債協退還款101.匯款轉帳102.銀行扣款103.員工扣款104.支票兌現105.法院扣薪106.理賠金107.代收款-債權協商109.其他111.匯款轉帳預先作業201:整批匯款202:單筆匯款204:退款台新(存款憑條)205:退款他行(整批匯款)211:退款新光(存款憑條) */
+  /* 撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx)090:暫收抵繳091:借新還舊092:暫收轉帳093:抽退票094:轉債協暫收款095:轉債協退還款101:匯款轉帳102:銀行扣款103:員工扣款104:支票兌現105:法院扣薪106:理賠金107:代收款-債權協商109:其他111:匯款轉帳預先作業201:整批匯款202:單筆匯款204:退款台新(存款憑條)205:退款他行(整批匯款)211:退款新光(存款憑條) */
   @Column(name = "`SumNo`", length = 3)
   private String sumNo;
 
@@ -149,7 +150,7 @@ public class AcDetail implements Serializable {
   private String slipNote;
 
   // 傳票批號
-  /* 01~10-關帳11-支票繳款90~99 提存帳務，不會更新AcMain總帳檔99-利息提存 98-迴轉上月96-放款承諾 97-迴轉上月95-未付火險費提存 94-迴轉上月 */
+  /* 01~10:關帳11:支票繳款90~99:提存帳務，不會更新AcMain總帳檔99:利息提存98:迴轉上月96:放款承諾97:迴轉上月95:未付火險費提存94:迴轉上月 */
   @Column(name = "`SlipBatNo`")
   private int slipBatNo = 0;
 
@@ -190,7 +191,7 @@ public class AcDetail implements Serializable {
   private String titaSupNo;
 
   // 作業模式
-  /* 1一段式，2二段式，3三段式 */
+  /* 1:一段式2:二段式3:三段式 */
   @Column(name = "`TitaRelCd`")
   private int titaRelCd = 0;
 
@@ -417,7 +418,8 @@ public class AcDetail implements Serializable {
 
 /**
 	* 借貸別<br>
-	* D-借，C-貸
+	* D:借
+C:貸
 	* @return String
 	*/
   public String getDbCr() {
@@ -426,7 +428,8 @@ public class AcDetail implements Serializable {
 
 /**
 	* 借貸別<br>
-	* D-借，C-貸
+	* D:借
+C:貸
   *
   * @param dbCr 借貸別
 	*/
@@ -455,7 +458,10 @@ public class AcDetail implements Serializable {
 
 /**
 	* 入總帳記號<br>
-	* 0:未入帳 1:已入帳  2:被沖正(隔日訂正) 3.沖正(隔日訂正)
+	* 0:未入帳
+1:已入帳
+2:被沖正(隔日訂正)
+3.沖正(隔日訂正)
 	* @return Integer
 	*/
   public int getEntAc() {
@@ -464,7 +470,10 @@ public class AcDetail implements Serializable {
 
 /**
 	* 入總帳記號<br>
-	* 0:未入帳 1:已入帳  2:被沖正(隔日訂正) 3.沖正(隔日訂正)
+	* 0:未入帳
+1:已入帳
+2:被沖正(隔日訂正)
+3.沖正(隔日訂正)
   *
   * @param entAc 入總帳記號
 	*/
@@ -550,8 +559,8 @@ public class AcDetail implements Serializable {
 
 /**
 	* 業務科目記號<br>
-	* 0: 非業務科目
-1: 資負明細科目（放款、催收款項..)
+	* 0:非業務科目
+1:資負明細科目（放款、催收款項..)
 	* @return Integer
 	*/
   public int getAcctFlag() {
@@ -560,8 +569,8 @@ public class AcDetail implements Serializable {
 
 /**
 	* 業務科目記號<br>
-	* 0: 非業務科目
-1: 資負明細科目（放款、催收款項..)
+	* 0:非業務科目
+1:資負明細科目（放款、催收款項..)
   *
   * @param acctFlag 業務科目記號
 	*/
@@ -571,11 +580,11 @@ public class AcDetail implements Serializable {
 
 /**
 	* 銷帳科目記號<br>
-	* 0－非銷帳科目(會計科子細目設定檔帶入)
-1－會計銷帳科目(會計科子細目設定檔帶入)
-2－業務銷帳科目(會計科子細目設定檔帶入)
-3－未收費用、4-短繳期金、5-另收欠款(銷帳檔帶入)
-8－核心銷帳碼科目，須以銷帳編號(銷帳碼彙總)上傳核心(會計科子細目設定檔帶入)
+	* 0:非銷帳科目(會計科子細目設定檔帶入)
+1:會計銷帳科目(會計科子細目設定檔帶入)
+2:業務銷帳科目(會計科子細目設定檔帶入)
+3:未收費用、4-短繳期金、5-另收欠款(銷帳檔帶入)
+8:核心銷帳碼科目，須以銷帳編號(銷帳碼彙總)上傳核心(會計科子細目設定檔帶入)
 	* @return Integer
 	*/
   public int getReceivableFlag() {
@@ -584,11 +593,11 @@ public class AcDetail implements Serializable {
 
 /**
 	* 銷帳科目記號<br>
-	* 0－非銷帳科目(會計科子細目設定檔帶入)
-1－會計銷帳科目(會計科子細目設定檔帶入)
-2－業務銷帳科目(會計科子細目設定檔帶入)
-3－未收費用、4-短繳期金、5-另收欠款(銷帳檔帶入)
-8－核心銷帳碼科目，須以銷帳編號(銷帳碼彙總)上傳核心(會計科子細目設定檔帶入)
+	* 0:非銷帳科目(會計科子細目設定檔帶入)
+1:會計銷帳科目(會計科子細目設定檔帶入)
+2:業務銷帳科目(會計科子細目設定檔帶入)
+3:未收費用、4-短繳期金、5-另收欠款(銷帳檔帶入)
+8:核心銷帳碼科目，須以銷帳編號(銷帳碼彙總)上傳核心(會計科子細目設定檔帶入)
   *
   * @param receivableFlag 銷帳科目記號
 	*/
@@ -599,12 +608,12 @@ public class AcDetail implements Serializable {
 /**
 	* 帳冊別記號<br>
 	* CdAcCode會計科子細目設定檔帶入(0,1,2)
-0: 不細分，區隔帳冊固定為00A:傳統帳冊
-1: 細分，區隔帳冊By戶號設定(AcBookCom)
-2: 中介，應收調撥款科目
-   ※明細檔無(只寫入總帳檔)，應收調撥款之核心傳票媒體檔，係自動產生。
-3: 指定帳冊，區隔帳冊由業務交易指定
-   ※L6201:其他傳票輸入、L618D各項提存
+0:不細分，區隔帳冊固定為00A:傳統帳冊
+1:細分，區隔帳冊By戶號設定(AcBookCom)
+2:中介，應收調撥款科目
+  ※明細檔無(只寫入總帳檔)，應收調撥款之核心傳票媒體檔，係自動產生。
+3:指定帳冊，區隔帳冊由業務交易指定
+  ※L6201:其他傳票輸入、L618D各項提存
 	* @return Integer
 	*/
   public int getAcBookFlag() {
@@ -614,12 +623,12 @@ public class AcDetail implements Serializable {
 /**
 	* 帳冊別記號<br>
 	* CdAcCode會計科子細目設定檔帶入(0,1,2)
-0: 不細分，區隔帳冊固定為00A:傳統帳冊
-1: 細分，區隔帳冊By戶號設定(AcBookCom)
-2: 中介，應收調撥款科目
-   ※明細檔無(只寫入總帳檔)，應收調撥款之核心傳票媒體檔，係自動產生。
-3: 指定帳冊，區隔帳冊由業務交易指定
-   ※L6201:其他傳票輸入、L618D各項提存
+0:不細分，區隔帳冊固定為00A:傳統帳冊
+1:細分，區隔帳冊By戶號設定(AcBookCom)
+2:中介，應收調撥款科目
+  ※明細檔無(只寫入總帳檔)，應收調撥款之核心傳票媒體檔，係自動產生。
+3:指定帳冊，區隔帳冊由業務交易指定
+  ※L6201:其他傳票輸入、L618D各項提存
   *
   * @param acBookFlag 帳冊別記號
 	*/
@@ -650,7 +659,8 @@ public class AcDetail implements Serializable {
 
 /**
 	* 區隔帳冊<br>
-	* 00A:傳統帳冊;201:利變年金帳冊
+	* 00A:傳統帳冊
+201:利變年金帳冊
 帳冊別記號=0時，不須處理
 帳冊別記號=1時，由帳冊別處理公用程式設定
 帳冊別記號=3時，由業務交易帶入
@@ -662,7 +672,8 @@ public class AcDetail implements Serializable {
 
 /**
 	* 區隔帳冊<br>
-	* 00A:傳統帳冊;201:利變年金帳冊
+	* 00A:傳統帳冊
+201:利變年金帳冊
 帳冊別記號=0時，不須處理
 帳冊別記號=1時，由帳冊別處理公用程式設定
 帳冊別記號=3時，由業務交易帶入
@@ -676,21 +687,21 @@ public class AcDetail implements Serializable {
 /**
 	* 彙總別<br>
 	* 撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx)
-090.暫收抵繳
+090:暫收抵繳
 091:借新還舊
 092:暫收轉帳
 093:抽退票
 094:轉債協暫收款
 095:轉債協退還款
-101.匯款轉帳
-102.銀行扣款
-103.員工扣款
-104.支票兌現
-105.法院扣薪
-106.理賠金
-107.代收款-債權協商
-109.其他
-111.匯款轉帳預先作業
+101:匯款轉帳
+102:銀行扣款
+103:員工扣款
+104:支票兌現
+105:法院扣薪
+106:理賠金
+107:代收款-債權協商
+109:其他
+111:匯款轉帳預先作業
 201:整批匯款
 202:單筆匯款
 204:退款台新(存款憑條)
@@ -705,21 +716,21 @@ public class AcDetail implements Serializable {
 /**
 	* 彙總別<br>
 	* 撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx)
-090.暫收抵繳
+090:暫收抵繳
 091:借新還舊
 092:暫收轉帳
 093:抽退票
 094:轉債協暫收款
 095:轉債協退還款
-101.匯款轉帳
-102.銀行扣款
-103.員工扣款
-104.支票兌現
-105.法院扣薪
-106.理賠金
-107.代收款-債權協商
-109.其他
-111.匯款轉帳預先作業
+101:匯款轉帳
+102:銀行扣款
+103:員工扣款
+104:支票兌現
+105:法院扣薪
+106:理賠金
+107:代收款-債權協商
+109:其他
+111:匯款轉帳預先作業
 201:整批匯款
 202:單筆匯款
 204:退款台新(存款憑條)
@@ -772,12 +783,15 @@ public class AcDetail implements Serializable {
 
 /**
 	* 傳票批號<br>
-	* 01~10-關帳
-11-支票繳款
-90~99 提存帳務，不會更新AcMain總帳檔
-99-利息提存 98-迴轉上月
-96-放款承諾 97-迴轉上月
-95-未付火險費提存 94-迴轉上月
+	* 01~10:關帳
+11:支票繳款
+90~99:提存帳務，不會更新AcMain總帳檔
+99:利息提存
+98:迴轉上月
+96:放款承諾
+97:迴轉上月
+95:未付火險費提存
+94:迴轉上月
 	* @return Integer
 	*/
   public int getSlipBatNo() {
@@ -786,12 +800,15 @@ public class AcDetail implements Serializable {
 
 /**
 	* 傳票批號<br>
-	* 01~10-關帳
-11-支票繳款
-90~99 提存帳務，不會更新AcMain總帳檔
-99-利息提存 98-迴轉上月
-96-放款承諾 97-迴轉上月
-95-未付火險費提存 94-迴轉上月
+	* 01~10:關帳
+11:支票繳款
+90~99:提存帳務，不會更新AcMain總帳檔
+99:利息提存
+98:迴轉上月
+96:放款承諾
+97:迴轉上月
+95:未付火險費提存
+94:迴轉上月
   *
   * @param slipBatNo 傳票批號
 	*/
@@ -972,7 +989,9 @@ public class AcDetail implements Serializable {
 
 /**
 	* 作業模式<br>
-	* 1一段式，2二段式，3三段式
+	* 1:一段式
+2:二段式
+3:三段式
 	* @return Integer
 	*/
   public int getTitaRelCd() {
@@ -981,7 +1000,9 @@ public class AcDetail implements Serializable {
 
 /**
 	* 作業模式<br>
-	* 1一段式，2二段式，3三段式
+	* 1:一段式
+2:二段式
+3:三段式
   *
   * @param titaRelCd 作業模式
 	*/

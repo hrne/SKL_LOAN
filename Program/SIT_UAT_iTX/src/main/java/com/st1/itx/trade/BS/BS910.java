@@ -21,7 +21,8 @@ import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.service.Ias39LoanCommitService;
-import com.st1.itx.db.service.TxToDoDetailReserveService;
+import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
@@ -54,13 +55,13 @@ public class BS910 extends TradeBuffer {
 	public Ias39LoanCommitService ias39LoanCommitService;
 
 	@Autowired
-	private TxToDoDetailReserveService txToDoDetailReserveService;
-
-	@Autowired
 	public TxToDoDetailService txToDoDetailService;
 
 	@Autowired
 	public TxToDoCom txToDoCom;
+
+	@Autowired
+	private AcDetailService acDetailService;
 
 	@Autowired
 	public GSeqCom gSeqCom;
@@ -70,7 +71,6 @@ public class BS910 extends TradeBuffer {
 	private int iAcDate;
 	private int iAcDateReverse;
 	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
-	private List<TxToDoDetailReserve> lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -79,8 +79,8 @@ public class BS910 extends TradeBuffer {
 
 		String dateYear = titaVo.getParam("Year");
 		String dateMonth = titaVo.getParam("Month");
-		int dateSent = Integer.parseInt(dateYear + dateMonth + "01") ;
-		int yearMonth = Integer.parseInt(dateYear + dateMonth) + 191100 ; // 提存年月
+		int dateSent = Integer.parseInt(dateYear + dateMonth + "01");
+		int yearMonth = Integer.parseInt(dateYear + dateMonth) + 191100; // 提存年月
 		dateUtil.init();
 		dateUtil.setDate_1(dateSent);
 		TxBizDate tTxBizDate = dateUtil.getForTxBizDate(true);// 若1號為假日,參數true則會找次一營業日,不會踢錯誤訊息
@@ -88,62 +88,53 @@ public class BS910 extends TradeBuffer {
 		iAcDate = tTxBizDate.getMfbsDy();// 畫面輸入年月的月底營業日
 		// 迴轉上個月底營業日
 		iAcDateReverse = tTxBizDate.getLmnDy();
-		this.info("BS910 iAcDate = " + iAcDate + ",iAcDateReverse=" + iAcDateReverse);		
-		
+		this.info("BS910 iAcDate = " + iAcDate + ",iAcDateReverse=" + iAcDateReverse);
+
 		// 1.刪除處理清單 ACCL03-放款承諾提存入帳 //
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL03", 0, 3, this.index, Integer.MAX_VALUE);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL03", 0, 3, this.index,
+				Integer.MAX_VALUE);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
 		}
 
-		// 2.刪除處理清單留存檔 ACCL03 //
-		this.info("3.bs910 delete Reserve ACCL03");
-		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL03", 0, 3, iAcDate + 19110000, iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
-		lTxToDoDetailReserve = slTxToDoDetailReserve == null ? null : slTxToDoDetailReserve.getContent();
-		if (lTxToDoDetailReserve != null) {
-			try {
-				txToDoDetailReserveService.deleteAll(lTxToDoDetailReserve, titaVo);
-			} catch (DBException e) {
-				e.printStackTrace();
-				throw new LogicException(titaVo, "E0008", "TxToDoDetailReserve deleteAll " + e.getErrorMsg());
-			}
-		}
-		lTxToDoDetail = new ArrayList<TxToDoDetail>();
-		lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
 		// 3.迴轉上月
 		this.info("3.bs900 last month ACCL03");
-		slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL03", 0, 3, iAcDateReverse + 19110000, iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
-		lTxToDoDetailReserve = slTxToDoDetailReserve == null ? null : slTxToDoDetailReserve.getContent();
-		if (lTxToDoDetailReserve != null) {
-			for (TxToDoDetailReserve t2 : lTxToDoDetailReserve) {
-				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-				tTxToDoDetail.setItemCode(t2.getItemCode());
-				tTxToDoDetail.setDtlValue(t2.getDtlValue());
-				TempVo t2TempVo = new TempVo();
-				t2TempVo = t2TempVo.getVo(t2.getProcessNote());
-				// 迴轉上月(傳票批號:97)
-				TempVo tTempVo = new TempVo();
-				tTempVo.clear();
-				tTempVo.putParam("AcDate", iAcDate);
-				tTempVo.putParam("SlipBatNo", "97");
-				tTempVo.putParam("AcclType", "迴轉上月");
-				tTempVo.putParam("AcctCode", t2TempVo.getParam("AcctCode"));
-				tTempVo.putParam("AcBookCode", t2TempVo.getParam("AcBookCode"));
-				tTempVo.putParam("AcSubBookCode", t2TempVo.getParam("AcSubBookCode"));
-				tTempVo.putParam("SlipNote", t2TempVo.getParam("SlipNote"));
-				tTempVo.putParam("CrAcctCode1", t2TempVo.getParam("DbAcctCode1"));
-				tTempVo.putParam("CrRvNo1", t2TempVo.getParam("DbRvNo1"));
-				tTempVo.putParam("CrTxAmt1", t2TempVo.getParam("DbTxAmt1"));
-				tTempVo.putParam("DbAcctCode1", t2TempVo.getParam("CrAcctCode1"));
-				tTempVo.putParam("DbTxAmt1", t2TempVo.getParam("CrTxAmt1"));
-				tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
-				lTxToDoDetail.add(tTxToDoDetail);
+		lTxToDoDetail = new ArrayList<TxToDoDetail>();
+		// 2.迴轉上月
+		this.info("3.bs900 last month ACCL03");
+		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 96, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slAcDetail != null) {
+			for (AcDetail t : slAcDetail.getContent()) {
+				if ("LC1".equals(t.getAcctCode())) {
+					String rvNo = getRvNo(titaVo);
+					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+					tTxToDoDetail.setItemCode("ACCL03");
+					tTxToDoDetail.setDtlValue(rvNo);
+					// 迴轉上月(傳票批號:97)
+					TempVo tTempVo = new TempVo();
+					tTempVo.clear();
+					tTempVo.putParam("AcDate", iAcDate);
+					tTempVo.putParam("SlipBatNo", "97");
+					tTempVo.putParam("AcclType", "迴轉上月");
+					tTempVo.putParam("AcctCode", "LC1");
+					tTempVo.putParam("AcBookCode", t.getAcBookCode());
+					tTempVo.putParam("AcSubBookCode", t.getAcSubBookCode());
+					tTempVo.putParam("SlipNote", t.getSlipNote());
+					tTempVo.putParam("CrAcctCode1", "LC1");
+					tTempVo.putParam("CrRvNo1", rvNo);
+					tTempVo.putParam("CrTxAmt1", t.getTxAmt());
+					tTempVo.putParam("DbAcctCode1", "LC2");
+					tTempVo.putParam("DbTxAmt1", t.getTxAmt());
+					tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
+					lTxToDoDetail.add(tTxToDoDetail);
+				}
 			}
 			this.info("3.last month ACCL03 " + lTxToDoDetail.size());
 		}
 
-		lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
+		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 
 		// xxxxx 放款承諾傳票批號設定為 96, 迴轉傳票批號設定為 97
 		// 4.寫入應處理清單
@@ -157,16 +148,6 @@ public class BS910 extends TradeBuffer {
 			txToDoCom.addByDetailList(false, 0, lTxToDoDetail, titaVo); // DupSkip = false ->重複 error
 		}
 
-		// 應處理明細留存檔
-		if (lTxToDoDetailReserve != null && lTxToDoDetailReserve.size() > 0) {
-			try {
-				txToDoDetailReserveService.insertAll(lTxToDoDetailReserve, titaVo);
-			} catch (DBException e) {
-				e.printStackTrace();
-				throw new LogicException(titaVo, "E0005", "TxToDoDetailReserve insertAll " + e.getErrorMsg());
-			}
-		}
-
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
 				"請執行 各項提存入帳作業(放款承諾)", titaVo);
 
@@ -178,7 +159,8 @@ public class BS910 extends TradeBuffer {
 	/* 寫入應處理清單 ACCL03-各項提存作業，寫入新提存 */
 	private void procTxToDo(int yearMonth, TitaVo titaVo) throws LogicException {
 		HashMap<String, BigDecimal> map = new HashMap<>();
-		Slice<Ias39LoanCommit> slIas39LoanCommit = ias39LoanCommitService.findDataYmEq(yearMonth, this.index, Integer.MAX_VALUE);
+		Slice<Ias39LoanCommit> slIas39LoanCommit = ias39LoanCommitService.findDataYmEq(yearMonth, this.index,
+				Integer.MAX_VALUE);
 		List<Ias39LoanCommit> lIas39LoanCommit = slIas39LoanCommit == null ? null : slIas39LoanCommit.getContent();
 
 		if (lIas39LoanCommit != null) {
@@ -200,11 +182,21 @@ public class BS910 extends TradeBuffer {
 		}
 	}
 
-	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal avblBal, TitaVo titaVo) throws LogicException {
+	private String getRvNo(TitaVo titaVo) throws LogicException {
+		// 銷帳編號：AC+民國年後兩碼+流水號六碼
+		String rvNo = "AC"
+				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(
+						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
+						6);
+		return rvNo;
+	}
+
+	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal avblBal, TitaVo titaVo)
+			throws LogicException {
 		// 借：不可撤銷放款承諾 貸：待抵銷不可撤銷放款承諾
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
+		String rvNo = getRvNo(titaVo);
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setItemCode("ACCL03");
 		tTxToDoDetail.setDtlValue(rvNo);
@@ -225,14 +217,6 @@ public class BS910 extends TradeBuffer {
 		tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 		lTxToDoDetail.add(tTxToDoDetail);
 		this.info("addTxToDo lTxToDoDetail size" + lTxToDoDetail.size());
-
-		// 應處理明細留存檔
-		TxToDoDetailReserve tTxToDoDetailReserve = new TxToDoDetailReserve();
-		tTxToDoDetailReserve.setItemCode(tTxToDoDetail.getItemCode());
-		tTxToDoDetailReserve.setDtlValue(tTxToDoDetail.getDtlValue());
-		tTxToDoDetailReserve.setDataDate(iAcDate);
-		tTxToDoDetailReserve.setProcessNote(tTxToDoDetail.getProcessNote());
-		lTxToDoDetailReserve.add(tTxToDoDetailReserve);
 
 	}
 

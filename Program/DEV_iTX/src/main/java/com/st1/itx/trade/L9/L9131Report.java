@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdAcCode;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdCodeService;
@@ -55,7 +55,7 @@ public class L9131Report extends MakeReport {
 
 	// 區隔帳冊
 	private String nowAcSubBookCode = "00A";
-	private String nowAcSubBookItem = "全帳冊";
+	private String nowAcSubBookItem = "傳統帳冊";
 
 	// 製表日期
 	private String nowDate;
@@ -144,20 +144,22 @@ public class L9131Report extends MakeReport {
 			return;
 		}
 
+		SlipMedia2022 tFirstSlipMedia2022 = lSlipMedia2022.get(0);
+
 		// 合計容器(以借貸方區分)
 		BigDecimal dbAmt = BigDecimal.ZERO;
 		BigDecimal crAmt = BigDecimal.ZERO;
-		String currencyCode = lSlipMedia2022.get(0).getCurrencyCode();
+		String currencyCode = tFirstSlipMedia2022.getCurrencyCode();
 
-		this.nowAcBookCode = lSlipMedia2022.get(0).getAcBookCode();
-		this.nowAcBookItem = sCdCodeService.defCodeEq("AcBookCode", this.nowAcBookCode, 0, 1, titaVo).getContent()
-				.get(0).getItem();
+		this.nowAcBookCode = tFirstSlipMedia2022.getAcBookCode();
+		CdCode acBookCdCodeFirst = sCdCodeService.getItemFirst(6, "AcBookCode", this.nowAcBookCode, titaVo);
+		this.nowAcBookItem = acBookCdCodeFirst == null ? "" : acBookCdCodeFirst.getItem();
 
-		this.nowAcSubBookCode = lSlipMedia2022.get(0).getAcSubBookCode();
-		this.nowAcSubBookItem = sCdCodeService.defCodeEq("AcSubBookCode", this.nowAcSubBookCode, 0, 1, titaVo)
-				.getContent().get(0).getItem();
+		this.nowAcSubBookCode = tFirstSlipMedia2022.getAcSubBookCode();
+		CdCode acSubBookCdCodeFirst = sCdCodeService.getItemFirst(6, "AcSubBookCode", this.nowAcSubBookCode, titaVo);
+		this.nowAcSubBookItem = acSubBookCdCodeFirst == null ? "" : acSubBookCdCodeFirst.getItem();
 
-		this.slipNo = lSlipMedia2022.get(0).getSlipMedia2022Id().getMediaSlipNo();
+		this.slipNo = tFirstSlipMedia2022.getSlipMedia2022Id().getMediaSlipNo();
 
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
@@ -169,13 +171,13 @@ public class L9131Report extends MakeReport {
 					|| !this.nowAcSubBookCode.equals(tSlipMedia2022.getAcSubBookCode())) {
 				// 修改表頭的帳冊別欄位
 				this.nowAcBookCode = tSlipMedia2022.getAcBookCode();
-				this.nowAcBookItem = sCdCodeService.defCodeEq("AcBookCode", this.nowAcBookCode, 0, 1, titaVo)
-						.getContent().get(0).getItem();
+				CdCode acBookCdCode = sCdCodeService.getItemFirst(6, "AcBookCode", this.nowAcBookCode, titaVo);
+				this.nowAcBookItem = acBookCdCode == null ? "" : acBookCdCode.getItem();
 
 				// 修改表頭的區隔帳冊欄位
 				this.nowAcSubBookCode = tSlipMedia2022.getAcSubBookCode();
-				this.nowAcSubBookItem = sCdCodeService.defCodeEq("AcSubBookCode", this.nowAcSubBookCode, 0, 1, titaVo)
-						.getContent().get(0).getItem();
+				CdCode acSubBookCdCode = sCdCodeService.getItemFirst(6, "AcSubBookCode", this.nowAcSubBookCode, titaVo);
+				this.nowAcSubBookItem = acSubBookCdCode == null ? "" : acSubBookCdCode.getItem();
 
 				this.slipNo = tSlipMedia2022.getSlipMedia2022Id().getMediaSlipNo();
 
@@ -208,18 +210,7 @@ public class L9131Report extends MakeReport {
 				crAmt = crAmt.add(txAmt);
 			}
 
-			Slice<CdAcCode> sCdAcCode = sCdAcCodeService.findAcCode(tSlipMedia2022.getAcNoCode(),
-					tSlipMedia2022.getAcNoCode(), tSlipMedia2022.getAcSubCode(), tSlipMedia2022.getAcSubCode(), "  ",
-					"  ", 0, 1, titaVo);
-
-			String acNoItem = "";
-
-			if (sCdAcCode != null) {
-				List<CdAcCode> lCdAcCode = sCdAcCode.getContent();
-				if (lCdAcCode != null && !lCdAcCode.isEmpty()) {
-					acNoItem = lCdAcCode.get(0).getAcNoItem();
-				}
-			}
+			String acNoItem = tSlipMedia2022.getSlipRmk();
 
 			// 明細資料第二行
 			print(1, 1, "　　");

@@ -17,8 +17,11 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.AcMainId;
+import com.st1.itx.db.domain.CdAcCode;
+import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcMainService;
+import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -48,6 +51,8 @@ public class L6903 extends TradeBuffer {
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
 	@Autowired
+	public CdAcCodeService sCdAcCodeService;
+	@Autowired
 	Parse parse;
 	private String debits[] = { "1", "5", "6", "9" }; // 資產、支出為借方科目，負債、收入為貸方科目
 	private List<String> debitsList = Arrays.asList(debits);
@@ -73,7 +78,7 @@ public class L6903 extends TradeBuffer {
 		BigDecimal wkDb = new BigDecimal(0);
 		BigDecimal wkCr = new BigDecimal(0);
 		String iTranItem = "";
-
+		int classcode = 0;
 		if (iAcSubCode.isEmpty()) {
 			iAcSubCode = "     ";
 		}
@@ -85,23 +90,42 @@ public class L6903 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 305 * 100 = 30,500
+		this.limit = 100; 
 
+		
+		// 查詢會計科子細目設定檔
+		if (!(iAcNoCode.isEmpty())) {
+			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(iAcNoCode, iAcSubCode, iAcDtlCode), titaVo);
+			if (tCdAcCode == null) {
+				throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
+			} else {
+				classcode = tCdAcCode.getClassCode(); // 1:下編子細目
+			}
+		}
+				
 		// 查詢會計總帳檔
 		AcMain tAcMain = sAcMainService.findById(new AcMainId(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt), titaVo);
 		if (tAcMain == null) {
 			// throw new LogicException(titaVo, "E0001", "會計總帳檔"); // 查無資料
 			wkBal = new BigDecimal(0);
+			this.info("wkBal 1=="+wkBal);
 		} else {
 			wkBal = tAcMain.getYdBal();
+			this.info("wkBal 2=="+wkBal+",==="+tAcMain.getYdBal());
 		}
-
+		
 		// 查詢會計帳務明細檔
 		Slice<AcDetail> slAcDetail;
-		slAcDetail = sAcDetailService.acdtlAcDateRange(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
-				titaVo);
+		if(classcode == 1) {
+			slAcDetail = sAcDetailService.acdtlAcDateRange2(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
+					titaVo);
+		} else {
+			slAcDetail = sAcDetailService.acdtlAcDateRange(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
+					titaVo);
+		}
+		
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
-
+		this.info("lAcDetail size ="+lAcDetail.size());
 		if (lAcDetail == null || lAcDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
@@ -118,47 +142,17 @@ public class L6903 extends TradeBuffer {
 				continue;
 			}
 
-			// 科子細目可不輸入 ; 有輸入不等時找下一筆
-			// if (!(iAcNoCode.isEmpty() || iAcNoCode.equals(tAcDetail.getAcNoCode()))) {
-			// this.info("L6903 1 ");
-			// continue;
-			// }
 
 			if (!(titaVo.getParam("AcNoCode").trim().isEmpty())) {
 				if (!(iAcSubCode.equals(tAcDetail.getAcSubCode()))) {
 					this.info("L6903 2 ");
 					continue;
-				} else if (!(iAcDtlCode.equals(tAcDetail.getAcDtlCode()))) {
+				} else if (!(iAcDtlCode.equals(tAcDetail.getAcDtlCode())) && classcode == 0) {
 					this.info("L6903 3 ");
 					continue;
 				}
 			}
 
-			// 0: 不細分 (000)
-			// 1: 兼全帳冊與特殊帳冊 (輸入000,輸出含000,201 ; 輸入201,只輸出201)
-			// 2: 特殊帳冊之應收調撥款，明細檔無(只寫入總帳檔)
-			// 3: 特殊帳冊(L6201:其他傳票輸入) (輸入000,只輸出000 ; 輸入201,只輸出201)
-
-//			if (tAcDetail.getAcBookFlag() == 0) {
-//				if (!(iAcBookCode.equals("000") || iAcBookCode.equals("10H"))) {
-//					this.info("L6903 4 ");
-//					continue;
-//				}
-//			} else if (tAcDetail.getAcBookFlag() == 1) {
-//				if (!(iAcBookCode.equals("000") || iAcBookCode.equals("10H")
-//						|| iAcBookCode.equals(tAcDetail.getAcBookCode()))) {
-//					this.info("L6903 5 ");
-//					continue;
-//				}
-//			} else if (tAcDetail.getAcBookFlag() == 3) {
-//				if (!(iAcBookCode.equals(tAcDetail.getAcBookCode()) || iAcBookCode.equals("10H"))) {
-//					this.info("L6903 6 ");
-//					continue;
-//				}
-//			} else {
-//				this.info("L6903 7 ");
-//				continue;
-//			}
 
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOAcDate", tAcDetail.getAcDate());
@@ -185,8 +179,10 @@ public class L6903 extends TradeBuffer {
 			} else {
 				if (tAcDetail.getDbCr().equals("D")) {
 					wkBal = wkBal.subtract(tAcDetail.getTxAmt());
+					this.info("wkBal d=="+wkBal);
 				} else {
 					wkBal = wkBal.add(tAcDetail.getTxAmt());
+					this.info("wkBal c=="+wkBal);
 				}
 			}
 
@@ -208,6 +204,7 @@ public class L6903 extends TradeBuffer {
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slAcDetail != null && slAcDetail.hasNext()) {
+			this.info("lAcDetail hasNext");
 			titaVo.setReturnIndex(this.setIndexNext());
 			// this.totaVo.setMsgEndToEnter();// 手動折返
 			this.totaVo.setMsgEndToAuto();// 自動折返

@@ -154,12 +154,13 @@ public class L3916 extends TradeBuffer {
 						"催收呆帳檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 = " + tLoanBorMain.getFacmNo() + " 撥款序號 = "
 								+ tLoanBorMain.getBormNo() + " 催收序號 = " + tLoanBorMain.getLastOvduNo()); // 查詢資料不存在
 			}
-			wkOvduDate = tLoanOverdue.getOvduDate();
-			wkOvduAmt = tLoanOverdue.getOvduAmt();
-			wkNplRepay = tLoanOverdue.getOvduAmt().subtract(tLoanOverdue.getOvduBal());
-			wkBadDebtAmt = wkBadDebtAmt.add(tLoanOverdue.getBadDebtAmt());
-			wkBadDebtBal = wkBadDebtBal.add(tLoanOverdue.getBadDebtBal());
-			wkOvduSituaction = tLoanOverdue.getOvduSituaction();
+			wkOvduDate = tLoanOverdue.getOvduDate(); // 催收開始日
+			wkOvduAmt = tLoanOverdue.getOvduAmt(); // 轉催收金額
+			wkNplRepay = tLoanOverdue.getOvduAmt()
+					.subtract(tLoanOverdue.getOvduBal().subtract(tLoanOverdue.getBadDebtAmt())); // 催收還款金額
+			wkBadDebtAmt = wkBadDebtAmt.add(tLoanOverdue.getBadDebtAmt()); // 轉呆帳金額
+			wkBadDebtBal = wkBadDebtBal.add(tLoanOverdue.getBadDebtBal());// 呆帳餘額
+			wkOvduSituaction = tLoanOverdue.getOvduSituaction(); // 催收處理情形
 
 		}
 		int Prohibitperiod = 0;

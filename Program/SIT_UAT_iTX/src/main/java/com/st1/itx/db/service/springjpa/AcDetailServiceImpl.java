@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -1035,6 +1038,34 @@ em = null;
   }
 
   @Override
+  public Slice<AcDetail> acdtlAcDateRange2(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, int acDate_6, int acDate_7, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("acdtlAcDateRange2 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acNoCode_4 : " +  acNoCode_4 + " acSubCode_5 : " +  acSubCode_5 + " acDate_6 : " +  acDate_6 + " acDate_7 : " +  acDate_7);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDate_6, acDate_7, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDate_6, acDate_7, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDate_6, acDate_7, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDate_6, acDate_7, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public AcDetail holdById(AcDetailId acDetailId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -1082,7 +1113,7 @@ em = null;
        empNot = ThreadVariable.getEmpNot();
 
     this.info("Insert..." + dbName + " " + acDetail.getAcDetailId());
-    if (this.findById(acDetail.getAcDetailId()) != null)
+    if (this.findById(acDetail.getAcDetailId(), titaVo) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())

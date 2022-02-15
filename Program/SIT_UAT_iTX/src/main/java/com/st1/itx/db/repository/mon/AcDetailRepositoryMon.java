@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.mon;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,6 +123,9 @@ public interface AcDetailRepositoryMon extends JpaRepository<AcDetail, AcDetailI
 
   // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND TitaSecNo >= ,AND TitaSecNo <= ,AND RvNo %
   public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaSecNo_7, String titaSecNo_8, String rvNo_9, Pageable pageable);
+
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcNoCode = ,AND AcSubCode =  ,AND AcDate >= ,AND AcDate <= 
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, int acDate_6, int acDate_7, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

@@ -40,7 +40,7 @@ BEGIN
           ,NVL(LMSP."LastBormNo",0)       AS "LastBormNo"          -- 已撥款序號 DECIMAL 3 
           ,NVL(LMSP."LastBormRvNo",900)   AS "LastBormRvNo"        -- 已預約序號 DECIMAL 3 
           ,APLP."APLNUM"                  AS "ApplNo"              -- 申請號碼 DECIMAL 7 
-          ,APLP."CASNUM3"                 AS "CreditSysNo"         -- 徵審系統案號 DECIMAL 7   -- 2020/10/19 Wei修改
+          ,APLP."CASNUM3"                 AS "CreditSysNo"         -- 徵審系統案號 DECIMAL 7 -- 2020/10/19 Wei修改
           ,APLP."IRTBCD"                  AS "ProdNo"              -- 商品代碼 VARCHAR2 5 
           ,PROD."BaseRateCode"            AS "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 
           ,APLP."IRTASC"                  AS "RateIncr"            -- 加碼利率 DECIMAL 6 4 -- 2020/10/19 Wei修改
@@ -130,8 +130,7 @@ BEGIN
              THEN LPAD(TRIM(APLP."CUSECD"),2,'0')
              WHEN TRIM(APLP."CUSECD") = 'E'
              THEN '01'
-           ELSE TRIM(APLP."CUSECD") END
-                                          AS "CustTypeCode"        -- 客戶別 VARCHAR2 2 
+           ELSE TRIM(APLP."CUSECD") END   AS "CustTypeCode"        -- 客戶別 VARCHAR2 2 
           ,APLP."APLRCD"                  AS "RecycleCode"         -- 循環動用 VARCHAR2 1 
           ,APLP."APLRDT"                  AS "RecycleDeadline"     -- 循環動用期限 DECIMALD 8 
           -- 2021-02-08 補零
@@ -205,7 +204,15 @@ BEGIN
           ,''                             AS "LastTlrNo"           -- 上次櫃員編號 VARCHAR2(6 BYTE)
           ,''                             AS "LastTxtNo"           -- 上次交易序號 VARCHAR2(8 BYTE)
           ,0                              AS "AcDate"              -- 會計日期 DECIMALD 8 
-          ,'Y'                            AS "L9110Flag"           -- 是否已列印[撥款審核資料表] VARCHAR2(1 BYTE)
+          -- 2022-02-15 Wei 修改: QC1386 
+          -- 未撥款轉N
+          -- 其他Y
+          , CASE
+              WHEN NVL(LMSP."LastBormNo",0) = 0 -- 已撥款序號 DECIMAL 3 
+                   AND NVL(LMSP."LastBormRvNo",900) = 900 -- 已預約序號 DECIMAL 3 
+              THEN 'N'
+           ELSE 'Y'
+           END                            AS "L9110Flag"           -- 是否已列印[撥款審核資料表] VARCHAR2(1 BYTE)
           ,'0000'                         AS "BranchNo"
           ,''                             AS "ApprovedLevel"       -- 核准層級 VARCHAR2(1 BYTE)
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  

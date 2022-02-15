@@ -3,6 +3,8 @@ package com.st1.itx.db.repository.online;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
@@ -62,10 +64,6 @@ public interface JobMainRepository extends JpaRepository<JobMain, JobMainId> {
   // (月底日日終批次)維護 MonthlyFacBal 額度月報工作檔
   @Procedure(value = "\"Usp_L9_MonthlyFacBal_Upd\"")
   public void uspL9MonthlyfacbalUpd(int tbsdyf,  String empNo);
-
-  // (月底日日終批次)維護 Ias39Loan34Data 每月IAS39放款34號公報資料檔
-  @Procedure(value = "\"Usp_L7_Ias39Loan34Data_Upd\"")
-  public void uspL7Ias39loan34dataUpd(int tbsdyf,  String empNo);
 
   // (月底日日終批次)維護 JcicMonthlyLoanData 聯徵放款月報資料檔
   @Procedure(value = "\"Usp_L8_JcicMonthlyLoanData_Upd\"")

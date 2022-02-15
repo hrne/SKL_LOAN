@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -510,22 +513,6 @@ em = null;
       jobMainReposHist.uspL9MonthlyfacbalUpd(tbsdyf,  empNo);
    else
       jobMainRepos.uspL9MonthlyfacbalUpd(tbsdyf,  empNo);
-  }
-
-  @Override
-  public void Usp_L7_Ias39Loan34Data_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
-    String dbName = "";
-    
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL7Ias39loan34dataUpd(tbsdyf,  empNo);
-    else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL7Ias39loan34dataUpd(tbsdyf,  empNo);
-    else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL7Ias39loan34dataUpd(tbsdyf,  empNo);
-   else
-      jobMainRepos.uspL7Ias39loan34dataUpd(tbsdyf,  empNo);
   }
 
   @Override

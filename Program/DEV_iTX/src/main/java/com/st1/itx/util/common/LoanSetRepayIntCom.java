@@ -135,13 +135,17 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setIntCalcCode(t.getIntCalcCode());// 計息方式 1:按日計息 2:按月計息
 		// 利息提存
 		// 1.短擔以日計算
-		// 2.中長擔以月計算
+		// 2.中長擔，已到期按月、未到期按日
 		if (iIntEndCode == 2) {
 			if (tFacMain.getAcctCode().equals("310")) {
 				loanCalcRepayIntCom.setIntCalcCode("1");
 			} else {
 				if (tFacMain.getAcctCode().equals("320") || tFacMain.getAcctCode().equals("330")) {
-					loanCalcRepayIntCom.setIntCalcCode("2");
+					if (t.getNextPayIntDate() >= iIntEndDate) {
+						loanCalcRepayIntCom.setIntCalcCode("1");
+					} else {
+						loanCalcRepayIntCom.setIntCalcCode("2");
+					}
 				}
 			}
 			this.info("Caculate log Set ... 戶號= " + t.getCustNo() + "-" + t.getFacmNo() + "-" + t.getBormNo()

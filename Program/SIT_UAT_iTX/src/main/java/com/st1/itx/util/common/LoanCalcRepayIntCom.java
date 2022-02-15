@@ -2016,7 +2016,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	}
 
 	private void logInputRoutine() {
-		this.info(" Caculate log Input ... CustNo-FacmNo-BormNo= " + iCustNo + "-" + iFacmNo + "-" + iBormNo + " , 結案記號 = "
+		this.info(" Caculate log Input ... 戶號= " + iCustNo + "-" + iFacmNo + "-" + iBormNo + " , 結案記號 = "
 				+ iCaseCloseFlag + " , 部分償還本金 = " + iExtraRepay + " , 部分償還本金是否內含利息 = " + iExtraRepayFlag
 				+ " , 本次繳息期數 = " + iTerms + " , 計算起日 = " + iIntStartDate + " , 計算止日 = " + iIntEndDate + " , 幣別 = "
 				+ iCurrencyCode + " , 商品代碼 = " + iProdNo + " , 指標利率代碼 = " + iBaseRateCode + " , 利率區分 = " + iRateCode
@@ -2038,20 +2038,18 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	}
 
 	private void logOutputRoutine() {
-		this.info("Caculate log Output ... CustNo-FacmNo-BormNo " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-		this.info(" 適用利率 = " + oStoreRate + " , 加碼利率 = " + oRateIncr + " , 個別加碼利率 = " + oIndividualIncr + " , 上次還本日 = "
-				+ oPrevRepaidDate + " , 下次還本日 = " + oNextRepayDate + " , 期金 = " + oDueAmt + " , 應還本金總額 = " + oPrincipal
-				+ " , 利息總金額 = " + oInterest + " , 延遲息總額 = " + oDelayInt + " , 違約金總額 = " + oBreachAmt + " , 部分償還金額 = "
-				+ oExtraAmt + " , 本次還本期數 = " + oRepaidPeriod + " , 已繳息期數 = " + oPaidTerms + " , 上次收息日 = "
-				+ oPrevPaidIntDate + " ,  下次收息日 = " + oNextPayIntDate + " , 計息筆數 = " + oCalcCount + " , 計息後餘額 = "
-				+ oLoanBal);
+		this.info("Caculate log Output ... 戶號= " + iCustNo + "-" + iFacmNo + "-" + iBormNo + ", 適用利率 = " + oStoreRate
+				+ " , 加碼利率 = " + oRateIncr + " , 個別加碼利率 = " + oIndividualIncr + " , 上次還本日 = " + oPrevRepaidDate
+				+ " , 下次還本日 = " + oNextRepayDate + " , 期金 = " + oDueAmt + " , 應還本金總額 = " + oPrincipal + " , 利息總金額 = "
+				+ oInterest + " , 延遲息總額 = " + oDelayInt + " , 違約金總額 = " + oBreachAmt + " , 部分償還金額 = " + oExtraAmt
+				+ " , 本次還本期數 = " + oRepaidPeriod + " , 已繳息期數 = " + oPaidTerms + " , 上次收息日 = " + oPrevPaidIntDate
+				+ " ,  下次收息日 = " + oNextPayIntDate + " , 計息筆數 = " + oCalcCount + " , 計息後餘額 = " + oLoanBal);
 
 		for (int i = 0; i <= wkCalcVoCount; i++) {
 			CalcRepayIntVo tCalcRepayIntVo = lCalcRepayIntVo.get(i);
-			this.info("Caculate log 期數編號 = " + tCalcRepayIntVo.getTermNo() + ", 種類 = " + tCalcRepayIntVo.getType() + ", 計算金額 = "
-					+ tCalcRepayIntVo.getAmount() + ", 計算起日 = " + tCalcRepayIntVo.getStartDate() + ", 計算止日 = "
-					+ tCalcRepayIntVo.getEndDate() + ", 計算日數 = " + tCalcRepayIntVo.getDays() + ", 計算利率 = "
-					+ tCalcRepayIntVo.getStoreRate() + ", 加碼利率 = " + tCalcRepayIntVo.getRateIncr() + ", 個別加碼利率 = "
+			this.info("Caculate log 期數編號 = " + tCalcRepayIntVo.getTermNo() + ", 種類 = " + tCalcRepayIntVo.getType()
+					+ ", 計算金額 = " + tCalcRepayIntVo.getAmount() + ", 計算起日 = " + tCalcRepayIntVo.getStartDate()
+					+ ", 計算止日 = " + tCalcRepayIntVo.getEndDate() + ", 計算日數 = " + tCalcRepayIntVo.getDays() + ", 計算利率 = "
 					+ tCalcRepayIntVo.getIndividualIncr() + ", 應還本金 = " + tCalcRepayIntVo.getPrincipal() + ", 利息 = "
 					+ tCalcRepayIntVo.getInterest() + ", 違約金 = " + tCalcRepayIntVo.getBreachAmt() + ", 違約日數 = "
 					+ tCalcRepayIntVo.getOdDays() + ", 延遲息 = " + tCalcRepayIntVo.getDelayInt() + ", 期金 = "

@@ -100,12 +100,12 @@ public class LM042Report extends MakeReport {
 
 	}
 
-	/*
+	/**
 	 * 執行報表產出
 	 * @param titaVo
 	 * @param lastYMD 上月底日
 	 * @param thisYMD 當月底日
-	 * **/
+	 * */
 	public boolean exec(TitaVo titaVo, int lastYMD, int thisYMD) throws LogicException {
 		this.info("LM042Report.exportExcel");
 
@@ -129,6 +129,10 @@ public class LM042Report extends MakeReport {
 		return true;
 	}
 
+	/**
+	 * 輸出表單"統計數" 
+	 * @param titaVo
+	 */
 	private void exportFindStatistics(TitaVo titaVo) throws LogicException {
 
 		List<Map<String, String>> statisticsList1 = null;
@@ -430,12 +434,17 @@ public class LM042Report extends MakeReport {
 
 	}
 
+	/**
+	 * 輸出表單"明細表"
+	 * @param titaVo 
+	 * @param tYMD 當月底日
+	 * */
 	private void exportLoanSchedule(TitaVo titaVo, int tYMD) throws LogicException {
 		makeExcel.setSheet("明細表");
 
 		makeExcel.setValue(2, 2, this.showRocDate(tYMD, 6), "C");
 
-		// 一般放款-非利關-不動產 (缺扣除備抵呆帳)
+		// (缺扣除備抵呆帳)
 		cN1Total = cNToTalAmt.subtract(cNloseToTalAmt);
 		makeExcel.setValue(5, 3, cN1Total, "#,##0");
 
@@ -475,10 +484,17 @@ public class LM042Report extends MakeReport {
 		BigDecimal loss = BigDecimal.ZERO;
 		makeExcel.setValue(28, 1, "註：各類放款總餘額(含催收款)已扣除備抵呆帳(" + loss + ")。");
 		
+		//更新金額
 		updateData(titaVo, iYear * 100 + iMonth);
 
 	}
 
+	/**
+	 * 輸出表單"RBC"
+	 * @param titaVo
+	 * @param lYMD 上月底日
+	 * @param tYMD 當月底日
+	 * */
 	private void exportRBC(TitaVo titaVo, int lYMD, int tYMD) throws LogicException {
 
 		makeExcel.setSheet("YYYMMRBC", (tYMD / 100) + "RBC");
@@ -515,12 +531,13 @@ public class LM042Report extends MakeReport {
 		}
 
 		if (leYMlm042RBCList.size() > 0 || lYMlm042RBCList.size() > 0 || tYMlm042RBCList.size() > 0) {
+			
 			dataProcess(leYMlm042RBCList, 0);
 			dataProcess(lYMlm042RBCList, 1);
 			dataProcess(tYMlm042RBCList, 2);
-			// 明天處理公事重新整理
 
 		}
+		
 		BigDecimal loss = BigDecimal.ZERO;
 		makeExcel.setValue(26, 1, "註1：各類放款總餘額(含催收款)已扣除備抵損失 （ " + loss + "）。");
 
@@ -669,6 +686,12 @@ public class LM042Report extends MakeReport {
 
 	}
 
+	/**
+	 * 更新各項目金額
+	 * @param titaVo
+	 * @param yearMonth 年月
+	 *  
+	 * */
 	private void updateData(TitaVo titaVo, int yearMonth) {
 
 		try {
@@ -705,7 +728,16 @@ public class LM042Report extends MakeReport {
 		}
 
 	}
-
+	
+	/**
+	 * 更新金額
+	 * @param titaVo
+	 * @param yearMonth 年月
+	 * @param loanType 放款類型
+	 * @param loanItem 放款項目
+	 * @param relatedCode 是否為利害關係人
+	 * @param amt 金額
+	 * */
 	private void updateAmt(TitaVo titaVo, int yearMonth, String loanType, String loanItem, String relatedCode,
 			BigDecimal amt) throws LogicException {
 		MonthlyLM042RBC cMonthlyLM042RBC = new MonthlyLM042RBC();
@@ -732,10 +764,7 @@ public class LM042Report extends MakeReport {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else {
-				this.info(
-						"不用更新：" + cMonthlyLM042RBC.getLoanItem() + "-" + amt + "=" + cMonthlyLM042RBC.getLoanAmount());
-			}
+			} 
 		}
 	}
 

@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -597,6 +599,24 @@ public interface AcDetailService {
    * @return Slice AcDetail AcDetail of List
    */
   public Slice<AcDetail> SubBookTitaSecNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaSecNo_7, String titaSecNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcNoCode = ,AND AcSubCode =  ,AND AcDate &gt;= ,AND AcDate &lt;= 
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acNoCode_4 acNoCode_4
+   * @param acSubCode_5 acSubCode_5
+   * @param acDate_6 acDate_6
+   * @param acDate_7 acDate_7
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> acdtlAcDateRange2(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, int acDate_6, int acDate_7, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By AcDetail

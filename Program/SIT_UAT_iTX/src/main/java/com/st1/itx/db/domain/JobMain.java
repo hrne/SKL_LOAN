@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * JobMain 批次工作主檔<br>
@@ -26,7 +30,7 @@ public class JobMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5514439016490269734L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private JobMainId jobMainId;
@@ -57,7 +61,7 @@ public class JobMain implements Serializable {
   private java.sql.Timestamp endTime;
 
   // 狀態記號
-  /* U : 執行中F : 失敗S : 成功 */
+  /* U:執行中F:失敗S:成功 */
   @Column(name = "`Status`", length = 1)
   private String status;
 
@@ -185,9 +189,9 @@ public class JobMain implements Serializable {
 
 /**
 	* 狀態記號<br>
-	* U : 執行中
-F : 失敗
-S : 成功
+	* U:執行中
+F:失敗
+S:成功
 	* @return String
 	*/
   public String getStatus() {
@@ -196,9 +200,9 @@ S : 成功
 
 /**
 	* 狀態記號<br>
-	* U : 執行中
-F : 失敗
-S : 成功
+	* U:執行中
+F:失敗
+S:成功
   *
   * @param status 狀態記號
 	*/

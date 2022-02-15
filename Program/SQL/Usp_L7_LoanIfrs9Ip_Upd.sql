@@ -3,12 +3,12 @@ CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Ip_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Ip 每月IFRS9欄位清單9
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_LoanIfrs9Ip_Upd"(20201231,'System');
+-- 執行方式：EXEC "Usp_L7_LoanIfrs9Ip_Upd"(20201231,'System',0);
 --
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
-    EmpNo          IN  VARCHAR2    -- 經辦
---    NewAcFg        IN  INT         -- 0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
+    EmpNo          IN  VARCHAR2,   -- 經辦
+    NewAcFg        IN  INT         -- 0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
 )
 AS
 BEGIN
@@ -293,8 +293,14 @@ BEGIN
                 || trim(to_char(NVL(F."LoanTermMm",0),'00'))
                 || trim(to_char(NVL(F."LoanTermDd",0),'00'))
                                                      AS "LoanTer"           -- 合約期限
-         , CASE WHEN NVL(M."IrrevocableFlag",0) = 1 THEN '91300000'
-                ELSE '91500000'
+         , CASE WHEN NewAcFg = 0 THEN
+                  CASE WHEN NVL(M."IrrevocableFlag",0) = 1 THEN '91300000'  -- 不可撤銷放款承諾
+                       ELSE '91500000'                                      -- 可撤銷放款承諾
+                  END
+                ELSE
+                  CASE WHEN NVL(M."IrrevocableFlag",0) = 1 THEN '90800000000'
+                       ELSE '90900000000'
+                  END
            END                                       AS "AcCode"            -- 備忘分錄會計科目
          , 1                                         AS "AcCurcd"           -- 記帳幣別 1=台幣 2=美元 3=澳幣 4=人民幣 5=歐元
          , CASE 
@@ -313,7 +319,6 @@ BEGIN
     FROM   "Ifrs9FacData" M
       LEFT JOIN "FacMain"  F   ON  F."CustNo" = M."CustNo"
                               AND  F."FacmNo" = M."FacmNo"
-      LEFT JOIN "CdAcCode"     ON  "CdAcCode"."AcctCode"  = F."AcctCode"
       LEFT JOIN ( SELECT "CustNo",
                          MAX( CASE WHEN "AcSubBookCode" = '201' THEN 'A'    -- 資金來源
                                    ELSE ' ' END) AS "ACTFSC" 
