@@ -1224,7 +1224,7 @@ INVOKEJS(SHOW,p9,0)
 #OTypeCode=X,1,L
 
 #OTypeCodeX=x,20,L
-T(H,#TypeCode,#TypeCodeHelp)
+T(H,#OTypeCode,#TypeCodeHelp)
 
 !戶名
 #OCustName=x,2.50,L
@@ -1359,7 +1359,6 @@ T(H,#OOEnable,#EnableHelp)
 #FunCd
 #CustId
 #TypeCode
-#OTypeCode
 #BranchNo
 #CustName
 #Birthday
@@ -1412,6 +1411,7 @@ T(H,#OOEnable,#EnableHelp)
 <sub type="TOM">
 TXFORM=L1102
 #OCustId
+#OTypeCode
 #OCustName
 #OBirthday
 #OCustTypeCode

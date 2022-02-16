@@ -1405,7 +1405,7 @@ INVOKEJS(SHOW,p9,0)
 #OTypeCode=X,1,L
 
 #OTypeCodeX=x,20,L
-T(H,#TypeCode,#TypeCodeHelp)
+T(H,#OTypeCode,#TypeCodeHelp)
 
 
 !戶名

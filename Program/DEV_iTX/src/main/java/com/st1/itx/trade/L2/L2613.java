@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,7 @@ public class L2613 extends TradeBuffer {
 			// 法拍費用檔無資料
 			throw new LogicException(titaVo, "E0001", "法拍費用檔"); // 查無資料
 		}
+		List<LinkedHashMap<String, String>> chkOccursList = null;
 		for (ForeclosureFee tForeclosureFee : lForeclosureFee) {
 			// new occurs
 			OccursList occursList = new OccursList();
@@ -136,18 +138,21 @@ public class L2613 extends TradeBuffer {
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 
-//!	ACDETAIL AcDate	會計日期
-//! ACDETAIL CustNo	戶號
-//! CUSTMAIN 戶名
-//! 收件日期
-//! 單據日期
-//! 科目
-//! 法拍費用
-//! 記錄號碼
-//! acdetail    SlipNo	傳票號碼 同登放序號會有兩筆分錄序號 分別為借貸
-//! acdetail    SlipNo	傳票號碼 同登放序號會有兩筆分錄序號 分別為借貸
-		}
+			
+			chkOccursList = this.totaVo.getOccursList();
+			
+			if (lForeclosureFee.size() >= this.limit ) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
 
+		} // for
+
+		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
+			throw new LogicException("E2003", ""); // 查無資料
+		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

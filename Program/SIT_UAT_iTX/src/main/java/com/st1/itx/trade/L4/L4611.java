@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
@@ -367,7 +368,12 @@ public class L4611 extends TradeBuffer {
 		acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 		acReceivable.setFacmNo(tInsuRenew.getFacmNo());
 		acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-		acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
+		acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
+		tInsuRenew.setInsuYearMonth(insuYearMonth);
+		TempVo tTempVo = new TempVo();
+		tTempVo.clear();
+		tTempVo.putParam("InsuYearMonth", tInsuRenew.getInsuYearMonth());
+		acReceivable.setJsonFields(tTempVo.getJsonString());
 		acReceivableList.add(acReceivable);
 		acReceivableCom.setTxBuffer(this.getTxBuffer());
 		acReceivableCom.mnt(flag, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除

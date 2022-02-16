@@ -157,7 +157,7 @@ public class L3916 extends TradeBuffer {
 			wkOvduDate = tLoanOverdue.getOvduDate(); // 催收開始日
 			wkOvduAmt = tLoanOverdue.getOvduAmt(); // 轉催收金額
 			wkNplRepay = tLoanOverdue.getOvduAmt()
-					.subtract(tLoanOverdue.getOvduBal().subtract(tLoanOverdue.getBadDebtAmt())); // 催收還款金額
+					.subtract(tLoanOverdue.getOvduBal()).subtract(tLoanOverdue.getBadDebtAmt()); // 催收還款金額
 			wkBadDebtAmt = wkBadDebtAmt.add(tLoanOverdue.getBadDebtAmt()); // 轉呆帳金額
 			wkBadDebtBal = wkBadDebtBal.add(tLoanOverdue.getBadDebtBal());// 呆帳餘額
 			wkOvduSituaction = tLoanOverdue.getOvduSituaction(); // 催收處理情形

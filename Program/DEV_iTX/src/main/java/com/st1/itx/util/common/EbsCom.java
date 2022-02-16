@@ -1,7 +1,12 @@
 package com.st1.itx.util.common;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -62,7 +67,7 @@ public class EbsCom extends CommBuffer {
 		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
 
 		String ebsFg = tSystemParas.getEbsFg();
-		
+
 		this.info("EbsCom post ebsFg = " + ebsFg);
 
 		if (ebsFg == null || ebsFg.isEmpty() || !ebsFg.equals("Y")) {
@@ -73,6 +78,21 @@ public class EbsCom extends CommBuffer {
 		String slipMediaUrl = tSystemParas.getEbsUrl();
 
 		String ebsAuth = tSystemParas.getEbsAuth();
+		
+		// 測試連線
+		URL url = new URL(slipMediaUrl);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty("Content-Type", "application/json");
+		conn.setRequestMethod("POST");
+		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(ebsAuth.getBytes()));
+		conn.setRequestProperty("Authorization", basicAuth);
+		conn.setDoOutput(true);
+		conn.setDoInput(true);
+		OutputStream os = conn.getOutputStream();
+		OutputStreamWriter out = new OutputStreamWriter(os, "utf-8");
+		this.info("requestJO.toString() = " + requestJO.toString());
+		out.write(requestJO.toString());
+		out.flush();
 
 		HttpEntity<String> request = setRequest(ebsAuth, requestJO);
 

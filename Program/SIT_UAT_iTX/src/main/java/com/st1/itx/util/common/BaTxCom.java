@@ -68,6 +68,9 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal tmAmt = BigDecimal.ZERO; // tmAmt 需暫收抵繳金額
 	private BigDecimal loanBal = BigDecimal.ZERO; // 還款前本金餘額
 	private BigDecimal tavAmt = BigDecimal.ZERO; // tavAmt 可暫收抵繳金額
+	private BigDecimal shortAmt = BigDecimal.ZERO; // 短繳(正值)
+	private BigDecimal overAmt = BigDecimal.ZERO; // 溢繳(正值)
+	private int overRpFacmNo = 0; // 溢短繳額度;
 
 // isPayAllFee 是否全部回收費用
 	// true->回收全部費用，false 回收金額足夠的費用
@@ -79,8 +82,8 @@ public class BaTxCom extends TradeBuffer {
 	// 未到期火險費用條件 0.全列已到期、1.續約保單起日 > 入帳月、2.續約保單起日 >=入帳日,
 	private int isUnOpenfireFee = 0;
 
-// isTermAdvance 是否含未到期期款
-	private boolean isTermAdvance = false;
+// isBatchRepay 是否為整批入帳
+	private boolean isBatchRepay = false;
 
 // isAcLoanInt 是否利息提存
 	private boolean isAcLoanInt = false;
@@ -125,6 +128,9 @@ public class BaTxCom extends TradeBuffer {
 
 //  initialize
 	private void init() {
+
+		this.isBatchRepay = false; // isBatchRepay 是否為整批入帳
+
 		this.baTxVo = new BaTxVo();
 		this.baTxList = new ArrayList<BaTxVo>();
 		this.rvList = new ArrayList<AcReceivable>();
@@ -133,6 +139,10 @@ public class BaTxCom extends TradeBuffer {
 		this.tmAmt = BigDecimal.ZERO; // tmAmt 需暫收抵繳金額
 		this.loanBal = BigDecimal.ZERO; // 還款前本金餘額
 		this.tavAmt = BigDecimal.ZERO; // tavAmt 可暫收抵繳金額
+		this.shortAmt = BigDecimal.ZERO; // 短繳(正值)
+		this.overAmt = BigDecimal.ZERO; // 溢繳(正值)
+		this.overRpFacmNo = 0; // 溢短繳額度;
+
 		// 費用、短繳
 		this.shortfall = BigDecimal.ZERO; // 累短收
 		this.shortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
@@ -157,6 +167,7 @@ public class BaTxCom extends TradeBuffer {
 		this.interest = BigDecimal.ZERO; // 利息
 		this.delayInt = BigDecimal.ZERO; // 延滯息
 		this.breachAmt = BigDecimal.ZERO; // 違約金
+			BigDecimal shortAmtLimit = BigDecimal.ZERO;// 短繳限額計算
 
 		// 還款金額、日期
 		this.tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
@@ -222,9 +233,6 @@ public class BaTxCom extends TradeBuffer {
 		} else {
 			isUnOpenfireFee = 2;
 		}
-
-		// isTermAdvance 是否為含未到期期款 ->含
-		this.isTermAdvance = true;
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = false;
@@ -346,8 +354,8 @@ public class BaTxCom extends TradeBuffer {
 			isUnOpenfireFee = 2;
 		}
 
-		// isTermAdvance 是否含提前繳期款 ->不含(依會計日及批次預收期數計算)
-		this.isTermAdvance = false;
+		// isBatchRepay 是否為整批入帳
+		this.isBatchRepay = true;
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = true;
@@ -426,9 +434,9 @@ public class BaTxCom extends TradeBuffer {
 				this.info("sort A: " + ba.toString());
 			}
 			settleByPayintDate();
-			// 無可回收計算全部欠繳
+			// 無可回收算全部已到期本息
 			if (this.repayIntDate == 0) {
-				settleAcctAmt(5);
+				settleByTbsdy();
 			}
 		}
 		if (iRepayType == 2 || iRepayType == 3) {
@@ -471,9 +479,6 @@ public class BaTxCom extends TradeBuffer {
 		// iPayintDate 利息計算止日 ==> 次月月初日
 
 		this.baTxList = new ArrayList<BaTxVo>();
-
-		// isTermAdvance 是否含提前繳期款
-		this.isTermAdvance = true;
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = true;
@@ -518,9 +523,6 @@ public class BaTxCom extends TradeBuffer {
 		// 未到期火險費用條件 1：fireFee(續約保單起日 <= 入帳月)、 unOpenfireFee(續約保單起日 > 入帳月)
 		isUnOpenfireFee = 1;
 
-		// isTermAdvance 是否含提前繳期款
-		this.isTermAdvance = true;
-
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = false;
 
@@ -555,9 +557,6 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom getDueAmt ..." + iEntryDate + "/ " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		init();
 
-		// isTermAdvance 是否含提前繳期款
-		this.isTermAdvance = true;
-
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = false;
 
@@ -591,9 +590,6 @@ public class BaTxCom extends TradeBuffer {
 			throws LogicException {
 		this.info("BaTxCom cashFlow ...");
 		init();
-
-		// isTermAdvance 是否含提前繳期款
-		this.isTermAdvance = true;
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = false;
@@ -808,20 +804,20 @@ public class BaTxCom extends TradeBuffer {
 						wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
 								ln.getSpecificDd(), ln.getPrevPayIntDate());
 					}
-					// 是否含提前繳期款
-					if (this.isTermAdvance) {
-						// 可回收期數 = 計算至入帳日/應繳日的應繳期數
-						wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
-								ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-								wkPayIntDate);
-
-					} else {
+					// isBatchRepay 是否為整批入帳
+					if (this.isBatchRepay) {
 						// 可回收期數 = 可回收期數 + 批次預收期數
 						wkRepayTermNo = loanCom.getTermNo(
 								this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
 								ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
 								this.txBuffer.getTxCom().getTbsdy())
 								+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+					} else {
+						// 可回收期數 = 計算至入帳日/應繳日的應繳期數
+						wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
+								ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+								wkPayIntDate);
+
 					}
 					wkTerms = wkRepayTermNo - wkPrevTermNo;
 				} else {
@@ -1123,6 +1119,7 @@ public class BaTxCom extends TradeBuffer {
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt());
 					this.txBal = this.txBal.subtract(ba.getAcctAmt());
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
+					this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
 				}
 			} else {
 				// 部分回收，可償還餘額比作帳金額大時回收
@@ -1132,6 +1129,25 @@ public class BaTxCom extends TradeBuffer {
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt()); // this.xxBal = this.xxBal - AcctAmt
 					this.txBal = this.txBal.subtract(ba.getAcctAmt()); //
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
+					this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
+				}
+			}
+		}
+	}
+
+	/* 計算全部已到期本息 */
+	private void settleByTbsdy() {
+		this.info("settleByTbsdy");
+		for (BaTxVo ba : this.baTxList) {
+			if (ba.getRepayPriority() == 5 && ba.getAcctAmt().equals(BigDecimal.ZERO)) { // 尚未作帳
+				if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+					ba.setAcctAmt(ba.getUnPaidAmt()); // AcctAmt = UnPaidAmt
+					this.xxBal = this.xxBal.subtract(ba.getAcctAmt());
+					this.txBal = this.txBal.subtract(ba.getAcctAmt());
+					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
+					if (this.overRpFacmNo == 0) {
+						this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
+					}
 				}
 			}
 		}
@@ -1188,6 +1204,7 @@ public class BaTxCom extends TradeBuffer {
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt());
 					this.txBal = this.txBal.subtract(ba.getAcctAmt());
+					this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
 				}
 			}
 		}
@@ -1223,18 +1240,19 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/* 計算溢(C)短(D)繳 */
-	private void settleOverAmt(int CustNo, int FacmNo, TitaVo titaVo) {
-		// 無額度 ---> 抓最小
-		int rpFacmNo = FacmNo;
-		if (FacmNo == 0)
-			rpFacmNo = gettingRpFacmNo(CustNo, titaVo);
-		else
-			rpFacmNo = FacmNo;
+	private void settleOverAmt(int iCustNo, int iFacmNo, TitaVo titaVo) {
+		// 溢短繳額度;
+		if (iFacmNo > 0) {
+			this.overRpFacmNo = iFacmNo;
+		}
+		if (this.overRpFacmNo == 0) {
+			this.overRpFacmNo = gettingRpFacmNo(iCustNo, titaVo);
+		}
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(4); // 4.本期溢(+)短(-)繳
 		baTxVo.setRepayType(0);
-		baTxVo.setCustNo(CustNo);
-		baTxVo.setFacmNo(rpFacmNo);
+		baTxVo.setCustNo(iCustNo);
+		baTxVo.setFacmNo(this.overRpFacmNo);
 		baTxVo.setBormNo(0);
 		baTxVo.setRvNo(" ");
 		baTxVo.setAcctCode("TAV");
@@ -1245,74 +1263,47 @@ public class BaTxCom extends TradeBuffer {
 			baTxVo.setUnPaidAmt(this.txBal);
 			baTxVo.setAcctAmt(this.txBal);
 			this.tempAmt = this.tempAmt.add(this.txBal);
-			this.info("溢繳金額= " + baTxVo.getUnPaidAmt());
+			this.overAmt = baTxVo.getAcctAmt();
+			this.info("溢繳金額= " + this.overAmt);
 		} else {
 			baTxVo.setDbCr("D");
 			baTxVo.setUnPaidAmt(BigDecimal.ZERO.subtract(this.xxBal));
-			this.info("短繳金額= " + baTxVo.getUnPaidAmt());
+			this.shortAmt = baTxVo.getUnPaidAmt();
+			this.info("短繳金額= " + this.shortAmt);
 		}
 		this.baTxList.add(baTxVo);
 	}
 
 	private int gettingRpFacmNo(int CustNo, TitaVo titaVo) {
-		// 無應繳資料 ---> 抓資負明細科目
+		// 無應繳資料 ---> 業務科目記號 1:資負明細科目，最大
 		int rpFacmNo = 0;
-		if (this.baTxList == null || this.baTxList.size() == 0) {
+		if (this.baTxList != null && this.baTxList.size() > 0) {
+			// 計息第一筆
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 2) {
+					rpFacmNo = ba.getFacmNo();
+					break;
+				}
+			}
+			// 其他第一筆
+			if (rpFacmNo == 0) {
+				for (BaTxVo ba : this.baTxList) {
+					rpFacmNo = ba.getFacmNo();
+					break;
+				}
+			}
+		}
+		if (rpFacmNo == 0) {
+			// 資負明細科目，額度最大，先找未銷
+			// 0-未銷
 			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, CustNo, 1, 0, 999, 0,
-					Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 1:資負明細科目
+					Integer.MAX_VALUE, titaVo);
 			// 1-已銷
 			if (srvList == null) {
 				srvList = acReceivableService.acrvFacmNoRange(1, CustNo, 1, 0, 999, 0, Integer.MAX_VALUE, titaVo);
 			}
 			if (srvList != null) {
-				rpFacmNo = srvList.getContent().get(0).getFacmNo();
-			}
-		} else {
-			// 計息、至還款應繳日部分繳款
-			for (BaTxVo ba : this.baTxList) {
-				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) == 0 && this.repayIntDate > 0
-						&& ba.getPayIntDate() <= this.repayIntDate) {
-					rpFacmNo = ba.getFacmNo();
-					break;
-				}
-			}
-			// 計息、無帳務
-			for (BaTxVo ba : this.baTxList) {
-				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
-					rpFacmNo = ba.getFacmNo();
-					break;
-				}
-			}
-			// 計息、有帳務、非結案
-			if (rpFacmNo == 0) {
-				for (BaTxVo ba : this.baTxList) {
-					if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0
-							&& ba.getCloseFg() == 0) {
-						rpFacmNo = ba.getFacmNo();
-						break;
-					}
-				}
-			}
-			// 計息
-			if (rpFacmNo == 0) {
-				for (BaTxVo ba : this.baTxList) {
-					if (ba.getDataKind() == 2) {
-						rpFacmNo = ba.getFacmNo();
-						break;
-					}
-				}
-			}
-			// 有帳務
-			for (BaTxVo ba : this.baTxList) {
-				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					rpFacmNo = ba.getFacmNo();
-					break;
-				}
-			}
-			//
-			for (BaTxVo ba : this.baTxList) {
-				rpFacmNo = ba.getFacmNo();
-				break;
+				rpFacmNo = srvList.getContent().get(srvList.getContent().size() - 1).getFacmNo();
 			}
 		}
 		return rpFacmNo;
@@ -1802,4 +1793,30 @@ public class BaTxCom extends TradeBuffer {
 		return terms;
 	}
 
+	/**
+	 * 短繳(正值)
+	 * 
+	 * @return
+	 */
+	public BigDecimal getShortAmt() {
+		return shortAmt;
+	}
+
+	/**
+	 * 溢繳(正值)
+	 * 
+	 * @return
+	 */
+	public BigDecimal getOverAmt() {
+		return overAmt;
+	}
+
+	/**
+	 * 溢短繳額度
+	 * 
+	 * @return
+	 */
+	public int getOverRpFacmNo() {
+		return overRpFacmNo;
+	}
 }

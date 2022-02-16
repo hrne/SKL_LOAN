@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -225,6 +226,10 @@ public class TxBatchCom extends TradeBuffer {
 	private BigDecimal shortAmt = BigDecimal.ZERO;
 //  溢繳金額 
 	private BigDecimal overAmt = BigDecimal.ZERO;
+//  短繳限額
+	private BigDecimal shortAmtLimit = BigDecimal.ZERO;
+	
+	
 //	其他額度暫收可抵繳  
 	private BigDecimal otrTavAmt = BigDecimal.ZERO;
 //  放款餘額(還款前)	
@@ -1110,7 +1115,15 @@ public class TxBatchCom extends TradeBuffer {
 				this.procStsCode = "2"; // 2.人工處理
 				break;
 			}
-			if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
+			// 短繳
+			if (this.shortAmt.compareTo(this.shortAmtLimit) > 0) {
+				// 短繳超過限額
+				if (this.shortAmt.compareTo(this.shortAmtLimit) > 0) {
+					this.checkMsg = "短繳: " + this.shortAmt +" 超過限額:" + this.shortAmtLimit;
+					apendcheckMsgAmounts(tBatxDetail, titaVo);
+					this.procStsCode = "2"; // 2.人工處理
+					break;
+				}
 				if (this.shortAmt.compareTo(this.principal) > 0) {
 					this.checkMsg = "積欠期款: " + this.shortAmt;
 				} else {
@@ -1551,6 +1564,7 @@ public class TxBatchCom extends TradeBuffer {
 
 			this.procStsCode = "3"; // 3.檢核錯誤
 		}
+
 		// 還款應繳日 (期款按期償還)
 		if (this.repayType == 1) {
 			this.repayIntDate = baTxCom.getRepayIntDate();
@@ -1658,22 +1672,6 @@ public class TxBatchCom extends TradeBuffer {
 					this.tavAmt = this.tavAmt.add(baTxVo.getUnPaidAmt());
 					this.tmpAmt = this.tmpAmt.add(baTxVo.getAcctAmt());
 				}
-				// overRpFg 溢短收記號 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
-				if (baTxVo.getDataKind() == 4) {
-					if ("D".equals(baTxVo.getDbCr())) {
-						this.shortAmt = this.shortAmt.add(baTxVo.getUnPaidAmt());
-						this.overRpFacmNo = baTxVo.getFacmNo();
-						this.overRpFg = 1;
-					} else {
-						this.overAmt = this.overAmt.add(baTxVo.getUnPaidAmt());
-						this.overRpFacmNo = baTxVo.getFacmNo();
-						if (isRepayPart) {
-							this.overRpFg = 3;
-						} else {
-							this.overRpFg = 2;
-						}
-					}
-				}
 				if (baTxVo.getDataKind() == 5) {
 					this.otrTavAmt = this.otrTavAmt.add(baTxVo.getUnPaidAmt());
 				}
@@ -1685,8 +1683,41 @@ public class TxBatchCom extends TradeBuffer {
 				this.closeFg = 0;
 			}
 		}
+
+		// 溢短繳
+		this.shortAmt = baTxCom.getShortAmt();// 短繳(正值)
+		this.overAmt = baTxCom.getOverAmt();// 溢繳(正值)
+		this.overRpFacmNo = baTxCom.getOverRpFacmNo();// 溢短繳額度;
+
+		// 溢短收記號 1->短收 2->溢收 3->溢收:整批入帳部分繳 (回收部分額度期款)
+		this.overRpFg = 0;
+		if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
+			this.overRpFg = 1;
+		} else {
+			if (isRepayPart) {
+				this.overRpFg = 3;
+			} else {
+				if (this.overAmt.compareTo(BigDecimal.ZERO) > 0) {
+					this.overRpFg = 2;
+				}
+			}
+		}
+		
+		// 短繳限額
+			// 到期取息(到期繳息還本)
+				// 依 1.還本金額 2.還息金額
+				if (principal.compareTo(BigDecimal.ZERO) > 0) {
+					this.shortAmtLimit = principal.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
+							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+				} else {
+					this.shortAmtLimit = interest.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
+							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+				}
+		
 		// 計算清償違約金
-		if (this.repayType == 3) {
+		if (this.repayType == 3)
+
+		{
 			if ("Y".equals(this.collectFlag)) {
 				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(tDetail.getCustNo(), this.repayFacmNo, 0,
 						iListCloseBreach, titaVo);

@@ -501,6 +501,36 @@ public class L9130Report2022 extends MakeReport {
 
 		if (transferAmt.compareTo(BigDecimal.ZERO) != 0) {
 
+			JSONObject dataJo = new JSONObject();
+
+			try {
+				dataJo.put("GROUP_ID", groupId);
+				dataJo.put("BATCH_DATE", slipDate);
+				dataJo.put("JE_SOURCE_NAME", "LN");
+				dataJo.put("USER_LEDGER_CODE", acBookCode);
+				dataJo.put("CONVENTION", ifrsType);
+				dataJo.put("JOURNAL_NAME", slipNo);
+				dataJo.put("CURRENCY_CODE", currencyCode);
+				dataJo.put("ISSUED_BY", "");
+				dataJo.put("ACCOUNTING_DATE", slipDate);
+				dataJo.put("JE_LINE_NUM", "" + i);
+				dataJo.put("SEGREGATE_CODE", acSubBookCode);
+				dataJo.put("ACCOUNT_CODE", tempAcNoCode);
+				dataJo.put("SUBACCOUNT_CODE", tempAcSubNoCode);
+				dataJo.put("COSTCENTER_CODE", costUnit);
+				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
+				dataJo.put("INTERCOMPANY_CODE", "");
+				dataJo.put("DEPARTMENT_CODE", deptCode);
+				dataJo.put("ENTERED_AMOUNT", transferAmt.negate()); // 寫一筆反向
+				dataJo.put("LINE_DESC", tempSlipRmk);
+				dataJo.put("WRITE_OFF_CODE", tempAcReceivableCode);
+				dataJo.put("RELATIONSHIP", "");
+			} catch (JSONException e) {
+				this.error("L9130Report22 error = " + e.getMessage());
+			}
+
+			journalTbl.put(dataJo);
+			
 			String data = "";
 
 			data += acBookCode + ","; // 帳冊別

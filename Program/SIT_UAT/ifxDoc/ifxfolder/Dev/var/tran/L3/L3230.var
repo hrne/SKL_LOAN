@@ -59,7 +59,7 @@ E(0,@Year,0)
 E(0,@Month,0)
 T(3,@Description, )
 E(0,@BormNo,0)
-E(0,@RemoveNo,0)
+T(3,@RemoveNo, )
 
 <include src="COM.icf::TITLE-RUN.pre"/>
 </sub>

@@ -125,7 +125,7 @@ public class L6903 extends TradeBuffer {
 		}
 		
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
-		this.info("lAcDetail size ="+lAcDetail.size());
+		
 		if (lAcDetail == null || lAcDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}

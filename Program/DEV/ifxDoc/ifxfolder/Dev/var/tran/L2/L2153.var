@@ -598,6 +598,12 @@ T(3,CdCode.ApprovedLevel)
 
 #ApprovedLevelHelp=x,1024,S 
 
+![週期基準0]
+#CDDEF25=x,30,S
+T(3,CdCode.FreqBase2)
+
+#FreqBase2Help=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
@@ -632,13 +638,14 @@ T(2,@BaseRate0Help,#HelpDesc10)
 
 #HelpRim3=X,1,S
 RESET_RIM(#HelpRim3,XXR99)
-S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24)
+S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24,#CDDEF25)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ProdIntCalcCodeHelp,#HelpDesc1)
 T(2,@RateTypeHelp,#HelpDesc2)
 T(2,@BankDeductCdHelp,#HelpDesc3)
 T(2,@ApprovedLevelHelp,#HelpDesc4)
+T(2,@FreqBase2Help,#HelpDesc5)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -971,18 +978,20 @@ C(3,#L2r01AmortizedCode,9,SHOW(#AmortizedCode,#FreqBase)
                           T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp))
 C(3,#L2r01FreqBase,9,$,E(0,@FreqBase,#L2r01FreqBase)
                            T(H,@FreqBaseX,#FreqBase,#FreqBaseHelp))
+T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
+T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
 C(3,#L2r01PayIntFreq,99,SHOW(#PayIntFreq,#PayIntFreqX)
                         HIDE(#LbPayIntFreq)
                        ,HIDE(#PayIntFreq,#PayIntFreqX)
                         SHOW(#LbPayIntFreq)
                         E(0,@PayIntFreq,#L2r01PayIntFreq)
                         X(@LbPayIntFreq,#PayIntFreq)
-                        T(B,@LbPayIntFreq,#LbPayIntFreq+#WkUnitX))
+                        T(B,@LbPayIntFreq,#LbPayIntFreq+#PayIntFreqX))
 C(3,#L2r01RepayFreq,99,SHOW(#RepayFreq,#RepayFreqX)HIDE(#LbRepayFreq)
                       ,HIDE(#RepayFreq,#RepayFreqX)SHOW(#LbRepayFreq)
                        E(0,@RepayFreq,#L2r01RepayFreq)
                        X(@LbRepayFreq,#RepayFreq)
-                       T(B,@LbRepayFreq,#LbRepayFreq+#WkUnitX))
+                       T(B,@LbRepayFreq,#LbRepayFreq+#RepayFreqX))
 T(2,@BaseRateCode,#L2r01BaseRateCode)
 HIDE(#LbFirstRateAdjFreq)
 HIDE(#LbRateAdjFreq)
@@ -1179,9 +1188,7 @@ T(2,@FdRepayFreq,#WkStar)
 T(2,@FdUtilDeadline,#WkStar)
 T(2,@FdAcctFee, )
 T(2,@FdHandlingFee, )
-T(2,@PayIntFreqX,#WkUnitX)
 T(F,@PayIntFreqX,0)
-T(2,@RepayFreqX,#WkUnitX)
 T(F,@RepayFreqX,0)
 T(2,@GracePeriodX,#WkMonthX)
 T(F,@GracePeriodX,0)
@@ -1341,6 +1348,7 @@ C(3,#AmortizedCode,4,V(1,2,3),$)
 
 #FreqBaseX=X,8,L
 T(H,#FreqBase,#FreqBaseHelp)
+T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
 
 ![繳息週期]
 #FdPayIntFreq=X,2,L
@@ -1358,7 +1366,7 @@ C(3,#PayIntFreq,0,E(0,1),$)
 
 #LbPayIntFreq=X,9,L
 X(#PayIntFreq)
-T(B,#LbPayIntFreq+#WkUnitX)
+T(B,#LbPayIntFreq+#PayIntFreqX)
 
 #PayIntFreqX=X,7,L
 
@@ -1408,11 +1416,13 @@ C(3,#RepayFreq,0,E(0,1),$)
 
 #LbRepayFreq=X,9,L
 X(#RepayFreq)
-T(B,#LbRepayFreq+#WkUnitX)
+T(B,#LbRepayFreq+#RepayFreqX)
 
 #RepayFreqX=X,7,L
 C(3,#RepayFreq,0,T(3,無)HIDE(#RepayFreq)T(3,@FdRepayFreq, ),
-                 T(2,#WkUnitX)T(3,@FdRepayFreq,*)SHOW(#RepayFreq))
+                 T(2,#RepayFreqX)T(3,@FdRepayFreq,*)SHOW(#RepayFreq))
+C(3,#RepayFreq,0,$,T(H,@RepayFreqX,#FreqBase,#FreqBase2Help))
+
 
 ![動支期限]
 !必須輸入,動支期限須大於准駁日期
@@ -2025,7 +2035,7 @@ T(3,      Y)
 #Introducer=X,6,I
 
 #BUF11B=X,7,S
-T(2,#Introducer+Y)
+T(2,#Introducer)
 
 #BIND11B=X,1,S
 BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF11B;ntxbuf5=type<-1:Introducer<-OOEmployeeNo})
@@ -2064,7 +2074,7 @@ T(3,      Y)
 #FireOfficer=X,6,I
 
 #BUF12B=X,7,S
-T(2,#FireOfficer+Y)
+T(2,#FireOfficer)
 
 #BIND12B=X,1,S
 BIND(#BTN12,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF12B;ntxbuf5=type<-1:FireOfficer<-OOEmployeeNo})
@@ -2091,7 +2101,7 @@ T(3,      Y)
 #Estimate=X,6,I
 
 #BUF13B=X,7,S
-T(2,#Estimate+Y)
+T(2,#Estimate)
 
 #BIND13B=X,1,S
 BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF13B;ntxbuf5=type<-1:Estimate<-OOEmployeeNo})
@@ -2119,7 +2129,7 @@ T(3,      Y)
 @V(7)
 
 #BUF14B=X,7,S
-T(2,#CreditOfficer+Y)
+T(2,#CreditOfficer)
 
 #BIND14B=X,1,S
 BIND(#BTN14,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF14B;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo})
@@ -2147,7 +2157,7 @@ T(3,      Y)
 #BusinessOfficer=X,6,I
 
 #BUF16B=X,7,S
-T(2,#BusinessOfficer+Y)
+T(2,#BusinessOfficer)
 
 #BIND16B=X,1,S
 BIND(#BTN16,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF16B;ntxbuf5=type<-1:BusinessOfficer<-OOEmployeeNo})
@@ -2191,7 +2201,7 @@ C(3,#ApprovedLevel,9,S,$)
 @V(7)
 
 #BUF17B=X,7,S
-T(2,#Supervisor+Y)
+T(2,#Supervisor)
 
 #BIND17B=X,1,S
 BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF17B;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
@@ -2222,7 +2232,7 @@ C(3,#Hide6Flag,0,CALL(#HideP6),$)
 #InvestigateOfficerLb=X,6,L
 
 #BUF19B=X,7,S
-T(2,#InvestigateOfficer+Y)
+T(2,#InvestigateOfficer)
 
 #BIND19B=X,1,S
 BIND(#BTN19,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF19B;ntxbuf5=type<-1:InvestigateOfficer<-OOEmployeeNo})
@@ -2251,7 +2261,7 @@ C(3,#Hide6Flag,0,CALL(#HideP6),$)
 #EstimateReviewLb=X,6,L
 
 #BUF20B=X,7,S
-T(2,#EstimateReview+Y)
+T(2,#EstimateReview)
 
 #BIND20B=X,1,S
 BIND(#BTN20,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF20B;ntxbuf5=type<-1:EstimateReview<-OOEmployeeNo})

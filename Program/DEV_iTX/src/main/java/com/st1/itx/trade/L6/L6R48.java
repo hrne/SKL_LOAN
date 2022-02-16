@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxErrCode;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 
