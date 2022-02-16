@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu May 28 14:11:13 CST 2020
+tomcat-jdbc-9.0.34.jar>central=
+tomcat-jdbc-9.0.34.pom>central=
+tomcat-jdbc-9.0.34-sources.jar>central=
