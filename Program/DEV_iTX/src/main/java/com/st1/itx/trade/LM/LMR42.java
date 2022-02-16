@@ -17,6 +17,7 @@ import com.st1.itx.db.domain.MonthlyLM042RBC;
 import com.st1.itx.db.domain.MonthlyLM042RBCId;
 import com.st1.itx.db.service.MonthlyLM042RBCService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /* Tita
@@ -37,9 +38,13 @@ public class LMR42 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 
+	@Autowired
+	DateUtil dateUtil;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LM042 ");
+			
 		this.totaVo.init(titaVo);
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 

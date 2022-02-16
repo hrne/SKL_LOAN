@@ -1,7 +1,9 @@
 package com.st1.itx.trade.LM;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +54,10 @@ public class LM042p extends TradeBuffer {
 		this.info("active LM042p");
 		this.totaVo.init(titaVo);
 
-//		this.info("LMR42LoanItem3 =" + titaVo.getParam("LoanItem3"));
-//		this.info("LMR42RiskFactor3 =" + titaVo.getParam("RiskFactor3"));
-
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
-		int tYMD = this.txBuffer.getTxCom().getMfbsdy();
-		int lYMD = this.txBuffer.getTxCom().getLmndy();
+		int tYMD = ymd(yearMonth, 0);//本月底日
+		int lYMD = ymd(yearMonth, -1);//上月底日
 
 		checkAndUpdateData(titaVo, yearMonth);
 
@@ -91,8 +90,18 @@ public class LM042p extends TradeBuffer {
 		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
 
 		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
-		// null 表示無此月份
+		
+		// 判斷有無當月資料
+		if (sMonthlyLM042RBC == null) {
+			this.info("insert data");
+			// 新增當月資料
+			insertData(titaVo, yearMonth);
 
+			// 新增後再次搜尋
+			sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
+		}
+		
+		
 		List<MonthlyLM042RBC> lMonthlyLM042RBC = sMonthlyLM042RBC == null ? null : sMonthlyLM042RBC.getContent();
 
 		this.info("lMonthlyLM042RBC=" + lMonthlyLM042RBC.toString());
@@ -139,7 +148,6 @@ public class LM042p extends TradeBuffer {
 		MonthlyLM042RBC mMonthlyLM042RBC = new MonthlyLM042RBC();
 		MonthlyLM042RBCId monthlyLM042RBCId = new MonthlyLM042RBCId();
 
-		
 		for (int i = 1; i <= 2; i++) {
 			mMonthlyLM042RBC = new MonthlyLM042RBC();
 			monthlyLM042RBCId = new MonthlyLM042RBCId();
@@ -215,8 +223,32 @@ public class LM042p extends TradeBuffer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		this.info("insert done");
 
+	}
+
+	/**
+	 * 取得月底日
+	 * @param yearMonth 西元年月(YYYYMM)
+	 * @paran num 單位(0=本月底日,1=下月底日,-1=上月底日)
+	 * */
+	private Integer ymd(int yearMonth,int num) {
+		
+		// 格式
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		Calendar calendar = Calendar.getInstance();
+
+		int iYear = yearMonth/100;
+		int iMonth = yearMonth%100;
+		
+		int number = num - 1;
+		// 設月底日
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth + number);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+
+		
+		return Integer.valueOf(dateFormat.format(calendar.getTime()));
 	}
 }

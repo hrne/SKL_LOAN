@@ -399,6 +399,7 @@ public class L2415 extends TradeBuffer {
 			clBuildingPublicId.setClCode1(iClCode1);
 			clBuildingPublicId.setClCode2(iClCode2);
 			clBuildingPublicId.setClNo(iClNo);
+			clBuildingPublicId.setPublicSeq(i);
 			tClBuildingPublic.setClBuildingPublicId(clBuildingPublicId);
 			tClBuildingPublic.setClCode1(iClCode1);
 			tClBuildingPublic.setClCode2(iClCode2);

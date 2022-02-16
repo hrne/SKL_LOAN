@@ -1159,8 +1159,7 @@ C(3,#TimRepayAmt,0,$,E(0,#WkRepayAmt))
 ! C(3,#TimCloseBreachAmt,0,$,E(0,#TimCloseBreachAmt))
 ! C(3,#TimExtraRepay,0,$,E(0,#RealTxAmt))
 C(5,#L2r01CharCode,2,E(0,0),$)
-E(3,@RPTOT,#SumRepayAmt)
-ALERT(#RPTOT)
+E(3,@RPTOT,#SumRepayAmt-#TimReduceAmt)
 C(3,#RepayType,12,E(3,@RPTOT,#TimOvduRepay),$)
 
 !實際收付金額

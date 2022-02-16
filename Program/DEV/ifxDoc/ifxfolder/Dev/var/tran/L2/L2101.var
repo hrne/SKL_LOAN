@@ -1937,7 +1937,7 @@ IF(#BreachFlag=="Y",T(2,@FdBreachCode,#WkStar)
                     T(2,@FdBreachGetCode,#WkStar)
                     T(2,@FdBreachPercent,#WkStar)
                     T(2,@FdBreachDecreaseMonth,#WkStar)
-                    T(2,@FdBreachDecrease,#WkSpc)
+                    T(2,@FdBreachDecrease,#WkStar)
                     T(2,@FdBreachStartPercent,#WkStar)
                    ,T(2,@FdBreachCode,#WkSpc)
                     T(2,@FdProhibitMonth,#WkSpc)
@@ -1967,6 +1967,9 @@ C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
 HELP(#ProdBreachCodeHelp)
 @V(H,#ProdBreachCodeHelp)
+IF(#BreachCode=="001"||#BreachCode=="005",T(3,@FdBreachDecreaseMonth,)T(F,@BreachDecreaseMonth,0),T(3,@FdBreachDecreaseMonth,*)T(F,@BreachDecreaseMonth,1))
+IF(#BreachCode=="001",E(0,@BreachDecreaseMonth,12),$)
+IF(#BreachCode=="005",E(0,@BreachDecreaseMonth,0),$)
 
 #BreachCodeX=X,40,L
 T(H,#BreachCode,#ProdBreachCodeHelp)
@@ -2027,6 +2030,12 @@ V(5,0,100)
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
 C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
+IF(#BreachCode=="001",E(0,@BreachDecreaseMonth,12),$)
+IF(#BreachCode=="001",s,$)
+IF(#BreachCode=="005",E(0,@BreachDecreaseMonth,0),$)
+IF(#BreachCode=="005",s,$)
+@
+IF(#BreachCode=="002",V(2,0),$)
 
 
 !分段遞減百分比

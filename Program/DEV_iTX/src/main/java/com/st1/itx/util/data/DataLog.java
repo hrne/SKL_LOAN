@@ -11,11 +11,10 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.modelmapper.ModelMapper;
@@ -58,11 +57,11 @@ public class DataLog extends CommBuffer {
 
 	private int txsno = 0;
 
-	private List<HashMap<String, Object>> otherList = null;
+	private List<Map<String, Object>> otherList = new ArrayList<Map<String, Object>>();
 
 	public static AtomicInteger atomNext = new AtomicInteger(0);
 
-	private Map<String, Object> oldnewMap = new TreeMap<String, Object>();
+	private Map<String, Object> oldnewMap = new LinkedHashMap<String, Object>();
 
 	/**
 	 * set parameters
@@ -82,12 +81,12 @@ public class DataLog extends CommBuffer {
 	/**
 	 * set parameters
 	 * 
-	 * @param titaVo  TitaVo
-	 * @param bef     Before data
-	 * @param aft     After data
+	 * @param titaVo    TitaVo
+	 * @param bef       Before data
+	 * @param aft       After data
 	 * @param otrList 其他變更項目一次放入
 	 */
-	public void setEnv(TitaVo titaVo, Object bef, Object aft, List<HashMap<String, Object>> otrList) {
+	public void setEnv(TitaVo titaVo, Object bef, Object aft, List<Map<String, Object>> otrList) {
 		this.setTitaVo(titaVo);
 		this.bef = bef;
 		this.aft = aft;
@@ -106,10 +105,10 @@ public class DataLog extends CommBuffer {
 	 */
 	public void setLog(String key, Object bef, Object aft) {
 //		this.info("setLog = " + key + "/" + bef + "/" + aft);
-		if (otherList == null) {
-			otherList = new ArrayList<HashMap<String, Object>>();
-		}
-		HashMap<String, Object> map = new HashMap<String, Object>();
+//		if (otherList == null) {
+//			otherList = new ArrayList<HashMap<String, Object>>();
+//		}
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		map.put("f", key);
 		map.put("o", bef);
 		map.put("n", aft);
@@ -175,18 +174,23 @@ public class DataLog extends CommBuffer {
 
 	@Override
 	public void exec() throws LogicException {
-		toExec("");
+		toExec("", "");
 	}
 
 	public void exec(String reason) throws LogicException {
-		toExec(reason);
+		toExec(reason, "");
 	}
 
-	private void toExec(String reason) throws LogicException {
+	public void exec(String reason, String MrKey) throws LogicException {
+		this.info("DataLog exec 3 = " + reason + "/" + MrKey);
+		toExec(reason, MrKey);
+	}
+
+	private void toExec(String reason, String MrKey) throws LogicException {
 		Map<String, Map<String, Object>> resultMap = this.compareFields(this.bef, this.aft);
 		int size = resultMap.size();
 
-		HashMap<String, String> columnMap = new HashMap<String, String>();
+		Map<String, String> columnMap = new LinkedHashMap<String, String>();
 
 		try {
 			List<Map<String, String>> lTableColumnVo = tableColumnServiceImpl.findAll(objectName);
@@ -241,9 +245,13 @@ public class DataLog extends CommBuffer {
 		}
 		txDataLog.setBormNo(BormNo);
 
-		txDataLog.setMrKey(this.titaVo.get("MRKEY").trim());
+		if (MrKey.isEmpty()) {
+			txDataLog.setMrKey(this.titaVo.get("MRKEY").trim());
+		} else {
+			txDataLog.setMrKey(MrKey);
+		}
 
-		List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+		List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
 
 		if (size > 0) {
 			this.info("物件1與物件2的屬性值有差異,差異結果如下：");
@@ -252,7 +260,7 @@ public class DataLog extends CommBuffer {
 			while (it.hasNext()) {
 				String key = it.next();
 //				this.info("  " + key + "(oldValue:" + resultMap.get(key).get("oldValue") + ",newValue:" + resultMap.get(key).get("newValue") + ")");
-				HashMap<String, Object> map = new HashMap<String, Object>();
+				Map<String, Object> map = new LinkedHashMap<String, Object>();
 				map.put("f", columnMap.get(key.toLowerCase()));
 				map.put("o", resultMap.get(key).get("oldValue"));
 				map.put("n", resultMap.get(key).get("newValue"));
@@ -316,7 +324,7 @@ public class DataLog extends CommBuffer {
 			 * 只有兩個物件都是同一型別的才有可比性
 			 */
 			if (oldObject.getClass() == newObject.getClass()) {
-				map = new HashMap<String, Map<String, Object>>();
+				map = new LinkedHashMap<String, Map<String, Object>>();
 
 				Class clazz = oldObject.getClass();
 				// 獲取object的所有屬性
@@ -360,12 +368,12 @@ public class DataLog extends CommBuffer {
 						newValue = parse.timeStampToString((Timestamp) newValue);
 					}
 
-//					this.info("compareFields : " + name + "=" + oldValue + "/" + newValue);
+					this.info("DataLog compareFields : " + name + "=" + oldValue + "/" + newValue);
 
 					if (oldValue == null && newValue == null) {
 						continue;
 					} else if (oldValue == null && newValue != null) {
-						Map<String, Object> valueMap = new HashMap<String, Object>();
+						Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
 						valueMap.put("oldValue", oldValue);
 						valueMap.put("newValue", newValue);
 
@@ -375,7 +383,7 @@ public class DataLog extends CommBuffer {
 					}
 
 					if (!oldValue.equals(newValue)) {// 比較這兩個值是否相等,不等就可以放入map了
-						Map<String, Object> valueMap = new HashMap<String, Object>();
+						Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
 						if (oldValue instanceof BigDecimal && (((BigDecimal) oldValue).compareTo((BigDecimal) newValue) == 0))
 							continue;
 
@@ -420,5 +428,35 @@ public class DataLog extends CommBuffer {
 	protected int getNextHostTranC() {
 		atomNext.compareAndSet(9999, 0); // 如果到底了 就歸零
 		return atomNext.incrementAndGet();
+	}
+
+	/**
+	 * 訂正刪除原紀錄
+	 * 
+	 * @param titaVo titaVo
+	 * @throws LogicException
+	 */
+
+	public void delete(TitaVo titaVo) throws LogicException {
+		TxDataLogId txDataLogId = new TxDataLogId();
+		txDataLogId.setTxDate(titaVo.getOrgEntdyI() + 19110000);
+		txDataLogId.setTxSeq(titaVo.getOrgTxSeq());
+
+		int sno = 0;
+		while (true) {
+			txDataLogId.setTxSno(sno);
+			TxDataLog txDataLog = txDataLogService.findById(txDataLogId, titaVo);
+			if (txDataLog != null) {
+				try {
+					txDataLogService.delete(txDataLog, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0004", "資料變更紀錄檔" + e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
+			} else {
+				break;
+			}
+
+			sno++;
+		}
 	}
 }

@@ -284,14 +284,17 @@ IF(#EMail_ALL_FG==0,T(3,@EMail{i},),T(3,@EMail{i},Y))
 T(2,Y)
 ! SendCode==1不可申請全部不寄送;2可以申請全部不寄送
 ##loop{times:40,i:1}
-! 不列印記號-書面
+! 不寄送記號-書面
 #Paper{i}=X,1,I,ui:checkbox;value:;
 C(4,#FormNo{i},S,$)
-@C(4,#Paper{i},$,IF(#Paper{i} == #CheckY,$,V(P,限輸入Y或空白)))
-! 不列印記號-簡訊
+HELP(Y:不寄送; :寄送)
+@
+C(4,#Paper{i},$,IF(#Paper{i} == #CheckY,$,V(P,限輸入Y或空白)))
+! 不發送記號-簡訊
 #Msg{i}=X,1,I,ui:checkbox;value:;
 C(4,#FormNo{i},S,$)
 C(3,#IsCheck,0,$,C(5,#MsgFg,0,T(3,Y),$))
+HELP(Y:不發送; :發送)
 @
 C(3,#IsCheck,0,$,C(5,#MsgFg,0,C(4,#Msg{i},V(P,此客戶尚未設定簡訊電話，故不可設定為發送),$),$))
 C(4,#Msg{i},$,IF(#Msg{i} == #CheckY,$,V(P,限輸入Y或空白)))
@@ -299,10 +302,11 @@ C(4,#Msg{i},$,IF(#Msg{i} == #CheckY,$,V(P,限輸入Y或空白)))
 #Err{i}=x,200,S
 T(B,#NoticeX{i}+，不可申請全部不寄送)
 
-! 不列印記號-EMail
+! 不發送記號-EMail
 #EMail{i}=X,1,I,ui:checkbox;value:;
 C(4,#FormNo{i},S,$)
 C(3,#IsCheck,0,$,C(5,#EmailFg,0,T(3,Y),$))
+HELP(Y:不發送; :發送)
 @
 C(3,#IsCheck,0,$,C(5,#EmailFg,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$))
 C(4,#EMail{i},$,IF(#EMail{i} == #CheckY,$,V(P,限輸入Y或空白)))

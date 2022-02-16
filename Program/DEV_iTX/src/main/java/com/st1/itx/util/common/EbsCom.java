@@ -1,6 +1,7 @@
 package com.st1.itx.util.common;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -60,6 +62,8 @@ public class EbsCom extends CommBuffer {
 		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
 
 		String ebsFg = tSystemParas.getEbsFg();
+		
+		this.info("EbsCom post ebsFg = " + ebsFg);
 
 		if (ebsFg == null || ebsFg.isEmpty() || !ebsFg.equals("Y")) {
 			return "";
@@ -71,14 +75,16 @@ public class EbsCom extends CommBuffer {
 		String ebsAuth = tSystemParas.getEbsAuth();
 
 		HttpEntity<String> request = setRequest(ebsAuth, requestJO);
-		
+
 		RestTemplate restTemplate = new RestTemplate();
 
-		this.info("slipMediaUrl = " + slipMediaUrl);
-		this.info("request = " + request.toString());
-		
+		restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
+		this.info("post slipMediaUrl = " + slipMediaUrl);
+		this.info("post request = " + request.toString());
+
 		String resultAsJsonStr = restTemplate.postForObject(slipMediaUrl, request, String.class);
-				
+
 		JsonNode root = objectMapper.readTree(resultAsJsonStr);
 
 		return root.path("X_RETURN_STATUS").asText();
@@ -91,12 +97,18 @@ public class EbsCom extends CommBuffer {
 
 		String[] splitAuth = ebsAuth.split(":");
 
+		String username = splitAuth[0];
+		String password = splitAuth[1];
+
+		this.info("setRequest username = " + username);
+		this.info("setRequest password = " + password);
+
 		HttpHeaders headers = new HttpHeaders();
-		
-		headers.add("username", splitAuth[0]);
-		headers.add("password", splitAuth[1]);
-						
-//		headers.setBasicAuth(splitAuth[0], splitAuth[1]);
+
+		headers.add("username", username);
+		headers.add("password", password);
+
+		headers.setBasicAuth(username, password, StandardCharsets.UTF_8);
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
 

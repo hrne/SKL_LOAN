@@ -179,7 +179,7 @@ C(3,#DefCodeT,1,C(3,#EditMode,1,T(F,@DefType,1),T(F,@DefType,0)),T(F,@DefType,0)
 !代碼
 #Code=x,20,I
 C(3,#CHAIN,1,C(3,#FunCode,1,$,s),$)
-@V(7)
+@V(7)V(NL)
 C(3,#MinCodeLength,0,s,V(8,#MinCodeLength,#MaxCodeLength))
 
 
