@@ -12,41 +12,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
-
-/**
- * Tita<br>
- * CustId=X,10 CustIdInd=X,1 CustIdAft=X,10 CustNameInd=X,1 CustName1Aft=X,50
- * CustName2Aft=X,50 BirthdayInd=X,1 BirthdayAft=9,7 GenderInd=X,1 GenderAft=9,1
- * CustTypeInd=X,1 CustTypeAft=9,2 IndustryInd=X,1 IndustryAft=9,6
- * CountryInd=X,1 CountryAft=X,2 SpouseIdInd=X,1 SpouseIdAft=X,10
- * SpouseNmInd=X,1 SpouseNmAft=X,100 RegZip3Ind=X,1 RegZip3Aft=9,3
- * RegZip2Ind=X,1 RegZip2Aft=9,2 RegCityCodeInd=X,1 RegCityCodeAft=X,2
- * RegAreaCodeInd=X,1 RegAreaCodeAft=X,3 RegIrcodeInd=X,1 RegIrcodeAft=X,4
- * RegRoadInd=X,1 RegRoadAft=X,40 RegSctionInd=X,1 RegSctionAft=X,5
- * RegAlleyInd=X,1 RegAlleyAft=X,5 RegLaneInd=X,1 RegLaneAft=X,5 RegNumInd=X,1
- * RegNumAft=X,5 RegNumDashInd=X,1 RegNumDashAft=X,5 RegFloorInd=X,1
- * RegFloorAft=X,5 RegFloorDashInd=X,1 RegFloorDashAft=X,5 CurrZip3Ind=X,1
- * CurrZip3Aft=X,3 CurrZip2Ind=X,1 CurrZip2Aft=X,2 CurrCityCodeInd=X,1
- * CurrCityCodeAft=X,2 CurrAreaCodeInd=X,1 CurrAreaCodeAft=X,3 CurrIrcodeInd=X,1
- * CurrIrcodeAft=X,4 CurrRoadInd=X,1 CurrRoadAft=X,40 CurrSectionInd=X,1
- * CurrSectionAft=X,5 CurrAlleyInd=X,1 CurrAlleyAft=X,5 CurrLaneInd=X,1
- * CurrLaneAft=X,5 CurrNumInd=X,1 CurrNumAft=X,5 CurrNumDashInd=X,1
- * CurrNumDashAft=X,5 CurrFloorInd=X,1 CurrFloorAft=X,5 CurrFloorDashInd=X,1
- * CurrFloorDashAft=X,5 IslimitInd=X,1 IslimitAft=X,1 IsrelatedInd=X,1
- * IsrelatedAft=X,1 IsrelnearInd=X,1 IsrelnearAft=X,1 EntcodeInd=X,1
- * EntcodeAft=9,1 EmpnoInd=X,1 EmpnoAft=X,6 EnameInd=X,1 EnameAft=X,20
- * EducodeInd=X,1 EducodeAft=X,1 OwnedhomeInd=X,1 OwnedhomeAft=X,1
- * CurrcompnameInd=X,1 CurrcompnameAft=X,60 CurrcompidInd=X,1 CurrcompidAft=X,8
- * CurrcomptelInd=X,1 CurrcomptelAft=X,16 JobtitleInd=X,1 JobtitleAft=X,20
- * JobTenureInd=X,1 JobTenureAft=X,2 IncomeofyearlyInd=X,1 IncomeofyearlyAft=9,9
- * IncomedatadateInd=X,1 IncomedatadateAft=X,6 PassportnoInd=X,1
- * PassportnoAft=X,20 AmljobcodeInd=X,1 AmljobcodeAft=X,3 AmlgroupInd=X,1
- * AmlgroupAft=X,3 IndigenousnameInd=X,1 IndigenousnameAft=X,100
- */
 
 @Service("L1103")
 @Scope("prototype")
@@ -55,6 +25,9 @@ public class L1103 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService iCustMainService;
+
+	@Autowired
+	public TxDataLogService txDataLogService;
 
 	@Autowired
 	public Parse iParse;
@@ -407,7 +380,8 @@ public class L1103 extends TradeBuffer {
 				if (titaVo.getParam("IncomedatadateAft").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
+					tCustMain.setIncomeDataDate(
+							"" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
 				}
 
 			}
@@ -443,7 +417,7 @@ public class L1103 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
-			iDataLog.exec();
+			iDataLog.exec("修改顧客 " + tCustMain.getCustId() + " 資料",tCustMain.getCustUKey());
 		}
 
 		// 放行訂正
@@ -686,7 +660,8 @@ public class L1103 extends TradeBuffer {
 				if (titaVo.getParam("IncomedatadateBef").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBef")) + 191100));
+					tCustMain.setIncomeDataDate(
+							"" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBef")) + 191100));
 				}
 
 			}
@@ -719,8 +694,13 @@ public class L1103 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 			// 紀錄變更前變更後
-			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
-			iDataLog.exec();
+//			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
+//			iDataLog.exec();
+			
+			//刪除變更記錄
+			
+			iDataLog.delete(titaVo);
+			
 		}
 
 		this.addList(this.totaVo);

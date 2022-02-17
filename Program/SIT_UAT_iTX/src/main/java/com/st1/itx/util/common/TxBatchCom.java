@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,10 +225,7 @@ public class TxBatchCom extends TradeBuffer {
 	private BigDecimal shortAmt = BigDecimal.ZERO;
 //  溢繳金額 
 	private BigDecimal overAmt = BigDecimal.ZERO;
-//  短繳限額
-	private BigDecimal shortAmtLimit = BigDecimal.ZERO;
-	
-	
+
 //	其他額度暫收可抵繳  
 	private BigDecimal otrTavAmt = BigDecimal.ZERO;
 //  放款餘額(還款前)	
@@ -1115,16 +1111,8 @@ public class TxBatchCom extends TradeBuffer {
 				this.procStsCode = "2"; // 2.人工處理
 				break;
 			}
-			// 短繳
-			if (this.shortAmt.compareTo(this.shortAmtLimit) > 0) {
-				// 短繳超過限額
-				if (this.shortAmt.compareTo(this.shortAmtLimit) > 0) {
-					this.checkMsg = "短繳: " + this.shortAmt +" 超過限額:" + this.shortAmtLimit;
-					apendcheckMsgAmounts(tBatxDetail, titaVo);
-					this.procStsCode = "2"; // 2.人工處理
-					break;
-				}
-				if (this.shortAmt.compareTo(this.principal) > 0) {
+			if (this.repayIntDate == 0) {
+				if (this.principal.compareTo(BigDecimal.ZERO) > 0) {
 					this.checkMsg = "積欠期款: " + this.shortAmt;
 				} else {
 					this.checkMsg = "不足利息: " + this.shortAmt;
@@ -1136,8 +1124,13 @@ public class TxBatchCom extends TradeBuffer {
 			// 處理狀態:4.檢核正常
 			// if 回收金額 > 全部應繳 then 處理說明:有溢繳款:999,999,999,999
 			this.procStsCode = "4"; // 4.檢核正常
-			if (this.overAmt.compareTo(BigDecimal.ZERO) > 0)
+			if (this.overAmt.compareTo(BigDecimal.ZERO) > 0) {
 				this.checkMsg = this.checkMsg + "有溢繳款: " + this.overAmt;
+			}
+			
+			if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
+				this.checkMsg = this.checkMsg + "有短繳款: " + this.overAmt;
+			}
 			apendcheckMsgAmounts(tBatxDetail, titaVo);
 			break;
 		// 02-部分償還
@@ -1291,13 +1284,14 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg = this.checkMsg + ", 應繳本利:" + this.unPayLoan;
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 償還本利:" + this.repayLoan;
-		//
+		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0)
+			this.checkMsg = this.checkMsg + ", 償還本利:" + this.repayLoan;
 		if (this.shortfallInt.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 短繳利息:" + this.shortfallInt;
+			this.checkMsg = this.checkMsg + ", 累短收利息:" + this.shortfallInt;
 		if (this.shortfallPrin.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 短繳本金:" + this.shortfallPrin;
+			this.checkMsg = this.checkMsg + ", 累短收本金:" + this.shortfallPrin;
 		if (this.shortCloseBreach.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 短繳清償違約金:" + this.shortCloseBreach;
+			this.checkMsg = this.checkMsg + ", 累短收清償違約金:" + this.shortCloseBreach;
 		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 帳管費:" + this.acctFee;
 		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0)
@@ -1702,18 +1696,7 @@ public class TxBatchCom extends TradeBuffer {
 				}
 			}
 		}
-		
-		// 短繳限額
-			// 到期取息(到期繳息還本)
-				// 依 1.還本金額 2.還息金額
-				if (principal.compareTo(BigDecimal.ZERO) > 0) {
-					this.shortAmtLimit = principal.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
-							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-				} else {
-					this.shortAmtLimit = interest.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
-							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-				}
-		
+
 		// 計算清償違約金
 		if (this.repayType == 3)
 

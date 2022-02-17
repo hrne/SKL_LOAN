@@ -1,6 +1,9 @@
 package com.st1.itx.util.common;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -20,7 +23,6 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
@@ -74,12 +76,17 @@ public class EbsCom extends CommBuffer {
 			return "";
 		}
 
+		// 原本用RestTemplate送出對方收到都是亂碼
+		byte[] bytes = requestJO.toString().getBytes(StandardCharsets.UTF_8);
+		String jsonString = new String(bytes, StandardCharsets.UTF_8);
+		this.info("jsonString = " + jsonString);
+
 		// 取得Url
 		String slipMediaUrl = tSystemParas.getEbsUrl();
 
 		String ebsAuth = tSystemParas.getEbsAuth();
-		
-		// 測試連線
+
+		// 清河提供程式碼
 		URL url = new URL(slipMediaUrl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestProperty("Content-Type", "application/json");
@@ -89,48 +96,51 @@ public class EbsCom extends CommBuffer {
 		conn.setDoOutput(true);
 		conn.setDoInput(true);
 		OutputStream os = conn.getOutputStream();
-		OutputStreamWriter out = new OutputStreamWriter(os, "utf-8");
-		this.info("requestJO.toString() = " + requestJO.toString());
-		out.write(requestJO.toString());
+		OutputStreamWriter out = new OutputStreamWriter(os, StandardCharsets.UTF_8);
+		out.write(jsonString);
 		out.flush();
+		InputStream is = conn.getInputStream();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+		StringBuilder response = new StringBuilder();
+		while (reader.ready()) {
+			response.append(reader.readLine());
+			response.append('\r');
+		}
+		reader.close();
 
-		HttpEntity<String> request = setRequest(ebsAuth, requestJO);
+		this.info("HttpURLConnection response = " + response);
+		conn.disconnect();
+
+		HttpEntity<String> request = setRequest(ebsAuth, jsonString);
 
 		RestTemplate restTemplate = new RestTemplate();
 
-		restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+		restTemplate.getMessageConverters().clear();
+		restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
-		this.info("post slipMediaUrl = " + slipMediaUrl);
-		this.info("post request = " + request.toString());
+		
+		
+		this.info("restTemplate post request = " + request.toString());
 
 		String resultAsJsonStr = restTemplate.postForObject(slipMediaUrl, request, String.class);
 
-		JsonNode root = objectMapper.readTree(resultAsJsonStr);
+		this.info("RestTemplate resultAsJsonStr = " + resultAsJsonStr);
 
-		return root.path("X_RETURN_STATUS").asText();
-
+		return response.toString();
 	}
 
-	private HttpEntity<String> setRequest(String ebsAuth, JSONObject requestJO) {
-
-		String jsonString = requestJO.toString();
+	private HttpEntity<String> setRequest(String ebsAuth, String jsonString) {
 
 		String[] splitAuth = ebsAuth.split(":");
 
 		String username = splitAuth[0];
 		String password = splitAuth[1];
 
-		this.info("setRequest username = " + username);
-		this.info("setRequest password = " + password);
-
 		HttpHeaders headers = new HttpHeaders();
 
-		headers.add("username", username);
-		headers.add("password", password);
+		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		headers.setBasicAuth(username, password, StandardCharsets.UTF_8);
-
-		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		return new HttpEntity<String>(jsonString, headers);
 	}

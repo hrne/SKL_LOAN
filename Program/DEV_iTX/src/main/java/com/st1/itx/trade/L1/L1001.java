@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.domain.Guarantor;
 import com.st1.itx.db.domain.LoanNotYet;
 import com.st1.itx.db.domain.ReltMain;
+import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.CustCrossService;
@@ -45,6 +47,7 @@ import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.db.service.ReltMainService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.springjpa.cm.L1001ServiceImpl;
 import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.service.CustDataCtrlService;
@@ -114,6 +117,9 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	public GraceConditionService iGraceConditionService;
+
+	@Autowired
+	public TxDataLogService txDataLogService;
 
 	@Autowired
 	private L1001ServiceImpl l1001ServiceImpl;
@@ -380,6 +386,8 @@ public class L1001 extends TradeBuffer {
 		OccursList occursList = new OccursList();
 		// 顧客
 		int CustMainBTNFg = 0;
+		// 變更紀錄
+		int LogFg = 0;
 		// 財報
 		int CustFinBTNFg = 0;
 		// 放款
@@ -434,6 +442,18 @@ public class L1001 extends TradeBuffer {
 		if (!custDataControl && allowInquiry) {
 			CustMainBTNFg = 1;
 		}
+
+		String cdate = aCustMain.getCreateDate() == null ? "" : aCustMain.getCreateDate().toString();
+		String udate = aCustMain.getLastUpdate() == null ? "" : aCustMain.getLastUpdate().toString();
+
+		List<String> txcds = Arrays.asList("L1103", "L1104", "L1105", "L1107", "L1108", "L1109", "L1110", "L1111");
+
+		TxDataLog txDataLog = txDataLogService.findByMrKeyFirst(aCustMain.getCustUKey(), txcds, titaVo);
+
+		if (txDataLog != null && !custDataControl && allowInquiry && !cdate.equals(udate)) {
+			LogFg = 1;
+		}
+
 //		}
 		// 財報按鈕fg
 //		Slice<CustFin> stmpCustFin = sCustFinService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
@@ -603,6 +623,10 @@ public class L1001 extends TradeBuffer {
 		occursList.putParam("OOCustTelNoBTNFg", CustTleNoBTNFg);
 		// 寬限控管
 		occursList.putParam("OOGraceConditionFg", iGraceCondition);
+		// 變更紀錄
+		occursList.putParam("OOLogFg", LogFg);
+
+		occursList.putParam("OOCustUKey", aCustMain.getCustUKey());
 		occursList.putParam("OOCustId", aCustMain.getCustId());
 		occursList.putParam("OOCustNo", aCustMain.getCustNo());
 		occursList.putParam("OOCustTypeCode", aCustMain.getCustTypeCode());

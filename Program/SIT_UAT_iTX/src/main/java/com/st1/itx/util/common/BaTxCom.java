@@ -1,6 +1,7 @@
 package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -114,6 +115,7 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal breachAmt = BigDecimal.ZERO; // 違約金
 	private BigDecimal tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
 	private BigDecimal repayTotal = BigDecimal.ZERO; // 還款總金額
+	private BigDecimal shortAmtLimit = BigDecimal.ZERO;// 短繳限額
 	private int rateEffectDate = 0; // 目前利率生效日
 	private BigDecimal fitRate = BigDecimal.ZERO; // 目前利率
 	private int repayIntDate = 0; // 還款應繳日
@@ -167,7 +169,7 @@ public class BaTxCom extends TradeBuffer {
 		this.interest = BigDecimal.ZERO; // 利息
 		this.delayInt = BigDecimal.ZERO; // 延滯息
 		this.breachAmt = BigDecimal.ZERO; // 違約金
-			BigDecimal shortAmtLimit = BigDecimal.ZERO;// 短繳限額計算
+		this.shortAmtLimit = BigDecimal.ZERO;// 短繳限額計算
 
 		// 還款金額、日期
 		this.tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
@@ -1169,7 +1171,7 @@ public class BaTxCom extends TradeBuffer {
 						payintDateAmt = getPayintDateAmt(payIntDate, facmNo);
 						this.info("settleByPayintDate xxBal=" + this.xxBal + ", payintDat=" + payIntDate
 								+ ", payintDateAmt=" + payintDateAmt);
-						if (this.xxBal.compareTo(payintDateAmt) < 0) {
+						if (this.xxBal.add(this.shortAmtLimit).compareTo(payintDateAmt) < 0) {
 							break;
 						} else {
 							this.info("settleByPayintDate payintDateAmt=" + payintDateAmt);
@@ -1182,13 +1184,24 @@ public class BaTxCom extends TradeBuffer {
 		}
 	}
 
-	// 取得額度應繳日金額
+	// 取得額度應繳日金額，短繳限額
 	private BigDecimal getPayintDateAmt(int payIntDate, int facmNo) {
 		BigDecimal unPaidAmt = BigDecimal.ZERO;
+		this.shortAmtLimit = BigDecimal.ZERO;
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getFacmNo() == facmNo && ba.getAcctAmt().equals(BigDecimal.ZERO)) {
 				if (ba.getRepayPriority() == 5 && ba.getPayIntDate() == payIntDate) {
 					unPaidAmt = unPaidAmt.add(ba.getUnPaidAmt());
+					// 依短繳限額 1.還本金額 2.還息金額
+					if (ba.getPrincipal().compareTo(BigDecimal.ZERO) > 0) {
+						this.shortAmtLimit = ba.getPrincipal()
+								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
+								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+					} else {
+						this.shortAmtLimit = ba.getInterest()
+								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
+								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+					}
 				}
 			}
 		}
@@ -1217,25 +1230,28 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	/* 計算暫收抵繳作帳金額 */
 	private void settleTmpAcctAmt() {
+		// 暫收款金額(存入暫收為正、暫收抵繳為負)
 		// 回收餘額不足->需暫收抵繳
-		if (this.txBal.compareTo(BigDecimal.ZERO) <= 0) {
+		if (this.txBal.compareTo(BigDecimal.ZERO) >= 0) {
+			this.tempAmt = this.txBal;
+		} else {
 			this.tmAmt = BigDecimal.ZERO.subtract(this.txBal);
-		}
-		BigDecimal tmBal = this.tmAmt;
-		for (BaTxVo ba : this.baTxList) {
-			if (ba.getDataKind() == 3 && tmBal.compareTo(BigDecimal.ZERO) > 0) {
-				if (tmBal.compareTo(ba.getUnPaidAmt()) >= 0) {
-					ba.setAcctAmt(ba.getUnPaidAmt());
-					tmBal = tmBal.subtract(ba.getAcctAmt());
-				} else {
-					ba.setAcctAmt(tmBal);
-					tmBal = BigDecimal.ZERO;
+			BigDecimal tmBal = this.tmAmt;
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 3 && tmBal.compareTo(BigDecimal.ZERO) > 0) {
+					if (tmBal.compareTo(ba.getUnPaidAmt()) >= 0) {
+						ba.setAcctAmt(ba.getUnPaidAmt());
+						tmBal = tmBal.subtract(ba.getAcctAmt());
+					} else {
+						ba.setAcctAmt(tmBal);
+						tmBal = BigDecimal.ZERO;
+					}
+					// 暫收款金額(存入暫收為正、暫收抵繳為負)
+					this.tempAmt = this.tempAmt.subtract(ba.getAcctAmt());
 				}
-				// 暫收款金額(存入暫收為正、暫收抵繳為負)
-				this.tempAmt = this.tempAmt.subtract(ba.getAcctAmt());
 			}
 		}
-		this.info("tavAmt 可暫收抵繳金額= " + this.tavAmt + ", tmAmt 需暫收抵繳金額=" + this.tmAmt);
+		this.info("tavAmt 可暫收抵繳金額= " + this.tavAmt + ", tmAmt 需暫收抵繳金額=" + this.tmAmt + ", tempAmt暫收款金額" + this.tempAmt);
 
 	}
 
@@ -1262,7 +1278,6 @@ public class BaTxCom extends TradeBuffer {
 			baTxVo.setDbCr("C");
 			baTxVo.setUnPaidAmt(this.txBal);
 			baTxVo.setAcctAmt(this.txBal);
-			this.tempAmt = this.tempAmt.add(this.txBal);
 			this.overAmt = baTxVo.getAcctAmt();
 			this.info("溢繳金額= " + this.overAmt);
 		} else {

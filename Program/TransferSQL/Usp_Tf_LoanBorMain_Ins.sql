@@ -142,7 +142,8 @@ BEGIN
              -- 有首次利率調整日期 且 下次利率調整日期為0者 放首次利率調整日期
              WHEN "LA$LMSP"."LMSFSD" > 0 AND "LA$LMSP"."LMSNSD" = 0 THEN "LA$LMSP"."LMSFSD"
            ELSE "LA$LMSP"."LMSNSD" END    AS "NextAdjRateDate"     -- 下次利率調整日期 DECIMALD 8 
-          ,0                              AS "AcctFee"             -- 帳管費 DECIMAL 16 2
+          -- 2022-02-16 QC1435
+          ,ACFP."ACTFEE"                  AS "AcctFee"             -- 帳管費 DECIMAL 16 2
           ,0                              AS "HandlingFee"         -- 手續費 DECIMAL 16 2
           ,0                              AS "FinalBal"            -- 最後一期本金餘額 DECIMAL 16 2
           ,'N'                            AS "NotYetFlag"          -- 未齊件 VARCHAR2 1 
@@ -159,7 +160,7 @@ BEGIN
           ,0                              AS "PieceCodeSecondAmt"
           ,LPAD(APLP."APLUSG",2,'0')      AS "UsageCode"           -- 資金用途別 VARCHAR2 2 
           ,0                              AS "SyndNo"              -- 聯貸案序號 DECIMAL 6
-          ,''                             AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+          ,"LA$LMSP"."LMSPRL"             AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
           ,"LA$LMSP"."LMSPAN"             AS "RelationName"        -- 第三人帳戶戶名 NVARCHAR2 100 
           ,"LA$LMSP"."LMSPID"             AS "RelationId"          -- 第三人身份證字號 VARCHAR2 10 
           ,0                              AS "RelationBirthday"    -- 第三人生日 DECIMALD 8 
@@ -174,7 +175,8 @@ BEGIN
           ,NVL(EXG."EXGACN",0)            AS "RemitAcctNo"         -- 匯款帳號 DECIMAL 14 
           ,"LA$LMSP"."LMSPYC"             AS "CompensateAcct"      -- 代償專戶 NVARCHAR2 60 
           ,EXG."EXGBBC"                   AS "PaymentBank"         -- 解付單位代號 VARCHAR2 7 
-          ,"LN$CLMP"."M24070"             AS "Remark"              -- 附言 NVARCHAR2 40 
+          ,NVL("LN$CLMP"."M24070",EXG."M24070")
+                                          AS "Remark"              -- 附言 NVARCHAR2 40 
           ,0                              AS "AcDate"              -- 會計日期 DECIMALD 8 
           ,0                              AS "NextAcDate"          -- 次日交易會計日期 DECIMALD 8 
           ,'0000'                         AS "BranchNo"
@@ -250,6 +252,7 @@ BEGIN
                      ,EX."LMSAPN"
                      ,EX."LMSASQ"
                      ,EX."EXGCDE"
+                     ,EX."M24070"
                      ,CB."BankCode"
                      ,CB."BranchCode"
                      ,CASE
@@ -282,6 +285,9 @@ BEGIN
                     AND IRTP."LMSAPN" = "LA$LMSP"."LMSAPN"
                     AND IRTP."LMSASQ" = "LA$LMSP"."LMSASQ"
                     AND IRTP."Seq" = 1
+    LEFT JOIN "LN$ACFP" ACFP ON ACFP."LMSACN" = "LA$LMSP"."LMSACN"
+                            AND ACFP."LMSAPN" = "LA$LMSP"."LMSAPN"
+                            AND ACFP."LMSASQ" = "LA$LMSP"."LMSASQ"
     ;
 
     -- 記錄寫入筆數

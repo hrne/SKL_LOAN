@@ -53,6 +53,9 @@ public interface TxDataLogRepositoryHist extends JpaRepository<TxDataLog, TxData
   // TranNo = ,AND MrKey = 
   public Slice<TxDataLog> findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(String tranNo_0, String mrKey_1, Pageable pageable);
 
+  // MrKey = ,AND TranNo ^i
+  public Optional<TxDataLog> findTopByMrKeyIsAndTranNoInOrderByCreateDateDesc(String mrKey_0, List<String> tranNo_1);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

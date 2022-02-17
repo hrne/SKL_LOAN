@@ -10,10 +10,14 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.service.CdReportService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -32,11 +36,18 @@ public class L1108 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
+	public CustMainService sCustMainService;
+
+	@Autowired
 	public CustNoticeService sCustNoticeService;
 
 	/* DB服務注入 */
 	@Autowired
 	public FacMainService sFacMainService;
+	
+	/* DB服務注入 */
+	@Autowired
+	public CdReportService sCdReportService;
 
 	/* 轉換工具 */
 	@Autowired
@@ -58,6 +69,12 @@ public class L1108 extends TradeBuffer {
 
 		// 取tita額度號碼
 		int iFacmNo = iParse.stringToInteger(titaVo.getParam("FacmNo"));
+
+		CustMain custMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+
+		if (custMain == null) {
+			throw new LogicException("E0001", "客戶資料主檔");
+		}
 
 		FacMain tFacMain = new FacMain();
 		String iFormNo;
@@ -162,9 +179,13 @@ public class L1108 extends TradeBuffer {
 				tCustNoticePK.setFormNo(iFormNo);
 
 				tCustNotice = sCustNoticeService.holdById(tCustNoticePK);
+
+				boolean log = false;
+				CustNotice oCustNotice = new CustNotice();
+
 				// 維護時的新資料改為新增
 				if (tCustNotice == null) {
-					CustNotice xCustNotice = new CustNotice();
+					tCustNotice = new CustNotice();
 					CustNoticeId xCustNoticePK = new CustNoticeId();
 
 					xCustNoticePK.setCustNo(iCustNo);
@@ -172,20 +193,32 @@ public class L1108 extends TradeBuffer {
 					xCustNoticePK.setFormNo(iFormNo);
 					this.info("i = " + i);
 					this.info("tCustNoticePK = " + tCustNoticePK);
-					xCustNotice.setCustNoticeId(xCustNoticePK);
-					xCustNotice.setPaperNotice(VarPaper);
-					xCustNotice.setMsgNotice(VarMsg);
-					xCustNotice.setEmailNotice(VarEMail);
-					xCustNotice.setApplyDate(ApplyDt);
+					tCustNotice.setCustNoticeId(xCustNoticePK);
+					tCustNotice.setPaperNotice(VarPaper);
+					tCustNotice.setMsgNotice(VarMsg);
+					tCustNotice.setEmailNotice(VarEMail);
+					tCustNotice.setApplyDate(ApplyDt);
 
 					try {
-						sCustNoticeService.insert(xCustNotice, titaVo);
+						sCustNoticeService.insert(tCustNotice, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0005", "客戶通知設定檔");
 					}
+					if ("N".equals(VarPaper) || "N".equals(VarMsg) || "N".equals(VarPaper)) {
+						log = true;
+						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
+						oCustNotice.setPaperNotice("Y");
+						oCustNotice.setMsgNotice("Y");
+						oCustNotice.setEmailNotice("Y");
+					}
 				} else {
 					// 變更前
-					CustNotice beforeCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
+					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice())
+							|| !VarEMail.equals(tCustNotice.getEmailNotice())) {
+						log = true;
+						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
+					}
+
 					tCustNotice.setPaperNotice(VarPaper);
 					tCustNotice.setMsgNotice(VarMsg);
 					tCustNotice.setEmailNotice(VarEMail);
@@ -197,9 +230,21 @@ public class L1108 extends TradeBuffer {
 						throw new LogicException("E0007", "客戶通知設定檔");
 					}
 
+				}
+				if (log) {
 					// 紀錄變更前變更後
-					iDataLog.setEnv(titaVo, beforeCustNotice, tCustNotice);
-					iDataLog.exec();
+					
+					String formx = "";
+					CdReport cdReport = sCdReportService.findById(tCustNotice.getFormNo(), titaVo);
+					if (cdReport != null) {
+						formx =cdReport.getFormName();
+					}
+										
+					oCustNotice = tranDesc(oCustNotice);
+					CustNotice nCustNotice = tranDesc(tCustNotice);
+					
+					iDataLog.setEnv(titaVo, oCustNotice, nCustNotice);
+					iDataLog.exec("修改顧客 " + custMain.getCustId() + "/" + oCustNotice.getFormNo() + " " + formx + " 通知書",custMain.getCustUKey());
 				}
 			}
 		}
@@ -207,4 +252,27 @@ public class L1108 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+	
+    private CustNotice tranDesc(CustNotice custNotice) {
+    	
+		if ("N".equals(custNotice.getPaperNotice())) {
+			custNotice.setPaperNotice("不寄送");
+		} else {
+			custNotice.setPaperNotice("寄送");
+		}
+		
+		if ("N".equals(custNotice.getMsgNotice())) {
+			custNotice.setMsgNotice("不發送");
+		} else {
+			custNotice.setMsgNotice("發送");
+		}
+		
+		if ("N".equals(custNotice.getEmailNotice())) {
+			custNotice.setEmailNotice("不發送");
+		} else {
+			custNotice.setEmailNotice("發送");
+		}
+
+		return custNotice;
+    }
 }

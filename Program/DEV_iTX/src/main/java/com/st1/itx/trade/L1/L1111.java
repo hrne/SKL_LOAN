@@ -66,6 +66,9 @@ public class L1111 extends TradeBuffer {
 		}
 
 		CustMain uCustMain = iCustMainService.holdById(iCustMain.getCustUKey(), titaVo);
+		
+		titaVo.putParam("CustNo", uCustMain.getCustNo());
+		
 		CustMain beforeCustMain = (CustMain) iDataLog.clone(iCustMain);
 		uCustMain.setCustId(iCustIdAfter);
 		try {
@@ -80,7 +83,7 @@ public class L1111 extends TradeBuffer {
 //		}
 		// 紀錄變更前變更後
 		iDataLog.setEnv(titaVo, beforeCustMain, uCustMain);
-		iDataLog.exec(iMarkX);
+		iDataLog.exec("變更顧客 " + beforeCustMain.getCustId() + " 證號/" + iMarkX, beforeCustMain.getCustUKey());
 
 		this.addList(this.totaVo);
 		return this.sendList();

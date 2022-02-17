@@ -177,6 +177,16 @@ public interface TxDataLogService {
   public Slice<TxDataLog> findByTranNo(String tranNo_0, String mrKey_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * MrKey = ,AND TranNo ^i
+   *
+   * @param mrKey_0 mrKey_0
+   * @param tranNo_1 tranNo_1
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxDataLog TxDataLog of List
+   */
+  public TxDataLog findByMrKeyFirst(String mrKey_0, List<String> tranNo_1, TitaVo... titaVo);
+
+  /**
    * hold By TxDataLog
    * 
    * @param txDataLogId key

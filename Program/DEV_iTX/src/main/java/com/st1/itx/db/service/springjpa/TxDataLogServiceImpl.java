@@ -391,6 +391,25 @@ em = null;
   }
 
   @Override
+  public TxDataLog findByMrKeyFirst(String mrKey_0, List<String> tranNo_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findByMrKeyFirst " + dbName + " : " + "mrKey_0 : " + mrKey_0 + " tranNo_1 : " +  tranNo_1);
+    Optional<TxDataLog> txDataLogT = null;
+    if (dbName.equals(ContentName.onDay))
+      txDataLogT = txDataLogReposDay.findTopByMrKeyIsAndTranNoInOrderByCreateDateDesc(mrKey_0, tranNo_1);
+    else if (dbName.equals(ContentName.onMon))
+      txDataLogT = txDataLogReposMon.findTopByMrKeyIsAndTranNoInOrderByCreateDateDesc(mrKey_0, tranNo_1);
+    else if (dbName.equals(ContentName.onHist))
+      txDataLogT = txDataLogReposHist.findTopByMrKeyIsAndTranNoInOrderByCreateDateDesc(mrKey_0, tranNo_1);
+    else 
+      txDataLogT = txDataLogRepos.findTopByMrKeyIsAndTranNoInOrderByCreateDateDesc(mrKey_0, tranNo_1);
+
+    return txDataLogT.isPresent() ? txDataLogT.get() : null;
+  }
+
+  @Override
   public TxDataLog holdById(TxDataLogId txDataLogId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -438,7 +457,7 @@ em = null;
        empNot = ThreadVariable.getEmpNot();
 
     this.info("Insert..." + dbName + " " + txDataLog.getTxDataLogId());
-    if (this.findById(txDataLog.getTxDataLogId()) != null)
+    if (this.findById(txDataLog.getTxDataLogId(), titaVo) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())

@@ -355,6 +355,7 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setReceiveCode(acReceivableCode);
 			tSlipMedia2022.setSlipRmk(slipRmk);
 			tSlipMedia2022.setCostMonth(costMonth);
+			tSlipMedia2022.setDeptCode(deptCode);
 
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
@@ -588,6 +589,7 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setReceiveCode(tempAcReceivableCode);
 			tSlipMedia2022.setSlipRmk(tempSlipRmk);
 			tSlipMedia2022.setCostMonth(costMonth);
+			tSlipMedia2022.setDeptCode(deptCode);
 
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
