@@ -16,13 +16,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
@@ -92,6 +86,7 @@ public class EbsCom extends CommBuffer {
 		conn.setRequestProperty("Content-Type", "application/json");
 		conn.setRequestMethod("POST");
 		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(ebsAuth.getBytes()));
+		this.info("basicAuth = " + basicAuth);
 		conn.setRequestProperty("Authorization", basicAuth);
 		conn.setDoOutput(true);
 		conn.setDoInput(true);
@@ -107,42 +102,24 @@ public class EbsCom extends CommBuffer {
 			response.append('\r');
 		}
 		reader.close();
-
 		this.info("HttpURLConnection response = " + response);
 		conn.disconnect();
 
-		HttpEntity<String> request = setRequest(ebsAuth, jsonString);
-
-		RestTemplate restTemplate = new RestTemplate();
-
-		restTemplate.getMessageConverters().clear();
-		restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-
-		
-		
-		this.info("restTemplate post request = " + request.toString());
-
-		String resultAsJsonStr = restTemplate.postForObject(slipMediaUrl, request, String.class);
-
-		this.info("RestTemplate resultAsJsonStr = " + resultAsJsonStr);
+		// 我的程式碼
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//		byte[] base64CredsBytes = Base64.getEncoder().encode(ebsAuth.getBytes());
+//		String base64Creds = new String(base64CredsBytes);
+//		this.info("base64Creds = " + base64Creds);
+//		headers.add("Authorization", "Basic " + base64Creds);
+//		HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+//		RestTemplate restTemplate = new RestTemplate();
+//		restTemplate.getMessageConverters().clear();
+//		restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+//		String result = restTemplate.postForObject(slipMediaUrl, request, String.class);
+//		this.info("result = " + result);
 
 		return response.toString();
-	}
-
-	private HttpEntity<String> setRequest(String ebsAuth, String jsonString) {
-
-		String[] splitAuth = ebsAuth.split(":");
-
-		String username = splitAuth[0];
-		String password = splitAuth[1];
-
-		HttpHeaders headers = new HttpHeaders();
-
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
-		headers.setBasicAuth(username, password, StandardCharsets.UTF_8);
-
-		return new HttpEntity<String>(jsonString, headers);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.online;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,16 +21,16 @@ import com.st1.itx.db.domain.TxTeller;
  */
 public interface TxTellerRepository extends JpaRepository<TxTeller, String> {
 
-	// BrNo = ,AND TlrNo %
-	public Slice<TxTeller> findAllByBrNoIsAndTlrNoLikeOrderByTlrNoAsc(String brNo_0, String tlrNo_1, Pageable pageable);
+  // BrNo = ,AND TlrNo %
+  public Slice<TxTeller> findAllByBrNoIsAndTlrNoLikeOrderByTlrNoAsc(String brNo_0, String tlrNo_1, Pageable pageable);
 
-	// BrNo = ,AND GroupNo >=,AND GroupNo <=,AND LevelFg>=,AND LevelFg<=
-	public Slice<TxTeller> findAllByBrNoIsAndGroupNoGreaterThanEqualAndGroupNoLessThanEqualAndLevelFgGreaterThanEqualAndLevelFgLessThanEqualOrderByTlrNoAsc(String brNo_0, String groupNo_1,
-			String groupNo_2, int levelFg_3, int levelFg_4, Pageable pageable);
+  // BrNo = ,AND GroupNo >=,AND GroupNo <=,AND LevelFg>=,AND LevelFg<=
+  public Slice<TxTeller> findAllByBrNoIsAndGroupNoGreaterThanEqualAndGroupNoLessThanEqualAndLevelFgGreaterThanEqualAndLevelFgLessThanEqualOrderByTlrNoAsc(String brNo_0, String groupNo_1, String groupNo_2, int levelFg_3, int levelFg_4, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxTeller> findByTlrNo(String tlrNo);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxTeller> findByTlrNo(String tlrNo);
 
 }
+

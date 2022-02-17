@@ -199,6 +199,8 @@ A(ID_UNINO,0,#CustId)
 #MRKEY=_,_,S
 T(2,#CustId)
 
+#CustNo=A,7,S
+
 #checkchain=X,1,S
 C(3,#CHAIN,1,T(F,@CustId,0),T(F,@CustId,1))
 
@@ -210,6 +212,7 @@ E(0,@RimFunCd,5)
 RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
+T(2,@CustNo,#L1r01CustNo)
 T(2,@BranchNoBef,#L1r01BranchNo)
 T(2,@CustIdBef,#L1r01CustId)
 T(2,@CustIdAfter,#L1r01CustId)
@@ -1224,6 +1227,7 @@ T(3,[L1104] 顧客基本資料變更-法人)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#CustNo
 #CustId
 #TypeCodeInd
 #TypeCodeAft

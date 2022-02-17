@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -15,6 +16,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
@@ -25,6 +28,7 @@ import com.st1.itx.db.domain.FacProdStepRate;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanNotYet;
+import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
@@ -70,6 +74,8 @@ public class L2R05 extends TradeBuffer {
 	public LoanBorMainService loanBorMainService;
 	@Autowired
 	public FacCaseApplService facCaseApplService;
+	@Autowired
+	public AcReceivableService acReceivableService;
 	@Autowired
 	public LoanNotYetService sLoanNotYetService;
 	@Autowired
@@ -122,6 +128,7 @@ public class L2R05 extends TradeBuffer {
 	private String wkRelationGender = "";
 	private int wkRvCnt = 0;
 	private BigDecimal wkRvDrawdownAmt = new BigDecimal(0);
+	private AcReceivable tAcReceivable;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -131,7 +138,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		initset();
-		
+
 		// 取得輸入資料
 		iFuncCode = this.parse.stringToInteger(titaVo.getParam("RimFuncCode"));
 		iTxCode = titaVo.getParam("RimTxCode");
@@ -225,10 +232,15 @@ public class L2R05 extends TradeBuffer {
 		if (iTxCode.equals("L3100") || iTxCode.equals("L3110")) {
 			if (iFKey != 7) {
 				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) <= 0) {
-					throw new LogicException(titaVo, "E2072",
-							" 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = " + tFacMain.getFacmNo()
-									+ " 核准額度 = " + df.format(tFacMain.getLineAmt()) + " 已動用額度餘額 = "
-									+ df.format(tFacMain.getUtilBal())); // 該筆額度編號沒有可用額度
+					// TODO:檢查此額度是否為借新還舊
+					tAcReceivable = acReceivableService.findById(new AcReceivableId("TRO", iCustNo, iFacmNo,
+							"FacmNo" + StringUtils.leftPad(String.valueOf(iFacmNo), 3, "0")), titaVo);
+					if (tAcReceivable == null) {
+						throw new LogicException(titaVo, "E2072",
+								" 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = " + tFacMain.getFacmNo() + " 核准額度 = "
+										+ df.format(tFacMain.getLineAmt()) + " 已動用額度餘額 = "
+										+ df.format(tFacMain.getUtilBal())); // 該筆額度編號沒有可用額度
+					}
 				}
 			}
 //			if (tFacProd.getCharCode().equals("2") && tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {   //TODO 已房養老刪除
@@ -313,10 +325,10 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05RvBormNo", wkRvBormNo); // 預定撥款序號
 		this.totaVo.putParam("L2r05RvDrawdownAmt", wkRvDrawdownAmt); // 已預約撥款金額
 		for (int i = 1; i <= 10; i++) {
-			this.totaVo.putParam("StepMonths" + i, 0);
-			this.totaVo.putParam("StepMonthE" + i, 0);
-			this.totaVo.putParam("StepRateType" + i, 0);
-			this.totaVo.putParam("StepRateIncr" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonths" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonthE" + i, 0);
+			this.totaVo.putParam("L2r05StepRateType" + i, 0);
+			this.totaVo.putParam("L2r05StepRateIncr" + i, 0);
 		}
 
 		sProdNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
@@ -439,11 +451,11 @@ public class L2R05 extends TradeBuffer {
 		BigDecimal wkAvailableAmt = loanAvailableAmt.caculate(tFacMain, titaVo); // 可用額度
 		// 限額計算方式 F-核准額度, C-擔保品 S-合併額度控管
 		String wkLimitFlag = loanAvailableAmt.getLimitFlag();
-		this.totaVo.putParam("L2r05AvailableAmt", wkAvailableAmt);
+		// 借新還舊處理
+		this.totaVo.putParam("L2r05AvailableAmt", tAcReceivable == null ? wkAvailableAmt : tAcReceivable.getAcBal());
 		this.totaVo.putParam("L2r05LimitFlag", wkLimitFlag);
 
 	}
-
 
 	private void PrevIntDateRoutine() throws LogicException {
 		this.info("PrevIntDateRoutine ...");
@@ -509,10 +521,10 @@ public class L2R05 extends TradeBuffer {
 
 		int i = 1;
 		for (FacProdStepRate tFacProdStepRate : slFacProdStepRate.getContent()) {
-			this.totaVo.putParam("StepMonths" + i, tFacProdStepRate.getMonthStart());
-			this.totaVo.putParam("StepMonthE" + i, tFacProdStepRate.getMonthEnd());
-			this.totaVo.putParam("StepRateType" + i, tFacProdStepRate.getRateType());
-			this.totaVo.putParam("StepRateIncr" + i, tFacProdStepRate.getRateIncr());
+			this.totaVo.putParam("L2r05StepRateMonths" + i, tFacProdStepRate.getMonthStart());
+			this.totaVo.putParam("L2r05StepRateMonthE" + i, tFacProdStepRate.getMonthEnd());
+			this.totaVo.putParam("L2r05StepRateType" + i, tFacProdStepRate.getRateType());
+			this.totaVo.putParam("L2r05StepRateIncr" + i, tFacProdStepRate.getRateIncr());
 			i++;
 		}
 	}
@@ -540,7 +552,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05LoanTermYy", 0);
 		this.totaVo.putParam("L2r05LoanTermMm", 0);
 		this.totaVo.putParam("L2r05LoanTermDd", 0);
-		this.totaVo.putParam("L2r05FirstDrawdownDate",0);
+		this.totaVo.putParam("L2r05FirstDrawdownDate", 0);
 		this.totaVo.putParam("L2r05MaturityDate", 0);
 		this.totaVo.putParam("L2r05IntCalcCode", "");
 		this.totaVo.putParam("L2r05AmortizedCode", "");
@@ -614,21 +626,15 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05LoanBal", "");
 		this.totaVo.putParam("L2r05BormCount", "");
 		this.totaVo.putParam("L2r05DueAmt", "");
-		this.totaVo.putParam("L2r05BaseRate", 0); 
-		this.totaVo.putParam("L2r05CloseFg", ""); 
-		this.totaVo.putParam("L2r05RvBormNo", 0); 
-		this.totaVo.putParam("L2r05RvDrawdownAmt", 0); 
+		this.totaVo.putParam("L2r05BaseRate", 0);
+		this.totaVo.putParam("L2r05CloseFg", "");
+		this.totaVo.putParam("L2r05RvBormNo", 0);
+		this.totaVo.putParam("L2r05RvDrawdownAmt", 0);
 		for (int i = 1; i <= 10; i++) {
-			this.totaVo.putParam("BreachbMmA" + i, 0);
-			this.totaVo.putParam("BreachbMmB" + i, 0);
-			this.totaVo.putParam("BreachbPercent" + i, 0);
-			this.totaVo.putParam("BreachaYyA" + i, 0);
-			this.totaVo.putParam("BreachaYyB" + i, 0);
-			this.totaVo.putParam("BreachaPercent" + i, 0);
-			this.totaVo.putParam("StepMonths" + i, 0);
-			this.totaVo.putParam("StepMonthE" + i, 0);
-			this.totaVo.putParam("StepRateType" + i, "");
-			this.totaVo.putParam("StepRateIncr" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonths" + i, 0);
+			this.totaVo.putParam("L2r05StepRateMonthE" + i, 0);
+			this.totaVo.putParam("L2r05StepRateType" + i, "");
+			this.totaVo.putParam("L2r05StepRateIncr" + i, 0);
 		}
 	}
 }

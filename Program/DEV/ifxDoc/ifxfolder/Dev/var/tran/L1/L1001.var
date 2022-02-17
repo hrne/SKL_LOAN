@@ -296,6 +296,10 @@ T(H,#OOCustTypeCode,#CustTypeCodeHelp)
 
 #OODataStatus=X,1,S
 
+#OOCustUKey=x,32,S
+
+#OOLogFg=A,1,S
+
 #custidlen=X,2,S
 P(1,#OOCustId)
 
@@ -441,6 +445,16 @@ T(2,#OOCustId)
 C(5,#OODataStatus,X,BIND(grid,cancel),
 C(4,#OOCustId,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1111;text=變更; ntxbuf=#OOBUF17})))
 
+#Ed=9,7,S
+T(1,#SYSCDATE,2,7)
+
+!統一編號變更
+#OOBUF18=X,150,S
+T(2,                                                                           1000101+#Ed+#OOCustUKey)
+
+#OOBTN18=X,1,S
+C(3,#OOLogFg,1,BIND(grid,{ cmd=CHAIN; ntxcd=L6932;text=紀錄; ntxbuf=#OOBUF18}),BIND(grid,cancel))
+
 </sub>
 
 
@@ -481,6 +495,8 @@ TXFORM=L1001
 #OOCustName
 #OODataStatus
 #OOAllowInquire
+#OOCustUKey
+#OOLogFg
 ^
 <include src="ROM.icf::L6R06.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -553,6 +569,9 @@ TXFORM=L1001
 
 #OOBTN17=統一編號</br>變更
 {width:70,search:false,formatter:'cust:bind-button:#OOBTN17',align:'center',canExport:false}
+
+#OOBTN18=變更
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN18',align:'center',canExport:false}
 
 ^
 

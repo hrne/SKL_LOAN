@@ -19,8 +19,11 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.SlipMedia2022Id;
+import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.springjpa.cm.L9130ServiceImpl;
 import com.st1.itx.util.common.EbsCom;
@@ -50,6 +53,10 @@ public class L9130Report2022 extends MakeReport {
 
 	/* DB服務注入 */
 	@Autowired
+	private AcCloseService sAcCloseService;
+
+	/* DB服務注入 */
+	@Autowired
 	private SlipMedia2022Service sSlipMedia2022Service;
 
 	@Autowired
@@ -61,7 +68,6 @@ public class L9130Report2022 extends MakeReport {
 	@Autowired
 	private EbsCom ebsCom;
 
-	JSONArray summaryTbl;
 	JSONArray journalTbl;
 	BigInteger groupId;
 
@@ -156,11 +162,12 @@ public class L9130Report2022 extends MakeReport {
 	// 應收調撥款金額
 	BigDecimal transferAmt;
 
+	// For EBS WS P_SUMMARY_TBL.TOTAL_AMOUNT - 該批號下各幣別傳票借方總金額
 	BigDecimal drAmtTotal;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9130Report2022 exec ...");
-
+		
 		// 會計日期 #AcDate=D,7,I
 		iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
 
@@ -256,6 +263,12 @@ public class L9130Report2022 extends MakeReport {
 				// 特殊處理:同區隔帳冊借貸金額加總後，寫一筆反向10340000000 應收調撥款
 				i = specialHandling(i, titaVo);
 				// 特殊處理結束
+
+				// 區隔帳冊不同時，從AcClose取傳票序號加一，並更新回AcClose
+				updateCoreSeq(titaVo);
+
+				// 統計並送出
+				doSummaryAndSendToEbs(i);
 			}
 
 			acBookCode = l9130.get("F0"); // 帳冊別
@@ -282,15 +295,16 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("CONVENTION", ifrsType);
 				dataJo.put("JOURNAL_NAME", slipNo);
 				dataJo.put("CURRENCY_CODE", currencyCode);
-				dataJo.put("ISSUED_BY", "");
+				dataJo.put("ISSUED_BY", titaVo.getTlrNo());
 				dataJo.put("ACCOUNTING_DATE", slipDate);
 				dataJo.put("JE_LINE_NUM", "" + i);
 				dataJo.put("SEGREGATE_CODE", acSubBookCode);
 				dataJo.put("ACCOUNT_CODE", acNoCode);
-				dataJo.put("SUBACCOUNT_CODE", acSubNoCode);
+				dataJo.put("SUBACCOUNT_CODE", acSubNoCode.trim().isEmpty() ? "00000" : acSubNoCode);
 				dataJo.put("COSTCENTER_CODE", costUnit);
+				dataJo.put("CHANNEL_CODE", "00"); // 通路代號
 				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
-				dataJo.put("INTERCOMPANY_CODE", "");
+				dataJo.put("INTERCOMPANY_CODE", "999");
 				dataJo.put("DEPARTMENT_CODE", deptCode);
 				dataJo.put("ENTERED_AMOUNT", txBal);
 				dataJo.put("LINE_DESC", slipRmk);
@@ -380,7 +394,20 @@ public class L9130Report2022 extends MakeReport {
 		// 全部傳票印完，執行特殊處理
 		specialHandling(i, titaVo);
 
-		summaryTbl = new JSONArray();
+		// 統計並送出
+		doSummaryAndSendToEbs(i);
+
+		// 寫產檔記錄到TxFile
+		long fileno = makeFile.close();
+
+		// 產生CSV檔案
+		makeFile.toFile(fileno);
+
+	}
+
+	private void doSummaryAndSendToEbs(int i) {
+
+		JSONArray summaryTbl = new JSONArray();
 
 		JSONObject summaryMap = new JSONObject();
 
@@ -413,12 +440,8 @@ public class L9130Report2022 extends MakeReport {
 
 		this.info("result = " + result);
 
-		// 寫產檔記錄到TxFile
-		long fileno = makeFile.close();
-
-		// 產生CSV檔案
-		makeFile.toFile(fileno);
-
+		drAmtTotal = BigDecimal.ZERO;
+		journalTbl = new JSONArray();
 	}
 
 	/**
@@ -517,10 +540,11 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("JE_LINE_NUM", "" + i);
 				dataJo.put("SEGREGATE_CODE", acSubBookCode);
 				dataJo.put("ACCOUNT_CODE", tempAcNoCode);
-				dataJo.put("SUBACCOUNT_CODE", tempAcSubNoCode);
+				dataJo.put("SUBACCOUNT_CODE", tempAcSubNoCode.trim().isEmpty() ? "00000" : tempAcSubNoCode);
 				dataJo.put("COSTCENTER_CODE", costUnit);
+				dataJo.put("CHANNEL_CODE", "00"); // 通路代號
 				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
-				dataJo.put("INTERCOMPANY_CODE", "");
+				dataJo.put("INTERCOMPANY_CODE", "99999"); // 關聯方代號
 				dataJo.put("DEPARTMENT_CODE", deptCode);
 				dataJo.put("ENTERED_AMOUNT", transferAmt.negate()); // 寫一筆反向
 				dataJo.put("LINE_DESC", tempSlipRmk);
@@ -531,7 +555,7 @@ public class L9130Report2022 extends MakeReport {
 			}
 
 			journalTbl.put(dataJo);
-			
+
 			String data = "";
 
 			data += acBookCode + ","; // 帳冊別
@@ -599,11 +623,55 @@ public class L9130Report2022 extends MakeReport {
 
 			i++;
 		}
+		
+		// 計算借方加總
+		drAmtTotal = transferAmt.compareTo(BigDecimal.ZERO) > 0 ? drAmtTotal : drAmtTotal.add(transferAmt);
 
 		// 此區隔帳冊的印完，歸零
 		transferAmt = BigDecimal.ZERO;
 		// 特殊處理結束
 
 		return i;
+	}
+
+	private void updateCoreSeq(TitaVo titaVo) throws LogicException {
+
+		AcClose tAcClose = null;
+		AcCloseId tAcCloseId = new AcCloseId();
+
+		tAcCloseId.setAcDate(iAcDate);
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
+
+		tAcClose = sAcCloseService.holdById(tAcCloseId);
+
+		if (tAcClose == null) {
+			tAcClose = new AcClose();
+			tAcClose.setAcCloseId(tAcCloseId);
+			tAcClose.setClsFg(0);
+			tAcClose.setBatNo(1);
+			tAcClose.setCoreSeqNo(1);
+			try {
+				sAcCloseService.insert(tAcClose, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E6003", "Acclose insert " + e.getErrorMsg());
+			}
+		} else {
+			tAcClose.setCoreSeqNo(tAcClose.getCoreSeqNo() + 1);
+			try {
+				sAcCloseService.update(tAcClose);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "更新上傳核心序號(09:放款)"); // 更新資料時，發生錯誤
+			}
+		}
+
+		iMediaSeq = tAcClose.getCoreSeqNo();
+
+		slipNo = getSlipNo(iAcDate, iMediaSeq);
+
+		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
+				.add(new BigDecimal(iMediaSeq));
+
+		groupId = tmpGroupId.toBigInteger();
 	}
 }

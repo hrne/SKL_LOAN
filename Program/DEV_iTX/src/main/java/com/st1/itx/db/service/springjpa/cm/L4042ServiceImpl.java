@@ -16,7 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -33,9 +32,6 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	// *** 折返控制相關 ***
 	private int index;
@@ -63,6 +59,8 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iDateFrom = parse.stringToInteger(titaVo.get("DateFrom")) + 19110000;
 		int iDateTo = parse.stringToInteger(titaVo.get("DateTo")) + 19110000;
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
+		int iRepayBank = parse.stringToInteger(titaVo.get("RepayBank"));
+		
 		String iRepayAcct = FormatUtil.pad9(titaVo.get("RepayAcct").trim(), 14);
 
 		String sql = "";
@@ -107,6 +105,12 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		if (iSearchFlag == 5) {
 			sql += "            act.\"RepayAcct\" = " + iRepayAcct;
+		}
+		if(iRepayBank ==998) {
+			sql += "          and  act.\"RepayBank\" <> " + "103";
+		}
+		if(iRepayBank ==103) {
+			sql += "          and  act.\"RepayBank\" = " + "103";
 		}
 		sql += "  order by act.\"CustNo\",act.\"FacmNo\",act.\"CreateDate\" Desc  ";
 		sql += " ) a where a.\"F18\" = 1                                          ";

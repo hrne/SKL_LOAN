@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.parse.Parse;
 
 @Service("reportCom")
 @Scope("prototype")
@@ -32,12 +35,18 @@ public class ReportCom extends CommBuffer {
 
 	@Autowired
 	DateUtil dDateUtil;
+	
+	@Autowired
+	CdReportService cdReportService;
 
 	@Autowired
 	public WebClient webClient;
 
 	@Autowired
 	ConfigurableApplicationContext applicationContext;
+	
+	@Autowired
+	Parse parse;
 	
 	public BeanDefinition getBean(String beanName)
 	{
@@ -88,14 +97,21 @@ public class ReportCom extends CommBuffer {
 		StringBuilder backgroundJobs = new StringBuilder();
 		Queue<NeedInputJob> needInputJobs = new LinkedList<NeedInputJob>();
 
-		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
+		int totalItem = parse.stringToInteger(titaVo.getParam("TotalItem"));
 
 		for (int i = 1; i <= totalItem; i++) {
 
 			// Put jobs into related job queue
-			if (titaVo.getParam("BtnShell" + i).equals("V")) {
+			if (!titaVo.getParam("BtnShell" + i).trim().isEmpty()) {
 				String tradeCode = titaVo.getParam("TradeCode" + i);
-				String tradeName = titaVo.getParam("TradeName" + i);
+				String tradeName = "";
+				
+				// get tradeName
+				CdReport form =  cdReportService.FormNoFirst(tradeCode, titaVo);
+				if (form != null)
+				{
+					tradeName = cdReportService.FormNoFirst(tradeCode, titaVo).getFormName();
+				}
 
 				if (needInput(tradeCode)) {
 					// send notice through website

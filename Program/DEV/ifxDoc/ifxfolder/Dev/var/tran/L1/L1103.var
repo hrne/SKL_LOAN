@@ -240,6 +240,8 @@ ASGN(AGAIN$)
 
 #CustUKey=x,32,S
 
+#CustNo=A,7,S
+
 !身分證字號
 #CustId=X,10,L
 !C(3,#CHAIN,1,s,$)
@@ -261,6 +263,7 @@ RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
 T(2,@CustUKey,#L1r01CustUKey)
+T(2,@CustNo,#L1r01CustNo)
 T(2,@BranchNoBef,#L1r01BranchNo)
 T(2,@CustIdBef,#L1r01CustId)
 T(2,@CustIdAft,#L1r01CustId)
@@ -375,11 +378,14 @@ T(H,@TypeCodeXAft,#L1r01TypeCode,#TypeCodeHelp)
 T(2,@RegAddressBef,#L1r01RegAddress)
 T(2,@CurrAddressBef,#L1r01CurrAddress)
 
+#RimErrorSkip=_,_,S
+T(3,Y)
+
 #RIM_L2R08a=X,1,S
 C(4,#EmpnoBef,S,$)
 RESET_RIM(#RIM_L2R08a,L2R08)
 T(2,@RimEmployeeNo,#EmpnoBef)
-S(L2R08,1,#RimTxCode,#RimEmployeeNo)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
 T(2,@EmpnameBef,#L2r08FullName)
 T(2,@EmpnameAft,#L2r08FullName)
@@ -704,7 +710,7 @@ C(5,#CustTypeBef,#CustTypeAft,C(5,#EmpnoBef,#EmpnoAft,S,$),$)
 T(3,@EmpnameAft,)
 RESET_RIM(#RIM_L2R08,L2R08)
 T(2,@RimEmployeeNo,#EmpnoAft)
-S(L2R08,1,#RimTxCode,#RimEmployeeNo)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
 T(2,@EmpnameAft,#L2r08FullName)
 
@@ -1429,7 +1435,9 @@ IF(#OwnedhomeAft==#OwnedhomeBef,T(3,),T(3,X))
 #CurrcompidInd=X,1,L
 
 #CurrcompidAft=X,8,I
-@C(4,#CurrcompidAft,S,A(ID_UNINO,0,#CurrcompidAft))
+@
+C(5,CurrcompidBef,#CurrcompidAft,s,$)
+C(4,#CurrcompidAft,s,A(ID_UNINO,0,#CurrcompidAft))
 
 #CurrcompidInd=_,_,L
 IF(#CurrcompidAft==#CurrcompidBef,T(3,),T(3,X))
@@ -1597,6 +1605,7 @@ T(3,[L1103] 顧客基本資料變更-自然人)
 !------ 上行電文 ------
 <sub type="TIM">
 #CustUKey
+#CustNo
 #CustId
 #BranchNoBef
 #BranchNo

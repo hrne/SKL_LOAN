@@ -161,8 +161,8 @@ C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
 
 #CheinXmt=X,1,S
-C(3,#CHAIN,1,E(0,@CHAIN,0),$)
-! C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+!C(3,#CHAIN,1,E(0,@CHAIN,0),$)
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 #Return=A,1,S
 E(0,0)

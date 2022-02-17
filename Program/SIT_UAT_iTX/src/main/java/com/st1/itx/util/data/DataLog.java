@@ -316,7 +316,7 @@ public class DataLog extends CommBuffer {
 	 * @return 屬性差異比較結果map
 	 */
 	@SuppressWarnings("rawtypes")
-	private Map<String, Map<String, Object>> compareFields(Object oldObject, Object newObject) {
+	public Map<String, Map<String, Object>> compareFields(Object oldObject, Object newObject) {
 		Map<String, Map<String, Object>> map = null;
 
 		try {
