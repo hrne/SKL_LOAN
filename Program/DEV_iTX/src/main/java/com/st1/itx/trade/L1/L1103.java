@@ -11,6 +11,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.domain.TxDataLogId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.eum.ContentName;
@@ -417,7 +419,7 @@ public class L1103 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
-			iDataLog.exec("修改顧客 " + tCustMain.getCustId() + " 資料",tCustMain.getCustUKey());
+			iDataLog.exec("修改顧客 " + tCustMain.getCustId() + " 資料", "CustUKey:" + tCustMain.getCustUKey());
 		}
 
 		// 放行訂正
@@ -696,11 +698,11 @@ public class L1103 extends TradeBuffer {
 			// 紀錄變更前變更後
 //			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
 //			iDataLog.exec();
-			
-			//刪除變更記錄
-			
+
+			// 刪除變更記錄
+
 			iDataLog.delete(titaVo);
-			
+
 		}
 
 		this.addList(this.totaVo);

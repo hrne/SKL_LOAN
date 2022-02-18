@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -77,22 +78,32 @@ public class L1107 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 
+	String iFunCd;
+	String iCustId;
+	String iCustUKey;
+	String iUKey;
+	int iStartYY;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1107 ");
 		this.totaVo.init(titaVo);
 
-		String iFunCd = titaVo.getParam("FunCd");
-		String iCustId = titaVo.getParam("CustId");
-		String iCustUKey = titaVo.getParam("CustUKey");
-		String iUKey = titaVo.getParam("UKey");
-		int iStartYY = Integer.valueOf(titaVo.getParam("StartYY"));
+		iFunCd = titaVo.getParam("FunCd");
+		iCustId = titaVo.getParam("CustId");
+		iCustUKey = titaVo.getParam("CustUKey");
+		iUKey = titaVo.getParam("UKey");
+		iStartYY = Integer.valueOf(titaVo.getParam("StartYY"));
 
+		CustMain custMain = custMainService.custIdFirst(iCustId, titaVo);
+		if (custMain == null) {
+			throw new LogicException("E1003", "客戶資料主檔 : " + iCustId);
+		}
+		
+		titaVo.putParam("CustNo", custMain.getCustNo());
+		
 		if ("1".equals(iFunCd)) { // 新增
-			CustMain custMain = custMainService.custIdFirst(iCustId, titaVo);
-			if (custMain == null) {
-				throw new LogicException("E1003", "客戶資料主檔 : " + iCustId);
-			}
+			
 			iCustUKey = custMain.getCustUKey();
 			iUKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 			FinReportDebt finReportDebt = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY, titaVo);
@@ -114,11 +125,11 @@ public class L1107 extends TradeBuffer {
 				throw new LogicException("E0005", "資產負債表(FinReportDebt)");
 			}
 
-			mntFinReportReview(titaVo, iCustUKey, iUKey);
-			mntFinReportProfit(titaVo, iCustUKey, iUKey);
-			mntFinReportCashFlow(titaVo, iCustUKey, iUKey);
-			mntFinReportRate(titaVo, iCustUKey, iUKey);
-			mntFinReportQuality(titaVo, iCustUKey, iUKey);
+			mntFinReportReview(titaVo);
+			mntFinReportProfit(titaVo);
+			mntFinReportCashFlow(titaVo);
+			mntFinReportRate(titaVo);
+			mntFinReportQuality(titaVo);
 		} else if ("2".equals(iFunCd)) { // 修改
 			FinReportDebtId finReportDebtId = new FinReportDebtId();
 			finReportDebtId.setCustUKey(iCustUKey);
@@ -135,20 +146,29 @@ public class L1107 extends TradeBuffer {
 			finReportDebt = setFinReportDebt(titaVo, finReportDebt);
 
 			try {
+				boolean diff = false;
+				Map<String, Map<String, Object>> diffMap = dataLog.compareFields(finReportDebt2, finReportDebt);
+
+				if (diffMap.size() > 0) {
+					diff = true;
+				}
+
 				finReportDebt = finReportDebtService.update2(finReportDebt, titaVo);
 
-				dataLog.setEnv(titaVo, finReportDebt2, finReportDebt);
-				dataLog.exec();
+				if (diff) {
+					dataLog.setEnv(titaVo, finReportDebt2, finReportDebt);
+					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.資產負債表", "CustUKey:" + iCustUKey);
+				}
 
 			} catch (DBException e) {
 				throw new LogicException("E0007", "資產負債表(FinReportDebt)");
 			}
 
-			mntFinReportReview(titaVo, iCustUKey, iUKey);
-			mntFinReportProfit(titaVo, iCustUKey, iUKey);
-			mntFinReportCashFlow(titaVo, iCustUKey, iUKey);
-			mntFinReportRate(titaVo, iCustUKey, iUKey);
-			mntFinReportQuality(titaVo, iCustUKey, iUKey);
+			mntFinReportReview(titaVo);
+			mntFinReportProfit(titaVo);
+			mntFinReportCashFlow(titaVo);
+			mntFinReportRate(titaVo);
+			mntFinReportQuality(titaVo);
 		} else if ("4".equals(iFunCd)) { // 刪除
 			FinReportDebtId finReportDebtId = new FinReportDebtId();
 			finReportDebtId.setCustUKey(iCustUKey);
@@ -240,14 +260,14 @@ public class L1107 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void mntFinReportReview(TitaVo titaVo, String custUKey, String uKey) throws LogicException {
+	private void mntFinReportReview(TitaVo titaVo) throws LogicException {
 		boolean exist = false;
 
 		FinReportReview finReportReview2 = new FinReportReview();
 
 		FinReportReviewId finReportReviewId = new FinReportReviewId();
-		finReportReviewId.setCustUKey(custUKey);
-		finReportReviewId.setUKey(uKey);
+		finReportReviewId.setCustUKey(iCustUKey);
+		finReportReviewId.setUKey(iUKey);
 
 		FinReportReview finReportReview = finReportReviewService.holdById(finReportReviewId, titaVo);
 
@@ -290,31 +310,40 @@ public class L1107 extends TradeBuffer {
 
 		if (exist) {
 			try {
+				boolean diff = false;
+				Map<String, Map<String, Object>> diffMap = dataLog.compareFields(finReportReview2, finReportReview);
+
+				if (diffMap.size() > 0) {
+					diff = true;
+				}
+
 				finReportReview = finReportReviewService.update2(finReportReview, titaVo);
 
-				dataLog.setEnv(titaVo, finReportReview2, finReportReview);
-				dataLog.exec();
+				if (diff) {
+					dataLog.setEnv(titaVo, finReportReview2, finReportReview);
+					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.覆審比率表", "CustUKey:" + iCustUKey);
+				}
 
 			} catch (DBException e) {
-				throw new LogicException("E0007", "財報品質(FinReportReview)");
+				throw new LogicException("E0007", "覆審比率表(FinReportReview)");
 			}
 		} else {
 			try {
 				finReportReviewService.insert(finReportReview, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0005", "財報品質(FinReportReview)");
+				throw new LogicException("E0005", "覆審比率表(FinReportReview)");
 			}
 		}
 	}
 
-	private void mntFinReportQuality(TitaVo titaVo, String custUKey, String uKey) throws LogicException {
+	private void mntFinReportQuality(TitaVo titaVo) throws LogicException {
 		boolean exist = false;
 
 		FinReportQuality finReportQuality2 = new FinReportQuality();
 
 		FinReportQualityId finReportQualityId = new FinReportQualityId();
-		finReportQualityId.setCustUKey(custUKey);
-		finReportQualityId.setUKey(uKey);
+		finReportQualityId.setCustUKey(iCustUKey);
+		finReportQualityId.setUKey(iUKey);
 
 		FinReportQuality finReportQuality = finReportQualityService.holdById(finReportQualityId, titaVo);
 
@@ -336,10 +365,19 @@ public class L1107 extends TradeBuffer {
 
 		if (exist) {
 			try {
+				boolean diff = false;
+				Map<String, Map<String, Object>> diffMap = dataLog.compareFields(finReportQuality2, finReportQuality);
+
+				if (diffMap.size() > 0) {
+					diff = true;
+				}
+
 				finReportQuality = finReportQualityService.update2(finReportQuality, titaVo);
 
-				dataLog.setEnv(titaVo, finReportQuality2, finReportQuality);
-				dataLog.exec();
+				if (diff) {
+					dataLog.setEnv(titaVo, finReportQuality2, finReportQuality);
+					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.財報品質", "CustUKey:" + iCustUKey);
+				}
 
 			} catch (DBException e) {
 				throw new LogicException("E0007", "財報品質(FinReportQuality)");
@@ -353,14 +391,14 @@ public class L1107 extends TradeBuffer {
 		}
 	}
 
-	private void mntFinReportRate(TitaVo titaVo, String custUKey, String uKey) throws LogicException {
+	private void mntFinReportRate(TitaVo titaVo) throws LogicException {
 		boolean exist = false;
 
 		FinReportRate finReportRate2 = new FinReportRate();
 
 		FinReportRateId finReportRateId = new FinReportRateId();
-		finReportRateId.setCustUKey(custUKey);
-		finReportRateId.setUKey(uKey);
+		finReportRateId.setCustUKey(iCustUKey);
+		finReportRateId.setUKey(iUKey);
 
 		FinReportRate finReportRate = finReportRateService.holdById(finReportRateId, titaVo);
 
@@ -399,10 +437,19 @@ public class L1107 extends TradeBuffer {
 
 		if (exist) {
 			try {
+				boolean diff = false;
+				Map<String, Map<String, Object>> diffMap = dataLog.compareFields(finReportRate2, finReportRate);
+
+				if (diffMap.size() > 0) {
+					diff = true;
+				}
+
 				finReportRate = finReportRateService.update2(finReportRate, titaVo);
 
-				dataLog.setEnv(titaVo, finReportRate2, finReportRate);
-				dataLog.exec();
+				if (diff) {
+					dataLog.setEnv(titaVo, finReportRate2, finReportRate);
+					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.財務比率表", "CustUKey:" + iCustUKey);
+				}
 
 			} catch (DBException e) {
 				throw new LogicException("E0007", "財務比率表(FinReportCashFlow)");
@@ -416,14 +463,14 @@ public class L1107 extends TradeBuffer {
 		}
 	}
 
-	private void mntFinReportCashFlow(TitaVo titaVo, String custUKey, String uKey) throws LogicException {
+	private void mntFinReportCashFlow(TitaVo titaVo) throws LogicException {
 		boolean exist = false;
 
 		FinReportCashFlow finReportCashFlow2 = new FinReportCashFlow();
 
 		FinReportCashFlowId finReportCashFlowId = new FinReportCashFlowId();
-		finReportCashFlowId.setCustUKey(custUKey);
-		finReportCashFlowId.setUKey(uKey);
+		finReportCashFlowId.setCustUKey(iCustUKey);
+		finReportCashFlowId.setUKey(iUKey);
 
 		FinReportCashFlow finReportCashFlow = finReportCashFlowService.holdById(finReportCashFlowId, titaVo);
 
@@ -446,10 +493,19 @@ public class L1107 extends TradeBuffer {
 
 		if (exist) {
 			try {
+				boolean diff = false;
+				Map<String, Map<String, Object>> diffMap = dataLog.compareFields(finReportCashFlow2, finReportCashFlow);
+
+				if (diffMap.size() > 0) {
+					diff = true;
+				}
+
 				finReportCashFlow = finReportCashFlowService.update2(finReportCashFlow, titaVo);
 
-				dataLog.setEnv(titaVo, finReportCashFlow2, finReportCashFlow);
-				dataLog.exec();
+				if (diff) {
+					dataLog.setEnv(titaVo, finReportCashFlow2, finReportCashFlow);
+					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.現金流量表", "CustUKey:" + iCustUKey);
+				}
 
 			} catch (DBException e) {
 				throw new LogicException("E0007", "現金流量表(FinReportCashFlow)");
@@ -463,14 +519,14 @@ public class L1107 extends TradeBuffer {
 		}
 	}
 
-	private void mntFinReportProfit(TitaVo titaVo, String custUKey, String uKey) throws LogicException {
+	private void mntFinReportProfit(TitaVo titaVo) throws LogicException {
 		boolean exist = false;
 
 		FinReportProfit finReportProfit2 = new FinReportProfit();
 
 		FinReportProfitId finReportProfitId = new FinReportProfitId();
-		finReportProfitId.setCustUKey(custUKey);
-		finReportProfitId.setUKey(uKey);
+		finReportProfitId.setCustUKey(iCustUKey);
+		finReportProfitId.setUKey(iUKey);
 
 		FinReportProfit finReportProfit = finReportProfitService.holdById(finReportProfitId, titaVo);
 		if (finReportProfit == null) {
@@ -501,10 +557,19 @@ public class L1107 extends TradeBuffer {
 
 		if (exist) {
 			try {
+				boolean diff = false;
+				Map<String, Map<String, Object>> diffMap = dataLog.compareFields(finReportProfit2, finReportProfit);
+
+				if (diffMap.size() > 0) {
+					diff = true;
+				}
+
 				finReportProfit = finReportProfitService.update2(finReportProfit, titaVo);
 
-				dataLog.setEnv(titaVo, finReportProfit2, finReportProfit);
-				dataLog.exec();
+				if (diff) {
+					dataLog.setEnv(titaVo, finReportProfit2, finReportProfit);
+					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.損益表","CustUKey:" + iCustUKey);
+				}
 
 			} catch (DBException e) {
 				throw new LogicException("E0007", "損益表(FinReportProfit)");

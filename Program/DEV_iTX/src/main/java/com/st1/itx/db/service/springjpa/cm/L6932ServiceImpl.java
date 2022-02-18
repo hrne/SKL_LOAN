@@ -11,9 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdBcm;
+
+import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.common.data.L5051Vo;
+import com.st1.itx.util.common.data.L5052Vo;
+import com.st1.itx.util.common.data.L5053Vo;
+import com.st1.itx.util.common.data.L5054Vo;
 
 @Service("l6932ServiceImpl")
 @Repository
@@ -38,7 +46,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //	public String FindL5051(String FunctionCd, String PerfDateFm, String PerfDateTo, String CustNo, String FacmNo) throws Exception {
 	public List<Map<String, String>> FindData(TitaVo titaVo, int index, int limit) throws Exception {
-		this.info("L5051FindData");
+		this.info("L6932FindData");
 
 		int txDate1 = Integer.parseInt(titaVo.getParam("ST_DT").toString());
 		int txDate2 = Integer.parseInt(titaVo.getParam("ED_DT").toString());
@@ -73,9 +81,15 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += "WHERE A.\"LastUpdate\" >= to_date(:TrDate1,'yyyymmdd hh24:mi:ss') AND A.\"LastUpdate\" <= to_date(:TrDate2,'yyyymmdd hh24:mi:ss') ";
 		}
-		if (CustNo > 0) {
+		
+		boolean skipCustNo = false;
+		//為客戶變更整合查詢及結清戶控管特殊處理
+		if (iMrKey.length() == 41 && "CustUKey:".equals(iMrKey.substring(0, 9))) {
+			skipCustNo = true;
+		} else if (CustNo > 0) {
 			sql += "AND A.\"CustNo\" = :CustNo ";
 		}
+		
 		if (FacmNo > 0) {
 			sql += "AND A.\"FacmNo\" = :FacmNo ";
 		}
@@ -123,7 +137,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("TrDate1", caDate1 + " 00:00:00");
 			query.setParameter("TrDate2", caDate2 + " 23:59:59");
 		}
-		if (CustNo > 0) {
+		if (CustNo > 0 && !skipCustNo) {
 			query.setParameter("CustNo", CustNo);
 		}
 		if (FacmNo > 0) {

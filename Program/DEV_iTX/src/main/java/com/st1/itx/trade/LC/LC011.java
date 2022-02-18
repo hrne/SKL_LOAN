@@ -1,5 +1,8 @@
 package com.st1.itx.trade.LC;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,21 +11,29 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
+import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.LC011ServiceImpl;
 
 @Service("LC011")
@@ -126,7 +137,13 @@ public class LC011 extends TradeBuffer {
 			}
 			occursList.putParam("FlowType", d.get("FlowType"));
 			occursList.putParam("FlowStep", d.get("FlowStep"));
-			if ("1".equals(d.get("Hcode").toString()) && Integer.valueOf(d.get("OrgEntdy").toString()) > 0 && d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
+			
+			TempVo tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(d.get("TranData"));
+			occursList.putParam("Funcind", tTempVo.get("FUNCIND"));
+
+			if ("1".equals(d.get("Hcode").toString()) && Integer.valueOf(d.get("OrgEntdy").toString()) > 0
+					&& d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
 				occursList.putParam("Hcode", 3);
 			} else {
 				occursList.putParam("Hcode", d.get("Hcode"));
@@ -134,7 +151,8 @@ public class LC011 extends TradeBuffer {
 
 			occursList.putParam("Status", d.get("ActionFg"));
 			occursList.putParam("FlowNo", d.get("FlowNo"));
-			if (Integer.valueOf(d.get("OrgEntdy").toString()) > 0 && d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
+			if (Integer.valueOf(d.get("OrgEntdy").toString()) > 0
+					&& d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
 				occursList.putParam("OOOrgEntdy", Integer.valueOf(d.get("OrgEntdy").toString().trim()) - 19110000);
 			} else {
 				occursList.putParam("OOOrgEntdy", "");
@@ -144,7 +162,9 @@ public class LC011 extends TradeBuffer {
 
 			if (Integer.valueOf(d.get("AcCnt")) > 0) {
 				// 當天訂正及被訂正交易 無分錄
-				if (("1".equals(d.get("Hcode").toString()) && d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) || "1".equals(d.get("ActionFg").toString())) {
+				if (("1".equals(d.get("Hcode").toString())
+						&& d.get("OrgEntdy").toString().equals(d.get("Entdy").toString()))
+						|| "1".equals(d.get("ActionFg").toString())) {
 					occursList.putParam("AcCnt", 0);
 				} else {
 					occursList.putParam("AcCnt", 1);

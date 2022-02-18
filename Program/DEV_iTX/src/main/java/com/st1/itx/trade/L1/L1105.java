@@ -166,7 +166,7 @@ public class L1105 extends TradeBuffer {
 			nCustTelNo.setTelExt("");
 			
 			iDataLog.setEnv(titaVo, oCustTelNo, nCustTelNo);
-			iDataLog.exec("修改顧客 " + iCustMain.getCustId() + " 電話資料/"+oCustTelNo.getTelArea()+oCustTelNo.getTelNo()+oCustTelNo.getTelExt(), iCustMain.getCustUKey());
+			iDataLog.exec("修改顧客 " + iCustMain.getCustId() + " 電話資料/"+oCustTelNo.getTelArea()+oCustTelNo.getTelNo()+oCustTelNo.getTelExt(), "CustUKey:" + iCustMain.getCustUKey());
 		}
 
 		this.totaVo.putParam("OResult", "Y");

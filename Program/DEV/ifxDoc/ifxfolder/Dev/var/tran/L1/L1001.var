@@ -449,8 +449,8 @@ C(4,#OOCustId,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1111;text=變更; 
 T(1,#SYSCDATE,2,7)
 
 !統一編號變更
-#OOBUF18=X,150,S
-T(2,                                                                           1000101+#Ed+#OOCustUKey)
+#OOBUF18=x,150,S
+T(2,                                     +#OOCustNo+                               1000101+#Ed+CustUKey:+#OOCustUKey)
 
 #OOBTN18=X,1,S
 C(3,#OOLogFg,1,BIND(grid,{ cmd=CHAIN; ntxcd=L6932;text=紀錄; ntxbuf=#OOBUF18}),BIND(grid,cancel))

@@ -44,7 +44,7 @@ public class L1108 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public FacMainService sFacMainService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public CdReportService sCdReportService;
@@ -233,18 +233,19 @@ public class L1108 extends TradeBuffer {
 				}
 				if (log) {
 					// 紀錄變更前變更後
-					
+
 					String formx = "";
 					CdReport cdReport = sCdReportService.findById(tCustNotice.getFormNo(), titaVo);
 					if (cdReport != null) {
-						formx =cdReport.getFormName();
+						formx = cdReport.getFormName();
 					}
-										
+
 					oCustNotice = tranDesc(oCustNotice);
 					CustNotice nCustNotice = tranDesc(tCustNotice);
-					
+
 					iDataLog.setEnv(titaVo, oCustNotice, nCustNotice);
-					iDataLog.exec("修改顧客 " + custMain.getCustId() + "/" + oCustNotice.getFormNo() + " " + formx + " 通知書",custMain.getCustUKey());
+					iDataLog.exec("修改顧客 " + custMain.getCustId() + "/" + oCustNotice.getFormNo() + " " + formx + " 通知書",
+							"CustUKey:" + custMain.getCustUKey());
 				}
 			}
 		}
@@ -252,21 +253,21 @@ public class L1108 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
-    private CustNotice tranDesc(CustNotice custNotice) {
-    	
+
+	private CustNotice tranDesc(CustNotice custNotice) {
+
 		if ("N".equals(custNotice.getPaperNotice())) {
 			custNotice.setPaperNotice("不寄送");
 		} else {
 			custNotice.setPaperNotice("寄送");
 		}
-		
+
 		if ("N".equals(custNotice.getMsgNotice())) {
 			custNotice.setMsgNotice("不發送");
 		} else {
 			custNotice.setMsgNotice("發送");
 		}
-		
+
 		if ("N".equals(custNotice.getEmailNotice())) {
 			custNotice.setEmailNotice("不發送");
 		} else {
@@ -274,5 +275,5 @@ public class L1108 extends TradeBuffer {
 		}
 
 		return custNotice;
-    }
+	}
 }

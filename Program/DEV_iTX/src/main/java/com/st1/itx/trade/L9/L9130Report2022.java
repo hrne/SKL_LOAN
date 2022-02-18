@@ -1,10 +1,10 @@
 package com.st1.itx.trade.L9;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -165,9 +165,14 @@ public class L9130Report2022 extends MakeReport {
 	// For EBS WS P_SUMMARY_TBL.TOTAL_AMOUNT - 該批號下各幣別傳票借方總金額
 	BigDecimal drAmtTotal;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	// 紀錄本次產生的序號 提供L9131產表使用
+	List<String> listMediaSeq;
+
+	public List<String> exec(TitaVo titaVo) throws LogicException {
 		this.info("L9130Report2022 exec ...");
-		
+
+		listMediaSeq = new ArrayList<>();
+
 		// 會計日期 #AcDate=D,7,I
 		iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
 
@@ -176,6 +181,9 @@ public class L9130Report2022 extends MakeReport {
 
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
+
+		// 紀錄本次產生的序號
+		listMediaSeq.add("" + iMediaSeq);
 
 		// 取得傳票號碼
 		slipNo = getSlipNo(iAcDate, iMediaSeq);
@@ -268,7 +276,20 @@ public class L9130Report2022 extends MakeReport {
 				updateCoreSeq(titaVo);
 
 				// 統計並送出
-				doSummaryAndSendToEbs(i);
+				doSummaryAndSendToEbs(i, titaVo);
+
+				// 寫產檔記錄到TxFile
+				long fileno = makeFile.close();
+
+				this.info("makeFile close fileno = " + fileno);
+
+				// 開始新的傳票
+
+				i = 1;
+
+				name = "總帳傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
+
+				makeFile.open(titaVo, date, brno, no, desc, name, format);
 			}
 
 			acBookCode = l9130.get("F0"); // 帳冊別
@@ -395,17 +416,17 @@ public class L9130Report2022 extends MakeReport {
 		specialHandling(i, titaVo);
 
 		// 統計並送出
-		doSummaryAndSendToEbs(i);
+		doSummaryAndSendToEbs(i, titaVo);
 
 		// 寫產檔記錄到TxFile
 		long fileno = makeFile.close();
 
-		// 產生CSV檔案
-		makeFile.toFile(fileno);
+		this.info("makeFile close fileno = " + fileno);
 
+		return listMediaSeq;
 	}
 
-	private void doSummaryAndSendToEbs(int i) {
+	private void doSummaryAndSendToEbs(int i, TitaVo titaVo) throws LogicException {
 
 		JSONArray summaryTbl = new JSONArray();
 
@@ -419,7 +440,10 @@ public class L9130Report2022 extends MakeReport {
 			summaryMap.put("CURRENCY_CODE", "NTD");
 			summaryMap.put("TOTAL_AMOUNT", drAmtTotal);
 		} catch (JSONException e) {
-			this.error("L9130Report22 error = " + e.getMessage());
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9130Report22 Exception = " + e.getMessage());
+			throw new LogicException("CE000", "傳票媒體檔上傳失敗");
 		}
 
 		summaryTbl.put(summaryMap);
@@ -431,14 +455,7 @@ public class L9130Report2022 extends MakeReport {
 //        "CURRENCY_CODE": "NTD",
 //        "TOTAL_AMOUNT": 12450
 
-		String result = "";
-		try {
-			result = ebsCom.sendSlipMediaToEbs(summaryTbl, journalTbl, titaVo);
-		} catch (IOException | JSONException e) {
-			this.error("L9130Report22 error = " + e.getMessage());
-		}
-
-		this.info("result = " + result);
+		ebsCom.sendSlipMediaToEbs(summaryTbl, journalTbl, titaVo);
 
 		drAmtTotal = BigDecimal.ZERO;
 		journalTbl = new JSONArray();
@@ -623,7 +640,7 @@ public class L9130Report2022 extends MakeReport {
 
 			i++;
 		}
-		
+
 		// 計算借方加總
 		drAmtTotal = transferAmt.compareTo(BigDecimal.ZERO) > 0 ? drAmtTotal : drAmtTotal.add(transferAmt);
 
@@ -666,6 +683,9 @@ public class L9130Report2022 extends MakeReport {
 		}
 
 		iMediaSeq = tAcClose.getCoreSeqNo();
+
+		// 紀錄本次產生的序號
+		listMediaSeq.add("" + iMediaSeq);
 
 		slipNo = getSlipNo(iAcDate, iMediaSeq);
 

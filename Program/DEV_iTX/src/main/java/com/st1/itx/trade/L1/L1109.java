@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustCross;
@@ -74,9 +76,9 @@ public class L1109 extends TradeBuffer {
 		if (iCustMain == null) {
 			throw new LogicException(titaVo, "E0001", "客戶主檔查無資料"); // 輸入錯誤
 		}
-		
+
 		titaVo.putParam("CustNo", iCustMain.getCustNo());
-		
+
 		iCustUKey = iCustMain.getCustUKey();
 
 		String iSubCompanyFg = titaVo.getParam("SubCompanyFg");
@@ -84,7 +86,7 @@ public class L1109 extends TradeBuffer {
 //		List<HashMap<String, Object>> logMap = new ArrayList<HashMap<String, Object>>();
 
 		int cnt = 0;
-		
+
 		if ("N".equals(iSubCompanyFg)) {
 			Slice<CustCross> slCustCross = iCustCrossService.custUKeyEq(iCustUKey, 0, Integer.MAX_VALUE, titaVo);
 			List<CustCross> lCustCross = slCustCross == null ? null : slCustCross.getContent();
@@ -111,10 +113,10 @@ public class L1109 extends TradeBuffer {
 						} else {
 							k = fCustCross.getSubCompanyCode() + " 交互運用";
 						}
-						
+
 						iDataLog.setLog(k, "Y", "N");
 						cnt++;
-						
+
 					}
 				}
 			}
@@ -193,7 +195,7 @@ public class L1109 extends TradeBuffer {
 		this.info("L1109 cnt = " + cnt);
 		if (cnt > 0) {
 			iDataLog.setEnv(titaVo, iCustMain, iCustMain);
-			iDataLog.exec("修改顧客 " + iCustMain.getCustId() + " 交互運用資料", iCustMain.getCustUKey());
+			iDataLog.exec("修改顧客 " + iCustMain.getCustId() + " 交互運用資料", "CustUKey:" + iCustMain.getCustUKey());
 		}
 
 		this.addList(this.totaVo);
