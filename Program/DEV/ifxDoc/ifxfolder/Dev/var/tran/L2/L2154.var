@@ -2623,10 +2623,7 @@ E(0,@RimFunCode,#FuncCode)
 RESET_RIM(#SendL2r44,L2R44)
 S(L2R44,1,#RimCustNo,#RimFacmNo,#RimFunCode)
 R(1,L2R44)
-
-#CHECKL2R44=X,1,S
 IF(#FKEY==0,$,s)
-C(3,#RepayCode,2,$,S)
 T(2,@RepayBank,#L2r44RepayBank)
 T(2,@OldRepayBank,#L2r44RepayBank)
 E(0,@RepayAcctNo,#L2r44RepayAcctNo)

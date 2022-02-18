@@ -272,9 +272,6 @@ public class L9130Report2022 extends MakeReport {
 				i = specialHandling(i, titaVo);
 				// 特殊處理結束
 
-				// 區隔帳冊不同時，從AcClose取傳票序號加一，並更新回AcClose
-				updateCoreSeq(titaVo);
-
 				// 統計並送出
 				doSummaryAndSendToEbs(i, titaVo);
 
@@ -284,6 +281,8 @@ public class L9130Report2022 extends MakeReport {
 				this.info("makeFile close fileno = " + fileno);
 
 				// 開始新的傳票
+				// 從AcClose取傳票序號加一，並更新回AcClose
+				updateCoreSeq(titaVo);
 
 				i = 1;
 
