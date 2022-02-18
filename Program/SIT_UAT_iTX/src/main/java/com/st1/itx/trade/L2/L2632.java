@@ -122,7 +122,7 @@ public class L2632 extends TradeBuffer {
 			
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeFacClose, tFacClose);
-			dataLog.exec("修改清償作業");
+			dataLog.exec();
 			// 刪除
 		} else if (iFunCd == 4) {
 			

@@ -16,7 +16,7 @@ E(0,565)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
-E(0,40)ASGN(INQREC$)
+E(0,100)ASGN(INQREC$)
 
 ![畫面顯示的明細間的高度]
 #LOOPH=n,3,S
@@ -24,7 +24,7 @@ E(0,1)ASGN(LOOPHEIGHT$)
 
 ![每張印錄單列印的筆數]
 #INQPRT=n,2,S
-E(0,40)ASGN(INQPRT$)
+E(0,100)ASGN(INQPRT$)
 
 </sub>
 
@@ -153,6 +153,7 @@ T(3,)T(H,#InqCode,#InqCodeHelp)
 #AdjDate=D,7,I
 C(3,#CHAIN,0,$,s)
 E(0,#SYSDATE)
+
 
 #OvduTerm=A,2,I
 C(3,#CHAIN,0,$,s)
@@ -413,7 +414,7 @@ TXFORM=L4931
 ^
 
 #RPTFG=7,QUERY.GRID,L4931
-#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+#any={caption:'[L4931]',width:1000,rowNum:100,ifxDisplay:1,
 ifxBatch:{
      	name:'按擬調利率調整;按目前利率調整;按輸入利率調整',
 	     type:'5',
@@ -476,7 +477,7 @@ ifxBatch:{
 ^
 
 #RPTFG=6,QUERY.GRID,L4931
-#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+#any={caption:'[L4931]',width:1000,rowNum:100,ifxDisplay:1,
 ifxBatch:{
      	name:'取消調整',
 	     type:'5',
@@ -572,7 +573,7 @@ ifxBatch:{
 ^
 
 #RPTFG=4,QUERY.GRID,L4931
-#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+#any={caption:'[L4931]',width:1000,rowNum:100,ifxDisplay:1,
 ifxBatch:{
      	name:'取消調整',
 	     type:'5',
@@ -631,7 +632,7 @@ ifxBatch:{
 ^
 
 #RPTFG=3,QUERY.GRID,L4931
-#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+#any={caption:'[L4931]',width:1000,rowNum:100,ifxDisplay:1,
 ifxBatch:{
      	name:'按擬調利率調整;按目前利率調整;按輸入利率調整',
 	     type:'5',
@@ -697,7 +698,7 @@ ifxBatch:{
 ^
 
 #RPTFG=2,QUERY.GRID,L4931
-#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+#any={caption:'[L4931]',width:1000,rowNum:100,ifxDisplay:1,
 ifxBatch:{
      	name:'重新處理',
 	     type:'5',

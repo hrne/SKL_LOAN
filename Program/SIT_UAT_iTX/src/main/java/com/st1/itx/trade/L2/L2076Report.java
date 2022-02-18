@@ -137,7 +137,11 @@ public class L2076Report extends MakeReport {
 		FacCloseId FacCloseId = new FacCloseId();
 		FacCloseId.setCustNo(iCustNo);
 		FacCloseId.setCloseNo(iCloseNo);
-		ClOtherRights tClOtherRights = sClOtherRightsService.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
+		ClOtherRights tClOtherRights = sClOtherRightsService
+				.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
+		if (tClOtherRights == null) {
+			throw new LogicException(titaVo, "E2003", "擔保品他項權利檔"); // 查無資料
+		}
 //		FacClose tFacClose = sFacCloseService.findById(FacCloseId, titaVo);
 		int DocNo = tFacClose.getDocNo();
 		String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);
@@ -158,7 +162,8 @@ public class L2076Report extends MakeReport {
 		// 地政
 		String wkLandAdm = "";
 		if ("".equals(tClOtherRights.getOtherLandAdm())) {
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()), titaVo);
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()),
+					titaVo);
 			if (tCdCode != null) {
 				wkLandAdm = tCdCode.getItem();
 			}
@@ -171,7 +176,8 @@ public class L2076Report extends MakeReport {
 		// 收件字
 		String wkRecWord = "";
 		if ("".equals(tClOtherRights.getOtherRecWord())) {
-			CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+			CdLandOffice tCdLandOffice = cdLandOfficeService
+					.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
 			if (tCdLandOffice != null) {
 				wkRecWord = tCdLandOffice.getRecWordItem();
 			}
@@ -217,10 +223,10 @@ public class L2076Report extends MakeReport {
 //		SecuredTotal擔保債權總金額
 		if ("3".equals(funCdString)) {
 
-			Point a = new Point(550, 7);
-			Point b = new Point(588, 7);
-			Point c = new Point(550, 25);
-			Point d = new Point(588, 25);
+			Point a = new Point(85, 200);
+			Point b = new Point(120, 200);
+			Point c = new Point(85, 220);
+			Point d = new Point(120, 220);
 
 			Line ab = new Line(a, b);
 			Line ac = new Line(a, c);
@@ -235,8 +241,9 @@ public class L2076Report extends MakeReport {
 			lineList.add(cd);
 
 			this.drawLineList(lineList);
-			this.setFont(1, 12);
-			this.print(-1, 93, "補發", "L");
+			this.setFont(1, 17);
+			this.print(7, 11, "補發", "L");
+			this.print(-9, 1, " ");
 		}
 		this.print(1, 1, "　　");
 
@@ -244,15 +251,11 @@ public class L2076Report extends MakeReport {
 		 * -----------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * --------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		this.print(1, 15, " ");
+//		this.print(1, 15, " ");
 
 		// 設定字體1:標楷體 字體大小14
 		this.setFont(1, 14);
-		this.print(1, 1, " ");
-		this.print(1, 1, " ");
-		this.print(1, 1, " ");
-		this.print(1, 1, " ");
-		this.print(1, 5, "                                        新壽放款   字第           號 ");
+		this.print(1, 5, "                                        新壽放款   　　           　 ");
 		this.print(0, 40, "(" + DocNoyy + ")");
 		this.print(0, 62, DocNoseQ);
 		this.print(1, 1, " ");
@@ -312,8 +315,12 @@ public class L2076Report extends MakeReport {
 		this.print(1, 1, " ");
 		this.print(1, 10, "地　  　址 : 台北市忠孝西路1段66號31～43樓");
 		this.print(1, 1, " ");
-		this.print(1, 1, " ");
-		this.print(1, 1, " ");
+		if ("3".equals(funCdString)) {
+			this.print(1, 17, "※他項權利證明書與抵押權設定契約書已由客戶領取無誤。");
+		} else {
+			this.print(1, 1, " ");
+		}
+		this.print(1, 17, " ");
 		this.print(1, 1, " ");
 		this.print(1, 10, "");
 //		this.print(1, 10, "");
@@ -321,6 +328,13 @@ public class L2076Report extends MakeReport {
 		this.print(0, 40, date.substring(0, 3));
 		this.print(0, 52, date.substring(3, 5));
 		this.print(0, 68, date.substring(5, 7));
+//		for (int i = 1; i <= 400; i++) {
+//			if ((i % 10) == 0) {
+//				this.print(-2, i, "" + (i / 10));
+//			}
+//			this.print(-1, i, "" + (i % 10));
+//			this.print(-i, 1, "" + (i % 10));
+//		}
 	}
 
 	private void drawLineList(ArrayList<Line> lineList) {

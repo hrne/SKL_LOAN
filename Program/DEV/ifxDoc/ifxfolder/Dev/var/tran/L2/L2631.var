@@ -48,7 +48,6 @@
 ["#FdTelNo1+連絡電話１",#TelNo1,#BTN9],["#FdTelNo2+連絡電話２",#TelNo2,#BTN10],
 ["#FdTelNo3+連絡電話３",#TelNo3,#BTN11],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 [#<->#,"#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],
-[#<->#,"#FdRegisteredAddress+雙掛號地址",#RegisteredAddress],
 [#<->#,"#FdReceiveDate+領取日期",#ReceiveDate],
 [#<->#,"#FdRmk1+備註欄",#Rmk1],
 ]
@@ -111,7 +110,6 @@ T(3,* )
 #FdTelNo2=X,2,L
 #FdCloseReasonCode=X,2,L
 T(3,* )
-#FdRegisteredAddress=X,2,L
 #FdReceiveDate=X,2,L
 !---------- AP TEXT AREA Variables ----------
 ! Help
@@ -177,7 +175,6 @@ T(F,#CloseInd,0)
 
 #init=X,1,S
 INVOKEJS(SHOW,p1,9,9,0)
-INVOKEJS(SHOW,p1,15,15,0)
 K(MODIFYBUTTON,登錄)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
@@ -511,18 +508,12 @@ HELP(#CollectWayCodeHelp,cols:5)
 C(4,#CollectWayCode,T(3,@CollectWayCodeX,),$)
 V(H,#CollectWayCodeHelp)
 C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,T(3,@FdRegisteredAddress,*),T(3,@FdRegisteredAddress,))
 
 #CollectWayCodeX=x,12,L
 T(3,)
 C(4,#CollectWayCode,S,$)
 T(H,#CollectWayCode,#CollectWayCodeHelp)
 
-!雙掛號地址
-#RegisteredAddress=x,100,I
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,15,15,1),INVOKEJS(SHOW,p1,15,15,0))
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,$,S)
-@V(7)
 
 
 !領取日期
@@ -619,7 +610,6 @@ K(LIGHT,#CloseNo,TXTRED,0,1)
 #TelNo2
 #TelNo3
 #CloseReasonCode
-#RegisteredAddress
 #CollectWayCode
 #ReceiveDate
 #Rmk1

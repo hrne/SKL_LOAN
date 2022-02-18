@@ -11,17 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdBcm;
-
-import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.util.common.data.L5051Vo;
-import com.st1.itx.util.common.data.L5052Vo;
-import com.st1.itx.util.common.data.L5053Vo;
-import com.st1.itx.util.common.data.L5054Vo;
 
 @Service("l6932ServiceImpl")
 @Repository

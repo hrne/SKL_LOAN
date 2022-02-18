@@ -122,6 +122,7 @@ T(3,Y:是;N:否)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2077清償作業明細資料查詢]進入),$)
+
 #NTXBUF=X,60,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCode,#NTXBUF,1,1)
@@ -164,7 +165,6 @@ E(0,@ItemCode,#L2r36FunCode)
 T(2,@CloseReasonCode,#L2r36CloseReasonCode)
 T(H,@CloseReasonCodeX,#CloseReasonCode,#CloseReasonCodeHelp)
 T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
-
 
 ! L2r36CarLoan=A,1,S
 ! L2r36ApplDate=D,7,S
@@ -345,8 +345,6 @@ C(5,#L3r11CloseReasonCode,00,S,$)
 CALL2(#ADJUSTDOT,#PRECISION,#TimCloseAmt,#CloseAmtX)
 
 
-
-
 !連絡電話１ 自動顯示不需輸入
 #TelNo1=X,15,I
 C(3,#FunCode,4,s,$)
@@ -363,9 +361,6 @@ C(3,#FunCode,5,s,$)
 #TelNo3=X,15,I
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
-
-
-
 
 
 !清償原因 修改時自動顯示可修改,其他自動顯示不需輸入
@@ -389,6 +384,7 @@ C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
 
 #CollectWayCodeX=X,50,L
 T(H,#CollectWayCode,#CollectWayCodeHelp)
+
 
 ![領取日期]
 !修改時自動顯示可修改,其他自動顯示不需輸入

@@ -49,8 +49,6 @@ import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.db.service.ReltMainService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.springjpa.cm.L1001ServiceImpl;
-import com.st1.itx.db.service.springjpa.cm.L2023ServiceImpl;
-import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.service.CustDataCtrlService;
 

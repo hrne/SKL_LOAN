@@ -67,6 +67,12 @@ public class L2631 extends TradeBuffer {
 	/* 報表服務注入 */
 	@Autowired
 	public L2076Report L2076Report;
+	@Autowired
+	public L2076ReportB L2076ReportB;
+	@Autowired
+	public L2076ReportC L2076ReportC;
+	@Autowired
+	public L2076ReportD L2076ReportD;
 
 	/* 轉換工具 */
 	@Autowired
@@ -87,7 +93,10 @@ public class L2631 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2631 ");
 		this.totaVo.init(titaVo);
-
+		L2076Report.setTxBuffer(txBuffer);
+		L2076ReportB.setTxBuffer(txBuffer);
+		L2076ReportC.setTxBuffer(txBuffer);
+		L2076ReportD.setTxBuffer(txBuffer);
 		// new PK
 		FacCloseId tFacCloseId = new FacCloseId();
 		// new table
@@ -175,7 +184,7 @@ public class L2631 extends TradeBuffer {
 				// 短繳清償違約金處理, 新增銷帳檔
 				List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 				AcReceivable tAcReceivable = new AcReceivable();
-				tAcReceivable.setReceivableFlag(3); // 短繳期金
+				tAcReceivable.setReceivableFlag(3); // 未收費用
 				tAcReceivable.setAcctCode("YOP");
 				tAcReceivable.setCustNo(iCustNo);
 				tAcReceivable.setFacmNo(iFacmNo);
@@ -205,19 +214,23 @@ public class L2631 extends TradeBuffer {
 				wkFacmNoEd = iFacmNo;
 			}
 			// 擔保品與額度關聯檔
-			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0,
+					Integer.MAX_VALUE, titaVo);
 			lClFac = slClFac == null ? null : slClFac.getContent();
 			// 全部結案
 			boolean isAllClose = true;
 			for (ClFac c : lClFac) {
-				if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
+				if ((c.getCustNo() == iCustNo && iFacmNo == 0)
+						|| (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
 
 					// 撥款主檔
-					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
+							c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 					if (slLoanBorMain != null) {
 						for (LoanBorMain t : slLoanBorMain.getContent()) {
 							// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6 || t.getStatus() == 8) {
+							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
+									|| t.getStatus() == 8) {
 								isAllClose = false;
 								break;
 							}
@@ -271,14 +284,27 @@ public class L2631 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "清償作業檔");
 			}
-
+			this.info("selectTotal = " + titaVo.get("selectTotal"));
+			this.info("selectIndex = " + titaVo.get("selectIndex"));
+			// 總筆數
+			titaVo.get("selectTotal");
+			// 當前筆數
+			titaVo.get("selectIndex");
 			String checkMsg = "抵押權塗銷同意書已完成。";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), checkMsg, titaVo);
+			if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 
+				doRptB(tFacClose, titaVo);// 用印申請書
+				doRptC(tFacClose, titaVo.get("selectTotal"), titaVo); // 簽收回條
+				if (tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26")
+						|| tFacClose.getCollectWayCode().equals("27")) {
+					doRptD(tFacClose, titaVo);// 雙掛號信封
+				}
+
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+						titaVo.getTlrNo(), checkMsg, titaVo);
+			}
 		}
-
-		// 更新領取記號
 
 		this.totaVo.putParam("OCloseNo", wkcloseNo);
 
@@ -287,7 +313,7 @@ public class L2631 extends TradeBuffer {
 	}
 
 	public long doRpt(TitaVo titaVo, FacClose tFacClose) throws LogicException {
-		this.info("L2670 doRpt started.");
+		this.info("L2076 doRpt started.");
 
 		// 撈資料組報表
 		L2076Report.exec(titaVo, tFacClose);
@@ -298,7 +324,31 @@ public class L2631 extends TradeBuffer {
 		// 產生PDF檔案
 		L2076Report.toPdf(rptNo);
 
-		this.info("L2670 doRpt finished.");
+		this.info("L2076 doRpt finished.");
 		return rptNo;
+	}
+
+	public void doRptB(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+		this.info("L2076B doRptB started.");
+
+		// 撈資料組報表
+		L2076ReportB.exec(tFacClose, titaVo);
+
+	}
+
+	public void doRptC(FacClose tFacClose, String selectTotal, TitaVo titaVo) throws LogicException {
+		this.info("L2076C doRptC started.");
+
+		// 撈資料組報表
+		L2076ReportC.exec(tFacClose, selectTotal, titaVo);
+
+	}
+
+	public void doRptD(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+		this.info("L2076D doRptD started.");
+
+		// 撈資料組報表
+		L2076ReportD.exec(tFacClose, titaVo);
+
 	}
 }
