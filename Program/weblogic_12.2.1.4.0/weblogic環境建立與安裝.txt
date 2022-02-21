@@ -1,0 +1,194 @@
+/*
+ *weblogic安裝及啟動請使用oracle帳號 (如有使用gourp請用oinstall)，請勿使用root。
+ *所有相關啟動服務的script請放𦋠於oracle home directory下。
+ *如果3rd party軟體無法以oracle帳號啟動時，請來電討論做法。
+ *
+ *原則上所有相關的檔案均放在 /u01下，/u01下目錄列出如下:
+ *app            weblogic binary安裝路徑
+ *domain         weblogic domain路徑
+ *jdk            weblogic application 使用JDK路徑
+ *properties     application使用設定檔案路徑
+ *source         相關軟體source files
+*/
+
+
+
+1.新建使用者群組
+    groupadd weblogic
+
+2.新建使用者weblogic
+    useradd -g weblogic weblogic
+    passwd "1qaz2wsx"
+
+3.新增資料夾賦予權限
+    mkdir /u01
+    chmod 777 /u01
+
+    #change to weblogic
+    mkdir /u01/app
+    mkdir /u01/domain
+    mkdir /u01/jdk
+    mkdir /u01/properties
+    mkdir /u01/source
+
+3.安裝JDK
+    java -version
+    rpm -qa | grep java
+    #如果有openJDK刪除openJDK
+    rpm -e --nodeps ...
+
+    tar xzf jdk-8u321-linux-x64.tar.gz -C /u01/jdk/
+    sudo alternatives --install /usr/bin/java java /u01/jdk/jdk1.8.0_321/bin/java 2
+    sudo alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_181/bin/javac 2
+    sudo alternatives --install /usr/bin/jar jar /u01/jdk/jdk1.8.0_321/bin/jar 2
+    sudo alternatives --set jar /u01/jdk/jdk1.8.0_321/bin/jar
+    sudo alternatives --set javac /u01/jdk/jdk1.8.0_321/bin/javac
+
+    #確認版本
+    java -version
+
+    #新增環境變數(weblogic)
+    export JAVA_HOME=/u01/jdk/jdk1.8.0_321
+    export JAVA_BIN=/u01/jdk/jdk1.8.0_321/bin
+    export JRE_HOME=/u01/jdk/jdk1.8.0_321/jre
+    export PATH=$PATH:$JAVA_HOME/bin
+    export JAVA_HOME JAVA_BIN JRE_HOME PATH CLASSPATH
+
+ˋ4.準備安裝文件
+
+    #fmw_12.2.1.4.0_infrastructure.jar 安裝檔放置位置
+    vi wls.rsp
+[ENGINE]
+
+#DO NOT CHANGE THIS.
+
+Response File Version=1.0.0.0.0
+
+[GENERIC]
+#The oracle home location. This can be an existing Oracle Home or a new Oracle Home
+
+ORACLE_HOME=/u01/app/Oracle
+
+#Set this variable value to the Installation Type selected. e.g. WebLogic Server, Coherence, Complete with Examples.
+
+INSTALL_TYPE=Fusion Middleware Infrastructure
+
+#Provide the My Oracle Support Username. If you wish to ignore Oracle Configuration Manager configuration provide empty string for user name.
+
+MYORACLESUPPORT_USERNAME=
+
+#Provide the My Oracle Support Password
+
+MYORACLESUPPORT_PASSWORD=<SECURE VALUE>
+
+#Set this to true if you wish to decline the security updates. Setting this to true and providing empty string for My Oracle Support username will ignore the Oracle Configuration Manager configuration
+
+DECLINE_SECURITY_UPDATES=true
+
+#Set this to true if My Oracle Support Password is specified
+
+SECURITY_UPDATES_VIA_MYORACLESUPPORT=false
+
+#Provide the Proxy Host
+
+PROXY_HOST=
+
+#Provide the Proxy Port
+
+PROXY_PORT=
+
+#Provide the Proxy Username
+
+PROXY_USER=
+
+#Provide the Proxy Password
+
+PROXY_PWD=<SECURE VALUE>
+
+#Type String (URL format) Indicates the OCM Repeater URL which should be of the format [scheme[Http/Https]]://[repeater host]:[repeater port]
+
+COLLECTOR_SUPPORTHUB_URL=
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    vi oraInst.loc
+inventory_loc=/u01/app/oraInventory
+
+inst_group=weblogic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+5.開始安裝
+    java -jar /home/weblogic/softWare/weblogic_12.2.1.4.0/fmw_12.2.1.4.0_infrastructure.jar -silent -responseFile /home/weblogic/softWare/weblogic_12.2.1.4.0/wls.rsp -invPtrLoc /home/weblogic/softWare/weblogic_12.2.1.4.0/oraInst.loc
+
+    #導入「安裝位置」環境變量
+    export MW_HOME=/u01/app
+    export WL_HOME=/u01/app/Oracle/oracle_common
+
+    source .bash_profile
+    cd $WL_HOME
+    cd common/bin/
+    #更新環境變數
+    ./commEnv.sh
+    #進入「Weblogic」 WLST Console
+    ./wlst.sh
+    readTemplate('/u01/app/Oracle/wlserver/common/templates/wls/wls.jar')
+    cd('Servers/AdminServer')
+    #設定console監聽位置
+    set('ListenAddress','')
+    #設定console監聽Port
+    set('ListenPort',7001)
+    cd('../..')
+    #設定管理者
+    cd('Security/base_domain/User/weblogic')
+    #設定管理者密碼
+    cmo.setPassword('1qaz2wsx')
+    setOption('OverwriteDomain','true')
+    #創建域
+    writeDomain('/u01/domain/servyou_domain')
+    closeTemplate()
+    exit()
+    sudo firewall-cmd --permanent --zone=public --add-port=50001/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=7001/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=7005/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+    systemctl restart firewalld
+    cd /u01/domain/servyou_domain/security
+    export CLASSPATH=$CLASSPATH:$MW_HOME/Oracle/wlserver/server/lib/weblogic.jar
+    java utils.CertGen -keyfilepass DemoIdentityPassPhrase -certfile democert -keyfile demokey -strength 2048 -noskid
+    java utils.ImportPrivateKey -keystore DemoIdentity.jks -storepass DemoIdentityKeyStorePassPhrase -keyfile demokey.pem -keyfilepass DemoIdentityPassPhrase -certfile democert.pem -alias demoidentity
+    cd /u01/domain/servyou_domain/bin
+    #修改記憶體及參數
+    vi setDomainEnv.sh
+WLS_MEM_ARGS_64BIT="-Xms1024m -Xmx1024m -Djava.security.egd=file:/dev/./urandom"
+export WLS_MEM_ARGS_64BIT
+
+WLS_MEM_ARGS_32BIT="-Xms1024m -Xmx1024m -Djava.security.egd=file:/dev/./urandom"
+export WLS_MEM_ARGS_32BIT
+
+if [ "${JAVA_VENDOR}" != "HP" ] ; then
+        if [ "${VM_TYPE}" = "HotSpot" ] ; then
+                WLS_MEM_ARGS_64BIT="-Xms512m -Xmx1024m"
+                export WLS_MEM_ARGS_64BIT
+                WLS_MEM_ARGS_32BIT="-Xms512m -Xmx1024m"
+                export WLS_MEM_ARGS_32BIT
+        fi
+fi
+
+
+
+#iTX iFX-Server 啟動參數
+-Xms1024m
+-Xmx1024m
+-Djava.security.egd=file:/dev/./urandom
+-Difx_LocalAddr=http://192.168.245.8/iFX
+-Difx_OtherAddr=http://192.168.245.8:81/iFX
+-Difx_OtherMqAddr=http://192.168.245.8:50011
+-Difx_PortNumber=50010
+-Difx_fxtxwrite=/home/weblogic/ifxDoc/ifxwriter
+-Difx_fxworkfile=/home/weblogic/ifxDoc/ifxfolder
+-Difx_spring_env=/home/weblogic/ifxDoc/ifxfolder
+-Dlogback_configurationFile=/home/weblogic/ifxDoc/ifxfolder/webServerEnv/logback.xml
+-Ditx_configFolder=/home/weblogic/itxDoc/itxConfig
+-DiTXInFolder=/home/weblogic/itxDoc/itxWrite/upload/
+-DiTXPort=556887799
+
+
