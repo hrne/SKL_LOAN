@@ -167,12 +167,18 @@ public class L9130Report2022 extends MakeReport {
 
 	// 紀錄本次產生的序號 提供L9131產表使用
 	List<String> listMediaSeq;
+	
+	// 作業人員
+	String tellerNo = "";
 
 	public List<String> exec(TitaVo titaVo) throws LogicException {
 		this.info("L9130Report2022 exec ...");
 
 		listMediaSeq = new ArrayList<>();
-
+		
+		// 作業人員
+		tellerNo = titaVo.getTlrNo();
+		
 		// 會計日期 #AcDate=D,7,I
 		iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
 
@@ -315,7 +321,7 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("CONVENTION", ifrsType);
 				dataJo.put("JOURNAL_NAME", slipNo);
 				dataJo.put("CURRENCY_CODE", currencyCode);
-				dataJo.put("ISSUED_BY", titaVo.getTlrNo());
+				dataJo.put("ISSUED_BY", tellerNo);
 				dataJo.put("ACCOUNTING_DATE", slipDate);
 				dataJo.put("JE_LINE_NUM", "" + i);
 				dataJo.put("SEGREGATE_CODE", acSubBookCode);
@@ -435,7 +441,7 @@ public class L9130Report2022 extends MakeReport {
 			summaryMap.put("GROUP_ID", groupId);
 			summaryMap.put("BATCH_DATE", slipDate);
 			summaryMap.put("JE_SOURCE_NAME", "LN");
-			summaryMap.put("TOTAL_LINES", i);
+			summaryMap.put("TOTAL_LINES", i - 1);
 			summaryMap.put("CURRENCY_CODE", "NTD");
 			summaryMap.put("TOTAL_AMOUNT", drAmtTotal);
 		} catch (JSONException e) {
@@ -551,7 +557,7 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("CONVENTION", ifrsType);
 				dataJo.put("JOURNAL_NAME", slipNo);
 				dataJo.put("CURRENCY_CODE", currencyCode);
-				dataJo.put("ISSUED_BY", "");
+				dataJo.put("ISSUED_BY", tellerNo);
 				dataJo.put("ACCOUNTING_DATE", slipDate);
 				dataJo.put("JE_LINE_NUM", "" + i);
 				dataJo.put("SEGREGATE_CODE", acSubBookCode);
@@ -560,7 +566,7 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("COSTCENTER_CODE", costUnit);
 				dataJo.put("CHANNEL_CODE", "00"); // 通路代號
 				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
-				dataJo.put("INTERCOMPANY_CODE", "99999"); // 關聯方代號
+				dataJo.put("INTERCOMPANY_CODE", "999"); // 關聯方代號
 				dataJo.put("DEPARTMENT_CODE", deptCode);
 				dataJo.put("ENTERED_AMOUNT", transferAmt.negate()); // 寫一筆反向
 				dataJo.put("LINE_DESC", tempSlipRmk);
@@ -641,7 +647,7 @@ public class L9130Report2022 extends MakeReport {
 		}
 
 		// 計算借方加總
-		drAmtTotal = transferAmt.compareTo(BigDecimal.ZERO) > 0 ? drAmtTotal : drAmtTotal.add(transferAmt);
+		drAmtTotal = transferAmt.compareTo(BigDecimal.ZERO) > 0 ? drAmtTotal : drAmtTotal.add(transferAmt.abs());
 
 		// 此區隔帳冊的印完，歸零
 		transferAmt = BigDecimal.ZERO;

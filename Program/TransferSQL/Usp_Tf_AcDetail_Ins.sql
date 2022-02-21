@@ -320,6 +320,80 @@ BEGIN
                  ELSE "TitaTxCd" END 
     ;
 
+    -- 寫入資料
+    INSERT INTO "AcDetail"
+    WITH JORP AS (
+        SELECT CORACC
+             , CORACS
+             , CORAMT
+             , ACNBOK
+             , NEWVBN
+             , TRXDAT
+             , TRXATP
+             , CORVNO
+             , CORVNS
+             , CORVDS
+        FROM "LA$JORP"
+        WHERE NEWVBN > 90
+    )
+    SELECT JORP."TRXDAT"                  AS "RelDy"               -- 登放日期 Decimald 8 0
+          ,'000099999900000000'           AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0
+          ,ROW_NUMBER() OVER (PARTITION BY JORP."TRXDAT"
+                              ORDER BY JORP."NEWVBN"  
+                                     , JORP."CORVNS"
+                                     , JORP."ACNBOK"
+                             )            AS "AcSeq"               -- 分錄序號 DECIMAL 4 0
+          ,JORP."TRXDAT"                  AS "AcDate"              -- 會計日期 Decimald 8 0
+          ,'0000'                         AS "BranchNo"            -- 單位別 VARCHAR2 4 0
+          ,'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 0
+          ,S5."AcNoCode"                  AS "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改為新版11碼
+          ,S5."AcSubCode"                 AS "AcSubCode"           -- 子目代號 VARCHAR2 5 0
+          ,S5."AcDtlCode"                 AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0
+          ,S5."AcctCode"                  AS "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
+          ,JORP."TRXATP"                  AS "DbCr"                -- 借貸別 VARCHAR2 1 0
+          ,JORP."CORAMT"                  AS "TxAmt"               -- 記帳金額 DECIMAL 16 2
+          ,0                              AS "EntAc"               -- 入總帳記號 DECIMAL 1 0
+          ,0                              AS "CustNo"              -- 戶號 DECIMAL 7 0
+          ,0                              AS "FacmNo"              -- 額度編號 DECIMAL 3 0
+          ,0                              AS "BormNo"              -- 撥款序號 DECIMAL 3 0
+          ,''                             AS "RvNo"                -- 銷帳編號 VARCHAR2 30 0
+          ,NVL(S5."AcctFlag",0)           AS "AcctFlag"            -- 業務科目記號 DECIMAL 1 0
+          ,NVL(S5."ReceivableFlag",0)     AS "ReceivableFlag"      -- 銷帳科目記號 DECIMAL 1 0
+          ,NVL(S5."AcBookFlag",0)         AS "AcBookFlag"          -- 帳冊別記號 DECIMAL 1 0
+          ,'000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3  -- 2021-07-15 舊資料固定為000:全公司
+          ,CASE
+             WHEN NVL(JORP."ACNBOK",' ') = '201'
+             THEN '201'
+           ELSE '00A' END                 AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增欄位,00A傳統帳冊、201利變帳冊
+          ,''                             AS "SumNo"               -- 彙總別 VARCHAR2 3 0
+          ,''                             AS "DscptCode"           -- 摘要代號 VARCHAR2 4 0
+          ,u''                            AS "SlipNote"            -- 傳票摘要 NVARCHAR2 80 0
+          ,JORP."NEWVBN"                  AS "SlipBatNo"           -- 傳票批號 DECIMAL 2 0
+          ,JORP."CORVNS"                  AS "SlipNo"              -- 傳票號碼 DECIMAL 6 0
+          ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0
+          ,'999999'                       AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
+          ,0                              AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
+          ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0
+          ,''                             AS "TitaSecNo"           -- 業務類別 VARCHAR2 2 0
+          ,''                             AS "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0
+          ,''                             AS "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0
+          ,''                             AS "TitaSupNo"           -- 核准主管 VARCHAR2 6 0
+          ,0                              AS "TitaRelCd"           -- 作業模式 DECIMAL 1 0
+          ,''                             AS "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0
+          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    FROM JORP
+    LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = JORP."CORACC"
+                           AND S5."AcSubCode" = NVL(JORP."CORACS",'     ')
+                           AND S5."AcDtlCode" = '  '
+    WHERE NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
+    ;
+
+    -- 記錄寫入筆數
+    INS_CNT := INS_CNT + sql%rowcount;
+
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 

@@ -657,7 +657,7 @@ E(0,@UsHandlingFee{n},#L2r01HandlingFee{n})
 C(3,#Precision,0,E(0,@TimLoanAmtB{n},#TwLoanAmtB{n}),E(0,@TimLoanAmtB{n},#UsLoanAmtB{n}))
 ##end
 T(H,@StatusCodeX,#StatusCode,#StatusCodeHelp)
-C(3,#StatusCode,0,IF(#StartDate <= #wksyscdate,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效)),$)
+C(3,#StatusCode,0,IF(#StartDate <= #wksyscdate,T(3,@StatusCodeX,啟用),T(3,@StatusCodeX,未啟用)),$)
 C(3,#EndDate,0,$,IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$))
 T(H,@BaseRateCodeX,#BaseRateCode,#BaseRate0Help)
 T(H,@IncrFlagX,#IncrFlag,#YesNoHelp)
@@ -695,19 +695,19 @@ C(3,#FuncCode,3,E(0,@StartDate,#SYSCDATE),$)
 T(2,@UseProdFg,#L2r01UseProdFg)
 
 
-!檢查輸入生效日期是否生效 1為生效 0為未生效
+!檢查輸入啟用日期是否生效 1為啟用 0為未啟用
 #checkeffdate=A,1,S
 E(0,0)
 IF(#StartDate <= #wksyscdate,E(0,1),E(0,0))
 ! C(3,#FuncCode,2,$,s)
 ! C(3,#StatusCode,0,$,s)
-C(3,#checkeffdate,1,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效))
+C(3,#checkeffdate,1,T(3,@StatusCodeX,啟用),T(3,@StatusCodeX,未啟用))
 C(3,#EndDate,0,$,IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$))
 
 
-!判斷商品是否已生效
+!判斷商品是否已啟用
 !商品參數生效後禁止刪除,只允許修改商品狀態、商品截止日期
-!1生效 0未生效
+!1啟用 0未啟用
 #Effective=A,1,S
 E(0,0)
 C(3,#FuncCode,2,$,S)
@@ -891,7 +891,7 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(7)
 
-![商品生效日期]
+![商品啟用日期]
 #FdStartDate=X,2,L
 
 #StartDate=D,7,I
@@ -912,13 +912,13 @@ C(3,#Effective,1,$,S)
 T(F,#EndDate,1)
 T(F,#StatusCode,1)
 
-!檢查輸入生效日期是否生效 1為生效 0為未生效
+!檢查輸入啟用日期是否生效 1為生效 0為未生效
 #checkeffdate1=A,1,S
 E(0,0)
 IF(#StartDate <= #wksyscdate,E(0,1),E(0,0))
 ! C(3,#FuncCode,2,$,s)
 ! C(3,#StatusCode,0,$,s)
-C(3,#checkeffdate1,1,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效))
+C(3,#checkeffdate1,1,T(3,@StatusCodeX,啟用),T(3,@StatusCodeX,未啟用))
 C(3,#EndDate,0,$,IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$))
 
 ![商品截止日期]
@@ -958,7 +958,7 @@ HELP(#StatusCodeHelp)
 #StatusCodeX=X,6,L
 ! T(H,#StatusCode,#StatusCodeHelp)
 C(3,#StatusCode,0,$,s)
-C(3,#checkeffdate1,1,T(3,已生效),T(3,待生效))
+C(3,#checkeffdate1,1,T(3,啟用),T(3,未啟用))
 C(3,#EndDate,0,s,$)
 IF(#EndDate < #wksyscdate,T(3,已失效),$)
 ! C(2,#StatusCode,T(3,啟用),T(3,停用),T(3, ))
@@ -2136,7 +2136,7 @@ C(3,#EndDate,0,HIDE(#EndDate),SHOW(#EndDate))
 [
 ["<font color=red>@商品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 "], 
 [#<->#,"#FdProdName+商品名稱",#ProdName],
-["#FdStartDate+商品生效日期",#StartDate],
+["#FdStartDate+商品啟用日期",#StartDate],
 ["#FdEndDate+商品截止日期",#EndDate],
 ["#FdStatusCode+商品狀態",#StatusCodeX],["#FdAgreementFg+是否為協議商品",#AgreementFg,#AgreementFgX],
 [#<->#,"#FdEnterpriseFg+企金使用記號",#EnterpriseFg,#EnterpriseFgX],

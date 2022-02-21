@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TotaVoList;
@@ -80,6 +81,17 @@ public class L420C extends TradeBuffer {
 		if (tBatxDetail == null) {
 			throw new LogicException("E0014", tBatxDetailId + " hold not exist"); // 檔案錯誤
 		}
+		BatxHeadId tBatxHeadId = new BatxHeadId();
+		tBatxHeadId.setAcDate(acDate);
+		tBatxHeadId.setBatchNo(batchNo);
+		BatxHead tBatxHead = batxHeadService.findById(tBatxHeadId);
+		if (tBatxHead == null) {
+			throw new LogicException("E0014", tBatxHeadId + " hold not exist"); // 檔案錯誤
+		}
+		// BatxStsCode 整批作業狀態 0.正常 1.整批處理中
+		if ("1".equals(tBatxHead.getBatxStsCode())) {
+			throw new LogicException("E0014", batchNo + "整批處理中 "); // 檔案錯誤
+		}
 		boolean isUpdate = false;
 		String procStsCode = tBatxDetail.getProcStsCode();
 //		1.訂正
@@ -110,11 +122,18 @@ public class L420C extends TradeBuffer {
 			} catch (DBException e) {
 				e.printStackTrace();
 			}
-			updateHeadRoutine(titaVo);
+			int mergeCnt = 0;
+			TempVo tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
+			if (tTempVo.get("MergeCnt") != null) {
+				mergeCnt = parse.stringToInteger(tTempVo.get("MergeCnt"));
+			}
+			updateHeadRoutine(titaVo, mergeCnt);
 		} else {
 			// 組入帳交易電文
 			TitaVo txTitaVo = new TitaVo();
-			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, titaVo); // 1:訂正 2:轉暫收
+			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, tBatxHead.getBatxTotCnt(), titaVo); // 1:訂正
+																										// 2:轉暫收
 
 			// 執行入帳交易
 			this.info("L420C excuteTx " + txTitaVo);
@@ -127,12 +146,11 @@ public class L420C extends TradeBuffer {
 					throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
 			}
 		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	private void updateHeadRoutine(TitaVo titaVo) throws LogicException {
+	private void updateHeadRoutine(TitaVo titaVo, int mergeCnt) throws LogicException {
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(acDate);
 		tBatxHeadId.setBatchNo(batchNo);
@@ -142,6 +160,10 @@ public class L420C extends TradeBuffer {
 		}
 
 		if (functionCode == 1) {
+			tBatxHead.setBatxExeCode("0");// 0.待檢核
+		}
+		// 同戶號合併檢核須重新檢核
+		if (functionCode == 2 && mergeCnt > 1) {
 			tBatxHead.setBatxExeCode("0");// 0.待檢核
 		}
 

@@ -646,13 +646,13 @@ BEGIN
              WHEN FAC."AcctCode" = '330' THEN 'Z30'
              WHEN FAC."AcctCode" = '340' THEN 'Z40'
            ELSE '' END          AS "AcctCode"         -- 業務科目代號
-          ,LPAD(ACT."LMSACN",7,0)
+          ,LPAD(LMSP."LMSACN",7,0)
                                 AS "CustNo"           -- 戶號
           -- 取該戶號下尚有餘額的第一筆額度號碼
-          ,LPAD(FAC."FacmNo",3,0)
+          ,LPAD(LMSP."LMSAPN",3,0)
                                 AS "FacmNo"           -- 額度編號
           -- 取該額度下尚有餘額的第一筆撥款序號
-          ,LPAD(FAC."BormNo",3,0)
+          ,LPAD(LMSP."LMSASQ",3,0)
                                 AS "RvNo"             -- 銷帳編號
           ,C1."AcNoCode"        AS "AcNoCode"         -- 科目代號
           ,C1."AcSubCode"       AS "AcSubCode"        -- 子目代號
@@ -662,11 +662,11 @@ BEGIN
           ,0                    AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
           ,0                    AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
           ,4                    AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
-          ,ABS(ACT."LMSLPN")    AS "RvAmt"            -- 起帳總額
-          ,ABS(ACT."LMSLPN")    AS "RvBal"            -- 未銷餘額
-          ,ABS(ACT."LMSLPN")    AS "AcBal"            -- 會計日餘額
+          ,LMSP."LMSLPN"        AS "RvAmt"            -- 起帳總額
+          ,LMSP."LMSLPN"        AS "RvBal"            -- 未銷餘額
+          ,LMSP."LMSLPN"        AS "AcBal"            -- 會計日餘額
           ,''                   AS "SlipNote"         -- 傳票摘要
-          ,'000'                AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
+          ,'000'                AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改為000:全公司
           ,CASE
              WHEN NVL(ACT."ACTFSC",' ') = 'A' THEN '201' -- 利變A
            ELSE '00A' END       AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
@@ -682,31 +682,18 @@ BEGIN
           ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
-    FROM "LA$ACTP" ACT
-    LEFT JOIN (SELECT F1."CustNo"
-                     ,F1."FacmNo"
-                     ,LB."BormNo"
-                     ,F1."AcctCode"
-                     ,ROW_NUMBER() OVER (PARTITION BY F1."CustNo"
-                                         ORDER BY F1."CustNo"
-                                                 ,F1."FacmNo"
-                                                 ,LB."BormNo" ) AS "Seq"
-               FROM "FacMain" F1
-               LEFT JOIN (SELECT "CustNo"
-                                ,"FacmNo"
-                                ,MIN("BormNo")  AS "BormNo"
-                                ,SUM("LoanBal") AS "LoanBal"
-                          FROM "LoanBorMain"
-                          WHERE "LoanBal" > 0
-                          GROUP BY "CustNo"
-                                  ,"FacmNo"
-                         ) LB ON LB."CustNo" = F1."CustNo"
-                             AND LB."FacmNo" = F1."FacmNo"
-               WHERE LB."LoanBal" > 0
-              ) FAC ON FAC."CustNo" = ACT."LMSACN"
-                   AND FAC."Seq"    = 1
-    LEFT JOIN "CdAcCode" C1 ON C1."AcctCode" = FAC."AcctCode"
-    WHERE FAC."CustNo" > 0
+    FROM "LA$LMSP" LMSP
+    LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LMSP."LMSACN"
+                           AND FAC."FacmNo" = LMSP."LMSAPN"
+    LEFT JOIN "CdAcCode" C1 ON C1."AcctCode" = CASE
+                                                 WHEN FAC."AcctCode" = '310' THEN 'IC1'
+                                                 WHEN FAC."AcctCode" = '320' THEN 'IC2'
+                                                 WHEN FAC."AcctCode" = '330' THEN 'IC3'
+                                                 WHEN FAC."AcctCode" = '340' THEN 'IC4'
+                                               ELSE '' END
+    LEFT JOIN "LA$ACTP" ACT ON ACT."LMSACN" = LMSP."LMSACN"
+    WHERE LMSP."LMSLPN" > 0
+      AND FAC."CustNo" > 0
       AND FAC."AcctCode" IN ('310','320','330','340')
     ;
 

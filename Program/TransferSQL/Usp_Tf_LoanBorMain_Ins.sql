@@ -143,7 +143,7 @@ BEGIN
              WHEN "LA$LMSP"."LMSFSD" > 0 AND "LA$LMSP"."LMSNSD" = 0 THEN "LA$LMSP"."LMSFSD"
            ELSE "LA$LMSP"."LMSNSD" END    AS "NextAdjRateDate"     -- 下次利率調整日期 DECIMALD 8 
           -- 2022-02-16 QC1435
-          ,ACFP."ACTFEE"                  AS "AcctFee"             -- 帳管費 DECIMAL 16 2
+          ,NVL(ACFP."ACTFEE",0)           AS "AcctFee"             -- 帳管費 DECIMAL 16 2
           ,0                              AS "HandlingFee"         -- 手續費 DECIMAL 16 2
           ,0                              AS "FinalBal"            -- 最後一期本金餘額 DECIMAL 16 2
           ,'N'                            AS "NotYetFlag"          -- 未齊件 VARCHAR2 1 

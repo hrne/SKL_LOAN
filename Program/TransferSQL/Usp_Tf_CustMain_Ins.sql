@@ -33,7 +33,7 @@ BEGIN
            END                            AS "CustId"              -- 身份證字號/統一編號 VARCHAR2 10 
           ,CUSP."LMSACN"                  AS "CustNo"              -- 戶號 DECIMAL 7 
           ,LPAD(CUSP."CUSBRH",4,'0')      AS "BranchNo"            -- 單位別 VARCHAR2 4 
-          ,REPLACE(REPLACE(TRIM(CUSP."CUSNA1"),'	','')||REPLACE(TRIM(CUSP."CUSNA5"),'	',''),'○','o')
+          ,REPLACE(REPLACE(TRIM(CUSP."CUSNA1"),' ','')||REPLACE(TRIM(CUSP."CUSNA5"),' ',''),'○','o')
                                           AS "CustName"            -- 戶名/公司名稱 NVARCHAR2 100 
           ,CUSP."CUSBDT"                  AS "Birthday"            -- 出生年月日/設立日期 decimald 8 
           ,CASE
@@ -141,11 +141,14 @@ BEGIN
           ,TRIM(CUSP."CUSMAL")            AS "Email"               -- Email Address VARCHAR2 50 
           ,0                              AS "ActFg"               -- 交易進行記號 DECIMAL 1 
           ,CUSP."CUSEM3"                  AS "Introducer"          -- 介紹人 VARCHAR2 6 
+          ,NVL(CUSP."CUSEM1",CUSP."CUSEM2")
+                                          AS "BusinessOfficer" -- 房貸專員/企金人員 VARCHAR2 6
           ,'N'                            AS "IsSuspected"         -- 是否為金控「疑似準利害關係人」名單 VARCHAR2 1 
           ,'N'                            AS "IsSuspectedCheck"    -- 是否為金控疑似準利害關係人 VARCHAR2 1 
           ,'N'                            AS "IsSuspectedCheckType"-- 是否為金控疑似準利害關係人_確認狀態 VARCHAR2 1 
           ,0                              AS "DataStatus"          -- 資料狀態 DECIMAL 1 
           ,0                              AS "TypeCode"            -- 建檔身分別 DECIMAL 1 
+          ,CUSP."CUSSTN"                  AS "Station"             -- 站別 VARCHAR2 3
           -- 2022-01-04 智偉修改:若原檔案的建檔日期有值,使用該值,否則用轉換時的日期
           ,CASE
              WHEN CUSP."CUSCDT" > 0

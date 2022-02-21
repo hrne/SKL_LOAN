@@ -79,8 +79,8 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2035借款戶關係人/關�
 
 #NTXBUF=X,14,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@CaseNo,#NTXBUF,1,7)
-T(1,@CustNo,#NTXBUF,8,7)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@CaseNo,#NTXBUF,8,7)
 
 #NTXBUF5=X,14,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)

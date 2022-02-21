@@ -82,7 +82,7 @@ T(2,@StatusCodeHelp,#HelpDesc1)
 #StatusCodeHelp=x,1024,S
 
 #ProdStatusHelp=x,1024,S
-T(3,0:全部;1:已生效;2:待生效;3:已失效)
+T(3,0:全部;1:啟用;2:未啟用;3:已失效)
 
 #EnterpriseFgHelp=x,1024,S
 T(3,:空白為查全部;Y:是)
@@ -246,11 +246,11 @@ T(3,1)ASGN(LOOP$)
 #OOStartDate=D,7,O
 
 
-!檢查生效日期是否生效 1為生效 0為未生效
+!檢查啟用日期是否生效 1為生效 0為未生效
 #checkeffdate=A,1,S
 E(0,0)
 IF(#OOStartDate <= #wkSYSCDATE,E(0,1),E(0,0))
-C(3,#checkeffdate,1,T(3,@OOStatusCodeX,已生效),T(3,@OOStatusCodeX,待生效))
+C(3,#checkeffdate,1,T(3,@OOStatusCodeX,啟用),T(3,@OOStatusCodeX,未啟用))
 
 
 #OOEndDate=D,7,O
@@ -347,7 +347,7 @@ TXFORM=L2001
 #OOProdNo=商品代碼
 {width:100,align:'center'}
 
-#OOStartDate=生效日期 
+#OOStartDate=啟用日期 
 {width:80,align:'center'}
 
 #OOEndDate=截止日期 
@@ -367,7 +367,7 @@ TXFORM=L2001
 #OOProdNo=商品代碼
 {width:100,align:'center'}
 
-#OOStartDate=生效日期 
+#OOStartDate=啟用日期 
 {width:80,align:'center'}
 
 #OOEndDate=截止日期 

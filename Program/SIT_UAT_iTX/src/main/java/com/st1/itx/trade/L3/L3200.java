@@ -32,8 +32,6 @@ import com.st1.itx.db.domain.LoanIntDetailId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
 import com.st1.itx.db.domain.MlaundryRecord;
-import com.st1.itx.db.domain.TxTemp;
-import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
@@ -61,7 +59,6 @@ import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.PfDetailVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -173,7 +170,8 @@ public class L3200 extends TradeBuffer {
 	private int iRepayType;
 	private int iRepayTerms;
 	private int iEntryDate;
-	private int iPayIntDate;
+	private int iRepayIntDate;
+	private TempVo iRepayIntDateByFacmNoVo = new TempVo();
 	private int iPayMethod;
 	private int iOverRpFg; // 1.短收 2.溢收 3->溢收(整批入帳、部分繳款)
 	private int iRpCode; // 還款來源
@@ -283,7 +281,6 @@ public class L3200 extends TradeBuffer {
 	private String checkMsg = "";
 	private AcReceivable tAcReceivable = new AcReceivable();
 	private AcDetail acDetail;
-	private TempVo tTempVo = new TempVo();
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 	private List<LoanOverdue> lLoanOverdue = new ArrayList<LoanOverdue>();
@@ -296,7 +293,7 @@ public class L3200 extends TradeBuffer {
 	private boolean isSettleUnpaid = false;
 	private boolean isLoanClose = false; // 最後一期期款/部分償還結案
 	private boolean isRepayPrincipal = false; // 回收本金
-	private int repayPartFlag = 0;// 整批入帳部分繳款 0-否 1-執行該額度 2-執行完該額度
+	private TempVo tTempVo = new TempVo();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -392,10 +389,11 @@ public class L3200 extends TradeBuffer {
 		this.info("iRepayAmt=" + iRepayAmt + ",OverAmt=" + iOverAmt + ",iShortAmt=" + iShortAmt + ",iOverRpFacmNo="
 				+ iOverRpFacmNo);
 		// 應繳日
-		if (titaVo.isTrmtypBatch() && titaVo.get("PayIntDate") != null) {
-			iPayIntDate = parse.stringToInteger(titaVo.getParam("PayIntDate"));
+		if (titaVo.isTrmtypBatch() && titaVo.get("RepayIntDate") != null) {
+			iRepayIntDate = parse.stringToInteger(titaVo.getParam("RepayIntDate"));
+			iRepayIntDateByFacmNoVo = iRepayIntDateByFacmNoVo.getVo(titaVo.getParam("RepayIntDateByFacmNoVo"));
 		} else {
-			iPayIntDate = 0;
+			iRepayIntDate = 0;
 		}
 		// 償還本利
 		if (titaVo.isTrmtypBatch() && titaVo.get("RepayLoan") != null) {
@@ -403,66 +401,19 @@ public class L3200 extends TradeBuffer {
 		} else {
 			iRepayLoan = BigDecimal.ZERO;
 		}
-		this.info("iPayIntDate=" + iPayIntDate + ", iRepayLoan=" + iRepayLoan + ", iExtraRepay=" + iExtraRepay);
+		this.info("iRepayIntDate=" + iRepayIntDate + "," + iRepayIntDateByFacmNoVo.toString() + ", iRepayLoan="
+				+ iRepayLoan + ", iExtraRepay=" + iExtraRepay);
+		
+		this.info("TotalRepayAmt = " + iTotalRepayAmt + ",RealRepayAmt=" + iRealRepayAmt);
 
 		// Check Input
-
 		checkInputRoutine();
 
 		// 按清償違約金、違約金、 延滯息、利息順序減免，計算各自減免金額
-		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
-			wkReduceAmtRemaind = iReduceAmt;
-			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
-				if (wkReduceAmtRemaind.compareTo(iCloseBreachAmt) >= 0) {
-					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iCloseBreachAmt);
-					wkReduceCloseBreachAmtRemaind = iCloseBreachAmt;
-				} else {
-					wkReduceCloseBreachAmtRemaind = wkReduceAmtRemaind;
-					wkReduceAmtRemaind = BigDecimal.ZERO;
-				}
-			}
-			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
-				if (wkReduceAmtRemaind.compareTo(iBreachAmt) >= 0) {
-					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iBreachAmt);
-					wkReduceBreachAmtRemaind = iBreachAmt;
-				} else {
-					wkReduceBreachAmtRemaind = wkReduceAmtRemaind;
-					wkReduceAmtRemaind = BigDecimal.ZERO;
-				}
-			}
-			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
-				if (wkReduceAmtRemaind.compareTo(iDelayInt) >= 0) {
-					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iDelayInt);
-					wkReduceDelayIntRemaind = iDelayInt;
-				} else {
-					wkReduceDelayIntRemaind = wkReduceAmtRemaind;
-					wkReduceAmtRemaind = BigDecimal.ZERO;
-				}
-			}
-			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
-				if (wkReduceAmtRemaind.compareTo(iInterest) >= 0) {
-					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iInterest);
-					wkReduceInterestRemaind = iInterest;
-				} else {
-					wkReduceInterestRemaind = wkReduceAmtRemaind;
-					wkReduceAmtRemaind = BigDecimal.ZERO;
-				}
-			}
-		}
-		this.info("iReduceAmt " + iReduceAmt + "," + wkReduceCloseBreachAmtRemaind + "," + wkReduceBreachAmtRemaind
-				+ "," + wkReduceDelayIntRemaind + "," + wkReduceInterestRemaind);
+		reduceAmtRoutine();
 
 		wkOvduRepayRemaind = iOvduRepay;
 		wkUnpaidAmtRemaind = iShortAmt;
-		// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
-		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(BigDecimal.ZERO) > 0) {
-			wkTotalShortAmtLimit = iShortfallInt;
-			if (wkUnpaidAmtRemaind.compareTo(iShortfallInt) > 0) {
-				wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(iShortfallInt);
-			} else {
-				wkUnpaidAmtRemaind = BigDecimal.ZERO;
-			}
-		}
 
 		if (iFacmNo > 0) {
 			wkFacmNoStart = iFacmNo;
@@ -474,7 +425,6 @@ public class L3200 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		this.info("TotalRepayAmt = " + iTotalRepayAmt + ",RealRepayAmt=" + iRealRepayAmt);
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -546,6 +496,7 @@ public class L3200 extends TradeBuffer {
 		if (iRepayType == 2) {
 			loanBookRoutine();
 		}
+		
 		// 疑似洗錢交易訪談記錄檔處理
 		if (iRepayType == 2) {
 			mlaundryRecordRoutine();
@@ -567,11 +518,11 @@ public class L3200 extends TradeBuffer {
 			if (iUnpaidIntFlag.equals("N")) {
 				throw new LogicException(titaVo, "E3094", "利息是否可欠繳 = N ");
 			}
-			if (iShortAmt.compareTo(iShortfallInt.add(iInterest)) > 0) {
-				throw new LogicException(titaVo, "E3094", "短繳金額大於 累短收利息+利息 ");
+			if (iShortAmt.compareTo(iInterest.add(iShortfallInt)) > 0) {
+				throw new LogicException(titaVo, "E3094", "短繳金額大於利息 " + iInterest.add(iShortfallInt));
 			}
 		}
-
+		
 		if (titaVo.isHcodeNormal()) {
 			// 減免金額超過限額，需主管核可
 			if (iRqspFlag.equals("Y")) {
@@ -580,6 +531,51 @@ public class L3200 extends TradeBuffer {
 				}
 			}
 		}
+	}
+
+	// 按清償違約金、違約金、 延滯息、利息順序減免，計算各自減免金額
+	private void reduceAmtRoutine() throws LogicException {
+		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
+			wkReduceAmtRemaind = iReduceAmt;
+			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceAmtRemaind.compareTo(iCloseBreachAmt) >= 0) {
+					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iCloseBreachAmt);
+					wkReduceCloseBreachAmtRemaind = iCloseBreachAmt;
+				} else {
+					wkReduceCloseBreachAmtRemaind = wkReduceAmtRemaind;
+					wkReduceAmtRemaind = BigDecimal.ZERO;
+				}
+			}
+			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceAmtRemaind.compareTo(iBreachAmt) >= 0) {
+					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iBreachAmt);
+					wkReduceBreachAmtRemaind = iBreachAmt;
+				} else {
+					wkReduceBreachAmtRemaind = wkReduceAmtRemaind;
+					wkReduceAmtRemaind = BigDecimal.ZERO;
+				}
+			}
+			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceAmtRemaind.compareTo(iDelayInt) >= 0) {
+					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iDelayInt);
+					wkReduceDelayIntRemaind = iDelayInt;
+				} else {
+					wkReduceDelayIntRemaind = wkReduceAmtRemaind;
+					wkReduceAmtRemaind = BigDecimal.ZERO;
+				}
+			}
+			if (wkReduceAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceAmtRemaind.compareTo(iInterest) >= 0) {
+					wkReduceAmtRemaind = wkReduceAmtRemaind.subtract(iInterest);
+					wkReduceInterestRemaind = iInterest;
+				} else {
+					wkReduceInterestRemaind = wkReduceAmtRemaind;
+					wkReduceAmtRemaind = BigDecimal.ZERO;
+				}
+			}
+		}
+		this.info("iReduceAmt " + iReduceAmt + "," + wkReduceCloseBreachAmtRemaind + "," + wkReduceBreachAmtRemaind
+				+ "," + wkReduceDelayIntRemaind + "," + wkReduceInterestRemaind);
 	}
 
 	private void calcRepayNormalRoutine() throws LogicException {
@@ -594,8 +590,6 @@ public class L3200 extends TradeBuffer {
 				wkRepaykindCode = 3;
 			}
 		}
-
-		BigDecimal wkShortAmtLimit = BigDecimal.ZERO; // 短繳限額
 
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
 				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
@@ -672,8 +666,10 @@ public class L3200 extends TradeBuffer {
 			wkFacmNo = ln.getFacmNo();
 			wkBormNo = ln.getBormNo();
 			wkBorxNo = ln.getLastBorxNo() + 1;
+
 			// 計算利息
 			calcRepayInt(ln);
+
 			if (isCalcRepayInt) {
 				wkTotaCount++;
 			}
@@ -685,107 +681,17 @@ public class L3200 extends TradeBuffer {
 				wkCloseBreachAmt = BigDecimal.ZERO;
 			}
 
-			// 減免前金額
-			wkReduceAmt = wkCloseBreachAmt.add(wkBreachAmt).add(wkDelayInt).add(wkInterest); // 減免金額
-			wkReduceBreachAmt = wkCloseBreachAmt.add(wkBreachAmt).add(wkDelayInt); // 減免清償違約金+減免違約金+減免延滯息
+			// 計算減免
+			calcReduceAmt(ln);
 
-			if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
-				if (wkReduceCloseBreachAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
-					if (wkReduceCloseBreachAmtRemaind.compareTo(wkCloseBreachAmt) >= 0) {
-						wkReduceCloseBreachAmtRemaind = wkReduceCloseBreachAmtRemaind.subtract(wkCloseBreachAmt);
-						wkCloseBreachAmt = BigDecimal.ZERO;
-					} else {
-						wkCloseBreachAmt = wkCloseBreachAmt.subtract(wkReduceCloseBreachAmtRemaind);
-						wkReduceAmtRemaind = BigDecimal.ZERO;
-					}
-				}
-				if (wkReduceBreachAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
-					if (wkReduceBreachAmtRemaind.compareTo(wkBreachAmt) >= 0) {
-						wkReduceBreachAmtRemaind = wkReduceBreachAmtRemaind.subtract(wkBreachAmt);
-						wkBreachAmt = BigDecimal.ZERO;
-					} else {
-						wkBreachAmt = wkBreachAmt.subtract(wkReduceBreachAmtRemaind);
-						wkReduceBreachAmtRemaind = BigDecimal.ZERO;
-					}
-				}
-				if (wkReduceDelayIntRemaind.compareTo(BigDecimal.ZERO) > 0) {
-					if (wkReduceDelayIntRemaind.compareTo(wkDelayInt) >= 0) {
-						wkReduceDelayIntRemaind = wkReduceDelayIntRemaind.subtract(wkDelayInt);
-						wkDelayInt = BigDecimal.ZERO;
-					} else {
-						wkDelayInt = wkDelayInt.subtract(wkReduceDelayIntRemaind);
-						wkReduceDelayIntRemaind = BigDecimal.ZERO;
-					}
-				}
-				if (wkReduceInterestRemaind.compareTo(BigDecimal.ZERO) > 0) {
-					if (wkReduceInterestRemaind.compareTo(wkInterest) >= 0) {
-						wkReduceInterestRemaind = wkReduceInterestRemaind.subtract(wkInterest);
-						wkInterest = BigDecimal.ZERO;
-					} else {
-						wkInterest = wkInterest.subtract(wkReduceInterestRemaind);
-						wkReduceInterestRemaind = BigDecimal.ZERO;
-					}
-				}
-			}
-			// 本筆減免=減免前金額 - 減免後金額
-			wkReduceAmt = wkReduceAmt.subtract(wkCloseBreachAmt).subtract(wkBreachAmt).subtract(wkDelayInt)
-					.subtract(wkInterest); // 減免金額
-			wkReduceBreachAmt = wkReduceBreachAmt.subtract(wkCloseBreachAmt).subtract(wkBreachAmt).subtract(wkDelayInt); // 減免清償違約金+減免違約金+減免延滯息
 			wkTotalPrincipal = wkTotalPrincipal.add(wkPrincipal);
 			wkTotalInterest = wkTotalInterest.add(wkInterest);
 			wkTotalDelayInt = wkTotalDelayInt.add(wkDelayInt);
 			wkTotalBreachAmt = wkTotalBreachAmt.add(wkBreachAmt);
 			wkTotalExtraRepay = wkTotalExtraRepay.add(wkExtraRepay);
 
-			// 本次短繳處理
-			wkUnpaidPrin = BigDecimal.ZERO;
-			wkUnpaidInt = BigDecimal.ZERO;
-			wkShortAmtLimit = BigDecimal.ZERO;
-			if (iShortAmt.compareTo(BigDecimal.ZERO) > 0 && !isLoanClose) {
-				if (wkRepaykindCode == 1) { // 部分償還本金欠繳利息
-					wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkInterest); // 利息全額
-					this.info("wkTotalShortAmtLimit= " + wkTotalShortAmtLimit + "," + wkInterest);
-					if (wkInterest.compareTo(wkUnpaidAmtRemaind) >= 0) {
-						wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
-						wkUnpaidAmtRemaind = BigDecimal.ZERO;
-					} else {
-						wkUnpaidInt = wkUnpaidInt.add(wkInterest);
-						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkInterest);
-					}
-				} else {
-					// 到期取息(到期繳息還本)
-					if ("2".equals(ln.getAmortizedCode())) {
-						throw new LogicException(titaVo, "E3094", "到期繳息還本， 不可有短繳金額");
-
-					}
-					// 依 1.還本金額 2.還息金額
-					if (isRepayPrincipal) {
-						wkShortAmtLimit = wkPrincipal
-								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
-								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-						wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
-						if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
-							wkUnpaidPrin = wkUnpaidPrin.add(wkUnpaidAmtRemaind);
-							wkUnpaidAmtRemaind = BigDecimal.ZERO;
-						} else {
-							wkUnpaidPrin = wkUnpaidPrin.add(wkShortAmtLimit);
-							wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
-						}
-					} else {
-						wkShortAmtLimit = wkInterest
-								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
-								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-						wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
-						if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
-							wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
-							wkUnpaidAmtRemaind = BigDecimal.ZERO;
-						} else {
-							wkUnpaidInt = wkUnpaidInt.add(wkShortAmtLimit);
-							wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
-						}
-					}
-				}
-			}
+			// 計算短繳
+			calcUnpaidAmt(ln);
 
 			// 費用、短繳期金
 			getSettleUnpaid();
@@ -795,9 +701,9 @@ public class L3200 extends TradeBuffer {
 				continue;
 			}
 
+			// 實收處理
 			// Principal 實收本金 => 扣除短收本金、含收回欠繳本金
 			// 期款最後一期本金含欠繳本金
-			this.info("本金 =" + wkPrincipal + ",短收本金= " + wkUnpaidPrin + ",收回欠繳本=" + wkShortfallPrincipal);
 			if (isLoanClose) {
 				wkPrincipal = wkPrincipal.subtract(wkUnpaidPrin);
 			} else {
@@ -873,6 +779,109 @@ public class L3200 extends TradeBuffer {
 
 	}
 
+	// 計算短繳
+	private void calcUnpaidAmt(LoanBorMain ln) throws LogicException {
+		wkUnpaidPrin = BigDecimal.ZERO;
+		wkUnpaidInt = BigDecimal.ZERO;
+		BigDecimal wkShortAmtLimit = BigDecimal.ZERO;
+		if (iShortAmt.compareTo(BigDecimal.ZERO) > 0 && !isLoanClose) {
+			if (wkRepaykindCode == 1) { // 部分償還本金欠繳利息
+				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkInterest); // 利息全額
+				this.info("wkTotalShortAmtLimit= " + wkTotalShortAmtLimit + "," + wkInterest);
+				if (wkInterest.compareTo(wkUnpaidAmtRemaind) >= 0) {
+					wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
+					wkUnpaidAmtRemaind = BigDecimal.ZERO;
+				} else {
+					wkUnpaidInt = wkUnpaidInt.add(wkInterest);
+					wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkInterest);
+				}
+			} else {
+				// 到期取息(到期繳息還本)
+				if ("2".equals(ln.getAmortizedCode())) {
+					throw new LogicException(titaVo, "E3094", "到期繳息還本， 不可有短繳金額");
+
+				}
+				// 依 1.還本金額 2.還息金額
+				if (isRepayPrincipal) {
+					wkShortAmtLimit = wkPrincipal
+							.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
+							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+					wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
+					if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
+						wkUnpaidPrin = wkUnpaidPrin.add(wkUnpaidAmtRemaind);
+						wkUnpaidAmtRemaind = BigDecimal.ZERO;
+					} else {
+						wkUnpaidPrin = wkUnpaidPrin.add(wkShortAmtLimit);
+						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
+					}
+				} else {
+					wkShortAmtLimit = wkInterest
+							.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
+							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+					wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
+					if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
+						wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
+						wkUnpaidAmtRemaind = BigDecimal.ZERO;
+					} else {
+						wkUnpaidInt = wkUnpaidInt.add(wkShortAmtLimit);
+						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
+					}
+				}
+			}
+		}
+	}
+
+	// 計算減免
+	private void calcReduceAmt(LoanBorMain ln) throws LogicException {
+		// 減免前金額
+		wkReduceAmt = wkCloseBreachAmt.add(wkBreachAmt).add(wkDelayInt).add(wkInterest); // 減免金額
+		wkReduceBreachAmt = wkCloseBreachAmt.add(wkBreachAmt).add(wkDelayInt); // 減免清償違約金+減免違約金+減免延滯息
+
+		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
+			if (wkReduceCloseBreachAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceCloseBreachAmtRemaind.compareTo(wkCloseBreachAmt) >= 0) {
+					wkReduceCloseBreachAmtRemaind = wkReduceCloseBreachAmtRemaind.subtract(wkCloseBreachAmt);
+					wkCloseBreachAmt = BigDecimal.ZERO;
+				} else {
+					wkCloseBreachAmt = wkCloseBreachAmt.subtract(wkReduceCloseBreachAmtRemaind);
+					wkReduceAmtRemaind = BigDecimal.ZERO;
+				}
+			}
+			if (wkReduceBreachAmtRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceBreachAmtRemaind.compareTo(wkBreachAmt) >= 0) {
+					wkReduceBreachAmtRemaind = wkReduceBreachAmtRemaind.subtract(wkBreachAmt);
+					wkBreachAmt = BigDecimal.ZERO;
+				} else {
+					wkBreachAmt = wkBreachAmt.subtract(wkReduceBreachAmtRemaind);
+					wkReduceBreachAmtRemaind = BigDecimal.ZERO;
+				}
+			}
+			if (wkReduceDelayIntRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceDelayIntRemaind.compareTo(wkDelayInt) >= 0) {
+					wkReduceDelayIntRemaind = wkReduceDelayIntRemaind.subtract(wkDelayInt);
+					wkDelayInt = BigDecimal.ZERO;
+				} else {
+					wkDelayInt = wkDelayInt.subtract(wkReduceDelayIntRemaind);
+					wkReduceDelayIntRemaind = BigDecimal.ZERO;
+				}
+			}
+			if (wkReduceInterestRemaind.compareTo(BigDecimal.ZERO) > 0) {
+				if (wkReduceInterestRemaind.compareTo(wkInterest) >= 0) {
+					wkReduceInterestRemaind = wkReduceInterestRemaind.subtract(wkInterest);
+					wkInterest = BigDecimal.ZERO;
+				} else {
+					wkInterest = wkInterest.subtract(wkReduceInterestRemaind);
+					wkReduceInterestRemaind = BigDecimal.ZERO;
+				}
+			}
+		}
+		// 本筆減免=減免前金額 - 減免後金額
+		wkReduceAmt = wkReduceAmt.subtract(wkCloseBreachAmt).subtract(wkBreachAmt).subtract(wkDelayInt)
+				.subtract(wkInterest); // 減免金額
+		wkReduceBreachAmt = wkReduceBreachAmt.subtract(wkCloseBreachAmt).subtract(wkBreachAmt).subtract(wkDelayInt); // 減免清償違約金+減免違約金+減免延滯息
+	}
+
+	// 計算利息
 	private void calcRepayInt(LoanBorMain ln) throws LogicException {
 		checkMsg = " 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo();
 		isCalcRepayInt = false;
@@ -898,14 +907,16 @@ public class L3200 extends TradeBuffer {
 				return;
 			}
 		}
-		// 整批入帳部分繳款(少繳一期)
-		// repayPartFlag = 0;// 整批入帳部分繳款 0-否 1-執行該額度 2-執行完該額度
-		if (this.iOverRpFg == 3 && ln.getFacmNo() == iOverRpFacmNo) {
-			this.repayPartFlag = 1;
-		}
 
-		if (this.repayPartFlag == 1 && ln.getFacmNo() != iOverRpFacmNo) {
-			repayPartFlag = 2;
+		// 整批入帳繳款(依額度還款日期)
+		int wkRepayIntDate = iEntryDate;
+		if (iRepayIntDate > 0) {
+			if (iRepayIntDateByFacmNoVo.get(parse.IntegerToString(ln.getFacmNo(), 3)) == null) {
+				this.info(parse.IntegerToString(ln.getFacmNo(), 3) + "RepayIntDate = 0 return");
+				return;
+			}
+			wkRepayIntDate = parse
+					.stringToInteger(iRepayIntDateByFacmNoVo.get(parse.IntegerToString(ln.getFacmNo(), 3)));
 		}
 
 		wkIntStartDate = 9991231;
@@ -960,14 +971,13 @@ public class L3200 extends TradeBuffer {
 			break;
 		case 3: // 回收期數 = 0
 			// 計算至入帳日或指定應繳日的應繳之期數
-			int wkPayIntDate = iPayIntDate > 0 ? iPayIntDate : iEntryDate;
-			if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
-				checkMsg += ", 應繳日:" + wkPayIntDate + ", 上次繳息日=" + ln.getPrevPayIntDate();
+			if (wkRepayIntDate <= ln.getPrevPayIntDate() || wkRepayIntDate <= ln.getDrawdownDate()) {
+				checkMsg += ", 應繳日:" + wkRepayIntDate + ", 上次繳息日=" + ln.getPrevPayIntDate();
 				this.info(checkMsg);
 				return;
 			}
-			wkTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
-					ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), wkPayIntDate);
+			wkTermNo = loanCom.getTermNo(wkRepayIntDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
+					ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), wkRepayIntDate);
 			// 應繳計算止日
 			wkIntEndDate = loanCom.getPayIntEndDate(ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
 					ln.getSpecificDd(), wkTermNo, ln.getMaturityDate());
@@ -975,11 +985,6 @@ public class L3200 extends TradeBuffer {
 			// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
 			wkTerms = wkTermNo - wkPrevTermNo;
 
-			// 整批入帳、部分繳款(少繳一期)
-			if (this.repayPartFlag == 2) {
-				this.info("repayPartFlag == 2, wkTerms--");
-				wkTerms--;
-			}
 			// 應繳之期數不可大於可回收期數
 			if (wkTerms <= 0) {
 				checkMsg += ", 可預收迄日:" + wkPreRepayDate + ", 試算收息日:" + wkIntEndDate + ",可回收期數= " + wkTerms;
@@ -1045,15 +1050,6 @@ public class L3200 extends TradeBuffer {
 			wkBormNo = tx.getBormNo();
 			wkBorxNo = tx.getBorxNo();
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
-			// temporary for OldVersion
-			String wkSeqNo = FormatUtil.pad9(String.valueOf(wkCustNo), 7) + FormatUtil.pad9(String.valueOf(wkFacmNo), 3)
-					+ FormatUtil.pad9(String.valueOf(wkBormNo), 3) + FormatUtil.pad9(String.valueOf(0), 3);
-			TxTemp tTxTemp = txTempService.findById(new TxTempId(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), wkSeqNo), titaVo);
-			if (tTxTemp != null) {
-				tTempVo = tTempVo.getVo(tTxTemp.getText());
-			}
-			// end
 			// 還原金額處理
 			wkOvduNo = parse.stringToInteger(tTempVo.get("OvduNo"));
 			wkPrincipal = tx.getPrincipal();
@@ -1895,26 +1891,6 @@ public class L3200 extends TradeBuffer {
 		// call 應繳試算
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
 		if (this.baTxList != null) {
-			// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
-			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(wkUnpaidAmtRemaind) > 0) {
-				BigDecimal wkShortIntRemaind = iShortAmt.subtract(wkUnpaidAmtRemaind);
-				for (BaTxVo ba : this.baTxList) {
-					if (ba.getDataKind() == 1 && ba.getInterest().compareTo(BigDecimal.ZERO) > 0) {
-						this.info("wkShortIntRemaind =" + wkShortIntRemaind);
-						if (ba.getInterest().compareTo(BigDecimal.ZERO) > 0) {
-							if (wkShortIntRemaind.compareTo(ba.getInterest()) > 0) {
-								ba.setInterest(BigDecimal.ZERO);
-								ba.setAcctAmt(BigDecimal.ZERO);
-								wkShortIntRemaind = wkShortIntRemaind.subtract(ba.getInterest());
-							} else {
-								ba.setInterest(ba.getInterest().subtract(wkShortIntRemaind));
-								ba.setAcctAmt(ba.getAcctAmt().subtract(wkShortIntRemaind));
-								wkShortIntRemaind = BigDecimal.ZERO;
-							}
-						}
-					}
-				}
-			}
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 1 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					acDetail = new AcDetail();

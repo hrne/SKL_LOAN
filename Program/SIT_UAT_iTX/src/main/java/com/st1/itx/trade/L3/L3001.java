@@ -80,6 +80,11 @@ public class L3001 extends TradeBuffer {
 		int wkFacmNoStart = 0;
 		int wkFacmNoEnd = 0;
 		int wkValidFacm = 0;
+		BigDecimal totalLineAmt = BigDecimal.ZERO;
+		BigDecimal totalUtilAmt = BigDecimal.ZERO;
+		BigDecimal totalUtilBal = BigDecimal.ZERO;
+		BigDecimal totalAvailable = BigDecimal.ZERO;
+
 		String wkClShareFg = "";
 		Slice<FacMain> slFacMain;
 		List<FacMain> lFacMain;
@@ -114,6 +119,20 @@ public class L3001 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "額度主檔"); // 查詢資料不存在
 			}
 			for (FacMain tFacMain : lFacMain) {
+
+				totalLineAmt = totalLineAmt.add(tFacMain.getLineAmt());// 合計核准額度
+				totalUtilAmt = totalUtilAmt.add(tFacMain.getUtilAmt());// 合計目前餘額
+				totalUtilBal = totalUtilBal.add(tFacMain.getUtilBal());// 合計已動用額度餘額
+				if (tFacMain.getRecycleCode().equals("1")) {
+					if (tFacMain.getRecycleDeadline() >= this.txBuffer.getTxCom().getTbsdy()) {
+						totalAvailable = totalAvailable.add(loanAvailableAmt.caculate(tFacMain, titaVo)); // 合計可用額度
+					}
+				} else {
+					if (tFacMain.getUtilDeadline() >= this.txBuffer.getTxCom().getTbsdy()) {
+						totalAvailable = totalAvailable.add(loanAvailableAmt.caculate(tFacMain, titaVo)); // 合計可用額度
+					}
+				}
+
 				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) == 1) {
 					switch (tFacMain.getRecycleCode()) {
 					case "0":
@@ -131,7 +150,15 @@ public class L3001 extends TradeBuffer {
 			}
 			titaVo.putParam("ValidFacm", wkValidFacm);
 			this.totaVo.putParam("OValidFacm", wkValidFacm);
+			this.totaVo.putParam("OLineAmt", totalLineAmt);
+			this.totaVo.putParam("OUtilAmt", totalUtilAmt);
+			this.totaVo.putParam("OUtilBal", totalUtilBal);
+			this.totaVo.putParam("OAvailable", totalAvailable);
 			this.info("L3001 OValidFacm = " + wkValidFacm);
+			this.info("L3001 OLineAmt = " + totalLineAmt);
+			this.info("L3001 OUtilAmt = " + totalUtilAmt);
+			this.info("L3001 OUtilBal = " + totalUtilBal);
+			this.info("L3001 OAvailable = " + totalAvailable);
 		}
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -166,8 +193,21 @@ public class L3001 extends TradeBuffer {
 		}
 		// 如有有找到資料
 		for (FacMain tFacMain : lFacMain) {
-			wkAvailable = loanAvailableAmt.caculate(tFacMain, titaVo); // 可用額度
 			wkClShareFg = loanAvailableAmt.getClShareFlag();
+			int deadline = 0;
+			// 判斷循環非循環日期
+			if (tFacMain.getRecycleCode().equals("1")) {
+				deadline = tFacMain.getRecycleDeadline();
+			} else {
+				deadline = tFacMain.getUtilDeadline();
+			}
+
+			wkAvailable = loanAvailableAmt.caculate(tFacMain, titaVo); // 可用額度
+			// 動支期限循環動用止日到期時顯示0
+			if (deadline < this.txBuffer.getTxCom().getTbsdy()) {
+				wkAvailable = BigDecimal.ZERO;
+			}
+
 			// 1. 當有合併額度控管時，「共用額度」欄顯示[限額]按鈕，連結L2118額度合併控管登錄-查詢
 			wkFacShareFg = loanAvailableAmt.getFacShareFlag();
 			wkFacShareAvailable = loanAvailableAmt.getAvailableShare();
@@ -176,11 +216,8 @@ public class L3001 extends TradeBuffer {
 			occursList.putParam("OOCustNo", tFacMain.getCustNo());
 			occursList.putParam("OOFacmNo", tFacMain.getFacmNo());
 			occursList.putParam("OOApplNo", tFacMain.getApplNo());
-			if (tFacMain.getRecycleCode().equals("1")) {
-				occursList.putParam("OODeadline", tFacMain.getRecycleDeadline());
-			} else {
-				occursList.putParam("OODeadline", tFacMain.getUtilDeadline());
-			}
+
+			occursList.putParam("OODeadline", deadline);
 			occursList.putParam("OOCurrencyCode", tFacMain.getCurrencyCode());
 			occursList.putParam("OOLineAmt", tFacMain.getLineAmt());
 			occursList.putParam("OOUtilAmt", tFacMain.getUtilAmt());
@@ -199,7 +236,7 @@ public class L3001 extends TradeBuffer {
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
-		
+
 		// 顧客控管警訊通知訊息
 		if (titaVo.getReturnIndex() == 0) {
 //			custRmkCom.getCustRmk(titaVo, iCustNo);

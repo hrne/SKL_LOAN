@@ -469,14 +469,21 @@ public class AcEnterCom extends TradeBuffer {
 			else
 				CrAmt = CrAmt.add(ac.getTxAmt());
 		}
+
+		String checkAc = "";
+		if (DbAmt.compareTo(CrAmt) == 0) {
+			checkAc = "equal !! ";
+		} else {
+			checkAc = "unequal !! ";
+		}
+		for (AcDetail ac : acList) {
+			this.info(checkAc + ac.getDbCr() + " " + ac.getAcctCode() + " " + FormatUtil.padLeft("" + ac.getTxAmt(), 11)
+					+ " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " " + ac.getRvNo());
+		}
+		this.info(checkAc + "DB=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", Cr=" + CrAmt + ", diff="
+				+ DbAmt.subtract(CrAmt));
+		
 		if (DbAmt.compareTo(CrAmt) != 0) {
-			for (AcDetail ac : acList) {
-				this.info("unequal !! " + ac.getDbCr() + " " + ac.getAcctCode() + " "
-						+ FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-"
-						+ ac.getBormNo() + " " + ac.getRvNo());
-			}
-			this.info("借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方=" + CrAmt + ", 差額="
-					+ DbAmt.subtract(CrAmt));
 			throw new LogicException(titaVo, "E6003", "借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方="
 					+ CrAmt + ", 差額=" + DbAmt.subtract(CrAmt));
 		}

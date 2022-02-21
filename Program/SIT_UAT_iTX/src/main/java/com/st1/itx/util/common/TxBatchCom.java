@@ -249,6 +249,9 @@ public class TxBatchCom extends TradeBuffer {
 //  應繳息日
 	private int repayIntDate = 0;
 
+// 額度還款應繳日
+	private TempVo repayIntDateByFacmNoVo = new TempVo();
+
 //	溢短收記號
 	private int overRpFg = 0; // 1->溢短收記號 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 
@@ -315,6 +318,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.overRpFacmNo = 0;
 		this.repayType = 0;
 		this.repayIntDate = 0;
+		this.repayIntDateByFacmNoVo = new TempVo();
 		this.closeFg = 0;
 		this.closeReasonCode = null;
 		this.collectFlag = "";
@@ -334,7 +338,7 @@ public class TxBatchCom extends TradeBuffer {
 	 */
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("TxBatchCom run ... " + titaVo);
-		// 隔日訂正不處理(隔日訂正，來源科目回沖至暫收可抵繳，不處理)
+		// 以批號、明細檔序號更新整批入帳檔
 		if ("L32".equals(titaVo.getTxCode().substring(0, 3)) || "L34".equals(titaVo.getTxCode().substring(0, 3))) {
 			if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
 					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4)) && titaVo.get("RpDetailSeq1") != null) {
@@ -478,20 +482,48 @@ public class TxBatchCom extends TradeBuffer {
 	 * 
 	 * @param functionCode 0:入帳 1:訂正 2.虛擬轉暫收
 	 * @param tDetail      整批入帳明細檔
+	 * @param iTotalcnt    總筆數
 	 * @param titaVo       TitaVo
 	 * @return TitaVo
 	 * @throws LogicException ... LogicException
 	 */
-	public TitaVo txTita(int functionCode, BatxDetail tDetail, TitaVo titaVo) throws LogicException {
+	public TitaVo txTita(int functionCode, BatxDetail tDetail, int iTotalcnt, TitaVo titaVo) throws LogicException {
 		this.info("TxBatchCom txTita .... functionCode=" + functionCode + tDetail.toString());
 // 功能 0:入帳 1:訂正 2.虛擬轉暫收
 		int hcode = 0;
-		if (functionCode == 1)
+		if (functionCode == 1) {
 			hcode = 1;
+		}
+		// TempVo
+		this.tTempVo = new TempVo();
+		this.tTempVo = this.tTempVo.getVo(tDetail.getProcNote());
+
+// TXTNO = BatchNo[2] + TxtSeq [6]
+// TxtSeq = EraseAddNo * 10000 + mod (DetailSeq 
+// EraseAddNo = if EraseCnt = 0  then 0 else =  EraseCnt * 2  + TotalCnt / 10000 
+//		                          EraseAddNo  
+//		        EraseCnt     Normal      Erase
+// Normal          0           0                
+// Erase           0                       4       
+// Normal          1           5      
+// Erase           1                       6       
+// Normal          2           7 
+
+		int eraseAddNo = 0;
+		if (this.tTempVo.get("EraseCnt") != null) {
+			eraseAddNo = ((parse.stringToInteger(tTempVo.get("EraseCnt")) * 2) + (iTotalcnt / 10000));
+		}
+		if (hcode == 1) {
+			eraseAddNo++;
+		}
+		String txtNo = tDetail.getBatchNo().substring(4, 6)
+				+ parse.IntegerToString(tDetail.getDetailSeq() + eraseAddNo * 10000, 6);
+
 		TitaVo txTitaVo = new TitaVo();
 		// 正常交易，組交易電文
 		if (hcode == 0) {
 			txTitaVo = (TitaVo) titaVo.clone();
+			txTitaVo.putParam("TXTNO", txtNo);
 			txTitaVo = isTxCode(functionCode, tDetail, txTitaVo);
 			titaVo = txTitaVo;
 		} else {
@@ -510,6 +542,7 @@ public class TxBatchCom extends TradeBuffer {
 				this.error(errors.toString());
 				throw new LogicException("E0013", "txExecute 轉換交易記錄檔電文"); // E0013 程式邏輯有誤
 			}
+			txTitaVo.putParam("TXTNO", txtNo);
 			txTitaVo.putParam("ORGTLR", tDetail.getTitaTlrNo()); // 原經辦
 			txTitaVo.putParam("ORGTNO", tDetail.getTitaTxtNo()); // 原交易序號
 			txTitaVo.putParam("HCODE", "1"); // 訂正交易
@@ -525,19 +558,7 @@ public class TxBatchCom extends TradeBuffer {
 //				L3210 暫收款登錄	4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他 11.債協匯入款 
 //				L3420 結案登錄     3.結案         
 //				L3200 回收登錄     1.期款 2.部分償還 
-		// 交易序號 : 批號後兩碼(2)+訂正次數+明細序號
-
-		// TempVo
-		tTempVo = new TempVo();
-		this.tTempVo = this.tTempVo.getVo(tDetail.getProcNote());
-
-		// 交易序號(批號(2)+訂正次數、整批序號(6)
-		if (this.tTempVo.get("EraseCnt") != null)
-			txTitaVo.putParam("TXTNO", tDetail.getBatchNo().substring(4, 6) + this.tTempVo.get("EraseCnt")
-					+ parse.IntegerToString(tDetail.getDetailSeq(), 6 - this.tTempVo.get("EraseCnt").length()));
-		else
-			txTitaVo.putParam("TXTNO",
-					tDetail.getBatchNo().substring(4, 6) + parse.IntegerToString(tDetail.getDetailSeq(), 6));
+		// 交易序號 : 批號後兩碼(2)+ 訂正次數 * 2 + 明細序號(4)
 
 		// 櫃台機種類 : 批次
 		txTitaVo.putParam("TRMTYP", "BA");
@@ -548,10 +569,11 @@ public class TxBatchCom extends TradeBuffer {
 
 		// 交易戶號
 		String MRKEY = parse.IntegerToString(tDetail.getCustNo(), 7);
-		if (tDetail.getFacmNo() > 0)
+		if (tDetail.getFacmNo() > 0) {
 			MRKEY = MRKEY + "-" + parse.IntegerToString(tDetail.getFacmNo(), 3) + "    ";
-		else
+		} else {
 			MRKEY = MRKEY + "    " + "    ";
+		}
 		txTitaVo.putParam("MRKEY", MRKEY);
 
 		// 交易金額
@@ -565,25 +587,40 @@ public class TxBatchCom extends TradeBuffer {
 		txTitaVo.putParam("SECNO", "09"); // 業務別 09-放款
 
 		// 還款額度
-		if (this.tTempVo.get("FacmNo") != null)
+		if (this.tTempVo.get("FacmNo") != null) {
 			this.repayFacmNo = parse.stringToInteger(this.tTempVo.get("FacmNo"));
-		else
+		} else {
 			this.repayFacmNo = tDetail.getFacmNo();
-
+		}
 		// 組L3200、L3210、L3420 交易電文
-		if (this.tTempVo.get("RepayType") != null)
+		if (this.tTempVo.get("RepayType") != null) {
 			this.repayType = parse.stringToInteger(this.tTempVo.get("RepayType"));
-		else
+		} else {
 			this.repayType = tDetail.getRepayType();
+		}
 
+		// 轉暫收
 		if (functionCode == 2) {
 			txTitaVo = setL3210Tita(txTitaVo, tDetail);
-		} else if (this.repayType == 1 || this.repayType == 2 || this.repayType == 12)
-			txTitaVo = setL3200Tita(txTitaVo, tDetail);
-		else if (this.repayType == 3)
-			txTitaVo = setL3420Tita(txTitaVo, tDetail);
-		else
+		}
+		// 匯款同戶號合併，非最後一筆轉暫收
+		else if (this.tTempVo.get("MergeCnt") != null
+				&& !this.tTempVo.get("MergeSeq").equals(this.tTempVo.get("MergeCnt"))) {
+			txTitaVo.putParam("MergeCnt", this.tTempVo.get("MergeCnt"));
 			txTitaVo = setL3210Tita(txTitaVo, tDetail);
+		}
+		// 1:期款 2:部分償還 12:催收收回
+		else if (this.repayType == 1 || this.repayType == 2 || this.repayType == 12) {
+			txTitaVo = setL3200Tita(txTitaVo, tDetail);
+		}
+		// 3:結案
+		else if (this.repayType == 3) {
+			txTitaVo = setL3420Tita(txTitaVo, tDetail);
+		}
+		// 暫收
+		else {
+			txTitaVo = setL3210Tita(txTitaVo, tDetail);
+		}
 
 		// 支票兌現
 		String iChequeAcct = "";
@@ -824,7 +861,8 @@ public class TxBatchCom extends TradeBuffer {
 		l3200TitaVo.putParam("TimReduceAmt", "0"); // 減免金額
 		l3200TitaVo.putParam("TotalRepayAmt", tBatxDetail.getAcquiredAmt()); // 應收付總金額 --> 還款總金額
 		l3200TitaVo.putParam("RealRepayAmt", tBatxDetail.getRepayAmt()); // 實際收付金額 --> 還款金額
-		l3200TitaVo.putParam("PayIntDate", this.tTempVo.getParam("RepayIntDate"));// 應繳日
+		l3200TitaVo.putParam("RepayIntDate", this.tTempVo.getParam("RepayIntDate"));// 應繳日
+		l3200TitaVo.putParam("RepayIntDateByFacmNoVo", this.tTempVo.getParam("RepayIntDateByFacmNoVo"));// 額度應繳日
 		l3200TitaVo.putParam("RepayLoan", this.tTempVo.getParam("RepayLoan"));// 償還本利
 		return l3200TitaVo;
 	}
@@ -932,6 +970,7 @@ public class TxBatchCom extends TradeBuffer {
 			} else {
 				// 訂正交易
 				unfinishCnt = 1;
+				this.info("updBatxResult 訂正交易");
 				tDetail.setProcStsCode("0"); // 訂正後為未檢核，需重新檢核或刪除
 				tDetail.setDisacctAmt(BigDecimal.ZERO);
 				tDetail.setAcctAmt(BigDecimal.ZERO); // 還款金額 - 入暫收金額
@@ -956,8 +995,10 @@ public class TxBatchCom extends TradeBuffer {
 			}
 		} else {
 			// 交易失敗
-			this.tTempVo.putParam("ErrorMsg",
-					this.txBuffer.getTxCom().getMsgId() + this.txBuffer.getTxCom().getErrorMsg()); // 錯誤訊息
+			String errorMsg = this.txBuffer.getTxCom().getErrorMsg().length() > 100
+					? this.txBuffer.getTxCom().getErrorMsg().substring(0, 100)
+					: this.txBuffer.getTxCom().getErrorMsg();
+			this.tTempVo.putParam("ErrorMsg", this.txBuffer.getTxCom().getMsgId() + errorMsg); // 錯誤訊息
 			if (titaVo.isHcodeNormal()) {
 				tDetail.setProcStsCode("3"); // 正常交易失敗，設定為檢核錯誤
 			} else { // 訂正交易失敗，狀態不變
@@ -1127,9 +1168,9 @@ public class TxBatchCom extends TradeBuffer {
 			if (this.overAmt.compareTo(BigDecimal.ZERO) > 0) {
 				this.checkMsg = this.checkMsg + "有溢繳款: " + this.overAmt;
 			}
-			
+
 			if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
-				this.checkMsg = this.checkMsg + "有短繳款: " + this.overAmt;
+				this.checkMsg = this.checkMsg + "有短繳款: " + this.shortAmt;
 			}
 			apendcheckMsgAmounts(tBatxDetail, titaVo);
 			break;
@@ -1246,15 +1287,17 @@ public class TxBatchCom extends TradeBuffer {
 			String str = this.checkMsg.substring(2);
 			this.checkMsg = str;
 		}
-		this.info("TxBatchCom settingprocStsCode end");
+		this.info("log output");
+		this.info("還款戶號額度                              = " + tBatxDetail.getCustNo() + "-" + this.repayFacmNo + "-"
+				+ this.repayBormNo);
 		this.info("還款類別 repayType           = " + this.repayType);
-		this.info("還款額度 repayFacmNo         = " + this.repayFacmNo + "-" + this.repayBormNo);
 		this.info("還款金額 RepayAmt            = " + tBatxDetail.getRepayAmt());
 		this.info("還款總金額 RepayTotal        = " + this.repayTotal);
 		this.info("全部應繳 unPayTotal          = " + this.unPayTotal);
 		this.info("應繳費用 unPayFee            = " + this.unPayFee);
 		this.info("應繳本利 unPayLoan           = " + this.unPayLoan);
-		this.info("償還本利 repayLoan           = " + this.repayLoan + ", 應繳日=" + this.repayIntDate);
+		this.info("償還本利 repayLoan           = " + this.repayLoan);
+		this.info("應繳日 repayIntDat           = " + this.repayIntDate + " ," + this.repayIntDateByFacmNoVo.toString());
 		this.info("償還本金 Principal           = " + this.principal);
 		this.info("清償違約金 closeBreachAmt    = " + this.closeBreachAmt);
 		this.info("回收費用 repayFee            = " + this.repayFee);
@@ -1264,22 +1307,20 @@ public class TxBatchCom extends TradeBuffer {
 		this.info("溢繳金額 overAmt             = " + this.overAmt);
 		this.info("溢繳款額度 OverRpFacmNo      = " + this.overRpFacmNo + ", 溢短收記號=" + this.overRpFg);
 		this.info("其他額度暫收可抵繳 otrTavAmt = " + this.otrTavAmt);
-		this.info("還款前放款餘額 loanBal       = " + this.loanBal);
 		this.info("費用還款類別 feeRepayType    = " + this.feeRepayType);
-		this.info("結案記號 closeFg             = " + this.closeFg);
-		this.info("檢核訊息  checkMsg           = " + this.checkMsg);
-		this.info("錯誤訊息  errorMsg           = " + this.errorMsg);
-		this.info("處理狀態  procStsCode        = " + this.procStsCode);
-
+		this.info("費用還款類別 feeRepayType    = " + this.feeRepayType);
 	}
 
 	/* append this.checkMsg Amount Field */
 	private void apendcheckMsgAmounts(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
-		// 應繳本利 > 償還本利 => 顯示應繳本利
+		if (this.tTempVo.get("MergeAmt") != null) {
+			this.checkMsg = this.checkMsg + ", 同戶號合併檢核 總金額:" + this.tTempVo.get("MergeAmt");
+		}
 		if (this.repayFacmNo != tBatxDetail.getFacmNo())
 			this.checkMsg = this.checkMsg + ", 額度:" + parse.IntegerToString(this.repayFacmNo, 3);
 		if (this.repayBormNo > 0)
 			this.checkMsg = this.checkMsg + ", 撥款:" + parse.IntegerToString(this.repayBormNo, 3);
+		// 應繳本利 > 償還本利 => 顯示應繳本利
 		if (this.unPayLoan.compareTo(this.repayLoan) > 0)
 			this.checkMsg = this.checkMsg + ", 應繳本利:" + this.unPayLoan;
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0)
@@ -1507,6 +1548,7 @@ public class TxBatchCom extends TradeBuffer {
 		// 還款應繳日
 		if (this.repayIntDate > 0) {
 			this.tTempVo.putParam("RepayIntDate", this.repayIntDate);
+			this.tTempVo.putParam("RepayIntDateByFacmNoVo", this.repayIntDateByFacmNoVo.getJsonString());
 		}
 		// 償還本利
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0) {
@@ -1562,6 +1604,8 @@ public class TxBatchCom extends TradeBuffer {
 		// 還款應繳日 (期款按期償還)
 		if (this.repayType == 1) {
 			this.repayIntDate = baTxCom.getRepayIntDate();
+			this.repayIntDateByFacmNoVo = baTxCom.getRepayIntDateByFacmNoVo();
+			this.info("PreRepayTermsBatch=" + baTxCom.getPreRepayTermsBatch());
 		}
 
 		// 部分償還
@@ -1573,9 +1617,6 @@ public class TxBatchCom extends TradeBuffer {
 
 		// 結案記號判斷
 		boolean isCloseFg = true;
-
-//		整批入帳、部分繳款
-		boolean isRepayPart = false;
 
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
 			for (BaTxVo baTxVo : baTxList) {
@@ -1637,13 +1678,6 @@ public class TxBatchCom extends TradeBuffer {
 					if (baTxVo.getCloseFg() == 0) {
 						isCloseFg = false;
 					}
-					// 整批入帳、部分繳款
-					if (this.repayIntDate > 0) {
-						if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0
-								&& baTxVo.getPayIntDate() <= this.repayIntDate) {
-							isRepayPart = true;
-						}
-					}
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
 						this.principal = this.principal.add(baTxVo.getPrincipal());
@@ -1688,12 +1722,8 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
 			this.overRpFg = 1;
 		} else {
-			if (isRepayPart) {
-				this.overRpFg = 3;
-			} else {
-				if (this.overAmt.compareTo(BigDecimal.ZERO) > 0) {
-					this.overRpFg = 2;
-				}
+			if (this.overAmt.compareTo(BigDecimal.ZERO) > 0) {
+				this.overRpFg = 2;
 			}
 		}
 

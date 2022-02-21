@@ -37,13 +37,14 @@ import com.st1.itx.util.parse.Parse;
 
 /*
  * L3210 暫收款登錄
- * a.此功能供預收客戶現金或期票時登錄暫收款用.
- * b.如係預收期票者,支票帳號,票號,開票日,支票銀行及分行之值,會保留上一筆者,僅清除金額欄,以便利連號支票輸入用.
- * c.暫收款登錄交易之支票繳款功能，增加支票用途欄，如：還本，期款…，使支票兌現時可自動入帳。
- * d.支票繳款時需入到該戶的額度編號下
- * d1.若多筆額度期款收回失敗時，帳掛在第一筆的額度編號。
- * d2.若多筆額度期款收回成功且有溢收金額時，帳掛在第一筆的額度編號。
+ * 1.此功能供存入暫收款或存入期票時登錄用.
+ * 2.暫收款登錄交易之支票繳款功能，增加支票用途欄，如：還本，期款…，使支票兌現時可自動入帳。
+ * 3.支票繳款時需入到該戶的額度編號下(可多個額度)
+ * 4.暫收原因為債協暫收款：
+ * 4.1.依案件種類出帳：債協暫收款－收款專戶(601776戶號)、 債協暫收款－抵繳款 (債協)、前調暫收款－抵繳款 (調解)、更生暫收款－抵繳款  (更生,清算)
+ * 4.2.專戶的匯入款，為一般債權人撥付款(一般債權撥付資料檔，提兌日 = 入帳日，金額相同)時，自動轉入該戶債協暫收款。                           
  */
+
 /*
  * Tita
  * TimCustNo=9,7
@@ -128,6 +129,7 @@ public class L3210 extends TradeBuffer {
 	private BigDecimal fireFee;
 	private BigDecimal lawFee;
 	private BigDecimal closeBreachAmt;
+	private boolean isRepaidFee;
 
 	// initialize variable
 	@PostConstruct
@@ -147,6 +149,7 @@ public class L3210 extends TradeBuffer {
 		this.fireFee = BigDecimal.ZERO;
 		this.lawFee = BigDecimal.ZERO;
 		this.closeBreachAmt = BigDecimal.ZERO;
+		this.isRepaidFee = false;
 	}
 
 	@Override
@@ -185,6 +188,13 @@ public class L3210 extends TradeBuffer {
 			}
 		}
 
+		// 費用抵繳是否抵繳(整批入帳且非除合併戶號存入暫收)
+		this.isRepaidFee = false;
+		if (titaVo.isTrmtypBatch()) {
+			if (titaVo.get("MergeCnt") == null) {
+				this.isRepaidFee = true;
+			}
+		}
 		// 帳務處理
 		AcDetailRoutine();
 
@@ -338,7 +348,7 @@ public class L3210 extends TradeBuffer {
 				acPaymentCom.setTxBuffer(this.getTxBuffer());
 				acPaymentCom.run(titaVo);
 				// 貸方
-				if (titaVo.isTrmtypBatch()) {
+				if (isRepaidFee) {
 					acDetailSettleUnpaid();
 				} else {
 					acDetail = new AcDetail();
@@ -373,7 +383,7 @@ public class L3210 extends TradeBuffer {
 				acPaymentCom.setTxBuffer(this.getTxBuffer());
 				acPaymentCom.run(titaVo);
 				// 整批入帳自動收回費用
-				if (titaVo.isTrmtypBatch()) {
+				if (isRepaidFee) {
 					acDetailSettleUnpaid();
 				} else {
 					acDetail = new AcDetail();

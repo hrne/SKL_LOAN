@@ -47,51 +47,36 @@ public class L420B extends TradeBuffer {
 		// 會計日期、批號
 		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		String iBatchNo = titaVo.getParam("BatchNo");
-		String iReconCode = "";
-		if (titaVo.get("ReconCode") != null) {
-			iReconCode = titaVo.getParam("ReconCode").trim();
-		}
 
-		// 檢查作業狀態
-		checkHead(functionCode, iAcDate, iBatchNo, titaVo);
-
-		// 啟動背景作業－整批入帳
-		MySpring.newTask("BS401", this.txBuffer, titaVo);
-
-		this.addList(this.totaVo);
-		return this.sendList();
-	}
-
-	/* 檢查作業狀態 */
-	private void checkHead(int functionCode, int acDate, String batchNo, TitaVo titaVo) throws LogicException {
 		// find 整批入帳總數檔
 		BatxHeadId tBatxHeadId = new BatxHeadId();
-		tBatxHeadId.setAcDate(acDate);
-		tBatxHeadId.setBatchNo(batchNo);
+		tBatxHeadId.setAcDate(iAcDate);
+		tBatxHeadId.setBatchNo(iBatchNo);
 		BatxHead tBatxHead = batxHeadService.findById(tBatxHeadId);
 		if (tBatxHead == null) {
 			throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
 		}
-
-// BatxStsCode 整批作業狀態 0.正常 1.整批處理中
-		if ("1".equals(tBatxHead.getBatxStsCode())) {
-			if (!titaVo.getHsupCode().equals("1")) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");
-			}
-		}
 // 處理代碼 0:入帳 1:刪除 2:訂正　4.刪除回復
 // BatxExeCode 作業狀態 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除	
-
-		String batxExeCode = tBatxHead.getBatxExeCode();
-
 		if (functionCode == 4) {
-			if (!"8".equals(batxExeCode)) {
+			if (!"8".equals(tBatxHead.getBatxExeCode())) {
 				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
 			}
 		} else {
-			if ("8".equals(batxExeCode)) {
+			if ("8".equals(tBatxHead.getBatxExeCode())) {
 				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
 			}
 		}
+
+// BatxStsCode 整批作業狀態 0.正常 1.整批處理中
+		if ("1".equals(tBatxHead.getBatxStsCode()) && titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");
+		} else {
+			// 啟動背景作業－整批入帳
+			MySpring.newTask("BS401", this.txBuffer, titaVo);
+		}
+		this.addList(this.totaVo);
+		return this.sendList();
 	}
+
 }

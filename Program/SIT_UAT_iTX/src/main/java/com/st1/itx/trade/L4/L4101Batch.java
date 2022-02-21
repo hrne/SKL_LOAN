@@ -109,6 +109,7 @@ public class L4101Batch extends TradeBuffer {
 
 	int acDate = 0;
 	String batchNo = "";
+	private String nowBatchNo = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -295,9 +296,11 @@ public class L4101Batch extends TradeBuffer {
 //		bankRemitFileVo.setOccursList(tmp);
 		// 轉換資料格式
 		ArrayList<String> file = l4101Vo.toFile();
-
+// 檔案產生者員編_disb_送匯日期_3碼檔案序號_secret.csv
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + "-撥款匯款媒體檔", "LNM24p.csv", 2);
+				titaVo.getTxCode() + "-撥款匯款媒體檔", titaVo.getTlrNo() + "_disb_"
+						+ (this.getTxBuffer().getTxBizDate().getTbsDy() + 19110000) + "_" + nowBatchNo + "_secret.csv",
+				2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -342,6 +345,7 @@ public class L4101Batch extends TradeBuffer {
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "無撥款帳務資料"); // 查詢資料不存在
 		}
+		nowBatchNo = parse.IntegerToString(tAcClose.getBatNo(), 3);
 		batchNo = batchNo.trim() + parse.IntegerToString(tAcClose.getBatNo(), 2);
 		tAcClose.setBatNo(tAcClose.getBatNo() + 1);
 		try {

@@ -388,7 +388,7 @@ IF(#OOFacShareApplBTNFg==0,BIND(grid,cancel),$)
 T(2,#OOCustNo)
 
 #OOBTN11=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2035; ntxbuf=#OOBUF11})
+BIND(grid,{ cmd=CHAIN; ntxcd=L2036; ntxbuf=#OOBUF11})
 IF(#OOCustRelBTNFg==0,BIND(grid,cancel),$)
 
 !交互運用

@@ -598,7 +598,7 @@ T(H,#NationalityCodeBef,#NationalityCodeHelp)
 #NationalityCodeAft=X,2,I
 HELP(#NationalityCodeHelp)
 @
-C(5,NationalityCodeAft,#NationalityCodeBef,s,$)
+C(5,#NationalityCodeAft,#NationalityCodeBef,s,$)
 C(5,#FdNationalityCode,*,V(7),$)
 C(4,#NationalityCodeAft,$,V(H,#NationalityCodeHelp))
 
@@ -976,6 +976,7 @@ IF(#CurrCityCodeInd=="X",T(3,X),IF(#CurrAreaCodeAft==#CurrAreaCodeBef,T(3,),T(3,
 #RimL1r10B=X,1,S
 C(5,#SameReg,Y,s,$)
 C(4,#CurrCityCodeAft,S,$)
+C(4,#CurrAreaCodeAft,S,$)
 T(2,@RimCityCode,#CurrCityCodeAft)
 T(2,@RimAreaCode,#CurrAreaCodeAft)
 RESET_RIM(#RimL1r10B,L1R10)

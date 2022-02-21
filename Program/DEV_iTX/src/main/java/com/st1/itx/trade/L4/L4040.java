@@ -273,7 +273,7 @@ public class L4040 extends TradeBuffer {
 //																			O：舊檔轉換用"
 						occursList.putParam("OccCreateFlag", result.get("F5"));
 //							9.OccAuthCreateDate		資料製作日期	9	8	79	
-						occursList.putParam("OccAuthCreateDate", FormatUtil.pad9("" + authCreateDate, 8));
+						occursList.putParam("OccPropDate", FormatUtil.pad9("" + propDate, 8));
 //							10.OccSnederNo			提出行代號		9	7	86	1030116
 						occursList.putParam("OccSnederNo", "1030116");
 //							11.OccSenderRemarker	發動者專用區	X	20	106	戶號+額度

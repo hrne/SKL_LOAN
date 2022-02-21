@@ -80,8 +80,9 @@ public class AchAuthFileVo extends FileVo {
 //				RepayBank	扣款銀行
 //				RepayAcct	扣款帳號
 //				CreateFlag		新增或取消
-				occursList.putParam("AuthCreateDate", thisLine.substring(71, 79));
+				occursList.putParam("PropDate", thisLine.substring(71, 79));
 				occursList.putParam("CustNo", thisLine.substring(50, 70));
+				occursList.putParam("FacmNo", thisLine.substring(93, 96));
 				occursList.putParam("RepayBank", thisLine.substring(19, 22));
 				occursList.putParam("RepayAcct", thisLine.substring(26, 40));
 				occursList.putParam("CreateFlag", thisLine.substring(70, 71));
@@ -138,7 +139,7 @@ public class AchAuthFileVo extends FileVo {
 					+ occursList.get("OccCustId") // 6委繳戶統一編號 身分證字號
 					+ occursList.get("OccCustNo") // 7用戶號碼 借款人戶號
 					+ occursList.get("OccCreateFlag") // 8新增或取消 A：新增(人工紙本)O：舊檔轉換用
-					+ occursList.get("OccAuthCreateDate")// 9資料製作日期
+					+ occursList.get("OccPropDate")// 9資料製作日期
 					+ occursList.get("OccSnederNo") // 10提出行代號 1030116
 					+ occursList.get("OccSenderRemarker") // 11發動者專用區 戶號+額度
 					+ occursList.get("OccTxType")// 12交易型態 N：提出

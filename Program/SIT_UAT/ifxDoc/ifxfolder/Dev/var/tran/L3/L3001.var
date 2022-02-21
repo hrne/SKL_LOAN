@@ -9,7 +9,7 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,3)ASGN(INQHD$)
+E(0,67)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -360,6 +360,21 @@ T(3,[L3001] 放款明細資料)
 E(0,#SYSDATE/100)
 E(0,#EntryDate*100+1)
 
+#OLineAmt=+m,14.2,L
+#OLineAmt14=+m,14,L
+E(0,#OLineAmt)
+
+#OUtilAmt=+m,14.2,L
+#OUtilAmt14=+m,14,L
+E(0,#OUtilAmt)
+
+#OUtilBal=+m,14.2,L
+#OUtilBal14=+m,14,L
+E(0,#OUtilBal)
+
+#OAvailable=+m,14.2,L
+#OAvailable14=+m,14,L
+E(0,#OAvailable)
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #OCaseNo=X,7,L
@@ -562,7 +577,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2017;text=#BTN11NAME; ntxbuf=#OOBUF11})
 <sub type="TOM">
 
 TXFORM=L3001
-#OValidFacm
+#OValidFacm#OLineAmt#OUtilAmt#OUtilBal#OAvailable
 #OOCaseNo#OOCustNo#OOFacmNo#OOApplNo#OODeadline#OOCurrencyCode#OOLineAmt
 #OOUtilAmt#OOUtilBal#OOAvailable#OOShareFacFg#OOClShareFg#OOLastBormNo
 ^
@@ -575,12 +590,16 @@ TXFORM=L3001
 </sub>
 <sub type="PART" name="L3001" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
 [
-["[L3001]                                 放款明細資料查詢"],
+["[L3001]                                 放款明細資料查詢                                                                                                   "],
 ![#<->#,"@案件編號",#OCaseNo,#OCaseNoX],
 [#<->#,"@借戶戶號",#OCustNo,#OCustNoX],
 [#<->#,"@統一編號",#OCustId],
 ![#<->#,"@核准編號",#OApplNo,#OApplNoX],
 ["@尚餘有效額度",#OValidFacm,"@筆"],
+[#<->#,"@核准額度",#OLineAmt14],
+[#<->#,"@目前餘額",#OUtilAmt14],
+[#<->#,"@已動用額度餘額",#OUtilBal14],
+[#<->#,"@可用額度",#OAvailable14],
 ["@","@"],
 ]
 </sub>
@@ -622,16 +641,16 @@ TXFORM=L3001
 {width:55,align:'center'}
 
 #OOLineAmt14=核准額度
-{width:100}
+{width:100,sum:true}
 
 #OOUtilAmt14=目前餘額
-{width:100}
+{width:100,sum:true}
 
 #OOUtilBal14=已動用</br>額度餘額
-{width:100}
+{width:100,sum:true}
 
 #OOAvailable14=可用額度
-{width:100}
+{width:100,sum:true}
 
 #OOBTN10=合併</br>額度控管
 {width:80,search:false,formatter:'cust:bind-button:額度;L291B 合併額度控管額度查詢',align:'center',canExport:false}
@@ -660,16 +679,16 @@ TXFORM=L3001
 {width:55,align:'center'}
 
 #OOLineAmt14=核准額度
-{width:100}
+{width:100,sum:true}
 
 #OOUtilAmt14=目前餘額
-{width:100}
+{width:100,sum:true}
 
 #OOUtilBal14=已動用</br>額度餘額
-{width:100}
+{width:100,sum:true}
 
 #OOAvailable14=可用額度
-{width:100}
+{width:100,sum:true}
 
 
 

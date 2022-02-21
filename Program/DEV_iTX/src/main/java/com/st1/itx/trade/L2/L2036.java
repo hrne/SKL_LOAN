@@ -60,10 +60,11 @@ public class L2036 extends TradeBuffer {
 		String Ukey = "";
 
 		Slice<ReltMain> iReltMain = null;
-		if (iCustNo != 0) {
-			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);
+		
+		if(iCaseNo == 0) { // L1001連進來查該戶號全部
+			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);		
 		} else {
-			iReltMain = iReltMainService.caseNoEq(iCaseNo, this.index, this.limit, titaVo);
+			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);			
 		}
 
 		if (iReltMain == null) {

@@ -49,14 +49,20 @@ public class L420A extends TradeBuffer {
 		tBatxHeadId.setAcDate(iAcDate);
 		tBatxHeadId.setBatchNo(iBatchNo);
 		BatxHead tBatxHead = batxHeadService.findById(tBatxHeadId);// find 整批入帳總數檔
-		if (tBatxHead == null)
+		if (tBatxHead == null) {
 			throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
-
-		// 檢查作業狀態
-		checkHead(tBatxHead, titaVo);
-
-		// 啟動背景作業－整批檢核
-		MySpring.newTask("L420ABatch", this.txBuffer, titaVo);
+		}
+		// BatxExeCode 作業狀態 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除
+		if ("8".equals(tBatxHead.getBatxExeCode())) {
+			throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
+		}
+		// BatxStsCode 整批作業狀態 0.正常 1.整批處理中
+		if ("1".equals(tBatxHead.getBatxStsCode()) && !titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");
+		} else {
+			// 啟動背景作業－整批檢核
+			MySpring.newTask("L420ABatch", this.txBuffer, titaVo);
+		}
 
 		// end
 		this.addList(this.totaVo);
@@ -64,21 +70,4 @@ public class L420A extends TradeBuffer {
 
 	}
 
-	/* 檢查作業狀態 */
-	private void checkHead(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
-
-// BatxStsCode 整批作業狀態 0.正常 1.整批處理中
-		if ("1".equals(tBatxHead.getBatxStsCode())) {
-			if (!titaVo.getHsupCode().equals("1")) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");
-			}
-		}
-
-// 處理代碼 0:入帳 1:刪除 2:訂正
-// BatxExeCode 作業狀態 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除		
-		String batxExeCode = tBatxHead.getBatxExeCode();
-		if ("8".equals(batxExeCode))
-			throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
-
-	}
 }
