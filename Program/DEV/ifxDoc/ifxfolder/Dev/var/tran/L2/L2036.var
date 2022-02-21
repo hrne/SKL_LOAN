@@ -37,6 +37,13 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
+#BTNADDBUF=X,18,S
+T(2,1)
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2306; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------

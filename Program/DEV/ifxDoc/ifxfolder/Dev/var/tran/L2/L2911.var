@@ -260,7 +260,7 @@ C(4,#OwnerId{n},INVOKEJS(SHOW,grd3_{k},0),INVOKEJS(SHOW,grd3_{k},1))
 C(3,#FirstAmt{n},0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
 ##end
 !代號1
-#ClCode1=A,1,I
+#ClCode1=A,1,L
 C(3,#CHAIN,1,s,$)
 HELP(#ClCode1Help) 
 @V(H,#ClCode1Help)
@@ -270,7 +270,7 @@ C(4,#ClCode1,S,$)
 T(H,#ClCode1,#ClCode1Help)
 
 !代號2
-#ClCode2=A,2,I
+#ClCode2=A,2,L
 C(3,#CHAIN,1,s,$)
 C(2,#ClCode1,T(3,),
              HELP(#ClCode21Help),
@@ -287,7 +287,7 @@ C(2,#ClCode1,T(3,),T(H,#ClCode2,#ClCode21Help),
                    T(H,#ClCode2,#ClCode22Help))
 
 !擔保品編號
-#ClNo=A,7,I
+#ClNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 

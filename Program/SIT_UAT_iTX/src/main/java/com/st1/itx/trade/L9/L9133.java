@@ -71,11 +71,12 @@ public class L9133 extends TradeBuffer {
 		doRpt(titaVo);
 
 		// MSG帶入預設值
-		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9133", 60) + iAcDate;
+		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9133", 60) + (iAcDate - 19110000);
 
 		this.info("ntxbuf = " + ntxbuf);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9133會計與主檔餘額檢核表已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+				"L9133會計與主檔餘額檢核表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

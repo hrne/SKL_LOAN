@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacClose;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -30,6 +33,10 @@ public class L2R45 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public FacCloseService sFacCloseService;
+	@Autowired
+	public CustMainService custMainService;
+	@Autowired
+	public CustNoticeCom custNoticeCom;
 
 	/* 日期工具 */
 	@Autowired
@@ -40,6 +47,7 @@ public class L2R45 extends TradeBuffer {
 
 	private Slice<FacClose> slFacClose;
 	private FacClose tFacClose = new FacClose();
+	private CustMain tCustMain = new CustMain();
 	// 作業項目
 	private List<String> lfunCode = new ArrayList<String>();
 
@@ -75,6 +83,19 @@ public class L2R45 extends TradeBuffer {
 			}
 		}
 
+		tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+		if (tCustMain == null) {
+			throw new LogicException(titaVo, "E2003", "查無客戶主檔資料"); // 查無資料
+		}
+		String WkRegAddres = "";
+		WkRegAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
+		if (tCustMain.getCurrZip3() != null || !tCustMain.getCurrZip3().isEmpty()) {
+			if (tCustMain.getCurrZip2() != null || !tCustMain.getCurrZip2().isEmpty()) {
+				WkRegAddres = tCustMain.getCurrZip3() + "-" + tCustMain.getCurrZip2() + " " + WkRegAddres;
+			} else {
+				WkRegAddres = tCustMain.getCurrZip3() + " " + WkRegAddres;
+			}
+		}
 		this.totaVo.putParam("L2r45CustNo", tFacClose.getCustNo());
 		this.totaVo.putParam("L2r45CloseNo", tFacClose.getCloseNo());
 		this.totaVo.putParam("L2r45FacmNo", tFacClose.getFacmNo());
@@ -100,6 +121,7 @@ public class L2R45 extends TradeBuffer {
 		this.totaVo.putParam("L2r45ClCode1", tFacClose.getClCode1());
 		this.totaVo.putParam("L2r45ClCode2", tFacClose.getClCode2());
 		this.totaVo.putParam("L2r45ClNo", tFacClose.getClNo());
+		this.totaVo.putParam("L2r45Addres", WkRegAddres);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -3,18 +3,16 @@ package com.st1.itx.util.common;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
-import java.util.List;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,9 +37,13 @@ public class EbsCom extends CommBuffer {
 
 		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
 
+		if (tSystemParas == null) {
+			throw new LogicException("E0001", "EbsCom,SystemParas");
+		}
+
 		String ebsFg = tSystemParas.getEbsFg();
 
-		this.info("EbsCom post ebsFg = " + ebsFg);
+		this.info("EbsCom ebsFg = " + (ebsFg == null ? "" : ebsFg));
 
 		if (ebsFg == null || ebsFg.isEmpty() || !ebsFg.equals("Y")) {
 			return;
@@ -49,125 +51,73 @@ public class EbsCom extends CommBuffer {
 
 		// 取得Url
 		String slipMediaUrl = tSystemParas.getEbsUrl();
-
 		String ebsAuth = tSystemParas.getEbsAuth();
-
 		String returnStatus = null;
 		JSONObject outputParameters = null;
+		JSONObject requestJO = new JSONObject();
+		JSONObject main = new JSONObject();
+		JSONObject inputParameters = new JSONObject();
+		JSONObject summaryTblItem = new JSONObject();
+		JSONObject journalTblItem = new JSONObject();
 
 		try {
-			JSONObject requestJO = new JSONObject();
-			JSONObject main = new JSONObject();
-			JSONObject inputParameters = new JSONObject();
-
-			JSONObject summaryTblItem = new JSONObject();
-
 			summaryTblItem.putOpt("P_SUMMARY_TBL_ITEM", summaryTbl);
 			inputParameters.putOpt("P_SUMMARY_TBL", summaryTblItem);
-
-			JSONObject journalTblItem = new JSONObject();
-
 			journalTblItem.putOpt("P_JOURNAL_TBL_ITEM", journalTbl);
 			inputParameters.putOpt("P_JOURNAL_TBL", journalTblItem);
-
 			main.putOpt("InputParameters", inputParameters);
-
 			requestJO.putOpt("main", main);
+		} catch (JSONException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("EbsCom Exception = " + e.getMessage());
+			throw new LogicException("E9004", "EbsCom組合上傳資料時有誤");
+		}
 
-			String result = post(slipMediaUrl, ebsAuth, requestJO, titaVo);
+		String result = post(slipMediaUrl, ebsAuth, requestJO.toString(), titaVo);
 
+		try {
 			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
-
 			returnStatus = outputParameters.getString("X_RETURN_STATUS");
-
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("EbsCom Exception = " + e.getMessage());
-			throw new LogicException("E9004", "EbsCom");
+			throw new LogicException("E9004", "EbsCom分析收到的訊息時有誤");
 		}
 
 		if (returnStatus != null && returnStatus.equals("E")) {
-			throw new LogicException("E9004", "SlipMediaLog");
+			// TODO:寫進TABLE存起來
+			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
 		}
 	}
 
-	private String post(String slipMediaUrl,String ebsAuth,JSONObject requestJO, TitaVo titaVo) {
-
-		// 原本用RestTemplate送出對方收到都是亂碼
-		// 先把資料字串用UTF_8編碼一次
-		byte[] bytes = requestJO.toString().getBytes(StandardCharsets.UTF_8);
-		String jsonString = new String(bytes, StandardCharsets.UTF_8);
-		this.info("jsonString = " + jsonString);
-		
-		// 清河提供程式碼
-//		URL url = new URL(slipMediaUrl);
-//		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//		conn.setRequestProperty("Content-Type", "application/json");
-//		conn.setRequestMethod("POST");
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(ebsAuth.getBytes())); // 帳號密碼指定用Base64編碼
-//		this.info("basicAuth = " + basicAuth);
-//		conn.setRequestProperty("Authorization", basicAuth);
-//		conn.setDoOutput(true);
-//		conn.setDoInput(true);
-//		OutputStream os = conn.getOutputStream();
-//		OutputStreamWriter out = new OutputStreamWriter(os, StandardCharsets.UTF_8);
-//		out.write(jsonString);
-//		out.flush();
-//		InputStream is = conn.getInputStream();
-//		BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-//		StringBuilder response = new StringBuilder();
-//		while (reader.ready()) {
-//			response.append(reader.readLine());
-//			response.append('\r');
-//		}
-//		reader.close();
-//		this.info("HttpURLConnection response = " + response);
-//		conn.disconnect();
-
-		// 我的程式碼
-		HttpHeaders headers = setEbsHeader(basicAuth);
+	private String post(String slipMediaUrl, String ebsAuth, String jsonString, TitaVo titaVo) throws LogicException {
+		HttpHeaders headers = setEbsHeader(ebsAuth);
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
-		RestTemplate restTemplate = setEbsRestTemplate();
-		String result = restTemplate.postForObject(slipMediaUrl, request, String.class);
-		this.info("result = " + result);
+		RestTemplate restTemplate = new RestTemplate();
+		String result = null;
+		this.info("EbsCom request = " + request.toString());
+		try {
+			result = restTemplate.postForObject(slipMediaUrl, request, String.class);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("EbsCom Exception = " + e.getMessage());
+			throw new LogicException("E9004", "EbsCom上傳資料中發生錯誤");
+		}
+		this.info("EbsCom result = " + result);
 
 		return result;
 	}
 
-	private HttpHeaders setEbsHeader(String basicAuth) {
+	private HttpHeaders setEbsHeader(String ebsAuth) {
 		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		headers.add("Content-Type", "application/json; charset=UTF-8"); // 指定編碼方式
-		headers.add("Authorization", basicAuth);
-		headers.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8)); // 指定可接受編碼方式
+		headers.setContentType(MediaType.APPLICATION_JSON_UTF8); // 指定編碼方式
+		String[] ebsAuthArray = ebsAuth.split(":");
+		headers.setBasicAuth(ebsAuthArray[0], ebsAuthArray[1], StandardCharsets.UTF_8); // 指定帳密編碼方式
+		headers.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8)); // 指定傳送/接收資料時可接受編碼方式
 		return headers;
-	}
-
-	private RestTemplate setEbsRestTemplate() {
-
-		RestTemplate restTemplate = new RestTemplate();
-
-		// 取得HttpMessageConverter
-		// 原本附的太多了，我只要一個，而且要指定編碼方式為UTF-8
-		List<HttpMessageConverter<?>> listM = restTemplate.getMessageConverters();
-
-		// 清空
-		listM.clear();
-
-		// 宣告一個新的，並指定編碼方式
-		HttpMessageConverter<?> thisM = new StringHttpMessageConverter(StandardCharsets.UTF_8);
-
-		// 設定不讓它覆寫可接受編碼方式
-		((StringHttpMessageConverter) thisM).setWriteAcceptCharset(false);
-
-		// 記得放進list
-		listM.add(thisM);
-
-		// 存回模板
-		restTemplate.setMessageConverters(listM);
-
-		return restTemplate;
 	}
 
 	@Override

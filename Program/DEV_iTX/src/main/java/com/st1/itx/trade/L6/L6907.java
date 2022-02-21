@@ -147,20 +147,26 @@ public class L6907 extends TradeBuffer {
 //			}
 //		}
 		int custNo = 0;
+		String acctcode = "";
 		BigDecimal rvBal = BigDecimal.ZERO;
+		
 		for (AcReceivable tAcReceivable : lAcReceivable) {
 			this.info("tAcReceivable = " + tAcReceivable);
 			// new occurs
 			OccursList occurslist = new OccursList();
+			rvBal = BigDecimal.ZERO;
+			
 
-			if (tAcReceivable.getCustNo() != custNo) {
-				rvBal = tAcReceivable.getRvBal();
-				custNo = tAcReceivable.getCustNo();
-			} else {
-				rvBal = rvBal.add(tAcReceivable.getRvBal());
-
+			//同戶號、業務代號金額累加全部(同戶號、業務代號戶號合計需相同)2022/2/21
+		
+			for (AcReceivable tAcReceivable2 : lAcReceivable) {
+				if(tAcReceivable2.getCustNo() == tAcReceivable.getCustNo() && (tAcReceivable2.getAcctCode().equals(tAcReceivable.getAcctCode()))) {
+					rvBal = rvBal.add(tAcReceivable2.getRvBal());
+					this.info("CustNo=="+tAcReceivable2.getCustNo()+",AcctCode=="+tAcReceivable2.getAcctCode()+",rvBal=="+rvBal);
+				}
 			}
-
+			
+		
 			occurslist.putParam("OOAcNoCode", tAcReceivable.getAcNoCode());
 			occurslist.putParam("OOAcSubCode", tAcReceivable.getAcSubCode());
 			occurslist.putParam("OOAcDtlCode", tAcReceivable.getAcDtlCode());

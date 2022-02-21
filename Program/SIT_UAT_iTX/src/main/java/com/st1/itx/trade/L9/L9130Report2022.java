@@ -167,7 +167,7 @@ public class L9130Report2022 extends MakeReport {
 
 	// 紀錄本次產生的序號 提供L9131產表使用
 	List<String> listMediaSeq;
-	
+
 	// 作業人員
 	String tellerNo = "";
 
@@ -175,10 +175,10 @@ public class L9130Report2022 extends MakeReport {
 		this.info("L9130Report2022 exec ...");
 
 		listMediaSeq = new ArrayList<>();
-		
+
 		// 作業人員
 		tellerNo = titaVo.getTlrNo();
-		
+
 		// 會計日期 #AcDate=D,7,I
 		iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
 
@@ -418,7 +418,7 @@ public class L9130Report2022 extends MakeReport {
 		}
 
 		// 全部傳票印完，執行特殊處理
-		specialHandling(i, titaVo);
+		i = specialHandling(i, titaVo);
 
 		// 統計並送出
 		doSummaryAndSendToEbs(i, titaVo);
@@ -560,7 +560,7 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("ISSUED_BY", tellerNo);
 				dataJo.put("ACCOUNTING_DATE", slipDate);
 				dataJo.put("JE_LINE_NUM", "" + i);
-				dataJo.put("SEGREGATE_CODE", acSubBookCode);
+				dataJo.put("SEGREGATE_CODE", lastAcSubBookCode);
 				dataJo.put("ACCOUNT_CODE", tempAcNoCode);
 				dataJo.put("SUBACCOUNT_CODE", tempAcSubNoCode.trim().isEmpty() ? "00000" : tempAcSubNoCode);
 				dataJo.put("COSTCENTER_CODE", costUnit);

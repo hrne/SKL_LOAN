@@ -258,7 +258,9 @@ R(1,L4R21)
 
 #CustCheck=A,1,S
 C(3,#FuncCode,4,s,C(3,#FuncCode,5,s,$))
-IF(#L4r21CheckCode==1,$,V(P,該戶號不存在於客戶檔))
+IF(#L4r21CheckCode==1,s,$)
+T(2,@CustName,)
+V(P,該戶號不存在於客戶檔)
 
 ! 額度
 #FacmNo=A,3,I
@@ -277,7 +279,9 @@ R(1,L4R21)
 
 #FacmCheck=A,1,S
 C(3,#FuncCode,4,s,C(3,#FuncCode,5,s,$))
-IF(#L4r21CheckCode==1,$,V(P,該客戶額度不存在於額度檔))
+IF(#L4r21CheckCode==1,s,$)
+T(2,@CustName,)
+V(P,該客戶額度不存在於額度檔)
 
 #RimL4r03B=X,1,S
 E(0,@RimCustNo,#CustNo)
@@ -453,9 +457,12 @@ S(L4R03,1,#RimCustNo)
 R(1,L4R03)
 T(2,@RelAcctName,#L4r03CustName)
 T(2,@RelationId,#L4r03CustId)
-E(0,@RelAcctBirthday,#L4r03Birthday)
 T(2,@RelAcctGenderP,#L4r03Gender)
 T(2,@RelAcctGender,#L4r03Gender)
+
+#SetBirth=X,1,S
+IF(#FuncCode==1 || #FuncCode==2,$,s)
+E(0,@RelAcctBirthday,#L4r03Birthday)
 
 ! 性別
 #RelAcctGenderP=X,1,S

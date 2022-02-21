@@ -115,6 +115,7 @@
 !    L6R32 : 尋找郵遞區號
 !    L6R35 : 尋找各類代碼檔
 !    L7R04 : 尋找特殊客觀減損狀況檔
+!    L9R01 : 傳入中曆日期,回傳中曆工作年月
 !-----------------------------------------------------------
 !  IFXWeb
 !
@@ -1432,7 +1433,6 @@ TXFORM=CWAMR
 ^
 </CWAMR.tom>
 
-
 <CWAMX.dec>
 #CWAMX_XCWAMRKY=X,24,S
 #CWAMX_CHKSEQ  =A,02,S
@@ -1452,7 +1452,6 @@ TXFORM=CWAMR
 #CWAMX_CHITLIST=X,10,S
 #CWAMX_FIELDNM=X,20,S
 </CWAMX.dec>
-
 
 <CWAMX.tom>
 TXFORM=CWAMX
@@ -1805,7 +1804,7 @@ TXFORM=L2R04
 #L2r05EstimateReview=X,6,S
 #L2r05Coorgnizer=X,6,S
 #L2r05GroupId=X,10,S
-#L2r05AdvanceCloseCode=A,1,S
+#L2r05AdvanceCloseCode=A,2,S
 #L2r05BreachCode=A,3,S
 #L2r05BreachGetCode=A,1,S
 #L2r05ProdBreachFlag=X,1,S
@@ -3022,7 +3021,7 @@ TXFORM=L2R34
 
 !    L2R35 : 依核准號碼,保證人統編尋找保證人資料
 <L2R35.dec>
-#L2r35RelInd=A,2,S
+#L2r35RelInd=X,2,S
 #L2r35GuaAmt=m,14,S
 #L2r35GuaType=A,2,S
 #L2r35GuaDt=D,7,S
@@ -3171,7 +3170,6 @@ TXFORM=L2R42
 ^
 </L2R42.tom>
 
-
 ! L2R43 : 取建物或土地所有權人姓名
 <L2R43.dec>
 #L2r43CustName=x,100,S
@@ -3243,6 +3241,7 @@ TXFORM=L2R44
 #L2r45ClCode1=A,1,S
 #L2r45ClCode2=A,2,S
 #L2r45ClNo=A,7,S
+#L2r45Addres=x,200,S
 </L2R45.dec>
 
 <L2R45.tom>
@@ -3272,6 +3271,7 @@ TXFORM=L2R45
 #L2r45ClCode1
 #L2r45ClCode2
 #L2r45ClNo
+#L2r45Addres
 ^
 </L2R45.tom>
 
@@ -3367,7 +3367,6 @@ TXFORM=L2R49
 ##end
 ^
 </L2R49.tom>
-
 
 <L2R50.dec>
 #L2r50Exist=X,1,S
@@ -5752,6 +5751,12 @@ TXFORM=L5R14
 #L5R15ClNo=9,7,S
 #L5R15ClCode1=9,1,S
 #L5R15ClCode2=9,2,S
+#L5R15AccTelArea=X,5,S
+#L5R15AccTelNo=X,10,S
+#L5R15AccTelExt=X,5,S
+#L5R15LegalArea=X,5,S
+#L5R15LegalNo=X,10,S
+#L5R15LegalExt=X,5,S
 </L5R15.dec>
 
 <L5R15.tom>
@@ -5770,6 +5775,12 @@ TXFORM=L5R15
 #L5R15ClNo
 #L5R15ClCode1
 #L5R15ClCode2
+#L5R15AccTelArea
+#L5R15AccTelNo
+#L5R15AccTelExt
+#L5R15LegalArea
+#L5R15LegalNo
+#L5R15LegalExt
 ^
 </L5R15.tom>
 
@@ -8240,6 +8251,8 @@ TXFORM=L6R02
 #L6R04Code=x,20,S
 #L6R04Item=X,50,S
 #L6R04Enable=X,1,S
+#L6R04MinCodeLength=A,1,S
+#L6R04MaxCodeLength=A,1,S
 </L6R04.dec>
 
 <L6R04.tom>
@@ -8249,6 +8262,8 @@ TXFORM=L6R04
 #L6R04Code
 #L6R04Item
 #L6R04Enable
+#L6R04MinCodeLength
+#L6R04MaxCodeLength
 ^
 </L6R04.tom>
 
@@ -8993,11 +9008,15 @@ TXFORM=L6R34
 !尋找各類代碼檔
 <L6R35.dec>
 #L6R35Item=X,80,S
+#L6R35MinCodeLength=A,1,S
+#L6R35MaxCodeLength=A,1,S
 </L6R35.dec>
 
 <L6R35.tom>
 TXFORM=L6R35
 #L6R35Item
+#L6R35MinCodeLength
+#L6R35MaxCodeLength
 ^
 </L6R35.tom>
 
@@ -9311,6 +9330,22 @@ TXFORM=L6R47
 </L6R47.tom>
 ^
 
+<L6R48Rim.dec>
+#RimFunCode=9,1,S
+#RimErrCode=X,8,S
+</L6R48Rim.dec>
+
+<L6R48.dec>
+#L6R48ErrContent=X,125,S
+</L6R48.dec>
+
+<L6R48.tom>
+TXFORM=L6R48
+#L6R48ErrContent
+^
+</L6R48.tom>
+
+
 <L5R47.dec>
 #L5R47CustName=x,100,S
 #L5R47ReCheckYearMonth=9,5,S
@@ -9368,3 +9403,13 @@ TXFORM=L5R49
 #L5R49FileNo
 ^
 </L5R49.tom>
+
+<L9R01.dec>
+#L9R01WorkMonth=9,6,S
+</L9R01.dec>
+
+<L9R01.tom>
+TXFORM=L9R01
+#L9R01WorkMonth
+^
+</L9R01.tom>

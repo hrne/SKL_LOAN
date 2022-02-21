@@ -50,6 +50,7 @@ E(0,0)
 ["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 ["#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],
 ["#FdReceiveDate+領取日期",#ReceiveDate],
+["#FdAddres+地址",#Addres],
 ["#FdRmk1+備註欄",#Rmk1],
 ]
 
@@ -64,6 +65,8 @@ T(3,*)
 #FdCollectWayCode=X,2,L
 T(3,*)
 #FdReceiveDate=X,2,L
+#FdAddres=X,2,L
+T(3,*)
 #FdRmk1=X,2,L
 
 
@@ -141,12 +144,6 @@ K(MODIFYBUTTON,1,上傳附件)
 T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
 K(MODIFYBUTTON,2,上傳附件查詢)
 
-
-
-
-
-
-
 #initchain=X,1,S
 T(F,#FunCode,0)
 T(F,#CustNo,0)
@@ -194,6 +191,7 @@ T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
 ! E(0,@ReceiveDate,#L2r45ReceiveDate)
 T(1,@Rmk1,#L2r45Rmk,1,100)
 E(0,@CloseNo,#L2r45CloseNo)
+T(2,@Addres,#L2r45Addres)
 
 !#L2r45CustNo=A,7,S
 !#L2r45CloseNo=A,3,S
@@ -222,6 +220,7 @@ E(0,@CloseNo,#L2r45CloseNo)
 !#L2r45ClNo=A,7,S
 !連絡電話１
 #TelNo1=x,15,I
+
 !連絡電話２
 #TelNo2=x,15,I
 
@@ -236,24 +235,24 @@ HELP(#AdvanceCloseCodeHelp)
 #CloseReasonCodeX=X,20,L
 T(H,#CloseReasonCode,#AdvanceCloseCodeHelp)
 
-
 !領取地點
 #CollectWayCode=X,2,I
 HELP(#CollectWayCodeHelp,cols:5)
 @V(H,#CollectWayCodeHelp)
 
-
-
 #CollectWayCodeX=x,12,L
 C(4,#CollectWayCode,S,$)
 T(H,#CollectWayCode,#CollectWayCodeHelp)
-
 
 !領取日期
 #ReceiveDate=D,7,I
 C(3,#CollectWayCode,1,S,$)
 E(0,#SYSCDATE)
 @A(DATE,0,#ReceiveDate)
+
+!地址
+#Addres=x,200,I
+@V(7)
 
 !備註欄
 #Rmk1=x,100,I
@@ -356,7 +355,7 @@ T(2,@MRKEY,#CustNo+-+#FacmNo)
 #secret-no=x,1000,S
 T(6A,#CustId+#CustNo+#CloseNo+#FacmNo+#SECNO+#ACTFG+#FunCode+#CarLoan+#ApplDate+#CloseDate+#CloseReasonCode+#CloseAmt+#CloseInd
 +#CollectFlag+#CollectWayCode+#ReceiveDate+#TelNo1+#TelNo2+#TelNo3+#TranDate+#AgreeNo+#DocNo+#ClsNo+#Rmk1+#OOClCode1
-+#OOClCode2+#OOClNo+#OOSeq+#RpFg+#MRKEY)
++#OOClCode2+#OOClNo+#OOSeq+#RpFg+#MRKEY+#Addres)
 
 
 

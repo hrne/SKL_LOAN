@@ -3053,7 +3053,6 @@ TXFORM=L2R35
 #L2r36CloseAmt=+m,14.2,S
 #L2r36CollectFlag=X,1,S
 #L2r36CollectWayCode=X,2,S
-#L2r36RegisteredAddress=x,200,S
 #L2r36ReceiveDate=D,7,S
 #L2r36AgreeNo=X,10,S
 #L2r36DocNo=A,7,S
@@ -3080,7 +3079,6 @@ TXFORM=L2R36
 #L2r36CloseAmt
 #L2r36CollectFlag
 #L2r36CollectWayCode
-#L2r36RegisteredAddress
 #L2r36ReceiveDate
 #L2r36AgreeNo
 #L2r36DocNo
@@ -3172,7 +3170,6 @@ TXFORM=L2R42
 ^
 </L2R42.tom>
 
-
 ! L2R43 : 取建物或土地所有權人姓名
 <L2R43.dec>
 #L2r43CustName=x,100,S
@@ -3232,7 +3229,6 @@ TXFORM=L2R44
 #L2r45UsCloseAmt=m,14.2,S
 #L2r45CollectFlag=X,1,S
 #L2r45CollectWayCode=X,2,S
-#L2r45RegisteredAddress=x,200,S
 #L2r45ReceiveDate=D,7,S
 #L2r45TelNo1=X,15,S
 #L2r45TelNo2=X,15,S
@@ -3245,6 +3241,7 @@ TXFORM=L2R44
 #L2r45ClCode1=A,1,S
 #L2r45ClCode2=A,2,S
 #L2r45ClNo=A,7,S
+#L2r45Addres=x,200,S
 </L2R45.dec>
 
 <L2R45.tom>
@@ -3262,7 +3259,6 @@ TXFORM=L2R45
 #L2r45UsCloseAmt
 #L2r45CollectFlag
 #L2r45CollectWayCode
-#L2r45RegisteredAddress
 #L2r45ReceiveDate
 #L2r45TelNo1
 #L2r45TelNo2
@@ -3275,6 +3271,7 @@ TXFORM=L2R45
 #L2r45ClCode1
 #L2r45ClCode2
 #L2r45ClNo
+#L2r45Addres
 ^
 </L2R45.tom>
 
@@ -3370,7 +3367,6 @@ TXFORM=L2R49
 ##end
 ^
 </L2R49.tom>
-
 
 <L2R50.dec>
 #L2r50Exist=X,1,S
