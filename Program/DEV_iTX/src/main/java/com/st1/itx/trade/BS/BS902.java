@@ -45,9 +45,6 @@ public class BS902 extends TradeBuffer {
 
 	@Autowired
 	public TxToDoCom txToDoCom;
-	private int tbsDyf;
-
-	private int mfbsDyf;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -55,14 +52,9 @@ public class BS902 extends TradeBuffer {
 
 		txToDoCom.setTxBuffer(this.txBuffer);
 
-		// 本營業日(西元)
-		this.tbsDyf = this.getTxBuffer().getMgBizDate().getTbsDyf();
 
 		// 取本年月份
 		int entryDateMm = this.txBuffer.getMgBizDate().getTbsDy() / 100;
-
-		// 月底營業日(西元)
-		this.mfbsDyf = this.getTxBuffer().getMgBizDate().getMfbsDyf();
 
 		// find data
 		// SL 聯貸費用

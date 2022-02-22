@@ -2691,6 +2691,10 @@ TXFORM=L2R26
 #L2r27ParkingArea=m,9.2,S
 #L2r27HouseTaxNo=X,12,S
 #L2r27HouseBuyDate=D,7,S
+#L2r27Reason=X,1,S
+#L2r27OtherReason=x,60,S
+#L2r27CreateEmpNo=X,6,S
+#L2r27CreateDate=D,7,S
 ##loop{times:10,i:1}
 #L2r27PublicBdNoA{i}=X,5,S
 #L2r27PublicBdNoB{i}=X,3,S
@@ -2706,10 +2710,6 @@ TXFORM=L2R26
 #L2r27OwnerRelCode{i}=X,2,S
 #L2r27OwnerPart{i}=m,10,S
 #L2r27OwnerTotal{i}=m,10,S
-#L2r27Reason{i}=X,1,S
-#L2r27OtherReason{i}=x,60,S
-#L2r27CreateEmpNo{i}=X,6,S
-#L2r27CreateDate{i}=D,7,S
 ##end
 ##loop{times:5,i:1}
 #L2r27ParkingTypeCodeA{i}=A,1,S
@@ -2772,6 +2772,10 @@ TXFORM=L2R27
 #L2r27ParkingArea
 #L2r27HouseTaxNo
 #L2r27HouseBuyDate
+#L2r27Reason
+#L2r27OtherReason
+#L2r27CreateEmpNo
+#L2r27CreateDate
 ##loop{times:10,i:1}
 #L2r27PublicBdNoA{i}
 #L2r27PublicBdNoB{i}
@@ -2783,10 +2787,6 @@ TXFORM=L2R27
 #L2r27OwnerRelCode{i}
 #L2r27OwnerPart{i}
 #L2r27OwnerTotal{i}
-#L2r27Reason{i}
-#L2r27OtherReason{i}
-#L2r27CreateEmpNo{i}
-#L2r27CreateDate{i}
 ##end
 ##loop{times:5,i:1}
 #L2r27ParkingTypeCodeA{i}

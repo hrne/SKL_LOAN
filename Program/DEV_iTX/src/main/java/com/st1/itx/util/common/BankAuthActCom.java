@@ -373,7 +373,7 @@ public class BankAuthActCom extends TradeBuffer {
 		boolean isUpdFac = false; // 本額度更新
 		boolean isUpdAct = false; // 本帳號更新
 		switch (t.getCreateFlag()) {
-		case "A":
+		case "A": //A.新增授權
 			if ("0".equals(t.getAuthStatus())) { // 0:成功
 				status = "0"; // 0:授權成功
 				isUpdFac = true;
@@ -386,7 +386,7 @@ public class BankAuthActCom extends TradeBuffer {
 			}
 			isUpdAct = true;
 			break;
-		case "2": // 2.終止
+		case "D": // D.取消授權
 			if ("0".equals(t.getAuthStatus())) { // 0:成功
 				status = "2"; // 2.取消授權
 				isUpdFac = true;
@@ -401,7 +401,7 @@ public class BankAuthActCom extends TradeBuffer {
 			tBankAuthAct = bankAuthActService.holdById(tBankAuthAct, titaVo);
 			tBankAuthAct.setRepayBank(t.getRepayBank());
 			tBankAuthAct.setRepayAcct(t.getRepayAcct());
-			tBankAuthAct.setPostDepCode(" ");
+			tBankAuthAct.setPostDepCode("");
 			tBankAuthAct.setLimitAmt(t.getLimitAmt());
 			tBankAuthAct.setAcctSeq("  ");
 			tBankAuthAct.setStatus(status);

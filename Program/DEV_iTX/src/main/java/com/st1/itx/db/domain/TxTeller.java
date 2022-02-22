@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class TxTeller implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1475350139473068903L;
-
-// 使用者代號
+  // 使用者代號
   @Id
   @Column(name = "`TlrNo`", length = 6)
   private String tlrNo = " ";
@@ -169,6 +166,11 @@ public class TxTeller implements Serializable {
   // 站別
   @Column(name = "`Station`", length = 3)
   private String station;
+
+  // 管理者權限記號
+  /* 0.否 1.是 */
+  @Column(name = "`AdminFg`")
+  private int adminFg = 0;
 
   // 最後維護時間
   @Column(name = "`MntDate`")
@@ -793,6 +795,25 @@ public class TxTeller implements Serializable {
   }
 
 /**
+	* 管理者權限記號<br>
+	* 0.否 1.是
+	* @return Integer
+	*/
+  public int getAdminFg() {
+    return this.adminFg;
+  }
+
+/**
+	* 管理者權限記號<br>
+	* 0.否 1.是
+  *
+  * @param adminFg 管理者權限記號
+	*/
+  public void setAdminFg(int adminFg) {
+    this.adminFg = adminFg;
+  }
+
+/**
 	* 最後維護時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -914,7 +935,7 @@ public class TxTeller implements Serializable {
            + ", loggerFg=" + loggerFg + ", txtNo=" + txtNo + ", ltxDate=" + ltxDate + ", ltxTime=" + ltxTime + ", desc=" + desc + ", lastDate=" + lastDate
            + ", lastTime=" + lastTime + ", amlHighFg=" + amlHighFg + ", authNo1=" + authNo1 + ", authNo2=" + authNo2 + ", authNo3=" + authNo3 + ", authNo4=" + authNo4
            + ", authNo5=" + authNo5 + ", authNo6=" + authNo6 + ", authNo7=" + authNo7 + ", authNo8=" + authNo8 + ", authNo9=" + authNo9 + ", authNo10=" + authNo10
-           + ", station=" + station + ", mntDate=" + mntDate + ", mntEmpNo=" + mntEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", station=" + station + ", adminFg=" + adminFg + ", mntDate=" + mntDate + ", mntEmpNo=" + mntEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -62,7 +62,7 @@ E(0,40)ASGN(INQPRT$)
 ["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@土地所有權人","","",
 ["統編","姓名","與授信戶關係","持份比例"],
 [[#OwnerId1],[#OwnerName1],[[#OwnerRelCode1],[#OwnerRelCodeX1]],[[#OwnerPart1],["/"],[#OwnerTotal1]]]],
-["#grid#,{id:2,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@土地修改原因","","",
+["#grid#,{id:2,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@土地修改原因","","","",
 ["原因","建立者","建立日期"],
 [[[#Reason1],[#ReasonX1],[#OtherReason1]],[#CreateEmpNo1],[#CreateDate1]]],
 ]
@@ -147,8 +147,8 @@ INVOKEJS(SHOW,grd2,0)
 CALL(#KLIGHT)
 SWITCH(#PAGE_FG,1,INVOKEJS(SHOW,p1,7,7,1),
                 2,INVOKEJS(SHOW,p1,8,19,1),
-                3,INVOKEJS(SHOW,p1,20,20,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_3,1),
-                4,INVOKEJS(SHOW,p1,21,21,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_3,1),
+                3,INVOKEJS(SHOW,p1,20,20,1)INVOKEJS(SHOW,grd1,1),
+                4,INVOKEJS(SHOW,p1,21,21,1)INVOKEJS(SHOW,grd2,1),
                 5,INVOKEJS(SHOW,p1,7,21,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd2,1),
                 $)
 !---------- AP TEXT Area Variables ----------
@@ -437,17 +437,17 @@ T(3,)T(H,#OwnerRelCode{i},#RelationCodeHelp)
 #Reason0=X,1,S
 T(3,X)
 
-##loop{times:10,i:1,j:0,rowSeq:3}
+##loop{times:10,i:1,k:3}
 
 #HIDE_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd2_{rowSeq},0)
+INVOKEJS(SHOW,grd2_{k},0)
 #SHOW_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd2_{rowSeq},1)
+INVOKEJS(SHOW,grd2_{k},1)
 
 ! [土地修改原因-原因]
 #Reason{i}=X,1,L
 IF(#PAGE_FG==4,$,CALL(#SHOW_4))
-C(3,#Reason{i},0,CALL(#HIDE_ROW_{i}),CALL(#SHOW_ROW_{i}))
+C(3,#Reason{i},0,CALL(#HIDE_ROW_{i}),$)
 
 #ReasonX{i}=X,20,L
 T(3,)T(H,#Reason{i},#ReasonHelp)

@@ -133,32 +133,43 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setDelayRate(t.getStoreRate()); // 遲延息之利率
 		loanCalcRepayIntCom.setUnpaidFlag(0); // 未繳清記號
 		loanCalcRepayIntCom.setIntCalcCode(t.getIntCalcCode());// 計息方式 1:按日計息 2:按月計息
-		// 利息提存
-		// 1.短擔以日計算
-		// 2.中長擔，已到期按月(下次繳息日 <= 下個月1日)、未到期按日
-		int nextMonth01 = (this.txBuffer.getTxCom().getNbsdy() / 100) * 100 + 1;
-		if (iIntEndCode == 2) {
-			if (tFacMain.getAcctCode().equals("310")) {
-				loanCalcRepayIntCom.setIntCalcCode("1");
-			} else {
-				if (t.getNextPayIntDate() <= nextMonth01) {
-					loanCalcRepayIntCom.setIntCalcCode("2");
-				} else {
-					loanCalcRepayIntCom.setIntCalcCode("1");
-				}
-			}
-			this.info("Caculate log Set ... 戶號= " + t.getCustNo() + "-" + t.getFacmNo() + "-" + t.getBormNo()
-					+ ", AcctCode=" + tFacMain.getAcctCode() + ", CalcCode =" + t.getIntCalcCode() + ", AmortizedCode="
-					+ t.getAmortizedCode() + ", SpecificDate =" + t.getSpecificDate() + " ,prevPayIntDate ="
-					+ prevPayIntDate);
-		}
 
-		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(t.getAmortizedCode())); // 攤還方式,還本方式
 		// 1.按月繳息(按期繳息到期還本)
 		// 2.到期取息(到期繳息還本)
 		// 3.本息平均法(期金)
 		// 4.本金平均法
-		// 5.按月撥款收息(逆向貸款)
+		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(t.getAmortizedCode())); // 攤還方式,還本方式
+
+		// 利息提存
+		// 1.短擔以日計算
+		// 2.中長擔，已到期按月(下次繳息日 <= 下個月1日)；未到期，首次繳款按日
+		// 3.已過到期日，按日、不分期(以到期取息(到期繳息還本)計算)
+		// 4.未到期以最後一段利率計算(計息程式內處理)
+		int nextMonth01 = (this.txBuffer.getTxCom().getNbsdy() / 100) * 100 + 1;
+		if (iIntEndCode == 2) {
+			String intCalcCode = t.getIntCalcCode();
+			String amortizedCode = t.getAmortizedCode();
+			if (tFacMain.getAcctCode().equals("310")) {
+				intCalcCode = "1";
+			} else {
+				intCalcCode = "2";
+				if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
+					intCalcCode = "2";
+				} else {
+					intCalcCode = "1";
+				}
+			}
+			if (t.getMaturityDate() < nextMonth01) {
+				intCalcCode = "1";
+				amortizedCode = "2";
+			}
+			loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
+			loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));
+			this.info("Caculate log Set ... 戶號= " + t.getCustNo() + "-" + t.getFacmNo() + "-" + t.getBormNo()
+					+ ", AcctCode=" + tFacMain.getAcctCode() + ", CalcCode =" + t.getIntCalcCode() + "/" + intCalcCode
+					+ ", AmortizedCode=" + t.getAmortizedCode() + "/" + amortizedCode + ", SpecificDate ="
+					+ t.getSpecificDate() + " ,prevPayIntDate =" + prevPayIntDate);
+		}
 		loanCalcRepayIntCom.setDelayFlag(0); // 0:收遲延息 1: 不收
 		loanCalcRepayIntCom.setNonePrincipalFlag(0); // 0:契約到期要還本 1:契約到期不還本記號
 		loanCalcRepayIntCom.setTbsDy(this.txBuffer.getTxCom().getTbsdy()); // 營業日期

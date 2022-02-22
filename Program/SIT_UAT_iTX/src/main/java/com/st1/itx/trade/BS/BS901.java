@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
@@ -63,20 +64,18 @@ public class BS901 extends TradeBuffer {
 	private int iAcDate = 0;
 	private int iAcDateReverse = 0;
 	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
-	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private Slice<TxToDoDetail> slTxToDoDetail;
-	private Slice<AcDetail> slAcDetail;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active BS901 ......");
 		int yearMonth = this.getTxBuffer().getMgBizDate().getTbsDyf() / 100; // 提存年月
 		txToDoCom.setTxBuffer(this.getTxBuffer());
-		iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
+		iAcDate = this.getTxBuffer().getMgBizDate().getTmnDy();
 
 		// 未付火險費提存，月初日迴轉上月
 		if (this.txBuffer.getMgBizDate().getTbsDy() / 100 != this.txBuffer.getMgBizDate().getLbsDy() / 100) {
-			iAcDateReverse = this.getTxBuffer().getMgBizDate().getLbsDy();
+			iAcDateReverse = this.getTxBuffer().getMgBizDate().getLmnDy();
 		}
 		if (iAcDateReverse == 0) {
 			// 1.刪除處理清單 ACCL02-未付火險費提存 BS901 //

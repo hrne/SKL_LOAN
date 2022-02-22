@@ -1079,8 +1079,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("    wkIntStartDate    =" + wkIntStartDate);
 
 		tLoanRateChange = new LoanRateChange();
-		tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
-				wkIntStartDate + 19110000, titaVo);
+		// 利息提存未到期利息以最後一段利率計算(BatxCom自行重算)
+		if (iIntEndCode == 2 && iNextPayIntDate > iIntEndDate) {
+			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
+					iEntryDate + 19110000, titaVo);
+		} else {
+			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
+					wkIntStartDate + 19110000, titaVo);
+		}
 		if (tLoanRateChange == null) {
 			throw new LogicException(titaVo, "E3926",
 					iCustNo + "-" + iFacmNo + "-" + iBormNo + " 無放款利率變動資料 = " + wkIntStartDate); // 計算利息錯誤，放款利率變動檔查無資料

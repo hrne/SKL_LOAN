@@ -19,6 +19,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcLoanInt;
 import com.st1.itx.db.domain.AcLoanIntId;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.service.AcLoanIntService;
@@ -97,22 +98,8 @@ public class BS900 extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		baTxCom.setTxBuffer(this.getTxBuffer());
 		iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
+		// 迴轉上個月底日
 		iAcDateReverse = this.getTxBuffer().getMgBizDate().getLmnDy();
-		// 迴轉上個月底營業日
-		dateUtil.init();
-		dateUtil.setDate_2(this.getTxBuffer().getMgBizDate().getLmnDy());
-		if (dateUtil.isHoliDay()) {
-			int i = 0;
-			do {
-				i--;
-				dateUtil.init();
-				dateUtil.setDate_1(this.getTxBuffer().getMgBizDate().getLmnDy());
-				dateUtil.setDays(i);
-				iAcDateReverse = dateUtil.getCalenderDay();
-				dateUtil.init();
-				dateUtil.setDate_2(iAcDateReverse);
-			} while (dateUtil.isHoliDay());
-		}
 		this.info("iAcDateReverse=" + iAcDateReverse);
 		// 1.刪除當月提息明細檔 //
 		this.info("1.bs900 delete acLoanint, yearMonth=" + yearMonth);

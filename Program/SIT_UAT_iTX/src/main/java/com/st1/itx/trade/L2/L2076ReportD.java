@@ -15,6 +15,7 @@ import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
@@ -38,6 +39,8 @@ public class L2076ReportD extends MakeReport {
 	public FacCloseService sFacCloseService;
 	@Autowired
 	public LoanCom loanCom;
+	@Autowired
+	public CustNoticeCom custNoticeCom;
 
 //	private static DecimalFormat df = new DecimalFormat("#########################0.0#");
 
@@ -98,16 +101,16 @@ public class L2076ReportD extends MakeReport {
 //		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo());
 	}
 
-	public Boolean exec(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+	public Boolean exec(FacClose tFacClose, String Addres, TitaVo titaVo) throws LogicException {
 
 		this.info("L2076ReportB exec");
 
-		exportPdf(tFacClose, titaVo);
+		exportPdf(tFacClose, Addres, titaVo);
 
 		return true;
 	}
 
-	private void exportPdf(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+	private void exportPdf(FacClose tFacClose, String Addres, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2631D", "雙掛號信封", "", "L2631D_雙掛號信封.pdf");
@@ -137,7 +140,9 @@ public class L2076ReportD extends MakeReport {
 		} else {
 			telNo = tFacClose.getTelNo1();
 		}
-		this.print(-33, 33, ""); // 地址 TODO:
+
+		this.print(-33, 33, Addres); // 戶籍地址
+
 		this.print(-35, 33, "#" + StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "  " + custName); // 戶號戶名
 		this.setFontSize(14);
 		this.print(-41, 52, telNo); // 電話

@@ -161,7 +161,7 @@ public class L9131Report extends MakeReport {
 
 		this.slipNo = tFirstSlipMedia2022.getSlipMedia2022Id().getMediaSlipNo();
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		this.open(titaVo, reportDate, brno, reportCode, reportItem + "_" + slipNo, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
 
@@ -207,7 +207,7 @@ public class L9131Report extends MakeReport {
 			if (receiveCode != null && !receiveCode.isEmpty()) {
 				print(0, 111, tSlipMedia2022.getReceiveCode());
 			}
-			
+
 			print(0, 141, tSlipMedia2022.getDeptCode());
 
 			if (tSlipMedia2022.getDbCr().equals("D")) {

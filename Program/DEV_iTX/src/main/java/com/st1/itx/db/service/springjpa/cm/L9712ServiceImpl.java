@@ -44,9 +44,9 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,T.\"CustNo\" F1";
 		sql += "			,T.\"FacmNo\" F2";
 		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) F3";
-		sql += "			,T.\"Interest\" F4";
+		sql += "			,T.\"Interest\" - T.\"ReduceBreachAmt\" F4";
 		sql += "			,T.\"BreachAmt\" F5";
-		sql += "			,T.\"ReduceAmt\" F6";
+		sql += "			,T.\"ReduceAmt\" - T.\"ReduceBreachAmt\" F6";
 		sql += "			,T.\"ReduceBreachAmt\" F7";
 		sql += "			,T.\"TitaEmpNoS\" F8";
 		sql += "	  FROM(SELECT T.\"AcDate\"";

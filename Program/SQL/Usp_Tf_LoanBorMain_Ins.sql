@@ -143,7 +143,7 @@ BEGIN
              WHEN "LA$LMSP"."LMSFSD" > 0 AND "LA$LMSP"."LMSNSD" = 0 THEN "LA$LMSP"."LMSFSD"
            ELSE "LA$LMSP"."LMSNSD" END    AS "NextAdjRateDate"     -- 下次利率調整日期 DECIMALD 8 
           -- 2022-02-16 QC1435
-          ,ACFP."ACTFEE"                  AS "AcctFee"             -- 帳管費 DECIMAL 16 2
+          ,NVL(ACFP."ACTFEE",0)           AS "AcctFee"             -- 帳管費 DECIMAL 16 2
           ,0                              AS "HandlingFee"         -- 手續費 DECIMAL 16 2
           ,0                              AS "FinalBal"            -- 最後一期本金餘額 DECIMAL 16 2
           ,'N'                            AS "NotYetFlag"          -- 未齊件 VARCHAR2 1 
@@ -162,9 +162,18 @@ BEGIN
           ,0                              AS "SyndNo"              -- 聯貸案序號 DECIMAL 6
           ,"LA$LMSP"."LMSPRL"             AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
           ,"LA$LMSP"."LMSPAN"             AS "RelationName"        -- 第三人帳戶戶名 NVARCHAR2 100 
-          ,"LA$LMSP"."LMSPID"             AS "RelationId"          -- 第三人身份證字號 VARCHAR2 10 
-          ,0                              AS "RelationBirthday"    -- 第三人生日 DECIMALD 8 
-          ,''                             AS "RelationGender"      -- 第三人性別 VARCHAR2 1 
+          ,"LA$LMSP"."LMSPID"             AS "RelationId"          -- 第三人身份證字號 VARCHAR2 10
+          ,NVL(CU3."CUSBDT",0)            AS "RelationBirthday"    -- 第三人生日 DECIMALD 8 
+          ,CASE
+             WHEN TRIM(CU3."CUSSEX") IN ('1','2') THEN TRIM(CU3."CUSSEX")
+             WHEN TRIM(CU3."CUSSEX") IN ('0','6') THEN '0'
+           ELSE CASE
+                  WHEN LENGTHB(REPLACE(TRIM(CU3."CUSID1"),CHR(26),'')) = 10
+                       AND SUBSTR(REPLACE(TRIM(CU3."CUSID1"),CHR(26),''),0,1) IN ('1','2')
+                  THEN SUBSTR(REPLACE(TRIM(CU3."CUSID1"),CHR(26),''),0,1)
+                ELSE '0'
+                END
+           END                            AS "RelationGender"      -- 第三人性別 VARCHAR2 1 
           ,0                              AS "ActFg"               -- 交易進行記號 DECIMAL 1 
           ,"LA$LMSP"."LMSDAT"             AS "LastEntDy"           -- 上次交易日 DECIMALD 8 
           ,''                             AS "LastKinbr"           -- 上次交易行別 VARCHAR2 4 
@@ -288,6 +297,7 @@ BEGIN
     LEFT JOIN "LN$ACFP" ACFP ON ACFP."LMSACN" = "LA$LMSP"."LMSACN"
                             AND ACFP."LMSAPN" = "LA$LMSP"."LMSAPN"
                             AND ACFP."LMSASQ" = "LA$LMSP"."LMSASQ"
+    LEFT JOIN "CU$CUSP" CU3 ON CU3.CUSID1 = NVL("LA$LMSP"."LMSPID",' ') -- 第三人資料
     ;
 
     -- 記錄寫入筆數

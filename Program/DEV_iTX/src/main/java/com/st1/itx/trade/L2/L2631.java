@@ -298,7 +298,7 @@ public class L2631 extends TradeBuffer {
 				doRptC(tFacClose, titaVo.get("selectTotal"), titaVo); // 簽收回條
 				if (tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26")
 						|| tFacClose.getCollectWayCode().equals("27")) {
-					doRptD(tFacClose, titaVo);// 雙掛號信封
+					doRptD(tFacClose, titaVo.get("Addres"), titaVo);// 雙掛號信封
 				}
 
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
@@ -344,11 +344,11 @@ public class L2631 extends TradeBuffer {
 
 	}
 
-	public void doRptD(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+	public void doRptD(FacClose tFacClose, String Addres, TitaVo titaVo) throws LogicException {
 		this.info("L2076D doRptD started.");
 
 		// 撈資料組報表
-		L2076ReportD.exec(tFacClose, titaVo);
+		L2076ReportD.exec(tFacClose, Addres,titaVo);
 
 	}
 }

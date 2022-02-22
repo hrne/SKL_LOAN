@@ -235,7 +235,7 @@ public class NegReportCom extends CommBuffer {
 					Header[4] = TransAccCode;
 					// 性質別
 					Header[5] = ThisLine.substring(29, 30);
-					if (!Header[5].equals("1")) {
+					if (!Header[5].equals("2")) {
 						// E0015 檢查錯誤
 						throw new LogicException(titaVo, "E0015", "性質別不為結果，請檢查檔案是否正確");
 					}

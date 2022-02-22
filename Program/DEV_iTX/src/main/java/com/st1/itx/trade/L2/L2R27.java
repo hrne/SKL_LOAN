@@ -18,20 +18,20 @@ import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClBuildingParking;
 import com.st1.itx.db.domain.ClBuildingPublic;
 import com.st1.itx.db.domain.ClBuildingReason;
-import com.st1.itx.db.domain.ClParking;
-import com.st1.itx.db.domain.ClParkingType;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.ClParking;
+import com.st1.itx.db.domain.ClParkingType;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
 import com.st1.itx.db.service.ClBuildingReasonService;
 import com.st1.itx.db.service.ClBuildingService;
+import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClParkingService;
 import com.st1.itx.db.service.ClParkingTypeService;
-import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -109,7 +109,7 @@ public class L2R27 extends TradeBuffer {
 		List<ClParking> lClParking = new ArrayList<ClParking>();
 		List<ClParkingType> lClParkingType = new ArrayList<ClParkingType>();
 		List<ClBuildingOwner> lClBuildingOwner = new ArrayList<ClBuildingOwner>();
-		List<ClBuildingReason> lClBuildingReason = new ArrayList<ClBuildingReason>();
+
 		// new pk
 		ClMainId ClMainId = new ClMainId();
 		ClBuildingId ClBuildingId = new ClBuildingId();
@@ -124,21 +124,30 @@ public class L2R27 extends TradeBuffer {
 
 		tClMain = sClMainService.findById(ClMainId, titaVo);
 		tClBuilding = sClBuildingService.findById(ClBuildingId, titaVo);
-		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
-		lClBuildingPublic = slClBuildingPublic == null ? null : new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
-		Slice<ClBuildingParking> slClBuildingParking = sClBuildingParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
-		lClBuildingParking = slClBuildingParking == null ? null : new ArrayList<ClBuildingParking>(slClBuildingParking.getContent());
+		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE, titaVo);
+		lClBuildingPublic = slClBuildingPublic == null ? null
+				: new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
+		Slice<ClBuildingParking> slClBuildingParking = sClBuildingParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE, titaVo);
+		lClBuildingParking = slClBuildingParking == null ? null
+				: new ArrayList<ClBuildingParking>(slClBuildingParking.getContent());
 
-		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
+				titaVo);
 		lClParking = slClParking == null ? null : new ArrayList<ClParking>(slClParking.getContent());
 
-		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE, titaVo);
 		lClParkingType = slClParkingType == null ? null : new ArrayList<ClParkingType>(slClParkingType.getContent());
 
-		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
-		lClBuildingOwner = slClBuildingOwner == null ? null : new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
-		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
-		lClBuildingReason = slClBuildingReason == null ? null : new ArrayList<ClBuildingReason>(slClBuildingReason.getContent());
+		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE, titaVo);
+		lClBuildingOwner = slClBuildingOwner == null ? null
+				: new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
+
+		ClBuildingReason tClBuildingReason = sClBuildingReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
+
 		this.info("tClMain l2r27" + tClMain);
 		// 不存在擔保品主檔 拋錯
 		if (tClMain == null) {
@@ -172,7 +181,7 @@ public class L2R27 extends TradeBuffer {
 					lClBuildingPublic = new ArrayList<ClBuildingPublic>();
 					lClBuildingParking = new ArrayList<ClBuildingParking>();
 					lClBuildingOwner = new ArrayList<ClBuildingOwner>();
-					lClBuildingReason = new ArrayList<ClBuildingReason>();
+					tClBuildingReason = new ClBuildingReason();
 					break;
 				case 2:
 					tClBuilding = new ClBuilding();
@@ -185,8 +194,8 @@ public class L2R27 extends TradeBuffer {
 					if (lClBuildingOwner == null) {
 						lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 					}
-					if (lClBuildingReason == null) {
-						lClBuildingReason = new ArrayList<ClBuildingReason>();
+					if (tClBuildingReason == null) {
+						tClBuildingReason = new ClBuildingReason();
 					}
 					break;
 
@@ -279,7 +288,8 @@ public class L2R27 extends TradeBuffer {
 				}
 				this.info("tClBuildingPublic L2r27 " + tClBuildingPublic);
 
-				this.totaVo.putParam("L2r27PublicBdNoA" + i, tClBuildingPublic.getPublicBdNo1() == 0 ? "" : tClBuildingPublic.getPublicBdNo1());
+				this.totaVo.putParam("L2r27PublicBdNoA" + i,
+						tClBuildingPublic.getPublicBdNo1() == 0 ? "" : tClBuildingPublic.getPublicBdNo1());
 				this.totaVo.putParam("L2r27PublicBdNoB" + i, tClBuildingPublic.getPublicBdNo2());
 				this.totaVo.putParam("L2r27Area" + i, tClBuildingPublic.getArea());
 				this.totaVo.putParam("L2r27PublicBdOwnerId" + i, tClBuildingPublic.getOwnerId());
@@ -365,50 +375,29 @@ public class L2R27 extends TradeBuffer {
 			k++;
 		}
 		// 修改原因
-		if (lClBuildingReason == null) {
-			lClBuildingReason = new ArrayList<ClBuildingReason>();
-		}
-		// 資料筆數
-		int dataSize4 = lClBuildingReason.size();
-		this.info("L2R27 lClBuildingReason size in DB = " + dataSize4);
-
-		// 暫時只抓前10筆,把第11筆之後的刪除
-		if (dataSize4 > 10) {
-			for (int j = dataSize4 + 1; j <= dataSize4; j++) {
-				lClBuildingReason.remove(j);
-			}
-		} else if (dataSize4 <= 10) {
-			// 若不足10筆,補足10筆
-			for (int j = dataSize4 + 1; j <= 10; j++) {
-				ClBuildingReason tClBuildingReason = new ClBuildingReason();
-				lClBuildingReason.add(tClBuildingReason);
-			}
+		if (tClBuildingReason == null) {
+			tClBuildingReason = new ClBuildingReason();
 		}
 
-		int l = 1;
-		for (ClBuildingReason tClBuildingReason : lClBuildingReason) {
-			String CreateDate4 = " ";
-			int reason = tClBuildingReason.getReason();
-			// 判斷是否有資料 無資料new table給tota
-			if (reason == 0) {
+		String CreateDate4 = " ";
+		int reason = tClBuildingReason.getReason();
+		// 判斷是否有資料 無資料new table給tota
+		if (reason == 0) {
 
-				tClBuildingReason = new ClBuildingReason();
+			tClBuildingReason = new ClBuildingReason();
 
-			} else {
-				String CreateDate = tClBuildingReason.getCreateDate().toString();
-				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
-				int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
-				CreateDate4 = String.valueOf(CreateDate3);
-			}
-
-			this.info("tClBuildingReasonL2R27 " + tClBuildingReason);
-			this.totaVo.putParam("L2r27Reason" + l, tClBuildingReason.getReason() == 0 ? "" : tClBuildingReason.getReason());
-			this.totaVo.putParam("L2r27OtherReason" + l, tClBuildingReason.getOtherReason());
-			this.totaVo.putParam("L2r27CreateEmpNo" + l, tClBuildingReason.getCreateEmpNo());
-			this.totaVo.putParam("L2r27CreateDate" + l, CreateDate4);
-			this.info("DATE2 " + CreateDate4);
-			l++;
+		} else {
+			String CreateDate = tClBuildingReason.getCreateDate().toString();
+			String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
+			int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
+			CreateDate4 = String.valueOf(CreateDate3);
 		}
+
+		this.info("tClBuildingReasonL2R27 " + tClBuildingReason);
+		this.totaVo.putParam("L2r27Reason", tClBuildingReason.getReason() == 0 ? "" : tClBuildingReason.getReason());
+		this.totaVo.putParam("L2r27OtherReason", tClBuildingReason.getOtherReason());
+		this.totaVo.putParam("L2r27CreateEmpNo", tClBuildingReason.getCreateEmpNo());
+		this.totaVo.putParam("L2r27CreateDate", CreateDate4);
 
 		// 修改原因
 		if (lClParkingType == null) {

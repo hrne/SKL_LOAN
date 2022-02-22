@@ -211,14 +211,14 @@ public class L9130Report2022 extends MakeReport {
 		// no 檔案編號
 		String no = "L9130";
 		// desc 檔案說明
-		String desc = "總帳傳票媒體檔";
+		String desc = "總帳傳票媒體檔_" + slipNo;
 
 		// 檔名編碼方式
 		// 固定值 核心傳票媒體上傳序號
 		// jori 999
 
 		// name 輸出檔案名稱
-		String name = "總帳傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
+		String name = "總帳傳票媒體檔_" + slipNo + "_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
 
 		// format 輸出檔案格式 1.UTF8 2.BIG5
 		int format = 2;
@@ -292,7 +292,9 @@ public class L9130Report2022 extends MakeReport {
 
 				i = 1;
 
-				name = "總帳傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
+				name = "總帳傳票媒體檔_" + slipNo + "_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
+
+				desc = "總帳傳票媒體檔_" + slipNo;
 
 				makeFile.open(titaVo, date, brno, no, desc, name, format);
 			}

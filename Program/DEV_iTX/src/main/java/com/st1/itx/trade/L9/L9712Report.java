@@ -50,7 +50,7 @@ public class L9712Report extends MakeReport {
 		this.print(-4, 146, "頁　　次：");
 		this.print(0, 160, Integer.toString(this.getNowPage()), "R");
 
-		this.print(-5, 80, showRocDate(titaVo.get("ACCTDATE"), 1) + " - " + showRocDate(titaVo.get("ACCTDATE"), 1), "C");
+		this.print(-5, 80, showRocDate(titaVo.get("AcDateMin"), 1) + " - " + showRocDate(titaVo.get("AcDateMax"), 1), "C");
 		this.print(-5, 146, "單　　位：元");
 
 		this.print(-7, 84, "應    收                               減    免");

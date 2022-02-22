@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.SystemParas;
@@ -29,8 +28,6 @@ public class EbsCom extends CommBuffer {
 
 	@Autowired
 	private SystemParasService sSystemParasService;
-
-	ObjectMapper objectMapper = new ObjectMapper();
 
 	public void sendSlipMediaToEbs(JSONArray summaryTbl, JSONArray journalTbl, TitaVo titaVo) throws LogicException {
 		this.info("EbsCom sendSlipMediaToEbs.");
@@ -51,15 +48,45 @@ public class EbsCom extends CommBuffer {
 
 		// 取得Url
 		String slipMediaUrl = tSystemParas.getEbsUrl();
+		// 取得帳密
 		String ebsAuth = tSystemParas.getEbsAuth();
-		String returnStatus = null;
+
+		// 組合上傳資料
+		JSONObject requestJO = setEbsRequestJo(summaryTbl, journalTbl);
+
+		// 上傳及接收資料
+		String result = post(slipMediaUrl, ebsAuth, requestJO.toString());
+
+		// 分析回傳資料
+		String returnStatus = analyzeResult(result);
+
+		if (returnStatus != null && returnStatus.equals("E")) {
+			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
+		}
+	}
+
+	private String analyzeResult(String result) throws LogicException {
 		JSONObject outputParameters = null;
+		String returnStatus = null;
+		try {
+			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
+			returnStatus = outputParameters.getString("X_RETURN_STATUS");
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("EbsCom Exception = " + e.getMessage());
+			throw new LogicException("E9004", "EbsCom分析回傳資料時有誤");
+		}
+		// TODO:寫進TABLE存起來
+		return returnStatus;
+	}
+
+	private JSONObject setEbsRequestJo(JSONArray summaryTbl, JSONArray journalTbl) throws LogicException {
 		JSONObject requestJO = new JSONObject();
 		JSONObject main = new JSONObject();
 		JSONObject inputParameters = new JSONObject();
 		JSONObject summaryTblItem = new JSONObject();
 		JSONObject journalTblItem = new JSONObject();
-
 		try {
 			summaryTblItem.putOpt("P_SUMMARY_TBL_ITEM", summaryTbl);
 			inputParameters.putOpt("P_SUMMARY_TBL", summaryTblItem);
@@ -73,26 +100,10 @@ public class EbsCom extends CommBuffer {
 			this.error("EbsCom Exception = " + e.getMessage());
 			throw new LogicException("E9004", "EbsCom組合上傳資料時有誤");
 		}
-
-		String result = post(slipMediaUrl, ebsAuth, requestJO.toString(), titaVo);
-
-		try {
-			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
-			returnStatus = outputParameters.getString("X_RETURN_STATUS");
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("EbsCom Exception = " + e.getMessage());
-			throw new LogicException("E9004", "EbsCom分析收到的訊息時有誤");
-		}
-
-		if (returnStatus != null && returnStatus.equals("E")) {
-			// TODO:寫進TABLE存起來
-			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
-		}
+		return requestJO;
 	}
 
-	private String post(String slipMediaUrl, String ebsAuth, String jsonString, TitaVo titaVo) throws LogicException {
+	private String post(String slipMediaUrl, String ebsAuth, String jsonString) throws LogicException {
 		HttpHeaders headers = setEbsHeader(ebsAuth);
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
 		RestTemplate restTemplate = new RestTemplate();
@@ -104,7 +115,7 @@ public class EbsCom extends CommBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("EbsCom Exception = " + e.getMessage());
-			throw new LogicException("E9004", "EbsCom上傳資料中發生錯誤");
+			throw new LogicException("E9004", "EbsCom上傳及接收資料時發生錯誤");
 		}
 		this.info("EbsCom result = " + result);
 

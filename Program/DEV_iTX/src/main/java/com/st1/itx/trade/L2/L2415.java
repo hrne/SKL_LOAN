@@ -177,30 +177,7 @@ public class L2415 extends TradeBuffer {
 		}
 
 		// 擔保品主檔有資料
-//		// 新增
-//		if (iFunCd == 1) {
-//			if (tClBuilding != null) {
-//				throw new LogicException("E0002", "擔保品不動產建物檔主檔");
-//			} else {
-//				tClBuilding = new ClBuilding();
-//			}
-//			// 擔保品不動產建物檔主檔
-//			setClBuilding(titaVo);
-//			try {
-//				tClBuilding = sClBuildingService.insert(tClBuilding, titaVo);
-//			} catch (DBException e) {
-//				throw new LogicException("E0005", "擔保品不動產建物檔主檔" + e.getErrorMsg());
-//			}
-//
-//			// insert 公設建號
-//			insertClBuildingPublic(titaVo);
-//
-//			// insert ClParking 車位
-//			insertClParking(titaVo);
-//
-//			// insert 擔保品不動產建物修改原因檔
-//			insertClBuildingReason(titaVo);
-//
+
 		if (iFunCd == 1 || iFunCd == 2) {
 
 			if (tClBuilding == null) {
@@ -223,10 +200,6 @@ public class L2415 extends TradeBuffer {
 			// insert 停車位形式
 			insertClParkingType(titaVo);
 
-			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
-			dataLog.exec("修改擔保品不動產建物檔資料");
-
 			// delete 公設建號
 			deleteClBuildingPublic(titaVo);
 			// insert 公設建號
@@ -243,7 +216,11 @@ public class L2415 extends TradeBuffer {
 			deleteClBuildingReason(titaVo);
 			// insert 擔保品不動產建物修改原因檔
 			insertClBuildingReason(titaVo);
-
+			
+			// 紀錄變更前變更後
+			dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
+			dataLog.exec("不動產建物修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
+						
 			// FunCD=4 刪除
 		} else if (iFunCd == 4) {
 
@@ -493,15 +470,6 @@ public class L2415 extends TradeBuffer {
 
 	// insert 擔保品不動產建物修改原因檔
 	private void insertClBuildingReason(TitaVo titaVo) throws LogicException {
-		for (int i = 1; i <= 10; i++) {
-			String reason = titaVo.get("Reason" + i);
-			// 若該筆無資料就離開迴圈
-//			if (titaVo.getParam("Reason" + i) == null || titaVo.getParam("Reason" + i).trim().isEmpty()) {
-//				break;
-//			}
-			if (reason == null || "".equals(reason.trim())) {
-				break;
-			}
 
 			tClBuildingReason = new ClBuildingReason();
 			clBuildingReasonId = new ClBuildingReasonId();
@@ -509,40 +477,40 @@ public class L2415 extends TradeBuffer {
 			clBuildingReasonId.setClCode1(iClCode1);
 			clBuildingReasonId.setClCode2(iClCode2);
 			clBuildingReasonId.setClNo(iClNo);
-			clBuildingReasonId.setReasonSeq(i);
 
 			tClBuildingReason.setClBuildingReasonId(clBuildingReasonId);
 			tClBuildingReason.setClCode1(iClCode1);
 			tClBuildingReason.setClCode2(iClCode2);
 			tClBuildingReason.setClNo(iClNo);
-			tClBuildingReason.setReasonSeq(i);
-			tClBuildingReason.setReason(parse.stringToInteger(titaVo.getParam("Reason" + i)));
-			this.info("OtherReason =" + titaVo.getParam("OtherReason" + i));
-			this.info("CreateEmpNo =" + titaVo.getParam("CreateEmpNo" + i));
 
-			tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason" + i));
-			tClBuildingReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo" + i));
-			tClBuildingReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo" + i));
+			tClBuildingReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
+			this.info("OtherReason =" + titaVo.getParam("OtherReason1"));
+			this.info("CreateEmpNo =" + titaVo.getParam("CreateEmpNo1"));
+
+			tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason1"));
+			tClBuildingReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
+			tClBuildingReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
 
 			try {
 				sClBuildingReasonService.insert(tClBuildingReason, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "擔保品不動產建物修改原因檔" + e.getErrorMsg());
 			}
-		}
+
 	}
 
 	// delete 擔保品不動產建物修改原因檔
 	private void deleteClBuildingReason(TitaVo titaVo) throws LogicException {
-		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
-		lClBuildingReason = slClBuildingReason == null ? null : slClBuildingReason.getContent();
-		if (lClBuildingReason != null) {
+		ClBuildingReason tClBuildingReason = sClBuildingReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
+		
+		if (tClBuildingReason != null) {
 			try {
-				sClBuildingReasonService.deleteAll(lClBuildingReason);
+				sClBuildingReasonService.delete(tClBuildingReason);
 			} catch (DBException e) {
 				throw new LogicException("E0008", "擔保品不動產建物修改原因檔" + e.getErrorMsg());
 			}
 		}
+		
 	}
 
 }
