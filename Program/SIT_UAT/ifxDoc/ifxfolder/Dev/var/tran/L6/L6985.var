@@ -417,7 +417,7 @@ ifxBatch:{
 	rim:'L618A',
 	txtno:'#secret-no',
 	pfnx:"L618A.PFNX",
-	col_captions:["戶號","明細鍵值","交易序號","處理結果"],
+	col_captions:["戶號","明細鍵值","交易序號           ","處理結果"],
 	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
 	}
 }
@@ -471,7 +471,7 @@ ifxBatch:{
 	rim:'L618A',
 	txtno:'#secret-no',
 	pfnx:"L618A.PFNX",
-	col_captions:["戶號","明細鍵值","交易序號","處理結果"],
+	col_captions:["戶號","明細鍵值","交易序號           ","處理結果"],
 	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
 	}
 }
@@ -567,7 +567,7 @@ ifxBatch:{
 	rim:'L618D',
 	txtno:'#forL618DH',
 	pfnx:"L618A.PFNX",
-	col_captions:["戶號","明細鍵值","交易序號","處理結果"],
+	col_captions:["戶號","明細鍵值","交易序號           ","處理結果"],
 	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
 	}
 }
@@ -620,7 +620,7 @@ ifxBatch:{
 	rim:'L618A',
 	txtno:'#secret-no',
 	pfnx:"L618A.PFNX",
-	col_captions:["戶號","明細鍵值","交易序號","處理結果"],
+	col_captions:["戶號","明細鍵值","交易序號           ","處理結果"],
 	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
 	}
 }
@@ -671,7 +671,7 @@ ifxBatch:{
 	rim:'L618D',
 	txtno:'#secret-no',
 	pfnx:"L618D.PFNX",
-	col_captions:["戶號","明細鍵值","交易序號","處理結果"],
+	col_captions:["戶號","明細鍵值","交易序號           ","處理結果"],
 	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
 	}
 }

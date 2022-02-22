@@ -19,7 +19,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcLoanInt;
 import com.st1.itx.db.domain.AcLoanIntId;
 import com.st1.itx.db.domain.LoanBorMain;
-import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.service.AcLoanIntService;
@@ -89,6 +88,7 @@ public class BS900 extends TradeBuffer {
 	private int iAcDate;
 	private int iAcDateReverse = 0;
 	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
+	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -129,12 +129,39 @@ public class BS900 extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
+		// 刪除提存當月AcDetal:98
+		this.info("2-1.bs900 delete AcDetal-98, yearMonth=" + yearMonth);
+		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 98, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slAcDetail != null) {
+			lAcDetail = new ArrayList<AcDetail>();
+			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
+			try {
+				acDetailService.deleteAll(lAcDetail, titaVo); // delete AcDetail
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "AcDetail delete " + e.getErrorMsg());
+			}
+		}
+		// 刪除提存當月AcDetal:99
+		this.info("2-2.bs900 delete AcDetal-99, yearMonth=" + yearMonth);
+		Slice<AcDetail> tlAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 99, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (tlAcDetail != null) {
+			lAcDetail = new ArrayList<AcDetail>();
+			lAcDetail = tlAcDetail == null ? null : tlAcDetail.getContent();
+			try {
+				acDetailService.deleteAll(lAcDetail, titaVo); // delete AcDetail
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "AcDetail delete " + e.getErrorMsg());
+			}
+		}
+
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 
 		// 3.迴轉上月
 		this.info("3.bs900 last month ACCL01");
-		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index,
-				Integer.MAX_VALUE, titaVo);
+		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index, Integer.MAX_VALUE,
+				titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
 				if ("ICR".equals(t.getAcctCode())) {
@@ -164,6 +191,10 @@ public class BS900 extends TradeBuffer {
 				lTxToDoDetail.add(tTxToDoDetail);
 			}
 			this.info("3.last month ACCL01 " + lTxToDoDetail.size());
+			// 應處理明細檔
+			if (lTxToDoDetail != null && lTxToDoDetail.size() > 0) {
+				txToDoCom.addByDetailList(false, 0, lTxToDoDetail, titaVo); // DupSkip = false ->重複 error
+			}
 		}
 
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();

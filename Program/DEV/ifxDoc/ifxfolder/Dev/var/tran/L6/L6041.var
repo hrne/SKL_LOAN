@@ -66,6 +66,17 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@BrHelp,#HelpDesc1)
 
+#RIM_L6R20a=A,1,S
+RESET_RIM(#RIM_L6R20a,L6R20)
+E(0,@FunCode,9)
+S(L6R20,01,#FunCode)
+R(1,L6R20)
+
+#IsAdmin=A,1,S
+
+#AdminFg=A,1,S
+E(0,#IsAdmin)
+C(3,#AdminFg,1,$,T(F,@BrNo,0))
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -96,25 +107,17 @@ T(3,0:全部;1:主管;3:經辦)
 E(0,5)
 
 !使用單位
-#BrNo=X,4,L
+#BrNo=X,4,I
 T(2,#KINBR) 
+C(3,#AdminFg,1,$,s)
 !C(4,#TlrNo,$,S)
-!HELP(#BrHelp)
-!@V(H,#BrHelp)
+HELP(#BrHelp)
+@
+C(4,#BrNo,$,V(H,#BrHelp))
 
 #BrNoX=X,80,L
 T(H,#BrNo,#BrHelp)
-
-!<include src="COM.icf::RPTFG.dec"/>
-#RPTFG=A,1,S
-E(0,0)
-
-#RPTFG2=A,1,S
-C(3,#RPTFG,0,$,S)
-C(4,#NTXBUF5,T(3,1),T(3,2))
-
-#RPTFG=_,_,S
-
+C(4,#BrNo,T(3,@FdTlrNo,*),T(3,@FdTlrNo,))
 
 #TXMT=A,1,S
 C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
@@ -127,22 +130,22 @@ C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
 !使用者代號
 #TlrNo=X,6,I
 @
-C(4,#TlrNo,s,$)
-V(8,6,6)
+C(4,#BrNo,V(7),$)
+C(4,#TlrNo,$,V(8,6,6))
 
 #RIM_L6R20=A,1,S
 C(4,#TlrNo,S,$)
+E(0,@FunCode,8)
 RESET_RIM(#RIM_L6R20,L6R20)
-S(L6R20,01,#FunCode,#TlrNo,#END)
+S(L6R20,01,#FunCode,#BrNo,#TlrNo,#END)
 R(1,L6R20)
 
 #TlrItem=X,50,L
 
-
 #GroupHelp=x,50000,S
 
 #RimL6r44=X,1,S
-C(4,#BrNo,s,$)
+C(4,#BrNo,S,$)
 T(2,@L6R44BranchNo,#BrNo)
 S(L6R44,1,#L6R44BranchNo)
 R(1,L6R44)
@@ -150,12 +153,15 @@ T(2,@GroupHelp,#L6r44GroupHelpList)
 T(H,@GroupNoX,#GroupNo,#GroupHelp)
 
 #GroupNo=X,1,I
+C(4,#BrNo,S,$)
 C(4,#TlrNo,$,S)
 HELP(#GroupHelp,cols:2))
-@C(4,#GroupNo,s,V(H,#GroupHelp))
+@
+C(4,#GroupNo,s,V(H,#GroupHelp))
 
 #GroupNoX=X,20,L
 C(4,#GroupNo,S,$)
+C(4,#TlrNo,$,S)
 T(H,#GroupNo,#GroupHelp)
 
 #LevelFg=A,1,I
@@ -165,6 +171,17 @@ HELP(#LevelHelp)
 
 #LevelFgX=X,10,L
 T(H,#LevelFg,#LevelHelp)
+
+!<include src="COM.icf::RPTFG.dec"/>
+#RPTFG=A,1,S
+E(0,0)
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+#RPTFG=_,_,S
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -286,7 +303,7 @@ TXFORM=L6041
 
 TXFORM=L6R20
 #TlrItem
-
+#IsAdmin
 ^
 
 </sub>

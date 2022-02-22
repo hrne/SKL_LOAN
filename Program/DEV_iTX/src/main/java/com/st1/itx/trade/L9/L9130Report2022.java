@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,14 +18,13 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.AcClose;
-import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.SlipMedia2022Id;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.springjpa.cm.L9130ServiceImpl;
 import com.st1.itx.util.common.EbsCom;
+import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.FormatUtil;
@@ -42,7 +40,11 @@ import com.st1.itx.util.format.FormatUtil;
  * 2022-02-09 修改 智偉 <BR>
  * 說明:From 珮琪 新傳票媒體檔也要作應收調撥款特殊處理<BR>
  * 2022-02-10 修改 智偉 <BR>
- * 說明:修改應收調撥款的特殊處理
+ * 說明:修改應收調撥款的特殊處理 <BR>
+ * 2022-02-22 修改 智偉 <BR>
+ * 說明:相同上傳核心序號(MediaSeq)下， <BR>
+ * 有不同區隔帳冊(AcSubBookCode)時， <BR>
+ * 需產生不同傳票號碼(MediaSlipNo)。 <BR>
  * 
  * @author st1-ChihWei
  *
@@ -67,6 +69,10 @@ public class L9130Report2022 extends MakeReport {
 
 	@Autowired
 	private EbsCom ebsCom;
+
+	/* 自動取號 */
+	@Autowired
+	GSeqCom gGSeqCom;
 
 	JSONArray journalTbl;
 	BigInteger groupId;
@@ -165,16 +171,14 @@ public class L9130Report2022 extends MakeReport {
 	// For EBS WS P_SUMMARY_TBL.TOTAL_AMOUNT - 該批號下各幣別傳票借方總金額
 	BigDecimal drAmtTotal;
 
-	// 紀錄本次產生的序號 提供L9131產表使用
-	List<String> listMediaSeq;
-
 	// 作業人員
 	String tellerNo = "";
 
-	public List<String> exec(TitaVo titaVo) throws LogicException {
-		this.info("L9130Report2022 exec ...");
+	// For EBS WS JE_LINE_NUM
+	int lineNum;
 
-		listMediaSeq = new ArrayList<>();
+	public void exec(TitaVo titaVo) throws LogicException {
+		this.info("L9130Report2022 exec ...");
 
 		// 作業人員
 		tellerNo = titaVo.getTlrNo();
@@ -188,11 +192,8 @@ public class L9130Report2022 extends MakeReport {
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
 
-		// 紀錄本次產生的序號
-		listMediaSeq.add("" + iMediaSeq);
-
 		// 取得傳票號碼
-		slipNo = getSlipNo(iAcDate, iMediaSeq);
+		slipNo = getSlipNo(iAcDate, titaVo);
 
 		this.info("L9130Report2022 iAcDate = " + iAcDate);
 		this.info("L9130Report2022 iBatchNo = " + iBatchNo);
@@ -211,14 +212,14 @@ public class L9130Report2022 extends MakeReport {
 		// no 檔案編號
 		String no = "L9130";
 		// desc 檔案說明
-		String desc = "總帳傳票媒體檔_" + slipNo;
+		String desc = "總帳傳票媒體檔_" + iMediaSeq;
 
 		// 檔名編碼方式
 		// 固定值 核心傳票媒體上傳序號
 		// jori 999
 
 		// name 輸出檔案名稱
-		String name = "總帳傳票媒體檔_" + slipNo + "_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
+		String name = "總帳傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
 
 		// format 輸出檔案格式 1.UTF8 2.BIG5
 		int format = 2;
@@ -226,15 +227,17 @@ public class L9130Report2022 extends MakeReport {
 		makeFile.open(titaVo, date, brno, no, desc, name, format);
 
 		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
-				iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
+				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
 
+		// 若已存在,是重新製作傳票媒體
 		if (sSlipMedia2022 != null && !sSlipMedia2022.isEmpty()) {
-			// 若已存在,將該筆舊傳票刪除
+			// 更新原傳票媒體的"是否為最新"(LatestFlag)欄位
 			for (SlipMedia2022 tSlipMedia2022 : sSlipMedia2022.getContent()) {
+				tSlipMedia2022.setLatestFlag("N");
 				try {
-					sSlipMedia2022Service.delete(tSlipMedia2022, titaVo);
+					sSlipMedia2022Service.update(tSlipMedia2022, titaVo);
 				} catch (DBException e) {
-					throw new LogicException("E0008", "傳票媒體檔");
+					throw new LogicException("E0003", "傳票媒體檔");
 				}
 			}
 		}
@@ -250,6 +253,7 @@ public class L9130Report2022 extends MakeReport {
 		}
 
 		int i = 1;
+		lineNum = i;
 
 		lastAcSubBookCode = "00A";
 
@@ -259,44 +263,20 @@ public class L9130Report2022 extends MakeReport {
 
 		journalTbl = new JSONArray();
 
-		/**
-		 * AcBookCode F0 帳冊別<BR>
-		 * AcDate F1 會計日期 <BR>
-		 * AcNoCode F2 科目代號 <BR>
-		 * AcSubCode F3 子目代號 <BR>
-		 * DbCr F4 借貸別 <BR>
-		 * TxAmt F5 金額 <BR>
-		 * AcSubBookCode F6 區隔帳冊 <BR>
-		 * AcNoItem F7 科目名稱
-		 */
 		for (Map<String, String> l9130 : l9130List) {
 
 			acSubBookCode = l9130.get("F6"); // 區隔帳冊
+
 			// 此筆區隔帳冊與上一筆不同
 			if (!acSubBookCode.equals(lastAcSubBookCode)) {
 				// 特殊處理:同區隔帳冊借貸金額加總後，寫一筆反向10340000000 應收調撥款
-				i = specialHandling(i, titaVo);
+				specialHandling(i, titaVo);
 				// 特殊處理結束
 
-				// 統計並送出
-				doSummaryAndSendToEbs(i, titaVo);
-
-				// 寫產檔記錄到TxFile
-				long fileno = makeFile.close();
-
-				this.info("makeFile close fileno = " + fileno);
-
-				// 開始新的傳票
-				// 從AcClose取傳票序號加一，並更新回AcClose
-				updateCoreSeq(titaVo);
+				// 取新的傳票號碼
+				slipNo = getSlipNo(iAcDate, titaVo);
 
 				i = 1;
-
-				name = "總帳傳票媒體檔_" + slipNo + "_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
-
-				desc = "總帳傳票媒體檔_" + slipNo;
-
-				makeFile.open(titaVo, date, brno, no, desc, name, format);
 			}
 
 			acBookCode = l9130.get("F0"); // 帳冊別
@@ -325,7 +305,7 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("CURRENCY_CODE", currencyCode);
 				dataJo.put("ISSUED_BY", tellerNo);
 				dataJo.put("ACCOUNTING_DATE", slipDate);
-				dataJo.put("JE_LINE_NUM", "" + i);
+				dataJo.put("JE_LINE_NUM", "" + lineNum);
 				dataJo.put("SEGREGATE_CODE", acSubBookCode);
 				dataJo.put("ACCOUNT_CODE", acNoCode);
 				dataJo.put("SUBACCOUNT_CODE", acSubNoCode.trim().isEmpty() ? "00000" : acSubNoCode);
@@ -398,6 +378,7 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setSlipRmk(slipRmk);
 			tSlipMedia2022.setCostMonth(costMonth);
 			tSlipMedia2022.setDeptCode(deptCode);
+			tSlipMedia2022.setLatestFlag("Y");
 
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
@@ -417,23 +398,22 @@ public class L9130Report2022 extends MakeReport {
 			lastAcSubBookCode = acSubBookCode;
 
 			i++;
+			lineNum = i;
 		}
 
 		// 全部傳票印完，執行特殊處理
-		i = specialHandling(i, titaVo);
+		specialHandling(i, titaVo);
 
 		// 統計並送出
-		doSummaryAndSendToEbs(i, titaVo);
+		doSummaryAndSendToEbs(titaVo);
 
 		// 寫產檔記錄到TxFile
 		long fileno = makeFile.close();
 
 		this.info("makeFile close fileno = " + fileno);
-
-		return listMediaSeq;
 	}
 
-	private void doSummaryAndSendToEbs(int i, TitaVo titaVo) throws LogicException {
+	private void doSummaryAndSendToEbs(TitaVo titaVo) throws LogicException {
 
 		JSONArray summaryTbl = new JSONArray();
 
@@ -443,14 +423,14 @@ public class L9130Report2022 extends MakeReport {
 			summaryMap.put("GROUP_ID", groupId);
 			summaryMap.put("BATCH_DATE", slipDate);
 			summaryMap.put("JE_SOURCE_NAME", "LN");
-			summaryMap.put("TOTAL_LINES", i - 1);
+			summaryMap.put("TOTAL_LINES", lineNum - 1);
 			summaryMap.put("CURRENCY_CODE", "NTD");
 			summaryMap.put("TOTAL_AMOUNT", drAmtTotal);
 		} catch (JSONException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9130Report22 Exception = " + e.getMessage());
-			throw new LogicException("CE000", "傳票媒體檔上傳失敗");
+			throw new LogicException("CE000", "彙總上傳資料時有誤");
 		}
 
 		summaryTbl.put(summaryMap);
@@ -470,16 +450,26 @@ public class L9130Report2022 extends MakeReport {
 
 	/**
 	 * 組傳票編號<BR>
-	 * 固定值 民國年 月份 日期 核心傳票媒體上傳序號<BR>
+	 * 固定值 民國年 月份 日期 3碼序號<BR>
 	 * // F10 + YYY + M + DD + 999
 	 * 
-	 * @param acDate   國曆會計日期
-	 * @param mediaSeq 核心傳票媒體上傳序號
+	 * @param acDate 國曆會計日期
+	 * @param titaVo titaVo
 	 * @return 傳票號碼
 	 */
-	private String getSlipNo(int acDate, int mediaSeq) {
+	private String getSlipNo(int acDate, TitaVo titaVo) {
 
-		// 傳票編號 "F"+year+month(123456789ABC)+day+mediaSeq核心傳票媒體上傳序號
+		int slipNoSeq = 0;
+
+		try {
+			slipNoSeq = gGSeqCom.getSeqNo(acDate, 3, "L2", "SLIP", 999, titaVo);
+		} catch (LogicException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9130Report2022 gGSeqCom getSeqNo error = " + e.getMessage());
+		}
+
+		// 傳票編號 "F"+year+month(123456789ABC)+day+3碼序號
 		String tmpSlipNo = "";
 
 		String sAcDate = FormatUtil.pad9(String.valueOf(acDate), 7);
@@ -490,7 +480,7 @@ public class L9130Report2022 extends MakeReport {
 
 		String day = sAcDate.substring(5, 7);
 
-		// 固定值 民國年 月份 日期 核心傳票媒體上傳序號
+		// 固定值 民國年 月份 日期 3碼序號
 		// F10 + YYY + M + DD + 999
 
 		// 月份特殊處理
@@ -517,9 +507,9 @@ public class L9130Report2022 extends MakeReport {
 			month = String.valueOf(iMonth);
 		}
 
-		String sMediaSeq = FormatUtil.pad9(String.valueOf(mediaSeq), 3);
+		String sSlipNoSeq = FormatUtil.pad9(String.valueOf(slipNoSeq), 3);
 
-		tmpSlipNo = "F10" + year + month + day + sMediaSeq;
+		tmpSlipNo = "F10" + year + month + day + sSlipNoSeq;
 
 		this.info("L9130Report2022 getSlipNo slipNo : " + tmpSlipNo);
 		return tmpSlipNo;
@@ -533,7 +523,7 @@ public class L9130Report2022 extends MakeReport {
 	 * @return 處理後的新筆數
 	 * @throws LogicException LogicException
 	 */
-	private int specialHandling(int i, TitaVo titaVo) throws LogicException {
+	private void specialHandling(int i, TitaVo titaVo) throws LogicException {
 
 		this.info("L9130 specialHandling i = " + i);
 		this.info("L9130 specialHandling lastAcSubBookCode = " + lastAcSubBookCode);
@@ -561,7 +551,7 @@ public class L9130Report2022 extends MakeReport {
 				dataJo.put("CURRENCY_CODE", currencyCode);
 				dataJo.put("ISSUED_BY", tellerNo);
 				dataJo.put("ACCOUNTING_DATE", slipDate);
-				dataJo.put("JE_LINE_NUM", "" + i);
+				dataJo.put("JE_LINE_NUM", "" + lineNum);
 				dataJo.put("SEGREGATE_CODE", lastAcSubBookCode);
 				dataJo.put("ACCOUNT_CODE", tempAcNoCode);
 				dataJo.put("SUBACCOUNT_CODE", tempAcSubNoCode.trim().isEmpty() ? "00000" : tempAcSubNoCode);
@@ -638,6 +628,7 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setSlipRmk(tempSlipRmk);
 			tSlipMedia2022.setCostMonth(costMonth);
 			tSlipMedia2022.setDeptCode(deptCode);
+			tSlipMedia2022.setLatestFlag("Y");
 
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
@@ -646,6 +637,7 @@ public class L9130Report2022 extends MakeReport {
 			}
 
 			i++;
+			lineNum = i;
 		}
 
 		// 計算借方加總
@@ -654,51 +646,5 @@ public class L9130Report2022 extends MakeReport {
 		// 此區隔帳冊的印完，歸零
 		transferAmt = BigDecimal.ZERO;
 		// 特殊處理結束
-
-		return i;
-	}
-
-	private void updateCoreSeq(TitaVo titaVo) throws LogicException {
-
-		AcClose tAcClose = null;
-		AcCloseId tAcCloseId = new AcCloseId();
-
-		tAcCloseId.setAcDate(iAcDate);
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
-
-		tAcClose = sAcCloseService.holdById(tAcCloseId);
-
-		if (tAcClose == null) {
-			tAcClose = new AcClose();
-			tAcClose.setAcCloseId(tAcCloseId);
-			tAcClose.setClsFg(0);
-			tAcClose.setBatNo(1);
-			tAcClose.setCoreSeqNo(1);
-			try {
-				sAcCloseService.insert(tAcClose, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E6003", "Acclose insert " + e.getErrorMsg());
-			}
-		} else {
-			tAcClose.setCoreSeqNo(tAcClose.getCoreSeqNo() + 1);
-			try {
-				sAcCloseService.update(tAcClose);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "更新上傳核心序號(09:放款)"); // 更新資料時，發生錯誤
-			}
-		}
-
-		iMediaSeq = tAcClose.getCoreSeqNo();
-
-		// 紀錄本次產生的序號
-		listMediaSeq.add("" + iMediaSeq);
-
-		slipNo = getSlipNo(iAcDate, iMediaSeq);
-
-		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
-				.add(new BigDecimal(iMediaSeq));
-
-		groupId = tmpGroupId.toBigInteger();
 	}
 }

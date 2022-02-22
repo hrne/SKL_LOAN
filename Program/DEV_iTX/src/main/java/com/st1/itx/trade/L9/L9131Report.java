@@ -133,7 +133,7 @@ public class L9131Report extends MakeReport {
 		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
 
 		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(this.reportDate, iBatchNo, iMediaSeq,
-				0, Integer.MAX_VALUE, titaVo);
+				"Y", 0, Integer.MAX_VALUE, titaVo);
 		List<SlipMedia2022> lSlipMedia2022 = sSlipMedia2022 == null ? null : sSlipMedia2022.getContent();
 
 		if (lSlipMedia2022 == null || lSlipMedia2022.isEmpty()) {
@@ -169,17 +169,6 @@ public class L9131Report extends MakeReport {
 
 			if (!this.nowAcBookCode.equals(tSlipMedia2022.getAcBookCode())
 					|| !this.nowAcSubBookCode.equals(tSlipMedia2022.getAcSubBookCode())) {
-				// 修改表頭的帳冊別欄位
-				this.nowAcBookCode = tSlipMedia2022.getAcBookCode();
-				CdCode acBookCdCode = sCdCodeService.getItemFirst(6, "AcBookCode", this.nowAcBookCode, titaVo);
-				this.nowAcBookItem = acBookCdCode == null ? "" : acBookCdCode.getItem();
-
-				// 修改表頭的區隔帳冊欄位
-				this.nowAcSubBookCode = tSlipMedia2022.getAcSubBookCode();
-				CdCode acSubBookCdCode = sCdCodeService.getItemFirst(6, "AcSubBookCode", this.nowAcSubBookCode, titaVo);
-				this.nowAcSubBookItem = acSubBookCdCode == null ? "" : acSubBookCdCode.getItem();
-
-				this.slipNo = tSlipMedia2022.getSlipMedia2022Id().getMediaSlipNo();
 
 				print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－－－－－－");
 				print(1, 1, "　　　合計　TOTAL ：");
@@ -190,7 +179,20 @@ public class L9131Report extends MakeReport {
 				dbAmt = BigDecimal.ZERO;
 				crAmt = BigDecimal.ZERO;
 
+				// 修改表頭的帳冊別欄位
+				this.nowAcBookCode = tSlipMedia2022.getAcBookCode();
+				CdCode acBookCdCode = sCdCodeService.getItemFirst(6, "AcBookCode", this.nowAcBookCode, titaVo);
+				this.nowAcBookItem = acBookCdCode == null ? "" : acBookCdCode.getItem();
+
+				// 修改表頭的區隔帳冊欄位
+				this.nowAcSubBookCode = tSlipMedia2022.getAcSubBookCode();
+				CdCode acSubBookCdCode = sCdCodeService.getItemFirst(6, "AcSubBookCode", this.nowAcSubBookCode, titaVo);
+				this.nowAcSubBookItem = acSubBookCdCode == null ? "" : acSubBookCdCode.getItem();
+
 				this.newPage();
+
+				// 修改頁尾的傳票號碼欄位
+				this.slipNo = tSlipMedia2022.getSlipMedia2022Id().getMediaSlipNo();
 			}
 
 			BigDecimal txAmt = tSlipMedia2022.getTxAmt();

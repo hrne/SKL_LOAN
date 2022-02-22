@@ -111,7 +111,7 @@ em = null;
   }
 
   @Override
-  public Slice<SlipMedia2022> findMediaSeq(int acDate_0, int batchNo_1, int mediaSeq_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<SlipMedia2022> findMediaSeq(int acDate_0, int batchNo_1, int mediaSeq_2, String latestFlag_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<SlipMedia2022> slice = null;
     if (titaVo.length != 0)
@@ -122,15 +122,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findMediaSeq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " mediaSeq_2 : " +  mediaSeq_2);
+    this.info("findMediaSeq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " mediaSeq_2 : " +  mediaSeq_2 + " latestFlag_3 : " +  latestFlag_3);
     if (dbName.equals(ContentName.onDay))
-      slice = slipMedia2022ReposDay.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAscAcSubBookCodeAsc(acDate_0, batchNo_1, mediaSeq_2, pageable);
+      slice = slipMedia2022ReposDay.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsAndLatestFlagIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, mediaSeq_2, latestFlag_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = slipMedia2022ReposMon.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAscAcSubBookCodeAsc(acDate_0, batchNo_1, mediaSeq_2, pageable);
+      slice = slipMedia2022ReposMon.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsAndLatestFlagIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, mediaSeq_2, latestFlag_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = slipMedia2022ReposHist.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAscAcSubBookCodeAsc(acDate_0, batchNo_1, mediaSeq_2, pageable);
+      slice = slipMedia2022ReposHist.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsAndLatestFlagIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, mediaSeq_2, latestFlag_3, pageable);
     else 
-      slice = slipMedia2022Repos.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAscAcSubBookCodeAsc(acDate_0, batchNo_1, mediaSeq_2, pageable);
+      slice = slipMedia2022Repos.findAllByAcDateIsAndBatchNoIsAndMediaSeqIsAndLatestFlagIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, mediaSeq_2, latestFlag_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -152,13 +152,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findBatchNo " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
     if (dbName.equals(ContentName.onDay))
-      slice = slipMedia2022ReposDay.findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, pageable);
+      slice = slipMedia2022ReposDay.findAllByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = slipMedia2022ReposMon.findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, pageable);
+      slice = slipMedia2022ReposMon.findAllByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = slipMedia2022ReposHist.findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, pageable);
+      slice = slipMedia2022ReposHist.findAllByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, pageable);
     else 
-      slice = slipMedia2022Repos.findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(acDate_0, batchNo_1, pageable);
+      slice = slipMedia2022Repos.findAllByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -174,13 +174,13 @@ em = null;
     this.info("findMediaSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
     Optional<SlipMedia2022> slipMedia2022T = null;
     if (dbName.equals(ContentName.onDay))
-      slipMedia2022T = slipMedia2022ReposDay.findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(acDate_0, batchNo_1);
+      slipMedia2022T = slipMedia2022ReposDay.findTopByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1);
     else if (dbName.equals(ContentName.onMon))
-      slipMedia2022T = slipMedia2022ReposMon.findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(acDate_0, batchNo_1);
+      slipMedia2022T = slipMedia2022ReposMon.findTopByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1);
     else if (dbName.equals(ContentName.onHist))
-      slipMedia2022T = slipMedia2022ReposHist.findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(acDate_0, batchNo_1);
+      slipMedia2022T = slipMedia2022ReposHist.findTopByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1);
     else 
-      slipMedia2022T = slipMedia2022Repos.findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(acDate_0, batchNo_1);
+      slipMedia2022T = slipMedia2022Repos.findTopByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(acDate_0, batchNo_1);
 
     return slipMedia2022T.isPresent() ? slipMedia2022T.get() : null;
   }

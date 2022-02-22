@@ -11,10 +11,12 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.modelmapper.ModelMapper;
@@ -81,9 +83,9 @@ public class DataLog extends CommBuffer {
 	/**
 	 * set parameters
 	 * 
-	 * @param titaVo    TitaVo
-	 * @param bef       Before data
-	 * @param aft       After data
+	 * @param titaVo  TitaVo
+	 * @param bef     Before data
+	 * @param aft     After data
 	 * @param otrList 其他變更項目一次放入
 	 */
 	public void setEnv(TitaVo titaVo, Object bef, Object aft, List<Map<String, Object>> otrList) {
@@ -149,10 +151,18 @@ public class DataLog extends CommBuffer {
 		Object oVal = dVal;
 		Object nVal = dVal;
 		boolean newfg = false;
-		for (Map.Entry<String, Object> entry : oldnewMap.entrySet()) {
+
+		Set set = oldnewMap.keySet();
+		Object[] arr = set.toArray();
+		Arrays.sort(arr);
+
+		for (Object key : arr) {
+//		for (Map.Entry<String, Object> entry : oldnewMap.entrySet()) {
 //			this.info("key:" + entry.getKey() + ",value:" + entry.getValue());
-			String mapKey = entry.getKey().trim();
-			mapKey = mapKey.substring(0, mapKey.length() - 2);
+//			String mapKey = entry.getKey().trim();
+			String orgKey = key.toString();
+
+			String mapKey = orgKey.substring(0, orgKey.length() - 2);
 
 			if (!oKey.isEmpty() && !oKey.equals(mapKey)) {
 				// add difference
@@ -164,10 +174,14 @@ public class DataLog extends CommBuffer {
 			}
 
 			oKey = mapKey;
-			if ("_O".equals(entry.getKey().substring(entry.getKey().length() - 2))) {
-				oVal = entry.getValue();
+
+//			if ("_O".equals(entry.getKey().substring(entry.getKey().length() - 2))) {
+			if ("_O".equals(orgKey.substring(orgKey.length() - 2))) {
+//				oVal = entry.getValue();
+				oVal = oldnewMap.get(orgKey).toString();
 			} else {
-				nVal = entry.getValue();
+//				nVal = entry.getValue();
+				nVal = oldnewMap.get(orgKey).toString();
 			}
 		}
 	}
@@ -434,7 +448,7 @@ public class DataLog extends CommBuffer {
 	 * 訂正刪除原紀錄
 	 * 
 	 * @param titaVo titaVo
-	 * @throws LogicException
+	 * @throws LogicException ..
 	 */
 
 	public void delete(TitaVo titaVo) throws LogicException {

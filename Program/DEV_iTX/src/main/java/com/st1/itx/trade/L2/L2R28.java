@@ -18,11 +18,11 @@ import com.st1.itx.db.domain.ClLandReason;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandReasonService;
 import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -93,7 +93,7 @@ public class L2R28 extends TradeBuffer {
 		int dataSize = 0;
 		// new list
 		List<ClLandOwner> lClLandOwner = new ArrayList<ClLandOwner>();
-		List<ClLandReason> lClLandReason = new ArrayList<ClLandReason>();
+
 		// new pk
 		ClLandId ClLandId = new ClLandId();
 		ClMainId ClMainId = new ClMainId();
@@ -111,10 +111,10 @@ public class L2R28 extends TradeBuffer {
 		tClMain = sClMainService.findById(ClMainId, titaVo);
 		tClLand = sClLandService.findById(ClLandId, titaVo);
 
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
+				Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
-		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
-		lClLandReason = slClLandReason == null ? null : new ArrayList<ClLandReason>(slClLandReason.getContent());
+		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
 
 		this.totaVo.putParam("L2r28LandSeq", iLandSeq);
 		// 不存在擔保品主檔 拋錯
@@ -123,16 +123,16 @@ public class L2R28 extends TradeBuffer {
 			switch (iFunCd) {
 			case 1:
 				// 若為新增且資料不存在主檔
-				throw new LogicException("E2003", "(擔保品主檔)"); //查無資料
+				throw new LogicException("E2003", "(擔保品主檔)"); // 查無資料
 			case 2:
 				// 若為修改，但資料不存在，拋錯
-				throw new LogicException("E0003", ""); //修改資料不存在
+				throw new LogicException("E0003", ""); // 修改資料不存在
 			case 4:
 				// 若為刪除，但資料不存在，拋錯
-				throw new LogicException("E0004", ""); //刪除資料不存在
+				throw new LogicException("E0004", ""); // 刪除資料不存在
 			default:
 				// funch不在以上範圍，拋錯
-				throw new LogicException("E0010", ""); //功能選擇錯誤
+				throw new LogicException("E0010", ""); // 功能選擇錯誤
 			}
 		} else {
 
@@ -156,18 +156,18 @@ public class L2R28 extends TradeBuffer {
 
 					tClLand = new ClLand();
 					lClLandOwner = new ArrayList<ClLandOwner>();
-					lClLandReason = new ArrayList<ClLandReason>();
+					tClLandReason = new ClLandReason();
 
 					break;
 				case 2:
 					// 若為修改，但資料不存在，拋錯
-					throw new LogicException("E0003", ""); //修改資料不存在
+					throw new LogicException("E0003", ""); // 修改資料不存在
 				case 4:
 					// 若為刪除，但資料不存在，拋錯
-					throw new LogicException("E0004", ""); //刪除資料不存在
+					throw new LogicException("E0004", ""); // 刪除資料不存在
 				default:
 					// funch不在以上範圍，拋錯
-					throw new LogicException("E0010", ""); //功能選擇錯誤
+					throw new LogicException("E0010", ""); // 功能選擇錯誤
 				}
 
 			} else {
@@ -176,10 +176,10 @@ public class L2R28 extends TradeBuffer {
 					if (iClCode1 == 2) {
 
 						this.totaVo.putParam("L2r28LandSeq", 0);
-						lClLandReason = new ArrayList<ClLandReason>();
+						tClLandReason = new ClLandReason();
 					} else {
 						// 新增房地，但資料已存在，拋錯
-						throw new LogicException("E0002", ""); //新增資料已存在
+						throw new LogicException("E0002", ""); // 新增資料已存在
 					}
 				}
 			}
@@ -224,7 +224,7 @@ public class L2R28 extends TradeBuffer {
 			this.totaVo.putParam("L2r28LandUsageCode", tClLand.getLandUsageCode());
 			this.totaVo.putParam("L2r28LandRentStartDate", tClLand.getLandRentStartDate());
 			this.totaVo.putParam("L2r28LandRentEndDate", tClLand.getLandRentEndDate());
-//			this.totaVo.putParam("L2r28LandOwnedArea", tClLand.getLandOwnedArea()); TODO DB改動
+
 
 			// 資料筆數
 			if (lClLandOwner != null) {
@@ -272,52 +272,32 @@ public class L2R28 extends TradeBuffer {
 				i++;
 
 			}
-			if (lClLandReason == null) {
-				lClLandReason = new ArrayList<ClLandReason>();
-			}
-			// 資料筆數
-			int dataSize2 = lClLandReason.size();
-			this.info("L1R05 lClLandReason size in DB = " + dataSize2);
-
-			// 暫時只抓前10筆,把第11筆之後的刪除
-			if (dataSize2 > 10) {
-				for (int j = dataSize2 + 1; j <= dataSize2; j++) {
-					lClLandReason.remove(j);
-				}
-			} else if (dataSize2 <= 10) {
-				// 若不足10筆,補足10筆
-				for (int j = dataSize2 + 1; j <= 10; j++) {
-					ClLandReason tClLandReason = new ClLandReason();
-					lClLandReason.add(tClLandReason);
-				}
+			if (tClLandReason == null) {
+				tClLandReason = new ClLandReason();
 			}
 
-			int j = 1;
-			for (ClLandReason tClLandReason : lClLandReason) {
-				this.info("lClLandReasonL2416 " + lClLandReason);
-				this.info("tClLandReasonL2416 " + tClLandReason);
-				String CreateDate4 = " ";
-				int reason = tClLandReason.getReason();
-				// 判斷是否有資料 無資料new table給tota
-				if (reason == 0) {
+			this.info("tClLandReasonL2416 " + tClLandReason);
+			String CreateDate4 = " ";
+			int reason = tClLandReason.getReason();
+			// 判斷是否有資料 無資料new table給tota
+			if (reason == 0) {
 
-					tClLandReason = new ClLandReason();
+				tClLandReason = new ClLandReason();
 
-				} else {
-					String CreateDate = tClLandReason.getCreateDate().toString();
-					String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
-					int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
-					CreateDate4 = String.valueOf(CreateDate3);
-				}
-
-				this.totaVo.putParam("L2r28Reason" + j, tClLandReason.getReason());
-				this.totaVo.putParam("L2r28OtherReason" + j, tClLandReason.getOtherReason());
-				this.totaVo.putParam("L2r28CreateEmpNo" + j, tClLandReason.getCreateEmpNo());
-				this.info("DATE " + tClLandReason.getCreateDate());
-				this.totaVo.putParam("L2r28CreateDate" + j, CreateDate4);
-				this.info("DATE2 " + CreateDate4);
-				j++;
+			} else {
+				String CreateDate = tClLandReason.getCreateDate().toString();
+				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7)
+						+ CreateDate.substring(8, 10);
+				int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
+				CreateDate4 = String.valueOf(CreateDate3);
 			}
+
+			this.totaVo.putParam("L2r28Reason", tClLandReason.getReason());
+			this.totaVo.putParam("L2r28OtherReason", tClLandReason.getOtherReason());
+			this.totaVo.putParam("L2r28CreateEmpNo", tClLandReason.getCreateEmpNo());
+			this.info("DATE " + tClLandReason.getCreateDate());
+			this.totaVo.putParam("L2r28CreateDate", CreateDate4);
+			this.info("DATE2 " + CreateDate4);
 
 		}
 

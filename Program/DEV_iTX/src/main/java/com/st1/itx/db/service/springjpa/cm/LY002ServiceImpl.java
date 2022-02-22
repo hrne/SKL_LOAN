@@ -98,7 +98,6 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	AND MLB2.\"FacmNo\" = MFB.\"FacmNo\"";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = MLB.\"FacmNo\"";
-		sql += "						   AND F.\"LastBormNo\" = MLB.\"BormNo\"";
 		sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "	LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "							   AND L.\"FacmNo\" = MLB.\"FacmNo\"";

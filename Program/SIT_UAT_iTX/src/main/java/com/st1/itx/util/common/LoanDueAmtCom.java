@@ -35,7 +35,7 @@ public class LoanDueAmtCom extends CommBuffer {
 	 * @param iFinalBal      最後一期本金餘額
 	 * @param titaVo         TitaVo
 	 * @return 期金
-	 * @throws LogicException
+	 * @throws LogicException ..
 	 */
 	public BigDecimal getDueAmt(BigDecimal iPrincipal, BigDecimal iRate, String iAmortizedCode, int iFreqBase, int iLoanTerm, int iGracePeriod, int iPayIntFreq, BigDecimal iFinalBal, TitaVo titaVo)
 			throws LogicException {
@@ -126,7 +126,7 @@ public class LoanDueAmtCom extends CommBuffer {
 	 * @param iDueAmt        期金
 	 * @param titaVo         TitaVo
 	 * @return 還本期數
-	 * @throws LogicException
+	 * @throws LogicException ..
 	 */
 	public int getDueTerms(BigDecimal iPrincipal, BigDecimal iRate, String iAmortizedCode, int iFreqBase, int iPayIntFreq, BigDecimal iFinalBal, BigDecimal iDueAmt, TitaVo titaVo)
 			throws LogicException {

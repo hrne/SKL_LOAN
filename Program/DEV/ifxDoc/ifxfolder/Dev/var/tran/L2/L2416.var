@@ -105,8 +105,8 @@ C(3,#PageFg,5,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
 #CALLGRID=@,1,S
 ##loop{times:10,n:1,k:2,j:3}
 C(4,#OwnerId{n},INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
-IF(#Reason{n}==0,INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
 ##end
+
 
 #ResetPages=@,1,S
 INVOKEJS(SHOW,p2,0)
@@ -262,10 +262,7 @@ E(0,@OwnerTotal1,0)
 T(3,@Reason1,)
 T(3,@CreateEmpNo1,)
 E(0,@CreateDate1,0)
-##loop{times:10,i:1}
-CALL(#HIDE_ROW_{i})
-HIDE(#OtherReason{i})
-##end
+HIDE(#OtherReason1)
 ##loop{times:10,i:1}
 CALL(#HIDE_LAND_{i})
 ##end
@@ -290,6 +287,11 @@ T(F,@EvaUnitPrice,#LabelControlFlag)
 T(F,@LandUsageCode,#LabelControlFlag)
 T(F,@LandRentStartDate,#LabelControlFlag)
 T(F,@LandRentEndDate,#LabelControlFlag)
+T(F,@Reason1,#LabelControlFlag)
+T(F,@ReasonX1,#LabelControlFlag)
+T(F,@OtherReason1,#LabelControlFlag)
+T(F,@CreateEmpNo1,#LabelControlFlag)
+T(F,@CreateDate1,#LabelControlFlag)
 ##loop{times:10,i:1}
 T(F,@OwnerId{i},#LabelControlFlag)
 T(F,@OwnerName{i},#LabelControlFlag)
@@ -297,13 +299,7 @@ T(F,@OwnerRelCode{i},#LabelControlFlag)
 T(F,@OwnerPart{i},#LabelControlFlag)
 T(F,@OwnerTotal{i},#LabelControlFlag)
 ##end
-##loop{times:10,i:1}
-T(F,@Reason{i},#LabelControlFlag)
-T(F,@ReasonX{i},#LabelControlFlag)
-T(F,@OtherReason{i},#LabelControlFlag)
-T(F,@CreateEmpNo{i},#LabelControlFlag)
-T(F,@CreateDate{i},#LabelControlFlag)
-##end
+
 
 #AFTER_FUNCD_1_2=@,1,S
 T(3,@FdClTypeCode,*)
@@ -338,6 +334,9 @@ C(3,#CHAIN,1,T(F,@ClCode2,0),T(F,@ClCode2,1))
 C(3,#CHAIN,1,T(F,@ClNo,0),T(F,@ClNo,1))
 C(3,#CHAIN,1,T(F,@LandSeq,0),T(F,@LandSeq,1))
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#ClCode1+-+#ClCode2+-+#ClNo)
 
 ! [功能]
 #FunCd=X,1,L
@@ -452,16 +451,16 @@ E(0,@EvaUnitPrice,#L2r28EvaUnitPrice)
 T(2,@LandUsageCode,#L2r28LandUsageCode)
 E(0,@LandRentStartDate,#L2r28LandRentStartDate)
 E(0,@LandRentEndDate,#L2r28LandRentEndDate)
+T(2,@Reason1,#L2r28Reason)
+T(2,@OtherReason1,#L2r28OtherReason)
+T(2,@CreateEmpNo1,#L2r28CreateEmpNo)
+E(0,@CreateDate1,#L2r28CreateDate)
 ##loop{times:10,i:1}
 T(2,@OwnerId{i},#L2r28OwnerId{i})
 T(2,@OwnerName{i},#L2r28OwnerName{i})
 T(2,@OwnerRelCode{i},#L2r28OwnerRelCode{i})
 E(0,@OwnerPart{i},#L2r28OwnerPart{i})
 E(0,@OwnerTotal{i},#L2r28OwnerTotal{i})
-IF(#L2r28Reason{i}<=0,$,T(2,@Reason{i},#L2r28Reason{i}))
-T(2,@OtherReason{i},#L2r28OtherReason{i})
-T(2,@CreateEmpNo{i},#L2r28CreateEmpNo{i})
-E(0,@CreateDate{i},#L2r28CreateDate{i})
 ##end
 
 
@@ -852,49 +851,35 @@ T(4,DATE$)
 #DT=D,7,S
 T(1,#DATE,2,7)
 
-##loop{times:10,i:1,j:0,rowSeq:2}
-
-#HIDE_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd2_{rowSeq},0)
-#SHOW_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd2_{rowSeq},1)
-
 ! [土地修改原因-原因]
-#Reason{i}=X,1,I
+#Reason1=X,1,I
 IF(#FunCd==1,S,$)
 IF(#PageFg==4,$,CALL(#SHOW_4))
-C(4,#Reason{j},CALL(#HIDE_ROW_{i}),CALL(#SHOW_ROW_{i}))
-IF(#FunCd==4,C(4,#Reason{i},CALL(#HIDE_ROW_{i}),CALL(#SHOW_ROW_{i})),$)
 IF(#FunCd==4,s,$)
-C(4,#Reason{j},s,$)
 HELP(#ReasonHelp)
 @
-IF({i} == 1,V(H,#ReasonHelp),$)
-C(4,#Reason{i},CALL(#HIDE_ROW_{i}),$)
-C(4,#Reason{i},s,$)
 V(H,#ReasonHelp)
 
-#ReasonX{i}=X,20,L
-T(H,#Reason{i},#ReasonHelp)
+#ReasonX1=X,20,L
+T(H,#Reason1,#ReasonHelp)
 
-#OtherReason{i}=c,60,I
+#OtherReason1=c,60,I
 IF(#FunCd==1,S,$)
-IF(#Reason{i}==6,SHOW(#OtherReason{i}),HIDE(#OtherReason{i}))
-IF(#Reason{i}==6,$,S)
+IF(#Reason1==6,SHOW(#OtherReason1),HIDE(#OtherReason1))
+IF(#Reason1==6,$,S)
 IF(#FunCd==4,s,$)
 @V(7)
 
 ! [土地修改原因-建立者]
-#CreateEmpNo{i}=X,6,L
-IF(#Reason{i} == "",S,$)
+#CreateEmpNo1=X,6,L
+IF(#Reason1 == "",S,$)
 T(2,#EMPNOT)
 
 ! [土地修改原因-建立日期]
-#CreateDate{i}=D,7,L
-IF(#Reason{i} == "",S,$)
+#CreateDate1=D,7,L
+IF(#Reason1 == "",S,$)
 E(0,#SYSCDATE)
 
-##end
 
 #ShowAll=X,1,S
 ENABLE(#BtnExpand)
@@ -950,7 +935,7 @@ IF(#FunCd == 4,INVOKEJS(SHOW,p2,1,1,0),$)
 <sub type="DC" name="p5" layout="cols=3;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
 [
 ["土地修改原因"],
-["#grid#,{id:2,expand:true,loop:10,row_height:1,s_cols:[300,100,100], p_cols:[]}","#FdCHG+土地修改原因","","",
+["#grid#,{id:2,expand:true,loop:1,row_height:1,s_cols:[300,100,100], p_cols:[]}","#FdCHG+土地修改原因","","",
 ["原因","建立者","建立日期"],
 [[#Reason1,#ReasonX1,#OtherReason1],#CreateEmpNo1,#CreateDate1],
 ],
@@ -975,11 +960,7 @@ IF(#FunCd == 4,INVOKEJS(SHOW,p2,1,1,0),$)
 T(3,[L2416] 不動產土地擔保品資料登錄)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-!#OResult=X,1,S
 
-!#OResultX=X,10,L
-!IF(#OResult == "Y",T(3,交易成功),T(3,交易失敗))
-!ALERT(#OResultX);
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -1014,18 +995,17 @@ T(3,[L2416] 不動產土地擔保品資料登錄)
 #LandUsageCode
 #LandRentStartDate
 #LandRentEndDate
+#Reason1
+#ReasonX1
+#OtherReason1
+#CreateEmpNo1
+#CreateDate1
 ##loop{times:10,i:1}
 #OwnerId{i}
 #OwnerName{i}
 #OwnerRelCode{i}
 #OwnerPart{i}
 #OwnerTotal{i}
-##end
-##loop{times:10,i:1}
-#Reason{i}
-#OtherReason{i}
-#CreateEmpNo{i}
-#CreateDate{i}
 ##end
 #END
 </sub>

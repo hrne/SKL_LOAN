@@ -22,14 +22,14 @@ import com.st1.itx.db.domain.SlipMedia2022Id;
  */
 public interface SlipMedia2022RepositoryHist extends JpaRepository<SlipMedia2022, SlipMedia2022Id> {
 
-  // AcDate = ,AND BatchNo = ,AND MediaSeq =
-  public Slice<SlipMedia2022> findAllByAcDateIsAndBatchNoIsAndMediaSeqIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAscAcSubBookCodeAsc(int acDate_0, int batchNo_1, int mediaSeq_2, Pageable pageable);
+  // AcDate = ,AND BatchNo = ,AND MediaSeq = ,AND LatestFlag = 
+  public Slice<SlipMedia2022> findAllByAcDateIsAndBatchNoIsAndMediaSeqIsAndLatestFlagIsOrderByMediaSlipNoAscSeqAsc(int acDate_0, int batchNo_1, int mediaSeq_2, String latestFlag_3, Pageable pageable);
 
   // AcDate = ,AND BatchNo = 
-  public Slice<SlipMedia2022> findAllByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqAscMediaSlipNoAscAcBookCodeAscSeqAsc(int acDate_0, int batchNo_1, Pageable pageable);
+  public Slice<SlipMedia2022> findAllByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(int acDate_0, int batchNo_1, Pageable pageable);
 
   // AcDate = ,AND BatchNo = 
-  public Optional<SlipMedia2022> findTopByAcDateIsAndBatchNoIsOrderByAcDateAscBatchNoAscMediaSeqDesc(int acDate_0, int batchNo_1);
+  public Optional<SlipMedia2022> findTopByAcDateIsAndBatchNoIsOrderByMediaSlipNoAscSeqAsc(int acDate_0, int batchNo_1);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

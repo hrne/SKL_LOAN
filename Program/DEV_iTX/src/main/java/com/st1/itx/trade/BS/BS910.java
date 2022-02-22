@@ -19,7 +19,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.Ias39LoanCommit;
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
-import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.service.Ias39LoanCommitService;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.service.AcDetailService;
@@ -71,6 +70,7 @@ public class BS910 extends TradeBuffer {
 	private int iAcDate;
 	private int iAcDateReverse;
 	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
+	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -86,7 +86,7 @@ public class BS910 extends TradeBuffer {
 		TxBizDate tTxBizDate = dateUtil.getForTxBizDate(true);// 若1號為假日,參數true則會找次一營業日,不會踢錯誤訊息
 
 		iAcDate = tTxBizDate.getTmnDy();// 畫面輸入年月的月底日
-		// 迴轉上個月底營業日
+		// 迴轉上個月底日
 		iAcDateReverse = tTxBizDate.getLmnDy();
 		this.info("BS910 iAcDate = " + iAcDate + ",iAcDateReverse=" + iAcDateReverse);
 
@@ -98,12 +98,39 @@ public class BS910 extends TradeBuffer {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
 		}
 
+		// 刪除提存當月AcDetal:96
+		this.info("2-1.bs910 delete AcDetal-96, yearMonth=" + yearMonth);
+		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 96, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slAcDetail != null) {
+			lAcDetail = new ArrayList<AcDetail>();
+			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
+			try {
+				acDetailService.deleteAll(lAcDetail, titaVo); // delete AcDetail
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "AcDetail delete " + e.getErrorMsg());
+			}
+		}
+		// 刪除提存當月AcDetal:97
+		this.info("2-2.bs910 delete AcDetal-97, yearMonth=" + yearMonth);
+		slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 97, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slAcDetail != null) {
+			lAcDetail = new ArrayList<AcDetail>();
+			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
+			try {
+				acDetailService.deleteAll(lAcDetail, titaVo); // delete AcDetail
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "AcDetail delete " + e.getErrorMsg());
+			}
+		}
+		
 		// 3.迴轉上月
-		this.info("3.bs900 last month ACCL03");
+		this.info("3.bs910 last month ACCL03");
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		// 2.迴轉上月
-		this.info("3.bs900 last month ACCL03");
-		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 96, this.index,
+		this.info("3.bs910 last month ACCL03");
+		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 96, this.index,
 				Integer.MAX_VALUE, titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
@@ -132,6 +159,11 @@ public class BS910 extends TradeBuffer {
 				}
 			}
 			this.info("3.last month ACCL03 " + lTxToDoDetail.size());
+			// 應處理明細檔
+			if (lTxToDoDetail != null && lTxToDoDetail.size() > 0) {
+				txToDoCom.addByDetailList(false, 0, lTxToDoDetail, titaVo); // DupSkip = false ->重複 error
+			}
+
 		}
 
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
@@ -205,6 +237,7 @@ public class BS910 extends TradeBuffer {
 		tTempVo.putParam("AcDate", iAcDate);
 		tTempVo.putParam("SlipBatNo", "96");
 		tTempVo.putParam("AcclType", "放款承諾提存");
+		tTempVo.putParam("AcctCode", "LC1");
 		tTempVo.putParam("AcBookCode", acBookCode); // 帳冊別
 		tTempVo.putParam("AcSubBookCode", acSubBookCode);// 區隔帳冊
 		tTempVo.putParam("SlipNote", "");

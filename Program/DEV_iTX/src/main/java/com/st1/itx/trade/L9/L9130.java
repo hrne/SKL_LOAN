@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L9;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -111,7 +110,7 @@ public class L9130 extends TradeBuffer {
 			return this.sendList();
 		}
 
-		List<String> listMediaSeq = doRpt(titaVo);
+		doRpt(titaVo);
 
 		// MSG帶入預設值
 		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9130", 60) + iAcDate;
@@ -121,10 +120,7 @@ public class L9130 extends TradeBuffer {
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
 				"L9130核心傳票媒體檔產生已完成", titaVo);
 
-		for (String tmpMediaSeq : listMediaSeq) {
-			titaVo.putParam("MediaSeq", tmpMediaSeq);
-			tranL9131.run(titaVo);
-		}
+		tranL9131.run(titaVo);
 
 		tranL9132.run(titaVo);
 
@@ -145,7 +141,7 @@ public class L9130 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	public List<String> doRpt(TitaVo titaVo) throws LogicException {
+	public void doRpt(TitaVo titaVo) throws LogicException {
 		this.info("L9130 doRpt started.");
 
 //		String parentTranCode = titaVo.getTxcd();
@@ -154,10 +150,8 @@ public class L9130 extends TradeBuffer {
 
 		// 撈資料組報表
 //		l9130Report.exec(titaVo);
-		List<String> listMediaSeq = l9130Report2022.exec(titaVo);
+		l9130Report2022.exec(titaVo);
 
 		this.info("L9130 doRpt finished.");
-
-		return listMediaSeq;
 	}
 }

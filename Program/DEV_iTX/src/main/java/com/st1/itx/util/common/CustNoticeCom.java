@@ -106,7 +106,7 @@ public class CustNoticeCom extends TradeBuffer {
 	 * @param formNo 程式ID or 報表ID
 	 * @param custNo 戶號
 	 * @param facmNo 額度
-	 * @param titaVo
+	 * @param titaVo TitaVo
 	 * @return NoticeFlag = 2:簡訊 ＞ 3:電郵 ＞ 1:書信 ＞ 4.不寄送 <br>
 	 *         isMessage Y.發送簡訊<br>
 	 *         isEmail Y.發送電郵<br>
@@ -478,7 +478,7 @@ public class CustNoticeCom extends TradeBuffer {
 		if (!messPhone.isEmpty()) {
 			messagePhoneNo = messPhone;
 		}
-		
+
 		return messagePhoneNo;
 	}
 

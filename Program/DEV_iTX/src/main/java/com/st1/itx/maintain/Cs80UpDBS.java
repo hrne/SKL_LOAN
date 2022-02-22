@@ -20,7 +20,9 @@ import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxFlowId;
+import com.st1.itx.db.domain.TxInquiry;
 import com.st1.itx.db.service.TxFlowService;
+import com.st1.itx.db.service.TxInquiryService;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxCruiser;
 import com.st1.itx.db.domain.TxCruiserId;
@@ -45,6 +47,9 @@ public class Cs80UpDBS extends CommBuffer {
 
 	@Autowired
 	private TxRecordService txRecordService;
+
+	@Autowired
+	private TxInquiryService txInquiryService;
 
 	@Autowired
 	private CustMainService custMainService;
@@ -152,15 +157,18 @@ public class Cs80UpDBS extends CommBuffer {
 		}
 
 		// 2022.2.9 by eric
-//		if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTxcdInq() && !this.titaVo.isTxcdRim() && this.titaVo.getReturnIndex() <= 1) {
-//			TotaVo tota = this.totaVoList.get(0);
-//			if (!tota.isError()) {
-//				this.insTxRecord(tota);
-//			}
-//		}
+		if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTxcdInq() && !this.titaVo.isTxcdRim() && !this.titaVo.isRim() && this.titaVo.getReturnIndex() <= 1) {
+			TotaVo tota = this.totaVoList.get(0);
+//			if (!"EC998".equals(tota.getMsgId())) {
+			if (!tota.isError()) {
+				this.insTxInquiry(tota);
+			}
+		}
 
 		// 2022.1.11 by eric
-		if (!this.titaVo.isTxcdSpecial()) {
+		if (!this.titaVo.isTxcdSpecial())
+
+		{
 			TotaVo tota = this.totaVoList.get(0);
 			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
 				this.custRmk();
@@ -494,6 +502,50 @@ public class Cs80UpDBS extends CommBuffer {
 			} else {
 				throw new LogicException("EC003", "交易記錄檔(TxRecord)" + txRecordId.getEntdy() + "-" + txRecordId.getTxNo() + ":" + e.getErrorMsg());
 			}
+		} catch (JsonProcessingException e) {
+			throw new LogicException("EC009", "MtRecord titaVo 轉換失敗");
+		}
+	}
+
+	private void insTxInquiry(TotaVo tota) throws LogicException {
+
+		TxInquiry txInquiry = new TxInquiry();
+
+		txInquiry.setEntdy(this.titaVo.getEntDyI());
+		txInquiry.setCalDate(this.parse.stringToInteger(this.titaVo.getCalDy()) + 19110000);
+		txInquiry.setBrNo(this.titaVo.getKinbr());
+		txInquiry.setTlrNo(this.titaVo.getTlrNo());
+		txInquiry.setSupNo(this.titaVo.getSupNo());
+		txInquiry.setTranNo(this.titaVo.getTxCode());
+		txInquiry.setMrKey(this.titaVo.getMrKey());
+
+		txInquiry.setMsgId(tota.getMsgId());
+		if (tota.isError()) {
+			// 交易失敗
+			txInquiry.setTxResult("E");
+			txInquiry.setErrMsg(tota.get("ERRMSG").toString());
+		} else {
+			txInquiry.setTxResult("S");
+			txInquiry.setErrMsg("");
+		}
+
+		if (!this.titaVo.getReason().isEmpty()) {
+			txInquiry.setImportFg("1");
+		} else {
+			txInquiry.setImportFg("0");
+		}
+
+		try {
+			/* E-Loan 完整電文 */
+			if (this.titaVo.isEloan()) {
+				txInquiry.setTranData(this.titaVo.getOrgTitaVO());
+			} else {
+				txInquiry.setTranData(new ObjectMapper().writeValueAsString(this.titaVo));
+			}
+
+			txInquiryService.insert(txInquiry);
+		} catch (DBException e) {
+			throw new LogicException("EC002", "查詢紀錄檔(TxInquiry):" + e.getErrorMsg());
 		} catch (JsonProcessingException e) {
 			throw new LogicException("EC009", "MtRecord titaVo 轉換失敗");
 		}

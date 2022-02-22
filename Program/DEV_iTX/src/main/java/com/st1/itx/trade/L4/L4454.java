@@ -89,6 +89,9 @@ public class L4454 extends TradeBuffer {
 	public L4454Report3 l4454Report3;
 
 	@Autowired
+	public L4454Report4 l4454Report4;
+	
+	@Autowired
 	public TxToDoCom txToDoCom;
 
 	@Autowired
@@ -513,6 +516,7 @@ public class L4454 extends TradeBuffer {
 		  titaVo.putParam("CONDITION1", "A");	
 		  this.info("go l9705ListA size="+ l9705ListA.size());
 		  l9705Report.exec(l9705ListA, titaVo, this.getTxBuffer());
+		  l4454Report4.exec(titaVo, l9705ListA);
 		} 
 		
 		if(l9705ListB.size() > 0) {
@@ -520,6 +524,7 @@ public class L4454 extends TradeBuffer {
 		  this.info("go l9705ListB size=" + + l9705ListB.size());
 		  l9705Report.exec(l9705ListB, titaVo, this.getTxBuffer());
 		  l9705Form.exec(l9705ListB, titaVo, this.getTxBuffer());
+		  l4454Report4.exec(titaVo, l9705ListB);
 		}
 	}
 

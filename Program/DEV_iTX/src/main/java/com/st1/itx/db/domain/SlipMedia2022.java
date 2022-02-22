@@ -29,7 +29,7 @@ public class SlipMedia2022 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3867938910759649320L;
+	private static final long serialVersionUID = 2529265719607915903L;
 
 @EmbeddedId
   private SlipMedia2022Id slipMedia2022Id;
@@ -40,16 +40,17 @@ public class SlipMedia2022 implements Serializable {
   private String acBookCode;
 
   // 傳票號碼
-  /* F10+民國年+月份(1碼)+日期+3碼序號 */
+  /* F10+民國年+月份(1碼)+日期+3碼序號*3碼序號，從CdGSeq取號 */
   @Column(name = "`MediaSlipNo`", length = 12, insertable = false, updatable = false)
   private String mediaSlipNo;
 
   // 傳票明細序號
-  /* 以相同傳票號碼編立流水號 */
+  /* 以相同傳票號碼(MediaSlipNo)編立流水號 */
   @Column(name = "`Seq`", insertable = false, updatable = false)
   private int seq = 0;
 
   // 傳票日期
+  /* 一般情況都是會計日期(營業日)僅月底提存時，會是月底日期(日曆日) */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -57,8 +58,8 @@ public class SlipMedia2022 implements Serializable {
   @Column(name = "`BatchNo`")
   private int batchNo = 0;
 
-  // 媒體檔上傳序號
-  /* 同單位別、會計日期、傳票批號時，根據帳冊別代碼依序給予序號ROW_NUMBER() OVER (PARTITION BY BranchNo,AcDate,BatchNo ORDER BY AcBookCode)*要注意重複產生傳票媒體時,應先取最後一筆序號為基數 */
+  // 上傳核心序號
+  /* 相關說明有二:1.關帳時,由L6101連動,以AcClose.CoreSeqNo放在titaVo.MediaSeq傳入2.上傳EBS Webservice此欄位使用於ETL批號(GROUP_ID) */
   @Column(name = "`MediaSeq`")
   private int mediaSeq = 0;
 
@@ -147,6 +148,11 @@ public class SlipMedia2022 implements Serializable {
   @Column(name = "`Ifrs17Group`", length = 9)
   private String ifrs17Group;
 
+  // 是否為最新
+  /* Y:是N:否 */
+  @Column(name = "`LatestFlag`", length = 1)
+  private String latestFlag;
+
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -198,6 +204,7 @@ public class SlipMedia2022 implements Serializable {
 /**
 	* 傳票號碼<br>
 	* F10+民國年+月份(1碼)+日期+3碼序號
+*3碼序號，從CdGSeq取號
 	* @return String
 	*/
   public String getMediaSlipNo() {
@@ -207,6 +214,7 @@ public class SlipMedia2022 implements Serializable {
 /**
 	* 傳票號碼<br>
 	* F10+民國年+月份(1碼)+日期+3碼序號
+*3碼序號，從CdGSeq取號
   *
   * @param mediaSlipNo 傳票號碼
 	*/
@@ -216,7 +224,7 @@ public class SlipMedia2022 implements Serializable {
 
 /**
 	* 傳票明細序號<br>
-	* 以相同傳票號碼編立流水號
+	* 以相同傳票號碼(MediaSlipNo)編立流水號
 	* @return Integer
 	*/
   public int getSeq() {
@@ -225,7 +233,7 @@ public class SlipMedia2022 implements Serializable {
 
 /**
 	* 傳票明細序號<br>
-	* 以相同傳票號碼編立流水號
+	* 以相同傳票號碼(MediaSlipNo)編立流水號
   *
   * @param seq 傳票明細序號
 	*/
@@ -235,7 +243,8 @@ public class SlipMedia2022 implements Serializable {
 
 /**
 	* 傳票日期<br>
-	* 
+	* 一般情況都是會計日期(營業日)
+僅月底提存時，會是月底日期(日曆日)
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -244,7 +253,8 @@ public class SlipMedia2022 implements Serializable {
 
 /**
 	* 傳票日期<br>
-	* 
+	* 一般情況都是會計日期(營業日)
+僅月底提存時，會是月底日期(日曆日)
   *
   * @param acDate 傳票日期
   * @throws LogicException when Date Is Warn	*/
@@ -272,12 +282,10 @@ public class SlipMedia2022 implements Serializable {
   }
 
 /**
-	* 媒體檔上傳序號<br>
-	* 同單位別、會計日期、傳票批號時，根據帳冊別代碼依序給予序號
-ROW_NUMBER() OVER (
-PARTITION BY BranchNo,AcDate,BatchNo 
-ORDER BY AcBookCode)
-*要注意重複產生傳票媒體時,應先取最後一筆序號為基數
+	* 上傳核心序號<br>
+	* 相關說明有二:
+1.關帳時,由L6101連動,以AcClose.CoreSeqNo放在titaVo.MediaSeq傳入
+2.上傳EBS Webservice此欄位使用於ETL批號(GROUP_ID)
 	* @return Integer
 	*/
   public int getMediaSeq() {
@@ -285,14 +293,12 @@ ORDER BY AcBookCode)
   }
 
 /**
-	* 媒體檔上傳序號<br>
-	* 同單位別、會計日期、傳票批號時，根據帳冊別代碼依序給予序號
-ROW_NUMBER() OVER (
-PARTITION BY BranchNo,AcDate,BatchNo 
-ORDER BY AcBookCode)
-*要注意重複產生傳票媒體時,應先取最後一筆序號為基數
+	* 上傳核心序號<br>
+	* 相關說明有二:
+1.關帳時,由L6101連動,以AcClose.CoreSeqNo放在titaVo.MediaSeq傳入
+2.上傳EBS Webservice此欄位使用於ETL批號(GROUP_ID)
   *
-  * @param mediaSeq 媒體檔上傳序號
+  * @param mediaSeq 上傳核心序號
 	*/
   public void setMediaSeq(int mediaSeq) {
     this.mediaSeq = mediaSeq;
@@ -680,6 +686,27 @@ C:貸
   }
 
 /**
+	* 是否為最新<br>
+	* Y:是
+N:否
+	* @return String
+	*/
+  public String getLatestFlag() {
+    return this.latestFlag == null ? "" : this.latestFlag;
+  }
+
+/**
+	* 是否為最新<br>
+	* Y:是
+N:否
+  *
+  * @param latestFlag 是否為最新
+	*/
+  public void setLatestFlag(String latestFlag) {
+    this.latestFlag = latestFlag;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -762,6 +789,7 @@ C:貸
            + ", acNoCode=" + acNoCode + ", acSubCode=" + acSubCode + ", deptCode=" + deptCode + ", dbCr=" + dbCr + ", txAmt=" + txAmt + ", slipRmk=" + slipRmk
            + ", receiveCode=" + receiveCode + ", costMonth=" + costMonth + ", insuNo=" + insuNo + ", salesmanCode=" + salesmanCode + ", salaryCode=" + salaryCode + ", currencyCode=" + currencyCode
            + ", acSubBookCode=" + acSubBookCode + ", CostUnit=" + CostUnit + ", salesChannelType=" + salesChannelType + ", ifrsType=" + ifrsType + ", relationId=" + relationId + ", relateCode=" + relateCode
-           + ", ifrs17Group=" + ifrs17Group + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", ifrs17Group=" + ifrs17Group + ", latestFlag=" + latestFlag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

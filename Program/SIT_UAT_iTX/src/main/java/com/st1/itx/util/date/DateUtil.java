@@ -470,10 +470,10 @@ public class DateUtil extends SysLogger {
 	}
 
 	/**
-	 * 營業日期相關資料
 	 * 
+	 * @param isThrowError isThrowError
 	 * @return TxBizDate
-	 * @throws LogicException when isHolidySkip Non or False Date_1 is Holiday
+	 * @throws LogicException ..
 	 */
 	public TxBizDate getForTxBizDate(boolean... isThrowError) throws LogicException {
 		int year = this.date_1.getYear();

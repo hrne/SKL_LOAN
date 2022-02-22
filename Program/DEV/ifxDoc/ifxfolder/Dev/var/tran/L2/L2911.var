@@ -84,12 +84,8 @@ E(0,40)ASGN(INQPRT$)
 ]
 
 #FdClCode1=X,2,L
-T(3,*)
 #FdClCode2=X,2,L
-T(3,*)
 #FdClNo=X,2,L
-T(3,*)
-
 #FdClTypeCode=X,2,L
 #FdEvaDate=X,2,L
 #FdEvaNetWorth=X,2,L

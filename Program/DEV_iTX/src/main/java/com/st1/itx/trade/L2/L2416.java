@@ -88,7 +88,6 @@ public class L2416 extends TradeBuffer {
 	private ClLandOwner tClLandOwner = new ClLandOwner();
 	private ClLandReason tClLandReason = new ClLandReason();
 	private List<ClLandOwner> lClLandOwner = new ArrayList<ClLandOwner>();
-	private List<ClLandReason> lClLandReason = new ArrayList<ClLandReason>();
 	private boolean isEloan = false;
 
 	@Override
@@ -190,9 +189,6 @@ public class L2416 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品不動產土地檔");
 				}
-				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec("修改擔保品不動產土地檔");
 
 				// delete 土地所有權人
 				deleteClLandOwner(titaVo);
@@ -202,6 +198,11 @@ public class L2416 extends TradeBuffer {
 				deleteClLandReason(titaVo);
 				// insert 土地修改原因檔
 				InsertClLandReason(titaVo);
+				
+				// 紀錄變更前變更後
+				dataLog.setEnv(titaVo, beforeClLand, tClLand);
+				dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
+				
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
 
@@ -403,48 +404,41 @@ public class L2416 extends TradeBuffer {
 
 	// insert 土地修改原因檔
 	private void InsertClLandReason(TitaVo titaVo) throws LogicException {
-		lClLandReason = new ArrayList<ClLandReason>();
-		for (int i = 1; i <= 10; i++) {
-			// 若該筆無資料就離開迴圈
-			if (titaVo.getParam("Reason" + i) == null || titaVo.getParam("Reason" + i).trim().isEmpty()) {
-				break;
-			}
+
 			tClLandReason = new ClLandReason();
 			clLandReasonId = new ClLandReasonId();
 
 			clLandReasonId.setClCode1(iClCode1);
 			clLandReasonId.setClCode2(iClCode2);
 			clLandReasonId.setClNo(iClNo);
-			clLandReasonId.setReasonSeq(i);
 
 			tClLandReason.setClLandReasonId(clLandReasonId);
 			tClLandReason.setClCode1(iClCode1);
 			tClLandReason.setClCode2(iClCode2);
 			tClLandReason.setClNo(iClNo);
-			tClLandReason.setReasonSeq(i);
-			tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason" + i)));
-			tClLandReason.setOtherReason(titaVo.getParam("OtherReason" + i));
 
-			tClLandReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo" + i));
-			tClLandReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo" + i));
+			tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
+			tClLandReason.setOtherReason(titaVo.getParam("OtherReason1"));
+
+			tClLandReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
+			tClLandReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
 
 			try {
 				sClLandReasonService.insert(tClLandReason, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "擔保品土地修改原因檔");
 			}
-		}
+
 	}
 
 	// insert 土地修改原因檔
 	private void deleteClLandReason(TitaVo titaVo) throws LogicException {
 
-		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE);
-		lClLandReason = slClLandReason == null ? null : slClLandReason.getContent();
-		if (lClLandReason != null && lClLandReason.size() > 0) {
+		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
+		
+		if (tClLandReason != null) {
 			try {
-				sClLandReasonService.deleteAll(lClLandReason);
+				sClLandReasonService.delete(tClLandReason);
 			} catch (DBException e) {
 				throw new LogicException("E0008", "擔保品土地修改原因檔");
 			}

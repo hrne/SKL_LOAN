@@ -36,17 +36,18 @@ public interface SlipMedia2022Service {
   public Slice<SlipMedia2022> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = ,AND BatchNo = ,AND MediaSeq =
+   * AcDate = ,AND BatchNo = ,AND MediaSeq = ,AND LatestFlag = 
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
    * @param mediaSeq_2 mediaSeq_2
+   * @param latestFlag_3 latestFlag_3
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice SlipMedia2022 SlipMedia2022 of List
    */
-  public Slice<SlipMedia2022> findMediaSeq(int acDate_0, int batchNo_1, int mediaSeq_2, int index, int limit, TitaVo... titaVo);
+  public Slice<SlipMedia2022> findMediaSeq(int acDate_0, int batchNo_1, int mediaSeq_2, String latestFlag_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate = ,AND BatchNo = 

@@ -22,12 +22,12 @@ public class SlipMedia2022Id implements Serializable {
 	private static final long serialVersionUID = -1828069018445059553L;
 
 // 傳票號碼
-  /* F10+民國年+月份(1碼)+日期+3碼序號 */
+  /* F10+民國年+月份(1碼)+日期+3碼序號*3碼序號，從CdGSeq取號 */
   @Column(name = "`MediaSlipNo`", length = 12)
   private String mediaSlipNo = " ";
 
   // 傳票明細序號
-  /* 以相同傳票號碼編立流水號 */
+  /* 以相同傳票號碼(MediaSlipNo)編立流水號 */
   @Column(name = "`Seq`")
   private int seq = 0;
 
@@ -42,6 +42,7 @@ public class SlipMedia2022Id implements Serializable {
 /**
 	* 傳票號碼<br>
 	* F10+民國年+月份(1碼)+日期+3碼序號
+*3碼序號，從CdGSeq取號
 	* @return String
 	*/
   public String getMediaSlipNo() {
@@ -51,6 +52,7 @@ public class SlipMedia2022Id implements Serializable {
 /**
 	* 傳票號碼<br>
 	* F10+民國年+月份(1碼)+日期+3碼序號
+*3碼序號，從CdGSeq取號
   *
   * @param mediaSlipNo 傳票號碼
 	*/
@@ -60,7 +62,7 @@ public class SlipMedia2022Id implements Serializable {
 
 /**
 	* 傳票明細序號<br>
-	* 以相同傳票號碼編立流水號
+	* 以相同傳票號碼(MediaSlipNo)編立流水號
 	* @return Integer
 	*/
   public int getSeq() {
@@ -69,7 +71,7 @@ public class SlipMedia2022Id implements Serializable {
 
 /**
 	* 傳票明細序號<br>
-	* 以相同傳票號碼編立流水號
+	* 以相同傳票號碼(MediaSlipNo)編立流水號
   *
   * @param seq 傳票明細序號
 	*/

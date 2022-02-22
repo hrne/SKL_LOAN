@@ -1146,7 +1146,6 @@ C(5,#FacmOnlyFlag,Y,S,$)
 C(5,#OvduFlag,Y,S,$)
 C(3,#WkRateAdjFreq,1,$,S)
 D(8)
-IF(#RateCode1=="3" && #RateCode2=="" && #RateAdjFreq2=="" && #FirstRateAdjDate2==0,s,$)
 @
 A(DATE,0,#NextRateAdjDate2)
 V(5,#FirstRateAdjDate2,#L3r02MaturityDate)

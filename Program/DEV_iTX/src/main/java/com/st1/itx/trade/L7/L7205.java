@@ -135,7 +135,7 @@ public class L7205 extends TradeBuffer {
 			} else {
 				tMonthlyFacBal.setAssetClass(assetclass);
 				try {
-					tMothlyFacBalService.update(tMonthlyFacBal);
+					tMothlyFacBalService.update(tMonthlyFacBal, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
@@ -153,7 +153,7 @@ public class L7205 extends TradeBuffer {
 			} else {
 				tIfrs9FacData.setAssetClass(parse.stringToInteger(assetclass));
 				try {
-					tIfrs9FacDataService.update(tIfrs9FacData);
+					tIfrs9FacDataService.update(tIfrs9FacData, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
@@ -169,7 +169,7 @@ public class L7205 extends TradeBuffer {
 				for (Ias34Ap t : lIas34Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
 					try {
-						tIas34ApService.update(t);
+						tIas34ApService.update(t, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
@@ -187,7 +187,7 @@ public class L7205 extends TradeBuffer {
 				for (LoanIfrs9Ap t : lLoanIfrs9Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
 					try {
-						tLoanIfrs9ApService.update(t);
+						tLoanIfrs9ApService.update(t, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}

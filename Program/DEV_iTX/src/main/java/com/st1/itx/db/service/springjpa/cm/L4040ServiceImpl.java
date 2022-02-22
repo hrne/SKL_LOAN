@@ -16,7 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4040ServiceImpl")
@@ -32,9 +31,6 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	// *** 折返控制相關 ***
 	private int index;
@@ -175,7 +171,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += "   and a.\"PropDate\" >= " + iPropDate;
 			}
 			if (iPropDate == 0 && iCustNo == 0) {
-				sql += "   and a.\"PropDate\" != " + propDate;
+				sql += "   and a.\"PropDate\" = 0 " ;
 			}
 			if (iCreateFlag == 3) {
 				sql += "   and a.\"CreateFlag\" = 'A'";
