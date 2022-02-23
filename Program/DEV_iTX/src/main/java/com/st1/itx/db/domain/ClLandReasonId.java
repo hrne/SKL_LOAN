@@ -19,7 +19,7 @@ public class ClLandReasonId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1639562887909880021L;
+	private static final long serialVersionUID = -3141843187230856295L;
 
 // 擔保品-代號1
   @Column(name = "`ClCode1`")
@@ -33,13 +33,18 @@ public class ClLandReasonId implements Serializable {
   @Column(name = "`ClNo`")
   private int clNo = 0;
 
+  // 土地序號
+  @Column(name = "`LandSeq`")
+  private int landSeq = 0;
+
   public ClLandReasonId() {
   }
 
-  public ClLandReasonId(int clCode1, int clCode2, int clNo) {
+  public ClLandReasonId(int clCode1, int clCode2, int clNo, int landSeq) {
     this.clCode1 = clCode1;
     this.clCode2 = clCode2;
     this.clNo = clNo;
+    this.landSeq = landSeq;
   }
 
 /**
@@ -99,10 +104,29 @@ public class ClLandReasonId implements Serializable {
     this.clNo = clNo;
   }
 
+/**
+	* 土地序號<br>
+	* 
+	* @return Integer
+	*/
+  public int getLandSeq() {
+    return this.landSeq;
+  }
+
+/**
+	* 土地序號<br>
+	* 
+  *
+  * @param landSeq 土地序號
+	*/
+  public void setLandSeq(int landSeq) {
+    this.landSeq = landSeq;
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(clCode1, clCode2, clNo);
+    return Objects.hash(clCode1, clCode2, clNo, landSeq);
   }
 
   @Override
@@ -112,11 +136,11 @@ public class ClLandReasonId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     ClLandReasonId clLandReasonId = (ClLandReasonId) obj;
-    return clCode1 == clLandReasonId.clCode1 && clCode2 == clLandReasonId.clCode2 && clNo == clLandReasonId.clNo;
+    return clCode1 == clLandReasonId.clCode1 && clCode2 == clLandReasonId.clCode2 && clNo == clLandReasonId.clNo && landSeq == clLandReasonId.landSeq;
   }
 
   @Override
   public String toString() {
-    return "ClLandReasonId [clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + "]";
+    return "ClLandReasonId [clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", landSeq=" + landSeq + "]";
   }
 }

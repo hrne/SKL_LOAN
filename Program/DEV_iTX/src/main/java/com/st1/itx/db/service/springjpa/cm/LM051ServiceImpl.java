@@ -1,7 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -35,49 +33,10 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll(TitaVo titaVo, int groupNum) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth, int groupNum) throws Exception {
 
 		this.info("lM051.findAll ");
-
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("thisMonthEndDate=" + thisMonthEndDate);
-
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
-		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
-		this.info("yymm:" + iYearMonth);
+		this.info("yearMonth="+yearMonth + "-" + groupNum);
 
 		// 0
 		String groupSelect1 = "	WHERE M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"Status\" = 0 ";
@@ -213,55 +172,16 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", iYearMonth);
+		query.setParameter("yymm",String.valueOf(yearMonth));
 		return this.convertToMap(query);
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll2(TitaVo titaVo, int formNum) throws Exception {
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth,int formNum) throws Exception {
 
 		this.info("lM051.findAll2");
 
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("thisMonthEndDate=" + thisMonthEndDate);
-
-	
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
-		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
-		this.info("yymm:" + iYearMonth);
+		this.info("yearMonth="+yearMonth + "-" + formNum);
 
 		String sql = " ";
 		if (formNum == 1) {
@@ -390,7 +310,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", iYearMonth);
+		query.setParameter("yymm",String.valueOf(yearMonth) );
 		return this.convertToMap(query);
 	}
 

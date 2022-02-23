@@ -91,9 +91,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "LandSeq"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "LandSeq"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clLandReasonReposDay.findAll(pageable);
@@ -111,26 +111,26 @@ em = null;
   }
 
   @Override
-  public ClLandReason clNoFirst(int clCode1_0, int clCode2_1, int clNo_2, TitaVo... titaVo) {
+  public ClLandReason clNoFirst(int clCode1_0, int clCode2_1, int clNo_2, int landSeq_3, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("clNoFirst " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("clNoFirst " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " landSeq_3 : " +  landSeq_3);
     Optional<ClLandReason> clLandReasonT = null;
     if (dbName.equals(ContentName.onDay))
-      clLandReasonT = clLandReasonReposDay.findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2);
+      clLandReasonT = clLandReasonReposDay.findTopByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3);
     else if (dbName.equals(ContentName.onMon))
-      clLandReasonT = clLandReasonReposMon.findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2);
+      clLandReasonT = clLandReasonReposMon.findTopByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3);
     else if (dbName.equals(ContentName.onHist))
-      clLandReasonT = clLandReasonReposHist.findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2);
+      clLandReasonT = clLandReasonReposHist.findTopByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3);
     else 
-      clLandReasonT = clLandReasonRepos.findTopByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2);
+      clLandReasonT = clLandReasonRepos.findTopByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3);
 
     return clLandReasonT.isPresent() ? clLandReasonT.get() : null;
   }
 
   @Override
-  public Slice<ClLandReason> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClLandReason> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int landSeq_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClLandReason> slice = null;
     if (titaVo.length != 0)
@@ -141,15 +141,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("clNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("clNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " landSeq_3 : " +  landSeq_3);
     if (dbName.equals(ContentName.onDay))
-      slice = clLandReasonReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clLandReasonReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clLandReasonReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clLandReasonReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clLandReasonReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clLandReasonReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3, pageable);
     else 
-      slice = clLandReasonRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clLandReasonRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndLandSeqIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, landSeq_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

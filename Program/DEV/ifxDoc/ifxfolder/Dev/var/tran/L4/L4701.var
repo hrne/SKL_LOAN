@@ -1,0 +1,158 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4701)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4701" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4701]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@票據媒體製作"],
+[#<->#,"#FdEntryDate+收票日",#EntryDate,],
+] 
+
+#FdEntryDate=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+! 收票日
+#EntryDate=D,7,L
+T(1,#SYSDATE,2,7)
+
+! 下一營業日
+#NEXT_DATE=D,8,S
+T(4,NBSDY$)
+
+! 版面配置
+#FlagA=A,1,S
+E(0,1)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+![顯示註記]
+#L4701PRT=A,1,S
+C(4,#FlagA,E(0,0),E(0,1))
+![資料表頭(HEADER)長度]
+#L4701HD=n,3,S
+C(4,#FlagA,S,$)E(0,40)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L4701LN=n,3,S
+C(4,#FlagA,S,$)E(0,204)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L4701QPRT=n,2,S
+C(4,#FlagA,S,$)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L4701LOOP=n,3,S
+C(4,#FlagA,S,$)E(0,1)ASGN(LOOPHEIGHT$)
+
+</sub>
+
+!------------ TXFORM = L4701 -----------
+<sub type="FORM" name="L4701" tota-mode="1">
+#OChequeCnt=m,6,O
+C(3,#OChequeCnt,0,E(0,@L4701PRT,0),E(0,@L4701PRT,1))
+
+#OChequeOutCnt=m,6,O
+#OChequeInCnt=m,6,O
+#OChequeTotAmt=m,14,O
+
+! 媒體檔FileNo
+#PdfSnoM=X,8,S
+E(2,@SnoM,#PdfSnoM)
+#SnoM=A,8,S
+
+! 媒體檔FileNo
+#PdfPrtM=A,1,S
+C(3,#OChequeCnt,0,E(0,0),E(0,1))
+C(3,#OChequeCnt,0,s,$)
+C(3,#SnoM,0,E(0,0),E(0,1))
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,O
+#OOCustName=x,20,O
+#OOChequeBank=A,3,O
+#OOChequeBranch=A,4,O
+#OOChequeAcctNo=A,9,O
+#OOChequeNo=A,7,O
+#OOChequeAmt=m,14,O
+#OOOutsideCode=X,1,O
+#OOChequeDate=D,7,O
+#OOAreaCode=X,2,O
+#OOChequeId=X,10,O
+#OOChequeName=x,120,O
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#EntryDate
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4701
+#OChequeCnt
+#OChequeOutCnt
+#OChequeInCnt
+#OChequeTotAmt
+#PdfSnoM
+
+#OOCustNo
+#OOCustName
+#OOChequeBank
+#OOChequeBranch
+#OOChequeAcctNo
+#OOChequeNo
+#OOChequeAmt
+#OOOutsideCode
+#OOChequeDate
+#OOAreaCode
+#OOChequeId
+#OOChequeName
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+#L4701PRT=1,L4701,NA,,D,15
+%
+#OOCustNo
+#OOCustName
+#OOChequeBank
+#OOChequeBranch
+#OOChequeAcctNo
+#OOChequeNo
+#OOChequeAmt
+#OOOutsideCode
+#OOChequeDate
+#OOAreaCode
+#OOChequeId
+#OOChequeName
+@
+#OChequeCnt
+#OChequeInCnt
+#OChequeOutCnt
+#OChequeTotAmt
+^
+#PdfPrtM=1,PDF,,,,,,,,,,,,,PdfSnoM;3,票據媒體檔
+^
+
+</sub>

@@ -175,7 +175,7 @@ public class L2916 extends TradeBuffer {
 		}
 
 		// tita擔保品編號取建物修改原因檔資料list
-		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
+		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, iLandSeq,titaVo);
 
 		// 資料筆數
 		if (lClLandReason == null || lClLandReason.size() == 0) {
@@ -183,7 +183,7 @@ public class L2916 extends TradeBuffer {
 		}
 
 		String CreateDate4 = "";
-		if (tClLandReason.getClLandReasonId() == null) {
+		if (tClLandReason == null) {
 
 			tClLandReason = new ClLandReason();
 

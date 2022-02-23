@@ -26,7 +26,7 @@ public class ClLandReason implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7017686118098412083L;
+	private static final long serialVersionUID = -9210629166187959309L;
 
 @EmbeddedId
   private ClLandReasonId clLandReasonId;
@@ -42,6 +42,10 @@ public class ClLandReason implements Serializable {
   // 擔保品編號
   @Column(name = "`ClNo`", insertable = false, updatable = false)
   private int clNo = 0;
+
+  // 土地序號
+  @Column(name = "`LandSeq`", insertable = false, updatable = false)
+  private int landSeq = 0;
 
   // 修改原因
   /* 1:補齊舊資料2:資料錯誤3:部分塗銷（持分）4:部分塗銷（車位）5:政府機關通知6:其他 */
@@ -134,6 +138,25 @@ public class ClLandReason implements Serializable {
 	*/
   public void setClNo(int clNo) {
     this.clNo = clNo;
+  }
+
+/**
+	* 土地序號<br>
+	* 
+	* @return Integer
+	*/
+  public int getLandSeq() {
+    return this.landSeq;
+  }
+
+/**
+	* 土地序號<br>
+	* 
+  *
+  * @param landSeq 土地序號
+	*/
+  public void setLandSeq(int landSeq) {
+    this.landSeq = landSeq;
   }
 
 /**
@@ -263,7 +286,7 @@ public class ClLandReason implements Serializable {
 
   @Override
   public String toString() {
-    return "ClLandReason [clLandReasonId=" + clLandReasonId + ", reason=" + reason + ", otherReason=" + otherReason + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "ClLandReason [clLandReasonId=" + clLandReasonId + ", reason=" + reason + ", otherReason=" + otherReason
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

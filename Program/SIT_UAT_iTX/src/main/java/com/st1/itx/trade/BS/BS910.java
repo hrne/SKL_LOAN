@@ -37,8 +37,8 @@ import com.st1.itx.util.parse.Parse;
  * 執行時機：月底日EomFinal 月底維護結束自動啟動<br>
  * 
  * 1.讀取IAS39放款承諾明細檔累計提存金額 <br>
- * 2.新增應處理明細－各項提存入帳作業，傳票批號=96<br>
- * 3.依前月底的應處理明細留存檔內容，產生迴轉上月，傳票批號=97<br>
+ * 2.新增應處理明細－各項提存入帳作業，傳票批號=97<br>
+ * 3.依前月底的應處理明細留存檔內容，產生迴轉上月，傳票批號=96<br>
  * 
  * @author LAI
  * @version 1.0.0
@@ -130,7 +130,7 @@ public class BS910 extends TradeBuffer {
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		// 2.迴轉上月
 		this.info("3.bs910 last month ACCL03");
-		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 96, this.index,
+		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 97, this.index,
 				Integer.MAX_VALUE, titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
@@ -139,11 +139,11 @@ public class BS910 extends TradeBuffer {
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 					tTxToDoDetail.setItemCode("ACCL03");
 					tTxToDoDetail.setDtlValue(rvNo);
-					// 迴轉上月(傳票批號:97)
+					// 迴轉上月(傳票批號:96)
 					TempVo tTempVo = new TempVo();
 					tTempVo.clear();
 					tTempVo.putParam("AcDate", iAcDate);
-					tTempVo.putParam("SlipBatNo", "97");
+					tTempVo.putParam("SlipBatNo", "96");
 					tTempVo.putParam("AcclType", "迴轉上月");
 					tTempVo.putParam("AcctCode", "LC1");
 					tTempVo.putParam("AcBookCode", t.getAcBookCode());
@@ -168,7 +168,7 @@ public class BS910 extends TradeBuffer {
 
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 
-		// xxxxx 放款承諾傳票批號設定為 96, 迴轉傳票批號設定為 97
+		// xxxxx 放款承諾傳票批號設定為 97, 迴轉傳票批號設定為 96
 		// 4.寫入應處理清單
 		this.info("4.bs910 TxToDo ThisMonth");
 
@@ -235,7 +235,7 @@ public class BS910 extends TradeBuffer {
 		TempVo tTempVo = new TempVo();
 		tTempVo.clear();
 		tTempVo.putParam("AcDate", iAcDate);
-		tTempVo.putParam("SlipBatNo", "96");
+		tTempVo.putParam("SlipBatNo", "97");
 		tTempVo.putParam("AcclType", "放款承諾提存");
 		tTempVo.putParam("AcctCode", "LC1");
 		tTempVo.putParam("AcBookCode", acBookCode); // 帳冊別

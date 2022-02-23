@@ -138,6 +138,34 @@ em = null;
   }
 
   @Override
+  public Slice<TxInquiry> findImportFg(int calDate_0, int calDate_1, String importFg_2, int custNo_3, int custNo_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<TxInquiry> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findImportFg " + dbName + " : " + "calDate_0 : " + calDate_0 + " calDate_1 : " +  calDate_1 + " importFg_2 : " +  importFg_2 + " custNo_3 : " +  custNo_3 + " custNo_4 : " +  custNo_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = txInquiryReposDay.findAllByCalDateGreaterThanEqualAndCalDateLessThanEqualAndImportFgIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCreateDateAsc(calDate_0, calDate_1, importFg_2, custNo_3, custNo_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = txInquiryReposMon.findAllByCalDateGreaterThanEqualAndCalDateLessThanEqualAndImportFgIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCreateDateAsc(calDate_0, calDate_1, importFg_2, custNo_3, custNo_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = txInquiryReposHist.findAllByCalDateGreaterThanEqualAndCalDateLessThanEqualAndImportFgIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCreateDateAsc(calDate_0, calDate_1, importFg_2, custNo_3, custNo_4, pageable);
+    else 
+      slice = txInquiryRepos.findAllByCalDateGreaterThanEqualAndCalDateLessThanEqualAndImportFgIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCreateDateAsc(calDate_0, calDate_1, importFg_2, custNo_3, custNo_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public TxInquiry holdById(Long logNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

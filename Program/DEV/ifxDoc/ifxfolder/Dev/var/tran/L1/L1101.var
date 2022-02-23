@@ -396,6 +396,9 @@ P(1,@checkIdlen,#CustId)
 C(3,#checkIdlen,10,$,V(P,請輸入正確身分證字號))
 A(ID_UNINO,0,#CustId)
 
+#MRKEY=_,_,S
+T(2,#CustId)
+
 #IdSTAT=A,1,S
 T(4,STAT$)
 C(3,#IdSTAT,4,T(2,@FdPassportNo,#WKSTAR),T(2,@FdPassportNo,#WKSPC))
@@ -1086,7 +1089,7 @@ IF(#FdEmail=="*",V(7),$)
 C(4,#Email,$,A(M,0,#Email))
 </sub>
 
-<sub type="DC" name="p2" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p2" layout="cols=3;screen.width=[250,250,250,400];printer.width=[20,20,20,20];order=1">
 [
 [""],
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
@@ -1144,22 +1147,24 @@ V(H,#YesNoHelp)
 
 #IsSuspectedCheckX=X,4,L
 T(H,#IsSuspectedCheck,#YesNoHelp)
+C(5,#IsSuspectedCheck,Y,SHOW(#IsSuspectedCheckType,#IsSuspectedCheckTypeX),HIDE(#IsSuspectedCheckType,#IsSuspectedCheckTypeX))
 
 #IsSuspectedCheckTypeHelp=X,100,S
 T(3, :請選擇;Y:確認核對無誤)
 
 #IsSuspectedCheckType=X,1,I
 C(3,#FunCd,5,s,$)
+C(5,#IsSuspectedCheck,Y,$,S)
 HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
 V(H,#IsSuspectedCheckTypeHelp)
 
-#IsSuspectedCheckTypeX=X,4,L
+#IsSuspectedCheckTypeX=X,12,L
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 </sub>
-<sub type="DC" name="p3" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p3" layout="cols=3;screen.width=[250,250,250,400];printer.width=[20,20,20,20];order=1">
 [
 [""],
 [#<->#,"#FdEduCode+教育程度代號",#EduCode,#EduCodeX],

@@ -11,6 +11,7 @@ create table "TxInquiry" (
   "SupNo" varchar2(6),
   "TranNo" varchar2(5),
   "MrKey" varchar2(20),
+  "CustNo" decimal(7, 0) default 0 not null,
   "TxResult" varchar2(1),
   "MsgId" varchar2(5),
   "ErrMsg" nvarchar2(300),
@@ -37,6 +38,7 @@ comment on column "TxInquiry"."TlrNo" is '使用者編號';
 comment on column "TxInquiry"."SupNo" is '主管編號';
 comment on column "TxInquiry"."TranNo" is '交易代號';
 comment on column "TxInquiry"."MrKey" is '交易編號/帳號';
+comment on column "TxInquiry"."CustNo" is '戶號';
 comment on column "TxInquiry"."TxResult" is '交易結果';
 comment on column "TxInquiry"."MsgId" is '訊息代號';
 comment on column "TxInquiry"."ErrMsg" is '錯誤訊息';

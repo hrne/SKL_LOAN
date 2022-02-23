@@ -39,7 +39,14 @@ public class LM051 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LM051 ");
 
-		lM051report.exec(titaVo);
+		// 帳務日(民國)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdy();
+		// 月底日(民國)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdy();
+		// 上個月底日(民國)
+//		int lmndy = this.txBuffer.getTxCom().getLmndy();
+
+		lM051report.exec(titaVo, tbsdy, mfbsdy);
 
 	}
 }

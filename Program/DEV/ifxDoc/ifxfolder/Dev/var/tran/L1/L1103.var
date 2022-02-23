@@ -636,7 +636,7 @@ E(0,#BirthdayBef)
 #BirthdayAft8=D,8,S
 E(0,#BirthdayAft)
 
-#Birthdaydiff=+n,8,L
+#Birthdaydiff=+n,8,S
 E(0,#BirthdayBef-#BirthdayAft)
 
 #BirthdayInd=_,_,L

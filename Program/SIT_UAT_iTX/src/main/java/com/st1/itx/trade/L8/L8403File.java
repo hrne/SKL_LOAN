@@ -1400,8 +1400,11 @@ public class L8403File extends MakeFile {
 					String iLastPayAmt = String.valueOf(sJcicZ043.getLastPayAmt()); // 最後繳款金額
 					String iOutstandAmt = String.valueOf(sJcicZ043.getOutstandAmt()); // 已到期尚未償還金額
 					String iRepayPerMonday = String.valueOf(sJcicZ043.getRepayPerMonDay()); // 每月應還款日
-					String iContractStartYM = FormateYM(sJcicZ043.getContractStartYM()); // 契約起始年月									
-					String iContractEndYM = FormateYM(sJcicZ043.getContractEndYM()) ;// 契約截止年月
+//					String iContractStartYM = FormateYM(sJcicZ043.getContractStartYM()); // 契約起始年月									
+//					String iContractEndYM = FormateYM(sJcicZ043.getContractEndYM()) ;// 契約截止年月
+					//2022/2/23檢查發現不需要用formateYM()此方法 Mata
+					String iContractStartYM = String.valueOf(sJcicZ043.getContractStartYM()); // 契約起始年月									
+					String iContractEndYM = String.valueOf(sJcicZ043.getContractEndYM()) ;// 契約截止年月
 					BigDecimal ixOriginLoanAmt = new BigDecimal(iOriginLoanAmt);
 					BigDecimal ixCreditBalance = new BigDecimal(iCreditBalance);
 					BigDecimal ixPerPeriordAmt = new BigDecimal(iPerPeriordAmt);
@@ -1410,8 +1413,7 @@ public class L8403File extends MakeFile {
 					BigDecimal ixOutstandAmt = new BigDecimal(iOutstandAmt);
 					int ixRepayPerMonDay = Integer.valueOf(sJcicZ043.getRepayPerMonDay());
 					int ixContractStartYM = Integer.valueOf(sJcicZ043.getContractStartYM());
-					int ixContractEndYM = Integer.valueOf(sJcicZ043.getContractEndYM());
-
+					int ixContractEndYM = Integer.valueOf(sJcicZ043.getContractEndYM());				
 					String iUkey = sJcicZ043.getUkey();
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "43" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)

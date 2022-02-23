@@ -82,7 +82,7 @@ E(0,40)ASGN(INQPRT$)
 ["#grid#,{id:3,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@建物所有權人","","",
 ["統編","姓名","與授信戶關係","持份比率"],
 [[#OwnerId1],[#OwnerName1],[[#OwnerRelCode1],[#OwnerNameOwnerRelCodeX1]],[[#OwnerPart1],["/"],[#OwnerTotal1]]]],
-["#grid#,{id:4,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@建物修改原因","","",
+["#grid#,{id:4,expand:true,loop:1,row_height:1,s_cols:[], p_cols:[]}","@@@@@@建物修改原因","","",
 ["原因","建立者","建立日期"],
 [[[#Reason1],[#ReasonX1],[#OtherReason1]],[#CreateEmpNo1],[#CreateDate1]]],
 ]
@@ -709,6 +709,7 @@ T(3,X)
 ! [建物修改原因-原因]
 #Reason1=X,1,L
 IF(#PAGE_FG==6,$,CALL(#SHOW_6))
+IF(#Reason1==0,INVOKEJS(SHOW,grd4_2,0),INVOKEJS(SHOW,grd4_2,1))
 
 #ReasonX1=X,20,L
 T(3,)T(H,#Reason1,#ReasonHelp)

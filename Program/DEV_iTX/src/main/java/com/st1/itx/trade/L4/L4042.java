@@ -15,6 +15,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 /* DB服務 */
 import com.st1.itx.db.service.springjpa.cm.L4042ServiceImpl;
 /* DB容器 */
@@ -42,6 +44,8 @@ public class L4042 extends TradeBuffer {
 	@Autowired
 	public DateUtil dateUtil;
 
+	@Autowired
+	public CdEmpService tCdEmpService;
 	@Autowired
 	public L4042ServiceImpl l4042ServiceImpl;
 
@@ -74,14 +78,17 @@ public class L4042 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
 				int authCreateDate = parse.stringToInteger(result.get("F8"));
+				this.info("authCreateDate 1=="+authCreateDate);
 				int propDate = parse.stringToInteger(result.get("F9"));
 				int retrDate = parse.stringToInteger(result.get("F10"));
 				int stampFinishDate = parse.stringToInteger(result.get("F16"));
 				int deleteDate = parse.stringToInteger(result.get("F17"));
+				String empno = result.get("F20");
 				String wkCreateFlag = result.get("F7");
 
 				if (authCreateDate > 19110000) {
 					authCreateDate = authCreateDate - 19110000;
+					this.info("authCreateDate 2=="+authCreateDate);
 				}
 				if (propDate > 19110000) {
 					propDate = propDate - 19110000;
@@ -105,6 +112,13 @@ public class L4042 extends TradeBuffer {
 					}
 				}
 
+				CdEmp tCdEmp = tCdEmpService.findById(empno, titaVo);
+				if(tCdEmp!=null) {
+					empno = tCdEmp.getFullname();
+				} else {
+					empno="";
+				}
+				
 				occursList.putParam("OOCustNo", result.get("F0"));
 				occursList.putParam("OOFacmNo", result.get("F1"));
 				occursList.putParam("OOAuthType", result.get("F2"));
@@ -123,6 +137,7 @@ public class L4042 extends TradeBuffer {
 				occursList.putParam("OORepayAcctLog", result.get("F15"));
 				occursList.putParam("OOStampFinishDate", stampFinishDate);
 				occursList.putParam("OODeleteDate", deleteDate);
+				occursList.putParam("OOCreateEmpNo", empno);
 //				暫無用處
 				occursList.putParam("OOButtenFlagA", result.get("F18"));
 				occursList.putParam("OOTitaTxCd", result.get("F19"));

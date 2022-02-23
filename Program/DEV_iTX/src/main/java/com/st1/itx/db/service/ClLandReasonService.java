@@ -36,28 +36,30 @@ public interface ClLandReasonService {
   public Slice<ClLandReason> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND LandSeq =
    *
    * @param clCode1_0 clCode1_0
    * @param clCode2_1 clCode2_1
    * @param clNo_2 clNo_2
+   * @param landSeq_3 landSeq_3
    * @param titaVo Variable-Length Argument
    * @return Slice ClLandReason ClLandReason of List
    */
-  public ClLandReason clNoFirst(int clCode1_0, int clCode2_1, int clNo_2, TitaVo... titaVo);
+  public ClLandReason clNoFirst(int clCode1_0, int clCode2_1, int clNo_2, int landSeq_3, TitaVo... titaVo);
 
   /**
-   * ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND LandSeq =
    *
    * @param clCode1_0 clCode1_0
    * @param clCode2_1 clCode2_1
    * @param clNo_2 clNo_2
+   * @param landSeq_3 landSeq_3
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClLandReason ClLandReason of List
    */
-  public Slice<ClLandReason> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
+  public Slice<ClLandReason> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int landSeq_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By ClLandReason

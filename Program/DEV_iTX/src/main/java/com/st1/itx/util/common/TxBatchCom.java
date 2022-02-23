@@ -43,7 +43,6 @@ import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
-import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 //
@@ -143,9 +142,6 @@ public class TxBatchCom extends TradeBuffer {
 
 	@Autowired
 	public BaTxCom baTxCom;
-
-	@Autowired
-	LoanCloseBreachCom loanCloseBreachCom;
 
 	@Autowired
 	public AcNegCom acNegCom;
@@ -366,7 +362,6 @@ public class TxBatchCom extends TradeBuffer {
 		this.info("TxBatchCom txCheck .... checkBatxDetail" + tDetail.toString());
 		baTxCom.setTxBuffer(this.getTxBuffer());
 		acNegCom.setTxBuffer(this.getTxBuffer());
-		loanCloseBreachCom.setTxBuffer(this.txBuffer);
 
 // RepayCode 還款來源 01.匯款轉帳 02.銀行扣款 03.員工扣款 04.支票兌現
 //                    05.法院扣薪 06.理賠金 07.代收款-債權協商 09.其他 11.匯款轉帳預先作業 90.暫收抵繳
@@ -1327,6 +1322,8 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg = this.checkMsg + ", 償還本利:" + this.repayLoan;
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 償還本利:" + this.repayLoan;
+		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0)
+			this.checkMsg = this.checkMsg + ", 清償違約金:" + this.closeBreachAmt;
 		if (this.shortfallInt.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 累短收利息:" + this.shortfallInt;
 		if (this.shortfallPrin.compareTo(BigDecimal.ZERO) > 0)
@@ -1341,8 +1338,6 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg = this.checkMsg + ", 契變手續費:" + this.modifyFee;
 		if (this.lawFee.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 法務費:" + this.lawFee;
-		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 清償違約金:" + this.closeBreachAmt;
 		if (this.unOpenfireFee.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 未到期火險費用:" + this.unOpenfireFee;
 
@@ -1436,7 +1431,6 @@ public class TxBatchCom extends TradeBuffer {
 
 	/* 2.執行過清償作業 ==> 還款類別:03-結案 */
 	private void facCloseRepayType(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
-		this.info("CASE 3-2!!!!");
 		Slice<FacClose> facCloseList = facCloseService.findCustNo(tDetail.getCustNo(), this.index, Integer.MAX_VALUE,
 				titaVo); // 清償作業檔
 		// 還清金額需相同
@@ -1452,6 +1446,7 @@ public class TxBatchCom extends TradeBuffer {
 				}
 			}
 		}
+		this.info("facCloseRepayType CollectFlag=" + this.collectFlag);
 	}
 
 	/* 初始處理說明 */
@@ -1581,8 +1576,6 @@ public class TxBatchCom extends TradeBuffer {
 // loanBal 放款餘額(還款前)
 // this.feeRepayType 費用還款類別
 
-		ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
-		ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 		baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算，試算至會計日
 		try {
@@ -1630,7 +1623,8 @@ public class TxBatchCom extends TradeBuffer {
 						case 1: // 01-期款
 							this.shortfallInt = this.shortfallInt.add(baTxVo.getInterest()); // 短繳利息
 							this.shortfallPrin = this.shortfallPrin.add(baTxVo.getPrincipal()); // 短繳本金
-							this.shortCloseBreach = this.shortfallPrin.add(baTxVo.getCloseBreachAmt());// 短繳清償違約金
+							// 短繳清償違約金(提前償還有即時清償違約金時寫入)
+							this.shortCloseBreach = this.shortfallPrin.add(baTxVo.getCloseBreachAmt());
 							break;
 						case 4: // 04-帳管費
 							this.acctFee = this.acctFee.add(baTxVo.getAcctAmt());
@@ -1645,7 +1639,8 @@ public class TxBatchCom extends TradeBuffer {
 							this.lawFee = this.lawFee.add(baTxVo.getAcctAmt());
 							break;
 						case 9: // 09-其他(清償違約金)
-							this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());// 未收清償違約金
+							// 未收清償違約金，結案後補領清償證明時寫入
+							this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());// 
 							break;
 						default:
 							break;
@@ -1685,16 +1680,6 @@ public class TxBatchCom extends TradeBuffer {
 						this.delayInt = this.delayInt.add(baTxVo.getDelayInt());
 						this.breachAmt = this.breachAmt.add(baTxVo.getBreachAmt());
 					}
-					// 提前還款金額 extraAmt = BigDecimal.ZERO; // 提前還款金額
-					if (baTxVo.getExtraAmt().compareTo(BigDecimal.ZERO) > 0) {
-						LoanCloseBreachVo v = new LoanCloseBreachVo();
-						v.setCustNo(baTxVo.getCustNo());
-						v.setFacmNo(baTxVo.getFacmNo());
-						v.setBormNo(baTxVo.getBormNo());
-						v.setExtraRepay(baTxVo.getExtraAmt());
-						v.setEndDate(tDetail.getEntryDate());
-						iListCloseBreach.add(v);
-					}
 				}
 				if (baTxVo.getDataKind() == 3) {
 					this.tavAmt = this.tavAmt.add(baTxVo.getUnPaidAmt());
@@ -1705,6 +1690,15 @@ public class TxBatchCom extends TradeBuffer {
 				}
 				if (baTxVo.getDataKind() == 6 && baTxVo.getRepayType() == 5) { // 未到期火險費用
 					this.unOpenfireFee = this.unOpenfireFee.add(baTxVo.getUnPaidAmt());
+				}
+				
+				// 清償違約金，部分償還、結案即時收取、結案要領清償證明
+				if (baTxVo.getDataKind() == 6 && baTxVo.getRepayType() == 9) { 
+					this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());
+					// 結案時才會入帳
+					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+						this.repayTotal = this.repayLoan.add(baTxVo.getAcctAmt());
+					}
 				}
 			}
 			if (!isCloseFg) {
@@ -1727,26 +1721,7 @@ public class TxBatchCom extends TradeBuffer {
 			}
 		}
 
-		// 計算清償違約金
-		if (this.repayType == 3)
-
-		{
-			if ("Y".equals(this.collectFlag)) {
-				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(tDetail.getCustNo(), this.repayFacmNo, 0,
-						iListCloseBreach, titaVo);
-			} else {
-				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(tDetail.getCustNo(), this.repayFacmNo, 0,
-						iListCloseBreach, titaVo);
-			}
-			if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
-				for (LoanCloseBreachVo v : oListCloseBreach) {
-					this.closeBreachAmt = this.closeBreachAmt.add(v.getCloseBreachAmt());
-				}
-				this.unPayTotal = this.unPayTotal.add(this.closeBreachAmt);
-				this.repayTotal = this.repayTotal.add(this.closeBreachAmt);
-			}
-		}
 		// 還款總金額
-		this.repayTotal = this.repayLoan.add(this.repayFee).add(this.closeBreachAmt);
+		this.repayTotal = this.repayLoan.add(this.repayFee);
 	}
 }

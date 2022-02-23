@@ -128,7 +128,7 @@ C(3,#CustNo,0,S,T(2,#CustNo))
 T(3,@FdPropDate,)
 ! 提出日期
 #PropDate=D,7,I
-T(3,@FdPropDate,*)
+T(3,@FdPropDate,)
 C(3,#FunctionCode,1,$,S)
 C(3,#CreateFlag,1,S,$)
 C(3,#CustNo,0,T(1,#SYSCDATE,2,7),E(0,0))

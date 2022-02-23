@@ -391,8 +391,12 @@ T(F,@IncomeDataDate,#WKTFKEY)
 #CustId=X,8,I
 C(3,#FunCd,1,$,s)
 C(3,#FunCd,1,T(F,@CustId,1),T(F,@CustId,0))
-@V(7)A(ID_UNINO,0,#CustId))
+@
+V(7)
+A(ID_UNINO,0,#CustId))
 
+#MRKEY=_,_,S
+T(2,#CustId)
 
 #chechCustId=X,1,S
 A(ID_UNINO,0,#CustId)

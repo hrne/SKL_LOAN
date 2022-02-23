@@ -666,7 +666,8 @@ IF(#ApplDate>#wkSysCDate,V(P,申請日期不可大於日曆日),$)
 C(2,#FuncCode,S,$,$,$,s,s,S)
 C(3,#ApproveFlag,1,s,$)
 HELP(#DepartmentCodeHelp)
-@V(H,#DepartmentCodeHelp)
+@
+V(H,#DepartmentCodeHelp)
 T(2,@BUF3,#ProdNo)
 
 #DepartmentCodeX=X,10,L
@@ -827,7 +828,9 @@ HELP(#YesNoHelp)
 V(H,#YesNoHelp)
 
 #IsSuspectedCheckX=X,4,L
+C(3,#CustEntCode,1,S,$)
 T(H,#IsSuspectedCheck,#YesNoHelp)
+C(5,#IsSuspectedCheck,Y,SHOW(#IsSuspectedCheckType,#IsSuspectedCheckTypeX),HIDE(#IsSuspectedCheckType,#IsSuspectedCheckTypeX))
 
 #IsSuspectedCheckTypeHelp=X,100,S
 T(3, :請選擇;Y:確認核對無誤)
@@ -835,6 +838,7 @@ T(3, :請選擇;Y:確認核對無誤)
 #IsSuspectedCheckType=X,1,I
 C(3,#UpdateCode,1,$,S)
 C(3,#CustEntCode,1,S,$)
+C(5,#IsSuspectedCheck,Y,$,S)
 HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
@@ -842,6 +846,7 @@ V(H,#IsSuspectedCheckTypeHelp)
 
 #IsSuspectedCheckTypeX=X,12,L
 C(3,#UpdateCode,1,$,S)
+C(3,#CustEntCode,1,S,$)
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 #IsDataDate=D,7,L

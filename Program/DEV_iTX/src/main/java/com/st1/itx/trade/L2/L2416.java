@@ -123,19 +123,19 @@ public class L2416 extends TradeBuffer {
 		}
 
 		boolean clLandFlag = true;
-		
+
 		// clLand
 		// 房地 && 新增
 		if (iClCode1 == 1 && iFunCd == 1) {
 
 			// eloan判斷是否已存在
 			if (this.isEloan) {
-				
+
 				clLandId.setClCode1(iClCode1);
 				clLandId.setClCode2(iClCode2);
 				clLandId.setClNo(iClNo);
 				clLandId.setLandSeq(iLandSeq);
-				
+
 				ClLand tLastClLand = sClLandService.findById(clLandId, titaVo);
 				if (tLastClLand != null) {
 					iFunCd = 2;
@@ -162,7 +162,7 @@ public class L2416 extends TradeBuffer {
 		if (clLandFlag) {
 			tClLand = sClLandService.holdById(clLandId, titaVo);
 		}
-		
+
 		// 房地
 		if (iClCode1 == 1) {
 			if (iFunCd == 1) {
@@ -198,11 +198,12 @@ public class L2416 extends TradeBuffer {
 				deleteClLandReason(titaVo);
 				// insert 土地修改原因檔
 				InsertClLandReason(titaVo);
-				
+
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
-				
+				dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
+						+ titaVo.getParam("ReasonX1"));
+
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
 
@@ -247,13 +248,16 @@ public class L2416 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品不動產土地檔");
 				}
-				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec("修改擔保品不動產土地檔");
+
 				// delete 土地修改原因檔
 				deleteClLandReason(titaVo);
 				// insert 土地修改原因檔
 				InsertClLandReason(titaVo);
+
+				// 紀錄變更前變更後
+				dataLog.setEnv(titaVo, beforeClLand, tClLand);
+				dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
+						+ titaVo.getParam("ReasonX1"));
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
 
@@ -405,37 +409,38 @@ public class L2416 extends TradeBuffer {
 	// insert 土地修改原因檔
 	private void InsertClLandReason(TitaVo titaVo) throws LogicException {
 
-			tClLandReason = new ClLandReason();
-			clLandReasonId = new ClLandReasonId();
+		tClLandReason = new ClLandReason();
+		clLandReasonId = new ClLandReasonId();
 
-			clLandReasonId.setClCode1(iClCode1);
-			clLandReasonId.setClCode2(iClCode2);
-			clLandReasonId.setClNo(iClNo);
+		clLandReasonId.setClCode1(iClCode1);
+		clLandReasonId.setClCode2(iClCode2);
+		clLandReasonId.setClNo(iClNo);
+		clLandReasonId.setLandSeq(iLandSeq);
 
-			tClLandReason.setClLandReasonId(clLandReasonId);
-			tClLandReason.setClCode1(iClCode1);
-			tClLandReason.setClCode2(iClCode2);
-			tClLandReason.setClNo(iClNo);
+		tClLandReason.setClLandReasonId(clLandReasonId);
+		tClLandReason.setClCode1(iClCode1);
+		tClLandReason.setClCode2(iClCode2);
+		tClLandReason.setClNo(iClNo);
+		tClLandReason.setLandSeq(iLandSeq);
+		tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
+		tClLandReason.setOtherReason(titaVo.getParam("OtherReason1"));
 
-			tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
-			tClLandReason.setOtherReason(titaVo.getParam("OtherReason1"));
+		tClLandReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
+		tClLandReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
 
-			tClLandReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
-			tClLandReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
-
-			try {
-				sClLandReasonService.insert(tClLandReason, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", "擔保品土地修改原因檔");
-			}
+		try {
+			sClLandReasonService.insert(tClLandReason, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0005", "擔保品土地修改原因檔");
+		}
 
 	}
 
 	// insert 土地修改原因檔
 	private void deleteClLandReason(TitaVo titaVo) throws LogicException {
 
-		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
-		
+		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, iLandSeq, titaVo);
+
 		if (tClLandReason != null) {
 			try {
 				sClLandReasonService.delete(tClLandReason);

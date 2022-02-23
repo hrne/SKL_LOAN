@@ -1,5 +1,6 @@
 package com.st1.itx.util.common;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,6 +163,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 			if (t.getMaturityDate() < nextMonth01) {
 				intCalcCode = "1";
 				amortizedCode = "2";
+				loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
 			}
 			loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
 			loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));

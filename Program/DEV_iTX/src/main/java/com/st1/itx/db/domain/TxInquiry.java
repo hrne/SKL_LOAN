@@ -31,7 +31,7 @@ public class TxInquiry implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -774346786058606581L;
+	private static final long serialVersionUID = -613930085904730150L;
 
 // 序號
   @Id
@@ -67,6 +67,10 @@ public class TxInquiry implements Serializable {
   // 交易編號/帳號
   @Column(name = "`MrKey`", length = 20)
   private String mrKey;
+
+  // 戶號
+  @Column(name = "`CustNo`")
+  private int custNo = 0;
 
   // 交易結果
   /* S:成功 E:失敗 */
@@ -263,6 +267,25 @@ public class TxInquiry implements Serializable {
   }
 
 /**
+	* 戶號<br>
+	* 
+	* @return Integer
+	*/
+  public int getCustNo() {
+    return this.custNo;
+  }
+
+/**
+	* 戶號<br>
+	* 
+  *
+  * @param custNo 戶號
+	*/
+  public void setCustNo(int custNo) {
+    this.custNo = custNo;
+  }
+
+/**
 	* 交易結果<br>
 	* S:成功 E:失敗
 	* @return String
@@ -437,7 +460,8 @@ public class TxInquiry implements Serializable {
   @Override
   public String toString() {
     return "TxInquiry [logNo=" + logNo + ", entdy=" + entdy + ", calDate=" + calDate + ", brNo=" + brNo + ", tlrNo=" + tlrNo + ", supNo=" + supNo
-           + ", tranNo=" + tranNo + ", mrKey=" + mrKey + ", txResult=" + txResult + ", msgId=" + msgId + ", errMsg=" + errMsg + ", tranData=" + tranData
-           + ", importFg=" + importFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", tranNo=" + tranNo + ", mrKey=" + mrKey + ", custNo=" + custNo + ", txResult=" + txResult + ", msgId=" + msgId + ", errMsg=" + errMsg
+           + ", tranData=" + tranData + ", importFg=" + importFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

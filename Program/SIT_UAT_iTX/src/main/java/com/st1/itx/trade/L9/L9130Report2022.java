@@ -529,15 +529,15 @@ public class L9130Report2022 extends MakeReport {
 		this.info("L9130 specialHandling lastAcSubBookCode = " + lastAcSubBookCode);
 		this.info("L9130 specialHandling transferAmt = " + transferAmt);
 
-		// 於借貸方各寫一筆10340000000 應收調撥款
-		String tempAcNoCode = "10340000000";
-		String tempAcSubNoCode = "     ";
-		String slipDateROC = String.valueOf(Integer.parseInt(slipDate) - 19110000);
-		String tempAcReceivableCode = deptCode + slipDateROC + FormatUtil.pad9(String.valueOf(iBatchNo), 2);
-		this.info("tempAcReceivableCode = " + tempAcReceivableCode);
-		String tempSlipRmk = "應收調撥款";
-
 		if (transferAmt.compareTo(BigDecimal.ZERO) != 0) {
+			
+			// 於借貸方各寫一筆10340000000 應收調撥款
+			String tempAcNoCode = "10340000000";
+			String tempAcSubNoCode = "     ";
+			String slipDateROC = String.valueOf(Integer.parseInt(slipDate) - 19110000);
+			String tempAcReceivableCode = deptCode + slipDateROC + FormatUtil.pad9(String.valueOf(iBatchNo), 2);
+			this.info("tempAcReceivableCode = " + tempAcReceivableCode);
+			String tempSlipRmk = "應收調撥款";
 
 			JSONObject dataJo = new JSONObject();
 

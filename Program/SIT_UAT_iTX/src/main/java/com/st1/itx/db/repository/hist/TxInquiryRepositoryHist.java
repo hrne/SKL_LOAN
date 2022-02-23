@@ -24,6 +24,9 @@ public interface TxInquiryRepositoryHist extends JpaRepository<TxInquiry, Long> 
   // CalDate >= ,AND CalDate <= 
   public Slice<TxInquiry> findAllByCalDateGreaterThanEqualAndCalDateLessThanEqualOrderByCreateDateAsc(int calDate_0, int calDate_1, Pageable pageable);
 
+  // CalDate >= ,AND CalDate <= ,AND ImportFg = ,AND CustNo >= ,AND CustNo <=
+  public Slice<TxInquiry> findAllByCalDateGreaterThanEqualAndCalDateLessThanEqualAndImportFgIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCreateDateAsc(int calDate_0, int calDate_1, String importFg_2, int custNo_3, int custNo_4, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

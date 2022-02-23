@@ -36,7 +36,7 @@ T(3,0:無權限;1:有權限)
 [      "#FdAllowFg+主管等級",      #AllowFg],
 [      "#FdBrNo+使用單位",         #BrNo,#BrNoX],
 [      "#Fd9+課組別",              #GroupNo,#GroupNoX],
-[      "#FdStation+站別",          #Station],
+[      "#FdStation+站別",          #Station,#StationX],
 [      "#FdAdminFg+管理者權限",    #AdminFg,#AdminFgX],
 [      "#Fd7+狀態",                #Status,#StatusX],
 [      "#AmlHighFgFd+AML定審高風險處理權限",#AmlHighFg,#AmlHighFgX],
@@ -93,15 +93,20 @@ T(3,0:否;1:是)
 
 #AuthHelp=X,1024,S
 
+#StationCode=x,14,S
+T(3,CdCode.Station)
+
+#StationHelp=x,1000,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#H1,#H2,#CODEFuncCode2)
+S(XXR99,01,#H1,#H2,#CODEFuncCode2,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@BrHelp,#HelpDesc1)
 T(2,@AuthHelp,#HelpDesc2)
 T(2,@FuncCode2Help,#HelpDesc3)
+T(2,@StationHelp,#HelpDesc4)
 
 ![經辦/使用者等級]
 #LevelHelp=X,100,S
@@ -225,6 +230,7 @@ T(H,@BrNoX,#BrNo,#BrHelp)
 T(H,@StatusX,#Status,#StatusHelp)
 T(H,@AmlHighFgX,#AmlHighFg,#AmlHighFgH)
 T(H,@AdminFgX,#AdminFg,#AdminFgH)
+C(4,#Station,T(3,@StationX,總公司),T(H,@StationX,#StationHelp))
 
 #GroupT=X,4,S
 T(3,GROP)
@@ -401,6 +407,12 @@ T(H,#GroupNo,#GroupHelp)
 !站別
 #Station=X,3,I
 C(2,#FunCode,s,$,$,s,s,s)
+HELP(#StationHelp)
+@
+C(4,#Station,S,V(H,#StationHelp))
+
+#StationX=x,20,L
+C(4,#Station,T(3,總公司),T(H,#Station,#StationHelp))
 
 !管理者權限
 #AdminFg=A,1,I

@@ -114,7 +114,7 @@ public class L2R28 extends TradeBuffer {
 		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
 				Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
-		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
+		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, iLandSeq, titaVo);
 
 		this.totaVo.putParam("L2r28LandSeq", iLandSeq);
 		// 不存在擔保品主檔 拋錯
@@ -224,7 +224,6 @@ public class L2R28 extends TradeBuffer {
 			this.totaVo.putParam("L2r28LandUsageCode", tClLand.getLandUsageCode());
 			this.totaVo.putParam("L2r28LandRentStartDate", tClLand.getLandRentStartDate());
 			this.totaVo.putParam("L2r28LandRentEndDate", tClLand.getLandRentEndDate());
-
 
 			// 資料筆數
 			if (lClLandOwner != null) {

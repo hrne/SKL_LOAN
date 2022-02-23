@@ -3,8 +3,6 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -32,44 +30,48 @@ public class LM051Report extends MakeReport {
 	// 起始列印行數
 	int row = 2;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param nowDate          今天日期(民國)
+	 * @param thisMonthEndDate 當月底日期(民國)
+	 * 
+	 */
+	public void exec(TitaVo titaVo, int nowDate, int thisMonthEndDate) throws LogicException {
 
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		
 		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iYear = thisMonthEndDate / 10000;
 		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+		int iMonth = (thisMonthEndDate / 100) % 100;
 
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當年月
+		int thisYM = 0;
+		// 上年月
+		int lastYM = 0;
 
-		Calendar calendar = Calendar.getInstance();
+		// 判斷帳務日與月底日是否同一天
+		if (nowDate < thisMonthEndDate) {
+			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+		}
 
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+		thisYM = iYear * 100 + iMonth;
 
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(iEntdy));
+		// 判斷這個月是否為1月
+		if (iMonth - 1 == 0) {
+			lastYM = (iYear - 1) * 100 + 12;
+		} else {
+			lastYM = thisYM - 1;
+		}
 
-		// 上個月初
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMinimum(Calendar.DATE));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管",
+				"LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "10804工作表");
 
-		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+		makeExcel.setSheet("10804工作表", thisYM + "工作表");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管", "LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "10804工作表");
-
-		makeExcel.setSheet("10804工作表", titaVo.get("ENTDY").substring(1, 6) + "工作表");
-
-		String mm = String.valueOf(Integer.valueOf(titaVo.get("ENTDY").substring(4, 6)));
-
-		makeExcel.setValue(1, 2, "資產分類案件明細表" + titaVo.get("ENTDY").substring(1, 4) + "." + mm);
+		makeExcel.setValue(1, 2, "資產分類案件明細表" + iYear + "." + iMonth);
 
 		List<Map<String, String>> lM051List = null;
 
@@ -79,7 +81,7 @@ public class LM051Report extends MakeReport {
 		for (int i = 1; i <= 4; i++) {
 			try {
 
-				lM051List = lM051ServiceImpl.findAll(titaVo, i);
+				lM051List = lM051ServiceImpl.findAll(titaVo, thisYM + 191100, i);
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -105,14 +107,14 @@ public class LM051Report extends MakeReport {
 
 		makeExcel.setValue(12, 9, iMonth + "月月報表數", "C");
 		makeExcel.setValue(14, 5, thisMonthEndDate, "C");
-		makeExcel.setValue(14, 6, lastMonthEndDate, "C");
+		makeExcel.setValue(14, 6, lastYM + "01", "C");
 
 		// 有3個表格，要select 3次
 		for (int i = 1; i <= 3; i++) {
 
 			try {
 
-				lM051List = lM051ServiceImpl.findAll2(titaVo, i);
+				lM051List = lM051ServiceImpl.findAll2(titaVo, thisYM + 191100, i);
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -125,7 +127,7 @@ public class LM051Report extends MakeReport {
 			}
 		}
 
-		long sno = makeExcel.close();
+		makeExcel.close();
 		// makeExcel.toExcel(sno);
 	}
 
@@ -160,7 +162,8 @@ public class LM051Report extends MakeReport {
 			// F1 額度：3
 			makeExcel.setValue(row, 3, Integer.valueOf(tLDVo.get("F1")), "C");
 			// F2 利變；4
-			makeExcel.setValue(row, 4, tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"), "C");
+			makeExcel.setValue(row, 4, tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"),
+					"C");
 			// F3 戶名；5
 			makeExcel.setValue(row, 5, tLDVo.get("F3"), "L");
 			// F4 本金餘額；6
@@ -190,9 +193,13 @@ public class LM051Report extends MakeReport {
 
 			makeExcel.setValue(row, 8, ovduText, "C");
 			// F7 地區別；9
-			makeExcel.setValue(row, 9, tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")), "C");
+			makeExcel.setValue(row, 9,
+					tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")),
+					"C");
 			// F8 繳息日期；10
-			makeExcel.setValue(row, 10, tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")), "C");
+			makeExcel.setValue(row, 10,
+					tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")),
+					"C");
 			// F9分類項目:11
 //				makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
 			// F4 五類金額(用F16區分F4)=；12~17

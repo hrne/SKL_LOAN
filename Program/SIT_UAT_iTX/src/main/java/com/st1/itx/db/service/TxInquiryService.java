@@ -47,6 +47,21 @@ public interface TxInquiryService {
   public Slice<TxInquiry> findByCalDate(int calDate_0, int calDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CalDate &gt;= ,AND CalDate &lt;= ,AND ImportFg = ,AND CustNo &gt;= ,AND CustNo &lt;=
+   *
+   * @param calDate_0 calDate_0
+   * @param calDate_1 calDate_1
+   * @param importFg_2 importFg_2
+   * @param custNo_3 custNo_3
+   * @param custNo_4 custNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxInquiry TxInquiry of List
+   */
+  public Slice<TxInquiry> findImportFg(int calDate_0, int calDate_1, String importFg_2, int custNo_3, int custNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By TxInquiry
    * 
    * @param logNo key
