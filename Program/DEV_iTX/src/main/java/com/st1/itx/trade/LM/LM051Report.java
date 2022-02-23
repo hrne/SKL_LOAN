@@ -201,7 +201,7 @@ public class LM051Report extends MakeReport {
 					tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")),
 					"C");
 			// F9分類項目:11
-//				makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
+			makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
 			// F4 五類金額(用F16區分F4)=；12~17
 			putAsset(row, tLDVo.get("F4"), tLDVo.get("F16"));
 			// F10 分類標準(文字)；18
@@ -215,13 +215,13 @@ public class LM051Report extends MakeReport {
 			} else {
 				classText = tLDVo.get("F10");
 			}
-			makeExcel.setValue(row, 17, tLDVo.get("F10").isEmpty() ? "核貸估價" : classText, "L");
+			makeExcel.setValue(row, 18, tLDVo.get("F10").isEmpty() ? "核貸估價" : classText, "L");
 			// F11 金額 19
-			makeExcel.setValue(row, 18, Integer.valueOf(tLDVo.get("F11")), "#,##0");
+			makeExcel.setValue(row, 19, Integer.valueOf(tLDVo.get("F11")), "#,##0");
 			// F12 備註；20
-			makeExcel.setValue(row, 19, tLDVo.get("F12"), "L");
+			makeExcel.setValue(row, 20, tLDVo.get("F12"), "L");
 			// F13 基本利率代碼(商品代號)；21
-			makeExcel.setValue(row, 20, tLDVo.get("F13"), "C");
+			makeExcel.setValue(row, 21, tLDVo.get("F13"), "C");
 		}
 
 	}
@@ -369,23 +369,23 @@ public class LM051Report extends MakeReport {
 //		String memo = "";
 		switch (assetClass) {
 		case "21":
-			col = 11;
+			col = 12;
 
 			break;
 		case "22":
-			col = 12;
-			break;
-		case "23":
 			col = 13;
 			break;
-		case "3":
+		case "23":
 			col = 14;
 			break;
-		case "4":
+		case "3":
 			col = 15;
 			break;
-		case "5":
+		case "4":
 			col = 16;
+			break;
+		case "5":
+			col = 17;
 			break;
 		default:
 			col = 0;

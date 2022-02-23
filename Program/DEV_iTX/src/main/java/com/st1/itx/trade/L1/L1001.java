@@ -450,7 +450,7 @@ public class L1001 extends TradeBuffer {
 
 		TxDataLog txDataLog = txDataLogService.findByMrKeyFirst("CustUKey:" + aCustMain.getCustUKey(), txcds, titaVo);
 
-		if (txDataLog != null && !custDataControl && allowInquiry && !cdate.equals(udate)) {
+		if (txDataLog != null && !custDataControl && allowInquiry) {
 			LogFg = 1;
 		}
 

@@ -3,8 +3,6 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -34,76 +32,35 @@ public class LM052Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
 
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[day - 1]);
-		int diff = 0;
-		if (day == 1) {
-			diff = -2;
-		} else if (day == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
-		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
-		calendar.set(iYear, iMonth - 1, 0);
-
-		String lyymm = String.valueOf(Integer.valueOf(dateFormat.format(calendar.getTime())) / 100);
-
-		this.info("yymm=" + iYearMonth + ",lyymm=" + lyymm);
+		//上年月
+		int lastYM = yearMonth - 1 ;
+		
+		//判斷是否為一月
+		if (yearMonth % 100 == 1) {
+			lastYM = ((yearMonth / 100) - 1) * 100 + 12;
+		} 
+		
+		this.info("yymm=" + yearMonth + ",lyymm=" + lastYM);
 		this.info("LM052Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提", "LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "備呆總表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提",
+				"LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "備呆總表");
 
 		String formTitle = "";
 
-		formTitle = (iYear - 1911) + "年 " + String.format("%02d", iMonth) + "    放款資產品質分類";
+		formTitle = ((yearMonth / 100) - 1911) + "年 " + String.format("%02d", yearMonth % 100) + "    放款資產品質分類";
 		makeExcel.setValue(1, 1, formTitle);
 
-		formTitle = lyymm + "\n" + "放款總額";
+		formTitle = (lastYM - 191100) + "\n" + "放款總額";
 		makeExcel.setValue(15, 3, formTitle, "C");
 
 		List<Map<String, String>> lM052List = null;
@@ -112,7 +69,7 @@ public class LM052Report extends MakeReport {
 
 			try {
 
-				lM052List = lM052ServiceImpl.findAll(titaVo, formNum);
+				lM052List = lM052ServiceImpl.findAll(titaVo,yearMonth,lastYM ,formNum);
 
 			} catch (Exception e) {
 
@@ -126,8 +83,8 @@ public class LM052Report extends MakeReport {
 			exportExcel(lM052List, formNum);
 		}
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+
 	}
 
 	/*
@@ -162,9 +119,14 @@ public class LM052Report extends MakeReport {
 											: "22".equals(tLDVo.get("F0")) ? 7
 													: "23".equals(tLDVo.get("F0")) ? 8
 															: "3".equals(tLDVo.get("F0")) ? 9
-																	: "4".equals(tLDVo.get("F0")) ? 10 : "5".equals(tLDVo.get("F0")) ? 11 : "6".equals(tLDVo.get("F0")) ? 12 : 14;
+																	: "4".equals(tLDVo.get("F0")) ? 10
+																			: "5".equals(tLDVo.get("F0")) ? 11
+																					: "6".equals(tLDVo.get("F0")) ? 12
+																							: 14;
 
-					col = "00A".equals(tLDVo.get("F1")) ? 3 : "201".equals(tLDVo.get("F1")) ? 4 : "6".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1")) ? 6 : 12;
+					col = "00A".equals(tLDVo.get("F1")) ? 3
+							: "201".equals(tLDVo.get("F1")) ? 4
+									: "6".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1")) ? 6 : 12;
 
 					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 
@@ -174,7 +136,10 @@ public class LM052Report extends MakeReport {
 					row = "1".equals(tLDVo.get("F0")) ? 17
 							: "21".equals(tLDVo.get("F0")) ? 18
 									: "22".equals(tLDVo.get("F0")) ? 19
-											: "23".equals(tLDVo.get("F0")) ? 20 : "3".equals(tLDVo.get("F0")) ? 21 : "4".equals(tLDVo.get("F0")) ? 22 : "5".equals(tLDVo.get("F0")) ? 23 : 24;
+											: "23".equals(tLDVo.get("F0")) ? 20
+													: "3".equals(tLDVo.get("F0")) ? 21
+															: "4".equals(tLDVo.get("F0")) ? 22
+																	: "5".equals(tLDVo.get("F0")) ? 23 : 24;
 
 					col = 3;
 
@@ -194,7 +159,9 @@ public class LM052Report extends MakeReport {
 				case 4:
 					row = 27;
 
-					col = "S1".equals(tLDVo.get("F0")) ? 7 : "S2".equals(tLDVo.get("F0")) ? 8 : "NS1".equals(tLDVo.get("F0")) ? 9 : "NS2".equals(tLDVo.get("F0")) ? 11 : 12;
+					col = "S1".equals(tLDVo.get("F0")) ? 7
+							: "S2".equals(tLDVo.get("F0")) ? 8
+									: "NS1".equals(tLDVo.get("F0")) ? 9 : "NS2".equals(tLDVo.get("F0")) ? 11 : 12;
 
 					amt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
 

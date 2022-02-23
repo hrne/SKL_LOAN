@@ -1,5 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+
 
 @Service("LY003ServiceImpl")
 @Repository
@@ -32,11 +34,13 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum, int endOfYearMonth) throws Exception {
+
+	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum,int endOfYearMonth) throws Exception {
 		this.info("LY003.findAll ");
 
 		String sql = " ";
 		if (formNum == 1) {
+			//row 6~13
 			sql += "	SELECT ( CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
@@ -80,7 +84,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			   ELSE 'N' END )";
 
 		} else if (formNum == 2) {
-
+			//row 14~18
 			sql += "	SELECT (CASE";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL AND ML.\"EntCode\" = 0 THEN 'D'";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL AND ML.\"EntCode\" <> 0 THEN 'C'";
@@ -125,7 +129,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  ELSE ' ' END )";
 
 		} else if (formNum == 3) {
-
+			//row 19~22
 			sql += "	SELECT (CASE";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL AND ML.\"EntCode\" = 0 THEN 'D'";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL AND ML.\"EntCode\" <> 0 THEN 'C'";
@@ -159,8 +163,8 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  ELSE ' ' END )";
 
 		} else if (formNum == 4) {
-
-			sql += "	SELECT 'T' AS \"EvaAmt\"";
+			//row 23~24
+			sql += "	SELECT 'T' AS \"KIND\"";
 			sql += "	      ,SUM(CM.\"EvaAmt\") AS \"EvaAmt\"";
 			sql += "		  ,SUM(F.\"LineAmt\") AS \"LineAmt\"";
 			sql += "		  ,SUM(ML.\"LoanBalance\") AS \"LoanBalance\"";
@@ -179,10 +183,10 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "							AND CM.\"ClNo\" = ML.\"ClNo\"";
 			sql += "	LEFT JOIN \"ReltMain\" R ON R.\"CustNo\" = C.\"CustNo\"";
 			sql += "	WHERE ML.\"YearMonth\" = :yymm";
-			sql += "	  AND ML.\"LoanBalance\" > 0 ";
+			sql += "	  AND ML.\"LoanBalance\" > 0 "; 
 
 		} else if (formNum == 5) {
-
+			//row 25~66
 			sql += "	SELECT ( CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
@@ -234,7 +238,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       	      END )";
 
 		} else if (formNum == 6) {
-
+			//row 83~87
 			sql += "	SELECT \"KIND\" AS \"KIND\"";
 			sql += "		  ,DECODE(\"COL\",'11','1','12','1',\"COL\") AS \"COL\"";
 			sql += "		  ,SUM(ROUND(\"AMT\",0)) AS \"AMT\"";
@@ -304,6 +308,16 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       	     	     END )";
 			sql += " ) GROUP BY \"KIND\"";
 			sql += " 		   ,DECODE(\"COL\",'11','1','12','1',\"COL\")";
+		} else if(formNum == 7){
+			//row 67~72 
+		} else {
+			
+			// L6~L7
+			sql += "	SELECT \"AvailableFunds\" AS \"AvailableFunds\"";
+			sql += "		  ,\"Totalequity\" AS \"Totalequity\"";
+			sql += "	FROM \"CdVarValue\"";
+			sql += "	WHERE \"YearMonth\" = :yymm ";
+
 		}
 
 		this.info("sql=" + sql);

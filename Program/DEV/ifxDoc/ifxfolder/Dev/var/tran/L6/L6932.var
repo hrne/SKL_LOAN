@@ -363,7 +363,7 @@ TXFORM=L6932
 #OTranName=交易名稱
 {width:350,align:'left'}
 #OCustNoX=戶號
-{width:100,align:'center'}
+{width:60,align:'center'}
 #OMrKey=參考編號
 {width:300,align:'left'}
 #OReason=修改原因

@@ -253,7 +253,7 @@ public class L9130Report2022 extends MakeReport {
 		}
 
 		int i = 1;
-		lineNum = i;
+		lineNum = 1;
 
 		lastAcSubBookCode = "00A";
 
@@ -398,7 +398,7 @@ public class L9130Report2022 extends MakeReport {
 			lastAcSubBookCode = acSubBookCode;
 
 			i++;
-			lineNum = i;
+			lineNum++;
 		}
 
 		// 全部傳票印完，執行特殊處理
@@ -637,7 +637,7 @@ public class L9130Report2022 extends MakeReport {
 			}
 
 			i++;
-			lineNum = i;
+			lineNum++;
 		}
 
 		// 計算借方加總

@@ -403,7 +403,7 @@ public class L3200 extends TradeBuffer {
 		}
 		this.info("iRepayIntDate=" + iRepayIntDate + "," + iRepayIntDateByFacmNoVo.toString() + ", iRepayLoan="
 				+ iRepayLoan + ", iExtraRepay=" + iExtraRepay);
-		
+
 		this.info("TotalRepayAmt = " + iTotalRepayAmt + ",RealRepayAmt=" + iRealRepayAmt);
 
 		// Check Input
@@ -424,7 +424,6 @@ public class L3200 extends TradeBuffer {
 			wkBormNoStart = iBormNo;
 			wkBormNoEnd = iBormNo;
 		}
-
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -496,7 +495,7 @@ public class L3200 extends TradeBuffer {
 		if (iRepayType == 2) {
 			loanBookRoutine();
 		}
-		
+
 		// 疑似洗錢交易訪談記錄檔處理
 		if (iRepayType == 2) {
 			mlaundryRecordRoutine();
@@ -522,7 +521,7 @@ public class L3200 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3094", "短繳金額大於利息 " + iInterest.add(iShortfallInt));
 			}
 		}
-		
+
 		if (titaVo.isHcodeNormal()) {
 			// 減免金額超過限額，需主管核可
 			if (iRqspFlag.equals("Y")) {
@@ -580,10 +579,13 @@ public class L3200 extends TradeBuffer {
 
 	private void calcRepayNormalRoutine() throws LogicException {
 		this.info("calcRepayNormalRoutine ...");
-
-		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
+		// 部分償還本金，限額含短收-利息
+		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 			wkRepaykindCode = 1;
-		} else {
+			wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(iShortfallInt);
+		}
+		// 期款
+		else {
 			if (iRepayTerms > 0) { // 回收期數 > 0
 				wkRepaykindCode = 2;
 			} else {
@@ -1891,6 +1893,26 @@ public class L3200 extends TradeBuffer {
 		// call 應繳試算
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
 		if (this.baTxList != null) {
+			// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
+			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(wkUnpaidAmtRemaind) > 0) {
+				BigDecimal wkShortIntRemaind = iShortAmt.subtract(wkUnpaidAmtRemaind);
+				for (BaTxVo ba : this.baTxList) {
+					if (ba.getDataKind() == 1 && ba.getInterest().compareTo(BigDecimal.ZERO) > 0) {
+						this.info("wkShortIntRemaind =" + wkShortIntRemaind);
+						if (ba.getInterest().compareTo(BigDecimal.ZERO) > 0) {
+							if (wkShortIntRemaind.compareTo(ba.getInterest()) > 0) {
+								ba.setInterest(BigDecimal.ZERO);
+								ba.setAcctAmt(BigDecimal.ZERO);
+								wkShortIntRemaind = wkShortIntRemaind.subtract(ba.getInterest());
+							} else {
+								ba.setInterest(ba.getInterest().subtract(wkShortIntRemaind));
+								ba.setAcctAmt(ba.getAcctAmt().subtract(wkShortIntRemaind));
+								wkShortIntRemaind = BigDecimal.ZERO;
+							}
+						}
+					}
+				}
+			}
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 1 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					acDetail = new AcDetail();
