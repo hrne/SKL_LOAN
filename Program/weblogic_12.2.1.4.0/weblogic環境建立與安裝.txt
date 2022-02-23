@@ -39,7 +39,7 @@
 
     tar xzf jdk-8u321-linux-x64.tar.gz -C /u01/jdk/
     sudo alternatives --install /usr/bin/java java /u01/jdk/jdk1.8.0_321/bin/java 2
-    sudo alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_181/bin/javac 2
+    sudo alternatives --install /usr/bin/javac javac /u01/jdk/jdk1.8.0_321/bin/javac 2
     sudo alternatives --install /usr/bin/jar jar /u01/jdk/jdk1.8.0_321/bin/jar 2
     sudo alternatives --set jar /u01/jdk/jdk1.8.0_321/bin/jar
     sudo alternatives --set javac /u01/jdk/jdk1.8.0_321/bin/javac
@@ -117,7 +117,7 @@ inst_group=weblogic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5.開始安裝
-    java -jar /home/weblogic/softWare/weblogic_12.2.1.4.0/fmw_12.2.1.4.0_infrastructure.jar -silent -responseFile /home/weblogic/softWare/weblogic_12.2.1.4.0/wls.rsp -invPtrLoc /home/weblogic/softWare/weblogic_12.2.1.4.0/oraInst.loc
+    java -jar /u01/source/fmw_12.2.1.4.0_infrastructure.jar -silent -responseFile /u01/source/wls.rsp -invPtrLoc /u01/source/oraInst.loc
 
     #導入「安裝位置」環境變量
     export MW_HOME=/u01/app
@@ -190,5 +190,3 @@ fi
 -Ditx_configFolder=/home/weblogic/itxDoc/itxConfig
 -DiTXInFolder=/home/weblogic/itxDoc/itxWrite/upload/
 -DiTXPort=556887799
-
-
