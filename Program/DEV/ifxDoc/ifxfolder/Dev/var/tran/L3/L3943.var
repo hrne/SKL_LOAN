@@ -210,13 +210,15 @@ T(3,[L3943] 支票內容)
 #OChequeNo=A,7,L
 
 ![會計日期]
-#OAcDate=D,7,L
+!xiangwei: 用純文字在java處理，無日期時維持空字串
+#OAcDate=X,9,L
 
 ![支票到期日]
 #OChequeDate=D,7,L
 
 ![入帳日]
-#OEntryDate=D,7,L
+!xiangwei: 用純文字在java處理，無日期時維持空字串
+#OEntryDate=X,9,L
 
 ![支票銀行]
 #OBankItem=X,20,L
@@ -326,9 +328,6 @@ P(R,#OORvAmtX)
 CALL2(#ADJUSTDOT,#Precision,#OORvBal,#OORvBalX)
 P(R,#OORvBalX)
 
-
-
-
 </sub>
 
 
@@ -377,8 +376,7 @@ TXFORM=L3943
 ["#FdOBankItem+支票銀行",#OBankItem],
 ["#FdOAreaCodeX+交換區號",#OAreaCodeX],
 ["#FdOBranchItem+支票分行",#OBranchItem], 
-["#FdOBktwFlagX+是否為台支",#OBktwFlagX], 
-["#FdOTsibFlagX+是否為台新",#OTsibFlagX],
+["#FdOBktwFlagX+是否為台支",#OBktwFlagX],
 ["#FdOStatusCodeX+票據狀況碼",#OStatusCodeX],
 ["#FdOMediaFlagX+入媒體檔",#OMediaFlagX],
 ["#FdOUsageCodeX+支票用途",#OUsageCodeX],
@@ -421,7 +419,7 @@ TXFORM=L3943
 #OChequeAmtX#OOutsideCodeX
 #OBankItem#OAreaCodeX
 #OBranchItem#OBktwFlagX
-#OStatusCodeX#OTsibFlagX
+#OStatusCodeX
 #OUsageCodeX#OMediaFlagX
 #OServiceCenterX#OCreditorId
 #OCreditorBankItem

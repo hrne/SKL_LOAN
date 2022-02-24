@@ -124,6 +124,9 @@ public interface AcDetailRepositoryMon extends JpaRepository<AcDetail, AcDetailI
   // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcNoCode = ,AND AcSubCode =  ,AND AcDate >= ,AND AcDate <= 
   public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, int acDate_6, int acDate_7, Pageable pageable);
 
+  // AcctCode = ,AND CustNo = ,AND RvNo = ,AND AcDate =
+  public Optional<AcDetail> findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

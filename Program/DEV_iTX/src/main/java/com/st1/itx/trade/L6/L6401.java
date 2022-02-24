@@ -122,7 +122,7 @@ public class L6401 extends TradeBuffer {
 	private TxTeller MoveToDb(String iTlrNo, TxTeller tTxTeller, TitaVo titaVo) throws LogicException {
 
 		tTxTeller.setTlrNo(iTlrNo);
-		tTxTeller.setTlrItem(titaVo.getParam("TlrItem"));
+//		tTxTeller.setTlrItem(titaVo.getParam("TlrItem"));
 		tTxTeller.setBrNo(titaVo.getParam("BrNo"));
 //		tTxTeller.setAdFg(Integer.valueOf(titaVo.get("AdFg")));
 		tTxTeller.setLevelFg(Integer.valueOf(titaVo.get("LevelFg")));

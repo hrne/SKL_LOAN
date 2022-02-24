@@ -29,7 +29,7 @@ public class AchAuthLog implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6438848682888551812L;
+	private static final long serialVersionUID = 1507319106665947712L;
 
 @EmbeddedId
   private AchAuthLogId achAuthLogId;
@@ -64,6 +64,11 @@ public class AchAuthLog implements Serializable {
   /* 最新動作之日期時間(Ex.建檔提出產媒體) */
   @Column(name = "`ProcessDate`")
   private int processDate = 0;
+
+  // 處理時間
+  /* 最新動作之日期時間 */
+  @Column(name = "`ProcessTime`")
+  private int processTime = 0;
 
   // 核印完成日期時間
   /* 提回並且成功之日期時間 */
@@ -302,6 +307,25 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
   * @throws LogicException when Date Is Warn	*/
   public void setProcessDate(int processDate) throws LogicException {
     this.processDate = StaticTool.rocToBc(processDate);
+  }
+
+/**
+	* 處理時間<br>
+	* 最新動作之日期時間
+	* @return Integer
+	*/
+  public int getProcessTime() {
+    return StaticTool.bcToRoc(this.processTime);
+  }
+
+/**
+	* 處理時間<br>
+	* 最新動作之日期時間
+  *
+  * @param processTime 處理時間
+  * @throws LogicException when Date Is Warn	*/
+  public void setProcessTime(int processTime) throws LogicException {
+    this.processTime = StaticTool.rocToBc(processTime);
   }
 
 /**
@@ -770,9 +794,9 @@ Y:已產生媒體
   @Override
   public String toString() {
     return "AchAuthLog [achAuthLogId=" + achAuthLogId + ", facmNo=" + facmNo
-           + ", processDate=" + processDate + ", stampFinishDate=" + stampFinishDate + ", authStatus=" + authStatus + ", authMeth=" + authMeth + ", limitAmt=" + limitAmt + ", mediaCode=" + mediaCode
-           + ", batchNo=" + batchNo + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName
-           + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd + ", createEmpNo=" + createEmpNo
-           + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
+           + ", processDate=" + processDate + ", processTime=" + processTime + ", stampFinishDate=" + stampFinishDate + ", authStatus=" + authStatus + ", authMeth=" + authMeth + ", limitAmt=" + limitAmt
+           + ", mediaCode=" + mediaCode + ", batchNo=" + batchNo + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode
+           + ", relAcctName=" + relAcctName + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd
+           + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }

@@ -329,6 +329,7 @@ public class L3210 extends TradeBuffer {
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);
 				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
+				acDetail.setRvNo(titaVo.getParam("RpRvno1"));
 				lAcDetail.add(acDetail);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				// 貸方 收付欄

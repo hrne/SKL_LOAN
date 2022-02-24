@@ -34,75 +34,75 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> deleteAll(TitaVo titaVo) throws Exception {
 
 		String sql = "　";
-		sql += "	DELETE                                                    \r\n";
-		sql += "	FROM \"AmlCustList\"                                      \r\n";
+		sql += "DELETE FROM \"AmlCustList\"";
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		return this.convertToMap(query);
+		//must set to true
+		return this.convertToMap(query,true);
 	}
 
 	public List<Map<String, String>> insertAll(int iDate, int iDate3Y, int iDate5Y, int iAmt, TitaVo titaVo) throws Exception {
 
 		String sql = "　";
-		sql += "INSERT INTO \"AmlCustList\"                               \r\n";
-		sql += "SELECT                                                    \r\n";
-		sql += " \"CustNo\"                                               \r\n"; // 戶號
-		sql += ",CASE WHEN AMT1 >" + iAmt + "                            \r\n";
-		sql += "	          THEN 'Y'                                       \r\n";
-		sql += " 	 ELSE 'N'                                            \r\n";
-		sql += "	END                                                      \r\n"; // 註記1
-		sql += ",CASE WHEN AMT2 >" + iAmt + "                            \r\n";
-		sql += "		      THEN 'Y'                                       \r\n";
-		sql += "		 ELSE 'N'                                            \r\n";
-		sql += "	END                                                      \r\n"; // 註記2
-		sql += ",CASE WHEN CNT3 > 0                                       \r\n";
-		sql += "	          THEN 'Y'                                       \r\n";
-		sql += "	     ELSE 'N'                                            \r\n";
-		sql += "	END                                                      \r\n"; // 註記3
-		sql += ",SYSTIMESTAMP                                                \r\n"; // 建檔日期時間
-		sql += ",:TlrNo                                \r\n"; // 建檔人員
-		sql += ",SYSTIMESTAMP                                               \r\n"; // 最後更新日期時間
-		sql += ",:TlrNo                                \r\n"; // 最後更新人員
-		sql += "	FROM                                                     \r\n";
-		sql += "	 (SELECT                                                  \r\n";
-		sql += "		 L.\"CustNo\"         AS  \"CustNo\"                  \r\n"; // 戶號
-		sql += "		,SUM(CASE WHEN T.\"EntryDate\" <= " + iDate3Y + "     \r\n";
-		sql += "		                THEN T.\"TxAmt\"                      \r\n";
-		sql += "		           ELSE 0                                     \r\n";
-		sql += "		     END)             AS  AMT1                        \r\n"; // 三年內還本的匯款金額
-		sql += "		,SUM(CASE WHEN T.\"EntryDate\" <= " + iDate5Y + "    \r\n";
-		sql += "		                THEN T.\"TxAmt\"                      \r\n";
-		sql += "		           ELSE 0                                     \r\n";
-		sql += "		     END)             AS  AMT2                        \r\n"; // 五年內還本的匯款金額
-		sql += "		,SUM(CASE WHEN F.\"RecycleDeadline\" <= " + iDate + " \r\n";
-		sql += "		                THEN  1                               \r\n";
-		sql += "		           ELSE 0                                     \r\n";
-		sql += "		     END)             AS  CNT3                        \r\n"; // 循環動用期限>=資料產生日(筆數)
-		sql += "		FROM ( SELECT                                         \r\n";
-		sql += "		        \"CustNo\"                                    \r\n";
-		sql += "		       ,\"FacmNo\"                                    \r\n";
-		sql += "		       FROM \"LoanBorMain\"                           \r\n";
-		sql += "		       WHERE \"Status\" IN (0,2,4,7)                  \r\n"; // 00: 正常戶 02: 催收戶 03: 結案戶 04:逾期戶
+		sql += "INSERT INTO \"AmlCustList\"                                ";
+		sql += "SELECT                                                     ";
+		sql += " \"CustNo\"                                                "; // 戶號
+		sql += ",CASE WHEN AMT1 >" + iAmt + "                             ";
+		sql += "	          THEN 'Y'                                        ";
+		sql += " 	 ELSE 'N'                                             ";
+		sql += "	END                                                       "; // 註記1
+		sql += ",CASE WHEN AMT2 >" + iAmt + "                             ";
+		sql += "		      THEN 'Y'                                        ";
+		sql += "		 ELSE 'N'                                             ";
+		sql += "	END                                                       "; // 註記2
+		sql += ",CASE WHEN CNT3 > 0                                        ";
+		sql += "	          THEN 'Y'                                        ";
+		sql += "	     ELSE 'N'                                             ";
+		sql += "	END                                                       "; // 註記3
+		sql += ",SYSTIMESTAMP                                                 "; // 建檔日期時間
+		sql += ",:TlrNo                                 "; // 建檔人員
+		sql += ",SYSTIMESTAMP                                                "; // 最後更新日期時間
+		sql += ",:TlrNo                                 "; // 最後更新人員
+		sql += "	FROM                                                      ";
+		sql += "	 (SELECT                                                   ";
+		sql += "		 L.\"CustNo\"         AS  \"CustNo\"                   "; // 戶號
+		sql += "		,SUM(CASE WHEN T.\"EntryDate\" <= " + iDate3Y + "      ";
+		sql += "		                THEN T.\"TxAmt\"                       ";
+		sql += "		           ELSE 0                                      ";
+		sql += "		     END)             AS  AMT1                         "; // 三年內還本的匯款金額
+		sql += "		,SUM(CASE WHEN T.\"EntryDate\" <= " + iDate5Y + "     ";
+		sql += "		                THEN T.\"TxAmt\"                       ";
+		sql += "		           ELSE 0                                      ";
+		sql += "		     END)             AS  AMT2                         "; // 五年內還本的匯款金額
+		sql += "		,SUM(CASE WHEN F.\"RecycleDeadline\" <= " + iDate + "  ";
+		sql += "		                THEN  1                                ";
+		sql += "		           ELSE 0                                      ";
+		sql += "		     END)             AS  CNT3                         "; // 循環動用期限>=資料產生日(筆數)
+		sql += "		FROM ( SELECT                                          ";
+		sql += "		        \"CustNo\"                                     ";
+		sql += "		       ,\"FacmNo\"                                     ";
+		sql += "		       FROM \"LoanBorMain\"                            ";
+		sql += "		       WHERE \"Status\" IN (0,2,4,7)                   "; // 00: 正常戶 02: 催收戶 03: 結案戶 04:逾期戶
 																						// 05:催收結案戶 06:呆帳戶 07:部分轉呆戶
 																						// 08:債權轉讓戶 09:呆帳結案戶
-		sql += "		       GROUP BY \"CustNo\",\"FacmNo\"                 \r\n";
-		sql += "		      ) L                                             \r\n";
-		sql += "	  LEFT JOIN \"FacMain\" F                                 \r\n";
-		sql += "		       ON F.\"CustNo\" = L.\"CustNo\"                 \r\n";
-		sql += "		      AND F.\"FacmNo\" = L.\"FacmNo\"                 \r\n";
-		sql += "	  LEFT JOIN \"FacProd\" P                                 \r\n";
-		sql += "		       ON P.\"ProdNo\" = F.\"ProdNo\"                 \r\n";
-		sql += "      LEFT JOIN \"LoanBorTx\" T                               \r\n";
-		sql += "		       ON T.\"CustNo\" = L.\"CustNo\"                 \r\n";
-		sql += "		      AND T.\"FacmNo\" = L.\"FacmNo\"                 \r\n";
-		sql += "		      AND T.\"TitaTxCd\" = 'L3200'                    \r\n";
-		sql += "		      AND T.\"ExtraRepay\" > 0                        \r\n";
-		sql += "		      AND JSON_VALUE(T.\"OtherFields\",'$.RepayCode') = '1'  \r\n";
-		sql += "		      AND P.\"BreachFlag\" = 'N'                      \r\n";
-		sql += "       GROUP BY L.\"CustNo\"                                  \r\n";
-		sql += "   )                                                          \r\n";
+		sql += "		       GROUP BY \"CustNo\",\"FacmNo\"                  ";
+		sql += "		      ) L                                              ";
+		sql += "	  LEFT JOIN \"FacMain\" F                                  ";
+		sql += "		       ON F.\"CustNo\" = L.\"CustNo\"                  ";
+		sql += "		      AND F.\"FacmNo\" = L.\"FacmNo\"                  ";
+		sql += "	  LEFT JOIN \"FacProd\" P                                  ";
+		sql += "		       ON P.\"ProdNo\" = F.\"ProdNo\"                  ";
+		sql += "      LEFT JOIN \"LoanBorTx\" T                                ";
+		sql += "		       ON T.\"CustNo\" = L.\"CustNo\"                  ";
+		sql += "		      AND T.\"FacmNo\" = L.\"FacmNo\"                  ";
+		sql += "		      AND T.\"TitaTxCd\" = 'L3200'                     ";
+		sql += "		      AND T.\"ExtraRepay\" > 0                         ";
+		sql += "		      AND JSON_VALUE(T.\"OtherFields\",'$.RepayCode') = '1'   ";
+		sql += "		      AND P.\"BreachFlag\" = 'N'                       ";
+		sql += "       GROUP BY L.\"CustNo\"                                   ";
+		sql += "   )                                                           ";
 
 		this.info("sql=" + sql);
 		Query query;

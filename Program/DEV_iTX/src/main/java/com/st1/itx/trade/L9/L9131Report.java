@@ -43,7 +43,7 @@ public class L9131Report extends MakeReport {
 	private int reportDate = 0;
 	private String brno = "";
 	private String reportCode = "L9131";
-	private String reportItem = "核心日結單代傳票列印";
+	private String reportItem = "總帳日結單代傳票列印";
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
@@ -98,9 +98,9 @@ public class L9131Report extends MakeReport {
 		 * -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * ----------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		print(1, 1, "傳票　會計科目代號　　　子目代號　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　銷帳碼／　　　　　　　　　　單位代號／");
-		print(1, 1, "序號　科目名稱　　　　　子目名稱　　　　　　　　　　　　　　幣別　　　　借方金額　　　　　　　貸方金額　　　　　　　　　摘要說明　　　　　　　　　　成本月份");
-		print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－－－－－－");
+		print(1, 1, "傳票　會計科目代號　　　子目代號　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　銷帳碼／　　　　　　　　單位代號／");
+		print(1, 1, "序號　科目名稱　　　　　子目名稱　　　　　　　　　　　　　　幣別　　　　借方金額　　　　　　　貸方金額　　　　　　　　　摘要說明　　　　　　　　成本單位　　　通路");
+		print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－　－－－－");
 
 	}
 
@@ -161,7 +161,10 @@ public class L9131Report extends MakeReport {
 
 		this.slipNo = tFirstSlipMedia2022.getSlipMedia2022Id().getMediaSlipNo();
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem + "_" + slipNo, security, pageSize, pageOrientation);
+		int thisMediaSeq = tFirstSlipMedia2022.getMediaSeq();
+
+		this.open(titaVo, reportDate, brno, reportCode, reportItem + "_" + FormatUtil.pad9("" + thisMediaSeq, 3),
+				security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
 
@@ -225,6 +228,7 @@ public class L9131Report extends MakeReport {
 			// 明細資料第二行
 			print(1, 1, "　　");
 			print(0, 7, acNoItem);
+			print(0, 111, acNoItem);
 		}
 
 		print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－－－－－－");

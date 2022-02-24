@@ -1,4 +1,4 @@
-﻿!---------- BASIC LABEL Variables ----------
+﻿ !---------- BASIC LABEL Variables ----------
 <sub type="SYS">
 </sub>
 
@@ -85,8 +85,8 @@ E(0,1)ASGN(LOOP$)
 
 #OOCustNo=A,7,O
 #OOCustName=x,20,O
-#OOChequeBank=A,3,O
-#OOChequeBranch=A,4,O
+#OOChequeBank=X,20,O
+#OOChequeBranch=X,20,O
 #OOChequeAcctNo=A,9,O
 #OOChequeNo=A,7,O
 #OOChequeAmt=m,14,O

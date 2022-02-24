@@ -16,9 +16,12 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.SlipEbsRecord;
 import com.st1.itx.db.domain.SystemParas;
+import com.st1.itx.db.service.SlipEbsRecordService;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.tradeService.CommBuffer;
 
@@ -28,6 +31,8 @@ public class EbsCom extends CommBuffer {
 
 	@Autowired
 	private SystemParasService sSystemParasService;
+	@Autowired
+	private SlipEbsRecordService sSlipEbsRecordService;
 
 	public void sendSlipMediaToEbs(JSONArray summaryTbl, JSONArray journalTbl, TitaVo titaVo) throws LogicException {
 		this.info("EbsCom sendSlipMediaToEbs.");
@@ -58,16 +63,36 @@ public class EbsCom extends CommBuffer {
 		String result = post(slipMediaUrl, ebsAuth, requestJO.toString());
 
 		// 分析回傳資料
-		String returnStatus = analyzeResult(result);
+		String returnStatus = analyzeResult(requestJO, result);
 
 		if (returnStatus != null && returnStatus.equals("E")) {
 			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
 		}
 	}
 
-	private String analyzeResult(String result) throws LogicException {
+	private String analyzeResult(JSONObject requestJo, String result) throws LogicException {
 		JSONObject outputParameters = null;
 		String returnStatus = null;
+		String groupId = null;
+		try {
+			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL")
+					.getJSONArray("P_SUMMARY_TBL_ITEM").getJSONObject(0).getString("GROUP_ID");
+		} catch (JSONException e1) {
+			groupId = "RequestERR";
+		}
+
+		// 寫進TABLE存起來
+		SlipEbsRecord tSlipEbsRecord = new SlipEbsRecord();
+
+		tSlipEbsRecord.setGroupId(groupId);
+		tSlipEbsRecord.setRequestData(requestJo.toString());
+		tSlipEbsRecord.setResultData(result);
+
+		try {
+			sSlipEbsRecordService.insert(tSlipEbsRecord, titaVo);
+		} catch (DBException e1) {
+			throw new LogicException("E0001", "EbsCom,SlipEbsRecord");
+		}
 		try {
 			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
 			returnStatus = outputParameters.getString("X_RETURN_STATUS");
@@ -77,7 +102,6 @@ public class EbsCom extends CommBuffer {
 			this.error("EbsCom Exception = " + e.getMessage());
 			throw new LogicException("E9004", "EbsCom分析回傳資料時有誤");
 		}
-		// TODO:寫進TABLE存起來
 		return returnStatus;
 	}
 

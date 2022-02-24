@@ -72,7 +72,7 @@ T(4,CHAIN$)
 ! 連動交易資料
 ! 後端使用webclient.post時以參數帶入的連動資料
 ! Ref:L9130.java
-#NTXBUF=X,40,S
+#NTXBUF=X,74,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@iTlrNo,#NTXBUF,1,6)
 T(1,@iCode,#NTXBUF,7,20)

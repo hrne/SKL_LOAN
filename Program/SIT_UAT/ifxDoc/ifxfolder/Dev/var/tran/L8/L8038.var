@@ -163,6 +163,8 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 #OOTotalAmt=M,10,S
 #OOCivil323Amt=M,10,S
 #OOInterviewDate=D,7,S
+#OOInterviewDateX=D,7,S
+C(3,#OOInterviewDate,0,T(2,),E(2,#OOInterviewDate))
 #OOPassDate=D,7,S
 #OOLimitDate=D,7,S
 #OOSignDate=D,7,S
@@ -269,7 +271,7 @@ TXFORM=L8038
 {width:160}
 #OOCivil323Amt=依民法第323條<br>計算之債務總金額
 {width:160}
-#OOInterviewDate=面談日期
+#OOInterviewDateX=面談日期
 {width:100,align:'center'}
 #OOPassDate=協議完成日
 {width:100,align:'center'}

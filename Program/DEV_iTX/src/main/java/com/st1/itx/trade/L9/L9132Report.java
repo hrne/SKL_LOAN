@@ -50,7 +50,7 @@ public class L9132Report extends MakeReport {
 	private int reportDate = 0;
 	private String brno = "";
 	private String reportCode = "L9132";
-	private String reportItem = "傳票媒體明細表(核心)";
+	private String reportItem = "傳票媒體明細表(總帳)";
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";

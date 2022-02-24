@@ -6,13 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
+
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.TxRecord;
-import com.st1.itx.db.domain.TxTeller;
-import com.st1.itx.db.service.TxRecordService;
+import com.st1.itx.db.domain.TxInquiry;
+import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.TxInquiryService;
 import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
@@ -37,10 +39,13 @@ public class L6101Excel extends MakeReport {
 	WebClient webClient;
 	
 	@Autowired
-	TxRecordService sTxRecordService;
+	TxInquiryService sTxInquiryService;
 	
 	@Autowired
 	TxTellerService sTxTellerService;
+	
+	@Autowired
+	TxTranCodeService sTxTranCodeService;
 	
 	
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -49,36 +54,34 @@ public class L6101Excel extends MakeReport {
 		printExcelHeader();
 		
 		int Caldy = Integer.parseInt(titaVo.getCalDy())+19110000;
-		String Brno = titaVo.getBrno();
 		
-		this.info("Caldy=="+Caldy+",Brno=="+Brno);
-		
-		Slice<TxRecord> sTxRecord = sTxRecordService.findImportFg(Caldy, Brno, "1",0, Integer.MAX_VALUE, titaVo);
+		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findImportFg(Caldy,Caldy, "1",0,9999999, 0,Integer.MAX_VALUE, titaVo);
 
-		List<TxRecord> iTxRecord = sTxRecord== null ? null : sTxRecord.getContent();
-		this.info("iTxRecord="+iTxRecord);
+		List<TxInquiry> iTxInquiry = sTxInquiry== null ? null : sTxInquiry.getContent();
 
-		TxTeller tTxTeller = new TxTeller();
 		TempVo tTempVo = new TempVo();
 		int rowCursor = 2;
 		
-		if (iTxRecord != null) {
+		if (iTxInquiry != null) {
 			
-			for ( TxRecord tTxRecord : iTxRecord) {
+			for ( TxInquiry tTxInquiry : iTxInquiry) {
 				
 				String reason = "";
 				
 				tTempVo = new TempVo();
-				tTempVo = tTempVo.getVo(tTxRecord.getTranData());
+				tTempVo = tTempVo.getVo(tTxInquiry.getTranData());
 				
-				if(tTempVo.get("REASON") ==null || tTempVo.get("REASON").isEmpty()) {
+				if(tTempVo.get("TxReason") ==null || tTempVo.get("TxReason").isEmpty()) {
 					continue;
 				}
+				
+				String tranItem =findTranItem(tTempVo.get("TXCD"),titaVo);
+				
 				//交易代號
-				makeExcel.setValue(rowCursor, 1, tTempVo.get("TXCD"));
+				makeExcel.setValue(rowCursor, 1, tTempVo.get("TXCD")+" "+tranItem);
 				
 				//查詢理由
-				reason = tTempVo.get("REASON");
+				reason = tTempVo.get("TxReason");
 				makeExcel.setValue(rowCursor, 2, reason);
 				
 				//經辦
@@ -139,9 +142,21 @@ public class L6101Excel extends MakeReport {
 		}
 
 	}
+	
+	private String findTranItem(String iTranCode,TitaVo titaVo) {
+		String tranitem = "";
+		
+		TxTranCode sTxTranCode = sTxTranCodeService.findById(iTranCode, titaVo);
+		
+		if(sTxTranCode!=null) {
+			tranitem = sTxTranCode.getTranItem();
+		}
+		
+		return tranitem;
+	}
 	private void printExcelHeader() throws LogicException {
 		makeExcel.setValue(1, 1, "交易代號");
-		makeExcel.setWidth(1, 15);
+		makeExcel.setWidth(1, 40);
 		
 		makeExcel.setValue(1, 2, "查詢理由");
 		makeExcel.setWidth(2, 40);

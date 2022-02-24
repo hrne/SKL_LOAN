@@ -46,7 +46,7 @@ E(0,0)
 ["#FdCaseNo+ELoan案件編號",#CaseNo],
 ["#FdRelId+關係人統編",#RelId],
 ["#FdRelName+關係人姓名",#RelName],
-["#FdPosInd+關係",#PosInd,#PosIndX],
+["#FdPosInd+職稱代碼",#PosInd,#PosIndX],
 ["#FdRemarkType+備註類型",#RemarkType,#RemarkTypeX],
 ["#FdRemark+備註",#Remark],
 ]

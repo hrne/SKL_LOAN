@@ -1063,6 +1063,25 @@ em = null;
   }
 
   @Override
+  public AcDetail findL4701First(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findL4701First " + dbName + " : " + "acctCode_0 : " + acctCode_0 + " custNo_1 : " +  custNo_1 + " rvNo_2 : " +  rvNo_2 + " acDate_3 : " +  acDate_3);
+    Optional<AcDetail> acDetailT = null;
+    if (dbName.equals(ContentName.onDay))
+      acDetailT = acDetailReposDay.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+    else if (dbName.equals(ContentName.onMon))
+      acDetailT = acDetailReposMon.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+    else if (dbName.equals(ContentName.onHist))
+      acDetailT = acDetailReposHist.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+    else 
+      acDetailT = acDetailRepos.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+
+    return acDetailT.isPresent() ? acDetailT.get() : null;
+  }
+
+  @Override
   public AcDetail holdById(AcDetailId acDetailId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

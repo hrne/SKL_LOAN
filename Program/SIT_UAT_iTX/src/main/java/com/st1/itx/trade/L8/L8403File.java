@@ -1793,14 +1793,20 @@ public class L8403File extends MakeFile {
 					int ixMonthPayAmt2 = Integer.valueOf(sJcicZ047.getMonthPayAmt2());
 					String iPayLastAmt2 = String.valueOf(sJcicZ047.getPayLastAmt2());
 					int ixPayLastAmt2 = Integer.valueOf(sJcicZ047.getPayLastAmt2());
-
+					/**新增如果面試日期沒有輸入會帶0近來，但是在印出時應該顯示為空白*/
+					String iInterviewDate2 ="";
+					if(iInterviewDate.equals("0")) {
+						iInterviewDate2 =  " ";
+					}else {
+						iInterviewDate2 = iInterviewDate;
+					}
 					String iUkey = sJcicZ047.getUkey();
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "47" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
 							+ StringUtils.leftPad(iPeriod, 3, '0') + StringUtils.leftPad(FormatRate(iRate, 2), 5, '0') + StringUtils.leftPad(iCivil323ExpAmt, 9, '0')
 							+ StringUtils.leftPad(iExpLoanAmt, 9, '0') + StringUtils.leftPad(iCivil323CashAmt, 9, '0') + StringUtils.leftPad(iCashCardAmt, 9, '0')
 							+ StringUtils.leftPad(iCivil323CreditAmt, 9, '0') + StringUtils.leftPad(iCreditCardAmt, 9, '0') + StringUtils.leftPad(iCivil323Amt, 10, '0')
-							+ StringUtils.leftPad(iTotalAmt, 10, '0') + StringUtils.leftPad(iPassDate, 7, '0') + StringUtils.leftPad(iInterviewDate, 7, "") + StringUtils.leftPad(iSignDate, 7, "")
+							+ StringUtils.leftPad(iTotalAmt, 10, '0') + StringUtils.leftPad(iPassDate, 7, '0') + StringUtils.leftPad(iInterviewDate2, 7, "") + StringUtils.leftPad(iSignDate, 7, "")
 							+ StringUtils.leftPad(iLimitDate, 7, '0') + StringUtils.leftPad(iFirstPayDate, 7, '0') + StringUtils.leftPad(iMonthPayAmt, 9, '0')
 							+ StringUtils.rightPad(iPayAccount, 20, "") + nPostAddr + StringUtils.rightPad(iGradeType, 1, "") + StringUtils.leftPad(iPayLastAmt, 9, '0')
 							+ outPeriod2 + outRate2 + StringUtils.leftPad(iMonthPayAmt2, 9, '0')

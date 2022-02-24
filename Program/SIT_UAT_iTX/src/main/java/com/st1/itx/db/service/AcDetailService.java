@@ -617,6 +617,18 @@ public interface AcDetailService {
   public Slice<AcDetail> acdtlAcDateRange2(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, int acDate_6, int acDate_7, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcctCode = ,AND CustNo = ,AND RvNo = ,AND AcDate =
+   *
+   * @param acctCode_0 acctCode_0
+   * @param custNo_1 custNo_1
+   * @param rvNo_2 rvNo_2
+   * @param acDate_3 acDate_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public AcDetail findL4701First(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, TitaVo... titaVo);
+
+  /**
    * hold By AcDetail
    * 
    * @param acDetailId key
