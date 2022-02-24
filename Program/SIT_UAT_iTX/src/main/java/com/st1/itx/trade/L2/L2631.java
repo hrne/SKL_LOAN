@@ -73,6 +73,8 @@ public class L2631 extends TradeBuffer {
 	public L2076ReportC L2076ReportC;
 	@Autowired
 	public L2076ReportD L2076ReportD;
+	@Autowired
+	public L2076ReportE L2076ReportE;
 
 	/* 轉換工具 */
 	@Autowired
@@ -299,6 +301,7 @@ public class L2631 extends TradeBuffer {
 				if (tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26")
 						|| tFacClose.getCollectWayCode().equals("27")) {
 					doRptD(tFacClose, titaVo.get("Addres"), titaVo);// 雙掛號信封
+					doRptE(tFacClose, titaVo.get("Addres"), titaVo);// 雙掛號小單
 				}
 
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
@@ -349,6 +352,13 @@ public class L2631 extends TradeBuffer {
 
 		// 撈資料組報表
 		L2076ReportD.exec(tFacClose, Addres,titaVo);
+
+	}
+	public void doRptE(FacClose tFacClose, String Addres, TitaVo titaVo) throws LogicException {
+		this.info("L2076E doRptE started.");
+
+		// 撈資料組報表
+		L2076ReportE.exec(tFacClose, Addres,titaVo);
 
 	}
 }

@@ -143,14 +143,14 @@ public class L6R20 extends TradeBuffer {
 		this.totaVo.putParam("LastDate", tTxTeller.getLastDate());
 		this.totaVo.putParam("LastTime", tTxTeller.getLastTime());
 
-		this.totaVo.putParam("LastUpdate", parse.timeStampToString(tTxTeller.getLastUpdate()));
-		String LastUpdateEmpNo = tTxTeller.getLastUpdateEmpNo();
+		this.totaVo.putParam("LastUpdate", parse.timeStampToString(tTxTeller.getMntDate()));
+		String LastUpdateEmpNo = tTxTeller.getMntEmpNo();
 		this.totaVo.putParam("LastUpdateEmpNo", LastUpdateEmpNo);
 
 		String name = "";
-		TxTeller sTxTeller = sTxTellerService.findById(LastUpdateEmpNo, titaVo);
-		if (sTxTeller != null) {
-			name = sTxTeller.getTlrItem();
+		CdEmp cdEmp = cdEmpService.findById(LastUpdateEmpNo, titaVo);
+		if (cdEmp != null) {
+			name = cdEmp.getFullname();
 		}
 
 		this.totaVo.putParam("LastUpdateEmpNoX", name);

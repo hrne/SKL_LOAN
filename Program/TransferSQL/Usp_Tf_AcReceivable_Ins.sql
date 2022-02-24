@@ -401,7 +401,6 @@ BEGIN
             ,ACTP.LMSTOA
       FROM LADACTP ACTP
       WHERE ACTP.LMSACN != 601776
-        AND ACTP.LMSTOA > 0
     )
     , L1 AS (
       -- 加總各額度放款餘額

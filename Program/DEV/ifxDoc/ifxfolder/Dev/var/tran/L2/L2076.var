@@ -179,8 +179,6 @@ E(0,@RimFacmNo,#FacmNo)
 RESET_RIM(#SendL2R45A,L2R45)
 S(L2R45,1,#RimFunCode,#RimCustNo,#RimFacmNo)
 R(1,L2R45)
-
-#checkl2r45A=X,1,S
 T(2,@TelNo1,#L2r45TelNo1)
 T(2,@TelNo2,#L2r45TelNo2)
 T(2,@TelNo3,#L2r45TelNo3)
@@ -191,7 +189,7 @@ T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
 ! E(0,@ReceiveDate,#L2r45ReceiveDate)
 T(1,@Rmk1,#L2r45Rmk,1,100)
 E(0,@CloseNo,#L2r45CloseNo)
-IF(#CollectWayCode=="21"||#CollectWayCode=="26"||#CollectWayCode=="27",T(2,@Addres,#L2r45Addres),$)
+T(2,@Addres,#L2r45Addres)
 IF(#CollectWayCode=="21"||#CollectWayCode=="26"||#CollectWayCode=="27",INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
 
 
@@ -241,6 +239,7 @@ T(H,#CloseReasonCode,#AdvanceCloseCodeHelp)
 #CollectWayCode=X,2,I
 HELP(#CollectWayCodeHelp,cols:5)
 @V(H,#CollectWayCodeHelp)
+IF(#CollectWayCode=="21"||#CollectWayCode=="26"||#CollectWayCode=="27",INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
 
 #CollectWayCodeX=x,12,L
 C(4,#CollectWayCode,S,$)
@@ -253,7 +252,7 @@ E(0,#SYSCDATE)
 @A(DATE,0,#ReceiveDate)
 
 !地址
-#Addres=x,200,I
+#Addres=x,200,I,maxWidth:100
 IF(#CollectWayCode=="21"||#CollectWayCode=="26"||#CollectWayCode=="27",$,S)
 @V(7)
 

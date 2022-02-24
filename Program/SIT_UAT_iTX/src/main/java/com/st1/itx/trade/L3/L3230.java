@@ -181,6 +181,9 @@ public class L3230 extends TradeBuffer {
 		if (iTempReasonCode == 0 || iTempReasonCode > 5) {
 			throw new LogicException(titaVo, "E0019", "暫收帳戶"); // 輸入資料錯誤
 		}
+		if (iTempReasonCode == 2 && iCustNo != this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+			throw new LogicException(titaVo, "E0019", "戶號需為前置協商收款專戶"); // 輸入資料錯誤
+		}
 		if (iFacmNo > 0) {
 			wkFacmNoStart = iFacmNo;
 			wkFacmNoEnd = iFacmNo;
@@ -633,6 +636,9 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
+
+		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
+
 		if ("06".equals(iTempItemCode)) {
 			tLoanBorTx.setDesc("暫收款轉帳");
 		} else {

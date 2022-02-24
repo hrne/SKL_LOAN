@@ -519,6 +519,28 @@ public class Cs80UpDBS extends CommBuffer {
 		txInquiry.setTranNo(this.titaVo.getTxCode());
 		txInquiry.setMrKey(this.titaVo.getMrKey());
 
+		this.info("CS80 custRmk = " + this.titaVo.get("CustNo") + "/" + this.titaVo.get("CustId"));
+		int custNo = 0;
+		if (titaVo.getMrKey().trim().length() >= 7 && parse.isNumeric(titaVo.getMrKey().trim().substring(0, 7))) {
+			custNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
+		} else {
+			String custNox = this.titaVo.get("CustNo");
+			if (custNox != null) {
+				custNo = parse.stringToInteger(custNox);
+			}
+			if (custNo == 0) {
+				String custId = this.titaVo.get("CustId");
+				if (custId != null) {
+					CustMain custMain = custMainService.custIdFirst(custId, titaVo);
+					if (custMain != null) {
+						custNo = custMain.getCustNo();
+					}
+				}
+			}
+		}
+
+		txInquiry.setCustNo(custNo);
+
 		txInquiry.setMsgId(tota.getMsgId());
 		if (tota.isError()) {
 			// 交易失敗

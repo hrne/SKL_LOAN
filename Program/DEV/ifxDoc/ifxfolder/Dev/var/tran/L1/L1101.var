@@ -1788,7 +1788,7 @@ TXFORM=L1101
 #OONuber=電話號碼
 {width:150,align:'left'}
 
-#OORelationLb=與借款人關係
+#OORelationLb=與顧客關係
 {width:150,align:'left'}
 
 #OOLiaisonName=聯絡人姓名

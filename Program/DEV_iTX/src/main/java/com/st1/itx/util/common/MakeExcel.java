@@ -51,6 +51,7 @@ import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
+import com.st1.itx.util.filter.SafeClose;
 
 /**
  * 
@@ -1023,7 +1024,9 @@ public class MakeExcel extends CommBuffer {
 
 		int l = fileName.length();
 
-		try (InputStream is = new FileInputStream(fna)) {
+		InputStream is = null;
+		try {
+			is = new FileInputStream(fna);
 			if (".xls".equals(fileName.substring(l - 4, l))) {
 				this.xls = true;
 				this.wb = new HSSFWorkbook(is);
@@ -1035,6 +1038,8 @@ public class MakeExcel extends CommBuffer {
 			}
 		} catch (IOException e) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel)" + fna + "檔案不存在");
+		} finally {
+			SafeClose.close(is);
 		}
 	}
 

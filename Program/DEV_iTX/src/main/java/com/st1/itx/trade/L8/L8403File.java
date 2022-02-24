@@ -3128,13 +3128,18 @@ public class L8403File extends MakeFile {
 					String iCourtCode = sJcicZ444.getCourtCode();
 					iCourtCode = FormatUtil.padX(iCourtCode, 3);
 					String iCustRegAddr = sJcicZ444.getCustRegAddr();
-					iCustRegAddr = FormatUtil.padLeft(iCustRegAddr, 76);
+/**2022/2/23 使用padLeft會導致地址往右邊靠，且位元組會有錯，已修改成padx Mata*/
+//					iCustRegAddr = FormatUtil.padLeft(iCustRegAddr, 76);
+					iCustRegAddr = FormatUtil.padX(iCustRegAddr, 76);
 					String iCustComAddr = sJcicZ444.getCustComAddr();
-					iCustComAddr = FormatUtil.padLeft(iCustComAddr, 76);
+//					iCustComAddr = FormatUtil.padLeft(iCustComAddr, 76);
+					iCustComAddr = FormatUtil.padX(iCustComAddr, 76);
 					String iCustRegTelNo = sJcicZ444.getCustRegTelNo();
 					String iCustComTelNo = sJcicZ444.getCustComTelNo();
 					String iCustMobilNo = sJcicZ444.getCustMobilNo();
 					String iUkey = sJcicZ444.getUkey();
+					this.info("iCustRegAddr ===== " +iCustRegAddr);
+					this.info("iCustComAddr ===== " +iCustComAddr);
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "444" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iApplyDate, 7, '0') + iCourtCode
 							+ StringUtils.rightPad("", 5) + iCustRegAddr + iCustComAddr + StringUtils.rightPad(iCustRegTelNo, 16, "")

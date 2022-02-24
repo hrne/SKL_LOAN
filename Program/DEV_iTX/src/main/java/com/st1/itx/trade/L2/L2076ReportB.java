@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L2;
 
+import java.math.BigDecimal;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -7,14 +9,20 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacClose;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandOfficeService;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
@@ -36,6 +44,10 @@ public class L2076ReportB extends MakeReport {
 	public CustMainService sCustMainService;
 	@Autowired
 	public FacCloseService sFacCloseService;
+	@Autowired
+	public FacMainService facMainService;
+	@Autowired
+	public ClFacService clFacService;
 	@Autowired
 	public LoanCom loanCom;
 
@@ -122,6 +134,24 @@ public class L2076ReportB extends MakeReport {
 		if (tCustMain != null) {
 			custId = tCustMain.getCustId();
 		}
+		FacMain tFacMain = new FacMain();
+		ClFac tClFac = new ClFac();
+		if (tFacClose.getFacmNo() > 0) {
+
+			tFacMain = facMainService.findById(new FacMainId(tFacClose.getCustNo(), tFacClose.getFacmNo()), titaVo);
+		}
+		if (tFacMain != null) {
+			tClFac = clFacService.findById(new ClFacId(tFacClose.getClCode1(), tFacClose.getClCode2(),
+					tFacClose.getClNo(), tFacMain.getApplNo()), titaVo);
+		}
+		// 設定金額
+		BigDecimal wkOriSettingAmt = BigDecimal.ZERO;
+		String amtChinese = "";
+		// 金額轉中文大寫
+		if (tClFac != null) {
+			wkOriSettingAmt = tClFac.getOriSettingAmt();
+			amtChinese = this.convertAmtToChinese(wkOriSettingAmt);
+		}
 		String wkSysDate = titaVo.getCalDy(); // 系統日國曆
 		this.info("wkSysDate = " + wkSysDate);
 
@@ -142,7 +172,7 @@ public class L2076ReportB extends MakeReport {
 				+ StringUtils.leftPad(String.valueOf(tFacClose.getFacmNo()), 3, "0")); // 戶號額度
 		this.print(-33, 42, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
 		this.print(-36, 42, custId); // 統編
-		this.print(-39, 42, "" + "萬"); // 設定金額
+		this.print(-39, 42, amtChinese + " 元整"); // 設定金額
 		this.print(-41, 42, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
 
 //		for (int i = 1; i <= 400; i++) {

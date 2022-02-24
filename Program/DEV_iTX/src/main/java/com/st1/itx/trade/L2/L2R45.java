@@ -91,7 +91,7 @@ public class L2R45 extends TradeBuffer {
 		WkRegAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		if (tCustMain.getCurrZip3() != null || !tCustMain.getCurrZip3().isEmpty()) {
 			if (tCustMain.getCurrZip2() != null || !tCustMain.getCurrZip2().isEmpty()) {
-				WkRegAddres = tCustMain.getCurrZip3() + "-" + tCustMain.getCurrZip2() + " " + WkRegAddres;
+				WkRegAddres = tCustMain.getCurrZip3() + " " + tCustMain.getCurrZip2() + " " + WkRegAddres;
 			} else {
 				WkRegAddres = tCustMain.getCurrZip3() + " " + WkRegAddres;
 			}
