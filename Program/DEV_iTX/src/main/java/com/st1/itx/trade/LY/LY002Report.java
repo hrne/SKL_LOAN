@@ -43,10 +43,13 @@ public class LY002Report extends MakeReport {
 	Map<String, Object> mergeLineMap = null;
 	int countLine = 1;
 
+	int row = 0;
+
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LY002.exportExcel active");
 
 		List<Map<String, String>> lY002List = null;
+		List<Map<String, String>> lY002List2 = null;
 
 		// 年月底
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
@@ -54,6 +57,7 @@ public class LY002Report extends MakeReport {
 		try {
 
 			lY002List = lY002ServiceImpl.findAll(titaVo, endOfYearMonth);
+			lY002List2 = lY002ServiceImpl.findAll2(titaVo, endOfYearMonth);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -73,6 +77,7 @@ public class LY002Report extends MakeReport {
 		if (lY002List.size() > 0) {
 
 			exportExcel(lY002List);
+			exportColl(lY002List2, this.row);
 
 		} else {
 
@@ -80,18 +85,14 @@ public class LY002Report extends MakeReport {
 
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+//		makeExcel.toExcel(sno);
 
-		if (lY002List.size() > 0) {
-
-			return true;
-
-		} else {
-
+		if (lY002List.size() != 0) {
 			return false;
-
 		}
+		
+		return true;
 
 	}
 
@@ -100,6 +101,11 @@ public class LY002Report extends MakeReport {
 	 * 放款到期年月日 F9 放款年利率% F10 付息方式 F11 最後腳昔日 F12 提供人代號(統編或身分證) F13 提供人姓名 F14 設定順位 F15
 	 * 估計總值 F16 核貸金額 F17 NTD F18 放款餘額 F19 應收利息 F20 資產分類
 	 * 
+	 */
+	/**
+	 * 報表輸出
+	 * 
+	 * @param lDList
 	 */
 	private void exportExcel(List<Map<String, String>> lDList) throws LogicException {
 
@@ -230,6 +236,9 @@ public class LY002Report extends MakeReport {
 		makeExcel.setValue(row + 4, 2, count + 4, "C");
 		makeExcel.setValue(row + 5, 2, count + 5, "C");
 
+		// 要給擔保品判斷列數
+		this.row = row;
+
 		this.info("mergeEva=" + mergeEva.toString());
 
 		this.info("mergeLine=" + mergeLine.toString());
@@ -266,32 +275,8 @@ public class LY002Report extends MakeReport {
 
 		}
 
-//		}
-//Test1
-//		for (Map<String, Object> eva : mergeEva) {
-//
-//			tempEvaAmt = new BigDecimal(eva.get("eva").toString());
-//
-//			eRow = sRow + Integer.valueOf(eva.get("count").toString()) - 1;
-//
-//
-//			if (sRow == eRow) {
-//
-//				makeExcel.setValue(sRow, 17, tempEvaAmt, "#,##0");
-//
-//			} else {
-//
-//				makeExcel.setMergedRegionValue(sRow, eRow, 17, 17, tempEvaAmt, "#,##0");
-//
-//			}
-//
-//			sRow = eRow + 1;
-//		}
-
 		sRow = 7;
 		eRow = 0;
-		// TEST2
-//		for (int i = 0, length = mergeLine.size(); i < length; i++) {
 
 		iter = mergeLine.iterator();
 
@@ -317,28 +302,43 @@ public class LY002Report extends MakeReport {
 
 		}
 
-//		}
-//TEST1
-//		for (Map<String, Object> line : mergeLine) {
-//
-//			tempLineAmt = new BigDecimal(line.get("line").toString());
-//
-//			eRow = sRow + Integer.valueOf(line.get("count").toString()) - 1;
-//
-//
-//			if (sRow == eRow) {
-//
-//				makeExcel.setValue(sRow, 18, tempLineAmt, "#,##0");
-//
-//			} else {
-//
-//				makeExcel.setMergedRegionValue(sRow, eRow, 18, 18, tempLineAmt, "#,##0");
-//
-//			}
-//
-//			sRow = eRow + 1;
-//
-//		}
+	}
+
+	// 下方表格最後 擔保品放款的分類金額
+	/**
+	 * 報表輸出(擔保品部分)
+	 * 
+	 * @param lY002List
+	 * @param lrow      目前列數
+	 */
+	private void exportColl(List<Map<String, String>> lY002List, int lrow)
+			throws NumberFormatException, LogicException {
+
+//		BigDecimal evaAmt = BigDecimal.ZERO;
+		BigDecimal lineAmt = BigDecimal.ZERO;
+		BigDecimal loanAmt = BigDecimal.ZERO;
+		BigDecimal interest = BigDecimal.ZERO;
+
+		int row = 0;
+
+		for (Map<String, String> tLDVo : lY002List) {
+			// 判斷擔保類型
+			row = tLDVo.get("TYPE").equals("A") ? 1
+					: tLDVo.get("TYPE").equals("B") ? 2
+							: tLDVo.get("TYPE").equals("C") ? 3 : tLDVo.get("TYPE").equals("D") ? 4 : 5;
+
+			// 加上明細最後一筆資料的列數
+			row = row + lrow;
+
+			lineAmt = tLDVo.get("LineAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LineAmt"));
+			loanAmt = tLDVo.get("LoanBalance").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LoanBalance"));
+			interest = tLDVo.get("Interest").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("Interest"));
+
+			makeExcel.setValue(row, 18, lineAmt, "#,##0");
+			makeExcel.setValue(row, 20, loanAmt, "#,##0");
+			makeExcel.setValue(row, 23, interest, "#,##0");
+
+		}
 
 	}
 

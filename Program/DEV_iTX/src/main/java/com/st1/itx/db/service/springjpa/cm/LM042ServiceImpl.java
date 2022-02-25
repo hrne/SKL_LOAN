@@ -36,6 +36,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
+		this.info("yearMonth="+ yearMonth);
+		
 		String sql = "";
 		sql += " SELECT \"YearMonth\" ";
 		sql += " 	   ,SUBSTR(\"AssetClass\",0,1) AS \"AssetClass\" ";
@@ -43,22 +45,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,\"RPTID\" ";
 		sql += " 	   ,SUM(\"AMT\") AS \"AMT\" ";
 		sql += " FROM ( ";
-		sql += "   SELECT \"YearMonth\" ";
-		sql += " 		 ,CASE ";
-		sql += "  			WHEN M.\"PrinBalance\" = 1 ";
-		sql += "			THEN '5' ";
-		sql += " 			WHEN M.\"OvduTerm\" >= 12 ";
-		sql += " 			 AND F.\"ProdNo\" IN ('60','61','62') ";
-		sql += " 		    THEN '23' ";
-		sql += " 			WHEN M.\"OvduTerm\" >= 12 ";
-		sql += " 			THEN '3' ";
-		sql += " 			WHEN M.\"OvduTerm\" >= 7 ";
-		sql += " 			THEN '23'";
-		sql += " 			WHEN M.\"OvduTerm\" >= 1 ";
-		sql += " 			THEN '22' ";
-		sql += " 			WHEN F.\"ProdNo\" IN ('60','61','62') ";
-		sql += " 			THEN '21'";
-		sql += " 		  END AS \"AssetClass\" ";
+		sql += "   SELECT M.\"YearMonth\" ";
+		sql += " 		 ,M.\"AssetClass\" ";
 		sql += " 		 ,CASE";
 		sql += " 			WHEN M.\"ClCode1\" IN (1,2)";
 		sql += " 			 AND ( M.\"FacAcctCode\" = 340";
@@ -87,7 +75,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               FROM \"RptRelationCompany\" ";
 		sql += "               WHERE \"LAW005\" = '1' ";
 		sql += "             ) REL ON REL.\"RptId\" = CM.\"CustId\" ";
-		sql += "   WHERE \"YearMonth\" = :yymm )";
+		sql += "   WHERE M.\"YearMonth\" = :yymm ";
+		sql += "   	 AND SUBSTR(M.\"AssetClass\",0,1) <> '1' )";
 		sql += "   GROUP BY \"YearMonth\" ";
 		sql += "           ,SUBSTR(\"AssetClass\",0,1) ";
 		sql += "           ,\"KIND\"";
@@ -109,6 +98,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
+		this.info("yearMonth="+ yearMonth);
+		
 		String sql = "";
 		// 折溢價與催收費用
 		sql += " SELECT 'DisPreRemFees' AS \"Item\" ";
@@ -176,6 +167,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
+		this.info("yearMonth="+ yearMonth);
+		
 		String sql = "";
 		sql += "SELECT * FROM (";
 		sql += "	SELECT ( CASE";
@@ -197,7 +190,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  AND M.\"PrinBalance\" > 0";
-		sql += "	  AND M.\"AssetClass\" IS NULL";
+		sql += "	  AND SUBSTR(M.\"AssetClass\",0,1) = '1'";
 		sql += "	GROUP BY( CASE";
 		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 		sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";

@@ -283,8 +283,8 @@ C(3,#FKEY,0,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P7E,0),$)
 ["#FdCustTypeCode+客戶別",#CustTypeCodeX],
 ["#FdNotYetFlag+未齊件",#NotYetFlagX],
 [#<->#,"#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
-["#FdPieceCodeSecond+計件代碼2",#PieceCodeSecond,#PieceCodeSecondX],
-["#FdPieceCodeSecondAmt+計件代碼2金額",#TimPieceCodeSecondAmt],
+! ["#FdPieceCodeSecond+計件代碼2",#PieceCodeSecond,#PieceCodeSecondX],
+! ["#FdPieceCodeSecondAmt+計件代碼2金額",#TimPieceCodeSecondAmt],
 ["#FdUsageCode+資金用途別",#UsageCodeX],
 ["#FdSyndNo+聯貸案序號",#SyndNo],
 ["#FdRenewFlag+借新還舊",#RenewFlagX],
@@ -1088,21 +1088,21 @@ T(2,#L3r02PieceCode)
 T(3,)T(H,#PieceCode,#PieceCodeHelp)            
 
 !計件代碼2
-#FdPieceCodeSecond=X,2,L
+#FdPieceCodeSecond=X,2,S
 
-#PieceCodeSecond=X,1,L
+#PieceCodeSecond=X,1,S
 T(2,#L3r02PieceCodeSecond)
 
-#PieceCodeSecondX=X,20,L
+#PieceCodeSecondX=X,20,S
 T(3,)T(H,#PieceCodeSecond,#PieceCodeHelp)
 
 !計件代碼2金額
-#FdPieceCodeSecondAmt=X,2,L
+#FdPieceCodeSecondAmt=X,2,S
 
 #PieceCodeSecondAmt=m,14.2,S
 E(0,#L3r02PieceCodeSecondAmt)
 
-#TimPieceCodeSecondAmt=X,22,L
+#TimPieceCodeSecondAmt=X,22,S
 CALL2(#ADJUSTDOT,#Precision,#PieceCodeSecondAmt,#TimPieceCodeSecondAmt)
 
 ![資金用途別]

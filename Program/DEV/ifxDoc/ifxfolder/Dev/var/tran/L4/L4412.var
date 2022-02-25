@@ -144,8 +144,6 @@ T(1,@PostMediaCode,#NTXBUF,45,1)
 T(1,@AmlRsp,#NTXBUF,46,1)
 C(3,#FuncCode,1,$,T(1,@AuthCreateDate,#NTXBUF,47,7))
 T(1,@StampFinishDate,#NTXBUF,54,7)
-T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
-T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
 INVOKEJS(SHOW,p1,02,02,1)
 
 #PREVALUE=A,1,S
@@ -439,6 +437,20 @@ T(2,@RelAcctName,#L4r22RelAcctName)
 T(2,@RelationId,#L4r22RelationId)
 E(0,@RelAcctBirthday,#L4r22RelAcctBirthday)
 T(2,@RelAcctGender,#L4r22RelAcctGender)))
+T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
+T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
+C(3,#RelationCode,0,HIDE(#RelAcctGender),SHOW(#RelAcctGender))
+
+#RimL4r03=X,1,S
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL4r03,L4R03)
+S(L4R03,1,#RimCustNo)
+R(1,L4R03)
+T(2,@RelAcctName,#L4r03CustName)
+T(2,@RelationId,#L4r03CustId)
+E(0,@RelAcctBirthday,#L4r03Birthday)
+T(2,@RelAcctGenderP,#L4r03Gender)
+T(H,@RelAcctGenderX,#RelAcctGenderP,#SexHelp)
 
 #SetValue2=A,1,S
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -530,16 +542,16 @@ T(F,@RelationId,1)
 T(F,@RelAcctBirthday,1)
 T(F,@RelAcctGender,1))
 
-#RimL4r03=X,1,S
-C(3,#RelationCode,0,$,s)
-E(0,@RimCustNo,#CustNo)
-RESET_RIM(#RimL4r03,L4R03)
-S(L4R03,1,#RimCustNo)
-R(1,L4R03)
-T(2,@RelAcctName,#L4r03CustName)
-T(2,@RelationId,#L4r03CustId)
-E(0,@RelAcctBirthday,#L4r03Birthday)
-T(2,@RelAcctGenderP,#L4r03Gender)
+!#RimL4r03=X,1,S
+!C(3,#RelationCode,0,$,s)
+!E(0,@RimCustNo,#CustNo)
+!RESET_RIM(#RimL4r03,L4R03)
+!S(L4R03,1,#RimCustNo)
+!R(1,L4R03)
+!T(2,@RelAcctName,#L4r03CustName)
+!T(2,@RelationId,#L4r03CustId)
+!E(0,@RelAcctBirthday,#L4r03Birthday)
+!T(2,@RelAcctGenderP,#L4r03Gender)
 
 #RelAcctGenderP=X,1,S
 C(3,#RelationCode,0,$,s)

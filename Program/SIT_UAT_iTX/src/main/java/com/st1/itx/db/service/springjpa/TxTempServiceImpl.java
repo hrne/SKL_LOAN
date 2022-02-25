@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txTempService")
 @Repository
-public class TxTempServiceImpl implements TxTempService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxTempServiceImpl.class);
-
+public class TxTempServiceImpl extends ASpringJpaParm implements TxTempService, InitializingBean {
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + txTempId);
+		this.info("findById " + dbName + " " + txTempId);
 		Optional<TxTemp> txTemp = null;
 		if (dbName.equals(ContentName.onDay))
 			txTemp = txTempReposDay.findById(txTempId);
@@ -95,7 +91,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Entdy", "Kinbr", "TlrNo", "TxtNo", "SeqNo"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txTempReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +113,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("txTempTxtNoEq " + dbName + " : " + "entdy_0 : " + entdy_0 + " kinbr_1 : " + kinbr_1 + " tlrNo_2 : " + tlrNo_2 + " txtNo_3 : " + txtNo_3);
+		this.info("txTempTxtNoEq " + dbName + " : " + "entdy_0 : " + entdy_0 + " kinbr_1 : " + kinbr_1 + " tlrNo_2 : " + tlrNo_2 + " txtNo_3 : " + txtNo_3);
 		if (dbName.equals(ContentName.onDay))
 			slice = txTempReposDay.findAllByEntdyIsAndKinbrIsAndTlrNoIsAndTxtNoIsOrderBySeqNoAsc(entdy_0, kinbr_1, tlrNo_2, txtNo_3, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -135,7 +131,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txTempId);
+		this.info("Hold " + dbName + " " + txTempId);
 		Optional<TxTemp> txTemp = null;
 		if (dbName.equals(ContentName.onDay))
 			txTemp = txTempReposDay.findByTxTempId(txTempId);
@@ -153,7 +149,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txTemp.getTxTempId());
+		this.info("Hold " + dbName + " " + txTemp.getTxTempId());
 		Optional<TxTemp> txTempT = null;
 		if (dbName.equals(ContentName.onDay))
 			txTempT = txTempReposDay.findByTxTempId(txTemp.getTxTempId());
@@ -175,7 +171,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txTemp.getTxTempId());
+		this.info("Insert..." + dbName + " " + txTemp.getTxTempId());
 		if (this.findById(txTemp.getTxTempId()) != null)
 			throw new DBException(2);
 
@@ -200,7 +196,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txTemp.getTxTempId());
+		this.info("Update..." + dbName + " " + txTemp.getTxTempId());
 		txTemp.setLastUpdateEmpNo(empNot);
 
 		if (dbName.equals(ContentName.onDay))
@@ -222,7 +218,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txTemp.getTxTempId());
+		this.info("Update..." + dbName + " " + txTemp.getTxTempId());
 		txTemp.setLastUpdateEmpNo(empNot);
 
 		if (dbName.equals(ContentName.onDay))
@@ -241,7 +237,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txTemp.getTxTempId());
+		this.info("Delete..." + dbName + " " + txTemp.getTxTempId());
 		if (dbName.equals(ContentName.onDay)) {
 			txTempReposDay.delete(txTemp);
 			txTempReposDay.flush();
@@ -268,7 +264,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxTemp t : txTemp)
 			t.setCreateEmpNo(empNot);
 
@@ -296,7 +292,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txTemp == null || txTemp.size() == 0)
 			throw new DBException(6);
 
@@ -320,7 +316,7 @@ public class TxTempServiceImpl implements TxTempService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<TxTemp> txTemp, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

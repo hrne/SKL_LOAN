@@ -1,7 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -33,51 +31,23 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll(TitaVo titaVo, String isAllData) throws Exception {
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * @param isAllData 是否為產出明細
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth, String isAllData) throws Exception {
 
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
-		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
-		this.info("lM056.findAll nowDate=" + nowDate + ",yymm=" + iYearMonth);
-
+		this.info("lM056.findAll");
+		this.info(" yymm=" + yearMonth);
+		
 		String sql = " ";
-		sql += "	SELECT MLB.\"CustNo\"";
-		sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
-		sql += "		  ,C.\"CustId\"";
+		sql += "	SELECT MLB.\"CustNo\" AS \"CustNo\"";
+		sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+		sql += "		  ,C.\"CustId\" AS\"CustId\"";
 		sql += "		  ,SUM(MLB.\"LoanBalance\") AS \"LoanBalance\"";
 		sql += "		  ,(CASE";
 		sql += "			  WHEN FCA.\"SyndNo\" <> 0 THEN '聯貸'";
@@ -129,56 +99,27 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", iYearMonth);
+		query.setParameter("yymm", yearMonth);
 
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll2(TitaVo titaVo,int yearMonth) throws Exception {
 
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
-		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
-		this.info("lM056.findAll nowDate=" + nowDate + ",yymm=" + iYearMonth);
-
+		
+		this.info("lM056.findAll2");
+		this.info("yymm=" + yearMonth);
+		
 		String sql = " ";
 		sql += " SELECT \"KIND\"";
-		sql += "       ,SUM(\"AMT\") AS \"AMT\"";
+		sql += "       ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
 		sql += " FROM(";
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C'";
@@ -211,7 +152,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    GROUP BY \"KIND\"";
 		sql += "	UNION";
 		sql += "	SELECT 'TOTAL' AS \"KIND\"";
-		sql += "		  ,SUM(\"AMT\") AS \"AMT\"";
+		sql += "       	  ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
 		sql += "	FROM ( SELECT SUM(M.\"PrinBalance\") AS \"AMT\"";
 		sql += "	       FROM \"MonthlyFacBal\" M";
 		sql += "		   WHERE M.\"YearMonth\" = :yymm";
@@ -228,7 +169,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", iYearMonth);
+		query.setParameter("yymm", yearMonth);
 
 		return this.convertToMap(query);
 	}

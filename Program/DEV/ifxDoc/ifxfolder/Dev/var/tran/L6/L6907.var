@@ -341,7 +341,7 @@ X(#OO_SUM1)
 
 !明細
 #OOBUF5=X,92,S
-T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#OOCustNo+#OOFacmNo+000+#OORvNo+#OOOpenAcDate+#OOLastTxDate+#OOAcctCode)
+T(2,#AcBookCode+#OOAcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#OOCustNo+#OOFacmNo+000+#OORvNo+#OOOpenAcDate+#OOLastTxDate+#OOAcctCode)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5})

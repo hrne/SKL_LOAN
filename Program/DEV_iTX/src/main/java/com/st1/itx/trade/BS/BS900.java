@@ -16,14 +16,14 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcLoanInt;
 import com.st1.itx.db.domain.AcLoanIntId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.TxToDoDetail;
-import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcLoanIntService;
 import com.st1.itx.db.service.LoanBorMainService;
-import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcBookCom;
@@ -33,6 +33,7 @@ import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Service("BS900")
@@ -53,6 +54,9 @@ import com.st1.itx.util.parse.Parse;
 public class BS900 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
+
+	@Autowired
+	WebClient webClient;
 
 	@Autowired
 	DateUtil dateUtil;
@@ -230,6 +234,8 @@ public class BS900 extends TradeBuffer {
 		this.addList(this.totaVo);
 
 		this.info("bs900 process end");
+
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "BS900已完成", titaVo);
 
 		return this.sendList();
 	}

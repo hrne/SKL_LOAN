@@ -126,6 +126,8 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@SyndNoSt,#NTXBUF,6,6)
+T(1,@SyndNoEnd,#NTXBUF,12,6)
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
@@ -275,6 +277,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
 !聯貸案編號區間(起)
 
 #SyndNoSt=A,6,I
+C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 ! #WkSyndNoX=A,6,S
@@ -282,6 +285,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
 !聯貸案編號區間(迄)
 !不可輸入小於等於[聯貸案編號區間(起)]
 #SyndNoEnd=A,6,I
+C(3,#CHAIN,1,s,$)
 E(0,#SyndNoSt)
 @IF(#SyndNoEnd<#SyndNoSt,V(P,不可小於聯貸案編號起號),$)
 ! V(6,0,#WkSyndNoX)
@@ -291,15 +295,18 @@ E(0,#SyndNoSt)
 ![主辦行]
 !可不輸入
 #LeadingBank=X,7,I
+C(3,#CHAIN,1,s,$)
 
 ![簽約日]
 !可不輸入
 #SigningDateStart=D,7,I
+C(3,#CHAIN,1,s,$)
 E(0,0)
 @
 A(DATE,0,#SigningDateStart)
 
 #SigningDateEnd=D,7,I
+C(3,#CHAIN,1,s,$)
 E(0,#SYSDATE)
 @A(DATE,0,#SigningDateEnd)
 V(5,#SigningDateStart,9991231)

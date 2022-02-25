@@ -1,7 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -34,44 +32,20 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param monthDate 西元年月底日
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo,int monthDate) throws Exception {
 		this.info("lM057.findAll ");
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+
 		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iYear = monthDate / 10000;
 		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
+		int iMonth = (monthDate / 100) % 100;
 
 		int last4Month = 0;
 		if (iMonth <= 4) {
@@ -85,7 +59,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += " SELECT * FROM( ";
 		sql += " SELECT \"KIND\"";
-		sql += "       ,SUM(\"AMT\") AS \"AMT\"";
+		sql += "       ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
 		sql += " FROM(";
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C2'";
@@ -119,7 +93,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    GROUP BY \"KIND\"";
 		sql += "	UNION";
 		sql += "	SELECT 'TOTAL' AS \"KIND\"";
-		sql += "		  ,SUM(\"AMT\") AS \"AMT\"";
+		sql += "       	  ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
 		sql += "	FROM ( SELECT SUM(M.\"PrinBalance\") AS \"AMT\"";
 		sql += "	       FROM \"MonthlyFacBal\" M";
 		sql += "		   WHERE M.\"YearMonth\" = :yymm";

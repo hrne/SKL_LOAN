@@ -393,7 +393,7 @@ G:劃撥
 	* @return Integer
 	*/
   public int getProcessTime() {
-    return StaticTool.bcToRoc(this.processTime);
+    return this.processTime;
   }
 
 /**
@@ -401,9 +401,9 @@ G:劃撥
 	* 
   *
   * @param processTime 處理時間
-  * @throws LogicException when Date Is Warn	*/
-  public void setProcessTime(int processTime) throws LogicException {
-    this.processTime = StaticTool.rocToBc(processTime);
+	*/
+  public void setProcessTime(int processTime) {
+    this.processTime = processTime;
   }
 
 /**

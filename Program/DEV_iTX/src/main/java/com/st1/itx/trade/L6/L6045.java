@@ -14,9 +14,9 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.db.domain.TxRecord;
+import com.st1.itx.db.domain.TxInquiry;
 import com.st1.itx.db.domain.TxTranCode;
-import com.st1.itx.db.service.TxRecordService;
+import com.st1.itx.db.service.TxInquiryService;
 import com.st1.itx.db.service.TxTranCodeService;
 
 @Service("L6045")
@@ -31,7 +31,7 @@ public class L6045 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	TxRecordService sTxRecordService;
+	TxInquiryService sTxInquiryService;
 	@Autowired
 	public TxTranCodeService txTranCodeService;
 	
@@ -49,28 +49,29 @@ public class L6045 extends TradeBuffer {
 		int iTxDAteS = Integer.parseInt(titaVo.getParam("TxDateS"))+19110000;
 		int iTxDAteE = Integer.parseInt(titaVo.getParam("TxDateE"))+19110000;
 		
-		String iBrno = titaVo.getBrno();
-		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
-		Slice<TxRecord> sTxRecord = null;
 		
-		if(iCustNo == 0) {
-			sTxRecord = sTxRecordService.findByCalDate(iTxDAteS, iTxDAteE, iBrno, "1", this.index, this.limit, titaVo);
+		int iCustNoSt = Integer.parseInt(titaVo.getParam("CustNo"));
+		int iCustNoEd = 0;
+		if(iCustNoSt>0) {
+			iCustNoEd = iCustNoSt;
 		} else {
-			sTxRecord = sTxRecordService.findByCustNo(iTxDAteS, iTxDAteE, iBrno, iCustNo, "1", this.index, this.limit, titaVo);
+			iCustNoEd = 9999999;
 		}
-	
+		Slice<TxInquiry> sTxInquiry = null;
+		
+		sTxInquiry = sTxInquiryService.findImportFg(iTxDAteS, iTxDAteE, "1",iCustNoSt,iCustNoEd, this.index, this.limit, titaVo);
 
-		List<TxRecord> iTxRecord = sTxRecord== null ? null : sTxRecord.getContent();
+		List<TxInquiry> iTxInquiry = sTxInquiry== null ? null : sTxInquiry.getContent();
 
 		TempVo tTempVo = new TempVo();
 		TxTranCode tTxTranCode = null;
-		if (iTxRecord != null) {
+		if (iTxInquiry != null) {
 			
-			for (TxRecord tTxRecord : iTxRecord) {
+			for (TxInquiry tTxInquiry : iTxInquiry) {
 				OccursList occursList = new OccursList();
 				String tranItem = "";
 				tTempVo = new TempVo();
-				tTempVo = tTempVo.getVo(tTxRecord.getTranData());
+				tTempVo = tTempVo.getVo(tTxInquiry.getTranData());
 
 				if(tTempVo.get("TxReason")==null || tTempVo.get("TxReason").isEmpty()) {
 					continue;
@@ -104,7 +105,7 @@ public class L6045 extends TradeBuffer {
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (sTxRecord != null && sTxRecord.hasNext()) {
+		if (sTxInquiry != null && sTxInquiry.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}

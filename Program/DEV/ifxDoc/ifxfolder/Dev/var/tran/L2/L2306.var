@@ -134,6 +134,9 @@ HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
 E(0,@FUNCIND,#FunCd)
 
+#SetSysPar1=X,1,S
+IF(#FunCd ==1 ,E(0,0)ASGN(AGAIN$),$)
+
 #FunCdX=X,4,L
 C(4,#FunCd,S,$)
 T(H,#FunCd,#FunCdHelp)

@@ -51,8 +51,8 @@ public class LY003Report extends MakeReport {
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
 		try {
-			//暫時先產前3
-			for (int f = 1; f <= 6; f++) {
+			// 暫時先產前3
+			for (int f = 1; f <= 4; f++) {
 
 				lY003List = lY003ServiceImpl.findAll(titaVo, f, endOfYearMonth);
 
@@ -77,17 +77,23 @@ public class LY003Report extends MakeReport {
 			this.info("LY003ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+//		makeExcel.toExcel(sno);
 
 		return isNotEmpty;
 
 	}
 
 	private void exportExcel(List<Map<String, String>> LDList, int formNum) throws LogicException {
+		
 		int row = 0;
 
-		BigDecimal evaAmt = BigDecimal.ZERO;
+		// 最下方表格欄列用
+		int bCol = 0;
+		int bRow = 0;
+		
+		// 估計總值為人工
+//		BigDecimal evaAmt = BigDecimal.ZERO;
 		BigDecimal lineAmt = BigDecimal.ZERO;
 		BigDecimal loanAmt = BigDecimal.ZERO;
 
@@ -95,37 +101,111 @@ public class LY003Report extends MakeReport {
 
 			switch (formNum) {
 			case 1:
-				row = tLDVo.get("F0").equals("C") ? 8 : tLDVo.get("F0").equals("D") ? 9 : 10;
+				row = tLDVo.get("TYPE").equals("A") ? 6
+						: tLDVo.get("TYPE").equals("B") ? 7
+								: tLDVo.get("TYPE").equals("C") ? 8 : tLDVo.get("TYPE").equals("D") ? 9 : 10;
 				break;
 			case 2:
-				row = tLDVo.get("F0").equals("A") ? 14
-						: tLDVo.get("F0").equals("B") ? 15 : tLDVo.get("F0").equals("C") ? 16 : 17;
+				row = tLDVo.get("TYPE").equals("A") ? 14
+						: tLDVo.get("TYPE").equals("B") ? 15 : tLDVo.get("TYPE").equals("C") ? 16 : 17;
 				break;
 			case 3:
-				row = tLDVo.get("F0").equals("A") ? 19
-						: tLDVo.get("F0").equals("B") ? 20 : tLDVo.get("F0").equals("C") ? 21 : 22;
+				row = tLDVo.get("TYPE").equals("A") ? 19
+						: tLDVo.get("TYPE").equals("B") ? 20 : tLDVo.get("TYPE").equals("C") ? 21 : 22;
 				break;
 			case 4:
-				row = 23;
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
-			case 7:
+				row = tLDVo.get("TYPE").equals("A") ? 25
+						: tLDVo.get("TYPE").equals("B") ? 31
+								: tLDVo.get("TYPE").equals("C") ? 37 : tLDVo.get("TYPE").equals("D") ? 43 : 49;
+
+				// 最下方表格用
+				bCol = tLDVo.get("TYPE").equals("A") ? 3
+						: tLDVo.get("TYPE").equals("B") ? 4
+								: tLDVo.get("TYPE").equals("C") ? 5 : tLDVo.get("TYPE").equals("D") ? 6 : 7;
 				break;
 			default:
 				break;
 			}
 
-			evaAmt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
-			lineAmt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
-			loanAmt = tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3"));
+//			evaAmt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
+			lineAmt = tLDVo.get("LineAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LineAmt"));
+			loanAmt = tLDVo.get("LoanBalance").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LoanBalance"));
 
-			makeExcel.setValue(row, 4, evaAmt, "#,##0");
+			//
+			if (formNum == 4) {
+				int assetClass = tLDVo.get("AssetClass").isEmpty() ? 0 : Integer.valueOf(tLDVo.get("AssetClass"));
+				switch (assetClass) {
+				case 1:
+					row = row + 1;
+
+					bRow = 83;// 最下方表格用
+					break;
+				case 2:
+					row = row + 2;
+					bRow = 84;// 最下方表格用
+					break;
+				case 3:
+					row = row + 3;
+					bRow = 85;// 最下方表格用
+					break;
+				case 4:
+					row = row + 4;
+					bRow = 86;// 最下方表格用
+					break;
+				case 5:
+					row = row + 5;
+					bRow = 87;// 最下方表格用
+					break;
+				default:
+					break;
+				}
+				// 最下方表格
+				makeExcel.setValue(bRow, bCol, loanAmt, "#,##0");
+
+			}
+//			makeExcel.setValue(row, 4, evaAmt, "#,##0");
 			makeExcel.setValue(row, 5, lineAmt, "#,##0");
 			makeExcel.setValue(row, 8, loanAmt, "#,##0");
 		}
+
+		// 重整公式 上方表格
+		for (int x = 4; x <= 10; x++) {
+			makeExcel.formulaCalculate(13, x);
+			makeExcel.formulaCalculate(18, x);
+			makeExcel.formulaCalculate(23, x);
+			makeExcel.formulaCalculate(25, x);
+			makeExcel.formulaCalculate(31, x);
+			makeExcel.formulaCalculate(37, x);
+			makeExcel.formulaCalculate(43, x);
+			makeExcel.formulaCalculate(49, x);
+			makeExcel.formulaCalculate(55, x);
+			makeExcel.formulaCalculate(67, x);
+			makeExcel.formulaCalculate(68, x);
+			makeExcel.formulaCalculate(69, x);
+		}
+		// 重整公式 上方表格
+		for (int y = 6; y <= 69; y++) {
+			makeExcel.formulaCalculate(y, 6);
+			makeExcel.formulaCalculate(y, 9);
+			makeExcel.formulaCalculate(y, 10);
+		}
+		// 重整公式 上方表格
+		for (int y = 70; y <= 71; y++) {
+			makeExcel.formulaCalculate(y, 4);
+		}
+		
+		// 重整公式 下方表格
+		for (int x = 3; x <= 10; x++) {
+			makeExcel.formulaCalculate(88, x);
+		}
+		for (int y = 83; y <= 88; y++) {
+			makeExcel.formulaCalculate(y, 10);
+		}
+		
+		// 暫缺 列68 列69 的值 (從LM054 55找)
+		// 缺壽險貸款 
+		//擔保品 壽險貸款 
+		// 缺業主權益 資金總額 上年度業主權益
 
 	}
 

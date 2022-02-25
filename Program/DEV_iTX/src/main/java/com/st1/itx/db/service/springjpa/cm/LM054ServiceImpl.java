@@ -1,7 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -28,82 +26,41 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param monthDate 西元年月底日
+	 * @param isAcctCode 是否為會計科目項目
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo, int monthDate, String isAcctCode) throws Exception {
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, String acctCode) throws Exception {
-
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		// 西元年
+		int iYear = monthDate / 10000;
 		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+		int iMonth = (monthDate / 100) % 100;
 
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
-
-		Calendar calendar = Calendar.getInstance();
-
-		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-
-		// 以當前月份取得月底日期 並格式化處理
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[day - 1]);
-		int diff = 0;
-		if (day == 1) {
-			diff = -2;
-		} else if (day == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
-		// 上個月底
-		calendar.set(iYear, iMonth - 1, 0);
-		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("lM054.findAll nowDate=" + nowDate + ",ymd=" + thisMonthEndDate);
-
-		this.info("lM054.findAll yymm=" + (iYear * 100 + iMonth) + ",lyymm=" + lastMonthEndDate / 100 + ",ymd=" + thisMonthEndDate + ",ymd=" + lastMonthEndDate);
-
-		// 當年月
+		// 當前年月
 		String iYearMonth = iYear * 100 + iMonth + "";
 
-		// 上年月
-		String lYearMonth = lastMonthEndDate / 100 + "";
+		//判斷前一個年月
+		iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+		iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+
+		// 上個年月
+		String lYearMonth = (iYear * 100) + iMonth + "";
 
 		// 月底
-		String eYmd = thisMonthEndDate + "";
+		String eYmd = monthDate + "";
 		// 月初
-		String sYmd = iYear * 100 + iMonth + "01";
+		String sYmd = (monthDate / 100) + "01";
 
-		this.info("lM054.findAll iYearMonth=" + iYearMonth + ",iYearMonth=" + lYearMonth + "sYmd=" + sYmd + ",eYmd=" + eYmd);
+		this.info("lM054.findAll iYearMonth=" + iYearMonth + ",iYearMonth=" + lYearMonth + "sYmd=" + sYmd + ",eYmd="
+				+ eYmd);
 
 		String sql = "";
-		if (acctCode.equals("N")) {
+		if (isAcctCode.equals("N")) {
 			/*
 			 * F0 放款代號(戶號) F1 放款種類 F2 放款對象名稱 (戶名) F3 放款對象關係人代碼 F4 利害關係人代碼 F5
 			 * 是否為專案運用公共及社會福利事業投資 F6 是否為聯合貸款 F7 持有資產幣別 F8 放款日期 F9 到期日期 F10 放款年利率 F11 放款餘額
@@ -249,18 +206,23 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		if (acctCode.equals("N")) {
+		if (isAcctCode.equals("N")) {
 
 			query.setParameter("yymm", iYearMonth);
 		} else {
-			query.setParameter("symd", sYmd);
-			query.setParameter("eymd", eYmd);
-			query.setParameter("lyymm", lYearMonth);
-			query.setParameter("tyymm", iYearMonth);
+			query.setParameter("symd", sYmd);// 20211201
+			query.setParameter("eymd", eYmd);// 20211231
+			query.setParameter("lyymm", lYearMonth);// 202111
+			query.setParameter("tyymm", iYearMonth);// 202112
 		}
 		return this.convertToMap(query);
 	}
 
+	/**
+	 * 查詢資料 Ias34Ap
+	 * @param titaVo
+	 * 
+	 */
 	public List<Map<String, String>> ias34Ap(TitaVo titaVo) throws Exception {
 
 		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);

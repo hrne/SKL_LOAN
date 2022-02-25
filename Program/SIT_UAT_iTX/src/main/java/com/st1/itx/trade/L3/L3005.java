@@ -160,11 +160,9 @@ public class L3005 extends TradeBuffer {
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-
 		if (iCustDataCtrl == 1) {
 			this.totaVo.putParam("OCustNo", "");
 		}
-
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -179,15 +177,20 @@ public class L3005 extends TradeBuffer {
 		lDisplayFlag.add("F"); // 繳息首筆
 
 		if (iAcDate == 0) {
-			slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, wkEntryDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit,
-					titaVo);
+			slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart,
+					wkBormNoEnd, wkEntryDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit, titaVo);
 		} else {
-			slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, wkAcDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit, titaVo);
+			slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart,
+					wkBormNoEnd, wkAcDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit, titaVo);
 		}
 
 		lLoanBorTx = slLoanBorTx == null ? null : new ArrayList<LoanBorTx>(slLoanBorTx.getContent());
 		if (lLoanBorTx == null || lLoanBorTx.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
+			if (iAcDate == 0) {
+				throw new LogicException(titaVo, "E0001", "入帳日期  " + iEntryDate + " 後無交易資料"); // 查詢資料不存在
+			} else {
+				throw new LogicException(titaVo, "E0001", "會計日期  " + iAcDate + " 後無交易資料"); // 查詢資料不存在
+			}
 		}
 
 		mrKey1 = parse.IntegerToString(iCustNo, 7);
@@ -203,9 +206,11 @@ public class L3005 extends TradeBuffer {
 		lTranNo.add("L3220");
 		lTranNo.add("L3230");
 		if (iAcDate == 0) {
-			slTxRecord = txRecordService.findByL3005(mrKey1 + "%", lTranNo, wkEntryDateStart, 99999999, 0, Integer.MAX_VALUE, titaVo);
+			slTxRecord = txRecordService.findByL3005(mrKey1 + "%", lTranNo, wkEntryDateStart, 99999999, 0,
+					Integer.MAX_VALUE, titaVo);
 		} else {
-			slTxRecord = txRecordService.findByL3005(mrKey1 + "%", lTranNo, wkAcDateStart, 99999999, 0, Integer.MAX_VALUE, titaVo);
+			slTxRecord = txRecordService.findByL3005(mrKey1 + "%", lTranNo, wkAcDateStart, 99999999, 0,
+					Integer.MAX_VALUE, titaVo);
 		}
 		lTxRecord = slTxRecord == null ? null : new ArrayList<TxRecord>(slTxRecord.getContent());
 
@@ -225,7 +230,8 @@ public class L3005 extends TradeBuffer {
 			}
 
 			// 是否顯示分錄清單： Y-有分錄清單 、N-無分錄清單、空白(同交易序號次筆)
-			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("3") || ln.getTitaHCode().equals("4")) && (ln.getDisplayflag().equals("A") || ln.getDisplayflag().equals("F")))
+			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("3") || ln.getTitaHCode().equals("4"))
+					&& (ln.getDisplayflag().equals("A") || ln.getDisplayflag().equals("F")))
 				AcFg = "Y";
 			else if (relNo.equals(newRelNo))
 				AcFg = "";
@@ -233,15 +239,20 @@ public class L3005 extends TradeBuffer {
 				AcFg = "N";
 			// 費用
 			tTempVo = tTempVo.getVo(ln.getOtherFields());
-			if ((!"".equals(tTempVo.getParam("AcctFee")) && (parse.stringToBigDecimal(tTempVo.getParam("AcctFee")).compareTo(BigDecimal.ZERO) != 0)
-					|| (!"".equals(tTempVo.getParam("ModifyFee")) && parse.stringToBigDecimal(tTempVo.getParam("ModifyFee")).compareTo(BigDecimal.ZERO) != 0)
-					|| (!"".equals(tTempVo.getParam("FireFee")) && parse.stringToBigDecimal(tTempVo.getParam("FireFee")).compareTo(BigDecimal.ZERO) != 0)
-					|| (!"".equals(tTempVo.getParam("LawFee")) && parse.stringToBigDecimal(tTempVo.getParam("LawFee")).compareTo(BigDecimal.ZERO) != 0)))
+			if ((!"".equals(tTempVo.getParam("AcctFee"))
+					&& (parse.stringToBigDecimal(tTempVo.getParam("AcctFee")).compareTo(BigDecimal.ZERO) != 0)
+					|| (!"".equals(tTempVo.getParam("ModifyFee"))
+							&& parse.stringToBigDecimal(tTempVo.getParam("ModifyFee")).compareTo(BigDecimal.ZERO) != 0)
+					|| (!"".equals(tTempVo.getParam("FireFee"))
+							&& parse.stringToBigDecimal(tTempVo.getParam("FireFee")).compareTo(BigDecimal.ZERO) != 0)
+					|| (!"".equals(tTempVo.getParam("LawFee"))
+							&& parse.stringToBigDecimal(tTempVo.getParam("LawFee")).compareTo(BigDecimal.ZERO) != 0)))
 				FeeFg = "Y";
 			else
 				FeeFg = "";
 			// 是否顯示L3913計息明細按鈕
-			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("2") || ln.getTitaHCode().equals("4")) && (ln.getDisplayflag().equals("I") || ln.getDisplayflag().equals("F"))) {
+			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("2") || ln.getTitaHCode().equals("4"))
+					&& (ln.getDisplayflag().equals("I") || ln.getDisplayflag().equals("F"))) {
 				loanIntDetailFg = "Y";
 			} else {
 				loanIntDetailFg = "N";

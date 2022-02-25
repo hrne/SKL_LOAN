@@ -172,26 +172,31 @@ public class LM042Report extends MakeReport {
 				// 擔保品C 利關人 資產分類1
 				if ("C".equals(kind) && "Y".equals(rptId) && assetClass == 1) {
 					row = 21;
+					col = 3;
 					cY1Amt = cY1Amt.add(amt);
 				}
 				// 擔保品C 非利關人 資產分類1
 				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 1) {
 					row = 22;
+					col = 3;
 					cN1Amt = cN1Amt.add(amt);
 				}
 				// 擔保品C 利關人 資產分類2
 				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 2) {
 					row = 22;
+					col = 4;
 					cN2Amt = cN2Amt.add(amt);
 				}
 				// 擔保品C 非利關人 資產分類3
 				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 3) {
 					row = 22;
+					col = 5;
 					cN3Amt = cN3Amt.add(amt);
 				}
 				// 擔保品C 非利關人 資產分類5
 				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 5) {
 					row = 22;
+					col = 7;
 					cN5Amt = cN5Amt.add(amt);
 				}
 				// 擔保品D 非利關人 資產分類1
@@ -202,26 +207,31 @@ public class LM042Report extends MakeReport {
 				// 擔保品Z 利關人 資產分類1
 				if ("Z".equals(kind) && "Y".equals(rptId) && assetClass == 1) {
 					row = 24;
+					col = 3;
 					zY1Amt = zY1Amt.add(amt);
 				}
 				// 擔保品Z 非利關人 資產分類1
 				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 1) {
 					row = 25;
+					col = 3;
 					zN1Amt = zN1Amt.add(amt);
 				}
 				// 擔保品Z 非利關人 資產分類2
 				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 2) {
 					row = 25;
+					col = 4;
 					zN2Amt = zN2Amt.add(amt);
 				}
 				// 擔保品Z 非利關人 資產分類3
 				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 3) {
 					row = 25;
+					col = 4;
 					zN3Amt = zN3Amt.add(amt);
 				}
 				// 擔保品Z 非利關人 資產分類5
 				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 5) {
 					row = 25;
+					col = 7;
 					zN5Amt = zN5Amt.add(amt);
 				}
 				makeExcel.setValue(row, col, amt, "#,##0");
@@ -250,6 +260,7 @@ public class LM042Report extends MakeReport {
 				// 折溢價及催收費用
 				if ("DisPreRemFees".equals(item)) {
 					row = 12;
+					col = 2;
 					sDisPreRemFees = sDisPreRemFees.add(amt);
 				}
 				// 應收利息
@@ -314,18 +325,19 @@ public class LM042Report extends MakeReport {
 			// 統計數 G9
 			makeExcel.setValue(9, 5, zN3Amt, "#,##0");
 
+			//統計數I5
 			cYToTalAmt = cYToTalAmt.add(cY1Amt);
 			makeExcel.setValue(5, 9, cYToTalAmt, "#,##0");
-
+			//統計數I6
 			cNToTalAmt = cNToTalAmt.add(cN1Amt).add(cN2Amt).add(cN3Amt).add(cN5Amt).add(sDisPreRemFees);
 			makeExcel.setValue(6, 9, cNToTalAmt, "#,##0");
-
+			//統計數I7
 			dNToTalAmt = dNToTalAmt.add(dN1Amt);
 			makeExcel.setValue(7, 9, dNToTalAmt, "#,##0");
-
+			//統計數I8
 			zYToTalAmt = zYToTalAmt.add(zY1Amt);
 			makeExcel.setValue(8, 9, zYToTalAmt, "#,##0");
-
+			//統計數I9
 			zNToTalAmt = zNToTalAmt.add(zN1Amt).add(zN2Amt).add(zN3Amt).add(zN5Amt);
 			makeExcel.setValue(9, 9, zYToTalAmt, "#,##0");
 

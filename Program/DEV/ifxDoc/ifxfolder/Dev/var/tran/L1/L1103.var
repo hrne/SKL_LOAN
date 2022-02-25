@@ -390,22 +390,28 @@ R(1,L2R08)
 T(2,@EmpnameBef,#L2r08FullName)
 T(2,@EmpnameAft,#L2r08FullName)
 
+#ErrSkip=X,1,S
+
 ! 預先調rim塞值1
 #SendL6R06AA=X,1,S
 #RimIndustryCode=X,6,S
 E(0,@RimFuncCode,5)
 T(2,@RimIndustryCode,#IndustryBef)
 RESET_RIM(#SendL6R06A,L6R06)
-S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode,#ErrSkip)
 R(1,L6R06)
-#RL6R06AA=X,1,S
 T(2,@IndustryBefX,#L6R06IndustryItem)
-#SendL6R06BB=X,1,S
-E(0,@RimFuncCode,5)
-T(2,@RimIndustryCode,#IndustryAft)
-RESET_RIM(#SendL6R06A,L6R06)
-S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
-R(1,L6R06)
+T(2,@IndustryAftX,#L6R06IndustryItem)
+
+!#RL6R06AA=X,1,S
+!T(2,@IndustryBefX,#L6R06IndustryItem)
+!#SendL6R06BB=X,1,S
+!E(0,@RimFuncCode,5)
+!T(2,@RimIndustryCode,#IndustryAft)
+!RESET_RIM(#SendL6R06A,L6R06)
+!S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode,#ErrSkip)
+!R(1,L6R06)
+
 #RL6R06BB=X,1,S
 T(2,@IndustryAftX,#L6R06IndustryItem)
 
@@ -748,15 +754,13 @@ IF(#EntcodeAft==#EntcodeBef,T(3,),T(3,X))
 !行業別
 #IndustryBef=X,6,L
 
-#SendL6R06A=X,1,S
-E(0,@RimFuncCode,5)
-T(2,@RimIndustryCode,#IndustryBef)
-RESET_RIM(#SendL6R06,L6R06)
-S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
-R(1,L6R06)
-
-#RL6R06A=X,1,S
-T(2,@IndustryBefX,#L6R06IndustryItem)
+!#SendL6R06A=X,1,S
+!E(0,@RimFuncCode,5)
+!T(2,@RimIndustryCode,#IndustryBef)
+!RESET_RIM(#SendL6R06,L6R06)
+!S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+!R(1,L6R06)
+!(2,@IndustryBefX,#L6R06IndustryItem)
 
 #IndustryBefX=X,40,L
 

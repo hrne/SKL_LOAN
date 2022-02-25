@@ -315,7 +315,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 	* @return Integer
 	*/
   public int getProcessTime() {
-    return StaticTool.bcToRoc(this.processTime);
+    return this.processTime;
   }
 
 /**
@@ -323,9 +323,9 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 	* 最新動作之日期時間
   *
   * @param processTime 處理時間
-  * @throws LogicException when Date Is Warn	*/
-  public void setProcessTime(int processTime) throws LogicException {
-    this.processTime = StaticTool.rocToBc(processTime);
+	*/
+  public void setProcessTime(int processTime) {
+    this.processTime = processTime;
   }
 
 /**

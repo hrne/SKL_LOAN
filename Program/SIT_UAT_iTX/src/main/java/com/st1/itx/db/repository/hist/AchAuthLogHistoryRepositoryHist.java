@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,12 +21,13 @@ import com.st1.itx.db.domain.AchAuthLogHistory;
  */
 public interface AchAuthLogHistoryRepositoryHist extends JpaRepository<AchAuthLogHistory, Long> {
 
-	// CustNo = ,AND FacmNo =
-	public Slice<AchAuthLogHistory> findAllByCustNoIsAndFacmNoIsOrderByAuthCreateDateDescCreateDateDesc(int custNo_0, int facmNo_1, Pageable pageable);
+  // CustNo = ,AND FacmNo = 
+  public Slice<AchAuthLogHistory> findAllByCustNoIsAndFacmNoIsOrderByAuthCreateDateDescCreateDateDesc(int custNo_0, int facmNo_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<AchAuthLogHistory> findByLogNo(Long logNo);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<AchAuthLogHistory> findByLogNo(Long logNo);
 
 }
+
