@@ -1687,6 +1687,7 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
+C(3,#CustTypeCode,1,E(0,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
 
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
@@ -1696,6 +1697,7 @@ T(H,#CustTypeCode,#CustTypeCodeHelp)
 #FdRuleCode=X,2,L
 
 #RuleCode=A,2,I
+C(3,#CustTypeCode,1,s,$)
 HELP(#RuleCodeHelp)
 @V(H,#RuleCodeHelp)
 

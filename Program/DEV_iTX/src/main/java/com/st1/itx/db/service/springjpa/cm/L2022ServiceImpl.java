@@ -146,7 +146,7 @@ public class L2022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    LEFT JOIN \"CustMain\"           cu2 ON cu2.\"CustNo\" = fs2.\"CustNo\"";
 		sql += "  WHERE";
 		sql += "    cu2.\"CustNo\" = fs2.\"CustNo\"";
-
+		sql += "    AND cu2.\"CustId\" is not null ";
 		if (CustNo != 0) {
 			sql += "    AND cu.\"CustNo\" = :custno";
 			if (FacmNo != 0) {
@@ -274,7 +274,7 @@ public class L2022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WHERE";
 		sql += "    cf.\"CustNo\" = cu.\"CustNo\"";
 		sql += "    AND cf.\"FacmNo\" = fm.\"FacmNo\"";
-
+		sql += "    AND cu2.\"CustId\" is not null ";
 		if (CustNo != 0) {
 			sql += "    AND cu.\"CustNo\" = :custno";
 			if (FacmNo != 0) {

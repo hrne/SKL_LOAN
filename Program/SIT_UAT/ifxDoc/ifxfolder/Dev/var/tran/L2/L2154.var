@@ -1094,8 +1094,6 @@ E(0,@StepMonthELb{n},#L2r05StepRateMonthE{n})
 E(0,@StepRateIncrLb{n},#L2r05StepRateIncr{n})
 T(3,@StepRatePer{n},%)
 ##end
-!C(3,#DepartmentCode,1,E(0,@TwHandlingFee,#L2r05HandlingFee),$)
-!C(3,#DepartmentCode,1,E(0,@UsHandlingFee,#L2r05HandlingFee),$)
 
 
 
@@ -2098,24 +2096,20 @@ C(3,#Precision,0,SHOW(#TwHandlingFee)HIDE(#UsHandlingFee)
                 ,HIDE(#TwHandlingFee)SHOW(#UsHandlingFee))
 
 #TwHandlingFee=m,14,I
-C(3,#DepartmentCode,1,$,S)
 C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,$,s)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 
 #UsHandlingFee=m,14.2,I
-C(3,#DepartmentCode,1,$,S)
 C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,s,$)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 
 #LbHandlingFee=X,21,L
-C(3,#DepartmentCode,1,$,S)
 C(3,#Precision,0,X(#TwHandlingFee),X(#UsHandlingFee))
 P(L,#LbHandlingFee)
 
 #TimHandlingFee=m,14.2,S
-C(3,#DepartmentCode,1,$,S)
 C(3,#Precision,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 
 #LbGuaranteeDate=D,7,L
@@ -2387,6 +2381,7 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Hide4Fg,0,CALL(#HideP4),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
+C(3,#CustTypeCode,1,E(0,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
 !HELP(L2DEF,CustTypeCodeDef,CustTypeCode,CustTypeCodeX,cols:3)
 !@V(E,0,L2DEF,CustTypeCodeDef)
 
@@ -2399,6 +2394,7 @@ T(H,#CustTypeCode,#CustTypeCodeHelp)
 
 #RuleCode=A,2,I
 C(3,#UpdateCode,1,$,s)
+C(3,#CustTypeCode,1,s,$)
 HELP(#RuleCodeHelp)
 @V(H,#RuleCodeHelp)
 

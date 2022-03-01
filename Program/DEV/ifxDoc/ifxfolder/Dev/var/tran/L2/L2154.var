@@ -2381,6 +2381,7 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Hide4Fg,0,CALL(#HideP4),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
+C(3,#CustTypeCode,1,E(0,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
 !HELP(L2DEF,CustTypeCodeDef,CustTypeCode,CustTypeCodeX,cols:3)
 !@V(E,0,L2DEF,CustTypeCodeDef)
 
@@ -2393,6 +2394,7 @@ T(H,#CustTypeCode,#CustTypeCodeHelp)
 
 #RuleCode=A,2,I
 C(3,#UpdateCode,1,$,s)
+C(3,#CustTypeCode,1,s,$)
 HELP(#RuleCodeHelp)
 @V(H,#RuleCodeHelp)
 

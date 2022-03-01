@@ -39,7 +39,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param monthDate 西元年月底日
 	 * 
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo,int monthDate) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int monthDate) throws Exception {
 		this.info("lM057.findAll ");
 
 		// 年
@@ -49,7 +49,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int last4Month = 0;
 		if (iMonth <= 4) {
-			last4Month = ((iYear - 1) * 100) + (12 - (iMonth - 4));
+			last4Month = ((iYear - 1) * 100) + (12 - (4 - iMonth));
 		} else {
 			last4Month = iYear * 100 + (iMonth - 4);
 		}
@@ -98,7 +98,6 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       FROM \"MonthlyFacBal\" M";
 		sql += "		   WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  		 AND M.\"PrinBalance\" > 0";
-		sql += "	  		 AND M.\"AssetClass\" IS NULL";
 		sql += "	       UNION";
 		sql += "	       SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
 		sql += "	       FROM \"AcMain\"";
@@ -115,7 +114,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("l4mdy", last4Month);
 
 		return this.convertToMap(query);
-		
+
 	}
 
 }

@@ -316,8 +316,12 @@ T(2,#L6r03Result)
 !C(3,#CHAIN,1,E(0,#CHAIN_Funcd),$)
 C(3,#CHAIN,1,T(F,@FunCd,0),T(F,@FunCd,1))
 C(3,#CHAIN,1,s,$)
-HELP(#FunCdHelp)
-@V(H,#FunCdHelp)
+!HELP(#FunCdHelp)
+!@V(H,#FunCdHelp)
+
+!打開暫存
+#Binit=X,1,S
+C(3,#FunCd,1,K(MODIFYBUTTON,acsave),S)
 
 #Space1=X,1,S
 E(0,@FUNCIND,#FunCd)

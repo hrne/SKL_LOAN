@@ -88,6 +88,7 @@ public class L4101ReportB extends MakeReport {
 
 	int acDate = 0;
 	String batchNo = "";
+	int cnt = 0; // 總筆數
 
 	// 自訂表頭
 	@Override
@@ -127,14 +128,14 @@ public class L4101ReportB extends MakeReport {
 
 	}
 
-//	// 自訂表尾
-//	@Override
-//	public void printFooter() {
-//		this.print(-41, 1, "總　　　　　　　　　副　　　　　　　　協　　　　　　　　經　　　　　　覆　　　　　　　　　　　　　　　　　　　　　　　　　　傳票號碼：" + slipNo);
-//		this.print(-42, 1, "經　　　　　　　　　總　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　經辦單位");
-//		this.print(-43, 1, "理　　　　　　　　　經　　　　　　　　理　　　　　　　　理　　　　　　核　　　　　　　　　　　　　　　　　－－－－－－－－－－－－－－－－－－－－－");
-//		this.print(-44, 1, "　　　　　　　　　　理　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　協理　　　　經理　　　　經辦");
-//	}
+	// 自訂表尾
+	@Override
+	public void printFooter() {
+		this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		this.print(-43, 1, "　　　　　　　　　　　　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+		this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L4101ReportB exec ...");
@@ -200,7 +201,9 @@ public class L4101ReportB extends MakeReport {
 				oldCustNo = tBankRemit.getCustNo();
 				oldFacmNo = tBankRemit.getFacmNo();
 				subTotal = BigDecimal.ZERO;
+				cnt++;
 			}
+
 //			if (!this.nowAcBookCode.equals(tAcDetail.getAcBookCode())) {
 //				// 修改表頭的帳冊別欄位
 //				this.nowAcBookCode = tSlipMedia.getAcBookCode();
@@ -329,7 +332,7 @@ public class L4101ReportB extends MakeReport {
 
 		print(1, 1, "－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　");
 		print(1, 1, "　　　　　　           ");
-
+		print(0, 1, "　總　計：　　　" + cnt + "　戶");
 //		print(0, 61, currencyCode);
 		print(0, 151, formatAmt(total, 0), "R");
 //		print(0, 146, formatAmt(crAmt, 2), "R");

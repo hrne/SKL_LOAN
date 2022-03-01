@@ -154,9 +154,17 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				intCalcCode = "1";
 			} else {
 				intCalcCode = "2";
-				if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
-					intCalcCode = "2";
-				} else {
+//				if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
+//					intCalcCode = "2";
+//				} else {
+//					intCalcCode = "1";
+//				}
+				// 未滿一個月，以日計息
+				if (t.getNextPayIntDate() > nextMonth01) {
+					intCalcCode = "1";
+				}
+				// 首次繳息，且天數超過一個月，以日計息
+				if (prevPayIntDate == t.getDrawdownDate() && t.getSpecificDate() > t.getDrawdownDate()) {
 					intCalcCode = "1";
 				}
 			}

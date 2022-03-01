@@ -50,6 +50,10 @@ public class LM055Report extends MakeReport {
 		this.info("LM055Report exec");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
+		
+		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表",
+				"LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
 
 		makeExcel.setValue(2, 3, yearMonth);
 

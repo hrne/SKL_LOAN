@@ -313,7 +313,7 @@ public class LY002Report extends MakeReport {
 	 */
 	private void exportColl(List<Map<String, String>> lY002List, int lrow)
 			throws NumberFormatException, LogicException {
-
+		this.info("go exportColl");
 //		BigDecimal evaAmt = BigDecimal.ZERO;
 		BigDecimal lineAmt = BigDecimal.ZERO;
 		BigDecimal loanAmt = BigDecimal.ZERO;
