@@ -351,10 +351,11 @@ public class L1101 extends TradeBuffer {
 		this.totaVo.putParam("OAMLJobCode", tCustMain.getAMLJobCode());
 		this.totaVo.putParam("OAMLGroup", tCustMain.getAMLGroup());
 		this.totaVo.putParam("OIndigenousName", tCustMain.getIndigenousName());
+		this.totaVo.putParam("OStation", tCustMain.getStation());
 
-		// 取介紹人名稱
+		// 介紹人
 		String wkIntroducerX = tCustMain.getIntroducer();
-		if (tCustMain.getIntroducer() != null) {
+		if (!tCustMain.getIntroducer().isEmpty()) {
 			CdEmp tCdEmp = cdEmpService.findById(tCustMain.getIntroducer(), titaVo);
 			if (tCdEmp != null) {
 				wkIntroducerX += " " + tCdEmp.getFullname();
@@ -362,6 +363,18 @@ public class L1101 extends TradeBuffer {
 		}
 
 		this.totaVo.putParam("OIntroducerX", wkIntroducerX);
+		
+		// 房貸專員
+		String businessOfficer = tCustMain.getBusinessOfficer();
+		if (!tCustMain.getBusinessOfficer().isEmpty()) {
+			CdEmp tCdEmp = cdEmpService.findById(tCustMain.getBusinessOfficer(), titaVo);
+			if (tCdEmp != null) {
+				businessOfficer += " " + tCdEmp.getFullname();
+			}
+		}
+		
+		this.totaVo.putParam("OBusinessOfficerX", businessOfficer);
+		
 //		this.totaVo.putParam("OCustCross", "Y"); 此欄位移除 --Fegie 0917
 
 //		交互運用

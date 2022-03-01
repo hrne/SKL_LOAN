@@ -44,7 +44,10 @@ BEGIN
           ,'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 0
           ,S3."AcNoCode"                  AS "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改 取11碼會科
           ,NVL(S2."CORACS",'     ')       AS "AcSubCode"           -- 子目代號 VARCHAR2 5 0
-          ,'  '                           AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0
+          ,CASE
+             WHEN S3."AcNoCode" = '40903030000' -- 手續費收入－放款帳管費
+             THEN '01'
+           ELSE '  ' END                  AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0
           ,S1."TRXDAT"                    AS "AcDate"              -- 會計日期 Decimald 8 0
           ,SUM(CASE
              WHEN S1."LCDPDA" > 0 THEN S1."LCDPDA" -- 前日借方金額

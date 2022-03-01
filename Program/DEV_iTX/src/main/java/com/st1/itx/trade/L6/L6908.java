@@ -2,6 +2,7 @@ package com.st1.itx.trade.L6;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -99,26 +100,33 @@ public class L6908 extends TradeBuffer {
 				iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo, iFacmNo, iFAcDateSt, iFAcDateEd, this.index,
 				this.limit, titaVo);
 
-//		if (slAcDetail == null) {
-//			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
-//		}
+// AcReceivable RvAmt=100, Rvbal=80,  rvCls  = 80      
+// ACDTL        起帳             TxAmt=100, rvCls  = -20
+// ACDTL        銷帳             TxAmt=20,  rvCls  = 0
 
-		BigDecimal rvAmt = BigDecimal.ZERO;
+// AcReceivable RvAmt=100, Rvbal=80,  rvCls  = 80      
+// ACDTL        銷帳             TxAmt=20,  rvCls  = 100
+// 補差額             起帳             TxAmt=100, rvCls  = 0
+
+// AcReceivable RvAmt=100, Rvbal=130, rvCls  = 130      
+// ACDTL        銷帳             TxAmt=20,  rvCls  = 150
+// 補差額             起帳             TxAmt=150, rvCls  = 0
+
 		BigDecimal rvCls = BigDecimal.ZERO;
+		BigDecimal rvAmt = BigDecimal.ZERO;
 		int clsFlag = 0;
 
 		AcReceivable tAcReceivable = sAcReceivableService
 				.findById(new AcReceivableId(iAcctCode, iCustNo, iFacmNo, iRvNo), titaVo);
 		if (tAcReceivable != null) {
-			rvAmt = tAcReceivable.getRvAmt();
-			rvCls = tAcReceivable.getRvAmt().subtract(tAcReceivable.getRvBal());
+			rvCls = tAcReceivable.getRvBal();
 		}
 		// 查詢會計科子細目設定檔
 		CdAcCode tCdAcCode = sCdAcCodeService.acCodeAcctFirst(iAcctCode, titaVo);
 		if (tCdAcCode == null) {
 			throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
 		}
-		if(slAcDetail!=null) {
+		if (slAcDetail != null) {
 			for (AcDetail tAcDetail : slAcDetail.getContent()) {
 				if (tAcDetail.getEntAc() != 1) {
 					continue;
@@ -135,85 +143,82 @@ public class L6908 extends TradeBuffer {
 				}
 
 				if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
-					rvAmt = rvAmt.subtract(tAcDetail.getTxAmt());
+					rvCls = rvCls.subtract(tAcDetail.getTxAmt());
 				} else {
-					rvCls= rvCls.subtract(tAcDetail.getTxAmt());
+					rvCls = rvCls.add(tAcDetail.getTxAmt());
 				}
 			}
 		}
-		
+		if (rvCls.compareTo(BigDecimal.ZERO) > 0) {
+			clsFlag = 0;
+			rvAmt = rvCls;
+		} else {
+			clsFlag = 1;
+			rvAmt = BigDecimal.ZERO.subtract(rvCls);
+		}
 		this.info("rvAmt=" + rvAmt + ", rvCls=" + rvCls);
+
+		// 如銷帳差額 = 0，先補起帳金額，再補差額
 		if (tAcReceivable != null) {
 			if (rvAmt.compareTo(BigDecimal.ZERO) != 0) {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OORvNo", iRvNo);
 				occursList.putParam("OORvAmt", rvAmt);
-				occursList.putParam("OOTitaTlrNo", "999999");
-				occursList.putParam("OOTitaTxtNo", "");
-				occursList.putParam("OOTranItem", "");
-				occursList.putParam("OOTitaTxCd", "");
+				occursList.putParam("OOTitaTlrNo", tAcReceivable.getOpenTlrNo());
+				occursList.putParam("OOTitaTxtNo", tAcReceivable.getOpenTxtNo());
+				iTranItem = "";
+				iTranItem = inqTxTranCode(tAcReceivable.getOpenTxCd(), iTranItem, titaVo);
+				occursList.putParam("OOTranItem", iTranItem);
+				occursList.putParam("OOTitaTxCd", tAcReceivable.getOpenTxCd());
 				occursList.putParam("OOSlipNote", "");
 				occursList.putParam("OOAcDate", tAcReceivable.getOpenAcDate());
-				occursList.putParam("OOClsFlag", 0);
-				this.totaVo.addOccursList(occursList);
-			}
-			if (rvCls.compareTo(BigDecimal.ZERO) != 0) {
-				OccursList occursList = new OccursList();
-				occursList.putParam("OORvNo", iRvNo);
-				occursList.putParam("OORvAmt", rvCls);
-				occursList.putParam("OOTitaTlrNo", "999999");
-				occursList.putParam("OOTitaTxtNo", "");
-				occursList.putParam("OOTranItem", "");
-				occursList.putParam("OOTitaTxCd", "");
-				occursList.putParam("OOSlipNote", "");
-				occursList.putParam("OOAcDate", tAcReceivable.getOpenAcDate());
-				occursList.putParam("OOClsFlag", 1);
+				occursList.putParam("OOClsFlag", clsFlag);
 				this.totaVo.addOccursList(occursList);
 			}
 		}
 		// 如有找到資料
-		if(slAcDetail!=null) {
-		for (AcDetail tAcDetail : slAcDetail.getContent()) {
+		if (slAcDetail != null) {
+			for (AcDetail tAcDetail : slAcDetail.getContent()) {
 
-			this.info("AcDetail : " + tAcDetail.toString());
-			// 不含未入帳,例如:未放行之交易
-			// 0:未入帳 1:已入帳 2:被沖正(隔日訂正) 3.沖正(隔日訂正)
-			if (tAcDetail.getEntAc() != 1) {
-				continue;
-			}
-			// 銷帳編號有輸入時只查詢銷帳編號的資料，業務科目記號=1.資負明細科目（放款、催收款項..)時撥款序號為銷帳編號
-			if (tAcDetail.getAcctFlag() == 1) {
-				if (!(iRvNo.isEmpty()) && !(iRvNo.equals(parse.IntegerToString(tAcDetail.getBormNo(), 3)))) {
+				this.info("AcDetail : " + tAcDetail.toString());
+				// 不含未入帳,例如:未放行之交易
+				// 0:未入帳 1:已入帳 2:被沖正(隔日訂正) 3.沖正(隔日訂正)
+				if (tAcDetail.getEntAc() != 1) {
 					continue;
 				}
-			} else {
-				if (!(iRvNo.isEmpty()) && !(iRvNo.equals(tAcDetail.getRvNo()))) {
-					continue;
+				// 銷帳編號有輸入時只查詢銷帳編號的資料，業務科目記號=1.資負明細科目（放款、催收款項..)時撥款序號為銷帳編號
+				if (tAcDetail.getAcctFlag() == 1) {
+					if (!(iRvNo.isEmpty()) && !(iRvNo.equals(parse.IntegerToString(tAcDetail.getBormNo(), 3)))) {
+						continue;
+					}
+				} else {
+					if (!(iRvNo.isEmpty()) && !(iRvNo.equals(tAcDetail.getRvNo()))) {
+						continue;
+					}
 				}
+
+				OccursList occursList = new OccursList();
+				occursList.putParam("OORvNo", tAcDetail.getRvNo());
+				occursList.putParam("OORvAmt", tAcDetail.getTxAmt());
+				occursList.putParam("OOTitaTlrNo", tAcDetail.getTitaTlrNo());
+				occursList.putParam("OOTitaTxtNo", tAcDetail.getTitaTxtNo());
+				iTranItem = "";
+				iTranItem = inqTxTranCode(tAcDetail.getTitaTxCd(), iTranItem, titaVo);
+				occursList.putParam("OOTranItem", iTranItem);
+				occursList.putParam("OOTitaTxCd", tAcDetail.getTitaTxCd());
+				occursList.putParam("OOSlipNote", tAcDetail.getSlipNote());
+				occursList.putParam("OOAcDate", tAcDetail.getAcDate());
+
+				if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
+					clsFlag = 0;
+				} else {
+					clsFlag = 1;
+				}
+				occursList.putParam("OOClsFlag", clsFlag);
+
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
 			}
-
-			OccursList occursList = new OccursList();
-			occursList.putParam("OORvNo", tAcDetail.getRvNo());
-			occursList.putParam("OORvAmt", tAcDetail.getTxAmt());
-			occursList.putParam("OOTitaTlrNo", tAcDetail.getTitaTlrNo());
-			occursList.putParam("OOTitaTxtNo", tAcDetail.getTitaTxtNo());
-			iTranItem = "";
-			iTranItem = inqTxTranCode(tAcDetail.getTitaTxCd(), iTranItem, titaVo);
-			occursList.putParam("OOTranItem", iTranItem);
-			occursList.putParam("OOTitaTxCd", tAcDetail.getTitaTxCd());
-			occursList.putParam("OOSlipNote", tAcDetail.getSlipNote());
-			occursList.putParam("OOAcDate", tAcDetail.getAcDate());
-
-			if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
-				clsFlag = 0;
-			} else {
-				clsFlag = 1;
-			}
-			occursList.putParam("OOClsFlag", clsFlag);
-
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
-		}
 		}
 		if (this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
@@ -232,17 +237,13 @@ public class L6908 extends TradeBuffer {
 
 	// 查詢交易控制檔
 	private String inqTxTranCode(String uTranNo, String uTranItem, TitaVo titaVo) throws LogicException {
-
-		TxTranCode tTxTranCode = new TxTranCode();
-
-		tTxTranCode = sTxTranCodeService.findById(uTranNo, titaVo);
-
-		if (tTxTranCode == null) {
-			uTranItem = "";
-		} else {
-			uTranItem = tTxTranCode.getTranItem();
+		uTranItem = "";
+		if (uTranNo != null && !uTranNo.isEmpty()) {
+			TxTranCode tTxTranCode = sTxTranCodeService.findById(uTranNo, titaVo);
+			if (tTxTranCode != null) {
+				uTranItem = tTxTranCode.getTranItem();
+			}
 		}
-
 		return uTranItem;
 
 	}

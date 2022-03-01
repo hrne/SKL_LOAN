@@ -783,7 +783,7 @@ E(0,@LoanTermDd,#L2r05LoanTermDd)
 E(0,@RateCode,#L2r05RateCode)
 T(2,@IntCalcCode,#L2r05IntCalcCode)
 E(0,@AcctCode,#L2r05AcctCode)
-T(2,@CustTypeCode,#L2r05CustTypeCode)
+! T(2,@CustTypeCode,#L2r05CustTypeCode)
 E(0,@RepayCode,#L2r05RepayCode)
 E(0,@RepayAcctNo,#L2r05RepayAcctNo)
 E(0,@RepayBank,#L2r05RepayBank)
@@ -816,6 +816,7 @@ T(2,@PieceCode,#L2r05PieceCode)
 ! E(0,@UsDrawdownAmt,#L2r05DuePayAmt)
 T(2,@NotYetFlag,#L2r05CloseFg)
 E(0,@NewBormNo,#L2r05RvBormNo)
+E(0,@BormNo,#L2r05NextRvBormNo)
 T(2,@CompensateFlag,#L2r05CompensateFlag)
 ##loop{times:10,n:1}
 E(0,@StepRateMonths{n},#L2r05StepRateMonths{n})
@@ -836,7 +837,7 @@ T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp)
 T(H,@FreqBaseX,#FreqBase,#FreqBase2Help) 
 T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
 T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
-T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeCodeHelp)
+! T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeCodeHelp)
 T(H,@NotYetFlagX,#NotYetFlag,#YNHelp)
 T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
 T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)    
@@ -1533,12 +1534,12 @@ C(5,#L2r01CharCode,2,$,S)
 
 ![客戶別]
 !依核准額度自動顯示不必輸入 L2R05
-#FdCustTypeCode=X,2,L
+! #FdCustTypeCode=X,2,L
 
-#CustTypeCode=X,2,S
+! #CustTypeCode=X,2,S
 
-#CustTypeCodeX=X,20,L
-T(3,)T(H,#CustTypeCode,#CustTypeCodeHelp)
+! #CustTypeCodeX=X,20,L
+! T(3,)T(H,#CustTypeCode,#CustTypeCodeHelp)
 
 ![未齊件] 
 !必須輸入
@@ -1644,7 +1645,8 @@ T(3,0)
 
 #CompensateFlag=X,1,I
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
-@C(4,#CompensateFlag,S,V(3,Y,N))
+HELP(#YNHelp)
+@V(H,#YNHelp)
 
 
 #CompensateFlagX=X,2,L
@@ -1749,8 +1751,8 @@ C(3,#L2r05FirstAdjRateDate,0,E(0,#WKFADJ),$)
 #FirstRateAdjFreq=X,2,S
 
 #Wait1=X,1,I 
-C(3,#RateCode,3,S,$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+@T(3,)
 
 !--- P3 階梯式利率
 #INVK3=X,1,S
@@ -1989,6 +1991,10 @@ T(2,@RpRemitGender,)
 E(0,@RpRemitBirthday,0),$)
 T(2,@INITp8,1)
 
+! 系統日
+#wksysdate=D,7,S
+E(0,#SYSCDATE)
+
 #RPTITLEtt=X,20,L
 IF(#CompensateAcct==#TimCustNoX,T(3,匯款人資料（本人）),$)
 IF(#CompensateAcct==#RelationName,T(3,匯款人資料（同銀扣第三人）),$)
@@ -2024,6 +2030,7 @@ T(H,#RpRemitGender,#SexHelp)
 IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,$,S)
 C(4,#RpRemitGender,S,$)
 @A(DATE,0,#RpRemitBirthday)
+IF(#RpRemitBirthday>#wksysdate,V(P,出生日期不可大於日曆日),$)
 
 
 !AML處理
@@ -2121,7 +2128,6 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 [
 ![其他]
 ["<font color=red>@其他"],
-["#FdCustTypeCode+客戶別",#CustTypeCodeX],
 ["#FdNotYetFlag+未齊件",#NotYetFlag,#NotYetFlagX,#BTN6],
 ["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
 ! ["#FdPieceCodeSecond+計件代碼2",#PieceCodeSecond,#PieceCodeSecondX],

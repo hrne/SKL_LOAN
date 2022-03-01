@@ -1,0 +1,36 @@
+!系統變數
+!報表名稱=SFORMNAME$
+!PDF代號=SPDFFORM$
+!可否編輯=SEDITFORM$
+!如果 SEDITFORM$ = edit -> 可編輯
+
+<HELPRIM.rtn>
+
+#HelpCount=9,2,S
+#HelpIdx=9,4,S
+#HelpLen=9,4,S
+#HelpDesc=x,20480,S
+##loop {times:15,i:1}
+#HelpDesc{i}=x,20480,S
+##end
+
+
+#HelpProc=@,1,S
+E(0,@HelpIdx,1)
+##loop {times:15,i:1}
+C(3,#HelpCount,{i-1},s,$)
+T(1,@HelpLen,#HelpDesc,#HelpIdx,4)
+E(0,@HelpIdx,#HelpIdx+4)
+T(1,@HelpDesc{i},#HelpDesc,#HelpIdx,#HelpLen)
+E(0,@HelpIdx,#HelpIdx+#HelpLen)
+##end
+
+</HELPRIM.rtn>
+
+
+<HELPRIM.tom>
+TXFORM=XXR99
+#HelpCount
+#HelpDesc
+^
+</HELPRIM.tom>

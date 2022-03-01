@@ -106,40 +106,38 @@ BEGIN
 
     MERGE INTO "AcLoanRenew" TARGET_TABLE
     USING (
-      WITH NEW_NO AS (
-        SELECT LMSACN
-             , NEGNUM
-             , LMSAPN
-             , LMSASQ
-        FROM LN$NODP
-        WHERE CHGFLG = 'A' -- 新
+      WITH ACNP AS (
+        SELECT "LMSACN"
+             , "LMSAPN"  -- 新
+             , "LMSASQ"  -- 新
+             , "LMSAPN1" -- 舊
+             , "LMSASQ1" -- 舊
+        FROM "LNACNP"
       )
-      , OLD_NO AS (
-        SELECT LMSACN
-             , NEGNUM
-             , LMSAPN
-             , LMSASQ
-        FROM LN$NODP
-        WHERE CHGFLG = 'B' -- 舊
-      )
-      , S1 AS (
-        SELECT NEW_NO.LMSACN
-             , NEW_NO.LMSAPN
-             , NEW_NO.LMSASQ
-             , OLD_NO.LMSAPN AS OLD_LMSAPN
-             , OLD_NO.LMSASQ AS OLD_LMSASQ
-             , ROW_NUMBER() 
-               OVER (
-                 PARTITION BY NEW_NO.LMSACN
-                            , NEW_NO.LMSAPN
-                            , NEW_NO.LMSASQ
-                 ORDER BY OLD_NO.LMSAPN
-                        , OLD_NO.LMSASQ
-               ) AS "Seq"
-        FROM NEW_NO
-        LEFT JOIN OLD_NO ON OLD_NO.LMSACN = NEW_NO.LMSACN
-                        AND OLD_NO.NEGNUM = NEW_NO.NEGNUM
-        WHERE NVL(OLD_NO.LMSACN,0) != 0
+      , NODP AS (
+        SELECT N.LMSACN
+             , N.NEGNUM
+             , N.LMSAPN         AS LMSAPN
+             , N.LMSASQ         AS LMSASQ
+             , NVL(A.LMSAPN1,0) AS OLD_LMSAPN -- 舊
+             , NVL(A.LMSASQ1,0) AS OLD_LMSASQ -- 舊
+        FROM LN$NODP N
+        LEFT JOIN ACNP A ON A.LMSACN = N.LMSACN
+                        AND A.LMSAPN = N.LMSAPN
+                        AND A.LMSASQ = N.LMSASQ
+        WHERE N.CHGFLG = 'A' -- 新
+        UNION
+        SELECT N.LMSACN
+             , N.NEGNUM
+             , NVL(A.LMSAPN,0) AS LMSAPN
+             , NVL(A.LMSASQ,0) AS LMSASQ
+             , N.LMSAPN        AS OLD_LMSAPN -- 舊
+             , N.LMSAPN        AS OLD_LMSASQ -- 舊
+        FROM LN$NODP N
+        LEFT JOIN ACNP A ON A.LMSACN = N.LMSACN
+                        AND A.LMSAPN1 = N.LMSAPN
+                        AND A.LMSASQ1 = N.LMSASQ
+        WHERE N.CHGFLG = 'B' -- 舊
       )
       SELECT S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 3
             ,S1."LMSAPN"                    AS "NewFacmNo"           -- 新額度編號 DECIMAL 3
@@ -154,10 +152,14 @@ BEGIN
             ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
             ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
             ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-      FROM  S1
+      FROM NODP S1
       LEFT JOIN LA$LMSP S3 ON S3.LMSACN = S1.LMSACN
                           AND S3.LMSAPN = S1.LMSAPN
                           AND S3.LMSASQ = S1.LMSASQ
+      WHERE S1.LMSAPN != 0
+        AND S1.LMSASQ != 0
+        AND S1.OLD_LMSAPN != 0
+        AND S1.OLD_LMSASQ != 0
     ) SOURCE_TABLE
     ON (
       TARGET_TABLE."CustNo" = SOURCE_TABLE."CustNo"

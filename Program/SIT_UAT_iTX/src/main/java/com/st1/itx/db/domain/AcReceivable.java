@@ -29,7 +29,7 @@ public class AcReceivable implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8577366775480282621L;
+	private static final long serialVersionUID = -1805293039174189924L;
 
 @EmbeddedId
   private AcReceivableId acReceivableId;
@@ -124,6 +124,22 @@ public class AcReceivable implements Serializable {
   @Column(name = "`OpenAcDate`")
   private int openAcDate = 0;
 
+  // 起帳交易代號
+  @Column(name = "`OpenTxCd`", length = 5)
+  private String openTxCd;
+
+  // 起帳單位別
+  @Column(name = "`OpenKinBr`", length = 4)
+  private String openKinBr;
+
+  // 起帳經辦
+  @Column(name = "`OpenTlrNo`", length = 6)
+  private String openTlrNo;
+
+  // 起帳交易序號
+  @Column(name = "`OpenTxtNo`")
+  private int openTxtNo = 0;
+
   // 最後作帳日
   /* 不含次日交易 */
   @Column(name = "`LastAcDate`")
@@ -159,12 +175,10 @@ public class AcReceivable implements Serializable {
   private String jsonFields;
 
   // 建檔人員
-  /* 起帳 */
   @Column(name = "`CreateEmpNo`", length = 6)
   private String createEmpNo;
 
   // 建檔日期
-  /* 起帳 */
   @CreatedDate
   @Column(name = "`CreateDate`")
   private java.sql.Timestamp createDate;
@@ -585,6 +599,82 @@ public class AcReceivable implements Serializable {
   }
 
 /**
+	* 起帳交易代號<br>
+	* 
+	* @return String
+	*/
+  public String getOpenTxCd() {
+    return this.openTxCd == null ? "" : this.openTxCd;
+  }
+
+/**
+	* 起帳交易代號<br>
+	* 
+  *
+  * @param openTxCd 起帳交易代號
+	*/
+  public void setOpenTxCd(String openTxCd) {
+    this.openTxCd = openTxCd;
+  }
+
+/**
+	* 起帳單位別<br>
+	* 
+	* @return String
+	*/
+  public String getOpenKinBr() {
+    return this.openKinBr == null ? "" : this.openKinBr;
+  }
+
+/**
+	* 起帳單位別<br>
+	* 
+  *
+  * @param openKinBr 起帳單位別
+	*/
+  public void setOpenKinBr(String openKinBr) {
+    this.openKinBr = openKinBr;
+  }
+
+/**
+	* 起帳經辦<br>
+	* 
+	* @return String
+	*/
+  public String getOpenTlrNo() {
+    return this.openTlrNo == null ? "" : this.openTlrNo;
+  }
+
+/**
+	* 起帳經辦<br>
+	* 
+  *
+  * @param openTlrNo 起帳經辦
+	*/
+  public void setOpenTlrNo(String openTlrNo) {
+    this.openTlrNo = openTlrNo;
+  }
+
+/**
+	* 起帳交易序號<br>
+	* 
+	* @return Integer
+	*/
+  public int getOpenTxtNo() {
+    return this.openTxtNo;
+  }
+
+/**
+	* 起帳交易序號<br>
+	* 
+  *
+  * @param openTxtNo 起帳交易序號
+	*/
+  public void setOpenTxtNo(int openTxtNo) {
+    this.openTxtNo = openTxtNo;
+  }
+
+/**
 	* 最後作帳日<br>
 	* 不含次日交易
 	* @return Integer
@@ -719,7 +809,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 建檔人員<br>
-	* 起帳
+	* 
 	* @return String
 	*/
   public String getCreateEmpNo() {
@@ -728,7 +818,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 建檔人員<br>
-	* 起帳
+	* 
   *
   * @param createEmpNo 建檔人員
 	*/
@@ -738,7 +828,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 建檔日期<br>
-	* 起帳
+	* 
 	* @return java.sql.Timestamp
 	*/
   public java.sql.Timestamp getCreateDate() {
@@ -747,7 +837,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 建檔日期<br>
-	* 起帳
+	* 
   *
   * @param createDate 建檔日期
 	*/
@@ -799,8 +889,8 @@ public class AcReceivable implements Serializable {
     return "AcReceivable [acReceivableId=" + acReceivableId + ", acNoCode=" + acNoCode + ", acSubCode=" + acSubCode
            + ", acDtlCode=" + acDtlCode + ", branchNo=" + branchNo + ", currencyCode=" + currencyCode + ", clsFlag=" + clsFlag + ", acctFlag=" + acctFlag + ", receivableFlag=" + receivableFlag
            + ", rvAmt=" + rvAmt + ", rvBal=" + rvBal + ", acBal=" + acBal + ", slipNote=" + slipNote + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
-           + ", openAcDate=" + openAcDate + ", lastAcDate=" + lastAcDate + ", lastTxDate=" + lastTxDate + ", titaTxCd=" + titaTxCd + ", titaKinBr=" + titaKinBr + ", titaTlrNo=" + titaTlrNo
-           + ", titaTxtNo=" + titaTxtNo + ", jsonFields=" + jsonFields + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate
-           + "]";
+           + ", openAcDate=" + openAcDate + ", openTxCd=" + openTxCd + ", openKinBr=" + openKinBr + ", openTlrNo=" + openTlrNo + ", openTxtNo=" + openTxtNo + ", lastAcDate=" + lastAcDate
+           + ", lastTxDate=" + lastTxDate + ", titaTxCd=" + titaTxCd + ", titaKinBr=" + titaKinBr + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", jsonFields=" + jsonFields
+           + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }

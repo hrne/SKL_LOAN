@@ -405,6 +405,22 @@ public class L1103 extends TradeBuffer {
 			if (titaVo.getParam("IndigenousnameInd").equals("X")) {
 				tCustMain.setIndigenousName(titaVo.getParam("IndigenousnameAft"));
 			}
+
+			// 介紹人
+			if (titaVo.getParam("IntroducerInd").equals("X")) {
+				tCustMain.setIntroducer(titaVo.getParam("IntroducerAft"));
+			}
+
+			// 房貸專員
+			if (titaVo.getParam("BusinessOfficerInd").equals("X")) {
+				tCustMain.setBusinessOfficer(titaVo.getParam("BusinessOfficerAft"));
+			}
+
+			// 站別
+			if (titaVo.getParam("StationInd").equals("X")) {
+				tCustMain.setStation(titaVo.getParam("StationAft"));
+			}
+
 			tCustMain.setActFg(2);
 			// 維護中櫃員代號 放行清空
 //			tCustMain.setMainTenanceTlrNo("");

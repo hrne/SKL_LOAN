@@ -157,7 +157,6 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       FROM \"MonthlyFacBal\" M";
 		sql += "		   WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  		 AND M.\"PrinBalance\" > 0";
-		sql += "	  		 AND M.\"AssetClass\" IS NULL";
 		sql += "	       UNION";
 		sql += "	       SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
 		sql += "	       FROM \"AcMain\"";

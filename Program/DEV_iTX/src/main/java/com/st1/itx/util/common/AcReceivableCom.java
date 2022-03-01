@@ -520,14 +520,6 @@ public class AcReceivableCom extends TradeBuffer {
 		// jsonFields 欄
 		settingjsonfields(ac.getJsonFields(), titaVo);
 
-		// 起帳總額
-		if (wkRvFg == 0 && AcHCode == 0) {
-			if (tAcReceivable.getClsFlag() == 1)
-				tAcReceivable.setRvAmt(wkTxAmt);
-			else
-				tAcReceivable.setRvAmt(wkTxAmt.add(tAcReceivable.getRvAmt()));
-		}
-
 //                      最後作帳日   會計日餘額    最後交易日   未銷餘額    系統營業日    交易日          銷帳金額    新最後作帳日       新會計日餘額    新最後交易日   新未銷餘額
 //                      LastAcDate    AcBal        LastTxDate   RvBal       MgDate.Tbsdy  Txcom.Tbsdy     wkTxAmt     LastAcDate         AcBal           LastTxDate     RvBal 
 //                       3/16         300          3/17          250        3/18          3/19(次日)      -100         
@@ -562,15 +554,7 @@ public class AcReceivableCom extends TradeBuffer {
 			tAcReceivable.setClsFlag(0);
 		}
 
-//5.起帳金額
-		// ZXX短繳本金同時有起帳(本期欠繳)、銷帳(欠繳收回)，起帳金額=未銷金額
-		if (tAcReceivable.getAcctCode().length() > 1 && "Z".equals(tAcReceivable.getAcctCode().substring(0, 1))) {
-			if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) > 0) {
-				tAcReceivable.setRvAmt(tAcReceivable.getRvBal());
-			}
-		}
-
-//6.檢查銷帳金額		
+//5.檢查銷帳金額		
 		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) < 0
 				|| tAcReceivable.getAcBal().compareTo(BigDecimal.ZERO) < 0) {
 			this.info("銷帳金額超過原入帳金額 :" + ", bizTbsdy=" + bizTbsdy + ", AcBal=" + tAcReceivable.getRvBal());
@@ -635,21 +619,25 @@ public class AcReceivableCom extends TradeBuffer {
 		tAcReceivable.setCurrencyCode(ac.getCurrencyCode());
 		tAcReceivable.setAcctFlag(ac.getAcctFlag());
 		tAcReceivable.setReceivableFlag(ac.getReceivableFlag());
-		tAcReceivable.setRvAmt(BigDecimal.ZERO);
+		tAcReceivable.setRvAmt(ac.getTxAmt());
 		tAcReceivable.setRvBal(BigDecimal.ZERO);
 		tAcReceivable.setAcBal(BigDecimal.ZERO);
 		tAcReceivable.setSlipNote(ac.getSlipNote());
 		tAcReceivable.setAcBookCode(ac.getAcBookCode());
 		tAcReceivable.setAcSubBookCode(ac.getAcSubBookCode());
-		if (wkOpenAcDate > 0)
+		if (wkOpenAcDate > 0) {
 			tAcReceivable.setOpenAcDate(wkOpenAcDate);
-		else
+		} else {
 			tAcReceivable.setOpenAcDate(ac.getAcDate());
+		}
 		tAcReceivable.setTitaTxCd(ac.getTitaTxCd());
 		tAcReceivable.setTitaKinBr(ac.getTitaKinbr());
 		tAcReceivable.setTitaTlrNo(ac.getTitaTlrNo());
 		tAcReceivable.setTitaTxtNo(ac.getTitaTxtNo());
-
+		tAcReceivable.setOpenTxCd(ac.getTitaTxCd());
+		tAcReceivable.setOpenKinBr(ac.getTitaKinbr());
+		tAcReceivable.setOpenTlrNo(ac.getTitaTlrNo());
+		tAcReceivable.setOpenTxtNo(ac.getTitaTxtNo());
 	}
 
 	/* 更新火險單續保檔 AcDate */

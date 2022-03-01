@@ -98,7 +98,9 @@ public class L2R05 extends TradeBuffer {
 	private int wkCustNo = 0;
 	private int wkFacmNo = 0;
 	private int wkRvBormNo = 0;
+	private int wkNextRvBormNo = 0;
 	private int facLastBormNo = 0;
+	private int facLastRvBormNo = 0;
 	private BigDecimal wkBaseRate = BigDecimal.ZERO;
 	private TitaVo titaVo = new TitaVo();
 	private String wkCurrencyCode = "TWD";
@@ -243,10 +245,6 @@ public class L2R05 extends TradeBuffer {
 					}
 				}
 			}
-//			if (tFacProd.getCharCode().equals("2") && tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {   //TODO 已房養老刪除
-//				throw new LogicException(titaVo, "E3099", " 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = "
-//						+ tFacMain.getFacmNo() + " 已動用額度 = " + df.format(tFacMain.getUtilAmt())); // 該筆額度(以房養老)已撥款
-//			}
 		}
 
 		tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
@@ -293,8 +291,26 @@ public class L2R05 extends TradeBuffer {
 				wkRvDrawdownAmt = wkRvDrawdownAmt.add(rv.getDrawdownAmt());
 			}
 		}
+		if (iTxCode.equals("L3100") || iTxCode.equals("L3110")) {
+			if (iFKey != 7) {
+				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal().add(wkRvDrawdownAmt)) <= 0) {
+					// TODO:檢查此額度是否為借新還舊
+					tAcReceivable = acReceivableService.findById(new AcReceivableId("TRO", iCustNo, iFacmNo,
+							"FacmNo" + StringUtils.leftPad(String.valueOf(iFacmNo), 3, "0")), titaVo);
+					if (tAcReceivable == null) {
+						throw new LogicException(titaVo, "E2072", " 額度主檔 借款人戶號 = " + tFacMain.getCustNo() + " 額度編號 = "
+								+ tFacMain.getFacmNo() + " 核准額度 = " + df.format(tFacMain.getLineAmt()) + " 已動用額度餘額 = "
+								+ df.format(tFacMain.getUtilBal()) + " 已預約撥款金額 = " + df.format(wkRvDrawdownAmt)); // 該筆額度編號沒有可用額度
+					}
+				}
+			}
+		}
 		facLastBormNo = tFacMain.getLastBormNo();
+		facLastRvBormNo = tFacMain.getLastBormRvNo();
 		wkRvBormNo = wkRvCnt + facLastBormNo + 1;
+		wkNextRvBormNo = facLastRvBormNo + 1;
+		this.info("tFacMain.getLastBormRvNo() = " + tFacMain.getLastBormRvNo());
+		this.info("wkNextRvBormNo = " + wkNextRvBormNo);
 		// 登錄取首筆撥款下次利率調整日期
 		if (tFacMain.getLastBormNo() >= 1) {
 			this.info("登錄取首筆撥款下次利率調整日期");
@@ -323,6 +339,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05BaseRate", wkBaseRate); // 指標利率
 		this.totaVo.putParam("L2r05CloseFg", wkCloseFg); // 未齊件註記
 		this.totaVo.putParam("L2r05RvBormNo", wkRvBormNo); // 預定撥款序號
+		this.totaVo.putParam("L2r05NextRvBormNo", wkNextRvBormNo); // 預定撥款序號
 		this.totaVo.putParam("L2r05RvDrawdownAmt", wkRvDrawdownAmt); // 已預約撥款金額
 		for (int i = 1; i <= 10; i++) {
 			this.totaVo.putParam("L2r05StepRateMonths" + i, 0);
@@ -629,6 +646,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05BaseRate", 0);
 		this.totaVo.putParam("L2r05CloseFg", "");
 		this.totaVo.putParam("L2r05RvBormNo", 0);
+		this.totaVo.putParam("L2r05NextRvBormNo", 0); // 預定撥款序號
 		this.totaVo.putParam("L2r05RvDrawdownAmt", 0);
 		for (int i = 1; i <= 10; i++) {
 			this.totaVo.putParam("L2r05StepRateMonths" + i, 0);

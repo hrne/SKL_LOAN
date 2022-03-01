@@ -112,6 +112,16 @@ public class L4101ReportA extends MakeReport {
 
 	}
 
+	// 自訂表尾
+	@Override
+	public void printFooter() {
+		this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		this.print(-43, 1, "　放 款 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+		this.print(-44, 1, "　財 務 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+//		this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+	}
+
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L4101ReportA exec ...");
 
@@ -175,7 +185,7 @@ public class L4101ReportA extends MakeReport {
 		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
 		print(1, 1, "　　　　　　           ");
 
-//		print(0, 61, currencyCode);
+		print(0, 61, "　　　　　　　　共　" + cnt + "　戶　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 		print(0, 105, formatAmt(sumDbAmt, 0), "R");// 借方金額加總
 		print(0, 125, formatAmt(sumCrAmt, 0), "R");// 貸方金額加總
 

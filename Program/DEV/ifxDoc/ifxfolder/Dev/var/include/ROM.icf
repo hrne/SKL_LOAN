@@ -1833,6 +1833,7 @@ TXFORM=L2R04
 #L2r05BaseRate=n,2.4,S
 #L2r05CloseFg=X,1,S
 #L2r05RvBormNo=A,3,S
+#L2r05NextRvBormNo=A,3,S
 #L2r05RvDrawdownAmt=m,14.2,S
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}=n,1,S
@@ -1944,6 +1945,7 @@ TXFORM=L2R05
 #L2r05BaseRate
 #L2r05CloseFg
 #L2r05RvBormNo
+#L2r05NextRvBormNo
 #L2r05RvDrawdownAmt
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}
@@ -4300,10 +4302,14 @@ TXFORM=L3R14
 #L1r01AMLGroup=X,3,S
 #L1r01IndigenousName=x,100,S
 #L1r01Introducer=X,6,S
+#L1r01IntroducerX=X,20,S
+#L1r01BusinessOfficer=X,6,S
+#L1r01BusinessOfficerX=X,20,S
 #L1r01TypeCode=A,1,S
 #L1r01AllowInquire=X,1,S
 #L1r01RegAddress=x,115,S
 #L1r01CurrAddress=x,115,S
+#L1r01Station=X,3,S
 </L1R01.dec>
 
 <L1R01.tom>
@@ -4363,10 +4369,14 @@ TXFORM=L1R01
 #L1r01AMLGroup
 #L1r01IndigenousName
 #L1r01Introducer
+#L1r01IntroducerX
+#L1r01BusinessOfficer
+#L1r01BusinessOfficerX
 #L1r01TypeCode
 #L1r01AllowInquire
 #L1r01RegAddress
 #L1r01CurrAddress
+#L1r01Station
 ^
 </L1R01.tom>
 

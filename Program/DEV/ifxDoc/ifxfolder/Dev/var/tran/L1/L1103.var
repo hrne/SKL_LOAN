@@ -99,6 +99,9 @@ E(0,0)
 ["#FdAmlgroupBef+AML組織",#AmlgroupBef,#AmlgroupBefX],[#AmlgroupInd,#AmlgroupAft,#AmlgroupAftX],
 [#<->#,"#FdIndigenousnameBef1+修改前-原住民姓名",#IndigenousnameBef],
 [#<->#,"#FdIndigenousnameBef2+修改後-原住民姓名@+#IndigenousnameInd",#IndigenousnameAft],
+["#FdIntroducer+介紹人",#IntroducerBef,#IntroducerBefX],[#IntroducerInd,#IntroducerAft,#IntroducerAftX],
+["#FdBusinessOfficer+房貸專員",#BusinessOfficerBef,#BusinessOfficerBefX],[#BusinessOfficerInd,#BusinessOfficerAft,#BusinessOfficerAftX],
+["#FdStation+站別",#StationBef,#StationBefX],[#StationInd,#StationAft,#StationAftX],
 ]
 !["#FdIsLimit+是否為授信限制對象",#IsLimitX],[#IsLimitXInd,#IsLimitXAft],
 !["#FdIsRelated+是否為利害關係人",#IsRelatedX],[#IsRelatedXInd,#IsRelatedXAft],
@@ -195,9 +198,14 @@ T(3,CdCode.AMLJobCode)
 
 #AMLJobCodeHelp=x,1024,S
 
+#StationCode=x,14,S
+T(3,CdCode.Station)
+
+#StationHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@SexHelp,#HelpDesc1)
@@ -208,6 +216,7 @@ T(2,@YesNoHelp,#HelpDesc4)
 T(2,@EduCodeHelp,#HelpDesc6)
 T(2,@AMLCodeHelp,#HelpDesc7)
 T(2,@AMLJobCodeHelp,#HelpDesc8)
+T(2,@StationHelp,#HelpDesc9)
 
 ! 調RIM取縣市代碼
 #RimL6r03City=X,1,S
@@ -377,9 +386,21 @@ T(H,@TypeCodeXBef,#L1r01TypeCode,#TypeCodeHelp)
 T(H,@TypeCodeXAft,#L1r01TypeCode,#TypeCodeHelp)
 T(2,@RegAddressBef,#L1r01RegAddress)
 T(2,@CurrAddressBef,#L1r01CurrAddress)
+T(2,@IntroducerBef,#L1r01Introducer)
+T(2,@IntroducerAft,#L1r01Introducer)
+T(2,@IntroducerBefX,#L1r01IntroducerX)
+T(2,@IntroducerAftX,#L1r01IntroducerX)
+T(2,@BusinessOfficerBef,#L1r01BusinessOfficer)
+T(2,@BusinessOfficerAft,#L1r01BusinessOfficer)
+T(2,@BusinessOfficerBefX,#L1r01BusinessOfficerX)
+T(2,@BusinessOfficerAftX,#L1r01BusinessOfficerX)
+T(2,@StationBef,#L1r01Station)
+T(H,@StationBefX,#StationBef,#StationHelp)
+T(2,@StationAft,#L1r01Station)
+T(H,@StationAftX,#StationAft,#StationHelp)
 
 #RimErrorSkip=_,_,S
-T(3,Y)
+T(3,X)
 
 #RIM_L2R08a=X,1,S
 C(4,#EmpnoBef,S,$)
@@ -586,6 +607,9 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 #FdPassportnoBef=X,2,L
 #FdAmljobcodeBef=X,2,L
 C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+#FdIntroducer=X,2,L
+#FdBusinessOfficer=X,2,L
+#FdStation=X,2,L
 
 #FdAmlgroupBef=X,2,L
 C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
@@ -1575,8 +1599,66 @@ IF(#AmlgroupAft==#AmlgroupBef,T(3,),T(3,X))
 C(5,#IndigenousnameAft,#IndigenousnameBef,T(3,),T(3,X))
 
 
+!介紹人
+#IntroducerBef=X,6,L
+#IntroducerBefX=X,20,L
+#IntroducerAft=X,6,I
 
-!串IND IF空白跳ERROR
+#RIM_L2R08b=X,1,S
+C(5,#IntroducerAft,#IntroducerBef,S,$)
+T(3,@IntroducerAftX,)
+C(4,#IntroducerAft,S,$)
+RESET_RIM(#RIM_L2R08b,L2R08)
+T(2,@RimEmployeeNo,#IntroducerAft)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@IntroducerAftX,#L2r08FullName)
+
+#IntroducerAftX=X,20,L
+C(5,#IntroducerAft,#IntroducerBef,T(2,#IntroducerBefX),$)
+
+#IntroducerInd=X,1,L
+C(5,#IntroducerAft,#IntroducerBef,T(3,),T(3,X))
+
+!房貸專員
+#BusinessOfficerBef=X,6,L
+#BusinessOfficerBefX=X,20,L
+#BusinessOfficerAft=X,6,I
+
+#RIM_L2R08c=X,1,S
+C(5,#BusinessOfficerAft,#BusinessOfficerBef,S,$)
+T(3,@BusinessOfficerAftX,)
+C(4,#BusinessOfficerAft,S,$)
+RESET_RIM(#RIM_L2R08c,L2R08)
+T(2,@RimEmployeeNo,#BusinessOfficerAft)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@BusinessOfficerAftX,#L2r08FullName)
+
+#BusinessOfficerAftX=X,20,L
+C(5,#BusinessOfficerAft,#BusinessOfficerBef,T(2,#BusinessOfficerBefX),$)
+
+#BusinessOfficerInd=X,1,L
+C(5,#BusinessOfficerAft,#BusinessOfficerBef,T(3,),T(3,X))
+
+!站別
+#StationBef=X,3,L
+#StationBefX=X,20,L
+#StationAft=X,3,I
+HELP(#StationHelp)
+@
+C(4,#StationAft,S,$)
+V(H,#StationHelp)
+
+#StationAftX=X,20,L
+C(5,#StationAft,StationBef,s,$)
+C(4,#StationAft,S,$)
+T(H,#StationAft,#StationHelp)
+
+#StationInd=X,1,L
+C(5,#StationAft,#StationBef,T(3,),T(3,X))
+
+
 
 </sub>
 
@@ -1770,6 +1852,12 @@ T(3,[L1103] 顧客基本資料變更-自然人)
 #IndigenousnameBef
 #IndigenousnameInd
 #IndigenousnameAft
+#IntroducerInd
+#IntroducerAft
+#BusinessOfficerInd
+#BusinessOfficerAft
+#StationInd
+#StationAft
 #END
 
 </sub>

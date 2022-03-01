@@ -29,7 +29,7 @@ BEGIN
            NP."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 
           ,FAC."FacmNo"                   AS "FacmNo"              -- 額度編號 DECIMAL 3 
           ,RCM."NewReportCode"            AS "FormNo"              -- 報表代號 VARCHAR2 10 
-          ,'Y'                            AS "PaperNotice"         -- 書面通知與否 VARCHAR2 1 
+          ,NP."ACTUSE"                    AS "PaperNotice"         -- 書面通知與否 VARCHAR2 1 
           ,'Y'                            AS "MsgNotice"           -- 簡訊發送與否 VARCHAR2 1 
           ,'Y'                            AS "EmailNotice"         -- 電子郵件發送與否 VARCHAR2 1 
           ,0                              AS "ApplyDate"           -- 申請日期 decimald 8 

@@ -1833,6 +1833,7 @@ TXFORM=L2R04
 #L2r05BaseRate=n,2.4,S
 #L2r05CloseFg=X,1,S
 #L2r05RvBormNo=A,3,S
+#L2r05NextRvBormNo=A,3,S
 #L2r05RvDrawdownAmt=m,14.2,S
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}=n,1,S
@@ -1944,6 +1945,7 @@ TXFORM=L2R05
 #L2r05BaseRate
 #L2r05CloseFg
 #L2r05RvBormNo
+#L2r05NextRvBormNo
 #L2r05RvDrawdownAmt
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}
@@ -2691,6 +2693,10 @@ TXFORM=L2R26
 #L2r27ParkingArea=m,9.2,S
 #L2r27HouseTaxNo=X,12,S
 #L2r27HouseBuyDate=D,7,S
+#L2r27Reason=X,1,S
+#L2r27OtherReason=x,60,S
+#L2r27CreateEmpNo=X,6,S
+#L2r27CreateDate=D,7,S
 ##loop{times:10,i:1}
 #L2r27PublicBdNoA{i}=X,5,S
 #L2r27PublicBdNoB{i}=X,3,S
@@ -2706,10 +2712,6 @@ TXFORM=L2R26
 #L2r27OwnerRelCode{i}=X,2,S
 #L2r27OwnerPart{i}=m,10,S
 #L2r27OwnerTotal{i}=m,10,S
-#L2r27Reason{i}=X,1,S
-#L2r27OtherReason{i}=x,60,S
-#L2r27CreateEmpNo{i}=X,6,S
-#L2r27CreateDate{i}=D,7,S
 ##end
 ##loop{times:5,i:1}
 #L2r27ParkingTypeCodeA{i}=A,1,S
@@ -2772,6 +2774,10 @@ TXFORM=L2R27
 #L2r27ParkingArea
 #L2r27HouseTaxNo
 #L2r27HouseBuyDate
+#L2r27Reason
+#L2r27OtherReason
+#L2r27CreateEmpNo
+#L2r27CreateDate
 ##loop{times:10,i:1}
 #L2r27PublicBdNoA{i}
 #L2r27PublicBdNoB{i}
@@ -2783,10 +2789,6 @@ TXFORM=L2R27
 #L2r27OwnerRelCode{i}
 #L2r27OwnerPart{i}
 #L2r27OwnerTotal{i}
-#L2r27Reason{i}
-#L2r27OtherReason{i}
-#L2r27CreateEmpNo{i}
-#L2r27CreateDate{i}
 ##end
 ##loop{times:5,i:1}
 #L2r27ParkingTypeCodeA{i}
@@ -2836,16 +2838,16 @@ TXFORM=L2R27
 #L2r28LandUsageCode=A,2,S
 #L2r28LandRentStartDate=D,7,S
 #L2r28LandRentEndDate=D,7,S
+#L2r28Reason=X,1,S
+#L2r28OtherReason=x,60,S
+#L2r28CreateEmpNo=X,6,S
+#L2r28CreateDate=D,7,S
 ##loop{times:10,i:1}
 #L2r28OwnerId{i}=X,10,S
 #L2r28OwnerName{i}=x,30,S
 #L2r28OwnerRelCode{i}=X,2,S
 #L2r28OwnerPart{i}=m,10,S
 #L2r28OwnerTotal{i}=m,10,S
-#L2r28Reason{i}=X,1,S
-#L2r28OtherReason{i}=x,60,S
-#L2r28CreateEmpNo{i}=X,6,S
-#L2r28CreateDate{i}=D,7,S
 ##end
 </L2R28.dec>
 
@@ -2875,16 +2877,16 @@ TXFORM=L2R28
 #L2r28LandUsageCode
 #L2r28LandRentStartDate
 #L2r28LandRentEndDate
+#L2r28Reason
+#L2r28OtherReason
+#L2r28CreateEmpNo
+#L2r28CreateDate
 ##loop{times:10,i:1}
 #L2r28OwnerId{i}
 #L2r28OwnerName{i}
 #L2r28OwnerRelCode{i}
 #L2r28OwnerPart{i}
 #L2r28OwnerTotal{i}
-#L2r28Reason{i}
-#L2r28OtherReason{i}
-#L2r28CreateEmpNo{i}
-#L2r28CreateDate{i}
 ##end
 ^
 </L2R28.tom>
@@ -4300,10 +4302,14 @@ TXFORM=L3R14
 #L1r01AMLGroup=X,3,S
 #L1r01IndigenousName=x,100,S
 #L1r01Introducer=X,6,S
+#L1r01IntroducerX=X,20,S
+#L1r01BusinessOfficer=X,6,S
+#L1r01BusinessOfficerX=X,20,S
 #L1r01TypeCode=A,1,S
 #L1r01AllowInquire=X,1,S
 #L1r01RegAddress=x,115,S
 #L1r01CurrAddress=x,115,S
+#L1r01Station=X,3,S
 </L1R01.dec>
 
 <L1R01.tom>
@@ -4363,10 +4369,14 @@ TXFORM=L1R01
 #L1r01AMLGroup
 #L1r01IndigenousName
 #L1r01Introducer
+#L1r01IntroducerX
+#L1r01BusinessOfficer
+#L1r01BusinessOfficerX
 #L1r01TypeCode
 #L1r01AllowInquire
 #L1r01RegAddress
 #L1r01CurrAddress
+#L1r01Station
 ^
 </L1R01.tom>
 

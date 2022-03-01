@@ -89,9 +89,8 @@ T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L1001 顧客明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 
-#NTXBUF=X,11,S
+#NTXBUF=x,11,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-!#CHAIN_Funcd=A,1,S
 T(1,@FunCd,#NTXBUF,1,1)
 
 #CHAIN_CustId=X,10,S
@@ -281,8 +280,13 @@ T(3,CdCode.SubCompanyCode)
 
 #SubCompanyCodeHelp=x,1024,S
 
+#StationCode=x,14,S
+T(3,CdCode.Station)
+
+#StationHelp=x,1024,S
+
 #HelpRim=X,1,S
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008,#CDDEF0009,#CDDEF0010)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008,#CDDEF0009,#CDDEF0010,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@SexHelp,#HelpDesc1)
@@ -296,6 +300,7 @@ T(2,@YesNoHelp,#HelpDesc7)
 T(2,@AMLJobCodeHelp,#HelpDesc8)
 T(2,@TelTypeCodeHelp,#HelpDesc9)
 T(2,@RelationCodeHelp,#HelpDesc10)
+T(2,@StationHelp,#HelpDesc11)
 
 #HelpRim1=X,1,S
 S(XXR99,01,,#CDDEF0011)
@@ -329,21 +334,16 @@ R(1,L6R03)
 T(2,#L6r03Result)
 
 
-T(1,@CustId,#NTXBUF,2,10)
 
 #INIT=X,1,S
 INVOKEJS(SHOW,grd3,0)
 
-
-
 !功能
 #FunCd=A,1,S
-!C(3,#CHAIN,1,E(0,#CHAIN_Funcd),$)
-C(3,#CHAIN,1,T(F,@FunCd,0),T(F,@FunCd,1))
-C(3,#CHAIN,1,s,$)
-!HELP(#FunCdHelp)
-!@
-!V(H,#FunCdHelp)
+
+#id=x,1,S
+C(3,#FunCd,1,S,$)
+T(1,@CustId,#NTXBUF,2,10)
 
 !打開暫存
 #Binit=X,1,S
@@ -1521,6 +1521,12 @@ T(H,#OAMLGroup,#AMLCodeHelp)
 #OIndigenousName=x,100,L
 !介紹人
 #OIntroducerX=X,50,L
+!房貸專員
+#OBusinessOfficerX=X,50,L
+!站別
+#OStation=X,3,L
+#OStationX=X,20,L
+T(H,#OStation,#StationHelp)
 
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}=X,2,L
@@ -1713,6 +1719,9 @@ TXFORM=L1101
 #OOLiaisonName
 #OOEnable
 #OORmk
+#OIntroducerX
+#OBusinessOfficerX
+#OStation
 ^
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L1R05.tom"/>
@@ -1767,7 +1776,9 @@ TXFORM=L1101
 ["AML職業別",#OAMLJobCodeX],
 ["AML組織",#OAMLGroupX],
 [#<->#,"原住民姓名",#OIndigenousName],
-[#<->#,"介紹人",#OIntroducerX],
+["介紹人",#OIntroducerX],
+["房貸專員",#OBusinessOfficerX],
+["站別",#OStation,#OStationX],
 [#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,"<br>",#OSubCompanyItem2,#OCrossUseX2,
             "<br>",#OSubCompanyItem3,#OCrossUseX3,"<br>",#OSubCompanyItem4,#OCrossUseX4,
             "<br>",#OSubCompanyItem5,#OCrossUseX5,"<br>",#OSubCompanyItem6,#OCrossUseX6,

@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -31,7 +33,10 @@ public class L1R01 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustTelNoService sCustTelNoService;
-
+	/* DB服務注入 */
+	@Autowired
+	public CdEmpService cdEmpService;
+	
 	@Autowired
 	public CustNoticeCom custNoticeCom;
 
@@ -178,12 +183,28 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01AMLGroup", tCustMain.getAMLGroup());
 		this.totaVo.putParam("L1r01IndigenousName", tCustMain.getIndigenousName());
 		this.totaVo.putParam("L1r01Introducer", tCustMain.getIntroducer());
+		this.totaVo.putParam("L1r01IntroducerX", getCdEmp(titaVo,tCustMain.getIntroducer()));
+		this.totaVo.putParam("L1r01BusinessOfficer", tCustMain.getBusinessOfficer());
+		this.totaVo.putParam("L1r01BusinessOfficerX", getCdEmp(titaVo,tCustMain.getBusinessOfficer()));
 		this.totaVo.putParam("L1r01TypeCode", tCustMain.getTypeCode());
 		this.totaVo.putParam("L1r01AllowInquire", tCustMain.getAllowInquire());
 		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain, titaVo));
 		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain, titaVo));
+		this.totaVo.putParam("L1r01Station", tCustMain.getStation());
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String getCdEmp(TitaVo titaVo, String employee) {
+		String fullname = "";
+		
+		CdEmp cdEmp = cdEmpService.findById(employee, titaVo);
+		
+		if (cdEmp != null) {
+			fullname = cdEmp.getFullname();
+		}
+		
+		return fullname;
 	}
 }
