@@ -193,7 +193,9 @@ public class L4455Report extends MakeReport {
 		
 		lCdCode2 = slCdCode2 == null ? null : slCdCode2.getContent();
 		
-		if (L4455List.size() > 0) {
+		this.info("L4455List = " + L4455List.toString());
+		this.info("size = " + L4455List.size());
+		if (L4455List.size() > 0 && !L4455List.isEmpty()) {
 			int i = 0, pageCnt = 0;
 			
 			batchno = L4455List.get(0).get("BatchNo");

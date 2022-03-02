@@ -171,6 +171,8 @@ public class L6501 extends TradeBuffer {
 
 		mSystemParas.setPerfDate(this.parse.stringToInteger(titaVo.getParam("PerfDate")));
 		mSystemParas.setAcBookAdjDate(this.parse.stringToInteger(titaVo.getParam("AcBookAdjDate")));
+		
+		mSystemParas.setFtpUrl(titaVo.getParam("FtpUrl"));
 
 		if (mFuncCode != 2) {
 			mSystemParas.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));

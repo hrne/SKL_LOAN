@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -695,7 +695,6 @@ public class L3200 extends TradeBuffer {
 			getSettleUnpaid();
 
 			// 無(計息)、無(費用、短繳期金)
-			this.info("isSettleUnpaid = " + isSettleUnpaid);
 			if (!isCalcRepayInt && !isSettleUnpaid) {
 				continue;
 			}
@@ -1657,6 +1656,10 @@ public class L3200 extends TradeBuffer {
 		}
 		if (wkReduceBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ReduceBreachAmt", wkReduceBreachAmt); // 減免清償違約金+減免違約金+減免延滯息
+		}
+		// 支票繳款利息免印花稅
+		if (iRpCode == 4) {
+			tTempVo.putParam("StampFreeAmt", wkInterest);
 		}
 		// 短繳金額收回
 		if (wkShortfallPrincipal.compareTo(BigDecimal.ZERO) > 0) {

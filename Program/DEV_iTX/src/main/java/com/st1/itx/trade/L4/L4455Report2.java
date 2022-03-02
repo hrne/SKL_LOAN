@@ -68,8 +68,6 @@ public class L4455Report2 extends MakeReport {
 	private String acctcodex = "";
 	private String relationcodex = "";
 	
-	private BigDecimal Amt = new BigDecimal("0");
-	
 	private List<CdCode> lCdCode = null;
 	private List<CdCode> lCdCode2 = null;
 	private List<CdCode> lCdCode3 = null;
@@ -168,10 +166,10 @@ public class L4455Report2 extends MakeReport {
 		lCdCode3 = slCdCode3 == null ? null : slCdCode3.getContent();
 		
 		
-		if (L4455List.size() > 0) {
+		if (L4455List.size() > 0 && !L4455List.isEmpty()) {
 			int i = 0, pageCnt = 0;
 			int pagetime = 0 ; 
-			
+			BigDecimal Amt = new BigDecimal("0");
 			repaybank = L4455List.get(0).get("RepayBank");
 			
 			for (int j = 1; j <= L4455List.size(); j++) {
@@ -282,9 +280,9 @@ public class L4455Report2 extends MakeReport {
 					}
 					
 					
-//					每頁第42筆 跳頁 
-					if (pageCnt == 42) {
-						this.print(1, 70, "=====續下頁=====", "C");
+//					每頁第38筆 跳頁 
+					if (pageCnt == 38) {
+						this.print(1, 95, "=====續下頁=====", "C");
 
 						pageCnt = 0;
 						this.newPage();

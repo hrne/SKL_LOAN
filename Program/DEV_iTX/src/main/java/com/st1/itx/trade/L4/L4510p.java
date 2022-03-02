@@ -302,7 +302,7 @@ public class L4510p extends TradeBuffer {
 		totaVo.put("OReportE", "" + reportE);
 		totaVo.put("OReportF", "" + reportF);
 		if (cnt == 0) {
-			sendMsg = (iOpItem == 1 ? "15日薪" : "非15日薪") + " 產生扣薪明細筆數 = 0";
+			sendMsg = " 請繼續執行";
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4511",
 					titaVo.get("MediaDate") + iOpItem, sendMsg, titaVo);
 		} else {

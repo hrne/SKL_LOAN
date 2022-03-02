@@ -1426,9 +1426,15 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		// == 1)) {
 		if (vCalcRepayIntVo.getInterestFlag() == 1) { // 按日計息
 
+			// 變動小數位數處理
+			// a = 利率的小數位數
+			// b = 天數/36500後的小數位數
+			// b = 9 - a
+			int b = getVariableDecimal(vCalcRepayIntVo.getStoreRate());
+
 			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過時，四捨五入
-			BigDecimal wkDaysDenominator = new BigDecimal(vCalcRepayIntVo.getDays()).divide(new BigDecimal(36500), 9,
-					RoundingMode.HALF_UP);
+			BigDecimal wkDaysDenominator = new BigDecimal(vCalcRepayIntVo.getDays()).divide(new BigDecimal(36500), b,
+					RoundingMode.DOWN);
 
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
 					.multiply(wkDaysDenominator).setScale(0, RoundingMode.HALF_UP);
@@ -1446,9 +1452,15 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			BigDecimal wkMonthDenominator = new BigDecimal(1200)
 					.multiply(new BigDecimal((iPayIntFreq == 99 ? 1 : iPayIntFreq) * vCalcRepayIntVo.getMonthLimit()));
 
+			// 變動小數位數處理
+			// a = 利率的小數位數
+			// b = 天數/36500後的小數位數
+			// b = 9 - a
+			int b = getVariableDecimal(vCalcRepayIntVo.getStoreRate());
+
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
 					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(wkMonthDenominator, 9, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
+					.divide(wkMonthDenominator, b, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
 
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());
@@ -1458,6 +1470,49 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 		this.info("calcInterestRoutine end ");
 		return wkInterest;
+	}
+
+	private int getVariableDecimal(BigDecimal storeRate) {
+
+		String stringOfStoreRate = storeRate.toString();
+
+		// 小數點位製
+		int pointPosition = stringOfStoreRate.indexOf(".");
+
+		if (pointPosition < 0) {
+			// 小數點不存在
+			return 9;
+		}
+
+		// 擷取小數字串
+		String decimal = stringOfStoreRate.substring(pointPosition);
+
+		int lengthOfDecimal = decimal.length();
+
+		// 變動小數位數處理
+		// a = 利率的小數位數
+		// b = 天數/36500後的小數位數
+		// b = 9 - a
+		int a = 0;
+
+		for (int i = lengthOfDecimal - 1; i > 0; i--) {
+			String tempNumber = decimal.substring(i, i + 1);
+			if (!tempNumber.equals("0")) {
+				// 從後面找回來，第一個非0的數字則為真正的小數位數長度
+				a = i;
+				// 不能使用 BigDecimal.scale()
+				// 該方法回傳的長度是該物件被設定的小數位數長度
+				// 若使用該方法時,數值 1.234500 會被判斷為6碼長
+				// 不符合此處需求
+				break;
+			}
+		}
+
+		if (a > 9) {
+			a = 9; // 理論上不可能出現，利率欄位設計是最多4位
+		}
+
+		return 9 - a;
 	}
 
 	// 計算違約金

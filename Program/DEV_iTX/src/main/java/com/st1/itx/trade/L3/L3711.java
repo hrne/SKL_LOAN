@@ -115,7 +115,8 @@ public class L3711 extends TradeBuffer {
 	private int iNewPayIntDate;
 	private BigDecimal iReduceAmt;
 	private String iRqspFlag;
-	private BigDecimal iTmpAmt =  BigDecimal.ZERO; // 暫收抵繳金額
+	private int iRpCode; // 還款來源
+	private BigDecimal iTmpAmt = BigDecimal.ZERO; // 暫收抵繳金額
 
 	// work area
 	private int wkTbsDy;
@@ -173,6 +174,7 @@ public class L3711 extends TradeBuffer {
 		iNewPayIntDate = this.parse.stringToInteger(titaVo.getParam("NewPayIntDate"));
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
+		iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));
 		wkReduceAmt = iReduceAmt;
 
 		// 收付欄金額
@@ -517,7 +519,7 @@ public class L3711 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setDesc("應繳日變更-不可欠繳");
-		tLoanBorTx.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RpCode1"))); // 還款來源
+		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(wkTbsDy);
 		tLoanBorTx.setTxAmt(this.parse.stringToBigDecimal(titaVo.getTxAmt()));
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
@@ -525,7 +527,7 @@ public class L3711 extends TradeBuffer {
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setInterest(wkInterest);
-		tLoanBorTx.setTempAmt(this.compTempAmt());	// 暫收款金額	
+		tLoanBorTx.setTempAmt(this.compTempAmt()); // 暫收款金額
 		tLoanBorTx.setUnpaidInterest(BigDecimal.ZERO);
 		tLoanBorTx.setShortfall(BigDecimal.ZERO);
 		// 繳息首筆、繳息次筆
@@ -537,6 +539,10 @@ public class L3711 extends TradeBuffer {
 
 		// 其他欄位
 		tTempVo.putParam("ReduceAmt", wkReduceAmt); // 違約金減免金額
+		// 支票繳款利息免印花稅
+		if (iRpCode == 4) {
+			tTempVo.putParam("StampFreeAmt", wkInterest);
+		}
 		tTempVo.putParam("OldSpecificDd", wkOldSpecificDd); // 原指定應繳日
 		tTempVo.putParam("NewSpecificDd", tLoanBorMain.getSpecificDd()); // 新指定應繳日
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
@@ -614,10 +620,11 @@ public class L3711 extends TradeBuffer {
 					"撥款主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
 		}
 	}
+
 	// 計算暫收款金額
 	private BigDecimal compTempAmt() throws LogicException {
 		// 還款總金額
-		BigDecimal wkAcTotal = BigDecimal.ZERO;		
+		BigDecimal wkAcTotal = BigDecimal.ZERO;
 		for (AcDetail ac : lAcDetail) {
 			if ("C".equals(ac.getDbCr())) {
 				wkAcTotal = wkAcTotal.add(ac.getTxAmt());

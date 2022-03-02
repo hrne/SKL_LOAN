@@ -99,8 +99,8 @@ E(0,0)
 ["#FdAmlgroupBef+AML組織",#AmlgroupBef,#AmlgroupBefX],[#AmlgroupInd,#AmlgroupAft,#AmlgroupAftX],
 [#<->#,"#FdIndigenousnameBef1+修改前-原住民姓名",#IndigenousnameBef],
 [#<->#,"#FdIndigenousnameBef2+修改後-原住民姓名@+#IndigenousnameInd",#IndigenousnameAft],
-["#FdIntroducer+介紹人",#IntroducerBef,#IntroducerBefX],[#IntroducerInd,#IntroducerAft,#IntroducerAftX],
-["#FdBusinessOfficer+房貸專員",#BusinessOfficerBef,#BusinessOfficerBefX],[#BusinessOfficerInd,#BusinessOfficerAft,#BusinessOfficerAftX],
+["#FdIntroducer+介紹人",#IntroducerBef,#IntroducerBefX],[#IntroducerInd,#IntroducerAft,#BtnCdEmp2,#IntroducerAftX],
+["#FdBusinessOfficer+房貸專員",#BusinessOfficerBef,#BusinessOfficerBefX],[#BusinessOfficerInd,#BusinessOfficerAft,#BtnCdEmp3,#BusinessOfficerAftX],
 ["#FdStation+站別",#StationBef,#StationBefX],[#StationInd,#StationAft,#StationAftX],
 ]
 !["#FdIsLimit+是否為授信限制對象",#IsLimitX],[#IsLimitXInd,#IsLimitXAft],
@@ -118,6 +118,14 @@ E(0,0)
 #BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BindCdEmp=X,1,S
 BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:EmpnoAft<-OOEmployeeNo:EmpnameAft<-OOFullname})
+
+#BtnCdEmp2=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BindCdEmp2=X,1,S
+BIND(#BtnCdEmp2,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:IntroducerAft<-OOEmployeeNo:IntroducerAftX<-OOFullname})
+
+#BtnCdEmp3=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BindCdEmp3=X,1,S
+BIND(#BtnCdEmp3,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:BusinessOfficerAft<-OOEmployeeNo:BusinessOfficerAftX<-OOFullname})
 
 #Submit=A,1,S
 K(MODIFYBUTTON,修改)

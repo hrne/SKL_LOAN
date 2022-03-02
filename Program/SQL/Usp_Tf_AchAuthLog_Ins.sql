@@ -62,6 +62,8 @@ BEGIN
           ,JOB_START_TIME                 AS "CreateDate"          -- 建立日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 修改日期時間 DATE  
+          ,CASE WHEN S2."ACHCDT" > 0 THEN MOD(S2."ACHCDT" , 1000000)
+           ELSE 0 END                     AS "ProcessTime"
     FROM (SELECT "AH$ACRP"."CUSCDT"
                 ,"AH$ACRP"."LMSACN"
                 ,"AH$ACRP"."LMSPBK"
@@ -141,6 +143,8 @@ BEGIN
           ,JOB_START_TIME                 AS "CreateDate"          -- 建立日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 修改日期時間 DATE  
+          ,CASE WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)
+           ELSE 0 END                     AS "ProcessTime"
     FROM "AH$ACHP" S1
     LEFT JOIN (SELECT DISTINCT
                       "LMSACN"

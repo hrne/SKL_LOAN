@@ -211,6 +211,11 @@ BEGIN
                                                    THEN TO_CHAR(0 - TR1."TRXDBC")
                                                  ELSE TO_CHAR(TR1."TRXDBC")
                                                  END  ,'0') || '"' -- 減免違約金
+           || ',' || '"StampFreeAmt":"' || NVL(CASE
+                                                 WHEN TR1."TRXCRC" IN ('1','3')
+                                                 THEN TO_CHAR(0 - TR1."TRXNTX")
+                                               ELSE TO_CHAR(TR1."TRXNTX")
+                                               END  ,'0') || '"' -- 免印花稅金額
            || '}'                         AS "OtherFields"         -- 其他欄位 VARCHAR2 1000 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 

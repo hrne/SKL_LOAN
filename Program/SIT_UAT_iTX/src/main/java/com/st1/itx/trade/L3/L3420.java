@@ -1399,6 +1399,10 @@ public class L3420 extends TradeBuffer {
 		if (wkReduceBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ReduceBreachAmt", wkReduceBreachAmt); // 減免清償違約金+減免違約金+減免延滯息
 		}
+		// 支票繳款利息免印花稅
+		if (iRpCode == 4) {
+			tTempVo.putParam("StampFreeAmt", wkInterest);
+		}
 		// 短繳金額收回
 		if (wkShortfallPrincipal.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ShortfallPrin", wkShortfallPrincipal);

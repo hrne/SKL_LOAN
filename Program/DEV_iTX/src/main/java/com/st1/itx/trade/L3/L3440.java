@@ -117,6 +117,7 @@ public class L3440 extends TradeBuffer {
 	private int iFacmNo;
 	private int iEntryDate;
 	private BigDecimal iReduceAmt;
+	private int iRpCode; // 還款來源
 	private BigDecimal iTotalRepayAmt;
 	private BigDecimal iRealRepayAmt;
 	private BigDecimal iTxAmt;
@@ -241,10 +242,12 @@ public class L3440 extends TradeBuffer {
 		this.info("iAcctFee=" + iAcctFee + ",iModifyFee=" + iModifyFee);
 		this.info("iFireFee=" + iFireFee + ",iLawFee=" + iLawFee);
 		this.info("iShortfall=" + iShortfall);
+		this.info("iTotalRepayAmt=" + iTotalRepayAmt + ",iRealRepayAmt=" + iRealRepayAmt);
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收
 		iOverAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
 		iTxAmt = this.parse.stringToBigDecimal(titaVo.getTxAmt());
+		iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));
 		// 不可有短繳金額
 		if (iOverRpFg == 1 && iOverAmt.compareTo(BigDecimal.ZERO) > 0) {
 			throw new LogicException(titaVo, "E3094", "短繳金額 = " + iOverAmt); // 不可有短繳金額
@@ -716,7 +719,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setDesc("催收回復登錄");
-		tLoanBorTx.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RpCode1"))); // 還款來源
+		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(wkDueDate);
 		tLoanBorTx.setTxAmt(this.parse.stringToBigDecimal(titaVo.getTxAmt()));
@@ -746,6 +749,10 @@ public class L3440 extends TradeBuffer {
 		}
 		if (wkReduceBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ReduceBreachAmt", wkReduceBreachAmt); // 減免違約金+減免延滯息
+		}
+		// 支票繳款利息免印花稅
+		if (iRpCode == 4) {
+			tTempVo.putParam("StampFreeAmt", wkInterest);
 		}
 		// 短繳金額收回
 		if (wkShortfallPrincipal.compareTo(BigDecimal.ZERO) > 0) {

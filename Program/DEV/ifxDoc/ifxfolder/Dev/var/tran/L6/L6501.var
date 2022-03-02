@@ -52,6 +52,7 @@ E(0,0)
 ["#FdShortIntPercent+回收時可短繳利息金額之百分比",#ShortIntPercent],
 ["#FdAmlFg+AML檢查記號",#AmlFg,#AmlFgX],
 ["#FdAmlUrl+AML網址",#AmlUrl],
+["#FdFtpUrl+FTP網址",#FtpUrl],
 ["#FdPerfDate+業績日期",#PerfDate],
 ["#FdAcBookAdjDate+帳冊別帳務調整日期",#AcBookAdjDate],
 ]
@@ -126,6 +127,8 @@ T(3,*)
 #FdAmlFg=X,2,L
 T(3,*)
 #FdAmlUrl=X,2,L
+T(3,*)
+#FdFtpUrl=X,2,L
 T(3,*)
 #FdPerfDate=X,2,L
 T(3, )
@@ -255,6 +258,7 @@ T(H,#AmlFg,#AmlFgHelp)
 T(2,@AmlFgX,#AmlFgTmp)
 
 T(2,@AmlUrl,#L6R28AmlUrl)
+T(2,@FtpUrl,#L6R28FtpUrl)
 E(0,@PerfDate,#L6R28PerfDate)
 E(0,@AcBookAdjDate,#L6R28AcBookAdjDate)
 
@@ -410,6 +414,10 @@ T(H,#AmlFg,#AmlFgHelp)
 #AmlUrl=x,50,I
 @V(7)
 
+! AML網址
+#FtpUrl=x,50,I
+@V(7)
+
 ! 業績日期
 #PerfDate=D,7,S
 
@@ -481,6 +489,7 @@ T(3,[L6501] 系統變數及系統值設定)
 #ShortIntPercent
 #AmlFg
 #AmlUrl
+#FtpUrl
 #PerfDate
 #AcBookAdjDate
 #END

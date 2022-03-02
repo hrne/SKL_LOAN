@@ -4466,6 +4466,9 @@ TXFORM=L1R03
 #L1r04Paper{i}=X,1,S
 #L1r04Msg{i}=X,1,S
 #L1r04EMail{i}=X,1,S
+#L1r04PaperFg{i}=X,1,S
+#L1r04MsgFg{i}=X,1,S
+#L1r04EMailFg{i}=X,1,S
 ##end
 </L1R04.dec>
 
@@ -4479,6 +4482,9 @@ TXFORM=L1R04
 #L1r04Paper{i}
 #L1r04Msg{i}
 #L1r04EMail{i}
+#L1r04PaperFg{i}
+#L1r04MsgFg{i}
+#L1r04EMailFg{i}
 ##end
 ^
 </L1R04.tom>
@@ -8867,6 +8873,7 @@ TXFORM=L6R27
 #L6R28ShortIntPercent=N,3,S
 #L6R28AmlFg=N,1,S
 #L6R28AmlUrl=x,50,S
+#L6R28FtpUrl=x,50,S
 #L6R28PerfDate=D,7,S
 #L6R28AcBookAdjDate=D,7,S
 </L6R28.dec>
@@ -8910,6 +8917,7 @@ TXFORM=L6R28
 #L6R28ShortIntPercent
 #L6R28AmlFg
 #L6R28AmlUrl
+#L6R28FtpUrl
 #L6R28PerfDate
 #L6R28AcBookAdjDate
 ^

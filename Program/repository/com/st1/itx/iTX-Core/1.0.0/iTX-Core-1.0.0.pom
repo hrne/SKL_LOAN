@@ -47,6 +47,7 @@
 		<Commons-Text-Ver>1.8</Commons-Text-Ver>
 		<Xz-Ver>1.9</Xz-Ver>
 		<Commons-FileUpload-Ver>1.4</Commons-FileUpload-Ver>
+		<Commons-Net-Ver>3.8.0</Commons-Net-Ver>
 		<Jackson-Databind-Ver>2.9.9</Jackson-Databind-Ver>
 		<Apache-POI-Ver>4.1.2</Apache-POI-Ver>
 		<JSoup-Ver>1.11.3</JSoup-Ver>

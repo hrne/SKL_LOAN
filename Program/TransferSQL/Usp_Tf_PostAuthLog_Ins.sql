@@ -37,8 +37,6 @@ BEGIN
           ,''                             AS "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0
           ,CASE WHEN "PO$AARP"."PRCCDT" > 0 THEN TRUNC("PO$AARP"."PRCCDT" / 1000000)
            ELSE 0 END                     AS "ProcessDate"         -- 處理日期 Decimald 8 0
-          ,CASE WHEN "PO$AARP"."PRCCDT" > 0 THEN MOD("PO$AARP"."PRCCDT" , 1000000)
-           ELSE 0 END                     AS "ProcessDate"         -- 處理時間 Decimal 6 0
           ,"PO$AARP"."FNDDAT"             AS "StampFinishDate"     -- 核印完成日期 Decimald 8 0
           ,"PO$AARP"."CNLDAT"             AS "StampCancelDate"     -- 核印取消日期 Decimald 8 0
           ,"PO$AARP"."POACD2"             AS "StampCode"           -- 核印註記 VARCHAR2 1 0
@@ -69,6 +67,8 @@ BEGIN
              THEN TO_DATE("CHGDAT",'YYYYMMDD')
            ELSE JOB_START_TIME
            END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
+          ,CASE WHEN "PO$AARP"."PRCCDT" > 0 THEN MOD("PO$AARP"."PRCCDT" , 1000000)
+           ELSE 0 END                     AS "ProcessTime"         -- 處理時間 Decimal 6 0
     FROM "PO$AARP"
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."CRTEMP"
     LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = S1."CHGEMP"
