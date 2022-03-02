@@ -86,9 +86,8 @@ public class LY002Report extends MakeReport {
 		}
 
 		makeExcel.close();
-//		makeExcel.toExcel(sno);
 
-		if (lY002List.size() != 0) {
+		if (lY002List.size() == 0) {
 			return false;
 		}
 		

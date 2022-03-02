@@ -164,7 +164,8 @@ public class L4450Batch extends TradeBuffer {
 		if (tBatxHead == null || !"4".equals(tBatxHead.getBatxExeCode())) {
 			tBatxHead = bs020.exec(titaVo, this.txBuffer);
 			this.info("BatchNo = " + tBatxHead.getBatchNo());
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(), "請先完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
+					"請先完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
 		} else {
 			exec(titaVo);
 		}
@@ -245,7 +246,8 @@ public class L4450Batch extends TradeBuffer {
 						setFacmValue(fnAllList, i);
 
 						// 還款試算
-						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")), parse.stringToInteger(fnAllList.get(i).get("FacmNo")), 1, titaVo); // 期款
+						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")),
+								parse.stringToInteger(fnAllList.get(i).get("FacmNo")), 1, titaVo); // 期款
 
 						if (i % commitCnt == 0) {
 							this.batchTransaction.commit();
@@ -276,9 +278,11 @@ public class L4450Batch extends TradeBuffer {
 			}
 
 			if (checkFlag) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), checkMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+						titaVo.getTlrNo(), checkMsg, titaVo);
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450", titaVo.getTlrNo(), checkMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
+						titaVo.getTlrNo(), checkMsg, titaVo);
 			}
 		}
 		// 單筆
@@ -304,7 +308,8 @@ public class L4450Batch extends TradeBuffer {
 						setFacmValue(fnAllList, i);
 
 						// 還款試算
-						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")), parse.stringToInteger(fnAllList.get(i).get("FacmNo")), iRepayType, titaVo); // 還款類別
+						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")),
+								parse.stringToInteger(fnAllList.get(i).get("FacmNo")), iRepayType, titaVo); // 還款類別
 
 					}
 				}
@@ -334,7 +339,9 @@ public class L4450Batch extends TradeBuffer {
 
 			if (checkFlag) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4943",
-						"1" + titaVo.getParam("CustNo") + "00000" + titaVo.getParam("EntryDate") + titaVo.getParam("EntryDate"), checkMsg, titaVo);
+						"1" + titaVo.getParam("CustNo") + "00000" + titaVo.getParam("EntryDate")
+								+ titaVo.getParam("EntryDate"),
+						checkMsg, titaVo);
 			} else {
 				checkMsg = "執行失敗，" + checkMsg;
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", checkMsg, titaVo);
@@ -405,7 +412,8 @@ public class L4450Batch extends TradeBuffer {
 			});
 			for (BaTxVo tBaTxVo : listBaTxVo) {
 
-				tmpBorm tmp = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(), tBaTxVo.getDataKind() == 2 ? tBaTxVo.getPayIntDate() : 0);
+				tmpBorm tmp = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(),
+						tBaTxVo.getDataKind() == 2 ? tBaTxVo.getPayIntDate() : 0);
 				this.info("L4450 Test's Log Start");
 				this.info("CustNo : " + tmp.getCustNo());
 				this.info("FacmNo : " + tmp.getFacmNo());
@@ -422,12 +430,13 @@ public class L4450Batch extends TradeBuffer {
 				}
 
 				// 本金利息 = 0
-				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPrincipal().add(tBaTxVo.getInterest()).add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()).compareTo(BigDecimal.ZERO) == 0) {
+				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPrincipal().add(tBaTxVo.getInterest())
+						.add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()).compareTo(BigDecimal.ZERO) == 0) {
 					this.info("continue...  本金利息 = 0");
 					continue;
 				}
 				// 是否有還款資料
-				if (tBaTxVo.getDataKind() == 2) {
+				if (tBaTxVo.getRepayType() >= 1 && tBaTxVo.getRepayType() <= 3 ) {
 					isLoanRepay = true;
 				}
 
@@ -461,15 +470,18 @@ public class L4450Batch extends TradeBuffer {
 //              4.帳管費 5.火險費 6.契變手續費 7.法務費 ==> 還款類別				
 				if (tBaTxVo.getDataKind() == 1) {
 					if (iRepayType <= 3) {
-						if (tBaTxVo.getRepayType() == 1 || tBaTxVo.getRepayType() == 4 || tBaTxVo.getRepayType() == 5 || tBaTxVo.getRepayType() == 6) {
+						if (tBaTxVo.getRepayType() == 1 || tBaTxVo.getRepayType() == 4 || tBaTxVo.getRepayType() == 5
+								|| tBaTxVo.getRepayType() == 6) {
 						} else {
-							this.info("continue... DataKind=" + tBaTxVo.getDataKind() + ", RepayType=" + tBaTxVo.getRepayType());
+							this.info("continue... DataKind=" + tBaTxVo.getDataKind() + ", RepayType="
+									+ tBaTxVo.getRepayType());
 							continue;
 						}
 					} else {
 						if (tBaTxVo.getRepayType() == iRepayType) {
 						} else {
-							this.info("continue... DataKind=" + tBaTxVo.getDataKind() + ", RepayType=" + tBaTxVo.getRepayType());
+							this.info("continue... DataKind=" + tBaTxVo.getDataKind() + ", RepayType="
+									+ tBaTxVo.getRepayType());
 							continue;
 						}
 					}
@@ -493,7 +505,8 @@ public class L4450Batch extends TradeBuffer {
 					this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
 					if (tBaTxVo.getUnPaidAmt().compareTo(bookAmtMap.get(tmp2)) > 0) {
 						if (tmpAmtMap.containsKey(tmp2)) {
-							tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).add(tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2))));
+							tmpAmtMap.put(tmp2,
+									tmpAmtMap.get(tmp2).add(tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2))));
 						} else {
 							tmpAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2)));
 						}
@@ -722,7 +735,8 @@ public class L4450Batch extends TradeBuffer {
 			}
 //			扣款金額(by 額度)超過帳號設定限額(限額為零不檢查)
 			this.info("repAmtFacMap ..." + repAmtFacMap.get(tmp2));
-			if (limitAmt.get(tmp2).compareTo(BigDecimal.ZERO) > 0 && repAmtFacMap.get(tmp2).compareTo(limitAmt.get(tmp2)) > 0) {
+			if (limitAmt.get(tmp2).compareTo(BigDecimal.ZERO) > 0
+					&& repAmtFacMap.get(tmp2).compareTo(limitAmt.get(tmp2)) > 0) {
 				tTempVo.putParam("Deduct", "超過帳戶限額");
 			}
 			// 火險單
@@ -763,13 +777,16 @@ public class L4450Batch extends TradeBuffer {
 		Slice<BankDeductDtl> slBankDeductDtl = null;
 		switch (iOpItem) {
 		case 1:
-			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate + 19110000, iEntryDate + 19110000, this.index, this.limit, titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate + 19110000, iEntryDate + 19110000,
+					this.index, this.limit, titaVo);
 			break;
 		case 2:
-			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate + 19110000, iEntryDate + 19110000, this.index, this.limit, titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate + 19110000, iEntryDate + 19110000,
+					this.index, this.limit, titaVo);
 			break;
 		default:
-			slBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate + 19110000, iEntryDate + 19110000, this.index, this.limit, titaVo);
+			slBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate + 19110000, iEntryDate + 19110000,
+					this.index, this.limit, titaVo);
 			break;
 		}
 
@@ -806,14 +823,18 @@ public class L4450Batch extends TradeBuffer {
 		int result = 0;
 		BankDeductDtl tBankDeductDtl = null;
 		if (tmp.getRepayType() <= 3) {
-			tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(tmp.getCustNo(), tmp.getFacmNo(), prevIntDate + 19110000, titaVo);
+			tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
+					prevIntDate + 19110000, titaVo);
 		} else {
-			tBankDeductDtl = bankDeductDtlService.findL4450EntryDateFirst(tmp.getCustNo(), tmp.getFacmNo(), tmp.getRepayType(), titaVo);
+			tBankDeductDtl = bankDeductDtlService.findL4450EntryDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
+					tmp.getRepayType(), titaVo);
 		}
 
 		if (tBankDeductDtl != null) {
-			if ((iRepayType <= 3 && tBankDeductDtl.getRepayType() <= 3) || iRepayType == tBankDeductDtl.getRepayType()) {
-				if ("".equals(tBankDeductDtl.getMediaCode().trim()) || "".equals(tBankDeductDtl.getReturnCode().trim())) {
+			if ((iRepayType <= 3 && tBankDeductDtl.getRepayType() <= 3)
+					|| iRepayType == tBankDeductDtl.getRepayType()) {
+				if ("".equals(tBankDeductDtl.getMediaCode().trim())
+						|| "".equals(tBankDeductDtl.getReturnCode().trim())) {
 					result = 1;
 				}
 			}
@@ -879,7 +900,8 @@ public class L4450Batch extends TradeBuffer {
 	private BigDecimal getLoanBookAmt(tmpBorm tmp, TitaVo titaVo) {
 		// 未到期約定還本金額
 		BigDecimal bookAmt = BigDecimal.ZERO;
-		Slice<LoanBook> loanBookList = loanBookService.bookCustNoRange(tmp.getCustNo(), tmp.getCustNo(), tmp.getFacmNo(), tmp.getFacmNo(), 0, 0, 990, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBook> loanBookList = loanBookService.bookCustNoRange(tmp.getCustNo(), tmp.getCustNo(),
+				tmp.getFacmNo(), tmp.getFacmNo(), 0, 0, 990, this.index, Integer.MAX_VALUE, titaVo);
 		if (loanBookList != null) {
 			for (LoanBook tLoanBook : loanBookList.getContent()) {
 				if (tLoanBook.getStatus() == 0 && tLoanBook.getBookDate() >= titaVo.getEntDyI()) {
@@ -909,7 +931,8 @@ public class L4450Batch extends TradeBuffer {
 
 		@Override
 		public String toString() {
-			return "tmpBorm [custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", payIntDate=" + payIntDate + ", repayType=" + repayType + "]";
+			return "tmpBorm [custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", payIntDate="
+					+ payIntDate + ", repayType=" + repayType + "]";
 		}
 
 		@Override

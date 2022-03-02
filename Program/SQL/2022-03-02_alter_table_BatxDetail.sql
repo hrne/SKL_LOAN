@@ -1,0 +1,1 @@
+alter table BatxDetail modify ProcNote NVARCHAR2(2000);alter table BatxDetail modify ProcNote NVARCHAR2(2000);

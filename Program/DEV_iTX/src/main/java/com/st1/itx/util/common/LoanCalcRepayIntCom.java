@@ -1425,34 +1425,36 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		// && vCalcRepayIntVo.getEndDate() == iMaturityDate && vCalcRepayIntVo.getDays()
 		// == 1)) {
 		if (vCalcRepayIntVo.getInterestFlag() == 1) { // 按日計息
+
+			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過時，四捨五入
+			BigDecimal wkDaysDenominator = new BigDecimal(vCalcRepayIntVo.getDays()).divide(new BigDecimal(36500), 9,
+					RoundingMode.HALF_UP);
+
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
-					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(new BigDecimal(36500), 15, RoundingMode.HALF_UP).setScale(0, RoundingMode.DOWN);
-			BigDecimal interestBeforeRound = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
-					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(new BigDecimal(36500), 15, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP);
+					.multiply(wkDaysDenominator).setScale(0, RoundingMode.HALF_UP);
+
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());
 			this.info("   Amount     = " + vCalcRepayIntVo.getAmount());
 			this.info("   wkInterest = " + wkInterest);
-			this.info("   interestBeforeRound = " + interestBeforeRound);
+			this.info("   wkDaysDenominator = " + wkDaysDenominator);
 		} else {
 			dDateUtil.init();
 			dDateUtil.setDate_1(vCalcRepayIntVo.getStartDate());
+
+			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過時，四捨五入
+			BigDecimal wkMonthDenominator = new BigDecimal(1200)
+					.multiply(new BigDecimal((iPayIntFreq == 99 ? 1 : iPayIntFreq) * vCalcRepayIntVo.getMonthLimit()));
+
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
 					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(new BigDecimal(
-							1200 / (iPayIntFreq == 99 ? 1 : iPayIntFreq) * vCalcRepayIntVo.getMonthLimit()), 15,
-							RoundingMode.HALF_UP)
-					.setScale(0, RoundingMode.DOWN);
-			BigDecimal interestBeforeRound = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
-					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(new BigDecimal(36500), 15, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP);
+					.divide(wkMonthDenominator, 9, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
+
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());
 			this.info("   Amount     = " + vCalcRepayIntVo.getAmount());
 			this.info("   wkInterest = " + wkInterest);
-			this.info("   interestBeforeRound = " + interestBeforeRound);
+			this.info("   wkMonthDenominator = " + wkMonthDenominator);
 		}
 		this.info("calcInterestRoutine end ");
 		return wkInterest;

@@ -1,5 +1,6 @@
 package com.st1.itx.trade.BS;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,13 +14,26 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.AchDeductMedia;
+import com.st1.itx.db.domain.AchDeductMediaId;
+import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
+import com.st1.itx.db.domain.EmpDeductMedia;
+import com.st1.itx.db.domain.EmpDeductMediaId;
+import com.st1.itx.db.domain.LoanCheque;
+import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.domain.PostDeductMedia;
+import com.st1.itx.db.domain.PostDeductMediaId;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.service.AchDeductMediaService;
+import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
+import com.st1.itx.db.service.EmpDeductMediaService;
+import com.st1.itx.db.service.LoanChequeService;
+import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.main.ApControl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
@@ -56,6 +70,21 @@ public class BS401 extends TradeBuffer {
 
 	@Autowired
 	public BatxHeadService batxHeadService;
+
+	@Autowired
+	public AchDeductMediaService achDeductMediaService;
+
+	@Autowired
+	public EmpDeductMediaService empDeductMediaService;
+
+	@Autowired
+	public PostDeductMediaService postDeductMediaService;
+
+	@Autowired
+	public BankDeductDtlService bankDeductDtlService;
+
+	@Autowired
+	public LoanChequeService loanChequeService;
 
 	@Autowired
 	public WebClient webClient;
@@ -171,7 +200,7 @@ public class BS401 extends TradeBuffer {
 					if ("4".equals(tDetail.getProcStsCode())) {
 						ProcessCnt++;
 						if (tTempVo.get("MergeCnt") != null
-								&& ! tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
+								&& !tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
 							excuteTx(2, tDetail, tBatxHead, titaVo); // 轉暫收
 						} else {
 							excuteTx(0, tDetail, tBatxHead, titaVo); // 正常交易
@@ -197,6 +226,7 @@ public class BS401 extends TradeBuffer {
 								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 					isUpdate = true;
+					cancelUpdate(tDetail, titaVo);
 					break;
 
 				case 2: // 2.轉暫收
@@ -231,6 +261,7 @@ public class BS401 extends TradeBuffer {
 								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 					isUpdate = true;
+					cancelUpdate(tDetail, titaVo);
 					break;
 				}
 
@@ -443,6 +474,135 @@ public class BS401 extends TradeBuffer {
 		apControl.callTrade(txTitaVo);
 		this.addAllList(apControl.getTotaVoList());
 		apControl = null;
+	}
+
+	private void cancelUpdate(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		switch (tBatxDetail.getRepayCode()) {
+		case 2:
+			if ("3".equals(tBatxDetail.getMediaKind())) {
+				updatePostDeduct(tBatxDetail, titaVo);
+			} else {
+				updateAchDeduct(tBatxDetail, titaVo);
+			}
+			break;
+		case 3:
+			updateEmpDeduct(tBatxDetail, titaVo);
+			break;
+		case 4:
+			updateLoanCheque(tBatxDetail, titaVo);
+			break;
+		}
+	}
+
+	private void updateEmpDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+//		回寫媒體檔
+		EmpDeductMedia tEmpDeductMedia = empDeductMediaService.holdById(new EmpDeductMediaId(
+				tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
+		if ("D".equals(tBatxDetail.getProcStsCode())) {
+			tEmpDeductMedia.setTxAmt(BigDecimal.ZERO);
+			tEmpDeductMedia.setErrorCode("");
+		} else {
+			tEmpDeductMedia.setTxAmt(tBatxDetail.getRepayAmt());
+			if ("00000".equals(tBatxDetail.getProcCode())) {
+				tEmpDeductMedia.setErrorCode("01");
+			} else {
+				tEmpDeductMedia.setErrorCode(tBatxDetail.getProcCode().substring(3, 5));
+			}
+		}
+		try {
+			empDeductMediaService.update(tEmpDeductMedia, titaVo);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new LogicException("E0007", "EmpDeductMedia update Fail");
+		}
+	}
+
+	private void updateLoanCheque(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		int chequeAcct = parse.stringToInteger(tBatxDetail.getRvNo().substring(0, 9));
+		int chequeNo = parse.stringToInteger(tBatxDetail.getRvNo().substring(10, 17));
+		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(chequeAcct, chequeNo), titaVo);
+		if ("D".equals(tBatxDetail.getProcStsCode())) {
+			tLoanCheque.setStatusCode("0");
+			tLoanCheque.setEntryDate(0);
+		} else {
+			tLoanCheque.setStatusCode("4");
+			tLoanCheque.setEntryDate(tBatxDetail.getEntryDate());
+		}
+		try {
+			loanChequeService.update(tLoanCheque, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0007", "LoanCheque update error : " + e.getErrorMsg());
+		}
+
+	}
+
+	private void updateAchDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		AchDeductMedia tAchDeductMedia = achDeductMediaService.holdById(new AchDeductMediaId(
+				tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
+		tAchDeductMedia.setReturnCode("");
+		try {
+			achDeductMediaService.update(tAchDeductMedia, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0007", "AchDeductMedia update Fail");
+		}
+
+		Slice<BankDeductDtl> sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
+				tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), 0, Integer.MAX_VALUE, titaVo);
+		List<BankDeductDtl> lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
+
+		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
+			for (BankDeductDtl tB : lBankDeductDtl) {
+				BankDeductDtl tBankDeductDtl = bankDeductDtlService.holdById(tB, titaVo);
+				if ("D".equals(tBatxDetail.getProcStsCode())) {
+					tBankDeductDtl.setReturnCode("");
+				} else {
+					tBankDeductDtl.setReturnCode(tBatxDetail.getProcCode().substring(3, 5));
+				}
+				try {
+					bankDeductDtlService.update(tBankDeductDtl, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0007", "bankDeductDtlService update " + e.getErrorMsg());
+				}
+			}
+
+		}
+	}
+
+	private void updatePostDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		PostDeductMedia tPostDeductMedia = postDeductMediaService.holdById(
+				new PostDeductMediaId(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaSeq()), titaVo);
+		if ("D".equals(tBatxDetail.getProcStsCode())) {
+			tPostDeductMedia.setProcNoteCode("");
+		} else {
+			tPostDeductMedia.setProcNoteCode(tBatxDetail.getProcCode().substring(3, 5));
+		}
+
+		try {
+			postDeductMediaService.update(tPostDeductMedia, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0007", "PostDeductMedia update Fail");
+		}
+
+		Slice<BankDeductDtl> sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
+				tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), 0, Integer.MAX_VALUE, titaVo);
+		List<BankDeductDtl> lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
+
+		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
+			for (BankDeductDtl tB : lBankDeductDtl) {
+				BankDeductDtl tBankDeductDtl = bankDeductDtlService.holdById(tB, titaVo);
+				if ("D".equals(tBatxDetail.getProcStsCode())) {
+					tBankDeductDtl.setReturnCode("");
+				} else {
+					tBankDeductDtl.setReturnCode(tBatxDetail.getProcCode().substring(3, 5));
+				}
+				try {
+					bankDeductDtlService.update(tBankDeductDtl, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0007", "bankDeductDtlService update " + e.getErrorMsg());
+				}
+			}
+
+		}
 	}
 
 }

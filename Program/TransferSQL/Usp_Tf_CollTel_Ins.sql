@@ -38,7 +38,8 @@ BEGIN
                                           AS "TelDate"             -- 電催日期 DecimalD 8 0
           ,S0.Calling_Time                AS "TelTime"             -- 電催時間 VARCHAR2 4 0
           ,S0.Calling_Person              AS "ContactCode"         -- 聯絡對象 VARCHAR2 1 0
-          ,S0.Receive_Person              AS "RecvrCode"           -- 接話人 VARCHAR2 1 0
+          -- 2022-03-02 Wei修改: from Linda RecvrCode =>舊資料為0~3,新資料對應為1~4
+          ,S0.Receive_Person + 1          AS "RecvrCode"           -- 接話人 VARCHAR2 1 0
           ,CASE
              WHEN LENGTHB(TO_CHAR(TRIM(TO_SINGLE_BYTE(S0.Calling_Tel)))) >= 1
                   AND LENGTHB(SUBSTR(TO_CHAR(TRIM(TO_SINGLE_BYTE(S0.Calling_Tel))),0,5)) <= 5

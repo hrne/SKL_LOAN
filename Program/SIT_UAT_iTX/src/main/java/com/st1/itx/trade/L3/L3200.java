@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -672,10 +672,6 @@ public class L3200 extends TradeBuffer {
 			// 計算利息
 			calcRepayInt(ln);
 
-			if (isCalcRepayInt) {
-				wkTotaCount++;
-			}
-
 			// 清償違約金(部分償還)放首筆
 			if (isFirstBorm) {
 				wkCloseBreachAmt = iCloseBreachAmt;
@@ -699,9 +695,12 @@ public class L3200 extends TradeBuffer {
 			getSettleUnpaid();
 
 			// 無(計息)、無(費用、短繳期金)
+			this.info("isSettleUnpaid = " + isSettleUnpaid);
 			if (!isCalcRepayInt && !isSettleUnpaid) {
 				continue;
 			}
+
+			wkTotaCount++;
 
 			// 實收處理
 			// Principal 實收本金 => 扣除短收本金、含收回欠繳本金

@@ -75,7 +75,6 @@ public class LY003Report extends MakeReport {
 		}
 
 		makeExcel.close();
-//		makeExcel.toExcel(sno);
 
 		return isNotEmpty;
 
@@ -188,7 +187,7 @@ public class LY003Report extends MakeReport {
 		}
 		// 重整公式 上方表格
 		for (int y = 70; y <= 71; y++) {
-			makeExcel.formulaCalculate(y, 4);
+//			makeExcel.formulaCalculate(y, 4);
 		}
 
 		// 重整公式 下方表格

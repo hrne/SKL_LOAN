@@ -35,9 +35,11 @@ BEGIN
           ,NVL(M.Presence_Date,0)         AS "MeetDate"            -- 面催日期 DecimalD 8 0
           ,SUBSTR(M.Presence_Time,1,4)    AS "MeetTime"            -- 面催時間 VARCHAR2 4 0
           ,M.Presence_Person              AS "ContactCode"         -- 聯絡對象 VARCHAR2 1 0
-          ,M.Receive_Person               AS "MeetPsnCode"         -- 面晤人 VARCHAR2 1 0
+          -- 2022-03-02 Wei修改: from Linda MeetPsnCode =>舊資料為0~3,新資料對應為1~4
+          ,M.Receive_Person + 1           AS "MeetPsnCode"         -- 面晤人 VARCHAR2 1 0
           ,M.Worker_Type                  AS "CollPsnCode"         -- 催收人員 VARCHAR2 1 0
-          ,M.Work_Username                AS "CollPsnName"         -- 催收人員姓名 NVARCHAR2 8 0
+          -- 2022-03-02 Wei修改: from Linda CollMeet.CollPsnName轉舊資料改放催收人員員工編號
+          ,M.Work_User                    AS "CollPsnName"         -- 催收人員姓名 NVARCHAR2 8 0
           ,0                              AS "MeetPlaceCode"       -- 面催地點選項 DECIMAL 1 0
           ,M.Presence_Addr                AS "MeetPlace"           -- 面催地點 NVARCHAR2 60 0
           ,M.Other_Record                 AS "Remark"              -- 其他記錄 NVARCHAR2 500 0

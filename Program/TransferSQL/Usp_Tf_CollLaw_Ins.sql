@@ -33,7 +33,7 @@ BEGIN
           ,LAWP.LMSAPN                    AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,TO_NUMBER(TO_CHAR(LAWP.entry_date,'YYYYMMDD'))
                                           AS "AcDate"              -- 作業日期 DecimalD 8 0
-          ,NVL(SUBSTR(LAWP.UserID,0,6),' ')
+          ,NVL(SUBSTR(LAWP.UserID,0,6),'999999') -- Wei 修改: from Linda TitaTlrNo不可為空白值,KEY值會找不到該筆資料
                                           AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
           ,LPAD(LAWP.SerialNum,8,'0')     AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
           ,LAWP.process_date              AS "RecordDate"          -- 記錄日期 DecimalD 8 0

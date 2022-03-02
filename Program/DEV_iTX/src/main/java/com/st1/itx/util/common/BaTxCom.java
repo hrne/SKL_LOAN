@@ -1542,6 +1542,7 @@ public class BaTxCom extends TradeBuffer {
 									if (iRepayType >= 4 && iRepayType < 99) {
 										if (rv.getReceivableFlag() == 3) {
 											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
+											this.acctFee = this.acctFee.add(rv.getRvBal());
 										} else {
 											baTxVo.setDataKind(6); // 另收費用
 										}
@@ -1549,7 +1550,6 @@ public class BaTxCom extends TradeBuffer {
 										baTxVo.setDataKind(6); // 另收費用
 									}
 									baTxVo.setRepayType(4); // 04-帳管費/手續費
-									this.acctFee = this.acctFee.add(rv.getRvBal());
 									break;
 
 								case "F29": // F29 契變手續費

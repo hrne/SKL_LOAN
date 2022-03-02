@@ -28,8 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4454Report3 extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L4454Report3.class);
 
 	@Autowired
 	public MakeExcel makeExcel;

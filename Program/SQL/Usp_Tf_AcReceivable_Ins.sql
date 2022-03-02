@@ -390,35 +390,48 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
 
     -- TAV : 暫收款-可抵繳
+    -- 2022-03-02 轉入該戶號下依條件排序後之第一額度
+    -- 排序:依應繳日順序由小到大、利率順序由大到小、額度由小到大
     INSERT INTO "AcReceivable"
     WITH ACT AS (
       -- 篩選出基本資料
       -- 條件1:排除戶號為601776
-      -- 條件2:取BKPDAT最新的第一筆
-      SELECT ROW_NUMBER() OVER (PARTITION BY ACTP.LMSACN ORDER BY ACTP.BKPDAT DESC) AS "Seq"
-            ,ACTP.BKPDAT
-            ,ACTP.LMSACN
-            ,ACTP.LMSTOA
+      -- 條件2:BKPDAT = 轉換基準日
+      SELECT ACTP.BKPDAT
+           , ACTP.LMSACN
+           , ACTP.LMSTOA
       FROM LADACTP ACTP
       WHERE ACTP.LMSACN != 601776
+        AND ACTP.BKPDAT = "TbsDyF"
     )
-    , L1 AS (
-      -- 加總各額度放款餘額
-      SELECT LMSACN
-           , LMSAPN
-           , SUM(LMSLBL) AS LMSLBL
-      FROM LA$LMSP
-      WHERE LMSLBL > 0
-      GROUP BY LMSACN
-             , LMSAPN
-    )
-    , L2 AS (
-      -- 加總各戶號放款餘額
-      SELECT LMSACN
-           , SUM(LMSLBL) AS LMSLBL
-      FROM LA$LMSP
-      WHERE LMSLBL > 0
-      GROUP BY LMSACN
+    , OrderedFacmNo AS )
+      SELECT "CustNo"
+           , "FacmNo"
+           , ROW_NUMBER (
+                PARTITION BY "CustNo"
+                ORDER BY CASE
+                           -- 0:正常戶
+                           -- 1:展期
+                           -- 2:催收戶
+                           -- 3:結案戶
+                           -- 4:逾期戶(顯示用)
+                           -- 5:催收結案戶
+                           -- 6:呆帳戶
+                           -- 7:部分轉呆戶
+                           -- 8:債權轉讓戶
+                           -- 9:呆帳結案戶
+                           -- 97:預約撥款已刪除
+                           -- 98:預約已撥款
+                           -- 99:預約撥款
+                           WHEN "Status" IN (0,1,2,4,6,7) 
+                           THEN "Status"
+                         ELSE 100 + "Status" 
+                         END ASC -- 戶況取未結案、非預約優先
+                       , "NextPayIntDate" ASC
+                       , "StoreRate" DESC
+                       , "FacmNo" ASC
+             ) AS "FacmNoSeq"
+      FROM "LoanBorMain"
     )
     , TMP AS (
       -- 依照額度放款餘額佔戶號放款餘額的比例
@@ -428,49 +441,10 @@ BEGIN
            , L1.LMSAPN
            , ROUND(ACT.LMSTOA * L1.LMSLBL / L2.LMSLBL ,0) AS "NewLMSTOA"
            , ACT.LMSTOA
-           , ROW_NUMBER()
-             OVER (
-               PARTITION BY ACT.LMSACN
-               ORDER BY L1.LMSAPN
-             ) AS "Seq"
       FROM ACT
-      LEFT JOIN L1 ON L1.LMSACN = ACT.LMSACN
-      LEFT JOIN L2 ON L2.LMSACN = ACT.LMSACN
-      WHERE ACT."Seq" = 1 -- 取BKPDAT最新的第一筆
-        AND ACT.LMSTOA > 0 -- 有費用的才做
-        AND L1.LMSLBL > 0
-        AND L2.LMSLBL > 0 
-    )
-    , M AS (
-      -- 判斷最後一筆
-      SELECT LMSACN
-           , MAX("Seq") AS "MaxSeq"
-      FROM TMP
-      GROUP BY LMSACN
-    )
-    , S AS (
-      -- 計算前幾筆已分配金額的加總
-      SELECT M.LMSACN
-           , SUM(TMP."NewLMSTOA") AS "OthersLMSTOA"
-      FROM M
-      LEFT JOIN TMP ON TMP.LMSACN = M.LMSACN
-                   AND TMP."Seq" < M."MaxSeq"
-      GROUP BY M.LMSACN
-    )
-    , S1 AS (
-      -- 處理分配費用除不盡時的尾數差
-      -- 最後一筆 用 總費用 減去 前幾筆已分配金額的加總
-      SELECT TMP.BKPDAT
-           , TMP.LMSACN
-           , TMP.LMSAPN
-           , CASE
-               WHEN TMP."Seq" = M."MaxSeq" -- 如果是最後一筆
-               THEN TMP.LMSTOA - NVL(S."OthersLMSTOA",0) -- 用總金額 - 前幾筆的加總
-             ELSE TMP."NewLMSTOA"
-             END AS "LMSTOA"
-      FROM TMP
-      LEFT JOIN M ON M.LMSACN = TMP.LMSACN
-      LEFT JOIN S ON S.LMSACN = TMP.LMSACN
+      LEFT JOIN OrderedFacmNo OFN ON OFN."CustNo" = ACT.LMSACN
+                                 AND OFN."FacmNoSeq" = 1
+      WHERE ACT.LMSTOA > 0 -- 有費用的才做
     )
     SELECT 'TAV'               AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."LMSACN",7,0)

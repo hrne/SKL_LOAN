@@ -53,6 +53,12 @@ public class L420C extends TradeBuffer {
 	private int finishCnt = 0;
 	private int functionCode = 0;
 
+	/**
+	 * 0.轉暫收 </br>
+	 * 1.入帳 </br>
+	 */
+	private int btnIndex = 0;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L420C ");
@@ -63,13 +69,20 @@ public class L420C extends TradeBuffer {
 		batchNo = titaVo.getParam("OOBatchNo");
 
 		detailSeq = parse.stringToInteger(titaVo.getParam("OODetailSeq"));
-		// 處理代碼 1:訂正 2:轉暫收
+		// 處理代碼 0:入帳 1:訂正 2:轉暫收
 		functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+
+		btnIndex = parse.stringToInteger(titaVo.getBtnIndex());
+
+		if (btnIndex == 1) {
+			functionCode = 0; // 入帳
+		}
 
 		this.info("AcDate : " + acDate);
 		this.info("BatchNo : " + batchNo);
 		this.info("DetailSeq : " + detailSeq);
 		this.info("functionCode =" + titaVo.getParam("FunctionCode"));
+		this.info("btnIndex ..." + btnIndex);
 
 		BatxDetail tBatxDetail = new BatxDetail();
 		BatxDetailId tBatxDetailId = new BatxDetailId();
@@ -95,7 +108,6 @@ public class L420C extends TradeBuffer {
 		boolean isUpdate = false;
 		String procStsCode = tBatxDetail.getProcStsCode();
 //		1.訂正
-//		2.轉暫收 
 		if (functionCode == 1 && "5".equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException("E0015", tBatxDetail.getDetailSeq() + "非整批入帳，請執行交易訂正"); // 檢查錯誤
 		}
@@ -130,20 +142,32 @@ public class L420C extends TradeBuffer {
 			}
 			updateHeadRoutine(titaVo, mergeCnt);
 		} else {
-			// 組入帳交易電文
-			TitaVo txTitaVo = new TitaVo();
-			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, tBatxHead.getBatxTotCnt(), titaVo); // 1:訂正
-																										// 2:轉暫收
-
-			// 執行入帳交易
-			this.info("L420C excuteTx " + txTitaVo);
-			// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
-			TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
-
-			/* 錯誤 */
-			if (totaVoList != null && totaVoList.size() > 0) {
-				if (totaVoList.get(0).isError())
-					throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
+			boolean isTx = true;
+			// 入帳檢核
+			if (functionCode == 0) {
+				tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
+				if (!"4".equals(tBatxDetail.getProcStsCode())) {
+					try {
+						batxDetailService.update(tBatxDetail);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", "update batxDetail " + e.getErrorMsg());
+					}
+					isTx = false;
+				}
+			}
+			if (isTx) {
+				// 組入帳交易電文
+				TitaVo txTitaVo = new TitaVo();
+				txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, tBatxHead.getBatxTotCnt(), titaVo); // 1:訂正
+				// 執行入帳交易
+				this.info("L420C excuteTx " + txTitaVo);
+				// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
+				TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
+				/* 錯誤 */
+				if (totaVoList != null && totaVoList.size() > 0) {
+					if (totaVoList.get(0).isError())
+						throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
+				}
 			}
 		}
 		this.addList(this.totaVo);

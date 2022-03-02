@@ -30,14 +30,16 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
-	public List<Map<String, String>> findStatistics1(TitaVo titaVo) throws Exception {
+	/**
+	 * 查詢 LM042 統計數 工作表資料1
+	 * @param titaVo
+	 * @param yearMonth 當西元年月
+	 * */
+	public List<Map<String, String>> findStatistics1(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics1");
 
-		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
+		this.info("yearMonth=" + yearMonth);
 
-		this.info("yearMonth="+ yearMonth);
-		
 		String sql = "";
 		sql += " SELECT \"YearMonth\" ";
 		sql += " 	   ,SUBSTR(\"AssetClass\",0,1) AS \"AssetClass\" ";
@@ -92,14 +94,16 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", yearMonth);
 		return this.convertToMap(query);
 	}
-
-	public List<Map<String, String>> findStatistics2(TitaVo titaVo) throws Exception {
+	/**
+	 * 查詢 LM042 統計數 工作表資料2
+	 * @param titaVo
+	 * @param yearMonth 當西元年月
+	 * */
+	public List<Map<String, String>> findStatistics2(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics2");
 
-		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
+		this.info("yearMonth=" + yearMonth);
 
-		this.info("yearMonth="+ yearMonth);
-		
 		String sql = "";
 		// 折溢價與催收費用
 		sql += " SELECT 'DisPreRemFees' AS \"Item\" ";
@@ -161,14 +165,17 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", yearMonth);
 		return this.convertToMap(query);
 	}
-
-	public List<Map<String, String>> findStatistics3(TitaVo titaVo) throws Exception {
+	
+	/**
+	 * 查詢 LM042 統計數 工作表資料3
+	 * @param titaVo
+	 * @param yearMonth 當西元年月
+	 * */
+	public List<Map<String, String>> findStatistics3(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics3 ");
 
-		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
+		this.info("yearMonth=" + yearMonth);
 
-		this.info("yearMonth="+ yearMonth);
-		
 		String sql = "";
 		sql += "SELECT * FROM (";
 		sql += "	SELECT ( CASE";
@@ -213,37 +220,22 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findRBC(TitaVo titaVo) throws Exception {
+	/**
+	 * 查詢 LM042 RBC工作表資料
+	 * @param titaVo
+	 * @param yearMonth 當西元年月
+	 * @param lastYearMonth 上西元年月
+	 * */
+	public List<Map<String, String>> findRBC(TitaVo titaVo, int yearMonth, int lastYearMonth) throws Exception {
 		this.info("lM042.findRBC ");
 
-		int iYear = parse.stringToInteger(titaVo.get("ENTDY")) / 10000 + 1911;
-		int iMonth = (parse.stringToInteger(titaVo.get("ENTDY")) / 100) % 100;
-
-		// 當月
-		int tYearMonth = iYear * 100 + iMonth;
-		
-		// 當月/上月/去年月底
-		// 202101/202012/202012
-		// 202112/202111/202012
-		
-		int liYear = 0;
-		int liMonth = 0;
-		if (iMonth - 1 == 0) {
-			liYear = iYear - 1;
-			liMonth = 12;
-		} else {
-			liYear = iYear;
-			liMonth = iMonth - 1;
-		}
-		// 上月
-		int lYearMonth = liYear * 100 + liMonth;
 		// 去年 年月底
-		int lEndYearMonth = (iYear - 1) * 100 + 12;
+		int lEndYearMonth = (yearMonth / 100) * 100 + 12;
 
-		this.info("lEndYearMonth="+lEndYearMonth);
-		this.info("lastYearMonth="+lYearMonth);
-		this.info("thisYearMonth="+tYearMonth);
-		
+		this.info("lEndYearMonth=" + lEndYearMonth);
+		this.info("lastYearMonth=" + lastYearMonth);
+		this.info("yearMonth=" + yearMonth);
+
 		String sql = "";
 		sql += " SELECT \"YearMonth\" AS F0";
 		sql += "	   ,\"LoanType\" AS F1";
@@ -257,15 +249,15 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	 	 ,\"LoanType\" ASC ";
 		sql += " 	 	 ,\"LoanItem\" ASC ";
 		sql += " 	 	 ,\"RelatedCode\" ASC ";
-		
+
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("leyymm", lEndYearMonth);
-		query.setParameter("lyymm", lYearMonth);
-		query.setParameter("yymm", tYearMonth);
+		query.setParameter("lyymm", lastYearMonth);
+		query.setParameter("yymm", yearMonth);
 		return this.convertToMap(query);
 	}
 

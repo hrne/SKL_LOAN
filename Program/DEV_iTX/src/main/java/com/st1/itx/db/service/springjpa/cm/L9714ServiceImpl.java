@@ -50,7 +50,7 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,F.\"DrawdownAmt\" F4";
 		sql += "            ,F.\"FirstDrawdownDate\" F5";
 		sql += "            ,F.\"MaturityDate\" F6";
-		sql += "            ,F.\"LoanBal\" F7";
+		sql += "            ,Y.\"LoanBal\" F7";
 		sql += "            ,T.\"UsageCode\" F8";
 		sql += "            ,NVL(T.\"Interest\", 0) F9";
 		sql += "            ,Y.\"HouseBuyDate\" F10";

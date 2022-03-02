@@ -71,7 +71,8 @@ public class AcTxFormCom extends TradeBuffer {
 			headAcDetail = acDetailList.get(0);
 
 //			業務類別 01.撥款匯款 02.支票繳款 03.債協 09.放款
-			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2), titaVo);
+			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2),
+					titaVo);
 
 			String secNoX = "";
 
@@ -166,6 +167,10 @@ public class AcTxFormCom extends TradeBuffer {
 				if (tCdCode != null) {
 					SumNoX = tCdCode.getItem();
 				}
+				String acSubBookCodeXX = acSubBookCode + "-" + acSubBookCodeX;
+				if (this.txBuffer.getSystemParas().getAcSubBookCode().equals(acSubBookCode)) {
+					acSubBookCodeXX = "";
+				}
 
 				OccursList occursList = new OccursList();
 //				彙總別
@@ -177,13 +182,14 @@ public class AcTxFormCom extends TradeBuffer {
 				occursList.putParam("FM101_FacmNo", tAcDetail.getFacmNo());
 				occursList.putParam("FM101_BormNo", tAcDetail.getBormNo());
 //				科子目
-				occursList.putParam("FM101_AcNoCode", FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + "-" + FormatUtil.padX(tAcDetail.getAcSubCode(), 5));
+				occursList.putParam("FM101_AcNoCode", FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + "-"
+						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5));
 				occursList.putParam("FM101_AcDtlCode", tAcDetail.getAcDtlCode());
 //				科子細目中文
 				occursList.putParam("FM101_AcNoCodeX", acNoCodeX);
 //				區隔帳冊
-				occursList.putParam("FM101_AcSubBookCode", acSubBookCode);
-				occursList.putParam("FM101_AcSubBookCodeX", acSubBookCodeX);
+//				occursList.putParam("FM101_AcSubBookCode", acSubBookCode);
+				occursList.putParam("FM101_AcSubBookCodeX", acSubBookCodeXX);
 //				幣別
 				occursList.putParam("FM101_CurrencyCode", tAcDetail.getCurrencyCode());
 //				貸方金額(D) 借方金額(C)

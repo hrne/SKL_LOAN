@@ -34,15 +34,33 @@ BEGIN
                                           AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
           ,LPAD("ReminMail_Info".SerialNum,8,'0')
                                           AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
-          ,"ReminMail_Info".Mail_Type     AS "MailTypeCode"        -- 發函種類 VARCHAR2 1 0
+          -- 2022-03-02 Wei 修改: from Linda "MailTypeCode" =>舊資料若=3存證信函則轉新資料=2,其他則新資料轉成1
+          ,CASE
+             WHEN "ReminMail_Info".Mail_Type = 3
+             THEN '2'
+           ELSE '1' END                   AS "MailTypeCode"        -- 發函種類 VARCHAR2 1 0
           ,NVL("ReminMail_Info".Mail_Date,0)
                                           AS "MailDate"            -- 發函日期 DecimalD 8 0
           ,"ReminMail_Info".Mail_Person   AS "MailObj"             -- 發函對象 VARCHAR2 1 0
           ,"ReminMail_Info".Mail_PersonName
                                           AS "CustName"            -- 姓名 NVARCHAR2 100 0
-          ,"ReminMail_Info".Mail_Flg      AS "DelvrYet"            -- 送達否 VARCHAR2 1 0
-          ,TO_CHAR(TO_NUMBER("ReminMail_Info".Mail_Service))
-                                          AS "DelvrCode"           -- 送達方式 VARCHAR2 1 0
+          -- 2022-03-02 Wei 修改: from Linda "DelvrYet" =>舊資料若=1則新資料=1已送達,其他則轉成新資料=2未送達
+          ,CASE
+             WHEN "ReminMail_Info".Mail_Flg = '1'
+             THEN '1'
+           ELSE '2' END                   AS "DelvrYet"            -- 送達否 VARCHAR2 1 0
+          -- 2022-03-02 Wei 修改: from Linda
+          -- "DelvrCode" 送達方式舊資料1.親自送達 2.郵務-平信寄出 3.郵務-掛號寄出
+          -- =>新的1:郵務-平信 2:郵務-限時專送 3:郵務-掛號 4:郵務-雙掛號 5:親自送達; 
+          -- 舊資料非1~3時新的放0
+          ,CASE
+             WHEN TO_CHAR(TO_NUMBER("ReminMail_Info".Mail_Service)) = '1' 
+             THEN '5'
+             WHEN TO_CHAR(TO_NUMBER("ReminMail_Info".Mail_Service)) = '2'
+             THEN '1'
+             WHEN TO_CHAR(TO_NUMBER("ReminMail_Info".Mail_Service)) = '3'
+             THEN '3'
+           ELSE '0' END                   AS "DelvrCode"           -- 送達方式 VARCHAR2 1 0
           ,0                              AS "AddressCode"         -- 寄送地點選項 DECIMAL 1 0
           ,"ReminMail_Info".Mail_Addr     AS "Address"             -- 寄送地點 NVARCHAR2 60 0
           ,TRIM(TO_SINGLE_BYTE("ReminMail_Info".other_record))

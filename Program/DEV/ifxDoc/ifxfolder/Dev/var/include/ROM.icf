@@ -4720,12 +4720,17 @@ TXFORM=L4R02
 ^
 </L4R02.tom>
 
+<L4R03Rim.dec>
+#RimType=9,1,S
+</L4R03Rim.dec>
+
 <L4R03.dec>
 #L4r03CustName=c,100,S
 #L4r03CustId=X,10,S
 #L4r03Birthday=D,7,S
 #L4r03Gender=X,1,S
 #L4r03EmpNo=X,6,S
+#L4r03Type=9,1,S
 </L4R03.dec>
 
 <L4R03.tom>
@@ -4735,6 +4740,7 @@ TXFORM=L4R03
 #L4r03Birthday
 #L4r03Gender
 #L4r03EmpNo
+#L4r03Type
 ^
 </L4R03.tom>
 
@@ -8941,6 +8947,9 @@ TXFORM=L6R29
 #L6R31UsageDesc=X,80,S
 #L6R31Watermark=A,1,S
 #L6R31Enable=X,1,S
+#L6R31LetterFg=X,1,S
+#L6R31MessageFg=X,1,S
+#L6R31EmailFg=X,1,S
 </L6R31.dec>
 
 <L6R31.tom>
@@ -8956,6 +8965,9 @@ TXFORM=L6R31
 #L6R31UsageDesc
 #L6R31Watermark
 #L6R31Enable
+#L6R31LetterFg
+#L6R31MessageFg
+#L6R31EmailFg
 ^
 </L6R31.tom>
 

@@ -301,7 +301,7 @@ TXFORM=L4930
 #RPTFG=0,QUERY.GRID
 #any={caption:'[L4930]',width:1000,rowNum:40,
 ifxBatch:{
-	name:'整批轉暫收',
+	name:'轉暫收;入帳',
 	type:'5',
 	rim:'L420C',
 	txtno:'#secret-no',

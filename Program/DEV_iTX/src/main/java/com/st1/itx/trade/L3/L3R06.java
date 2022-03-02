@@ -332,7 +332,8 @@ public class L3R06 extends TradeBuffer {
 				}
 			}
 		}
-		if (wkTotaCount == 0 && iExtraRepay.compareTo(BigDecimal.ZERO) == 0 && !iTxCode.equals("L3440")) {
+		if (oShortfall.compareTo(BigDecimal.ZERO) == 0 && wkTotaCount == 0
+				&& iExtraRepay.compareTo(BigDecimal.ZERO) == 0 && !iTxCode.equals("L3440")) {
 			throw new LogicException(titaVo, "E3070", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無可計息的放款資料
 		}
 		// 還款金額

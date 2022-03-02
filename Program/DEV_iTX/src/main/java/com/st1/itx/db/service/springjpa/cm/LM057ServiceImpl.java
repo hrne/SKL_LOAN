@@ -88,8 +88,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  ON CL.\"CustNo\" = M.\"CustNo\" AND CL.\"FacmNo\" = M.\"FacmNo\" ";
 		sql += "	 								  AND CL.\"SEQ\" = 1";
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
-		sql += "	  AND M.\"PrinBalance\" > 0";
-		sql += "	  AND M.\"AssetClass\" IS NOT NULL)";
+		sql += "	  AND M.\"PrinBalance\" > 0 )";
 		sql += "    GROUP BY \"KIND\"";
 		sql += "	UNION";
 		sql += "	SELECT 'TOTAL' AS \"KIND\"";
