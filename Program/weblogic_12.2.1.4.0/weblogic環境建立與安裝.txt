@@ -11,14 +11,28 @@
  *source         相關軟體source files
 */
 
-
-
 1.新建使用者群組
     groupadd weblogic
 
 2.新建使用者weblogic
     useradd -g weblogic weblogic
     passwd "1qaz2wsx"
+
+    #系統參數設定
+    vi /etc/security/limits.conf
+
+    #root可以使用執行緒數量(無限制)
+    root             hard    nproc           unlimited
+    root             soft    nproc           unlimited
+    #root可以開啟檔案數量
+    root             soft    nofile          65535
+    root             hard    nofile          10240
+    #weblogic可以使用執行緒數量
+    @weblogic        hard    nproc           4096
+    @weblogic        soft    nproc           2048
+    #weblogic可以開啟檔案數量
+    @weblogic        hard    nofile          4096
+    @weblogic        soft    nofile          2048
 
 3.新增資料夾賦予權限
     mkdir /u01
