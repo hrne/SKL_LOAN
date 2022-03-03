@@ -95,6 +95,7 @@ T(2,@MaterialHelp,#HelpDesc1)
 #RimAreaCode=X,3,S
 #RimFunCd=A,1,S
 #RimMaterial=A,1,S
+#RimVersionDate=D,7,S
 
 ! 調RIM取縣市代碼
 #RimL6r03City=X,1,S
@@ -137,7 +138,8 @@ T(H,#Material,#MaterialHelp)
 #RimL4r28City=X,1,S
 T(2,@RimCityCode,#CityCode)
 E(0,@RimMaterial,#Material)
-S(L4R28,1,#RimCityCode,#RimMaterial)
+E(0,@RimVersionDate,#VersionDate)
+S(L4R28,1,#RimCityCode,#RimMaterial,#RimVersionDate)
 R(1,L4R28)
 
 #Final=A,3,S

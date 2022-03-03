@@ -111,7 +111,7 @@ em = null;
   }
 
   @Override
-  public Slice<CdBuildingCost> getCost(String cityCode_0, int floorLowerLimit_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<CdBuildingCost> getCost(String cityCode_0, int floorLowerLimit_1, int versionDate_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CdBuildingCost> slice = null;
     if (titaVo.length != 0)
@@ -122,15 +122,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("getCost " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " floorLowerLimit_1 : " +  floorLowerLimit_1);
+    this.info("getCost " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " floorLowerLimit_1 : " +  floorLowerLimit_1 + " versionDate_2 : " +  versionDate_2);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBuildingCostReposDay.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, pageable);
+      slice = cdBuildingCostReposDay.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualAndVersionDateIsOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, versionDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBuildingCostReposMon.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, pageable);
+      slice = cdBuildingCostReposMon.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualAndVersionDateIsOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, versionDate_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBuildingCostReposHist.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, pageable);
+      slice = cdBuildingCostReposHist.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualAndVersionDateIsOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, versionDate_2, pageable);
     else 
-      slice = cdBuildingCostRepos.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, pageable);
+      slice = cdBuildingCostRepos.findAllByCityCodeIsAndFloorLowerLimitLessThanEqualAndVersionDateIsOrderByFloorLowerLimitDesc(cityCode_0, floorLowerLimit_1, versionDate_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -139,7 +139,7 @@ em = null;
   }
 
   @Override
-  public Slice<CdBuildingCost> findCityCode(String cityCode_0, int material_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<CdBuildingCost> findCityCode(String cityCode_0, int material_1, int versionDate_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CdBuildingCost> slice = null;
     if (titaVo.length != 0)
@@ -150,15 +150,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findCityCode " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " material_1 : " +  material_1);
+    this.info("findCityCode " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " material_1 : " +  material_1 + " versionDate_2 : " +  versionDate_2);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBuildingCostReposDay.findAllByCityCodeIsAndMaterialIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, pageable);
+      slice = cdBuildingCostReposDay.findAllByCityCodeIsAndMaterialIsAndVersionDateIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, versionDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBuildingCostReposMon.findAllByCityCodeIsAndMaterialIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, pageable);
+      slice = cdBuildingCostReposMon.findAllByCityCodeIsAndMaterialIsAndVersionDateIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, versionDate_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBuildingCostReposHist.findAllByCityCodeIsAndMaterialIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, pageable);
+      slice = cdBuildingCostReposHist.findAllByCityCodeIsAndMaterialIsAndVersionDateIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, versionDate_2, pageable);
     else 
-      slice = cdBuildingCostRepos.findAllByCityCodeIsAndMaterialIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, pageable);
+      slice = cdBuildingCostRepos.findAllByCityCodeIsAndMaterialIsAndVersionDateIsOrderByFloorLowerLimitAsc(cityCode_0, material_1, versionDate_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

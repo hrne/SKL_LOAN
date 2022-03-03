@@ -37,8 +37,9 @@ public class L4R28 extends TradeBuffer {
 
 		String CityCode = titaVo.getParam("RimCityCode");
 		int Material = parse.stringToInteger(titaVo.getParam("RimMaterial"));
+		int VersionDate = parse.stringToInteger(titaVo.getParam("RimVersionDate")) + 19110000;
 		
-		Slice<CdBuildingCost> slCdBuildingCost = cdBuildingCostService.findCityCode(CityCode,Material, index, limit, titaVo);
+		Slice<CdBuildingCost> slCdBuildingCost = cdBuildingCostService.findCityCode(CityCode, Material, VersionDate, index, limit, titaVo);
 
 		List<CdBuildingCost> lCdBuildingCost = new ArrayList<CdBuildingCost>();
 		

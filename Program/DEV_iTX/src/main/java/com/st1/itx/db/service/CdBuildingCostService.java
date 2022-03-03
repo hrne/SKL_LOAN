@@ -36,28 +36,30 @@ public interface CdBuildingCostService {
   public Slice<CdBuildingCost> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * CityCode = ,AND FloorLowerLimit &lt;= 
+   * CityCode = ,AND FloorLowerLimit &lt;= ,AND VersionDate =
    *
    * @param cityCode_0 cityCode_0
    * @param floorLowerLimit_1 floorLowerLimit_1
+   * @param versionDate_2 versionDate_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice CdBuildingCost CdBuildingCost of List
    */
-  public Slice<CdBuildingCost> getCost(String cityCode_0, int floorLowerLimit_1, int index, int limit, TitaVo... titaVo);
+  public Slice<CdBuildingCost> getCost(String cityCode_0, int floorLowerLimit_1, int versionDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CityCode = ,AND Material =
+   * CityCode = ,AND Material = ,AND VersionDate =
    *
    * @param cityCode_0 cityCode_0
    * @param material_1 material_1
+   * @param versionDate_2 versionDate_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice CdBuildingCost CdBuildingCost of List
    */
-  public Slice<CdBuildingCost> findCityCode(String cityCode_0, int material_1, int index, int limit, TitaVo... titaVo);
+  public Slice<CdBuildingCost> findCityCode(String cityCode_0, int material_1, int versionDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CdBuildingCost

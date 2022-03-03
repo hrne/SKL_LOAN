@@ -22,11 +22,11 @@ import com.st1.itx.db.domain.CdBuildingCostId;
  */
 public interface CdBuildingCostRepositoryHist extends JpaRepository<CdBuildingCost, CdBuildingCostId> {
 
-  // CityCode = ,AND FloorLowerLimit <= 
-  public Slice<CdBuildingCost> findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(String cityCode_0, int floorLowerLimit_1, Pageable pageable);
+  // CityCode = ,AND FloorLowerLimit <= ,AND VersionDate =
+  public Slice<CdBuildingCost> findAllByCityCodeIsAndFloorLowerLimitLessThanEqualAndVersionDateIsOrderByFloorLowerLimitDesc(String cityCode_0, int floorLowerLimit_1, int versionDate_2, Pageable pageable);
 
-  // CityCode = ,AND Material =
-  public Slice<CdBuildingCost> findAllByCityCodeIsAndMaterialIsOrderByFloorLowerLimitAsc(String cityCode_0, int material_1, Pageable pageable);
+  // CityCode = ,AND Material = ,AND VersionDate =
+  public Slice<CdBuildingCost> findAllByCityCodeIsAndMaterialIsAndVersionDateIsOrderByFloorLowerLimitAsc(String cityCode_0, int material_1, int versionDate_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
