@@ -1147,7 +1147,7 @@ public class TxBatchCom extends TradeBuffer {
 				this.procStsCode = "2"; // 2.人工處理
 				break;
 			}
-			if (this.repayIntDate == 0) {
+			if (this.repayLoan.compareTo(BigDecimal.ZERO) == 0 ) {
 				if (this.principal.compareTo(BigDecimal.ZERO) > 0) {
 					this.checkMsg = "積欠期款: " + this.shortAmt;
 				} else {
@@ -1323,13 +1323,13 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 償還本利:" + this.repayLoan;
 		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 清償違約金:" + this.closeBreachAmt;
+			this.checkMsg = this.checkMsg + ", 含清償違約金:" + this.closeBreachAmt;
 		if (this.shortfallInt.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 累短收利息:" + this.shortfallInt;
+			this.checkMsg = this.checkMsg + ", 含累短收利息:" + this.shortfallInt;
 		if (this.shortfallPrin.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 累短收本金:" + this.shortfallPrin;
+			this.checkMsg = this.checkMsg + ", 含累短收本金:" + this.shortfallPrin;
 		if (this.shortCloseBreach.compareTo(BigDecimal.ZERO) > 0)
-			this.checkMsg = this.checkMsg + ", 累短收清償違約金:" + this.shortCloseBreach;
+			this.checkMsg = this.checkMsg + ", 含累短收清償違約金:" + this.shortCloseBreach;
 		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 帳管費:" + this.acctFee;
 		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0)
@@ -1614,17 +1614,25 @@ public class TxBatchCom extends TradeBuffer {
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
 			for (BaTxVo baTxVo : baTxList) {
 				if (baTxVo.getDataKind() == 1) {
-					// 應繳費用 = 1.應收費用+未收費用+短繳期金
-					this.unPayFee = this.unPayFee.add(baTxVo.getUnPaidAmt());
+					// 應繳費用 = 1.應收費用+未收費用
+					// +短繳期金
 					// 全部應繳
 					this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt()); // 全部應繳
+					if (baTxVo.getRepayType() == 1 || baTxVo.getRepayType() == 9) {
+						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt());
+						this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
+						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
+					} else {
+						this.unPayFee = this.unPayFee.add(baTxVo.getUnPaidAmt());
+						this.repayFee = this.repayFee.add(baTxVo.getAcctAmt());
+					}
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						switch (baTxVo.getRepayType()) {
 						case 1: // 01-期款
 							this.shortfallInt = this.shortfallInt.add(baTxVo.getInterest()); // 短繳利息
 							this.shortfallPrin = this.shortfallPrin.add(baTxVo.getPrincipal()); // 短繳本金
 							// 短繳清償違約金(提前償還有即時清償違約金時寫入)
-							this.shortCloseBreach = this.shortfallPrin.add(baTxVo.getCloseBreachAmt());
+							this.shortCloseBreach = this.shortCloseBreach.add(baTxVo.getCloseBreachAmt());
 							break;
 						case 4: // 04-帳管費
 							this.acctFee = this.acctFee.add(baTxVo.getAcctAmt());
@@ -1636,11 +1644,12 @@ public class TxBatchCom extends TradeBuffer {
 							this.modifyFee = this.modifyFee.add(baTxVo.getAcctAmt());
 							break;
 						case 7: // 07-法務費
+							this.unPayFee = this.unPayFee.add(baTxVo.getUnPaidAmt());
 							this.lawFee = this.lawFee.add(baTxVo.getAcctAmt());
 							break;
 						case 9: // 09-其他(清償違約金)
 							// 未收清償違約金，結案後補領清償證明時寫入
-							this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());// 
+							this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());//
 							break;
 						default:
 							break;
@@ -1691,13 +1700,13 @@ public class TxBatchCom extends TradeBuffer {
 				if (baTxVo.getDataKind() == 6 && baTxVo.getRepayType() == 5) { // 未到期火險費用
 					this.unOpenfireFee = this.unOpenfireFee.add(baTxVo.getUnPaidAmt());
 				}
-				
+
 				// 清償違約金，部分償還、結案即時收取、結案要領清償證明
-				if (baTxVo.getDataKind() == 6 && baTxVo.getRepayType() == 9) { 
+				if (baTxVo.getDataKind() == 6 && baTxVo.getRepayType() == 9) {
 					this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());
 					// 結案時才會入帳
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-						this.repayTotal = this.repayLoan.add(baTxVo.getAcctAmt());
+						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
 					}
 				}
 			}

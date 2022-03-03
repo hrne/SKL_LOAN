@@ -213,11 +213,11 @@ public class L4510p extends TradeBuffer {
 				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
 						titaVo);
 //				1.15日薪 2.非15日薪
-				if (iOpItem == 1 && "1".equals(tCdCode.getItem().substring(0, 1))) {
+				if (iOpItem == 1 && ("4".equals(tCdCode.getCode().substring(0, 1)) || "5".equals(tCdCode.getCode().substring(0, 1)))) {
 					procCodeIs15.add(tEmpDeductSchedule.getAgType1());
 //					entryDate = tEmpDeductSchedule.getEntryDate();
 				}
-				if (iOpItem == 2 && "2".equals(tCdCode.getItem().substring(0, 1))) {
+				if (iOpItem == 2 && !"4".equals(tCdCode.getCode().substring(0, 1)) && !"5".equals(tCdCode.getCode().substring(0, 1))) {
 					procCodeUn15.add(tEmpDeductSchedule.getAgType1());
 //					entryDate = tEmpDeductSchedule.getEntryDate();
 				}

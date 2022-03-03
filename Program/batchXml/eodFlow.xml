@@ -46,13 +46,16 @@
 			<tasklet ref="StartBS996" />
 		</step>
 		<!-- 每日批次結束，判斷是否需要執行月批 -->
-		<step id="eodFinal" parent="parentStep" next="startEomFlow">
+		<step id="eodFinal" parent="parentStep">
 			<tasklet ref="EodFinal" />
 			<next on="COMPLETED" to="startEomFlow" />
-			<end on="STOPPED" />
+			<next on="STOPPED" to="startDailyRptFlow" />
 		</step>
-		<step id="startEomFlow" parent="parentStep">
+		<step id="startEomFlow" parent="parentStep" next="startDailyRptFlow">
 			<job ref="eomFlow" job-launcher="jobLauncher" />
+		</step>
+		<step id="startDailyRptFlow" parent="parentStep">
+			<job ref="dailyRptFlow" job-launcher="jobLauncher" />
 		</step>
 	</job>
 </beans>

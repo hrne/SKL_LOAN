@@ -84,6 +84,7 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,i.\"KeeperEmpNo\"                                ";
 		sql += "        ,i.\"ApplEmpNo\"                                ";
 		sql += "        ,i.\"ReturnEmpNo\"                                ";
+		sql += "        ,i.\"TitaActFg\"                                ";
 		sql += " from \"InnDocRecord\" i                                  ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"  ";
 		sql += " left join \"CdEmp\" e1 on e1.\"EmployeeNo\" = i.\"KeeperEmpNo\"  ";

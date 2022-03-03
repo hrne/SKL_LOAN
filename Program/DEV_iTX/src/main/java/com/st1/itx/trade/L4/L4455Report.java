@@ -153,8 +153,10 @@ public class L4455Report extends MakeReport {
 		this.print(-5, 185, "單　位：元");
 		if(String.valueOf(entrydate).length() == 7) {
 			this.print(-6, 3, "扣款日期：" + entrydate.substring(0, 3) + "/" + entrydate.substring(3, 5) + "/" + entrydate.substring(5, 7));			
-		} else {
+		} else if(String.valueOf(entrydate).length() == 6){
 			this.print(-6, 3, "扣款日期：" + entrydate.substring(0, 2) + "/" + entrydate.substring(2, 4) + "/" + entrydate.substring(4, 6));			
+		} else {
+			this.print(-6, 3, "扣款日期：");
 		}
 		
 		

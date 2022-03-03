@@ -31,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L4500 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4500.class);
 
 	/* 日期工具 */
 	@Autowired
@@ -76,7 +75,7 @@ public class L4500 extends TradeBuffer {
 		CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", agType1, titaVo);
 
 //		2.非15日薪A
-		if ("2".equals(tCdCode.getItem().substring(0, 1))) {
+		if (!"4".equals(tCdCode.getCode().substring(0, 1)) && !"5".equals(tCdCode.getCode().substring(0, 1)) ) {
 //			非15日薪
 			for (int i = 1; i <= 13; i++) {
 				EmpDeductSchedule tEmpDeductSchedule = new EmpDeductSchedule();

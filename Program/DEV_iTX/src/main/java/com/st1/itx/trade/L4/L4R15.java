@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R15 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R15.class);
 
 	@Autowired
 	public Parse parse;
@@ -65,7 +64,7 @@ public class L4R15 extends TradeBuffer {
 
 		CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", agType1, titaVo);
 
-		this.totaVo.putParam("L4r15EmpDeductFlag", tCdCode.getItem().substring(0, 1));
+		this.totaVo.putParam("L4r15EmpDeductFlag", tCdCode.getCode().substring(0, 1));
 
 		this.info("EmpDeductFlag: " + tCdCode.getItem().substring(0, 1));
 

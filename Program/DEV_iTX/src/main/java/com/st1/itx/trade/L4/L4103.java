@@ -63,7 +63,7 @@ public class L4103 extends TradeBuffer {
 		
 
 
-		if (lAcDetail.size() == 0) {
+		if (lAcDetail != null && lAcDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 

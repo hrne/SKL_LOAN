@@ -147,8 +147,8 @@ BEGIN
                     WHERE  T2."AcDate"    =  TBSDYF
                       AND  T2."TitaHCode" IN (0, 3)
                       AND  T2."Principal"  <> 0
-                      AND  T2."TitaTxCd"  IN ('L3420')
-                      AND  M."Status" = 3
+                      AND  T2."TitaTxCd"  IN ('L3410', 'L3420')
+                      AND  M."Status" IN (1 , 3)
                   ) T3
              LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T3."CustNo"
                                          AND  M."FacmNo"    =  T3."FacmNo"
@@ -158,7 +158,7 @@ BEGIN
                          FROM  "RptJcic" A
                        ) A    ON  A."CustNo"    =  T3."CustNo"
                              AND  A."FacmNo"    =  T3."FacmNo"     -- 呆帳不報送檔
-             WHERE (  M."Status" IN (0, 2, 3) OR
+             WHERE (  M."Status" IN (0, 1, 2, 3) OR
                      (M."Status" IN (6) AND A."CustNo" IS NULL)
                    )
                AND (  T3."TitaHCode" = 0      OR
@@ -171,7 +171,7 @@ BEGIN
         AND  O."FacmNo"    =  T."FacmNo"
         AND  O."BormNo"    =  T."BormNo"
         AND  O."OvduNo"    =  T."LastOvduNo"
-      WHERE  T."Status" IN (0, 2, 3)
+      WHERE  T."Status" IN (0, 1 , 2, 3)
          OR (T."Status" = 6  AND O."AcctCode" = '990')
       )
 

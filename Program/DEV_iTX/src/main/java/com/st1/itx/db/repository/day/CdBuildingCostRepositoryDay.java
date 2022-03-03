@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,15 +22,16 @@ import com.st1.itx.db.domain.CdBuildingCostId;
  */
 public interface CdBuildingCostRepositoryDay extends JpaRepository<CdBuildingCost, CdBuildingCostId> {
 
-	// CityCode = ,AND FloorLowerLimit <=
-	public Slice<CdBuildingCost> findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(String cityCode_0, int floorLowerLimit_1, Pageable pageable);
+  // CityCode = ,AND FloorLowerLimit <= 
+  public Slice<CdBuildingCost> findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(String cityCode_0, int floorLowerLimit_1, Pageable pageable);
 
-	// CityCode =
-	public Slice<CdBuildingCost> findAllByCityCodeIsOrderByFloorLowerLimitAsc(String cityCode_0, Pageable pageable);
+  // CityCode = ,AND Material =
+  public Slice<CdBuildingCost> findAllByCityCodeIsAndMaterialIsOrderByFloorLowerLimitAsc(String cityCode_0, int material_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdBuildingCost> findByCdBuildingCostId(CdBuildingCostId cdBuildingCostId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdBuildingCost> findByCdBuildingCostId(CdBuildingCostId cdBuildingCostId);
 
 }
+

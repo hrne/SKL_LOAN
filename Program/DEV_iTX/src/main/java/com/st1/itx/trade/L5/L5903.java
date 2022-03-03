@@ -12,6 +12,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.springjpa.cm.L5903ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -48,6 +50,9 @@ public class L5903 extends TradeBuffer {
 	@Autowired
 	public L5903ServiceImpl l5903ServiceImpl;
 
+	@Autowired
+	public TxTellerService txTellerService;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5903 ");
@@ -64,7 +69,7 @@ public class L5903 extends TradeBuffer {
 			// *** 折返控制相關 ***
 			resultList = l5903ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
-			this.error("l4920ServiceImpl findByCondition " + e.getMessage());
+			this.error("l5903ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
 
@@ -77,6 +82,30 @@ public class L5903 extends TradeBuffer {
 			}
 
 			for (Map<String, String> result : resultList) {
+				
+				
+				TxTeller t1txTeller = txTellerService.findById(result.get("F13"), titaVo);
+				TxTeller t2txTeller = txTellerService.findById(result.get("F14"), titaVo);
+
+//				若保管與借閱同單位改為2段式交易
+				this.info("AcFg=="+result.get("F16"));
+				
+				if (t1txTeller != null && t2txTeller != null) {//已放行才顯示
+					
+					if (t1txTeller.getGroupNo().equals(t2txTeller.getGroupNo())) {
+						if(!("2").equals(result.get("F16"))) {
+							this.info("into 1");
+							continue;
+						}
+					} else {
+						if(!("4").equals(result.get("F16"))){
+						 
+							this.info("into 2");
+							continue;
+						}
+					}
+				}
+				
 
 				int applDate = parse.stringToInteger(result.get("F6"));
 				int returnDate = parse.stringToInteger(result.get("F7"));
@@ -112,6 +141,11 @@ public class L5903 extends TradeBuffer {
 		} else {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
+		
+		if(this.totaVo.getOccursList().size()==0) {
+			throw new LogicException(titaVo, "E0001", "查無資料");
+		}
+			
 
 		this.addList(this.totaVo);
 		return this.sendList();

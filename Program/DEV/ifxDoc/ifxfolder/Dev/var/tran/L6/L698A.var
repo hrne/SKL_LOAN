@@ -41,9 +41,6 @@ E(0,1)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L698A]                                 應處理明細                                                            "],
-["@",#SelectCode],
-["@",#ItemCode],
-["@",#AutoFg],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]

@@ -24,7 +24,7 @@ public class L4R28 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdBuildingCostService cdBuildingCostService;
-
+	
 	@Autowired
 	public Parse parse;
 
@@ -36,25 +36,27 @@ public class L4R28 extends TradeBuffer {
 //		L4607建築造價參考作業調rim
 
 		String CityCode = titaVo.getParam("RimCityCode");
-
-		Slice<CdBuildingCost> slCdBuildingCost = cdBuildingCostService.findCityCode(CityCode, index, limit, titaVo);
+		int Material = parse.stringToInteger(titaVo.getParam("RimMaterial"));
+		
+		Slice<CdBuildingCost> slCdBuildingCost = cdBuildingCostService.findCityCode(CityCode,Material, index, limit, titaVo);
 
 		List<CdBuildingCost> lCdBuildingCost = new ArrayList<CdBuildingCost>();
-
+		
 		lCdBuildingCost = slCdBuildingCost == null ? null : slCdBuildingCost.getContent();
-
+		
+		
 		for (int i = 1; i <= 50; i++) {
-			this.totaVo.putParam("L4r28FloorLowerLimit" + i, i);
+			this.totaVo.putParam("L4r28FloorLowerLimit" + i, 0);
 			this.totaVo.putParam("L4r28Cost" + i, "");
 		}
-
-		if (lCdBuildingCost != null) {
+		
+		if(lCdBuildingCost != null) {
 			int m = 1;
-			for (CdBuildingCost tCdBuildingCost : lCdBuildingCost) {
-				m = tCdBuildingCost.getFloorLowerLimit();
+			for(CdBuildingCost tCdBuildingCost: lCdBuildingCost) {
 				this.totaVo.putParam("L4r28FloorLowerLimit" + m, tCdBuildingCost.getFloorLowerLimit());
 				this.totaVo.putParam("L4r28Cost" + m, tCdBuildingCost.getCost());
-			}
+				m++;
+		    }
 		}
 
 		this.addList(this.totaVo);

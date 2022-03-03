@@ -44,9 +44,16 @@ E(0,0)
 [
 ["[L4607]                                 建築造價參考資料維護"],
 ["#FdCityCode+縣市代碼",#CityCode,#CityCodeX],
+["#FdMaterial+建物建材",#Material,#MaterialX],
+["#FdVersionDate+版本日期",#VersionDate],
 ]
 
 #FdCityCode=X,2,L
+T(2,*)
+#FdMaterial=X,2,L
+T(2,*)
+#FdVersionDate=X,2,L
+T(2,*)
 #FdFloorLowerLimit=X,2,L
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -59,7 +66,7 @@ T(4,CHAIN$)
 #NTXBUF=X,13,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
-
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 #CALLGRID=X,1,S
 INVOKEJS(SHOW,p1,0)
 ##loop{times:50,n:1}
@@ -67,12 +74,27 @@ C(3,#Cost{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 ##end
 INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,grd1_2,1)
 
+
+#CODEMATERIAL=x,20,S
+T(3,CdCode.Material)
+
+#MaterialHelp=x,200,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEMATERIAL)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@MaterialHelp,#HelpDesc1)
+
+
 !調RIM縣市 ST
 <include src="ROM.icf::L6R03.dec"/>
 !調RIM參數
 #RimCityCode=X,2,S
 #RimAreaCode=X,3,S
 #RimFunCd=A,1,S
+#RimMaterial=A,1,S
 
 ! 調RIM取縣市代碼
 #RimL6r03City=X,1,S
@@ -97,12 +119,25 @@ V(H,#L6r03ResultCity)
 #CityCodeX=X,10,L
 T(H,#CityCode,#L6r03ResultCity)
 
+!建物材料
+#Material=A,1,I
+HELP(#MaterialHelp)
+@V(H,#MaterialHelp)
+
+#MaterialX=X,40,L
+T(H,#Material,#MaterialHelp)
+
+!建物材料
+#VersionDate=D,7,I
+@A(DATE,1,#VersionDate)
+
 <include src="ROM.icf::L4R28.dec"/>
 
 ! 調RIM取縣市代碼
 #RimL4r28City=X,1,S
 T(2,@RimCityCode,#CityCode)
-S(L4R28,1,#RimCityCode)
+E(0,@RimMaterial,#Material)
+S(L4R28,1,#RimCityCode,#RimMaterial)
 R(1,L4R28)
 
 #Final=A,3,S
@@ -206,6 +241,8 @@ E(0,1)ASGN(LOOP$)
 !------ 上行電文 ------
 <sub type="TIM">
 #CityCode
+#Material
+#VersionDate
 #Final
 ##loop {times:50,i:1}
 #FloorLowerLimit{i}
@@ -221,6 +258,7 @@ TXFORM=L4607
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L6R03.tom"/>
 <include src="ROM.icf::L4R28.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L4607" layout="cols=3;screen.width=[100,900];order=1;">

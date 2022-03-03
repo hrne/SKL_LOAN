@@ -113,11 +113,11 @@ public class L4455Report2 extends MakeReport {
 			year = String.valueOf(acdate).substring(0, 3);
 			month = String.valueOf(acdate).substring(3, 5);
 			date = String.valueOf(acdate).substring(5, 7);
-		} else {
+		} else if(String.valueOf(acdate).length() == 6){
 			year = String.valueOf(acdate).substring(0, 2);
 			month = String.valueOf(acdate).substring(2, 4);
 			date = String.valueOf(acdate).substring(4, 6);
-		}
+		} 
 		
 		this.print(-5, 91, year);
 		this.print(-5, 99, month);

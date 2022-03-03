@@ -246,8 +246,8 @@ public class L2R01 extends TradeBuffer {
 		for (int i = 1; i <= 10; i++) {
 			this.totaVo.putParam("L2r01StepRateMonths" + i, 0);
 			this.totaVo.putParam("L2r01StepRateMonthE" + i, 0);
-			this.totaVo.putParam("L2r05StepRateType" + i, 0);
-			this.totaVo.putParam("L2r05StepRateIncr" + i, 0);
+			this.totaVo.putParam("L2r01StepRateType" + i, 0);
+			this.totaVo.putParam("L2r01StepRateIncr" + i, 0);
 		}
 
 	}
@@ -256,14 +256,14 @@ public class L2R01 extends TradeBuffer {
 	private void SetTotaPremium() throws LogicException {
 		if (lFacProdPremium == null || lFacProdPremium.isEmpty()) {
 			for (int i = 1; i <= 10; i++) {
-				this.totaVo.putParam("Premium" + i, 0);
-				this.totaVo.putParam("PremiumIncr" + i, 0);
+				this.totaVo.putParam("L2r01Premium" + i, 0);
+				this.totaVo.putParam("L2r01PremiumIncr" + i, 0);
 			}
 		} else {
 			int i = 1;
 			for (FacProdPremium tFacProdPremium : lFacProdPremium.getContent()) {
-				this.totaVo.putParam("Premium" + i, tFacProdPremium.getPremiumLow());
-				this.totaVo.putParam("PremiumIncr" + i, tFacProdPremium.getPremiumIncr());
+				this.totaVo.putParam("L2r01Premium" + i, tFacProdPremium.getPremiumLow());
+				this.totaVo.putParam("L2r01PremiumIncr" + i, tFacProdPremium.getPremiumIncr());
 				i++;
 				if (i > 10)
 					break;
@@ -275,14 +275,14 @@ public class L2R01 extends TradeBuffer {
 	private void SetTotaAcctFee() throws LogicException {
 		if (lFacProdAcctFee == null || lFacProdAcctFee.isEmpty()) {
 			for (int i = 1; i <= 5; i++) {
-				this.totaVo.putParam("LoanAmt" + i, 0);
-				this.totaVo.putParam("AcctFee" + i, 0);
+				this.totaVo.putParam("L2r01AcctFeeLoanAmt" + i, 0);
+				this.totaVo.putParam("L2r01AcctFeeAcctFee" + i, 0);
 			}
 		} else {
 			int i = 1;
 			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFee.getContent()) {
-				this.totaVo.putParam("LoanAmt" + i, tFacProdAcctFee.getLoanLow());
-				this.totaVo.putParam("AcctFee" + i, tFacProdAcctFee.getAcctFee());
+				this.totaVo.putParam("L2r01AcctFeeLoanAmt" + i, tFacProdAcctFee.getLoanLow());
+				this.totaVo.putParam("L2r01AcctFeeAcctFee" + i, tFacProdAcctFee.getAcctFee());
 				i++;
 				if (i > 5)
 					break;
@@ -294,14 +294,14 @@ public class L2R01 extends TradeBuffer {
 	private void SetTotaHandingFee() throws LogicException {
 		if (lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty()) {
 			for (int i = 1; i <= 5; i++) {
-				this.totaVo.putParam("LoanAmtB" + i, 0);
-				this.totaVo.putParam("HandlingFee" + i, 0);
+				this.totaVo.putParam("L2r01HandlingFeeLoanAmt" + i, 0);
+				this.totaVo.putParam("L2r01HandlingFee" + i, 0);
 			}
 		} else {
 			int i = 1;
 			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFeeB.getContent()) {
-				this.totaVo.putParam("LoanAmtB" + i, tFacProdAcctFee.getLoanLow());
-				this.totaVo.putParam("HandlingFee" + i, tFacProdAcctFee.getAcctFee());
+				this.totaVo.putParam("L2r01HandlingFeeLoanAmt" + i, tFacProdAcctFee.getLoanLow());
+				this.totaVo.putParam("L2r01HandlingFee" + i, tFacProdAcctFee.getAcctFee());
 				i++;
 				if (i > 5)
 					break;

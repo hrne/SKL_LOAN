@@ -20,7 +20,7 @@ BEGIN
     JOB_START_TIME TIMESTAMP;  -- 記錄程式起始時間
     JOB_END_TIME   TIMESTAMP;   -- 記錄程式結束時間    
   BEGIN   
-    -- EXEC "Usp_L5_CollList_Upd"(20211029,'999999','99999999',20211021,20211020);
+    -- EXEC "Usp_L5_CollList_Upd"(20211029,'999999','99991231',20211021,20211020);
     INS_CNT :=0;       
     UPD_CNT :=0;        
 
@@ -58,11 +58,11 @@ BEGIN
                                       Order By M."Status" DESC, M."NextIntDate" ASC)
                 END                          AS "ClRowNo"             -- '同擔保品序列號';
           , '1'                              AS "CaseCode"            -- '案件種類';
-          ,CASE WHEN M."PrevIntDate" = 99999999 
+          ,CASE WHEN M."PrevIntDate" = 99991231 
                      THEN 0 
                 ELSE M."PrevIntDate"
            END                               AS "PrevIntDate"         -- '繳息迄日';
-          ,CASE WHEN M."NextIntDate" = 99999999 
+          ,CASE WHEN M."NextIntDate" = 99991231 
                      THEN 0
                 ELSE  M."NextIntDate"
            END                               AS "NextIntDate"         -- '應繳息日';
@@ -72,7 +72,7 @@ BEGIN
            ,CASE WHEN M."Status" = '50'
                   AND M."NextIntDate" > 0
                   AND M."NextIntDate" < TBSDYF 
-                  AND TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYY-MM-DD'), TO_DATE(M."NextIntDate",'YYYY-MM-DD'))) >= 1
+                  AND TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(M."NextIntDate",'YYYYMMDD'))) >= 1
                  THEN 4
                  ELSE TO_NUMBER(SUBSTR(M."Status" ,2,1))  
            END                               AS "Status"              -- '戶況';
@@ -88,13 +88,13 @@ BEGIN
             B."CustNo"                   AS "CustNo"            -- '戶號';
            ,B."FacmNo"                   AS "FacmNo"            -- '額度';
            ,MIN(CASE WHEN B."Status" IN (3,5,6,8,9) 
-                          THEN  99999999     
+                          THEN  99991231     
                      WHEN B."PrevPayIntDate" = 0        
                           THEN  B."DrawdownDate"
                      ELSE B."PrevPayIntDate"        
                 END )                    AS "PrevIntDate"       -- '繳息迄日';
            ,MIN(CASE WHEN B."Status" IN (3,5,6,8,9) 
-                          THEN 99999999   
+                          THEN 99991231   
                      ELSE B."NextPayIntDate"
                 END )                    AS "NextIntDate"       -- '應繳息日';
            ,B."CurrencyCode"             AS "CurrencyCode"      -- '幣別';
@@ -158,7 +158,7 @@ BEGIN
                                       AND O."BormNo"  = B."BormNo"
                                       AND O."OvduNo" = B."LastOvduNo"
                                       AND B."Status" in (2,6,7) 
-           LEFT  JOIN  "AcLoanRenew" R ON B."RenewFlag" != 0 -- 2022-01-14 放款主檔的此欄位不為0才串會計借新還舊檔
+           LEFT  JOIN  "AcLoanRenew" R ON B."RenewFlag" != '0' -- 2022-01-14 放款主檔的此欄位不為0才串會計借新還舊檔
                                       AND R."CustNo" = B."CustNo"
                                       AND R."NewFacmNo"  = B."FacmNo"
                                       AND R."NewBormNo"  = B."BormNo" 
@@ -344,7 +344,7 @@ BEGIN
           ,CASE WHEN  N."Status" = 0
                   AND N."NextPayDate" > 0
                   AND N."NextPayDate" < TBSDYF 
-                  AND TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYY-MM-DD'), TO_DATE(N."NextPayDate",'YYYY-MM-DD'))) >= 1
+                  AND TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(N."NextPayDate",'YYYYMMDD'))) >= 1
                  THEN 4
                 ELSE  N."Status"      
            END                        AS "Status"              -- '戶況';
@@ -388,10 +388,10 @@ BEGIN
           ,T."PrevIntDate"            AS "PrevIntDate"         -- '繳息迄日';
           ,T."NextIntDate"            AS "NextIntDate"         -- '應繳息日';
           ,CASE WHEN T."NextIntDate" = 0 OR T."NextIntDate" >= TBSDYF   THEN  0 
-                ELSE TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYY-MM-DD'), TO_DATE(T."NextIntDate",'YYYY-MM-DD')))
+                ELSE TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(T."NextIntDate",'YYYYMMDD')))
            END                         AS "OvduTerm"            -- '逾期期數';
           ,CASE WHEN  T."NextIntDate" = 0 OR T."NextIntDate" >= TBSDYF  THEN  0 
-                ELSE  TO_DATE(TBSDYF,'YYYY-MM-DD')  - TO_DATE(T."NextIntDate",'YYYY-MM-DD') 
+                ELSE  TO_DATE(TBSDYF,'YYYYMMDD')  - TO_DATE(T."NextIntDate",'YYYYMMDD') 
                 END                   AS "OvduDays"            -- '逾期天數';
           ,T."CurrencyCode"           AS "CurrencyCode"        -- '幣別';
           ,T."PrinBalance"            AS "PrinBalance"         -- '本金餘額';
@@ -437,14 +437,14 @@ BEGIN
                   -- 否則 擺零
                   ,CASE
                      WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 AND C1."PrinBalance" + C1."BadDebtBal" <> 0
-                     THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYY-MM-DD'), TO_DATE(C1."NextIntDate",'YYYY-MM-DD')))
+                     THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(C1."NextIntDate",'YYYYMMDD')))
                    ELSE 0 END                 AS "OvduTerm"            -- '逾期期數';
                   -- 若 應繳息日 <= 系統營業日(TBSDYF)
                   -- 則 計算逾期天數
                   -- 否則 擺零
                   ,CASE
                      WHEN C1."NextIntDate" <= TBSDYF AND C1."NextIntDate" > 0 AND C1."PrinBalance" + C1."BadDebtBal" <> 0
-                     THEN TO_DATE(TBSDYF,'YYYY-MM-DD')  - TO_DATE(C1."NextIntDate",'YYYY-MM-DD') 
+                     THEN TO_DATE(TBSDYF,'YYYYMMDD')  - TO_DATE(C1."NextIntDate",'YYYYMMDD') 
                    ELSE 0 END                 AS "OvduDays"            -- '逾期天數';
                   ,C1."CurrencyCode"          AS "CurrencyCode"        -- '幣別';
                   ,C1."PrinBalance"           AS "PrinBalance"         -- '本金餘額';

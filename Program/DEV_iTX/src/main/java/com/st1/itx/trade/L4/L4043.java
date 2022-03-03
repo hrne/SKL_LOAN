@@ -12,6 +12,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.springjpa.cm.L4043ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -40,6 +42,9 @@ public class L4043 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public L4043ServiceImpl l4043ServiceImpl;
+	
+	@Autowired 
+	public CdEmpService sCdEmpService;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -81,9 +86,15 @@ public class L4043 extends TradeBuffer {
 				int propDate = parse.stringToInteger(result.get("F12")); // 提出
 				int retrDate = parse.stringToInteger(result.get("F13")); // 提回
 				int stampFinishDate = parse.stringToInteger(result.get("F19"));
+				int stampCancelDate = parse.stringToInteger(result.get("F29"));
 				int deleteDate = parse.stringToInteger(result.get("F20"));
 				String wkCreateFlag = result.get("F10");
 				String wkPostMediaCode = result.get("F16"); // 媒體檔
+				int processdate = parse.stringToInteger(result.get("F23"));
+				String createempno = result.get("F25");
+				String lastupdateempno = result.get("F27");
+				int creatdate = Integer.parseInt(result.get("F26"));
+				int lastupdate = Integer.parseInt(result.get("F28"));
 				if (wkPostMediaCode == null) {
 					wkPostMediaCode = "";
 				}
@@ -101,8 +112,20 @@ public class L4043 extends TradeBuffer {
 				if (stampFinishDate > 19110000) {
 					stampFinishDate = stampFinishDate - 19110000;
 				}
+				if (stampCancelDate > 19110000) {
+					stampCancelDate = stampCancelDate - 19110000;
+				}
+				if (processdate > 19110000) {
+					processdate = processdate - 19110000;
+				}
 				if (deleteDate > 19110000) {
 					deleteDate = deleteDate - 19110000;
+				}
+				if (creatdate > 19110000) {
+					creatdate = creatdate - 19110000;
+				}
+				if (lastupdate > 19110000) {
+					lastupdate = lastupdate - 19110000;
 				}
 				if (deleteDate > 0) {
 //					1申請 2終止 9暫停
@@ -154,7 +177,18 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OOButtenFlagA", result.get("F21"));
 				occursList.putParam("OORetFlag", wkRetFlag);
 				occursList.putParam("OOTitaTxCd", result.get("F22"));
-
+				occursList.putParam("OOProcessDate", processdate);
+				occursList.putParam("OOProcessTime", result.get("F24"));
+				
+				createempno = findCdEmp(createempno,titaVo);
+				lastupdateempno = findCdEmp(lastupdateempno,titaVo);
+				occursList.putParam("OOCreateEmpNo", createempno);
+				occursList.putParam("OOCreareDate", creatdate);
+				occursList.putParam("OOLastUpdateEmpNo", lastupdateempno);
+				occursList.putParam("OOLastUpdate", lastupdate);
+				occursList.putParam("OOStampCancelDate", stampCancelDate);
+				
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -184,5 +218,17 @@ public class L4043 extends TradeBuffer {
 		this.info("result ..." + result);
 
 		return result;
+	}
+	
+	private String findCdEmp(String iEmpno, TitaVo titaVo) throws LogicException{
+		String fullname="";
+		
+		CdEmp tCdEmp = sCdEmpService.findById(iEmpno, titaVo);
+		
+		if(tCdEmp!=null) {
+			fullname = tCdEmp.getFullname();
+		}
+		
+		return fullname;
 	}
 }

@@ -87,7 +87,7 @@ public class FtpClient extends CommBuffer {
 				this.error("FTPServer refused connection.");
 				this.closeConnection();
 			}
-			this.info("setConecttion() login success: " + ftp.login(username, password));
+			this.info("setConnection() login success: " + ftp.login(username, password));
 		} catch (Exception e) {
 			this.error("error while setConnection()!");
 			this.error(e.toString());

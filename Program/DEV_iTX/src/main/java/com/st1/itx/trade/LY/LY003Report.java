@@ -51,12 +51,12 @@ public class LY003Report extends MakeReport {
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
 		try {
-			// 暫時先產前3
+			int recordNo = 0;
+			
 			for (int f = 1; f <= 4; f++) {
 
 				lY003List = lY003ServiceImpl.findAll(titaVo, f, endOfYearMonth);
 			
-				int recordNo = 0;
 				if (lY003List.size() == 0) {
 
 					recordNo++;
@@ -127,7 +127,6 @@ public class LY003Report extends MakeReport {
 			lineAmt = tLDVo.get("LineAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LineAmt"));
 			loanAmt = tLDVo.get("LoanBalance").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LoanBalance"));
 
-			//
 			if (formNum == 4) {
 				int assetClass = tLDVo.get("AssetClass").isEmpty() ? 0 : Integer.valueOf(tLDVo.get("AssetClass"));
 				switch (assetClass) {

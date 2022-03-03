@@ -22,13 +22,18 @@ E(0,0)
 [#<->#,"#FdCustNo+戶號",#CustNo,"-",#FacmNo,#CustName],
 ["#FdPostDepCode+郵局存款別",#PostDepCode,#PostDepCodeX],[#Lable_AuthCode,#AuthCode,#AuthCodeX],
 ["#FdRepayAcct+扣款帳號",#RepayAcct],["#FdRepayAcctSeq+帳號碼",#RepayAcctSeq],
-["#FdAuthApplCode+申請代號",#AuthApplCode,#AuthApplCodeX],["#FdCustId+扣款人ＩＤ",#CustId],
-[#<->#,"#FdRelationCode+與借款人關係",#RelationCode,#RelationCodeX],
+["#FdAuthApplCode+申請代號",#AuthApplCode,#AuthApplCodeX],["#FdRelationCode+與借款人關係",#RelationCode,#RelationCodeX],
+[#<->#,"#FdCustId+扣款人ＩＤ",#CustId],
 [#<->#,"#FdRelAcctName+帳戶戶名",#RelAcctName],
 ["#FdRelationId+身份證字號",#RelationId],["#FdRelAcctBirthday+出生日期",#RelAcctBirthday],
 ["#FdRelAcctGender+性別",#RelAcctGender,#RelAcctGenderX],["#FdStampCodeX+核印註記",#StampCodeX],
+[#<->#,"#FdCalDy+處理日期時間",#CalDate," ",#CalTime],
 ["#FdAuthErrorCodeX+授權狀態",#AuthErrorCodeX],["#FdPostMediaCodeX+媒體碼",#PostMediaCodeX],
-["#FdAmlRspX+AML回應碼",#AmlRspX],["#FdStampFinishDateX+核印完成日期",#StampFinishDate],
+[#<->#,"#FdAuthType+授權方式",#AuthType,#AuthTypeX],
+[#<->#,"#FdAmlRspX+AML回應碼",#AmlRspX],
+["#FdStampFinishDateX+核印完成日期",#StampFinishDate],["#FdStampCancelDate+核印取消日期",#StampCancelDate],
+["#FdCreateEmpNoX+建立者",#CreateEmpNo],["#FdLastUpdateEmpNoX+修改者",#LastUpdateEmpNo],
+["#FdCreateDateX+建檔日",#CreateDate],["#FdLastUpdateX+異動日期",#LastUpdate],
 ]
 
 #FdFuncCodeX=X,2,L
@@ -53,6 +58,13 @@ T(3,*)
 #FdAuthErrorCodeX=X,2,L
 #FdAmlRspX=X,2,L
 #FdStampFinishDateX=X,2,L
+#FdStampCancelDate=X,2,L
+#FdCalDy=X,2,L
+#FdCreateEmpNoX=X,2,L
+#FdLastUpdateEmpNoX=X,2,L
+#FdCreateDateX=X,2,L
+#FdLastUpdateX=X,2,L
+#FdAuthType=X,2,L
 
 #RepayCode=A,2,S
 E(0,2)
@@ -106,6 +118,9 @@ T(3,Y:已產生媒體; :未產生媒體)
 T(3,CdCode.AmlCheckItem)
 #AmlRspHelp=x,1024,S
 
+#CALDATE=D,8,S
+T(4,CDATE$)
+
 ! PK =
 ! AuthCreateDate,AuthApplCode,CustNo,
 ! PostDepCode,RepayAcct,AuthCode
@@ -145,8 +160,53 @@ T(1,@AmlRsp,#NTXBUF,46,1)
 C(3,#FuncCode,1,$,T(1,@AuthCreateDate,#NTXBUF,47,7))
 T(1,@StampFinishDate,#NTXBUF,54,7)
 INVOKEJS(SHOW,p1,02,02,1)
+IF(#FuncCode==4 || #FuncCode==5,T(1,@CDT,#NTXBUF,61,7),T(1,@CDT,#CALDATE,2,7))
+T(1,@SysTime,#NTXBUF,68,6)
+T(1,@CreateEmpNo,#NTXBUF,74,30)
+T(1,@CreateDate,#NTXBUF,104,7)
+T(1,@LastUpdateEmpNo,#NTXBUF,111,30)
+T(1,@LastUpdate,#NTXBUF,141,7)
+T(1,@StampCancelDate,#NTXBUF,148,7)
 
 #PREVALUE=A,1,S
+
+
+
+
+#CDT=D,7,S
+
+
+#SysTime=X,6,S
+IF(#FuncCode==4 || #FuncCode==5,$,T(4,TIME$))
+
+!處理日期
+#CalDate=D,7,L
+E(0,#CDT)
+
+#HH=X,2,S
+T(1,#SysTime,1,2)
+#MM=X,2,S
+T(1,#SysTime,3,2)
+#SS=X,2,S
+T(1,#SysTime,5,2)
+
+!處理時間
+#CalTime=X,8,L
+C(3,#HH,0,C(4,#MM,s,$),$)
+T(2,#HH+:+#MM+:+#SS)
+
+#CreateEmpNo=X,30,L
+C(2,#FuncCode,S,S,$,$,$)
+
+#CreateDate=D,7,L
+C(2,#FuncCode,S,S,$,$,$)
+
+#LastUpdateEmpNo=X,30,L
+C(2,#FuncCode,S,S,$,$,$)
+
+#LastUpdate=D,7,L
+C(2,#FuncCode,S,S,$,$,$)
+
 
 #StampCodeX=X,10,L
 T(3,)T(H,#StampCode,#StampCodeHelp)
@@ -162,6 +222,11 @@ T(3,)T(H,#AmlRsp,#AmlRspHelp)
 #PostSuccessFg=A,1,S
 IF(#AuthErrorCode=="00",E(0,1),E(0,0))
 
+!授權方式
+#AuthType=X,1,L
+T(2,A)
+#AuthTypeX=X,8,L
+T(2,紙本新增)
 
 #SysDateRoc7=D,7,S
 E(0,#SYSDATE)
@@ -295,11 +360,16 @@ IF(#L4r21CheckCode==1,$,V(P,該戶號不存在於客戶檔))
 #RimL4r03A=X,1,S
 C(3,#FuncCode,4,s,C(3,#FuncCode,5,s,$))
 E(0,@RimCustNo,#CustNo)
+!RimType=1找尋客戶主檔，=2找郵局授權主檔
+E(0,@RimType,2)
 RESET_RIM(#RimL4r03A,L4R03)
-S(L4R03,1,#RimCustNo)
+S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
-! T(2,@CustId,#L4r03CustId)
 T(2,@CustIdTemp,#L4r03CustId)
+
+!找尋主檔OR客戶主檔記號
+#Type=9,1,S
+E(0,#L4r03Type)
 
 ! 額度
 #FacmNo=A,3,I
@@ -322,8 +392,10 @@ IF(#L4r21CheckCode==1,$,V(P,該額度不存在於額度檔))
 
 #RimL4r03B=X,1,S
 E(0,@RimCustNo,#CustNo)
+!RimType=1找尋客戶主檔，=2找郵局授權主檔
+E(0,@RimType,1)
 RESET_RIM(#RimL4r03B,L4R03)
-S(L4R03,1,#RimCustNo)
+S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
 T(2,@CustName,#L4r03CustName)
 
@@ -370,6 +442,7 @@ C(3,#FuncCode,1,$,s)
 #RimAuthApplCode=A,1,S
 #RimAuthCreateDate=D,7,S
 
+<include src="ROM.icf::L4R03Rim.dec"/>
 <include src="ROM.icf::L4R01.dec"/>
 <include src="ROM.icf::L4R03.dec"/>
 <include src="ROM.icf::L4R21.dec"/>
@@ -443,8 +516,10 @@ C(3,#RelationCode,0,HIDE(#RelAcctGender),SHOW(#RelAcctGender))
 
 #RimL4r03=X,1,S
 E(0,@RimCustNo,#CustNo)
+!RimType=1找尋客戶主檔，=2找郵局授權主檔
+E(0,@RimType,1)
 RESET_RIM(#RimL4r03,L4R03)
-S(L4R03,1,#RimCustNo)
+S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
 T(2,@RelAcctName,#L4r03CustName)
 T(2,@RelationId,#L4r03CustId)
@@ -493,6 +568,22 @@ C(3,#AcctCheckFlag,1,$,C(3,#AcctCheckFlag,2,$,s))
 IF(#AuthApplCodeTemp==#AuthApplCode,E(0,@checkFlag,0),E(0,@checkFlag,1))
 C(3,#checkFlag,1,T(F,@CustId,0)T(F,@RelationCode,0),C(3,#PostSuccessFg,1,$,T(F,@CustId,1)T(F,@RelationCode,1)))
 
+#RelationCode=A,2,I
+IF(#FuncCode==4 || #FuncCode==5,s,$)
+C(3,#PostSuccessFg,1,s,$)
+C(3,#checkFlag,1,s,$)
+HELP(#RelationCodeHelp)
+! C(3,#AcctCheckFlag,0,$,s)
+@
+
+V(H,#RelationCodeHelp)
+IF(#RelationCode==00,T(2,@CustId,#CustIdTemp),$)
+IF(#RelationCode==00,s,$)
+IF(#RelationCode==99,T(2,@RelAcctGender,),IF(#RelationCode==01||#RelationCode==03||#RelationCode==05||#RelationCode==07||#RelationCode==08||#RelationCode==11,T(2,@RelAcctGender,1),T(2,@RelAcctGender,2)))
+
+#RelationCodeX=X,4,L
+T(H,#RelationCode,#RelationCodeHelp)
+
 ! 扣款人ＩＤ
 #CustIdTemp=X,10,S
 #CustIdTemp2=X,10,S
@@ -503,30 +594,20 @@ C(3,#checkFlag,1,s,$)
 @
 V(7)
 A(ID_UNINO,0,#CustId)
+C(5,#RelationCode,#OldRelationCode,s,$)
+IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
+C(3,#RelationCode,0,$,s)
+C(3,#Type,1,IF(#CustId==#CustIdTemp,$,V(P,非本人ID)),IF(#CustId==#CustIdTemp,$,V(P,非授權檔ID))))
+
 ! IF(#CustId==#CustIdTemp,s,$)
 ! C(5,#CustId,#CustIdTemp,$,V(P,與主檔設定ID不合))
 ! C(5,#CustId,#L4r03CustId,E(0,@checkFlag,0),E(0,@checkFlag,1))
 ! C(3,#FuncCode,1,$,C(3,#checkFlag,0,V(P,至少修改一個項目),$))
-
 ! 非本人----
 ! 與借款人關係
 #OldRelationCode=A,2,S
 
-#RelationCode=A,2,I
-IF(#FuncCode==4 || #FuncCode==5,s,$)
-C(3,#PostSuccessFg,1,s,$)
-C(3,#checkFlag,1,s,$)
-HELP(#RelationCodeHelp)
-! C(3,#AcctCheckFlag,0,$,s)
-@
-C(5,#RelationCode,#OldRelationCode,$,C(3,#RelationCode,0,IF(#CustId==#CustIdTemp,$,V(P,非本人ID),$)))
-V(H,#RelationCodeHelp)
-IF(#RelationCode==00,IF(#CustId==#CustIdTemp || #CustId==#CustIdTemp2,s,V(P,非本人ID)),T(2,@RelationId,#CustId))
-IF(#RelationCode==00,s,$)
-IF(#RelationCode==99,T(2,@RelAcctGender,),IF(#RelationCode==01||#RelationCode==03||#RelationCode==05||#RelationCode==07||#RelationCode==08||#RelationCode==11,T(2,@RelAcctGender,1),T(2,@RelAcctGender,2)))
 
-#RelationCodeX=X,4,L
-T(H,#RelationCode,#RelationCodeHelp)
 
 
 #SetValue3=A,1,S
@@ -567,12 +648,12 @@ C(3,#RelationCode,0,s,$)
 @V(7)
 
 ! 身分證字號
-#RelationId=X,10,L
+#RelationId=X,10,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
-! C(3,#AcctCheckFlag,0,$,s)
+C(3,#AcctCheckFlag,0,$,s)
 ! 11/5 非本人時自動帶扣款人ID
-! C(3,#RelationCode,0,s,$)
-! @V(7)A(ID_UNINO,0,#RelationId)
+C(3,#RelationCode,0,s,$)
+@V(7)A(ID_UNINO,0,#RelationId)
 
 #CustIdLen=m,2,S
 P(1,#RelationId)
@@ -630,6 +711,7 @@ C(3,#RelationCode,0,C(4,#RelAcctGenderP,T(2,),T(H,#RelAcctGenderP,#SexHelp)),C(4
 
 #StampFinishDate=D,7,L
 
+#StampCancelDate=D,7,L
 
 
 </sub>
@@ -664,6 +746,7 @@ C(3,#RelationCode,0,C(4,#RelAcctGenderP,T(2,),T(H,#RelAcctGenderP,#SexHelp)),C(4
 #AuthErrorCode
 #END
 #RepayCode
+#SysTime
 </sub>
 
 !------ 下行電文TOM ------

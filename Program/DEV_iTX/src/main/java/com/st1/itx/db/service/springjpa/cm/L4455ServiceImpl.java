@@ -40,7 +40,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String RepayBank = titaVo.getParam("RepayBank");
+		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 		String BatchNo = titaVo.getParam("BatchNo");
 		int AcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 
@@ -191,11 +191,13 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        THEN LPAD(:inputBatchNo,2,'0')";
 		sql += "      ELSE SUBSTR(BKD.\"TitaTxtNo\",0,2)";
 		sql += "      END = SUBSTR(BKD.\"TitaTxtNo\",0,2)";
-		sql += "  AND CASE ";
-		sql += "        WHEN :inputRepayBank != '999' ";
-		sql += "        THEN :inputRepayBank";
-		sql += "      ELSE BKD.\"RepayBank\"";
-		sql += "      END = BKD.\"RepayBank\"";
+		
+		if (RepayBank != 998 && RepayBank != 999) {
+			sql += "       AND BKD.\"RepayBank\" = :inputRepayBank";
+		} else if (RepayBank == 998) {
+			sql += "       AND BKD.\"RepayBank\" <> 700";
+		}
+		
 		sql += "  AND BKD.\"AcDate\" = :inputAcDate";
 		sql += "  ORDER BY SUBSTR(BKD.\"TitaTxtNo\",0,2)";
 		sql += "       , BKD.\"EntryDate\"";
@@ -209,7 +211,9 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		query.setParameter("inputRepayBank", RepayBank);
+		if (RepayBank != 998 && RepayBank != 999) {
+			query.setParameter("inputRepayBank", RepayBank);
+		}
 		query.setParameter("inputBatchNo", BatchNo);
 		query.setParameter("inputAcDate", AcDate);
 		return this.convertToMap(query);
@@ -218,7 +222,8 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
 
 		int EntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
-
+		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
+		
 		String sql = "SELECT BKD.\"RepayBank\"   ";
 		sql += "     , BKD.\"AcctCode\"     ";
 		sql += "     , BKD.\"RepayAcctNo\"  ";
@@ -283,6 +288,11 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           WHERE TMP.\"Seq\" <= 1";
 		sql += "          ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\"";
 		sql += "  WHERE NVL(BKD.\"ReturnCode\",'00') != '00'";
+		if (RepayBank != 998 && RepayBank != 999) {
+			sql += "       AND BKD.\"RepayBank\" = :inputRepayBank";
+		} else if (RepayBank == 998) {
+			sql += "       AND BKD.\"RepayBank\" <> 700";
+		}
 		sql += "  AND BKD.\"EntryDate\" = :inputEntryDate";
 		sql += "  ORDER BY BKD.\"RepayBank\"    ";
 		sql += "       , BKD.\"AcctCode\"     ";
@@ -292,12 +302,16 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputEntryDate", EntryDate);
+		if (RepayBank != 998 && RepayBank != 999) {
+			query.setParameter("inputRepayBank", RepayBank);
+		}
 		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findSum(TitaVo titaVo) throws Exception {
 
 		int EntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
+		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 
 		String sql = "WITH FailedData AS (";
 		sql += "     SELECT COUNT(1) AS \"Counts\"";
@@ -305,6 +319,12 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     FROM \"BankDeductDtl\" BKD";
 		sql += "     WHERE NVL(BKD.\"ReturnCode\",'00') != '00'";
 		sql += "       AND BKD.\"EntryDate\" = :inputEntryDate";
+
+		if (RepayBank != 998 && RepayBank != 999) {
+			sql += "       AND BKD.\"RepayBank\" = :inputRepayBank";
+		} else if (RepayBank == 998) {
+			sql += "       AND BKD.\"RepayBank\" <> 700";
+		}
 		sql += "  )";
 		sql += "  , BKDCustNo AS (";
 		sql += "     SELECT COUNT(1) AS \"Counts\"";
@@ -313,6 +333,12 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          FROM \"BankDeductDtl\" BKD";
 		sql += "          WHERE BKD.\"EntryDate\" = :inputEntryDate";
 		sql += "          AND BKD.\"MediaCode\" = 'Y' ";
+		if (RepayBank != 998 && RepayBank != 999) {
+			sql += "       AND BKD.\"RepayBank\" = :inputRepayBank";
+		} else if (RepayBank == 998) {
+			sql += "       AND BKD.\"RepayBank\" <> 700";
+		}
+
 		sql += "          GROUP BY \"CustNo\"";
 		sql += "     )";
 		sql += "  )";
@@ -323,6 +349,11 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          FROM \"BankDeductDtl\" BKD";
 		sql += "          WHERE NVL(BKD.\"ReturnCode\",'00') != '00'";
 		sql += "          AND BKD.\"EntryDate\" = :inputEntryDate";
+		if (RepayBank != 998 && RepayBank != 999) {
+			sql += "       AND BKD.\"RepayBank\" = :inputRepayBank";
+		} else if (RepayBank == 998) {
+			sql += "       AND BKD.\"RepayBank\" <> 700";
+		}
 		sql += "          GROUP BY \"CustNo\"";
 		sql += "     )";
 		sql += "  )";
@@ -336,6 +367,9 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputEntryDate", EntryDate);
+		if (RepayBank != 998 && RepayBank != 999) {
+			query.setParameter("inputRepayBank", RepayBank);
+		}
 		return this.convertToMap(query);
 	}
 

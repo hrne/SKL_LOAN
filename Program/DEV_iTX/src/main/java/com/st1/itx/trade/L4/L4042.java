@@ -85,7 +85,8 @@ public class L4042 extends TradeBuffer {
 				int deleteDate = parse.stringToInteger(result.get("F17"));
 				String empno = result.get("F20");
 				String wkCreateFlag = result.get("F7");
-
+				int processdate = parse.stringToInteger(result.get("F21"));
+				
 				if (authCreateDate > 19110000) {
 					authCreateDate = authCreateDate - 19110000;
 					this.info("authCreateDate 2=="+authCreateDate);
@@ -102,6 +103,9 @@ public class L4042 extends TradeBuffer {
 				this.info("deleteDate = " + deleteDate);
 				if (deleteDate > 19110000) {
 					deleteDate = deleteDate - 19110000;
+				}
+				if (processdate > 19110000) {
+					processdate = processdate - 19110000;
 				}
 
 				if (deleteDate > 0) {
@@ -141,6 +145,8 @@ public class L4042 extends TradeBuffer {
 //				暫無用處
 				occursList.putParam("OOButtenFlagA", result.get("F18"));
 				occursList.putParam("OOTitaTxCd", result.get("F19"));
+				occursList.putParam("OOProcessDate", processdate);
+				occursList.putParam("OOProcessTime", result.get("F22"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

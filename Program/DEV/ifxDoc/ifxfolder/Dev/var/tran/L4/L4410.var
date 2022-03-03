@@ -26,6 +26,7 @@ E(0,0)
 [#<->#,"#FdRelAcctName+帳戶戶名",#RelAcctName],
 [#<->#,"#FdRelationId+身份證字號",#RelationId],
 ["#FdRelAcctBirthday+出生日期",#RelAcctBirthday],["#FdRelAcctGender+性別",#RelAcctGender,#RelAcctGenderX],
+[#<->#,"#FdCalDy+處理日期時間",#CalDate," ",#CalTime],
 ["#FdAuthStatusX+授權狀態",#AuthStatusX],["#FdMediaCodeX+媒體碼",#MediaCodeX],
 ["#FdAmlRspX+AML檢核",#AmlRspX],["#FdStampFinishDateX+核印完成日期",#StampFinishDate],
 
@@ -46,6 +47,7 @@ E(0,0)
 #FdRelationCode=X,2,L
 #FdRelAcctGender=X,2,L
 #FdMediaCodeX=X,2,L
+#FdCalDy=X,2,L
 
 #RepayCode=A,2,S
 E(0,2)
@@ -131,6 +133,9 @@ C(3,#FuncCode,1,$,T(1,@AuthCreateDate,#NTXBUF,47,7))
 T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
 T(H,@RepayBankX,#RepayBank,#BankCdHelp)
 INVOKEJS(SHOW,p1,02,02,1)
+T(1,@CDT,#NTXBUF,61,7)
+T(1,@SysTime,#NTXBUF,68,6)
+
 
 ! 作業項目
 #FuncCode=A,1,S
@@ -156,6 +161,32 @@ T(2,@FdRelationCode,#ShowFd)
 #PREVALUE=A,1,S
 ! IF(#FuncCode==4 || #FuncCode==5,s,$)
 ! INVOKEJS(SHOW,L4410,8,9,0)
+
+#CALDATE=D,8,S
+T(4,CDATE$)
+
+#CDT=D,7,S
+IF(#FuncCode==4 || #FuncCode==5,$,T(1,#CALDATE,2,7))
+
+
+#SysTime=X,6,S
+IF(#FuncCode==4 || #FuncCode==5,$,T(4,TIME$))
+
+#CalDate=D,7,L
+E(0,#CDT)
+
+#HH=X,2,S
+T(1,#SysTime,1,2)
+#MM=X,2,S
+T(1,#SysTime,3,2)
+#SS=X,2,S
+T(1,#SysTime,5,2)
+
+#CalTime=X,8,L
+C(3,#HH,0,C(4,#MM,s,$),$)
+T(2,#HH+:+#MM+:+#SS)
+
+
 #AuthStatusX=X,24,L
 !C(4,#AuthStatus,T(H,#AuthStatus,#AuthStatusHelp),$)
 !C(4,#AuthStatus,s,$)
@@ -285,8 +316,10 @@ V(P,該客戶額度不存在於額度檔)
 
 #RimL4r03B=X,1,S
 E(0,@RimCustNo,#CustNo)
+!RimType=1找尋客戶主檔，=2找郵局授權主檔
+E(0,@RimType,1)
 RESET_RIM(#RimL4r03B,L4R03)
-S(L4R03,1,#RimCustNo)
+S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
 T(2,@CustName,#L4r03CustName)
 
@@ -430,6 +463,7 @@ IF(#RelationCode==99,T(2,@RelAcctGender,),IF(#RelationCode==01||#RelationCode==0
 #RelationCodeX=X,4,L
 T(H,#RelationCode,#RelationCodeHelp)
 
+<include src="ROM.icf::L4R03Rim.dec"/>
 <include src="ROM.icf::L4R03.dec"/>
 <include src="ROM.icf::L4R21.dec"/>
 <include src="ROM.icf::L4R22.dec"/>
@@ -452,8 +486,10 @@ T(F,@RelAcctGender,1))
 #RimL4r03=X,1,S
 C(3,#RelationCode,0,$,s)
 E(0,@RimCustNo,#CustNo)
+!RimType=1找尋客戶主檔，=2找郵局授權主檔
+E(0,@RimType,1)
 RESET_RIM(#RimL4r03,L4R03)
-S(L4R03,1,#RimCustNo)
+S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
 T(2,@RelAcctName,#L4r03CustName)
 T(2,@RelationId,#L4r03CustId)
@@ -576,6 +612,7 @@ C(4,#RelAcctGender,T(2,),T(H,#RelAcctGender,#SexHelp))
 #AuthStatus
 #END
 #RepayCode
+#SysTime
 </sub>
 
 !------ 下行電文TOM ------
