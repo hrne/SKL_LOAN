@@ -432,6 +432,7 @@ BEGIN
              , "FacmNo"
              , "AcDate" AS "TxDate"
              , '2'      AS "TxCode" -- 2:函催登錄
+             , "LastUpdate"
         FROM "CollLetter"
         UNION
         SELECT "CaseCode"
@@ -439,6 +440,7 @@ BEGIN
              , "FacmNo"
              , "AcDate" AS "TxDate"
              , '3'      AS "TxCode" -- 3:電催登錄
+             , "LastUpdate"
         FROM "CollTel"
         UNION
         SELECT "CaseCode"
@@ -446,6 +448,7 @@ BEGIN
              , "FacmNo"
              , "AcDate" AS "TxDate"
              , '4'      AS "TxCode" -- 4:面催登錄
+             , "LastUpdate"
         FROM "CollMeet"
         UNION
         SELECT "CaseCode"
@@ -453,6 +456,7 @@ BEGIN
              , "FacmNo"
              , "AcDate" AS "TxDate"
              , '5'      AS "TxCode" -- 5:法務進度登錄
+             , "LastUpdate"
         FROM "CollLaw"
         UNION
         SELECT "CaseCode"
@@ -460,6 +464,7 @@ BEGIN
              , "FacmNo"
              , "AcDate" AS "TxDate"
              , '6'      AS "TxCode" -- 6:提醒登錄
+             , "LastUpdate"
         FROM "CollRemind"
       )
       , "lastTxData" AS (
@@ -474,6 +479,7 @@ BEGIN
                             , "CustNo"
                             , "FacmNo"
                  ORDER BY "TxDate" DESC
+                        , "LastUpdate" DESC
                ) AS "Seq"
         FROM "rawData"
       )

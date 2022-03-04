@@ -871,7 +871,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLog.setCustId(iCustId);
 		tPostAuthLog.setRepayAcctSeq(acctSeq);
 		tPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-		tPostAuthLog.setProcessTime(Integer.parseInt(titaVo.getParam("SysTime")));
+//		tPostAuthLog.setProcessTime(Integer.parseInt(titaVo.getParam("SysTime")));
 		tPostAuthLog.setAuthErrorCode(" ");
 		tPostAuthLog.setRelationCode(iRelationCode);
 		tPostAuthLog.setRelAcctName(iRelAcctName);
@@ -911,7 +911,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tAchAuthLog.setAchAuthLogId(tAchAuthLogId);
 		tAchAuthLog.setFacmNo(iFacmNo);
 		tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-		tAchAuthLog.setProcessTime(Integer.parseInt(titaVo.getParam("SysTime")));
+//		tAchAuthLog.setProcessTime(Integer.parseInt(titaVo.getParam("SysTime")));
 		tAchAuthLog.setLimitAmt(iLimitAmt);
 		tAchAuthLog.setAuthMeth("A");
 		tAchAuthLog.setAuthStatus(" ");
