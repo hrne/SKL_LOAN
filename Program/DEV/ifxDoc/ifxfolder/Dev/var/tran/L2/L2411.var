@@ -1851,7 +1851,7 @@ E(0,1)
 <sub type="DC" name="p4" layout="cols=3;screen.width=[180,265,180,405];printer.width=[20,40,20,40];order=1">
 [
 ["鑑價"],
-["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+鑑價總值",#EvaAmt],
+["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+鑑估總值",#EvaAmt],
 ["#FdEvaNetWorth+評估淨值",#EvaNetWorth],["#FdLVITax+土地增值稅",#LVITax],
 ["#FdRentEvaValue+出租評估淨值",#RentEvaValue],["#FdRentPrice+押租金",#RentPrice],
 [#<->#,"#FdEvaCompany+鑑價公司",#EvaCompany,#BTN1,#EvaCompanyX],

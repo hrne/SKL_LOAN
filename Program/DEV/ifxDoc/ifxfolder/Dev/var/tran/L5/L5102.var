@@ -30,49 +30,22 @@ E(0,0)
 #FdMeetingDate=X,2,L
 T(3,*)
 #FdIssue=X,2,L
+T(3,*)
 
 #FdCustCode=X,2,L
 T(3,*)
 #FdAmount=X,2,L
 #FdRemark=X,2,L
 
-<include src="ROM.icf::L5R49.dec"/>  
-#RimL5R49=X,1,S 
-#RimFunCd=X,1,S
-T(2,1)
-RESET_RIM(#RimL5R49,L5R49)
-S(L5R49,1,#RimFunCd)
-R(1,L5R49)
-T(2,@FileNo,#L5R49FileNo)
+!<include src="ROM.icf::L5R49.dec"/>  
+!#RimL5R49=X,1,S 
+!#RimFunCd=X,1,S
+!T(2,1)
+!RESET_RIM(#RimL5R49,L5R49)
+!S(L5R49,1,#RimFunCd)
+!R(1,L5R49)
+!T(2,@FileNo,#L5R49FileNo)
 
-#FileNo=A,8,S
-
-#TODAY1=A,7,S
-T(1,#SYSCDATE,2,7)
-
-#Space1=X,1,S
-T(2,@LC014Mrkey,#TODAY1+-+#FileNo)
-
-#LC014Mrkey=X,100,S
-#LC014MrkeyS=X,100,S
-
-#LC014Note=X,100,S
-T(B,授信審議委員會會議紀錄)
-
-#BufLC014=X,250,S
-T(2,L5102+0000000+000+000+#LC014Mrkey+#LC014Note)
-
-#BufLC014S=X,250,S
-T(2,L5102+0000000+000+000+#LC014MrkeyS+#LC014Note)
-
-
-#button2=x,100,S
-T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,上傳附件)
-
-#button3=x,100,S
-T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014S})ASGN(BTN_NEW2$)
-K(MODIFYBUTTON,2,上傳附件查詢)
 
 
 !---------- AP TEXT AREA Variables ----------
@@ -114,6 +87,7 @@ T(1,@MeetNo,#NTXBUF,24,6)
 T(1,@Issue,#NTXBUF,30,50)
 T(1,@Remark,#NTXBUF,80,500)
 
+
 INVOKEJS(SHOW,p1,02,02,1)
 
 #AmountX=X,20,O
@@ -142,7 +116,7 @@ C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
 
 !刪除隱藏重新交易按鈕
 #AGAIN=X,1,S
-C(3,#FunctionCode,1,S,$)
+!C(3,#FunctionCode,1,S,$)
 E(0,1)ASGN(AGAIN$)
 
 
@@ -199,9 +173,30 @@ A(DATE,0,#MeetingDate)
 ! 議題
 #Issue=X,50,I
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
+@
+V(7)
+
+#LC014Note=X,100,S
+T(2,授信審議委員會會議紀錄/+#MeetingDate+ +#Issue)
+
+#LC014Mrkey=X,100,S
+T(2,#MeetNo)
+
+#BufLC014=X,250,S
+T(2,L5102+0000000+000+000+#LC014Mrkey+#LC014Note)
+
+#button2=x,100,S
+C(3,#FunctionCode,5,$,S)
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,上傳附件)
+
+#button3=x,100,S
+C(3,#FunctionCode,5,$,S)
+T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,上傳附件查詢)
 
 ! 戶別
-#CustCode=A,1,I
+#CustCode=X,1,I
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
 HELP(#InnEntCodeHelp)
 @V(H,#InnEntCodeHelp)
@@ -227,6 +222,22 @@ C(2,#FunctionCode,s,$,$,s,s,s,s)
 
 !------------ TXFORM = L5102 -----------
 <sub type="FORM" name="L5102">
+
+
+#LC014Mrkey=_,_,S
+T(2,#MeetNo)
+
+#BufLC014=_,_,S
+T(2,L5102+0000000+000+000+#LC014Mrkey+#LC014Note)
+
+#button2=_,_,S
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,上傳附件)
+
+#button3=_,_,S
+T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,上傳附件查詢)
+
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -247,7 +258,7 @@ C(2,#FunctionCode,s,$,$,s,s,s,s)
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="ROM.icf::L5R49.tom"/>
 TXFORM=L5102
-
+#MeetNo
 ^
 </sub>
 

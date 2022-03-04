@@ -203,6 +203,7 @@ public class L3200 extends TradeBuffer {
 	private BigDecimal iTmpAmt = BigDecimal.ZERO; // 暫收抵繳金額
 	private String iExtraRepayFlag;
 	private String iUnpaidIntFlag;
+	private String iPayFeeFlag; // 是否回收費用
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private LoanBorMain tLoanBorMain;
@@ -332,6 +333,7 @@ public class L3200 extends TradeBuffer {
 		iExtraRepay = this.parse.stringToBigDecimal(titaVo.getParam("TimExtraRepay"));
 		iExtraRepayFlag = titaVo.getParam("IncludeIntFlag");
 		iUnpaidIntFlag = titaVo.getParam("UnpaidIntFlag");
+		iPayFeeFlag = titaVo.getParam("PayFeeFlag"); // 部分償還是否內含費用
 		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 			iCloseBreachAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimExtraCloseBreachAmt"));
 		} else {
@@ -890,14 +892,6 @@ public class L3200 extends TradeBuffer {
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan + ", 試算償還本利:" + iRepayLoan);
 
-		// 整批入帳電文有償還本利償則只計至還至應繳日時本利 > 0 (未全部償還時)>= 已償還本利
-		if (iRepayLoan.compareTo(BigDecimal.ZERO) > 0) {
-			if (iRepayLoan.compareTo(wkRepayLoan) <= 0) {
-				checkMsg += " 累計償還本利:" + wkRepayLoan + ", 超過試算償還本利:" + iRepayLoan;
-				this.info(checkMsg);
-				return;
-			}
-		}
 		// 部分償還餘額 > 0
 		if (wkRepaykindCode == 1) {
 			wkExtraRepayRemaind = iExtraRepay.subtract(wkRepayLoan);
@@ -1896,31 +1890,38 @@ public class L3200 extends TradeBuffer {
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
 		if (this.baTxList != null) {
 			// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
-			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(wkUnpaidAmtRemaind) > 0) {
-				BigDecimal wkShortIntRemaind = iShortAmt.subtract(wkUnpaidAmtRemaind);
+			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(BigDecimal.ZERO) > 0) {
 				for (BaTxVo ba : this.baTxList) {
 					if (ba.getDataKind() == 1 && ba.getInterest().compareTo(BigDecimal.ZERO) > 0) {
-						this.info("wkShortIntRemaind =" + wkShortIntRemaind);
 						if (ba.getInterest().compareTo(BigDecimal.ZERO) > 0) {
-							if (wkShortIntRemaind.compareTo(ba.getInterest()) > 0) {
+							if (wkUnpaidAmtRemaind.compareTo(ba.getInterest()) > 0) {
+								wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(ba.getInterest());
 								ba.setInterest(BigDecimal.ZERO);
 								ba.setAcctAmt(BigDecimal.ZERO);
-								wkShortIntRemaind = wkShortIntRemaind.subtract(ba.getInterest());
+								this.info(" 1 wkUnpaidAmtRemaind =" + wkUnpaidAmtRemaind + ", iShortAmt=" + iShortAmt);
 							} else {
-								ba.setInterest(ba.getInterest().subtract(wkShortIntRemaind));
-								ba.setAcctAmt(ba.getAcctAmt().subtract(wkShortIntRemaind));
-								wkShortIntRemaind = BigDecimal.ZERO;
+								ba.setInterest(ba.getInterest().subtract(wkUnpaidAmtRemaind));
+								ba.setAcctAmt(ba.getAcctAmt().subtract(wkUnpaidAmtRemaind));
+								wkUnpaidAmtRemaind = BigDecimal.ZERO;
+								this.info(" 2 wkUnpaidAmtRemaind =" + wkUnpaidAmtRemaind + ", iShortAmt=" + iShortAmt);
 							}
 						}
 					}
 				}
 			}
+			// 是否回收費用
+			if ("N".equals(iPayFeeFlag)) {
+				for (BaTxVo ba : this.baTxList) {
+					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4) {
+						ba.setAcctAmt(BigDecimal.ZERO);
+					}
+				}
+			}
+			// 出帳
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 1 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					acDetail = new AcDetail();
 					acDetail.setDbCr("C");
-					this.wkShortfallPrincipal = ba.getPrincipal();
-					this.wkShortfallInterest = ba.getInterest();
 					acDetail.setAcctCode(ba.getAcctCode());
 					acDetail.setTxAmt(ba.getAcctAmt());
 					acDetail.setCustNo(ba.getCustNo());

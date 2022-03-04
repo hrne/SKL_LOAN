@@ -341,6 +341,13 @@ public class L4101Batch extends TradeBuffer {
 		
 		SystemParas systemParas = systemParasService.findById("LN", titaVo);
 		String[] auth = systemParas.getFtpAuth().split(":");
+
+		if (auth.length != 2)
+		{
+			this.error("Tried to sendToFTP() but SystemParas.FtpAuth is not proper value!");
+			return;
+		}
+
 		String fileName = txFile.getFileOutput();
 		Path fullPath = Paths.get(outFolder, fileName);
 		

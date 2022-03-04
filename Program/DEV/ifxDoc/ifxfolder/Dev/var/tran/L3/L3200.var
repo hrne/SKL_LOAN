@@ -92,15 +92,15 @@ INVOKEJS(SHOW,p1,13,18,0)
 [#<->#,"#FdCustId+統一編號",#CustId,"@@@",#BTN2,#CustIdX],
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,"@",#BTN4],
-[#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX], 
+[#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo,"@",#BTN1],
 [#<->#,"#FdBormNo+撥款序號",#BormNo,"@",#BTN7],
-[#<->#,"#FdCurrencyCode+幣別",#CurrencyCode], 
+[#<->#,"#FdCurrencyCode+幣別",#CurrencyCode],
 [#<->#,"#FdRepayTerms+回收期數",#RepayTerms,"@@",#BTN5],
 [#<->#,"#FdRepayAmt+回收金額",#TwRepayAmt,#UsRepayAmt],
 [#<->#,"#FdOvduRepay+催收收回金額",#TwOvduRepay,#UsOvduRepay],
-[#<->#,"#FdCloseBreachAmt+清償違約金",#TwCloseBreachAmt,#UsCloseBreachAmt,#CloseBreachAmtX],                  
-[#<->#,"#FdExtraRepay+部分償還金額",#TwExtraRepay,#UsExtraRepay,"@@是否內含利息",#IncludeIntFlag,#IncludeIntFlagX,"@@利息是否可欠繳",#UnpaidIntFlag,#UnpaidIntFlagX],
+[#<->#,"#FdCloseBreachAmt+清償違約金",#TwCloseBreachAmt,#UsCloseBreachAmt,#CloseBreachAmtX],
+[#<->#,"#FdExtraRepay+部分償還金額",#TwExtraRepay,#UsExtraRepay,"@@是否內含利息",#IncludeIntFlag,#IncludeIntFlagX,"@@利息是否可欠繳",#UnpaidIntFlag,#UnpaidIntFlagX,"@@是否回收費用",#PayFeeFlag,#PayFeeFlagX],
 ["#FdPrincipal+本金",#TwPrincipal,#UsPrincipal],["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee],
 ["#FdInterest+利息",#TwInterest,#UsInterest],["#FdModifyFee+契變手續費",#TwModifyFee,#UsModifyFee],
 ["#FdDelayInt+延遲息",#TwDelayInt,#UsDelayInt],["#FdFireFee+火險費",#TwFireFee,#UsFireFee],
@@ -718,15 +718,15 @@ CALL2(#ADJUSTDOT,#Precision,#TimCloseBreachAmt,#CloseBreachAmtX)
 !催收戶回收時，部份償還本金不可輸入
 !清償違約金時，回收期數．部份償還本金，減免金額不可輸入
 #FdExtraRepay=X,2,L
-C(3,#L492aRepayType,2,T(F,@TwExtraRepay,0),T(F,@TwExtraRepay,1))
-C(3,#L492aRepayType,2,T(F,@UsExtraRepay,0),T(F,@UsExtraRepay,1))
+! C(3,#L492aRepayType,2,T(F,@TwExtraRepay,0),T(F,@TwExtraRepay,1))
+! C(3,#L492aRepayType,2,T(F,@UsExtraRepay,0),T(F,@UsExtraRepay,1))
 
 #TwExtraRepay=m,14,I
 C(3,#Precision,0,$,S)
 C(3,#CHAIN,1,s,$)
 C(3,#RepayType,12,S,$)
 C(3,#L492aRepayType,2,E(0,#L492aRepayAmt),$)
-C(3,#L492aRepayType,2,s,$)
+! C(3,#L492aRepayType,2,s,$)
 C(3,#RepayType,2,$,S)
 @V(2,0)
 
@@ -769,6 +769,18 @@ HELP(#YNHelp)
 #UnpaidIntFlagX=X,2,L
 T(3,)T(H,#UnpaidIntFlag,#YNHelp)
 
+!是否回收費用
+#PayFeeFlag=X,1,I
+T(3,Y)
+C(3,#RepayType,12,s,$)
+C(3,#TimExtraRepay,0,s,$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+#PayFeeFlagX=X,2,L
+T(3,)T(H,#PayFeeFlag,#YNHelp)
+
+
 #SendL3r06B=X,1,S
 C(3,#RepayType,2,$,S)
 C(3,#RepayType,12,S,$)
@@ -787,9 +799,10 @@ S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#Ri
 R(1,L3R06)
 C(3,#L3r06CloseBreachAmtUnpaid,0,T(3,@BreachCodeX,),T(3,@BreachCodeX,領清償證明時收取))
 
-
+!還款類別為[02.部分償還]且[是否內含費用]為[Y.是]時加費用
 #SumRepayAmt=m,14.2,S
-E(0,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall)
+IF(#RepayType==2&&#PayFeeFlag=="N",E(0,#L3r06RepayAmt+#L3r06Shortfall),E(0,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall))
+
 
 !回收金額
 #TwRepayAmt=m,14,I
@@ -1238,10 +1251,9 @@ T(3,[L3200] 回收登錄)
 </sub>
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-
 #TimCustNo#CustId#ApplNo#FacmNo#BormNo
 #RepayType#TimRepayAmt#TimOvduRepay#TimCloseBreachAmt
-#TimExtraRepay#IncludeIntFlag#UnpaidIntFlag
+#TimExtraRepay#IncludeIntFlag#UnpaidIntFlag#PayFeeFlag
 #RepayTerms#EntryDate
 #TimAcctFee#TimModifyFee#TimFireFee#TimLawFee
 #PayMethod#TimReduceAmt

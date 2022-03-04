@@ -72,16 +72,16 @@ public class PostAuthFileVo extends FileVo {
 //				13  StampCode    	核對註記		73-74	X(1)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
 //				14  OccNoteB    	保留欄		74-100	X(26)	空白	
 //				CustNo = ,AND PostDepCode = ,AND RepayAcct = ,AND AuthCode = 
-// 用戶編號=	扣款人ID(1)+郵局存款別(1)+戶號(7)+帳號碼(文字2位) 
+// 用戶編號=	帳號碼(文字2位)+扣款人ID(10)+郵局存款別(1)+戶號(7)
 				occursList.putParam("OccMediaDate", thisLine.substring(8, 16));
 				occursList.putParam("OccDataSeq", thisLine.substring(19, 25));
 				occursList.putParam("OccOrgCode", thisLine.substring(1, 4));
 //				AuthApplCode		申請代號1：申請2：終止
 				occursList.putParam("AuthApplCode", thisLine.substring(25, 26));
 //				 戶號(7)
-				occursList.putParam("CustNo", thisLine.substring(52, 59));
+				occursList.putParam("CustNo", thisLine.substring(54, 61));
 //				郵局存款別(1)
-				occursList.putParam("PostDepCode", thisLine.substring(26, 27));
+				occursList.putParam("PostDepCode", thisLine.substring(26, 27));			
 //				儲金帳號(14)
 				occursList.putParam("RepayAcct", thisLine.substring(27, 41));
 

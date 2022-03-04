@@ -55,8 +55,32 @@ BEGIN
                   AND LENGTHB(SUBSTR(TO_CHAR(TRIM(TO_SINGLE_BYTE(S0.Calling_Tel))),16)) <= 5
              THEN SUBSTR(TO_CHAR(TRIM(TO_SINGLE_BYTE(S0.Calling_Tel))),16)
            ELSE '' END                    AS "TelExt"            -- 連絡電話 VARCHAR2 5 0
-          ,SUBSTR(S0.Calling_Result,-1,1)
-                                          AS "ResultCode"          -- 通話結果 VARCHAR2 1 0
+          -- 舊的:
+          -- 1會繳 
+          -- 2繳款有困難
+          -- 3無人接聽
+          -- 4請接話人轉達
+          -- 5保證人代繳
+          -- 6其他
+          -- 7電話留言
+          -- 新的:
+          -- 1:會繳
+          -- 2:繳款有困難
+          -- 3:無人接聽
+          -- 4:請接話人轉達
+          -- 5:保證人代繳
+          -- 6:電話留言
+          -- 7:語音信箱
+          -- 9:其他
+          ,CASE NVL(SUBSTR(S0.Calling_Result,-1,1),'6')
+             WHEN '1' THEN '1'
+             WHEN '2' THEN '2'
+             WHEN '3' THEN '3'
+             WHEN '4' THEN '4'
+             WHEN '5' THEN '5'
+             WHEN '6' THEN '9'
+             WHEN '7' THEN '6'
+           ELSE '9' END                   AS "ResultCode"          -- 通話結果 VARCHAR2 1 0
           ,S0.Other_Record                AS "Remark"              -- 其他記錄 NVARCHAR2 500 0
           ,NVL(S0.Calling_Date,0)
                                           AS "CallDate"            -- 通話日期 DecimalD 8 0

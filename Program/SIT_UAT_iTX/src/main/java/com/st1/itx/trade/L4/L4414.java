@@ -115,7 +115,10 @@ public class L4414 extends TradeBuffer {
 		String[] filelist = filena.split(";");
 		for (String filename : filelist) {
 			this.info("fileName : " + filename);
-			if (filename.indexOf("AHP21P") >= 0) {
+			this.info("filename.substring(0, 1) =" + filename.substring(0, 1));
+			this.info("filename.substring(0, 1).indexOf(\"A\") >= 0 =" + filename.substring(0, 1).indexOf("A"));
+			this.info("filename.substring(0, 1).indexOf(\"P\") >= 0 =" + filename.substring(0, 1).indexOf("P"));
+			if (filename.substring(0, 1).indexOf("A") >= 0) {
 //					filePath1 = "D:\\temp\\TestingInPut\\AHP21P_授回.txt";
 				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 						+ File.separatorChar + filename;
@@ -138,27 +141,7 @@ public class L4414 extends TradeBuffer {
 
 				setAchAuthLog(achAuthFileVo, titaVo);
 
-			} else if (filename.indexOf("AHP22P") >= 0) {
-//					filePath2 = "D:\\temp\\TestingInPut\\AHP22P_授回.txt";
-				String filePath2 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
-
-				achCnt = achCnt + 1;
-
-				ArrayList<String> dataLineList = new ArrayList<>();
-
-				try {
-					dataLineList = fileCom.intputTxt(filePath2, "UTF-8");
-				} catch (IOException e) {
-					throw new LogicException("E0014", "L4414(" + filePath2 + ") : " + e.getMessage());
-				}
-
-				AchAuthFileVo achAuthFileVo = new AchAuthFileVo();
-				// 使用資料容器內定義的方法切資料
-				achAuthFileVo.setValueFromFile(dataLineList);
-
-				setAchAuthLog(achAuthFileVo, titaVo);
-			} else if (filename.indexOf("PO$P21P") >= 0) {
+			} else if (filename.substring(0, 1).indexOf("P") >= 0) {
 //					POST
 //					暫定路徑 待討論過後決定抓取路徑方法
 //					filePath1 = "D:\\temp\\TestingInPut\\PO$P21P_846授權回.txt";
@@ -174,27 +157,6 @@ public class L4414 extends TradeBuffer {
 					dataLineList = fileCom.intputTxt(filePath1, "UTF-8");
 				} catch (IOException e) {
 					throw new LogicException("E0014", "L4414(" + filePath1 + ") : " + e.getMessage());
-				}
-
-				PostAuthFileVo postAuthFileVo = new PostAuthFileVo();
-				// 使用資料容器內定義的方法切資料
-				postAuthFileVo.setValueFromFile(dataLineList);
-
-				setPostAuthLog(postAuthFileVo, titaVo);
-			} else if (filename.indexOf("PO$P22P") >= 0) {
-//					filePath2 = "D:\\temp\\TestingInPut\\PO$P22P_53N授權回.txt";
-				String filePath2 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
-
-				postCnt = postCnt + 1;
-
-				ArrayList<String> dataLineList = new ArrayList<>();
-
-				// 編碼參數，設定為UTF-8 || big5
-				try {
-					dataLineList = fileCom.intputTxt(filePath2, "UTF-8");
-				} catch (IOException e) {
-					throw new LogicException("E0014", "L4414(" + filePath2 + ") : " + e.getMessage());
 				}
 
 				PostAuthFileVo postAuthFileVo = new PostAuthFileVo();

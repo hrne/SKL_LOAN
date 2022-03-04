@@ -66,6 +66,7 @@ T(3,@FdBookAmt,*)
 ["#FdBookDate+約定部分償還日期",#BookDate],
 ["#FdIncludeIntFlag+是否內含利息",#IncludeIntFlag,#IncludeIntFlagX],
 ["#FdUnpaidIntFlag+利息是否可欠繳",#UnpaidIntFlag,#UnpaidIntFlagX],
+["#FdIncludeFeeFlag+是否內含費用",#IncludeFeeFlag,#IncludeFeeFlagX],
 ["#FdBookAmt+約定部分償還金額",#TwBookAmt,#UsBookAmt,#BookAmtX,#BTN5],
 ["#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
 ["#FdBookStatus+狀態",#BookStatusX],
@@ -157,12 +158,14 @@ S(L3R03,1,#RimTxCode,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimBookDate)
 R(1,L3R03)
 T(2,@IncludeIntFlag,#L3r03IncludeIntFlag)
 T(2,@UnpaidIntFlag,#L3r03UnpaidIntFlag)
+T(2,@IncludeFeeFlag,#L3r03IncludeFeeFlag)
 E(0,@TwBookAmt,#L3r03BookAmt)
 E(0,@UsBookAmt,#L3r03BookAmt)
 T(2,@PayMethod,#L3r03PayMethod)
 E(0,@BookStatus,#L3r03BookStatus)
 T(H,@IncludeIntFlagX,#IncludeIntFlag,#YNHelp)
 T(H,@UnpaidIntFlagX,#UnpaidIntFlag,#YNHelp)
+T(H,@IncludeFeeFlagX,#IncludeFeeFlag,#YNHelp)
 T(H,@PayMethodX,#PayMethod,#PayMethodHelp)
 T(H,@BookStatusX,#BookStatus,#BookStatusHelp)
 
@@ -202,6 +205,7 @@ T(F,@BormNo,1)
 T(F,@BookDate,1)
 T(F,@IncludeIntFlag,1)
 T(F,@UnpaidIntFlag,1)
+T(F,@IncludeFeeFlag,1)
 T(F,@TwBookAmt,1)
 T(F,@UsBookAmt,1)
 T(F,@PayMethod,1)
@@ -218,6 +222,7 @@ T(F,@BormNo,0)
 T(F,@BookDate,0)
 T(F,@IncludeIntFlag,0)
 T(F,@UnpaidIntFlag,0)
+T(F,@IncludeFeeFlag,0)
 T(F,@TwBookAmt,0)
 T(F,@UsBookAmt,0)
 T(F,@PayMethod,0)
@@ -453,6 +458,19 @@ HELP(#YNHelp)
 #UnpaidIntFlagX=X,2,L
 T(3,)T(H,#UnpaidIntFlag,#YNHelp)
 
+!是否內含費用
+#FdIncludeFeeFlag=X,2,L
+C(3,#UpdateCode,1,$,S)
+T(3,*)
+
+#IncludeFeeFlag=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(4,#IncludeFeeFlag,T(3,N),$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+#IncludeFeeFlagX=X,2,L
+T(3,)T(H,#IncludeFeeFlag,#YNHelp)
 
 ![約定部分償還金額]
 #FdBookAmt=X,2,L
@@ -513,7 +531,6 @@ HELP(#PayMethodHelp)
 #PayMethodX=X,20,L
 T(3,)T(H,#PayMethod,#PayMethodHelp)
 
-
 ![狀態]
 #FdBookStatus=X,2,L
 
@@ -529,18 +546,14 @@ T(H,#BookStatus,#BookStatusHelp)
 C(3,#UpdateCode,1,$,S)
 T(2,1+#SysDate+#CustNo+#FacmNo+#BormNo)ASGN(NTXBUF$)
 
-
-
 #TmpNTXCD=X,5,S
 C(3,#UpdateCode,1,$,S)
 T(3,L8204)
 IF(#UpdateCode == 1,ASGN(NTXCD$),$)
 
-
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 C(3,#BormNo,0,$,T(2,#CustNo+-+#FacmNo+-+#BormNo)))
-
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
@@ -572,11 +585,12 @@ T(3,[L3130] 約定部分償還登錄)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
-#FuncCode#CustNo#FacmNo#BormNo#CurrencyCode#BookDate#TimBookAmt#PayMethod
+#FuncCode#CustNo#FacmNo#BormNo#CurrencyCode#BookDate#IncludeFeeFlag#TimBookAmt#PayMethod
 #IncludeIntFlag
 #UnpaidIntFlag
 #OldBookDate
-
+#TwBookAmt
+#UsBookAmt
 </sub>
 
 

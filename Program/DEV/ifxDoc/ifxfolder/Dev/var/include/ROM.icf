@@ -3858,6 +3858,7 @@ TXFORM=L3R02
 <L3R03.dec>
 #L3r03IncludeIntFlag=X,1,S
 #L3r03UnpaidIntFlag=X,1,S
+#L3r03IncludeFeeFlag=X,1,S
 #L3r03BookAmt=m,14.2,S
 #L3r03PayMethod=X,1,S
 #L3r03BookStatus=A,1,S
@@ -3867,6 +3868,7 @@ TXFORM=L3R02
 TXFORM=L3R03
 #L3r03IncludeIntFlag
 #L3r03UnpaidIntFlag
+#L3r03IncludeFeeFlag
 #L3r03BookAmt
 #L3r03PayMethod
 #L3r03BookStatus

@@ -74,6 +74,7 @@ public class L3R03 extends TradeBuffer {
 			if (iTxCode.equals("L3130") && (iFuncCode == 1)) {
 				this.totaVo.putParam("L3r03IncludeIntFlag", "");
 				this.totaVo.putParam("L3r03UnpaidIntFlag", "");
+				this.totaVo.putParam("L3r03IncludeFeeFlag", "");
 				this.totaVo.putParam("L3r03BookAmt", 0);
 				this.totaVo.putParam("L3r03PayMethod", "");
 				this.totaVo.putParam("L3r03BookStatus", 0);
@@ -91,9 +92,10 @@ public class L3R03 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3056", ""); // 該筆約定部分償還金額已回收
 			}
 		}
-
+		
 		this.totaVo.putParam("L3r03IncludeIntFlag", tLoanBook.getIncludeIntFlag());
 		this.totaVo.putParam("L3r03UnpaidIntFlag", tLoanBook.getUnpaidIntFlag());
+		this.totaVo.putParam("L3r03IncludeFeeFlag", tLoanBook.getIncludeFeeFlag());
 		this.totaVo.putParam("L3r03BookAmt", tLoanBook.getBookAmt());
 		this.totaVo.putParam("L3r03PayMethod", tLoanBook.getPayMethod());
 		this.totaVo.putParam("L3r03BookStatus", tLoanBook.getStatus());

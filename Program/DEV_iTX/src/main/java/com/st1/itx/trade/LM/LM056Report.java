@@ -53,11 +53,11 @@ public class LM056Report extends MakeReport {
 		try {
 
 			// YYYMM工作表
-			findList = lM056ServiceImpl.findAll(titaVo, yearMon, "Y");
+			findList = lM056ServiceImpl.findAll(titaVo, yearMonth, "Y");
 			// 14-1工作表
-			findList2 = lM056ServiceImpl.findAll(titaVo, yearMon, "N");
+			findList2 = lM056ServiceImpl.findAll(titaVo, yearMonth, "N");
 			// 14-2工作表
-			findList3 = lM056ServiceImpl.findAll2(titaVo, yearMon);
+			findList3 = lM056ServiceImpl.findAll2(titaVo, yearMonth);
 
 		} catch (Exception e) {
 

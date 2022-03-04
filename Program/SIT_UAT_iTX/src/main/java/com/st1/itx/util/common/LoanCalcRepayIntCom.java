@@ -1430,7 +1430,10 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			// a = 利率的小數位數
 			// b = 天數/36500後的小數位數
 			// b = 9 - a
-			int b = getVariableDecimal(vCalcRepayIntVo.getStoreRate());
+//			int b = getVariableDecimal(vCalcRepayIntVo.getStoreRate());
+
+			// 最後決定固定9
+			int b = 9;
 
 			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過時，四捨五入
 			BigDecimal wkDaysDenominator = new BigDecimal(vCalcRepayIntVo.getDays()).divide(new BigDecimal(36500), b,
@@ -1456,7 +1459,10 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			// a = 利率的小數位數
 			// b = 天數/36500後的小數位數
 			// b = 9 - a
-			int b = getVariableDecimal(vCalcRepayIntVo.getStoreRate());
+//			int b = getVariableDecimal(vCalcRepayIntVo.getStoreRate());
+
+			// 最後決定固定9
+			int b = 9;
 
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
 					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
@@ -1514,6 +1520,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		return 9 - a;
 	}
+
 
 	// 計算違約金
 	// (1) 貸款戶繳納本息期款有一寬限期間(5個營業日)，超過寬限日仍未繳納者，應按契約收取違約金。

@@ -71,6 +71,7 @@ public class L3130 extends TradeBuffer {
 		String iPayMethod = titaVo.getParam("PayMethod");
 		String iIncludeIntFlag = titaVo.getParam("IncludeIntFlag");
 		String iUnpaidIntFlag = titaVo.getParam("UnpaidIntFlag");
+		String iIncludeFeeFlag = titaVo.getParam("IncludeFeeFlag");
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
@@ -113,6 +114,7 @@ public class L3130 extends TradeBuffer {
 			tLoanBook.setCurrencyCode(iCurrencyCode);
 			tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
 			tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
+			tLoanBook.setIncludeFeeFlag(iIncludeFeeFlag);
 			tLoanBook.setBookAmt(iBookAmt);
 			tLoanBook.setPayMethod(iPayMethod);
 			tLoanBook.setRepayAmt(new BigDecimal(0));
@@ -138,6 +140,7 @@ public class L3130 extends TradeBuffer {
 				}
 				tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
 				tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
+				tLoanBook.setIncludeFeeFlag(iIncludeFeeFlag);
 				tLoanBook.setBookAmt(iBookAmt);
 				tLoanBook.setPayMethod(iPayMethod);
 				try {
@@ -176,6 +179,7 @@ public class L3130 extends TradeBuffer {
 				tLoanBook.setCurrencyCode(iCurrencyCode);
 				tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
 				tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
+				tLoanBook.setIncludeFeeFlag(iIncludeFeeFlag);
 				tLoanBook.setBookAmt(iBookAmt);
 				tLoanBook.setPayMethod(iPayMethod);
 				tLoanBook.setRepayAmt(new BigDecimal(0));
@@ -198,6 +202,8 @@ public class L3130 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3056", "放款約定還本檔"); // 該筆資料已回收
 			}
 			try {
+				datalog.setEnv(titaVo, tLoanBook, tLoanBook);
+				datalog.exec("刪除約定部分償還");
 				loanBookService.delete(tLoanBook, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "放款約定還本檔 " + e.getErrorMsg()); // 刪除資料時，發生錯誤

@@ -67,6 +67,11 @@ public class LY003Report extends MakeReport {
 				exportExcel(lY003List, f);
 
 			}
+			
+			
+			lY003List = lY003ServiceImpl.findAll2(titaVo, endOfYearMonth);
+			reportExcel14_2(lY003List);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			StringWriter errors = new StringWriter();
@@ -203,5 +208,70 @@ public class LY003Report extends MakeReport {
 		// 缺業主權益 資金總額 上年度業主權益
 
 	}
+	
+	/**
+	 * 報表輸出 表14-2
+	 * @param listData
+	 * */
+	private void reportExcel14_2(List<Map<String, String>> listData) throws LogicException {
+
+		this.info("LY003report.reportExcel14_2");
+
+		makeExcel.setSheet("表14-2");
+
+		int row = 0;
+		int col = 0;
+		BigDecimal tempAmt = BigDecimal.ZERO;
+
+
+		for (Map<String, String> lY003Vo : listData) {
+
+			// 金額
+			tempAmt = "0".equals(lY003Vo.get("F1")) ? BigDecimal.ZERO : new BigDecimal(lY003Vo.get("F1"));
+
+			// H37 放款總計
+			// D40 甲類逾期放款金額
+			// D41 乙類逾期放款金額
+			// D44 逾期放款比率%
+			if ("B".equals(lY003Vo.get("F0"))) {
+
+				row = 70;
+				col = 4;
+
+			} else if ("C".equals(lY003Vo.get("F0"))) {
+
+				row = 71;
+				col = 4;
+
+			} else if ("COLLECTION".equals(lY003Vo.get("F0"))) {
+//				return;
+				row = 68;
+				col = 8;
+
+			} else if ("TOTAL".equals(lY003Vo.get("F0"))) {
+				return;
+//				row = 37;
+//				col = 8;
+
+			}
+
+			makeExcel.setValue(row, col, tempAmt, "#,##0", "R");
+
+		}
+		// 重整
+		// 甲類逾期放款比率%(含壽險保單質押放款)
+		makeExcel.formulaCaculate(72, 4);
+		// 乙類逾期放款比率%(含壽險保單質押放款)
+		makeExcel.formulaCaculate(73, 4);
+		// 逾期放款比率%(含壽險保單質押放款)
+		makeExcel.formulaCaculate(74, 4);
+		// 逾期放款比率%(不含壽險保單質押放款)
+		makeExcel.formulaCaculate(75, 4);
+		// 逾期放款比率%(不含壽險保單質押放款)
+		makeExcel.formulaCaculate(76, 4);
+		// 逾期放款比率%(不含壽險保單質押放款)
+		makeExcel.formulaCaculate(77, 4);
+	}
+
 
 }

@@ -2677,7 +2677,7 @@ TXFORM=L2R26
 #L2r27BdTypeCode=A,2,S
 #L2r27TotalFloor=m,3,S
 #L2r27FloorNo=X,7,S
-#L2r27FloorArea=m,5.2,S
+#L2r27FloorArea=m,16.2,S
 #L2r27EvaUnitPrice=m,14,S
 #L2r27RoofStructureCode=X,2,S
 #L2r27BdDate=D,7,S
@@ -2690,7 +2690,7 @@ TXFORM=L2R26
 #L2r27BdUsageCode=A,1,S
 #L2r27ParkingTypeCode=A,1,S
 #L2r27ParkingProperty=X,1,S
-#L2r27ParkingArea=m,9.2,S
+#L2r27ParkingArea=m,16.2,S
 #L2r27HouseTaxNo=X,12,S
 #L2r27HouseBuyDate=D,7,S
 #L2r27Reason=X,1,S
@@ -2826,7 +2826,7 @@ TXFORM=L2R27
 #L2r28LandNo2=X,4,S
 #L2r28LandLocation=x,150,S
 #L2r28LandCode=A,2,S
-#L2r28Area=m,5.2,S
+#L2r28Area=m,9.2,S
 #L2r28LandZoningCode=A,2,S
 #L2r28LandUsageType=A,2,S
 #L2r28PostedLandValue=m,14,S
@@ -3858,6 +3858,7 @@ TXFORM=L3R02
 <L3R03.dec>
 #L3r03IncludeIntFlag=X,1,S
 #L3r03UnpaidIntFlag=X,1,S
+#L3r03IncludeFeeFlag=X,1,S
 #L3r03BookAmt=m,14.2,S
 #L3r03PayMethod=X,1,S
 #L3r03BookStatus=A,1,S
@@ -3867,6 +3868,7 @@ TXFORM=L3R02
 TXFORM=L3R03
 #L3r03IncludeIntFlag
 #L3r03UnpaidIntFlag
+#L3r03IncludeFeeFlag
 #L3r03BookAmt
 #L3r03PayMethod
 #L3r03BookStatus

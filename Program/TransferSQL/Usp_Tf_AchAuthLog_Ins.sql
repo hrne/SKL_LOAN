@@ -115,9 +115,6 @@ BEGIN
              WHEN S1."ACHCDT" > 0 THEN TRUNC(S1."ACHCDT" / 1000000)
            ELSE 0 END                     AS "ProcessDate"         -- 處理日期 Decimald 8   
           ,CASE
-             WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)
-           ELSE 0 END                     AS "ProcessDate"         -- 處理時間 Decimal 6 
-          ,CASE
              WHEN S1."ATHFND" > 0 THEN S1."ATHFND"
            ELSE 0 END                     AS "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
           ,NVL(S1."ATHCOD",' ')           AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 

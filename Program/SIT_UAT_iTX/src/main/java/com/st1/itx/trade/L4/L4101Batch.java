@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L4;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,8 @@ import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.SystemParas;
+import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
@@ -29,8 +33,11 @@ import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.SystemParasService;
+import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.FtpClient;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BankRemitFileVo;
 import com.st1.itx.util.common.data.L4101Vo;
@@ -93,6 +100,12 @@ public class L4101Batch extends TradeBuffer {
 	CdBankService cdBankService;
 	@Autowired
 	CdEmpService cdEmpService;
+	@Autowired
+	TxFileService txFileService;
+	@Autowired
+	FtpClient ftpClient;
+	@Autowired
+	SystemParasService systemParasService;
 
 	/* 報表服務注入 */
 	@Autowired
@@ -118,8 +131,7 @@ public class L4101Batch extends TradeBuffer {
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
 		batchNo = this.getBatchNo(iItemCode, titaVo);
-
-		String wkbatchNo = titaVo.getBacthNo();
+		
 		this.info("L4101 Batch batchNo = " + batchNo);
 
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
@@ -311,8 +323,35 @@ public class L4101Batch extends TradeBuffer {
 		this.info("snoM : " + snoM);
 
 		makeFile.toFile(snoM);
+
+		sendToFTP(snoM, titaVo);
+
 		totaVo.put("PdfSnoM", "" + snoM);
 
+	}
+
+	private void sendToFTP(long fileNo, TitaVo titaVo) {
+		TxFile txFile = txFileService.findById(fileNo, titaVo);
+
+		if (txFile == null) {
+			this.error("Tried to sendToFTP() but fileNo is not found in TxFile!");
+			this.error("fileNo: " + fileNo);
+			return;
+		}
+		
+		SystemParas systemParas = systemParasService.findById("LN", titaVo);
+		String[] auth = systemParas.getFtpAuth().split(":");
+
+		if (auth.length != 2)
+		{
+			this.error("Tried to sendToFTP() but SystemParas.FtpAuth is not proper value!");
+			return;
+		}
+
+		String fileName = txFile.getFileOutput();
+		Path fullPath = Paths.get(outFolder, fileName);
+		
+		ftpClient.sendFile(systemParas.getFtpUrl(), auth[0], auth[1], fullPath.toString());
 	}
 
 	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {

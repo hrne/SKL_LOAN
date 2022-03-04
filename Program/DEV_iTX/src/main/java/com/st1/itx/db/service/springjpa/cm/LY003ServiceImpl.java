@@ -32,7 +32,14 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param formNum 表格次序
+	 * @param endOfYearMonth 西元年底年月
+	 * 
+	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum, int endOfYearMonth) throws Exception {
 
 		this.info("LY003.findAll " + formNum);
@@ -158,6 +165,83 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", endOfYearMonth);
 		return this.convertToMap(query);
 
+	}
+	
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll2(TitaVo titaVo,int yearMonth) throws Exception {
+
+		
+		this.info("lY003.findAll2");
+		this.info("yymm=" + yearMonth);
+		
+		String sql = " ";
+		sql += " SELECT \"KIND\"";
+		sql += "       ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
+		sql += " FROM(";
+		sql += "	SELECT ( CASE";
+		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C'";
+		sql += "       	       WHEN CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'C'";
+		sql += "       	     ELSE 'B' END ) AS \"KIND\"";
+		sql += "	      ,M.\"PrinBalance\" AS \"AMT\"";
+		sql += "	FROM \"MonthlyLoanBal\" ML";
+		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = ML.\"CustNo\"";
+		sql += "						   AND F.\"FacmNo\" = ML.\"FacmNo\"";
+		sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = ML.\"CustNo\"";
+		sql += "    LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" =  ML.\"CustNo\"";
+		sql += "                               AND L.\"FacmNo\" =  ML.\"FacmNo\"";
+		sql += "                               AND L.\"BormNo\" =  ML.\"BormNo\"";
+		sql += "    LEFT JOIN \"MonthlyFacBal\" M ON M.\"YearMonth\" = ML.\"YearMonth\"";
+		sql += "                                 AND M.\"CustNo\" = ML.\"CustNo\"";
+		sql += "                                 AND M.\"FacmNo\" = ML.\"FacmNo\"";
+		sql += "	LEFT JOIN(SELECT L.\"CustNo\"";
+		sql += "				    ,L.\"FacmNo\"";
+		sql += "					,L.\"LegalProg\"";
+		sql += "					,L.\"Amount\"";
+		sql += "					,L.\"Memo\"";
+		sql += "					,ROW_NUMBER() OVER (PARTITION BY L.\"CustNo\", L.\"FacmNo\" ORDER BY L.\"TitaTxtNo\" DESC) AS \"SEQ\"";
+		sql += "			  FROM \"CollLaw\" L";
+		sql += "		      WHERE TRUNC(L.\"AcDate\" / 100) <= :yymm ) CL";
+		sql += "	  ON CL.\"CustNo\" = M.\"CustNo\" AND CL.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += "	 								  AND CL.\"SEQ\" = 1";
+		sql += "	WHERE M.\"YearMonth\" = :yymm";
+		sql += "	  AND M.\"PrinBalance\" > 0";
+		sql += "	  AND M.\"AssetClass\" IS NOT NULL)";
+		sql += "    GROUP BY \"KIND\"";
+		sql += "	UNION";
+		sql += "	SELECT 'COLLECTION' AS \"KIND\"";
+		sql += "       	  ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
+		sql += "	FROM ( SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
+		sql += "	       FROM \"AcMain\"";
+		sql += "	       WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
+		sql += "	         AND \"MonthEndYm\" = :yymm )";
+		sql += "	GROUP BY 'COLLECTION'";
+		sql += "	UNION";
+		sql += "	SELECT 'TOTAL' AS \"KIND\"";
+		sql += "       	  ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
+		sql += "	FROM ( SELECT SUM(M.\"PrinBalance\") AS \"AMT\"";
+		sql += "	       FROM \"MonthlyFacBal\" M";
+		sql += "		   WHERE M.\"YearMonth\" = :yymm";
+		sql += "	  		 AND M.\"PrinBalance\" > 0";
+		sql += "	       UNION";
+		sql += "	       SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
+		sql += "	       FROM \"AcMain\"";
+		sql += "	       WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
+		sql += "	         AND \"MonthEndYm\" = :yymm )";
+		sql += "	GROUP BY 'TOTAL'";
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", yearMonth);
+
+		return this.convertToMap(query);
 	}
 
 

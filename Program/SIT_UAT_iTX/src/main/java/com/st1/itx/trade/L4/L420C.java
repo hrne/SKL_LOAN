@@ -76,6 +76,7 @@ public class L420C extends TradeBuffer {
 
 		if (btnIndex == 1) {
 			functionCode = 0; // 入帳
+			titaVo.putParam("FunctionCode", 0);
 		}
 
 		this.info("AcDate : " + acDate);
