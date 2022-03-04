@@ -498,7 +498,7 @@ C(3,#FuncCode,1,DISABLE(#BTN1),ENABLE(#BTN1))
 E(0,@FUNCIND,#FuncCode)
 
 #SetSysPar1=X,1,S
-IF(#FuncCode ==1 ,E(0,0)ASGN(AGAIN$),$)
+IF(#FuncCode ==1 ||#FuncCode ==3,E(0,0)ASGN(AGAIN$),$)
 
 #FuncCodeX=X,4,L
 E(0,@FUNCIND,#FuncCode)

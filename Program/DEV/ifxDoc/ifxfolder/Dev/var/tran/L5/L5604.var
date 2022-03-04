@@ -368,6 +368,9 @@ T(H,#Remark,#LawRemarkHelp)
 ! 其他記錄
 #Memo=x,10.50,I
 C(2,#FunctionCd,S,$,$,$,s,s)
+@C(3,#LegalProg,099,V(7),$)
+
+
 ! 維護人員
 #EditEmpNo=X,6,L
 C(2,#FunctionCd,S,$,$,$,s,s)

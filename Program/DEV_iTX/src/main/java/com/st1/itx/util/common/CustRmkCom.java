@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustRmk;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustRmkService;
 //import com.st1.itx.db.service.TxCtrlService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -43,6 +45,9 @@ public class CustRmkCom extends TradeBuffer {
 
 	@Autowired
 	public CustRmkService custRmkService;
+	
+	@Autowired
+	public CdEmpService cdEmpService;
 
 	@Autowired
 	public WebClient webClient;
@@ -62,7 +67,12 @@ public class CustRmkCom extends TradeBuffer {
 		if (lCustRmk != null && lCustRmk.size() > 0) {
 			String s = "{red-s}{b-s}顧客控管警訊：{b-e}{red-e}<br><br>";
 			for (CustRmk custRmk : lCustRmk) {
-				s += custRmk.getRmkDesc() + "<br>";
+				CdEmp cdEmp = cdEmpService.findById(custRmk.getLastUpdateEmpNo(), titaVo);
+				String emp = custRmk.getLastUpdateEmpNo();
+				if (cdEmp != null) {
+					emp += " " + cdEmp.getFullname();
+				}
+				s += custRmk.getRmkDesc() + " ("+ emp + " " + parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
 			}
 
 //			this.info("CustRmkCom.setHtmlContent = " + s);

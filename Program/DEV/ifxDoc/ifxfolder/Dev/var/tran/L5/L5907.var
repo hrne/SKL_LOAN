@@ -42,11 +42,10 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="L5907" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L5907]                                 指定覆審名單查詢"],
-[#<->#,"#FdCustNo+戶號",#CustNo,#FacmNo,"(額度為0查全部)"],
+[#<->#,"#FdCustNo+戶號",#CustNo,"-",#FacmNo],
 ]
 
 #FdCustNo=X,2,L
-T(3,*)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -58,9 +57,12 @@ T(1,@YyyMmTo,#NTXBUF,6,5)
 INVOKEJS(SHOW,p1,02,02,1)
 ! 戶號
 #CustNo=A,7,I
-@V(2,0)
+!@
+!V(2,0)
+
 ! 額度
 #FacmNo=A,3,I
+C(3,#CustNo,0,S,$)
 
 #RPTFG=A,1,S
 
@@ -100,6 +102,9 @@ T(2,#OOCustNo+-+#OOFacmNo)
 ! 覆審年月
 #OOReChkYearMonth=A,5,S
 
+#OOLastEmp=x,40,S
+#OOLastDate=x,20,S
+
 #OOBUF2=X,17,S
 T(2,2+#OOCustNo+#OOFacmNo)
 
@@ -125,6 +130,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L5107;text=刪除;ntxbuf=#OOBUF4})
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L5907
 #OOCustNo#OOFacmNo#OOCustName#OORemark#OOCycle#OOReChkYearMonth
+#OOLastEmp#OOLastDate
 ^
 </sub>
 
@@ -151,18 +157,27 @@ TXFORM=L5907
 
 !戶號
 #OOCustName=戶名
-{width:105,align:'center'}
-
-!備註
-#OORemark=備註
-{width:105}
-
-!指定覆審週期
-#OOCycle=指定覆審週期
-{width:100}
+{width:105,align:'Left'}
 
 !覆審年月
 #OOReChkYearMonth=覆審年月
 {width:80,align:'center'}
+
+!指定覆審週期
+#OOCycle=指定覆審週期
+{width:100,align:'center'}
+
+!備註
+#OORemark=備註
+{width:300,align:'Left'}
+
+!修改人員
+#OOLastEmp=修改人員
+{width:130,align:'Left'}
+
+!修改日期
+#OOLastDate=修改日期
+{width:130,align:'Left'}
+
 ^
 </sub>

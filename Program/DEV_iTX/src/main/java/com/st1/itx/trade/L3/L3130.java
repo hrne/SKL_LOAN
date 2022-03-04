@@ -84,14 +84,13 @@ public class L3130 extends TradeBuffer {
 			wkBormNoS = iBormNo;
 			wkBormNoE = iBormNo;
 		}
-		// 入帳日或會計日小於等於約定部分償還日期，未過期者僅能一筆
+		// 入帳日或會計日小於等於約定部分償還日期，同日僅能一筆
 		LoanBook lastLoanBook = loanBookService.facmNoLastBookDateFirst(iCustNo, iFacmNo, iFacmNo, wkBormNoS, wkBormNoE,
 				titaVo);
 
-		if (lastLoanBook != null && lastLoanBook.getBookDate() >= this.txBuffer.getTxCom().getTbsdy()) {
+		if (lastLoanBook != null && iBookDate <= lastLoanBook.getBookDate()) {
 			existence = true;
 		}
-
 
 		// 更新放款約定還本檔
 		LoanBookId tLoanBookId = new LoanBookId();
@@ -103,7 +102,7 @@ public class L3130 extends TradeBuffer {
 		switch (iFuncCode) {
 		case 1: // 新增
 			if (existence) {
-				throw new LogicException(titaVo, "E2067", "約定部分償還，未過期者僅能一筆"); // 約定部分償還，未過期者僅能一筆
+				throw new LogicException(titaVo, "E0015", "約定部分償還，同日僅能一筆"); // 檢查錯誤
 			}
 			tLoanBook.setCustNo(iCustNo);
 			tLoanBook.setFacmNo(iFacmNo);

@@ -36,7 +36,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 查詢資料
 	 * 
 	 * @param titaVo
-	 * @param formNum 表格次序
+	 * @param formNum        表格次序
 	 * @param endOfYearMonth 西元年底年月
 	 * 
 	 */
@@ -47,7 +47,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "	SELECT ";
 
-		if (formNum == 1 || formNum == 2 || formNum == 3) {
+		if (formNum == 2 || formNum == 3) {
 			sql += "		(CASE";
 			sql += "    		  WHEN MF2.\"EntCode\" = 1 AND R.\"RptId\" IS NOT NULL THEN 'A'";
 			sql += "    		  WHEN MF2.\"EntCode\" <> 1 AND R.\"RptId\" IS NOT NULL THEN 'B'";
@@ -57,6 +57,18 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,SUM(NVL(R.\"LineAmt\",0)) AS \"LineAmt\"";
 			sql += "		  ,SUM(NVL(MF2.\"LoanBalance\",0)) AS \"LoanBalance\"";
 
+		}
+		if (formNum == 1 ) {
+			sql += "	   (CASE";
+			sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) ";
+			sql += "    		   AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+			sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
+			sql += "    		  WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
+			sql += "    		  WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
+			sql += "    		  WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
+			sql += "   		    END) AS \"TYPE\"";
+			sql += "		  ,SUM(NVL(R.\"LineAmt\",0)) AS \"LineAmt\"";
+			sql += "		  ,SUM(NVL(MF2.\"LoanBalance\",0)) AS \"LoanBalance\"";
 		}
 		if (formNum == 4) {
 			sql += "		SUBSTR(MFB.\"AssetClass\",0,1) AS \"AssetClass\"";
@@ -87,7 +99,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		   		  	  GROUP BY \"CustNo\"";
 		sql += "		   		  	  		  ,\"FacmNo\" ) S";
 		sql += "		   ON S.\"CustNo\" =  T.\"CustNo\"";
-		if (formNum != 3 || formNum != 4) {
+		if (formNum == 1 || formNum == 2) {
 			sql += "		   WHERE T.\"LineAmt\" >= 100000000";
 		}
 		sql += "		  ) R";
@@ -134,8 +146,8 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               FROM \"RptRelationCompany\" ";
 		sql += "               WHERE \"LAW005\" = '1' ";
 		sql += "             ) R ON R.\"RptId\" = CM.\"CustId\" ";
-		
-		if (formNum == 1 || formNum == 2 || formNum == 3) {
+
+		if (formNum == 2 || formNum == 3) {
 			sql += "	GROUP BY (CASE";
 			sql += "    		    WHEN MF2.\"EntCode\" = 1 AND R.\"RptId\" IS NOT NULL THEN 'A'";
 			sql += "    		    WHEN MF2.\"EntCode\" <> 1 AND R.\"RptId\" IS NOT NULL THEN 'B'";
@@ -143,7 +155,17 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     		    WHEN MF2.\"EntCode\" <> 1 AND R.\"RptId\" IS NULL THEN 'D'";
 			sql += "   		      END)";
 		}
-		
+
+		if (formNum == 1) {
+			sql += "	GROUP BY (CASE";
+			sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) ";
+			sql += "    		     AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+			sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
+			sql += "    		    WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
+			sql += "    		    WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
+			sql += "    		    WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
+			sql += "   		      END)";
+		}
 		if (formNum == 4) {
 			sql += "	GROUP BY SUBSTR(MFB.\"AssetClass\",0,1)";
 			sql += "	   		,(CASE";
@@ -155,7 +177,6 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    		    WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
 			sql += "   		      END)";
 		}
-		
 
 		this.info("sql=" + sql);
 
@@ -166,7 +187,7 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 
 	}
-	
+
 	/**
 	 * 查詢資料
 	 * 
@@ -174,12 +195,11 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param yearMonth 西元年月
 	 * 
 	 */
-	public List<Map<String, String>> findAll2(TitaVo titaVo,int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth) throws Exception {
 
-		
 		this.info("lY003.findAll2");
 		this.info("yymm=" + yearMonth);
-		
+
 		String sql = " ";
 		sql += " SELECT \"KIND\"";
 		sql += "       ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
@@ -243,6 +263,5 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-
 
 }

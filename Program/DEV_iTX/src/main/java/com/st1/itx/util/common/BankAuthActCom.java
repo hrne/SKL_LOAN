@@ -173,7 +173,6 @@ public class BankAuthActCom extends TradeBuffer {
 		this.info("bankAuthActCom add ...");
 		setVarValue(titaVo);
 		showLog();
-
 		if ("A".equals(createFlag)) {
 			if (titaVo.isHcodeNormal()) {
 				addAuth(titaVo);
@@ -1210,6 +1209,7 @@ public class BankAuthActCom extends TradeBuffer {
 			iRelAcctName = titaVo.get("RelAcctName");
 			iRelAcctBirthday = titaVo.get("RelAcctBirthday");
 			iRelAcctGender = titaVo.get("RelAcctGender");
+			iCustId = titaVo.getParam("CustId");
 		}
 		if (iPostDepCode == null || "".equals(iPostDepCode)) {
 			iPostDepCode = " ";

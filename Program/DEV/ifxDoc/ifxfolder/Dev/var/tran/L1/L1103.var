@@ -1472,7 +1472,7 @@ IF(#OwnedhomeAft==#OwnedhomeBef,T(3,),T(3,X))
 
 #CurrcompidAft=X,8,I
 @
-C(5,CurrcompidBef,#CurrcompidAft,s,$)
+C(5,#CurrcompidBef,#CurrcompidAft,s,$)
 C(4,#CurrcompidAft,s,A(ID_UNINO,0,#CurrcompidAft))
 
 #CurrcompidInd=_,_,L

@@ -324,7 +324,7 @@ TXFORM=LC011
 {width:140,align:'center'}
 
 #TranItemX=交易代號
-{width:160,align:'center'}
+{width:160,align:'left'}
 
 #MrKey=戶號/編號
 {width:140,align:'left'}

@@ -115,6 +115,11 @@ HELP(#L6r03ResultCity,cols:5)
 @
 V(H,#L6r03ResultCity)
 
+#Cdate=D,8,S
+T(4,CDATE$)
+
+#CD=D,7,S
+T(1,#Cdate,2,7)
 
 ! 縣市代碼對應名稱
 #CityCodeX=X,10,L
@@ -130,7 +135,8 @@ T(H,#Material,#MaterialHelp)
 
 !建物材料
 #VersionDate=D,7,I
-@A(DATE,1,#VersionDate)
+E(0,#CD)
+@V(7)A(DATE,0,#VersionDate)
 
 <include src="ROM.icf::L4R28.dec"/>
 
