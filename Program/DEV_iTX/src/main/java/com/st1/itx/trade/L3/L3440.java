@@ -752,7 +752,7 @@ public class L3440 extends TradeBuffer {
 		}
 		// 支票繳款利息免印花稅
 		if (iRpCode == 4) {
-			tTempVo.putParam("StampFreeAmt", wkInterest);
+			tTempVo.putParam("StampFreeAmt", wkInterest.add(wkDelayInt).add(wkBreachAmt).add(wkCloseBreachAmt));
 		}
 		// 短繳金額收回
 		if (wkShortfallPrincipal.compareTo(BigDecimal.ZERO) > 0) {

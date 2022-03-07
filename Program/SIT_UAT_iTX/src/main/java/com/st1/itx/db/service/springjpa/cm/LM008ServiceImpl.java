@@ -38,8 +38,8 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String bcYearMonth = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
 
-		String sql = "SELECT \"AcctCode\"";
-		sql += "              ,COUNT(*) AS \"Cnts\"";
+		String sql = "SELECT NVL(\"AcctCode\", '   ') AS \"AcctCode\"";
+		sql += "            ,COUNT(*) AS \"Cnts\"";
 		sql += "        FROM ( SELECT A.\"AcctCode\"";
 		sql += "               FROM \"AcLoanInt\" A";
 		sql += "               LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = A.\"CustNo\"";
@@ -58,46 +58,63 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findDetail(String acctCode, TitaVo titaVo) throws Exception {
 		this.info("lM008.findDetail acctCode = " + acctCode);
 
-		String bcDate = String.valueOf(Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000);
 		String bcYearMonth = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
 
-		String sql = "SELECT \"AcctCode\" AS F0";
-		sql += "              , \"Aging\" AS F1";
-		sql += "              , \"CustNo\" AS F2";
-		sql += "              , \"FacmNo\" AS F3";
-		sql += "              , \"Fn_ParseEOL\"(\"CustName\", 0) AS F4";
-		sql += "              , SUM(\"LoanBal\") AS F5";
-		sql += "              , MAX(\"IntRate\") AS F6";
-		sql += "              , MIN(\"IntStartDate\") AS F7";
-		sql += "              , SUM(\"INT\") AS F8";
-		sql += "              , SUM(\"OINT\") AS F9";
-		sql += "        FROM ( SELECT A.\"AcctCode\"";
-		sql += "                    , A.\"Aging\"";
-		sql += "                    , A.\"CustNo\"";
-		sql += "                    , C.\"CustName\"";
-		sql += "                    , A.\"FacmNo\"";
-		sql += "                    , A.\"LoanBal\"";
-		sql += "                    , A.\"IntRate\"";
-		sql += "                    , DECODE(A.\"IntStartDate\", 0, 99999999, A.\"IntStartDate\") \"IntStartDate\" ";
-		sql += "                    , CASE WHEN A.\"PayIntDate\" <= :bcDate THEN A.\"Interest\"";
-		sql += "                      ELSE 0 END INT";
-		sql += "                    , CASE WHEN A.\"PayIntDate\" > :bcDate THEN A.\"Interest\"";
-		sql += "                      ELSE 0 END OINT";
-		sql += "               FROM \"AcLoanInt\" A";
-		sql += "               LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = A.\"CustNo\"";
-		sql += "               WHERE A.\"YearMonth\" = :bcYearMonth ";
-		sql += "                 AND A.\"AcctCode\" = :acctCode";
-		// sql += " AND A.\"IntStartDate\" <> 0";
-		sql += " ) S1";
-		sql += "        GROUP BY \"AcctCode\", \"Aging\", \"CustNo\", \"CustName\", \"FacmNo\"";
-		sql += "        ORDER BY F0, F1, F2, F3";
+		String sql = "";
+		sql += " SELECT \"AcctCode\"                   AS \"AcctCode\" ";
+		sql += "      , \"Aging\"                      AS \"Aging\" ";
+		sql += "      , \"CustNo\"                     AS \"CustNo\" ";
+		sql += "      , \"FacmNo\"                     AS \"FacmNo\" ";
+		sql += "      , \"Fn_ParseEOL\"(\"CustName\", 0) AS \"CustName\" ";
+		sql += "      , SUM(\"LoanBal\")               AS \"LoanBal\" ";
+		sql += "      , MAX(\"IntRate\")               AS \"IntRate\" ";
+		sql += "      , MIN(\"IntStartDate\")          AS \"IntStartDate\" ";
+		sql += "      , SUM(\"UnpaidInt\")             AS \"UnpaidInt\" ";
+		sql += "      , SUM(\"UnexpiredInt\")          AS \"UnexpiredInt\" ";
+		sql += " FROM (SELECT A.\"AcctCode\" ";
+		sql += "            , A.\"Aging\" ";
+		sql += "            , A.\"CustNo\" ";
+		sql += "            , C.\"CustName\" ";
+		sql += "            , A.\"FacmNo\" ";
+		sql += "            , A.\"LoanBal\" ";
+		sql += "            , A.\"IntRate\" ";
+		sql += "            , DECODE(A.\"IntStartDate\", 0, 99991231, A.\"IntStartDate\") \"IntStartDate\" ";
+		sql += "            , CASE WHEN A.\"PayIntDate\" <= ";
+		sql += "                        TO_CHAR(ADD_MONTHS(TO_DATE(:bcYearMonth || '01', 'YYYYMMDD') - 1, 1), 'YYYYMMDD') ";
+		sql += "                    AND SUBSTR(A.\"IntStartDate\", 1, 6) != :bcYearMonth ";
+		sql += "                       THEN A.\"Interest\" "; // 繳息日小於等於月底日曆日，且繳息起日非當月
+		sql += "                       ELSE 0 ";
+		sql += "              END                                                     \"UnpaidInt\" "; // 已到期
+		sql += "            , CASE WHEN A.\"PayIntDate\" > ";
+		sql += "                        TO_CHAR(ADD_MONTHS(TO_DATE(:bcYearMonth || '01', 'YYYYMMDD') - 1, 1), 'YYYYMMDD') ";
+		sql += "                       THEN A.\"Interest\" "; // 繳息日大於月底日曆日
+		sql += "                   WHEN SUBSTR(A.\"IntStartDate\", 1, 6) = :bcYearMonth ";
+		sql += "                       THEN A.\"Interest\" "; // 計息起日為同月時，視為未到期
+		sql += "                       ELSE 0 ";
+		sql += "              END                                                     \"UnexpiredInt\" "; // 未到期
+		sql += "       FROM \"AcLoanInt\" A ";
+		sql += "       LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\" ";
+		sql += "       WHERE A.\"YearMonth\" = :bcYearMonth ";
+		sql += "         AND A.\"AcctCode\" = :acctCode ";
+		sql += "      ) S1 ";
+		sql += " GROUP BY \"AcctCode\" ";
+		sql += "        , \"Aging\" ";
+		sql += "        , \"CustNo\" ";
+		sql += "        , \"CustName\" ";
+		sql += "        , \"FacmNo\" ";
+		sql += " ORDER BY \"AcctCode\" ";
+		sql += "        , \"Aging\" ";
+		sql += "        , \"CustNo\" ";
+		sql += "        , \"FacmNo\" ";
+
+		
+		
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("acctCode", acctCode);
-		query.setParameter("bcDate", bcDate);
 		query.setParameter("bcYearMonth", bcYearMonth);
 		return this.convertToMap(query);
 	}

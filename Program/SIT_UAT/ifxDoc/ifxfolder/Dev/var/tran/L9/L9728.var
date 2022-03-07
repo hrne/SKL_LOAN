@@ -66,8 +66,8 @@ E(0,9999999)
 E(0,790101)
 
 #FindDateEnd=D,7,I
-E(0,#SYSDATE)
-@V(5,#FindDateStart,#SYSDATE)
+E(0,#SYSCDATE)
+@V(5,#FindDateStart,#SYSCDATE)
 
 </sub>
 

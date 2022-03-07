@@ -918,7 +918,7 @@ public class L2411 extends TradeBuffer {
 			try {
 				sClBuildingOwnerService.insert(tClBuildingOwner, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E2009", "擔保品不動產土地檔" + e.getErrorMsg());
+				throw new LogicException("E2009", "擔保品建物所有權人檔" + e.getErrorMsg());
 			}
 			if (iApplNo > 0) {
 				ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();

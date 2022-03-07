@@ -36,23 +36,25 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		String sql = "";
 		sql += " WITH OutputData AS ( ";
-		sql += "                        SELECT * ";
-		sql += "                        FROM \"CustNotice\" ";
-		sql += "                        WHERE 'N' IN (\"PaperNotice\", \"MsgNotice\", \"EmailNotice\") ";
+		sql += "     SELECT * ";
+		sql += "     FROM \"CustNotice\" ";
+		sql += "     WHERE 'N' IN (\"PaperNotice\", \"MsgNotice\", \"EmailNotice\") ";
 		sql += "                    ) ";
-		sql += " SELECT UNIQUE CN.\"CustNo\"         AS \"CustNo\" ";
-		sql += "             , CM.\"CustName\"       AS \"CustName\" ";
-		sql += "             , CECreate.\"Fullname\" AS \"CreateName\" ";
-		sql += "             , CN.\"CreateDate\"     AS \"CreateDate\" ";
-		sql += "             , CEUpdate.\"Fullname\" AS \"UpdateName\" ";
-		sql += "             , CN.\"LastUpdate\"     AS \"UpdateDate\" ";
+		sql += " SELECT UNIQUE LPAD(CN.\"CustNo\", 7, '0')                   AS \"CustNo\" ";
+		sql += "             , CM.\"CustName\"                               AS \"CustName\" ";
+		sql += "             , CECreate.\"Fullname\"                         AS \"CreateName\" ";
+		sql += "             , TO_CHAR(CN.\"CreateDate\", 'YYYY') - 1911 || ";
+		sql += "               TO_CHAR(CN.\"CreateDate\", '/MM/DD hh:mm:ss') AS \"CreateDate\" ";
+		sql += "             , CEUpdate.\"Fullname\"                         AS \"UpdateName\" ";
+		sql += "             , TO_CHAR(CN.\"LastUpdate\", 'YYYY') - 1911 || ";
+		sql += "               TO_CHAR(CN.\"LastUpdate\", '/MM/DD hh:mm:ss') AS \"UpdateDate\" ";
 		sql += " FROM OutputData CN ";
 		sql += " LEFT JOIN ( ";
-		sql += "               SELECT \"CustNo\" ";
-		sql += "                    , \"FacmNo\" ";
-		sql += "                    , \"FormNo\" ";
-		sql += "                    , ROW_NUMBER( ) over (PARTITION BY \"CustNo\" ORDER BY \"FormNo\" ASC, \"LastUpdate\" DESC ) \"Seq\" ";
-		sql += "               FROM OutputData ";
+		sql += "     SELECT \"CustNo\" ";
+		sql += "          , \"FacmNo\" ";
+		sql += "          , \"FormNo\" ";
+		sql += "          , ROW_NUMBER() over (PARTITION BY \"CustNo\" ORDER BY \"FormNo\" ASC, \"LastUpdate\" DESC ) \"Seq\" ";
+		sql += "     FROM OutputData ";
 		sql += "           ) CNPRT ON CNPRT.\"CustNo\" = CN.\"CustNo\" AND CNPRT.\"FacmNo\" = CN.\"FacmNo\" AND CNPRT.\"FormNo\" = CN.\"FormNo\" ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = CN.\"CustNo\" ";
 		sql += " LEFT JOIN \"CdEmp\" CECreate ON CECreate.\"EmployeeNo\" = CN.\"CreateEmpNo\" ";
@@ -60,7 +62,8 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE CNPRT.\"Seq\" = 1 ";
 		sql += "   AND CNPRT.\"CustNo\" BETWEEN :custNoStart AND :custNoEnd ";
 		sql += "   AND TO_CHAR(CN.\"LastUpdate\", 'YYYYMMDD') BETWEEN :findDateStart AND :findDateEnd ";
-		sql += " ORDER BY CN.\"CustNo\" ASC ";
+		sql += " ORDER BY \"CustNo\" ASC ";
+
 
 		this.info("sql=" + sql);
 

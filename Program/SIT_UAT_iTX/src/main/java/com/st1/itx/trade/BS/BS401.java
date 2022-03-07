@@ -226,7 +226,7 @@ public class BS401 extends TradeBuffer {
 								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 					isUpdate = true;
-					cancelUpdate(tDetail, titaVo);
+					cancelUpdate(tDetail, tTempVo.getParam("StsCode"), titaVo);
 					break;
 
 				case 2: // 2.轉暫收
@@ -261,7 +261,7 @@ public class BS401 extends TradeBuffer {
 								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 					isUpdate = true;
-					cancelUpdate(tDetail, titaVo);
+					cancelUpdate(tDetail, tTempVo.getParam("StsCode"), titaVo);
 					break;
 				}
 
@@ -476,7 +476,7 @@ public class BS401 extends TradeBuffer {
 		apControl = null;
 	}
 
-	private void cancelUpdate(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+	private void cancelUpdate(BatxDetail tBatxDetail, String StsCode, TitaVo titaVo) throws LogicException {
 		switch (tBatxDetail.getRepayCode()) {
 		case 2:
 			if ("3".equals(tBatxDetail.getMediaKind())) {
@@ -489,7 +489,7 @@ public class BS401 extends TradeBuffer {
 			updateEmpDeduct(tBatxDetail, titaVo);
 			break;
 		case 4:
-			updateLoanCheque(tBatxDetail, titaVo);
+			updateLoanCheque(tBatxDetail, StsCode, titaVo);
 			break;
 		}
 	}
@@ -498,6 +498,9 @@ public class BS401 extends TradeBuffer {
 //		回寫媒體檔
 		EmpDeductMedia tEmpDeductMedia = empDeductMediaService.holdById(new EmpDeductMediaId(
 				tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
+		if (tEmpDeductMedia == null || !tEmpDeductMedia.getBatchNo().equals(tBatxDetail.getBatchNo())) {
+			return;
+		}
 		if ("D".equals(tBatxDetail.getProcStsCode())) {
 			tEmpDeductMedia.setTxAmt(BigDecimal.ZERO);
 			tEmpDeductMedia.setErrorCode("");
@@ -517,10 +520,17 @@ public class BS401 extends TradeBuffer {
 		}
 	}
 
-	private void updateLoanCheque(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+	private void updateLoanCheque(BatxDetail tBatxDetail, String StsCode, TitaVo titaVo) throws LogicException {
+		// 狀態為正常才會更新支票檔
+		if ("D".equals(tBatxDetail.getProcStsCode()) && !"0".equals(StsCode)) {
+			return;
+		}
 		int chequeAcct = parse.stringToInteger(tBatxDetail.getRvNo().substring(0, 9));
 		int chequeNo = parse.stringToInteger(tBatxDetail.getRvNo().substring(10, 17));
 		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(chequeAcct, chequeNo), titaVo);
+		if (tLoanCheque == null) {
+			return;
+		}
 		if ("D".equals(tBatxDetail.getProcStsCode())) {
 			tLoanCheque.setStatusCode("0");
 			tLoanCheque.setEntryDate(0);
@@ -537,9 +547,20 @@ public class BS401 extends TradeBuffer {
 	}
 
 	private void updateAchDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		// 正常回應碼為0XXXX
+		if (tBatxDetail.getProcCode().isEmpty() || !"0".equals(tBatxDetail.getProcCode().substring(0, 1))) {
+			return;
+		}
 		AchDeductMedia tAchDeductMedia = achDeductMediaService.holdById(new AchDeductMediaId(
 				tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
-		tAchDeductMedia.setReturnCode("");
+		if (tAchDeductMedia == null || !tAchDeductMedia.getBatchNo().equals(tBatxDetail.getBatchNo())) {
+			return;
+		}
+		if ("D".equals(tBatxDetail.getProcStsCode())) {
+			tAchDeductMedia.setReturnCode("");
+		} else {
+			tAchDeductMedia.setReturnCode(tBatxDetail.getProcCode().substring(3, 5));
+		}
 		try {
 			achDeductMediaService.update(tAchDeductMedia, titaVo);
 		} catch (DBException e) {
@@ -569,8 +590,15 @@ public class BS401 extends TradeBuffer {
 	}
 
 	private void updatePostDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		// 正常回應碼為0XXXX
+		if (tBatxDetail.getProcCode().isEmpty() || !"0".equals(tBatxDetail.getProcCode().substring(0, 1))) {
+			return;
+		}
 		PostDeductMedia tPostDeductMedia = postDeductMediaService.holdById(
 				new PostDeductMediaId(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaSeq()), titaVo);
+		if (tPostDeductMedia == null || !tPostDeductMedia.getBatchNo().equals(tBatxDetail.getBatchNo())) {
+			return;
+		}
 		if ("D".equals(tBatxDetail.getProcStsCode())) {
 			tPostDeductMedia.setProcNoteCode("");
 		} else {
