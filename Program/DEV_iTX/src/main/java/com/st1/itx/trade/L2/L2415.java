@@ -515,7 +515,10 @@ public class L2415 extends TradeBuffer {
 			this.info("OtherReason =" + titaVo.getParam("OtherReason1"));
 			this.info("CreateEmpNo =" + titaVo.getParam("CreateEmpNo1"));
 
-			tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason1"));
+			if(!this.isEloan) {  // eloan 沒有修改原因欄位
+				tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason1"));				
+			}
+			
 			tClBuildingReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
 			tClBuildingReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
 

@@ -265,9 +265,9 @@ public class L2416 extends TradeBuffer {
 				ClLand beforeClLand = (ClLand) dataLog.clone(tClLand);
 				setClLand(titaVo);
 				try {
-					tClLand = sClLandService.update2(tClLand);
+					sClLandService.delete(tClLand, titaVo);
 				} catch (DBException e) {
-					throw new LogicException("E0007", "擔保品不動產土地檔");
+					throw new LogicException("E0008", "擔保品不動產土地檔");
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClLand, tClLand);

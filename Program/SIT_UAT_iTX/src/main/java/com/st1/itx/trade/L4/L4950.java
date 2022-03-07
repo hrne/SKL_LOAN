@@ -144,7 +144,7 @@ public class L4950 extends TradeBuffer {
 			occursList.putParam("OOEmpName", tCustMain.getCustName().substring(0, nameLength));
 			occursList.putParam("OOEmpNo", tCustMain.getEmpNo());
 			occursList.putParam("OOEmpId", tCustMain.getCustId());
-			occursList.putParam("OOErrMsg", "非車貸，制度別0/2才可設定員工薪");
+			occursList.putParam("OOErrMsg", "非車貸，制度別0/2才可設定員工扣薪");
 			break;
 		default:
 			occursList.putParam("OOErrMsg", "");

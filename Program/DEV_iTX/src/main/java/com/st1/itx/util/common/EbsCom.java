@@ -63,14 +63,14 @@ public class EbsCom extends CommBuffer {
 		String result = post(slipMediaUrl, ebsAuth, requestJO.toString());
 
 		// 分析回傳資料
-		String returnStatus = analyzeResult(requestJO, result);
+		String returnStatus = analyzeResult(requestJO, result,titaVo);
 
 		if (returnStatus != null && returnStatus.equals("E")) {
 			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
 		}
 	}
 
-	private String analyzeResult(JSONObject requestJo, String result) throws LogicException {
+	private String analyzeResult(JSONObject requestJo, String result, TitaVo titaVo) throws LogicException {
 		JSONObject outputParameters = null;
 		String returnStatus = null;
 		String groupId = null;

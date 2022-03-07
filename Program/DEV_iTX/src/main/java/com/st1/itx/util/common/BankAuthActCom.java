@@ -152,6 +152,7 @@ public class BankAuthActCom extends TradeBuffer {
 	private String iRelationId = "";
 	private String iTitaTxCd = "";
 	private String txType = "";
+	private String iProcessTime = "";
 	private boolean isNewAct = false;
 	private boolean isNewLog = false;
 	private boolean isDelAct = false;
@@ -871,7 +872,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLog.setCustId(iCustId);
 		tPostAuthLog.setRepayAcctSeq(acctSeq);
 		tPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-		tPostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
+		tPostAuthLog.setProcessTime(Integer.parseInt(iProcessTime));
 		tPostAuthLog.setAuthErrorCode(" ");
 		tPostAuthLog.setRelationCode(iRelationCode);
 		tPostAuthLog.setRelAcctName(iRelAcctName);
@@ -911,7 +912,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tAchAuthLog.setAchAuthLogId(tAchAuthLogId);
 		tAchAuthLog.setFacmNo(iFacmNo);
 		tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-		tAchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
+		tAchAuthLog.setProcessTime(Integer.parseInt(iProcessTime));
 		tAchAuthLog.setLimitAmt(iLimitAmt);
 		tAchAuthLog.setAuthMeth("A");
 		tAchAuthLog.setAuthStatus(" ");
@@ -1200,6 +1201,7 @@ public class BankAuthActCom extends TradeBuffer {
 			iRelAcctName = titaVo.get("RelationName");
 			iRelAcctBirthday = titaVo.get("RelationBirthday");
 			iRelAcctGender = titaVo.get("RelationGender");
+			iProcessTime = "0";
 			iCustId = titaVo.getParam("CustId");
 
 		} else if ("L4".equals(titaVo.getTxcd().substring(0, 2))) {
@@ -1209,7 +1211,13 @@ public class BankAuthActCom extends TradeBuffer {
 			iRelAcctName = titaVo.get("RelAcctName");
 			iRelAcctBirthday = titaVo.get("RelAcctBirthday");
 			iRelAcctGender = titaVo.get("RelAcctGender");
-			iCustId = titaVo.getParam("CustId");
+			iProcessTime = titaVo.getParam("SysTime");
+			this.info("TXCD ==" + titaVo.getTxcd());
+			if(!"L4410".equals(titaVo.getTxcd())){
+				this.info("into 1");
+				iCustId = titaVo.getParam("CustId");
+			}
+			
 		}
 		if (iPostDepCode == null || "".equals(iPostDepCode)) {
 			iPostDepCode = " ";
