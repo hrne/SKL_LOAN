@@ -42,8 +42,9 @@ public class BatchTransaction extends SysLogger {
 	}
 
 	public void rollBackEnd() {
-		this.info("rollback...End");
-		transactionManager.rollback(status);
+		this.info("rollback...End [" + status.isCompleted() + "]");
+		if (!status.isCompleted())
+			transactionManager.rollback(status);
 //		this.init();
 //		this.status = transactionManager.getTransaction(def);
 	}
@@ -56,8 +57,9 @@ public class BatchTransaction extends SysLogger {
 	}
 
 	public void commitEnd() {
-		this.info("commit...End");
-		transactionManager.commit(status);
+		this.info("commit...End [" + status.isCompleted() + "]");
+		if (!status.isCompleted())
+			transactionManager.commit(status);
 //		this.status = transactionManager.getTransaction(def);
 	}
 }

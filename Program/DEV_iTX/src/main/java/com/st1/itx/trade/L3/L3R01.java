@@ -56,6 +56,7 @@ public class L3R01 extends TradeBuffer {
 		int iRimCustNo = this.parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		int iRimFacmNo = this.parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		int iFunCd = this.parse.stringToInteger(titaVo.getParam("RimFunCd"));
+		int iRimWkYetDate = this.parse.stringToInteger(titaVo.getParam("RimWkYetDate"));
 		String iRimNotYetCode = titaVo.getParam("RimNotYetCode");
 
 		int wkYetDays = 0;
@@ -73,6 +74,9 @@ public class L3R01 extends TradeBuffer {
 			wkYetDays = cdLoanNotYet.getYetDays();
 		}
 
+		dDateUtil.init();
+		dDateUtil.getbussDate(iRimWkYetDate, wkYetDays);
+		wkYetDate = dDateUtil.getCalenderDay() - 19110000;
 		// 查詢未齊件管理檔
 		LoanNotYet tLoanNotYet = loanNotYetService.findById(new LoanNotYetId(iRimCustNo, iRimFacmNo, iRimNotYetCode), titaVo);
 
@@ -85,20 +89,19 @@ public class L3R01 extends TradeBuffer {
 			if (tLoanNotYet == null) {
 				throw new LogicException(titaVo, "E0003", "戶號 = " + iRimCustNo + "額度編號 = " + iRimFacmNo + " 未齊件代號 = " + iRimNotYetCode); // 修改資料不存在
 			} else {
-				wkYetDate = tLoanNotYet.getYetDate();
 				wkCloseDate = tLoanNotYet.getCloseDate();
+				wkYetDate = tLoanNotYet.getYetDate();
 			}
+			
 		} else if (iFunCd >= 4) {
 			if (tLoanNotYet == null) {
 				throw new LogicException(titaVo, "E0001", "戶號 = " + iRimCustNo + "額度編號 = " + iRimFacmNo + " 未齊件代號 = " + iRimNotYetCode); // 查詢資料不存在
 			} else {
-
-				wkYetDate = tLoanNotYet.getYetDate();
 				wkCloseDate = tLoanNotYet.getCloseDate();
+				wkYetDate = tLoanNotYet.getYetDate();
 			}
 		}
 
-		this.totaVo.putParam("L3r01YetDays", wkYetDays);
 		this.totaVo.putParam("L3r01YetDate", wkYetDate);
 		this.totaVo.putParam("L3r01CloseDate", wkCloseDate);
 

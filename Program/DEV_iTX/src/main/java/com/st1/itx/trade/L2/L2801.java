@@ -199,9 +199,10 @@ public class L2801 extends TradeBuffer {
 			// 日期加工作日
 
 			dDateUtil.init();
-			dDateUtil.setDate_1(YetDate);
-			dDateUtil.setMons(0);
-			dDateUtil.setDays(wkYetDays);
+			dDateUtil.getbussDate(YetDate, wkYetDays);
+//			dDateUtil.setDate_1(YetDate);
+//			dDateUtil.setMons(0);
+//			dDateUtil.setDays(wkYetDays);
 
 			tLoanNotYet.setYetDate(dDateUtil.getCalenderDay());
 		} else {

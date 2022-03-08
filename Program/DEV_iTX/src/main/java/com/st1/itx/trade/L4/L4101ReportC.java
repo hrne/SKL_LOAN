@@ -90,6 +90,8 @@ public class L4101ReportC extends MakeReport {
 		// 退款名稱
 		if ("BCK".equals(batchNo)) {
 			reportItem = "抽退票傳票明細表";
+		} else if ("RT".equals(batchNo.substring(0, 2))) {
+			reportItem = "退款傳票明細表";
 		}
 		this.print(-2, 85, this.reportItem, "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
@@ -148,6 +150,8 @@ public class L4101ReportC extends MakeReport {
 		// 退款名稱
 		if ("BCK".equals(batchNo)) {
 			reportItem = "抽退票傳票明細表";
+		} else if ("RT".equals(batchNo.substring(0, 2))) {
+			reportItem = "退款傳票明細表";
 		}
 		String wkName = "";
 		String wkBankCode = "";

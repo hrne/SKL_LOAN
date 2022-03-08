@@ -95,7 +95,10 @@ public class L4101ReportB extends MakeReport {
 	public void printHeader() {
 
 		this.info("L4101ReportB.printHeader");
-
+		if (batchNo.length() > 2)
+			if ("RT".equals(batchNo.substring(0, 2))) {
+				reportItem = "整批退款單";
+			}
 		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 145, "機密等級：" + this.security);
@@ -152,6 +155,10 @@ public class L4101ReportB extends MakeReport {
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
 		reportCode = reportCode + "-" + batchNo + "-B";
+		if (batchNo.length() > 2)
+			if ("RT".equals(batchNo.substring(0, 2))) {
+				reportItem = "整批退款單";
+			}
 		// 批號查全部
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,

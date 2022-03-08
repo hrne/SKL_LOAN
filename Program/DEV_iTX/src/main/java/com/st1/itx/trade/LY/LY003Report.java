@@ -53,7 +53,7 @@ public class LY003Report extends MakeReport {
 		try {
 			int recordNo = 0;
 			
-			for (int f = 1; f <= 4; f++) {
+			for (int f = 1; f <= 3; f++) {
 
 				lY003List = lY003ServiceImpl.findAll(titaVo, f, endOfYearMonth);
 			
@@ -61,7 +61,7 @@ public class LY003Report extends MakeReport {
 
 					recordNo++;
 
-					isNotEmpty = recordNo == 4 ? false : true;
+					isNotEmpty = recordNo == 3 ? false : true;
 				}
 				
 				exportExcel(lY003List, f);
@@ -89,9 +89,7 @@ public class LY003Report extends MakeReport {
 
 		int row = 0;
 
-		// 最下方表格欄列用
-		int bCol = 0;
-		int bRow = 0;
+
 
 		// 估計總值為人工
 //		BigDecimal evaAmt = BigDecimal.ZERO;
@@ -114,16 +112,7 @@ public class LY003Report extends MakeReport {
 				row = "A".equals(tLDVo.get("TYPE")) ? 19
 						: "B".equals(tLDVo.get("TYPE")) ? 20 : "C".equals(tLDVo.get("TYPE")) ? 21 : 22;
 				break;
-			case 4:
-				row = "A".equals(tLDVo.get("TYPE")) ? 25
-						: "B".equals(tLDVo.get("TYPE")) ? 31
-								: "C".equals(tLDVo.get("TYPE")) ? 37 : "D".equals(tLDVo.get("TYPE")) ? 43 : 49;
 
-				// 最下方表格用
-				bCol = "A".equals(tLDVo.get("TYPE")) ? 3
-						: "B".equals(tLDVo.get("TYPE")) ? 4
-								: "C".equals(tLDVo.get("TYPE")) ? 5 : "D".equals(tLDVo.get("TYPE")) ? 6 : 7;
-				break;
 			default:
 				break;
 			}
@@ -132,37 +121,7 @@ public class LY003Report extends MakeReport {
 			lineAmt = tLDVo.get("LineAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LineAmt"));
 			loanAmt = tLDVo.get("LoanBalance").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LoanBalance"));
 
-			if (formNum == 4) {
-				int assetClass = tLDVo.get("AssetClass").isEmpty() ? 0 : Integer.valueOf(tLDVo.get("AssetClass"));
-				switch (assetClass) {
-				case 1:
-					row = row + 1;
-
-					bRow = 83;// 最下方表格用
-					break;
-				case 2:
-					row = row + 2;
-					bRow = 84;// 最下方表格用
-					break;
-				case 3:
-					row = row + 3;
-					bRow = 85;// 最下方表格用
-					break;
-				case 4:
-					row = row + 4;
-					bRow = 86;// 最下方表格用
-					break;
-				case 5:
-					row = row + 5;
-					bRow = 87;// 最下方表格用
-					break;
-				default:
-					break;
-				}
-				// 最下方表格
-				makeExcel.setValue(bRow, bCol, loanAmt, "#,##0");
-
-			}
+		
 //			makeExcel.setValue(row, 4, evaAmt, "#,##0");
 			makeExcel.setValue(row, 5, lineAmt, "#,##0");
 			makeExcel.setValue(row, 8, loanAmt, "#,##0");
@@ -195,12 +154,27 @@ public class LY003Report extends MakeReport {
 		}
 
 		// 重整公式 下方表格
+		
+		for (int y = 3; y <= 9; y++) {
+			makeExcel.formulaCalculate(y, 83);
+			makeExcel.formulaCalculate(y, 84);
+			makeExcel.formulaCalculate(y, 85);
+			makeExcel.formulaCalculate(y, 86);
+			makeExcel.formulaCalculate(y, 87);
+		}
+		
+		
 		for (int x = 3; x <= 10; x++) {
 			makeExcel.formulaCalculate(88, x);
 		}
 		for (int y = 83; y <= 88; y++) {
 			makeExcel.formulaCalculate(y, 10);
 		}
+
+			
+	
+		
+		
 
 		// 暫缺 列68 列69 的值 (從LM054 55找)
 		// 缺壽險貸款

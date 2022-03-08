@@ -43,6 +43,7 @@ E(0,0)
 ["[L9710]                                 寬限到期明細表"],
 ["#R1+@寬限到期起訖日",#ACCTDATE_ST,#ACCTDATE_ED],
 ["#R2+@戶號",#CustNo, " ( 0:全部 )"],
+["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -63,7 +64,10 @@ K(LIGHT,#R{i},TXTRED,0)
 T(3,@R1,*)
 T(3,@R2,*)
 
-
+#FdMsg=X,1,L
+#Msg=x,20.100,L
+K(LIGHT,#Msg,TXTRED,0)
+INVOKEJS(SHOW,p1,3,3,0)
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -117,7 +121,29 @@ A(DATE,0,#ACCTDATE_ED)
 
 ![戶號] 必須輸入,輸入0時查全部
 #CustNo=A,7,I
+!E(0,0)
+
+<include src="ROM.icf::L1R20.dec"/>
+
+#FacmNo=A,3,S
 E(0,0)
+
+#FormNo=x,10,S
+T(3,L9710)
+
+#RimFlag=A,1,S
+
+#L1R20Rim2=X,1,S
+C(3,#CustNo,0,S,$)
+RESET_RIM(#L1R20Rim2,L1R20)
+E(0,@RimFlag,0)
+S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
+R(1,L1R20)
+T(2,@Msg,#L1R20Msg)
+
+#ShowMsg=A,1,S
+C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
+INVOKEJS(SHOW,p1,3,3,#ShowMsg)
 
 </sub>
 
@@ -157,6 +183,7 @@ T(3,[L9710] 寬限到期明細表)
 <sub type="TOM">
 TXFORM=L9710^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R20.tom"/>
 </sub>
 
 <sub type="PART" name="L9710" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

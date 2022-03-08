@@ -32,6 +32,14 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * @param groupNum 表格次序
+	 * 
+	 */
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth, int groupNum) throws Exception {
 
@@ -176,6 +184,15 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * @param formNum 表格次序
+	 * 
+	 */
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth,int formNum) throws Exception {
 
@@ -247,7 +264,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"PrinBalance\" > 0";
-			sql += "	  AND M.\"AssetClass\" IS NULL";
+//			sql += "	  AND M.\"AssetClass\" IS NULL";
 			sql += "	GROUP BY ( CASE";
 			sql += "			     WHEN M.\"AcSubBookCode\" = '00A' THEN '1'";
 			sql += "			     WHEN M.\"AcSubBookCode\" = '201' THEN 'A'";
@@ -286,7 +303,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"PrinBalance\" > 0";
-			sql += "	  AND M.\"AssetClass\" IS NULL";
+//			sql += "	  AND M.\"AssetClass\" IS NULL";
 			sql += "	GROUP BY ( CASE";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";

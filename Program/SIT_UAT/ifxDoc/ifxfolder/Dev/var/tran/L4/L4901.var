@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,109)ASGN(INQLEN$)
+E(0,127)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -301,11 +301,20 @@ T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 #OOPayCodeXX=X,35,O
 T(2,#OOPayCode+-+#OOPayCodeX)
 
+#OORelNo=X,18,L
+
 #OOBUF_A=X,37,S
 T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OOCustNo+#OOFacmNo+#OOBormNo)
 
 #OOBTN_A=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L3912; ntxbuf=#OOBUF_A})
+
+!分錄
+#OOBUF3=X,32,S
+T(2,#OOAcDate+#OOAcDate+#OORelNo)
+
+#OOBTN3=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄;ntxbuf=#OOBUF3})
 
 </sub>
 
@@ -338,6 +347,7 @@ TXFORM=L4901
 #OOTxtNo
 #OOPayCode
 #OOPayCodeX
+#OORelNo
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -367,6 +377,8 @@ TXFORM=L4901
 {width:100,align:'center'}
 #OOBatchNo=整批批號
 {width:100}
+#OOCustNoX=戶號
+{width:120}
 #OODrawdownCodeX=撥款方式
 {width:95}
 #OOStatusCodeX=狀態
@@ -379,8 +391,6 @@ TXFORM=L4901
 {width:95}
 #RemitAcctNo=匯款帳號
 {width:120}
-#OOCustNoX=收款戶號
-{width:120}
 #OOCustName=收款戶名
 {width:95}
 #OORemaker=附言
@@ -389,6 +399,11 @@ TXFORM=L4901
 {width:60}
 #OORemitAmt=匯款金額
 {width:95}
+
+#OOBTN3=分錄
+{width:40,search:true,formatter:'cust:bind-button:分錄;L6901 分錄',align:'center',canExport:false,}
+
+
 ^
 #RPTFG=2,QUERY.GRID
 #any={detail:true, caption:'[L4901]撥款匯款記錄檔', rowNum:20, rowList:[20,40,60]}
@@ -400,6 +415,8 @@ TXFORM=L4901
 {width:90,align:'center'}
 #OOBatchNo=整批批號
 {width:90}
+#OOCustNoX=戶號
+{width:150}
 #OODrawdownCodeX=撥款方式
 {width:150}
 #OOStatusCodeX=狀態
@@ -412,8 +429,6 @@ TXFORM=L4901
 {width:95}
 #RemitAcctNo=匯款帳號
 {width:150}
-#OOCustNoX=收款戶號
-{width:150}
 #OOCustName=收款戶名
 {width:150}
 #OORemaker=附言
@@ -422,6 +437,10 @@ TXFORM=L4901
 {width:60}
 #OORemitAmt=匯款金額
 {width:95}
+
+#OOBTN3=分錄
+{width:40,search:true,formatter:'cust:bind-button:分錄;L6901 分錄',align:'center',canExport:false,}
+
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4901;cpi=15"/>
 #SearchFlag#CustNo#AcDate#BatchNo#DrawdownCode#StatusCode

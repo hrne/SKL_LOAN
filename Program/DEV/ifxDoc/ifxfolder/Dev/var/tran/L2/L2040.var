@@ -40,24 +40,40 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
 ["[L2040]                                 擔保品號碼新舊對照查詢"],
-["#FdFunCd+查詢功能",#FunCd,#FunCdX],
-["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
-["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
-["#FdClNo+擔保品編號",#ClNo],
+["#FdFunCd+#FdFunCdName",#FunCd,#FunCdX],
+["#FdClCode1+#FdClCode1Name",#ClCode1,#ClCode1X],
+["#FdClCode2+#FdClCode2Name",#ClCode2,#ClCode2X],
+["#FdClNo+#FdClNoName",#ClNo],
+["#FdClSeq+#FdClSeqName",#ClSeq],
 ]
 
-#FdFunCd=X,2,L
+#FdFunCd=X,1,L
 T(3,*)
-#FdClCode1=X,2,L
+#FdClCode1=X,1,L
 T(3,*)
-#FdClCode2=X,2,L
+#FdClCode2=X,1,L
 T(3,*)
-#FdClNo=X,2,L
+#FdClNo=X,1,L
 T(3,*)
+#FdClSeq=X,1,L
 
+#FdFunCdName=X,14,L
+T(3,查詢功能)
+
+#FdClCode1Name=X,14,L
+T(3,擔保品代號1)
+
+#FdClCode2Name=X,14,L
+T(3,擔保品代號2)
+
+#FdClNoName=X,14,L
+T(3,擔保品編號)
+
+#FdClSeqName=X,14,L
+T(3,原擔保品序號)
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 #BUF1=X,42,S
@@ -99,11 +115,15 @@ T(2,@ClCode22Help,#HelpDesc1)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+#INIT=X,1,S
+INVOKEJS(SHOW,p1_5,0)
+	
 #NTXBUF=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ClCode1,#NTXBUF,1,1)
 T(1,@ClCode2,#NTXBUF,2,2)
 T(1,@ClNo,#NTXBUF,4,7)
+
 
 !查詢功能
 #FunCd=A,1,I
@@ -114,6 +134,9 @@ HELP(#FunCdHelp)
 
 #FunCdX=X,20,L
 T(H,#FunCd,#FunCdHelp)
+C(3,#FunCd,1,T(3,@FdClCode1Name,原擔保品代號1)T(3,@FdClCode2Name,原擔保品代號2)T(3,@FdClNoName,原擔保品編號)INVOKEJS(SHOW,p1_5,1),
+T(3,@FdClCode1Name,新擔保品代號1)T(3,@FdClCode2Name,新擔保品代號2)T(3,@FdClNoName,新擔保品編號)INVOKEJS(SHOW,p1_5,0))
+
 
 !代號1
 #ClCode1=A,1,I
@@ -143,7 +166,13 @@ T(2,#ClCode1+#ClCode2)
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
+
+#ClSeq=A,2,I
+C(3,#CHAIN,1,s,$)
+C(3,#FunCd,1,$,S)
+
 #RPTFG=A,1,S
+C(3,#FunCd,1,E(0,0),E(0,1))
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -179,6 +208,8 @@ T(3,1)ASGN(LOOP$)
 #OOClCodeX=X,12,S
 T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
 
+#OOClSeq=A,2,S
+
 #OOCustNo=A,7,L
 
 #OOFacmNo=A,3,L
@@ -195,6 +226,7 @@ T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
 #ClCode1
 #ClCode2
 #ClNo
+#ClSeq
 #END
 </sub>
 
@@ -205,6 +237,7 @@ TXFORM=L2040
 #OOClCode1
 #OOClCode2
 #OOClNo
+#OOClSeq
 #OOCustNo
 #OOFacmNo
 #OOAddress
@@ -227,7 +260,10 @@ TXFORM=L2040
 #any={detail:true, header:'L2040.part', caption:'', width:1010, rowNum:20, rowList:[20,40,60]}
 
 
-#OOClCodeX=擔保品編號
+#OOClCodeX=新擔保品編號
+{width:100,align:'center'}
+
+#OOClSeq=原擔保品序號
 {width:100,align:'center'}
 
 #OOCustNo=戶號
@@ -240,4 +276,23 @@ TXFORM=L2040
 {width:400,align:'center'}
 
 ^
+
+#RPTFG=1,QUERY.GRID,L2040
+#any={detail:true, header:'L2040.part', caption:'', width:1010, rowNum:20, rowList:[20,40,60]}
+
+
+#OOClCodeX=原擔保品編號
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度
+{width:100,align:'center'}
+
+#OOAddress=地址
+{width:400,align:'center'}
+
+^
+
 </sub>

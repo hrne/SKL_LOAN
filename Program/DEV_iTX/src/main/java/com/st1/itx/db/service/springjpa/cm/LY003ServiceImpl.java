@@ -70,19 +70,19 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,SUM(NVL(R.\"LineAmt\",0)) AS \"LineAmt\"";
 			sql += "		  ,SUM(NVL(MF2.\"LoanBalance\",0)) AS \"LoanBalance\"";
 		}
-		if (formNum == 4) {
-			sql += "		SUBSTR(MFB.\"AssetClass\",0,1) AS \"AssetClass\"";
-			sql += "	   ,(CASE";
-			sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) ";
-			sql += "    		   AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
-			sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
-			sql += "    		  WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
-			sql += "    		  WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
-			sql += "    		  WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
-			sql += "   		    END) AS \"TYPE\"";
-			sql += "		  ,SUM(NVL(R.\"LineAmt\",0)) AS \"LineAmt\"";
-			sql += "		  ,SUM(NVL(MF2.\"LoanBalance\",0)) AS \"LoanBalance\"";
-		}
+//		if (formNum == 4) {
+//			sql += "		SUBSTR(MFB.\"AssetClass\",0,1) AS \"AssetClass\"";
+//			sql += "	   ,(CASE";
+//			sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) ";
+//			sql += "    		   AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+//			sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
+//			sql += "    		  WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
+//			sql += "    		  WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
+//			sql += "    		  WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
+//			sql += "   		    END) AS \"TYPE\"";
+//			sql += "		  ,SUM(NVL(R.\"LineAmt\",0)) AS \"LineAmt\"";
+//			sql += "		  ,SUM(NVL(MF2.\"LoanBalance\",0)) AS \"LoanBalance\"";
+//		}
 		sql += "	FROM ( SELECT S.\"CustNo\"";
 		sql += "				 ,S.\"FacmNo\"";
 		sql += "				 ,S.\"LineAmt\"";
@@ -166,17 +166,17 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    		    WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
 			sql += "   		      END)";
 		}
-		if (formNum == 4) {
-			sql += "	GROUP BY SUBSTR(MFB.\"AssetClass\",0,1)";
-			sql += "	   		,(CASE";
-			sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) ";
-			sql += "    		     AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
-			sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
-			sql += "    		    WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
-			sql += "    		    WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
-			sql += "    		    WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
-			sql += "   		      END)";
-		}
+//		if (formNum == 4) {
+//			sql += "	GROUP BY SUBSTR(MFB.\"AssetClass\",0,1)";
+//			sql += "	   		,(CASE";
+//			sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) ";
+//			sql += "    		     AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+//			sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
+//			sql += "    		    WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
+//			sql += "    		    WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
+//			sql += "    		    WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
+//			sql += "   		      END)";
+//		}
 
 		this.info("sql=" + sql);
 

@@ -80,7 +80,10 @@ public class L4101ReportA extends MakeReport {
 	public void printHeader() {
 
 		this.info("L4101ReportA.printHeader");
-
+		if (batchNo.length() > 2)
+			if ("RT".equals(batchNo.substring(0, 2))) {
+				reportItem = "退款傳票總表";
+			}
 		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 145, "機密等級：" + this.security);
@@ -137,6 +140,10 @@ public class L4101ReportA extends MakeReport {
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
+		if (batchNo.length() > 2)
+			if ("RT".equals(batchNo.substring(0, 2))) {
+				reportItem = "退款傳票總表";
+			}
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-" + batchNo + "-A";
 		// 分錄

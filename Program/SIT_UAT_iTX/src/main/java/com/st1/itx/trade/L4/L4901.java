@@ -210,7 +210,8 @@ public class L4901 extends TradeBuffer {
 		tTempVo = tTempVo.getVo(t.getModifyContent());
 		BankRemit t2 = new BankRemit();
 		t2 = (BankRemit) datalog.clone(t);
-		t.setStatusCode(0);
+	
+		t.setStatusCode(5);
 		lBankRemit.add(t);
 
 		if (tTempVo.get("DrawdownCode") != null) {
@@ -227,13 +228,13 @@ public class L4901 extends TradeBuffer {
 		if (tTempVo.get("RemitBranch") != null) {
 			t2.setRemitBranch(tTempVo.getParam("RemitBranch"));
 		}
-		if (tTempVo.getParam("CustName") != null) {
+		if (tTempVo.get("CustName") != null) {
 			t2.setCustName(tTempVo.getParam("CustName"));
 		}
-		if (tTempVo.getParam("RemitAcctNo") != null) {
+		if (tTempVo.get("RemitAcctNo") != null) {
 			t2.setRemitAcctNo(tTempVo.getParam("RemitAcctNo"));
 		}
-		if (tTempVo.getParam("Remark") != null) {
+		if (tTempVo.get("Remark") != null) {
 			t2.setRemark(tTempVo.getParam("Remark"));
 		}
 		lBankRemit.add(t2);
