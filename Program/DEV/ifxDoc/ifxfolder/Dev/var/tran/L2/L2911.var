@@ -816,6 +816,8 @@ C(4,#OOAddress,BIND(grid,cancel),$)
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOtradecode2; ntxbuf=#OBuf4})
 C(4,#OOAddress,BIND(grid,cancel),$)
 C(5,#OOtradecode,"L2915",BIND(grid,cancel),$)
+C(3,#ClCode,2,BIND(grid,cancel),$)
+
 
 #OBtn5=X,10,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L4060; ntxbuf=#OBuf5})
@@ -873,7 +875,7 @@ TXFORM=L2911
 #Cl1Type=類別
 {width:80,align:'center'}
 
-#OBtn3=查詢
+#OBtn3=修改
 {width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OBtn4=刪除
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}

@@ -1310,6 +1310,7 @@ T(1,#MaturityDate,006,002)
 C(3,#AmortizedCode,2,S,$)
 C(3,#FreqBase,2,$,S)
 C(3,#L2r05SpecificDd,0,E(0,#WKSPDD),E(0,#L2r05SpecificDd))
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 @V(5,1,31)
 !指定應繳日減撥款日日
 !計算是否滿一個月
@@ -1392,6 +1393,7 @@ C(3,#FreqBase,3,D(7,2,#SpecificDate,0,#WKWEEKINT),$)
 
 #FirstDueDate=D,7,I
 E(0,#NextIntDate)
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 @
 A(DATE,0,#FirstDueDate)
 IF(#FirstDueDate>#DrawdownDate,$,V(P,需大於撥款日期))
@@ -1505,14 +1507,14 @@ C(3,#PRECISION,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 ![最後一期餘額]上線鎖住
 #FdFinalBal=X,2,L
 
-#TwFinalBal=m,14,I
+#TwFinalBal=m,14,L
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 C(5,#L2r01CharCode,2,S,$)
 C(3,#PRECISION,0,$,s)
 C(3,#TwFinalBal,0,E(0,0),$)
 @V(5,0,#WKAMT1)
 
-#UsFinalBal=m,14.2,I
+#UsFinalBal=m,14.2,L
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 C(5,#L2r01CharCode,2,S,$)
 C(3,#PRECISION,0,s,$)
@@ -1731,7 +1733,6 @@ P(R,#WKRATE1)
 T(2,#WKRATE1+#WkPercent)
 P(L,#WKRATE2)
 ! T(2,@ApproveRateX,#WKRATE2)
-
 
 ![商品利率]
 !依核准額度自動顯示不必輸入 L2R01

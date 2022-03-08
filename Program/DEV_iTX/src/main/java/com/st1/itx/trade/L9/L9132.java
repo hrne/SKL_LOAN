@@ -27,6 +27,14 @@ public class L9132 extends TradeBuffer {
 	/* 報表服務注入 */
 	@Autowired
 	L9132Report l9132Report;
+	@Autowired
+	L9132ReportA l9132ReportA;
+	@Autowired
+	L9132ReportB l9132ReportB;
+	@Autowired
+	L9132ReportC l9132ReportC;
+	@Autowired
+	L9132ReportD l9132ReportD;
 
 	@Autowired
 	WebClient webClient;
@@ -61,7 +69,8 @@ public class L9132 extends TradeBuffer {
 
 		this.info("ntxbuf = " + ntxbuf);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9132傳票媒體明細表(總帳)已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+				"L9132傳票媒體明細表(總帳)已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -73,17 +82,31 @@ public class L9132 extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9132Report.setParentTranCode(parentTranCode);
+		l9132ReportA.setParentTranCode(parentTranCode);
+		l9132ReportB.setParentTranCode(parentTranCode);
+		l9132ReportC.setParentTranCode(parentTranCode);
+		l9132ReportD.setParentTranCode(parentTranCode);
 
-		// 撈資料組報表
+		// 製作報表-傳票媒體明細表
 		l9132Report.exec(titaVo);
+		l9132Report.close();
 
-		// 寫產檔記錄到TxReport
-		long rptNo = l9132Report.close();
+		// 製作報表-傳票媒體總表
+		l9132ReportA.exec(titaVo);
+		l9132ReportA.close();
 
-		// 產生PDF檔案
-		l9132Report.toPdf(rptNo);
+		// 製作報表-傳票媒體明細表-交易序號
+		l9132ReportB.exec(titaVo);
+		l9132ReportB.close();
+
+		// 製作報表-傳票媒體明細表-櫃員編號
+		l9132ReportC.exec(titaVo);
+		l9132ReportC.close();
+
+		// 製作報表-放款部日計表
+		l9132ReportD.exec(titaVo);
+		l9132ReportD.close();
 
 		this.info("L9132 doRpt finished.");
-
 	}
 }

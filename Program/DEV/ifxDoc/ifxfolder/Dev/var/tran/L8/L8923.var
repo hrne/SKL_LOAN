@@ -224,6 +224,15 @@ T(H,#OORepaySource,#ApHelp)
 !異動日期(TOTA)
 #OOUpdate=X,9,L
 
+!控制歷程按鈕
+#OOHaveLog=A,1,S
+!會計日期
+#OOTxDate=D,7,S
+!交易序號
+#OOTxSeq=X,18,S
+!明細序號
+#OOTxSno=A,2,S
+
 ! 修改的按鈕
 #OOBUF2=X,21,S
 T(2,2+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
@@ -246,11 +255,11 @@ T(2,4+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=刪除;ntxbuf=#OOBUF4})
 
 ! 歷程的按鈕
-#OOBUF5=X,32,S
-T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+000000000)
+#OOBUF5=X,27,S
+T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+#OORecordDate+00)
 
 #OOBTN5=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5})
+C(3,#OOHaveLog,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5}))
 
 </sub>
 
@@ -285,6 +294,10 @@ TXFORM=L8923
 #OODescription
 #OOEmpNo
 #OOUpdate
+#OOHaveLog
+#OOTxDate
+#OOTxSeq
+#OOTxSno
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

@@ -200,10 +200,11 @@ public class L2416 extends TradeBuffer {
 				InsertClLandReason(titaVo);
 
 				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
-						+ titaVo.getParam("ReasonX1"));
-
+				if (!this.isEloan) {
+					dataLog.setEnv(titaVo, beforeClLand, tClLand);
+					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
+							+ titaVo.getParam("ReasonX1"));
+				}
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
 
@@ -255,9 +256,11 @@ public class L2416 extends TradeBuffer {
 				InsertClLandReason(titaVo);
 
 				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, beforeClLand, tClLand);
-				dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
-						+ titaVo.getParam("ReasonX1"));
+				if (!this.isEloan) {
+					dataLog.setEnv(titaVo, beforeClLand, tClLand);
+					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
+							+ titaVo.getParam("ReasonX1"));
+				}
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
 
@@ -422,8 +425,10 @@ public class L2416 extends TradeBuffer {
 		tClLandReason.setClCode2(iClCode2);
 		tClLandReason.setClNo(iClNo);
 		tClLandReason.setLandSeq(iLandSeq);
-		tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
-		tClLandReason.setOtherReason(titaVo.getParam("OtherReason1"));
+		if (!this.isEloan) {
+			tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
+			tClLandReason.setOtherReason(titaVo.getParam("OtherReason1"));
+		}
 
 		tClLandReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
 		tClLandReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));

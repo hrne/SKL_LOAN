@@ -214,33 +214,11 @@ public class L2415 extends TradeBuffer {
 			insertClBuildingReason(titaVo);
 			
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
-			dataLog.exec("不動產建物修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
-						
-			// FunCD=4 刪除
-		} else if (iFunCd == 4) {
-
-			// 擔保品不動產建物檔主檔
-			setClBuilding(titaVo);
-			try {
-				tClBuilding = sClBuildingService.update2(tClBuilding, titaVo);
-
-			} catch (DBException e) {
-				throw new LogicException("E0007", "擔保品不動產建物檔" + e.getErrorMsg());
-			}
-
-			// delete 停車位形式
-			deleteClParkingType(titaVo);
-
-			// delete 公設建號
-			deleteClBuildingPublic(titaVo);
-
-			// delete ClBuildingParking 獨立產權車位
-
-			deleteClParking(titaVo);
-
-			// delete 擔保品不動產建物修改原因檔
-			deleteClBuildingReason(titaVo);
+			if(!this.isEloan) {
+			  dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
+			  dataLog.exec("不動產建物修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
+			}	
+			
 		}
 		//
 		this.totaVo.putParam("OResult", "Y");
@@ -510,13 +488,10 @@ public class L2415 extends TradeBuffer {
 			tClBuildingReason.setClCode1(iClCode1);
 			tClBuildingReason.setClCode2(iClCode2);
 			tClBuildingReason.setClNo(iClNo);
-
-			tClBuildingReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
-			this.info("OtherReason =" + titaVo.getParam("OtherReason1"));
-			this.info("CreateEmpNo =" + titaVo.getParam("CreateEmpNo1"));
-
+			
 			if(!this.isEloan) {  // eloan 沒有修改原因欄位
-				tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason1"));				
+			  tClBuildingReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
+			  tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason1"));				
 			}
 			
 			tClBuildingReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));

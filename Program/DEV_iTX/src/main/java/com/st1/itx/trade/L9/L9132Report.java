@@ -83,8 +83,13 @@ public class L9132Report extends MakeReport {
 		this.setBeginRow(5);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(35);
+		this.setMaxRows(39);
 
+	}
+
+	@Override
+	public void printContinueNext() {
+		this.print(1, 85, "=====　續　　下　　頁　=====", "C");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -110,7 +115,8 @@ public class L9132Report extends MakeReport {
 		this.batchNo = FormatUtil.pad9(titaVo.getParam("BatchNo"), 2);
 
 		// 查AcDetail
-		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(this.reportDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(this.reportDate, iBatchNo, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 		if (lAcDetail == null || lAcDetail.size() == 0) {
@@ -198,7 +204,8 @@ public class L9132Report extends MakeReport {
 
 				String acNoCode = tmpEntry.getKey();
 				String acNoItem = "";
-				Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCode(acNoCode, acNoCode, "     ", "     ", "  ", "  ", 0, Integer.MAX_VALUE, titaVo);
+				Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCode(acNoCode, acNoCode, "     ", "     ", "  ",
+						"  ", 0, Integer.MAX_VALUE, titaVo);
 				List<CdAcCode> lCdAcCode = slCdAcCode == null ? null : slCdAcCode.getContent();
 				if (lCdAcCode == null || lCdAcCode.size() == 0) {
 					acNoItem = "";
@@ -225,7 +232,8 @@ public class L9132Report extends MakeReport {
 				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 				print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 
-				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet().iterator(); detailIt.hasNext();) {
+				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet()
+						.iterator(); detailIt.hasNext();) {
 					Entry<AcSubCodeVo, L9132RptDataVo> tmpDetailEntry = detailIt.next();
 
 					AcSubCodeVo tmpAcSubCodeVo = tmpDetailEntry.getKey();
@@ -254,8 +262,10 @@ public class L9132Report extends MakeReport {
 							print(1, 1, "會計科目：");
 							print(0, 13, acNoCode);
 							print(0, 26, acNoItem);
-							print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
-							print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+							print(1, 1,
+									"子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+							print(1, 1,
+									"－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 						}
 
 						print(1, 1, "　　");

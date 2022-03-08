@@ -285,7 +285,7 @@ E(0,1)ASGN(AGAIN$)
 
 !參考編號
 #MRKEY=_,_,S
-T(2,#CustNo+-+#FacmNo+-+#BormNo)
+T(2,#RecordDate+#CustNo+#FacmNo+#BormNo)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L8R51.dec"/>

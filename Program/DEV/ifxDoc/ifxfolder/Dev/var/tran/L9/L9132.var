@@ -43,7 +43,6 @@ E(0,0)
 ["[L9132]                                 傳票媒體明細表"],
 ["#R1+@會計日期",#AcDate],
 ["#R2+@傳票批號",#BatchNo],
-["#R3+@媒體類別",#MediaType,#MediaTypeX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -66,22 +65,8 @@ T(3,@R1,*)
 T(3,@R2,*)
 T(3,@R3,*)
 
-
-
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
-#CDCODEMediaType=x,20,S                  
-T(3,CdCode.MediaType)                  
-                                         
-#MediaTypeHelpRim=X,1,S                 
-RESET_RIM(#MediaTypeHelpRim,XXR99)      
-S(XXR99,01,#CDCODEMediaType)             
-R(1,XXR99)                               
-CALL(#HelpProc)                          
-T(2,@MediaTypeHelp,#HelpDesc1)          
-                                         
-#MediaTypeHelp=x,50,S        
-
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
@@ -101,23 +86,12 @@ T(2,#DT2)
 V(5,0,#DT2)
 A(DATE,0,#AcDate)
 
-
 !傳票批號
 #BatchNo=A,2,I
 @V(2,0)
 
-
-!媒體類別
-#MediaType=A,1,I
-HELP(#MediaTypeHelp)
-@V(H,#MediaTypeHelp)
-
-#MediaTypeX=X,20,L
-T(H,#MediaType,#MediaTypeHelp)      
-
 #RPTFG=A,1,S
 E(0,0)
-
 
 </sub>
 
@@ -148,7 +122,6 @@ T(3,[L9132] 傳票媒體明細表（核心）)
 <sub type="TIM">
 #AcDate
 #BatchNo
-#MediaType
 </sub>
 
 

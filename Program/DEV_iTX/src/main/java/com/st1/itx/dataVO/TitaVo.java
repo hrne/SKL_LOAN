@@ -1380,6 +1380,16 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public int getSelectIndex() {
 		return Objects.isNull(this.get("selectIndex")) ? 0 : Integer.parseInt(this.get("selectIndex"));
 	}
+	
+	/**
+	 * when trade is not gridBatch or value is null or previous gridBatch not
+	 * Success return 0
+	 * 
+	 * @return SelectReturnOK Count
+	 */
+	public int getSelectReturnOK() {
+		return Objects.isNull(this.get("selectReturnOK")) ? 0 : Integer.parseInt(this.get("selectReturnOK"));
+	}
 
 	// flowtype = 0,1 / flowstep = 0,1
 	// flowtype = 2 / flowstep = 1,2

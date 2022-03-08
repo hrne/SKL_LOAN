@@ -118,6 +118,7 @@ public class LC100 extends TradeBuffer {
 				this.totaVo.putParam("NBSDY", txBuffer.getMgBizDate().getNbsDy());
 				this.totaVo.putParam("NNBSDY", txBuffer.getMgBizDate().getNnbsDy());
 				this.totaVo.putParam("LBSDY", txBuffer.getMgBizDate().getLbsDy());
+				this.totaVo.putParam("MFBSDY", txBuffer.getMgBizDate().getMfbsDy());
 //				}
 
 				this.totaVo.putParam("DBTO", tTxTeller.getReportDb());

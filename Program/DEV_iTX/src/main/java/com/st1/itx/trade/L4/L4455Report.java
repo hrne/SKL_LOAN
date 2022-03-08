@@ -359,9 +359,9 @@ public class L4455Report extends MakeReport {
 						
 					}
 					
-//					每頁第42筆 跳頁 
-					if (pageCnt == 42) {
-						this.print(1, 70, "=====續下頁=====", "C");
+//					每頁第38筆 跳頁 
+					if (pageCnt >= 38) {
+						this.print(1, 95, "=====續下頁=====", "C");
 //
 						pageCnt = 0;
 						this.newPage();

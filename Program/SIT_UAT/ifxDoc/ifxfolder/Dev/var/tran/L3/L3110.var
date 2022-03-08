@@ -1306,6 +1306,7 @@ T(3,*)
 C(3,#AmortizedCode,2,S,$)
 C(3,#FreqBase,2,$,S)
 C(3,#L2r05SpecificDd,0,E(0,#WKSPDD),E(0,#L2r05SpecificDd))
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 @V(5,1,31)
 
 !改 原是T(1,#MaturityDate,006,002)取到期日的日期16 造成WKSPDD= 15-16=小於, 14-16=小於,16-16=等於  
@@ -1384,6 +1385,7 @@ C(3,#FreqBase,3,D(7,2,#SpecificDate,0,#WKWEEKINT),$)
 
 #FirstDueDate=D,7,I
 E(0,#NextIntDate)
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 @V(7)
 A(DATE,0,#FirstDueDate)
 T(1,@FirstDueDateDD,#FirstDueDate,006,002)
@@ -1491,14 +1493,14 @@ C(3,#PRECISION,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 ![最後一期餘額]上線版鎖住預設0
 #FdFinalBal=X,2,L
 
-#TwFinalBal=m,14,I
+#TwFinalBal=m,14,L
 C(3,#PRECISION,0,$,s)
 C(5,#L2r01CharCode,2,s,$)
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 C(3,#TwFinalBal,0,E(0,0),$)
 @V(5,0,#WKAMT1)
 
-#UsFinalBal=m,14.2,I
+#UsFinalBal=m,14.2,L
 C(3,#PRECISION,0,s,$)
 C(5,#L2r01CharCode,2,s,$)
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)

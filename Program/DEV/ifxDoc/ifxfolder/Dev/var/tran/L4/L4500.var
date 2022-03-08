@@ -86,11 +86,8 @@ HELP(#EmpDeductTypeHelp)
 @V(H,#EmpDeductTypeHelp)
 
 
-#Tmp_AgType1X=X,20,S
+#AgType1X=X,30,L
 T(H,#AgType1,#EmpDeductTypeHelp)
-
-#AgType1X=X,20,L
-T(1,@AgType1X,#Tmp_AgType1X,3,20)
 
 ! 複製碼決定要調rim欄位
 #CopyCode=X,1,I

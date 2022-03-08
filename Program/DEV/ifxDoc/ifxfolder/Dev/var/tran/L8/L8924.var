@@ -154,8 +154,9 @@ C(3,#CHAIN,0,$,s)
 E(0,#CUST_NO)
 
 #MRKEY=_,_,S
-C(3,#CHAIN_AcDAte,0,S,$)
-T(2,#CHAIN_AcDAte+-+#CHAIN_Factor+-+#CHAIN_CutNo)
+C(3,#CHAIN,1,$,S)
+C(3,#TRN_CODE,1,C(3,#CHAIN_AcDAte,0,S,T(2,#CHAIN_AcDAte+-+#CHAIN_Factor+-+#CHAIN_CutNo)),T(2,#CHAIN_AcDAte+#CHAIN_CutNo+#CHAIN_FacmNo+#CHAIN_BormNo))
+
 
 
 #CHAINXMT=X,1,S

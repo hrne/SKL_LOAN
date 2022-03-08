@@ -89,7 +89,7 @@ T(3,CDBR)
 T(3,AUTHGROUP)
 
 #AdminFgH=x,100,S
-T(3,0:否;1:是)
+T(3,0:無權限;1:有權限)
 
 #AuthHelp=X,1024,S
 
@@ -332,6 +332,7 @@ HELP(#LevelHelp)
 T(H,#LevelFg,#LevelHelp)
 
 #AllowFg=A,1,I
+C(2,#FunCode,s,$,$,s,s,s)
 C(3,#LevelFg,1,$,S)
 @
 V(5,1,5)

@@ -76,6 +76,7 @@ T(3,*)
 
 !轉催收日期 
 #OverdueDate=D,7,I
+E(0,MFBSDY$)
 @V(7)A(DATE,0,#OverdueDate)
 
 
@@ -149,14 +150,13 @@ X(#OOCTxAmt)
 
 </sub>
 
-
 !------ 上行電文 ------
 <sub type="TIM">
 #OverdueDate
 </sub>
 
-
 !------ 下行電文TOM ------
+
 <sub type="TOM">
 TXFORM=L2614
 #OOTxtNo
@@ -170,6 +170,7 @@ TXFORM=L2614
 #OOCustNo
 #OOCustName
 ^
+
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

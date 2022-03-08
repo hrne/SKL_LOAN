@@ -1040,11 +1040,11 @@ public class MakeReport extends CommBuffer {
 			// 2021-1-5 增加判斷 SignCode == 1 才印
 			if (tCdReport.getSignCode() == 1 && !useDefault) {
 				if ("P".equals(pageOrientation)) {
-					this.print(2, 40, signOff0, "C");
-					this.print(2, 41, signOff1, "C");
+					this.print(1, 40, signOff0, "C");
+					this.print(1, 40, signOff1, "C");
 				} else {
-					this.print(2, 70, signOff0, "C");
-					this.print(2, 71, signOff1, "C");
+					this.print(1, 85, signOff0, "C");
+					this.print(1, 85, signOff1, "C");
 				}
 			}
 		}
