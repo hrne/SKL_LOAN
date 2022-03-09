@@ -475,13 +475,13 @@ T(3,)
 T(H,#OOActFlag,#ActFlagHelp)
 
 #OOBUF1=X,37,S
-T(2,#FUNC5+#OOCustNo+#SPC10+0000000+#OOFacmNo+#OOBormNo)
+T(2,#FUNC5+#OOCustNo+#SPC10+#OOApplNo+#OOFacmNo+#OOBormNo)
 
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3120; ntxbuf=#OOBUF1})
 
 #OOBUF2=X,37,S
-T(2,#FUNC4+#OOCustNo+#SPC10+0000000+#OOFacmNo+#OOBormNo)
+T(2,#FUNC4+#OOCustNo+#SPC10+#OOApplNo+#OOFacmNo+#OOBormNo)
 
 #OOBTN2=X,1,S
 C(3,#OOStatus,99,BIND(grid,{ cmd=CHAIN; ntxcd=L3120; ntxbuf=#OOBUF2}),BIND(grid,cancel))

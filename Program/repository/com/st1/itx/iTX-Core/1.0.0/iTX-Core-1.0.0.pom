@@ -76,6 +76,13 @@
 			<artifactId>guava</artifactId>
 			<version>29.0-jre</version>
 		</dependency>
+		
+		<!-- Ftp -->
+		<dependency>
+    		<groupId>commons-net</groupId>
+    		<artifactId>commons-net</artifactId>
+    		<version>${Commons-Net-Ver}</version>
+		</dependency>
 
 		<!-- Mail -->
 		<dependency>
@@ -452,11 +459,6 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.49</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-net</groupId>
-			<artifactId>commons-net</artifactId>
-			<version>3.8.0</version>
 		</dependency>
 	</dependencies>
 

@@ -764,10 +764,7 @@ IF(#EvaStandard=="02",V(2,0),$)
 ! [前日收盤價]
 #YdClosingPrice=m,14.2,I
 IF(#FunCd==4,s,$)
-@IF(#FunCd==4,s,$)
-IF(#ClTypeCode == 141 || #ClTypeCode == 142,$,S)
-V(7)
-
+@
 IF(#EvaStandard=="03",V(2,0),$)
 
 ! [一個月平均價]

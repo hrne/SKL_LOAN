@@ -199,9 +199,9 @@ public class L2415 extends TradeBuffer {
 			List<ClParkingType> beforeClParkingType = deleteClParkingType(titaVo);
 			List<ClParkingType> tlClParkingType = insertClParkingType(titaVo);
 			dataLog.setEnv(titaVo, beforeClParkingType, tlClParkingType);
-			
+
 			// 公設建號
-			List<ClBuildingPublic> beforeClBuildingPublic =  deleteClBuildingPublic(titaVo);
+			List<ClBuildingPublic> beforeClBuildingPublic = deleteClBuildingPublic(titaVo);
 			List<ClBuildingPublic> tlClBuildingPublic = insertClBuildingPublic(titaVo);
 			dataLog.setEnv(titaVo, beforeClBuildingPublic, tlClBuildingPublic);
 
@@ -209,16 +209,17 @@ public class L2415 extends TradeBuffer {
 			List<ClParking> beforeClParking = deleteClParking(titaVo);
 			List<ClParking> tlClParking = insertClParking(titaVo);
 			dataLog.setEnv(titaVo, beforeClParking, tlClParking);
-			
-			deleteClBuildingReason(titaVo);
-			insertClBuildingReason(titaVo);
-			
+
 			// 紀錄變更前變更後
-			if(!this.isEloan) {
-			  dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
-			  dataLog.exec("不動產建物修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
-			}	
-			
+			if (!this.isEloan) {
+				deleteClBuildingReason(titaVo);
+				insertClBuildingReason(titaVo);
+
+				dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
+				dataLog.exec("不動產建物修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
+						+ titaVo.getParam("ReasonX1"));
+			}
+
 		}
 		//
 		this.totaVo.putParam("OResult", "Y");
@@ -283,7 +284,7 @@ public class L2415 extends TradeBuffer {
 	private List<ClParkingType> insertClParkingType(TitaVo titaVo) throws LogicException {
 
 		List<ClParkingType> lClParkingType = new ArrayList<ClParkingType>();
-		
+
 		for (int i = 1; i <= 5; i++) {
 			// 若該筆無資料就離開迴圈
 			String publicTypeCode = titaVo.get("ParkingTypeCodeA" + i);
@@ -326,7 +327,8 @@ public class L2415 extends TradeBuffer {
 	// delete 車位
 	private List<ClParkingType> deleteClParkingType(TitaVo titaVo) throws LogicException {
 		this.info("L2415 deleteClParkingType");
-		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
+		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE);
 		List<ClParkingType> lClParkingType = slClParkingType == null ? null : slClParkingType.getContent();
 		if (lClParkingType != null) {
 			try {
@@ -335,19 +337,19 @@ public class L2415 extends TradeBuffer {
 				throw new LogicException("E0008", "擔保品停車位型式檔" + e.getErrorMsg());
 			}
 		}
-		
-		if(lClParkingType == null) {
+
+		if (lClParkingType == null) {
 			lClParkingType = new ArrayList<ClParkingType>();
 		}
-		
+
 		return lClParkingType;
 	}
 
 	// insert 公設建號
 	private List<ClBuildingPublic> insertClBuildingPublic(TitaVo titaVo) throws LogicException {
-		
+
 		List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
-		
+
 		for (int i = 1; i <= 10; i++) {
 			// 若該筆無資料就離開迴圈
 			String publicBdNoA = titaVo.get("PublicBdNoA" + i);
@@ -379,16 +381,17 @@ public class L2415 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "擔保品不動產建物公設建號檔" + e.getErrorMsg());
 			}
-			
+
 			lClBuildingPublic.add(tClBuildingPublic);
 		}
-		
+
 		return lClBuildingPublic;
 	}
 
 	// 先刪除資料後新增
 	private List<ClBuildingPublic> deleteClBuildingPublic(TitaVo titaVo) throws LogicException {
-		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
+		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE);
 		lClBuildingPublic = slClBuildingPublic == null ? null : slClBuildingPublic.getContent();
 		if (lClBuildingPublic != null) {
 			try {
@@ -397,11 +400,11 @@ public class L2415 extends TradeBuffer {
 				throw new LogicException("E0008", "擔保品不動產建物公設建號檔" + e.getErrorMsg());
 			}
 		}
-		
-		if(lClBuildingPublic == null) {
+
+		if (lClBuildingPublic == null) {
 			lClBuildingPublic = new ArrayList<ClBuildingPublic>();
 		}
-		
+
 		return lClBuildingPublic;
 	}
 
@@ -455,7 +458,7 @@ public class L2415 extends TradeBuffer {
 	}
 
 	// delete 車位
-	private List<ClParking>  deleteClParking(TitaVo titaVo) throws LogicException {
+	private List<ClParking> deleteClParking(TitaVo titaVo) throws LogicException {
 		this.info("L2415 deleteClParking");
 		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		List<ClParking> lClParking = slClParking == null ? null : slClParking.getContent();
@@ -466,49 +469,46 @@ public class L2415 extends TradeBuffer {
 				throw new LogicException("E0008", "擔保品不動產車位檔" + e.getErrorMsg());
 			}
 		}
-		
-		if(lClParking == null) {
+
+		if (lClParking == null) {
 			lClParking = new ArrayList<ClParking>();
 		}
-		
+
 		return lClParking;
 	}
 
 	// insert 擔保品不動產建物修改原因檔
 	private void insertClBuildingReason(TitaVo titaVo) throws LogicException {
 
-			tClBuildingReason = new ClBuildingReason();
-			clBuildingReasonId = new ClBuildingReasonId();
+		tClBuildingReason = new ClBuildingReason();
+		clBuildingReasonId = new ClBuildingReasonId();
 
-			clBuildingReasonId.setClCode1(iClCode1);
-			clBuildingReasonId.setClCode2(iClCode2);
-			clBuildingReasonId.setClNo(iClNo);
+		clBuildingReasonId.setClCode1(iClCode1);
+		clBuildingReasonId.setClCode2(iClCode2);
+		clBuildingReasonId.setClNo(iClNo);
 
-			tClBuildingReason.setClBuildingReasonId(clBuildingReasonId);
-			tClBuildingReason.setClCode1(iClCode1);
-			tClBuildingReason.setClCode2(iClCode2);
-			tClBuildingReason.setClNo(iClNo);
-			
-			if(!this.isEloan) {  // eloan 沒有修改原因欄位
-			  tClBuildingReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
-			  tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason1"));				
-			}
-			
-			tClBuildingReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
-			tClBuildingReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
+		tClBuildingReason.setClBuildingReasonId(clBuildingReasonId);
+		tClBuildingReason.setClCode1(iClCode1);
+		tClBuildingReason.setClCode2(iClCode2);
+		tClBuildingReason.setClNo(iClNo);
 
-			try {
-				sClBuildingReasonService.insert(tClBuildingReason, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", "擔保品不動產建物修改原因檔" + e.getErrorMsg());
-			}
+		tClBuildingReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
+		tClBuildingReason.setOtherReason(titaVo.getParam("OtherReason1"));
+		tClBuildingReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
+		tClBuildingReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
+
+		try {
+			sClBuildingReasonService.insert(tClBuildingReason, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0005", "擔保品不動產建物修改原因檔" + e.getErrorMsg());
+		}
 
 	}
 
 	// delete 擔保品不動產建物修改原因檔
 	private void deleteClBuildingReason(TitaVo titaVo) throws LogicException {
 		ClBuildingReason tClBuildingReason = sClBuildingReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
-		
+
 		if (tClBuildingReason != null) {
 			try {
 				sClBuildingReasonService.delete(tClBuildingReason);
@@ -516,7 +516,7 @@ public class L2415 extends TradeBuffer {
 				throw new LogicException("E0008", "擔保品不動產建物修改原因檔" + e.getErrorMsg());
 			}
 		}
-		
+
 	}
 
 }

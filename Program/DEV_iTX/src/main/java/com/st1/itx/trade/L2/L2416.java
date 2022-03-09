@@ -194,13 +194,13 @@ public class L2416 extends TradeBuffer {
 				deleteClLandOwner(titaVo);
 				// insert 土地所有權人檔
 				InsertClLandOwner(titaVo);
-				// delete 土地修改原因檔
-				deleteClLandReason(titaVo);
-				// insert 土地修改原因檔
-				InsertClLandReason(titaVo);
-
 				// 紀錄變更前變更後
 				if (!this.isEloan) {
+					// delete 土地修改原因檔
+					deleteClLandReason(titaVo);
+					// insert 土地修改原因檔
+					InsertClLandReason(titaVo);
+
 					dataLog.setEnv(titaVo, beforeClLand, tClLand);
 					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
 							+ titaVo.getParam("ReasonX1"));
@@ -250,13 +250,13 @@ public class L2416 extends TradeBuffer {
 					throw new LogicException("E0007", "擔保品不動產土地檔");
 				}
 
-				// delete 土地修改原因檔
-				deleteClLandReason(titaVo);
-				// insert 土地修改原因檔
-				InsertClLandReason(titaVo);
-
 				// 紀錄變更前變更後
 				if (!this.isEloan) {
+					// delete 土地修改原因檔
+					deleteClLandReason(titaVo);
+					// insert 土地修改原因檔
+					InsertClLandReason(titaVo);
+
 					dataLog.setEnv(titaVo, beforeClLand, tClLand);
 					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
 							+ titaVo.getParam("ReasonX1"));
@@ -425,11 +425,8 @@ public class L2416 extends TradeBuffer {
 		tClLandReason.setClCode2(iClCode2);
 		tClLandReason.setClNo(iClNo);
 		tClLandReason.setLandSeq(iLandSeq);
-		if (!this.isEloan) {
-			tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
-			tClLandReason.setOtherReason(titaVo.getParam("OtherReason1"));
-		}
-
+		tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason1")));
+		tClLandReason.setOtherReason(titaVo.getParam("OtherReason1"));
 		tClLandReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo1"));
 		tClLandReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo1"));
 

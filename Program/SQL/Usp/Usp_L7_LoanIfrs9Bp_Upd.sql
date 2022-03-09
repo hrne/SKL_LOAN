@@ -148,16 +148,18 @@ BEGIN
          AND C."BormNo"  = M."BormNo"
     WHERE  M."DataYM"  =  YYYYMM
       AND CASE
-            WHEN F."Ifrs9StepProdCode" IN ('B')
+            WHEN F."Ifrs9StepProdCode" IN ('B')                   -- 浮動階梯4
             THEN 1
-            WHEN F."Ifrs9StepProdCode" NOT IN ('B')
-                 AND TRUNC(NVL(C."EffectDate",0) / 100) <= YYYYMM -- 非浮動階梯, skip 尚未生效者
+            WHEN F."Ifrs9StepProdCode" IN ('A')
+                 AND TRUNC(NVL(C."EffectDate",0) / 100) <= YYYYMM -- 固定階梯3, skip 尚未生效者
+            THEN 1
+            WHEN NVL(M."RateCode", '0')  IN ('1','3')
+                 AND TRUNC(NVL(C."EffectDate",0) / 100) <= YYYYMM -- 機動1, skip 尚未生效者
+            THEN 1
+            WHEN NVL(M."RateCode", '0')  = '2'                    -- 固定2
             THEN 1
           ELSE 0
           END = 1
---      AND  ( ( F."Ifrs9StepProdCode" IN ('B') ) OR    -- 浮動階梯
---             ( F."Ifrs9StepProdCode" NOT IN ('B') AND TRUNC(NVL(C."EffectDate",0) / 100) <= YYYYMM )  -- 非浮動階梯, skip 尚未生效者
---           )
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;

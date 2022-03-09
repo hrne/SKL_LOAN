@@ -33,12 +33,15 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
+#button=x,100,S
+K(MODIFYBUTTON,查詢)
+
 </sub>
 
 <sub type="DC" name="p1" layout="cols=1;screen.width=[120,880];printer.width=[15,45];order=1;">
 [
-["[L6970] 批次執行結果查詢"],
-["@執行結果篩選",#Choice,#ChoiceItem],
+["[L6970] 批次執行結果查詢 "],
+["@執行結果篩選",#BatchResultCode,#BatchResultCodeX],
 ["@執行日期區間",#InputStartDate,#InputEndDate],
 ]
 
@@ -56,29 +59,48 @@ T(4,CHAIN$)
 #HideAll=A,1,S
 
 !---------- AP TEXT AREA Variables ----------
-#Choice=A,1,I
-HELP(0:全部;
-     1:成功;
-     2:失敗)
-@V(1,0,1,2)
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 
+! 選單代碼
+#CdCodeBatchResultCode=x,30,S
+T(3,CdCode.BatchResultCode)
+
+! 選單內容
+#BatchResultCodeH=x,100,S
+
+! 根據選單代碼取得選單內容
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CdCodeBatchResultCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@BatchResultCodeH,#HelpDesc1)
+
+! 輸入欄位
 ! [執行結果篩選]
-#ChoiceItem=X,20,L
-SWITCH(#Choice,0,T(3,全部),
-               1,T(3,成功),
-               2,T(3,失敗)
-)
+#BatchResultCode=A,1,I
+HELP(#BatchResultCodeH)
+@C(4,#BatchResultCode,$,V(H,#BatchResultCodeH))
 
+! 輸出欄位
+! [執行結果篩選]
+#BatchResultCodeX=X,20,L
+C(4,#BatchResultCode,S,T(H,#BatchResultCode,#BatchResultCodeH))
+
+! 輸入欄位
 ! [執行日期區間-起日]
 #InputStartDate=D,7,I
 E(0,#SYSCDATE)
-@A(4,0,#InputStartDate)
-V(5,0,#SYSCDATE)
+@V(7)
+A(4,0,#InputStartDate)
+V(5,0010101,#SYSCDATE)
 
+! 輸入欄位
 ! [執行日期區間-迄日]
 #InputEndDate=D,7,I
 E(0,#SYSCDATE)
-@A(4,0,#InputEndDate)
+@V(7)
+A(4,0,#InputEndDate)
 V(5,#InputStartDate,#SYSCDATE)
 
 #RPTFG=A,1,S
@@ -154,7 +176,7 @@ T(6A,#OOJobCode)
 
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
-#Choice
+#BatchResultCode
 #InputStartDate
 #InputEndDate
 #END
@@ -176,6 +198,12 @@ TXFORM=L6970
 </sub>
 
 !---------- 單據輸出組合 ----------
+<sub type="PART" name="L6970" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6970] 批次執行結果查詢 "],
+[""],
+]
+</sub>
 <sub type="SELECT">
 #batch-print=8,L6970.PFNX,NA,,,,,,1169:827
 ^

@@ -25,7 +25,7 @@ BEGIN
     MM             INT;         -- 本月月份
     YYYY           INT;         -- 本月年度
     OccursNum      NUMBER;
-    YearFirstDay   DECIMAL;     -- 本年度第一天
+    YearFirstDay   DECIMAL;     -- 呆帳當年度計算之起始日
     TMNDYF         INT;         -- 本月月底日
   BEGIN
     INS_CNT := 0;
@@ -51,8 +51,14 @@ BEGIN
     WHERE "DateCode" = 'ONLINE'
     ;
 
-    --　本年度第一天
-    YearFirstDay := to_number(substr(to_char(YYYYMM),0,4) || '0101') ;
+    --　呆帳當年度計算之起始日
+    IF MM = 12 THEN
+       YearFirstDay := YYYY * 10000 + 0101 ;
+    ELSE
+       YearFirstDay := ( (YYYY - 1) * 100 + (MM + 1) ) * 100 + 01 ;
+    END IF;
+
+    --YearFirstDay := to_number(substr(to_char(YYYYMM),0,4) || '0101') ;
     DBMS_OUTPUT.PUT_LINE('YearFirstDay = ' || YearFirstDay);
 
 

@@ -229,7 +229,7 @@ C(3,#FKEY,0,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P7E,0),$)
 ["[L3120]                                 預約撥款維護"],
 [#<->#,"#FdFuncFg+功能",#FuncFgX],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#CustNoX],
-[#<->#,"#FdCustId+統一編號",#CustId,"@",#CustIdX],
+! [#<->#,"#FdCustId+統一編號",#CustId,"@",#CustIdX],
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#ApplNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo,"@@@@@@"],
 ["#FdBormNo+預約撥款序號",#BormNo],
@@ -310,7 +310,7 @@ C(3,#FKEY,0,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P7E,0),$)
 #BTNHIDEP7=X,15,I,ui:button;value:  匯款帳號  ;enable:1;tabbable:0
 !#BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:1
 #WKHIDE=X,1,S
-INVOKEJS(SHOW,p1,3,4,0)
+! INVOKEJS(SHOW,p1,3,4,0)
 !---------- AP TEXT AREA Variables ----------
 
 #SetSysPar=X,1,S
@@ -527,11 +527,11 @@ T(2,#L2r07CustName)
 ![統一編號]
 #FdCustId=X,2,L
 
-#CustId=X,10,I
+#CustId=X,10,S
 T(3,@FdApplNo, )
 C(3,#CHAIN,1,T(1,#NTXBUF,9,10),$)
 C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,s)
+! C(3,#CustNo,0,$,s)
 @C(4,#CustId,S,$)
 V(7)
 
@@ -550,7 +550,7 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 T(2,@CustIdX,#L2r07CustName)
 
-#CustIdX=x,2.50,L
+#CustIdX=x,2.50,S
 
 #IdCustNo=A,7,S
 C(4,#CustId,E(0,#CustNo),E(0,#L2r07CustNo))
@@ -565,7 +565,8 @@ T(3, )
 #ApplNo=A,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,19,7),$)
 C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
+! C(3,#CustNo,0,$,S)
+! C(4,#CustId,$,S)
 @V(2,0)
 
 
@@ -578,6 +579,7 @@ E(0,@RimCustNo,0)
 E(0,@RimFacmNo,0)
 E(0,@RimApplNo,#ApplNo)
 E(0,@RimCaseNo,0)
+C(3,#FuncFg,5,E(0,@RimFKey,3),$)
 RESET_RIM(#SendL2r05A,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
@@ -623,6 +625,7 @@ E(0,@RimCustNo,#IdCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimApplNo,#ApplNo)
 E(0,@RimCaseNo,0)
+C(3,#FuncFg,5,E(0,@RimFKey,3),$)
 RESET_RIM(#SendL2r05B,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
@@ -641,6 +644,7 @@ E(0,@RimFuncCode,#FuncFg)
 E(0,#RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimBormNo,#BormNo)
+C(3,#FuncFg,5,E(0,@RimFKey,3),$)
 RESET_RIM(#SendL3r02,L3R02)
 S(L3R02,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo)
 R(1,L3R02)

@@ -325,7 +325,11 @@ public class L4455Report extends MakeReport {
 						
 						amt();
 						
-						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+						if(pageIndex - pageCnt - 2 <= 0) {
+							this.print(1, 95, "=====續下頁=====", "C");					
+						} else {
+							this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");							
+						}
 						pageCnt = 0;
 						this.newPage();
 						
@@ -391,7 +395,12 @@ public class L4455Report extends MakeReport {
 					totalamt();
 					
 					pageCnt = pageCnt + 4;
-					this.print(pageIndex - pageCnt - 2, 95, "=====報表結束=====", "C");
+					if(pageIndex - pageCnt - 2 <= 0) {
+						this.print(1, 95, "=====報表結束=====", "C");					
+					} else {
+						this.print(pageIndex - pageCnt - 2, 95, "=====報表結束=====", "C");							
+					}
+
 					this.print(2, 95, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
 				}
 				

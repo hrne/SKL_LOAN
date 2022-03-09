@@ -321,7 +321,7 @@ T(6A,#TimCustNo+#FacmNo+#BormNo+#RateIncr+#ApproveRate+#RateCode+#RateAdjFreq+#D
 
 ! L3120預約內容查詢按鈕
 #DTL_BUF=X,100,S
-T(2,5+#OOCustNo+          +0000000+#OOFacmNo+#OOBormNo)
+T(2,5+#OOCustNo+          +#OOApplNo+#OOFacmNo+#OOBormNo)
 #DTL_BTN=X,3,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3120;text=預約內容查詢;ntxbuf=#DTL_BUF})
 

@@ -474,7 +474,7 @@ E(0,1)ASGN(LOOP$)
 ![帳冊別]
 #FM101_AcSubBookCode=X,3,O
 ![帳冊別-中文]
-#FM101_AcSubBookCodeX=x,10,O
+#FM101_AcSubBookCodeX=x,14,O
 
 ![幣別]
 #FM101_CurrencyCode=X,3,O
@@ -512,7 +512,6 @@ TXFORM=FM101
 #FM101_AcNoCode
 #FM101_AcDtlCode
 #FM101_AcNoCodeX
-#FM101_AcSubBookCode
 #FM101_AcSubBookCodeX
 #FM101_CurrencyCode
 #FM101_DbAmt
@@ -546,7 +545,6 @@ TXFORM=FM101
 #FM101_AcNoCode
 #FM101_AcDtlCode
 #FM101_AcNoCodeX
-#FM101_AcSubBookCode
 #FM101_AcSubBookCodeX
 #FM101_CurrencyCode
 #FM101_DbAmt
