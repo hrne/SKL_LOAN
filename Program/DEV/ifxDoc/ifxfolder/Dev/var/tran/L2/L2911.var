@@ -816,7 +816,7 @@ C(4,#OOAddress,BIND(grid,cancel),$)
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOtradecode2; ntxbuf=#OBuf4})
 C(4,#OOAddress,BIND(grid,cancel),$)
 C(5,#OOtradecode,"L2915",BIND(grid,cancel),$)
-C(3,#ClCode,2,BIND(grid,cancel),$)
+C(3,#ClCode1,2,BIND(grid,cancel),$)
 
 
 #OBtn5=X,10,S

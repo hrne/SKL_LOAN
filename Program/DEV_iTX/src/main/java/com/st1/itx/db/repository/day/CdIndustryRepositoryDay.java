@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,15 +21,19 @@ import com.st1.itx.db.domain.CdIndustry;
  */
 public interface CdIndustryRepositoryDay extends JpaRepository<CdIndustry, String> {
 
-	// MainType >= ,AND MainType <=
-	public Slice<CdIndustry> findAllByMainTypeGreaterThanEqualAndMainTypeLessThanEqual(String mainType_0, String mainType_1, Pageable pageable);
+  // MainType >= ,AND MainType <= 
+  public Slice<CdIndustry> findAllByMainTypeGreaterThanEqualAndMainTypeLessThanEqual(String mainType_0, String mainType_1, Pageable pageable);
 
-	// IndustryCode >= ,AND IndustryCode <=
-	public Slice<CdIndustry> findAllByIndustryCodeGreaterThanEqualAndIndustryCodeLessThanEqualOrderByIndustryCodeAsc(String industryCode_0, String industryCode_1, Pageable pageable);
+  // IndustryCode %
+  public Slice<CdIndustry> findAllByIndustryCodeLikeOrderByIndustryCodeAsc(String industryCode_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdIndustry> findByIndustryCode(String industryCode);
+  // IndustryItem %
+  public Slice<CdIndustry> findAllByIndustryItemLikeOrderByIndustryCodeAsc(String industryItem_0, Pageable pageable);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdIndustry> findByIndustryCode(String industryCode);
 
 }
+

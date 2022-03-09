@@ -1325,6 +1325,9 @@ INVOKEJS(SHOW,grd3_{rowSeq},0)
 #SHOW_OWNER_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd3_{rowSeq},1)
 
+#CheckCustId{i}=X,10,S
+T(3, )
+
 ! [建物所有權人-統編]
 #OwnerId{i}=X,10,I
 IF(#PageFg==2,$,CALL(#Show2))
@@ -1335,6 +1338,8 @@ C(4,#OwnerId{j},S,$)
 C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
 C(4,#OwnerId{i},s,$)
 V(7)A(ID_UNINO,0,#OwnerId{i})
+V(4,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10)
+
 
 #tt{i}=X,1,S
 !C(3,#FunCd,1,C(4,#CustId,T(F,#OwnerRelCode{i},0),C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1))),T(F,#OwnerRelCode{i},0))
@@ -1402,6 +1407,9 @@ IF(#OwnerRelCode{i}==#L2r27OwnerRelCode{i}||#OwnerRelCode{i}==#L2r28OwnerRelCode
 #OwnerRelCodeX{i}=X,40,L
 C(4,#OwnerRelCode{i},S,$)
 T(H,#OwnerRelCode{i},#RelationCodeHelp)
+
+#WKI{i}=X,1,S
+T(2,@CheckCustId{i},#OwnerId{i})
 
 ##end
 

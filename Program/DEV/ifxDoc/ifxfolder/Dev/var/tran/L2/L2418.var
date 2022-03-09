@@ -42,10 +42,10 @@ E(0,40)ASGN(INQPRT$)
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品編號",#ClNo,#BTN1],
 ["#FdSeq+他項權利序號",#SeqS,"-",#SeqE],
-["#FdCity+縣市",#City,#CityX,"<br>",#InCityX],
-["#FdLandAdm+地政",#LandAdm,#LandAdmX,"<br>",#InLandAdmX],
+["#FdCity+縣市",#City,#CityX,#InCityX],
+["#FdLandAdm+地政",#LandAdm,#LandAdmX,#InLandAdmX],
 ["#FdRecYear+收件年",#RecYear],
-["#FdRecWord+收件字",#RecWord,#RecWordX,"<br>",#InRecWordX],
+["#FdRecWord+收件字",#RecWord,#RecWordX,#InRecWordX],
 ["#FdRecNumber+收件號",#RecNumber],
 ["#FdRightsNote+權利價值說明",#RightsNote,#RightsNoteX],
 ["#FdSecuredTotal+擔保債權總金額",#TwSecuredTotal,#UsSecuredTotal],
@@ -363,7 +363,7 @@ C(3,#FunCd,5,s,$)
 HELP(#L6r03ResultCity)
 @V(H,#L6r03ResultCity)
 
-#CityX=X,10,L
+#CityX=X,17,L
 T(H,#City,#L6r03ResultCity)
 C(4,#City,SHOW(#InCityX),HIDE(#InCityX))
 C(4,#City,$,s)
@@ -402,7 +402,7 @@ C(4,#City,S,HELP(#LoanOfficeHelp))
 @
 V(H,#LoanOfficeHelp)
 
-#LandAdmX=X,8,L
+#LandAdmX=X,17,L
 T(H,#LandAdm,#LoanOfficeHelp)
 C(4,#LandAdm,SHOW(#InLandAdmX),HIDE(#InLandAdmX))
 

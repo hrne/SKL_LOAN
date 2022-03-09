@@ -434,7 +434,7 @@ TXFORM=L6907
 #OORvBal1=未銷餘額
 {width:150,align:'right',sum:true}
 
-#OO_SUM1=業務合計
+#OO_SUM1=業務科目合計
 {width:150,align:'right'}
 
 #OOAcSubBookCode=區隔帳冊
@@ -469,7 +469,7 @@ TXFORM=L6907
 #OORvBal1=未銷餘額
 {width:180,align:'right',sum:true}
 
-#OO_SUM1=業務合計
+#OO_SUM1=業務科目合計
 {width:180,align:'right'}
 
 #OOAcSubBookCode=區隔帳冊

@@ -48,14 +48,14 @@ public class L5511ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
-		String sql = "select a.\"PieceCode\",a.\"ProdCode\",a.\"EmployeeNo\",d.\"Fullname\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\",a.\"BonusType\",e.\"CustName\",b.\"DrawdownDate\",b.\"DrawdownAmt\",a.\"AdjustBonus\",f.\"AcSubBookCode\" from \"PfRewardMedia\" a "
-				+ "left join \"PfItDetail\" b on b.\"PerfDate\" = a.\"PerfDate\" and b.\"CustNo\"=a.\"CustNo\" and b.\"FacmNo\"=a.\"FacmNo\" and b.\"BormNo\"=a.\"BormNo\" and a.\"BonusType\" != 6 and b.\"DrawdownAmt\" > 0 and b.\"RepayType\" = 0 "
-				+ "left join \"FacMain\" c on c.\"CustNo\"=a.\"CustNo\" and c.\"FacmNo\"=a.\"FacmNo\" and a.\"BonusType\" != 6 " + "left join \"CdEmp\" d on d.\"EmployeeNo\"=a.\"EmployeeNo\" "
-				+ "left join \"CustMain\" e on e.\"CustNo\"=a.\"CustNo\" and a.\"BonusType\" != 6 "
-				+ "left join (select distinct \"CustNo\",first_value(\"AcSubBookCode\") over (partition by \"CustNo\" order by \"LastUpdate\" desc) \"AcSubBookCode\" from \"AcReceivable\") f on f.\"CustNo\"=a.\"CustNo\" and a.\"BonusType\" != 6 "
-				+
+		String sql = "select a.\"PieceCode\",a.\"ProdCode\",a.\"EmployeeNo\",NVL(d.\"Fullname\",'') as \"Fullname\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\",a.\"BonusType\",NVL(e.\"CustName\",'') as \"CustName\",NVL(b.\"DrawdownDate\",0) as \"DrawdownDate\",NVL(b.\"DrawdownAmt\",0) as \"DrawdownAmt\",a.\"AdjustBonus\",NVL(f.\"AcSubBookCode\",'') as \"AcSubBookCode\" ";
+		sql += "from \"PfRewardMedia\" a ";
+		sql += "left join \"PfItDetail\" b on b.\"PerfDate\" = a.\"PerfDate\" and b.\"CustNo\"=a.\"CustNo\" and b.\"FacmNo\"=a.\"FacmNo\" and b.\"BormNo\"=a.\"BormNo\" and a.\"BonusType\" != 6 and b.\"DrawdownAmt\" > 0 and b.\"RepayType\" = 0 ";
+		sql += "left join \"FacMain\" c on c.\"CustNo\"=a.\"CustNo\" and c.\"FacmNo\"=a.\"FacmNo\" and a.\"BonusType\" != 6 " + "left join \"CdEmp\" d on d.\"EmployeeNo\"=a.\"EmployeeNo\" ";
+		sql += "left join \"CustMain\" e on e.\"CustNo\"=a.\"CustNo\" and a.\"BonusType\" != 6 ";
+		sql += "left join (select distinct \"CustNo\",first_value(\"AcSubBookCode\") over (partition by \"CustNo\" order by \"LastUpdate\" desc) \"AcSubBookCode\" from \"AcReceivable\") f on f.\"CustNo\"=a.\"CustNo\" and a.\"BonusType\" != 6 ";
 //				"left join \"FacProd\" f on f.\"ProdNo\"=a.\"ProdCode\" " +
-				"where a.\"WorkMonth\"=:workMonth and a.\"BonusType\" != 7 " + "order by a.\"EmployeeNo\",a.\"PieceCode\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\" ";
+		sql +=	"where a.\"WorkMonth\"=:workMonth and a.\"BonusType\" != 7 " + "order by a.\"EmployeeNo\",a.\"PieceCode\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\" ";
 
 		query = em.createNativeQuery(sql);
 		query.setParameter("workMonth", workYM);
@@ -63,7 +63,7 @@ public class L5511ServiceImpl extends ASpringJpaParm implements InitializingBean
 		logger.info("L5053ServiceImpl sql=[" + sql + "]");
 		logger.info("L5051Service FindData=" + query.toString());
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

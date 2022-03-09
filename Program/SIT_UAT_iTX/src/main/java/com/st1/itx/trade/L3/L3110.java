@@ -209,6 +209,8 @@ public class L3110 extends TradeBuffer {
 		iCompensateFlag = titaVo.getParam("CompensateFlag");
 
 		wkBormNo = iBormNo;
+		// 交易檢核
+		txCheckRoutine();
 
 		// 維護額度主檔
 		FacMainRoutine();
@@ -639,5 +641,46 @@ public class L3110 extends TradeBuffer {
 		tTempVo.putParam("RemitAcctNo", titaVo.getParam("RemitAcctNo"));
 		tTempVo.putParam("CompensateFlag", iCompensateFlag);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+	}
+
+	private void txCheckRoutine() throws LogicException {
+
+		// 登錄時檢查,[繳款方式]為[2.銀扣].[週期基準]為[2.月].[攤還方式]不為[2.到期取息]時檢查指定應繳日是否依設定檔設定
+		if (titaVo.isHcodeNormal()) {
+			FacMain tFacMain = facMainService.findById((new FacMainId(iCustNo, iFacmNo)), titaVo);
+			if (tFacMain == null) {
+				throw new LogicException(titaVo, "E0001", "額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+			}
+			if (tFacMain.getRepayCode() == 2 && tFacMain.getFreqBase().equals("2")
+					&& !tFacMain.getAmortizedCode().equals("2")) {
+
+				TempVo tempVo = authLogCom.exec(iCustNo, iFacmNo, titaVo);
+				if (tempVo == null) {
+					throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+				}
+				String wkRepayBank = tempVo.getParam("RepayBank");
+				int iSpecificDd = this.parse.stringToInteger(titaVo.getParam("SpecificDd"));
+//				檢查ACH扣款特定日
+				if (!wkRepayBank.equals("700") && this.txBuffer.getSystemParas().getAchDeductFlag() == 1
+						&& !(iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD1()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD2()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD3()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD4()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD5())) {
+					throw new LogicException(titaVo, "E3040", "指定應繳日 = " + iSpecificDd); // 指定應繳日與扣款特定日設定不符
+				}
+				
+//				檢查郵局扣款特定日
+				if (wkRepayBank.equals("700") && this.txBuffer.getSystemParas().getPostDeductFlag() == 1
+						&& !(iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD1()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD2()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD3()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD4()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD5())) {
+					throw new LogicException(titaVo, "E3040", "指定應繳日 = " + iSpecificDd); // 指定應繳日與扣款特定日設定不符
+				}
+			}
+		}
+
 	}
 }

@@ -66,12 +66,15 @@ public class TempVo extends LinkedHashMap<String, String> {
 	}
 
 	/**
+	 * To TempVo
 	 * 
-	 * @param msg String
+	 * @param msg         String
+	 * @param isSkipError boolean
 	 * @return TitaVo Object
-	 * @throws LogicException 轉換失敗
+	 * @throws LogicException When Convert Fail But No throw Exception When
+	 *                        isSkipError[0] Is True
 	 */
-	public TempVo getVo(String msg) throws LogicException {
+	public TempVo getVo(String msg, boolean... isSkipError) throws LogicException {
 		try {
 			if (msg == null || msg.trim().isEmpty())
 				return this;
@@ -80,18 +83,25 @@ public class TempVo extends LinkedHashMap<String, String> {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			logger.error(errors.toString());
-
-			throw new LogicException("CE000", "TempVo To Vo 轉換失敗!! ");
+			if (isSkipError.length > 0) {
+				if (isSkipError[0])
+					return new TempVo();
+				else
+					throw new LogicException("CE000", "TempVo To Vo 轉換失敗!! ");
+			} else
+				throw new LogicException("CE000", "TempVo To Vo 轉換失敗!! ");
 		}
 	}
 
 	/**
-	 * get Json String
+	 * To Json String
 	 * 
-	 * @return String this
-	 * @throws LogicException if convert fail throw LogicException
+	 * @param isSkipError boolean
+	 * @return String json String
+	 * @throws LogicException When Convert Fail But No throw Exception When
+	 *                        isSkipError[0] Is True
 	 */
-	public String getJsonString() throws LogicException {
+	public String getJsonString(boolean... isSkipError) throws LogicException {
 		try {
 			if (this.isEmpty())
 				return "";
@@ -101,7 +111,13 @@ public class TempVo extends LinkedHashMap<String, String> {
 			e.printStackTrace(new PrintWriter(errors));
 			logger.error(errors.toString());
 
-			throw new LogicException("CE000", "TempVo to String 轉換失敗 : " + this);
+			if (isSkipError.length > 0) {
+				if (isSkipError[0])
+					return "";
+				else
+					throw new LogicException("CE000", "TempVo to String 轉換失敗 : " + this);
+			} else
+				throw new LogicException("CE000", "TempVo to String 轉換失敗 : " + this);
 		}
 	}
 

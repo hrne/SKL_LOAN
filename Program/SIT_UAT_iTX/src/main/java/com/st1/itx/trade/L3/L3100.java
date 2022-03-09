@@ -301,20 +301,22 @@ public class L3100 extends TradeBuffer {
 				String wkRepayBank = tempVo.getParam("RepayBank");
 				int iSpecificDd = this.parse.stringToInteger(titaVo.getParam("SpecificDd"));
 //				檢查ACH扣款特定日
-				if (!wkRepayBank.equals("700") && !(iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD1()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD2()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD3()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD4()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD5())) {
+				if (!wkRepayBank.equals("700") && this.txBuffer.getSystemParas().getAchDeductFlag() == 1
+						&& !(iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD1()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD2()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD3()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD4()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD5())) {
 
 					throw new LogicException(titaVo, "E3040", "指定應繳日 = " + iSpecificDd); // 指定應繳日與扣款特定日設定不符
 				}
 //				檢查郵局扣款特定日
-				if (wkRepayBank.equals("700") && !(iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD1()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD2()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD3()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD4()
-						|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD5())) {
+				if (wkRepayBank.equals("700") && this.txBuffer.getSystemParas().getPostDeductFlag() == 1
+						&& !(iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD1()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD2()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD3()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD4()
+								|| iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD5())) {
 
 					throw new LogicException(titaVo, "E3040", "指定應繳日 = " + iSpecificDd); // 指定應繳日與扣款特定日設定不符
 				}

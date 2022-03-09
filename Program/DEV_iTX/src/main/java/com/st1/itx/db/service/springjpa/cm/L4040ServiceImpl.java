@@ -63,9 +63,15 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iPropDate = parse.stringToInteger(titaVo.getParam("PropDate"));
 		int iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		int iCreateFlag = parse.stringToInteger(titaVo.getParam("CreateFlag"));
-
+		int iAuthCreateDate = parse.stringToInteger(titaVo.getParam("AuthCreateDate"));
+		int iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
+		
 		if (iPropDate > 0) {
 			iPropDate = iPropDate + 19110000;
+		}
+		
+		if(iAuthCreateDate>0) {
+			iAuthCreateDate = iAuthCreateDate+19110000;
 		}
 
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
@@ -179,10 +185,29 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 2:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
+			if(iAuthCreateDate>0) {
+				sql += "   and a.\"AuthCreateDate\" =" + iAuthCreateDate;
+			}
+			if(iRepayBank==1) {
+				sql += "   and a.\"RepayBank\" = '103'" ;
+			}
+			if(iRepayBank==2) {
+				sql += "   and a.\"RepayBank\" <> '103'" ;
+			}
+			
 			break;
 		case 3:
 			sql += "   and a.\"PropDate\" = " + propDate;
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
+			if(iAuthCreateDate>0) {
+				sql += "   and a.\"AuthCreateDate\" =" + iAuthCreateDate;
+			}
+			if(iRepayBank==1) {
+				sql += "   and a.\"RepayBank\" = '103'" ;
+			}
+			if(iRepayBank==2) {
+				sql += "   and a.\"RepayBank\" <> '103'" ;
+			}
 			break;
 		}
 //		排序用

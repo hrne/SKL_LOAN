@@ -528,9 +528,9 @@ public class TxToDoCom extends TradeBuffer {
 		if (detailList == null || detailList.size() == 0) {
 			return;
 		}
-
-		mntMainFixValue(tMain, detailList.get(0).getItemCode(), titaVo);
-		if (!"R".equals(tMain.getYdReserveFg())) {
+		TxToDoMain tTxToDoMain = new TxToDoMain();
+		mntMainFixValue(tTxToDoMain, detailList.get(0).getItemCode(), titaVo);
+		if (!"R".equals(tTxToDoMain.getYdReserveFg())) {
 			throw new LogicException(titaVo, "E0013", "寫入應處理明細留存檔");
 		}
 		for (TxToDoDetailReserve tTxToDoDetailReserve : detailList) {

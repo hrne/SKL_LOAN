@@ -1,13 +1,11 @@
 " A4
    產生郵局授權資料
 
-   TLR:{{#TLRNO}} {{#EMPNM}} ^ DATE:{{#SYSDATEF}} TIME:{{#now!}}
+   經辦:{{#TLRNO}} {{#EMPNM}} ^ 日期:{{#SYSDATEF}}  時間:{{#now!}}
 
-total:{{#batch-rows}}  selected:{{#batch-rows-selected}}  success:{{#batch-rows-ok}} failed:{{#batch-rows-error}}
+總筆數:{{#batch-rows}}  選擇筆數:{{#batch-rows-selected}}  成功筆數:{{#batch-rows-ok}} 失敗筆數:{{#batch-rows-error}}
    
      產生郵局授權資料 
 
 {{#batch-detail}}
 
-
-PREPARED BY：________   REVIEWED BY：________  AUTHORIZED BY：________

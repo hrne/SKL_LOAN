@@ -46,7 +46,7 @@ public class LM016p extends TradeBuffer {
 		int iAcDate = Integer.parseInt(titaVo.getEntDy());
 
 		// MSG帶入預設值
-		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("LM042", 60) + iAcDate;
+		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("LM016", 60) + iAcDate;
 
 		this.info("ntxbuf = " + ntxbuf);
 		

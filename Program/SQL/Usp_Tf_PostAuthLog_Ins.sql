@@ -70,8 +70,8 @@ BEGIN
           ,CASE WHEN "PO$AARP"."PRCCDT" > 0 THEN MOD("PO$AARP"."PRCCDT" , 1000000)
            ELSE 0 END                     AS "ProcessTime"         -- 處理時間 Decimal 6 0
     FROM "PO$AARP"
-    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."CRTEMP"
-    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = S1."CHGEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = "PO$AARP"."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = "PO$AARP"."CHGEMP"
     LEFT JOIN (SELECT "LMSACN"
                      ,"LMSAPN"
                      ,"LMSPCN"

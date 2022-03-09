@@ -33,7 +33,7 @@ public interface AcReceivableRepositoryHist extends JpaRepository<AcReceivable, 
   public Slice<AcReceivable> findAllByAcctCodeIsAndCustNoIsAndRvNoIsOrderByFacmNoAsc(String acctCode_0, int custNo_1, String rvNo_2, Pageable pageable);
 
   // ClsFlag = ,AND CustNo = ,AND AcctFlag = ,AND FacmNo >= ,AND FacmNo <=
-  public Slice<AcReceivable> findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAsc(int clsFlag_0, int custNo_1, int acctFlag_2, int facmNo_3, int facmNo_4, Pageable pageable);
+  public Slice<AcReceivable> findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAscRvNoAsc(int clsFlag_0, int custNo_1, int acctFlag_2, int facmNo_3, int facmNo_4, Pageable pageable);
 
   // AcctCode =, AND ClsFlag = ,AND OpenAcDate <
   public Slice<AcReceivable> findAllByAcctCodeIsAndClsFlagIsAndOpenAcDateLessThanOrderByCustNoAscFacmNoAscRvNoAsc(String acctCode_0, int clsFlag_1, int openAcDate_2, Pageable pageable);

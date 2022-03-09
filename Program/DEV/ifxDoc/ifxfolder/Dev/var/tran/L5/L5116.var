@@ -88,11 +88,13 @@ T(1,@FacmNo,#NTXBUF,9,3)
 <include src="ROM.icf::L5R35.dec"/>
 #RimCustNo=X,7,S
 #RimFacmNo=X,3,S
+#RimFunCd=A,1,S
 T(2,@RimCustNo,#CustNo)
 T(2,@RimFacmNo,#FacmNo)
+E(0,@RimFunCd,#FunctionCode)
 C(3,#FunctionCode,1,S,$)
 RESET_RIM(#RimL5R35,L5R35)
-S(L5R35,1,#RimCustNo,#RimFacmNo)
+S(L5R35,1,#RimCustNo,#RimFacmNo,#RimFunCd)
 R(1,L5R35)
 T(2,@ActUse,#L5R35ActUse)
 T(H,@ActUseX,#ActUse,#YesNoHelp)
@@ -138,6 +140,15 @@ T(2,@CustName,#L5R36CustName)
 #FacmNo=A,3,I
 C(3,#FunctionCode,1,$,s)
 @V(2,0)
+
+#L5R35A=X,1,S
+T(2,@RimCustNo,#CustNo)
+T(2,@RimFacmNo,#FacmNo)
+E(0,@RimFunCd,1)
+C(3,#FunctionCode,1,$,S)
+RESET_RIM(#RimL5R35,L5R35)
+S(L5R35,1,#RimCustNo,#RimFacmNo,#RimFunCd)
+R(1,L5R35)
 
 #ActUse=X,1,I
 C(3,#FunctionCode,4,s,$)

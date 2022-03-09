@@ -199,13 +199,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("acrvFacmNoRange " + dbName + " : " + "clsFlag_0 : " + clsFlag_0 + " custNo_1 : " +  custNo_1 + " acctFlag_2 : " +  acctFlag_2 + " facmNo_3 : " +  facmNo_3 + " facmNo_4 : " +  facmNo_4);
     if (dbName.equals(ContentName.onDay))
-      slice = acReceivableReposDay.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
+      slice = acReceivableReposDay.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAscRvNoAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = acReceivableReposMon.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
+      slice = acReceivableReposMon.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAscRvNoAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = acReceivableReposHist.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
+      slice = acReceivableReposHist.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAscRvNoAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
     else 
-      slice = acReceivableRepos.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
+      slice = acReceivableRepos.findAllByClsFlagIsAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByOpenAcDateAscRvNoAsc(clsFlag_0, custNo_1, acctFlag_2, facmNo_3, facmNo_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

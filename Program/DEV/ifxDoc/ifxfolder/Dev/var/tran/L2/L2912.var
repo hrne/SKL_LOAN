@@ -47,9 +47,7 @@ E(0,40)ASGN(INQPRT$)
 
 #FdClCode1=X,2,L
 #FdClCode2=X,2,L
-T(3,*)
 #FdClNo=X,2,L
-T(3,*)
 
 #FdOCustId=X,2,L
 #FdOClCode1=X,2,L
@@ -234,7 +232,7 @@ E(0,9)
 T(3,動產)
 
 !代號2
-#ClCode2=A,2,I
+#ClCode2=A,2,L
 C(3,#CHAIN,1,s,$)
 HELP(#ClCode2Help)
 @V(H,#ClCode2Help)
@@ -246,7 +244,7 @@ T(2,#ClCode1+#ClCode2)
 T(H,#COLIND,#ClCode2Help)
 
 !擔保品編號
-#ClNo=A,7,I
+#ClNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 

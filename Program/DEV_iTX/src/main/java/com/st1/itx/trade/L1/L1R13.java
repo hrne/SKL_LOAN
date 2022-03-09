@@ -86,7 +86,8 @@ public class L1R13 extends TradeBuffer {
 		}
 		if (iCustTelNo != null) {
 			for (CustTelNo xCustTelNo : iCustTelNo) {
-				if (xCustTelNo.getTelTypeCode().equals("05")) {
+				if (xCustTelNo.getEnable().equals("Y")
+						&& (xCustTelNo.getTelTypeCode().equals("03") || xCustTelNo.getTelTypeCode().equals("05"))) {
 					iMsgFg = "1";
 				}
 			}

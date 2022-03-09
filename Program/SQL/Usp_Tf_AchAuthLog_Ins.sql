@@ -91,6 +91,7 @@ BEGIN
               ) FACM ON FACM."LMSACN" = S2."LMSACN"
                     AND FACM."LMSPCN" = S2."LMSPCN"
                     AND FACM."SEQ" = 1
+    WHERE NOT (S2."CUSCDT" > 19110000 * 2)
     ;
 
     -- 記錄寫入筆數
@@ -114,9 +115,6 @@ BEGIN
           ,CASE
              WHEN S1."ACHCDT" > 0 THEN TRUNC(S1."ACHCDT" / 1000000)
            ELSE 0 END                     AS "ProcessDate"         -- 處理日期 Decimald 8   
-          ,CASE
-             WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)
-           ELSE 0 END                     AS "ProcessDate"         -- 處理時間 Decimal 6 
           ,CASE
              WHEN S1."ATHFND" > 0 THEN S1."ATHFND"
            ELSE 0 END                     AS "StampFinishDate"     -- 核印完成日期時間 Decimald 8   

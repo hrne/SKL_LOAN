@@ -129,7 +129,7 @@ public class LC011 extends TradeBuffer {
 			occursList.putParam("FlowStep", d.get("FlowStep"));
 			
 			TempVo tTempVo = new TempVo();
-			tTempVo = tTempVo.getVo(d.get("TranData"));
+			tTempVo = tTempVo.getVo(d.get("TranData"),true);
 			occursList.putParam("Funcind", tTempVo.get("FUNCIND"));
 
 			if ("1".equals(d.get("Hcode").toString()) && Integer.valueOf(d.get("OrgEntdy").toString()) > 0

@@ -322,7 +322,23 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "AcDetail"
-    WITH JORP AS (
+    WITH BOKOTHERS AS (
+        SELECT CORACC
+             , CORACS
+             , NEWVBN
+             , TRXDAT
+             , TRXATP
+             , SUM(CORAMT) AS CORAMT
+        FROM "LA$JORP"
+        WHERE NEWVBN > 90
+          AND ACNBOK != '000'
+        GROUP BY CORACC
+               , CORACS
+               , NEWVBN
+               , TRXDAT
+               , TRXATP
+    ) 
+    , JORP AS (
         SELECT CORACC
              , CORACS
              , CORAMT
@@ -351,7 +367,11 @@ BEGIN
           ,S5."AcDtlCode"                 AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0
           ,S5."AcctCode"                  AS "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
           ,JORP."TRXATP"                  AS "DbCr"                -- 借貸別 VARCHAR2 1 0
-          ,JORP."CORAMT"                  AS "TxAmt"               -- 記帳金額 DECIMAL 16 2
+          ,JORP."CORAMT"
+           - CASE
+               WHEN NVL(JORP."ACNBOK",' ') = '000'
+               THEN NVL(BOKOTHERS."CORAMT",0)
+             ELSE 0 END                   AS "TxAmt"               -- 記帳金額 DECIMAL 16 2
           ,0                              AS "EntAc"               -- 入總帳記號 DECIMAL 1 0
           ,0                              AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,0                              AS "FacmNo"              -- 額度編號 DECIMAL 3 0
@@ -388,6 +408,12 @@ BEGIN
     LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = JORP."CORACC"
                            AND S5."AcSubCode" = NVL(JORP."CORACS",'     ')
                            AND S5."AcDtlCode" = '  '
+    LEFT JOIN BOKOTHERS ON NVL(JORP."ACNBOK",' ') = '000'
+                       AND BOKOTHERS."CORACC" = JORP."CORACC"
+                       AND BOKOTHERS."CORACS" = JORP."CORACS"
+                       AND BOKOTHERS."NEWVBN" = JORP."NEWVBN"
+                       AND BOKOTHERS."TRXDAT" = JORP."TRXDAT"
+                       AND BOKOTHERS."TRXATP" = JORP."TRXATP"
     WHERE NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
     ;
 

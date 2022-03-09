@@ -284,6 +284,9 @@ TXFORM=L2040
 #OOClCodeX=原擔保品編號
 {width:100,align:'center'}
 
+#OOClSeq=原擔保品序號
+{width:100,align:'center'}
+
 #OOCustNo=戶號
 {width:100,align:'center'}
 

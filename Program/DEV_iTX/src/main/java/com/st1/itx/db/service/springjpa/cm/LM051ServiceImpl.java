@@ -37,14 +37,14 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @param groupNum 表格次序
+	 * @param groupNum  表格次序
 	 * 
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth, int groupNum) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int groupNum) throws Exception {
 
 		this.info("lM051.findAll ");
-		this.info("yearMonth="+yearMonth + "-" + groupNum);
+		this.info("yearMonth=" + yearMonth + "-" + groupNum);
 
 		// 0
 		String groupSelect1 = "	WHERE M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"Status\" = 0 ";
@@ -180,25 +180,34 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm",String.valueOf(yearMonth));
+		query.setParameter("yymm", String.valueOf(yearMonth));
 		return this.convertToMap(query);
 	}
 
-	
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @param formNum 表格次序
+	 * @param formNum   表格次序
 	 * 
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth,int formNum) throws Exception {
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth, int formNum) throws Exception {
 
 		this.info("lM051.findAll2");
 
-		this.info("yearMonth="+yearMonth + "-" + formNum);
+		this.info("yearMonth=" + yearMonth + "-" + formNum);
+
+		int lYear = yearMonth / 100;
+		int lMonth = yearMonth % 100;
+
+		if (lMonth == 1) {
+			lYear = lYear - 1;
+			lMonth = 12;
+		}
+
+		int outStandingYMD = (lYear * 10000) + (lMonth * 100) + 1;
 
 		String sql = " ";
 		if (formNum == 1) {
@@ -264,6 +273,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"PrinBalance\" > 0";
+			sql += "	  AND M.\"PrevIntDate\"  >= :lyymmdd";
 //			sql += "	  AND M.\"AssetClass\" IS NULL";
 			sql += "	GROUP BY ( CASE";
 			sql += "			     WHEN M.\"AcSubBookCode\" = '00A' THEN '1'";
@@ -303,6 +313,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"PrinBalance\" > 0";
+			sql += "	  AND M.\"PrevIntDate\"  >= :lyymmdd";
 //			sql += "	  AND M.\"AssetClass\" IS NULL";
 			sql += "	GROUP BY ( CASE";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
@@ -327,7 +338,11 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm",String.valueOf(yearMonth) );
+		query.setParameter("yymm", String.valueOf(yearMonth));
+		if (formNum != 1) {
+			query.setParameter("lyymmdd", String.valueOf(outStandingYMD));
+		}
+
 		return this.convertToMap(query);
 	}
 

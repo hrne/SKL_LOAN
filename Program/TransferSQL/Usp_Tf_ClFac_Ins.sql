@@ -93,13 +93,14 @@ BEGIN
                             ,"ClNo"
                             ,ROW_NUMBER() OVER (PARTITION BY "CustNo"
                                                             ,"FacmNo"
-                                                ORDER BY "ClCode1"
-                                                        ,"ClCode2"
-                                                        ,CASE
+                                                ORDER BY "ApproveNo" DESC -- 2022-03-08 智偉增加判斷:案件申請號碼最新的一筆抓最新的擔保品
+                                                       , "ClCode1"
+                                                       , "ClCode2"
+                                                       , CASE
                                                            WHEN "ClNo" > 9000000
                                                            THEN 0 
                                                          ELSE "ClNo" END DESC
-                                                        ,"ClNo"
+                                                       , "ClNo"
                                                ) AS "SEQ"
                       FROM "ClFac"
                      ) SS2 ON SS2."CustNo" = SS1."CustNo"

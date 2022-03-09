@@ -91,6 +91,7 @@ BEGIN
               ) FACM ON FACM."LMSACN" = S2."LMSACN"
                     AND FACM."LMSPCN" = S2."LMSPCN"
                     AND FACM."SEQ" = 1
+    WHERE NOT (S2."CUSCDT" > 19110000 * 2)
     ;
 
     -- 記錄寫入筆數

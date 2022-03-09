@@ -230,7 +230,7 @@ T(2,@ApplNo,#ApplNo2)
 T(2,0000000000000000000000000000          +#ApplNo)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L3003; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
 
 
 !用核准號碼(ApplNo)調L2R05
@@ -467,7 +467,7 @@ T(2,@RP_CUSTNM,#RpCustName)
 IF(#TempItemCode==01 ||#TempItemCode==02,S,$)
 
 #MRKEY=_,_,S
-C(3,#TimFacmNo,0,T(2,#TimCustNo+#FacmNo),T(2,#TimCustNo+-+#TimFacmNo))
+C(3,#TimFacmNo,0,T(2,#TimCustNo+-+#FacmNo),T(2,#TimCustNo+-+#TimFacmNo))
 
 ![摘要內容]
 #FdDescription=X,2,L

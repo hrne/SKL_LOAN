@@ -84,12 +84,6 @@ public class L9728Report extends MakeReport {
 
 		this.setMaxRows(29);
 	}
-	
-	@Override
-	public void printFooter() {
-		this.print(1, 1,"  ========================================================================================================================================");
-		this.print(1, 1,"  部主管：                  課主管：                  經辦人：");
-	}
 
 	private Boolean exportPdf(TitaVo titaVo, List<Map<String, String>> list) throws LogicException {
 		

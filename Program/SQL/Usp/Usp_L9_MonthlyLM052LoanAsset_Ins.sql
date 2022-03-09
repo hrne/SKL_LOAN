@@ -72,7 +72,7 @@ BEGIN
                   THEN 'NS2'               -- 非特定資產放款：股票質押
                   ELSE 'NS3'               -- 非特定資產放款
                 END                  AS "LoanAssetCode"	--放款資產項目代號	  
-                ,M."PrinBalance"     AS "LoanBal"
+              ,SUM(M."PrinBalance")  AS "LoanBal"
           FROM "MonthlyFacBal" M
           LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                               AND F."FacmNo" = M."FacmNo"
@@ -80,16 +80,40 @@ BEGIN
           LEFT JOIN "CdIndustry" CDI ON CDI."IndustryCode" = CM."IndustryCode"
           WHERE M."YearMonth" = TYYMM
             AND M."PrinBalance" > 0
+          GROUP BY "YearMonth"     --資料年月
+                  ,CASE
+                     WHEN M."ClCode1" IN (1,2) 
+                       AND F."FirstDrawdownDate" >= 20100101 
+                       AND M."FacAcctCode" = 340
+                     THEN 'NS1'               -- 非特定資產放款：100年後政策性貸款
+                     WHEN M."ClCode1" IN (1,2) 
+                       AND F."FirstDrawdownDate" >= 20100101 
+                       AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
+                     THEN 'NS1'               -- 非特定資產放款：100年後政策性貸款
+                     WHEN M."ClCode1" IN (1,2) 
+                       AND CDI."IndustryItem" LIKE '不動產%'
+                     THEN 'S2'                -- 特定資產放款：建築貸款
+                     WHEN M."ClCode1" IN (1,2) 
+                       AND CDI."IndustryItem" LIKE '建築%'
+                     THEN 'S2'                -- 特定資產放款：建築貸款
+                     WHEN M."ClCode1" IN (1,2) 
+                       AND F."UsageCode" = '02' 
+                     THEN 'S1'                -- 特定資產放款：購置住宅+修繕貸款
+                     WHEN M."ClCode1" IN (3,4) 
+                     THEN 'NS2'               -- 非特定資產放款：股票質押
+                     ELSE 'NS3'               -- 非特定資產放款
+                   END                 
           UNION
           SELECT "MonthEndYm"            AS "YearMonth"     --資料年月
                 ,'NS3'                   AS "LoanAssetCode" --放款資產項目代號
-                ,"DbAmt" - "CrAmt"       AS "LoanBal"       --折溢價與催收費用
+                ,SUM("DbAmt" - "CrAmt")  AS "LoanBal"       --折溢價與催收費用
           FROM "AcMain"
           WHERE "AcNoCode" IN ( '10600304000'    --擔保放款-折溢價
                                ,'10601301000'    --催收款項-法務費用
                                ,'10601302000'    --催收款項-火險費用
                                ,'10601304000')   --催收款項-折溢價
-                  AND "MonthEndYm" = TYYMM)
+                  AND "MonthEndYm" = TYYMM
+          GROUP BY "MonthEndYm")
     GROUP BY "YearMonth"
             ,"LoanAssetCode"
     ;
