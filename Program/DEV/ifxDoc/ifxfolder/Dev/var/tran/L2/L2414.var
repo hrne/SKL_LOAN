@@ -122,9 +122,14 @@ T(3,CdGuarantor)
 
 #RelationCodeHelp=x,3000,S
 
+#CDDEF09=x,20,S
+T(3,CdCode.Listed)
+
+#ListedHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClStatCodeHelp,#HelpDesc1)
@@ -135,6 +140,7 @@ T(2,@YesNoHelp,#HelpDesc5)
 T(2,@SyndCodeHelp,#HelpDesc6)
 T(2,@NationalityCodeHelp,#HelpDesc7)
 T(2,@RelationCodeHelp,#HelpDesc8)
+T(2,@ListedHelp,#HelpDesc9)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -214,7 +220,7 @@ T(F,@DispDate,1)
 
 !FunCd=2 隱藏框線
 #WKTF=X,1,S
-IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0)T(F,@CityCode,0),$)
+IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0),$)
 
 #IF_FUNCD_4=X,1,S
 IF(#FunCd==4,$,S)
@@ -533,8 +539,6 @@ T(H,#ClTypeCode,#ClTypeCodeHelp)
 
 ! 調RIM取縣市代碼
 #RimL6r03City=X,1,S
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
 E(0,@RimFunCd,1)
 T(2,@RimCityCode,)
 T(2,@RimAreaCode,)
@@ -549,7 +553,7 @@ T(2,#L6r03Result)
 
 ! [地區別]
 #CityCode=X,2,I
-IF(#FunCd==1,$,s)
+IF(#FunCd==4,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
 
@@ -712,8 +716,6 @@ C(3,#PHFG,1,$,S)
 C(4,#SecuritiesType,S,$)
 T(H,#SecuritiesType,#SecuritiesTypeHelp)
 
-#ListedHelp=x,120,S
-T(3,01:臺灣證交所;02:櫃檯買賣中心;03:紐約證券交易所（NYSE）;04:那斯達克（Nasdaq）;05:倫敦證券交易所（LSE）;06:德國證券交易所（GSE）;07:歐洲交易所（Euronext）;08:東京證券交易所（TSE）;99:無)))
 !掛牌交易所 Listed
 #Listed=X,2,I
 C(3,#PHFG,1,$,S)

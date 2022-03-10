@@ -364,7 +364,7 @@ T(F,@ClCode1,0)
 T(F,@ClCode2,0)
 T(F,@ClNo,0)
 T(F,@ClTypeCode,0)
-T(F,@CityCode,0)
+T(F,@CityCode,1)
 T(F,@StockCode,1)
 T(F,@ListingType,1)
 T(F,@StockType,1)
@@ -614,8 +614,6 @@ T(H,#ClTypeCode,#ClTypeCode3Help)
 
 ! 調RIM取縣市代碼
 #RimL6r03City=X,1,S
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
 E(0,@RimFunCd,1)
 T(3,@RimCityCode,)
 T(3,@RimAreaCode,)
@@ -629,7 +627,7 @@ R(1,L6R03)
 T(2,#L6r03Result)
 ! [地區別]
 #CityCode=X,2,I
-IF(#FunCd==1,$,s)
+IF(#FunCd==4,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
 

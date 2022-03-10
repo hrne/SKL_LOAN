@@ -26,9 +26,13 @@ BEGIN
     -- -- 寫入資料 (舊擔保品編號檔)
     INSERT INTO "ClBuildingUnique"
     SELECT CASE
-             WHEN S1."GDRMRK" = 1 THEN 'Y'
-             WHEN S1."GDRNUM2" > 0 THEN ' '
-             WHEN S1."GDRNUM" = "MaxGDRNUM" AND S1."LGTSEQ" = "MaxLGTSEQ" THEN 'Y'
+             WHEN S1."GDRMRK" = 1 
+             THEN 'Y'
+             WHEN S1."GDRNUM2" > 0 
+             THEN ' '
+             WHEN S1."GDRNUM" = S4."GDRNUM" 
+                  AND S1."LGTSEQ" = S4."LGTSEQ" 
+             THEN 'Y' -- 2022-03-10 Wei
            ELSE ' ' END AS "TfFg"
           ,S1."GroupNo"
           ,S1."SecGroupNo"
@@ -39,22 +43,27 @@ BEGIN
           ,S1."GDRNUM"
           ,S1."LGTSEQ"
     FROM "TmpLA$HGTP" S1
-    LEFT JOIN (SELECT "GroupNo"
-                     ,"SecGroupNo"
-                     ,MAX(GDRNUM) AS "MaxGDRNUM"
+    LEFT JOIN (SELECT  "GroupNo"
+                     , "SecGroupNo"
+                     , ROW_NUMBER ()
+                       OVER (
+                           PARTITION BY "GroupNo"
+                                      , "SecGroupNo"
+                           ORDER BY "LMSACN" -- 2022-03-10 Wei
+                                  , "LMSAPN" DESC -- 2022-03-10 Wei
+                                  , "GDRID1"
+                                  , "GDRID2"
+                                  , "GDRNUM" DESC -- 2022-03-10 Wei
+                                  , "LGTSEQ"
+                       ) AS "Seq"
+                     , "GDRID1"
+                     , "GDRID2"
+                     , "GDRNUM"
+                     , "LGTSEQ"
                FROM "TmpLA$HGTP"
-               GROUP BY "GroupNo","SecGroupNo"
               ) S4 ON S4."GroupNo" = S1."GroupNo"
                   AND S4."SecGroupNo" = S1."SecGroupNo"
-    LEFT JOIN (SELECT "GroupNo"
-                     ,"SecGroupNo"
-                     ,"GDRNUM"
-                     ,MAX("LGTSEQ") AS "MaxLGTSEQ"
-               FROM "TmpLA$HGTP"
-               GROUP BY "GroupNo","SecGroupNo","GDRNUM"
-              ) S4 ON S4."GroupNo" = S1."GroupNo"
-                  AND S4."SecGroupNo" = S1."SecGroupNo"
-                  AND S4."GDRNUM" = S1."GDRNUM"
+                  AND S4."Seq" = 1
     ;
 
     -- 記錄寫入筆數
@@ -66,10 +75,12 @@ BEGIN
                  ,S0."SecGroupNo"
                  ,S1."MaxSecGroupNo"
                  ,ROW_NUMBER() OVER (PARTITION BY S0."GroupNo"
-                                       ORDER BY S2."GDRID1"
-                                               ,S2."GDRID2"
-                                               ,S2."GDRNUM"
-                                               ,S2."LGTSEQ"
+                                       ORDER BY  S2."LMSACN" -- 2022-03-10 Wei
+                                               , S2."LMSAPN" DESC -- 2022-03-10 Wei
+                                               , S2."GDRID1"
+                                               , S2."GDRID2"
+                                               , S2."GDRNUM" DESC -- 2022-03-10 Wei
+                                               , S2."LGTSEQ"
                                     ) AS "Seq"
                  ,S2."GDRID1"
                  ,S2."GDRID2"

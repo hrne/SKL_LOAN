@@ -26,6 +26,7 @@ import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClBuildingOwnerId;
 import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClImmRankDetail;
@@ -480,7 +481,7 @@ public class L2411 extends TradeBuffer {
 				}
 
 				if (iApplNo > 0) {
-
+					List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
 					for (int i = 1; i <= 20; i++) {
 						// 若該筆無資料就離開迴圈
 						if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
@@ -494,6 +495,11 @@ public class L2411 extends TradeBuffer {
 							String custUKey = custMain.getCustUKey().trim();
 							String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
 
+							HashMap<String, String> map = new HashMap<String, String>();
+							map.put("OwnerCustUKey", custUKey);
+							map.put("OwnerRelCode", relCode);
+							ownerMap.add(map);
+							
 							FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
 							if (facMain == null) {
 								throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
@@ -526,6 +532,19 @@ public class L2411 extends TradeBuffer {
 
 						} // if
 					} // for
+					
+					if(this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+						ClFacId clFacId = new ClFacId();
+						clFacId.setClCode1(iClCode1);
+						clFacId.setClCode2(iClCode2);
+						clFacId.setClNo(iClNo);
+						clFacId.setApproveNo(iApplNo);	
+						ClFac clFac = sClFacService.findById(clFacId, titaVo);
+						if (clFac == null) {
+							clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+						}
+					} 
+					
 				} // if
 
 			} else
@@ -956,7 +975,7 @@ public class L2411 extends TradeBuffer {
 			try {
 				sClBuildingOwnerService.deleteAll(lClBuildingOwner, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品土地所有權人檔" + e.getErrorMsg());
+				throw new LogicException("E0008", "擔保品建物所有權人檔" + e.getErrorMsg());
 			}
 		}
 	}

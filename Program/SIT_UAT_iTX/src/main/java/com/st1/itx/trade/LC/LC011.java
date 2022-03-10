@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -81,7 +82,7 @@ public class LC011 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0014", "");
 		}
 
-		if (dList == null || dList.size() == 0) {
+		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "交易明細資料");
 		}
 
@@ -126,7 +127,13 @@ public class LC011 extends TradeBuffer {
 			}
 			occursList.putParam("FlowType", d.get("FlowType"));
 			occursList.putParam("FlowStep", d.get("FlowStep"));
-			if ("1".equals(d.get("Hcode").toString()) && Integer.valueOf(d.get("OrgEntdy").toString()) > 0 && d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
+			
+			TempVo tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(d.get("TranData"),true);
+			occursList.putParam("Funcind", tTempVo.get("FUNCIND"));
+
+			if ("1".equals(d.get("Hcode").toString()) && Integer.valueOf(d.get("OrgEntdy").toString()) > 0
+					&& d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
 				occursList.putParam("Hcode", 3);
 			} else {
 				occursList.putParam("Hcode", d.get("Hcode"));
@@ -134,7 +141,8 @@ public class LC011 extends TradeBuffer {
 
 			occursList.putParam("Status", d.get("ActionFg"));
 			occursList.putParam("FlowNo", d.get("FlowNo"));
-			if (Integer.valueOf(d.get("OrgEntdy").toString()) > 0 && d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
+			if (Integer.valueOf(d.get("OrgEntdy").toString()) > 0
+					&& !d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
 				occursList.putParam("OOOrgEntdy", Integer.valueOf(d.get("OrgEntdy").toString().trim()) - 19110000);
 			} else {
 				occursList.putParam("OOOrgEntdy", "");
@@ -144,7 +152,9 @@ public class LC011 extends TradeBuffer {
 
 			if (Integer.valueOf(d.get("AcCnt")) > 0) {
 				// 當天訂正及被訂正交易 無分錄
-				if (("1".equals(d.get("Hcode").toString()) && d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) || "1".equals(d.get("ActionFg").toString())) {
+				if (("1".equals(d.get("Hcode").toString())
+						&& d.get("OrgEntdy").toString().equals(d.get("Entdy").toString()))
+						|| "1".equals(d.get("ActionFg").toString())) {
 					occursList.putParam("AcCnt", 0);
 				} else {
 					occursList.putParam("AcCnt", 1);

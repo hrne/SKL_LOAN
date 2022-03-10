@@ -46,10 +46,8 @@ E(0,40)ASGN(INQPRT$)
 ]
 
 #FdClCode1=X,2,L
-T(3,*)
 #FdClCode2=X,2,L
 #FdClNo=X,2,L
-T(3,*)
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -166,7 +164,7 @@ T(1,@ClNo,#NTXBUF,4,7)
 T(1,@ApplNo,#NTXBUF,11,7)
 
 !擔保品別1
-#ClCode1=A,1,I
+#ClCode1=A,1,L
 C(3,#CHAIN,1,s,$)
 HELP(#ClCode1Help) 
 @V(H,#ClCode1Help)
@@ -186,7 +184,7 @@ T(2,#ClCode1+#ClCode2)
 C(3,#ClCode1,3,T(3,股票),T(3,其他有價證券))
 
 !擔保品號碼
-#ClNo=A,7,I
+#ClNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
@@ -310,21 +308,21 @@ T(H,#OStockType,#StockTypeHelp)
 !發行股數
 #OIssuedShares=m,14,L
 !非上市(櫃)每股淨值
-#ONetWorth=m,14,L
+#ONetWorth=m,14.2,L
 !每股單價鑑估標準
 #OEvaStandard=X,12,L
 #OEvaStandardX=X,30,L
 T(H,#OEvaStandard,#EvaStandardHelp)
 !每股面額
-#OParValue=m,14,L
+#OParValue=m,14.2,L
 !一個月平均價
-#OMonthlyAvg=m,14,L
+#OMonthlyAvg=m,14.2,L
 !前日收盤價
-#OYdClosingPrice=m,14,L
+#OYdClosingPrice=m,14.2,L
 !三個月平均價
-#OThreeMonthAvg=m,14,L
+#OThreeMonthAvg=m,14.2,L
 !鑑定單價
-#OEvaUnitPrice=m,14,L
+#OEvaUnitPrice=m,14.2,L
 !股票持有人統編
 #OOwnerId=X,10,L
 !股票持有人姓名

@@ -16,6 +16,8 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClOther;
@@ -271,57 +273,6 @@ public class L2414 extends TradeBuffer {
 
 			} // if
 
-//			// 依核准號碼建立一筆額度與擔保品關聯檔
-//			if( iApplNo > 0 ) { // 核准編號大於0才去做
-//				ClFacId clFacId = new ClFacId();
-//				clFacId.setClCode1(iClCode1);
-//				clFacId.setClCode2(iClCode2);
-//				clFacId.setClNo(iClNo);
-//				clFacId.setApproveNo(iApplNo);
-//				ClFac tClFac = sClFacService.findById(clFacId, titaVo);
-//
-//				FacCaseAppl tFacCaseAppl = sFacCaseApplService.findById(iApplNo, titaVo);
-//				if (tFacCaseAppl == null) {
-//					throw new LogicException("E2019", "申請號碼 = " + iApplNo); // 此申請號碼不存在案件申請檔
-//				}
-//				FacMain tFacMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
-//				if (tFacMain == null) {
-//					tFacMain = new FacMain();
-//				}
-//
-//				// 新增資料重複
-//				if (tClFac != null) {
-//					throw new LogicException("E0005", "額度與擔保品關聯檔"); // 新增資料時，發生錯誤
-//				} else {
-//				tClFac = new ClFac();
-//				clFacId = new ClFacId();
-//				clFacId.setClCode1(iClCode1);
-//				clFacId.setClCode2(iClCode2);
-//				clFacId.setClNo(iClNo);
-//				clFacId.setApproveNo(iApplNo);
-//				tClFac.setApproveNo(iApplNo);
-//				tClFac.setClCode1(iClCode1);
-//				tClFac.setClCode2(iClCode2);
-//				tClFac.setClNo(iClNo);
-//				tClFac.setClFacId(clFacId);
-//				tClFac.setCustNo(tFacMain.getCustNo());
-//				tClFac.setFacmNo(tFacMain.getFacmNo());
-//				tClFac.setMainFlag("Y");
-//				tClFac.setShareAmt(BigDecimal.ZERO);
-//				tClFac.setFacShareFlag(0);
-//				tClFac.setOriSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
-//
-//				// insert
-//				try {
-//					sClFacService.insert(tClFac, titaVo);
-//				} catch (DBException e) {
-//					throw new LogicException("E0005", "額度與擔保品關聯檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
-//				}
-//
-//				// 額度與擔保品關聯檔變動處理
-//				clFacCom.changeClFac(iApplNo, titaVo);
-//				}
-//			} // if
 		} else if (iFunCd == 2) {
 
 			tClMain = new ClMain();
@@ -439,6 +390,33 @@ public class L2414 extends TradeBuffer {
 			dataLog.setEnv(titaVo, beforeClOther, tClOther);
 			dataLog.exec("修改擔保品其他檔資料");
 
+			
+			if (iApplNo > 0 && this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+				List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
+				String iOwnerId = titaVo.getParam("OwnerId");
+
+				CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+				if (custMain != null) {
+					String custUKey = custMain.getCustUKey().trim();
+					String relCode = titaVo.getParam("OwnerRelCode").trim();
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("OwnerCustUKey", custUKey);
+					map.put("OwnerRelCode", relCode);
+					ownerMap.add(map);
+				}
+
+				ClFacId clFacId = new ClFacId();
+				clFacId.setClCode1(iClCode1);
+				clFacId.setClCode2(iClCode2);
+				clFacId.setClNo(iClNo);
+				clFacId.setApproveNo(iApplNo);
+				ClFac clFac = sClFacService.findById(clFacId, titaVo);
+				if (clFac == null) {
+					clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+				}
+
+			} // if
+			
 		} else if (iFunCd == 4) {
 			/* 刪除 */
 

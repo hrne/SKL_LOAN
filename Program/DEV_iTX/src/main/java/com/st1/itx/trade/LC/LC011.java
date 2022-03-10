@@ -142,7 +142,7 @@ public class LC011 extends TradeBuffer {
 			occursList.putParam("Status", d.get("ActionFg"));
 			occursList.putParam("FlowNo", d.get("FlowNo"));
 			if (Integer.valueOf(d.get("OrgEntdy").toString()) > 0
-					&& d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
+					&& !d.get("OrgEntdy").toString().equals(d.get("Entdy").toString())) {
 				occursList.putParam("OOOrgEntdy", Integer.valueOf(d.get("OrgEntdy").toString().trim()) - 19110000);
 			} else {
 				occursList.putParam("OOOrgEntdy", "");

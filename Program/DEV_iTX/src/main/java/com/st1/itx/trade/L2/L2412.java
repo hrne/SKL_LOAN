@@ -16,6 +16,8 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClMovables;
@@ -255,6 +257,7 @@ public class L2412 extends TradeBuffer {
 				dataLog.exec("修改擔保品動產檔資料");
 
 				if (iApplNo > 0) {
+					List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
 					String iOwnerId = titaVo.getParam("OwnerId");
 
 					CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
@@ -294,6 +297,18 @@ public class L2412 extends TradeBuffer {
 
 					} // if
 
+					if(this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+						ClFacId clFacId = new ClFacId();
+						clFacId.setClCode1(iClCode1);
+						clFacId.setClCode2(iClCode2);
+						clFacId.setClNo(iClNo);
+						clFacId.setApproveNo(iApplNo);	
+						ClFac clFac = sClFacService.findById(clFacId, titaVo);
+						if (clFac == null) {
+							clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+						}
+					} 
+					
 				} // if
 
 			} else if (iFunCd == 4) {
