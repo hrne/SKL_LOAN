@@ -49,7 +49,12 @@ BEGIN
           ,R."LMSAPN"                     AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,R."LMSASQ"                     AS "BormNo"              -- 撥款序號 DECIMAL 3 0
           ,R."EffectDate"                 AS "EffectDate"          -- 生效日期 DECIMALD 8 0
-          ,0                              AS "Status"              -- 狀態 DECIMAL 1 0             Lai 2021/1/14
+          ,CASE
+             WHEN R."IncrRateEffectDate" > 0 
+                  AND R."IncrRateEffectDate" = R."EffectDate"
+                  -- 有建加碼利率者,放1
+             THEN 1
+           ELSE 0 END                     AS "Status"              -- 狀態 DECIMAL 1 0             Lai 2021/1/14
           ,R."AILIRT"                     AS "RateCode"            -- 利率區分 VARCHAR2 1 0
           ,R."IRTBCD"                     AS "ProdNo"              -- 商品代碼 VARCHAR2 5 0        Lai 2021/1/14 Wei 2021/4/13
           ,FP."BaseRateCode"              AS "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 0    Lai 2021/1/14
@@ -114,7 +119,7 @@ BEGIN
           ,LA."LMSAPN"                    AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,LA."LMSASQ"                    AS "BormNo"              -- 撥款序號 DECIMAL 3 0
           ,LA."ASCADT"                    AS "EffectDate"          -- 生效日期 DECIMALD 8 0
-          ,0                              AS "Status"              -- 狀態 DECIMAL 1 0
+          ,1                              AS "Status"              -- 狀態 DECIMAL 1 0
           ,LM."AILIRT"                    AS "RateCode"            -- 利率區分 VARCHAR2 1 0
           ,LM."IRTBCD"                    AS "ProdNo"              -- 商品代碼 VARCHAR2 5 0
           ,FP."BaseRateCode"              AS "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 0

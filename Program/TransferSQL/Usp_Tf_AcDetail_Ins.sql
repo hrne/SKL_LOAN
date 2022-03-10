@@ -104,7 +104,7 @@ BEGIN
           ,S."BSTBTN"                     AS "SlipBatNo"           -- 傳票批號 DECIMAL 2 0
           ,S."JLNVNO"                     AS "SlipNo"              -- 傳票號碼 DECIMAL 6 0
           ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0
-          ,'999999'                       AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
+          ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
           ,LPAD(S."TRXNMT",5,0)
            || LPAD(S."TRXNM2",3,0)        AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
           ,S."TRXTRN"                     AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0
@@ -149,6 +149,7 @@ BEGIN
                 ,S5."ReceivableFlag"
                 ,S5."AcBookFlag"
                 ,S4."TRXTCT"
+                ,S4."TRXMEM"
                 ,NVL(S4."LMSACN",FF."CustNo") AS "LMSACN"
                 ,NVL(S4."LMSAPN",FF."FacmNo") AS "LMSAPN"
                 ,NVL(S4."LMSASQ",0) AS "LMSASQ"
@@ -177,6 +178,7 @@ BEGIN
                            ,TR."LMSASQ"
                            ,TR."TRXAMT"
                            ,TR."TRXTCT"
+                           ,TR."TRXMEM"
                            ,CASE
                               WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'D' THEN 'C'
                               WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'C' THEN 'D'
@@ -194,6 +196,7 @@ BEGIN
                                  ,TR1."LMSAPN"
                                  ,TR1."LMSASQ"
                                  ,TR1."TRXAMT"
+                                 ,TR1."TRXMEM"
                                  ,MAX(CASE
                                         WHEN TR1."TRXTCT" IS NOT NULL
                                         THEN CASE
@@ -290,6 +293,7 @@ BEGIN
                WHERE "ACTFSC" IS NOT NULL
               ) ACT ON ACT."LMSACN" = NVL(S."LMSACN",0)
                    AND NVL(S."LMSACN",0) > 0
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S."TRXMEM"
     ;
 
     -- 記錄寫入筆數

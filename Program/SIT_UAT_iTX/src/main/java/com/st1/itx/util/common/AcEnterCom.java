@@ -482,7 +482,7 @@ public class AcEnterCom extends TradeBuffer {
 		}
 		this.info(checkAc + "DB=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", Cr=" + CrAmt + ", diff="
 				+ DbAmt.subtract(CrAmt));
-		
+
 		if (DbAmt.compareTo(CrAmt) != 0) {
 			throw new LogicException(titaVo, "E6003", "借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方="
 					+ CrAmt + ", 差額=" + DbAmt.subtract(CrAmt));
@@ -561,15 +561,29 @@ public class AcEnterCom extends TradeBuffer {
 //	     1.自動設定為一段式交易
 //	     2.原分錄入總帳記號皆設定為 2:被沖正 
 //	     3.依原分錄產生借貸相反之新分錄(，
-//	       A.借方銀行存款科目不回沖，轉至'暫收款－可抵繳'科目(TAV)   
+//	       A.來源科目不回沖，轉至'暫收款－可抵繳'科目(TAV)   
+//         B.若為債協入帳則轉至'債協退還款'科目(T2x)  
 		int rpFacmno = 0;
-		if (acList0 == null)
+		if (acList0 == null) {
 			throw new LogicException(titaVo, "E6003", "訂正或主管放行時AcDetail NotFound " + RelDy + RelTxseq);
-
+		}
 		// 找最小額度編號
 		for (AcDetail ac : acList0) {
 			if (rpFacmno == 0 || ac.getFacmNo() < rpFacmno) {
 				rpFacmno = ac.getFacmNo();
+			}
+		}
+
+		// 債協入帳
+		String negAcctCode = "";
+		boolean isNegTx = false;
+		if (rpFacmno == 0 && acList0.size() == 2) {
+			for (AcDetail ac : acList0) {
+				if (ac.getDbCr().equals("C") && ac.getAcctCode().length() == 3
+						&& "T1".equals(ac.getAcctCode().substring(0, 2))) {
+					negAcctCode = "T2" + ac.getAcctCode().substring(2, 3);
+					isNegTx = true;
+				}
 			}
 		}
 
@@ -601,7 +615,11 @@ public class AcEnterCom extends TradeBuffer {
 				// 整批入帳的隔日訂正，還款來源(1xx-應收)回沖至暫收可抵繳
 				if (acDetail.getSumNo() != null && acDetail.getSumNo().length() == 3
 						&& "1".equals(ac.getSumNo().substring(0, 1)) && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
-					acDetail.setAcctCode("TAV");
+					if (isNegTx) {
+						acDetail.setAcctCode(negAcctCode);
+					} else {
+						acDetail.setAcctCode("TAV");
+					}
 					if (acDetail.getFacmNo() == 0) {
 						acDetail.setFacmNo(rpFacmno);
 					}

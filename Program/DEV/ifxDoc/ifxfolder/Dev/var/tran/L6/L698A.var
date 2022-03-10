@@ -304,7 +304,7 @@ ifxBatch:{
 #OOCustName=戶名
 {width:100,align:'left'}
 
-#OODtlValue=明細值
+#OODtlValue=明細項目
 {width:300,align:'left'}
 
 #OOProcessNote=處理事項說明
@@ -348,7 +348,7 @@ ifxBatch:{
 #OOCustName=戶名
 {width:100,align:'left'}
 
-#OODtlValue=明細值
+#OODtlValue=明細項目
 {width:300,align:'left'}
 
 #OOProcessNote=處理事項說明
@@ -374,7 +374,7 @@ ifxBatch:{
 #OOCustName=戶名
 {width:100,align:'left'}
 
-#OODtlValue=明細值
+#OODtlValue=明細項目
 {width:300,align:'left'}
 
 
@@ -417,7 +417,7 @@ ifxBatch:{
 #OOCustName=戶名
 {width:100,align:'left'}
 
-#OODtlValue=明細值
+#OODtlValue=明細項目
 {width:300,align:'left'}
 
 #OOProcessNote=處理事項說明
@@ -460,7 +460,7 @@ ifxBatch:{
 #OOCustName=戶名
 {width:100,align:'left'}
 
-#OODtlValue=明細值
+#OODtlValue=明細項目
 {width:300,align:'left'}
 
 
@@ -504,7 +504,7 @@ ifxBatch:{
 #OOCustName=戶名
 {width:100,align:'left'}
 
-#OODtlValue=明細值
+#OODtlValue=明細項目
 {width:300,align:'left'}
 
 
@@ -532,7 +532,7 @@ ifxBatch:{
 #OOCustName=戶名
 {width:100,align:'left'}
 
-#OODtlValue=明細值
+#OODtlValue=明細項目
 {width:300,align:'left'}
 
 

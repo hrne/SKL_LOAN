@@ -58,10 +58,18 @@ BEGIN
           ,''                             AS "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1
           ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5
-          ,'999999'                       AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建立日期時間 DATE  
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 修改日期時間 DATE  
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+          ,CASE
+             WHEN TRUNC(S2."CRTDTM" / 1000000) > 0
+             THEN TO_DATE(TRUNC(S2."CRTDTM" / 1000000),'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                 AS "CreateDate"          -- 建檔日期 DATE 0 0
+          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+          ,CASE
+             WHEN TRUNC(S2."CHGDTM" / 1000000) > 0
+             THEN TO_DATE(TRUNC(S2."CHGDTM" / 1000000),'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S2."ACHCDT" > 0 THEN MOD(S2."ACHCDT" , 1000000)
            ELSE 0 END                     AS "ProcessTime"
     FROM (SELECT "AH$ACRP"."CUSCDT"
@@ -79,6 +87,8 @@ BEGIN
                           AND S2."LMSPBK" = S1."LMSPBK"
                           AND S2."LMSPCN" = S1."LMSPCN"
                           AND S2."LMSAPN" = S1."LMSAPN"
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S2."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = S2."CHGEMP"
     LEFT JOIN (SELECT DISTINCT
                       "LMSACN"
                      ,"LMSPCN"
@@ -91,7 +101,7 @@ BEGIN
               ) FACM ON FACM."LMSACN" = S2."LMSACN"
                     AND FACM."LMSPCN" = S2."LMSPCN"
                     AND FACM."SEQ" = 1
-    WHERE NOT (S2."CUSCDT" > 19110000 * 2)
+    WHERE S2."CUSCDT" <= 19110000 * 2
     ;
 
     -- 記錄寫入筆數
@@ -137,13 +147,23 @@ BEGIN
           ,''                             AS "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1
           ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5
-          ,'999999'                       AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建立日期時間 DATE  
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 修改日期時間 DATE  
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+          ,CASE
+             WHEN TRUNC(S1."CRTDTM" / 1000000) > 0
+             THEN TO_DATE(TRUNC(S1."CRTDTM" / 1000000),'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                 AS "CreateDate"          -- 建檔日期 DATE 0 0
+          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+          ,CASE
+             WHEN TRUNC(S1."CHGDTM" / 1000000) > 0
+             THEN TO_DATE(TRUNC(S1."CHGDTM" / 1000000),'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)
            ELSE 0 END                     AS "ProcessTime"
     FROM "AH$ACHP" S1
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = S1."CHGEMP"
     LEFT JOIN (SELECT DISTINCT
                       "LMSACN"
                      ,"LMSPCN"

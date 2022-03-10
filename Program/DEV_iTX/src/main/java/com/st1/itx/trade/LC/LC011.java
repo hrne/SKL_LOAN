@@ -82,7 +82,7 @@ public class LC011 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0014", "");
 		}
 
-		if (dList == null || dList.size() == 0) {
+		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "交易明細資料");
 		}
 

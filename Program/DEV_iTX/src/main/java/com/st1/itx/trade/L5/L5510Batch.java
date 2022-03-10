@@ -157,9 +157,9 @@ public class L5510Batch extends TradeBuffer {
 		if (lPfItDetail.size() > 0) {
 			plusCnt = lPfItDetail.size();
 			ArrayList<PfItDetail> lPfFac = new ArrayList<PfItDetail>(); // 額度業績
+			custNo = slPfItDetail.getContent().get(0).getCustNo();
+			facmNo = slPfItDetail.getContent().get(0).getFacmNo();
 			for (PfItDetail pfIt : lPfItDetail) {
-				custNo = slPfItDetail.getContent().get(0).getCustNo();
-				facmNo = slPfItDetail.getContent().get(0).getFacmNo();
 				// 額度不同則執行房貸獎勵保費檢核、產生發放媒體
 				if (pfIt.getCustNo() != custNo || pfIt.getFacmNo() != facmNo) {
 					calculate(custNo, facmNo, lPfFac, titaVo);
@@ -192,6 +192,7 @@ public class L5510Batch extends TradeBuffer {
 			makeExcel.setValue(row, 9, "檢核工作月");
 			for (PfInsCheck pf : lPfInsCheck) {
 				this.info("lPfInsCheck =" + pf.toString());
+				this.info("lPfInsCheck2 =" + pf.getCustNo() + "/" + pf.getFacmNo());
 				row++;
 				makeExcel.setValue(row, 1, String.format("%07d", pf.getCustNo()));
 				makeExcel.setValue(row, 2, String.format("%03d", pf.getFacmNo()));
@@ -282,6 +283,7 @@ public class L5510Batch extends TradeBuffer {
 		// 執行房貸獎勵保費檢核
 		PfInsCheck tPfInsCheck = pfCheckInsuranceCom.check(0, iCustNo, iFacmNo, iWorkMonth, titaVo); // 0.換算業績、業務報酬
 
+		this.info("after pfCheckInsuranceCom = " + tPfInsCheck.getCustNo() + "/" + tPfInsCheck.getFacmNo());
 		lPfInsCheck.add(tPfInsCheck);
 
 		// 計算正業績，本工作月正業績一率寫入

@@ -439,7 +439,7 @@ public class L4320Batch extends TradeBuffer {
 			// 本次生效日 = 主檔下次利率調整日
 			effDateCurt = nextAdjRateDate;
 			// 利率按合約 Y ， 本次利率 = 本次指標利率 + 目前合約加減碼
-			// 利率按合約 N && 有地區別， 本次利率 = 目前利率 + 地區別加減碼，依地區別利率上、下限調整
+			// 利率按合約 N && 有地區別， 本次利率 = 目前利率 + 地區別加減碼，依地區別利率上、下限調整，不可超過合約加碼利率
 			// 利率按合約 N && 無地區別， 本次利率 = 本次指標利率 +借戶利率檔個人加碼利率
 			if ("Y".equals(incrFlag)) {
 				adjCode = 1;
@@ -451,19 +451,27 @@ public class L4320Batch extends TradeBuffer {
 				adjCode = 2;
 				// 本次利率 = 目前利率 + 地區別加減碼
 				rateCurt = fitRate.add(cityIntRateIncr);
+				warnMsg += "地區別加減碼:" + cityIntRateIncr ;			
 				// 依地區別利率上、下限調整
 				if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
 					rateCurt = cityIntRateCeiling;
+					warnMsg += "達地區別上限 ";
 				}
 				if (rateCurt.compareTo(cityIntRateFloor) < 0) {
 					rateCurt = cityIntRateFloor;
+					warnMsg += "達地區別下限 ";
 				}
+			}
+			
+			if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateCurt) < 0) {
+				rateCurt = contractRate;
+				warnMsg += "達合約利率上限 ";
 			}
 
 			// 逾一期 => 下次繳息日,下次應繳日 < 上次月初日
-			if (b.getOvduTerm() >= 1) {
+			if (adjCode > 1 && b.getOvduTerm() >= 1) {
 				adjCode = 3;
-				warnMsg += "逾 " + dateUtil.getMons() + " 期";
+				warnMsg += "逾 " + dateUtil.getMons() + " 期 ";
 			}
 
 			break;
@@ -558,7 +566,7 @@ public class L4320Batch extends TradeBuffer {
 		}
 
 		// 若利率變動且大於利率生效日
-		if (adjCode == 1 ) {
+		if (adjCode == 1) {
 			if (rateCurt.compareTo(fitRate) != 0 && prevIntDate > effDateCurt) {
 				errorFlag = 1;
 				checkMsg += "上次繳息日大於利率生效日";
@@ -567,7 +575,7 @@ public class L4320Batch extends TradeBuffer {
 
 		tmpBorm facm = new tmpBorm(custNo, facmNo, 0);
 		if (facRateFlag.get(facm) == 1) {
-			warnMsg += "額度下撥款的目前利率不同";       // warning only
+			warnMsg += "額度下撥款的目前利率不同"; // warning only
 		}
 		// 預調週期
 		b.setTxRateAdjFreq(iNextAdjPeriod);
@@ -581,10 +589,10 @@ public class L4320Batch extends TradeBuffer {
 		tTempVo.putParam("CheckMsg", checkMsg);
 		// 緊告訊息
 		tTempVo.putParam("warnMsg", warnMsg);
-		
+
 		// 目前利率 <> 借戶利率檔適用利率(預調利率)
-		if (fitRate.compareTo(parse.stringToBigDecimal(s.get("F14"))) !=0) {			
-			tTempVo.putParam("FitRate",s.get("F14"));
+		if (fitRate.compareTo(parse.stringToBigDecimal(s.get("F14"))) != 0) {
+			tTempVo.putParam("FitRate", s.get("F14"));
 		}
 
 		b.setJsonFields(tTempVo.getJsonString());
@@ -606,7 +614,6 @@ public class L4320Batch extends TradeBuffer {
 
 	}
 
-	
 //	訂正(刪除)
 	private void deleteBatxRate(TitaVo titaVo) throws LogicException {
 		// 戶別 CustType 1:個金;2:企金（含企金自然人）=> 客戶檔 0:個金1:企金2:企金自然人

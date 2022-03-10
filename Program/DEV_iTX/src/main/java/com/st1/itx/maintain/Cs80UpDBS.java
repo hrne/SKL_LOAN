@@ -150,7 +150,7 @@ public class Cs80UpDBS extends CommBuffer {
 //				this.custRmk();
 //			}
 
-			if (!(this.titaVo.isTrmtypBatch() && this.titaVo.isHcodeErase()) && !this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
+			if (!this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
 				this.insTxRecord(tota);
 			}
 
@@ -415,15 +415,6 @@ public class Cs80UpDBS extends CommBuffer {
 		boolean newfg = true;
 
 		TxRecord txRecord = new TxRecord();
-
-		if (this.titaVo.isTrmtypBatch()) {
-			txRecord = txRecordService.holdById(txRecordId);
-			if (txRecord == null) {
-				txRecord = new TxRecord();
-			} else {
-				newfg = false;
-			}
-		}
 
 		txRecord.setTxRecordId(txRecordId);
 		txRecord.setBrNo(this.titaVo.getKinbr());

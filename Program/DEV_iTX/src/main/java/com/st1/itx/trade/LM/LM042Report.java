@@ -201,7 +201,7 @@ public class LM042Report extends MakeReport {
 				// 擔保品C 非利關人 資產分類5
 				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 5) {
 					row = 22;
-					col = 7;
+					col = 6;
 					cN5Amt = cN5Amt.add(amt);
 				}
 				// 擔保品D 非利關人 資產分類1

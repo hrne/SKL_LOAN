@@ -1191,7 +1191,7 @@ public class L3100 extends TradeBuffer {
 		tLoanRateChange.setBormNo(wkBormNo);
 		tLoanRateChange.setEffectDate(wkEffectDate);
 		tLoanRateChange.setLoanRateChangeId(tLoanRateChangeId);
-		tLoanRateChange.setStatus(0);
+		tLoanRateChange.setStatus(2); // 階梯利率
 		// 指標利率代碼與額度檔相同(01: 保單分紅利率 02: 中華郵政二年期定儲機動利率 99: 自訂利率)
 		tLoanRateChange.setBaseRateCode(tFacMain.getBaseRateCode());
 		// RateCode 利率區分 (1:機動 2:固定 3:定期機動)，機動的固定利率與撥款主檔不同 (例如：郵局機動利率)

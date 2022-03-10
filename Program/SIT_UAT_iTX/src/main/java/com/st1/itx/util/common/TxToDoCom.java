@@ -765,37 +765,37 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "MAIL00;Y;Y;Y;Y;-;L698A;     ;L4711;-;電子郵件";
 			break;
 		case "L45101":
-			settingValue = "L45101;-;Y;-;-;Y;L698A;L4510;L4511;-;產出15日薪員工扣薪檔";
+			settingValue = "L45101;-;Y;-;-;Y;     ;L4510;L4511;-;產出15日薪員工扣薪檔";
 			break;
 		case "L45102":
-			settingValue = "L45102;-;Y;-;-;Y;L698A;L4510;L4511;-;產出非15日薪員工扣薪檔";
+			settingValue = "L45102;-;Y;-;-;Y;     ;L4510;L4511;-;產出非15日薪員工扣薪檔";
 			break;
 		case "EMEP00":
-			settingValue = "EMEP00;-;C;-;-;-;L698A;L4200;L4200;-;員工扣薪入帳作業";
+			settingValue = "EMEP00;-;C;-;-;-;     ;L4200;L4200;-;員工扣薪入帳作業";
 			break;
 		case "L4602":
-			settingValue = "L4602 ;Y;C;-;-;-;L698A;L4602;L4602;-;火險出單明細表作業";
+			settingValue = "L4602 ;Y;C;-;-;-;     ;L4602;L4602;-;火險出單明細表作業";
 			break;
 		case "L4604":
-			settingValue = "L4604 ;Y;C;-;-;-;L698A;L4604;L4604;Y;火險保費未繳轉借支";
+			settingValue = "L4604 ;Y;C;-;-;-;     ;L4604;L4604;Y;火險保費未繳轉借支";
 			break;
 		case "L4702":
-			settingValue = "L4702 ;Y;C;Y;-;-;L698A;L4702;L4702;-;繳息通知單產生作業";
+			settingValue = "L4702 ;Y;C;Y;-;-;     ;L4702;L4702;-;繳息通知單產生作業";
 			break;
 		case "L4703":
-			settingValue = "L4703 ;Y;C;Y;-;-;L698A;L4703;L4703;-;滯繳通知單產生作業";
+			settingValue = "L4703 ;Y;C;Y;-;-;     ;L4703;L4703;-;滯繳通知單產生作業";
 			break;
 		case "L4454":
-			settingValue = "L4454 ;Y;Y;Y;-;-;L698A;L4454;L4454;-;銀扣失敗通知產生作業";
+			settingValue = "L4454 ;Y;Y;Y;-;-;     ;L4454;L4454;-;銀扣失敗通知產生作業";
 			break;
 		case "L9710":
-			settingValue = "L9710 ;-;C;-;-;-;L698A;L9710;L9710;-;產生寬限到期明細表";
+			settingValue = "L9710 ;-;C;-;-;-;     ;L9710;L9710;-;產生寬限到期明細表";
 			break;
 		case "L9711":
-			settingValue = "L9711 ;-;C;-;-;-;L698A;L9711;L9711;-;產生放款到期明細表及通知單";
+			settingValue = "L9711 ;-;C;-;-;-;     ;L9711;L9711;-;產生放款到期明細表及通知單";
 			break;
 		case "PFCL00": // L6101 寫入，提醒經辦
-			settingValue = "PFCL00;-;M;-;-;-;L698A;     ;L5500;-;業績工作月結算啟動通知";
+			settingValue = "PFCL00;-;M;-;-;-;     ;     ;L5500;-;業績工作月結算啟動通知";
 			break;
 		case "NOTI01": // L4454 寫入應處理明細留存檔，紀錄列印日期
 			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;L4454;-;銀扣失敗繳息還本通知單";

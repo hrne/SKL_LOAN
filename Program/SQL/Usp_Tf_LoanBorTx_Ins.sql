@@ -97,8 +97,7 @@ BEGIN
           ,TR1."TRXTDT"                   AS "TitaCalDy"           -- 交易日期 DECIMALD 8 
           ,TR1."TRXTIM"                   AS "TitaCalTm"           -- 交易時間 DECIMAL 8 
           ,'0000'                         AS "TitaKinBr"           -- 單位別 VARCHAR2 4
-          -- 左補零,總長度6
-          ,LPAD(TR1."TRXMEM",6,0)         AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
+          ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
 	        -- "TRXNMT" NUMBER(7,0), 目前最大20519
 	        -- "TRXNM2" NUMBER(3,0), 目前最大72
           -- 左補零,總長度8
@@ -108,7 +107,7 @@ BEGIN
           ,''                             AS "TitaCrDb"            -- 借貸別 VARCHAR2 1 
           ,TR1."TRXCRC"                   AS "TitaHCode"           -- 訂正別 VARCHAR2 1 
           ,'TWD'                          AS "TitaCurCd"           -- 幣別 VARCHAR2 3 
-          ,TR1."TRXSID"                   AS "TitaEmpNoS"          -- 主管編號 VARCHAR2 6 
+          ,NVL(AEM2."EmpNo",TR1."TRXSID") AS "TitaEmpNoS"          -- 主管編號 VARCHAR2 6 
           ,CASE TR1."TRXSAK"
              WHEN 0 THEN 9
              WHEN 1 THEN 1
@@ -322,6 +321,8 @@ BEGIN
               ) JL ON JL."TRXDAT" = TR."TRXDAT"
                   AND JL."TRXNMT" = TR."TRXNMT"
                   AND JL."JLNAMT" = ABS(TR."TRXAMT")
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = TR1."TRXMEM"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = TR1."TRXSID"
     LEFT JOIN "TB$TCDP" TCD ON TCD."TRXTRN" = TR."TRXTRN"
     WHERE TR1."TRXDAT" <= "TbsDyF"
     ;
