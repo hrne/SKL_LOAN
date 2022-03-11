@@ -147,7 +147,6 @@ public class L2076ReportC extends MakeReport {
 		this.print(-13, 65, custId); // 統編
 		this.print(-49, 74, tlrName); // 經辦
 
-
 //		for (int i = 1; i <= 400; i++) {
 //			if ((i % 10) == 0) {
 //				this.print(-2, i, "" + (i / 10));

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
@@ -20,11 +21,14 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacCloseId;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.domain.TxTemp;
+import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.CdGseqService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.BaTxCom;
@@ -91,6 +95,14 @@ public class L2631 extends TradeBuffer {
 	@Autowired
 	BaTxCom baTxCom;
 
+	@Autowired
+	public TxTempService txTempService;
+	private TxTemp tTxTemp;
+	private TxTempId tTxTempId;
+	private List<TxTemp> lTxTemp;
+	private int iCustNo;
+	private int iFacmNo;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2631 ");
@@ -111,7 +123,7 @@ public class L2631 extends TradeBuffer {
 		// 登放記號
 		int iActFg = parse.stringToInteger(titaVo.getParam("ACTFG"));
 		// 戶號
-		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		// 統編
 		String iCustId = titaVo.getParam("CustId");
 		long pdfSnoF = 0;
@@ -132,7 +144,7 @@ public class L2631 extends TradeBuffer {
 		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"));
 		String iCloseInd = titaVo.getParam("CloseInd");
 		// 額度編號
-		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 
 		int iCloseNo = parse.stringToInteger(titaVo.getParam("CloseNo"));
 		BigDecimal iCloseAmt = parse.stringToBigDecimal(titaVo.getParam("CloseAmt"));
@@ -152,6 +164,17 @@ public class L2631 extends TradeBuffer {
 		tFacCloseId.setCloseNo(wkcloseNo);
 
 		tFacClose.setFacCloseId(tFacCloseId);
+		if ("0".equals(iFunCode)) {
+
+			// 清償日期
+			tFacClose.setCloseDate(0);
+			// 塗銷同意書編號L2632
+			tFacClose.setAgreeNo("");
+			// 公文編號L2632
+			tFacClose.setDocNo(wkDocNo);
+			// 銷號欄L2632
+			tFacClose.setClsNo("");
+		}
 		tFacClose.setCustNo(iCustNo);
 		tFacClose.setCloseNo(wkcloseNo);
 		tFacClose.setFacmNo(iFacmNo);
@@ -160,8 +183,6 @@ public class L2631 extends TradeBuffer {
 		tFacClose.setApplDate(iApplDate);
 		tFacClose.setCloseInd(iCloseInd);
 
-		// 入帳日期L2632
-		tFacClose.setCloseDate(0);
 		tFacClose.setCollectFlag(titaVo.getParam("CollectFlag"));
 		tFacClose.setCloseAmt(iCloseAmt);
 		tFacClose.setTelNo1(titaVo.getParam("TelNo1"));
@@ -171,12 +192,6 @@ public class L2631 extends TradeBuffer {
 		tFacClose.setCollectWayCode(titaVo.getParam("CollectWayCode"));
 		tFacClose.setReceiveDate(parse.stringToInteger(titaVo.getParam("ReceiveDate")));
 		tFacClose.setEntryDate(iTranDate);
-		// 塗銷同意書編號L2632
-		tFacClose.setAgreeNo("");
-		// 公文編號L2632
-		tFacClose.setDocNo(wkDocNo);
-		// 銷號欄L2632
-		tFacClose.setClsNo("");
 		tFacClose.setRmk(titaVo.getParam("Rmk1"));
 		// **[清償違約金即時收取]部分償還時一律記短收，連同下期期款收回，提前結案時計算清償違約金併入結案金額。
 		// **[清償違約金領清償證明收取]<清償請領>結案時計算全部的部分償還及提前結案的清償違約金，併入結案金額。
@@ -286,17 +301,43 @@ public class L2631 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "清償作業檔");
 			}
-			this.info("selectTotal = " + titaVo.get("selectTotal"));
-			this.info("selectIndex = " + titaVo.get("selectIndex"));
 			// 總筆數
-			titaVo.get("selectTotal");
+			this.info("selectTotal = " + titaVo.get("selectTotal"));
 			// 當前筆數
-			titaVo.get("selectIndex");
-			String checkMsg = "抵押權塗銷同意書已完成。";
+			this.info("selectIndex = " + titaVo.get("selectIndex"));
+
+			String txtNo = "";
+			if (parse.stringToInteger(titaVo.get("selectIndex")) == 1) {
+				setTxTemp(txtNo, titaVo);
+			} else {
+				if (titaVo.getSelectReturnOK() == 0) {
+					setTxTemp(txtNo, titaVo);
+				} else {
+					TxTemp t2TxTemp = txTempService.txtNoLastFirst(titaVo.getTlrNo(), titaVo);
+					if (t2TxTemp != null) {
+						txtNo = t2TxTemp.getTxtNo();
+					}
+					setTxTemp(txtNo, titaVo);
+				}
+
+			}
 
 			if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
+				String t3txtNo = "";
+				TxTemp t3TxTemp = txTempService.txtNoLastFirst(titaVo.getTlrNo(), titaVo);
+				if (t3TxTemp != null) {
+					t3txtNo = t3TxTemp.getTxtNo();
+				}
+				Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getEntDyI() + 19110000, titaVo.getKinbr(),
+						titaVo.getTlrNo(), t3txtNo, this.index, Integer.MAX_VALUE, titaVo);
+				lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
+				if (lTxTemp == null || lTxTemp.size() == 0) {
+					throw new LogicException(titaVo, "E0001",
+							"交易暫存檔 會計日期 = " + parse.stringToInteger(titaVo.getEntDy()) + 19110000 + "分行別 = "
+									+ titaVo.getKinbr() + " 交易員代號 = " + titaVo.getTlrNo() + " 交易序號 = " + t3txtNo); // 查詢資料不存在
+				}
 
-				doRptB(tFacClose, titaVo);// 用印申請書
+				doRptB(tFacClose, lTxTemp, titaVo);// 用印申請書
 				doRptC(tFacClose, titaVo.get("selectTotal"), titaVo); // 簽收回條
 				if (tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26")
 						|| tFacClose.getCollectWayCode().equals("27")) {
@@ -304,6 +345,7 @@ public class L2631 extends TradeBuffer {
 					doRptE(tFacClose, titaVo.get("Addres"), titaVo);// 雙掛號小單
 				}
 
+				String checkMsg = "抵押權塗銷同意書已完成。";
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 						titaVo.getTlrNo(), checkMsg, titaVo);
 			}
@@ -331,15 +373,16 @@ public class L2631 extends TradeBuffer {
 		return rptNo;
 	}
 
-	public void doRptB(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+	public void doRptB(FacClose tFacClose, List<TxTemp> txTemp, TitaVo titaVo) throws LogicException {
 		this.info("L2076B doRptB started.");
 
 		// 撈資料組報表
-		L2076ReportB.exec(tFacClose, titaVo);
+		L2076ReportB.exec(tFacClose, txTemp, titaVo);
 
 	}
 
-	public void doRptC(FacClose tFacClose, String selectTotal, TitaVo titaVo) throws LogicException {
+	public void doRptC(FacClose tFacClose, String selectTotal, TitaVo titaVo)
+			throws LogicException {
 		this.info("L2076C doRptC started.");
 
 		// 撈資料組報表
@@ -351,14 +394,51 @@ public class L2631 extends TradeBuffer {
 		this.info("L2076D doRptD started.");
 
 		// 撈資料組報表
-		L2076ReportD.exec(tFacClose, Addres,titaVo);
+		L2076ReportD.exec(tFacClose, Addres, titaVo);
 
 	}
+
 	public void doRptE(FacClose tFacClose, String Addres, TitaVo titaVo) throws LogicException {
 		this.info("L2076E doRptE started.");
 
 		// 撈資料組報表
-		L2076ReportE.exec(tFacClose, Addres,titaVo);
+		L2076ReportE.exec(tFacClose, Addres, titaVo);
 
+	}
+
+	public void setTxTemp(String txtNo, TitaVo titaVo) throws LogicException {
+		this.info("setTxTemp ... ");
+		this.info("   titaVo.getEntDy() = " + parse.stringToInteger(titaVo.getEntDy()) + 19110000);
+		this.info("   titaVo.getKinbr()  = " + titaVo.getKinbr());
+		this.info("   titaVo.getTlrNo()  = " + titaVo.getTlrNo());
+		this.info("   titaVo.getTxtNo()  = " + titaVo.getTxtNo());
+		tTxTempId = new TxTempId();
+		tTxTemp = new TxTemp();
+		TempVo tTempVo = new TempVo();
+		String wkSeqNo = titaVo.getTxtNo();
+		tTxTempId.setEntdy(parse.stringToInteger(titaVo.getEntDy()) + 19110000);
+		tTxTempId.setKinbr(titaVo.getKinbr());
+		tTxTempId.setTlrNo(titaVo.getTlrNo());
+		tTxTempId.setTxtNo(txtNo.isEmpty() ? titaVo.getTxtNo() : txtNo);
+		tTxTempId.setSeqNo(wkSeqNo);
+		tTxTemp.setEntdy(parse.stringToInteger(titaVo.getEntDy()) + 19110000);
+		tTxTemp.setKinbr(titaVo.getKinbr());
+		tTxTemp.setTlrNo(titaVo.getTlrNo());
+		tTxTemp.setTxtNo(txtNo.isEmpty() ? titaVo.getTxtNo() : txtNo);
+		tTxTemp.setSeqNo(wkSeqNo);
+		tTxTemp.setTxTempId(tTxTempId);
+
+		tTempVo.clear();
+		tTempVo.putParam("CustNo", iCustNo);
+		tTempVo.putParam("FacmNo", iFacmNo);
+		tTempVo.putParam("ClCode1", parse.stringToInteger(titaVo.getParam("OOClCode1")));
+		tTempVo.putParam("ClCode2", parse.stringToInteger(titaVo.getParam("OOClCode2")));
+		tTempVo.putParam("ClNo", parse.stringToInteger(titaVo.getParam("OOClNo")));
+		tTxTemp.setText(tTempVo.getJsonString());
+		try {
+			txTempService.insert(tTxTemp);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤 }
+		}
 	}
 }

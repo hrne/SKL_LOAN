@@ -187,12 +187,19 @@ E(2,@Sno103,#PdfSno103)
 E(2,@Sno998,#PdfSno998)
 #Sno998=A,8,S
 
+!報表
+#PdfSno=X,8,S
+E(2,@Sno,#PdfSno)
+#Sno=A,8,S
+
 ! 媒體檔FileNo
 #PdfPrt103=A,1,S
 C(3,#Sno103,0,E(0,0),E(0,1))
 #PdfPrt998=A,1,S
 C(3,#Sno998,0,E(0,0),E(0,1))
-
+!報表
+#PdfPrt=A,1,S
+C(3,#Sno,0,E(0,0),E(0,1))
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
@@ -294,6 +301,7 @@ T(6A,#OOAuthCreateDate+#OOCustNo+#OORepayBank+#OORepayAcct+#OOCreateFlag+#Create
 TXFORM=L4040
 #PdfSno103
 #PdfSno998
+#PdfSno
 #OOAuthCreateDate
 #OOCustNo
 #OOFacmNo
@@ -423,5 +431,6 @@ ifxBatch:{
 ^
 #PdfPrt998=1,PDF,,,,,,,,,,,,,PdfSno998;3,ACH授權提出媒體檔-他行
 ^
-
+#PdfPrt=1,PDF,,,,,,,,,,,,,PdfSno;1,授權資料明細表
+^
 </sub>

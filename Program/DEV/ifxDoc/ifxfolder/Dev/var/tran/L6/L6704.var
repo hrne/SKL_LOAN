@@ -72,7 +72,7 @@ T(2,@FuncCode2Help,#HelpDesc1)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6074進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6074 地區別資料查詢]進入),$)
 
 #NTXBUF=X,41,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)

@@ -78,6 +78,9 @@ public class L4041 extends TradeBuffer {
 	@Autowired
 	public BankAuthActService bankAuthActService;
 
+	@Autowired
+	L4041Report l4041Report;
+	
 	private int authCreateDate = 0;
 	private int processDate = 0;
 	private int stampFinishDate = 0;
@@ -86,6 +89,7 @@ public class L4041 extends TradeBuffer {
 	private int deleteDate = 0;
 	private int relAcctBirthday = 0;
 
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4041 ");
@@ -194,20 +198,21 @@ public class L4041 extends TradeBuffer {
 					this.info("AuthErrorCode : " + result.get("F14"));
 					this.info("PostMediaCode : " + result.get("F13"));
 					this.info("PropDate : " + propDate);
-
-					if ("1".equals(result.get("F5"))) {
-						checkFlag = 1;
-						tempCheckAcctNo = result.get("F4");
-						tempCustNo = FormatUtil.pad9(result.get("F2"), 7);
-						tempFacmNo = FormatUtil.pad9(result.get("F6"), 3);
-					} else {
-						if (!tempCheckAcctNo.equals(result.get("F4"))) {
-							throw new LogicException(titaVo, "E0014",
-									"戶號:" + tempCustNo + "，額度:" + tempFacmNo + "，期款與火險需同時授權");
-						} else {
-							checkFlag = 0;
-						}
-					}
+					this.info("tempCheckAcctNo : " + tempCheckAcctNo);
+					this.info("F5 : " + result.get("F5"));
+//					if ("1".equals(result.get("F5"))) {
+//						checkFlag = 1;
+//						tempCheckAcctNo = result.get("F4");
+//						tempCustNo = FormatUtil.pad9(result.get("F2"), 7);
+//						tempFacmNo = FormatUtil.pad9(result.get("F6"), 3);
+//					} else {
+//						if (!tempCheckAcctNo.equals(result.get("F4"))) {
+//							throw new LogicException(titaVo, "E0014",
+//									"戶號:" + tempCustNo + "，額度:" + tempFacmNo + "，期款與火險需同時授權");
+//						} else {
+//							checkFlag = 0;
+//						}
+//					}
 
 					if (!"Y".equals(result.get("F13")) && propDate > 0) {
 						cnt = cnt + 1;
@@ -371,10 +376,10 @@ public class L4041 extends TradeBuffer {
 				if (cnt == 0) {
 					throw new LogicException(titaVo, "CE001", "查無資料");
 				}
-
-				if (checkFlag == 1) {
-					throw new LogicException(titaVo, "E0014", "戶號:" + tempCustNo + "-額度:" + tempFacmNo + "，期款與火險需同時授權");
-				}
+				
+//				if (checkFlag == 1) {
+//					throw new LogicException(titaVo, "E0014", "戶號:" + tempCustNo + "-額度:" + tempFacmNo + "，期款與火險需同時授權");
+//				}
 
 //				Footer
 //				1	FootDataClass   資料別		0-1		X(1)	固定值為2	
@@ -459,6 +464,13 @@ public class L4041 extends TradeBuffer {
 				makeFile.toFile(sno);
 				totaVo.put("PdfSno53N", "" + sno);
 
+				l4041Report.setParentTranCode(titaVo.getTxcd());
+				
+				l4041Report.exec(resultList, titaVo);
+				sno = l4041Report.close();
+				l4041Report.toPdf(sno);
+				
+				totaVo.put("PdfSno", "" + sno);
 			} else {
 				throw new LogicException(titaVo, "CE001", "查無資料");
 			}
@@ -594,4 +606,7 @@ public class L4041 extends TradeBuffer {
 		this.info("deleteDate ... " + deleteDate);
 		this.info("relAcctBirthday ... " + relAcctBirthday);
 	}
+	
+	
+	
 }

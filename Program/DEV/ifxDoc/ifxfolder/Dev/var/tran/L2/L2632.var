@@ -322,14 +322,19 @@ E(0,@RimCaseCloseCode,#CloseInd)
 RESET_RIM(#SendL3R11,L3R11)
 S(L3R11,1,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEntryDate,#RimCaseCloseCode,#CollectFlag)
 R(1,L3R11)
-
-#checkl2r11=X,1,S
-C(3,#FunCode,2,$,S)
 C(3,#L2r36CloseDate,0,$,S)
 ! E(0,@CloseReasonCode,0)
 E(0,@TimCloseAmt,#L3r11CloseAmt)
 C(5,#L3r11CloseReasonCode,00,T(3,@closefg,Y),T(3,@closefg,N))
 C(5,#L3r11CloseReasonCode,00,S,$)
+
+! #checkl2r11=X,1,S
+! C(3,#FunCode,2,$,S)
+! C(3,#L2r36CloseDate,0,$,S)
+! ! E(0,@CloseReasonCode,0)
+! E(0,@TimCloseAmt,#L3r11CloseAmt)
+! C(5,#L3r11CloseReasonCode,00,T(3,@closefg,Y),T(3,@closefg,N))
+! C(5,#L3r11CloseReasonCode,00,S,$)
 ! T(2,@CloseReasonCode,#L3r11CloseReasonCode)
 
 
@@ -504,6 +509,7 @@ TXFORM=L2632^
 ! </sub>
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
 <include src="PRT.icf::FM01.sel"/>
 <include src="PRT.icf::FMR01.sel"/>
 <include src="PRT.icf::FMH01.sel"/>

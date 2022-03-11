@@ -155,7 +155,7 @@ T(2,@GuaranteedCodeHelp,#HelpDesc7)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-IF(#CHAIN==1,$,IF(#FKEY == 3 || #FKEY == 7,$,V(P,此為連動交易，請從交易:L5903進入)))
+IF(#CHAIN==1,$,IF(#FKEY == 3 || #FKEY == 7,$,V(P,此為連動交易，請從交易:[L5903 檔案借閱查詢]進入)))
 
 #InitApplCode=A,1,S
 IF(#FKEY == 3 ,E(0,1),S)

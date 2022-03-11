@@ -1,20 +1,22 @@
 package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.ClFac;
-import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandOfficeService;
@@ -72,6 +74,7 @@ public class L2076ReportB extends MakeReport {
 	private String reportCode = "L2076";
 	private String reportItem = "用印申請書";
 	private String defaultPdf = "";
+	private TempVo t2TempVo = new TempVo();
 
 	private String security = "";
 //	private String pageSize ="A5";
@@ -110,16 +113,16 @@ public class L2076ReportB extends MakeReport {
 //		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo());
 	}
 
-	public Boolean exec(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+	public Boolean exec(FacClose tFacClose, List<TxTemp> txTemp, TitaVo titaVo) throws LogicException {
 
 		this.info("L2076ReportB exec");
 
-		exportPdf(tFacClose, titaVo);
+		exportPdf(tFacClose, txTemp, titaVo);
 
 		return true;
 	}
 
-	private void exportPdf(FacClose tFacClose, TitaVo titaVo) throws LogicException {
+	private void exportPdf(FacClose tFacClose, List<TxTemp> txTemp, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2631B", "用印申請書", "", "L2631B_用印申請書.pdf");
@@ -134,24 +137,7 @@ public class L2076ReportB extends MakeReport {
 		if (tCustMain != null) {
 			custId = tCustMain.getCustId();
 		}
-		FacMain tFacMain = new FacMain();
-		ClFac tClFac = new ClFac();
-		if (tFacClose.getFacmNo() > 0) {
 
-			tFacMain = facMainService.findById(new FacMainId(tFacClose.getCustNo(), tFacClose.getFacmNo()), titaVo);
-		}
-		if (tFacMain != null) {
-			tClFac = clFacService.findById(new ClFacId(tFacClose.getClCode1(), tFacClose.getClCode2(),
-					tFacClose.getClNo(), tFacMain.getApplNo()), titaVo);
-		}
-		// 設定金額
-		BigDecimal wkOriSettingAmt = BigDecimal.ZERO;
-		String amtChinese = "";
-		// 金額轉中文大寫
-		if (tClFac != null) {
-			wkOriSettingAmt = tClFac.getOriSettingAmt();
-			amtChinese = this.convertAmtToChinese(wkOriSettingAmt);
-		}
 		String wkSysDate = titaVo.getCalDy(); // 系統日國曆
 		this.info("wkSysDate = " + wkSysDate);
 
@@ -168,11 +154,62 @@ public class L2076ReportB extends MakeReport {
 		this.print(-17, 86, "" + wkYy); // 年
 		this.print(-20, 87, "" + wkMm); // 月
 		this.print(-23, 87, "" + wkDd); // 日
-		this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-"
-				+ StringUtils.leftPad(String.valueOf(tFacClose.getFacmNo()), 3, "0")); // 戶號額度
+		if (tFacClose.getFacmNo() > 0) {
+			this.print(-31, 42,
+					StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + tFacClose.getFacmNo()); // 戶號額度
+		} else {
+			Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(), tFacClose.getCustNo(), 0,
+					999, 0, Integer.MAX_VALUE, titaVo);
+			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
+			String facms = "";
+			String x = "";
+			for (FacMain facMain : lFacMain) {
+				facms += x + facMain.getFacmNo();
+				x = ".";
+			}
+
+			this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + facms); // 戶號額度
+		}
 		this.print(-33, 42, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
 		this.print(-36, 42, custId); // 統編
-		this.print(-39, 42, amtChinese + " 元整"); // 設定金額
+		int i = 0;
+		for (TxTemp tTxTemp : txTemp) {
+			i++;
+			t2TempVo = new TempVo();
+			t2TempVo = t2TempVo.getVo(tTxTemp.getText());
+			int txCustNo = parse.stringToInteger(t2TempVo.getParam("CustNo"));
+			int txFacmNo = parse.stringToInteger(t2TempVo.getParam("FacmNo"));
+			int txClCode1 = parse.stringToInteger(t2TempVo.getParam("ClCode1"));
+			int txClCode2 = parse.stringToInteger(t2TempVo.getParam("ClCode2"));
+			int txClNo = parse.stringToInteger(t2TempVo.getParam("ClNo"));
+			ClFac t2ClFac = new ClFac();
+			t2ClFac = clFacService.clMainFirst(txClCode1, txClCode2, txClNo, "Y", titaVo);
+			String amtChinese = "";
+			// 設定金額
+			BigDecimal wkOriSettingAmt = BigDecimal.ZERO;
+			if (t2ClFac != null) {
+				wkOriSettingAmt = t2ClFac.getOriSettingAmt();
+				amtChinese = this.convertAmtToChinese(wkOriSettingAmt);
+			}
+			if (txTemp.size() >= 2) {
+				switch (i) {
+				case 1:
+					this.print(-37, 42, amtChinese + " 元整"); // 設定金額
+					break;
+				case 2:
+					this.print(-38, 42, amtChinese + " 元整"); // 設定金額
+					break;
+				case 3:
+					this.print(-39, 42, amtChinese + " 元整"); // 設定金額
+					break;
+				case 4:
+					this.print(-40, 42, amtChinese + " 元整"); // 設定金額
+					break;
+				}
+			}else {
+				this.print(-39, 42, amtChinese + " 元整"); // 設定金額
+			}
+		}
 		this.print(-41, 42, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
 
 //		for (int i = 1; i <= 400; i++) {

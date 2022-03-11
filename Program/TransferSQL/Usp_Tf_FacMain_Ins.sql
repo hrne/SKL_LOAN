@@ -214,7 +214,10 @@ BEGIN
            ELSE 'Y'
            END                            AS "L9110Flag"           -- 是否已列印[撥款審核資料表] VARCHAR2(1 BYTE)
           ,'0000'                         AS "BranchNo"
-          ,''                             AS "ApprovedLevel"       -- 核准層級 VARCHAR2(1 BYTE)
+          -- 核准層級為新增欄位
+          -- 待User決定就資料轉什麼值
+          -- 預設先擺1:	審查課專案經理
+          ,'1'                             AS "ApprovedLevel"       -- 核准層級 VARCHAR2(1 BYTE)
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  

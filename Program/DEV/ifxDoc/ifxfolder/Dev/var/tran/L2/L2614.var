@@ -41,7 +41,7 @@ K(MODIFYBUTTON,查詢)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
 [
-["[L2614]                                 法務費轉催收傳票開立作業(列印)"],
+["[L2614]                                 法務費轉催收傳票查詢"],
 ["#FdCONVERSION_DATE+轉催收日期",#OverdueDate],
 ]
 !---------- AP Button AREA ----------
@@ -97,7 +97,7 @@ E(0,MFBSDY$)
 !C(5,#TXFORM,L2614,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L2614] 法務費轉催收傳票開立作業(列印))
+T(3,[L2614] 法務費轉催收傳票查詢)
 
 #CurrencyCode=X,3,S
 T(3,TWD)
@@ -177,7 +177,7 @@ TXFORM=L2614
 
 ! <sub type="PART" name="L2614" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
 ! [
-! ["[L2614]                                 法務費轉催收傳票開立作業(列印)"],
+! ["[L2614]                                 法務費轉催收傳票查詢"],
 ! [#<->#,"@案件編號"],
 ! [#<->#,"@統一編號"],
 ! ["@借戶戶號"],

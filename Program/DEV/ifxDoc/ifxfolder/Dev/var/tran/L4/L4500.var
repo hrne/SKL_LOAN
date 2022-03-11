@@ -96,11 +96,9 @@ HELP(#EmpDeductTypeHelp)
 C(4,#CopyCode,S,$)
 V(6,#AgType1,#AgType1)C(4,#CopyCode,$,V(H,#EmpDeductTypeHelp))
 
-#Tmp_CopyCodeX=X,20,S
-T(H,#CopyCode,#EmpDeductTypeHelp)
 
 #CopyCodeX=X,20,L
-T(1,@CopyCodeX,#Tmp_CopyCodeX,3,20)
+T(H,#CopyCode,#EmpDeductTypeHelp)
 
 <include src="ROM.icf::L4R15.dec"/>
 

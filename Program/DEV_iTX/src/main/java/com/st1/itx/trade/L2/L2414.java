@@ -420,11 +420,14 @@ public class L2414 extends TradeBuffer {
 		} else if (iFunCd == 4) {
 			/* 刪除 */
 
-			tClOther = sClOtherService.holdById(tClOtherId);
-			if (tClOther == null) {
-				throw new LogicException("E0006", "擔保品其他檔");
+
+			try {
+				sClOtherService.delete(tClOther);
+			} catch (DBException e) {
+				throw new LogicException("E0008", "擔保品其他檔");
 			}
 
+			
 			/* 刪除 */
 			try {
 
@@ -433,11 +436,6 @@ public class L2414 extends TradeBuffer {
 				throw new LogicException("E0008", "擔保品主檔");
 			}
 
-			try {
-				sClOtherService.delete(tClOther);
-			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品其他檔");
-			}
 
 		}
 

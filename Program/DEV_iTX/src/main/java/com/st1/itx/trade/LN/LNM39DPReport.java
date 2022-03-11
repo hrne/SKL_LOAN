@@ -15,6 +15,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LNM39DPServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.MakeFile;
 
 import java.text.DecimalFormat;
@@ -40,6 +41,9 @@ public class LNM39DPReport extends MakeReport {
 
 	@Autowired
 	public MakeFile makeFile;
+	
+	@Autowired
+	public Parse parse;
 
 	@Autowired
 	@Qualifier("makeFile")
@@ -140,27 +144,27 @@ public class LNM39DPReport extends MakeReport {
 							break; // 到期日
 						case 10:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額
 						case 11:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 撥款金額
 						case 12:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 本金餘額(撥款)
 						case 13:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 應收利息
 						case 14:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 法拍及火險費用
 						case 15:
@@ -174,7 +178,7 @@ public class LNM39DPReport extends MakeReport {
 							break; // 轉銷呆帳日期
 						case 18:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 轉銷呆帳金額
 						case 19:
@@ -187,93 +191,122 @@ public class LNM39DPReport extends MakeReport {
 							break; // 上述發生日期前之最近一次利率
 						case 21:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 上述發生日期時之本金餘額
 						case 22:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 上述發生日期時之應收利息
 						case 23:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 上述發生日期時之法拍及火險費用
 						case 24:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 個案減損客觀證據發生後第一年本金回收金額
 						case 25:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 個案減損客觀證據發生後第二年本金回收金額
 						case 26:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 個案減損客觀證據發生後第三年本金回收金額
 						case 27:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 個案減損客觀證據發生後第四年本金回收金額
 						case 28:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 個案減損客觀證據發生後第五年本金回收金額
 						case 29:
-							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
-							;
-							strField = makeFile.fillStringL(strField, 11, '0');
+							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
+								formatter.applyPattern("0000000000");
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
+								strField = '-' + makeFile.fillStringL(strField, 10, '0');
+							} else {
+								formatter.applyPattern("00000000000");
+								strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+								strField = makeFile.fillStringL(strField, 11, '0');
+							}
 							break; // 個案減損客觀證據發生後第一年應收利息回收金額
 						case 30:
-							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
-							strField = makeFile.fillStringL(strField, 11, '0');
+							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
+								formatter.applyPattern("0000000000");
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
+								strField = '-' + makeFile.fillStringL(strField, 10, '0');
+							} else {
+								formatter.applyPattern("00000000000");
+								strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+								strField = makeFile.fillStringL(strField, 11, '0');
+							}
 							break; // 個案減損客觀證據發生後第二年應收利息回收金額
 						case 31:
-							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
-							strField = makeFile.fillStringL(strField, 11, '0');
+							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
+								formatter.applyPattern("0000000000");
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
+								strField = '-' + makeFile.fillStringL(strField, 10, '0');
+							} else {
+								formatter.applyPattern("00000000000");
+								strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+								strField = makeFile.fillStringL(strField, 11, '0');
+							}
 							break; // 個案減損客觀證據發生後第三年應收利息回收金額
 						case 32:
-							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
-							strField = makeFile.fillStringL(strField, 11, '0');
+							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
+								formatter.applyPattern("0000000000");
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
+								strField = '-' + makeFile.fillStringL(strField, 10, '0');
+							} else {
+								formatter.applyPattern("00000000000");
+								strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+								strField = makeFile.fillStringL(strField, 11, '0');
+							}
 							break; // 個案減損客觀證據發生後第四年應收利息回收金額
 						case 33:
-							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
-							strField = makeFile.fillStringL(strField, 11, '0');
+							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
+								formatter.applyPattern("0000000000");
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
+								strField = '-' + makeFile.fillStringL(strField, 10, '0');
+							} else {
+								formatter.applyPattern("00000000000");
+								strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+								strField = makeFile.fillStringL(strField, 11, '0');
+							}
 							break; // 個案減損客觀證據發生後第五年應收利息回收金額
 						case 34:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 個案減損客觀證據發生後第一年法拍及火險費用回收金額
 						case 35:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 個案減損客觀證據發生後第二年法拍及火險費用回收金額
 						case 36:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 個案減損客觀證據發生後第三年法拍及火險費用回收金額
 						case 37:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 個案減損客觀證據發生後第四年法拍及火險費用回收金額
 						case 38:
 							formatter.applyPattern("00000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 個案減損客觀證據發生後第五年法拍及火險費用回收金額
 						case 39:

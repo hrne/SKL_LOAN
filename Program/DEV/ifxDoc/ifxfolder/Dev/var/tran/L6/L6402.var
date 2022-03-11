@@ -37,7 +37,7 @@
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6042進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6042 交易控制檔查詢]進入),$)
 
 #NTXBUF=X,6,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)

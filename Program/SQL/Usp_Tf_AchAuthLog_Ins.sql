@@ -60,14 +60,14 @@ BEGIN
           ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5
           ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
           ,CASE
-             WHEN TRUNC(S2."CRTDTM" / 1000000) > 0
-             THEN TO_DATE(TRUNC(S2."CRTDTM" / 1000000),'YYYYMMDD')
+             WHEN S2."CRTDTM" > 0
+             THEN TO_DATE(S2."CRTDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
            END                 AS "CreateDate"          -- 建檔日期 DATE 0 0
           ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
           ,CASE
-             WHEN TRUNC(S2."CHGDTM" / 1000000) > 0
-             THEN TO_DATE(TRUNC(S2."CHGDTM" / 1000000),'YYYYMMDD')
+             WHEN S2."CHGDTM" > 0
+             THEN TO_DATE(S2."CHGDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
            END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S2."ACHCDT" > 0 THEN MOD(S2."ACHCDT" , 1000000)
@@ -149,14 +149,14 @@ BEGIN
           ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5
           ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
           ,CASE
-             WHEN TRUNC(S1."CRTDTM" / 1000000) > 0
-             THEN TO_DATE(TRUNC(S1."CRTDTM" / 1000000),'YYYYMMDD')
+             WHEN S1."CRTDTM" > 0
+             THEN TO_DATE(S1."CRTDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
            END                 AS "CreateDate"          -- 建檔日期 DATE 0 0
           ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
           ,CASE
-             WHEN TRUNC(S1."CHGDTM" / 1000000) > 0
-             THEN TO_DATE(TRUNC(S1."CHGDTM" / 1000000),'YYYYMMDD')
+             WHEN S1."CHGDTM" > 0
+             THEN TO_DATE(S1."CHGDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
            END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)

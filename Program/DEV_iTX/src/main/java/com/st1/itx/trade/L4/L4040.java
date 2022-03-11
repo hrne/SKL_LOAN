@@ -85,6 +85,8 @@ public class L4040 extends TradeBuffer {
 	public BankAuthActService bankAuthActService;
 	
 	@Autowired
+	L4040Report l4040Report;
+	@Autowired
 	public CdCodeService cdCodeService;
 
 	private int authCreateDate = 0;
@@ -482,6 +484,12 @@ public class L4040 extends TradeBuffer {
 					makeFile.toFile(sno);
 					totaVo.put("PdfSno998", "" + sno);
 				}
+				l4040Report.setParentTranCode(titaVo.getTxcd());
+				
+				l4040Report.exec(resultList, titaVo);
+				long sno = l4040Report.close();
+				l4040Report.toPdf(sno);
+				totaVo.put("PdfSno", "" + sno);
 			} else {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}

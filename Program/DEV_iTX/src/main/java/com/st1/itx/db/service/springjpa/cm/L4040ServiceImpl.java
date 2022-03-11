@@ -134,6 +134,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  , a.\"RelAcctBirthday\"      as F20       ";
 		sql += "  , a.\"RelAcctGender\"        as F21       ";
 		sql += "  , a.\"AmlRsp\"               as F22       ";
+		sql += "  , a.\"CreateEmpNo\"          as F23       ";
 		sql += " from (                                     ";
 		sql += " select                                     ";
 		sql += "   \"AuthCreateDate\"                       ";
@@ -158,6 +159,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , \"RelAcctBirthday\"                      ";
 		sql += " , \"RelAcctGender\"                        ";
 		sql += " , \"AmlRsp\"                               ";
+		sql += " , \"CreateEmpNo\"         			        ";
 //		取消時須看到其他帳號
 		sql += " ,row_number() over (partition by \"CustNo\",\"RepayBank\",\"RepayAcct\"  order by \"CreateDate\" Desc) as seq  ";
 		sql += " from \"AchAuthLog\"                        ";

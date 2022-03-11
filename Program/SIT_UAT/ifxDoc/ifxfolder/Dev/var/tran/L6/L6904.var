@@ -282,7 +282,7 @@ X(#OOCrAmt1)
 
 !明細
 #OOBUF5=X,46,S
-T(2,#AcBookCode+#OOAcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#AcDate+#InqType+#OOInqData+0)
+T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#AcDate+#InqType+#OOInqData+0)
 
 #OOBTN5=X,4,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6905;text=明細;ntxbuf=#OOBUF5})
