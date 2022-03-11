@@ -1435,7 +1435,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			// 最後決定固定9
 			int b = 9;
 
-			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過時，四捨五入
+			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過之位數，無條件捨去
 			BigDecimal wkDaysDenominator = new BigDecimal(vCalcRepayIntVo.getDays()).divide(new BigDecimal(36500), b,
 					RoundingMode.DOWN);
 
@@ -1451,7 +1451,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			dDateUtil.init();
 			dDateUtil.setDate_1(vCalcRepayIntVo.getStartDate());
 
-			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過時，四捨五入
+			// 2022-02-25 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過之位數，無條件捨去
 			BigDecimal wkMonthDenominator = new BigDecimal(1200)
 					.multiply(new BigDecimal((iPayIntFreq == 99 ? 1 : iPayIntFreq) * vCalcRepayIntVo.getMonthLimit()));
 
@@ -1520,7 +1520,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		return 9 - a;
 	}
-
 
 	// 計算違約金
 	// (1) 貸款戶繳納本息期款有一寬限期間(5個營業日)，超過寬限日仍未繳納者，應按契約收取違約金。
@@ -1706,8 +1705,11 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		} else {
 			wkDelayBase = vCalcRepayIntVo.getPrincipal().add(vCalcRepayIntVo.getInterest().add(wkDuraInt));
 		}
-		wkDelayInt = (wkDelayBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDays))
-				.divide(new BigDecimal(36500), 15, RoundingMode.HALF_UP));
+		// 2022-03-11 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過之位數，無條件捨去
+		BigDecimal wkDaysDenominator = new BigDecimal(wkDays).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
+
+		wkDelayInt = wkDelayBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominator);
+
 // 違約金計算公式 
 //      資金用途別               非購置不動產                       購置不動產(非寬限期內)        購置不動產(寬限期內)  
 //   	逾期6個月內              應繳期款(本金+利息)*年利率/365*逾期日數*0.1   本金*年利率/365*逾期日數*0.1         利息*年利率/365*逾期日數*0.1
@@ -1748,15 +1750,17 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			}
 		}
 
-		wkBreachAmtA = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysA))
-				.divide(new BigDecimal(36500), 15, RoundingMode.HALF_UP).multiply(new BigDecimal(0.1))
-				.setScale(3, RoundingMode.HALF_UP);
-		wkBreachAmtB = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysB))
-				.divide(new BigDecimal(36500), 15, RoundingMode.HALF_UP).multiply(new BigDecimal(0.2))
-				.setScale(3, RoundingMode.HALF_UP);
-		wkBreachAmtC = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysC))
-				.divide(new BigDecimal(36500), 15, RoundingMode.HALF_UP).multiply(new BigDecimal(0.2))
-				.setScale(3, RoundingMode.HALF_UP);
+		// 2022-03-11 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過之位數，無條件捨去
+		BigDecimal wkDaysDenominatorA = new BigDecimal(wkDaysA).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
+		BigDecimal wkDaysDenominatorB = new BigDecimal(wkDaysB).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
+		BigDecimal wkDaysDenominatorC = new BigDecimal(wkDaysC).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
+
+		wkBreachAmtA = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominatorA)
+				.multiply(new BigDecimal("0.1")).setScale(3, RoundingMode.HALF_UP);
+		wkBreachAmtB = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominatorB)
+				.multiply(new BigDecimal("0.2")).setScale(3, RoundingMode.HALF_UP);
+		wkBreachAmtC = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominatorC)
+				.multiply(new BigDecimal("0.2")).setScale(3, RoundingMode.HALF_UP);
 
 		vCalcRepayIntVo
 				.setBreachAmt((wkBreachAmtA.add(wkBreachAmtB).add(wkBreachAmtC)).setScale(0, RoundingMode.HALF_UP));

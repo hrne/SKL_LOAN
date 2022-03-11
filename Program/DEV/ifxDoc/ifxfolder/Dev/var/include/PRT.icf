@@ -485,6 +485,9 @@ E(0,1)ASGN(LOOP$)
 ![貸方金額]
 #FM101_CrAmt=m,14,O
 
+![傳票號碼]
+#FM101_SlipNo=A,6,O
+
 </FM101.form>
 
 <FM101.tom>
@@ -516,6 +519,7 @@ TXFORM=FM101
 #FM101_CurrencyCode
 #FM101_DbAmt
 #FM101_CrAmt
+#FM101_SlipNo
 ^
 </FM101.tom>
 
@@ -549,6 +553,7 @@ TXFORM=FM101
 #FM101_CurrencyCode
 #FM101_DbAmt
 #FM101_CrAmt
+#FM101_SlipNo
 @^
 </FM101.sel>
 

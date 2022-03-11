@@ -88,6 +88,7 @@ public class L4041 extends TradeBuffer {
 	private int retrDate = 0;
 	private int deleteDate = 0;
 	private int relAcctBirthday = 0;
+	private TitaVo txtitaVo;
 
 	
 	@Override
@@ -130,6 +131,28 @@ public class L4041 extends TradeBuffer {
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
+		switch (iFunctionCode) {
+		case 1:
+			this.info("case1!!");
+//			郵局不可一日多批,篩選資料檢查本日是否以產出媒體檔
+			txtitaVo = new TitaVo();
+			txtitaVo = (TitaVo) titaVo.clone();
+			txtitaVo.putParam("FunctionCode", "3");
+			try {
+				// *** 折返控制相關 ***
+				resultList = l4041ServiceImpl.findAll(nPropDate, this.index, Integer.MAX_VALUE, txtitaVo);
+			} catch (Exception e) {
+				this.error("l4920ServiceImpl findByCondition " + e.getMessage());
+				throw new LogicException("E0013", e.getMessage());
+			}
+
+			if (resultList != null && resultList.size() != 0) {
+				throw new LogicException(titaVo, "E0010", "不可一日多批"); //功能選擇錯誤
+			}
+
+		}
+
+		resultList = new ArrayList<Map<String, String>>();
 		try {
 			// *** 折返控制相關 ***
 			resultList = l4041ServiceImpl.findAll(nPropDate, this.index, this.limit, titaVo);

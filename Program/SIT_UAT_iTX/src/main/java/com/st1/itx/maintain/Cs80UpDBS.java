@@ -84,7 +84,7 @@ public class Cs80UpDBS extends CommBuffer {
 	public void exec() throws LogicException {
 		this.info("CS80....");
 
-		if (!this.titaVo.isTxcdInq() && !this.titaVo.isHcodeErase() && !this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject() && this.txBuffer.getAcDetailList() != null) {
+		if (!this.titaVo.isTxcdInq() && this.txBuffer.getTxCom().getBookAcHcode() != 1 && !this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject() && this.txBuffer.getAcDetailList() != null) {
 			if (this.titaVo.getActFgI() <= 1) {
 				this.AcCnt = this.txBuffer.getAcDetailList().size();
 			} else {
@@ -150,7 +150,7 @@ public class Cs80UpDBS extends CommBuffer {
 //				this.custRmk();
 //			}
 
-			if (!(this.titaVo.isTrmtypBatch() && this.titaVo.isHcodeErase()) && !this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
+			if (!this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
 				this.insTxRecord(tota);
 			}
 
@@ -415,15 +415,6 @@ public class Cs80UpDBS extends CommBuffer {
 		boolean newfg = true;
 
 		TxRecord txRecord = new TxRecord();
-
-		if (this.titaVo.isTrmtypBatch()) {
-			txRecord = txRecordService.holdById(txRecordId);
-			if (txRecord == null) {
-				txRecord = new TxRecord();
-			} else {
-				newfg = false;
-			}
-		}
 
 		txRecord.setTxRecordId(txRecordId);
 		txRecord.setBrNo(this.titaVo.getKinbr());

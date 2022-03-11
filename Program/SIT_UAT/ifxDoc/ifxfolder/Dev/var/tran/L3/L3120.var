@@ -463,7 +463,7 @@ T(3,4:刪除;5:查詢)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L3003進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3003預約撥款明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 

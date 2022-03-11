@@ -127,6 +127,15 @@ public interface AcDetailRepositoryHist extends JpaRepository<AcDetail, AcDetail
   // AcctCode = ,AND CustNo = ,AND RvNo = ,AND AcDate =
   public Optional<AcDetail> findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3);
 
+  // AcDate = ,AND RelTxseq = 
+  public Slice<AcDetail> findAllByAcDateIsAndRelTxseqIsOrderByAcSeqAsc(int acDate_0, String relTxseq_1, Pageable pageable);
+
+  // AcDate = ,AND SlipNo = 
+  public Slice<AcDetail> findAllByAcDateIsAndSlipNoIsOrderByAcSeqAsc(int acDate_0, int slipNo_1, Pageable pageable);
+
+  // RelDy = ,AND SlipNo = 
+  public Slice<AcDetail> findAllByRelDyIsAndSlipNoIsOrderByAcSeqAsc(int relDy_0, int slipNo_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

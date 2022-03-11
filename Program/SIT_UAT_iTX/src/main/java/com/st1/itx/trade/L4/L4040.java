@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -18,9 +19,11 @@ import com.st1.itx.db.domain.AchAuthLog;
 import com.st1.itx.db.domain.AchAuthLogId;
 import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.BankAuthActId;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.AchAuthLogService;
 import com.st1.itx.db.service.BankAuthActService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.springjpa.cm.L4040ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
@@ -81,6 +84,11 @@ public class L4040 extends TradeBuffer {
 	@Autowired
 	public BankAuthActService bankAuthActService;
 
+	@Autowired
+	L4040Report l4040Report;
+	@Autowired
+	public CdCodeService cdCodeService;
+
 	private int authCreateDate = 0;
 	private int processDate = 0;
 	private int stampFinishDate = 0;
@@ -88,6 +96,7 @@ public class L4040 extends TradeBuffer {
 	private int retrDate = 0;
 	private int deleteDate = 0;
 	private int relAcctBirthday = 0;
+	private TitaVo txtitaVo;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -107,7 +116,6 @@ public class L4040 extends TradeBuffer {
 //		  1.新增授權 -> 授權狀態為空者
 //        2.再次授權 -> 授權狀態為失敗
 //        3.取消授權 -> 授權狀態為成功者
-//		 
 
 		int iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		int iCreateFlag = parse.stringToInteger(titaVo.getParam("CreateFlag"));
@@ -116,7 +124,15 @@ public class L4040 extends TradeBuffer {
 		if (iPropDate != 0) {
 			iPropDate = iPropDate + 19110000;
 		}
-
+		int iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
+		String batchNo = "";
+		if (iRepayBank == 00) {
+			batchNo = "00";
+		} else if (iRepayBank == 01) {
+			batchNo = "01";
+		} else if (iRepayBank == 02) {
+			batchNo = "02";
+		}
 		this.info("iFunctionCode : " + iFunctionCode);
 		this.info("iCreateFlag : " + iCreateFlag);
 		this.info("iCustNo : " + iCustNo);
@@ -138,6 +154,29 @@ public class L4040 extends TradeBuffer {
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
+		switch (iFunctionCode) {
+		case 1:
+			this.info("case1!!");
+//			不可一日多批時,篩選資料檢查本日是否以產出媒體檔
+			if ("Y".equals(this.getTxBuffer().getSystemParas().getAchAuthOneTime())) {
+				txtitaVo = new TitaVo();
+				txtitaVo = (TitaVo) titaVo.clone();
+				txtitaVo.putParam("FunctionCode", "3");
+				try {
+					// *** 折返控制相關 ***
+					resultList = l4040ServiceImpl.findAll(nPropDate, this.index, Integer.MAX_VALUE, txtitaVo);
+				} catch (Exception e) {
+					this.error("l4920ServiceImpl findByCondition " + e.getMessage());
+					throw new LogicException("E0013", e.getMessage());
+				}
+
+				if (resultList != null && resultList.size() != 0) {
+					throw new LogicException(titaVo, "E0010", "不可一日多批"); //功能選擇錯誤
+				}
+			}
+		}
+
+		resultList = new ArrayList<Map<String, String>>();
 		try {
 			// *** 折返控制相關 ***
 			resultList = l4040ServiceImpl.findAll(nPropDate, this.index, this.limit, titaVo);
@@ -149,9 +188,18 @@ public class L4040 extends TradeBuffer {
 		switch (iFunctionCode) {
 		case 1:
 			this.info("case1!!");
+//			不可一日多批時,篩選資料檢查本日是否以產出媒體檔
+			if ("Y".equals(this.getTxBuffer().getSystemParas().getAchAuthOneTime())) {
 
+			} else {
+
+			}
 		case 3:
 			this.info("case3!!");
+
+//			
+//			找BATCHNO最大的
+//			
 
 			if (resultList != null && resultList.size() != 0) {
 				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
@@ -202,7 +250,6 @@ public class L4040 extends TradeBuffer {
 							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
 						}
 					}
-
 				}
 			} else {
 				throw new LogicException(titaVo, "E0001", "查無資料");
@@ -232,7 +279,8 @@ public class L4040 extends TradeBuffer {
 					this.info("!*!*!*! Size : " + resultList.size());
 					this.info("!*!*!*! AuthStatus : " + result.get("F9"));
 					this.info("!*!*!*! CustNo : " + result.get("F2"));
-
+					String BankNo3 = "";
+					String BankNo7 = "";
 					if (!"Y".equals(result.get("F12")) && parse.stringToInteger(result.get("F14")) > 0) {
 						cnt = cnt + 1;
 
@@ -246,21 +294,27 @@ public class L4040 extends TradeBuffer {
 //																			台新：8120012
 //																			合庫：0060567
 //																			新光：1030019
-						if (("103").equals(result.get("F3"))) {
+						Slice<CdCode> tCdCode = cdCodeService.defCodeEq("BankNo", result.get("F3") + "%", 0, this.limit,
+								titaVo);
+						if (tCdCode != null) {
+							BankNo7 = tCdCode.getContent().get(0).getCode();
+							BankNo3 = BankNo7.substring(0, 3);
+						} else {
+							throw new LogicException("E0015",
+									"error RepayBank Code:" + result.get("F3") + ",請先新增代碼:BankNo");
+						}
+
+						this.info("BankNo3==" + BankNo3);
+						this.info("BankNo7==" + BankNo7);
+						if (("103").equals(BankNo3)) {
 							aCnt++;
 							occursList.putParam("OccTxseq", FormatUtil.pad9("" + aCnt, 6));
-							occursList.putParam("OccWdBankNo", "1030019");
 						} else {
 							bCnt++;
 							occursList.putParam("OccTxseq", FormatUtil.pad9("" + bCnt, 6));
-							if (("812").equals(result.get("F3"))) {
-								occursList.putParam("OccWdBankNo", "8120012");
-							} else if (("006").equals(result.get("F3"))) {
-								occursList.putParam("OccWdBankNo", "0060567");
-							} else {
-								throw new LogicException("E0015", "error RepayBank Code");
-							}
+
 						}
+						occursList.putParam("OccWdBankNo", BankNo7);
 
 //							5.OccRepayAcct			委繳戶帳號		X	14	40	扣款帳號
 						occursList.putParam("OccRepayAcct", FormatUtil.padX(result.get("F4"), 14));
@@ -294,9 +348,11 @@ public class L4040 extends TradeBuffer {
 //							15.OccNote				備用			X	4	120	
 						occursList.putParam("OccNote", FormatUtil.padX("", 4));
 
-						if (("103").equals(result.get("F3"))) {
+						if (("103").equals(BankNo3)) {
 							// 裝進明細資料容器
 							aTmp.add(occursList);
+							this.info("aTmp 1==" + aTmp.get(0));
+							this.info("aTmp 1==" + aTmp.get(0).get("OccPropDate"));
 						} else {
 							// 裝進明細資料容器
 							bTmp.add(occursList);
@@ -328,6 +384,7 @@ public class L4040 extends TradeBuffer {
 
 						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 						tAchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
+//						tAchAuthLog.setBatchNo("Au" + batchNo + "");
 						tAchAuthLog.setMediaCode("Y");
 						try {
 							// 送出到DB
@@ -402,6 +459,8 @@ public class L4040 extends TradeBuffer {
 					achAuthFileVo.put("FootNote", FormatUtil.padX("", 109));
 
 					// 把明細資料容器裝到檔案資料容器內
+					this.info("aTmp 2==" + aTmp.get(0));
+					this.info("aTmp 2==" + aTmp.get(0).get("OccPropDate"));
 					achAuthFileVo.setOccursList(aTmp);
 					// 轉換資料格式
 					ArrayList<String> aFile = achAuthFileVo.toFile();
@@ -467,6 +526,12 @@ public class L4040 extends TradeBuffer {
 					makeFile.toFile(sno);
 					totaVo.put("PdfSno998", "" + sno);
 				}
+				l4040Report.setParentTranCode(titaVo.getTxcd());
+				
+				l4040Report.exec(resultList, titaVo);
+				long sno = l4040Report.close();
+				l4040Report.toPdf(sno);
+				totaVo.put("PdfSno", "" + sno);
 			} else {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}

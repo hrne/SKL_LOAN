@@ -64,7 +64,8 @@ public class L6901 extends TradeBuffer {
 		int iRelDy = parse.stringToInteger(titaVo.getParam("RelDy"));
 		// tita 登放序號 RelTxseq
 		String iRelTxseq = titaVo.getParam("RelTxseq");
-		if (iRelTxseq.length() < 18) {
+		int iSlipNo = parse.stringToInteger(titaVo.getParam("SlipNo"));
+		if (iSlipNo == 0 && iRelTxseq.length() < 18) {
 			if (iRelDy == 19110000) {
 
 				throw new LogicException(titaVo, "E6105", ""); // 查無資料
@@ -84,13 +85,24 @@ public class L6901 extends TradeBuffer {
 		// AcDetail tacDetail = new AcDetail();
 		// 登放日期,登放序號找AcDetail資料
 		if (iRelDy == 0) {
-			slAcDetailList = sAcDetailService.findTxtNoEq(iAcDate + 19110000, iRelTxseq.substring(0, 4),
-					iRelTxseq.substring(4, 10), parse.stringToInteger(iRelTxseq.substring(10, 18)), this.index,
-					Integer.MAX_VALUE, titaVo);
+			if(iSlipNo>0) {
+				slAcDetailList = sAcDetailService.acdtlSlipNo2(iAcDate + 19110000, iSlipNo, this.index,
+						Integer.MAX_VALUE, titaVo);
+			} else {
+				slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000, iRelTxseq, this.index,
+						Integer.MAX_VALUE, titaVo);
+			}
+			
 			lAcDetailList = slAcDetailList == null ? null : slAcDetailList.getContent();
 		} else {
-			slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy + 19110000, iRelTxseq, this.index,
-					Integer.MAX_VALUE, titaVo);
+			if(iSlipNo>0) {
+				slAcDetailList = sAcDetailService.acdtlSlipNo(iRelDy + 19110000, iSlipNo, this.index,
+						Integer.MAX_VALUE, titaVo);
+			} else {
+				slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy + 19110000, iRelTxseq, this.index,
+						Integer.MAX_VALUE, titaVo);
+			}
+			
 			if (slAcDetailList != null) {
 				for (AcDetail ac : slAcDetailList.getContent()) {				
 					if (iAcDate == 0 || ac.getAcDate() == iAcDate) {

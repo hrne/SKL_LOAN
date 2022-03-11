@@ -256,6 +256,10 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"CustMain\" CU";
 		sql += "          ON CU.\"CustNo\" = N.\"CustNo\"";
 		sql += "   WHERE N.\"ThisMonthBal\" = 0";
+		sql += "  AND CASE WHEN N.\"LoanBalance\" = 0 "; 
+		sql += "      THEN trunc(n.\"CloseDate\" / 100)  ";
+		sql += "      ELSE trunc(:thisMonth)  ";
+		sql += "           END = :thisMonth ";
 		sql += "   ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 
 		this.info("sql=" + sql);

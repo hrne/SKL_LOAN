@@ -390,7 +390,6 @@ public class L2414 extends TradeBuffer {
 			dataLog.setEnv(titaVo, beforeClOther, tClOther);
 			dataLog.exec("修改擔保品其他檔資料");
 
-			
 			if (iApplNo > 0 && this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
 				List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
 				String iOwnerId = titaVo.getParam("OwnerId");
@@ -416,10 +415,15 @@ public class L2414 extends TradeBuffer {
 				}
 
 			} // if
-			
+
 		} else if (iFunCd == 4) {
 			/* 刪除 */
 
+			// holde table刪除
+			tClOther = sClOtherService.holdById(tClOtherId);
+			if (tClOther == null) {
+				throw new LogicException("E0006", "擔保品其他檔");
+			}
 
 			try {
 				sClOtherService.delete(tClOther);
@@ -427,7 +431,10 @@ public class L2414 extends TradeBuffer {
 				throw new LogicException("E0008", "擔保品其他檔");
 			}
 
-			
+			tClMain = sClMainService.holdById(tClMainId);
+			if (tClMain == null) {
+				throw new LogicException("E0006", "擔保品主檔");
+			}
 			/* 刪除 */
 			try {
 
@@ -435,7 +442,6 @@ public class L2414 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0008", "擔保品主檔");
 			}
-
 
 		}
 

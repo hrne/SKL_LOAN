@@ -68,7 +68,7 @@ BEGIN
                                   AND  M."NewBormNo" =  LM."BormNo"
     
     WHERE  M."AcDate" > 20120831      -- 借新還舊之舊撥款序號資料檔資料從201209開始
-      AND  LM."Status"  NOT IN (3)    
+      --AND  LM."Status"  NOT IN (3)    
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;

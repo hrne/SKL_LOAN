@@ -629,6 +629,42 @@ public interface AcDetailService {
   public AcDetail findL4701First(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, TitaVo... titaVo);
 
   /**
+   * AcDate = ,AND RelTxseq = 
+   *
+   * @param acDate_0 acDate_0
+   * @param relTxseq_1 relTxseq_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> acdtlRelTxseqEq2(int acDate_0, String relTxseq_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate = ,AND SlipNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param slipNo_1 slipNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> acdtlSlipNo2(int acDate_0, int slipNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * RelDy = ,AND SlipNo = 
+   *
+   * @param relDy_0 relDy_0
+   * @param slipNo_1 slipNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> acdtlSlipNo(int relDy_0, int slipNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AcDetail
    * 
    * @param acDetailId key

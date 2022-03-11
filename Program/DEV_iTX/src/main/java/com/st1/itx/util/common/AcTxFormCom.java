@@ -202,6 +202,8 @@ public class AcTxFormCom extends TradeBuffer {
 				} else {
 					throw new LogicException("E0001", "DbCr未定義");
 				}
+				//傳票號碼
+				occursList.putParam("FM101_SlipNo", tAcDetail.getSlipNo());
 
 				this.totaVo.addOccursList(occursList);
 			}

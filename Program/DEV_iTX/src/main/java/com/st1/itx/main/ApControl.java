@@ -244,7 +244,6 @@ public class ApControl extends SysLogger {
 			this.totaVoList.clear();
 			this.totaVoList.add(new LogicException("CE000", errors.toString()).getErrorMsg(this.titaVo));
 			baseTransaction.rollBackEnd();
-
 		} finally {
 			if (!isDone)
 				tota = jsonConvert.deserializationJsonString(this.titaVo, this.totaVoList.getIfxList());
@@ -493,7 +492,7 @@ public class ApControl extends SysLogger {
 			txCom.setBookAcHcode(0);
 		if (this.titaVo.isHcodeNormal())
 			txCom.setBookAcHcode(0);
-		if (this.titaVo.isHcodeErase()) {
+		if (this.txBuffer.getTxCom().getBookAcHcode() != 1) {
 			if (this.titaVo.getEntDyI() != this.titaVo.getOrgEntdyI()) {
 				txCom.setBookAcHcode(2);
 			} else {
@@ -531,7 +530,7 @@ public class ApControl extends SysLogger {
 			MySpring.jobLaunch(jobId, params);
 		}
 	}
-	
+
 	public void clearV() {
 		jsonConvert = null;
 		eloanConver = null;

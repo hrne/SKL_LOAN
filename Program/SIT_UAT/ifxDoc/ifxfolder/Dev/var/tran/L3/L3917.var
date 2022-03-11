@@ -102,7 +102,7 @@ E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L3911進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3911繳息情形查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 

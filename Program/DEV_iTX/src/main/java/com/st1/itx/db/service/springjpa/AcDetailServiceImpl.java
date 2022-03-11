@@ -1082,6 +1082,90 @@ em = null;
   }
 
   @Override
+  public Slice<AcDetail> acdtlRelTxseqEq2(int acDate_0, String relTxseq_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("acdtlRelTxseqEq2 " + dbName + " : " + "acDate_0 : " + acDate_0 + " relTxseq_1 : " +  relTxseq_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcDateIsAndRelTxseqIsOrderByAcSeqAsc(acDate_0, relTxseq_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcDateIsAndRelTxseqIsOrderByAcSeqAsc(acDate_0, relTxseq_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcDateIsAndRelTxseqIsOrderByAcSeqAsc(acDate_0, relTxseq_1, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcDateIsAndRelTxseqIsOrderByAcSeqAsc(acDate_0, relTxseq_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> acdtlSlipNo2(int acDate_0, int slipNo_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("acdtlSlipNo2 " + dbName + " : " + "acDate_0 : " + acDate_0 + " slipNo_1 : " +  slipNo_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcDateIsAndSlipNoIsOrderByAcSeqAsc(acDate_0, slipNo_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcDateIsAndSlipNoIsOrderByAcSeqAsc(acDate_0, slipNo_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcDateIsAndSlipNoIsOrderByAcSeqAsc(acDate_0, slipNo_1, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcDateIsAndSlipNoIsOrderByAcSeqAsc(acDate_0, slipNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> acdtlSlipNo(int relDy_0, int slipNo_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("acdtlSlipNo " + dbName + " : " + "relDy_0 : " + relDy_0 + " slipNo_1 : " +  slipNo_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByRelDyIsAndSlipNoIsOrderByAcSeqAsc(relDy_0, slipNo_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByRelDyIsAndSlipNoIsOrderByAcSeqAsc(relDy_0, slipNo_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByRelDyIsAndSlipNoIsOrderByAcSeqAsc(relDy_0, slipNo_1, pageable);
+    else 
+      slice = acDetailRepos.findAllByRelDyIsAndSlipNoIsOrderByAcSeqAsc(relDy_0, slipNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public AcDetail holdById(AcDetailId acDetailId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

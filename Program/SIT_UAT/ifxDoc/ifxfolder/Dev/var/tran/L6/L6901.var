@@ -40,6 +40,7 @@ E(0,0)
 ["[L6901]                                 交易分錄清單查詢"],
 ["#FD_AcDate+@會計日期",#AcDate],
 ["#FD_RelDy+@登放日期",#RelDy],
+["#FD_SlipNo+@傳票號碼",#SlipNo],
 [#FD_RelTxseq+#SeqName,#RelTxseq]
 ]
 !---------- AP Button AREA ----------
@@ -71,10 +72,11 @@ T(3,*)
 
 #FD_RelDy=X,2,L
 C(2,#CHAIN,$,S)
+#FD_SlipNo=X,2,L
 
 #FD_RelTxseq=X,2,L
 C(2,#CHAIN,$,S)
-T(3,*)
+
 
 #ShowFrame=A,1,S
 C(2,#CHAIN,T(3,1),T(3,0))
@@ -100,6 +102,14 @@ C(3,#CHAIN,0,$,s)
 @C(3,#RelDy,0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,2,2,1))
 C(3,#RelDy,0,$,A(4,0,#RelDy))
 
+
+#SlipNo=A,6,I
+INVOKEJS(SHOW,p1,3,3,1)
+C(3,#CHAIN,0,$,C(3,#SlipNo,0,INVOKEJS(SHOW,p1,3,3,0),s))
+C(3,#CHAIN,0,$,s)
+@C(3,#SlipNo,0,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,3,3,1))
+C(3,#SlipNo,0,INVOKEJS(SHOW,p1,4,4,1),INVOKEJS(SHOW,p1,4,4,0))
+
 !登放序號 必須輸入
 #SeqName=x,8,L
 T(3,登放序號)
@@ -108,7 +118,9 @@ C(3,#RelDy,0,T(3,交易序號),T(3,登放序號))
 
 #RelTxseq=X,18,I
 C(3,#CHAIN,0,$,s)
-@V(7)
+C(3,#SlipNo,0,$,S)
+@
+IF(#SlipNo==0 && #RelTxseq=="",V(P,傳票號碼、交易（登放）序號擇一輸入),$)
 
 #Submit=A,1,S
 C(3,#CHAIN,1,XMT(),$)
@@ -127,6 +139,7 @@ C(3,#CHAIN,1,XMT(),$)
 <sub type="TIM">
 #AcDate
 #RelDy
+#SlipNo
 #RelTxseq
 #END
 </sub>
@@ -152,6 +165,7 @@ TXFORM=L6901
 #OOCurrencyCode
 #OODrTxAmt
 #OOCrTxAmt
+#OOSlipNo
 ^
 <include src="PRT.icf::FM101.tom"/>
 
