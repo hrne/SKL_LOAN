@@ -130,7 +130,7 @@ T(3,Y:是;N:否)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L3004進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3004約定部分償還明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 

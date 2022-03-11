@@ -1319,8 +1319,8 @@ V(5,0,366)
 #AmortizedCode=A,1,I
 HELP(#FacmAmortizedCodeHelp)
 @V(H,#FacmAmortizedCodeHelp)
-C(3,#AcctCode,330,V(2,1),$)
-C(3,#AcctCode,340,V(2,1),$)
+! C(3,#AcctCode,330,V(2,1),$)
+! C(3,#AcctCode,340,V(2,1),$)
 C(3,#AmortizedCode,2,E(0,@IntCalcCode,1),$)
 !利率為0,攤還方式不可為本息平均法
 !C(3,#ApproveRate,0,V(2,3),$)

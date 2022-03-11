@@ -36,28 +36,6 @@ public interface TxArchiveTableService {
   public Slice<TxArchiveTable> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * AgentTlrNo =
-   *
-   * @param agentTlrNo_0 agentTlrNo_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice TxArchiveTable TxArchiveTable of List
-   */
-  public Slice<TxArchiveTable> findByAgentTlrNo(TxArchiveTableId agentTlrNo_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * TlrNo =
-   *
-   * @param tlrNo_0 tlrNo_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice TxArchiveTable TxArchiveTable of List
-   */
-  public Slice<TxArchiveTable> findByTlrNo(TxArchiveTableId tlrNo_0, int index, int limit, TitaVo... titaVo);
-
-  /**
    * hold By TxArchiveTable
    * 
    * @param txArchiveTableId key

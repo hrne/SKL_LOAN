@@ -492,7 +492,7 @@ BEGIN
     USING (
       SELECT M."YearMonth"
            , M."CustNo"
-           , M."FacmNo"
+           , M."FacmNo" 
            , CASE
                WHEN M."PrinBalance" = 1
                THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)

@@ -150,7 +150,7 @@ T(3,)T(H,#ACTFG,#ActFgHelp)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L3932進入),$),$)
+C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3932借戶利率查詢]進入),$),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 

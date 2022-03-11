@@ -111,62 +111,6 @@ em = null;
   }
 
   @Override
-  public Slice<TxArchiveTable> findByAgentTlrNo(TxArchiveTableId agentTlrNo_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<TxArchiveTable> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findByAgentTlrNo " + dbName + " : " + "agentTlrNo_0 : " + agentTlrNo_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = txArchiveTableReposDay.findAllByAgentTlrNoIsOrderByTlrNoAsc(agentTlrNo_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = txArchiveTableReposMon.findAllByAgentTlrNoIsOrderByTlrNoAsc(agentTlrNo_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = txArchiveTableReposHist.findAllByAgentTlrNoIsOrderByTlrNoAsc(agentTlrNo_0, pageable);
-    else 
-      slice = txArchiveTableRepos.findAllByAgentTlrNoIsOrderByTlrNoAsc(agentTlrNo_0, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<TxArchiveTable> findByTlrNo(TxArchiveTableId tlrNo_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<TxArchiveTable> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findByTlrNo " + dbName + " : " + "tlrNo_0 : " + tlrNo_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = txArchiveTableReposDay.findAllByTlrNoIsOrderByAgentTlrNoAsc(tlrNo_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = txArchiveTableReposMon.findAllByTlrNoIsOrderByAgentTlrNoAsc(tlrNo_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = txArchiveTableReposHist.findAllByTlrNoIsOrderByAgentTlrNoAsc(tlrNo_0, pageable);
-    else 
-      slice = txArchiveTableRepos.findAllByTlrNoIsOrderByAgentTlrNoAsc(tlrNo_0, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
   public TxArchiveTable holdById(TxArchiveTableId txArchiveTableId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

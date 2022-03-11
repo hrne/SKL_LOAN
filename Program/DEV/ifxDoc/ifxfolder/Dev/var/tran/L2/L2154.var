@@ -1861,8 +1861,8 @@ CALL(#HidePayIntFreq)
 CALL(#HideRepayFreq)
 C(4,#L2r05AmortizedCode,$,C(5,#AmortizedCode,#L2r05AmortizedCode,s,$))
 V(H,#AmortizedCodeHelp)
-C(3,#AcctCode,330,V(2,1),$)
-C(3,#AcctCode,340,V(2,1),$)
+! C(3,#AcctCode,330,V(2,1),$)
+! C(3,#AcctCode,340,V(2,1),$)
 !利率為0,攤還方式不可為本息平均法
 !C(3,#ApproveRate,0,V(2,3),$)
 !FreqBase
