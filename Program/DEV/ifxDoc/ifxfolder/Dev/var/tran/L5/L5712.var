@@ -69,7 +69,7 @@ E(0,1)ASGN(AGAIN$)
 !訂正時顯示之欄位
 !參考編號
 #MRKEY=_,_,S
-T(2,#CustId)
+T(2,#CustNo)
 ![交易金額]
 #TXAMT=_,_,S
 E(0,#OOPayAmt)

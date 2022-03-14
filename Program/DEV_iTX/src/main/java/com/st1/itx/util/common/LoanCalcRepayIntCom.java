@@ -1755,18 +1755,37 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		BigDecimal wkDaysDenominatorB = new BigDecimal(wkDaysB).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
 		BigDecimal wkDaysDenominatorC = new BigDecimal(wkDaysC).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
 
+		// 2022-03-14 智偉修改
+		// 因為原系統延遲息及違約金為一個欄位運算及顯示
+		// 然而，新系統需求是要拆分為兩個欄位顯示
+		// 若分開運算後各自四捨五入，合計後會比原本合計多一元
+		// 這裡原本係數是 0.1 改為1.1 ，0.2改為1.2
+		// 下段運算再減去延遲息所代表的1的部分
 		wkBreachAmtA = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominatorA)
-				.multiply(new BigDecimal("0.1")).setScale(3, RoundingMode.HALF_UP);
+				.multiply(new BigDecimal("1.1")).setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
 		wkBreachAmtB = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominatorB)
-				.multiply(new BigDecimal("0.2")).setScale(3, RoundingMode.HALF_UP);
+				.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
 		wkBreachAmtC = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominatorC)
-				.multiply(new BigDecimal("0.2")).setScale(3, RoundingMode.HALF_UP);
+				.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
 
-		vCalcRepayIntVo
-				.setBreachAmt((wkBreachAmtA.add(wkBreachAmtB).add(wkBreachAmtC)).setScale(0, RoundingMode.HALF_UP));
-		vCalcRepayIntVo.setDelayInt((wkDelayInt).setScale(0, RoundingMode.HALF_UP));
+		// 2022-03-14 智偉增加
+		// 因為原系統延遲息及違約金為一個欄位運算及顯示
+		// 然而，新系統需求是要拆分為兩個欄位顯示
+		// 若分開運算後各自四捨五入，合計後會比原本合計多一元
+		// 這裡修改為先算出總額(四捨五入) 減去 延遲息(四捨五入)，得違約金
+		BigDecimal wkBreachAmt = (wkBreachAmtA.add(wkBreachAmtB).add(wkBreachAmtC));
+		this.info(" 延遲息及違約金 合併計算總額(四捨五入前) = " + wkBreachAmt);
+		wkBreachAmt = wkBreachAmt.setScale(0, RoundingMode.HALF_UP);
+		this.info(" 延遲息及違約金 合併計算總額(四捨五入後) = " + wkBreachAmt);
+		this.info(" 延遲息 (四捨五入前) = " + wkDelayInt);
+		wkDelayInt = wkDelayInt.setScale(0, RoundingMode.HALF_UP);
+		this.info(" 延遲息 (四捨五入後) = " + wkDelayInt);
+		wkBreachAmt = wkBreachAmt.subtract(wkDelayInt);
+		this.info(" 違約金 ( 延遲息及違約金 合併計算總額(四捨五入後) - 延遲息 (四捨五入後) )= " + wkBreachAmt);
+
+		vCalcRepayIntVo.setBreachAmt(wkBreachAmt);
+		vCalcRepayIntVo.setDelayInt(wkDelayInt);
 		lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
-
 		this.info("   DelayDays    逾期計算日數              = " + wkDays);
 		this.info("   DelayIntBase 延遲息計算金額           = " + wkDelayBase);
 		this.info("   DelayInt     延遲息                        = " + vCalcRepayIntVo.getDelayInt());

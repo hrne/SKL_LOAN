@@ -676,7 +676,7 @@ T(H,#DataType,#DataTypeValue)
 !訂正時顯示之欄位
 !參考編號
 #MRKEY=_,_,S
-T(2,#CustId)
+T(2,#CustNo+#CaseSeq)
 ![交易金額]
 #TXAMT=_,_,S
 E(0,#TransTxAmt)

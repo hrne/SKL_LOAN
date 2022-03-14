@@ -111,6 +111,7 @@ BEGIN
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."FirstAdjRateDate",0) / 100) > YYYYMM
           AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
+          AND LRC."Status" NOT IN (2)     -- 剔除有建加碼資料
         UNION
         SELECT LBM."CustNo"
              , LBM."FacmNo"
@@ -142,6 +143,7 @@ BEGIN
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."NextAdjRateDate",0) / 100) > YYYYMM
           AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
+          AND LRC."Status" NOT IN (2)     -- 剔除有建加碼資料
       ) C ON C."CustNo"  = M."CustNo"
          AND C."FacmNo"  = M."FacmNo"
          AND C."BormNo"  = M."BormNo"
