@@ -60,13 +60,13 @@ public class L4510Report2 extends MakeReport {
 //		月/日/年(西元後兩碼)
 		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-2, 1, "報　表：" + "L4510Report2");
-		this.print(-2, 70, "帳管費扣薪明細表", "C");
+		this.print(-2, 70, "帳管費及其他扣薪明細表", "C");
 		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
 		this.print(-4, 1, "業績年月：" + perfMonth);
 		this.print(-4, 30, "流程別：" + procCode);
 		this.print(-4, 60, "入帳日期：" + formatDate(entryDate));
-		this.print(-5, 1, "員工代號  身分證字號   戶號    戶名             額度編號    撥款序號                     應扣金額");
+		this.print(-5, 1, "員工代號  身分證字號   戶號    戶名             額度編號    撥款序號                           應扣金額");
 		this.print(-6, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
@@ -83,7 +83,7 @@ public class L4510Report2 extends MakeReport {
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("L4510ServiceImpl.findAll error = " + errors.toString());
+			this.info("l4510R2ServiceImpl.findAll error = " + errors.toString());
 		}
 
 		if (fnAllList.size() > 0) {
@@ -124,12 +124,13 @@ public class L4510Report2 extends MakeReport {
 				this.print(0, 30, fnAllList.get(i).get("F6").substring(0, lengthF6));// 戶名
 				this.print(0, 50, FormatUtil.pad9(fnAllList.get(i).get("F7"), 3));// 額度
 				this.print(0, 60, FormatUtil.pad9(fnAllList.get(i).get("F8"), 3));// 撥款
-				this.print(0, 94, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F9"))), "R");// 應扣金額
+				this.print(0, 80, fnAllList.get(i).get("F9"), "R");// 金額種類說明
+				this.print(0, 100, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F10"))), "R");// 應扣金額
 
 //				流程別筆數統計
 				timeAs++;
 //				by 流程別合計
-				sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("F9")));
+				sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("F10")));
 
 //				全部筆數統計
 				total++;
@@ -147,7 +148,7 @@ public class L4510Report2 extends MakeReport {
 						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 1, "         總　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeAs), "R");
-						this.print(0, 94, df1.format(sumA1), "R");
+						this.print(0, 100, df1.format(sumA1), "R");
 						this.print(1, 70, "=====續下頁=====", "C");
 
 						timeAs = 0;
@@ -175,7 +176,7 @@ public class L4510Report2 extends MakeReport {
 						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 1, "         總　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeAs), "R");
-						this.print(0, 94, df1.format(sumA1), "R");
+						this.print(0, 100, df1.format(sumA1), "R");
 					}
 				}
 			}

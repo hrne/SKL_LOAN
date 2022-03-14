@@ -80,6 +80,7 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal shortAmt = BigDecimal.ZERO; // 短繳(正值)
 	private BigDecimal overAmt = BigDecimal.ZERO; // 溢繳(正值)
 	private int overRpFacmNo = 0; // 溢短繳額度;
+	private int iPayIntDate = 0; // 應繳日;
 
 // isPayAllFee 是否全部回收費用
 	// true->回收全部費用，false 回收金額足夠的費用
@@ -231,6 +232,7 @@ public class BaTxCom extends TradeBuffer {
 			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom settingUnPaid ...");
 		this.info("BaTxCom settingUnPaid EntryDate  入帳日=" + iEntryDate);
+		this.info("BaTxCom settingUnPaid PayIntDate 應繳日=" + this.iPayIntDate);
 		this.info("BaTxCom settingUnPaid 戶號=" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		this.info("BaTxCom settingUnPaid RepayType 還款類別=" + iRepayType);
 		this.info("BaTxCom settingUnPaid TxAmt 回收金額=" + iTxAmt);
@@ -299,7 +301,7 @@ public class BaTxCom extends TradeBuffer {
 
 		// STEP 3: 計算放款本息
 		if (iRepayType >= 1 && iRepayType <= 3) {
-			repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, 0, titaVo); // Terms = 0
+			repayLoan(iEntryDate, this.iPayIntDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, 0, titaVo);
 		}
 
 		// STEP 4: 設定總金額
@@ -344,6 +346,27 @@ public class BaTxCom extends TradeBuffer {
 				this.info("settingUnPaid " + ba.toString());
 			}
 		}
+		return this.baTxList;
+	}
+
+	/**
+	 * 應繳試算 by 應繳日
+	 * 
+	 * @param iEntryDate  入帳日
+	 * @param iPayintDate 應繳日
+	 * @param iCustNo     戶號
+	 * @param iFacmNo     額度
+	 * @param iBormNo     撥款
+	 * @param iRepayType  還款類別
+	 * @param iTxAmt      入帳金額
+	 * @param titaVo      TitaVo
+	 * @return ArrayList of BaTxVo
+	 * @throws LogicException ...
+	 */
+	public ArrayList<BaTxVo> settingPayintDate(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
+			int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
+		this.iPayIntDate = iPayintDate; // 應繳日;
+		this.baTxList = settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, titaVo);
 		return this.baTxList;
 	}
 
@@ -1555,7 +1578,7 @@ public class BaTxCom extends TradeBuffer {
 									this.acctFee = this.acctFee.add(rv.getRvBal());
 									break;
 
-								case "F12": // 聯貸件
+								case "F12": // 帳管費企金件
 								case "F27": // 聯貸管理費
 									// 期款 另收費用
 									if (iRepayType >= 4 && iRepayType < 99) {

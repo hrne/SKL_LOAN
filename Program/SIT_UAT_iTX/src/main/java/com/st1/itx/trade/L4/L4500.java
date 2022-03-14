@@ -3,8 +3,6 @@ package com.st1.itx.trade.L4;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L4500 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4500.class);
 
 	/* 日期工具 */
 	@Autowired
@@ -78,7 +75,7 @@ public class L4500 extends TradeBuffer {
 		CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", agType1, titaVo);
 
 //		2.非15日薪A
-		if ("2".equals(tCdCode.getItem().substring(0, 1))) {
+		if (!"4".equals(tCdCode.getCode().substring(0, 1)) && !"5".equals(tCdCode.getCode().substring(0, 1)) ) {
 //			非15日薪
 			for (int i = 1; i <= 13; i++) {
 				EmpDeductSchedule tEmpDeductSchedule = new EmpDeductSchedule();
@@ -88,7 +85,7 @@ public class L4500 extends TradeBuffer {
 
 				tEmpDeductSchedule.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDateA" + i)));
 				tEmpDeductSchedule.setMediaDate(parse.stringToInteger(titaVo.getParam("MediaDateA" + i)));
-
+				tEmpDeductSchedule.setRepayEndDate(parse.stringToInteger(titaVo.getParam("RepayEndDateA" + i)));
 				tEmpDeductSchedule.setEmpDeductScheduleId(tEmpDeductScheduleId);
 
 				try {
@@ -106,7 +103,7 @@ public class L4500 extends TradeBuffer {
 
 				tEmpDeductSchedule.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDateB" + i)));
 				tEmpDeductSchedule.setMediaDate(parse.stringToInteger(titaVo.getParam("MediaDateB" + i)));
-
+				tEmpDeductSchedule.setRepayEndDate(parse.stringToInteger(titaVo.getParam("RepayEndDateB" + i)));
 				tEmpDeductSchedule.setEmpDeductScheduleId(tEmpDeductScheduleId);
 
 				try {

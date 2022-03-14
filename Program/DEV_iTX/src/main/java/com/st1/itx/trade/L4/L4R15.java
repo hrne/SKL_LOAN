@@ -76,6 +76,7 @@ public class L4R15 extends TradeBuffer {
 			if ("1".equals(tCdCode.getItem().substring(0, 1))) {
 				this.totaVo.putParam("L4r15EntryDateA13", 0);
 				this.totaVo.putParam("L4r15MediaDateA13", 0);
+				this.totaVo.putParam("L4r15RepayEndDateA13", 0);
 			}
 
 			for (EmpDeductSchedule tEmpDeductSchedule : lEmpDeductSchedule) {
@@ -93,6 +94,7 @@ public class L4R15 extends TradeBuffer {
 				if (i <= 13) {
 					this.totaVo.putParam("L4r15EntryDateA" + i, tEmpDeductSchedule.getEntryDate());
 					this.totaVo.putParam("L4r15MediaDateA" + i, tEmpDeductSchedule.getMediaDate());
+					this.totaVo.putParam("L4r15RepayEndDateA" + i, tEmpDeductSchedule.getRepayEndDate());
 				} else {
 					this.info(i + " continue... ");
 					continue;
@@ -101,6 +103,7 @@ public class L4R15 extends TradeBuffer {
 				if (i <= 12) {
 					this.totaVo.putParam("L4r15EntryDateB" + i, tEmpDeductSchedule.getEntryDate());
 					this.totaVo.putParam("L4r15MediaDateB" + i, tEmpDeductSchedule.getMediaDate());
+					this.totaVo.putParam("L4r15RepayEndDateB" + i, tEmpDeductSchedule.getRepayEndDate());
 				} else {
 					this.info(i + " continue... ");
 					continue;
@@ -112,9 +115,11 @@ public class L4R15 extends TradeBuffer {
 			for (int i = 1; i <= 13; i++) {
 				this.totaVo.putParam("L4r15EntryDateA" + i, 0);
 				this.totaVo.putParam("L4r15MediaDateA" + i, 0);
+				this.totaVo.putParam("L4r15RepayEndDateA" + i, 0);
 				if (i <= 12) {
 					this.totaVo.putParam("L4r15EntryDateB" + i, 0);
 					this.totaVo.putParam("L4r15MediaDateB" + i, 0);
+					this.totaVo.putParam("L4r15RepayEndDateB" + i, 0);
 				}
 			}
 		}

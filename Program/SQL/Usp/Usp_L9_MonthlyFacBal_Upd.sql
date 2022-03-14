@@ -564,6 +564,7 @@ BEGIN
     )
     WHEN MATCHED THEN UPDATE SET
     "AssetClass" = TMP."AssetClass"
+    ;
 
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;

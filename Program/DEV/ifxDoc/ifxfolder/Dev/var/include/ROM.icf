@@ -5000,10 +5000,12 @@ TXFORM=L4R14
 ##loop {times:13,i:1}
 #L4r15EntryDateA{i}=D,7,S
 #L4r15MediaDateA{i}=D,7,S
+#L4r15RepayEndDateA{i}=D,7,S
 ##end
 ##loop {times:12,i:1}
 #L4r15EntryDateB{i}=D,7,S
 #L4r15MediaDateB{i}=D,7,S
+#L4r15RepayEndDateB{i}=D,7,S
 ##end
 </L4R15.dec>
 
@@ -5013,10 +5015,12 @@ TXFORM=L4R15
 ##loop {times:13,i:1}
 #L4r15EntryDateA{i}
 #L4r15MediaDateA{i}
+#L4r15RepayEndDateA{i}
 ##end
 ##loop {times:12,i:1}
 #L4r15EntryDateB{i}
 #L4r15MediaDateB{i}
+#L4r15RepayEndDateB{i}
 ##end
 ^
 </L4R15.tom>
@@ -7965,7 +7969,7 @@ TXFORM=L8R50
 #L8R51Income=x,60,S
 #L8R51RepaySource=N,2,S
 #L8R51RepayBank=x,20,S
-#L8R51Description=x,120,S
+#L8R51Description=x,500,S
 #L8R51CustName=x,200,S
 </L8R51.dec>
 
@@ -8879,6 +8883,7 @@ TXFORM=L6R27
 #L6R28PreRepayTerms=N,3,S
 #L6R28PreRepayTermsBatch=N,3,S
 #L6R28ShortPrinPercent=N,3,S
+#L6R28ShortPrinPercentLimit=N,5,S
 #L6R28ShortIntPercent=N,3,S
 #L6R28AmlFg=N,1,S
 #L6R28AmlUrl=x,50,S
@@ -8923,6 +8928,7 @@ TXFORM=L6R28
 #L6R28PreRepayTerms
 #L6R28PreRepayTermsBatch
 #L6R28ShortPrinPercent
+#L6R28ShortPrinPercentLimit
 #L6R28ShortIntPercent
 #L6R28AmlFg
 #L6R28AmlUrl

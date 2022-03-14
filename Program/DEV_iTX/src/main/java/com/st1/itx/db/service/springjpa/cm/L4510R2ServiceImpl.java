@@ -50,12 +50,16 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += " ,c.\"CustName\"             AS F6                                      ";
 		sql += " ,d.\"FacmNo\"               AS F7                                      ";
 		sql += " ,d.\"BormNo\"               AS F8                                      ";
-		sql += " ,d.\"RepayAmt\"             AS F9                                      ";
+		sql += " ,CASE WHEN d.\"AchRepayCode\" = 4 THEN n'帳管費'                        "; 
+		sql += "      WHEN d.\"AchRepayCode\" = 6 THEN n'契變手續費'                    "; 
+		sql += "      WHEN d.\"AchRepayCode\" = 7 THEN n'法務費'                        "; 
+		sql += "      ELSE n'其他' END AS f9                                            ";
+		sql += " ,d.\"RepayAmt\"             AS F10                                     ";
 		sql += " from \"EmpDeductDtl\" d                                                ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\"                ";
 		sql += " where d.\"ErrMsg\" is null                                             ";
-		sql += "   and d.\"MediaDate\" = :mediaDate ";
-		sql += "   and d.\"ProcCode\" in (" + procCode + ") ";
+		sql += "   and d.\"MediaDate\" = :mediaDate                                     ";
+		sql += "   and d.\"ProcCode\" in (" + procCode + ")                             ";
 		sql += "   and d.\"AchRepayCode\" >= 4 and  d.\"AchRepayCode\" <> 5             ";
 		sql += " order by d.\"CustNo\",d.\"FacmNo\"                                     ";
 

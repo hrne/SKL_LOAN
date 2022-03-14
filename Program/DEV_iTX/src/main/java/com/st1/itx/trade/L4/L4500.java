@@ -85,7 +85,7 @@ public class L4500 extends TradeBuffer {
 
 				tEmpDeductSchedule.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDateA" + i)));
 				tEmpDeductSchedule.setMediaDate(parse.stringToInteger(titaVo.getParam("MediaDateA" + i)));
-
+				tEmpDeductSchedule.setRepayEndDate(parse.stringToInteger(titaVo.getParam("RepayEndDateA" + i)));
 				tEmpDeductSchedule.setEmpDeductScheduleId(tEmpDeductScheduleId);
 
 				try {
@@ -103,7 +103,7 @@ public class L4500 extends TradeBuffer {
 
 				tEmpDeductSchedule.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDateB" + i)));
 				tEmpDeductSchedule.setMediaDate(parse.stringToInteger(titaVo.getParam("MediaDateB" + i)));
-
+				tEmpDeductSchedule.setRepayEndDate(parse.stringToInteger(titaVo.getParam("RepayEndDateB" + i)));
 				tEmpDeductSchedule.setEmpDeductScheduleId(tEmpDeductScheduleId);
 
 				try {

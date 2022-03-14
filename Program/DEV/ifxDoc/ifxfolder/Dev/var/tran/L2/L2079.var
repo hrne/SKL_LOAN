@@ -142,7 +142,7 @@ C(3,#CHAIN,1,s,$)
 E(0,0)
 
 #CHAINXMT=X,1,S
-C(3,#CHAIN,1,E(0,@CHAIN,0),$)
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 </sub>
 
