@@ -1840,6 +1840,27 @@ V(5,0,366)
 
 #LbLoanTermDd=N,3,L
 
+!計算寬限總月數上限 
+!先算出相差幾月
+#checkLoanYyMm=N,3,S
+E(0,#LoanTermYy*12)
+E(0,#checkLoanYyMm+#LoanTermMm)
+#DateS=D,8,S
+E(0,00000)
+#checkLoanDate=D,8,S
+E(0,00000)
+D(7,2,#checkLoanDate,#checkLoanYyMm,#LoanTermDd)
+D(7,1,#checkLoanDate,#DateS)
+#GracePeriodYy=N,4,S
+T(1,#checkLoanDate,1,4)
+#GracePeriodMm=N,2,S
+T(1,#checkLoanDate,5,2)
+#GracePeriodDd=N,2,S
+T(1,#checkLoanDate,7,2)
+#GracePeriodTM=N,3,S
+E(0,#GracePeriodYy*12)
+E(0,#GracePeriodTM+#GracePeriodMm)
+
 
 ![攤還方式]
 !當商品不限制時,(修改時自動顯示可修改,其他自動顯示不必須輸入)
@@ -2040,6 +2061,8 @@ C(3,#LbUtilDeadline,0,HIDE(#LbUtilDeadline),SHOW(#LbUtilDeadline))
 !,否則自動顯示不必輸入
 !攤還方式為本息或本金平均時，才可輸入
 !寬限總月數不可超過上限
+
+
 #FdGracePeriod=X,2,L
 
 #GracePeriod=N,3,I
@@ -2051,6 +2074,8 @@ IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
 HIDE(#LbGracePeriod)
 SHOW(#GracePeriod,#GracePeriodX)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
+@IF(#GracePeriod>#GracePeriodTM,V(P,需小於貸款期間),$)
+
 
 #LbGracePeriod=X,9,L
 C(3,#GracePeriod,0,T(3,無),$)
@@ -2059,9 +2084,6 @@ X(#GracePeriod)
 T(B,#LbGracePeriod+#WkMonthX)
 
 #GracePeriodX=X,5,L
-
-
-
 
 ![帳管費]
 !修改時自動顯示可修改,其他自動顯示不必須輸入

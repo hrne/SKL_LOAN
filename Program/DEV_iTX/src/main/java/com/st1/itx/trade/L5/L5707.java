@@ -79,7 +79,7 @@ public class L5707 extends TradeBuffer {
 			if (titaVo.isHcodeNormal()) {
 				// 正向
 				StringBuffer sbData = NegReportCom.BatchTx01(BringUpDate, titaVo);
-				sno = NegReportCom.CreateTxt(titaVo, sbData, "BATCHTX01");
+				sno = NegReportCom.CreateTxt(sbData, "BATCHTX01", titaVo);
 				this.info("L5707 sno=[" + sno + "]");
 			} else {
 				// 訂正

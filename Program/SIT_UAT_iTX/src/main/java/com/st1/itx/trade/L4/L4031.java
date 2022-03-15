@@ -128,20 +128,27 @@ public class L4031 extends TradeBuffer {
 				int txKind = tempL4031Vo.getLableA();
 				int adjCode = tempL4031Vo.getLableB() / 10;
 				int keyinCode = tempL4031Vo.getLableB() % 10;
+				// 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
+				int status = 9;
+				// 檢核記號 0-確認 1-已確認報表 2-輸入利率
 				int checkFlag = 9;
+				// 記號放在已輸入利率那筆，如有未輸入利率則為9
 				if (tempL4031Vo.getRank() > 1 && keyinCode == 1) {
 					if (CheckFlag.get(tempL4031Vo) != null) {
 						checkFlag = CheckFlag.get(tempL4031Vo);
 					} else {
 						if (relCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+							status = 2; // 2.已確認放行
 							checkFlag = 1; // 1-已確認報表
+						} else if (conCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+							status = 1; // 1.確認未放行 
+							checkFlag = 9;  
 						} else if (keyinCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+							status = 0; // 0.未確認 
 							checkFlag = 0; // 0-確認
 						}
 					}
 				}
-				// 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
-				int status = 9;
 				if (tempL4031Vo.getRank() == 1) {
 					if (relCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
 						status = 2;

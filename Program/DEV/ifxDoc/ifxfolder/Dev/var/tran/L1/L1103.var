@@ -1656,11 +1656,12 @@ C(5,#BusinessOfficerAft,#BusinessOfficerBef,T(3,),T(3,X))
 HELP(#StationHelp)
 @
 C(4,#StationAft,S,$)
+C(5,#StationAft,StationBef,s,$)
 V(H,#StationHelp)
 
 #StationAftX=X,20,L
-C(5,#StationAft,StationBef,s,$)
 C(4,#StationAft,S,$)
+C(5,#StationAft,StationBef,s,$)
 T(H,#StationAft,#StationHelp)
 
 #StationInd=X,1,L

@@ -15,7 +15,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClBuildingOwner;
-import com.st1.itx.db.domain.ClBuildingParking;
 import com.st1.itx.db.domain.ClBuildingPublic;
 import com.st1.itx.db.domain.ClBuildingReason;
 import com.st1.itx.db.domain.ClMain;
@@ -24,7 +23,6 @@ import com.st1.itx.db.domain.ClParking;
 import com.st1.itx.db.domain.ClParkingType;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.ClBuildingOwnerService;
-import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
 import com.st1.itx.db.service.ClBuildingReasonService;
 import com.st1.itx.db.service.ClBuildingService;
@@ -57,10 +55,6 @@ public class L2R27 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingPublicService sClBuildingPublicService;
-
-	/* DB服務注入 */
-	@Autowired
-	public ClBuildingParkingService sClBuildingParkingService;
 
 	/* DB服務注入 */
 	@Autowired
@@ -105,7 +99,6 @@ public class L2R27 extends TradeBuffer {
 		ClBuilding tClBuilding = new ClBuilding();
 		// new list
 		List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
-		List<ClBuildingParking> lClBuildingParking = new ArrayList<ClBuildingParking>();
 		List<ClParking> lClParking = new ArrayList<ClParking>();
 		List<ClParkingType> lClParkingType = new ArrayList<ClParkingType>();
 		List<ClBuildingOwner> lClBuildingOwner = new ArrayList<ClBuildingOwner>();
@@ -128,10 +121,6 @@ public class L2R27 extends TradeBuffer {
 				Integer.MAX_VALUE, titaVo);
 		lClBuildingPublic = slClBuildingPublic == null ? null
 				: new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
-		Slice<ClBuildingParking> slClBuildingParking = sClBuildingParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingParking = slClBuildingParking == null ? null
-				: new ArrayList<ClBuildingParking>(slClBuildingParking.getContent());
 
 		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
 				titaVo);
@@ -179,7 +168,6 @@ public class L2R27 extends TradeBuffer {
 					// 若為新增，傳tota給零 空白
 					tClBuilding = new ClBuilding();
 					lClBuildingPublic = new ArrayList<ClBuildingPublic>();
-					lClBuildingParking = new ArrayList<ClBuildingParking>();
 					lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 					tClBuildingReason = new ClBuildingReason();
 					break;
@@ -187,9 +175,6 @@ public class L2R27 extends TradeBuffer {
 					tClBuilding = new ClBuilding();
 					if (lClBuildingPublic == null) {
 						lClBuildingPublic = new ArrayList<ClBuildingPublic>();
-					}
-					if (lClBuildingParking == null) {
-						lClBuildingParking = new ArrayList<ClBuildingParking>();
 					}
 					if (lClBuildingOwner == null) {
 						lClBuildingOwner = new ArrayList<ClBuildingOwner>();
@@ -297,13 +282,6 @@ public class L2R27 extends TradeBuffer {
 				i++;
 
 			}
-			// 獨立產權車位
-			if (lClBuildingParking == null) {
-				lClBuildingParking = new ArrayList<ClBuildingParking>();
-			}
-			// 資料筆數
-			int dataSize2 = lClBuildingParking.size();
-			this.info("L2R27 lClBuildingParking size in DB = " + dataSize2);
 
 			int j = 1;
 			if (lClParking != null) {

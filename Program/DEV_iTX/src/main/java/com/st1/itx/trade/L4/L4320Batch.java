@@ -580,7 +580,11 @@ public class L4320Batch extends TradeBuffer {
 		// 預調週期
 		b.setTxRateAdjFreq(iNextAdjPeriod);
 
-//		調整記號
+//		調整記號，批次自動調整有錯誤轉為人工處理
+		if (adjCode == 1 && errorFlag > 0) {
+			adjCode = 3;	
+		}
+
 		b.setAdjCode(adjCode);
 
 		/* 設定 jsonFields 欄 */

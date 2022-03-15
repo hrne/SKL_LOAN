@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -21,7 +21,6 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClBuildingOwner;
-import com.st1.itx.db.domain.ClBuildingParking;
 import com.st1.itx.db.domain.ClBuildingPublic;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
@@ -35,7 +34,6 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
-import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
@@ -97,9 +95,6 @@ public class L4600Batch extends TradeBuffer {
 
 	@Autowired
 	public ClBuildingService clBuildingService;
-
-	@Autowired
-	public ClBuildingParkingService clBuildingParkingService;
 
 	@Autowired
 	public ClBuildingPublicService clBuildingPublicService;
@@ -528,13 +523,7 @@ public class L4600Batch extends TradeBuffer {
 		BigDecimal publicArea = BigDecimal.ZERO;
 
 		if (tClBuilding != null) {
-			Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 			Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
-			if (sClBuildingParking != null) {
-				for (ClBuildingParking tClBuildingParking : sClBuildingParking.getContent()) {
-					parkArea = parkArea.add(tClBuildingParking.getArea());
-				}
-			}
 			if (sClBuildingPublic != null) {
 				for (ClBuildingPublic tClBuildingPublic : sClBuildingPublic.getContent()) {
 					publicArea = publicArea.add(tClBuildingPublic.getArea());

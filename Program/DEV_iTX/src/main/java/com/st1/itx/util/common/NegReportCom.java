@@ -133,23 +133,24 @@ public class NegReportCom extends CommBuffer {
 	/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 	private Integer limit = Integer.MAX_VALUE;// 查全部
 
-	public long CreateTxt(TitaVo titaVo, StringBuffer sb, String FileName) throws LogicException {
+	public long CreateTxt(StringBuffer sb, String FileName, TitaVo titaVo) throws LogicException {
 		long sno = 0L;
 		ArrayList<String> TxtData = new ArrayList<String>();
 		String Data[] = sb.toString().split(ChangeLine);
 		if (Data != null && Data.length != 0) {
 			String fileitem = "";
 			String filename = "";
+			String BringUpDate = titaVo.getParam("BringUpDate").trim();// 提兌日
 			switch (FileName) {
 			case "BATCHTX01":
 				// For L5707 BatchTx01
 				fileitem = "最大債權撥付產檔";
-				filename = "BATCHTX01.txt";
+				filename = BringUpDate + "_BATCHTX01.txt";
 				break;
 			case "BATCHTX03":
 				// For L5710 BACHTX03
 				fileitem = "一般債權撥付資料檢核";
-				filename = "BATCHTX03.txt";
+				filename = BringUpDate + "_BATCHTX03.txt";
 				break;
 			}
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileitem, filename, 2);

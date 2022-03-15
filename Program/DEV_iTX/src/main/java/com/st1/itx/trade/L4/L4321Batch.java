@@ -150,6 +150,7 @@ public class L4321Batch extends TradeBuffer {
 
 		// 處理更新
 		processUpdate(titaVo);
+		this.batchTransaction.commit();
 
 		// 產出確認清單
 		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
@@ -163,9 +164,9 @@ public class L4321Batch extends TradeBuffer {
 			// 設定訊息
 			if (iTxKind <= 3) {
 				if (this.iCustType == 1) {
-					sendMsg = "個金，" + sendMsg;
+					sendMsg = "個金" + sendMsg;
 				} else {
-					sendMsg = "企金，" + sendMsg;
+					sendMsg = "企金" + sendMsg;
 				}
 			}
 
@@ -220,6 +221,8 @@ public class L4321Batch extends TradeBuffer {
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
 			}
+		} else {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "執行有誤", titaVo);
 		}
 	}
 
@@ -235,6 +238,7 @@ public class L4321Batch extends TradeBuffer {
 				isComplete = true;
 			}
 		}
+		this.info("isComplete " + isComplete);
 		return isComplete;
 	}
 

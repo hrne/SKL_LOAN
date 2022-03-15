@@ -17,8 +17,6 @@ import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClBuildingOwnerId;
-import com.st1.itx.db.domain.ClBuildingParking;
-import com.st1.itx.db.domain.ClBuildingParkingId;
 import com.st1.itx.db.domain.ClBuildingPublic;
 import com.st1.itx.db.domain.ClBuildingPublicId;
 import com.st1.itx.db.domain.ClBuildingReason;
@@ -32,7 +30,6 @@ import com.st1.itx.db.domain.ClParkingTypeId;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
-import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
 import com.st1.itx.db.service.ClBuildingReasonService;
 import com.st1.itx.db.service.ClBuildingService;
@@ -80,10 +77,6 @@ public class L2415 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public ClBuildingParkingService sClBuildingParkingService;
-
-	/* DB服務注入 */
-	@Autowired
 	public ClParkingService sClParkingService;
 
 	/* DB服務注入 */
@@ -119,13 +112,11 @@ public class L2415 extends TradeBuffer {
 	ClMainId clMainId = new ClMainId();
 	ClBuildingId clBuildingId = new ClBuildingId();
 	ClBuildingPublicId clBuildingPublicId = new ClBuildingPublicId();
-	ClBuildingParkingId clBuildingParkingId = new ClBuildingParkingId();
 	ClBuildingOwnerId clBuildingOwnerId = new ClBuildingOwnerId();
 	ClBuildingReasonId clBuildingReasonId = new ClBuildingReasonId();
 
 	// new ArrayList
 	List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
-	List<ClBuildingParking> lClBuildingParking = new ArrayList<ClBuildingParking>();
 	List<ClBuildingOwner> lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 	List<ClBuildingReason> lClBuildingReason = new ArrayList<ClBuildingReason>();
 
@@ -133,7 +124,6 @@ public class L2415 extends TradeBuffer {
 	ClMain tClMain = new ClMain();
 	ClBuilding tClBuilding = new ClBuilding();
 	ClBuildingPublic tClBuildingPublic = new ClBuildingPublic();
-	ClBuildingParking tClBuildingParking = new ClBuildingParking();
 	ClBuildingOwner tClBuildingOwner = new ClBuildingOwner();
 	ClBuildingReason tClBuildingReason = new ClBuildingReason();
 	private boolean isEloan = false;
