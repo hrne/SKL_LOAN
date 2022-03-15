@@ -1327,6 +1327,7 @@ public class BaTxCom extends TradeBuffer {
 	// 取得額度應繳日金額，短繳限額
 	private BigDecimal getPayintDateAmt(int payIntDate, int facmNo) {
 		BigDecimal unPaidAmt = BigDecimal.ZERO;
+		BigDecimal wkShortAmtLimit = BigDecimal.ZERO;
 		this.shortAmtLimit = BigDecimal.ZERO;
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getFacmNo() == facmNo && ba.getAcctAmt().equals(BigDecimal.ZERO)) {
@@ -1334,14 +1335,19 @@ public class BaTxCom extends TradeBuffer {
 					unPaidAmt = unPaidAmt.add(ba.getUnPaidAmt());
 					// 依短繳限額 1.還本金額 2.還息金額
 					if (ba.getPrincipal().compareTo(BigDecimal.ZERO) > 0) {
-						this.shortAmtLimit = ba.getPrincipal()
+						wkShortAmtLimit = ba.getPrincipal()
 								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
 								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+						if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit
+								.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) < 0) {
+							wkShortAmtLimit = new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit());
+						}
 					} else {
-						this.shortAmtLimit = ba.getInterest()
+						wkShortAmtLimit = ba.getInterest()
 								.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
 								.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
 					}
+					this.shortAmtLimit = this.shortAmtLimit.add(wkShortAmtLimit);
 				}
 			}
 		}

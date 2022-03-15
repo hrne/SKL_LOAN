@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4321ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,7 +32,6 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		String iAdjDate = String.valueOf(Integer.valueOf(titaVo.get("AdjDate")) + 19110000);
@@ -49,8 +45,9 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 			custType1 = 1;
 			custType2 = 2;
 		}
+		int adjCode = Integer.valueOf(titaVo.getParam("AdjCode"));
 
-		logger.info("l4321.findAll AdjDate=" + iAdjDate);
+		this.info("l4321.findAll AdjDate=" + iAdjDate);
 
 		String sql = "SELECT CC.\"CityItem\"   " // 鄉鎮區
 				+ "      , CA.\"AreaItem\"      " // 地區別
@@ -70,17 +67,20 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "      , CC.\"IntRateFloor\"  " // 下限
 				+ "      , CC.\"IntRateCeiling\"" // 上限
 				+ "      , BR.\"AdjustedRate\"  " // 調後
-				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" " + " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
-				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" " + " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
-				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = " + iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= "
-				+ custType1 + "   AND BR.\"CustCode\" <= " + custType2;
-		logger.info("sql=" + sql);
+				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" "
+				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
+				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
+				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
+				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
+				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1
+				+ "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

@@ -386,6 +386,9 @@ T(2,#OOTitaSupNo+ +#OOSupItem)
 !登放序號
 #OORelTxseq=X,18,S
 
+!傳票號碼
+#OOSlipNo=A,6,S
+
 !經辦
 #OOTitaTlrNo=X,6,S
 #OOTlrItem=X,20,S
@@ -452,6 +455,7 @@ TXFORM=L6905
 #OOTlrItem
 #OORelDy
 #OORelTxseq
+#OOSlipNo
 ^
 </sub>
 
@@ -503,6 +507,8 @@ TXFORM=L6905
 {width:80,align:'center'}
 #OOAcNoItem=科子細目名稱
 {width:300,align:'left'}
+#OOSlipNo=傳票號碼
+{width:70,align:'center'}
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6905;cpi=15"/>
 %

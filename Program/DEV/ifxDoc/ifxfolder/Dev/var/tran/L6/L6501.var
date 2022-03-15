@@ -48,7 +48,7 @@ E(0,0)
                                             ,#AcctCode330A,"年以上～",#AcctCode330B,"年"],
 [#<->#,"#FdReduceAmtLimit+減免金額限額",#ReduceAmtLimit],
 ["#FdPreRepayTerms+單筆預收期數",#PreRepayTerms],["#FdPreRepayTermsBatch+批次預收期數",#PreRepayTermsBatch],
-["#FdShortPrinPercent+回收時可短繳本金金額之百分比",#ShortPrinPercent],
+["#FdShortPrinPercent+回收時可短繳本金金額之百分比",#ShortPrinPercent," 限額",#ShortPrinLimit],
 ["#FdShortIntPercent+回收時可短繳利息金額之百分比",#ShortIntPercent],
 ["#FdAmlFg+AML檢查記號",#AmlFg,#AmlFgX],
 ["#FdAmlUrl+AML網址",#AmlUrl],
@@ -250,6 +250,7 @@ E(0,@ReduceAmtLimit,#L6R28ReduceAmtLimit)
 E(0,@PreRepayTerms,#L6R28PreRepayTerms)
 E(0,@PreRepayTermsBatch,#L6R28PreRepayTermsBatch)
 E(0,@ShortPrinPercent,#L6R28ShortPrinPercent)
+E(0,@ShortPrinLimit,#L6R28ShortPrinLimit)
 E(0,@ShortIntPercent,#L6R28ShortIntPercent)
 
 E(0,@AmlFg,#L6R28AmlFg)
@@ -398,6 +399,9 @@ T(H,#PostDeductMethod,#DeductMethodHelp)
 #ShortPrinPercent=N,3,I
 @V(5,0,50)
 
+!限額
+#ShortPrinLimit=N,5,I
+
 ! 回收時可短繳利息金額之百分比
 #ShortIntPercent=N,3,I
 @V(5,0,50)
@@ -486,6 +490,7 @@ T(3,[L6501] 系統變數及系統值設定)
 #PreRepayTerms
 #PreRepayTermsBatch
 #ShortPrinPercent
+#ShortPrinLimit
 #ShortIntPercent
 #AmlFg
 #AmlUrl

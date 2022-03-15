@@ -46,11 +46,13 @@ public class L4321Report extends MakeReport {
 
 	private int iTxKind = 0;
 	private int iCustType = 0;
+	private int iAdjCode = 0;
 
 	public long exec(TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
+		this.iAdjCode = parse.stringToInteger(titaVo.getParam("AdjCode"));
 
 		this.info("L4321Report exec");
 
@@ -63,32 +65,46 @@ public class L4321Report extends MakeReport {
 //		defaultExcel 預設excel底稿檔
 //		defaultSheet 預設sheet,可指定 sheet index or sheet name
 		String fileNm = "";
+		if (this.iCustType == 1) {
+			fileNm = "個金";
+		} else {
+			fileNm = "企金";
+		}
 		switch (this.iTxKind) {
 		case 1:
-			fileNm = "定期機動利率變動資料確認";
+			fileNm += "定期機動利率";
 			break;
 		case 2:
-			fileNm = "機動指數利率變動資料確認";
+			fileNm += "機動指數利率";
 			break;
 		case 3:
-			fileNm = "機動非指數利率變動資料確認";
+			fileNm += "機動非指數利率";
 			break;
 		case 4:
-			fileNm = "員工利率變動資料確認";
+			fileNm += "員工利率變動";
 			break;
 		case 5:
-			fileNm = "按商品別利率變動資料確認";
+			fileNm += "按商品別利率";
 			break;
 		default:
 			break;
 		}
-		if (this.iCustType == 1) {
-			fileNm = "個金" + fileNm;
-		} else {
-			fileNm = "企金" + fileNm;
+		switch (this.iAdjCode) {
+		case 1:
+			fileNm += "-批次自動調整";
+			break;
+		case 2:
+			fileNm += "-按地區別調整";
+			break;
+		case 3:
+			fileNm += "-人工調整";
+			break;
+		default:
+			break;
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, "LNW171E", "LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, "LNW171E",
+				"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", "利率調整作業確認", "LNW171E",
 //				"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");

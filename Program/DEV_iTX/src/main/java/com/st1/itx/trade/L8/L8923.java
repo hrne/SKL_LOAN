@@ -108,11 +108,9 @@ public class L8923 extends TradeBuffer {
 				occursList.putParam("OORepayDate", repaydate); // 預定還款日期
 				occursList.putParam("OOActualRepayDate", actualrepaydate); // 實際還款日期
 				occursList.putParam("OORepayAmt", result.get("F5")); // 還款金額
-				occursList.putParam("OOCareer", result.get("F6").replace(" ", "")); // 職業別
-				occursList.putParam("OOIncome", result.get("F7")); // 年收入(萬)
-				occursList.putParam("OORepaySource", result.get("F8")); // 還款來源
-				occursList.putParam("OORepayBank", result.get("F9")); // 代償銀行
-				occursList.putParam("OODescription", result.get("F13").replace("$n", "")); // 其他說明
+				
+				occursList.putParam("OOActualRepayAmt", result.get("F14")); // 實際還款金額
+				
 				occursList.putParam("OOEmpNo", result.get("F10")); // 經辦
 			
 				iFacmNo = parse.stringToInteger(result.get("F3"));

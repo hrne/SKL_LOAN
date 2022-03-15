@@ -59,7 +59,7 @@ K(MODIFYBUTTON,查詢)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN==0,V(P,本交易為連動交易，請由入口交易連動進入),$)
+IF(#CHAIN==0,V(P,本交易為連動交易，請從交易[L6932 資料變更交易查詢]進入),$)
 
 #NTXBUF=x,40,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)

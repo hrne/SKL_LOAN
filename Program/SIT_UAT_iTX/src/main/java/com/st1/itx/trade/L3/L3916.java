@@ -212,6 +212,7 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("RepayFreq", tLoanBorMain.getRepayFreq());
 		this.totaVo.putParam("PayIntFreq", tLoanBorMain.getPayIntFreq());
 		this.totaVo.putParam("GraceDate", tLoanBorMain.getGraceDate());
+		this.totaVo.putParam("RenewFlag", tLoanBorMain.getRenewFlag());
 		this.totaVo.putParam("StoreRate", tLoanBorMain.getStoreRate());
 		this.totaVo.putParam("RateCode", tLoanBorMain.getRateCode());
 		this.totaVo.putParam("RateIncr", tLoanBorMain.getRateIncr());

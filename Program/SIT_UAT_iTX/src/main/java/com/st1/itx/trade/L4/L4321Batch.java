@@ -69,6 +69,7 @@ public class L4321Batch extends TradeBuffer {
 
 	private int iAdjDate = 0;
 	private int iTxKind = 0;
+	private int iAdjCode = 0;
 	private int iCustType = 0;
 	private int iConfirmFlag = 0;
 	private int processCnt = 0;
@@ -91,6 +92,7 @@ public class L4321Batch extends TradeBuffer {
 		this.iAdjDate = parse.stringToInteger(titaVo.getParam("AdjDate")) + 19110000;
 		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
+		this.iAdjCode = parse.stringToInteger(titaVo.getParam("AdjCode"));
 		// 設定分頁、筆數
 		this.index = titaVo.getReturnIndex();
 		this.limit = Integer.MAX_VALUE;
@@ -186,6 +188,19 @@ public class L4321Batch extends TradeBuffer {
 			default:
 				break;
 			}
+			switch (this.iAdjCode) {
+			case 1:
+				sendMsg = sendMsg + "，批次自動調整";
+				break;
+			case 2:
+				sendMsg = sendMsg + "，按地區別調整";
+				break;
+			case 3:
+				sendMsg = sendMsg + "，人工調整";
+				break;
+			default:
+				break;
+			}
 
 			if (titaVo.isHcodeNormal()) {
 				sendMsg = sendMsg + "，完成確認，筆數：" + this.processCnt;
@@ -193,37 +208,41 @@ public class L4321Batch extends TradeBuffer {
 				sendMsg = sendMsg + "，取消確認，筆數：" + this.processCnt;
 			}
 
-			if (this.processCnt > 0 && titaVo.isHcodeNormal()) {
+			if (titaVo.isHcodeNormal()) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 						titaVo.getEmpNot() + "L4321", sendMsg, titaVo);
-//				提醒原櫃員執行列印對帳單交易
-//				主管放行
-				if (!titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
+//				主管放行提醒原櫃員執行列印對帳單交易			
+				if (titaVo.isActfgSuprele() && isComplete(titaVo)) {
 					this.info("OrgTlr ..." + titaVo.getOrgTlr());
 					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "",
 							sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
 				}
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", "", sendMsg,
-						titaVo);
-//				提醒原櫃員執行列印對帳單交易
-//				主管放行
-				if (!titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
-					this.info("OrgTlr ..." + titaVo.getOrgTlr());
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "",
-							sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
-				}
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
 			}
-		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", "", sendMsg, titaVo);
 		}
+	}
+
+	private boolean isComplete(TitaVo titaVo) throws LogicException {
+		this.info("checkComplete...");
+		boolean isComplete = false;
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate,
+				custType1, custType2, iTxKind, 0, 9, 0, this.index, this.limit, titaVo);
+		if (sBatxRateChange == null) {
+			sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate, custType1, custType2,
+					iTxKind, 0, 9, 1, this.index, this.limit, titaVo);
+			if (sBatxRateChange == null) {
+				isComplete = true;
+			}
+		}
+		return isComplete;
 	}
 
 	private void processUpdate(TitaVo titaVo) throws LogicException {
 		this.info("processUpdate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate,
-				custType1, custType2, iTxKind, this.wkConfirmFlag, this.index, this.limit, titaVo);
+				custType1, custType2, iTxKind, iAdjCode, iAdjCode, this.wkConfirmFlag, this.index, this.limit, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {

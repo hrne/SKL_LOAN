@@ -2,6 +2,7 @@ package com.st1.itx.trade.LW;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LW003Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(LW003Report.class);
 
 	@Autowired
 	LW003ServiceImpl LW003ServiceImpl;
@@ -35,11 +34,58 @@ public class LW003Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表產出
+	 * 
+	 * @param tbsdy 帳務日(西元)
+	 * 
+	 */
+
+	public void exec(TitaVo titaVo, int tbsdy) throws LogicException {
 
 		this.info("LW003Report exec");
 
-//getEntDyI()帳務日 getKinbr()單位
+		int q = 1;
+
+		List<Map<String, String>> findWK = new ArrayList<>();
+
+		// 確認工作月
+		try {
+
+			findWK = LW003ServiceImpl.findWorkMonth(titaVo, tbsdy);
+
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("LW003ServiceImpl.findWorkMonth error = " + errors.toString());
+		}
+
+		// 工作月(西元)
+		int wkYear = Integer.valueOf(findWK.get(0).get("F0"));
+		int wkYearRoc = wkYear - 1911;
+		// 工作日
+		int wkMonth = Integer.valueOf(findWK.get(0).get("F1"));
+		// 工作日 (西元日期)
+		int endDate = (Integer.valueOf(findWK.get(0).get("F2")) - 19110000) % 10000;
+		String endDateStr = (endDate / 100) + "/" + (endDate % 100);
+
+		// 依據工作季(13工獨立)，使用哪個底稿
+		if (wkMonth <= 13) {
+			q = 5;
+		}
+		if (wkMonth <= 12) {
+			q = 4;
+		}
+		if (wkMonth <= 9) {
+			q = 3;
+		}
+		if (wkMonth <= 6) {
+			q = 2;
+		}
+		if (wkMonth <= 3) {
+			q = 1;
+		}
+		// getEntDyI()帳務日 getKinbr()單位
 		/**
 		 * 開啟excel製檔<br>
 		 * 
@@ -52,74 +98,37 @@ public class LW003Report extends MakeReport {
 		 * @param sheetnanme 新建Sheet名稱
 		 * @throws LogicException LogicException
 		 */
-//		open(TitaVo titaVo, int date, String brno, String filecode, String fileitem, String filename, String sheetnanme)
-//		 open(TitaVo titaVo, int date, String brno, String filecode, String fileitem, String filename, String defaultExcel, Object defaultSheet) 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率", "房貸獎勵費用率.xls", "獎勵費用率");
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率", "獎勵費用率");
-		List<Map<String, String>> wkSsnList = new ArrayList<>();
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率",
+				"LW003_底稿_房貸獎勵費用率" + q + ".xls", "獎勵費用率");
 
+		this.info("use excel LW003_底稿房貸獎勵費用率"+q);
+		
+		// 設定值
+		makeExcel.setValue(1, 1, wkYearRoc + "年放款部第" + wkMonth + "工作月房貸獎勵費用率統計表\n[獎勵費/個金總業績]～" + endDateStr);
+
+		for (int i = 4, col = 1; col <= wkMonth; i++, col++) {
+
+			makeExcel.setValue(2, i, wkYearRoc + "." + String.format("%02d", col));
+		}
+
+		List<Map<String, String>> data1 = new ArrayList<>();
+		List<Map<String, String>> data2 = new ArrayList<>();
+		List<Map<String, String>> data3 = new ArrayList<>();
+		List<Map<String, String>> data4 = new ArrayList<>();
+		List<Map<String, String>> data5 = new ArrayList<>();
+
+		// 確認工作月
 		try {
-
-			wkSsnList = LW003ServiceImpl.wkSsn(titaVo);
-
-			this.info("0." + wkSsnList);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("LW003ServiceImpl.WorkSeason error = " + errors.toString());
-		}
-
-		if (wkSsnList.size() > 0) {
-//			執行excel_init
-			this.info("0." + titaVo);
-			this.info("0.." + wkSsnList.get(0));
-//			陣列中第一個位置的數組丟進下面兩個method做處理
-			excel_init(titaVo, wkSsnList.get(0));
-			findAll(titaVo, wkSsnList.get(0));
-		}
-
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
-	}
-
-	private void excel_init(TitaVo titaVo, Map<String, String> wkSsnVo) throws LogicException {
-		this.info("1." + wkSsnVo.get("F0"));
-//		西元年轉民國 get組別中的name=F0 
-		String ROCYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
-		this.info("2." + ROCYear);
-//		月份
-		this.info("3." + wkSsnVo.get("F1"));
-		int mm = Integer.valueOf(wkSsnVo.get("F1"));
-		this.info("4." + mm);
-//		一樣取titaVo數組中的 name=ENTDY
-		this.info(titaVo.get("ENTDY") + "-----" + titaVo.get("ENTDY").substring(6, 8) + "-----" + titaVo.get("ENTDY").substring(6, 8).replaceFirst("^0*", ""));
-//		標題串連
-		String tmp = ROCYear + "年放款部第1~" + wkSsnVo.get("F1") + "工作月房貸獎勵費用率統計表\n" + "[獎勵費 /個金總業績 ] ～ " + titaVo.get("ENTDY").substring(4, 6).replaceFirst("^0*", "") + "/"
-				+ titaVo.get("ENTDY").substring(6, 8).replaceFirst("^0*", "") + "止";
-//		串接結果
-		this.info(tmp);
-//		標題位置 第1列 第1欄
-		makeExcel.setValue(1, 1, tmp);
-//		makeExcel.setRange(1, 5, 1, 10);
-
-//		makeExcel.setValue(2, 1, tmp);
-		for (int i = 1; i <= 13; i++) {
-//			設置第2列 第x欄 放入民國年.月
-			makeExcel.setValue(2, i + 3, ROCYear + "." + String.format("%02d", i));
-
-//			makeExcel.setValue(19, i + 3, 0);
-		}
-	}
-
-	private void findAll(TitaVo titaVo, Map<String, String> wkSsnVo) throws LogicException {
-
-		this.info("===========in wrExcel");
-
-		List<Map<String, String>> fnAllList = new ArrayList<>();
-
-		try {
-			fnAllList = LW003ServiceImpl.findAll(titaVo, wkSsnVo);
-			this.info("5." + fnAllList);
+			// 個金總業績
+			data1 = LW003ServiceImpl.findAll1(titaVo, wkYear, wkMonth);
+			// 區部 獎勵金額
+			data2 = LW003ServiceImpl.findAll2(titaVo, wkYear, wkMonth);
+			// 通訓處 獎勵金額
+			data3 = LW003ServiceImpl.findAll3(titaVo, wkYear, wkMonth);
+			// 介紹人個人獎勵
+			data4 = LW003ServiceImpl.findAll4(titaVo, wkYear, wkMonth);
+			// 專銷制單位
+			data5 = LW003ServiceImpl.findAll5(titaVo, wkYear, wkMonth);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -127,18 +136,201 @@ public class LW003Report extends MakeReport {
 			this.info("LW003ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		int mm = 0;
+		if (data1.size() > 0 && data2.size() > 0 && data3.size() > 0 && data4.size() > 0 && data5.size() > 0) {
+			exportExcel(data1, wkYear, wkMonth, 1);// 個金總業績
+			exportExcel(data2, wkYear, wkMonth, 2);// 區部 獎勵金額
+			exportExcel(data3, wkYear, wkMonth, 3);// 通訓處 獎勵金額
+			exportExcel(data4, wkYear, wkMonth, 4);// 介紹人個人獎勵
+			exportExcel(data5, wkYear, wkMonth, 5);// 專銷制單位
 
-		if (fnAllList.size() > 0) {
-			for (Map<String, String> tLDVo : fnAllList) {
-//				{F0=202002, F1=150}, {F0=202003, F1=600}, {F0=202001, F1=246}
-				mm = Integer.valueOf(tLDVo.get("F0")) % 100;
-				this.info("6." + mm);
-				makeExcel.setValue(19, mm + 3, Float.valueOf(tLDVo.get("F1")), "#,##0");
-				this.info("6." + tLDVo.get("F1"));
-			}
 		} else {
-			makeExcel.setValue(3, 4, "本日無資料");
+			makeExcel.setValue(4, 4, "本日無資料");
 		}
+
+		makeExcel.close();
+
 	}
+
+	private void exportExcel(List<Map<String, String>> data, int wkYear, int wkMonth, int form) throws LogicException {
+
+		this.info("exportExcel...");
+		// 個金總業績
+		if (form == 1) {
+			int num = 0;
+			for (Map<String, String> lw003Vo : data) {
+
+				// 總業績金
+				BigDecimal performance = new BigDecimal(lw003Vo.get("Performance").toString());
+
+				makeExcel.setValue(3, 4 + num, performance, "#,##0");
+
+				num++;
+			}
+
+		}
+		// 區部 獎勵金額
+		if (form == 2) {
+			// 列數
+			int row = 0;
+			int col = 0;
+			for (Map<String, String> lw003Vo : data) {
+				// 區部代號
+				String deptCode = lw003Vo.get("DeptCode");
+				// 工作季
+				int quarter = Integer.valueOf(lw003Vo.get("Quarter"));
+				// 獎勵金
+				BigDecimal bonus = new BigDecimal(lw003Vo.get("Bonus").toString());
+
+				// 判斷列數
+				switch (deptCode) {
+				case "A0B000":
+					row = 9;
+					break;
+				case "A0E000":
+					row = 10;
+					break;
+				case "A0F000":
+					row = 11;
+					break;
+				case "A0M000":
+					row = 12;
+					break;
+				}
+
+				// 判斷欄位
+				if (quarter == 1) {
+					col = 6;
+				}
+				if (quarter == 2) {
+					col = 9;
+				}
+				if (quarter == 3) {
+					col = 12;
+				}
+				if (quarter == 4) {
+					col = 15;
+				}
+				if (quarter == 5) {
+					return;
+				}
+				makeExcel.setValue(row, col, bonus, "#,##0");
+
+			}
+
+		}
+
+		// 通訊處 獎勵金
+		if (form == 3) {
+			// 列數
+			int row = 0;
+			int col = 0;
+
+			for (Map<String, String> lw003Vo : data) {
+				// 區部代號
+				String deptCode = lw003Vo.get("DeptCode");
+				// 工作季
+				int quarter = Integer.valueOf(lw003Vo.get("Quarter"));
+				// 獎勵金
+				BigDecimal bonus = new BigDecimal(lw003Vo.get("Bonus").toString());
+
+				// 判斷列數
+				switch (deptCode) {
+				case "A0B000":
+					row = 14;
+					break;
+				case "A0E000":
+					row = 15;
+					break;
+				case "A0F000":
+					row = 16;
+					break;
+				case "A0M000":
+					row = 17;
+					break;
+				}
+
+				// 判斷欄位
+				if (quarter == 1) {
+					col = 6;
+				}
+				if (quarter == 2) {
+					col = 9;
+				}
+				if (quarter == 3) {
+					col = 12;
+				}
+				if (quarter == 4) {
+					col = 15;
+				}
+				if (quarter == 5) {
+					return;
+				}
+				makeExcel.setValue(row, col, bonus, "#,##0");
+			}
+		}
+
+		// 介紹人個人獎立
+		if (form == 4) {
+			int num = 0;
+			for (Map<String, String> lw003Vo : data) {
+
+				// 總業績金
+				BigDecimal performance = new BigDecimal(lw003Vo.get("Bonus").toString());
+
+				makeExcel.setValue(19, 4 + num, performance, "#,##0");
+
+				num++;
+			}
+
+		}
+
+		// 專銷制單位
+		if (form == 5) {
+			// 列數
+			int row = 20;
+			int col = 0;
+
+			for (Map<String, String> lw003Vo : data) {
+				// 工作季
+				int quarter = Integer.valueOf(lw003Vo.get("Quarter"));
+				// 獎勵金
+				BigDecimal bonus = new BigDecimal(lw003Vo.get("Bonus").toString());
+
+				// 判斷欄位
+				if (quarter == 1) {
+					col = 6;
+				}
+				if (quarter == 2) {
+					col = 9;
+				}
+				if (quarter == 3) {
+					col = 12;
+				}
+				if (quarter == 4) {
+					col = 15;
+				}
+				if (quarter == 5) {
+					return;
+				}
+
+				makeExcel.setValue(row, col, bonus, "#,##0");
+			}
+		}
+
+		// 重整公式
+
+		for (int x = 0; x < wkMonth; x++) {
+			makeExcel.formulaCalculate(8, 4 + x);
+			makeExcel.formulaCalculate(13, 4 + x);
+			makeExcel.formulaCalculate(18, 4 + x);
+			makeExcel.formulaCalculate(22, 4 + x);
+			makeExcel.formulaCalculate(23, 4 + x);
+		}
+
+		for (int y = 3; y <= 23; y++) {
+			makeExcel.formulaCalculate(y, 17);
+		}
+
+	}
+
 }

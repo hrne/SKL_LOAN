@@ -44,13 +44,10 @@ public class L4031 extends TradeBuffer {
 	private HashMap<tmpBatx, Integer> ignCnt = new HashMap<>();// 待處理筆數
 	private HashMap<tmpBatx, Integer> totCnt = new HashMap<>();// 總筆數
 	private HashMap<tmpBatx, Integer> conCnt = new HashMap<>();// 已確認筆數
+	private HashMap<tmpBatx, Integer> relCnt = new HashMap<>();// 已放行筆數
 	private HashMap<tmpBatx, Integer> keyinCnt = new HashMap<>();// 已處理筆數
-
 // 	狀態
-	private HashMap<tmpBatx, Integer> status = new HashMap<>();
-
-//	確認是否同作業項目皆已確認:0.尚有未確認 1.全皆已確認
-	private int checkFlag = 0;
+	private HashMap<tmpBatx, Integer> CheckFlag = new HashMap<>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -93,13 +90,15 @@ public class L4031 extends TradeBuffer {
 // 				grp1 (Group by 作業項目 )
 				setCount(tBatxRateChange, grp1, 1);
 
-				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(), tBatxRateChange.getRateKeyInCode(), 2);
+				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(),
+						tBatxRateChange.getRateKeyInCode(), 2);
 // 				grp2 (Group by 作業項目，調整記號, 輸入記號 )
 				setCount(tBatxRateChange, grp2, 2);
 
-//				該作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
-				if (tBatxRateChange.getRateKeyInCode() != 9 && !status.containsKey(grp1)) {
-					status.put(grp1, tBatxRateChange.getConfirmFlag());
+				tmpBatx grp3 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(), 1, 2);
+// 				grp2 (Group by 作業項目，調整記號, 輸入記號 )
+				if (tBatxRateChange.getRateKeyInCode() != 1 && !CheckFlag.containsKey(grp3)) {
+					CheckFlag.put(grp3, 9);
 				}
 			}
 
@@ -117,27 +116,41 @@ public class L4031 extends TradeBuffer {
 			});
 
 			for (tmpBatx tempL4031Vo : tempList) {
-				int totcnt = totCnt.get(tempL4031Vo);
-				int sumcnt = sumCnt.get(tempL4031Vo);
-				int igncnt = ignCnt.get(tempL4031Vo);
-				int concnt = conCnt.get(tempL4031Vo);
-				int keyincnt = keyinCnt.get(tempL4031Vo);
-				if (totcnt == 0 && sumcnt == 0 && igncnt == 0) {
+				if (totCnt.get(tempL4031Vo) == 0) {
 					continue;
 				}
 				OccursList occursList = new OccursList();
-				this.info("totCnt=" + totcnt + ", sumCnt = " + sumcnt + ",ignCnt=" + igncnt + ", conCnt=" + concnt);
-				checkFlag = 9;
-				if (tempL4031Vo.getRank() == 1) {
-					if (sumcnt == concnt) {
-						checkFlag = 1; // 1-已確認報表
-					} else if (keyincnt == totcnt) {
-						checkFlag = 0; // 0-確認
-					}
-				}
+				this.info("totCnt=" + totCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
+						+ ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
+						+ conCnt.get(tempL4031Vo) + ", relCnt=" + relCnt.get(tempL4031Vo));
+				this.info("CheckFlag=" + CheckFlag.get(tempL4031Vo));
+//				確認是否同作業項目皆已確認:0.尚有未確認 1.全皆已確認
+				int txKind = tempL4031Vo.getLableA();
 				int adjCode = tempL4031Vo.getLableB() / 10;
 				int keyinCode = tempL4031Vo.getLableB() % 10;
-				int txKind = tempL4031Vo.getLableA();
+				int checkFlag = 9;
+				if (tempL4031Vo.getRank() > 1 && keyinCode == 1) {
+					if (CheckFlag.get(tempL4031Vo) != null) {
+						checkFlag = CheckFlag.get(tempL4031Vo);
+					} else {
+						if (relCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+							checkFlag = 1; // 1-已確認報表
+						} else if (keyinCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+							checkFlag = 0; // 0-確認
+						}
+					}
+				}
+				// 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
+				int status = 9;
+				if (tempL4031Vo.getRank() == 1) {
+					if (relCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+						status = 2;
+					} else if (conCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+						status = 1;
+					} else {
+						status = 0;
+					}
+				}
 				// 1.批次自動調整 RPTFG = 5(只有目前&調後，無取消調整)
 				// 2.按地區別調整 RPTFG = 6(只有目前&調後&上下限，無取消調整)
 				// 3.人工調整(未調整) RPTFG = 3(全部欄位，可選擇4種調整方式) 若為機動利率調整則為7
@@ -145,7 +158,7 @@ public class L4031 extends TradeBuffer {
 				// 5.人工調整(已調整) RPTFG = 2(全部欄位，無取消調整)
 				// A.全部 RPTFG = 4(全部欄位，可取消調整)
 
-// TxKind           adjcode            KeyinCode          RptFg    
+// TxKind           Adjcode            KeyinCode          RptFg    
 // ------------------------------------------------------------------------------------------------------------------------
 //                  0.全部                                2(無利率欄)
 // 1.定期機動調整
@@ -153,7 +166,7 @@ public class L4031 extends TradeBuffer {
 //                  1.批次自動調整                        5(目前&調後)   
 //                  2.按地區別調整                                                   
 //                  3.人工調整                                   
-//                                      0.未調整          7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//                                      0.未調整 9:待處理 7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
 //                                      1.已調整          6(有地區別，可選擇<取消調整>)         
 //                                      2.待輸入          6(有地區別，可選擇<取消調整>)   
 // 2.指數型利率調整
@@ -162,7 +175,7 @@ public class L4031 extends TradeBuffer {
 //				    1.批次自動調整                                              5(目前&調後)  
 //				             
 //				    3.人工調整                                   
-//				                        0.未調整                     3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//				                        0.未調整  9:待處理      3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
 //				                        1.已調整                     4(無地區別，可選擇<取消調整>)   
 //				                        2.待輸入                     4(無地區別，可選擇<取消調整>)   
 
@@ -196,7 +209,7 @@ public class L4031 extends TradeBuffer {
 						checkFlag = 2; // 2-輸入利率
 						break;
 					}
-					if (keyinCode == 0) {
+					if (keyinCode == 0 || keyinCode == 9) {
 						if (txKind == 1 || txKind == 3) {
 							rptFg = 7;
 						} else {
@@ -219,8 +232,8 @@ public class L4031 extends TradeBuffer {
 				occursList.putParam("OOIgnCnt", ignCnt.get(tempL4031Vo));
 				occursList.putParam("OOTotCnt", totCnt.get(tempL4031Vo));
 				occursList.putParam("OOCheckFlag", checkFlag); // 檢核記號 0-確認 1-已確認報表 2-輸入利率
-				occursList.putParam("OOStatus", status.get(tempL4031Vo)); // 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
-				occursList.putParam("OORptFg", rptFg); // 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
+				occursList.putParam("OOStatus", status); // 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
+				occursList.putParam("OORptFg", rptFg);
 
 				this.info("L4031 occursList : " + occursList.toString());
 				/* 將每筆資料放入Tota的OcList */
@@ -331,12 +344,16 @@ public class L4031 extends TradeBuffer {
 	}
 
 	private void setCount(BatxRateChange tBatxRateChange, tmpBatx grp, int rank) {
+		// private HashMap<tmpBatx, Integer> sumCnt = new HashMap<>();// 要處理筆數
+		// private HashMap<tmpBatx, Integer> ignCnt = new HashMap<>();// 待處理筆數
+		// private HashMap<tmpBatx, Integer> totCnt = new HashMap<>();// 總筆數
+		// private HashMap<tmpBatx, Integer> conCnt = new HashMap<>();// 已確認筆數
+		// private HashMap<tmpBatx, Integer> keyinCnt = new HashMap<>();// 已處理筆數
+// RateKeyInCode	0:未調整		1:已調整		2:待輸入		9:待處理(檢核有誤)
 		if (!totCnt.containsKey(grp)) {
 			totCnt.put(grp, 0);
 		}
-		if (rank == 1) {
-			totCnt.put(grp, totCnt.get(grp) + 1);
-		}
+		totCnt.put(grp, totCnt.get(grp) + 1);
 
 		if (!sumCnt.containsKey(grp)) {
 			sumCnt.put(grp, 0);
@@ -350,28 +367,28 @@ public class L4031 extends TradeBuffer {
 			ignCnt.put(grp, 0);
 		}
 
-		if (rank == 1) {
-			if (tBatxRateChange.getRateKeyInCode() == 9) {
-				ignCnt.put(grp, ignCnt.get(grp) + 1);
-			}
+		if (tBatxRateChange.getRateKeyInCode() == 9) {
+			ignCnt.put(grp, ignCnt.get(grp) + 1);
 		}
 
 		if (!conCnt.containsKey(grp)) {
 			conCnt.put(grp, 0);
 		}
-		if (rank == 1) {
-			if (tBatxRateChange.getConfirmFlag() >= 1) {
-				conCnt.put(grp, conCnt.get(grp) + 1);
-			}
+		if (tBatxRateChange.getConfirmFlag() == 1) {
+			conCnt.put(grp, conCnt.get(grp) + 1);
+		}
+		if (!relCnt.containsKey(grp)) {
+			relCnt.put(grp, 0);
+		}
+		if (tBatxRateChange.getConfirmFlag() == 2) {
+			relCnt.put(grp, relCnt.get(grp) + 1);
 		}
 
 		if (!keyinCnt.containsKey(grp)) {
 			keyinCnt.put(grp, 0);
 		}
-		if (rank == 1) {
-			if (tBatxRateChange.getRateKeyInCode() == 1) {
-				keyinCnt.put(grp, keyinCnt.get(grp) + 1);
-			}
+		if (tBatxRateChange.getRateKeyInCode() == 1) {
+			keyinCnt.put(grp, keyinCnt.get(grp) + 1);
 		}
 
 	}

@@ -29,7 +29,7 @@ public class SystemParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1370246350027183426L;
+	private static final long serialVersionUID = 830698246172574665L;
 
 // 業務類型
   /* LN */
@@ -204,6 +204,10 @@ public class SystemParas implements Serializable {
   // 回收時可短繳本金金額之百分比
   @Column(name = "`ShortPrinPercent`")
   private int shortPrinPercent = 0;
+
+  // 限額
+  @Column(name = "`ShortPrinLimit`")
+  private int shortPrinLimit = 0;
 
   // 回收時可短繳利息金額之百分比
   @Column(name = "`ShortIntPercent`")
@@ -1032,6 +1036,25 @@ N:一日多批
   }
 
 /**
+	* 限額<br>
+	* 
+	* @return Integer
+	*/
+  public int getShortPrinLimit() {
+    return this.shortPrinLimit;
+  }
+
+/**
+	* 限額<br>
+	* 
+  *
+  * @param shortPrinLimit 限額
+	*/
+  public void setShortPrinLimit(int shortPrinLimit) {
+    this.shortPrinLimit = shortPrinLimit;
+  }
+
+/**
 	* 回收時可短繳利息金額之百分比<br>
 	* 
 	* @return Integer
@@ -1349,9 +1372,9 @@ N:不啟用
            + ", postDeductDD1=" + postDeductDD1 + ", postDeductDD2=" + postDeductDD2 + ", postDeductDD3=" + postDeductDD3 + ", postDeductDD4=" + postDeductDD4 + ", postDeductDD5=" + postDeductDD5 + ", postSecondDeductDays=" + postSecondDeductDays
            + ", postDeductMethod=" + postDeductMethod + ", loanDeptCustNo=" + loanDeptCustNo + ", negDeptCustNo=" + negDeptCustNo + ", perfBackRepayAmt=" + perfBackRepayAmt + ", perfBackPeriodS=" + perfBackPeriodS + ", perfBackPeriodE=" + perfBackPeriodE
            + ", empNoList=" + empNoList + ", acctCode310A=" + acctCode310A + ", acctCode310B=" + acctCode310B + ", acctCode320A=" + acctCode320A + ", acctCode320B=" + acctCode320B + ", acctCode330A=" + acctCode330A
-           + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortIntPercent=" + shortIntPercent
-           + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", acBookAdjDate=" + acBookAdjDate
-           + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", ftpUrl=" + ftpUrl + ", ftpAuth=" + ftpAuth + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortPrinLimit=" + shortPrinLimit
+           + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
+           + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", ftpUrl=" + ftpUrl + ", ftpAuth=" + ftpAuth
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

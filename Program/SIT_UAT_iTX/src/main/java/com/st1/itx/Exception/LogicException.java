@@ -6,7 +6,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxErrCode;
 import com.st1.itx.db.service.TxErrCodeService;
+import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.MySpring;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * LogicException
@@ -16,6 +19,7 @@ import com.st1.itx.util.MySpring;
  *
  */
 public class LogicException extends Exception {
+	private final Logger logger = LoggerFactory.getLogger(LogicException.class);
 
 	private static final long serialVersionUID = 1713417913516730890L;
 
@@ -53,6 +57,9 @@ public class LogicException extends Exception {
 			this.errorMsg = !Objects.isNull(this.errorMsg) && !this.errorMsg.trim().isEmpty() ? txErrCode.getErrContent() + " (" + this.errorMsg + " )" : txErrCode.getErrContent();
 		if (Objects.isNull(this.errorMsg))
 			this.errorMsg = "";
+
+		if (ThreadVariable.isLogger())
+			logger.info(this.errorMsg);
 	}
 
 	public String getErrorMsgId() {

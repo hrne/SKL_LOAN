@@ -30,16 +30,15 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	Parse parse;
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> L8205Rpt1(TitaVo titaVo) throws Exception {
 
 		this.info("L8205Rpt1");
 		String iEntryDateStart = titaVo.getParam("DateStart");
 		String iEntryDateEnd = titaVo.getParam("DateEnd");
-
+			
 		int afEntryDateStart = Integer.parseInt(iEntryDateStart) + 19110000;
 		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd) + 19110000;
-		this.info("afEntryDateStart=" + afEntryDateStart + ",afEntryDateEnd=" + afEntryDateEnd);
+		
 
 		String sql = "";
 		sql += " SELECT                               			 	   			\n";
@@ -70,6 +69,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("entryStart", afEntryDateStart);
 		query.setParameter("entrydEnd", afEntryDateEnd);
+
 
 		return this.convertToMap(query);
 	}
@@ -206,7 +206,17 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L8205Rpt5");
 		String iReCordStart = titaVo.getParam("DateStart");
 		String iReCordEnd = titaVo.getParam("DateEnd");
-
+		int iRepayDate = Integer.parseInt(titaVo.getParam("RepayDate"));
+		int iActualRepayDate = Integer.parseInt(titaVo.getParam("ActualRepayDate"));
+		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
+				
+		if(iRepayDate>0) {
+			iRepayDate = iRepayDate+19110000; 
+		}
+		
+		if(iActualRepayDate>0) {
+			iActualRepayDate = iActualRepayDate+19110000; 
+		}
 		int fReCordStart = Integer.parseInt(iReCordStart) + 19110000;
 		int fReCordEnd = Integer.parseInt(iReCordEnd) + 19110000;
 		this.info("fReCordStart=" + fReCordStart + ",fReCordEnd=" + fReCordEnd);
@@ -233,7 +243,18 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "and CD.\"Code\" = M.\"RepaySource\"			\n";
 		sql += "left join \"CdEmp\" E on E.\"EmployeeNo\" = M.\"CreateEmpNo\"			\n";
 		sql += "where M.\"RecordDate\" >= :recordStart and M.\"RecordDate\" <= :recordEnd  \n";
-		sql += "order by M.\"RecordDate\" ";
+		if(iRepayDate>0) {
+			sql += " and M.\"RepayDate\" = "+iRepayDate+"\n";
+		}
+		
+		if(iActualRepayDate>0) {
+			sql += " and M.\"ActualRepayDate\" = "+iActualRepayDate+"\n";
+		}
+		
+		if(iCustNo>0) {
+			sql += " and M.\"CustNo\" = "+iCustNo+"\n";
+		}
+		sql += " order by M.\"RecordDate\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -243,6 +264,9 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("recordStart", fReCordStart);
 		query.setParameter("recordEnd", fReCordEnd);
+//		query.setParameter("repaydate", iRepayDate);
+//		query.setParameter("actualrepaydate", iActualRepayDate);
+//		query.setParameter("custno", iCustNo);
 
 		return this.convertToMap(query);
 	}

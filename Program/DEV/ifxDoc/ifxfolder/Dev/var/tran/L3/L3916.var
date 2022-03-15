@@ -207,6 +207,12 @@ T(3,CdCode.ProdIntCalcCode)
 
 #ProdIntCalcCodeHelp=x,1024,S
 
+!RenewFlag 展期借新還舊記號
+#CDDEF14=x,25,S
+T(3,CdCode.RenewFlag)
+
+#RenewFlagHelp=x,1024,S 
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
@@ -225,12 +231,13 @@ T(2,@RateCodeHelp,#HelpDesc10)
 
 #HelpRim2=X,1,S
 RESET_RIM(#HelpRim2,XXR99)
-S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@SexHelp,#HelpDesc1) 
 T(2,@RelationCodeHelp,#HelpDesc2)
 T(2,@ProdIntCalcCodeHelp,#HelpDesc3)
+T(2,@RenewFlagHelp,#HelpDesc4)
 
 #FdMain=X,2,L
 T(3,*)
@@ -464,8 +471,9 @@ T(3,*)
 C(3,#CHAIN,1,T(1,#NTXBUF,35,3),$)
 C(3,#CHAIN,1,s,$)
 HIDE(#BTN2,#BTN3,#BTN4,#BTN5)
-@IF(#BormNo>900,V(P,不可輸入預約撥款序號),$)
+@
 V(2,0)
+! IF(#BormNo>900,V(P,不可輸入預約撥款序號),$)
 
 
 #MRKEY=_,_,S
@@ -665,6 +673,16 @@ T(3,@PayIntFreqX,)T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
 #GraceDateX=X,9,L
 CALL2(#AdjustDate,#GraceDate,#GraceDateX)
 
+![借新還舊]
+!0=正常 1=展期 2=借新還舊
+#FdRenewFlag=X,2,L
+
+#RenewFlag=X,1,S
+
+#RenewFlagX=X,8,L
+T(3,)
+T(H,#RenewFlag,#RenewFlagHelp)
+
 ![目前利率]
 #StoreRate=n,2.4,S
 
@@ -733,7 +751,7 @@ CALL2(#ADJUSTDOT,#Precision,#Shortfall,#ShortfallX)
 T(3,[利息 )
 
 #WKPRIX=X,5,S
-T(3,本金 )
+T(3, 本金 )
 
 #WKBRAX=X,1,S
 T(3,])
@@ -759,8 +777,9 @@ T(2,#WKPRIX+#ShortfallPrinXX)
 #WKSPC2=X,2,S
 
 #ShortfallXX=X,60,L
-T(2,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX)
+T(B,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX)
 P(L,#ShortfallXX)
+
 
 ![最後還本日]
 #PrevRepayDate=D,7,S
@@ -859,7 +878,7 @@ TXFORM=L3916
 #OCustNo#OFacmNo#OBormNo#ProdNo#ProdName#OApplNo#PROHIBITPERIOD#AcctCode#Status
 #CurrencyCode#DrawdownAmt#LoanBal#RemitBank#RemitBranch#RemitAcctNo#PaymentBank#CompensateAcct
 #DrawdownDate#DrawdownCode#MaturityDate#FirstDueDate#RepayCode#AcctFee#TotalPeriod#RepaidPeriod
-#IntCalcCode#AmortizedCode#DueAmt#FreqBase#RepayFreq#PayIntFreq#GraceDate#StoreRate
+#IntCalcCode#AmortizedCode#DueAmt#FreqBase#RepayFreq#PayIntFreq#GraceDate#RenewFlag#StoreRate
 #RateCode#RateIncr#FirstAdjRateDate#IndividualIncr#RateAdjFreq#RepayBank#RepayBankItem
 #RepayAcctNo#PrevIntDate#Shortfall#ShortfallInt#ShortfallPrin
 #PrevRepayDate#NextRepayDate#NplRepay#NplTrfDate#NplTrfAmt#NplProcSitu#BadDebtAmt#BadDebtBal#Remark
@@ -901,7 +920,7 @@ TXFORM=L3916
 ["#FdPrevRepayDateX+最後還本日",#PrevRepayDateX],
 ["#FdNextRepayDate+下次還本日",#NextRepayDate],
 ["#FdGraceDateX+寬限到期日",#GraceDateX],
-[#<->#,"@","@"],
+[#<->#,"#FdRenewFlag+展期／借新還舊",#RenewFlagX],
 [#<->#,"<font color=red>@利率資料區","@"],
 [#<->#,"#FdProdNo+商品代碼",#ProdNo,#ProdName],
 ["#FdStoreRateX+目前利率",#StoreRateX],

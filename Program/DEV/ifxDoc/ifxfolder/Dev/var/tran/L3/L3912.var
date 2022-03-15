@@ -2067,8 +2067,8 @@ TXFORM=L3912
 ["@放款餘額",#OLoanBalX],["@電匯金額",#ORemitAmtX],
 ["@本金",#OPrinciPalX],["@支票金額",#OChequeAmtX],
 ["@利息",#OInterestX],["@暫收抵繳",#OTempRepayX],
-["@延遲息",#ODelayIntX],["@"],
-["@違約金",#OBreachAmtX],["@暫付所得稅",#OTempTaxX],
+["@延遲息",#ODelayIntX],["@暫付所得稅",#OTempTaxX],
+["@違約金",#OBreachAmtX],["@免印花稅金額",#OStampFreeAmtX],
 ["@暫收款",#OTempAmtX],["@計息起日",#OIntStartDateX],
 ["@部分償還本金",#OExtraRepayX],["@計息迄日",#OIntEndDateX],
 ["@欠繳利息",#OUnpaidInterestX],["@結案區分",#OCaseCloseCode,#OCaseCloseCodeX],
@@ -2076,7 +2076,7 @@ TXFORM=L3912
 [#CloseBreachX,#OUnpaidAmt],["@匯款帳號",#ORemitAcctNo],
 ["@短收金額",#OShortFallX],["@溢收金額",#OOverflowX],
 ["@主管編號",#OSupperNo,#OSupperNoX],["@減免金額",#OReduceAmt],
-["@作業日期",#OTxDate,#OTxTimeX],["@免印花稅金額",#OStampFreeAmtX],
+["@作業日期",#OTxDate,#OTxTimeX],["@",""],
 ["@批次號碼",#OBatchNo],["@匯款序號",#ORemitSeq],
 ["@暫收原因",#OTempReasonCode,#OTempReasonCodeX],["@扣款銀行",#ORepayBank,#ORepayBankX],
 ["",""],["@支票帳號",#OChequeAcctNo],
@@ -2120,7 +2120,7 @@ TXFORM=L3912
 ["@回收金額",#L3200RepayAmtX],["@暫收抵繳",#L3200TempRepayX],
 ["@回收期數",#L3200RepayTerms],["@部分償還繳納方式",#L3200PayMethodX], 
 ["@計息起日",#L3200IntStartDateX],["@領清償證明時收取",#L3200CloseBreachAmtUnpaidX], 
-[#<->#,"@計息迄日",#L3200IntEndDateX],
+["@計息迄日",#L3200IntEndDateX],["@免印花稅金額",#OStampFreeAmtX],
 ["@減免金額",#L3200ReduceAmtX],["@帳管費",#L3420AcctFeeX],
 ["@本金",#L3200PrinciPalX],["@契變手續費",#L3420ModifyFeeX],
 ["@利息",#L3200InterextX],["@火險費",#L3420FireFeeX],
@@ -2128,8 +2128,8 @@ TXFORM=L3912
 ["@違約金",#L3200BreachAmtX],["@清償違約金",#L3200CloseBreachAmtX],
 ["@溢收金額",#OOverflowX],["@部分償還金額",#L3200ExtraRepayX],
 ["@短收金額",#OShortFallX],["@部分償還欠繳利息",#L3200ExtraUnpaidIntX],
-["@新攤還金額",#L3200NewDueAmtX],["@主管編號",#L3200SupperNo,#L3200SupperNoX], 
-["@"],["@作業日期",#L3200TxDate,#L3200TxTimeX],
+["@新攤還金額",#L3200NewDueAmtX],["@主管編號",#L3200SupperNo,#L3200SupperNoX],
+["@",""],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
 
 </sub>
@@ -2171,68 +2171,6 @@ TXFORM=L3912
 ]
 
 </sub>
-<sub type="PART" name="L3600" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
-[
-["[L3912]                                 交易內容查詢"],
-[#<->#,"@聯貸編號",#L3600CustNo,"@-@",#L3600SyndNo,"@",#L3600CustNoX],
-[#<->#,"@交易代號",#L3600TxCode,#L3600TxCodeX],
-[#<->#,"@會計日期",#L3600AcctDate],
-["@櫃員編號",#L3600TellerNo,#L3600TellerNoX],["@交易序號",#L3600TxtNo],
-[#<->#,"@還款來源",#L3600RepayCodeX],
-[#<->#,"@幣別",#L3600CurrencyCode],
-["@主辦行",#L3600LeadingBank],["@母公司統編",#L3600MasterCustId,#L3600MasterCustIdX],
-["@簽約日",#L3600SigningDate],
-["@動撥起日",#L3600DrawdownStartDate],
-["@動撥迄日",#L3600DrawdownEndDate],
-["@是否有收承諾費",#L3600CommitFeeFlagX],
-["@聯貸總金額",#L3600SyndAmtX],
-["@參貸金額",#L3600PartAmtX],
-[#<->#,"@代理行",#L3600AgentBank],
-["@央行融資",#L3600CentralBankPercentX],["@作業日期",#L3600TxDate,#L3600TxTimeX],
-]
-</sub>
-
-<sub type="PART" name="L3610" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
-[
-["[L3912]                                 交易內容查詢"],
-[#<->#,"@聯貸編號",#L3610CustNo,"@-@",#L3610SyndNo,"@",#L3610CustNoX],
-[#<->#,"@交易代號",#L3610TxCode,#L3610TxCodeX],
-[#<->#,"@會計日期",#L3610AcctDate],
-["@櫃員編號",#L3610TellerNo,#L3610TellerNoX],["@交易序號",#L3610TxtNo],
-["@還款來源",#L3610RepayCodeX],["@訂正別",#L3610HCodeX],
-["@幣別",#L3610CurrencyCode],["@交易金額",#L3610TxAmtX],
-["@主辦費",#L3610LeadingFeeX],["@帳務科目-手續費收入",#L3610IncomeFeeX],
-["@管理費",#L3610ManageFeeX],["@帳務科目-其他預收款",#L3610PrepaidFeeX],
-["@承諾費",#L3610CommitFeeX],["@暫收款",#L3610TempAmtX],
-["@參貸費",#L3610PartFeeX],["@暫收抵繳",#L3610TempRepayX],
-[#<->#,"@代理費",#L3610AgencyFeeX],
-[#<->#,"@包銷費",#L3610UnderwriteFeeX],
-[#<->#,"@其他費用",#L3610OtherFeeX],
-["@費用合計金額",#L3610SumFeeX],["@作業日期",#L3610TxDate,#L3610TxTimeX],
-]
-</sub>
-
-<sub type="PART" name="PFN10" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
-[
-["[L3912]                                 交易內容查詢"],
-[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
-[#<->#,"@交易代號",#OTxCode,#OTxCodeX],
-["@會計日期",#OAcctDate],["@入帳日期",#OEntryDateX],
-["@櫃員編號",#OTellerNo,#OTellerNoX],["@交易序號",#OTxtNo],
-["@還款來源",#ORepayCodeX],["@訂正別",#OHCodeX],
-[#<->#,"@幣別",#OCurrencyCode],
-[#<->#,"@回收金額",#ORepayAmtX],
-[#<->#,"@回收期數",#ORepayTerms],
-[#<->#,"@計息起日",#OIntStartDateX],
-[#<->#,"@計息迄日",#OIntEndDateX],
-[#<->#,"@本金",#OPrinciPalX],
-[#<->#,"@利息",#OInterestX],
-[#<->#,"@延遲息",#ODelayIntX],
-[#<->#,"@違約金",#OBreachAmtX],
-["@清償違約金",#L3200CloseBreachAmtX],["@主管編號",#OSupperNo,#OSupperNoX],
-["@領清償證明時收取",#L3200CloseBreachAmtUnpaidX],["@作業日期",#OTxDate,#OTxTimeX],
-]
-</sub>
 
 <sub type="PART" name="L3410" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
@@ -2246,7 +2184,7 @@ TXFORM=L3912
 ["@回收金額",#L3410RepayAmtX],["@暫收抵繳",#L3410TempRepayX],
 ["@回收期數",#L3410RepayTerms],["@結案區分",#L3410CaseCloseCodeX],
 ["@計息起日",#L3410IntStartDateX],["@欠繳利息",#L3410UnpaidInterestX],
-[#<->#,"@計息迄日",#L3410IntEndDateX],
+["@計息迄日",#L3410IntEndDateX],["@免印花稅金額",#OStampFreeAmtX],
 ["@減免金額",#L3410ReduceAmtX],["@帳管費",#L3420AcctFeeX],
 ["@本金",#L3410PrinciPalX],["@契變手續費",#L3420ModifyFeeX],
 ["@利息",#L3410InterextX],["@火險費",#L3420FireFeeX],
@@ -2290,7 +2228,7 @@ TXFORM=L3912
 ["@本金",#L3440PrinciPalX],["@催收收回違約金",#L3440OvduPaidBreachX],
 ["@利息",#L3440InterextX],["@催收減免金額",#L3440OvduReduceAmtX],
 [#<->#,"@延遲息",#L3440DelayIntX],
-[#<->#,"@違約金",#L3440BreachAmtX],
+["@違約金",#L3440BreachAmtX],["@免印花稅金額",#OStampFreeAmtX],
 ["@減免金額",#L3440ReduceAmtX],["@主管編號",#L3440SupperNo,#L3440SupperNoX],                
 ["@累溢短收",#L3440OverflowX],["@作業日期",#L3440TxDate,#L3440TxTimeX],
 ]
@@ -2388,20 +2326,11 @@ TXFORM=L3912
 #RPTFG=05,QUERY.GRID,L3721
 #any={detail:false, header:'L3721.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}
 ^
-#RPTFG=06,QUERY.GRID,L3600
-#any={detail:false, header:'L3600.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}
-^
-#RPTFG=07,QUERY.GRID,L3610
-#any={detail:false, header:'L3610.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}
-^
 #RPTFG=08,QUERY.GRID,L3912
 #any={detail:false, header:'L3912.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}
 ^
 #RPTFG=09,QUERY.GRID,L618X
 #any={detail:false, header:'L618X.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}
-^
-#RPTFG=10,QUERY.GRID,PFN10
-#any={detail:false, header:'PFN10.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}
 ^
 #RPTFG=11,QUERY.GRID,L3410
 #any={detail:false, header:'L3410.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}

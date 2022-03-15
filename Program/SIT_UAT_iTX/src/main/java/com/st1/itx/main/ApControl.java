@@ -492,7 +492,8 @@ public class ApControl extends SysLogger {
 			txCom.setBookAcHcode(0);
 		if (this.titaVo.isHcodeNormal())
 			txCom.setBookAcHcode(0);
-		if (this.txBuffer.getTxCom().getBookAcHcode() != 1) {
+//		if (this.txBuffer.getTxCom().getBookAcHcode() != 1) {
+		if (this.titaVo.isHcodeErase()) {
 			if (this.titaVo.getEntDyI() != this.titaVo.getOrgEntdyI()) {
 				txCom.setBookAcHcode(2);
 			} else {

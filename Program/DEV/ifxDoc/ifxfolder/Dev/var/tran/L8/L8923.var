@@ -190,10 +190,7 @@ T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 !預定還款日期(TOTA)
 #OORepayDate=D,7,L
 
-!實際還款日期(TOTA)
-#OOActualRepayDate=D,7,L
-
-!還款金額(TOTA)
+!預定還款金額(TOTA)
 #OORepayAmt=m,14.2,S
 #OORepayAmt1=m,14,S
 E(0,#OORepayAmt)
@@ -201,22 +198,17 @@ E(0,#OORepayAmt)
 IF(#OORepayAmt1==0,S,$)
 X(#OORepayAmt1)
 
-!職業別(TOTA)
-#OOCareer=x,40,L
+!實際還款日期(TOTA)
+#OOActualRepayDate=D,7,L
 
-!年收入(萬)(TOTA)
-#OOIncome=x,60,L
+!實際還款金額(TOTA)
+#OOActualRepayAmt=m,14.2,S
+#OOActualRepayAmt1=m,14,S
+E(0,#OOActualRepayAmt)
+#OOActualRepayAmtX=X,17,L
+IF(#OOActualRepayAmt1==0,S,$)
+X(#OOActualRepayAmt1)
 
-!還款來源(TOTA)
-#OORepaySource=A,2,S
-#OORepaySourceX=X,20,L
-T(H,#OORepaySource,#ApHelp)
-
-!代償銀行(TOTA)
-#OORepayBank=x,20,L
-
-!其他說明(TOTA)
-#OODescription=x,120,L
 
 !經辦(TOTA)
 #OOEmpNo=X,6,L
@@ -254,12 +246,26 @@ T(2,4+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=刪除;ntxbuf=#OOBUF4})
 
-! 歷程的按鈕
-#OOBUF5=X,27,S
-T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+#OORecordDate+00)
+! 查詢的按鈕
+#OOBUF5=X,21,S
+T(2,5+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
 
 #OOBTN5=X,4,S
-C(3,#OOHaveLog,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5}))
+BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=查詢;ntxbuf=#OOBUF5})
+
+! 複製的按鈕
+#OOBUF6=X,21,S
+T(2,3+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
+
+#OOBTN6=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=複製;ntxbuf=#OOBUF6})
+
+! 歷程的按鈕
+#OOBUF7=X,27,S
+T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+#OORecordDate+00)
+
+#OOBTN7=X,4,S
+C(3,#OOHaveLog,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF7}))
 
 </sub>
 
@@ -287,11 +293,7 @@ TXFORM=L8923
 #OORepayDate
 #OOActualRepayDate
 #OORepayAmt
-#OOCareer
-#OOIncome
-#OORepaySource
-#OORepayBank
-#OODescription
+#OOActualRepayAmt
 #OOEmpNo
 #OOUpdate
 #OOHaveLog
@@ -326,13 +328,18 @@ TXFORM=L8923
 #OOBTN4=刪除
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
-#OOBTN5=歷程
+#OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN5',align:'center',canExport:false}
 
-#OORecordDate=訪談日期
-{width:80,align:'center'}
+#OOBTN6=複製
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN6',align:'center',canExport:false}
 
-#OOActualRepayDate=還款日期
+#OOBTN7=歷程
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN7',align:'center',canExport:false}
+
+
+
+#OORecordDate=訪談日期
 {width:80,align:'center'}
 
 #OOCustNoX=戶號
@@ -341,20 +348,17 @@ TXFORM=L8923
 #OOCustName=戶名
 {width:150,align:'left'}
 
-#OORepayAmtX=還款金額
-{width:100,align:'right'}
-
-#OOCareer=職業別
-{width:100,align:'left'}
-
-#OOIncome=年收入(萬)
-{width:80,align:'right'}
-
-#OORepaySourceX=還款來源
-{width:100,align:'left'}
-
-#OORepayBank=代償銀行
+#OORepayDate=預定還款日期
 {width:100,align:'center'}
+
+#OORepayAmtX=預定還款金額
+{width:140,align:'right'}
+
+#OOActualRepayDate=實際還款日期
+{width:100,align:'center'}
+
+#OOActualRepayAmtX=實際還款金額
+{width:140,align:'right'}
 
 #OOEmpNo=經辦
 {width:50,align:'center'}
@@ -362,8 +366,6 @@ TXFORM=L8923
 #OOUpdate=異動日期
 {width:80,align:'center'}
 
-#OODescription=其他說明
-{width:400,align:'left'}
 
 ^
 </sub>

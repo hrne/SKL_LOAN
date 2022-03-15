@@ -165,6 +165,7 @@ public class L6501 extends TradeBuffer {
 		mSystemParas.setPreRepayTerms(this.parse.stringToInteger(titaVo.getParam("PreRepayTerms")));
 		mSystemParas.setPreRepayTermsBatch(this.parse.stringToInteger(titaVo.getParam("PreRepayTermsBatch")));
 		mSystemParas.setShortPrinPercent(this.parse.stringToInteger(titaVo.getParam("ShortPrinPercent")));
+		mSystemParas.setShortPrinLimit(this.parse.stringToInteger(titaVo.getParam("ShortPrinLimit")));
 		mSystemParas.setShortIntPercent(this.parse.stringToInteger(titaVo.getParam("ShortIntPercent")));
 		mSystemParas.setAmlFg(this.parse.stringToInteger(titaVo.getParam("AmlFg")));
 		mSystemParas.setAmlUrl(titaVo.getParam("AmlUrl"));

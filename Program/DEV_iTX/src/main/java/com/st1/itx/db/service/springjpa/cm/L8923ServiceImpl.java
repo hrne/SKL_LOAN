@@ -47,7 +47,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryfindbycustno(int index, int limit, TitaVo titaVo) throws Exception {
 
-		this.info("L8923ServiceImpl.queryRecordDate");
+		this.info("L8923ServiceImpl.queryfindbycustno");
 
 		// *** 折返控制相關 ***
 		this.index = index;
@@ -74,7 +74,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",\"CustNo\" as F2						\n"; // 戶號
 		sql += ",\"FacmNo\" as F3						\n"; // 額度
 		sql += ",\"BormNo\" as F4						\n"; // 撥款序號
-		sql += ",\"RepayAmt\" as F5						\n"; // 還款金額
+		sql += ",\"RepayAmt\" as F5						\n"; // 預定還款金額
 		sql += ",\"Career\" as F6						\n"; // 職業
 		sql += ",\"Income\" as F7						\n"; // 年收入
 		sql += ",\"RepaySource\" as F8					\n"; // 還款來源
@@ -83,6 +83,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",\"LastUpdate\" as F11					\n"; // 更新時間
 		sql += ",\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",\"Description\" as F13					\n"; // 其他說明
+		sql += ",\"ActualRepayAmt\" as F14				\n"; // 實際還款金額
 		sql += "from \"MlaundryRecord\" 				\n";
 		if (iRecordDateStart > 0) {
 			sql += "where \"RecordDate\" >= :recordDateStart and \"RecordDate\" <= :recordDateEnd  \n";
@@ -134,7 +135,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> queryresult(int index, int limit, TitaVo titaVo) throws Exception {
 
-		this.info("L8923ServiceImpl.queryRecordDate");
+		this.info("L8923ServiceImpl.queryresult");
 
 		// *** 折返控制相關 ***
 		this.index = index;
@@ -171,6 +172,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"LastUpdate\" as F11					\n"; // 更新時間
 		sql += ",M.\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",M.\"Description\" as F13					\n"; // 其他說明
+		sql += ",M.\"ActualRepayAmt\" as F14				\n"; // 實際還款金額
 		sql += "from \"MlaundryRecord\" M				\n";
 		if (!iCustName.isEmpty() && iCustNo == 0) {
 			sql += "left join \"CustMain\" C on C.\"CustNo\" = M.\"CustNo\" \n";

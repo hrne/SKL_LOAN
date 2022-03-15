@@ -20,7 +20,6 @@
 //  */
 // public class LW003 extends TradeBuffer {
 // 	@SuppressWarnings("unused")
-// 	// private static final Logger logger = LoggerFactory.getLogger(LW003.class);
 
 // 	@Autowired
 // 	public LW003Report lw003report;
@@ -65,20 +64,26 @@ public class LW003 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		;
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LW003.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LW003 ");
+		
+
+		// 帳務日(西元)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底日(西元)
+//		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+	
+		
 		lw003report.setTxBuffer(this.getTxBuffer());
-		lw003report.exec(titaVo);
+		lw003report.exec(titaVo,tbsdy);
 	}
 
 }

@@ -130,6 +130,13 @@ T(3,)T(H,#OOLableA,#LableAHelp)
 
 ! 註記
 #OOLableB=X,2,O
+T(1,@OOLableB_AdjCode,#OOLableB,1,1)
+T(1,@OOLableB_KeyinCode,#OOLableB,2,1)
+!1.批次自動調整 2.按地區別調整 3.人工調整
+#OOLableB_AdjCode=X,1,S
+!0.未調整 1.已調整 2.待輸入
+#OOLableB_KeyinCode=X,1,S
+
 #OOLableBX=X,30,O
 
 ! 方式細項 0:未輸入 1:已輸入 2:有誤
@@ -183,9 +190,9 @@ IF(#OOIgnCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOIgnCntX; ntxbuf=#OOBUF
 
 #OOText_Exec=X,10,O
 IF(#OOCheckFlag==1,T(2,已確認報表),IF(#OOCheckFlag==0,T(2,確認),IF(#OOCheckFlag==2,T(2,輸入利率),T(2,)))))
-  
-#OOBuff_L4321=X,10,O
-T(2,#RateChangeDate+#OOLableA+#CustType)
+
+#OOBuff_L4321=X,42,O
+T(2,#RateChangeDate+#OOLableA+#CustType+#OOLableB_AdjCode+#OOLableB_KeyinCode+#OOLableBX)
 #OOBuff_LC009=X,10,O
 T(2,#TLRNO)
 
@@ -193,16 +200,15 @@ T(2,#TLRNO)
 T(2,#RateChangeDate+#OOLableA+#CustType)
 
 #OOBTN_Exec=A,1,O
-IF(#OOSumCnt>=1&&#OORank==1,
 SWITCH(#OOCheckFlag,1,BIND(grid,{ cmd=CHAIN;ntxcd=LC009; text=#OOText_Exec; ntxbuf=#OOBuff_LC009}),
-					0,BIND(grid,{ cmd=CHAIN;ntxcd=L4321; text=#OOText_Exec; ntxbuf=#OOBuff_L4321}),BIND(grid,cancel)
-      ),IF(#OOCheckFlag==2,BIND(grid,{ cmd=CHAIN;ntxcd=L4325; text=#OOText_Exec; ntxbuf=#OOBuff_L4325}),BIND(grid,cancel)))
+			  0,BIND(grid,{ cmd=CHAIN;ntxcd=L4321; text=#OOText_Exec; ntxbuf=#OOBuff_L4321}),
+                    2,BIND(grid,{ cmd=CHAIN;ntxcd=L4325; text=#OOText_Exec; ntxbuf=#OOBuff_L4325}),BIND(grid,cancel))
+! IF(#OOCheckFlag==2,BIND(grid,{ cmd=CHAIN;ntxcd=L4325; text=#OOText_Exec; ntxbuf=#OOBuff_L4325}),BIND(grid,cancel))
 
 #OOStatus=A,1,O
 
 #OOStatusX=x,10,O
 T(2,)
-C(3,#OORank,1,$,s)
 C(2,#OOStatus,T(2,未確認),T(2,確認未放行),T(2,已確認放行))
 
 #OORptFg=X,1,O
