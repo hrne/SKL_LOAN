@@ -132,7 +132,8 @@ public class L2916 extends TradeBuffer {
 		this.totaVo.putParam("LandRentEndDate", tClLand.getLandRentEndDate());
 
 		// tita擔保品編號取建物所有權人檔資料list
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
+				Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
 
 		if (lClLandOwner == null || lClLandOwner.size() == 0) {
@@ -174,52 +175,31 @@ public class L2916 extends TradeBuffer {
 		}
 
 		// tita擔保品編號取建物修改原因檔資料list
-		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
-		lClLandReason = slClLandReason == null ? null : new ArrayList<ClLandReason>(slClLandReason.getContent());
+		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, iLandSeq,titaVo);
+
 		// 資料筆數
 		if (lClLandReason == null || lClLandReason.size() == 0) {
 			lClLandReason = new ArrayList<ClLandReason>();
 		}
-		int dataSize4 = lClLandReason.size();
-		this.info("L1R05 lClBuildingReason size in DB = " + dataSize4);
 
-		// 暫時只抓前10筆,把第11筆之後的刪除
-		if (dataSize4 > 10) {
-			for (int l = dataSize4 + 1; l <= dataSize4; l++) {
-				lClLandReason.remove(l);
-			}
-		} else if (dataSize4 < 10) {
-			// 若不足10筆,補足10筆
-			for (int l = dataSize4 + 1; l <= 10; l++) {
-				ClLandReason tClLandReason = new ClLandReason();
-				lClLandReason.add(tClLandReason);
-			}
+		String CreateDate4 = "";
+		if (tClLandReason == null) {
+
+			tClLandReason = new ClLandReason();
+
+		} else {
+			this.info("tClLandReason.getCreateDate().toString()L2915 " + tClLandReason.getCreateDate().toString());
+			String CreateDate = tClLandReason.getCreateDate().toString();
+			this.info("CreateDate L2915 " + CreateDate);
+			String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
+			int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
+			CreateDate4 = String.valueOf(CreateDate3);
 		}
-		int l = 1;
-		for (ClLandReason tClLandReason : lClLandReason) {
 
-			String CreateDate4 = "";
-			if (tClLandReason.getClLandReasonId() == null) {
-
-				tClLandReason = new ClLandReason();
-
-			} else {
-				this.info("tClLandReason.getCreateDate().toString()L2915 " + tClLandReason.getCreateDate().toString());
-				String CreateDate = tClLandReason.getCreateDate().toString();
-				this.info("CreateDate L2915 " + CreateDate);
-				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
-				int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
-				CreateDate4 = String.valueOf(CreateDate3);
-			}
-
-			this.totaVo.putParam("Reason" + l, tClLandReason.getReason() == 0 ? "" : tClLandReason.getReason());
-			this.totaVo.putParam("OtherReason" + l, tClLandReason.getOtherReason());
-			this.totaVo.putParam("CreateEmpNo" + l, tClLandReason.getCreateEmpNo());
-			this.totaVo.putParam("CreateDate" + l, CreateDate4);
-
-			l++;
-
-		}
+		this.totaVo.putParam("Reason1", tClLandReason.getReason() == 0 ? "" : tClLandReason.getReason());
+		this.totaVo.putParam("OtherReason1", tClLandReason.getOtherReason());
+		this.totaVo.putParam("CreateEmpNo1", tClLandReason.getCreateEmpNo());
+		this.totaVo.putParam("CreateDate1", CreateDate4);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -1,7 +1,7 @@
 package com.st1.itx.trade.L4;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -112,10 +112,10 @@ public class L4454Report extends MakeReport {
 		String custNo = FormatUtil.pad9(tL4454Vo.get("CustNo"), 7);
 		int intCustNo = parse.stringToInteger(tL4454Vo.get("CustNo"));
 		CustMain tCustMain = custMainService.custNoFirst(intCustNo, intCustNo, titaVo);
-		if (tCustMain == null) {
+		if ( tCustMain == null) {
 			throw new LogicException("E0014", "CustMain"); // 檔案錯誤
 		}
-		String address = custNoticeCom.getCurrAddress(tCustMain, titaVo);
+		String address =  custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		String custName = tCustMain.getCustName();
 		String zipCode1 = tCustMain.getCurrZip3();
 		String zipCode2 = tCustMain.getCurrZip2();
@@ -154,7 +154,7 @@ public class L4454Report extends MakeReport {
 			this.info("tranDate X = " + tranData.substring(i, i + 1));
 			tmp = tranData.charAt(i);
 
-			tranTemp = tmp;
+			tranTemp = (int) tmp;
 
 			tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 

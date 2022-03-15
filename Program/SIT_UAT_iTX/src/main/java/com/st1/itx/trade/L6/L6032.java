@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,7 +31,7 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6032 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6032.class);
+	// private static final Logger logger = LoggerFactory.getLogger(L6032.class);
 
 	/* DB服務注入 */
 	@Autowired

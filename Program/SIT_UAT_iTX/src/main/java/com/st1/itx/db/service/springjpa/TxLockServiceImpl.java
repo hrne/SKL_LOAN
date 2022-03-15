@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txLockService")
 @Repository
-public class TxLockServiceImpl implements TxLockService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxLockServiceImpl.class);
+public class TxLockServiceImpl extends ASpringJpaParm implements TxLockService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + lockNo);
+		this.info("findById " + dbName + " " + lockNo);
 		Optional<TxLock> txLock = null;
 		if (dbName.equals(ContentName.onDay))
 			txLock = txLockReposDay.findById(lockNo);
@@ -94,7 +91,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LockNo"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txLockReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -116,7 +113,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findByCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
+		this.info("findByCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = txLockReposDay.findAllByCustNoIsOrderByLockNoAsc(custNo_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -134,7 +131,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + lockNo);
+		this.info("Hold " + dbName + " " + lockNo);
 		Optional<TxLock> txLock = null;
 		if (dbName.equals(ContentName.onDay))
 			txLock = txLockReposDay.findByLockNo(lockNo);
@@ -152,7 +149,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txLock.getLockNo());
+		this.info("Hold " + dbName + " " + txLock.getLockNo());
 		Optional<TxLock> txLockT = null;
 		if (dbName.equals(ContentName.onDay))
 			txLockT = txLockReposDay.findByLockNo(txLock.getLockNo());
@@ -174,7 +171,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txLock.getLockNo());
+		this.info("Insert..." + dbName + " " + txLock.getLockNo());
 		if (this.findById(txLock.getLockNo()) != null)
 			throw new DBException(2);
 
@@ -200,7 +197,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txLock.getLockNo());
+		this.info("Update..." + dbName + " " + txLock.getLockNo());
 		if (!empNot.isEmpty())
 			txLock.setLastUpdateEmpNo(empNot);
 
@@ -223,7 +220,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txLock.getLockNo());
+		this.info("Update..." + dbName + " " + txLock.getLockNo());
 		if (!empNot.isEmpty())
 			txLock.setLastUpdateEmpNo(empNot);
 
@@ -243,7 +240,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txLock.getLockNo());
+		this.info("Delete..." + dbName + " " + txLock.getLockNo());
 		if (dbName.equals(ContentName.onDay)) {
 			txLockReposDay.delete(txLock);
 			txLockReposDay.flush();
@@ -270,7 +267,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxLock t : txLock)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -299,7 +296,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txLock == null || txLock.size() == 0)
 			throw new DBException(6);
 
@@ -324,7 +321,7 @@ public class TxLockServiceImpl implements TxLockService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<TxLock> txLock, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

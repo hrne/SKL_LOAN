@@ -2,8 +2,6 @@ package com.st1.itx.trade.LM;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +31,7 @@ import com.st1.itx.util.MySpring;
 //
 //	@Override
 //	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-//		logger = LoggerFactory.getLogger(LM016.class);
+//		// logger = LoggerFactory.getLogger(LM016.class);
 //		return this.exec(contribution, "M");
 //	}
 //
@@ -47,7 +45,7 @@ import com.st1.itx.util.MySpring;
 //}
 
 public class LM016 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LM016.class);
+	// private static final Logger logger = LoggerFactory.getLogger(LM016.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

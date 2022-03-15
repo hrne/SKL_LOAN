@@ -56,6 +56,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<Map<String, String>> execSql(TitaVo titaVo) throws Exception {
 		this.info("L2038ServiceImpl.find");
 
@@ -214,7 +215,6 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
 
-		@SuppressWarnings("unchecked")
 		List<Object> result = query.getResultList();
 
 		size = result.size();
@@ -285,6 +285,13 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (clNo > 0) {
 			conditionList.add(" cm.\"ClNo\" = :clNo ");
 		}
+		
+		// ClTypeCode 擔保品類別
+		String ClTypeCode = titaVo.getParam("ClTypeCode");
+		if (ClTypeCode != null && !ClTypeCode.isEmpty()) {
+			conditionList.add(" cm.\"ClTypeCode\" = :ClTypeCode ");
+		}
+		
 		// ApproveNo 核准號碼
 		int approveNo = parse.stringToInteger(titaVo.getParam("ApproveNo"));
 		if (approveNo > 0) {
@@ -391,38 +398,38 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			conditionList.add(" cb.\"Road\" LIKE :road ");
 		}
 		// Section 段
-		int section = parse.stringToInteger(titaVo.getParam("Section"));
-		if (section > 0) {
+		String section = titaVo.getParam("Section");
+		if (section != null && !section.isEmpty()) {
 			conditionList.add(" cb.\"Section\" = :section ");
 		}
 		// Alley 巷
-		int alley = parse.stringToInteger(titaVo.getParam("Alley"));
-		if (alley > 0) {
+		String alley = titaVo.getParam("Alley");
+		if (alley != null && !alley.isEmpty()) {
 			conditionList.add(" cb.\"Alley\" = :alley ");
 		}
 		// Lane 弄
-		int lane = parse.stringToInteger(titaVo.getParam("Lane"));
-		if (lane > 0) {
+		String lane = titaVo.getParam("Lane");
+		if (lane != null && !lane.isEmpty()) {
 			conditionList.add(" cb.\"Lane\" = :lane ");
 		}
 		// Num 號
-		int num = parse.stringToInteger(titaVo.getParam("Num"));
-		if (num > 0) {
+		String num = titaVo.getParam("Num");
+		if (num != null && !num.isEmpty()) {
 			conditionList.add(" cb.\"Num\" = :num ");
 		}
 		// NumDash 號之幾
-		int numDash = parse.stringToInteger(titaVo.getParam("NumDash"));
-		if (numDash > 0) {
+		String numDash = titaVo.getParam("NumDash");
+		if (numDash != null && !numDash.isEmpty()) {
 			conditionList.add(" cb.\"NumDash\" = :numDash ");
 		}
 		// Floor 樓
-		int floor = parse.stringToInteger(titaVo.getParam("Floor"));
-		if (floor > 0) {
+		String floor = titaVo.getParam("Floor");
+		if (floor != null && !floor.isEmpty()) {
 			conditionList.add(" cb.\"Floor\" = :floor ");
 		}
 		// FloorDash 樓之幾
-		int floorDash = parse.stringToInteger(titaVo.getParam("FloorDash"));
-		if (floorDash > 0) {
+		String floorDash = titaVo.getParam("FloorDash");
+		if (floorDash != null && !floor.isEmpty()) {
 			conditionList.add(" cb.\"FloorDash\" = :floorDash ");
 		}
 
@@ -469,6 +476,11 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("clNo", clNo);
 		}
 
+		String ClTypeCode = titaVo.getParam("ClTypeCode");
+		if (ClTypeCode != null && !ClTypeCode.isEmpty()) {
+			query.setParameter("ClTypeCode", ClTypeCode);
+		}
+		
 		int approveNo = parse.stringToInteger(titaVo.getParam("ApproveNo"));
 		if (approveNo > 0) {
 			query.setParameter("approveNo", approveNo);
@@ -607,38 +619,38 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("road", road);
 		}
 
-		int section = parse.stringToInteger(titaVo.getParam("Section"));
-		if (section > 0) {
+		String section = titaVo.getParam("Section");
+		if (section != null && !section.isEmpty()) {
 			query.setParameter("section", String.valueOf(section));
 		}
 
-		int alley = parse.stringToInteger(titaVo.getParam("Alley"));
-		if (alley > 0) {
+		String alley = titaVo.getParam("Alley");
+		if (alley != null && !alley.isEmpty()) {
 			query.setParameter("alley", String.valueOf(alley));
 		}
 
-		int lane = parse.stringToInteger(titaVo.getParam("Lane"));
-		if (lane > 0) {
+		String lane = titaVo.getParam("Lane");
+		if (lane != null && !lane.isEmpty()) {
 			query.setParameter("lane", String.valueOf(lane));
 		}
 
-		int num = parse.stringToInteger(titaVo.getParam("Num"));
-		if (num > 0) {
+		String num = titaVo.getParam("Num");
+		if (num != null && !num.isEmpty()) {
 			query.setParameter("num", String.valueOf(num));
 		}
 
-		int numDash = parse.stringToInteger(titaVo.getParam("NumDash"));
-		if (numDash > 0) {
+		String numDash = titaVo.getParam("NumDash");
+		if (numDash != null && !numDash.isEmpty()) {
 			query.setParameter("numDash", String.valueOf(numDash));
 		}
 
-		int floor = parse.stringToInteger(titaVo.getParam("Floor"));
-		if (floor > 0) {
+		String floor = titaVo.getParam("Floor");
+		if (floor != null && !floor.isEmpty()) {
 			query.setParameter("floor", String.valueOf(floor));
 		}
 
-		int floorDash = parse.stringToInteger(titaVo.getParam("FloorDash"));
-		if (floorDash > 0) {
+		String floorDash = titaVo.getParam("FloorDash");
+		if (floorDash != null && !floorDash.isEmpty()) {
 			query.setParameter("floorDash", String.valueOf(floorDash));
 		}
 

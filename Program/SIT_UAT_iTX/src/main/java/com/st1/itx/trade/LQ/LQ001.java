@@ -28,7 +28,7 @@
 //  */
 //public class LQ001 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LQ001.class);
+//	// private static final Logger logger = LoggerFactory.getLogger(LQ001.class);
 //
 //	@Autowired
 //	public LQ001Report lq001report;

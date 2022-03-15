@@ -97,6 +97,7 @@ public class L2022 extends TradeBuffer {
 	@Autowired
 	public L2022ServiceImpl sL2022ServiceImpl;
 
+
 	HashMap<String, String> owners = new HashMap<String, String>();
 
 	String mainRel = "";
@@ -118,6 +119,7 @@ public class L2022 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 50; // 9 * 15 * 376 = 50760 1次最多9筆occurs
 
+
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
@@ -125,15 +127,15 @@ public class L2022 extends TradeBuffer {
 			resultList = sL2022ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("L2022ServiceImpl findByCondition " + e.getMessage());
-			throw new LogicException("E0013", "L2022");
+			throw new LogicException("E0001", "L2022");
 
 		}
-
+		
 		List<LinkedHashMap<String, String>> chkOccursList = null;
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
-				if (parse.stringToInteger(result.get("CreditSysNo")) == 0) {
+				if(parse.stringToInteger(result.get("CreditSysNo")) == 0) {
 					occursList.putParam("oCreditSysNo", "");
 				} else {
 					occursList.putParam("oCreditSysNo", result.get("CreditSysNo"));
@@ -153,26 +155,29 @@ public class L2022 extends TradeBuffer {
 				occursList.putParam("oModify", result.get("Modify"));
 
 				this.totaVo.addOccursList(occursList);
-
+				
 			}
-
+			
 			chkOccursList = this.totaVo.getOccursList();
 
-			if (resultList.size() >= this.limit) {
+			if (resultList.size() >= this.limit ) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
 			}
 		}
-
+		
+		
+		
 		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
-			throw new LogicException("E2003", ""); // 查無資料
+			throw new LogicException("E0001", ""); // 查無資料
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
+		
 //		if (iCreditSysNo > 0) {
 //			Slice<FacMain> slFacMain = sFacMainService.facmCreditSysNoRange(iCreditSysNo, iCreditSysNo, 0, 999, this.index, this.limit, titaVo);
 //			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();

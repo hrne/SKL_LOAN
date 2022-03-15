@@ -90,7 +90,7 @@ public class L4512 extends TradeBuffer {
 
 		BigDecimal iRepayAmt = parse.stringToBigDecimal(titaVo.getParam("RepayAmt"));
 
-		int iMediaDate = parse.stringToInteger(titaVo.getParam("MediaDate"));
+		int iMediaDate = parse.stringToInteger(titaVo.getParam("MediaDate")) ;
 
 		String iMediaKind = titaVo.getParam("MediaKind");
 
@@ -116,18 +116,21 @@ public class L4512 extends TradeBuffer {
 				throw new LogicException("E0001", "員工扣薪日程表的媒體日期不符" + tEmpDeductSchedule.getMediaDate());
 			}
 			CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(), titaVo);
-//			1.15日薪 2.非15日薪
-			if ("2".equals(tCdCode.getItem().substring(0, 1))) {
-				iMediaKind = "5";
-			} else {
+//			4.15日薪 5.非15日薪 CdCode 4 5 15日薪
+			if ("4".equals(tCdCode.getCode().substring(0, 1)) || "5".equals(tCdCode.getCode().substring(0, 1))) {
 				iMediaKind = "4";
+			} else {
+				iMediaKind = "5";
 			}
-			EmpDeductMedia t1EmpDeductMedia = empDeductMediaService.lastMediaSeqFirst(iMediaDate + 19110000, iMediaKind, titaVo);
+			
+			iMediaDate = iMediaDate + 19110000;
+			EmpDeductMedia t1EmpDeductMedia = empDeductMediaService.lastMediaSeqFirst(iMediaDate, iMediaKind, titaVo);
 			if (t1EmpDeductMedia == null) {
 				iMediaSeq = 1;
 			} else {
 				iMediaSeq = t1EmpDeductMedia.getMediaSeq() + 1;
 			}
+
 			tEmpDeductMediaId.setMediaDate(iMediaDate);
 			tEmpDeductMediaId.setMediaKind(iMediaKind);
 			tEmpDeductMediaId.setMediaSeq(iMediaSeq);
@@ -168,6 +171,9 @@ public class L4512 extends TradeBuffer {
 			insertEmpDeductDtl(tEmpDeductMedia, tCustMain, tCdEmp, titaVo);
 			break;
 		case 2:
+			
+			iMediaDate = iMediaDate + 19110000;
+			
 			tEmpDeductMediaId.setMediaDate(iMediaDate);
 			tEmpDeductMediaId.setMediaKind(iMediaKind);
 			tEmpDeductMediaId.setMediaSeq(iMediaSeq);
@@ -186,11 +192,13 @@ public class L4512 extends TradeBuffer {
 			}
 			break;
 		case 4:
+			
+			iMediaDate = iMediaDate + 19110000;
 			tEmpDeductMediaId.setMediaDate(iMediaDate);
 			tEmpDeductMediaId.setMediaKind(iMediaKind);
 			tEmpDeductMediaId.setMediaSeq(iMediaSeq);
 			tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMediaId, titaVo);
-
+			
 			if (tEmpDeductMedia == null) {
 				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
 			}
@@ -199,17 +207,17 @@ public class L4512 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0008", "EmpDeductMedia : " + e.getErrorMsg());
 			}
-
-//			// delete EmpDeductDtl
-//			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(iMediaDate + 19110000, iMediaKind, iMediaSeq, this.index, Integer.MAX_VALUE, titaVo);
-//			if (slEmpDeductDtl == null) {
-//				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
-//			}
-//			try {
-//				empDeductDtlService.deleteAll(slEmpDeductDtl.getContent(), titaVo);
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E0008", "EmpDeductDtl : " + e.getErrorMsg());
-//			}
+			
+			// delete EmpDeductDtl
+			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(iMediaDate, iMediaKind, iMediaSeq, this.index, Integer.MAX_VALUE, titaVo);
+			if (slEmpDeductDtl == null) {
+				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
+			}
+			try {
+				empDeductDtlService.deleteAll(slEmpDeductDtl.getContent(), titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "EmpDeductDtl : " + e.getErrorMsg());
+			}
 
 			break;
 		}

@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,8 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LP001Report2 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LP001Report2.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LP001Report2.class);
 
 	@Autowired
 	public LP001ServiceImpl LP001ServiceImpl;

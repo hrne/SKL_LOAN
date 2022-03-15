@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdEmpService")
 @Repository
-public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(CdEmpServiceImpl.class);
+public class CdEmpServiceImpl extends ASpringJpaParm implements CdEmpService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + employeeNo);
+		this.info("findById " + dbName + " " + employeeNo);
 		Optional<CdEmp> cdEmp = null;
 		if (dbName.equals(ContentName.onDay))
 			cdEmp = cdEmpReposDay.findById(employeeNo);
@@ -96,7 +93,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "EmployeeNo"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -121,7 +118,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findEmployeeNo " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " employeeNo_1 : " + employeeNo_1);
+		this.info("findEmployeeNo " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " employeeNo_1 : " + employeeNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByEmployeeNoGreaterThanEqualAndEmployeeNoLessThanEqualOrderByEmployeeNoAsc(employeeNo_0, employeeNo_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -146,7 +143,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("EmployeeNoLike " + dbName + " : " + "employeeNo_0 : " + employeeNo_0);
+		this.info("EmployeeNoLike " + dbName + " : " + "employeeNo_0 : " + employeeNo_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByEmployeeNoLikeOrderByEmployeeNoAsc(employeeNo_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -164,7 +161,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findAgentIdFirst " + dbName + " : " + "agentId_0 : " + agentId_0);
+		this.info("findAgentIdFirst " + dbName + " : " + "agentId_0 : " + agentId_0);
 		Optional<CdEmp> cdEmpT = null;
 		if (dbName.equals(ContentName.onDay))
 			cdEmpT = cdEmpReposDay.findTopByAgentIdIs(agentId_0);
@@ -189,7 +186,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findCenterCode " + dbName + " : " + "centerCode_0 : " + centerCode_0);
+		this.info("findCenterCode " + dbName + " : " + "centerCode_0 : " + centerCode_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByCenterCodeIsOrderByEmployeeNoAsc(centerCode_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -214,7 +211,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findFullname " + dbName + " : " + "fullname_0 : " + fullname_0);
+		this.info("findFullname " + dbName + " : " + "fullname_0 : " + fullname_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByFullnameIsOrderByEmployeeNoAsc(fullname_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -239,7 +236,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findFullnameLike " + dbName + " : " + "fullname_0 : " + fullname_0);
+		this.info("findFullnameLike " + dbName + " : " + "fullname_0 : " + fullname_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByFullnameLikeOrderByEmployeeNoAsc(fullname_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -264,7 +261,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findCenterCodeAndAgCurInd " + dbName + " : " + "centerCode_0 : " + centerCode_0 + " agCurInd_1 : " + agCurInd_1);
+		this.info("findCenterCodeAndAgCurInd " + dbName + " : " + "centerCode_0 : " + centerCode_0 + " agCurInd_1 : " + agCurInd_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByCenterCodeIsAndAgCurIndIsOrderByEmployeeNoAsc(centerCode_0, agCurInd_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -289,7 +286,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("EmployeeNoLikeAndAgCurInd " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " agCurInd_1 : " + agCurInd_1);
+		this.info("EmployeeNoLikeAndAgCurInd " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " agCurInd_1 : " + agCurInd_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByEmployeeNoLikeAndAgCurIndIsOrderByEmployeeNoAsc(employeeNo_0, agCurInd_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -314,7 +311,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findFullnameLikeAndAgCurInd " + dbName + " : " + "fullname_0 : " + fullname_0 + " agCurInd_1 : " + agCurInd_1);
+		this.info("findFullnameLikeAndAgCurInd " + dbName + " : " + "fullname_0 : " + fullname_0 + " agCurInd_1 : " + agCurInd_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByFullnameLikeAndAgCurIndIsOrderByEmployeeNoAsc(fullname_0, agCurInd_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -339,7 +336,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findEmployeeNoAndAgCurInd " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " employeeNo_1 : " + employeeNo_1 + " agCurInd_2 : " + agCurInd_2);
+		this.info("findEmployeeNoAndAgCurInd " + dbName + " : " + "employeeNo_0 : " + employeeNo_0 + " employeeNo_1 : " + employeeNo_1 + " agCurInd_2 : " + agCurInd_2);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdEmpReposDay.findAllByEmployeeNoGreaterThanEqualAndEmployeeNoLessThanEqualAndAgCurIndIsOrderByEmployeeNoAsc(employeeNo_0, employeeNo_1, agCurInd_2, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -357,7 +354,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + employeeNo);
+		this.info("Hold " + dbName + " " + employeeNo);
 		Optional<CdEmp> cdEmp = null;
 		if (dbName.equals(ContentName.onDay))
 			cdEmp = cdEmpReposDay.findByEmployeeNo(employeeNo);
@@ -375,7 +372,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + cdEmp.getEmployeeNo());
+		this.info("Hold " + dbName + " " + cdEmp.getEmployeeNo());
 		Optional<CdEmp> cdEmpT = null;
 		if (dbName.equals(ContentName.onDay))
 			cdEmpT = cdEmpReposDay.findByEmployeeNo(cdEmp.getEmployeeNo());
@@ -398,7 +395,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + cdEmp.getEmployeeNo());
+		this.info("Insert..." + dbName + " " + cdEmp.getEmployeeNo());
 		if (this.findById(cdEmp.getEmployeeNo()) != null)
 			throw new DBException(2);
 
@@ -427,7 +424,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + cdEmp.getEmployeeNo());
+		this.info("Update..." + dbName + " " + cdEmp.getEmployeeNo());
 		if (!empNot.isEmpty())
 			cdEmp.setLastUpdateEmpNo(empNot);
 
@@ -450,7 +447,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + cdEmp.getEmployeeNo());
+		this.info("Update..." + dbName + " " + cdEmp.getEmployeeNo());
 		if (!empNot.isEmpty())
 			cdEmp.setLastUpdateEmpNo(empNot);
 
@@ -470,7 +467,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + cdEmp.getEmployeeNo());
+		this.info("Delete..." + dbName + " " + cdEmp.getEmployeeNo());
 		if (dbName.equals(ContentName.onDay)) {
 			cdEmpReposDay.delete(cdEmp);
 			cdEmpReposDay.flush();
@@ -498,7 +495,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (CdEmp t : cdEmp) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -530,7 +527,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (cdEmp == null || cdEmp.size() == 0)
 			throw new DBException(6);
 
@@ -555,7 +552,7 @@ public class CdEmpServiceImpl implements CdEmpService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<CdEmp> cdEmp, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

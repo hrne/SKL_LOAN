@@ -330,6 +330,7 @@ public class L6403Batch extends TradeBuffer {
 		}
 	}
 
+	
 	private String authFgX(int authfg) {
 		String r = "";
 		if (authfg == 0) {

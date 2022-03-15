@@ -1,6 +1,11 @@
 package com.st1.itx.trade.L1;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -15,7 +20,9 @@ import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.springjpa.cm.L1R04ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L1R04")
 @Scope("prototype")
@@ -39,9 +46,74 @@ public class L1R04 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public FacMainService sFacMainService;
+	@Autowired
+	L1R04ServiceImpl l1R04ServiceImpl;
+
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		this.info("active L1R04 ");
+		this.totaVo.init(titaVo);
+
+		try {
+
+			List<Map<String, String>> dList = l1R04ServiceImpl.FindData(titaVo);
+
+			int applyDt = 0;
+
+			if (dList != null && dList.size() != 0) {
+				int i = 0;
+				for (Map<String, String> dVo : dList) {
+
+					if (applyDt == 0) {
+						int applyDt2 = parse.stringToInteger(dVo.get("ApplyDate"));
+						if (applyDt2 > 19110000) {
+							applyDt2 -= 19110000;
+							applyDt = applyDt2;
+						}
+					}
+					
+					i++;
+					this.totaVo.putParam("L1r04FormNo" + i, dVo.get("FormNo"));
+					this.totaVo.putParam("L1r04FormName" + i, dVo.get("FormName"));
+					this.totaVo.putParam("L1r04SendCode" + i, dVo.get("SendCode"));
+					this.totaVo.putParam("L1r04PaperFg" + i, dVo.get("LetterFg"));
+					this.totaVo.putParam("L1r04MsgFg" + i, dVo.get("MessageFg"));
+					this.totaVo.putParam("L1r04EMailFg" + i, dVo.get("EmailFg"));
+					if (!"N".equals(dVo.get("PaperNotice").trim())) {
+						this.totaVo.putParam("L1r04Paper" + i, " ");
+					} else {
+						this.totaVo.putParam("L1r04Paper" + i, "Y");
+					}
+					if (!"N".equals(dVo.get("MsgNotice").trim())) {
+						this.totaVo.putParam("L1r04Msg" + i, " ");
+					} else {
+						this.totaVo.putParam("L1r04Msg" + i, "Y");
+					}
+					if (!"N".equals(dVo.get("EmailNotice").trim())) {
+						this.totaVo.putParam("L1r04EMail" + i, " ");
+					} else {
+						this.totaVo.putParam("L1r04EMail" + i, "Y");
+					}
+				}
+			}
+			this.totaVo.putParam("L1r04ApplyDt", applyDt);
+		} catch (LogicException e) {
+			throw e;
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			throw new LogicException(titaVo, "E0000", errors.toString());
+		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+
+	public ArrayList<TotaVo> run2(TitaVo titaVo) throws LogicException {
 		this.info("active L1R04 ");
 		this.totaVo.init(titaVo);
 		/*

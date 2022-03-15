@@ -10,11 +10,14 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.SpecInnReCheck;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.SpecInnReCheckService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L5907")
 @Scope("prototype")
@@ -30,8 +33,16 @@ public class L5907 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public SpecInnReCheckService iSpecInnReCheckService;
+	
 	@Autowired
 	public CustMainService iCustMainService;
+	
+	@Autowired
+	public CdEmpService cdEmpService;
+	
+	/* 轉型共用工具 */
+	@Autowired
+	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -47,7 +58,9 @@ public class L5907 extends TradeBuffer {
 
 		Slice<SpecInnReCheck> iSpecInnReCheck = null;
 		CustMain iCustMain = new CustMain();
-		if (iFacmNo == 0) {
+		if (iCustNo == 0) {
+			iSpecInnReCheck = iSpecInnReCheckService.findAll(this.index, this.limit, titaVo);
+		} else if (iFacmNo == 0) {
 			iSpecInnReCheck = iSpecInnReCheckService.findCustNo(iCustNo, this.index, this.limit, titaVo);
 		} else {
 			iSpecInnReCheck = iSpecInnReCheckService.findCustFacmNo(iCustNo, iFacmNo, this.index, this.limit, titaVo);
@@ -75,6 +88,15 @@ public class L5907 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOReChkYearMonth", rSpecInnReCheck.getReChkYearMonth() - 191100);
 			}
+			
+			String emp = rSpecInnReCheck.getLastUpdateEmpNo();
+			CdEmp cdEmp = cdEmpService.findById(rSpecInnReCheck.getLastUpdateEmpNo(), titaVo);
+			if (cdEmp != null) {
+				emp += " " + cdEmp.getFullname();
+			}
+			
+			occursList.putParam("OOLastEmp", emp);
+			occursList.putParam("OOLastDate", parse.timeStampToString(rSpecInnReCheck.getLastUpdate()));
 
 			this.totaVo.addOccursList(occursList);
 		}

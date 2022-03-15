@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,11 +147,11 @@ public class L5512Batch extends TradeBuffer {
 		for (PfReward pf : lPfMinus) {
 			this.info("Minus =" + pf.toString());
 		}
-		
+
 		this.info("lPfInsCheck size=" + lPfInsCheck.size());
 		if (lPfInsCheck.size() > 0) {
-			makeExcel.open(titaVo, titaVo.getEntDyI(),  titaVo.getKinbr(), "L5512.1", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "介紹人加碼獎金");
-			
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5512.1", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "介紹人加碼獎金");
+
 			int row = 1;
 			makeExcel.setValue(row, 1, "戶號");
 			makeExcel.setValue(row, 2, "額度");
@@ -218,7 +219,7 @@ public class L5512Batch extends TradeBuffer {
 		PfInsCheck tPfInsCheck = pfCheckInsuranceCom.check(2, iCustNo, iFacmNo, iWorkMonth, titaVo); // 2.介紹人加碼獎勵津貼
 
 		lPfInsCheck.add(tPfInsCheck);
-		
+
 		// 計算負業績，本工作月還款追回或房貸獎勵保費檢核追回(本工作月檢核結果為Y)
 		// 1.本工作月撥款，檢核結果為Y要追回
 		// 2.本工作月還款，檢核結果為N要追回(檢核結果為Y時已追回撥款，故還款不用追回)
@@ -298,11 +299,10 @@ public class L5512Batch extends TradeBuffer {
 				if (pfReward.getIntroducerAddBonus().compareTo(BigDecimal.ZERO) == 0) {
 					continue;
 				}
-				
-				if (pfReward.getRepayType() == 0 && pfReward.getIntroducerAddBonus().compareTo(BigDecimal.ZERO) < 0 ) {
+
+				if (pfReward.getRepayType() == 0 && pfReward.getIntroducerAddBonus().compareTo(BigDecimal.ZERO) < 0) {
 					continue;
 				}
-
 
 				PfRewardMedia pfRewardMedia = new PfRewardMedia();
 
@@ -398,7 +398,7 @@ public class L5512Batch extends TradeBuffer {
 //				}
 
 				BigDecimal bbonus = pfRewardMedia.getAdjustBonus();
-				bbonus = bbonus.setScale(0, bbonus.ROUND_FLOOR);
+				bbonus = bbonus.setScale(0, RoundingMode.FLOOR);
 
 				if (bbonus.compareTo(BigDecimal.ZERO) == 0) {
 					continue;
@@ -459,7 +459,7 @@ public class L5512Batch extends TradeBuffer {
 		if (cnt > 0) {
 			makeFile.close();
 			msg = "共產製 " + cnt + "筆媒體檔資料,請至【報表及製檔】作業,下傳【媒體檔】";
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", String.format("%-8s", titaVo.getTlrNo().trim())+"L5512", msg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", String.format("%-8s", titaVo.getTlrNo().trim()) + "L5512", msg, titaVo);
 		} else {
 			msg = "共產製 " + cnt + "筆媒體檔資料";
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5054", workYM + "9", msg, titaVo);

@@ -2,10 +2,6 @@ package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
 
-/* log */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -36,7 +32,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R04 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5R04.class);
+	// private static final Logger logger = LoggerFactory.getLogger(L5R04.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegFinAcctService sNegFinAcctService;

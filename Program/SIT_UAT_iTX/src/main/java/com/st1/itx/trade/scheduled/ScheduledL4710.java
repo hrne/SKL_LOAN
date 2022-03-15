@@ -66,7 +66,7 @@ public class ScheduledL4710 {
 
 	public void ex() throws LogicException {
 		logger.info("每日 14:30 啟動...");
-//		this.info("每30 秒啟動...");
+//		logger.info("每30 秒啟動...");
 
 		TitaVo titaVo = new TitaVo();
 

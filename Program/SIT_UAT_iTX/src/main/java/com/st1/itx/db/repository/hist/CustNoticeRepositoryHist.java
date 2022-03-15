@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,18 +22,22 @@ import com.st1.itx.db.domain.CustNoticeId;
  */
 public interface CustNoticeRepositoryHist extends JpaRepository<CustNotice, CustNoticeId> {
 
-	// CustNo =
-	public Slice<CustNotice> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
+  // CustNo =
+  public Slice<CustNotice> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
 
-	// FormNo =
-	public Slice<CustNotice> findAllByFormNoIs(String formNo_0, Pageable pageable);
+  // FormNo =
+  public Slice<CustNotice> findAllByFormNoIs(String formNo_0, Pageable pageable);
 
-	// CustNo = ,AND FacmNo >= ,AND FacmNo <=
-	public Slice<CustNotice> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByCustNoAscFacmNoAsc(int custNo_0, int facmNo_1, int facmNo_2, Pageable pageable);
+  // CustNo = ,AND FacmNo >= ,AND FacmNo <=
+  public Slice<CustNotice> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByCustNoAscFacmNoAsc(int custNo_0, int facmNo_1, int facmNo_2, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CustNotice> findByCustNoticeId(CustNoticeId custNoticeId);
+  // CustNo = ,AND FormNo = 
+  public Slice<CustNotice> findAllByCustNoIsAndFormNoIsOrderByFacmNoAsc(int custNo_0, String formNo_1, Pageable pageable);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CustNotice> findByCustNoticeId(CustNoticeId custNoticeId);
 
 }
+

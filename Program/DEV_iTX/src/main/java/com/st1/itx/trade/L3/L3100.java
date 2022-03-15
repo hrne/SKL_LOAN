@@ -19,6 +19,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBaseRate;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
@@ -32,6 +33,7 @@ import com.st1.itx.db.domain.LoanRateChangeId;
 import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.CdBaseRateService;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.FacProdStepRateService;
@@ -126,6 +128,8 @@ public class L3100 extends TradeBuffer {
 	public LoanRateChangeService loanRateChangeService;
 	@Autowired
 	public TxTempService txTempService;
+	@Autowired
+	public ClFacService clFacService;
 
 	@Autowired
 	Parse parse;
@@ -285,8 +289,15 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0010", "不可跨日訂正，原交易日= " + titaVo.getOrgEntdyI()); // E0010 功能選擇錯誤
 		}
 
-		// 登錄時檢查,[繳款方式]為[2.銀扣].[週期基準]為[2.月].[攤還方式]不為[2.到期取息]時檢查指定應繳日是否依設定檔設定
+		// 登錄時檢查
 		if (titaVo.isHcodeNormal()) {
+
+			Slice<ClFac> slClFac = clFacService.facmNoEq(iCustNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
+			if (slClFac == null ) {
+				throw new LogicException(titaVo, "E0015", "此額度未關聯擔保品不可撥款"); // 檢查錯誤
+			}
+
+			// [繳款方式]為[2.銀扣].[週期基準]為[2.月].[攤還方式]不為[2.到期取息]時檢查指定應繳日是否依設定檔設定
 			FacMain tFacMain = facMainService.findById((new FacMainId(iCustNo, iFacmNo)), titaVo);
 			if (tFacMain == null) {
 				throw new LogicException(titaVo, "E0001", "額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
@@ -1191,7 +1202,7 @@ public class L3100 extends TradeBuffer {
 		tLoanRateChange.setBormNo(wkBormNo);
 		tLoanRateChange.setEffectDate(wkEffectDate);
 		tLoanRateChange.setLoanRateChangeId(tLoanRateChangeId);
-		tLoanRateChange.setStatus(2); // 階梯利率
+		tLoanRateChange.setStatus(0);
 		// 指標利率代碼與額度檔相同(01: 保單分紅利率 02: 中華郵政二年期定儲機動利率 99: 自訂利率)
 		tLoanRateChange.setBaseRateCode(tFacMain.getBaseRateCode());
 		// RateCode 利率區分 (1:機動 2:固定 3:定期機動)，機動的固定利率與撥款主檔不同 (例如：郵局機動利率)

@@ -22,7 +22,7 @@ import com.st1.itx.tradeService.BatchBase;
 // */
 //public class LM027 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LM027.class);
+//	// private static final Logger logger = LoggerFactory.getLogger(LM027.class);
 //
 //	@Autowired
 //	public LM027Report lm027report;

@@ -1,45 +1,43 @@
 package com.st1.itx.trade.LM;
 
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.InitializingBean;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.service.MonthlyLM042RBCService;
+import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
+import com.st1.itx.util.parse.Parse;
 
 @Service("LM042")
-@Scope("step")
+@Scope("prototype")
 /**
  * 
  * 
  * @author Eric Chang
  * @version 1.0.0
  */
-public class LM042 extends BatchBase implements Tasklet, InitializingBean {
+
+public class LM042 extends TradeBuffer {
 
 	@Autowired
-	public LM042Report lM042report;
+	MonthlyLM042RBCService sMonthlyLM042RBCService;
+
+	@Autowired
+	Parse parse;
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		;
-	}
-
-	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM042.class);
-		return this.exec(contribution, "M");
-	}
-
-	@Override
-	public void run() throws LogicException {
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LM042 ");
-		lM042report.exec(titaVo);
-	}
+		this.totaVo.init(titaVo);
+		
+		MySpring.newTask("LM042p", this.txBuffer, titaVo);
 
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
 }

@@ -4,8 +4,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.util.common.data.L6R25Vo;
 @Repository
 
 public class L6R25ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L6R25ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,7 +32,7 @@ public class L6R25ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<L6R25Vo> findAll(String authno, String aptype) throws Exception {
-		logger.info("L6R25.findAll authno/aptype = " + authno + '/' + aptype);
+		this.info("L6R25.findAll authno/aptype = " + authno + '/' + aptype);
 //		int defno = 0;
 //		if ("L1".equals(aptype)) {
 //			defno = 9001;
@@ -67,7 +64,7 @@ public class L6R25ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += "left join TxAuthority d on d.authNo = c.authNo and d.tranNo = a.tranNo ";
 		queryttext += "where a.menuNo = :menuno and a.status=0 ";
 		queryttext += "order by a.menuNo,a.subMenuNo,a.tranNo ";
-		logger.info("queryttext=" + queryttext);
+		this.info("queryttext=" + queryttext);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createQuery(queryttext, L6R25Vo.class);

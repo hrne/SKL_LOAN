@@ -7,9 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -18,7 +15,6 @@ import javax.persistence.Query;
 
 @Service("l5909ServiceImpl")
 public class L5909ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5909ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -53,7 +49,7 @@ public class L5909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " and c.\"PerfDate\" between '" + startDate + "' and '" + endDate + "' group by x.\"Fullname\"";
 		sql += " order by \"Percent\" desc , sum(c.\"DrawdownAmt\") desc , sum(i.\"BadDebtBal\") desc ";
 		sql += sqlRow;
-		logger.info("sql = " + sql);
+		this.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
 		query.setParameter("ThisIndex", index);
@@ -63,7 +59,7 @@ public class L5909ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setMaxResults(this.limit);
 
-		logger.info("L5909Service FindData=" + query.toString());
+		this.info("L5909Service FindData=" + query.toString());
 		return this.convertToMap(query.getResultList());
 	}
 }

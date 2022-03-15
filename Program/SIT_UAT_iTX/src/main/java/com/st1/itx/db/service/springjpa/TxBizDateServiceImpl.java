@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txBizDateService")
 @Repository
-public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxBizDateServiceImpl.class);
+public class TxBizDateServiceImpl extends ASpringJpaParm implements TxBizDateService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + dateCode);
+		this.info("findById " + dbName + " " + dateCode);
 		Optional<TxBizDate> txBizDate = null;
 		if (dbName.equals(ContentName.onDay))
 			txBizDate = txBizDateReposDay.findById(dateCode);
@@ -94,7 +91,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DateCode"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txBizDateReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -112,7 +109,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + dateCode);
+		this.info("Hold " + dbName + " " + dateCode);
 		Optional<TxBizDate> txBizDate = null;
 		if (dbName.equals(ContentName.onDay))
 			txBizDate = txBizDateReposDay.findByDateCode(dateCode);
@@ -130,7 +127,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txBizDate.getDateCode());
+		this.info("Hold " + dbName + " " + txBizDate.getDateCode());
 		Optional<TxBizDate> txBizDateT = null;
 		if (dbName.equals(ContentName.onDay))
 			txBizDateT = txBizDateReposDay.findByDateCode(txBizDate.getDateCode());
@@ -152,7 +149,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txBizDate.getDateCode());
+		this.info("Insert..." + dbName + " " + txBizDate.getDateCode());
 		if (this.findById(txBizDate.getDateCode()) != null)
 			throw new DBException(2);
 
@@ -178,7 +175,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txBizDate.getDateCode());
+		this.info("Update..." + dbName + " " + txBizDate.getDateCode());
 		if (!empNot.isEmpty())
 			txBizDate.setLastUpdateEmpNo(empNot);
 
@@ -201,7 +198,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txBizDate.getDateCode());
+		this.info("Update..." + dbName + " " + txBizDate.getDateCode());
 		if (!empNot.isEmpty())
 			txBizDate.setLastUpdateEmpNo(empNot);
 
@@ -221,7 +218,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txBizDate.getDateCode());
+		this.info("Delete..." + dbName + " " + txBizDate.getDateCode());
 		if (dbName.equals(ContentName.onDay)) {
 			txBizDateReposDay.delete(txBizDate);
 			txBizDateReposDay.flush();
@@ -248,7 +245,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxBizDate t : txBizDate)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -277,7 +274,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txBizDate == null || txBizDate.size() == 0)
 			throw new DBException(6);
 
@@ -302,7 +299,7 @@ public class TxBizDateServiceImpl implements TxBizDateService, InitializingBean 
 
 	@Override
 	public void deleteAll(List<TxBizDate> txBizDate, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

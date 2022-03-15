@@ -19,7 +19,6 @@ import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxDataLogService;
-import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
@@ -48,10 +47,10 @@ public class L8924 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
-
+	
 	@Autowired
 	public CustMainService sCustMainService;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -69,8 +68,6 @@ public class L8924 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 393 * 100 = 39,300
 
-		String iTlrItem = "";
-		String iTranItem = "";
 
 		String TranNo = titaVo.getParam("TRN_CODE");
 
@@ -80,82 +77,83 @@ public class L8924 extends TradeBuffer {
 		} else if (("2").equals(TranNo)) {
 			iTranNo.add("L8204");
 			TranNo = "L8204";
-		}
+		} 
 
 		int CustNo = Integer.parseInt(titaVo.getParam("CUST_NO").toString());
 		int iDateStart = Integer.parseInt(titaVo.getParam("CDATESTART").toString());
 		int iDateEnd = Integer.parseInt(titaVo.getParam("CDATEEND").toString());
 		iDateStart = iDateStart + 19110000;
 		iDateEnd = iDateEnd + 19110000;
-
+		
 		String iMrkey = titaVo.getMrKey().trim();
+		
 
-		Slice<TxDataLog> slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo, CustNo, this.index, this.limit, titaVo);
+		 Slice<TxDataLog> slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo, CustNo, this.index, this.limit, titaVo);
 
-		List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
+
+		 List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
 
 		if (lTxDataLog == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
+		
+			for (TxDataLog txDataLog : lTxDataLog) {
 
-		for (TxDataLog txDataLog : lTxDataLog) {
+			
+				OccursList occursList = new OccursList();
 
-			OccursList occursList = new OccursList();
-
-			if (!iMrkey.isEmpty()) {
-				this.info("iMrkey==" + iMrkey);
-				if (!(iMrkey).equals(txDataLog.getMrKey())) {
-					continue;
+				if(!iMrkey.isEmpty()) {
+					this.info("iMrkey=="+iMrkey);
+					if(!(iMrkey).equals(txDataLog.getMrKey())) {
+						continue;					}
 				}
-			}
 
-			String tranName = txDataLog.getTranNo();
-
-			TxTranCode txTranCode = sTxTranCodeService.findById(txDataLog.getTranNo(), titaVo);
-
-			if (txTranCode != null) {
-				tranName += " " + txTranCode.getTranItem();
-			}
-
-			occursList.putParam("OTranName", tranName);
-
-			occursList.putParam("OCustNo", txDataLog.getCustNo());
-			occursList.putParam("OFacmNo", txDataLog.getFacmNo());
-			occursList.putParam("OBormNo", txDataLog.getBormNo());
-
-			// 查詢客戶資料主檔
-			CustMain tCustMain = new CustMain();
-			int iCustNo = txDataLog.getCustNo();
-			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-			if (tCustMain != null) {
-				occursList.putParam("OCustName", tCustMain.getCustName().replace("$n", "")); // 戶名
-			} else {
-				occursList.putParam("OCustName", ""); // 戶名
-			}
-
-			occursList.putParam("OMrKey", txDataLog.getMrKey());
-
-			occursList.putParam("OReason", txDataLog.getReason());
-
-			String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
-
-			occursList.putParam("OLastUpdate", lastUpdate);
-
-			String lastEmp = txDataLog.getLastUpdateEmpNo();
-			if (txDataLog.getLastUpdateEmpNo() != null && txDataLog.getLastUpdateEmpNo().toString().length() > 0) {
-				CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
-				if (cdEmp != null) {
-					lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
+				String tranName = txDataLog.getTranNo();
+				
+				TxTranCode txTranCode = sTxTranCodeService.findById(txDataLog.getTranNo(), titaVo);
+				
+				if (txTranCode != null) {
+					tranName += " " + txTranCode.getTranItem();
 				}
-			}
+				
+				occursList.putParam("OTranName", tranName);
 
-			occursList.putParam("OLastEmp", lastEmp);
-			occursList.putParam("OTxDate", txDataLog.getTxDate());
-			occursList.putParam("OTxSeq", txDataLog.getTxSeq());
-			occursList.putParam("OTxSno", txDataLog.getTxSno());
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
-		}
+				occursList.putParam("OCustNo", txDataLog.getCustNo());
+				occursList.putParam("OFacmNo", txDataLog.getFacmNo());
+				occursList.putParam("OBormNo", txDataLog.getBormNo());
+				
+				// 查詢客戶資料主檔
+				CustMain tCustMain = new CustMain();
+				int iCustNo = txDataLog.getCustNo();
+				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+				if (tCustMain != null) {
+					occursList.putParam("OCustName", tCustMain.getCustName().replace("$n", "")); // 戶名
+				} else {
+					occursList.putParam("OCustName", ""); // 戶名
+				}
+				
+				occursList.putParam("OMrKey", txDataLog.getMrKey());
+
+				occursList.putParam("OReason", txDataLog.getReason());
+
+				String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
+
+				occursList.putParam("OLastUpdate", lastUpdate);
+
+				String lastEmp = txDataLog.getLastUpdateEmpNo();
+				if (txDataLog.getLastUpdateEmpNo() != null && txDataLog.getLastUpdateEmpNo().toString().length() > 0) {
+					CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
+					if (cdEmp != null) {
+						lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
+					}
+				}
+				occursList.putParam("OLastEmp", lastEmp);
+				occursList.putParam("OTxDate", txDataLog.getTxDate());
+				occursList.putParam("OTxSeq", txDataLog.getTxSeq());
+				occursList.putParam("OTxSno", txDataLog.getTxSno());
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
+			}
 
 //		}
 
@@ -169,38 +167,5 @@ public class L8924 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	// 查詢交易控制檔
-	private String inqTxTranCode(String uTranNo, String uTranItem, TitaVo titaVo) throws LogicException {
-
-		TxTranCode tTxTranCode = new TxTranCode();
-
-		tTxTranCode = sTxTranCodeService.findById(uTranNo, titaVo);
-
-		if (tTxTranCode == null) {
-			uTranItem = "";
-		} else {
-			uTranItem = tTxTranCode.getTranItem();
-		}
-
-		return uTranItem;
-
-	}
-
-	// 查詢使用者設定檔
-	private String inqTxTeller(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
-
-		TxTeller tTxTeller = new TxTeller();
-
-		tTxTeller = sTxTellerService.findById(uTlrNo, titaVo);
-
-		if (tTxTeller == null) {
-			uTlrItem = uTlrNo;
-		} else {
-			uTlrItem = tTxTeller.getTlrItem();
-		}
-
-		return uTlrItem;
-
-	}
 
 }

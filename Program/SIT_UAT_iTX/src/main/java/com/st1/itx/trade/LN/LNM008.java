@@ -58,7 +58,7 @@ public class LNM008 extends BatchBase implements Tasklet, InitializingBean {
 // */
 //public class LNM008 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LNM008.class);
+//	// private static final Logger logger = LoggerFactory.getLogger(LNM008.class);
 //
 //	@Autowired
 //	public LNM008Report lnm008Report;

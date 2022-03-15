@@ -4,8 +4,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LNM004ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LNM004ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -42,9 +39,9 @@ public class LNM004ServiceImpl extends ASpringJpaParm implements InitializingBea
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LNM004.findAll ---------------");
-		logger.info("-----LNM004 TitaVo=" + titaVo);
-		logger.info("-----LNM004 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LNM004.findAll ---------------");
+		this.info("-----LNM004 TitaVo=" + titaVo);
+		this.info("-----LNM004 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
@@ -53,7 +50,7 @@ public class LNM004ServiceImpl extends ASpringJpaParm implements InitializingBea
 //			dateMonth = 202004;
 //		}
 
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
@@ -69,7 +66,7 @@ public class LNM004ServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ "         ELSE 'G'" + "       END                   AS  \"AreaCode\"" + "     , A.\"ProdRateCode\"" + "     , A.\"CustKind\"" + "     , A.\"ProdNo\"" + " FROM \"Ias34Dp\" A"
 				+ "   LEFT JOIN \"CdArea\"  ON \"CdArea\".\"Zip3\"  = A.\"AreaCode\"" + " WHERE A.\"DataYM\" = " + dateMonth + " ORDER BY A.\"CustNo\", A.\"FacmNo\", A.\"BormNo\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;

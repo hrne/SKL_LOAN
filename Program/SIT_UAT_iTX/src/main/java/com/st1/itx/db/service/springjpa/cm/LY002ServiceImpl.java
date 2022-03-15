@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo,int endOfYearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int endOfYearMonth) throws Exception {
 		this.info("lY002.findAll ");
 
 		this.info("YYMM:" + endOfYearMonth);
@@ -43,12 +42,12 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,C.\"CustId\" AS F1";
 		sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
 		sql += "		  ,(CASE";
-		sql += "			  WHEN R.\"ReltCode\" IS NULL AND MLB.\"EntCode\" = 0 THEN 'D'";
-		sql += "			  WHEN R.\"ReltCode\" IS NULL AND MLB.\"EntCode\" <> 0 THEN 'C'";
-		sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND MLB.\"EntCode\" = 0 THEN 'B'";
-		sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND MLB.\"EntCode\" <> 0 THEN 'A'";
+		sql += "			  WHEN R.\"RptId\" IS NULL AND MLB.\"EntCode\" = 0 THEN 'D'";
+		sql += "			  WHEN R.\"RptId\" IS NULL AND MLB.\"EntCode\" <> 0 THEN 'C'";
+		sql += "			  WHEN R.\"RptId\" IS NOT NULL AND MLB.\"EntCode\" = 0 THEN 'B'";
+		sql += "			  WHEN R.\"RptId\" IS NOT NULL AND MLB.\"EntCode\" <> 0 THEN 'A'";
 		sql += "			ELSE ' ' END ) AS F3";
-		sql += "		  ,CC.\"Item\" AS F4";
+		sql += "		  ,' ' AS F4";
 		sql += "		  ,(CASE";
 		sql += "			  WHEN MLB.\"ClCode1\" IN (1,2) THEN 'C'";
 		sql += "			  WHEN MLB.\"ClCode1\" IN (3,4) THEN 'D'";
@@ -76,20 +75,28 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	FROM \"MonthlyLoanBal\" MLB";
 		sql += "	LEFT JOIN \"MonthlyFacBal\" MFB ON MFB.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "								   AND MFB.\"FacmNo\" = MLB.\"FacmNo\"";
-		sql += "								   AND MFB.\"YearMonth\" = :yymm";
-		sql += "	LEFT JOIN ( SELECT * ";
-		sql += "				FROM ( SELECT M.\"CustNo\"";
-		sql += "					   		 ,SUM(F.\"LineAmt\") AS \"LineAmt\"";
-		sql += "					   FROM \"MonthlyFacBal\" M ";
-		sql += "					   LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
-		sql += "											  AND F.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "					   WHERE M.\"YearMonth\" = :yymm";
-		sql += "					   GROUP BY M.\"CustNo\" ) M ";
-		sql += "				WHERE M.\"LineAmt\" > 100000000 ) MLB2";
-		sql += "	ON MLB2.\"CustNo\" = MFB.\"CustNo\"";
+		sql += "								   AND MFB.\"YearMonth\" = MLB.\"YearMonth\"";
+		sql += "	LEFT JOIN ( SELECT S.\"CustNo\" ";
+		sql += "					  ,S.\"FacmNo\" ";
+		sql += "					  ,S.\"LineAmt\" ";
+		sql += "				FROM ( SELECT \"CustNo\"";
+		sql += "					   		 ,SUM(\"LineAmt\") AS \"LineAmt\"";
+		sql += "					   FROM \"FacMain\"";
+		sql += "					   WHERE \"UtilAmt\" > 0";
+		sql += "					   GROUP BY \"CustNo\" )T ";
+		sql += "				LEFT JOIN ( SELECT \"CustNo\"";
+		sql += "								  ,\"FacmNo\"";
+		sql += "					   		 	  ,SUM(\"LineAmt\") AS \"LineAmt\"";
+		sql += "					   FROM \"FacMain\"";
+		sql += "					   WHERE \"UtilAmt\" > 0";
+		sql += "					   GROUP BY \"CustNo\"";
+		sql += "					   		   ,\"FacmNo\" ) S ";
+		sql += "				ON S.\"CustNo\" = T.\"CustNo\"";
+		sql += "				WHERE T.\"LineAmt\" >= 100000000 ) MLB2";
+		sql += "	 ON MLB2.\"CustNo\" = MFB.\"CustNo\"";
+		sql += "	AND MLB2.\"FacmNo\" = MFB.\"FacmNo\"";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = MLB.\"FacmNo\"";
-		sql += "						   AND F.\"LastBormNo\" = MLB.\"BormNo\"";
 		sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "	LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = MLB.\"CustNo\"";
 		sql += "							   AND L.\"FacmNo\" = MLB.\"FacmNo\"";
@@ -97,14 +104,22 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"ClMain\" CM ON CM.\"ClCode1\" = MLB.\"ClCode1\"";
 		sql += "						   AND CM.\"ClCode2\" = MLB.\"ClCode2\"";
 		sql += "						   AND CM.\"ClNo\" = MLB.\"ClNo\"";
-		sql += "	LEFT JOIN (SELECT ROW_NUMBER () OVER (ORDER BY \"ApplDate\" DESC) AS \"SEQ\" ";
-		sql += "			  		 ,\"CustNo\" ";
-		sql += "			  		 ,\"ReltCode\" ";
-		sql += "			  		 ,\"ApplDate\" ";
-		sql += "			   FROM \"ReltMain\") R ";
-		sql += "     ON R.\"CustNo\" = C.\"CustNo\"  AND R.\"SEQ\" = 1";
-		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"Code\" = R.\"ReltCode\"";
-		sql += "						   AND CC.\"DefCode\" = 'CustRelationType'";
+		sql += "	LEFT JOIN ( SELECT * ";
+		sql += "				FROM \"CustMain\" CM";
+		sql += " 				LEFT JOIN ( SELECT TO_CHAR(\"CusId\") AS \"RptId\" ";
+		sql += "             			   FROM \"RptRelationSelf\" ";
+		sql += "             			   WHERE \"LAW005\" = '1' ";
+		sql += "             			   UNION ";
+		sql += "             			   SELECT TO_CHAR(\"RlbID\") AS \"RptId\" ";
+		sql += "             			   FROM \"RptRelationFamily\" ";
+		sql += "             			   WHERE \"LAW005\" = '1' ";
+		sql += "             			   UNION ";
+		sql += "             			   SELECT TO_CHAR(\"ComNo\") AS \"RptId\" ";
+		sql += "             			   FROM \"RptRelationCompany\" ";
+		sql += "             			   WHERE \"LAW005\" = '1' ";
+		sql += "           			    ) S1 ON S1.\"RptId\" = CM.\"CustId\" ";
+		sql += "				WHERE NVL(S1.\"RptId\",' ') != ' ' ) R";
+		sql += "	ON R.\"RptId\" = C.\"CustId\"";
 		sql += "	WHERE MLB.\"YearMonth\" = :yymm";
 		sql += "	  AND MLB.\"LoanBalance\" > 0 ";
 		sql += "	  AND MLB2.\"CustNo\" IS NOT NULL";
@@ -120,6 +135,112 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", endOfYearMonth);
 		return this.convertToMap(query);
+	}
+
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int endOfYearMonth) throws Exception {
+
+		this.info("LY002.findAll2 ");
+
+		String sql = " ";
+		sql += "	SELECT (CASE";
+		sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) ";
+		sql += "    		   AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+		sql += "    		  WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
+		sql += "    		  WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
+		sql += "    		  WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
+		sql += "    		  WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
+		sql += "   		    END) AS \"TYPE\"";
+		sql += "		  ,SUM(NVL(R.\"LineAmt\",0)) AS \"LineAmt\"";
+		sql += "		  ,SUM(NVL(MF2.\"LoanBalance\",0)) AS \"LoanBalance\"";
+		sql += "		  ,SUM(NVL(INT.\"Interest\",0)) AS \"Interest\"";
+		sql += "	FROM ( SELECT S.\"CustNo\"";
+		sql += "				 ,S.\"FacmNo\"";
+		sql += "				 ,S.\"LineAmt\"";
+		sql += "		   FROM ( SELECT \"CustNo\"";
+		sql += "		   				,SUM(\"LineAmt\") AS \"LineAmt\"";
+		sql += "		   		  FROM \"FacMain\"";
+		sql += "		   		  WHERE \"UtilAmt\" > 0 ";
+		sql += "		   		  GROUP BY \"CustNo\" ) T";
+		sql += "		   LEFT JOIN( SELECT \"CustNo\"";
+		sql += "		   					,\"FacmNo\"";
+		sql += "		   					,SUM(\"LineAmt\") AS \"LineAmt\"";
+		sql += "		   		 	  FROM \"FacMain\"";
+		sql += "		   		  	  WHERE \"UtilAmt\" > 0 ";
+		sql += "		   		  	  GROUP BY \"CustNo\"";
+		sql += "		   		  	  		  ,\"FacmNo\" ) S";
+		sql += "		   ON S.\"CustNo\" =  T.\"CustNo\"";
+		//需要取得非核貸金額1億元以上的 (目前缺少利害關係人的判斷)
+		sql += "		   WHERE T.\"LineAmt\" < 100000000";
+		sql += "		  ) R";
+		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
+		sql += "						   AND F.\"FacmNo\" = R.\"FacmNo\"";
+		sql += "	LEFT JOIN ( SELECT DISTINCT \"CustNo\"";
+		sql += "					  ,\"FacmNo\"";
+		sql += "					  ,\"ClCode1\"";
+		sql += "					  ,\"ClCode2\"";
+		sql += "					  ,\"ClNo\"";
+		sql += "				FROM \"MonthlyLoanBal\"";
+		sql += "				WHERE \"YearMonth\" = :yymm";
+		sql += "				  AND \"LoanBalance\" > 0 ) MF";
+		sql += "	 ON MF.\"CustNo\" = F.\"CustNo\"";
+		sql += "	AND MF.\"FacmNo\" = F.\"FacmNo\"";
+		sql += "	LEFT JOIN \"MonthlyFacBal\" MFB ON MFB.\"CustNo\" = MF.\"CustNo\"";
+		sql += "	 							   AND MFB.\"FacmNo\" = MF.\"FacmNo\"";
+		sql += "	 							   AND MFB.\"YearMonth\" = :yymm ";
+		sql += "	LEFT JOIN \"ClMain\" CM ON CM.\"ClCode1\" = MF.\"ClCode1\"";
+		sql += "							AND CM.\"ClCode2\" = MF.\"ClCode2\"";
+		sql += "							AND CM.\"ClNo\" = MF.\"ClNo\"";
+		sql += "	LEFT JOIN ( SELECT \"CustNo\"";
+		sql += "					  ,\"FacmNo\"";
+		sql += "					  ,\"EntCode\"";
+		sql += "					  ,SUM(\"LoanBalance\") AS \"LoanBalance\"";
+		sql += "				FROM \"MonthlyLoanBal\"";
+		sql += "				WHERE \"YearMonth\" = :yymm";
+		sql += "				  AND \"LoanBalance\" > 0 ";
+		sql += "				GROUP BY \"CustNo\"";
+		sql += "						,\"FacmNo\"";
+		sql += "						,\"EntCode\" ) MF2";
+		sql += "	 ON MF2.\"CustNo\" = F.\"CustNo\"";
+		sql += "	AND MF2.\"FacmNo\" = F.\"FacmNo\"";
+		sql += "	LEFT JOIN ( SELECT \"CustNo\"";
+		sql += "					  ,\"FacmNo\"";
+		sql += "					  ,SUM(\"Interest\") AS \"Interest\"";
+		sql += "				FROM \"AcLoanInt\"";
+		sql += "				WHERE \"YearMonth\" = :yymm";
+		sql += "				GROUP BY \"CustNo\"";
+		sql += "						,\"FacmNo\" ) INT";
+		sql += "	 ON INT.\"CustNo\" = F.\"CustNo\"";
+		sql += "	AND INT.\"FacmNo\" = F.\"FacmNo\"";
+		sql += "    LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = R.\"CustNo\"";
+		sql += "    LEFT JOIN (SELECT TO_CHAR(\"CusId\") AS \"RptId\" ";
+		sql += "               FROM \"RptRelationSelf\" ";
+		sql += "               WHERE \"LAW005\" = '1' ";
+		sql += "               UNION ";
+		sql += "               SELECT TO_CHAR(\"RlbID\") AS \"RptId\" ";
+		sql += "               FROM \"RptRelationFamily\" ";
+		sql += "               WHERE \"LAW005\" = '1' ";
+		sql += "               UNION ";
+		sql += "               SELECT TO_CHAR(\"ComNo\") AS \"RptId\" ";
+		sql += "               FROM \"RptRelationCompany\" ";
+		sql += "               WHERE \"LAW005\" = '1' ";
+		sql += "             ) R ON R.\"RptId\" = CM.\"CustId\" ";
+		sql += "	GROUP BY (CASE";
+		sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) ";
+		sql += "    		     AND (MFB.\"FacAcctCode\" = 340 OR REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+		sql += "    		    WHEN MFB.\"ClCode1\" IN (1,2) THEN 'C'";
+		sql += "    		    WHEN MFB.\"ClCode1\" IN (3,4) THEN 'D'";
+		sql += "    		    WHEN MFB.\"ClCode1\" IN (5) THEN 'A'";
+		sql += "    		    WHEN MFB.\"ClCode1\" IN (9) THEN 'B'";
+		sql += "   		      END)";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", endOfYearMonth);
+		return this.convertToMap(query);
+
 	}
 
 }

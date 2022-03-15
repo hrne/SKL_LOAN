@@ -3,8 +3,6 @@ package com.st1.itx.trade.LP;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,8 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LP001Report1 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LP001Report1.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LP001Report1.class);
 
 	@Autowired
 	public LP001ServiceImpl LP001ServiceImpl;

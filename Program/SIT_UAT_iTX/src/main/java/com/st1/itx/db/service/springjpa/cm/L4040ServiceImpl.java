@@ -16,7 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4040ServiceImpl")
@@ -32,9 +31,6 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	// *** 折返控制相關 ***
 	private int index;
@@ -67,9 +63,15 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iPropDate = parse.stringToInteger(titaVo.getParam("PropDate"));
 		int iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		int iCreateFlag = parse.stringToInteger(titaVo.getParam("CreateFlag"));
-
+		int iAuthCreateDate = parse.stringToInteger(titaVo.getParam("AuthCreateDate"));
+		int iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
+		
 		if (iPropDate > 0) {
 			iPropDate = iPropDate + 19110000;
+		}
+		
+		if(iAuthCreateDate>0) {
+			iAuthCreateDate = iAuthCreateDate+19110000;
 		}
 
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
@@ -132,6 +134,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  , a.\"RelAcctBirthday\"      as F20       ";
 		sql += "  , a.\"RelAcctGender\"        as F21       ";
 		sql += "  , a.\"AmlRsp\"               as F22       ";
+		sql += "  , a.\"CreateEmpNo\"          as F23       ";
 		sql += " from (                                     ";
 		sql += " select                                     ";
 		sql += "   \"AuthCreateDate\"                       ";
@@ -156,6 +159,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , \"RelAcctBirthday\"                      ";
 		sql += " , \"RelAcctGender\"                        ";
 		sql += " , \"AmlRsp\"                               ";
+		sql += " , \"CreateEmpNo\"         			        ";
 //		取消時須看到其他帳號
 		sql += " ,row_number() over (partition by \"CustNo\",\"RepayBank\",\"RepayAcct\"  order by \"CreateDate\" Desc) as seq  ";
 		sql += " from \"AchAuthLog\"                        ";
@@ -175,7 +179,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += "   and a.\"PropDate\" >= " + iPropDate;
 			}
 			if (iPropDate == 0 && iCustNo == 0) {
-				sql += "   and a.\"PropDate\" != " + propDate;
+				sql += "   and a.\"PropDate\" = 0 " ;
 			}
 			if (iCreateFlag == 3) {
 				sql += "   and a.\"CreateFlag\" = 'A'";
@@ -183,10 +187,29 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 2:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
+			if(iAuthCreateDate>0) {
+				sql += "   and a.\"AuthCreateDate\" =" + iAuthCreateDate;
+			}
+			if(iRepayBank==1) {
+				sql += "   and a.\"RepayBank\" = '103'" ;
+			}
+			if(iRepayBank==2) {
+				sql += "   and a.\"RepayBank\" <> '103'" ;
+			}
+			
 			break;
 		case 3:
 			sql += "   and a.\"PropDate\" = " + propDate;
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
+			if(iAuthCreateDate>0) {
+				sql += "   and a.\"AuthCreateDate\" =" + iAuthCreateDate;
+			}
+			if(iRepayBank==1) {
+				sql += "   and a.\"RepayBank\" = '103'" ;
+			}
+			if(iRepayBank==2) {
+				sql += "   and a.\"RepayBank\" <> '103'" ;
+			}
 			break;
 		}
 //		排序用

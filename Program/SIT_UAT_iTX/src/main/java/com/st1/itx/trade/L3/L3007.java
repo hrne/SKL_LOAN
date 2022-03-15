@@ -16,8 +16,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
+import com.st1.itx.db.domain.CdBankOld;
+import com.st1.itx.db.domain.CdBankOldId;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.CdBankOldService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -56,7 +59,8 @@ public class L3007 extends TradeBuffer {
 	public AcReceivableService acReceivableService;
 	@Autowired
 	public CdBankService cdBankService;
-
+	@Autowired
+	public CdBankOldService cdBankOldService;
 	@Autowired
 	Parse parse;
 
@@ -94,6 +98,7 @@ public class L3007 extends TradeBuffer {
 		int wkChequeDateStart = 0;
 		int wkChequeDateEnd = 99991231;
 
+
 		if (iChequeDateStart > 0) {
 			wkChequeDateStart = iChequeDateStart + 19110000;
 		}
@@ -122,7 +127,8 @@ public class L3007 extends TradeBuffer {
 		this.limit = 100; // 113 * 500 = 56500
 
 		// 查詢放款主檔
-		slLoanCheque = loanChequeService.custNoChequeRange(wkCustNoSt, wkCustNoEd, lStatusCode, wkChequeNoSt, wkChequeNoEd, wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
+		slLoanCheque = loanChequeService.custNoChequeRange(wkCustNoSt, wkCustNoEd, lStatusCode, wkChequeNoSt,
+				wkChequeNoEd, wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
 
 		lLoanCheque = slLoanCheque == null ? null : slLoanCheque.getContent();
 		if (lLoanCheque == null || lLoanCheque.size() == 0) {
@@ -186,8 +192,15 @@ public class L3007 extends TradeBuffer {
 		String branchCode = FormatUtil.right(wkBankCode, 4);
 		CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode, branchCode), titaVo);
 		if (tCdBank == null) {
-			occursList.putParam("OOChequeBank", "");
-			occursList.putParam("OOChequeBranch", "");
+			CdBankOld tCdBankOld = cdBankOldService.findById(new CdBankOldId(bankCode, branchCode), titaVo);//找已裁撤銀行
+			if(tCdBankOld == null) {
+				occursList.putParam("OOChequeBank", "");
+				occursList.putParam("OOChequeBranch", "");
+			} else {
+				occursList.putParam("OOChequeBank", tCdBankOld.getBankItem());
+				occursList.putParam("OOChequeBranch", tCdBankOld.getBranchItem());
+			}
+			
 		} else {
 			occursList.putParam("OOChequeBank", tCdBank.getBankItem());
 			occursList.putParam("OOChequeBranch", tCdBank.getBranchItem());

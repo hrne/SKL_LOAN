@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txFlowService")
 @Repository
-public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxFlowServiceImpl.class);
+public class TxFlowServiceImpl extends ASpringJpaParm implements TxFlowService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + txFlowId);
+		this.info("findById " + dbName + " " + txFlowId);
 		Optional<TxFlow> txFlow = null;
 		if (dbName.equals(ContentName.onDay))
 			txFlow = txFlowReposDay.findById(txFlowId);
@@ -97,7 +94,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Entdy", "FlowNo"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txFlowReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -122,7 +119,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findByFlowBrNo " + dbName + " : " + "entdy_0 : " + entdy_0 + " flowBrNo_1 : " + flowBrNo_1);
+		this.info("findByFlowBrNo " + dbName + " : " + "entdy_0 : " + entdy_0 + " flowBrNo_1 : " + flowBrNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = txFlowReposDay.findAllByEntdyIsAndFlowBrNoIsOrderByFlowNoAsc(entdy_0, flowBrNo_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -147,7 +144,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findByLC003 " + dbName + " : " + "entdy_0 : " + entdy_0 + " flowBrNo_1 : " + flowBrNo_1 + " flowMode_2 : " + flowMode_2 + " tranNo_3 : " + tranNo_3 + " flowGroupNo_4 : "
+		this.info("findByLC003 " + dbName + " : " + "entdy_0 : " + entdy_0 + " flowBrNo_1 : " + flowBrNo_1 + " flowMode_2 : " + flowMode_2 + " tranNo_3 : " + tranNo_3 + " flowGroupNo_4 : "
 				+ flowGroupNo_4);
 		if (dbName.equals(ContentName.onDay))
 			slice = txFlowReposDay.findAllByEntdyIsAndFlowBrNoIsAndFlowModeIsAndTranNoLikeAndFlowGroupNoInOrderByFlowNoAsc(entdy_0, flowBrNo_1, flowMode_2, tranNo_3, flowGroupNo_4, pageable);
@@ -173,7 +170,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findBySecNo " + dbName + " : " + "entdy_0 : " + entdy_0 + " secNo_1 : " + secNo_1);
+		this.info("findBySecNo " + dbName + " : " + "entdy_0 : " + entdy_0 + " secNo_1 : " + secNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = txFlowReposDay.findAllByEntdyIsAndSecNoIs(entdy_0, secNo_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -191,7 +188,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txFlowId);
+		this.info("Hold " + dbName + " " + txFlowId);
 		Optional<TxFlow> txFlow = null;
 		if (dbName.equals(ContentName.onDay))
 			txFlow = txFlowReposDay.findByTxFlowId(txFlowId);
@@ -209,7 +206,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txFlow.getTxFlowId());
+		this.info("Hold " + dbName + " " + txFlow.getTxFlowId());
 		Optional<TxFlow> txFlowT = null;
 		if (dbName.equals(ContentName.onDay))
 			txFlowT = txFlowReposDay.findByTxFlowId(txFlow.getTxFlowId());
@@ -231,7 +228,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txFlow.getTxFlowId());
+		this.info("Insert..." + dbName + " " + txFlow.getTxFlowId());
 		if (this.findById(txFlow.getTxFlowId()) != null)
 			throw new DBException(2);
 
@@ -257,7 +254,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txFlow.getTxFlowId());
+		this.info("Update..." + dbName + " " + txFlow.getTxFlowId());
 		if (!empNot.isEmpty())
 			txFlow.setLastUpdateEmpNo(empNot);
 
@@ -280,7 +277,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txFlow.getTxFlowId());
+		this.info("Update..." + dbName + " " + txFlow.getTxFlowId());
 		if (!empNot.isEmpty())
 			txFlow.setLastUpdateEmpNo(empNot);
 
@@ -300,7 +297,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txFlow.getTxFlowId());
+		this.info("Delete..." + dbName + " " + txFlow.getTxFlowId());
 		if (dbName.equals(ContentName.onDay)) {
 			txFlowReposDay.delete(txFlow);
 			txFlowReposDay.flush();
@@ -327,7 +324,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxFlow t : txFlow)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -356,7 +353,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txFlow == null || txFlow.size() == 0)
 			throw new DBException(6);
 
@@ -381,7 +378,7 @@ public class TxFlowServiceImpl implements TxFlowService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<TxFlow> txFlow, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

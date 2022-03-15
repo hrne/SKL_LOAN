@@ -37,29 +37,35 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L9712.findAll");
 
-		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
+		String iAcDateMin = String.valueOf(Integer.valueOf(titaVo.get("AcDateMin")) + 19110000);
+		String iAcDateMax = String.valueOf(Integer.valueOf(titaVo.get("AcDateMax")) + 19110000);
 
 		String sql = "SELECT T.\"AcDate\" F0";
 		sql += "			,T.\"CustNo\" F1";
 		sql += "			,T.\"FacmNo\" F2";
 		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) F3";
-		sql += "			,T.\"Interest\" F4";
+		sql += "			,T.\"Interest\" - T.\"ReduceBreachAmt\" F4";
 		sql += "			,T.\"BreachAmt\" F5";
-		sql += "			,0 F6";
-		sql += "			,NVL(T.\"ReduceBreachAmt\",0) F7";
+		sql += "			,T.\"ReduceAmt\" - T.\"ReduceBreachAmt\" F6";
+		sql += "			,T.\"ReduceBreachAmt\" F7";
 		sql += "			,T.\"TitaEmpNoS\" F8";
 		sql += "	  FROM(SELECT T.\"AcDate\"";
 		sql += "				 ,T.\"CustNo\"";
 		sql += "				 ,T.\"FacmNo\"";
-		sql += "                 ,SUM(T.\"Interest\") \"Interest\"";
-		sql += "			     ,SUM(T.\"DelayInt\") + SUM(T.\"BreachAmt\") \"BreachAmt\"";
-		sql += "                 ,SUM(JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt')) \"ReduceBreachAmt\"";
+		//應收利息 = 應收利息 + 減免利息
+		sql += "                 ,SUM(T.\"Interest\") + SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt'),0)) \"Interest\"";
+		//應收違約金 = 實收違約金 +實收延滯息 + 減免違約金 
+		sql += "			     ,SUM(T.\"DelayInt\") + SUM(T.\"BreachAmt\") + SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt'),0)) \"BreachAmt\"";
+		sql += "                 ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt'),0)) \"ReduceAmt\"";
+		sql += "                 ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt'),0)) \"ReduceBreachAmt\"";
 		sql += "                 ,T.\"TitaEmpNoS\"";
 		sql += "		   FROM  \"LoanBorTx\" T ";
 		sql += "           WHERE T.\"AcDate\" >= :isday ";
 		sql += "             AND T.\"AcDate\" <= :ieday ";
 		sql += "             AND  T.\"TitaHCode\" = '0' ";
-		sql += "	         AND  JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt') > 0 ";
+		sql += "             AND  T.\"Interest\" + T.\"DelayInt\" + T.\"BreachAmt\" > 0";
+		sql += "	         AND (NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt'),0)";
+		sql += "	         + NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt'),0) >0) ";
 		sql += "		   GROUP BY T.\"AcDate\"";
 		sql += "				   ,T.\"CustNo\"";
 		sql += "			       ,T.\"FacmNo\"";
@@ -72,8 +78,8 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("isday", iDAY);
-		query.setParameter("ieday", iDAY);
+		query.setParameter("isday", iAcDateMin);
+		query.setParameter("ieday", iAcDateMax);
 		return this.convertToMap(query.getResultList());
 	}
 

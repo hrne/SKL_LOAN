@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,8 @@ import com.st1.itx.util.common.MakeReport;
 @Component
 @Scope("prototype")
 public class L9702Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9702Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L9702Report.class);
 
 	@Autowired
 	L9702ServiceImpl l9702ServiceImpl;

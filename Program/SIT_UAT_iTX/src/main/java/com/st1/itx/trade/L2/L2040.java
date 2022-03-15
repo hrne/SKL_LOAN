@@ -63,13 +63,18 @@ public class L2040 extends TradeBuffer {
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
+		int iClSeq = parse.stringToInteger(titaVo.getParam("ClSeq"));
 
 		List<ClNoMap> lClNoMap = new ArrayList<ClNoMap>();
 		List<ClFac> lClFac = new ArrayList<ClFac>();
 		Slice<ClNoMap> sClNoMap = null;
 		Slice<ClFac> slClFac = null;
 		if (iFunCd == 1) { // 原擔保品 查新的
-			sClNoMap = sClNoMapService.findGdrNum(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+			if (iClSeq == 0) { // 查全部
+				sClNoMap = sClNoMapService.findGdrNum(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+			} else {
+				sClNoMap = sClNoMapService.findGdrNum2(iClCode1, iClCode2, iClNo, iClSeq, 0, Integer.MAX_VALUE, titaVo);
+			}
 		} else { // 新擔保品 查舊的
 			sClNoMap = sClNoMapService.findNewClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		}
@@ -84,10 +89,12 @@ public class L2040 extends TradeBuffer {
 					occurslist.putParam("OOClCode1", tClNoMap.getClCode1());
 					occurslist.putParam("OOClCode2", tClNoMap.getClCode2());
 					occurslist.putParam("OOClNo", tClNoMap.getClNo());
+					occurslist.putParam("OOClSeq", tClNoMap.getLgtSeq());
 				} else { // 舊的
 					occurslist.putParam("OOClCode1", tClNoMap.getGdrId1());
 					occurslist.putParam("OOClCode2", tClNoMap.getGdrId2());
 					occurslist.putParam("OOClNo", tClNoMap.getGdrNum());
+					occurslist.putParam("OOClSeq", tClNoMap.getLgtSeq());
 				}
 
 				int tClCode1 = tClNoMap.getClCode1();
@@ -114,7 +121,8 @@ public class L2040 extends TradeBuffer {
 					tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 
 					if (tClBuilding != null) {
-						occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
+						occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1()
+								+ "-" + tClBuilding.getBdNo2());
 					} else {
 						occurslist.putParam("OOAddress", "");
 					}

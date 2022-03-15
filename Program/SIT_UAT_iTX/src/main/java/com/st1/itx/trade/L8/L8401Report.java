@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -29,7 +27,8 @@ public class L8401Report extends MakeReport {
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 	String strToday = String.valueOf(Integer.parseInt(sdf.format(dateNow)) - 19110000); // 民國年
 
-	private static final Logger logger = LoggerFactory.getLogger(L8401Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L8401Report.class);
 
 	@Autowired
 	public L8401ServiceImpl L8401ServiceImpl;

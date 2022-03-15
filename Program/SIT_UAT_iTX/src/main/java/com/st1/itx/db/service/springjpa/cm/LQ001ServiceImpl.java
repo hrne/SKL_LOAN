@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.eum.ContentName;
 @Repository
 /* 逾期放款明細 */
 public class LQ001ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LQ001ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,7 +32,7 @@ public class LQ001ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings({ "unchecked" })
 	// 20201211 ted 增加SQL
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lQ001.findAll ");
+		this.info("lQ001.findAll ");
 		// 20200430
 		String lastENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000 - 10000);
 		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
@@ -84,10 +81,10 @@ public class LQ001ServiceImpl extends ASpringJpaParm implements InitializingBean
 			nowed = nowYEAR + "1231";
 			break;
 		}
-		logger.info("SQLlastsd:" + lastsd);
-		logger.info("SQLlasted:" + lasted);
-		logger.info("SQLnowsd:" + nowsd);
-		logger.info("SQLnowed:" + nowed);
+		this.info("SQLlastsd:" + lastsd);
+		this.info("SQLlasted:" + lasted);
+		this.info("SQLnowsd:" + nowsd);
+		this.info("SQLnowed:" + nowed);
 //		sql += "			,CC.\"AS400CityCode\" AS F1";
 		String sql = "SELECT CC.\"CityItem\" AS F0";
 		sql += "			,A1.\"C1\" AS F1";
@@ -209,7 +206,7 @@ public class LQ001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  ON A5.\"CityCode\" = CC.\"CityCode\"";
 		sql += "	  ORDER BY CC.\"CityCode\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);

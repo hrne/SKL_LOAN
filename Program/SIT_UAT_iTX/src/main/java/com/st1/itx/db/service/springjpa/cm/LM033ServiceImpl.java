@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,22 +14,28 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
 /* 逾期放款明細 */
 public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM033ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> doQuery(TitaVo titaVo) throws Exception {
+
+		this.info("LM003ServiceImpl doQuery()");
+		this.info("inputDateStart - inputDateEnd:");
+		this.info(titaVo.getParam("inputDateStart") + " - " + titaVo.getParam("inputDateEnd"));
 
 		String sql = "SELECT FC.\"BranchNo\""; // 單位別
 		sql += "            ,FC.\"ApplDate\""; // 申請日期
@@ -61,7 +65,7 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND NVL(FM.\"CustNo\",0) <> 0"; // 額度檔之戶號不為0
 		sql += "      ORDER BY FM.\"CustNo\"";
 		sql += "              ,FM.\"FacmNo\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 
@@ -69,10 +73,10 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("inputDateStart", Integer.toString(Integer.parseInt(titaVo.getParam("inputDateStart")) + 19110000));
-		query.setParameter("inputDateEnd", Integer.toString(Integer.parseInt(titaVo.getParam("inputDateEnd")) + 19110000));
+		query.setParameter("inputDateStart", parse.stringToInteger(titaVo.getParam("inputDateStart")) + 19110000);
+		query.setParameter("inputDateEnd", parse.stringToInteger(titaVo.getParam("inputDateEnd")) + 19110000);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

@@ -41,7 +41,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6933]                                 資料變更明細查詢"],
-["#FdTranNo+交易代號",#TranNo,#TranNo2],
+["#FdTranNo+交易代號",#TranNo],
 ["#FDMrKey+參考編號",#MrKey],
 
 ]
@@ -59,17 +59,14 @@ K(MODIFYBUTTON,查詢)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN==0,V(P,本交易為連動交易，請由入口交易連動進入),$)
+IF(#CHAIN==0,V(P,本交易為連動交易，請從交易[L6932 資料變更交易查詢]進入),$)
 
 #NTXBUF=x,40,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@TranNo,#NTXBUF,1,5)
 T(1,@MrKey,#NTXBUF,6,20)
-T(1,@TranNo2,#NTXBUF,26,5)
 
 #TranNo=x,5,L
-
-#TranNo2=x,5,L
 
 #MrKey=x,20,L
 
@@ -102,7 +99,7 @@ T(3,[L6933] 資料變更交易)
 #OCustNo=A,7,L
 #OFacmNo=A,3,L
 #OBormNo=A,3,L
-#OMrKey=x,20,L
+#OMrKey=x,50,L
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
@@ -130,7 +127,6 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6934; ntxbuf=#BufA})
 !------ 上行電文 ------
 <sub type="TIM">
 #TranNo
-#TranNo2
 #MrKey
 #END
 </sub>
@@ -175,7 +171,7 @@ TXFORM=L6933
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:70}
 
 #OReason=修改原因
-{width:300,align:'left'}
+{width:400,align:'left'}
 #OLastUpdate=修改日期
 {width:140,align:'left'}
 #OLastEmp=修改人員

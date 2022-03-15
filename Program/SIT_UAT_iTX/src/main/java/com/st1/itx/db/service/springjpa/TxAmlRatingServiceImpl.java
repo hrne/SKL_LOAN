@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txAmlRatingService")
 @Repository
-public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxAmlRatingServiceImpl.class);
+public class TxAmlRatingServiceImpl extends ASpringJpaParm implements TxAmlRatingService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + logNo);
+		this.info("findById " + dbName + " " + logNo);
 		Optional<TxAmlRating> txAmlRating = null;
 		if (dbName.equals(ContentName.onDay))
 			txAmlRating = txAmlRatingReposDay.findById(logNo);
@@ -96,7 +93,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LogNo"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAmlRatingReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -121,7 +118,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findByCaseNo " + dbName + " : " + "caseNo_0 : " + caseNo_0);
+		this.info("findByCaseNo " + dbName + " : " + "caseNo_0 : " + caseNo_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAmlRatingReposDay.findAllByCaseNoIsOrderByCaseNoAsc(caseNo_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -139,7 +136,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + logNo);
+		this.info("Hold " + dbName + " " + logNo);
 		Optional<TxAmlRating> txAmlRating = null;
 		if (dbName.equals(ContentName.onDay))
 			txAmlRating = txAmlRatingReposDay.findByLogNo(logNo);
@@ -157,7 +154,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txAmlRating.getLogNo());
+		this.info("Hold " + dbName + " " + txAmlRating.getLogNo());
 		Optional<TxAmlRating> txAmlRatingT = null;
 		if (dbName.equals(ContentName.onDay))
 			txAmlRatingT = txAmlRatingReposDay.findByLogNo(txAmlRating.getLogNo());
@@ -180,7 +177,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + txAmlRating.getLogNo());
+		this.info("Insert..." + dbName + " " + txAmlRating.getLogNo());
 		if (this.findById(txAmlRating.getLogNo()) != null)
 			throw new DBException(2);
 
@@ -209,7 +206,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txAmlRating.getLogNo());
+		this.info("Update..." + dbName + " " + txAmlRating.getLogNo());
 		if (!empNot.isEmpty())
 			txAmlRating.setLastUpdateEmpNo(empNot);
 
@@ -232,7 +229,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txAmlRating.getLogNo());
+		this.info("Update..." + dbName + " " + txAmlRating.getLogNo());
 		if (!empNot.isEmpty())
 			txAmlRating.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +249,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txAmlRating.getLogNo());
+		this.info("Delete..." + dbName + " " + txAmlRating.getLogNo());
 		if (dbName.equals(ContentName.onDay)) {
 			txAmlRatingReposDay.delete(txAmlRating);
 			txAmlRatingReposDay.flush();
@@ -280,7 +277,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxAmlRating t : txAmlRating) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -312,7 +309,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txAmlRating == null || txAmlRating.size() == 0)
 			throw new DBException(6);
 
@@ -337,7 +334,7 @@ public class TxAmlRatingServiceImpl implements TxAmlRatingService, InitializingB
 
 	@Override
 	public void deleteAll(List<TxAmlRating> txAmlRating, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

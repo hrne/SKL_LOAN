@@ -66,7 +66,8 @@ public class L2R08 extends TradeBuffer {
 			}
 		} else {
 			if (!tCdEmp.getAgCurInd().equals("Y")) {
-				if (!iErrorSkip.equals("Y")) {
+				if ("X".equals(iErrorSkip)) {
+				} else if (!iErrorSkip.equals("Y")) {
 					throw new LogicException(titaVo, "E2081", " 員工編號=" + iEmployeeNo); // 該員工非現職人員
 				}
 			}

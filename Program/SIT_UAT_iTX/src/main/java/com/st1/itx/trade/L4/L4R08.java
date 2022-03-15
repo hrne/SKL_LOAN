@@ -3,8 +3,6 @@ package com.st1.itx.trade.L4;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -35,7 +33,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R08 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4R08.class);
+	// private static final Logger logger = LoggerFactory.getLogger(L4R08.class);
 	@Autowired
 	public Parse parse;
 

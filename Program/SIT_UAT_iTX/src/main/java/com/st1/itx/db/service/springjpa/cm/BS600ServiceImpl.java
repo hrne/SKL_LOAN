@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("bS600ServiceImpl")
 @Repository
 public class BS600ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(BS600ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -40,7 +37,7 @@ public class BS600ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> execSql(TitaVo titaVo) throws Exception {
 		// 依戶號加總，按帳冊別、分配順序、戶號排序
-		logger.info("bS600ServiceImpl.find");
+		this.info("bS600ServiceImpl.find");
 
 		String sql = "";
 		sql += "SELECT S1.\"CustNo\" ";
@@ -54,7 +51,7 @@ public class BS600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "WHERE S1.\"AcctFlag\" = 1 ";
 		sql += "GROUP BY S1.\"CustNo\",S1.\"AcBookCode\",S1.\"AcSubBookCode\",NVL(S2.\"AssignSeq\",0) ";
 		sql += "ORDER BY \"AcBookCode\",\"AssignSeq\",\"CustNo\" ";
-		logger.info("sql = " + sql);
+		this.info("sql = " + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txApLogService")
 @Repository
-public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxApLogServiceImpl.class);
+public class TxApLogServiceImpl extends ASpringJpaParm implements TxApLogService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -66,7 +63,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + autoSeq);
+		this.info("findById " + dbName + " " + autoSeq);
 		Optional<TxApLog> txApLog = null;
 		if (dbName.equals(ContentName.onDay))
 			txApLog = txApLogReposDay.findById(autoSeq);
@@ -94,7 +91,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AutoSeq"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txApLogReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -116,7 +113,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findTlrNo " + dbName + " : " + "tlrNo_0 : " + tlrNo_0);
+		this.info("findTlrNo " + dbName + " : " + "tlrNo_0 : " + tlrNo_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = txApLogReposDay.findAllByTlrNoIsOrderByTlrNoAsc(tlrNo_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -138,7 +135,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findEntdy " + dbName + " : " + "entdy_0 : " + entdy_0);
+		this.info("findEntdy " + dbName + " : " + "entdy_0 : " + entdy_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = txApLogReposDay.findAllByEntdyIsOrderByEntdyAsc(entdy_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -160,7 +157,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findEntdyAndTlrno " + dbName + " : " + "entdy_0 : " + entdy_0 + " tlrNo_1 : " + tlrNo_1);
+		this.info("findEntdyAndTlrno " + dbName + " : " + "entdy_0 : " + entdy_0 + " tlrNo_1 : " + tlrNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = txApLogReposDay.findAllByEntdyIsAndTlrNoIsOrderByEntdyAscTlrNoAsc(entdy_0, tlrNo_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -178,7 +175,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + autoSeq);
+		this.info("Hold " + dbName + " " + autoSeq);
 		Optional<TxApLog> txApLog = null;
 		if (dbName.equals(ContentName.onDay))
 			txApLog = txApLogReposDay.findByAutoSeq(autoSeq);
@@ -196,7 +193,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txApLog.getAutoSeq());
+		this.info("Hold " + dbName + " " + txApLog.getAutoSeq());
 		Optional<TxApLog> txApLogT = null;
 		if (dbName.equals(ContentName.onDay))
 			txApLogT = txApLogReposDay.findByAutoSeq(txApLog.getAutoSeq());
@@ -218,7 +215,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + txApLog.getAutoSeq());
+		this.info("Insert..." + dbName + " " + txApLog.getAutoSeq());
 		if (this.findById(txApLog.getAutoSeq()) != null)
 			throw new DBException(2);
 
@@ -244,7 +241,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txApLog.getAutoSeq());
+		this.info("Update..." + dbName + " " + txApLog.getAutoSeq());
 		if (!empNot.isEmpty())
 			txApLog.setLastUpdateEmpNo(empNot);
 
@@ -267,7 +264,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txApLog.getAutoSeq());
+		this.info("Update..." + dbName + " " + txApLog.getAutoSeq());
 		if (!empNot.isEmpty())
 			txApLog.setLastUpdateEmpNo(empNot);
 
@@ -287,7 +284,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txApLog.getAutoSeq());
+		this.info("Delete..." + dbName + " " + txApLog.getAutoSeq());
 		if (dbName.equals(ContentName.onDay)) {
 			txApLogReposDay.delete(txApLog);
 			txApLogReposDay.flush();
@@ -314,7 +311,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxApLog t : txApLog)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -343,7 +340,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txApLog == null || txApLog.size() == 0)
 			throw new DBException(6);
 
@@ -368,7 +365,7 @@ public class TxApLogServiceImpl implements TxApLogService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<TxApLog> txApLog, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

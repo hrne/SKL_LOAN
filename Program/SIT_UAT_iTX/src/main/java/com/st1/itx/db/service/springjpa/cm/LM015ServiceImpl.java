@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM015ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM015ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,9 +30,9 @@ public class LM015ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lM015.findAll ");
+		this.info("lM015.findAll ");
 		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
-		logger.info("entdy == >" + entdy);
+		this.info("entdy == >" + entdy);
 		String sql = "SELECT \"F1\"";
 		sql += "              , \"F2\"";
 		sql += "              , ROUND(SUM(F3),0)";
@@ -57,7 +54,7 @@ public class LM015ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHERE M.\"YearMonth\" = :entdy)";
 		sql += "        GROUP BY \"F1\", \"F2\" ";
 		sql += "        ORDER BY \"F1\", \"F2\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

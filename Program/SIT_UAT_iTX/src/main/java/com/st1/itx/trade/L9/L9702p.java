@@ -2,8 +2,6 @@ package com.st1.itx.trade.L9;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,7 @@ import com.st1.itx.util.http.WebClient;
 @Service("L9702p")
 @Scope("prototype")
 public class L9702p extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L9702p.class);
+	// private static final Logger logger = LoggerFactory.getLogger(L9702p.class);
 
 	@Autowired
 	L9702Report l9702Report;

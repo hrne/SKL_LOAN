@@ -82,7 +82,7 @@ public class L6R25 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L6R25 ");
+		logger.info("active L6R25 ");
 		this.totaVo.init(titaVo);
 
 		String iFunCode = titaVo.get("FunCode").trim();

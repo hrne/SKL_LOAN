@@ -50,7 +50,7 @@ public class L5102 extends TradeBuffer {
 	/* 自動取號 */
 	@Autowired
 	GSeqCom gGSeqCom;
-
+	
 	@Autowired
 	SendRsp iSendRsp;
 
@@ -94,7 +94,7 @@ public class L5102 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0002", "");
 			}
-
+			
 			if (iInnLoanMeeting == null) {
 				throw new LogicException(titaVo, "E0006", "");
 			} else {
@@ -115,7 +115,7 @@ public class L5102 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-
+			
 			if (iInnLoanMeeting == null) {
 				throw new LogicException(titaVo, "E0006", "");
 			} else {
@@ -130,6 +130,8 @@ public class L5102 extends TradeBuffer {
 		case 5:
 			break;
 		}
+		
+		this.totaVo.putParam("MeetNo", tInnLoanMeeting.getMeetNo());
 
 		this.addList(this.totaVo);
 		return this.sendList();

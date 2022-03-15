@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4962ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -59,7 +56,7 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4962.findAll");
+		this.info("L4962.findAll");
 
 		String sql = " select                                                    ";
 		sql += "  coll.\"CustNo\"                                        AS F0   ";
@@ -120,14 +117,14 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  where NVL(f.\"FirstDrawdownDate\",0) != 0                      ";
 		sql += "    and cf.\"ClCode1\" = 1                                       ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -140,7 +137,7 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

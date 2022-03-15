@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("monthlyBookValueService")
 @Repository
-public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(MonthlyBookValueServiceImpl.class);
+public class MonthlyBookValueServiceImpl extends ASpringJpaParm implements MonthlyBookValueService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + monthlyBookValueId);
+		this.info("findById " + dbName + " " + monthlyBookValueId);
 		Optional<MonthlyBookValue> monthlyBookValue = null;
 		if (dbName.equals(ContentName.onDay))
 			monthlyBookValue = monthlyBookValueReposDay.findById(monthlyBookValueId);
@@ -97,7 +94,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo", "BormNo"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = monthlyBookValueReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -115,7 +112,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + monthlyBookValueId);
+		this.info("Hold " + dbName + " " + monthlyBookValueId);
 		Optional<MonthlyBookValue> monthlyBookValue = null;
 		if (dbName.equals(ContentName.onDay))
 			monthlyBookValue = monthlyBookValueReposDay.findByMonthlyBookValueId(monthlyBookValueId);
@@ -133,7 +130,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
+		this.info("Hold " + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
 		Optional<MonthlyBookValue> monthlyBookValueT = null;
 		if (dbName.equals(ContentName.onDay))
 			monthlyBookValueT = monthlyBookValueReposDay.findByMonthlyBookValueId(monthlyBookValue.getMonthlyBookValueId());
@@ -155,7 +152,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
+		this.info("Insert..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
 		if (this.findById(monthlyBookValue.getMonthlyBookValueId()) != null)
 			throw new DBException(2);
 
@@ -181,7 +178,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
+		this.info("Update..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
 		if (!empNot.isEmpty())
 			monthlyBookValue.setLastUpdateEmpNo(empNot);
 
@@ -204,7 +201,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
+		this.info("Update..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
 		if (!empNot.isEmpty())
 			monthlyBookValue.setLastUpdateEmpNo(empNot);
 
@@ -224,7 +221,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
+		this.info("Delete..." + dbName + " " + monthlyBookValue.getMonthlyBookValueId());
 		if (dbName.equals(ContentName.onDay)) {
 			monthlyBookValueReposDay.delete(monthlyBookValue);
 			monthlyBookValueReposDay.flush();
@@ -251,7 +248,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (MonthlyBookValue t : monthlyBookValue)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -280,7 +277,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (monthlyBookValue == null || monthlyBookValue.size() == 0)
 			throw new DBException(6);
 
@@ -305,7 +302,7 @@ public class MonthlyBookValueServiceImpl implements MonthlyBookValueService, Ini
 
 	@Override
 	public void deleteAll(List<MonthlyBookValue> monthlyBookValue, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

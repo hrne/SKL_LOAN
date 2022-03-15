@@ -35,7 +35,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdSpecParmsService")
 @Repository
-public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingBean {
+public class CdSpecParmsServiceImpl extends ASpringJpaParm implements CdSpecParmsService, InitializingBean {
 	private static final Logger logger = LoggerFactory.getLogger(CdSpecParmsServiceImpl.class);
 
 	@Autowired
@@ -67,7 +67,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + cdSpecParmsId);
+		this.info("findById " + dbName + " " + cdSpecParmsId);
 		Optional<CdSpecParms> cdSpecParms = null;
 		if (dbName.equals(ContentName.onDay))
 			cdSpecParms = cdSpecParmsReposDay.findById(cdSpecParmsId);
@@ -97,7 +97,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ConditionCode", "Condition"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = cdSpecParmsReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -115,7 +115,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + cdSpecParmsId);
+		this.info("Hold " + dbName + " " + cdSpecParmsId);
 		Optional<CdSpecParms> cdSpecParms = null;
 		if (dbName.equals(ContentName.onDay))
 			cdSpecParms = cdSpecParmsReposDay.findByCdSpecParmsId(cdSpecParmsId);
@@ -133,7 +133,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + cdSpecParms.getCdSpecParmsId());
+		this.info("Hold " + dbName + " " + cdSpecParms.getCdSpecParmsId());
 		Optional<CdSpecParms> cdSpecParmsT = null;
 		if (dbName.equals(ContentName.onDay))
 			cdSpecParmsT = cdSpecParmsReposDay.findByCdSpecParmsId(cdSpecParms.getCdSpecParmsId());
@@ -156,7 +156,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
+		this.info("Insert..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
 		if (this.findById(cdSpecParms.getCdSpecParmsId()) != null)
 			throw new DBException(2);
 
@@ -185,7 +185,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
+		this.info("Update..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
 		if (!empNot.isEmpty())
 			cdSpecParms.setLastUpdateEmpNo(empNot);
 
@@ -208,7 +208,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
+		this.info("Update..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
 		if (!empNot.isEmpty())
 			cdSpecParms.setLastUpdateEmpNo(empNot);
 
@@ -228,7 +228,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
+		this.info("Delete..." + dbName + " " + cdSpecParms.getCdSpecParmsId());
 		if (dbName.equals(ContentName.onDay)) {
 			cdSpecParmsReposDay.delete(cdSpecParms);
 			cdSpecParmsReposDay.flush();
@@ -256,7 +256,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (CdSpecParms t : cdSpecParms) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -288,7 +288,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (cdSpecParms == null || cdSpecParms.size() == 0)
 			throw new DBException(6);
 
@@ -313,7 +313,7 @@ public class CdSpecParmsServiceImpl implements CdSpecParmsService, InitializingB
 
 	@Override
 	public void deleteAll(List<CdSpecParms> cdSpecParms, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

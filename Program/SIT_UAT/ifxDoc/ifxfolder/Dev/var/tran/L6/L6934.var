@@ -55,7 +55,7 @@ K(MODIFYBUTTON,查詢)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN==0,V(P,本交易為連動交易，請由L6933連動進入),$)
+IF(#CHAIN==0,V(P,本交易為連動交易，請從交易[L6933 資料變更明細查詢]進入),$)
 
 #NTXBUF=x,30,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -96,7 +96,7 @@ T(3,[L6934] 資料變更交易)
 #OCustNo=A,7,L
 #OFacmNo=A,3,L
 #OBormNo=A,3,L
-#OMrKey=x,20,L
+#OMrKey=x,50,L
 		
 #OReason=X,100,L
 
@@ -165,7 +165,7 @@ TXFORM=L6934
 
 
 #OColumnName=變更資料項目
-{width:300,align:'left'}
+{width:400,align:'left'}
 
 #ODataBefore=變更前
 {width:300,align:'left'}

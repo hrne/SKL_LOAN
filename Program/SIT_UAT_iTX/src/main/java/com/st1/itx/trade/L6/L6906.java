@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -17,9 +15,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
@@ -41,7 +40,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6906 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6906.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -52,6 +50,8 @@ public class L6906 extends TradeBuffer {
 	public TxTellerService sTxTellerService;
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
+	@Autowired
+	CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -125,12 +125,12 @@ public class L6906 extends TradeBuffer {
 			occursList.putParam("OOTitaTxCd", tAcDetail.getTitaTxCd());
 
 			iTlrItem = "";
-			iTlrItem = inqTxTeller(tAcDetail.getTitaTlrNo(), iTlrItem, titaVo);
+			iTlrItem = inqCdEmp(tAcDetail.getTitaTlrNo(), iTlrItem, titaVo);
 			occursList.putParam("OOTlrItem", iTlrItem);
 			occursList.putParam("OOTitaTlrNo", tAcDetail.getTitaTlrNo());
 
 			iTlrItem = "";
-			iTlrItem = inqTxTeller(tAcDetail.getTitaSupNo(), iTlrItem, titaVo);
+			iTlrItem = inqCdEmp(tAcDetail.getTitaSupNo(), iTlrItem, titaVo);
 			occursList.putParam("OOSupItem", iTlrItem);
 			occursList.putParam("OOTitaSupNo", tAcDetail.getTitaSupNo());
 
@@ -186,16 +186,15 @@ public class L6906 extends TradeBuffer {
 	}
 
 	// 查詢使用者設定檔
-	private String inqTxTeller(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
+	private String inqCdEmp(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
 
-		TxTeller tTxTeller = new TxTeller();
+		CdEmp tCdEmp = new CdEmp();
+		tCdEmp = cdEmpService.findById(uTlrNo, titaVo);
 
-		tTxTeller = sTxTellerService.findById(uTlrNo, titaVo);
-
-		if (tTxTeller == null) {
+		if (tCdEmp == null) {
 			uTlrItem = uTlrNo;
 		} else {
-			uTlrItem = tTxTeller.getTlrItem();
+			uTlrItem = tCdEmp.getFullname();
 		}
 
 		return uTlrItem;

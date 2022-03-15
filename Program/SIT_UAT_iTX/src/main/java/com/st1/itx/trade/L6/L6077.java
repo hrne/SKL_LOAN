@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -34,7 +32,7 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6077 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6077.class);
+	// private static final Logger logger = LoggerFactory.getLogger(L6077.class);
 
 	/* DB服務注入 */
 	@Autowired

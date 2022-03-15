@@ -12,9 +12,12 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustCross;
 import com.st1.itx.db.domain.CustCrossId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustCrossService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -36,6 +39,9 @@ public class L1109 extends TradeBuffer {
 
 	@Autowired
 	public CustCrossService iCustCrossService;
+
+	@Autowired
+	public CdCodeService iCdCodeService;
 
 	@Autowired
 	public DataLog iDataLog;
@@ -68,9 +74,16 @@ public class L1109 extends TradeBuffer {
 		if (iCustMain == null) {
 			throw new LogicException(titaVo, "E0001", "客戶主檔查無資料"); // 輸入錯誤
 		}
+
+		titaVo.putParam("CustNo", iCustMain.getCustNo());
+
 		iCustUKey = iCustMain.getCustUKey();
 
 		String iSubCompanyFg = titaVo.getParam("SubCompanyFg");
+
+//		List<HashMap<String, Object>> logMap = new ArrayList<HashMap<String, Object>>();
+
+		int cnt = 0;
 
 		if ("N".equals(iSubCompanyFg)) {
 			Slice<CustCross> slCustCross = iCustCrossService.custUKeyEq(iCustUKey, 0, Integer.MAX_VALUE, titaVo);
@@ -79,7 +92,6 @@ public class L1109 extends TradeBuffer {
 				for (CustCross fCustCross : lCustCross) {
 					if ("Y".equals(fCustCross.getCrossUse())) {
 						// update
-						CustCross beforeCustCross = (CustCross) iDataLog.clone(fCustCross);
 						fCustCross.setCrossUse("N");
 						try {
 							fCustCross = iCustCrossService.update2(fCustCross, titaVo);
@@ -87,9 +99,22 @@ public class L1109 extends TradeBuffer {
 							throw new LogicException("E0007", "更新時發生錯誤");
 						}
 
-						// 紀錄變更前變更後
-						iDataLog.setEnv(titaVo, beforeCustCross, fCustCross);
-						iDataLog.exec();
+						CdCodeId cdCodeId = new CdCodeId();
+
+						cdCodeId.setDefCode("SubCompanyCode");
+						cdCodeId.setCode(fCustCross.getSubCompanyCode());
+
+						CdCode cdCode = iCdCodeService.findById(cdCodeId, titaVo);
+						String k = "";
+						if (cdCode != null) {
+							k = fCustCross.getSubCompanyCode() + " " + cdCode.getItem() + " 交互運用";
+						} else {
+							k = fCustCross.getSubCompanyCode() + " 交互運用";
+						}
+
+						iDataLog.setLog(k, "Y", "N");
+						cnt++;
+
 					}
 				}
 			}
@@ -103,7 +128,6 @@ public class L1109 extends TradeBuffer {
 					break;
 				}
 				String iSubCompanyCode = titaVo.get("SubCompanyCode" + i).trim();
-				this.info("上送==" + iSubCompanyCode + ".");
 
 				if (iSubCompanyCode.isEmpty()) {
 					break;
@@ -117,6 +141,21 @@ public class L1109 extends TradeBuffer {
 				fCustCrossId.setCustUKey(iCustUKey);
 				fCustCrossId.setSubCompanyCode(iSubCompanyCode);
 				fCustCross = iCustCrossService.holdById(fCustCrossId, titaVo);
+
+				CdCodeId cdCodeId = new CdCodeId();
+
+				cdCodeId.setDefCode("SubCompanyCode");
+				cdCodeId.setCode(iSubCompanyCode);
+
+				CdCode cdCode = iCdCodeService.findById(cdCodeId, titaVo);
+
+				String k = "";
+				if (cdCode != null) {
+					k = iSubCompanyCode + " " + cdCode.getItem() + " 交互運用";
+				} else {
+					k = iSubCompanyCode + " 交互運用";
+				}
+
 				if (fCustCross == null) {
 					// insert
 					fCustCross = new CustCross(); // init
@@ -127,9 +166,17 @@ public class L1109 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException("E0005", "新增時發生錯誤");
 					}
+					if ("Y".equals(iCrossUse)) {
+						iDataLog.setLog(k, "N", iCrossUse);
+						cnt++;
+					}
 				} else {
 					// update
-					CustCross beforeCustCross = (CustCross) iDataLog.clone(fCustCross);
+					if (!iCrossUse.equals(fCustCross.getCrossUse())) {
+						iDataLog.setLog(k, fCustCross.getCrossUse(), iCrossUse);
+						cnt++;
+					}
+
 					fCustCross.setCrossUse(iCrossUse);
 					try {
 						fCustCross = iCustCrossService.update2(fCustCross, titaVo);
@@ -137,12 +184,16 @@ public class L1109 extends TradeBuffer {
 						throw new LogicException("E0007", "更新時發生錯誤");
 					}
 
-					// 紀錄變更前變更後
-					iDataLog.setEnv(titaVo, beforeCustCross, fCustCross);
-					iDataLog.exec();
 				}
+
 				i++;
 			}
+		}
+
+		this.info("L1109 cnt = " + cnt);
+		if (cnt > 0) {
+			iDataLog.setEnv(titaVo, iCustMain, iCustMain);
+			iDataLog.exec("修改顧客 " + iCustMain.getCustId() + " 交互運用資料", "CustUKey:" + iCustMain.getCustUKey());
 		}
 
 		this.addList(this.totaVo);

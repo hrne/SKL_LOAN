@@ -4,8 +4,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.eum.ContentName;
  */
 
 public class LNM007ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LNM007ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -42,9 +39,9 @@ public class LNM007ServiceImpl extends ASpringJpaParm implements InitializingBea
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
-		logger.info("----------- LNM007.findAll ---------------");
-		logger.info("-----LNM007 TitaVo=" + titaVo);
-		logger.info("-----LNM007 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
+		this.info("----------- LNM007.findAll ---------------");
+		this.info("-----LNM007 TitaVo=" + titaVo);
+		this.info("-----LNM007 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
 		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
 
@@ -53,7 +50,7 @@ public class LNM007ServiceImpl extends ASpringJpaParm implements InitializingBea
 //			dateMonth = 202005;
 //		}
 
-		logger.info("dataMonth= " + dateMonth);
+		this.info("dataMonth= " + dateMonth);
 
 		String sql = "";
 
@@ -71,7 +68,7 @@ public class LNM007ServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ "                  GROUP BY A.\"CustNo\"" + "                ) CustData   ON  CustData.\"CustNo\" = \"Ias34Ap\".\"CustNo\"" + " WHERE \"Ias34Ap\".\"DataYM\" = " + dateMonth
 				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em;

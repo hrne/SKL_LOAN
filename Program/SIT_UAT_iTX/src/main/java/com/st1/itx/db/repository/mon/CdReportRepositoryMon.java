@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,24 +21,25 @@ import com.st1.itx.db.domain.CdReport;
  */
 public interface CdReportRepositoryMon extends JpaRepository<CdReport, String> {
 
-	// Cycle =
-	public Slice<CdReport> findAllByCycleIs(int cycle_0, Pageable pageable);
+  // Cycle = 
+  public Slice<CdReport> findAllByCycleIs(int cycle_0, Pageable pageable);
 
-	// Enable =
-	public Slice<CdReport> findAllByEnableIs(String enable_0, Pageable pageable);
+  // Enable = 
+  public Slice<CdReport> findAllByEnableIs(String enable_0, Pageable pageable);
 
-	// FormNo %
-	public Slice<CdReport> findAllByFormNoLikeOrderByFormNoAsc(String formNo_0, Pageable pageable);
+  // FormNo %
+  public Slice<CdReport> findAllByFormNoLikeOrderByFormNoAsc(String formNo_0, Pageable pageable);
 
-	// FormName %
-	public Slice<CdReport> findAllByFormNameLikeOrderByFormNoAsc(String formName_0, Pageable pageable);
+  // FormName %
+  public Slice<CdReport> findAllByFormNameLikeOrderByFormNoAsc(String formName_0, Pageable pageable);
 
-	// FormNo =
-	public Optional<CdReport> findTopByFormNoIs(String formNo_0);
+  // FormNo =
+  public Optional<CdReport> findTopByFormNoIs(String formNo_0);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdReport> findByFormNo(String formNo);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdReport> findByFormNo(String formNo);
 
 }
+

@@ -163,7 +163,7 @@ public class L5710 extends TradeBuffer {
 		}
 
 		long sno2 = 0L;
-		sno2 = sNegReportNegService.CreateTxt(titaVo, sbData, "BATCHTX03");
+		sno2 = sNegReportNegService.CreateTxt(sbData, "BATCHTX03", titaVo);
 
 		totaVo.put("TxtSnoF", "" + sno2);
 

@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import java.util.List;
@@ -23,23 +24,26 @@ import com.st1.itx.db.domain.CollListId;
  */
 public interface CollListRepositoryDay extends JpaRepository<CollList, CollListId> {
 
-	// ClCustNo=, AND ClFacmNo=
-	public Slice<CollList> findAllByClCustNoIsAndClFacmNoIs(int clCustNo_0, int clFacmNo_1, Pageable pageable);
+  // ClCustNo=, AND ClFacmNo=
+  public Slice<CollList> findAllByClCustNoIsAndClFacmNoIs(int clCustNo_0, int clFacmNo_1, Pageable pageable);
 
-	// CustNo >= ,AND CustNo <= ,AND FacmNo >= ,AND FacmNo <= ,AND Status ^i
-	public Slice<CollList> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndStatusIn(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3,
-			List<Integer> status_4, Pageable pageable);
+  // CustNo >= ,AND CustNo <= ,AND FacmNo >= ,AND FacmNo <= ,AND Status ^i
+  public Slice<CollList> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndStatusIn(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, List<Integer> status_4, Pageable pageable);
 
-	// OvduDays >= ,AND OvduDays <=
-	public Slice<CollList> findAllByOvduDaysGreaterThanEqualAndOvduDaysLessThanEqual(int ovduDays_0, int ovduDays_1, Pageable pageable);
+  // OvduDays >= ,AND OvduDays <= 
+  public Slice<CollList> findAllByOvduDaysGreaterThanEqualAndOvduDaysLessThanEqual(int ovduDays_0, int ovduDays_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CollList> findByCollListId(CollListId collListId);
+  // CityCode=
+  public Slice<CollList> findAllByCityCodeIs(String cityCode_0, Pageable pageable);
 
-	// (日終批次)維護 CollList 法催紀錄清單檔
-	@Procedure(value = "\"Usp_L5_CollList_Upd\"")
-	public void uspL5ColllistUpd(int tbsdyf, String empNo);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CollList> findByCollListId(CollListId collListId);
+
+  // (日終批次)維護 CollList 法催紀錄清單檔
+  @Procedure(value = "\"Usp_L5_CollList_Upd\"")
+  public void uspL5ColllistUpd(int tbsdyf,  String empNo);
 
 }
+

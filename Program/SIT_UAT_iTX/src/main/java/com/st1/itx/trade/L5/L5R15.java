@@ -90,6 +90,12 @@ public class L5R15 extends TradeBuffer {
 			totaVo.putParam("L5R15ClNo", "");
 			totaVo.putParam("L5R15ClCode1", "");
 			totaVo.putParam("L5R15ClCode2", "");
+			totaVo.putParam("L5R15AccTelArea", "");
+			totaVo.putParam("L5R15AccTelNo", "");
+			totaVo.putParam("L5R15AccTelExt", "");
+			totaVo.putParam("L5R15LegalArea", "");
+			totaVo.putParam("L5R15LegalNo", "");
+			totaVo.putParam("L5R15LegalExt", "");
 		} else {
 			for (Map<String, String> r5015SqlReturn : i5R15SqlReturn) {
 				// 戶號名稱
@@ -140,6 +146,14 @@ public class L5R15 extends TradeBuffer {
 				totaVo.putParam("L5R15ClCode1", r5015SqlReturn.get("F6"));
 				// 擔保品代號2
 				totaVo.putParam("L5R15ClCode2", r5015SqlReturn.get("F7"));
+				// //催收人員電話
+				totaVo.putParam("L5R15AccTelArea", r5015SqlReturn.get("F14"));
+				totaVo.putParam("L5R15AccTelNo", r5015SqlReturn.get("F15"));
+				totaVo.putParam("L5R15AccTelExt", r5015SqlReturn.get("F16"));
+				// //法務人員電話
+				totaVo.putParam("L5R15LegalArea", r5015SqlReturn.get("F17"));
+				totaVo.putParam("L5R15LegalNo", r5015SqlReturn.get("F18"));
+				totaVo.putParam("L5R15LegalExt", r5015SqlReturn.get("F19"));
 			}
 		}
 		this.addList(this.totaVo);

@@ -164,7 +164,10 @@ public class MakeReport extends CommBuffer {
 	private int printCnt = 0;
 
 	// 簽核
-	private String signOff = "$$$Sign off$$$";
+	private String signOff0 = "$$$Sign off0$$$";
+
+	// 簽核
+	private String signOff1 = "$$$Sign off1$$$";
 
 	private String rptPassword = "";
 
@@ -1037,9 +1040,11 @@ public class MakeReport extends CommBuffer {
 			// 2021-1-5 增加判斷 SignCode == 1 才印
 			if (tCdReport.getSignCode() == 1 && !useDefault) {
 				if ("P".equals(pageOrientation)) {
-					this.print(2, 40, signOff, "C");
+					this.print(1, 40, signOff0, "C");
+					this.print(1, 40, signOff1, "C");
 				} else {
-					this.print(2, 70, signOff, "C");
+					this.print(1, 85, signOff0, "C");
+					this.print(1, 85, signOff1, "C");
 				}
 			}
 		}
@@ -1388,8 +1393,11 @@ public class MakeReport extends CommBuffer {
 					int col = Integer.parseInt(map.get("col").toString());
 					String txt = map.get("txt").toString();
 
+					if (signOff0.equals(txt)) {
+						txt = "=====　報　表　結　束　=====";
+					}
 					// 簽核
-					if (signOff.equals(txt)) {
+					if (signOff1.equals(txt)) {
 						String tlrna = "";
 						String supna = "";
 

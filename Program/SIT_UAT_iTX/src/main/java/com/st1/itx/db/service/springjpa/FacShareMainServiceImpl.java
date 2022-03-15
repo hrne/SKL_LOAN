@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("facShareMainService")
 @Repository
-public class FacShareMainServiceImpl implements FacShareMainService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(FacShareMainServiceImpl.class);
+public class FacShareMainServiceImpl extends ASpringJpaParm implements FacShareMainService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + facShareMainId);
+		this.info("findById " + dbName + " " + facShareMainId);
 		Optional<FacShareMain> facShareMain = null;
 		if (dbName.equals(ContentName.onDay))
 			facShareMain = facShareMainReposDay.findById(facShareMainId);
@@ -97,7 +94,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "CreditSysNo"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = facShareMainReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -125,7 +122,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findCreditSysNoEq " + dbName + " : " + "creditSysNo_0 : " + creditSysNo_0);
+		this.info("findCreditSysNoEq " + dbName + " : " + "creditSysNo_0 : " + creditSysNo_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = facShareMainReposDay.findAllByCreditSysNoIsOrderByCustNoAsc(creditSysNo_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -146,7 +143,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + facShareMainId);
+		this.info("Hold " + dbName + " " + facShareMainId);
 		Optional<FacShareMain> facShareMain = null;
 		if (dbName.equals(ContentName.onDay))
 			facShareMain = facShareMainReposDay.findByFacShareMainId(facShareMainId);
@@ -164,7 +161,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + facShareMain.getFacShareMainId());
+		this.info("Hold " + dbName + " " + facShareMain.getFacShareMainId());
 		Optional<FacShareMain> facShareMainT = null;
 		if (dbName.equals(ContentName.onDay))
 			facShareMainT = facShareMainReposDay.findByFacShareMainId(facShareMain.getFacShareMainId());
@@ -187,7 +184,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + facShareMain.getFacShareMainId());
+		this.info("Insert..." + dbName + " " + facShareMain.getFacShareMainId());
 		if (this.findById(facShareMain.getFacShareMainId()) != null)
 			throw new DBException(2);
 
@@ -216,7 +213,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + facShareMain.getFacShareMainId());
+		this.info("Update..." + dbName + " " + facShareMain.getFacShareMainId());
 		if (!empNot.isEmpty())
 			facShareMain.setLastUpdateEmpNo(empNot);
 
@@ -239,7 +236,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + facShareMain.getFacShareMainId());
+		this.info("Update..." + dbName + " " + facShareMain.getFacShareMainId());
 		if (!empNot.isEmpty())
 			facShareMain.setLastUpdateEmpNo(empNot);
 
@@ -259,7 +256,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + facShareMain.getFacShareMainId());
+		this.info("Delete..." + dbName + " " + facShareMain.getFacShareMainId());
 		if (dbName.equals(ContentName.onDay)) {
 			facShareMainReposDay.delete(facShareMain);
 			facShareMainReposDay.flush();
@@ -287,7 +284,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (FacShareMain t : facShareMain) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -319,7 +316,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (facShareMain == null || facShareMain.size() == 0)
 			throw new DBException(6);
 
@@ -344,7 +341,7 @@ public class FacShareMainServiceImpl implements FacShareMainService, Initializin
 
 	@Override
 	public void deleteAll(List<FacShareMain> facShareMain, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

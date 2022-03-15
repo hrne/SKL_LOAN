@@ -96,6 +96,7 @@ public class MySpring extends SysLogger implements ApplicationContextAware {
 
 			if (ThreadVariable.isLogger())
 				logger.info(batchTransaction.length + "");
+
 			if (batchTransaction.length != 0)
 				trade.setBatchTransaction(batchTransaction[0]);
 

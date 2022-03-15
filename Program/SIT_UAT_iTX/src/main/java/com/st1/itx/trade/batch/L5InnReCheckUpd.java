@@ -34,7 +34,7 @@ public class L5InnReCheckUpd extends BatchBase implements Tasklet, InitializingB
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(L5InnReCheckUpd.class);
+		// // logger = LoggerFactory.getLogger(L5InnReCheckUpd.class);
 
 		// 第二個參數
 		// D=日批

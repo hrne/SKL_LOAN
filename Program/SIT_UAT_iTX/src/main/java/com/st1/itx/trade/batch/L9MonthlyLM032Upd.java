@@ -34,7 +34,7 @@ public class L9MonthlyLM032Upd extends BatchBase implements Tasklet, Initializin
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(L9MonthlyLM032Upd.class);
+		// // logger = LoggerFactory.getLogger(L9MonthlyLM032Upd.class);
 
 		// 第二個參數
 		// D=日批

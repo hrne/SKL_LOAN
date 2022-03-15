@@ -32,6 +32,7 @@ public class L9723ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	@SuppressWarnings("unchecked")
 	public String findAll(TitaVo titaVo) throws Exception {
 		this.info("l9723.findAll ");
 

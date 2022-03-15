@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,7 +21,6 @@ import com.st1.itx.eum.ContentName;
 @Repository
 /* 逾期放款明細 */
 public class L4703ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4703ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -39,7 +36,7 @@ public class L4703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4703.findAll");
+		this.info("L4703.findAll");
 
 		String iFacmNo = titaVo.get("FacmNo");
 		String iCustNo = titaVo.get("CustNo");
@@ -61,7 +58,7 @@ public class L4703ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ " LEFT JOIN \"CdEmp\" E" + "   ON E.\"EmployeeNo\" =  F.\"BusinessOfficer\"" + " LEFT JOIN \"CustTelNo\" T" + "  ON  T.\"CustUKey\" =  C.\"CustUKey\"" + "  AND T.\"Enable\"   = 'Y'"
 				+ " ) D" + " WHERE D.\"SEQ\" = 1" + "   AND F.\"FacmNo\" = :iFacmNo" + " ORDER BY D.\"F0\", D.\"F1\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);

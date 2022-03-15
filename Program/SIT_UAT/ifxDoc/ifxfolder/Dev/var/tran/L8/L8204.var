@@ -53,11 +53,11 @@ E(0,0)
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
-!FuncCode2(1: 新增;2: 修改;4: 刪除)
+!FuncCode2(1: 新增;2: 修改;4: 刪除;5: 查詢)
 #CDCODEFuncCode2=x,20,S                  
-T(3,CdCode.FuncCode2)                  
+T(3,CdCode.FuncCode)                  
                                       
-#FuncCode2Help=x,50,S        
+#FuncCodeHelp=x,100,S        
 
 !AP
 #CDCODEAp=x,20,S                  
@@ -70,7 +70,7 @@ RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDCODEFuncCode2,#CDCODEAp)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@FuncCodeHelp,#HelpDesc1)
 T(2,@ApHelp,#HelpDesc2)
             
 !#ApHelp=x,1024,S
@@ -82,7 +82,7 @@ T(2,@ApHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L8923進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L8923 疑似洗錢交易訪談記錄查詢]進入),$)
 
 #NTXBUF=X,21,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -112,18 +112,18 @@ E(0,@FacmNo,#CHAIN_FacmNo)
 E(0,@BormNo,#CHAIN_BormNo)
 
 
-! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5:查詢)
 #FuncCode=A,1,S
 T(F,@FuncCode,0)
 T(F,@CustName,0)
 C(3,#CHAIN,1,s,$)
-HELP(#FuncCode2Help)
-@V(H,#FuncCode2Help)
+HELP(#FuncCodeHelp)
+@V(H,#FuncCodeHelp)
 E(0,@FUNCIND,#FuncCode)
 
 #FuncCodeX=X,12,L
-T(H,#FuncCode,#FuncCode2Help)
-C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(NOBUTTON,CLOSEY))
 
 #FUNCIND=_,_,S
 E(0,#FuncCode)
@@ -131,11 +131,11 @@ E(0,#FuncCode)
 
 !FuncCode=1,2 顯示框線
 #WKTF=X,1,S
-IF (#FuncCode==1 || #FuncCode==2 ,T(F,@RepayDate,1)T(F,@RepayAmt,1)T(F,@Career,1)T(F,@Income,1)T(F,@RepaySource,1)T(F,@RepayBank,1)T(F,@ActualRepayDate,1)T(F,@ActualRepayAmt,1)T(F,@Description,1),
+IF (#FuncCode==1 || #FuncCode==2 || #FuncCode==3 ,T(F,@RepayDate,1)T(F,@RepayAmt,1)T(F,@Career,1)T(F,@Income,1)T(F,@RepaySource,1)T(F,@RepayBank,1)T(F,@ActualRepayDate,1)T(F,@ActualRepayAmt,1)T(F,@Description,1),
                                   T(F,@RepayDate,0)T(F,@RepayAmt,0)T(F,@Career,0)T(F,@Income,0)T(F,@RepaySource,0)T(F,@RepayBank,0)T(F,@ActualRepayDate,0)T(F,@ActualRepayAmt,0)T(F,@Description,0))
 
-IF (#FuncCode==1 ,T(F,@RecordDate,1)T(F,@CustNo,1)T(F,@FacmNo,1)T(F,@BormNo,1),
-                  T(F,@RecordDate,0)T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@BormNo,0))
+IF (#FuncCode==1 ||#FuncCode==3,T(F,@RecordDate,1)T(F,@CustNo,1)T(F,@FacmNo,1)T(F,@BormNo,1),
+                                T(F,@RecordDate,0)T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@BormNo,0))
 
 #WKPSC=X,2,S
 
@@ -163,32 +163,6 @@ T(2,@FdDescription,#WKPSC)
 #DATE=D,8,S
 T(4,CDATE$)
 
-!訪談日期  
-#RecordDate=D,7,I
-C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-T(1,#DATE,2,7)
-D(8)
-@V(7)A(DATE,0,#RecordDate)
-
-
-!戶號
-#CustNo=A,7,I
-C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-@V(7)
-IF(#CustNo==0,V(P,戶號不可為0),s)
-
-!額度號碼
-#FacmNo=A,3,I
-C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-@V(7)
-
-!撥款序號
-#BormNo=A,3,I
-C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-@V(7)
-
-
-
 #RimRecordDate=9,7,S
 E(0,#RecordDate)
 #RimCustNo=9,7,S
@@ -198,13 +172,14 @@ E(0,#FacmNo)
 #RimBormNo=9,3,S
 E(0,#BormNo)
 
-#SendL8R51=X,1,S
-E(0,@RimFuncCode,#FuncCode)
+!複製先調RIM
+#SendL8R51A=X,1,S
+C(3,#FuncCode,3,$,s)
+E(0,@RimFuncCode,5)
 T(2,@RimTxCode,#TXCD)
 RESET_RIM(#SendL8R51,L8R51)
 S(L8R51,1,#RimFuncCode,#RimTxCode,#RimRecordDate,#RimCustNo,#RimFacmNo,#RimBormNo)
 R(1,L8R51)
-
 E(0,@RepayDate,#L8R51RepayDate)
 E(0,@RepayAmt,#L8R51RepayAmt)
 T(2,@Career,#L8R51Career)
@@ -216,33 +191,83 @@ E(0,@ActualRepayAmt,#L8R51ActualRepayAmt)
 T(2,@Description,#L8R51Description)
 T(2,@CustName,#L8R51CustName)
 T(H,#RepaySourceX,#RepaySource,#ApHelp)
+
+!訪談日期  
+#RecordDate=D,7,I
+C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+C(3,#FuncCode,3,$,T(1,#DATE,2,7))
+D(8)
+@V(7)A(DATE,0,#RecordDate)
+
+
+!戶號
+#CustNo=A,7,I
+C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+@V(7)
+IF(#CustNo==0,V(P,戶號不可為0),s)
+
+!額度號碼
+#FacmNo=A,3,I
+C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+@V(7)
+
+!撥款序號
+#BormNo=A,3,I
+C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+@V(7)
+
+#SendL8R51B=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimTxCode,#TXCD)
+IF(#FuncCode==1 || #FuncCode==3,
+E(0,#RimRecordDate,#RecordDate)
+E(0,#RimCustNo,#CustNo)
+E(0,#RimFacmNo,#FacmNo)
+E(0,#RimBormNo,#BormNo)
+,$)
+RESET_RIM(#SendL8R51,L8R51)
+S(L8R51,1,#RimFuncCode,#RimTxCode,#RimRecordDate,#RimCustNo,#RimFacmNo,#RimBormNo)
+R(1,L8R51)
+C(3,#FuncCode,3,T(2,@CustName,#L8R51CustName),
+E(0,@RepayDate,#L8R51RepayDate)
+E(0,@RepayAmt,#L8R51RepayAmt)
+T(2,@Career,#L8R51Career)
+T(2,@Income,#L8R51Income)
+E(0,@RepaySource,#L8R51RepaySource)
+T(2,@RepayBank,#L8R51RepayBank)
+E(0,@ActualRepayDate,#L8R51ActualRepayDate)
+E(0,@ActualRepayAmt,#L8R51ActualRepayAmt)
+T(2,@Description,#L8R51Description)
+T(2,@CustName,#L8R51CustName)
+T(H,#RepaySourceX,#RepaySource,#ApHelp)
+)
 !戶名
 #CustName=x,80,L
 
 !預定還款日期
 #RepayDate=D,7,I
-C(3,#FuncCode,4,s)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 C(3,#CHAIN,1,$,T(1,#DATE,2,7))
 D(8)
 @V(7)A(DATE,0,#RepayDate)
 
 !約定還款金額
 #RepayAmt=m,14,I
-C(3,#FuncCode,4,s)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 C(3,#RepayDate,0,S,$)
 @V(2,0)
 
 !職業別
 #Career=x,40,I
-C(3,#FuncCode,4,s)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 
 !年收入(萬)
 #Income=x,30,I
-C(3,#FuncCode,4,s)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 
 !還款來源             
 #RepaySource=A,2,I    
-C(3,#FuncCode,4,s)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 HELP(#ApHelp)
 @V(H,#ApHelp)
 
@@ -255,27 +280,26 @@ T(2,@FdRepayBank,#WKSTAR3)
 
 !代償銀行
 #RepayBank=x,20,I
-C(3,#FuncCode,4,s)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 C(3,#RepaySource,1,$,S)
 @V(7)
 
 !實際還款日期
 #ActualRepayDate=D,7,I
-C(3,#FuncCode,4,s)
-T(1,#DATE,2,7)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 D(8)
 @A(DATE,0,#ActualRepayDate)
 
 !實際還款金額
 #ActualRepayAmt=m,14,I
-C(3,#FuncCode,4,s)
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 C(3,#ActualRepayDate,0,T(3,@FdActualRepayAmt,),T(3,@FdActualRepayAmt,*))
 C(3,#ActualRepayDate,0,S,$)
 @V(2,0)
 
 !其他說明
-#Description=x,3.40,I
-C(3,#FuncCode,4,s)
+#Description=x,10.50,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -286,7 +310,7 @@ E(0,1)ASGN(AGAIN$)
 
 !參考編號
 #MRKEY=_,_,S
-T(2,#CustNo+-+#FacmNo+-+#BormNo)
+T(2,#RecordDate+#CustNo+#FacmNo+#BormNo)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L8R51.dec"/>

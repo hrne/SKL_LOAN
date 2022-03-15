@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 債權案件明細查詢 */
 public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5071ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -31,19 +28,14 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo, int index, int limit) throws Exception {
-		logger.info("L5071ServiceImpl.findAll ");
+		this.info("L5071ServiceImpl.findAll ");
+		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 
-		// *** 折返控制相關 ***
-		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
 
@@ -75,6 +67,10 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "  WHERE C.\"CustId\" IS NOT NULL";
 
+		if (iCustNo != 0) {
+			sql += "   AND N.\"CustNo\" = :CustNo";
+		}
+
 		if (!"".equals(titaVo.getParam("CaseKindCode").trim())) {
 			sql += "   AND N.\"CaseKindCode\" = :CaseKindCode";
 		}
@@ -91,11 +87,14 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ORDER BY  C.\"CustId\", N.\"CaseSeq\" ";
 		sql += sqlRow;
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		if (iCustNo != 0) {
+			query.setParameter("CustNo", titaVo.getParam("CustNo").trim());
+		}
 		if (!"".equals(titaVo.getParam("CustId").trim())) {
 			query.setParameter("CustId", titaVo.getParam("CustId").trim());
 		}
@@ -117,6 +116,6 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

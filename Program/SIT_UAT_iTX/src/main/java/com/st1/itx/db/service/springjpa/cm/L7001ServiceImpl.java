@@ -90,7 +90,7 @@ public class L7001ServiceImpl extends ASpringJpaParm implements InitializingBean
 //
 //		} catch (Exception e) {
 //
-//			this.error("Exception:" + e);
+//			logger.error("Exception:" + e);
 //
 //		}
 //

@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -27,16 +26,9 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("ld009.findAll ");
-
-		LocalDate today = LocalDate.of(titaVo.getEntDyI() / 10000 + 1911, titaVo.getEntDyI() / 100 % 100, titaVo.getEntDyI() % 100);
-		LocalDate yesterday = today.minusDays(1);
-
-		this.info(today.getYear() + "/" + today.getMonthValue() + "/" + today.getDayOfMonth());
-		this.info(yesterday.getYear() + "/" + yesterday.getMonthValue() + "/" + yesterday.getDayOfMonth());
 
 		String sql = " ";
 		sql += " SELECT am.\"AcctCode\" AS F0 ";
@@ -79,7 +71,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("today", today.getYear() + String.format("%02d", today.getMonthValue()) + String.format("%02d", today.getDayOfMonth()));
+		query.setParameter("today", titaVo.getEntDyI() + 19110000);
 
 		return this.convertToMap(query);
 	}

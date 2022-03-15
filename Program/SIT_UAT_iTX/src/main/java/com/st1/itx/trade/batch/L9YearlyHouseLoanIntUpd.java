@@ -34,7 +34,7 @@ public class L9YearlyHouseLoanIntUpd extends BatchBase implements Tasklet, Initi
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(L9YearlyHouseLoanIntUpd.class);
+		// // logger = LoggerFactory.getLogger(L9YearlyHouseLoanIntUpd.class);
 
 		// 第二個參數
 		// D=日批

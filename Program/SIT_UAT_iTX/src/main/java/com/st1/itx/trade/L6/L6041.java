@@ -118,11 +118,11 @@ public class L6041 extends TradeBuffer {
 				occursList.putParam("OBrNo", tTxTeller.getBrNo());
 				occursList.putParam("OBrItem", cdBranch.getBranchItem());
 				occursList.putParam("OGroupNo", tTxTeller.getGroupNo());
-				String DateTime = this.parse.timeStampToString(tTxTeller.getLastUpdate());
+				String DateTime = this.parse.timeStampToString(tTxTeller.getMntDate());
 				
 				occursList.putParam("OLastUpdate", DateTime);
 				
-				String iEmpNo = tTxTeller.getLastUpdateEmpNo();
+				String iEmpNo = tTxTeller.getMntEmpNo();
 				if(!iEmpNo.isEmpty() || iEmpNo.length()>0) {
 					CdEmp tCdEmp = cdEmpService.findById(iEmpNo, titaVo);
 					if(tCdEmp!=null) {

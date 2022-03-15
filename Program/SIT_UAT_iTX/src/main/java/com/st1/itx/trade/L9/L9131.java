@@ -56,7 +56,7 @@ public class L9131 extends TradeBuffer {
 
 		this.info("ntxbuf = " + ntxbuf);
 		
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9131核心日結單代傳票已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9131總帳日結單代傳票已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

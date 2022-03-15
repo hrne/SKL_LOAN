@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("monthlyLM014CService")
 @Repository
-public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(MonthlyLM014CServiceImpl.class);
+public class MonthlyLM014CServiceImpl extends ASpringJpaParm implements MonthlyLM014CService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + monthlyLM014CId);
+		this.info("findById " + dbName + " " + monthlyLM014CId);
 		Optional<MonthlyLM014C> monthlyLM014C = null;
 		if (dbName.equals(ContentName.onDay))
 			monthlyLM014C = monthlyLM014CReposDay.findById(monthlyLM014CId);
@@ -97,7 +94,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "AcctCode", "AccountType", "AcBookCode", "RelsFlag", "ClFlag", "DepartmentCode"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = monthlyLM014CReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -122,7 +119,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("DataYMEq " + dbName + " : " + "dataYM_0 : " + dataYM_0);
+		this.info("DataYMEq " + dbName + " : " + "dataYM_0 : " + dataYM_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = monthlyLM014CReposDay.findAllByDataYMIs(dataYM_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -140,7 +137,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + monthlyLM014CId);
+		this.info("Hold " + dbName + " " + monthlyLM014CId);
 		Optional<MonthlyLM014C> monthlyLM014C = null;
 		if (dbName.equals(ContentName.onDay))
 			monthlyLM014C = monthlyLM014CReposDay.findByMonthlyLM014CId(monthlyLM014CId);
@@ -158,7 +155,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
+		this.info("Hold " + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
 		Optional<MonthlyLM014C> monthlyLM014CT = null;
 		if (dbName.equals(ContentName.onDay))
 			monthlyLM014CT = monthlyLM014CReposDay.findByMonthlyLM014CId(monthlyLM014C.getMonthlyLM014CId());
@@ -180,7 +177,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
+		this.info("Insert..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
 		if (this.findById(monthlyLM014C.getMonthlyLM014CId()) != null)
 			throw new DBException(2);
 
@@ -206,7 +203,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
+		this.info("Update..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
 		if (!empNot.isEmpty())
 			monthlyLM014C.setLastUpdateEmpNo(empNot);
 
@@ -229,7 +226,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
+		this.info("Update..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
 		if (!empNot.isEmpty())
 			monthlyLM014C.setLastUpdateEmpNo(empNot);
 
@@ -249,7 +246,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
+		this.info("Delete..." + dbName + " " + monthlyLM014C.getMonthlyLM014CId());
 		if (dbName.equals(ContentName.onDay)) {
 			monthlyLM014CReposDay.delete(monthlyLM014C);
 			monthlyLM014CReposDay.flush();
@@ -276,7 +273,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (MonthlyLM014C t : monthlyLM014C)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -305,7 +302,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (monthlyLM014C == null || monthlyLM014C.size() == 0)
 			throw new DBException(6);
 
@@ -330,7 +327,7 @@ public class MonthlyLM014CServiceImpl implements MonthlyLM014CService, Initializ
 
 	@Override
 	public void deleteAll(List<MonthlyLM014C> monthlyLM014C, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

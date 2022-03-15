@@ -3,8 +3,6 @@ package com.st1.itx.trade.L4;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -31,7 +29,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R19 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4R19.class);
+	// private static final Logger logger = LoggerFactory.getLogger(L4R19.class);
 
 	@Autowired
 	public Parse parse;

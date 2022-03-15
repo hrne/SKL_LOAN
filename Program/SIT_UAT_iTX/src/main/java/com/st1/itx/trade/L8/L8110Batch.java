@@ -2,8 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,8 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L8110Batch extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8110Batch.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L8110Batch.class);
 
 	@Autowired
 	public L8110ServiceImpl l8110ServiceImpl;

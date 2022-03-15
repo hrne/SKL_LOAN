@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,7 @@ public class L5512Batch extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L5512Batch ");
+		this.info("active L5512Batch ");
 		this.totaVo.init(titaVo);
 
 		String iFunCode = titaVo.getParam("FunCode").trim();// 使用功能
@@ -137,17 +138,17 @@ public class L5512Batch extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
-		logger.info("lPfPlus size=" + lPfPlus.size());
+		this.info("lPfPlus size=" + lPfPlus.size());
 		for (PfReward pf : lPfPlus) {
-			logger.info("Plus =" + pf.toString());
+			this.info("Plus =" + pf.toString());
 		}
 
-		logger.info("lPfMinus size=" + lPfMinus.size());
+		this.info("lPfMinus size=" + lPfMinus.size());
 		for (PfReward pf : lPfMinus) {
-			logger.info("Minus =" + pf.toString());
+			this.info("Minus =" + pf.toString());
 		}
 
-		logger.info("lPfInsCheck size=" + lPfInsCheck.size());
+		this.info("lPfInsCheck size=" + lPfInsCheck.size());
 		if (lPfInsCheck.size() > 0) {
 			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5512.1", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "介紹人加碼獎金");
 
@@ -162,7 +163,7 @@ public class L5512Batch extends TradeBuffer {
 			makeExcel.setValue(row, 8, "檢核結果");
 			makeExcel.setValue(row, 9, "檢核工作月");
 			for (PfInsCheck pf : lPfInsCheck) {
-				logger.info("lPfInsCheck =" + pf.toString());
+				this.info("lPfInsCheck =" + pf.toString());
 				row++;
 				makeExcel.setValue(row, 1, String.format("%07d", pf.getCustNo()));
 				makeExcel.setValue(row, 2, String.format("%03d", pf.getFacmNo()));
@@ -186,12 +187,12 @@ public class L5512Batch extends TradeBuffer {
 
 	// 執行房貸獎勵保費檢核、產生發放媒體
 	private void calculate(int iCustNo, int iFacmNo, ArrayList<PfReward> lPfFac, TitaVo titaVo) throws LogicException {
-		logger.info("calculate  " + iCustNo + "-" + iFacmNo + ", size=" + lPfFac.size());
+		this.info("calculate  " + iCustNo + "-" + iFacmNo + ", size=" + lPfFac.size());
 
 		BigDecimal addBonusLM = BigDecimal.ZERO; // 前月累計業績
 		// 本工作月正業績，並累計前月業績
 		for (PfReward iPf : lPfFac) {
-			logger.info("calculate = " + iPf.toString());
+			this.info("calculate = " + iPf.toString());
 			if (iPf.getWorkMonth() == iWorkMonth) {
 				PfReward pfIt = (PfReward) dataLog.clone(iPf);
 				pfIt.setIntroducerBonus(BigDecimal.ZERO);
@@ -248,7 +249,7 @@ public class L5512Batch extends TradeBuffer {
 			}
 			// 3.檢核結果為Y且檢核工作月為本月，追回前月累計
 			if (iPf.getWorkMonth() < iWorkMonth && "Y".equals(tPfInsCheck.getCheckResult()) && tPfInsCheck.getCheckWorkMonth() == iWorkMonth) {
-				logger.info("calculate 3 addBonusLM =" + addBonusLM);
+				this.info("calculate 3 addBonusLM =" + addBonusLM);
 				// 追回前月業績，不超過前月累計
 				if (iPf.getIntroducerAddBonus().compareTo(BigDecimal.ZERO) > 0) {
 					if (addBonusLM.compareTo(iPf.getIntroducerAddBonus()) > 0) {
@@ -262,7 +263,7 @@ public class L5512Batch extends TradeBuffer {
 				if (pfIt.getIntroducerAddBonus().compareTo(BigDecimal.ZERO) < 0) {
 					lPfMinus.add(pfIt);
 				}
-				logger.info("calculate 3  pfIt =" + pfIt.toString());
+				this.info("calculate 3  pfIt =" + pfIt.toString());
 			}
 		}
 
@@ -397,7 +398,7 @@ public class L5512Batch extends TradeBuffer {
 //				}
 
 				BigDecimal bbonus = pfRewardMedia.getAdjustBonus();
-				bbonus = bbonus.setScale(0, BigDecimal.ROUND_FLOOR);
+				bbonus = bbonus.setScale(0, RoundingMode.FLOOR);
 
 				if (bbonus.compareTo(BigDecimal.ZERO) == 0) {
 					continue;

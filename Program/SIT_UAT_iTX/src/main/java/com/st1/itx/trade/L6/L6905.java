@@ -15,9 +15,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
@@ -50,6 +51,8 @@ public class L6905 extends TradeBuffer {
 	public TxTellerService sTxTellerService;
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
+	@Autowired
+	CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -187,8 +190,11 @@ public class L6905 extends TradeBuffer {
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 		if (lAcDetail == null || lAcDetail.size() == 0) {
+			this.info("into erro 1");
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
+		
+		this.info("lAcDetail=="+lAcDetail.size());
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
 
@@ -266,12 +272,12 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOSumNo", tAcDetail.getSumNo());
 
 			iTlrItem = "";
-			iTlrItem = inqTxTeller(tAcDetail.getTitaSupNo(), iTlrItem, titaVo);
+			iTlrItem = inqCdEmp(tAcDetail.getTitaSupNo(), iTlrItem, titaVo);
 			occursList.putParam("OOSupItem", iTlrItem);
 			occursList.putParam("OOTitaSupNo", tAcDetail.getTitaSupNo());
 
 			iTlrItem = "";
-			iTlrItem = inqTxTeller(tAcDetail.getTitaTlrNo(), iTlrItem, titaVo);
+			iTlrItem = inqCdEmp(tAcDetail.getTitaTlrNo(), iTlrItem, titaVo);
 			occursList.putParam("OOTlrItem", iTlrItem);
 			occursList.putParam("OOTitaTlrNo", tAcDetail.getTitaTlrNo());
 
@@ -299,19 +305,21 @@ public class L6905 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
-
+			occursList.putParam("OOSlipNo", tAcDetail.getSlipNo());
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
+			
 		}
-
-		if (this.totaVo.getOccursList().size() == 0) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
-		}
+		
+//		if (this.totaVo.getOccursList().size() == 0) {
+//			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
+//		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slAcDetail != null && slAcDetail.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			// this.totaVo.setMsgEndToEnter();// 手動折返
+//			 this.totaVo.setMsgEndToEnter();// 手動折返
 			this.totaVo.setMsgEndToAuto();// 自動折返
 		}
 
@@ -323,7 +331,6 @@ public class L6905 extends TradeBuffer {
 	private String inqTxTranCode(String uTranNo, String uTranItem, TitaVo titaVo) throws LogicException {
 
 		TxTranCode tTxTranCode = new TxTranCode();
-
 		tTxTranCode = sTxTranCodeService.findById(uTranNo, titaVo);
 
 		if (tTxTranCode == null) {
@@ -337,16 +344,16 @@ public class L6905 extends TradeBuffer {
 	}
 
 	// 查詢使用者設定檔
-	private String inqTxTeller(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
+	private String inqCdEmp(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
 
-		TxTeller tTxTeller = new TxTeller();
+		CdEmp tCdEmp = new CdEmp();
 
-		tTxTeller = sTxTellerService.findById(uTlrNo, titaVo);
+		tCdEmp = cdEmpService.findById(uTlrNo, titaVo);
 
-		if (tTxTeller == null) {
+		if (tCdEmp == null) {
 			uTlrItem = uTlrNo;
 		} else {
-			uTlrItem = tTxTeller.getTlrItem();
+			uTlrItem = tCdEmp.getFullname();
 		}
 
 		return uTlrItem;

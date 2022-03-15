@@ -46,7 +46,7 @@ public class L2305 extends TradeBuffer {
 		int iOriginCaseNo = Integer.valueOf(titaVo.getParam("OriginCaseNo"));
 		int iTargetCaseNo = Integer.valueOf(titaVo.getParam("TargetCaseNo"));
 
-		int iOriginCustNo = Integer.valueOf(titaVo.getParam("OriginCustNo")); // 若戶號可修改時使用
+		int iOriginCustNo = Integer.valueOf(titaVo.getParam("OriginCustNo"));
 		int iTargetCustNo = Integer.valueOf(titaVo.getParam("TargetCustNo"));
 
 		Slice<ReltMain> iReltMain = null;
@@ -55,7 +55,7 @@ public class L2305 extends TradeBuffer {
 
 		String Ukey = "";
 
-		iReltMain = iReltMainService.caseNoEq(iOriginCaseNo, 0, Integer.MAX_VALUE, titaVo);
+		iReltMain = iReltMainService.findByBoth(iOriginCaseNo, iOriginCustNo, this.index, this.limit, titaVo);
 
 		if (iReltMain == null) {
 			throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料

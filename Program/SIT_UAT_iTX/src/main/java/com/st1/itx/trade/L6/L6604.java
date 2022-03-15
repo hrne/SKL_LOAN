@@ -84,6 +84,8 @@ public class L6604 extends TradeBuffer {
 
 		CdCode tCdCode = sCdCodeService.holdById(tCdCodeId);
 
+		
+		
 		switch (iFunCode) {
 		case 1: // 新增
 			if (tCdCode != null) {
@@ -107,11 +109,12 @@ public class L6604 extends TradeBuffer {
 			if (tCdCode == null) {
 				throw new LogicException(titaVo, "E0003", iDefCode + "-" + iCode); // 修改資料不存在
 			}
-
+			
 			// 代碼檔修改[業務類別]時,其下代碼一併修改
-			if (iDefCode.equals("CodeType") && (!(iDefType == tCdCode.getDefType()))) {
+			if (iDefCode.equals("CodeType")) {
+				this.info("Synchronize CodeType");
 				iChkFg = updDefType(iCode, iDefType, iChkFg, titaVo);
-			}
+			} 
 
 			CdCode tCdCode2 = (CdCode) dataLog.clone(tCdCode);
 			try {
@@ -136,7 +139,7 @@ public class L6604 extends TradeBuffer {
 			dataLog.setEnv(titaVo, tCdCode, tCdCode); ////
 			dataLog.exec("刪除各類代碼檔"); ////
 			break;
-
+			
 		}
 
 		this.addList(this.totaVo);
@@ -150,7 +153,30 @@ public class L6604 extends TradeBuffer {
 		tCdCode.setCode(titaVo.getParam("Code"));
 		tCdCode.setItem(titaVo.getParam("Item").trim()); // 2021-08-04 智偉修改:增加trim method,不留下空白
 		tCdCode.setEnable(titaVo.getParam("Enable"));
-
+		tCdCode.setMinCodeLength(Integer.parseInt(titaVo.getParam("MinCodeLength")));
+		tCdCode.setMaxCodeLength(Integer.parseInt(titaVo.getParam("MaxCodeLength")));
+		
+		CdCode cdCode = new CdCode();
+		if(("CodeType").equals(titaVo.getParam("DefCode"))) {
+			Slice<CdCode>cCdCode = sCdCodeService.defCodeEq(titaVo.getParam("Code"),"%", 0, Integer.MAX_VALUE, titaVo);
+			List<CdCode> sCdCode = cCdCode == null ? null : cCdCode.getContent();
+			if(sCdCode!=null) {
+				for(CdCode iCdCode : sCdCode) {
+					cdCode = new CdCode();
+					this.info("iCdCode=="+iCdCode.getDefCode()+",code=="+iCdCode.getCode());
+					cdCode = sCdCodeService.holdById(new CdCodeId(iCdCode.getDefCode(),iCdCode.getCode()), titaVo);
+					cdCode.setMinCodeLength(Integer.parseInt(titaVo.getParam("MinCodeLength")));
+					cdCode.setMaxCodeLength(Integer.parseInt(titaVo.getParam("MaxCodeLength")));
+					try {
+						sCdCodeService.update2(cdCode, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+					}
+				}
+			}
+			
+		}
+		
 		return tCdCode;
 	}
 
@@ -161,15 +187,22 @@ public class L6604 extends TradeBuffer {
 		slCdCode = sCdCodeService.defCodeEq(uCode, "%", this.index, Integer.MAX_VALUE);
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
+		
+		
 		if (lCdCode == null || lCdCode.size() == 0) {
 			this.info("L6604 updDefType notfound : " + uChkFg);
 			uChkFg = 0;
 			return uChkFg;
 		}
-
+		
+		this.info("uDefType=="+uDefType+",lCdCode Type=="+lCdCode.get(0).getDefType());
+		if(uDefType == lCdCode.get(0).getDefType()) {
+			uChkFg = 0;
+			return uChkFg;
+		}
+		
 		// 如有找到資料
 		for (CdCode tCdCode : lCdCode) {
-
 			CdCode uCdCode = new CdCode();
 			uCdCode = sCdCodeService.holdById(new CdCodeId(tCdCode.getDefCode(), tCdCode.getCode()));
 

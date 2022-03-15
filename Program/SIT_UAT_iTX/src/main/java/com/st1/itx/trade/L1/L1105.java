@@ -51,7 +51,7 @@ public class L1105 extends TradeBuffer {
 		this.totaVo.putParam("OResult", "N");
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		String iCustId = titaVo.getParam("CustId");
-		String iCustUKey = "";
+
 		CustMain iCustMain = new CustMain();
 		// check if input id or no exist in custmain
 		if (iCustNo == 0) {
@@ -64,10 +64,12 @@ public class L1105 extends TradeBuffer {
 
 		if (iCustMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔");
-		} else {
-			iCustUKey = iCustMain.getCustUKey();
-		}
+		} 
 
+		String iCustUKey = iCustMain.getCustUKey();
+		
+		titaVo.putParam("CustNo", iCustMain.getCustNo());
+		
 		// start deal with data
 		CustTelNo tCustTelNo = new CustTelNo();
 //		CustTelNo hCustTelNo = new CustTelNo();
@@ -131,7 +133,7 @@ public class L1105 extends TradeBuffer {
 			}
 //			hCustTelNo = sCustTelNoService.findById(tita_TelNoUKey, titaVo);
 			// 變更前
-			CustTelNo beforeCustTelNo = (CustTelNo) iDataLog.clone(tCustTelNo);
+			CustTelNo oCustTelNo = (CustTelNo) iDataLog.clone(tCustTelNo);
 			tCustTelNo.setTelTypeCode(iTelTypeCode);
 			tCustTelNo.setTelArea(iTelArea);
 			tCustTelNo.setTelNo(iTelNo);
@@ -150,14 +152,46 @@ public class L1105 extends TradeBuffer {
 				throw new LogicException("E0007", "客戶聯絡電話檔");
 			}
 			// 紀錄變更前變更後
-			iDataLog.setEnv(titaVo, beforeCustTelNo, tCustTelNo);
-			iDataLog.exec();
+			
+			CustTelNo nCustTelNo = (CustTelNo) iDataLog.clone(tCustTelNo);
+			
+			String oTelNo = showTelNo(oCustTelNo);
+			String nTelNo = showTelNo(nCustTelNo);
+			
+			oCustTelNo.setTelArea("");
+			oCustTelNo.setTelNo(oTelNo);
+			oCustTelNo.setTelExt("");
+			nCustTelNo.setTelArea("");
+			nCustTelNo.setTelNo(nTelNo);
+			nCustTelNo.setTelExt("");
+			
+			iDataLog.setEnv(titaVo, oCustTelNo, nCustTelNo);
+			iDataLog.exec("修改顧客 " + iCustMain.getCustId() + " 電話資料/"+oCustTelNo.getTelArea()+oCustTelNo.getTelNo()+oCustTelNo.getTelExt(), "CustUKey:" + iCustMain.getCustUKey());
 		}
 
 		this.totaVo.putParam("OResult", "Y");
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String showTelNo(CustTelNo custTelNo) {
+		String telno = "";
+		
+		if ("03".equals(custTelNo.getTelTypeCode()) || "05".equals(custTelNo.getTelTypeCode())) {
+			telno = custTelNo.getTelNo();
+		} else if ("09".equals(custTelNo.getTelTypeCode())) {
+			telno = custTelNo.getTelArea() + custTelNo.getTelNo() + custTelNo.getTelExt();
+		} else {
+			if (!custTelNo.getTelArea().isEmpty()) {
+				telno = custTelNo.getTelArea()+ " ";
+			}
+			telno += custTelNo.getTelNo();
+			if (!custTelNo.getTelExt().isEmpty()) {
+				telno += " " + custTelNo.getTelExt();
+			}
+		}
+		return telno;
 	}
 
 	private String uniqueEloan(String iCustUKey, String iTelTypeCode, String iTelArea, String iTelNo, String iTelExt) {

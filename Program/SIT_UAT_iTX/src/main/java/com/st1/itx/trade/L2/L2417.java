@@ -338,6 +338,7 @@ public class L2417 extends TradeBuffer {
 					
 					ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
 					
+					
 					if (clOwnerRelation == null) {
 						clOwnerRelation = new ClOwnerRelation();
 						clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
@@ -348,7 +349,22 @@ public class L2417 extends TradeBuffer {
 							throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
 						}
 					} else {
+						// 變更前
+						ClOwnerRelation beforeClOwnerRelation = (ClOwnerRelation) dataLog.clone(clOwnerRelation);
+
 						clOwnerRelation.setOwnerRelCode(relCode);
+						if(!relCode.equals(beforeClOwnerRelation.getOwnerRelCode())) {
+							// 紀錄變更前變更後
+							dataLog.setEnv(titaVo, beforeClOwnerRelation, clOwnerRelation);
+							
+							CustMain tCustMain = sCustMainService.findById(custUKey, titaVo);
+							String CustName = "";
+							if(tCustMain != null) {
+								CustName = tCustMain.getCustName();
+							}
+							dataLog.exec("修改所有權人與授信戶關係:" + CustName );
+						}
+						
 						try {
 							sClOwnerRelationService.update(clOwnerRelation, titaVo);
 						} catch (DBException e) {
@@ -404,6 +420,7 @@ public class L2417 extends TradeBuffer {
 					
 					ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
 					
+					
 					if (clOwnerRelation == null) {
 						clOwnerRelation = new ClOwnerRelation();
 						clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
@@ -414,7 +431,23 @@ public class L2417 extends TradeBuffer {
 							throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
 						}
 					} else {
+						// 變更前
+						ClOwnerRelation beforeClOwnerRelation = (ClOwnerRelation) dataLog.clone(clOwnerRelation);
+						
 						clOwnerRelation.setOwnerRelCode(titaVo.getParam("OwnerRelCode" + i));
+						if(!titaVo.getParam("OwnerRelCode" + i).equals(beforeClOwnerRelation.getOwnerRelCode())) {
+							// 紀錄變更前變更後
+							dataLog.setEnv(titaVo, beforeClOwnerRelation, clOwnerRelation);
+													
+							CustMain tCustMain = sCustMainService.findById(titaVo.getParam("OwnerCustUKey" + i).trim(), titaVo);
+							String CustName = "";
+							if(tCustMain != null) {
+								CustName = tCustMain.getCustName();
+							}
+							dataLog.exec("修改所有權人與授信戶關係:" + CustName );
+							
+						}
+						
 						try {
 							sClOwnerRelationService.update(clOwnerRelation, titaVo);
 						} catch (DBException e) {

@@ -7,7 +7,6 @@ import java.io.StringWriter;
 
 import java.util.*;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -41,7 +40,7 @@ import com.st1.itx.db.service.springjpa.cm.TableColumnServiceImpl;
  * @version 1.0.0
  */
 public class LC998 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC998.class);
+	// private static final Logger logger = LoggerFactory.getLogger(LC998.class);
 
 	@Autowired
 	public TableColumnServiceImpl tableColumnServiceImpl;

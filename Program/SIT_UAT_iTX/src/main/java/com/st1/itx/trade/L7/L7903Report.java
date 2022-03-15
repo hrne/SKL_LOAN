@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,7 +22,8 @@ import java.text.DecimalFormat;
 @Scope("prototype")
 
 public class L7903Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L7903Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(L7903Report.class);
 
 	@Autowired
 	public L7903ServiceImpl L7903ServiceImpl;

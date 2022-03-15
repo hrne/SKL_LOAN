@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -33,7 +31,7 @@ import com.st1.itx.db.service.springjpa.cm.LC900ServiceImpl;
  * @version 1.0.0
  */
 public class LC900 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC900.class);
+	// private static final Logger logger = LoggerFactory.getLogger(LC900.class);
 
 	// 檔案輸出路徑
 	@Value("${iTXOutFolder}")

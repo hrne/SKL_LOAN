@@ -2,8 +2,6 @@ package com.st1.itx.trade.LC;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +19,6 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class LC701 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC701.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -30,7 +27,9 @@ public class LC701 extends TradeBuffer {
 
 		this.info("LC701 執行月底日日終維護");
 
-		titaVo.setBatchJobId("eomFlow");
+//		titaVo.setBatchJobId("eomFlow");
+
+		titaVo.setBatchJobId("jcicFlow");
 
 		this.info("LC701 exit.");
 

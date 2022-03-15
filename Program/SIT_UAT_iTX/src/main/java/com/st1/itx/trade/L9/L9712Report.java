@@ -50,7 +50,7 @@ public class L9712Report extends MakeReport {
 		this.print(-4, 146, "頁　　次：");
 		this.print(0, 160, Integer.toString(this.getNowPage()), "R");
 
-		this.print(-5, 80, showRocDate(titaVo.get("ACCTDATE"), 1) + " - " + showRocDate(titaVo.get("ACCTDATE"), 1), "C");
+		this.print(-5, 80, showRocDate(titaVo.get("AcDateMin"), 1) + " - " + showRocDate(titaVo.get("AcDateMax"), 1), "C");
 		this.print(-5, 146, "單　　位：元");
 
 		this.print(-7, 84, "應    收                               減    免");
@@ -103,9 +103,9 @@ public class L9712Report extends MakeReport {
 			this.info("L9712ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 
-		long sno = this.close();
+		this.close();
 
-		// this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	private void report1(Map<String, String> tL9712Vo) throws LogicException {
@@ -133,12 +133,13 @@ public class L9712Report extends MakeReport {
 		totalInterestReceive += Integer.parseInt((tL9712Vo.get("F4")));
 
 		// 應收 違約金
-		this.print(0, 102, showAmt(tL9712Vo.get("F7")), "R");
-		totalBreachAmtReceive += Integer.parseInt((tL9712Vo.get("F7")));
+		this.print(0, 102, showAmt(tL9712Vo.get("F5")), "R");
+		totalBreachAmtReceive += Integer.parseInt((tL9712Vo.get("F5")));
 
 //		double amt = Double.parseDouble(tL9712Vo.get("F7"));
-//		
+		//減免 利息
 		int amt1 = Integer.valueOf(tL9712Vo.get("F6"));
+		//減免 違約金
 		int amt2 = Integer.valueOf(tL9712Vo.get("F7"));
 //
 //		if (amt > amt2) {
@@ -166,7 +167,7 @@ public class L9712Report extends MakeReport {
 			totalBreachAmtGrace += amt2;
 		}
 
-//		 tL9712Vo.get("F7")
+//		 tL9712Vo.get("F8")
 		// 授權主管
 		this.print(0, 147, String.format("%04d", Integer.valueOf(tL9712Vo.get("F8"))));
 	}

@@ -65,7 +65,6 @@ public class L1908ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "AND (A.\"PaperNotice\"='N' OR A.\"MsgNotice\"='N' OR A.\"EmailNotice\"='N') ";
 //		sql += "ORDER BY A.\"CustNo\",A.\"FacmNo\",A.\"FormNo\" ";
 
-		
 		String sql = "SELECT A.\"FormNo\",A.\"FormName\",A.\"SendCode\",A.\"LetterFg\",A.\"MessageFg\",A.\"EmailFg\"";
 		sql += ",NVL(B.\"PaperNotice\",'Y') AS \"PaperNotice\"";
 		sql += ",NVL(B.\"MsgNotice\",'Y') AS \"MsgNotice\"";
@@ -79,15 +78,10 @@ public class L1908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdEmp\" C ON C.\"EmployeeNo\"=B.\"LastUpdateEmpNo\" ";
 		sql += "WHERE A.\"SendCode\" > 0 ";
 		sql += "ORDER BY A.\"FormNo\" ";
-		
+
 //		sql += sqlRow;
 
 		this.info("Find L1908 sql=" + sql);
-
-		// *** 折返控制相關 ***
-		this.index = index;
-		// *** 折返控制相關 ***
-		this.limit = limit;
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

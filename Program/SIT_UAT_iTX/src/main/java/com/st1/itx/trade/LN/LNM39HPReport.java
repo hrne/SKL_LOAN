@@ -98,7 +98,6 @@ public class LNM39HPReport extends MakeReport {
 			if (L7List.size() == 0) { // 無資料時，會出空檔
 
 			} else {
-				this.info("*** : " + L7List);
 				// 欄位內容
 				for (Map<String, String> tL7Vo : L7List) {
 					strContent = "";
@@ -136,7 +135,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 初貸日期
 						case 8:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(台幣)
 						case 9:
@@ -144,7 +143,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 產品別
 						case 10:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(台幣)
 						case 11:
@@ -154,7 +153,7 @@ public class LNM39HPReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 1, '0');
 							break; // 該筆額度是否為不可撤銷 1=是 0=否
 						case 13:
-							// strField = strField.substring(1);
+							//strField = strField.substring(1);
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 主計處行業別代碼
 						case 14:
@@ -179,12 +178,12 @@ public class LNM39HPReport extends MakeReport {
 							break; // 違約損失率
 						case 20:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(交易幣)
 						case 21:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(交易幣)
 						default:

@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service("l5974ServiceImpl")
 @Repository
 public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5974ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -61,24 +58,24 @@ public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<String[]> FindL5974(int index, int limit, String sql, String FinCode, TitaVo titaVo) throws LogicException {
-		logger.info("FindData");
+		this.info("FindData");
 
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		logger.info("L5974ServiceImpl sql=[" + sql + "]");
+		this.info("L5974ServiceImpl sql=[" + sql + "]");
 
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		logger.info("L5974ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
+		this.info("L5974ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
 
 		if (FinCode != null && FinCode.length() != 0) {
-			logger.info("L5974ServiceImpl FinCode=[" + FinCode + "]");
+			this.info("L5974ServiceImpl FinCode=[" + FinCode + "]");
 			query.setParameter("FinCode", FinCode);
 		}
 

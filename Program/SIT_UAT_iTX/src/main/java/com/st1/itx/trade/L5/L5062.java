@@ -44,6 +44,8 @@ public class L5062 extends TradeBuffer {
 
 		// 取得輸入資料
 		String iCityCode = titaVo.getParam("CityCode");
+		String iLegalPsnNo = titaVo.getParam("LegalPsn");
+		String iLegalPsnName = titaVo.getParam("LegalPsnX");
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -51,67 +53,88 @@ public class L5062 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200; // 51 * 200 = 10,200
 		Slice<CdCity> iCdCity = null;
-
+		
 		if (iCityCode.equals("00") || iCityCode.trim().isEmpty()) {
 			iCdCity = sCdCityService.findAll(0, Integer.MAX_VALUE, titaVo);
-		} else {
+		}else {
 			iCdCity = sCdCityService.findCityCode(iCityCode, iCityCode, this.index, this.limit, titaVo);
 		}
-
+		
+		int iCount = 0 ;
 		if (iCdCity == null) {
 			throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
 		} else {
 			for (CdCity rCdCity : iCdCity) {
 				OccursList occursList = new OccursList();
 				CdEmp iCdEmp = new CdEmp();
-				String iEmpNo = "";
 				String iAccTelArea = "";
 				String iAccTelNo = "";
 				String iAccTelExt = "";
 				String iAccCollPsnX = "";
-
-				occursList.putParam("OOCityCode", rCdCity.getCityCode());
-				occursList.putParam("OOCityItem", rCdCity.getCityItem());
-				occursList.putParam("OOUnitCode", rCdCity.getUnitCode());
-
-				iEmpNo = rCdCity.getAccCollPsn();// 催收人員
-				if (!iEmpNo.trim().isEmpty() || !iEmpNo.equals("")) {
-					iAccTelArea = rCdCity.getAccTelArea();
-					iAccTelNo = rCdCity.getAccTelNo();
-					iAccTelExt = rCdCity.getAccTelExt();
-					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
-					if (iCdEmp != null) {
-						iAccCollPsnX = iCdEmp.getFullname();
-					}
-				}
-				occursList.putParam("OOAccCollPsn", iEmpNo);
-				occursList.putParam("OOAccTelArea", iAccTelArea);
-				occursList.putParam("OOAccTelNo", iAccTelNo);
-				occursList.putParam("OOAccTelExt", iAccTelExt);
-				occursList.putParam("OOAccCollPsnX", iAccCollPsnX);
-
-				iEmpNo = rCdCity.getLegalPsn();// 法務人員
 				String iLegalArea = "";
 				String iLegalNo = "";
 				String iLegalExt = "";
 				String iLegalPsnX = "";
-				if (!iEmpNo.trim().isEmpty() || !iEmpNo.equals("")) {
+				String iLegalPsn = "";
+				String iAccCollPsn = "";
+
+				iLegalPsn = rCdCity.getLegalPsn();// 法務人員
+				if (!iLegalPsn.trim().isEmpty() || !iLegalPsn.equals("")) {
 					iLegalArea = rCdCity.getLegalArea();
 					iLegalNo = rCdCity.getLegalNo();
 					iLegalExt = rCdCity.getLegalExt();
-					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
+					iCdEmp = sCdEmpService.findById(iLegalPsn, titaVo);
 					if (iCdEmp != null) {
 						iLegalPsnX = iCdEmp.getFullname();
 					}
 				}
-				occursList.putParam("OOLegalPsn", iEmpNo);
+				
+				iAccCollPsn = rCdCity.getAccCollPsn();// 催收人員
+				if (!iAccCollPsn.trim().isEmpty() || !iAccCollPsn.equals("")) {
+					iAccTelArea = rCdCity.getAccTelArea();
+					iAccTelNo = rCdCity.getAccTelNo();
+					iAccTelExt = rCdCity.getAccTelExt();
+					iCdEmp = sCdEmpService.findById(iAccCollPsn, titaVo);
+					if (iCdEmp != null) {
+						iAccCollPsnX = iCdEmp.getFullname();
+					}
+				}
+
+				if (!iLegalPsnNo.trim().isEmpty()) {// 畫面有輸入法務人員員編
+					if (!iLegalPsnNo.equals(iLegalPsn) && !iLegalPsnNo.equals(iAccCollPsn)) {
+						continue;
+					}
+				}
+				
+				if (!iLegalPsnName.trim().isEmpty()) {// 畫面有輸入法務人員姓名
+					if (!iLegalPsnName.equals(iLegalPsnX) && !iLegalPsnName.equals(iAccCollPsnX)) {
+						continue;
+					}
+				}
+
+				iCount = 1 ;
+				occursList.putParam("OOCityCode", rCdCity.getCityCode());
+				occursList.putParam("OOCityItem", rCdCity.getCityItem());
+				occursList.putParam("OOUnitCode", rCdCity.getUnitCode());
+
+				occursList.putParam("OOLegalPsn", rCdCity.getLegalPsn());
 				occursList.putParam("OOLegalArea", iLegalArea);
 				occursList.putParam("OOLegalNo", iLegalNo);
 				occursList.putParam("OOLegalExt", iLegalExt);
 				occursList.putParam("OOLegalPsnX", iLegalPsnX);
 
+				occursList.putParam("OOAccCollPsn", rCdCity.getAccCollPsn());
+				occursList.putParam("OOAccTelArea", iAccTelArea);
+				occursList.putParam("OOAccTelNo", iAccTelNo);
+				occursList.putParam("OOAccTelExt", iAccTelExt);
+				occursList.putParam("OOAccCollPsnX", iAccCollPsnX);
+
 				this.totaVo.addOccursList(occursList);
 			}
+		}
+		
+		if (iCount == 0) {
+			throw new LogicException(titaVo, "E0001", "無此法催人員"); // 查無資料
 		}
 
 		this.addList(this.totaVo);

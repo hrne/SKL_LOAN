@@ -35,8 +35,11 @@ public class L9714Report extends MakeReport {
 	String f10 = "";
 	String isday = "";
 	String ieday = "";
+	
+	
 	int cnt = 0;
 
+	//起始欄
 	int colCount = 8;
 
 	@Override
@@ -45,9 +48,9 @@ public class L9714Report extends MakeReport {
 		// this.setFontSize(13);
 		this.setCharSpaces(0);
 
-		if (f0.equals("")) {
-			return;
-		}
+//		if (f0.equals("")) {
+//			return;
+//		}
 
 		this.setBeginRow(3);
 
@@ -72,45 +75,58 @@ public class L9714Report extends MakeReport {
 		this.print(-11, colCount + 67, "└─┴─────────────┘");
 
 		this.print(-13, colCount + 1, "┌────┬──────┬────────┬───────────────────────────┐");
-		this.print(-14, colCount + 1, "│借戶姓名│            │房屋所有權人姓名│※                                                    │");
+		this.print(-14, colCount + 1,
+				"│借戶姓名│            │房屋所有權人姓名│※                                                    │");
 		this.print(-15, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-16, colCount + 1, "│統一編號│            │統一編號        │※                                                    │");
+		this.print(-16, colCount + 1,
+				"│統一編號│            │統一編號        │※                                                    │");
 		this.print(-17, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-18, colCount + 1, "│房屋稅籍│※          │房屋坐落        │※                                                    │");
+		this.print(-18, colCount + 1,
+				"│房屋稅籍│※          │房屋坐落        │※                                                    │");
 		this.print(-19, colCount + 1, "└────┴──────┴────────┴───────────────────────────┘");
 
 		this.print(-21, colCount + 1, "┌──────┬───────┬─────────┬──────┬──────┬─────────┐");
-		this.print(-22, colCount + 1, "│房屋所有權　│              │                  │            │            │      本期未償還　│");
+		this.print(-22, colCount + 1,
+				"│房屋所有權　│              │                  │            │            │      本期未償還　│");
 		this.print(-23, colCount + 1, "│取得日※    │ 貸款帳號     │     最初貸款金額 │   貸款起日 │   貸款迄日 │      本金額（元）│");
 		this.print(-24, colCount + 1, "├──────┼───────┼─────────┼──────┼──────┼─────────┤");
-		this.print(-25, colCount + 1, "│            │              │                  │            │            │                  │");
+		this.print(-25, colCount + 1,
+				"│            │              │                  │            │            │                  │");
 		this.print(-26, colCount + 1, "└──────┴───────┴─────────┴──────┴──────┴─────────┘");
 
 		this.print(-28, colCount + 1, "┌──────────────┬────────────────┬────────────────┐");
-		this.print(-29, colCount + 1, "│繳息所屬年月                │                      繳息金額　│                    用途別      │");
+		this.print(-29, colCount + 1,
+				"│繳息所屬年月                │                      繳息金額　│                    用途別      │");
 		this.print(-30, colCount + 1, "├──────────────┼────────────────┼────────────────┤");
-		this.print(-31, colCount + 1, "│自                          │                                │                                │");
-		this.print(-32, colCount + 1, "│至                          │                                │                                │");
+		this.print(-31, colCount + 1,
+				"│自                          │                                │                                │");
+		this.print(-32, colCount + 1,
+				"│至                          │                                │                                │");
 
 		String tmp;
-//		this.info("f0=" + f0 + ",f1=" + f1 + ",f2=" + f2 + ",f3=" + f3 + ",f4=" + f4 + ",f5=" + f5 + ",f6=" + f6
-//				+ ",f7=" + f7);
 
 		tmp = f0;
 		if (tmp.length() > 5) {
 			tmp = tmp.substring(0, 5);
 		}
+		// 姓名
 		this.print(-14, colCount + 14, tmp);
+		// 身分證
 		this.print(-16, colCount + 14, f1);
-
+		// 房屋所有權取得日
+		this.print(-25, colCount + 14, showRocDate(f10, 1), "R");
+		// 貸款帳號(戶號+額度)
 		tmp = String.format("%07d", Integer.valueOf(f2)) + "-" + String.format("%03d", Integer.valueOf(f3));
 		this.print(-25, colCount + 18, tmp);
-
+		// 最初貸款金額
 		this.print(-25, colCount + 50, showAmt(f4), "R");
+		// 貸款起日
 		this.print(-25, colCount + 64, showRocDate(f5, 1), "R");
+		// 貸款迄日
 		this.print(-25, colCount + 78, showRocDate(f6, 1), "R");
+		// 本期未償還本金額
 		this.print(-25, colCount + 98, showAmt(f7), "R");
-
+		// 繳息所屬年月
 		if (ieday.length() == 6) {
 			this.print(-32, colCount + 7, ieday.substring(0, 2) + " 年 " + ieday.substring(2, 4) + " 月");
 		} else {
@@ -130,7 +146,6 @@ public class L9714Report extends MakeReport {
 		List<Map<String, String>> l9714List = null;
 
 		try {
-
 			l9714List = l9714ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -138,9 +153,9 @@ public class L9714Report extends MakeReport {
 			this.info("L9714ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 
-//		if (l9714List == null || l9714List.isEmpty()) {
-//			return false;
-//		}
+		if (l9714List.size() == 0 || l9714List.isEmpty()) {
+			return false;
+		}
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9714", "繳息證明單", "", "A4", "P");
 
@@ -148,10 +163,8 @@ public class L9714Report extends MakeReport {
 			for (Map<String, String> tL9714Vo : l9714List) {
 
 				if (!tL9714Vo.get("F3").equals(f3)) {
-//					if (this.getNowPage() > 0) {
-//						printEnd();
-//					}
-					f0 = tL9714Vo.get("F0");
+
+					f0 = tL9714Vo.get("F0").isEmpty() ? " " : tL9714Vo.get("F0");
 					f1 = tL9714Vo.get("F1");
 					f2 = tL9714Vo.get("F2");
 					f3 = tL9714Vo.get("F3");
@@ -159,11 +172,13 @@ public class L9714Report extends MakeReport {
 					f5 = tL9714Vo.get("F5");
 					f6 = tL9714Vo.get("F6");
 					f7 = tL9714Vo.get("F7");
+					f10 = tL9714Vo.get("F10");
 					this.newPage();
 					cnt = 0;
 
 				}
-				report1(tL9714Vo);
+				report(tL9714Vo);
+				
 				printEnd();
 			}
 		} else {
@@ -181,39 +196,25 @@ public class L9714Report extends MakeReport {
 			printEnd();
 		}
 
-//		if (this.getNowPage() > 0) {
-//			printEnd();
-//		}
-		// 為了不跑無資料
-//		drawLine(0, 0, 0, 0);
-		long sno = this.close();
+		this.close();
 
-		// 測試用
-		// this.toPdf(sno);
-		if (l9714List.size() > 0) {
-			return true;
-		} else {
-			return false;
+		return true;
 
-		}
 	}
 
+	/**
+	 * 列印頁尾
+	 * 
+	 */
 	private void printEnd() {
-//		if (cnt == 1) {
-//			this.print(-31, colCount + 1,
-//					"│至                          │                                │                                │");
-//			if (ieday.length() == 6) {
-//				this.print(-32, colCount + 7, ieday.substring(0, 2) + " 年 " + ieday.substring(2, 4) + " 月");
-//			} else {
-//				this.print(-32, colCount + 6, ieday.substring(0, 3) + " 年 " + ieday.substring(3, 5) + " 月");
-//			}
-//		}
+
 		this.print(-33, colCount + 1, "└──────────────┴────────────────┴────────────────┘");
 		this.print(-34, colCount + 1, " ( 註１：有※註記的欄位，由借戶自行填寫 )");
 		this.print(-35, colCount + 1, " ( 註２：申報所得稅─非自用住宅借款利息，不得列舉 )");
 	}
 
-	private void report1(Map<String, String> tL9714Vo) {
+
+	private void report(Map<String, String> tL9714Vo) {
 		String tmp = "";
 
 		cnt += 1;
@@ -244,8 +245,7 @@ public class L9714Report extends MakeReport {
 		}
 
 		if (cnt == 1) {
-//			this.print(-31, colCount + 1,
-//					"│自                          │                                │                                │");
+
 			if (isday.length() == 6) {
 				this.print(-31, colCount + 7, isday.substring(0, 2) + " 年 " + isday.substring(2, 4) + " 月");
 			} else {
@@ -253,20 +253,25 @@ public class L9714Report extends MakeReport {
 				this.print(-31, colCount + 6, isday.substring(0, 3) + " 年 " + isday.substring(3, 5) + " 月");
 			}
 		} else if (cnt == 2) {
-//			this.print(-32, colCount + 1,
-//					"│至                          │                                │                                │");
+
 			if (ieday.length() == 6) {
 				this.print(-32, colCount + 7, ieday.substring(0, 2) + " 年 " + ieday.substring(2, 4) + " 月");
 			} else {
 				this.print(-32, colCount + 6, ieday.substring(0, 3) + " 年 " + ieday.substring(3, 5) + " 月");
 			}
 		} else {
-			this.print(1, colCount + 1, "│                            │                                │                                │");
+			this.print(1, colCount + 1,
+					"│                            │                                │                                │");
 		}
+		// 繳息金額
 		this.print(0, colCount + 63, showAmt(tL9714Vo.get("F9")), "R");
+		// 用途別
 		this.print(0, colCount + 87, tmp);
 	}
 
+	/**
+	 * 金額格式化
+	 * */
 	private String showAmt(String xamt) {
 		if (xamt == null || xamt.equals("") || xamt.equals("0")) {
 			return "";

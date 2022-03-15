@@ -33,6 +33,7 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6075 extends TradeBuffer {
+	// private static final Logger logger = LoggerFactory.getLogger(L6075.class);
 
 	/* DB服務注入 */
 	@Autowired

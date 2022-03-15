@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,7 +23,8 @@ import java.text.SimpleDateFormat;
 @Scope("prototype")
 
 public class LNM004Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LNM004Report.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LNM004Report.class);
 
 	Date dateNow = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");

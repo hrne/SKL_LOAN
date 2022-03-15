@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("facShareSubService")
 @Repository
-public class FacShareSubServiceImpl implements FacShareSubService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(FacShareSubServiceImpl.class);
+public class FacShareSubServiceImpl extends ASpringJpaParm implements FacShareSubService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + facShareSubId);
+		this.info("findById " + dbName + " " + facShareSubId);
 		Optional<FacShareSub> facShareSub = null;
 		if (dbName.equals(ContentName.onDay))
 			facShareSub = facShareSubReposDay.findById(facShareSubId);
@@ -97,7 +94,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ShareCustNo", "ShareFacmNo"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = facShareSubReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -125,7 +122,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findMainIdEq " + dbName + " : " + "creditSysNo_0 : " + creditSysNo_0 + " mainCustNo_1 : " + mainCustNo_1);
+		this.info("findMainIdEq " + dbName + " : " + "creditSysNo_0 : " + creditSysNo_0 + " mainCustNo_1 : " + mainCustNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = facShareSubReposDay.findAllByCreditSysNoIsAndMainCustNoIsOrderByShareSeqAscShareCustNoAscShareFacmNoAsc(creditSysNo_0, mainCustNo_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -153,7 +150,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findCustNoEq " + dbName + " : " + "shareCustNo_0 : " + shareCustNo_0 + " shareFacmNo_1 : " + shareFacmNo_1 + " shareFacmNo_2 : " + shareFacmNo_2);
+		this.info("findCustNoEq " + dbName + " : " + "shareCustNo_0 : " + shareCustNo_0 + " shareFacmNo_1 : " + shareFacmNo_1 + " shareFacmNo_2 : " + shareFacmNo_2);
 		if (dbName.equals(ContentName.onDay))
 			slice = facShareSubReposDay
 					.findAllByShareCustNoIsAndShareFacmNoGreaterThanEqualAndShareFacmNoLessThanEqualOrderByCreditSysNoAscMainCustNoAscMainFacmNoAscShareSeqAscShareCustNoAscShareFacmNoAsc(
@@ -189,7 +186,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findMainFacmNoEq " + dbName + " : " + "mainCustNo_0 : " + mainCustNo_0 + " mainFacmNo_1 : " + mainFacmNo_1);
+		this.info("findMainFacmNoEq " + dbName + " : " + "mainCustNo_0 : " + mainCustNo_0 + " mainFacmNo_1 : " + mainFacmNo_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = facShareSubReposDay.findAllByMainCustNoIsAndMainFacmNoIsOrderByShareSeqAscShareCustNoAscShareFacmNoAsc(mainCustNo_0, mainFacmNo_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -210,7 +207,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + facShareSubId);
+		this.info("Hold " + dbName + " " + facShareSubId);
 		Optional<FacShareSub> facShareSub = null;
 		if (dbName.equals(ContentName.onDay))
 			facShareSub = facShareSubReposDay.findByFacShareSubId(facShareSubId);
@@ -228,7 +225,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + facShareSub.getFacShareSubId());
+		this.info("Hold " + dbName + " " + facShareSub.getFacShareSubId());
 		Optional<FacShareSub> facShareSubT = null;
 		if (dbName.equals(ContentName.onDay))
 			facShareSubT = facShareSubReposDay.findByFacShareSubId(facShareSub.getFacShareSubId());
@@ -251,7 +248,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + facShareSub.getFacShareSubId());
+		this.info("Insert..." + dbName + " " + facShareSub.getFacShareSubId());
 		if (this.findById(facShareSub.getFacShareSubId()) != null)
 			throw new DBException(2);
 
@@ -280,7 +277,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + facShareSub.getFacShareSubId());
+		this.info("Update..." + dbName + " " + facShareSub.getFacShareSubId());
 		if (!empNot.isEmpty())
 			facShareSub.setLastUpdateEmpNo(empNot);
 
@@ -303,7 +300,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + facShareSub.getFacShareSubId());
+		this.info("Update..." + dbName + " " + facShareSub.getFacShareSubId());
 		if (!empNot.isEmpty())
 			facShareSub.setLastUpdateEmpNo(empNot);
 
@@ -323,7 +320,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + facShareSub.getFacShareSubId());
+		this.info("Delete..." + dbName + " " + facShareSub.getFacShareSubId());
 		if (dbName.equals(ContentName.onDay)) {
 			facShareSubReposDay.delete(facShareSub);
 			facShareSubReposDay.flush();
@@ -351,7 +348,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (FacShareSub t : facShareSub) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -383,7 +380,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (facShareSub == null || facShareSub.size() == 0)
 			throw new DBException(6);
 
@@ -408,7 +405,7 @@ public class FacShareSubServiceImpl implements FacShareSubService, InitializingB
 
 	@Override
 	public void deleteAll(List<FacShareSub> facShareSub, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

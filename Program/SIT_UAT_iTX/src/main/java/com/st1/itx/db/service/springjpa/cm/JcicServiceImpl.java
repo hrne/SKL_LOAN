@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,7 +21,6 @@ import com.st1.itx.util.common.JcicCom;
 @Service("jcicServiceImpl")
 @Repository
 public class JcicServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(JcicServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -47,7 +44,7 @@ public class JcicServiceImpl extends ASpringJpaParm implements InitializingBean 
 
 	public String sqlJcic(TitaVo titaVo, String chainCd) {
 		// ChainCd 交易編號
-		logger.info("JcicService sqlJcic chainCd=[" + chainCd + "]");
+		this.info("JcicService sqlJcic chainCd=[" + chainCd + "]");
 		String sql = "";
 		String order = "";
 		if (("L8R10").equals(chainCd)) {
@@ -75,25 +72,25 @@ public class JcicServiceImpl extends ASpringJpaParm implements InitializingBean 
 	}
 
 	public List<String[]> FindJcic(int index, int limit, String sql, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
-		logger.info("FindData");
+		this.info("FindData");
 
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		logger.info("JcicServiceImpl sql=[" + sql + "]");
+		this.info("JcicServiceImpl sql=[" + sql + "]");
 
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		logger.info("JcicServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
+		this.info("JcicServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
 
 		if (queryKey != null && queryKey.size() != 0) {
 			for (String key : queryKey.keySet()) {
-				logger.info("JcicService FindJcic Key=[" + key + "],keyValue=[" + queryKey.get(key) + "]");
+				this.info("JcicService FindJcic Key=[" + key + "],keyValue=[" + queryKey.get(key) + "]");
 				query.setParameter(key, queryKey.get(key));
 			}
 		}

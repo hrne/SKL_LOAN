@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txAgentService")
 @Repository
-public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(TxAgentServiceImpl.class);
+public class TxAgentServiceImpl extends ASpringJpaParm implements TxAgentService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + txAgentId);
+		this.info("findById " + dbName + " " + txAgentId);
 		Optional<TxAgent> txAgent = null;
 		if (dbName.equals(ContentName.onDay))
 			txAgent = txAgentReposDay.findById(txAgentId);
@@ -97,7 +94,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "TlrNo", "AgentTlrNo"));
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAgentReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -122,7 +119,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findByAgentTlrNo " + dbName + " : " + "agentTlrNo_0 : " + agentTlrNo_0);
+		this.info("findByAgentTlrNo " + dbName + " : " + "agentTlrNo_0 : " + agentTlrNo_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAgentReposDay.findAllByAgentTlrNoIsOrderByTlrNoAsc(agentTlrNo_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -147,7 +144,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			pageable = Pageable.unpaged();
 		else
 			pageable = PageRequest.of(index, limit);
-		logger.info("findByTlrNo " + dbName + " : " + "tlrNo_0 : " + tlrNo_0);
+		this.info("findByTlrNo " + dbName + " : " + "tlrNo_0 : " + tlrNo_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = txAgentReposDay.findAllByTlrNoIsOrderByAgentTlrNoAsc(tlrNo_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -165,7 +162,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txAgentId);
+		this.info("Hold " + dbName + " " + txAgentId);
 		Optional<TxAgent> txAgent = null;
 		if (dbName.equals(ContentName.onDay))
 			txAgent = txAgentReposDay.findByTxAgentId(txAgentId);
@@ -183,7 +180,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + txAgent.getTxAgentId());
+		this.info("Hold " + dbName + " " + txAgent.getTxAgentId());
 		Optional<TxAgent> txAgentT = null;
 		if (dbName.equals(ContentName.onDay))
 			txAgentT = txAgentReposDay.findByTxAgentId(txAgent.getTxAgentId());
@@ -206,7 +203,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("Insert..." + dbName + " " + txAgent.getTxAgentId());
+		this.info("Insert..." + dbName + " " + txAgent.getTxAgentId());
 		if (this.findById(txAgent.getTxAgentId()) != null)
 			throw new DBException(2);
 
@@ -235,7 +232,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txAgent.getTxAgentId());
+		this.info("Update..." + dbName + " " + txAgent.getTxAgentId());
 		if (!empNot.isEmpty())
 			txAgent.setLastUpdateEmpNo(empNot);
 
@@ -258,7 +255,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + txAgent.getTxAgentId());
+		this.info("Update..." + dbName + " " + txAgent.getTxAgentId());
 		if (!empNot.isEmpty())
 			txAgent.setLastUpdateEmpNo(empNot);
 
@@ -278,7 +275,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + txAgent.getTxAgentId());
+		this.info("Delete..." + dbName + " " + txAgent.getTxAgentId());
 		if (dbName.equals(ContentName.onDay)) {
 			txAgentReposDay.delete(txAgent);
 			txAgentReposDay.flush();
@@ -306,7 +303,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (TxAgent t : txAgent) {
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -338,7 +335,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (txAgent == null || txAgent.size() == 0)
 			throw new DBException(6);
 
@@ -363,7 +360,7 @@ public class TxAgentServiceImpl implements TxAgentService, InitializingBean {
 
 	@Override
 	public void deleteAll(List<TxAgent> txAgent, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

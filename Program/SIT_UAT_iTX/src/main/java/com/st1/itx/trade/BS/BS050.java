@@ -11,15 +11,14 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CdLoanNotYet;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanNotYet;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CdLoanNotYetService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanNotYetService;
@@ -55,11 +54,12 @@ public class BS050 extends TradeBuffer {
 	@Autowired
 	private LoanNotYetService loanNotYetService;
 	@Autowired
+	public CdLoanNotYetService cdLoanNotYetService;
+	@Autowired
 	private LoanBorMainService loanBorMainService;
 	@Autowired
 	private FacMainService facMainService;
-	@Autowired
-	private CdCodeService cdCodeService;
+
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -92,18 +92,29 @@ public class BS050 extends TradeBuffer {
 					continue;
 				}
 //				取未齊件代碼中文 找不到時放入原代碼
-				CdCode tCdCode = cdCodeService.findById(new CdCodeId("NotYetCode", t.getNotYetCode()), titaVo);
-				if (tCdCode != null) {
-					wkNotYetItem = tCdCode.getItem();
+//				CdCode tCdCode = cdCodeService.findById(new CdCodeId("NotYetCode", t.getNotYetCode()), titaVo);
+//				if (tCdCode != null) {
+//					wkNotYetItem = tCdCode.getItem();
+//				} else {
+//					wkNotYetItem = t.getNotYetCode();
+//				}
+
+				/*
+				 * 未齊件代碼說明2022.2.9 by 昱衡
+				 */
+				CdLoanNotYet cdLoanNotYet = cdLoanNotYetService.findById(t.getNotYetCode(), titaVo);
+				if (cdLoanNotYet != null) {
+					wkNotYetItem = cdLoanNotYet.getNotYetItem();
 				} else {
 					wkNotYetItem = t.getNotYetCode();
 				}
-
+				
 				tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
 //				取額度建檔所列[房貸專員/企金人員]
 				if (tFacMain != null && !"".equals(tFacMain.getBusinessOfficer())) {
 
-					bodyText += " 案件編號 " + tFacMain.getCreditSysNo() + " 核准號碼 " + tFacMain.getApplNo() + " 初貸日 " + tFacMain.getFirstDrawdownDate() + " 房貸專員 " + tFacMain.getBusinessOfficer();
+					bodyText += " 案件編號 " + tFacMain.getCreditSysNo() + " 核准號碼 " + tFacMain.getApplNo() + " 初貸日 "
+							+ tFacMain.getFirstDrawdownDate() + " 房貸專員 " + tFacMain.getBusinessOfficer();
 					if (!"".equals(tFacMain.getBusinessOfficer())) {
 
 						tEmpNo = tFacMain.getBusinessOfficer();
@@ -112,7 +123,8 @@ public class BS050 extends TradeBuffer {
 					}
 
 				}
-				slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
+				slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(), 0, 900, 0,
+						Integer.MAX_VALUE, titaVo);
 				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 				if (lLoanBorMain != null && lLoanBorMain.size() > 0) {
 //				取「L3100撥款」登錄經辦
@@ -129,7 +141,8 @@ public class BS050 extends TradeBuffer {
 					}
 				}
 
-				String subject = "未齊件到期通知 借戶 " + FormatUtil.pad9("" + t.getCustNo(), 7) + "-" + FormatUtil.pad9("" + t.getFacmNo(), 3) + " 說明 :  " + wkNotYetItem;
+				String subject = "未齊件到期通知 借戶 " + FormatUtil.pad9("" + t.getCustNo(), 7) + "-"
+						+ FormatUtil.pad9("" + t.getFacmNo(), 3) + " 說明 :  " + wkNotYetItem;
 
 				bodyText += " 齊件到期日 " + t.getYetDate() + " 備註 " + t.getReMark();
 

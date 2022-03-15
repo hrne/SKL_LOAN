@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -41,7 +39,7 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2010")
 @Scope("prototype")
 public class L2010 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2010.class);
+	// private static final Logger logger = LoggerFactory.getLogger(L2010.class);
 
 	/* DB服務注入 */
 	@Autowired

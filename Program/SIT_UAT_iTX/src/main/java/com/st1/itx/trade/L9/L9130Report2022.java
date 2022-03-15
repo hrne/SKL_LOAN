@@ -212,7 +212,7 @@ public class L9130Report2022 extends MakeReport {
 		// no 檔案編號
 		String no = "L9130";
 		// desc 檔案說明
-		String desc = "總帳傳票媒體檔_" + iMediaSeq;
+		String desc = "總帳傳票媒體檔_" + FormatUtil.pad9("" + iMediaSeq, 3);
 
 		// 檔名編碼方式
 		// 固定值 核心傳票媒體上傳序號
@@ -530,7 +530,7 @@ public class L9130Report2022 extends MakeReport {
 		this.info("L9130 specialHandling transferAmt = " + transferAmt);
 
 		if (transferAmt.compareTo(BigDecimal.ZERO) != 0) {
-			
+
 			// 於借貸方各寫一筆10340000000 應收調撥款
 			String tempAcNoCode = "10340000000";
 			String tempAcSubNoCode = "     ";

@@ -38,7 +38,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //	public String FindL5051(String FunctionCd, String PerfDateFm, String PerfDateTo, String CustNo, String FacmNo) throws Exception {
 	public List<Map<String, String>> FindData(TitaVo titaVo, int index, int limit) throws Exception {
-		this.info("L5051FindData");
+		this.info("L6932FindData");
 
 		int txDate1 = Integer.parseInt(titaVo.getParam("ST_DT").toString());
 		int txDate2 = Integer.parseInt(titaVo.getParam("ED_DT").toString());
@@ -73,9 +73,15 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += "WHERE A.\"LastUpdate\" >= to_date(:TrDate1,'yyyymmdd hh24:mi:ss') AND A.\"LastUpdate\" <= to_date(:TrDate2,'yyyymmdd hh24:mi:ss') ";
 		}
-		if (CustNo > 0) {
+		
+		boolean skipCustNo = false;
+		//為客戶變更整合查詢及結清戶控管特殊處理
+		if (iMrKey.length() == 41 && "CustUKey:".equals(iMrKey.substring(0, 9))) {
+			skipCustNo = true;
+		} else if (CustNo > 0) {
 			sql += "AND A.\"CustNo\" = :CustNo ";
 		}
+		
 		if (FacmNo > 0) {
 			sql += "AND A.\"FacmNo\" = :FacmNo ";
 		}
@@ -123,7 +129,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("TrDate1", caDate1 + " 00:00:00");
 			query.setParameter("TrDate2", caDate2 + " 23:59:59");
 		}
-		if (CustNo > 0) {
+		if (CustNo > 0 && !skipCustNo) {
 			query.setParameter("CustNo", CustNo);
 		}
 		if (FacmNo > 0) {

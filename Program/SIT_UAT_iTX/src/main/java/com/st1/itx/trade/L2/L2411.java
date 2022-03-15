@@ -19,11 +19,14 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdArea;
 import com.st1.itx.db.domain.CdAreaId;
 import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdLandSection;
+import com.st1.itx.db.domain.CdLandSectionId;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClBuildingOwnerId;
 import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClImmRankDetail;
@@ -42,6 +45,7 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdClService;
+import com.st1.itx.db.service.CdLandSectionService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
@@ -92,6 +96,8 @@ public class L2411 extends TradeBuffer {
 	@Autowired
 	public CdAreaService sCdAreaService;
 	@Autowired
+	public CdLandSectionService sCdLandSectionService;
+	@Autowired
 	public ClBuildingService sClBuildingService;
 	@Autowired
 	public ClBuildingOwnerService sClBuildingOwnerService;
@@ -105,10 +111,10 @@ public class L2411 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
-
+	
 	@Autowired
-	public CheckClEva sCheckClEva;
-
+	public CheckClEva sCheckClEva ;
+	
 	/* DB服務注入 */
 	@Autowired
 	public ClParkingTypeService sClParkingTypeService;
@@ -227,7 +233,7 @@ public class L2411 extends TradeBuffer {
 				if (this.isEloan) {
 					iFunCd = 2;
 					// 新增擔保品重評資料
-					sCheckClEva.setClEva(titaVo, iClNo);
+					sCheckClEva.setClEva(titaVo,iClNo);
 				} else {
 					iFunCd = 2;
 					if (iClCode1 == 1) {
@@ -475,7 +481,7 @@ public class L2411 extends TradeBuffer {
 				}
 
 				if (iApplNo > 0) {
-
+					List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
 					for (int i = 1; i <= 20; i++) {
 						// 若該筆無資料就離開迴圈
 						if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
@@ -489,6 +495,11 @@ public class L2411 extends TradeBuffer {
 							String custUKey = custMain.getCustUKey().trim();
 							String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
 
+							HashMap<String, String> map = new HashMap<String, String>();
+							map.put("OwnerCustUKey", custUKey);
+							map.put("OwnerRelCode", relCode);
+							ownerMap.add(map);
+							
 							FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
 							if (facMain == null) {
 								throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
@@ -521,6 +532,19 @@ public class L2411 extends TradeBuffer {
 
 						} // if
 					} // for
+					
+					if(this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+						ClFacId clFacId = new ClFacId();
+						clFacId.setClCode1(iClCode1);
+						clFacId.setClCode2(iClCode2);
+						clFacId.setClNo(iClNo);
+						clFacId.setApproveNo(iApplNo);	
+						ClFac clFac = sClFacService.findById(clFacId, titaVo);
+						if (clFac == null) {
+							clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+						}
+					} 
+					
 				} // if
 
 			} else
@@ -913,7 +937,7 @@ public class L2411 extends TradeBuffer {
 			try {
 				sClBuildingOwnerService.insert(tClBuildingOwner, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E2009", "擔保品不動產土地檔" + e.getErrorMsg());
+				throw new LogicException("E2009", "擔保品建物所有權人檔" + e.getErrorMsg());
 			}
 			if (iApplNo > 0) {
 				ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
@@ -951,7 +975,7 @@ public class L2411 extends TradeBuffer {
 			try {
 				sClBuildingOwnerService.deleteAll(lClBuildingOwner, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品土地所有權人檔" + e.getErrorMsg());
+				throw new LogicException("E0008", "擔保品建物所有權人檔" + e.getErrorMsg());
 			}
 		}
 	}
@@ -1048,6 +1072,7 @@ public class L2411 extends TradeBuffer {
 		}
 
 		CityItem = tCdCity.getCityItem().trim();
+		
 		String AreaCode = titaVo.getParam("AreaCode").trim();
 
 		String AreaItem = "";
@@ -1057,7 +1082,17 @@ public class L2411 extends TradeBuffer {
 		}
 
 		AreaItem = tCdArea.getAreaItem().trim();
-
+		
+		String IrCode = titaVo.getParam("IrCode").trim();
+		
+		String IrItem = "";
+		CdLandSection tCdLandSection = sCdLandSectionService.findById(new CdLandSectionId(CityCode, AreaCode, IrCode), titaVo);
+		if (tCdLandSection == null) {
+			throw new LogicException("E0003", "地段代碼檔" + CityCode + "-" + AreaCode);
+		}
+		
+		IrItem = tCdLandSection.getIrItem().trim();
+		
 		String Road = titaVo.getParam("Road").trim();
 		String Section = titaVo.getParam("Section").trim();
 		String Alley = titaVo.getParam("Alley").trim();
@@ -1073,8 +1108,11 @@ public class L2411 extends TradeBuffer {
 		if (!AreaItem.isEmpty()) {
 			result += AreaItem;
 		}
+		if (!IrItem.isEmpty()) {
+			result += IrItem;
+		}
 		if (!Road.isEmpty()) {
-			result += Road;
+			result += Road ;
 		}
 		if (!Section.isEmpty()) {
 			result += Section + "段";
@@ -1100,5 +1138,5 @@ public class L2411 extends TradeBuffer {
 		this.info("L2415 getBdLocation result = " + result);
 		return result;
 	}
-
+	
 }

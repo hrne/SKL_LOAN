@@ -36,18 +36,6 @@ import com.st1.itx.util.common.data.BankRelationVo;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * FunCd=9,1 CustId=X,10 CustName1=X,50 CustName2=X,50 Birthday=9,7
- * CustTypeCode=9,2 IndustryCode=9,6 NationalityCode=X,2 SpouseId=X,10
- * SpouseName=X,100 RegZip3=X,3 RegZip2=X,2 RegCityCode=X,2 RegAreaCode=X,3
- * RegIrCode=X,4 RegRoad=X,40 RegSection=X,5 RegAlley=X,5 RegLane=X,5 RegNum=X,5
- * RegNumDash=X,5 RegFloor=X,5 RegFloorDash=X,5 CurrZip3=X,3 CurrZip2=X,2
- * CurrCityCode=X,2 CurrAreaCode=X,3 CurrIrCode=X,4 CurrRoad=X,40
- * CurrSection=X,5 CurrAlley=X,5 CurrLane=X,5 CurrNum=X,5 CurrNumDash=X,5
- * CurrFloor=X,5 CurrFloorDash=X,5 EntCode=X,1 EName=X,20
- */
-
 @Service("L1102")
 @Scope("prototype")
 /**
@@ -199,18 +187,6 @@ public class L1102 extends TradeBuffer {
 //					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
 //			}
 			
-			BankRelationVo vo = bankRelationCom.getBankRelation(CustId, titaVo);
-
-			if ("Y".equals(vo.getIsLimit())) {
-				wkIsLimit = "Y"; // 是否為授信限制對象
-			}
-			if ("Y".equals(vo.getIsRelated())) {
-				wkIsRelated = "Y"; // 是否為利害關係人
-			}
-			if ("Y".equals(vo.getIsLnrelNear())) {
-				wkIsLnrelNear = "Y"; // 是否為準利害關係人
-			}
-			wkIsDataDate = vo.getDataDate();
 		}
 
 //			刪除功能
@@ -238,10 +214,21 @@ public class L1102 extends TradeBuffer {
 
 		// 通訊地址
 		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
-		this.info("CurrAddres" + WkCurrAddres);
 		// 戶籍地址
 		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain, titaVo);
-		this.info("CurrAddres" + WkRegAddres);
+
+		BankRelationVo vo = bankRelationCom.getBankRelation(CustId, titaVo);
+
+		if ("Y".equals(vo.getIsLimit())) {
+			wkIsLimit = "Y"; // 是否為授信限制對象
+		}
+		if ("Y".equals(vo.getIsRelated())) {
+			wkIsRelated = "Y"; // 是否為利害關係人
+		}
+		if ("Y".equals(vo.getIsLnrelNear())) {
+			wkIsLnrelNear = "Y"; // 是否為準利害關係人
+		}
+		wkIsDataDate = vo.getDataDate();
 
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());
 		this.totaVo.putParam("OCustNo", tCustMain.getCustNo());
@@ -394,43 +381,6 @@ public class L1102 extends TradeBuffer {
 		tCustMain.setAllowInquire("2");
 	}
 
-	// 查詢放款主檔
-//	private int inqLoanBorMain(int cCustNo, int cChkFg, TitaVo titaVo) throws LogicException {
-//
-//		Slice<LoanBorMain> slLoanBorMain = null;
-//		slLoanBorMain = sLoanBorMainService.bormCustNoEq(cCustNo, 0, 999, 0, 999, 0, Integer.MAX_VALUE, titaVo);
-//		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-//
-//		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
-//			cChkFg = 0;
-//			return cChkFg;
-//		}
-//
-//		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
-//
-//			// 0:正常戶 2:催收戶 4:逾期戶 6:呆帳戶 7:部分轉呆戶 => 不需授權
-//			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
-//					|| tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
-//				cChkFg = 0;
-//				return cChkFg;
-//			}
-//
-//			// 3:結案戶 5:催收結案戶 8:債權轉讓戶 9:呆帳結案戶 => 滿5年需授權
-//			this.info("tLoanBorMain.getAcDate() = " + tLoanBorMain.getAcDate());
-//			this.info("this.txBuffer.getTxCom().getTbsdy() = " + this.txBuffer.getTxCom().getTbsdy());
-//			if (tLoanBorMain.getAcDate() + 50000 <= this.txBuffer.getTxCom().getTbsdy()) {
-//				cChkFg = 1;
-//				this.info("  > 5 year = " + cChkFg);
-//			} else {
-//				cChkFg = 0;
-//				this.info("  < 5 year = " + cChkFg);
-//				return cChkFg;
-//			}
-//		}
-//
-//		return cChkFg;
-//
-//	}
 
 	// by eric 2021.7.31
 	private void setCustCross(TitaVo titaVo, CustMain custMain) throws LogicException {

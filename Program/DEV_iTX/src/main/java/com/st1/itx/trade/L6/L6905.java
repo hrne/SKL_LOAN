@@ -190,8 +190,11 @@ public class L6905 extends TradeBuffer {
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 		if (lAcDetail == null || lAcDetail.size() == 0) {
+			this.info("into erro 1");
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
+		
+		this.info("lAcDetail=="+lAcDetail.size());
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
 
@@ -302,19 +305,21 @@ public class L6905 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
-
+			occursList.putParam("OOSlipNo", tAcDetail.getSlipNo());
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
+			
 		}
-
-		if (this.totaVo.getOccursList().size() == 0) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
-		}
+		
+//		if (this.totaVo.getOccursList().size() == 0) {
+//			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
+//		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slAcDetail != null && slAcDetail.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			// this.totaVo.setMsgEndToEnter();// 手動折返
+//			 this.totaVo.setMsgEndToEnter();// 手動折返
 			this.totaVo.setMsgEndToAuto();// 自動折返
 		}
 

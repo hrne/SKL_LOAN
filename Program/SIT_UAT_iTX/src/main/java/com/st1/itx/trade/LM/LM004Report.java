@@ -17,6 +17,9 @@ import com.st1.itx.util.common.MakeReport;
 
 public class LM004Report extends MakeReport {
 
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(LM004Report.class);
+
 	@Autowired
 	public LM004Report1 lm004report1;
 

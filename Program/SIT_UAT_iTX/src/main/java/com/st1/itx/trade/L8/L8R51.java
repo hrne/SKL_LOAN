@@ -80,17 +80,17 @@ public class L8R51 extends TradeBuffer {
 
 		// 查詢疑似洗錢交易訪談記錄檔
 		MlaundryRecord tMlaundryRecord = sMlaundryRecordService.findById(new MlaundryRecordId(iFRecordDate, iRimCustNo, iRimFacmNo, iRimBormNo), titaVo);
-
+		this.info("iRimFuncCode=="+iRimFuncCode);
 		/* 如有找到資料 */
 		if (tMlaundryRecord != null) {
-			if (iRimFuncCode == 1) {
-				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimCustNo")); // 新增資料已存在
+			if (iRimFuncCode == 1 || iRimFuncCode == 3) {
+				throw new LogicException(titaVo, "E0002", "訪談日期 ="+titaVo.getParam("RimRecordDate")+",戶號 ="+titaVo.getParam("RimCustNo")+"-"+titaVo.getParam("RimFacmNo")+"-"+titaVo.getParam("RimBormNo")); // 新增資料已存在
 			} else {
 				/* 將每筆資料放入Tota */
 				moveTotaMlaundryRecord(tMlaundryRecord, tCustMain.getCustName());
 			}
 		} else {
-			if (iRimFuncCode == 1) {
+			if (iRimFuncCode == 1 || iRimFuncCode == 3) {
 				this.addList(this.totaVo);
 				return this.sendList();
 			} else {

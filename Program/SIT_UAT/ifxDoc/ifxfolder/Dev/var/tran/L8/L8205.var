@@ -28,6 +28,9 @@ E(0,0)
 ["[L8205]                                 產生疑似洗錢報表"],
 ["#FdType+@報表",#Type,#TypeX],
 ["#FdRecordDate+#DateItem",#DateStart,"~",#DateEnd],
+["#FdRepayDate+@預定償還日期",#RepayDate],
+["#FdActualRepayDate+@實際償還日期",#ActualRepayDate],
+["#FdCustNo+@戶號",#CustNo],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -37,6 +40,9 @@ E(0,0)
 T(3,*)
 #FdType=X,2,L
 T(3,*)
+#FdRepayDate=X,2,L
+#FdActualRepayDate=X,2,L
+#FdCustNo=X,2,L
 
 #TypeHelp=x,200,S
 T(3,1:洗錢樣態3合理性報表;2:洗錢樣態1、2合理性報表;3:洗錢樣態3延遲交易報表;4:洗錢樣態1、2延遲交易報表;5:洗錢訪談報表)
@@ -44,7 +50,7 @@ T(3,1:洗錢樣態3合理性報表;2:洗錢樣態1、2合理性報表;3:洗錢�
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L8922、L8923進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L8922 疑似洗錢交易合理性查詢、L8923 疑似洗錢交易訪談記錄查詢]進入),$)
 
 #NTXBUF=X,5,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -75,6 +81,7 @@ HELP(#TypeHelp)
 @
 V(H,#TypeHelp)
 INVOKEJS(SHOW,p1,2,2,1)
+C(3,#Type,5,INVOKEJS(SHOW,p1,3,5,1),INVOKEJS(SHOW,p1,3,5,0))
 
 #TypeX=X,20,L
 T(H,#Type,#TypeHelp)
@@ -101,6 +108,17 @@ D(8)
 V(7)
 A(DATE,0,#DateEnd)
 V(5,#DateStart,#CDATEX)
+
+#RepayDate=D,7,I
+C(3,#Type,5,$,S)
+@A(DATE,0,#RepayDate)
+
+#ActualRepayDate=D,7,I
+C(3,#Type,5,$,S)
+@A(DATE,0,#ActualRepayDate)
+
+#CustNo=A,7,I
+C(3,#Type,5,$,S)
 
 
 #RPTFG=A,1,S
@@ -130,6 +148,9 @@ T(3,[L8205] 疑似洗錢報表產生)
 #DateStart
 #DateEnd
 #Type
+#RepayDate
+#ActualRepayDate
+#CustNo
 #END
 </sub>
 

@@ -58,7 +58,6 @@ public class L3943 extends TradeBuffer {
 	DateUtil dDateUtil;
 
 	private OccursList occursList;
-	private int wkTotalCount = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -89,9 +88,13 @@ public class L3943 extends TradeBuffer {
 		this.totaVo.putParam("OChequeAcct", tLoanCheque.getChequeAcct());
 		this.totaVo.putParam("OReceiveDate", tLoanCheque.getReceiveDate());
 		this.totaVo.putParam("OChequeNo", tLoanCheque.getChequeNo());
-		this.totaVo.putParam("OAcDate", tLoanCheque.getAcDate());
+		// AcDate 為 0 時不顯示
+		int tmpDate = tLoanCheque.getAcDate();
+		this.totaVo.putParam("OAcDate", tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
 		this.totaVo.putParam("OChequeDate", tLoanCheque.getChequeDate());
-		this.totaVo.putParam("OEntryDate", tLoanCheque.getEntryDate());
+		// entrydate 為 0 時不顯示
+		tmpDate = tLoanCheque.getEntryDate(); 
+		this.totaVo.putParam("OEntryDate", tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
 		// 查詢行庫代號檔
 		String iBankCode1 = FormatUtil.padX(tLoanCheque.getBankCode().trim(), 7);
 		String bankCode1 = FormatUtil.padX(iBankCode1, 3);
@@ -151,7 +154,6 @@ public class L3943 extends TradeBuffer {
 //				}
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
-				wkTotalCount++;
 			}
 		}
 

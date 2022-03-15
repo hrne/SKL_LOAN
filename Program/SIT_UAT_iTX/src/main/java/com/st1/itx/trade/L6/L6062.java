@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6062 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6062.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -49,7 +46,8 @@ public class L6062 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		String iIndustryCode = titaVo.getParam("IndustryCode");
+		String iIndustryCode = titaVo.getParam("IndustryCode").trim();
+		String iIndustryItem = titaVo.get("IndustryItem").trim();
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -59,10 +57,12 @@ public class L6062 extends TradeBuffer {
 
 		// 查詢行業別代號資料檔
 		Slice<CdIndustry> slCdIndustry;
-		if (iIndustryCode.isEmpty() || iIndustryCode.equals("000000")) {
+		if(iIndustryCode.isEmpty() && iIndustryItem.isEmpty()) {
 			slCdIndustry = sCdIndustryService.findAll(this.index, this.limit, titaVo);
-		} else {
-			slCdIndustry = sCdIndustryService.findIndustryCode(iIndustryCode, iIndustryCode, this.index, this.limit, titaVo);
+		} else if (!iIndustryCode.isEmpty()) {
+			slCdIndustry = sCdIndustryService.findIndustryCode(iIndustryCode+"%", this.index, this.limit, titaVo);
+		} else{
+			slCdIndustry = sCdIndustryService.findIndustryItem("%"+iIndustryItem+"%", this.index, this.limit, titaVo);
 		}
 		List<CdIndustry> lCdIndustry = slCdIndustry == null ? null : slCdIndustry.getContent();
 

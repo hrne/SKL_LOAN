@@ -55,7 +55,7 @@ public class L6970 extends TradeBuffer {
 	private void doInquiry(TitaVo titaVo) throws LogicException {
 		this.info("L6970 doInquiry ... ");
 
-		int choice = parse.stringToInteger(titaVo.getParam("Choice"));
+		int batchResultCode = parse.stringToInteger(titaVo.getParam("BatchResultCode"));
 		int inputStartDate = parse.stringToInteger(titaVo.getParam("InputStartDate")) + 19110000;
 		int inputEndDate = parse.stringToInteger(titaVo.getParam("InputEndDate")) + 19110000;
 
@@ -73,13 +73,13 @@ public class L6970 extends TradeBuffer {
 		TitaVo onlineTitaVo = (TitaVo) titaVo.clone();
 		onlineTitaVo.setDataBaseOnLine();
 
-		if (choice == 0) {
+		if (batchResultCode == 0) {
 			// 查全部
 			slJobDetail = jobDetailService.findExecDateIn(inputStartDate, inputEndDate, this.index, this.limit,
 					onlineTitaVo); // 2022-01-19 智偉修改:查Online
 		} else {
 			// 只查成功或失敗
-			slJobDetail = jobDetailService.findStatusExecDateIn(inputStartDate, inputEndDate, choice == 1 ? "S" : "F",
+			slJobDetail = jobDetailService.findStatusExecDateIn(inputStartDate, inputEndDate, batchResultCode == 1 ? "S" : "F",
 					this.index, this.limit, onlineTitaVo); // 2022-01-19 智偉修改:查Online
 		}
 

@@ -12,33 +12,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
-
-/**
- * Tita<br>
- * CustId=X,10 CustIdInd=X,1 CustIdAfter=X,10 CustNameInd=X,1 CustName1Aft=X,50
- * CustName2Aft=X,50 BirthdayInd=X,1 BirthdayBef=9,7 CustTypeInd=X,1
- * CustTypeAft=9,2 IndustryInd=X,1 IndustryAft=9,6 NationalityCodeInd=X,1
- * CountryAft=X,2 SpouseIdInd=X,1 SpouseIdAft=X,10 SpouseNameInd=X,1
- * SpouseNameAft=X,14 RegZip3Ind=X,1 RegZip3Aft=9,3 RegZip2Ind=X,1
- * RegZip2Aft=9,2 RegCityCodeInd=X,1 RegCityCodeAft=X,10 RegAreaCodeInd=X,1
- * RegAreaCodeAft=X,2 RegIrcodeInd=X,1 RegIrcodeAft=X,4 RegRoadInd=X,1
- * RegRoadAft=X,40 RegSctionInd=X,1 RegSctionAft=X,5 RegAlleyInd=X,1
- * RegAlleyAft=X,5 RegLaneInd=X,1 RegLaneAft=X,5 RegNumInd=X,1 RegNumAft=X,5
- * #RegNumDashInd=X,1 #RegNumDashAft=X,5 RegFloorInd=X,1 RegFloorAft=X,5
- * RegFloorDashInd=X,1 RegFloorDashAft=X,5 CurrZip3Ind=X,1 CurrZip3Aft=X,3
- * CurrZip2Ind=X,1 CurrZip2Aft=X,2 CurrCityCodeInd=X,1 CurrCityCodeAft=X,10
- * CurrAreaCodeInd=X,1 CurrAreaCodeAft=X,2 CurrIrcodeInd=X,1 CurrIrcodeAft=X,4
- * CurrRoadInd=X,1 CurrRoadAft=X,40 CurrSectionInd=X,1 CurrSectionAft=X,5
- * CurrAlleyInd=X,1 CurrAlleyAft=X,5 CurrLaneInd=X,1 CurrLaneAft=X,5
- * CurrNumInd=X,1 CurrNumAft=X,5 CurrNumDashInd=X,1 CurrNumDashAft=X,5
- * CurrFloorInd=X,1 CurrFloorAft=X,5 CurrFloorDashInd=X,1 CurrFloorDashAft=X,5
- * EntcodeInd=X,1 EntcodeAft=9,1 EnameInd=X,1 EnameAft=X,20
- * IncomeofyearlyInd=X,1 IncomeofyearlyAft=9,9 IncomeDataDateInd=X,1
- * IncomeDataDateAft=X,6
- */
 
 @Service("L1104")
 @Scope("prototype")
@@ -47,6 +24,9 @@ public class L1104 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService iCustMainService;
+
+	@Autowired
+	public TxDataLogService txDataLogService;
 
 	@Autowired
 	public Parse iParse;
@@ -73,9 +53,6 @@ public class L1104 extends TradeBuffer {
 		// 經辦登錄時更新
 		if (titaVo.isActfgEntry()) {
 
-			// 變更前
-			CustMain BefCustMain = (CustMain) iDataLog.clone(tCustMain);
-
 			// 若該欄位有被修改,更新該欄位資料
 
 			// 如果要修改統編
@@ -96,6 +73,7 @@ public class L1104 extends TradeBuffer {
 				}
 
 			}
+
 			// 正常交易或修正交易
 			if (titaVo.isHcodeNormal() || titaVo.isHcodeModify()) {
 
@@ -120,9 +98,6 @@ public class L1104 extends TradeBuffer {
 
 			}
 
-			// 紀錄變更前變更後
-			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
-			iDataLog.exec();
 		}
 
 		// 放行一般
@@ -132,6 +107,9 @@ public class L1104 extends TradeBuffer {
 			if (tCustMain.getActFg() != 1) {
 				throw new LogicException(titaVo, "E0017", " "); // 該筆交易狀態非待放行，不可做交易放行
 			}
+
+			// 變更前
+			CustMain BefCustMain = (CustMain) iDataLog.clone(tCustMain);
 
 			// 單位別
 			if (titaVo.getParam("BranchNoInd").equals("X")) {
@@ -337,10 +315,15 @@ public class L1104 extends TradeBuffer {
 
 			tCustMain.setActFg(2);
 			try {
-				tCustMain = iCustMainService.update(tCustMain, titaVo);
+				tCustMain = iCustMainService.update2(tCustMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
+
+			// 紀錄變更前變更後
+			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
+			iDataLog.exec("修改顧客 " + tCustMain.getCustId() + " 資料", "CustUKey:" + tCustMain.getCustUKey());
+
 		}
 		// 放行訂正
 		if (titaVo.isActfgSuprele() && titaVo.isHcodeErase()) {
@@ -546,6 +529,11 @@ public class L1104 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
+
+//刪除變更記錄
+
+			iDataLog.delete(titaVo);
+
 		}
 
 		this.addList(this.totaVo);

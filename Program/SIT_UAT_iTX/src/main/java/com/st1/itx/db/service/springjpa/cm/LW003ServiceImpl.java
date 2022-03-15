@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LW003ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -31,66 +28,382 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	/**
+	 * 查詢工作月
+	 * @param titaVo
+	 * @param tbsdy 帳務日
+	 * 
+	 */
+	
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> wkSsn(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findWorkMonth(TitaVo titaVo, int tbsdy) throws Exception {
 
-		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		logger.info("lW003.wkSsn ENTDY=" + iENTDY);
+		this.info("tbsdy=" + tbsdy);
 
-		// 總表 f0:本日之工作年,f1:本日之工作月
-		String sql = "SELECT W.\"Year\" AS F0";
-		sql += "			,W.\"Month\" AS F1";
-		sql += "	  FROM \"CdWorkMonth\" W";
-		sql += "	  WHERE W.\"StartDate\" <= :iday";
-		sql += "		AND W.\"EndDate\" >= :iday";
-		logger.info("sql=" + sql);
+		String sql = " ";
+		sql += "	SELECT \"Year\" AS F0";
+		sql += "		  ,\"Month\" AS F1";
+		sql += "		  ,\"EndDate\" AS F2";
+		sql += "	FROM \"CdWorkMonth\"";
+		sql += "	WHERE \"EndDate\" = ";
+		sql += "	  ( SELECT MAX(\"EndDate\") ";
+		sql += "		FROM \"CdWorkMonth\" ";
+		sql += "		WHERE \"EndDate\" <= :iday )";
+
+		this.info("sql=" + sql);
+
 		Query query;
-		logger.info("titaVo=" + titaVo);
-//		從titaVo tom??傳過來的資料?
-//		顯示出Shared EntityManager proxy for target factory [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean@4b174242]
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-//		logger.info("Impl0."+em);
 		query = em.createNativeQuery(sql);
-//		logger.info("Impl00."+query);
-//		iENTDY=20200420
-		query.setParameter("iday", iENTDY);
-//		logger.info("Impl000."+query.setParameter("iday", iENTDY));
-//		logger.info("Impl0000."+this.convertToMap(query.getResultList()));
+		query.setParameter("iday", tbsdy);
 		return this.convertToMap(query.getResultList());
 	}
 
+	/**
+	 * 個金總業績
+	 * @param titaVo
+	 * @param wkYear 工作年
+	 * @param wkMonth 工作月
+	 */
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo, Map<String, String> wkVo) throws Exception {
-		logger.info("impl1." + titaVo.get("ENTDY") + "----" + Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-//		1090420+19110000=20200420
-		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		logger.info("impl2." + wkVo.get("F0"));
-//		2020
-		String tWKYEAR = wkVo.get("F0");
-//		20200420   2020
-		logger.info("lW003.findAll ENTDY=" + iENTDY + ",WORKSEASON=" + tWKYEAR);
+	public List<Map<String, String>> findAll1(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
 
-		String sql = "SELECT P.\"WorkMonth\" AS F0";// 營業日對應之工作年
-		sql += "			,SUM(P.\"IntroducerAddBonus\") AS F1";// 介紹人獎勵金
-		sql += "	  FROM \"PfReward\" P";
-		sql += "	  LEFT JOIN \"CustMain\" C";
-		sql += "  	  ON  C.\"CustNo\" =P.\"CustNo\"";
-		sql += "	  WHERE TRUNC(P.\"WorkMonth\" / 100) = :wkyear";//
-		sql += "  		AND P.\"PerfDate\" <= :iday";
-		sql += "  		AND C.\"EntCode\" = 0";
-		sql += " 	  GROUP BY P.\"WorkMonth\"";
+		this.info("lW003.findAll1");
 
-		logger.info("sql=" + sql);
+		this.info("wkYear=" + wkYear + ",wkMonth=" + wkMonth);
+
+		String sql = " ";
+		sql += "	SELECT PD.\"WorkMonth\" AS \"WorkMonth\"";
+		sql += "      	  ,ROUND(SUM(PD.\"DrawdownAmt\") / 10000 ) AS \"Performance\" ";
+		sql += "	FROM \"PfBsDetail\" PD";
+		sql += "    LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
+		sql += "                                AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
+		sql += "    WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
+		sql += "      AND NVL(PO.\"DeptCode\",' ') IN ('A0B000','A0E000','A0F000','A0M000') ";
+		sql += "      AND TRUNC(PD.\"WorkMonth\" / 100 ) = :iwkyear ";
+		sql += "      AND MOD(PD.\"WorkMonth\", 100 ) = :iwkmonth ";
+		sql += "      AND PD.\"PerfAmt\" >= 0 ";
+		sql += "    GROUP BY PD.\"WorkMonth\" ";
+		sql += "    ORDER BY PD.\"WorkMonth\" ";
+
+		this.info("sql=" + sql);
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		logger.info("impl3." + em);
 		query = em.createNativeQuery(sql);
-		logger.info("impl4." + query);
-		query.setParameter("wkyear", tWKYEAR);
-//		logger.info("impl5." + query.setParameter("wkyear", tWKYEAR));
-		query.setParameter("iday", iENTDY);
-//		logger.info("impl6." + query.setParameter("iday", iENTDY));
-//		logger.info("impl7." +  this.convertToMap(query.getResultList()));
+		query.setParameter("iwkyear", wkYear);
+		query.setParameter("iwkmonth", wkMonth);
+		return this.convertToMap(query.getResultList());
+	}
+
+	/**
+	 * 區部
+	 * @param titaVo
+	 * @param wkYear  工作年
+	 * @param wkMonth 工作月
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
+
+		this.info("lW003.findAll2");
+
+		this.info("wkYear=" + wkYear + ",wkMonth=" + wkMonth);
+
+		String sql = " ";
+		sql += "  WITH \"Data1\" AS (";
+		sql += "	SELECT B.\"DeptItem\"";
+		sql += "      	  ,I.\"WorkMonth\"";
+		sql += "      	  ,I.\"PerfCnt\"";
+		sql += "          ,I.\"PerfAmt\"";
+		sql += "      	  ,B.\"DeptCode\"";
+		sql += "	FROM ( SELECT I.\"DistCode\" ";
+		sql += "                 ,I.\"WorkMonth\" ";
+		sql += "                 ,SUM(I.\"PerfCnt\") AS \"PerfCnt\" ";
+		sql += "                 ,SUM(I.\"PerfAmt\") AS \"PerfAmt\" ";
+		sql += "           FROM ( SELECT I.\"DistCode\" ";
+		sql += "                    	,I.\"WorkMonth\" ";
+		sql += "                    	,I.\"PerfCnt\" ";
+		sql += "                   		,I.\"PerfAmt\" ";
+		sql += "                  FROM \"PfItDetail\" I ";
+		sql += "                  WHERE TRUNC(I.\"WorkMonth\" / 100) = :iwkyear ";
+		sql += "                  UNION ALL";
+		sql += "                  SELECT B.\"UnitCode\"                 AS \"DistCode\" ";
+		sql += "                        ,W.\"Year\" * 100 + W.\"Month\" AS \"WorkMonth\" ";
+		sql += "                        ,0                              AS \"PerfCnt\" ";
+		sql += "                        ,0                              AS \"PerfAmt\" ";
+		sql += "                  FROM \"CdBcm\" B ";
+		sql += "                  CROSS JOIN \"CdWorkMonth\" W ";
+		sql += "                  WHERE B.\"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += "                    AND B.\"DistCode\" = B.\"UnitCode\" ";
+		sql += "                    AND W.\"Year\" = :iwkyear ";
+		sql += "                    AND W.\"Month\" >= 1";
+		sql += "                    AND W.\"Month\" <= :iwkmonth ) I ";
+		sql += "           GROUP BY I.\"DistCode\" ";
+		sql += "                   ,I.\"WorkMonth\" ) I ";
+		sql += "    LEFT JOIN \"CdBcm\" B ON B.\"UnitCode\" = B.\"DistCode\" ";
+		sql += "    					 AND B.\"UnitCode\" = I.\"DistCode\" ";
+		sql += "    LEFT JOIN ( SELECT * ";
+		sql += "                FROM \"PfDeparment\"";
+		sql += "                WHERE \"DepartOfficer\" IS NOT NULL ";
+		sql += "                  AND \"DistItem\" IS NOT NULL ";
+		sql += "              ) D ON D.\"DistCode\" = B.\"DistCode\" ";
+		sql += "    LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = B.\"UnitManager\" ";
+		sql += " 	WHERE B.\"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += "      AND E.\"Fullname\" IS NOT NULL)";
+		sql += " ";
+		sql += "	SELECT R.\"DeptCode\"";
+		sql += "          ,CASE ";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 3 THEN '1'";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 6 THEN '2'";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 9 THEN '3'";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 12 THEN '4'";
+		sql += "          	 ELSE '5'";
+		sql += "           END AS \"Quarter\""; // --工作季(13工獨立出來)
+		sql += "          ,SUM(R.\"Bonus\") AS \"Bonus\"";
+		sql += "	FROM ( SELECT D.\"WorkMonth\"";
+		sql += "				 ,D.\"DeptCode\"";
+		sql += "          		 ,CASE ";
+		sql += "          	 		WHEN D.\"PerfAmt\" >= 30000000 THEN ROUND(D.\"PerfAmt\" / 3000000) * 500 ";
+		sql += "          	 		WHEN D.\"PerfAmt\" >= 20000000 AND D.\"PerfAmt\" < 30000000 THEN 2500";
+		sql += "          	 		WHEN D.\"PerfAmt\" >= 10000000 AND D.\"PerfAmt\" < 20000000 THEN 1000";
+		sql += "          	 		WHEN D.\"PerfAmt\" < 10000000 THEN 0";
+		sql += "           		  END AS \"Bonus\""; // --計算獎金(根據樣張上公式判斷)
+		sql += "		   FROM \"Data1\" D ) R ";
+		sql += " 	WHERE R.\"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += " 	GROUP BY R.\"DeptCode\"";
+		sql += "            ,CASE ";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 3 THEN '1'";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 6 THEN '2'";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 9 THEN '3'";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 12 THEN '4'";
+		sql += "          	   ELSE '5'";
+		sql += "             END";
+		sql += " 	ORDER BY \"Quarter\" ASC";
+		sql += "		    ,R.\"DeptCode\" ASC";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("iwkyear", wkYear);
+		query.setParameter("iwkmonth", wkMonth);
+		return this.convertToMap(query.getResultList());
+	}
+
+	/**
+	 * 通訊處
+	 * 
+	 * @param titaVo
+	 * @param wkYear  工作年
+	 * @param wkMonth 工作月
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findAll3(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
+
+		this.info("lW003.findAll3");
+
+		this.info("wkYear=" + wkYear + ",wkMonth=" + wkMonth);
+
+		String sql = " ";
+		sql += "  WITH \"Data1\" AS (";
+		sql += "	SELECT I.\"WorkMonth\"";
+		sql += "      	  ,I.\"PerfCnt\"";
+		sql += "          ,I.\"PerfAmt\"";
+		sql += "      	  ,B.\"DeptCode\"";
+		sql += "          ,I.\"UnitCode\"";
+		sql += "	FROM ( SELECT I.\"UnitCode\" ";
+		sql += "                 ,I.\"WorkMonth\" ";
+		sql += "                 ,SUM(I.\"PerfCnt\") AS \"PerfCnt\" ";
+		sql += "                 ,SUM(I.\"PerfAmt\") AS \"PerfAmt\" ";
+		sql += "           FROM ( SELECT I.\"UnitCode\" ";
+		sql += "                    	,I.\"WorkMonth\" ";
+		sql += "                    	,I.\"PerfCnt\" ";
+		sql += "                   		,I.\"PerfAmt\" ";
+		sql += "                  FROM \"PfItDetail\" I ";
+		sql += "                  WHERE TRUNC(I.\"WorkMonth\" / 100) = :iwkyear ";
+		sql += "                  UNION ALL";
+		sql += "                  SELECT B.\"UnitCode\"                 AS \"DistCode\" ";
+		sql += "                        ,W.\"Year\" * 100 + W.\"Month\" AS \"WorkMonth\" ";
+		sql += "                        ,0                              AS \"PerfCnt\" ";
+		sql += "                        ,0                              AS \"PerfAmt\" ";
+		sql += "                  FROM \"CdBcm\" B ";
+		sql += "                  CROSS JOIN \"CdWorkMonth\" W ";
+		sql += "                  WHERE B.\"DeptCode\" IN ('A0B000','A0F000','A0E000','A0M000') ";
+		sql += "                    AND B.\"DistCode\" <> B.\"UnitCode\" ";
+		sql += "                    AND W.\"Year\" = :iwkyear ";
+		sql += "                    AND W.\"Month\" >= 1";
+		sql += "                    AND W.\"Month\" <= :iwkmonth ) I ";
+		sql += "           GROUP BY I.\"UnitCode\" ";
+		sql += "                   ,I.\"WorkMonth\" ) I ";
+		sql += "    LEFT JOIN \"CdBcm\" B ON B.\"UnitCode\" = I.\"UnitCode\" ";
+		sql += "    LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = B.\"UnitManager\" ";
+		sql += " 	WHERE B.\"UnitManager\" IS NOT NULL)";
+		sql += " ";
+		sql += "	SELECT R.\"DeptCode\"";
+		sql += "          ,CASE ";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 3 THEN '1'";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 6 THEN '2'";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 9 THEN '3'";
+		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 12 THEN '4'";
+		sql += "          	 ELSE '5'";
+		sql += "           END AS \"Quarter\""; // --工作季(13工獨立出來)
+		sql += "          ,SUM(R.\"cntBonus\") + SUM(R.\"amtBonus\") AS \"Bonus\"";
+		sql += "	FROM ( SELECT D.\"WorkMonth\"";
+		sql += "				 ,D.\"DeptCode\"";
+		sql += "          		 ,CASE ";
+		sql += "          	 		WHEN D.\"PerfCnt\" >= 4 THEN D.\"PerfCnt\" * 500 ";
+		sql += "          	 		WHEN D.\"PerfCnt\" >= 3 THEN 1500";
+		sql += "          	 		WHEN D.\"PerfCnt\" >= 2 THEN 1000";
+		sql += "          	 		WHEN D.\"PerfCnt\" >= 1 THEN 500";
+		sql += "           		  END AS \"cntBonus\""; // --計算獎金(根據樣張上公式判斷)
+		sql += "          		 ,CASE ";
+		sql += "          	 		WHEN D.\"PerfAmt\" >= 9000000 THEN ROUND(D.\"PerfAmt\" / 1000000) * 500 ";
+		sql += "          	 		WHEN D.\"PerfAmt\" >= 6000000 AND D.\"PerfAmt\" < 9000000 THEN 1000";
+		sql += "          	 		WHEN D.\"PerfAmt\" >= 3000000 AND D.\"PerfAmt\" < 6000000 THEN 500";
+		sql += "          	 		WHEN D.\"PerfAmt\" < 3000000 THEN 0";
+		sql += "           		  END AS \"amtBonus\""; // --計算獎金(根據樣張上公式判斷)
+		sql += "		   FROM \"Data1\" D ) R ";
+		sql += " 	WHERE R.\"DeptCode\" IN ('A0B000','A0E000','A0F000','A0M000') ";
+		sql += " 	GROUP BY R.\"DeptCode\"";
+		sql += "            ,CASE ";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 3 THEN '1'";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 6 THEN '2'";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 9 THEN '3'";
+		sql += "          	   WHEN MOD(R.\"WorkMonth\",100) <= 12 THEN '4'";
+		sql += "          	   ELSE '5'";
+		sql += "             END";
+		sql += " 	ORDER BY \"Quarter\" ASC";
+		sql += "		    ,R.\"DeptCode\" ASC";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("iwkyear", wkYear);
+		query.setParameter("iwkmonth", wkMonth);
+		return this.convertToMap(query.getResultList());
+	}
+
+	/**
+	 * 介紹人個人獎金
+	 * 
+	 * @param titaVo
+	 * @param wkYear  工作年
+	 * @param wkMonth 工作月
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findAll4(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
+
+		this.info("lW003.findAll4");
+
+		this.info("wkYear=" + wkYear + ",wkMonth=" + wkMonth);
+
+		String sql = " ";
+		sql += "  WITH \"Data1\" AS (";
+		sql += "	SELECT IM.\"WorkMonth\"";
+		sql += "	      ,SUM(NVL(PDA.\"AdjPerfAmt\",R.\"IntroducerAddBonus\")) AS \"IntroAddBonus\"";
+		sql += "	FROM( SELECT I.* ";
+		sql += "	            ,ROW_NUMBER() OVER(";
+		sql += "		  		 PARTITION BY I.\"CustNo\", I.\"FacmNo\"";
+		sql += "	        	     ORDER BY I.\"DrawdownDate\" ASC ) AS \"SEQ\"";
+		sql += " 	      FROM \"PfItDetail\" I";
+		sql += "		  WHERE TRUNC(I.\"WorkMonth\"/100) = :iwkyear ";
+		sql += " 	     	AND MOD(I.\"WorkMonth\",100) <= :iwkmonth ";
+		sql += " 	     	AND I.\"PieceCode\" IN ('A','1')";
+		sql += " 	     	AND I.\"DistCode\" IS NOT NULL ) IM ";
+		sql += "	LEFT JOIN ( SELECT  \"CustNo\"";
+		sql += "					  , \"FacmNo\"";
+		sql += "					  , \"Introducer\"";
+		sql += "	  	 			  , SUM(\"IntroducerAddBonus\") AS \"IntroducerAddBonus\"";
+		sql += "	            FROM \"PfReward\"";
+		sql += "		  		WHERE TRUNC(\"WorkMonth\"/100) = :iwkyear ";
+		sql += " 	     		  AND MOD(\"WorkMonth\",100) <= :iwkmonth ";
+		sql += "	        	GROUP BY \"CustNo\"";
+		sql += "						,\"FacmNo\"";
+		sql += "						,\"Introducer\"";
+		sql += "	          ) R ON R.\"CustNo\" = IM.\"CustNo\" AND R.\"FacmNo\" = IM.\"FacmNo\"";
+		sql += "				 								  AND R.\"Introducer\" = IM.\"Introducer\"";
+		sql += "	LEFT JOIN \"PfItDetailAdjust\" PDA ON PDA.\"CustNo\" = IM.\"CustNo\"";
+		sql += "	                        	      AND PDA.\"FacmNo\" = IM.\"FacmNo\"";
+		sql += "	                                  AND PDA.\"WorkMonth\" = IM.\"WorkMonth\"";
+		sql += "	WHERE  IM.\"SEQ\" =  1";
+		sql += "	GROUP BY IM.\"WorkMonth\")";
+		sql += " ";
+		sql += "	SELECT \"WorkMonth\"";
+		sql += "          ,SUM(\"Bonus\") AS \"Bonus\"";
+		sql += "	FROM ( SELECT D.\"WorkMonth\"";
+		sql += "				 ,D.\"IntroAddBonus\" AS \"Bonus\"";
+		sql += "		   FROM \"Data1\" D ";
+		sql += "		   UNION ";
+		sql += "		   SELECT \"Year\" * 100 + \"Month\" AS \"WorkMonth\"";
+		sql += "			     , 0 AS \"Bonus\"";
+		sql += "		   FROM \"CdWorkMonth\"";
+		sql += " 		   WHERE \"Year\" = :iwkyear ";
+		sql += " 	         AND \"Month\" <= :iwkmonth )";
+		sql += " 	GROUP BY \"WorkMonth\"";
+		sql += " 	ORDER BY \"WorkMonth\" ASC";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("iwkyear", wkYear);
+		query.setParameter("iwkmonth", wkMonth);
+		return this.convertToMap(query.getResultList());
+	}
+
+	/**
+	 * 專銷制單位
+	 * 
+	 * @param titaVo
+	 * @param wkYear  工作年
+	 * @param wkMonth 工作月
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findAll5(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
+
+		this.info("lW003.findAll5");
+
+		this.info("wkYear=" + wkYear + ",wkMonth=" + wkMonth);
+
+		String sql = " ";
+		sql += "	SELECT \"Quarter\" AS \"Quarter\"";
+		sql += "      	  ,CASE";
+		sql += "      	     WHEN \"Bonus\" > 6000000 THEN (\"Bonus\" / 10000) * 5";
+		sql += "      	     WHEN \"Bonus\" > 3000000 THEN (\"Bonus\" / 10000) * 4";
+		sql += "      	   END AS \"Bonus\"";
+		sql += "    FROM ( SELECT CASE";
+		sql += "    				WHEN MOD(P.\"WorkMonth\",100) <=3 THEN '1'";
+		sql += "    				WHEN MOD(P.\"WorkMonth\",100) <=6 THEN '2'";
+		sql += "    				WHEN MOD(P.\"WorkMonth\",100) <=9 THEN '3'";
+		sql += "    				WHEN MOD(P.\"WorkMonth\",100) <=12 THEN '4'";
+		sql += "    				ELSE '5'";
+		sql += "    			  END AS \"Quarter\"";
+		sql += "    			 ,SUM(P.\"DrawdownAmt\") AS \"Bonus\"";
+		sql += "		   FROM \"PfItDetail\" P";
+		sql += "		   WHERE TRUNC(\"WorkMonth\" / 100) = :iwkyear";
+		sql += "		     AND MOD(\"WorkMonth\" ,100) <= :iwkmonth";
+		sql += "		     AND \"DistCode\" IN ('A0X100','A0X200','A0X300','A0X400','A0X500')";
+		sql += "		   GROUP BY CASE";
+		sql += "    				  WHEN MOD(P.\"WorkMonth\",100) <=3 THEN '1'";
+		sql += "    				  WHEN MOD(P.\"WorkMonth\",100) <=6 THEN '2'";
+		sql += "    				  WHEN MOD(P.\"WorkMonth\",100) <=9 THEN '3'";
+		sql += "    				  WHEN MOD(P.\"WorkMonth\",100) <=12 THEN '4'";
+		sql += "    				  ELSE '5'";
+		sql += "    			    END )";
+		sql += "	ORDER BY \"Quarter\" ASC";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("iwkyear", wkYear);
+		query.setParameter("iwkmonth", wkMonth);
 		return this.convertToMap(query.getResultList());
 	}
 
