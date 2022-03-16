@@ -123,21 +123,24 @@ public class L9133Report extends MakeReport {
 
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
+			// 2022-03-16 智偉新增判斷:會計帳&銷帳檔&主檔 皆為0者不顯示
+			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal())
+					.add(tAcAcctCheck.getAcctMasterBal());
+			if (total.compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+			}
+
+			String acSubBookCode = tAcAcctCheck.getAcSubBookCode();// 區隔帳冊
+			String acctCode = tAcAcctCheck.getAcctCode();// 科目
+			String acctItem = tAcAcctCheck.getAcctItem();// 科目
+			String acMainBal = formatAmt(tAcAcctCheck.getTdBal(), 0);// 會計帳餘額
+			String receivableBal = formatAmt(tAcAcctCheck.getReceivableBal(), 0);// 銷帳檔餘額
+			String masterBal = formatAmt(tAcAcctCheck.getAcctMasterBal(), 0);// 主檔餘額
+
 			// 明細資料新的一行
 			print(1, 1, "　　");
-
-			// 區隔帳冊
-			String acSubBookCode = tAcAcctCheck.getAcSubBookCode();
-			print(0, 1, acSubBookCode);
-
-			String acctCode = tAcAcctCheck.getAcctCode();
-
-			// 科目
-			String acctItem = tAcAcctCheck.getAcctItem();
-			print(0, 11, acctItem);
-
-			// 會計帳餘額
-			String acMainBal = formatAmt(tAcAcctCheck.getTdBal(), 0);
+			print(0, 1, acSubBookCode);// 區隔帳冊
+			print(0, 11, acctItem);// 科目
 			if (acctCode != null && !acctCode.isEmpty()) {
 				switch (acctCode) {
 				case "310":
@@ -156,14 +159,8 @@ public class L9133Report extends MakeReport {
 					break;
 				}
 			}
-
-			// 銷帳檔餘額
-			String receivableBal = formatAmt(tAcAcctCheck.getReceivableBal(), 0);
-			print(0, 83, receivableBal, "R");
-
-			// 主檔餘額
-			String masterBal = formatAmt(tAcAcctCheck.getAcctMasterBal(), 0);
-			print(0, 119, masterBal, "R");
+			print(0, 83, receivableBal, "R");// 銷帳檔餘額
+			print(0, 119, masterBal, "R");// 主檔餘額
 
 			// 差額 (銷帳檔餘額-主檔餘額)
 			String diffAmt = formatAmt(tAcAcctCheck.getReceivableBal().subtract(tAcAcctCheck.getAcctMasterBal()), 0);

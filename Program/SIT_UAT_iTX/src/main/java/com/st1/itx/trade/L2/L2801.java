@@ -124,7 +124,8 @@ public class L2801 extends TradeBuffer {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "修改銷帳日期");
 			}
 
-			LoanNotYet bLoanNotYet = tLoanNotYet;
+			// 變更前
+			LoanNotYet bLoanNotYet = (LoanNotYet) datalog.clone(tLoanNotYet);
 			moveLoanNotYet();
 			try {
 				loanNotYetService.update(tLoanNotYet);
@@ -132,6 +133,7 @@ public class L2801 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007",
 						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
+			bLoanNotYet.setCreateDate(tLoanNotYet.getCreateDate()); // 排除建檔時間
 			datalog.setEnv(titaVo, bLoanNotYet, tLoanNotYet);
 			datalog.exec("修改未齊案件檔資料");
 			break;

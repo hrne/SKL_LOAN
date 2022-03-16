@@ -29,7 +29,6 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductDtlService;
-import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.EmpDeductScheduleService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4510ServiceImpl;
@@ -85,9 +84,6 @@ public class L4510Batch extends TradeBuffer {
 
 	@Autowired
 	public InsuRenewService insuRenewService;
-
-	@Autowired
-	public EmpDeductMediaService empDeductMediaService;
 
 	@Autowired
 	public EmpDeductScheduleService empDeductScheduleService;

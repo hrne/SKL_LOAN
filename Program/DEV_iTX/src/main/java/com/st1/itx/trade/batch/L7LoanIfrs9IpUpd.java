@@ -51,7 +51,7 @@ public class L7LoanIfrs9IpUpd extends BatchBase implements Tasklet, Initializing
 
 		String empNo = titaVo.getTlrNo();
 
-		int newAcFg = 0; // 新會計科目記號：0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
+		int newAcFg = 1; // 新會計科目記號：0=使用舊會計科目(8碼) 1=使用新會計科目(11碼)
 
 		this.info("active L7LoanIfrs9IpUpd tbsdyf=" + tbsdyf);
 		this.info("active L7LoanIfrs9IpUpd empNo =" + empNo);

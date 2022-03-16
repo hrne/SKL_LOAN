@@ -46,7 +46,7 @@ public class TxArchiveTable implements Serializable {
   private int enabled = 0;
 
   // 搬運條件
-  /* 1:戶號2:戶號-額度3:戶號-額度-撥款序號 */
+  /* [5YTX]1:戶號2:戶號-額度3:戶號-額度-撥款序號 */
   @Column(name = "`Conditions`")
   private int conditions = 0;
 
@@ -138,7 +138,8 @@ public class TxArchiveTable implements Serializable {
 
 /**
 	* 搬運條件<br>
-	* 1:戶號
+	* [5YTX]
+1:戶號
 2:戶號-額度
 3:戶號-額度-撥款序號
 	* @return Integer
@@ -149,7 +150,8 @@ public class TxArchiveTable implements Serializable {
 
 /**
 	* 搬運條件<br>
-	* 1:戶號
+	* [5YTX]
+1:戶號
 2:戶號-額度
 3:戶號-額度-撥款序號
   *

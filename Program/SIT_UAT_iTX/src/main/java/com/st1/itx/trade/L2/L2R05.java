@@ -105,6 +105,7 @@ public class L2R05 extends TradeBuffer {
 	private TitaVo titaVo = new TitaVo();
 	private String wkCurrencyCode = "TWD";
 	private String wkCustId = "";
+	private String wkCustName = "";
 	private String wkGroupId = "";
 	private String wkBreachNo;
 	private String sProdNo;
@@ -252,6 +253,7 @@ public class L2R05 extends TradeBuffer {
 			throw new LogicException(titaVo, "E2003", " 客戶資料主檔 UKey=" + tFacMain.getCustNo()); // 查無資料
 		}
 		wkCustId = tCustMain.getCustId();
+		wkCustName = tCustMain.getCustName();
 		// 查詢案件申請檔
 		FacCaseAppl tFacCaseAppl = facCaseApplService.findById(tFacMain.getApplNo(), titaVo);
 		if (tFacCaseAppl != null) {
@@ -373,6 +375,7 @@ public class L2R05 extends TradeBuffer {
 		}
 		this.info("tempVo =   " + tempVo);
 		this.totaVo.putParam("L2r05CustId", wkCustId);
+		this.totaVo.putParam("L2r05CustName", wkCustName);
 		this.totaVo.putParam("L2r05CustNo", tFacMain.getCustNo());
 		this.totaVo.putParam("L2r05FacmNo", tFacMain.getFacmNo());
 		this.totaVo.putParam("L2r05ApplNo", tFacMain.getApplNo());

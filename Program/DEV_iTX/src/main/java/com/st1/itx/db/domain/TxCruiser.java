@@ -26,7 +26,7 @@ public class TxCruiser implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3136955254791342167L;
+	private static final long serialVersionUID = 8238661350850279997L;
 
 @EmbeddedId
   private TxCruiserId txCruiserId;
@@ -46,6 +46,10 @@ public class TxCruiser implements Serializable {
   // 批次執行清單
   @Column(name = "`JobList`", length = 800)
   private String jobList;
+
+  // 參數
+  @Column(name = "`Parameter`", length = 3000)
+  private String parameter;
 
   // 執行狀態
   /* U:執行中S:完成F:失敗 */
@@ -158,6 +162,25 @@ public class TxCruiser implements Serializable {
 	*/
   public void setJobList(String jobList) {
     this.jobList = jobList;
+  }
+
+/**
+	* 參數<br>
+	* 
+	* @return String
+	*/
+  public String getParameter() {
+    return this.parameter == null ? "" : this.parameter;
+  }
+
+/**
+	* 參數<br>
+	* 
+  *
+  * @param parameter 參數
+	*/
+  public void setParameter(String parameter) {
+    this.parameter = parameter;
   }
 
 /**
@@ -281,7 +304,7 @@ F:失敗
 
   @Override
   public String toString() {
-    return "TxCruiser [txCruiserId=" + txCruiserId + ", txCode=" + txCode + ", jobList=" + jobList + ", status=" + status + ", sendMSgChainOff=" + sendMSgChainOff
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "TxCruiser [txCruiserId=" + txCruiserId + ", txCode=" + txCode + ", jobList=" + jobList + ", parameter=" + parameter + ", status=" + status
+           + ", sendMSgChainOff=" + sendMSgChainOff + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

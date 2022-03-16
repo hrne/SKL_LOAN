@@ -119,4 +119,27 @@ public interface TxArchiveTableService {
    */
   public void deleteAll(List<TxArchiveTable> txArchiveTable, TitaVo... titaVo) throws DBException;
 
+  /**
+   * Stored Procedure<br>
+   * 封存結清且領清償證明滿五年之交易明細
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L6_ArchiveFiveYearTx_Copy(int tbsdyf,  String empNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * 將結清且領清償證明滿五年之已封存交易明細搬回連線環境
+   * @param  custNo int
+   * @param  facmNo int
+   * @param  bormNo int
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L6_UnarchiveFiveYearTx_Copy(int custNo,  int facmNo,  int bormNo,  int tbsdyf,  String empNo, TitaVo... titaVo);
+
 }

@@ -1747,6 +1747,7 @@ TXFORM=L2R04
 #L2r05CustNo=A,7,S
 #L2r05FacmNo=A,3,S
 #L2r05CustId=X,10,S
+#L2r05CustName=x,100,S
 #L2r05ApplNo=A,7,S
 #L2r05ProdNo=X,5,S
 #L2r05BaseRateCode=A,2,S
@@ -1859,6 +1860,7 @@ TXFORM=L2R05
 #L2r05CustNo
 #L2r05FacmNo
 #L2r05CustId
+#L2r05CustName
 #L2r05ApplNo
 #L2r05ProdNo
 #L2r05BaseRateCode

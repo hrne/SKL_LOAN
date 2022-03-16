@@ -283,6 +283,12 @@ TXFORM=L2072
 #OORmkDesc=備忘錄說明
 {width:500}
 
+#OOName=建立經辦姓名
+{width:120,align:'center'}
+
+#OOCreateDate=建立日期
+{width:100,align:'center'}
+
 #OOName1=最後修改經辦
 {width:120,align:'center'}
 

@@ -13,9 +13,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
+import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdCodeService;
@@ -47,6 +49,9 @@ public class XXR99 extends TradeBuffer {
 	@Autowired
 	public CdBranchService sCdBranchService;
 
+	@Autowired
+	public CdBranchGroupService sCdBranchGroupService;
+	
 	@Autowired
 	public CdBcmService sCdBcmService;
 
@@ -96,7 +101,7 @@ public class XXR99 extends TradeBuffer {
 
 			} else if (k.length() > 4 && "GROP".equals(k.substring(0, 4))) {
 				String BrNo = k.substring(4, 8);
-				s = getGrop(BrNo);
+				s = getGrop(BrNo,titaVo);
 
 			} else if (k.length() > 7 && "CdCode.".equals(k.substring(0, 7))) {
 				String DefCode = k.substring(7);
@@ -382,70 +387,18 @@ public class XXR99 extends TradeBuffer {
 		return s;
 	}
 
-	private String getGrop(String BrNo) {
+	private String getGrop(String BrNo ,TitaVo titaVo) {
 		this.info("XXR99 getGrop = " + BrNo);
 		String s = "";
 
 //		String BrNo = k.substring(4, 8);
 		this.info("XXR99 GROP = " + BrNo);
-		CdBranch tCdBranch = sCdBranchService.findById(BrNo);
-		if (tCdBranch != null) {
-			if (!"".equals(tCdBranch.getGroup1())) {
-				s += "1:" + tCdBranch.getGroup1().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup2())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "2:" + tCdBranch.getGroup2().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup3())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "3:" + tCdBranch.getGroup3().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup4())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "4:" + tCdBranch.getGroup4().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup5())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "5:" + tCdBranch.getGroup5().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup6())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "6:" + tCdBranch.getGroup6().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup7())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "7:" + tCdBranch.getGroup7().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup8())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "8:" + tCdBranch.getGroup8().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup9())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "9:" + tCdBranch.getGroup9().trim();
-			}
-			if (!"".equals(tCdBranch.getGroup10())) {
-				if (!"".equals(s)) {
-					s += ";";
-				}
-				s += "A:" + tCdBranch.getGroup10().trim();
+		Slice<CdBranchGroup> tCdBranchGroup = sCdBranchGroupService.findByBranchNo(BrNo, 0, Integer.MAX_VALUE, titaVo);
+		
+		List<CdBranchGroup> lCdBranchGroup = tCdBranchGroup == null ? null : tCdBranchGroup.getContent();
+		if (lCdBranchGroup != null) {
+			for(CdBranchGroup Cdbg : lCdBranchGroup) {
+				s +=Cdbg.getGroupNo().trim()+ ":" + Cdbg.getGroupItem().trim();
 			}
 		}
 

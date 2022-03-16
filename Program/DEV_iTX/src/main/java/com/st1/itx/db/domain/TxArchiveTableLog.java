@@ -26,7 +26,7 @@ public class TxArchiveTableLog implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5418957794546073142L;
+	private static final long serialVersionUID = -4326021505569836973L;
 
 @EmbeddedId
   private TxArchiveTableLogId txArchiveTableLogId;
@@ -35,6 +35,16 @@ public class TxArchiveTableLog implements Serializable {
   /* 5YTX:已結清並領取清償證明五年之交易明細 */
   @Column(name = "`Type`", length = 4, insertable = false, updatable = false)
   private String type;
+
+  // 搬運來源環境
+  /* ONLINE:連線環境HISTORY:歷史環境 */
+  @Column(name = "`DataFrom`", length = 7, insertable = false, updatable = false)
+  private String dataFrom;
+
+  // 搬運目標環境
+  /* ONLINE:連線環境HISTORY:歷史環境 */
+  @Column(name = "`DataTo`", length = 7, insertable = false, updatable = false)
+  private String dataTo;
 
   // 執行日期
   @Column(name = "`ExecuteDate`", insertable = false, updatable = false)
@@ -68,6 +78,15 @@ public class TxArchiveTableLog implements Serializable {
   // 執行結果說明
   @Column(name = "`Description`", length = 200)
   private String description;
+
+  // 搬運資料筆數
+  @Column(name = "`Records`")
+  private int records = 0;
+
+  // 已自連線環境刪除
+  /* 1:是0:否 */
+  @Column(name = "`IsDeleted`")
+  private int isDeleted = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -113,6 +132,48 @@ public class TxArchiveTableLog implements Serializable {
 	*/
   public void setType(String type) {
     this.type = type;
+  }
+
+/**
+	* 搬運來源環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+	* @return String
+	*/
+  public String getDataFrom() {
+    return this.dataFrom == null ? "" : this.dataFrom;
+  }
+
+/**
+	* 搬運來源環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+  *
+  * @param dataFrom 搬運來源環境
+	*/
+  public void setDataFrom(String dataFrom) {
+    this.dataFrom = dataFrom;
+  }
+
+/**
+	* 搬運目標環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+	* @return String
+	*/
+  public String getDataTo() {
+    return this.dataTo == null ? "" : this.dataTo;
+  }
+
+/**
+	* 搬運目標環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+  *
+  * @param dataTo 搬運目標環境
+	*/
+  public void setDataTo(String dataTo) {
+    this.dataTo = dataTo;
   }
 
 /**
@@ -270,6 +331,46 @@ public class TxArchiveTableLog implements Serializable {
   }
 
 /**
+	* 搬運資料筆數<br>
+	* 
+	* @return Integer
+	*/
+  public int getRecords() {
+    return this.records;
+  }
+
+/**
+	* 搬運資料筆數<br>
+	* 
+  *
+  * @param records 搬運資料筆數
+	*/
+  public void setRecords(int records) {
+    this.records = records;
+  }
+
+/**
+	* 已自連線環境刪除<br>
+	* 1:是
+0:否
+	* @return Integer
+	*/
+  public int getIsDeleted() {
+    return this.isDeleted;
+  }
+
+/**
+	* 已自連線環境刪除<br>
+	* 1:是
+0:否
+  *
+  * @param isDeleted 已自連線環境刪除
+	*/
+  public void setIsDeleted(int isDeleted) {
+    this.isDeleted = isDeleted;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -348,8 +449,8 @@ public class TxArchiveTableLog implements Serializable {
 
   @Override
   public String toString() {
-    return "TxArchiveTableLog [txArchiveTableLogId=" + txArchiveTableLogId + ", result=" + result
-           + ", description=" + description + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "TxArchiveTableLog [txArchiveTableLogId=" + txArchiveTableLogId
+           + ", result=" + result + ", description=" + description + ", records=" + records
+           + ", isDeleted=" + isDeleted + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

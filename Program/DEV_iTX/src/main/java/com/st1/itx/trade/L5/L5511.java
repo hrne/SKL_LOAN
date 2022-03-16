@@ -38,10 +38,10 @@ public class L5511 extends TradeBuffer {
 
 	@Autowired
 	public TxControlService txControlService;
-
+	
 	@Autowired
 	public Parse parse;
-
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		logger.info("Run L5511");
@@ -50,21 +50,21 @@ public class L5511 extends TradeBuffer {
 
 		String iFunCode = titaVo.getParam("FunCode").trim();// 使用功能
 		int iWorkMonth = parse.stringToInteger(titaVo.getParam("WorkMonth")) + 191100;
-
+		
 		if ("1".equals(iFunCode)) {
 			String controlCode = "L5511." + iWorkMonth + ".2";
 			TxControl txControl = txControlService.findById(controlCode, titaVo);
 			if (txControl != null) {
 				throw new LogicException(titaVo, "E0010", "已產生媒體檔");
 			}
-
+			
 		} else if ("2".equals(iFunCode)) {
 			String controlCode = "L5511." + iWorkMonth + ".1";
 			TxControl txControl = txControlService.findById(controlCode, titaVo);
 			if (txControl == null) {
-				throw new LogicException(titaVo, "E0010", "未執行 L5510 保費檢核");
+				throw new LogicException(titaVo, "E0010", "未執行 L5511 保費檢核");
 			}
-
+			
 		} else if ("3".equals(iFunCode)) {
 			String controlCode = "L5511." + iWorkMonth + ".2";
 			TxControl txControl = txControlService.holdById(controlCode, titaVo);
@@ -82,9 +82,9 @@ public class L5511 extends TradeBuffer {
 
 		if (!"3".equals(iFunCode)) {
 			MySpring.newTask("L5511Batch", this.txBuffer, titaVo);
-
+			
 			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
-
+			
 		}
 
 		this.addList(this.totaVo);

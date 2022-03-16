@@ -1,0 +1,202 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,88)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,100,S
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,880];printer.width=[15,45];order=1;">
+[
+["[L6971] 已封存且待刪除明細結果查詢 "],
+["@搬運種類",#InputType,#InputTypeX],
+]
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FUNCIND=_,_,S
+E(0,5)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,6,S
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+! 搬運種類
+#InputTypeHelp=X,40,S
+T(3,1:已結清並領取清償證明五年之交易明細)
+
+#InputType=A,1,I
+HELP(#InputTypeHelp)
+@V(H,#InputTypeHelp)
+
+#InputTypeX=X,40,L
+T(H,#InputType,#InputTypeHelp)
+
+! RPTFG
+#RPTFG=A,1,S
+E(0,0)
+
+
+! iCompensateFlag
+
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L6971 ----------
+<sub type="FORM" name="L6971">
+
+#SCRTIL=_,_,S
+T(3,[L6971] 已封存且待刪除明細結果查詢)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+!批次執行日期
+#OOExecDate=D,7,L
+!批次編號
+#OOBatchNo=A,3,L
+!戶號
+#OOCustNo=A,7,L
+!額度
+#OOFacmNo=A,3,L
+!撥款
+#OOBormNo=A,3,L
+
+! use T(6A,...)
+! 勾選幾個就會sendback幾次, 所以不需要concats
+! 長度似乎要大於某個值, 但實際進Vo的欄位長度會切剛好, 並且能用其原本名字存取
+#Sendback=x,10000,S
+T(6A,#OOExecDate+#OOBatchNo+#OOCustNo+#OOFacmNo+#OOBormNo+#InputType)
+
+</sub>
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#InputType
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L6971
+#OOExecDate
+#OOBatchNo
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6971" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6971] 已封存且待刪除明細結果查詢 "],
+[""],
+]
+</sub>
+<sub type="SELECT">
+#batch-print=8,L6971.PFNX,NA,,,,,,1169:827
+^
+#RPTFG=9,QUERY.GRID,L6971
+#any={detail:true, header:'L6971.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'確認刪除明細',
+	type:'5',
+	rim:'L6971',
+	txtno:'#Sendback',
+	pfnx:"L6971.PFNX",
+	col_captions:["戶號","額度","撥款編號","處理結果        "],
+	col_names:["#OOCustNo","#OOFacmNo","#OOBormNo","#batch-row-status"]
+	}
+}
+
+#Sendback
+
+#OOExecDate=最後搬運日期
+{width:160,align:'center'}
+
+#OOBatchNo=最後批次編號
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度
+{width:100,align:'center'}
+
+#OOBormNo=撥款編號
+{width:100,align:'center'}
+^
+
+
+</sub>
+
+

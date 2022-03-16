@@ -18,14 +18,14 @@ E(0,0)
 <sub type="DC" name="L4511" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L4511]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@產出員工扣薪媒體檔"],
-[#<->#,"#FdMediaDate+媒體檔日期",#MediaDate],
+[#<->#,"#FdEntryDate+入帳日期",#EntryDate],
 [#<->#,"#FdOpItem+作業項目",#OpItem,#OpItemX],
 ]
 ! 作業項目
 #OpItemHelp=x,20,S
 T(3,1:15日薪;2:非15日薪)
 
-#FdMediaDate=X,2,L
+#FdEntryDate=X,2,L
 T(3,*)
 
 #FdOpItem=X,2,L
@@ -44,11 +44,11 @@ C(3,#CHAIN,1,$,S)
 #NEXT_DATE=D,8,S
 T(4,NBSDY$)
 
-! 會計日期
-#MediaDate=D,7,I
+! 入帳日期
+#EntryDate=D,7,I
 E(0,#SYSDATE)
 @
-V(7)A(DATE,0,#MediaDate)
+V(7)A(DATE,0,#EntryDate)
 
 
 
@@ -70,7 +70,7 @@ T(3,)T(H,#OpItem,#OpItemHelp)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#MediaDate
+#EntryDate
 #OpItem
 </sub>
 

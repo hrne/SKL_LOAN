@@ -45,7 +45,7 @@ E(0,0)
 ["#FdApplNo+核准編號",#ApplNo],
 ["#FdFacmNo+額度編號",#FacmNo,#BTN5],
 ["#FdNotYetCode+未齊件代碼",#NotYetCode,#NotYetCodeX],
-["#FdYetDate+齊件訖日",#YetDate],
+["#FdYetDate+齊件迄日",#YetDate],
 ["#FdCloseDate+銷號日期",#CloseDate],
 ["#FdReMark+備註",#ReMark],
 ]

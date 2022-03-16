@@ -565,7 +565,7 @@ TXFORM=L2921
 #OOTODATEDAY=迄今日數
 {width:85,align:'center'}
 
-#OOYetDate=齊件訖日    
+#OOYetDate=齊件迄日    
 {width:85,align:'center'}
 
 #OOCloseDate=銷號日期  
@@ -604,7 +604,7 @@ TXFORM=L2921
 #OOTODATEDAY=迄今日數
 {width:85,align:'center'}
 
-#OOYetDate=齊件訖日    
+#OOYetDate=齊件迄日    
 {width:85,align:'center'}
 
 #OOCloseDate=銷號日期  

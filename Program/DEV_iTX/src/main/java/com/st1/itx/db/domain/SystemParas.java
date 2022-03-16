@@ -29,7 +29,7 @@ public class SystemParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 830698246172574665L;
+	private static final long serialVersionUID = -5856751104537736729L;
 
 // 業務類型
   /* LN */
@@ -266,6 +266,16 @@ public class SystemParas implements Serializable {
   /* username：password */
   @Column(name = "`FtpAuth`", length = 100)
   private String ftpAuth;
+
+  // JCIC放款報送聯絡人姓名
+  /* 配合聯徵格式,最多4個中文字 */
+  @Column(name = "`JcicEmpName`", length = 4)
+  private String jcicEmpName;
+
+  // JCIC放款報送聯絡人電話
+  /* 範例格式:02-23895858#7279 */
+  @Column(name = "`JcicEmpTel`", length = 16)
+  private String jcicEmpTel;
 
   // 建檔日期時間
   @CreatedDate
@@ -1289,6 +1299,44 @@ N:不啟用
   }
 
 /**
+	* JCIC放款報送聯絡人姓名<br>
+	* 配合聯徵格式,最多4個中文字
+	* @return String
+	*/
+  public String getJcicEmpName() {
+    return this.jcicEmpName == null ? "" : this.jcicEmpName;
+  }
+
+/**
+	* JCIC放款報送聯絡人姓名<br>
+	* 配合聯徵格式,最多4個中文字
+  *
+  * @param jcicEmpName JCIC放款報送聯絡人姓名
+	*/
+  public void setJcicEmpName(String jcicEmpName) {
+    this.jcicEmpName = jcicEmpName;
+  }
+
+/**
+	* JCIC放款報送聯絡人電話<br>
+	* 範例格式:02-23895858#7279
+	* @return String
+	*/
+  public String getJcicEmpTel() {
+    return this.jcicEmpTel == null ? "" : this.jcicEmpTel;
+  }
+
+/**
+	* JCIC放款報送聯絡人電話<br>
+	* 範例格式:02-23895858#7279
+  *
+  * @param jcicEmpTel JCIC放款報送聯絡人電話
+	*/
+  public void setJcicEmpTel(String jcicEmpTel) {
+    this.jcicEmpTel = jcicEmpTel;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1375,6 +1423,7 @@ N:不啟用
            + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortPrinLimit=" + shortPrinLimit
            + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
            + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", ftpUrl=" + ftpUrl + ", ftpAuth=" + ftpAuth
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

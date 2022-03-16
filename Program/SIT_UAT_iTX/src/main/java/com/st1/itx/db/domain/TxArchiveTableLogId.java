@@ -19,12 +19,22 @@ public class TxArchiveTableLogId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2702309601680695741L;
+	private static final long serialVersionUID = 5050163324965259963L;
 
 // 分類
   /* 5YTX:已結清並領取清償證明五年之交易明細 */
   @Column(name = "`Type`", length = 4)
   private String type = " ";
+
+  // 搬運來源環境
+  /* ONLINE:連線環境HISTORY:歷史環境 */
+  @Column(name = "`DataFrom`", length = 7)
+  private String dataFrom = " ";
+
+  // 搬運目標環境
+  /* ONLINE:連線環境HISTORY:歷史環境 */
+  @Column(name = "`DataTo`", length = 7)
+  private String dataTo = " ";
 
   // 執行日期
   @Column(name = "`ExecuteDate`")
@@ -53,8 +63,10 @@ public class TxArchiveTableLogId implements Serializable {
   public TxArchiveTableLogId() {
   }
 
-  public TxArchiveTableLogId(String type, int executeDate, String tableName, int batchNo, int custNo, int facmNo, int bormNo) {
+  public TxArchiveTableLogId(String type, String dataFrom, String dataTo, int executeDate, String tableName, int batchNo, int custNo, int facmNo, int bormNo) {
     this.type = type;
+    this.dataFrom = dataFrom;
+    this.dataTo = dataTo;
     this.executeDate = executeDate;
     this.tableName = tableName;
     this.batchNo = batchNo;
@@ -80,6 +92,48 @@ public class TxArchiveTableLogId implements Serializable {
 	*/
   public void setType(String type) {
     this.type = type;
+  }
+
+/**
+	* 搬運來源環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+	* @return String
+	*/
+  public String getDataFrom() {
+    return this.dataFrom == null ? "" : this.dataFrom;
+  }
+
+/**
+	* 搬運來源環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+  *
+  * @param dataFrom 搬運來源環境
+	*/
+  public void setDataFrom(String dataFrom) {
+    this.dataFrom = dataFrom;
+  }
+
+/**
+	* 搬運目標環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+	* @return String
+	*/
+  public String getDataTo() {
+    return this.dataTo == null ? "" : this.dataTo;
+  }
+
+/**
+	* 搬運目標環境<br>
+	* ONLINE:連線環境
+HISTORY:歷史環境
+  *
+  * @param dataTo 搬運目標環境
+	*/
+  public void setDataTo(String dataTo) {
+    this.dataTo = dataTo;
   }
 
 /**
@@ -199,7 +253,7 @@ public class TxArchiveTableLogId implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(type, executeDate, tableName, batchNo, custNo, facmNo, bormNo);
+    return Objects.hash(type, dataFrom, dataTo, executeDate, tableName, batchNo, custNo, facmNo, bormNo);
   }
 
   @Override
@@ -209,11 +263,11 @@ public class TxArchiveTableLogId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     TxArchiveTableLogId txArchiveTableLogId = (TxArchiveTableLogId) obj;
-    return type.equals(txArchiveTableLogId.type) && executeDate == txArchiveTableLogId.executeDate && tableName.equals(txArchiveTableLogId.tableName) && batchNo == txArchiveTableLogId.batchNo && custNo == txArchiveTableLogId.custNo && facmNo == txArchiveTableLogId.facmNo && bormNo == txArchiveTableLogId.bormNo;
+    return type.equals(txArchiveTableLogId.type) && dataFrom.equals(txArchiveTableLogId.dataFrom) && dataTo.equals(txArchiveTableLogId.dataTo) && executeDate == txArchiveTableLogId.executeDate && tableName.equals(txArchiveTableLogId.tableName) && batchNo == txArchiveTableLogId.batchNo && custNo == txArchiveTableLogId.custNo && facmNo == txArchiveTableLogId.facmNo && bormNo == txArchiveTableLogId.bormNo;
   }
 
   @Override
   public String toString() {
-    return "TxArchiveTableLogId [type=" + type + ", executeDate=" + executeDate + ", tableName=" + tableName + ", batchNo=" + batchNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + "]";
+    return "TxArchiveTableLogId [type=" + type + ", dataFrom=" + dataFrom + ", dataTo=" + dataTo + ", executeDate=" + executeDate + ", tableName=" + tableName + ", batchNo=" + batchNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + "]";
   }
 }

@@ -53,10 +53,10 @@ K(MODIFYBUTTON,1,新增)
 ["[L2921]                                 未齊件資料查詢"],
 ["#FdMain+查詢條件","@(案件編號、借戶戶號、統一編號、核准編號、房貸專員，需擇一輸入)"],
 ["#FdCaseNo+案件編號",#CaseNo],
-["#FdCustNo+借戶戶號",#CustNo,#BTN2],
-["#FdCustId+統一編號",#CustId,#BTN3],
+["#FdCustNo+借戶戶號",#CustNo,#BTN2,#CustNoX],
+["#FdCustId+統一編號",#CustId,#BTN3,#CustIdX],
 ["#FdApplNo+核准編號",#ApplNo,#BTN4],
-["#FdTeller+房貸專員",#Teller,#BTN5],
+["#FdTeller+房貸專員",#Teller,#BTN5,#TellerX],
 ["#FdFacmNo+額度編號",#FacmNo,"@(000表示查詢全部額度)"],
 ["#FdCloseCode+銷號狀態",#CloseCode,#CloseCodeX],
 ["#FdYetDate+齊件迄日",#YetDate1,"-",#YetDate2],
@@ -140,14 +140,16 @@ C(3,#CHAIN,1,s,$)
 T(3,00000019999999000)
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
+
+#SPACE=X,100,S
 
 ![借戶戶號]
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
 C(3,#CaseNo,0,$,S)
-!INVOKEJS(SHOW,p1,2,5,1)
-!SHOW(#BTN2)
+@
+T(2,@CustNoX,#SPACE)
 
 <include src="ROM.icf::L1R01.dec"/>
 !調RIML1R01取CustName
@@ -159,20 +161,36 @@ RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimFunCd,#RimCustNo)
 R(1,L1R01)
 
+
+#CustNoX=X,100,L
+C(3,#CustNo,0,S,T(2,#L1r01CustName))
+
+
 #BUF3=X,18,S
 
-
 #BIND3=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3;ntxbuf5=type<-1:CustId<-OOCustId})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 
 ![統一編號]
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
 C(3,#CaseNo,0,$,S)
 C(3,#CustNo,0,$,S)
-!INVOKEJS(SHOW,p1,3,5,1)
-!SHOW(#BTN3)
 @C(4,#CustId,S,$)A(ID_UNINO,0,#CustId)
+T(2,@CustIdX,#SPACE)
+
+#SendL2r07A=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+
+#CustIdX=X,100,L
+C(4,#CustId,S,T(2,#L2r07CustName))
+
 
 !戶號有輸入，塞戶號
 
@@ -221,7 +239,7 @@ C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 
 
 #BIND5=X,1,S
-BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUF5;ntxbuf5=type<-1:Teller<-OTlrNo})
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5;ntxbuf5=type<-1:Teller<-OOEmployeeNo:TellerX<-OOFullname})
 
 
 ![經辦]
@@ -231,10 +249,20 @@ C(3,#CaseNo,0,$,S)
 C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
 C(3,#ApplNo,0,$,S)
-
-!@V(7)
 @IF(#CaseNo == 0 && #CustNo == 0 &&#CustId == 0 &&#ApplNo == 0 &&#Teller == 0 ,V(P,案件編號、借戶戶號、統一編號、核准編號、房貸專員擇一輸入),$)
+T(2,@TellerX,#SPACE)
 
+#SendL2r08A=X,1,S
+C(4,#Teller,S,$)
+T(2,@RimEmployeeNo,#Teller)
+RESET_RIM(#SendL2r08A,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo)
+R(1,L2R08)
+
+
+#TellerX=X,20,L
+C(4,#Teller,S,$)
+T(2,#L2r08FullName)
 
 ![額度編號]
 #FacmNo=A,3,I
@@ -296,7 +324,7 @@ C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
-
+<include src="ROM.icf::L2R08.dec"/>
 
 </sub>
 
@@ -398,8 +426,6 @@ IF(#OOFirstDrawdownDate==0,E(0,0),D(6,1,#FirstDateF,#DATEf))
 
 #OONotYetCode=A,2,L
 
-#OONotYetItemX=X,40,L
-
 #NotYetItem=X,40,L
 T(H,#OONotYetCode,#NotYetCodeHelp)
 
@@ -474,8 +500,7 @@ TXFORM=L2921
 #OOFirstDrawdownDate    
 #OOEmpNo  
 #OOEmpName      
-#OONotYetCode
-#OONotYetItemX    
+#OONotYetCode   
 #OOYetDate       
 #OOCloseDate
 #OOReMark     
@@ -484,6 +509,7 @@ TXFORM=L2921
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
@@ -539,7 +565,7 @@ TXFORM=L2921
 #OOTODATEDAY=迄今日數
 {width:85,align:'center'}
 
-#OOYetDate=齊件訖日    
+#OOYetDate=齊件迄日    
 {width:85,align:'center'}
 
 #OOCloseDate=銷號日期  
@@ -578,7 +604,7 @@ TXFORM=L2921
 #OOTODATEDAY=迄今日數
 {width:85,align:'center'}
 
-#OOYetDate=齊件訖日    
+#OOYetDate=齊件迄日    
 {width:85,align:'center'}
 
 #OOCloseDate=銷號日期  

@@ -101,8 +101,8 @@ public class LW003Report extends MakeReport {
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率",
 				"LW003_底稿_房貸獎勵費用率" + q + ".xls", "獎勵費用率");
 
-		this.info("use excel LW003_底稿房貸獎勵費用率"+q);
-		
+		this.info("use excel LW003_底稿房貸獎勵費用率" + q);
+
 		// 設定值
 		makeExcel.setValue(1, 1, wkYearRoc + "年放款部第" + wkMonth + "工作月房貸獎勵費用率統計表\n[獎勵費/個金總業績]～" + endDateStr);
 
@@ -179,7 +179,8 @@ public class LW003Report extends MakeReport {
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F1"));
 				// 獎勵金Bonus
-				BigDecimal bonus =lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F2").toString());
+				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F2").toString());
 
 				// 判斷列數
 				switch (deptCode) {
@@ -231,7 +232,8 @@ public class LW003Report extends MakeReport {
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F1"));
 				// 獎勵金Bonus
-				BigDecimal bonus =lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F2").toString());
+				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F2").toString());
 
 				// 判斷列數
 				switch (deptCode) {
@@ -275,7 +277,8 @@ public class LW003Report extends MakeReport {
 			for (Map<String, String> lw003Vo : data) {
 
 				// 總業績金
-				BigDecimal performance = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F1").toString());
+				BigDecimal performance = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F1").toString());
 
 				makeExcel.setValue(19, 4 + num, performance, "#,##0");
 
@@ -294,7 +297,8 @@ public class LW003Report extends MakeReport {
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F0"));
 				// 獎勵金Bonus
-				BigDecimal bonus = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F1").toString());
+				BigDecimal bonus = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F1").toString());
 
 				// 判斷欄位
 				if (quarter == 1) {
@@ -328,7 +332,7 @@ public class LW003Report extends MakeReport {
 		}
 
 		for (int y = 3; y <= 23; y++) {
-			makeExcel.formulaCalculate(y, 17);
+			makeExcel.formulaCalculate(y, 4 + y);
 		}
 
 	}

@@ -130,7 +130,7 @@ public class L2072 extends TradeBuffer {
 			occurslist.putParam("OOUpdateEmpNo", updateEmpNo);
 
 			occurslist.putParam("OOUpdateEmpName", ""); // 更新人員姓名
-			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);
+			tCdEmp = sCdEmpService.findById(updateEmpNo, titaVo);
 
 			if (tCdEmp != null) {
 				occurslist.putParam("OOUpdateEmpName", tCdEmp.getFullname()); // 更新人員姓名

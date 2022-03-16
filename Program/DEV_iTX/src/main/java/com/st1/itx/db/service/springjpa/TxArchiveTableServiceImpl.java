@@ -356,4 +356,36 @@ em = null;
     }
   }
 
+  @Override
+  public void Usp_L6_ArchiveFiveYearTx_Copy(int tbsdyf,  String empNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      txArchiveTableReposDay.uspL6ArchivefiveyeartxCopy(tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onMon))
+      txArchiveTableReposMon.uspL6ArchivefiveyeartxCopy(tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onHist))
+      txArchiveTableReposHist.uspL6ArchivefiveyeartxCopy(tbsdyf,  empNo);
+   else
+      txArchiveTableRepos.uspL6ArchivefiveyeartxCopy(tbsdyf,  empNo);
+  }
+
+  @Override
+  public void Usp_L6_UnarchiveFiveYearTx_Copy(int custNo,  int facmNo,  int bormNo,  int tbsdyf,  String empNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      txArchiveTableReposDay.uspL6UnarchivefiveyeartxCopy(custNo,  facmNo,  bormNo,  tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onMon))
+      txArchiveTableReposMon.uspL6UnarchivefiveyeartxCopy(custNo,  facmNo,  bormNo,  tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onHist))
+      txArchiveTableReposHist.uspL6UnarchivefiveyeartxCopy(custNo,  facmNo,  bormNo,  tbsdyf,  empNo);
+   else
+      txArchiveTableRepos.uspL6UnarchivefiveyeartxCopy(custNo,  facmNo,  bormNo,  tbsdyf,  empNo);
+  }
+
 }

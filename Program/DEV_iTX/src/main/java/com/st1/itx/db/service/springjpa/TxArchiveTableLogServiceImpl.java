@@ -91,9 +91,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Type", "ExecuteDate", "TableName", "BatchNo", "CustNo", "FacmNo", "BormNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Type", "DataFrom", "DataTo", "ExecuteDate", "TableName", "BatchNo", "CustNo", "FacmNo", "BormNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Type", "ExecuteDate", "TableName", "BatchNo", "CustNo", "FacmNo", "BormNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Type", "DataFrom", "DataTo", "ExecuteDate", "TableName", "BatchNo", "CustNo", "FacmNo", "BormNo"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = txArchiveTableLogReposDay.findAll(pageable);

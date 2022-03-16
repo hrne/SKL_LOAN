@@ -33,7 +33,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxAttachment;
+import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.service.TxAttachmentService;
+import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.MySpring;
@@ -49,7 +51,10 @@ import com.st1.itx.util.parse.ZLibUtils;
 public class AjaxController extends SysLogger {
 
 	@Autowired
-	MenuBuilder menuBuilder;
+	private MenuBuilder menuBuilder;
+
+	@Autowired
+	private TxFileService txFileService;
 
 	@PostConstruct
 	public void init() {
@@ -113,6 +118,10 @@ public class AjaxController extends SysLogger {
 		} finally {
 			ThreadVariable.clearThreadLocal();
 			SafeClose.close(inputStream);
+
+			zLibUtils = null;
+			txAttachmentService = null;
+			txAttachment = null;
 		}
 	}
 
@@ -122,6 +131,34 @@ public class AjaxController extends SysLogger {
 		this.info("getFile...");
 
 		fileType = fileType == null ? "" : fileType.trim();
+		if (fileType.equals("7")) {
+			InputStream inputStream = null;
+			ZLibUtils zLibUtils = MySpring.getBean("zLibUtils", ZLibUtils.class);
+			TxFile txFile = txFileService.findById(Long.parseLong(Objects.isNull(sno) || sno.isEmpty() ? "0" : sno));
+			try {
+				if (Objects.isNull(txFile))
+					return;
+
+				response.addHeader("Access-Control-Allow-Origin", "*");
+				response.setHeader("Content-Disposition", "attachment;filename*=UTF-8'zh_TW'" + URLEncoder.encode(txFile.getFileItem(), "UTF-8"));
+				response.setContentType("application/force-download");
+
+				inputStream = new ByteArrayInputStream(zLibUtils.unCompress7z(txFile.getFileZip()));
+				IOUtils.copy(inputStream, response.getOutputStream());
+				response.flushBuffer();
+				return;
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+				return;
+			} finally {
+				txFile = null;
+				zLibUtils = null;
+				SafeClose.close(inputStream);
+				ThreadVariable.clearThreadLocal();
+			}
+		}
 
 		TitaVo titaVo = new TitaVo();
 		titaVo.putParam("fileno", sno);
@@ -143,6 +180,7 @@ public class AjaxController extends SysLogger {
 			response.addHeader("Access-Control-Allow-Origin", "*");
 
 			if (!"1".equals(fileType)) {
+
 				response.setHeader("Content-Disposition", "attachment;filename*=UTF-8'zh_TW'" + URLEncoder.encode(saveName, "UTF-8"));
 				response.setContentType("application/force-download");
 				// "attachment;filename*=UTF-8''"+URLEncoder.encode("时间都去哪儿了.mp3", "UTF-8");
@@ -199,16 +237,17 @@ public class AjaxController extends SysLogger {
 					prt = (String) p.get("Printer");
 					prtIp = (String) p.get("ServerIp");
 				}
-				
+
 				if (!"1".equals(p.get("morePage").toString()) || pageNo > 100)
 					break;
-				
+
 				pageNo++;
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.error(errors.toString());
 				map.put("success", false);
+				map.put("msg", e.getMessage());
 				break;
 			}
 		}
