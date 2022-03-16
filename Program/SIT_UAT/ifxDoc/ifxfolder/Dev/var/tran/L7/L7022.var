@@ -79,6 +79,21 @@ E(0,0)
 T(4,#SYSCDATE)
 !T(4,DATE$)
 
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+! Ias39LGDType類別下拉選單1
+#Ias39LGDTypeCode=x,20,S
+T(3,CdCode.Ias39LGDType)
+#Ias39LGDTypeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#Ias39LGDTypeCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@Ias39LGDTypeHelp,#HelpDesc1)
+
+
 ! 生效日期起
 #DateStart=D,7,I
 !T(1,#DATE,2,7)
@@ -125,10 +140,13 @@ T(3,1)ASGN(LOOP$)
 ! 類別(TOTA)
 #OOType=A,2,S
 
-! 類別說明(TOTA)
+! 類別說明(TOTA)-改抓HELP中文
 #OOTypeDesc=X,20,S
 #OOTypeDescX=X,23,S
-T(2,#OOType+-+#OOTypeDesc)
+T(2,)
+T(H,#OOType,#Ias39LGDTypeHelp)
+C(4,OOTypeDescX,T(2,#OOType),T(2,#OOType+#OOTypeDescX))
+
 
 ! 違約損失率％(TOTA)
 #OOLGDPercent=m,2.5,S
@@ -148,11 +166,21 @@ T(B,#OOLGDPercentX+%)
 E(0,2)
 
 #OOBUF2=X,38,S
-T(2,#OOFunc2+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent)
+T(2,#OOFunc2+#OODate+#OOType+#OOLGDPercent)
 !T(2,#OOFunc2+#OODate+#OOType+#OOTypeDesc+#OOLGDPercent+#OOEnable)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L7202;text=修改;ntxbuf=#OOBUF2})
+
+! 複製的按鈕
+#OOFunc3=A,1,S
+E(0,3)
+
+#OOBUF3=X,38,S
+T(2,#OOFunc3+#OODate+#OOType+#OOLGDPercent)
+
+#OOBTN3=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L7202;text=複製;ntxbuf=#OOBUF3})
 
 !! 刪除的按鈕  (移除刪除功能)
 !#OOFunc4=A,1,S
@@ -176,10 +204,10 @@ BIND(grid,{cmd=CHAIN;ntxcd=L7202;text=修改;ntxbuf=#OOBUF2})
 
 !------ 下行電文TOM ------
 <sub type="TOM">
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L7022
 #OODate
 #OOType
-#OOTypeDesc
 #OOLGDPercent
 ^
 <include src="COM.icf::TRCTL.tom"/>
@@ -201,6 +229,8 @@ TXFORM=L7022
 
 #OOBTN2=
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+#OOBTN3=
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN3',align:'center',canExport:false}
 
 !#OOBTN4=
 !{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
@@ -209,7 +239,7 @@ TXFORM=L7022
 {width:100,align:'center'}
 
 #OOTypeDescX=類別
-{width:150,align:'center'}
+{width:150,align:'left'}
 
 #OOLGDPercentX1=違約損失率％
 {width:150,align:'center'}

@@ -63,8 +63,9 @@ K(MODIFYBUTTON,4,其他擔保品新增)
 ["[L2038]                                 擔保品明細資料查詢"],
 ["#FdClMainType+擔保品大類",#ClMainType,#ClMainTypeX],
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
-["#FdClCode2+擔保品代號2",#ClCode2,#BTN1,#ClCode2X],
+["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品編號",#ClNo],
+["#FdClTypeCode+擔保品類別",#ClTypeCode,#ClTypeCodeName],
 ["#FdApproveNo+核准號碼",#ApproveNo],
 ["#FdCustId+借款戶統編",#CustId,#BTN2],
 ["#FdCustNo+戶號",#CustNo,#BTN3],
@@ -78,6 +79,7 @@ K(MODIFYBUTTON,4,其他擔保品新增)
 #FdClCode1=X,2,L
 #FdClCode2=X,2,L
 #FdClNo=X,2,L
+#FdClTypeCode=X,2,L
 #FdFacmNo=X,2,L
 #FdApproveNo=X,2,L
 #FdCustId=X,2,L
@@ -96,7 +98,7 @@ K(MODIFYBUTTON,4,其他擔保品新增)
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,8,I,ui:button;value:擔保品代號查詢;enable:1;tabbable:0
+
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 #BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 #BTN4=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
@@ -130,9 +132,41 @@ T(3,CdCode.ClTypeCode)
 
 #ClTypeCodeHelp=x,1024,S 
 
+!不動產
+!ClTypeCode21
+#CDDEF06=x,20,S
+T(3,CdCode.ClTypeCode21)
+
+#ClTypeCode21Help=x,1024,S
+
+!ClTypeCode22
+#CDDEF07=x,20,S
+T(3,CdCode.ClTypeCode22)
+
+#ClTypeCode22Help=x,1024,S
+
+!動產
+#CDDEF08=x,20,S
+T(3,CdCode.ClTypeCode2)
+
+#ClTypeCodeHelp2=x,1024,S
+
+!股票
+!ClTypeCode23
+#CDDEF09=x,20,S
+T(3,CdCode.ClTypeCode23)
+
+#ClTypeCode23Help=x,1024,S
+
+!ClTypeCode24
+#CDDEF10=x,20,S
+T(3,CdCode.ClTypeCode24)
+
+#ClTypeCode24Help=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClCode1Help,#HelpDesc1)
@@ -140,6 +174,74 @@ T(2,@ClMainTypeHelp,#HelpDesc2)
 T(2,@SettingStatHelp,#HelpDesc3)
 T(2,@ClStatHelp,#HelpDesc4)
 T(2,@ClTypeCodeHelp,#HelpDesc5)
+T(2,@ClTypeCode21Help,#HelpDesc6)
+T(2,@ClTypeCode22Help,#HelpDesc7)
+T(2,@ClTypeCodeHelp2,#HelpDesc8)
+T(2,@ClTypeCode23Help,#HelpDesc9)
+T(2,@ClTypeCode24Help,#HelpDesc10)
+
+!ClTypeCode,其他擔保品類別
+#CDDEF11=x,20,S
+T(3,CdCode.ClTypeCode4)
+
+#ClTypeCodeHelp4=x,2048,S
+
+#CDDEF12=x,20,S
+T(3,CdCode.ClCode21)
+
+#ClCode21Help=x,1024,S
+
+#CDDEF13=x,20,S
+T(3,CdCode.ClCode22)
+
+#ClCode22Help=x,1024,S
+
+#CDDEF14=x,20,S
+T(3,CdCode.ClCode23)
+
+#ClCode23Help=x,1024,S
+
+#CDDEF15=x,20,S
+T(3,CdCode.ClCode24)
+
+#ClCode24Help=x,1024,S
+
+#CDDEF16=x,20,S
+T(3,CdCode.ClCode25)
+
+#ClCode25Help=x,1024,S
+
+#CDDEF17=x,20,S
+T(3,CdCode.ClCode29)
+
+#ClCode29Help=x,1024,S
+
+#CDDEF18=x,20,S
+T(3,CdCode.ClTypeCode1)
+
+#ClTypeCodeHelp1=x,1024,S
+
+#CDDEF19=x,20,S
+T(3,CdCode.ClTypeCode3)
+
+#ClTypeCodeHelp3=x,1024,S
+
+
+#HelpRim2=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15,#CDDEF16,#CDDEF17,#CDDEF18,#CDDEF19)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClTypeCodeHelp4,#HelpDesc1)
+T(2,@ClCode21Help,#HelpDesc2)
+T(2,@ClCode22Help,#HelpDesc3)
+T(2,@ClCode23Help,#HelpDesc4)
+T(2,@ClCode24Help,#HelpDesc5)
+T(2,@ClCode25Help,#HelpDesc6)
+T(2,@ClCode29Help,#HelpDesc7)
+T(2,@ClTypeCodeHelp1,#HelpDesc8)
+T(2,@ClTypeCodeHelp3,#HelpDesc9)
+
 !調RIM縣市 ST
 <include src="ROM.icf::L6R03.dec"/>
 
@@ -169,7 +271,6 @@ T(4,CHAIN$)
 INVOKEJS(SHOW,p2,0)
 INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
-HIDE(#BTN1)
 
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -196,13 +297,13 @@ HELP(#ClMainTypeHelp)
 IF(#ClMainType==1,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
 IF(#ClMainType==2,INVOKEJS(SHOW,p3,1),INVOKEJS(SHOW,p3,0))
 IF(#ClMainType==3,INVOKEJS(SHOW,p4,1),INVOKEJS(SHOW,p4,0))
+C(4,#ClMainType,INVOKEJS(SHOW,p1,2,4,1),INVOKEJS(SHOW,p1,2,4,0))
 C(4,#ClMainType,S,$)
 V(7)V(5,1,4)
 V(H,#ClMainTypeHelp)
 
 
 #ClMainTypeX=X,10,L
-C(4,#ClMainType,SHOW(#BTN1),HIDE(#BTN1))
 C(4,#ClMainType,S,$)
 T(H,#ClMainType,#ClMainTypeHelp)
 
@@ -219,6 +320,7 @@ T(3,5:銀行保證)
 !擔保品代號1
 #ClCode1=X,1,I
 C(3,#CHAIN,1,s,$)
+C(4,#ClMainType,$,S)
 HELP(#ClCode1Help)
 C(3,#ClMainType,1,HELP(#ClCode1Help1),$)
 C(3,#ClMainType,2,HELP(#ClCode1Help2),$)
@@ -236,26 +338,41 @@ C(3,#ClMainType,4,V(H,#ClCode1Help4),$)
 C(4,#ClCode1,S,$)
 T(H,#ClCode1,#ClCode1Help)
 
-#BUF1=X,42,S
-C(4,#ClCode1,T(2,0+00),T(2,#ClCode1+00))
-! T(2,#ClCode1+#ClCode2)
-
-!依擔保品代號1取擔保品代號2下拉選單RIM
-#BIND1=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6063; ntxbuf=#BUF1;ntxbuf5=type<-1:ClCode2<-OOClCode2:ClCode2X<-OOClItem})
-
 !擔保品代號2
 #ClCode2=X,2,I
 C(3,#CHAIN,1,s,$)
-@C(3,#ClCode2,0,S,$)
-
+C(4,#ClMainType,$,S)
+C(3,#ClCode1,1,HELP(#ClCode21Help),$)
+C(3,#ClCode1,2,HELP(#ClCode22Help),$)
+C(3,#ClCode1,3,HELP(#ClCode23Help),$)
+C(3,#ClCode1,4,HELP(#ClCode24Help),$)
+C(3,#ClCode1,5,HELP(#ClCode25Help),$)
+C(3,#ClCode1,9,HELP(#ClCode29Help),$)
+@
+C(4,#ClCode2,S,$)
+C(3,#ClCode1,1,V(H,#ClCode21Help),$)
+C(3,#ClCode1,2,V(H,#ClCode22Help),$)
+C(3,#ClCode1,3,V(H,#ClCode23Help),$)
+C(3,#ClCode1,4,V(H,#ClCode24Help),$)
+C(3,#ClCode1,5,V(H,#ClCode25Help),$)
+C(3,#ClCode1,9,V(H,#ClCode29Help),$)
+V(9)
 
 #ClCode2X=X,50,L
+C(4,#ClCode1,S,$)
+C(4,#ClCode2,S,$)
+C(3,#ClCode1,1,T(H,#ClCode2,#ClCode21Help),$)
+C(3,#ClCode1,2,T(H,#ClCode2,#ClCode22Help),$)
+C(3,#ClCode1,3,T(H,#ClCode2,#ClCode23Help),$)
+C(3,#ClCode1,4,T(H,#ClCode2,#ClCode24Help),$)
+C(3,#ClCode1,5,T(H,#ClCode2,#ClCode25Help),$)
+C(3,#ClCode1,9,T(H,#ClCode2,#ClCode29Help),$)
 
 
 !擔保品編號
 #ClNo=X,7,I
 C(3,#CHAIN,1,s,$)
+C(4,#ClMainType,$,S)
 @C(4,#ClNo,S,$)
 V(9)
 
@@ -263,6 +380,40 @@ V(9)
 C(4,#ClNo,S,$)
 E(0,@TmpClNo,#ClNo)
 T(2,@ClNo,#TmpClNo)
+
+! [擔保品類別]
+#ClTypeCode=X,3,I
+C(3,#CHAIN,1,s,$)
+IF(#ClCode1==1,HELP(#ClTypeCode21Help),$)
+IF(#ClCode1==2,HELP(#ClTypeCode22Help),$)
+IF(#ClCode1==3,HELP(#ClTypeCode23Help),$)
+IF(#ClCode1==4,HELP(#ClTypeCode24Help),$)
+IF(#ClCode1==5,HELP(#ClTypeCodeHelp4),$)
+IF(#ClCode1==9,HELP(#ClTypeCodeHelp2),$)
+IF(#ClMainType==1,HELP(#ClTypeCodeHelp1),$)
+IF(#ClMainType==2,HELP(#ClTypeCodeHelp2),$)
+IF(#ClMainType==3,HELP(#ClTypeCodeHelp3),$)
+IF(#ClMainType==4,HELP(#ClTypeCodeHelp4),$)
+C(4,#ClMainType,C(4,#ClCode1,HELP(#ClTypeCodeHelp),$),$)
+@
+C(4,#ClTypeCode,S,$)
+IF(#ClCode1==1,V(H,#ClTypeCode21Help),$)
+IF(#ClCode1==2,V(H,#ClTypeCode22Help),$)
+IF(#ClCode1==3,V(H,#ClTypeCode23Help),$)
+IF(#ClCode1==4,V(H,#ClTypeCode24Help),$)
+IF(#ClCode1==5,V(H,#ClTypeCodeHelp4),$)
+IF(#ClCode1==9,V(H,#ClTypeCodeHelp2),$)
+IF(#ClMainType==1,V(H,#ClTypeCodeHelp1),$)
+IF(#ClMainType==2,V(H,#ClTypeCodeHelp2),$)
+IF(#ClMainType==3,V(H,#ClTypeCodeHelp3),$)
+IF(#ClMainType==4,V(H,#ClTypeCodeHelp4),$)
+C(4,#ClMainType,C(4,#ClCode1,V(H,#ClTypeCodeHelp),$),$)
+
+#ClTypeCodeName=X,50,L
+C(4,#ClTypeCode,S,$)
+T(H,#ClTypeCode,#ClTypeCodeHelp)
+
+			   
 
 !核准號碼
 #ApproveNo=X,7,I
@@ -890,6 +1041,7 @@ IF(#OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#E
 #ClCode1
 #ClCode2
 #ClNo
+#ClTypeCode
 #FacmNo
 #ApproveNo
 #CustId

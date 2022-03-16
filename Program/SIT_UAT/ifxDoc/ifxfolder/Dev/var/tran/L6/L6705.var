@@ -77,7 +77,7 @@ T(3,*)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6075進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6075 聯徵報送-地區別資料查詢]進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 

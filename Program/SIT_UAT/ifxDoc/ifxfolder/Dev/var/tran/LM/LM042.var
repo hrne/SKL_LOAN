@@ -1,0 +1,160 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LM042)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[280,720];printer.width=[20,20,20,20];order=1;">
+[
+["[LM042]                   LM042 RBC會計表"],
+["@@@年月",#YearMonth],
+["@@@放款項目","@風險係數"],
+["@@@非授信限制對象-銀行保證放款",#RiskFactor1],
+["@@@非授信限制對象-動產擔保放款",#RiskFactor2],
+["@@@非授信限制對象-不動產擔保放款",#RiskFactor3],
+["@@@非授信限制對象-有價證券質押放款",#RiskFactor4],
+["@@@授信限制對象-非具控制與從屬關係",#RiskFactor5],
+["@@@授信限制對象-具控制與從屬關係",#RiskFactor6],
+]
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,3,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+! T(1,@FUNCD,#NTXBUF,1,1)
+! T(1,@TLR,#NTXBUF,2,2)
+T(2,@FKEY,7)
+
+
+#YearMonth=A,5,I
+C(3,#YearMonth,0,T(1,@YearMonth,#SYSDATE,2,5),$)
+@V(7)
+
+
+!#SendLMR42=X,1,S
+!RESET_RIM(#SendLMR42,LMR42)
+S(LMR42,0,#YearMonth)
+R(1,LMR42)
+
+E(0,@RiskFactor1,#LMR42RiskFactor1)
+E(0,@RiskFactor2,#LMR42RiskFactor2)
+E(0,@RiskFactor3,#LMR42RiskFactor3)
+E(0,@RiskFactor4,#LMR42RiskFactor4)
+E(0,@RiskFactor5,#LMR42RiskFactor5)
+E(0,@RiskFactor6,#LMR42RiskFactor6)
+
+#RiskFactor1=n,1.4,I
+@V(5,0.0000,0.9999)
+#RiskFactor2=n,1.4,I
+@V(5,0.0000,0.9999)
+#RiskFactor3=n,1.4,I
+@V(5,0.0000,0.9999)
+#RiskFactor4=n,1.4,I
+@V(5,0.0000,0.9999)
+#RiskFactor5=n,1.4,I
+@V(5,0.0000,0.9999)
+#RiskFactor6=n,1.4,I
+@V(5,0.0000,0.9999)
+
+#LMR42RiskFactor1=n,1.4,I
+#LMR42RiskFactor2=n,1.4,I
+#LMR42RiskFactor3=n,1.4,I
+#LMR42RiskFactor4=n,1.4,I
+#LMR42RiskFactor5=n,1.4,I
+#LMR42RiskFactor6=n,1.4,I
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+! #PRTSC_RFG=X,1,S
+! C(3,#HCODE,1,S,$)
+! C(5,#TXFORM,LM042,$,S)
+! C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LM042">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,LM042,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM042] LM042 RBC會計表)
+</sub>
+
+!---------- TXFORM = LM042 ----------
+<sub type="FORM" name="LM042">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM042,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM042] LM042 RBC會計表)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#YearMonth
+#RiskFactor1
+#RiskFactor2
+#RiskFactor3
+#RiskFactor4
+#RiskFactor5
+#RiskFactor6
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=LM042
+^
+TXFORM=LMR42
+#LMR42RiskFactor1
+#LMR42RiskFactor2
+#LMR42RiskFactor3
+#LMR42RiskFactor4
+#LMR42RiskFactor5
+#LMR42RiskFactor6
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

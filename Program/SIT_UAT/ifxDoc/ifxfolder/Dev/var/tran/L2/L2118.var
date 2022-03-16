@@ -100,6 +100,7 @@ T(3,Y:是)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2018共同借款人資料查詢]進入),$)
 
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -237,7 +238,7 @@ C(3,#ApplNo{n},0,S,$)
 E(0,@RimApplNo,#ApplNo{n})
 C(3,#FuncCode,1,E(0,@RimFuncCode,#FuncCode),E(0,@RimFuncCode,5))
 T(2,@RimCustId,)
-RESET_RIM(#SendL2r02A,{n}L2R02)
+RESET_RIM(#SendL2r02A{n},L2R02)
 S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
 R(1,L2R02)
 
@@ -249,8 +250,6 @@ E(0,@RimCustNo,0)
 RESET_RIM(#L2r07A{n},L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
-
-#RcvL2r05A{n}=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
 C(3,#ApplNo{n},0,S,$)
 E(0,@MCustNo{n},#L2r05CustNo)
@@ -263,6 +262,8 @@ E(0,@MUtilDeadline{n},#L2r05UtilDeadline)
 T(2,@MCurrencyCode{n},#L2r05CurrencyCode)
 E(0,@MLineAmt{n},#L2r05LineAmt)
 C(3,#L2r05RecycleCode,1,T(3,@MRecycleCode{n},Y),T(3,@MRecycleCode{n},))
+
+! #RcvL2r05A{n}=X,1,S
 
 !戶號-額度
 #MCustNo{n}=A,7,L

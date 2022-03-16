@@ -26,7 +26,13 @@ E(0,0)
 [#<->#,"#FdID_TYPE+個金/企金",#ID_TYPE,#ID_TYPEX],
 [#<->#,"#FdCORP_IND+企金別",#CORP_IND,#CORP_INDX],
 [#<->#,"#FdAPNO+業務科目",#APNO,#APNOX],
+["#FdMsg+@注意事項",#Msg],
 ] 
+
+#FdMsg=X,1,L
+#Msg=x,20.100,L
+K(LIGHT,#Msg,TXTRED,0)
+INVOKEJS(SHOW,L4702,9,9,0)
 
 #FdFunctionCodeX=X,2,L
 T(3,*)
@@ -110,7 +116,9 @@ T(4,NBSDY$)
 C(3,#CHAIN,0,E(0,1),E(0,2))
 C(3,#CHAIN,0,$,s)
 HELP(#FunctionHelp)
-@V(H,#FunctionHelp)
+@
+V(H,#FunctionHelp)
+C(3,#FunctionCode,2,INVOKEJS(SHOW,L4702,9,9,0),$)
 
 #FunctionCodeX=X,4,L  
 T(3,)T(H,#FunctionCode,#FunctionHelp)
@@ -197,6 +205,7 @@ C(3,#CHAIN,0,$,s)
 @V(2,0)
 V(5,#CUSTNO,9999999)
 
+
 !選擇條件一
 #CONDITION1=A,1,I
 C(3,#FunctionCode,2,s,$)
@@ -248,6 +257,30 @@ HELP(#ApnoHelp)
 #APNOX=X,12,L
 T(H,#APNO,#ApnoHelp)
 
+<include src="ROM.icf::L1R20.dec"/>
+
+#CustNo=A,7,S
+E(0,#CUSTNO)
+
+#FacmNo=A,3,S
+E(0,0)
+
+#FormNo=x,10,S
+T(3,L4702)
+
+#RimFlag=A,1,S
+
+#L1R20Rim2=X,1,S
+C(3,#CUSTNO,#CUSTNOB,$,S)
+RESET_RIM(#L1R20Rim2,L1R20)
+E(0,@RimFlag,0)
+S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
+R(1,L1R20)
+T(2,@Msg,#L1R20Msg)
+
+#ShowMsg=A,1,S
+C(3,#CUSTNO,#CUSTNOB,C(4,#Msg,E(0,0),E(0,1)),E(0,0))
+INVOKEJS(SHOW,L4702,9,9,#ShowMsg)
 
 </sub>
 
@@ -282,9 +315,10 @@ T(3,[L4702] 放款本息攤還表暨繳息通知單)
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L1R20.tom"/>
 TXFORM=L4702
 ^
-<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

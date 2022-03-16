@@ -34,8 +34,10 @@ T(3,0:無權限;1:有權限)
 [      "#Fd5+姓名",                #TlrItem],
 [      "#Fd3+權限等級",            #LevelFg,#LevelFgX],
 [      "#FdAllowFg+主管等級",      #AllowFg],
-[      "#Fd8+使用單位",            #BrNo,#BrNoX],
+[      "#FdBrNo+使用單位",         #BrNo,#BrNoX],
 [      "#Fd9+課組別",              #GroupNo,#GroupNoX],
+[      "#FdStation+站別",          #Station,#StationX],
+[      "#FdAdminFg+管理者權限",    #AdminFg,#AdminFgX],
 [      "#Fd7+狀態",                #Status,#StatusX],
 [      "#AmlHighFgFd+AML定審高風險處理權限",#AmlHighFg,#AmlHighFgX],
 ![#Fd1],
@@ -54,7 +56,7 @@ T(3,0:無權限;1:有權限)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6041進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6041 使用者資料查詢]進入),$)
 C(2,#CHAIN,$,T(F,@FunCode,0))
 
 
@@ -86,16 +88,25 @@ T(3,CDBR)
 #H2=X,9,S
 T(3,AUTHGROUP)
 
+#AdminFgH=x,100,S
+T(3,0:無權限;1:有權限)
+
 #AuthHelp=X,1024,S
+
+#StationCode=x,14,S
+T(3,CdCode.Station)
+
+#StationHelp=x,1000,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#H1,#H2,#CODEFuncCode2)
+S(XXR99,01,#H1,#H2,#CODEFuncCode2,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@BrHelp,#HelpDesc1)
 T(2,@AuthHelp,#HelpDesc2)
 T(2,@FuncCode2Help,#HelpDesc3)
+T(2,@StationHelp,#HelpDesc4)
 
 ![經辦/使用者等級]
 #LevelHelp=X,100,S
@@ -114,15 +125,23 @@ T(3,1:啟用;9:停用);
 C(3,#CHAIN,0,$,S)
 T(3,*)
 
-
 #FdAllowFg=X,2,L
-T(3,*)
+C(3,#FunCode,5,S,T(3,*))
+
+#FdBrNo=X,2,L
+C(3,#FunCode,5,S,T(3,*))
+
+#FdAdminFg=X,2,L
+C(3,#FunCode,5,S,T(3,*))
+
+#FdStation=X,2,L
 
 ![維護記號](1:新增;2:修改;4:刪除;5:查詢)
 #FunCode=A,1,S
 C(2,#CHAIN,$,s)
-HELP(#FuncCode2Help)
-@V(H,#FuncCode2Help)
+!HELP(#FuncCode2Help)
+!@
+!V(H,#FuncCode2Help)
 
 #HIDE=X,1,S
 C(3,#FunCode,1,INVOKEJS(SHOW,p2,2,40,0),$)
@@ -166,6 +185,8 @@ T(F,@GroupNo,#ShowFrame2)
 T(F,@Desc,#ShowFrame2)
 T(F,@TlrItem,#ShowFrame2)
 T(F,@AllowFg,#ShowFrame2)
+T(F,@Station,#ShowFrame2)
+T(F,@AdminFg,#ShowFrame2)
 ##loop {times:40,i:1}
 T(F,@AuthNo{i},#ShowFrame2)
 ##end
@@ -183,6 +204,10 @@ RESET_RIM(#RIM_L6R20,L6R20)
 S(L6R20,01,#FunCode,#TlrNo,#END)
 R(1,L6R20)
 
+!變更者是否為管理者
+#IsAdmin=A,1,S
+C(3,#IsAdmin,1,T(F,@AdminFg,1)T(F,@BrNO,1),T(F,@AdminFg,0)T(F,@BrNo,0)T(3,@FdBrNo,)T(3,@FdAdminFg,))
+
 #RIMSET=X,1,S
 C(2,#FunCode,s,s,$,s,$,$)
 ##loop {times:39,i:2}
@@ -198,14 +223,14 @@ S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
 R(1,L6R17)
 T(2,@TlrItem,#L6R17Fullname)
 
-
-
 #TT=X,1,S
 T(H,@LevelFgX,#LevelFg,#LevelHelp)
 T(H,@AdFgX,#AdFg,#YnHelp)
 T(H,@BrNoX,#BrNo,#BrHelp)
 T(H,@StatusX,#Status,#StatusHelp)
 T(H,@AmlHighFgX,#AmlHighFg,#AmlHighFgH)
+T(H,@AdminFgX,#AdminFg,#AdminFgH)
+C(4,#Station,T(3,@StationX,總公司),T(H,@StationX,#StationHelp))
 
 #GroupT=X,4,S
 T(3,GROP)
@@ -307,6 +332,7 @@ HELP(#LevelHelp)
 T(H,#LevelFg,#LevelHelp)
 
 #AllowFg=A,1,I
+C(2,#FunCode,s,$,$,s,s,s)
 C(3,#LevelFg,1,$,S)
 @
 V(5,1,5)
@@ -337,6 +363,8 @@ T(H,#AdFg,#YnHelp)
 
 #BrNo=X,4,I
 C(2,#FunCode,s,$,$,s,s,s)
+C(3,#FunCode,1,T(2,#KINBR),$)
+C(3,#IsAdmin,1,$,s)
 HELP(#BrHelp)
 @V(H,#BrHelp)
 
@@ -376,6 +404,27 @@ HELP(#GroupHelp,cols:2))
 
 #GroupNoX=X,20,L
 T(H,#GroupNo,#GroupHelp)
+
+!站別
+#Station=X,3,I
+C(2,#FunCode,s,$,$,s,s,s)
+HELP(#StationHelp)
+@
+C(4,#Station,S,V(H,#StationHelp))
+
+#StationX=x,20,L
+C(4,#Station,T(3,總公司),T(H,#Station,#StationHelp))
+
+!管理者權限
+#AdminFg=A,1,I
+C(2,#FunCode,s,$,$,s,s,s)
+C(3,#IsAdmin,1,$,s)
+HELP(#AdminFgH)
+@
+V(H,#AdminFgH)
+
+#AdminFgX=X,2,L
+T(H,#AdminFg,#AdminFgH)
 
 ![經辦/使用者狀態]
 
@@ -2521,6 +2570,8 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNo),T(2,#EMPNOS))
 #FunCode#TlrNo#LevelFg#AllowFg#Status#BrNo#GroupNo#AdFg#Desc
 #LtxDate#LtxTime#TxtNo#Entdy#LogonFg#TlrItem
 #AmlHighFg
+#Station
+#AdminFg
 ##loop {times:40,i:1}
 #AuthNo{i}
 ##end
@@ -2555,6 +2606,9 @@ TXFORM=L6R20
 #LastUpdate
 #LastUpdateEmpNo
 #LastUpdateEmpNoX
+#Station
+#AdminFg
+#IsAdmin
 ##loop {times:40,i:1}
 #AuthNo{i}
 ##end

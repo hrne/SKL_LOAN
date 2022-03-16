@@ -84,12 +84,8 @@ E(0,40)ASGN(INQPRT$)
 ]
 
 #FdClCode1=X,2,L
-T(3,*)
 #FdClCode2=X,2,L
-T(3,*)
 #FdClNo=X,2,L
-T(3,*)
-
 #FdClTypeCode=X,2,L
 #FdEvaDate=X,2,L
 #FdEvaNetWorth=X,2,L
@@ -260,7 +256,7 @@ C(4,#OwnerId{n},INVOKEJS(SHOW,grd3_{k},0),INVOKEJS(SHOW,grd3_{k},1))
 C(3,#FirstAmt{n},0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
 ##end
 !代號1
-#ClCode1=A,1,I
+#ClCode1=A,1,L
 C(3,#CHAIN,1,s,$)
 HELP(#ClCode1Help) 
 @V(H,#ClCode1Help)
@@ -270,7 +266,7 @@ C(4,#ClCode1,S,$)
 T(H,#ClCode1,#ClCode1Help)
 
 !代號2
-#ClCode2=A,2,I
+#ClCode2=A,2,L
 C(3,#CHAIN,1,s,$)
 C(2,#ClCode1,T(3,),
              HELP(#ClCode21Help),
@@ -287,7 +283,7 @@ C(2,#ClCode1,T(3,),T(H,#ClCode2,#ClCode21Help),
                    T(H,#ClCode2,#ClCode22Help))
 
 !擔保品編號
-#ClNo=A,7,I
+#ClNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
@@ -820,6 +816,8 @@ C(4,#OOAddress,BIND(grid,cancel),$)
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOtradecode2; ntxbuf=#OBuf4})
 C(4,#OOAddress,BIND(grid,cancel),$)
 C(5,#OOtradecode,"L2915",BIND(grid,cancel),$)
+C(3,#ClCode1,2,BIND(grid,cancel),$)
+
 
 #OBtn5=X,10,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L4060; ntxbuf=#OBuf5})
@@ -877,7 +875,7 @@ TXFORM=L2911
 #Cl1Type=類別
 {width:80,align:'center'}
 
-#OBtn3=查詢
+#OBtn3=修改
 {width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OBtn4=刪除
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}

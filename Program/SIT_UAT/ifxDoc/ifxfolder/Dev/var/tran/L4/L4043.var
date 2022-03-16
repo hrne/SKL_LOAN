@@ -263,10 +263,19 @@ T(3,)T(H,#OOPostMediaCode,#MediaCodeHelp2)
 #OORepayAcctLog=A,14,O
 
 #OOStampFinishDate=D,7,O
+#OOStampCancelDate=D,7,O
 #OODeleteDate=D,7,O
 #OOButtenFlagA=A,1,O
 #OORetFlag=X,1,O
 #OOTitaTxCd=X,5,O
+
+#OOProcessDate=D,7,O
+#OOProcessTime=A,6,O
+
+#OOCreateEmpNo=X,30,O
+#OOCreareDate=D,7,O
+#OOLastUpdateEmpNo=X,30,O
+#OOLastUpdate=D,7,O
 
 
 #OOTitaTxType=X,2,S
@@ -292,6 +301,13 @@ T(2,2
 +#OOAmlRsp
 +#OOAuthCreateDate
 +#OOStampFinishDate
++#OOProcessDate
++#OOProcessTime
++#OOCreateEmpNo
++#OOCreareDate
++#OOLastUpdateEmpNo
++#OOLastUpdate
++#OOStampCancelDate
 )
 #OOBUF_DELETE=X,500,S
 T(2,4
@@ -309,6 +325,13 @@ T(2,4
 +#OOAmlRsp
 +#OOAuthCreateDate
 +#OOStampFinishDate
++#OOProcessDate
++#OOProcessTime
++#OOCreateEmpNo
++#OOCreareDate
++#OOLastUpdateEmpNo
++#OOLastUpdate
++#OOStampCancelDate
 )
 #OOBUF_SEARCH=X,500,S
 T(2,5
@@ -326,6 +349,13 @@ T(2,5
 +#OOAmlRsp
 +#OOAuthCreateDate
 +#OOStampFinishDate
++#OOProcessDate
++#OOProcessTime
++#OOCreateEmpNo
++#OOCreareDate
++#OOLastUpdateEmpNo
++#OOLastUpdate
++#OOStampCancelDate
 )
 ! #OOBTN_CREAT=A,2,O
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_CREAT})
@@ -410,6 +440,13 @@ TXFORM=L4043
 #OOButtenFlagA
 #OORetFlag
 #OOTitaTxCd
+#OOProcessDate
+#OOProcessTime
+#OOCreateEmpNo
+#OOCreareDate
+#OOLastUpdateEmpNo
+#OOLastUpdate
+#OOStampCancelDate
 
 ^
 </sub>

@@ -7,10 +7,6 @@
 !#TXCD
 !T(3,L1101)
 
-!打開暫存
-#Binit=X,1,S
-K(MODIFYBUTTON,acsave)
-
 ![資料表頭(HEADER)長度]
 #INQHD=n,4,S
 E(0,1076)ASGN(INQHD$)
@@ -31,6 +27,10 @@ E(0,1)ASGN(LOOPHEIGHT$)
 #INQPRT=n,2,S
 E(0,1)ASGN(INQPRT$)
 
+</sub>
+
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -89,9 +89,8 @@ T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L1001 顧客明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 
-#NTXBUF=X,11,S
+#NTXBUF=x,11,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-!#CHAIN_Funcd=A,1,S
 T(1,@FunCd,#NTXBUF,1,1)
 
 #CHAIN_CustId=X,10,S
@@ -281,8 +280,13 @@ T(3,CdCode.SubCompanyCode)
 
 #SubCompanyCodeHelp=x,1024,S
 
+#StationCode=x,14,S
+T(3,CdCode.Station)
+
+#StationHelp=x,1024,S
+
 #HelpRim=X,1,S
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008,#CDDEF0009,#CDDEF0010)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008,#CDDEF0009,#CDDEF0010,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@SexHelp,#HelpDesc1)
@@ -296,6 +300,7 @@ T(2,@YesNoHelp,#HelpDesc7)
 T(2,@AMLJobCodeHelp,#HelpDesc8)
 T(2,@TelTypeCodeHelp,#HelpDesc9)
 T(2,@RelationCodeHelp,#HelpDesc10)
+T(2,@StationHelp,#HelpDesc11)
 
 #HelpRim1=X,1,S
 S(XXR99,01,,#CDDEF0011)
@@ -329,21 +334,20 @@ R(1,L6R03)
 T(2,#L6r03Result)
 
 
-T(1,@CustId,#NTXBUF,2,10)
 
 #INIT=X,1,S
 INVOKEJS(SHOW,grd3,0)
 
-
-
 !功能
 #FunCd=A,1,S
-!C(3,#CHAIN,1,E(0,#CHAIN_Funcd),$)
-C(3,#CHAIN,1,T(F,@FunCd,0),T(F,@FunCd,1))
-C(3,#CHAIN,1,s,$)
-HELP(#FunCdHelp)
-@V(H,#FunCdHelp)
 
+#id=x,1,S
+C(3,#FunCd,1,S,$)
+T(1,@CustId,#NTXBUF,2,10)
+
+!打開暫存
+#Binit=X,1,S
+C(3,#FunCd,1,K(MODIFYBUTTON,acsave),S)
 
 #Space1=X,1,S
 E(0,@FUNCIND,#FunCd)
@@ -391,6 +395,9 @@ V(7)
 P(1,@checkIdlen,#CustId)
 C(3,#checkIdlen,10,$,V(P,請輸入正確身分證字號))
 A(ID_UNINO,0,#CustId)
+
+#MRKEY=_,_,S
+T(2,#CustId)
 
 #IdSTAT=A,1,S
 T(4,STAT$)
@@ -1082,7 +1089,7 @@ IF(#FdEmail=="*",V(7),$)
 C(4,#Email,$,A(M,0,#Email))
 </sub>
 
-<sub type="DC" name="p2" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p2" layout="cols=3;screen.width=[250,250,250,400];printer.width=[20,20,20,20];order=1">
 [
 [""],
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
@@ -1140,22 +1147,24 @@ V(H,#YesNoHelp)
 
 #IsSuspectedCheckX=X,4,L
 T(H,#IsSuspectedCheck,#YesNoHelp)
+C(5,#IsSuspectedCheck,Y,SHOW(#IsSuspectedCheckType,#IsSuspectedCheckTypeX),HIDE(#IsSuspectedCheckType,#IsSuspectedCheckTypeX))
 
 #IsSuspectedCheckTypeHelp=X,100,S
 T(3, :請選擇;Y:確認核對無誤)
 
 #IsSuspectedCheckType=X,1,I
 C(3,#FunCd,5,s,$)
+C(5,#IsSuspectedCheck,Y,$,S)
 HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
 V(H,#IsSuspectedCheckTypeHelp)
 
-#IsSuspectedCheckTypeX=X,4,L
+#IsSuspectedCheckTypeX=X,12,L
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 </sub>
-<sub type="DC" name="p3" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p3" layout="cols=3;screen.width=[250,250,250,400];printer.width=[20,20,20,20];order=1">
 [
 [""],
 [#<->#,"#FdEduCode+教育程度代號",#EduCode,#EduCodeX],
@@ -1279,7 +1288,7 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 
 #SubCompanyFgHelp=X,200,S
-T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行鎖之用;N:不同意)
+T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用;N:不同意)
 
 #SubCompanyFg=X,1,I
 C(3,#FunCd,4,s,$)
@@ -1357,7 +1366,7 @@ T(2,1+#CustId+0000000)ASGN(NTXBUF$)
 IF(#FunCd == 1,$,S)
 T(3,L1105)
 ASGN(NTXCD$)
-K(NEXTNOCLOSE,true)
+IF(#TypeCode==0||#TypeCode==1,K(NEXTNOCLOSE,true),$)
 
 #RPTFG=A,1,S
 C(3,#FunCd,1,E(0,0),$)
@@ -1401,7 +1410,7 @@ INVOKEJS(SHOW,p9,0)
 #OTypeCode=X,1,L
 
 #OTypeCodeX=x,20,L
-T(H,#TypeCode,#TypeCodeHelp)
+T(H,#OTypeCode,#TypeCodeHelp)
 
 
 !戶名
@@ -1512,6 +1521,12 @@ T(H,#OAMLGroup,#AMLCodeHelp)
 #OIndigenousName=x,100,L
 !介紹人
 #OIntroducerX=X,50,L
+!房貸專員
+#OBusinessOfficerX=X,50,L
+!站別
+#OStation=X,3,L
+#OStationX=X,20,L
+T(H,#OStation,#StationHelp)
 
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}=X,2,L
@@ -1704,6 +1719,9 @@ TXFORM=L1101
 #OOLiaisonName
 #OOEnable
 #OORmk
+#OIntroducerX
+#OBusinessOfficerX
+#OStation
 ^
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L1R05.tom"/>
@@ -1758,7 +1776,9 @@ TXFORM=L1101
 ["AML職業別",#OAMLJobCodeX],
 ["AML組織",#OAMLGroupX],
 [#<->#,"原住民姓名",#OIndigenousName],
-[#<->#,"介紹人",#OIntroducerX],
+["介紹人",#OIntroducerX],
+["房貸專員",#OBusinessOfficerX],
+["站別",#OStation,#OStationX],
 [#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,"<br>",#OSubCompanyItem2,#OCrossUseX2,
             "<br>",#OSubCompanyItem3,#OCrossUseX3,"<br>",#OSubCompanyItem4,#OCrossUseX4,
             "<br>",#OSubCompanyItem5,#OCrossUseX5,"<br>",#OSubCompanyItem6,#OCrossUseX6,
@@ -1779,7 +1799,7 @@ TXFORM=L1101
 #OONuber=電話號碼
 {width:150,align:'left'}
 
-#OORelationLb=與借款人關係
+#OORelationLb=與顧客關係
 {width:150,align:'left'}
 
 #OOLiaisonName=聯絡人姓名

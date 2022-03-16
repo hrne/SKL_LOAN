@@ -43,6 +43,8 @@ E(0,0)
 [#<->#,"#FdCreateFlag+新增或取消",#CreateFlag,#CreateFlagX],
 [#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdPropDate+提出日期+(+起日+)",#PropDate],
+[#<->#,"#FdAuthCreateDate+資料產生日期",#AuthCreateDate],
+[#<->#,"#FdRepayBank+扣款銀行",#RepayBank,#RepayBankX],
 ]
 
 #FdFunctionCode=X,2,L
@@ -51,7 +53,8 @@ T(3,*)
 T(3,*)
 #FdCustNo=X,2,L
 #FdPropDate=X,2,L
-
+#FdAuthCreateDate=X,2,L
+#FdRepayBank=X,2,L
 
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -89,6 +92,9 @@ T(3,1:篩選資料;2:產出媒體檔;3:重製媒體碼)
 #CreateFlagHelp=x,50,S
 T(3,1:新增授權;2:再次授權;3:取消授權)
 
+#RepayBankHelp=x,1024,S
+T(3,0:全部;1:新光商銀;2:他行)
+
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
@@ -100,6 +106,7 @@ T(4,CHAIN$)
 HELP(#FunctionHelp)
 @V(H,#FunctionHelp)
 C(3,#FunctionCode,1,INVOKEJS(SHOW,L4040,2,4,1),INVOKEJS(SHOW,L4040,2,4,0))
+C(3,#FunctionCode,1,INVOKEJS(SHOW,L4040,5,6,0),INVOKEJS(SHOW,L4040,5,6,1))
 ! 功能中文
 #FunctionCodeX=X,10,L
 T(3,)T(H,#FunctionCode,#FunctionHelp)
@@ -128,13 +135,26 @@ C(3,#CustNo,0,S,T(2,#CustNo))
 T(3,@FdPropDate,)
 ! 提出日期
 #PropDate=D,7,I
-T(3,@FdPropDate,*)
+T(3,@FdPropDate,)
 C(3,#FunctionCode,1,$,S)
 C(3,#CreateFlag,1,S,$)
 C(3,#CustNo,0,T(1,#SYSCDATE,2,7),E(0,0))
 @C(3,#CustNo,0,C(4,#PropDate,V(P,戶號及提出日期擇一輸入),$),$)
 C(3,#PropDate,0,$,A(DATE,0,#PropDate))
 
+#AuthCreateDate=D,7,I
+C(3,#FunctionCode,1,S,$)
+T(1,#SYSCDATE,2,7)
+@C(3,#AuthCreateDate,0,$,A(DATE,0,#AuthCreateDate))
+
+#RepayBank=A,1,I
+C(3,#FunctionCode,1,S,$)
+HELP(#RepayBankHelp)
+@V(H,#RepayBankHelp)
+
+#RepayBankX=X,30,L
+C(3,#FunctionCode,1,S,$)
+T(H,#RepayBank,#RepayBankHelp)
 
 ![勾選模式] 2-無勾選模式 3-新增授權 4-取消授權 5-重製授權
 ! FuncCode = 1(篩選)->取消(RPTFG = 4),新增、再次(RPTFG = 3)
@@ -167,12 +187,19 @@ E(2,@Sno103,#PdfSno103)
 E(2,@Sno998,#PdfSno998)
 #Sno998=A,8,S
 
+!報表
+#PdfSno=X,8,S
+E(2,@Sno,#PdfSno)
+#Sno=A,8,S
+
 ! 媒體檔FileNo
 #PdfPrt103=A,1,S
 C(3,#Sno103,0,E(0,0),E(0,1))
 #PdfPrt998=A,1,S
 C(3,#Sno998,0,E(0,0),E(0,1))
-
+!報表
+#PdfPrt=A,1,S
+C(3,#Sno,0,E(0,0),E(0,1))
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
@@ -264,7 +291,7 @@ T(6A,#OOAuthCreateDate+#OOCustNo+#OORepayBank+#OORepayAcct+#OOCreateFlag+#Create
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#FunctionCode#CreateFlag#CustNo#PropDate
+#FunctionCode#CreateFlag#CustNo#PropDate#AuthCreateDate#RepayBank
 #END
 </sub>
 
@@ -274,6 +301,7 @@ T(6A,#OOAuthCreateDate+#OOCustNo+#OORepayBank+#OORepayAcct+#OOCreateFlag+#Create
 TXFORM=L4040
 #PdfSno103
 #PdfSno998
+#PdfSno
 #OOAuthCreateDate
 #OOCustNo
 #OOFacmNo
@@ -403,5 +431,6 @@ ifxBatch:{
 ^
 #PdfPrt998=1,PDF,,,,,,,,,,,,,PdfSno998;3,ACH授權提出媒體檔-他行
 ^
-
+#PdfPrt=1,PDF,,,,,,,,,,,,,PdfSno;1,授權資料明細表
+^
 </sub>

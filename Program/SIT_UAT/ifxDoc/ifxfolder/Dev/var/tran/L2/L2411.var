@@ -1108,7 +1108,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Section,s,$)
-V(9)V(2,0)
+
 
 ! 巷
 #Alley=X,5,I
@@ -1116,7 +1116,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Alley,s,$)
-V(9)V(2,0)
+
 
 ! 弄
 #Lane=X,5,I
@@ -1124,7 +1124,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Lane,s,$)
-V(9)V(2,0)
+
 
 ! 號
 #Num=X,5,I
@@ -1132,7 +1132,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Num,s,$)
-V(9)V(2,0)
+
 
 #NumDash=X,5,I
 C(3,#ClCode1,1,$,S)
@@ -1140,7 +1140,7 @@ IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 IF(#Num=="",S,$)
 @C(4,#NumDash,s,$)
-V(9)V(2,0)
+
 
 ! 樓
 #Floor=X,5,I
@@ -1148,7 +1148,7 @@ C(3,#ClCode1,1,$,S)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 @C(4,#Floor,s,$)
-V(9)V(2,0)
+
 
 #FloorDash=X,5,I
 C(3,#ClCode1,1,$,S)
@@ -1156,7 +1156,7 @@ IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 IF(#Floor=="",S,$)
 @C(4,#FloorDash,s,$)
-V(9)V(2,0)
+
 
 ! 建號
 #BdNo1=A,5,I
@@ -1325,6 +1325,9 @@ INVOKEJS(SHOW,grd3_{rowSeq},0)
 #SHOW_OWNER_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd3_{rowSeq},1)
 
+#CheckCustId{i}=X,10,S
+T(3, )
+
 ! [建物所有權人-統編]
 #OwnerId{i}=X,10,I
 IF(#PageFg==2,$,CALL(#Show2))
@@ -1335,6 +1338,8 @@ C(4,#OwnerId{j},S,$)
 C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
 C(4,#OwnerId{i},s,$)
 V(7)A(ID_UNINO,0,#OwnerId{i})
+V(4,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10)
+
 
 #tt{i}=X,1,S
 !C(3,#FunCd,1,C(4,#CustId,T(F,#OwnerRelCode{i},0),C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1))),T(F,#OwnerRelCode{i},0))
@@ -1402,6 +1407,9 @@ IF(#OwnerRelCode{i}==#L2r27OwnerRelCode{i}||#OwnerRelCode{i}==#L2r28OwnerRelCode
 #OwnerRelCodeX{i}=X,40,L
 C(4,#OwnerRelCode{i},S,$)
 T(H,#OwnerRelCode{i},#RelationCodeHelp)
+
+#WKI{i}=X,1,S
+T(2,@CheckCustId{i},#OwnerId{i})
 
 ##end
 
@@ -1851,7 +1859,7 @@ E(0,1)
 <sub type="DC" name="p4" layout="cols=3;screen.width=[180,265,180,405];printer.width=[20,40,20,40];order=1">
 [
 ["鑑價"],
-["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+鑑價總值",#EvaAmt],
+["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+鑑估總值",#EvaAmt],
 ["#FdEvaNetWorth+評估淨值",#EvaNetWorth],["#FdLVITax+土地增值稅",#LVITax],
 ["#FdRentEvaValue+出租評估淨值",#RentEvaValue],["#FdRentPrice+押租金",#RentPrice],
 [#<->#,"#FdEvaCompany+鑑價公司",#EvaCompany,#BTN1,#EvaCompanyX],

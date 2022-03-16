@@ -81,7 +81,7 @@ T(2,@FuncCodeHelp,#HelpDesc1)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6077進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6077 現金流量預估資料查詢]進入),$)
 
 #NTXBUF=X,6,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)

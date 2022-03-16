@@ -248,6 +248,8 @@ T(2,@OORepayAcctX,#OORepayAcct)
 #OOCreateFlagX=X,20,O
 C(5,#OOCreateFlag,D,T(2,取消授權),C(5,#OOCreateFlag,A,T(2,新增授權),C(5,#OOCreateFlag,Z,T(2,暫停授權))))
 
+#OOCreateEmpNo=X,30,O
+
 #OOAuthCreateDate=D,7,O
 
 #OOPropDate=D,7,O
@@ -286,6 +288,8 @@ T(H,@OORepayBankLogX,#OORepayBankLog,#BankCdHelp)
 C(4,#OOTitaTxCd,S,$)
 T(1,#OOTitaTxCd,1,2)
 
+#OOProcessDate=D,7,O
+#OOProcessTime=A,6,O
 
 ! #OOBUF_CREAT=X,1,S
 ! T(2,1)
@@ -316,6 +320,8 @@ T(2,4
 +#OOAmlRsp
 +#OOAuthCreateDate
 +#OOStampFinishDate
++#OOProcessDate
++#OOProcessTime
 )
 #OOBUF_SEARCH=X,500,S
 T(2,5
@@ -330,6 +336,8 @@ T(2,5
 +#OOAmlRsp
 +#OOAuthCreateDate
 +#OOStampFinishDate
++#OOProcessDate
++#OOProcessTime
 )
 
 ! #OOBTN_CREAT=A,2,O 改為頁面上方新增
@@ -392,6 +400,7 @@ TXFORM=L4042
 #OOStatus
 #OOLimitAmt
 #OOCreateFlag
+#OOCreateEmpNo
 #OOAuthCreateDate
 #OOPropDate
 #OORetrDate
@@ -404,6 +413,8 @@ TXFORM=L4042
 #OODeleteDate
 #OOButtenFlagA
 #OOTitaTxCd
+#OOProcessDate
+#OOProcessTime
 ^
 </sub>
 !---------- 單據輸出組合 ----------
@@ -434,6 +445,8 @@ TXFORM=L4042
 #OOAuthStatusX=授權狀態
 {width:100}
 #OOMediaCodeX=媒體碼
+{width:100}
+#OOCreateEmpNo=建檔人員
 {width:100}
 #OOAuthCreateDate=建檔日期
 {width:100}
@@ -469,6 +482,8 @@ TXFORM=L4042
 {width:100}
 #OOMediaCodeX=媒體碼
 {width:100}
+#OOCreateEmpNo=建檔人員
+{width:100}
 #OOAuthCreateDate=建檔日期
 {width:100}
 #OOPropDate=提出日期
@@ -501,6 +516,8 @@ TXFORM=L4042
 {width:100}
 #OOMediaCodeX=媒體碼
 {width:100}
+#OOCreateEmpNo=建檔人員
+{width:100}
 #OOAuthCreateDate=建檔日期
 {width:100}
 #OOPropDate=提出日期
@@ -532,6 +549,8 @@ TXFORM=L4042
 #OOAuthStatusX=授權狀態
 {width:100}
 #OOMediaCodeX=媒體碼
+{width:100}
+#OOCreateEmpNo=建檔人員
 {width:100}
 #OOAuthCreateDate=建檔日期
 {width:100}

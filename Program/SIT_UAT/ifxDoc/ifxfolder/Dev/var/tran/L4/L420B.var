@@ -27,6 +27,9 @@ E(0,0)
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4002進入),$)
 
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunctionCode,#NTXBUF,1,1)
@@ -55,6 +58,9 @@ C(3,#CHAIN,0,$,s)
 ![對帳類別]
 #ReconCode=X,3,L
 C(3,#CHAIN,0,$,s)
+
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)

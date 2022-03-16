@@ -67,6 +67,8 @@ C(3,#CHAIN,1,s,$)
 @V(7)
 A(ID_UNINO,0,#CustId)
 
+#CustNo=A,7,S
+
 #MRKEY=_,_,S
 T(2,#CustId)
 
@@ -80,6 +82,7 @@ T(2,@RimCustId,#CustId)
 RESET_RIM(#RimL1R01,L1R01)
 S(L1R01,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R01)
+T(2,@CustNo,#L1r01CustNo)
 T(2,@CustName,#L1r01CustName)
 T(2,@AllowInquire,#L1r01AllowInquire)
 T(H,@AllowInquireX,#AllowInquire,#AllowInquireHelp)
@@ -133,6 +136,7 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#CustNo
 #CustId
 #AllowInquire
 #AllowInquireAft

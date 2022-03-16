@@ -30,9 +30,15 @@ E(0,0)
 [#<->#,"#FdEntryDateS+入帳日期",#EntryDateS,"之後"],
 [#<->#,"#FdFailTimes+連續失敗次數",#FailTimes,"(最多８次）"],
 [#<->#,"#FdSendDateS+上次寄發日在",#SendDateS,"之後者，不再寄發"],
+[#<->#,"#FdMsg+@注意事項",#Msg],
 ] 
 
 ! #BTNA=X,1,I,ui:button;value:瀏覽;enable:1;tabbable:0
+
+#FdMsg=X,1,L
+#Msg=x,20.100,L
+K(LIGHT,#Msg,TXTRED,0)
+INVOKEJS(SHOW,L4454,8,8,0)
 
 #FdFunctionCodeX=X,2,L
 #FdCustNo=X,2,L
@@ -91,7 +97,9 @@ T(4,NBSDY$)
 #FunctionCode=A,1,I
 C(3,#CHAIN,0,E(0,1),s)
 HELP(#FunctionHelp)
-@V(H,#FunctionHelp)
+@
+V(H,#FunctionHelp)
+C(3,#FunctionCode,1,$,INVOKEJS(SHOW,L4454,8,8,0))
 
 #CHECK=X,1,S
 IF(#FunctionCode == 1,INVOKEJS(SHOW,L4454,2,7,1)INVOKEJS(SHOW,L4454,4,7,0),$)
@@ -147,6 +155,25 @@ E(0,1)
 
 #CHAINXMT=X,1,S
 ! C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+<include src="ROM.icf::L1R20.dec"/>
+
+#FormNo=x,10,S
+T(3,L4454)
+
+#RimFlag=A,1,S
+
+#L1R20Rim2=X,1,S
+C(3,#CustNo,0,S,$)
+RESET_RIM(#L1R20Rim2,L1R20)
+E(0,@RimFlag,0)
+S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
+R(1,L1R20)
+T(2,@Msg,#L1R20Msg)
+
+#ShowMsg=A,1,S
+C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
+INVOKEJS(SHOW,L4454,8,8,#ShowMsg)
 
 </sub>
 
@@ -221,6 +248,8 @@ TXFORM=L4454
 #ReportARepayAcctNo
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L1R20.tom"/>
+
 </sub>
 
 !---------- 單據輸出組合 ----------

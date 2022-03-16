@@ -39,7 +39,8 @@ E(0,0)
 <sub type="DC" name="L5071" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L5071]                                 債權案件明細查詢"],
-[#<->#,"#FdCustId+身分證字號",#CustId],
+[#<->#,"#FdCustNo+戶號",#CustNo],
+[#<->#,"#FdCustId+身分證字號",#CustId,"(戶號/身分證字號，可擇一輸入)"],
 [#<->#,"#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],
 [#<->#,"#FdCustLoanKind+債權戶別",#CustLoanKind,#CustLoanKindX],
 [#<->#,"#FdStatus+債權戶況",#Status,#StatusX],
@@ -47,6 +48,7 @@ E(0,0)
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
+#FdCustNo=X,2,L
 #FdCustId=X,2,L
 !T(3,*)
 #FdCaseKindCode=X,2,L
@@ -99,9 +101,13 @@ T(1,@ViewSysDate1,#ViewSysDate,2,7)
 
 #ViewSysDate1=D,7,S
 
+!戶號
+#CustNo=A,7,I
+
 ! 身分證字號
 #CustId=X,10,I
 C(3,#CHAIN,0,$,s)
+C(3,#CustNo,0,$,S)
 @A(ID_UNINO,0,#CustId)
 
 ! 調RIM找CustNo
@@ -115,15 +121,16 @@ T(2,#CustId)
 #RimCustNo=A,7,S
 
 #SendL2r07=X,1,S
-C(4,#CustId,S,$)
+!C(4,#CustId,S,$)
+C(4,#CustId,C(3,#CustNo,0,S,$),$)
 T(2,@RimCustId,#CustId)
-E(0,@RimCustNo,0)
+E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SEND_L2R07,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #MRKEY=_,_,S
-T(2,#L2r07CustNo)
+C(3,#CustNo,0,T(2,#L2r07CustNo),T(2,#CustNo))
 
 ! 01:新增
 
@@ -313,6 +320,7 @@ IF(#OOIsMainFin=="N",BIND(grid,cancel)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
+#CustNo
 #CustId
 #CaseKindCode
 #CustLoanKind
@@ -401,6 +409,7 @@ TXFORM=L5071
 {width:95,align:'right'}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5071;cpi=15"/>
+#CustNo
 #CustId
 #CaseKindCode
 #CustLoanKind

@@ -48,13 +48,17 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L5062]                                 法務催收人員查詢"],
-["#FdCityCode+地區別",#CityCode],
+["#FdCityCode+地區別",#CityCode,#CityItem],
+["#FdLegalPsn+法催人員員編",#LegalPsn,"(員編/姓名，可擇一輸入)"],
+["#FdLegalPsnX+法催人員姓名",#LegalPsnX],
 ]
 !---------- AP Button AREA ----------
 
 !---------- AP TEXT AREA Variables ----------
 
 #FdCityCode=X,2,L
+#FdLegalPsn=X,2,L
+#FdLegalPsnX=X,2,L
 #FdRPTFG=X,2,L
 T(3,*)
 
@@ -74,9 +78,36 @@ C(3,#CHAIN,0,E(0,0),E(0,1))
 C(3,#CHAIN,1,T(1,#NTXBUF,1,2),$)
 C(3,#CHAIN,1,s,$)
 
+#SendL6R12=X,1,S
+C(3,#CityCode, ,s,$)
+T(2,@RimFuncCode,5)
+T(2,@RimTxCode,L5062)
+T(2,@RimL6R12CityCode,#CityCode)
+RESET_RIM(#SendL6R12,L6R12)
+S(L6R12,1,#RimFuncCode,#RimTxCode,#RimL6R12CityCode)
+R(1,L6R12)
+
+#RecL6R12=X,1,S
+C(3,#CityCode, ,s,$)
+T(2,@CityItem,#L6R12CityItem)
+
+! 地區別名稱
+#CityItem=x,20,L
+C(3,#CityCode, ,T(2,全部),$)
+
+! 催收/法務人員員編
+#LegalPsn=X,6,I
+
+#LegalPsnX=X,100,I,maxWidth:50
+C(4,#LegalPsn,$,S)
+
+
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R12Rim.dec"/>
+<include src="ROM.icf::L6R12.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -165,6 +196,8 @@ BIND(grid,{cmd=CHAIN;ntxcd=L5606;text=修改;ntxbuf=#OOBUF2})
 !------ 上行電文 ------
 <sub type="TIM">
 #CityCode
+#LegalPsn
+#LegalPsnX
 #END
 </sub>
 
@@ -173,6 +206,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L5606;text=修改;ntxbuf=#OOBUF2})
 ! #OOIntRateCeiling
 ! #OOIntRateFloor
 <sub type="TOM">
+<include src="ROM.icf::L6R12.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L5062
 #OOCityCode

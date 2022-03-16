@@ -62,6 +62,14 @@ T(3,*)
 #FdEnable=X,2,L
 T(3,*)
 
+#FdLetterFg=X,2,L
+T(3,*)
+#FdMessageFg=X,2,L
+T(3,*)
+#FdEmailFg=X,2,L
+T(3,*)
+
+
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -69,7 +77,7 @@ T(3,*)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
-IF(#CHAIN!=1,V(P,此為連動交易，請由L6068連動進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6068  報表代號對照檔]連動進入),$)
 
 #NTXBUF=X,179,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -148,9 +156,14 @@ T(3,CdCode.RptWaterCode)
 T(3,CdCode.EnableFg)
 #EnableFg=x,1000,S
 
+#YesNoCode=x,20,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,100,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CODEFuncCode2,#CODERptCycle,#CODERptSendCode,#CODERptSignCode,#CODEEnableFg,#CODERptWaterCode)
+S(XXR99,01,#CODEFuncCode2,#CODERptCycle,#CODERptSendCode,#CODERptSignCode,#CODEEnableFg,#CODERptWaterCode,#YesNoCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCode2Help,#HelpDesc1)
@@ -159,6 +172,7 @@ T(2,@RptSendCode,#HelpDesc3)
 T(2,@RptSignCode,#HelpDesc4)
 T(2,@EnableFg,#HelpDesc5)
 T(2,@RptWaterCode,#HelpDesc6)
+T(2,@YesNoHelp,#HelpDesc7)
 !---------------------------------
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
@@ -244,7 +258,17 @@ T(H,@SendCodeX,#SendCode,#RptSendCode)
 T(H,@SignCodeX,#SignCode,#RptSignCode)
 T(H,@WatermarkX,#Watermark,#RptWaterCode)
 T(H,@EnableX,#Enable,#EnableFg)
-C(3,#SendCode,2,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
+C(3,#SendCode,0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
+C(3,#SendCode,2,INVOKEJS(SHOW,p3,1),INVOKEJS(SHOW,p3,0))
+T(2,@LetterFg,#L6R31LetterFg)
+T(2,@MessageFg,#L6R31MessageFg)
+T(2,@EmailFg,#L6R31EmailFg)
+T(H,@LetterFgX,#LetterFg,#YesNoHelp)
+T(H,@MessageFgX,#MessageFg,#YesNoHelp)
+T(H,@EmailFgX,#EmailFg,#YesNoHelp)
+IF(#LetterFg=="Y",INVOKEJS(SHOW,p3,1,1,1),INVOKEJS(SHOW,p3,1,1,0))
+IF(#MessageFg=="Y",INVOKEJS(SHOW,p3,2,2,1),INVOKEJS(SHOW,p3,2,2,0))
+IF(#EmailFg=="Y",INVOKEJS(SHOW,p3,3,3,1),INVOKEJS(SHOW,p3,3,3,0))
 
 ! 報表名稱
 #FormName=x,80,I
@@ -305,17 +329,68 @@ HELP(#RptSendCode)
 #SendCodeX=X,40,L
 !C(2,#FuncCode,$,$,$,$,s,s)
 T(H,#SendCode,#RptSendCode)
-C(3,#SendCode,2,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
+C(3,#SendCode,0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
+C(3,#SendCode,2,INVOKEJS(SHOW,p3,1),INVOKEJS(SHOW,p3,0))
+
+
 
 </sub>
 
 <sub type="DC" name="p2" layout="cols=1;screen.width=[200,800];printer.width=[40,60];order=1;">
 [
-["設定寄送優先順序：書面、簡訊、EMAIL寄送請輸入優先序，若不寄送輸入0，優先序同為1時則同時寄送"],
+["設定提供寄送項目：書面、簡訊、EMAIL，至少需勾選一個寄送方式"],
+["#FdLetterFg+書面寄送",#LetterFg,#LetterFgX],
+["#FdMessageFg+簡訊寄送",#MessageFg,#MessageFgX],
+["#FdEmailFg+EMAIL寄送",#EmailFg,#EmailFgX],
+]
+
+
+!提供書面寄送
+#LetterFg=X,1,I
+C(3,#SendCode,0,S,$)
+HELP(#YesNoHelp)
+@
+V(H,#YesNoHelp)
+IF(#LetterFg=="Y",INVOKEJS(SHOW,p3,1,1,1),INVOKEJS(SHOW,p3,1,1,0))
+
+
+#LetterFgX=X,2,L
+C(4,LetterFg,S,T(H,#LetterFg,#YesNoHelp))
+
+!提供簡訊寄送
+#MessageFg=X,1,I
+C(3,#SendCode,0,S,$)
+HELP(#YesNoHelp)
+@
+V(H,#YesNoHelp)
+IF(#MessageFg=="Y",INVOKEJS(SHOW,p3,2,2,1),INVOKEJS(SHOW,p3,2,2,0))
+
+#MessageFgX=X,2,L
+C(4,MessageFg,S,T(H,#MessageFg,#YesNoHelp))
+
+!提供電子郵件寄送
+#EmailFg=X,1,I
+C(3,#SendCode,0,S,$)
+HELP(#YesNoHelp)
+@
+V(H,#YesNoHelp)
+IF(#EmailFg=="Y",INVOKEJS(SHOW,p3,3,3,1),INVOKEJS(SHOW,p3,3,3,0))
+IF(#LetterFg=="N" && #MessageFg=="N" && #EmailFg=="N",$,s)
+V(P,至少需勾選一個寄送方式)
+
+#EmailFgX=X,2,L
+C(4,EmailFg,S,T(H,#EmailFg,#YesNoHelp))
+
+</sub>
+
+<sub type="DC" name="p3" layout="cols=1;screen.width=[200,800];printer.width=[40,60];order=1;">
+[
+["設定寄送優先順序：書面、簡訊、EMAIL寄送請輸入優先序，優先序同為1時則同時寄送"],
 ["#FdLetter+書面寄送",#Letter],
 ["#FdMessage+簡訊寄送",#Message],
 ["#FdEmail+EMAIL寄送",#Email],
 ]
+!["設定寄送優先順序：書面、簡訊、EMAIL寄送請輸入優先序，若不寄送輸入0，優先序同為1時則同時寄送"],
 
 #FdLetter=X,2,L
 C(2,#FuncCode,S,$,$,S,S,S)
@@ -333,24 +408,29 @@ C(3,#SendCode,2,T(3,*),S)
 #Letter=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 C(3,#SendCode,2,$,S)
-@V(1,0,1,2,3)
+C(5,#LetterFg,"Y",$,S)
+@
+V(1,1,2,3)
 
 
 ! 簡訊寄送
 #Message=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 C(3,#SendCode,2,$,S)
+C(5,#MessageFg,"Y",$,S)
 !C(3,#Letter,0,s,$)
-@C(3,#SendCode,2,C(2,#Message,$,$,IF(#Letter==2,V(P,優先序重複),$),IF(#Letter==3,V(P,優先序重複),$)),$)
-V(1,0,1,2,3)
+@
+C(3,#SendCode,2,C(2,#Message,$,$,IF(#Letter==2,V(P,優先序重複),$),IF(#Letter==3,V(P,優先序重複),$)),$)
+V(1,1,2,3)
 
 ! EMAIL寄送
 #Email=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 C(3,#SendCode,2,$,S)
-!C(3,#Letter,0,s,$)
-@C(3,#SendCode,2,C(2,#Email,$,$,IF(#Letter==2||#Message==2,V(P,優先序重複),$),IF(#Letter==3||#Message==3,V(P,優先序重複),$)),$)
-V(1,0,1,2,3)
+C(5,#EmailFg,"Y",$,S)
+@
+C(3,#SendCode,2,C(2,#Email,$,$,IF(#Letter==2||#Message==2,V(P,優先序重複),$),IF(#Letter==3||#Message==3,V(P,優先序重複),$)),$)
+V(1,1,2,3)
 
 #Check=X,1,S
 C(3,#SendCode,2,$,s)
@@ -388,6 +468,9 @@ T(3,[L6608] 報表代號對照檔維護)
 !------ 上行電文 ------
 <sub type="TIM">
 #FuncCode#FormNo#FormName#Cycle#SendCode#Letter#Message#Email#SignCode#UsageDesc#Watermark#Enable
+#LetterFg
+#MessageFg
+#EmailFg
 #END
 </sub>
 

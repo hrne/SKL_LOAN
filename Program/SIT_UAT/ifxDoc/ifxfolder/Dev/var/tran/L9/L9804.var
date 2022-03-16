@@ -361,7 +361,6 @@ T(3,@BtnAllShell0,　)
 #TotalItem
 ##loop{times:4,i:1}
 #BtnShell{i}
-#TradeName{i}
 #TradeCode{i}
 ##end
 </sub>

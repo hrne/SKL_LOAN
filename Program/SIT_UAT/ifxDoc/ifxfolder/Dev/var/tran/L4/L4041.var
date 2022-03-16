@@ -43,6 +43,8 @@ E(0,0)
 [#<->#,"#FdAuthApplCode+申請代號",#AuthApplCode,#AuthApplCodeX],
 [#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdPropDate+提出日期+(+起日+)",#PropDate],
+[#<->#,"#FdAuthCreateDate+資料產生日期",#AuthCreateDate],
+[#<->#,"#FdAuthCode+授權方式",#AuthCode,#AuthCodeX],
 ]
 
 #FdFunctionCode=X,2,L
@@ -51,7 +53,8 @@ T(3,*)
 T(3,*)
 #FdCustNo=X,2,L
 #FdPropDate=X,2,L
-
+#FdAuthCreateDate=X,2,L
+#FdAuthCode=X,2,L
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -74,6 +77,9 @@ R(1,XXR99)
 CALL(#HelpProc) 
 T(2,@PostDepCodeHelp,#HelpDesc1) 
 T(2,@AuthCodeHelp,#HelpDesc2) 
+
+#AuthCodeHelp2=x,1024,S
+T(2,0:全部;+#HelpDesc2)
 
 #AuthApplCodeHelp=x,20,S
 T(3,1:申請;2:再次;3:終止)
@@ -109,6 +115,7 @@ T(1,@CustNo,#NTXBUF,11,7)
 HELP(#FunctionHelp)
 @V(H,#FunctionHelp)
 C(3,#FunctionCode,1,INVOKEJS(SHOW,L4041,2,4,1),INVOKEJS(SHOW,L4041,2,4,0))
+C(3,#FunctionCode,1,INVOKEJS(SHOW,L4041,5,6,0),INVOKEJS(SHOW,L4041,5,6,1))
 ! 功能中文
 #FunctionCodeX=X,10,L
 T(3,)T(H,#FunctionCode,#FunctionHelp)
@@ -118,9 +125,8 @@ T(3,)T(H,#FunctionCode,#FunctionHelp)
 C(3,#FunctionCode,1,$,s)
 HELP(#AuthApplCodeHelp)
 @V(H,#AuthApplCodeHelp)
-C(3,#AuthApplCode,1,INVOKEJS(SHOW,L4041_3,0)INVOKEJS(SHOW,L4041_4,0)
-,INVOKEJS(SHOW,L4041_3,1)INVOKEJS(SHOW,L4041_4,1))
-
+C(3,#AuthApplCode,1,INVOKEJS(SHOW,L4041_3,0)INVOKEJS(SHOW,L4041_4,0),INVOKEJS(SHOW,L4041_3,1)INVOKEJS(SHOW,L4041_4,1))
+										
 #AuthApplCodeX=X,4,L
 T(3,)T(H,#AuthApplCode,#AuthApplCodeHelp)
 !SWITCH(#AuthApplCode,1,T(2,申請),2,T(2,終止),T(2,))
@@ -144,6 +150,20 @@ C(3,#AuthApplCode,1,s,$)
 C(3,#CustNo,0,T(1,#SYSCDATE,2,7),E(0,0))
 @C(3,#CustNo,0,C(4,#PropDate,V(P,戶號及提出日期擇一輸入),$),$)
 A(DATE,0,#PropDate)
+
+#AuthCreateDate=D,7,I
+C(3,#FunctionCode,1,S,$)
+T(1,#SYSCDATE,2,7)
+@C(3,#AuthCreateDate,0,$,A(DATE,0,#AuthCreateDate))
+
+#AuthCode=A,1,I
+C(3,#FunctionCode,1,S,$)
+HELP(#AuthCodeHelp2)
+@V(H,#AuthCodeHelp2)
+
+#AuthCodeX=X,30,L
+C(3,#FunctionCode,1,S,$)
+T(H,#AuthCode,#AuthCodeHelp2)
 
 ![顯示方式] 2-無勾 3-申請 4-終止
 #RPTFG=A,1,S
@@ -174,11 +194,20 @@ E(2,@Sno846,#PdfSno846)
 E(2,@Sno53N,#PdfSno53N)
 #Sno53N=A,8,S
 
+!報表
+#PdfSno=X,8,S
+E(2,@Sno,#PdfSno)
+#Sno=A,8,S
+
 ! 媒體檔FileNo
 #PdfPrt846=A,1,S
 C(3,#Sno846,0,E(0,0),E(0,1))
 #PdfPrt53N=A,1,S
 C(3,#Sno53N,0,E(0,0),E(0,1))
+
+!報表
+#PdfPrt=A,1,S
+C(3,#Sno,0,E(0,0),E(0,1))
 
 
 #LOOP=X,1,S
@@ -269,7 +298,7 @@ T(6A,#OOAuthCreateDate+#OOAuthApplCode+#OOCustNo+#OOPostDepCode+#OORepayAcct+#OO
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#FunctionCode#AuthApplCode#CustNo#PropDate
+#FunctionCode#AuthApplCode#CustNo#PropDate#AuthCreateDate#AuthCode
 #END
 </sub>
 
@@ -279,6 +308,7 @@ T(6A,#OOAuthCreateDate+#OOAuthApplCode+#OOCustNo+#OOPostDepCode+#OORepayAcct+#OO
 TXFORM=L4041
 #PdfSno846
 #PdfSno53N
+#PdfSno
 #OOCustNo
 #OOFacmNo
 #OOAuthCreateDate
@@ -320,21 +350,21 @@ ifxBatch:{
 }
 #secret-no
 #OOCustNo=戶號
-{width:70}
+{width:70,align:'center'}
 #OOFacmNo=額度
-{width:50}
+{width:50,align:'center'}
 #OOAuthApplCodeX=授權註記
-{width:100}
+{width:100,align:'center'}
 #OOPostDepCodeX=帳戶別
-{width:100}
+{width:100,align:'center'}
 #OOAuthCodeX=授權代碼
-{width:100}
+{width:100,align:'center'}
 #OORepayAcct=扣款帳號
-{width:100}
+{width:120}
 #OOPropDate=提出日期
-{width:100}
+{width:100,align:'center'}
 #OORetrDate=提回日期
-{width:100}
+{width:100,align:'center'}
 ^
 #RPTFG=3,QUERY.GRID,
 #any={header:'L4041.part',caption:'[L4041]郵局授權資料',width:1200,rowNum:40,ifxDisplay:1,
@@ -350,44 +380,45 @@ ifxBatch:{
 }
 #secret-no
 #OOCustNo=戶號
-{width:70}
+{width:70,align:'center'}
 #OOFacmNo=額度
-{width:50}
+{width:50,align:'center'}
 #OOAuthApplCodeX=授權註記
-{width:100}
+{width:100,align:'center'}
 #OOPostDepCodeX=帳戶別
-{width:100}
+{width:100,align:'center'}
 #OOAuthCodeX=授權代碼
-{width:100}
+{width:100,align:'center'}
 #OORepayAcct=扣款帳號
-{width:100}
+{width:120,align:'left'}
 #OOPropDate=提出日期
-{width:100}
+{width:100,align:'center'}
 #OORetrDate=提回日期
-{width:100}
+{width:100,align:'center'}
 ^
 #RPTFG=2,QUERY.GRID
 #any={detail:true, header:'L4041.part',caption:'[L4041]郵局授權資料', rowNum:20, rowList:[20,40,60], ifxDisplay:0}
 #OOCustNo=戶號
-{width:70}
+{width:70,align:'center'}
 #OOFacmNo=額度
-{width:50}
+{width:50,align:'center'}
 #OOAuthApplCodeX=授權註記
-{width:100}
+{width:100,align:'center'}
 #OOPostDepCodeX=帳戶別
-{width:100}
+{width:100,align:'center'}
 #OOAuthCodeX=授權代碼
-{width:100}
+{width:100,align:'center'}
 #OORepayAcct=扣款帳號
-{width:100}
+{width:120}
 #OOPropDate=提出日期
-{width:100}
+{width:100,align:'center'}
 #OORetrDate=提回日期
-{width:100}
+{width:100,align:'center'}
 ^
 #PdfPrt846=1,PDF,,,,,,,,,,,,,PdfSno846;3,郵局授權提出媒體檔846
 ^
 #PdfPrt53N=1,PDF,,,,,,,,,,,,,PdfSno53N;3,郵局授權提出媒體檔53N
 ^
-
+#PdfPrt=1,PDF,,,,,,,,,,,,,PdfSno;1,授權資料明細表
+^
 </sub>

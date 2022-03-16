@@ -215,9 +215,13 @@ IF(#Ovdamtto<#Ovdamtfm,V(P,結束金額不可小於起始金額),$)
 ! 期數/天數
 #OprionCd=A,1,I
 HELP(#OprionCdHelp)
-@V(H,#OprionCdHelp)
+@
+IF(#Identity==1 || #Identity==2 || #Identity==3,C(3,#OprionCd,0,s,$),$)
+V(H,#OprionCdHelp)
+
 #OprionCdX=X,4,L
 T(H,#OprionCd,#OprionCdHelp)
+C(3,#OprionCd,0,S,$)
 
 #COLDIS=A,1,S
 C(3,#OprionCd,1,INVOKEJS(SHOW,L5060_11,1)INVOKEJS(SHOW,L5060_12,0),
@@ -227,10 +231,12 @@ C(3,#OprionCd,1,INVOKEJS(SHOW,L5060_11,1)INVOKEJS(SHOW,L5060_12,0),
 #Ovdtrmfm=A,2,I
 C(3,#OprionCd,1,$,s)
 #TmpOvdtrmfm=n,2,S
+C(3,#OprionCd,0,E(0,0),E(0,01))
 C(3,#OprionCd,1,$,s)
 E(0,#Ovdtrmfm)
 ! @C(3,#Ovdtrmfm,0,INVOKEJS(SHOW,L5060_13,1),INVOKEJS(SHOW,L5060_13,0))
 #Ovdtrmto=A,2,I
+C(3,#OprionCd,0,E(0,0),E(0,99))
 C(3,#OprionCd,1,$,s)
 #TmpOvdtrmto=n,2,S
 C(3,#OprionCd,1,$,s)
@@ -239,12 +245,14 @@ IF(#TmpOvdtrmfm>#TmpOvdtrmto,V(P,結束期數不可小於起始期數),$)
 
 ! 逾期天數
 #Ovddayfm=A,4,I
+C(3,#OprionCd,0,E(0,0),E(0,7))
 C(3,#OprionCd,2,$,s)
 #TmpOvddayfm=n,2,S
 C(3,#OprionCd,2,$,s)
 E(0,#Ovddayfm)
-! @C(3,#Ovddayfm,0,INVOKEJS(SHOW,L5060_13,1),INVOKEJS(SHOW,L5060_13,0))
+
 #Ovddayto=A,4,I
+C(3,#OprionCd,0,E(0,0),E(0,9999))
 C(3,#OprionCd,2,$,s)
 #TmpOvddayto=n,2,S
 C(3,#OprionCd,2,$,s)
@@ -253,9 +261,9 @@ IF(#TmpOvddayto<#TmpOvddayfm,V(P,結束天數不可小於起始天數),$)
 
 ! 戶況
 #Status=A,2,I
-E(0,04)
+IF(#Identity==1 || #Identity==2 || #Identity==3,E(0,99),E(0,04))
 HELP(#StatusHelp,cols:2)
-C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s))
+IF(#Identity==1 || #Identity==2 || #Identity==3,$,C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s)))
 @V(H,#StatusHelp)
 #StatusX=X,22,L
 T(H,#Status,#StatusHelp)
@@ -277,13 +285,15 @@ R(1,L6R03)
 
 ! 縣市代碼的下拉選單
 #L6r03ResultCity=X,10000,S
-T(2,#L6r03Result)
+T(2,00:全部;+#L6r03Result)
 
 !擔保品地區別-縣市代碼
 #CityCode=X,2,I
+C(4,#CityCode,T(2,00),$)
 HELP(#L6r03ResultCity,cols:5)
 @
-C(4,#CityCode,$,V(H,#L6r03ResultCity))
+C(4,#CityCode,T(2,00),$)
+V(H,#L6r03ResultCity)
 
 ! 縣市代碼對應名稱
 #CityCodeX=X,8,L
@@ -375,6 +385,9 @@ T(1,#OOAlertDate,6,2)
 #XXAlertDate=X,9,O
 T(2,#AlertDateYYY+/+#AlertDateMM+/+#AlertDateDD)
 
+#XXIsSpecify=X,1,O
+T(2,#OOIsSpecify)
+
 ! 1+7+3+1 +1+7+7+5+2+160+6+20=220
 #OOBufEntry=X,12,S
 T(2,#OOCustNo+#OOFacmNo+#CaseCode)
@@ -382,6 +395,8 @@ T(2,#OOCustNo+#OOFacmNo+#CaseCode)
 #OOBufAlert=X,13,S
 T(2,#CaseCode+#OOCustNo+#OOFacmNo+1)
 
+#OOBufIsSpecify=X,13,S
+T(2,#OOCustNo+#OOFacmNo+#OOCityCode+#OOIsSpecify)
 
 #XXCustNo=A,10,S
 T(2,#OOCustNo+#OOFacmNo)
@@ -408,6 +423,9 @@ C(3,#OOClFlagA,0,BIND(grid,cancel),
 !         BIND(grid,cancel))
 C(3,#OOClFlagB,0,BIND(grid,cancel),
                         BIND(grid,{ cmd=CHAIN; ntxcd=L5965; text=#XXAlertDate; ntxbuf=#OOBufAlert}))
+
+#OOBtnIsSpecify=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5607; text=#XXIsSpecify; ntxbuf=#OOBufIsSpecify})
 
 #secret-no=x,99,S
 T(6A,#OOCustNo+#OOFacmNo+#OOPrinBalance+#OOOverDueterm)
@@ -545,8 +563,8 @@ ifxBatch:{
 {width:95}
 #OOBtnEntryB=同擔保品
 {search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:95}
-#OOIsSpecify=是否指定
-{width:95,align:'center'}
+#OOBtnIsSpecify=是否指定
+{search:false,formatter:'cust:bind-button:#XXIsSpecify',align:'center',canExport:false,width:80}
 #OOStatusX=戶況
 {width:45}
 #OOCityCodeX=擔保品地區別
@@ -595,8 +613,8 @@ ifxBatch:{
 {width:95}
 #OOBtnEntryB=同擔保品
 {search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:95}
-#OOIsSpecify=是否指定
-{width:95,align:'center'}
+#OOBtnIsSpecify=是否指定
+{search:false,formatter:'cust:bind-button:#XXIsSpecify',align:'center',canExport:false,width:80}
 #OOStatusX=戶況
 {width:45}
 #OOCityCodeX=擔保品地區別

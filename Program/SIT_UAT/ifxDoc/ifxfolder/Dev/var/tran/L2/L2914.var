@@ -48,7 +48,6 @@ E(0,40)ASGN(INQPRT$)
 #FdClCode1=X,2,L
 #FdClCode2=X,2,L
 #FdClNo=X,2,L
-T(3,*)
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -91,9 +90,14 @@ T(3,CdGuarantor)
 
 #RelationCodeHelp=x,3000,S
 
+#CDDEF07=x,20,S
+T(3,CdCode.Listed)
+
+#ListedHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClTypeCodeHelp,#HelpDesc1)
@@ -102,6 +106,8 @@ T(2,@SettingStatHelp,#HelpDesc3)
 T(2,@ClStatHelp,#HelpDesc4)
 T(2,@SyndCodeHelp,#HelpDesc5) 
 T(2,@RelationCodeHelp,#HelpDesc6) 
+T(2,@ListedHelp,#HelpDesc7) 
+
 #YNHelp=x,10,S
 T(3,Y:是;N:否)
 
@@ -131,7 +137,7 @@ E(0,1)
 
 
 !擔保品號碼
-#ClNo=A,7,I
+#ClNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
@@ -259,8 +265,8 @@ T(3,01:股票;02:基金;03:債券;04:票券/國庫儲蓄券;05:其他)
 C(4,#OSecuritiesType,S,$)
 T(H,#OSecuritiesType,#SecuritiesTypeHelp)
 
-#ListedHelp=x,120,S
-T(3,01:臺灣證交所;02:櫃檯買賣中心;03:紐約證券交易所（NYSE）;04:那斯達克（Nasdaq）;05:倫敦證券交易所（LSE）;06:德國證券交易所（GSE）;07:歐洲交易所（Euronext）;08:東京證券交易所（TSE）;99:無)))
+
+
 !掛牌交易所 Listed
 #OListed=X,2,L
 

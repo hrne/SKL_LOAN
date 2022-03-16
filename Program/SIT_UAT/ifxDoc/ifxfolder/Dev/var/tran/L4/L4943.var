@@ -131,6 +131,8 @@ T(1,@LowLimit,#NTXBUF,56,14)
 ! 4.檢核不正常(Aml) = 入帳日+銀行別
 ! 9.整批 = 銀行別+還款別+入帳日
 #FunctionCode=A,1,I
+INVOKEJS(SHOW,L4943,2,9,0)
+C(3,#CHAIN,1,s,$)
 HELP(#FunctionHelp)
 @V(H,#FunctionHelp)
 !HELP(
@@ -140,10 +142,10 @@ HELP(#FunctionHelp)
 !4:檢核不正常;
 !9:整批)
 !@V(1,1,2,3,4,9)
-INVOKEJS(SHOW,L4943,2,9,0)
 E(0,@FUNCIND,#FunctionCode)
 
 #FunctionCodeX=x,20,L
+C(3,#CHAIN,1,s,$)
 T(3,)T(H,#FunctionCode,#FunctionHelp)
 !SWITCH(#FunctionCode
 !,1,T(2,戶號)
@@ -188,6 +190,7 @@ INVOKEJS(SHOW,L4943_5,1),$)
 
 ! 戶號
 #CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
 C(3,#FunctionCode,1,$,s)
 @C(3,#CustNo,0,V(P,請輸入戶號),$)
 
@@ -204,6 +207,7 @@ T(2,)
 
 ! 銀行別
 #BankCode=A,3,I
+C(3,#CHAIN,1,s,$)
 IF(#FunctionCode==4 ||#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9,$,s)
 HELP(#BankDeductCdHelp,cols:4)
 @V(H,#BankDeductCdHelp)
@@ -216,6 +220,7 @@ T(HELP,@RepayTypeHelp1,#RepayTypeHelp,+,01;05;99)
 
 ! 還款類別
 #RepayType=A,2,I
+C(3,#CHAIN,1,s,$)
 IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9,$,s)
 IF(#FunctionCode==6,HELP(#RepayTypeHelp1),HELP(#RepayTypeHelp))
 @IF(#FunctionCode==6,V(H,#RepayTypeHelp1),V(H,#RepayTypeHelp))
@@ -227,6 +232,7 @@ IF(#FunctionCode==6,T(H,#RepayType,#RepayTypeHelp1),T(H,#RepayType,#RepayTypeHel
 
 ! 入帳日期
 #EntryDateFm=D,7,I
+C(3,#CHAIN,1,s,$)
 C(3,#CHAIN,1,$,E(0,#SYSDATE))
 @
 V(7)A(DATE,0,#EntryDateFm)
@@ -234,10 +240,12 @@ V(7)A(DATE,0,#EntryDateFm)
 ! 入帳日期
 #EntryDateTo=D,7,I
 E(0,#EntryDateFm)
+C(3,#CHAIN,1,s,$)
 @V(7)A(DATE,0,#EntryDateTo)
 IF(#EntryDateTo<#EntryDateFm,V(P,起日不可大於迄日),$)
 
 #OpItem=A,1,I
+C(3,#CHAIN,1,s,$)
 IF(#FunctionCode == 2 || #FunctionCode == 3 ,$,S)
 HELP(#OpItemHelp)
 @V(H,#OpItemHelp)
@@ -251,6 +259,7 @@ C(3,#FunctionCode,2,$,s)
 
 ! 單筆超過限額
 #SingleLimit=m,14,I
+C(3,#CHAIN,1,s,$)
 C(3,#FunctionCode,2,$,s)
 
 #LowLimit=m,14,I
@@ -259,8 +268,8 @@ C(3,#FunctionCode,3,$,s)
 
 #RPTFG=A,1,S
 
-! #CHAINXMT=X,1,S
-! C(3,#SRHCD,1,$,E(0,@CHAIN,0)XMT())
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 #CHECKFunction=A,1,S
 C(3,#FUNCIND,6,E(0,@RPTFG,1),E(0,@RPTFG,0))

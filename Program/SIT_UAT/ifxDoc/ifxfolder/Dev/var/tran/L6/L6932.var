@@ -90,7 +90,7 @@ T(4,CHAIN$)
 #CHAINFlag=A,1,S
 C(3,#CHAIN,1,E(0,1),E(0,0))
 
-#NTXBUF=X,100,S
+#NTXBUF=x,150,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_ST_DT=X,7,S
@@ -114,7 +114,7 @@ T(1,#NTXBUF,45,3)
 #CHAIN_BORM_SEQ=X,3,S
 T(1,#NTXBUF,48,3)
 
-#CHAIN_MrKey=X,20,S
+#CHAIN_MrKey=x,20,S
 T(1,#NTXBUF,51,20)
 
 #CHAIN_TRN_CODE2=X,5,S
@@ -126,6 +126,9 @@ T(1,#NTXBUF,76,7)
 #CHAIN_EX_DT=X,7,S
 T(1,#NTXBUF,83,7)
 
+#CHAIN_MrKey2=x,50,S
+T(1,#NTXBUF,90,50)
+
 #CHAINSET=X,1,S
 E(0,@ST_DT,#CHAIN_ST_DT)
 E(0,@ED_DT,#CHAIN_ED_DT)
@@ -134,7 +137,7 @@ T(2,@TRN_CODE,#CHAIN_TRN_CODE)
 E(0,@CUST_NO,#CHAIN_CUST_NO)
 E(0,@FACM_NO,#CHAIN_FACM_NO)
 E(0,@BORM_SEQ,#CHAIN_BORM_SEQ)
-T(2,@MrKey,#CHAIN_MrKey)
+C(4,#CHAIN_MrKey2,T(2,@MrKey,#CHAIN_MrKey),T(2,@MrKey,#CHAIN_MrKey2))
 T(2,@TRN_CODE2,#CHAIN_TRN_CODE2)
 E(0,@SX_DT,#CHAIN_SX_DT)
 E(0,@EX_DT,#CHAIN_EX_DT)
@@ -230,7 +233,7 @@ C(3,#CHAIN,1,s,$)
 !C(3,#TRN_CODE,0,$,S)
 C(3,#FACM_NO,0,S,$)
 
-#MrKey=x,20,I
+#MrKey=x,50,I
 C(3,#CHAIN,1,s,$)
 !C(4,#TxtNo,$,S)
 !C(3,#CUST_NO,0,$,S)
@@ -284,7 +287,7 @@ T(3,1)ASGN(LOOP$)
 #OCustNoX=20,7,S
 T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 
-#OMrKey=x,20,S
+#OMrKey=x,50,S
 #OReason=x,120,S
 #OLastUpdate=x,40,S
 #OLastEmp=x,30,S
@@ -360,11 +363,11 @@ TXFORM=L6932
 #OTranName=交易名稱
 {width:350,align:'left'}
 #OCustNoX=戶號
-{width:100,align:'center'}
+{width:60,align:'center'}
 #OMrKey=參考編號
-{width:150,align:'left'}
-#OReason=修改原因
 {width:300,align:'left'}
+#OReason=修改原因
+{width:400,align:'left'}
 #OLastUpdate=修改日期
 {width:140,align:'left'}
 #OLastEmp=修改人員

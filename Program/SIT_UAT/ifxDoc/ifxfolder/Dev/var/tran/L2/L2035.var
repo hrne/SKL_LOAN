@@ -194,7 +194,7 @@ T(2,#OOCaseNo+#OOCustNo)
 BIND(grid,{ cmd=CHAIN; ntxcd=L2305; ntxbuf=#OOBUF3})
 
 #OOBUF5=X,228,S
-C(3,#CustNo,0,T(2,#OOCaseNo+0000000),T(2,#OOCaseNo+#OOCustNo))
+C(3,#CustNo,0,T(2,0000000+#OOCaseNo),T(2,#OOCustNo+#OOCaseNo))
 
 
 #OOBTN5=X,1,S

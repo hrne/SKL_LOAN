@@ -192,6 +192,7 @@ X(#TxAmt1)
 #SupNo=X,6,S
 #FlowType=X,1,S
 #FlowStep=X,1,S
+#Funcind=X,1,S
 #Status=A,1,S
 #AcCnt=A,1,S
 #Hcode=A,1,S
@@ -212,7 +213,7 @@ T(2,#TranNo+ +#TranItem)
 C(2,#FlowMode,S,T(3,待放行),T(3,待審核),T(3,待提交),S)
 
 #TypeX=X,8,S
-C(2,#FlowStep,T(3,登錄),T(3,登錄),T(3,放行),T(3,審核),T(3,審核放行))
+C(2,#FlowStep,C(5,#Funcind,4,T(3,刪除),T(3,登錄)),C(5,#Funcind,4,T(3,刪除),T(3,登錄)),T(3,放行),T(3,審核),T(3,審核放行))
 
 #HcodeX=X,4,S
 C(2,#Hcode,T(3,一般),T(3,訂正),T(3,修正),T(3,沖正),$)
@@ -271,6 +272,7 @@ TXFORM=LC011
 #SupNo
 #FlowType
 #FlowStep
+#Funcind
 #Status
 #AcCnt
 #Hcode
@@ -322,7 +324,7 @@ TXFORM=LC011
 {width:140,align:'center'}
 
 #TranItemX=交易代號
-{width:160,align:'center'}
+{width:160,align:'left'}
 
 #MrKey=戶號/編號
 {width:140,align:'left'}

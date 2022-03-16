@@ -49,7 +49,7 @@ K(MODIFYBUTTON,查詢)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-IF(#CHAIN!=1,V(P,此為連動交易),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L5060案件處理清單]進入),$)
 
 #NTXBUF=X,11,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -158,6 +158,7 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 
 ! 項目
 #DateFlag=A,1,I
+E(0,9)
 HELP(#DateFlagHelp)
 @V(H,#DateFlagHelp)
 #DateFlagX=X,9,L

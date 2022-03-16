@@ -213,7 +213,8 @@ TXFORM=L5902
 #OOBTN_SEARCH=
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOCustCnt=項次
-{width:45}
+{width:45,align:'center'}
+
 #OOMeetingDate=日期
 {width:65,align:'center'}
 #OOIssue=議題

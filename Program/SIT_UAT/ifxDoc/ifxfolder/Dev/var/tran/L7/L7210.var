@@ -69,7 +69,7 @@ T(2,@IfrsProdCode2Help,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L7903進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L7903商品分類資料查詢]進入),$)
 
 !做完交易自動更新原畫面
 #AutoReFresh=A,1,S

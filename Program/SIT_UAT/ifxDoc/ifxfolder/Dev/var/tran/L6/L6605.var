@@ -67,7 +67,7 @@ T(3,1:新增;2:減少)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6065進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6065 逾期新增減少原因]進入),$)
 
 #NTXBUF=X,106,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)

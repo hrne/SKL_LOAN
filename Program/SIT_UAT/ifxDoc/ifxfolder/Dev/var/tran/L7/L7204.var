@@ -30,7 +30,7 @@ E(0,0)
 [#<->#,"#FdMarkRsnDesc+原因說明",#MarkRsnDesc],
 [#<->#,"#FdStartDate+起始日期",#StartDate],
 [#<->#,"#FdEndDate+終止日期",#EndDate],
-[#<->#,"#FdLosCod+客觀減損條件",#LosCod],
+[#<->#,"#FdLosCod+客觀減損條件",#LosCod,#LosCodX],
 ]
 
 !["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","","",
@@ -88,16 +88,21 @@ T(3,CdCode.MarkCode)
 #MarkRsnRimName=x,20,S
 T(3,CdCode.MarkRsn)
 #MarkRsnHelp=x,1024,S
+! 客觀減損條件代碼下拉選單4
+#LosCodRimName=x,20,S
+T(3,CdCode.LosCod)
+#LosCodHelp=x,1024,S
 
 
 #FuncCode2HelpRim=X,1,S
 RESET_RIM(#FuncCode2HelpRim,XXR99)
-S(XXR99,01,#CDCODEFuncCode2,#MarkCodeRimName,#MarkRsnRimName)
+S(XXR99,01,#CDCODEFuncCode2,#MarkCodeRimName,#MarkRsnRimName,#LosCodRimName)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCode2Help,#HelpDesc1)
 T(2,@MarkCodeHelp,#HelpDesc2)
 T(2,@MarkRsnHelp,#HelpDesc3)
+T(2,@LosCodHelp,#HelpDesc4)
 
 #FuncCode2Help=x,300,S
 
@@ -121,7 +126,7 @@ INVOKEJS(SHOW,grd1_{i},0)
 
 #CHAIN=X,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L7904進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L7904特殊客觀減損狀況查詢]進入),$)
 
 !做完交易自動更新原畫面
 #AutoReFresh=A,1,S
@@ -256,6 +261,7 @@ E(0,@EndDate,#L7R04EndDate)
 ! 調Rim完成預先帶入
 T(H,@MarkCodeX,#MarkCode,#MarkCodeHelp)
 T(H,@MarkRsnX,#MarkRsn,#MarkRsnHelp)
+T(H,@LosCodX,#LosCod,#LosCodHelp)
 
 
 ! 註記碼
@@ -300,7 +306,13 @@ IF(#EndDate < #StartDate,V(P,終止日期不可小於起始日期),s)
 ! 客觀減損條件
 #LosCod=A,2,I
 C(3,#FuncCode,4,s)
-@V(7)V(5,1,99)
+HELP(#LosCodHelp)
+@V(H,#LosCodHelp)
+!@V(7)V(5,1,99)
+
+#LosCodX=X,30,L
+T(H,#LosCod,#LosCodHelp)
+
 
 !##loop{times:9,i:2,j:1}
 

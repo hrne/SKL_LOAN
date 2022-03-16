@@ -234,7 +234,7 @@ TXFORM=L2022
 #oRelation=與授信戶關係/掃描類別
 {width:200,align:'left'}
 
-#Btn1=登錄關係
+#Btn1=登錄
 {width:70,search:false,formatter:'cust:bind-button:登錄',align:'center',canExport:false}
 
 #oClNoX=擔保品編號

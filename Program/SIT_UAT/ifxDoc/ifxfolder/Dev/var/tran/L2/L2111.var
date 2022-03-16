@@ -46,7 +46,7 @@ E(0,0)
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN1,#CustIdX],
 [#<->#,"#FdApplNo+申請號碼",#ApplNo,"@@@"],
 [#<->#,"#FdCreditSysNo+案件編號",#CreditSysNo],
-[#<->#,"#FdSyndNo+聯貸案編號",#SyndNo],
+[#<->#,"#FdSyndNo+聯貸案編號",#SyndNo,#BTN2],
 [#<->#,"#FdApplDate+申請日期",#ApplDate,#LbApplDate],
 [#<->#,"#FdDepartmentCode+案件隸屬單位",#DepartmentCode,#DepartmentCodeX],
 [#<->#,"#FdProdNo+申請商品代碼",#ProdNo,#BTN3,#ProdName], 
@@ -58,6 +58,7 @@ E(0,0)
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 #BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+#BTN2=X,15,I,ui:button;value:聯貸案資料查詢;enable:1;tabbable:0;title:L2060 聯貸案明細資料查詢;
 #BTN3=X,15,I,ui:button;value:商品參數查詢;enable:0;tabbable:0;title:L2001 商品參數明細資料查詢
 #BTN4=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
 #BTN5=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
@@ -625,11 +626,23 @@ C(2,#FuncCode,S,$,$,$,s,s,S)
 @
 ! IF(#CreditSysNo==#L2r02CreditSysNo,s,$)
 V(2,0)
-![聯貸案編號]
 
+#BUF2=X,17,S
+T(2,L2111+000001999999)
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2060; ntxbuf=#BUF2;ntxbuf5=type<-1:SyndNo<-OOSyndNo})
+
+![聯貸案編號]
 #SyndNo=A,6,I
 C(2,#FuncCode,S,$,$,$,s,s,S)
 C(3,#ApproveFlag,1,s,$)
+
+#BUF2B=X,17,S
+C(3,#SyndNo,0,T(2,L2111+000001999999),T(2,L2111+#SyndNo+#SyndNo))
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2060; ntxbuf=#BUF2B;ntxbuf5=type<-1:SyndNo<-OOSyndNo})
 
 
 !查詢聯貸訂約檔
@@ -666,7 +679,8 @@ IF(#ApplDate>#wkSysCDate,V(P,申請日期不可大於日曆日),$)
 C(2,#FuncCode,S,$,$,$,s,s,S)
 C(3,#ApproveFlag,1,s,$)
 HELP(#DepartmentCodeHelp)
-@V(H,#DepartmentCodeHelp)
+@
+V(H,#DepartmentCodeHelp)
 T(2,@BUF3,#ProdNo)
 
 #DepartmentCodeX=X,10,L
@@ -827,7 +841,9 @@ HELP(#YesNoHelp)
 V(H,#YesNoHelp)
 
 #IsSuspectedCheckX=X,4,L
+C(3,#CustEntCode,1,S,$)
 T(H,#IsSuspectedCheck,#YesNoHelp)
+C(5,#IsSuspectedCheck,Y,SHOW(#IsSuspectedCheckType,#IsSuspectedCheckTypeX),HIDE(#IsSuspectedCheckType,#IsSuspectedCheckTypeX))
 
 #IsSuspectedCheckTypeHelp=X,100,S
 T(3, :請選擇;Y:確認核對無誤)
@@ -835,6 +851,7 @@ T(3, :請選擇;Y:確認核對無誤)
 #IsSuspectedCheckType=X,1,I
 C(3,#UpdateCode,1,$,S)
 C(3,#CustEntCode,1,S,$)
+C(5,#IsSuspectedCheck,Y,$,S)
 HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
@@ -842,6 +859,7 @@ V(H,#IsSuspectedCheckTypeHelp)
 
 #IsSuspectedCheckTypeX=X,12,L
 C(3,#UpdateCode,1,$,S)
+C(3,#CustEntCode,1,S,$)
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 #IsDataDate=D,7,L

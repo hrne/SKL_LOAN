@@ -114,7 +114,7 @@ HIDE(#usApplAmt1)
 #BUF1A=X,100,S
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:GroupId<-OOCustId})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:GroupId<-OOCustId:GroupIdX<-OOCustName})
 
 ![團體戶]
 !必須輸入
@@ -124,8 +124,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:GroupId
 
 #GroupId=X,10,I
 @V(7)A(ID_UNINO,0,#GroupId)
-
-T(2,@CreditOfficerX,#Space)T(2,@IntroducerX,#Space)T(2,@LoanOfficerX,#Space)T(2,@SupervisorX,#Space)
+T(2,@GroupIdX,#Space)
 
 #SendL2r03=X,1,S
 E(0,@RimFuncCode,5)
@@ -174,11 +173,13 @@ T(2,@Introducer,#L2r03Introducer)
 T(2,@Supervisor,#L2r03Supervisor)
 
 #BUF2=X,6,S
-T(2,#ProdNo+0)
+T(2,#ProdNo)
 
 #BIND2=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF2;ntxbuf5=type<-1:ProdNo<-OOProdNo})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF2;ntxbuf5=type<-1:ProdNo<-OOProdNo:ProdName<-OOProdName})
 
+
+#Space60=X,60,L
 
 ![申請商品代碼]
 #FdProdNo=X,2,L
@@ -186,6 +187,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF2;ntxbuf5=type<-1:ProdNo<-
 #ProdNo=X,5,I
 !C(3,#FuncCode,2,s,$)
 @V(7)
+T(2,@ProdName,#Space60)
 
 
 
@@ -244,7 +246,6 @@ A(DATE,0,#ApplDate)
 V(5,#SYSCDATE,9991231)
 
 #BUF3A=X,7,S
-T(3,      Y)
 
 #BIND3A=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF3A;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo:CreditOfficerX<-OOFullname})
@@ -253,11 +254,10 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF3A;ntxbuf5=type<-1:CreditO
 #FdCreditOfficer=X,2,L
 
 #CreditOfficer=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
+T(2,@CreditOfficerX,#Space)
 
 #BUF3B=X,7,S
-! T(2,#CreditOfficer+Y)
-T(2,      Y)
 
 #BIND3B=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF3B;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo:CreditOfficerX<-OOFullname})
@@ -270,13 +270,11 @@ RESET_RIM(#SendL2r08A,L2R08)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo)
 R(1,L2R08)
 
-
 #CreditOfficerX=X,20,L
 C(4,#CreditOfficer,S,$)
 T(2,#L2r08FullName)
 
 #BUF4A=X,7,S
-T(3,      Y)
 
 #BIND4A=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4A;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:IntroducerX<-OOFullname})
@@ -286,11 +284,10 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4A;ntxbuf5=type<-1:Introdu
 #FdIntroducer=X,2,L
 
 #Introducer=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
+T(2,@IntroducerX,#Space)
 
 #BUF4B=X,7,S
-! T(2,#Introducer+Y)
-T(2,      Y)
 
 #BIND4B=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4B;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:IntroducerX<-OOFullname})
@@ -307,7 +304,6 @@ C(4,#Introducer,S,$)
 T(2,#L2r08FullName)
 
 #BUF5A=X,7,S
-T(3,      Y)
 
 #BIND5A=X,1,S
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5A;ntxbuf5=type<-1:LoanOfficer<-OOEmployeeNo:LoanOfficerX<-OOFullname})
@@ -317,11 +313,10 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5A;ntxbuf5=type<-1:LoanOff
 #FdLoanOfficer=X,2,L
 
 #LoanOfficer=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
+T(2,@LoanOfficerX,#Space)
 
 #BUF5B=X,7,S
-! T(2,#LoanOfficer+Y)
-T(2,      Y)
 
 #BIND5B=X,1,S
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5B;ntxbuf5=type<-1:LoanOfficer<-OOEmployeeNo:LoanOfficerX<-OOFullname})
@@ -338,7 +333,6 @@ C(4,#LoanOfficer,S,$)
 T(2,#L2r08FullName)
 
 #BUF6A=X,7,S
-T(3,      Y)
 
 #BIND6A=X,1,S
 BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
@@ -348,11 +342,10 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6A;ntxbuf5=type<-1:Supervi
 #FdSupervisor=X,2,L
 
 #Supervisor=X,6,I
-!C(3,#FuncCode,2,s,$)
+@
+T(2,@SupervisorX,#Space)
 
 #BUF6B=X,7,S
-! T(2,#Supervisor+Y)
-T(2,      Y)
 
 #BIND6B=X,1,S
 BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6B;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
@@ -401,7 +394,7 @@ C(3,#Precision,0,SHOW(#twApplAmt{i})HIDE(#usApplAmt{i})
 @
 IF({i}==1,V(7),$)
 A(ID_UNINO,0,#CustId{i})
-C(4,#CustId{i},$,V(4,#GroupId,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10,#CheckCustId11,#CheckCustId12,#CheckCustId13,#CheckCustId14,#CheckCustId15,#CheckCustId16,#CheckCustId17,#CheckCustId18,#CheckCustId19,#CheckCustId20))
+C(4,#CustId{i},CALL(#HIDE_D_ROW_{i}),IF(#CustId{i}==#GroupId,V(P,不可與團體戶統編相同),V(4,#GroupId,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10,#CheckCustId11,#CheckCustId12,#CheckCustId13,#CheckCustId14,#CheckCustId15,#CheckCustId16,#CheckCustId17,#CheckCustId18,#CheckCustId19,#CheckCustId20)))
 
 #SendL2r07C{i}=X,1,S
 C(4,#CustId{i},T(3,@FdApplAmt{i}, ),T(3,@FdApplAmt{i},*))

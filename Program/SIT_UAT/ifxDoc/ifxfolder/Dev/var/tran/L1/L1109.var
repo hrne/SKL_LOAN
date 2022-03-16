@@ -167,7 +167,7 @@ INVOKEJS(SHOW,grd1,{n},{n},1)
 C(5,#YNdef,Y,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
 
 #SubCompanyFgHelp=X,200,S
-T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行鎖之用;N:不同意)
+T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用;N:不同意)
 
 #SubCompanyFg=X,1,I
 C(4,#SubCompanyFg,T(2,#YNdef),$)

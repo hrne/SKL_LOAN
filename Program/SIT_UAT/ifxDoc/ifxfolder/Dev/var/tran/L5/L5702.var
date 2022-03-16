@@ -80,7 +80,7 @@ E(0,1)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 IF(#CHAIN==0,$,s)
-V(P,本交易為連動交易，不可直接進入)
+V(P,本交易為連動交易，請從交易:[L5074債務協商作業－應處理事項清單]進入)
 
 !做完交易自動更新原畫面
 #AutoReFresh=A,1,S
@@ -676,7 +676,7 @@ T(H,#DataType,#DataTypeValue)
 !訂正時顯示之欄位
 !參考編號
 #MRKEY=_,_,S
-T(2,#CustId)
+T(2,#CustNo+#CaseSeq)
 ![交易金額]
 #TXAMT=_,_,S
 E(0,#TransTxAmt)

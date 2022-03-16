@@ -50,7 +50,7 @@ E(0,0)
 #BTNJ=X,1,I,ui:button;value:上傳附件查詢;enable:1;tabbable:0
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L5060案件處理清單]進入),$)
 
 !做完交易自動更新原畫面
 #AutoReFresh=A,1,S
@@ -368,6 +368,9 @@ T(H,#Remark,#LawRemarkHelp)
 ! 其他記錄
 #Memo=x,10.50,I
 C(2,#FunctionCd,S,$,$,$,s,s)
+@C(3,#LegalProg,099,V(7),$)
+
+
 ! 維護人員
 #EditEmpNo=X,6,L
 C(2,#FunctionCd,S,$,$,$,s,s)

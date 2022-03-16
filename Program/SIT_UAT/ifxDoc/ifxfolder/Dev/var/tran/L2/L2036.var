@@ -37,6 +37,13 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
+#BTNADDBUF=X,18,S
+T(2,1)
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2306; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -79,8 +86,8 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2035借款戶關係人/關�
 
 #NTXBUF=X,14,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@CaseNo,#NTXBUF,1,7)
-T(1,@CustNo,#NTXBUF,8,7)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@CaseNo,#NTXBUF,8,7)
 
 #NTXBUF5=X,14,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
