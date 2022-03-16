@@ -159,8 +159,8 @@ public class LW003Report extends MakeReport {
 			int num = 0;
 			for (Map<String, String> lw003Vo : data) {
 
-				// 總業績金
-				BigDecimal performance = new BigDecimal(lw003Vo.get("Performance").toString());
+				// 總業績金Performance
+				BigDecimal performance = new BigDecimal(lw003Vo.get("F1").toString());
 
 				makeExcel.setValue(3, 4 + num, performance, "#,##0");
 
@@ -174,12 +174,12 @@ public class LW003Report extends MakeReport {
 			int row = 0;
 			int col = 0;
 			for (Map<String, String> lw003Vo : data) {
-				// 區部代號
-				String deptCode = lw003Vo.get("DeptCode");
-				// 工作季
-				int quarter = Integer.valueOf(lw003Vo.get("Quarter"));
-				// 獎勵金
-				BigDecimal bonus = new BigDecimal(lw003Vo.get("Bonus").toString());
+				// 以區部分 DeptCode
+				String deptCode = lw003Vo.get("F0");
+				// 工作季Quarter
+				int quarter = Integer.valueOf(lw003Vo.get("F1"));
+				// 獎勵金Bonus
+				BigDecimal bonus =lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F2").toString());
 
 				// 判斷列數
 				switch (deptCode) {
@@ -226,12 +226,12 @@ public class LW003Report extends MakeReport {
 			int col = 0;
 
 			for (Map<String, String> lw003Vo : data) {
-				// 區部代號
-				String deptCode = lw003Vo.get("DeptCode");
-				// 工作季
-				int quarter = Integer.valueOf(lw003Vo.get("Quarter"));
-				// 獎勵金
-				BigDecimal bonus = new BigDecimal(lw003Vo.get("Bonus").toString());
+				// 以通訊處分 DeptCode
+				String deptCode = lw003Vo.get("F0");
+				// 工作季Quarter
+				int quarter = Integer.valueOf(lw003Vo.get("F1"));
+				// 獎勵金Bonus
+				BigDecimal bonus =lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F2").toString());
 
 				// 判斷列數
 				switch (deptCode) {
@@ -275,7 +275,7 @@ public class LW003Report extends MakeReport {
 			for (Map<String, String> lw003Vo : data) {
 
 				// 總業績金
-				BigDecimal performance = new BigDecimal(lw003Vo.get("Bonus").toString());
+				BigDecimal performance = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F1").toString());
 
 				makeExcel.setValue(19, 4 + num, performance, "#,##0");
 
@@ -291,10 +291,10 @@ public class LW003Report extends MakeReport {
 			int col = 0;
 
 			for (Map<String, String> lw003Vo : data) {
-				// 工作季
-				int quarter = Integer.valueOf(lw003Vo.get("Quarter"));
-				// 獎勵金
-				BigDecimal bonus = new BigDecimal(lw003Vo.get("Bonus").toString());
+				// 工作季Quarter
+				int quarter = Integer.valueOf(lw003Vo.get("F0"));
+				// 獎勵金Bonus
+				BigDecimal bonus = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO :new BigDecimal(lw003Vo.get("F1").toString());
 
 				// 判斷欄位
 				if (quarter == 1) {

@@ -95,6 +95,7 @@ public class L3R10 extends TradeBuffer {
 	private void initTotaLoanSynd() {
 
 		this.totaVo.putParam("L3r10SyndNo", 0);
+		this.totaVo.putParam("L3r10SyndName", "");
 		this.totaVo.putParam("L3r10LeadingBank", "");
 		this.totaVo.putParam("L3r10AgentBank", "");
 		this.totaVo.putParam("L3r10SigningDate", 0);
@@ -108,6 +109,7 @@ public class L3R10 extends TradeBuffer {
 
 	private void moveTotaLoanSynd() throws LogicException {
 		this.totaVo.putParam("L3r10SyndNo", tLoanSynd.getSyndNo());
+		this.totaVo.putParam("L3r10SyndName", tLoanSynd.getSyndName());
 		this.totaVo.putParam("L3r10LeadingBank", tLoanSynd.getLeadingBank());
 		this.totaVo.putParam("L3r10AgentBank", tLoanSynd.getAgentBank());
 		this.totaVo.putParam("L3r10SigningDate", tLoanSynd.getSigningDate());

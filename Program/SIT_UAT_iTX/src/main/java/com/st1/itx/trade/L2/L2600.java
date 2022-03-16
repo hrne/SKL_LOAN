@@ -87,6 +87,7 @@ public class L2600 extends TradeBuffer {
 	private int iFuncCode;
 	private int iSyndNo;
 	private String iSyndTypeCode;
+	private String iSyndName;
 	private String iLeadingBank;
 	private String iAgentBank;
 	private int iSigningDate;
@@ -116,6 +117,7 @@ public class L2600 extends TradeBuffer {
 		// 取得輸入資料
 		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode")); // 功能
 		iSyndNo = this.parse.stringToInteger(titaVo.getParam("SyndNo")); // 聯貸案編號
+		iSyndName = titaVo.getParam("SyndName"); // 國內或國際聯貸
 		iSyndTypeCode = titaVo.getParam("SyndTypeCode"); // 國內或國際聯貸
 		iLeadingBank = titaVo.getParam("LeadingBank"); // 主辦行
 		iAgentBank = titaVo.getParam("AgentBank"); // 擔保品管理行
@@ -203,6 +205,7 @@ public class L2600 extends TradeBuffer {
 
 	private void moveLoanSynd() throws LogicException {
 		tLoanSynd.setSyndTypeCodeFlag(iSyndTypeCode);
+		tLoanSynd.setSyndName(iSyndName);
 		tLoanSynd.setLeadingBank(iLeadingBank);
 		tLoanSynd.setSigningDate(iSigningDate);
 		tLoanSynd.setPartRate(iPartRate);

@@ -25,324 +25,352 @@ import com.st1.itx.Exception.LogicException;
 @Table(name = "`LoanSynd`")
 public class LoanSynd implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6744512353542327223L;
+	private static final long serialVersionUID = -3370639796702902025L;
 
 // 聯貸編號
-	/* 自動編號民國年(3)+流水號(3) */
-	@Id
-	@Column(name = "`SyndNo`")
-	private int syndNo = 0;
+  /* 自動編號民國年(3)+流水號(3) */
+  @Id
+  @Column(name = "`SyndNo`")
+  private int syndNo = 0;
 
-	// 主辦行
-	@Column(name = "`LeadingBank`", length = 7)
-	private String leadingBank;
+  // 聯貸名稱
+  @Column(name = "`SyndName`", length = 60)
+  private String syndName;
 
-	// 代理行
-	/* 擔保品管理行 */
-	@Column(name = "`AgentBank`", length = 7)
-	private String agentBank;
+  // 主辦行
+  @Column(name = "`LeadingBank`", length = 7)
+  private String leadingBank;
 
-	// 簽約日
-	@Column(name = "`SigningDate`")
-	private int signingDate = 0;
+  // 代理行
+  /* 擔保品管理行 */
+  @Column(name = "`AgentBank`", length = 7)
+  private String agentBank;
 
-	// 國內或國際聯貸
-	/* CdCode.SyndTypeCodeA:國內B:國際 */
-	@Column(name = "`SyndTypeCodeFlag`", length = 1)
-	private String syndTypeCodeFlag;
+  // 簽約日
+  @Column(name = "`SigningDate`")
+  private int signingDate = 0;
 
-	// 參貸費率
-	@Column(name = "`PartRate`")
-	private BigDecimal partRate = new BigDecimal("0");
+  // 國內或國際聯貸
+  /* CdCode.SyndTypeCodeA:國內B:國際 */
+  @Column(name = "`SyndTypeCodeFlag`", length = 1)
+  private String syndTypeCodeFlag;
 
-	// 幣別
-	@Column(name = "`CurrencyCode`", length = 3)
-	private String currencyCode;
+  // 參貸費率
+  @Column(name = "`PartRate`")
+  private BigDecimal partRate = new BigDecimal("0");
 
-	// 聯貸總金額
-	@Column(name = "`SyndAmt`")
-	private BigDecimal syndAmt = new BigDecimal("0");
+  // 幣別
+  @Column(name = "`CurrencyCode`", length = 3)
+  private String currencyCode;
 
-	// 參貸金額
-	@Column(name = "`PartAmt`")
-	private BigDecimal partAmt = new BigDecimal("0");
+  // 聯貸總金額
+  @Column(name = "`SyndAmt`")
+  private BigDecimal syndAmt = new BigDecimal("0");
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 參貸金額
+  @Column(name = "`PartAmt`")
+  private BigDecimal partAmt = new BigDecimal("0");
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	/**
-	 * 聯貸編號<br>
-	 * 自動編號 民國年(3)+流水號(3)
-	 * 
-	 * @return Integer
-	 */
-	public int getSyndNo() {
-		return this.syndNo;
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	/**
-	 * 聯貸編號<br>
-	 * 自動編號 民國年(3)+流水號(3)
-	 *
-	 * @param syndNo 聯貸編號
-	 */
-	public void setSyndNo(int syndNo) {
-		this.syndNo = syndNo;
-	}
 
-	/**
-	 * 主辦行<br>
-	 * 
-	 * @return String
-	 */
-	public String getLeadingBank() {
-		return this.leadingBank == null ? "" : this.leadingBank;
-	}
+/**
+	* 聯貸編號<br>
+	* 自動編號
+民國年(3)+流水號(3)
+	* @return Integer
+	*/
+  public int getSyndNo() {
+    return this.syndNo;
+  }
 
-	/**
-	 * 主辦行<br>
-	 * 
-	 *
-	 * @param leadingBank 主辦行
-	 */
-	public void setLeadingBank(String leadingBank) {
-		this.leadingBank = leadingBank;
-	}
+/**
+	* 聯貸編號<br>
+	* 自動編號
+民國年(3)+流水號(3)
+  *
+  * @param syndNo 聯貸編號
+	*/
+  public void setSyndNo(int syndNo) {
+    this.syndNo = syndNo;
+  }
 
-	/**
-	 * 代理行<br>
-	 * 擔保品管理行
-	 * 
-	 * @return String
-	 */
-	public String getAgentBank() {
-		return this.agentBank == null ? "" : this.agentBank;
-	}
+/**
+	* 聯貸名稱<br>
+	* 
+	* @return String
+	*/
+  public String getSyndName() {
+    return this.syndName == null ? "" : this.syndName;
+  }
 
-	/**
-	 * 代理行<br>
-	 * 擔保品管理行
-	 *
-	 * @param agentBank 代理行
-	 */
-	public void setAgentBank(String agentBank) {
-		this.agentBank = agentBank;
-	}
+/**
+	* 聯貸名稱<br>
+	* 
+  *
+  * @param syndName 聯貸名稱
+	*/
+  public void setSyndName(String syndName) {
+    this.syndName = syndName;
+  }
 
-	/**
-	 * 簽約日<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getSigningDate() {
-		return StaticTool.bcToRoc(this.signingDate);
-	}
+/**
+	* 主辦行<br>
+	* 
+	* @return String
+	*/
+  public String getLeadingBank() {
+    return this.leadingBank == null ? "" : this.leadingBank;
+  }
 
-	/**
-	 * 簽約日<br>
-	 * 
-	 *
-	 * @param signingDate 簽約日
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setSigningDate(int signingDate) throws LogicException {
-		this.signingDate = StaticTool.rocToBc(signingDate);
-	}
+/**
+	* 主辦行<br>
+	* 
+  *
+  * @param leadingBank 主辦行
+	*/
+  public void setLeadingBank(String leadingBank) {
+    this.leadingBank = leadingBank;
+  }
 
-	/**
-	 * 國內或國際聯貸<br>
-	 * CdCode.SyndTypeCode A:國內 B:國際
-	 * 
-	 * @return String
-	 */
-	public String getSyndTypeCodeFlag() {
-		return this.syndTypeCodeFlag == null ? "" : this.syndTypeCodeFlag;
-	}
+/**
+	* 代理行<br>
+	* 擔保品管理行
+	* @return String
+	*/
+  public String getAgentBank() {
+    return this.agentBank == null ? "" : this.agentBank;
+  }
 
-	/**
-	 * 國內或國際聯貸<br>
-	 * CdCode.SyndTypeCode A:國內 B:國際
-	 *
-	 * @param syndTypeCodeFlag 國內或國際聯貸
-	 */
-	public void setSyndTypeCodeFlag(String syndTypeCodeFlag) {
-		this.syndTypeCodeFlag = syndTypeCodeFlag;
-	}
+/**
+	* 代理行<br>
+	* 擔保品管理行
+  *
+  * @param agentBank 代理行
+	*/
+  public void setAgentBank(String agentBank) {
+    this.agentBank = agentBank;
+  }
 
-	/**
-	 * 參貸費率<br>
-	 * 
-	 * @return BigDecimal
-	 */
-	public BigDecimal getPartRate() {
-		return this.partRate;
-	}
+/**
+	* 簽約日<br>
+	* 
+	* @return Integer
+	*/
+  public int getSigningDate() {
+    return StaticTool.bcToRoc(this.signingDate);
+  }
 
-	/**
-	 * 參貸費率<br>
-	 * 
-	 *
-	 * @param partRate 參貸費率
-	 */
-	public void setPartRate(BigDecimal partRate) {
-		this.partRate = partRate;
-	}
+/**
+	* 簽約日<br>
+	* 
+  *
+  * @param signingDate 簽約日
+  * @throws LogicException when Date Is Warn	*/
+  public void setSigningDate(int signingDate) throws LogicException {
+    this.signingDate = StaticTool.rocToBc(signingDate);
+  }
 
-	/**
-	 * 幣別<br>
-	 * 
-	 * @return String
-	 */
-	public String getCurrencyCode() {
-		return this.currencyCode == null ? "" : this.currencyCode;
-	}
+/**
+	* 國內或國際聯貸<br>
+	* CdCode.SyndTypeCode
+A:國內
+B:國際
+	* @return String
+	*/
+  public String getSyndTypeCodeFlag() {
+    return this.syndTypeCodeFlag == null ? "" : this.syndTypeCodeFlag;
+  }
 
-	/**
-	 * 幣別<br>
-	 * 
-	 *
-	 * @param currencyCode 幣別
-	 */
-	public void setCurrencyCode(String currencyCode) {
-		this.currencyCode = currencyCode;
-	}
+/**
+	* 國內或國際聯貸<br>
+	* CdCode.SyndTypeCode
+A:國內
+B:國際
+  *
+  * @param syndTypeCodeFlag 國內或國際聯貸
+	*/
+  public void setSyndTypeCodeFlag(String syndTypeCodeFlag) {
+    this.syndTypeCodeFlag = syndTypeCodeFlag;
+  }
 
-	/**
-	 * 聯貸總金額<br>
-	 * 
-	 * @return BigDecimal
-	 */
-	public BigDecimal getSyndAmt() {
-		return this.syndAmt;
-	}
+/**
+	* 參貸費率<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getPartRate() {
+    return this.partRate;
+  }
 
-	/**
-	 * 聯貸總金額<br>
-	 * 
-	 *
-	 * @param syndAmt 聯貸總金額
-	 */
-	public void setSyndAmt(BigDecimal syndAmt) {
-		this.syndAmt = syndAmt;
-	}
+/**
+	* 參貸費率<br>
+	* 
+  *
+  * @param partRate 參貸費率
+	*/
+  public void setPartRate(BigDecimal partRate) {
+    this.partRate = partRate;
+  }
 
-	/**
-	 * 參貸金額<br>
-	 * 
-	 * @return BigDecimal
-	 */
-	public BigDecimal getPartAmt() {
-		return this.partAmt;
-	}
+/**
+	* 幣別<br>
+	* 
+	* @return String
+	*/
+  public String getCurrencyCode() {
+    return this.currencyCode == null ? "" : this.currencyCode;
+  }
 
-	/**
-	 * 參貸金額<br>
-	 * 
-	 *
-	 * @param partAmt 參貸金額
-	 */
-	public void setPartAmt(BigDecimal partAmt) {
-		this.partAmt = partAmt;
-	}
+/**
+	* 幣別<br>
+	* 
+  *
+  * @param currencyCode 幣別
+	*/
+  public void setCurrencyCode(String currencyCode) {
+    this.currencyCode = currencyCode;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 聯貸總金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getSyndAmt() {
+    return this.syndAmt;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 聯貸總金額<br>
+	* 
+  *
+  * @param syndAmt 聯貸總金額
+	*/
+  public void setSyndAmt(BigDecimal syndAmt) {
+    this.syndAmt = syndAmt;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 參貸金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getPartAmt() {
+    return this.partAmt;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 參貸金額<br>
+	* 
+  *
+  * @param partAmt 參貸金額
+	*/
+  public void setPartAmt(BigDecimal partAmt) {
+    this.partAmt = partAmt;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
 
-	@Override
-	public String toString() {
-		return "LoanSynd [syndNo=" + syndNo + ", leadingBank=" + leadingBank + ", agentBank=" + agentBank + ", signingDate=" + signingDate + ", syndTypeCodeFlag=" + syndTypeCodeFlag + ", partRate="
-				+ partRate + ", currencyCode=" + currencyCode + ", syndAmt=" + syndAmt + ", partAmt=" + partAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate="
-				+ lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "LoanSynd [syndNo=" + syndNo + ", syndName=" + syndName + ", leadingBank=" + leadingBank + ", agentBank=" + agentBank + ", signingDate=" + signingDate + ", syndTypeCodeFlag=" + syndTypeCodeFlag
+           + ", partRate=" + partRate + ", currencyCode=" + currencyCode + ", syndAmt=" + syndAmt + ", partAmt=" + partAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

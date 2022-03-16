@@ -1954,4 +1954,33 @@ public class MakeExcel extends CommBuffer {
 	public void toExcel(long fileno, String fileName) throws LogicException {
 		doToExcel(fileno, fileName);
 	}
+
+	// 2022.3.25 by eric for 配合openExcel變更EXCEL檔
+	public void setValueInt(int row, int col, int val) throws LogicException {
+		if (this.sheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) getValue sheet is null");
+		}
+
+		Row prow = this.sheet.getRow(row - 1);
+
+		if (prow != null) {
+			Cell tmpCell = prow.getCell(col - 1);
+
+			tmpCell.setCellValue(val);
+		} else {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) setValueInt error = " + row + "/" + col + "/" + val);
+		}
+
+	}
+
+	public void saveExcel(String outfile) throws LogicException {
+
+		try (FileOutputStream fos = new FileOutputStream(new File(outfile))) {
+			this.wb.write(fos);
+			this.wb.close();
+		} catch (IOException e) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) close excel ");
+		}
+	}
+
 }

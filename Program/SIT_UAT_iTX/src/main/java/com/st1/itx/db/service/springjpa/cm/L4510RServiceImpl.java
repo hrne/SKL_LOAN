@@ -57,7 +57,7 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "     WHERE JSON_VALUE(EDD.\"JsonFields\", '$.InsuNo') IS NOT NULL "; // -- 判斷NOT NULL 避免後面資料重複
 		sql += "       AND EDD.\"ErrMsg\" IS NULL ";
 		sql += "       AND EDD.\"MediaDate\" = :mediaDate ";
-		sql += "       AND EDD.\"ProcCode\" IN ( :procCode ) ";
+		sql += "       AND EDD.\"ProcCode\" in (" + procCode + ") ";
 		sql += "       AND EDD.\"AchRepayCode\" = 5 ";
 		sql += " ) ";
 		sql += " ,EDD2 AS ( ";
@@ -103,7 +103,7 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("mediaDate", mediaDate);
-		query.setParameter("procCode", procCode);
+//		query.setParameter("procCode", procCode);
 
 		return this.convertToMap(query);
 	}

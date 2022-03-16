@@ -51,11 +51,11 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="L4951" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L4951]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@員工扣薪明細檔查詢"],
-[#<->#,"#FdMediaDate+媒體日期",#MediaDate],
+[#<->#,"#FdEntryDate+入帳日期",#EntryDate],
 [#<->#,"#FdMediaType+查詢選項",#MediaType,#MediaTypeX],
 ] 
 
-#FdMediaDate=X,2,L
+#FdEntryDate=X,2,L
 T(3,*)
 #FdMediaType=X,2,L
 T(3,*)
@@ -90,10 +90,10 @@ T(3,1:15日薪;2:非15日薪)
 T(4,NBSDY$)
 
 ! 會計日期
-#MediaDate=D,7,I
+#EntryDate=D,7,I
 E(0,#SYSDATE)
-@V(7)A(DATE,0,#MediaDate)
-T(2,@BUF0,1+#MediaDate)
+@V(7)A(DATE,0,#EntryDate)
+T(2,@BUF0,1+#EntryDate)
 
 
 #MediaType=A,1,I
@@ -121,13 +121,21 @@ T(3,[L4951] 員工扣薪明細檔查詢)
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
+#OOEntryDate=D,7,O
+#OOPerfMonth=A,5,O
+#OOProcCode=A,1,O
+#OOAcctCode=X,3,O
 
+#OORepayCode=A,1,O
+#OORepayCodeX=X,10,O
+T(H,#OORepayCode,#PerfRepayCodeHelp)
+! SWITCH(#OORepayCode,
+! 1,T(2,扣薪件),
+! 2,T(2,特約件),
+! 3,T(2,滯繳件),
+! 4,T(2,人事特約件),
+! 5,T(2,房貸扣薪件))
 
-#OOCustNo=A,7,O
-#OOFacmNo=A,3,O
-#OOBormNo=A,3,O
-#OOCustNoX=X,15,O
-T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 #OOAchRepayCode=A,2,O
 #OOAchRepayCodeX=X,10,O
 T(H,#OOAchRepayCode,#RepayCodeXHelp)
@@ -141,30 +149,23 @@ T(H,#OOAchRepayCode,#RepayCodeXHelp)
 ! 6,T(2,契變手續費),
 ! 7,T(2,法務費),
 ! 9,T(2,其他))
-#OOPerfMonth=A,5,O
-#OORepayCode=A,1,O
-#OORepayCodeX=X,10,O
-T(H,#OORepayCode,#PerfRepayCodeHelp)
-! SWITCH(#OORepayCode,
-! 1,T(2,扣薪件),
-! 2,T(2,特約件),
-! 3,T(2,滯繳件),
-! 4,T(2,人事特約件),
-! 5,T(2,房貸扣薪件))
+
+#OOCustNo=A,7,O
+#OOFacmNo=A,3,O
+#OOBormNo=A,3,O
+#OOCustNoX=X,15,O
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+
 #OOTellerNo=X,6,O
 #OOTellerId=X,10,O
 #OOTellerName=X,100,O
 #OORepayAmt=m,14,O
-#OOMediaDate=D,7,O
-#OOMediaKind=X,1,O
-#OOMediaSeq=m,6,O
-
 
 #OOBUF_Edit=X,500,S
-T(2,2+#OOMediaDate+#OOMediaKind+#OOMediaSeq+#OOCustNo+#OOAchRepayCode+#OOPerfMonth+#OORepayCode+#OOTellerNo+#OOTellerId+#OOTellerName+#OORepayAmt)
+T(2,2+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo)
 
 #OOBUF_Delete=X,500,S
-T(2,4+#OOMediaDate+#OOMediaKind+#OOMediaSeq+#OOCustNo+#OOAchRepayCode+#OOPerfMonth+#OORepayCode+#OOTellerNo+#OOTellerId+#OOTellerName+#OORepayAmt)
+T(2,4+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo)
 
 #OOBTN_Edit=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Edit})
@@ -175,7 +176,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Delete})
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#MediaDate
+#EntryDate
 #MediaType
 #END
 </sub>
@@ -185,20 +186,19 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Delete})
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L4951
+#OOEntryDate
+#OOPerfMonth
+#OOProcCode
+#OOAcctCode
+#OORepayCode
+#OOAchRepayCode
+#OORepayAmt
 #OOCustNo
 #OOFacmNo
 #OOBormNo
-#OOAchRepayCode
-#OOPerfMonth
-#OORepayCode
 #OOTellerNo
 #OOTellerId
 #OOTellerName
-#OORepayAmt
-#OOMediaDate
-#OOMediaKind
-#OOMediaSeq
-
 ^
 </sub>
 
@@ -207,7 +207,7 @@ TXFORM=L4951
 [
 ["[L4951]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@員工扣薪明細檔查詢"],
 [""],
-! [#<->#,"@媒體日期",#MediaDate],
+! [#<->#,"@媒體日期",#EntryDate],
 ! [#<->#,"@查詢選項",#MediaType,#MediaTypeX],
 ]
 
@@ -238,11 +238,5 @@ TXFORM=L4951
 #OORepayAmt=應扣金額
 {width:90,align:'right'}
 
-#OOMediaDate=
-{width:1,hidden:true}
-#OOMediaKind=
-{width:1,hidden:true}
-#OOMediaSeq=
-{width:1,hidden:true}
 ^
 </sub>

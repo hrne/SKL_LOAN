@@ -72,7 +72,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	 * @return 清償違約金計算明細
 	 * @throws LogicException LogicException
 	 */
-	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtPaid(int iCustNo, int iFacmNo, int iBormNo, List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
+	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtPaid(int iCustNo, int iFacmNo, int iBormNo,
+			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmt  ... ");
 
 		int wkFacmNoStart = 1;
@@ -82,7 +83,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			wkFacmNoEnd = iFacmNo;
 		}
 		// 查詢額度主檔
-		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		if (lFacMain == null) {
 			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
@@ -147,7 +149,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	 * @return 清償違約金計算明細
 	 * @throws LogicException LogicException
 	 */
-	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iCustNo, int iFacmNo, int iBormNo, List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
+	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iCustNo, int iFacmNo, int iBormNo,
+			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmtAll  ");
 
 		int wkFacmNoStart = 1;
@@ -157,7 +160,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			wkFacmNoEnd = iFacmNo;
 		}
 		// 查詢額度主檔
-		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		if (lFacMain == null) {
 			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
@@ -228,11 +232,13 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		lDisplayFlag.add("F"); // 繳息首筆
 		lDisplayFlag.add("I"); // 繳息
 		List<LoanBorTx> lLoanBorTx = new ArrayList<LoanBorTx>();
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 0, 99991231, lDisplayFlag, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, 0, 99991231, lDisplayFlag, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
 		if (lLoanBorTx != null) {
 			for (LoanBorTx tLoanBorTx : lLoanBorTx) {
-				if ("0".equals(tLoanBorTx.getTitaHCode()) && tLoanBorTx.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
+				if ("0".equals(tLoanBorTx.getTitaHCode())
+						&& tLoanBorTx.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
 					LoanCloseBreachVo v = new LoanCloseBreachVo();
 					v.setCustNo(tLoanBorTx.getCustNo()); // 戶號
 					v.setFacmNo(tLoanBorTx.getFacmNo()); // 額度編號
@@ -258,8 +264,10 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		} else {
 			Boolean isAddList = true;
 			for (LoanCloseBreachVo v : lLoanCloseBreach) {
-				if (iVo.getFacmNo() == v.getFacmNo() && iVo.getEndDate() == v.getEndDate() && iVo.getAcDate() == v.getAcDate() && iVo.getTitaTxCd().equals(v.getTitaTxCd())
-						&& iVo.getTitaKinBr().equals(v.getTitaKinBr()) && iVo.getTitaTlrNo().equals(v.getTitaTlrNo()) && iVo.getTitaTxtNo().equals(v.getTitaTxtNo())) {
+				if (iVo.getFacmNo() == v.getFacmNo() && iVo.getEndDate() == v.getEndDate()
+						&& iVo.getAcDate() == v.getAcDate() && iVo.getTitaTxCd().equals(v.getTitaTxCd())
+						&& iVo.getTitaKinBr().equals(v.getTitaKinBr()) && iVo.getTitaTlrNo().equals(v.getTitaTlrNo())
+						&& iVo.getTitaTxtNo().equals(v.getTitaTxtNo())) {
 					v.setExtraRepay(v.getExtraRepay().add(iVo.getExtraRepay()));
 					v.setBormNo(0);
 					isAddList = false;
@@ -340,14 +348,17 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		calcVo.setMonIdx(wkMonIdx);
 
 		// 計算百分比 = 違約金百分比 - 遞減段數 * 分段遞減百分比
-		wkBreachRate = calcVo.getBreachPercent().subtract(calcVo.getBreachDecrease().multiply(new BigDecimal(wkMonIdx)));
+		wkBreachRate = calcVo.getBreachPercent()
+				.subtract(calcVo.getBreachDecrease().multiply(new BigDecimal(wkMonIdx)));
 		if (wkBreachRate.compareTo(BigDecimal.ZERO) == 0) {
 			this.info("calcCloseBreachAmtRoutine end C");
 			return calcVo;
 		}
 
 		// 違約起算金額 = 撥款金額 * 還款起算比例
-		wkBreachStartAmt = calcVo.getUtilBal().multiply(new BigDecimal(calcVo.getBreachStartPercent())).divide(new BigDecimal(100), 15, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
+		// 2022-03-16 智偉修改:模仿AS400運算過程中小數位數最多9位，超過時無條件捨去
+		wkBreachStartAmt = calcVo.getUtilBal().multiply(new BigDecimal(calcVo.getBreachStartPercent()))
+				.divide(new BigDecimal(100), 9, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
 		calcVo.setBreachStartAmt(wkBreachStartAmt);
 
 		// 違約金計算金額
@@ -387,7 +398,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			if ("3".equals(calcVo.getAmortizedCode()) || "4".equals(calcVo.getAmortizedCode())) {
 				if (calcVo.getExtraRepayAcc().compareTo(wkBreachStartAmt) <= 0) {
 					wkBreachAmount = BigDecimal.ZERO;
-				} else if ((calcVo.getExtraRepayAcc().subtract(wkBreachStartAmt)).compareTo(calcVo.getExtraRepay()) < 0) {
+				} else if ((calcVo.getExtraRepayAcc().subtract(wkBreachStartAmt))
+						.compareTo(calcVo.getExtraRepay()) < 0) {
 					wkBreachAmount = calcVo.getExtraRepayAcc().subtract(wkBreachStartAmt);
 				} else {
 					wkBreachAmount = calcVo.getExtraRepay();
@@ -401,7 +413,9 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			return calcVo;
 		}
 		// 清償違約金 = 計算金額 * 計算百分比 / 100
-		wkCloseBreachAmt = wkBreachAmount.multiply(wkBreachRate).divide(new BigDecimal(100), 15, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
+		// 2022-03-16 智偉修改:模仿AS400運算過程中小數位數最多9位，超過時無條件捨去
+		wkCloseBreachAmt = wkBreachAmount.multiply(wkBreachRate).divide(new BigDecimal(100), 9, RoundingMode.DOWN)
+				.setScale(0, RoundingMode.HALF_UP);
 
 		calcVo.setAmount(wkBreachAmount); // 計算金額
 		calcVo.setBreachRate(wkBreachRate); // 計算利率
@@ -495,7 +509,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 					wkBreachD = "，" + tFacProd.getBreachPercent() + "% 計付違約金";
 				}
 				if (tFacProd.getBreachDecreaseMonth() != 0) {
-					wkBreachE = "，但每" + tFacProd.getBreachDecreaseMonth() + "個月遞減違約金" + tFacProd.getBreachDecrease() + "%";
+					wkBreachE = "，但每" + tFacProd.getBreachDecreaseMonth() + "個月遞減違約金" + tFacProd.getBreachDecrease()
+							+ "%";
 				}
 				switch (tFacProd.getBreachGetCode()) {
 				case "1":

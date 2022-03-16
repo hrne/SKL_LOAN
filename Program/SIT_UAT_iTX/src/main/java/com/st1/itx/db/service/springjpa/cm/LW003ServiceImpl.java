@@ -81,7 +81,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
 		sql += "      AND NVL(PO.\"DeptCode\",' ') IN ('A0B000','A0E000','A0F000','A0M000') ";
 		sql += "      AND TRUNC(PD.\"WorkMonth\" / 100 ) = :iwkyear ";
-		sql += "      AND MOD(PD.\"WorkMonth\", 100 ) = :iwkmonth ";
+		sql += "      AND MOD(PD.\"WorkMonth\", 100 ) <= :iwkmonth ";
 		sql += "      AND PD.\"PerfAmt\" >= 0 ";
 		sql += "    GROUP BY PD.\"WorkMonth\" ";
 		sql += "    ORDER BY PD.\"WorkMonth\" ";

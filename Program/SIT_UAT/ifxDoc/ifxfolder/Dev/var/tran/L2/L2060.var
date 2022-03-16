@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,184)ASGN(INQLEN$)
+E(0,244)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -126,6 +126,8 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@SyndNoSt,#NTXBUF,6,6)
+T(1,@SyndNoEnd,#NTXBUF,12,6)
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
@@ -275,6 +277,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
 !聯貸案編號區間(起)
 
 #SyndNoSt=A,6,I
+C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 ! #WkSyndNoX=A,6,S
@@ -282,6 +285,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
 !聯貸案編號區間(迄)
 !不可輸入小於等於[聯貸案編號區間(起)]
 #SyndNoEnd=A,6,I
+C(3,#CHAIN,1,s,$)
 E(0,#SyndNoSt)
 @IF(#SyndNoEnd<#SyndNoSt,V(P,不可小於聯貸案編號起號),$)
 ! V(6,0,#WkSyndNoX)
@@ -291,15 +295,18 @@ E(0,#SyndNoSt)
 ![主辦行]
 !可不輸入
 #LeadingBank=X,7,I
+C(3,#CHAIN,1,s,$)
 
 ![簽約日]
 !可不輸入
 #SigningDateStart=D,7,I
+C(3,#CHAIN,1,s,$)
 E(0,0)
 @
 A(DATE,0,#SigningDateStart)
 
 #SigningDateEnd=D,7,I
+C(3,#CHAIN,1,s,$)
 E(0,#SYSDATE)
 @A(DATE,0,#SigningDateEnd)
 V(5,#SigningDateStart,9991231)
@@ -388,7 +395,7 @@ T(3,1)ASGN(LOOP$)
 
 #OOSyndNo=A,6,S
 
-
+#OOSyndName=c,60,O
 
 #OOLeadingBank=A,7,O
 
@@ -470,7 +477,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3230; ntxbuf=#OOBUF5})
 <sub type="TOM">
 
 TXFORM=L2060
-#OOSyndNo#OOLeadingBank#OOSigningDate#OOCurrencyCode#OOSyndAmt#OOPartAmt#OOSyndTypeCode
+#OOSyndNo#OOSyndName#OOLeadingBank#OOSigningDate#OOCurrencyCode#OOSyndAmt#OOPartAmt#OOSyndTypeCode
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -508,6 +515,9 @@ TXFORM=L2060
 #OOSyndNo=聯貸編號 
 {width:85,align:'center'}
 
+#OOSyndName=聯貸名稱
+{width:120,align:'center'}
+
 #OOLeadingBank=主辦行 
 {width:85,align:'center'}
 
@@ -537,6 +547,9 @@ TXFORM=L2060
 #OOSyndNo=聯貸編號 
 {width:85,align:'center'}
 
+#OOSyndName=聯貸名稱
+{width:120,align:'center'}
+
 #OOLeadingBank=主辦行 
 {width:85,align:'center'}
 
@@ -562,7 +575,7 @@ TXFORM=L2060
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L2060;cpi=15"/>
 %
-#OOSyndNo#OOLeadingBank#OOSigningDate#OOCurrencyCode
+#OOSyndNo#OOSyndName#OOLeadingBank#OOSigningDate#OOCurrencyCode
 #OOSyndAmtX#OOPartAmtX
 @^
 </sub>

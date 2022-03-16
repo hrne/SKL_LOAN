@@ -53,9 +53,9 @@ public class L4951 extends TradeBuffer {
 		this.info("active L4951 ");
 		this.totaVo.init(titaVo);
 
-//		1.查詢 媒體日期
+//		1.查詢 入帳日期
 
-		int mediaDate = parse.stringToInteger(titaVo.getParam("MediaDate")) + 19110000;
+		int entryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		int mediaType = parse.stringToInteger(titaVo.getParam("MediaType"));
 
 		List<EmpDeductDtl> lEmpDeductDtl = new ArrayList<EmpDeductDtl>();
@@ -67,12 +67,21 @@ public class L4951 extends TradeBuffer {
 
 		Slice<EmpDeductDtl> sEmpDeductDtl = null;
 
+		List<String> type = new ArrayList<String>();
+
 		if (mediaType == 1) {
-
-			sEmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "4", this.index, this.limit);
-
+			type.add("4");
+			type.add("5");
+			sEmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit);
 		} else if (mediaType == 2) {
-			sEmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "5", this.index, this.limit);
+			type.add("1");
+			type.add("2");
+			type.add("3");
+			type.add("6");
+			type.add("7");
+			type.add("8");
+			type.add("9");			
+			sEmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit);
 		}
 
 		lEmpDeductDtl = sEmpDeductDtl == null ? null : sEmpDeductDtl.getContent();
@@ -85,20 +94,19 @@ public class L4951 extends TradeBuffer {
 
 				tCustMain = custMainService.custNoFirst(tEmpDeductDtl.getCustNo(), tEmpDeductDtl.getCustNo());
 
+				occursList.putParam("OOEntryDate", tEmpDeductDtl.getEntryDate());
+				occursList.putParam("OOPerfMonth", tEmpDeductDtl.getPerfMonth() - 191100);
+				occursList.putParam("OOProcCode", tEmpDeductDtl.getProcCode());
+				occursList.putParam("OOAcctCode", tEmpDeductDtl.getAcctCode());
+				occursList.putParam("OORepayCode", tEmpDeductDtl.getRepayCode());
+				occursList.putParam("OOAchRepayCode", tEmpDeductDtl.getAchRepayCode());
 				occursList.putParam("OOCustNo", tEmpDeductDtl.getCustNo());
 				occursList.putParam("OOFacmNo", tEmpDeductDtl.getFacmNo());
 				occursList.putParam("OOBormNo", tEmpDeductDtl.getBormNo());
-				occursList.putParam("OOAchRepayCode", tEmpDeductDtl.getAchRepayCode());
-				occursList.putParam("OOPerfMonth", tEmpDeductDtl.getPerfMonth() - 191100);
-				occursList.putParam("OORepayCode", tEmpDeductDtl.getRepayCode());
 				occursList.putParam("OOTellerNo", tCustMain.getEmpNo());
 				occursList.putParam("OOTellerId", tEmpDeductDtl.getCustId());
 				occursList.putParam("OOTellerName", tCustMain.getCustName());
 				occursList.putParam("OORepayAmt", tEmpDeductDtl.getRepayAmt());
-				occursList.putParam("OOMediaDate", tEmpDeductDtl.getMediaDate());
-				occursList.putParam("OOMediaKind", tEmpDeductDtl.getMediaKind());
-				occursList.putParam("OOMediaSeq", tEmpDeductDtl.getMediaSeq());
-
 				this.totaVo.addOccursList(occursList);
 			}
 		} else {

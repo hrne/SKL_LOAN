@@ -41,8 +41,8 @@ BEGIN
           ,''                             AS "NumDash"             -- 號之 VARCHAR2 5 
           ,''                             AS "Floor"               -- 樓 VARCHAR2 5 
           ,''                             AS "FloorDash"           -- 樓之 VARCHAR2 5 
-          ,S2."HGTMHN"                    AS "BdNo1"               -- 建號 VARCHAR2 5 
-          ,S2."HGTMHN2"                   AS "BdNo2"               -- 建號(子號) VARCHAR2 3 
+          ,LPAD(S2."HGTMHN",5,'0')        AS "BdNo1"               -- 建號 VARCHAR2 5 
+          ,LPAD(S2."HGTMHN2",3,'0')       AS "BdNo2"               -- 建號(子號) VARCHAR2 3 
           ,TRIM(TO_SINGLE_BYTE(S2."LGTADR"))
                                           AS "BdLocation"          -- 建物門牌 VARCHAR2 150 
           ,CASE

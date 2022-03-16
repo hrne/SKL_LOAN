@@ -149,6 +149,9 @@ public class Cs80UpDBS extends CommBuffer {
 //			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
 //				this.custRmk();
 //			}
+			
+			if (tota.isError() && this.titaVo.isTrmtypBatch())
+				return;
 
 			if (!this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
 				this.insTxRecord(tota);

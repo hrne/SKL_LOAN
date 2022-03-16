@@ -1708,7 +1708,8 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		// 2022-03-11 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過之位數，無條件捨去
 		BigDecimal wkDaysDenominator = new BigDecimal(wkDays).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
 
-		wkDelayInt = wkDelayBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominator);
+		wkDelayInt = wkDelayBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominator).setScale(9,
+				RoundingMode.DOWN);
 
 // 違約金計算公式 
 //      資金用途別               非購置不動產                       購置不動產(非寬限期內)        購置不動產(寬限期內)  

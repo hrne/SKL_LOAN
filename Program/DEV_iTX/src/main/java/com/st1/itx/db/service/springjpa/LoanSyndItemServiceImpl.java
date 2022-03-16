@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.LoanSyndItemRepositoryHist;
 import com.st1.itx.db.service.LoanSyndItemService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -182,7 +183,9 @@ public class LoanSyndItemServiceImpl extends ASpringJpaParm implements LoanSyndI
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Insert..." + dbName + " " + loanSyndItem.getLoanSyndItemId());
 		if (this.findById(loanSyndItem.getLoanSyndItemId()) != null)
 			throw new DBException(2);
@@ -211,7 +214,9 @@ public class LoanSyndItemServiceImpl extends ASpringJpaParm implements LoanSyndI
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + loanSyndItem.getLoanSyndItemId());
 		if (!empNot.isEmpty())
 			loanSyndItem.setLastUpdateEmpNo(empNot);
@@ -234,7 +239,9 @@ public class LoanSyndItemServiceImpl extends ASpringJpaParm implements LoanSyndI
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + loanSyndItem.getLoanSyndItemId());
 		if (!empNot.isEmpty())
 			loanSyndItem.setLastUpdateEmpNo(empNot);
@@ -282,7 +289,9 @@ public class LoanSyndItemServiceImpl extends ASpringJpaParm implements LoanSyndI
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("InsertAll...");
 		for (LoanSyndItem t : loanSyndItem) {
 			if (!empNot.isEmpty())
@@ -314,7 +323,9 @@ public class LoanSyndItemServiceImpl extends ASpringJpaParm implements LoanSyndI
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("UpdateAll...");
 		if (loanSyndItem == null || loanSyndItem.size() == 0)
 			throw new DBException(6);
