@@ -25,8 +25,8 @@
     root             hard    nproc           unlimited
     root             soft    nproc           unlimited
     #root可以開啟檔案數量
-    root             soft    nofile          65535
-    root             hard    nofile          10240
+    root             hard    nofile          65535
+    root             soft    nofile          10240
     #weblogic可以使用執行緒數量
     @weblogic        hard    nproc           4096
     @weblogic        soft    nproc           2048
