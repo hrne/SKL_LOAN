@@ -575,14 +575,36 @@ C(3,#checkFlag,1,s,$)
 HELP(#RelationCodeHelp)
 ! C(3,#AcctCheckFlag,0,$,s)
 @
-
 V(H,#RelationCodeHelp)
 IF(#RelationCode==00,T(2,@CustId,#CustIdTemp),$)
 IF(#RelationCode==00,s,$)
-IF(#RelationCode==99,T(2,@RelAcctGender,),IF(#RelationCode==01||#RelationCode==03||#RelationCode==05||#RelationCode==07||#RelationCode==08||#RelationCode==11,T(2,@RelAcctGender,1),T(2,@RelAcctGender,2)))
+IF(#RelationCode==99
+,T(2,@RelAcctGender,)
+T(2,@RelAcctGenderX,)
+,IF(#RelationCode==01||#RelationCode==03||#RelationCode==05||#RelationCode==07||#RelationCode==08||#RelationCode==11
+,T(2,@RelAcctGender,1)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
+,T(2,@RelAcctGender,2)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)))
 
 #RelationCodeX=X,4,L
 T(H,#RelationCode,#RelationCodeHelp)
+
+#closeRela=X,1,S
+IF(#FuncCode==1,$,s)
+C(3,#PostSuccessFg,1,s,$)
+C(3,#checkFlag,1,s,$)
+C(3,#RelationCode,0,
+T(2,@RelAcctName,#L4r03CustName)
+T(2,@RelationId,#L4r03CustId)
+E(0,@RelAcctBirthday,#L4r03Birthday)
+T(2,@RelAcctGenderP,#L4r03Gender)
+T(H,@RelAcctGenderX,#RelAcctGenderP,#SexHelp)
+,T(2,@CustId,)
+T(2,@RelAcctName,)
+T(2,@RelationId,)
+E(0,@RelAcctBirthday,0)
+T(2,@RelAcctGender,)
+T(2,@RelAcctGenderX,)
+)
 
 ! 扣款人ＩＤ
 #CustIdTemp=X,10,S
@@ -595,7 +617,8 @@ C(3,#checkFlag,1,s,$)
 V(7)
 A(ID_UNINO,0,#CustId)
 C(5,#RelationCode,#OldRelationCode,s,$)
-IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
+! IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
+T(2,@RelationId,#CustId)
 C(3,#RelationCode,0,$,s)
 C(3,#Type,1,IF(#CustId==#CustIdTemp,$,V(P,非本人ID)),IF(#CustId==#CustIdTemp,$,V(P,非授權檔ID))))
 
@@ -606,9 +629,6 @@ C(3,#Type,1,IF(#CustId==#CustIdTemp,$,V(P,非本人ID)),IF(#CustId==#CustIdTemp,
 ! 非本人----
 ! 與借款人關係
 #OldRelationCode=A,2,S
-
-
-
 
 #SetValue3=A,1,S
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -638,7 +658,6 @@ T(F,@RelAcctGender,1))
 C(3,#RelationCode,0,$,s)
 T(H,@RelAcctGenderX,#RelAcctGenderP,#SexHelp)
 
-
 ! 帳戶戶名
 #RelAcctName=x,100,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -653,6 +672,7 @@ IF(#FuncCode==4 || #FuncCode==5,s,$)
 C(3,#AcctCheckFlag,0,$,s)
 ! 11/5 非本人時自動帶扣款人ID
 C(3,#RelationCode,0,s,$)
+IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
 @V(7)A(ID_UNINO,0,#RelationId)
 
 #CustIdLen=m,2,S

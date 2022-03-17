@@ -49,6 +49,8 @@ public class LB080 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB080 active LB080 ");
 		this.info("LB080 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
+		lb080Report.setTxBuffer(this.txBuffer);
+
 		//String tranCode = "LB080";
 		//String tranName = "授信額度資料檔";
 

@@ -52,6 +52,8 @@ public class LNM39GP extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LNM39GP";
 		//String tranName = "LNM39GP 欄位清單７";
 
+		lnm39gpReport.setTxBuffer(this.txBuffer);
+		
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lnm39gpReport.exec(titaVo); // 使用月報資料庫
 

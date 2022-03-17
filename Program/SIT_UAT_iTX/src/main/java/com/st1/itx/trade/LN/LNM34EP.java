@@ -52,6 +52,8 @@ public class LNM34EP extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LNM34EP";
 		//String tranName = "IAS39 資料欄位清單E";
 
+		lnm34epReport.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lnm34epReport.exec(titaVo); // 使用月報資料庫
 

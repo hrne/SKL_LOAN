@@ -52,6 +52,8 @@ public class LB207 extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LB207";
 		//String tranName = "授信戶基本資料檔";
 
+		lb207Report.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb207Report.exec(titaVo); // 使用月報資料庫
 

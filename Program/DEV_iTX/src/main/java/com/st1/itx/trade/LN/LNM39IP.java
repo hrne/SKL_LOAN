@@ -52,6 +52,8 @@ public class LNM39IP extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LNM39IP";
 		//String tranName = "LNM39IP 欄位清單９";
 
+		lnm39ipReport.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lnm39ipReport.exec(titaVo); // 使用月報資料庫
 

@@ -15,8 +15,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LB211ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.data.L8ConstantEum;
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.db.domain.SystemParas;
+import com.st1.itx.db.service.SystemParasService;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -42,6 +43,9 @@ public class LB211Report extends MakeReport {
 
 	@Autowired
 	public MakeFile makeFile;
+
+	@Autowired
+	public SystemParasService sSystemParasService;
 
 	// 自訂明細標題
 	@Override
@@ -102,7 +106,31 @@ public class LB211Report extends MakeReport {
 
 		String acctDate = titaVo.getEntDy(); // 8位 民國年
 		this.info("-----LB211 genFile acctDate=" + acctDate);
+		
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		String sfileNo2 = titaVo.getParam("FileNo");
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+			sfileNo2 = "01"; 
+		}
 
+		// 查詢系統參數設定檔-JCIC放款報送人員資料
+		String iRimBusinessType = "LN";
+		String jcicEmpName = "";
+		String jcicEmpTel = "";
+		SystemParas tSystemParas = sSystemParasService.findById(iRimBusinessType, titaVo);
+		/* 如有找到資料 */
+		if (tSystemParas != null) {
+			jcicEmpName = tSystemParas.getJcicEmpName();
+			jcicEmpTel = tSystemParas.getJcicEmpTel();
+			if (jcicEmpName == null || jcicEmpTel == null) {
+				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC放款報送人員資料");
+			}
+		} else {
+			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
+		}
+		
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17";
 		String txt1[] = txt.split(";");
 
@@ -111,13 +139,14 @@ public class LB211Report extends MakeReport {
 			int sumLoanBal = 0; // 本筆撥款／還款後餘額
 			String strContent = "";
 
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".211"; // 458+月日+序號(1).211
+			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".211"; // 458+月日+序號.211
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B211", "聯徵每日授信餘額變動資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－" + L8ConstantEum.contact, 20, ' ')
-					+ makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ') + makeFile.fillStringR(" ", 20, ' ') + makeFile.fillStringR(" ", 16, ' ') + StringUtils.repeat(" ", 80)
-					+ StringUtils.repeat(" ", 43);
+			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－" + jcicEmpName, 20, ' ')
+					+ makeFile.fillStringR(jcicEmpTel, 16, ' ') + makeFile.fillStringR(" ", 20, ' ')
+					+ makeFile.fillStringR(" ", 16, ' ') + StringUtils.repeat(" ", 80) + StringUtils.repeat(" ", 43);
 			makeFile.put(strContent);
 
 			// 欄位內容
@@ -225,12 +254,19 @@ public class LB211Report extends MakeReport {
 		this.info("=========== LB211 genExcel: ");
 		this.info("LB211 genExcel TitaVo=" + titaVo);
 
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+		}
+
 		// 自訂標題 inf (首筆/尾筆)
 		String inf = "";
 		String txt = "";
 
 		// B211 聯徵每日授信餘額變動資料檔
-		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),交易屬性(19),交易日期(20~26)," + "本筆撥款／還款帳號(27~76),本筆撥款／還款金額(77~86),本筆撥款／還款後餘額(87~96),本筆還款後之還款紀錄(97),本筆還款後之債權結案註記(98~100),"
+		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),交易屬性(19),交易日期(20~26),"
+				+ "本筆撥款／還款帳號(27~76),本筆撥款／還款金額(77~86),本筆撥款／還款後餘額(87~96),本筆還款後之還款紀錄(97),本筆還款後之債權結案註記(98~100),"
 				+ "科目別(101),科目別註記(102),呆帳轉銷年月(103~107),個人消費性貸款註記(108),融資業務分類(109),用途別(110),空白(111~240)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17";
 
@@ -241,7 +277,7 @@ public class LB211Report extends MakeReport {
 			int sumLoanBal = 0; // 本筆撥款／還款後餘額
 			String strContent = "";
 
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".211.CSV"; // 458+月日+序號(1)+.211.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".211.CSV"; // 458+月日+序號+.211.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B211", "聯徵每日授信餘額變動資料檔", strFileName, 2);

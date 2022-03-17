@@ -52,6 +52,8 @@ public class LB093 extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LB093";
 		//String tranName = "動產及貴重物品擔保品明細檔";
 
+		lb093Report.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb093Report.exec(titaVo); // 使用月報資料庫
 

@@ -52,6 +52,8 @@ public class LB095 extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LB095";
 		//String tranName = "動產擔保品明細－建號附加檔";
 
+		lb095Report.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb095Report.exec(titaVo); // 使用月報資料庫
 

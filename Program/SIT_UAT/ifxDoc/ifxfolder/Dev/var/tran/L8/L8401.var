@@ -41,8 +41,10 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,80];">
 [
 ["[L8401]                                 產生JCIC日報媒體檔"],
-!["#R1+@會計日期",#ACCTDATE],
 ["#FdAcDate+會計日期",#AcDateStart,"~",#AcDateEnd],
+["#FdFileDay+報送日期",#FileDay,"#FdFileNo+檔案序號",#FileNo],
+["#FdJcicEmpName+審查部主辦人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
+
 ["@"],
 ["@",#BtnAll,"@全選"],
 ["@",#Btn1,"@B204 聯徵授信餘額日報檔"],
@@ -60,6 +62,29 @@ E(0,5)
 !---------- Required Input Setting ----------
 #FdAcDate=X,2,L
 T(3,*)
+#FdFileDay=X,2,L
+T(3,*)
+#FdFileNo=X,2,L
+T(3, )
+#FdJcicEmpName=X,2,L
+T(3, )
+#FdJcicEmpTel=X,2,L
+T(3, )
+
+! 業務類型
+#BusinessType=X,2,S
+T(3,LN)
+
+#SendL6R28=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimTxCode,L8401)
+T(2,@RimBusinessType,#BusinessType)
+RESET_RIM(#SendL6R28,L6R28)
+S(L6R28,1,#RimFuncCode,#RimTxCode,#RimBusinessType)
+R(1,L6R28)
+T(2,@JcicEmpName,#L6R28JcicEmpName)
+T(2,@JcicEmpTel,#L6R28JcicEmpTel)
+
 
 ! 必輸欄位
 ##loop{times:1,i:1}
@@ -107,6 +132,7 @@ T(4,DATE$)
 #DT2=D,7,S
 T(1,#DT1,2,7)
 
+
 #DT_YM=A,5,S
 T(1,#DT1,2,5)
 
@@ -125,6 +151,13 @@ T(4,LBSDY$)
 #DT4=D,7,S
 T(1,#DT3,2,7)
 
+!日曆日
+#DT5=X,8,S
+T(4,#SYSCDATE)
+
+#Day=D,7,L
+T(1,#DT5,2,7)
+E(0,@FileDay,#Day)
 
 !會計日期起迄
 #AcDateStart=D,7,I
@@ -138,9 +171,25 @@ D(8)
 @V(7)A(4,0,#AcDateEnd)V(5,#AcDateStart,#DT2)
 
 
+
+#FileDay=D,7,L
+
+#FileNo=A,2,I
+E(0,1)
+@V(2,0)
+#JcicEmpName=x,8,L
+#JcicEmpTel=x,16,L
+
+
 ##loop {times:2,i:1} 
 #DAILY{i}=X,1,S
 ##end
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R28.dec"/>
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -171,6 +220,7 @@ T(3,[L8401] 產生JCIC日報媒體檔)
 <sub type="TIM">
 #AcDateStart
 #AcDateEnd
+#FileNo
 ##loop {times:2,i:1}
 #DAILY{i}
 ##end
@@ -182,6 +232,7 @@ T(3,[L8401] 產生JCIC日報媒體檔)
 <sub type="TOM">
 TXFORM=L8401^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R28.tom"/>
 </sub>
 
 <sub type="PART" name="L8401" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

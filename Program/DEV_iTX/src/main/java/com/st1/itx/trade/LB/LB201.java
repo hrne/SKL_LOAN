@@ -52,6 +52,8 @@ public class LB201 extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LB201";
 		//String tranName = "聯徵授信餘額月報檔";
 
+		lB201Report.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		// 2021-12-20 智偉修改
 		boolean isFinish = lB201Report.exec(titaVo); // 使用月報資料庫

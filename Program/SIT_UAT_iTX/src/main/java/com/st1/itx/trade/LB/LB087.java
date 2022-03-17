@@ -52,6 +52,8 @@ public class LB087 extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LB087";
 		//String tranName = "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔";
 
+		lb087Report.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb087Report.exec(titaVo); // 使用月報資料庫
 

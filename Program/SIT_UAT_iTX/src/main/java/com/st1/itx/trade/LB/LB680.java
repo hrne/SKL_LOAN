@@ -52,6 +52,8 @@ public class LB680 extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LB680";
 		//String tranName = "「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔";
 
+		lb680Report.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb680Report.exec(titaVo); // 使用月報資料庫
 

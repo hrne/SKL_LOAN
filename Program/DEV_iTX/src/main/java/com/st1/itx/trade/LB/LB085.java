@@ -52,6 +52,8 @@ public class LB085 extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LB085";
 		//String tranName = "帳號轉換資料檔";
 
+		lb085Report.setTxBuffer(this.txBuffer);
+
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb085Report.exec(titaVo); // 使用月報資料庫
 

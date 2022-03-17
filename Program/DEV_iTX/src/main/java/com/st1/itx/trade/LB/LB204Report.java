@@ -101,6 +101,14 @@ public class LB204Report extends MakeReport {
 		String acctDate = titaVo.getEntDy(); // 8位 民國年
 		this.info("-----LB204 genFile acctDate=" + acctDate);
 
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		String sfileNo2 = titaVo.getParam("FileNo");
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+			sfileNo2 = "01"; 
+		}
+
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12";
 		String txt1[] = txt.split(";");
 
@@ -110,11 +118,12 @@ public class LB204Report extends MakeReport {
 			String strContent = "";
 			DecimalFormat formatter = new DecimalFormat("0");
 
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".204"; // 458+月日+序號(1).204
+			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".204"; // 458+月日+序號.204
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵授信餘額日報檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B204-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(" ", 16, ' ') // 聯絡電話
+			strContent = "JCIC-DAT-B204-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(" ", 16, ' ') // 聯絡電話
 					+ StringUtils.repeat(" ", 67);
 			makeFile.put(strContent);
 
@@ -216,12 +225,18 @@ public class LB204Report extends MakeReport {
 		this.info("=========== LB204 genExcel: ");
 		this.info("LB204 genExcel TitaVo=" + titaVo);
 
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+		}
 		// 自訂標題 inf (首筆/尾筆)
 		String inf = "";
 		String txt = "";
 
 		// B204 聯徵授信餘額日報檔
-		inf = "總行代號(1~3),分行代號(4~7),新增核准額度日期／清償日期／額度到期或解約日期(8~14),額度控制編碼／帳號(15~64)," + "授信戶IDN/BAN(65~74),科目別(75),科目別註記(76),交易別(77),訂約金額(78~87),新增核准額度當日動撥／清償金額(88~97),"
+		inf = "總行代號(1~3),分行代號(4~7),新增核准額度日期／清償日期／額度到期或解約日期(8~14),額度控制編碼／帳號(15~64),"
+				+ "授信戶IDN/BAN(65~74),科目別(75),科目別註記(76),交易別(77),訂約金額(78~87),新增核准額度當日動撥／清償金額(88~97),"
 				+ "本筆新增核准額度應計入DBR22倍規範之金額(98~107),1~7欄資料值相同之交易序號(108),空白(109~128)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12";
 
@@ -232,7 +247,7 @@ public class LB204Report extends MakeReport {
 			int sumDrawdownAmt = 0; // 授信／清償金額總金額
 			String strContent = "";
 			DecimalFormat formatter = new DecimalFormat("0");
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".204.CSV"; // 458+月日+序號(1)+.204.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".204.CSV"; // 458+月日+序號+.204.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵授信餘額日報檔", strFileName, 2);
