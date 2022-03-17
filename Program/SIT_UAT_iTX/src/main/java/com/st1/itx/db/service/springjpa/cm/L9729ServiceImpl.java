@@ -92,6 +92,8 @@ public class L9729ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"BormNo\" ";
 		sql += "      , DECODE(\"Result\", 1, '成功', '失敗') \"Result\" ";
 		sql += "      , \"Description\" ";
+		sql += "      , \"DataFrom\" ";
+		sql += "      , \"DataTo\" ";
 		sql += " FROM \"TxArchiveTableLog\" ";
 		sql += " WHERE \"ExecuteDate\" = :inputDate ";
 		sql += "   AND \"Type\" = :inputType ";

@@ -137,11 +137,27 @@ public class LW003Report extends MakeReport {
 		}
 
 		if (data1.size() > 0 && data2.size() > 0 && data3.size() > 0 && data4.size() > 0 && data5.size() > 0) {
-			exportExcel(data1, wkYear, wkMonth, 1);// 個金總業績
-			exportExcel(data2, wkYear, wkMonth, 2);// 區部 獎勵金額
-			exportExcel(data3, wkYear, wkMonth, 3);// 通訓處 獎勵金額
-			exportExcel(data4, wkYear, wkMonth, 4);// 介紹人個人獎勵
-			exportExcel(data5, wkYear, wkMonth, 5);// 專銷制單位
+			exportExcel(data1, wkYear, wkMonth, q, 1);// 個金總業績
+			exportExcel(data2, wkYear, wkMonth, q, 2);// 區部 獎勵金額
+			exportExcel(data3, wkYear, wkMonth, q, 3);// 通訓處 獎勵金額
+			exportExcel(data4, wkYear, wkMonth, q, 4);// 介紹人個人獎勵
+			exportExcel(data5, wkYear, wkMonth, q, 5);// 專銷制單位
+
+			// 重整公式
+
+			for (int x = 0; x < wkMonth; x++) {
+				makeExcel.formulaCalculate(8, 4 + x);
+				makeExcel.formulaCalculate(13, 4 + x);
+				makeExcel.formulaCalculate(18, 4 + x);
+				makeExcel.formulaCalculate(22, 4 + x);
+				makeExcel.formulaCalculate(23, 4 + x);
+			}
+
+			int rCol = q == 1 ? 7 : q == 2 ? 10 : q == 3 ? 13 : q == 4 ? 16 : 17;
+			
+			for (int y = 3; y <= 23; y++) {
+				makeExcel.formulaCalculate(y, rCol);
+			}
 
 		} else {
 			makeExcel.setValue(4, 4, "本日無資料");
@@ -151,18 +167,23 @@ public class LW003Report extends MakeReport {
 
 	}
 
-	private void exportExcel(List<Map<String, String>> data, int wkYear, int wkMonth, int form) throws LogicException {
+	private void exportExcel(List<Map<String, String>> data, int wkYear, int wkMonth, int Quarter, int form)
+			throws LogicException {
 
 		this.info("exportExcel...");
 		// 個金總業績
 		if (form == 1) {
-			int num = 0;
+			int num = 1;
 			for (Map<String, String> lw003Vo : data) {
 
 				// 總業績金Performance
 				BigDecimal performance = new BigDecimal(lw003Vo.get("F1").toString());
 
-				makeExcel.setValue(3, 4 + num, performance, "#,##0");
+				makeExcel.setValue(3, 3 + num, performance, "#,##0");
+
+				if (num == wkMonth) {
+					break;
+				}
 
 				num++;
 			}
@@ -199,18 +220,8 @@ public class LW003Report extends MakeReport {
 				}
 
 				// 判斷欄位
-				if (quarter == 1) {
-					col = 6;
-				}
-				if (quarter == 2) {
-					col = 9;
-				}
-				if (quarter == 3) {
-					col = 12;
-				}
-				if (quarter == 4) {
-					col = 15;
-				}
+				col = 3 + wkMonth;
+
 				if (quarter == 5) {
 					return;
 				}
@@ -235,53 +246,31 @@ public class LW003Report extends MakeReport {
 				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(lw003Vo.get("F2").toString());
 
-				// 判斷列數
-				switch (deptCode) {
-				case "A0B000":
-					row = 14;
-					break;
-				case "A0E000":
-					row = 15;
-					break;
-				case "A0F000":
-					row = 16;
-					break;
-				case "A0M000":
-					row = 17;
-					break;
-				}
-
 				// 判斷欄位
-				if (quarter == 1) {
-					col = 6;
-				}
-				if (quarter == 2) {
-					col = 9;
-				}
-				if (quarter == 3) {
-					col = 12;
-				}
-				if (quarter == 4) {
-					col = 15;
-				}
+				col = 3 + wkMonth;
+
 				if (quarter == 5) {
 					return;
 				}
+
 				makeExcel.setValue(row, col, bonus, "#,##0");
 			}
 		}
 
 		// 介紹人個人獎立
 		if (form == 4) {
-			int num = 0;
+			int num = 1;
 			for (Map<String, String> lw003Vo : data) {
 
 				// 總業績金
 				BigDecimal performance = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(lw003Vo.get("F1").toString());
 
-				makeExcel.setValue(19, 4 + num, performance, "#,##0");
+				makeExcel.setValue(19, 3 + num, performance, "#,##0");
 
+				if (num == wkMonth) {
+					break;
+				}
 				num++;
 			}
 
@@ -301,38 +290,14 @@ public class LW003Report extends MakeReport {
 						: new BigDecimal(lw003Vo.get("F1").toString());
 
 				// 判斷欄位
-				if (quarter == 1) {
-					col = 6;
-				}
-				if (quarter == 2) {
-					col = 9;
-				}
-				if (quarter == 3) {
-					col = 12;
-				}
-				if (quarter == 4) {
-					col = 15;
-				}
+				col = 3 + wkMonth;
+
 				if (quarter == 5) {
 					return;
 				}
 
 				makeExcel.setValue(row, col, bonus, "#,##0");
 			}
-		}
-
-		// 重整公式
-
-		for (int x = 0; x < wkMonth; x++) {
-			makeExcel.formulaCalculate(8, 4 + x);
-			makeExcel.formulaCalculate(13, 4 + x);
-			makeExcel.formulaCalculate(18, 4 + x);
-			makeExcel.formulaCalculate(22, 4 + x);
-			makeExcel.formulaCalculate(23, 4 + x);
-		}
-
-		for (int y = 3; y <= 23; y++) {
-			makeExcel.formulaCalculate(y, 4 + y);
 		}
 
 	}

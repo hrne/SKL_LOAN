@@ -26,28 +26,43 @@ BEGIN
     -- 寫入資料
     INSERT INTO "CustRmk"
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
-          ,ROW_NUMBER() OVER (PARTITION BY S1."LMSACN" ORDER BY S1."TRXTDT")
-                                          AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
+          ,ROW_NUMBER()
+           OVER (
+               PARTITION BY S1."LMSACN"
+               ORDER BY S1."TRXTDT"
+                      , S1."DOCSEQ"
+           )                              AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
           ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-          ,''                             AS "RmkCode"             -- 備忘錄代碼 VARCHAR2 2 
+          ,'999'                          AS "RmkCode"             -- 備忘錄代碼 VARCHAR2 3
           ,S1."DOCTXT"                    AS "RmkDesc"             -- 備忘錄說明 NVARCHAR2 120 
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,CASE
+             WHEN S1."TRXTDT" > 0
+             THEN TO_DATE(S1."TRXTDT",'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE  
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,CASE
+             WHEN S1."TRXTDT" > 0
+             THEN TO_DATE(S1."TRXTDT",'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM (  SELECT "LMSACN"
                   ,"TRXTDT"
                   ,"DOCSEQ"
                   ,TO_CHAR("TRXTDT") || "DOCTXT" AS "DOCTXT"
+                  ,"TRXMEM"
             FROM "LNREMP"
             UNION ALL 
             SELECT "LMSACN"
                   ,"TRXDAT" AS "TRXTDT"
                   ,"DOCSEQ"
                   ,TO_CHAR("TRXDAT") || "DOCTXT" AS "DOCTXT"
+                  ,"TRXMEM"
             FROM "DAT_LNDOCP"
         ) S1
     LEFT JOIN "CustMain" on "CustMain"."CustNo" = S1."LMSACN"
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."TRXMEM"
     WHERE S1."LMSACN" > 0
     AND NVL("CustMain"."CustUKey",' ') <> ' '
     ;

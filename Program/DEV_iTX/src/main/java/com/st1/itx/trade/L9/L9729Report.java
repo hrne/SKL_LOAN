@@ -78,7 +78,7 @@ public class L9729Report extends MakeReport {
 		 * ------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		this.print(-7, 1,"   執行批次  資料表名              戶號     額度  撥款編號  結果  搬運結果說明");
+		this.print(-7, 1,"   執行批次  封存／復原　資料表名              戶號     額度  撥款編號  結果  搬運結果說明");
 		this.print(-8, 1,"  ========================================================================================================================================");
 		
 		this.setBeginRow(9);
@@ -102,13 +102,28 @@ public class L9729Report extends MakeReport {
 		} else {
 			for (Map<String, String> l9728Vo : list)
 			{
+				String route;
+				String dataFrom = l9728Vo.get("DataFrom");
+				String dataTo = l9728Vo.get("DataTo");
+				
+				if ("HISTORY".equals(dataFrom) && "ONLINE".equals(dataTo))
+				{
+					route = "復原";
+				} else if ("ONLINE".equals(dataFrom) && "HISTORY".equals(dataTo))
+				{
+					route = "封存";
+				} else
+				{
+					route = "紀錄錯誤";
+				}
 				this.print(1, 8, l9728Vo.get("BatchNo"), "C");
-				this.print(0, 14, l9728Vo.get("TableName"));
-				this.print(0, 36, l9728Vo.get("CustNo"));
-				this.print(0, 45, l9728Vo.get("FacmNo"));
-				this.print(0, 51, l9728Vo.get("BormNo"));
-				this.print(0, 61, l9728Vo.get("Result"));
-				this.print(0, 67, StringCut.stringCut(l9728Vo.get("Description"), 0, 80));
+				this.print(0, 18, route, "C");
+				this.print(0, 26, l9728Vo.get("TableName"));
+				this.print(0, 48, l9728Vo.get("CustNo"));
+				this.print(0, 57, l9728Vo.get("FacmNo"));
+				this.print(0, 63, l9728Vo.get("BormNo"));
+				this.print(0, 73, l9728Vo.get("Result"));
+				this.print(0, 79, StringCut.stringCut(l9728Vo.get("Description"), 0, 59));
 			}
 		}
 		

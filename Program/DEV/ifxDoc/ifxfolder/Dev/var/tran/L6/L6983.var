@@ -253,6 +253,9 @@ SWITCH(#OOTitaCrDb,1,T(3,借),
 #TxtNo=A,8,L
 T(1,@TxtNo,#OORelNo,18,8)
 
+#OORelAcDate=D,7,S
+T(1,@OORelAcDate,#OORelNo,1,7)
+
 #OOKINBR=X,4,S
 T(1,@OOKINBR,#OORelNo,8,4)
 #OOTlrNo=X,6,S
@@ -288,9 +291,6 @@ E(0,0)
 IF(#SelectCode==4,T(2,@ORGKIN,#OOKINBR)T(2,@ORGTLR,#OOTlrNo)T(2,@ORGTNO,#OOTxtNo)E(0,@OrgEntdy,#SYSDATE)E(0,@HCODE,1),$)
 T(6A,#TxItemCode+#TxCustNo+#TxFacmNo+#TxBormNo+#TxDtlValue+#TxSelectCode+#TXAMT+#MRKEY+#BATCHNO+#TITFCD+#ORGKIN+#ORGTLR+#ORGTNO+#OrgEntdy+#HCODE)
 
-
-
-
 #batch-detail=x,100000,S
 
 #batch-print=A,1,S
@@ -313,10 +313,9 @@ T(6A,#TxItemCode+#TxCustNo+#TxFacmNo+#TxBormNo+#TxDtlValue+#TxSelectCode+#TXAMT+
 !#batch-row-txtno 該列傳送序號
 #batch-row-txtno=X,14,O
 
-
 ! L6901分錄
 #DTL_BUF=X,100,S
-T(2,#OOAcDate+0000000+#OOKINBR+#OOTlrNo+#OOTxtNo)
+T(2,#OORelAcDate+0000000+#OOKINBR+#OOTlrNo+#OOTxtNo)
 
 #DTL_BTN=X,3,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄;ntxbuf=#DTL_BUF})

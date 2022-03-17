@@ -34,6 +34,7 @@ import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.common.TxBatchCom;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.CustRmkCom;
+import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
 @Component("cs80UpDBS")
@@ -149,7 +150,6 @@ public class Cs80UpDBS extends CommBuffer {
 //			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
 //				this.custRmk();
 //			}
-			
 			if (tota.isError() && this.titaVo.isTrmtypBatch())
 				return;
 
@@ -581,6 +581,18 @@ public class Cs80UpDBS extends CommBuffer {
 		txCruiser.setTxCruiserId(txCruiserId);
 		txCruiser.setTxCode(this.titaVo.getTxCode());
 		txCruiser.setJobList(jobList);
+		try {
+			TitaVo titaVo = (TitaVo) this.titaVo.clone();
+			titaVo.clearBodyFld();
+			txCruiser.setParameter(titaVo.getJsonString());
+			titaVo.clear();
+			titaVo = null;
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			txCruiser.setParameter("");
+		}
 		txCruiser.setStatus("U");
 
 		if (this.titaVo.isJobSendMsgChainOff())

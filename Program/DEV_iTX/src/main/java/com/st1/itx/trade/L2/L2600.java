@@ -25,6 +25,7 @@ import com.st1.itx.db.service.LoanSyndService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.GSeqCom;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
 /*
  * L2600 聯貸案訂約登錄
@@ -82,6 +83,8 @@ public class L2600 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	GSeqCom gGSeqCom;
+	@Autowired
+	DataLog datalog;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iFuncCode;
@@ -103,6 +106,7 @@ public class L2600 extends TradeBuffer {
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
 	private LoanSynd tLoanSynd = new LoanSynd();
+	private LoanSynd beforeLoanSynd;
 	private LoanSyndId tLoanSyndId = new LoanSyndId();
 
 	@Override
@@ -144,7 +148,7 @@ public class L2600 extends TradeBuffer {
 
 			moveLoanSynd();
 			try {
-				loanSyndService.insert(tLoanSynd);
+				loanSyndService.insert(tLoanSynd, titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
@@ -156,28 +160,35 @@ public class L2600 extends TradeBuffer {
 			if (tLoanSynd == null) {
 				throw new LogicException(titaVo, "E0006", "聯貸訂約檔  聯貸案序號 = " + iSyndNo); // 鎖定資料時，發生錯誤
 			}
+			beforeLoanSynd = (LoanSynd) datalog.clone(tLoanSynd);
 			moveLoanSynd();
 			try {
-				loanSyndService.update(tLoanSynd);
+				tLoanSynd = loanSyndService.update2(tLoanSynd, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0003", e.getErrorMsg()); // 修改資料不存在
 			}
+			datalog.setEnv(titaVo, beforeLoanSynd, tLoanSynd);
+			datalog.exec();
+
 			break;
 		case 4: // 刪除
 			tLoanSynd = loanSyndService.holdById(iSyndNo);
 			if (tLoanSynd == null) {
 				throw new LogicException(titaVo, "E0006", "聯貸訂約檔  聯貸案序號 = " + iSyndNo); // 鎖定資料時，發生錯誤
 			}
+			beforeLoanSynd = (LoanSynd) datalog.clone(tLoanSynd);
 			// 刪除時 有案件申請使用時error
 			Slice<FacCaseAppl> slFacCaseAppl = facCaseApplService.syndNoEq(iSyndNo, 0, 1, titaVo);
 			if (slFacCaseAppl != null) {
 				throw new LogicException(titaVo, "E0008", "案件申請檔有使用此聯貸案編號  聯貸案編號 =  " + iSyndNo); // 刪除資料時，發生錯誤
 			}
 			try {
-				loanSyndService.delete(tLoanSynd);
+				loanSyndService.delete(tLoanSynd, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0004", e.getErrorMsg()); // 刪除資料不存在
 			}
+			datalog.setEnv(titaVo, beforeLoanSynd, tLoanSynd);
+			datalog.exec("刪除聯貸訂約檔");
 			break;
 		case 5: // 查詢
 			break;

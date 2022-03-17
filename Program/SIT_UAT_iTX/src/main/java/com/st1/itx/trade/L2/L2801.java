@@ -103,7 +103,7 @@ public class L2801 extends TradeBuffer {
 						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 新增資料已存在
 			}
 			tLoanNotYet = new LoanNotYet();
-			moveLoanNotYet();
+			moveLoanNotYet(iFunCd);
 			try {
 				loanNotYetService.insert(tLoanNotYet);
 			} catch (DBException e) {
@@ -126,7 +126,7 @@ public class L2801 extends TradeBuffer {
 
 			// 變更前
 			LoanNotYet bLoanNotYet = (LoanNotYet) datalog.clone(tLoanNotYet);
-			moveLoanNotYet();
+			moveLoanNotYet(iFunCd);
 			try {
 				loanNotYetService.update(tLoanNotYet);
 			} catch (DBException e) {
@@ -163,7 +163,7 @@ public class L2801 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveLoanNotYet() throws LogicException {
+	private void moveLoanNotYet(int iFunCd) throws LogicException {
 
 		tLoanNotYet.setCustNo(iCustNo);
 		tLoanNotYet.setFacmNo(iFacmNo);
@@ -213,11 +213,11 @@ public class L2801 extends TradeBuffer {
 
 		tLoanNotYet.setCloseDate(this.parse.stringToInteger(iTitaVo.getParam("CloseDate")));
 		tLoanNotYet.setReMark(iTitaVo.getParam("ReMark"));
-		tLoanNotYet
-				.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-		tLoanNotYet.setCreateEmpNo(iTitaVo.getTlrNo());
-		tLoanNotYet
-				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		if(iFunCd == 1) { // 新增才填建檔日和人員
+			tLoanNotYet.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tLoanNotYet.setCreateEmpNo(iTitaVo.getTlrNo());			
+		}
+		tLoanNotYet.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		tLoanNotYet.setLastUpdateEmpNo(iTitaVo.getTlrNo());
 	}
 }

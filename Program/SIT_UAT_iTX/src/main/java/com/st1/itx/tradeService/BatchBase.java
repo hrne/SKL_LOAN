@@ -1,7 +1,9 @@
 package com.st1.itx.tradeService;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
@@ -12,21 +14,28 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.TxCruiser;
+import com.st1.itx.db.domain.TxCruiserId;
+import com.st1.itx.db.service.TxCruiserService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
 
 public abstract class BatchBase {
 
-	private Logger logger;
+	@Autowired
+	private TxCruiserService txCruiserService;
 
 	@Autowired
 	public TxBuffer txBuffer;
 
 	@Autowired
 	public TitaVo titaVo;
+
+	private Logger logger;
 
 	private boolean loggerFg = true;
 
@@ -42,6 +51,8 @@ public abstract class BatchBase {
 
 	private String logFg;
 
+	private String txSeq;
+
 	@PostConstruct
 	private void init() {
 		try {
@@ -53,13 +64,17 @@ public abstract class BatchBase {
 
 			loggerFg = ThreadVariable.isLogger();
 
-			this.titaVo = new TitaVo();
-			this.titaVo.init();
+			TxCruiser txCruiser = txCruiserService.findById(new TxCruiserId(this.getTxSeq(), this.getTlrNo()));
+			if (Objects.isNull(txCruiser)) {
+				this.titaVo = new TitaVo();
+				this.titaVo.init();
 
-			this.titaVo.putParam(ContentName.kinbr, "0000");
-			this.titaVo.putParam(ContentName.tlrno, tlrNo);
-			this.titaVo.putParam(ContentName.empnot, tlrNo);
-
+				this.titaVo.putParam(ContentName.kinbr, "0000");
+				this.titaVo.putParam(ContentName.tlrno, tlrNo);
+				this.titaVo.putParam(ContentName.empnot, tlrNo);
+			} else {
+				this.titaVo = this.titaVo.getVo(txCruiser.getParameter());
+			}
 			if ("0".equals(this.excuteMode))
 				this.titaVo.putParam(ContentName.dataBase, this.dataBase);
 			else {
@@ -71,8 +86,14 @@ public abstract class BatchBase {
 
 			this.txBuffer.init(this.titaVo);
 			this.titaVo.putParam(ContentName.entdy, "0" + this.txBuffer.getTxCom().getTbsdy());
-		} catch (LogicException e) {
-			this.error(e.getErrorMsgId() + " " + e.getErrorMsg());
+		} catch (LogicException | IOException e) {
+			if (e instanceof LogicException)
+				this.error(((LogicException) e).getErrorMsgId() + " " + ((LogicException) e).getErrorMsg());
+			else {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+			}
 		}
 	}
 
@@ -168,6 +189,15 @@ public abstract class BatchBase {
 	@Value("#{jobParameters['loogerFg']}")
 	public void setLogFg(String logFg) {
 		this.logFg = logFg;
+	}
+
+	public String getTxSeq() {
+		return txSeq;
+	}
+
+	@Value("#{jobParameters['txSeq']}")
+	public void setTxSeq(String txSeq) {
+		this.txSeq = txSeq;
 	}
 
 	public abstract void run() throws LogicException;

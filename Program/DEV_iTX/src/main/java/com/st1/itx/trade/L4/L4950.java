@@ -85,16 +85,14 @@ public class L4950 extends TradeBuffer {
 							CdEmp tCdEmp = new CdEmp();
 							tCdEmp = cdEmpService.findById(tCustMain.getEmpNo());
 							if (tCdEmp != null) {
-								if ("0".equals(tCdEmp.getAgType1()) || "2".equals(tCdEmp.getAgType1()) || "3".equals(tCdEmp.getAgType1()) || "5".equals(tCdEmp.getAgType1())) {
-								} else {
+								if (!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1()) && !"3".equals(tCdEmp.getAgType1()) && !"5".equals(tCdEmp.getAgType1())) {
 									errCnt = errCnt + 1;
 									setreport(tFacMain, tCustMain, 2);
-								}
-								if ("0".equals(tCdEmp.getAgType1()) || "2".equals(tCdEmp.getAgType1())) {
-								} else {
+								} else if(!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1())) {
 									errCnt = errCnt + 1;
 									setreport(tFacMain, tCustMain, 3);
 								}
+
 							} else {
 								errCnt = errCnt + 1;
 								setreport(tFacMain, tCustMain, 1);
@@ -129,9 +127,9 @@ public class L4950 extends TradeBuffer {
 		occursList.putParam("OOBormNo", 0);
 		switch (errorFlag) {
 		case 1:
-			occursList.putParam("OOEmpName", "");
-			occursList.putParam("OOEmpNo", "");
-			occursList.putParam("OOEmpId", "");
+			occursList.putParam("OOEmpName", tCustMain.getCustName().substring(0, nameLength));
+			occursList.putParam("OOEmpNo", tCustMain.getEmpNo());
+			occursList.putParam("OOEmpId", tCustMain.getCustId());
 			occursList.putParam("OOErrMsg", "在職檔無此資料");
 			break;
 		case 2:

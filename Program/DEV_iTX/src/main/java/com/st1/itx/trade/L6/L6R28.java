@@ -125,6 +125,8 @@ public class L6R28 extends TradeBuffer {
 		this.totaVo.putParam("L6R28FtpUrl", mSystemParas.getFtpUrl());
 		this.totaVo.putParam("L6R28PerfDate", mSystemParas.getPerfDate());
 		this.totaVo.putParam("L6R28AcBookAdjDate", mSystemParas.getAcBookAdjDate());
+		this.totaVo.putParam("L6R28JcicEmpName", mSystemParas.getJcicEmpName());
+		this.totaVo.putParam("L6R28JcicEmpTel", mSystemParas.getJcicEmpTel());
 
 	}
 

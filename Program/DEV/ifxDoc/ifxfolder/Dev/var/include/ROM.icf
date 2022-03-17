@@ -8932,6 +8932,8 @@ TXFORM=L6R27
 #L6R28FtpUrl=x,50,S
 #L6R28PerfDate=D,7,S
 #L6R28AcBookAdjDate=D,7,S
+#L6R28JcicEmpName=X,8,S
+#L6R28JcicEmpTel=X,16,S
 </L6R28.dec>
 
 <L6R28.tom>
@@ -8977,6 +8979,8 @@ TXFORM=L6R28
 #L6R28FtpUrl
 #L6R28PerfDate
 #L6R28AcBookAdjDate
+#L6R28JcicEmpName
+#L6R28JcicEmpTel
 ^
 </L6R28.tom>
 
