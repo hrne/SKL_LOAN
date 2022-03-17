@@ -79,7 +79,7 @@ public class L4950 extends TradeBuffer {
 					if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
 //						1.在職檔無此資料
 //						2.制度別不屬於員工扣薪(0/2/3/5)
-//						3.非車貸，制度別0/2才可設定員工薪
+
 						CustMain tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
 						if (tCustMain != null) {
 							CdEmp tCdEmp = new CdEmp();
@@ -88,10 +88,7 @@ public class L4950 extends TradeBuffer {
 								if (!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1()) && !"3".equals(tCdEmp.getAgType1()) && !"5".equals(tCdEmp.getAgType1())) {
 									errCnt = errCnt + 1;
 									setreport(tFacMain, tCustMain, 2);
-								} else if(!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1())) {
-									errCnt = errCnt + 1;
-									setreport(tFacMain, tCustMain, 3);
-								}
+								} 
 
 							} else {
 								errCnt = errCnt + 1;

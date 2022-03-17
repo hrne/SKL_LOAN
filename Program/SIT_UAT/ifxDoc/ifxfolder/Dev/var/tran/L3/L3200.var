@@ -531,7 +531,6 @@ T(2,0000000+#TimCustNo+#CustId+#ApplNo+000)
 #FdBormNo=X,2,L
 
 #BormNo=A,3,I
-E(0,0)
 C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,T(F,#BormNo,0),T(F,#BormNo,1))
 C(3,#FacmNo,0,S,$)

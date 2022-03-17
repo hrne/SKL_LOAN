@@ -54,9 +54,28 @@ public class LB090Report extends MakeReport {
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LBList = null;
 		try {
-			LBList = lB090ServiceImpl.findAll(titaVo);
+			LBList = lB090ServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -107,7 +126,8 @@ public class LB090Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B090", "擔保品關聯檔資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B090-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B090-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 67, ' ');
 			makeFile.put(strContent);
 
@@ -164,7 +184,8 @@ public class LB090Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 116);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
+					+ StringUtils.repeat(" ", 116);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -185,7 +206,8 @@ public class LB090Report extends MakeReport {
 		String txt = "";
 
 		// B090 擔保品關聯檔資料檔
-		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),授信戶IDN/BAN(12~21),擔保品控制編碼(22~71),額度控制編碼(72~121)," + "海外不動產擔保品資料註記(122~123),資料所屬年月(124~128)";
+		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),授信戶IDN/BAN(12~21),擔保品控制編碼(22~71),額度控制編碼(72~121),"
+				+ "海外不動產擔保品資料註記(122~123),資料所屬年月(124~128)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8";
 
 		String txt1[] = txt.split(";");

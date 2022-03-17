@@ -232,6 +232,7 @@ public class L3R06 extends TradeBuffer {
 			wkBormNoStart = iBormNo;
 			wkBormNoEnd = iBormNo;
 		}
+
 		BigDecimal wkExtraRepay = iExtraRepay;
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
 				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
@@ -334,7 +335,15 @@ public class L3R06 extends TradeBuffer {
 		}
 		if (oShortfall.compareTo(BigDecimal.ZERO) == 0 && wkTotaCount == 0
 				&& iExtraRepay.compareTo(BigDecimal.ZERO) == 0 && !iTxCode.equals("L3440")) {
-			throw new LogicException(titaVo, "E3070", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無可計息的放款資料
+			if (iBormNo > 0) {
+				throw new LogicException(titaVo, "E3070",
+						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無可計息的放款資料
+			}
+			if (iFacmNo > 0) {
+				throw new LogicException(titaVo, "E3070", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查無可計息的放款資料
+			}
+			throw new LogicException(titaVo, "E3070", "戶號 = " + iCustNo); // 查無可計息的放款資料
+
 		}
 		// 還款金額
 		oRepayAmt = oRepayAmt.add(oPrincipal).add(oInterest).add(oDelayInt).add(oBreachAmt);

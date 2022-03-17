@@ -53,9 +53,28 @@ public class LNM39FPReport extends MakeReport {
 		// LNM39FP 欄位清單６
 		this.info("---------- LNM39FPReport exec titaVo: " + titaVo);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LNM39FPList = null;
 		try {
-			LNM39FPList = lNM39FPServiceImpl.findAll(titaVo);
+			LNM39FPList = lNM39FPServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -86,7 +105,8 @@ public class LNM39FPReport extends MakeReport {
 
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFFP", "LNM39FP 欄位清單６", "LNFFP.TXT", 1); // UTF-8
 			// 產製[控制檔]
-			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFFPIDX", "LNM39FP 欄位清單６控制檔", "LNFFP.IDX", 1); // UTF-8
+			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFFPIDX", "LNM39FP 欄位清單６控制檔", "LNFFP.IDX",
+					1); // UTF-8
 
 			// 標題列
 			// strContent = "";
@@ -142,7 +162,8 @@ public class LNM39FPReport extends MakeReport {
 
 			// makeFile.toFile(sno); // 不直接下傳
 
-			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + "," + String.format("%06d", L7List.size());
+			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + ","
+					+ String.format("%06d", L7List.size());
 			makeFileC.put(strContent);
 			makeFile.close();
 			this.info("=========== LNM39FP genFile close === ");

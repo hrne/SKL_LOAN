@@ -32,7 +32,7 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,23 +40,17 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM39IP TitaVo=" + titaVo);
 		this.info("-----LNM39IP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202004;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// IFRS9 資料欄位清單9
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", " + " \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", "
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", "
+				+ " \"ApproveDate\", \"FirstDrawdownDate\", \"LineAmt\", \"AcctFee\", \"Fee\", "
 				+ " \"ApproveRate\", \"GracePeriod\", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
-				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"Ifrs9ProdCode\", " + " \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", "
-				+ " \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", " + " \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " + " FROM  \"LoanIfrs9Ip\" "
-				+ " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"DrawdownFg\", \"CustNo\", \"FacmNo\" ";
+				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"Ifrs9ProdCode\", "
+				+ " \"EvaAmt\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", \"LoanTerm\", "
+				+ " \"AcCode\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", "
+				+ " \"LineAmtCurr\", \"AcctFeeCurr\", \"FeeCurr\" " + " FROM  \"LoanIfrs9Ip\" "
+				+ " WHERE \"DataYM\"  = :dataMonth " + " ORDER BY \"DrawdownFg\", \"CustNo\", \"FacmNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -68,7 +62,7 @@ public class LNM39IPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39IP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

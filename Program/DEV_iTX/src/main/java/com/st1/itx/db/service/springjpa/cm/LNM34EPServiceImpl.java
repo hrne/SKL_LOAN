@@ -32,7 +32,7 @@ public class LNM34EPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,20 +40,13 @@ public class LNM34EPServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM34EP TitaVo=" + titaVo);
 		this.info("-----LNM34EP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202003;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LNM34EP 資料欄位清單E
-		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
-				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" " + " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" "
+				+ ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
+				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" "
+				+ " WHERE \"DataYM\"  = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -65,7 +58,7 @@ public class LNM34EPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM34EP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

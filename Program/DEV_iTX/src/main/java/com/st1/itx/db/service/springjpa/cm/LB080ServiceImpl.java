@@ -32,7 +32,7 @@ public class LB080ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,17 +40,16 @@ public class LB080ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("-----LB080 TitaVo=" + titaVo);
 		this.info("-----LB080 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LB080 授信額度資料檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"TranCode\"" + "     , M.\"Filler4\"" + "     , M.\"CustId\"" + "     , M.\"FacmNo\""
-				+ "     , M.\"CurrencyCode\"" + "     , M.\"DrawdownAmt\"" + "     , M.\"DrawdownAmtFx\"" + "     , M.\"DrawdownDate\"" + "     , M.\"MaturityDate\"" + "     , M.\"RecycleCode\""
-				+ "     , M.\"IrrevocableFlag\"" + "     , M.\"UpFacmNo\"" + "     , M.\"AcctCode\"" + "     , M.\"SubAcctCode\"" + "     , M.\"ClTypeCode\"" + "     , M.\"Filler18\""
-				+ "     , M.\"JcicDataYM\"" + " FROM  \"JcicB080\" M" + " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"FacmNo\" ";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"TranCode\""
+				+ "     , M.\"Filler4\"" + "     , M.\"CustId\"" + "     , M.\"FacmNo\"" + "     , M.\"CurrencyCode\""
+				+ "     , M.\"DrawdownAmt\"" + "     , M.\"DrawdownAmtFx\"" + "     , M.\"DrawdownDate\""
+				+ "     , M.\"MaturityDate\"" + "     , M.\"RecycleCode\"" + "     , M.\"IrrevocableFlag\""
+				+ "     , M.\"UpFacmNo\"" + "     , M.\"AcctCode\"" + "     , M.\"SubAcctCode\""
+				+ "     , M.\"ClTypeCode\"" + "     , M.\"Filler18\"" + "     , M.\"JcicDataYM\""
+				+ " FROM  \"JcicB080\" M" + " WHERE M.\"DataYM\" = :dataMonth " + " ORDER BY M.\"FacmNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -62,7 +61,7 @@ public class LB080ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB080.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

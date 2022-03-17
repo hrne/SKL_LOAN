@@ -28,8 +28,8 @@ E(0,0)
 ["#FdRelAcctBirthday+出生日期",#RelAcctBirthday],["#FdRelAcctGender+性別",#RelAcctGender,#RelAcctGenderX],
 [#<->#,"#FdCalDy+處理日期時間",#CalDate," ",#CalTime],
 ["#FdAuthStatusX+授權狀態",#AuthStatusX],["#FdMediaCodeX+媒體碼",#MediaCodeX],
+[#<->#,"#FdAuthType+授權方式",#AuthType,#AuthTypeX],
 ["#FdAmlRspX+AML檢核",#AmlRspX],["#FdStampFinishDateX+核印完成日期",#StampFinishDate],
-
 ]
 
 #FdFuncCodeX=X,2,L
@@ -48,6 +48,7 @@ E(0,0)
 #FdRelAcctGender=X,2,L
 #FdMediaCodeX=X,2,L
 #FdCalDy=X,2,L
+#FdAuthType=X,2,L
 
 #RepayCode=A,2,S
 E(0,2)
@@ -86,6 +87,10 @@ T(3,CdCode.CreateFlag)
 T(3,A:新增授權;D:取消授權)
 #CreateFlagHelp2=x,1024,S
 T(3,A:新增授權)
+! 授權方式
+#AuthTypeHelp=x,1024,S
+T(3,A:紙本新增;O:舊檔轉換)
+
 
 ! 授權狀態下拉選單
 #AuthStatusRimName=x,50,S
@@ -135,6 +140,7 @@ T(H,@RepayBankX,#RepayBank,#BankCdHelp)
 INVOKEJS(SHOW,p1,02,02,1)
 T(1,@CDT,#NTXBUF,61,7)
 T(1,@SysTime,#NTXBUF,68,6)
+T(1,@AuthType,#NTXBUF,74,1)
 
 
 ! 作業項目
@@ -199,6 +205,13 @@ C(3,#FuncCode,5,C(5,#CreateFlag,Y,T(2,恢復授權),$))
 T(3,)T(H,#MediaCode,#MediaCodeHelp)
 #AmlRspX=X,30,L
 C(4,#AmlRsp,T(2,未審核),T(H,#AmlRsp,#AmlRspHelp))
+
+!授權方式
+#AuthType=X,1,L
+C(4,#AuthType,T(2,A),$)
+
+#AuthTypeX=X,8,L
+T(H,#AuthType,#AuthTypeHelp)
 
 
 !刪除關閉框線
@@ -610,6 +623,7 @@ C(4,#RelAcctGender,T(2,),T(H,#RelAcctGender,#SexHelp))
 #RelAcctBirthday
 #RelAcctGender
 #AuthStatus
+#AuthType
 #END
 #RepayCode
 #SysTime

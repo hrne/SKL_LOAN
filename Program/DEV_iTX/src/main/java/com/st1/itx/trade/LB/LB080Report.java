@@ -56,9 +56,28 @@ public class LB080Report extends MakeReport {
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+		
 		List<Map<String, String>> LBList = null;
 		try {
-			LBList = lB080ServiceImpl.findAll(titaVo);
+			LBList = lB080ServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -111,7 +130,8 @@ public class LB080Report extends MakeReport {
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B080", "授信額度資料檔", strFileName, 2);
 
 		// 首筆
-		strContent = "JCIC-DAT-B080-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+		strContent = "JCIC-DAT-B080-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+				+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 				+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 80, ' ') + StringUtils.repeat(" ", 51);
 		makeFile.put(strContent);
 
@@ -213,7 +233,8 @@ public class LB080Report extends MakeReport {
 
 		// 末筆
 		strContent = "TRLR" + StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(sumDrawdownAmt), 13, '0') // 訂約金額(台幣)
-				+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 9, '0') + StringUtils.repeat(" ", 160);
+				+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 9, '0')
+				+ StringUtils.repeat(" ", 160);
 		makeFile.put(strContent);
 
 		makeFile.close();
@@ -229,8 +250,10 @@ public class LB080Report extends MakeReport {
 		String txt = "";
 
 		// B080 授信戶基本資料檔
-		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),交易代碼(10),空白(11~14),授信戶IDN/BAN(15~24),本階共用額度控制編碼(25~74)," + "授信幣別(75~77),本階訂約金額(台幣)(78~87),本階訂約金額(外幣)(88~97),本階額度開始年月(98~102),本階額度約定截止年月(103~107),"
-				+ "循環信用註記(108),額度可否撤銷(109),上階共用額度控制編碼(110~159),科目別(160),科目別註記(161)," + "擔保品類別(162~163),空白(164~187),資料所屬年月(188~192)";
+		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),交易代碼(10),空白(11~14),授信戶IDN/BAN(15~24),本階共用額度控制編碼(25~74),"
+				+ "授信幣別(75~77),本階訂約金額(台幣)(78~87),本階訂約金額(外幣)(88~97),本階額度開始年月(98~102),本階額度約定截止年月(103~107),"
+				+ "循環信用註記(108),額度可否撤銷(109),上階共用額度控制編碼(110~159),科目別(160),科目別註記(161),"
+				+ "擔保品類別(162~163),空白(164~187),資料所屬年月(188~192)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19";
 
 		String txt1[] = txt.split(";");

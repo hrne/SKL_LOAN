@@ -54,9 +54,28 @@ public class LB094Report extends MakeReport {
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LBList = null;
 		try {
-			LBList = lB094ServiceImpl.findAll(titaVo);
+			LBList = lB094ServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -209,7 +228,8 @@ public class LB094Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 180);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
+					+ StringUtils.repeat(" ", 180);
 			makeFile.put(strContent);
 
 			makeFile.close();

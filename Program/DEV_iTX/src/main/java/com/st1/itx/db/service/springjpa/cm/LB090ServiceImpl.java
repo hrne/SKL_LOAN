@@ -32,7 +32,7 @@ public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,15 +40,11 @@ public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("-----LB090 TitaVo=" + titaVo);
 		this.info("-----LB090 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LB090 擔保品關聯檔資料檔
 		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"CustId\"" + " , M.\"ClActNo\"" + "     , M.\"FacmNo\""
-				+ " , M.\"GlOverseas\"" + "   , M.\"JcicDataYM\"" + " FROM  \"JcicB090\" M" + " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
+				+ " , M.\"GlOverseas\"" + "   , M.\"JcicDataYM\"" + " FROM  \"JcicB090\" M" + " WHERE M.\"DataYM\" = :dataMonth " + " ORDER BY M.\"ClActNo\", M.\"FacmNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -60,7 +56,7 @@ public class LB090ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB090.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

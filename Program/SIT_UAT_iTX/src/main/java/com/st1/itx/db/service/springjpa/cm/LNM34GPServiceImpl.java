@@ -32,7 +32,7 @@ public class LNM34GPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,19 +40,11 @@ public class LNM34GPServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM34GP TitaVo=" + titaVo);
 		this.info("-----LNM34GP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202003;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LNM34GP 資料欄位清單G
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" " + " FROM  \"Ias34Gp\" " + " WHERE \"DataYM\"  = :dateMonth "
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" "
+				+ " FROM  \"Ias34Gp\" " + " WHERE \"DataYM\"  = :dataMonth "
 				+ " ORDER BY \"CustNo\", \"AgreeNo\", \"AgreeFg\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
@@ -65,7 +57,7 @@ public class LNM34GPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM34GP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

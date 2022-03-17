@@ -32,7 +32,7 @@ public class LB680ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,20 +40,11 @@ public class LB680ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("-----LB680 TitaVo=" + titaVo);
 		this.info("-----LB680 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-		// TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202003;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LB680 「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔
 		sql = "SELECT M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"TranCode\"" + "     , M.\"CustId\"" + "     , M.\"CustIdErr\"" + "     , M.\"Filler6\"" + "     , M.\"Amt\""
-				+ " , M.\"JcicDataYM\"" + "     , M.\"Filler9\"" + " FROM  \"JcicB680\" M" + " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"CustId\" ";
+				+ " , M.\"JcicDataYM\"" + "     , M.\"Filler9\"" + " FROM  \"JcicB680\" M" + " WHERE M.\"DataYM\" = :dataMonth " + " ORDER BY M.\"CustId\" ";
 
 		this.info("sql=" + sql);
 
@@ -65,7 +56,7 @@ public class LB680ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB680.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

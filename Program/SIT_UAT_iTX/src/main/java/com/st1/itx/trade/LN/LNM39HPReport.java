@@ -55,9 +55,28 @@ public class LNM39HPReport extends MakeReport {
 		// LNM39HP 欄位清單８
 		this.info("---------- LNM39HPReport exec titaVo: " + titaVo);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LNM39HPList = null;
 		try {
-			LNM39HPList = lNM39HPServiceImpl.findAll(titaVo);
+			LNM39HPList = lNM39HPServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -89,7 +108,8 @@ public class LNM39HPReport extends MakeReport {
 
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFHP", "LNM39HP 欄位清單８", "LNFHP.TXT", 1); // UTF-8
 			// 產製[控制檔]
-			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFHPIDX", "LNM39HP 欄位清單８控制檔", "LNFHP.IDX", 1); // UTF-8
+			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFHPIDX", "LNM39HP 欄位清單８控制檔", "LNFHP.IDX",
+					1); // UTF-8
 
 			// 標題列
 			// strContent = "";
@@ -135,7 +155,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 初貸日期
 						case 8:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(台幣)
 						case 9:
@@ -143,7 +163,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 產品別
 						case 10:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(台幣)
 						case 11:
@@ -153,7 +173,7 @@ public class LNM39HPReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 1, '0');
 							break; // 該筆額度是否為不可撤銷 1=是 0=否
 						case 13:
-							//strField = strField.substring(1);
+							// strField = strField.substring(1);
 							strField = makeFile.fillStringL(strField, 5, '0');
 							break; // 主計處行業別代碼
 						case 14:
@@ -173,17 +193,18 @@ public class LNM39HPReport extends MakeReport {
 							break; // 違約損失率模型
 						case 19:
 							formatter.applyPattern("00.00000");
-							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter
+									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 違約損失率
 						case 20:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 核准金額(交易幣)
 						case 21:
 							formatter.applyPattern("00000000000");
-							strField = new BigDecimal(strField).setScale(0,BigDecimal.ROUND_HALF_UP).toString();
+							strField = new BigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP).toString();
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 可動用餘額(交易幣)
 						default:
@@ -201,7 +222,8 @@ public class LNM39HPReport extends MakeReport {
 
 			// makeFile.toFile(sno); // 不直接下傳
 
-			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + "," + String.format("%06d", L7List.size());
+			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + ","
+					+ String.format("%06d", L7List.size());
 			makeFileC.put(strContent);
 			makeFile.close();
 			this.info("=========== LNM39HP genFile close === ");

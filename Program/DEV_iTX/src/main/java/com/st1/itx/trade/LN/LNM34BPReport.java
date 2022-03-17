@@ -48,9 +48,28 @@ public class LNM34BPReport extends MakeReport {
 		// LNM34BP 資料欄位清單B
 		this.info("---------- LNM34BPReport exec titaVo: " + titaVo);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LNM34BPList = null;
 		try {
-			LNM34BPList = lNM34BPServiceImpl.findAll(titaVo);
+			LNM34BPList = lNM34BPServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -114,7 +133,8 @@ public class LNM34BPReport extends MakeReport {
 						} // 撥款序號
 						if (j == 5) {
 							DecimalFormat formatter = new DecimalFormat("0.000000");
-							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter
+									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 						} // 貸放利率
 						if (j == 6) {

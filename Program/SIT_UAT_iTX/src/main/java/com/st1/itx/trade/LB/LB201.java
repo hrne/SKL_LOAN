@@ -49,16 +49,15 @@ public class LB201 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB201 active LB201 ");
 		this.info("LB201 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		// String tranCode = "LB201";
-		// String tranName = "聯徵授信餘額月報檔";
+		//String tranCode = "LB201";
+		//String tranName = "聯徵授信餘額月報檔";
 
-		this.titaVo.setDataBaseOnMon(); // 月報資料庫
+		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		// 2021-12-20 智偉修改
 		boolean isFinish = lB201Report.exec(titaVo); // 使用月報資料庫
 
-		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
-		// "Y", "LC009", titaVo.getTlrNo(),
-		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
 
 	}
 

@@ -9,6 +9,7 @@ import org.apache.commons.net.ftp.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.CommBuffer;
 
 /**
@@ -99,8 +100,9 @@ public class FtpClient extends CommBuffer {
 	 * 上傳指定的檔案至目前連接的 FTP
 	 * 
 	 * @param fileLocation 要傳送的檔案所在位置
+	 * @param remoteSubdirectory 指定傳送到遠端時，要放在對方的哪個子目錄。留空則不移動至子目錄。
 	 */
-	public void sendFile(String fileLocation) {
+	public void sendFile(String fileLocation, String remoteSubdirectory) {
 		File file = new File(fileLocation);
 
 		if (file == null || !file.exists() || file.isDirectory()) {
@@ -121,6 +123,16 @@ public class FtpClient extends CommBuffer {
 		try (FileInputStream fileInputStream = new FileInputStream(file)) {
 			ftp.setFileType(FTP.BINARY_FILE_TYPE);
 			ftp.enterLocalPassiveMode();
+			
+			if (remoteSubdirectory != null && !remoteSubdirectory.isEmpty())
+			{
+				this.info("change WorkingDirectory to " + remoteSubdirectory);
+				Boolean hasChangedDirectory = ftp.changeWorkingDirectory(remoteSubdirectory);
+				this.info("succesfully changed?" + hasChangedDirectory);
+				
+				if (!hasChangedDirectory)
+					throw new LogicException("E0013", "指定的 FTP 子目錄不存在!");
+			}
 
 			isSuccessful = ftp.storeFile(file.getName(), fileInputStream);
 		} catch (Exception e) {
@@ -161,9 +173,40 @@ public class FtpClient extends CommBuffer {
 	 * @param username     登入帳號
 	 * @param password     登入密碼
 	 * @param fileLocation 完整的檔案位置
+	 * @param remoteSubdirectory 指定傳送到遠端時，要放在對方的哪個子目錄。留空則不移動至子目錄。
+	 */
+	public void sendFile(String ip, String username, String password, String fileLocation, String remoteSubdirectory) {
+		sendFile(ip, 21, username, password, fileLocation, remoteSubdirectory);
+	}
+
+	/**
+	 * 傳送檔案至指定的 FTP 伺服器。<br>
+	 * 會自己處理開啟與關閉連線。
+	 * 
+	 * @param ip           FTP 伺服器的位置
+	 * @param port         連接埠
+	 * @param username     登入帳號
+	 * @param password     登入密碼
+	 * @param fileLocation 完整的檔案位置
+	 * @param remoteSubdirectory 指定傳送到遠端時，要放在對方的哪個子目錄。留空則不移動至子目錄。
+	 */
+	public void sendFile(String ip, int port, String username, String password, String fileLocation, String remoteSubdirectory) {
+		this.setConnection(ip, port, username, password);
+		this.sendFile(fileLocation, remoteSubdirectory);
+		this.closeConnection();
+	}
+	
+	/**
+	 * 傳送檔案至指定的 FTP 伺服器。<br>
+	 * 會自己處理開啟與關閉連線。
+	 * 
+	 * @param ip           FTP 伺服器的位置
+	 * @param username     登入帳號
+	 * @param password     登入密碼
+	 * @param fileLocation 完整的檔案位置
 	 */
 	public void sendFile(String ip, String username, String password, String fileLocation) {
-		sendFile(ip, 21, username, password, fileLocation);
+		sendFile(ip, 21, username, password, fileLocation, "");
 	}
 
 	/**
@@ -177,9 +220,7 @@ public class FtpClient extends CommBuffer {
 	 * @param fileLocation 完整的檔案位置
 	 */
 	public void sendFile(String ip, int port, String username, String password, String fileLocation) {
-		this.setConnection(ip, port, username, password);
-		this.sendFile(fileLocation);
-		this.closeConnection();
+		sendFile(ip, port, username, password, fileLocation, "");
 	}
 
 	@Override

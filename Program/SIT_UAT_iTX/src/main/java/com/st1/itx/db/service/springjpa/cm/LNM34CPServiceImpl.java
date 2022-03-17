@@ -32,7 +32,7 @@ public class LNM34CPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,20 +40,12 @@ public class LNM34CPServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM34CP TitaVo=" + titaVo);
 		this.info("-----LNM34CP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202003;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LNM34CP 資料欄位清單C
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"AmortizedCode\" " + ", \"PayIntFreq\", \"RepayFreq\", \"EffectDate\"  " + " FROM  \"Ias34Cp\" "
-				+ " WHERE \"DataYM\" = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"AmortizedCode\" "
+				+ ", \"PayIntFreq\", \"RepayFreq\", \"EffectDate\"  " + " FROM  \"Ias34Cp\" "
+				+ " WHERE \"DataYM\" = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\" ";
 
 		this.info("sql=" + sql);
 
@@ -65,7 +57,7 @@ public class LNM34CPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM34CP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

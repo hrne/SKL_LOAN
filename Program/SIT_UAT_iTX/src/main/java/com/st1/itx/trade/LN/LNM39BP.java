@@ -28,7 +28,7 @@ public class LNM39BP extends BatchBase implements Tasklet, InitializingBean {
 	public LNM39BPReport lnm39bpReport;
 
 	@Autowired
-	DateUtil dDateUtil;
+	DateUtil dDateUtil; 
 
 	@Autowired
 	WebClient webClient;
@@ -49,16 +49,15 @@ public class LNM39BP extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LNM39BP active LNM39BP ");
 		this.info("LNM39BP titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		// String tranCode = "LNM39BP";
-		// String tranName = "LNM39BP 欄位清單２";
+		//String tranCode = "LNM39BP";
+		//String tranName = "LNM39BP 欄位清單２";
 
-		this.titaVo.setDataBaseOnMon(); // 月報資料庫
+		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lnm39bpReport.exec(titaVo); // 使用月報資料庫
 
-		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
-		// "Y", "LC009", titaVo.getTlrNo(),
-		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-
+		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }

@@ -32,7 +32,7 @@ public class LB094ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dateMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,18 +40,18 @@ public class LB094ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("-----LB094 TitaVo=" + titaVo);
 		this.info("-----LB094 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LB094 股票擔保品明細檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\""
-				+ "     , M.\"EvaAmt\"" + "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\"" + "     , M.\"CompanyId\"" + "     , M.\"CompanyCountry\""
-				+ "     , M.\"StockCode\"" + "     , M.\"StockType\"" + "     , M.\"Currency\"" + "     , M.\"SettingBalance\"" + "     , M.\"LoanBal\"" + "     , M.\"InsiderJobTitle\""
-				+ "     , M.\"InsiderPosition\"" + "     , M.\"LegalPersonId\"" + "     , M.\"DispPrice\"" + "     , M.\"Filler19\"" + "     , M.\"JcicDataYM\"" + " FROM  \"JcicB094\" M"
-				+ " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"ClActNo\" ";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\""
+				+ "     , M.\"ClActNo\"" + "     , M.\"ClTypeJCIC\"" + "     , M.\"OwnerId\"" + "     , M.\"EvaAmt\""
+				+ "     , M.\"EvaDate\"" + "     , M.\"LoanLimitAmt\"" + "     , M.\"SettingDate\""
+				+ "     , M.\"CompanyId\"" + "     , M.\"CompanyCountry\"" + "     , M.\"StockCode\""
+				+ "     , M.\"StockType\"" + "     , M.\"Currency\"" + "     , M.\"SettingBalance\""
+				+ "     , M.\"LoanBal\"" + "     , M.\"InsiderJobTitle\"" + "     , M.\"InsiderPosition\""
+				+ "     , M.\"LegalPersonId\"" + "     , M.\"DispPrice\"" + "     , M.\"Filler19\""
+				+ "     , M.\"JcicDataYM\"" + " FROM  \"JcicB094\" M" + " WHERE M.\"DataYM\" = :dateMonth "
+				+ " ORDER BY M.\"ClActNo\" ";
 
 		this.info("sql=" + sql);
 

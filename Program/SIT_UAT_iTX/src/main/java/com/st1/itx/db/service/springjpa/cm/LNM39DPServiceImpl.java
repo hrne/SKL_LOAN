@@ -32,31 +32,27 @@ public class LNM39DPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
 		this.info("----------- LNM39DP.findAll ---------------");
 		this.info("-----LNM39DP TitaVo=" + titaVo);
 		this.info("-----LNM39DP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
-
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202003;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
+		
 		String sql = "";
 
 		// LNM39DP 欄位清單D
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"MaturityDate\" "
-				+ ", \"LineAmt\", \"DrawdownAmt\", \"LoanBal\", \"IntAmt\", \"Fee\" " + ", \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\" "
-				+ ", \"DerDate\", \"DerRate\", \"DerLoanBal\", \"DerIntAmt\", \"DerFee\" " + ", \"DerY1Amt\", \"DerY2Amt\", \"DerY3Amt\", \"DerY4Amt\", \"DerY5Amt\" "
-				+ ", \"DerY1Int\", \"DerY2Int\", \"DerY3Int\", \"DerY4Int\", \"DerY5Int\" " + ", \"DerY1Fee\", \"DerY2Fee\", \"DerY3Fee\", \"DerY4Fee\", \"DerY5Fee\" "
-				+ ", \"IndustryCode\", \"ClTypeJCIC\", \"AreaCode\", \"ProdCode\", \"CustKind\", \"Ifrs9ProdCode\" " + " FROM  \"LoanIfrs9Dp\" " + " WHERE \"DataYM\" = :dateMonth "
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" "
+				+ ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"MaturityDate\" "
+				+ ", \"LineAmt\", \"DrawdownAmt\", \"LoanBal\", \"IntAmt\", \"Fee\" "
+				+ ", \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\" "
+				+ ", \"DerDate\", \"DerRate\", \"DerLoanBal\", \"DerIntAmt\", \"DerFee\" "
+				+ ", \"DerY1Amt\", \"DerY2Amt\", \"DerY3Amt\", \"DerY4Amt\", \"DerY5Amt\" "
+				+ ", \"DerY1Int\", \"DerY2Int\", \"DerY3Int\", \"DerY4Int\", \"DerY5Int\" "
+				+ ", \"DerY1Fee\", \"DerY2Fee\", \"DerY3Fee\", \"DerY4Fee\", \"DerY5Fee\" "
+				+ ", \"IndustryCode\", \"ClTypeJCIC\", \"AreaCode\", \"ProdCode\", \"CustKind\", \"Ifrs9ProdCode\" "
+				+ " FROM  \"LoanIfrs9Dp\" " + " WHERE \"DataYM\" = :dataMonth "
 				+ " ORDER BY \"DataFg\", \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
@@ -69,7 +65,7 @@ public class LNM39DPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39DP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

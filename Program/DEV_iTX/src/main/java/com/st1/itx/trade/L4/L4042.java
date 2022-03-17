@@ -86,6 +86,7 @@ public class L4042 extends TradeBuffer {
 				String empno = result.get("F20");
 				String wkCreateFlag = result.get("F7");
 				int processdate = parse.stringToInteger(result.get("F21"));
+				String authMeth = result.get("F23");
 				
 				if (authCreateDate > 19110000) {
 					authCreateDate = authCreateDate - 19110000;
@@ -147,6 +148,8 @@ public class L4042 extends TradeBuffer {
 				occursList.putParam("OOTitaTxCd", result.get("F19"));
 				occursList.putParam("OOProcessDate", processdate);
 				occursList.putParam("OOProcessTime", result.get("F22"));
+				occursList.putParam("OOAuthMeth", authMeth);
+				
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

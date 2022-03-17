@@ -115,20 +115,58 @@ BEGIN
      * 2022-03-16 智偉 修改 將未被寫入的加碼利率轉入
     */
     INSERT INTO "LoanRateChange"
-    SELECT LA."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
-          ,LA."LMSAPN"                    AS "FacmNo"              -- 額度編號 DECIMAL 3 0
-          ,LA."LMSASQ"                    AS "BormNo"              -- 撥款序號 DECIMAL 3 0
-          ,LA."ASCADT"                    AS "EffectDate"          -- 生效日期 DECIMALD 8 0
+    WITH rawData AS (
+      SELECT LA."LMSACN"
+           , LA."LMSAPN"
+           , LA."LMSASQ"
+           , LA."ASCADT"
+           , LM."AILIRT"
+           , LM."IRTBCD"
+           , FP."BaseRateCode"
+           , FP."IncrFlag"
+           , LA."ASCRAT"
+           , NVL(CB."BaseRate",0)
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY CB."BaseRateCode"
+               ORDER BY CB."EffectDate" DESC
+             ) AS "CbSeq"
+      FROM "LA$ASCP" LA
+      LEFT JOIN "LA$LMSP" LM ON LM."LMSACN" = LA."LMSACN"
+                            AND LM."LMSAPN" = LA."LMSAPN"
+                            AND LM."LMSASQ" = LA."LMSASQ"
+      LEFT JOIN "FacProd" FP ON FP."ProdNo" = LM."IRTBCD"
+      LEFT JOIN "LoanRateChange" LRC ON LRC."CustNo" = LA."LMSACN"
+                                    AND LRC."FacmNo" = LA."LMSAPN"
+                                    AND LRC."BormNo" = LA."LMSASQ"
+                                    AND LRC."EffectDate" = LA."ASCADT"
+      LEFT JOIN (
+        SELECT "BaseRateCode"
+             , "BaseRate"
+             , "EffectDate"
+        FROM "CdBaseRate"
+        WHERE "BaseRateCode" IN ('01','02')
+      ) CB ON CB."BaseRateCode" = FP."BaseRateCode"
+          AND CB."EffectDate" <= LA."ASCADT"
+      WHERE NVL(LM."LMSACN",0) > 0 -- 有串到放款主檔的資料才寫入
+        AND NVL(LRC."EffectDate",0) = 0 -- 尚未被記錄在放款利率變動檔的加碼利率才寫入
+        AND NVL(FP."BaseRateCode",'00') IN ('01','02')
+        AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
+    )
+    SELECT "LMSACN"                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
+          ,"LMSAPN"                       AS "FacmNo"              -- 額度編號 DECIMAL 3 0
+          ,"LMSASQ"                       AS "BormNo"              -- 撥款序號 DECIMAL 3 0
+          ,"ASCADT"                       AS "EffectDate"          -- 生效日期 DECIMALD 8 0
           -- 有建加碼利率者,放2
           ,2                              AS "Status"              -- 狀態 DECIMAL 1 0
-          ,LM."AILIRT"                    AS "RateCode"            -- 利率區分 VARCHAR2 1 0
-          ,LM."IRTBCD"                    AS "ProdNo"              -- 商品代碼 VARCHAR2 5 0
-          ,FP."BaseRateCode"              AS "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 0
-          ,FP."IncrFlag"                  AS "IncrFlag"            -- 加減碼是否依合約 VARCHAR2 1 0
-          ,NVL(LA."ASCRAT",0)             AS "RateIncr"            -- 加碼利率 DECIMAL 6 4
+          ,"AILIRT"                       AS "RateCode"            -- 利率區分 VARCHAR2 1 0
+          ,"IRTBCD"                       AS "ProdNo"              -- 商品代碼 VARCHAR2 5 0
+          ,"BaseRateCode"                 AS "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 0
+          ,"IncrFlag"                     AS "IncrFlag"            -- 加減碼是否依合約 VARCHAR2 1 0
+          ,"ASCRAT"                       AS "RateIncr"            -- 加碼利率 DECIMAL 6 4
           ,0                              AS "IndividualIncr"      -- 個別加碼利率 DECIMAL 6 4
-          ,NVL(CB."BaseRate",0)
-           + LA."ASCRAT"                  AS "FitRate"             -- 適用利率 DECIMAL 6 4
+          ,NVL("BaseRate",0)
+           + "ASCRAT"                     AS "FitRate"             -- 適用利率 DECIMAL 6 4
           ,''                             AS "Remark"              -- 備註 NVARCHAR2 60 0
           ,0                              AS "AcDate"              -- 交易序號-會計日期 DECIMALD 8 0
           ,''                             AS "TellerNo"            -- 交易序號-櫃員別 VARCHAR2 6 0
@@ -137,27 +175,8 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM "LA$ASCP" LA
-    LEFT JOIN "LA$LMSP" LM ON LM."LMSACN" = LA."LMSACN"
-                          AND LM."LMSAPN" = LA."LMSAPN"
-                          AND LM."LMSASQ" = LA."LMSASQ"
-    LEFT JOIN "FacProd" FP ON FP."ProdNo" = LM."IRTBCD"
-    LEFT JOIN "LoanRateChange" LRC ON LRC."CustNo" = LA."LMSACN"
-                                  AND LRC."FacmNo" = LA."LMSAPN"
-                                  AND LRC."BormNo" = LA."LMSASQ"
-                                  AND LRC."EffectDate" = LA."ASCADT"
-    LEFT JOIN (SELECT "BaseRateCode"
-                     ,"BaseRate"
-                     ,ROW_NUMBER() OVER (PARTITION BY "BaseRateCode"
-                                         ORDER BY "EffectDate" DESC) AS "Seq"
-               FROM "CdBaseRate"
-               WHERE "BaseRateCode" IN ('01','02')
-              ) CB ON CB."BaseRateCode" = FP."BaseRateCode"
-    WHERE NVL(LM."LMSACN",0) > 0 -- 有串到放款主檔的資料才寫入
-      AND NVL(LRC."EffectDate",0) = 0 -- 尚未被記錄在放款利率變動檔的加碼利率才寫入
-      AND NVL(FP."BaseRateCode",'00') IN ('01','02')
-      AND NVL(CB."Seq",1) = 1
-      AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
+    FROM rawData
+    WHERE NVL("CbSeq",1) = 1
     ;
 
     -- 記錄寫入筆數

@@ -32,7 +32,7 @@ public class LB096ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,17 +40,13 @@ public class LB096ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("-----LB096 TitaVo=" + titaVo);
 		this.info("-----LB096 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// LB096 不動產擔保品明細-地號附加檔
 		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"Filler4\"" + "     , M.\"ClActNo\"" + "     , M.\"OwnerId\"" + "     , M.\"CityJCICCode\""
 				+ "     , M.\"AreaJCICCode\"" + "     , M.\"IrCode\"" + "     , M.\"LandNo1\"" + "     , M.\"LandNo2\"" + "     , M.\"LandCode\"" + "     , M.\"Area\"" + "     , M.\"LandZoningCode\""
 				+ "     , M.\"LandUsageType\"" + "     , M.\"PostedLandValue\"" + "     , M.\"PostedLandValueYearMonth\"" + "     , M.\"Filler18\"" + "     , M.\"JcicDataYM\""
-				+ " FROM  \"JcicB096\" M" + " WHERE M.\"DataYM\" = :dateMonth " + " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"LandNo1\", \"LandNo2\"";
+				+ " FROM  \"JcicB096\" M" + " WHERE M.\"DataYM\" = :dataMonth " + " ORDER BY M.\"ClActNo\", \"CityJCICCode\", \"AreaJCICCode\", \"IrCode\", \"LandNo1\", \"LandNo2\"";
 
 		this.info("sql=" + sql);
 
@@ -62,7 +58,7 @@ public class LB096ServiceImpl extends ASpringJpaParm implements InitializingBean
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LB096.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

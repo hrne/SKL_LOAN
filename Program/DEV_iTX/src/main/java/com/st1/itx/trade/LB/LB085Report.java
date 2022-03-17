@@ -54,9 +54,28 @@ public class LB085Report extends MakeReport {
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LBList = null;
 		try {
-			LBList = lB085ServiceImpl.findAll(titaVo);
+			LBList = lB085ServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -107,7 +126,8 @@ public class LB085Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B085", "帳號轉換資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B085-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B085-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 67, ' ');
 			makeFile.put(strContent);
 
@@ -173,7 +193,8 @@ public class LB085Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 116);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
+					+ StringUtils.repeat(" ", 116);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -194,7 +215,8 @@ public class LB085Report extends MakeReport {
 		String txt = "";
 
 		// B085 帳號轉換資料檔
-		inf = "資料別(1~2),轉換帳號年月(3~7),授信戶IDN/BAN(8~17),轉換前總行代號(18~20),轉換前分行代號(21~24),空白(25~26)," + "轉換前帳號(27~76),轉換後總行代號(77~79),轉換後分行代號(80~83),空白(84~85),轉換後帳號(86~135),空白(136~160)";
+		inf = "資料別(1~2),轉換帳號年月(3~7),授信戶IDN/BAN(8~17),轉換前總行代號(18~20),轉換前分行代號(21~24),空白(25~26),"
+				+ "轉換前帳號(27~76),轉換後總行代號(77~79),轉換後分行代號(80~83),空白(84~85),轉換後帳號(86~135),空白(136~160)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11";
 
 		String txt1[] = txt.split(";");

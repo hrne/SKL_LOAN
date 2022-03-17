@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.online;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,12 +21,13 @@ import com.st1.itx.db.domain.CdBranch;
  */
 public interface CdBranchRepository extends JpaRepository<CdBranch, String> {
 
-	// BranchNo %
-	public Slice<CdBranch> findAllByBranchNoLikeOrderByBranchNoAsc(String branchNo_0, Pageable pageable);
+  // BranchNo %
+  public Slice<CdBranch> findAllByBranchNoLikeOrderByBranchNoAsc(String branchNo_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdBranch> findByBranchNo(String branchNo);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdBranch> findByBranchNo(String branchNo);
 
 }
+

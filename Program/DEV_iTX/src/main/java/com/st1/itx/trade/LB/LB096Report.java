@@ -56,9 +56,28 @@ public class LB096Report extends MakeReport {
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LBList = null;
 		try {
-			LBList = lB096ServiceImpl.findAll(titaVo);
+			LBList = lB096ServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -110,7 +129,8 @@ public class LB096Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B096", "不動產擔保品明細－地號附加檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B096-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B096-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 80, ' ') + StringUtils.repeat(" ", 9);
 			makeFile.put(strContent);
 
@@ -207,7 +227,8 @@ public class LB096Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 138);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
+					+ StringUtils.repeat(" ", 138);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -229,7 +250,8 @@ public class LB096Report extends MakeReport {
 
 		// B096 不動產擔保品明細-地號附加檔
 		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品所有權人或代表人IDN/BAN(62~71),縣市別(72~72),"
-				+ "鄉鎮市區別(73~74),段、小段號(75~78),地號-前四碼(79~82),地號-後四碼(83~86),地目(87),面積(88~97),使用分區(98),使用地類別(99~100)," + "公告土地現值(101~110),公告土地現值年月(111~115),空白(116~145),資料所屬年月(146~150)";
+				+ "鄉鎮市區別(73~74),段、小段號(75~78),地號-前四碼(79~82),地號-後四碼(83~86),地目(87),面積(88~97),使用分區(98),使用地類別(99~100),"
+				+ "公告土地現值(101~110),公告土地現值年月(111~115),空白(116~145),資料所屬年月(146~150)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18";
 
 		String txt1[] = txt.split(";");

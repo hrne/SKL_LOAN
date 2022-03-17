@@ -22,12 +22,12 @@ E(0,0)
 ["#FdAgType1+流程別",#AgType1,#AgType1X],
 ["#FdCopyCode+複製",#CopyCode,#CopyCodeX],
 ["#grid#,{id:1,expand:true,loop:13,row_height:1,s_cols:[130,130,130], p_cols:[]}","","",
-["工作月份","媒體日期","入帳日期"],
-[[#MonthA1],[#MediaDateA1],[#EntryDateA1],
+["工作月份","媒體日期","入帳日期","應繳截止日"],
+[[#MonthA1],[#MediaDateA1],[#EntryDateA1],[#RepayEndDateA1],
 []]],
 ["#grid#,{id:2,expand:true,loop:12,row_height:1,s_cols:[130,130,130], p_cols:[]}","","",
-["月份","媒體日期","入帳日期"],
-[[#MonthB1],[#MediaDateB1],[#EntryDateB1],
+["月份","媒體日期","入帳日期","應繳截止日"],
+[[#MonthB1],[#MediaDateB1],[#EntryDateB1],[#RepayEndDateB1],
 []]],
 ] 
 
@@ -116,10 +116,12 @@ E(0,@EmpDeductFlag,#L4r15EmpDeductFlag)
 ##loop {times:13,i:1}
 E(0,@EntryDateA{i},#L4r15EntryDateA{i})
 E(0,@MediaDateA{i},#L4r15MediaDateA{i})
+E(0,@RepayEndDateA{i},#L4r15RepayEndDateA{i})
 ##end
 ##loop {times:12,i:1}
 E(0,@EntryDateB{i},#L4r15EntryDateB{i})
 E(0,@MediaDateB{i},#L4r15MediaDateB{i})
+E(0,@RepayEndDateB{i},#L4r15RepayEndDateB{i})
 ##end
 
 !4,5 15日薪
@@ -196,6 +198,27 @@ IF(#EntryDateMonthCheckA{i}==#MonCheckFrom{i}||#EntryDateMonthCheckA{i}==#MonChe
 IF(#EntryDateMonthCheckA{i}>=#MonCheckFrom{i}&&#EntryDateMonthCheckA{i}<=#MonCheckTo{i},$,V(P,#CheckMsgA{i})))
 IF(#MediaDateA{i}>#EntryDateA{i},V(P,入帳日不可小於媒體日),$)
 
+#RepayEndDateA{i}=D,7,I
+IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,s,$)
+@A(DATE,0,#RepayEndDateA{i})
+
+
+#RepayEndDateACheck{i}=x,30,S
+IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,s,$)
+IF({i}>1,
+IF(#RepayEndDateA{i}<=#RepayEndDateA{z},
+T(2,請輸入日期大於+#RepayEndDateA{z}),s),s)
+V(P,#RepayEndDateACheck{i})
+
+#RepayEndDateMonthCheckA{i}=x,2,S
+IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,s,$)
+IF(#RepayEndDateA{i}>0,$,s)
+T(1,@RepayEndDateMonthCheckA{i},#RepayEndDateA{i},4,2)
+IF(#MonthA{i}==13,
+IF(#RepayEndDateMonthCheckA{i}==#MonCheckFrom{i}||#RepayEndDateMonthCheckA{i}==#MonCheckTo{i},$,V(P,#CheckMsgA{i})),
+IF(#RepayEndDateMonthCheckA{i}>=#MonCheckFrom{i}&&#RepayEndDateMonthCheckA{i}<=#MonCheckTo{i},$,V(P,#CheckMsgA{i})))
+IF(#RepayEndDateA{i}>=#MediaDateA{i},V(P,應繳截止日需小於等於媒體日),$)
+! IF(#EntryDateA{i}>=#RepayEndDateA{i},V(P,應繳截止日不可小於等於入帳日),$)
 ##end
 
 
@@ -223,7 +246,7 @@ V(P,#MediaDateBCheck{i})
 IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,$,s)
 IF(#MediaDateB{i}>0,$,s)
 T(1,@MediaDateMonthCheckB{i},#MediaDateB{i},4,2)
-IF(#MediaDateMonthCheckB{i}==#MonthB{i},$,V(P,#CheckMsgB{i}))
+! IF(#MediaDateMonthCheckB{i}==#MonthB{i},$,V(P,#CheckMsgB{i}))
 
 #EntryDateB{i}=D,7,I
 IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,$,s)
@@ -240,9 +263,27 @@ V(P,#EntryDateBCheck{i})
 IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,$,s)
 IF(#EntryDateB{i}>0,$,s)
 T(1,@EntryDateMonthCheckB{i},#EntryDateB{i},4,2)
-IF(#EntryDateMonthCheckB{i}==#MonthB{i},$,V(P,#CheckMsgB{i}))
+! IF(#EntryDateMonthCheckB{i}==#MonthB{i},$,V(P,#CheckMsgB{i}))
 IF(#MediaDateB{i}>#EntryDateB{i},V(P,入帳日不可小於媒體日),$)
 
+#RepayEndDateB{i}=D,7,I
+IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,$,s)
+@A(DATE,0,#RepayEndDateB{i})
+
+#RepayEndDateBCheck{i}=x,30,S
+IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,$,s)
+IF({i}>1,
+IF(#RepayEndDateB{i}<=#RepayEndDateB{z},
+T(2,請輸入日期大於+#RepayEndDateB{z}),s),s)
+V(P,#RepayEndDateBCheck{i})
+
+#RepayEndDateMonthCheckB{i}=x,2,S
+IF(#EmpDeductFlag==4 || #EmpDeductFlag==5,$,s)
+IF(#RepayEndDateB{i}>0,$,s)
+T(1,@RepayEndDateMonthCheckB{i},#RepayEndDateB{i},4,2)
+! IF(#RepayEndDateMonthCheckB{i}==#MonthB{i},$,V(P,#CheckMsgB{i}))
+IF(#RepayEndDateB{i}>#MediaDateB{i},V(P,應繳截止日需小於等於媒體日),$)
+! IF(#EntryDateB{i}<#RepayEndDateB{i},V(P,應繳截止日需小於入帳日),$)
 ##end
 
 
@@ -270,12 +311,14 @@ IF(#MediaDateB{i}>#EntryDateB{i},V(P,入帳日不可小於媒體日),$)
 #MonthA{i}
 #EntryDateA{i}
 #MediaDateA{i}
+#RepayEndDateA{i}
 ##end
 
 ##loop {times:12,i:1}
 #MonthB{i}
 #EntryDateB{i}
 #MediaDateB{i}
+#RepayEndDateB{i}
 ##end
 
 

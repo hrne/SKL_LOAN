@@ -32,7 +32,7 @@ public class LNM39JPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,19 +40,12 @@ public class LNM39JPServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM39JP TitaVo=" + titaVo);
 		this.info("-----LNM39JP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202004;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// 清單7
-		sql = "SELECT " + "  \"AcDateYM\", \"CustNo\", " + " \"NewFacmNo\", \"NewBormNo\", \"OldFacmNo\", \"OldBormNo\" " + " FROM  \"LoanIfrs9Jp\" " + " WHERE \"DataYM\"  = :dateMonth "
+		sql = "SELECT " + "  \"AcDateYM\", \"CustNo\", "
+				+ " \"NewFacmNo\", \"NewBormNo\", \"OldFacmNo\", \"OldBormNo\" " + " FROM  \"LoanIfrs9Jp\" "
+				+ " WHERE \"DataYM\"  = :dataMonth "
 				+ " ORDER BY \"AcDateYM\", \"CustNo\", \"NewFacmNo\", \"NewBormNo\", \"OldFacmNo\", \"OldBormNo\" ";
 
 		this.info("sql=" + sql);
@@ -65,7 +58,7 @@ public class LNM39JPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39JP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

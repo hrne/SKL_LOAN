@@ -28,7 +28,7 @@ public class LB085 extends BatchBase implements Tasklet, InitializingBean {
 	public LB085Report lb085Report;
 
 	@Autowired
-	DateUtil dDateUtil;
+	DateUtil dDateUtil; 
 
 	@Autowired
 	WebClient webClient;
@@ -49,16 +49,15 @@ public class LB085 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB085 active LB085 ");
 		this.info("LB085 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		// String tranCode = "LB085";
-		// String tranName = "帳號轉換資料檔";
+		//String tranCode = "LB085";
+		//String tranName = "帳號轉換資料檔";
 
-		this.titaVo.setDataBaseOnMon(); // 月報資料庫
+		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb085Report.exec(titaVo); // 使用月報資料庫
 
-		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
-		// "Y", "LC009", titaVo.getTlrNo(),
-		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-
+		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }

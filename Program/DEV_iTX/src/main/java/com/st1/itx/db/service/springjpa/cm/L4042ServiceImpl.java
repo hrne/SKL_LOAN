@@ -89,6 +89,7 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ,act.\"CreateEmpNo\"          as F20                                        ";
 		sql += "    ,act.\"ProcessDate\"          as F21                                        ";
 		sql += "    ,act.\"ProcessTime\"          as F22                                        ";
+		sql += "    ,act.\"AuthMeth\"          as F23                                        ";
 		sql += "   from \"AchAuthLog\" act                                            ";
 		sql += "  where                                                                    ";
 		if (iSearchFlag == 1) {

@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,106)ASGN(INQLEN$)
+E(0,107)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -291,6 +291,7 @@ T(1,#OOTitaTxCd,1,2)
 #OOProcessDate=D,7,O
 #OOProcessTime=A,6,O
 
+#OOAuthMeth=X,1,O
 ! #OOBUF_CREAT=X,1,S
 ! T(2,1)
 #OOBUF_EDIT=X,500,S
@@ -306,7 +307,9 @@ T(2,2
 +#OOAmlRsp
 +#OOAuthCreateDate
 +#OOStampFinishDate
-)
++0000000
++000000
++#OOAuthMeth)
 #OOBUF_DELETE=X,500,S
 T(2,4
 +#OOCustNo
@@ -322,6 +325,7 @@ T(2,4
 +#OOStampFinishDate
 +#OOProcessDate
 +#OOProcessTime
++#OOAuthMeth
 )
 #OOBUF_SEARCH=X,500,S
 T(2,5
@@ -338,6 +342,7 @@ T(2,5
 +#OOStampFinishDate
 +#OOProcessDate
 +#OOProcessTime
++#OOAuthMeth
 )
 
 ! #OOBTN_CREAT=A,2,O 改為頁面上方新增
@@ -415,6 +420,7 @@ TXFORM=L4042
 #OOTitaTxCd
 #OOProcessDate
 #OOProcessTime
+#OOAuthMeth
 ^
 </sub>
 !---------- 單據輸出組合 ----------

@@ -32,7 +32,7 @@ public class LNM39APServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,25 +40,20 @@ public class LNM39APServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM39AP TitaVo=" + titaVo);
 		this.info("-----LNM39AP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202004;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// IFRS9 資料欄位清單1
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", " + " \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"FacLineDate\", \"MaturityDate\", "
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", "
+				+ " \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"FacLineDate\", \"MaturityDate\", "
 				+ " \"LineAmt\", \"DrawdownAmt\", \"AcctFee\", \"LoanBal\", \"IntAmt\", \"Fee\", \"Rate\", "
-				+ " \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\", \"GracePeriod\", \"ApproveRate\", " + " \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
+				+ " \"OvduDays\", \"OvduDate\", \"BadDebtDate\", \"BadDebtAmt\", \"GracePeriod\", \"ApproveRate\", "
+				+ " \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", "
 				+ " \"IndustryCode\", \"ClTypeJCIC\", \"CityCode\", \"ProdNo\", \"CustKind\", \"AssetClass\", \"Ifrs9ProdCode\", "
 				+ " \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\", \"AvblBal\", \"RecycleCode\", \"IrrevocableFlag\", "
-				+ " \"TempAmt\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", " + " \"LineAmtCurr\", \"DrawdownAmtCurr\", \"AcctFeeCurr\", \"LoanBalCurr\", "
-				+ " \"IntAmtCurr\", \"FeeCurr\", \"AvblBalCurr\", \"TempAmtCurr\" " + " FROM  \"LoanIfrs9Ap\"" + " WHERE \"DataYM\"  = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+				+ " \"TempAmt\", \"AcCurcd\", \"AcBookCode\", \"CurrencyCode\", \"ExchangeRate\", "
+				+ " \"LineAmtCurr\", \"DrawdownAmtCurr\", \"AcctFeeCurr\", \"LoanBalCurr\", "
+				+ " \"IntAmtCurr\", \"FeeCurr\", \"AvblBalCurr\", \"TempAmtCurr\" " + " FROM  \"LoanIfrs9Ap\""
+				+ " WHERE \"DataYM\"  = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -70,7 +65,7 @@ public class LNM39APServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39AP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

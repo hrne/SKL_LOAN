@@ -32,18 +32,14 @@ public class LB093ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dateMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
 		this.info("----------- LB093.findAll ---------------");
 		this.info("-----LB093 TitaVo=" + titaVo);
 		this.info("-----LB093 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
-
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-		this.info("dataMonth= " + dateMonth);
-
+		
 		String sql = "";
 
 		// LB093 動產及貴重物品擔保品明細檔

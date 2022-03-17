@@ -55,9 +55,28 @@ public class LNM39APReport extends MakeReport {
 		// LNM39AP 欄位清單１
 		this.info("---------- LNM39APReport exec titaVo: " + titaVo);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LNM39APList = null;
 		try {
-			LNM39APList = lNM39APServiceImpl.findAll(titaVo);
+			LNM39APList = lNM39APServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -80,7 +99,8 @@ public class LNM39APReport extends MakeReport {
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM39AP genFile : ");
-		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;" + "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;"
+		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;"
+				+ "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;"
 				+ "F40;F41;F42;F43;F44;F45;F46;F47;F48;F49;F50;F51;F52;F53";
 
 		String txt1[] = txt.split(";");
@@ -91,7 +111,8 @@ public class LNM39APReport extends MakeReport {
 
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFAP", "LNM39AP 欄位清單１", "LNFAP.TXT", 1); // UTF-8
 			// 產製[控制檔]
-			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFAPIDX", "LNM39AP 欄位清單１控制檔", "LNFAP.IDX", 1); // UTF-8
+			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFAPIDX", "LNM39AP 欄位清單１控制檔", "LNFAP.IDX",
+					1); // UTF-8
 
 			// 標題列
 			// strContent = "戶號(1~7), ";
@@ -183,7 +204,8 @@ public class LNM39APReport extends MakeReport {
 							break; // 法拍及火險費用
 						case 18:
 							formatter.applyPattern("0.000000");
-							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter
+									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 利率(撥款)
 						case 19:
@@ -205,7 +227,8 @@ public class LNM39APReport extends MakeReport {
 							break; // 初貸時約定還本寬限期
 						case 24:
 							formatter.applyPattern("0.000000");
-							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter
+									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 核准利率
 						case 25:
@@ -279,7 +302,8 @@ public class LNM39APReport extends MakeReport {
 							break; // 交易幣別
 						case 46:
 							formatter.applyPattern("00.00000000");
-							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter
+									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 報導日匯率
 						case 47:
@@ -337,7 +361,8 @@ public class LNM39APReport extends MakeReport {
 
 			// makeFile.toFile(sno); // 不直接下傳
 
-			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + "," + String.format("%06d", L7List.size());
+			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + ","
+					+ String.format("%06d", L7List.size());
 			makeFileC.put(strContent);
 			makeFile.close();
 			this.info("=========== LNM39AP genFile close === ");

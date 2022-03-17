@@ -52,9 +52,28 @@ public class LBRelReport extends MakeReport {
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dateMonth= " + dataMonth);
+
 		List<Map<String, String>> LBList = null;
 		try {
-			LBList = lBRelServiceImpl.findAll(titaVo);
+			LBList = lBRelServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -101,7 +120,8 @@ public class LBRelReport extends MakeReport {
 			String strContent = "";
 
 			String strFileName = "458" + strToday + "1" + ".GRM"; // 458+年月日+序號(1).GRM
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName,
+					2);
 
 			// 首筆 無 ???
 //			strContent = "JCIC-DAT-BRel-V01-458" + StringUtils.repeat(" ",5) + strToday + "01" + StringUtils.repeat(" ",10) 
@@ -190,7 +210,8 @@ public class LBRelReport extends MakeReport {
 		String txt = "";
 
 		// BRel 聯徵授信「同一關係企業及集團企業」資料報送檔
-		inf = "總行代號(1~3),分行代號(4~7),客戶填表年月(8~12),報送時機(13),授信企業統編(14~21),空白(22)," + " 關係企業統編(23~30),空白(31),關係企業關係代號(32~34),空白(35~39),結束註記碼(40)";
+		inf = "總行代號(1~3),分行代號(4~7),客戶填表年月(8~12),報送時機(13),授信企業統編(14~21),空白(22),"
+				+ " 關係企業統編(23~30),空白(31),關係企業關係代號(32~34),空白(35~39),結束註記碼(40)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10";
 
 		String txt1[] = txt.split(";");
@@ -200,7 +221,8 @@ public class LBRelReport extends MakeReport {
 			String strFileName = "458" + strToday + "1" + ".GRM.CSV"; // 458+年月日+序號(1).GRM.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName,
+					2);
 
 			// 標題列
 			strContent = inf;

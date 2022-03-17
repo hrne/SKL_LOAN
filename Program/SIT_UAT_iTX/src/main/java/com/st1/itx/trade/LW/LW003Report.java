@@ -145,12 +145,12 @@ public class LW003Report extends MakeReport {
 
 			// 重整公式
 
-			for (int x = 0; x < wkMonth; x++) {
-				makeExcel.formulaCalculate(8, 4 + x);
-				makeExcel.formulaCalculate(13, 4 + x);
-				makeExcel.formulaCalculate(18, 4 + x);
-				makeExcel.formulaCalculate(22, 4 + x);
-				makeExcel.formulaCalculate(23, 4 + x);
+			for (int x = 1; x <= wkMonth; x++) {
+				makeExcel.formulaCalculate(8, 3 + x);
+				makeExcel.formulaCalculate(13, 3 + x);
+				makeExcel.formulaCalculate(18, 3 + x);
+				makeExcel.formulaCalculate(22, 3 + x);
+				makeExcel.formulaCalculate(23, 3 + x);
 			}
 
 			int rCol = q == 1 ? 7 : q == 2 ? 10 : q == 3 ? 13 : q == 4 ? 16 : 17;
@@ -191,6 +191,7 @@ public class LW003Report extends MakeReport {
 		}
 		// 區部 獎勵金額
 		if (form == 2) {
+			int num = 1;
 			// 列數
 			int row = 0;
 			int col = 0;
@@ -220,26 +221,34 @@ public class LW003Report extends MakeReport {
 				}
 
 				// 判斷欄位
-				col = 3 + wkMonth;
-
+				col = 3 + num;
+			
+				
 				if (quarter == 5) {
 					return;
 				}
+				
+				if (num == wkMonth) {
+					break;
+				}
+				
 				makeExcel.setValue(row, col, bonus, "#,##0");
-
+				
+				num++;
 			}
 
 		}
 
 		// 通訊處 獎勵金
 		if (form == 3) {
+			int num = 1;
 			// 列數
 			int row = 0;
 			int col = 0;
 
 			for (Map<String, String> lw003Vo : data) {
 				// 以通訊處分 DeptCode
-				String deptCode = lw003Vo.get("F0");
+//				String deptCode = lw003Vo.get("F0");
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F1"));
 				// 獎勵金Bonus
@@ -247,13 +256,21 @@ public class LW003Report extends MakeReport {
 						: new BigDecimal(lw003Vo.get("F2").toString());
 
 				// 判斷欄位
-				col = 3 + wkMonth;
-
+				col = 3 + num;
+			
+				
 				if (quarter == 5) {
 					return;
 				}
-
+				
+				if (num == wkMonth) {
+					break;
+				}
+				
 				makeExcel.setValue(row, col, bonus, "#,##0");
+				
+				num++;
+
 			}
 		}
 
@@ -278,6 +295,7 @@ public class LW003Report extends MakeReport {
 
 		// 專銷制單位
 		if (form == 5) {
+			int num = 1;
 			// 列數
 			int row = 20;
 			int col = 0;
@@ -290,10 +308,14 @@ public class LW003Report extends MakeReport {
 						: new BigDecimal(lw003Vo.get("F1").toString());
 
 				// 判斷欄位
-				col = 3 + wkMonth;
-
+				col = 3 + num;
+				
 				if (quarter == 5) {
 					return;
+				}
+				
+				if (num == wkMonth) {
+					break;
 				}
 
 				makeExcel.setValue(row, col, bonus, "#,##0");

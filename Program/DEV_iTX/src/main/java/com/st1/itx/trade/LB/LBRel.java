@@ -52,7 +52,7 @@ public class LBRel extends BatchBase implements Tasklet, InitializingBean {
 		//String tranCode = "LBRel";
 		//String tranName = "聯徵授信「同一關係企業及集團企業」資料報送檔";
 
-		this.titaVo.setDataBaseOnMon(); // 月報資料庫
+		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lbRelReport.exec(titaVo);
 
 		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),

@@ -32,7 +32,7 @@ public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,21 +40,15 @@ public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM39HP TitaVo=" + titaVo);
 		this.info("-----LNM39HP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202004;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// 清單8
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", " + " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
-				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", " + " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", " + " \"LineAmtCurr\", \"AvblBalCurr\" "
-				+ " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\"   = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", "
+				+ " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
+				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", "
+				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", "
+				+ " \"LineAmtCurr\", \"AvblBalCurr\" " + " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\"   = :dataMonth "
+				+ " ORDER BY \"CustNo\", \"FacmNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -66,7 +60,7 @@ public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39HP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

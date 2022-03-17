@@ -28,7 +28,7 @@ public class LNM34GP extends BatchBase implements Tasklet, InitializingBean {
 	public LNM34GPReport lnm34gpReport;
 
 	@Autowired
-	DateUtil dDateUtil;
+	DateUtil dDateUtil; 
 
 	@Autowired
 	WebClient webClient;
@@ -49,16 +49,15 @@ public class LNM34GP extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LNM34GP active LNM34GP ");
 		this.info("LNM34GP titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		// String tranCode = "LNM34GP";
-		// String tranName = "IAS39 資料欄位清單G";
+		//String tranCode = "LNM34GP";
+		//String tranName = "IAS39 資料欄位清單G";
 
-		this.titaVo.setDataBaseOnMon(); // 月報資料庫
+		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lnm34gpReport.exec(titaVo); // 使用月報資料庫
 
-		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
-		// "Y", "LC009", titaVo.getTlrNo(),
-		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-
+		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }

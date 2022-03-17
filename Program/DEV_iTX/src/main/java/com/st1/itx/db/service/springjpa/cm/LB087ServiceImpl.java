@@ -40,10 +40,6 @@ public class LB087ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("-----LB087 TitaVo=" + titaVo);
 		this.info("-----LB087 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = ""; // 無 table
 
 		// LB087 聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔

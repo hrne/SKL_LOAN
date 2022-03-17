@@ -32,7 +32,7 @@ public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBe
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int dataMonth, TitaVo titaVo) throws Exception {
 //		boolean onLineMode = true;
 		boolean onLineMode = false;
 
@@ -40,21 +40,15 @@ public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("-----LNM39GP TitaVo=" + titaVo);
 		this.info("-----LNM39GP Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
 
-		int dateMonth = Integer.parseInt(titaVo.getEntDy().substring(0, 6)) + 191100; // 年月份(西元年月)
-
-//		TEST
-//		if (onLineMode == true) {
-//			dateMonth = 202004;
-//		}
-
-		this.info("dataMonth= " + dateMonth);
-
 		String sql = "";
 
 		// 清單7
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", " + " \"CustKind\", \"Status\", \"OvduDate\", "
-				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", " + " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" " + " FROM  \"LoanIfrs9Gp\" "
-				+ " WHERE \"DataYM\"   = :dateMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", "
+				+ " \"CustKind\", \"Status\", \"OvduDate\", "
+				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", "
+				+ " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" "
+				+ " FROM  \"LoanIfrs9Gp\" " + " WHERE \"DataYM\"   = :dataMonth "
+				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 
@@ -66,7 +60,7 @@ public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBe
 			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 LNM39GP.java 帶入資料庫環境
 		}
 		query = em.createNativeQuery(sql);
-		query.setParameter("dateMonth", dateMonth);
+		query.setParameter("dataMonth", dataMonth);
 
 		// 轉成 List<HashMap<String, String>>
 		return this.convertToMap(query);

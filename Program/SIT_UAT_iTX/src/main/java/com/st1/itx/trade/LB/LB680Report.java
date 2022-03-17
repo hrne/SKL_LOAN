@@ -54,9 +54,28 @@ public class LB680Report extends MakeReport {
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
 
+		// 系統營業日
+		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底營業日
+		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		// 上月月底日
+		int lmndyf = this.txBuffer.getTxCom().getLmndyf();
+
+		int dataMonth = 0;
+
+		if (tbsdyf == mfbsdyf) {
+			// 今日為月底營業日:產本月報表
+			dataMonth = tbsdyf / 100;
+		} else {
+			// 今日非月底營業日:產上月報表
+			dataMonth = lmndyf / 100;
+		}
+
+		this.info("dataMonth= " + dataMonth);
+
 		List<Map<String, String>> LBList = null;
 		try {
-			LBList = lB680ServiceImpl.findAll(titaVo);
+			LBList = lB680ServiceImpl.findAll(dataMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -103,10 +122,12 @@ public class LB680Report extends MakeReport {
 			String strContent = "";
 
 			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".680"; // 458+月日+序號(1).680
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B680", "「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B680",
+					"「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B680-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
+			strContent = "JCIC-DAT-B680-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 67, ' ');
 			makeFile.put(strContent);
 
@@ -164,7 +185,8 @@ public class LB680Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 116);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
+					+ StringUtils.repeat(" ", 116);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -185,7 +207,8 @@ public class LB680Report extends MakeReport {
 		String txt = "";
 
 		// B680 「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔
-		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),上欄IDN或BAN錯誤註記(19),空白(20~59)," + "貸款餘額扣除擔保品鑑估值之金額(60~69),資料所屬年月(70~74),空白(75~128)";
+		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),上欄IDN或BAN錯誤註記(19),空白(20~59),"
+				+ "貸款餘額扣除擔保品鑑估值之金額(60~69),資料所屬年月(70~74),空白(75~128)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8";
 
 		String txt1[] = txt.split(";");
@@ -195,7 +218,8 @@ public class LB680Report extends MakeReport {
 			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".680.CSV"; // 458+月日+序號(1).680.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B680", "「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B680",
+					"「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔", strFileName, 2);
 
 			// 標題列
 			strContent = inf;
