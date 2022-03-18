@@ -17,8 +17,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LB080ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.data.L8ConstantEum;
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.db.domain.SystemParas;
+import com.st1.itx.db.service.SystemParasService;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -43,6 +44,9 @@ public class LB080Report extends MakeReport {
 
 	@Autowired
 	public MakeFile makeFile;
+
+	@Autowired
+	public SystemParasService sSystemParasService;
 
 	// 自訂明細標題
 	@Override
@@ -120,19 +124,43 @@ public class LB080Report extends MakeReport {
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19";
 		String txt1[] = txt.split(";");
 
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		String sfileNo2 = titaVo.getParam("FileNo");
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+			sfileNo2 = "01"; 
+		}
+
+		// 查詢系統參數設定檔-JCIC放款報送人員資料
+		String iRimBusinessType = "LN";
+		String jcicEmpName = "";
+		String jcicEmpTel = "";
+		SystemParas tSystemParas = sSystemParasService.findById(iRimBusinessType, titaVo);
+		/* 如有找到資料 */
+		if (tSystemParas != null) {
+			jcicEmpName = tSystemParas.getJcicEmpName();
+			jcicEmpTel = tSystemParas.getJcicEmpTel();
+			if (jcicEmpName == null || jcicEmpTel == null) {
+				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC放款報送人員資料");
+			}
+		} else {
+			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
+		}
+
 		Pattern pattern = Pattern.compile("[0-9]*");
 		Matcher isNum = null;
 
 		int sumDrawdownAmt = 0; // 本階訂約金額(台幣)(78~87)
 		String strContent = "";
 
-		String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".080"; // 458+月日+序號(1).080
+		String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".080"; // 458+月日+序號.080
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B080", "授信額度資料檔", strFileName, 2);
 
 		// 首筆
-		strContent = "JCIC-DAT-B080-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01"
-				+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(L8ConstantEum.phoneNum, 16, ' ')
-				+ makeFile.fillStringR("審查單位聯絡人－" + L8ConstantEum.contact, 80, ' ') + StringUtils.repeat(" ", 51);
+		strContent = "JCIC-DAT-B080-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
+				+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
+				+ makeFile.fillStringR("審查單位聯絡人－" + jcicEmpName, 80, ' ') + StringUtils.repeat(" ", 51);
 		makeFile.put(strContent);
 
 		// 欄位內容
@@ -245,6 +273,11 @@ public class LB080Report extends MakeReport {
 		this.info("=========== LB080 genExcel: ");
 		this.info("LB080 genExcel TitaVo=" + titaVo);
 
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+		}
 		// 自訂標題 inf (首筆/尾筆)
 		String inf = "";
 		String txt = "";
@@ -262,7 +295,7 @@ public class LB080Report extends MakeReport {
 
 		int sumDrawdownAmt = 0; // 本階訂約金額(台幣)(78~87)
 		String strContent = "";
-		String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".080.CSV"; // 458+月日+序號(1)+.080.CSV
+		String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".080.CSV"; // 458+月日+序號+.080.CSV
 		this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 		this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B080", "授信額度資料檔", strFileName, 2);

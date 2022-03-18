@@ -135,8 +135,8 @@ public class LW003Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LW003ServiceImpl.findAll error = " + errors.toString());
 		}
-
-		if (data1.size() > 0 && data2.size() > 0 && data3.size() > 0 && data4.size() > 0 && data5.size() > 0) {
+//		if (data1.size() > 0 && data2.size() > 0 && data3.size() > 0 && data4.size() > 0 && data5.size() > 0) {
+		if (true) {
 			exportExcel(data1, wkYear, wkMonth, q, 1);// 個金總業績
 			exportExcel(data2, wkYear, wkMonth, q, 2);// 區部 獎勵金額
 			exportExcel(data3, wkYear, wkMonth, q, 3);// 通訓處 獎勵金額
@@ -220,8 +220,10 @@ public class LW003Report extends MakeReport {
 					break;
 				}
 
+				
 				// 判斷欄位
-				col = 3 + num;
+				col = Quarter == 1 ? 6 : Quarter == 2 ? 9 : Quarter == 3 ? 12 : Quarter == 4 ? 15 : 16;
+			
 			
 				
 				if (quarter == 5) {
@@ -248,15 +250,31 @@ public class LW003Report extends MakeReport {
 
 			for (Map<String, String> lw003Vo : data) {
 				// 以通訊處分 DeptCode
-//				String deptCode = lw003Vo.get("F0");
+				String deptCode = lw003Vo.get("F0");
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F1"));
 				// 獎勵金Bonus
 				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(lw003Vo.get("F2").toString());
 
+				// 判斷列數
+				switch (deptCode) {
+				case "A0B000":
+					row = 9;
+					break;
+				case "A0E000":
+					row = 10;
+					break;
+				case "A0F000":
+					row = 11;
+					break;
+				case "A0M000":
+					row = 12;
+					break;
+				}
+				
 				// 判斷欄位
-				col = 3 + num;
+				col = Quarter == 1 ? 6 : Quarter == 2 ? 9 : Quarter == 3 ? 12 : Quarter == 4 ? 15 : 16;
 			
 				
 				if (quarter == 5) {
@@ -308,7 +326,7 @@ public class LW003Report extends MakeReport {
 						: new BigDecimal(lw003Vo.get("F1").toString());
 
 				// 判斷欄位
-				col = 3 + num;
+				col = Quarter == 1 ? 6 : Quarter == 2 ? 9 : Quarter == 3 ? 12 : Quarter == 4 ? 15 : 16;
 				
 				if (quarter == 5) {
 					return;

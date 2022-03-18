@@ -542,9 +542,9 @@ T(H,#BookStatus,#BookStatusHelp)
 ! C(3,#BookStatus,0,T(3,未回收),T(3,已回收))
 
 !新增修改複製送出後自動連動L8204疑似洗錢交易訪談記錄維護
-#NTXBUF1=X,25,S
+#NTXBUF1=X,50,S
 C(3,#UpdateCode,1,$,S)
-T(2,1+#SysDate+#CustNo+#FacmNo+#BormNo)ASGN(NTXBUF$)
+T(2,1+#SysDate+#CustNo+#FacmNo+#BormNo+#BookDate+#TimBookAmt)ASGN(NTXBUF$)
 
 #TmpNTXCD=X,5,S
 C(3,#UpdateCode,1,$,S)

@@ -884,8 +884,9 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4A;ntxbuf5=type<-1:Estimat
 C(3,#UpdateCode,1,$,s)
 C(3,#ApproveFlag,1,s,$)
 
+!有輸入值時查詢L6088 也不該帶值QC1679
 #BUF4B=X,7,S
-T(2,#Estimate)
+!T(2,#Estimate)
 
 #BIND4B=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4B;ntxbuf5=type<-1:Estimate<-OOEmployeeNo:EstimateX<-OOFullname})
@@ -915,9 +916,9 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5A;ntxbuf5=type<-1:CreditO
 C(3,#UpdateCode,1,$,s)
 C(3,#ApproveFlag,1,s,$)
 
-
+!有輸入值時查詢L6088 也不該帶值QC1679
 #BUF5B=X,7,S
-T(2,#CreditOfficer)
+!T(2,#CreditOfficer)
 
 #BIND5B=X,1,S
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5B;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo:CreditOfficerX<-OOFullname})
@@ -947,8 +948,9 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6A;ntxbuf5=type<-1:LoanOff
 #LoanOfficer=X,6,I
 C(3,#UpdateCode,1,$,s)
 
+!有輸入值時查詢L6088 也不該帶值QC1679
 #BUF6B=X,7,S
-T(2,#LoanOfficer)
+!T(2,#LoanOfficer)
 
 #BIND6B=X,1,S
 BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6B;ntxbuf5=type<-1:LoanOfficer<-OOEmployeeNo:LoanOfficerX<-OOFullname})
@@ -980,8 +982,9 @@ BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF8A;ntxbuf5=type<-1:Supervi
 #Supervisor=X,6,I
 C(3,#UpdateCode,1,$,s)
 
+!有輸入值時查詢L6088 也不該帶值QC1679
 #BUF8B=X,7,S
-T(2,#Supervisor)
+!T(2,#Supervisor)
 
 #BIND8B=X,1,S
 BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF8B;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})

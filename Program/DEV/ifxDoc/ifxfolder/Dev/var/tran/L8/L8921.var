@@ -208,7 +208,7 @@ IF(#OOTotalAmt1==0,S,$)
 X(#OOTotalAmt1)
 
 !累計筆數
-#OOTotalCnt=N,2,L
+#OOTotalCnt=N,3,L
 
 !交易樣態(TOTA)
 #OOFactor=N,2,L

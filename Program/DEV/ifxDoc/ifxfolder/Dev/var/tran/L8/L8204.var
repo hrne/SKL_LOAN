@@ -84,7 +84,7 @@ T(2,@ApHelp,#HelpDesc2)
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L8923 疑似洗錢交易訪談記錄查詢]進入),$)
 
-#NTXBUF=X,21,S
+#NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_FuncCode=X,1,S
@@ -102,6 +102,13 @@ T(1,#NTXBUF,16,3)
 #CHAIN_BormNo=X,3,S
 T(1,#NTXBUF,19,3)
 
+#CHAIN_RepayDate=D,7,S
+T(1,#NTXBUF,22,7)
+
+#CHAIN_RepayAmt=m,14.2,S
+T(1,#NTXBUF,29,14)
+
+
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
 T(2,@FuncCode,#CHAIN_FuncCode)
@@ -110,6 +117,8 @@ E(0,@RecordDate,#CHAIN_RecordDate)
 E(0,@CustNo,#CHAIN_CustNo)
 E(0,@FacmNo,#CHAIN_FacmNo)
 E(0,@BormNo,#CHAIN_BormNo)
+E(0,@RepayDate,#CHAIN_RepayDate)
+E(0,@RepayAmt,#CHAIN_RepayAmt)
 
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5:查詢)
@@ -228,7 +237,10 @@ E(0,#RimBormNo,#BormNo)
 RESET_RIM(#SendL8R51,L8R51)
 S(L8R51,1,#RimFuncCode,#RimTxCode,#RimRecordDate,#RimCustNo,#RimFacmNo,#RimBormNo)
 R(1,L8R51)
-C(3,#FuncCode,3,T(2,@CustName,#L8R51CustName),
+
+#SETA=X,1,S
+T(2,@CustName,#L8R51CustName)
+IF(#FuncCode==2 || #FuncCode==4 || #FuncCode==5,$,s)
 E(0,@RepayDate,#L8R51RepayDate)
 E(0,@RepayAmt,#L8R51RepayAmt)
 T(2,@Career,#L8R51Career)

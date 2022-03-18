@@ -88,6 +88,10 @@ public class L6901 extends TradeBuffer {
 			if(iSlipNo>0) {
 				slAcDetailList = sAcDetailService.acdtlSlipNo2(iAcDate + 19110000, iSlipNo, this.index,
 						Integer.MAX_VALUE, titaVo);
+				if(slAcDetailList!=null) {//再依交易序號查詢
+					slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000, slAcDetailList.getContent().get(0).getRelTxseq(), this.index,
+							Integer.MAX_VALUE, titaVo);
+				}
 			} else {
 				slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000, iRelTxseq, this.index,
 						Integer.MAX_VALUE, titaVo);
@@ -98,6 +102,10 @@ public class L6901 extends TradeBuffer {
 			if(iSlipNo>0) {
 				slAcDetailList = sAcDetailService.acdtlSlipNo(iRelDy + 19110000, iSlipNo, this.index,
 						Integer.MAX_VALUE, titaVo);
+				if(slAcDetailList!=null) {//再依交易序號查詢
+					slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000, slAcDetailList.getContent().get(0).getRelTxseq(), this.index,
+							Integer.MAX_VALUE, titaVo);
+				}
 			} else {
 				slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy + 19110000, iRelTxseq, this.index,
 						Integer.MAX_VALUE, titaVo);

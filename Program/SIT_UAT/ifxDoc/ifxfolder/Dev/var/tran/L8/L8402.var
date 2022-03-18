@@ -43,6 +43,9 @@ E(0,0)
 [
 ["[L8402]                                 產生JCIC月報媒體檔"],
 ["#R1+@會計日期",#ACCTDATE],
+["#FdFileDay+報送日期",#FileDay,"#FdFileNo+檔案序號",#FileNo],
+["#FdJcicEmpName+審查部主辦人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
+
 ["@"],
 ["@",#BtnAll,"@全選"],
 ["@",#Btn1, "@B201 聯徵授信餘額月報檔"],
@@ -69,6 +72,30 @@ E(0,5)
 
 
 !---------- Required Input Setting ----------
+#FdFileDay=X,2,L
+T(3,*)
+#FdFileNo=X,2,L
+T(3, )
+#FdJcicEmpName=X,2,L
+T(3, )
+#FdJcicEmpTel=X,2,L
+T(3, )
+
+! 業務類型
+#BusinessType=X,2,S
+T(3,LN)
+!調出JCIC放款報送人員資料
+#SendL6R28=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimTxCode,L8401)
+T(2,@RimBusinessType,#BusinessType)
+RESET_RIM(#SendL6R28,L6R28)
+S(L6R28,1,#RimFuncCode,#RimTxCode,#RimBusinessType)
+R(1,L6R28)
+T(2,@JcicEmpName,#L6R28JcicEmpName)
+T(2,@JcicEmpTel,#L6R28JcicEmpTel)
+
+
 ! 必輸欄位
 ##loop{times:13,i:1}
 #R{i}=X,1,L
@@ -121,15 +148,38 @@ T(1,#DT1,2,5)
 ! #DT_MM_LAST=A,2,S
 ! E(0,#DT_MM-1)
 
+!日曆日
+#DT5=X,8,S
+T(4,#SYSCDATE)
+
+#Day=D,7,L
+T(1,#DT5,2,7)
+E(0,@FileDay,#Day)
+
 !會計日期
 #ACCTDATE=D,7,L
 T(2,#DT2)
 @V(7)A(DATE,0,#ACCTDATE)
 V(5,0,#DT2)
 
+#FileDay=D,7,L
+
+#FileNo=A,2,I
+E(0,1)
+@V(2,0)
+#JcicEmpName=x,8,L
+#JcicEmpTel=x,16,L
+
+
 ##loop {times:13,i:1} 
 #MONTHLY{i}=X,1,S
 ##end
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R28.dec"/>
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -158,6 +208,7 @@ T(3,[L8402] 產生JCIC月報媒體檔)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#FileNo
 ##loop {times:13,i:1}
 #MONTHLY{i}
 ##end
@@ -169,6 +220,7 @@ T(3,[L8402] 產生JCIC月報媒體檔)
 <sub type="TOM">
 TXFORM=L8402^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R28.tom"/>
 </sub>
 
 <sub type="PART" name="L8402" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

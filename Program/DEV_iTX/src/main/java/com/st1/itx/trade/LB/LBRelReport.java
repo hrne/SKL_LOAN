@@ -113,13 +113,20 @@ public class LBRelReport extends MakeReport {
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> LBList) throws LogicException {
 		this.info("=========== LBRel genFile : ");
+
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+		}
+		
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10";
 		String txt1[] = txt.split(";");
 
 		try {
 			String strContent = "";
 
-			String strFileName = "458" + strToday + "1" + ".GRM"; // 458+年月日+序號(1).GRM
+			String strFileName = "458" + strToday + sfileNo1 + ".GRM"; // 458+年月日+序號.GRM
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName,
 					2);
 
@@ -205,6 +212,11 @@ public class LBRelReport extends MakeReport {
 		this.info("=========== LBRel genExcel: ");
 		this.info("LBRel genExcel TitaVo=" + titaVo);
 
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		String sfileNo1 = String.valueOf(ifileNo);
+		if (ifileNo == 0) {
+			sfileNo1 = "1";
+		}
 		// 自訂標題 inf (首筆/尾筆)
 		String inf = "";
 		String txt = "";
@@ -218,7 +230,7 @@ public class LBRelReport extends MakeReport {
 
 		try {
 			String strContent = "";
-			String strFileName = "458" + strToday + "1" + ".GRM.CSV"; // 458+年月日+序號(1).GRM.CSV
+			String strFileName = "458" + strToday + sfileNo1 + ".GRM.CSV"; // 458+年月日+序號.GRM.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName,

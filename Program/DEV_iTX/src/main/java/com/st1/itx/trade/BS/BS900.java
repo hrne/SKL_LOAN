@@ -101,7 +101,7 @@ public class BS900 extends TradeBuffer {
 		int yearMonth = this.getTxBuffer().getMgBizDate().getTbsDyf() / 100; // 提息年月
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		baTxCom.setTxBuffer(this.getTxBuffer());
-		iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
+		iAcDate = this.getTxBuffer().getMgBizDate().getTmnDy();
 		// 迴轉上個月底日
 		iAcDateReverse = this.getTxBuffer().getMgBizDate().getLmnDy();
 		this.info("iAcDateReverse=" + iAcDateReverse);

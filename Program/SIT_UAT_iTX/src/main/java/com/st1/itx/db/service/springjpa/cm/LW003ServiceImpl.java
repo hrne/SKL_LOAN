@@ -159,7 +159,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 12 THEN '4'";
 		sql += "          	 ELSE '5'";
 		sql += "           END AS \"Quarter\""; // --工作季(13工獨立出來)
-		sql += "          ,SUM(R.\"Bonus\") AS \"Bonus\"";
+		sql += "          ,SUM(NVL(R.\"Bonus\",0)) AS \"Bonus\"";
 		sql += "	FROM ( SELECT D.\"WorkMonth\"";
 		sql += "				 ,D.\"DeptCode\"";
 		sql += "          		 ,CASE ";
@@ -248,7 +248,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          	 WHEN MOD(R.\"WorkMonth\",100) <= 12 THEN '4'";
 		sql += "          	 ELSE '5'";
 		sql += "           END AS \"Quarter\""; // --工作季(13工獨立出來)
-		sql += "          ,SUM(R.\"cntBonus\") + SUM(R.\"amtBonus\") AS \"Bonus\"";
+		sql += "          ,SUM(NVL(R.\"cntBonus\",0)) + SUM(NVL(R.\"amtBonus\",0)) AS \"Bonus\"";
 		sql += "	FROM ( SELECT D.\"WorkMonth\"";
 		sql += "				 ,D.\"DeptCode\"";
 		sql += "          		 ,CASE ";
@@ -332,7 +332,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	GROUP BY IM.\"WorkMonth\")";
 		sql += " ";
 		sql += "	SELECT \"WorkMonth\"";
-		sql += "          ,SUM(\"Bonus\") AS \"Bonus\"";
+		sql += "          ,SUM(NVL(\"Bonus\",0)) AS \"Bonus\"";
 		sql += "	FROM ( SELECT D.\"WorkMonth\"";
 		sql += "				 ,D.\"IntroAddBonus\" AS \"Bonus\"";
 		sql += "		   FROM \"Data1\" D ";
@@ -383,7 +383,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    				WHEN MOD(P.\"WorkMonth\",100) <=12 THEN '4'";
 		sql += "    				ELSE '5'";
 		sql += "    			  END AS \"Quarter\"";
-		sql += "    			 ,SUM(P.\"DrawdownAmt\") AS \"Bonus\"";
+		sql += "    			 ,SUM(NVL(P.\"DrawdownAmt\",0)) AS \"Bonus\"";
 		sql += "		   FROM \"PfItDetail\" P";
 		sql += "		   WHERE TRUNC(\"WorkMonth\" / 100) = :iwkyear";
 		sql += "		     AND MOD(\"WorkMonth\" ,100) <= :iwkmonth";

@@ -32,7 +32,6 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> checkAll(String iYear, TitaVo titaVo) throws Exception {
 
 		String sql = "　";
@@ -98,9 +97,10 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",Y.\"FirstDrawdownDate\" - 19110000            AS F25   					 "; // 貸款起日
 		sql += ",Y.\"MaturityDate\" - 19110000                 AS F26  						 "; // 貸款迄日
 		sql += ",Y.\"LoanBal\"                                 AS F27  						 "; // 本期未償還本金額
-		sql += ",CASE WHEN TRUNC(Y.\"FirstDrawdownDate\")	< TRUNC(" + iYYYYMM + "* 100)	 	 ";
-		sql += "  THEN TRUNC(" + iYYYYMM + ",-2) -191100+01                               		 ";
-		sql += "        ELSE TRUNC(Y.\"FirstDrawdownDate\",-2)/100 - 191100            		 ";
+		sql += ", CASE ";
+		sql += "   WHEN TRUNC(Y.\"FirstDrawdownDate\" / 100 ) < :iYYYYMM "; // 2022-03-18 智偉修改
+		sql += "   THEN (TRUNC( :iYYYYMM / 100) - 1911) * 100 + 01 "; // 首撥日小於查詢區間起月時 放查詢區間起月
+		sql += "   ELSE TRUNC(Y.\"FirstDrawdownDate\" / 100 ) - 191100 "; // 否則放首撥日月份
 		sql += " END                                           AS F28  						 "; // 繳息所屬年月(起)
 		sql += ",Y.\"YearMonth\" - 191100                      AS F29 						 "; // 繳息所屬年月(止)
 		sql += ",Y.\"YearlyInt\"                               AS F30  						 "; // 繳息金額
@@ -130,13 +130,14 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdArea\" CA                          							 "; // 縣市與鄉鎮區對照檔
 		sql += "    ON CA.\"CityCode\" = CB.\"CityCode\"									 ";
 		sql += "   AND CA.\"AreaCode\" = CB.\"AreaCode\"									 ";
-		sql += "WHERE Y.\"YearMonth\" = " + iYYYYMM;
-		sql += "AND Y.\"UsageCode\" =  '2' or Y.\"UsageCode\" =  '02'							";
+		sql += " WHERE Y.\"YearMonth\" = :iYYYYMM ";
+		sql += " AND LPAD(Y.\"UsageCode\",2,'0') = '02'	";
 
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("iYYYYMM", iYYYYMM);
 		return this.convertToMap(query);
 	}
 
@@ -181,12 +182,13 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ON CB.\"ClCode1\" = CL.\"ClCode1\"										 ";
 		sql += "   AND CB.\"ClCode2\" = CL.\"ClCode2\"										 ";
 		sql += "   AND CB.\"ClNo\"    = CL.\"ClNo\"											 ";
-		sql += "WHERE Y.\"YearMonth\" = " + iYYYYMM;
+		sql += "WHERE Y.\"YearMonth\" = :iYYYYMM ";
 
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("iYYYYMM", iYYYYMM);
 		return this.convertToMap(query);
 	}
 

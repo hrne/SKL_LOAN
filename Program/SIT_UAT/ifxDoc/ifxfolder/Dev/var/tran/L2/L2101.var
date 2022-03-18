@@ -694,6 +694,16 @@ C(3,#Precision,0,SHOW(#TwLoanAmtB{n},#TwHandlingFee{n})HIDE(#UsLoanAmtB{n},#UsHa
 C(3,#FuncCode,3,E(0,@StartDate,#SYSCDATE),$)
 T(2,@UseProdFg,#L2r01UseProdFg)
 
+!複製調L2R56取清償違約說明
+#RcvL2r56A=X,1,S
+C(3,#UpdateCode,1,$,S)
+C(3,#FuncCode,3,$,S)
+! C(5,#BreachFlag,Y,$,S)
+RESET_RIM(#RcvL2r56A,L2R56)
+S(L2R56,1,#BreachFlag,#BreachCode,#ProhibitMonth,#BreachGetCode,#BreachPercent,#BreachDecreaseMonth,#BreachDecrease,#BreachStartPercent)
+R(1,L2R56)
+T(2,@Breach1,#L2r56Breach)
+
 
 !檢查輸入啟用日期是否生效 1為啟用 0為未啟用
 #checkeffdate=A,1,S
@@ -877,7 +887,6 @@ T(F,@TwHandlingFee{n},0)
 T(F,@UsHandlingFee{n},0)
 ##end
 
-
 #INITP2=X,1,S
 T(H,@GovOfferFlagX,#GovOfferFlag,#YesNoHelp) 
 T(H,@FinancialFlagX,#FinancialFlag,#YesNoHelp) 
@@ -1018,7 +1027,7 @@ C(3,#FuncCode,1,T(3,TWD),$)
 
 #Precision=N,1,S
 T(H,#CurrencyCode,#CurrPrecisionHelp)
-             
+
 
 ![政府優惠房貸]
 #FdGovOfferFlag=X,2,L
@@ -1130,6 +1139,8 @@ T(H,#BaseRateCode,#BaseRate0Help)
 C(5,#BaseRateCode,99,SHOW(#LbProdIncr)HIDE(#ProdIncr,#ProdIncrX),SHOW(#ProdIncr,#ProdIncrX)HIDE(#LbProdIncr))
 
 #SendL2r06B=X,1,S
+C(5,#CurrencyCode,#L2r01CurrencyCode
+,C(5,#BaseRateCode,#L2r01BaseRateCode,S,$),$)
 T(2,@RimCurrencyCode,#CurrencyCode)
 T(2,@RimBaseRateCode,#BaseRateCode)
 E(0,@RimEffectDate,#EffectDate)
@@ -1187,8 +1198,6 @@ C(3,#FuncCode,1,C(4,#IncrFlag,T(3,Y),$),$)
 #IncrFlagX=X,2,L
 ! T(H,#IncrFlag,#YesNoHelp)
 
-
-
 ![商品利率]
 #FdProdRate=X,2,L
 
@@ -1198,7 +1207,6 @@ E(0,#BaseRate+#ProdIncr)
 #ProdRateX=X,12,L
 X(#ProdRate)
 T(B,#ProdRateX+#WkPercent)
-
 
 ![利率下限]
 #FdLowLimitRate=X,2,L
@@ -2060,11 +2068,17 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(5,0,100)
 
-
-#RcvL2r56=X,1,S
+#RcvL2r56B=X,1,S
 C(3,#UpdateCode,1,$,S)
-! C(5,#BreachFlag,Y,$,S)
-RESET_RIM(#RcvL2r56,L2R56)
+C(5,#BreachFlag,#L2r01BreachFlag
+,C(5,#BreachCode,#L2r01BreachCode
+,C(5,#ProhibitMonth,#L2r01ProhibitMonth
+,C(5,#BreachGetCode,#L2r01BreachGetCode
+,C(5,#BreachPercent,#L2r01BreachPercent
+,C(5,#BreachDecreaseMonth,#L2r01BreachDecreaseMonth
+,C(5,#BreachDecrease,#L2r01BreachDecrease
+,C(5,#BreachStartPercent,#L2r01BreachStartPercent,S,$),$),$),$),$),$),$),$)
+RESET_RIM(#RcvL2r56B,L2R56)
 S(L2R56,1,#BreachFlag,#BreachCode,#ProhibitMonth,#BreachGetCode,#BreachPercent,#BreachDecreaseMonth,#BreachDecrease,#BreachStartPercent)
 R(1,L2R56)
 T(2,@Breach1,#L2r56Breach)
