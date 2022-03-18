@@ -480,6 +480,11 @@ public class L5512Batch extends TradeBuffer {
 					titaVo);
 		}
 
+		// 寫入交易控制檔
+
+		String controlCode = "L5512." + iWorkMonth + ".2";
+		logTxControl(titaVo, controlCode, "");
+
 //		makeFile.toFile(fileSno, "TOTAL.txt");
 
 		return cnt;

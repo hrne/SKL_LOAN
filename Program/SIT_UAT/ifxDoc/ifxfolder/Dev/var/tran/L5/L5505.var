@@ -70,6 +70,14 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@PieceCodeHelp,#HelpDesc1) 
 
+#RimL5R44=X,1,S
+RESET_RIM(#RimL5R44,L5R44)
+S(L5R46,1,#LogNo)
+R(1,L5R46)
+T(2,@PieceCodeAft,#PieceCode)
+T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)
+T(H,@PieceCodeAftX,#PieceCodeAft,#PieceCodeHelp)
+
 #CustNo=A,7,L
 !C(3,#CHAIN,1,s,$)
 !@
@@ -87,14 +95,6 @@ T(2,@PieceCodeHelp,#HelpDesc1)
 
 #MRKEY=_,_,S
 T(2,#CustNo+-+#FacmNo+-+#BormNo)
-
-#RimL5R44=X,1,S
-RESET_RIM(#RimL5R44,L5R44)
-S(L5R46,1,#LogNo)
-R(1,L5R46)
-T(2,@PieceCodeAft,#PieceCode)
-T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)
-T(H,@PieceCodeAftX,#PieceCodeAft,#PieceCodeHelp)
 
 #CustName=x,2.50,L
 
@@ -116,7 +116,7 @@ T(H,@PieceCodeAftX,#PieceCodeAft,#PieceCodeHelp)
 
 #PieceCodeAft=X,1,I
 HELP(#PieceCodeHelp)
-@
+@T(3,@PieceCodeAftX,)
 V(H,#PieceCodeHelp)
 IF(#PieceCodeAft == #PieceCode,V(P,計件代碼無異動),$)
 !V(4,#PieceCode)

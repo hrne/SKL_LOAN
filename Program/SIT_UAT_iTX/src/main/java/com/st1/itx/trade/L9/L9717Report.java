@@ -201,7 +201,7 @@ public class L9717Report extends MakeReport {
 //		this.print(-46, 88, "===== 報　表　結　束 =====", "C");
 //	}
 
-	private void fillData(TitaVo titaVo) {
+	private boolean fillData(TitaVo titaVo) {
 		this.newPage();
 
 		List<Map<String, String>> lL9717 = null;
@@ -439,19 +439,24 @@ public class L9717Report extends MakeReport {
 				this.print(1, 1, "『因組織變動因素，經辦人員餘期案件統計基準：94年元月前以授信人員為統計對象，94年元月起則更改為放款專員。』");
 			}
 
-			this.print(2, 88, "===== 報　表　結　束 =====", "C");
+                        return true;
 
 		} else {
 			print(1, 1, "本日無資料!!!");
+                        return false;
 		}
 	}
 
-	public void makePdf(TitaVo titaVo) throws LogicException {
+	public boolean makePdf(TitaVo titaVo) throws LogicException {
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
+		
+		boolean result = fillData(titaVo);
+		
+		this.close();
 
-		fillData(titaVo);
+		return result;
 
 		// this.toPdf(this.close(), this.reportCode + "_" + this.reportItem);
 	}
@@ -489,9 +494,7 @@ public class L9717Report extends MakeReport {
 
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-
-		makePdf(titaVo);
-
-		return true;
+		
+		return makePdf(titaVo);
 	}
 }

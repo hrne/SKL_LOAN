@@ -43,7 +43,7 @@ E(0,0)
 ["[L8401]                                 產生JCIC日報媒體檔"],
 ["#FdAcDate+會計日期",#AcDateStart,"~",#AcDateEnd],
 ["#FdFileDay+報送日期",#FileDay,"#FdFileNo+檔案序號",#FileNo],
-["#FdJcicEmpName+審查部主辦人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
+["#FdJcicEmpName+審查聯絡人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
 
 ["@"],
 ["@",#BtnAll,"@全選"],

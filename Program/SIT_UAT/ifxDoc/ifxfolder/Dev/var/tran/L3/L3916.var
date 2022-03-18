@@ -658,12 +658,12 @@ T(3,@RepayFreqX,)T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
 T(3,@PayIntFreqX,)T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
 
 ![還本週期]
-#RepayFreq=A,2,L
+#RepayFreq=n,2,L
 
 #RepayFreqX=X,8,L
 
 ![繳息週期]
-#PayIntFreq=A,2,L
+#PayIntFreq=n,2,L
 
 #PayIntFreqX=X,8,L
 
@@ -717,7 +717,7 @@ X(#IndividualIncr)
 T(B,#IndividualIncrX+%)
 
 ![利率調整週期]
-#RateAdjFreq=A,2,L
+#RateAdjFreq=n,2,L
 
 
 #RateAdjFreqX=X,7,L

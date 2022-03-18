@@ -56,17 +56,15 @@ E(0,0)
 !必輸欄位
 #FdEMPNM=X,2,L
 #FdNO0=X,2,L
-#FdNO2=X,2,L
+
 
 !永遠為必輸欄位
 #FdFUNCD=X,2,L
-T(3,*)
 #FdCUSTNO=X,2,L
-T(3,*)
 #FdNO1=X,2,L
 T(3,*)
-
-
+#FdNO2=X,2,L
+T(3,*)
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -121,26 +119,21 @@ C(3,#FunCd,5,K(NOBUTTON,CLOSEY),$)
 
 #ShowFd=X,1,S
 C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
-T(2,@FdFUNCD,#ShowFd)     
-T(2,@FdCUSTNO,#ShowFd)
 T(2,@FdNO1,#ShowFd)
-T(2,@FdNO0,#ShowFd)
+T(2,@FdNO2,#ShowFd)
 
 
 #WKSTAR=X,2,L
-C(2,#FunCd,S,T(3,*),T(3,*),S,S,S)
+C(2,#FunCd,S,T(3,*),S,S,S,S)
+T(2,@FdCUSTNO,#ShowFd)
 
 #WKSTAR1=X,2,L
 C(2,#FunCd,S,S,T(3,*),S,T(3, ),T(3, ))
 
-#WKNAME=X,1,S
-T(2,@FdEMPNM,#WKSPC)
-T(2,@FdNO0,#WKSTAR1)
-T(2,@FdNO2,#WKSPC)
 
 
 #WKTF=X,1,S
-IF(#FunCd==1 || #FunCd==2,T(F,@RmkCode,1)T(F,@RmkDesc,0),T(F,@RmkCode,0)T(F,@RmkDesc,0))
+IF(#FunCd==1 || #FunCd==2,T(F,@RmkCode,1),T(F,@RmkCode,0)T(F,@RmkDesc,0))
 IF(#FunCd==2,T(F,@CustNo,0)HIDE(#BTN1),$)
 IF(#FunCd==1,T(F,@RmkNo,0),T(F,@RmkNo,0))
 IF(#FunCd==4 || #FunCd==5,HIDE(#BTN1)T(F,@CustNo,0)T(F,@RmkNo,0),$ )
@@ -275,12 +268,13 @@ T(H,#RmkCode,#RmkCodeHelp)
 
 ![備忘錄說明] 
 !新增、修改時備忘錄代碼若為其他則此欄必須輸入,其他則自動顯示不必輸入
+!2022.3.18 QC1698皆必須輸入
 #RmkDesc=c,120,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 !T(2,#RmkDesc,#RmkCodeX)
-IF(#RmkCode == 999, T(F,@RmkDesc,1)T(2,@FdNO2,*), T(F,@RmkDesc,0)T(2,@FdNO2,))
-C(3,#RmkCode,999,$,S)
+!IF(#RmkCode == 999, T(F,@RmkDesc,1)T(2,@FdNO2,*), T(F,@RmkDesc,0)T(2,@FdNO2,))
+!C(3,#RmkCode,999,$,S)
 @V(7)
 
 

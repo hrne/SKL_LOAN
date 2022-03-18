@@ -18,8 +18,8 @@ E(0,0)
 <sub type="DC" name="L8501" layout="cols=1;screen.width=[200,800];printer.width=[20,80];">
 [
 ["[L8501]                           JCIC放款報送人員維護"],
-["#FdJcicEmpName+審查部主辦人",#JcicEmpName],
-["#FdJcicEmpTel+審查部主辦人聯絡電話",#JcicEmpTel," （區碼－電話號碼＃分機）"],
+["#FdJcicEmpName+審查聯絡人",#JcicEmpName],
+["#FdJcicEmpTel+聯絡電話",#JcicEmpTel," （區碼－電話號碼＃分機）"],
 ]
 
 !---------- AP TEXT AREA Variables ----------

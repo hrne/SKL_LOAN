@@ -319,7 +319,8 @@ T(2,4+#OOLogNo)
 #OOBtnC=A,2,O
 C(5,#OOAdjRange,0,BIND(grid,cancel),
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=刪除; ntxbuf=#OOBufC}))
-IF(#OOLog==1||#OOLog==2,$,BIND(grid,cancel))
+!IF(#OOLog==1||#OOLog==2,$,BIND(grid,cancel))
+C(5,#OOAdjRange,9,BIND(grid,cancel),$)
 C(3,#OOCanModify,1,$,BIND(grid,cancel))
 
 #OOMrKey=X,20,S
@@ -333,7 +334,7 @@ T(2,00000000000000L5501                  0000000000000+#OOMrKey+L55050010101+#SY
 
 #OOBtnD=A,1,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L6932; ntxbuf=#OOBufD})
-C(3,#OOLog,9,BIND(grid,cancel),$)
+C(3,#OOLog,0,BIND(grid,cancel),$)
 
 </sub>
 

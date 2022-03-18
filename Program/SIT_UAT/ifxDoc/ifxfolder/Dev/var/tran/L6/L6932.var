@@ -46,7 +46,7 @@ E(0,0)
 ["#FD_TX_DT+．交易日期",#SX_DT,"~",#EX_DT],
 ["#FdSearch+查詢條件","交易序號、交易代號、戶號，需擇一輸入"],
 ["#FdTxtNo+．交易序號",#TxtNo],
-["#FD_TRN_CODE+．交易代號",#TRN_CODE],
+["#FD_TRN_CODE+．交易代號",#TRN_CODE,#TRN_CODE2],
 ["#FD_CUST_NO+．戶@@@@號",#CUST_NO,"-",#FACM_NO,"-",#BORM_SEQ],
 ["#FD_MrKey+．參考編號",#MrKey],
 
@@ -62,6 +62,7 @@ E(0,0)
 ! 必輸欄位
 #FdDate=X,2,L
 T(3,*)
+T(F,@TRN_CODE2,0)
 
 #FdSearch=X,2,L
 T(3,*)
@@ -144,6 +145,7 @@ E(0,@EX_DT,#CHAIN_EX_DT)
 
 #RPTFG=A,1,S
 E(0,0)
+C(4,#TRN_CODE2,T(F,@TRN_CODE2,0),T(F,@TRN_CODE2,1))
 
 ! 作業日期
 #DATE=D,8,S
@@ -210,7 +212,8 @@ C(3,#CHAIN,1,s,$)
 !C(4,#TxtNo,$,S)
 !INVOKEJS(SHOW,p1,3,4,1)
 
-#TRN_CODE2=X,5,S
+#TRN_CODE2=X,5,I
+C(3,#CHAIN,1,s,s)
 
 #WKBTN=X,1,S
 !C(3,#TRN_CODE,0,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))

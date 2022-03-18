@@ -260,16 +260,16 @@ public class LW003Report extends MakeReport {
 				// 判斷列數
 				switch (deptCode) {
 				case "A0B000":
-					row = 9;
+					row = 14;
 					break;
 				case "A0E000":
-					row = 10;
+					row = 15;
 					break;
 				case "A0F000":
-					row = 11;
+					row = 16;
 					break;
 				case "A0M000":
-					row = 12;
+					row = 17;
 					break;
 				}
 				

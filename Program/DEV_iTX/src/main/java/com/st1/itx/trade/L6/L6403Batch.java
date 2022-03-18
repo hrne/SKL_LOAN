@@ -26,12 +26,13 @@ import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxAuthorityService;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.menu.MenuBuilder;
 
 @Service("L6403Batch")
 @Scope("prototype")
 /**
- * 
- * 
+ *
+ *
  * @author eric chang
  * @version 1.0.0
  */
@@ -47,7 +48,7 @@ public class L6403Batch extends TradeBuffer {
 
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
-	
+
 	@Autowired
 	public DataLog dataLog;
 
@@ -56,6 +57,9 @@ public class L6403Batch extends TradeBuffer {
 
 	@Autowired
 	Parse parse;
+
+	@Autowired
+	MenuBuilder menuBuilder;
 
 	@Autowired
 	public WebClient webClient;
@@ -107,11 +111,11 @@ public class L6403Batch extends TradeBuffer {
 					InsertAllAuthority(iAuthNo, titaVo);
 
 					dataLog.compareOldNew("無權限");
-					
+
 					dataLog.setEnv(titaVo, tTxAuthGroup2, tTxAuthGroup);
 					dataLog.exec("修改權限群組 " + tTxAuthGroup.getAuthNo());
 
-					
+
 				} else if ("4".equals(iFunCode)) {
 					sTxAuthGroupService.delete(tTxAuthGroup);
 					DeleteAllAuthority(iAuthNo, titaVo);
@@ -127,6 +131,9 @@ public class L6403Batch extends TradeBuffer {
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "",
 				"已成功更新權限群組" + iAuthNo + "交易權限", titaVo);
+
+		// 清除選單快取 Adam
+		menuBuilder.evict();
 
 		return null;
 	}
@@ -330,7 +337,7 @@ public class L6403Batch extends TradeBuffer {
 		}
 	}
 
-	
+
 	private String authFgX(int authfg) {
 		String r = "";
 		if (authfg == 0) {

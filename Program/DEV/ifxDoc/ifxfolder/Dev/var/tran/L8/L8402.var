@@ -44,7 +44,7 @@ E(0,0)
 ["[L8402]                                 產生JCIC月報媒體檔"],
 ["#R1+@會計日期",#ACCTDATE],
 ["#FdFileDay+報送日期",#FileDay,"#FdFileNo+檔案序號",#FileNo],
-["#FdJcicEmpName+審查部主辦人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
+["#FdJcicEmpName+審查聯絡人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
 
 ["@"],
 ["@",#BtnAll,"@全選"],

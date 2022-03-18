@@ -270,7 +270,7 @@ TXFORM=L6088
 #OOCenterCodeName=單位名稱
 {width:100,align:'left'}
 
-#OOCommLineTypeX=員工身份別
+#OOCommLineTypeX=是否在職
 {width:100,align:'left'}
 
 #OOAgCurInd=現職

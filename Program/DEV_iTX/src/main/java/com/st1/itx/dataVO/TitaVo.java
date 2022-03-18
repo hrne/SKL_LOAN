@@ -241,6 +241,12 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * gen bodyFld Asc
 	 */
 	public void getBodyLenAndAdd() {
+		if (!this.getTxCode().equals("XXR99") || Objects.isNull(this.get("bodyFildFg")))
+			return;
+
+		if (!Objects.isNull(this.get("bodyFildFg")) && !this.get("bodyFildFg").equals("1"))
+			return;
+		
 		int i = 1;
 		List<String> bodyNameList = new ArrayList<String>();
 		for (Map.Entry<String, String> entry : this.entrySet()) {
