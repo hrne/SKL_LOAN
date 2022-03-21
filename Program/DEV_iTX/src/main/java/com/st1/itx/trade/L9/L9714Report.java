@@ -33,8 +33,8 @@ public class L9714Report extends MakeReport {
 	String f8 = "";
 	String f9 = "";
 	String f10 = "";
-	String isday = "";
-	String ieday = "";
+	String f11 = "";
+	String f12 = "";
 	
 	
 	int cnt = 0;
@@ -96,7 +96,7 @@ public class L9714Report extends MakeReport {
 
 		this.print(-28, colCount + 1, "┌──────────────┬────────────────┬────────────────┐");
 		this.print(-29, colCount + 1,
-				"│繳息所屬年月                │                      繳息金額　│                    用途別      │");
+				"│繳息所屬年月                │                      繳息金額　│                        用途別  │");
 		this.print(-30, colCount + 1, "├──────────────┼────────────────┼────────────────┤");
 		this.print(-31, colCount + 1,
 				"│自                          │                                │                                │");
@@ -119,29 +119,26 @@ public class L9714Report extends MakeReport {
 		tmp = String.format("%07d", Integer.valueOf(f2)) + "-" + String.format("%03d", Integer.valueOf(f3));
 		this.print(-25, colCount + 18, tmp);
 		// 最初貸款金額
-		this.print(-25, colCount + 50, showAmt(f4), "R");
+		this.print(-25, colCount + 50, formatAmt(f4,0), "R");
 		// 貸款起日
-		this.print(-25, colCount + 64, showRocDate(f5, 1), "R");
+		this.print(-25, colCount + 64, showRocDate(f11, 1), "R"); 
 		// 貸款迄日
-		this.print(-25, colCount + 78, showRocDate(f6, 1), "R");
+		this.print(-25, colCount + 78, showRocDate(f12, 1), "R");
 		// 本期未償還本金額
-		this.print(-25, colCount + 98, showAmt(f7), "R");
-		// 繳息所屬年月
-		if (ieday.length() == 6) {
-			this.print(-32, colCount + 7, ieday.substring(0, 2) + " 年 " + ieday.substring(2, 4) + " 月");
-		} else {
-
-			this.print(-32, colCount + 6, ieday.substring(0, 3) + " 年 " + ieday.substring(3, 5) + " 月");
-		}
+		this.print(-25, colCount + 98, formatAmt(f7,0), "R");
+		// 繳息期間
+		this.print(-31, colCount + 7, showRocDate(f5 + "01", 5)); // showRocDate 吃 yyymmdd, 加個dummy
+		this.print(-32, colCount + 7, showRocDate(f6 + "01", 5)); // showRocDate 吃 yyymmdd, 加個dummy
+		// 繳息金額
+		this.print(-31, colCount + 63, formatAmt(f9, 0), "R");
+		// 用途別
+		this.print(-31, colCount + 97, f8, "R");
 
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 
 		this.info("L9714Report exec");
-
-		isday = titaVo.get("ACCTDATE_ST");
-		ieday = titaVo.get("ACCTDATE_ED");
 
 		List<Map<String, String>> l9714List = null;
 
@@ -153,7 +150,7 @@ public class L9714Report extends MakeReport {
 			this.info("L9714ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 
-		if (l9714List.size() == 0 || l9714List.isEmpty()) {
+		if (l9714List == null || l9714List.isEmpty()) {
 			return false;
 		}
 
@@ -172,12 +169,15 @@ public class L9714Report extends MakeReport {
 					f5 = tL9714Vo.get("F5");
 					f6 = tL9714Vo.get("F6");
 					f7 = tL9714Vo.get("F7");
+					f8 = tL9714Vo.get("F8");
+					f9 = tL9714Vo.get("F9");
 					f10 = tL9714Vo.get("F10");
+					f11 = tL9714Vo.get("F11");
+					f12 = tL9714Vo.get("F12");
 					this.newPage();
 					cnt = 0;
 
 				}
-				report(tL9714Vo);
 				
 				printEnd();
 			}
@@ -191,6 +191,11 @@ public class L9714Report extends MakeReport {
 			f5 = "0";
 			f6 = "0";
 			f7 = "0";
+			f8 = "";
+			f9 = "0";
+			f10 = "0";
+			f11 = "0";
+			f12 = "0";
 			printHeader();
 
 			printEnd();
@@ -212,72 +217,4 @@ public class L9714Report extends MakeReport {
 		this.print(-34, colCount + 1, " ( 註１：有※註記的欄位，由借戶自行填寫 )");
 		this.print(-35, colCount + 1, " ( 註２：申報所得稅─非自用住宅借款利息，不得列舉 )");
 	}
-
-
-	private void report(Map<String, String> tL9714Vo) {
-		String tmp = "";
-
-		cnt += 1;
-		switch (tL9714Vo.get("F8")) {
-		case "01":
-			tmp = "週轉金";
-			break;
-		case "02":
-			tmp = "購置不動產";
-			break;
-		case "03":
-			tmp = "營業用資產";
-			break;
-		case "04":
-			tmp = "固定資產";
-			break;
-		case "05":
-			tmp = "企業投資";
-			break;
-		case "06":
-			tmp = "購置動產";
-			break;
-		case "09":
-			tmp = "其他";
-			break;
-		default:
-			break;
-		}
-
-		if (cnt == 1) {
-
-			if (isday.length() == 6) {
-				this.print(-31, colCount + 7, isday.substring(0, 2) + " 年 " + isday.substring(2, 4) + " 月");
-			} else {
-
-				this.print(-31, colCount + 6, isday.substring(0, 3) + " 年 " + isday.substring(3, 5) + " 月");
-			}
-		} else if (cnt == 2) {
-
-			if (ieday.length() == 6) {
-				this.print(-32, colCount + 7, ieday.substring(0, 2) + " 年 " + ieday.substring(2, 4) + " 月");
-			} else {
-				this.print(-32, colCount + 6, ieday.substring(0, 3) + " 年 " + ieday.substring(3, 5) + " 月");
-			}
-		} else {
-			this.print(1, colCount + 1,
-					"│                            │                                │                                │");
-		}
-		// 繳息金額
-		this.print(0, colCount + 63, showAmt(tL9714Vo.get("F9")), "R");
-		// 用途別
-		this.print(0, colCount + 87, tmp);
-	}
-
-	/**
-	 * 金額格式化
-	 * */
-	private String showAmt(String xamt) {
-		if (xamt == null || xamt.equals("") || xamt.equals("0")) {
-			return "";
-		}
-		int amt = Integer.valueOf(xamt);
-		return String.format("%,d", amt);
-	}
-
 }

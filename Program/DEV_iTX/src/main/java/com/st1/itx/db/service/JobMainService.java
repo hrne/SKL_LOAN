@@ -300,10 +300,14 @@ public interface JobMainService {
    * (年底日日終批次)維護 YearlyHouseLoanInt 每年房屋擔保借款繳息工作檔 
    * @param  tbsdyf int
    * @param  empNo String
+   * @param  StartMonth int
+   * @param  EndMonth int
+   * @param  CustNo int
+   * @param  AcctCode String
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L9_YearlyHouseLoanInt_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+  public void Usp_L9_YearlyHouseLoanInt_Upd(int tbsdyf,  String empNo,int StartMonth,int EndMonth,int CustNo,String AcctCode, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>

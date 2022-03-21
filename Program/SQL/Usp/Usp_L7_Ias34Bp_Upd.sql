@@ -1,8 +1,8 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Bp_Upd"
+create or replace NONEDITIONABLE PROCEDURE "Usp_L7_Ias34Bp_Upd"
 (
 -- 程式功能：維護 Ias34Bp 每月IAS34資料欄位清單B檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_Ias34Bp_Upd"(20200420,'999999');
+-- 執行方式：EXEC "Usp_L7_Ias34Bp_Upd"(20211230,'999999');
 --
 
     -- 參數
@@ -47,7 +47,8 @@ BEGIN
     ;
 
     -- 寫入資料
-    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp LoanRateChange');
+    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp');
+    INS_CNT := 0;
 
     INSERT INTO "Ias34Bp"
     SELECT
@@ -94,6 +95,17 @@ BEGIN
                                       AND LRC."FacmNo" = LBM."FacmNo"
                                       AND LRC."BormNo" = LBM."BormNo"
                                       AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
+        LEFT JOIN (
+            SELECT DISTINCT
+                   "CustNo"
+                 , "FacmNo"
+                 , "BormNo"
+                 , "Status"
+            FROM "LoanRateChange"
+            WHERE "Status" = 2 -- 找出任一筆有建過加碼的資料
+        ) LRC_2 ON LRC_2."CustNo" = LBM."CustNo"
+               AND LRC_2."FacmNo" = LBM."FacmNo"
+               AND LRC_2."BormNo" = LBM."BormNo"
         LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
                                AND FAC."FacmNo" = LBM."FacmNo"
         LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
@@ -111,7 +123,7 @@ BEGIN
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."FirstAdjRateDate",0) / 100) > YYYYMM
           AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
-          AND LRC."Status" NOT IN (2)     -- 剔除有建加碼資料
+          AND NVL(LRC_2."Status",0) != 2 -- 剔除有建加碼資料
         UNION
         SELECT LBM."CustNo"
              , LBM."FacmNo"
@@ -126,6 +138,17 @@ BEGIN
                                       AND LRC."FacmNo" = LBM."FacmNo"
                                       AND LRC."BormNo" = LBM."BormNo"
                                       AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
+        LEFT JOIN (
+            SELECT DISTINCT
+                   "CustNo"
+                 , "FacmNo"
+                 , "BormNo"
+                 , "Status"
+            FROM "LoanRateChange"
+            WHERE "Status" = 2 -- 找出任一筆有建過加碼的資料
+        ) LRC_2 ON LRC_2."CustNo" = LBM."CustNo"
+               AND LRC_2."FacmNo" = LBM."FacmNo"
+               AND LRC_2."BormNo" = LBM."BormNo"
         LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
                                AND FAC."FacmNo" = LBM."FacmNo"
         LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
@@ -143,7 +166,7 @@ BEGIN
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."NextAdjRateDate",0) / 100) > YYYYMM
           AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
-          AND LRC."Status" NOT IN (2)     -- 剔除有建加碼資料
+          AND NVL(LRC_2."Status",0) != 2 -- 剔除有建加碼資料
       ) C ON C."CustNo"  = M."CustNo"
          AND C."FacmNo"  = M."FacmNo"
          AND C."BormNo"  = M."BormNo"
@@ -165,48 +188,7 @@ BEGIN
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;
-    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp LoanRateChange END');
-
-
-    -- 寫入資料
-    -- 浮動階梯未生效加碼
---    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp 浮動階梯未生效加碼');
---
---    INSERT INTO "Ias34Bp"
---    SELECT
---           YYYYMM                                AS "DataYM"            -- 資料年月
---         , NVL(M."CustNo",0)                     AS "CustNo"            -- 戶號
---         , NVL(M."CustId",' ')                   AS "CustId"            -- 借款人ID / 統編
---         , NVL(M."FacmNo",0)                     AS "FacmNo"            -- 額度編號
---         , NVL(M."BormNo",0)                     AS "BormNo"            -- 撥款序號
---         , NVL(C."FitRate",0)                    AS "LoanRate"          -- 貸放利率
---         , CASE
---             WHEN NVL(F."Ifrs9StepProdCode",' ') = 'B' THEN 4  -- 浮動階梯
---             WHEN NVL(F."Ifrs9StepProdCode",' ') = 'A' THEN 3  -- 固定階梯
---             WHEN NVL(M."RateCode", 0)  IN (1, 3)     THEN 1  -- 機動
---             WHEN NVL(M."RateCode", 0)  = 2           THEN 2  -- 固定
---             ELSE NVL(M."RateCode", 0)
---           END                                   AS "RateCode"          -- 利率調整方式（1=機動；2=固定；3=固定階梯；4=浮動階梯）
---         , NVL(C."EffectDate",0)                 AS "EffectDate"        -- 利率欄位生效日（西元年）
---         , JOB_START_TIME                        AS "CreateDate"        -- 建檔日期時間
---         , EmpNo                                 AS "CreateEmpNo"       -- 建檔人員
---         , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
---         , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
---    FROM   "Ifrs9LoanData" M
---      LEFT JOIN "Ifrs9FacData" F  ON F."DataYM"  = M."DataYM"
---                                 AND F."CustNo"  = M."CustNo"
---                                 AND F."FacmNo"  = M."FacmNo"
---      LEFT JOIN "LoanRateChange" C     ON C."CustNo"  = M."CustNo"
---                                      AND C."FacmNo"  = M."FacmNo"
---                                      AND C."BormNo"  = M."BormNo"
---    WHERE  M."DataYM"  =  YYYYMM
---      AND  M."Status" IN (0, 2, 7)   -- 正常件, 催收, 部分轉呆
---      ;
---
---    INS_CNT := INS_CNT + sql%rowcount;
---    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp 浮動階梯未生效加碼 END');
-
-
+    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp END');
     DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp INS_CNT=' || INS_CNT);
 
 

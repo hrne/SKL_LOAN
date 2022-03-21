@@ -263,17 +263,19 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			lLoanCloseBreach.add(iVo);
 		} else {
 			Boolean isAddList = true;
-			for (LoanCloseBreachVo v : lLoanCloseBreach) {
-				if (iVo.getFacmNo() == v.getFacmNo() && iVo.getEndDate() == v.getEndDate()
-						&& iVo.getAcDate() == v.getAcDate() && iVo.getTitaTxCd().equals(v.getTitaTxCd())
-						&& iVo.getTitaKinBr().equals(v.getTitaKinBr()) && iVo.getTitaTlrNo().equals(v.getTitaTlrNo())
-						&& iVo.getTitaTxtNo().equals(v.getTitaTxtNo())) {
-					v.setExtraRepay(v.getExtraRepay().add(iVo.getExtraRepay()));
-					v.setBormNo(0);
-					isAddList = false;
-					break;
-				}
-			}
+			// for (LoanCloseBreachVo v : lLoanCloseBreach) {
+			// if (iVo.getFacmNo() == v.getFacmNo() && iVo.getEndDate() == v.getEndDate()
+			// && iVo.getAcDate() == v.getAcDate() &&
+			// iVo.getTitaTxCd().equals(v.getTitaTxCd())
+			// && iVo.getTitaKinBr().equals(v.getTitaKinBr()) &&
+			// iVo.getTitaTlrNo().equals(v.getTitaTlrNo())
+			// && iVo.getTitaTxtNo().equals(v.getTitaTxtNo())) {
+			// v.setExtraRepay(v.getExtraRepay().add(iVo.getExtraRepay()));
+			// v.setBormNo(0);
+			// isAddList = false;
+			// break;
+			// }
+			// }
 			if (isAddList) {
 				lLoanCloseBreach.add(iVo);
 			}
@@ -361,6 +363,9 @@ public class LoanCloseBreachCom extends TradeBuffer {
 				.divide(new BigDecimal(100), 9, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
 		calcVo.setBreachStartAmt(wkBreachStartAmt);
 
+		this.info("wkBreachStartAmt 違約起算金額 = " + wkBreachStartAmt);
+		this.info("違約適用方式 = " + calcVo.getBreachCode());
+
 		// 違約金計算金額
 		switch (calcVo.getBreachCode()) { // 違約適用方式
 		case "001": // "001":綁約專案[按年分段]
@@ -412,6 +417,9 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			this.info("calcCloseBreachAmtRoutine end D");
 			return calcVo;
 		}
+
+		this.info("wkCloseBreachAmt 算式 = " + wkBreachAmount + " * " + wkBreachRate + " / 100 ");
+
 		// 清償違約金 = 計算金額 * 計算百分比 / 100
 		// 2022-03-16 智偉修改:模仿AS400運算過程中小數位數最多9位，超過時無條件捨去
 		wkCloseBreachAmt = wkBreachAmount.multiply(wkBreachRate).divide(new BigDecimal(100), 9, RoundingMode.DOWN)

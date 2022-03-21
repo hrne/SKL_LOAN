@@ -16,12 +16,7 @@ import javax.persistence.Embeddable;
 public class JobMainId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2821264237950133459L;
-
-// 交易序號
+  // 交易序號
   /* 交易序號 */
   @Column(name = "`TxSeq`", length = 20)
   private String txSeq = " ";

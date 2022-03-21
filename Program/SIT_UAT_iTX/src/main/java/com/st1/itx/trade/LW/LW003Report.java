@@ -154,7 +154,7 @@ public class LW003Report extends MakeReport {
 			}
 
 			int rCol = q == 1 ? 7 : q == 2 ? 10 : q == 3 ? 13 : q == 4 ? 16 : 17;
-			
+
 			for (int y = 3; y <= 23; y++) {
 				makeExcel.formulaCalculate(y, rCol);
 			}
@@ -220,22 +220,18 @@ public class LW003Report extends MakeReport {
 					break;
 				}
 
-				
 				// 判斷欄位
 				col = Quarter == 1 ? 6 : Quarter == 2 ? 9 : Quarter == 3 ? 12 : Quarter == 4 ? 15 : 16;
-			
-			
-				
+
 				if (quarter == 5) {
 					return;
 				}
-				
+
+				makeExcel.setValue(row, col, bonus, "#,##0");
+
 				if (num == wkMonth) {
 					break;
 				}
-				
-				makeExcel.setValue(row, col, bonus, "#,##0");
-				
 				num++;
 			}
 
@@ -272,21 +268,20 @@ public class LW003Report extends MakeReport {
 					row = 17;
 					break;
 				}
-				
+
 				// 判斷欄位
 				col = Quarter == 1 ? 6 : Quarter == 2 ? 9 : Quarter == 3 ? 12 : Quarter == 4 ? 15 : 16;
-			
-				
+
 				if (quarter == 5) {
 					return;
 				}
-				
+
+				makeExcel.setValue(row, col, bonus, "#,##0");
+
 				if (num == wkMonth) {
 					break;
 				}
-				
-				makeExcel.setValue(row, col, bonus, "#,##0");
-				
+
 				num++;
 
 			}
@@ -327,16 +322,18 @@ public class LW003Report extends MakeReport {
 
 				// 判斷欄位
 				col = Quarter == 1 ? 6 : Quarter == 2 ? 9 : Quarter == 3 ? 12 : Quarter == 4 ? 15 : 16;
-				
+
 				if (quarter == 5) {
 					return;
 				}
-				
+
+				makeExcel.setValue(row, col, bonus, "#,##0");
+
 				if (num == wkMonth) {
 					break;
 				}
 
-				makeExcel.setValue(row, col, bonus, "#,##0");
+				num++;
 			}
 		}
 

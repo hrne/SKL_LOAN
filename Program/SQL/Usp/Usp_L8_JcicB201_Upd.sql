@@ -1,9 +1,8 @@
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB201_Upd"
+create or replace NONEDITIONABLE PROCEDURE "Usp_L8_JcicB201_Upd"
 (
 -- 程式功能：維護 JcicB201 每月聯徵授信餘額月報資料檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB201_Upd"(20210531,'System');
+-- 執行方式：EXEC "Usp_L8_JcicB201_Upd"(20211230,'999999');
 --
 
     -- 參數
@@ -119,7 +118,7 @@ BEGIN
          , G."ApplNo"                          AS "ApplNo"        -- 核准號碼
          , G."CustId"                          AS "CustId"        -- 保證人身份統一編號
          , G."Seq"                             AS "ROW_NUM"       -- 序號（同一核准號碼編列流水號）
-         , 0                                   AS "ApplNoCount"   -- 筆數（同一核准號碼）
+         , S."ApplNoCount"                     AS "ApplNoCount"   -- 筆數（同一核准號碼）
          , G."DataSource"                      AS "Source"        -- 資料來源(1=保證人檔 2=擔保品提供人與授信戶關係檔 3=共同借款人關係檔)
          , G."GuaRelCode"                      AS "GuaRelCode"    -- 保證人關係代碼
          , G."GuaRelJcic"                      AS "GuaRelJcic"    -- 保證人關係ＪＣＩＣ代碼
@@ -134,6 +133,12 @@ BEGIN
            ELSE ' '
            END                               AS "GuaTypeJcic"   -- 保證類別ＪＣＩＣ代碼
     FROM OrderedData G
+    LEFT JOIN (
+        SELECT "ApplNo"
+             , COUNT(*) AS "ApplNoCount"
+        FROM OrderedData
+        GROUP BY "ApplNo"
+    ) S ON S."ApplNo" = G."ApplNo"
     WHERE G."DetailSeq" = 1
     ;
 
@@ -150,7 +155,7 @@ BEGIN
     FOR OccursNum IN 1 .. 5
     LOOP
       INSERT INTO "JcicB201"
-      
+
     WITH TOTAL AS (
       -- 合計資料
       SELECT F."MainApplNo"
@@ -582,8 +587,8 @@ BEGIN
            , ' '                                   AS "ExtraStatusCode"   -- 補充揭露案件註記－案件情形
            , ' '                                   AS "Filler74A"         -- 空白
            , YYYYMM - 191100                       AS "JcicDataYM"        -- 資料所屬年月
-           , CASE WHEN WK5."ApplNo" IS NULL THEN 'Y'
-                  WHEN WK5."ApplNoCount" <= OccursNum * 5 THEN 'Y'
+           , CASE WHEN NVL(WK5."ApplNo",0) = 0 THEN 'Y' -- 第五個保證人資料為空
+                  WHEN WK5."ROW_NUM" = WK5."ApplNoCount" THEN 'Y' --第五個保證人資料的序號與總筆數相等
                   ELSE 'N'
              END                                   AS "DataEnd"           -- 資料結束註記
            , JOB_START_TIME                        AS "CreateDate"        -- 建檔日期時間

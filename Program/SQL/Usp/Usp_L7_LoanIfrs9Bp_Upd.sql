@@ -1,8 +1,8 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Bp_Upd"
+create or replace NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Bp_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Bp 每月IFRS9欄位清單B檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_LoanIfrs9Bp_Upd"(20200420,'System');
+-- 執行方式：EXEC "Usp_L7_LoanIfrs9Bp_Upd"(20211230,'999999');
 --
 
     -- 參數
@@ -95,6 +95,17 @@ BEGIN
                                       AND LRC."FacmNo" = LBM."FacmNo"
                                       AND LRC."BormNo" = LBM."BormNo"
                                       AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
+        LEFT JOIN (
+            SELECT DISTINCT
+                   "CustNo"
+                 , "FacmNo"
+                 , "BormNo"
+                 , "Status"
+            FROM "LoanRateChange"
+            WHERE "Status" = 2 -- 找出任一筆有建過加碼的資料
+        ) LRC_2 ON LRC_2."CustNo" = LBM."CustNo"
+               AND LRC_2."FacmNo" = LBM."FacmNo"
+               AND LRC_2."BormNo" = LBM."BormNo"
         LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
                                AND FAC."FacmNo" = LBM."FacmNo"
         LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
@@ -112,7 +123,7 @@ BEGIN
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."FirstAdjRateDate",0) / 100) > YYYYMM
           AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
-          AND LRC."Status" NOT IN (2)     -- 剔除有建加碼資料
+          AND NVL(LRC_2."Status",0) != 2 -- 剔除有建加碼資料
         UNION
         SELECT LBM."CustNo"
              , LBM."FacmNo"
@@ -127,6 +138,17 @@ BEGIN
                                       AND LRC."FacmNo" = LBM."FacmNo"
                                       AND LRC."BormNo" = LBM."BormNo"
                                       AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
+        LEFT JOIN (
+            SELECT DISTINCT
+                   "CustNo"
+                 , "FacmNo"
+                 , "BormNo"
+                 , "Status"
+            FROM "LoanRateChange"
+            WHERE "Status" = 2 -- 找出任一筆有建過加碼的資料
+        ) LRC_2 ON LRC_2."CustNo" = LBM."CustNo"
+               AND LRC_2."FacmNo" = LBM."FacmNo"
+               AND LRC_2."BormNo" = LBM."BormNo"
         LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
                                AND FAC."FacmNo" = LBM."FacmNo"
         LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
@@ -144,7 +166,7 @@ BEGIN
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."NextAdjRateDate",0) / 100) > YYYYMM
           AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
-          AND LRC."Status" NOT IN (2)     -- 剔除有建加碼資料
+          AND NVL(LRC_2."Status",0) != 2 -- 剔除有建加碼資料
       ) C ON C."CustNo"  = M."CustNo"
          AND C."FacmNo"  = M."FacmNo"
          AND C."BormNo"  = M."BormNo"

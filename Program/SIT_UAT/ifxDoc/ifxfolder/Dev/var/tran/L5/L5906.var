@@ -101,6 +101,17 @@ E(0,1)ASGN(LOOP$)
 #OOFacmNo=A,3,O
 ! 使用號碼
 #OOActUse=X,1,O
+! 繳息迄日
+#OOPrevPayIntDate=D,7,I
+! 寬限到期日
+#OOGraceDate=D,7,I
+! 放款餘額
+#OOLoanBal=m,14.2,S
+#OOLoanBal1=m,14,S
+E(0,#OOLoanBal)
+#OOLoanBalX=X,17,O
+C(3,#OOLoanBal1,0,S,X(#OOLoanBal1))
+
 
 #OOBUF_EDIT=X,107,S
 T(2,2+#OOCustNo+#OOFacmNo)
@@ -126,7 +137,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5116; ntxbuf=#OOBUF_DELETE})
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L5906
-#OOCustNo#OOCustName#OOFacmNo#OOActUse
+#OOCustNo#OOCustName#OOFacmNo#OOActUse#OOPrevPayIntDate#OOGraceDate#OOLoanBal
 ^
 </sub>
 
@@ -156,6 +167,15 @@ TXFORM=L5906
 ! 額度編號
 #OOFacmNo=額度編號
 {width:85,align:'center'}
+! 繳息迄日
+#OOPrevPayIntDate=繳息迄日
+{width:90,align:'center'}
+! 放款餘額
+#OOLoanBalX=放款餘額
+{width:105,align:'right'}
+! 寬限到期日
+#OOGraceDate=寬限到期日
+{width:90,align:'center'}
 ! 使用號碼
 #OOActUse=使用碼
 {width:85,align:'center'}

@@ -97,7 +97,7 @@ public interface JobMainRepository extends JpaRepository<JobMain, JobMainId> {
 
   // (年底日日終批次)維護 YearlyHouseLoanInt 每年房屋擔保借款繳息工作檔 
   @Procedure(value = "\"Usp_L9_YearlyHouseLoanInt_Upd\"")
-  public void uspL9YearlyhouseloanintUpd(int tbsdyf,  String empNo);
+  public void uspL9YearlyhouseloanintUpd(int tbsdyf,  String empNo,int StartMonth,int EndMonth,int CustNo,String AcctCode);
 
   // (月底日日終批次)維護 JcicB201 每月聯徵授信餘額月報資料檔
   @Procedure(value = "\"Usp_L8_JcicB201_Upd\"")

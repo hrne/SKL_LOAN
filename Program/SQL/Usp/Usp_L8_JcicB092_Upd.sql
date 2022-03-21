@@ -1,8 +1,8 @@
-create or replace PROCEDURE "Usp_L8_JcicB092_Upd"
+create or replace NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd"
 (
 -- 程式功能：維護 JcicB092 每月聯徵不動產擔保品明細檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB092_Upd"(20200430,'System');
+-- 執行方式：EXEC "Usp_L8_JcicB092_Upd"(20211230,'999999');
 --
 
     -- 參數
@@ -125,10 +125,10 @@ BEGIN
          , CASE
              WHEN  NVL(CD2."ClTypeJCIC",' ') IN ('20', '21', '22', '23', '24', '2X') THEN '000000000'  -- "ParkingTypeCode" = 'X'
              WHEN  NVL(B."ParkingTypeCode",'1') IN ('1')        THEN '000000000'  -- "ParkingTypeCode" = '0' 無車位
-             WHEN  NVL("ClBuildingParking"."Area",0) = 0        THEN '000000000'
+             WHEN  NVL(CP."ParkingArea",0) = 0        THEN '000000000'
              WHEN  NVL(B."ParkingProperty",'N') = 'Y'
 --              THEN SUBSTR('000000000' || TRUNC(NVL("ClBuildingParking"."Area",0) / 0.3025, 2), -9)
-                THEN to_char(TRUNC(NVL("ClBuildingParking"."Area",0) / 0.3025, 2), 'FM000000.00')
+                THEN to_char(TRUNC(NVL(CP."ParkingArea",0) / 0.3025, 2), 'FM000000.00')
              ELSE '000000000'
            END                                   AS "Area"              -- 車位單獨登記面積 (1平方公尺=0.3025坪)
          , CASE
@@ -154,11 +154,18 @@ BEGIN
       LEFT JOIN "ClBuilding"  B     ON B."ClCode1" = CM."ClCode1"
                                    AND B."ClCode2" = CM."ClCode2"
                                    AND B."ClNo"    = CM."ClNo"
-      LEFT JOIN "ClBuildingParking" ON "ClBuildingParking"."ClCode1"      = B."ClCode1"
-                                   AND "ClBuildingParking"."ClCode2"      = B."ClCode2"
-                                   AND "ClBuildingParking"."ClNo"         = B."ClNo"
-                                   AND "ClBuildingParking"."ParkingBdNo1" = B."BdNo1"
-                                   AND "ClBuildingParking"."ParkingBdNo2" = B."BdNo2"
+      LEFT JOIN (
+        SELECT "ClCode1"
+             , "ClCode2"
+             , "ClNo"
+             , SUM("ParkingArea") AS "ParkingArea"
+        FROM "ClParking"
+        GROUP BY  "ClCode1"
+               , "ClCode2"
+               , "ClNo"
+      ) CP ON CP."ClCode1"      = B."ClCode1"
+          AND CP."ClCode2"      = B."ClCode2"
+          AND CP."ClNo"         = B."ClNo"
       LEFT JOIN "ClLand"  L    ON L."ClCode1" = CM."ClCode1"
                               AND L."ClCode2" = CM."ClCode2"
                               AND L."ClNo"    = CM."ClNo"
@@ -441,4 +448,3 @@ END;
 --     , ' '      as "Area"                -- varchar2(9)
 --     , 0        as "LandOwnedArea"       -- decimal(14, 2)
 --     , 0        as "LineAmt"             -- decimal(14, 0)
-

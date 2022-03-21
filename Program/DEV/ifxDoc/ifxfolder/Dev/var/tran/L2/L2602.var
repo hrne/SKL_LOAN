@@ -141,7 +141,6 @@ T(2,@FdDOC_DT,#ShowFd)
 T(2,@FdFEE,#ShowFd)
 T(2,@FdFEE_IND,#ShowFd)
 T(2,@FdCASE_NO,#ShowFd)
-T(2,@FdRMK,#ShowFd)
 									
 !紀錄號碼
 #RecordNo=A,7,S

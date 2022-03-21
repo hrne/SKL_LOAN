@@ -40,87 +40,51 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iCUSTNO = titaVo.get("CustNo");
 		String iFACMNO = titaVo.get("FacmNo");
 		String iUSEFG = titaVo.get("UsageCode");
-		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
-		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ED")) + 19110000);
+		String iYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("YearMonth")) + 191100);
 
-		String sql = "SELECT \"Fn_ParseEOL\"(C.\"CustName\",0) F0";
-		sql += "            ,C.\"CustId\" F1";
-		sql += "            ,F.\"CustNo\" F2";
-		sql += "            ,F.\"FacmNo\" F3";
-		sql += "            ,F.\"DrawdownAmt\" F4";
-		sql += "            ,F.\"FirstDrawdownDate\" F5";
-		sql += "            ,F.\"MaturityDate\" F6";
-		sql += "            ,Y.\"LoanBal\" F7";
-		sql += "            ,T.\"UsageCode\" F8";
-		sql += "            ,NVL(T.\"Interest\", 0) F9";
-		sql += "            ,Y.\"HouseBuyDate\" F10";
-		sql += "      FROM(SELECT F.\"CustNo\"";
-		sql += "                 ,F.\"FacmNo\"";
-		sql += "                 ,F.\"FirstDrawdownDate\"";
-		sql += "                 ,F.\"MaturityDate\"";
-		sql += "                 ,SUM(M.\"DrawdownAmt\") \"DrawdownAmt\"";
-		sql += "                 ,SUM(M.\"LoanBal\") \"LoanBal\"";
-		sql += "           FROM \"FacMain\" F";
-		sql += "           LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
-		sql += "                                      AND M.\"FacmNo\" = F.\"FacmNo\"";
-		sql += "           WHERE F.\"CustNo\" = :icustno";
-		if (!iFACMNO.equals("000")) {
-			sql += " AND F.\"FacmNo\" = :ifacmno";
-		}
-		sql += "           GROUP BY F.\"CustNo\"";
-		sql += "                   ,F.\"FacmNo\"";
-		sql += "                   ,F.\"FirstDrawdownDate\"";
-		sql += "                   ,F.\"MaturityDate\" ";
-		sql += "          ) F";
-		sql += "      LEFT JOIN (SELECT T.\"CustNo\"";
-		sql += "                       ,T.\"FacmNo\"";
-		sql += "                       ,M.\"UsageCode\"";
-		sql += "                       ,SUM(T.\"Interest\") \"Interest\"";
-		sql += "                 FROM (SELECT T.\"CustNo\"";
-		sql += "                             ,T.\"FacmNo\"";
-		sql += "                             ,T.\"BormNo\"";
-		sql += "                             ,T.\"Interest\" + T.\"DelayInt\" + T.\"BreachAmt\" - T.\"UnpaidInterest\" - T.\"UnpaidCloseBreach\" - NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt'),0) \"Interest\"";
-		sql += "                       FROM \"LoanBorTx\" T";
-		sql += "                       WHERE T.\"AcDate\" >= :isday";
-		sql += "                         AND T.\"AcDate\" <= :ieday";
-		sql += "                         AND T.\"CustNo\" = :icustno";
-		if (!iFACMNO.equals("000")) {
-			sql += " AND T.\"FacmNo\" = :ifacmno";
-		}
-		sql += "                         AND T.\"TitaHCode\" = '0'";
-		sql += "                      ) T";
-		sql += "                 LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = T.\"CustNo\"";
-		sql += "                                            AND M.\"FacmNo\" = T.\"FacmNo\"";
-		sql += "                                            AND M.\"BormNo\" = T.\"BormNo\"";
-		sql += "                 WHERE T.\"Interest\" > 0 ";
-		if (!iUSEFG.equals("00")) {
-			sql += " AND M.\"UsageCode\" =  :iusefg";
-		}
-		sql += "                 GROUP BY T.\"CustNo\"";
-		sql += "                         ,T.\"FacmNo\"";
-		sql += "                         ,M.\"UsageCode\"";
-		sql += "                ) T ON T.\"CustNo\" = F.\"CustNo\"";
-		sql += "                   AND T.\"FacmNo\" = F.\"FacmNo\"";
-		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\"";
-		sql += "      LEFT JOIN \"YearlyHouseLoanInt\" Y ON Y.\"CustNo\" = T.\"CustNo\"";
-		sql += "                                        AND Y.\"FacmNo\" = T.\"FacmNo\"";
-		sql += "                                        AND Y.\"YearMonth\" = TRUNC( :ieday / 100 )";
-		sql += "      WHERE NVL(T.\"Interest\", 0) > 0";
+		boolean useUsageCode = !"00".equals(iUSEFG);
+		boolean useFacmNo = !"000".equals(iFACMNO);
+
+		String sql = "";
+
+		sql += " SELECT \"Fn_ParseEOL\"(CM.\"CustName\", 0) AS \"CustName\" ";
+		sql += "      , CM.\"CustId\" ";
+		sql += "      , YHLI.\"CustNo\" ";
+		sql += "      , YHLI.\"FacmNo\" ";
+		sql += "      , YHLI.\"LoanAmt\" ";
+		sql += "      , NVL(JSON_VALUE(YHLI.\"JsonFields\", '$.StartMonth'), 0) AS \"StartMonth\" ";
+		sql += "      , NVL(JSON_VALUE(YHLI.\"JsonFields\", '$.EndMonth'), 0)   AS \"EndMonth\" ";
+		sql += "      , YHLI.\"LoanBal\" ";
+		sql += "      , CC.\"Item\"                         AS \"Usage\" ";
+		sql += "      , YHLI.\"YearlyInt\" ";
+		sql += "      , YHLI.\"HouseBuyDate\" ";
+		sql += "      , YHLI.\"FirstDrawdownDate\" ";
+		sql += "      , YHLI.\"MaturityDate\" ";
+		sql += " FROM \"YearlyHouseLoanInt\" YHLI ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = YHLI.\"CustNo\" ";
+		sql += " LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'UsageCode' ";
+		sql += "                        AND CC.\"Code\" = YHLI.\"UsageCode\" ";
+		sql += " WHERE YHLI.\"YearlyInt\" > 0 ";
+		sql += "   AND YHLI.\"YearMonth\" = :iyearmonth";
+		sql += "   AND YHLI.\"CustNo\" = :icustno ";
+		if (useFacmNo)
+			sql += "   AND YHLI.\"FacmNo\" = :ifacmno ";
+		if (useUsageCode)
+			sql += "   AND YHLI.\"UsageCode\" = :iusefg ";
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		query = em.createNativeQuery(sql);
 		query.setParameter("icustno", iCUSTNO);
-		query.setParameter("isday", iSDAY);
-		query.setParameter("ieday", iEDAY);
-		if (!iFACMNO.equals("000")) {
+		query.setParameter("iyearmonth", iYEARMONTH);
+		if (useFacmNo) {
 			query.setParameter("ifacmno", iFACMNO);
 		}
-		if (!iUSEFG.equals("00")) {
+		if (useUsageCode) {
 			query.setParameter("iusefg", iUSEFG);
 		}
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

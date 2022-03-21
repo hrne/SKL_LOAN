@@ -641,19 +641,19 @@ em = null;
   }
 
   @Override
-  public void Usp_L9_YearlyHouseLoanInt_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L9_YearlyHouseLoanInt_Upd(int tbsdyf,  String empNo,int StartMonth,int EndMonth,int CustNo,String AcctCode, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo);
+      jobMainReposDay.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo,StartMonth,EndMonth,CustNo,AcctCode);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo);
+      jobMainReposMon.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo,StartMonth,EndMonth,CustNo,AcctCode);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo);
+      jobMainReposHist.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo,StartMonth,EndMonth,CustNo,AcctCode);
    else
-      jobMainRepos.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo);
+      jobMainRepos.uspL9YearlyhouseloanintUpd(tbsdyf,  empNo,StartMonth,EndMonth,CustNo,AcctCode);
   }
 
   @Override

@@ -398,9 +398,9 @@ public class L4450Batch extends TradeBuffer {
 				} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
 					result = c1.getFacmNo() - c2.getFacmNo();
 				} else if (c1.getDataKind() - c2.getDataKind() != 0) {
-					result = c1.getDataKind() - c2.getDataKind();
+					result = c2.getDataKind() - c1.getDataKind();
 				} else if (c1.getRepayType() - c2.getRepayType() != 0) {
-					result = c2.getRepayType() - c1.getRepayType();
+					result = c1.getRepayType() - c2.getRepayType();
 				} else if (c1.getPayIntDate() - c2.getPayIntDate() != 0) {
 					result = c1.getPayIntDate() - c2.getPayIntDate();
 				} else {
@@ -409,8 +409,12 @@ public class L4450Batch extends TradeBuffer {
 				return result;
 			});
 			for (BaTxVo tBaTxVo : listBaTxVo) {
-				if (tBaTxVo.getDataKind() < 0) {
+				if (tBaTxVo.getDataKind() == -2) {
 					tBaTxVo.setDataKind(1);
+				} else {
+					if (tBaTxVo.getDataKind() == -1) {
+						tBaTxVo.setDataKind(3);
+					}
 				}
 				tmpBorm tmp = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(),
 						tBaTxVo.getDataKind() == 2 ? tBaTxVo.getPayIntDate() : 0);

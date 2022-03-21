@@ -93,7 +93,7 @@ public class LM016Report extends MakeReport {
 				print(0, 37, tLM016Vo.get("F4") == "0" || tLM016Vo.get("F4") == null || tLM016Vo.get("F4").length() == 0 || tLM016Vo.get("F4").equals(" ") ? " " : showDate(tLM016Vo.get("F4"), 1));
 
 				// 繳息迄日
-				print(0, 52, tLM016Vo.get("F4") == "0" || tLM016Vo.get("F3") == null || tLM016Vo.get("F3").length() == 0 || tLM016Vo.get("F3").equals(" ") ? " " : showDate(tLM016Vo.get("F3"), 1));
+				print(0, 52, tLM016Vo.get("F3") == "0" || tLM016Vo.get("F3") == null || tLM016Vo.get("F3").length() == 0 || tLM016Vo.get("F3").equals(" ") ? " " : showDate(tLM016Vo.get("F3"), 1));
 
 				// 貸出金額
 				BigDecimal f5 = tLM016Vo.get("F5") == "0" || tLM016Vo.get("F5") == null || tLM016Vo.get("F5").length() == 0 || tLM016Vo.get("F5").equals(" ") ? BigDecimal.ZERO
@@ -118,7 +118,7 @@ public class LM016Report extends MakeReport {
 		}
 
 		long sno = this.close();
-		// this.toPdf(sno);
+		//this.toPdf(sno);
 
 		if (LM016List != null && LM016List.size() > 0) {
 			return true;

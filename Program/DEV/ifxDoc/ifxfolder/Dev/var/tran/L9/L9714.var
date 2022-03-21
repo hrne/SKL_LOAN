@@ -44,7 +44,7 @@ E(0,0)
 ["#R1+@戶    號",#CustNo],
 ["#R2+@額    度",#FacmNo, " 0:全部 "],
 ["#R3+@用    途",#UsageCode,#UsageCodeX],
-["#R4+@繳息期間",#ACCTDATE_ST,#ACCTDATE_ED],
+["#R4+@資料年月",#YearMonth],
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -97,8 +97,8 @@ CALL(#ALWAYS_HIGHLIGHT)
 #DT1=D,8,S
 T(4,DATE$)
 
-#DT2=D,7,S
-T(1,#DT1,2,7)
+#DT2=A,5,S
+T(1,#DT1,2,5)
 
 !戶號 必須輸入
 #CustNo=A,7,I
@@ -118,17 +118,11 @@ HELP(#UsageCodeHelp)
 T(H,#UsageCode,#UsageCodeHelp)   
 
 !會計日期 必須輸入，不可大於本營業日
-#ACCTDATE_ST=D,7,I
+#YearMonth=A,5,I
 T(2,#DT2)
 @V(7)
 V(5,0,#DT2)
-A(DATE,0,#ACCTDATE_ST)
-
-#ACCTDATE_ED=D,7,I
-T(2,#DT2)
-@V(7)
-V(5,#ACCTDATE_ST,#DT2)
-A(DATE,0,#ACCTDATE_ED)
+A(YM,1,#YearMonth)
 
 <include src="ROM.icf::L1R20.dec"/>
 
@@ -187,8 +181,7 @@ T(3,[L9714] 繳息證明單)
 #CustNo
 #FacmNo
 #UsageCode
-#ACCTDATE_ST
-#ACCTDATE_ED
+#YearMonth
 </sub>
 
 
