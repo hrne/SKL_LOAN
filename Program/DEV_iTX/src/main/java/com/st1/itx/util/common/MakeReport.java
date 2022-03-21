@@ -999,7 +999,8 @@ public class MakeReport extends CommBuffer {
 		List<HashMap<String, Object>> orgMap = new ArrayList<HashMap<String, Object>>();
 
 		try {
-			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), new TypeReference<List<Map<String, Object>>>() {});
+			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), new TypeReference<List<Map<String, Object>>>() {
+			});
 		} catch (IOException e) {
 			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
 		}
@@ -1038,13 +1039,16 @@ public class MakeReport extends CommBuffer {
 			tTxFile.setSignCode(String.valueOf(tCdReport.getSignCode()));
 
 			// 2021-1-5 增加判斷 SignCode == 1 才印
+			// 2022-3-18 xiangwei: 增加以 fontSize 為根據的方程式
+			// 求法是產出實際pdf後對照尺標與座標, 代入ax+b推出適合的公式
+			// 需要採更多樣以保證正確性
 			if (tCdReport.getSignCode() == 1 && !useDefault) {
 				if ("P".equals(pageOrientation)) {
-					this.print(1, 40, signOff0, "C");
-					this.print(1, 40, signOff1, "C");
+					this.print(1, (230 + this.fontSize * -8) / 3, signOff0, "C");
+					this.print(1, (230 + this.fontSize * -8) / 3, signOff1, "C");
 				} else {
-					this.print(1, 85, signOff0, "C");
-					this.print(1, 85, signOff1, "C");
+					this.print(1, 210 + this.fontSize * -14, signOff0, "C");
+					this.print(1, 210 + this.fontSize * -14, signOff1, "C");
 				}
 			}
 		}

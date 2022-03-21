@@ -61,10 +61,10 @@ public class L6R17 extends TradeBuffer {
 //			if (!(tCdEmp.getAgCurInd().equals("Y") || tCdEmp.getAgCurInd().equals("y"))) {
 //				throw new LogicException(titaVo, "E6012", "員工編號 = " + iRimEmployeeNo); // 該員工非現職人員
 //			} else {
-			moveTotaCdEmp(tCdEmp);
+				moveTotaCdEmp(tCdEmp);
 //			}
 		} else {
-			if (iRimFuncCode == 5) {
+			if (iRimFuncCode == 1) {
 				this.info("L6R17 iRimFuncCode : " + iRimFuncCode);
 				this.addList(this.totaVo);
 				return this.sendList();

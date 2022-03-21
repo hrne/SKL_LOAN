@@ -48,7 +48,6 @@
 ["#FdTelNo1+連絡電話１",#TelNo1,#BTN9],["#FdTelNo2+連絡電話２",#TelNo2,#BTN10],
 ["#FdTelNo3+連絡電話３",#TelNo3,#BTN11],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 [#<->#,"#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],
-[#<->#,"#FdReceiveDate+領取日期",#ReceiveDate],
 [#<->#,"#FdRmk1+備註欄",#Rmk1],
 ]
 !---------- AP Button AREA ----------   
@@ -331,7 +330,7 @@ V(2,0)
 ![申請日期]
 !補領或補發時必須輸入
 #ApplDate=D,7,L
-E(0,#SYSDATE)
+E(0,#SYSCDATE)
 ! @V(7)
 ! A(DATE,0,#ApplDate)
 ! V(2,0)
@@ -497,7 +496,6 @@ C(4,#CloseReasonCode,T(3,@CloseReasonCodeX,),$)
 V(H,#AdvanceCloseCodeHelp)
 C(5,#closefg,Y,S,V(2,0))
 
-
 #CloseReasonCodeX=X,20,L
 T(3,)T(H,#CloseReasonCode,#AdvanceCloseCodeHelp)
 
@@ -514,13 +512,11 @@ T(3,)
 C(4,#CollectWayCode,S,$)
 T(H,#CollectWayCode,#CollectWayCodeHelp)
 
-
-
 !領取日期
-#ReceiveDate=D,7,I
-C(3,#CollectWayCode,1,S,$)
-C(3,#CollectWayCode,20,S,$)
-@V(7)A(DATE,0,#ReceiveDate)
+#ReceiveDate=D,7,S
+! C(3,#CollectWayCode,1,S,$)
+! C(3,#CollectWayCode,20,S,$)
+! @V(7)A(DATE,0,#ReceiveDate)
 
 !備註欄
 #Rmk1=x,100,I

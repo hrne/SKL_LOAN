@@ -1623,7 +1623,7 @@ public class BaTxCom extends TradeBuffer {
 									case 2:
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 										this.fireFee = this.fireFee.add(rv.getRvBal());
-										if (rv.getOpenAcDate() >= iEntryDate) {
+										if (rv.getOpenAcDate() / 100 >= iEntryDate / 100) {
 											this.unOpenfireFee = this.unOpenfireFee.add(rv.getRvBal());
 										}
 										break;

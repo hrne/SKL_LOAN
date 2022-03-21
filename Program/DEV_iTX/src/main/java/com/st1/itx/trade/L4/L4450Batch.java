@@ -383,24 +383,22 @@ public class L4450Batch extends TradeBuffer {
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 //			batxvo sort by CustNo, FacmNo, 法務費, 暫收款, RepayType(大至小)PayIntDate(小至大) 
+			for (BaTxVo tBaTxVo : listBaTxVo) {
+				if (tBaTxVo.getRepayType() == 7) {
+					tBaTxVo.setDataKind(-2);
+				}
+				if (tBaTxVo.getDataKind() == 3) {
+					tBaTxVo.setDataKind(-1);
+				}
+			}
 			listBaTxVo.sort((c1, c2) -> {
 				int result = 0;
 				if (c1.getCustNo() - c2.getCustNo() != 0) {
 					result = c1.getCustNo() - c2.getCustNo();
 				} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
 					result = c1.getFacmNo() - c2.getFacmNo();
-				} else if (c1.getRepayType() == 7 && c1.getRepayType() != c2.getRepayType()) {
-					result = -1;
-				} else if (c2.getRepayType() == 7 && c1.getRepayType() != c2.getRepayType()) {
-					result = 1;
 				} else if (c1.getDataKind() - c2.getDataKind() != 0) {
-					if (c1.getDataKind() == 3) {
-						result = -1;
-					} else if (c2.getDataKind() == 3) {
-						result = 1;
-					} else {
-						result = c1.getDataKind() - c2.getDataKind();
-					}
+					result = c1.getDataKind() - c2.getDataKind();
 				} else if (c1.getRepayType() - c2.getRepayType() != 0) {
 					result = c2.getRepayType() - c1.getRepayType();
 				} else if (c1.getPayIntDate() - c2.getPayIntDate() != 0) {
@@ -411,15 +409,11 @@ public class L4450Batch extends TradeBuffer {
 				return result;
 			});
 			for (BaTxVo tBaTxVo : listBaTxVo) {
-
+				if (tBaTxVo.getDataKind() < 0) {
+					tBaTxVo.setDataKind(1);
+				}
 				tmpBorm tmp = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(),
 						tBaTxVo.getDataKind() == 2 ? tBaTxVo.getPayIntDate() : 0);
-				this.info("L4450 Test's Log Start");
-				this.info("CustNo : " + tmp.getCustNo());
-				this.info("FacmNo : " + tmp.getFacmNo());
-				this.info("DataKind : " + tBaTxVo.getDataKind());
-				this.info("RepayType : " + tBaTxVo.getRepayType());
-				this.info("PayIntDate : " + tBaTxVo.getPayIntDate());
 // 
 
 //				因應此交易為提前做，故入帳日會大於應繳日，排除下一期之試算
@@ -436,7 +430,7 @@ public class L4450Batch extends TradeBuffer {
 					continue;
 				}
 				// 是否有還款資料
-				if (tBaTxVo.getRepayType() >= 1 && tBaTxVo.getRepayType() <= 3 ) {
+				if (tBaTxVo.getRepayType() >= 1 && tBaTxVo.getRepayType() <= 3) {
 					isLoanRepay = true;
 				}
 
@@ -544,18 +538,21 @@ public class L4450Batch extends TradeBuffer {
 				}
 //				應扣金額 shPayAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
 
+				BigDecimal unPaidAmt = tBaTxVo.getUnPaidAmt();
+
+//				短繳合計於第一筆期款
+				if (tBaTxVo.getDataKind() == 2) {
+					if (shortAmtMap.get(tmp2) != null && shortAmtMap.get(tmp2).compareTo(BigDecimal.ZERO) > 0) {
+						unPaidAmt = unPaidAmt.add(shortAmtMap.get(tmp2));
+						shortAmtMap.put(tmp2, BigDecimal.ZERO);
+					}
+				}
+
 				if (shPayAmtMap.containsKey(tmp)) {
-					shPayAmtMap.put(tmp, tBaTxVo.getUnPaidAmt().add(shPayAmtMap.get(tmp)));
+					shPayAmtMap.put(tmp, unPaidAmt.add(shPayAmtMap.get(tmp)));
 				} else {
-					shPayAmtMap.put(tmp, tBaTxVo.getUnPaidAmt());
+					shPayAmtMap.put(tmp, unPaidAmt);
 				}
-
-//				短繳合計於第一筆欠款
-				if (shortAmtMap.get(tmp2) != null && shortAmtMap.get(tmp2).compareTo(BigDecimal.ZERO) > 0) {
-					shPayAmtMap.put(tmp, shPayAmtMap.get(tmp).add(shortAmtMap.get(tmp2)));
-					shortAmtMap.put(tmp2, BigDecimal.ZERO);
-				}
-
 //              除火險費外可暫收抵繳
 //				應扣金額 shPayAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
 
@@ -565,29 +562,29 @@ public class L4450Batch extends TradeBuffer {
 //				暫收款(目前額度下)=暫收款(目前額度下)-應扣金額
 				if (tBaTxVo.getRepayType() == 5) {
 					if (repAmtMap.containsKey(tmp)) {
-						repAmtMap.put(tmp, repAmtMap.get(tmp).add(tBaTxVo.getUnPaidAmt()));
+						repAmtMap.put(tmp, repAmtMap.get(tmp).add(unPaidAmt));
 					} else {
-						repAmtMap.put(tmp, tBaTxVo.getUnPaidAmt());
+						repAmtMap.put(tmp, unPaidAmt);
 					}
 //				合計至額度，限額計算用
 					if (repAmtFacMap.containsKey(tmp2)) {
-						repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(tBaTxVo.getUnPaidAmt()));
+						repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(unPaidAmt));
 					} else {
-						repAmtFacMap.put(tmp2, tBaTxVo.getUnPaidAmt());
+						repAmtFacMap.put(tmp2, unPaidAmt);
 					}
 				} else {
-					if (tBaTxVo.getUnPaidAmt().compareTo(tmpAmtMap.get(tmp2)) <= 0) {
+					if (unPaidAmt.compareTo(tmpAmtMap.get(tmp2)) <= 0) {
 						if (repAmtMap.containsKey(tmp)) {
 						} else {
 							repAmtMap.put(tmp, BigDecimal.ZERO);
 						}
-						tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
+						tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(unPaidAmt));
 					} else {
 //				若應扣金額>暫收款
 //				扣款金額=應扣金額-暫收款
 //				暫收款(該扣款代碼) = 暫收款(目前額度下)
 //				暫收款(目前額度下)
-						BigDecimal repayAmt = tBaTxVo.getUnPaidAmt().subtract(tmpAmtMap.get(tmp2));
+						BigDecimal repayAmt = unPaidAmt.subtract(tmpAmtMap.get(tmp2));
 						if (repAmtMap.containsKey(tmp)) {
 							repAmtMap.put(tmp, repAmtMap.get(tmp).add(repayAmt));
 						} else {

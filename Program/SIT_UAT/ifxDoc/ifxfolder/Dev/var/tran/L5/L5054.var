@@ -198,7 +198,7 @@ C(3,#OBonusType,6,S,$)
 #OMediaFg=A,1,O	
 
 ! 產出媒體檔日期
-#OMediaDate=D,7,O
+#OMediaDate=X,9,O
 C(3,#OMediaDate,0,S,$)
 
 ! 人工新增記號

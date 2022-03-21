@@ -160,9 +160,14 @@ BEGIN
     -- F25 : 催收款項-火險費用
     INSERT INTO "AcReceivable"
     SELECT CASE
-             WHEN S1."StatusCode" = 2 THEN 'F25'
-             WHEN S1."StatusCode" = 1 THEN 'F09'
-             WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'TMI'
+             WHEN S1."StatusCode" = 2
+             THEN 'F25'
+             WHEN S1."StatusCode" = 1
+             THEN 'F09'
+             WHEN S1."StatusCode" = 0 
+                  -- AND S1."NotiTempFg" = 'Y' -- 2022-03-21 from Lai
+                  AND S1."TotInsuPrem" != 0  -- 2022-03-21 from Lai
+             THEN 'TMI'
            ELSE ' ' END        AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."CustNo",7,0)
                                AS "CustNo"           -- 戶號
@@ -212,16 +217,24 @@ BEGIN
           ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "InsuRenew" S1
     LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = CASE
-                                                 WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'TMI'
-                                                 WHEN S1."StatusCode" = 1 THEN 'F09'
-                                                 WHEN S1."StatusCode" = 2 THEN 'F25'
+                                                 WHEN S1."StatusCode" = 0
+                                                      AND S1."TotInsuPrem" != 0
+                                                 THEN 'TMI'
+                                                 WHEN S1."StatusCode" = 1
+                                                 THEN 'F09'
+                                                 WHEN S1."StatusCode" = 2
+                                                 THEN 'F25'
                                                ELSE ' ' END
     WHERE S1."AcDate" = 0
       AND S1."TotInsuPrem" > 0
       AND CASE
-            WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'Y'
-            WHEN S1."StatusCode" = 1 THEN 'Y'
-            WHEN S1."StatusCode" = 2 THEN 'Y'
+            WHEN S1."StatusCode" = 0 
+                 -- AND S1."NotiTempFg" = 'Y' -- 2022-03-21 from Lai
+                 AND S1."TotInsuPrem" != 0  -- 2022-03-21 from Lai
+            WHEN S1."StatusCode" = 1
+            THEN 'Y'
+            WHEN S1."StatusCode" = 2
+            THEN 'Y'
           ELSE 'N' END = 'Y'
     ;
 
@@ -449,7 +462,6 @@ BEGIN
                          ELSE 100 + "Status" 
                          END ASC -- 戶況取未結案、非預約優先
                        , "NextPayIntDate" ASC
-                       , "StoreRate" DESC
                        , "FacmNo" ASC
              ) AS "FacmNoSeq"
       FROM "LoanBorMain"

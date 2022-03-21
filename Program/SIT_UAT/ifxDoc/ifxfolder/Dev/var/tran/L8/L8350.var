@@ -52,7 +52,7 @@ K(MODIFYBUTTON,新增)
 ["#FdTitle+職稱",#Title],["#FdQryUserId+使用者代碼",#QryUserId],
 ["#FdAuthQryType+授權查詢方式",#AuthQryType,#AuthQryTypeX],
 ["#grid#,{id:1,expand:true,loop:1,row_height:1}","","","",
-["#FdAuthItemQuery+授權辦理事項+#FdAuthItemQuery1+#FdAuthItemQuery1","審核",#AuthItemQuery,"覆核",#AuthItemReview,"其他",#AuthItemOther],
+["#FdAuthItemQuery+授權辦理事項+#FdAuthItemQuery1+#FdAuthItemQuery1","查詢",#AuthItemQuery,"覆核",#AuthItemReview,"其他",#AuthItemOther],
 ! [[#Paper1],[#Msg1],[#EMail1],[#Notice1]],
 ],
 ["#FdAuthStartDay+授權起日",#AuthStartDay],["#FdAuthEndDay+授權迄日",#AuthEndDay],
@@ -229,7 +229,7 @@ T(H,#AuthQryType,#AuthQryCodeHelp)
 #AuthItemOther=X,1,I,ui:checkbox;value:;
 @
 @C(4,#AuthItemOther,$,C(5,#AuthItemOther,Y,$,V(P,限輸入Y或空白)))
-C(4,#AuthItemQuery,C(4,#AuthItemReview,C(4,#AuthItemOther,V(P,審核、覆核、其他，至少需勾選一項),$),$),$)
+C(4,#AuthItemQuery,C(4,#AuthItemReview,C(4,#AuthItemOther,V(P,查詢、覆核、其他，至少需勾選一項),$),$),$)
 !授權起日
 #AuthStartDay=D,7,I
 @V(7)

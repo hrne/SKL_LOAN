@@ -131,7 +131,6 @@ T(1,@CloseNo,#NTXBUF,9,3)
 T(1,@RimCloseNo,#NTXBUF,9,3)
 T(1,@CustNo,#NTXBUF,12,7)
 
-
 !    L2R36B : 尋找清償作業檔資料
 #RimL2r36B=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -175,7 +174,6 @@ T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
 C(3,#L2r36CloseDate,0,S,$)
 T(F,@AgreeNo,0)
 T(F,@DocNo,0)
-T(F,@ClsNo,0)
 T(F,@EntryDate,0)
 T(F,@CloseInd,0)
 T(F,@CollectFlag,0)
@@ -420,7 +418,7 @@ C(3,#L2r36CloseDate,0,$,s)
 ![銷號欄]
 #ClsNo=c,18,I
 C(2,#FunCode,S,S,$,S,s,s,S)
-C(3,#L2r36CloseDate,0,$,s)
+! C(3,#L2r36CloseDate,0,$,s)
 
 ![清償日期] 
 !系統帳務日期 必須輸入

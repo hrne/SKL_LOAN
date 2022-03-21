@@ -54,8 +54,8 @@ K(MODIFYBUTTON,1,新增)
 ["[L2077]                                 清償作業明細資料查詢"],
 ["#FdMain+查詢條件","@(申請日期、入帳日期、戶號，需擇一輸入)"],
 ["#FdApplDate+申請日期",#ApplDate],
-["#FdENTRYDATE+入帳日期",#TranDate],
-["#FdCUSTNO+戶號",#CustNo],
+["#FdEntryDate+入帳日期",#TranDate],
+["#FdCustNo+戶號查詢區間",#CustNoS,"-",#CustNoE],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -97,8 +97,8 @@ T(3,*)
 T(4,CHAIN$)
 
 #WKINIT=X,1,S
-T(3,@FdENTRYDATE, )
-T(3,@FdCUSTNO,*)
+T(3,@FdEntryDate, )
+T(3,@FdCustNo,*)
 T(3,@FdRPTFG,*)
 
 #FdApplDate=X,2,L
@@ -108,7 +108,7 @@ T(2, )
 @A(DATE,0,#ApplDate)
 
 ![入帳日期]
-#FdENTRYDATE=X,2,L
+#FdEntryDate=X,2,L
 T(2, )
 
 #TranDate=D,7,I
@@ -119,17 +119,20 @@ C(3,#ApplDate,0,$,S)
 ! C(3,#TranDate,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
 
 ![戶號]
-#FdCUSTNO=X,2,L
-! C(3,#TranDate,0,T(3,*),T(3, ))
+#FdCustNo=X,2,L
 
-#CustNo=A,7,I
+#CustNoS=A,7,I
 C(3,#TranDate,0,$,S)
 C(3,#ApplDate,0,$,S)
-@C(3,#CustNo,0,V(P,需擇一輸入查詢條件),$)
+@C(3,#CustNoS,0,V(P,需擇一輸入查詢條件),$)
 
 
-#MRKEY=_,_,S
-T(2,#CustNo)
+!戶號查詢止號
+#CustNoE=A,7,I
+C(3,#TranDate,0,$,S)
+C(3,#ApplDate,0,$,S)
+C(3,#CustNoS,0,s,$)
+@V(5,#CustNoS,9999999)
 
 #FdRPTFG=X,2,L
 
@@ -159,8 +162,6 @@ T(3,[L2077] 清償作業明細資料)
 #OENTRYDATE=D,7,L
 T(2,#TranDate)
 
-#OCUSTNO=A,7,L
-E(0,#CustNo)
 
 #OCurrencyCode=X,3,L
 T(3,TWD)
@@ -339,7 +340,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6932;text=歷程 ;ntxbuf=#OOBUF1})
 <sub type="TIM">
 #ApplDate
 #TranDate
-#CustNo
+#CustNoS
+#CustNoE
 #END
 </sub>
 
@@ -376,8 +378,6 @@ TXFORM=L2077
 [
 ["[L2077]                                 清償作業明細資料查詢"],
 [""],
-! ["@入帳日期",#OENTRYDATE],
-! ["@戶號",#OCUSTNO],
 ]
 </sub>
 !---------- 單據輸出組合 ----------

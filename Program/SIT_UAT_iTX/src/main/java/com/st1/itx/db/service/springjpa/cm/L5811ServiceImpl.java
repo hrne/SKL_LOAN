@@ -131,7 +131,9 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ON CA.\"CityCode\" = CB.\"CityCode\"									 ";
 		sql += "   AND CA.\"AreaCode\" = CB.\"AreaCode\"									 ";
 		sql += " WHERE Y.\"YearMonth\" = :iYYYYMM ";
-		sql += " AND LPAD(Y.\"UsageCode\",2,'0') = '02'	";
+		// sql += " AND LPAD(Y.\"UsageCode\",2,'0') = '02'	";
+		sql += " ORDER BY Y.\"CustNo\" ";
+		sql += "        , Y.\"FacmNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;

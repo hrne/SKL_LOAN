@@ -23,7 +23,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9717p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9717p.class);
 
 	@Autowired
 	L9717Report l9717Report;
@@ -50,11 +49,7 @@ public class L9717p extends TradeBuffer {
 		boolean isFinish = false;
 
 		for (OutputSortBy o : OutputSortBy.values()) {
-			isFinish = l9717Report.exec(titaVo, o);
-
-			if (!isFinish) {
-				break;
-			}
+			isFinish = isFinish || l9717Report.exec(titaVo, o); // 只要有任何一次執行是true, 就回傳有資料
 		}
 
 		if (isFinish) {
