@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class FacCloseId implements Serializable {
 
 
-  // 戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7636277796977510217L;
+
+// 戶號
   @Column(name = "`CustNo`")
   private int custNo = 0;
 

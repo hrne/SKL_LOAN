@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class FacClose implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7681528373660544349L;
+
+@EmbeddedId
   private FacCloseId facCloseId;
 
   // 戶號

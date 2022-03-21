@@ -398,7 +398,7 @@ public class L4450Batch extends TradeBuffer {
 				} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
 					result = c1.getFacmNo() - c2.getFacmNo();
 				} else if (c1.getDataKind() - c2.getDataKind() != 0) {
-					result = c2.getDataKind() - c1.getDataKind();
+					result = c1.getDataKind() - c2.getDataKind();
 				} else if (c1.getRepayType() - c2.getRepayType() != 0) {
 					result = c1.getRepayType() - c2.getRepayType();
 				} else if (c1.getPayIntDate() - c2.getPayIntDate() != 0) {
