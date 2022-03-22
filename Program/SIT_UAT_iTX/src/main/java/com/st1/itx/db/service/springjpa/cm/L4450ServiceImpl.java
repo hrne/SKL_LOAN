@@ -205,7 +205,8 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   from \"AcReceivable\") rv on  rv.\"CustNo\"         = b.\"CustNo\" ";
 		sql += "                            and  rv.\"FacmNo\"         = b.\"FacmNo\" ";
 		sql += "                            and  rv.\"RvBal\"          > 0 ";
-		sql += "                            and  rv.\"ReceivableFlag\" = 4 ";  // 銷帳科目記號  4:短繳期金
+		sql += "                            and (   rv.\"ReceivableFlag\" in (3, 4) ";  // 銷帳科目記號  3:未收費用  4:短繳期金
+		sql += "                            and  or rv.\"AcctCode\" like 'F%' ) ";  // 費用類
 		sql += "                            and  rv.seq = 1 ";
 		sql += "  left join ( ";
 		sql += "   select ";
@@ -266,28 +267,28 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// ___________ 且 指定應繳日(2碼dd) = 郵局扣款應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and (   b.\"NextPayIntDate\" <= :iPostSpecificDd  ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 )";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0 )";
 		sql += "               and b.\"SpecificDd\" = :iPostSpecificDay ";
 		sql += "          then 1 ";
 		// 郵局-條件2: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd) 或 有短繳期金
 		// ___________ 且 指定應繳日(2碼dd) = 郵局二扣應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and (   b.\"NextPayIntDate\" <= :iPostSecondSpecificDd ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0 ) ";
 		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
 		sql += "          then 1 ";
 		// 郵局-條件3: 下繳日(8碼yyyymmdd) = 郵局扣款應繳日(8碼yyyymmdd)  或 有短繳期金
 		// ___________ 且 指定應繳日(2碼dd) = 0
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and (   b.\"NextPayIntDate\" = :iPostSpecificDd ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0 ) ";
      	sql += "               and b.\"SpecificDd\" = 0 ";
 		sql += "          then 1 ";
 		// 郵局-條件4: 下繳日(8碼yyyymmdd) = 郵局二扣應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 0
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and (   b.\"NextPayIntDate\" = :iPostSecondSpecificDd ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0) ";
 		sql += "               and b.\"SpecificDd\" = 0 ";
 		sql += "          then 1 ";
 		// RepayBank not in (null,700) = ACH
@@ -295,28 +296,28 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// __________ 且 指定應繳日(2碼dd) IN ACH扣款應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
 		sql += "               and (   b.\"NextPayIntDate\" <= :iAchSpecificDdTo ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0 ) ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
 		sql += "          then 1 ";
 		// ACH-條件2: 下繳日(8碼yyyymmdd) <= ACH二扣應繳日止日(8碼yyyymmdd)
 		// __________ 且 指定應繳日(2碼dd) IN ACH二扣應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
 		sql += "               and (   b.\"NextPayIntDate\" <= :iAchSecondSpecificDdTo ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0 ) ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSecondSpecificDays ";
 		sql += "          then 1 ";
 		// ACH-條件3: 下繳日(8碼yyyymmdd) 在 ACH扣款應繳日的起日與止日之間
 		// __________ 且 指定應繳日(2碼dd) = 0
 		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
 		sql += "               and (   b.\"NextPayIntDate\" between :iAchSpecificDdFrom and :iAchSpecificDdTo ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0  ) ";
 		sql += "               and b.\"SpecificDd\" = 0 ";
 		sql += "          then 1 ";
 		// ACH-條件4: 下繳日(8碼yyyymmdd) 在 ACH二扣應繳日的起日與止日之間
 		// __________ 且 指定應繳日(2碼dd) = 0
 		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
 		sql += "               and (   b.\"NextPayIntDate\" between :iAchSecondSpecificDdFrom and :iAchSecondSpecificDdTo ";
-		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
+		sql += "                    or nvl(rv.\"ReceivableFlag\" ,0) > 0  ) ";
 		sql += "               and b.\"SpecificDd\" = 0 ";
 		sql += "          then 1 ";
 		// 追加逾期期數
@@ -417,7 +418,8 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   from \"AcReceivable\") rv on  rv.\"CustNo\"         = b.\"CustNo\" ";
 		sql += "                            and  rv.\"FacmNo\"         = b.\"FacmNo\" ";
 		sql += "                            and  rv.\"RvBal\"          > 0 ";
-		sql += "                            and  rv.\"ReceivableFlag\" = 4 ";  // 銷帳科目記號  4:短繳期金
+		sql += "                            and (   rv.\"ReceivableFlag\" in (3, 4) ";  // 銷帳科目記號  3:未收費用  4:短繳期金
+		sql += "                            and  or rv.\"AcctCode\" like 'F%' ) ";  // 費用類
 		sql += "                            and  rv.seq = 1 ";
 		sql += "  left join (                                                            ";
 		sql += "   select                                                                ";

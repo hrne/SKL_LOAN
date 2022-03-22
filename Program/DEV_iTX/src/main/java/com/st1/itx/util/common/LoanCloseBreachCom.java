@@ -287,6 +287,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		this.info("v=" + lLoanCloseBreach.toString());
 		if (lLoanCloseBreach != null && lLoanCloseBreach.size() > 0) {
 			BigDecimal extraRepayAcc = BigDecimal.ZERO; // 提前還款金額累計
+			int lastFacmNo = 0;
 			for (LoanCloseBreachVo v : lLoanCloseBreach) {
 				if (v.getFacmNo() == m.getFacmNo()) {
 					v.setProdNo(m.getProdNo()); // 商品代碼
@@ -305,7 +306,23 @@ public class LoanCloseBreachCom extends TradeBuffer {
 					v.setExtraRepayAcc(extraRepayAcc); // 提前還款金額累計
 					v.setBreachStartPercent(p.getBreachStartPercent()); // 還款起算比例
 					this.info("v=" + v.toString());
-					v = calcCloseBreachAmt(v, titaVo);
+
+					// 2022-03-22 智偉增加
+					// 若違約適用方式為003:依核准額度計算清償違約金者
+					// 每一額度只計算一次清償違約金
+					String thisBreachCode = v.getBreachCode() == null ? "" : v.getBreachCode();
+					if (lastFacmNo == v.getFacmNo() && thisBreachCode.equals("003")) {
+						this.info("額度號碼與前筆相同且違約方式為003:依核准額度計算清償違約金者，每一額度只計算一次清償違約金");
+						continue;
+					} else {
+						v = calcCloseBreachAmt(v, titaVo);
+						this.info("CloseBreachAmt = " + v.getCloseBreachAmt());
+						this.info("CloseBreachAmtPaid = " + v.getCloseBreachAmtPaid());
+						this.info("CloseBreachAmtUnpaid = " + v.getCloseBreachAmtUnpaid());
+					}
+					// 2022-03-22 智偉增加
+					// 紀錄額度號碼
+					lastFacmNo = v.getFacmNo();
 				}
 			}
 		}

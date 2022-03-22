@@ -191,7 +191,7 @@ public class LW003Report extends MakeReport {
 		}
 		// 區部 獎勵金額
 		if (form == 2) {
-			int num = 1;
+	
 			// 列數
 			int row = 0;
 			int col = 0;
@@ -229,17 +229,14 @@ public class LW003Report extends MakeReport {
 
 				makeExcel.setValue(row, col, bonus, "#,##0");
 
-				if (num == wkMonth) {
-					break;
-				}
-				num++;
+
 			}
 
 		}
 
 		// 通訊處 獎勵金
 		if (form == 3) {
-			int num = 1;
+	
 			// 列數
 			int row = 0;
 			int col = 0;
@@ -278,11 +275,6 @@ public class LW003Report extends MakeReport {
 
 				makeExcel.setValue(row, col, bonus, "#,##0");
 
-				if (num == wkMonth) {
-					break;
-				}
-
-				num++;
 
 			}
 		}
@@ -308,7 +300,7 @@ public class LW003Report extends MakeReport {
 
 		// 專銷制單位
 		if (form == 5) {
-			int num = 1;
+	
 			// 列數
 			int row = 20;
 			int col = 0;
@@ -329,11 +321,6 @@ public class LW003Report extends MakeReport {
 
 				makeExcel.setValue(row, col, bonus, "#,##0");
 
-				if (num == wkMonth) {
-					break;
-				}
-
-				num++;
 			}
 		}
 

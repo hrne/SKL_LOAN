@@ -94,8 +94,8 @@ C(3,#CHAIN,1,s,$)
 @C(4,#BranchCode,s,V(9))
 
 !行庫名稱
-#BankItem=x,100,I
-C(3,#CHAIN,1,T(1,#NTXBUF,8,100),$)
+#BankItem=x,50,I
+C(3,#CHAIN,1,T(1,#NTXBUF,8,50),$)
 C(3,#CHAIN,1,s,$)
 !C(4,#BankCode,$,S)
 !@V(7)
@@ -156,10 +156,10 @@ C(4,#OOBranchCode,T(2,#OOEBankCodeA+#OOBankCodeB),T(2,#OOEBankCodeA+#OOEBankCode
 
 
 ! 行庫名稱(TOTA)
-#OOBankItem=x,100,L
+#OOBankItem=x,50,L
 
 ! 分行名稱(TOTA)
-#OOBranchItem=x,100,L
+#OOBranchItem=x,50,L
 
 #OOItem=x,40,S
 T(B,#OOBankItem+#OOBranchItem)
@@ -171,7 +171,7 @@ T(4,CHAIN$)
 #OOFunc2=A,1,S
 E(0,2)
 
-#OOBUF2=X,208,S
+#OOBUF2=X,108,S
 T(2,#OOFunc2+#OOBankCode+#OOBranchCode+#OOBankItem+#OOBranchItem)
 
 ! 連結時隱藏按鈕

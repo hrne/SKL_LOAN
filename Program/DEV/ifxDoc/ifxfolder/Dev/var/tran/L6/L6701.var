@@ -109,10 +109,10 @@ T(1,#NTXBUF,2,3)
 T(1,#NTXBUF,5,4)
 
 #CHAIN_BankItem=x,100,S
-T(1,#NTXBUF,9,100)
+T(1,#NTXBUF,9,50)
 
 #CHAIN_BranchItem=x,100,S
-T(1,#NTXBUF,109,100)
+T(1,#NTXBUF,59,50)
 
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -191,13 +191,13 @@ T(2,@BankItem,#L6R01BankItem)
 T(2,@BranchItem,#L6R01BranchItem)
 
 ! 行庫名稱
-#BankItem=x,100,I
+#BankItem=x,50,I
 C(3,#CHAIN,1,T(2,#CHAIN_BankItem),)
 C(3,#FuncCode,4,s,$)
 @V(7)
 
 ! 分行名稱
-#BranchItem=x,100,I
+#BranchItem=x,50,I
 C(3,#CHAIN,1,T(2,#CHAIN_BranchItem),)
 C(3,#FuncCode,4,s,$)
 !@V(7)

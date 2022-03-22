@@ -362,8 +362,7 @@ BEGIN
                                AS  ROW_NUMBER
            ,"PayIntDate" 
            ,"NextPayDate"         
-           ,"TotalContrAmt" - "AccuTempAmt"   
-                               AS  "PrinBalance"        
+           ,"PrincipalBal"                AS  "PrinBalance"        
            ,CASE "Status"
                  WHEN '0' THEN 0            -- 0.正常       ==> 0.正常戶
                  WHEN '2' THEN 3            -- 2.毀諾       ==> 3.結案戶
@@ -510,11 +509,27 @@ BEGIN
             -- 若 應繳息日 < 系統營業日(TBSDYF)
             -- 則 擺擔保品地區別在"CdCity"的催收員 (若該擔保品無地區別,擺台北市的催收員)
             -- 否則 擺空白
-            ,NVL(S1."AccCollPsn",' ')   AS "AccCollPsn"          -- '催收員';
+            -- 2022-03-22 新增條件 from Linda: CaseCode=2債協的時候,如果是否指定IsSpecify=N,催收人員AccCollPsn跟法務人員LegalPsn都固定放怡婷的員編CB7541
+            ,CASE
+               WHEN C1."CaseCode" = '2'
+                    AND NVL(Ori."IsSpecify",'N') = 'N'
+               THEN 'CB7541'
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN NVL(Ori."AccCollPsn",' ')
+             ELSE NVL(S1."AccCollPsn",' ')
+             END                        AS "AccCollPsn"          -- '催收員';
             -- 若 應繳息日 < 系統營業日(TBSDYF)
             -- 則 擺擔保品地區別在"CdCity"的法務人員 (若該擔保品無地區別,擺台北市的法務人員)
             -- 否則 擺空白
-            ,NVL(S1."LegalPsn",' ')     AS "LegalPsn"            -- '法務人員';
+            -- 2022-03-22 新增條件 from Linda: CaseCode=2債協的時候,如果是否指定IsSpecify=N,催收人員AccCollPsn跟法務人員LegalPsn都固定放怡婷的員編CB7541
+            ,CASE
+               WHEN C1."CaseCode" = '2'
+                    AND NVL(Ori."IsSpecify",'N') = 'N'
+               THEN 'CB7541'
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN NVL(Ori."LegalPsn",' ')
+             ELSE NVL(S1."LegalPsn",' ')
+             END                        AS "LegalPsn"            -- '法務人員';
             ,C1."Status"                AS "Status"              -- '戶況';
             ,C1."AcctCode"              AS "AcctCode"            -- 業務科目代號
             ,C1."FacAcctCode"           AS "FacAcctCode"         -- 額度業務科目   

@@ -232,10 +232,13 @@
 		<step id="eomFinal" parent="parentStep">
 			<tasklet ref="EomFinal" />
 			<next on="COMPLETED" to="startEoy" />
-		 	<end on="FAILED" />
+			<next on="STOPPED" to="startDailyRptFlow" />
 		</step>
 		<step id="startEoy" parent="parentStep">
 			<job ref="eoyFlow" job-launcher="jobLauncher" />
+		</step>
+		<step id="startMonthlyRptFlow" parent="parentStep">
+			<job ref="monthlyRptFlow" job-launcher="jobLauncher" />
 		</step>
 	</job>
 </beans>
