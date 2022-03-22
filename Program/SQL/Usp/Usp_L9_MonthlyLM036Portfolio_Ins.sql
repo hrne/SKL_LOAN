@@ -17,6 +17,7 @@ BEGIN
     JOB_START_TIME TIMESTAMP;  -- 記錄程式起始時間
     JOB_END_TIME   TIMESTAMP;   -- 記錄程式結束時間
     YYYYMM         INT;         -- 本月年月
+    lYYYYMM         INT;         -- 去年底年月
   BEGIN
     INS_CNT :=0;
     UPD_CNT :=0;

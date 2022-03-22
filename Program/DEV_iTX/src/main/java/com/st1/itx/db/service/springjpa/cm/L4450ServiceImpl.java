@@ -201,12 +201,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"FacmNo\" ";
 		sql += "   ,\"ReceivableFlag\" ";
 		sql += "   ,\"RvBal\" ";
+		sql += "   ,\"AcctCode\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by \"RvNo\" ASC) as seq ";
 		sql += "   from \"AcReceivable\") rv on  rv.\"CustNo\"         = b.\"CustNo\" ";
 		sql += "                            and  rv.\"FacmNo\"         = b.\"FacmNo\" ";
 		sql += "                            and  rv.\"RvBal\"          > 0 ";
 		sql += "                            and (   rv.\"ReceivableFlag\" in (3, 4) ";  // 銷帳科目記號  3:未收費用  4:短繳期金
-		sql += "                            and  or rv.\"AcctCode\" like 'F%' ) ";  // 費用類
+		sql += "                                 or rv.\"AcctCode\" like 'F%' ) ";  // 費用類
 		sql += "                            and  rv.seq = 1 ";
 		sql += "  left join ( ";
 		sql += "   select ";
@@ -414,12 +415,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"FacmNo\" ";
 		sql += "   ,\"ReceivableFlag\" ";
 		sql += "   ,\"RvBal\" ";
+		sql += "   ,\"AcctCode\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by \"RvNo\" ASC) as seq ";
 		sql += "   from \"AcReceivable\") rv on  rv.\"CustNo\"         = b.\"CustNo\" ";
 		sql += "                            and  rv.\"FacmNo\"         = b.\"FacmNo\" ";
 		sql += "                            and  rv.\"RvBal\"          > 0 ";
 		sql += "                            and (   rv.\"ReceivableFlag\" in (3, 4) ";  // 銷帳科目記號  3:未收費用  4:短繳期金
-		sql += "                            and  or rv.\"AcctCode\" like 'F%' ) ";  // 費用類
+		sql += "                                 or rv.\"AcctCode\" like 'F%' ) ";  // 費用類
 		sql += "                            and  rv.seq = 1 ";
 		sql += "  left join (                                                            ";
 		sql += "   select                                                                ";

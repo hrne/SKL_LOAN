@@ -38,7 +38,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int funcd) throws Exception {
 
 		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 		String BatchNo = titaVo.getParam("BatchNo");
@@ -111,15 +111,41 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       || '-' || LPAD(TX1.\"BormNo\",3,'0') AS \"CustNo\"";
 		sql += "     , CM.\"CustName\"";
 		sql += "     , BKD.\"RepayAmt\"";
-		sql += "     , TX2.\"Principal\"";
-		sql += "       + TX2.\"Interest\"";
-		sql += "       + TX2.\"DelayInt\"";
-		sql += "       + TX2.\"BreachAmt\"";
-		sql += "       + TX2.\"CloseBreachAmt\"";
-		sql += "       + TX2.\"AcctFee\"";
-		sql += "       + TX2.\"ModifyFee\"";
-		sql += "       + TX2.\"FireFee\"";
-		sql += "       + TX2.\"LawFee\" AS \"AcctAmt\" ";
+
+		if (funcd == 1) { // 全部
+			sql += "     , TX2.\"Principal\"";
+			sql += "       + TX2.\"Interest\"";
+			sql += "       + TX2.\"DelayInt\"";
+			sql += "       + TX2.\"BreachAmt\"";
+			sql += "       + TX2.\"CloseBreachAmt\"";
+			sql += "       + TX2.\"AcctFee\"";
+			sql += "       + TX2.\"ModifyFee\"";
+			sql += "       + TX2.\"FireFee\"";
+			sql += "       + TX2.\"LawFee\" AS \"AcctAmt\" ";
+		} else if (funcd == 2) { // 帳管 + 法拍
+			sql += "     , TX2.\"Principal\"";
+			sql += "       + TX2.\"Interest\"";
+			sql += "       + TX2.\"DelayInt\"";
+			sql += "       + TX2.\"BreachAmt\"";
+			sql += "       + TX2.\"CloseBreachAmt\"";
+			sql += "       + TX2.\"AcctFee\"";
+			sql += "       + TX2.\"LawFee\" AS \"AcctAmt\" ";
+		} else if (funcd == 3) { // 契變
+			sql += "     , TX2.\"Principal\"";
+			sql += "       + TX2.\"Interest\"";
+			sql += "       + TX2.\"DelayInt\"";
+			sql += "       + TX2.\"BreachAmt\"";
+			sql += "       + TX2.\"CloseBreachAmt\"";
+			sql += "       + TX2.\"ModifyFee\" AS \"AcctAmt\" ";
+		} else { // 火險
+			sql += "     , TX2.\"Principal\"";
+			sql += "       + TX2.\"Interest\"";
+			sql += "       + TX2.\"DelayInt\"";
+			sql += "       + TX2.\"BreachAmt\"";
+			sql += "       + TX2.\"CloseBreachAmt\"";
+			sql += "       + TX2.\"FireFee\" AS \"AcctAmt\" ";
+		}
+
 		sql += "     , TX1.\"IntStartDate\"";
 		sql += "     , TX1.\"IntEndDate\"";
 		sql += "     , TX2.\"Principal\"";
@@ -137,10 +163,10 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         THEN TX2.\"TempAmt\"";
 		sql += "       ELSE 0 END AS \"TempCr\" ";
 		sql += "     , TX2.\"Shortfall\" ";
-		sql += "     , TX2.\"AcctFee\"";
-		sql += "       + TX2.\"ModifyFee\"";
-		sql += "       + TX2.\"FireFee\"";
-		sql += "       + TX2.\"LawFee\" AS \"Fee\" ";
+//		sql += "     , TX2.\"AcctFee\"";
+//		sql += "       + TX2.\"ModifyFee\"";
+//		sql += "       + TX2.\"FireFee\"";
+//		sql += "       + TX2.\"LawFee\" AS \"Fee\" ";
 		sql += "     , TX2.\"AcDate\" ";
 		sql += "     , TX2.\"TitaTlrNo\" ";
 		sql += "     , TX2.\"TitaTxtNo\" ";
@@ -191,13 +217,28 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        THEN LPAD(:inputBatchNo,2,'0')";
 		sql += "      ELSE SUBSTR(BKD.\"TitaTxtNo\",0,2)";
 		sql += "      END = SUBSTR(BKD.\"TitaTxtNo\",0,2)";
-		
+
+		switch (funcd) {
+		case 2:
+			sql += " AND bkd.\"RepayType\" = 4 or bkd.\"RepayType\" = 7";
+			break;
+		case 3:
+			sql += " AND bkd.\"RepayType\" = 6 ";
+			break;
+		case 4:
+			sql += " AND bkd.\"RepayType\" = 5 ";
+			break;
+		default:
+			break;
+
+		}
+
 		if (RepayBank != 998 && RepayBank != 999) {
 			sql += "       AND BKD.\"RepayBank\" = :inputRepayBank";
 		} else if (RepayBank == 998) {
 			sql += "       AND BKD.\"RepayBank\" <> 700";
 		}
-		
+
 		sql += "  AND BKD.\"AcDate\" = :inputAcDate";
 		sql += "  ORDER BY SUBSTR(BKD.\"TitaTxtNo\",0,2)";
 		sql += "       , BKD.\"EntryDate\"";
@@ -223,7 +264,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int EntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
-		
+
 		String sql = "SELECT BKD.\"RepayBank\"   ";
 		sql += "     , BKD.\"AcctCode\"     ";
 		sql += "     , BKD.\"RepayAcctNo\"  ";

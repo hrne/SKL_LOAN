@@ -54,9 +54,16 @@ public class L6088 extends TradeBuffer {
 		String iCenterCode = titaVo.getParam("CenterCode");
 		String iEmployeeNo = titaVo.getParam("EmployeeNo");
 		String iFullname = titaVo.getParam("EmployeeNoX");
-		String iAgCurInd = titaVo.getParam("AgCurInd");
+		String iAgStatusCode = titaVo.getParam("AgStatusCode");
+		if("Y".equals(iAgStatusCode)) {
+			iAgStatusCode = "1";
+		} else if("N".equals(iAgStatusCode)) {
+			iAgStatusCode = "2";
+		}
+			
+			
 		Slice<CdEmp> slCdEmp = null;
-		if (iAgCurInd.equals("")) {
+		if (iAgStatusCode.equals("")) {
 			// 查全部
 			if (!iCenterCode.equals("")) {
 				slCdEmp = sCdEmpService.findCenterCode(iCenterCode, this.index, this.limit, titaVo);
@@ -69,13 +76,13 @@ public class L6088 extends TradeBuffer {
 			}
 		} else {
 			if (!iCenterCode.equals("")) {
-				slCdEmp = sCdEmpService.findCenterCodeAndAgCurInd(iCenterCode, iAgCurInd, this.index, this.limit, titaVo);
+				slCdEmp = sCdEmpService.findCenterCodeAndAgStatusCode(iCenterCode, iAgStatusCode, this.index, this.limit, titaVo);
 			} else if (!iEmployeeNo.equals("")) {
-				slCdEmp = sCdEmpService.findEmployeeNoAndAgCurInd(iEmployeeNo, iEmployeeNo, iAgCurInd, this.index, this.limit, titaVo);
+				slCdEmp = sCdEmpService.findEmployeeNoAndAgStatusCode(iEmployeeNo, iEmployeeNo, iAgStatusCode, this.index, this.limit, titaVo);
 			} else if (!iFullname.equals("")) {
-				slCdEmp = sCdEmpService.findFullnameLikeAndAgCurInd(iFullname + "%", iAgCurInd, this.index, this.limit, titaVo);
+				slCdEmp = sCdEmpService.findFullnameLikeAndAgStatusCode(iFullname + "%", iAgStatusCode, this.index, this.limit, titaVo);
 			} else {
-				slCdEmp = sCdEmpService.EmployeeNoLikeAndAgCurInd(iEmployeeNo.trim() + "%", iAgCurInd, this.index, this.limit, titaVo);
+				slCdEmp = sCdEmpService.EmployeeNoLikeAndAgStatusCode(iEmployeeNo.trim() + "%", iAgStatusCode, this.index, this.limit, titaVo);
 			}
 		}
 		List<CdEmp> lCdEmp = slCdEmp == null ? null : slCdEmp.getContent();

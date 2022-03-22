@@ -52,99 +52,6 @@ public class LC001 extends TradeBuffer {
 		this.info("active LC001 ");
 		this.totaVo.init(titaVo);
 
-//		int iEntday = Integer.valueOf(titaVo.get("iEntdy").trim()) + 19110000;
-//		String iBrNo = titaVo.get("iBrNo").trim();
-//		String iTlrNo = titaVo.get("iTlrNo").trim();
-//		String iTranNo = titaVo.get("iTranNo").trim();
-//		int supRelease = 0;
-//		this.info("LC001 parm = " + iEntday + "/" + iBrNo + "/" + iTlrNo + "/" + iTranNo);
-//
-//		/*
-//		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-//		 */
-//		this.index = titaVo.getReturnIndex();
-//
-//		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-//		this.limit = 500;
-//
-//		Slice<TxRecord> slTxRecord = txRecordService.findByLC001(iEntday, iBrNo, "S", 1, 0, 1, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
-//		List<TxRecord> lTxRecord = slTxRecord == null ? null : slTxRecord.getContent();
-//
-//		if (lTxRecord == null) {
-//			throw new LogicException(titaVo, "E0001", "訂正資料");
-//		} else {
-//			this.info("LC001 size = " + lTxRecord.size());
-//			for (TxRecord tTxRecord : lTxRecord) {
-//				this.info("LC001 TxRecord = " + tTxRecord.getTranNo() + "/" + tTxRecord.getCanCancel() + "/" + tTxRecord.getTxResult());
-//				// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
-//				supRelease = 0;
-//				if (tTxRecord.getFlowType() > 1 && tTxRecord.getFlowStep() == 1) {
-//					TxFlowId tTxFlowId = new TxFlowId();
-//					tTxFlowId.setEntdy(tTxRecord.getEntdy());
-//					tTxFlowId.setFlowNo(tTxRecord.getFlowNo());
-//					TxFlow tTxFlow = txFlowService.findById(tTxFlowId);
-//					if (tTxFlow != null) {
-////						if (tTxFlow.getFlowMode() == 0) {
-////							supRelease = 1; // 1的時候 按鈕不開
-////						}
-//						if (tTxRecord.getFlowStep() != tTxFlow.getFlowStep() || (tTxRecord.getFlowStep() == 1 && tTxFlow.getSubmitFg() == 1 && tTxFlow.getFlowMode() != 3)) {
-//							supRelease = 1; // 1的時候 按鈕不開
-//						}
-//					}
-//				}
-//				OccursList occursList = new OccursList();
-//				occursList.putParam("CalDate", tTxRecord.getCalDate());
-//				occursList.putParam("CalTime", tTxRecord.getCalTime());
-//				occursList.putParam("Entdy", tTxRecord.getEntdy());
-//				occursList.putParam("TxNo", tTxRecord.getTxNo());
-//				occursList.putParam("TranNo", tTxRecord.getTranNo());
-//				occursList.putParam("MrKey", tTxRecord.getMrKey());
-//				occursList.putParam("CurName", tTxRecord.getCurName());
-//				occursList.putParam("TxAmt", tTxRecord.getTxAmt());
-//				occursList.putParam("BrNo", tTxRecord.getBrNo());
-//				occursList.putParam("TlrNo", tTxRecord.getTlrNo());
-//				occursList.putParam("FlowType", tTxRecord.getFlowType());
-//				occursList.putParam("FlowStep", tTxRecord.getFlowStep());
-//				occursList.putParam("SupRelease", supRelease);
-//				/* 將每筆資料放入Tota的OcList */
-//				this.totaVo.addOccursList(occursList);
-//			}
-//		}
-//
-//		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-//		if (slTxRecord != null && slTxRecord.hasNext()) {
-//			titaVo.setReturnIndex(this.setIndexNext());
-//			this.totaVo.setMsgEndToEnter();// 手動折返
-//		}
-//	    
-//		try {
-//
-//			List<Map<String, String>> lc001List = lc001ServiceImpl.findAll(titaVo);			
-//
-//			if (lc001List != null && lc001List.size() != 0) {
-//				int cnt = 0;
-//				for (Map<String, String> lc001Vo : lc001List) {
-//					String flds = "";
-//					for (int i = 0; i < lc001Vo.size(); i++) {
-//						String fname = "F" + String.valueOf(i);
-//						flds+=lc001Vo.get(fname)+",";
-//					}
-//					this.info("LC001 count = " + ++cnt + "/" + flds);
-//				}
-//
-//			} 
-//			
-//		} catch (Exception e) {
-//			this.error("C001ServiceImpl error");
-//		}
-
-		toRun(titaVo);
-
-		this.addList(this.totaVo);
-		return this.sendList();
-	}
-
-	private void toRun(TitaVo titaVo) throws LogicException {
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -153,6 +60,9 @@ public class LC001 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;
 
+		int tbsdy = this.txBuffer.getTxCom().getTbsdy();
+		this.info("LC001 tbsdy = " + tbsdy);
+		
 		try {
 
 			List<Map<String, String>> lc001List = lc001ServiceImpl.findAll(titaVo, index, limit);
@@ -185,7 +95,10 @@ public class LC001 extends TradeBuffer {
 
 					// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
 					int supRelease = 0;
-					if (daFlowType > 1 && daFlowStep == 1) {
+					if (daFlowType > 1 && daEntdy < tbsdy) {
+						//非一段式交易,不可訂正非本日交易
+						supRelease = 1;
+					} else if (daFlowType > 1 && daFlowStep == 1) {
 						if (daFlowStep != daFlowStep2 || (daFlowStep == 1 && daSubmitFg == 1 && daFlowMode != 3)) {
 							supRelease = 1; // 1的時候 按鈕不開
 						}
@@ -225,6 +138,9 @@ public class LC001 extends TradeBuffer {
 			this.error(errors.toString());
 			throw new LogicException(titaVo, "E0000", errors.toString());
 		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
 
 	}
 

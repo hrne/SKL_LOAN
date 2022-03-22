@@ -1,0 +1,283 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2605)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,45)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,205)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+[
+["[L2605]                                 法拍費用未銷明細查詢"],
+["#FdReceiveDate+收件迄日",#ReceiveDate],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+
+#FUNCIND=_,_,S
+E(0,5)
+
+#FdReceiveDate=X,2,L
+T(3,*)
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!Status
+#CDDEF0001=x,20,S
+T(3,CdCode.Status)
+
+#StatusHelpRim=X,1,S
+RESET_RIM(#StatusHelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@StatusHelp,#HelpDesc1)
+
+#StatusHelp=x,1024,S
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+
+#PostingDate=D,8,S
+T(4,DATE$)
+
+!收件日期 必須輸入
+#ReceiveDate=D,7,I
+T(1,#PostingDate,2,7)
+@A(DATE,0,#ReceiveDate)V(7)
+
+#RPTFG=A,1,S
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2605 ----------
+<sub type="FORM" name="L2605">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2605,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2605] 法拍費用未銷明細查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!筆數
+#OCnt=X,3,L
+
+!法務費用
+#OFee=m,14,L
+
+!催收法務費用
+#OOverFee=m,14,L
+
+!金額
+#OFeeAmt=m,14,L
+
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+
+!戶號
+#OOCustNo=A,7,S
+!額度
+#OOFacmNo=A,3,S
+
+#OOcustNoX=X,11,S
+T(2,#OOCustNo+-+#OOFacmNo)
+
+
+!戶名
+#OOCustName=X,100,L
+!收件日
+#OOReceiveDate=D,7,L
+!法拍費
+#OOFee=m,14,L
+!催收法拍費
+#OOFee1=m,14,L
+!法拍費合計
+#OOFeeAmt=m,14,L
+!本戶累溢短收
+#OOShortfallOverflow=+m,14,L
+!地區別
+#OOClMainType=A,1,L
+!擔保品大類
+#OOClMainTypeX=X,10,L
+SWITCH(#OOClMainType,1,T(3,不動產),
+                  2,T(3,不動產),
+                  3,T(3,股票),
+                  4,T(3,股票),
+                  5,T(3,其他擔保品),
+                  9,T(3,動產),
+                  0,T(3, ))
+!地區別
+#OOCityCode=X,2,L
+!地區別名稱
+#OOCityCodeX=X,10,L
+!戶況
+#OOStatus=X,2,L
+#OOStatusX=X,14,L
+T(H,#OOStatus,#StatusHelp)
+
+!繳息迄日
+#OOPrevPayIntDate=D,7,L
+!催收人員
+#OOCollPsn=X,6,L
+#OOName=X,10,L
+#OOName1=X,18,L
+T(2,#OOCollPsn+  +#OOName)
+
+!轉催收註記
+#OOOverdueCode=X,1,L
+
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ReceiveDate
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2605
+#OCnt
+#OFee
+#OOverFee
+#OFeeAmt
+#OOCustNo
+#OOFacmNo
+#OOCustName
+#OOReceiveDate
+#OOFee
+#OOFee1
+#OOFeeAmt
+#OOShortfallOverflow
+#OOClMainType
+#OOCityCode
+#OOCityCodeX
+#OOStatus
+#OOPrevPayIntDate
+#OOCollPsn
+#OOName
+#OOOverdueCode
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2605" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L2605]                                 法拍費用未銷明細查詢"],
+[#<->#,"@筆數",#OCnt],
+["@法務費",#OFee],["@催收法務費",#OOverFee],
+[#<->#,"@金額",#OFeeAmt],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L2605
+#any={detail:true, header:'L2605.part', caption:'', width:1010, rowNum:20, rowList:[20,40,60]}
+
+
+
+#OOcustNoX=戶號
+{width:80,align:'center'}
+
+#OOCustName=戶名
+{width:120,align:'left'}
+
+#OOReceiveDate=收件日
+{width:80,align:'center'}
+
+#OOFee=法拍費
+{width:100,align:'right'}
+
+#OOFee1=催收法拍費
+{width:100,align:'right'}
+
+#OOFeeAmt=法拍費合計
+{width:100,align:'right'}
+
+#OOShortfallOverflow=本戶累溢短收
+{width:100,align:'right'}
+
+#OOClMainTypeX=擔保品大類
+{width:100,align:'left'}
+
+#OOCityCode=地區別
+{width:60,align:'center'}
+
+#OOCityCodeX=地區別名稱
+{width:90,align:'center'}
+
+#OOStatusX=戶況
+{width:100,align:'center'}
+
+#OOPrevPayIntDate=繳息迄日
+{width:100,align:'center'}
+
+#OOName1=催收人員
+{width:120,align:'left'}
+
+#OOOverdueCode=轉催收註記
+{width:100,align:'center'}
+
+^
+
+<include src="PRT.icf::INQ01.sel" map="i=L2605;cpi=15"/>
+
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

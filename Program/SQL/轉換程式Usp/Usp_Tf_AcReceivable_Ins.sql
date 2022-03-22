@@ -586,7 +586,7 @@ BEGIN
     SELECT 'TCK'               AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."CustNo",7,0)
                                AS "CustNo"           -- 戶號
-          ,LPAD(NVL(S2."FacmNo",0),3,0) -- 2021-10-01 from 賴桑 DueAmt與支票金額一樣時，放該額度號碼
+          ,LPAD(NVL(S2."FacmNo",1),3,0) -- 2021-10-01 from 賴桑 DueAmt與支票金額一樣時，放該額度號碼
            -- 0 -- 2021-09-30 from 綺萍 支票的額度號碼轉0
            -- LPAD(S2."FacmNo",3,0)
                                AS "FacmNo"           -- 額度編號
@@ -623,27 +623,37 @@ BEGIN
           ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
           ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "LoanCheque" S1
-    LEFT JOIN (SELECT LC."ChequeNo"
-                    , LC."CustNo"
-                    , F1."FacmNo"
-                    , ROW_NUMBER() OVER (PARTITION BY LC."ChequeNo"
-                                                    , LC."CustNo"
-                                         ORDER BY F1."FacmNo" DESC) AS "Seq"
-               FROM "LoanCheque" LC
-               LEFT JOIN "FacMain" F1 ON F1."CustNo" = LC."CustNo"
-               LEFT JOIN ( SELECT "CustNo"
-                                , "FacmNo"
-                                , SUM("DueAmt") AS "DueAmt"
-                           FROM "LoanBorMain"
-                           WHERE "Status" IN (0,2,4,6,7)
-                           GROUP BY "CustNo"
-                                  , "FacmNo"
-                         ) L1 ON L1."CustNo" = F1."CustNo"
-                             AND L1."FacmNo" = F1."FacmNo"
-               WHERE LC."ChequeAmt" = NVL(L1."DueAmt",0)
-              ) S2 ON S2."ChequeNo" = S1."ChequeNo"
-                  AND S2."CustNo" = S1."CustNo"
-                  AND S2."Seq" = 1
+    LEFT JOIN (
+      SELECT LC."ChequeNo"
+           , LC."ChequeAcct"
+           , LC."CustNo"
+           , L1."FacmNo"
+           , LC."ChequeAmt"
+           , NVL(L1."DueAmt",0) AS "DueAmt"
+           , ABS(LC."ChequeAmt" - NVL(L1."DueAmt",0)) AS "Match" -- 吻合程度,越低者越高
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY LC."ChequeNo"
+                          , LC."ChequeAcct"                    
+                         , LC."CustNo"
+               ORDER BY ABS(LC."ChequeAmt" - NVL(L1."DueAmt",0))
+                      , L1."FacmNo"
+             ) AS "MatchSeq"
+      FROM "LoanCheque" LC
+      LEFT JOIN (
+        SELECT "CustNo"
+             , "FacmNo"
+             , SUM("DueAmt") AS "DueAmt"
+        FROM "LoanBorMain"
+        WHERE "Status" IN (0,2,4,6,7)
+        GROUP BY "CustNo"
+               , "FacmNo"
+      ) L1 ON L1."CustNo" = LC."CustNo"
+      WHERE LC."StatusCode" IN ('0','4')
+    ) S2 ON S2."ChequeNo" = S1."ChequeNo"
+        AND S2."ChequeAcct" = S1."ChequeAcct"
+        AND S2."CustNo" = S1."CustNo"
+        AND S2."MatchSeq" = 1
     LEFT JOIN "CdAcCode" S3 ON S3."AcctCode" = 'TCK'
     WHERE S1."StatusCode" IN ('0','4')
     ;
