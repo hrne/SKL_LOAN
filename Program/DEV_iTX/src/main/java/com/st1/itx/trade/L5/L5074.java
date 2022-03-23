@@ -155,8 +155,8 @@ public class L5074 extends TradeBuffer {
 						throw new LogicException(titaVo, "E5004", "");
 					}
 					// 前日匯入(總筆數)-(未入帳,待處理)
-					// TodayWorkCnt = Data[0];// 筆數
-					// TodayWorkAmt = Data[1];// 金額
+					//TodayWorkCnt = Data[0];// 筆數
+					//TodayWorkAmt = Data[1];// 金額
 					TodayWorkCnt = "0";// 筆數
 					TodayWorkAmt = "0";// 金額
 
@@ -502,7 +502,7 @@ public class L5074 extends TradeBuffer {
 					BufToday = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
 				} else if (i == 20) {
 					LabelB = ColB[4];
-					LabelE = ColE[5];
+					//LabelE = ColE[5];
 					// 檢核成功(左)
 					State = 14;
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
@@ -518,26 +518,26 @@ public class L5074 extends TradeBuffer {
 					TodayWorkAmt = Data[1];// 金額
 					BufToday = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
 					// 暫收解入(右)
-					State = 18;
-					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
-					ExportDateYN = 0;
-					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
-					} catch (LogicException e) {
-						// E5004 讀取DB時發生問題
-						this.info("L5051 ErrorForDB=" + e);
-						throw new LogicException(titaVo, "E5004", "");
-					}
-					SummaryWorkCnt = Data[0];// 筆數
-					SummaryWorkAmt = Data[1];// 金額
-					BufSummary = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
-					BufIssue = BufValue(IsMainFin, State, Detail, ExportDateYN, 1);
-					ThisIssue = Issue[5];// 處理事項
-					if (SummaryWorkAmt != null && Integer.parseInt(SummaryWorkAmt) > 0) {
-						BtnCode = "1";
-					} else {
-						BtnCode = "0";
-					}
+//					State = 18;
+//					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
+//					ExportDateYN = 0;
+//					try {
+//						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+//					} catch (LogicException e) {
+//						// E5004 讀取DB時發生問題
+//						this.info("L5051 ErrorForDB=" + e);
+//						throw new LogicException(titaVo, "E5004", "");
+//					}
+//					SummaryWorkCnt = Data[0];// 筆數
+//					SummaryWorkAmt = Data[1];// 金額
+//					BufSummary = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
+//					BufIssue = BufValue(IsMainFin, State, Detail, ExportDateYN, 1);
+//					ThisIssue = Issue[5];// 處理事項
+//					if (SummaryWorkAmt != null && Integer.parseInt(SummaryWorkAmt) > 0) {
+//						BtnCode = "1";
+//					} else {
+//						BtnCode = "0";
+//					}
 				} else if (i == 21) {
 					// 檢核失敗(左)
 					LabelB = ColB[5];

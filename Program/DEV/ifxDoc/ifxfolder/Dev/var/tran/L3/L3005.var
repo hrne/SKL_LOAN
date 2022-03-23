@@ -356,6 +356,16 @@ T(3,[L3005] 交易明細資料)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+#BUF1=X,11,S
+T(2,#TimCustNo)
+
+#button=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L3072; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,備忘錄)
+
+
 #OCustNo=A,7,L
 
 #OCustNoX=X,100,L
@@ -443,7 +453,6 @@ P(R,#OOTxAmtX)
 #OOTempAmtX=X,22,O
 CALL2(#ADJUSTDOT,#OOPrecision,#OOTempAmt,#OOTempAmtX)
 P(R,#OOTempAmtX)
-
 
 #OOShortfall=+m,14.2,S
 

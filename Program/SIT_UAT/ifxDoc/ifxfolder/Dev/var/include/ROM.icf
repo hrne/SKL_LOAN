@@ -3678,6 +3678,21 @@ TXFORM=L2R60
 ^
 </L2R60.tom>
 
+!    L2R62 : 尋找帳務備忘錄明細檔(RmkNo DESC)
+<L2R62.dec>
+#L2r62RmkNo=A,3,S
+#L2r62RmkCode=A,3,S
+#L2r62RmkDesc=c,120,S
+</L2R62.dec>
+
+<L2R62.tom>
+TXFORM=L2R62
+#L2r62RmkNo
+#L2r62RmkCode
+#L2r62RmkDesc
+^
+</L2R62.tom>
+
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -4249,6 +4264,18 @@ TXFORM=L3R14
 #L3r14RemitBankItem
 ^
 </L3R14.tom>
+
+!檢查帳管費、手續費是否已在企金費用建檔
+<L3R15.dec>
+#L3r15MessageTxt=X,30,S
+</L3R15.dec>
+
+<L3R15.tom>
+TXFORM=L3R15
+#L3r15MessageTxt
+^
+</L3R15.tom>
+
 --------------------------------------------------------------
 !尋找客戶檔資料
 <L1R01.dec>

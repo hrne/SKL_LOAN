@@ -76,7 +76,14 @@ BEGIN
     WITH existedData AS (
       SELECT DISTINCT "CustNo"
       FROM "YearlyHouseLoanInt"
-      WHERE "YearMonth" = YYYYMM
+      WHERE CASE
+              WHEN EndMonth != 0
+                   AND "YearMonth" = EndMonth
+              THEN 1
+              WHEN EndMonth = 0
+                   AND "YearMonth" = YYYYMM
+              THEN 1
+            ELSE 0 END = 1
         AND JSON_VALUE("JsonFields",  '$.EndMonth') != 0
     )
     , A AS (

@@ -136,7 +136,7 @@ public class L5702 extends TradeBuffer {
 				if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
 					UpdAcDB(tNegTransId, titaVo);
 				}
-				updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02
+//				updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02,2022-3-22取消L5712暫收解入功能
 
 			} else {
 				NegTrans bNegTrans = (NegTrans) dataLog.clone(tNegTrans); ////
@@ -185,7 +185,7 @@ public class L5702 extends TradeBuffer {
 			if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
 				UpdAcDB(tNegTransId, titaVo);
 			}
-			updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02
+//			updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02,2022-3-22取消L5712暫收解入功能
 
 		}
 
@@ -238,8 +238,8 @@ public class L5702 extends TradeBuffer {
 	/* 更新 NegAppr02一般債權撥付資料檔 */
 	private void updateNegAppr02(NegTransId tNegTransId, TitaVo titaVo) throws LogicException {
 		// NegAppr02一般債權撥付資料檔，有找到NegTrans的KEY值相同才維護
+		// 2022-3-22取消L5712暫收解入功能(更新NegAppr02.TxStatus,NegTransAcDate,NegTransTlrNo,NegTransTxtNo),無更新NegAppr02資料故以下程式不做
 		NegTrans tNegTrans = sNegTransService.findById(tNegTransId);
-
 		if (tNegTrans == null) {
 			throw new LogicException(titaVo, "E0001", "債務協商交易檔");
 		}
