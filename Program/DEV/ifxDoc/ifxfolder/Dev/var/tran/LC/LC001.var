@@ -126,7 +126,7 @@ T(1,#TranNo,1,5)
 #TxAmt1=m,14,S
 E(0,#TxAmt)
 #TxAmtX=X,17,S
-X(#TxAmt1)
+C(3,#TxAmt1,0,T(3,)T(3,@CurName,),X(#TxAmt1)) ! 金額為0時隱藏幣別與金額
 
 #BrNo=X,30,S
 #TlrNo=X,20,S

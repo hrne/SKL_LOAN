@@ -89,7 +89,8 @@ public class L2613 extends TradeBuffer {
 		// new table
 		CustMain tCustMain = new CustMain();
 
-		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDateStart, iOverdueDateEnd, this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDateStart,
+				iOverdueDateEnd, this.index, this.limit);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		if (lForeclosureFee == null) {
 			// 法拍費用檔無資料
@@ -138,21 +139,20 @@ public class L2613 extends TradeBuffer {
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 
-			
 			chkOccursList = this.totaVo.getOccursList();
-			
-			if (lForeclosureFee.size() >= this.limit ) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
-			}
 
 		} // for
 
-		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
-			throw new LogicException("E2003", ""); // 查無資料
+		if (lForeclosureFee.size() >= this.limit) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
 		}
-		
+
+		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
+			throw new LogicException(titaVo, "E0001", "法拍費用檔"); // 查無資料
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

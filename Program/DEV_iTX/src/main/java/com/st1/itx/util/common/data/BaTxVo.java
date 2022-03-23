@@ -14,7 +14,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 3.暫收抵繳 <BR>
 	 * 4.溢(C)短(D)繳 <BR>
 	 * 5.其他額度暫收可抵繳 <BR>
-	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金) <BR>
+	 * 6.另收欠款(清償違約金、未到期火險費用、費用收取之短繳期金、繳本息之聯貸費用) <BR>
 	 */
 	private int dataKind = 0;
 
@@ -147,7 +147,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 短繳清償違約金
 	 */
 	private BigDecimal closeBreachAmt = BigDecimal.ZERO;
-
+	
 	/**
 	 * 還款後餘額
 	 */
@@ -170,11 +170,14 @@ public class BaTxVo implements Comparable<BaTxVo> {
 
 	@Override
 	public String toString() {
-		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo="
-				+ rvNo + ", payIntDate=" + payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority=" + repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr
-				+ ", acctAmt=" + acctAmt + ", loanBal=" + loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", amount=" + amount + ", intRate="
-				+ intRate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", rateIncr="
-				+ rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
+		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo
+				+ ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo=" + rvNo + ", payIntDate="
+				+ payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority="
+				+ repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", acctAmt=" + acctAmt + ", loanBal="
+				+ loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate
+				+ ", amount=" + amount + ", intRate=" + intRate + ", principal=" + principal + ", interest=" + interest
+				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt
+				+ ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
 	}
 
 	public int getDataKind() {
@@ -418,7 +421,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		if (getClass() != o.getClass())
 			return 0;
 
-		BaTxVo other = o;
+		BaTxVo other = (BaTxVo) o;
 
 		/**
 		 * 排序優先度(由小到大) payIntDate 應繳日

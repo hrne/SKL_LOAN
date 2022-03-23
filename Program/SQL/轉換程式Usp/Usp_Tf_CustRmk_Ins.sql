@@ -47,24 +47,18 @@ BEGIN
            ELSE JOB_START_TIME
            END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM (  SELECT "LMSACN"
-                  ,"TRXTDT"
-                  ,"DOCSEQ"
-                  ,"DOCTXT" AS "DOCTXT"
-                  ,"TRXMEM"
-            FROM "LNREMP"
-            UNION ALL 
-            SELECT "LMSACN"
-                  ,"TRXDAT" AS "TRXTDT"
-                  ,"DOCSEQ"
-                  ,"DOCTXT" AS "DOCTXT"
-                  ,"TRXMEM"
-            FROM "DAT_LNDOCP"
-        ) S1
+    FROM (
+      SELECT "LMSACN"
+           , "TRXTDT"
+           , "DOCSEQ"
+           , "DOCTXT" AS "DOCTXT"
+           , "TRXMEM"
+      FROM "LNREMP"
+    ) S1
     LEFT JOIN "CustMain" on "CustMain"."CustNo" = S1."LMSACN"
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."TRXMEM"
     WHERE S1."LMSACN" > 0
-    AND NVL("CustMain"."CustUKey",' ') <> ' '
+      AND NVL("CustMain"."CustUKey",' ') <> ' '
     ;
 
     -- 記錄寫入筆數

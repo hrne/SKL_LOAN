@@ -426,9 +426,8 @@ IF({i}==5,E(0,@RPTOTF,#RPTOTBAL-#RpAmt1-#RpAmt2-#RpAmt3-#RpAmt4),$)
 #RPTOT_DIS{i}=@,1,S
 C(3,#RP_IND,0,s,$)
 IF(#RPTOTF{z}>0&&#DF1=={i},
-   IF(#RPFG==1||#RPFG==2||#RPFG==6,INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{j},0)),
+   IF(#RPFG==1||#RPFG==2||#RPFG==6||#RPFG==7,INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{j},0)),
    IF(#RPTOTF{z}>0&&#RpAmt{i}>0,INVOKEJS(SHOW,grd9_{j},1),INVOKEJS(SHOW,grd9_{j},0)))
-
 ! IF(#RPTOTF>0,$,s)
 IF(#it1 > {j},$,s)
 IF(#RPFG==1&&#RPTOTF{z}>0&&#RpAmt{i}>0,E(0,@RpCode{j},90),IF(#RPFG==1&&#DF1=={i}&&#RPTOTF{z}>0&&#RpAmt{i}==0,E(0,@RpCode{j},90),$))
@@ -517,12 +516,13 @@ SHOW(#GRD_COLL{i},#RpCustNo{i})),$)
 C(3,#RP_IND,0,s,$)
 C(3,#RPTOTF,0,CALL(#SKFG_CAL{i}),$)
 C(3,#RP_IND,1,$,C(3,#RP_IND,5,$,C(3,#RP_IND,3,$,s)))
-IF(#DF1=={i},C(3,#RPFG,7,$,s),C(3,#RPFG,7,s,$))
+! IF(#DF1=={i},C(3,#RPFG,7,$,s),C(3,#RPFG,7,s,$))
 IF(#RPFG==2,s,$)
 IF(#RPFG==1,s,$)
 C(3,#GRD_SKFG{i},1,$,C(3,#RPFG,7,$,s))
 C(3,#RPFG,6,HELP(01:整批匯款;91:展期／借新還舊),
 C(3,#RPFG,7,HELP(92:暫收轉帳;94:轉債協暫收款;95:轉債協退還款)))
+IF(#RPFG==7,IF(#RPTOTF{z}>0,INVOKEJS(SHOW,grd9_{i},1)CALL(#COL_DIS_CALL{i}),INVOKEJS(SHOW,grd9_{i},0))IF(#RPTOTF{z}>0,$,s),$)
 @SWITCH(#RPFG,
 6,V(1,01,91),
 7,V(1,92,94,95),
@@ -620,7 +620,6 @@ T(2,金額不可低於+#RpXtypeRpTotF{i})
 #RpAmtComfirmB{i}=c,50,S
 T(2,金額不可高於+#RpXtypeRpTotF{i})
 
-
 ! 收付金額 IF(#DF1=={i}&&#RP_IND==5,CALL(#RPTOT_DIS{i},6),$)
 ! 若第一筆金額為0,第一筆grid不顯示,顯示第二筆並停留。
 ! 第二筆也為0,則skip到最後
@@ -635,7 +634,7 @@ IF(#GRD_SKFG{i}==1&&#RpAmt{z}>0&&#RPTOTF{z}>0,
      IF(#RPFG==1,E(0,@RpCode{i},90),$)
      IF(#RPFG==2,E(0,@RpCode{i},90),$)
      IF(#RPFG==3,E(0,@RpCode{i},93),$)
-     IF(#RPFG==1||#RPFG==2||#RPFG==3||#RPFG==6,
+     IF(#RPFG==1||#RPFG==2||#RPFG==3||#RPFG==6||#RPFG==7,
         IF(#RPTOTF{z}>0,INVOKEJS(SHOW,grd9_{i},1)CALL(#COL_DIS_CALL{i}),INVOKEJS(SHOW,grd9_{i},0))
         IF(#RPTOTF{z}>0,$,s),s),
      IF(#DF2=={i}&&#RPTOTF{z}>0,
@@ -645,11 +644,12 @@ IF(#GRD_SKFG{i}==1&&#RpAmt{z}>0&&#RPTOTF{z}>0,
                IF(#RPFG==6,E(0,@RpCode{i},01),$)
                INVOKEJS(SHOW,grd9_{i},1),E(0,@RpCode{i},0)INVOKEJS(SHOW,grd9_{i},0))
      IF(#DF2=={i}&&#RPTOTF{z}>0,$,s),s))
-IF(#RPFG==4||#RPFG==5||#RPFG==7||#RPFG==8,s,$)
+IF(#RPFG==4||#RPFG==5||#RPFG==8,s,$)
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91,$,CALL(#RPTOT_CAL{i})),$)
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91,$,CALL(#RPTOT_DIS{i},6)),$)
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91,$,s),$)
 CALL(#RPTOTBALX{i})
+IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
 @
 IF(#RpAmt{i}>0,
   IF(#RPFG==1||#RPFG==2,
@@ -664,8 +664,8 @@ CALL(#RPTOT_CAL{i})
 #RpCustNo{i}=A,7,I
 C(3,#RP_IND,0,S,$)
 IF(#DF1<{i},E(0,#RpCustNo{z}),$)
-IF(#DF1=={i},C(3,#RPFG,7,$,s),s)
-
+IF(#DF1=={i},C(3,#RPFG,7,$,s),C(3,#RPFG,7,$,s))
+IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
 
 ! 額度號碼
 #RpFacmNo{i}=A,3,I
@@ -675,6 +675,7 @@ C(3,#RpCode{i},1,s,$)
 IF(#DF1=={i},IF(#RPFG==3||#RPFG==7,
 IF(#RpCode{i}==94 || #RpCode{i}==95 ,s,$),s),
 IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
+IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
 @
 IF(#RpCode{i}==92,$,V(2,000))
 IF(#RPFG==3||#RPFG==7,CALL(#RPTOT_DIS{i},6),s)

@@ -283,16 +283,16 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          then 1 ";
 		// 郵局-條件3: 下繳日(8碼yyyymmdd) = 郵局扣款應繳日(8碼yyyymmdd) 或 有短繳期金
 		// ___________ 且 指定應繳日(2碼dd) = 0
-		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
-		sql += "               and b.\"NextPayIntDate\" = :iPostSpecificDd ";
-		sql += "               and b.\"SpecificDd\" = 0 ";
-		sql += "          then 1 ";
+//		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
+//		sql += "               and b.\"NextPayIntDate\" = :iPostSpecificDd ";
+//		sql += "               and b.\"SpecificDd\" = 0 ";
+//		sql += "          then 1 ";
 		// 郵局-條件4: 下繳日(8碼yyyymmdd) = 郵局二扣應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 0
-		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
-		sql += "               and b.\"NextPayIntDate\" = :iPostSecondSpecificDd ";
-		sql += "               and b.\"SpecificDd\" = 0 ";
-		sql += "          then 1 ";
+//		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
+//		sql += "               and b.\"NextPayIntDate\" = :iPostSecondSpecificDd ";
+//		sql += "               and b.\"SpecificDd\" = 0 ";
+//		sql += "          then 1 ";
 		// RepayBank not in (null,700) = ACH
 		// ACH-條件1: 下繳日(8碼yyyymmdd) <= ACH扣款應繳日止日(8碼yyyymmdd)
 		// __________ 且 指定應繳日(2碼dd) IN ACH扣款應繳日的應繳日(2碼dd)
@@ -308,18 +308,25 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          then 1 ";
 		// ACH-條件3: 下繳日(8碼yyyymmdd) 在 ACH扣款應繳日的起日與止日之間
 		// __________ 且 指定應繳日(2碼dd) = 0
-		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-		sql += "               and b.\"NextPayIntDate\" between :iAchSpecificDdFrom and :iAchSpecificDdTo ";
-		sql += "               and b.\"SpecificDd\" = 0 ";
-		sql += "          then 1 ";
+//		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+//		sql += "               and b.\"NextPayIntDate\" between :iAchSpecificDdFrom and :iAchSpecificDdTo ";
+//		sql += "               and b.\"SpecificDd\" = 0 ";
+//		sql += "          then 1 ";
 		// ACH-條件4: 下繳日(8碼yyyymmdd) 在 ACH二扣應繳日的起日與止日之間
 		// __________ 且 指定應繳日(2碼dd) = 0
-		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-		sql += "               and b.\"NextPayIntDate\" between :iAchSecondSpecificDdFrom and :iAchSecondSpecificDdTo ";
-		sql += "               and b.\"SpecificDd\" = 0 ";
-		sql += "          then 1 ";
-		// 費用: 費用檔有撈到就進
+//		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+//		sql += "               and b.\"NextPayIntDate\" between :iAchSecondSpecificDdFrom and :iAchSecondSpecificDdTo ";
+//		sql += "               and b.\"SpecificDd\" = 0 ";
+//		sql += "          then 1 ";
+		// 郵局-費用: 費用檔有撈到就進
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
+		sql += "               and nvl(ba.\"RepayBank\", '000') = '700' ";
+		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
+		sql += "          then 1 ";
+		// ACH-費用: 費用檔有撈到就進
+		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
+		sql += "               and nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
 		sql += "          then 1 ";
 		// 追加逾期期數
 		sql += "          when b.\"NextPayIntDate\" >= :iDeductDateStart ";
@@ -338,11 +345,11 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iDeductDateStart", iDeductDateStart);
 		query.setParameter("iDeductDateEnd", iDeductDateEnd);
 
-		query.setParameter("iAchSpecificDdFrom", iAchSpecificDdFrom);
+//		query.setParameter("iAchSpecificDdFrom", iAchSpecificDdFrom);
 		query.setParameter("iAchSpecificDdTo", iAchSpecificDdTo);
 		query.setParameter("iAchSpecificDays", iAchSpecificDays);
 
-		query.setParameter("iAchSecondSpecificDdFrom", iAchSecondSpecificDdFrom);
+//		query.setParameter("iAchSecondSpecificDdFrom", iAchSecondSpecificDdFrom);
 		query.setParameter("iAchSecondSpecificDdTo", iAchSecondSpecificDdTo);
 		query.setParameter("iAchSecondSpecificDays", iAchSecondSpecificDays);
 

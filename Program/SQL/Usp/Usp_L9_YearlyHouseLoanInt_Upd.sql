@@ -131,7 +131,10 @@ BEGIN
       GROUP BY "CustNo"
              , "FacmNo"
     )
-    SELECT YYYYMM                     AS "YearMonth"           -- 資料年月
+    SELECT CASE
+             WHEN EndMonth != 0
+             THEN EndMonth
+           ELSE YYYYMM END            AS "YearMonth"           -- 資料年月
           ,A."CustNo"                 AS "CustNo"              -- 戶號 
           ,A."FacmNo"                 AS "FacmNo"              -- 額度 
           ,CASE

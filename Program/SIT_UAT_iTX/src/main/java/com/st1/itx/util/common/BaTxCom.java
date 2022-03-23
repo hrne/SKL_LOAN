@@ -80,7 +80,6 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal shortAmt = BigDecimal.ZERO; // 短繳(正值)
 	private BigDecimal overAmt = BigDecimal.ZERO; // 溢繳(正值)
 	private int overRpFacmNo = 0; // 溢短繳額度;
-	private int iPayIntDate = 0; // 應繳日;
 
 // isPayAllFee 是否全部回收費用
 	// true->回收全部費用，false 回收金額足夠的費用
@@ -230,13 +229,35 @@ public class BaTxCom extends TradeBuffer {
 
 	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
 			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
+		this.baTxList = settingPayintDate(iEntryDate, iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt,
+				titaVo);
+		return this.baTxList;
+	}
+
+	/**
+	 * 應繳試算 by 應繳日
+	 * 
+	 * @param iEntryDate  入帳日
+	 * @param iPayIntDate 應繳日
+	 * @param iCustNo     戶號
+	 * @param iFacmNo     額度
+	 * @param iBormNo     撥款
+	 * @param iRepayType  還款類別
+	 * @param iTxAmt      入帳金額
+	 * @param titaVo      TitaVo
+	 * @return ArrayList of BaTxVo
+	 * @throws LogicException ...
+	 */
+	public ArrayList<BaTxVo> settingPayintDate(int iEntryDate, int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo,
+			int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom settingUnPaid ...");
 		this.info("BaTxCom settingUnPaid EntryDate  入帳日=" + iEntryDate);
-		this.info("BaTxCom settingUnPaid PayIntDate 應繳日=" + this.iPayIntDate);
+		this.info("BaTxCom settingUnPaid PayIntDate 應繳日=" + iPayIntDate);
 		this.info("BaTxCom settingUnPaid 戶號=" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		this.info("BaTxCom settingUnPaid RepayType 還款類別=" + iRepayType);
 		this.info("BaTxCom settingUnPaid TxAmt 回收金額=" + iTxAmt);
 		init();
+
 		// STEP 1: 設定預設值
 		// isPayAllFee 費用是否全部回收->
 		if (iRepayType <= 3 || iRepayType == 99) {
@@ -297,11 +318,11 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		// STEP 2: Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
-		loadUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, titaVo);
+		loadUnPaid(iPayIntDate, iCustNo, iFacmNo, 0, iRepayType, titaVo);
 
 		// STEP 3: 計算放款本息
 		if (iRepayType >= 1 && iRepayType <= 3) {
-			repayLoan(iEntryDate, this.iPayIntDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, 0, titaVo);
+			repayLoan(iEntryDate, iPayIntDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, 0, titaVo);
 		}
 
 		// STEP 4: 設定總金額
@@ -313,7 +334,7 @@ public class BaTxCom extends TradeBuffer {
 
 		// STEP 5: 設定還款順序
 		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:應繳本利 > 6:另收欠款
-		settlePriority(iEntryDate, iRepayType); // 還款順序
+		settlePriority(iPayIntDate, iRepayType); // 還款順序
 
 		// STEP 6 : 計算作帳金額
 
@@ -346,27 +367,6 @@ public class BaTxCom extends TradeBuffer {
 				this.info("settingUnPaid " + ba.toString());
 			}
 		}
-		return this.baTxList;
-	}
-
-	/**
-	 * 應繳試算 by 應繳日
-	 * 
-	 * @param iEntryDate  入帳日
-	 * @param iPayintDate 應繳日
-	 * @param iCustNo     戶號
-	 * @param iFacmNo     額度
-	 * @param iBormNo     撥款
-	 * @param iRepayType  還款類別
-	 * @param iTxAmt      入帳金額
-	 * @param titaVo      TitaVo
-	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ...
-	 */
-	public ArrayList<BaTxVo> settingPayintDate(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
-			int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
-		this.iPayIntDate = iPayintDate; // 應繳日;
-		this.baTxList = settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, titaVo);
 		return this.baTxList;
 	}
 
@@ -1474,7 +1474,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/* Load UnPaid */
-	public void loadUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo)
+	public void loadUnPaid(int iUnPaidDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo)
 			throws LogicException {
 // 銷帳科目記號ReceivableFlag = 1,2
 		// F09 暫付款－火險保費
@@ -1580,8 +1580,12 @@ public class BaTxCom extends TradeBuffer {
 								switch (rv.getAcctCode()) {
 								case "F10": // 帳管費/手續費
 									baTxVo.setRepayType(4); // 04-帳管費/手續費
-									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
-									this.acctFee = this.acctFee.add(rv.getRvBal());
+									if (iRepayType <= 3 && iUnPaidDate > rv.getOpenAcDate()) {
+										baTxVo.setDataKind(6); // 6.另收欠款(帳管費/手續費)
+									} else {
+										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
+										this.acctFee = this.acctFee.add(rv.getRvBal());
+									}
 									break;
 
 								case "F12": // 帳管費企金件
@@ -1623,12 +1627,12 @@ public class BaTxCom extends TradeBuffer {
 									case 2:
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 										this.fireFee = this.fireFee.add(rv.getRvBal());
-										if (rv.getOpenAcDate() / 100 >= iEntryDate / 100) {
+										if (rv.getOpenAcDate() / 100 >= iUnPaidDate / 100) {
 											this.unOpenfireFee = this.unOpenfireFee.add(rv.getRvBal());
 										}
 										break;
 									case 1:
-										if ((rv.getOpenAcDate() / 100) <= (iEntryDate / 100)) {
+										if ((rv.getOpenAcDate() / 100) <= (iUnPaidDate / 100)) {
 											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 											this.fireFee = this.fireFee.add(rv.getRvBal());
 										} else {

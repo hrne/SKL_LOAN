@@ -89,7 +89,7 @@ public class L9132Report extends MakeReport {
 
 	@Override
 	public void printContinueNext() {
-		this.print(1, 85, "=====　續　　下　　頁　=====", "C");
+		this.print(1, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
