@@ -65,10 +65,10 @@ public class L9728Report extends MakeReport {
 		this.setFontSize(12);
 
 		this.print(-1, 1, "  程式ID：" + this.getParentTranCode());
-		this.print(-1, 68, "新光人壽保險股份有限公司", "C");
+		this.print(-1, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-1, 123, "日  期：" + this.showBcDate(dateUtil.getNowStringBc(), 1));
 		this.print(-2, 1, "  報  表：" + this.getRptCode());
-		this.print(-2, 68, "申請不列印書面通知書控管報表", "C");
+		this.print(-2, this.getMidXAxis(), "申請不列印書面通知書控管報表", "C");
 		this.print(-2, 123, "時  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-3, 123, "頁  數：" + this.getNowPage());
 		this.print(-4, 1, String.format("  戶號... %d - %d ", custNoStart, custNoEnd));
@@ -83,6 +83,11 @@ public class L9728Report extends MakeReport {
 		this.setBeginRow(9);
 
 		this.setMaxRows(29);
+	}
+	
+	@Override
+	public void printFooter() {
+		this.print(1, 1,"  ========================================================================================================================================");
 	}
 
 	private Boolean exportPdf(TitaVo titaVo, List<Map<String, String>> list) throws LogicException {

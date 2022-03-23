@@ -84,6 +84,8 @@ public class L9717Report extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
+		
+		this.setFont(1, 10);
 
 //		this.info("L9717Report.printHeader");
 
@@ -111,10 +113,10 @@ public class L9717Report extends MakeReport {
 		this.print(-4, newBorder.length() - 20, "時　　間：" + showTime(this.nowTime));
 		this.print(-5, newBorder.length() - 20, "頁　　數：" + this.getNowPage());
 
-		this.print(-1, 88, "新光人壽保險股份有限公司", "C");
-		this.print(-2, 88, this.reportItem, "C");
-		this.print(-3, 88, "逾 01 - 99 期", "C");
-		this.print(-4, 88, "撥款日期  70/01/01 起", "C");
+		this.print(-1, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
+		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
+		this.print(-3, this.getMidXAxis(), "逾 01 - 99 期", "C");
+		this.print(-4, this.getMidXAxis(), "撥款日期  70/01/01 起", "C");
 
 		switch (currentSort) {
 		case Agent:
@@ -482,11 +484,6 @@ public class L9717Report extends MakeReport {
 		default:
 			break;
 		}
-
-		;
-
-		// 設定字體1:標楷體 字體大小12
-		this.setFont(1, 12);
 
 		this.reportDate = titaVo.getEntDyI() + 19110000;
 

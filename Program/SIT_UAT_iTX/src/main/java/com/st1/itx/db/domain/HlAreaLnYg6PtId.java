@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * HlAreaLnYg6Pt 匯出用HlAreaLnYg6Pt<br>
+ * HlAreaLnYg6Pt 區域中心房貸專員業績統計<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -15,82 +15,86 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class HlAreaLnYg6PtId implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 9157311540917090595L;
+	private static final long serialVersionUID = -1471276776431107806L;
 
 // 年月份
-	@Column(name = "`WorkYM`", length = 10)
-	private String workYM = " ";
+  /* eric 2022.1.6 */
+  @Column(name = "`WorkYM`")
+  private int workYM = 0;
 
-	// 單位代號
-	@Column(name = "`AreaUnitNo`", length = 6)
-	private String areaUnitNo = " ";
+  // 單位代號
+  /* eric 2022.1.6 */
+  @Column(name = "`AreaCode`", length = 6)
+  private String areaCode = " ";
 
-	public HlAreaLnYg6PtId() {
-	}
+  public HlAreaLnYg6PtId() {
+  }
 
-	public HlAreaLnYg6PtId(String workYM, String areaUnitNo) {
-		this.workYM = workYM;
-		this.areaUnitNo = areaUnitNo;
-	}
+  public HlAreaLnYg6PtId(int workYM, String areaCode) {
+    this.workYM = workYM;
+    this.areaCode = areaCode;
+  }
 
-	/**
-	 * 年月份<br>
-	 * 
-	 * @return String
-	 */
-	public String getWorkYM() {
-		return this.workYM == null ? "" : this.workYM;
-	}
+/**
+	* 年月份<br>
+	* eric 2022.1.6
+	* @return Integer
+	*/
+  public int getWorkYM() {
+    return this.workYM;
+  }
 
-	/**
-	 * 年月份<br>
-	 * 
-	 *
-	 * @param workYM 年月份
-	 */
-	public void setWorkYM(String workYM) {
-		this.workYM = workYM;
-	}
+/**
+	* 年月份<br>
+	* eric 2022.1.6
+  *
+  * @param workYM 年月份
+	*/
+  public void setWorkYM(int workYM) {
+    this.workYM = workYM;
+  }
 
-	/**
-	 * 單位代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getAreaUnitNo() {
-		return this.areaUnitNo == null ? "" : this.areaUnitNo;
-	}
+/**
+	* 單位代號<br>
+	* eric 2022.1.6
+	* @return String
+	*/
+  public String getAreaCode() {
+    return this.areaCode == null ? "" : this.areaCode;
+  }
 
-	/**
-	 * 單位代號<br>
-	 * 
-	 *
-	 * @param areaUnitNo 單位代號
-	 */
-	public void setAreaUnitNo(String areaUnitNo) {
-		this.areaUnitNo = areaUnitNo;
-	}
+/**
+	* 單位代號<br>
+	* eric 2022.1.6
+  *
+  * @param areaCode 單位代號
+	*/
+  public void setAreaCode(String areaCode) {
+    this.areaCode = areaCode;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(workYM, areaUnitNo);
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		HlAreaLnYg6PtId hlAreaLnYg6PtId = (HlAreaLnYg6PtId) obj;
-		return workYM.equals(hlAreaLnYg6PtId.workYM) && areaUnitNo.equals(hlAreaLnYg6PtId.areaUnitNo);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(workYM, areaCode);
+  }
 
-	@Override
-	public String toString() {
-		return "HlAreaLnYg6PtId [workYM=" + workYM + ", areaUnitNo=" + areaUnitNo + "]";
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj)
+      return true;
+    if(obj == null || getClass() != obj.getClass())
+      return false;
+    HlAreaLnYg6PtId hlAreaLnYg6PtId = (HlAreaLnYg6PtId) obj;
+    return workYM == hlAreaLnYg6PtId.workYM && areaCode.equals(hlAreaLnYg6PtId.areaCode);
+  }
+
+  @Override
+  public String toString() {
+    return "HlAreaLnYg6PtId [workYM=" + workYM + ", areaCode=" + areaCode + "]";
+  }
 }

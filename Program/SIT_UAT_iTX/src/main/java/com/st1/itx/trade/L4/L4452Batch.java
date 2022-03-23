@@ -403,12 +403,14 @@ public class L4452Batch extends TradeBuffer {
 
 //				扣款人ID+郵局存款別(POSCDE)+戶號) +2位帳號碼
 				// 右靠左補空白
-
-				String custId = tBankDeductDtl.getRelCustId();
-				if (tBankDeductDtl.getRelCustId().isEmpty()) {
-					custId = tCustMain.getCustId();
+				// 關係為本人 抓客戶黨統編
+				String custId = "";
+				if("00".equals(tBankDeductDtl.getRelationCode())) {
+					custId = tBankDeductDtl.getRelCustId();
+				} else {
+					custId = tCustMain.getCustId();					
 				}
-
+				
 				tPostDeductMedia.setPostUserNo(
 						FormatUtil.padX(tBankDeductDtl.getRepayAcctSeq(), 2) + FormatUtil.padX(custId, 10)
 								+ tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7));
@@ -679,7 +681,7 @@ public class L4452Batch extends TradeBuffer {
 				occursList.putParam("OccRepayAmt", FormatUtil.pad9(tPostDeductMedia.getRepayAmt() + "00", 11));
 
 				occursList.putParam("OccCustMemo", FormatUtil.padLeft(tPostDeductMedia.getPostUserNo(), 20));
-				occursList.putParam("OccPrtCustNo", FormatUtil.padX("", 1));
+				occursList.putParam("OccPrtCustNo", FormatUtil.padX("1", 1));
 				;
 				occursList.putParam("OccPostNote2", FormatUtil.padX("", 1));
 				occursList.putParam("OccMaskFlag", FormatUtil.padX("", 1));
@@ -997,9 +999,6 @@ public class L4452Batch extends TradeBuffer {
 					amt12 = amt12.add(tAchDeductMedia.getRepayAmt());
 				}
 
-				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tAchDeductMedia.getCustNo(), tAchDeductMedia.getCustNo(),
-						titaVo);
 
 				OccursList occursList = new OccursList();
 
@@ -1024,7 +1023,7 @@ public class L4452Batch extends TradeBuffer {
 				occursList.putParam("OccReturnCode", FormatUtil.pad9("", 2));
 				occursList.putParam("OccIndicator", "B");
 				occursList.putParam("OccSenderId", FormatUtil.padX("03458902", 10));
-				occursList.putParam("OccCustId", FormatUtil.padX(tCustMain.getCustId(), 10));
+				occursList.putParam("OccCustId", FormatUtil.padX(tAchDeductMedia.getRelCustId(), 10));
 				occursList.putParam("OccCompanyCode", FormatUtil.padX("2888", 6));
 				occursList.putParam("OccOTransDate", FormatUtil.pad9("", 8));
 				occursList.putParam("OccOTransSeq", FormatUtil.pad9("", 6));

@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
- * HlThreeLaqhcp 房貸排行邏輯檔<br>
+ * HlThreeLaqhcp 單位、區部、部室業績累計檔<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -15,155 +17,132 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class HlThreeLaqhcpId implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3642705676859360182L;
+	private static final long serialVersionUID = 341327590192502959L;
 
 // 年月日
-	@Column(name = "`CalDate`", length = 10)
-	private String calDate = " ";
+  @Column(name = "`CalDate`")
+  private int calDate = 0;
 
-	// 員工代號
-	@Column(name = "`EmpNo`", length = 6)
-	private String empNo = " ";
+  // 部室代號
+  @Column(name = "`DeptCode`", length = 6)
+  private String deptCode = " ";
 
-	// 區部代號
-	@Column(name = "`BranchNo`", length = 6)
-	private String branchNo = " ";
+  // 區部代號
+  @Column(name = "`DistCode`", length = 6)
+  private String distCode = " ";
 
-	// 部室代號
-	@Column(name = "`DeptNo`", length = 6)
-	private String deptNo = " ";
+  // 單位代號
+  @Column(name = "`UnitCode`", length = 6)
+  private String unitCode = " ";
 
-	// 單位代號
-	@Column(name = "`UnitNo`", length = 6)
-	private String unitNo = " ";
+  public HlThreeLaqhcpId() {
+  }
 
-	public HlThreeLaqhcpId() {
-	}
+  public HlThreeLaqhcpId(int calDate, String deptCode, String distCode, String unitCode) {
+    this.calDate = calDate;
+    this.deptCode = deptCode;
+    this.distCode = distCode;
+    this.unitCode = unitCode;
+  }
 
-	public HlThreeLaqhcpId(String calDate, String empNo, String branchNo, String deptNo, String unitNo) {
-		this.calDate = calDate;
-		this.empNo = empNo;
-		this.branchNo = branchNo;
-		this.deptNo = deptNo;
-		this.unitNo = unitNo;
-	}
+/**
+	* 年月日<br>
+	* 
+	* @return Integer
+	*/
+  public int getCalDate() {
+    return  StaticTool.bcToRoc(this.calDate);
+  }
 
-	/**
-	 * 年月日<br>
-	 * 
-	 * @return String
-	 */
-	public String getCalDate() {
-		return this.calDate == null ? "" : this.calDate;
-	}
+/**
+	* 年月日<br>
+	* 
+  *
+  * @param calDate 年月日
+  * @throws LogicException when Date Is Warn	*/
+  public void setCalDate(int calDate) throws LogicException {
+    this.calDate = StaticTool.rocToBc(calDate);
+  }
 
-	/**
-	 * 年月日<br>
-	 * 
-	 *
-	 * @param calDate 年月日
-	 */
-	public void setCalDate(String calDate) {
-		this.calDate = calDate;
-	}
+/**
+	* 部室代號<br>
+	* 
+	* @return String
+	*/
+  public String getDeptCode() {
+    return this.deptCode == null ? "" : this.deptCode;
+  }
 
-	/**
-	 * 員工代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getEmpNo() {
-		return this.empNo == null ? "" : this.empNo;
-	}
+/**
+	* 部室代號<br>
+	* 
+  *
+  * @param deptCode 部室代號
+	*/
+  public void setDeptCode(String deptCode) {
+    this.deptCode = deptCode;
+  }
 
-	/**
-	 * 員工代號<br>
-	 * 
-	 *
-	 * @param empNo 員工代號
-	 */
-	public void setEmpNo(String empNo) {
-		this.empNo = empNo;
-	}
+/**
+	* 區部代號<br>
+	* 
+	* @return String
+	*/
+  public String getDistCode() {
+    return this.distCode == null ? "" : this.distCode;
+  }
 
-	/**
-	 * 區部代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getBranchNo() {
-		return this.branchNo == null ? "" : this.branchNo;
-	}
+/**
+	* 區部代號<br>
+	* 
+  *
+  * @param distCode 區部代號
+	*/
+  public void setDistCode(String distCode) {
+    this.distCode = distCode;
+  }
 
-	/**
-	 * 區部代號<br>
-	 * 
-	 *
-	 * @param branchNo 區部代號
-	 */
-	public void setBranchNo(String branchNo) {
-		this.branchNo = branchNo;
-	}
+/**
+	* 單位代號<br>
+	* 
+	* @return String
+	*/
+  public String getUnitCode() {
+    return this.unitCode == null ? "" : this.unitCode;
+  }
 
-	/**
-	 * 部室代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getDeptNo() {
-		return this.deptNo == null ? "" : this.deptNo;
-	}
+/**
+	* 單位代號<br>
+	* 
+  *
+  * @param unitCode 單位代號
+	*/
+  public void setUnitCode(String unitCode) {
+    this.unitCode = unitCode;
+  }
 
-	/**
-	 * 部室代號<br>
-	 * 
-	 *
-	 * @param deptNo 部室代號
-	 */
-	public void setDeptNo(String deptNo) {
-		this.deptNo = deptNo;
-	}
 
-	/**
-	 * 單位代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getUnitNo() {
-		return this.unitNo == null ? "" : this.unitNo;
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(calDate, deptCode, distCode, unitCode);
+  }
 
-	/**
-	 * 單位代號<br>
-	 * 
-	 *
-	 * @param unitNo 單位代號
-	 */
-	public void setUnitNo(String unitNo) {
-		this.unitNo = unitNo;
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj)
+      return true;
+    if(obj == null || getClass() != obj.getClass())
+      return false;
+    HlThreeLaqhcpId hlThreeLaqhcpId = (HlThreeLaqhcpId) obj;
+    return calDate == hlThreeLaqhcpId.calDate && deptCode.equals(hlThreeLaqhcpId.deptCode) && distCode.equals(hlThreeLaqhcpId.distCode) && unitCode.equals(hlThreeLaqhcpId.unitCode);
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(calDate, empNo, branchNo, deptNo, unitNo);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		HlThreeLaqhcpId hlThreeLaqhcpId = (HlThreeLaqhcpId) obj;
-		return calDate.equals(hlThreeLaqhcpId.calDate) && empNo.equals(hlThreeLaqhcpId.empNo) && branchNo.equals(hlThreeLaqhcpId.branchNo) && deptNo.equals(hlThreeLaqhcpId.deptNo)
-				&& unitNo.equals(hlThreeLaqhcpId.unitNo);
-	}
-
-	@Override
-	public String toString() {
-		return "HlThreeLaqhcpId [calDate=" + calDate + ", empNo=" + empNo + ", branchNo=" + branchNo + ", deptNo=" + deptNo + ", unitNo=" + unitNo + "]";
-	}
+  @Override
+  public String toString() {
+    return "HlThreeLaqhcpId [calDate=" + calDate + ", deptCode=" + deptCode + ", distCode=" + distCode + ", unitCode=" + unitCode + "]";
+  }
 }

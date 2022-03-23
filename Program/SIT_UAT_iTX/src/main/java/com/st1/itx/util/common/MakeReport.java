@@ -1039,16 +1039,13 @@ public class MakeReport extends CommBuffer {
 			tTxFile.setSignCode(String.valueOf(tCdReport.getSignCode()));
 
 			// 2021-1-5 增加判斷 SignCode == 1 才印
-			// 2022-3-18 xiangwei: 增加以 fontSize 為根據的方程式
-			// 求法是產出實際pdf後對照尺標與座標, 代入ax+b推出適合的公式
-			// 需要採更多樣以保證正確性
 			if (tCdReport.getSignCode() == 1 && !useDefault) {
 				if ("P".equals(pageOrientation)) {
-					this.print(1, (230 + this.fontSize * -8) / 3, signOff0, "C");
-					this.print(1, (230 + this.fontSize * -8) / 3, signOff1, "C");
+					this.print(1, this.getMidXAxis(), signOff0, "C");
+					this.print(1, this.getMidXAxis(), signOff1, "C");
 				} else {
-					this.print(1, 210 + this.fontSize * -14, signOff0, "C");
-					this.print(1, 210 + this.fontSize * -14, signOff1, "C");
+					this.print(1, this.getMidXAxis(), signOff0, "C");
+					this.print(1, this.getMidXAxis(), signOff1, "C");
 				}
 			}
 		}
@@ -2553,6 +2550,21 @@ public class MakeReport extends CommBuffer {
 
 	public void setBatchNo(String batchNo) {
 		this.batchNo = batchNo;
+	}
+	
+	/**
+	 * 回傳目前紙張設定 X 軸正中央的座標<br>
+	 * 會用到字型大小和紙張方向，因此請確認設定順序<br><br>
+	 * 求法是產出實際 pdf 後對照尺標與座標, 代入 ax+b 推出適合的公式<br>
+	 * 需要採更多樣以保證正確性
+	 * @return int x axis for print
+	 */
+	public int getMidXAxis() {
+		if ("P".equals(this.pageOrientation)) {
+			return (230 + this.fontSize * -8) / 3;
+		} else {
+			return 154 + this.fontSize * -7;
+		}
 	}
 
 }

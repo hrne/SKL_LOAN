@@ -322,6 +322,74 @@ BEGIN
     T1."RateIncr"  = S1."RateIncr" 
     ;
 
+    -- 2022-03-23 智偉新增
+    -- 將預調利率更新為前一筆利率的數字
+    MERGE INTO "LoanRateChange" T1
+    USING (
+      WITH LBM AS (
+        SELECT "CustNo"
+             , "FacmNo"
+             , "BormNo"
+             , "Status"
+        FROM "LoanBorMain"
+      )
+      , orderedData AS (
+        SELECT LRC."CustNo"
+             , LRC."FacmNo"
+             , LRC."BormNo"
+             , LRC."EffectDate"
+             , LRC."Status"
+             , LRC."RateCode"
+             , LRC."ProdNo"
+             , LRC."BaseRateCode"
+             , LRC."IncrFlag"
+             , LRC."RateIncr"
+             , LRC."IndividualIncr"
+             , LRC."FitRate"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY LRC."CustNo"
+                            , LRC."FacmNo"
+                            , LRC."BormNo"
+                 ORDER BY LRC."EffectDate" DESC
+               ) AS "Seq"
+        FROM "LoanRateChange" LRC
+        LEFT JOIN LBM ON LBM."CustNo" = LRC."CustNo"
+                     AND LBM."FacmNo" = LRC."FacmNo"
+                     AND LBM."BormNo" = LRC."BormNo"
+        LEFT JOIN "FacProd" FP ON FP."ProdNo" = LRC."ProdNo"
+        WHERE NVL(LBM."Status",-1) = 0
+          AND LRC."BaseRateCode" = '99'
+          AND FP."EmpFlag" = 'N' -- 排除員工商品
+      ) 
+      SELECT O1."CustNo"
+           , O1."FacmNo"
+           , O1."BormNo"
+           , O1."EffectDate"
+           , O2."RateIncr"
+           , O2."IndividualIncr"
+           , O2."FitRate"
+      FROM orderedData O1
+      LEFT JOIN orderedData O2 ON O2."CustNo" = O1."CustNo"
+                              AND O2."FacmNo" = O1."FacmNo"
+                              AND O2."BormNo" = O1."BormNo"
+                              AND O2."Seq" = 2
+      WHERE O1."Seq" = 1
+        AND TO_DATE(O1."EffectDate",'YYYYMMDD') > ADD_MONTHS(TO_DATE(TbsDyF,'YYYYMMDD'),1)
+    ) S1
+    ON (
+      S1."CustNo" = T1."CustNo"
+      AND S1."FacmNo" = T1."FacmNo"
+      AND S1."BormNo" = T1."BormNo"
+      AND S1."EffectDate" = T1."EffectDate"
+    )
+    WHEN MATCHED THEN UPDATE SET
+    T1."RateIncr" = NVL(S1."RateIncr",0)
+    , T1."IndividualIncr" = NVL(S1."IndividualIncr",0)
+    , T1."FitRate" = NVL(S1."FitRate",0)
+    , T1."Remark" = '預調利率'
+    ;
+
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 

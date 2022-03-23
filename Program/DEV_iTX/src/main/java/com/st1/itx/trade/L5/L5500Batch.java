@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +15,21 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.HlAreaData;
+import com.st1.itx.db.domain.HlAreaLnYg6Pt;
+import com.st1.itx.db.domain.HlAreaLnYg6PtId;
 import com.st1.itx.db.domain.HlCusData;
+import com.st1.itx.db.domain.HlEmpLnYg5Pt;
+import com.st1.itx.db.domain.HlEmpLnYg5PtId;
+import com.st1.itx.db.domain.HlThreeLaqhcp;
+import com.st1.itx.db.domain.HlThreeLaqhcpId;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.HlAreaDataService;
+import com.st1.itx.db.service.HlAreaLnYg6PtService;
 import com.st1.itx.db.service.HlCusDataService;
+import com.st1.itx.db.service.HlEmpLnYg5PtService;
+import com.st1.itx.db.service.HlThreeLaqhcpService;
 import com.st1.itx.db.service.springjpa.cm.L5500ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -43,22 +56,75 @@ public class L5500Batch extends TradeBuffer {
 
 	@Autowired
 	public HlCusDataService hlCusDataService;
-	
+
+	@Autowired
+	public HlEmpLnYg5PtService hlEmpLnYg5PtService;
+
+	@Autowired
+	public HlAreaLnYg6PtService hlAreaLnYg6PtService;
+
+	@Autowired
+	public HlThreeLaqhcpService hlThreeLaqhcpService;
+
+	@Autowired
+	CdWorkMonthService cdWorkMonthService;
+
 	@Autowired
 	public L5500ServiceImpl l5500ServiceImpl;
 
 	@Autowired
 	public WebClient webClient;
 
+	private int entday;
+	private int bworkmonth = 0;
+	private String bworkmonthX = "";
+	private int lworkmonth = 0;
+	private String lworkmonthX = "";
+	private int workmonth = 0;
+	private String workmonthX = "";
+	private int workseason = 0;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5500Batch ");
 		this.totaVo.init(titaVo);
 
+		entday = Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000;
+
+		CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(entday, entday, titaVo);
+		if (cdWorkMonth == null) {
+			throw new LogicException("E0001", "放款業績工作月對照檔");
+		}
+
+		// 工作月
+		workmonth = cdWorkMonth.getYear() * 100 + cdWorkMonth.getMonth();
+
+		workmonthX = String.valueOf(workmonth);
+
+		// 上工作月
+		if (cdWorkMonth.getMonth() > 1) {
+			lworkmonth = cdWorkMonth.getYear() * 100 + (cdWorkMonth.getMonth() - 1);
+		} else {
+			lworkmonth = (cdWorkMonth.getYear() - 1) * 100 + 12;
+		}
+		lworkmonthX = String.valueOf(lworkmonth);
+
+		// 年度首月
+		bworkmonth = cdWorkMonth.getYear() * 100 + 1;
+		bworkmonthX = String.valueOf(bworkmonth);
+
+		this.info("L5500Batch workmonth = " + workmonth);
+
 		ProcHlAreaData(titaVo);
 
 		ProcHlCusData(titaVo);
-		
+
+		procHlEmpLnYg5Pt(titaVo);
+
+		procHlAreaLnYg6Pt(titaVo);
+
+		procHlThreeLaqhcp(titaVo);
+
 		String msg = "L5500已處理完畢";
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", msg, titaVo);
@@ -67,14 +133,309 @@ public class L5500Batch extends TradeBuffer {
 		return this.sendList();
 	}
 
-	// 單位達成件數、金額統計檔
-	public void procHlAreaLnYg6Pt(TitaVo titaVo) throws LogicException {
+	// 單位、區部、部室業績累計檔
+	public void procHlThreeLaqhcp(TitaVo titaVo) throws LogicException {
+		// delete
+		Slice<HlThreeLaqhcp> slHlThreeLaqhcp = hlThreeLaqhcpService.findCalDate(entday, 0, Integer.MAX_VALUE);
+		List<HlThreeLaqhcp> lHlThreeLaqhcp = slHlThreeLaqhcp == null ? null : slHlThreeLaqhcp.getContent();
+		if (lHlThreeLaqhcp != null) {
+			try {
+				hlThreeLaqhcpService.deleteAll(lHlThreeLaqhcp, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "HlThreeLaqhcp");
+			}
+		}
+		String sql = "select a.*";
+		sql += ",NVL(b.\"DeptCnt\",0) as \"DeptCnt\"";
+		sql += ",NVL(b.\"DeptAmt\",0) as \"DeptAmt\"";
+		sql += ",NVL(c.\"DistCnt\",0) as \"DistCnt\"";
+		sql += ",NVL(c.\"DistAmt\",0) as \"DistAmt\"";
+		sql += ",NVL(d.\"UnitCnt\",0) as \"UnitCnt\"";
+		sql += ",NVL(d.\"UnitAmt\",0) as \"UnitAmt\"";
+		sql += ",NVL(bb.\"DeptCnt\",0) as \"tDeptCnt\"";
+		sql += ",NVL(bb.\"DeptAmt\",0) as \"tDeptAmt\"";
+		sql += ",NVL(cc.\"DistCnt\",0) as \"tDistCnt\"";
+		sql += ",NVL(cc.\"DistAmt\",0) as \"tDistAmt\"";
+		sql += ",NVL(dd.\"UnitCnt\",0) as \"tUnitCnt\"";
+		sql += ",NVL(dd.\"UnitAmt\",0) as \"tUnitAmt\"";
+		sql += "from \"PfDeparment\" a ";
+		sql += "left join (";
+		sql += "  select \"DeptCode\",sum(\"PerfCnt\") as \"DeptCnt\",sum(\"PerfAmt\") as \"DeptAmt\"";
+		sql += "    from \"PfItDetail\" ";
+		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   group by \"DeptCode\" ";
+		sql += ") b on b.\"DeptCode\"=a.\"DeptCode\" ";
+		sql += "left join (";
+		sql += "  select \"DistCode\",sum(\"PerfCnt\") as \"DistCnt\",sum(\"PerfAmt\") as \"DistAmt\"";
+		sql += "    from \"PfItDetail\" ";
+		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   group by \"DistCode\" ";
+		sql += ") c on c.\"DistCode\"=a.\"DistCode\" ";
+		sql += "left join (";
+		sql += "  select \"UnitCode\",sum(\"PerfCnt\") as \"UnitCnt\",sum(\"PerfAmt\") as \"UnitAmt\"";
+		sql += "    from \"PfItDetail\" ";
+		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   group by \"UnitCode\" ";
+		sql += ") d on d.\"UnitCode\"=a.\"UnitCode\" ";
+		sql += "left join (";
+		sql += "  select \"DeptCode\",sum(\"PerfCnt\") as \"DeptCnt\",sum(\"PerfAmt\") as \"DeptAmt\"";
+		sql += "    from \"PfItDetail\" ";
+		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   group by \"DeptCode\" ";
+		sql += ") bb on bb.\"DeptCode\"=a.\"DeptCode\" ";
+		sql += "left join (";
+		sql += "  select \"DistCode\",sum(\"PerfCnt\") as \"DistCnt\",sum(\"PerfAmt\") as \"DistAmt\"";
+		sql += "    from \"PfItDetail\" ";
+		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   group by \"DistCode\" ";
+		sql += ") cc on cc.\"DistCode\"=a.\"DistCode\" ";
+		sql += "left join (";
+		sql += "  select \"UnitCode\",sum(\"PerfCnt\") as \"UnitCnt\",sum(\"PerfAmt\") as \"UnitAmt\"";
+		sql += "    from \"PfItDetail\" ";
+		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   group by \"UnitCode\" ";
+		sql += ") dd on dd.\"UnitCode\"=a.\"UnitCode\" ";
 
+		Map<String, String> conds = new HashMap<String, String>();
+
+		conds.put("workmonth1", bworkmonthX);
+		conds.put("workmonth2", workmonthX);
+
+		List<Map<String, String>> data = l5500ServiceImpl.findData(index, limit, sql, conds, titaVo);
+		lHlThreeLaqhcp = new ArrayList<HlThreeLaqhcp>();
+		if (data != null && data.size() > 0) {
+			for (Map<String, String> d : data) {
+				HlThreeLaqhcp hlThreeLaqhcp = new HlThreeLaqhcp();
+
+				HlThreeLaqhcpId hlThreeLaqhcpId = new HlThreeLaqhcpId();
+
+				hlThreeLaqhcpId.setCalDate(entday);
+				hlThreeLaqhcpId.setDeptCode(d.get("DeptCode"));
+				hlThreeLaqhcpId.setDistCode(d.get("DistCode"));
+				hlThreeLaqhcpId.setUnitCode(d.get("UnitCode"));
+
+				hlThreeLaqhcp.setHlThreeLaqhcpId(hlThreeLaqhcpId);
+
+				hlThreeLaqhcp.setEmpNo(d.get("EmpNo"));
+				hlThreeLaqhcp.setEmpName(d.get("EmpName"));
+				hlThreeLaqhcp.setDeptName(d.get("DeptItem"));
+				hlThreeLaqhcp.setDistName(d.get("DistItem"));
+				hlThreeLaqhcp.setUnitName(d.get("UnitItem"));
+				hlThreeLaqhcp.setDepartOfficer(d.get("DepartOfficer"));
+				hlThreeLaqhcp.setDirectorCode(d.get("DirectorCode"));
+				hlThreeLaqhcp.setGoalNum(new BigDecimal(d.get("GoalCnt")));
+				hlThreeLaqhcp.setGoalAmt(new BigDecimal(d.get("GoalAmt")));
+				hlThreeLaqhcp.setTGoalNum(new BigDecimal(d.get("SumGoalCnt")));
+				hlThreeLaqhcp.setTGoalAmt(new BigDecimal(d.get("SumGoalAmt")));
+
+				if (d.get("UnitCode").isEmpty() && d.get("DistCode").isEmpty()) {
+					hlThreeLaqhcp.setActNum(new BigDecimal(d.get("DeptCnt")));
+					hlThreeLaqhcp.setActAmt(new BigDecimal(d.get("DeptAmt")));
+					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tDeptCnt")));
+					hlThreeLaqhcp.setTActAmt(new BigDecimal(d.get("tDeptAmt")));
+				} else if (d.get("UnitCode").isEmpty()) {
+					hlThreeLaqhcp.setActNum(new BigDecimal(d.get("DistCnt")));
+					hlThreeLaqhcp.setActAmt(new BigDecimal(d.get("DistAmt")));
+					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tDistCnt")));
+					hlThreeLaqhcp.setTActAmt(new BigDecimal(d.get("tDistAmt")));
+				} else {
+					hlThreeLaqhcp.setActNum(new BigDecimal(d.get("UnitCnt")));
+					hlThreeLaqhcp.setActAmt(new BigDecimal(d.get("UnitAmt")));
+					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tUnitCnt")));
+					hlThreeLaqhcp.setTActAmt(new BigDecimal(d.get("tUnitAmt")));
+				}
+				if (hlThreeLaqhcp.getGoalAmt().compareTo(BigDecimal.ZERO) == 0
+						|| hlThreeLaqhcp.getActAmt().compareTo(BigDecimal.ZERO) == 0) {
+					hlThreeLaqhcp.setActRate(BigDecimal.ZERO);
+				} else {
+					BigDecimal ma = hlThreeLaqhcp.getActAmt().divide(hlThreeLaqhcp.getGoalAmt())
+							.multiply(new BigDecimal("100").setScale(2,BigDecimal.ROUND_UP));
+
+					hlThreeLaqhcp.setActRate(ma);
+				}
+				if (hlThreeLaqhcp.getTGoalAmt().compareTo(BigDecimal.ZERO) == 0
+						|| hlThreeLaqhcp.getTActAmt().compareTo(BigDecimal.ZERO) == 0) {
+					hlThreeLaqhcp.setTActRate(BigDecimal.ZERO);
+				} else {
+					BigDecimal ma = hlThreeLaqhcp.getTActAmt().divide(hlThreeLaqhcp.getTGoalAmt())
+							.multiply(new BigDecimal("100").setScale(2,BigDecimal.ROUND_UP));
+
+					hlThreeLaqhcp.setTActRate(ma);
+				}
+
+				hlThreeLaqhcp.setUpNo(1);
+				hlThreeLaqhcp.setProcessDate(entday);
+
+				lHlThreeLaqhcp.add(hlThreeLaqhcp);
+			}
+
+		}
+
+		if (lHlThreeLaqhcp != null && lHlThreeLaqhcp.size() != 0) {
+			try {
+				hlThreeLaqhcpService.insertAll(lHlThreeLaqhcp, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "HlThreeLaqhcp");
+			}
+		}
+
+		this.batchTransaction.commit();
+	}
+
+	// 區域中心房貸專員業績統計
+	public void procHlAreaLnYg6Pt(TitaVo titaVo) throws LogicException {
+		// delete
+		Slice<HlAreaLnYg6Pt> slHlAreaLnYg6Pt = hlAreaLnYg6PtService.findCalDate(entday, 0, Integer.MAX_VALUE);
+		List<HlAreaLnYg6Pt> lHlAreaLnYg6Pt = slHlAreaLnYg6Pt == null ? null : slHlAreaLnYg6Pt.getContent();
+		if (lHlAreaLnYg6Pt != null) {
+			try {
+				hlAreaLnYg6PtService.deleteAll(lHlAreaLnYg6Pt, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "HlAreaLnYg6Pt");
+			}
+		}
+		String sql = "select a.\"AreaCode\" ";
+		sql += ",NVL(b.\"lPerfCnt\",0) as \"lPerfCnt\",NVL(b.\"lPerfAmt\",0) as \"lPerfAmt\" ";
+		sql += ",NVL(c.\"PerfCnt\",0) as \"PerfCnt\",NVL(c.\"PerfAmt\",0) as \"PerfAmt\" ";
+		sql += "from (select distinct(\"AreaCode\") as \"AreaCode\" from \"PfBsOfficer\") a ";
+		sql += "left join (";
+		sql += "  select bb.\"AreaCode\",sum(NVL(cc.\"AdjPerfCnt\",aa.\"PerfCnt\")) as \"lPerfCnt\",sum(NVL(cc.\"AdjPerfAmt\",aa.\"PerfAmt\")) as \"lPerfAmt\" ";
+		sql += "  from \"PfBsDetail\" aa ";
+		sql += "  left join \"PfBsOfficer\" bb on bb.\"WorkMonth\"=:lworkmonth and bb.\"EmpNo\"=aa.\"BsOfficer\" ";
+		sql += "  left join \"PfBsDetailAdjust\" cc on cc.\"CustNo\"=aa.\"CustNo\" and cc.\"FacmNo\"=aa.\"FacmNo\" and cc.\"BormNo\"=aa.\"BormNo\" ";
+		sql += "  where aa.\"WorkMonth\"=:lworkmonth and bb.\"AreaCode\" is not null ";
+		sql += "  group by bb.\"AreaCode\"";
+		sql += ") b on b.\"AreaCode\"=a.\"AreaCode\" ";
+		sql += "left join (";
+		sql += "  select bb.\"AreaCode\",sum(NVL(cc.\"AdjPerfCnt\",aa.\"PerfCnt\")) as \"PerfCnt\",sum(NVL(cc.\"AdjPerfAmt\",aa.\"PerfAmt\")) as \"PerfAmt\" ";
+		sql += "  from \"PfBsDetail\" aa ";
+		sql += "  left join \"PfBsOfficer\" bb on bb.\"WorkMonth\"=:workmonth and bb.\"EmpNo\"=aa.\"BsOfficer\" ";
+		sql += "  left join \"PfBsDetailAdjust\" cc on cc.\"CustNo\"=aa.\"CustNo\" and cc.\"FacmNo\"=aa.\"FacmNo\" and cc.\"BormNo\"=aa.\"BormNo\" ";
+		sql += "  where aa.\"WorkMonth\"=:workmonth and bb.\"AreaCode\" is not null ";
+		sql += "  group by bb.\"AreaCode\"";
+		sql += ") c on c.\"AreaCode\"=a.\"AreaCode\"";
+
+		Map<String, String> conds = new HashMap<String, String>();
+
+		conds.put("lworkmonth", lworkmonthX);
+		conds.put("workmonth", workmonthX);
+
+		List<Map<String, String>> data = l5500ServiceImpl.findData(index, limit, sql, conds, titaVo);
+		lHlAreaLnYg6Pt = new ArrayList<HlAreaLnYg6Pt>();
+		if (data != null && data.size() > 0) {
+			for (Map<String, String> d : data) {
+				HlAreaLnYg6Pt hlAreaLnYg6Pt = new HlAreaLnYg6Pt();
+
+				HlAreaLnYg6PtId hlAreaLnYg6PtId = new HlAreaLnYg6PtId();
+				hlAreaLnYg6PtId.setWorkYM(workmonth);
+				hlAreaLnYg6PtId.setAreaCode(d.get("AreaCode"));
+
+				hlAreaLnYg6Pt.setHlAreaLnYg6PtId(hlAreaLnYg6PtId);
+//				LstAppNum
+//				LstAppAmt
+//				TisAppNum
+//				TisAppAmt
+
+				hlAreaLnYg6Pt.setLstAppNum(new BigDecimal(d.get("lPerfCnt")));
+				hlAreaLnYg6Pt.setLstAppAmt(new BigDecimal(d.get("lPerfAmt")));
+				hlAreaLnYg6Pt.setTisAppNum(new BigDecimal(d.get("PerfCnt")));
+				hlAreaLnYg6Pt.setTisAppAmt(new BigDecimal(d.get("PerfAmt")));
+				hlAreaLnYg6Pt.setCalDate(entday);
+				hlAreaLnYg6Pt.setUpNo(1);
+
+				lHlAreaLnYg6Pt.add(hlAreaLnYg6Pt);
+			}
+
+		}
+
+		if (lHlAreaLnYg6Pt != null && lHlAreaLnYg6Pt.size() != 0) {
+			try {
+				hlAreaLnYg6PtService.insertAll(lHlAreaLnYg6Pt, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "HlAreaLnYg6Pt");
+			}
+		}
+
+		this.batchTransaction.commit();
+	}
+
+	// 房貨專員目標檔案
+
+	public void procHlEmpLnYg5Pt(TitaVo titaVo) throws LogicException {
+		// delete
+		Slice<HlEmpLnYg5Pt> slHlEmpLnYg5Pt = hlEmpLnYg5PtService.findCalDate(entday, 0, Integer.MAX_VALUE);
+		List<HlEmpLnYg5Pt> lHlEmpLnYg5Pt = slHlEmpLnYg5Pt == null ? null : slHlEmpLnYg5Pt.getContent();
+		if (lHlEmpLnYg5Pt != null) {
+			try {
+				hlEmpLnYg5PtService.deleteAll(lHlEmpLnYg5Pt, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "HlEmpLnYg5Pt");
+			}
+		}
+
+		String sql = "select a.*,NVL(b.\"PerfCnt\",0) as \"PerfCnt\",NVL(b.\"PerfAmt\",0) as \"PerfAmt\" ";
+		sql += "from \"PfBsOfficer\" a ";
+		sql += "left join (";
+		sql += "select \"BsOfficer\",sum(\"PerfCnt\") as \"PerfCnt\",sum(\"PerfAmt\") as \"PerfAmt\" from ( ";
+		sql += "  select aa.\"BsOfficer\"";
+		sql += "        ,NVL(bb.\"AdjPerfCnt\",aa.\"PerfCnt\") as \"PerfCnt\"";
+		sql += "        ,NVL(bb.\"AdjPerfAmt\",aa.\"PerfAmt\") as \"PerfAmt\"";
+		sql += "    from \"PfBsDetail\" aa ";
+		sql += "    left join \"PfBsDetailAdjust\" bb on bb.\"CustNo\"=aa.\"CustNo\" and bb.\"FacmNo\"=aa.\"FacmNo\" and bb.\"BormNo\"=aa.\"BormNo\" ";
+		sql += "    where aa.\"WorkMonth\"=:workmonth and aa.\"RepayType\"=0 and aa.\"BsOfficer\" is not null ";
+		sql += "  ) group by \"BsOfficer\" ";
+		sql += ") b on b.\"BsOfficer\" = a.\"EmpNo\" ";
+		sql += "where a.\"WorkMonth\"=:workmonth ";
+		sql += "order by a.\"AreaCode\",a.\"EmpNo\" ";
+
+		Map<String, String> conds = new HashMap<String, String>();
+
+		conds.put("workmonth", workmonthX);
+
+		List<Map<String, String>> data = l5500ServiceImpl.findData(index, limit, sql, conds, titaVo);
+		lHlEmpLnYg5Pt = new ArrayList<HlEmpLnYg5Pt>();
+		if (data != null && data.size() > 0) {
+			for (Map<String, String> d : data) {
+				HlEmpLnYg5Pt hlEmpLnYg5Pt = new HlEmpLnYg5Pt();
+
+				HlEmpLnYg5PtId hlEmpLnYg5PtId = new HlEmpLnYg5PtId();
+				hlEmpLnYg5PtId.setWorkYM(workmonth);
+				hlEmpLnYg5PtId.setEmpNo(d.get("EmpNo"));
+
+				hlEmpLnYg5Pt.setHlEmpLnYg5PtId(hlEmpLnYg5PtId);
+				hlEmpLnYg5Pt.setFullname(d.get("Fullname"));
+				hlEmpLnYg5Pt.setAreaCode(d.get("AreaCode"));
+				hlEmpLnYg5Pt.setAreaItem(d.get("AreaItem"));
+				hlEmpLnYg5Pt.setDeptCode(d.get("DeptCode"));
+				hlEmpLnYg5Pt.setDepItem(d.get("DepItem"));
+				hlEmpLnYg5Pt.setDistCode(d.get("DistCode"));
+				hlEmpLnYg5Pt.setDistItem(d.get("DistItem"));
+				hlEmpLnYg5Pt.setStationName(d.get("StationName"));
+				hlEmpLnYg5Pt.setGoalAmt(new BigDecimal(d.get("GoalAmt")));
+				hlEmpLnYg5Pt.setHlAppAmt(new BigDecimal(d.get("PerfAmt")));
+				hlEmpLnYg5Pt.setHlAppNum(new BigDecimal(d.get("PerfCnt")));
+				hlEmpLnYg5Pt.setCalDate(entday);
+				hlEmpLnYg5Pt.setUpNo(1);
+
+				lHlEmpLnYg5Pt.add(hlEmpLnYg5Pt);
+			}
+
+		}
+
+		if (lHlEmpLnYg5Pt != null && lHlEmpLnYg5Pt.size() != 0) {
+			try {
+				hlEmpLnYg5PtService.insertAll(lHlEmpLnYg5Pt, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "HlEmpLnYg5Pt");
+			}
+		}
+
+		this.batchTransaction.commit();
 	}
 
 	// 借款人資料
 	public void ProcHlCusData(TitaVo titaVo) throws LogicException {
-		//initialize 
+		// initialize
 		Slice<HlCusData> slHlCusData = hlCusDataService.findAll(0, Integer.MAX_VALUE);
 		List<HlCusData> lHlCusData = slHlCusData == null ? null : slHlCusData.getContent();
 		if (lHlCusData != null) {
@@ -84,7 +445,7 @@ public class L5500Batch extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", "HlAreaData");
 			}
 		}
-		
+
 		String sql = "select \"CustNo\",\"CustName\",\"LastUpdate\" ";
 		sql += "from \"CustMain\" ";
 		sql += "where \"CustNo\" > 0 ";
@@ -96,9 +457,11 @@ public class L5500Batch extends TradeBuffer {
 				HlCusData hlCusData = new HlCusData();
 
 				hlCusData.setHlCusNo(Long.valueOf(d.get("CustNo").toString()));
-				hlCusData.setHlCusName(d.get("CustName").substring(0, d.get("CustName").length()>50?50:d.get("CustName").length()));
-				this.info(parse.stringToStringDate(d.get("LastUpdate"))+"-"+parse.stringToInteger(parse.stringToStringDate(d.get("LastUpdate"))));
-				
+				hlCusData.setHlCusName(d.get("CustName").substring(0,
+						d.get("CustName").length() > 50 ? 50 : d.get("CustName").length()));
+				this.info(parse.stringToStringDate(d.get("LastUpdate")) + "-"
+						+ parse.stringToInteger(parse.stringToStringDate(d.get("LastUpdate"))));
+
 				int processDate = parse.stringToInteger(parse.stringToStringDate(d.get("LastUpdate")));
 				if (processDate > 0) {
 					processDate += 19110000;
@@ -116,14 +479,14 @@ public class L5500Batch extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", "HlCusData");
 			}
 		}
-		
+
 		this.batchTransaction.commit();
 
 	}
 
 	// 區域資料主檔
 	public void ProcHlAreaData(TitaVo titaVo) throws LogicException {
-		//initialize 
+		// initialize
 		Slice<HlAreaData> slHlAreaData = hlAreaDataService.findAll(0, Integer.MAX_VALUE);
 		List<HlAreaData> lHlAreaData = slHlAreaData == null ? null : slHlAreaData.getContent();
 		if (lHlAreaData != null) {
@@ -134,7 +497,7 @@ public class L5500Batch extends TradeBuffer {
 			}
 		}
 
-		//insert
+		// insert
 		this.info("L5500 DataInsertUpdateAreaData");
 		String sql = "select A.\"UnitCode\",";
 		sql += "A.\"UnitItem\",";

@@ -347,7 +347,7 @@ public class L2631 extends TradeBuffer {
 
 				String checkMsg = "抵押權塗銷同意書已完成。";
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo(), checkMsg, titaVo);
+						titaVo.getTlrNo()+"L2631", checkMsg, titaVo);
 			}
 		}
 

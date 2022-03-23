@@ -81,7 +81,7 @@ public class AchAuthLog implements Serializable {
   private String authStatus;
 
   // 授權方式
-  /* CdCode.AchAuthCodeA:紙本新增O:舊檔轉換 */
+  /* CdCode.AchAuthCodeA:紙本新增O:舊檔轉換X:紙本終止R:申請恢復 */
   @Column(name = "`AuthMeth`", length = 1)
   private String authMeth;
 
@@ -415,6 +415,8 @@ Z:未交易或匯入失敗資料
 	* CdCode.AchAuthCode
 A:紙本新增
 O:舊檔轉換
+X:紙本終止
+R:申請恢復
 	* @return String
 	*/
   public String getAuthMeth() {
@@ -426,6 +428,8 @@ O:舊檔轉換
 	* CdCode.AchAuthCode
 A:紙本新增
 O:舊檔轉換
+X:紙本終止
+R:申請恢復
   *
   * @param authMeth 授權方式
 	*/

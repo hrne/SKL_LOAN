@@ -86,6 +86,9 @@ public interface AchAuthLogRepositoryHist extends JpaRepository<AchAuthLog, AchA
   // CustNo = ,AND FacmNo = ,AND RepayBank = ,AND RepayAcct = ,AND PropDate = 
   public Optional<AchAuthLog> findTopByCustNoIsAndFacmNoIsAndRepayBankIsAndRepayAcctIsAndPropDateIs(int custNo_0, int facmNo_1, String repayBank_2, String repayAcct_3, int propDate_4);
 
+  // PropDate = ,AND BatchNo %
+  public Slice<AchAuthLog> findAllByPropDateIsAndBatchNoLikeOrderByBatchNoDesc(int propDate_0, String batchNo_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

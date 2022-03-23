@@ -85,9 +85,9 @@ public class L4040 extends TradeBuffer {
 	public BankAuthActService bankAuthActService;
 
 	@Autowired
-	L4040Report l4040Report;
-	@Autowired
 	public CdCodeService cdCodeService;
+	@Autowired
+	L4040Report l4040Report;
 
 	private int authCreateDate = 0;
 	private int processDate = 0;
@@ -126,13 +126,14 @@ public class L4040 extends TradeBuffer {
 		}
 		int iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 		String batchNo = "";
-		if (iRepayBank == 00) {
+		if (iRepayBank == 0) {
 			batchNo = "00";
-		} else if (iRepayBank == 01) {
+		} else if (iRepayBank == 1) {
 			batchNo = "01";
-		} else if (iRepayBank == 02) {
+		} else if (iRepayBank == 2) {
 			batchNo = "02";
 		}
+		String lastAuthSeq = "";
 		this.info("iFunctionCode : " + iFunctionCode);
 		this.info("iCreateFlag : " + iCreateFlag);
 		this.info("iCustNo : " + iCustNo);
@@ -156,6 +157,7 @@ public class L4040 extends TradeBuffer {
 
 		switch (iFunctionCode) {
 		case 1:
+		case 2:
 			this.info("case1!!");
 //			不可一日多批時,篩選資料檢查本日是否以產出媒體檔
 			if ("Y".equals(this.getTxBuffer().getSystemParas().getAchAuthOneTime())) {
@@ -166,12 +168,12 @@ public class L4040 extends TradeBuffer {
 					// *** 折返控制相關 ***
 					resultList = l4040ServiceImpl.findAll(nPropDate, this.index, Integer.MAX_VALUE, txtitaVo);
 				} catch (Exception e) {
-					this.error("l4920ServiceImpl findByCondition " + e.getMessage());
+					this.error("l4040ServiceImpl findByCondition " + e.getMessage());
 					throw new LogicException("E0013", e.getMessage());
 				}
 
 				if (resultList != null && resultList.size() != 0) {
-					throw new LogicException(titaVo, "E0010", "不可一日多批"); //功能選擇錯誤
+					throw new LogicException(titaVo, "E0010", "不可一日多批"); // 功能選擇錯誤
 				}
 			}
 		}
@@ -181,25 +183,16 @@ public class L4040 extends TradeBuffer {
 			// *** 折返控制相關 ***
 			resultList = l4040ServiceImpl.findAll(nPropDate, this.index, this.limit, titaVo);
 		} catch (Exception e) {
-			this.error("l4920ServiceImpl findByCondition " + e.getMessage());
+			this.error("l4040ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
 
 		switch (iFunctionCode) {
 		case 1:
 			this.info("case1!!");
-//			不可一日多批時,篩選資料檢查本日是否以產出媒體檔
-			if ("Y".equals(this.getTxBuffer().getSystemParas().getAchAuthOneTime())) {
 
-			} else {
-
-			}
 		case 3:
 			this.info("case3!!");
-
-//			
-//			找BATCHNO最大的
-//			
 
 			if (resultList != null && resultList.size() != 0) {
 				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
@@ -209,9 +202,25 @@ public class L4040 extends TradeBuffer {
 					this.totaVo.setMsgEndToEnter();
 				}
 
+				// 重製需判斷扣款銀行來重製
+				// 找BATCHNO最大的
+				if (iFunctionCode == 3) {
+
+					Slice<AchAuthLog> slAchAuthLog = achAuthLogService.propBatchNoEq(nPropDate, "Au" + batchNo + "%", 0,
+							Integer.MAX_VALUE, titaVo);
+					if (slAchAuthLog != null && slAchAuthLog.getContent().get(0).getBatchNo().length() >= 6) {
+						lastAuthSeq = slAchAuthLog.getContent().get(0).getBatchNo();
+					}
+				}
 				for (Map<String, String> result : resultList) {
 					setData(result);
 
+					// 重製需判斷扣款銀行來重製最後一筆
+					if (iFunctionCode == 3) {
+						if (!result.get("F13").equals(lastAuthSeq)) {
+							continue;
+						}
+					}
 					OccursList occursListOutput = new OccursList();
 					occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
 					occursListOutput.putParam("OOCustNo", result.get("F2"));
@@ -242,6 +251,7 @@ public class L4040 extends TradeBuffer {
 						if ("A".equals(result.get("F5"))) {
 							tAchAuthLog.setPropDate(0);
 						}
+						tAchAuthLog.setBatchNo("");
 						tAchAuthLog.setMediaCode("");
 
 						try {
@@ -264,6 +274,24 @@ public class L4040 extends TradeBuffer {
 
 //			String outputFilePath22 = outFolder + "AHP22P_授出 - 他行.txt";
 //			String outputFilePath21 = outFolder + "AHP21P_授出 - 新光.txt";
+			Slice<AchAuthLog> slAchAuthLog = achAuthLogService.propBatchNoEq(nPropDate, "Au" + batchNo + "%", 0,
+					Integer.MAX_VALUE, titaVo);
+			String AuthSeq = "00";
+			// 一日一批時固定00,一日多批時找出最後一筆序號+1 若無則為1
+			if (!"Y".equals(this.getTxBuffer().getSystemParas().getAchAuthOneTime())) {
+				if (slAchAuthLog == null) {
+					AuthSeq = "01";
+				} else {
+					if (slAchAuthLog.getContent().get(0).getBatchNo().length() >= 6) {
+						AuthSeq = FormatUtil.pad9(""
+								+ (parse.stringToInteger(slAchAuthLog.getContent().get(0).getBatchNo().substring(4, 6))
+										+ 1),
+								2);
+					} else {
+						AuthSeq = "01";
+					}
+				}
+			}
 
 			aCnt = 0;
 			bCnt = 0;
@@ -282,6 +310,7 @@ public class L4040 extends TradeBuffer {
 					String BankNo3 = "";
 					String BankNo7 = "";
 					if (!"Y".equals(result.get("F12")) && parse.stringToInteger(result.get("F14")) > 0) {
+
 						cnt = cnt + 1;
 
 						OccursList occursList = new OccursList();
@@ -384,7 +413,7 @@ public class L4040 extends TradeBuffer {
 
 						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 						tAchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
-//						tAchAuthLog.setBatchNo("Au" + batchNo + "");
+						tAchAuthLog.setBatchNo("Au" + batchNo + AuthSeq);
 						tAchAuthLog.setMediaCode("Y");
 						try {
 							// 送出到DB
@@ -527,11 +556,12 @@ public class L4040 extends TradeBuffer {
 					totaVo.put("PdfSno998", "" + sno);
 				}
 				l4040Report.setParentTranCode(titaVo.getTxcd());
-				
+
 				l4040Report.exec(resultList, titaVo);
 				long sno = l4040Report.close();
 				l4040Report.toPdf(sno);
 				totaVo.put("PdfSno", "" + sno);
+
 			} else {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}

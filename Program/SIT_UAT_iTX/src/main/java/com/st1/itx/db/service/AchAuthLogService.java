@@ -284,6 +284,18 @@ public interface AchAuthLogService {
   public AchAuthLog facmNoPropDateFirst(int custNo_0, int facmNo_1, String repayBank_2, String repayAcct_3, int propDate_4, TitaVo... titaVo);
 
   /**
+   * PropDate = ,AND BatchNo %
+   *
+   * @param propDate_0 propDate_0
+   * @param batchNo_1 batchNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AchAuthLog AchAuthLog of List
+   */
+  public Slice<AchAuthLog> propBatchNoEq(int propDate_0, String batchNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AchAuthLog
    * 
    * @param achAuthLogId key
