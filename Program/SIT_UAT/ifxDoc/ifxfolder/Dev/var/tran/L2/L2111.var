@@ -245,6 +245,7 @@ R(1,L2R02)
 #RcvL2r02CA=X,1,S
 C(3,#FuncCode,3,$,S)
 E(0,@CreditSysNo,#L2r02CreditSysNo)
+E(0,@SyndNo,#L2r02SyndNo)
 E(0,@ApplDate,#L2r02ApplDate)
 E(0,@LbApplDate,#L2r02ApplDate)
 E(0,@DepartmentCode,#L2r02DepartmentCode)
@@ -430,6 +431,7 @@ R(1,L2R02)
 C(3,#FuncCode,3,S,$)
 C(3,#FuncCode,1,S,$)
 E(0,@CreditSysNo,#L2r02CreditSysNo)
+E(0,@SyndNo,#L2r02SyndNo)
 E(0,@ApplDate,#L2r02ApplDate)
 E(0,@LbApplDate,#L2r02ApplDate)
 E(0,@DepartmentCode,#L2r02DepartmentCode)
@@ -804,9 +806,9 @@ T(2,@IsLimit,#L1R16IsLimitYn)
 T(2,@IsRelated,#L1R16IsRelatedYn)
 T(2,@IsLnrelNear,#L1R16IsLnrelNearYn)
 T(2,@IsSuspected,#L1R16IsSuspectedYn)
-T(2,@IsSuspectedCheck,#L1R16IsSuspectedYn)
+T(2,@IsSuspectedCheck,#L1R16IsSuspectedCheckYn)
+IF(#IsSuspectedCheck=="Y",T(2,@IsSuspectedCheckType,#L1R16IsSuspectedCheckYn),$)
 T(2,@IsDataDate,#L1R16DataDate)
-
 !是否為授信限制對象
 #IsLimit=X,1,L
 
@@ -834,7 +836,7 @@ T(H,#IsLnrelNear,#YesNoHelp)
 T(H,#IsSuspected,#YesNoHelp)
 
 #IsSuspectedCheck=X,1,I
-C(3,#UpdateCode,1,$,S)
+C(3,#UpdateCode,1,$,s)
 C(3,#CustEntCode,1,S,$)
 HELP(#YesNoHelp)
 @
@@ -849,7 +851,7 @@ C(5,#IsSuspectedCheck,Y,SHOW(#IsSuspectedCheckType,#IsSuspectedCheckTypeX),HIDE(
 T(3, :請選擇;Y:確認核對無誤)
 
 #IsSuspectedCheckType=X,1,I
-C(3,#UpdateCode,1,$,S)
+C(3,#UpdateCode,1,$,s)
 C(3,#CustEntCode,1,S,$)
 C(5,#IsSuspectedCheck,Y,$,S)
 HELP(#IsSuspectedCheckTypeHelp)
@@ -858,8 +860,6 @@ V(7)
 V(H,#IsSuspectedCheckTypeHelp)
 
 #IsSuspectedCheckTypeX=X,12,L
-C(3,#UpdateCode,1,$,S)
-C(3,#CustEntCode,1,S,$)
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 #IsDataDate=D,7,L

@@ -39,12 +39,12 @@ BEGIN
                                           AS "CaseKindCode"        -- 案件種類 VARCHAR2 1 0
           ,CASE
              WHEN "tbJCICMain".CustStatus = '1'
-                  AND NVL(NZ046."TRANSACTIONSID",'D') IN ('A','C') --A新增 C異動
-                  AND NVL(NZ046."CLOSE_CODE",' ') = '00' -- 結案原因代碼有值，為00時
+                  AND NVL(Z046."TRANSACTIONSID",'D') IN ('A','C') --A新增 C異動
+                  AND NVL(Z046."CLOSE_CODE",' ') = '00' -- 結案原因代碼有值，為00時
              THEN '2' -- 毀諾
              WHEN "tbJCICMain".CustStatus = '1'
-                  AND NVL(NZ046."TRANSACTIONSID",'D') IN ('A','C') --A新增 C異動
-                  AND NVL(NZ046."CLOSE_CODE",' ') != ' ' -- 結案原因代碼有值時
+                  AND NVL(Z046."TRANSACTIONSID",'D') IN ('A','C') --A新增 C異動
+                  AND NVL(Z046."CLOSE_CODE",' ') != ' ' -- 結案原因代碼有值時
              THEN '3' -- 結案
              WHEN "tbJCICMain".CustStatus = '1'
              THEN '0'

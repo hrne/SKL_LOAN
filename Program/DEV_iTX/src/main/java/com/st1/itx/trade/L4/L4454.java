@@ -320,11 +320,11 @@ public class L4454 extends TradeBuffer {
 //		若為皆1則傳簡訊
 //		若為皆0則傳簡訊
 
-		if ("Y".equals(tempVo.getParam("isMessage"))) {
+		if (!"N".equals(tempVo.getParam("isMessage"))) {
 			sendText(repayBank, t, phoneNo, insuM, titaVo);
 			isSend = true;
 		}
-		if ("Y".equals(tempVo.getParam("isEmail"))) {
+		if (!"N".equals(tempVo.getParam("isEmail"))) {
 			sendEmail(repayBank, t, emailAd, insuM, titaVo);
 			isSend = true;
 		}

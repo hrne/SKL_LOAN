@@ -1,6 +1,7 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -28,7 +29,7 @@ public class PostAuthLog implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4725865491912998296L;
+	private static final long serialVersionUID = -6617509019481767547L;
 
 @EmbeddedId
   private PostAuthLogId postAuthLogId;
@@ -55,7 +56,7 @@ public class PostAuthLog implements Serializable {
   @Column(name = "`RepayAcct`", length = 14, insertable = false, updatable = false)
   private String repayAcct;
 
-  // 授權方式
+  // 授權類別
   /* CdCode.AuthCode1:期款2:火險 */
   @Column(name = "`AuthCode`", length = 1, insertable = false, updatable = false)
   private String authCode;
@@ -67,6 +68,10 @@ public class PostAuthLog implements Serializable {
   // 統一編號
   @Column(name = "`CustId`", length = 10)
   private String custId;
+
+  // 每筆扣款限額
+  @Column(name = "`LimitAmt`")
+  private BigDecimal limitAmt = new BigDecimal("0");
 
   // 帳號碼
   @Column(name = "`RepayAcctSeq`", length = 2)
@@ -102,6 +107,11 @@ public class PostAuthLog implements Serializable {
   /* CdCode.AuthErrorCode空:再次授權空白:未授權00:成功03:已終止代繳06:凍結警示戶07:支票專戶08:帳號錯誤09:終止戶10:身分證不符11:轉出戶12:拒絕往來戶13:無此編號14:編號已存在16:管制帳戶17:掛失戶18:異常帳戶19:編號非英數91:期限未扣款98:其他 */
   @Column(name = "`AuthErrorCode`", length = 2)
   private String authErrorCode;
+
+  // 授權方式
+  /* CdCode.AchAuthCodeA:紙本新增O:舊檔轉換X:紙本終止R:申請恢復 */
+  @Column(name = "`AuthMeth`", length = 1)
+  private String authMeth;
 
   // 媒體檔流水編號
   /* 媒體產出前為0 */
@@ -289,7 +299,7 @@ G:劃撥
   }
 
 /**
-	* 授權方式<br>
+	* 授權類別<br>
 	* CdCode.AuthCode
 1:期款
 2:火險
@@ -300,12 +310,12 @@ G:劃撥
   }
 
 /**
-	* 授權方式<br>
+	* 授權類別<br>
 	* CdCode.AuthCode
 1:期款
 2:火險
   *
-  * @param authCode 授權方式
+  * @param authCode 授權類別
 	*/
   public void setAuthCode(String authCode) {
     this.authCode = authCode;
@@ -347,6 +357,25 @@ G:劃撥
 	*/
   public void setCustId(String custId) {
     this.custId = custId;
+  }
+
+/**
+	* 每筆扣款限額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLimitAmt() {
+    return this.limitAmt;
+  }
+
+/**
+	* 每筆扣款限額<br>
+	* 
+  *
+  * @param limitAmt 每筆扣款限額
+	*/
+  public void setLimitAmt(BigDecimal limitAmt) {
+    this.limitAmt = limitAmt;
   }
 
 /**
@@ -549,6 +578,33 @@ Y:產出後
 	*/
   public void setAuthErrorCode(String authErrorCode) {
     this.authErrorCode = authErrorCode;
+  }
+
+/**
+	* 授權方式<br>
+	* CdCode.AchAuthCode
+A:紙本新增
+O:舊檔轉換
+X:紙本終止
+R:申請恢復
+	* @return String
+	*/
+  public String getAuthMeth() {
+    return this.authMeth == null ? "" : this.authMeth;
+  }
+
+/**
+	* 授權方式<br>
+	* CdCode.AchAuthCode
+A:紙本新增
+O:舊檔轉換
+X:紙本終止
+R:申請恢復
+  *
+  * @param authMeth 授權方式
+	*/
+  public void setAuthMeth(String authMeth) {
+    this.authMeth = authMeth;
   }
 
 /**
@@ -872,10 +928,10 @@ Y:產出後
   @Override
   public String toString() {
     return "PostAuthLog [postAuthLogId=" + postAuthLogId
-           + ", facmNo=" + facmNo + ", custId=" + custId + ", repayAcctSeq=" + repayAcctSeq + ", processDate=" + processDate + ", processTime=" + processTime + ", stampFinishDate=" + stampFinishDate
-           + ", stampCancelDate=" + stampCancelDate + ", stampCode=" + stampCode + ", postMediaCode=" + postMediaCode + ", authErrorCode=" + authErrorCode + ", fileSeq=" + fileSeq + ", propDate=" + propDate
-           + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday
-           + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + ", lastUpdate=" + lastUpdate + "]";
+           + ", facmNo=" + facmNo + ", custId=" + custId + ", limitAmt=" + limitAmt + ", repayAcctSeq=" + repayAcctSeq + ", processDate=" + processDate + ", processTime=" + processTime
+           + ", stampFinishDate=" + stampFinishDate + ", stampCancelDate=" + stampCancelDate + ", stampCode=" + stampCode + ", postMediaCode=" + postMediaCode + ", authErrorCode=" + authErrorCode + ", authMeth=" + authMeth
+           + ", fileSeq=" + fileSeq + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName
+           + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd + ", createEmpNo=" + createEmpNo
+           + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }

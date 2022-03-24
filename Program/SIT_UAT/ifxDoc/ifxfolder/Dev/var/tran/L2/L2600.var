@@ -143,6 +143,7 @@ T(3,%)
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2060聯貸案訂約明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
+CALL(#INVKALL)
 C(3,#CHAIN,1,$,s)
 !HIDE(#FuncCode,#Btn1,#UsSyndAmt,#UsPartAmt)
 HIDE(#FuncCode,#UsSyndAmt,#UsPartAmt)
@@ -177,8 +178,6 @@ HELP(#FuncCode1Help)
 @V(H,#FuncCode1Help) 
 E(0,@FUNCIND,#FuncCode)
 
-
-
 #UpdateCode=N,1,S
 IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 
@@ -197,7 +196,7 @@ IF(#FuncCode==1 || #FuncCode==3,T(3,*),T(3, ))
 T(3,)T(H,#FuncCode,#FuncCode1Help)  
 C(3,#FuncCode,3,INVOKEJS(SHOW,p1,3,3,1),INVOKEJS(SHOW,p1,3,3,0))
 CALL(#InitValue)
-CALL(#INVKALL)
+! CALL(#INVKALL)
 
 #InitA=X,1,S
 C(3,#CHAIN,1,$,C(3,#FuncCode,1,T(F,@SyndNo,0),T(F,@SyndNo,1)))
@@ -236,7 +235,7 @@ E(0,@TwSyndAmt,#L3r10SyndAmt)
 E(0,@UsSyndAmt,#L3r10SyndAmt)
 E(0,@TwPartAmt,#L3r10PartAmt)
 E(0,@UsPartAmt,#L3r10PartAmt)
-CALL(#INVKALL)
+! CALL(#INVKALL)
 
 ![聯貸編號]
 !新增時由系統自動編號,其他必須輸入
@@ -250,7 +249,7 @@ C(3,#CHAIN,1,s,$)
 #BUF2A=X,7,S
 
 #BIND2A=X,1,S
-BIND(#Btn2,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF2A;ntxbuf5=type<-1:LeadingBank<-OOTBankCode:LeadingBankX<-OOBankItem})
+BIND(#Btn2,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF2A;ntxbuf5=type<-1:LeadingBank<-OOTBankCode:LeadingBankX<-OOItem})
 
 !查詢聯貸訂約檔
 #SendL3r10B=X,1,S
@@ -274,7 +273,7 @@ E(0,@TwSyndAmt,#L3r10SyndAmt)
 E(0,@UsSyndAmt,#L3r10SyndAmt)
 E(0,@TwPartAmt,#L3r10PartAmt)
 E(0,@UsPartAmt,#L3r10PartAmt)
-CALL(#INVKALL)
+! CALL(#INVKALL)
 
 #InitB=X,1,S
 IF(#FuncCode==4 || #FuncCode==5,$,S)
@@ -330,7 +329,7 @@ T(B,#L2r09BankItem+#L2r09BranchItem)
 #BUF3A=X,7,S
 
 #BIND3A=X,1,S
-BIND(#Btn3,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF3A;ntxbuf5=type<-1:AgentBank<-OOBankCode:AgentBankX<-OOBankItem})
+BIND(#Btn3,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF3A;ntxbuf5=type<-1:AgentBank<-OOTBankCode:AgentBankX<-OOItem})
 
 
 #AgentBank=X,7,I
@@ -437,12 +436,10 @@ CALL2(#ADJUSTDOT,#Precision,#TimPartAmt,#TimPartAmtX)
 #PartRateB=n,2.2,L
 E(0,#TimPartAmt/#TimSyndAmt*100)
 
-
 #ShowFac=X,1,S
 C(3,#UpdateCode,1,S,$)
-INVOKEJS(SHOW,p2,1)
-INVOKEJS(SHOW,p3,1)
-
+! INVOKEJS(SHOW,p2,1)
+! INVOKEJS(SHOW,p3,1)
 
 #SendL2r54=X,1,S
 C(3,#UpdateCode,1,S,$)
@@ -455,7 +452,6 @@ C(3,#UpdateCode,1,S,$)
 E(0,@RimSyndNo,#CopySyndNo)
 S(L2R55,1,#RimSyndNo)
 R(1,L2R55)
-
 
 ##loop{times:50,n:1}
 
@@ -510,7 +506,10 @@ C(3,#FacmNo{n},0,INVOKEJS(SHOW,grd3_{n},0),INVOKEJS(SHOW,grd3_{n},1))
 
 ##end
 
-
+#Eend=X,1,S
+C(3,#UpdateCode,1,S,$)
+INVOKEJS(SHOW,p2,1)
+INVOKEJS(SHOW,p3,1)
 
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>

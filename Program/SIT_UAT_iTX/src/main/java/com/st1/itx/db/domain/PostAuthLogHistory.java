@@ -1,6 +1,7 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -31,7 +32,7 @@ public class PostAuthLogHistory implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5693957621462588809L;
+	private static final long serialVersionUID = 1203339552784614913L;
 
 // 序號
   @Id
@@ -75,6 +76,10 @@ public class PostAuthLogHistory implements Serializable {
   // 統一編號
   @Column(name = "`CustId`", length = 10)
   private String custId;
+
+  // 每筆扣款限額
+  @Column(name = "`LimitAmt`")
+  private BigDecimal limitAmt = new BigDecimal("0");
 
   // 帳號碼
   @Column(name = "`RepayAcctSeq`", length = 2)
@@ -368,6 +373,25 @@ G:劃撥
 	*/
   public void setCustId(String custId) {
     this.custId = custId;
+  }
+
+/**
+	* 每筆扣款限額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLimitAmt() {
+    return this.limitAmt;
+  }
+
+/**
+	* 每筆扣款限額<br>
+	* 
+  *
+  * @param limitAmt 每筆扣款限額
+	*/
+  public void setLimitAmt(BigDecimal limitAmt) {
+    this.limitAmt = limitAmt;
   }
 
 /**
@@ -872,10 +896,10 @@ Y:產出後
   @Override
   public String toString() {
     return "PostAuthLogHistory [logNo=" + logNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", authCode=" + authCode + ", authCreateDate=" + authCreateDate + ", authApplCode=" + authApplCode
-           + ", postDepCode=" + postDepCode + ", repayAcct=" + repayAcct + ", custId=" + custId + ", repayAcctSeq=" + repayAcctSeq + ", processDate=" + processDate + ", processTime=" + processTime
-           + ", stampFinishDate=" + stampFinishDate + ", stampCancelDate=" + stampCancelDate + ", stampCode=" + stampCode + ", postMediaCode=" + postMediaCode + ", authErrorCode=" + authErrorCode + ", fileSeq=" + fileSeq
-           + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName + ", relationId=" + relationId
-           + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + ", lastUpdate=" + lastUpdate + "]";
+           + ", postDepCode=" + postDepCode + ", repayAcct=" + repayAcct + ", custId=" + custId + ", limitAmt=" + limitAmt + ", repayAcctSeq=" + repayAcctSeq + ", processDate=" + processDate
+           + ", processTime=" + processTime + ", stampFinishDate=" + stampFinishDate + ", stampCancelDate=" + stampCancelDate + ", stampCode=" + stampCode + ", postMediaCode=" + postMediaCode + ", authErrorCode=" + authErrorCode
+           + ", fileSeq=" + fileSeq + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName
+           + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }

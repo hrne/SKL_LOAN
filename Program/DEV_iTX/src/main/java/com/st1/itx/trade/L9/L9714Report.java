@@ -44,8 +44,6 @@ public class L9714Report extends MakeReport {
 	String f11 = "";
 	String f12 = "";
 
-	int cnt = 0;
-
 	// 起始欄
 	int colCount = 8;
 
@@ -162,6 +160,8 @@ public class L9714Report extends MakeReport {
 		}
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9714", "繳息證明單", "", "A4", "P");
+		
+		int cnt = 0;
 
 		if (l9714List.size() > 0) {
 			for (Map<String, String> tL9714Vo : l9714List) {
@@ -179,6 +179,8 @@ public class L9714Report extends MakeReport {
 				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
 				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9714", titaVo))
 					continue;
+				
+				cnt++;
 
 				if (!tL9714Vo.get("F3").equals(f3)) {
 
@@ -196,13 +198,14 @@ public class L9714Report extends MakeReport {
 					f11 = tL9714Vo.get("F11");
 					f12 = tL9714Vo.get("F12");
 					this.newPage();
-					cnt = 0;
 
 				}
 
 				printEnd();
 			}
-		} else {
+		}
+		
+		if (cnt == 0) {
 
 			f0 = "本日無資料";
 			f1 = " ";

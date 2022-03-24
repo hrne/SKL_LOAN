@@ -227,7 +227,7 @@ T(H,@OOPostDepCodeX,#OOPostDepCode,#PostDepCodeHelp)
 #OOStatusX=x,10,O
 T(H,@OOStatusX,#OOStatus,#AuthStatusCodeHelp)
 
-! 郵局無限額
+! 郵局限額
 #OOLimitAmt=m,14,O
 
 #OOAcctSeq=x,2,O
@@ -308,6 +308,7 @@ T(2,2
 +#OOLastUpdateEmpNo
 +#OOLastUpdate
 +#OOStampCancelDate
++#OOLimitAmt
 )
 #OOBUF_DELETE=X,500,S
 T(2,4
@@ -332,6 +333,7 @@ T(2,4
 +#OOLastUpdateEmpNo
 +#OOLastUpdate
 +#OOStampCancelDate
++#OOLimitAmt
 )
 #OOBUF_SEARCH=X,500,S
 T(2,5
@@ -356,6 +358,7 @@ T(2,5
 +#OOLastUpdateEmpNo
 +#OOLastUpdate
 +#OOStampCancelDate
++#OOLimitAmt
 )
 ! #OOBTN_CREAT=A,2,O
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_CREAT})

@@ -4688,6 +4688,7 @@ TXFORM=L1R13
 #L1R16IsRelatedYn=X,1,S
 #L1R16IsLnrelNearYn=X,1,S
 #L1R16IsSuspectedYn=X,1,S
+#L1R16IsSuspectedCheckYn=X,1,S
 #L1R16DataDate=D,7,S
 </L1R16.dec>
 
@@ -4697,6 +4698,7 @@ TXFORM=L1R16
 #L1R16IsRelatedYn
 #L1R16IsLnrelNearYn
 #L1R16IsSuspectedYn
+#L1R16IsSuspectedCheckYn
 #L1R16DataDate
 ^
 </L1R16.tom>

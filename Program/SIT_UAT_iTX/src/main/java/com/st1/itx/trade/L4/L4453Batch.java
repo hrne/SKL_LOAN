@@ -197,10 +197,10 @@ public class L4453Batch extends TradeBuffer {
 				}
 				custId.put(tmp, tCustMain.getCustId());
 				custPhone.put(tmp, noticePhoneNo);
-				if ("Y".equals(tempVo.getParam("isMessage"))) {
+				if (!"N".equals(tempVo.getParam("isMessage"))) {
 					setText(tmp, titaVo);
 				}
-				if ("Y".equals(tempVo.getParam("isEmail"))) {
+				if (!"N".equals(tempVo.getParam("isEmail"))) {
 					setMail(tmp, titaVo);
 				}
 			}
@@ -339,7 +339,7 @@ public class L4453Batch extends TradeBuffer {
 		int tranTemp = 0;
 
 		for (int i = 0; i < chars.length; i++) {
-			tranTemp = chars[i];
+			tranTemp = (int) chars[i];
 			if (tranTemp != 45) // ASCII碼:45 是減號 -
 				tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 			outStr += (char) tranTemp;

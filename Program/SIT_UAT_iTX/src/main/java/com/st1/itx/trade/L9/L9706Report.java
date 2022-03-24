@@ -88,7 +88,9 @@ public class L9706Report extends MakeReport {
 				report1(tL9706Vo);
 				cnt += 1;
 			}
-		} else {
+		}
+		
+		if (cnt <= 0) {
 			this.print(1, 1, "無資料");
 			this.print(1, 1, "");
 			this.print(1, 1, "");
@@ -126,7 +128,7 @@ public class L9706Report extends MakeReport {
 
 		// 測試用
 		//this.toPdf(sno);
-		if (loanBTXList != null && loanBTXList.size() != 0) {
+		if (loanBTXList != null && loanBTXList.size() != 0 && cnt > 0) {
 			return true;
 		} else {
 			return false;

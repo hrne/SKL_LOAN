@@ -69,7 +69,7 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,p.\"PostDepCode\"       as F4                                       ";
 		sql += " ,p.\"RepayAcct\"         as F5                                       ";
 		sql += " ,''                      as F6                                       ";
-		sql += " ,''                      as F7                                       ";
+		sql += " ,p.\"LimitAmt\"          as F7                                       ";
 		sql += " ,p.\"RepayAcctSeq\"      as F8                                       ";
 		sql += " ,p.\"CustId\"            as F9                                       ";
 		sql += " ,p.\"AuthApplCode\"      as F10                                      ";

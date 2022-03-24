@@ -40,6 +40,7 @@ public class L2R09 extends TradeBuffer {
 
 		// 取得輸入資料
 		String iBankCode = titaVo.getParam("RimBankCode");
+		String iTxCode = titaVo.get("RimTxCode");
 		iBankCode = FormatUtil.padX(iBankCode, 7);
 		String bankCode = FormatUtil.padX(iBankCode, 3);
 		String branchCode = FormatUtil.right(iBankCode, 4);
@@ -52,6 +53,10 @@ public class L2R09 extends TradeBuffer {
 		// 查詢行庫代號檔
 		CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode, branchCode), titaVo);
 		if (tCdBank == null) {
+			if (iTxCode != null && iTxCode.equals("L6701") && "    ".equals(branchCode)) {
+				throw new LogicException(titaVo, "E0015", "行庫代碼:" + bankCode + "未建，請先建立行庫代碼"); // 檢查錯誤
+			}
+
 			throw new LogicException(titaVo, "E0001", " 行庫代號檔  行庫代號=" + iBankCode); // 查無資料
 		}
 

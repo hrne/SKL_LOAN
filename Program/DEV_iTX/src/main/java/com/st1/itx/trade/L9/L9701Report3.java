@@ -120,6 +120,8 @@ public class L9701Report3 extends MakeReport {
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 		
+		int cnt = 0;
+		
 		if (listL9701 != null && listL9701.size() > 0) {
 			this.custName = listL9701.get(0).get("CustName");
 			this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來交易明細表", "", "A4", "L");
@@ -141,9 +143,13 @@ public class L9701Report3 extends MakeReport {
 						
 				// 印明細						
 				printDetail(tL9701Vo);
+				cnt++;
 			}
 			this.print(1, 3, "－－　－－　－－－－－　－－－－－－　－－－　－－－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－");
-		} else {
+		}
+		
+		if (cnt <= 0)
+		{
 			this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來交易明細表", "", "A4", "L");
 			this.print(1, 1, "本日無資料");
 			this.print(1, 3, "－－　－－　－－－－－　－－－－－－　－－－　－－－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－");

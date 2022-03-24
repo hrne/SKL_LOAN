@@ -265,13 +265,13 @@ public class L4603p extends TradeBuffer {
 //				2.依通知方式寫入L6001處理事項清單，之後在由批次程式去執行BatxNoticeCom寫File
 //				通知方式為書信者直接寫File
 //			           預設書信
-				if ("Y".equals(tempVo.getParam("isLetter"))) {
+				if (!"N".equals(tempVo.getParam("isLetter"))) {
 					setLetterFileVO(t, titaVo);
 				}
-				if ("Y".equals(tempVo.getParam("isMessage"))) {
+				if (!"N".equals(tempVo.getParam("isMessage"))) {
 					setTextFileVO(t, 0, titaVo);
 				}
-				if ("Y".equals(tempVo.getParam("isEmail"))) {
+				if (!"N".equals(tempVo.getParam("isEmail"))) {
 
 					// 智偉修改
 					noticeEmail = tempVo.getParam("EmailAddress");

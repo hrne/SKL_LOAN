@@ -40,20 +40,44 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param groupNum  表格次序
 	 * 
 	 */
-	@SuppressWarnings({ "unchecked" })
+
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int groupNum) throws Exception {
 
 		this.info("lM051.findAll ");
 		this.info("yearMonth=" + yearMonth + "-" + groupNum);
 
-		// 0
-		String groupSelect1 = "	WHERE M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"Status\" = 0 ";
+//		// 0
+//		String groupSelect1 = "	WHERE M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"Status\" = 0 ";
+//		// 協
+//		String groupSelect2 = "	WHERE M.\"ProdNo\" IN ('60','61','62') AND M.\"Status\" = 0 ";
+//		// 催
+//		String groupSelect3 = "	WHERE M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"Status\" IN (2,6,7) ";
+//		// 催 + 協
+//		String groupSelect4 = "	WHERE M.\"ProdNo\" IN ('60','61','62') AND M.\"Status\" IN (2,6,7) ";
+
+		// 一般逾期
+		String query1 = " ";
+		query1 += "	 AND M.\"AcctCode\" <> 990";
+		query1 += "  AND M.\"ProdNo\" NOT IN ('60','61','62')";
+		query1 += "  AND M.\"OvduTerm\" > 0 ";
+		// 協 * 1
+		String query2 = " ";
+		query2 += "	 AND M.\"AcctCode\" <> 990";
+		query2 += "  AND M.\"ProdNo\" IN ('60','61','62')";
+		query2 += "  AND M.\"OvduTerm\" > 0 ";
 		// 協
-		String groupSelect2 = "	WHERE M.\"ProdNo\" IN ('60','61','62') AND M.\"Status\" = 0 ";
+		String query3 = " ";
+		query3 += "	 AND M.\"AcctCode\" <> 990";
+		query3 += "  AND M.\"ProdNo\" IN ('60','61','62')";
+		query3 += "  AND M.\"OvduTerm\" = 0 ";
 		// 催
-		String groupSelect3 = "	WHERE M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"Status\" IN (2,6,7) ";
+		String query4 = " ";
+		query4 += "  AND M.\"AcctCode\" = 990";
+		query4 += "  AND M.\"ProdNo\" NOT IN ('60','61','62')";
 		// 催 + 協
-		String groupSelect4 = "	WHERE M.\"ProdNo\" IN ('60','61','62') AND M.\"Status\" IN (2,6,7) ";
+		String query5 = " ";
+		query5 += "  AND M.\"AcctCode\" = 990";
+		query5 += "  AND M.\"ProdNo\" IN ('60','61','62')";
 
 		String sql = "SELECT M.\"CustNo\""; // F0
 		sql += "			,M.\"FacmNo\""; // F1
@@ -136,10 +160,28 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				      ,M.\"OvduDays\"";
 		sql += "				FROM \"MonthlyFacBal\" M";
 		sql += "				WHERE M.\"YearMonth\" =  :yymm ";
-		sql += "				  AND M.\"Status\" IN (0, 2, 6, 7)";
-		sql += "				  AND M.\"AssetClass\" IN ('21', '22', '23', '3', '4', '5')";
-		sql += "				  AND M.\"OvduTerm\" >= 0 ";
-		sql += "				  AND M.\"PrinBalance\" > 0 ) M";
+		sql += "				  AND M.\"PrinBalance\" > 0 ";
+		// 有四種不同條件分四次
+		switch (groupNum) {
+		case 1:
+			sql += query1;
+			break;
+		case 2:
+			sql += query2;
+			break;
+		case 3:
+			sql += query3;
+			break;
+		case 4:
+			sql += query4;
+			break;
+		case 5:
+			sql += query5;
+			break;
+		default:
+			break;
+		}
+		sql += "				) M";
 		sql += "			 	LEFT JOIN(SELECT * ";
 		sql += "						  FROM(SELECT L.\"CustNo\"";
 		sql += "									 ,L.\"FacmNo\"";
@@ -155,25 +197,6 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			LEFT JOIN \"CdAcBook\" B ON B.\"AcSubBookCode\" = M.\"AcSubBookCode\"";
 		sql += "			LEFT JOIN \"CdCode\" CD ON CD.\"Code\" = M.\"LegalProg\"";
 		sql += "			AND CD.\"DefCode\" = 'LegalProg' ";
-
-		// 有四種不同條件分四次
-		switch (groupNum) {
-		case 1:
-			sql += groupSelect1;
-			break;
-		case 2:
-			sql += groupSelect2;
-			break;
-		case 3:
-			sql += groupSelect3;
-			break;
-		case 4:
-			sql += groupSelect4;
-			break;
-		default:
-			break;
-		}
-
 		sql += "			ORDER BY M.\"OvduTerm\",M.\"CustNo\",M.\"FacmNo\"";
 		this.info("sql=" + sql);
 
@@ -192,7 +215,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param formNum   表格次序
 	 * 
 	 */
-	@SuppressWarnings({ "unchecked" })
+
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth, int formNum) throws Exception {
 
 		this.info("lM051.findAll2");

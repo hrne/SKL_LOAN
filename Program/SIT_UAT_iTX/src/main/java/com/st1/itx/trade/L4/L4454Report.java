@@ -89,6 +89,20 @@ public class L4454Report extends MakeReport {
 		int execCnt = 0;
 
 		for (Map<String, String> tL4454Vo : L4454List) {
+			// 確認 CustNoticeCom 檢查是否能產出郵寄通知
+			
+			// inputCustNo: #CustNo
+			// CustNo: Query.CustNo
+			// FacmNo: Query.FacmNo
+			
+			String inputCustNo = titaVo.get("icustno");
+			String recordCustNoString = tL4454Vo.get("CustNo");
+			String recordFacmNoString = tL4454Vo.get("FacmNo");
+			int recordCustNo = parse.stringToInteger(recordCustNoString);
+			int recordFacmNo = parse.stringToInteger(recordFacmNoString);
+			if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L4454", titaVo))
+				continue;
+			
 			execCnt++;
 			if (execCnt >= 2 && execCnt != reportCnt) {
 				this.newPage();

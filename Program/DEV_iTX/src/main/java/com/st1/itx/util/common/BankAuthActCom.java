@@ -323,7 +323,7 @@ public class BankAuthActCom extends TradeBuffer {
 			tBankAuthAct.setRepayBank("700");
 			tBankAuthAct.setRepayAcct(t.getRepayAcct());
 			tBankAuthAct.setPostDepCode(t.getPostDepCode());
-			tBankAuthAct.setLimitAmt(BigDecimal.ZERO);
+			tBankAuthAct.setLimitAmt(t.getLimitAmt());
 			tBankAuthAct.setAcctSeq(t.getRepayAcctSeq());
 			tBankAuthAct.setStatus(status);
 			try {
@@ -874,6 +874,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 		tPostAuthLog.setProcessTime(Integer.parseInt(iProcessTime));
 		tPostAuthLog.setAuthErrorCode(" ");
+		tPostAuthLog.setLimitAmt(iLimitAmt);
 		tPostAuthLog.setRelationCode(iRelationCode);
 		tPostAuthLog.setRelAcctName(iRelAcctName);
 		tPostAuthLog.setRelationId(iRelationId);
@@ -1073,6 +1074,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLogHistory.setPostDepCode(t.getPostDepCode());
 		tPostAuthLogHistory.setRepayAcct(t.getRepayAcct());
 		tPostAuthLogHistory.setCustId(t.getCustId());
+		tPostAuthLogHistory.setLimitAmt(t.getLimitAmt());
 		tPostAuthLogHistory.setRepayAcctSeq(t.getRepayAcctSeq());
 		tPostAuthLogHistory.setProcessDate(t.getProcessDate());
 		tPostAuthLogHistory.setProcessTime(t.getProcessTime());
@@ -1213,11 +1215,11 @@ public class BankAuthActCom extends TradeBuffer {
 			iRelAcctGender = titaVo.get("RelAcctGender");
 			iProcessTime = titaVo.getParam("SysTime");
 			this.info("TXCD ==" + titaVo.getTxcd());
-			if(!"L4410".equals(titaVo.getTxcd())){
+			if (!"L4410".equals(titaVo.getTxcd())) {
 				this.info("into 1");
 				iCustId = titaVo.getParam("CustId");
 			}
-			
+
 		}
 		if (iPostDepCode == null || "".equals(iPostDepCode)) {
 			iPostDepCode = " ";

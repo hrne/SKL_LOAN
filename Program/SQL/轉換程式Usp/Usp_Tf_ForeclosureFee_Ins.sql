@@ -73,7 +73,7 @@ BEGIN
           ,S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,NVL(S3."FacmNo",1)             AS "FacmNo"              -- 額度編號 DECIMAL 3 
           ,S1."RCVDAT"                    AS "ReceiveDate"         -- 收件日期 DecimalD 8 
-          ,S1."RCVDAT"                    AS "DocDate"             -- 單據日期 DecimalD 8 
+          ,S1."TRXIDT"                    AS "DocDate"             -- 單據日期 DecimalD 8 
           ,S1."TRXIDT"                    AS "OpenAcDate"          -- 起帳日期 DecimalD 8 
           ,CASE
              WHEN S1."TFRBAD" <> 0 -- 轉催收日

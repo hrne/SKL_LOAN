@@ -123,7 +123,6 @@ T(2,@BranchCode,#CHAIN_BranchCode)
 T(2,@BankItem,#CHAIN_BankItem)
 T(2,@BranchItem,#CHAIN_BranchItem)
 
-
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
 #FuncCode=A,1,S
 T(F,@FuncCode,0)
@@ -143,14 +142,11 @@ E(0,1)ASGN(AGAIN$)
 E(0,#FuncCode)
 <include src="COM.icf::CheckAuth.rtn"/>
 
-
 !顯示框線
 #WKTF=X,1,S
 IF (#FuncCode==1 || #FuncCode==2 ,T(F,@BankItem,1)T(F,@BranchItem,1),
                                   T(F,@BankItem,0)T(F,@BranchItem,0))
 IF (#FuncCode==1 || #CHAIN==0 ,T(F,@BankCode,1)T(F,@BranchCode,1),T(F,@BankCode,0)T(F,@BranchCode,0))
-
-
 
 #WKPSC=X,2,S
 
@@ -174,7 +170,18 @@ C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
 #BranchCode=X,4,I
 C(3,#CHAIN,1,T(2,#CHAIN_BranchCode),)
 C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
-@C(4,#BranchCode,s,V(5,0,9999))
+@
+C(4,#BranchCode,T(3,@R4,),T(3,@R4,*))
+C(4,#BranchCode,s,V(5,0,9999))
+
+#SendL2r09A=X,1,S
+C(3,#FuncCode,4,s,$)
+C(4,#BranchCode,S,$)
+T(2,@RimBankCode,#BankCode)
+RESET_RIM(#SendL2r09A,L2R09)
+S(L2R09,1,#RimTxCode,#RimBankCode)
+R(1,L2R09)
+T(2,@BankItem,#L2r09BankItem)
 
 #SendL6R01=X,1,S
 C(3,#CHAIN,1,s,$)
@@ -192,15 +199,16 @@ T(2,@BranchItem,#L6R01BranchItem)
 
 ! 行庫名稱
 #BankItem=x,50,I
-C(3,#CHAIN,1,T(2,#CHAIN_BankItem),)
+! C(3,#CHAIN,1,T(2,#CHAIN_BankItem),$)
 C(3,#FuncCode,4,s,$)
 @V(7)
 
 ! 分行名稱
 #BranchItem=x,50,I
-C(3,#CHAIN,1,T(2,#CHAIN_BranchItem),)
+! C(3,#CHAIN,1,T(2,#CHAIN_BranchItem),$)
 C(3,#FuncCode,4,s,$)
-!@V(7)
+C(4,#BranchCode,S,$)
+@V(7)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -210,8 +218,10 @@ E(0,0)
 T(2,#BankCode)
 
 <include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L6R01Rim.dec"/>
 <include src="ROM.icf::L6R01.dec"/>
+<include src="ROM.icf::L2R09.dec"/>
 
 </sub>
 
@@ -245,6 +255,7 @@ T(3,[L6701] 行庫資料維護)
 TXFORM=L6701
 ^
 <include src="ROM.icf::L6R01.tom"/>
+<include src="ROM.icf::L2R09.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

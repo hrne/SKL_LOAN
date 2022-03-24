@@ -175,6 +175,9 @@ public class MakeReport extends CommBuffer {
 
 	// 批號(控制分別出表,但記錄在同一TxFile)
 	private String batchNo = "";
+	
+	// 目前的字距
+	private int currentCharSpaces = 1;
 
 	// 列印明細
 	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
@@ -913,6 +916,8 @@ public class MakeReport extends CommBuffer {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 6);
 		map.put("x", charSpaces);
+		
+		currentCharSpaces = charSpaces;
 
 		listMap.add(map);
 
@@ -1040,6 +1045,10 @@ public class MakeReport extends CommBuffer {
 
 			// 2021-1-5 增加判斷 SignCode == 1 才印
 			if (tCdReport.getSignCode() == 1 && !useDefault) {
+				
+				// 輸出結束字樣時，字距設為1以求座標準確
+				int charSpacesTemp = this.currentCharSpaces;
+				this.setCharSpaces(1);
 				if ("P".equals(pageOrientation)) {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
 					this.print(1, this.getMidXAxis(), signOff1, "C");
@@ -1047,6 +1056,7 @@ public class MakeReport extends CommBuffer {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
 					this.print(1, this.getMidXAxis(), signOff1, "C");
 				}
+				this.setCharSpaces(charSpacesTemp);
 			}
 		}
 
@@ -2553,17 +2563,18 @@ public class MakeReport extends CommBuffer {
 	}
 	
 	/**
-	 * 回傳目前紙張設定 X 軸正中央的座標<br>
+	 * 回傳目前紙張設定 X 軸正中央的座標，<u><b>前提為字距為 1</b></u><br>
 	 * 會用到字型大小和紙張方向，因此請確認設定順序<br><br>
 	 * 求法是產出實際 pdf 後對照尺標與座標, 代入 ax+b 推出適合的公式<br>
 	 * 需要採更多樣以保證正確性
-	 * @return int x axis for print
+	 * @return x axis for print
 	 */
 	public int getMidXAxis() {
+		this.info("getMidXAxis fontSize = " + this.fontSize);
 		if ("P".equals(this.pageOrientation)) {
 			return (230 + this.fontSize * -8) / 3;
 		} else {
-			return 154 + this.fontSize * -7;
+			return 210 + this.fontSize * -14;
 		}
 	}
 

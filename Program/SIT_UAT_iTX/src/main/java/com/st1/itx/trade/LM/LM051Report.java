@@ -77,8 +77,8 @@ public class LM051Report extends MakeReport {
 
 		int dataSize = 0;
 
-		// 有四種不同條件，要select 4次
-		for (int i = 1; i <= 4; i++) {
+		// 有四種不同條件，要query 5次
+		for (int i = 1; i <= 5; i++) {
 			try {
 
 				lM051List = lM051ServiceImpl.findAll(titaVo, thisYM + 191100, i);
@@ -128,7 +128,7 @@ public class LM051Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+
 	}
 
 	// YYYMM工作表

@@ -299,14 +299,14 @@ TXFORM=L4930
 #batch-print=2,L4930B.PFNX,NA,,,,,,1169:827
 ^
 #RPTFG=0,QUERY.GRID
-#any={caption:'[L4930]',width:1000,rowNum:40,
+#any={caption:'[L4930]',width:2000,rowNum:40,
 ifxBatch:{
 	name:'轉暫收;入帳',
 	type:'5',
 	rim:'L420C',
 	txtno:'#secret-no',
 	pfnx:"L4930A.PFNX",
-	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號               ","放行狀態"],
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號               ","放行狀態                                                                                                                                                                     "],
 	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
 	}
 }
@@ -340,14 +340,14 @@ ifxBatch:{
 
 ^
 #RPTFG=1,QUERY.GRID
-#any={caption:'[L4930]',width:1000,rowNum:40,
+#any={caption:'[L4930]',width:2000,rowNum:40,
 ifxBatch:{
 	name:'整批訂正',
 	type:'5',
 	rim:'L420C',
 	txtno:'#secret-no',
 	pfnx:"L4930B.PFNX",
-	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號               ","放行狀態"],
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號               ","放行狀態                                                                                                                                                                     "],
 	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
 	}
 }
