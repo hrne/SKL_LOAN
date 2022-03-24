@@ -21,12 +21,14 @@ import com.st1.itx.db.domain.AchDeductMediaId;
 import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.PostAuthLog;
 import com.st1.itx.db.domain.PostDeductMedia;
 import com.st1.itx.db.domain.PostDeductMediaId;
 import com.st1.itx.db.service.AchDeductMediaService;
 import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.trade.L4.L4452Report;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -82,6 +84,9 @@ public class L4452Batch extends TradeBuffer {
 
 	@Autowired
 	public CdCodeService cdCodeService;
+	@Autowired
+	public PostAuthLogService postAuthLogService;
+
 	@Autowired
 	public L4452Report l4452Report;
 	@Autowired
@@ -369,9 +374,6 @@ public class L4452Batch extends TradeBuffer {
 				tPostDeductMedia.setMediaDate(tPostDeductMediaId.getMediaDate());
 				tPostDeductMedia.setMediaSeq(tPostDeductMediaId.getMediaSeq());
 
-				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tBankDeductDtl.getCustNo(), tBankDeductDtl.getCustNo(), titaVo);
-
 				tPostDeductMedia.setCustNo(tBankDeductDtl.getCustNo());
 				tPostDeductMedia.setFacmNo(tBankDeductDtl.getFacmNo());
 				tPostDeductMedia.setRepayType(tBankDeductDtl.getRepayType());
@@ -403,14 +405,15 @@ public class L4452Batch extends TradeBuffer {
 
 //				扣款人ID+郵局存款別(POSCDE)+戶號) +2位帳號碼
 				// 右靠左補空白
-				// 關係為本人 抓客戶黨統編
 				String custId = "";
-				if("00".equals(tBankDeductDtl.getRelationCode())) {
-					custId = tBankDeductDtl.getRelCustId();
+				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(tBankDeductDtl.getCustNo(),
+						tBankDeductDtl.getPostCode(), tBankDeductDtl.getRepayAcctNo(), "1", titaVo);
+				if (tPostAuthLog != null) {
+					custId = tPostAuthLog.getCustId();
 				} else {
-					custId = tCustMain.getCustId();					
+					throw new LogicException("E0005", "無授權檔資料");
 				}
-				
+
 				tPostDeductMedia.setPostUserNo(
 						FormatUtil.padX(tBankDeductDtl.getRepayAcctSeq(), 2) + FormatUtil.padX(custId, 10)
 								+ tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7));
@@ -999,7 +1002,6 @@ public class L4452Batch extends TradeBuffer {
 					amt12 = amt12.add(tAchDeductMedia.getRepayAmt());
 				}
 
-
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("OccTransType", "N");
@@ -1023,7 +1025,16 @@ public class L4452Batch extends TradeBuffer {
 				occursList.putParam("OccReturnCode", FormatUtil.pad9("", 2));
 				occursList.putParam("OccIndicator", "B");
 				occursList.putParam("OccSenderId", FormatUtil.padX("03458902", 10));
-				occursList.putParam("OccCustId", FormatUtil.padX(tAchDeductMedia.getRelCustId(), 10));
+				String custId = "";
+				if ("00".equals(tAchDeductMedia.getRelationCode())) {
+					CustMain tCustMain = custMainService.custNoFirst(tAchDeductMedia.getCustNo(),
+							tAchDeductMedia.getCustNo(), titaVo);
+					custId = tCustMain.getCustId();
+				} else {
+					custId = tAchDeductMedia.getRelCustId();
+				}
+
+				occursList.putParam("OccCustId", FormatUtil.padX(custId, 10));
 				occursList.putParam("OccCompanyCode", FormatUtil.padX("2888", 6));
 				occursList.putParam("OccOTransDate", FormatUtil.pad9("", 8));
 				occursList.putParam("OccOTransSeq", FormatUtil.pad9("", 6));

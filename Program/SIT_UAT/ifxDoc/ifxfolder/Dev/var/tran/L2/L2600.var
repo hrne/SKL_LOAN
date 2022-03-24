@@ -250,7 +250,7 @@ C(3,#CHAIN,1,s,$)
 #BUF2A=X,7,S
 
 #BIND2A=X,1,S
-BIND(#Btn2,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF2A;ntxbuf5=type<-1:LeadingBank<-OOTBank Code})
+BIND(#Btn2,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF2A;ntxbuf5=type<-1:LeadingBank<-OOTBankCode:LeadingBankX<-OOBankItem})
 
 !查詢聯貸訂約檔
 #SendL3r10B=X,1,S
@@ -330,12 +330,11 @@ T(B,#L2r09BankItem+#L2r09BranchItem)
 #BUF3A=X,7,S
 
 #BIND3A=X,1,S
-BIND(#Btn3,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF3A;ntxbuf5=type<-1:AgentBank<-OOBankCode})
+BIND(#Btn3,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF3A;ntxbuf5=type<-1:AgentBank<-OOBankCode:AgentBankX<-OOBankItem})
 
 
 #AgentBank=X,7,I
 C(3,#UpdateCode,1,$,s)
-T(2,#LeadingBank)
 @V(7)
 
 !尋找行庫資料檔

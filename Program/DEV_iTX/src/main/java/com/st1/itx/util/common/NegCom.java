@@ -47,6 +47,8 @@ import com.st1.itx.db.domain.JcicZ450;
 import com.st1.itx.db.domain.JcicZ450Id;
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
+import com.st1.itx.db.domain.JcicZ447;
+import com.st1.itx.db.domain.JcicZ572;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBank;
 //import com.st1.itx.db.domain.AcReceivableId;
@@ -71,6 +73,8 @@ import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.JcicZ050Service;
 import com.st1.itx.db.service.JcicZ573Service;
 import com.st1.itx.db.service.JcicZ450Service;
+import com.st1.itx.db.service.JcicZ447Service;
+import com.st1.itx.db.service.JcicZ572Service;
 import com.st1.itx.db.service.NegAppr01Service;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdBankService;
@@ -124,6 +128,10 @@ public class NegCom extends CommBuffer {
 	public JcicZ450Service sJcicZ450Service;
 	@Autowired
 	public JcicZ573Service sJcicZ573Service;
+	@Autowired
+	public JcicZ447Service sJcicZ447Service;
+	@Autowired
+	public JcicZ572Service sJcicZ572Service;
 
 	@Autowired
 	public TxTempService sTxTempService;
@@ -1004,89 +1012,98 @@ public class NegCom extends CommBuffer {
 	}
 
 	public void DbJcicZ573(String CustId, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
-		JcicZ573Id tJcicZ573Id = new JcicZ573Id();
-		tJcicZ573Id.setApplyDate(tNegMain.getApplDate());
-		tJcicZ573Id.setCustId(CustId);
-		tJcicZ573Id.setPayDate(tNegTrans.getEntryDate());
-		tJcicZ573Id.setSubmitKey(tNegMain.getMainFinCode());
-		JcicZ573 tJcicZ573 = sJcicZ573Service.holdById(tJcicZ573Id, titaVo);
+		// 更生需已有Z572才自動產Z573
+		Slice<JcicZ572> slJcicZ572 = null;
+		slJcicZ572 = sJcicZ572Service.custRcEq(CustId, tNegMain.getApplDate() + 19110000, index, limit, titaVo);
+		List<JcicZ572> lJcicZ572 = slJcicZ572 == null ? null : slJcicZ572.getContent();
+		if (lJcicZ572 == null || lJcicZ572.size() == 0) {
 
-		String tranKey = "";
-		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
-		BigDecimal totalPayAmt = mainAccuTempAmt;// 累計實際還款金額:累繳金額
-		if (titaVo.isHcodeNormal()) {
-			// 正向
-			if (tJcicZ573 != null) {
-				// Update
-
-				tJcicZ573.setPayAmt(tJcicZ573.getPayAmt() + payAmt.intValue());
-				tJcicZ573.setTotalPayAmt(tJcicZ573.getTotalPayAmt() + payAmt.intValue());
-				tJcicZ573.setTranKey(tranKey);
-				if (tJcicZ573.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ573.getTranKey())) { // 已報送過聯徵,則改報異動
-					tJcicZ573.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
-					tJcicZ573.setOutJcicTxtDate(0);
-				}
-				try {
-					sJcicZ573Service.update(tJcicZ573, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "更生債務人繳款資料");// E0007 更新資料時，發生錯誤
-				}
-			} else {
-				// Insert
-				tranKey = "A";
-				tJcicZ573 = new JcicZ573();
-				tJcicZ573.setJcicZ573Id(tJcicZ573Id);
-				tJcicZ573.setPayAmt(payAmt.intValue());
-				tJcicZ573.setTotalPayAmt(totalPayAmt.intValue());
-				tJcicZ573.setTranKey(tranKey);
-				tJcicZ573.setOutJcicTxtDate(0);
-				String iKey = "";
-				iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-				tJcicZ573.setUkey(iKey);
-				try {
-					sJcicZ573Service.insert(tJcicZ573, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0005", "更生債務人繳款資料");// E0005 新增資料時，發生錯誤
-				}
-			}
 		} else {
-			// 訂正
-			if (tJcicZ573 == null) {
-				throw new LogicException(titaVo, "E0003", "更生債務人繳款資料");
-			}
-			// 訂正最後一筆
-			if (tJcicZ573.getPayAmt() == payAmt.intValue()) {
-				if (tJcicZ573.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ573.getTranKey())) { // 已報送過聯徵,則改報刪除
-					tJcicZ573.setTranKey("D");// 交易代碼 A:新增;C:異動;D:刪除
-					tJcicZ573.setOutJcicTxtDate(0);
-					tJcicZ573.setPayAmt(tJcicZ573.getPayAmt() - payAmt.intValue());
-					tJcicZ573.setTotalPayAmt(tJcicZ573.getTotalPayAmt() - payAmt.intValue());
+
+			JcicZ573Id tJcicZ573Id = new JcicZ573Id();
+			tJcicZ573Id.setApplyDate(tNegMain.getApplDate());
+			tJcicZ573Id.setCustId(CustId);
+			tJcicZ573Id.setPayDate(tNegTrans.getEntryDate());
+			tJcicZ573Id.setSubmitKey(tNegMain.getMainFinCode());
+			JcicZ573 tJcicZ573 = sJcicZ573Service.holdById(tJcicZ573Id, titaVo);
+
+			String tranKey = "";
+			BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
+			BigDecimal totalPayAmt = mainAccuTempAmt;// 累計實際還款金額:累繳金額
+			if (titaVo.isHcodeNormal()) {
+				// 正向
+				if (tJcicZ573 != null) {
+					// Update
+
+					tJcicZ573.setPayAmt(tJcicZ573.getPayAmt() + payAmt.intValue());
+					tJcicZ573.setTotalPayAmt(tJcicZ573.getTotalPayAmt() + payAmt.intValue());
+					tJcicZ573.setTranKey(tranKey);
+					if (tJcicZ573.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ573.getTranKey())) { // 已報送過聯徵,則改報異動
+						tJcicZ573.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
+						tJcicZ573.setOutJcicTxtDate(0);
+					}
 					try {
 						sJcicZ573Service.update(tJcicZ573, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", "更生債務人繳款資");// E0007 更新資料時，發生錯誤
+						throw new LogicException(titaVo, "E0007", "更生債務人繳款資料");// E0007 更新資料時，發生錯誤
 					}
 				} else {
-
-					// DELETE
+					// Insert
+					tranKey = "A";
+					tJcicZ573 = new JcicZ573();
+					tJcicZ573.setJcicZ573Id(tJcicZ573Id);
+					tJcicZ573.setPayAmt(payAmt.intValue());
+					tJcicZ573.setTotalPayAmt(totalPayAmt.intValue());
+					tJcicZ573.setTranKey(tranKey);
+					tJcicZ573.setOutJcicTxtDate(0);
+					String iKey = "";
+					iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+					tJcicZ573.setUkey(iKey);
 					try {
-						sJcicZ573Service.delete(tJcicZ573, titaVo);
+						sJcicZ573Service.insert(tJcicZ573, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", "更生債務人繳款資料");// E0008 刪除資料時，發生錯誤
+						throw new LogicException(titaVo, "E0005", "更生債務人繳款資料");// E0005 新增資料時，發生錯誤
 					}
 				}
-				// 訂正非最後一筆
 			} else {
-				tJcicZ573.setPayAmt(tJcicZ573.getPayAmt() - payAmt.intValue());
-				tJcicZ573.setTotalPayAmt(tJcicZ573.getTotalPayAmt() - payAmt.intValue());
-				if (tJcicZ573.getOutJcicTxtDate() != 0) { // 已報送過聯徵,則改報異動
-					tJcicZ573.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
-					tJcicZ573.setOutJcicTxtDate(0);
+				// 訂正
+				if (tJcicZ573 == null) {
+					throw new LogicException(titaVo, "E0003", "更生債務人繳款資料");
 				}
-				try {
-					sJcicZ573Service.update(tJcicZ573, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "更生債務人繳款資料");// E0007 更新資料時，發生錯誤
+				// 訂正最後一筆
+				if (tJcicZ573.getPayAmt() == payAmt.intValue()) {
+					if (tJcicZ573.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ573.getTranKey())) { // 已報送過聯徵,則改報刪除
+						tJcicZ573.setTranKey("D");// 交易代碼 A:新增;C:異動;D:刪除
+						tJcicZ573.setOutJcicTxtDate(0);
+						tJcicZ573.setPayAmt(tJcicZ573.getPayAmt() - payAmt.intValue());
+						tJcicZ573.setTotalPayAmt(tJcicZ573.getTotalPayAmt() - payAmt.intValue());
+						try {
+							sJcicZ573Service.update(tJcicZ573, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", "更生債務人繳款資");// E0007 更新資料時，發生錯誤
+						}
+					} else {
+
+						// DELETE
+						try {
+							sJcicZ573Service.delete(tJcicZ573, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0008", "更生債務人繳款資料");// E0008 刪除資料時，發生錯誤
+						}
+					}
+					// 訂正非最後一筆
+				} else {
+					tJcicZ573.setPayAmt(tJcicZ573.getPayAmt() - payAmt.intValue());
+					tJcicZ573.setTotalPayAmt(tJcicZ573.getTotalPayAmt() - payAmt.intValue());
+					if (tJcicZ573.getOutJcicTxtDate() != 0) { // 已報送過聯徵,則改報異動
+						tJcicZ573.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
+						tJcicZ573.setOutJcicTxtDate(0);
+					}
+					try {
+						sJcicZ573Service.update(tJcicZ573, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", "更生債務人繳款資料");// E0007 更新資料時，發生錯誤
+					}
 				}
 			}
 		}
@@ -1154,106 +1171,113 @@ public class NegCom extends CommBuffer {
 	}
 
 	public void DbJcicZ450(String CustId, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
-		JcicZ450Id tJcicZ450Id = new JcicZ450Id();
-		tJcicZ450Id.setApplyDate(tNegMain.getApplDate());
-		tJcicZ450Id.setCourtCode(tNegMain.getCourtCode());
-		tJcicZ450Id.setCustId(CustId);
-		tJcicZ450Id.setPayDate(tNegTrans.getEntryDate());
-		tJcicZ450Id.setSubmitKey(tNegMain.getMainFinCode());
-
-		JcicZ450 tJcicZ450 = sJcicZ450Service.holdById(tJcicZ450Id, titaVo);
-
-		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
-		String payStatus = ""; // 債權結案註記 Y N
-		BigDecimal sumRepayActualAmt = mainAccuTempAmt;// 累計實際還款金額:累繳金額
-		BigDecimal sumRepayShouldAmt = mainAccuDueAmt;// 截至目前累計應還款金額:累期款金額
-		String tranKey = "";// 交易代碼
-		if (("3").equals(tNegMain.getStatus())) {
-			// 結案
-			payStatus = "Y";
+		// 前置調解需已有Z447才自動產Z450(因為不是每個客戶都有報聯徵)
+		Slice<JcicZ447> slJcicZ447 = null;
+		slJcicZ447 = sJcicZ447Service.custRcEq(CustId, tNegMain.getApplDate() + 19110000, index, limit, titaVo);
+		List<JcicZ447> lJcicZ447 = slJcicZ447 == null ? null : slJcicZ447.getContent();
+		if (lJcicZ447 == null || lJcicZ447.size() == 0) {
 		} else {
-			payStatus = "N";
-		}
-		if (titaVo.isHcodeNormal()) {
-			// 正向
-			if (tJcicZ450 != null) {
-				// Update
-				tJcicZ450.setPayAmt(tJcicZ450.getPayAmt() + payAmt.intValue());// 本次繳款金額
-				tJcicZ450.setPayStatus(payStatus);// 債權結案註記 Y N
-				tJcicZ450.setSumRepayActualAmt(tJcicZ450.getSumRepayActualAmt() + payAmt.intValue());// 累計實際還款金額
-				if (tJcicZ450.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ450.getTranKey())) { // 已報送過聯徵,則改報異動
-					tJcicZ450.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
-					tJcicZ450.setOutJcicTxtDate(0);
-				}
-				try {
-					sJcicZ450Service.update(tJcicZ450, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "前置調解債務人繳款資料");// E0007 更新資料時，發生錯誤
-				}
+			JcicZ450Id tJcicZ450Id = new JcicZ450Id();
+			tJcicZ450Id.setApplyDate(tNegMain.getApplDate());
+			tJcicZ450Id.setCourtCode(tNegMain.getCourtCode());
+			tJcicZ450Id.setCustId(CustId);
+			tJcicZ450Id.setPayDate(tNegTrans.getEntryDate());
+			tJcicZ450Id.setSubmitKey(tNegMain.getMainFinCode());
+
+			JcicZ450 tJcicZ450 = sJcicZ450Service.holdById(tJcicZ450Id, titaVo);
+
+			BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
+			String payStatus = ""; // 債權結案註記 Y N
+			BigDecimal sumRepayActualAmt = mainAccuTempAmt;// 累計實際還款金額:累繳金額
+			BigDecimal sumRepayShouldAmt = mainAccuDueAmt;// 截至目前累計應還款金額:累期款金額
+			String tranKey = "";// 交易代碼
+			if (("3").equals(tNegMain.getStatus())) {
+				// 結案
+				payStatus = "Y";
 			} else {
-				// Insert
-				tranKey = "A";
-				tJcicZ450 = new JcicZ450();
-				tJcicZ450.setJcicZ450Id(tJcicZ450Id);
-
-				tJcicZ450.setPayAmt(payAmt.intValue());// 本次繳款金額
-				tJcicZ450.setPayStatus(payStatus);// 債權結案註記 Y N
-				tJcicZ450.setSumRepayActualAmt(sumRepayActualAmt.intValue());// 累計實際還款金額
-				tJcicZ450.setSumRepayShouldAmt(sumRepayShouldAmt.intValue());// 截至目前累計應還款金額
-				tJcicZ450.setTranKey(tranKey);// 交易代碼
-				tJcicZ450.setOutJcicTxtDate(0);
-				String iKey = "";
-				iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-				tJcicZ450.setUkey(iKey);
-
-				try {
-					sJcicZ450Service.insert(tJcicZ450, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0005", "前置調解債務人繳款資料");// E0005 新增資料時，發生錯誤
-				}
+				payStatus = "N";
 			}
-
-		} else {
-			// 訂正
-			if (tJcicZ450 == null) {
-				throw new LogicException(titaVo, "E0003", "前置調解債務人繳款資料");// E0003 修改資料不存在
-			}
-			payStatus = tJcicZ450.getPayStatus(); // 訂正前交易別
-			// 訂正最後一筆
-			if (tJcicZ450.getPayAmt() == payAmt.intValue()) {
-				if (tJcicZ450.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ450.getTranKey())) { // 已報送過聯徵,則改報刪除
-					tJcicZ450.setTranKey("D");// 交易代碼 A:新增;C:異動;D:刪除
-					tJcicZ450.setOutJcicTxtDate(0);
-					tJcicZ450.setPayAmt(tJcicZ450.getPayAmt() - payAmt.intValue()); // 本次繳款金額
-					tJcicZ450.setSumRepayActualAmt(tJcicZ450.getSumRepayActualAmt() - payAmt.intValue());// 累計實際還款金額
-					tJcicZ450.setPayStatus("N");// 債權結案註記 Y N
+			if (titaVo.isHcodeNormal()) {
+				// 正向
+				if (tJcicZ450 != null) {
+					// Update
+					tJcicZ450.setPayAmt(tJcicZ450.getPayAmt() + payAmt.intValue());// 本次繳款金額
+					tJcicZ450.setPayStatus(payStatus);// 債權結案註記 Y N
+					tJcicZ450.setSumRepayActualAmt(tJcicZ450.getSumRepayActualAmt() + payAmt.intValue());// 累計實際還款金額
+					if (tJcicZ450.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ450.getTranKey())) { // 已報送過聯徵,則改報異動
+						tJcicZ450.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
+						tJcicZ450.setOutJcicTxtDate(0);
+					}
 					try {
 						sJcicZ450Service.update(tJcicZ450, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "前置調解債務人繳款資料");// E0007 更新資料時，發生錯誤
 					}
 				} else {
+					// Insert
+					tranKey = "A";
+					tJcicZ450 = new JcicZ450();
+					tJcicZ450.setJcicZ450Id(tJcicZ450Id);
 
-					// Delete
+					tJcicZ450.setPayAmt(payAmt.intValue());// 本次繳款金額
+					tJcicZ450.setPayStatus(payStatus);// 債權結案註記 Y N
+					tJcicZ450.setSumRepayActualAmt(sumRepayActualAmt.intValue());// 累計實際還款金額
+					tJcicZ450.setSumRepayShouldAmt(sumRepayShouldAmt.intValue());// 截至目前累計應還款金額
+					tJcicZ450.setTranKey(tranKey);// 交易代碼
+					tJcicZ450.setOutJcicTxtDate(0);
+					String iKey = "";
+					iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+					tJcicZ450.setUkey(iKey);
+
 					try {
-						sJcicZ450Service.delete(tJcicZ450, titaVo);
+						sJcicZ450Service.insert(tJcicZ450, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", "前置調解債務人繳款資料");// E0008 刪除資料時，發生錯誤
+						throw new LogicException(titaVo, "E0005", "前置調解債務人繳款資料");// E0005 新增資料時，發生錯誤
 					}
 				}
-				// 訂正非最後一筆
+
 			} else {
-				tJcicZ450.setPayAmt(tJcicZ450.getPayAmt() - payAmt.intValue()); // 本次繳款金額
-				tJcicZ450.setPayStatus("N");// 債權結案註記 Y N
-				tJcicZ450.setSumRepayActualAmt(tJcicZ450.getSumRepayActualAmt() - payAmt.intValue());// 累計實際還款金額
-				if (tJcicZ450.getOutJcicTxtDate() != 0) { // 已報送過聯徵,則改報異動
-					tJcicZ450.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
-					tJcicZ450.setOutJcicTxtDate(0);
+				// 訂正
+				if (tJcicZ450 == null) {
+					throw new LogicException(titaVo, "E0003", "前置調解債務人繳款資料");// E0003 修改資料不存在
 				}
-				try {
-					sJcicZ450Service.update(tJcicZ450, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "前置調解債務人繳款資料");// E0007 更新資料時，發生錯誤
+				payStatus = tJcicZ450.getPayStatus(); // 訂正前交易別
+				// 訂正最後一筆
+				if (tJcicZ450.getPayAmt() == payAmt.intValue()) {
+					if (tJcicZ450.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ450.getTranKey())) { // 已報送過聯徵,則改報刪除
+						tJcicZ450.setTranKey("D");// 交易代碼 A:新增;C:異動;D:刪除
+						tJcicZ450.setOutJcicTxtDate(0);
+						tJcicZ450.setPayAmt(tJcicZ450.getPayAmt() - payAmt.intValue()); // 本次繳款金額
+						tJcicZ450.setSumRepayActualAmt(tJcicZ450.getSumRepayActualAmt() - payAmt.intValue());// 累計實際還款金額
+						tJcicZ450.setPayStatus("N");// 債權結案註記 Y N
+						try {
+							sJcicZ450Service.update(tJcicZ450, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", "前置調解債務人繳款資料");// E0007 更新資料時，發生錯誤
+						}
+					} else {
+
+						// Delete
+						try {
+							sJcicZ450Service.delete(tJcicZ450, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0008", "前置調解債務人繳款資料");// E0008 刪除資料時，發生錯誤
+						}
+					}
+					// 訂正非最後一筆
+				} else {
+					tJcicZ450.setPayAmt(tJcicZ450.getPayAmt() - payAmt.intValue()); // 本次繳款金額
+					tJcicZ450.setPayStatus("N");// 債權結案註記 Y N
+					tJcicZ450.setSumRepayActualAmt(tJcicZ450.getSumRepayActualAmt() - payAmt.intValue());// 累計實際還款金額
+					if (tJcicZ450.getOutJcicTxtDate() != 0) { // 已報送過聯徵,則改報異動
+						tJcicZ450.setTranKey("C");// 交易代碼 A:新增;C:異動;D:刪除
+						tJcicZ450.setOutJcicTxtDate(0);
+					}
+					try {
+						sJcicZ450Service.update(tJcicZ450, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", "前置調解債務人繳款資料");// E0007 更新資料時，發生錯誤
+					}
 				}
 			}
 		}

@@ -185,7 +185,7 @@ BEGIN
           ,0                   AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
           ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
           ,CASE
-             WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 3
+             WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0  THEN 3
              WHEN S1."StatusCode" = 1 THEN 2
              WHEN S1."StatusCode" = 2 THEN 2
            ELSE 0 END                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
@@ -196,7 +196,7 @@ BEGIN
           ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
           ,CASE
-             WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN S1."InsuYearMonth" * 100 + 1
+             WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0  THEN S1."InsuYearMonth" * 100 + 1
              WHEN S1."StatusCode" = 1 THEN S1."InsuYearMonth" * 100 + 1
              WHEN S1."StatusCode" = 2 THEN S1."OvduDate"
            ELSE 0 END          AS "OpenAcDate"       -- 起帳日期
@@ -231,6 +231,7 @@ BEGIN
             WHEN S1."StatusCode" = 0 
                  -- AND S1."NotiTempFg" = 'Y' -- 2022-03-21 from Lai
                  AND S1."TotInsuPrem" != 0  -- 2022-03-21 from Lai
+            THEN 'Y'
             WHEN S1."StatusCode" = 1
             THEN 'Y'
             WHEN S1."StatusCode" = 2

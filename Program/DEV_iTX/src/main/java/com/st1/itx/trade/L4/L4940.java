@@ -135,8 +135,8 @@ public class L4940 extends TradeBuffer {
 
 					wkPostDepCode = tBankAuthAct.getPostDepCode();
 					wkCustNo = FormatUtil.pad9("" + tBankAuthAct.getCustNo(), 7);
-					wkAcctSeq = tBankAuthAct.getAcctSeq();
-					wkCustNoSeq = wkCustId + wkPostDepCode + wkCustNo + wkAcctSeq;
+					wkAcctSeq = FormatUtil.padX(tBankAuthAct.getAcctSeq(), 2);
+					wkCustNoSeq = wkAcctSeq + wkCustId + wkPostDepCode + wkCustNo;
 				} else {
 					tAchAuthLog = achAuthLogService.facmNoRepayAcctFirst(tBankAuthAct.getCustNo(),
 							tBankAuthAct.getFacmNo(), tBankAuthAct.getRepayBank(), tBankAuthAct.getRepayAcct(), titaVo);

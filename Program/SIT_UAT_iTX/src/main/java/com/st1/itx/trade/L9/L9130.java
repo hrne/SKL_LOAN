@@ -34,6 +34,8 @@ public class L9130 extends TradeBuffer {
 	L9132 tranL9132;
 	@Autowired
 	L9133 tranL9133;
+	@Autowired
+	L9134 tranL9134;
 
 	@Autowired
 	WebClient webClient;
@@ -136,6 +138,10 @@ public class L9130 extends TradeBuffer {
 		if (doL9133.equals("Y")) {
 			tranL9133.run(titaVo);
 		}
+
+		titaVo.putParam("StartDate", iAcDate);
+		titaVo.putParam("EndDate", iAcDate);
+		tranL9134.run(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

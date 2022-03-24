@@ -1580,7 +1580,7 @@ public class BaTxCom extends TradeBuffer {
 								switch (rv.getAcctCode()) {
 								case "F10": // 帳管費/手續費
 									baTxVo.setRepayType(4); // 04-帳管費/手續費
-									if (iRepayType <= 3 && iUnPaidDate > rv.getOpenAcDate()) {
+									if (iRepayType <= 3 && iUnPaidDate < rv.getOpenAcDate()) {
 										baTxVo.setDataKind(6); // 6.另收欠款(帳管費/手續費)
 									} else {
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金

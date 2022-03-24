@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.online;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -18,9 +19,10 @@ import com.st1.itx.db.domain.HlCusData;
  */
 public interface HlCusDataRepository extends JpaRepository<HlCusData, Long> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<HlCusData> findByHlCusNo(Long hlCusNo);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<HlCusData> findByHlCusNo(Long hlCusNo);
 
 }
+
