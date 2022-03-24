@@ -488,6 +488,9 @@ BEGIN
 
     DBMS_OUTPUT.PUT_LINE('UPDATE LawAmount END');
 
+--  更新  資產五分類
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass');
+
     MERGE INTO "MonthlyFacBal" M
     USING (
       SELECT M."YearMonth"
@@ -498,35 +501,33 @@ BEGIN
                THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)
                                --   無擔保部分--超過清償期12月者
                                --   或拍訂貨拍賣無實益之損失者
-                               --   或放款資產經評估無法回收者                         
-               WHEN M."OvduTerm" >= 12
-                 AND M."ProdNo" NOT IN ('60','61','62') 
-               THEN '3'        --(3)第三類-可望收回：
-                               --   有足無擔保--逾繳超過清償期12月者
-                               --   或無擔保部分--超過清償期3-6月者   
-               ELSE '23'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者
-
-             END                  AS "AssetClass"	--放款資產項目	  
-      FROM "MonthlyFacBal" M
-      WHERE M."PrinBalance" > 0
-        AND M."YearMonth" = YYYYMM
-        AND M."Status" IN (2,6,7) --催收戶、呆帳戶、部分呆帳戶
-      UNION
-      SELECT M."YearMonth"
-           , M."CustNo"
-           , M."FacmNo"
-           , CASE
-               WHEN F."ProdNo" IN ('60','61','62') 
+                               --   或放款資產經評估無法回收者        
+               WHEN M."AcctCode" <> 990
+                AND M."ProdNo" IN ('60','61','62')
                 AND M."OvduTerm" = 0
                THEN '21'       --(21)第二類-應予注意：
                                --    有足額擔保--但債信以不良者
                                --    (有擔保分期協議且正常還款者)
-               WHEN M."OvduTerm" >= 1
+               WHEN M."AcctCode" <> 990
+                AND M."OvduTerm" >= 1
                 AND M."OvduTerm" <= 6
                THEN '22'       --(22)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期1-6月者
+               WHEN M."AcctCode" = 990
+                AND M."ProdNo" IN ('60','61','62')
+                AND M."PrinBalance" > 1
+                AND M."OvduTerm" >= 7
+                AND M."OvduTerm" <= 12
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者                  
+               WHEN M."AcctCode" = 990
+                AND M."ProdNo" IN ('60','61','62')
+                AND M."OvduTerm" > 12
+                AND M."PrinBalance" > 1
+               THEN '3'        --(3)第三類-可望收回：
+                               --   有足無擔保--逾繳超過清償期12月者
+                               --   或無擔保部分--超過清償期3-6月者   
                WHEN M."ClCode1" IN (1,2) 
                  AND F."FirstDrawdownDate" >= 20100101 
                  AND M."FacAcctCode" = 340
@@ -555,7 +556,6 @@ BEGIN
       LEFT JOIN "CdIndustry" CDI ON CDI."IndustryCode" = CM."IndustryCode"
       WHERE M."PrinBalance" > 0
         AND M."YearMonth" = YYYYMM
-        AND M."Status" = 0 --正常戶
     ) TMP
     ON (
       TMP."YearMonth" = M."YearMonth"
@@ -565,6 +565,11 @@ BEGIN
     WHEN MATCHED THEN UPDATE SET
     "AssetClass" = TMP."AssetClass"
     ;
+    
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass END');
+
 
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;

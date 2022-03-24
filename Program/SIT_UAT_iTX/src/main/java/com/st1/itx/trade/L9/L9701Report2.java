@@ -12,18 +12,24 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
 public class L9701Report2 extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L9701Report2.class);
 
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
 
+	@Autowired
+	Parse parse;
+	
+	@Autowired
+	CustNoticeCom custNoticeCom;
+	
 	// 製表日期
 	private String nowDate;
 	// 製表時間
@@ -85,7 +91,7 @@ public class L9701Report2 extends MakeReport {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9701_2", "客戶往來費用明細表", "", "A4", "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9701", "客戶往來費用明細表", "", "A4", "L");
 
 		List<Map<String, String>> listL9701 = null;
 
@@ -101,6 +107,17 @@ public class L9701Report2 extends MakeReport {
 		this.facmNo = "";
 
 		for (Map<String, String> tL9701Vo : listL9701) {
+			
+			// custNo: 都吃VAR  #CustNo
+			// facmNo: FacmNo
+			
+			String inputCustNo = titaVo.get("CustNo");
+			int recordCustNo = parse.stringToInteger(inputCustNo);
+			String recordFacmNoString = tL9701Vo.get("FacmNo");
+			int recordFacmNo = parse.stringToInteger(recordFacmNoString);
+			
+			if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9701", titaVo))
+				continue;
 
 			if (!this.facmNo.equals(tL9701Vo.get("F3"))) {
 				ptfg = 0;
@@ -108,7 +125,7 @@ public class L9701Report2 extends MakeReport {
 				this.facmNo = tL9701Vo.get("F3");
 			}
 
-			if (!tL9701Vo.get("F0").equals("99999999")) {
+			if (!"99999999".equals(tL9701Vo.get("F0"))) {
 				report1(tL9701Vo);
 			} else {
 				if (listBaTxVo != null && listBaTxVo.size() != 0) {

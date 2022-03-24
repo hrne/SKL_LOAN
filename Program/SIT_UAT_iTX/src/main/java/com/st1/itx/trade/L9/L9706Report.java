@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9706ServiceImpl;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.ConvertUpMoney;
+import com.st1.itx.util.parse.Parse;
 
 @Component("L9706Report")
 @Scope("prototype")
@@ -20,6 +22,12 @@ public class L9706Report extends MakeReport {
 
 	@Autowired
 	L9706ServiceImpl l9706ServiceImpl;
+	
+	@Autowired
+	Parse parse;
+	
+	@Autowired
+	CustNoticeCom custNoticeCom;
 
 	String iENTDAY = "";
 
@@ -58,6 +66,21 @@ public class L9706Report extends MakeReport {
 
 		if (loanBTXList != null && loanBTXList.size() != 0) {
 			for (Map<String, String> tL9706Vo : loanBTXList) {
+				
+				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
+				
+				// inputCustNo: #CUSTNO
+				// CustNo: Query.F6
+				// FacmNo: Query.F7
+				
+				String inputCustNo = titaVo.get("CUSTNO");
+				String recordCustNoString = tL9706Vo.get("F6");
+				String recordFacmNoString = tL9706Vo.get("F7");
+				int recordCustNo = parse.stringToInteger(recordCustNoString);
+				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
+				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9706", titaVo))
+					continue;
+				
 				if (cnt == 2) {
 					this.newPage();
 					cnt = 0;
@@ -102,7 +125,7 @@ public class L9706Report extends MakeReport {
 		long sno = this.close();
 
 		// 測試用
-		// this.toPdf(sno);
+		//this.toPdf(sno);
 		if (loanBTXList != null && loanBTXList.size() != 0) {
 			return true;
 		} else {
@@ -219,7 +242,7 @@ public class L9706Report extends MakeReport {
 //			this.info("idata X = " + idata.substring(i, i + 1));
 			tmp = idata.charAt(i);
 
-			tranTemp = tmp;
+			tranTemp = (int) tmp;
 
 			tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 

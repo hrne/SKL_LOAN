@@ -16,6 +16,7 @@ import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -40,6 +41,9 @@ public class L4721Report extends MakeReport {
 
 	@Autowired
 	public BaTxCom baTxCom;
+	
+	@Autowired
+	CustNoticeCom custNoticeCom;
 
 	@Autowired
 	Parse parse;
@@ -183,7 +187,12 @@ public class L4721Report extends MakeReport {
 
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
-
+			
+			// 檢查 CustNotice 確認這份表是否能出
+			
+			if (!custNoticeCom.checkIsLetterSendable(null, custNo, facmNo, "L4721", titaVo))
+				continue;
+			
 //				每張表有該戶號額度對應之Header，所以必須有兩個迴圈
 //				第一層為應產出list，第二層為產出客戶之列印內容
 			try {

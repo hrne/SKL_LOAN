@@ -48,8 +48,6 @@ public class L2060 extends TradeBuffer {
 	@Autowired
 	LoanCom loanCom;
 
-	private int wkTotalCount = 0;
-	private int wkSyndNo = 0;
 
 	private OccursList occursList;
 	private Slice<LoanSynd> slLoanSynd;
@@ -83,7 +81,7 @@ public class L2060 extends TradeBuffer {
 		// 查詢聯貸案主檔 聯貸案編號區間
 		if (iSyndNoStart > 0) {
 			slLoanSynd = loanSyndService.syndNoRange(iSyndNoStart, iSyndNoEnd, iLeadingBank,
-					iSigningDateStart + 19110000, iSigningDateEnd + 19110000, this.index, this.limit, titaVo);
+					iSigningDateStart + 19110000, iSigningDateEnd, this.index, this.limit, titaVo);
 		} else {
 
 		}

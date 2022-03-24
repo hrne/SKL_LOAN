@@ -13,18 +13,24 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
 
 public class L9701Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L9701Report.class);
 
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
+	
+	@Autowired
+	CustNoticeCom custNoticeCom;
+	
+	@Autowired
+	Parse parse;
 
 	// 製表日期
 	private String NowDate;
@@ -156,7 +162,7 @@ public class L9701Report extends MakeReport {
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 
-		this.open(titaVo, entday, titaVo.getKinbr(), "L9701_1", "客戶往來本息明細表", "", "A4", "L");
+		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來本息明細表", "", "A4", "L");
 
 		this.custName = "";
 		this.facmNo = "";
@@ -169,6 +175,16 @@ public class L9701Report extends MakeReport {
 		int detailCounts = 0;
 
 		for (Map<String, String> tL9701Vo : listL9701) {
+			
+			// F11 CustNo
+			// F13 FacmNo
+			// INPUT #CustNo
+			
+			// 檢查 CustNoticeCom 確認該筆戶號額度是否能產出郵寄文件
+			int recordCustNo = parse.stringToInteger(tL9701Vo.get("F11"));
+			int recordFacmNo = parse.stringToInteger(tL9701Vo.get("F13"));
+			if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CustNo"), recordCustNo, recordFacmNo, this.getRptCode(), titaVo))
+				continue;
 
 			if (!this.facmNo.equals(tL9701Vo.get("F13"))) {
 

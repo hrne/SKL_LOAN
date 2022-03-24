@@ -151,7 +151,12 @@ public class L9705Report extends MakeReport {
 				if (tL9Vo.get("RepayCode") != null) {
 					repayCode = tL9Vo.get("RepayCode");
 				}
-
+				
+				// 檢查 CustNoticeCom 確認此戶此報表是否能產出
+				// input parameter: CUSTNO
+				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, "L9705", titaVo))
+					continue;
+				
 //				if (tL9Vo.get("CustName") != null) {
 //					custName = tL9Vo.get("CustName");
 //				}

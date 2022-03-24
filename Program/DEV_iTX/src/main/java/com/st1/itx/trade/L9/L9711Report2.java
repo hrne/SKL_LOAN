@@ -80,6 +80,20 @@ public class L9711Report2 extends MakeReport {
 		if (L9711List.size() > 0) {
 
 			for (Map<String, String> tL9711Vo : L9711List) {
+				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
+				
+				// inputCustNo: #CUSTNO
+				// CustNo: Query.F4
+				// FacmNo: Query.F5
+				
+				String inputCustNo = titaVo.get("CUSTNO");
+				String recordCustNoString = tL9711Vo.get("F4");
+				String recordFacmNoString = tL9711Vo.get("F5");
+				int recordCustNo = parse.stringToInteger(recordCustNoString);
+				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
+				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo))
+					continue;
+				
 				// 有一樣戶號額度的話 用同一張
 				if (f4.equals(tL9711Vo.get("F4")) && f5.equals(tL9711Vo.get("F5"))) {
 

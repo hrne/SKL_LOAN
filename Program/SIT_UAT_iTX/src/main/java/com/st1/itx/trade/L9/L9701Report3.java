@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -21,6 +23,12 @@ public class L9701Report3 extends MakeReport {
 
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
+	
+	@Autowired
+	Parse parse;
+	
+	@Autowired
+	CustNoticeCom custNoticeCom;
 
 	// 製表日期
 	private String nowDate;
@@ -94,16 +102,16 @@ public class L9701Report3 extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9701Report3 exec");
-
+		
 		iCUSTNO = titaVo.get("CustNo");
-
+		
 		entday = titaVo.getEntDyI();
-
+		
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-
+		
 		List<Map<String, String>> listL9701 = null;
-
+		
 		try {
 			listL9701 = l9701ServiceImpl.doQuery3(titaVo);
 		} catch (Exception e) {
@@ -111,17 +119,32 @@ public class L9701Report3 extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
-
+		
 		if (listL9701 != null && listL9701.size() > 0) {
 			this.custName = listL9701.get(0).get("CustName");
-			this.open(titaVo, entday, titaVo.getKinbr(), "L9701_3", "客戶往來交易明細表", "", "A4", "L");
+			this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來交易明細表", "", "A4", "L");
+			
 			for (Map<String, String> tL9701Vo : listL9701) {
-				// 印明細
+				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
+				
+				// inputCustNo: #CustNo
+				// CustNo: Query.CustNo
+				// FacmNo: Query.FacmNo
+				
+				String inputCustNo = titaVo.get("CustNo");
+				String recordCustNoString = tL9701Vo.get("CustNo");
+				String recordFacmNoString = tL9701Vo.get("FacmNo");
+				int recordCustNo = parse.stringToInteger(recordCustNoString);
+				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
+				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9701", titaVo))
+					continue;
+						
+				// 印明細						
 				printDetail(tL9701Vo);
 			}
 			this.print(1, 3, "－－　－－　－－－－－　－－－－－－　－－－　－－－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－");
 		} else {
-			this.open(titaVo, entday, titaVo.getKinbr(), "L9701_3", "客戶往來交易明細表", "", "A4", "L");
+			this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來交易明細表", "", "A4", "L");
 			this.print(1, 1, "本日無資料");
 			this.print(1, 3, "－－　－－　－－－－－　－－－－－－　－－－　－－－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－");
 		}
@@ -155,7 +178,8 @@ public class L9701Report3 extends MakeReport {
 		this.print(0, 60, formatAmt(txAmt, 0), "R"); // 交易金額
 
 		if (Integer.parseInt(tL9701Vo.get("IntStartDate")) > 0) {
-			this.print(0, 63, showRocDate(tL9701Vo.get("IntStartDate"), 1) + "-" + showRocDate(tL9701Vo.get("IntEndDate"), 1)); // 計息期間
+			this.print(0, 63,
+					showRocDate(tL9701Vo.get("IntStartDate"), 1) + "-" + showRocDate(tL9701Vo.get("IntEndDate"), 1)); // 計息期間
 		}
 
 		BigDecimal principal = getBigDecimal(tL9701Vo.get("Principal"));

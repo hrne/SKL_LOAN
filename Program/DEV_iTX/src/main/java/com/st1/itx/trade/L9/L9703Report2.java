@@ -103,61 +103,13 @@ public class L9703Report2 extends MakeReport {
 
 		this.info("L9703List-------->" + L9703List.size());
 		for (Map<String, String> tL9703Vo : L9703List) {
-//			if (!f4.equals(tL9703Vo.get("F4")) || !f5.equals(tL9703Vo.get("F5"))) {
-			report(tL9703Vo, txbuffer, titaVo);
-//			}
-//			f4 = tL9703Vo.get("F4");
-//			f5 = tL9703Vo.get("F5");
+			// 檢查 CustNotice 是否設定不通知
+			String custNoInput = titaVo.get("CustNo");
+			int custNo = parse.stringToInteger(tL9703Vo.get("CustNo"));
+			int facmNo = parse.stringToInteger(tL9703Vo.get("FacmNo"));
+			if (custNoticeCom.checkIsLetterSendable(custNoInput, custNo, facmNo, "L9703", titaVo))
+				report(tL9703Vo, txbuffer, titaVo);
 		}
-
-//		if (this.getNowPage() == 0) {
-//
-//			String iCUSTNO = titaVo.get("CustNo");
-//			String iFACMNO = titaVo.get("FacmNo");
-//
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 10, "【限定本人拆閱，若無此人，請寄回本公司】");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			String tmp = "";
-//			this.print(1, 10, tmp);
-//			this.print(1, 1, "");
-//			this.print(1, 10, String.format("%07d", Integer.valueOf(iCUSTNO)) + "   ");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//
-//			// this.setFontSize(14);
-//			this.print(1, 45, "放款本息攤還表暨繳息通知單", "C");
-//
-//			// this.setFontSize(10);
-//			this.print(1, 1, "");
-//			this.print(1, 1, "");
-//			this.print(1, 10, "製發日期：");
-//			this.print(0, 20, this.showRocDate(entdy, 1));
-//
-//			tmp = "";
-//
-//			this.print(0, 87, tmp);
-//
-//			this.print(1, 10, "戶號：　　　　　　　目前利率：　　　　%");
-//			this.print(0, 16, String.format("%07d", Integer.valueOf(iCUSTNO)) + "-"
-//					+ String.format("%03d", Integer.valueOf(iFACMNO)));
-//			this.print(1, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
-//			this.print(1, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　帳管費：");
-//			this.print(1, 10, "　　　　　　　　　　　　　每期應攤還　　　　　　　　　　　　未　　還　　暫　付");
-//			this.print(1, 10, "應繳日　　違約金　　　　本金　　　　　利息　　　應繳合計　　本金餘額　　所得稅　　應繳淨額");
-//			this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-//			this.print(1, 20, "*******    查無資料   ******");
 
 		if (this.getPrintCnt() == 0) {
 			this.setRptItem("放款本息攤還表暨繳息通知單(無符合資料)");

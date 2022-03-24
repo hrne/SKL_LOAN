@@ -154,17 +154,9 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				intCalcCode = "1";
 			} else {
 				intCalcCode = "2";
-//				if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
-//					intCalcCode = "2";
-//				} else {
-//					intCalcCode = "1";
-//				}
-				// 未滿一個月，以日計息
-				if (t.getNextPayIntDate() > nextMonth01) {
-					intCalcCode = "1";
-				}
-				// 首次繳息，且天數超過一個月，以日計息
-				if (prevPayIntDate == t.getDrawdownDate() && t.getSpecificDate() > t.getDrawdownDate()) {
+				if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
+					intCalcCode = "2";
+				} else {
 					intCalcCode = "1";
 				}
 			}
@@ -186,12 +178,16 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setEntryDate(iEntryDate); // 入帳日期
 		loanCalcRepayIntCom.setUsageCode(t.getUsageCode()); // 資金用途別 1: 週轉金2: 購置不動產3: 營業用資產4: 固定資產5: 企業投資6: 購置動產9: 其他
 		loanCalcRepayIntCom.setCaseCloseFlag("N"); // 結案記號 Y:是 N:否
-		loanCalcRepayIntCom.setBreachReliefFlag(t.getNextPayIntDate() > t.getMaturityDate() ? "Y" : "N"); // 減免違約金 Y:是
-																											// N:否
-		// 聯貸案件 Y:是 N:否
-		if (tFacCaseAppl.getSyndNo() > 0)
 
-		{ // 聯貸案編號
+		// 減免違約金 Y:是 N:否
+		loanCalcRepayIntCom.setBreachReliefFlag("N");
+		// 最後一期期款，入帳日在應繳日前減免違約金，即只收至到期日的利息、不收延滯息及違約金
+		if (t.getNextPayIntDate() > t.getMaturityDate() && iEntryDate <= t.getNextPayIntDate()) {
+			loanCalcRepayIntCom.setBreachReliefFlag("Y");
+		}
+
+		// 聯貸案件 Y:是 N:否
+		if (tFacCaseAppl.getSyndNo() > 0) { // 聯貸案編號
 			loanCalcRepayIntCom.setSyndFlag("Y");
 		} else {
 			loanCalcRepayIntCom.setSyndFlag("N");

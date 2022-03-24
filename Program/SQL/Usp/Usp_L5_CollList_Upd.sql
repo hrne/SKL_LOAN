@@ -339,7 +339,9 @@ BEGIN
           ,N."PayIntDate"             AS "PrevIntDate"         -- '繳息迄日';
           ,N."NextPayDate"            AS "NextIntDate"         -- '應繳息日';
           ,'TWD'                      AS "CurrencyCode"        -- '幣別';
-          ,N."PrinBalance"            AS "PrinBalance"         -- '本金餘額';
+          ,CASE WHEN N."Status" = 3   THEN 0
+                ELSE N."PrinBalance"  
+           END                        AS "PrinBalance"         -- '本金餘額';
           ,0                          AS "BadDebtBal"          -- '呆帳餘額'; 
           ,CASE WHEN  N."Status" = 0
                   AND N."NextPayDate" > 0
