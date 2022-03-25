@@ -550,11 +550,11 @@ public class MainProcess extends SysLogger {
 						sendRsp.addvReason(this.txBuffer, titaVo, "0004", "查詢結清滿五年客戶資料,理由:" + titaVo.getReason());
 					}
 				} else if (tCustDataCtrl.getApplMark() == 1) {
-					if ("L3".equals(this.titaVo.getTxcd().substring(0, 2))) {
-						txCom.setCustDataCtrl(1);
-					} else {
-						throw new LogicException("E0015", "結清客戶已申請資料控管");
-					}
+//					if ("L3".equals(this.titaVo.getTxcd().substring(0, 2))) {
+//						txCom.setCustDataCtrl(1);
+//					} else {
+//						throw new LogicException("E0015", "結清客戶已申請資料控管");
+//					}
 				}
 			}
 		}
