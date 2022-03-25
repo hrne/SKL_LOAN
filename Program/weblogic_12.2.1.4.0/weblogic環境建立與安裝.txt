@@ -204,3 +204,8 @@ fi
 -Ditx_configFolder=/home/weblogic/itxDoc/itxConfig
 -DiTXInFolder=/home/weblogic/itxDoc/itxWrite/upload/
 -DiTXPort=556887799
+
+
+#匯入AD憑證
+cd /u01/jdk/jdk1.8.0_321/jre/bin
+./keytool -import -alias testCA -file /home/weblogic/war/testCA.cer -storetype JKS -keystore "/u01/jdk/jdk1.8.0_321/jre/lib/security/cacerts"
