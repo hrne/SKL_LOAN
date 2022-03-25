@@ -22,203 +22,257 @@ import javax.persistence.Column;
 @Table(name = "`CustDataCtrl`")
 public class CustDataCtrl implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7557696199710592432L;
+	private static final long serialVersionUID = 3758088225677264689L;
 
 // 借款人戶號
-	@Id
-	@Column(name = "`CustNo`")
-	private int custNo = 0;
+  @Id
+  @Column(name = "`CustNo`")
+  private int custNo = 0;
 
-	// 客戶識別碼
-	@Column(name = "`CustUKey`", length = 32)
-	private String custUKey;
+  // 客戶識別碼
+  @Column(name = "`CustUKey`", length = 32)
+  private String custUKey;
 
-	// 申請記號
-	/* 1:客戶申請(案件申請時丟錯誤訊息)2:滿五年自動寫入(案件申請自動刪除)3:解除 */
-	@Column(name = "`ApplMark`")
-	private int applMark = 0;
+  // 申請記號
+  /* 1:客戶申請(案件申請時丟錯誤訊息)2:滿五年自動寫入(案件申請自動刪除)3:解除 */
+  @Column(name = "`ApplMark`")
+  private int applMark = 0;
 
-	// 解除原因
-	@Column(name = "`Reason`", length = 50)
-	private String reason;
+  // 解除原因
+  @Column(name = "`Reason`", length = 50)
+  private String reason;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 原始身份證字號/統一編號
+  /* 客戶申請留存原始ID用 by eric 2022.3.25 */
+  @Column(name = "`CustId`", length = 10)
+  private String custId;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 原始戶名/公司名稱
+  /* 客戶申請留存原始戶名用 by eric 2022.3.25 */
+  @Column(name = "`CustName`", length = 100)
+  private String custName;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	/**
-	 * 借款人戶號<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getCustNo() {
-		return this.custNo;
-	}
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	/**
-	 * 借款人戶號<br>
-	 * 
-	 *
-	 * @param custNo 借款人戶號
-	 */
-	public void setCustNo(int custNo) {
-		this.custNo = custNo;
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	/**
-	 * 客戶識別碼<br>
-	 * 
-	 * @return String
-	 */
-	public String getCustUKey() {
-		return this.custUKey == null ? "" : this.custUKey;
-	}
 
-	/**
-	 * 客戶識別碼<br>
-	 * 
-	 *
-	 * @param custUKey 客戶識別碼
-	 */
-	public void setCustUKey(String custUKey) {
-		this.custUKey = custUKey;
-	}
+/**
+	* 借款人戶號<br>
+	* 
+	* @return Integer
+	*/
+  public int getCustNo() {
+    return this.custNo;
+  }
 
-	/**
-	 * 申請記號<br>
-	 * 1:客戶申請(案件申請時丟錯誤訊息) 2:滿五年自動寫入(案件申請自動刪除) 3:解除
-	 * 
-	 * @return Integer
-	 */
-	public int getApplMark() {
-		return this.applMark;
-	}
+/**
+	* 借款人戶號<br>
+	* 
+  *
+  * @param custNo 借款人戶號
+	*/
+  public void setCustNo(int custNo) {
+    this.custNo = custNo;
+  }
 
-	/**
-	 * 申請記號<br>
-	 * 1:客戶申請(案件申請時丟錯誤訊息) 2:滿五年自動寫入(案件申請自動刪除) 3:解除
-	 *
-	 * @param applMark 申請記號
-	 */
-	public void setApplMark(int applMark) {
-		this.applMark = applMark;
-	}
+/**
+	* 客戶識別碼<br>
+	* 
+	* @return String
+	*/
+  public String getCustUKey() {
+    return this.custUKey == null ? "" : this.custUKey;
+  }
 
-	/**
-	 * 解除原因<br>
-	 * 
-	 * @return String
-	 */
-	public String getReason() {
-		return this.reason == null ? "" : this.reason;
-	}
+/**
+	* 客戶識別碼<br>
+	* 
+  *
+  * @param custUKey 客戶識別碼
+	*/
+  public void setCustUKey(String custUKey) {
+    this.custUKey = custUKey;
+  }
 
-	/**
-	 * 解除原因<br>
-	 * 
-	 *
-	 * @param reason 解除原因
-	 */
-	public void setReason(String reason) {
-		this.reason = reason;
-	}
+/**
+	* 申請記號<br>
+	* 1:客戶申請(案件申請時丟錯誤訊息)
+2:滿五年自動寫入(案件申請自動刪除)
+3:解除
+	* @return Integer
+	*/
+  public int getApplMark() {
+    return this.applMark;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 申請記號<br>
+	* 1:客戶申請(案件申請時丟錯誤訊息)
+2:滿五年自動寫入(案件申請自動刪除)
+3:解除
+  *
+  * @param applMark 申請記號
+	*/
+  public void setApplMark(int applMark) {
+    this.applMark = applMark;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 解除原因<br>
+	* 
+	* @return String
+	*/
+  public String getReason() {
+    return this.reason == null ? "" : this.reason;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 解除原因<br>
+	* 
+  *
+  * @param reason 解除原因
+	*/
+  public void setReason(String reason) {
+    this.reason = reason;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 原始身份證字號/統一編號<br>
+	* 客戶申請留存原始ID用 by eric 2022.3.25
+	* @return String
+	*/
+  public String getCustId() {
+    return this.custId == null ? "" : this.custId;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 原始身份證字號/統一編號<br>
+	* 客戶申請留存原始ID用 by eric 2022.3.25
+  *
+  * @param custId 原始身份證字號/統一編號
+	*/
+  public void setCustId(String custId) {
+    this.custId = custId;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 原始戶名/公司名稱<br>
+	* 客戶申請留存原始戶名用 by eric 2022.3.25
+	* @return String
+	*/
+  public String getCustName() {
+    return this.custName == null ? "" : this.custName;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 原始戶名/公司名稱<br>
+	* 客戶申請留存原始戶名用 by eric 2022.3.25
+  *
+  * @param custName 原始戶名/公司名稱
+	*/
+  public void setCustName(String custName) {
+    this.custName = custName;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	@Override
-	public String toString() {
-		return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", applMark=" + applMark + ", reason=" + reason + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-				+ ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", applMark=" + applMark + ", reason=" + reason + ", custId=" + custId + ", custName=" + custName
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

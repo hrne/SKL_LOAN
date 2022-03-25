@@ -78,7 +78,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHERE \"LAW005\" = '1' ";
 		sql += "             ) REL ON REL.\"RptId\" = CM.\"CustId\" ";
 		sql += "   WHERE M.\"YearMonth\" = :yymm  ";
-		sql += "   	 AND M.\"PrinBalance\" > 0' )";
+		sql += "   	 AND M.\"PrinBalance\" > 0 )";
 //		sql += "   	 AND SUBSTR(M.\"AssetClass\",0,1) <> '1' )";
 		sql += "   GROUP BY \"YearMonth\" ";
 		sql += "           ,SUBSTR(\"AssetClass\",0,1) ";

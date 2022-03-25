@@ -39,10 +39,23 @@ E(0,0)
 #FirstIn=A,1,S
 E(0,1)
 
+!調RIM確認執行櫃員是否有管理權限
+#TlrNo=X,6,S
+T(4,TLRNO$)
+
+#RIM_L6R20=A,1,S
+RESET_RIM(#RIM_L6R20,L6R20)
+S(L6R20,01,#FunCode,#TlrNo,#END)
+R(1,L6R20)
+
+!變更者是否為管理者
+#IsAdmin=A,1,S
+
 #button=x,100,S
+K(MODIFYBUTTON,查詢)
+C(3,#IsAdmin,1,$,s)
 T(2,{cmd=CHAIN; ntxcd=L6604; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增代碼)
-K(MODIFYBUTTON,查詢)
 
 !#DefTypeH=x,150,S
 !T(3,01:顧客管理作業;02:業務作業;03:帳務作業;04:批次作業;05:管理性作業;06:共同作業;07:介接外部系統;08:遵循法令作業;09:報表作業)
@@ -86,6 +99,12 @@ BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:De
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
+![維護記號](1:新增;2:修改;4:刪除;5:查詢)
+#FunCode=A,1,S
+C(2,#CHAIN,$,s)
+
+
+
 !業務類別
 #CDCODEMenuCode=x,20,S
 T(3,CdCode.MenuCode)
@@ -121,7 +140,8 @@ C(3,#CHAIN,1,T(F,@DefType,0)T(F,@DefCode,0)T(F,@DefItemX,0),$)
 #DefType=X,2,I
 C(3,#CHAIN,1,s,$)
 HELP(#DefTypeH)
-@C(4,#DefType,$,V(H,#DefTypeH))
+@T(3,@DefTypeX,)
+C(4,#DefType,$,V(H,#DefTypeH))
 
 #DefTypeX=x,20,L
 C(4,#DefType,S,T(H,#DefType,#DefTypeH))
@@ -130,7 +150,7 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 #DefCode=x,20,I
 C(3,#CHAIN,1,s,$)
 !HELP(#DefCodeH)
-@
+@T(3,@DefItemX,)
 C(4,#DefCode,$,V(H,#DefCodeH))
 
 #Rim6R33DefType=X,2,S
@@ -228,7 +248,12 @@ E(0,2)
 T(2,#OOFunc2+#OODefCode+#OOCode)
 
 #OOBTN2=X,4,S
-C(3,#CHAIN,1,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2}))
+! CHAIN 1 時必為隱藏
+C(3,#CHAIN,1,s,$)
+! DefCode為CodeType時，須為Admin才可修改
+! DefCode為其他時，皆可修改
+C(5,#OODefCode,CodeType,C(3,#IsAdmin,1,$,s),$) 
+BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2})
 
 ! 刪除的按鈕
 #OOFunc4=A,1,S
@@ -261,6 +286,10 @@ TXFORM=L6064
 #OOItem
 #OOType
 #OOEnable
+^
+
+TXFORM=L6R20
+#IsAdmin
 ^
 </sub>
 

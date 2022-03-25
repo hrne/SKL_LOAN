@@ -75,6 +75,7 @@ public class L2R31 extends TradeBuffer {
 			this.totaVo.putParam("L2r31CreateDate", dateUtil.getNowIntegerForBC() - 19110000);
 			this.totaVo.putParam("L2r31CreateTime", dateUtil.getNowIntegerTime());
 			this.totaVo.putParam("L2r31Reason", "");
+			this.totaVo.putParam("L2r31CuscCd", tCustMain.getCuscCd());
 			this.info("tlrno = " + titaVo.getTlrNo());
 
 		} else {
@@ -100,6 +101,7 @@ public class L2R31 extends TradeBuffer {
 			this.totaVo.putParam("L2r31CreateDate", txDate4);
 			this.totaVo.putParam("L2r31CreateTime", txTime2);
 			this.totaVo.putParam("L2r31Reason", tCustDataCtrl.getReason());
+			this.totaVo.putParam("L2r31CuscCd", tCustMain.getCuscCd());
 		}
 
 		this.addList(this.totaVo);

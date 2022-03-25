@@ -2945,6 +2945,7 @@ TXFORM=L2R30
 <L2R31.dec>
 #L2r31CustNo=A,7,S
 #L2r31CustName=X,200,S
+#L2r31CuscCd=A,1,S
 #L2r31CreateEmpNo=X,6,S
 #L2r31CreateDate=D,7,S
 #L2r31CreateTime=X,8,S
@@ -2955,6 +2956,7 @@ TXFORM=L2R30
 TXFORM=L2R31
 #L2r31CustNo
 #L2r31CustName
+#L2r31CuscCd
 #L2r31CreateEmpNo
 #L2r31CreateDate
 #L2r31CreateTime

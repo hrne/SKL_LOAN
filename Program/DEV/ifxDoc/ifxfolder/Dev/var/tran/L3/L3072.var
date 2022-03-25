@@ -37,17 +37,9 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
-
-
-
 #120spc=X,155,S
 
-#BUF2=X,11,S
-T(2,1+0000000+          +000+00+#120spc)
 
-#button=x,100,S
-T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,新增)
 
 </sub>
 
@@ -55,18 +47,17 @@ K(MODIFYBUTTON,1,新增)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
 [
 ["[L3072]                                 帳務備忘錄明細資料查詢"],
-["#FdCustNo+借戶戶號",#CustNo,#BTN1,#CustName],
+["#FdCustNo+借戶戶號",#CustNo,#CustName],
 ]
 
 #FdCustNo=X,2,L
-T(3,*)
 
 #RimFunCd=A,1,S
 #RimCustId=X,10,S
 #RimCustNo=A,7,S
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+! #BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -74,24 +65,27 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3005交易明細資料查�
 
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
 
+#BUF2=X,11,S
+T(2,1+#CustNo+          +000+00+#120spc)
 
+#button=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
 
-#BUF1=X,42,S
+! #BUF1=X,42,S
 
-#BIND1=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNo2<-OOCustNo:CustName<-OOCustName})
+! #BIND1=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNo2<-OOCustNo:CustName<-OOCustName})
 
 
 !借戶戶號
-#CustNo=A,7,I
-C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
-C(3,#CHAIN,1,s,$)
-@V(2,0)
-T(3,#CustName,)
+#CustNo=A,7,L
+! C(3,#CHAIN,1,s,$)
+! @V(2,0)
+! T(3,#CustName,)
 
-#oCustNo=A,7,L
-E(0,#CustNo)
 
 #CustNo2=A,7,S
 
@@ -137,7 +131,7 @@ T(2,#CustNo)
 T(3,[L3072] 帳務備忘錄明細資料查詢)
 
 !借戶戶號
-#OCustNo=A,7,S
+#OCustNo=A,7,L
 E(0,#CustNo)
 
 
@@ -147,7 +141,7 @@ E(0,2)
 
 !複製
 #FUNC3=A,1,S
-E(0,1)
+E(0,3)
 
 !刪除
 #FUNC4=A,1,S
@@ -253,7 +247,7 @@ TXFORM=L3072
 <sub type="PART" name="L3072" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];order=1">
 [
 ["[L3072]                                 帳務備忘錄明細資料查詢                                                                   "],
-["借戶戶號",#oCustNo],
+["借戶戶號",#OCustNo],
 ["借款人戶名",#CustName],
 ]
 </sub>

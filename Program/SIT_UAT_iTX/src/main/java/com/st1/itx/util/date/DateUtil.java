@@ -1,7 +1,10 @@
 package com.st1.itx.util.date;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
@@ -23,6 +26,7 @@ import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxHoliday;
 import com.st1.itx.db.domain.TxHolidayId;
 import com.st1.itx.db.service.TxHolidayService;
+import com.st1.itx.util.StaticTool;
 import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.parse.Parse;
 
@@ -73,6 +77,40 @@ public class DateUtil extends SysLogger {
 	private void check() throws LogicException {
 		if (this.date_1.isAfter(this.date_2))
 			throw new LogicException("CE000", "日期錯誤 date_1 > date_2 " + this.date_1 + " > " + this.date_2);
+	}
+
+	/**
+	 * 日期檢查
+	 * 
+	 * @param value 日期 ROC or BC
+	 * @throws LogicException When Date Is Error
+	 */
+	public void checkDate(Object value) throws LogicException {
+		int afValue = 0;
+
+		if (Objects.isNull(value)) {
+			this.warn("checkDate value Is Null...");
+			return;
+		}
+
+		try {
+			if (value instanceof Integer || value instanceof Double || value instanceof Float || value instanceof Long)
+				afValue = (Integer) value;
+			else if (value instanceof String)
+				afValue = Integer.parseInt(value.toString());
+			else {
+				this.warn("checkDate value Type Is ???...");
+				return;
+			}
+			StaticTool.rocToBc(afValue);
+		} catch (LogicException e) {
+			this.warn("日期格式錯誤!!");
+			throw e;
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+		}
 	}
 
 	/**
@@ -320,7 +358,7 @@ public class DateUtil extends SysLogger {
 	 */
 	public int getNowIntegerRoc() {
 		Date date = new Date();
-		SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat dt = new SimpleDateFormat(this.format);
 		return Integer.parseInt(dt.format(date)) - 19110000;
 	}
 
@@ -331,7 +369,7 @@ public class DateUtil extends SysLogger {
 	 */
 	public String getNowStringRoc() {
 		Date date = new Date();
-		SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat dt = new SimpleDateFormat(this.format);
 		return new String("" + (Integer.parseInt(dt.format(date)) - 19110000));
 	}
 
@@ -342,7 +380,7 @@ public class DateUtil extends SysLogger {
 	 */
 	public int getNowIntegerForBC() {
 		Date date = new Date();
-		SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat dt = new SimpleDateFormat(this.format);
 		return Integer.parseInt(dt.format(date));
 	}
 
@@ -353,7 +391,7 @@ public class DateUtil extends SysLogger {
 	 */
 	public String getNowStringBc() {
 		Date date = new Date();
-		SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat dt = new SimpleDateFormat(this.format);
 		return dt.format(date);
 	}
 
@@ -490,7 +528,7 @@ public class DateUtil extends SysLogger {
 				this.setDate_1(bcDate);
 				this.setDays(1);
 				bcDate = this.getCalenderDay();
-				if (!this.isHoliDay()) 
+				if (!this.isHoliDay())
 					break;
 			}
 		}
@@ -597,7 +635,6 @@ public class DateUtil extends SysLogger {
 				return bcDate;
 			}
 		}
-
 	}
 
 	/**

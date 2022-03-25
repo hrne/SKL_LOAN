@@ -244,13 +244,11 @@ public class L5500Batch extends TradeBuffer {
 					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tUnitCnt")));
 					hlThreeLaqhcp.setTActAmt(new BigDecimal(d.get("tUnitAmt")));
 				}
-				this.info("GoalAmt" + hlThreeLaqhcp.getGoalAmt());
-				this.info("ActAmt" + hlThreeLaqhcp.getActAmt());
 				if (hlThreeLaqhcp.getGoalAmt().compareTo(BigDecimal.ZERO) == 0
 						|| hlThreeLaqhcp.getActAmt().compareTo(BigDecimal.ZERO) == 0) {
 					hlThreeLaqhcp.setActRate(BigDecimal.ZERO);
 				} else {
-					BigDecimal ma = hlThreeLaqhcp.getActAmt().divide(hlThreeLaqhcp.getGoalAmt())
+					BigDecimal ma = hlThreeLaqhcp.getActAmt().divide(hlThreeLaqhcp.getGoalAmt(),2,BigDecimal.ROUND_UP)
 							.multiply(new BigDecimal("100").setScale(2,BigDecimal.ROUND_UP));
 
 					hlThreeLaqhcp.setActRate(ma);
@@ -259,7 +257,7 @@ public class L5500Batch extends TradeBuffer {
 						|| hlThreeLaqhcp.getTActAmt().compareTo(BigDecimal.ZERO) == 0) {
 					hlThreeLaqhcp.setTActRate(BigDecimal.ZERO);
 				} else {
-					BigDecimal ma = hlThreeLaqhcp.getTActAmt().divide(hlThreeLaqhcp.getTGoalAmt())
+					BigDecimal ma = hlThreeLaqhcp.getTActAmt().divide(hlThreeLaqhcp.getTGoalAmt(),2,BigDecimal.ROUND_UP)
 							.multiply(new BigDecimal("100").setScale(2,BigDecimal.ROUND_UP));
 
 					hlThreeLaqhcp.setTActRate(ma);

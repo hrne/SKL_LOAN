@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.st1.itx.eum.ThreadVariable;
+import com.st1.itx.util.format.FormatUtil;
 
 public class SysLogger {
 	private final Logger logger;
@@ -19,19 +20,20 @@ public class SysLogger {
 
 	public void info(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.info(msg);
+			logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void warn(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.warn(msg);
+			logger.warn(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void error(String msg) {
-		logger.error(msg);
+		logger.error(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void mustInfo(String msg) {
-		logger.info(msg);
+		logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
+
 }

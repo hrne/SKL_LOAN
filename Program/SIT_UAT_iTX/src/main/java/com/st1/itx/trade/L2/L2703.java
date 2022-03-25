@@ -22,6 +22,7 @@ import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -57,7 +58,11 @@ public class L2703 extends TradeBuffer {
 	public LoanBorMainService sLoanBorMainService;
 	@Autowired
 	public SendRsp sendRsp;
-
+	
+	@Autowired
+	GSeqCom gSeqCom;
+	
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -76,9 +81,11 @@ public class L2703 extends TradeBuffer {
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		// 客戶統編
 		String iCustId = titaVo.getParam("CustId");
-
+		
+		
 		String iReason = titaVo.getParam("Reason");
-
+		
+		
 		// new table
 		CustMain tCustMain = new CustMain();
 		CustDataCtrl tCustDataCtrl = new CustDataCtrl();
@@ -118,8 +125,38 @@ public class L2703 extends TradeBuffer {
 			tCustDataCtrl.setCustNo(custNo);
 			tCustDataCtrl.setCustUKey(custUKet);
 			tCustDataCtrl.setApplMark(1);
+			tCustDataCtrl.setCustId(tCustMain.getCustId());
+			tCustDataCtrl.setCustName(tCustMain.getCustName());
 			tCustDataCtrl.setCreateEmpNo(titaVo.getParam("CreateEmpNo"));
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
+			
+			// 更新 CustMain
+			
+			// 將 CustMain.CustId   設為 XX+8 位序號（序號檔）
+			//    CustMain.CustName 偶數位改為Ｏ
+			
+			String custName = tCustMain.getCustName();
+			String custId = tCustMain.getCustId();
+			if (custName != null && !custName.isEmpty() && custId != null && !custId.isEmpty())
+			{
+				// Id
+				String newSeq = parse.IntegerToString(gSeqCom.getSeqNo(0, 0, "L2", "2703", 99999999, titaVo), 8);
+				String newId = "XX" + newSeq;
+				tCustMain.setCustId(newId);
+				
+				// 戶名
+				StringBuilder sb = new StringBuilder(custName);
+				for (int i = 1; i < sb.length(); i += 2)
+					sb.setCharAt(i, 'Ｏ');
+				tCustMain.setCustName(sb.toString());
+				// 寫回
+				try {
+					sCustMainService.update(tCustMain, titaVo);
+				} catch (DBException e) {
+					this.error(e.toString());
+					throw new LogicException(titaVo, "E0007", "寫回客戶主檔時錯誤");
+				}
+			}
 
 			/* 存入DB */
 			try {
@@ -134,11 +171,32 @@ public class L2703 extends TradeBuffer {
 			if (tCustDataCtrl == null) {
 				throw new LogicException(titaVo, "E0003", "L2703 該戶號" + custNo + "不存在於結清戶個資控管檔。");
 			}
-
+			
+			tCustDataCtrl.setCustId(tCustMain.getCustId());
+			tCustDataCtrl.setCustName(tCustMain.getCustName());
 			tCustDataCtrl.setApplMark(3);
 			tCustDataCtrl.setReason(iReason);
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
-
+			
+			// 更新 CustMain
+			
+			// 將 CustMain.CustId   恢復
+			//    CustMain.CustName 恢復
+			
+			String custName = tCustDataCtrl.getCustName();
+			String custId = tCustDataCtrl.getCustId();
+			if (custName != null && !custName.isEmpty() && custId != null && !custId.isEmpty())
+			{
+				tCustMain.setCustName(custName);
+				tCustMain.setCustId(custId);
+				try {
+					sCustMainService.update(tCustMain, titaVo);
+				} catch (DBException e) {
+					this.error(e.toString());
+					throw new LogicException(titaVo, "E0007", "寫回客戶主檔時錯誤");
+				}
+			}
+			
 			/* UpdateDB */
 			try {
 				this.info("update");
@@ -146,7 +204,7 @@ public class L2703 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-
+			
 			// 刪除
 		} else if (iFunCd == 4) {
 

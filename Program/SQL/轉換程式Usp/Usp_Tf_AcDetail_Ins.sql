@@ -247,6 +247,7 @@ BEGIN
                                    ,TR1."LMSAPN"
                                    ,TR1."LMSASQ"
                                    ,TR1."TRXAMT"
+                                   ,TR1."TRXMEM"
                           ) TR
                     LEFT JOIN ATF ON ATF."TRXTRN" = TR."TRXTRN"
                                  AND ATF."ACTACT" = TR."ACTACT"
@@ -305,7 +306,7 @@ BEGIN
               ) ACT ON ACT."LMSACN" = NVL(S."LMSACN",0)
                    AND NVL(S."LMSACN",0) > 0
     LEFT JOIN tempTRXP ON tempTRXP."TRXDAT" = S."TRXDAT"
-                      AND tempTRXP."TRXNMT" = STRXNMT
+                      AND tempTRXP."TRXNMT" = S."TRXNMT"
                       AND tempTRXP."TxSeq" = 1
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S."TRXMEM"
     ;

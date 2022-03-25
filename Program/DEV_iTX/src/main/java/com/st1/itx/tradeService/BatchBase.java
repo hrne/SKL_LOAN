@@ -23,6 +23,7 @@ import com.st1.itx.db.domain.TxCruiserId;
 import com.st1.itx.db.service.TxCruiserService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
+import com.st1.itx.util.format.FormatUtil;
 
 public abstract class BatchBase {
 
@@ -120,21 +121,21 @@ public abstract class BatchBase {
 	}
 
 	public void mustInfo(String msg) {
-		logger.info(msg);
+		logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void info(String msg) {
 		if (loggerFg)
-			logger.info(msg);
+			logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void warn(String msg) {
 		if (loggerFg)
-			logger.warn(msg);
+			logger.warn(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void error(String msg) {
-		logger.error(msg);
+		logger.error(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	@Value("#{jobParameters['jobId']}")

@@ -1046,9 +1046,6 @@ public class MakeReport extends CommBuffer {
 			// 2021-1-5 增加判斷 SignCode == 1 才印
 			if (tCdReport.getSignCode() == 1 && !useDefault) {
 				
-				// 輸出結束字樣時，字距設為1以求座標準確
-				int charSpacesTemp = this.currentCharSpaces;
-				this.setCharSpaces(1);
 				if ("P".equals(pageOrientation)) {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
 					this.print(1, this.getMidXAxis(), signOff1, "C");
@@ -1056,7 +1053,6 @@ public class MakeReport extends CommBuffer {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
 					this.print(1, this.getMidXAxis(), signOff1, "C");
 				}
-				this.setCharSpaces(charSpacesTemp);
 			}
 		}
 
@@ -2563,19 +2559,19 @@ public class MakeReport extends CommBuffer {
 	}
 	
 	/**
-	 * 回傳目前紙張設定 X 軸正中央的座標，<u><b>前提為字距為 1</b></u><br>
-	 * 會用到字型大小和紙張方向，因此請確認設定順序<br><br>
-	 * 求法是產出實際 pdf 後對照尺標與座標, 代入 ax+b 推出適合的公式<br>
-	 * 需要採更多樣以保證正確性
-	 * @return x axis for print
+	 * 回傳目前紙張設定 X 軸正中央的座標
+	 * 由 doToPdf 的 print 邏輯反推出來的
+	 * @return col for print
 	 */
 	public int getMidXAxis() {
 		this.info("getMidXAxis fontSize = " + this.fontSize);
-		if ("P".equals(this.pageOrientation)) {
-			return (230 + this.fontSize * -8) / 3;
-		} else {
-			return 210 + this.fontSize * -14;
-		}
+		this.info("getMidXAxis charSpaces = " + this.currentCharSpaces);
+		int fontWidth = this.fontSize / 2 + this.currentCharSpaces; // 實際產檔時這邊存成 int, 因此這裡也用 int 以便完全模擬回去
+		float paperWidthPt =  ("P".equals(this.pageOrientation) ? 8.3f : 11.7f) * 72f;
+		float paperWidthPtHalf = paperWidthPt / 2f;
+		int frameX = 5; // hard coded because it's hard coded in doToPdf()
+		
+		return (int)((paperWidthPtHalf - frameX) / fontWidth + 1);
 	}
-
+ 
 }

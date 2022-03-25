@@ -164,12 +164,14 @@ BEGIN
     ON (
       S."Seq" = 1
       AND T."RepayBank" = '700'
-      AND NVL(T."PostDepCode",' ') = ' '
       AND S."LMSACN" = T."CustNo"
       AND LPAD(S."LMSPCN",14,'0') = T."RepayAcct"
     )
     WHEN MATCHED THEN UPDATE SET
-    T."PostDepCode" = S."POSCDE"
+    T."PostDepCode" = CASE
+                        WHEN NVL(T."PostDepCode",' ') = ' '
+                        THEN S."POSCDE"
+                      ELSE T."PostDepCode" END
     ;
 
     -- 記錄程式結束時間

@@ -14,13 +14,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
-import com.st1.itx.db.domain.CdBank;
-import com.st1.itx.db.domain.CdBankId;
-import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BatxChequeService;
-import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -29,6 +25,7 @@ import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BatxChequeFileVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -72,10 +69,13 @@ public class L4701 extends TradeBuffer {
 	public BatxChequeService batxChequeService;
 
 	@Autowired
-	public CdBankService cdBankService;
-
-	@Autowired
 	public MakeFile makeFile;
+	@Autowired
+	public WebClient webClient;
+
+	/* 報表服務注入 */
+	@Autowired
+	L4701Report l4701Report;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -157,67 +157,6 @@ public class L4701 extends TradeBuffer {
 
 				tmp.add(occursList);
 
-//				2.產生票據明細表
-
-//		 		戶號 戶名 支票銀行 支票分行 帳號 票號 票面金額 埠別 到期日 交換區號
-//				發票人ID 發票人姓名
-
-//				支票數 本 外 金額
-				OccursList occursListRpt = new OccursList();
-
-				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tLoanCheque.getCustNo(), tLoanCheque.getCustNo());
-//						#OOCustNo=A,7,O
-//						#OOCustName=x,20,O
-//						#OOChequeBank=A,3,O
-//						#OOChequeBranch=A,4,O
-//						#OOChequeAcctNo=A,9,O
-//						#OOChequeNo=A,7,O
-//						#OOChequeAmt=m,14.2,O
-//						#OOOutsideCode=X,1,O
-//						#OOChequeDate=D,7,O
-//						#OOAreaCode=X,2,O
-//						#OOChequeId=X,10,O
-//						#OOChequeName=c,120,O
-
-				occursListRpt.putParam("OOCustNo", FormatUtil.pad9("" + tLoanCheque.getCustNo(), 7));
-				if (tCustMain != null) {
-					occursListRpt.putParam("OOCustName", FormatUtil.padX(tCustMain.getCustName(), 10));
-				}
-
-//				occursListRpt.putParam("OOChequeBank", FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(0, 3));
-//				occursListRpt.putParam("OOChequeBranch", FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(3, 7));
-
-				CdBank tCdBank = cdBankService
-						.findById(new CdBankId(FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(0, 3),
-								FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(3, 7)), titaVo);
-				if (tCdBank == null) {
-					occursListRpt.putParam("OOChequeBank", "");
-					occursListRpt.putParam("OOChequeBranch", "");
-				} else {
-					occursListRpt.putParam("OOChequeBank", tCdBank.getBankItem());
-					occursListRpt.putParam("OOChequeBranch", tCdBank.getBranchItem());
-				}
-
-				occursListRpt.putParam("OOChequeAcctNo", FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));
-				occursListRpt.putParam("OOChequeNo", FormatUtil.padX("" + tLoanCheque.getChequeNo(), 7));
-				occursListRpt.putParam("OOChequeAmt", FormatUtil.pad9("" + tLoanCheque.getChequeAmt(), 14));
-				occursListRpt.putParam("OOOutsideCode", FormatUtil.padX("" + tLoanCheque.getOutsideCode(), 1));
-				occursListRpt.putParam("OOChequeDate", FormatUtil.pad9("" + tLoanCheque.getChequeDate(), 7));
-				occursListRpt.putParam("OOAreaCode", FormatUtil.pad9("" + tLoanCheque.getAreaCode(), 2));
-				occursListRpt.putParam("OOChequeId", FormatUtil.padX("", 10));
-				occursListRpt.putParam("OOChequeName", FormatUtil.padX(tLoanCheque.getChequeName(), 60));
-
-				chequeCnt = chequeCnt + 1;
-				if ("2".equals(tLoanCheque.getOutsideCode())) {
-					chequeOutCnt = chequeOutCnt + 1;
-				} else if ("1".equals(tLoanCheque.getOutsideCode())) {
-					chequeInCnt = chequeInCnt + 1;
-				}
-
-				chequeTotAmt = chequeTotAmt.add(tLoanCheque.getChequeAmt());
-
-				this.totaVo.addOccursList(occursListRpt);
 			}
 			// 把明細資料容器裝到檔案資料容器內
 			batxChequeFileVo.setOccursList(tmp);
@@ -241,18 +180,36 @@ public class L4701 extends TradeBuffer {
 
 			totaVo.put("PdfSnoM", "" + snoM);
 
-		}
-//		#OChequeCnt=m,6,O
-//		#OChequeOutCnt=m,6,O
-//		#OChequeInCnt=m,6,O
-//		#OChequeTotAmt=m,14.2,O
+//			傳票明細表
+			doRptA(titaVo);
 
-		this.totaVo.putParam("OChequeCnt", FormatUtil.pad9("" + chequeCnt, 6));
-		this.totaVo.putParam("OChequeOutCnt", FormatUtil.pad9("" + chequeOutCnt, 6));
-		this.totaVo.putParam("OChequeInCnt", FormatUtil.pad9("" + chequeInCnt, 6));
-		this.totaVo.putParam("OChequeTotAmt", FormatUtil.pad9("" + chequeTotAmt, 14));
+			String checkMsg = "票據明細表已完成。 ";
+
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4701", checkMsg, titaVo);
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	public void doRptA(TitaVo titaVo) throws LogicException {
+		this.info("L4701 doRpt started.");
+		l4701Report.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+
+		l4701Report.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l4701Report.exec(titaVo);
+
+		// 寫產檔記錄到TxReport
+		long rptNoA = l4701Report.close();
+
+		// 產生PDF檔案
+		l4701Report.toPdf(rptNoA);
+
+		this.info("L4701 doRpt finished.");
+
 	}
 }

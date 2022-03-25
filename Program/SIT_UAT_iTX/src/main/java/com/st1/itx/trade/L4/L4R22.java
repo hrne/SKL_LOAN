@@ -71,9 +71,9 @@ public class L4R22 extends TradeBuffer {
 				} else if ("9".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) { // 2.暫停授權已成功授權
 					flag = 2;
 				} else if ("2".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) { // 9.終止授權已成功授權
-
 					flag = 9;
-				} else if ("1".equals(tPostAuthLog.getAuthApplCode()) && tPostAuthLog.getPropDate() > 0 && tPostAuthLog.getRetrDate() == 0) { // 7.申請授權已提出未提回
+				} else if ("1".equals(tPostAuthLog.getAuthApplCode()) && tPostAuthLog.getPropDate() > 0
+						&& tPostAuthLog.getRetrDate() == 0) { // 7.申請授權已提出未提回
 					flag = 7;
 				}
 
@@ -84,6 +84,7 @@ public class L4R22 extends TradeBuffer {
 				relationId = tPostAuthLog.getRelationId();
 				relAcctBirthday = tPostAuthLog.getRelAcctBirthday();
 				relAcctGender = tPostAuthLog.getRelAcctGender();
+				limitAmt = tPostAuthLog.getLimitAmt();
 			} else {
 				this.info("tPostAuthLog null ... ");
 			}
@@ -99,7 +100,7 @@ public class L4R22 extends TradeBuffer {
 				this.info("tAchAuthLog ... " + tAchAuthLog.toString());
 
 				int flag = 0;
-				if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() == 0) { // 已提出
+				if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() == 0) { // 申請授權未提出 
 					flag = 8;
 				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) { // 已提回授權成功
 					flag = 1;
@@ -107,7 +108,8 @@ public class L4R22 extends TradeBuffer {
 					flag = 2;
 				} else if ("D".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) { // 取消授權
 					flag = 9;
-				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() > 0 && tAchAuthLog.getRetrDate() == 0) { // 7.申請授權已提出未提回
+				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() > 0
+						&& tAchAuthLog.getRetrDate() == 0) { // 7.申請授權已提出未提回
 					flag = 7;
 				}
 //				塞不塞值為var檢核

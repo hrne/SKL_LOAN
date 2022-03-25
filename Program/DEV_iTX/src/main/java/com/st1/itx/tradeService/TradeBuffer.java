@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TotaVoList;
 import com.st1.itx.db.transaction.BatchTransaction;
 import com.st1.itx.eum.ThreadVariable;
+import com.st1.itx.util.format.FormatUtil;
 
 /**
  * TradeBuffer
@@ -83,18 +84,22 @@ public abstract class TradeBuffer implements TradeIn {
 		return this.totaList;
 	}
 
+	public void mustInfo(String msg) {
+		logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
+	}
+
 	public void info(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.info(msg);
+			logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void warn(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.warn(msg);
+			logger.warn(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void error(String msg) {
-		logger.error(msg);
+		logger.error(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public int setIndexNext() {

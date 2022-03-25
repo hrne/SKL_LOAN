@@ -156,12 +156,14 @@ E(0,@CustNo,#L2r31CustNo)
 T(2,@CustName,#L2r31CustName)
 T(2,@CreateEmpNo,#L2r31CreateEmpNo)
 T(2,@Reason,#L2r31Reason)
+E(0,@CuscCd,#L2r31CuscCd)
 C(3,#FunCd,1,S,$)
 T(2,@CreateDate,#L2r31CreateDate)
 T(2,@CreateTime,#L2r31CreateTime)
 
-
-
+!自然人檢查：僅新增時檢查
+#CuscCd=A,1,L
+C(3,#FunCd,1,IF(#CuscCd!=1,V(P,限自然人申請),$),$)
 
 !借戶戶號
 #CustNo=A,7,L

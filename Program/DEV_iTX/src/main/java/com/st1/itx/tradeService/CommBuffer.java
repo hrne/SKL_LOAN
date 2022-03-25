@@ -8,6 +8,7 @@ import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVoList;
 import com.st1.itx.eum.ThreadVariable;
+import com.st1.itx.util.format.FormatUtil;
 
 public abstract class CommBuffer {
 	private Logger logger;
@@ -82,22 +83,22 @@ public abstract class CommBuffer {
 		this.beanName = beanName;
 	}
 
+	public void mustInfo(String msg) {
+		logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
+	}
+
 	public void info(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.info(msg);
+			logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void warn(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.warn(msg);
+			logger.warn(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public void error(String msg) {
-		logger.error(msg);
-	}
-
-	public void mustInfo(String msg) {
-		logger.info(msg);
+		logger.error(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
 	}
 
 	public abstract void exec() throws LogicException;

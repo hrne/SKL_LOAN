@@ -69,15 +69,15 @@ public class L9132Report extends MakeReport {
 		this.info("L9132Report.printHeader");
 
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
-		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
+		this.print(-1, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-1, 145, "機密等級：" + this.security);
 		this.print(-2, 1, "報　表：" + this.reportCode);
-		this.print(-2, 85, this.reportItem, "C");
+		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 1, "來源別：放款服務課");
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
-		this.print(-4, 85, showRocDate(this.reportDate), "C");
+		this.print(-4, this.getMidXAxis(), showRocDate(this.reportDate), "C");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(5);

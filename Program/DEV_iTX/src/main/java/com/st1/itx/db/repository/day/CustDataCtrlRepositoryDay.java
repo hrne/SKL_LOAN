@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,15 +21,16 @@ import com.st1.itx.db.domain.CustDataCtrl;
  */
 public interface CustDataCtrlRepositoryDay extends JpaRepository<CustDataCtrl, Integer> {
 
-	// CustNo =
-	public Slice<CustDataCtrl> findAllByCustNoIs(int custNo_0, Pageable pageable);
+  // CustNo = 
+  public Slice<CustDataCtrl> findAllByCustNoIs(int custNo_0, Pageable pageable);
 
-	// CustUKey =
-	public Slice<CustDataCtrl> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
+  // CustUKey = 
+  public Slice<CustDataCtrl> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CustDataCtrl> findByCustNo(int custNo);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CustDataCtrl> findByCustNo(int custNo);
 
 }
+
