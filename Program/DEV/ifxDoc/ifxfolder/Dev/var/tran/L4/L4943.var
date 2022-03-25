@@ -54,6 +54,7 @@ K(MODIFYBUTTON,查詢)
 ["#FdPostLimitAmt+郵局同戶超過限額",#PostLimitAmt,"@@0為全部"],
 ["#FdSingleLimit+單筆超過限額",#SingleLimit,"@@0為全部"],
 ["#FdLowLimit+單筆低於金額",#LowLimit],
+["#FdEntryDate+入帳日期",#EntryDate],
 ]
 ! 銀行別[瀏覽]
 ! #BTNA=X,1,I,ui:button;value:行庫資料查詢;enable:1;tabbable:0
@@ -73,6 +74,8 @@ T(3,*)
 #FdPostLimitAmt=X,2,L
 #FdSingleLimit=X,2,L
 #FdLowLimit=X,2,L
+T(3,*)
+#FdEntryDate=X,2,L
 T(3,*)
 
 #OpItemHelp=x,40,S
@@ -106,8 +109,8 @@ T(2,@BankDeductCdHelp,#HelpDesc1)
 T(B,@RepayTypeHelp,#HelpDesc2+;99:全部)
 T(B,@AmlRspHelp,#HelpDesc3)
 
-#FunctionHelp=x,80,S
-T(3,1:戶號;2:上限金額;3:下限金額;4:檢核不正常;5:扣款金額為0;6:媒體檔總金額;9:整批)
+#FunctionHelp=x,100,S
+T(3,1:戶號;2:上限金額;3:下限金額;4:檢核不正常;5:扣款金額為0;6:媒體檔總金額;7:已到期未至應繳日;9:整批)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -131,7 +134,7 @@ T(1,@LowLimit,#NTXBUF,56,14)
 ! 4.檢核不正常(Aml) = 入帳日+銀行別
 ! 9.整批 = 銀行別+還款別+入帳日
 #FunctionCode=A,1,I
-INVOKEJS(SHOW,L4943,2,9,0)
+INVOKEJS(SHOW,L4943,2,10,0)
 C(3,#CHAIN,1,s,$)
 HELP(#FunctionHelp)
 @V(H,#FunctionHelp)
@@ -144,7 +147,7 @@ HELP(#FunctionHelp)
 !@V(1,1,2,3,4,9)
 E(0,@FUNCIND,#FunctionCode)
 
-#FunctionCodeX=x,20,L
+#FunctionCodeX=x,30,L
 C(3,#CHAIN,1,s,$)
 T(3,)T(H,#FunctionCode,#FunctionHelp)
 !SWITCH(#FunctionCode
@@ -183,6 +186,9 @@ C(3,#FunctionCode,6,
 INVOKEJS(SHOW,L4943_3,1)
 INVOKEJS(SHOW,L4943_4,1)
 INVOKEJS(SHOW,L4943_5,1),$)
+C(3,#FunctionCode,7,
+INVOKEJS(SHOW,L4943_3,1)
+INVOKEJS(SHOW,L4943_10,1),$)
 C(3,#FunctionCode,9,
 INVOKEJS(SHOW,L4943_3,1)
 INVOKEJS(SHOW,L4943_4,1)
@@ -208,7 +214,7 @@ T(2,)
 ! 銀行別
 #BankCode=A,3,I
 C(3,#CHAIN,1,s,$)
-IF(#FunctionCode==4 ||#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9,$,s)
+IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==9,$,s)
 HELP(#BankDeductCdHelp,cols:4)
 @V(H,#BankDeductCdHelp)
 
@@ -234,6 +240,7 @@ IF(#FunctionCode==6,T(H,#RepayType,#RepayTypeHelp1),T(H,#RepayType,#RepayTypeHel
 #EntryDateFm=D,7,I
 C(3,#CHAIN,1,s,$)
 C(3,#CHAIN,1,$,E(0,#SYSDATE))
+C(3,#FunctionCode,7,s,$)
 @
 V(7)A(DATE,0,#EntryDateFm)
 
@@ -241,6 +248,7 @@ V(7)A(DATE,0,#EntryDateFm)
 #EntryDateTo=D,7,I
 E(0,#EntryDateFm)
 C(3,#CHAIN,1,s,$)
+C(3,#FunctionCode,7,s,$)
 @V(7)A(DATE,0,#EntryDateTo)
 IF(#EntryDateTo<#EntryDateFm,V(P,起日不可大於迄日),$)
 
@@ -266,6 +274,15 @@ C(3,#FunctionCode,2,$,s)
 C(3,#FunctionCode,3,$,s)
 @V(2,0)
 
+! 入帳日期
+#EntryDate=D,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#CHAIN,1,$,E(0,#SYSDATE))
+C(3,#FunctionCode,7,$,s)
+@
+V(7)A(DATE,0,#EntryDate)
+
+
 #RPTFG=A,1,S
 
 #CHAINXMT=X,1,S
@@ -273,6 +290,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 #CHECKFunction=A,1,S
 C(3,#FUNCIND,6,E(0,@RPTFG,1),E(0,@RPTFG,0))
+C(3,#FUNCIND,7,E(0,@RPTFG,7),$)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -346,6 +364,8 @@ IF(#OOAcDate=="0000000",T(2,),T(2,#OOAcDateA+/+#OOAcDateB+/+#OOAcDateC))
 #OOBUF_A=X,390,S
 T(2,2+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 #OOBTN_A=A,2,O
+C(3,#FunctionCode,7,BIND(grid,cancel),$)
+C(3,#FunctionCode,7,s,$)
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_A}),BIND(grid,cancel))
 
 ! <刪除> 6+7+7+3+7+1+16+7=54
@@ -356,9 +376,13 @@ T(2,4+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType
 #OOBUF_C=X,390,S
 T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 #OOBTN_B=A,2,O
+C(3,#FunctionCode,7,BIND(grid,cancel),$)
+C(3,#FunctionCode,7,s,$)
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
 
 #OOBTN_C=A,2,O
+C(3,#FunctionCode,7,BIND(grid,cancel),$)
+C(3,#FunctionCode,7,s,$)
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}),BIND(grid,cancel))
 
 #OOMediaCode=X,1,O
@@ -389,6 +413,7 @@ T(3,)T(H,#OOAmlRsp,#AmlRspHelp)
 #SingleLimit
 #LowLimit
 #OpItem
+#EntryDate
 #END
 </sub>
 
@@ -466,6 +491,23 @@ TXFORM=L4943
 
 #RPTFG=1,QUERY.GRID,L4943
 #any={detail:false, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
+^
+
+#RPTFG=7,QUERY.GRID,L4943
+#any={detail:true, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
+
+#OOCustNo=戶號　
+{width:95}
+#OOFacmNo=額度
+{width:95}
+#OOPrevIntDate=到期日
+{width:95}
+#OOPayIntDate=應繳日
+{width:95}
+#OOUnpaidAmt=應扣金額
+{width:95,sum:true}
+#OOProcNote=檢核結果
+{width:300}
 ^
 
 <include src="PRT.icf::INQ04.sel" map="i=L4943;cpi=15"/>

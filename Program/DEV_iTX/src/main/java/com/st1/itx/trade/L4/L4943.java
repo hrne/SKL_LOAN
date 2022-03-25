@@ -21,16 +21,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CustNo=9,7<br>
- * EntryDateFm=9,7<br>
- * EntryDateTo=9,7<br>
- * PostLimitAmt=9,14.2<br>
- * SingleLimet=9,14.2<br>
- * END=X,1<br>
- */
-
 @Service("L4943")
 @Scope("prototype")
 /**
@@ -43,18 +33,18 @@ public class L4943 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public L4943ServiceImpl l4943ServiceImpl;
+	L4943ServiceImpl l4943ServiceImpl;
 
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
+	Parse parse;
 
 	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
+	DateUtil dateUtil;
 
 	@Autowired
-	private CdCodeService cdCodeService;
+	CdCodeService cdCodeService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -81,13 +71,16 @@ public class L4943 extends TradeBuffer {
 		List<Map<String, String>> resulAlltList = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> resulParttList = new ArrayList<Map<String, String>>();
 
-		try {
-			// *** 折返控制相關 ***
-			resulAlltList = l4943ServiceImpl.findAll(1, titaVo);
-		} catch (Exception e) {
-			this.error("l4943ServiceImpl findByCondition " + e.getMessage());
-			throw new LogicException("E0013", e.getMessage());
+		if (functionCode != 7) {
+			try {
+				// *** 折返控制相關 ***
+				resulAlltList = l4943ServiceImpl.findAll(1, titaVo);
+			} catch (Exception e) {
+				this.error("l4943ServiceImpl findByCondition " + e.getMessage());
+				throw new LogicException("E0013", e.getMessage());
+			}
 		}
+
 		if (resulAlltList != null && resulAlltList.size() > 0) {
 			totUnpaidAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("UnpaidAmt"));
 			totTempAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("TempAmt"));
@@ -100,12 +93,22 @@ public class L4943 extends TradeBuffer {
 			totaVo.putParam("OTotalRepayAmt", totRepayAmt);
 		} else {
 
-			try {
-				// *** 折返控制相關 ***
-				resulParttList = l4943ServiceImpl.findAll(0, this.index, this.limit, titaVo);
-			} catch (Exception e) {
-				this.error("l4943ServiceImpl findByCondition " + e.getMessage());
-				throw new LogicException("E0013", e.getMessage());
+			if (functionCode == 7) {
+				// 7:已到期未至應繳日
+				try {
+					resulParttList = l4943ServiceImpl.doQuery7(this.index, this.limit, titaVo);
+				} catch (Exception e) {
+					this.error("l4943ServiceImpl findByCondition " + e.getMessage());
+					throw new LogicException("E0013", e.getMessage());
+				}
+			} else {
+				try {
+					// *** 折返控制相關 ***
+					resulParttList = l4943ServiceImpl.findAll(0, this.index, this.limit, titaVo);
+				} catch (Exception e) {
+					this.error("l4943ServiceImpl findByCondition " + e.getMessage());
+					throw new LogicException("E0013", e.getMessage());
+				}
 			}
 
 			if (resulParttList != null && resulParttList.size() > 0) {
@@ -134,10 +137,26 @@ public class L4943 extends TradeBuffer {
 					occursList.putParam("OOEntryDate", entryDate);
 					occursList.putParam("OOCustNo", result.get("CustNo"));
 					occursList.putParam("OOFacmNo", result.get("FacmNo"));
-					occursList.putParam("OOPrevIntDate", prevIntDate);
-					occursList.putParam("OOPayIntDate", payIntDate);
+					if (functionCode == 7 && entryDate == 0) {
+						int maturityDate = parse.stringToInteger(result.get("MaturityDate"));
+						int nextPayIntDate = parse.stringToInteger(result.get("NextPayIntDate"));
+						BigDecimal loanBal = result.get("LoanBal") == null ? BigDecimal.ZERO:new BigDecimal(result.get("LoanBal"));
+						if (maturityDate > 19110000) {
+							maturityDate = maturityDate - 19110000;
+						}
+						if (nextPayIntDate > 19110000) {
+							nextPayIntDate = nextPayIntDate - 19110000;
+						}
+						occursList.putParam("OOPrevIntDate", maturityDate);
+						occursList.putParam("OOPayIntDate", nextPayIntDate);
+						occursList.putParam("OOUnpaidAmt", loanBal);
+						totUnpaidAmt = totUnpaidAmt.add(loanBal);
+					} else {
+						occursList.putParam("OOPrevIntDate", prevIntDate);
+						occursList.putParam("OOPayIntDate", payIntDate);
+						occursList.putParam("OOUnpaidAmt", result.get("UnpaidAmt"));
+					}
 					occursList.putParam("OORepayType", result.get("RepayType"));
-					occursList.putParam("OOUnpaidAmt", result.get("UnpaidAmt"));
 					occursList.putParam("OOTempAmt", result.get("TempAmt"));
 					occursList.putParam("OORepayAmt", result.get("RepayAmt"));
 					occursList.putParam("OOMediaCode", result.get("MediaCode"));
@@ -148,12 +167,16 @@ public class L4943 extends TradeBuffer {
 					String returnCode = result.get("ReturnCode");
 					String mediaKind = result.get("MediaKind");
 					String amlRsp = result.get("AmlRsp");
-					if (acDate > 0) {
+					if (functionCode == 7) {
+						int maturityDate = parse.stringToInteger(result.get("MaturityDate"));
+						procNote = "已到期未至應繳日, 到期日:" + maturityDate;
+					} else if (acDate > 0) {
 						if (tempVo.get("ProcStsCode") != null && tempVo.get("ProcStsCode").length() > 0) {
 							procNote = procStsCodeX(tempVo.get("ProcStsCode"), titaVo);
 						}
 					} else if (returnCode == null || returnCode.trim().isEmpty()) {
-//						欄位不夠長，順序為帳號、AML、扣帳金額為零
+
+//					順序為帳號授權、AML、扣帳金額為零、扣款金額(by 額度)超過帳號設定限額(限額為零不檢查)
 						if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
 							procNote = "帳號授權檢核:" + authX(tempVo.get("Auth"), titaVo) + "。";
 						} else if ("1".equals(amlRsp) || "2".equals(amlRsp)) {
@@ -165,7 +188,8 @@ public class L4943 extends TradeBuffer {
 						if ("00".equals(returnCode)) {
 							procNote = "扣款成功";
 						} else {
-							procNote = "扣款失敗：" + procCodeX("3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
+							procNote = "扣款失敗：" + procCodeX(
+									"3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
 						}
 					}
 					occursList.putParam("OOAmlRsp", " ");

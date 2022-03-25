@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -124,14 +125,13 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
-		
+
 		// BatxDetail 處理狀態 ProcStsCode 不為 刪除 'D' 2022/1/25
 //		sql += " left join \"BatxDetail\" BTL on BTL.\"CustNo\" = BDD.\"CustNo\"";
 //		sql += "                             and BTL.\"FacmNo\" = BDD.\"FacmNo\"";
 //		sql += "                             and BTL.\"EntryDate\" = BDD.\"EntryDate\"";
 //		sql += "                             and BTL.\"MediaSeq\" = BDD.\"MediaSeq\"";
-		
-		
+
 		sql += " where BDD.\"EntryDate\" >= :entryDateFm";
 		sql += "   and BDD.\"EntryDate\" <= :entryDateTo";
 		// 2022/1/25
@@ -260,5 +260,115 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public int getSize() {
 		return cnt;
+	}
+
+	public List<Map<String, String>> doQuery7(int inputIndex, int inputLimit, TitaVo titaVo) throws LogicException {
+
+		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
+		int bankCode = Integer.parseInt(titaVo.getParam("BankCode"));
+		
+		String sql = " ";
+		sql += " WITH loanData AS ( ";
+		sql += "     SELECT L.\"CustNo\" ";
+		sql += "          , L.\"FacmNo\" ";
+		sql += "          , MAX(L.\"MaturityDate\") AS \"MaturityDate\" ";
+		sql += "          , MIN(L.\"NextPayIntDate\") AS \"NextPayIntDate\" ";
+		sql += "          , SUM(L.\"LoanBal\") AS \"LoanBal\" ";
+		sql += "     FROM \"LoanBorMain\" L ";
+		sql += "     LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\" ";
+		sql += "                            AND F.\"FacmNo\" = L.\"FacmNo\" ";
+		sql += "     WHERE L.\"Status\" = 0 ";
+		sql += "       AND F.\"RepayCode\" = 2 ";
+		sql += "       AND L.\"MaturityDate\" <= :entryDate ";
+		sql += "       AND L.\"NextPayIntDate\" >= :entryDate ";
+		sql += "       AND L.\"NextPayIntDate\" > L.\"MaturityDate\" ";
+		sql += "     GROUP BY L.\"CustNo\" ";
+		sql += "            , L.\"FacmNo\" ";
+		sql += " ) ";
+		sql += " , orderedData AS ( ";
+		sql += "     SELECT \"CustNo\" ";
+		sql += "          , \"FacmNo\" ";
+		sql += "          , \"RepayType\" ";
+		sql += "          , \"EntryDate\" ";
+		sql += "          , \"PayIntDate\" ";
+		sql += "          , \"PrevIntDate\" ";
+		sql += "          , \"UnpaidAmt\" ";
+		sql += "          , \"TempAmt\" ";
+		sql += "          , \"RepayAmt\" ";
+		sql += "          , \"IntStartDate\" ";
+		sql += "          , \"IntEndDate\" ";
+		sql += "          , \"MediaCode\" ";
+		sql += "          , \"ReturnCode\" ";
+		sql += "          , \"MediaKind\" ";
+		sql += "          , \"AmlRsp\" ";
+		sql += "          , \"JsonFields\" ";
+		sql += "          , ROW_NUMBER() ";
+		sql += "            OVER ( ";
+		sql += "                PARTITION BY \"CustNo\" ";
+		sql += "                           , \"FacmNo\" ";
+		sql += "                ORDER BY \"EntryDate\" DESC ";
+		sql += "            ) AS \"Seq\" ";
+		sql += "     FROM \"BankDeductDtl\" ";
+		sql += "     WHERE \"RepayType\" <= 3 ";
+		sql += "       AND \"EntryDate\" >= :entryDate ";
+		sql += " ) ";
+		sql += " SELECT L.\"CustNo\" ";
+		sql += "      , L.\"FacmNo\" ";
+		sql += "      , L.\"MaturityDate\" ";
+		sql += "      , L.\"NextPayIntDate\" ";
+		sql += "      , L.\"LoanBal\" ";
+		sql += "      , 0  AS \"EntryDate\" ";
+		sql += "      , 0  AS \"RepayType\" ";
+		sql += "      , 0  AS \"PayIntDate\" ";
+		sql += "      , 0  AS \"PrevIntDate\" ";
+		sql += "      , 0  AS \"UnpaidAmt\" ";
+		sql += "      , 0  AS \"TempAmt\" ";
+		sql += "      , 0  AS \"RepayAmt\" ";
+		sql += "      , 0  AS \"IntStartDate\" ";
+		sql += "      , 0  AS \"IntEndDate\" ";
+		sql += "      , '' AS \"MediaCode\" ";
+		sql += "      , '' AS \"ReturnCode\" ";
+		sql += "      , '' AS \"MediaKind\" ";
+		sql += "      , '' AS \"AmlRsp\" ";
+		sql += "      , '' AS \"JsonFields\" ";
+		sql += " FROM loanData L ";
+		sql += " LEFT JOIN orderedData O ON O.\"CustNo\" = L.\"CustNo\" ";
+		sql += "                        AND O.\"FacmNo\" = L.\"FacmNo\" ";
+		sql += "                        AND O.\"IntEndDate\" = L.\"MaturityDate\" ";
+		sql += " LEFT JOIN \"BankAuthAct\" BA ON BA.\"CustNo\" = L.\"CustNo\" ";
+		sql += "                             AND BA.\"FacmNo\" = L.\"FacmNo\" ";
+		sql += "                             AND BA.\"AuthType\" IN ('00','01') ";
+		sql += " WHERE NVL(O.\"EntryDate\",0) = 0 "; // 沒串到扣款檔的才進表
+		sql += "   AND CASE ";
+		sql += "         WHEN :bankCode = '999' "; // 輸入參數選999:全部
+		sql += "              AND NVL(BA.\"RepayBank\",' ') != ' ' "; // 授權檔有資料
+		sql += "         THEN 1 "; // 1:進表
+		sql += "         WHEN :bankCode = '998' "; // 輸入參數選998:ACH扣款
+		sql += "              AND NVL(BA.\"RepayBank\",'700') != '700' "; // 授權檔有資料且不為郵局
+		sql += "         THEN 1 "; // 1:進表
+		sql += "         WHEN NVL(BA.\"RepayBank\",' ') = :bankCode "; // 輸入參數選特定銀行時，授權檔有資料且銀行代碼吻合
+		sql += "         THEN 1 "; // 1:進表
+		sql += "       ELSE 0 "; // 0:不進表
+		sql += "       END = 1 "; // 篩選1:進表
+		sql += " ORDER BY L.\"CustNo\" ";
+		sql += "        , L.\"FacmNo\" ";
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		query.setParameter("entryDate", entryDate);
+		query.setParameter("bankCode", bankCode);
+
+		// *** 折返控制相關 ***
+		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+		query.setFirstResult(inputIndex * inputLimit);
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(inputLimit);
+
+		return this.convertToMap(query);
 	}
 }

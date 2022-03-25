@@ -182,9 +182,9 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		// 減免違約金 Y:是 N:否
 		loanCalcRepayIntCom.setBreachReliefFlag("N");
 		// 最後一期期款，入帳日在應繳日前減免違約金，即只收至到期日的利息、不收延滯息及違約金
-		if (t.getNextPayIntDate() > t.getMaturityDate() && iEntryDate <= t.getNextPayIntDate()) {
-			loanCalcRepayIntCom.setBreachReliefFlag("Y");
-		}
+//		if (t.getNextPayIntDate() > t.getMaturityDate() && iEntryDate <= t.getNextPayIntDate()) {
+//			loanCalcRepayIntCom.setBreachReliefFlag("Y");
+//		}
 
 		// 聯貸案件 Y:是 N:否
 		if (tFacCaseAppl.getSyndNo() > 0) { // 聯貸案編號

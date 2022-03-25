@@ -40,11 +40,11 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[180,320,180,320];printer.width=[20,120];order=1">
 [
-["[L2604]                                 聯貸費用維護"],
+["[L2604]                                 企金費用維護"],
 [#<->#,"#FdFunCd+功能",#FunCdX],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,#CustNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
-[#<->#,"#FdSyndFeeCode+費用項別",#SyndFeeCode,#SyndFeeCodeX],
+[#<->#,"#FdSyndFeeCode+費用項目",#SyndFeeCode,#SyndFeeCodeX],
 [#<->#,"#FdIsAllocation+是否攤提",#IsAllocation,#IsAllocationX],
 [#<->#,"#FdSyndFeeYearMonth+費用年月",#SyndFeeYearMonth],
 ["#FdAllocationFreq+攤提週期（月）",#AllocationFreq],["#FdAllocationTimes+攤提次數",#AllocationTimes],
@@ -54,7 +54,7 @@ E(0,0)
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-! #BTN1=X,15,I,ui:button;value:聯貸費用代碼查詢;enable:1;tabbable:0
+! #BTN1=X,15,I,ui:button;value:企金費用代碼查詢;enable:1;tabbable:0
 
 ! #BUF1=X,100,S
 
@@ -68,7 +68,7 @@ K(MODIFYBUTTON,新增)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #INIT=X,1,S
 HIDE(#UsSyndFee)
-INVOKEJS(SHOW,p1,6,7,0)INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p1,7,7,0)INVOKEJS(SHOW,p2,0)
 ##loop{times:50,n:1}
 INVOKEJS(SHOW,grd2_{n},0)
 ##end
@@ -120,7 +120,7 @@ T(H,#CurrencyCode,#CurrPrecisionHelp)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2064聯貸費用明細資料查詢]進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2064企金費用明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
@@ -213,6 +213,7 @@ C(3,#FunCd,1,T(2,@FdCustNo,*),T(2,@FdCustNo,))
 C(3,#FunCd,1,T(2,@FdFacmNo,*),T(2,@FdFacmNo,))
 C(3,#FunCd,1,T(2,@FdSyndFeeCode,*),T(2,@FdSyndFeeCode,))
 C(3,#FunCd,1,T(2,@FdIsAllocation,*),T(2,@FdIsAllocation,))
+C(3,#FunCd,1,T(2,@FdSyndFeeYearMonth,*),T(2,@FdSyndFeeYearMonth,))
 T(2,@FdSyndFee,*)
 ,
 T(2,@FdCustNo,)
@@ -306,18 +307,18 @@ HELP(#YNHelp)
 #IsAllocationX=X,2,L
 T(3,)
 T(H,#IsAllocation,#YNHelp)
-C(5,#IsAllocation,N,INVOKEJS(SHOW,p1,6,6,0),INVOKEJS(SHOW,p1,6,6,1))
+! C(5,#IsAllocation,N,INVOKEJS(SHOW,p1,6,6,0),INVOKEJS(SHOW,p1,6,6,1))
 C(5,#IsAllocation,N,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
 C(3,#FunCd,1,$,s)
 C(5,#IsAllocation,N,INVOKEJS(SHOW,p1,7,7,0),INVOKEJS(SHOW,p1,7,7,1))
-C(5,#IsAllocation,N,T(3,@FdSyndFeeYearMonth, )T(3,@FdAllocationFreq, ),T(3,@FdSyndFeeYearMonth,*)T(3,@FdAllocationFreq,*))
+C(5,#IsAllocation,N,T(3,@FdAllocationFreq, ),T(3,@FdAllocationFreq,*))
 
 
 
 !費用年月
 #SyndFeeYearMonth=A,5,I
 C(3,#FunCd,1,$,s)
-C(5,#IsAllocation,N,S,$)
+! C(5,#IsAllocation,N,S,$)
 @V(2,0)
 A(YM,1,#SyndFeeYearMonth)
 !攤提週期
@@ -521,7 +522,7 @@ IF(#wkAllocationSum==#TimSyndFee,$,V(P,金額不符))
 !C(5,#TXFORM,L2604,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L2604] 聯貸費用維護)
+T(3,[L2604] 企金費用維護)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
@@ -574,7 +575,7 @@ TXFORM=L2604
 
 <sub type="PART" name="L2604" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
 [
-["[L2604]                                 聯貸費用維護"],
+["[L2604]                                 企金費用維護"],
 [""],
 ]
 </sub>

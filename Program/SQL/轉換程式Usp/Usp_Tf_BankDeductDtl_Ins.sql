@@ -30,13 +30,16 @@ BEGIN
             ,"RepayAcctNo"
             ,"RepayAmt"
             ,"AcDate"
+            ,SUBSTR("OutsrcRemark",0,8) AS "IntEndDate"
             ,ROW_NUMBER() OVER (
                  PARTITION BY "CustNo"
                             , "FacmNo"
                             , "RepayType"
                             , "TransDate"
-                 ORDER BY "MediaDate" desc
-                        , "MediaSeq" desc
+                            , "RepayAmt"
+                            , "MediaDate"
+                            , SUBSTR("OutsrcRemark",0,8)
+                 ORDER BY "MediaSeq" desc
              ) AS "Seq"
       FROM "PostDeductMedia"
     )
@@ -123,6 +126,7 @@ BEGIN
                        AND ADM."RepayAcctNo" = LPAD(MBK."LMSPCN",14,'0')
                        AND ADM."RepayAmt" = MBK."MBKAMT"
                        AND ADM."AcDate" = MBK."TRXDAT"
+                       AND ADM."IntEndDate" = MBK."TRXIED"
                        AND ADM."Seq" = 1
     WHERE MBK."TRXIDT" >= 20190101
       AND MBK."LMSPBK" = '3' -- 只抓郵局
@@ -147,9 +151,10 @@ BEGIN
                  PARTITION BY "CustNo"
                             , "FacmNo"
                             , "RepayType"
-                 ORDER BY "MediaDate" desc
-                        , "MediaKind"
-                        , "MediaSeq" desc
+                            , "RepayAmt"
+                            , "MediaDate"
+                            , "MediaKind"
+                 ORDER BY "MediaSeq" desc
              ) AS "Seq"
       FROM "AchDeductMedia"
     )

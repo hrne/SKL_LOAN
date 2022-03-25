@@ -1055,7 +1055,17 @@ public class L4452Batch extends TradeBuffer {
 										+ FormatUtil.pad9("" + tAchDeductMedia.getFacmNo(), 3)
 										+ tAchDeductMedia.getAchRepayCode() + FormatUtil.pad9("" + prevIntDate, 8),
 								20));
-				occursList.putParam("OccAbstract", FormatUtil.padX("801", 10));
+				// 存摺摘要 1.左靠右補空白 2.非新光 : 放空白 3.新光 : 火險放705, 其他放801
+				if ("103".equals(tAchDeductMedia.getRepayBank())) {
+					if (tAchDeductMedia.getRepayType() == 5) {
+						occursList.putParam("OccAbstract", FormatUtil.padX("705", 10));
+					} else {
+						occursList.putParam("OccAbstract", FormatUtil.padX("801", 10));
+					}
+				} else {
+					occursList.putParam("OccAbstract", FormatUtil.padX(" ", 10));
+				}
+				
 				occursList.putParam("OccNote", FormatUtil.padX("", 2));
 
 				tmp.add(occursList);

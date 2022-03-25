@@ -28,7 +28,7 @@ public class CustMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8976413341156430112L;
+	private static final long serialVersionUID = -4978593393417917685L;
 
 // 客戶識別碼
   @Id
@@ -291,7 +291,7 @@ public class CustMain implements Serializable {
   private String introducer;
 
   // 房貸專員/企金人員
-  /* 2022/02/17新增欄位 by eric原DAT_CU$CUSP.CUSEM1/CUSEM2? */
+  /* 2022/02/17新增欄位 by eric原DAT_CU$CUSP.CUSEM2 */
   @Column(name = "`BusinessOfficer`", length = 6)
   private String businessOfficer;
 
@@ -309,6 +309,26 @@ public class CustMain implements Serializable {
   /* Y/N2021/08/06新增欄位(2021/08/06上DB)by eric */
   @Column(name = "`IsSuspectedCheckType`", length = 1)
   private String isSuspectedCheckType;
+
+  // 是否為授信限制對象
+  /* Y/N2022/3/24新增欄位by eric */
+  @Column(name = "`IsLimit`", length = 1)
+  private String isLimit;
+
+  // 是否為利害關係人
+  /* Y/N2022/3/24新增欄位by eric */
+  @Column(name = "`IsRelated`", length = 1)
+  private String isRelated;
+
+  // 是否為準利害關係人
+  /* Y/N2022/3/24新增欄位by eric */
+  @Column(name = "`IsLnrelNear`", length = 1)
+  private String isLnrelNear;
+
+  // 是否資訊日期
+  /* 2022/3/24新增欄位by eric */
+  @Column(name = "`IsDate`")
+  private int isDate = 0;
 
   // 資料狀態
   /* 0:已完成建檔1:未完成建檔(2021/08/13上DB)by eric */
@@ -1545,7 +1565,7 @@ N:否
 /**
 	* 房貸專員/企金人員<br>
 	* 2022/02/17新增欄位 by eric
-原DAT_CU$CUSP.CUSEM1/CUSEM2?
+原DAT_CU$CUSP.CUSEM2
 	* @return String
 	*/
   public String getBusinessOfficer() {
@@ -1555,7 +1575,7 @@ N:否
 /**
 	* 房貸專員/企金人員<br>
 	* 2022/02/17新增欄位 by eric
-原DAT_CU$CUSP.CUSEM1/CUSEM2?
+原DAT_CU$CUSP.CUSEM2
   *
   * @param businessOfficer 房貸專員/企金人員
 	*/
@@ -1624,6 +1644,88 @@ N:否
 	*/
   public void setIsSuspectedCheckType(String isSuspectedCheckType) {
     this.isSuspectedCheckType = isSuspectedCheckType;
+  }
+
+/**
+	* 是否為授信限制對象<br>
+	* Y/N
+2022/3/24新增欄位by eric
+	* @return String
+	*/
+  public String getIsLimit() {
+    return this.isLimit == null ? "" : this.isLimit;
+  }
+
+/**
+	* 是否為授信限制對象<br>
+	* Y/N
+2022/3/24新增欄位by eric
+  *
+  * @param isLimit 是否為授信限制對象
+	*/
+  public void setIsLimit(String isLimit) {
+    this.isLimit = isLimit;
+  }
+
+/**
+	* 是否為利害關係人<br>
+	* Y/N
+2022/3/24新增欄位by eric
+	* @return String
+	*/
+  public String getIsRelated() {
+    return this.isRelated == null ? "" : this.isRelated;
+  }
+
+/**
+	* 是否為利害關係人<br>
+	* Y/N
+2022/3/24新增欄位by eric
+  *
+  * @param isRelated 是否為利害關係人
+	*/
+  public void setIsRelated(String isRelated) {
+    this.isRelated = isRelated;
+  }
+
+/**
+	* 是否為準利害關係人<br>
+	* Y/N
+2022/3/24新增欄位by eric
+	* @return String
+	*/
+  public String getIsLnrelNear() {
+    return this.isLnrelNear == null ? "" : this.isLnrelNear;
+  }
+
+/**
+	* 是否為準利害關係人<br>
+	* Y/N
+2022/3/24新增欄位by eric
+  *
+  * @param isLnrelNear 是否為準利害關係人
+	*/
+  public void setIsLnrelNear(String isLnrelNear) {
+    this.isLnrelNear = isLnrelNear;
+  }
+
+/**
+	* 是否資訊日期<br>
+	* 2022/3/24新增欄位by eric
+	* @return Integer
+	*/
+  public int getIsDate() {
+    return StaticTool.bcToRoc(this.isDate);
+  }
+
+/**
+	* 是否資訊日期<br>
+	* 2022/3/24新增欄位by eric
+  *
+  * @param isDate 是否資訊日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setIsDate(int isDate) throws LogicException {
+    this.isDate = StaticTool.rocToBc(isDate);
   }
 
 /**
@@ -1792,7 +1894,8 @@ N:否
            + ", ownedHome=" + ownedHome + ", currCompName=" + currCompName + ", currCompId=" + currCompId + ", currCompTel=" + currCompTel + ", jobTitle=" + jobTitle + ", jobTenure=" + jobTenure
            + ", incomeOfYearly=" + incomeOfYearly + ", incomeDataDate=" + incomeDataDate + ", passportNo=" + passportNo + ", aMLJobCode=" + aMLJobCode + ", aMLGroup=" + aMLGroup + ", indigenousName=" + indigenousName
            + ", lastFacmNo=" + lastFacmNo + ", lastSyndNo=" + lastSyndNo + ", allowInquire=" + allowInquire + ", email=" + email + ", actFg=" + actFg + ", introducer=" + introducer
-           + ", businessOfficer=" + businessOfficer + ", isSuspected=" + isSuspected + ", isSuspectedCheck=" + isSuspectedCheck + ", isSuspectedCheckType=" + isSuspectedCheckType + ", dataStatus=" + dataStatus + ", typeCode=" + typeCode
-           + ", station=" + station + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", businessOfficer=" + businessOfficer + ", isSuspected=" + isSuspected + ", isSuspectedCheck=" + isSuspectedCheck + ", isSuspectedCheckType=" + isSuspectedCheckType + ", isLimit=" + isLimit + ", isRelated=" + isRelated
+           + ", isLnrelNear=" + isLnrelNear + ", isDate=" + isDate + ", dataStatus=" + dataStatus + ", typeCode=" + typeCode + ", station=" + station + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

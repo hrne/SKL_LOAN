@@ -53,7 +53,7 @@ K(MODIFYBUTTON,1,新增)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
 [
-["[L2064]                                 聯貸費用明細資料查詢"],
+["[L2064]                                 企金費用明細資料查詢"],
 ["#FdCustNo+借戶戶號",#CustNo,#CustName],
 ]
 
@@ -108,6 +108,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
 C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
 C(3,#CHAIN,1,s,$)
 @V(2,0)
+T(3,#CustName,)
 
 #RimL1r09=X,1,S
 E(0,@RimFunCd,1)
@@ -149,7 +150,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 !C(5,#TXFORM,L2064,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L2064] 聯貸案訂約明細資料)
+T(3,[L2064] 企金案訂約明細資料)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -169,7 +170,7 @@ T(3,1)ASGN(LOOP$)
 #OOCustNo=A,7,O
 ! 額度
 #OOFacmNo=A,3,O
-! 聯貸費用代碼+說明
+! 企金費用代碼+說明
 #OOSyndFeeItem=x,50,O
 ! 費用金額
 #OOSyndFee=m,14.2,O
@@ -264,7 +265,7 @@ TXFORM=L2064
 </sub>
 <sub type="PART" name="L2064" layout="cols=1;screen.width=[130,880];printer.width=[15,30,15,30];">
 [
-["[L2064]                                 聯貸費用明細資料查詢"],
+["[L2064]                                 企金費用明細資料查詢"],
 ["@借戶戶號",#OCustNo,#OCustNoX],
 ]
 </sub>
@@ -276,13 +277,13 @@ TXFORM=L2064
 #any={detail:true, header:'L2064.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 
 #OOBTN1=修改
-{width:50,search:false,formatter:'cust:bind-button:修改;L2604 聯貸費用新增',align:'center',canExport:false}
+{width:50,search:false,formatter:'cust:bind-button:修改;L2604 企金費用維護',align:'center',canExport:false}
 
 #OOBTN3=刪除
-{width:50,search:false,formatter:'cust:bind-button:刪除;L2604 聯貸費用新增',align:'center',canExport:false}
+{width:50,search:false,formatter:'cust:bind-button:刪除;L2604 企金費用維護',align:'center',canExport:false}
 
 #OOBTN4=查詢
-{width:50,search:false,formatter:'cust:bind-button:查詢;L2604 聯貸費用新增',align:'center',canExport:false}
+{width:50,search:false,formatter:'cust:bind-button:查詢;L2604 企金費用維護',align:'center',canExport:false}
 
 
 
@@ -294,9 +295,9 @@ TXFORM=L2064
 {width:120,align:'center'}
 #OOSyndFeeX=金額
 {width:180,align:'center'}
-#OOClsAmtX=已銷／已攤提金額
-{width:180,align:'center'}
 #OOEntryAmtX=已入帳金額
+{width:180,align:'center'}
+#OOClsAmtX=已銷／已攤提金額
 {width:180,align:'center'}
 #OORmk=備註
 {width:200,align:'center'}
@@ -314,9 +315,9 @@ TXFORM=L2064
 {width:120,align:'center'}
 #OOSyndFeeX=金額
 {width:180,align:'center'}
-#OOClsAmtX=已銷／已攤提金額
-{width:180,align:'center'}
 #OOEntryAmtX=已入帳金額
+{width:180,align:'center'}
+#OOClsAmtX=已銷／已攤提金額
 {width:180,align:'center'}
 #OORmk=備註
 {width:200,align:'center'}

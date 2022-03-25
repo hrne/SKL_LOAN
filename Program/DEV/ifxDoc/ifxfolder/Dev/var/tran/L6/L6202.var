@@ -19,10 +19,10 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L6202]                                 聯貸費用代碼維護"],
+["[L6202]                                 企金費用代碼維護"],
 ["#FdFunCd+功能",#FunCdX],
-["#FdSyndFeeCode+聯貸費用代碼",#SyndFeeCode],
-["#FdSyndFeeItem+聯貸費用說明",#SyndFeeItem],
+["#FdSyndFeeCode+企金費用代碼",#SyndFeeCode],
+["#FdSyndFeeItem+企金費用說明",#SyndFeeItem],
 ["#FdAcctCode+業務科目代號",#AcctCode,#AcctCodeX],
 ]
 !---------- AP Button AREA ----------
@@ -52,7 +52,7 @@ T(3,CdCode.AcctCode)
 #AcctCodeHelp=x,1024,S
 
 #AcctCodeHelp2=x,1024,S
-T(3,F12:聯貸件;F27:聯貸管理費)
+T(3,F12:企金件;F27:企金管理費)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -63,6 +63,9 @@ T(2,@FunCd2Help,#HelpDesc1)
 T(2,@AcctCodeHelp,#HelpDesc2)
 
 
+!YN
+#YNHelp=X,30,S
+T(3,Y:是;N:否)
 
 !RIM參數
 #RimTxCode=X,5,S
@@ -72,7 +75,7 @@ T(2,@AcctCodeHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6022進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6022企金費用代碼查詢]進入),$)
 
 #NTXBUF=X,66,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -101,7 +104,8 @@ T(2,@AcctCode,#CHAIN_AcctCode)
 #FunCd=A,1,S
 C(3,#CHAIN,1,s,$)
 HELP(#FunCd2Help)
-@V(H,#FunCd2Help)
+@T(3,@FunCdX,)
+V(H,#FunCd2Help)
 
 #FunCdX=X,12,L
 T(H,#FunCd,#FunCd2Help)
@@ -134,7 +138,8 @@ T(2,@FdSyndFeeItem,#WKSTAR2)
 T(2,@FdAcctCode,#WKSTAR2)
 
 
-!聯貸費用代碼
+
+!企金費用代碼
 #SyndFeeCode=X,2,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
 @V(7)V(NL)
@@ -143,12 +148,14 @@ C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
 #SendL6R45=X,1,S
 E(0,@RimFunCd,#FunCd)
 T(2,@RimSyndFeeCode,#SyndFeeCode)
+RESET_RIM(#SendL6R45,L6R45)
 S(L6R45,1,#RimFunCd,#RimTxCode,#RimSyndFeeCode)
 R(1,L6R45)
 T(2,@SyndFeeItem,#L6R45SyndFeeItem)
 T(2,@AcctCode,#L6R45AcctCode)
+T(H,@AcctCodeX,#AcctCode,#AcctCodeHelp2)
 
-!聯貸費用說明
+!企金費用說明
 #SyndFeeItem=x,60,I
 C(3,#FunCd,4,s,$)
 @V(7)
@@ -158,10 +165,12 @@ C(3,#FunCd,4,s,$)
 #AcctCode=X,3,I
 C(3,#FunCd,4,s,$)
 HELP(#AcctCodeHelp2)
-@V(H,#AcctCodeHelp2)
+@T(3,@AcctCodeX,)
+V(H,#AcctCodeHelp2)
 
 #AcctCodeX=X,20,L
 T(3,)T(H,#AcctCode,#AcctCodeHelp2)
+
 
 
 
@@ -189,7 +198,7 @@ E(0,1)ASGN(AGAIN$)
 C(5,#TXFORM,L6202,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L6202] 聯貸費用代碼維護)
+T(3,[L6202] 企金費用代碼維護)
 
 </sub>
 

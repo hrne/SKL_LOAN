@@ -244,6 +244,8 @@ public class L5500Batch extends TradeBuffer {
 					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tUnitCnt")));
 					hlThreeLaqhcp.setTActAmt(new BigDecimal(d.get("tUnitAmt")));
 				}
+				this.info("GoalAmt" + hlThreeLaqhcp.getGoalAmt());
+				this.info("ActAmt" + hlThreeLaqhcp.getActAmt());
 				if (hlThreeLaqhcp.getGoalAmt().compareTo(BigDecimal.ZERO) == 0
 						|| hlThreeLaqhcp.getActAmt().compareTo(BigDecimal.ZERO) == 0) {
 					hlThreeLaqhcp.setActRate(BigDecimal.ZERO);
