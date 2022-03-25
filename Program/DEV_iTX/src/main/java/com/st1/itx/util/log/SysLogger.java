@@ -20,20 +20,20 @@ public class SysLogger {
 
 	public void info(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
+			logger.info("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
 	}
 
 	public void warn(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.warn(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
+			logger.warn("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
 	}
 
 	public void error(String msg) {
-		logger.error(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
+		logger.error("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
 	}
 
 	public void mustInfo(String msg) {
-		logger.info(FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + msg);
+		logger.info("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
 	}
 
 }
