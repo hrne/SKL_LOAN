@@ -24,22 +24,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * L291B 合併額度控管額度查詢
- */
-/*
- * Tita
- * CustNo=9,7       -> MRKEY
- * CreditSysNo=9,7
- * CurrencyCode=X,3  
- * LineAmt==9,14.2 -> TXAMT
- * LineAmtCycle==9,14.2 
- * ShareCustNo=9,7
- * ShareFacmNo=9,7
- * iJcicMiainCustFlag=X,1 
- * END=X,1
- */
-
 /**
  * L291B 合併額度控管額度查詢
  * 
@@ -85,8 +69,6 @@ public class L291B extends TradeBuffer {
 
 		// 可用總額度
 		BigDecimal wkAvailable = BigDecimal.ZERO;
-		BigDecimal wkAvailableCycle = BigDecimal.ZERO;
-
 		if (lFacShareLimit != null) {
 			for (FacShareLimit t : lFacShareLimit) {
 				FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);

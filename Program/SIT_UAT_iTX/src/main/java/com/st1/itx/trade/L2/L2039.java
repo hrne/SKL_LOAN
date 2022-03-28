@@ -21,14 +21,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2039")
 @Scope("prototype")
 /**

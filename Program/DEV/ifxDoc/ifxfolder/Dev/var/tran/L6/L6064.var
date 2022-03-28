@@ -248,6 +248,7 @@ E(0,2)
 T(2,#OOFunc2+#OODefCode+#OOCode)
 
 #OOBTN2=X,4,S
+BIND(grid,cancel)
 ! CHAIN 1 時必為隱藏
 C(3,#CHAIN,1,s,$)
 ! DefCode為CodeType時，須為Admin才可修改

@@ -19,13 +19,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CUSTNO=9,7<br>
- * CUSTNO1=9,3<br>
- * END=X,1<br>
- */
-
 @Service("L2062")
 @Scope("prototype")
 /**

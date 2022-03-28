@@ -28,14 +28,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2041")
 @Scope("prototype")
 /**
@@ -45,7 +37,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2041 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2041.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -91,8 +82,7 @@ public class L2041 extends TradeBuffer {
 		// new ArrayList ClLand
 		List<ClLand> lClLand = new ArrayList<ClLand>();
 		Slice<ClLand> slClLand = null;
-		// new table
-		ClLand tClLand = new ClLand();
+		new ClLand();
 
 		// new ClImm PK
 		ClLandId ClLandId = new ClLandId();

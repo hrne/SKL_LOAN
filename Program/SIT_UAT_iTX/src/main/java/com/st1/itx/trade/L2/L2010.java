@@ -24,12 +24,7 @@ import com.st1.itx.util.parse.Parse;
  * a.此功能提供申請案件資料作准/駁處理或查詢
  * b.若申請案件資料為准時,同時輸入額度資料
  */
-/*
- * Tita
- * ApplNo=9,7
- * CustId=X,10
- * ProcessCode=X,1
- */
+
 /**
  * L2010 申請案件明細資料查詢
  * 
@@ -39,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2010")
 @Scope("prototype")
 public class L2010 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2010.class);
 
 	/* DB服務注入 */
 	@Autowired

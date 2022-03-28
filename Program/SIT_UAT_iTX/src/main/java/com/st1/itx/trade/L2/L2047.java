@@ -26,11 +26,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * END=X,1<br>
- */
-
 @Service("L2047")
 @Scope("prototype")
 /**
@@ -40,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2047 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2047.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -147,8 +141,7 @@ public class L2047 extends TradeBuffer {
 			OccursList occurslist = new OccursList();
 			// new ArrayList
 			List<ClFac> lClFac = new ArrayList<ClFac>();
-			// new table
-			ClFac tClFac = new ClFac();
+			new ClFac();
 			FacMain tFacMain = new FacMain();
 
 			// 取動產檔的擔保品代號1,擔保品代號2,擔保品編號 找擔保品與額度關聯檔(核准號碼,設定狀態),額度主檔(核准額度)

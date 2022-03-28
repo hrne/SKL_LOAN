@@ -23,12 +23,7 @@ import com.st1.itx.util.parse.Parse;
  * L2015 額度明細資料查詢
  * a.此功能提供以戶號查詢額度之明細資料
  */
-/*
- * Tita
- * CustNo1=9,7
- * CustNo2=9,7
- * FacmNo=9,3
- */
+
 /**
  * L2015 額度明細資料查詢
  * 

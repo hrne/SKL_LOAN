@@ -311,9 +311,7 @@ T(H,#IsAllocation,#YNHelp)
 C(5,#IsAllocation,N,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
 C(3,#FunCd,1,$,s)
 C(5,#IsAllocation,N,INVOKEJS(SHOW,p1,7,7,0),INVOKEJS(SHOW,p1,7,7,1))
-C(5,#IsAllocation,N,T(3,@FdAllocationFreq, ),T(3,@FdAllocationFreq,*))
-
-
+C(5,#IsAllocation,N,T(3,@FdAllocationFreq, )T(3,@FdAllocationTimes, ),T(3,@FdAllocationFreq,*)T(3,@FdAllocationTimes,*))
 
 !費用年月
 #SyndFeeYearMonth=A,5,I

@@ -16,11 +16,6 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ReltMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 
-/**
- * Tita<br>
- * CustId=X,10<br>
- */
-
 @Service("L2036")
 @Scope("prototype")
 /**

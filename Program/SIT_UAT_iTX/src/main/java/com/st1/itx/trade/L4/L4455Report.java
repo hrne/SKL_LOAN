@@ -55,6 +55,9 @@ public class L4455Report extends MakeReport {
 	public TxBuffer txBuffer;
 
 	// 自訂表頭
+	
+	private String irepaybank = "";
+	
 	private int acdate = 0;
 	private String year = "";
 	private String month = "";
@@ -121,8 +124,14 @@ public class L4455Report extends MakeReport {
 		this.print(-2, 203, "日　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
 				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 1, "報　表：" + "L4455Report");
-		if (!"700".equals(repaybank)) {
-			this.print(-3, 95, "郵局扣款總傳票明細表", "C");
+//		if (!"700".equals(repaybank)) {
+//		this.print(-3, 95, "扣款總傳票明細表", "C");
+//		} else {
+//			this.print(-3, 95, "扣款總傳票明細表", "C");
+//		}
+		
+		if("999".equals(irepaybank)) {
+			this.print(-3, 95, "銀行扣款總傳票明細表", "C");
 		} else {
 			this.print(-3, 95, "ACH 扣款總傳票明細表", "C");
 		}
@@ -189,6 +198,8 @@ public class L4455Report extends MakeReport {
 		this.info("L4455Report exec");
 		acdate = parse.stringToInteger(titaVo.getParam("AcDate"));
 
+		irepaybank = titaVo.getParam("RepayBank");
+		
 		List<Map<String, String>> L4455List = new ArrayList<Map<String, String>>();
 
 		this.info("L4455Report All");

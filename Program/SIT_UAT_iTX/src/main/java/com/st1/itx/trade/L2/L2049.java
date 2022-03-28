@@ -40,11 +40,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * END=X,1<br>
- */
-
 @Service("L2049")
 @Scope("prototype")
 /**
@@ -54,7 +49,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2049 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2049.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -206,7 +200,7 @@ public class L2049 extends TradeBuffer {
 		// new ArrayList
 		List<ClFacId> lClFacId = new ArrayList<ClFacId>();
 		List<ClFac> lClFac = new ArrayList<ClFac>();
-		List<ClMain> lClMain = new ArrayList<ClMain>();
+		new ArrayList<ClMain>();
 
 		// new table
 		CustMain tCustMain = new CustMain();

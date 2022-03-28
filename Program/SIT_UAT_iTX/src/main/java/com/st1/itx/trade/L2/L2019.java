@@ -27,12 +27,6 @@ import com.st1.itx.util.parse.Parse;
 /*
  * L2019 合併額度控管資料查詢
  */
-/**
- * Tita<br>
- * CreditSysNo=9,7<br>
- * CustNo=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L2019")
 @Scope("prototype")
@@ -54,7 +48,7 @@ public class L2019 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService sCdEmpService;
-
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -140,20 +134,21 @@ public class L2019 extends TradeBuffer {
 				occurslist.putParam("OOCreateDate", "");
 			}
 			occurslist.putParam("OOCreateEmpNo", t.getCreateEmpNo());
-
+			
 			String TlrNo = "";
 			String EmpName = "";
 			CdEmp tCdEmp = new CdEmp();
 
 			if (t.getCreateEmpNo() != null) {
-				TlrNo = t.getCreateEmpNo();
+				TlrNo = t.getCreateEmpNo() ;
 				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
 				if (tCdEmp != null) {
 					EmpName = tCdEmp.getFullname();
 				}
 			}
 			occurslist.putParam("OOCreateEmpName", EmpName);
-
+			
+			
 			if (t.getLastUpdate() != null) {
 				lastUpdate = parse.stringToInteger(df.format(t.getLastUpdate())) - 19110000;
 				occurslist.putParam("OOLastUpdate", lastUpdate);
@@ -161,16 +156,16 @@ public class L2019 extends TradeBuffer {
 				occurslist.putParam("OOLastUpdate", "");
 			}
 			occurslist.putParam("OOLastUpdateEmpNo", t.getLastUpdateEmpNo());
-
+			
 			if (t.getLastUpdateEmpNo() != null) {
-				TlrNo = t.getLastUpdateEmpNo();
+				TlrNo = t.getLastUpdateEmpNo() ;
 				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
 				if (tCdEmp != null) {
 					EmpName = tCdEmp.getFullname();
 				}
 			}
 			occurslist.putParam("OOLastUpdateEmpName", EmpName);
-
+			
 			occurslist.putParam("OOMainApplNo", t.getMainApplNo());
 
 			this.totaVo.addOccursList(occurslist);

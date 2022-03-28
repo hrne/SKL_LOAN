@@ -24,11 +24,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * END=X,1<br>
- */
-
 @Service("L2072")
 @Scope("prototype")
 /**
@@ -83,7 +78,6 @@ public class L2072 extends TradeBuffer {
 		Slice<CustRmk> slCustRmk = null;
 
 		// PK
-//		CustRmkId CustRmkId = new CustRmkId();
 		// 測試該戶號是否有資料存在顧客控管警訊檔
 		if (iCustNo > 0) {
 			slCustRmk = sCustRmkService.findCustNo(iCustNo, this.index, this.limit, titaVo);
@@ -153,9 +147,6 @@ public class L2072 extends TradeBuffer {
 
 			occurslist.putParam("OOCreateDate", createDate);
 			occurslist.putParam("OOLastUpdate", updateDate);
-
-//			occurslist.putParam("OOEmpName", tCustRmk.get
-			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
 
 		}

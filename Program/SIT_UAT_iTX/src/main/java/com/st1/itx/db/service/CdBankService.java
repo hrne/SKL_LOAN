@@ -16,141 +16,141 @@ import com.st1.itx.db.domain.CdBankId;
  */
 public interface CdBankService {
 
-	/**
-	 * findByPrimaryKey
-	 *
-	 * @param cdBankId PK
-	 * @param titaVo   Variable-Length Argument
-	 * @return CdBank CdBank
-	 */
-	public CdBank findById(CdBankId cdBankId, TitaVo... titaVo);
+  /**
+   * findByPrimaryKey
+   *
+   * @param cdBankId PK
+   * @param titaVo Variable-Length Argument
+   * @return CdBank CdBank
+   */
+  public CdBank findById(CdBankId cdBankId, TitaVo... titaVo);
 
-	/**
-	 * findAll
-	 *
-	 * @param index  Page Index
-	 * @param limit  Page Data Limit
-	 * @param titaVo Variable-Length Argument
-	 * @return Slice CdBank CdBank of List
-	 */
-	public Slice<CdBank> findAll(int index, int limit, TitaVo... titaVo);
+  /**
+   * findAll
+   *
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBank CdBank of List
+   */
+  public Slice<CdBank> findAll(int index, int limit, TitaVo... titaVo);
 
-	/**
-	 * BankCode %
-	 *
-	 * @param bankCode_0 bankCode_0
-	 * @param index      Page Index
-	 * @param limit      Page Data Limit
-	 * @param titaVo     Variable-Length Argument
-	 * @return Slice CdBank CdBank of List
-	 */
-	public Slice<CdBank> bankCodeLike(String bankCode_0, int index, int limit, TitaVo... titaVo);
+  /**
+   * BankCode %
+   *
+   * @param bankCode_0 bankCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBank CdBank of List
+   */
+  public Slice<CdBank> bankCodeLike(String bankCode_0, int index, int limit, TitaVo... titaVo);
 
-	/**
-	 * BankCode % ,AND BranchCode %
-	 *
-	 * @param bankCode_0   bankCode_0
-	 * @param branchCode_1 branchCode_1
-	 * @param index        Page Index
-	 * @param limit        Page Data Limit
-	 * @param titaVo       Variable-Length Argument
-	 * @return Slice CdBank CdBank of List
-	 */
-	public Slice<CdBank> branchCodeLike(String bankCode_0, String branchCode_1, int index, int limit, TitaVo... titaVo);
+  /**
+   * BankCode % ,AND BranchCode %
+   *
+   * @param bankCode_0 bankCode_0
+   * @param branchCode_1 branchCode_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBank CdBank of List
+   */
+  public Slice<CdBank> branchCodeLike(String bankCode_0, String branchCode_1, int index, int limit, TitaVo... titaVo);
 
-	/**
-	 * BankItem %
-	 *
-	 * @param bankItem_0 bankItem_0
-	 * @param index      Page Index
-	 * @param limit      Page Data Limit
-	 * @param titaVo     Variable-Length Argument
-	 * @return Slice CdBank CdBank of List
-	 */
-	public Slice<CdBank> bankItemLike(String bankItem_0, int index, int limit, TitaVo... titaVo);
+  /**
+   * BankItem %
+   *
+   * @param bankItem_0 bankItem_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBank CdBank of List
+   */
+  public Slice<CdBank> bankItemLike(String bankItem_0, int index, int limit, TitaVo... titaVo);
 
-	/**
-	 * hold By CdBank
-	 * 
-	 * @param cdBankId key
-	 * @param titaVo   Variable-Length Argument
-	 * @return CdBank CdBank
-	 */
-	public CdBank holdById(CdBankId cdBankId, TitaVo... titaVo);
+  /**
+   * hold By CdBank
+   * 
+   * @param cdBankId key
+   * @param titaVo Variable-Length Argument
+   * @return CdBank CdBank
+   */
+  public CdBank holdById(CdBankId cdBankId, TitaVo... titaVo);
 
-	/**
-	 * hold By CdBank
-	 * 
-	 * @param cdBank key
-	 * @param titaVo Variable-Length Argument
-	 * @return CdBank CdBank
-	 */
-	public CdBank holdById(CdBank cdBank, TitaVo... titaVo);
+  /**
+   * hold By CdBank
+   * 
+   * @param cdBank key
+   * @param titaVo Variable-Length Argument
+   * @return CdBank CdBank
+   */
+  public CdBank holdById(CdBank cdBank, TitaVo... titaVo);
 
-	/**
-	 * Insert
-	 * 
-	 * @param cdBank Entity
-	 * @param titaVo Variable-Length Argument
-	 * @return CdBank Entity
-	 * @throws DBException exception
-	 */
-	public CdBank insert(CdBank cdBank, TitaVo... titaVo) throws DBException;
+  /**
+   * Insert
+   * 
+   * @param cdBank Entity
+   * @param titaVo Variable-Length Argument
+   * @return CdBank Entity
+   * @throws DBException exception
+   */
+  public CdBank insert(CdBank cdBank, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update
-	 * 
-	 * @param cdBank Entity
-	 * @param titaVo Variable-Length Argument
-	 * @return CdBank Entity
-	 * @throws DBException exception
-	 */
-	public CdBank update(CdBank cdBank, TitaVo... titaVo) throws DBException;
+  /**
+   * Update
+   * 
+   * @param cdBank Entity
+   * @param titaVo Variable-Length Argument
+   * @return CdBank Entity
+   * @throws DBException exception
+   */
+  public CdBank update(CdBank cdBank, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update2
-	 * 
-	 * @param cdBank Entity
-	 * @param titaVo Variable-Length Argument
-	 * @return CdBank Entity
-	 * @throws DBException exception
-	 */
-	public CdBank update2(CdBank cdBank, TitaVo... titaVo) throws DBException;
+  /**
+   * Update2
+   * 
+   * @param cdBank Entity
+   * @param titaVo Variable-Length Argument
+   * @return CdBank Entity
+   * @throws DBException exception
+   */
+  public CdBank update2(CdBank cdBank, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Delete
-	 * 
-	 * @param cdBank Entity
-	 * @param titaVo Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void delete(CdBank cdBank, TitaVo... titaVo) throws DBException;
+  /**
+   * Delete
+   * 
+   * @param cdBank Entity
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void delete(CdBank cdBank, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Insert All For List
-	 * 
-	 * @param cdBank Entity of List
-	 * @param titaVo Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void insertAll(List<CdBank> cdBank, TitaVo... titaVo) throws DBException;
+  /**
+   * Insert All For List
+   * 
+   * @param cdBank Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void insertAll(List<CdBank> cdBank, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Update All For List
-	 * 
-	 * @param cdBank Entity of List
-	 * @param titaVo Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void updateAll(List<CdBank> cdBank, TitaVo... titaVo) throws DBException;
+  /**
+   * Update All For List
+   * 
+   * @param cdBank Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void updateAll(List<CdBank> cdBank, TitaVo... titaVo) throws DBException;
 
-	/**
-	 * Delete All For List
-	 * 
-	 * @param cdBank Entity of List
-	 * @param titaVo Variable-Length Argument
-	 * @throws DBException exception
-	 */
-	public void deleteAll(List<CdBank> cdBank, TitaVo... titaVo) throws DBException;
+  /**
+   * Delete All For List
+   * 
+   * @param cdBank Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void deleteAll(List<CdBank> cdBank, TitaVo... titaVo) throws DBException;
 
 }

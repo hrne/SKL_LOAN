@@ -184,7 +184,7 @@ RESET_RIM(#RimL1r04,L1R04)
 !C(3,#FunCd,1,S,$)
 S(L1R04,1,#RimCustNo,#RimFacmNo)
 R(1,L1R04)
-E(0,@ApplyDt,#L1r04ApplyDt)
+!E(0,@ApplyDt,#L1r04ApplyDt) 進來時固定代入系統日期
 ##loop{times:40,i:1}
 T(2,@FormNo{i},#L1r04FormNo{i})
 T(2,@Notice{i},#L1r04FormName{i})

@@ -18,18 +18,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * TimCustNo=9,7
- * LeadingBank=9,7
- * SigningDateStart=9,7
- * SigningDateEnd=9,7
- * DrawdownStartDateStart=9,7
- * DrawdownStartDateEnd=9,7
- * DrawdownEndDateStart=9,7
- * DrawdownEndDateEnd=9,7
- * CommitFeeFlag=X,1
- */
 /**
  * L2060 聯貸案訂約明細資料查詢
  * 
@@ -60,7 +48,6 @@ public class L2060 extends TradeBuffer {
 		loanCom.setTxBuffer(this.txBuffer);
 
 		// 取得輸入資料
-//		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		String iLeadingBank = titaVo.getParam("LeadingBank").trim() + "%";
 		int iSyndNoStart = this.parse.stringToInteger(titaVo.getParam("SyndNoSt"));
 		int iSyndNoEnd = this.parse.stringToInteger(titaVo.getParam("SyndNoEnd"));
@@ -86,8 +73,6 @@ public class L2060 extends TradeBuffer {
 
 		}
 
-//		LoanSynd tLoanSynd = loanSyndService.findById(wkSyndNo, titaVo);
-//		lLoanSynd.add(tLoanSynd);
 		lLoanSynd = slLoanSynd == null ? null : slLoanSynd.getContent();
 		if (lLoanSynd == null || lLoanSynd.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "聯貸案訂約檔"); // 查詢資料不存在

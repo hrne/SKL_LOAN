@@ -22,15 +22,9 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-
-/**
- * Tita<br>
- * CustId=X,10<br>
- * CustNo=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L2073")
 @Scope("prototype")
@@ -60,6 +54,9 @@ public class L2073 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
+	
+	@Autowired
+	MakeReport makeReport;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -81,8 +78,6 @@ public class L2073 extends TradeBuffer {
 
 		// 宣告
 		Timestamp ts;
-		String createDate = "";
-		String createTime = "";
 
 		// new table
 		CustMain tCustMain = new CustMain();
@@ -117,6 +112,8 @@ public class L2073 extends TradeBuffer {
 		}
 
 		for (CustDataCtrl tCustDateCtrl : lCustDateCtrl) {
+			
+			String lastUpdate = "";
 
 			// new occurs
 			OccursList occurslist = new OccursList();
@@ -128,27 +125,27 @@ public class L2073 extends TradeBuffer {
 				continue;
 			}
 
-			if (tCustDateCtrl.getCreateDate() != null) {
+			if (tCustDateCtrl.getLastUpdate() != null) {
 
 				// 宣告
-				ts = tCustDateCtrl.getCreateDate();
+				ts = tCustDateCtrl.getLastUpdate();
 				this.info("ts = " + ts);
 				DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
-				DateFormat sdftime = new SimpleDateFormat("HHmmss");
+				DateFormat sdftime = new SimpleDateFormat("HH:mm:ss");
 
-				createDate = sdfdate.format(ts);
-				createTime = sdftime.format(ts);
-				createDate = parse.IntegerToString(parse.stringToInteger(createDate) - 19110000, 7);
-				this.info("createDate = " + createDate);
-				this.info("createTime = " + createTime);
+				String lastUpdateDate = makeReport.showRocDate(sdfdate.format(ts), 1);
+				String lastUpdateTime = sdftime.format(ts);
+				this.info("createDate = " + lastUpdateDate);
+				this.info("createTime = " + lastUpdateTime);
+				lastUpdate = lastUpdateDate + " " + lastUpdateTime;
 
 			}
 			String TlrNo = "";
 			String EmpName = "";
 			CdEmp tCdEmp = new CdEmp();
 
-			if (tCustDateCtrl.getCreateEmpNo() != null) {
-				TlrNo = tCustDateCtrl.getCreateEmpNo();
+			if (tCustDateCtrl.getLastUpdateEmpNo() != null) {
+				TlrNo = tCustDateCtrl.getLastUpdateEmpNo();
 				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
 				if (tCdEmp != null) {
 					EmpName = tCdEmp.getFullname();
@@ -160,8 +157,7 @@ public class L2073 extends TradeBuffer {
 			occurslist.putParam("OOCustName", tCustMain.getCustName());
 			occurslist.putParam("OOTlrNo", TlrNo);
 			occurslist.putParam("OOEmpName", EmpName);
-			occurslist.putParam("OOCreateDate", createDate);
-			occurslist.putParam("OOCreateTime", createTime);
+			occurslist.putParam("OOLastUpdate", lastUpdate);
 			occurslist.putParam("OOReason", tCustDateCtrl.getReason());
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);

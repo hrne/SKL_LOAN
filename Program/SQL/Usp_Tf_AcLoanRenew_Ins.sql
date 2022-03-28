@@ -60,10 +60,7 @@ BEGIN
           ,S1."LMSASQ"                    AS "NewBormNo"           -- 新撥款序號 DECIMAL 3
           ,S1."LMSAPN1"                   AS "OldFacmNo"           -- 舊額度編號 DECIMAL 6
           ,S1."LMSASQ1"                   AS "OldBormNo"           -- 舊撥款序號 DECIMAL 6
-          ,CASE
-             WHEN NVL(S2."LMSACN",0) <> 0 THEN '2'  -- 協議
-           ELSE '1' -- 一般
-           END                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+          ,'1'                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
           -- 2022-01-03 智偉修改:最後統一更新
           ,'N'                            AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
           ,NVL(TX."TRXDAT",ACNP."AcDate") AS "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期 -- 2021-12-23 綺萍要求改為交易明細檔做撥款的會計日期
@@ -82,15 +79,6 @@ BEGIN
                   ,"LMSASQ"
                   ,"LMSAPN1"
                   ,"LMSASQ1") S1
-    LEFT JOIN (SELECT "LMSACN"
-                     ,"LMSAPN"
-                     ,"LMSASQ"
-               FROM "LN$NODP"
-               GROUP BY "LMSACN"
-                       ,"LMSAPN"
-                       ,"LMSASQ") S2 ON S2."LMSACN" = S1."LMSACN"
-                                    AND S2."LMSAPN" = S1."LMSAPN"
-                                    AND S2."LMSASQ" = S1."LMSASQ"
     LEFT JOIN TX ON TX."LMSACN" = S1."LMSACN"
                 AND TX."LMSAPN" = S1."LMSAPN"
                 AND TX."LMSASQ" = S1."LMSASQ"
@@ -114,30 +102,22 @@ BEGIN
              , "LMSASQ1" -- 舊
         FROM "LNACNP"
       )
-      , NODP AS (
-        SELECT N.LMSACN
-             , N.NEGNUM
-             , N.LMSAPN         AS LMSAPN
-             , N.LMSASQ         AS LMSASQ
-             , NVL(A.LMSAPN1,0) AS OLD_LMSAPN -- 舊
-             , NVL(A.LMSASQ1,0) AS OLD_LMSASQ -- 舊
-        FROM LN$NODP N
-        LEFT JOIN ACNP A ON A.LMSACN = N.LMSACN
-                        AND A.LMSAPN = N.LMSAPN
-                        AND A.LMSASQ = N.LMSASQ
-        WHERE N.CHGFLG = 'A' -- 新
-        UNION
-        SELECT N.LMSACN
-             , N.NEGNUM
-             , NVL(A.LMSAPN,0) AS LMSAPN
-             , NVL(A.LMSASQ,0) AS LMSASQ
-             , N.LMSAPN        AS OLD_LMSAPN -- 舊
-             , N.LMSAPN        AS OLD_LMSASQ -- 舊
-        FROM LN$NODP N
-        LEFT JOIN ACNP A ON A.LMSACN = N.LMSACN
-                        AND A.LMSAPN1 = N.LMSAPN
-                        AND A.LMSASQ1 = N.LMSASQ
-        WHERE N.CHGFLG = 'B' -- 舊
+      , joinedData AS (
+        SELECT A."LMSACN"
+             , A."LMSAPN"
+             , A."LMSASQ"
+             , A."LMSAPN1" AS "OLD_LMSAPN"
+             , A."LMSASQ1" AS "OLD_LMSASQ"
+        FROM ACNP A
+        LEFT JOIN "LN$NODP" NB ON NB."LMSACN" = A."LMSACN"
+                              AND NB."LMSAPN" = A."LMSAPN1"
+                              AND NB."LMSASQ" = A."LMSASQ1"
+                              AND NB."CHGFLG" = 'B'
+        LEFT JOIN "LN$NODP" NA ON NA."LMSACN" = A."LMSACN"
+                              AND NA."LMSAPN" = A."LMSAPN"
+                              AND NA."LMSASQ" = A."LMSASQ"
+                              AND NA."CHGFLG" = 'A'
+        WHERE NVL(NA."NEGNUM",0) + NVL(NB."NEGNUM",0) > 0
       )
       SELECT S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 3
             ,S1."LMSAPN"                    AS "NewFacmNo"           -- 新額度編號 DECIMAL 3

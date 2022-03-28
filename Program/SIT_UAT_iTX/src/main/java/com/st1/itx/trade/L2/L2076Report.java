@@ -48,8 +48,6 @@ public class L2076Report extends MakeReport {
 	@Autowired
 	public FacCloseService sFacCloseService;
 
-//	private static DecimalFormat df = new DecimalFormat("#########################0.0#");
-
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -74,19 +72,12 @@ public class L2076Report extends MakeReport {
 	private int iCustNo = 0;
 	private int iCloseNo = 0;
 
-//	// 製表日期
-//	private String NowDate;
-//	// 製表時間
-//	private String NowTime;
-
 	// 自訂表頭
 	@Override
 	public void printHeader() {
 
 		logger.info("L2076Report.printHeader");
 
-//		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
-//		this.print(-3, 55, "抵押權塗銷同意書", "C");
 		this.print(-4, 6, "", "L");
 
 		// 明細起始列(自訂亦必須)
@@ -102,7 +93,6 @@ public class L2076Report extends MakeReport {
 	public void printFooter() {
 		this.print(-15, 25, " ");
 
-//		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo());
 	}
 
 	public void exec(TitaVo titaVo, FacClose tFacClose) throws LogicException {
@@ -112,9 +102,6 @@ public class L2076Report extends MakeReport {
 		this.setFont(1, 36);
 		this.reportDate = Integer.valueOf(titaVo.getEntDy());
 		this.brno = titaVo.getBrno();
-//		this.NowDate = dDateUtil.getNowStringRoc();
-//		this.pageSize = "A5";
-//		this.NowTime = dDateUtil.getNowStringTime();
 		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		iCloseNo = parse.stringToInteger(titaVo.getParam("CloseNo"));
 		reportItem = "抵押權塗銷同意書,戶號 :" + titaVo.getParam("CustNo");
@@ -142,7 +129,6 @@ public class L2076Report extends MakeReport {
 		if (tClOtherRights == null) {
 			throw new LogicException(titaVo, "E2003", "擔保品他項權利檔"); // 查無資料
 		}
-//		FacClose tFacClose = sFacCloseService.findById(FacCloseId, titaVo);
 		int DocNo = tFacClose.getDocNo();
 		String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);
 
@@ -210,17 +196,6 @@ public class L2076Report extends MakeReport {
 		logger.info("RightsNote = " + wkRightsNote);
 		logger.info("SecuredTotal = " + wkSecuredTotal);
 		logger.info("amtChinese = " + amtChinese);
-//		ClCode1擔保品代號1
-//		ClCode2擔保品代號2
-//		ClNo擔保品編號
-//		Seq他項權利序號
-//		City縣市
-//		LandAdm地政
-//		RecYear收件年
-//		RecWord收件字
-//		RecNumber收件號
-//		RightsNote權利價值說明
-//		SecuredTotal擔保債權總金額
 		if ("3".equals(funCdString)) {
 
 			Point a = new Point(85, 200);
@@ -247,11 +222,6 @@ public class L2076Report extends MakeReport {
 		}
 		this.print(1, 1, "　　");
 
-		/**
-		 * -----------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-		 * --------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		 */
-//		this.print(1, 15, " ");
 
 		// 設定字體1:標楷體 字體大小14
 		this.setFont(1, 14);
@@ -323,18 +293,10 @@ public class L2076Report extends MakeReport {
 		this.print(1, 17, " ");
 		this.print(1, 1, " ");
 		this.print(1, 10, "");
-//		this.print(1, 10, "");
 		String date = titaVo.getCalDy();
 		this.print(0, 40, date.substring(0, 3));
 		this.print(0, 52, date.substring(3, 5));
 		this.print(0, 68, date.substring(5, 7));
-//		for (int i = 1; i <= 400; i++) {
-//			if ((i % 10) == 0) {
-//				this.print(-2, i, "" + (i / 10));
-//			}
-//			this.print(-1, i, "" + (i % 10));
-//			this.print(-i, 1, "" + (i % 10));
-//		}
 	}
 
 	private void drawLineList(ArrayList<Line> lineList) {

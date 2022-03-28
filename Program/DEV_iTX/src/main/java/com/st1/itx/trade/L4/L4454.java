@@ -90,7 +90,7 @@ public class L4454 extends TradeBuffer {
 
 	@Autowired
 	public L4454Report4 l4454Report4;
-	
+
 	@Autowired
 	public TxToDoCom txToDoCom;
 
@@ -102,7 +102,7 @@ public class L4454 extends TradeBuffer {
 
 	@Autowired
 	L9705Form l9705Form;
-	
+
 	private int reportACnt = 0;
 	private HashMap<Integer, Integer> custLoanFlag = new HashMap<>();
 	private HashMap<Integer, Integer> custFireFlag = new HashMap<>();
@@ -144,8 +144,8 @@ public class L4454 extends TradeBuffer {
 		// 訂正交易處理 (刪除應處理明細)
 		if (titaVo.isHcodeErase()) {
 			String msg = "L4454產生銀扣失敗通知 訂正完畢。";
-			cntText = txToDoCom.delDetailByTxNo("TEXT00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntText = txToDoCom.delDetailByTxNo("TEXT00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(),
+					titaVo.getOrgTno(), titaVo);
 			cntEmail = txToDoCom.delDetailByTxNo("MAIL00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
 					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
 			cntL9705 = txToDoCom.delReserveByTxNo("NOTI01", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
@@ -253,7 +253,9 @@ public class L4454 extends TradeBuffer {
 //		抓取火險到期年月 = 火險應繳日前5碼
 		int insuMon = 0;
 		if (repayType == 5) {
-			insuMon = parse.stringToInteger(FormatUtil.pad9("" + tTempVo.get("InsuDate"), 7).substring(0, 5));
+			if (tTempVo.get("InsuDate") != null) {
+				insuMon = parse.stringToInteger(FormatUtil.pad9("" + tTempVo.get("InsuDate"), 7).substring(0, 5));
+			}
 		}
 
 //		1.不成功簡訊通知(ALL)	
@@ -275,7 +277,7 @@ public class L4454 extends TradeBuffer {
 						if ("1".equals(t.get("RowNumber"))) {
 							l9705ListB.add(t); // 繳息還本通知單(火險成功期款失敗通知) ，同戶號、額度只印一份
 						}
-						failNoticeDateUpdate("NOTI01","火險成功期款失敗通知", titaVo); // 失敗通知日期
+						failNoticeDateUpdate("NOTI01", "火險成功期款失敗通知", titaVo); // 失敗通知日期
 					}
 				}
 				if (fistDeduct == 2) {
@@ -284,7 +286,7 @@ public class L4454 extends TradeBuffer {
 							l4454List.add(t); // 列印明信片，同戶號、額度只印一份
 						}
 					}
-					failNoticeDateUpdate("NOTI02","期款二扣失敗明信片", titaVo); // 失敗通知日期
+					failNoticeDateUpdate("NOTI02", "期款二扣失敗明信片", titaVo); // 失敗通知日期
 				}
 				break;
 			case 3: // 連續扣款失敗明細＆通知
@@ -292,7 +294,7 @@ public class L4454 extends TradeBuffer {
 				if ("1".equals(t.get("RowNumber"))) {
 					l9705ListA.add(t); // 繳息還本通知單，同戶號、額度只印一份
 				}
-				failNoticeDateUpdate("NOTI01","連續扣款失敗通知", titaVo); // 失敗通知日期
+				failNoticeDateUpdate("NOTI01", "連續扣款失敗通知", titaVo); // 失敗通知日期
 				break;
 			}
 		}
@@ -474,7 +476,7 @@ public class L4454 extends TradeBuffer {
 	private int fistDeductCheck(TitaVo titaVo) throws LogicException {
 		int result = 1;
 		// 銀扣檔有相同繳息迄日的期款扣款失敗資料
-		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo, 
+		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo,
 				prevIntDate + 19110000, titaVo);
 		if (tBankDeductDtl != null) {
 			if ((tBankDeductDtl.getEntryDate() < entryDate && tBankDeductDtl.getRepayType() == 1)) {
@@ -485,7 +487,7 @@ public class L4454 extends TradeBuffer {
 				}
 			}
 		}
-		this.info("fistDeductCheck="+ result );
+		this.info("fistDeductCheck=" + result);
 		return result;
 	}
 
@@ -511,20 +513,20 @@ public class L4454 extends TradeBuffer {
 //	還本繳息通知單(出火險成功期款失敗通知)
 	private void reportB(TitaVo titaVo) throws LogicException {
 		this.info("ReportB Start...");
-		
-		if(l9705ListA.size() > 0) {
-		  titaVo.putParam("CONDITION1", "A");	
-		  this.info("go l9705ListA size="+ l9705ListA.size());
-		  l9705Report.exec(l9705ListA, titaVo, this.getTxBuffer());
-		  l4454Report4.exec(titaVo, l9705ListA);
-		} 
-		
-		if(l9705ListB.size() > 0) {
-		  titaVo.putParam("CONDITION1", "B");
-		  this.info("go l9705ListB size=" + + l9705ListB.size());
-		  l9705Report.exec(l9705ListB, titaVo, this.getTxBuffer());
-		  l9705Form.exec(l9705ListB, titaVo, this.getTxBuffer());
-		  l4454Report4.exec(titaVo, l9705ListB);
+
+		if (l9705ListA.size() > 0) {
+			titaVo.putParam("CONDITION1", "A");
+			this.info("go l9705ListA size=" + l9705ListA.size());
+			l9705Report.exec(l9705ListA, titaVo, this.getTxBuffer());
+			l4454Report4.exec(titaVo, l9705ListA);
+		}
+
+		if (l9705ListB.size() > 0) {
+			titaVo.putParam("CONDITION1", "B");
+			this.info("go l9705ListB size=" + +l9705ListB.size());
+			l9705Report.exec(l9705ListB, titaVo, this.getTxBuffer());
+			l9705Form.exec(l9705ListB, titaVo, this.getTxBuffer());
+			l4454Report4.exec(titaVo, l9705ListB);
 		}
 	}
 

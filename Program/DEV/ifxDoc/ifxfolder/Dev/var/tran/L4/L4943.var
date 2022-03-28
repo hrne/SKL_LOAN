@@ -444,11 +444,19 @@ TXFORM=L4943
 !---------- 單據輸出組合 ----------
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L4943" layout="cols=3;screen.width=[200,300,100,400];order=1;">
 [
-["[L4943]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@銀行扣款檔資料查詢"],
+["[L4943]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@銀行扣款檔資料查詢@@@@"],
 [""],
 [#<->#,"@應扣金額合計",#OTotalUnpaidAmt],
 [#<->#,"@暫收抵繳金額合計",#OTotalTempAmt],
 [#<->#,"@扣款金額合計",#OTotalRepayAmt],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4943_7" layout="cols=3;screen.width=[200,300,100,400];order=1;">
+[
+["[L4943]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@銀行扣款檔資料查詢@@@@"],
+[""],
 ]
 </sub>
 
@@ -494,7 +502,7 @@ TXFORM=L4943
 ^
 
 #RPTFG=7,QUERY.GRID,L4943
-#any={detail:true, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
+#any={detail:true, header:'L4943_7.part', caption:'', rowNum:20, rowList:[20,40,60]}
 
 #OOCustNo=戶號　
 {width:95}
@@ -504,7 +512,7 @@ TXFORM=L4943
 {width:95}
 #OOPayIntDate=應繳日
 {width:95}
-#OOUnpaidAmt=應扣金額
+#OOUnpaidAmt=放款餘額
 {width:95,sum:true}
 #OOProcNote=檢核結果
 {width:300}

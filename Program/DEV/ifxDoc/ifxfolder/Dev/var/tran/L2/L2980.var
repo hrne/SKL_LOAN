@@ -288,6 +288,9 @@ T(2,#L1r01CustName)
 #SpouseName=X,100,L
 T(2,#L1r01SpouseName)
 
+#SpouseId=X,10,L
+T(2,#L1r01SpouseId)
+
 #RimFuncCode=A,1,S
 #RimFacmNo=A,3,S
 #RimApplNo=A,7,S
@@ -648,6 +651,7 @@ T(3,1)ASGN(LOOP$)
 #RepayCode
 #RepayCodeX
 #SpouseName
+#SpouseId
 #RepayBank
 #RepayBankX
 #Email

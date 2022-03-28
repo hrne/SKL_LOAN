@@ -24,15 +24,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CaseNo=9,7<br>
- * CustNo=9,7<br>
- * CustId=X,10<br>
- * ApplNo=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2021")
 @Scope("prototype")
 /**
@@ -88,14 +79,6 @@ public class L2021 extends TradeBuffer {
 			if (lFacRelation == null || lFacRelation.size() == 0) {
 				throw new LogicException(titaVo, "E0001", "交易關係人檔");
 			}
-
-//			String Ukey = lFacRelation.get(0).getCustUKey(); // 統編 案件編號pk
-//			
-//			lCustMain  = sCustMainService.findById(Ukey, titaVo);
-//			
-//	    	if( lCustMain == null ) {
-//	    		throw new LogicException(titaVo, "E0001", "客戶主檔"); 
-//	    	}
 
 		} else {
 

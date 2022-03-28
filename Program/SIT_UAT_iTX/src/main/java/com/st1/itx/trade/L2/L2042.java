@@ -141,8 +141,6 @@ public class L2042 extends TradeBuffer {
 
 			List<ClBuildingOwner> lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 			if (lClBuildingOwner != null) {
-//				lClBuildingOwner = new ArrayList<ClBuildingOwner>();
-//				lClBuildingOwner.add(tClBuildingOwner);
 				tClBuildingOwner = lClBuildingOwner.get(0);
 				CustMain custMain = custMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
 				if (custMain != null) {

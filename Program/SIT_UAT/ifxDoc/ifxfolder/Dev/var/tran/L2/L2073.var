@@ -170,26 +170,11 @@ T(3,1)ASGN(LOOP$)
 !建立者
 #OOTlrNo=X,6,S
 
-#OOEmpName=X,10,L
-
-#OOName=X,18,L
+#OOEmpName=X,18,L
 T(2,#OOTlrNo+  +#OOEmpName)
 
 !建立日期
-#OOCreateDate=D,7,S
-
-!建立時間
-#OOCreateTime=X,8,S
-
-#OOFormatHH=X,2,S
-T(1,#OOCreateTime,1,2)
-#OOFormatMM=X,2,S
-T(1,#OOCreateTime,3,2)
-#OOFormatSS=X,2,S
-T(1,#OOCreateTime,5,2)
-
-#OOFormatCreateTime=X,8,S
-T(2,#OOFormatHH+:+#OOFormatMM+:+#OOFormatSS)
+#OOLastUpdate=X,18,S
 
 #OOReason=X,50,S
 
@@ -239,8 +224,7 @@ TXFORM=L2073
 #OOCustName
 #OOTlrNo
 #OOEmpName
-#OOCreateDate
-#OOCreateTime
+#OOLastUpdate
 #OOReason
 ^
 <include src="ROM.icf::L1R09.tom"/>
@@ -262,32 +246,29 @@ TXFORM=L2073
 #OOBTN2=解除
 {width:50,search:false,formatter:'cust:bind-button:解除',align:'center',canExport:false}
 
-#OOBTN4=刪除
-{width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+! #OOBTN4=刪除
+! {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
 
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
-#OOCustId=客戶統一編號
-{width:120,align:'center'}
-
-#OOCustNo=借戶戶號
+#OOCustNo=戶號
 {width:100,align:'center'}
+
+#OOCustId=統一編號
+{width:120,align:'center'}
 
 #OOCustName=戶名
-{width:75,align:'center'}
+{width:150,align:'center'}
 
-#OOName=建立者
+#OOEmpName=最後異動櫃員
 {width:120,align:'center'}
 
-#OOCreateDate=建立日期
-{width:100,align:'center'}
-
-#OOFormatCreateTime=建立時間
-{width:100,align:'center'}
+#OOLastUpdate=最後異動時間
+{width:140,align:'center'}
 
 #OOReason=解除原因
-{width:75,align:'left'}
+{width:300,align:'left'}
 ^
 
 <include src="PRT.icf::INQ01.sel" map="i=L2049;cpi=15"/>

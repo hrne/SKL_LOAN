@@ -41,17 +41,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CUST_NO=9,7<br>
- * FACM_NO=9,3<br>
- * COL_IND1=9,1<br>
- * COL_IND2=9,2<br>
- * COL_NO=9,7<br>
- * SearchClsFg=X,1<br>
- * END=X,1<br>
- */
-
 @Service("L2017")
 @Scope("prototype")
 /**

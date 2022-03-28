@@ -34,11 +34,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * END=X,1<br>
- */
-
 @Service("L2038")
 @Scope("prototype")
 /**
@@ -132,17 +127,6 @@ public class L2038 extends TradeBuffer {
 
 				occurslist.putParam("OONewNote", result.get("F7"));
 				occurslist.putParam("OOClTypeCode", result.get("F8"));
-
-//				occurslist.putParam("OOOwnerId", "");
-//				occurslist.putParam("OOOwnerName", "");
-
-//				CustMain tCustMain = new CustMain();
-//				tCustMain = sCustMainService.findById(result.get("F9"), titaVo);
-//				if (tCustMain != null) {
-//					occurslist.putParam("OOOwnerId", tCustMain.getCustId());
-//					occurslist.putParam("OOOwnerName", tCustMain.getCustName());
-//				}
-
 				occurslist.putParam("OOOwnerFlag", result.get("F10"));
 				occurslist.putParam("OOSettingStat", result.get("F11"));
 				occurslist.putParam("OOSettingAmt", result.get("F12"));

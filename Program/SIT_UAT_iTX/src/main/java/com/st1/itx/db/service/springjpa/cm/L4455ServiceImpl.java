@@ -178,10 +178,12 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                , BKD.\"EntryDate\"";
 		sql += "                                , BKD.\"RepayBank\"";
 		sql += "                                , BKD.\"CustNo\"";
-		sql += "                                , BKD.\"AcctCode\"";
-		sql += "                                , TX2.\"TitaTxtNo\"";
 		sql += "                                , TX1.\"FacmNo\"";
 		sql += "                                , TX1.\"BormNo\"";
+		sql += "     							, TX1.\"IntStartDate\"";
+		sql += "     							, TX1.\"IntEndDate\"";
+		sql += "                                , BKD.\"AcctCode\"";
+		sql += "                                , TX2.\"TitaTxtNo\"";
 		sql += "                         ) AS \"NameSeq\" ";
 		sql += "     , ROW_NUMBER() OVER (PARTITION BY SUBSTR(BKD.\"TitaTxtNo\",0,2)";
 		sql += "                                     , BKD.\"EntryDate\"";
@@ -192,10 +194,12 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                , BKD.\"EntryDate\"";
 		sql += "                                , BKD.\"RepayBank\"";
 		sql += "                                , BKD.\"CustNo\"";
-		sql += "                                , BKD.\"AcctCode\"";
-		sql += "                                , TX2.\"TitaTxtNo\"";
 		sql += "                                , TX1.\"FacmNo\"";
 		sql += "                                , TX1.\"BormNo\"";
+		sql += "     							, TX1.\"IntStartDate\"";
+		sql += "     							, TX1.\"IntEndDate\"";
+		sql += "                                , BKD.\"AcctCode\"";
+		sql += "                                , TX2.\"TitaTxtNo\"";
 		sql += "                         ) AS \"TxSeq\" ";
 		sql += "  FROM \"BankDeductDtl\" BKD";
 		sql += "  LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BKD.\"CustNo\"";
@@ -219,6 +223,9 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      END = SUBSTR(BKD.\"TitaTxtNo\",0,2)";
 
 		switch (funcd) {
+		case 1:
+			sql += " AND bkd.\"RepayType\" NOT IN (4,5,6,7) ";
+			break;
 		case 2:
 			sql += " AND bkd.\"RepayType\" = 4 or bkd.\"RepayType\" = 7";
 			break;
@@ -244,10 +251,12 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , BKD.\"EntryDate\"";
 		sql += "       , BKD.\"RepayBank\"";
 		sql += "       , BKD.\"CustNo\"";
-		sql += "       , BKD.\"AcctCode\"";
-		sql += "       , TX2.\"TitaTxtNo\"";
 		sql += "       , TX1.\"FacmNo\"";
 		sql += "       , TX1.\"BormNo\"";
+		sql += "       , TX1.\"IntStartDate\"";
+		sql += "       , TX1.\"IntEndDate\"";
+		sql += "       , BKD.\"AcctCode\"";
+		sql += "       , TX2.\"TitaTxtNo\"";
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);

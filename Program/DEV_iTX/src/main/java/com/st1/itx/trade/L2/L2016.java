@@ -23,12 +23,7 @@ import com.st1.itx.util.parse.Parse;
  * L2016 核准號碼明細資料查詢
  * a.此功能提供以核准號碼查詢額度之明細資料
  */
-/*
- * Tita
- * ApplNo1=9,7
- * ApplNo2=9,7
- * ColSetCode=9,1 0:查詢全部;1:查詢未設定;2:查詢已設定
- */
+
 /**
  * L2016 核准號碼明細資料查詢
  * 
@@ -38,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2016")
 @Scope("prototype")
 public class L2016 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2016.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -206,76 +200,6 @@ public class L2016 extends TradeBuffer {
 		default:
 			break;
 		}
-
-//		if (iApplNo1 > 0) { // 當輸入核准號碼時
-//			lFacMain = facMainService.facmApplNoRange(iApplNo1, iApplNo2, 1, 999, wkColSetFlag, this.index, this.limit,
-//					titaVo);
-//		} else if(iCustNo > 0){ // 輸入戶號時
-//			lFacMain = facMainService.fildCustNoRange(iCustNo, iCustNo, wkColSetFlag, this.index, this.limit, titaVo);
-//		} else { 
-//			Slice<CustMain> iCustMain = null;
-//			iCustMain = custMainService.custNameLike("%" + iCustName + "%", this.index, this.limit, titaVo);
-//			if (iCustMain == null) {
-//				throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
-//			}
-//			List<CustMain> lCustMain = new ArrayList<CustMain>();			
-//			lCustMain = iCustMain == null ? null : iCustMain.getContent();
-//			
-//			for( CustMain tCustMain: lCustMain) {
-//				iCustNo = tCustMain.getCustNo();		
-//				sFacMain = facMainService.fildCustNoRange(iCustNo, iCustNo, wkColSetFlag, this.index, this.limit, titaVo);
-//	
-//				List<FacMain> tFacMain = new ArrayList<FacMain>();
-//				tFacMain = sFacMain == null ? null : sFacMain.getContent();
-//				
-//				
-//			}
-//		}
-//
-//		if (lFacMain == null || lFacMain.isEmpty()) {
-//			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
-//		}
-//
-//		// 如有有找到資料
-//		CustMain tCustMain;
-//		for (FacMain tFacMain : lFacMain.getContent()) {
-//			OccursList occursList = new OccursList();
-//			
-//			String dShow = "Y";
-//			// 該額度有撥款或預約撥款,不顯示刪除按鈕
-//			if (tFacMain.getLastBormNo() > 0 || tFacMain.getLastBormRvNo() > 900) {
-//				// hide
-//				dShow = "N";
-//			}
-//			
-//			occursList.putParam("OOApplNo", tFacMain.getApplNo());
-//			occursList.putParam("OOCustNo", tFacMain.getCustNo());
-//			occursList.putParam("OOFacmNo", tFacMain.getFacmNo());
-//			occursList.putParam("OOCurrencyCode", tFacMain.getCurrencyCode());
-//			occursList.putParam("OOLineAmt", tFacMain.getLineAmt());
-//			occursList.putParam("OOUtilAmt", tFacMain.getUtilAmt());
-//			occursList.putParam("OOColSetFlag", tFacMain.getColSetFlag());
-//			occursList.putParam("OOLoanFg", dShow);
-//			
-//			tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
-//
-//			if (tCustMain != null) {
-//				occursList.putParam("OOCustName", tCustMain.getCustName());
-//			} else {
-//				// occursList.putParam("OOCustNoX", "");
-//				throw new LogicException(titaVo, "E2003", "客戶資料主檔 戶號=" + tFacMain.getCustNo()); // 查無資料
-//			}
-//			// 將每筆資料放入Tota的OcList
-//			this.totaVo.addOccursList(occursList);
-//		}
-//
-//		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
-//		if (lFacMain != null && lFacMain.hasNext()) {
-//			titaVo.setReturnIndex(this.setIndexNext());
-//			/* 手動折返 */
-//			this.totaVo.setMsgEndToEnter();
-//		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

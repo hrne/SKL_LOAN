@@ -17,10 +17,6 @@ import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * ProdNo=X,5
- */
 /**
  * L2001 商品參數明細資料查詢
  * 

@@ -12,7 +12,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxHoliday;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxHolidayService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -31,11 +33,14 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6030 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6030.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public TxHolidayService sTxHolidayService;
+	
+	@Autowired
+	CdEmpService cdEmpService;
+	
 	@Autowired
 	Parse parse;
 
@@ -78,6 +83,17 @@ public class L6030 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOHoliday", tTxHoliday.getHoliday());
 			occursList.putParam("OOTypeCode", tTxHoliday.getTypeCode());
+			String DateTime = this.parse.timeStampToString(tTxHoliday.getLastUpdate());
+			occursList.putParam("OOLastUpdate", DateTime);
+			
+			String iEmpNo = tTxHoliday.getLastUpdateEmpNo();
+			if(!iEmpNo.isEmpty() || iEmpNo.length()>0) {
+				CdEmp tCdEmp = cdEmpService.findById(iEmpNo, titaVo);
+				if(tCdEmp!=null) {
+					iEmpNo = iEmpNo+" "+tCdEmp.getFullname();
+				}
+			}
+			occursList.putParam("OOLastUpdateEmpNo", iEmpNo);
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
