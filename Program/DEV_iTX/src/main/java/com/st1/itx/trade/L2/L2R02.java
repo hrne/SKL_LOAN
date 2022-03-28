@@ -136,6 +136,12 @@ public class L2R02 extends TradeBuffer {
 			this.totaVo.putParam("L2r02IsLimit", tFacCaseAppl.getIsLimit());
 			this.totaVo.putParam("L2r02IsRelated", tFacCaseAppl.getIsRelated());
 			this.totaVo.putParam("L2r02IsLnrelNear", tFacCaseAppl.getIsLnrelNear());
+			// 2022.3.28 新增 By昱衡
+			this.totaVo.putParam("L2r02IsSuspected", tFacCaseAppl.getIsSuspected());
+			this.totaVo.putParam("L2r02IsSuspectedCheck", tFacCaseAppl.getIsSuspectedCheck());
+			this.totaVo.putParam("L2r02IsSuspectedCheckType", tFacCaseAppl.getIsSuspectedCheckType());
+			this.totaVo.putParam("L2r02IsDate", tFacCaseAppl.getIsDate());			
+			
 			this.totaVo.putParam("L2r02ApplAmt", tFacCaseAppl.getApplAmt());
 			this.totaVo.putParam("L2r02Estimate", tFacCaseAppl.getEstimate());
 			this.totaVo.putParam("L2r02PieceCode", tFacCaseAppl.getPieceCode());

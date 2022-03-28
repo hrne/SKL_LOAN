@@ -25,9 +25,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- */
 
 @Service("L2306")
 @Scope("prototype")
@@ -81,19 +78,6 @@ public class L2306 extends TradeBuffer {
 
 		ReltMain tReltMain = new ReltMain();
 		List<ReltMain> tmplReltMain = new ArrayList<ReltMain>();
-
-//		// eloan resend
-//		if (isEloan && iFunCd == 1) {
-//			ReltMainId ReltMainIdVo = new ReltMainId();
-//			ReltMainIdVo.setCaseNo(iCaseNo);
-//			ReltMainIdVo.setCustNo(iCustNo);
-//			ReltMainIdVo.setReltId(iRelId);
-//			tReltMain.setReltMainId(ReltMainIdVo);
-//			tReltMain = sReltMainService.findById(ReltMainIdVo);
-//			if (tReltMain != null) {
-//				iFunCd = 2;
-//			}
-//		}
 
 		// 新增
 		if (iFunCd == 1) {

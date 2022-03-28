@@ -27,10 +27,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- */
-
 @Service("L2670")
 @Scope("prototype")
 /**
@@ -83,8 +79,7 @@ public class L2670 extends TradeBuffer {
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		// 契變日期
 		int iContractChgDate = parse.stringToInteger(titaVo.getParam("ContractChgDate")) + 19110000;
-		// 序號
-		int iContractChgNo = parse.stringToInteger(titaVo.getParam("ContractChgNo"));
+		parse.stringToInteger(titaVo.getParam("ContractChgNo"));
 		// 契變手續費
 		BigDecimal feeAmt = parse.stringToBigDecimal(titaVo.getParam("TimFeeAmt"));
 		String iRvNo = parse.IntegerToString(iContractChgDate, 8) + titaVo.getParam("ContractChgNo");
@@ -165,8 +160,7 @@ public class L2670 extends TradeBuffer {
 			if (tAcReceivable.getClsFlag() == 1)
 				throw new LogicException(titaVo, "E0010", "該筆已銷帳"); // E0010功能選擇錯誤
 
-			// 變更前
-			AcReceivable beforeAcReceivable = (AcReceivable) dataLog.clone(tAcReceivable);
+			dataLog.clone(tAcReceivable);
 
 			acReceivableList.add(tAcReceivable);
 

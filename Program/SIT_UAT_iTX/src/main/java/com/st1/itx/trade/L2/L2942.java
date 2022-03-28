@@ -21,11 +21,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * END=X,1<br>
- */
-
 @Service("L2942")
 @Scope("prototype")
 /**
@@ -72,8 +67,7 @@ public class L2942 extends TradeBuffer {
 
 		// new ArrayList
 		List<ForeclosureFee> lForeclosureFee = new ArrayList<ForeclosureFee>();
-		// new table
-		ForeclosureFee tForeclosureFee = new ForeclosureFee();
+		new ForeclosureFee();
 
 		// 測試該會計日期是否存在法拍費用檔
 		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.openAcDateBetween(iAccDateStart, iAccDateEnd, this.index, this.limit, titaVo);

@@ -96,6 +96,7 @@ BEGIN
                                 AND LA."ASCADT" <= LI."IRTADT"
           WHERE NVL(LI."IRTADT",0) > 0 -- 篩選放款戶利率檔生效日期不為0者
             AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
+            AND LI."IRTADT" >= LM."LMSLLD" -- 基本利率生效日期>=撥款日
          ) R
     LEFT JOIN "FacProd" FP ON FP."ProdNo" = R."IRTBCD"
     WHERE R."Seq" = 1 -- 加碼利率生效日早於適用利率生效日且最近的一筆
@@ -129,6 +130,10 @@ BEGIN
            , ROW_NUMBER()
              OVER (
                PARTITION BY CB."BaseRateCode"
+                          , LA."LMSACN"
+                          , LA."LMSAPN"
+                          , LA."LMSASQ"
+                          , LA."ASCADT"
                ORDER BY CB."EffectDate" DESC
              ) AS "CbSeq"
       FROM "LA$ASCP" LA
@@ -152,6 +157,7 @@ BEGIN
         AND NVL(LRC."EffectDate",0) = 0 -- 尚未被記錄在放款利率變動檔的加碼利率才寫入
         AND NVL(FP."BaseRateCode",'00') IN ('01','02')
         AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
+        AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
     )
     SELECT "LMSACN"                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,"LMSAPN"                       AS "FacmNo"              -- 額度編號 DECIMAL 3 0
@@ -375,7 +381,7 @@ BEGIN
                               AND O2."BormNo" = O1."BormNo"
                               AND O2."Seq" = 2
       WHERE O1."Seq" = 1
-        AND TO_DATE(O1."EffectDate",'YYYYMMDD') > ADD_MONTHS(TO_DATE(TbsDyF,'YYYYMMDD'),1)
+        AND TO_DATE(O1."EffectDate",'YYYYMMDD') > ADD_MONTHS(TO_DATE("TbsDyF",'YYYYMMDD'),1)
     ) S1
     ON (
       S1."CustNo" = T1."CustNo"

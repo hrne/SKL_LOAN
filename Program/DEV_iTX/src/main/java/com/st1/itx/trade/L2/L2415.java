@@ -241,8 +241,6 @@ public class L2415 extends TradeBuffer {
 			tClBuilding.setContractDate(0);
 			tClBuilding.setBdUsageCode("");
 			tClBuilding.setParkingTypeCode("");
-//			tClBuilding.setParkingProperty("");
-//			tClBuilding.setParkingArea(BigDecimal.ZERO);
 			tClBuilding.setHouseTaxNo("");
 			tClBuilding.setHouseBuyDate(0);
 		} else {
@@ -264,8 +262,6 @@ public class L2415 extends TradeBuffer {
 			tClBuilding.setContractDate(parse.stringToInteger(titaVo.getParam("ContractDate")));
 			tClBuilding.setBdUsageCode(titaVo.getParam("BdUsageCode"));
 			tClBuilding.setParkingTypeCode(titaVo.getParam("ParkingTypeCode"));
-//			tClBuilding.setParkingArea(parse.stringToBigDecimal(titaVo.getParam("ParkingArea")));
-//			tClBuilding.setParkingProperty(titaVo.getParam("ParkingProperty"));
 			tClBuilding.setHouseTaxNo(titaVo.getParam("HouseTaxNo"));
 			tClBuilding.setHouseBuyDate(parse.stringToInteger(titaVo.getParam("HouseBuyDate")));
 		}

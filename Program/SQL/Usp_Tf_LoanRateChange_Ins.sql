@@ -96,6 +96,7 @@ BEGIN
                                 AND LA."ASCADT" <= LI."IRTADT"
           WHERE NVL(LI."IRTADT",0) > 0 -- 篩選放款戶利率檔生效日期不為0者
             AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
+            AND LI."IRTADT" >= LM."LMSLLD" -- 基本利率生效日期>=撥款日
          ) R
     LEFT JOIN "FacProd" FP ON FP."ProdNo" = R."IRTBCD"
     WHERE R."Seq" = 1 -- 加碼利率生效日早於適用利率生效日且最近的一筆
@@ -125,10 +126,14 @@ BEGIN
            , FP."BaseRateCode"
            , FP."IncrFlag"
            , LA."ASCRAT"
-           , NVL(CB."BaseRate",0)
+           , NVL(CB."BaseRate",0) AS "BaseRate"
            , ROW_NUMBER()
              OVER (
                PARTITION BY CB."BaseRateCode"
+                          , LA."LMSACN"
+                          , LA."LMSAPN"
+                          , LA."LMSASQ"
+                          , LA."ASCADT"
                ORDER BY CB."EffectDate" DESC
              ) AS "CbSeq"
       FROM "LA$ASCP" LA
@@ -152,6 +157,7 @@ BEGIN
         AND NVL(LRC."EffectDate",0) = 0 -- 尚未被記錄在放款利率變動檔的加碼利率才寫入
         AND NVL(FP."BaseRateCode",'00') IN ('01','02')
         AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
+        AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
     )
     SELECT "LMSACN"                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,"LMSAPN"                       AS "FacmNo"              -- 額度編號 DECIMAL 3 0
@@ -320,6 +326,74 @@ BEGIN
              AND S1."RateIncr" IS NOT NULL)
     WHEN MATCHED THEN UPDATE SET
     T1."RateIncr"  = S1."RateIncr" 
+    ;
+
+    -- 2022-03-23 智偉新增
+    -- 將預調利率更新為前一筆利率的數字
+    MERGE INTO "LoanRateChange" T1
+    USING (
+      WITH LBM AS (
+        SELECT "CustNo"
+             , "FacmNo"
+             , "BormNo"
+             , "Status"
+        FROM "LoanBorMain"
+      )
+      , orderedData AS (
+        SELECT LRC."CustNo"
+             , LRC."FacmNo"
+             , LRC."BormNo"
+             , LRC."EffectDate"
+             , LRC."Status"
+             , LRC."RateCode"
+             , LRC."ProdNo"
+             , LRC."BaseRateCode"
+             , LRC."IncrFlag"
+             , LRC."RateIncr"
+             , LRC."IndividualIncr"
+             , LRC."FitRate"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY LRC."CustNo"
+                            , LRC."FacmNo"
+                            , LRC."BormNo"
+                 ORDER BY LRC."EffectDate" DESC
+               ) AS "Seq"
+        FROM "LoanRateChange" LRC
+        LEFT JOIN LBM ON LBM."CustNo" = LRC."CustNo"
+                     AND LBM."FacmNo" = LRC."FacmNo"
+                     AND LBM."BormNo" = LRC."BormNo"
+        LEFT JOIN "FacProd" FP ON FP."ProdNo" = LRC."ProdNo"
+        WHERE NVL(LBM."Status",-1) = 0
+          AND LRC."BaseRateCode" = '99'
+          AND FP."EmpFlag" = 'N' -- 排除員工商品
+      ) 
+      SELECT O1."CustNo"
+           , O1."FacmNo"
+           , O1."BormNo"
+           , O1."EffectDate"
+           , O2."RateIncr"
+           , O2."IndividualIncr"
+           , O2."FitRate"
+      FROM orderedData O1
+      LEFT JOIN orderedData O2 ON O2."CustNo" = O1."CustNo"
+                              AND O2."FacmNo" = O1."FacmNo"
+                              AND O2."BormNo" = O1."BormNo"
+                              AND O2."Seq" = 2
+      WHERE O1."Seq" = 1
+        AND TO_DATE(O1."EffectDate",'YYYYMMDD') > ADD_MONTHS(TO_DATE("TbsDyF",'YYYYMMDD'),1)
+    ) S1
+    ON (
+      S1."CustNo" = T1."CustNo"
+      AND S1."FacmNo" = T1."FacmNo"
+      AND S1."BormNo" = T1."BormNo"
+      AND S1."EffectDate" = T1."EffectDate"
+    )
+    WHEN MATCHED THEN UPDATE SET
+    T1."RateIncr" = NVL(S1."RateIncr",0)
+    , T1."IndividualIncr" = NVL(S1."IndividualIncr",0)
+    , T1."FitRate" = NVL(S1."FitRate",0)
+    , T1."Remark" = '預調利率'
     ;
 
     -- 記錄程式結束時間

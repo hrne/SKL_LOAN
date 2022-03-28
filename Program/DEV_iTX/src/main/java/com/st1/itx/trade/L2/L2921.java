@@ -22,18 +22,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CaseNo=9,7<br>
- * CustNo=9,7<br>
- * CustId=X,10<br>
- * ApplNo=9,7<br>
- * TELLER=X,6<br>
- * FacmNo=9,3<br>
- * CloseCode=9,1<br>
- * END=X,1<br>
- */
-
 @Service("L2921")
 @Scope("prototype")
 /**

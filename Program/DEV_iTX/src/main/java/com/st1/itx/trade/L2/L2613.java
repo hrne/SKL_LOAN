@@ -23,17 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * OOAcDate=9,7<br>
- * OOENTRYDATE=9,7<br>
- * OOCustNoFacmNo=X,11<br>
- * OOFee=X,21<br>
- * OOReceiveDate=9,7<br>
- * OOCloseDate=9,7<br>
- * OOOverdueDate=9,7<br>
- */
-
 @Service("L2613")
 @Scope("prototype")
 /**

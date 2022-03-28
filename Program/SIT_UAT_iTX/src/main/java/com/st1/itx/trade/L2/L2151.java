@@ -28,12 +28,7 @@ import com.st1.itx.util.parse.Parse;
  * L2151 駁回額度登錄
  * a.若申請案件資料為駁時,只需輸入准駁日期
  */
-/*
- * Tita
- * FuncCode=X,1
- * ApplNo=9,7
- * ApproveDate=9,7
- */
+
 /**
  * L2151 駁回額度登錄
  * 
@@ -43,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2151")
 @Scope("prototype")
 public class L2151 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2151.class);
 
 	/* DB服務注入 */
 	@Autowired

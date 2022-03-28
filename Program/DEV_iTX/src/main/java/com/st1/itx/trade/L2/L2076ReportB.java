@@ -53,8 +53,6 @@ public class L2076ReportB extends MakeReport {
 	@Autowired
 	public LoanCom loanCom;
 
-//	private static DecimalFormat df = new DecimalFormat("#########################0.0#");
-
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -77,15 +75,9 @@ public class L2076ReportB extends MakeReport {
 	private TempVo t2TempVo = new TempVo();
 
 	private String security = "";
-//	private String pageSize ="A5";
 	private String pageOrientation = "P";
 	private int iCustNo = 0;
 	private int iCloseNo = 0;
-
-//	// 製表日期
-//	private String NowDate;
-//	// 製表時間
-//	private String NowTime;
 
 	// 自訂表頭
 	@Override
@@ -93,8 +85,6 @@ public class L2076ReportB extends MakeReport {
 
 		this.info("L2076ReportB.printHeader");
 
-//		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
-//		this.print(-3, 55, "抵押權塗銷同意書", "C");
 		this.print(-4, 6, "", "L");
 
 		// 明細起始列(自訂亦必須)
@@ -109,8 +99,6 @@ public class L2076ReportB extends MakeReport {
 	@Override
 	public void printFooter() {
 		this.print(-15, 25, " ");
-
-//		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo());
 	}
 
 	public Boolean exec(FacClose tFacClose, List<TxTemp> txTemp, TitaVo titaVo) throws LogicException {
@@ -211,14 +199,6 @@ public class L2076ReportB extends MakeReport {
 			}
 		}
 		this.print(-41, 42, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
-
-//		for (int i = 1; i <= 400; i++) {
-//			if ((i % 10) == 0) {
-//				this.print(-2, i, "" + (i / 10));
-//			}
-//			this.print(-1, i, "" + (i % 10));
-//			this.print(-i, 1, "" + (i % 10));
-//		}
 
 		long sno = this.close();
 

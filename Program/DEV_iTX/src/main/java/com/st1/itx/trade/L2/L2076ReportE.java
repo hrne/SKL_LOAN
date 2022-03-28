@@ -52,8 +52,6 @@ public class L2076ReportE extends MakeReport {
 
 		this.info("L2076ReportE exec");
 
-//		String tran = titaVo.getTxCode().isEmpty() ? "L2631E" : titaVo.getTxCode();
-
 		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2631E", "中華郵政掛號郵件收件回執", "cm,19,9.5", "P");
 		
 		this.setFont(1);

@@ -303,17 +303,17 @@ T(2,Y)
 ##loop{times:40,i:1}
 
 ! 不寄送記號-書面
-#Paper{i}=X,1,I,ui:checkbox;value:;
-C(4,#FormNo{i},S,$)
-C(5,#PaperFg{i},N,S,$)
+#Paper{i}=X,1,I
+C(4,#FormNo{i},s,$)
+C(5,#PaperFg{i},N,s,$)
 HELP(Y:不寄送; :寄送)
 @
 C(4,#Paper{i},$,IF(#Paper{i} == #CheckY,$,V(P,限輸入Y或空白)))
 
 ! 不發送記號-簡訊
-#Msg{i}=X,1,I,ui:checkbox;value:;
-C(4,#FormNo{i},S,$)
-C(5,#MsgFg{i},N,S,$)
+#Msg{i}=X,1,I
+C(4,#FormNo{i},s,$)
+C(5,#MsgFg{i},N,s,$)
 C(3,#IsCheck,0,$,C(5,#CanMsg,0,T(3,Y),$))
 HELP(Y:不發送; :發送)
 @
@@ -324,9 +324,9 @@ C(4,#Msg{i},$,IF(#Msg{i} == #CheckY,$,V(P,限輸入Y或空白)))
 T(B,#NoticeX{i}+，不可申請全部不寄送)
 
 ! 不發送記號-EMail
-#EMail{i}=X,1,I,ui:checkbox;value:;
-C(4,#FormNo{i},S,$)
-C(5,#EMailFg{i},N,S,$)
+#EMail{i}=X,1,I
+C(4,#FormNo{i},s,$)
+C(5,#EMailFg{i},N,s,$)
 C(3,#IsCheck,0,$,C(5,#CanEmail,0,T(3,Y),$))
 HELP(Y:不發送; :發送)
 @

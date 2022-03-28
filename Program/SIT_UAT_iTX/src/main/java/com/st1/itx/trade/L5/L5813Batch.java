@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -18,11 +19,14 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.YearlyHouseLoanIntService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -34,22 +38,22 @@ public class L5813Batch extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
-
+	
 	@Autowired
 	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
-
+	
 	@Autowired
 	public ClFacService clFacService;
-
+	
 	@Autowired
 	public ClBuildingService sClBuildingService;
-
+	
 	@Autowired
 	public ClBuildingOwnerService sClBuildingOwnerService;
-
+	
 	@Autowired
 	public CdCodeService sCdCodeService;
-
+	
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -57,32 +61,36 @@ public class L5813Batch extends TradeBuffer {
 	public MakeFile makeFile;
 	@Autowired
 	public WebClient webClient;
-
+	@Autowired
+	MakeExcel makeExcel;
 	@Autowired
 	DateUtil dDateUtil;
 
-	private CustMain tCustMain = new CustMain();
-	private CdCode tCdCode = new CdCode();
-	private ClFac tClFac = new ClFac();
-	private ClBuilding tClBuilding = null;
+
 	private Slice<ClBuildingOwner> tClBuildingOwner = null;
 	private ClBuildingOwner cClBuildingOwner = null;
 	private Boolean checkFlag = true;
 	private String sendMsg = " ";
-
+	private String iYear ="";
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
-
-		int tYear = Integer.parseInt(titaVo.getParam("Year")) + 1;
-		String fileCode = "L5813";
-		String fileItem = "國稅局申報媒體檔";
-		String fileName = "每年房屋擔保借款繳息媒體檔" + tYear + "年度.CSV";
-
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
-
+		
+		iYear = titaVo.getParam("Year");
+		String iYearMonth = String.valueOf(Integer.parseInt(iYear)+1911);
+		this.info("iYearMonth=="+iYearMonth);
+		int iyearmonth = Integer.parseInt(iYearMonth+"12");
+		
+		Slice<YearlyHouseLoanInt> tYearlyHouseLoanInt = sYearlyHouseLoanIntService.findYearMonth(iyearmonth, titaVo.getReturnIndex(), 500, titaVo);
+		List<YearlyHouseLoanInt> sYearlyHouseLoanInt = tYearlyHouseLoanInt == null ? null:tYearlyHouseLoanInt.getContent();
+		
+		if(sYearlyHouseLoanInt==null) {
+			throw new LogicException(titaVo, "E0001", "每年房屋擔保借款繳息工作檔無資料");
+		}
+		
 		try {
-			doFile(titaVo);
+			doIR(sYearlyHouseLoanInt,titaVo);//TO 國稅局
+			doOW(sYearlyHouseLoanInt,titaVo);//TO 官網
 		} catch (LogicException e) {
 			checkFlag = false;
 			sendMsg = e.getErrorMsg();
@@ -91,160 +99,446 @@ public class L5813Batch extends TradeBuffer {
 		if (checkFlag) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L5813國稅局申報媒體檔已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
+		
 
-		long sno = makeFile.close();
-
-		this.info("sno : " + sno);
-
-		makeFile.toFile(sno);
-
+		
+		
+		
 		this.addList(this.totaVo);
 		return this.sendList();
-
+		
 	}
 
-	public void doFile(TitaVo titaVo) throws LogicException {
 
-		String iYear = titaVo.getParam("Year");
-		String iYearMonth = String.valueOf(Integer.parseInt(iYear) + 1911);
-		this.info("iYearMonth==" + iYearMonth);
-		int St = Integer.parseInt(iYearMonth + "01");
-		int End = Integer.parseInt(iYearMonth + "12");
 
-		Slice<YearlyHouseLoanInt> tYearlyHouseLoanInt = sYearlyHouseLoanIntService.findbyYear(St, End, titaVo.getReturnIndex(), 500, titaVo);
-		List<YearlyHouseLoanInt> sYearlyHouseLoanInt = tYearlyHouseLoanInt == null ? null : tYearlyHouseLoanInt.getContent();
-
-		if (sYearlyHouseLoanInt == null) {
-			throw new LogicException(titaVo, "E0001", "每年房屋擔保借款繳息工作檔無資料");
-		} else {
-
-			for (YearlyHouseLoanInt iYearlyHouseLoanInt : sYearlyHouseLoanInt) {
-				// 只找尋購置不動產 ***不確定***
-				if (!(("2").equals(iYearlyHouseLoanInt.getUsageCode()) || ("02").equals(iYearlyHouseLoanInt.getUsageCode()))) {
+	public void doIR(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) throws LogicException {
+		//上傳國稅局
+		this.info("into doIR"); 
+		
+		int tYear = Integer.parseInt(titaVo.getParam("Year"))+1;
+		String fileCode = "L5813";
+		String fileItem = "國稅局申報(國稅局-LNM57M1P)";
+		String fileName = "LNM57M1P-"+tYear+"年度.csv";
+		
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
+		
+		
+			
+			for(YearlyHouseLoanInt iYearlyHouseLoanInt : sYearlyHouseLoanInt) {
+				
+				if(!(("2").equals(iYearlyHouseLoanInt.getUsageCode()) || ("02").equals(iYearlyHouseLoanInt.getUsageCode())) ) {
 					continue;
 				}
-				String bdLocation = "";// 建物地址
-				String bdOwner = ""; // 所有權人姓名
-				String bdCustId = ""; // 所有權人身分證
-				int houseBuyDate = iYearlyHouseLoanInt.getHouseBuyDate();// 房屋取的日期
+				
+				
 				String iCustName = "";
 				String iCustId = "";
-				String iUkey = "";
+				String iUkey= "";
+				String bdOwner = ""; // 所有權人姓名
+				String bdCustId = ""; // 所有權人身分證
+				
+				int iCustNo = iYearlyHouseLoanInt.getCustNo();
+				int houseBuyDate = iYearlyHouseLoanInt.getHouseBuyDate();//房屋取的日期
+				int iFacmNo = iYearlyHouseLoanInt.getFacmNo();
+				BigDecimal iLoanAmt = iYearlyHouseLoanInt.getLoanAmt();// 最初初貸金額
+				int iFirstDrawdownDate = iYearlyHouseLoanInt.getFirstDrawdownDate();// 貸款起日
+				int iMaturityDate = iYearlyHouseLoanInt.getMaturityDate(); // 貸款迄日
+				BigDecimal iLoanBal = iYearlyHouseLoanInt.getLoanBal();// 放款餘額
+				int iYYYMM = iYearlyHouseLoanInt.getYearMonth()-191100; 
+				
+				CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+				ClFac tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);//戶號找擔保品
+				
+				//等於自然人 或 擔保品代號等於1，否則跳過
+				
+				if(tCustMain!=null && tClFac!=null) {
+					this.info("getCuscCd=="+tCustMain.getCuscCd());
+					this.info("getClCode1=="+tClFac.getClCode1());
+					if(!("1").equals(tCustMain.getCuscCd()) && !(tClFac.getClCode1()==1)) {
+						this.info("into continue");
+						continue;
+					}
+				}
+				
+							
+				if(tCustMain!=null) {
+					iCustName = tCustMain.getCustName();
+					if(iCustName.length()>9) {
+						iCustName = iCustName.substring(0, 9);
+					} else if(iCustName.length()<9){
+						for(int j = iCustName.length();j<9;j++){
+							iCustName = iCustName+'　';
+						}
+					}
+					iCustId = tCustMain.getCustId();
+					iUkey = tCustMain.getCustUKey();
+				}
+				
+				//戶號找擔保品
+				if(tClFac != null) {
+					int oClCode1 = tClFac.getClCode1();
+					int oClCode2 = tClFac.getClCode2();
+					int oClNo = tClFac.getClNo();
+
+					//所有權人戶名、統編 先找本人
+					cClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(oClCode1,oClCode2,oClNo,iUkey), titaVo);
+					
+					if(cClBuildingOwner != null) {
+						bdOwner = tCustMain.getCustName();
+						bdCustId = tCustMain.getCustId();
+					}else {
+						
+						tClBuildingOwner = sClBuildingOwnerService.clNoEq(oClCode1, oClCode2, oClNo, this.index, this.limit, titaVo);
+						List<ClBuildingOwner> sClBuildingOwner = tClBuildingOwner == null ? null:tClBuildingOwner.getContent();
+						
+						if(sClBuildingOwner != null) {
+							tCustMain = sCustMainService.findById(sClBuildingOwner.get(0).getOwnerCustUKey(), titaVo);
+							bdOwner = tCustMain.getCustName();
+							bdCustId = tCustMain.getCustId();
+						}
+					}
+					
+					
+				}
+				
+
+				TempVo tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(iYearlyHouseLoanInt.getJsonFields());
+				
+				String bdLocation = "";// 建物地址
+				bdLocation = tTempVo.get("BdLoacation");
+				bdLocation = covertToChineseFullChar(bdLocation);
+				if(bdLocation.length()<28) {
+					for(int a=bdLocation.length();a<28;a++) {
+						bdLocation = bdLocation+'　';
+					}
+				}
+				
+				
+				
+				
+				for(int i= bdOwner.length(); i<9;i++) {
+					bdOwner = bdOwner+"　";
+				}
+				
+				//貸款帳號
+				String iAccounount = "";				
+				iAccounount = String.format("%07d", iCustNo)+"-"+String.format("%03d", iFacmNo);
+				
+				
 				String iYearMonthSt = "";// 繳息年月起
+				
+				int yyymm =  iYYYMM/100;
+				this.info("yyymm=="+yyymm);
+				
+				int firstdrawdowndate = iFirstDrawdownDate/10000;
+				this.info("firstdrawdowndate=="+firstdrawdowndate);	
+				
+				//若資料年度與貸款起日年度相等，則繳息年月放貸款起日年月
+				//若資料年度大於貸款起日，則放資料年度+01
+				if(yyymm==firstdrawdowndate) {
+					firstdrawdowndate = iFirstDrawdownDate/100;
+					iYearMonthSt = String.valueOf(firstdrawdowndate);
+				} else if(yyymm > firstdrawdowndate) {
+					iYearMonthSt = yyymm+"01";
+				}
+				this.info("iYearMonthSt=="+iYearMonthSt);
+	
+				
+				
+				String cUsageCode = iYearlyHouseLoanInt.getUsageCode();
+				if(!cUsageCode.isEmpty() && cUsageCode.length()<2) {
+					cUsageCode = "0"+cUsageCode;
+				}
+
+				
+				
+			String strField = "";
+			String vertical ="|";
+			
+			strField += iYear; // 年度 
+			strField += vertical;
+			strField += "458"; // 金融機構固定458
+			strField += vertical;
+			strField += "    ";// 分行代號 空白
+			strField += vertical;
+			strField += bdLocation+"  "; // 房屋座落地址
+			strField += vertical;
+			strField += bdOwner; // 房屋所有權人姓名
+			strField += vertical;
+			strField += FormatUtil.padX(bdCustId,10); // 房屋所有權人身分證統一編號
+			strField += vertical;
+			if(houseBuyDate==0) {
+				strField += "       ";
+			}else {
+				strField += String.format("%07d",houseBuyDate); // 房屋所有權取得日 YYYMMDD
+			}
+			
+			strField += vertical;
+			strField += iCustName; // 借款人姓名 
+			strField += vertical;
+			strField += makeFile.fillStringL(iCustId, 16); // 借款人身分證統一編號
+			strField += vertical;
+			strField +=  makeFile.fillStringR(iAccounount,50); // 貸款帳號
+			strField += vertical;
+			strField +=  StringUtils.leftPad(String.valueOf(iLoanAmt), 10, '0'); // 最初貸款金額  右靠前埔0
+			strField += vertical;
+			strField += String.valueOf(iFirstDrawdownDate); // 貸款起日 
+			strField += vertical;
+			strField += String.valueOf(iMaturityDate); // 貸款迄日 
+			strField += vertical;
+			strField += StringUtils.leftPad(String.valueOf(iLoanBal), 10, '0'); // 截至本年度未償還本金餘額
+			strField += vertical;
+			strField += iYearMonthSt; // 繳息年月起
+			strField += vertical;
+			strField += String.valueOf(iYYYMM); // 繳息年月迄
+			strField += vertical;
+			strField += StringUtils.leftPad(String.valueOf(iYearlyHouseLoanInt.getYearlyInt()), 10, '0'); // 年度實際繳息金額  右靠前埔0
+
+			makeFile.put(strField);
+			}	
+		
+			long sno1 = makeFile.close();
+
+			this.info("sno1 : " + sno1);
+
+			makeFile.toFile(sno1);
+		
+		
+	}
+
+public void doOW(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) throws LogicException {
+		//上傳官網
+		this.info("into doOW");
+
+		int tYear = Integer.parseInt(titaVo.getParam("Year"))+1;
+		String fileCode = "L5813";
+		String fileItem = "國稅局申報(官網-LNM572P)";
+		String fileName = "LNM572P-"+tYear+"年度";
+		
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5813", fileItem, fileName, "LNM572P-"+tYear);
+
+		
+		
+			
+			for(YearlyHouseLoanInt iYearlyHouseLoanInt : sYearlyHouseLoanInt) {
+				
+				
+				
+				String bdOwner = ""; // 所有權人姓名
+				String bdCustId = ""; // 所有權人身分證
+				String iCustName = "";
+				String iCustId = "";
+				String iUkey= "";
+				
+				int houseBuyDate = iYearlyHouseLoanInt.getHouseBuyDate();//房屋取的日期
 				int iCustNo = iYearlyHouseLoanInt.getCustNo();
 				int iFacmNo = iYearlyHouseLoanInt.getFacmNo();
 				BigDecimal iLoanAmt = iYearlyHouseLoanInt.getLoanAmt();// 最初初貸金額
 				int iFirstDrawdownDate = iYearlyHouseLoanInt.getFirstDrawdownDate();// 貸款起日
 				int iMaturityDate = iYearlyHouseLoanInt.getMaturityDate(); // 貸款迄日
 				BigDecimal iLoanBal = iYearlyHouseLoanInt.getLoanBal();// 放款餘額
-
-				TempVo tTempVo = new TempVo();
-				tTempVo = tTempVo.getVo(iYearlyHouseLoanInt.getJsonFields());
-				bdLocation = tTempVo.get("F21");
-
-				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-
-				if (tCustMain == null) {
-					throw new LogicException(titaVo, "E0001", "客戶資料主檔,戶號=" + iCustNo);
-				} else {
+				String cUsageCode = iYearlyHouseLoanInt.getUsageCode(); // 用途別
+				int iYYYMM = iYearlyHouseLoanInt.getYearMonth()-191100; //資料年月
+				
+	
+				CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+				ClFac tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);//戶號找擔保品
+				
+				
+				//等於自然人 或 擔保品代號等於1，否則跳過
+				if(tCustMain!=null && tClFac!=null) {
+					if(!("1").equals(tCustMain.getCuscCd()) && !!(tClFac.getClCode1()==1)) {
+						continue;
+					}
+				}
+				
+				if(tCustMain!=null) {
 					iCustName = tCustMain.getCustName();
-					if (iCustName.length() > 6) {
-						iCustName = iCustName.substring(0, 6);
+					if(iCustName.length()>5) {
+						iCustName = iCustName.substring(0, 5);
+					} else if(iCustName.length()<5){
+						for(int j = iCustName.length();j<5;j++){
+							iCustName = iCustName+'　';
+						}
 					}
 					iCustId = tCustMain.getCustId();
 					iUkey = tCustMain.getCustUKey();
 				}
-
-				// 戶號找擔保品
-				tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);
-
-				if (tClFac != null) {
+				
+				
+				
+				//戶號找擔保品
+				if(tClFac != null) {
 					int oClCode1 = tClFac.getClCode1();
 					int oClCode2 = tClFac.getClCode2();
 					int oClNo = tClFac.getClNo();
-//					tClBuilding = sClBuildingService.findById(new ClBuildingId(oClCode1, oClCode2, oClNo), titaVo);
-//					if(tClBuilding!=null) {
-//						bdLocation = tClBuilding.getBdLocation();//	
-//					}
 
-					// 所有權人戶名、統編 先找本人
-					cClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(oClCode1, oClCode2, oClNo, iUkey), titaVo);
-
-					if (cClBuildingOwner != null) {
+					//所有權人戶名、統編 先找本人
+					cClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(oClCode1,oClCode2,oClNo,iUkey), titaVo);
+					
+					if(cClBuildingOwner != null) {
 						bdOwner = tCustMain.getCustName();
 						bdCustId = tCustMain.getCustId();
-					} else {
-
+					}else {
+						
 						tClBuildingOwner = sClBuildingOwnerService.clNoEq(oClCode1, oClCode2, oClNo, this.index, this.limit, titaVo);
-						List<ClBuildingOwner> sClBuildingOwner = tClBuildingOwner == null ? null : tClBuildingOwner.getContent();
-
-						if (sClBuildingOwner != null) {
+						List<ClBuildingOwner> sClBuildingOwner = tClBuildingOwner == null ? null:tClBuildingOwner.getContent();
+						
+						if(sClBuildingOwner != null) {
 							tCustMain = sCustMainService.findById(sClBuildingOwner.get(0).getOwnerCustUKey(), titaVo);
 							bdOwner = tCustMain.getCustName();
 							bdCustId = tCustMain.getCustId();
 						}
 					}
-
+					
+					
 				}
+				for(int i= bdOwner.length(); i<19;i++) {
+					bdOwner = bdOwner+"　";
+				}
+				
+				String bdLocation = "";// 建物地址
+				String bdSpace = "";//空白
+				
+				//地址
+				TempVo tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(iYearlyHouseLoanInt.getJsonFields());
+				bdLocation = tTempVo.get("BdLoacation");
+				bdLocation = covertToChineseFullChar(bdLocation);
+				if(bdLocation.length()<28) {
+					for(int a=bdLocation.length();a<28;a++) {
+						bdLocation = bdLocation+'　';
+					}
+				}
+				
+				//貸款帳號
+				String iAccounount = "";
+				iAccounount = String.format("%07d", iCustNo)+"-"+String.format("%03d", iFacmNo);
 
-				int iYYYMM = iYearlyHouseLoanInt.getYearMonth() - 191100;
-				if (iYearlyHouseLoanInt.getFirstDrawdownDate() < iYYYMM * 100) {// 繳息年月起
-					iYearMonthSt = String.valueOf(iYYYMM).substring(0, 3) + "01";
+				// 繳息年月起
+				
+				String iYearMonthSt = "";
+				
+				int yyymm =  iYYYMM/100;
+				this.info("yyymm=="+yyymm);
+				
+				int firstdrawdowndate = iFirstDrawdownDate/10000;
+				this.info("firstdrawdowndate=="+firstdrawdowndate);	
+				
+				//若資料年度與貸款起日年度相等，則繳息年月放貸款起日年月
+				//若資料年度大於貸款起日，則放資料年度+01
+				if(yyymm==firstdrawdowndate) {
+					firstdrawdowndate = iFirstDrawdownDate/100;
+					iYearMonthSt = String.valueOf(firstdrawdowndate);
+				} else if(yyymm > firstdrawdowndate) {
+					iYearMonthSt = yyymm+"01";
+				}
+				this.info("iYearMonthSt=="+iYearMonthSt);
+				
+				
+				String iUsageCode = "";
+				if(!cUsageCode.isEmpty() && cUsageCode.length()<2) {
+					cUsageCode = "0"+cUsageCode;
+				}
+				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode",cUsageCode),titaVo);
+				if(tCdCode!=null) {// 用途別
+					iUsageCode = tCdCode.getItem();
 				} else {
-					iYearMonthSt = String.valueOf(iYearlyHouseLoanInt.getFirstDrawdownDate() / 100);
+					iUsageCode = "週轉金";
 				}
-
-				String cUsageCode = iYearlyHouseLoanInt.getUsageCode();
-				if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
-					cUsageCode = "0" + cUsageCode;
-				}
-//				tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode",cUsageCode),titaVo);
-//				if(tCdCode!=null) {
-//					iUsageCode = tCdCode.getItem();// 用途別
-//				}
-
-				String strField = "";
-				strField += iYear; // 年度 3碼
-				strField += ",";
-				strField += "458"; // 金融機構固定458 3碼
-				strField += ",";
-				strField += "    ";// 分行代號 空白 4碼
-				strField += ",";
-				strField += bdLocation; // 房屋座落地址 120碼
-				strField += ",";
-				strField += bdOwner; // 房屋所有權人姓名 40碼
-				strField += ",";
-				strField += bdCustId; // 房屋所有權人身分證統一編號 10碼
-				strField += ",";
-				strField += String.valueOf(houseBuyDate); // 房屋所有權取得日 7碼 YYYMMDD
-				strField += ",";
-				strField += iCustName; // 借款人姓名 12碼
-				strField += ",";
-				strField += iCustId; // 借款人身分證統一編號 10碼
-				strField += ",";
-				strField += String.format("%07d", iCustNo) + "-" + String.format("%03d", iFacmNo); // 貸款帳號 50 碼
-				strField += ",";
-				strField += String.valueOf(iLoanAmt); // 最初貸款金額 10碼 右靠前埔0
-				strField += ",";
-				strField += String.valueOf(iFirstDrawdownDate); // 貸款起日 7碼
-				strField += ",";
-				strField += String.valueOf(iMaturityDate); // 貸款迄日 7碼
-				strField += ",";
-				strField += String.valueOf(iLoanBal); // 截至本年度未償還本金餘額 10碼
-				strField += ",";
-				strField += iYearMonthSt; // 繳息年月起 5碼 *不確定*
-				strField += ",";
-				strField += String.valueOf(iYYYMM); // 繳息年月迄 5碼 *不確定*
-				strField += ",";
-				strField += String.valueOf(iYearlyHouseLoanInt.getYearlyInt()); // 年度實際繳息金額 10碼 右靠前埔0
-//			strField += ",";
-//			strField += iUsageCode; // 用途別 12碼
-				makeFile.put(strField);
+				
+				
+			String strField = "";
+			String vertical =",";
+			
+			strField += iYear; // 年度 
+			strField += vertical;
+			strField += "458"; // 金融機構固定458
+			strField += vertical;
+			strField += "    ";// 分行代號 空白
+			strField += vertical;
+			strField += bdLocation+FormatUtil.padX(bdSpace,62); // 房屋座落地址
+			strField += vertical;
+			strField += bdOwner; // 房屋所有權人姓名
+			strField += vertical;
+			strField += FormatUtil.padX(bdCustId,10); // 房屋所有權人身分證統一編號
+			strField += vertical;
+			if(houseBuyDate==0) {
+				strField += "       ";
+			}else {
+				strField += String.format("%07d",houseBuyDate); // 房屋所有權取得日 YYYMMDD
 			}
-		}
+			
+			strField += vertical;
+			strField += iCustName; // 借款人姓名 
+			strField += vertical;
+			strField += FormatUtil.padX(iCustId, 10); // 借款人身分證統一編號
+			strField += vertical;
+			strField += "      "+makeFile.fillStringR(iAccounount,50); // 貸款帳號
+			strField += vertical;
+			strField +=  StringUtils.leftPad(String.valueOf(iLoanAmt), 10, '0'); // 最初貸款金額  右靠前埔0
+			strField += vertical;
+			strField += String.valueOf(iFirstDrawdownDate); // 貸款起日 
+			strField += vertical;
+			strField += String.valueOf(iMaturityDate); // 貸款迄日 
+			strField += vertical;
+			strField += StringUtils.leftPad(String.valueOf(iLoanBal), 10, '0'); // 截至本年度未償還本金餘額
+			strField += vertical;
+			strField += iYearMonthSt; // 繳息年月起 
+			strField += vertical;
+			strField += String.valueOf(iYYYMM); // 繳息年月迄  
+			strField += vertical;
+			strField += StringUtils.leftPad(String.valueOf(iYearlyHouseLoanInt.getYearlyInt()), 10, '0'); // 年度實際繳息金額  右靠前埔0
+			strField += vertical;
+			strField += iUsageCode; // 用途別 12碼
+			makeFile.put(strField);
+			
+			
+		
+			}	
+			
+			long sno2 = makeFile.close();
 
-	}
+			this.info("sno2 : " + sno2);
+
+			makeFile.toFile(sno2);
+			
+		}
+		
+		
+		
+	
+
+	 public String covertToChineseFullChar(String str) {  
+         String result = "";  
+         if (StringUtils.isNotEmpty(str)) {  
+              char[] chars = str.toCharArray();  
+              for (int i = 0; i < chars.length; i++) { //bypass Chinese character   
+                   if (chars[i] > '\200') {  
+                        continue;  
+                   }  
+                   // 半型空白轉成全型空白  
+                   if (chars[i] == 32) {  
+                        chars[i] = (char) 12288;  
+                        continue;  
+                   }  
+                   // 有定義的字、數字及符號  
+                   if (Character.isLetterOrDigit(chars[i])) {  
+                        chars[i] = (char) (chars[i] + 65248);  
+                        continue;  
+                   }  
+                   // 其它不合要求的，全部轉成全型空白。  
+                   chars[i] = (char) 12288;  
+              }  
+              result = String.valueOf(chars);  
+         }  
+         return result;  
+    }  
+
 
 }

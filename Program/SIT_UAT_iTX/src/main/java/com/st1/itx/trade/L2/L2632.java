@@ -25,10 +25,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- */
-
 @Service("L2632")
 @Scope("prototype")
 /**

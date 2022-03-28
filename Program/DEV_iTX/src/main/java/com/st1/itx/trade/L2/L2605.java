@@ -40,11 +40,6 @@ import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ReceiveDate=9,7<br>
- */
-
 @Service("L2605")
 @Scope("prototype")
 /**
@@ -162,10 +157,6 @@ public class L2605 extends TradeBuffer {
 		for (int i = 0; i < listsize; i++) {
 			// 本筆
 			ForeclosureFee tmpFF = lForeclosureFee.get(i);
-
-//			if (tmpFF.getCloseDate() > 0) {
-//				continue;
-//			}
 
 			// 與下一筆比較戶號(比到額度層)及收件日
 			int nextCustNo;

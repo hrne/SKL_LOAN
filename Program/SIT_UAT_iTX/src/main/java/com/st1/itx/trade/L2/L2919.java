@@ -18,13 +18,6 @@ import com.st1.itx.db.service.springjpa.cm.L2919ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CustId=X,10<br>
- * BORROWER=X,1<br>
- * END=X,1<br>
- */
-
 @Service("L2919")
 @Scope("prototype")
 /**

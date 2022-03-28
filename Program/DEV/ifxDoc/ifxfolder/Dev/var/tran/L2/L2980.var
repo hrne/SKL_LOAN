@@ -309,6 +309,21 @@ S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#Rim
 R(1,L2R05)
 
 
+#TimBormNo=A,3,L
+E(0,#L2r05BormNo)
+
+#RimBormNo=A,3,L
+
+#SendL3r02=X,1,S
+E(0,@RimFuncCode,5)
+!C(3,#CustNo,0,E(0,@RimCustNo,#TimCustNo),E(0,@RimCustNo,#CustNo))
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#TimBormNo)
+RESET_RIM(#SendL3r02,L3R02)
+S(L3R02,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo)
+R(1,L3R02)
+
 ![基本利率代碼]
 #FdProdNo=X,2,L
 
@@ -391,7 +406,7 @@ T(2,#L2r01BreachDecreaseMonth)
 #FdApproveRate=X,2,L
 
 #ApproveRate=n,2.4,L
-E(0,#L2r05ApproveRate)
+E(0,#L3r02ApproveRate)
 
 #ApproveRateX=X,12,L
 
@@ -400,21 +415,6 @@ E(0,#L2r05ApproveRate)
 
 #BreachPercent=n,3.2,L
 E(0,#L2r01BreachPercent)
-
-#TimBormNo=A,3,L
-E(0,#L2r05BormNo)
-
-#RimBormNo=A,3,L
-
-#SendL3r02=X,1,S
-E(0,@RimFuncCode,5)
-!C(3,#CustNo,0,E(0,@RimCustNo,#TimCustNo),E(0,@RimCustNo,#CustNo))
-E(0,@RimCustNo,#CustNo)
-E(0,@RimFacmNo,#FacmNo)
-E(0,@RimBormNo,#TimBormNo)
-RESET_RIM(#SendL3r02,L3R02)
-S(L3R02,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo)
-R(1,L3R02)
 
 ![目前利率]
 #FdStoreRate=X,2,L

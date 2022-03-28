@@ -18,15 +18,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ReceiveDateStart=9,7<br>
- * ReceiveDateEnd=9,7<br>
- * CustNoStart=9,7<br>
- * CustNoEnd=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2078")
 @Scope("prototype")
 /**
@@ -37,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L2078 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2078.class);
 
 	/* DB服務注入 */
 	@Autowired

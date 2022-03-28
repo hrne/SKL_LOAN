@@ -43,6 +43,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 		String BatchNo = titaVo.getParam("BatchNo");
 		int AcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		int EntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 
 		String sql = "  WITH TX1 AS (";
 		sql += "    SELECT \"CustNo\"";
@@ -55,6 +56,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , \"TitaTxtNo\"";
 		sql += "    FROM \"LoanBorTx\"";
 		sql += "    WHERE \"AcDate\" = :inputAcDate";
+		sql += "      AND \"EntryDate\" = :inputEntryDate";
 		sql += "      AND \"TitaHCode\" = 0";
 		sql += "    GROUP BY \"CustNo\"";
 		sql += "           , \"FacmNo\"";
@@ -92,6 +94,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AS \"LawFee\"";
 		sql += "    FROM \"LoanBorTx\"";
 		sql += "    WHERE \"AcDate\" = :inputAcDate";
+		sql += "      AND \"EntryDate\" = :inputEntryDate";
 		sql += "      AND \"TitaHCode\" = 0";
 		sql += "    GROUP BY \"CustNo\"";
 		sql += "           , \"FacmNo\"";
@@ -247,6 +250,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "  AND BKD.\"AcDate\" = :inputAcDate";
+		sql += "  AND BKD.\"EntryDate\" = :inputEntryDate";
 		sql += "  ORDER BY SUBSTR(BKD.\"TitaTxtNo\",0,2)";
 		sql += "       , BKD.\"EntryDate\"";
 		sql += "       , BKD.\"RepayBank\"";
@@ -266,6 +270,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		query.setParameter("inputBatchNo", BatchNo);
 		query.setParameter("inputAcDate", AcDate);
+		query.setParameter("inputEntryDate", EntryDate);
 		return this.convertToMap(query);
 	}
 
@@ -347,6 +352,8 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ORDER BY BKD.\"RepayBank\"    ";
 		sql += "       , BKD.\"AcctCode\"     ";
 		sql += "       , BKD.\"CustNo\"       ";
+		sql += "       , BKD.\"IntStartDate\" ";
+		sql += "       , BKD.\"IntEndDate\"   ";
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);

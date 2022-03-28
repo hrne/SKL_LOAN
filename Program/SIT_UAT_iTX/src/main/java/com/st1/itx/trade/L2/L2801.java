@@ -177,7 +177,6 @@ public class L2801 extends TradeBuffer {
 			// 不存在抓日歷日
 			if (tFacMain == null) {
 				throw new LogicException(iTitaVo, "E0001", " 額度主檔 借款人戶 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
-//				YetDate = this.parse.stringToInteger(iTitaVo.getParam("CALDY")); // 日曆日 CALDY
 			} else {
 				// 存在抓首撥日 或 首撥日為0時也抓日曆日
 				if (tFacMain.getFirstDrawdownDate() == 0) {
@@ -202,9 +201,6 @@ public class L2801 extends TradeBuffer {
 
 			dDateUtil.init();
 			dDateUtil.getbussDate(YetDate, wkYetDays);
-//			dDateUtil.setDate_1(YetDate);
-//			dDateUtil.setMons(0);
-//			dDateUtil.setDays(wkYetDays);
 
 			tLoanNotYet.setYetDate(dDateUtil.getCalenderDay());
 		} else {

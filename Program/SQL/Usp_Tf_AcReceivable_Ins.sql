@@ -127,6 +127,10 @@ BEGIN
           ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "FacMain" F1
     LEFT JOIN "LoanBorMain" L1 ON L1."CustNo" = F1."CustNo"
                               AND L1."FacmNo" = F1."FacmNo"
@@ -156,9 +160,14 @@ BEGIN
     -- F25 : 催收款項-火險費用
     INSERT INTO "AcReceivable"
     SELECT CASE
-             WHEN S1."StatusCode" = 2 THEN 'F25'
-             WHEN S1."StatusCode" = 1 THEN 'F09'
-             WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'TMI'
+             WHEN S1."StatusCode" = 2
+             THEN 'F25'
+             WHEN S1."StatusCode" = 1
+             THEN 'F09'
+             WHEN S1."StatusCode" = 0 
+                  -- AND S1."NotiTempFg" = 'Y' -- 2022-03-21 from Lai
+                  AND S1."TotInsuPrem" != 0  -- 2022-03-21 from Lai
+             THEN 'TMI'
            ELSE ' ' END        AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."CustNo",7,0)
                                AS "CustNo"           -- 戶號
@@ -176,7 +185,7 @@ BEGIN
           ,0                   AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
           ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
           ,CASE
-             WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 3
+             WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0  THEN 3
              WHEN S1."StatusCode" = 1 THEN 2
              WHEN S1."StatusCode" = 2 THEN 2
            ELSE 0 END                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
@@ -187,7 +196,7 @@ BEGIN
           ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
           ,CASE
-             WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN S1."InsuYearMonth" * 100 + 1
+             WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0  THEN S1."InsuYearMonth" * 100 + 1
              WHEN S1."StatusCode" = 1 THEN S1."InsuYearMonth" * 100 + 1
              WHEN S1."StatusCode" = 2 THEN S1."OvduDate"
            ELSE 0 END          AS "OpenAcDate"       -- 起帳日期
@@ -202,18 +211,31 @@ BEGIN
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "InsuRenew" S1
     LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = CASE
-                                                 WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'TMI'
-                                                 WHEN S1."StatusCode" = 1 THEN 'F09'
-                                                 WHEN S1."StatusCode" = 2 THEN 'F25'
+                                                 WHEN S1."StatusCode" = 0
+                                                      AND S1."TotInsuPrem" != 0
+                                                 THEN 'TMI'
+                                                 WHEN S1."StatusCode" = 1
+                                                 THEN 'F09'
+                                                 WHEN S1."StatusCode" = 2
+                                                 THEN 'F25'
                                                ELSE ' ' END
     WHERE S1."AcDate" = 0
       AND S1."TotInsuPrem" > 0
       AND CASE
-            WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'Y'
-            WHEN S1."StatusCode" = 1 THEN 'Y'
-            WHEN S1."StatusCode" = 2 THEN 'Y'
+            WHEN S1."StatusCode" = 0 
+                 -- AND S1."NotiTempFg" = 'Y' -- 2022-03-21 from Lai
+                 AND S1."TotInsuPrem" != 0  -- 2022-03-21 from Lai
+            THEN 'Y'
+            WHEN S1."StatusCode" = 1
+            THEN 'Y'
+            WHEN S1."StatusCode" = 2
+            THEN 'Y'
           ELSE 'N' END = 'Y'
     ;
 
@@ -251,7 +273,7 @@ BEGIN
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
           ,CASE
              WHEN S1."OverdueDate" > 0 THEN S1."OverdueDate"
-           ELSE S1."DocDate" END
+           ELSE S1."OpenAcDate" END
                                AS "OpenAcDate"       -- 起帳日期
           ,0                   AS "LastAcDate"       -- 最後作帳日
           ,0                   AS "LastTxDate"       -- 最後交易日
@@ -264,6 +286,10 @@ BEGIN
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "ForeclosureFee" S1
     LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = CASE
                                                  WHEN S1."OverdueDate" > 0 THEN 'F24'
@@ -307,7 +333,7 @@ BEGIN
           ,''                  AS "SlipNote"         -- 傳票摘要
           ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
-          ,NVL(S2."LMSLLD",0)  AS "OpenAcDate"       -- 起帳日期
+          ,NVL(S2."LMSPBD",0)  AS "OpenAcDate"       -- 起帳日期
           ,S1."TRXDAT"         AS "LastAcDate"       -- 最後作帳日
           ,S1."TRXDAT"         AS "LastTxDate"       -- 最後交易日
           ,''                  AS "TitaTxCd"         -- 交易代號
@@ -319,6 +345,10 @@ BEGIN
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "LN$ACFP" S1
     LEFT JOIN "LA$LMSP" S2 ON S2."LMSACN" = S1."LMSACN"
                           AND S2."LMSAPN" = S1."LMSAPN"
@@ -330,58 +360,72 @@ BEGIN
 
     -- F29 : 將未銷契變手續費寫入AcReceivable
     INSERT INTO "AcReceivable"
-    SELECT 'F29'               AS "AcctCode"         -- 業務科目代號
+    SELECT 'F29'                AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."LMSACN",7,0)
-                               AS "CustNo"           -- 戶號
+                                AS "CustNo"           -- 戶號
           ,LPAD(S1."LMSAPN",3,0)
-                               AS "FacmNo"           -- 額度編號
-          ,TRIM(TO_CHAR(S1.CFRDAT)) || TRIM(TO_CHAR(ROW_NUMBER() OVER (PARTITION BY S1."LMSACN",S1."LMSAPN" ORDER BY S1."LMSACN",S1."LMSAPN",S1."CFRDAT"),'00'))
-                               AS "RvNo"             -- 銷帳編號
-          ,'        '          AS "AcNoCode"         -- 科目代號
-          ,'     '             AS "AcSubCode"        -- 子目代號
-          ,'  '                AS "AcDtlCode"        -- 細目代號
-          ,'0000'              AS "BranchNo"         -- 單位別
-          ,'TWD'               AS "CurrencyCode"     -- 幣別
+                                AS "FacmNo"           -- 額度編號
+          ,TRIM(TO_CHAR(S1.CFRDAT))
+           || TRIM(
+                TO_CHAR(
+                  ROW_NUMBER()
+                  OVER (
+                    PARTITION BY S1."LMSACN"
+                               , S1."LMSAPN"
+                    ORDER BY S1."LMSACN"
+                           , S1."LMSAPN"
+                           ,S1."CFRDAT"
+                  )
+                ,'00'))         AS "RvNo"             -- 銷帳編號
+          ,'        '           AS "AcNoCode"         -- 科目代號
+          ,'     '              AS "AcSubCode"        -- 子目代號
+          ,'  '                 AS "AcDtlCode"        -- 細目代號
+          ,'0000'               AS "BranchNo"         -- 單位別
+          ,'TWD'                AS "CurrencyCode"     -- 幣別
           ,CASE
              WHEN S1."TRXDAT" != 0
              THEN 1
            ELSE 0
-           END                 AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
-          ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
-          ,3                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
-          ,S1."CFRAMT"         AS "RvAmt"            -- 起帳總額
+           END                  AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
+          ,0                    AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
+          ,3                    AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
+          ,S1."CFRAMT"          AS "RvAmt"            -- 起帳總額
           ,CASE
              WHEN S1."TRXDAT" != 0
              THEN 0
            ELSE S1."CFRAMT"
-           END                 AS "RvBal"            -- 未銷餘額
+           END                  AS "RvBal"            -- 未銷餘額
           ,CASE
              WHEN S1."TRXDAT" != 0
              THEN 0
            ELSE S1."CFRAMT"
-           END                 AS "AcBal"            -- 會計日餘額
+           END                  AS "AcBal"            -- 會計日餘額
           ,CASE TRIM(TO_CHAR(S1.CFRCOD,'00'))
              WHEN '01' THEN '寬限與年期'
              WHEN '02' THEN '變利率週期'
              WHEN '03' THEN '補清償證明'
              WHEN '04' THEN '變更抵押權'
              WHEN '05' THEN '變更保證人'
-          ELSE '' END          AS "SlipNote"         -- 傳票摘要
-          ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
-          ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
-          ,S1."CFRDAT"         AS "OpenAcDate"       -- 起帳日期
-          ,0                   AS "LastAcDate"       -- 最後作帳日
-          ,0                   AS "LastTxDate"       -- 最後交易日
-          ,''                  AS "TitaTxCd"         -- 交易代號
-          ,''                  AS "TitaKinBr"        -- 
-          ,AEM."EmpNo"         AS "TitaTlrNo"        -- 經辦
-          ,0                   AS "TitaTxtNo"        -- 交易序號
+          ELSE '' END           AS "SlipNote"         -- 傳票摘要
+          ,'000'                AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
+          ,'00A'                AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
+          ,S1."CFRDAT"          AS "OpenAcDate"       -- 起帳日期
+          ,S1."TRXDAT"          AS "LastAcDate"       -- 最後作帳日
+          ,S1."TRXDAT"          AS "LastTxDate"       -- 最後交易日
+          ,''                   AS "TitaTxCd"         -- 交易代號
+          ,''                   AS "TitaKinBr"        -- 
+          ,AEM."EmpNo"          AS "TitaTlrNo"        -- 經辦
+          ,S1."TRXNMT"          AS "TitaTxtNo"        -- 交易序號
           ,'{"ContractChgCode":"' || TRIM(TO_CHAR(S1.CFRCOD,'00')) || '"}'
-                               AS "JsonFields"       -- jason格式紀錄
-          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-          ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+                                AS "JsonFields"       -- jason格式紀錄
+          ,AEM."EmpNo"          AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
+          ,AEM."EmpNo"          AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "LN$CFRP" S1
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = S1."CFPMEM"
     ;
@@ -404,10 +448,11 @@ BEGIN
       WHERE ACTP.LMSACN != 601776
         AND ACTP.BKPDAT = "TbsDyF"
     )
-    , OrderedFacmNo AS )
+    , OrderedFacmNo AS (
       SELECT "CustNo"
            , "FacmNo"
-           , ROW_NUMBER (
+           , ROW_NUMBER ()
+             OVER (
                 PARTITION BY "CustNo"
                 ORDER BY CASE
                            -- 0:正常戶
@@ -428,7 +473,6 @@ BEGIN
                          ELSE 100 + "Status" 
                          END ASC -- 戶況取未結案、非預約優先
                        , "NextPayIntDate" ASC
-                       , "StoreRate" DESC
                        , "FacmNo" ASC
              ) AS "FacmNoSeq"
       FROM "LoanBorMain"
@@ -438,9 +482,8 @@ BEGIN
       -- 將費用分配到各個額度
       SELECT ACT.BKPDAT
            , ACT.LMSACN
-           , L1.LMSAPN
-           , ROUND(ACT.LMSTOA * L1.LMSLBL / L2.LMSLBL ,0) AS "NewLMSTOA"
            , ACT.LMSTOA
+           , NVL(OFN."FacmNo",1) AS "FacmNo"
       FROM ACT
       LEFT JOIN OrderedFacmNo OFN ON OFN."CustNo" = ACT.LMSACN
                                  AND OFN."FacmNoSeq" = 1
@@ -449,7 +492,7 @@ BEGIN
     SELECT 'TAV'               AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."LMSACN",7,0)
                                AS "CustNo"           -- 戶號
-          ,LPAD(S1."LMSAPN",3,0)
+          ,LPAD(S1."FacmNo",3,0)
                                AS "FacmNo"           -- 額度編號
           ,' '                 AS "RvNo"             -- 銷帳編號
           ,S2."AcNoCode"       AS "AcNoCode"         -- 科目代號
@@ -478,7 +521,11 @@ BEGIN
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
-    FROM  S1
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
+    FROM TMP S1
     LEFT JOIN "CdAcCode" S2 ON S2."AcctCode" = 'TAV'
     ;
 
@@ -519,6 +566,10 @@ BEGIN
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM (SELECT ROW_NUMBER() OVER (PARTITION BY ACTP.LMSACN ORDER BY ACTP.BKPDAT DESC) AS "Seq"
                 ,ACTP.BKPDAT
                 ,ACTP.LMSACN
@@ -546,7 +597,7 @@ BEGIN
     SELECT 'TCK'               AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."CustNo",7,0)
                                AS "CustNo"           -- 戶號
-          ,LPAD(NVL(S2."FacmNo",0),3,0) -- 2021-10-01 from 賴桑 DueAmt與支票金額一樣時，放該額度號碼
+          ,LPAD(NVL(S2."FacmNo",1),3,0) -- 2021-10-01 from 賴桑 DueAmt與支票金額一樣時，放該額度號碼
            -- 0 -- 2021-09-30 from 綺萍 支票的額度號碼轉0
            -- LPAD(S2."FacmNo",3,0)
                                AS "FacmNo"           -- 額度編號
@@ -578,28 +629,42 @@ BEGIN
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "LoanCheque" S1
-    LEFT JOIN (SELECT LC."ChequeNo"
-                    , LC."CustNo"
-                    , F1."FacmNo"
-                    , ROW_NUMBER() OVER (PARTITION BY LC."ChequeNo"
-                                                    , LC."CustNo"
-                                         ORDER BY F1."FacmNo" DESC) AS "Seq"
-               FROM "LoanCheque" LC
-               LEFT JOIN "FacMain" F1 ON F1."CustNo" = LC."CustNo"
-               LEFT JOIN ( SELECT "CustNo"
-                                , "FacmNo"
-                                , SUM("DueAmt") AS "DueAmt"
-                           FROM "LoanBorMain"
-                           WHERE "Status" IN (0,2,4,6,7)
-                           GROUP BY "CustNo"
-                                  , "FacmNo"
-                         ) L1 ON L1."CustNo" = F1."CustNo"
-                             AND L1."FacmNo" = F1."FacmNo"
-               WHERE LC."ChequeAmt" = NVL(L1."DueAmt",0)
-              ) S2 ON S2."ChequeNo" = S1."ChequeNo"
-                  AND S2."CustNo" = S1."CustNo"
-                  AND S2."Seq" = 1
+    LEFT JOIN (
+      SELECT LC."ChequeNo"
+           , LC."ChequeAcct"
+           , LC."CustNo"
+           , L1."FacmNo"
+           , LC."ChequeAmt"
+           , NVL(L1."DueAmt",0) AS "DueAmt"
+           , ABS(LC."ChequeAmt" - NVL(L1."DueAmt",0)) AS "Match" -- 吻合程度,越低者越高
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY LC."ChequeNo"
+                          , LC."ChequeAcct"                    
+                         , LC."CustNo"
+               ORDER BY ABS(LC."ChequeAmt" - NVL(L1."DueAmt",0))
+                      , L1."FacmNo"
+             ) AS "MatchSeq"
+      FROM "LoanCheque" LC
+      LEFT JOIN (
+        SELECT "CustNo"
+             , "FacmNo"
+             , SUM("DueAmt") AS "DueAmt"
+        FROM "LoanBorMain"
+        WHERE "Status" IN (0,2,4,6,7)
+        GROUP BY "CustNo"
+               , "FacmNo"
+      ) L1 ON L1."CustNo" = LC."CustNo"
+      WHERE LC."StatusCode" IN ('0','4')
+    ) S2 ON S2."ChequeNo" = S1."ChequeNo"
+        AND S2."ChequeAcct" = S1."ChequeAcct"
+        AND S2."CustNo" = S1."CustNo"
+        AND S2."MatchSeq" = 1
     LEFT JOIN "CdAcCode" S3 ON S3."AcctCode" = 'TCK'
     WHERE S1."StatusCode" IN ('0','4')
     ;
@@ -655,6 +720,10 @@ BEGIN
           ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "LA$LMSP" LMSP
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LMSP."LMSACN"
                            AND FAC."FacmNo" = LMSP."LMSAPN"
@@ -721,6 +790,10 @@ BEGIN
           ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+          ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
+          ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
+          ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6
+          ,0                    AS "OpenTxtNo" -- 起帳交易序號 DECIMAL 8
     FROM "LA$LMSP" LMSP
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LMSP."LMSACN"
                            AND FAC."FacmNo" = LMSP."LMSAPN"

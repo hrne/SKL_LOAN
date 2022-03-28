@@ -29,30 +29,6 @@ import com.st1.itx.util.parse.Parse;
  * a.若聯貸案訂約之ID不等於動撥時之ID或訂約為母公司，但為子公司動撥時，請輸入聯貸動撥之子公司。
  */
 
-/*
- * Tita
- * FuncCode=9,1
- * CustId=X,10
- * CustNo=9,7
- * SyndNo=9,3
- * LeadIngBank=X,7
- * SigningDate=9,7
- * DrawdownStartDate=9,7
- * DrawdownEndDate=9,7
- * CommitFeeFlag=X,1
- * CurrencyCode=X,3
- * TimSyndAmt=9,14.2
- * imPartAmt=9,14.2
- * AgentBank=X,7
- * CentralBankPercent=9,3
- * MasterCustId=X,10
- * SubCustId1=X,10
- * SubCustId2=X,10
- * SubCustId3=X,10
- * SubCustId4=X,10
- * SubCustId5=X,10
- * SubCustId6=X,10
- */
 /**
  * L2600 聯貸案訂約登錄
  * 

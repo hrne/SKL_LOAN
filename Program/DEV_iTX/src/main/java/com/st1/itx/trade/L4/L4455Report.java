@@ -450,8 +450,8 @@ public class L4455Report extends MakeReport {
 					}
 
 //					每頁第38筆 跳頁 
-					if (pageCnt >= 38) {
-						this.print(1, 95, "=====續下頁=====", "C");
+					if (pageCnt >= 34) {
+						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
 //
 						pageCnt = 0;
 						this.newPage();

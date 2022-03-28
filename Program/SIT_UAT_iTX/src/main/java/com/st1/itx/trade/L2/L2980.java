@@ -14,14 +14,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.http.WebClient;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2980")
 @Scope("prototype")
 /**
@@ -31,7 +23,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L2980 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2980.class);
 
 	@Autowired
 	L2980Report l2980report;

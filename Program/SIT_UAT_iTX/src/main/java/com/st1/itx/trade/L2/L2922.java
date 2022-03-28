@@ -31,16 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CityCode=X,2<br>
- * AreaCode=X,3<br>
- * IrCode=X,5<br>
- * LandNo1=X,4<br>
- * LandNo2=X,4<br>
- * END=X,1<br>
- */
-
 @Service("L2922")
 @Scope("prototype")
 /**

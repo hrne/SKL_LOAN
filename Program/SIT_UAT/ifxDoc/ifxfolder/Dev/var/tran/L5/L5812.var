@@ -98,7 +98,7 @@ T(2,@UsageCodeHelp,00:全部;+#HelpDesc3)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5982進入),$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L5982 國稅局申報檔查詢]進入),$)
 
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -237,7 +237,8 @@ C(2,#FuncCode,s,s,$,s,s,s)
 #AcctCode=A,3,I
 C(2,#FuncCode,s,s,$,s,s,s)
 HELP(#AcctCodeHelp)
-@C(3,#FuncCode,2,V(H,#AcctCodeHelp),$)
+@T(3,@AcctCodX,)
+C(3,#FuncCode,2,V(H,#AcctCodeHelp),$)
 
 #AcctCodX=X,20,L
 T(H,#AcctCode,#AcctCodeHelp)

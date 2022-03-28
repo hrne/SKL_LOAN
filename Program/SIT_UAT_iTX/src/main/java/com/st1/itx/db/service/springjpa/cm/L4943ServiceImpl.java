@@ -280,7 +280,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     WHERE L.\"Status\" = 0 ";
 		sql += "       AND F.\"RepayCode\" = 2 ";
 		sql += "       AND L.\"MaturityDate\" <= :entryDate ";
-		sql += "       AND L.\"NextPayIntDate\" >= :entryDate ";
+		sql += "       AND L.\"NextPayIntDate\" = :entryDate ";
 		sql += "       AND L.\"NextPayIntDate\" > L.\"MaturityDate\" ";
 		sql += "     GROUP BY L.\"CustNo\" ";
 		sql += "            , L.\"FacmNo\" ";
@@ -302,15 +302,8 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"MediaKind\" ";
 		sql += "          , \"AmlRsp\" ";
 		sql += "          , \"JsonFields\" ";
-		sql += "          , ROW_NUMBER() ";
-		sql += "            OVER ( ";
-		sql += "                PARTITION BY \"CustNo\" ";
-		sql += "                           , \"FacmNo\" ";
-		sql += "                ORDER BY \"EntryDate\" DESC ";
-		sql += "            ) AS \"Seq\" ";
 		sql += "     FROM \"BankDeductDtl\" ";
 		sql += "     WHERE \"RepayType\" <= 3 ";
-		sql += "       AND \"EntryDate\" >= :entryDate ";
 		sql += " ) ";
 		sql += " SELECT L.\"CustNo\" ";
 		sql += "      , L.\"FacmNo\" ";

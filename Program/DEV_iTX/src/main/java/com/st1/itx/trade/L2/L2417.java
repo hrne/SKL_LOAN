@@ -45,15 +45,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * ApproveNo=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2417")
 @Scope("prototype")
 /**
@@ -303,19 +294,6 @@ public class L2417 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
-//	private void deleteClOwnerRelation(TitaVo titaVo) throws LogicException {
-//
-//		Slice<ClOwnerRelation> slClOwnerRelation = sClOwnerRelationService.ApplNoAll(iClCode1, iClCode2, iClNo, iApplNo, 0, Integer.MAX_VALUE, titaVo);
-//		List<ClOwnerRelation> lClOwnerRelation = slClOwnerRelation == null ? null : slClOwnerRelation.getContent();
-//		if (lClOwnerRelation != null && lClOwnerRelation.size() > 0) {
-//			try {
-//				sClOwnerRelationService.deleteAll(lClOwnerRelation, titaVo);
-//			} catch (DBException e) {
-//				throw new LogicException("E0008", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
-//			}
-//		}
-//	}
 
 	private void updateClOwnerRelation(TitaVo titaVo) throws LogicException {
 		FacMain facMain = sFacMainService.facmApplNoFirst(iApproveNo, titaVo);

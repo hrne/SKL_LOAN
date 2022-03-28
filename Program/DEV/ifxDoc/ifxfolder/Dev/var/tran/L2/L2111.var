@@ -454,9 +454,16 @@ C(3,#FuncCode,2,S,$)
 T(2,@IsLimit,#L2r02IsLimit)
 T(2,@IsRelated,#L2r02IsRelated)
 T(2,@IsLnrelNear,#L2r02IsLnrelNear)
+T(2,@IsSuspected,#L2r02IsSuspected)
+T(2,@IsSuspectedCheck,#L2r02IsSuspectedCheck)
+T(2,@IsSuspectedCheckType,#L2r02IsSuspectedCheckType)
+E(0,@IsDataDate,#L2r02IsDate)
 T(H,@IsLimitX,#IsLimit,#YesNoHelp)
 T(H,@IsRelatedX,#IsRelated,#YesNoHelp)
 T(H,@IsLnrelNearX,#IsLnrelNear,#YesNoHelp)
+T(H,@IsSuspectedX,#IsSuspected,#YesNoHelp)
+T(H,@IsSuspectedCheckX,#IsSuspectedCheck,#YesNoHelp)
+T(H,@IsSuspectedCheckTypeX,#IsSuspectedCheckType,#YesNoHelp)
 
 #RcvL2r07B=X,1,S
 C(3,#FuncCode,3,S,$)
@@ -809,6 +816,7 @@ T(2,@IsSuspected,#L1R16IsSuspectedYn)
 T(2,@IsSuspectedCheck,#L1R16IsSuspectedCheckYn)
 IF(#IsSuspectedCheck=="Y",T(2,@IsSuspectedCheckType,#L1R16IsSuspectedCheckYn),$)
 T(2,@IsDataDate,#L1R16DataDate)
+
 !是否為授信限制對象
 #IsLimit=X,1,L
 
@@ -1133,7 +1141,6 @@ IF(#Supervisor!=#L2r02Supervisor,E(0,11),$)
 IF(#Coorgnizer!=#L2r02Coorgnizer,E(0,12),$) 
 IF(#ProcessCode!=#L2r02ProcessCode,E(0,13),$) 
 IF(#GroupId!=#L2r02GroupId,E(0,13),$) 
-! IF(#AcctCode!=#L2r02AcctCode,E(0,3),$) 
 IF(#IsSuspected!=#L1R16IsSuspectedYn,E(0,14),$)
 IF(#IsSuspectedCheck!=#L1R16IsSuspectedYn,E(0,15),$)
 IF(#DepartmentCode!=#DepartmentCode,E(0,16),$)
@@ -1241,6 +1248,7 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 #IsSuspected
 #IsSuspectedCheck
 #IsSuspectedCheckType
+#IsDataDate
 #SyndNo
 #END
 </sub>

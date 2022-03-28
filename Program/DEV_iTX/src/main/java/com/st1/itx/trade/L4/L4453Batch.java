@@ -197,10 +197,10 @@ public class L4453Batch extends TradeBuffer {
 				}
 				custId.put(tmp, tCustMain.getCustId());
 				custPhone.put(tmp, noticePhoneNo);
-				if (!"N".equals(tempVo.getParam("isMessage"))) {
+				if ("Y".equals(tempVo.getParam("isMessage"))) {
 					setText(tmp, titaVo);
 				}
-				if (!"N".equals(tempVo.getParam("isEmail"))) {
+				if ("Y".equals(tempVo.getParam("isEmail"))) {
 					setMail(tmp, titaVo);
 				}
 			}

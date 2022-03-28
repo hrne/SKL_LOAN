@@ -19,12 +19,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CUSTNO=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2941")
 @Scope("prototype")
 /**
@@ -35,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L2941 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2941.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -69,8 +62,7 @@ public class L2941 extends TradeBuffer {
 		String overdueCode = "";
 		// new ArrayList
 		List<ForeclosureFee> lForeclosureFee = new ArrayList<ForeclosureFee>();
-		// new table
-		ForeclosureFee tForeclosureFee = new ForeclosureFee();
+		new ForeclosureFee();
 		// 測試該戶號是否存在法拍費用檔
 		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.custNoEq(iCustNo, this.index, this.limit, titaVo);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
@@ -84,7 +76,6 @@ public class L2941 extends TradeBuffer {
 			throw new LogicException("E0001", "L2941該戶號在法拍費用檔無資料");
 		}
 		int filecnt = lForeclosureFee.size();
-		int custNo = 0;
 		BigDecimal fee = BigDecimal.ZERO;
 		BigDecimal fee1 = BigDecimal.ZERO;
 		String crdr = "";

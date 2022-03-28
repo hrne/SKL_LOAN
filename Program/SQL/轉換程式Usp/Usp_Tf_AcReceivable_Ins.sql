@@ -360,58 +360,68 @@ BEGIN
 
     -- F29 : 將未銷契變手續費寫入AcReceivable
     INSERT INTO "AcReceivable"
-    SELECT 'F29'               AS "AcctCode"         -- 業務科目代號
+    SELECT 'F29'                AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."LMSACN",7,0)
-                               AS "CustNo"           -- 戶號
+                                AS "CustNo"           -- 戶號
           ,LPAD(S1."LMSAPN",3,0)
-                               AS "FacmNo"           -- 額度編號
-          ,TRIM(TO_CHAR(S1.CFRDAT)) || TRIM(TO_CHAR(ROW_NUMBER() OVER (PARTITION BY S1."LMSACN",S1."LMSAPN" ORDER BY S1."LMSACN",S1."LMSAPN",S1."CFRDAT"),'00'))
-                               AS "RvNo"             -- 銷帳編號
-          ,'        '          AS "AcNoCode"         -- 科目代號
-          ,'     '             AS "AcSubCode"        -- 子目代號
-          ,'  '                AS "AcDtlCode"        -- 細目代號
-          ,'0000'              AS "BranchNo"         -- 單位別
-          ,'TWD'               AS "CurrencyCode"     -- 幣別
+                                AS "FacmNo"           -- 額度編號
+          ,TRIM(TO_CHAR(S1.CFRDAT))
+           || TRIM(
+                TO_CHAR(
+                  ROW_NUMBER()
+                  OVER (
+                    PARTITION BY S1."LMSACN"
+                               , S1."LMSAPN"
+                    ORDER BY S1."LMSACN"
+                           , S1."LMSAPN"
+                           ,S1."CFRDAT"
+                  )
+                ,'00'))         AS "RvNo"             -- 銷帳編號
+          ,'        '           AS "AcNoCode"         -- 科目代號
+          ,'     '              AS "AcSubCode"        -- 子目代號
+          ,'  '                 AS "AcDtlCode"        -- 細目代號
+          ,'0000'               AS "BranchNo"         -- 單位別
+          ,'TWD'                AS "CurrencyCode"     -- 幣別
           ,CASE
              WHEN S1."TRXDAT" != 0
              THEN 1
            ELSE 0
-           END                 AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
-          ,0                   AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
-          ,3                   AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
-          ,S1."CFRAMT"         AS "RvAmt"            -- 起帳總額
+           END                  AS "ClsFlag"          -- 銷帳記號 0:未銷 1:已銷
+          ,0                    AS "AcctFlag"         -- 業務科目記號 0:一般科目 1:資負明細科目
+          ,3                    AS "ReceivableFlag"   -- 銷帳科目記號 0:非銷帳科目 1:會計銷帳科目 2:業務銷帳科目 3:未收費用 4:短繳期金 5:另收欠款
+          ,S1."CFRAMT"          AS "RvAmt"            -- 起帳總額
           ,CASE
              WHEN S1."TRXDAT" != 0
              THEN 0
            ELSE S1."CFRAMT"
-           END                 AS "RvBal"            -- 未銷餘額
+           END                  AS "RvBal"            -- 未銷餘額
           ,CASE
              WHEN S1."TRXDAT" != 0
              THEN 0
            ELSE S1."CFRAMT"
-           END                 AS "AcBal"            -- 會計日餘額
+           END                  AS "AcBal"            -- 會計日餘額
           ,CASE TRIM(TO_CHAR(S1.CFRCOD,'00'))
              WHEN '01' THEN '寬限與年期'
              WHEN '02' THEN '變利率週期'
              WHEN '03' THEN '補清償證明'
              WHEN '04' THEN '變更抵押權'
              WHEN '05' THEN '變更保證人'
-          ELSE '' END          AS "SlipNote"         -- 傳票摘要
-          ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
-          ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
-          ,S1."CFRDAT"         AS "OpenAcDate"       -- 起帳日期
-          ,0                   AS "LastAcDate"       -- 最後作帳日
-          ,0                   AS "LastTxDate"       -- 最後交易日
-          ,''                  AS "TitaTxCd"         -- 交易代號
-          ,''                  AS "TitaKinBr"        -- 
-          ,AEM."EmpNo"         AS "TitaTlrNo"        -- 經辦
-          ,0                   AS "TitaTxtNo"        -- 交易序號
+          ELSE '' END           AS "SlipNote"         -- 傳票摘要
+          ,'000'                AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
+          ,'00A'                AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
+          ,S1."CFRDAT"          AS "OpenAcDate"       -- 起帳日期
+          ,S1."TRXDAT"          AS "LastAcDate"       -- 最後作帳日
+          ,S1."TRXDAT"          AS "LastTxDate"       -- 最後交易日
+          ,''                   AS "TitaTxCd"         -- 交易代號
+          ,''                   AS "TitaKinBr"        -- 
+          ,AEM."EmpNo"          AS "TitaTlrNo"        -- 經辦
+          ,S1."TRXNMT"          AS "TitaTxtNo"        -- 交易序號
           ,'{"ContractChgCode":"' || TRIM(TO_CHAR(S1.CFRCOD,'00')) || '"}'
-                               AS "JsonFields"       -- jason格式紀錄
-          ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
-          ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-          ,JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
+                                AS "JsonFields"       -- jason格式紀錄
+          ,AEM."EmpNo"          AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,JOB_START_TIME       AS "CreateDate"          -- 建檔日期時間 DATE 8 
+          ,AEM."EmpNo"          AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,JOB_START_TIME       AS "LastUpdate"          -- 最後更新日期時間 DATE 8 
           ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5
           ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4
           ,'999999'             AS "OpenTlrNo" -- 起帳經辦 VARCHAR2 6

@@ -83,14 +83,15 @@ public class DateUtil extends SysLogger {
 	 * 日期檢查
 	 * 
 	 * @param value 日期 ROC or BC
+	 * @return true is good
 	 * @throws LogicException When Date Is Error
 	 */
-	public void checkDate(Object value) throws LogicException {
+	public boolean checkDate(Object value) throws LogicException {
 		int afValue = 0;
 
 		if (Objects.isNull(value)) {
 			this.warn("checkDate value Is Null...");
-			return;
+			return false;
 		}
 
 		try {
@@ -100,16 +101,18 @@ public class DateUtil extends SysLogger {
 				afValue = Integer.parseInt(value.toString());
 			else {
 				this.warn("checkDate value Type Is ???...");
-				return;
+				return false;
 			}
 			StaticTool.rocToBc(afValue);
+			return true;
 		} catch (LogicException e) {
 			this.warn("日期格式錯誤!!");
-			throw e;
+			return false;
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
+			return false;
 		}
 	}
 

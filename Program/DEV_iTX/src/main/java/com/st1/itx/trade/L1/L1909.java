@@ -56,8 +56,7 @@ public class L1909 extends TradeBuffer {
 			OccursList.putParam("oCustId", bankRelationSuspected.getCustId());
 			OccursList.putParam("oCustName", bankRelationSuspected.getCustName());
 			OccursList.putParam("oSubCom", bankRelationSuspected.getSubCom());
-//			OccursList.putParam("oLastUpdate", this.parse.timeStampToString(bankRelationSuspected.getLastUpdate()));
-			OccursList.putParam("oLastUpdate", String.valueOf(titaVo.getEntDyI()));
+			OccursList.putParam("oLastUpdate", this.parse.timeStampToString(bankRelationSuspected.getLastUpdate()));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(OccursList);

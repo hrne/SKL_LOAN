@@ -55,12 +55,7 @@ public class L2670Report extends MakeReport {
 	private String security = "";
 	private String pageSize = "A4";
 	private String pageOrientation = "P";
-//	private String reprint = "✽✽✽重印✽✽✽";
 	private String reprint = "******重印******";
-	// 製表日期
-//	private String NowDate;
-	// 製表時間
-//	private String NowTime;
 	private int sPrintCode = 0;
 
 	// 自訂表頭
@@ -106,8 +101,6 @@ public class L2670Report extends MakeReport {
 
 		this.reportDate = Integer.valueOf(titaVo.getEntDy());
 		this.brno = titaVo.getBrno();
-//		this.NowDate = dDateUtil.getNowStringRoc();
-//		this.NowTime = dDateUtil.getNowStringTime();
 
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
@@ -123,13 +116,6 @@ public class L2670Report extends MakeReport {
 
 		String iRvNo = parse.IntegerToString(iContractChgDate, 8) + titaVo.getParam("ContractChgNo");
 
-		/**
-		 * X 30 550 Y 60 a------e---------f--------g--------h------i-------------b | 戶號
-		 * | 1234567 | 借款人 | 王小美 | 日期 | 105年3月18日|
-		 * j------k---------+--------m--------n------o-------------p | 金額: | 2000元 | 150
-		 * c----------------q--------------------------------------d
-		 * 
-		 */
 		Point a = new Point(30, 60);
 		Point b = new Point(550, 60);
 		Point c = new Point(30, 150);
@@ -193,10 +179,6 @@ public class L2670Report extends MakeReport {
 
 		String feeAmt = formatAmt(acReceivable.getRvAmt(), 0);
 		this.print(1, 1, "　　");
-		/**
-		 * -----------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-		 * --------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		 */
 		this.print(1, 8, "　戶號　　　　　　　　　　　　　　　借款人　　　　　　　　　　　日期");
 		String custNoX = FormatUtil.pad9(String.valueOf(iCustNo), 7) + "-" + FormatUtil.pad9(String.valueOf(iFacmNo), 3);
 		this.print(0, 27, custNoX);

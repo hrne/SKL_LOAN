@@ -31,12 +31,6 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ENTRYDATE=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L2077")
 @Scope("prototype")
 /**

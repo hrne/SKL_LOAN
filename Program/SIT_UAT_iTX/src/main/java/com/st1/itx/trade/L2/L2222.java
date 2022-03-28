@@ -62,7 +62,6 @@ public class L2222 extends TradeBuffer {
 		this.info("active L2222 ");
 		this.totaVo.init(titaVo);
 
-//		String iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		String creditSysNo = titaVo.getParam("CreditSysNo").toString().trim();
 		int iCreditSysNo = 0;
 		if (!"".equals(creditSysNo)) {

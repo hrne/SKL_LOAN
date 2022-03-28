@@ -22,19 +22,6 @@ import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CustNo=9,7<br>
- * FacmNo=9,3<br>
- * ReceiveDate=9,7<br>
- * DocDate=9,7<br>
- * Fee=9,14.2<br>
- * FeeCode=9,2<br>
- * LegalStaff=X,6<br>
- * CloseNo=9,7<br>
- * Rmk=X,60<br>
- */
-
 @Service("L2601")
 @Scope("prototype")
 /**
@@ -84,7 +71,6 @@ public class L2601 extends TradeBuffer {
 		tForeclosureFee.setReceiveDate(parse.stringToInteger(titaVo.getParam("ReceiveDate")));
 		// 起帳日期 新增的會計日期
 		tForeclosureFee.setOpenAcDate(parse.stringToInteger(titaVo.getParam("AcDate")));
-//		tForeclosureFee.setOpenAcDate(dateUtil.getNowIntegerForBC());
 		this.info("起帳日期" + tForeclosureFee.getOpenAcDate());
 		tForeclosureFee.setDocDate(parse.stringToInteger(titaVo.getParam("DocDate")));
 		tForeclosureFee.setFee(parse.stringToBigDecimal(titaVo.getParam("TimFee")));

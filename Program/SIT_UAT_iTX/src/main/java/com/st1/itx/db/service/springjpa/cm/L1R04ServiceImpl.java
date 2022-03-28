@@ -51,9 +51,9 @@ public class L1R04ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L1R04 parm = " + custNo + "/" + facmNo);
 
 		String sql = "SELECT A.\"FormNo\",A.\"FormName\",A.\"SendCode\",A.\"LetterFg\",A.\"MessageFg\",A.\"EmailFg\"";
-		sql += ",NVL(B.\"PaperNotice\",'Y') AS \"PaperNotice\"";
-		sql += ",NVL(B.\"MsgNotice\",'Y') AS \"MsgNotice\"";
-		sql += ",NVL(B.\"EmailNotice\",'Y') AS \"EmailNotice\"";
+		sql += ",NVL(B.\"PaperNotice\",A.\"LetterFg\") AS \"PaperNotice\"";
+		sql += ",NVL(B.\"MsgNotice\",A.\"MessageFg\") AS \"MsgNotice\"";
+		sql += ",NVL(B.\"EmailNotice\",A.\"EmailFg\") AS \"EmailNotice\"";
 		sql += ",NVL(B.\"ApplyDate\",0) AS \"ApplyDate\" ";
 		sql += "FROM \"CdReport\" A ";
 		sql += "LEFT JOIN \"CustNotice\" B ON B.\"CustNo\"=:CustNo AND B.\"FacmNo\"=:FacmNo AND B.\"FormNo\"=A.\"FormNo\" ";

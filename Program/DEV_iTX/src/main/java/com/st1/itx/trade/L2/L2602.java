@@ -20,10 +20,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- */
-
 @Service("L2602")
 @Scope("prototype")
 /**
@@ -81,7 +77,6 @@ public class L2602 extends TradeBuffer {
 			tForeclosureFee.setDocDate(parse.stringToInteger(titaVo.getParam("DocDate")));
 			tForeclosureFee.setFee(parse.stringToBigDecimal(titaVo.getParam("TimFee")));
 			tForeclosureFee.setFeeCode(titaVo.getParam("FeeCode"));
-//			tForeclosureFee.setCaseNo(titaVo.getParam("CaseNo"));
 			tForeclosureFee.setCloseDate(parse.stringToInteger(titaVo.getParam("CloseDate")));
 			tForeclosureFee.setRmk(titaVo.getParam("Rmk"));
 			tForeclosureFee.setCloseNo(parse.stringToInteger(titaVo.getParam("CloseNo")));

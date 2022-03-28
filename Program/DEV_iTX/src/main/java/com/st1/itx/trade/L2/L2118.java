@@ -29,18 +29,6 @@ import com.st1.itx.util.parse.Parse;
 /*
  * L2118 共用額度登錄
  */
-/*
- * Tita
- * CustNo=9,7       -> MRKEY
- * CreditSysNo=9,7
- * CurrencyCode=X,3  
- * LineAmt==9,14.2 -> TXAMT
- * LineAmtCycle==9,14.2 
- * ShareCustNo=9,7
- * ShareFacmNo=9,7
- * iJcicMiainCustFlag=X,1 
- * END=X,1
- */
 
 /**
  * L2118 共用額度登錄

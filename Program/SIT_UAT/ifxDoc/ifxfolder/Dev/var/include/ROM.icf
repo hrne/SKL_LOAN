@@ -1663,6 +1663,10 @@ TXFORM=L2R01
 #L2r02IsLimit=X,1,S
 #L2r02IsRelated=X,1,S
 #L2r02IsLnrelNear=X,1,S
+#L2r02IsSuspected=X,1,S
+#L2r02IsSuspectedCheck=X,1,S
+#L2r02IsSuspectedCheckType=X,1,S
+#L2r02IsDate=D,7,S
 #L2r02ApplAmt=m,14.2,S
 #L2r02Estimate=X,6,S
 #L2r02PieceCode=X,1,S
@@ -1690,6 +1694,10 @@ TXFORM=L2R02
 #L2r02IsLimit
 #L2r02IsRelated
 #L2r02IsLnrelNear
+#L2r02IsSuspected
+#L2r02IsSuspectedCheck
+#L2r02IsSuspectedCheckType
+#L2r02IsDate
 #L2r02ApplAmt
 #L2r02Estimate
 #L2r02PieceCode

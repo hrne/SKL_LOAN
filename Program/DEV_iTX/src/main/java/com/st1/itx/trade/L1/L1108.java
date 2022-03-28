@@ -158,14 +158,15 @@ public class L1108 extends TradeBuffer {
 
 				// FormNo報表代號
 				iFormNo = titaVo.getParam("FormNo" + i);
-
-				if ("".equals(titaVo.getParam("Paper" + i))) {
+				
+				// 這邊的邏輯因為前端 VAR 是設定「不通知申請」，所以Paper{i}, Msg{i}, EMail{i}為 Y 時對應DB的 N
+				if (titaVo.getParam("Paper" + i).trim().isEmpty()) {
 					VarPaper = "Y";
 				}
-				if ("".equals(titaVo.getParam("Msg" + i))) {
+				if (titaVo.getParam("Msg" + i).trim().isEmpty()) {
 					VarMsg = "Y";
 				}
-				if ("".equals(titaVo.getParam("EMail" + i))) {
+				if (titaVo.getParam("EMail" + i).trim().isEmpty()) {
 					VarEMail = "Y";
 				}
 
@@ -215,19 +216,21 @@ public class L1108 extends TradeBuffer {
 					// 變更前
 					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice())
 							|| !VarEMail.equals(tCustNotice.getEmailNotice())) {
+						
+						// 只在有修改選項時，才實際更新
 						log = true;
 						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
-					}
+						
+						tCustNotice.setPaperNotice(VarPaper);
+						tCustNotice.setMsgNotice(VarMsg);
+						tCustNotice.setEmailNotice(VarEMail);
+						tCustNotice.setApplyDate(ApplyDt);
 
-					tCustNotice.setPaperNotice(VarPaper);
-					tCustNotice.setMsgNotice(VarMsg);
-					tCustNotice.setEmailNotice(VarEMail);
-					tCustNotice.setApplyDate(ApplyDt);
-
-					try {
-						tCustNotice = sCustNoticeService.update2(tCustNotice, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "客戶通知設定檔");
+						try {
+							tCustNotice = sCustNoticeService.update2(tCustNotice, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0007", "客戶通知設定檔");
+						}
 					}
 
 				}

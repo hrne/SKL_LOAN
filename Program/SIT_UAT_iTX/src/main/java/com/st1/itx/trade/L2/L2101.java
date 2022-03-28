@@ -35,166 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * L2101 商品參數維護
  * a.商品參數生效後限制刪除,只允許修改商品狀態、商品截止日期.
  */
-/*
- * Tita
- * FuncCode=9,1
- * ProdNo=X,5
- * ProdName=X,60
- * StartDate=9,7
- * EndDate=9,7
- * StatusCode=9,1
- * CharCode=9,1
- * AcctCode=9,3
- * AcctAcno=9,5
- * AcctSbno=9,5
- * CurrencyCode=X,3
- * TimLowAmt=9,14.2
- * TimHighAmt=9,14.2
- * BaseRateCode=9,2
- * ProdIncr=+9,2.4
- * GraceIncr=9,2.4
- * LowIncr=9,2.4
- * RateCode=9,1
- * IncrCode=X,1
- * FirstRateAdjFreq=9,2
- * RateAdjFreq=9,2
- * FixAdjDd=9,2
- * RepayCode=9,1
- * IntCalcCode=9,1
- * ExtraRepayCode=9,1
- * RecycleCode=9,1
- * FreqBaseCode=9,1
- * PayIntFreq=9,2
- * RepayFreq=9,2
- * GracePeriod=9,3
- * AdvanceCloseCode=9,1
- * BreachCode=9,3
- * BreachGetCode=9,1
- * DecreaseCode=X,1
- * GovOfferCode=X,1
- * FinancialCode=X,1
- * StepMonths1=9,3
- * StepRateCode1=9,1
- * StepRateIncr1=+9,2.4
- * StepMonths2=9,3
- * StepRateCode2=9,1
- * StepRateIncr2=+9,2.4
- * StepMonths3=9,3
- * StepRateCode3=9,1
- * StepRateIncr3=+9,2.4
- * StepMonths4=9,3
- * StepRateCode4=9,1
- * StepRateIncr4=+9,2.4
- * StepMonths5=9,3
- * StepRateCode5=9,1
- * StepRateIncr5=+9,2.4
- * StepMonths6=9,3
- * StepRateCode6=9,1
- * StepRateIncr6=+9,2.4
- * StepMonths7=9,3
- * StepRateCode7=9,1
- * StepRateIncr7=+9,2.4
- * StepMonths8=9,3
- * StepRateCode8=9,1
- * StepRateIncr8=+9,2.4
- * StepMonths9=9,3
- * StepRateCode9=9,1
- * StepRateIncr9=+9,2.4
- * StepMonths10=9,3
- * StepRateCode10=9,1
- * StepRateIncr10=+9,2.4
- * TimPremium1=9,14.2
- * PremiumIncr1=+9,2.4
- * TimPremium2=9,14.2
- * PremiumIncr2=+9,2.4
- * TimPremium3=9,14.2
- * PremiumIncr3=+9,2.4
- * TimPremium4=9,14.2
- * PremiumIncr4=+9,2.4
- * TimPremium5=9,14.2
- * PremiumIncr5=+9,2.4
- * TimPremium6=9,14.2
- * PremiumIncr6=+9,2.4
- * TimPremium7=9,14.2
- * PremiumIncr7=+9,2.4
- * TimPremium8=9,14.2
- * PremiumIncr8=+9,2.4
- * TimPremium9=9,14.2
- * PremiumIncr9=+9,2.4
- * TimPremium10=9,14.2
- * PremiumIncr10=+9,2.4
- * TimLoanAmt1=9,14.2
- * TimAcctFee1=9,14.2
- * TimLoanAmt2=9,14.2
- * TimAcctFee2=9,14.2
- * TimLoanAmt3=9,14.2
- * TimAcctFee3=9,14.2
- * TimLoanAmt4=9,14.2
- * TimAcctFee4=9,14.2
- * TimLoanAmt5=9,14.2
- * TimAcctFee5=9,14.2
- * BreachaYyA1=9,1
- * BreachaYyB1=9,1
- * BreachaPercent1=9,1.2
- * BreachaYyA2=9,1
- * BreachaYyB2=9,1
- * BreachaPercent2=9,1.2
- * BreachaYyA3=9,1
- * BreachaYyB3=9,1
- * BreachaPercent3=9,1.2
- * BreachaYyA4=9,1
- * BreachaYyB4=9,1
- * BreachaPercent4=9,1.2
- * BreachaYyA5=9,1
- * BreachaYyB5=9,1
- * BreachaPercent5=9,1.2
- * BreachaYyA6=9,1
- * BreachaYyB6=9,1
- * BreachaPercent6=9,1.2
- * BreachaYyA7=9,1
- * BreachaYyB7=9,1
- * BreachaPercent7=9,1.2
- * BreachaYyA8=9,1
- * BreachaYyB8=9,1
- * BreachaPercent8=9,1.2
- * BreachaYyA9=9,1
- * BreachaYyB9=9,1
- * BreachaPercent9=9,1.2
- * BreachaYyA10=9,1
- * BreachaYyB10=9,1
- * BreachaPercent10=9,1.2
- * BreachbMmA1=9,2
- * BreachbMmB1=9,2
- * BreachbPercent1=9,1.2
- * BreachbMmA2=9,2
- * BreachbMmB2=9,2
- * BreachbPercent2=9,1.2
- * BreachbMmA3=9,2
- * BreachbMmB3=9,2
- * BreachbPercent3=9,1.2
- * BreachbMmA4=9,2
- * BreachbMmB4=9,2
- * BreachbPercent4=9,1.2
- * BreachbMmA5=9,2
- * BreachbMmB5=9,2
- * BreachbPercent5=9,1.2
- * BreachbMmA6=9,2
- * BreachbMmB6=9,2
- * BreachbPercent6=9,1.2
- * BreachbMmA7=9,2
- * BreachbMmB7=9,2
- * BreachbPercent7=9,1.2
- * BreachbMmA8=9,2
- * BreachbMmB8=9,2
- * BreachbPercent8=9,1.2
- * BreachbMmA9=9,2
- * BreachbMmB9=9,2
- * BreachbPercent9=9,1.2
- * BreachbMmA10=9,2
- * BreachbMmB10=9,2
- * BreachbPercent10=9,1.2
- * END=X,1
- */
 
 /**
  * L2101 商品參數維護
@@ -272,11 +112,6 @@ public class L2101 extends TradeBuffer {
 			if (tFacProd == null) {
 				throw new LogicException(titaVo, "E0003", "商品代碼 = " + iProdNo); // 修改資料不存在
 			} else {
-//				if (tFacProd.getStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
-//					tFacProd.setEndDate(this.parse.stringToInteger(titaVo.getParam("EndDate")));
-//					tFacProd.setStatusCode(titaVo.getParam("StatusCode"));
-//				} else {
-//				}
 				moveFacProd(iFuncCode, tFacProd, titaVo);
 			}
 			try {
@@ -344,8 +179,6 @@ public class L2101 extends TradeBuffer {
 					tFacProdStepRate.setCreateEmpNo(titaVo.getTlrNo());
 					tFacProdStepRate.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 					tFacProdStepRate.setLastUpdateEmpNo(titaVo.getTlrNo());
-					// this.info("L2101 StepRate i=" + i + "key=" +
-					// tFacProdStepRate.getFacProdStepRateId());
 					try {
 						facProdStepRateService.insert(tFacProdStepRate);
 					} catch (DBException e) {
@@ -475,76 +308,6 @@ public class L2101 extends TradeBuffer {
 			}
 		}
 
-//		// 更新清償金類型
-//		FacProdBreach tFacProdBreach = new FacProdBreach();
-//		Slice<FacProdBreach> slFacProdBreach = facProdBreachService.breachNoEq(iProdNo, "000", "999", this.index,
-//				Integer.MAX_VALUE);
-//		List<FacProdBreach> lFacProdBreach = slFacProdBreach == null ? null : slFacProdBreach.getContent();
-//		if (lFacProdBreach != null && lFacProdBreach.size() > 0) {
-//			try {
-//				facProdBreachService.deleteAll(lFacProdBreach);
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E2008", "清償金類型"); // 刪除資料時，發生錯誤
-//			}
-//		}
-//		if ((iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) && (iBreachCode.equals("001")
-//				|| iBreachCode.equals("003") || iBreachCode.equals("004") || iBreachCode.equals("005"))) {
-//			for (int i = 1; i <= 10; i++) {
-//				if (this.parse.stringToInteger(titaVo.getParam("BreachaYyB" + i)) > 0) {
-//					tFacProdBreach.setBreachNo(iProdNo);
-//					tFacProdBreach.setBreachCode(iBreachCode);
-//					tFacProdBreach
-//							.setMonthStart(this.parse.stringToInteger(titaVo.getParam("BreachaYyA" + i).trim()) * 12);
-//					tFacProdBreach.setFacProdBreachId(new FacProdBreachId(iProdNo, iBreachCode,
-//							this.parse.stringToInteger(titaVo.getParam("BreachaYyA" + i)) * 12));
-//					tFacProdBreach
-//							.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("BreachaYyB" + i).trim()) * 12);
-//					tFacProdBreach.setBreachPercent(
-//							this.parse.stringToBigDecimal(titaVo.getParam("BreachaPercent" + i).trim()));
-//					tFacProdBreach.setCreateDate(
-//							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//					tFacProdBreach.setCreateEmpNo(titaVo.getTlrNo());
-//					tFacProdBreach.setLastUpdate(
-//							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//					tFacProdBreach.setLastUpdateEmpNo(titaVo.getTlrNo());
-//					try {
-//						facProdBreachService.insert(tFacProdBreach);
-//					} catch (DBException e) {
-//						throw new LogicException(titaVo, "E2009", "清償金類型"); // 新增資料時，發生錯誤
-//					}
-//				} else {
-//					break;
-//				}
-//			}
-//		}
-//		if ((iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) && (iBreachCode.equals("002"))) {
-//			for (int i = 1; i <= 10; i++) {
-//				if (this.parse.stringToInteger(titaVo.getParam("BreachbMmB" + i)) > 0) {
-//					tFacProdBreach.setBreachNo(iProdNo);
-//					tFacProdBreach.setBreachCode(iBreachCode);
-//					tFacProdBreach.setMonthStart(this.parse.stringToInteger(titaVo.getParam("BreachbMmA" + i)));
-//					tFacProdBreach.setFacProdBreachId(new FacProdBreachId(iProdNo, iBreachCode,
-//							this.parse.stringToInteger(titaVo.getParam("BreachaMmA" + i))));
-//					tFacProdBreach.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("BreachbMmB" + i).trim()));
-//					tFacProdBreach.setBreachPercent(
-//							this.parse.stringToBigDecimal(titaVo.getParam("BreachbPercent" + i).trim()));
-//					tFacProdBreach.setCreateDate(
-//							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//					tFacProdBreach.setCreateEmpNo(titaVo.getTlrNo());
-//					tFacProdBreach.setLastUpdate(
-//							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-//					tFacProdBreach.setLastUpdateEmpNo(titaVo.getTlrNo());
-//					try {
-//						facProdBreachService.insert(tFacProdBreach);
-//					} catch (DBException e) {
-//						throw new LogicException(titaVo, "E2009", "清償金類型"); // 新增資料時，發生錯誤
-//					}
-//				} else {
-//					break;
-//				}
-//			}
-//		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -563,29 +326,12 @@ public class L2101 extends TradeBuffer {
 		mFacProd.setStatusCode(titaVo.getParam("StatusCode"));
 		mFacProd.setAgreementFg(titaVo.getParam("AgreementFg"));
 		mFacProd.setEnterpriseFg(titaVo.getParam("EnterpriseFg"));
-//		mFacProd.setCharCode(titaVo.getParam("CharCode"));
-//		mFacProd.setPayIntLimit(parse.stringToInteger(titaVo.getParam("PayIntLimit")));
-//		mFacProd.setAcctCode(titaVo.getParam("AcctCode"));
 		mFacProd.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-//		mFacProd.setLowAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimLowAmt")));
-//		mFacProd.setHighAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimHighAmt")));
 		mFacProd.setBaseRateCode(titaVo.getParam("BaseRateCode"));
 		mFacProd.setProdIncr(this.parse.stringToBigDecimal(titaVo.getParam("ProdIncr")));
-//		mFacProd.setGraceIncr(this.parse.stringToBigDecimal(titaVo.getParam("GraceIncr")));
 		mFacProd.setLowLimitRate(this.parse.stringToBigDecimal(titaVo.getParam("LowLimitRate")));
 		mFacProd.setRateCode(titaVo.getParam("RateCode"));
 		mFacProd.setIncrFlag(titaVo.getParam("IncrFlag"));
-//		mFacProd.setFirstRateAdjFreq(this.parse.stringToInteger(titaVo.getParam("FirstRateAdjFreq")));
-//		mFacProd.setRateAdjFreq(this.parse.stringToInteger(titaVo.getParam("RateAdjFreq")));
-//		mFacProd.setFixAdjDd(this.parse.stringToInteger(titaVo.getParam("FixAdjDd")));
-//		mFacProd.setAmortizedCode(titaVo.getParam("AmortizedCode"));
-//		mFacProd.setIntCalcCode(titaVo.getParam("IntCalcCode"));
-//		mFacProd.setExtraRepayCode(titaVo.getParam("ExtraRepayCode"));
-//		mFacProd.setRecycleCode(titaVo.getParam("RecycleCode"));
-//		mFacProd.setFreqBase(this.parse.stringToInteger(titaVo.getParam("FreqBase")));
-//		mFacProd.setPayIntFreq(this.parse.stringToInteger(titaVo.getParam("PayIntFreq")));
-//		mFacProd.setRepayFreq(this.parse.stringToInteger(titaVo.getParam("RepayFreq")));
-//		mFacProd.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
 		mFacProd.setBreachFlag(titaVo.getParam("BreachFlag"));
 		mFacProd.setBreachCode(titaVo.getParam("BreachCode"));
 		mFacProd.setBreachGetCode(titaVo.getParam("BreachGetCode"));
@@ -593,7 +339,6 @@ public class L2101 extends TradeBuffer {
 		mFacProd.setBreachDecreaseMonth(parse.stringToInteger(titaVo.getParam("BreachDecreaseMonth")));
 		mFacProd.setBreachDecrease(parse.stringToBigDecimal(titaVo.getParam("BreachDecrease")));
 		mFacProd.setBreachStartPercent(parse.stringToInteger(titaVo.getParam("BreachStartPercent")));
-//		mFacProd.setDecreaseFlag(titaVo.getParam("DecreaseFlag"));
 		mFacProd.setProhibitMonth(parse.stringToInteger(titaVo.getParam("ProhibitMonth")));
 		mFacProd.setGovOfferFlag(titaVo.getParam("GovOfferFlag"));
 		mFacProd.setFinancialFlag(titaVo.getParam("FinancialFlag"));

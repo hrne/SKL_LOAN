@@ -76,8 +76,6 @@ public class L2911 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		Slice<ClLand> slClLand = null;
-//		String custid = "";
-//		String custname = "";
 
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
@@ -108,81 +106,11 @@ public class L2911 extends TradeBuffer {
 		if (tClMain == null) {
 			throw new LogicException(titaVo, "E2003", "擔保品主檔"); // 查無資料
 		}
-//		CustMain tCustMain = sCustMainService.findById(tClMain.getCustUKey(), titaVo);
-//		if (tCustMain != null) {
-//			custid = tCustMain.getCustId();
-//			custname = tCustMain.getCustName();
-//
-//		}
 
 		ClBuilding tClBuilding = sClBuildingService.findById(new ClBuildingId(iClCode1, iClCode2, iClNo), titaVo);
 
 		slClLand = sClLandService.findClNo(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
 		List<ClLand> lClLand = slClLand == null ? null : new ArrayList<ClLand>(slClLand.getContent());
-
-//		// 查詢保險公司資料檔
-//		Slice<CdInsurer> slCdInsurer;
-//		slCdInsurer = sCdInsurerService.insurerTypeRange("1", "2", tClImm.getEvaCompanyCode(), tClImm.getEvaCompanyCode(), this.index, this.limit, titaVo);
-
-//		List<CdInsurer> lCdInsurer = slCdInsurer == null ? null : slCdInsurer.getContent();
-
-//		String OEvaCompanyX = "";
-//		// 如有找到資料
-//		if (lCdInsurer != null) {
-//			for (CdInsurer tCdInsurer : lCdInsurer) {
-//				OEvaCompanyX = tCdInsurer.getInsurerItem();
-//			}
-//		}
-
-//		this.totaVo.putParam("OCustId", custid);
-//		this.totaVo.putParam("OCustName", custname);
-//		this.totaVo.putParam("OClCode1", tClImm.getClCode1());
-//		this.totaVo.putParam("OClCode2", tClImm.getClCode2());
-//		this.totaVo.putParam("OClNo", tClImm.getClNo());
-//		this.totaVo.putParam("OClTypeCode", tClMain.getClTypeCode());
-//		this.totaVo.putParam("OEvaDate", tClMain.getEvaDate());
-//		this.totaVo.putParam("OEvaAmt", tClMain.getEvaAmt());
-//		this.totaVo.putParam("OEvaNetWorth", tClImm.getEvaNetWorth());
-//		this.totaVo.putParam("OLVITax", tClImm.getLVITax());
-//		this.totaVo.putParam("ORentEvaValue", tClImm.getRentEvaValue());
-//		this.totaVo.putParam("ORentPrice", tClImm.getRentPrice());
-//		this.totaVo.putParam("OEvaCompany", tClImm.getEvaCompanyCode());
-//		this.totaVo.putParam("OEvaCompanyX", OEvaCompanyX);
-//
-//		this.totaVo.putParam("OOwnershipCode", tClImm.getOwnershipCode());
-//		this.totaVo.putParam("OMtgCode", tClImm.getMtgCode());
-//		this.totaVo.putParam("OMtgCheck", tClImm.getMtgCheck());
-//		this.totaVo.putParam("OMtgLoan", tClImm.getMtgLoan());
-//		this.totaVo.putParam("OMtgPledge", tClImm.getMtgPledge());
-//		this.totaVo.putParam("OClStatus", tClMain.getClStatus());
-//		this.totaVo.putParam("OClStat", tClImm.getClStat());
-//		this.totaVo.putParam("OAgreement", tClImm.getAgreement());
-//		this.totaVo.putParam("OLimitCancelDate", tClImm.getLimitCancelDate());
-//		this.totaVo.putParam("OClCode", tClImm.getClCode());
-//		this.totaVo.putParam("OLoanToValue", tClImm.getLoanToValue());
-//		this.totaVo.putParam("OOtherOwnerTotal", tClImm.getOtherOwnerTotal());
-//		this.totaVo.putParam("OCompensationCopy", tClImm.getCompensationCopy());
-//		this.totaVo.putParam("OBdRmk", tClImm.getBdRmk());
-//		this.totaVo.putParam("OSynd", tClMain.getSynd());
-//		this.totaVo.putParam("OSyndCode", tClMain.getSyndCode());
-//		this.totaVo.putParam("ODispPrice", tClMain.getDispPrice());
-//		this.totaVo.putParam("ODispDate", tClMain.getDispDate());
-//		this.totaVo.putParam("OMtgReasonCode", tClImm.getMtgReasonCode());
-//		this.totaVo.putParam("OReceivedDate", tClImm.getReceivedDate());
-//		this.totaVo.putParam("OReceivedNo", tClImm.getReceivedNo());
-//		this.totaVo.putParam("OCancelDate", tClImm.getCancelDate());
-//		this.totaVo.putParam("OCancelNo", tClImm.getCancelNo());
-//		this.totaVo.putParam("OSettingDate", tClImm.getSettingDate());
-//		this.totaVo.putParam("OSettingStat", tClImm.getSettingStat());
-//		this.totaVo.putParam("OSettingAmt", tClImm.getSettingAmt());
-//		this.totaVo.putParam("OClaimDate", tClImm.getClaimDate());
-//		this.totaVo.putParam("OSettingSeq", tClImm.getSettingSeq());
-//		this.totaVo.putParam("OFirstAmt", tClImm.getFirstAmt());
-//		this.totaVo.putParam("OFirstCreditor", tClImm.getFirstCreditor());
-//		this.totaVo.putParam("OSecondAmt", tClImm.getSecondAmt());
-//		this.totaVo.putParam("OSecondCreditor", tClImm.getSecondCreditor());
-//		this.totaVo.putParam("OThirdAmt", tClImm.getThirdAmt());
-//		this.totaVo.putParam("OThirdCreditor", tClImm.getThirdCreditor());
 
 		if (tClBuilding != null) {
 			OccursList occursList = new OccursList();

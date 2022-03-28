@@ -37,10 +37,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- */
-
 @Service("L2631")
 @Scope("prototype")
 /**

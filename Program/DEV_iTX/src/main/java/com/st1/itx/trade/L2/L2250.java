@@ -23,13 +23,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunCd=9,1<br>
- * ApplNo=9,7<br>
- * GuaId=X,10<br>
- */
-
 @Service("L2250")
 @Scope("prototype")
 /**

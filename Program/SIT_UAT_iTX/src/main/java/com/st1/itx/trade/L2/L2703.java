@@ -27,16 +27,6 @@ import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunCd=9,1<br>
- * CustId=X,10<br>
- * CustNo=9,7<br>
- * CustName=X,100<br>
- * CreateEmpNo=X,6<br>
- * CreateDate=9,7<br>
- */
-
 @Service("L2703")
 @Scope("prototype")
 /**
@@ -130,11 +120,6 @@ public class L2703 extends TradeBuffer {
 			tCustDataCtrl.setCreateEmpNo(titaVo.getParam("CreateEmpNo"));
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
 			
-			// 更新 CustMain
-			
-			// 將 CustMain.CustId   設為 XX+8 位序號（序號檔）
-			//    CustMain.CustName 偶數位改為Ｏ
-			
 			String custName = tCustMain.getCustName();
 			String custId = tCustMain.getCustId();
 			if (custName != null && !custName.isEmpty() && custId != null && !custId.isEmpty())
@@ -177,12 +162,7 @@ public class L2703 extends TradeBuffer {
 			tCustDataCtrl.setApplMark(3);
 			tCustDataCtrl.setReason(iReason);
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
-			
-			// 更新 CustMain
-			
-			// 將 CustMain.CustId   恢復
-			//    CustMain.CustName 恢復
-			
+
 			String custName = tCustDataCtrl.getCustName();
 			String custId = tCustDataCtrl.getCustId();
 			if (custName != null && !custName.isEmpty() && custId != null && !custId.isEmpty())

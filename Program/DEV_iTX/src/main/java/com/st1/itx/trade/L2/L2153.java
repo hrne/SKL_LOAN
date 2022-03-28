@@ -598,10 +598,7 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setPayIntFreq(this.parse.stringToInteger(titaVo.getParam("PayIntFreq")));
 		tFacMain.setRepayFreq(this.parse.stringToInteger(titaVo.getParam("RepayFreq")));
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(titaVo.getParam("UtilDeadline")));
-//	tFacMain.setDuePayAmt(BigDecimal.ZERO);
-//	tFacMain.setDuePayLimit(BigDecimal.ZERO);
-//	tFacMain.setPayIntLimit(BigDecimal.ZERO);
-//	tFacMain.setCancelCode(0); // 預設0正常,該欄位需進維護交易L2154維護
+ // 預設0正常,該欄位需進維護交易L2154維護
 		tFacMain.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
 		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
@@ -631,13 +628,6 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(titaVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(titaVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(titaVo.getParam("Coorgnizer"));
-//	tFacMain.setAdvanceCloseCode("00"); 
-//		tFacMain.setBreachCode(titaVo.getParam("BreachCode")); // TODO DB刪除
-//		tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode")); // TODO DB刪除
-//		tFacMain.setDecreaseFlag(titaVo.getParam("DecreaseFlag")); // TODO DB刪除
-//		tFacMain.setProhibityear(parse.stringToInteger(titaVo.getParam("Prohibityear"))); // TODO DB刪除
-		// tFacMain.setGroupId(titaVo.getParam("GroupId"));
-//	tFacMain.setCopyFlag(titaVo.getParam("CopyFlag"));
 		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
 		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
@@ -764,15 +754,7 @@ public class L2153 extends TradeBuffer {
 				tFacProdStepRate.setMonthStart(this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i)));
 				tFacProdStepRate.setFacProdStepRateId(
 						new FacProdStepRateId(sProdNo, this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i))));
-//				if (i == 10) {
-//					tFacProdStepRate.setMonthEnd(999);
-//				} else {
-//					if (this.parse.stringToInteger(titaVo.getParam("StepMonths" + (i + 1))) == 0) {
-//						tFacProdStepRate.setMonthEnd(999);
-//					} else {
 				tFacProdStepRate.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("StepMonthE" + i)));
-//					}
-//				}
 				tFacProdStepRate.setRateType(titaVo.getParam("StepRateType" + i));
 				tFacProdStepRate.setRateIncr(parse.stringToBigDecimal(titaVo.getParam("StepRateIncr" + i)));
 				try {

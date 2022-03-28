@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankRelationCom;
 import com.st1.itx.util.common.data.BankRelationVo;
@@ -28,9 +26,6 @@ public class L1R16 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public BankRelationCom iBankRelationCom;
-
-	@Autowired
-	public CustMainService custMainService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -59,27 +54,10 @@ public class L1R16 extends TradeBuffer {
 		}
 
 		// 2021.8.31 by eric
-//		if ("Y".equals(vo.getIsSuspected())) {
-//			totaVo.putParam("L1R16IsSuspectedYn", "Y");
-//		} else {
-//			totaVo.putParam("L1R16IsSuspectedYn", "N");
-//		}
-
-		// 2022.3.24 by 昱衡
-		if ("".equals(vo.getIsSuspected().trim())) {
-			CustMain tCustMain = custMainService.custIdFirst(iCustId);
-			if (tCustMain != null) {
-				totaVo.putParam("L1R16IsSuspectedYn", tCustMain.getIsSuspected());
-				totaVo.putParam("L1R16IsSuspectedCheckYn", tCustMain.getIsSuspectedCheck());
-			}
+		if ("Y".equals(vo.getIsSuspected())) {
+			totaVo.putParam("L1R16IsSuspectedYn", "Y");
 		} else {
-			if ("Y".equals(vo.getIsSuspected())) {
-				totaVo.putParam("L1R16IsSuspectedYn", "Y");
-				totaVo.putParam("L1R16IsSuspectedCheckYn", "Y");
-			} else {
-				totaVo.putParam("L1R16IsSuspectedYn", "N");
-				totaVo.putParam("L1R16IsSuspectedCheckYn", "N");
-			}
+			totaVo.putParam("L1R16IsSuspectedYn", "N");
 		}
 
 		totaVo.putParam("L1R16DataDate", vo.getDataDate());

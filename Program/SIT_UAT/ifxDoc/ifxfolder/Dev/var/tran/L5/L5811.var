@@ -49,6 +49,10 @@ T(1,#DATE,2,3)
 E(2,#Year-1)
 @V(2,0)
 
+#StartMonth=A,5,S
+#EndMonth=A,5,S
+#CustNo=A,7,S
+#Acct=X,3,S
 
 #RPTFG=A,1,S
 E(0,0)
@@ -88,6 +92,10 @@ C(3,#SnoF,0,E(0,0),E(0,1))
 !------ 上行電文 ------
 <sub type="TIM">
 #Year
+#StartMonth
+#EndMonth
+#CustNo
+#Acct
 </sub>
 
 

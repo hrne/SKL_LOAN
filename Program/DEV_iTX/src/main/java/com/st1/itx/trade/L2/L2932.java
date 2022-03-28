@@ -39,14 +39,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CUSTNO=9,7<br>
- * CUSTNO1=9,3<br>
- * CUSTNO2=9,3<br>
- * END=X,1<br>
- */
-
 @Service("L2932")
 @Scope("prototype")
 /**
@@ -95,7 +87,6 @@ public class L2932 extends TradeBuffer {
 	public TotaVo totaC; // 抵押權塗銷同意書
 
 	private List<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
-//	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private List<LoanBorMain> lLoanBorMain2 = new ArrayList<LoanBorMain>();
 	private List<FacMain> lFacMain = new ArrayList<FacMain>();
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
@@ -139,10 +130,6 @@ public class L2932 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException(titaVo, "E0001", "客戶主檔"); // 查詢資料不存在
 		}
-
-		// 撥款主檔
-//		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, 1, 900, 0, Integer.MAX_VALUE, titaVo);
-//		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 
 		// 暫收支票
 		Slice<AcReceivable> slAcReceivable = acReceivableService.acctCodeEq(0, "TCK", iCustNo, iCustNo, 0, Integer.MAX_VALUE, titaVo);
@@ -194,7 +181,6 @@ public class L2932 extends TradeBuffer {
 			this.addList(totaC);
 		}
 
-//		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
@@ -214,7 +200,6 @@ public class L2932 extends TradeBuffer {
 		// 放款餘額
 		BigDecimal wkLoanBal = BigDecimal.ZERO;
 		if (lLoanBorMain2 != null && lLoanBorMain2.size() > 0) {
-//			lLoanBorMain = new ArrayList<LoanBorMain>();
 			for (LoanBorMain tLoanBorMain : lLoanBorMain2) {
 				wkLoanBal = wkLoanBal.add(tLoanBorMain.getLoanBal());
 			}
@@ -390,38 +375,5 @@ public class L2932 extends TradeBuffer {
 			}
 			totaC.addOccursList(occursList);
 		}
-//		// 全部結案
-//		List<ClFac> l2ClFac = new ArrayList<ClFac>(); // 擔保品與額度關聯檔
-//		Slice<ClFac> slClFac = clFacService.clNoEq(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0,
-//				Integer.MAX_VALUE, titaVo);
-//		l2ClFac = slClFac == null ? null : slClFac.getContent();
-//		boolean isAllClose = true;
-//		for (ClFac c : l2ClFac) {
-//
-//			if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
-//
-//				// 撥款主檔
-//				Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
-//						c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
-//				if (slLoanBorMain != null) {
-//					for (LoanBorMain t : slLoanBorMain.getContent()) {
-//						// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-//						if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
-//								|| t.getStatus() == 8) {
-//							isAllClose = false;
-//							break;
-//						}
-//					}
-//				}
-//			}
-//		}
-//
-//		this.info("isAllClose" + isAllClose);
-//		if (isAllClose) {
-//			occursList.putParam("OOCAllClose", "Y");
-//		} else {
-//			occursList.putParam("OOCAllClose", "N");
-//		}
-//		totaC.addOccursList(occursList);
 	}
 }

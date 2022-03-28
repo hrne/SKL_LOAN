@@ -28,13 +28,6 @@ import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CustId=X,10<br>
- * Borrower=X,1<br>
- * END=X,1<br>
- */
-
 @Service("L2902")
 @Scope("prototype")
 /**

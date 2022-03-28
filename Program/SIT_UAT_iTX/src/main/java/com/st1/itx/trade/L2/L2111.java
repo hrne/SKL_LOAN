@@ -176,34 +176,34 @@ public class L2111 extends TradeBuffer {
 		case 1: // 新增
 
 			// 需確認eloan是否有送
-			if (!isEloan) {
-				String IsSuspectedCheckType = titaVo.get("IsSuspectedCheckType");
-				if (IsSuspectedCheckType != null && "Y".equals(IsSuspectedCheckType)) {
-					CustMain custMain = custMainService.holdById(tCustMain, titaVo);
-					if (custMain == null) {
-						throw new LogicException(titaVo, "E2003", "客戶資料主檔" + iGroupId); // 查無資料
-					}
-					// 變更前
-					CustMain beforeCustMain = (CustMain) iDataLog.clone(custMain);
-
-					custMain.setIsSuspected(titaVo.getParam("IsSuspected"));
-					custMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
-					custMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
-
-					// 搬值
-
-					try {
-						custMain = custMainService.update2(custMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
-					}
-					// 紀錄變更前變更後
-					iDataLog.setEnv(titaVo, beforeCustMain, custMain);
-					iDataLog.exec("修改客戶主檔資料");
-				}
-
-			}
-
+//			if (!isEloan) {
+//				String IsSuspectedCheckType = titaVo.get("IsSuspectedCheckType");
+//				if (IsSuspectedCheckType != null && "Y".equals(IsSuspectedCheckType)) {
+//					CustMain custMain = custMainService.holdById(tCustMain, titaVo);
+//					if (custMain == null) {
+//						throw new LogicException(titaVo, "E2003", "客戶資料主檔" + iGroupId); // 查無資料
+//					}
+//					// 變更前
+//					CustMain beforeCustMain = (CustMain) iDataLog.clone(custMain);
+//
+//					custMain.setIsSuspected(titaVo.getParam("IsSuspected"));
+//					custMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
+//					custMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
+//
+//					// 搬值
+//
+//					try {
+//						custMain = custMainService.update2(custMain, titaVo);
+//					} catch (DBException e) {
+//						throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
+//					}
+//					// 紀錄變更前變更後
+//					iDataLog.setEnv(titaVo, beforeCustMain, custMain);
+//					iDataLog.exec("修改客戶主檔資料");
+//				}
+//
+//			}
+			
 		case 3: // 拷貝
 			// 新增時由電腦產生,營業日之民國年(2位)+5位之流水號
 			wkApplNo = gGSeqCom.getSeqNo(WkTbsYy * 10000, 1, "L2", "0002", 99999, titaVo);
@@ -338,12 +338,11 @@ public class L2111 extends TradeBuffer {
 		tFacCaseAppl.setCustUKey(wkCustUkey);
 		tFacCaseAppl.setCreditSysNo(parse.stringToInteger(titaVo.getParam("CreditSysNo")));
 		tFacCaseAppl.setSyndNo(parse.stringToInteger(titaVo.getParam("SyndNo"))); // 聯貸案序號 2021/09/27新增
-		tFacCaseAppl.setApplDate(this.parse.stringToInteger(titaVo.getParam("ApplDate")));
+		tFacCaseAppl.setApplDate(parse.stringToInteger(titaVo.getParam("ApplDate")));
 		tFacCaseAppl.setDepartmentCode(titaVo.getParam("DepartmentCode"));
 		tFacCaseAppl.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-		tFacCaseAppl.setApplAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimApplAmt")));
+		tFacCaseAppl.setApplAmt(parse.stringToBigDecimal(titaVo.getParam("TimApplAmt")));
 		tFacCaseAppl.setProdNo(titaVo.getParam("ProdNo"));
-//		tFacCaseAppl.setAcctCode(titaVo.getParam("AcctCode"));
 		tFacCaseAppl.setEstimate(titaVo.getParam("Estimate"));
 		tFacCaseAppl.setPieceCode(titaVo.getParam("PieceCode"));
 		tFacCaseAppl.setCreditOfficer(titaVo.getParam("CreditOfficer"));
@@ -351,6 +350,12 @@ public class L2111 extends TradeBuffer {
 		tFacCaseAppl.setIsLimit(titaVo.getParam("IsLimit"));
 		tFacCaseAppl.setIsLnrelNear(titaVo.getParam("IsLnrelNear"));
 		tFacCaseAppl.setIsRelated(titaVo.getParam("IsRelated"));
+		// 2022.3.28 新增欄位by 昱衡
+		tFacCaseAppl.setIsSuspected(titaVo.getParam("IsSuspected"));
+		tFacCaseAppl.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
+		tFacCaseAppl.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
+		tFacCaseAppl.setIsDate(parse.stringToInteger(titaVo.getParam("IsDataDate")));
+		
 		tFacCaseAppl.setIntroducer(titaVo.getParam("Introducer"));
 		tFacCaseAppl.setSupervisor(titaVo.getParam("Supervisor"));
 		tFacCaseAppl.setCoorgnizer(titaVo.getParam("Coorgnizer"));

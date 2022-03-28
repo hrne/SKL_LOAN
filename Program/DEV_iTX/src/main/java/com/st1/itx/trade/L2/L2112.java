@@ -23,57 +23,7 @@ import com.st1.itx.util.parse.Parse;
  * L2112 團體戶申請登錄
  * a.此功能提供團體戶放款申請案件資料輸入,以節省輸入時間
  */
-/*
- * GroupId=X,10
- * ProdNo=X,5
- * CurrencyCode=X,3
- * AcctCode=9,3
- * ApplDate=9,7
- * CreditOfficer=X,6
- * Introducer=X,6
- * LoanOfficer=X,6
- * Supervisor=X,6
- * CustId1=X,10
- * ApplAmt1=9,14.2
- * CustId2=X,10
- * ApplAmt2=9,14.2
- * CustId3=X,10
- * ApplAmt3=9,14.2
- * CustId4=X,10
- * ApplAmt4=9,14.2
- * CustId5=X,10
- * ApplAmt5=9,14.2
- * CustId6=X,10
- * ApplAmt6=9,14.2
- * CustId7=X,10
- * ApplAmt7=9,14.2
- * CustId8=X,10
- * ApplAmt8=9,14.2
- * CustId9=X,10
- * ApplAmt9=9,14.2
- * CustId10=X,10
- * ApplAmt10=9,14.2
- * CustId11=X,10
- * ApplAmt11=9,14.2
- * CustId12=X,10
- * ApplAmt12=9,14.2
- * CustId13=X,10
- * ApplAmt13=9,14.2
- * CustId14=X,10
- * ApplAmt14=9,14.2
- * CustId15=X,10
- * ApplAmt15=9,14.2
- * CustId16=X,10
- * ApplAmt16=9,14.2
- * CustId17=X,10
- * ApplAmt17=9,14.2
- * CustId18=X,10
- * ApplAmt18=9,14.2
- * ustId19=X,10
- * ApplAmt19=9,14.2
- * CustId20=X,10
- * ApplAmt20=9,14.2
- */
+
 /**
  * L2112 團體戶申請登錄
  * 
@@ -83,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2112")
 @Scope("prototype")
 public class L2112 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2112.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -139,7 +88,6 @@ public class L2112 extends TradeBuffer {
 				tFacCaseAppl.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 				tFacCaseAppl.setApplAmt(this.parse.stringToBigDecimal(titaVo.getParam("timApplAmt" + i)));
 				tFacCaseAppl.setProdNo(titaVo.getParam("ProdNo"));
-//				tFacCaseAppl.setAcctCode(titaVo.getParam("AcctCode"));
 				tFacCaseAppl.setEstimate("");
 				tFacCaseAppl.setPieceCode("A");
 				tFacCaseAppl.setCreditOfficer(titaVo.getParam("CreditOfficer"));
@@ -166,41 +114,4 @@ public class L2112 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
-	// 電腦產生,營業日之民國年(2位)+5位之流水號
-	/*
-	 * private int getGseqApplNo(TitaVo titaVo) throws LogicException { int
-	 * gGseqApplNo = 0; int gGseqDate = this.txBuffer.getTxCom().getTbsdy() / 10000
-	 * * 10000 + 101; int gGseqCode = 1; String gGseqType = "LN"; String gGseqKind =
-	 * "0002";
-	 * 
-	 * CdGseqId tCdGseqId = new CdGseqId(); tCdGseqId.setGseqDate(gGseqDate);
-	 * tCdGseqId.setGseqCode(gGseqCode); tCdGseqId.setGseqType(gGseqType);
-	 * tCdGseqId.setGseqKind(gGseqKind); CdGseq tCdGseq =
-	 * cdGseqService.holdById(tCdGseqId); if (tCdGseq != null) { gGseqApplNo =
-	 * tCdGseq.getSeqNo() + 1; if (gGseqApplNo == tCdGseq.getOffset()) {
-	 * tCdGseq.setSeqNo(1); } else { tCdGseq.setSeqNo(gGseqApplNo); }
-	 * tCdGseq.setLastUpdate(
-	 * parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(),
-	 * dDateUtil.getNowIntegerTime()));
-	 * tCdGseq.setLastUpdateEmpNo(titaVo.getTlrNo()); try {
-	 * cdGseqService.update(tCdGseq); } catch (DBException e) { throw new
-	 * LogicException(titaVo, "E2010", "編號編碼檔"); // 更新資料時，發生錯誤 } } else { tCdGseq =
-	 * new CdGseq(); tCdGseq.setGseqDate(gGseqDate); tCdGseq.setGseqCode(gGseqCode);
-	 * tCdGseq.setGseqType(gGseqType); tCdGseq.setGseqKind(gGseqKind);
-	 * tCdGseq.setCdGseqId(tCdGseqId);
-	 * tCdGseq.setOffset((this.txBuffer.getTxCom().getTbsdy() - 1000000) / 10000 *
-	 * 100000 + 99999); tCdGseq.setSeqNo((this.txBuffer.getTxCom().getTbsdy() -
-	 * 1000000) / 10000 * 100000 + 1); tCdGseq.setCreateDate(
-	 * parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(),
-	 * dDateUtil.getNowIntegerTime())); tCdGseq.setCreateEmpNo(titaVo.getTlrNo());
-	 * tCdGseq.setLastUpdate(
-	 * parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(),
-	 * dDateUtil.getNowIntegerTime()));
-	 * tCdGseq.setLastUpdateEmpNo(titaVo.getTlrNo()); try {
-	 * cdGseqService.insert(tCdGseq); } catch (DBException e) { throw new
-	 * LogicException(titaVo, "E2009", "編號編碼檔"); // 新增資料時，發生錯誤 } gGseqApplNo =
-	 * tCdGseq.getSeqNo(); } return gGseqApplNo; }
-	 */
-
 }

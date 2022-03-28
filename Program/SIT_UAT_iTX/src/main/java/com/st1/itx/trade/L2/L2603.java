@@ -23,11 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ReceiveDate=9,7<br>
- */
-
 @Service("L2603")
 @Scope("prototype")
 /**

@@ -56,7 +56,7 @@ public class L4455Report2 extends MakeReport {
 	@Autowired
 	public TxBuffer txBuffer;
 
-	private int acdate = 0;
+	private int entrydate = 0;
 	private int pageIndex = 38;
 	
 	
@@ -109,14 +109,14 @@ public class L4455Report2 extends MakeReport {
 		this.print(-4, 200, ""+this.getNowPage(),"R");
 		this.print(-5, 95, "入帳日期 ：    年    月    日", "C");
 		
-		if(String.valueOf(acdate).length() == 7) {
-			year = String.valueOf(acdate).substring(0, 3);
-			month = String.valueOf(acdate).substring(3, 5);
-			date = String.valueOf(acdate).substring(5, 7);
-		} else if(String.valueOf(acdate).length() == 6){
-			year = String.valueOf(acdate).substring(0, 2);
-			month = String.valueOf(acdate).substring(2, 4);
-			date = String.valueOf(acdate).substring(4, 6);
+		if(String.valueOf(entrydate).length() == 7) {
+			year = String.valueOf(entrydate).substring(0, 3);
+			month = String.valueOf(entrydate).substring(3, 5);
+			date = String.valueOf(entrydate).substring(5, 7);
+		} else if(String.valueOf(entrydate).length() == 6){
+			year = String.valueOf(entrydate).substring(0, 2);
+			month = String.valueOf(entrydate).substring(2, 4);
+			date = String.valueOf(entrydate).substring(4, 6);
 		} 
 		
 		this.print(-5, 91, year);
@@ -131,7 +131,7 @@ public class L4455Report2 extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		this.info("L4455Report2 exec");
-		acdate = parse.stringToInteger(titaVo.getParam("AcDate"));
+		entrydate = parse.stringToInteger(titaVo.getParam("EntryDate"));
 		
 		List<Map<String, String>> L4455List = new ArrayList<Map<String, String>>();
 		
@@ -192,6 +192,7 @@ public class L4455Report2 extends MakeReport {
 				this.print(0, 1, acctcodex);// 業務科目
 				this.print(0, 19, L4455List.get(i).get("RepayAcctNo"));// 扣款帳號
 				this.print(0, 38, FormatUtil.pad9(L4455List.get(i).get("CustNo"), 7));// 戶號
+				this.print(0, 48, limitLength(L4455List.get(i).get("CustName"), 20));// 戶名
 				
 				if(parse.stringToInteger(L4455List.get(i).get("IntStartDate")) != 0) {
 					String IntStartDate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("IntStartDate")) -19110000);
@@ -234,7 +235,7 @@ public class L4455Report2 extends MakeReport {
 				}
 				
 				this.print(0, 168, L4455List.get(i).get("ReturnCode"));// 原因
-				this.print(0, 184, L4455List.get(i).get("Remark"));// 備註
+				this.print(0, 172, L4455List.get(i).get("Remark"));// 備註
 				
 				pagetime++;
 				
@@ -251,7 +252,9 @@ public class L4455Report2 extends MakeReport {
 					this.print(0, 52, L4455List.get(i).get("RelCustId")); // 第三人身分證字號
 					this.print(0, 70, L4455List.get(i).get("RelCustName")); // 第三人身分證字號
 					pageCnt++;
+					relationcodex = ""; // 清空關係
 				}
+				
 				
 				if (j != L4455List.size()) {
 //					批次號碼/扣款銀行 不同則跳頁，並且累計歸零
@@ -281,8 +284,8 @@ public class L4455Report2 extends MakeReport {
 					
 					
 //					每頁第38筆 跳頁 
-					if (pageCnt == 38) {
-						this.print(1, 95, "=====續下頁=====", "C");
+					if (pageCnt >= 34) {
+						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
 
 						pageCnt = 0;
 						this.newPage();
@@ -293,12 +296,35 @@ public class L4455Report2 extends MakeReport {
 //					扣除總計合計的行數 +1 
 					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					this.print(1, 1,"                                                                                                                                                                               ");
+					this.print(0, 70, "小    計             件 ");
+					
+					this.print(0, 90, String.valueOf(pagetime),"R");
+					
+					if(Amt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
+						this.print(0, 117, df1.format(Amt), "R");// 應扣款金額合計
+					}
+					
+					Amt = new BigDecimal("0");
+					
+					pageCnt = pageCnt + 2;
+					
+					// 每頁第38筆 跳頁 
+					if (pageCnt >= 34) {
+						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+
+						pageCnt = 0;
+						this.newPage();
+						
+					}
+					
+					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					this.print(1, 1,"                                                                                                                                                                               ");
 					this.print(0, 70, "合    計             件                                       總戶數 ： 　　　 　　失敗戶數 ：");
 					
 					this.print(0, 90, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F0"))),"R");
 					this.print(0, 117, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F1"))),"R");
 					this.print(0, 160, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F2"))),"R");
-					this.print(0, 184, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F3"))),"R");
+					this.print(0, 172, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F3"))),"R");
 					pageCnt = pageCnt + 2 ;
 					this.print(pageIndex - pageCnt - 2, 95, "=====報表結束=====", "C");
 					this.print(2, 95, "協理：　　　　　　　　　　　　　　　襄理：　　　　　　　　　　　　　　　製表人：","C");

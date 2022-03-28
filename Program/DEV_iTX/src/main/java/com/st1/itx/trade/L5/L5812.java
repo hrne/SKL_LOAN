@@ -113,9 +113,7 @@ public class L5812 extends TradeBuffer {
 		mYearlyHouseLoanInt.setYearlyHouseLoanIntId(mYearlyHouseLoanIntId);
 
 		mYearlyHouseLoanInt.setAcctCode(titaVo.getParam("AcctCode"));// 業務科目代號
-//		int RepayCode = Integer.parseInt(titaVo.getParam("RepayCode"));
-//		String iRepayCode = String.valueOf(RepayCode);
-//		mYearlyHouseLoanInt.setRepayCode(iRepayCode);// 繳款方式 
+
 		mYearlyHouseLoanInt.setLoanAmt(this.parse.stringToBigDecimal(titaVo.getParam("LoanAmt"))); // 撥款金額
 		mYearlyHouseLoanInt.setLoanBal(this.parse.stringToBigDecimal(titaVo.getParam("LoanBal"))); // 放款餘額
 		mYearlyHouseLoanInt.setYearlyInt(this.parse.stringToBigDecimal(titaVo.getParam("YearlyInt"))); // 年度繳息金額
@@ -124,11 +122,11 @@ public class L5812 extends TradeBuffer {
 		mYearlyHouseLoanInt.setMaturityDate(this.parse.stringToInteger(titaVo.getParam("MaturityDate"))); // 到期日
 		mYearlyHouseLoanInt.setHouseBuyDate(this.parse.stringToInteger(titaVo.getParam("HouseBuyDate"))); // 房屋取得日期
 
-		tTempVo.putParam("F0", titaVo.getParam("CustName")); // 戶名
-		tTempVo.putParam("F1", titaVo.getParam("CustId")); // 統編
-		tTempVo.putParam("F5", titaVo.getParam("LineAmt")); // 核准額度
-		tTempVo.putParam("F21", titaVo.getParam("Location")); // 核准額度
+		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
+		
+		tTempVo.putParam("BdLoacation", titaVo.getParam("Location"));  //地址
 		mYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
+		
 
 	}
 }
