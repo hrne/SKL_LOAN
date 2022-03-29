@@ -265,7 +265,8 @@ SHOW(#PieceCode0)
 #PieceCode0=X,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ApHelp,cols:2)
-@C(4,#PieceCode0,S,V(H,#ApHelp))
+@T(3,@PieceCodex0,)
+C(4,#PieceCode0,S,V(H,#ApHelp))
 
 #PieceCodex0=X,10,L
 C(4,#PieceCode0,S,$)
@@ -278,7 +279,8 @@ C(4,#PieceCode{j},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
 C(4,#PieceCode{j},S,$)
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ApHelp,cols:2)
-@C(4,#PieceCode{i},S,V(H,#ApHelp))
+@T(3,@PieceCodex{i},)
+C(4,#PieceCode{i},S,V(H,#ApHelp))
 C(4,#PieceCode{i},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
    
 #PieceCodex{i}=X,10,L

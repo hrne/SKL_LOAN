@@ -84,6 +84,7 @@ T(1,@ReportDate,#DateX,2,7)
 ! 報送類別
 #SubmitType=A,1,I
 HELP(#SubmitTypeHelp)
+@T(3,@SubmitTypeX,)
 @V(H,#SubmitTypeHelp)
 #SubmitTypeX=X,10,L
 T(H,#SubmitType,#SubmitTypeHelp)

@@ -105,6 +105,8 @@ T(3,CdCode.TelChgRsnCode)
 
 #TelChgRsnCodeHelp=x,1024,S
 
+!當錯誤時會清空戶名
+#ClearSpace=X,20,S
 
 #EnableFgHelpRim=X,1,S
 RESET_RIM(#EnableFgHelpRim,XXR99)
@@ -136,9 +138,12 @@ C(4,#NTXBUF5,T(3,1),T(3,2))
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,2,1)
-@A(ID_UNINO,0,#CustId)
+@
+T(2,#CustIdName,)
+A(ID_UNINO,0,#CustId)
 ! C(4,#CustId,T(3,@CustIdName,)INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
 C(4,#CustId,$,T(2,@BTNADDBUF,1+#CustId+0000000))
+
 
 
 ! 調Rim相關 開始
@@ -185,6 +190,7 @@ C(4,#CustId,S,s)
 C(4,#CustId,$,S)
 ! C(3,#CHAIN,1,s,$)
 @
+T(2,#CustNoName,)
 C(4,#CustId,C(3,#CustNo,0,V(P,需擇一輸入查詢條件),$),S)
 C(3,#CustNo,0,$,T(2,@BTNADDBUF,1+          +#CustNo))
 

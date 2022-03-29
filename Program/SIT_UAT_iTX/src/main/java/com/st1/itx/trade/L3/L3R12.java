@@ -18,12 +18,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNo=9,3
- */
 /**
  * L3R12 結案查詢催收呆帳檔金額
  * 

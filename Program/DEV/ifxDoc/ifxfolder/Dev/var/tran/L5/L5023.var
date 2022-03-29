@@ -58,14 +58,16 @@ T(4,CHAIN$)
 ! T(1,@CustNo,#NTXBUF,1,7)
 ! INVOKEJS(SHOW,p1,02,02,1)
 
+
 ! 戶號
 #CustNo=A,7,I
+@T(3,@CustName,)
 
 <include src="ROM.icf::L5R36.dec"/>     
 #RimL5R36=X,1,S
 #RimCustNo=A,7,S
 E(0,#CustNo)
-RESET_RIM(#RimL5R36,L5R36)
+RESET_RIM(#RimCustNo,L5R36)
 S(L5R36,1,#RimCustNo)
 R(1,L5R36)
 T(2,@CustName,#L5R36CustName)

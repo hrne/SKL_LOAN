@@ -220,7 +220,8 @@ C(2,#FuncCode,S,$,s,$,s,s)
 C(3,#FuncCode,1,$,T(F,@PieceCode,0))
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 HELP(#ApHelp,cols:2)
-@V(H,#ApHelp)
+@T(3,@PieceCodeX,)
+V(H,#ApHelp)
 
 #PieceCodeX=X,50,L
 @C(4,#PieceCode,S,T(H,#PieceCode,#ApHelp))

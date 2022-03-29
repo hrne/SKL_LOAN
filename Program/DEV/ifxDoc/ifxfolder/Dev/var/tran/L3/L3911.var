@@ -121,6 +121,7 @@ C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,3,1)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 @C(4,#CustNo,S,$)
+T(3,#CustNoX,)
 V(9)
 
 #TmpCustNo=A,7,S
@@ -165,6 +166,7 @@ C(4,#CustNo,$,S)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 @C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -210,6 +212,7 @@ HIDE(#BTN1,#BTN2)
 @
 C(4,#ApplNo,V(P,需擇一輸入查詢條件),$)
 V(9)
+T(3,#ApplNoX,)
 
 #TmpApplNo=A,7,S
 C(4,#ApplNo,S,$)

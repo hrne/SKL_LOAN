@@ -139,6 +139,7 @@ T(2,#CustNo)
 #BIND5B=X,1,S
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF5B;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
+T(3,#CustNoX,)
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
 T(3,@RimCustId, )
@@ -164,6 +165,7 @@ C(3,#CustNo,0,$,S)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3,#BTN4,#BTN5)
 @C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -206,7 +208,9 @@ C(4,#CustId,$,S)
 ! INVOKEJS(SHOW,p1,3,3,1)
 SHOW(#BTN3)HIDE(#BTN1,#BTN2,#BTN4,#BTN5)
 ! @V(2,0)
-@C(3,#ApplNo,0,V(P,需擇一輸入),$)
+@
+T(3,#ApplNoX,)
+C(3,#ApplNo,0,V(P,需擇一輸入),$)
 
 #WKBTN3=X,1,S
 C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))

@@ -240,7 +240,8 @@ D(8)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@T(3,@MaxMainCodeX,)
+V(7)
 
 
 #MaxMainCodeX=X,70,L
@@ -255,7 +256,8 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#PayOffResultHelp)
-@V(H,#PayOffResultHelp)
+@T(3,@PayOffResultX,)
+V(H,#PayOffResultHelp)
 
 #PayOffResultX=X,80,L
 T(H,#PayOffResult,#PayOffResultHelp)

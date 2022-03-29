@@ -114,14 +114,16 @@ T(3,N:非階梯式;A:固定階梯;B:浮動階梯)
 ! IFRS階梯商品別
 #IfrsStepProdCode=X,1,I
 HELP(#IfrsStepProdCodeHelp)
-@V(H,#IfrsStepProdCodeHelp)
+@T(3,@IfrsStepProdCodeX,)
+V(H,#IfrsStepProdCodeHelp)
 ! IFRS階梯商品別中文
 #IfrsStepProdCodeX=X,10,L
 T(H,#IfrsStepProdCode,#IfrsStepProdCodeHelp)
 ! IFRS產品別
 #IfrsProdCode=X,2,I
 HELP(#IfrsProdCode2Help)
-@V(H,#IfrsProdCode2Help)
+@T(3,@IfrsProdCodeX,)
+V(H,#IfrsProdCode2Help)
 ! IFRS產品別中文
 #IfrsProdCodeX=X,20,L
 T(H,#IfrsProdCode,#IfrsProdCode2Help)

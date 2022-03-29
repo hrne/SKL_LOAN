@@ -25,14 +25,7 @@ import com.st1.itx.util.parse.Parse;
  * L3003 預約撥款明細資料查詢
  * a.此功能供查詢某一戶號下,其下各筆預約撥款資料,已完成撥款者不會顯示.
  */
-/*
- * Tita
- * RvStartDate=9,7
- * RvEndDate=9,7
- * CaseNo=9,7
- * TimCustNo=9,7
- * FacmNo=9,3
- */
+
 /**
  * L3003 預約撥款明細資料查詢
  * 
@@ -168,9 +161,9 @@ public class L3003 extends TradeBuffer {
 			occursList.putParam("OOStatus", tLoanBorMain.getStatus());
 			occursList.putParam("OOActFlag", tLoanBorMain.getActFg());
 
-			if (iCustDataCtrl == 1) {
-				occursList.putParam("OOCustNo", "");
-			}
+			// if (iCustDataCtrl == 1) {
+			// 	occursList.putParam("OOCustNo", "");
+			// }
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);
 			wkTotalCount++;

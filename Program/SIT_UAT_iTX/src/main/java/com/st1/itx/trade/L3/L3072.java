@@ -23,11 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * END=X,1<br>
- */
-
 @Service("L3072")
 @Scope("prototype")
 /**

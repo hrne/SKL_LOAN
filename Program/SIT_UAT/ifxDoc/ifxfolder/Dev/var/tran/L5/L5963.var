@@ -114,7 +114,8 @@ T(2,@DelvrCodeHelp,#HelpDesc6)
 ! 案件種類
 #CaseCode=A,1,I
 HELP(#CaseCodeHelp)
-@V(H,#CaseCodeHelp)
+@T(3,@CaseCodeX,)
+V(H,#CaseCodeHelp)
 
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
@@ -122,7 +123,8 @@ T(H,#CaseCode,#CaseCodeHelp)
 ! 借戶戶號
 #CustNo=A,7,I
 ! C(3,#CHAIN,0,$,s)
-@V(2,0)
+@T(3,@CustNoX,)
+V(2,0)
 
 ! 借款人戶名----調RIM
 #CustNoX=X,100,L
@@ -159,7 +161,8 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 #DateFlag=A,1,I
 E(0,9)
 HELP(#DateFlagHelp)
-@V(H,#DateFlagHelp)
+@T(3,@DateFlagX,)
+V(H,#DateFlagHelp)
 #DateFlagX=X,9,L
 T(H,#DateFlag,#DateFlagHelp)
 

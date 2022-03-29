@@ -457,7 +457,7 @@ T(2,@IsLnrelNear,#L2r02IsLnrelNear)
 T(2,@IsSuspected,#L2r02IsSuspected)
 T(2,@IsSuspectedCheck,#L2r02IsSuspectedCheck)
 T(2,@IsSuspectedCheckType,#L2r02IsSuspectedCheckType)
-E(0,@IsDataDate,#L2r02IsDate)
+E(0,@IsDate,#L2r02IsDate)
 T(H,@IsLimitX,#IsLimit,#YesNoHelp)
 T(H,@IsRelatedX,#IsRelated,#YesNoHelp)
 T(H,@IsLnrelNearX,#IsLnrelNear,#YesNoHelp)
@@ -815,7 +815,7 @@ T(2,@IsLnrelNear,#L1R16IsLnrelNearYn)
 T(2,@IsSuspected,#L1R16IsSuspectedYn)
 T(2,@IsSuspectedCheck,#L1R16IsSuspectedCheckYn)
 IF(#IsSuspectedCheck=="Y",T(2,@IsSuspectedCheckType,#L1R16IsSuspectedCheckYn),$)
-T(2,@IsDataDate,#L1R16DataDate)
+T(2,@IsDate,#L1R16DataDate)
 
 !是否為授信限制對象
 #IsLimit=X,1,L
@@ -870,7 +870,7 @@ V(H,#IsSuspectedCheckTypeHelp)
 #IsSuspectedCheckTypeX=X,12,L
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
-#IsDataDate=D,7,L
+#IsDate=D,7,L
 
 !-----
 
@@ -1171,7 +1171,7 @@ V(P,修改時，必須至少修改一個項目)
 [#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNear,#IsLnrelNearX],
 ["#FdIsSuspected+是否為金控「疑似準利害關係人」名單",#IsSuspectedX,#FinancialBtn],
 ["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
-["#FdIsLimit+以上資訊日期",#IsDataDate],["@@","@@"]
+["#FdIsLimit+以上資訊日期",#IsDate],["@@","@@"]
 ]
 </sub>
 
@@ -1248,7 +1248,7 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 #IsSuspected
 #IsSuspectedCheck
 #IsSuspectedCheckType
-#IsDataDate
+#IsDate
 #SyndNo
 #END
 </sub>

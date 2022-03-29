@@ -68,7 +68,8 @@ E(0,@BonusDate,#L5R38oBonusDate)
 
 #FunCode=X,1,I
 HELP(#FunCodeHelp)
-@V(H,#FunCodeHelp)
+@T(3,@FunCodeX,)
+V(H,#FunCodeHelp)
 
 #FunCodeX=X,60,L
 T(H,#FunCode,#FunCodeHelp)
@@ -78,11 +79,13 @@ C(3,#FunCode,1,INVOKEJS(SHOW,L5511_5,1),INVOKEJS(SHOW,L5511_5,0))
 #WorkMonth2=A,5,S
 
 #WorkMonth=A,5,I
-@
+@E(0,@DateFm,0)
+E(0,@DateTo,0)
+E(0,@BonusDate,0)
 A(YM13,1,#WorkMonth)
 
 #RimL5R38B=X,1,S
-C(5,#WorkMonth,#WorkMonth2,S,$)
+! C(5,#WorkMonth,#WorkMonth2,S,$) 2022-03-18 xiangwei: 為求RIM正確更新，先註解掉這行
 RESET_RIM(#RimL5R38B,L5R38)
 E(0,@L5R38iCode,2)
 E(0,@L5R38iWorkYM,#WorkMonth)

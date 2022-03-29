@@ -146,7 +146,8 @@ C(3,#CustNo,0,S,$)
 !日期 必須輸入；1.入帳日 2.會計日
 #DateType=A,1,I
 HELP(#DateTypeHelp)
-@V(H,#DateTypeHelp)
+@T(3,@DateTypeX,)
+V(H,#DateTypeHelp)
 
 #DateTypeX=X,6,L
 T(H,#DateType,#DateTypeHelp)
@@ -165,7 +166,8 @@ V(5,#BeginDate,#DT2)
 !訂正別
 #CorrectType=A,1,I
 HELP(#CorrectTypeHelp)
-@V(H,#CorrectTypeHelp)
+@T(3,@CorrectCodeX,)
+V(H,#CorrectTypeHelp)
 
 #CorrectCodeX=X,6,L
 T(H,#CorrectType,#CorrectTypeHelp) 
@@ -174,7 +176,8 @@ T(H,#CorrectType,#CorrectTypeHelp)
 #ReportType=A,1,I
 E(0,1)
 HELP(#ReportTypeHelp)
-@V(H,#ReportTypeHelp)
+@T(3,@ReportTypeX,)
+V(H,#ReportTypeHelp)
 
 #ReportTypeX=X,20,L
 T(H,#ReportType,#ReportTypeHelp)

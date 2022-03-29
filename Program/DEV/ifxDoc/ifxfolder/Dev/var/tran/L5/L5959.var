@@ -71,7 +71,7 @@ T(1,@FacmNo,#NTXBUF,9,3)
 #Kind=A,1,I
 C(3,#CHAIN,1,s,$)
 HELP(#KindH)
-@
+@T(3,@KindX,)
 V(H,#KindH)
 
 #KindX=X,20,L

@@ -1136,4 +1136,20 @@ em = null;
       jobMainRepos.uspL9Monthlylm052ovduIns(TYYMM, EmpNo);
   }
 
+  @Override
+  public void Usp_Tx_TxHoliday_Ins(String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspTxTxholidayIns(EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspTxTxholidayIns(EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspTxTxholidayIns(EmpNo);
+   else
+      jobMainRepos.uspTxTxholidayIns(EmpNo);
+  }
+
 }

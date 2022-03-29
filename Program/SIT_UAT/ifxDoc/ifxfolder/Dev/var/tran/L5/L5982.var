@@ -122,7 +122,7 @@ C(3,#RPTFG,0,$,S)
 !資金用途別
 #UsageCode=A,1,I
 HELP(#UsageHelp)
-@
+@T(3,@UsageCodeX,)
 V(H,#UsageHelp)
 
 #UsageCodeX=X,10,L
@@ -131,7 +131,7 @@ T(H,#UsageCode,#UsageHelp)
 !檢核條件
 #Condition=A,2,I
 HELP(#ConditionsCodeHelp)
-@
+@T(3,@ConditionX,)
 C(3,#Condition,0,s,V(H,#ConditionsCodeHelp))
 
 #ConditionX=X,30,L

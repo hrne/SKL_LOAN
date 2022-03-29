@@ -32,14 +32,7 @@ import com.st1.itx.util.parse.Parse;
  * c1.在某筆額度資料前可按[額度],以查閱該額度之明細資料.
  * c2.在某筆額度資料前可按[撥款],以查閱該額度下之各筆撥款資料.
  */
-/*
- * Tita
- * CaseNo=9,7
- * TimCustId=X,10
- * TimCustNo=9,7
- * FacmNo=9,3
- * ValidFacm=9,3
- */
+
 /**
  * L3001 放款明細資料查詢
  * 
@@ -239,8 +232,6 @@ public class L3001 extends TradeBuffer {
 
 		// 顧客控管警訊通知訊息
 		if (titaVo.getReturnIndex() == 0) {
-//			custRmkCom.getCustRmk(titaVo, iCustNo);
-//			this.addAllList(custRmkCom.getCustRmk(titaVo, iCustNo));
 		}
 
 		// end

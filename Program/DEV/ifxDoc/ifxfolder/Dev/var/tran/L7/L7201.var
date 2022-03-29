@@ -103,7 +103,8 @@ T(3,Y:是;N:否)
 #RemakeYN=X,1,I
 T(3,N)
 HELP(#HelpChoice)
-@V(H,#HelpChoice)
+@T(3,@RemakeYNText,)
+V(H,#HelpChoice)
 
 #RemakeYNText=X,2,L
 T(H,#RemakeYN,#HelpChoice)

@@ -112,7 +112,8 @@ T(1,#DT1,2,5)
 ! 用途
 #UsageCode=A,2,I 
 HELP(#UsageCodeHelp)
-@V(H,#UsageCodeHelp)
+@T(3,@UsageCodeX,)
+V(H,#UsageCodeHelp)
 
 #UsageCodeX=X,20,L
 T(H,#UsageCode,#UsageCodeHelp)   

@@ -89,7 +89,8 @@ T(2,@TxtDate,#CDate)
 ! 報送類別
 #SubmitType=A,1,I
 HELP(#SubmitTypeHelp)
-@V(H,#SubmitTypeHelp)
+@T(3,@SubmitTypeX,)
+V(H,#SubmitTypeHelp)
 #SubmitTypeX=X,10,L
 T(H,#SubmitType,#SubmitTypeHelp)
 

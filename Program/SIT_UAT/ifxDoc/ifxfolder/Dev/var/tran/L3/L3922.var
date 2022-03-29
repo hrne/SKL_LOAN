@@ -149,6 +149,7 @@ E(0,@BormNo,0)
 
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
+T(3,#CustNoX,)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07A,L2R07)
@@ -172,7 +173,9 @@ T(3,@FdApplNo, )
 C(3,#CustNo,0,$,s)
 ! INVOKEJS(SHOW,p1,2,3,1)
 SHOW(#BTN2)HIDE(#BTN3)
-@C(4,#CustId,S,$)V(7)
+@
+T(3,#CustIdX,)
+C(4,#CustId,S,$)V(7)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)

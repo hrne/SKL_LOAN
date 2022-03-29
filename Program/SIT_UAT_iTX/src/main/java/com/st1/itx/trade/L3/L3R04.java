@@ -20,13 +20,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimFuncCode=X,1 1:新增 2:修改 3:拷貝 4:刪除 5:查詢
- * RimChequeAcct=9,9
- * RimChequeNo=9,7
- */
 /**
  * L3R04 尋找支票檔資料,檢查該支票是否已存在
  * 

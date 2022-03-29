@@ -23,15 +23,6 @@ import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimFKey=9,1 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
- * RimFuncCode=X,1 1:新增 2:修改 3:拷貝 4:刪除 5:查詢
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNoNo=9,7
- */
 /**
  * L3R02 查尋放款主檔
  * 

@@ -252,7 +252,8 @@ T(2,@CustIdX,#L8R57CustName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@T(3,@SubmitKeyX,)
+V(7)
 
 #SubmitKeyX=X,80,L
 T(2,@RimJcicBankCode,#SubmitKey)

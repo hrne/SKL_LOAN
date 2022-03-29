@@ -75,7 +75,8 @@ T(3,1:已結清並領取清償證明五年之交易明細)
 
 #InputType=A,1,I
 HELP(#InputTypeHelp)
-@V(H,#InputTypeHelp)
+@T(3,@InputTypeX,)
+V(H,#InputTypeHelp)
 
 #InputTypeX=X,40,L
 T(H,#InputType,#InputTypeHelp)
@@ -85,7 +86,8 @@ T(3,0:連線環境至歷史環境;1:歷史環境至連線環境)
 
 #InputRoute=A,1,I
 HELP(#InputRouteHelp)
-@V(H,#InputRouteHelp)
+@T(3,@InputRouteX,)
+V(H,#InputRouteHelp)
 SWITCH(#InputRoute,0,HIDE(#CustNoText)HIDE(#InputCustNo)HIDE(#FacmNoText)HIDE(#InputFacmNo)HIDE(#BormNoText)HIDE(#InputBormNo),
                    1,SHOW(#CustNoText)SHOW(#InputCustNo)SHOW(#FacmNoText)SHOW(#InputFacmNo)SHOW(#BormNoText)SHOW(#InputBormNo),
                    $)

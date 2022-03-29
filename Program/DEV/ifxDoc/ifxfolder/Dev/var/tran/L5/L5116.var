@@ -124,7 +124,7 @@ T(H,#FunctionCode,#FuncCodeHelp)
 
 #CustNo=A,7,I
 C(3,#FunctionCode,1,$,s)
-@
+@T(3,@CustName,)
 V(2,0)
 
 #Sapce=X,1,S
@@ -154,7 +154,8 @@ R(1,L5R35)
 C(3,#FunctionCode,4,s,$)
 C(3,#FunctionCode,1,T(2,N),$)
 HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
+@T(3,@ActUseX,)
+V(H,#YesNoHelp)
 
 #ActUseX=X,10,L
 T(H,#ActUse,#YesNoHelp)

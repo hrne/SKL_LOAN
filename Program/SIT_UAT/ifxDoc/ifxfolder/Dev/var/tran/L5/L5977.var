@@ -68,7 +68,8 @@ T(4,DATE$)
 #CustId=X,10,I
 C(3,#CHAIN,1,T(1,#NTXBUF,1,10),$)
 C(3,#CHAIN,1,s,$)
-@V(7)
+@T(3,@CustName,)
+V(7)
 A(ID_UNINO,0,#CustId)
 
 #CaseSeq=A,3,I

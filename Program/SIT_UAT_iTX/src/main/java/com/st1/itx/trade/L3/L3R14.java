@@ -31,23 +31,6 @@ import com.st1.itx.util.common.LoanSetRepayIntCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimFKey=9,1
- * RimFuncCode=9,1
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNo=9,3
- * RimCurrencyCode=X,3
- * RimExtraRepay=9,14.2
- * RimIncludeIntFlag=X,1 是否內含利息 Y:是 N:否
- * RimRepayTerms=9,2
- * RimRepayType=9,2
- * RimEntryDate=9,7
- * RimCloseBreachAmt=9,14.2
- */
-
 /**
  * L3R14 撥款收息試算
  * 
@@ -98,7 +81,6 @@ public class L3R14 extends TradeBuffer {
 	private FacMain tFacMain;
 	private LoanBorMain tLoanBorMain;
 	private LoanBorMain t2LoanBorMain;
-//	private LoanEachFeeVo loanEachFeeVo = new LoanEachFeeVo();
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 
@@ -174,13 +156,6 @@ public class L3R14 extends TradeBuffer {
 		// 掛帳利息
 		// 1. 撥款金額為0 = 利息金額全部掛帳
 		// 2. 利息金額 - 應繳利息上限金額
-//		if (oDuePayAmt.equals(BigDecimal.ZERO)) {
-//			this.info("撥款金額為0");
-//			oOpenInterest = oInterest;
-//		} else if (oInterest.compareTo(tFacMain.getPayIntLimit()) > 0) {
-//			this.info("撥款金額不為0");
-//			oOpenInterest = oInterest.subtract(tFacMain.getPayIntLimit());
-//		}
 
 		// 查詢各項費用
 		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)

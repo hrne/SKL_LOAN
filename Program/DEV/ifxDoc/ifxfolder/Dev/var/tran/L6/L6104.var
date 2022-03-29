@@ -18,7 +18,6 @@ C(2,#FKEY,E(0,1),$)
 #ORGFG=_,_,S
 E(0,0)
 
-
 #Help=X,200,S
 T(3,1:設定;2:解除;3:查詢)
 
@@ -70,7 +69,8 @@ T(3, )
 
 #FunCode=A,1,I
 HELP(#Help)
-@V(H,#Help)
+@T(3,@FunCodeX,)
+V(H,#Help)
 
 
 #FunCodeX=X,10,L
@@ -119,7 +119,7 @@ T(H,@AgentTlrnoNa5,#AgentTlrno5,#tlrnoH)
 #AgentTlrno1=X,6,I
 C(3,#FunCode,1,$,s)
 HELP(#tlrnoH,cols:3)
-@
+@T(3,@AgentTlrnoNa1,)
 V(7)
 V(4,#TLRNO)
 V(H,#tlrnoH)
@@ -132,7 +132,7 @@ T(H,#AgentTlrno1,#tlrnoH)
 C(3,#FunCode,1,$,s)
 C(4,#AgentTlrno1,s,$)
 HELP(#tlrnoH,cols:3)
-@
+@T(3,@AgentTlrnoNa2,)
 C(4,#AgentTlrno2,S,$)
 V(4,#TLRNO)
 V(H,#tlrnoH)
@@ -146,7 +146,7 @@ T(H,#AgentTlrno2,#tlrnoH)
 C(3,#FunCode,1,$,s)
 C(4,#AgentTlrno2,s,$)
 HELP(#tlrnoH,cols:3)
-@
+@T(3,@AgentTlrnoNa3,)
 C(4,#AgentTlrno3,S,$)
 V(4,#TLRNO)
 V(H,#tlrnoH)
@@ -161,7 +161,7 @@ T(H,#AgentTlrno3,#tlrnoH)
 C(3,#FunCode,1,$,s)
 C(4,#AgentTlrno3,s,$)
 HELP(#tlrnoH,cols:3)
-@
+@T(3,@AgentTlrnoNa4,)
 C(4,#AgentTlrno4,S,$)
 V(4,#TLRNO)
 V(H,#tlrnoH)
@@ -177,7 +177,7 @@ T(H,#AgentTlrno4,#tlrnoH)
 C(3,#FunCode,1,$,s)
 C(4,#AgentTlrno4,s,$)
 HELP(#tlrnoH,cols:3)
-@
+@T(3,@AgentTlrnoNa5,)
 C(4,#AgentTlrno5,S,$)
 V(4,#TLRNO)
 V(H,#tlrnoH)
@@ -236,7 +236,7 @@ T(1,#EndTime,3,2)
 C(3,#FunCode,1,$,s)
 @
 C(3,#EndTimem,0,$,V(5,0,59))
-C(3,#BeginDate,#EndDate,V(5,#BeginTimem,59),$)
+C(3,#BeginDate,#EndDate,C(3,#BeginTimeh,#EndTimeh,V(5,#BeginTimem,59),$),$)
 T(2,@EndTime,#EndTimeh+#EndTimem)
 
 #TimTlrNo=X,6,S

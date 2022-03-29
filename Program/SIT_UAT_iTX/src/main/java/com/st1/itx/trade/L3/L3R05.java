@@ -19,14 +19,6 @@ import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimChequeFlag=9,1 0:非支票 1:支票
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimTempReasonCode=9,2 暫收原因, 暫收帳戶
- */
 /**
  * L3R05 尋找暫收款餘額
  * 

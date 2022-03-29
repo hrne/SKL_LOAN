@@ -257,7 +257,8 @@ D(8)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@C(4,#MaxMainNote,$,C(5,#MaxMainNote,Y,$,V(P,限輸入Y或空白)))
+@T(3,@MaxMainNoteX,)
+C(4,#MaxMainNote,$,C(5,#MaxMainNote,Y,$,V(P,限輸入Y或空白)))
 C(5,#MaxMainNote,Y,T(2,#MaxMainCode,458)T(2,@FdMaxMainCode, )T(F,@MaxMainCode,0)T(2,@FdIsGuarantor, )T(F,@IsGuarantor,0)T(2,@IsGuarantorX, )T(2,@IsGuarantor, ),
                    T(2,@FdIsGuarantor,*)T(2,@FdMaxMainCode,*)T(F,@MaxMainCode,1)T(2,@FdIsGuarantor,*)T(F,@IsGuarantor,1))
 
@@ -271,7 +272,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#MaxMainNote,Y,s,$)
-@V(7)
+@T(3,@MaxMainCodeX,)
+V(7)
 
 #Sapce=X,1,S
 T(2,@RimJcicBankCode,#MaxMainCode)
@@ -303,7 +305,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#MaxMainNote,Y,S,$)
 HELP(#YesNoHelp)
-@
+@T(3,@IsGuarantorX,)
 V(H,#YesNoHelp)
 
 #IsGuarantorX=X,2,L
@@ -314,7 +316,8 @@ C(4,#IsGuarantor,S,T(H,@IsGuarantorX,#IsGuarantor,#YesNoHelp))
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
+@T(3,@IsChangePaymentX,)
+V(H,#YesNoHelp)
 
 #IsChangePaymentX=X,2,L
 T(H,@IsChangePaymentX,#IsChangePayment,#YesNoHelp)

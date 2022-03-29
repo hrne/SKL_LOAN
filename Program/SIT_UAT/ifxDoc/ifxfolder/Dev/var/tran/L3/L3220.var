@@ -135,6 +135,7 @@ SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
+T(3,#CustNoX,)
 
 #InitFdB=X,1,S
 T(3,@FdApplNo, )
@@ -169,6 +170,7 @@ C(4,#CustNo,$,S)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 @C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -224,7 +226,7 @@ SHOW(#BTN3)HIDE(#BTN1,#BTN2)
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
 T(2,@ApplNo,#ApplNo2)
-
+T(3,#ApplNoX,)
 
 #BUF3B=X,45,S
 T(2,0000000000000000000000000000          +#ApplNo)

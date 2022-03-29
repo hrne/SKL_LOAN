@@ -1,0 +1,183 @@
+!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+#TXCD
+T(3,L6XXX)
+</sub>
+
+<sub type="DC" name="BFRP">
+<include src="RPDTL_Test.icf::BFRP.dec"/>
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+</sub>
+
+<sub type="PREDC" name="PreDC">
+#DEALNO_RUN=X,1,S
+C(3,#FKEY,0,$,T(2,@INO,#MRKEY))
+
+#CURSNM_RUN=X,1,S
+C(3,#FKEY,0,$,T(A,@CURCDEN,#CURCD,CURR,CURDEF,CURCD,ENAME))
+<include src="COM.icf::TITLE-RUN.pre"/>
+<include src="RPDTL_Test.icf::RPRUN.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=2;screen.width=[250,750];printer.width=[20,20];">
+[
+["[L6XXX]                                 TSST TITF5版本"],
+[#<->#,"應收付類別",#X_RPFG,#X_RPFGX],
+[#<->#,"還款來源／撥款方式",#X_RPTYP,#X_RPTYPX],
+[#<->#,"戶號",#X_CUSTNO,#X_FACMNO],
+[#<->#,"入帳日期",#X_ENTRYDATE,#X_BTNA],
+[#<->#,"支票帳號",#X_CHQACT],
+[#<->#,"支票號碼",#X_CHQUENO],
+[#<->#,"支票金額",#X_CHQUEAMT,#X_BTNB],
+[#<->#,"回收金額",#X_RPAMT],
+[#<->#,"應收付總金額",#X_RPTOT],
+]
+
+#X_BTNA=X,96,I,ui:button;value:瀏覽;enable:1;tabbable:0
+#X_BTNB=X,95,I,ui:button;value:瀏覽;enable:1;tabbable:0
+
+!---------- AP TEXT AREA Variables ----------
+#HELP_CRDB=X,8,S
+T(3,D:借;C:貸;)
+
+#SECNO=_,_,S
+!---------- HELP ----------------------------
+![應收付類別]
+#X_RPFG = A,1,I
+HELP(L4DEF,HFRTYP0DEF,NUM,NUMX)
+@T(3,@X_RPFGX,)
+V(1,0,1,2,3,4,5,6,7,8)
+E(3,@RPFG,#X_RPFG)
+
+#X_RPFGX = X,16,L
+T(A,#X_RPFG,L4DEF,HFRTYP0DEF,NUM,NUMX)
+
+![還款來源／撥款方式]
+#X_RPTYP = A,2,I
+IF(#X_RPFG<4,HELP(L4DEF,HFRTYP1DEF,NUM,NUMX),HELP(L4DEF,HFRTYP2DEF,NUM,NUMX))
+@T(3,@X_RPTYPX,)
+@C(2,#X_RPFG,$,V(1,01,02,03,04,06,07,09,11,90),
+               V(1,01,02,03,04,06,07,09,11,90,91),
+               V(1,04),
+               V(1,01,02),
+               V(1,04,05,11),
+               V(1,91),
+               V(1,92),
+               V(1,93))
+E(3,@RPTYPZ,#X_RPTYP)
+IF(#X_RPFG == 4 && #X_RPTYP == 01 ,T(2,@SECNO,01),$)
+
+#X_RPTYPX = X,16,L
+IF(#X_RPFG<4,T(A,#X_RPTYP,L4DEF,HFRTYP1DEF,NUM,NUMX),T(A,#X_RPTYP,L4DEF,HFRTYP2DEF,NUM,NUMX))
+
+! 戶號
+#X_CUSTNO = A,7,I
+@T(2,@RP_CUSTNO,#X_CUSTNO)
+
+! 額度
+#X_FACMNO = A,3,I
+@T(2,@RP_FACMNO,#X_FACMNO)
+
+#BUFA=X,12,S
+T(2,#X_CUSTNO+#X_FACMNO+#X_RPTYP)
+
+#BINDA=X,1,S
+BIND(#X_BTNA,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUFA;ntxbuf5=type<-1:X_FACMNO<-OOFACMNO:X_ENTRYDATE<-OOENTRYDATE:RPTYPZ<-OORPTYP:RP_REPCAT<-OORPKIND:RPSEQ<-OORPSEQ:X_RPAMT<-OORPAMT:RP_NOTE<-OORPNOTE})
+
+! 入帳日期
+#X_ENTRYDATE = D,7,O
+T(2,@RP_ENTRYDATE,#X_ENTRYDATE)
+
+! 支票帳號
+#X_CHQACT= A,14,I
+IF(#X_RPFG==3||#X_RPFG==8,$,s)
+@E(0,@RP_CHQACT,#X_CHQACT)
+
+! 支票號碼 
+#X_CHQUENO= A,7,I
+IF(#X_RPFG==3||#X_RPFG==8,$,s)
+@E(0,@RP_CHQUENO,#X_CHQUENO)
+
+#BUFB=X,56,S
+T(2,#X_CUSTNO+#X_CHQACT+#X_CHQUENO)
+
+#BINDB=X,1,S
+BIND(#X_BTNB,click, {cmd=CHAIN; ntxcd=L492B; ntxbuf=#BUFB;ntxbuf5=type<-1:RP_FACMNO<-OOFACMNO1:RPAMTZ<-OORPAMT1:RP_FACMNO2<-OOFACMNO2:RPAMTZ2<-OORPAMT2:RP_FACMNO3<-OOFACMNO3:RPAMTZ3<-OORPAMT3:RP_FACMNO4<-OOFACMNO4:RPAMTZ4<-OORPAMT4:RP_FACMNO5<-OOFACMNO5:RPAMTZ5<-OORPAMT5})
+
+
+! 支票金額   
+#X_CHQUEAMT= m,14.2,I
+IF(#X_RPFG==3||#X_RPFG==8,$,s)
+@E(3,@RP_CHQUEAMT,#X_CHQUEAMT)
+IF(#X_RPFG==3||#X_RPFG==8,E(3,@RPTOT,#X_CHQUEAMT),$)
+
+! 回收金額
+#X_RPAMT= m,14.2,I
+IF(#X_RPFG==1||#X_RPFG==2,$,s)
+@E(3,@RPAMTZ,#X_RPAMT)
+
+![應收付總金額]
+#X_RPTOT = m,14.2,I
+IF(#X_RPFG==3||#X_RPFG==8,s,$)
+@E(3,@RPTOT,#X_RPTOT)
+IF(#X_RPFG==4||#X_RPFG==5||#X_RPFG==7,E(3,@RPAMTZ,#X_RPTOT),$)
+
+<include src="RPDTL_Test.icf::RPCOL.dec"/>
+
+</sub>
+
+!<<<<收付欄>>>
+<sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
+[
+<include src="RPDTL_Test.icf::RPDTL.scr"/>
+]
+
+
+
+
+</sub>
+
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L6XXX -----------
+<sub type="FORM" name="L6XXX">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6XXX,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6XXX] TEST)
+
+
+
+</sub>
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+<supclude src="RPDTL_Test.icf::RPDTL.tim"/>
+
+
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+
+
+</sub>
+
+<sub type="SELECT">
+
+</sub>

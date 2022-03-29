@@ -126,6 +126,7 @@ D(8)
 #Factor=A,1,I
 C(3,#CHAIN,1,s,$)
 HELP(#FactorHelp)
+@T(3,@FactorX,)
 @V(H,#FactorHelp)
 
 #FactorX=X,6,L

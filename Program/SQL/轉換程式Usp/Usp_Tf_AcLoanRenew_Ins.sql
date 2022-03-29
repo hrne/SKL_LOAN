@@ -103,7 +103,7 @@ BEGIN
         FROM "LNACNP"
       )
       , joinedData AS (
-        SELECT A."LMSACN"
+        SELECT DISTINCT A."LMSACN"
              , A."LMSAPN"
              , A."LMSASQ"
              , A."LMSAPN1" AS "OLD_LMSAPN"
@@ -132,7 +132,7 @@ BEGIN
             ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
             ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
             ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-      FROM NODP S1
+      FROM joinedData S1
       LEFT JOIN LA$LMSP S3 ON S3.LMSACN = S1.LMSACN
                           AND S3.LMSAPN = S1.LMSAPN
                           AND S3.LMSASQ = S1.LMSASQ

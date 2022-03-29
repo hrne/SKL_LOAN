@@ -34,15 +34,7 @@ import com.st1.itx.util.parse.Parse;
  * c.畫面會計日期之初值為當月1日
  * d.在某筆交易資料前可按[查詢],以查閱該筆交易之明細資料.
  */
-/*
- * Tita
- * TimCustNo=9,7
- * CustId=X,10
- * ApplNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- * AcDate=9,7
- */
+
 /**
  * L3005 交易明細資料查詢
  * 
@@ -160,9 +152,9 @@ public class L3005 extends TradeBuffer {
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-		if (iCustDataCtrl == 1) {
-			this.totaVo.putParam("OCustNo", "");
-		}
+		// if (iCustDataCtrl == 1) {
+		// 	this.totaVo.putParam("OCustNo", "");
+		// }
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 

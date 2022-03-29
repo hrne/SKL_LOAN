@@ -172,7 +172,8 @@ T(2,@FdUnitCode,#WKSTAR2)
 #CityCode=X,2,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 C(2,#FuncCode,$,$,$,$,s,s)
-@V(7)
+@T(3,@CityItem,)
+V(7)
 V(9)
 
 #SendL6R12=X,1,S
@@ -202,7 +203,8 @@ BIND(#UnitCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#UnitCodeBUF;ntxbuf5=ty
 
 #UnitCode=X,6,I
 C(2,#FuncCode,$,$,$,$,s,s)
-@V(7)
+@T(3,@UnitItem,)
+V(7)
 
 #SendL6R13=X,1,S
 E(0,@RimFuncCode,#FuncCode)

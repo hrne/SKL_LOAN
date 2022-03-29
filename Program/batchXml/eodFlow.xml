@@ -8,6 +8,12 @@
 	<!-- 作業名稱 -->
 	<job id="eodFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
+		<!-- Usp_Tx_TxHoliday_Ins -->
+		<step id="txTxHolidayUpd" parent="parentStep">
+			<tasklet ref="TxTxHolidayUpd" />
+			<next on="COMPLETED" to="l2CustDataCtrlIns" />
+			<end on="FAILED" />
+		</step>
 		<!-- Usp_L2_CustDataCtrl_Ins -->
 		<step id="l2CustDataCtrlIns" parent="parentStep">
 			<tasklet ref="L2CustDataCtrlIns" />

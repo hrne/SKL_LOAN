@@ -350,7 +350,8 @@ C(3,#FunctionCd,1,T(1,#MeetTimeX,1,4),$)
 #ContactCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#ContactCodeHelp)
-@V(H,#ContactCodeHelp)
+@T(3,@ContactCodeX,)
+V(H,#ContactCodeHelp)
 #ContactCodeX=X,6,L
 T(H,#ContactCode,#ContactCodeHelp)
 
@@ -358,7 +359,8 @@ T(H,#ContactCode,#ContactCodeHelp)
 #MeetPsnCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MeetPsnCodeHelp)
-@V(H,#MeetPsnCodeHelp)
+@T(3,@MeetPsnCodeX,)
+V(H,#MeetPsnCodeHelp)
 #MeetPsnCodeX=X,4,L
 T(H,#MeetPsnCode,#MeetPsnCodeHelp)
 
@@ -366,7 +368,8 @@ T(H,#MeetPsnCode,#MeetPsnCodeHelp)
 #AccCollPsnCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#AccCollPsnCodeHelp)
-@V(H,#AccCollPsnCodeHelp)
+@T(3,@AccCollPsnCodeX,)
+V(H,#AccCollPsnCodeHelp)
 #AccCollPsnCodeX=X,6,L
 T(H,#AccCollPsnCode,#AccCollPsnCodeHelp)
 @C(3,#AccCollPsnCode,1,HIDE(#BTNF)HIDE(#BTNR)T(F,@AccCollPsnName,0),SHOW(#BTNF)SHOW(#BTNR)T(F,@AccCollPsnName,1))
@@ -389,7 +392,8 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#AccCollPsnCode,1,T(2,#TLRNO),$)
 C(3,#AccCollPsnCode,1,s,$)
 
-@V(7)
+@T(3,@AccCollPsnNameX,)
+V(7)
 
 #AccCollPsnNameX=X,6,L
 <include src="ROM.icf::L5R17.dec"/>
@@ -405,7 +409,8 @@ T(2,@AccCollPsnNameX,#L5R17FullName)
 #MeetPlaceCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MeetPlaceCodeHelp)
-@V(H,#MeetPlaceCodeHelp)
+@T(3,@MeetPlaceCodeX,)
+V(H,#MeetPlaceCodeHelp)
 #MeetPlaceCodeX=X,10,L
 T(H,#MeetPlaceCode,#MeetPlaceCodeHelp)
 

@@ -80,7 +80,8 @@ T(2,@BatchResultCodeH,#HelpDesc1)
 ! [執行結果篩選]
 #BatchResultCode=A,1,I
 HELP(#BatchResultCodeH)
-@C(4,#BatchResultCode,$,V(H,#BatchResultCodeH))
+@T(3,@BatchResultCodeX,)
+C(4,#BatchResultCode,$,V(H,#BatchResultCodeH))
 
 ! 輸出欄位
 ! [執行結果篩選]

@@ -130,7 +130,7 @@ A(YM13,1,#WorkYM)
 C(3,#BonusType,0,E(0,9),$)
 C(3,#CHAIN,1,s,$)
 HELP(#BonusTypeHelp)
-@
+@T(3,#BonusTypeX,)
 V(H,#BonusTypeHelp)
 
 #BonusTypeX=X,20,L

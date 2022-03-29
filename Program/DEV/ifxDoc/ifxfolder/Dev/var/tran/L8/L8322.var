@@ -271,7 +271,8 @@ T(2,@CustIdX,#L8R57CustName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@T(3,@SubmitKeyX,)
+V(7)
 
 #SubmitKeyX=X,80,L
 T(2,@RimJcicBankCode,#SubmitKey)
@@ -298,7 +299,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 HELP(#ApplyTypeHelp)
-@V(H,#ApplyTypeHelp)
+@T(3,@ApplyTypeX,)
+V(H,#ApplyTypeHelp)
 
 #ApplyTypeX=X,40,L
 T(H,#ApplyType,#ApplyTypeHelp)
@@ -309,10 +311,12 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 HELP(#CourtCodeHelp)
-@V(7)
+@T(3,@CourtCodeX,)
+V(7)
 
 #CourtCodeX=X,80,L
 T(2,@RimCourtCode,#CourtCode)
+RESET_RIM(#CourtCodeX,L8R59)
 S(L8R59,1,#RimCourtCode)
 R(1,L8R59)
 T(2,@CourtCodeX,#L8R59CourtCodeX)
@@ -346,7 +350,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 IF(#StartDate <= #AgreeDate,s,$)
 HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
+@T(3,@ReportYnX,)
+V(H,#YesNoHelp)
 
 #ReportYnX=X,2,L
 T(H,@ReportYnX,#ReportYn,#YesNoHelp)
@@ -362,6 +367,7 @@ T(2,1)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 IF(#NotBankId{j}!="",$,S)
+@T(3,@NotBankIdX{i},)
 
 #CheckNotBankId{i}=X,1,S
 IF(#NotBankId{i}=="",$,S)

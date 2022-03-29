@@ -110,8 +110,19 @@ HIDE(#SubCompanyItem{n})
 HIDE(#CrossUse{n})
 ##end
 
+
+
 !統一編號
 #CustId=X,10,I
+
+!當錯誤時會清空戶名
+#Space=X,20,S
+T(2,#CustName,#Space)
+T(2,#CustName1,#Space,1,50) 
+T(2,#CustName2,#Space,51,50)
+T(2,#SubCompanyFg,#Space)
+T(2,#SubCompanyFgX,#Space)
+
 INVOKEJS(SHOW,p1,2,3,1)
 C(3,#CHAIN,1,T(F,#CustId,0),T(F,#CustId,1))
 C(3,#CHAIN,1,T(2,#CHAIN_CustId),$)
@@ -125,6 +136,8 @@ C(4,#CustId,$,A(ID_UNINO,0,#CustId))
 C(3,#CHAIN,1,INVOKEJS(SHOW,p1,3,3,0),$)
 C(3,#CHAIN,1,S,$)
 C(4,#CustId,INVOKEJS(SHOW,p1,3,3,1),S)
+
+
 @
 C(4,#CustId,$,s)
 C(3,#CustNo,0,V(P,統一編號與戶號須擇一輸入),s)
@@ -132,6 +145,7 @@ C(3,#CustNo,0,V(P,統一編號與戶號須擇一輸入),s)
 <include src="ROM.icf::L1R06.dec"/>
 #RimCustId=X,10,S
 #RimCustNo=A,7,S
+
 
 #YNdef=X,1,S
 T(3,N)
@@ -155,6 +169,8 @@ C(5,#L1r06CrossUse{n},Y,T(3,@YNdef,Y),$)
 #CustName=c,100,S
 #CustName1=c,50,L
 #CustName2=c,50,L
+
+
 
 ##loop{times:20,n:1}
 #Show{n}=S,1,S
@@ -202,7 +218,6 @@ C(5,#CrossUse{n},Y,S,$)
 ##end
 @
 V(P,至少勾選一筆同意)
-
 
 !統一編號找戶號
 <include src="ROM.icf::L2R47.dec"/>

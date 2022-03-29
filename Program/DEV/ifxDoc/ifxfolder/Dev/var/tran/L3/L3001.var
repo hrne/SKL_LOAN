@@ -122,7 +122,7 @@ C(3,#CHAIN,1,s,$)
 C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
-
+T(3,#CustNoX,)
 
 #WKBTN2=X,1,S
 !C(3,#CustNo,0,HIDE(#BTN2),SHOW(#BTN2))
@@ -161,7 +161,11 @@ C(3,#CHAIN,1,s,$)
 C(4,#CustNo,$,S)
 !INVOKEJS(SHOW,p1,2,4,1)
 !SHOW(#BTN3)
-@C(4,#CustId,S,$)V(7)
+@
+C(4,#CustId,S,$)
+V(7)
+T(3,#CustIdX,)
+
 
 #BUF3B=X,100,S
 T(2,0000000+#CustId)
@@ -213,6 +217,7 @@ C(4,#CustId,$,S)
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
 T(2,@ApplNo,#ApplNo2)
+T(3,#ApplNoX,)
 
 
 

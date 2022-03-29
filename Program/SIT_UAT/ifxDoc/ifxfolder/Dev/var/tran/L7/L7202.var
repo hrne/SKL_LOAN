@@ -186,7 +186,8 @@ D(8)
 #Type1=A,2,I
 HELP(#Ias39LGDTypeHelp)
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,C(3,#FuncCode,3,$,s)),$)
-@V(H,#Ias39LGDTypeHelp)
+@T(3,@TypeDesc1,)
+V(H,#Ias39LGDTypeHelp)
 !C(3,#FuncCode,1,$,s)
 !@V(2,0)
 
@@ -227,7 +228,8 @@ C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
 C(4,#Date{i},S,$)
 C(3,#FuncCode,4,s)
 HELP(#Ias39LGDTypeHelp)
-@V(H,#Ias39LGDTypeHelp)
+@T(3,@TypeDesc{i},)
+V(H,#Ias39LGDTypeHelp)
 !@V(7)
 
 ! 類別型態

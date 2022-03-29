@@ -95,7 +95,8 @@ T(2,#KINBR)
 ! 狀態
 #Status=X,1,I
 HELP(#AmlCheckItemHelp,cols:1)
-@V(H,#AmlCheckItemHelp)
+@T(3,@StatusX,)
+V(H,#AmlCheckItemHelp)
 
 #StatusX=X,50,L
 T(H,#Status,#AmlCheckItemHelp)
@@ -120,7 +121,7 @@ T(3,0:撥款匯款;1:銀扣授權;2:產出扣帳檔;3:整批入帳;9:全部)
 #TypeCode=X,1,I
 C(4,#TypeCode,E(0,9),$)
 HELP(#TypeCodeHelp)
-@
+@T(3,@TypeCodeX,)
 V(7)
 V(H,#TypeCodeHelp)
 

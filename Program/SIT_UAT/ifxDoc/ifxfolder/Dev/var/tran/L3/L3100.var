@@ -534,6 +534,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<
 
 #WKIDNO=X,10,S
 
+T(3,#CustNoX,)
 #SendL2r07A=X,1,S
 C(3,#FKEY,0,$,s)
 C(4,#CustNo,S,$)
@@ -564,6 +565,7 @@ SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 T(2,@FdApplNo, )
 @C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -615,6 +617,7 @@ C(4,#CustId,$,S)
 C(3,#FKEY,0,$,s)
 SHOW(#BTN3)HIDE(#BTN2,#BTN1)
 @C(4,#ApplNo,V(P,需擇一輸入),$)
+T(3,#ApplNoX,)
 
 #ApplNo2=A,7,S
 C(4,#ApplNo,S,$)
@@ -1463,7 +1466,6 @@ E(0,#TimDrawdownAmt-1)
 ! S(L3R13,1,#RimFixAdjDd,#RimRateAdjFreq,#RimDrawdownDate)
 ! R(1,L3R13)
 
-
 ![帳管費]
 !個金不可修改，企金＞＝０, L2R05
 #FdAcctFee=X,2,L
@@ -1486,6 +1488,22 @@ E(0,#UsAcctFee)
 
 #TimAcctFee=m,14.2,S
 C(3,#PRECISION,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
+#RimAcctFee=m,14.2,S
+#RimAcctCode=X,3,S
+#MessageTxtA=X,30,L
+C(3,#TimAcctFee,0,S,$)
+
+#SendL3r15A=X,1,S
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimAcctFee,#TimAcctFee)
+T(2,@RimAcctCode,F10)
+C(3,#TimAcctFee,0,S,$)
+S(L3R15,1,#RimCustNo,#RimFacmNo,#RimAcctFee,#RimAcctCode)
+R(1,L3R15)
+T(2,@MessageTxtA,#L3r15MessageTxt)
+! K(LIGHT,#MessageTxtA,TXTRED,-1)
+K(LIGHT,#MessageTxtA,TXTRED,0)
 
 !手續費 企金才可輸入
 #FdHandlingFee=X,2,L
@@ -1503,6 +1521,21 @@ C(3,#PRECISION,0,s,$)
 #TimHandlingFee=m,14.2,S
 C(3,#L2r05DepartmentCode,1,$,S)
 C(3,#PRECISION,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
+
+#MessageTxtB=X,30,L
+C(3,#TimHandlingFee,0,S,$)
+
+#SendL3r15B=X,1,S
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimAcctFee,#TimHandlingFee)
+T(2,@RimAcctCode,F10)
+C(3,#TimAcctFee,0,S,$)
+S(L3R15,1,#RimCustNo,#RimFacmNo,#RimAcctFee,#RimAcctCode)
+R(1,L3R15)
+T(2,@MessageTxtB,#L3r15MessageTxt)
+! K(LIGHT,#MessageTxtA,TXTRED,-1)
+K(LIGHT,#MessageTxtB,TXTRED,0)
 
 ![最後一期餘額]上線鎖住
 #FdFinalBal=X,2,L
@@ -2144,8 +2177,8 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 <include src="ROM.icf::L6R28.dec"/>
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L3R13.dec"/>
+<include src="ROM.icf::L3R15.dec"/>
 </sub>
-
 
 ! <include src="ROM.icf::L0Rim.dec"/>
 ! <include src="ROM.icf::L2Rim.dec"/>
@@ -2179,8 +2212,8 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ["#FdGraceDate+寬限到期日",#GraceDate,#GraceDateX],
 ["#FdSpecificDd+指定應繳日",#SpecificDd],
 ["#FdFirstDueDate+首次應繳日",#FirstDueDate],
-["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee,#LbAcctFee],
-["#FdHandlingFee+手續費",#TwHandlingFee,#UsHandlingFee],
+["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee,#LbAcctFee,#MessageTxtA],
+["#FdHandlingFee+手續費",#TwHandlingFee,#UsHandlingFee,#MessageTxtB],
 ["#FdFinalBal+最後一期餘額",#TwFinalBal,#UsFinalBal],
 ]
 </sub>
@@ -2200,9 +2233,6 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ["#FdCompensateFlag+是否為代償案件",#CompensateFlag,#CompensateFlagX],
 ]
 </sub>
-
-
-
 
 <sub type="DC" name="p2" layout="cols=2;screen.width=[250,300,200,300];printer.width=[15,30];order=1;">
 [
@@ -2229,7 +2259,6 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ],
 ]
 </sub>
-
 
 <sub type="DC" name="p5" layout="cols=2;screen.width=[250,300,200,300];printer.width=[15,30];order=1;">
 [
@@ -2355,6 +2384,7 @@ C(3,#Sno,0,E(0,0),E(0,1))
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L2R09.tom"/>
 <include src="ROM.icf::L3R13.tom"/>
+<include src="ROM.icf::L3R15.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
 <include src="RPDTL.icf::RPDTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

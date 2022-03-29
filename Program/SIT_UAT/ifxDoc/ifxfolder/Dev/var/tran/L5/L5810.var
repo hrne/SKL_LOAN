@@ -90,7 +90,8 @@ V(5,#StartMonth,#NowMonth)
 
 #Acct=X,3,I
 HELP(#CdCodeAcctCodeH)
-@C(4,#Acct,$,V(H,#CdCodeAcctCodeH))
+@T(3,@AcctX,)
+C(4,#Acct,$,V(H,#CdCodeAcctCodeH))
 
 #AcctX=X,20,L
 C(4,#Acct,S,T(H,#Acct,#CdCodeAcctCodeH))

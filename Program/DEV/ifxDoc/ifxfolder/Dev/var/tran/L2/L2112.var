@@ -123,7 +123,9 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:GroupId
 #Space=X,20,S
 
 #GroupId=X,10,I
-@V(7)A(ID_UNINO,0,#GroupId)
+@
+T(3,#GroupIdX,)
+V(7)A(ID_UNINO,0,#GroupId)
 T(2,@GroupIdX,#Space)
 
 #SendL2r03=X,1,S
@@ -392,6 +394,7 @@ C(4,#CustId{j},S,$)
 C(3,#Precision,0,SHOW(#twApplAmt{i})HIDE(#usApplAmt{i})
                 ,SHOW(#usApplAmt{i})HIDE(#twApplAmt{i}))
 @
+T(3,#CustIdX1,)
 IF({i}==1,V(7),$)
 A(ID_UNINO,0,#CustId{i})
 C(4,#CustId{i},CALL(#HIDE_D_ROW_{i}),IF(#CustId{i}==#GroupId,V(P,不可與團體戶統編相同),V(4,#GroupId,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10,#CheckCustId11,#CheckCustId12,#CheckCustId13,#CheckCustId14,#CheckCustId15,#CheckCustId16,#CheckCustId17,#CheckCustId18,#CheckCustId19,#CheckCustId20)))

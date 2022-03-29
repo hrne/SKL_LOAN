@@ -111,7 +111,8 @@ T(4,DATE$)
 #TRN_CODE=A,1,I
 C(3,#CHAIN,0,$,s)
 HELP(#TypeHelp)
-@V(H,#TypeHelp)
+@T(3,@TRN_CODEX,)
+V(H,#TypeHelp)
 
 #TRN_CODEX=X,30,L
 T(H,#TRN_CODE,#TypeHelp)

@@ -219,5 +219,9 @@ public interface JobMainRepositoryHist extends JpaRepository<JobMain, JobMainId>
   @Procedure(value = "\"Usp_L9_MonthlyLM052Ovdu_Ins\"")
   public void uspL9Monthlylm052ovduIns(int TYYMM, String EmpNo);
 
+  // (日終批次)更新TxHoliday
+  @Procedure(value = "\"Usp_Tx_TxHoliday_Ins\"")
+  public void uspTxTxholidayIns(String EmpNo);
+
 }
 

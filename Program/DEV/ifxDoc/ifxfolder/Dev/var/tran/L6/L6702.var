@@ -256,7 +256,8 @@ C(2,#FuncCode,$,$,$,$,s,s)
 ! 郵遞區號 3+2
 #Zip3=A,3,I
 C(2,#FuncCode,$,$,$,$,s,s)
-@V(7)
+@T(3,@CityItem,)T(3,@AreaItem,)
+V(7)
 #Zip2=A,2,I
 C(2,#FuncCode,$,$,$,$,s,s)
 @V(7)

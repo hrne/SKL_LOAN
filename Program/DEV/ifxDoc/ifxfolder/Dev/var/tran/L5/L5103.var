@@ -320,7 +320,8 @@ T(F,@AMTC{i},0)
 #CustNo=A,7,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
-@C(1,#CustNo,s,V(P,戶號不可為0),s)
+@T(3,@CustName,)
+C(1,#CustNo,s,V(P,戶號不可為0),s)
 
 ! 借款人戶名rim
 <include src="ROM.icf::L5R33.dec"/>     
@@ -394,7 +395,8 @@ IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 C(3,#ApplCode,2,s,$)
 T(4,TLRNO$)
-@V(7)
+@T(3,@ApplEmpNoX,)
+V(7)
 
 #RimEmployeeNo=X,6,S
 #RimTxCode=X,6,S
@@ -425,7 +427,8 @@ C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#UsageCodeXHelp)
-@V(H,#UsageCodeXHelp)
+@T(3,@UsageCodeX,)
+V(H,#UsageCodeXHelp)
 
 #UsageCodeX=X,4,L
 T(H,#UsageCode,#UsageCodeXHelp)
@@ -436,7 +439,8 @@ T(H,#UsageCode,#UsageCodeXHelp)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#CopyCodeHelp)
-@V(H,#CopyCodeHelp)
+@T(3,@CopyCodeX,)
+V(H,#CopyCodeHelp)
 #CopyCodeX=X,6,L
 T(H,#CopyCode,#CopyCodeHelp)
 
@@ -484,7 +488,8 @@ C(3,#ApplCode,1,$,s)
 C(3,#ApplCode,2,s,$)
 !C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
 !V(P,請點選[瀏覽]取得員工編號)
-@V(7)
+@T(3,@KeeperEmpNoX,)
+V(7)
 
 #SendL2r08C=X,1,S
 C(4,#KeeperEmpNo,S,$)
@@ -533,7 +538,8 @@ IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,$,s)
 !C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
 !V(P,請點選[瀏覽]取得員工編號)
-@V(7)
+@T(3,@ReturnEmpNoX,)
+V(7)
 
 #CheckC=A,1,S
 !C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
@@ -567,7 +573,8 @@ C(3,#ApplCode,1,$,s)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#ApplObjHelp)
-@V(H,#ApplObjHelp)
+@T(3,@ApplObjX,)
+V(H,#ApplObjHelp)
 IF(#ApplObj==4&&#ApplCode==1,$,s)
 C(3,#ApplObj,4,INVOKEJS(SHOW,L5103_10,1)INVOKEJS(SHOW,grd1,2,17,0),INVOKEJS(SHOW,L5103_10,0))
 
@@ -612,7 +619,7 @@ INVOKEJS(SHOW,L5103_9,1)
 INVOKEJS(SHOW,grd1,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTA{j},0,S,$))
 HELP(#ApplicationCodeHelp)
-@
+@T(3,@FILENMA{i},)
 C(3,#OPTA{i},0,$,V(H,#ApplicationCodeHelp))
 C(3,{i},2,C(3,#OPTA2,0,$,V(2,#OPTA1)),$)
 C(3,{i},3,C(3,#OPTA3,0,$,V(2,#OPTA1,#OPTA2)),$)
@@ -669,7 +676,7 @@ INVOKEJS(SHOW,L5103_10,1)
 INVOKEJS(SHOW,grd2,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTB{j},0,S,$))
 HELP(#SettingCodeHelp)
-@
+@T(3,@FILENMB{i},)
 C(3,#OPTB{i},0,$,V(H,#SettingCodeHelp))
 C(3,{i},2,C(3,#OPTB2,0,$,V(2,#OPTB1)),$)
 C(3,{i},3,C(3,#OPTB3,0,$,V(2,#OPTB1,#OPTB2)),$)
@@ -727,7 +734,7 @@ INVOKEJS(SHOW,L5103_11,1)
 INVOKEJS(SHOW,grd3,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTC{j},0,S,$))
 HELP(#GuaranteedCodeHelp)
-@
+@T(3,@FILENMC{i},)
 C(3,#OPTC{i},0,$,V(H,#GuaranteedCodeHelp))
 C(3,{i},2,C(3,#OPTC2,0,$,V(2,#OPTC1)),$)
 C(3,{i},3,C(3,#OPTC3,0,$,V(2,#OPTC1,#OPTC2)),$)

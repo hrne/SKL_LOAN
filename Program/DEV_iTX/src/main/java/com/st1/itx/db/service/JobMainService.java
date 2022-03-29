@@ -615,4 +615,13 @@ public interface JobMainService {
    */
   public void Usp_L9_MonthlyLM052Ovdu_Ins(int TYYMM, String EmpNo, TitaVo... titaVo);
 
+  /**
+   * Stored Procedure<br>
+   * (日終批次)更新TxHoliday
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_Tx_TxHoliday_Ins(String EmpNo, TitaVo... titaVo);
+
 }

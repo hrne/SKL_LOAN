@@ -192,7 +192,8 @@ T(2,全公司)
 #AcSubBookCode=X,3,I
 C(3,#CHAIN,1,s,$)
 HELP(#AcSubBookCodeHelp)
-@C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
+@T(3,@AcSubBookItem,)
+C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
 
 #AcSubBookItem=X,20,L
 C(4,#AcSubBookCode,S,T(H,#AcSubBookCode,#AcSubBookCodeHelp))
@@ -254,7 +255,7 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 #AcctCode=X,3,I
 C(3,#CHAIN,1,s,$)
 HELP(#AcctCodeHelp,cols:2)
-@
+@T(3,@AcctCodeX,)
 C(4,#AcctCode,S,$)
 V(H,#AcctCodeHelp)
 
@@ -326,20 +327,20 @@ SWITCH(#OOClsFlag,0,T(3,起帳),
 #OOAcDate=D,7,L
 
 ! 交易金額
-#OORvAmt=m,14.2,S
-#OORvAmt1=m,14,S
+#OORvAmt=+m,14.2,S
+#OORvAmt1=+m,14,S
 E(0,#OORvAmt)
 #OORvAmtX=X,17,L
 IF(#OORvAmt1==0,S,$)
 X(#OORvAmt1)
 
 !起帳金額
-#OORvAmt00=X,17,L
+#OORvAmt00=X,18,L
 IF(#OORvAmt1==0,S,$)
 C(3,#OOClsFlag,0,X(#OORvAmt1),E(0,0))
 
 !銷帳金額
-#OORvAmt11=X,17,L
+#OORvAmt11=X,18,L
 IF(#OORvAmt1==0,S,$)
 C(3,#OOClsFlag,1,X(#OORvAmt1),E(0,0))
 
@@ -430,7 +431,7 @@ TXFORM=L6908
 {width:120,align:'right'}
 
 #OOTitaTxCdX=交易代號
-{width:150,align:'center'}
+{width:200,align:'left'}
 
 #OOSlipNote=摘要
 {width:500,align:'left'}

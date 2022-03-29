@@ -25,23 +25,6 @@ import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimFKey=9,1
- * RimFuncCode=9,1
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNo=9,3
- * RimCurrencyCode=X,3
- * RimExtraRepay=9,14.2
- * RimIncludeIntFlag=X,1 是否內含利息 Y:是 N:否
- * RimRepayTerms=9,2
- * RimRepayType=9,2
- * RimEntryDate=9,7
- * RimCloseBreachAmt=9,14.2
- */
-
 /**
  * L3R06 回收試算
  * 

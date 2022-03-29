@@ -64,7 +64,7 @@ public class L6R17 extends TradeBuffer {
 				moveTotaCdEmp(tCdEmp);
 //			}
 		} else {
-			if (iRimFuncCode == 1) {
+			if (iRimFuncCode == 5) {
 				this.info("L6R17 iRimFuncCode : " + iRimFuncCode);
 				this.addList(this.totaVo);
 				return this.sendList();

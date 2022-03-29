@@ -312,7 +312,8 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 #MailTypeCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MailTypeCodeHelp)
-@V(H,#MailTypeCodeHelp)
+@T(3,@MailTypeCodeX,)
+V(H,#MailTypeCodeHelp)
 #MailTypeCodeX=X,10,L
 T(H,#MailTypeCode,#MailTypeCodeHelp)
 
@@ -330,7 +331,8 @@ D(8)
 #MailObj=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MailObjHelp)
-@V(H,#MailObjHelp)
+@T(3,@MailObjX,)
+V(H,#MailObjHelp)
 C(5,#MailObj,1,T(2,@FieldName,借款人姓名),T(2,@FieldName,保證人姓名))
 
 #MailObjX=X,14,L
@@ -369,7 +371,8 @@ C(3,#MailObj,1,s,$)
 #DelvrYet=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)    
 HELP(#DelvrYetHelp)
-@V(H,#DelvrYetHelp)
+@T(3,@DelvrYetX,)
+V(H,#DelvrYetHelp)
 #DelvrYetX=X,6,L
 T(H,#DelvrYet,#DelvrYetHelp)
 
@@ -377,7 +380,8 @@ T(H,#DelvrYet,#DelvrYetHelp)
 #DelvrCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#DelvrCodeHelp)
-@V(H,#DelvrCodeHelp)
+@T(3,@DelvrCodeX,)
+V(H,#DelvrCodeHelp)
 #DelvrCodeX=X,16,L
 T(H,#DelvrCode,#DelvrCodeHelp)
 
@@ -385,7 +389,8 @@ T(H,#DelvrCode,#DelvrCodeHelp)
 #AddressCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#AddressCodeHelp)
-@V(H,#AddressCodeHelp)
+@T(3,@AddresCodeX,)
+V(H,#AddressCodeHelp)
 #AddressCodeX=X,10,L
 T(H,#AddressCode,#AddressCodeHelp)
 

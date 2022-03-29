@@ -20,12 +20,6 @@ import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * ChequeDate=9,7
- * ChequeAcct=9,9
- * ChequeNo=9,7
- */
 /**
  * L3009 支票明細資料查詢-全部
  * 
@@ -74,9 +68,6 @@ public class L3009 extends TradeBuffer {
 			iChequeNoEd = iChequeNo;
 		}
 		String iStatusCode = titaVo.getParam("StatusCode");
-
-		// work area
-		String wkRvNo;
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();

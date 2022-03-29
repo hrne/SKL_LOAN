@@ -1293,14 +1293,16 @@ V(5,0,366)
 !計算寬限總月數上限 
 !先算出相差幾月
 #checkLoanYyMm=N,3,S
+E(0,0)
 E(0,#LoanTermYy*12)
 E(0,#checkLoanYyMm+#LoanTermMm)
 #DateS=D,8,S
-E(0,00000)
+E(0,00010101)
 #checkLoanDate=D,8,S
-E(0,00000)
+E(0,00010101)
 D(7,2,#checkLoanDate,#checkLoanYyMm,#LoanTermDd)
-D(7,1,#checkLoanDate,#DateS)
+D(7,1,#DateS,#checkLoanDate)
+
 #GracePeriodYy=N,4,S
 T(1,#checkLoanDate,1,4)
 #GracePeriodMm=N,2,S
@@ -1310,6 +1312,7 @@ T(1,#checkLoanDate,7,2)
 #GracePeriodTM=N,3,S
 E(0,#GracePeriodYy*12)
 E(0,#GracePeriodTM+#GracePeriodMm)
+C(3,#GracePeriodDd,0,$,E(0,#GracePeriodTM+1))
 
 ! #checkloandate=D,7,S
 ! E(0,#LoanTermYy*10000)
@@ -1468,7 +1471,8 @@ C(3,#L2r01GracePeriod,999,$,s)
 SHOW(#GracePeriod)
 C(3,#L2r01CharCode,2,S,$)
 IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
-@IF(#GracePeriod>#GracePeriodTM,V(P,需小於貸款期間),$)
+C(3,#GracePeriodTM,0,S,$)
+@IF(#GracePeriod>=#GracePeriodTM,V(P,需小於貸款期間),$)
 
 #LbGracePeriod=X,9,L
 X(#GracePeriod)

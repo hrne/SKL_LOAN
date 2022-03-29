@@ -147,7 +147,8 @@ E(0,@Identity,0)
 ! 案件種類
 #CaseCode=A,1,I
 HELP(#CaseCodeHelp)
-@V(H,#CaseCodeHelp)
+@T(3,@CaseCodeX,)
+V(H,#CaseCodeHelp)
 
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
@@ -155,7 +156,8 @@ T(H,#CaseCode,#CaseCodeHelp)
 ! 作業細項
 #TxCode=A,1,I
 HELP(#TxCodeHelp)
-@V(H,#TxCodeHelp)
+@T(3,@TxCodeX,)
+V(H,#TxCodeHelp)
 #TxCodeX=X,12,L
 T(H,#TxCode,#TxCodeHelp)
 ! 金額幣別
@@ -166,7 +168,8 @@ T(H,#TxCode,#TxCodeHelp)
 T(2, )
 #Identity=A,1,I
 HELP(#IdentityHelp)
-@V(H,#IdentityHelp)
+@T(3,@IdentityX,)
+V(H,#IdentityHelp)
 #IdentityX=X,16,L
 T(H,#Identity,#IdentityHelp)
 SWITCH(#Identity,
@@ -215,7 +218,7 @@ IF(#Ovdamtto<#Ovdamtfm,V(P,結束金額不可小於起始金額),$)
 ! 期數/天數
 #OprionCd=A,1,I
 HELP(#OprionCdHelp)
-@
+@T(3,@OprionCdX,)
 IF(#Identity==1 || #Identity==2 || #Identity==3,C(3,#OprionCd,0,s,$),$)
 V(H,#OprionCdHelp)
 
@@ -264,7 +267,8 @@ IF(#TmpOvddayto<#TmpOvddayfm,V(P,結束天數不可小於起始天數),$)
 IF(#Identity==1 || #Identity==2 || #Identity==3,E(0,99),E(0,04))
 HELP(#StatusHelp,cols:2)
 IF(#Identity==1 || #Identity==2 || #Identity==3,$,C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s)))
-@V(H,#StatusHelp)
+@T(3,@StatusX,)
+V(H,#StatusHelp)
 #StatusX=X,22,L
 T(H,#Status,#StatusHelp)
 
@@ -292,6 +296,7 @@ T(2,00:全部;+#L6r03Result)
 C(4,#CityCode,T(2,00),$)
 HELP(#L6r03ResultCity,cols:5)
 @
+T(3,@CityCodeX,)
 C(4,#CityCode,T(2,00),$)
 V(H,#L6r03ResultCity)
 

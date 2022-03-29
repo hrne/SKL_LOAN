@@ -13,9 +13,18 @@
 <sub type="DC" name="p1" layout="cols=1;screen.width=[120,880];printer.width=[15,45];order=1;">
 [
 ["[L6880] 系統換日"],
-[#<->#,"日期類別",#iType,#iTypeX],
-[#<->#,"系統日期",#iEntday],
+![#<->#,"#FdType+日期類別",#iType,#iTypeX],
+[#<->#,"#FdEntday+會計日期",#iEntday],
 ]
+
+#FdType=X,2,L
+#FdEntday=X,2,L
+
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+K(MODIFYBUTTON,換日)
 
 !---------- AP Button AREA ----------
 #CHAIN=A,1,S
@@ -32,17 +41,19 @@ T(2,@FKEY,7)
 !---------- AP TEXT AREA Variables ----------
 
 #TypeH=X,100,S
-T(3,1:連線日期檔;2:批次日期檔)
+T(3,1:連線日期;2:批次日期)
 
-#iType=A,1,I
+#iType=A,1,S
+E(0,1)
 HELP(#TypeH)
-@V(H,#TypeH)
+@T(3,@iTypeX,)
+V(H,#TypeH)
 
-#iTypeX=X,20,L
+#iTypeX=X,20,S
 T(H,#iType,#TypeH)
 
 ![功能選項]
-#iEntday=D,7,I
+#iEntday=D,7,L
 E(0,#SYSNDATE)
 D(8)
 @V(7)A(DATE,0,#iEntday)

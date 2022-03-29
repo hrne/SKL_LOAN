@@ -114,13 +114,13 @@ T(2,@LandOfficeHelp,#L2r59Help1)
 #LandOfficeCode=X,2,I
 C(3,#FunCd,1,$,s)
 HELP(#LandOfficeHelp)
-@V(H,#LandOfficeHelp)
+@T(3,@LandOfficeCodeX,)
+V(H,#LandOfficeHelp)
 
 #LandOfficeCodeX=x,8,L
 T(H,#LandOfficeCode,#LandOfficeHelp)
 
-#RecWord=X,3,I
-C(3,#FunCd,1,$,s)
+#RecWord=X,3,L
 
 #RimLandOfficeCode=X,2,S
 #RimRecWord=X,3,S

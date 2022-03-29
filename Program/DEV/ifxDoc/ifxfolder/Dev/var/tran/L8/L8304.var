@@ -226,7 +226,8 @@ C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
-@V(H,#TranKeyHelp)
+@T(3,@TranKeyX,)
+V(H,#TranKeyHelp)
 C(5,#TranKey,X,K(MODIFYBUTTON,異動)
 T(F,@CollateralType,1)
 T(F,@OriginLoanAmt,1)
@@ -287,7 +288,7 @@ T(1,#RcDateA25,2,7)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)V(NL)
+@T(3,@MaxMainCodeX,)V(7)V(NL)
 
 
 #MaxMainCodeX=X,80,L
@@ -311,7 +312,8 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CollateralType,#L8r14CollateralType),$)
 C(5,#TranKey,D,s,$)
 HELP(#CollateralTypeHelp)
-@V(H,#CollateralTypeHelp)
+@T(3,@CollateralTypeX,)
+V(H,#CollateralTypeHelp)
 
 #CheckCollateralType=X,1,S
 ! IF(#CollateralType=="00" || #CollateralType=="01" || #CollateralType=="02" || #CollateralType=="03" || #CollateralType=="04" || #CollateralType=="05" || #CollateralType=="06" || #CollateralType=="07" || #CollateralType=="08" || #CollateralType=="09" ,$,S)

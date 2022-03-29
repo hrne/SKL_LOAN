@@ -64,7 +64,8 @@ T(3,1:已結清並領取清償證明五年之交易明細)
 
 #InputType=A,1,I
 HELP(#InputTypeHelp)
-@V(H,#InputTypeHelp)
+@T(3,@InputTypeX,)
+V(H,#InputTypeHelp)
 
 #InputTypeX=X,40,L
 T(H,#InputType,#InputTypeHelp)

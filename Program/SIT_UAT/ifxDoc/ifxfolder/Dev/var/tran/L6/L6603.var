@@ -145,7 +145,8 @@ T(2,@FdClTypeJCIC,#WKSTAR2)
 #ClCode1=A,1,I
 C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
 HELP(#ApHelp)
-@C(3,#FuncCode,1,V(H,#ApHelp),$)
+@T(3,@ClCode1Item,)
+C(3,#FuncCode,1,V(H,#ApHelp),$)
 
 ! 擔保品代號1-名稱
 #ClCode1Item=X,40,L

@@ -199,7 +199,8 @@ K(MODIFYBUTTON,2,上傳附件查詢)
 #CustCode=X,1,I
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
 HELP(#InnEntCodeHelp)
-@V(H,#InnEntCodeHelp)
+@T(3,@CustCodeX,)
+V(H,#InnEntCodeHelp)
 #CustCodeX=X,30,L
 T(H,#CustCode,#InnEntCodeHelp)
 

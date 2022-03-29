@@ -178,7 +178,8 @@ T(2,新光人壽)
 #BranchCode=X,4,I
 C(3,#FunCd,1,$,s)
 HELP(#MuSubHelp)
-@V(H,#MuSubHelp)
+@T(3,@BranchCodeX,)
+V(H,#MuSubHelp)
 #BranchCodeX=X,20,L
 T(H,#BranchCode,#MuSubHelp)
 
@@ -191,12 +192,12 @@ A(DATE,0,#DataDate)
 !員工代號
 #EmpId=X,6,I
 C(3,#FunCd,1,$,s)
-@V(7)V(NL)
+@T(3,@EmpName,)V(7)V(NL)
 
 #RimL8R58=X,1,S
 #RimEmpNo=X,6,S
 T(2,@RimEmpNo,#EmpId)
-RESET_RIM(#RimL8R58,L8R58)
+RESET_RIM(#RimEmpNo,L8R58)
 S(L8R58,1,#RimEmpNo)
 R(1,L8R58)
 T(2,@EmpName,#L8R58Fullname)
@@ -216,7 +217,8 @@ T(2,@EmpName,#L8R58Fullname)
 !授權查詢方式
 #AuthQryType=X,1,I
 HELP(#AuthQryCodeHelp)
-@V(H,#AuthQryCodeHelp)
+@T(3,@AuthQryTypeX,)
+V(H,#AuthQryCodeHelp)
 #AuthQryTypeX=X,20,L
 T(H,#AuthQryType,#AuthQryCodeHelp)
 
@@ -243,24 +245,26 @@ C(4,#AuthEndDay,$,IF(#AuthEndDay>#AuthStartDay,$,V(P,迄日需大於起日)))
 
 !起日授權主管中文代號
 #AuthMgrIdS=X,6,I
+@T(3,@AuthMgrNameS,)
 
 !起日授權主管中文姓名
 #AuthMgrNameS=X,42,L
 C(4,#AuthMgrIdS,S,$)
 T(2,@RimEmpNo,#AuthMgrIdS)
-RESET_RIM(#RimL8R58,L8R58)
+RESET_RIM(#AuthMgrNameS,L8R58)
 S(L8R58,1,#RimEmpNo)
 R(1,L8R58)
 T(2,@AuthMgrNameS,#L8R58Fullname)
 
 !迄日授權主管中文代號
 #AuthMgrIdE=X,6,I
+@T(3,@AuthMgrNameE,)
 
 !迄日授權主管中文姓名
 #AuthMgrNameE=X,42,L
 C(4,#AuthMgrIdE,S,$)
 T(2,@RimEmpNo,#AuthMgrIdE)
-RESET_RIM(#RimL8R58,L8R58)
+RESET_RIM(#AuthMgrNameE,L8R58)
 S(L8R58,1,#RimEmpNo)
 R(1,L8R58)
 T(2,@AuthMgrNameE,#L8R58Fullname)

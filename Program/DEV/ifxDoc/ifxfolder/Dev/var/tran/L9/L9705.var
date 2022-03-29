@@ -161,7 +161,8 @@ E(0,#CUSTNO)
 !選擇條件一
 #CONDITION1=A,1,I
 HELP(#Condition1Help)
-@V(H,#Condition1Help)
+@T(3,@CONDITION1X,)
+V(H,#Condition1Help)
 
 #CONDITION1X=X,12,L
 T(H,#CONDITION1,#Condition1Help)
@@ -169,7 +170,8 @@ T(H,#CONDITION1,#Condition1Help)
 !選擇條件二
 #CONDITION2=A,1,I
 HELP(#Condition2Help)
-@V(H,#Condition2Help)
+@T(3,@CONDITION2X,)
+V(H,#Condition2Help)
 
 #CONDITION2X=X,12,L
 T(H,#CONDITION2,#Condition2Help)
@@ -177,7 +179,8 @@ T(H,#CONDITION2,#Condition2Help)
 !戶別
 #ID_TYPE=A,1,I
 HELP(#CustTypeHelp)
-@V(H,#CustTypeHelp)
+@T(3,@ID_TYPEX,)
+V(H,#CustTypeHelp)
 
 #ID_TYPEX=X,6,L
 T(H,#ID_TYPE,#CustTypeHelp)
@@ -185,7 +188,8 @@ T(H,#ID_TYPE,#CustTypeHelp)
 !企金別
 #CORP_IND=A,1,I
 HELP(#CorpIndHelp)
-@V(H,#CorpIndHelp)
+@T(3,@CORP_INDX,)
+V(H,#CorpIndHelp)
 
 #CORP_INDX=X,8,L
 T(H,#CORP_IND,#CorpIndHelp)
@@ -193,7 +197,8 @@ T(H,#CORP_IND,#CorpIndHelp)
 !業務科目
 #APNO=A,1,I
 HELP(#ApnoHelp)
-@V(H,#ApnoHelp)
+@T(3,@APNOX,)
+V(H,#ApnoHelp)
 
 #APNOX=X,12,L
 T(H,#APNO,#ApnoHelp)

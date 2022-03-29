@@ -74,6 +74,9 @@ T(2,*)
 K(MODIFYBUTTON,修改)
 #CHAIN=A,1,S
 T(4,CHAIN$) 
+!當錯誤時會清空戶名
+#ClearSpace=X,20,S
+
 
 #NTXBUF=x,10,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -85,9 +88,13 @@ C(3,#CHAIN,1,T(F,@CustIdBefore,0),$)
 
 ! 修改前統一編號
 #CustIdBefore=X,10,I
-C(3,#CHAIN,1,s,$)
 @V(7)
+T(2,#CustName,)
+T(2,#CustIdAfter,)
+T(2,#Mark,)
+T(2,#MarkX,)
 A(ID_UNINO,0,#CustIdBefore)
+C(3,#CHAIN,1,s,$)
 
 #MRKEY=_,_,S
 T(2,#CustIdBefore)
@@ -96,24 +103,29 @@ T(2,#CustIdBefore)
 C(3,#CHAIN,1,A(ID_UNINO,0,#CustIdBefore),$)
 T(4,STAT$)
 
-#RimL1R18=X,1,S
 #RimCustNo=A,7,S
 #RimCustId=X,10,S
 #Space=X,1,S
+
+#RimL1R18=X,1,S
 T(2,@RimCustId,#CustIdBefore)
 RESET_RIM(#RimL1R18,L1R18)
 S(L1R18,1,#RimCustNo,#RimCustId)
 R(1,L1R18)
 T(2,@CustName,#L1R18CustName)
 
+
 ! 戶名
 #CustName=x,2.50,L
+
 ! 修改後統一編號
 #CustIdAfter=X,10,I
 @
 V(2,#CustIdBefore)
 V(7)
 A(ID_UNINO,0,#CustIdAfter)
+
+
 
 #IdStatAft=A,1,S
 T(4,STAT$)

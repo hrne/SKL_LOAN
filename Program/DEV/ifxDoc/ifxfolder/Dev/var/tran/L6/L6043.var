@@ -88,7 +88,8 @@ T(3,0:正常;1:停用;9:全部)
 
 #BranchNo=X,4,I
 HELP(#BrHelp)
-@C(4,#BranchNo,S,$)V(H,#BrHelp)
+@T(3,@BranchNoX,)
+C(4,#BranchNo,S,$)V(H,#BrHelp)
 
 #BranchNoX=X,50,L
 C(4,#BranchNo,S,$)
@@ -100,6 +101,7 @@ T(H,#BranchNo,#BrHelp)
 !權限狀態
 #Status=A,1,I
 HELP(#StatusHelp)
+@T(3,@StatusX,)
 
 #StatusX=X,10,L
 T(H,#Status,#StatusHelp)

@@ -14,12 +14,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimFixAdjDd=9,2
- * RimRateAdjFreq=9,2
- * RimDrawdownDate=9,7
- */
 /**
  * L3R13 當商品參數利率調整固定日期>0時,計算利率調整日期
  * 

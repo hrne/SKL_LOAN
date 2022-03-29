@@ -158,7 +158,12 @@ BIND(#UnitCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#UnitCodeBUF;ntxbuf5=ty
 #UnitCode=X,6,I
 C(2,#FunctionCd,s,$,s,s,s)
 C(5,#Director,M,$,s)
-@V(7)
+@T(3,@UnitItem,)
+T(3,@DirectorCode,)
+T(3,@DirectorCodeX,)
+T(3,@EmpNo,)
+T(3,@EmpName,)
+V(7)
 <include src="ROM.icf::L5R14.dec"/>     
 #RimAreaCode=X,6,S
 #RimChoose=X,1,S
@@ -168,6 +173,7 @@ T(2,@RimChoose,1)
 C(4,#UnitCode,S,$)
 C(3,#FunctionCd,1,$,S)
 RESET_RIM(#RimL5R14,L5R14)
+RESET_RIM(#RimAreaCode,L5R14)
 S(L5R14,1,#RimAreaCode,#RimChoose)
 R(1,L5R14)
 T(2,@EmpNo,#L5R14UnitManager)
@@ -191,7 +197,12 @@ BIND(#DistCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DistCodeBUF;ntxbuf5=ty
 #DistCode=X,6,I
 C(2,#FunctionCd,s,$,s,s,s)
 C(5,#Director,B,$,s)
-@V(7)
+@T(3,@DistItem,)
+T(3,@DirectorCode,)
+T(3,@DirectorCodeX,)
+T(3,@EmpNo,)
+T(3,@EmpName,)
+V(7)
 #RimDistCode=X,6,S
 T(2,@RimDistCode,#DistCode)
 T(2,@RimChoose,2)
@@ -199,6 +210,7 @@ C(3,#FunctionCd,1,$,S)
 C(4,#UnitCode,$,s)
 C(4,#DistCode,S,$)
 RESET_RIM(#RimL5R14,L5R14)
+RESET_RIM(#RimDistCode,L5R14)
 S(L5R14,1,#RimDistCode,#RimChoose)
 R(1,L5R14)
 T(2,@EmpNo,#L5R14DistManager)
@@ -222,7 +234,12 @@ BIND(#DeptCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DeptCodeBUF;ntxbuf5=ty
 #DeptCode=X,6,I
 C(2,#FunctionCd,s,$,s,s,s)
 C(5,#Director,D,$,s)
-@V(7)
+@T(3,@DeptItem,)
+T(3,@DirectorCode,)
+T(3,@DirectorCodeX,)
+T(3,@EmpNo,)
+T(3,@EmpName,)
+V(7)
 #RimDeptCode=X,6,S
 T(2,@RimDeptCode,#DeptCode)
 T(2,@RimChoose,3)
@@ -231,6 +248,7 @@ C(4,#UnitCode,$,s)
 C(4,#DistCode,$,s)
 C(4,#DeptCode,S,$)
 RESET_RIM(#RimL5R14,L5R14)
+RESET_RIM(#RimDeptCode,L5R14)
 S(L5R14,1,#RimDeptCode,#RimChoose)
 R(1,L5R14)
 T(2,@EmpNo,#L5R14DeptManager)
@@ -253,7 +271,8 @@ T(H,@DirectorCodeX,#DirectorCode,#DirectorCodeHelp)
 ! 員工代號
 #EmpNo=X,6,I
 C(3,#FunctionCd,4,s,$)
-@V(7)
+@T(3,@EmpName,)
+V(7)
 
 <include src="ROM.icf::L5R06.dec"/>     
 #RimL5R06=X,1,S

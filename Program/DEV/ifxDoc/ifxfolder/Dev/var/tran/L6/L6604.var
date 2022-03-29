@@ -148,7 +148,8 @@ C(5,#FdEnable,*,T(F,@Enable,1),T(F,@Enable,0))
 !代碼檔代號
 #DefCode=x,20,I
 C(3,#CHAIN,1,C(3,#FunCode,1,$,s),$)
-@V(7)
+@T(3,@DefItem,)
+V(7)
 C(5,#DefCode,CodeType,INVOKEJS(SHOW,p1_6,1),INVOKEJS(SHOW,p1_6,0))
 
 #DefCodeH=X,80,S
@@ -179,7 +180,8 @@ C(3,#DefCodeT,1,C(3,#EditMode,1,T(F,@DefType,1),T(F,@DefType,0)),T(F,@DefType,0)
 !代碼
 #Code=x,20,I
 C(3,#CHAIN,1,C(3,#FunCode,1,$,s),$)
-@V(7)V(NL)
+@T(3,@Item,)
+V(7)V(NL)
 C(3,#MinCodeLength,0,s,V(8,#MinCodeLength,#MaxCodeLength))
 
 
@@ -217,7 +219,8 @@ C(5,#DefCode,CodeType,$,s)
 #DefType=X,2,I
 C(3,#DefCodeT,1,$,s)
 HELP(#DefTypeH)
-@V(H,#DefTypeH)
+@T(3,@DefTypeX,)
+V(H,#DefTypeH)
 
 #DefTypeX=x,50,L
 C(4,#DefType,S,T(H,#DefType,#DefTypeH))
@@ -226,7 +229,8 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 #Enable=X,1,I
 C(2,#FunCode,s,$,$,$,s,s)
 HELP(#EnableH)
-@V(3,Y,N,y,n)
+@T(3,@EnableX,)
+V(3,Y,N,y,n)
 
 #EnableX=X,10,L
 T(H,#Enable,#EnableH)

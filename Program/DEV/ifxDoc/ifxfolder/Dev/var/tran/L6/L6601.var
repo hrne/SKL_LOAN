@@ -304,7 +304,8 @@ C(4,#AcctCode,S,$)
 #ClassCode=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ClassCodeHelp)
-@V(H,#ClassCodeHelp)
+@T(3,@ClassCodeX,)
+V(H,#ClassCodeHelp)
 !HELP(0: 可入帳科目;
 !     1: 下編子細目)
 !@V(1,0,1)
@@ -318,7 +319,8 @@ T(H,#ClassCode,#ClassCodeHelp)
 #AcBookFlag=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#AcBookFlagHelp)
-@V(H,#AcBookFlagHelp)
+@T(3,@AcBookFlagX,)
+V(H,#AcBookFlagHelp)
 !HELP(0: 不細分;
 !     1: 細分;
 !     2: 中介)
@@ -334,7 +336,8 @@ T(H,#AcBookFlag,#AcBookFlagHelp)
 #DbCr=X,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#DbCrHelp)
-@V(H,#DbCrHelp)
+@T(3,@DbCrX,)
+V(H,#DbCrHelp)
 !HELP(D: 借;
 !     C: 貸)
 !@V(3,D,C)
@@ -348,7 +351,8 @@ T(H,#DbCr,#DbCrHelp)
 #AcctFlag=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#AcctFlagHelp)
-@V(H,#AcctFlagHelp)
+@T(3,@AcctFlagX,)
+V(H,#AcctFlagHelp)
 !HELP(0: 一般科目;
 !     1: 資負明細科目)
 !@V(1,0,1)
@@ -362,7 +366,8 @@ T(H,#AcctFlag,#AcctFlagHelp)
 #ReceivableFlag=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ReceivableFlagHelp)
-@V(H,#ReceivableFlagHelp)
+@T(3,@ReceivableFlagX,)
+V(H,#ReceivableFlagHelp)
 !HELP(0: 非銷帳科目;
 !     1: 會計銷帳科目;
 !     2: 業務銷帳科目)
@@ -378,7 +383,8 @@ T(H,#ReceivableFlag,#ReceivableFlagHelp)
 #ClsChkFlag=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ClsChkFlagHelp)
-@V(H,#ClsChkFlagHelp)
+@T(3,@ClsChkFlagX,)
+V(H,#ClsChkFlagHelp)
 !HELP(0: 不檢查;
 !     1: 不過餘額;
 !     2: 應大於等於零;
@@ -398,7 +404,8 @@ T(H,#ClsChkFlag,#ClsChkFlagHelp)
 #InuseFlag=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#UseHelp)
-@V(H,#UseHelp)
+@T(3,@InuseFlagX,)
+V(H,#UseHelp)
 !HELP(0: 可以使用;
 !     1: 不可使用)
 !@V(1,0,1)

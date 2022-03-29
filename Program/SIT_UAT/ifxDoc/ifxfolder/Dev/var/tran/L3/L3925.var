@@ -127,6 +127,7 @@ C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,3,1)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 
+
 #WKBTN1=X,1,S
 ! C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
 
@@ -136,6 +137,7 @@ T(2,#CustNo+9999999000)
 #BIND1B=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
+T(3,#CustNoX,)
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
 T(3,@RimCustId, )
@@ -146,6 +148,7 @@ R(1,L2R07)
 
 #CustNoX=X,100,L
 C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
 
 #BUF2A=X,100,S
 
@@ -160,8 +163,11 @@ T(3,@FdApplNo, )
 C(3,#CustNo,0,$,s)
 ! INVOKEJS(SHOW,p1,2,3,1)
 SHOW(#BTN2)HIDE(#BTN3)
-@C(4,#CustId,S,$)
+@
+C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
+
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -206,7 +212,9 @@ C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
 ! INVOKEJS(SHOW,p1,3,3,1)
 SHOW(#BTN3)
-@C(3,#ApplNo,0,V(P,需擇一輸入),$)
+@
+C(3,#ApplNo,0,V(P,需擇一輸入),$)
+T(3,#ApplNoX,)
 
 #WKBTN3=X,1,S
 C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
@@ -233,6 +241,7 @@ RESET_RIM(#SendL2r05A,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
 E(0,@FacmNo,#L2r05FacmNo)
+
 
 #SendL2r07C=X,1,S
 C(3,#ApplNo,0,S,$)

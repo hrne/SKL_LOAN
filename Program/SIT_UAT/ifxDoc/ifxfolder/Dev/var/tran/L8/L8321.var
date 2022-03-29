@@ -207,7 +207,8 @@ T(2,@CustIdX,#L8R57CustName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@T(3,@SubmitKeyX,)
+V(7)
 
 #SubmitKeyX=X,80,L
 T(2,@RimJcicBankCode,#SubmitKey)
@@ -250,7 +251,8 @@ IF(#ClosedDate > #CDate,V(P,變更還款條件結案日期不可晚於報送日�
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#ClosedResultHelp)
-@V(H,#ClosedResultHelp)
+@T(3,@ClosedResultX,)
+V(H,#ClosedResultHelp)
 
 #ClosedResultX=X,40,L
 T(H,#ClosedResult,#ClosedResultHelp)

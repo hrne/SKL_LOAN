@@ -167,7 +167,8 @@ T(2,@FdTel,#WKSTAR3)
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 C(3,#FuncCode,4,s)
 HELP(#InsurerTypeHelp)
-@V(H,#InsurerTypeHelp)
+@T(3,@InsurerTypeX,)
+V(H,#InsurerTypeHelp)
 
 #InsurerTypeX=X,8,L
 C(4,#InsurerType,S,$)

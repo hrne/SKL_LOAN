@@ -109,7 +109,9 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF;ntxbuf5=type<-1:CustId<-O
 !統一編號
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
-@T(2,@BUF5,0000000+#CustId+                                                                                                                    0)
+@
+T(3,#CustName,)
+T(2,@BUF5,0000000+#CustId+                                                                                                                    0)
 V(7)A(ID_UNINO,0,#CustId)
 
 #BIND5=X,1,S

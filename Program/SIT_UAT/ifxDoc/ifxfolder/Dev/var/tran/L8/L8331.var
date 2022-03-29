@@ -199,7 +199,8 @@ C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
-@V(H,#TranKeyHelp)
+@T(3,@TranKeyX,)
+V(H,#TranKeyHelp)
 C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@PayOffResult,1)T(F,@PayOffDate,1)T(2,@FdPayOffResult,*)T(2,@FdPayOffDate,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayOffResult,0)T(F,@PayOffDate,0)T(2,@FdPayOffResult, )T(2,@FdPayOffDate, ),$))
 
@@ -245,11 +246,13 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 HELP(#CourtCodeHelp)
-@V(7)
+@T(3,@CourtCodeX,)
+V(7)
 
 
 #CourtCodeX=X,80,L
 T(2,@RimCourtCode,#CourtCode)
+RESET_RIM(#CourtCodeX,L8R59)
 S(L8R59,1,#RimCourtCode)
 R(1,L8R59)
 T(2,@CourtCodeX,#L8R59CourtCodeX)
@@ -259,11 +262,13 @@ T(2,@CourtCodeX,#L8R59CourtCodeX)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@T(3,@MaxMainCodeX,)
+V(7)
 
 
 #MaxMainCodeX=X,80,L
 T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#MaxMainCodeX,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
@@ -275,7 +280,8 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PayOffResult,#L8r48PayOffResult),$)
 C(5,#TranKey,D,s,$)
 HELP(#PayOffResultHelp)
-@V(H,#PayOffResultHelp)
+@T(3,@PayOffResultX,)
+V(H,#PayOffResultHelp)
 
 #PayOffResultX=X,80,L
 T(H,#PayOffResult,#PayOffResultHelp)

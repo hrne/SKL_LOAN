@@ -54,8 +54,7 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , EDD.\"CustId\" ";
 		sql += "          , JSON_VALUE(EDD.\"JsonFields\", '$.InsuNo') AS JSON_DATA "; // -- 先取得JSON_VALUE
 		sql += "     FROM \"EmpDeductDtl\" EDD ";
-		sql += "     WHERE JSON_VALUE(EDD.\"JsonFields\", '$.InsuNo') IS NOT NULL "; // -- 判斷NOT NULL 避免後面資料重複
-		sql += "       AND EDD.\"ErrMsg\" IS NULL ";
+		sql += "     WHERE EDD.\"ErrMsg\" IS NULL ";
 		sql += "       AND EDD.\"MediaDate\" = :mediaDate ";
 		sql += "       AND EDD.\"ProcCode\" in (" + procCode + ") ";
 		sql += "       AND EDD.\"AchRepayCode\" = 5 ";

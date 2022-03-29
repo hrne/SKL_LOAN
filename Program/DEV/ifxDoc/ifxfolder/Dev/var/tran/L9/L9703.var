@@ -173,7 +173,8 @@ C(3,#CustNo,0,S,$)
 !滯繳條件
 #UnpaidCond=A,1,I
 HELP(#UnpaidCondHelp)
-@V(H,#UnpaidCondHelp)
+@T(3,@UnpaidCondx,)
+V(H,#UnpaidCondHelp)
 CALL(#HIGHLIGHT_AFTER_UnpaidCond)
 IF(#UnpaidCond==1,INVOKEJS(SHOW,p1,5,5,0),INVOKEJS(SHOW,p1,4,4,0))
 IF(#UnpaidCond==2,INVOKEJS(SHOW,p1,5,5,1),INVOKEJS(SHOW,p1,4,4,1))
@@ -206,7 +207,8 @@ T(2,#UnpaidDaySt)
 !繳款方式
 #RepayType=A,1,I
 HELP(#RepayType1Help)
-@V(H,#RepayType1Help)
+@T(3,@RepayTypex,)
+V(H,#RepayType1Help)
 
 #RepayTypex=X,8,L
 T(H,#RepayType,#RepayType1Help)
@@ -214,7 +216,8 @@ T(H,#RepayType,#RepayType1Help)
 !戶別
 #CustType=A,1,I
 HELP(#CustTypeHelp)
-@V(H,#CustTypeHelp)
+@T(3,@CustTypex,)
+V(H,#CustTypeHelp)
 
 #CustTypex=X,6,L
 T(H,#CustType,#CustTypeHelp)

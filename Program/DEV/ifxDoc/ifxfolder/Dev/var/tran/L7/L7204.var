@@ -207,7 +207,8 @@ T(F,#CustName,0)
 ! 戶號
 #CustNo=A,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
-@V(7)V(2,0)
+@T(3,@CustName,)
+V(7)V(2,0)
 
 #RimL1r01=X,1,S
 E(0,@RimFunCd,5)
@@ -268,7 +269,8 @@ T(H,@LosCodX,#LosCod,#LosCodHelp)
 #MarkCode=A,1,I
 C(3,#FuncCode,4,s)
 HELP(#MarkCodeHelp)
-@V(H,#MarkCodeHelp)
+@T(3,@MarkCodeX,)
+V(H,#MarkCodeHelp)
 
 #MarkCodeX=X,30,L
 T(H,#MarkCode,#MarkCodeHelp)
@@ -282,7 +284,8 @@ T(H,#MarkCode,#MarkCodeHelp)
 #MarkRsn=A,2,I
 C(3,#FuncCode,4,s)
 HELP(#MarkRsnHelp)
-@V(H,#MarkRsnHelp)
+@T(3,@MarkRsnX,)
+V(H,#MarkRsnHelp)
 
 #MarkRsnX=X,30,L
 T(H,#MarkRsn,#MarkRsnHelp)
@@ -307,7 +310,8 @@ IF(#EndDate < #StartDate,V(P,終止日期不可小於起始日期),s)
 #LosCod=A,2,I
 C(3,#FuncCode,4,s)
 HELP(#LosCodHelp)
-@V(H,#LosCodHelp)
+@T(3,@LosCodX,)
+V(H,#LosCodHelp)
 !@V(7)V(5,1,99)
 
 #LosCodX=X,30,L

@@ -107,7 +107,7 @@ T(3,1)ASGN(LOOP$)
 
 #oSubCom=x,100,S
 
-#oLastUpdate=D,7,S
+#oLastUpdate=x,20,S
 
 
 </sub>
@@ -159,5 +159,5 @@ TXFORM=L1909
 {width:150,align:'left'}
 
 #oLastUpdate=更新日期
-{width:100,align:'center'}
+{width:130,align:'center'}
 </sub>

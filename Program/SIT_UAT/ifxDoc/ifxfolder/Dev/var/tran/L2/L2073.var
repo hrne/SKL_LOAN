@@ -75,6 +75,10 @@ T(2,1:依統一編號;2:依戶號)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+! 交易起始時的處理
+#StartUp=A,1,S
+E(0,@CustNo,0000000)
+
 !隱藏統一編號,戶號
 ! #WKHIDE=X,1,S
 ! INVOKEJS(SHOW,p1,02,03,0)
@@ -107,7 +111,6 @@ R(1,L2R47)
 
 !戶號
 #CustNo=A,7,I
-E(1,0000000)
 C(3,#IdNo,2,$,S)
 
 

@@ -279,7 +279,8 @@ C(2,#FuncCode,$,$,$,$,s,s)
 #Cycle=A,2,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#RptCycle)
-@V(H,#RptCycle)
+@T(3,@CycleX,)
+V(H,#RptCycle)
 
 #CycleX=X,20,L
 !C(2,#FuncCode,$,$,$,$,s,s)
@@ -290,7 +291,8 @@ T(H,#Cycle,#RptCycle)
 #SignCode=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#RptSignCode)
-@V(H,#RptSignCode)
+@T(3,@SignCodeX,)
+V(H,#RptSignCode)
 
 #SignCodeX=X,20,L
 !C(2,#FuncCode,$,$,$,$,s,s)
@@ -305,7 +307,8 @@ C(2,#FuncCode,$,$,$,$,s,s)
 #Watermark=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#RptWaterCode)
-@V(H,#RptWaterCode)
+@T(3,@WatermarkX,)
+V(H,#RptWaterCode)
 
 #WatermarkX=X,20,L
 T(H,#Watermark,#RptWaterCode)
@@ -314,7 +317,8 @@ T(H,#Watermark,#RptWaterCode)
 #Enable=X,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#EnableFg)
-@V(H,#EnableFg)
+@T(3,@EnableX,)
+V(H,#EnableFg)
 
 #EnableX=X,20,L
 !C(2,#FuncCode,$,$,$,$,s,s)
@@ -324,7 +328,8 @@ T(H,#Enable,#EnableFg)
 #SendCode=A,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#RptSendCode)
-@V(H,#RptSendCode)
+@T(3,@SendCodeX,)
+V(H,#RptSendCode)
 
 #SendCodeX=X,40,L
 !C(2,#FuncCode,$,$,$,$,s,s)
@@ -349,7 +354,7 @@ C(3,#SendCode,2,INVOKEJS(SHOW,p3,1),INVOKEJS(SHOW,p3,0))
 #LetterFg=X,1,I
 C(3,#SendCode,0,S,$)
 HELP(#YesNoHelp)
-@
+@T(3,@LetterFgX,)
 V(H,#YesNoHelp)
 IF(#LetterFg=="Y",INVOKEJS(SHOW,p3,1,1,1),INVOKEJS(SHOW,p3,1,1,0))
 
@@ -361,7 +366,7 @@ C(4,LetterFg,S,T(H,#LetterFg,#YesNoHelp))
 #MessageFg=X,1,I
 C(3,#SendCode,0,S,$)
 HELP(#YesNoHelp)
-@
+@T(3,@MessageFgX,)
 V(H,#YesNoHelp)
 IF(#MessageFg=="Y",INVOKEJS(SHOW,p3,2,2,1),INVOKEJS(SHOW,p3,2,2,0))
 
@@ -372,7 +377,7 @@ C(4,MessageFg,S,T(H,#MessageFg,#YesNoHelp))
 #EmailFg=X,1,I
 C(3,#SendCode,0,S,$)
 HELP(#YesNoHelp)
-@
+@T(3,@EmailFgX,)
 V(H,#YesNoHelp)
 IF(#EmailFg=="Y",INVOKEJS(SHOW,p3,3,3,1),INVOKEJS(SHOW,p3,3,3,0))
 IF(#LetterFg=="N" && #MessageFg=="N" && #EmailFg=="N",$,s)

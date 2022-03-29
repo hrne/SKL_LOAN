@@ -134,7 +134,8 @@ E(0,@ReChkMonth,#MM)
 !查詢條件
 #InqFg=A,1,I
 HELP(#InqFgHelp)
-@V(H,#InqFgHelp)
+@T(3,@InqFgX,)
+V(H,#InqFgHelp)
 
 #InqFgX=X,20,L
 T(H,#InqFg,#InqFgHelp)
@@ -151,7 +152,8 @@ SWITCH(#InqFg,1,INVOKEJS(SHOW,p1,2,3,1)INVOKEJS(SHOW,p1,4,5,0)INVOKEJS(SHOW,p1,7
 #ConditionCode=A,2,I
 C(3,#InqFg,1,$,S)
 HELP(#ConditionHelp)
-@V(H,#ConditionHelp)
+@T(3,@ConditionCodeX,)
+V(H,#ConditionHelp)
 
 #ConditionCodeX=X,40,L
 C(3,#InqFg,1,$,S)

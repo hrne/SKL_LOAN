@@ -329,7 +329,6 @@ public class L3210 extends TradeBuffer {
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);
 				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
-				acDetail.setRvNo(titaVo.getParam("RpRvno1"));
 				lAcDetail.add(acDetail);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				// 貸方 收付欄
@@ -417,6 +416,37 @@ public class L3210 extends TradeBuffer {
 		// call 應繳試算
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, iTempAmt, titaVo);
 		if (this.baTxList != null) {
+			// 4.本期溢(+)短(-)繳
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 4) {
+					// 貸: TAV  (交易金額)
+					acDetail = new AcDetail();
+					acDetail.setDbCr("C");
+					acDetail.setAcctCode(ba.getAcctCode());
+					acDetail.setTxAmt(iTempAmt);
+					acDetail.setCustNo(ba.getCustNo());
+					acDetail.setFacmNo(ba.getFacmNo());
+					acDetail.setBormNo(ba.getBormNo());
+					acDetail.setRvNo(ba.getRvNo());
+					acDetail.setReceivableFlag(ba.getReceivableFlag());
+					lAcDetail.add(acDetail);
+					// 借: TAV (交易金額減一本期溢繳
+					if (ba.getAcctAmt().compareTo(iTempAmt) < 0) {
+						acDetail = new AcDetail();
+						acDetail.setDbCr("D");
+						acDetail.setAcctCode(ba.getAcctCode());
+						acDetail.setTxAmt(iTempAmt.subtract(ba.getAcctAmt()));
+						acDetail.setCustNo(ba.getCustNo());
+						acDetail.setFacmNo(ba.getFacmNo());
+						acDetail.setBormNo(ba.getBormNo());
+						acDetail.setRvNo(ba.getRvNo());
+						acDetail.setReceivableFlag(ba.getReceivableFlag());
+						lAcDetail.add(acDetail);
+					}
+					ba.setAcctAmt(BigDecimal.ZERO);
+				}
+			}
+
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					acDetail = new AcDetail();

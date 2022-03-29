@@ -43,7 +43,7 @@ E(0,0)
 !---------- AP Button AREA ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
-C(3,#CHAIN,1,$,V(P,此為連動交易，請從交易:L6087進入))
+C(3,#CHAIN,1,$,V(P,此為連動交易，請從交易[L6087 協辦獎勵津貼標準查詢]進入))
 #NTXBUF=X,7,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FuncCode,#NTXBUF,1,1)
@@ -132,7 +132,8 @@ IF(#FuncCode == 2 ||#FuncCode == 4  || #FuncCode == 5,s,$)
 #PieceCode0=X,5,I
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ApHelp,cols:2)
-@C(4,#PieceCode0,S,V(H,#ApHelp))
+@T(3,@PieceCodex0,)
+C(4,#PieceCode0,S,V(H,#ApHelp))
 
 #PieceCodex0=X,50,L
 C(4,#PieceCode0,S,$)
@@ -146,7 +147,8 @@ C(4,#PieceCode{j},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
 C(4,#PieceCode{j},S,$)
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ApHelp,cols:2)
-@C(4,#PieceCode{i},S,V(H,#ApHelp))
+@T(3,@PieceCodex{i},)
+C(4,#PieceCode{i},S,V(H,#ApHelp))
 C(4,#PieceCode{i},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
    
 #PieceCodex{i}=X,50,L

@@ -129,7 +129,8 @@ T(2,#DT)
 #SelectCode=A,1,I
 C(3,#CHAIN,1,s,$)
 HELP(#SelectCodeHelp)
-@V(H,#SelectCodeHelp)
+@T(3,@SelectCodeX,)
+V(H,#SelectCodeHelp)
 
 #SelectCodeX=X,16,L
 T(3, )

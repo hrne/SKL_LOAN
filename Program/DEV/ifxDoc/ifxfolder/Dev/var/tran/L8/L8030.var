@@ -120,7 +120,8 @@ T(1,#VeiwSysDate,2,7)
 C(3,#CHAIN,1,T(1,#NTXBUF,1,3),$)
 C(3,#CHAIN,1,s,$)
 HELP(#TranCodeHelp,cols:3)
-@V(H,#TranCodeHelp)
+@T(3,@TranCodeX,)
+V(H,#TranCodeHelp)
 
 
 !<交易名稱>
@@ -132,7 +133,7 @@ T(H,#TranCode,#TranCodeHelp)
 #CustId=X,10,I
 C(3,#CHAIN,1,T(1,#NTXBUF,4,10),$)
 C(3,#CHAIN,1,s,$)
-@V(7)A(ID_UNINO,0,#CustId)
+@T(3,@CustIdX,)V(7)A(ID_UNINO,0,#CustId)
 
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>

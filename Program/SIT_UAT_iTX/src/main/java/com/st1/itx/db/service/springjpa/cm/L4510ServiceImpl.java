@@ -27,7 +27,6 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-
 	private String flag = "";
 	private String AgType1 = "";
 
@@ -43,7 +42,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " select                                                   ";
 		sql += "  f.\"CustNo\"              as \"CustNo\"                       ";
 		sql += " ,f.\"FacmNo\"              as \"FacmNo\"                       ";
-		sql += " ,f.\"AcctCode\"            as \"AcctCode\"                     ";						
+		sql += " ,f.\"AcctCode\"            as \"AcctCode\"                     ";
 		sql += " ,:AgType1                  as \"AgType1\"                      ";
 		sql += " ,f.\"RepayCode\"           as \"RepayCode\"                    ";
 		sql += " ,c.\"EmpNo\"               as \"EmpNo\"                        ";
@@ -58,23 +57,24 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "                         and d.\"Code\"       = :AgType1"  ;
 		sql += " where l.\"Status\" = 0                                         ";
 		sql += "   and nvl(e.\"EmployeeNo\", ' ') <> ' ' ";
-		
+
 		// EmployeeCom
 		// 2022-01-14 智偉修改: CommLineCode有非數值資料,比對時應以字串型態比較
 		// ex : e.\"CommLineCode\" = 21 修改為 e.\"CommLineCode\" = '21'
-		sql += "   AND CASE WHEN (    (e.\"CommLineCode\" = '21' AND substr(e.\"AgLevel\", 0, 1) NOT IN ( 'F','G','J','Z') ) "; 
-		sql += "                   OR (e.\"CommLineCode\" = '31' AND substr(e.\"AgLevel\", 0, 1) NOT IN ('K','Z') ) "; 
+		// 員工扣款一律為15日薪，且AgAgType1需等於0/2
+		sql += "   AND CASE WHEN f.\"RepayCode\" = 3 AND e.\"AgType1\" in (0,2) THEN  5 "; // 15日薪-員工扣薪
+		sql += "            WHEN f.\"RepayCode\" = 3 THEN  0 ";
+		sql += "            WHEN (    (e.\"CommLineCode\" = '21' AND substr(e.\"AgLevel\", 0, 1) NOT IN ( 'F','G','J','Z') ) ";
+		sql += "                   OR (e.\"CommLineCode\" = '31' AND substr(e.\"AgLevel\", 0, 1) NOT IN ('K','Z') ) ";
 		sql += "                   OR (e.\"CommLineCode\" NOT IN ('21','31','1C' )) )";
 		sql += "             AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097')  ";
-		sql += "                                      THEN  5";   
-		sql += "            WHEN f.\"RepayCode\" = 3  THEN  5 "; //		15日薪-員工扣薪 
+		sql += "                                      THEN  5";
 		sql += "            ELSE 1                            ";
 		sql += "       END = :AgType1";
-	// 員工扣款一律為15日薪
-    // 非員工扣款者判斷員工須在職  (AgStatusCode  任用狀況碼 =  1-在職)
+		// 非員工扣款者判斷員工須在職 (AgStatusCode 任用狀況碼 = 1-在職)
 		sql += "   AND (f.\"RepayCode\" = 3 OR nvl(e.\"AgStatusCode\",'') = '1') ";
 		sql += " GROUP BY f.\"CustNo\" , f.\"FacmNo\"  ,f.\"AcctCode\", f.\"RepayCode\", c.\"EmpNo\"  ";
-		
+
 		this.info("sql=" + sql);
 		Query query;
 
@@ -88,7 +88,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll(int iFlag, TitaVo titaVo) throws Exception {
 		flag = "" + iFlag;
-		AgType1 = "1".equals(flag) ? "5" : "1" ;
+		AgType1 = "1".equals(flag) ? "5" : "1";
 		return findAll(titaVo);
 	}
 }

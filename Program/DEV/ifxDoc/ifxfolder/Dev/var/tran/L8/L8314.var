@@ -256,7 +256,8 @@ D(8)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)V(NL)
+@T(3,@MaxMainCodeX,)
+V(7)V(NL)
 
 
 #MaxMainCodeX=X,80,L
@@ -270,7 +271,8 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
+@T(3,@AgreeSendX,)
+V(H,#YesNoHelp)
 C(5,#AgreeSend,Y,T(F,@AgreeSendData1,1)T(F,@AgreeSendData2,1)T(2,@FdAgreeSendData1,*),
 T(2,@FdAgreeSendData1, )T(F,@AgreeSendData1,0)T(F,@AgreeSendData2,0))
 
@@ -282,7 +284,8 @@ IF(#AgreeSend=="Y",$,S)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#DataCodeHelp)
-@V(H,#DataCodeHelp)
+@T(3,@AgreeSendDataX1,)
+V(H,#DataCodeHelp)
 
 
 ! 同意報送檔案格式資料別名稱2
@@ -299,6 +302,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#AgreeSendData1,42,T(2,@AgreeSendData2,43),$)
 C(5,#AgreeSendData1,43,T(2,@AgreeSendData2,42),$)
 C(5,#AgreeSendData1,61,T(2,@AgreeSendData2, ),$)
+@T(3,@AgreeSendDataX2,)
 
 ! 同意報送檔案格式資料別名稱2
 #AgreeSendDataX2=X,40,L

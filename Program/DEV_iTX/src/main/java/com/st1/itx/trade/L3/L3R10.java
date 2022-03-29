@@ -17,13 +17,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimFuncCode=9,1
- * RimTxCode=X,5
- * RimCustNo=9,7
- * RimSyndNo=9,3
- */
 /**
  * L3R10 查詢聯貸訂約檔
  * 

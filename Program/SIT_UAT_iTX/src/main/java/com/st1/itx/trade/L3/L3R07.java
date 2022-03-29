@@ -18,12 +18,6 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
-/*
- * Tita
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNo=9,3
- */
 import com.st1.itx.util.parse.Parse;
 
 /**

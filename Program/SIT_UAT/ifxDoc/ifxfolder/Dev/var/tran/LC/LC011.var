@@ -131,7 +131,8 @@ V(5,#iTxSt,#SYSCDATE)
 #iStatus=A,1,I
 E(0,0)
 HELP(#iStatusH)
-@V(H,#iStatusH)
+@T(3,@iStatusX,)
+V(H,#iStatusH)
 
 #iStatusX=X,20,L
 T(H,#iStatus,#iStatusH)

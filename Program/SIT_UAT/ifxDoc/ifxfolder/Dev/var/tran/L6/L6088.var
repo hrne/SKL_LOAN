@@ -108,6 +108,7 @@ BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUFA;ntxbuf5=type<-1:CenterCo
 
 ! 單位代號
 #CenterCode=X,6,I
+@T(3,@CenterCodeName,)
 !C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,3,1)
 ! @C(4,#CenterCode,INVOKEJS(SHOW,p1,1,1,0)INVOKEJS(SHOW,p1,2,3,1),INVOKEJS(SHOW,p1,2,3,0))
@@ -119,7 +120,7 @@ T(2,#CenterCode)
 T(2,1)
 C(4,#CenterCode,s,$)
 C(4,#CenterCodeName,$,s)
-RESET_RIM(#RimL5R14,L5R14)
+RESET_RIM(#RimChoose,L5R14)
 S(L5R14,1,#RimChoose,#RimAreaCode)
 R(1,L5R14)
 T(2,@CenterCodeName,#L5R14AreaItem)
@@ -150,7 +151,8 @@ C(4,#EmployeeNo,$,S)
 !C(3,#CHAIN,1,s,$)
 T(3,Y)
 HELP(#AgCurIndHelp)
-@C(4,#AgStatusCode,$,V(H,#AgCurIndHelp))
+@T(3,@AgStatusCodeX,)
+C(4,#AgStatusCode,$,V(H,#AgCurIndHelp))
 
 #AgStatusCodeX=X,6,L
 T(H,#AgStatusCode,#AgCurIndHelp)

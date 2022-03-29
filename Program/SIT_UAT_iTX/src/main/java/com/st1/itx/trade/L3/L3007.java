@@ -31,16 +31,7 @@ import com.st1.itx.util.parse.Parse;
  * L3007 暫收支票明細資料查詢
  * a.此功能供查詢該客戶未兌現之期票.
  */
-/*
- * Tita
- * CaseNo=9,7
- * TimCustNo=9,7
- * CustId=X,10
- * ApplNo=9,7
- * FacmNo=9,3
- * ChequeDateStart=9,7
- * ChequeDateEnd=9,7
- */
+
 /**
  * L3007 暫收支票明細資料查詢
  * 
@@ -135,32 +126,8 @@ public class L3007 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "支票檔"); // 查詢資料不存在
 		}
 		for (LoanCheque tLoanCheque : lLoanCheque) {
-//			 查詢會計銷帳檔
-//			wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
-//					+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
-//			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", iCustNo, wkRvNo, 0,
-//					Integer.MAX_VALUE, titaVo);
-//			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
-
 			occursList = new OccursList();
-//			occursList.putParam("OOFacmNo", tLoanCheque.getFacmNo());
 			moveOccursList(tLoanCheque, titaVo);
-
-//			if (lAcReceivable != null && lAcReceivable.size() > 0) {
-//				for (AcReceivable tAcReceivable : lAcReceivable) {
-//					if (iFacmNo == 0 || iFacmNo == tAcReceivable.getFacmNo()) {
-//						occursList = new OccursList();
-//						occursList.putParam("OOFacmNo", tAcReceivable.getFacmNo());
-//						moveOccursList(tLoanCheque, titaVo);
-//					}
-//				}
-//			} else {
-//				if (iFacmNo == 0) {
-//					occursList = new OccursList();
-//					occursList.putParam("OOFacmNo", 0);
-//					moveOccursList(tLoanCheque, titaVo);
-//				}
-//			}
 		}
 
 		if (wkTotalCount == 0) {

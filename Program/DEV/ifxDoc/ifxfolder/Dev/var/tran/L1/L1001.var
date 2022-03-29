@@ -162,7 +162,8 @@ C(3,#CustNoSt,0,s,$)
 #CustId=X,10,I
 !C(3,#CustNoEd,0,INVOKEJS(SHOW,p1,2,2,1),$)
 C(3,#CustNoEd,0,$,S)
-@C(4,#CustId,$,A(ID_UNINO,0,#CustId))
+@
+C(4,#CustId,$,A(ID_UNINO,0,#CustId))
 !C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
 
 !戶名
@@ -191,7 +192,9 @@ C(3,#CustNoEd,0,$,S)
 C(4,#CustId,$,S)
 C(4,#CustName,$,S)
 C(4,#Mobile,$,S)
-@C(4,#IndustryCode,V(P,需擇一輸入查詢條件),V(9))
+@
+T(3,@IndustryCodeX,)
+C(4,#IndustryCode,V(P,需擇一輸入查詢條件),V(9))
 
 #SendL6R06=X,1,S
 #RimIndustryCode=X,6,S

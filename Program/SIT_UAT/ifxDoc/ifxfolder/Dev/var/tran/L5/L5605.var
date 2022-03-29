@@ -193,7 +193,8 @@ C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,�
 ! C(3,#FunctionCd,6,s,$)
 C(3,#CHAIN,0,$,s)
 HELP(#FunctionCdHelp)
-@V(H,#FunctionCdHelp)
+@T(3,@FunctionCdX,)
+V(H,#FunctionCdHelp)
 E(0,@FUNCIND,#FunctionCd)
 
 #FunctionCdX=X,4,L
@@ -207,7 +208,8 @@ ASGN(AGAIN$)
 C(3,#CHAIN,0,$,s)
 C(2,#FunctionCd,S,$,$,s,s,s,s)
 HELP(#CaseCodeHelp)
-@V(H,#CaseCodeHelp)
+@T(3,@CaseCodeX,)
+V(H,#CaseCodeHelp)
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
 !<電催查詢>
@@ -267,7 +269,8 @@ C(2,#FunctionCd,S,$,$,s,s,s,s)
 #RemindCode=A,2,I
 C(2,#FunctionCd,S,$,$,s,s,s,s)
 HELP(#RemindCodeHelp)
-@V(H,#RemindCodeHelp)
+@T(3,@RemindCodeX,)
+V(H,#RemindCodeHelp)
 #RemindCodeX=X,30,L
 T(H,#RemindCode,#RemindCodeHelp)
 ! 其他記錄
@@ -285,7 +288,8 @@ C(2,#FunctionCd,S,T(2,#CDate),$,T(2,#CDate),s,s,s)
 C(2,#FunctionCd,S,$,$,s,E(0,4),s,E(0,6))
 C(2,#FunctionCd,S,$,$,s,s,s,s)
 HELP(#CondCodeHelp)
-@V(H,#CondCodeHelp)
+@T(3,@CondCodeX,)
+V(H,#CondCodeHelp)
 #CondCodeX=X,6,L
 T(H,#CondCode,#CondCodeHelp)
 ! 維護日期

@@ -127,7 +127,8 @@ V(5,#AcDateStart,#CDATE)
 !交易樣態
 #Factor=N,2,I
 HELP(#FactorHelp)
-@V(H,#FactorHelp)
+@T(3,@FactorX,)
+V(H,#FactorHelp)
 
 #FactorX=X,6,L
 T(H,#Factor,#FactorHelp)
@@ -136,7 +137,8 @@ T(H,#Factor,#FactorHelp)
 #Type=N,1,I
 E(0,1)
 HELP(#TypeHelp)
-@V(H,#TypeHelp)
+@T(3,@TypeX,)
+V(H,#TypeHelp)
 
 #TypeX=X,12,L
 T(H,#Type,#TypeHelp)

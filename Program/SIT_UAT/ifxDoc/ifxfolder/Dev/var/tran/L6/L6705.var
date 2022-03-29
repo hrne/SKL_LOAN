@@ -134,7 +134,8 @@ T(2,@AreaCode,#CHAIN_AreaCode)
 T(F,@FuncCode,0)
 C(3,#CHAIN,1,s,$)
 HELP(#FuncCodeHelp)
-@V(H,#FuncCodeHelp)
+@T(3,@FuncCodeX,)
+V(H,#FuncCodeHelp)
 
 #FuncCodeX=X,4,L
 C(4,#FuncCode,S,$)
@@ -190,7 +191,7 @@ T(2,@FdJcicAreaCode,#WKSTAR2)
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#CityHelp)
-@
+@T(3,@CityCodeX,)
 V(H,#CityHelp)
 
 #CityCodeX=x,20,L
@@ -200,7 +201,8 @@ T(H,@CityItem,#CityCode,#CityHelp)
 #AreaCode=X,2,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 C(2,#FuncCode,$,$,$,$,s,s)
-@V(7)V(9)
+@T(3,@AreaItem,)
+V(7)V(9)
 
 #SendL6R11=X,1,S
 E(0,@RimFuncCode,#FuncCode)

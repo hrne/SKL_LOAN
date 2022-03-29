@@ -134,8 +134,6 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<
 T(2,00000019999999000)
 #BIND6AS=X,1,S
 BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
-#BIND7AS=X,1,S
-BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF7A;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
 #BUF1=X,42,S
 HIDE(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#CloseBreachAmtX,#UsExtraRepay,#UsReduceAmt)
@@ -236,6 +234,7 @@ HIDE(#BTN6)
 C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
+T(3,#CustNoX,)
 
 
 
@@ -271,6 +270,7 @@ SHOW(#BTN2)HIDE(#BTN1,#BTN6,#BTN3,#BTN7)
 CALL(#InitValue)
 @C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -316,6 +316,7 @@ CALL(#InitValue)
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
 T(2,@ApplNo,#ApplNo2)
+T(3,#ApplNoX,)
 
 #WKBTN3=X,1,S
 C(4,#ApplNo,HIDE(#BTN3),SHOW(#BTN3))
@@ -529,6 +530,9 @@ T(2,0000000+#TimCustNo+#CustId+#ApplNo+000)
 ! [撥款序號]
 ! 可不輸入
 #FdBormNo=X,2,L
+
+#BIND7AS=X,1,S
+BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF7A;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
 #BormNo=A,3,I
 C(3,#CHAIN,1,s,$)

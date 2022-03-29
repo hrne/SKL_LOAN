@@ -87,6 +87,7 @@ T(2,@srh_brno,#KINBR)
 
 #txcode2=X,2,I
 HELP(#txcode2Help)
+@T(3,@txcode2X,)
 @V(H,#txcode2Help)
 !HELP(L1:顧客管理作業;
 !L2:業務作業;

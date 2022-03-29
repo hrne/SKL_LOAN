@@ -184,7 +184,8 @@ T(3,全公司)
 #AcSubBookCode=X,3,I
 C(3,#CHAIN,1,s,$)
 HELP(#AcSubBookCodeHelp)
-@C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
+@T(3,@AcSubBookItem,)
+C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
 
 #AcSubBookItem=X,20,L
 C(4,#AcSubBookCode,S,T(H,#AcSubBookCode,#AcSubBookCodeHelp))
@@ -254,7 +255,10 @@ IF(#AcDate > #DT,V(P,不可大於會計日),$)
 #InqType=A,1,I
 C(3,#CHAIN,1,s,$)
 HELP(#InqTypeHelp)
-@V(H,#InqTypeHelp)
+@T(3,@InqTypeX,)
+T(3,@InqTypeX1,)
+T(3,@InqTypeX2,)
+V(H,#InqTypeHelp)
 C(3,#InqType,0,T(3,@FdInqTypeX2, ),T(3,@FdInqTypeX2,*))
 
 #InqTypeX=X,12,L
@@ -280,7 +284,7 @@ C(3,#InqType,1,HELP(#SumNoTypeHelp),T(2,#InqDataX, ))
 C(3,#InqType,0,S,$)
 C(3,#CHAIN,1,T(F,@InqData,0),T(F,@InqData,1))
 C(3,#CHAIN,1,s,$)
-@
+@T(3,@InqDataX,)
 C(3,#InqType,1,V(H,#SumNoTypeHelp),V(7))
 
 #InqDataX=X,20,L
@@ -291,7 +295,8 @@ C(3,#InqType,1,T(H,#InqData,#SumNoTypeHelp),S)
 #DbCr=A,1,I
 C(3,#CHAIN,1,XMT(),$)
 HELP(#DbCrH)
-@V(H,#DbCrH)
+@T(3,@DbCrX,)
+V(H,#DbCrH)
 
 #DbCrX=X,4,L
 T(H,#DbCr,#DbCrH)

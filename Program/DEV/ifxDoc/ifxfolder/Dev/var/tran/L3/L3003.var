@@ -155,6 +155,7 @@ C(3,#RvStartDate,0,$,S)
 C(4,#CaseNo,S,$)
 E(0,#CaseNo)
 T(2,@CaseNo,#CaseNo2)
+T(3,#CaseNoX,)
 
 #SendL2r10=X,1,S
 C(4,#CaseNo,S,$)
@@ -204,6 +205,7 @@ SHOW(#BTN2)
 C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
+T(3,#CustNoX,)
 
 #BUF2B=X,18,S
 T(2,#CustNo+9999999000)
@@ -248,6 +250,7 @@ C(4,#CustNo,$,S)
 SHOW(#BTN3)HIDE(#BTN2,#BTN4)
 @C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
 
 #BUF3B=X,100,S
 T(2,0000000+#CustId)
@@ -304,7 +307,7 @@ SHOW(#BTN4)HIDE(#BTN2,#BTN3)
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
 T(2,@ApplNo,#ApplNo2)
-
+T(3,#ApplNoX,)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S

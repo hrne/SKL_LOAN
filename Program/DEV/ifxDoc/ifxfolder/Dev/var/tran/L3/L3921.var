@@ -137,6 +137,7 @@ C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 @
+T(3,#CustNoX,)
 HIDE(#BTN1)
 
 #CustNo2=A,7,S
@@ -175,6 +176,7 @@ CALL(#InitValue)
 C(4,#CustNo,$,S)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 @
+T(3,#CustIdX,)
 HIDE(#BTN2)
 C(4,#CustId,S,$)
 V(7)
@@ -215,7 +217,9 @@ T(3,*)
 C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 SHOW(#BTN3)HIDE(#BTN1,#BTN2)
-@C(4,#ApplNo,V(P,需擇一輸入查詢條件),$)
+@
+T(3,#ApplNoX,)
+C(4,#ApplNo,V(P,需擇一輸入查詢條件),$)
 HIDE(#BTN3)
 
 #ApplNo2=A,7,S
@@ -253,6 +257,7 @@ R(1,L2R07)
 
 #ApplNoX=X,100,L
 C(4,#ApplNo,S,T(2,#L2r07CustName))
+
 
 #TimCustNo=A,7,S
 E(0,0)

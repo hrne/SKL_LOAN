@@ -222,7 +222,7 @@ D(8)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)V(NL)
+@T(3,@MaxMainCodeX,)V(7)V(NL)
 
 
 #MaxMainCodeX=X,80,L
@@ -236,7 +236,7 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
+@T(3,@AgreeCodeX,)V(H,#YesNoHelp)
 
 #AgreeCodeX=X,2,L
 T(H,#AgreeCode,#YesNoHelp)

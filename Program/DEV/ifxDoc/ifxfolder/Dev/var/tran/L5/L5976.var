@@ -448,6 +448,7 @@ C(2,#WKTF2,HIDE(#BtnBankCode{i}),SHOW(#BtnBankCode{i}))
 #CustId=X,10,I
 IF(#FunctionCode==#SearchCode,s,$)
 C(3,#CHAIN,0,$,IF(#L5r01CustId!="",s,$))
+@T(3,@CustNo,)
 @V(7)
 @A(ID_UNINO,0,#CustId)
 
@@ -509,7 +510,8 @@ E(0,@NegFinShareCancelAmt{i},0)
 #CaseKindCode=X,1,I
 IF(#FunctionCode=="01"||#FunctionCode=="02",$,s)
 HELP(#CaseKindCodeHelp)
-@V(H,#CaseKindCodeHelp)
+@T(3,@CaseKindCodeX,)
+V(H,#CaseKindCodeHelp)
 
 #CaseKindCodeX=X,4,L
 T(H,#CaseKindCode,#CaseKindCodeHelp)
@@ -530,7 +532,8 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 #CustLoanKind=X,1,I
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 HELP(#CustLoanKindHelp)
-@V(H,#CustLoanKindHelp)
+@T(3,@CustLoanKindX,)
+V(H,#CustLoanKindHelp)
 
 #CustLoanKindX=X,6,L
 T(H,#CustLoanKind,#CustLoanKindHelp)
@@ -542,7 +545,8 @@ IF(#CustLoanKind==3,CALL(#ShowPayerCustNo),CALL(#HidePayerCustNo))
 #PayerCustNo=A,7,I
 IF(#CustLoanKind==3,$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-@V(2,0)
+@T(3,@PayerCustName,)
+V(2,0)
 ! 債權戶況
 ! 0:正常
 ! 1:已變更
@@ -570,7 +574,8 @@ C(3,#FunctionCode,09,T(2,@Status,0),$)
 C(3,#FunctionCode,11,T(2,@Status,4),$)
 IF(#FunctionCode=="02",$,s)
 HELP(#StatusHelp)
-@V(H,#StatusHelp)
+@T(3,@StatusX,)
+V(H,#StatusHelp)
 
 #StatusX=X,6,L
 T(H,#Status,#StatusHelp)
@@ -679,7 +684,8 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 #MainFinCode=X,8,I
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#IsMainFin=="Y",s,$)
-@V(7)
+@T(3,@MainFinCodeName,)
+V(7)
 
 !總本金餘額
 #PrincipalBal=m,14,S
@@ -708,6 +714,7 @@ T(2,@MainFinCodeName,#L5r12BankItem)
 #TwoStepCode=X,1,I
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 HELP(#YNHelp)
+@T(3,@TwoStepCodeX,)
 @V(3,Y,N,1,2)
 @IF(#TwoStepCode=="Y",T(2,1),$)
 @IF(#L5r01TwoStepCode==1 && #FunctionCode==11,T(2,2),s)

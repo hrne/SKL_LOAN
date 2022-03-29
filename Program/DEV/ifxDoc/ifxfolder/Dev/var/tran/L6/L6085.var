@@ -106,7 +106,8 @@ INVOKEJS(SHOW,p1,7,7,0)
 !查詢條件
 #InqFg=A,1,I
 HELP(#InqFgHelp)
-@V(H,#InqFgHelp)
+@T(3,@InqFgX,)
+V(H,#InqFgHelp)
 
 #InqFgX=X,20,L
 T(H,#InqFg,#InqFgHelp)

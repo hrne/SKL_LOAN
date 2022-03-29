@@ -80,7 +80,8 @@ T(2,@BrHelp,#HelpDesc1)
 
 #BrNo=X,4,I
 HELP(#BrHelp)
-@C(4,#BrNo,S,$)V(H,#BrHelp)
+@T(3,@BrNoX,)
+C(4,#BrNo,S,$)V(H,#BrHelp)
 
 #BrNoX=X,50,L
 C(4,#BrNo,S,$)
@@ -198,13 +199,13 @@ TXFORM=L6943
 {width:70,align:'center'}
 
 #OTranNoX=交易名稱
-{width:120,align:'left'}
+{width:200,align:'left'}
 
 #OAuthFgX=權限說明
 {width:70,align:'center'}
 
 #OLastUpdate=修改日期
-{width:120,align:'center'}
+{width:140,align:'center'}
 
 #OLastEmp=修改人員
 {width:120,align:'left'}

@@ -112,7 +112,7 @@ T(2,#KINBR)
 C(3,#AdminFg,1,$,s)
 !C(4,#TlrNo,$,S)
 HELP(#BrHelp)
-@
+@T(3,@BrNoX,)
 C(4,#BrNo,$,V(H,#BrHelp))
 
 #BrNoX=X,80,L
@@ -129,7 +129,7 @@ C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
 
 !使用者代號
 #TlrNo=X,6,I
-@
+@T(3,@TlrItem,)
 C(4,#BrNo,V(7),$)
 C(4,#TlrNo,$,V(8,6,6))
 
@@ -156,7 +156,7 @@ T(H,@GroupNoX,#GroupNo,#GroupHelp)
 C(4,#BrNo,S,$)
 C(4,#TlrNo,$,S)
 HELP(#GroupHelp,cols:2))
-@
+@T(3,@GroupNoX,)
 C(4,#GroupNo,s,V(H,#GroupHelp))
 
 #GroupNoX=X,20,L
@@ -167,7 +167,8 @@ T(H,#GroupNo,#GroupHelp)
 #LevelFg=A,1,I
 C(4,#TlrNo,$,S)
 HELP(#LevelHelp)
-@V(H,#LevelHelp)
+@T(3,@LevelFgX,)
+V(H,#LevelHelp)
 
 #LevelFgX=X,10,L
 T(H,#LevelFg,#LevelHelp)

@@ -1,0 +1,74 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#FunCodeH=x,200,S
+T(3,1:產生選單檔)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+
+
+</sub>
+
+<sub type="DC" name="p1" layout="cols=2;screen.width=[100,700];printer.width=[10,70];order=1;">
+[
+["[LC900] 共用工程程式"],
+[#<->#,"選項",#FunCode,#FunCodeX],
+]
+
+!---------- AP Button AREA ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,1,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+
+!---------- AP TEXT AREA Variables ----------
+
+#FunCode=A,1,I
+HELP(#FunCodeH)
+@T(3,@FunCodeX,)
+V(H,#FunCodeH)
+
+#FunCodeX=x,100,L
+T(H,#FunCode,#FunCodeH)
+
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#FunCode
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=LC900^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+</sub>

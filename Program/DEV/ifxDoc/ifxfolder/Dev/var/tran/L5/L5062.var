@@ -84,6 +84,7 @@ T(2,@RimFuncCode,5)
 T(2,@RimTxCode,L5062)
 T(2,@RimL6R12CityCode,#CityCode)
 RESET_RIM(#SendL6R12,L6R12)
+T(3,@CityItem,)
 S(L6R12,1,#RimFuncCode,#RimTxCode,#RimL6R12CityCode)
 R(1,L6R12)
 

@@ -25,6 +25,7 @@ import com.st1.itx.util.parse.Parse;
  * L2119 合併額度控管登錄
  */
 
+
 /**
  * L2119 共用額度登錄
  * 
@@ -115,6 +116,12 @@ public class L2119 extends TradeBuffer {
 			if (iApplNo == 0) {
 				break;
 			}
+			FacShareLimit tFacShareLimit2 = new FacShareLimit();
+			tFacShareLimit2 = facShareLimitService.findById(iApplNo, titaVo);
+			if (tFacShareLimit2 != null) {
+				throw new LogicException(titaVo, "E0012", "此核准號碼已有合併控管資料。 核准號碼= " + iApplNo); // 該筆資料已存在
+			}
+
 			tFacShareLimit = new FacShareLimit();
 			tFacShareLimit.setApplNo(iApplNo);
 			tFacShareLimit.setMainApplNo(wkMainApplNo);
@@ -126,7 +133,7 @@ public class L2119 extends TradeBuffer {
 			try {
 				facShareLimitService.insert(tFacShareLimit, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0005", "合併額度控管" + e.getErrorMsg());
+				throw new LogicException("E0005", "合併額度控管" + e.getErrorMsg());// 新增資料時，發生錯誤
 			}
 		}
 	}

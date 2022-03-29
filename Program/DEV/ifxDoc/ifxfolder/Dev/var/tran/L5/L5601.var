@@ -323,7 +323,8 @@ C(3,#FunctionCd,1,T(1,#TelTimeX,1,4),$)
 #ContactCode=A,1,I
 HELP(#ContactCodeHelp)
 C(2,#FunctionCd,S,$,$,$,s,s)
-@V(H,#ContactCodeHelp)
+@T(3,@ContactCodeX,)
+V(H,#ContactCodeHelp)
 
 #ContactCodeX=X,6,L
 T(H,#ContactCode,#ContactCodeHelp)
@@ -332,7 +333,8 @@ T(H,#ContactCode,#ContactCodeHelp)
 #RecvrCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#RecvrCodeHelp)
-@V(H,#RecvrCodeHelp)
+@T(3,@RecvrCodeX,)
+V(H,#RecvrCodeHelp)
 #RecvrCodeX=X,4,L
 T(H,#RecvrCode,#RecvrCodeHelp)
 
@@ -382,7 +384,8 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 #ResultCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#ResultCodeHelp,cols:2)
-@V(H,#ResultCodeHelp)
+@V(3,@ResultCodeX,)
+V(H,#ResultCodeHelp)
 
 #ResultCodeX=X,12,L
 T(H,#ResultCode,#ResultCodeHelp)

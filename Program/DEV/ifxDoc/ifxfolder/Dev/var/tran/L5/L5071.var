@@ -143,7 +143,8 @@ C(3,#CustNo,0,T(2,#L2r07CustNo),T(2,#CustNo))
 #CaseKindCode=X,1,I
 HELP(#CaseKindCodeHelp)
 @IF(#CaseKindCode=="",s,$)
-@V(H,#CaseKindCodeHelp)
+@T(3,@CaseKindCodeX,)
+V(H,#CaseKindCodeHelp)
 
 #CaseKindCodeX=X,4,L
 IF(#CaseKindCode=="",S,$)
@@ -153,7 +154,8 @@ T(H,#CaseKindCode,#CaseKindCodeHelp)
 #CustLoanKind=X,1,I
 HELP(#CustLoanKindHelp)
 @IF(#CustLoanKind=="",s,$)
-@V(H,#CustLoanKindHelp)
+@T(3,@CustLoanKindX,)
+V(H,#CustLoanKindHelp)
 
 #CustLoanKindX=X,6,L
 IF(#CustLoanKind=="",S,$)
@@ -163,7 +165,8 @@ T(H,#CustLoanKind,#CustLoanKindHelp)
 #Status=X,1,I
 HELP(#StatusHelp)
 @IF(#Status=="",s,$)
-@V(H,#StatusHelp)
+@T(3,@StatusX,)
+V(H,#StatusHelp)
 
 #StatusX=X,6,L
 IF(#Status=="",S,$)

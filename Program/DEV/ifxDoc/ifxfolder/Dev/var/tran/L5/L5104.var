@@ -63,7 +63,8 @@ C(3,#CHAIN,0,$,s)
 #ReportFlag=A,1,I
 E(0,4)
 HELP(#ReportHelp)
-@V(H,#ReportHelp)
+@T(3,@ReportFlagX,)
+V(H,#ReportHelp)
      
 #ReportFlagX=X,12,L
 T(3, )
@@ -142,7 +143,8 @@ C(4,#ReportC,S,$)E(0,1)ASGN(LOOPHEIGHT$)
 <sub type="FORM" name="L514A" tota-mode="1">
 #BackACnt=m,6,O
 C(3,#ReportFlag,4,s,$)
-C(3,#BackACnt,0,E(0,@L514APRT,0),E(0,@L514APRT,1))
+C(3,#BackACnt,0,E(0,@L514APRT,0)
+,E(0,@L514APRT,1))
 
 #L514A_LOOP=X,1,S
 E(0,1)ASGN(LOOP$)

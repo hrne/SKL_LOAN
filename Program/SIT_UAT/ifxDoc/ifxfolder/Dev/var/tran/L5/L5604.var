@@ -203,7 +203,8 @@ C(3,#FunctionCd,3,E(0,1),s)
 C(3,#CHAIN,0,$,s)
 C(2,#FunctionCd,S,$,$,s,s,s)
 HELP(#FunctionCdHelp)
-@V(H,#FunctionCdHelp)
+@T(3,@FunctionCdX,)
+V(H,#FunctionCdHelp)
 E(0,@FUNCIND,#FunctionCd)
 
 #FunctionCdX=X,4,L
@@ -218,7 +219,8 @@ ASGN(AGAIN$)
 C(3,#CHAIN,0,$,s)
 C(2,#FunctionCd,S,$,$,s,s,s)
 HELP(#CaseCode)
-@V(H,#CaseCode)
+@T(3,@CaseCodeX,)
+V(H,#CaseCode)
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
 
@@ -348,7 +350,8 @@ BIND(#BTNJ,click, {cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})
 #LegalProg=A,3,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#LegalProgHelp,cols:5)
-@V(H,#LegalProgHelp)
+@T(3,@LegalProgX,)
+V(H,#LegalProgHelp)
 #LegalProgX=X,30,L
 T(H,#LegalProg,#LegalProgHelp)
 ! 金額
@@ -360,7 +363,8 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 #Remark=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#LawRemarkHelp)
-@V(H,#LawRemarkHelp)
+@T(3,@RemarkX,)
+V(H,#LawRemarkHelp)
 
 #RemarkX=X,20,L
 ! C(3,#Remark,0,S,$)

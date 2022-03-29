@@ -130,7 +130,8 @@ T(3,全公司)
 #AcSubBookCode=X,3,I
 C(3,#CHAIN,1,s,$)
 HELP(#AcSubBookCodeHelp)
-@C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
+@T(3,@AcSubBookItem,)
+C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
 
 #AcSubBookItem=X,20,L
 C(4,#AcSubBookCode,S,T(H,#AcSubBookCode,#AcSubBookCodeHelp))
@@ -211,7 +212,7 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 C(3,#CHAIN,1,s,$)
 C(4,#AcNoCode,$,S)
 HELP(#AcctCodeHelp,cols:2)
-@
+@T(3,@AcctCodeX,)
 C(3,#CustNo,0,$,s)
 C(4,#AcctCode,V(P,科子細目、戶號、業務科目請擇一輸入),$)
 
@@ -226,7 +227,8 @@ T(H,#AcctCode,#AcctCodeHelp)
 C(3,#CHAIN,1,s,$)
 E(0,0)
 HELP(#ClsFgH)
-@V(H,#ClsFgH)
+@T(3,@ClsFlagX,)
+V(H,#ClsFgH)
 
 #ClsFlagX=X,4,L
 T(H,#ClsFlag,#ClsFgH)

@@ -114,7 +114,8 @@ IF(#CustE < #CustS,V(P,迄號不可小於起號),$)
 ! 查詢選項
 #OptionCode=A,1,I
 HELP(#OptionCdHelp)
-@V(H,#OptionCdHelp)
+@T(3,#OptionCodeX,)
+V(H,#OptionCdHelp)
 #OptionCodeX=X,20,L
 T(H,#OptionCode,#OptionCdHelp)
 

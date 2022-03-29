@@ -91,7 +91,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:CustId<-
 !戶號
 #CustNo=A,7,I
 @C(3,#CustNo,0,T(2,@BTNADDBUF,1+0000000+000+          )T(2,@CustNameA, ),T(2,@BTNADDBUF,1+#CustNo+000+          )T(2,@CustNameB, )T(2,@CustId, ))
-
+T(2,#CustNameA,)
 #RimL1R18=X,1,S
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#RimL1R18,L1R18)
@@ -110,12 +110,13 @@ C(3,#CustNo,0,S,$)
 #CustId=X,10,I
 C(3,#CustNo,0,$,S)
 @
+T(2,#CustNameB,)
 C(3,#CustNo,0,C(4,#CustId,V(P,需擇一輸入查詢條件),$),S)
-C(3,#CustNo,0,V(7)A(ID_UNINO,0,#CustId)T(2,@CustNameB, ),$)
+C(3,#CustNo,0,V(7)A(ID_UNINO,0,#CustId),$)
 
 #Space=X,1,S
 T(2,@RimCustId,#CustId)
-RESET_RIM(#RimL1R18,L1R18)
+RESET_RIM(#Space,L1R18)
 C(4,#CustId,S,$)
 S(L1R18,1,#RimCustNo,#RimCustId)
 R(1,L1R18)

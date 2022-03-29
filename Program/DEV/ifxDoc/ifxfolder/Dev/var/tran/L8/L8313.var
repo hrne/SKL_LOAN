@@ -234,7 +234,8 @@ T(2,@CustIdX,#L8R57CustName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@T(3,@SubmitKeyX,)
+V(7)
 #SubmitKeyX=X,40,L
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
@@ -258,7 +259,8 @@ T(2,1)
 C(4,#BankCode{j},S,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@C(4,#BankCode{i},T(2,@FdDataCode{i}, ),T(2,@FdDataCode{i},*))
+@T(3,@BankCodeX{i},)
+C(4,#BankCode{i},T(2,@FdDataCode{i}, ),T(2,@FdDataCode{i},*))
 
 #RimL8r01{i}=X,1,S
 C(4,#BankCode{i},S,$)
@@ -278,7 +280,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(4,#BankCode{i},S,$)
 HELP(#DataCodeHelp)
-@V(H,#DataCodeHelp)
+@T(3,@DataCodeX{i},)
+V(H,#DataCodeHelp)
 
 ! 同意報送檔案格式資料別名稱
 #DataCodeX{i}=X,40,L

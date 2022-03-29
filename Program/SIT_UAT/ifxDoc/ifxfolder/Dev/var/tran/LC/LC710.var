@@ -62,7 +62,8 @@ T(4,CHAIN$)
 HELP(0:全部;
      1:成功;
      2:失敗)
-@V(1,0,1,2)
+@T(3,@ChoiceItem,)
+V(1,0,1,2)
 
 ! [執行結果篩選]
 #ChoiceItem=X,20,L

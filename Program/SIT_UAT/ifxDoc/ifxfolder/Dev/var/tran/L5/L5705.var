@@ -1,0 +1,208 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5705)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,8)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,10)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5705" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5705]                                 債權比例分攤(產出)"],
+[#<->#,"使用功能",#UseFunc,#UseFuncX],
+[#<->#,"身分證字號",#CustId],
+[#<->#,"協商申請日",#RcDateFrom,"~",#RcDateTo],
+]
+
+#UseFuncHelp=x,100,S
+T(3,0:選擇身分證字號;1:產生媒體檔)
+
+#button=x,100,S
+K(MODIFYBUTTON,查詢)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+! 功能代碼 查詢
+#UseFunc=A,1,I
+HELP(#UseFuncHelp)
+@T(3,@UseFuncX,)
+V(H,#UseFuncHelp)
+IF(#UseFunc=="1",E(0,@RPTFG,1),E(0,@RPTFG,0))
+INVOKEJS(SHOW,L5705,2,3,1)
+
+
+#UseFuncIs1=X,1,S
+IF(#UseFunc=="1",$,S)
+K(MODIFYBUTTON,產生媒體檔)
+INVOKEJS(SHOW,L5705,2,3,0)
+
+#UseFuncIs0=X,1,S
+IF(#UseFunc=="0",$,S)
+K(MODIFYBUTTON,查詢)
+
+#UseFuncX=X,21,L
+T(H,#UseFunc,#UseFuncHelp)
+
+! 身分證字號
+#CustId=X,10,I
+IF(#UseFunc=="1",S,$)
+@A(ID_UNINO,1,#CustId)
+
+#RcDateFrom=D,7,I
+IF(#UseFunc=="1",S,$)
+D(8)
+@A(DATE,0,#RcDateFrom)
+@IF(#CustId=="" && #RcDateFrom==0,V(P,[身分證字號]與[協商申請日]至少需輸入一項),s)
+
+
+#RcDateTo=D,7,I,
+IF(#UseFunc=="1",S,$)
+D(8)
+@A(DATE,0,#RcDateTo)
+IF(#RcDateFrom==0,s,$)
+IF(#RcDateFrom>#RcDateTo,V(P,[協商申請日-訖]不可小於[協商申請日-起]),$)
+
+!#CheckRcDate=X,1,S
+!IF(#RcDateFrom<=#RcDateTo,$,V(P,協商申請日起日不可大於訖日))
+
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5705 -----------
+<sub type="FORM" name="L5705">
+#SCRTIL=_,_,S
+T(3,[L5705] 債權比例分攤-產出)
+
+! 匯款單FileNo
+#TxtSnoF=X,8,S
+E(2,@SnoF,#TxtSnoF)
+#SnoF=A,8,S
+
+! 匯款單FileNo
+#TxtPrtF=A,1,S
+C(3,#SnoF,0,E(0,0),E(0,1))
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 客戶編號
+#OOCustId=X,10,O
+
+#TxValue=A,1,S
+T(2,@TxCustId,#OOCustId)
+
+! 逐筆傳送的資料
+#TxCustId=X,10,S
+
+#secret-no=x,1000,S
+T(6A,#TxCustId)
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#UseFunc
+#CustId
+#RcDateFrom
+#RcDateTo
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5705
+#TxtSnoF
+#OOCustId
+^
+</sub>
+
+<sub type="PART" name="L5705" layout="cols=1;screen.width=[130,870];printer.width=[15,30,15,30];order=1">
+[
+["[L5705]                                 債權比例分攤(產出)                                                                         "],
+]
+</sub>
+
+! #RPTFG=1,QUERY.GRID,L5052A
+! #any={detail:true, header:'L5052A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#batch-print=1,L5705.PFNX,NA,,,,,,1169:827
+^
+#TxtPrtF=1,PDF,,,,,,,,,,,,,TxtSnoF;3,債權比例分攤產檔
+^
+#RPTFG=0,QUERY.GRID,L5705
+#any={detail:true, header:'L5705.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'加入請求檔',
+	type:'5',
+	rim:'L575A',
+	txtno:'#secret-no',
+	pfnx:"L5705.PFNX",
+	col_captions:["身分證字號","報表代碼","處理結果"],
+	col_names:["#OOCustId","#TXCD","#batch-row-status"]
+	}
+}
+#TXCD
+#secret-no
+#batch-row-status
+
+#OOCustId=身分證字號
+{width:100,align:'center'}
+^
+</sub>

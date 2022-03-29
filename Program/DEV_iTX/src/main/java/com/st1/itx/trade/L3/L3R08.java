@@ -27,15 +27,6 @@ import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimFKey=9,1
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNo=9,3
- * RimSpecificDate=9,7
- */
 /**
  * L3R08 查詢應繳日變更的利息
  * 

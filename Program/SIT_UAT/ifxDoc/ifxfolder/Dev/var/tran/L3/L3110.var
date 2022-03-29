@@ -560,6 +560,7 @@ C(4,#CustNo,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
 #BIND1B=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
 
+T(3,#CustNoX,)
 #SendL2r07A=X,1,S
 C(3,#FKEY,0,$,s)
 C(4,#CustNo,S,$)
@@ -589,6 +590,7 @@ C(3,#FKEY,0,$,s)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 @C(4,#CustId,S,$)
 V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -638,6 +640,7 @@ C(4,#CustId,$,S)
 C(3,#FKEY,0,$,s)
 SHOW(#BTN3)HIDE(#BTN1,#BTN2)
 @C(4,#ApplNo,V(P,需擇一輸入),$)
+T(3,#ApplNoX,)
 
 #ApplNo2=A,7,S
 C(4,#ApplNo,S,$)
@@ -1022,7 +1025,7 @@ E(0,#WKNDY)
 @V(7)A(DATE,0,#DrawdownDate)
 V(5,#WKNDY,#WKDDEND)
 ! V(5,#WKNDY,#MINDATE)
-  
+
 ![貸款期間]
 !必須輸入
 #FdLoanTerm=X,2,L
@@ -1045,7 +1048,6 @@ C(3,#AcctCode,320,E(0,#L6R28AcctCode320A*12),$)
 C(3,#AcctCode,330,E(0,#L6R28AcctCode330A*12),$)
 C(3,#AcctCode,340,E(0,#L6R28AcctCode330A*12),$)
 
-
 #WkBeginDate=D,8,S
 C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#WkBeginMm,0),D(7,2,#L2r05FirstDrawdownDate,#WkBeginMm,0))
 
@@ -1067,7 +1069,7 @@ D(7,1,#DrawdownDate,#MaturityDate,0)
 T(1,@LoanTermYy,#WkDifferenceDate,003,002)
 T(1,@LoanTermMm,#WkDifferenceDate,005,002)
 T(1,@LoanTermDd,#WkDifferenceDate,007,002)
-                
+
 !計息方式
 #FdIntCalcCode=X,2,L
 
@@ -1075,8 +1077,6 @@ T(1,@LoanTermDd,#WkDifferenceDate,007,002)
 
 #IntCalcCodeX=X,8,L
 T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
-
-
 
 ![攤還方式] 
 !1.按月繳息 2.到期取息  3.本息平均法  4.本金平均法
@@ -1111,8 +1111,8 @@ C(5,#L2r01CharCode,2,s,$)
 ! C(3,#AmortizedCode,4,V(1,2,3),$)  
 
 #FreqBaseX=X,8,L
-T(3,)T(H,#FreqBase,#FreqBaseHelp)            
-               
+T(3,)T(H,#FreqBase,#FreqBaseHelp)
+
 #PayIntFreqX=X,8,L
 T(3,)T(H,#FreqBase,#FreqBase2Help)
 
@@ -1120,7 +1120,7 @@ T(3,)T(H,#FreqBase,#FreqBase2Help)
 T(3,)T(H,#FreqBase,#FreqBase2Help)
 
 ![繳息週期]
-!必須輸入   
+!必須輸入
 #FdPayIntFreq=X,2,L
 
 !週期基準為週者，繳息週期固定為雙週
@@ -1202,7 +1202,7 @@ T(1,#WKYYYYMMDD,005,002)
 
 #WKDD2=N,2,S
 T(1,#WKYYYYMMDD,007,002)
-!改
+
 #WKMONTM2=A,4,S
 C(3,#AmortizedCode,2,S,$) 
 C(3,#FreqBase,2,$,S)
@@ -1245,10 +1245,9 @@ C(5,#L2r01CharCode,2,S,$)
 IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
 ! @V(5,0,#WKMM)
 
-
 #WKGDATE=D,8,S
 C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#GracePeriod,0),D(7,2,#L2r05FirstDrawdownDate,#GracePeriod,0))
-                    
+
 ![寬限到期日]
 !攤還方式為本息或本金平均戶時，才可輸入寬限到期日
 #FdGraceDate=X,2,L

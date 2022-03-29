@@ -163,7 +163,8 @@ T(3,全帳冊)
 T(F,@AcSubBookCode,0)
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 HELP(#AcSubBookCodeHelp)
-@C(3,#FuncCode,1,$,V(H,#AcSubBookCodeHelp))
+@T(3,@AcSubBookItem,)
+C(3,#FuncCode,1,$,V(H,#AcSubBookCodeHelp))
 V(7)V(NL)
 
 #AcSubBookItem=X,20,I

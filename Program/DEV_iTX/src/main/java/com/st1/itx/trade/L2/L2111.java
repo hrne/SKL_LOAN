@@ -354,7 +354,7 @@ public class L2111 extends TradeBuffer {
 		tFacCaseAppl.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tFacCaseAppl.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
 		tFacCaseAppl.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
-		tFacCaseAppl.setIsDate(parse.stringToInteger(titaVo.getParam("IsDataDate")));
+		tFacCaseAppl.setIsDate(parse.stringToInteger(titaVo.getParam("IsDate")));
 		
 		tFacCaseAppl.setIntroducer(titaVo.getParam("Introducer"));
 		tFacCaseAppl.setSupervisor(titaVo.getParam("Supervisor"));

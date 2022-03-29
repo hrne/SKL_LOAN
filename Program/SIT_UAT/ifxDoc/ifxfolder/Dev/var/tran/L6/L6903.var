@@ -1,0 +1,372 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6903)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,32)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,305)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6903]                                 會計帳務明細查詢"],
+["#FdAcBookCode+帳冊別",#AcBookCode,#AcBookItem],
+["#FdAcSubBookCode+區隔帳冊",#AcSubBookCode,#AcSubBookItem,"(空白:查詢全部)"],
+["#FdBranchNo+單位別",#BranchNo],
+["#FdCurrencyCode+幣別",#CurrencyCode],
+["#FdAcNoCode+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],
+["#FdAcDate+會計日期",#AcDateSt,"~",#AcDateEd],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:會計科目查詢;enable:1;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+
+#Submit=X,4,S
+K(MODIFYBUTTON,查詢)
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+
+#NTXBUF=X,31,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_AcBookCode=X,3,S
+T(1,#NTXBUF,1,3)
+
+#CHAIN_AcSubBookCode=X,3,S
+T(1,#NTXBUF,4,3)
+
+#CHAIN_AcNoCode=X,11,S
+T(1,#NTXBUF,7,11)
+
+#CHAIN_AcSubCode=X,5,S
+T(1,#NTXBUF,18,5)
+
+#CHAIN_AcDtlCode=X,2,S
+T(1,#NTXBUF,23,2)
+
+#CHAIN_AcDate=X,7,S
+T(1,#NTXBUF,25,7)
+
+C(3,#CHAIN,1,T(2,@AcBookCode,#CHAIN_AcBookCode),)
+C(3,#CHAIN,1,T(2,@AcSubBookCode,#CHAIN_AcSubBookCode),)
+C(3,#CHAIN,1,T(2,@AcNoCode,#CHAIN_AcNoCode),)
+C(3,#CHAIN,1,T(2,@AcSubCode,#CHAIN_AcSubCode),)
+C(3,#CHAIN,1,T(2,@AcDtlCode,#CHAIN_AcDtlCode),)
+C(3,#CHAIN,1,T(2,@AcDateSt,#CHAIN_AcDate),)
+C(3,#CHAIN,1,T(2,@AcDateEd,#CHAIN_AcDate),)
+
+#FdAcBookCode=X,2,L
+#FdAcSubBookCode=X,2,L
+
+#FdBranchNo=X,2,L
+#FdCurrencyCode=X,2,L
+#FdAcNoCode=X,2,L
+C(3,#CHAIN,1,T(3, ),T(3,*))
+#FdAcDate=X,2,L
+C(3,#CHAIN,1,T(3, ),T(3,*))
+
+! 顯示框線
+#WKTF=X,1,S
+IF (#CHAIN==1 ,T(F,@AcSubBookCode,0)T(F,@AcNoCode,0)T(F,@AcSubCode,0)T(F,@AcDtlCode,0)T(F,@AcDateSt,0)T(F,@AcDateEd,0),
+               T(F,@AcSubBookCode,1)T(F,@AcNoCode,1)T(F,@AcSubCode,1)T(F,@AcDtlCode,1)T(F,@AcDateSt,1)T(F,@AcDateEd,1))
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#ApHelp=x,1024,S
+T(3,CdCode.AcBookCode)
+#AcBookCodeHelp=x,1024,S
+
+#SubBookHelp=x,1024,S
+T(3,CdCode.AcSubBookCode)
+#AcSubBookCodeHelp=x,1024,S
+
+S(XXR99,01,#ApHelp,#SubBookHelp)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AcBookCodeHelp,#HelpDesc1)
+T(2,@AcSubBookCodeHelp,#HelpDesc2)
+
+!帳冊別
+#AcBookCode=X,3,L
+T(3,000)
+
+
+#AcBookItem=X,20,L
+T(3,全公司)
+
+!區隔帳冊
+#AcSubBookCode=X,3,I
+C(3,#CHAIN,1,s,$)
+HELP(#AcSubBookCodeHelp)
+@T(3,@AcSubBookItem,)
+C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
+
+#AcSubBookItem=X,20,L
+C(4,#AcSubBookCode,S,T(H,#AcSubBookCode,#AcSubBookCodeHelp))
+
+!單位別 自動顯示不必輸入
+#BranchNo=A,4,L
+T(2,#ACBRNO)
+
+!幣別 自動顯示不必輸入
+#CurrencyCode=X,3,L
+T(3,TWD)
+
+
+#BUF1A=X,18,S
+
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6061; ntxbuf=#BUF1A;ntxbuf5=type<-1:
+AcNoCode<-OOAcNoCode:
+AcSubCode<-OOAcSubCode:
+AcDtlCode<-OOAcDtlCode})
+
+
+!科子細目 AUTO COMPLETE，必須輸入
+#AcNoCode=X,11,I
+C(3,#CHAIN,1,s,$)
+@T(3,@AcNoItem,)
+V(7)
+#AcSubCode=X,5,I
+C(3,#CHAIN,1,s,$)
+#AcDtlCode=X,2,I
+C(3,#CHAIN,1,s,$)
+
+#SendL6R23=X,1,S
+C(4,#AcNoCode,S,$)
+E(0,@RimFuncCode,5)
+T(2,@RimAcNoCode,#AcNoCode)
+T(2,@RimAcSubCode,#AcSubCode)
+T(2,@RimAcDtlCode,#AcDtlCode)
+RESET_RIM(#SendL6R23,L6R23)
+S(L6R23,1,#RimFuncCode,#RimTxCode,#RimAcNoCode,#RimAcSubCode,#RimAcDtlCode)
+R(1,L6R23)
+
+#AcNoItem=X,80,L
+T(2,#L6R23AcNoItem)
+
+!會計日期 必須輸入
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
+
+#DT_MONTH=A,5,S
+T(1,#DATE,2,5)
+
+#DT_01=A,2,S
+E(0,1)
+
+#AcDateSt=D,7,I
+C(3,#CHAIN,1,s,$)
+T(2,#DT_MONTH+#DT_01)
+@V(7)A(4,0,#AcDateSt)
+IF(#AcDateSt > #DT ,V(P,不可大於會計日),$)
+
+#AcDateEd=D,7,I
+C(3,#CHAIN,1,XMT(),$)
+T(2,#DT)
+@V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,#DT)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R23.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6903 ----------
+<sub type="FORM" name="L6903">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6903,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6903] 會計帳務明細)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+! 借方合計
+#OODbAmt=m,14.2,S
+#OODbAmtX=m,14,L
+E(0,#OODbAmt)
+!#OODbAmtX=X,17,S
+!IF(#OODbAmt1==0,S,$)
+!X(#OODbAmt1)P(R,#OODbAmtX, )
+
+! 貸方合計
+#OOCrAmt=m,14.2,S
+#OOCrAmtX=m,14,L
+E(0,#OOCrAmt)
+!#OOCrAmtX=X,17,S
+!IF(#OOCrAmt1==0,S,$)
+!X(#OOCrAmt1)P(R,#OOCrAmtX, )
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+! 會計日期
+#OOAcDate=D,7,S
+
+!登放日期
+#OORelDy=D,7,S
+
+! 登放序號
+#OORelTxseq=X,18,S
+
+#OORelTxseqX=X,26,S
+T(2,#OORelDy+-+#OORelTxseq)
+! 交易代號
+#OOTitaTxCd=X,5,S
+#OOTranItem=X,80,S
+#OOTitaTxCdX=X,86,S
+T(2,#OOTitaTxCd+ +#OOTranItem)
+
+! 借貸
+#OODbCr=X,1,S
+
+#OODbCrX=X,2,S
+IF(#OODbCr=="D",T(3,借),T(3,貸))
+
+! 交易金額
+#OOTxAmt=+m,14.2,S
+#OOTxAmt1=+m,14,S
+E(0,#OOTxAmt)
+#OOTxAmtX=X,17,S
+IF(#OOTxAmt1==0,S,$)
+X(#OOTxAmt1)
+
+! 餘額
+#OOTdBal=+m,14.2,S
+#OOTdBal1=+m,14,S
+E(0,#OOTdBal)
+#OOTdBalX=X,17,S
+IF(#OOTdBal1==0,S,$)
+X(#OOTdBal1)
+
+! 摘要
+#OOSlipNote=X,160,S
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#AcBookCode
+#AcSubBookCode
+#BranchNo
+#CurrencyCode
+#AcNoCode
+#AcSubCode
+#AcDtlCode
+#AcDateSt
+#AcDateEd
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R23.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L6903
+#OODbAmt
+#OOCrAmt
+#OOAcDate
+
+#OORelDy#OORelTxseq
+#OOTitaTxCd
+#OOTranItem
+#OODbCr
+#OOTxAmt
+#OOTdBal
+#OOSlipNote
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L6903" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];">
+[
+["[L6903]                                 會計帳務明細查詢"],
+["@借方合計",#OODbAmtX],
+["@貸方合計",#OOCrAmtX],
+]
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6903
+#any={detail:true, header:'L6903.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOAcDate=會計日期
+{width:80,align:'center'}
+
+#OORelTxseqX=登放日期、序號
+{width:200,align:'center'}
+
+#OOTitaTxCdX=交易代號
+{width:150,align:'center'}
+
+#OODbCrX=借貸
+{width:40,align:'center'}
+
+#OOTxAmtX=交易金額
+{width:120,align:'right'}
+
+#OOTdBalX=餘額
+{width:120,align:'right'}
+
+#OOSlipNote=摘要
+{width:500,align:'left'}
+^
+
+<include src="PRT.icf::INQ01.sel" map="i=L6903;cpi=15"/>
+%
+@^
+</sub>

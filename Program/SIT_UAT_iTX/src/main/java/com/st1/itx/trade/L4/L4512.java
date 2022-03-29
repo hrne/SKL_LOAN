@@ -11,12 +11,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.EmpDeductDtlId;
-import com.st1.itx.db.domain.EmpDeductSchedule;
-import com.st1.itx.db.domain.EmpDeductScheduleId;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
@@ -101,17 +98,30 @@ public class L4512 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException("E0001", "CustMain");
 		}
-		CdEmp tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);
-		if (tCdEmp == null) {
-			throw new LogicException("E0001", "員工檔");
+		
+		// 15日薪放5  非15日薪放1
+		String AgType1 = "";
+		
+		switch(iProcCode) {
+		case "4":
+		case "5":
+			AgType1 = "5";
+			break;
+		case "1":
+		case "2":
+		case "3":
+		case "6":
+		case "7":
+		case "8":
+		case "9":
+			AgType1 = "1";
+			break;
+		default:
+			break;
+			
 		}
-		EmpDeductSchedule tEmpDeductSchedule = empDeductScheduleService
-				.findById(new EmpDeductScheduleId(iPerfMonth, tCdEmp.getAgType1()), titaVo);
-		if (tEmpDeductSchedule == null) {
-			throw new LogicException("E0001", "員工扣薪日程表");
-		}
-
-		CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(), titaVo);
+		
+		CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", AgType1, titaVo);
 //			4.15日薪 5.非15日薪 CdCode 4 5 15日薪
 		if ("4".equals(tCdCode.getCode().substring(0, 1)) || "5".equals(tCdCode.getCode().substring(0, 1))) {
 			iMediaKind = "4";

@@ -73,7 +73,8 @@ E(0,@BonusDate,#L5R38oBonusDate)
 
 #FunCode=X,1,I
 HELP(#FunCodeHelp)
-@V(H,#FunCodeHelp)
+@T(3,@FunCodeX,)
+V(H,#FunCodeHelp)
 
 #FunCodeX=X,60,L
 T(H,#FunCode,#FunCodeHelp)
@@ -83,7 +84,9 @@ C(3,#FunCode,1,INVOKEJS(SHOW,L5512_5,1),INVOKEJS(SHOW,L5512_5,0))
 #WorkMonth2=A,5,S
 
 #WorkMonth=A,5,I
-@
+@E(0,@DateFm,0)
+E(0,@DateTo,0)
+E(0,@BonusDate,0)
 A(YM13,1,#WorkMonth)
 
 #RimL5R38B=X,1,S

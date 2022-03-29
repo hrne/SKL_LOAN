@@ -1312,7 +1312,8 @@ C(2,#FunCode,s,$,$,$,s,s)
 #Status=A,1,I
 C(2,#FunCode,s,$,$,$,s,s)
 HELP(#StatusHelp)
-@V(H,#StatusHelp)
+@T(3,@StatusX,)
+V(H,#StatusHelp)
 
 #StatusX=X,4,L
 T(H,#Status,#StatusHelp)
@@ -1322,7 +1323,8 @@ T(H,#Status,#StatusHelp)
 #BranchNo=X,4,I
 C(2,#FunCode,s,$,$,$,s,s)
 HELP(#BrHelp)
-@V(H,#BrHelp)
+@T(3,@BranchX,)
+V(H,#BrHelp)
 
 #BranchX=x,30,L
 T(H,#BranchNo,#BrHelp)
@@ -1330,7 +1332,8 @@ T(H,#BranchNo,#BrHelp)
 #LevelFg=A,1,I
 C(2,#FunCode,s,$,$,$,s,s)
 HELP(#LevelHelp)
-@V(H,#LevelHelp)
+@T(3,@LevelFgX,)
+V(H,#LevelHelp)
 
 #LevelFgX=X,4,L
 T(H,#LevelFg,#LevelHelp)

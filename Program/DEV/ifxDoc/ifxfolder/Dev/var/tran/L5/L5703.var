@@ -71,7 +71,8 @@ T(1,@FinCode,#NTXBUF,2,8)
 E(0,#CHAINFUNCD)
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp) 
-@V(H,#FunCdHelp)
+@T(3,@FunCdX,)
+V(H,#FunCdHelp)
 E(0,@FUNCIND,#FunCode)
 
 #SetSysPar1=X,1,S
@@ -168,12 +169,14 @@ IF(#FunCode==4,s,$)
 !匯款銀行
 #RemitBank=X,7,I
 IF(#FunCode==4,s,$)
-@V(7)
+@T(3,@RemitBankX,)
+V(7)
 
 #RimL5r12D=X,1,S
 IF(#RemitBank!="",$,s)
 IF(#FunCode==1,IF(#RemitBank==#FinCode,s,$),$)
 T(2,@RimBankCode,#RemitBank)
+RESET_RIM(#RimL5r12D,L5R12)
 S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
@@ -189,12 +192,14 @@ IF(#FunCode==4,s,$)
 ! 資料傳送單位
 #DataSendSection=X,8,I
 IF(#FunCode==4,s,$)
-@V(7)
+@T(3,@DataSendSectionX,)
+V(7)
 
 #RimL5r12E=X,1,S
 IF(#DataSendSection!="",$,s)
 IF(#FunCode==1,IF(#DataSendSection==#FinCode,s,$),$)
 T(2,@RimBankCode,#DataSendSection)
+RESET_RIM(#RimL5r12E,L5R12)
 S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@DataSendSectionX,#L5r12BankItem)

@@ -131,7 +131,8 @@ T(3,全帳冊)
 #AcSubBookCode=X,3,I
 C(3,#CHAIN,1,s,$)
 HELP(#AcSubBookCodeHelp)
-@C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
+@T(3,@AcSubBookItem,)
+C(4,#AcSubBookCode,s,V(H,#AcSubBookCodeHelp))
 
 #AcSubBookItem=X,20,L
 C(4,#AcSubBookCode,S,T(H,#AcSubBookCode,#AcSubBookCodeHelp))
@@ -166,6 +167,7 @@ C(4,#AcNoCode,S,$)
 @C(4,#AcNoCode,S,$)
 
 #SendL6R23=X,1,S
+T(3,@AcNoItem,)
 C(4,#AcNoCode,S,$)
 E(0,@RimFuncCode,5)
 T(2,@RimAcNoCode,#AcNoCode)
@@ -194,7 +196,8 @@ IF(#AcDate > #DT,V(P,不可大於會計日),$)
 !彙計方式
 #InqType=A,1,I
 HELP(#InqTypeHelp)
-@V(H,#InqTypeHelp)
+@T(3,@InqTypeX,)
+V(H,#InqTypeHelp)
 ! C(3,#InqType,1,E(0,#RPTFG,1))
 
 #InqTypeX=X,12,L

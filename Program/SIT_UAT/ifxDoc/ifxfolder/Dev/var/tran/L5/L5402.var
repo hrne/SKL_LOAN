@@ -21,7 +21,6 @@ E(0,0)
 [#<->#,"#FdBUTTON_FLD+選擇檔案","#BUTTON_FLD"],
 [#<->#,"#FdUploadYear+上傳年度",#UploadYear],
 [#<->#,"#FdFileCheck+格式檢查",#FileCheck],
-! [#<->#,"#FdUploadFg+上傳模式",#UploadFg,#UploadFgX],
 ]
 
 #FdBUTTON_FLD=X,2,L
@@ -91,6 +90,8 @@ T(1,@UploadYear,#SYSDATE,2,3)
 V(2,0)
 T(2,@RimFileName,#FILENA)
 RESET_RIM(#RimL5R34,L5R34)
+T(3,@ReturnMessage,)
+E(0,@SuccessFlag,0)
 S(L5R34,1,#RimFileName)
 R(1,L5R34)
 T(2,@ReturnMessage,#L5R34Message)

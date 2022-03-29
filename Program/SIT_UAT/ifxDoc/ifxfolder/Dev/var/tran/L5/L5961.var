@@ -108,7 +108,8 @@ T(2,@ContactCodeHelp,#HelpDesc5)
 ! 案件種類
 #CaseCode=A,1,I
 HELP(#CaseCodeHelp)
-@V(H,#CaseCodeHelp)
+@T(3,@CaseCodeX,)
+V(H,#CaseCodeHelp)
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
 
@@ -154,7 +155,8 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 #DateFlag=A,1,I
 E(0,9)
 HELP(#DateFlagHelp)
-@V(H,#DateFlagHelp)
+@T(3,@DateFlagX,)
+V(H,#DateFlagHelp)
 #DateFlagX=X,9,L
 T(H,#DateFlag,#DateFlagHelp)
 

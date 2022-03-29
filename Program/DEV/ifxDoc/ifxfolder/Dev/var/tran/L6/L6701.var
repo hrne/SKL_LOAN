@@ -170,7 +170,7 @@ C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
 #BranchCode=X,4,I
 C(3,#CHAIN,1,T(2,#CHAIN_BranchCode),)
 C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
-@
+@T(3,@BankItem,)
 C(4,#BranchCode,T(3,@R4,),T(3,@R4,*))
 C(4,#BranchCode,s,V(5,0,9999))
 

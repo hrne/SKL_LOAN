@@ -25,14 +25,6 @@ import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNo=9,3
- * RimEffectDate=9,7
- */
-
 /**
  * L3R09 查詢下次利率調整日期的放款利率變動檔
  * 

@@ -95,8 +95,9 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-
 
 !借戶戶號
 #CustNo=A,7,I
-@V(2,0)
-
+@
+T(3,#CustName,)
+V(2,0)
 
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L1R01.dec"/>

@@ -126,6 +126,8 @@ T(2,#CustNo+9999999000)
 #BIND1B=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
+
+T(3,#CustNoX,)
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
 T(3,@RimCustId, )
@@ -152,6 +154,7 @@ CALL(#InitValue)
 C(3,#CustNo,0,$,S)
 SHOW(#BTN2)
 @C(4,#CustId,S,$)V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -207,6 +210,7 @@ T(2,#ApplNo+99999990)
 #BIND3B=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
 
+T(3,#ApplNoX,)
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05=X,1,S
 C(3,#ApplNo,0,S,$)

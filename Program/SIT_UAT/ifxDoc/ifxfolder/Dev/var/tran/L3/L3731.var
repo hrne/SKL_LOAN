@@ -99,7 +99,9 @@ T(3,@FdCustNo, )
 
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
-@V(2,0)
+@
+T(3,#CustNoX,)
+V(2,0)
 #CustId=X,10,S
 
 !RIM

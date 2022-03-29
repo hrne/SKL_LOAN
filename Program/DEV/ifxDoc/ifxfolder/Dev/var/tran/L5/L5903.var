@@ -125,7 +125,8 @@ V(5,#ApplDateFrom,#TODAY)
 #UsageCode=A,2,I
 C(3,#CHAIN,0,$,s)
 HELP(#UsageCodeHelp)
-@V(H,#UsageCodeHelp)
+@T(3,@UsageCodeX,)
+V(H,#UsageCodeHelp)
 
 #UsageCodeX=X,4,L
 T(H,#UsageCode,#UsageCodeHelp)
@@ -134,7 +135,8 @@ T(H,#UsageCode,#UsageCodeHelp)
 #ApplCode=A,2,I
 C(3,#CHAIN,0,$,s)
 HELP(#ApplHelp)
-@V(H,#ApplHelp)
+@T(3,@ApplCodeX,)
+V(H,#ApplHelp)
 
 #ApplCodeX=X,4,L
 T(H,#ApplCode,#ApplHelp)

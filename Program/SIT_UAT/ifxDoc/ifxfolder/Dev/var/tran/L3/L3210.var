@@ -52,7 +52,7 @@ K(MODIFYBUTTON,登錄)
 
 !先隱藏欄位 FLAG 0=隱藏 1=顯示
 #HIDE2FG=A,1,O
-IF(#FKEY==0,E(0,0),$)
+IF(#FKEY==0,E(0,0),s)
 INVOKEJS(SHOW,p1,9,16,#HIDE2FG)
 
 #HIDEP2=@,1,S
@@ -88,8 +88,6 @@ C(3,#ChequeFlag,1,INVOKEJS(SHOW,p1,12,12,0),$)
 ["#FdOutsideCode+本埠外埠",#OutsideCode,#OutsideCodeX],
 ["#FdUsageCode+支票用途",#UsageCode,#UsageCodeX],
 ["#FdServiceCenter+服務中心別",#ServiceCenter,#ServiceCenterX],    
-["#FdCreditorId+統一編號",#CreditorId],
-["#FdCreditorBankCode+債權機構",#CreditorBankCode,#CreditorBankItem],
 ! ["#FdOtherAcctCode+對方業務科目",#OtherAcctCode,#OtherAcctCodeX],  
 ["#FdPrevIntDate+繳息迄日",#PrevIntDateX],                         
 ! ["#FdReceiptNo+收據號碼",#ReceiptNo]   
@@ -184,7 +182,7 @@ T(1,@FacmNo,#NTXBUF,8,3)
 T(3,00000019999999000)
 
 #BIND6A=X,1,S
-BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName:FacmNo<-OOFacmNo})
 
 #InitFdA=X,1,S
 T(3,@FdEntryDate,*)
@@ -202,10 +200,17 @@ HIDE(#BTN2,#BTN3)
 @
 HIDE(#BTN6)
 
+#BUF6B=X,30,S
+T(2,#CustNo+#CustNo)
+
+#BIND6B=X,1,S
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6B;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName:FacmNo<-OOFacmNo})
+
 #CustNo2=A,7,S
 C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
+T(3,#CustNoX,)
 
 #SendL2r07A=X,1,S
 C(4,#CustNo,S,$)
@@ -239,6 +244,7 @@ HIDE(#BTN6,#BTN3)
 A(ID_UNINO,0,#CustId)
 HIDE(#BTN2)
 V(7)
+T(3,#CustIdX,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -291,6 +297,7 @@ HIDE(#BTN3)
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
 T(2,@ApplNo,#ApplNo2)
+T(3,#ApplNoX,)
 
 #WKBTN3=X,1,S
 C(4,#ApplNo,HIDE(#BTN3),SHOW(#BTN3))
@@ -395,9 +402,6 @@ E(0,@UsageCode,0)
 T(3,@UsageCodeX, )
 T(3,@ServiceCenter, )
 T(3,@ServiceCenterX, )    
-T(3,@CreditorId, )
-T(3,@CreditorBankCode, )
-T(3,@CreditorBankItem, )
 ! T(3,@OtherAcctCode, )
 ! T(3,@OtherAcctCodeX, )
 T(3,@PrevIntDateX, )
@@ -418,8 +422,6 @@ T(3,@FdMediaFlag, )
 T(3,@FdOutsideCode, )
 T(3,@FdUsageCode, )
 T(3,@FdServiceCenter, )    
-T(3,@FdCreditorId, )
-T(3,@FdCreditorBankCode, )
 INVOKEJS(SHOW,p1,5,5,1)
 !T(F,@FdFacmNo, )
 C(3,#ChequeFlag,1,$,S)
@@ -436,8 +438,6 @@ T(3,@FdMediaFlag,*)
 T(3,@FdOutsideCode,*)
 T(3,@FdUsageCode,*)
 T(3,@FdServiceCenter,*)    
-T(3,@FdCreditorId,*)
-T(3,@FdCreditorBankCode,*)
 INVOKEJS(SHOW,p1,5,5,0)
 T(F,@FdFacmNo,*)
 
@@ -453,7 +453,6 @@ T(F,@TsibFlag,1)
 T(F,@MediaFlag,1)
 T(F,@OutsideCode,1)
 T(F,@UsageCode,1)
-T(F,@CreditorId,1)
 T(F,@ServiceCenter,1)
 T(F,@TempSourceCode,1)
 HIDE(#EntryDate)
@@ -469,16 +468,11 @@ T(F,@BktwFlag,0)
 T(F,@TsibFlag,0)
 T(F,@MediaFlag,0)
 T(F,@OutsideCode,0)
-T(F,@CreditorId,0)
 T(F,@ServiceCenter,0)
 T(F,@TempSourceCode,0)
 HIDE(#AreaCode,#BktwFlag,#TsibFlag,#MediaFlag,#OutsideCode,#BankCode,#UsageCode,#ServiceCenter,#TempSourceCode)
 
 
-!控制必輸星號暫收原因=3時統編及債權機構不是必輸
-#checktmpreasoncode=X,1,S
-C(3,#TempReasonCode,03,T(2,@FdCreditorId,),$)
-C(3,#TempReasonCode,03,T(2,@FdCreditorBankCode,),$)
 
 #RepayCode=A,2,S
 C(3,#TempReasonCode,8,E(0,4),E(0,0))
@@ -610,6 +604,7 @@ C(3,#Precision,0,s,$)
 C(3,#Precision,0,E(0,#TwTempAmt),E(0,#UsTempAmt))
 
 #TempAmtX=X,22,L
+C(3,#ChequeFlag,1,$,s)
 CALL2(#ADJUSTDOT,#Precision,#TimTempAmt,#TempAmtX)
 
 ![交易金額]
@@ -638,7 +633,7 @@ SHOW(#TempSourceCode)
 !V(2,4)
 
 #TempSourceCodeX=X,16,L
-T(3,)T(H,#TempSourceCode,#TempSourceCodeHelp)  
+T(H,#TempSourceCode,#TempSourceCodeHelp)  
 
 ![發票人姓名]
 !暫收原因為期票或即期票現金者必須輸入,其他不必輸入
@@ -731,7 +726,8 @@ HELP(#AreaCodeHelp,cols:2)
 @V(H,#AreaCodeHelp)
 
 #AreaCodeX=X,10,L
-T(3,)T(H,#AreaCode,#AreaCodeHelp)
+C(3,#AreaCode,0,S,$)
+T(H,#AreaCode,#AreaCodeHelp)
 
 !交換區域為01時,本埠外埠為本埠,交換區域為01外的,本埠外埠為外埠
 #checkareacode=X,1,S
@@ -768,10 +764,10 @@ T(2,@RimBankCode,#BankCode)
 RESET_RIM(#SendL2r09A,L2R09)
 S(L2R09,1,#RimTxCode,#RimBankCode)
 R(1,L2R09)
+T(B,@BankItem,#L2r09BankItem+#L2r09BranchItem)
 
 #BankItem=X,40,L
 C(4,#BankCode,S,$)
-T(B,#L2r09BankItem+#L2r09BranchItem)
 
 ![是否為台支]
 #FdBktwFlag=X,2,L
@@ -837,7 +833,8 @@ HELP(#UsageCodeHelp,cols:2)
 @V(H,#UsageCodeHelp)
 
 #UsageCodeX=X,16,L
-T(3,)T(H,#UsageCode,#UsageCodeHelp)
+C(3,#UsageCode,0,S,$)
+T(H,#UsageCode,#UsageCodeHelp)
 
 ![服務中心別]
 !可不輸入
@@ -851,43 +848,15 @@ HELP(#ServiceCenterHelp,cols:2)
 @V(H,#ServiceCenterHelp)
 
 #ServiceCenterX=X,10,L
-T(3,)T(H,#ServiceCenter,#ServiceCenterHelp)
+C(4,#ServiceCenter,S,$)
+T(H,#ServiceCenter,#ServiceCenterHelp)
 
-![統一編號]
-!暫收來源為代收款-債權協商,統一編號及債權機構須輸入,其他不必輸入
-#FdCreditorId=X,2,L
-T(F,@CreditorId,0)
-C(3,#TempSourceCode,7,$,S)
-T(3,*)
-T(F,@CreditorId,1)
+![債權統一編號]
 
-#CreditorId=X,10,I
-C(3,#TempSourceCode,7,$,S)
-@V(7)A(ID_UNINO,0,#CreditorId)
+#CreditorId=X,10,S
 
 ![債權機構]
-!暫收來源為代收款-債權協商,統一編號及債權機構須輸入,其他不必輸入
-#FdCreditorBankCode=X,2,L
-T(F,@CreditorBankCode,0)
-C(3,#TempSourceCode,7,$,S)
-T(3,*)
-T(F,@CreditorBankCode,1)
-
-#CreditorBankCode=X,7,I
-C(3,#TempSourceCode,7,$,S)
-@V(2,0)
-
-#SendL2r09B=X,1,S
-C(4,#CreditorBankCode,S,$)
-T(2,@RimBankCode,CreditorBankCode)
-RESET_RIM(#SendL2r09B,L2R09)
-S(L2R09,1,#RimTxCode,#RimBankCode)
-R(1,L2R09)
-
-#CreditorBankItem=X,40,L
-C(4,#CreditorBankCode,S,$)
-T(2,#L2r09BranchItem)
-
+#CreditorBankCode=X,7,S
 ! ![對方業務科目]
 ! #FdOtherAcctCode=X,2,L
 
@@ -1023,7 +992,7 @@ T(3,[L3210] 暫收款登錄)
 #CustNo#CustNoX#CustIdX#ApplNoX#TempReasonCodeX
 #TwTempAmt#UsTempAmt#TempAmtX#TempSourceCodeX#AreaCodeX
 #ChequeAmtX#BankItem#BktwFlagX#TsibFlagX#MediaFlagX#OutsideCodeX
-#UsageCodeX#ServiceCenterX#CreditorBankItem
+#UsageCodeX#ServiceCenterX
 #PrevIntDateX
 </sub>
 

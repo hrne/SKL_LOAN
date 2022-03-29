@@ -98,7 +98,9 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-
 #CustNo=A,7,I
 C(3,#CHAIN,1,T(2,#NTXBUF),$)
 C(3,#CHAIN,1,s,$)
-@V(2,0)
+@
+T(3,#CustName,)
+V(2,0)
 
 <include src="ROM.icf::L1R09.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>

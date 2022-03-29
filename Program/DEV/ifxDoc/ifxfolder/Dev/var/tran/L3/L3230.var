@@ -199,6 +199,7 @@ HIDE(#BTN1)
 C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
+T(3,#CustNoX,)
 
 #SendL2r07A=X,1,S
 C(4,#CustNo,S,$)
@@ -227,8 +228,10 @@ C(4,#CustNo,$,s)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 CALL(#InitValue)
 @
+T(3,#CustIdX,)
 A(ID_UNINO,0,#CustId)
 HIDE(#BTN2)
+
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -239,7 +242,6 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
 A(ID_UNINO,0,#CustId)
-
 
 #SendL2r07B=X,1,S
 C(4,#CustId,S,$)
@@ -282,7 +284,7 @@ HIDE(#BTN3)
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
 T(2,@ApplNo,#ApplNo2)
-
+T(3,#ApplNoX,)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
@@ -315,7 +317,7 @@ C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
-<include src="COM.icf::LockControl.rtn"/>
+! <include src="COM.icf::LockControl.rtn"/>
 
 ![暫收帳戶]
 #FdTempReasonCode=X,2,L

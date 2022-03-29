@@ -212,7 +212,8 @@ D(8)
 !戶號
 #CustNo=A,7,I
 C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
-@V(7)
+@T(3,@CustName,)
+V(7)
 IF(#CustNo==0,V(P,戶號不可為0),s)
 
 !額度號碼
@@ -281,7 +282,8 @@ IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 #RepaySource=A,2,I    
 IF(#FuncCode == 4 || #FuncCode == 5,s,$)
 HELP(#ApHelp)
-@V(H,#ApHelp)
+@T(3,@RepaySourceX,)
+V(H,#ApHelp)
 
 #RepaySourceX=X,20,L
 T(H,#RepaySource,#ApHelp)

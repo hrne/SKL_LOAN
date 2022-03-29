@@ -181,7 +181,20 @@ T(2,@FdEnable,#WKSTAR2)
 C(3,#FuncCode,1,$,T(F,@UnitCode,0))
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 !!!!HELP(#ApHelp1)
-@V(7)
+@T(3,@UnitItem,)
+T(3,@DeptCode,)
+T(3,@DeptItem,)
+T(3,@DistCode,)
+T(3,@DistItem,)
+T(3,@UnitManager,)
+T(3,@DeptManager,)
+T(3,@DistManager,)
+T(3,@UnitManagerNm,)
+T(3,@DeptManagerNm,)
+T(3,@DistManagerNm,)
+T(3,@Enable,)
+T(3,@EnableX,)
+V(7)
 !!!!C(3,#FuncCode,1,$,V(H,#ApHelp1))
 
 #SendL6R13=X,1,S
@@ -257,7 +270,8 @@ C(3,#CHAIN,1,C(2,#FuncCode,$,$,$,$,s,s),$)
 ! 單位主管代號
 #UnitManager=X,6,I
 C(2,#FuncCode,$,$,$,$,s,s)
-@V(7)
+@T(3,@UnitManagerNm,)
+V(7)
 
 ! 單位主管名稱
 #UnitManagerNm=X,40,L
@@ -265,7 +279,7 @@ C(2,#FuncCode,$,$,$,$,s,s)
 #SendL6R17a=X,1,S
 E(0,@RimFuncCode,5)
 T(2,@RimEmployeeNo,#UnitManager)
-RESET_RIM(#SendL6R17,L6R17)
+RESET_RIM(#SendL6R17a,L6R17)
 S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
 R(1,L6R17)
 T(2,@UnitManagerNm,#L6R17Fullname)
@@ -273,14 +287,16 @@ T(2,@UnitManagerNm,#L6R17Fullname)
 ! 區部主管代號
 #DistManager=X,6,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@T(3,@DistManagerNm,)
 
 ! 區部主管名稱
 #DistManagerNm=X,40,L
 C(2,#FuncCode,$,$,$,$,s,s)
 #SendL6R17c=X,1,S
+C(4,#DistManager,s,$)
 E(0,@RimFuncCode,5)
 T(2,@RimEmployeeNo,#DistManager)
-RESET_RIM(#SendL6R17,L6R17)
+RESET_RIM(#SendL6R17c,L6R17)
 S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
 R(1,L6R17)
 T(2,@DistManagerNm,#L6R17Fullname)
@@ -288,7 +304,8 @@ T(2,@DistManagerNm,#L6R17Fullname)
 ! 部室主管代號
 #DeptManager=X,6,I
 C(2,#FuncCode,$,$,$,$,s,s)
-@V(7)
+@T(3,@DeptManagerNm,)
+V(7)
 
 ! 部室主管名稱
 #DeptManagerNm=X,40,L
@@ -296,7 +313,7 @@ C(2,#FuncCode,$,$,$,$,s,s)
 #SendL6R17b=X,1,S
 E(0,@RimFuncCode,5)
 T(2,@RimEmployeeNo,#DeptManager)
-RESET_RIM(#SendL6R17,L6R17)
+RESET_RIM(#SendL6R17b,L6R17)
 S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
 R(1,L6R17)
 T(2,@DeptManagerNm,#L6R17Fullname)
@@ -307,7 +324,8 @@ T(2,@DeptManagerNm,#L6R17Fullname)
 #Enable=X,1,I
 C(3,#FuncCode,1,T(2,Y),$)
 HELP(#EnableHelp)
-@V(H,#EnableHelp)
+@T(3,@EnableX,)
+V(H,#EnableHelp)
 
 #EnableX=X,10,L
 T(H,#Enable,#EnableHelp)

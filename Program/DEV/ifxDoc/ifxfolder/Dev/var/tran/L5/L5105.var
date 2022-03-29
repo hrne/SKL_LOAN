@@ -97,7 +97,8 @@ T(1,@FacmNo,#NTXBUF,15,3)
 #ConditionCode=A,2,L
 C(3,#CHAIN,1,s,$)
 HELP(#ConditionCodeHelp)
-@V(H,#ConditionCodeHelp)
+@T(3,@ConditionCodeX,)
+V(H,#ConditionCodeHelp)
 
 #ConditionCodeX=X,40,L
 T(H,#ConditionCode,#ConditionCodeHelp)
@@ -147,7 +148,7 @@ C(5,#FollowMark,2,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
 !覆審記號  可不輸入
 #ReCheckCode=X,1,I
 HELP(#ReCheckHelp)
-@
+@T(3,@ReCheckCodeX,)
 C(4,#ReCheckCode,$,V(H,#ReCheckHelp))
 C(5,#ReCheckCode,1,T(F,@ReChkYearMonth,1)T(2,@FdReChkYearMonth,*),T(F,@ReChkYearMonth,0)T(2,@FdReChkYearMonth, ))
 
@@ -165,7 +166,8 @@ C(5,#ReCheckCode,1,$,S)
 !追蹤記號  可不輸入
 #FollowMark=X,1,I
 HELP(#FollowMarkHelp)
-@C(4,#FollowMark,$,V(H,#FollowMarkHelp))
+@T(3,@FollowMarkX,)
+C(4,#FollowMark,$,V(H,#FollowMarkHelp))
 C(5,#FollowMark,2,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
 
 #FollowMarkX=X,6,L

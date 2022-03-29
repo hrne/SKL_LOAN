@@ -224,7 +224,8 @@ C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 #Factor=N,2,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 HELP(#FactorHelp)
-@V(H,#FactorHelp)
+@T(3,@FactorX,)
+V(H,#FactorHelp)
 
 #FactorX=X,6,L
 T(H,#Factor,#FactorHelp)
@@ -285,7 +286,8 @@ IF(#FuncCode==2 || #FuncCode==4,s,$)
 C(3,#FuncCode,4,s)
 C(3,#Level,3,$,s)
 HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
+@T(3,@RationalX,)
+V(H,#YesNoHelp)
 
 #RationalX=X,2,L
 T(H,#Rational,#YesNoHelp)
@@ -306,7 +308,8 @@ IF(#ManagerDateCopy>0,INVOKEJS(SHOW,p1,11,11,1),INVOKEJS(SHOW,p1,11,11,0))
 C(3,#ManagerDateCopy,0,E(0,@CheckDate,1),$)
 T(2,Y)
 HELP(#AgreeHelp)
-@V(H,#AgreeHelp)
+@T(3,@ManagerCheckX,)
+V(H,#AgreeHelp)
 
 #ManagerDateCopy=D,7,S
 !第一次放行=1,第二次=0

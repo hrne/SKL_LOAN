@@ -18,15 +18,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimFuncCode=X,1 1:新增 2:修改 3:拷貝 4:刪除 5:查詢
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNoNo=9,7
- * RimBookDate=9,7
- */
 /**
  * L3R03 尋找放款約定還本檔
  * 

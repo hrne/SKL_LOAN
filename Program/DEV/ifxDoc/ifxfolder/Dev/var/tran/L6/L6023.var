@@ -93,6 +93,7 @@ T(2,@LoanOfficeHelp,#L2r59Help1)
 #LandOfficeCode=X,2,I
 HELP(#LoanOfficeHelp)
 C(3,#CHAIN,1,s,$)
+@T(3,@LandOfficeCodeX,)
 @C(4,#LandOfficeCode,S,V(H,#LoanOfficeHelp))
 
 #LandOfficeCodeX=X,8,L

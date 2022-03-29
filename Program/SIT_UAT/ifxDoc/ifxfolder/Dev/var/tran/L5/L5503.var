@@ -26,7 +26,7 @@ E(0,0)
 
 <sub type="DC" name="L5503" layout="cols=3;screen.width=[180,500,180,400];printer.width=[20,30,20,30];order=1">
 [
-["L5503]                           介紹、協辦獎金維護"],
+["[L5503]                           介紹、協辦獎金維護"],
 [#<->#,"#FdFunCode+功能選項",#FunCodeX],
 ["#FdBonusNo+序號",#BonusNo],
 [#<->#,"#FdBonusType+獎金類別",#BonusType,#BonusTypeX],
@@ -187,7 +187,7 @@ C(3,#ManualFg,1,T(3,@ManualFgX,是),T(3,@ManualFgX,否))
 #BonusType=A,1,I
 C(2,#FunCode,s,I,s,s,s,s)
 HELP(#BonusTypeHelp)
-@
+@T(3,@BonusTypeX,)
 V(H,#BonusTypeHelp)
 
 #BonusTypeX=X,20,L

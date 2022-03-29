@@ -95,7 +95,8 @@ T(1,#SYSCDATE,2,5)
 ! 戶號
 #CustNo=A,7,I
 C(3,#FunctionCode,1,$,s)
-@V(2,0)
+@T(3,@CustName,)
+V(2,0)
 
 <include src="ROM.icf::L5R36.dec"/>
 C(3,#FunctionCode,1,$,S)

@@ -65,7 +65,8 @@ T(1,@Yyy,#SYSDATE,2,3)
 ! T(1,@Mm,#SYSDATE,5,2)
 
 #EmpNo=X,6,I
-@V(NL)
+@T(3,@EmpNoX,)
+V(NL)
 
 #Space=X,1,S
 <include src="ROM.icf::L5R06.dec"/>     
@@ -73,7 +74,7 @@ T(1,@Yyy,#SYSDATE,2,3)
 #CdEmpRimEmpNo=X,6,S
 T(2,#EmpNo)
 C(4,#EmpNo,S,$)
-RESET_RIM(#RimL5R06,L5R06)
+RESET_RIM(#CdEmpRimEmpNo,L5R06)
 S(L5R06,1,#CdEmpRimEmpNo)
 R(1,L5R06)
 T(2,@EmpNoX,#L5R06FullName)

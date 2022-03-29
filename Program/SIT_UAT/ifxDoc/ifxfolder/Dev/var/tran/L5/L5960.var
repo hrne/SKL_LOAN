@@ -134,7 +134,8 @@ K(NOBUTTON,CLOSE)
 ! 案件種類
 #CaseCode=A,1,L
 HELP(#CaseCodeHelp)
-@V(H,#CaseCodeHelp)
+@T(3,@CaseCodeX,)
+V(H,#CaseCodeHelp)
 
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)

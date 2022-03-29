@@ -29,16 +29,6 @@ import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimTxCode=X,5
- * RimFKey=9,1
- * RimCustNo=9,7
- * RimFacmNo=9,3
- * RimBormNo=9,3
- * RimEntryDate=9,7
- * RimCaseCloseCode=9,1 結案區分 0:正常 1:展期-一般 2:展期-協議 3:轉催收 4:催收戶本人清償 5:催收戶保證人代償 6:催收戶強制執行 7:轉列呆帳 8:催收部分轉呆
- */
 /**
  * L3R11 結案試算
  * 

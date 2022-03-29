@@ -24,15 +24,6 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * CaseNo=9,7
- * TimCustNo=9,7
- * TimCustId=X,10
- * ApplNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- */
 /**
  * L3002 撥款明細資料查詢
  * 
@@ -159,10 +150,10 @@ public class L3002 extends TradeBuffer {
 				occursList.putParam("OOCustName", tCustMain.getCustName());
 			}
 
-			if (iCustDataCtrl == 1) {
-				occursList.putParam("OOCustNo", "");
-				occursList.putParam("OOCustName", "");
-			}
+			// if (iCustDataCtrl == 1) {
+			// 	occursList.putParam("OOCustNo", "");
+			// 	occursList.putParam("OOCustName", "");
+			// }
 			occursList.putParam("OOFacmNo", tLoanBorMain.getFacmNo());
 			occursList.putParam("OOBormNo", tLoanBorMain.getBormNo());
 			occursList.putParam("OODrawdownDate", tLoanBorMain.getDrawdownDate());

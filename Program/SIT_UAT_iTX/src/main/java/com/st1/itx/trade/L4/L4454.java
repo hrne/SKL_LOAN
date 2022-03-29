@@ -408,12 +408,12 @@ public class L4454 extends TradeBuffer {
 			throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
+		String dataLines = "<" + emailAd + ">";
 		if (repayType == 1 || repayType == 3) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
 				cntEmail++;
-				String dataLines = "";
-				dataLines = "親愛的客戶，繳款通知；新光人壽關心您。";
+				dataLines += "親愛的客戶，繳款通知；新光人壽關心您。";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);
@@ -447,8 +447,7 @@ public class L4454 extends TradeBuffer {
 				this.info("sInsuAmt ... " + sInsuAmt);
 				this.info("sInsuMonth ... " + toFullWidth("" + insuM));
 
-				String dataLines = "";
-				dataLines = "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。";
+				dataLines += "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);

@@ -20,11 +20,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * RimCustNo=9,7
- * RimFacmNo=9,3
- */
 /**
  * L3R01 尋找未齊件管理檔
  * 

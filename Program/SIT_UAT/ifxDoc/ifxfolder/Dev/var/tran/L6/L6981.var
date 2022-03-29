@@ -106,7 +106,8 @@ C(3,#CHAIN,1,s,$)
 #SelectCode=A,1,I
 C(3,#CHAIN,1,s,$)
 HELP(#SelectCodeH)
-@V(H,#SelectCodeH)
+@T(3,@SelectCodeX,)
+V(H,#SelectCodeH)
 
 #SelectCodeX=X,16,L
 T(3, )
@@ -194,6 +195,7 @@ T(2,#OOOvduMonthX+／+#OOOvduDayX)
 
 ! 登放序號
 #OORelNo=X,26,L
+#OORelNoX=X,26,L
 
 ! 項目
 #OOItemCode=X,6,S
@@ -644,7 +646,7 @@ ifxBatch:{
 #OOOvduAmt=轉催收金額
 {width:150,align:'right'}
 
-#OORelNo=登放序號
+#OORelNoX=登放序號
 {width:150,align:'left'}
 
 ! #OOBTN1=

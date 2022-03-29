@@ -99,7 +99,8 @@ C(3,#CHAIN,0,$,s)
 
 #StatusFlag=X,1,I
 HELP(#EffectiveStatusHelp)
-@C(4,#StatusFlag,T(2,@StatusFlagX, ),V(H,#EffectiveStatusHelp)T(H,@StatusFlagX,#StatusFlag,#EffectiveStatusHelp))
+@T(3,#StatusFlagX,)
+C(4,#StatusFlag,T(2,@StatusFlagX, ),V(H,#EffectiveStatusHelp)T(H,@StatusFlagX,#StatusFlag,#EffectiveStatusHelp))
 #StatusFlagX=X,10,L
 
 #EffectiveDateS=D,7,I
