@@ -46,9 +46,30 @@ public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM036 ");
-		lM036Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM036第一類各項統計表", titaVo);
+		// 帳務日(西元)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底日(西元)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+		// 年
+		int iYear = mfbsdy / 10000;
+		// 月
+		int iMonth = (mfbsdy / 100) % 100;
+		// 當年月
+		int thisYM = 0;
+
+		// 判斷帳務日與月底日是否同一天
+		if (tbsdy < mfbsdy) {
+			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+		}
+
+		thisYM = iYear * 100 + iMonth;
+
+
+		lM036Report.exec(titaVo, thisYM);
+
+//		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM036第一類各項統計表", titaVo);
 	}
 
 }

@@ -98,7 +98,7 @@ T(1,#NTXBUF,1,6)
 #CHAIN_AgCurInd=X,1,S
 T(1,#NTXBUF,7,1)
 C(3,#CHAIN,1,T(2,@EmployeeNo,#CHAIN_EmployeeNo),)
-C(3,#CHAIN,1,T(2,@AgCurInd,#CHAIN_AgCurInd),)
+C(3,#CHAIN,1,T(2,@AgStatusCode,#CHAIN_AgCurInd),)
 
 
 #BUFA=X,1,S

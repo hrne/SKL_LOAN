@@ -190,9 +190,6 @@ public class L4510Batch extends TradeBuffer {
 		List<String> procCodeIs15 = new ArrayList<String>();
 		List<String> procCodeUn15 = new ArrayList<String>();
 
-//		List<String> dateIs15 = new ArrayList<String>();
-//		List<String> dateUn15 = new ArrayList<String>();
-
 //		1.清除原扣款檔
 //		2.從主檔撈資料
 //		3.BatxCom算金額
@@ -233,16 +230,8 @@ public class L4510Batch extends TradeBuffer {
 		if (iOpItem == 1) {
 
 			deleEmpDeductDtl("4", mediaDate, titaVo);
-//			deleEmpDeductMedia("4", mediaDate, titaVo);
 			// 還款試算
 			calculateY15BaTxCom(titaVo);
-//			List<EmpDeductDtl> is15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
-//			Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "4", this.index,
-//					this.limit, titaVo);
-//			is15EmpDeductDtl = sis15EmpDeductDtl == null ? null : sis15EmpDeductDtl.getContent();
-//			this.info("Is15 Dtl Start...");
-//		4.寫入EmpDeductMedia (彙總by戶號) 4:15日
-//			setEmpDeductMedia(is15EmpDeductDtl, 4, titaVo);
 //		D E F
 //		火險費
 			try {
@@ -265,17 +254,8 @@ public class L4510Batch extends TradeBuffer {
 		}
 		if (iOpItem == 2) {
 			deleEmpDeductDtl("5", mediaDate, titaVo);
-//			deleEmpDeductMedia("5", mediaDate, titaVo);
 //			3.產出火險(05)、帳管(04)、明細表
 			calculateN15BaTxCom(titaVo);
-//			List<EmpDeductDtl> un15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
-//
-//			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.mediaDateRng(mediaDate, "5", this.index,
-//					this.limit, titaVo);
-//			un15EmpDeductDtl = sun15EmpDeductDtl == null ? null : sun15EmpDeductDtl.getContent();
-//			this.info("Un15 Dtl Start...");
-//			4.寫入EmpDeductMedia (彙總by戶號) 5:非15日
-//			setEmpDeductMedia(un15EmpDeductDtl, 5, titaVo);
 
 //			A B C
 //			火險費
@@ -586,9 +566,6 @@ public class L4510Batch extends TradeBuffer {
 			if (tCustMain.getEmpNo() != null) {
 				tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);
 			}
-//			this.info("tCdEmp.getAgType1() : " + tCdEmp.getAgType1());
-//
-//			CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tCdEmp.getAgType1(), titaVo);
 
 			int month = 0;
 
@@ -620,6 +597,7 @@ public class L4510Batch extends TradeBuffer {
 
 			this.info("tmp ... " + tmp);
 			this.info("tmp2 ... " + tmp2);
+			this.info("tmp3 ... " + tmp3);
 			this.info("rpAmt30Map ... " + rpAmt30Map.get(tmp2));
 			this.info("mapFlag2 ... " + mapFlag2.containsKey(tmp3));
 
@@ -680,7 +658,20 @@ public class L4510Batch extends TradeBuffer {
 				tEmpDeductDtlId.setRepayCode("1"); // ???
 				tEmpDeductDtl.setMediaKind("4");
 			}
-			tEmpDeductDtlId.setAcctCode(facmAcctCode.get(tmp3));
+			
+			
+			tEmpDeductDtlId.setAcctCode("000"); // 費用類
+			
+			switch(tmp.getAchRepayCode()) {
+			case 1:
+			case 2:
+			case 3:			
+				tEmpDeductDtlId.setAcctCode(facmAcctCode.get(tmp3)); // 非費用類 330
+				break;
+			default:
+				break;
+			}
+			
 			tEmpDeductDtlId.setFacmNo(tmp.getFacmNo());
 			tEmpDeductDtlId.setBormNo(tmp.getBormNo());
 
@@ -801,230 +792,6 @@ public class L4510Batch extends TradeBuffer {
 		return l4510Report3.exec(imediaDate, iProcCode, flag, titaVo);
 	}
 
-//		[flag = 4:15日 ; 5:非15日]
-//	private void setEmpDeductMedia(List<EmpDeductDtl> lEmpDeductDtl, int flag, TitaVo titaVo) throws LogicException {
-//
-//		if (lEmpDeductDtl == null || lEmpDeductDtl.size() == 0) {
-//			return;
-//		}
-//
-//		this.info("setEmpDeductMedia Start... ");
-//
-//		HashMap<tmpCustRpCd, BigDecimal> repayAmt = new HashMap<>();
-//		lEmpDeductDtl = new ArrayList<EmpDeductDtl>(lEmpDeductDtl);
-//		lEmpDeductDtl.sort((c1, c2) -> {
-//			int result = 0;
-////			入帳順序: 入帳日ASC > 戶號ASC > 扣款類別ASC (火險往前，因其他費用包含在期款內)
-//			if (c1.getEntryDate() - c2.getEntryDate() != 0) {
-//				result = c1.getEntryDate() - c2.getEntryDate();
-//			} else if (c1.getCustNo() - c2.getCustNo() != 0) {
-//				result = c1.getCustNo() - c2.getCustNo();
-//			} else if (c1.getAchRepayCode() != c2.getAchRepayCode()) {
-//				if (c1.getAchRepayCode() == 5) {
-//					result = -1;
-//				} else if (c2.getAchRepayCode() == 5) {
-//					result = 1;
-//				} else {
-//					result = c1.getAchRepayCode() - c2.getAchRepayCode();
-//				}
-//			} else {
-//				result = 0;
-//			}
-//			return result;
-//		});
-//
-////		合計金額 火險、期款(其他費用)
-//		for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
-//			this.info("tEmpDeductDtl.getEntryDate() : " + tEmpDeductDtl.getEntryDate());
-//			this.info("tEmpDeductDtl.getCustNo() : " + tEmpDeductDtl.getCustNo());
-//			this.info("tEmpDeductDtl.getAchRepayCode() : " + tEmpDeductDtl.getAchRepayCode());
-//
-//			String rpcd = "";
-//
-//			if (tEmpDeductDtl.getAchRepayCode() == 5) {
-//				rpcd = "92";
-//			} else {
-//				rpcd = "XH";
-//			}
-//
-//			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getMediaDate(), tEmpDeductDtl.getCustNo(), rpcd);
-//			this.info("tmp : " + tmp.toString());
-//
-//			if (repayAmt.containsKey(tmp)) {
-//				repayAmt.put(tmp, repayAmt.get(tmp).add(tEmpDeductDtl.getRepayAmt()));
-//			} else {
-//				repayAmt.put(tmp, tEmpDeductDtl.getRepayAmt());
-//			}
-//			this.info("repayAmt : " + repayAmt.get(tmp));
-//		} // for
-//		List<EmpDeductMedia> deleEmpDeductMedia = new ArrayList<EmpDeductMedia>();
-//
-//		Slice<EmpDeductMedia> delesEmpDeductMedia = null;
-//
-//		delesEmpDeductMedia = empDeductMediaService.mediaDateRng(this.getTxBuffer().getTxCom().getTbsdyf(),
-//				this.getTxBuffer().getTxCom().getTbsdyf(), "" + flag, this.index, this.limit, titaVo);
-//
-//		deleEmpDeductMedia = delesEmpDeductMedia == null ? null : delesEmpDeductMedia.getContent();
-//
-//		if (deleEmpDeductMedia != null && deleEmpDeductMedia.size() != 0) {
-//			if (deleEmpDeductMedia.get(0).getAcDate() > 0) {
-//				throw new LogicException("E0008", "已入帳");
-//			}
-//			try {
-//				empDeductMediaService.deleteAll(deleEmpDeductMedia, titaVo);
-//			} catch (DBException e1) {
-//				throw new LogicException("E0008", e1.getErrorMsg());
-//			}
-//		}
-//
-//		HashMap<tmpCustRpCd, Integer> empCnt = new HashMap<>();
-//		int seq = 0;
-//		for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
-//			EmpDeductMedia tEmpDeductMedia = new EmpDeductMedia();
-//			EmpDeductMediaId tEmpDeductMediaId = new EmpDeductMediaId();
-//
-////			group by CustNo, RepayCode
-//			String rpcd = "";
-//
-//			if (tEmpDeductDtl.getAchRepayCode() == 5) {
-//				rpcd = "92";
-//			} else {
-//				rpcd = "XH";
-//			}
-//
-//			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getMediaDate(), tEmpDeductDtl.getCustNo(), rpcd);
-//
-//			if (empCnt.containsKey(tmp)) {
-//				updateEmpDeductDtl(tEmpDeductDtl.getEmpDeductDtlId(), seq, titaVo);
-//				this.info("tmp 已進入 continue ..." + tmp);
-//				continue;
-//			} else {
-//				empCnt.put(tmp, 1);
-//			}
-//
-//			seq = seq + 1;
-//
-//			tEmpDeductMediaId.setMediaDate(mediaDate);
-//			tEmpDeductMediaId.setMediaKind("" + flag);
-//			tEmpDeductMediaId.setMediaSeq(seq);
-//			tEmpDeductMedia.setEmpDeductMediaId(tEmpDeductMediaId);
-//			tEmpDeductMedia.setCustNo(tEmpDeductDtl.getCustNo());
-//			tEmpDeductMedia.setRepayCode(tEmpDeductDtl.getAchRepayCode());
-//			tEmpDeductMedia.setPerfRepayCode(parse.stringToInteger(tEmpDeductDtl.getRepayCode()));
-//			tEmpDeductMedia.setRepayAmt(repayAmt.get(tmp));
-//			tEmpDeductMedia.setPerfMonth(tEmpDeductDtl.getPerfMonth());
-//			tEmpDeductMedia.setFlowCode(tEmpDeductDtl.getProcCode());
-//			tEmpDeductMedia.setUnitCode(tEmpDeductDtl.getUnitCode());
-//			tEmpDeductMedia.setCustId(tEmpDeductDtl.getCustId());
-//			tEmpDeductMedia.setEntryDate(tEmpDeductDtl.getEntryDate());
-//			tEmpDeductMedia.setTxAmt(BigDecimal.ZERO);
-//			tEmpDeductMedia.setErrorCode("");
-//			if (tEmpDeductDtl.getAchRepayCode() == 5) {
-//				tEmpDeductMedia.setAcctCode("000");
-//			} else {
-//				tEmpDeductMedia.setAcctCode(custAcctCode.get(tEmpDeductDtl.getCustNo()));
-//			}
-//			tEmpDeductMedia.setAcDate(0);
-//			tEmpDeductMedia.setBatchNo("");
-//			tEmpDeductMedia.setDetailSeq(0);
-//
-//			this.info("tEmpDeductMedia.insert = " + tEmpDeductMedia);
-//			try {
-//				empDeductMediaService.insert(tEmpDeductMedia, titaVo);
-//			} catch (DBException e) {
-//				throw new LogicException("E0005", "員工扣薪檔新增失敗 :" + e.getErrorMsg());
-//			}
-//
-//			updateEmpDeductDtl(tEmpDeductDtl.getEmpDeductDtlId(), seq, titaVo);
-//		}
-//	}
-
-//	private void updateEmpDeductDtl(EmpDeductDtlId tEmpDeductDtlId, int seq, TitaVo titaVo) throws LogicException {
-//		this.info("updateEmpDeductDtl.tEmpDeductDtlId = " + tEmpDeductDtlId);
-//		EmpDeductDtl t2EmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtlId, titaVo);
-//		t2EmpDeductDtl.setMediaSeq(seq);
-//		try {
-//			empDeductDtlService.update(t2EmpDeductDtl, titaVo);
-//		} catch (DBException e) {
-//			throw new LogicException("E0005", "員工扣薪檔更新失敗 :" + e.getErrorMsg());
-//		}
-//	}
-
-//	暫時紀錄 媒體日期 戶號-額度-撥款 扣款代碼
-//	private class tmpCustRpCd {
-//
-////		private int entryDate = 0;
-//		private int mediaDate = 0;
-//		private int custNo = 0;
-//		private String repayFlag = "";
-
-//		public tmpCustRpCd(int mediaDate, int custNo, String repayFlag) {
-////			this.setEntryDate(entryDate);
-//			this.setMediaDate(mediaDate);
-//			this.setCustNo(custNo);
-//			this.setRepayFlag(repayFlag);
-//		}
-
-//		private void setEntryDate(int entryDate) {
-//			this.entryDate = entryDate;
-//		}
-
-//		private void setMediaDate(int mediaDate) {
-//			this.mediaDate = mediaDate;
-//		}
-//
-//		private void setCustNo(int custNo) {
-//			this.custNo = custNo;
-//		}
-//
-//		private void setRepayFlag(String repayFlag) {
-//			this.repayFlag = repayFlag;
-//		}
-//
-//		@Override
-//		public int hashCode() {
-//			final int prime = 31;
-//			int result = 1;
-//			result = prime * result + getEnclosingInstance().hashCode();
-//			result = prime * result + custNo;
-//			result = prime * result + mediaDate;
-//			result = prime * result + ((repayFlag == null) ? 0 : repayFlag.hashCode());
-//			return result;
-//		}
-//
-//		@Override
-//		public boolean equals(Object obj) {
-//			if (this == obj)
-//				return true;
-//			if (obj == null)
-//				return false;
-//			if (getClass() != obj.getClass())
-//				return false;
-//			tmpCustRpCd other = (tmpCustRpCd) obj;
-//			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-//				return false;
-//			if (custNo != other.custNo)
-//				return false;
-//			if (mediaDate != other.mediaDate)
-//				return false;
-//			if (repayFlag == null) {
-//				if (other.repayFlag != null)
-//					return false;
-//			} else if (!repayFlag.equals(other.repayFlag))
-//				return false;
-//			return true;
-//		}
-//
-//		private L4510Batch getEnclosingInstance() {
-//			return L4510Batch.this;
-//		}
-//
-//		@Override
-//		public String toString() {
-//			return "tmpCustRpCd [mediaDate=" + mediaDate + ", custNo=" + custNo + ", repayFlag=" + repayFlag + "]";
-//		}
-//	}
-
 	private void deleEmpDeductDtl(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
 		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaDateRng(iMediaDate, MediaKind, this.index,
 				this.limit, titaVo);
@@ -1042,23 +809,6 @@ public class L4510Batch extends TradeBuffer {
 		}
 	}
 
-//	private void deleEmpDeductMedia(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
-//
-//		Slice<EmpDeductMedia> slEmpDeductMedia = empDeductMediaService.mediaDateRng(iMediaDate, iMediaDate, MediaKind,
-//				this.index, this.limit, titaVo);
-//
-//		if (slEmpDeductMedia != null) {
-//			for (EmpDeductMedia tEmpDeductMedia : slEmpDeductMedia.getContent()) {
-//				tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMedia.getEmpDeductMediaId(), titaVo);
-//				try {
-//					empDeductMediaService.delete(tEmpDeductMedia, titaVo);
-//					this.info("deleEmpDeductMedia =" + tEmpDeductMedia);
-//				} catch (DBException e) {
-//					throw new LogicException("E0008", "員工媒體檔刪除失敗 :" + e.getErrorMsg());
-//				}
-//			}
-//		}
-//	}
 
 //	flag 1:15日薪 2:非15日薪
 	private void setBatxValue(List<BaTxVo> listBaTxVo, int flag, int procCode) throws LogicException {
@@ -1072,13 +822,6 @@ public class L4510Batch extends TradeBuffer {
 
 				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag,
 						procCode);
-
-//				20210409修改為抓取全部撥款且費用，by淑薇電話確認
-//				非15日僅製作期款媒體
-//				if ("2".equals(flag) && tBaTxVo.getRepayType() != 1) {
-//					this.info(tBaTxVo.getCustNo() + "-" + tBaTxVo.getFacmNo() + " 非15日僅製作期款媒體...");
-//					continue;
-//				}
 
 				if (!mapFlag.containsKey(tmp)) {
 					mapFlag.put(tmp, 1);

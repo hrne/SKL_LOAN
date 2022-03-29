@@ -174,7 +174,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 2: // 上限金額
 			sql += "   and (postLimit.\"RepayAmt\" >= :postLimitAmt";
-			sql += "        or BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
+			sql += "        and BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
 			break;
 		case 3: // 下限金額-
 			sql += "   and BDD.\"RepayAmt\" <= :lowLimitAmt";

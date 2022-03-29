@@ -34,13 +34,14 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo     titaVo
 	 * @return 查詢結果
 	 */
-	public List<Map<String, String>> queryBadRateCounts(int startMonth, int endMonth, TitaVo titaVo) {
+	public List<Map<String, String>> queryBadRateCounts(int startMonth, int endMonth, int num, TitaVo titaVo) {
 		this.info("LM036ServiceImpl queryBadRateCount ");
 
 		this.info("LM036ServiceImpl startMonth = " + startMonth);
 		this.info("LM036ServiceImpl endMonth = " + endMonth);
 
 		String sql = "";
+		sql += "SELECT R.* FROM ( ";
 		sql += " SELECT \"YearMonth\" ";
 		sql += "      , SUM(\"Counts\") AS \"Counts\" ";
 		sql += "      , \"BadDebtMonth\" AS \"BadDebtMonth\" ";
@@ -95,8 +96,16 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) ";
 		sql += " GROUP BY \"YearMonth\" ";
 		sql += "        , \"BadDebtMonth\" ";
-		sql += " ORDER BY \"YearMonth\" ";
-		sql += "        , \"BadDebtMonth\" ";
+		sql += " ) R";
+		if (num == 0) {
+			sql += " WHERE R.\"BadDebtMonth\" = 0 ";
+		} else {
+			sql += " WHERE R.\"BadDebtMonth\" > 0 ";
+		}
+		sql += "   AND R.\"YearMonth\" >= :startMonth  ";
+		sql += "   AND R.\"YearMonth\" <= :endMonth  ";
+		sql += " ORDER BY R.\"YearMonth\" ASC ";
+		sql += "        , R.\"BadDebtMonth\" ASC ";
 
 		this.info("sql=" + sql);
 
@@ -117,13 +126,14 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo     titaVo
 	 * @return 查詢結果
 	 */
-	public List<Map<String, String>> queryBadRateAmt(int startMonth, int endMonth, TitaVo titaVo) {
+	public List<Map<String, String>> queryBadRateAmt(int startMonth, int endMonth, int num, TitaVo titaVo) {
 		this.info("LM036ServiceImpl queryBadRateAmt ");
 
 		this.info("LM036ServiceImpl startMonth = " + startMonth);
 		this.info("LM036ServiceImpl endMonth = " + endMonth);
 
 		String sql = "";
+		sql += "SELECT R.* FROM ( ";
 		sql += " SELECT \"YearMonth\" "; // -- F0 初貸年月
 		sql += "      , SUM(\"DrawdownAmt\") AS \"DrawdownAmt\" "; // -- F1 初貸金額
 		sql += "      , \"BadDebtMonth\" "; // -- F2 逾90天時年月
@@ -181,8 +191,16 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) ";
 		sql += " GROUP BY \"YearMonth\" ";
 		sql += "        , \"BadDebtMonth\" ";
-		sql += " ORDER BY \"YearMonth\" ";
-		sql += "        , \"BadDebtMonth\" ";
+		sql += " ) R";
+		if (num == 0) {
+			sql += " WHERE R.\"BadDebtMonth\" = 0 ";
+		} else {
+			sql += " WHERE R.\"BadDebtMonth\" > 0 ";
+		}
+		sql += "   AND R.\"YearMonth\" >= :startMonth  ";
+		sql += "   AND R.\"YearMonth\" <= :endMonth  ";
+		sql += " ORDER BY R.\"YearMonth\" ASC ";
+		sql += "        , R.\"BadDebtMonth\" ASC ";
 
 		this.info("sql=" + sql);
 
@@ -210,120 +228,170 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LM036ServiceImpl endMonth = " + endMonth);
 
 		String sql = "";
-		sql += " SELECT \"YearMonth\" "; // F0 資料年月
-		sql += "      , SUM(\"EntNormal\")        AS \"EntNormal\" "; // F1 法人正常
-		sql += "      , SUM(\"EntOvdue1To2\")     AS \"EntOvdue1To2\" "; // F2 法人逾1~2期
-		sql += "      , SUM(\"EntOvdue3To6\")     AS \"EntOvdue3To6\" "; // F3 法人逾3~6期
-		sql += "      , SUM(\"EntColl\")          AS \"EntColl\" "; // F4 法人催收
-		sql += "      , SUM(\"NatNormal\")        AS \"NatNormal\" "; // F5 自然人正常
-		sql += "      , SUM(\"NatOvdue1To2\")     AS \"NatOvdue1To2\" "; // F6 自然人逾1~2期
-		sql += "      , SUM(\"NatOvdue3To6\")     AS \"NatOvdue3To6\" "; // F7 自然人逾3~6期
-		sql += "      , SUM(\"NatColl\")          AS \"NatColl\" "; // F8 自然人催收
-		sql += "      , SUM(\"Normal\")           AS \"Normal\" "; // F9 總額正常
-		sql += "      , SUM(\"Ovdue1To2\")        AS \"Ovdue1To2\" "; // F10 總額逾1~2期
-		sql += "      , SUM(\"Ovdue3To6\")        AS \"Ovdue3To6\" "; // F11 總額逾3~6期
-		sql += "      , SUM(\"Coll\")             AS \"Coll\" "; // F12 總額催收
-		sql += "      , SUM(\"Total\")            AS \"Total\" "; // F13 放款總餘額
+		sql += " SELECT R.\"YearMonth\" "; // --F0 資料年月
+		sql += "      , SUM(R.\"EntNormal\")        AS \"EntNormal\" "; // --F1 法人正常
+		sql += "      , SUM(R.\"EntOvdue1To2\")     AS \"EntOvdue1To2\" "; // --F2 法人逾1~2期
+		sql += "      , SUM(R.\"EntOvdue3To6\")     AS \"EntOvdue3To6\" "; // --F3 法人逾3~6期
+		sql += "      , SUM(R.\"EntColl\")          AS \"EntColl\" "; // --F4 法人催收
+		sql += "      , SUM(R.\"EntBadLaon\")       AS \"EntBadLaon\" "; // --F5 法人轉銷損失(呆帳)
+		sql += "      , SUM(R.\"NatNormal\")        AS \"NatNormal\" "; // --F6 自然人正常
+		sql += "      , SUM(R.\"NatOvdue1To2\")     AS \"NatOvdue1To2\" "; // --F7 自然人逾1~2期
+		sql += "      , SUM(R.\"NatOvdue3To6\")     AS \"NatOvdue3To6\" "; // --F8 自然人逾3~6期
+		sql += "      , SUM(R.\"NatColl\")          AS \"NatColl\" "; // --F9 自然人催收
+		sql += "      , SUM(R.\"NatBadLaon\")       AS \"NatBadLaon\" "; // --F10 自然人轉銷損失(呆帳)
+		sql += "      , SUM(R.\"Normal\")           AS \"Normal\" "; // --F11 總額正常
+		sql += "      , SUM(R.\"Ovdue1To2\")        AS \"Ovdue1To2\" "; // --F12 總額逾1~2期
+		sql += "      , SUM(R.\"Ovdue3To6\")        AS \"Ovdue3To6\" "; // --F13 總額逾3~6期
+		sql += "      , SUM(R.\"Coll\")             AS \"Coll\" "; // --F14 總額催收
+		sql += "      , SUM(R.\"BadLaon\")          AS \"BadLaon\" "; // --F15  轉銷損失(呆帳)
+		sql += "      , SUM(R.\"Fee\")            AS \"Fee\" "; // --F16 折溢價與催收費用
+		sql += "      , SUM(R.\"Total\")            AS \"Total\" "; // --F17 放款總餘額
 		sql += " FROM ( ";
-		sql += "     SELECT \"YearMonth\" ";
-		sql += "          , \"CustNo\" ";
-		sql += "          , \"FacmNo\" ";
-		sql += "          , \"OvduDays\" ";
-		sql += "          , \"OvduTerm\" ";
-		sql += "          , \"EntCode\" ";
-		sql += "          , \"AcctCode\" ";
-		sql += "          , \"PrinBalance\" ";
+		sql += "     SELECT M.\"YearMonth\" ";
+		sql += "          , M.\"CustNo\" ";
+		sql += "          , M.\"FacmNo\" ";
+		sql += "          , M.\"OvduDays\" ";
+		sql += "          , M.\"OvduTerm\" ";
+		sql += "          , M.\"EntCode\" ";
+		sql += "          , M.\"AcctCode\" ";
+		sql += "          , M.\"PrinBalance\" ";
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') = '1' ";
-		sql += "                   AND \"OvduTerm\" = 0 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') = '1' ";
+		sql += "                   AND M.\"OvduTerm\" = 0 ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END             AS \"EntNormal\" "; // --法人正常
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') = '1' ";
-		sql += "                   AND \"OvduTerm\" >= 1 ";
-		sql += "                   AND \"OvduTerm\" <= 2 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') = '1' ";
+		sql += "                   AND M.\"OvduTerm\" >= 1 ";
+		sql += "                   AND M.\"OvduTerm\" <= 2 ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"EntOvdue1To2\" "; // --法人逾1~2期
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') = '1' ";
-		sql += "                   AND \"OvduTerm\" >= 3 ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') = '1' ";
+		sql += "                   AND M.\"OvduTerm\" >= 3 ";
 //		sql += "                   AND \"OvduTerm\" <= 6 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"EntOvdue3To6\" "; // --法人逾3~6期
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') = '1' ";
-		sql += "                   AND \"AcctCode\" = '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') = '1' ";
+		sql += "                   AND M.\"AcctCode\" = '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"EntColl\" "; // --法人轉催收
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') != '1' ";
-		sql += "                   AND \"OvduTerm\" = 0 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') = '1' ";
+		sql += "              THEN NVL(LO.\"BadDebtAmt\",0) ";
+		sql += "            ELSE 0 ";
+		sql += "            END              AS \"EntBadLaon\" "; // --法人轉銷損失
+		sql += "          , CASE ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') != '1' ";
+		sql += "                   AND M.\"OvduTerm\" = 0 ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"NatNormal\" "; // --自然人正常
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') != '1' ";
-		sql += "                   AND \"OvduTerm\" >= 1 ";
-		sql += "                   AND \"OvduTerm\" <= 2 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') != '1' ";
+		sql += "                   AND M.\"OvduTerm\" >= 1 ";
+		sql += "                   AND M.\"OvduTerm\" <= 2 ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"NatOvdue1To2\" "; // --自然人逾1~2期
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') != '1' ";
-		sql += "                   AND \"OvduTerm\" >= 3 ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') != '1' ";
+		sql += "                   AND M.\"OvduTerm\" >= 3 ";
 //		sql += "                   AND \"OvduTerm\" <= 6 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"NatOvdue3To6\" "; // --自然人逾3~6期
 		sql += "          , CASE ";
-		sql += "              WHEN NVL(\"EntCode\", '0') != '1' ";
-		sql += "                   AND \"AcctCode\" = '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') != '1' ";
+		sql += "                   AND M.\"AcctCode\" = '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"NatColl\" "; // --自然人轉催收
 		sql += "          , CASE ";
-		sql += "              WHEN \"OvduTerm\" = 0 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN NVL(M.\"EntCode\", '0') != '1' ";
+		sql += "              THEN NVL(LO.\"BadDebtAmt\",0) ";
+		sql += "            ELSE 0 ";
+		sql += "            END              AS \"NatBadLaon\" "; // --自然人轉銷損失
+		sql += "          , CASE ";
+		sql += "              WHEN M.\"OvduTerm\" = 0 ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"Normal\" "; // --總額正常
 		sql += "          , CASE ";
-		sql += "              WHEN \"OvduTerm\" >= 1 ";
-		sql += "                   AND \"OvduTerm\" <= 2 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN M.\"OvduTerm\" >= 1 ";
+		sql += "                   AND M.\"OvduTerm\" <= 2 ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"Ovdue1To2\" "; // --總額逾1~2期
 		sql += "          , CASE ";
-		sql += "              WHEN \"OvduTerm\" >= 3 ";
+		sql += "              WHEN M.\"OvduTerm\" >= 3 ";
 //		sql += "                   AND \"OvduTerm\" <= 6 ";
-		sql += "                   AND \"AcctCode\" != '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "                   AND M.\"AcctCode\" != '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"Ovdue3To6\" "; // --總額逾3~6期
 		sql += "          , CASE ";
-		sql += "              WHEN \"AcctCode\" = '990' ";
-		sql += "              THEN \"PrinBalance\" ";
+		sql += "              WHEN M.\"AcctCode\" = '990' ";
+		sql += "              THEN M.\"PrinBalance\" ";
 		sql += "            ELSE 0 ";
 		sql += "            END              AS \"Coll\" "; // --總額轉催收
-		sql += "          , \"PrinBalance\"  AS \"Total\" "; // --放款總餘額
-		sql += "     FROM \"MonthlyFacBal\" ";
-		sql += "     WHERE \"PrinBalance\" > 0 ";
-		sql += "       AND \"YearMonth\" >= :startMonth ";
-		sql += "       AND \"YearMonth\" <= :endMonth ";
-		sql += " ) ";
-		sql += " GROUP BY \"YearMonth\" ";
-		sql += " ORDER BY \"YearMonth\" ";
+		sql += "          , NVL(LO.\"BadDebtAmt\",0)  AS \"BadLaon\" "; // --法人轉銷損失
+		sql += "          , NVL(FE.\"TxAmt\",0)  AS \"Fee\" "; // --法人轉銷損失
+		sql += "          , M.\"PrinBalance\"  AS \"Total\" "; // --放款總餘額
+		sql += "     FROM \"MonthlyFacBal\" M";
+		sql += "     LEFT JOIN (";
+		sql += "       SELECT TRUNC(LO.\"BadDebtDate\" / 100) AS \"YearMonth\"";
+		sql += "     		 ,C.\"EntCode\" AS \"EntCode\"";
+		sql += "     		 ,SUM(LO.\"BadDebtAmt\") AS \"BadDebtAmt\"";
+		sql += "       FROM \"LoanOverdue\" LO";
+		sql += "       LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = LO.\"CustNo\"";
+		sql += "       WHERE LO.\"Status\" IN (2,3)";
+		sql += "         AND TRUNC(LO.\"BadDebtDate\" / 100) >= :startMonth ";
+		sql += "         AND TRUNC(LO.\"BadDebtDate\" / 100) <= :endMonth ";
+		sql += "       GROUP BY TRUNC(LO.\"BadDebtDate\" / 100)";
+		sql += "       		   ,C.\"EntCode\"";
+		sql += "     ) LO ON LO.\"YearMonth\" = M.\"YearMonth\" AND LO.\"EntCode\" = M.\"EntCode\"";
+		sql += "     LEFT JOIN (";
+		sql += "       SELECT TRUNC(A.\"AcDate\" / 100) AS \"YearMonth\"";
+		sql += "     		 ,CASE ";
+		sql += "     		    WHEN C.\"EntCode\" = '1' ";
+		sql += "     		    THEN '1' ";
+		sql += "     		   ELSE '0' END AS \"EntCode\"";
+		sql += "     		 ,NVL(SUM(DECODE(A.\"DbCr\" , 'C' , A.\"TxAmt\",-A.\"TxAmt\")),0) AS \"TxAmt\"";
+		sql += "       FROM \"AcDetail\" A";
+		sql += "       LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\"";
+		sql += "							   AND A.\"CustNo\" NOT IN (0)";
+		sql += "       WHERE TRUNC(A.\"AcDate\" / 100) >= :startMonth ";
+		sql += "         AND TRUNC(A.\"AcDate\" / 100) <= :endMonth ";
+		sql += "         AND A.\"AcNoCode\" IN ( '10601301000'"; // -- 催收款項-法務
+		sql += "							    ,'10601302000'"; // -- 催收款項-火險
+		sql += "							    ,'10601302000'"; // -- 擔保放款-溢折價
+		sql += "							    ,'10601302000')"; // -- 催收款項-溢折價
+		sql += "       GROUP BY TRUNC(A.\"AcDate\" / 100)";
+		sql += "     		   ,CASE ";
+		sql += "     		      WHEN C.\"EntCode\" = '1' ";
+		sql += "     		      THEN '1' ";
+		sql += "     		     ELSE '0' END";
+		sql += "     ) FE ON FE.\"YearMonth\" = M.\"YearMonth\" AND FE.\"EntCode\" = M.\"EntCode\"";
+		sql += "     WHERE M.\"PrinBalance\" > 0 ";
+		sql += "       AND M.\"YearMonth\" >= :startMonth ";
+		sql += "       AND M.\"YearMonth\" <= :endMonth ";
+		sql += " ) R ";
+		sql += " GROUP BY R.\"YearMonth\" ";
+		sql += " ORDER BY R.\"YearMonth\" ";
 
 		this.info("sql=" + sql);
 
@@ -455,6 +523,31 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"Type\" > 0 ";
 		sql += " GROUP BY \"YearMonth\" ";
 		sql += "        , \"Type\" ";
+		sql += " UNION ";
+		sql += " SELECT R.\"YearMonth\" ";
+		sql += " 	   ,R.\"Type\" ";
+		sql += " 	   ,SUM(R.\"PrinBalance\") AS \"Total\" ";
+		sql += " FROM ( SELECT \"YearMonth\"";
+		sql += " 			  ,CASE";
+		sql += "			     WHEN \"OvduTerm\" >= 3 THEN 9 ";
+		sql += "			     WHEN \"AcctCode\" = 990 THEN 9 ";
+		sql += "			   ELSE 0 END AS　\"Type\" ";
+		sql += " 			  ,\"PrinBalance\" ";
+		sql += " 		FROM \"MonthlyFacBal\" ";
+		sql += " 		WHERE \"YearMonth\" >= :startMonth ";
+		sql += " 		  AND \"YearMonth\" <= :endMonth )R " ;
+		sql += " WHERE R.\"Type\" = 9 ";
+		sql += " GROUP BY R.\"YearMonth\"";
+		sql += " 		 ,R.\"Type\"";
+		sql += " UNION ";
+		sql += " SELECT A.\"MonthEndYm\" AS \"YearMonth\"";
+		sql += "       ,10 AS \"Type\"";
+		sql += "       ,SUM(NVL(\"TdBal\",0)) AS \"Total\"";
+		sql += " FROM \"AcMain\" A";
+		sql += " WHERE A.\"MonthEndYm\" >= :startMonth ";
+		sql += "   AND A.\"MonthEndYm\" <= :endMonth ";
+		sql += "   AND A.\"AcNoCode\" IN ( '40904010000') "; // -- 收回呆帳及過期障－放款
+		sql += " GROUP BY A.\"MonthEndYm\"";
 		sql += " ) ";
 		sql += " , \"MonthlyData\" AS ( ";
 		sql += " SELECT \"YearMonth\" ";
@@ -506,6 +599,33 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"Type\" > 0 ";
 		sql += " GROUP BY \"YearMonth\" ";
 		sql += "        , \"Type\" ";
+		sql += " UNION ";
+		sql += " SELECT R.\"YearMonth\" ";
+		sql += " 	   ,R.\"Type\" ";
+		sql += " 	   ,SUM(R.\"PrinBalance\") AS \"Total\"";
+		sql += " FROM ( SELECT \"YearMonth\"";
+		sql += " 			  ,CASE";
+		sql += "			     WHEN \"OvduTerm\" >= 3 THEN 9 ";
+		sql += "			     WHEN \"AcctCode\" = 990 THEN 9 ";
+		sql += "			   ELSE 0 END AS　\"Type\" ";
+		sql += " 			  ,\"PrinBalance\" ";
+		sql += " 		FROM \"MonthlyFacBal\" ";
+		sql += " 		WHERE \"YearMonth\" >= :startMonth ";
+		sql += " 		  AND \"YearMonth\" <= :endMonth )R " ;
+		sql += " WHERE R.\"Type\" = 9 ";
+		sql += " GROUP BY R.\"YearMonth\"";
+		sql += " 		 ,R.\"Type\"";
+		sql += " UNION ";
+		sql += " SELECT TRUNC(A.\"AcDate\" / 100) AS \"YearMonth\"";
+		sql += "       ,10 AS \"Type\"";
+		sql += "       ,NVL(SUM(DECODE(A.\"DbCr\" , 'C' , A.\"TxAmt\",-A.\"TxAmt\")),0) AS \"Total\"";
+		sql += " FROM \"AcDetail\" A";
+		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\"";
+		sql += "  						 AND A.\"CustNo\" NOT IN (0)";
+		sql += " WHERE TRUNC(A.\"AcDate\" / 100) >= \"Fn_GetLastMonth\"( :startMonth ) ";
+		sql += "   AND TRUNC(A.\"AcDate\" / 100) <= :endMonth ";
+		sql += "   AND A.\"AcNoCode\" IN ( '90501000000')"; // -- 追索債權－放款
+		sql += " GROUP BY TRUNC(A.\"AcDate\" / 100)";
 		sql += " ) ";
 		sql += " SELECT TM.\"YearMonth\" ";
 		sql += "      , TM.\"Type\" ";

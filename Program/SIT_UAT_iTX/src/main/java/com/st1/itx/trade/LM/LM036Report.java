@@ -1,13 +1,13 @@
 package com.st1.itx.trade.LM;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -20,6 +20,7 @@ import com.st1.itx.db.service.MonthlyLM036PortfolioService;
 import com.st1.itx.db.service.springjpa.cm.LM036ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -34,140 +35,137 @@ public class LM036Report extends MakeReport {
 	@Autowired
 	MonthlyLM036PortfolioService sMonthlyLM036PortfolioService;
 
-	private BigDecimal million = getBigDecimal("1000000");
+	@Autowired
+	Parse parse;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo, int thisYM) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM036", "第一類各項統計表", "LM036第一類各項統計表", "LM036_底稿_第一類各項統計表.xlsx", "Portfolio");
+//		int entdy = titaVo.getEntDyI() + 19110000;
 
-		int entdy = titaVo.getEntDyI() + 19110000;
+		int startMonth = thisYM - 100;
+		int endMonth = thisYM;
+		int startMonth12Seasons = getStartMonth12Seasons(endMonth);
 
-		int startMonth = entdy / 100 - 100;
-		int endMonth = entdy / 100;
+		// 只看月份來判斷要產多少筆
+		int iMonth = thisYM % 100;
+		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
+		int useExcel = iMonth % 3 == 1 ? 1 : iMonth % 3 == 2 ? 2 : 3;
+//		this.info("Excel" + useExcel);
 
 		this.info("startMonth = " + startMonth);
 		this.info("endMonth = " + endMonth);
+		this.info("startMonth12Seasons = " + startMonth12Seasons);
 
-		Slice<MonthlyLM036Portfolio> sMonthlyLM036Portfolio = sMonthlyLM036PortfolioService.findDataMonthBetween(startMonth, endMonth, 0, Integer.MAX_VALUE, titaVo);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM036", "第一類各項統計表", "LM036第一類各項統計表",
+				"LM036_底稿_第一類各項統計表" + useExcel + ".xlsx", "Portfolio");
 
-		List<MonthlyLM036Portfolio> lMonthlyLM036Portfolio = new ArrayList<>(sMonthlyLM036Portfolio.getContent());
+		// 表一 Portfolio
+		// 表二 BadRateCount
+		// 表三 BadRateAmt
+		// 表四 Deliquency
+		// 表五 Collection
 
 		// 表一
-		setPortfolio(lMonthlyLM036Portfolio);
-
-		List<Map<String, String>> listBadRateCounts = null;
-
-		// 表二的範圍為三年，完整的12季
-		int startMonth12Seasons = getStartMonth12Seasons(endMonth);
-
-		try {
-			listBadRateCounts = lM036ServiceImpl.queryBadRateCounts(startMonth12Seasons, endMonth, titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("lM036ServiceImpl queryDelinquency error = " + errors.toString());
-		}
+		startPortfolio(startMonth, endMonth, titaVo);
 
 		// 表二
-		setBadRateCount(listBadRateCounts);
-
-		List<Map<String, String>> listBadRateAmt = null;
-
-		try {
-			listBadRateAmt = lM036ServiceImpl.queryBadRateAmt(startMonth12Seasons, endMonth, titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("lM036ServiceImpl queryDelinquency error = " + errors.toString());
-		}
+		startBadRateCount(startMonth12Seasons, endMonth, titaVo);
 
 		// 表三
-		setBadRateAmt(listBadRateAmt);
-
-		List<Map<String, String>> listDelinquency = null;
-
-		try {
-			listDelinquency = lM036ServiceImpl.queryDelinquency(startMonth, endMonth, titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("lM036ServiceImpl queryDelinquency error = " + errors.toString());
-		}
+		startBadRateAmt(startMonth12Seasons, endMonth, titaVo);
 
 		// 表四
-		setDelinquency(listDelinquency);
-
-		List<Map<String, String>> listCollection = null;
-
-		try {
-			listCollection = lM036ServiceImpl.queryCollection(startMonth, endMonth, titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("lM036ServiceImpl queryCollection error = " + errors.toString());
-		}
+		startDeliquency(startMonth, endMonth, titaVo);
 
 		// 表五
-		setCollection(listCollection);
+		startCollection(startMonth, endMonth, titaVo);
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+//		long sno = 
+		makeExcel.close();
+//		makeExcel.toExcel(sno);
 	}
 
-	private BigDecimal formatMillion(BigDecimal portfolioTotal) {
-		return computeDivide(portfolioTotal, million, 0);
+	private void startPortfolio(int startMonth, int endMonth, TitaVo titaVo) {
+		Slice<MonthlyLM036Portfolio> sMonthlyLM036Portfolio = sMonthlyLM036PortfolioService
+				.findDataMonthBetween(startMonth, endMonth, 0, Integer.MAX_VALUE, titaVo);
+
+		List<MonthlyLM036Portfolio> lMonthlyLM036Portfolio = new ArrayList<>(sMonthlyLM036Portfolio.getContent());
+		try {
+			setPortfolio(lMonthlyLM036Portfolio);
+		} catch (LogicException e) {
+			this.error(ExceptionUtils.getStackTrace(e));
+		}
 	}
 
-	private BigDecimal formatMillion(String portfolioTotal) {
-		return formatMillion(getBigDecimal(portfolioTotal));
+	private void startBadRateCount(int startMonth12Seasons, int endMonth, TitaVo titaVo) {
+		List<Map<String, String>> listBadRateCounts = null;
+		List<Map<String, String>> listBadRateCounts2 = null;
+
+		// 表二的範圍為三年，完整的12季
+		listBadRateCounts = lM036ServiceImpl.queryBadRateCounts(startMonth12Seasons, endMonth, 0, titaVo);
+		listBadRateCounts2 = lM036ServiceImpl.queryBadRateCounts(startMonth12Seasons, endMonth, 1, titaVo);
+
+		try {
+			setBadRateCount(listBadRateCounts, listBadRateCounts2);
+		} catch (LogicException e) {
+			this.error(ExceptionUtils.getStackTrace(e));
+		}
+	}
+
+	private void startBadRateAmt(int startMonth12Seasons, int endMonth, TitaVo titaVo) {
+		List<Map<String, String>> listBadRateAmt = null;
+		List<Map<String, String>> listBadRateAmt2 = null;
+		listBadRateAmt = lM036ServiceImpl.queryBadRateAmt(startMonth12Seasons, endMonth, 0, titaVo);
+		listBadRateAmt2 = lM036ServiceImpl.queryBadRateAmt(startMonth12Seasons, endMonth, 1, titaVo);
+
+		try {
+			setBadRateAmt(listBadRateAmt, listBadRateAmt2);
+		} catch (LogicException e) {
+			this.error(ExceptionUtils.getStackTrace(e));
+		}
+
+	}
+
+	private void startDeliquency(int startMonth, int endMonth, TitaVo titaVo) {
+		List<Map<String, String>> listDelinquency = null;
+		listDelinquency = lM036ServiceImpl.queryDelinquency(startMonth, endMonth, titaVo);
+
+		try {
+			setDelinquency(listDelinquency);
+		} catch (LogicException e) {
+			this.error(ExceptionUtils.getStackTrace(e));
+		}
+	}
+
+	private void startCollection(int startMonth, int endMonth, TitaVo titaVo) {
+		List<Map<String, String>> listCollection = null;
+		listCollection = lM036ServiceImpl.queryCollection(startMonth, endMonth, titaVo);
+
+		try {
+			setCollection(listCollection);
+		} catch (LogicException e) {
+			this.error(ExceptionUtils.getStackTrace(e));
+		}
+	}
+
+	private static enum monthNames {
+		Zero, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec;
 	}
 
 	private String formatMonth(int dataMonth) {
 		int year = dataMonth / 100;
 		int month = dataMonth % 100;
 
-		String formatMonth = "";
-		switch (month) {
-		case 1:
-			formatMonth = "Jan";
-			break;
-		case 2:
-			formatMonth = "Feb";
-			break;
-		case 3:
-			formatMonth = "Mar";
-			break;
-		case 4:
-			formatMonth = "Apr";
-			break;
-		case 5:
-			formatMonth = "May";
-			break;
-		case 6:
-			formatMonth = "Jun";
-			break;
-		case 7:
-			formatMonth = "Jul";
-			break;
-		case 8:
-			formatMonth = "Aug";
-			break;
-		case 9:
-			formatMonth = "Sep";
-			break;
-		case 10:
-			formatMonth = "Oct";
-			break;
-		case 11:
-			formatMonth = "Nov";
-			break;
-		case 12:
-			formatMonth = "Dec";
-			break;
-		default:
-			break;
+		if (month < 1 || 12 < month) {
+			this.warn("formatMonth got weird input ! ");
+			this.warn("dataMonth = " + dataMonth);
+			return "";
 		}
-		formatMonth += "-" + year % 100;
+
+		String formatMonth = "";
+
+		formatMonth = monthNames.values()[month].name();
+		formatMonth += "-" + (year % 100);
 		return formatMonth;
 	}
 
@@ -175,22 +173,28 @@ public class LM036Report extends MakeReport {
 
 		// % 100 = 月份
 		// % 3 => 是否被3整除 = 是否為季底月
-		if (endMonth % 100 % 3 != 0) {
-			// 未被整除的情況，找出最近的季底月
-			if (endMonth % 100 >= 1 && endMonth % 100 <= 3) {
-				endMonth = ((endMonth / 100) - 1) * 100 + 12;
-			} else {
-				endMonth = endMonth - (endMonth % 100 % 3);
-			}
-		}
+//		if (endMonth % 100 % 3 != 0) {
+//			// 未被整除的情況，找出最近的季底月
+//			if (endMonth % 100 >= 1 && endMonth % 100 <= 3) {
+//				endMonth = ((endMonth / 100) - 1) * 100 + 12;
+//			} else {
+//				endMonth = endMonth - (endMonth % 100 % 3);
+//			}
+//		}
+
+		// 只看月份來判斷要產多少筆
+		int iMonth = endMonth % 100;
+		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
+		int rowCount = iMonth % 3;
+
 		// 回推12季(36個月)
 		endMonth = endMonth * 100 + 1;
 
-		this.info("endMonth = " + endMonth);
+		this.info("enddate = " + endMonth);
 
 		dDateUtil.init();
 		dDateUtil.setDate_1(endMonth);
-		dDateUtil.setMons(-35); // 完整12季的季初月
+		dDateUtil.setMons(-38 - rowCount); // XXX年一季~XXX+3年一季 + 多的月份
 		int startdate = dDateUtil.getCalenderDay();
 
 		this.info("startdate = " + startdate);
@@ -198,7 +202,7 @@ public class LM036Report extends MakeReport {
 		return startdate / 100;
 	}
 
-	private void setBadRateAmt(List<Map<String, String>> list) throws LogicException {
+	private void setBadRateAmt(List<Map<String, String>> list, List<Map<String, String>> list2) throws LogicException {
 
 		// 指向工作表Bad Rate-房貸(by金額)
 		makeExcel.setSheet("Bad Rate-房貸(by金額)");
@@ -212,74 +216,145 @@ public class LM036Report extends MakeReport {
 		int rowCursor = 4;
 
 		BigDecimal total = BigDecimal.ZERO;
-		BigDecimal totalOfBadDebtAmt = BigDecimal.ZERO;
 
-		Map<Integer, BigDecimal> badDebtAmtTotal = new HashMap<>();
-
+		// 民國年月份列
 		Map<Integer, Integer> rowCursorMap = new HashMap<>();
+		// 民國年月份欄
 		Map<Integer, Integer> columnCursorMap = new HashMap<>();
 
+		// 起始欄位
 		int columnCursor = 4;
 
-		// 列印逾90天時年月標題，並記錄欄位位置
-		for (Map<String, String> m : list) {
-			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
-			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
-			if (badDebtMonth == 0) {
-				// 加三個月
-				// 先拆成年、月
-				int tmpYear = yearMonth / 100;
-				int tmpMonth = yearMonth % 100;
-				// 若跨年,年+1,月+3-12,否則用原年月+3
-				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12)) : (yearMonth + 3);
-				makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
-				columnCursorMap.put(tmpBadDebtMonth, columnCursor);
-				columnCursor++;
-			}
-		}
+		// 計次
+		int num = 0;
 
+		// 輸出初貸年月(包含逾期90天的)和件數，並紀錄位置
 		for (Map<String, String> m : list) {
-			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
+
+			int yearMonth = parse.stringToInteger(m.get("F0")) - 191100; // 初貸年月
+
 			BigDecimal counts = getBigDecimal(m.get("F1")); // 初貸件數
-			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
-			BigDecimal badDebtAmt = getBigDecimal(m.get("F3")); // 逾90天時餘額
 
+			int badDebtMonth = parse.stringToInteger(m.get("F2")) == 0 ? 0
+					: parse.stringToInteger(m.get("F2")) - 191100; // 逾90天時年月
 			if (badDebtMonth == 0) {
-				makeExcel.setValue(rowCursor, 1, yearMonth); // 初貸年月
-				makeExcel.setValue(rowCursor, 2, counts, "#,##0"); // 初貸件數
-				total = total.add(counts);
-				rowCursorMap.put(yearMonth, rowCursor);
-				rowCursor++;
-			} else {
-				if (columnCursorMap != null && columnCursorMap.get(badDebtMonth) != null) {
-					columnCursor = columnCursorMap.get(badDebtMonth);
-					makeExcel.setValue(rowCursor, columnCursor, badDebtAmt, "#,##0"); // 逾90天件數
+				num++;
+				// 因列數(2)比欄數(A)少3個月，跑到第四個月才開始記年月份
+				if (num > 3) {
+
+					// 先拆成年、月
+					int tmpYear = yearMonth / 100;
+					int tmpMonth = yearMonth % 100;
+
+					// 民國年
+					int tmpBadDebtMonth = tmpYear * 100 + tmpMonth;
+
+					makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
+
+					// 紀錄欄位
+					columnCursorMap.put(tmpBadDebtMonth, columnCursor);
+
+					columnCursor++;
 				}
 
-				// 計算 每個初貸年月的 逾90天件數 加總
-				if (badDebtMonth > 0 && badDebtAmt.compareTo(BigDecimal.ZERO) > 0) {
-					if (badDebtAmtTotal.containsKey(yearMonth)) {
-						badDebtAmt = badDebtAmt.add(badDebtAmtTotal.get(yearMonth));
-					}
-					badDebtAmtTotal.put(yearMonth, badDebtAmt);
+				makeExcel.setValue(rowCursor, 1, yearMonth); // 初貸年月
+
+				makeExcel.setValue(rowCursor, 2, counts, "#,##0"); // 初貸件數
+
+				// 紀錄行列數
+				rowCursorMap.put(yearMonth, rowCursor);
+
+				total = total.add(counts);
+
+				rowCursor++;
+			}
+
+		}
+		// 數量合計
+//		makeExcel.setValue(rowCursor, 2, total, "#,##0"); 
+		makeExcel.formulaCalculate(rowCursor, 2);
+
+		// 輸出90天 件數
+		for (Map<String, String> m : list2) {
+			int yearMonth = parse.stringToInteger(m.get("F0")) - 191100; // 初貸年月
+
+//			BigDecimal counts = getBigDecimal(m.get("F1")); // 初貸件數
+
+			int badDebtMonth = parse.stringToInteger(m.get("F2")) == 0 ? 0
+					: parse.stringToInteger(m.get("F2")) - 191100; // 逾90天時年月
+
+			BigDecimal badDebtAmt = getBigDecimal(m.get("F3")); // 金額
+
+			// 計算初貸年月件數
+			if (badDebtMonth > 0) {
+
+				// 數量合計
+				int rowTemp = rowCursorMap.get(yearMonth);
+				int colTemp = columnCursorMap.get(badDebtMonth);
+
+				makeExcel.setValue(rowTemp, colTemp, badDebtAmt, "#,##0");
+
+			}
+
+		}
+
+		// 公式重新整理
+		for (int y = 4; y <= 44; y++) {
+			makeExcel.formulaCalculate(rowCursor, 3);
+		}
+
+		num = 0;
+		// 處理累計逾期比率\往來期數 標題
+		for (Map<String, String> m : list) {
+			int yearMonth = parse.stringToInteger(m.get("F0")) - 191100; // 初貸年月
+			int iYear = yearMonth / 100;
+			int iMonth = yearMonth % 100;
+
+			int badDebtMonth = parse.stringToInteger(m.get("F2")) == 0 ? 0
+					: parse.stringToInteger(m.get("F1")) - 191100; // 逾90天時年月
+			if (badDebtMonth == 0) {
+				String textQ = "";
+				switch (iMonth) {
+				case 3:
+					textQ = "一";
+					break;
+				case 6:
+					textQ = "二";
+					break;
+				case 9:
+					textQ = "三";
+					break;
+				case 12:
+					textQ = "四";
+					break;
+				default:
+					break;
 				}
+
+				if (iMonth == 3 || iMonth == 6 || iMonth == 9 || iMonth == 12) {
+					String text = iYear + "年第" + textQ + "季";
+					info("text=" + text);
+					makeExcel.setValue(47 + num, 2, text, "L");
+					num++;
+				}
+			}
+
+		}
+
+		for (int y = 47; y <= 59; y++) {
+			for (int x = 3; x <= 38; x++) {
+				makeExcel.formulaCalculate(y, x);
+
 			}
 		}
 
-		for (Map.Entry<Integer, BigDecimal> entrySet : badDebtAmtTotal.entrySet()) {
-			int yearMonth = entrySet.getKey();
-			BigDecimal badDebtAmt = entrySet.getValue();
-
-			rowCursor = rowCursorMap.get(yearMonth);
-			makeExcel.setValue(rowCursor, 3, badDebtAmt, "#,##0"); // 逾90天件數加總
-			totalOfBadDebtAmt = totalOfBadDebtAmt.add(badDebtAmt);
-		}
-
-		makeExcel.setValue(42, 2, total, "#,##0");
-		makeExcel.setValue(42, 3, totalOfBadDebtAmt, "#,##0");
 	}
 
-	private void setBadRateCount(List<Map<String, String>> list) throws LogicException {
+	/**
+	 * Bad Rate-房貸(by件數) 資料與表格處理
+	 */
+	private void setBadRateCount(List<Map<String, String>> list, List<Map<String, String>> list2)
+			throws LogicException {
 
 		// 指向工作表Bad Rate-房貸(by件數)
 		makeExcel.setSheet("Bad Rate-房貸(by件數)");
@@ -293,72 +368,140 @@ public class LM036Report extends MakeReport {
 		int rowCursor = 4;
 
 		BigDecimal total = BigDecimal.ZERO;
-		BigDecimal totalOfBadDebtCounts = BigDecimal.ZERO;
 
-		Map<Integer, BigDecimal> badDebtCountsTotal = new HashMap<>();
-
+		// 民國年月份列
 		Map<Integer, Integer> rowCursorMap = new HashMap<>();
+		// 民國年月份欄
 		Map<Integer, Integer> columnCursorMap = new HashMap<>();
 
+		// 起始欄位
 		int columnCursor = 4;
 
-		// 列印逾90天時年月標題，並記錄欄位位置
-		for (Map<String, String> m : list) {
-			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
-			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
-			if (badDebtMonth == 0) {
-				// 加三個月
-				// 先拆成年、月
-				int tmpYear = yearMonth / 100;
-				int tmpMonth = yearMonth % 100;
-				// 若跨年,年+1,月+3-12,否則用原年月+3
-				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12)) : (yearMonth + 3);
-				makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
-				columnCursorMap.put(tmpBadDebtMonth, columnCursor);
-				columnCursor++;
-			}
-		}
+		// 計次
+		int num = 0;
 
+		// 輸出初貸年月(包含逾期90天的)和件數，並紀錄位置
 		for (Map<String, String> m : list) {
-			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
+
+			int yearMonth = parse.stringToInteger(m.get("F0")) - 191100; // 初貸年月
+
 			BigDecimal counts = getBigDecimal(m.get("F1")); // 初貸件數
-			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
+
+			int badDebtMonth = parse.stringToInteger(m.get("F2")) == 0 ? 0
+					: parse.stringToInteger(m.get("F2")) - 191100; // 逾90天時年月
+			if (badDebtMonth == 0) {
+				num++;
+				// 因列數(2)比欄數(A)少3個月，跑到第四個月才開始記年月份
+				if (num > 3) {
+
+					// 先拆成年、月
+					int tmpYear = yearMonth / 100;
+					int tmpMonth = yearMonth % 100;
+
+					// 民國年
+					int tmpBadDebtMonth = tmpYear * 100 + tmpMonth;
+
+					makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
+
+					// 紀錄欄位
+					columnCursorMap.put(tmpBadDebtMonth, columnCursor);
+
+					columnCursor++;
+				}
+
+				makeExcel.setValue(rowCursor, 1, yearMonth); // 初貸年月
+
+				makeExcel.setValue(rowCursor, 2, counts, "#,##0"); // 初貸件數
+
+				// 紀錄行列數
+				rowCursorMap.put(yearMonth, rowCursor);
+
+				total = total.add(counts);
+
+				rowCursor++;
+			}
+
+		}
+		// 數量合計
+//		makeExcel.setValue(rowCursor, 2, total, "#,##0"); 
+		makeExcel.formulaCalculate(rowCursor, 2);
+
+		// 輸出90天 件數
+		for (Map<String, String> m : list2) {
+			int yearMonth = parse.stringToInteger(m.get("F0")) - 191100; // 初貸年月
+
+//			BigDecimal counts = getBigDecimal(m.get("F1")); // 初貸件數
+
+			int badDebtMonth = parse.stringToInteger(m.get("F2")) == 0 ? 0
+					: parse.stringToInteger(m.get("F2")) - 191100; // 逾90天時年月
+
 			BigDecimal badDebtCounts = getBigDecimal(m.get("F3")); // 逾90天件數
 
+			// 計算初貸年月件數
+			if (badDebtMonth > 0) {
+
+				// 數量合計
+				int rowTemp = rowCursorMap.get(yearMonth);
+				int colTemp = columnCursorMap.get(badDebtMonth);
+
+				makeExcel.setValue(rowTemp, colTemp, badDebtCounts, "#,##0");
+
+			}
+
+		}
+
+		// 公式重新整理
+		for (int y = 4; y <= 44; y++) {
+			makeExcel.formulaCalculate(rowCursor, 3);
+		}
+
+		num = 0;
+		// 處理累計逾期比率\往來期數 標題
+		for (Map<String, String> m : list) {
+			int yearMonth = parse.stringToInteger(m.get("F0")) - 191100; // 初貸年月
+			int iYear = yearMonth / 100;
+			int iMonth = yearMonth % 100;
+
+			int badDebtMonth = parse.stringToInteger(m.get("F2")) == 0 ? 0
+					: parse.stringToInteger(m.get("F1")) - 191100; // 逾90天時年月
 			if (badDebtMonth == 0) {
-				makeExcel.setValue(rowCursor, 1, yearMonth); // 初貸年月
-				makeExcel.setValue(rowCursor, 2, counts, "#,##0"); // 初貸件數
-				total = total.add(counts);
-				rowCursorMap.put(yearMonth, rowCursor);
-				rowCursor++;
-			} else {
-				if (columnCursorMap != null && columnCursorMap.get(badDebtMonth) != null) {
-					columnCursor = columnCursorMap.get(badDebtMonth);
-					makeExcel.setValue(rowCursor, columnCursor, badDebtCounts, "#,##0"); // 逾90天件數
+				String textQ = "";
+				switch (iMonth) {
+				case 3:
+					textQ = "一";
+					break;
+				case 6:
+					textQ = "二";
+					break;
+				case 9:
+					textQ = "三";
+					break;
+				case 12:
+					textQ = "四";
+					break;
+				default:
+					break;
 				}
 
-				// 計算 每個初貸年月的 逾90天件數 加總
-				if (badDebtMonth > 0 && badDebtCounts.compareTo(BigDecimal.ZERO) > 0) {
-					if (badDebtCountsTotal.containsKey(yearMonth)) {
-						badDebtCounts = badDebtCounts.add(badDebtCountsTotal.get(yearMonth));
-					}
-					badDebtCountsTotal.put(yearMonth, badDebtCounts);
+				if (iMonth == 3 || iMonth == 6 || iMonth == 9 || iMonth == 12) {
+					String text = iYear + "年第" + textQ + "季";
+					info("text=" + text);
+					makeExcel.setValue(47 + num, 2, text, "L"); // 逾90天時年月
+					num++;
 				}
+			}
+
+		}
+
+		for (int y = 47; y <= 59; y++) {
+			for (int x = 3; x <= 38; x++) {
+				makeExcel.formulaCalculate(y, x);
+
 			}
 		}
 
-		for (Map.Entry<Integer, BigDecimal> entrySet : badDebtCountsTotal.entrySet()) {
-			int yearMonth = entrySet.getKey();
-			BigDecimal badDebtCounts = entrySet.getValue();
-
-			rowCursor = rowCursorMap.get(yearMonth);
-			makeExcel.setValue(rowCursor, 3, badDebtCounts, "#,##0"); // 逾90天件數加總
-			totalOfBadDebtCounts = totalOfBadDebtCounts.add(badDebtCounts);
-		}
-
-		makeExcel.setValue(42, 2, total, "#,##0");
-		makeExcel.setValue(42, 3, totalOfBadDebtCounts, "#,##0");
 	}
+
 
 	private void setCollection(List<Map<String, String>> list) throws LogicException {
 
@@ -377,10 +520,7 @@ public class LM036Report extends MakeReport {
 
 		for (Map<String, String> m : list) {
 
-			int thisColumnMonth = Integer.parseInt(m.get("F0"));
-
-//			this.info("thisColumnMonth = " + thisColumnMonth);
-//			this.info("lastColumnMonth = " + lastColumnMonth);
+			int thisColumnMonth = parse.stringToInteger(m.get("F0"));
 
 			if (lastColumnMonth == 0 || lastColumnMonth != thisColumnMonth) {
 				lastColumnMonth = thisColumnMonth;
@@ -419,6 +559,10 @@ public class LM036Report extends MakeReport {
 				break;
 			case "8": // type 8 = 轉催收 to Loss
 				rowCursor = 16;
+			case "9": // type 9 = 催收款回收率(當月逾期總額/上月逾放總額)
+				rowCursor = 18;
+			case "10": // type 10 = 年度呆帳累計回收率 (年初到收回呆帳及過期帳-放款/上月追索債權-放款
+				rowCursor = 21;
 				break;
 			default:
 				continue;
@@ -426,6 +570,41 @@ public class LM036Report extends MakeReport {
 
 			makeExcel.setValue(rowCursor, columnCursor, rollingRate, "0.00%"); // 滾動率
 		}
+	}
+
+	/**
+	 * 預期 map 為 ServiceImpl 回傳結果<br>
+	 * 從中 get 出所有 F[queryItemNumbers] 的數字進行加總
+	 * 
+	 * @param map              query 結果
+	 * @param queryItemNumbers 指定要用 map 中的哪些 items
+	 * @return 指定的 query 結果項目之加總
+	 */
+	private BigDecimal getTotal(Map<String, String> map, int... queryItemNumbers) {
+		BigDecimal bd = BigDecimal.ZERO;
+
+		for (int i : queryItemNumbers) {
+			bd = bd.add(getBigDecimal(map.get("F" + i)));
+		}
+
+		return bd;
+	}
+
+	/**
+	 * 純粹在這裡用來稍微比較好讀的除法函數
+	 * 
+	 * @param dividend 被除數
+	 * @param divisor  除數
+	 * @param scale    小數點後留幾位
+	 * @return 除出來的結果
+	 */
+	private BigDecimal doDivide(BigDecimal dividend, BigDecimal divisor, int scale) {
+		if (dividend == null || divisor == null || divisor.compareTo(BigDecimal.ZERO) == 0) {
+			this.error("doDivide got weird input: dividend=" + dividend + " divisor=" + divisor);
+			return BigDecimal.ZERO;
+		}
+
+		return dividend.divide(divisor, scale, RoundingMode.HALF_UP);
 	}
 
 	private void setDelinquency(List<Map<String, String>> list) throws LogicException {
@@ -444,33 +623,41 @@ public class LM036Report extends MakeReport {
 		for (Map<String, String> m : list) {
 
 			// 月份
-			makeExcel.setValue(2, columnCursor, formatMonth(Integer.parseInt(m.get("F0"))));
+			makeExcel.setValue(2, columnCursor, formatMonth(parse.stringToInteger(m.get("F0"))));
 
 			// 法人
-			makeExcel.setValue(4, columnCursor, formatMillion(m.get("F1"))); // F1 法人正常
-			makeExcel.setValue(5, columnCursor, formatMillion(m.get("F2"))); // F2 法人逾1~2期
-			makeExcel.setValue(6, columnCursor, formatMillion(m.get("F3"))); // F3 法人逾3~6期
-			makeExcel.setValue(7, columnCursor, formatMillion(m.get("F4"))); // F4 法人催收
-			makeExcel.setValue(8, columnCursor, formatMillion("0"));
-			makeExcel.setValue(9, columnCursor, formatMillion("0"));
+			makeExcel.setValue(4, columnCursor, formatAmt(m.get("F1"), 0, 6)); // F1 法人正常
+			makeExcel.setValue(5, columnCursor, formatAmt(m.get("F2"), 0, 6)); // F2 法人逾1~2期
+			makeExcel.setValue(6, columnCursor, formatAmt(m.get("F3"), 0, 6)); // F3 法人逾3~6期
+			makeExcel.setValue(7, columnCursor, formatAmt(m.get("F4"), 0, 6)); // F4 法人催收
+			makeExcel.setValue(8, columnCursor, formatAmt(m.get("F5"), 0, 6)); // F5 法人轉銷損失金額
+			makeExcel.setValue(9, columnCursor, doDivide(getTotal(m, 3, 4), getTotal(m, 1, 2, 3, 4), 4), "0.00%"); // 法人放款逾放比
+																													// F3+F4
+																													// /
+																													// F1+F2+F3+F4
 
 			// 自然人
-			makeExcel.setValue(11, columnCursor, formatMillion(m.get("F5"))); // F5 自然人正常
-			makeExcel.setValue(12, columnCursor, formatMillion(m.get("F6"))); // F6 自然人逾1~2期
-			makeExcel.setValue(13, columnCursor, formatMillion(m.get("F7"))); // F7 自然人逾3~6期
-			makeExcel.setValue(14, columnCursor, formatMillion(m.get("F8"))); // F8 自然人催收
-			makeExcel.setValue(15, columnCursor, formatMillion("0"));
-			makeExcel.setValue(16, columnCursor, formatMillion("0"));
+			makeExcel.setValue(11, columnCursor, formatAmt(m.get("F6"), 0, 6)); // F6 自然人正常
+			makeExcel.setValue(12, columnCursor, formatAmt(m.get("F7"), 0, 6)); // F7 自然人逾1~2期
+			makeExcel.setValue(13, columnCursor, formatAmt(m.get("F8"), 0, 6)); // F8 自然人逾3~6期
+			makeExcel.setValue(14, columnCursor, formatAmt(m.get("F9"), 0, 6)); // F9 自然人催收
+			makeExcel.setValue(15, columnCursor, formatAmt(m.get("F10"), 0, 6)); // F10 自然人轉銷損失金額
+			makeExcel.setValue(16, columnCursor, doDivide(getTotal(m, 7, 8), getTotal(m, 5, 6, 7, 8), 4), "0.00%"); // 自然人逾放比
+																													// F7+F8
+																													// /
+																													// F5+F6+F7+F8
 
 			// 總額
-			makeExcel.setValue(18, columnCursor, formatMillion(m.get("F9"))); // F9 總額正常
-			makeExcel.setValue(19, columnCursor, formatMillion(m.get("F10"))); // F10 總額逾1~2期
-			makeExcel.setValue(20, columnCursor, formatMillion(m.get("F11"))); // F11 總額逾3~6期
-			makeExcel.setValue(21, columnCursor, formatMillion(m.get("F12"))); // F12 總額催收
-			makeExcel.setValue(22, columnCursor, formatMillion("0"));
-			makeExcel.setValue(23, columnCursor, formatMillion("0"));
-			makeExcel.setValue(24, columnCursor, formatMillion(m.get("F13"))); // F13 放款總餘額
-			makeExcel.setValue(25, columnCursor, formatMillion("0"));
+			makeExcel.setValue(18, columnCursor, formatAmt(m.get("F11"), 0, 6)); // F11 總額正常
+			makeExcel.setValue(19, columnCursor, formatAmt(m.get("F12"), 0, 6)); // F12 總額逾1~2期
+			makeExcel.setValue(20, columnCursor, formatAmt(m.get("F13"), 0, 6)); // F13 總額逾3~6期
+			makeExcel.setValue(21, columnCursor, formatAmt(m.get("F14"), 0, 6)); // F14 總額催收
+			makeExcel.setValue(22, columnCursor, formatAmt(m.get("F15"), 0, 6)); // F15 轉銷損失金額
+			makeExcel.setValue(23, columnCursor, formatAmt(m.get("F16"), 0, 6)); // F16溢折價與催收費用
+			makeExcel.setValue(24, columnCursor, formatAmt(m.get("F17"), 0, 6)); // F17 放款總餘額
+			makeExcel.setValue(25, columnCursor, doDivide(getTotal(m, 11, 12), getTotal(m, 13), 4)); // 放款逾放比
+																										// F11+F12+溢折價 /
+																										// F13
 
 			columnCursor++;
 		}
@@ -493,28 +680,28 @@ public class LM036Report extends MakeReport {
 			// 月底日
 			makeExcel.setValue(2, columnCursor, formatMonth(m.getDataMonth()));
 			// 授信組合餘額
-			makeExcel.setValue(3, columnCursor, formatMillion(m.getPortfolioTotal()));
+			makeExcel.setValue(3, columnCursor, formatAmt(m.getPortfolioTotal(), 0, 6));
 			// 自然人放款
-			makeExcel.setValue(4, columnCursor, formatMillion(m.getNaturalPersonLoanBal()));
+			makeExcel.setValue(4, columnCursor, formatAmt(m.getNaturalPersonLoanBal(), 0, 6));
 			// 法人放款
-			makeExcel.setValue(5, columnCursor, formatMillion(m.getLegalPersonLoanBal()));
+			makeExcel.setValue(5, columnCursor, formatAmt(m.getLegalPersonLoanBal(), 0, 6));
 			// 聯貸案
-			makeExcel.setValue(6, columnCursor, formatMillion(m.getSyndLoanBal()));
+			makeExcel.setValue(6, columnCursor, formatAmt(m.getSyndLoanBal(), 0, 6));
 			// 股票質押
-			makeExcel.setValue(7, columnCursor, formatMillion(m.getStockLoanBal()));
+			makeExcel.setValue(7, columnCursor, formatAmt(m.getStockLoanBal(), 0, 6));
 			// 一般法人放款
-			makeExcel.setValue(8, columnCursor, formatMillion(m.getOtherLoanbal()));
+			makeExcel.setValue(8, columnCursor, formatAmt(m.getOtherLoanbal(), 0, 6));
 			// 溢折價與催收費用
-			makeExcel.setValue(9, columnCursor, formatMillion(m.getAmortizeTotal().add(m.getOvduExpense())));
+			makeExcel.setValue(9, columnCursor, formatAmt(m.getAmortizeTotal().add(m.getOvduExpense()), 0, 6));
 
 			// 大額授信件餘額 - 自然人1000萬以上 - 件數
 			makeExcel.setValue(11, columnCursor, m.getNaturalPersonLargeCounts());
 			// 大額授信件餘額 - 自然人1000萬以上 - 金額
-			makeExcel.setValue(12, columnCursor, formatMillion(m.getNaturalPersonLargeTotal()));
+			makeExcel.setValue(12, columnCursor, formatAmt(m.getNaturalPersonLargeTotal(), 0, 6));
 			// 大額授信件餘額 - 法人3000萬以上 - 件數
 			makeExcel.setValue(13, columnCursor, m.getLegalPersonLargeCounts());
 			// 大額授信件餘額 - 法人人1000萬以上 - 金額
-			makeExcel.setValue(14, columnCursor, formatMillion(m.getLegalPersonLargeTotal()));
+			makeExcel.setValue(14, columnCursor, formatAmt(m.getLegalPersonLargeTotal(), 0, 6));
 
 			// 授信組合占比 - 自然人放款占比
 			makeExcel.setValue(16, columnCursor, m.getNaturalPersonPercent());

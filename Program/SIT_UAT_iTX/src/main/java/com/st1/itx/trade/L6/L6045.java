@@ -14,8 +14,10 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxInquiry;
 import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxInquiryService;
 import com.st1.itx.db.service.TxTranCodeService;
 
@@ -34,6 +36,8 @@ public class L6045 extends TradeBuffer {
 	TxInquiryService sTxInquiryService;
 	@Autowired
 	public TxTranCodeService txTranCodeService;
+	@Autowired
+	public CdEmpService cdEmpService;
 	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -86,7 +90,15 @@ public class L6045 extends TradeBuffer {
 				
 				occursList.putParam("OOReason", tTempVo.get("TxReason"));
 				occursList.putParam("OOTlrNo", tTempVo.get("TLRNO"));	
-				occursList.putParam("OOTlrItem", tTempVo.get("EMPNM"));
+				
+				CdEmp tCdEmp = cdEmpService.findById(tTempVo.get("TLRNO"), titaVo);
+				
+				if(tCdEmp!=null) {
+					occursList.putParam("OOTlrItem", tCdEmp.getFullname());
+				} else {
+					occursList.putParam("OOTlrItem", "");
+				}
+				
 				
 				String date = tTempVo.get("CALDY");
 				date = date.substring(0, 3) + "/" + date.substring(3, 5) + "/" + date.substring(5, 7);

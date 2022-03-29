@@ -74,6 +74,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , \"IntStartDate\"";
 		sql += "         , \"IntEndDate\"";
 		sql += "         , \"AcDate\"";
+		sql += "         , \"TitaTxCd\"";
 		sql += "         , \"TitaTlrNo\"";
 		sql += "         , \"TitaTxtNo\"";
 		sql += "         , SUM(\"TxAmt\")           AS \"TxAmt\"";
@@ -102,6 +103,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , \"IntStartDate\"";
 		sql += "           , \"IntEndDate\"";
 		sql += "           , \"AcDate\"";
+		sql += "           , \"TitaTxCd\"";
 		sql += "           , \"TitaTlrNo\"";
 		sql += "           , \"TitaTxtNo\"";
 		sql += "  )";
@@ -158,10 +160,14 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       + TX2.\"BreachAmt\"";
 		sql += "       + TX2.\"CloseBreachAmt\" AS \"BreachAmt\" ";
 		sql += "     , CASE";
+		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
+		sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\"";
 		sql += "         WHEN TX2.\"TempAmt\" < 0";
 		sql += "         THEN ABS(TX2.\"TempAmt\")";
 		sql += "       ELSE 0 END AS \"TempDr\" ";
 		sql += "     , CASE";
+		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
+		sql += "         THEN TX2.\"TxAmt\"";
 		sql += "         WHEN TX2.\"TempAmt\" > 0";
 		sql += "         THEN TX2.\"TempAmt\"";
 		sql += "       ELSE 0 END AS \"TempCr\" ";
@@ -230,7 +236,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " AND bkd.\"RepayType\" NOT IN (4,5,6,7) ";
 			break;
 		case 2:
-			sql += " AND bkd.\"RepayType\" = 4 or bkd.\"RepayType\" = 7";
+			sql += " AND ( bkd.\"RepayType\" = 4 or bkd.\"RepayType\" = 7 )" ;
 			break;
 		case 3:
 			sql += " AND bkd.\"RepayType\" = 6 ";
