@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+
+<title>Insert title here</title>
+<link rel=stylesheet type=text/css
+      href="../script/jqueryui/css/redmond/jquery-ui-1.10.3.custom.css" />
+ 
+<link rel="stylesheet" type="text/css" href="css/ui.jqgrid.css" />
+
+  <style type="text/css">
+        html, body { font-size: 75%; }
+    </style>
+<script src="../script/jquery.js" type="text/javascript"></script>
+<script src = "../script/jqueryui/js/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="js/grid.locale-tw.js" type="text/javascript"></script>
+   <script type="text/javascript">
+        $.jgrid.no_legacy_api = true;
+        $.jgrid.useJSON = true;
+    </script>
+<script src="js/jquery.jqGrid.min.js" type="text/javascript"></script>
+
+<script>
+	//isLeaf 是否還有向下分支?
+	//level 階層
+	//expanded 展開? 一組
+	//loaded 加載    一組
+	//只能一階層
+$(function(){
+   var topicjson={
+    "response": [
+           {
+               "id": "1",
+               "levid": "1",
+               "Children": "2",
+               "elementName": "Grouping",
+               level:"0", parent:"", isLeaf:false, expanded:true, loaded:true
+           },
+           {
+               "id": "2",
+               "levid": "1_1",
+               "Children": "0",
+               "elementName": "Simple Grouping",
+               level:"1", parent:"1", isLeaf:true, expanded:true, loaded:true
+           },
+           {
+               "id": "3",
+               "levid": "1_2",
+               "Children": "0",
+               "elementName": "May be some other grouping",
+               level:"1", parent:"1", isLeaf:true, expanded:true, loaded:true
+           },
+           {
+               "id": "4",
+               "levid": "2",
+               "Children": "3",
+               "elementName": "CustomFormater",
+               level:"0", parent:"", isLeaf:false, expanded:true, loaded:true
+           },
+           {
+               "id": "5",
+               "levid": "2_1",
+               "Children": "0",
+               "elementName": "Image Formatter",
+               level:"1", parent:"4", isLeaf:true, expanded:true, loaded:true
+           },
+           {
+               "id": "6",
+               "levid": "2_2",
+               "Children": "1",
+               "elementName": "Anchor Formatter",
+               level:"1", parent:"4", isLeaf:false, expanded:true, loaded:true
+           },
+           {
+               "id": "7",
+               "levid": "2_2_1",
+               "Children": "0",
+               "elementName": "Anchor Formatter",
+               level:"2", parent:"6", isLeaf:true, expanded:true, loaded:true
+           }
+       ]
+    },
+    grid;
+	
+		var grid = $('#grid');
+		
+		var getColumnIndexByName = function(grid, columnName) {
+        var cm = grid.jqGrid('getGridParam', 'colModel'), i, l;
+        for (i = 1, l = cm.length; i < l; i += 1) {
+            if (cm[i].name === columnName) {
+                return i; // return the index
+            }
+        }
+        return -1;
+    };
+		function cboxFormatter(cellvalue, options, rowObject)
+{
+  return '<input type="checkbox"' + (cellvalue ? ' checked="checked"' : '') + 'id=checkbox_' + options.rowId + ' class="checkboxin" />';
+}
+
+
+	grid.jqGrid({
+		 datastr: topicjson,
+    datatype: "jsonstring",
+    height: "auto",
+    loadui: "disable",
+    colNames: ["id","levid","Children","Aktiv","Items","level"],
+    colModel: [
+        {name: "id",hidden:true,index:'id'},
+        {name: "levid",hidden:true,index:'levid'},
+        {name: "Children",hidden:true,index:'Children'},
+        {name: 'Aktiv', index: 'Aktiv', width: 100, edittype: 'checkbox', align: 'center',formatter: cboxFormatter, editable: true, formatoptions: {disabled : false}},
+        {name: "elementName", resizable: false},
+        {name: "level"},
+    ],
+    treeGrid: true,
+    treeGridModel: "adjacency",
+    caption: "jqGrid Demos",
+    ExpandColumn: "elementName",
+    multiselect:true,
+    //autowidth: true,
+    rowNum: 10000,
+    //ExpandColClick: true,
+    treeIcons: {leaf:'ui-icon-document-b'},
+    jsonReader: {
+        repeatitems: false,
+        root: "response"
+    },
+    loadComplete: function () {
+//    	alert("aa");
+//    var iCol = getColumnIndexByName ($(this), 'Aktiv'), rows = this.rows, i,
+//        c = rows.length;
+//
+//for (var i = 1; i < c; i += 1) {
+//    $(('input[type="checkbox"]'),rows[i].cells[iCol]).click(function (e) {
+//    	alert("事件");
+//        var id = $(e.target).closest('tr')[0].id,isChecked = $(e.target).is(':checked');
+//        //alert('clicked on the checkbox in the row with id=' + id +'\nNow the checkbox is ' +(isChecked? 'checked': 'not checked'));
+//        var rowData = $('#grid').jqGrid('getRowData', id);
+//        if(rowData.Children != "0"){  //等於 isLeaf false
+//        	if(rowData.expanded =="false"){
+//        		 
+//        		}
+//        		 alert("No");
+//        	for (var j = 1; j <= rowData.Children; j += 1) {
+//        		var setid = parseInt(id,10)+j;
+//        		var rowDatachildren = $('#grid').jqGrid('getRowData', setid);
+//        		//alert(rowDatachildren.Aktiv);
+//        		if(rowDatachildren.Aktiv == "No" && isChecked){ //Yes||NO  如果no才做更改
+//        		// $("#grid").jqGrid('setRowData', setid, {Aktiv: true});
+//        		 alert("No");
+//        	 }else if(rowDatachildren.Aktiv == "Yes" && !isChecked){
+//        	 	alert("Yes");
+//        	 	//$("#grid").jqGrid('setRowData', setid, {Aktiv: false});
+//        	 	//$('#'+setid+"_"+"Aktiv").val(false);
+//        	 	//$("#grid").jqGrid('setCell', setid,"Aktiv",  false);
+//        	 	}
+//        	}
+//        }
+//    });
+//    
+//}
+//
+}
+ });             
+	
+	      jQuery("#a1").click( function(){
+	    		var id = jQuery("#grid").jqGrid('getGridParam','selrow');
+	    		if (id)	{
+	    			alert("id:"+id);
+	    			var ret = jQuery("#grid").jqGrid('getRowData',id);
+	    			alert("id="+ret.id+" invdate="+ret.invdate+"...");
+	    		} else { alert("Please select row");}
+	    	});
+	      jQuery("#a2").click( function() {
+	    		jQuery("#grid").jqGrid('setGridParam',{page:2}).trigger("reloadGrid");
+	    	});
+	      jQuery("#a3").click( function() {
+	    		var s;
+	    		s = jQuery("#grid").jqGrid('getGridParam','selarrrow');
+	    		alert(s);
+	    	});
+	    	jQuery("#a4").click( function() {
+	    		jQuery("#grid").jqGrid('setSelection',"2");
+	    	});
+
+	    	$("#bsdata").click(function(){
+	    		jQuery("#grid").jqGrid('searchGrid',
+	    			{sopt:['cn','bw','eq','ne','lt','gt','ew']}
+	    		);
+	    	});
+	    	
+	    	$("#resetbsdata").click(function(){
+	    		for(var i=0;i<=mydata.length;i++)
+              jQuery("#grid").jqGrid('addRowData',i+1,mydata[i]);
+	    		// var grid = $("#grid"); 
+    		  //  grid.jqGrid('setGridParam',{search:false}); 
+    		  //
+    		  //  // for singe search you should replace the line with 
+    		  //  // $.extend(postData,{searchField:"",searchString:"",searchOper:""}); 
+    		  //
+    		  //  grid.trigger("reloadGrid",[{page:1}]); 
+	    	});
+
+	    	
+	    	
+	            
+	    	  $("#getIds").click(function () {
+	    		  alert('s');
+	                var filteredData = grid.jqGrid('getGridParam', 'lastSelected'), i, n, ids = [],
+	                    idName = grid.jqGrid('getGridParam', 'localReader').id;
+	                alert(filteredData);
+	                if (filteredData) {
+	                    for (i = 0, n = filteredData.length; i < n; i++) {
+	                        ids.push(filteredData[i][idName]);
+	                    }
+	                    alert("tolal number of filtered data: " + n + "\n" +
+	                        "ids of filtered data:\n" + ids.join(', '));
+	                }
+	            });
+	            
+	            
+var handler = function() {
+	$('.checkboxin').unbind('click', handler);//先關閉
+	var id = this.id.toString().slice(9);
+	var isChecked = this.checked;
+	if( isChecked){ 
+			$('#'+id).css("background","rgba(255, 255, 0, 0.55)");
+	}else{
+		 	$('#'+id).css("background","");
+		}
+          var rowData = $('#grid').jqGrid('getRowData', id);
+        if(rowData.Children != "0"){  //等於 isLeaf false
+        	$(".checkboxin").unbind("click");
+        	if(rowData.expanded =="false"){
+        		 
+        		}
+        	for (var j = 1; j <= rowData.Children; j += 1) {
+        		var setid = parseInt(id,10)+j;
+        		var rowDatachildren = $('#grid').jqGrid('getRowData', setid);
+        		if( isChecked){ //Yes||NO  如果no才做更改
+        		$('#'+setid).css("background","rgba(255, 255, 0, 0.55)");
+        		 $("#grid").jqGrid('setRowData', setid, {Aktiv: true});
+        	 }else {
+        	 	$('#'+setid).css("background","");
+        	 	$("#grid").jqGrid('setRowData', setid, {Aktiv: false});
+        	 	}
+        	}
+        }
+   $('.checkboxin').bind('click', handler); //rebind!!
+};
+$('.checkboxin').bind('click', handler);
+
+	            
+	            
+});
+
+
+</script>
+</head>
+<body style='font-size:12px'>
+    <fieldset>
+        <button id="getIds" type="button">Show Ids</button>
+    </fieldset>
+    
+<table id="grid"></table>
+<div id="pager" style='text-align:left' class='scroll'></div>
+<input type="BUTTON" id="bsdata" value="Search" />
+<br/>
+<input type="BUTTON" id="resetbsdata" value="Reset Search" />
+<br/>
+<input type="BUTTON" id="btnExport" value="export" />
+<br/>
+<a href="#" id="a1">Get data from selected row</a>
+<br />
+<a href="javascript:void(0)" id="a2">Set to view second Page</a>
+<br />
+<a href="javascript:void(0)" id="a3">Get Selected id's</a>
+<br />
+<a href="javascript:void(0)" id="a4">Select(Unselect) row 2</a>
+
+
+</body>
+</html>

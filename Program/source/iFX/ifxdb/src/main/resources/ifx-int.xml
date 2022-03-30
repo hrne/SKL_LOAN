@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:int="http://www.springframework.org/schema/integration" xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration/stream
+      	http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+      	http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/task
+    	http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<!-- <context:property-placeholder location="classpath:import.properties" /> -->
+	<int:gateway id="fileImportGateway" service-interface="com.st1.ifx.file.FileImportGateway"
+		default-request-channel="file-import-as-string" />
+
+	<int:channel id="file-import-as-string" />
+
+	<!-- <int-stream:stdout-channel-adapter channel="file-import-as-string" -->
+
+	<!-- test integration only -->
+	<int-file:outbound-channel-adapter directory="import.folder" auto-create-directory="true"
+		channel="file-import-as-string" filename-generator="fileImportfileNameGenerator" />
+
+	<bean id="fileImportfileNameGenerator" class="com.st1.ifx.file.FileImportFileNameGenerator" />
+
+	<int:payload-serializing-transformer input-channel="input" output-channel="byte-array" />
+	<int:payload-deserializing-transformer input-channel="byte-array" output-channel="output" />
+
+	<int:object-to-json-transformer input-channel="input-json" output-channel="json" />
+	<int:json-to-object-transformer input-channel="json" output-channel="output" type="com.st1.ifx.domain.CodeList" />
+
+	<int:channel id="input" />
+	<int:channel id="byte-array">
+		<int:interceptors>
+			<int:wire-tap channel="logger" />
+		</int:interceptors>
+	</int:channel>
+	<int:channel id="output">
+		<int:queue capacity="10" />
+	</int:channel>
+	<int:channel id="input-json" />
+	<int:channel id="json">
+		<int:interceptors>
+			<int:wire-tap channel="logger" />
+		</int:interceptors>
+	</int:channel>
+
+	<!-- <int:channel-interceptor ref="logger" pattern="json, byte-array*, lowPriority*" order="2"/> -->
+	<int:logging-channel-adapter id="logger" log-full-message="true" level="INFO" />
+
+	<!-- end of test -->
+
+
+	<bean id="importFilePattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(t[12]))$)|([^\s]+(\.(?i)(txt))$)" />
+	</bean>
+	<bean id="importExcelPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(xls))$)" />
+	</bean>
+	<bean id="importFdpPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(fdp))$)" />
+	</bean>
+	<bean id="importRepPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(rep))$)" />
+	</bean>
+	<bean id="importRopPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(rop))$)" />
+	</bean>
+	<bean id="importDataPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(data))$)" />
+	</bean>
+	<bean id="importYangmeiPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(ym))$)" />
+	</bean>
+	<bean id="importMailPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(mail))$)" />
+	</bean>
+	<bean id="importXmlPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(xml))$)" />
+	</bean>
+	<bean id="importTutfPattern" class="java.lang.String">
+		<constructor-arg value="([^\s]+(\.(?i)(t1-))$)|([^\s]+(\.(?i)(mail-))$)" />
+	</bean>
+
+	<int-file:inbound-channel-adapter id="xlsAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="xls-input" filename-regex="#{importExcelPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="mover2" request-channel="xls-input" reply-channel="xls-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<!-- 因為轉檔速度可以接受 所以不需要放到task pool -->
+	<!-- <task:executor id="simpleExecutor" pool-size="5" queue-capacity="50" /> -->
+	<int:service-activator input-channel="xls-convert" ref="xlsConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+
+	<int:channel id="xls-convert">
+		<int:interceptors>
+			<int:wire-tap channel="logger" />
+		</int:interceptors>
+	</int:channel>
+
+	<int-file:inbound-channel-adapter id="fdpAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="fdp-input" filename-regex="#{importFdpPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverFdp" request-channel="fdp-input" reply-channel="fdp-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="fdp-convert" ref="fdpConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+
+	<int-file:inbound-channel-adapter id="repAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="rep-input" filename-regex="#{importRepPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverRep" request-channel="rep-input" reply-channel="rep-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="rep-convert" ref="repConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+
+	<int-file:inbound-channel-adapter id="ropAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="rop-input" filename-regex="#{importRopPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverRop" request-channel="rop-input" reply-channel="rop-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="rop-convert" ref="ropConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+
+	<int-file:inbound-channel-adapter id="dataAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="data-input" filename-regex="#{importDataPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverData" request-channel="data-input" reply-channel="data-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="data-convert" ref="dataConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+
+	<int-file:inbound-channel-adapter id="yangmeiAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="yangmei-input" filename-regex="#{importYangmeiPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverYangmei" request-channel="yangmei-input" reply-channel="yangmei-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="yangmei-convert" ref="yangmeiConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+
+
+	<int-file:inbound-channel-adapter id="mailAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="mail-input" filename-regex="#{importMailPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverMail" request-channel="mail-input" reply-channel="mail-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="mail-convert" ref="mailConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+
+	<!-- Xml轉檔 -->
+	<int-file:inbound-channel-adapter id="xmlAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="xml-input" filename-regex="#{importXmlPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverXml" request-channel="xml-input" reply-channel="xml-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="xml-convert" ref="xmlConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+	<!-- end -->
+
+	<!-- Big5轉utf8轉檔 -->
+	<int-file:inbound-channel-adapter id="tutfAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="tutf-input" filename-regex="#{importTutfPattern}">
+		<int:poller fixed-delay="${import.watch.interval}" max-messages-per-poll="${import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int-file:outbound-gateway id="moverTutf" request-channel="tutf-input" reply-channel="tutf-convert"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="tutf-convert" ref="tutfConverter">
+		<!-- <int:poller task-executor="simpleExecutor" fixed-delay="500"> </int:poller> -->
+	</int:service-activator>
+	<!-- end -->
+
+	<int-file:inbound-channel-adapter id="txtAdapter-1" queue-size="10" directory="${import.inbox}"
+		auto-create-directory="true" channel="moveInput" filename-regex="#{importFilePattern}">
+		<int:poller fixed-delay="${import.watch.interval}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+
+	<int-file:outbound-gateway id="mover" request-channel="moveInput" reply-channel="fileImporter"
+		directory="${import.batch.folder}" mode="REPLACE" delete-source-files="true" />
+
+	<int:service-activator input-channel="fileImporter" output-channel="job-requests">
+		<bean class="com.st1.ifx.file.FileImportToJobLaunchRequestHandler" />
+	</int:service-activator>
+	<!-- <int:service-activator input-channel="fileImporter" output-channel="job-requests" ref="fileImportToJobLaunchRequestHandler" /> -->
+
+
+	<int:service-activator input-channel="job-requests" output-channel="job-executions">
+		<bean class="com.st1.ifx.batch.integration.JobLaunchingMessageHandler">
+			<constructor-arg ref="jobRegistry" />
+			<constructor-arg ref="jobLauncher" />
+			<!-- asynchronously <constructor-arg ref="jobLauncherAsync" /> -->
+		</bean>
+	</int:service-activator>
+	<int-stream:stdout-channel-adapter id="job-executions" />
+
+
+</beans>

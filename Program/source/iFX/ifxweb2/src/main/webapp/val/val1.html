@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+                    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript"
+	src="http://jzaefferer.github.com/jquery-validation/jquery.validate.js"></script>
+<style type="text/css">
+* {
+	font-family: Verdana;
+	font-size: 96%;
+}
+
+label {
+	width: 10em;
+	float: left;
+}
+
+label.error {
+	float: none;
+	color: red;
+	padding-left: .5em;
+	vertical-align: top;
+}
+
+p {
+	clear: both;
+}
+
+.submit {
+	margin-left: 12em;
+}
+
+em {
+	font-weight: bold;
+	padding-right: 1em;
+	vertical-align: top;
+}
+</style>
+<script>
+	$(document).ready(function() {
+		$("#FormID").validate({
+			//onkeyup: false,
+			rules : {
+				user_name : {
+					required : true,
+					minlength:3,
+				},
+				mail : {
+					required : true,
+					email : true,
+				},
+				mail2 : {
+					required : true,
+					equalTo : '#mail',
+				},
+				phone : {
+					required : true,
+					isPhone : true,
+				},
+				fax : {
+					required : false,
+					isPhone : true,
+				}
+			},
+			messages : {
+				user_name : {
+					required:'請打一下大名',
+					minlength:'少說三位',
+				},
+				mail : {
+					required : 'email打一下',
+					email : '不要亂打mail',
+				},
+				mail2 : {
+					required : 'email打一下',
+					equalTo : 'mail要一樣',
+				},
+				phone : {
+					required : '電話幾號?',
+					isPhone : '不要亂打電話',
+				},
+				fax : {
+					isPhone : '這不是傳真號碼'
+				}
+			},
+			//這裡可以自訂錯誤顯示出現的地方。
+			errorPlacement : function(error, element) {
+				error.appendTo(element.siblings('label')); //錯誤訊息會顯示在上面所設定的 label 標籤當中。
+			},
+		});
+
+		$.validator.addMethod('nameVal', function(value, element) {
+			if (value == 'john')
+				return true;
+		}, 'name error1');
+		$.validator.addMethod('isPhone', function(value, element) {
+			var tel = /^[+]{0,1}(\d{0,3}-?)?(\d{3,4}-?)?\d{3,4}$/g;
+			return this.optional(element) || (tel.test(value));
+		}, 'phone error');
+
+	});
+</script>
+
+</head>
+<body>
+
+
+	<form id="FormID" method="post">
+		<p>
+			<input id='user_name' name="user_name" type="text" class="required" /> <label
+				for="user_name" generated="true"></label>
+		</p>
+		<p>
+			<input id='mail' name="mail" type="text" /> <label for="mail" generated="true"></label>
+		</p>
+		<p>
+			<input id='mail2' name="mail2" type="text" /> <label for="mail2" generated="true"></label>
+		</p>
+		<p>
+			<input id='phone' name="phone" type="text" /> <label for="phone"
+				generated="true"></label>
+		</p>
+		<p>
+			<input id='fax' name="fax" type="text" /> <label for="fax" generated="true"></label>
+		</p>
+		<p>
+			<input class="submit" type="submit" value="Submit" />
+		</p>
+	</form>
+
+
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+#swiftPanel {
+	//width: 95%
+	margin:10px;
+	margin-top:20px;
+	margin-right:5px;
+	padding:2px;
+	padding-bottom:8px;
+//	background-color: Midnightblue;
+//	color:ivory;
+    border-width: 1px 0px 1px 0px;
+//  background-color:rgba(234, 251, 211, 1);
+//	color:#416aa3;
+	color:white ;
+	background-color: rgba(33, 149, 113, 1);
+	
+	border-radius: 8px;
+	
+	font-family:"Times New Roman",Times,serif;
+	font-size:16px;
+	line-height:18px;	
+	
+}
+.swift-panel-title {
+	padding-left:10px;
+	letter-spacing:2px;
+	line-height:36px;
+	font-weight: bold;
+	
+}
+
+#swiftForm {
+	//width: 95%;
+	overflow:auto;
+	background-color:white;
+	padding:10px;
+	padding-top:15px;
+	padding-bottom:30px;
+	margin:5px;
+	border-radius: 3px;
+}
+
+#swiftMainTable {
+	margin-bottom:15px;
+	width: 100%;
+	border-radius: 5px;
+	
+}
+
+table.loopTable {
+	width: 95%;
+	border-radius: 5px;
+	 box-shadow: 0 0 5px gray;
+}
+table.loopTable caption{
+	text-align: left;
+	color:white;
+	background-color:rgba(55, 185, 62, 1);
+	font-weight:bold;
+	font-style:italic;
+	
+	padding-left:10px;
+}
+
+.loopIndex {
+	//font-size:24px;
+	color:gray;
+	font-weight:bold;
+	font-style:italic;
+	//width:36px;
+	vertical-align:top;
+	text-align:center;
+}
+.oneLoopWrapper {
+	width:95%;
+	border-radius: 6px;
+	box-shadow: 2px 2px 1px #888888;
+	
+background:#888888;
+
+	padding:0px;
+	padding-left:0px;
+	padding-right:0px;
+	margin:2px;
+	margin-left:0px;
+	margin-right:0px;
+	margin-bottom:5px;
+	margin-top:10px;
+}
+table.oneLoopTable {
+	width:100%;
+	background:ivory;
+	margin:0px;
+	padding:0px;]	
+}
+#swiftMainTable .lblLarger{
+	height: 30px;
+}
+#swiftMainTable .lblNormal{
+	
+}
+#swiftMainTable .lblTag {
+	width: 35px;
+	color: rgba(38, 166, 70, 1);
+	display: inline-block;
+	vertical-align: top;
+	padding-left:10px;
+	font-weight:bold;
+	letter-spacing:0.1mm;
+	
+}
+#swiftMainTable .lblStatus {
+	width:20px;
+	inline-block;
+}
+#swiftMainTable .lblStatus-M {
+	color: #990012;
+}
+#swiftMainTable .lblStatus-O {
+	color: rgba(38, 166, 70, 1);
+}
+
+
+
+
+#swiftMainTable .requiredTag {
+	color: #990012;
+}
+
+#swiftMainTable .lblName {
+/*	width: 180px;*/
+	color: #0026ff;
+	display: inline-block;
+	vertical-align: top;
+	padding-left:7px;
+	letter-spacing:1px;
+}
+
+#swiftMainTable .lblContext {
+	display: inline-block;
+	color:orange;
+	margin-left:1px;
+}
+#swiftMainTable .lblSubField {
+	width:22px;
+	display: inline-block;
+}
+
+#swiftMainTable .lblSubName {
+/*	width: 180px;*/
+	color: #1569C7;
+	display: inline-block;
+	vertical-align: center;
+	padding-left:7px;
+	letter-spacing:0mm;
+	font-size:16px;
+	font-style:italic;
+	line-height:18px;
+}
+
+#swiftMainTable .lblOptions {
+	width: 80px;
+	color: purple;
+	display: inline-block;
+	vertical-align: top;
+	padding-left:6px;
+}
+/*移除 solid for XR929輸出表格邊線明顯*/
+#swiftMainTable table,caption,th {
+	border: 1px lightgray;
+	padding-top:5px;
+	
+}
+#swiftMainTable td {
+	border: 1px solid lightgray;
+	padding-top:5px;
+	
+}
+
+#swiftMainTable > caption {
+	text-align: left;
+	color:white;
+	background-color:rgba(55, 185, 62, 1);
+	font-weight:bold;
+	font-style:italic;
+	line-height:36px;
+	padding-left:10px;
+}
+#swiftMainTable td {
+	//padding-left:1px;
+}
+#swiftMainTable .swiftField
+{ 
+	border: 1px 0px 0px 1px	 sunken green;	
+	background-color: #FFFFbf;	
+	
+	padding:2px;
+	padding-left:4px;
+	color:blue;
+	vertical-align:top;
+	
+	border-radius: 3px;
+	
+	margin-left:22px;;
+	margin-bottom:5px;;
+	font-size:16px;
+	font-family: Courier, 'Courier New', monospace;
+ } 
+#swiftMainTable .cantInput
+{ 
+	background-color: #C8C8C8;	
+} 
+
+#swiftMainTable .swiftField:focus
+{ 
+	background-color:pink;
+	 @include box-shadow(0 0 5px rgba(81, 203, 238, 1));
+	  border: 2px solid red;
+ } 
+ 
+ #swiftMainTable .swift_field_buddy {
+ 	background-color:Lavender;
+ 	color:#810541;
+ 	text-indent:10px;
+ 	font-weight:bold;
+ 	letter-spacing:1px;
+ 	margin:0px;
+ 	margin-top:5px;
+ }
+ 
+ #__div_swift_text_panel .swiftText {
+ 	font-size:16px;
+ 	color:darkblue;
+ }
+ #swift_text_panel {
+	height:95%;
+	padding:2px; 	
+	overflow:auto;
+	border:1px ridge;
+ }
+ #swift_text_title {
+ 	font-size:18px;
+ 	color:LightSlateGray ;
+ 	width:100%;
+ 	margin-bottom:10px;
+ 	letter-spacing:5px;
+ 	font-style:italic;
+ 	opacity:0.7;
+ }
+ #swift_text_counts_line{
+ 	font-size:14px;
+ 	color:LightSlateGray ;
+ 	width:100%;
+ 	
+ 	margin-bottom:10px;
+ 	letter-spacing:1px;
+ 	opacity:0.7;
+ }
+ 
+ .swift_text_counts_area{
+ }
+ 
+ #swift_text_counts{
+ 	color:blue;
+ 	font-weight:bold;
+ }
+ .swift_text_rest_area {
+ 	
+  }
+ #swift_text_rest {
+ 	color:orange;
+ 	font-weight:bold;
+ }
+ 
+ #swift_text {
+  	flow:clear;
+ 	width:99%;
+ 	overflow:auto;
+ 	color:LimeGreen ;
+ 	background:black ;
+ 	border:1px dotted lightgray;
+ 	border-radius: 5px;
+ 	
+ }
+ #swift_text pre {
+ 	line-height:20px;
+ }
+
+ #swift_text .pre {
+ 	line-height:20px;
+ 	overflow:scroll;
+ }
+
+ 
+ #swiftPanel .watermark {
+ }
+ 
+ .loopButton{
+ 	margin:4px;
+ 	//margin-left:20px;
+ 	//margin-right:20px;
+ }
+ 
+ 
+ #swiftPanel .code-accordion {
+ 	//width: 400px;
+ 	width: auto;
+ 	max-width: 70%;
+	font-size: 10pt;
+	margin:10px auto;
+	margin-left:22px;
+	
+ }
+ #swiftPanel  .ui-accordion-content {
+	font-size: 10pt;
+	line-height: 14pt;
+	padding: 0; 
+}
+
+#swiftPanel .ui-accordion-content > * {
+	margin: 0;
+	padding: 0px;
+}
+
+div.code-content {
+	margin: 25px ;
+	
+}
+table.code-table{
+	margin: 5px ;
+	margin-left:10px;
+	margin-right:10px;
+	
+}
+
+td.code-cell{
+	margin: 0;
+	padding: 3px;
+	padding-left:6px;
+	padding-right:6px;
+	color:black;
+	background-color:#FFFAFA;
+}
+
+#swiftPanel .code-cell-over {
+	color:MediumBlue;
+	background-color:LightGreen  ;
+	cursor:pointer;
+	font-weight:bold;
+}
+
+ #swiftPanel .code-redmust {
+ 	color: red;
+ }

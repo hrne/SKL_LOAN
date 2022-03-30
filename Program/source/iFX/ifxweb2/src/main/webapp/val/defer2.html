@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=BIG5">
+<title>Insert title here</title>
+<style type="text/css">
+td {
+	text-align: left;
+	padding: 5px
+}
+
+table {
+	width: 200px;
+	border-collapse: collapse;
+	width: 50%;
+	float: left
+}
+
+#buttonDiv {
+	width: 15%;
+	text-align: center;
+	margin: 20px;
+	float: left
+}
+</style>
+<script src="../	script/jquery.js"></script>
+<script>
+	$(function() {
+	
+		function longTaskSync(def) {
+			var start = $.now();
+			var total = 0;
+			 for (var i = 0; i < 500000000 ; i++) { 
+                 total += i;
+                 if(i%100000000==0 && def!=null) {
+                	 def.notify(i);
+                 }
+             } 
+			 var elapsedTime = (($.now() - start)/1000).toFixed(1);
+			 display('Task complete. time:' + elapsedTime + ' seconds');
+			// return total;
+			return elapsedTime;
+		}
+		function longTask(){
+			return $.Deferred(function(def){
+				setTimeout(function(){
+					var total = longTaskSync(def);
+					def.notify('hihi');
+					if(total%2==0)
+						def.resolve(total);
+					else
+						def.reject(total);
+				});
+			}, 10);
+			
+		}
+		$('#go').click(function() {
+			if($('#async').attr('checked')){
+				display('calling longTask');
+				var observer = longTask();
+				observer.done(function(total){
+					display('callback executed:'+total);
+				});
+				observer.fail(function(total){
+					display('failed:'+total);
+				});
+				observer.always(function(){
+					display('always');
+				});
+				observer.progress(function(v){
+					display('progress:'+v);
+				});
+				display('longTask returned');
+			}else {
+				display('calling longTaskSync');
+				longTaskSync();
+				display('longTaskSync returned');
+			}
+		});
+
+		$('#nogo').click(function() {
+			def.reject();
+		});
+		display('ready');
+
+	});
+	function display(msg) {
+		$('tbody').append("<tr><td>" + msg + "</td></tr>")
+	}
+</script>
+
+</head>
+<body>
+	<h1>Jacqui's Flower Shop</h1>
+
+	<table class="ui-widget" border=1>
+		<thead class="ui-widget-header">
+			<tr>
+				<th>Message</th>
+			</tr>
+		</thead>
+		<tbody class="ui-widget-content">
+		</tbody>
+	</table>
+
+	<div id="buttonDiv">
+		<input type='checkbox' id='async' checked /> <label for='async'>Async</label>
+		<button id='go'>Go</button>
+		<button id='nogo'>No Go</button>
+	</div>
+</body>
+</html>

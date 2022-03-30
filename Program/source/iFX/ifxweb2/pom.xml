@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.st1</groupId>
+	<artifactId>ifxweb2</artifactId>
+	<name>ifxweb2</name>
+	<packaging>war</packaging>
+	<version>2018-0903-CodeViewCMD</version>
+	<properties>
+		<Java-Ver>1.8</Java-Ver>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<JUnit-Ver>4.12</JUnit-Ver>
+		<JavaServer-API-Ver>2.3.3</JavaServer-API-Ver>
+		<ibm.mq.version>7.5.0.1</ibm.mq.version>
+
+		<Netty.all-Ver>4.1.44.Final</Netty.all-Ver>
+		
+		<axis2-Ver>1.7.9</axis2-Ver>
+		<axiom-api-Ver>1.2.22</axiom-api-Ver>
+	</properties>
+	<dependencies>
+		
+		<!--Netty 
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>${Netty.all-Ver}</version>
+		</dependency>
+        -->
+        
+		<!-- Main project -->
+		<dependency>
+			<groupId>com.st1</groupId>
+			<artifactId>ifxdb</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!-- Servlet -->
+		<dependency>
+			<groupId>org.directwebremoting</groupId>
+			<artifactId>dwr</artifactId>
+			<version>3.0.2-RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+			<version>${JavaServer-API-Ver}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<!-- component -->
+		<dependency>
+			<groupId>com.yahoo.platform.yui</groupId>
+			<artifactId>yuicompressor</artifactId>
+			<version>2.4.8</version>
+		</dependency>
+
+		<!-- 潘 systemPath 已經無效棄用 -->
+		<!-- mvn install:install-file -Dfile=./TBConvert.jar -DgroupId=com.AStar -DartifactId=TBConvert -Dversion=1.0.0 -Dpackaging=jar -->
+		<dependency>
+			<groupId>com.AStar</groupId>
+			<artifactId>TBConvert</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+        <!-- axis2 -->
+		<!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-kernel -->
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-kernel</artifactId>
+			<version>${axis2-Ver}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-adb -->
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-adb</artifactId>
+			<version>${axis2-Ver}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-adb-codegen -->
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-adb-codegen</artifactId>
+			<version>${axis2-Ver}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-local</artifactId>
+			<version>${axis2-Ver}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-http</artifactId>
+			<version>${axis2-Ver}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.ws.commons.axiom/axiom-api -->
+		<dependency>
+			<groupId>org.apache.ws.commons.axiom</groupId>
+			<artifactId>axiom-api</artifactId>
+			<version>${axiom-api-Ver}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ws.commons.axiom</groupId>
+			<artifactId>axiom-impl</artifactId>
+			<version>${axiom-api-Ver}</version>
+		</dependency>
+
+		
+		<!-- 未有新版是否保留 -->
+		<dependency>
+			<groupId>net.sourceforge.jexcelapi</groupId>
+			<artifactId>jxl</artifactId>
+			<version>2.6.12</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<!-- <version>2.9</version> -->
+				<configuration>
+					<additionalProjectnatures>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+					</additionalBuildcommands>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<!-- <version>3.5.1</version> -->
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<!-- <version>1.2.1</version> -->
+				<configuration>
+					<mainClass>org.test.int1.Main</mainClass>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<!-- <version>2.4</version> -->
+				<configuration>
+					<outputDirectory>C:\Users\Adam\Desktop\</outputDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

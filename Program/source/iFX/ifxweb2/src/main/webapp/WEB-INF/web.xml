@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <!-- The definition of the Root Spring Container shared by all Servlets	and Filters -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+			/WEB-INF/spring/root-context.xml
+		</param-value>
+    </context-param>
+    
+    <!-- set new logbackConfig -->
+    <listener>
+        <listener-class>com.st1.ifx.config.SetLogBackConfig</listener-class>
+    </listener>
+    
+    <!-- Creates the Spring Container shared by all Servlets and Filters -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    
+    <listener>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+    </listener>
+    
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class> 
+		org.springframework.web.filter.CharacterEncodingFilter 
+	</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    
+    <filter>
+        <filter-name>HttpMethodFilter</filter-name>
+        <filter-class> 
+			org.springframework.web.filter.HiddenHttpMethodFilter 
+		</filter-class>
+    </filter>
+    
+    <!-- xss攻擊預防  -->
+    <filter>
+        <filter-name>xssFilter</filter-name>
+        <filter-class>com.st1.filter.XSSFilter</filter-class>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>xssFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>HttpMethodFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <!-- Processes application requests -->
+    <servlet>
+        <servlet-name>appServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/spring/appServlet/servlet-context.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+        <multipart-config>
+            <location>/home/weblogic/itxDoc/itxWrite/temp/</location>
+            <max-file-size>5242880</max-file-size>
+            <max-request-size>20971520</max-request-size>
+        </multipart-config>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>appServlet</servlet-name>
+        <url-pattern>/mvc/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>StartupServlet</servlet-name>
+        <servlet-class>com.st1.servlet.StartupServlet</servlet-class>
+        <init-param>
+            <param-name>ifx-folder</param-name>
+            <!-- 
+			<param-value>/home/emdap21/st1/ifx</param-value>
+		 	-->
+            <param-value>d:/ifxfolder2</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>StartupServlet</servlet-name>
+        <url-pattern>/st1/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <display-name>DWR Servlet</display-name>
+        <servlet-name>dwr-invoker</servlet-name>
+        <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>jsonpEnabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>activeReverseAjaxEnabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <!-- 
+		<init-param><param-name>org.directwebremoting.extend.ServerLoadMonitor</param-name><param-value>org.directwebremoting.impl.PollingServerLoadMonitor</param-value></init-param><init-param><param-name>disconnectedTime</param-name><param-value>7000</param-value></init-param>
+		 -->
+        <init-param>
+            <param-name>initApplicationScopeCreatorsAtStartup</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>dwr-invoker</servlet-name>
+        <url-pattern>/dwr/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>dwr-invoker</servlet-name>
+        <url-pattern>/dwrForPolling/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <display-name>Mini Servlet</display-name>
+        <servlet-name>mini-invoker</servlet-name>
+        <servlet-class>com.st1.servlet.MiniServlet</servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>jsonpEnabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>mini-invoker</servlet-name>
+        <url-pattern>/mini/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ViewStatusMessages</servlet-name>
+        <servlet-class>ch.qos.logback.classic.ViewStatusMessagesServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ViewStatusMessages</servlet-name>
+        <url-pattern>/logStatus</url-pattern>
+    </servlet-mapping>
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <servlet>
+        <servlet-name>simpleService</servlet-name>
+        <servlet-class>com.st1.ifx.web.SimpleWebServiceEndpoint</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>simpleService</servlet-name>
+        <url-pattern>/simpleService</url-pattern>
+    </servlet-mapping>
+</web-app>

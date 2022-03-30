@@ -1,0 +1,26 @@
+body {
+	background-color:ivory;
+	padding:2
+}
+
+.tbl th {background: lightgreen}
+.tbl tr {
+	line-height: 1.5;
+	padding:5;
+}
+.tbl tr:nth-child(even) {background: #CCC}
+.tbl tr:nth-child(odd) {background: #FFF}
+
+.tbl td {
+	padding-left:5;
+	padding-right:5;
+}
+
+.navi a {
+	color:black;
+}
+a.disabled {
+   cursor: default !important;
+   pointer-events: none;
+   opacity:0.2;
+}

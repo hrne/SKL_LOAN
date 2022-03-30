@@ -1,0 +1,26 @@
+body {
+background-color: #f6f6f6;
+background: url(../images/bodyBg.png) repeat;
+}
+#wp {
+background-color: #fff;
+box-shadow: 6px 0 4px -4px #f0f0f0,-6px 0 4px -4px #f0f0f0;
+-webkit-box-shadow: 6px 0 4px -4px #f0f0f0,-6px 0 4px -4px #f0f0f0;
+-moz-box-shadow: 6px 0 4px -4px #f0f0f0,-6px 0 4px -4px #f0f0f0;
+}
+
+.wp {
+	overflow: hidden;
+	margin: 0 auto;
+	width: 1000px;
+}
+
+.container {
+margin: 0 11px;
+_display: inline;
+}
+.printBg {
+	clear: both;
+	background: url(../images/print_bg.gif?20130511) left bottom no-repeat;
+	padding-bottom: 40px;
+}
