@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:int="http://www.springframework.org/schema/integration" xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration/stream
+      	http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+      	http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+	 	http://www.springframework.org/schema/task
+    	http://www.springframework.org/schema/task/spring-task.xsd
+		">
+	<!-- 此設定檔已改成吃外部檔案 詳看 app-context-one.xml -->
+
+	<int-file:inbound-channel-adapter id="swift-auto-adapter" queue-size="10" directory="${swift.import.inbox}"
+		auto-create-directory="true" channel="swift-working-channel" filename-pattern="*.swift">
+		<int:poller fixed-delay="${swift.import.watch.interval}" max-messages-per-poll="${swift.import.perPoll}"></int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<!-- 如果要先複製檔案到另一目錄 則將 swift-auto-adapter之channel改為swift-input-channel 並且將swift-input-channel註解取消,再將swift-input-channel之input-channel改為swift-working-channel 
+		注意是否需要delete-source-files , delete-files -->
+	<!-- <int-file:outbound-gateway id="swift-auto-adapter" request-channel="swift-input-channel" reply-channel="swift-working-channel" directory="${swift.import.working.folder}" 
+		auto-create-directory="true" delete-source-files="true" mode="REPLACE" /> -->
+	<!-- delete-source-files="true" -->
+
+	<!-- 讀取電文檔, output file content(strings) -->
+	<int-file:file-to-string-transformer input-channel="swift-working-channel"
+		output-channel="swift-converting-channel" delete-files="true" charset="UTF-8" />
+
+	<!-- 將電文檔內容, 轉成印表檔 -->
+	<!-- om.st1.ifx.swiftauto.SwiftConverter.java -->
+	<int:service-activator input-channel="swift-converting-channel" ref="swiftConverter" />
+
+</beans>

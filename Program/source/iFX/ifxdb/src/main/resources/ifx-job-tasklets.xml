@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="loggingListener" class="com.st1.ifx.batch.integration.JobLoggerListener" />
+	<bean id="loggingStepListener" class="com.st1.ifx.batch.integration.LoggingStepStartStopListener" />
+
+	<bean id="importToJobInstanceMappingTasklet" class="com.st1.ifx.file.ImportToJobInstanceMappingTasklet" scope="step">
+		<property name="original" value="#{jobParameters['original']}" />
+		<property name="importId" value="#{jobParameters['importId']}" />
+		<property name="fileImportService" ref="fileImportService" />
+		<property name="directSources">
+			<set>
+				<value>host</value>
+			</set>
+		</property>
+	</bean>
+	<bean id="fileMoveTasklet" class="com.st1.ifx.file.FileMoveTasklet" scope="step">
+		<property name="sourceFile" value="file:#{jobParameters['inputFile']}" />
+		<property name="targetFolder" value="file:${import.backupFolder}" />
+	</bean>
+	<bean id="fileMoveTasklet-error" class="com.st1.ifx.file.FileMoveTasklet" scope="step">
+		<property name="sourceFile" value="file:#{jobParameters['inputFile']}" />
+		<property name="targetFolder" value="file:${import.errorFolder}" />
+	</bean>
+
+
+	<bean id="beginImportTasklet" class="com.st1.ifx.file.BeginImportTasklet" />
+	<bean id="cleanImportTasklet" class="com.st1.ifx.file.CleanImportTasklet" />
+	<bean id="echoTasklet" class="com.st1.ifx.batch.integration.EchoTasklet" />
+
+
+	<!-- abstract lineReader propertites -->
+	<bean id="abstractLineReader" abstract="true">
+		<property name="encoding" value="BIG5"></property>
+		<property name="resource" value="file:#{jobParameters['inputFile']}" />
+		<property name="linesToSkip" value="0" />
+		<property name="comments">
+			<list>
+				<value>#</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- TXCD import -->
+	<bean id="txcdLineReader" class="org.springframework.batch.item.file.FlatFileItemReader" parent="abstractLineReader" scope="step">
+		<property name="lineMapper">
+			<bean class="com.st1.ifx.batch.item.MyLineMapper">
+				<property name="mapper">
+					<bean class="com.st1.ifx.file.item.txcd.TxcdLineMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="txcdWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+		<property name="targetObject" ref="txcdLineItemWriter" />
+		<property name="targetMethod" value="write" />
+	</bean>
+
+	<!-- SBCTL import -->
+	<bean id="sbctlLineReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step" parent="abstractLineReader">
+		<property name="lineMapper">
+			<bean class="com.st1.ifx.batch.item.MyLineMapper">
+				<property name="mapper">
+					<bean class="com.st1.ifx.file.item.sbctl.SbctlLineMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="sbctlWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+		<property name="targetObject" ref="sbctlLineItemWriter" />
+		<property name="targetMethod" value="write" />
+	</bean>
+
+	<bean id="generalTokenizer" class="com.st1.ifx.batch.item.MyFixedLengthTokenizer">
+		<property name="columns" value="1-30,31-31,32-51,52" />
+		<property name="names" value="id,opfg,key,content" />
+		<property name="encoding" value="UTF-8" />
+	</bean>
+	<bean id="generalFieldMapper" class="com.st1.ifx.file.item.general.GeneralLineFieldMapper" />
+
+	<bean id="generalLineMapper" class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+		<property name="lineTokenizer" ref="generalTokenizer" />
+		<property name="fieldSetMapper" ref="generalFieldMapper" />
+	</bean>
+
+	<bean id="generalReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step" parent="abstractLineReader">
+		<property name="lineMapper" ref="generalLineMapper" />
+		<property name="encoding" value="UTF-8"></property>
+		<!-- <property name="lineMapper"> <bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" /> </property> -->
+	</bean>
+
+
+	<bean id="generalWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter" scope="step">
+		<property name="targetObject" ref="generalLineItemWriter" />
+		<property name="targetMethod" value="write" />
+	</bean>
+
+	<bean id="generalHeadProcessor" scope="step" class="com.st1.ifx.file.item.general.GeneralLineProcessor">
+	</bean>
+
+	<bean id="completeItemProcessor" class="org.springframework.batch.item.support.CompositeItemProcessor">
+		<property name="delegates">
+			<util:list>
+				<ref bean="generalHeadProcessor" />
+			</util:list>
+		</property>
+	</bean>
+
+	<bean id="codeListEvict" class="com.st1.ifx.file.item.general.GeneralLineDone" />
+	<bean id="generalStepListener" class="com.st1.ifx.file.item.general.GeneralStepListener" />
+	<bean id="generalReport" class="com.st1.ifx.file.item.general.GeneralReportTasklet" />
+
+
+
+	<bean id="rimTokenizer" class="com.st1.ifx.batch.item.MyFixedLengthTokenizer">
+		<property name="columns" value="1-8,9-9,10-29,30-1829" />
+		<property name="names" value="tableName,updateFlag,key,data" />
+		<property name="endOfLine" value="$" />
+		<property name="encoding" value="UTF-8" />
+	</bean>
+
+	<bean id="rimFieldMapper" class="com.st1.ifx.file.item.rim.RimLineFieldMapper" />
+
+	<bean id="rimMapper" class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+		<property name="lineTokenizer" ref="rimTokenizer" />
+		<property name="fieldSetMapper" ref="rimFieldMapper" />
+	</bean>
+
+	<bean id="rimReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step" parent="abstractLineReader">
+		<property name="lineMapper" ref="rimMapper" />
+		<property name="encoding" value="UTF-8"></property>
+
+	</bean>
+	<bean id="rimWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter" scope="step">
+		<property name="targetObject" ref="rimLineItemWriter" />
+		<property name="targetMethod" value="write" />
+	</bean>
+
+
+</beans>

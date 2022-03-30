@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>http://stackoverflow.com/q/9727075/315935</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/redmond/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-4.3.1/css/ui.jqgrid.css" />
+    <style type="text/css">
+        html, body { font-size: 75%; }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-4.3.1/js/i18n/grid.locale-en.js"></script>
+    <script type="text/javascript">
+        $.jgrid.no_legacy_api = true;
+        $.jgrid.useJSON = true;
+    </script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-4.3.1/js/jquery.jqGrid.min.js"></script>
+    
+    
+    <script type="text/javascript">
+    //<![CDATA[
+        /*global $ */
+        /*jslint devel: true, browser: true, plusplus: true */
+        $(document).ready(function () {
+            'use strict';
+            var mydata = [
+                    { id: "1",  invdate: "2007-10-01", name: "test",   note: "note",   amount: "200.00", tax: "10.00", closed: true,  ship_via: "TN", total: "210.00" },
+                    { id: "2",  invdate: "2007-10-02", name: "test2",  note: "note2",  amount: "300.00", tax: "20.00", closed: false, ship_via: "FE", total: "320.00" },
+                    { id: "3",  invdate: "2007-09-01", name: "test3",  note: "note3",  amount: "400.00", tax: "30.00", closed: false, ship_via: "FE", total: "430.00" },
+                    { id: "4",  invdate: "2007-10-04", name: "test4",  note: "note4",  amount: "200.00", tax: "10.00", closed: true,  ship_via: "TN", total: "210.00" },
+                    { id: "5",  invdate: "2007-10-31", name: "test5",  note: "note5",  amount: "300.00", tax: "20.00", closed: false, ship_via: "FE", total: "320.00" },
+                    { id: "6",  invdate: "2007-09-06", name: "test6",  note: "note6",  amount: "400.00", tax: "30.00", closed: false, ship_via: "FE", total: "430.00" },
+                    { id: "7",  invdate: "2007-10-04", name: "test7",  note: "note7",  amount: "200.00", tax: "10.00", closed: true,  ship_via: "TN", total: "210.00" },
+                    { id: "8",  invdate: "2007-10-03", name: "test8",  note: "note8",  amount: "300.00", tax: "20.00", closed: false, ship_via: "FE", total: "320.00" },
+                    { id: "9",  invdate: "2007-09-02", name: "test9",  note: "note9",  amount: "400.00", tax: "30.00", closed: false, ship_via: "TN", total: "430.00" },
+                    { id: "10", invdate: "2007-09-08", name: "test10", note: "note10", amount: "500.00", tax: "30.00", closed: true,  ship_via: "TN", total: "530.00" },
+                    { id: "11", invdate: "2007-09-08", name: "test11", note: "note11", amount: "500.00", tax: "30.00", closed: false, ship_via: "FE", total: "530.00" },
+                    { id: "12", invdate: "2007-09-10", name: "test12", note: "note12", amount: "500.00", tax: "30.00", closed: false, ship_via: "FE", total: "530.00" }
+                ],
+                $grid = $("#list"),
+                initDatepicker = function (elem) {
+                    $(elem).datepicker({
+                        dateFormat: 'dd-M-yy',
+                        autoSize: true,
+                        changeYear: true,
+                        changeMonth: true,
+                        showButtonPanel: true,
+                        showWeek: true,
+                        onSelect: function (dateText, inst) {
+            				//$(elem).val("hi");
+            				  	   setTimeout(function(){
+            				  		 $grid[0].triggerToolbar();
+            	                }, 50);
+                          }
+
+                        
+                    });
+                },
+                numberTemplate = {formatter: 'number', align: 'right', sorttype: 'number',
+                    editrules: {number: true, required: true},
+                    searchoptions: { sopt: ['eq', 'ne', 'lt', 'le', 'gt', 'ge', 'nu', 'nn', 'in', 'ni'] }},
+                oldFrom = $.jgrid.from,
+                lastSelected;
+        
+            $.jgrid.from = function (source, initalQuery) {
+                var result = oldFrom.call(this, source, initalQuery),
+                    old_select = result.select;
+                result.select = function (f) {
+                    lastSelected = old_select.call(this, f);
+                    return lastSelected;
+                };
+                return result;
+            };
+        
+            $grid.jqGrid({
+                datatype: 'local',
+                data: mydata,
+                colNames: [/*'Inv No', */'Client', 'Date', 'Amount', 'Tax', 'Total', 'Closed', 'Shipped via', 'Notes'],
+                colModel: [
+                    //{ name: 'id', index: 'id', width: 70, align: 'center', sorttype: 'int', searchoptions: { sopt: ['eq', 'ne']} },
+                    { name: 'name', index: 'name', align: 'center', editable: true, width: 65, editrules: {required: true} },
+                    { name: 'invdate', index: 'invdate', width: 80, align: 'center', sorttype: 'date',
+                        formatter: 'date', formatoptions: { newformat: 'd-M-Y' }, editable: true, datefmt: 'd-M-Y',
+                        editoptions: { dataInit: initDatepicker },
+                        searchoptions: { sopt: ['eq', 'ne', 'lt', 'le', 'gt', 'ge'], dataInit: initDatepicker } },
+                    { name: 'amount', index: 'amount', width: 75, editable: true, template: numberTemplate },
+                    { name: 'tax', index: 'tax', width: 52, editable: true, template: numberTemplate },
+                    { name: 'total', index: 'total', width: 60, template: numberTemplate },
+                    {name: 'closed', index: 'closed', width: 70, align: 'center', editable: true, formatter: 'checkbox',
+                        edittype: 'checkbox', editoptions: {value: 'Yes:No', defaultValue: 'Yes'},
+                        stype: 'select', searchoptions: { sopt: ['eq', 'ne'], value: ':Any;true:Yes;false:No' } },
+                    {name: 'ship_via', index: 'ship_via', width: 105, align: 'center', editable: true, formatter: 'select',
+                        edittype: 'select', editoptions: { value: 'FE:FedEx;TN:TNT;IN:Intim', defaultValue: 'IN' },
+                        stype: 'select', searchoptions: { sopt: ['eq', 'ne'], value: ':Any;FE:FedEx;TN:TNT;IN:IN' } },
+                    { name: 'note', index: 'note', width: 60, sortable: false, editable: true, edittype: 'textarea' }
+                ],
+                rowNum: 5,
+                rowList: [5, 10, 20],
+                pager: '#pager',
+                gridview: true,
+                rownumbers: true,
+                autoencode: true,
+                ignoreCase: true,
+                sortname: 'invdate',
+                viewrecords: true,
+                sortorder: 'desc',
+                shrinkToFit: false,
+                height: '100%',
+                caption: 'Demonstrate how to impelment native sort of Date',
+                loadComplete: function () {
+                    this.p.lastSelected = lastSelected; // set this.p.lastSelected
+                }
+            });
+            $grid.jqGrid('navGrid', '#pager', {add: false, edit: false, del: false});
+           // $grid.jqGrid('filterToolbar', {searchOnEnter: false, stringResult: true, defaultSearch: 'cn'});
+            $("#getIds").click(function () {
+                var filteredData = $grid.jqGrid('getGridParam', 'lastSelected'), i, n, ids = [],
+                    idName = $grid.jqGrid('getGridParam', 'localReader').id;
+                alert(filteredData);
+                if (filteredData) {
+                    for (i = 0, n = filteredData.length; i < n; i++) {
+                        ids.push(filteredData[i][idName]);
+                    }
+                    alert("tolal number of filtered data: " + n + "\n" +
+                        "ids of filtered data:\n" + ids.join(', '));
+                }
+            });
+        });
+    //]]>
+    </script>
+</head>
+<body>
+    <fieldset style="float:left">
+        <button id="getIds" type="button">Show Ids</button>
+    </fieldset>
+    <div style="clear:left">
+        <table id="list"><tr><td /></tr></table>
+        <div id="pager"></div>
+    </div>
+</body>
+</html>

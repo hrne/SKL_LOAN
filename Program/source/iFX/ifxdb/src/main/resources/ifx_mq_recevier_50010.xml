@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- MQ receiver queue setup -->
+	<bean id="receiverQueue" class="com.ibm.mq.jms.MQQueue">
+		<property name="baseQueueManagerName" value="${Queue.mq.Manager}" />
+		<property name="baseQueueName" value="${Queue.mq.InName}" />
+	</bean>
+
+	<!-- the JMSTemplate setup for Receiver Queue -->
+	<bean id="ReceiverJMSTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="jmsQueueConnectionFactory" />
+		<property name="defaultDestination" ref="receiverQueue" />
+		<property name="pubSubDomain" value="false" />
+	</bean>
+
+	<!-- 隊列接收程序 -->
+	<bean id="jmsReceiver" class="com.st1.ifx.hcomm.jms.JMSReceiver">
+		<property name="jmsTemplate" ref="ReceiverJMSTemplate" />
+		<property name="receiveQueue" ref="receiverQueue" />
+	</bean>
+
+	<!-- spring 監聽隊列，一旦隊列中有消息，馬上觸發 -->
+	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsQueueConnectionFactory" />
+		<property name="destination" ref="receiverQueue" />
+		<property name="messageListener" ref="jmsReceiver" />
+		<property name="concurrency" value="${Queue.mq.Concurrency}" />
+	</bean>
+</beans>

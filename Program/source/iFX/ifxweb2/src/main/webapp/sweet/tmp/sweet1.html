@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <style>
+            #results li.pass {
+	            color: green;
+            }
+
+            #results li.fail {
+	            color: red;
+            }
+            
+            #swiftForm {
+                width: 100%;
+            }
+            #swiftMainTable{
+                width: 90%;
+            }
+            #loopTable {
+                width:90%;
+            }
+            #swiftMainTable .lblTag {
+                width: 35px;
+                color: green;
+                display: inline-block;
+                vertical-align: top;
+            }
+            #swiftMainTable .lblName {
+                width: 180px;
+                color: #0026ff;
+                display: inline-block;
+                vertical-align: top;
+            }
+            #swiftMainTable .lblOptions {
+                width: 80px;
+                color: #ff006e;
+                display: inline-block;
+                vertical-align: top;
+            }
+            #swiftMainTable table, caption,th, td
+            {
+               border: 1px solid black;
+            }
+            #swiftMainTable caption {
+                text-align: left
+            }
+        </style>
+         
+    </head>
+    <body>
+     
+        <input type="text" id="mt" value="110"/>
+     
+        <button id="btnDisplay">display</button><br/>
+        <div id="screen"></div>
+        <div id="results">
+        </div>
+
+    <script src="../script/jquery.js"></script>
+    <script src="../script/underscore.js"></script> 
+    <script src="./script/swift-lib.js"></script>
+    <script>
+        function assert(value, desc) {
+            var li = document.createElement("li");
+            li.className = value ? "pass" : "fail";
+            li.appendChild(document.createTextNode(desc));
+            document.getElementById("results").appendChild(li);
+            log.info(desc);
+        }
+        $(function () {
+            Swift.util.assert(true, "hello");
+            $('#btnDisplay').on('click', function () {
+                
+                var promise = Swift.util.load($('#mt').val());
+                promise.done(function (x) {
+                    Swift.ui.display(x, 'screen');
+                });
+            });
+        });
+        </script>                
+    </body>
+
+</html>

@@ -1,0 +1,53 @@
+      *+-------------------------------------------------------------+
+      *+  USED IN TX : H1000             LENGTH = 40
+      *+-------------------------------------------------------------+
+       05 IT-TOTAH1000-TEXT       REDEFINES    IT-TOTW-TEXT.
+          07 IT-TOTAH1000-SNDKEY.
+             09 IT-TOTAH1000-BRNO              PIC 9(04).
+             09 IT-TOTAH1000-ENTDAY            PIC 9(08).
+             09 IT-TOTAH1000-MSGTYP            PIC X(04).
+             09 IT-TOTAH1000-ENTSEQ            PIC 9(06).
+          07 IT-TOTAH1000-CPYKEY.              
+             09 IT-TOTAH1000-CBRNO             PIC 9(04).
+             09 IT-TOTAH1000-CMSGTYP           PIC X(04).
+             09 IT-TOTAH1000-CCPYNO            PIC X(10).
+      *---------------------------------------------------------------
+       LINKAGE          SECTION.
+      *---------------------------------------------------------------
+      *----Public Variables   For LINKAGE SECTION Use
+                                         COPY  ..\CPY\BNFLINKA.
+      *+-------------------------------------------------------------+
+      *+  USED IN TX : H1000             LENGTH = 1123
+      *+-------------------------------------------------------------+
+       07 IT-TITAH1000-TEXT       REDEFINES    IT-TITA-TEXT-AREA.
+          09 IT-TITAH1000-QFLG                 PIC 9(02).
+          09 IT-TITAH1000-H13FLG               PIC 9(01).
+          09 IT-TITAH1000-SNDKEY               PIC X(22).
+          09 IT-TITAH1000-KEY     REDEFINES    IT-TITAH1000-SNDKEY.
+             11 IT-TITAH1000-BRNO              PIC 9(04).
+             11 IT-TITAH1000-ENTDAY            PIC 9(08).
+             11 IT-TITAH1000-MSGTYP            PIC X(04).
+             11 IT-TITAH1000-ENTSEQ            PIC 9(06).
+          09 IT-TITAH1000-MSGLEN               PIC 9(05).
+          09 IT-TITAH1000-MSGPR                PIC X(02).
+          09 IT-TITAH1000-TRN                  PIC X(16).
+          09 IT-TITAH1000-SEND                 PIC X(13).
+          09 IT-TITAH1000-DEST                 PIC X(11).
+          09 IT-TITAH1000-DESTR   REDEFINES    IT-TITAH1000-DEST.
+             11 IT-TITAH1000-NAM               PIC X(04).
+             11 IT-TITAH1000-NAL               PIC X(02).
+             11 IT-TITAH1000-TIM               PIC X(02).
+             11 IT-TITAH1000-BR                PIC X(03).
+          09 IT-TITAH1000-VALDAY               PIC 9(08).
+          09 IT-TITAH1000-CURNM                PIC X(03).
+          09 IT-TITAH1000-XAMT                 PIC X(15).
+          09 IT-TITAH1000-CPYNO                PIC X(18).
+          09 IT-TITAH1000-CPYR    REDEFINES    IT-TITAH1000-CPYNO.
+             11 IT-TITAH1000-CBRNO             PIC 9(04).
+             11 IT-TITAH1000-CMSGTYP           PIC X(04).
+             11 IT-TITAH1000-CCPYNO            PIC X(10).
+          09 IT-TITAH1000-SECNO                PIC 9(02).
+          09 IT-TITAH1000-TOBOX                PIC 9(02).
+          09 IT-TITAH1000-CUBOX                PIC 9(02).
+          09 IT-TITAH1000-DATA                 PIC X(1000).
+          09 IT-TITAH1000-END                  PIC X(01).       

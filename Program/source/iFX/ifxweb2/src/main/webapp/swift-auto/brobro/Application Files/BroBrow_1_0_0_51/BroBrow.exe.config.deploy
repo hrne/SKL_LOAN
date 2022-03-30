@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <configSections>
+        <sectionGroup name="userSettings" type="System.Configuration.UserSettingsGroup, System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" >
+            <section name="BroBrow.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" allowExeDefinition="MachineToLocalUser" requirePermission="false" />
+        </sectionGroup>
+    </configSections>
+    <userSettings>
+        <BroBrow.Properties.Settings>
+            <setting name="IfxBrno" serializeAs="String">
+                <value>5050</value>
+            </setting>
+            <setting name="IfxWeb" serializeAs="String">
+                <value>http://10.0.59.31:9080/ifx/</value>
+            </setting>
+        </BroBrow.Properties.Settings>
+    </userSettings>
+</configuration>

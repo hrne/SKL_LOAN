@@ -1,0 +1,49 @@
+      *+-------------------------------------------------------------+
+      *+  USED IN TX : H1000             LENGTH = 1122
+      *+-------------------------------------------------------------+
+024800 07 IT-TITAH1000-TEXT       REDEFINES    IT-TITA-TEXT-AREA.
+024900    09 IT-TITAH1000-QFLG                 PIC 9(02).
+025000    09 IT-TITAH1000-H13FLG               PIC 9(01).
+025100    09 IT-TITAH1000-SNDKEY               PIC X(22).
+025200    09 IT-TITAH1000-KEY     REDEFINES    IT-TITAH1000-SNDKEY.
+025300       11 IT-TITAH1000-BRNO              PIC 9(04).
+025400       11 IT-TITAH1000-ENTDAY            PIC 9(08).
+025500       11 IT-TITAH1000-MSGTYP            PIC X(04).
+025600       11 IT-TITAH1000-ENTSEQ            PIC 9(06).
+025700    09 IT-TITAH1000-MSGLEN               PIC 9(05).
+025800    09 IT-TITAH1000-MSGPR                PIC X(02).
+025900    09 IT-TITAH1000-TRN                  PIC X(16).
+026000    09 IT-TITAH1000-SEND                 PIC X(13).
+026100    09 IT-TITAH1000-DEST                 PIC X(11).
+026200    09 IT-TITAH1000-DESTR   REDEFINES    IT-TITAH1000-DEST.
+026300       11 IT-TITAH1000-NAM               PIC X(04).
+026400       11 IT-TITAH1000-NAL               PIC X(02).
+026500       11 IT-TITAH1000-TIM               PIC X(02).
+026600       11 IT-TITAH1000-BR                PIC X(03).
+026700    09 IT-TITAH1000-VALDAY               PIC 9(08).
+026800    09 IT-TITAH1000-CURNM                PIC X(03).
+026900    09 IT-TITAH1000-XAMT                 PIC X(15).
+027000    09 IT-TITAH1000-CPYNO                PIC X(18).
+027100    09 IT-TITAH1000-CPYR    REDEFINES    IT-TITAH1000-CPYNO.
+027200       11 IT-TITAH1000-CBRNO             PIC 9(04).
+027300       11 IT-TITAH1000-CMSGTYP           PIC X(04).
+027400       11 IT-TITAH1000-CCPYNO            PIC X(10).
+027500    09 IT-TITAH1000-SECNO                PIC 9(02).
+027600    09 IT-TITAH1000-TOBOX                PIC 9(02).
+027700    09 IT-TITAH1000-CUBOX                PIC 9(02).
+027900    09 IT-TITAH1000-DATA                 PIC X(1000).
+028000    09 FILLER                            PIC X(2624).
+      *+-------------------------------------------------------------+
+      *+  USED IN TX : H1000             LENGTH = 40
+      *+-------------------------------------------------------------+
+042800 05 IT-TOTAH1000-TEXT       REDEFINES    IT-TOTW-TEXT.
+042900    07 IT-TOTAH1000-SNDKEY.
+043000       09 IT-TOTAH1000-BRNO              PIC 9(04).
+043100       09 IT-TOTAH1000-ENTDAY            PIC 9(08).
+043200       09 IT-TOTAH1000-MSGTYP            PIC X(04).
+043300       09 IT-TOTAH1000-ENTSEQ            PIC 9(06).
+043400    07 IT-TOTAH1000-CPYKEY.              
+043500       09 IT-TOTAH1000-CBRNO             PIC 9(04).
+043600       09 IT-TOTAH1000-CMSGTYP           PIC X(04).
+043700       09 IT-TOTAH1000-CCPYNO            PIC X(10).
+043800    07 FILLER                            PIC X(3914).

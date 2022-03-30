@@ -1,0 +1,22 @@
+
+from var to swift
+_Vars['sendingTid'] = $.trim(ifx.getValue('#SENDINGTID'));
+_Vars['msgType'] = $.trim(ifx.getValue('#MSGTYPE'));
+_Vars['pri'] = $.trim(ifx.getValue('#PRI'));
+_Vars['dest'] = $.trim(ifx.getValue('#DEST'));
+
+INVOKEJS(SWIFT,FROMVAR,sendingTid=#SENDINGTID;msgType=#MSGTYPE;pri=#PRI;dest=#DEST)
+
+
+
+
+from swift to var
+
+#swiftMsgType=x,4,s
+#swiftMsgName=x,80,s
+    	tag20 -->#swiftTRN  
+!!    	tag(Date) --> #swiftVALDAY
+!!		tag(CUR)  --> #swiftCURAMT
+!!		tag(Amount) -->#swiftXAMT
+!!		swift電文--->#swiftWholeData(10000),#swiftData(1000)
+!!		swift電文長度 -->#swiftMsgLen

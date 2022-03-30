@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<devices>
+<device mnt="/hnd/p"  class="DummyDocPrint.NotepadDoc"  cab="Dummy,DummyDocPrint.dll,DummyDoc.zip" version="20140413" info="a printer"/>
+</devices>

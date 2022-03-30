@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wls:weblogic-web-app xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:wls="http://xmlns.oracle.com/weblogic/weblogic-web-app"
+	xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/weblogic-web-app.xsd ">
+
+	<wls:context-root>/iFX</wls:context-root>
+
+	<wls:charset-params>
+		<wls:input-charset>
+			<wls:resource-path>/*</wls:resource-path>
+			<wls:java-charset-name>UTF-8</wls:java-charset-name>
+		</wls:input-charset>
+	</wls:charset-params>
+
+	<wls:jsp-descriptor>
+		<wls:page-check-seconds>10</wls:page-check-seconds>
+		<wls:encoding>UTF-8</wls:encoding>
+	</wls:jsp-descriptor>
+
+	<wls:session-descriptor>
+		<wls:timeout-secs>3600</wls:timeout-secs>
+		<wls:id-length>54</wls:id-length>
+		<wls:cookie-name>iFX_JSESSIONID</wls:cookie-name>
+	</wls:session-descriptor>
+	
+	<wls:container-descriptor>
+		<wls:servlet-reload-check-secs>10</wls:servlet-reload-check-secs>
+		<!-- <wls:prefer-web-inf-classes>true</wls:prefer-web-inf-classes> -->
+		<wls:prefer-application-packages>
+			<wls:package-name>org.slf4j.*</wls:package-name>
+			<wls:package-name>org.springframework.*</wls:package-name>
+		</wls:prefer-application-packages>
+	</wls:container-descriptor>
+
+</wls:weblogic-web-app>

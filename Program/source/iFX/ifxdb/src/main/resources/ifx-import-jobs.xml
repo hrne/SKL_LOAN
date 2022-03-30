@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/batch 
+	http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<import resource="ifx-job-tasklets.xml" />
+
+	<job id="import-base" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+		<listeners>
+			<listener ref="loggingListener" />
+		</listeners>
+	</job>
+
+	<flow id="prepareImportFlow" xmlns="http://www.springframework.org/schema/batch">
+		<step id="prepare1" next="mapping1">
+			<tasklet ref="beginImportTasklet" />
+		</step>
+		<step id="mapping1">
+			<tasklet ref="importToJobInstanceMappingTasklet" />
+		</step>
+	</flow>
+
+	<flow id="cleanImportFlow" xmlns="http://www.springframework.org/schema/batch">
+		<step id="clean1" next="clean.moveFile">
+			<tasklet ref="cleanImportTasklet" />
+		</step>
+		<step id="clean.moveFile">
+			<tasklet ref="fileMoveTasklet" />
+		</step>
+	</flow>
+
+	<!-- import txcd job -->
+	<job id="import-txcd" parent="import-base" xmlns="http://www.springframework.org/schema/batch">
+		<!-- <step id="import-txcd.begin" next="import-txcd.readWrite"> <job ref="prepareImportJob" /> </step> -->
+		<flow id="import-txcd.being" next="import-txcd.readWrite" parent="prepareImportFlow" />
+
+		<step id="import-txcd.readWrite" next="import-txcd.clean">
+			<tasklet>
+				<chunk reader="txcdLineReader" writer="txcdWriter" commit-interval="100">
+				</chunk>
+			</tasklet>
+		</step>
+		<!-- <step id="import-txcd.clean"> <job ref="cleanImportJob" /> </step> -->
+		<flow id="import-txcd.clean" parent="cleanImportFlow" />
+	</job>
+
+	<job id="import-echo" parent="import-base" xmlns="http://www.springframework.org/schema/batch">
+		<!-- <step id="import-echo.begin" next="import-echo.readWrite"> <job ref="prepareImportJob" /> </step> -->
+		<flow id="import-echo.begin" next="import-echo.readWrite" parent="prepareImportFlow" />
+		<step id="import-echo.readWrite" next="import-echo.clean">
+			<tasklet ref="echoTasklet" />
+			<listeners>
+				<listener ref="loggingStepListener" />
+			</listeners>
+		</step>
+		<!-- <step id="import-echo.clean"> <job ref="cleanImportJob" /> </step> -->
+		<flow id="import-echo.clean" parent="cleanImportFlow" />
+	</job>
+
+
+	<!-- import sbctl job -->
+	<job id="import-sbctl-old" parent="import-base" xmlns="http://www.springframework.org/schema/batch">
+		<flow id="import-sbctl.begin" next="import-sbctl.readWrite" parent="prepareImportFlow">
+
+		</flow>
+
+		<step id="import-sbctl.readWrite" next="import-sbctl.clean">
+			<tasklet>
+				<chunk reader="sbctlLineReader" writer="sbctlWriter" commit-interval="100">
+				</chunk>
+			</tasklet>
+		</step>
+		<flow id="import-sbctl.clean" parent="cleanImportFlow" />
+	</job>
+
+
+	<step id="prepare" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet ref="beginImportTasklet" />
+	</step>
+
+	<step id="mapping" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet ref="importToJobInstanceMappingTasklet" />
+	</step>
+	<step id="clean" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet ref="cleanImportTasklet" />
+	</step>
+	<batch:step id="moveFile">
+		<tasklet ref="fileMoveTasklet" />
+	</batch:step>
+	<batch:step id="moveErrorFile">
+		<tasklet ref="fileMoveTasklet-error" />
+	</batch:step>
+
+	<job id="import-sbctl" parent="import-base" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import-sbctl-prepare" parent="prepare" next="import-sbctl-mapping"></step>
+		<step id="import-sbctl-mapping" parent="mapping" next="import-sbctl-readWrite">
+		</step>
+		<step id="import-sbctl-readWrite" next="import-sbctl-clean">
+			<tasklet>
+				<chunk reader="sbctlLineReader" writer="sbctlWriter" commit-interval="100">
+				</chunk>
+			</tasklet>
+		</step>
+		<step id="import-sbctl-clean" parent="clean" next="import-sbctl-moveFile" />
+		<step id="import-sbctl-moveFile" parent="moveFile" />
+	</job>
+
+
+	<job id="import-general" parent="import-base" restartable="false" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import-general-prepare" parent="prepare" next="import-general-mapping" />
+		<step id="import-general-mapping" parent="mapping">
+			<next on="FAILED" to="import-general-moveFile" />
+			<next on="*" to="import-general-readWrite" />
+		</step>
+		<step id="import-general-readWrite">
+			<tasklet>
+				<!--KE: old retry-limit = 3 to 5 -->
+				<chunk reader="generalReader" writer="generalWriter" processor="generalHeadProcessor" commit-interval="100" retry-limit="5">
+					<retryable-exception-classes>
+						<include class="org.springframework.dao.DeadlockLoserDataAccessException" />
+					</retryable-exception-classes>
+				</chunk>
+				<listeners>
+					<listener ref="generalStepListener" />
+				</listeners>
+			</tasklet>
+			<next on="FAILED" to="import-general-moveErrorFile" />
+			<next on="*" to="import-general-moveFile" />
+		</step>
+		<step id="import-general-moveErrorFile" parent="moveErrorFile" />
+		<step id="import-general-moveFile" parent="moveFile" />
+
+	</job>
+
+
+	<job id="import-rim" parent="import-base" restartable="false" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import-rim-prepare" parent="prepare" next="import-rim-mapping" />
+		<step id="import-rim-mapping" parent="mapping">
+			<next on="FAILED" to="import-rim-moveFile" />
+			<next on="*" to="import-rim-readWrite" />
+		</step>
+		<step id="import-rim-readWrite">
+			<tasklet>
+				<chunk reader="rimReader" writer="rimWriter" commit-interval="100" retry-limit="3">
+					<retryable-exception-classes>
+						<include class="org.springframework.dao.DeadlockLoserDataAccessException" />
+					</retryable-exception-classes>
+				</chunk>
+				<listeners>
+					<!-- <listener ref="rimStepListener"/> -->
+				</listeners>
+			</tasklet>
+			<next on="FAILED" to="import-rim-moveErrorFile" />
+			<next on="*" to="import-rim-moveFile" />
+		</step>
+		<step id="import-rim-moveErrorFile" parent="moveErrorFile" />
+		<step id="import-rim-moveFile" parent="moveFile" />
+
+	</job>
+
+
+
+</beans>

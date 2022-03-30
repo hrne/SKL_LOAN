@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- mq队列连接工厂 -->
+	<bean id="jmsConnectionFactory" class="com.ibm.mq.jms.MQQueueConnectionFactory">
+		<property name="transportType" value="${Queue.mq.TransportType}" />
+		<property name="queueManager" value="${Queue.mq.Manager}" />
+		<property name="hostName" value="${Queue.mq.Host}" />
+		<property name="port" value="${Queue.mq.port}" />
+		<property name="CCSID" value="${Queue.mq.CCSID}" />
+		<property name="channel" value="${Queue.mq.Channel}" />
+	</bean>
+	<!-- spring缓存管理mq队列连接工厂 -->
+	<bean id="jmsQueueConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<property name="targetConnectionFactory" ref="jmsConnectionFactory" />
+		<property name="sessionCacheSize">
+			<value>10</value>
+		</property>
+	</bean>
+
+</beans>

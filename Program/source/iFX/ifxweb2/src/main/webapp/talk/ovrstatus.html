@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>testd.html</TITLE>
+</HEAD>
+<BODY onload="doInit();" bgcolor="#ffcc00">
+<font size="10">
+<div id="statusLine"></div>
+
+<center>
+<BUTTON onclick="doCancel()">取消進行中的授權</BUTTON>
+</center>
+</font>
+</BODY>
+
+<SCRIPT language="JavaScript">
+
+var caller =null;
+
+function doInit()
+{
+  if (window.dialogArguments != null) {
+  		caller = window.dialogArguments.caller;
+
+  }
+}
+
+function doCancel()
+{
+	  if (window.dialogArguments != null) {
+	  	window.dialogArguments.abort = true;
+	  }
+	window.returnValue = true;
+	
+	window.close();
+}
+function updateStatus(s)
+{
+
+	document.all.statusLine.innerText = s;
+}
+function checkIt()
+{
+
+	if (caller.closeOvrStatusDialog()) {
+			window.returnValue = true;
+			window.close();
+	}
+	updateStatus(caller.getCurrentOvrStatus());
+	
+}
+
+window.setInterval(checkIt, 200);
+</script>
+
+</HTML>

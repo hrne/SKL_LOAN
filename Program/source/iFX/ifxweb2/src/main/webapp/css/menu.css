@@ -1,0 +1,93 @@
+  li.ui-state-default {
+    font-size : 15px;
+  }
+  div.ui-tabs-panel {
+    font-size : 15px;
+    font-family : arial;
+	color:blue;
+	line-height: 180%;
+	padding:0;
+	background-color:rgba(234, 251, 211, 1);
+
+  }
+   
+
+.tabcontent{
+	color:blue;
+	background-color:rgba(234, 251, 211, 1);
+	
+}
+ .mytabclass{
+	background-color:rgba(234, 251, 211, 1);
+		padding:0;
+	margin-left:0;
+	border:0;
+	
+}
+
+.menuanchor {
+	margin-left:40px;
+}
+
+.mytabclass table {
+	margin-left:60px;
+}
+.mytabclass td {
+	width:500px;
+}
+.ui-tabs  {
+	margin:0;
+	padding:0;
+
+}
+.ui-tabs .ui-tabs-panel  {
+	margin:0;
+	margin-left:-2px;
+	padding:0;
+
+}
+
+div.ui-tabs-panel a {
+	text-decoration:none;
+	color:#990066;
+	padding-left:20px;
+	padding-right:25px;
+	padding-top:6px;
+	padding-bottom:5px;
+	
+}
+.menuTable {
+ margin-top:10px;	
+ letter-spacing:0.5mm
+}
+myclass {
+	color:red;
+}
+#menulink {
+	margin-left:0;
+	background-color:rgba(242, 185, 185, 1) ;
+	border-radius: .5em;
+	 display: inline-block; 
+	padding-left:20px;
+	padding-right:50px;
+	padding-top:1px;
+	padding-bottom:1px;
+	margin:10px;
+	margin-left:20px;
+	
+}
+#menulink a {
+  color: rgba(0, 0, 0, 1);
+	/*color: rgba(255, 59, 5, 1);*/
+	
+	/*text-decoration:underline;*/
+	
+	
+}
+
+
+.itemDisabled{
+	 
+    color: gray !important; 
+    text-decoration: line-through;
+}

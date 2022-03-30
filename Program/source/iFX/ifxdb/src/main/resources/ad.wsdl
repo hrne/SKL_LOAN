@@ -1,0 +1,228 @@
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://tempuri.org/">
+<wsdl:types>
+<s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+<s:element name="IsAuthenticated">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="Account" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="strAuthType" type="s:string"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="IsAuthenticatedResponse">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="IsAuthenticatedResult">
+<s:complexType mixed="true">
+<s:sequence>
+<s:any/>
+</s:sequence>
+</s:complexType>
+</s:element>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="AD_IsAuthenticated">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="Account" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="AD_IsAuthenticatedResponse">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="1" maxOccurs="1" name="AD_IsAuthenticatedResult" type="s:boolean"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="Intranet_IsAuthenticated">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="Account" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="Intranet_IsAuthenticatedResponse">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="1" maxOccurs="1" name="Intranet_IsAuthenticatedResult" type="s:boolean"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="IsAuthenticatedClass">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="Account" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="strAuthType" type="s:string"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="IsAuthenticatedClassResponse">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="IsAuthenticatedClassResult" type="tns:IntraAuthenticated"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:complexType name="IntraAuthenticated">
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="ResultCode" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="ResultMessage" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="ExpiredDay" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="IsUserExpired" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="IsAccountLocked" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="accountExpires" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="isLockoutTime" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="isUserPwdExpired" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserCName" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserEmpid" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserId" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserUnitName" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserUnitId" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserBranchName" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserBranchId" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserDeptName" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserDeptId" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserFullDeptName" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserFullUnitName" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserEmail" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="UserEmpBirth" type="s:string"/>
+<s:element minOccurs="0" maxOccurs="1" name="IsFifteenSalary" type="s:string"/>
+</s:sequence>
+</s:complexType>
+</s:schema>
+</wsdl:types>
+<wsdl:message name="IsAuthenticatedSoapIn">
+<wsdl:part name="parameters" element="tns:IsAuthenticated"/>
+</wsdl:message>
+<wsdl:message name="IsAuthenticatedSoapOut">
+<wsdl:part name="parameters" element="tns:IsAuthenticatedResponse"/>
+</wsdl:message>
+<wsdl:message name="AD_IsAuthenticatedSoapIn">
+<wsdl:part name="parameters" element="tns:AD_IsAuthenticated"/>
+</wsdl:message>
+<wsdl:message name="AD_IsAuthenticatedSoapOut">
+<wsdl:part name="parameters" element="tns:AD_IsAuthenticatedResponse"/>
+</wsdl:message>
+<wsdl:message name="Intranet_IsAuthenticatedSoapIn">
+<wsdl:part name="parameters" element="tns:Intranet_IsAuthenticated"/>
+</wsdl:message>
+<wsdl:message name="Intranet_IsAuthenticatedSoapOut">
+<wsdl:part name="parameters" element="tns:Intranet_IsAuthenticatedResponse"/>
+</wsdl:message>
+<wsdl:message name="IsAuthenticatedClassSoapIn">
+<wsdl:part name="parameters" element="tns:IsAuthenticatedClass"/>
+</wsdl:message>
+<wsdl:message name="IsAuthenticatedClassSoapOut">
+<wsdl:part name="parameters" element="tns:IsAuthenticatedClassResponse"/>
+</wsdl:message>
+<wsdl:portType name="wsSKL_AuthenticationSoap">
+<wsdl:operation name="IsAuthenticated">
+<wsdl:input message="tns:IsAuthenticatedSoapIn"/>
+<wsdl:output message="tns:IsAuthenticatedSoapOut"/>
+</wsdl:operation>
+<wsdl:operation name="AD_IsAuthenticated">
+<wsdl:input message="tns:AD_IsAuthenticatedSoapIn"/>
+<wsdl:output message="tns:AD_IsAuthenticatedSoapOut"/>
+</wsdl:operation>
+<wsdl:operation name="Intranet_IsAuthenticated">
+<wsdl:input message="tns:Intranet_IsAuthenticatedSoapIn"/>
+<wsdl:output message="tns:Intranet_IsAuthenticatedSoapOut"/>
+</wsdl:operation>
+<wsdl:operation name="IsAuthenticatedClass">
+<wsdl:input message="tns:IsAuthenticatedClassSoapIn"/>
+<wsdl:output message="tns:IsAuthenticatedClassSoapOut"/>
+</wsdl:operation>
+</wsdl:portType>
+<wsdl:binding name="wsSKL_AuthenticationSoap" type="tns:wsSKL_AuthenticationSoap">
+<soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+<wsdl:operation name="IsAuthenticated">
+<soap:operation soapAction="http://tempuri.org/IsAuthenticated" style="document"/>
+<wsdl:input>
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="AD_IsAuthenticated">
+<soap:operation soapAction="http://tempuri.org/AD_IsAuthenticated" style="document"/>
+<wsdl:input>
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="Intranet_IsAuthenticated">
+<soap:operation soapAction="http://tempuri.org/Intranet_IsAuthenticated" style="document"/>
+<wsdl:input>
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="IsAuthenticatedClass">
+<soap:operation soapAction="http://tempuri.org/IsAuthenticatedClass" style="document"/>
+<wsdl:input>
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+</wsdl:binding>
+<wsdl:binding name="wsSKL_AuthenticationSoap12" type="tns:wsSKL_AuthenticationSoap">
+<soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+<wsdl:operation name="IsAuthenticated">
+<soap12:operation soapAction="http://tempuri.org/IsAuthenticated" style="document"/>
+<wsdl:input>
+<soap12:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap12:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="AD_IsAuthenticated">
+<soap12:operation soapAction="http://tempuri.org/AD_IsAuthenticated" style="document"/>
+<wsdl:input>
+<soap12:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap12:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="Intranet_IsAuthenticated">
+<soap12:operation soapAction="http://tempuri.org/Intranet_IsAuthenticated" style="document"/>
+<wsdl:input>
+<soap12:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap12:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="IsAuthenticatedClass">
+<soap12:operation soapAction="http://tempuri.org/IsAuthenticatedClass" style="document"/>
+<wsdl:input>
+<soap12:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap12:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+</wsdl:binding>
+<wsdl:service name="wsSKL_Authentication">
+<wsdl:port name="wsSKL_AuthenticationSoap" binding="tns:wsSKL_AuthenticationSoap">
+<soap:address location="https://t-ws.skl.com.tw/RequirementWebService/wsSKL_Authentication.asmx"/>
+</wsdl:port>
+<wsdl:port name="wsSKL_AuthenticationSoap12" binding="tns:wsSKL_AuthenticationSoap12">
+<soap12:address location="https://t-ws.skl.com.tw/RequirementWebService/wsSKL_Authentication.asmx"/>
+</wsdl:port>
+</wsdl:service>
+</wsdl:definitions>
