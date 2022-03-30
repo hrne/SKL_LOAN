@@ -983,6 +983,7 @@ public class L3420 extends TradeBuffer {
 			if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
 				isAllClose = true;
 			}
+			tFacMain.setAdvanceCloseCode(parse.stringToInteger(iAdvanceCloseCode));
 		} else {
 			if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
 				isAllClose = true;
@@ -991,6 +992,7 @@ public class L3420 extends TradeBuffer {
 			if (tFacMain.getRecycleCode().equals("1")) {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().add(wkPrincipal));
 			}
+			tFacMain.setAdvanceCloseCode(0);
 		}
 		try {
 			facMainService.update(tFacMain);

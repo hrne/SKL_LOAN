@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +30,8 @@ public class L5811 extends TradeBuffer {
 		MySpring.newTask("L5811Batch", this.txBuffer, titaVo);
 
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
-
+		
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
+	}	
 }
