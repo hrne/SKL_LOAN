@@ -113,7 +113,8 @@ public class L2064 extends TradeBuffer {
 				wkMrk = t.getSlipNote();
 			}
 			// 最後一筆 或 與下筆不同資料時塞入tota
-			if (i == lAcReceivable.size() || !wkRvNo.equals(lAcReceivable.get(i).getRvNo().substring(0, 9))) {
+			if (i == lAcReceivable.size() || t.getFacmNo() != lAcReceivable.get(i).getFacmNo()
+					|| !wkRvNo.equals(lAcReceivable.get(i).getRvNo().substring(0, 9))) {
 
 				OccursList occursList = new OccursList();
 

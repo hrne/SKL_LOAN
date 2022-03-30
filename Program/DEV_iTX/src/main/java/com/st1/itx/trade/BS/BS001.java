@@ -13,13 +13,11 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcMain;
-import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.EmpDeductSchedule;
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcMainService;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.EmpDeductScheduleService;
 import com.st1.itx.db.service.TxBizDateService;
@@ -83,9 +81,6 @@ public class BS001 extends TradeBuffer {
 	public TxBizDateService txBizDateService;
 
 	@Autowired
-	public CdCodeService cdCodeService;
-
-	@Autowired
 	public EmpDeductScheduleService empDeductScheduleService;
 
 	@Autowired
@@ -126,7 +121,6 @@ public class BS001 extends TradeBuffer {
 		// commitEnd
 		this.batchTransaction.commit();
 
-
 		/*---------- Step 4.  啟動背景作業 -----------------------------------*/
 
 		// 啟動背景作業－BS004 新增應處理明細－員工資料異動更新
@@ -134,10 +128,10 @@ public class BS001 extends TradeBuffer {
 
 		// 啟動背景作業－BS005 新增應處理明細－預約撥款到期
 		MySpring.newTask("BS005", this.txBuffer, titaVo);
-		
+
 		// 啟動背景作業－BS006 新增應處理明細－支票兌現檢核
 		MySpring.newTask("BS006", this.txBuffer, titaVo);
-		
+
 		// 啟動背景作業－BS007 新增應處理明細－未齊件到期通知
 		MySpring.newTask("BS007", this.txBuffer, titaVo);
 
@@ -154,7 +148,7 @@ public class BS001 extends TradeBuffer {
 
 		// 啟動背景作業－ BS020 新增整批入帳明細－暫收抵繳期款
 		MySpring.newTask("BS020", this.txBuffer, titaVo);
-		
+
 		// 啟動背景作業－ BS050 未齊件到期寄發Email通知
 		MySpring.newTask("BS050", this.txBuffer, titaVo);
 
@@ -257,13 +251,15 @@ public class BS001 extends TradeBuffer {
 
 		if (slEmpDeductSchedule != null) {
 			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
-				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
-						titaVo);
-				if (tCdCode != null) {
-					tTxToDoDetail = new TxToDoDetail();
-					tTxToDoDetail.setItemCode("L4510" + tCdCode.getItem().substring(0, 1));
-					txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
+				String itemCode = "";
+				if ("4".equals(tEmpDeductSchedule.getAgType1()) || "5".equals(tEmpDeductSchedule.getAgType1())) {
+					itemCode = "L45101";
+				} else {
+					itemCode = "L45102";
 				}
+				tTxToDoDetail = new TxToDoDetail();
+				tTxToDoDetail.setItemCode(itemCode);
+				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 			}
 		}
 		/* 5. 員工扣薪日程表的入帳日期= 本日，員工扣薪入帳作業 */

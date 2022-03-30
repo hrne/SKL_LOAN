@@ -145,11 +145,33 @@ C(5,#FdCode,*,T(F,@Code,1),T(F,@Code,0))
 C(5,#FdItem,*,T(F,@Item,1),T(F,@Item,0))
 C(5,#FdEnable,*,T(F,@Enable,1),T(F,@Enable,0))
 
+!調RIM確認執行櫃員是否有管理權限
+#TlrNo=X,6,S
+T(4,TLRNO$)
+
+#FunCodeTmp=A,1,S
+
+!5:查詢
+!L6R20吃FunCode, 但這裡真的只想查詢AdminFg而非新增
+!先用一個Tmp存原有的FunCode
+!以便傳5進去
+#RIM_L6R20=A,1,S
+E(0,@FunCodeTmp,#FunCode)
+E(0,@FunCode,5)
+RESET_RIM(#RIM_L6R20,L6R20)
+S(L6R20,01,#FunCode,#TlrNo,#END)
+R(1,L6R20)
+E(0,@FunCode,#FunCodeTmp)
+
+!變更者是否為管理者
+#IsAdmin=A,1,S
+
 !代碼檔代號
 #DefCode=x,20,I
 C(3,#CHAIN,1,C(3,#FunCode,1,$,s),$)
 @T(3,@DefItem,)
 V(7)
+C(5,#DefCode,CodeType,C(3,#IsAdmin,1,$,V(P,無管理者權限不可新增代碼檔代號)),$)
 C(5,#DefCode,CodeType,INVOKEJS(SHOW,p1_6,1),INVOKEJS(SHOW,p1_6,0))
 
 #DefCodeH=X,80,S
@@ -271,6 +293,10 @@ T(3,[L6604] 各類代碼檔維護)
 
 TXFORM=L6604
 
+^
+
+TXFORM=L6R20
+#IsAdmin
 ^
 
 <include src="COM.icf::TRCTL.tom"/>

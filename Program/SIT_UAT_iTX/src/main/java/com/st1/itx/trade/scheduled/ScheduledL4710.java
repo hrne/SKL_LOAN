@@ -3,8 +3,6 @@ package com.st1.itx.trade.scheduled;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,19 +19,19 @@ import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.parse.Parse;
 
 @Component
 @Transactional(value = "transactionManager")
-public class ScheduledL4710 {
-	private static final Logger logger = LoggerFactory.getLogger(ScheduledL4710.class);
+public class ScheduledL4710 extends SysLogger {
 
 	@Autowired
-	public TxBuffer txBuffer;
+	TxBuffer txBuffer;
 
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
+	Parse parse;
 
 	/* 日期工具 */
 	@Autowired
@@ -43,10 +41,10 @@ public class ScheduledL4710 {
 	TxToDoDetailService txToDoDetailService;
 
 	@Autowired
-	public MakeFile makeFile;
+	MakeFile makeFile;
 
 	@Autowired
-	public TxToDoCom txToDoCom;
+	TxToDoCom txToDoCom;
 
 //	ScheduledL4710
 
@@ -60,13 +58,13 @@ public class ScheduledL4710 {
 		try {
 			this.ex();
 		} catch (LogicException e) {
-			logger.info(e.getMessage());
+			this.info(e.getMessage());
 		}
 	}
 
 	public void ex() throws LogicException {
-		logger.info("每日 14:30 啟動...");
-//		logger.info("每30 秒啟動...");
+		this.info("每日 14:30 啟動...");
+//		this.info("每30 秒啟動...");
 
 		TitaVo titaVo = new TitaVo();
 
@@ -81,57 +79,20 @@ public class ScheduledL4710 {
 
 		dateUtil.init();
 
-//		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		int index = titaVo.getReturnIndex();
-//		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		int limit = 500;
-
-		Slice<TxToDoDetail> sTxToDoDetail = null;
-
 //		以日曆日抓取假日檔判斷是否假日，非假日才執行
 		dateUtil.setDate_1(dateUtil.getNowIntegerForBC());
 		dateUtil.setDate_2(dateUtil.getNowIntegerForBC());
 
-		logger.info("dateUtil.getNowIntegerForBC()" + dateUtil.getNowIntegerForBC());
-		logger.info("dateUtil.isHoliDay()" + dateUtil.isHoliDay());
+		this.info("dateUtil.getNowIntegerForBC()" + dateUtil.getNowIntegerForBC());
+		this.info("dateUtil.isHoliDay()" + dateUtil.isHoliDay());
 
 		if (!dateUtil.isHoliDay()) {
-			List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("TEXT00", 0, 0, index, limit);
+			// 非假日:產製簡訊媒體檔、Email媒體檔
 
-			lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
+			makeMsgMedia(titaVo);
 
-			logger.info("txBuffer.getTxCom().getTbsdy() : " + txBuffer.getTxCom().getTbsdy());
-			logger.info("txBuffer.getTxCom().getNbsdy() : " + txBuffer.getTxCom().getNbsdy());
-
-//			temp path = D:\\tmp\\LNM56OP.txt
-			makeFile.open(titaVo, txBuffer.getTxCom().getTbsdy(), "0000", "L4710", "L4710" + "-簡訊媒體檔", "LNM56OP.txt", 2);
-
-			if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
-				for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
-//					1.產出
-					makeFile.put(tTxToDoDetail.getProcessNote());
-
-					logger.info("tTxToDoDetail : " + tTxToDoDetail.toString());
-
-//					2.回寫狀態
-					TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-					tTxToDoDetailId.setCustNo(tTxToDoDetail.getCustNo());
-					tTxToDoDetailId.setFacmNo(tTxToDoDetail.getFacmNo());
-					tTxToDoDetailId.setBormNo(tTxToDoDetail.getBormNo());
-					tTxToDoDetailId.setDtlValue(tTxToDoDetail.getDtlValue());
-					tTxToDoDetailId.setItemCode(tTxToDoDetail.getItemCode());
-
-					txToDoCom.setTxBuffer(txBuffer);
-					txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
-				}
-				long sno = makeFile.close();
-
-				logger.info("sno : " + sno);
-
-				makeFile.toFile(sno);
-			}
+			makeEmailMedia();
 		}
 		// 執行交易
 //		try {
@@ -139,5 +100,58 @@ public class ScheduledL4710 {
 //		} catch (LogicException e) {
 //			throw new LogicException(titaVo, "XXXXX", e.getMessage());
 //		}
+	}
+
+	private void makeMsgMedia(TitaVo titaVo) throws LogicException {
+
+		Slice<TxToDoDetail> sTxToDoDetail = null;
+
+		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
+
+		sTxToDoDetail = txToDoDetailService.detailStatusRange("TEXT00", 0, 0, 0, Integer.MAX_VALUE);
+
+		lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
+
+		this.info("txBuffer.getTxCom().getTbsdy() : " + txBuffer.getTxCom().getTbsdy());
+		this.info("txBuffer.getTxCom().getNbsdy() : " + txBuffer.getTxCom().getNbsdy());
+
+//			temp path = D:\\tmp\\LNM56OP.txt
+
+		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
+			makeFile.open(titaVo, txBuffer.getTxCom().getTbsdy(), "0000", "L4710", "L4710" + "-簡訊媒體檔", "LNM56OP.txt",
+					2);
+
+			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
+//					1.產出
+				makeFile.put(tTxToDoDetail.getProcessNote());
+
+				this.info("tTxToDoDetail : " + tTxToDoDetail.toString());
+
+//					2.回寫狀態
+				TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
+				tTxToDoDetailId.setCustNo(tTxToDoDetail.getCustNo());
+				tTxToDoDetailId.setFacmNo(tTxToDoDetail.getFacmNo());
+				tTxToDoDetailId.setBormNo(tTxToDoDetail.getBormNo());
+				tTxToDoDetailId.setDtlValue(tTxToDoDetail.getDtlValue());
+				tTxToDoDetailId.setItemCode(tTxToDoDetail.getItemCode());
+
+				txToDoCom.setTxBuffer(txBuffer);
+				txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
+			}
+			long sno = makeFile.close();
+
+			this.info("sno : " + sno);
+
+			// makeFile.toFile(sno);
+
+			// TODO: 自動上傳至FTP 待確認是否要做
+		} else {
+			this.info("簡訊媒體檔,本日無資料");
+		}
+
+	}
+
+	private void makeEmailMedia() {
+		// TODO: 參考L4711
 	}
 }

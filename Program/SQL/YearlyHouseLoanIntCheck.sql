@@ -21,6 +21,7 @@ create table "YearlyHouseLoanIntCheck" (
   "C3" varchar2(1),
   "C4" varchar2(1),
   "C5" varchar2(1),
+  "JsonFields" nvarchar2(300),
   "CreateDate" timestamp,
   "CreateEmpNo" varchar2(6),
   "LastUpdate" timestamp,
@@ -50,6 +51,7 @@ comment on column "YearlyHouseLoanIntCheck"."C2" is '一額度多撥款';
 comment on column "YearlyHouseLoanIntCheck"."C3" is '多額度多撥款';
 comment on column "YearlyHouseLoanIntCheck"."C4" is '借新還舊件';
 comment on column "YearlyHouseLoanIntCheck"."C5" is '清償件';
+comment on column "YearlyHouseLoanIntCheck"."JsonFields" is 'jason格式紀錄欄';
 comment on column "YearlyHouseLoanIntCheck"."CreateDate" is '建檔日期時間';
 comment on column "YearlyHouseLoanIntCheck"."CreateEmpNo" is '建檔人員';
 comment on column "YearlyHouseLoanIntCheck"."LastUpdate" is '最後更新日期時間';

@@ -624,4 +624,19 @@ public interface JobMainService {
    */
   public void Usp_Tx_TxHoliday_Ins(String EmpNo, TitaVo... titaVo);
 
+  /**
+   * Stored Procedure<br>
+   * 執行L5811產生國稅局申報檢核檔時
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param  YYYYMM int
+   * @param  StartMonth int
+   * @param  EndMonth int
+   * @param  CustNo int
+   * @param  AcctCode String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L9_YearlyHouseLoanIntCheck_Upd(int tbsdyf,  String empNo,int YYYYMM,int StartMonth,int EndMonth,int CustNo,String AcctCode, TitaVo... titaVo);
+
 }

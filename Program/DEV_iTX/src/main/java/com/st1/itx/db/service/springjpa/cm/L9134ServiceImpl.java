@@ -63,7 +63,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"AcNoCode\" ";
 		sql += "      , \"DrAmt\" ";
 		sql += "      , \"CrAmt\" ";
-		sql += "      , \"DrAmt\" - \"CrAmt\" AS \"DiffAmt\" ";
+		sql += "      , \"CrAmt\" - \"DrAmt\" AS \"DiffAmt\" ";
 		sql += " FROM rawData ";
 		sql += " ORDER BY \"AcDate\" ";
 		sql += "        , \"AcNoCode\" ";

@@ -441,10 +441,14 @@ public class LM036Report extends MakeReport {
 			if (badDebtMonth > 0) {
 
 				// 數量合計
-				int rowTemp = rowCursorMap.get(yearMonth);
-				int colTemp = columnCursorMap.get(badDebtMonth);
+				int rowTemp = rowCursorMap.get(yearMonth) == null ? 0 : rowCursorMap.get(yearMonth);
+				int colTemp = columnCursorMap.get(badDebtMonth) == null ? 0 : columnCursorMap.get(badDebtMonth);
 
-				makeExcel.setValue(rowTemp, colTemp, badDebtCounts, "#,##0");
+				this.info("row,col=" + rowTemp + "," + colTemp);
+				if (rowTemp != 0 && colTemp != 0) {
+					makeExcel.setValue(rowTemp, colTemp, badDebtCounts, "#,##0");
+
+				}
 
 			}
 
@@ -485,7 +489,7 @@ public class LM036Report extends MakeReport {
 
 				if (iMonth == 3 || iMonth == 6 || iMonth == 9 || iMonth == 12) {
 					String text = iYear + "年第" + textQ + "季";
-					info("text=" + text);
+					this.info("text=" + text);
 					makeExcel.setValue(47 + num, 2, text, "L"); // 逾90天時年月
 					num++;
 				}
@@ -501,7 +505,6 @@ public class LM036Report extends MakeReport {
 		}
 
 	}
-
 
 	private void setCollection(List<Map<String, String>> list) throws LogicException {
 
@@ -642,10 +645,10 @@ public class LM036Report extends MakeReport {
 			makeExcel.setValue(13, columnCursor, formatAmt(m.get("F8"), 0, 6)); // F8 自然人逾3~6期
 			makeExcel.setValue(14, columnCursor, formatAmt(m.get("F9"), 0, 6)); // F9 自然人催收
 			makeExcel.setValue(15, columnCursor, formatAmt(m.get("F10"), 0, 6)); // F10 自然人轉銷損失金額
-			makeExcel.setValue(16, columnCursor, doDivide(getTotal(m, 7, 8), getTotal(m, 5, 6, 7, 8), 4), "0.00%"); // 自然人逾放比
-																													// F7+F8
-																													// /
-																													// F5+F6+F7+F8
+			makeExcel.setValue(16, columnCursor, doDivide(getTotal(m, 8, 9), getTotal(m, 6, 7, 8, 9), 4), "0.00%"); // 自然人逾放比
+																													// F8+F9
+																													// 
+																													// F6+F7+F8+F9
 
 			// 總額
 			makeExcel.setValue(18, columnCursor, formatAmt(m.get("F11"), 0, 6)); // F11 總額正常
@@ -655,9 +658,9 @@ public class LM036Report extends MakeReport {
 			makeExcel.setValue(22, columnCursor, formatAmt(m.get("F15"), 0, 6)); // F15 轉銷損失金額
 			makeExcel.setValue(23, columnCursor, formatAmt(m.get("F16"), 0, 6)); // F16溢折價與催收費用
 			makeExcel.setValue(24, columnCursor, formatAmt(m.get("F17"), 0, 6)); // F17 放款總餘額
-			makeExcel.setValue(25, columnCursor, doDivide(getTotal(m, 11, 12), getTotal(m, 13), 4)); // 放款逾放比
-																										// F11+F12+溢折價 /
-																										// F13
+			makeExcel.setValue(25, columnCursor, doDivide(getTotal(m, 13, 14,16), getTotal(m, 17), 4), "0.00%"); // 放款逾放比
+																										// F13+F14+F16溢折價 /
+																										// F17
 
 			columnCursor++;
 		}

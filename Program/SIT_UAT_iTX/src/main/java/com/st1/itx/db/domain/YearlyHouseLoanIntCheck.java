@@ -26,7 +26,7 @@ public class YearlyHouseLoanIntCheck implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -855361955025937198L;
+	private static final long serialVersionUID = 5059159352145790530L;
 
 @EmbeddedId
   private YearlyHouseLoanIntCheckId yearlyHouseLoanIntCheckId;
@@ -111,6 +111,10 @@ public class YearlyHouseLoanIntCheck implements Serializable {
   // 清償件
   @Column(name = "`C5`", length = 1)
   private String c5;
+
+  // jason格式紀錄欄
+  @Column(name = "`JsonFields`", length = 300)
+  private String jsonFields;
 
   // 建檔日期時間
   @CreatedDate
@@ -522,6 +526,25 @@ public class YearlyHouseLoanIntCheck implements Serializable {
   }
 
 /**
+	* jason格式紀錄欄<br>
+	* 
+	* @return String
+	*/
+  public String getJsonFields() {
+    return this.jsonFields == null ? "" : this.jsonFields;
+  }
+
+/**
+	* jason格式紀錄欄<br>
+	* 
+  *
+  * @param jsonFields jason格式紀錄欄
+	*/
+  public void setJsonFields(String jsonFields) {
+    this.jsonFields = jsonFields;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -603,7 +626,7 @@ public class YearlyHouseLoanIntCheck implements Serializable {
     return "YearlyHouseLoanIntCheck [yearlyHouseLoanIntCheckId=" + yearlyHouseLoanIntCheckId + ", r1=" + r1 + ", r2=" + r2
            + ", r3=" + r3 + ", r4=" + r4 + ", r5=" + r5 + ", r6=" + r6 + ", r7=" + r7 + ", r8=" + r8
            + ", r10=" + r10 + ", r11=" + r11 + ", r12=" + r12 + ", c1=" + c1 + ", c2=" + c2 + ", c3=" + c3
-           + ", c4=" + c4 + ", c5=" + c5 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", c4=" + c4 + ", c5=" + c5 + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -583,11 +583,13 @@ public class L3410 extends TradeBuffer {
 			if (tFacMain.getRecycleCode().equals("1")) {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().subtract(wkPrincipal));
 			}
+			tFacMain.setAdvanceCloseCode(8);
 		} else {
 			tFacMain.setUtilAmt(tFacMain.getUtilAmt().add(wkPrincipal));
 			if (tFacMain.getRecycleCode().equals("1")) {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().add(wkPrincipal));
 			}
+			tFacMain.setAdvanceCloseCode(0);
 		}
 		try {
 			facMainService.update(tFacMain);

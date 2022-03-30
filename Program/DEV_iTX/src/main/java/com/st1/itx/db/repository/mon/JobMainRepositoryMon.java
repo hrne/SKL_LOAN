@@ -223,5 +223,9 @@ public interface JobMainRepositoryMon extends JpaRepository<JobMain, JobMainId> 
   @Procedure(value = "\"Usp_Tx_TxHoliday_Ins\"")
   public void uspTxTxholidayIns(String EmpNo);
 
+  // 執行L5811產生國稅局申報檢核檔時
+  @Procedure(value = "\"Usp_L9_YearlyHouseLoanIntCheck_Upd\"")
+  public void uspL9YearlyhouseloanintcheckUpd(int tbsdyf,  String empNo,int YYYYMM,int StartMonth,int EndMonth,int CustNo,String AcctCode);
+
 }
 

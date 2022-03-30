@@ -73,7 +73,8 @@ public class L2614ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    LEFT JOIN \"CustMain\"         cm ON cm.\"CustNo\" = ad.\"CustNo\""; 
 		sql += "    WHERE" ; 
 		sql += "    ff.\"OverdueDate\" >= :ioverduedate"; 
-		sql += "    AND ff.\"OverdueDate\" <= :ioverduedate"; 
+		sql += "    AND ff.\"OverdueDate\" <= :ioverduedate";
+		sql += "    AND ad.\"AcctCode\" is not null";
 		sql += "    ORDER BY"; 
 		sql += "    ad.\"TitaTxtNo\","; 
 		sql += "    ad.\"SlipNo\"";

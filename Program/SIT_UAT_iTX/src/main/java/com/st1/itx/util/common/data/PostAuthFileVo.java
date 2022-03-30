@@ -135,6 +135,7 @@ public class PostAuthFileVo extends FileVo {
 
 			if (i > (LastIndex - footerCounts)) {
 				// 設定頁尾欄位的擷取位置s
+				this.put("FootCreateDate", thisLine.substring(26, 34));
 				this.put("FootErrorCnt", thisLine.substring(34, 40));
 				this.put("FootSuccsCnt", thisLine.substring(40, 46));
 			}

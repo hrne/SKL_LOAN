@@ -10,23 +10,23 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.TxAuthGroup;
-import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.TxAuthority;
 import com.st1.itx.db.domain.TxAuthorityId;
 import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.service.TxAuthorityService;
 import com.st1.itx.db.service.TxTranCodeService;
+import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.menu.MenuBuilder;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L6403Batch")
 @Scope("prototype")
@@ -180,7 +180,7 @@ public class L6403Batch extends TradeBuffer {
 
 		}
 		// L3
-		for (int i = 1; i <= 50; i++) {
+		for (int i = 1; i <= 60; i++) {
 			String iTranNo = titaVo.get("ApcCode" + i);
 			if (iTranNo != null) {
 

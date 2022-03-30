@@ -1152,4 +1152,20 @@ em = null;
       jobMainRepos.uspTxTxholidayIns(EmpNo);
   }
 
+  @Override
+  public void Usp_L9_YearlyHouseLoanIntCheck_Upd(int tbsdyf,  String empNo,int YYYYMM,int StartMonth,int EndMonth,int CustNo,String AcctCode, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL9YearlyhouseloanintcheckUpd(tbsdyf,  empNo,YYYYMM,StartMonth,EndMonth,CustNo,AcctCode);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL9YearlyhouseloanintcheckUpd(tbsdyf,  empNo,YYYYMM,StartMonth,EndMonth,CustNo,AcctCode);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL9YearlyhouseloanintcheckUpd(tbsdyf,  empNo,YYYYMM,StartMonth,EndMonth,CustNo,AcctCode);
+   else
+      jobMainRepos.uspL9YearlyhouseloanintcheckUpd(tbsdyf,  empNo,YYYYMM,StartMonth,EndMonth,CustNo,AcctCode);
+  }
+
 }

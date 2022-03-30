@@ -27,6 +27,7 @@ import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.AchAuthFileVo;
 import com.st1.itx.util.common.data.PostAuthFileVo;
 import com.st1.itx.util.date.DateUtil;
@@ -77,14 +78,30 @@ public class L4414 extends TradeBuffer {
 
 	@Autowired
 	BankAuthActCom bankAuthActCom;
+	@Autowired
+	MakeReport makeReport;
+	
 
 	// 上傳預設目錄
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
 
 	private int cntA = 0;
+	private int finishCntA = 0;
+	private int cancelCntA = 0;
 	private int cntB = 0;
+	private int finishCntB = 0;
+	private int cancelCntB = 0;
 	private int cntC = 0;
+	private int finishCntC = 0;
+	private int cancelCntC = 0;
+	private int headRocTxday = 0;
+	private int footCreateDateC = 0;
+	
+	
+	
+	private String nowDate;
+	private String nowTime;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -98,9 +115,18 @@ public class L4414 extends TradeBuffer {
 		int postCnt = 0;
 
 		cntA = 0;
+		finishCntA = 0;
+		cancelCntA = 0;
+		headRocTxday = 0;
 		cntB = 0;
+		finishCntB = 0;
+		cancelCntB = 0;
 		cntC = 0;
-
+		finishCntC = 0;
+		cancelCntC = 0;
+		footCreateDateC = 0;
+		
+		
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
@@ -170,17 +196,40 @@ public class L4414 extends TradeBuffer {
 		}
 
 		// 編碼參數，設定為UTF-8 || big5
-
+		// 取當前日期時間
+		this.nowDate = makeReport.dDateUtil.getNowStringRoc();
+		this.nowTime = makeReport.dDateUtil.getNowStringTime();
+		String bcDate = makeReport.showBcDate(this.nowDate, 1);
+		String time = makeReport.showTime(this.nowTime);
+		
 		totaA.putParam("MSGID", "L444A");
-		totaA.putParam("OCntA", cntA);
+		totaA.putParam("OBcDateA", bcDate); // 日期
+		totaA.putParam("OTimeA", time); // 時間
+		totaA.putParam("OHeadRocTxdayA", headRocTxday); // 資料建檔日期
+		totaA.putParam("OCntA", cntA); // 總筆數
+		totaA.putParam("OTotalCntA", cntA); // 總筆數
+		totaA.putParam("OFinishCntA", finishCntA); // 成功筆數
+		totaA.putParam("OCancelCntA", cancelCntA); // 失敗筆數
 		this.addList(this.totaA);
 
 		totaB.putParam("MSGID", "L444B");
-		totaB.putParam("OCntB", cntB);
+		totaB.putParam("OBcDateB", bcDate); // 日期
+		totaB.putParam("OTimeB", time); // 時間
+		totaB.putParam("OHeadRocTxdayB", headRocTxday); // 資料建檔日期
+		totaB.putParam("OCntB", cntB); // 總筆數
+		totaB.putParam("OTotalCntB", cntB); // 總筆數
+		totaB.putParam("OFinishCntB", finishCntB); // 成功筆數
+		totaB.putParam("OCancelCntB", cancelCntB); // 失敗筆數
 		this.addList(this.totaB);
 
 		totaC.putParam("MSGID", "L444C");
-		totaC.putParam("OCntC", cntC);
+		totaC.putParam("OBcDateC", bcDate); // 日期
+		totaC.putParam("OTimeC", time); // 時間
+		totaC.putParam("OFootCreateDateC", footCreateDateC); // 資料建檔日期
+		totaC.putParam("OCntC", cntC); // 總筆數
+		totaC.putParam("OTotalCntC", cntC); // 總筆數
+		totaC.putParam("OFinishCntC", finishCntC); // 成功筆數
+		totaC.putParam("OCancelCntC", cancelCntC); // 失敗筆數
 		this.addList(this.totaC);
 
 		return this.sendList();
@@ -189,7 +238,7 @@ public class L4414 extends TradeBuffer {
 	private void setAchAuthLog(AchAuthFileVo achAuthFileVo, TitaVo titaVo) throws LogicException {
 
 		// 取值
-//		int retrDate = parse.stringToInteger("" + achAuthFileVo.get("RetrDate"));
+		 headRocTxday = parse.stringToInteger("" + achAuthFileVo.get("HeadRocTxday"));
 
 		ArrayList<OccursList> uploadFile = achAuthFileVo.getOccursList();
 
@@ -239,6 +288,9 @@ public class L4414 extends TradeBuffer {
 						if ("0".equals("" + tempOccursList.get("AuthStatus"))) {
 							this.info("Update StampFinishDate !!!");
 							tAchAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+
+						} else {
+
 						}
 
 						try {
@@ -275,6 +327,8 @@ public class L4414 extends TradeBuffer {
 //			10	FootSuccsCnt    成功筆數		40-46	9(6)	初始值為0，回送時使用	
 			int footErrorCnt = parse.stringToInteger("" + postAuthFileVo.get("FootErrorCnt"));
 			int footSuccsCnt = parse.stringToInteger("" + postAuthFileVo.get("FootSuccsCnt"));
+			footCreateDateC = parse.stringToInteger("" + postAuthFileVo.get("FootCreateDate"))-19110000;
+			
 			if (footErrorCnt + footSuccsCnt == 0) {
 				throw new LogicException("E0014", "請確認是否為提回檔案");
 			}
@@ -302,6 +356,10 @@ public class L4414 extends TradeBuffer {
 					if ("00".equals(FormatUtil.pad9("" + tempOccursList.get("AuthErrorCode"), 2))) {
 						this.info("Update StampFinishDate !!!");
 						tPostAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+
+						finishCntC++;
+					}else {
+						cancelCntC++;
 					}
 					// 變更帳號檔
 					postToBankAuthAct(tPostAuthLog, titaVo);
@@ -325,6 +383,8 @@ public class L4414 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException("E0007", "L4414 PostAuthLog update " + e.getErrorMsg());
 					}
+
+					finishCntC++;
 					break;
 
 				case "3": // 3.郵局終止
@@ -364,6 +424,7 @@ public class L4414 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException("E0005", "L4414 PostAuthLog " + e.getErrorMsg());
 					}
+					finishCntC++;
 
 					break;
 
@@ -381,6 +442,8 @@ public class L4414 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException("E0005", "L4414 PostAuthLog " + e.getErrorMsg());
 					}
+
+					finishCntC++;
 					break;
 				}
 
@@ -415,7 +478,6 @@ public class L4414 extends TradeBuffer {
 		if (result != null) {
 			result = result.trim();
 		}
-
 		return result;
 	}
 
@@ -429,6 +491,11 @@ public class L4414 extends TradeBuffer {
 			occursList.putParam("OOCreateFlagA", tAchAuthLog.getCreateFlag());
 
 			this.totaA.addOccursList(occursList);
+			if ("0".equals(tAchAuthLog.getAuthStatus())) {
+				finishCntA++;
+			} else {
+				cancelCntA++;
+			}
 			cntA++;
 		} else {
 			OccursList occursList = new OccursList();
@@ -440,6 +507,12 @@ public class L4414 extends TradeBuffer {
 			occursList.putParam("OOCreateFlagB", tAchAuthLog.getCreateFlag());
 
 			this.totaB.addOccursList(occursList);
+
+			if ("0".equals(tAchAuthLog.getAuthStatus())) {
+				finishCntB++;
+			} else {
+				cancelCntB++;
+			}
 			cntB++;
 		}
 	}

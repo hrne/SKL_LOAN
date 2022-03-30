@@ -181,8 +181,9 @@ C(3,#OOReturnDate,0,s,E(0,#OOReturnDate))
 ! 歸還人
 #OOReturnEmpName=x,20,O
 ! 用途
-#OOUsageCode=A,2,O
+#OOUsageCode=X,2,O
 #OOUsageCodeX=X,4,O
+T(2,)
 T(H,#OOUsageCode,#UsageCodeHelp)
 
 ! 正本/影本
