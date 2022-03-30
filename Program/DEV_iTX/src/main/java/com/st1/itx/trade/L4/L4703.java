@@ -123,12 +123,13 @@ public class L4703 extends TradeBuffer {
 		titaVo.putParam("AcctDate", this.getTxBuffer().getTxCom().getTbsdy());
 		titaVo.putParam("UnpaidCond", 2); // 2 滯繳日數
 		titaVo.putParam("UnpaidDaySt", 7);
-		titaVo.putParam("UnpaidDayEd", 30);
+		titaVo.putParam("UnpaidDayEd", 999);
 		titaVo.putParam("UnpaidTermSt", 0);
 		titaVo.putParam("UnpaidTermEd", 0);
 		titaVo.putParam("RepayType", 0);
 		titaVo.putParam("CustType", 0);
 		titaVo.putParam("NoticeFlag", 1);
+		titaVo.putParam("PrinBalance", 0);
 
 		switch (functionCode) {
 //		1.個別
@@ -190,17 +191,6 @@ public class L4703 extends TradeBuffer {
 					}
 				}
 
-//				TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-//
-//				tTxToDoDetailId.setItemCode("RPDL00");
-//				tTxToDoDetailId.setCustNo(0);
-//				tTxToDoDetailId.setFacmNo(0);
-//				tTxToDoDetailId.setBormNo(0);
-//				tTxToDoDetailId.setItemCode(" ");
-//
-//				TxToDoCom tTxToDoCom = new TxToDoCom();
-//
-//				tTxToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 			}
 			break;
 		default:
@@ -214,6 +204,7 @@ public class L4703 extends TradeBuffer {
 		this.info("RepayType ... " + titaVo.getParam("RepayType"));
 		this.info("CustType ... " + titaVo.getParam("CustType"));
 		this.info("NoticeFlag ... " + titaVo.getParam("NoticeFlag"));
+		this.info("PrinBalance ... " + titaVo.getParam("PrinBalance"));
 
 //		滯繳明細表 通知方式為書信者，於9703產出
 //		l9703p.run(titaVo);

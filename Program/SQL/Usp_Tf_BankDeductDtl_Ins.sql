@@ -20,7 +20,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "BankDeductDtl"
-    WITH PDM AS (
+    WITH rawPDM AS (
       SELECT "MediaDate"
             ,"MediaSeq"
             ,"CustNo"
@@ -42,6 +42,20 @@ BEGIN
                  ORDER BY "MediaSeq" desc
              ) AS "Seq"
       FROM "PostDeductMedia"
+    )
+    , PDM AS (
+      SELECT "MediaDate"
+            ,"MediaSeq"
+            ,"CustNo"
+            ,"FacmNo"
+            ,"RepayType"
+            ,"TransDate"
+            ,"RepayAcctNo"
+            ,"RepayAmt"
+            ,"AcDate"
+            ,"IntEndDate"
+      FROM rawPDM
+      WHERE "Seq" = 1
     )
     , rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
@@ -128,7 +142,6 @@ BEGIN
                        AND PDM."RepayAmt" = MBK."MBKAMT"
                        AND PDM."AcDate" = MBK."TRXDAT"
                        AND PDM."IntEndDate" = MBK."TRXIED"
-                       AND PDM."Seq" = 1
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局
       AND CASE -- 排除一筆在AH$MBKP成功扣到,在LA$MBKP沒扣到火險費的資料
             WHEN MBK."TRXIDT" = 20180813
@@ -144,7 +157,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "BankDeductDtl"
-    WITH "ADM" AS (
+    WITH rawADM AS (
       SELECT "MediaDate"
             ,"MediaKind"
             ,"CustNo"
@@ -165,6 +178,19 @@ BEGIN
                  ORDER BY "MediaSeq" desc
              ) AS "Seq"
       FROM "AchDeductMedia"
+    )
+    , ADM AS (
+      SELECT "MediaDate"
+            ,"MediaKind"
+            ,"CustNo"
+            ,"FacmNo"
+            ,"RepayType"
+            ,"RepayAmt"
+            ,"RepayAcctNo"
+            ,"MediaSeq"
+            ,"IntEndDate"
+      FROM rawADM
+      WHERE "Seq" = 1
     )
     , rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
@@ -262,7 +288,6 @@ BEGIN
                        AND ADM."RepayAmt" = MBK."MBKAMT"
                        AND ADM."RepayAcctNo" = MBK."LMSPCN"
                        AND ADM."IntEndDate" = MBK."TRXIED"
-                       AND ADM."Seq" = 1
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = MBK."CHGEMP"
     -- WHERE NVL(MBK.MBKCDE,' ') = 'Y'
     ;

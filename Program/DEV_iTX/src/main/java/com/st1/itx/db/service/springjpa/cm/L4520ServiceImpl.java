@@ -169,7 +169,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  \"EmpDeductDtl\"   ed ";
 		
 		sql += "  LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\"              ";
-		sql += "  LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"TitaTlrNo\"       ";
+		sql += "  LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"EmpNo\"       ";
 		
 		sql += "  LEFT JOIN tx1 ON tx1.\"CustNo\" = ed.\"CustNo\"";
 		sql += "                       AND tx1.\"AcDate\" = ed.\"Acdate\"";  
@@ -194,7 +194,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    AND ed.\"ProcCode\" = :ProcCode";
 		}
 		
-		sql += "  ORDER BY  ed.\"TitaTxtNo\", ed.\"RepayCode\", ed.\"AcctCode\", ed.\"ProcCode\", ed.\"TitaTxtNo\", ed.\"CustNo\", tx2.\"IntStartDate\", tx2.\"IntEndDate\"";
+		sql += "  ORDER BY   ed.\"RepayCode\", ed.\"AcctCode\", ed.\"ProcCode\", ed.\"CustNo\", tx2.\"IntStartDate\", tx2.\"IntEndDate\"";
 
 		this.info("sql=" + sql);
 		Query query;

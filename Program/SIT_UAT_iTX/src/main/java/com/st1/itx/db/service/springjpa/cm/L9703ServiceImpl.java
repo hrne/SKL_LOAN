@@ -48,7 +48,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
-
+		int prinBalance = parse.stringToInteger(titaVo.getParam("PrinBalance"));
+		
 		this.info("L9703 queryForDetail");
 		this.info("L9703 icustno    = " + icustno);
 		this.info("L9703 ifacmno    = " + ifacmno);
@@ -57,7 +58,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9703 ed         = " + ed);
 		this.info("L9703 repay      = " + repay);
 		this.info("L9703 custType   = " + custType);
-
+		this.info("L9703 prinBalance   = " + prinBalance);
+		
 		String sql = "SELECT CC.\"CityItem\" F0";
 		sql += "            ,\"Fn_GetEmpName\"(CC.\"AccCollPsn\",1) AS F1";
 		sql += "            ,D.\"CustNo\" AS F2";
@@ -88,7 +90,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   AND F.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "            WHERE L.\"CaseCode\" = 1";
 		sql += "              AND L.\"Status\" IN (0, 4)";
-		sql += queryCondition(icustno, ifacmno, unpay, repay, custType);// 在子查詢的where篩選
+		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance);// 在子查詢的where篩選
 		sql += "           ) D";
 		sql += "      LEFT JOIN \"ClFac\" F ON F.\"CustNo\" = D.\"CustNo\"";
 		sql += "                           AND F.\"FacmNo\" = D.\"FacmNo\"";
@@ -134,11 +136,13 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 				query.setParameter("repay", repay);
 			}
 		}
-
+		
+		query.setParameter("prinBalance", prinBalance); 
+		
 		return this.convertToMap(query);
 	}
 
-	private String queryCondition(String icustno, String ifacmno, String unpay, String repay, String custType) {
+	private String queryCondition(String icustno, String ifacmno, String unpay, String repay, String custType, int prinBalance) {
 
 		String condition = " ";
 
@@ -187,6 +191,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 		}
 
+		condition += "  AND  L.\"PrinBalance\" >= :prinBalance";
+		
 		return condition;
 	}
 
@@ -210,7 +216,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
-
+		int prinBalance = parse.stringToInteger(titaVo.getParam("PrinBalance"));
+		
 		this.info("L9703 queryForNotice");
 		this.info("L9703 iCUSTNO    = " + iCUSTNO);
 		this.info("L9703 iFACMNO    = " + iFACMNO);
@@ -219,7 +226,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9703 ed         = " + ed);
 		this.info("L9703 repay      = " + repay);
 		this.info("L9703 custType   = " + custType);
-
+		this.info("L9703 prinBalance   = " + prinBalance);
+		
 		String sql = " SELECT *";
 		sql += "       FROM (SELECT ' ' F0";
 		sql += "                   ,Cl.\"CityCode\" F1";
@@ -274,7 +282,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                          AND F.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "                   WHERE M.\"Status\" = 0";
 		sql += "                     AND NVL(L.\"OvduDays\",0) >= 1";
-		sql += queryCondition(iCUSTNO, iFACMNO, unpay, repay, custType);
+		sql += queryCondition(iCUSTNO, iFACMNO, unpay, repay, custType, prinBalance);
 
 		int custno = parse.stringToInteger(iCUSTNO);
 		int facmno = parse.stringToInteger(iFACMNO);
@@ -339,7 +347,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 		}
 		query.setParameter("tlrno", tlrno);
-
+		query.setParameter("prinBalance", prinBalance); 
+		
 		return this.convertToMap(query);
 	}
 

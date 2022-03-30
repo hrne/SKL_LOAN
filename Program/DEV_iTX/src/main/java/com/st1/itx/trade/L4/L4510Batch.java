@@ -649,6 +649,10 @@ public class L4510Batch extends TradeBuffer {
 			tEmpDeductDtlId.setPerfMonth(month);
 			tEmpDeductDtlId.setProcCode("" + tmp.getProcCode());
 
+			
+			int AchRepayCode = tmp.getAchRepayCode();
+			
+			
 //			QC.623 非15薪扣款代碼應為滯繳件
 			// MediaDate, MediaKind由最後update移至
 			if (tmp.getFlag() == 2) {
@@ -659,6 +663,21 @@ public class L4510Batch extends TradeBuffer {
 				tEmpDeductDtl.setMediaKind("4");
 			}
 			
+			switch(AchRepayCode) {
+			case 1:
+			case 2:
+			case 3:
+				break;
+			case 5: // 火險費
+				tEmpDeductDtlId.setRepayCode("9");
+				break;
+			case 4:
+			case 6:
+			case 7:
+			case 9: // 帳管費
+				tEmpDeductDtlId.setRepayCode("8");
+				break;
+			}
 			
 			tEmpDeductDtlId.setAcctCode("000"); // 費用類
 			

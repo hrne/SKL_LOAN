@@ -48,6 +48,7 @@ E(0,0)
 ["#R5+@滯繳日數",#UnpaidDaySt,"~",#UnpaidDayEd],
 ["#R6+@繳款方式",#RepayType,#RepayTypex],
 ["#R7+@戶別",#CustType,#CustTypex],
+["#R8+@本金餘額",#PrinBalance,"元以上"],
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -58,7 +59,7 @@ E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
 ! 必輸欄位
-##loop{times:8,i:1}
+##loop{times:9,i:1}
 #R{i}=X,1,L
 INVOKEJS(SHOW,#R{i},0)
 K(LIGHT,#R{i},TXTRED,0)
@@ -74,7 +75,7 @@ T(3,@R7,*)
 #FdMsg=X,1,L
 #Msg=x,20.100,L
 K(LIGHT,#Msg,TXTRED,0)
-INVOKEJS(SHOW,p1,8,8,0)
+INVOKEJS(SHOW,p1,9,9,0)
 
 ! UnpaidCond=1 滯繳期數為必輸欄位,UnpaidCond=2 滯繳日數為必輸欄位
 #HIGHLIGHT_AFTER_UnpaidCond=@,1,S
@@ -222,6 +223,9 @@ V(H,#CustTypeHelp)
 #CustTypex=X,6,L
 T(H,#CustType,#CustTypeHelp)
 
+#PrinBalance=m,14,I
+
+
 <include src="ROM.icf::L1R20.dec"/>
 
 
@@ -240,7 +244,7 @@ T(2,@Msg,#L1R20Msg)
 
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
-INVOKEJS(SHOW,p1,8,8,#ShowMsg)
+INVOKEJS(SHOW,p1,9,9,#ShowMsg)
 
 </sub>
 
@@ -280,6 +284,7 @@ T(3,[L9703] 滯繳客戶明細表)
 #UnpaidDayEd
 #RepayType
 #CustType
+#PrinBalance
 </sub>
 
 

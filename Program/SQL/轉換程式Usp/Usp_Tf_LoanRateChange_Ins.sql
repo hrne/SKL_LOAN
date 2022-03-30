@@ -51,7 +51,7 @@ BEGIN
           ,R."EffectDate"                 AS "EffectDate"          -- 生效日期 DECIMALD 8 0
           ,CASE
              WHEN R."IncrRateEffectDate" > 0 
-                  AND R."IncrRateEffectDate" = R."EffectDate"
+                  AND R."IncrRateEffectDate" <= R."EffectDate"
                   -- 有建加碼利率者,放2
              THEN 2
            ELSE 0 END                     AS "Status"              -- 狀態 DECIMAL 1 0             Lai 2021/1/14
@@ -97,6 +97,7 @@ BEGIN
           WHERE NVL(LI."IRTADT",0) > 0 -- 篩選放款戶利率檔生效日期不為0者
             AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
             AND LI."IRTADT" >= LM."LMSLLD" -- 基本利率生效日期>=撥款日
+            AND NVL(LA."ASCADT",99999999) >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
          ) R
     LEFT JOIN "FacProd" FP ON FP."ProdNo" = R."IRTBCD"
     WHERE R."Seq" = 1 -- 加碼利率生效日早於適用利率生效日且最近的一筆
@@ -158,6 +159,7 @@ BEGIN
         AND NVL(FP."BaseRateCode",'00') IN ('01','02')
         AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
         AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
+        AND LA."ASCADT" > "TbsDyF" -- 未來的加碼利率
     )
     SELECT "LMSACN"                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,"LMSAPN"                       AS "FacmNo"              -- 額度編號 DECIMAL 3 0

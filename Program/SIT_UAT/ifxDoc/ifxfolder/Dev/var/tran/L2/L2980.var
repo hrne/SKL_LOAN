@@ -498,10 +498,12 @@ R(1,L3R09)
 #FdNextAdjRate=X,2,L
 
 #NextAdjRate=n,2.4,L
-E(0,0)
-!E(0,#L3r09BaseRate)
+!E(0,0)
+C(3,#L3r09BaseRate,0,S,$)
+E(0,#L3r09BaseRate)
 
 #NextAdjRateDate=D,7,L
+C(3,#L3r09BaseRate,0,S,$)
 E(0,#L3r02NextRateAdjDate)
 
 ! [門牌號碼]

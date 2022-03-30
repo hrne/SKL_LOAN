@@ -287,12 +287,17 @@ public class LM036Report extends MakeReport {
 
 			// 計算初貸年月件數
 			if (badDebtMonth > 0) {
-
+				
 				// 數量合計
-				int rowTemp = rowCursorMap.get(yearMonth);
-				int colTemp = columnCursorMap.get(badDebtMonth);
+				int rowTemp = rowCursorMap.get(yearMonth) == null ? 0 : rowCursorMap.get(yearMonth);
+				int colTemp = columnCursorMap.get(badDebtMonth) == null ? 0 : columnCursorMap.get(badDebtMonth);
 
-				makeExcel.setValue(rowTemp, colTemp, badDebtAmt, "#,##0");
+				this.info("row,col=" + rowTemp + "," + colTemp);
+				if (rowTemp != 0 && colTemp != 0) {
+//					makeExcel.setValue(rowTemp, colTemp, badDebtCounts, "#,##0");
+
+					makeExcel.setValue(rowTemp, colTemp, badDebtAmt, "#,##0");
+				}
 
 			}
 

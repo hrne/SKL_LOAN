@@ -3639,6 +3639,7 @@ TXFORM=L2R57
 #L2r58SyndFeeYearMonth=A,5,S
 #L2r58AllocationFreq=X,2,S
 #L2r58AllocationTimes=X,2,S
+#L2r58ClsCnt=A,2,S
 ##loop{times:50,i:1}
 #L2r58OYearMonth{i}=X,5,S
 #L2r58OAllocationAmt{i}=m,14.2,S
@@ -3659,6 +3660,7 @@ TXFORM=L2R58
 #L2r58SyndFeeYearMonth
 #L2r58AllocationFreq
 #L2r58AllocationTimes
+#L2r58ClsCnt
 ##loop{times:50,i:1}
 #L2r58OYearMonth{i}
 #L2r58OAllocationAmt{i}

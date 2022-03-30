@@ -255,11 +255,11 @@ public class L4520Report extends MakeReport {
 				this.print(0, 100, "");// 身分證字號
 			}
 
-			String AcDate = String.valueOf(parse.stringToInteger(tEmpDeductMedia.get(i).get("AcDate")) -19110000);
-			if(AcDate.length() == 7) {
-				this.print(0, 113, AcDate.substring(0,3) + "/" + AcDate.substring(3,5) + "/" + AcDate.substring(5,7));// 入帳日期
+			String EntryDate = String.valueOf(parse.stringToInteger(tEmpDeductMedia.get(i).get("EntryDate")) -19110000);
+			if(EntryDate.length() == 7) {
+				this.print(0, 113, EntryDate.substring(0,3) + "/" + EntryDate.substring(3,5) + "/" + EntryDate.substring(5,7));// 入帳日期
 			} else {
-				this.print(0, 113, AcDate.substring(0,2) + "/" + AcDate.substring(2,4) + "/" + AcDate.substring(4,6));// 入帳日期
+				this.print(0, 113, EntryDate.substring(0,2) + "/" + EntryDate.substring(2,4) + "/" + EntryDate.substring(4,6));// 入帳日期
 			}
 			
 			this.print(0, 124, Msg);// 作業結果

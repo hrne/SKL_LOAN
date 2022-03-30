@@ -786,13 +786,12 @@ public class TxBatchCom extends TradeBuffer {
 		if (tBatxDetail.getFacmNo() == 0) {
 			if (!"".equals(this.tTempVo.getParam("FacmNo"))) {
 				l3210TitaVo.putParam("FacmNo", this.tTempVo.getParam("FacmNo"));
-			} else if (!"".equals(this.tTempVo.getParam("OverRpFacmNo"))) {
-				l3210TitaVo.putParam("FacmNo", this.tTempVo.getParam("OverRpFacmNo"));
 			}
 		}
 		l3210TitaVo.putParam("EntryDate", tBatxDetail.getEntryDate());
 		l3210TitaVo.putParam("CurrencyCode", "TWD");
 		l3210TitaVo.putParam("TimTempAmt", tBatxDetail.getRepayAmt());
+		l3210TitaVo.putParam("TwTempAmt", tBatxDetail.getRepayAmt());
 		l3210TitaVo.putParam("TempReasonCode", iReasonCode);
 		l3210TitaVo.putParam("TempSourceCode", iSourceCode);
 		l3210TitaVo.putParam("AreaCode", "");
@@ -1032,7 +1031,7 @@ public class TxBatchCom extends TradeBuffer {
 			}
 
 			// 啟動背景作業－整批入帳完成(非整批入帳)
-			if (tBatxHead.getUnfinishCnt() == 0 && !"6".equals(tDetail.getProcStsCode())) {
+			if (tBatxHead.getUnfinishCnt() == 0 && "0".equals(tBatxHead.getBatxStsCode())) {
 				TitaVo bs401TitaVo = new TitaVo();
 				bs401TitaVo = (TitaVo) titaVo.clone();
 				bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核

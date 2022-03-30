@@ -50,7 +50,7 @@ public class L2R58 extends TradeBuffer {
 
 		AcReceivable tAcReceivable = new AcReceivable();
 		Slice<AcReceivable> slAcReceivable = null;
-
+		int clsCnt =0;
 		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iRvNo + "%", 0, Integer.MAX_VALUE,
 				titaVo);
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
@@ -95,6 +95,9 @@ public class L2R58 extends TradeBuffer {
 				occursList.putParam("L2r58OCloseFg", t.getClsFlag() == 1 ? "Y" : "");// 已銷記號
 				occursList.putParam("L2r58OReceivableFg", t.getReceivableFlag());// 已銷記號
 				wkRmk = t.getSlipNote();
+				if(t.getClsFlag()==1) {
+					clsCnt++;
+				}
 				this.totaVo.addOccursList(occursList);
 			}
 
@@ -108,6 +111,8 @@ public class L2R58 extends TradeBuffer {
 			this.totaVo.putParam("L2r58SyndFeeYearMonth", lAcReceivable.get(0).getRvNo().substring(10, 15));// 年月
 			this.totaVo.putParam("L2r58AllocationFreq", "0");// 攤提週期
 			this.totaVo.putParam("L2r58AllocationTimes", lAcReceivable.size());// 攤提次數
+			this.totaVo.putParam("L2r58ClsCnt", clsCnt);// 攤提次數
+			
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

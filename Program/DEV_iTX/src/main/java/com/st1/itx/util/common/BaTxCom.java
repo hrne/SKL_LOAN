@@ -89,7 +89,7 @@ public class BaTxCom extends TradeBuffer {
 	// 4.帳管費 5.火險費 6.契變手續費 7.法務費 => false
 	private boolean isPayAllFee = false;
 
-	// 未到期火險費用條件 0.全列已到期、1.續約保單起日 > 入帳月、2.續約保單起日 >=入帳日,
+	// 未到期火險費用條件 0.全列已到期、1.續約保單起日 > 入帳月
 	private int isUnOpenfireFee = 0;
 
 // isBatchRepay 是否為整批入帳
@@ -235,7 +235,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/**
-	 * 應繳試算 by 應繳日
+	 * 應繳試算 by 應繳日(員工扣薪，因應繳日與入帳日不同)
 	 * 
 	 * @param iEntryDate  入帳日
 	 * @param iPayIntDate 應繳日
@@ -264,19 +264,6 @@ public class BaTxCom extends TradeBuffer {
 			this.isPayAllFee = true; // 全部
 		} else {
 			this.isPayAllFee = false; // 部分
-		}
-		// isUnOpenfireFee 未到期火險費用條件
-// 還款類別                                                     未到期火險費用條件           火險費輸出欄說明
-// 03-結案, 99-費用全部                                0.全列已到期                      fireFee(全部)，unOpenfireFee(續約保單起日>=入帳日)，fireFee內含unOpenfireFee
-// 01-期款、02-部分部分償還 、05-火險費     1.續約保單起日 > 入帳月    fireFee(續約保單起日 <= 入帳月)、 unOpenfireFee(續約保單起日 > 入帳月)
-// 00-費用全部(已到期) 、else		    2.續約保單起日 >=入帳日    fireFee(續約保單起日  < 入帳日)、 unOpenfireFee(續約保單起日 >=入帳日)
-
-		if (iRepayType == 03 || iRepayType == 99) {
-			isUnOpenfireFee = 0;
-		} else if (iRepayType == 01 || iRepayType == 02 || iRepayType == 05) {
-			isUnOpenfireFee = 1;
-		} else {
-			isUnOpenfireFee = 2;
 		}
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
@@ -401,15 +388,6 @@ public class BaTxCom extends TradeBuffer {
 			this.isPayAllFee = true; // 全部
 		else
 			this.isPayAllFee = false; // 部分
-
-		// 未到期火險費用條件同settingUnPaid
-		if (iRepayType == 03 || iRepayType == 99) {
-			isUnOpenfireFee = 0;
-		} else if (iRepayType == 01 || iRepayType == 02 || iRepayType == 05) {
-			isUnOpenfireFee = 1;
-		} else {
-			isUnOpenfireFee = 2;
-		}
 
 		// isBatchRepay 是否為整批入帳
 		this.isBatchRepay = true;
@@ -558,9 +536,6 @@ public class BaTxCom extends TradeBuffer {
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = true;
 
-		// 未到期火險費用條件 ==> 1.續約保單起日 > 入帳月
-		isUnOpenfireFee = 1;
-
 		// isAcLoanInt 是否利息提存- > 是
 		this.isAcLoanInt = true;
 
@@ -594,9 +569,6 @@ public class BaTxCom extends TradeBuffer {
 
 		// 費用是否全部回收
 		this.isPayAllFee = true; // 全部
-
-		// 未到期火險費用條件 1：fireFee(續約保單起日 <= 入帳月)、 unOpenfireFee(續約保單起日 > 入帳月)
-		isUnOpenfireFee = 1;
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = false;
@@ -1615,19 +1587,19 @@ public class BaTxCom extends TradeBuffer {
 //   fireFee       : 全部
 //   unOpenfireFee : 續約保單起日 >=入帳日
 //    
-// 1. 還款類別 = 01-期款、02-部分部分償還
+// 1. 還款類別 = 00-回收全部，01-期款、02-部分部分償還、05-火險費、09-其他 
 //   fireFee       : 續約保單起日 <= 入帳月
 //   unOpenfireFee : 續約保單起日 > 入帳月
-//									
-// 2.還款類別 = 05-火險費								
-//   fireFee       : 全部
-//   unOpenfireFee : 續約保單起日 >=入帳日
-									switch (isUnOpenfireFee) {
+ 									if (iRepayType == 3 ||iRepayType == 99 ) {
+ 										this.isUnOpenfireFee = 0;	
+ 									} else {
+ 										this.isUnOpenfireFee = 1;										
+ 									}
+									switch (this.isUnOpenfireFee) {
 									case 0:
-									case 2:
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 										this.fireFee = this.fireFee.add(rv.getRvBal());
-										if (rv.getOpenAcDate() / 100 >= iUnPaidDate / 100) {
+										if (rv.getOpenAcDate() >= iUnPaidDate) {
 											this.unOpenfireFee = this.unOpenfireFee.add(rv.getRvBal());
 										}
 										break;

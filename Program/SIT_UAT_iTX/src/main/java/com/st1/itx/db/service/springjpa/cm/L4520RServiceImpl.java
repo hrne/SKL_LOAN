@@ -46,7 +46,7 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 		this.info("L4520.Fire");
 
 		String sql = "    SELECT                      ";
-		sql += "    substr(ed.\"TitaTxtNo\", 0, 2) AS \"BatchNo\",   ";
+		sql += "    ed.\"BatchNo\"         AS \"BatchNo\",   ";
 		sql += "    ed.\"CustNo\"          AS \"CustNo\",            ";
 		sql += "    ed.\"PerfMonth\"       AS \"PerfMonth\",         ";
 		sql += "    ir.\"PrevInsuNo\"      AS \"PrevInsuNo\",        ";
@@ -60,19 +60,13 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    \"EmpDeductDtl\"   ed   ";
 		sql += "    LEFT JOIN \"InsuRenew\"      ir ON ir.\"CustNo\" = ed.\"CustNo\" ";
 		sql += "                                   AND ir.\"AcDate\" = ed.\"Acdate\""; 
-		sql += "                                   AND ir.\"TitaTlrNo\" = ed.\"TitaTlrNo\"";  
-		sql += "                                   AND ir.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "    LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\" ";
-		sql += "    LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"TitaTlrNo\" ";
+		sql += "    LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"EmpNo\" ";
 		sql += "    WHERE                   ";
 		sql += "    ed.\"PerfMonth\" = :PerfMonth ";
 		sql += "    AND ed.\"AchRepayCode\" = 5   ";
 		sql += "    AND ed.\"BatchNo\" >= :BatchNoFm ";
 		sql += "    AND ed.\"BatchNo\" <= :BatchNoTo ";
-		sql += "    AND ir.\"CustNo\" = ed.\"CustNo\"";
-	    sql += "    AND ir.\"AcDate\" = ed.\"Acdate\"";
-	    sql += "    AND ir.\"TitaTlrNo\" = ed.\"TitaTlrNo\"";
-	    sql += "    AND ir.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "     ORDER BY \"BatchNo\",\"CustNo\"   ";
 		this.info("sql=" + sql);
 		Query query;

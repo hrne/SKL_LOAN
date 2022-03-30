@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
@@ -22,6 +23,7 @@ import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.YearlyHouseLoanIntService;
+import com.st1.itx.db.service.springjpa.cm.L5813ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeFile;
@@ -54,6 +56,9 @@ public class L5813Batch extends TradeBuffer {
 	@Autowired
 	public CdCodeService sCdCodeService;
 	
+	@Autowired
+	L5813ServiceImpl l5813ServiceImpl;
+	
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -72,25 +77,28 @@ public class L5813Batch extends TradeBuffer {
 	private Boolean checkFlag = true;
 	private String sendMsg = " ";
 	private String iYear ="";
+	private List<Map<String, String>> resultList = null;
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		
 		iYear = titaVo.getParam("Year");
-		String iYearMonth = String.valueOf(Integer.parseInt(iYear)+1911);
-		this.info("iYearMonth=="+iYearMonth);
-		int iyearmonth = Integer.parseInt(iYearMonth+"12");
+
 		
-		Slice<YearlyHouseLoanInt> tYearlyHouseLoanInt = sYearlyHouseLoanIntService.findYearMonth(iyearmonth, titaVo.getReturnIndex(), 500, titaVo);
-		List<YearlyHouseLoanInt> sYearlyHouseLoanInt = tYearlyHouseLoanInt == null ? null:tYearlyHouseLoanInt.getContent();
+		try {
+			resultList = l5813ServiceImpl.checkAll(iYear, titaVo);
+		} catch (Exception e) {
+			throw new LogicException("E0013", e.getMessage());
+		}
 		
-		if(sYearlyHouseLoanInt==null) {
+		this.info("resultList size=="+resultList.size());
+		if(resultList==null || resultList.size()==0) {
 			throw new LogicException(titaVo, "E0001", "每年房屋擔保借款繳息工作檔無資料");
 		}
 		
 		try {
-			doIR(sYearlyHouseLoanInt,titaVo);//TO 國稅局
-			doOW(sYearlyHouseLoanInt,titaVo);//TO 官網
+			doIR(titaVo);//TO 國稅局
+			doOW(titaVo);//TO 官網
 		} catch (LogicException e) {
 			checkFlag = false;
 			sendMsg = e.getErrorMsg();
@@ -113,7 +121,7 @@ public class L5813Batch extends TradeBuffer {
 
 
 
-	public void doIR(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) throws LogicException {
+	public void doIR(TitaVo titaVo) throws LogicException {
 		//上傳國稅局
 		this.info("into doIR"); 
 		
@@ -126,9 +134,9 @@ public class L5813Batch extends TradeBuffer {
 		
 		
 			
-			for(YearlyHouseLoanInt iYearlyHouseLoanInt : sYearlyHouseLoanInt) {
+			for (Map<String, String> result : resultList) {
 				
-				if(!(("2").equals(iYearlyHouseLoanInt.getUsageCode()) || ("02").equals(iYearlyHouseLoanInt.getUsageCode())) ) {
+				if(!(("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode"))) ) {
 					continue;
 				}
 				
@@ -139,14 +147,23 @@ public class L5813Batch extends TradeBuffer {
 				String bdOwner = ""; // 所有權人姓名
 				String bdCustId = ""; // 所有權人身分證
 				
-				int iCustNo = iYearlyHouseLoanInt.getCustNo();
-				int houseBuyDate = iYearlyHouseLoanInt.getHouseBuyDate();//房屋取的日期
-				int iFacmNo = iYearlyHouseLoanInt.getFacmNo();
-				BigDecimal iLoanAmt = iYearlyHouseLoanInt.getLoanAmt();// 最初初貸金額
-				int iFirstDrawdownDate = iYearlyHouseLoanInt.getFirstDrawdownDate();// 貸款起日
-				int iMaturityDate = iYearlyHouseLoanInt.getMaturityDate(); // 貸款迄日
-				BigDecimal iLoanBal = iYearlyHouseLoanInt.getLoanBal();// 放款餘額
-				int iYYYMM = iYearlyHouseLoanInt.getYearMonth()-191100; 
+				int iCustNo = Integer.parseInt(result.get("CustNo"));
+				int houseBuyDate = Integer.parseInt(result.get("HouseBuyDate"));//房屋取的日期
+				if(houseBuyDate>19110000) {
+					houseBuyDate = houseBuyDate-19110000;
+				}
+				int iFacmNo = Integer.parseInt(result.get("FacmNo"));
+				BigDecimal iLoanAmt = parse.stringToBigDecimal(result.get("LoanAmt"));// 最初初貸金額
+				int iFirstDrawdownDate = Integer.parseInt(result.get("FirstDrawdownDate"));// 貸款起日
+				if(iFirstDrawdownDate>19110000) {
+					iFirstDrawdownDate = iFirstDrawdownDate-19110000;
+				}
+				int iMaturityDate = Integer.parseInt(result.get("MaturityDate")); // 貸款迄日
+				if(iMaturityDate>19110000) {
+					iMaturityDate = iMaturityDate-19110000;
+				}
+				BigDecimal iLoanBal = parse.stringToBigDecimal(result.get("LoanBal"));// 放款餘額
+				int iYYYMM = Integer.parseInt(result.get("YearMonth"))-191100; 
 				
 				CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 				ClFac tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);//戶號找擔保品
@@ -205,7 +222,7 @@ public class L5813Batch extends TradeBuffer {
 				
 
 				TempVo tTempVo = new TempVo();
-				tTempVo = tTempVo.getVo(iYearlyHouseLoanInt.getJsonFields());
+				tTempVo = tTempVo.getVo(result.get("JsonFields"));
 				
 				String bdLocation = "";// 建物地址
 				bdLocation = tTempVo.get("BdLoacation");
@@ -248,7 +265,7 @@ public class L5813Batch extends TradeBuffer {
 	
 				
 				
-				String cUsageCode = iYearlyHouseLoanInt.getUsageCode();
+				String cUsageCode = result.get("UsageCode");
 				if(!cUsageCode.isEmpty() && cUsageCode.length()<2) {
 					cUsageCode = "0"+cUsageCode;
 				}
@@ -295,7 +312,7 @@ public class L5813Batch extends TradeBuffer {
 			strField += vertical;
 			strField += String.valueOf(iYYYMM); // 繳息年月迄
 			strField += vertical;
-			strField += StringUtils.leftPad(String.valueOf(iYearlyHouseLoanInt.getYearlyInt()), 10, '0'); // 年度實際繳息金額  右靠前埔0
+			strField += StringUtils.leftPad(result.get("YearlyInt"), 10, '0'); // 年度實際繳息金額  右靠前埔0
 
 			makeFile.put(strField);
 			}	
@@ -309,7 +326,7 @@ public class L5813Batch extends TradeBuffer {
 		
 	}
 
-public void doOW(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) throws LogicException {
+public void doOW( TitaVo titaVo) throws LogicException {
 		//上傳官網
 		this.info("into doOW");
 
@@ -325,7 +342,7 @@ public void doOW(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) th
 		
 		
 			
-			for(YearlyHouseLoanInt iYearlyHouseLoanInt : sYearlyHouseLoanInt) {
+		for (Map<String, String> result : resultList) {
 				
 				
 				
@@ -335,16 +352,25 @@ public void doOW(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) th
 				String iCustId = "";
 				String iUkey= "";
 				
-				int houseBuyDate = iYearlyHouseLoanInt.getHouseBuyDate();//房屋取的日期
-				int iCustNo = iYearlyHouseLoanInt.getCustNo();
-				int iFacmNo = iYearlyHouseLoanInt.getFacmNo();
-				BigDecimal iLoanAmt = iYearlyHouseLoanInt.getLoanAmt();// 最初初貸金額
-				int iFirstDrawdownDate = iYearlyHouseLoanInt.getFirstDrawdownDate();// 貸款起日
-				int iMaturityDate = iYearlyHouseLoanInt.getMaturityDate(); // 貸款迄日
-				BigDecimal iLoanBal = iYearlyHouseLoanInt.getLoanBal();// 放款餘額
-				String cUsageCode = iYearlyHouseLoanInt.getUsageCode(); // 用途別
-				int iYYYMM = iYearlyHouseLoanInt.getYearMonth()-191100; //資料年月
 				
+				int iCustNo = Integer.parseInt(result.get("CustNo"));
+				int houseBuyDate = Integer.parseInt(result.get("HouseBuyDate"));//房屋取的日期
+				if(houseBuyDate > 19110000) {
+					houseBuyDate = houseBuyDate-19110000;
+				}
+				int iFacmNo = Integer.parseInt(result.get("FacmNo"));
+				BigDecimal iLoanAmt = parse.stringToBigDecimal(result.get("LoanAmt"));// 最初初貸金額
+				int iFirstDrawdownDate = Integer.parseInt(result.get("FirstDrawdownDate"));// 貸款起日
+				if(iFirstDrawdownDate > 19110000) {
+					iFirstDrawdownDate = iFirstDrawdownDate-19110000;
+				}
+				int iMaturityDate = Integer.parseInt(result.get("MaturityDate")); // 貸款迄日
+				if(iMaturityDate > 19110000) {
+					iMaturityDate = iMaturityDate-19110000;
+				}
+				BigDecimal iLoanBal = parse.stringToBigDecimal(result.get("LoanBal"));// 放款餘額
+				int iYYYMM = Integer.parseInt(result.get("YearMonth"))-191100; 
+				String cUsageCode = result.get("UsageCode"); // 用途別
 	
 				CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 				ClFac tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);//戶號找擔保品
@@ -407,7 +433,7 @@ public void doOW(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) th
 				
 				//地址
 				TempVo tTempVo = new TempVo();
-				tTempVo = tTempVo.getVo(iYearlyHouseLoanInt.getJsonFields());
+				tTempVo = tTempVo.getVo(result.get("JsonFields"));
 				bdLocation = tTempVo.get("BdLoacation");
 				bdLocation = covertToChineseFullChar(bdLocation);
 				if(bdLocation.length()<28) {
@@ -493,7 +519,7 @@ public void doOW(List<YearlyHouseLoanInt> sYearlyHouseLoanInt, TitaVo titaVo) th
 			strField += vertical;
 			strField += String.valueOf(iYYYMM); // 繳息年月迄  
 			strField += vertical;
-			strField += StringUtils.leftPad(String.valueOf(iYearlyHouseLoanInt.getYearlyInt()), 10, '0'); // 年度實際繳息金額  右靠前埔0
+			strField += StringUtils.leftPad(result.get("YearlyInt"), 10, '0'); // 年度實際繳息金額  右靠前埔0
 			strField += vertical;
 			strField += iUsageCode; // 用途別 12碼
 			makeFile.put(strField);

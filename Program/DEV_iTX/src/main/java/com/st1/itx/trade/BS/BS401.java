@@ -2,6 +2,8 @@ package com.st1.itx.trade.BS;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +105,7 @@ public class BS401 extends TradeBuffer {
 		txBatchCom.setTxBuffer(this.getTxBuffer());
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
-		// 處理代碼 0:入帳 1:刪除 2.轉暫收 3.檢核
+		// 處理代碼 0:入帳 1:刪除 2.轉暫收 3.檢核(單筆入帳完畢由TxBatchCom啟動)
 		iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 
 		// 會計日期、批號
@@ -137,8 +139,22 @@ public class BS401 extends TradeBuffer {
 			// findAll 整批入帳明細檔
 			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
 					Integer.MAX_VALUE);
+			if (slBatxDetail == null) {
+				throw new LogicException("E0014", "整批入帳明細檔= null"); // E0014 檔案錯誤
+			}
 			List<BatxDetail> lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
-
+			// 員工扣薪費用先入帳
+			if (lBatxDetail.get(0).getRepayCode() == 3) {
+				Collections.sort(lBatxDetail, new Comparator<BatxDetail>() {
+					public int compare(BatxDetail c1, BatxDetail c2) {
+						// status
+						if (c1.getRepayType() != c2.getRepayType()) {
+							return c2.getRepayType() - c1.getRepayType();
+						}
+						return 0;
+					}
+				});
+			}
 			// 檢查明細狀態
 			checkDetail(iFunctionCode, lBatxDetail, titaVo);
 			this.batchTransaction.commitEnd();

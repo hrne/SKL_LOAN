@@ -149,15 +149,6 @@ public class L4520Report2 extends MakeReport {
 		acdate = parse.stringToInteger(titaVo.getParam("AcDate"));
 		PerfMonth = titaVo.getParam("PerfMonth");
 		this.info("L4520Report2 exec");
-//		List<Map<String, String>> fnAllList = new ArrayList<>();
-//		
-//		try {
-//			fnAllList = l4520ServiceImpl.findAll(titaVo);
-//		} catch (Exception e) {
-//			StringWriter errors = new StringWriter();
-//			e.printStackTrace(new PrintWriter(errors));
-//			this.info("L4510ServiceImpl.findAll error = " + errors.toString());
-//		}
 		
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "員工扣薪總傳票明細表", "", "A4", "L");
 	
@@ -282,8 +273,8 @@ public class L4520Report2 extends MakeReport {
 	  			}
 	  			  
 	  			  
-//				每頁第20筆 跳頁 
-				if (pageCnt == 20) {
+//				每頁第38筆 跳頁 
+				if (pageCnt >= 38) {
 					this.print(1, 80, "=====續下頁=====", "C");
 
 					pageCnt = 0;
