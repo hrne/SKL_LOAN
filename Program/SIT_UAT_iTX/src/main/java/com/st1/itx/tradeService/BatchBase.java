@@ -121,21 +121,21 @@ public abstract class BatchBase {
 	}
 
 	public void mustInfo(String msg) {
-		logger.info("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+		logger.info(msg);
 	}
 
 	public void info(String msg) {
 		if (loggerFg)
-			logger.info("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+			logger.info(msg);
 	}
 
 	public void warn(String msg) {
 		if (loggerFg)
-			logger.warn("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+			logger.warn(msg);
 	}
 
 	public void error(String msg) {
-		logger.error("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+		logger.error(msg);
 	}
 
 	@Value("#{jobParameters['jobId']}")

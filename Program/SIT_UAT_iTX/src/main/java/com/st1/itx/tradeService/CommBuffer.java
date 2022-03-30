@@ -1,5 +1,6 @@
 package com.st1.itx.tradeService;
 
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,21 +85,21 @@ public abstract class CommBuffer {
 	}
 
 	public void mustInfo(String msg) {
-		logger.info("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+		logger.info(msg);
 	}
 
 	public void info(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.info("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+			logger.info(msg);
 	}
 
 	public void warn(String msg) {
 		if (ThreadVariable.isLogger())
-			logger.warn("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+			logger.warn(msg);
 	}
 
 	public void error(String msg) {
-		logger.error("[*" + FormatUtil.padX(ThreadVariable.getEmpNot(), 10) + "*]" + msg);
+		logger.error(msg);
 	}
 
 	public abstract void exec() throws LogicException;
