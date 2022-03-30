@@ -20,7 +20,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "BankDeductDtl"
-    WITH "ADM" AS (
+    WITH PDM AS (
       SELECT "MediaDate"
             ,"MediaSeq"
             ,"CustNo"
@@ -63,7 +63,7 @@ BEGIN
              WHEN '4' THEN '6' -- 契變手續費
            ELSE '0' END                   AS "RepayType"           -- 還款類別 DECIMAL 2 0
           ,MBK."LMSLPD"                   AS "PayIntDate"          -- 應繳日 Decimald 8 0
-          ,MBK."TRXISD"                   AS "PrevIntDate"         -- 繳息迄日 Decimald 8 0
+          ,MBK."LMSLPD"                   AS "PrevIntDate"         -- 繳息迄日 Decimald 8 0
           ,MBK."ACTACT"                   AS "AcctCode"            -- 科目 VARCHAR2 3 0
           ,CASE
              WHEN MBK."LMSPBK" = '1' THEN '812'
@@ -94,9 +94,9 @@ BEGIN
              WHEN MBK."LMSPBK" = 4 THEN '1'
              WHEN MBK."LMSPBK" = 3 THEN '3'
            ELSE '2' END                   AS "MediaKind"           -- 媒體別 VARCHAR2 1 0
-          ,NVL(ADM."MediaSeq",0)          AS "MediaSeq"            -- 媒體序號 DECIMAL 6 0
+          ,NVL(PDM."MediaSeq",0)          AS "MediaSeq"            -- 媒體序號 DECIMAL 6 0
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 Decimald 8 0
-          ,''                             AS "TitaTlrNo"           -- 經辦 VARCHAR2 6
+          ,'999999'                       AS "TitaTlrNo"           -- 經辦 VARCHAR2 6
           ,MBK."TRXNMT"                   AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1 0
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0
@@ -109,26 +109,26 @@ BEGIN
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
                             AND APLP."LMSAPN" = MBK."MBKAPN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
-    LEFT JOIN "ADM" ADM ON ADM."MediaDate" = CASE
+    LEFT JOIN PDM PDM ON PDM."MediaDate" = CASE
                                                WHEN NVL(t.LastTRXIDT,0) != 0
                                                THEN t.NewTRXIDT
                                              ELSE MBK."TRXIDT"
                                              END
                        AND NVL(MBK.MBKCDE,' ') = 'Y'
-                       AND ADM."CustNo" = MBK."LMSACN"
-                       AND ADM."FacmNo" = MBK."MBKAPN"
-                       AND ADM."RepayType" = CASE MBK."MBKTRX"
+                       AND PDM."CustNo" = MBK."LMSACN"
+                       AND PDM."FacmNo" = MBK."MBKAPN"
+                       AND PDM."RepayType" = CASE MBK."MBKTRX"
                                                WHEN '1' THEN '5' -- 保險費
                                                WHEN '2' THEN '1' -- 期款
                                                WHEN '3' THEN '4' -- 帳管費
                                                WHEN '4' THEN '6' -- 契變手續費
                                              ELSE '0' END
-                       AND ADM."TransDate" = MBK."TRXIDT" 
-                       AND ADM."RepayAcctNo" = LPAD(MBK."LMSPCN",14,'0')
-                       AND ADM."RepayAmt" = MBK."MBKAMT"
-                       AND ADM."AcDate" = MBK."TRXDAT"
-                       AND ADM."IntEndDate" = MBK."TRXIED"
-                       AND ADM."Seq" = 1
+                       AND PDM."TransDate" = MBK."TRXIDT" 
+                       AND PDM."RepayAcctNo" = LPAD(MBK."LMSPCN",14,'0')
+                       AND PDM."RepayAmt" = MBK."MBKAMT"
+                       AND PDM."AcDate" = MBK."TRXDAT"
+                       AND PDM."IntEndDate" = MBK."TRXIED"
+                       AND PDM."Seq" = 1
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局
       AND CASE -- 排除一筆在AH$MBKP成功扣到,在LA$MBKP沒扣到火險費的資料
             WHEN MBK."TRXIDT" = 20180813
@@ -191,7 +191,7 @@ BEGIN
              WHEN '4' THEN '6' -- 契變手續費
            ELSE '0' END                   AS "RepayType"           -- 還款類別 DECIMAL 2 0
           ,MBK."LMSLPD"                   AS "PayIntDate"          -- 應繳日 Decimald 8 0
-          ,MBK."TRXISD"                   AS "PrevIntDate"         -- 繳息迄日 Decimald 8 0
+          ,MBK."LMSLPD"                   AS "PrevIntDate"         -- 繳息迄日 Decimald 8 0
           ,MBK."ACTACT"                   AS "AcctCode"            -- 科目 VARCHAR2 3 0
           ,CASE
              WHEN MBK."LMSPBK" = '1' THEN '812'
@@ -224,7 +224,7 @@ BEGIN
            ELSE '2' END                   AS "MediaKind"           -- 媒體別 VARCHAR2 1 0
           ,NVL(ADM."MediaSeq",0)          AS "MediaSeq"            -- 媒體序號 DECIMAL 6 0
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 Decimald 8 0
-          ,''                             AS "TitaTlrNo"           -- 經辦 VARCHAR2 6
+          ,NVL(AEM."EmpNo",'999999')      AS "TitaTlrNo"           -- 經辦 VARCHAR2 6
           ,MBK."TRXNMT"                   AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1 0
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0

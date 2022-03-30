@@ -50,7 +50,7 @@ public class AchAuthFileVo extends FileVo {
 			// 頁首
 			if (i < headerCounts) {
 				// 設定頁首欄位的擷取位置
-//				this.put("RetrDate", thisLine.substring(9, 17));
+				this.put("HeadRocTxday", thisLine.substring(10, 17));
 			}
 
 			// 明細

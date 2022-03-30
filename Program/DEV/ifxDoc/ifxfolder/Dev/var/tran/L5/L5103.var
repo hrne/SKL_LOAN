@@ -423,12 +423,13 @@ C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 !T(F,@KeeperEmpNo,0)
 
 ! 用途
-#UsageCode=A,2,I
+#UsageCode=x,2,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#UsageCodeXHelp)
 @T(3,@UsageCodeX,)
 V(H,#UsageCodeXHelp)
+V(NL)
 
 #UsageCodeX=X,4,L
 T(H,#UsageCode,#UsageCodeXHelp)

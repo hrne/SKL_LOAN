@@ -27,6 +27,7 @@ K(MODIFYBUTTON,製表)
 ]
 !---------- AP TEXT AREA Variables ----------
 
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 #FdStartDate=X,2,L
 #FdReportFlag=X,2,L
@@ -42,6 +43,20 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@StartDate,#NTXBUF,1,7)
 INVOKEJS(SHOW,p1,02,02,1)
+
+
+
+!4用途
+#UsageCodeXRimName=x,20,S
+T(3,CdCode.UsageCodeX)
+#UsageCodeXHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#UsageCodeXRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@UsageCodeXHelp,#HelpDesc1) 
 
 #TODAY=A,7,S
 T(1,#SYSCDATE,2,7)
@@ -158,15 +173,17 @@ C(3,#ReportAFacmNo,0,T(2,),T(2,#ReportAFacmNo))
 C(4,#ReportACustNoX,T(2,),T(2,#ReportACustNoX+-+#ReportAFacmNoX))
 
 #ReportACustName=X,20,O
-#ReportAUsageCode=A,2,O
+#ReportAUsageCode=X,2,O
 #ReportAUsageCodeX=x,4,O
-T(A,#ReportAUsageCode,L5DEF,UsageCodeDef,UsageCode,UsageCodeX)
-#UsageCodeAfter=A,2,O
-C(3,#UsageCodeAfter,0,E(0,#ReportAUsageCode),s)
+T(2,)
+T(H,#ReportAUsageCode,#UsageCodeXHelp)
+#UsageCodeAfter=X,2,O
+C(4,#UsageCodeAfter,T(2,#ReportAUsageCode),s)
 
 #ReportAMark=X,90,O
-C(3,#ReportAUsageCode,#UsageCodeAfter,T(2,),T(2,------------------------------------------------------------------------------------------))
-C(3,#ReportAUsageCode,#UsageCodeAfter,s,E(0,@UsageCodeAfter,#ReportAUsageCode))
+
+C(5,#ReportAUsageCode,#UsageCodeAfter,T(2,),T(2,------------------------------------------------------------------------------------------))
+C(5,#ReportAUsageCode,#UsageCodeAfter,s,T(2,@UsageCodeAfter,#ReportAUsageCode))
 
 #ReportAApplEmpNo=X,6,O
 #ReportAApplName=X,10,O	
@@ -300,6 +317,7 @@ TXFORM=L514C
 #ReportCUsageCode
 #ReportCUsageCnt
 ^
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

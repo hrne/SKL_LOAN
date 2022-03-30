@@ -15,13 +15,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.EmpDeductDtlId;
 import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.EmpDeductMediaId;
-import com.st1.itx.db.domain.EmpDeductSchedule;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
@@ -107,34 +105,28 @@ public class L4511 extends TradeBuffer {
 		cntN = 0;
 		sendMsg = "";
 		int entryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
+		// MediaDate 塞今天
+		MediaDate = parse.stringToInteger(titaVo.getEntDy()) + 19110000;
 //		根據輸入之入帳日查詢BORM(ACDATE)->FACM(REPAYCODE:03)寫入empdtl
 //		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
 
 //		抓取入帳日為今日者
-		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.entryDateRange(entryDate, entryDate,
-				this.index, this.limit, titaVo);
-		if (slEmpDeductSchedule != null) {
-			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
-				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
-						titaVo);
-//				1.15日薪 2.非15日薪
-
-				if (iOpItem == 1 && ("4".equals(tCdCode.getCode().substring(0, 1))
-						|| "5".equals(tCdCode.getCode().substring(0, 1)))) {
-					deleEmpDeductMedia("4", tEmpDeductSchedule.getMediaDate(), titaVo);
-					MediaDate = tEmpDeductSchedule.getMediaDate();
+//		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.entryDateRange(entryDate, entryDate,
+//				this.index, this.limit, titaVo);
+//		if (slEmpDeductSchedule != null) {
+//			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
+//				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
+//						titaVo);
+////				1.15日薪 2.非15日薪
+//
+				if (iOpItem == 1) {
+					deleEmpDeductMedia("4", MediaDate, titaVo);
+				} else {
+					deleEmpDeductMedia("5", MediaDate, titaVo);
 				}
-				if (iOpItem == 2 && !"4".equals(tCdCode.getCode().substring(0, 1))
-						&& !"5".equals(tCdCode.getCode().substring(0, 1))) {
-					deleEmpDeductMedia("5", tEmpDeductSchedule.getMediaDate(), titaVo);
-					MediaDate = tEmpDeductSchedule.getMediaDate();
-				}
-			}
-		}
+//			}
+//		}
 
-		if (MediaDate == 0) {
-			throw new LogicException("E0001", "查無資料");
-		}
 		List<String> type = new ArrayList<String>();
 //		------------is15------------
 		if (iOpItem == 1) {

@@ -45,9 +45,18 @@ public class L8R15 extends TradeBuffer {
 			totaVo.putParam("L8r15Rate", iJcicZ044.getRate());
 			totaVo.putParam("L8r15MonthPayAmt", iJcicZ044.getMonthPayAmt());
 			totaVo.putParam("L8r15ReceYearIncome", iJcicZ044.getReceYearIncome());
-			totaVo.putParam("L8r15ReceYear", iJcicZ044.getReceYear());
+			int iReceYear = iJcicZ044.getReceYear();
+			if(iReceYear>1911) {
+				iReceYear = iReceYear-1911;
+			}
+			totaVo.putParam("L8r15ReceYear", iReceYear);
 			totaVo.putParam("L8r15ReceYear2Income", iJcicZ044.getReceYear2Income());
-			totaVo.putParam("L8r15ReceYear2", iJcicZ044.getReceYear2());
+			
+			int iReceYear2 = iJcicZ044.getReceYear2();
+			if(iReceYear2>1911) {
+				iReceYear2 = iReceYear2-1911;
+			}
+			totaVo.putParam("L8r15ReceYear2", iReceYear2);
 			totaVo.putParam("L8r15CurrentMonthIncome", iJcicZ044.getCurrentMonthIncome());
 			totaVo.putParam("L8r15LivingCost", iJcicZ044.getLivingCost());
 			totaVo.putParam("L8r15CompName", iJcicZ044.getCompName());

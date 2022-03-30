@@ -126,7 +126,19 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       + TX2.\"AcctFee\"";
 			sql += "       + TX2.\"ModifyFee\"";
 			sql += "       + TX2.\"FireFee\"";
-			sql += "       + TX2.\"LawFee\" AS \"AcctAmt\" ";
+			sql += "       + TX2.\"LawFee\"";
+			sql += "       - CASE "; 
+			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' "; 
+			sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\""; 
+			sql += "         WHEN TX2.\"TempAmt\" < 0"; 
+			sql += "         THEN ABS(TX2.\"TempAmt\")"; 
+			sql += "         ELSE 0 END";
+			sql += "       + CASE";
+			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
+			sql += "         THEN TX2.\"TxAmt\"";
+			sql += "         WHEN TX2.\"TempAmt\" > 0";
+			sql += "         THEN TX2.\"TempAmt\"";
+			sql += "         ELSE 0 END AS \"AcctAmt\" ";
 		} else if (funcd == 2) { // 帳管 + 法拍
 			sql += "     , TX2.\"Principal\"";
 			sql += "       + TX2.\"Interest\"";

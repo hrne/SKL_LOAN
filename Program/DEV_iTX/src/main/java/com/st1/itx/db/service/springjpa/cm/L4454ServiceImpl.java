@@ -49,6 +49,8 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int failTimes = parse.stringToInteger(titaVo.getParam("FailTimes")); // 連續失敗次數
 		int sendDateS = parse.stringToInteger(titaVo.getParam("SendDateS")); // 上次寄發日
 
+		boolean useRepayBank = false;
+
 		this.info("FunctionCode = " + functionCode);
 		this.info("EntryDate = " + entryDate);
 		this.info("CustNo = " + custNo);
@@ -146,7 +148,8 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += "   and b.\"RepayBank\" <> 700 ";
 				break;
 			default:
-				sql += "   and b.\"RepayBank\" = " + repayBank;
+				sql += "   and b.\"RepayBank\" = :repayBank ";
+				useRepayBank = true;
 				break;
 			}
 			break;
@@ -234,6 +237,11 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+
+		if (useRepayBank)
+		{
+			query.setParameter("repayBank", repayBank);
+		}
 
 		return this.convertToMap(query);
 	}

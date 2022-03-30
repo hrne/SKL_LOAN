@@ -167,8 +167,8 @@ C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
 T(2,@FdFuncCode,#WKSTAR1)
 T(2,@FdUnitCode,#WKSTAR1)
 T(2,@FdUnitItem,#WKSTAR1)
-T(2,@FdDeptCode,#WKSTAR2)
-T(2,@FdDeptItem,#WKSTAR2)
+T(2,@FdDeptCode,#WKPSC)
+T(2,@FdDeptItem,#WKPSC)
 T(2,@FdDistCode,#WKPSC)
 T(2,@FdDistItem,#WKPSC)
 T(2,@FdUnitManager,#WKSTAR2)
@@ -259,12 +259,12 @@ BIND(#DeptCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DeptCodeBUF;ntxbuf5=ty
 C(3,#CHAIN,1,C(2,#FuncCode,$,$,$,$,s,s),$)
 !!!!HELP(#ApHelp2)
 !!!!@C(3,#FuncCode,1,V(7),V(H,#ApHelp2))
-@V(7)
+!@V(7)
 
 ! 部室名稱
 #DeptItem=x,40,I
 C(3,#CHAIN,1,C(2,#FuncCode,$,$,$,$,s,s),$)
-!!!!T(H,#DeptCode,#ApHelp2)
+C(4,#DeptCode,S,$)
 @V(7)
 
 ! 單位主管代號
@@ -277,7 +277,7 @@ V(7)
 #UnitManagerNm=X,40,L
 C(2,#FuncCode,$,$,$,$,s,s)
 #SendL6R17a=X,1,S
-E(0,@RimFuncCode,5)
+E(0,@RimFuncCode,1)
 T(2,@RimEmployeeNo,#UnitManager)
 RESET_RIM(#SendL6R17a,L6R17)
 S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
@@ -294,7 +294,7 @@ C(2,#FuncCode,$,$,$,$,s,s)
 C(2,#FuncCode,$,$,$,$,s,s)
 #SendL6R17c=X,1,S
 C(4,#DistManager,s,$)
-E(0,@RimFuncCode,5)
+E(0,@RimFuncCode,1)
 T(2,@RimEmployeeNo,#DistManager)
 RESET_RIM(#SendL6R17c,L6R17)
 S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
@@ -311,7 +311,7 @@ V(7)
 #DeptManagerNm=X,40,L
 C(2,#FuncCode,$,$,$,$,s,s)
 #SendL6R17b=X,1,S
-E(0,@RimFuncCode,5)
+E(0,@RimFuncCode,1)
 T(2,@RimEmployeeNo,#DeptManager)
 RESET_RIM(#SendL6R17b,L6R17)
 S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
