@@ -80,7 +80,6 @@ public class L4414 extends TradeBuffer {
 	BankAuthActCom bankAuthActCom;
 	@Autowired
 	MakeReport makeReport;
-	
 
 	// 上傳預設目錄
 	@Value("${iTXInFolder}")
@@ -97,9 +96,11 @@ public class L4414 extends TradeBuffer {
 	private int cancelCntC = 0;
 	private int headRocTxday = 0;
 	private int footCreateDateC = 0;
-	
-	
-	
+
+	private int AchStampFinishDate = 0;
+	// 郵局尾錄資料建檔日期
+	private int PostCreateDate = 0;
+
 	private String nowDate;
 	private String nowTime;
 
@@ -125,8 +126,7 @@ public class L4414 extends TradeBuffer {
 		finishCntC = 0;
 		cancelCntC = 0;
 		footCreateDateC = 0;
-		
-		
+
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
@@ -164,10 +164,13 @@ public class L4414 extends TradeBuffer {
 
 				// 使用資料容器內定義的方法切資料
 				achAuthFileVo.setValueFromFile(dataLineList);
+				AchStampFinishDate = Integer.parseInt(dataLineList.get(0).substring(9, 17)) + 19110000;
+				this.info("AchStampFinishDate==" + AchStampFinishDate);
 
 				setAchAuthLog(achAuthFileVo, titaVo);
 
 			} else if (filename.substring(0, 1).indexOf("P") >= 0) {
+				int postsize = 0;
 //					POST
 //					暫定路徑 待討論過後決定抓取路徑方法
 //					filePath1 = "D:\\temp\\TestingInPut\\PO$P21P_846授權回.txt";
@@ -189,6 +192,9 @@ public class L4414 extends TradeBuffer {
 				// 使用資料容器內定義的方法切資料
 				postAuthFileVo.setValueFromFile(dataLineList);
 
+				postsize = dataLineList.size() - 1;
+				PostCreateDate = Integer.parseInt(dataLineList.get(postsize).substring(26, 34));
+
 				setPostAuthLog(postAuthFileVo, titaVo);
 			} else {
 				throw new LogicException("E0014", filename + " 此檔案不符本交易處理範圍");
@@ -201,7 +207,7 @@ public class L4414 extends TradeBuffer {
 		this.nowTime = makeReport.dDateUtil.getNowStringTime();
 		String bcDate = makeReport.showBcDate(this.nowDate, 1);
 		String time = makeReport.showTime(this.nowTime);
-		
+
 		totaA.putParam("MSGID", "L444A");
 		totaA.putParam("OBcDateA", bcDate); // 日期
 		totaA.putParam("OTimeA", time); // 時間
@@ -238,7 +244,7 @@ public class L4414 extends TradeBuffer {
 	private void setAchAuthLog(AchAuthFileVo achAuthFileVo, TitaVo titaVo) throws LogicException {
 
 		// 取值
-		 headRocTxday = parse.stringToInteger("" + achAuthFileVo.get("HeadRocTxday"));
+		headRocTxday = parse.stringToInteger("" + achAuthFileVo.get("HeadRocTxday"));
 
 		ArrayList<OccursList> uploadFile = achAuthFileVo.getOccursList();
 
@@ -327,8 +333,8 @@ public class L4414 extends TradeBuffer {
 //			10	FootSuccsCnt    成功筆數		40-46	9(6)	初始值為0，回送時使用	
 			int footErrorCnt = parse.stringToInteger("" + postAuthFileVo.get("FootErrorCnt"));
 			int footSuccsCnt = parse.stringToInteger("" + postAuthFileVo.get("FootSuccsCnt"));
-			footCreateDateC = parse.stringToInteger("" + postAuthFileVo.get("FootCreateDate"))-19110000;
-			
+			footCreateDateC = parse.stringToInteger("" + postAuthFileVo.get("FootCreateDate")) - 19110000;
+
 			if (footErrorCnt + footSuccsCnt == 0) {
 				throw new LogicException("E0014", "請確認是否為提回檔案");
 			}
@@ -352,17 +358,30 @@ public class L4414 extends TradeBuffer {
 					}
 					tPostAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
 					tPostAuthLog.setStampCode(FormatUtil.pad9(tempOccursList.get("StampCode"), 1));
+					this.info("StampCode==" + tempOccursList.get("StampCode").trim());
+					this.info("AuthErrorCode==" + tempOccursList.get("AuthErrorCode").trim());
+
 					tPostAuthLog.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
 					if ("00".equals(FormatUtil.pad9("" + tempOccursList.get("AuthErrorCode"), 2))) {
 						this.info("Update StampFinishDate !!!");
+//						申請UP核印完成日期,清空核印取消日期
 						tPostAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+						tPostAuthLog.setStampCancelDate(0);
 
 						finishCntC++;
-					}else {
+					} else {
 						cancelCntC++;
 					}
-					// 變更帳號檔
-					postToBankAuthAct(tPostAuthLog, titaVo);
+//					檢查期款、火險需同時成功才更新帳號檔
+					PostAuthLog tPostAuthLog3 = postAuthLogService.repayAcctFirst(tPostAuthLog.getCustNo(),
+							tPostAuthLog.getPostDepCode(), tPostAuthLog.getRepayAcct(),
+							tPostAuthLog.getAuthCode().equals("1") ? "2" : "1", titaVo);
+					if (tPostAuthLog3 != null) {
+						if (tPostAuthLog3.getAuthErrorCode().equals("00")) {
+							// 變更帳號檔
+							postToBankAuthAct(tPostAuthLog, titaVo);
+						}
+					}
 					try {
 						postAuthLogService.update(tPostAuthLog, titaVo);
 					} catch (DBException e) {
@@ -376,6 +395,9 @@ public class L4414 extends TradeBuffer {
 					}
 					tPostAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
 					tPostAuthLog.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
+//					終止UP核印取消日期,清空核印完成日期
+					tPostAuthLog.setStampCancelDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog.setStampFinishDate(0);
 					// 變更帳號檔
 					postToBankAuthAct(tPostAuthLog, titaVo);
 					try {
@@ -417,6 +439,8 @@ public class L4414 extends TradeBuffer {
 					tPostAuthLog2.setRelAcctGender(tPostAuthLog.getRelAcctGender());
 					tPostAuthLog2.setRetrDate(dateUtil.getNowIntegerForBC());
 					tPostAuthLog2.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
+					tPostAuthLog.setStampFinishDate(0);
+					tPostAuthLog.setStampCancelDate(dateUtil.getNowIntegerForBC());
 					// 變更帳號檔
 					postToBankAuthAct(tPostAuthLog2, titaVo);
 					try {
@@ -434,6 +458,8 @@ public class L4414 extends TradeBuffer {
 					}
 
 					tPostAuthLog.setAuthApplCode("4");
+					tPostAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog.setStampCancelDate(0);
 
 					// 變更帳號檔
 					postToBankAuthAct(tPostAuthLog, titaVo);

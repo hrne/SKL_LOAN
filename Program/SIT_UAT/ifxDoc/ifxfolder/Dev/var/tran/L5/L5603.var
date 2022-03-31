@@ -389,7 +389,7 @@ T(H,#DelvrCode,#DelvrCodeHelp)
 #AddressCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#AddressCodeHelp)
-@T(3,@AddresCodeX,)
+@T(3,@AddressCodeX,)
 V(H,#AddressCodeHelp)
 #AddressCodeX=X,10,L
 T(H,#AddressCode,#AddressCodeHelp)

@@ -96,8 +96,8 @@ public class L4510Batch extends TradeBuffer {
 	public WebClient webClient;
 
 	private int iEntryDate = 0; // 入帳日期
-	private int iDelayYYMM = 0; // 滯繳年月
 	private int iRepayEndDate = 0; // 應繳截止日
+	private int iDelayYYMM = 0; // 滯繳年月
 
 //	繳息迄日 minNextPayIntDateList
 	private HashMap<tmpFacm, Integer> minNextPayIntDateList = new HashMap<>();
@@ -289,23 +289,19 @@ public class L4510Batch extends TradeBuffer {
 
 	private void getList(int flag, Slice<EmpDeductSchedule> slEmpDeductSchedule, String AgType1) throws LogicException {
 //	iEntryDate  入帳日
-//  iPayIntDate 應繳日
 //  iRepayEndDate 應繳截止日
-		this.info("slEmpDeductSchedule = " + slEmpDeductSchedule);
 		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 			if (AgType1.equals("" + tEmpDeductSchedule.getAgType1())) {
 				this.iEntryDate = tEmpDeductSchedule.getEntryDate();
 				this.iRepayEndDate = tEmpDeductSchedule.getRepayEndDate();
-				// 應繳截止日減1天，方便處理
-				if (tEmpDeductSchedule.getRepayEndDate() > 0) {
-					dDateUtil.init();
-					dDateUtil.setDate_1(this.iRepayEndDate);
-					dDateUtil.setMons(-1);
-					this.iDelayYYMM = dDateUtil.getCalenderDay() / 100;
-				}
+			}
+			if (tEmpDeductSchedule.getRepayEndDate() > 0) {
+				dDateUtil.init();
+				dDateUtil.setDate_1(this.iRepayEndDate);
+				dDateUtil.setMons(-1);
+				this.iDelayYYMM = dDateUtil.getCalenderDay() / 100;
 			}
 		}
-		this.info("iEntryDate=" + iEntryDate + ", iRepayEndDate=" + iRepayEndDate + ", iDelayYYMM=" + iDelayYYMM);
 	}
 
 //	用既有之List for each 找出RepayCode 1.期款  4.帳管 5.火險 6.契變手續費 
@@ -321,7 +317,7 @@ public class L4510Batch extends TradeBuffer {
 // 4/30         2/20             2
 // 3/31         2/28(應繳日31)   0
 // 3/31         2/20             1
-
+		int iPayIntDate = 0;
 		for (Map<String, String> result : resultList) {
 //			F0 CustNo
 //			F1 FacmNo
@@ -336,15 +332,17 @@ public class L4510Batch extends TradeBuffer {
 					this.info("skip NextPayIntDate > iPayIntDate " + result);
 					continue;
 				}
+				iPayIntDate = iRepayEndDate;
 			} else {
-				if (nextPayIntDate / 100 > iDelayYYMM) {
-					this.info("skip NextPayIntDate / 100 > iDelayYYMM " + result);
+				if (nextPayIntDate / 100 >= iDelayYYMM) {
+					this.info("skip NextPayIntDate / 100 >= iDelayYYMM  " + result);
 					continue;
 				}
+				iPayIntDate = iEntryDate;
 			}
 
 			// 應繳試算
-			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iRepayEndDate,
+			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate,
 					parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 0, 1,
 					BigDecimal.ZERO, titaVo);
 
@@ -616,6 +614,7 @@ public class L4510Batch extends TradeBuffer {
 			if (rpAmt42Map.get(tmp2) != null) {
 				tempVo.putParam("ShortInt", rpAmt42Map.get(tmp2));
 			}
+
 			if (insuNoMap.get(tmp2) != null) {
 				tempVo.putParam("InsuNo", insuNoMap.get(tmp2));
 			}
@@ -900,12 +899,12 @@ public class L4510Batch extends TradeBuffer {
 					}
 //					火險費
 				} else if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 5) {
-					if (!rpAmt05Map.containsKey(tmp)) {
-						rpAmt05Map.put(tmp, tBaTxVo.getUnPaidAmt());
-						insuNoMap.put(tmp, tBaTxVo.getRvNo());
+					if (!rpAmt05Map.containsKey(tmp2)) {
+						rpAmt05Map.put(tmp2, tBaTxVo.getUnPaidAmt());
+						insuNoMap.put(tmp2, tBaTxVo.getRvNo());
 					} else {
-						rpAmt05Map.put(tmp, rpAmt05Map.get(tmp).add(tBaTxVo.getUnPaidAmt()));
-						insuNoMap.put(tmp, insuNoMap.get(tmp) + "," + tBaTxVo.getRvNo());
+						rpAmt05Map.put(tmp2, rpAmt05Map.get(tmp2).add(tBaTxVo.getUnPaidAmt()));
+						insuNoMap.put(tmp2, insuNoMap.get(tmp2) + "," + tBaTxVo.getRvNo());
 					}
 //					短收 --結算至撥款，用tmp2
 				} else if (tBaTxVo.getDataKind() == 4 && "D".equals(tBaTxVo.getDbCr())) {

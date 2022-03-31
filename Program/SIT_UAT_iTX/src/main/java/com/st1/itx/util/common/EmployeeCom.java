@@ -67,7 +67,6 @@ public class EmployeeCom extends TradeBuffer {
 //	    	     OR  (AgLineCode NOT IN ('21', '31', '1C')) 
 //	    	     and (InPostNo NOT IN ('TU0036','TU0097')) )
 
-		
 		String commLineCode = tCdEmp.getCommLineCode();
 		String agLevel = " ";
 		if (tCdEmp.getAgLevel() != null && tCdEmp.getAgLevel().length() > 0) {
@@ -85,13 +84,11 @@ public class EmployeeCom extends TradeBuffer {
 				isSalary = true;
 			}
 		}
-		
-		if (!("21".equals(commLineCode) || "31".equals(commLineCode) || "1C".equals(commLineCode))) {
-			isSalary = true;
-		}
 
-		if ("TU0036".equals(tCdEmp.getAgPostIn()) || "TU0097".equals(tCdEmp.getAgPostIn())) {
-			isSalary = false;
+		if (!("21".equals(commLineCode) || "31".equals(commLineCode) || "1C".equals(commLineCode))) {
+			if (!("TU0036".equals(tCdEmp.getAgPostIn()) || "TU0097".equals(tCdEmp.getAgPostIn()))) {
+				isSalary = true;
+			}
 		}
 
 		return isSalary;

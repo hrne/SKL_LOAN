@@ -384,7 +384,7 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 #ResultCode=A,1,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#ResultCodeHelp,cols:2)
-@V(3,@ResultCodeX,)
+@T(3,@ResultCodeX,)
 V(H,#ResultCodeHelp)
 
 #ResultCodeX=X,12,L

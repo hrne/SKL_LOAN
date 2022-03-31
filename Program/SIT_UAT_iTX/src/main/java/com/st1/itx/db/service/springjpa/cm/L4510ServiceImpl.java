@@ -66,8 +66,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHEN f.\"RepayCode\" = 3 THEN  0 ";
 		sql += "            WHEN (    (e.\"CommLineCode\" = '21' AND substr(e.\"AgLevel\", 0, 1) NOT IN ( 'F','G','J','Z') ) ";
 		sql += "                   OR (e.\"CommLineCode\" = '31' AND substr(e.\"AgLevel\", 0, 1) NOT IN ('K','Z') ) ";
-		sql += "                   OR (e.\"CommLineCode\" NOT IN ('21','31','1C' )) )";
-		sql += "             AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097')  ";
+		sql += "                   OR (e.\"CommLineCode\" NOT IN ('21','31','1C' ) AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097')))";
 		sql += "                                      THEN  5";
 		sql += "            ELSE 1                            ";
 		sql += "       END = :AgType1";
