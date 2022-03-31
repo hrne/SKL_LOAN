@@ -37,6 +37,8 @@ public class LM036Report extends MakeReport {
 
 	@Autowired
 	Parse parse;
+	
+	public int startRow = 0;
 
 	public void exec(TitaVo titaVo, int thisYM) throws LogicException {
 
@@ -50,6 +52,7 @@ public class LM036Report extends MakeReport {
 		int iMonth = thisYM % 100;
 		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
 		int useExcel = iMonth % 3 == 1 ? 2 : iMonth % 3 == 2 ? 3 : 1;
+		this.startRow =  iMonth % 3 == 1 ? 47 : iMonth % 3 == 2 ? 45 : 46;
 //		this.info("Excel" + useExcel);
 
 		this.info("startMonth = " + startMonth);
@@ -186,6 +189,7 @@ public class LM036Report extends MakeReport {
 		int iMonth = endMonth % 100;
 		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
 		int rowCount = iMonth % 3 == 1? 2 :iMonth % 3 == 2? 0 : 1;
+		// 只有 (餘數1)40 (餘數2)38 (餘數3)39  筆
 
 		// 回推12季(36個月)
 		endMonth = endMonth * 100 + 1;
@@ -336,10 +340,12 @@ public class LM036Report extends MakeReport {
 					break;
 				}
 
+				int startRow = iMonth % 3 == 1 ? 2 : iMonth % 3 == 2 ? 3 : 1;
+				
 				if (iMonth == 3 || iMonth == 6 || iMonth == 9 || iMonth == 12) {
 					String text = iYear + "年第" + textQ + "季";
 					info("text=" + text);
-					makeExcel.setValue(47 + num, 2, text, "L");
+					makeExcel.setValue(this.startRow + num, 2, text, "L");
 					num++;
 				}
 			}
@@ -492,10 +498,11 @@ public class LM036Report extends MakeReport {
 					break;
 				}
 
+				
 				if (iMonth == 3 || iMonth == 6 || iMonth == 9 || iMonth == 12) {
 					String text = iYear + "年第" + textQ + "季";
 					this.info("text=" + text);
-					makeExcel.setValue(47 + num, 2, text, "L"); // 逾90天時年月
+					makeExcel.setValue(this.startRow + num, 2, text, "L"); // 逾90天時年月
 					num++;
 				}
 			}

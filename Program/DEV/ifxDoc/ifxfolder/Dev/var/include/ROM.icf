@@ -5075,6 +5075,7 @@ TXFORM=L4R15
 #L4r16EntryDate{i}=D,7,S
 #L4r16MediaDate{i}=D,7,S
 #L4r16WorkMonth{i}=A,5,S
+#L4r16RepayEndDate{i}=D,7,S
 ##end
 
 </L4R16.dec>
@@ -5085,6 +5086,7 @@ TXFORM=L4R16
 #L4r16EntryDate{i}
 #L4r16MediaDate{i}
 #L4r16WorkMonth{i}
+#L4r16RepayEndDate{i}
 ##end
 ^
 </L4R16.tom>

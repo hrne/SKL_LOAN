@@ -68,6 +68,7 @@ public class L4455Report extends MakeReport {
 	private String bank = "";
 	private String acctcode = "";
 	private String acctcodex = "";
+	private String tCustName = "";
 
 	// 合計
 
@@ -294,10 +295,12 @@ public class L4455Report extends MakeReport {
 						"                                                                                                                                                                               ");
 				this.print(0, 1, L4455List.get(i).get("CustNo"));// 戶號
 
-				if (parse.stringToInteger(L4455List.get(i).get("NameSeq")) == 1) {
+				if(!tCustName.equals(limitLength(L4455List.get(i).get("CustName"), 20))) {					
 					this.print(0, 19, limitLength(L4455List.get(i).get("CustName"), 20));// 戶名
 				}
 
+				tCustName = limitLength(L4455List.get(i).get("CustName"), 20);
+				
 				if (parse.stringToInteger(L4455List.get(i).get("TxSeq")) == 1) {
 					if (parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt"))
 							.compareTo(new BigDecimal("0")) != 0) { // 0不顯示

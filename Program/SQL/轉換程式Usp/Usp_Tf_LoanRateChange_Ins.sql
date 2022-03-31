@@ -94,10 +94,10 @@ BEGIN
                                 AND LA."LMSAPN" = LI."LMSAPN"
                                 AND LA."LMSASQ" = LI."LMSASQ"
                                 AND LA."ASCADT" <= LI."IRTADT"
+                                AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
           WHERE NVL(LI."IRTADT",0) > 0 -- 篩選放款戶利率檔生效日期不為0者
             AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
             AND LI."IRTADT" >= LM."LMSLLD" -- 基本利率生效日期>=撥款日
-            AND NVL(LA."ASCADT",99999999) >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
          ) R
     LEFT JOIN "FacProd" FP ON FP."ProdNo" = R."IRTBCD"
     WHERE R."Seq" = 1 -- 加碼利率生效日早於適用利率生效日且最近的一筆

@@ -25,8 +25,8 @@ E(0,0)
 [#<->#,"@@@@@@@@@","帳管費及其他扣薪明細表"],
 [#<->#,"@@@@@@@@@","扣薪媒體明細表"],
 ["#grid#,{id:1,expand:true,loop:9,row_height:1,s_cols:[80,100,100,100], p_cols:[10,10,10,10]}","","",
-["流程別","工作月份","媒體日期","入帳日期"],
-[[#Flow1],[#WorkMonth1],[#MediaDate1],[#EntryDate1],
+["流程別","工作月份","媒體日期","入帳日期","應繳截止日"],
+[[#Flow1],[#WorkMonth1],[#MediaDate1],[#EntryDate1],[#RepayEndDate1],
 []]],
 ]
 
@@ -80,6 +80,7 @@ R(1,L4R16)
 E(0,@EntryDate{i},#L4r16EntryDate{i})
 E(0,@MediaDate{i},#L4r16MediaDate{i})
 E(0,@WorkMonth{i},#L4r16WorkMonth{i})
+E(0,@RepayEndDate{i},#L4r16RepayEndDate{i})
 ##end
 
 ##loop {times:9,i:1,j:1}
@@ -96,6 +97,8 @@ C(3,#WorkMonth{i},0,INVOKEJS(SHOW,grd1_{j},0),INVOKEJS(SHOW,grd1_{j},1))
 #MediaDate{i}=D,7,L
 
 #EntryDate{i}=D,7,L
+
+#RepayEndDate{i}=D,7,L
 
 ##end
 

@@ -186,7 +186,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 				
 				
 				
-		sql += "  WHERE \"AchRepayCode\" = 1";
+		sql += "  WHERE \"AchRepayCode\" IN ( 1, 5) ";
 		sql += "  AND \"PerfMonth\" = :PerfMonth";
 		sql += "    AND ed.\"BatchNo\" >= :BatchNoFm";
 		sql += "    AND ed.\"BatchNo\" <= :BatchNoTo";

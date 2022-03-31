@@ -1758,7 +1758,11 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		this.info("wkDelayBase = " + wkDelayBase);
 		this.info("wkBreachBase = " + wkBreachBase);
-		if (wkDelayBase.compareTo(wkBreachBase) == 0) {
+		this.info("wkDays = " + wkDays);
+		this.info("wkDaysA = " + wkDaysA);
+		this.info("wkDaysB = " + wkDaysB);
+		this.info("wkDaysC = " + wkDaysC);
+		if (wkDelayBase.compareTo(wkBreachBase) == 0 && wkDays == wkDaysA + wkDaysB + wkDaysC) {
 			this.info("延遲息與違約金計算基礎相同");
 			// 2022-03-14 智偉修改
 			// 因為原系統延遲息及違約金為一個欄位運算及顯示
@@ -1772,6 +1776,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
 			wkBreachAmtC = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominatorC)
 					.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
+
 			if (wkDaysA > 0) {
 				this.info("A段延遲息及違約金 = " + wkBreachAmtA + " = " + wkBreachBase + " * " + vCalcRepayIntVo.getStoreRate()
 						+ " * " + wkDaysA + " / 36500 * 1.1 (逾期6個月內)");
@@ -1814,7 +1819,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("延遲息 (四捨五入前) = " + wkDelayInt);
 		wkDelayInt = wkDelayInt.setScale(0, RoundingMode.HALF_UP);
 		this.info("延遲息 (四捨五入後) = " + wkDelayInt);
-		
+
 		if (wkDelayBase.compareTo(wkBreachBase) == 0) {
 			// 2022-03-14 智偉增加
 			// 因為原系統延遲息及違約金為一個欄位運算及顯示

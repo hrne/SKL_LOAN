@@ -85,6 +85,7 @@ public class L4R16 extends TradeBuffer {
 						this.totaVo.putParam("L4r16WorkMonth" + i, tEmpDeductSchedule.getWorkMonth() - 191100);
 						this.totaVo.putParam("L4r16MediaDate" + i, tEmpDeductSchedule.getMediaDate());
 						this.totaVo.putParam("L4r16EntryDate" + i, tEmpDeductSchedule.getEntryDate());
+						this.totaVo.putParam("L4r16RepayEndDate" + i, tEmpDeductSchedule.getRepayEndDate());
 						break;
 					}
 				}
@@ -92,6 +93,7 @@ public class L4R16 extends TradeBuffer {
 					this.totaVo.putParam("L4r16WorkMonth" + j, 0);
 					this.totaVo.putParam("L4r16MediaDate" + j, 0);
 					this.totaVo.putParam("L4r16EntryDate" + j, 0);
+					this.totaVo.putParam("L4r16RepayEndDate" + j, 0);
 				}
 			}
 		} else {
@@ -99,6 +101,7 @@ public class L4R16 extends TradeBuffer {
 				this.totaVo.putParam("L4r16WorkMonth" + j, 0);
 				this.totaVo.putParam("L4r16MediaDate" + j, 0);
 				this.totaVo.putParam("L4r16EntryDate" + j, 0);
+				this.totaVo.putParam("L4r16RepayEndDate" + j, 0);
 			}
 		}
 

@@ -220,7 +220,7 @@ T(2,@CustNo,#L2r07CustNo)
 
 
 #BUF3=X,42,S
-T(2,#CustNo)
+T(2,L2980+#CustNo)
 
 #button=_,_,S
 T(2,{ cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF3})ASGN(BTN_NEW1$)

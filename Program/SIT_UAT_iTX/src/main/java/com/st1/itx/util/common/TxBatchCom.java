@@ -1595,10 +1595,11 @@ public class TxBatchCom extends TradeBuffer {
 // this.feeRepayType 費用還款類別
 
 		baTxList = new ArrayList<BaTxVo>();
-		// call 應繳試算，試算至會計日
+		// call 應繳試算，試算至會計日，匯款轉帳可預收(批次可預收期數)
 		try {
-			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), 0, tDetail.getCustNo(), this.repayFacmNo,
-					this.repayBormNo, tDetail.getRepayCode(), this.repayType, tDetail.getRepayAmt(), titaVo);
+			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), this.txBuffer.getTxCom().getTbsdy(),
+					tDetail.getCustNo(), this.repayFacmNo, this.repayBormNo, tDetail.getRepayCode(), this.repayType,
+					tDetail.getRepayAmt(), titaVo);
 		} catch (LogicException e) {
 			this.errorMsg = e.getMessage();
 			if (this.errorMsg.length() >= 5) {
