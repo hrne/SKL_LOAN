@@ -228,12 +228,9 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		List<String> lDisplayFlag = new ArrayList<String>();
-		lDisplayFlag.add("F"); // 繳息首筆
-		lDisplayFlag.add("I"); // 繳息
 		List<LoanBorTx> lLoanBorTx = new ArrayList<LoanBorTx>();
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, 0, 99991231, lDisplayFlag, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findDueDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, 0, 99991231, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
 		if (lLoanBorTx != null) {
 			for (LoanBorTx tLoanBorTx : lLoanBorTx) {

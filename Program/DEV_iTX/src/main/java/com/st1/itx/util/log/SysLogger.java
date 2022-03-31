@@ -1,11 +1,9 @@
 package com.st1.itx.util.log;
 
-import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.st1.itx.eum.ThreadVariable;
-import com.st1.itx.util.format.FormatUtil;
 
 public class SysLogger {
 	private final Logger logger;

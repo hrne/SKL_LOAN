@@ -630,8 +630,8 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT TM.\"YearMonth\" ";
 		sql += "      , TM.\"Type\" ";
 		sql += "      , TM.\"Total\" ";
-		sql += "      , LM.\"Type\"  AS \"LastMonthType\" ";
-		sql += "      , LM.\"Total\" AS \"LastMonthTotal\" ";
+		sql += "      , NVL(LM.\"Type\",0)  AS \"LastMonthType\" ";
+		sql += "      , NVL(LM.\"Total\",0) AS \"LastMonthTotal\" ";
 		sql += "      , CASE ";
 		sql += "          WHEN NVL(LM.\"Total\",0) > 0 ";
 		sql += "          THEN ROUND(TM.\"Total\" / LM.\"Total\",4)";

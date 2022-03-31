@@ -19,13 +19,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.EmpDeductDtlId;
 import com.st1.itx.db.domain.EmpDeductSchedule;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductDtlService;
@@ -89,9 +87,6 @@ public class L4510Batch extends TradeBuffer {
 	public EmpDeductScheduleService empDeductScheduleService;
 
 	@Autowired
-	public CdCodeService cdCodeService;
-
-	@Autowired
 	public TxToDoCom txToDoCom;
 
 	@Autowired
@@ -101,7 +96,7 @@ public class L4510Batch extends TradeBuffer {
 	public WebClient webClient;
 
 	private int iEntryDate = 0; // 入帳日期
-	private int iPayIntDate = 0; // 應繳日
+	private int iDelayYYMM = 0; // 滯繳年月
 	private int iRepayEndDate = 0; // 應繳截止日
 
 //	繳息迄日 minNextPayIntDateList
@@ -205,21 +200,14 @@ public class L4510Batch extends TradeBuffer {
 				titaVo);
 		if (slEmpDeductSchedule != null) {
 			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
-				// 應繳截止日減1天，方便處理
-				if (tEmpDeductSchedule.getRepayEndDate() > 0) {
-					dDateUtil.init();
-					dDateUtil.setDate_1(tEmpDeductSchedule.getRepayEndDate());
-					dDateUtil.setDays(-1);
-					tEmpDeductSchedule.setRepayEndDate(dDateUtil.getCalenderDay());
-				}
 				perfMonth.put(tEmpDeductSchedule.getAgType1(), tEmpDeductSchedule.getWorkMonth());
-				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
-						titaVo);
 //				1.15日薪 2.非15日薪
-				if (iOpItem == 1 && ("4".equals(tCdCode.getCode().substring(0, 1)) || "5".equals(tCdCode.getCode().substring(0, 1)))) {
+				if (iOpItem == 1 && ("4".equals(tEmpDeductSchedule.getAgType1())
+						|| "5".equals(tEmpDeductSchedule.getAgType1()))) {
 					procCodeIs15.add(tEmpDeductSchedule.getAgType1());
 				}
-				if (iOpItem == 2 && !"4".equals(tCdCode.getCode().substring(0, 1)) && !"5".equals(tCdCode.getCode().substring(0, 1))) {
+				if (iOpItem == 2 && !"4".equals(tEmpDeductSchedule.getAgType1())
+						&& !"5".equals(tEmpDeductSchedule.getAgType1())) {
 					procCodeUn15.add(tEmpDeductSchedule.getAgType1());
 				}
 			}
@@ -307,20 +295,17 @@ public class L4510Batch extends TradeBuffer {
 		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 			if (AgType1.equals("" + tEmpDeductSchedule.getAgType1())) {
 				this.iEntryDate = tEmpDeductSchedule.getEntryDate();
-				// 15薪 應繳日=15
-				if (flag == 1) {
-					this.iPayIntDate = (iEntryDate / 100) * 100 + 15;
-				} else {
-					this.iPayIntDate = iEntryDate;
-				}
+				this.iRepayEndDate = tEmpDeductSchedule.getRepayEndDate();
+				// 應繳截止日減1天，方便處理
 				if (tEmpDeductSchedule.getRepayEndDate() > 0) {
-					this.iRepayEndDate = tEmpDeductSchedule.getRepayEndDate();
-				} else {
-					this.iRepayEndDate = iEntryDate;
+					dDateUtil.init();
+					dDateUtil.setDate_1(this.iRepayEndDate);
+					dDateUtil.setMons(-1);
+					this.iDelayYYMM = dDateUtil.getCalenderDay() / 100;
 				}
 			}
 		}
-		this.info("iEntryDate=" + iEntryDate + ", iPayIntDate=" + iPayIntDate + ", iRepayEndDate=" + iRepayEndDate);
+		this.info("iEntryDate=" + iEntryDate + ", iRepayEndDate=" + iRepayEndDate + ", iDelayYYMM=" + iDelayYYMM);
 	}
 
 //	用既有之List for each 找出RepayCode 1.期款  4.帳管 5.火險 6.契變手續費 
@@ -347,22 +332,21 @@ public class L4510Batch extends TradeBuffer {
 			getList(flag, slEmpDeductSchedule, result.get("AgType1"));
 			int nextPayIntDate = parse.stringToInteger(result.get("NextPayIntDate")) - 19110000;
 			if ("3".equals(result.get("RepayCode"))) {
-				if (nextPayIntDate > iPayIntDate) {
+				if (nextPayIntDate > iRepayEndDate) {
 					this.info("skip NextPayIntDate > iPayIntDate " + result);
 					continue;
 				}
 			} else {
-				if (nextPayIntDate > iRepayEndDate) {
-					this.info("skip NextPayIntDate > iRepayEndDate " + result);
+				if (nextPayIntDate / 100 > iDelayYYMM) {
+					this.info("skip NextPayIntDate / 100 > iDelayYYMM " + result);
 					continue;
-				} else {
-					iPayIntDate = iRepayEndDate;
 				}
 			}
 
 			// 應繳試算
-			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, parse.stringToInteger(result.get("CustNo")),
-					parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
+			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iRepayEndDate,
+					parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 0, 1,
+					BigDecimal.ZERO, titaVo);
 
 			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")),
 					parse.stringToInteger(result.get("FacmNo")), 0, 0, flag,
@@ -649,10 +633,8 @@ public class L4510Batch extends TradeBuffer {
 			tEmpDeductDtlId.setPerfMonth(month);
 			tEmpDeductDtlId.setProcCode("" + tmp.getProcCode());
 
-			
 			int AchRepayCode = tmp.getAchRepayCode();
-			
-			
+
 //			QC.623 非15薪扣款代碼應為滯繳件
 			// MediaDate, MediaKind由最後update移至
 			if (tmp.getFlag() == 2) {
@@ -662,8 +644,8 @@ public class L4510Batch extends TradeBuffer {
 				tEmpDeductDtlId.setRepayCode("1"); // ???
 				tEmpDeductDtl.setMediaKind("4");
 			}
-			
-			switch(AchRepayCode) {
+
+			switch (AchRepayCode) {
 			case 1:
 			case 2:
 			case 3:
@@ -678,19 +660,19 @@ public class L4510Batch extends TradeBuffer {
 				tEmpDeductDtlId.setRepayCode("8");
 				break;
 			}
-			
+
 			tEmpDeductDtlId.setAcctCode("000"); // 費用類
-			
-			switch(tmp.getAchRepayCode()) {
+
+			switch (tmp.getAchRepayCode()) {
 			case 1:
 			case 2:
-			case 3:			
+			case 3:
 				tEmpDeductDtlId.setAcctCode(facmAcctCode.get(tmp3)); // 非費用類 330
 				break;
 			default:
 				break;
 			}
-			
+
 			tEmpDeductDtlId.setFacmNo(tmp.getFacmNo());
 			tEmpDeductDtlId.setBormNo(tmp.getBormNo());
 
@@ -827,7 +809,6 @@ public class L4510Batch extends TradeBuffer {
 			}
 		}
 	}
-
 
 //	flag 1:15日薪 2:非15日薪
 	private void setBatxValue(List<BaTxVo> listBaTxVo, int flag, int procCode) throws LogicException {

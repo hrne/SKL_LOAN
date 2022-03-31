@@ -142,18 +142,19 @@ public class BS401 extends TradeBuffer {
 			if (slBatxDetail == null) {
 				throw new LogicException("E0014", "整批入帳明細檔= null"); // E0014 檔案錯誤
 			}
-			List<BatxDetail> lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
-			// 員工扣薪費用先入帳
-			if (lBatxDetail.get(0).getRepayCode() == 3) {
-				Collections.sort(lBatxDetail, new Comparator<BatxDetail>() {
-					public int compare(BatxDetail c1, BatxDetail c2) {
-						// status
-						if (c1.getRepayType() != c2.getRepayType()) {
-							return c2.getRepayType() - c1.getRepayType();
+			List<BatxDetail> lBatxDetail = slBatxDetail == null ? null : new ArrayList<BatxDetail>(slBatxDetail.getContent());
+			if (iFunctionCode == 0) {
+				// 員工扣薪費用先入帳
+				if (lBatxDetail.get(0).getRepayCode() == 3) {
+					Collections.sort(lBatxDetail, new Comparator<BatxDetail>() {
+						public int compare(BatxDetail c1, BatxDetail c2) {
+							if (c1.getRepayType() != c2.getRepayType()) {
+								return c2.getRepayType() - c1.getRepayType();
+							}
+							return 0;
 						}
-						return 0;
-					}
-				});
+					});
+				}
 			}
 			// 檢查明細狀態
 			checkDetail(iFunctionCode, lBatxDetail, titaVo);

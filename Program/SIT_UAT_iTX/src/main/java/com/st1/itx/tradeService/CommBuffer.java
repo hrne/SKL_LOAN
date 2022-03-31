@@ -1,6 +1,5 @@
 package com.st1.itx.tradeService;
 
-import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +8,6 @@ import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVoList;
 import com.st1.itx.eum.ThreadVariable;
-import com.st1.itx.util.format.FormatUtil;
 
 public abstract class CommBuffer {
 	private Logger logger;

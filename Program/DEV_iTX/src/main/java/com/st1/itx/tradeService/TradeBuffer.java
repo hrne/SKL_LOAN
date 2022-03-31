@@ -2,7 +2,6 @@ package com.st1.itx.tradeService;
 
 import java.util.ArrayList;
 
-import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TotaVoList;
 import com.st1.itx.db.transaction.BatchTransaction;
 import com.st1.itx.eum.ThreadVariable;
-import com.st1.itx.util.format.FormatUtil;
 
 /**
  * TradeBuffer

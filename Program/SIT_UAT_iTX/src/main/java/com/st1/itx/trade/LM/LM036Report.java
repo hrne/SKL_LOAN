@@ -49,7 +49,7 @@ public class LM036Report extends MakeReport {
 		// 只看月份來判斷要產多少筆
 		int iMonth = thisYM % 100;
 		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
-		int useExcel = iMonth % 3 == 1 ? 1 : iMonth % 3 == 2 ? 2 : 3;
+		int useExcel = iMonth % 3 == 1 ? 2 : iMonth % 3 == 2 ? 3 : 1;
 //		this.info("Excel" + useExcel);
 
 		this.info("startMonth = " + startMonth);
@@ -185,7 +185,7 @@ public class LM036Report extends MakeReport {
 		// 只看月份來判斷要產多少筆
 		int iMonth = endMonth % 100;
 		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
-		int rowCount = iMonth % 3;
+		int rowCount = iMonth % 3 == 1? 2 :iMonth % 3 == 2? 0 : 1;
 
 		// 回推12季(36個月)
 		endMonth = endMonth * 100 + 1;
@@ -289,7 +289,7 @@ public class LM036Report extends MakeReport {
 			if (badDebtMonth > 0) {
 				
 				// 數量合計
-				int rowTemp = rowCursorMap.get(yearMonth) == null ? 0 : rowCursorMap.get(yearMonth);
+				int rowTemp = rowCursorMap.get(yearMonth) == null ? 0 : rowCursorMap.get(yearMonth) - 3;
 				int colTemp = columnCursorMap.get(badDebtMonth) == null ? 0 : columnCursorMap.get(badDebtMonth);
 
 				this.info("row,col=" + rowTemp + "," + colTemp);
@@ -410,7 +410,7 @@ public class LM036Report extends MakeReport {
 
 					// 紀錄欄位
 					columnCursorMap.put(tmpBadDebtMonth, columnCursor);
-
+					
 					columnCursor++;
 				}
 
@@ -446,7 +446,7 @@ public class LM036Report extends MakeReport {
 			if (badDebtMonth > 0) {
 
 				// 數量合計
-				int rowTemp = rowCursorMap.get(yearMonth) == null ? 0 : rowCursorMap.get(yearMonth);
+				int rowTemp = rowCursorMap.get(yearMonth) == null ? 0 : rowCursorMap.get(yearMonth) - 3;
 				int colTemp = columnCursorMap.get(badDebtMonth) == null ? 0 : columnCursorMap.get(badDebtMonth);
 
 				this.info("row,col=" + rowTemp + "," + colTemp);
@@ -567,8 +567,10 @@ public class LM036Report extends MakeReport {
 				break;
 			case "8": // type 8 = 轉催收 to Loss
 				rowCursor = 16;
+				break;
 			case "9": // type 9 = 催收款回收率(當月逾期總額/上月逾放總額)
 				rowCursor = 18;
+				break;
 			case "10": // type 10 = 年度呆帳累計回收率 (年初到收回呆帳及過期帳-放款/上月追索債權-放款
 				rowCursor = 21;
 				break;

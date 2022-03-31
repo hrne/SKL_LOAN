@@ -23,7 +23,6 @@ import com.st1.itx.db.domain.TxCruiserId;
 import com.st1.itx.db.service.TxCruiserService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
-import com.st1.itx.util.format.FormatUtil;
 
 public abstract class BatchBase {
 
