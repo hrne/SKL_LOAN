@@ -1493,15 +1493,15 @@ C(3,#PRECISION,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
 #MessageTxtA=X,30,L
 C(3,#TimAcctFee,0,S,$)
 
-#SendL3r15A=X,1,S
+#SendL3r16A=X,1,S
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimAcctFee,#TimAcctFee)
 T(2,@RimAcctCode,F10)
 C(3,#TimAcctFee,0,S,$)
-S(L3R15,1,#RimCustNo,#RimFacmNo,#RimAcctFee,#RimAcctCode)
-R(1,L3R15)
-T(2,@MessageTxtA,#L3r15MessageTxt)
+S(L3R16,1,#RimCustNo,#RimFacmNo,#RimAcctFee,#RimAcctCode)
+R(1,L3R16)
+T(2,@MessageTxtA,#L3r16MessageTxt)
 ! K(LIGHT,#MessageTxtA,TXTRED,-1)
 K(LIGHT,#MessageTxtA,TXTRED,0)
 
@@ -1525,15 +1525,15 @@ C(3,#PRECISION,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 #MessageTxtB=X,30,L
 C(3,#TimHandlingFee,0,S,$)
 
-#SendL3r15B=X,1,S
+#SendL3r16B=X,1,S
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimAcctFee,#TimHandlingFee)
 T(2,@RimAcctCode,F10)
 C(3,#TimAcctFee,0,S,$)
-S(L3R15,1,#RimCustNo,#RimFacmNo,#RimAcctFee,#RimAcctCode)
-R(1,L3R15)
-T(2,@MessageTxtB,#L3r15MessageTxt)
+S(L3R16,1,#RimCustNo,#RimFacmNo,#RimAcctFee,#RimAcctCode)
+R(1,L3R16)
+T(2,@MessageTxtB,#L3r16MessageTxt)
 ! K(LIGHT,#MessageTxtA,TXTRED,-1)
 K(LIGHT,#MessageTxtB,TXTRED,0)
 
@@ -2177,7 +2177,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 <include src="ROM.icf::L6R28.dec"/>
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L3R13.dec"/>
-<include src="ROM.icf::L3R15.dec"/>
+<include src="ROM.icf::L3R16.dec"/>
 </sub>
 
 ! <include src="ROM.icf::L0Rim.dec"/>
@@ -2384,7 +2384,7 @@ C(3,#Sno,0,E(0,0),E(0,1))
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L2R09.tom"/>
 <include src="ROM.icf::L3R13.tom"/>
-<include src="ROM.icf::L3R15.tom"/>
+<include src="ROM.icf::L3R16.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
 <include src="RPDTL.icf::RPDTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

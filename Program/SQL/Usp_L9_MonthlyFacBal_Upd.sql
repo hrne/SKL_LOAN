@@ -65,12 +65,7 @@ BEGIN
           ,CASE
              WHEN NVL(B."CustNo",0) = 0
              THEN L."OvduTerm" 
-             WHEN B."MaturityDate" < "ThisMonthEndDate"
-                  AND B."MaturityDate" < B."NextPayIntDate" -- 應繳日>到期日時用到期日計算
-                  AND L."PrinBalance" + L."BadDebtBal" <> 0
-             THEN TRUNC(MONTHS_BETWEEN(TO_DATE("ThisMonthEndDate",'YYYY-MM-DD'), TO_DATE(B."MaturityDate",'YYYY-MM-DD')))
-             WHEN B."NextPayIntDate" < "ThisMonthEndDate" AND B."NextPayIntDate" > 0
-                  AND L."PrinBalance" + L."BadDebtBal" <> 0
+             WHEN B."NextPayIntDate" < "ThisMonthEndDate" AND B."NextPayIntDate" > 0 AND L."PrinBalance" + L."BadDebtBal" <> 0
              THEN TRUNC(MONTHS_BETWEEN(TO_DATE("ThisMonthEndDate",'YYYY-MM-DD'), TO_DATE(B."NextPayIntDate",'YYYY-MM-DD')))
            ELSE 0 END                 AS "OvduTerm"            -- '逾期期數';
           -- 若 應繳息日 <= 系統營業日("ThisMonthEndDate")
@@ -79,12 +74,7 @@ BEGIN
           ,CASE
              WHEN NVL(B."CustNo",0) = 0
              THEN L."OvduDays" 
-             WHEN B."MaturityDate" < "ThisMonthEndDate"
-                  AND B."MaturityDate" < B."NextPayIntDate" -- 應繳日>到期日時用到期日計算
-                  AND L."PrinBalance" + L."BadDebtBal" <> 0
-             THEN TO_DATE("ThisMonthEndDate",'YYYY-MM-DD')  - TO_DATE(B."MaturityDate",'YYYY-MM-DD') 
-             WHEN B."NextPayIntDate" <= "ThisMonthEndDate" AND B."NextPayIntDate" > 0
-                  AND L."PrinBalance" + L."BadDebtBal" <> 0
+             WHEN B."NextPayIntDate" <= "ThisMonthEndDate" AND B."NextPayIntDate" > 0 AND L."PrinBalance" + L."BadDebtBal" <> 0
              THEN TO_DATE("ThisMonthEndDate",'YYYY-MM-DD')  - TO_DATE(B."NextPayIntDate",'YYYY-MM-DD') 
            ELSE 0 END                 AS "OvduDays"            -- '逾期天數';
           ,L."CurrencyCode"           AS "CurrencyCode"        -- 幣別
@@ -156,7 +146,6 @@ BEGIN
                    THEN  99999999
                  ELSE "NextPayIntDate" END
                 ) AS "NextPayIntDate" -- '應繳息日'
-           , MAX("MaturityDate") AS "MaturityDate"
       FROM "LoanBorMain"
       WHERE "Status" in (0,2,3,4,5,6,7,8,9)
       GROUP BY "CustNo"
@@ -508,6 +497,29 @@ BEGIN
            , M."CustNo"
            , M."FacmNo" 
            , CASE
+               WHEN M."ClCode1" IN (1,2) 
+                AND CDI."IndustryItem" LIKE '%不動產%'
+               THEN '12'              -- 特定資產放款：建築貸款
+               WHEN M."ClCode1" IN (1,2) 
+                AND CDI."IndustryItem" LIKE '%建築%'
+               THEN '12'              -- 特定資產放款：建築貸款
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."FirstDrawdownDate" >= 20100101 
+                AND M."FacAcctCode" = 340
+               THEN '11'               -- 正常繳息
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."FirstDrawdownDate" >= 20100101 
+                AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
+               THEN '11'               -- 正常繳息
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."FirstDrawdownDate" >= 20100101 
+                AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
+               THEN '11'               -- 正常繳息
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."UsageCode" = '02' 
+                AND M."ProdNo" NOT IN ('60','61','62')
+                AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+               THEN '12'       -- 特定資產放款：購置住宅+修繕貸款
                WHEN M."PrinBalance" = 1
                THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)
                                --   無擔保部分--超過清償期12月者
@@ -525,46 +537,27 @@ BEGIN
                THEN '22'       --(22)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期1-6月者
                WHEN M."AcctCode" = 990
-                AND M."ProdNo" IN ('60','61','62')
-                AND M."PrinBalance" > 1
-                AND M."OvduTerm" >= 7
-                AND M."OvduTerm" <= 12
-               THEN '23'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者                  
-               WHEN M."AcctCode" = 990
-                AND M."ProdNo" IN ('60','61','62')
+                AND M."ProdNo" NOT IN ('60','61','62')
                 AND M."OvduTerm" > 12
                 AND M."PrinBalance" > 1
                THEN '3'        --(3)第三類-可望收回：
                                --   有足無擔保--逾繳超過清償期12月者
                                --   或無擔保部分--超過清償期3-6月者   
-               WHEN M."ClCode1" IN (1,2) 
-                 AND F."FirstDrawdownDate" >= 20100101 
-                 AND M."FacAcctCode" = 340
-               THEN '11'               -- 非特定資產放款：100年後政策性貸款
-               WHEN M."ClCode1" IN (1,2) 
-                 AND F."FirstDrawdownDate" >= 20100101 
-                 AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
-               THEN '11'               -- 非特定資產放款：100年後政策性貸款
-               WHEN M."ClCode1" IN (1,2) 
-                 AND CDI."IndustryItem" LIKE '不動產%'
-               THEN '12'                -- 特定資產放款：建築貸款
-               WHEN M."ClCode1" IN (1,2) 
-                 AND CDI."IndustryItem" LIKE '建築%'
-               THEN '12'                -- 特定資產放款：建築貸款
-               WHEN M."ClCode1" IN (1,2) 
-                 AND F."UsageCode" = '02' 
-               THEN '12'                -- 特定資產放款：購置住宅+修繕貸款
-               WHEN M."ClCode1" IN (3,4) 
-               THEN '11'               -- 非特定資產放款：股票質押
-               ELSE '11'               -- 非特定資產放款
+               WHEN M."AcctCode" = 990
+                AND M."OvduTerm" >= 7
+                AND M."OvduTerm" <= 12
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者                         
+               ELSE '11'       -- 正常繳息
              END                  AS "AssetClass"	--放款資產項目	  
       FROM "MonthlyFacBal" M
       LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                             AND F."FacmNo" = M."FacmNo"
       LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
-      LEFT JOIN "CdIndustry" CDI ON CDI."IndustryCode" = CM."IndustryCode"
+      LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
+                        ,"IndustryItem"
+                  FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
       WHERE M."PrinBalance" > 0
         AND M."YearMonth" = YYYYMM
     ) TMP

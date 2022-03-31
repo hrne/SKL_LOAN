@@ -56,6 +56,7 @@ public class L5813ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +="	,\"YearlyInt\"\r\n" ; 
 		sql +="	from  \"YearlyHouseLoanInt\"\r\n" ; 
 		sql +="	where \"YearMonth\"= :iYYYYMM ";
+		sql +="	order by \"CustNo\",\"FacmNo\" ";
 		
 		
 		

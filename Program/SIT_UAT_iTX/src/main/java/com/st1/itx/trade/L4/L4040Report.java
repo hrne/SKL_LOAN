@@ -70,13 +70,6 @@ public class L4040Report extends MakeReport {
 		this.print(-5, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-6, 80, "頁　　數：　	　" + this.getNowPage());
 	}
-
-	// 自訂表尾
-//	@Override
-//	public void printFooter() {
-//		print(-68, 1, "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "P");
-//			
-//		}
 			
 	public void exec(List<Map<String, String>> ListResult,TitaVo titaVo) throws LogicException {
 
@@ -184,7 +177,6 @@ public class L4040Report extends MakeReport {
 	}
 
 	private String showDate(String date, int iType) {
-//		this.info("MakeReport.toPdf showRocDate1 = " + date);
 		if (date == null || date.equals("") || date.equals("0") || date.equals(" ")) {
 			return " ";
 		}
@@ -193,7 +185,6 @@ public class L4040Report extends MakeReport {
 			rocdate -= 19110000;
 		}
 		String rocdatex = String.valueOf(rocdate);
-//		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
 
 		if (rocdatex.length() == 7) {
 			return rocdatex.substring(0, 3) + "/" + rocdatex.substring(3, 5) + "/" + rocdatex.substring(5, 7);

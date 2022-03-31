@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -19,9 +20,13 @@ import com.st1.itx.db.domain.FinReportProfitId;
  */
 public interface FinReportProfitRepositoryMon extends JpaRepository<FinReportProfit, FinReportProfitId> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<FinReportProfit> findByFinReportProfitId(FinReportProfitId finReportProfitId);
+  // Ukey =
+  public Optional<FinReportProfit> findTopByUkeyIs(String ukey_0);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<FinReportProfit> findByFinReportProfitId(FinReportProfitId finReportProfitId);
 
 }
+

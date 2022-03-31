@@ -24,13 +24,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ACCTDATEFM=9,7<br>
- * ACCTDATETO=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L4001")
 @Scope("prototype")
 public class L4001 extends TradeBuffer {

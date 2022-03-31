@@ -34,14 +34,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunctionCode=9,1<br>
- * CreateFlag=X,1<br>
- * CustNo=9,7<br>
- * PropDate=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L4040")
 @Scope("prototype")

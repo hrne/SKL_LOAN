@@ -815,7 +815,12 @@ public class L4510Batch extends TradeBuffer {
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
-
+                // 非15日薪僅扣期款
+				if (flag==2) {
+					if (tBaTxVo.getRepayType() != 1) {
+						continue;
+					}
+				}
 				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
 						tBaTxVo.getRepayType(), flag, procCode);
 

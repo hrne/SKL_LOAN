@@ -21,17 +21,6 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.springjpa.cm.L4042ServiceImpl;
 /* DB容器 */
 
-/**
- * Tita<br>
- * SearchFlag=9,1<br>
- * DateFrom=9,7<br>
- * DateTo=9,7<br>
- * CustNo=9,7<br>
- * RepayAcct=9,14<br>
- * RepayBank=9,3<br>
- * END=X,1<br>
- */
-
 @Service("L4042")
 @Scope("prototype")
 public class L4042 extends TradeBuffer {

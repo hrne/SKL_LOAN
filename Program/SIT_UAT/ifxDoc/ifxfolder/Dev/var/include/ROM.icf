@@ -4278,15 +4278,15 @@ TXFORM=L3R14
 </L3R14.tom>
 
 !檢查帳管費、手續費是否已在企金費用建檔
-<L3R15.dec>
-#L3r15MessageTxt=X,30,S
-</L3R15.dec>
+<L3R16.dec>
+#L3r16MessageTxt=X,30,S
+</L3R16.dec>
 
-<L3R15.tom>
-TXFORM=L3R15
-#L3r15MessageTxt
+<L3R16.tom>
+TXFORM=L3R16
+#L3r16MessageTxt
 ^
-</L3R15.tom>
+</L3R16.tom>
 
 --------------------------------------------------------------
 !尋找客戶檔資料

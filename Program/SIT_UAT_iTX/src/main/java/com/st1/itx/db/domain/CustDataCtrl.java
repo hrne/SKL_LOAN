@@ -26,7 +26,7 @@ public class CustDataCtrl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3758088225677264689L;
+	private static final long serialVersionUID = -8401732095364550582L;
 
 // 借款人戶號
   @Id
@@ -55,6 +55,26 @@ public class CustDataCtrl implements Serializable {
   /* 客戶申請留存原始戶名用 by eric 2022.3.25 */
   @Column(name = "`CustName`", length = 100)
   private String custName;
+
+  // 設定日期
+  /* by eric 2022.3.31 */
+  @Column(name = "`SetDate`")
+  private int setDate = 0;
+
+  // 設定人員
+  /* by eric 2022.3.31 */
+  @Column(name = "`SetEmpNo`", length = 6)
+  private String setEmpNo;
+
+  // 解除日期
+  /* by eric 2022.3.31 */
+  @Column(name = "`ReSetDate`")
+  private int reSetDate = 0;
+
+  // 解除人員
+  /* by eric 2022.3.31 */
+  @Column(name = "`ReSetEmpNo`", length = 6)
+  private String reSetEmpNo;
 
   // 建檔日期時間
   @CreatedDate
@@ -194,6 +214,82 @@ public class CustDataCtrl implements Serializable {
   }
 
 /**
+	* 設定日期<br>
+	* by eric 2022.3.31
+	* @return Integer
+	*/
+  public int getSetDate() {
+    return this.setDate;
+  }
+
+/**
+	* 設定日期<br>
+	* by eric 2022.3.31
+  *
+  * @param setDate 設定日期
+	*/
+  public void setSetDate(int setDate) {
+    this.setDate = setDate;
+  }
+
+/**
+	* 設定人員<br>
+	* by eric 2022.3.31
+	* @return String
+	*/
+  public String getSetEmpNo() {
+    return this.setEmpNo == null ? "" : this.setEmpNo;
+  }
+
+/**
+	* 設定人員<br>
+	* by eric 2022.3.31
+  *
+  * @param setEmpNo 設定人員
+	*/
+  public void setSetEmpNo(String setEmpNo) {
+    this.setEmpNo = setEmpNo;
+  }
+
+/**
+	* 解除日期<br>
+	* by eric 2022.3.31
+	* @return Integer
+	*/
+  public int getReSetDate() {
+    return this.reSetDate;
+  }
+
+/**
+	* 解除日期<br>
+	* by eric 2022.3.31
+  *
+  * @param reSetDate 解除日期
+	*/
+  public void setReSetDate(int reSetDate) {
+    this.reSetDate = reSetDate;
+  }
+
+/**
+	* 解除人員<br>
+	* by eric 2022.3.31
+	* @return String
+	*/
+  public String getReSetEmpNo() {
+    return this.reSetEmpNo == null ? "" : this.reSetEmpNo;
+  }
+
+/**
+	* 解除人員<br>
+	* by eric 2022.3.31
+  *
+  * @param reSetEmpNo 解除人員
+	*/
+  public void setReSetEmpNo(String reSetEmpNo) {
+    this.reSetEmpNo = reSetEmpNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -273,6 +369,7 @@ public class CustDataCtrl implements Serializable {
   @Override
   public String toString() {
     return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", applMark=" + applMark + ", reason=" + reason + ", custId=" + custId + ", custName=" + custName
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", setDate=" + setDate + ", setEmpNo=" + setEmpNo + ", reSetDate=" + reSetDate + ", reSetEmpNo=" + reSetEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

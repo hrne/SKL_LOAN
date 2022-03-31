@@ -220,6 +220,7 @@ public class L5813Batch extends TradeBuffer {
 					
 				}
 				
+				
 
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(result.get("JsonFields"));
@@ -235,10 +236,14 @@ public class L5813Batch extends TradeBuffer {
 				
 				
 				
-				
-				for(int i= bdOwner.length(); i<9;i++) {
-					bdOwner = bdOwner+"　";
+				if(bdOwner.length()>9) {
+					bdOwner = bdOwner.substring(0, 9);
+				} else {
+					for(int i= bdOwner.length(); i<9;i++) {
+						bdOwner = bdOwner+"　";
+					}
 				}
+				
 				
 				//貸款帳號
 				String iAccounount = "";				

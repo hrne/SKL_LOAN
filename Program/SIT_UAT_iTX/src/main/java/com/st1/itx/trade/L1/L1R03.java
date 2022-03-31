@@ -177,7 +177,7 @@ public class L1R03 extends TradeBuffer {
 		// 損益表
 		FinReportProfitId finReportProfitId = new FinReportProfitId();
 		finReportProfitId.setCustUKey(iCustUKey);
-		finReportProfitId.setUKey(iUKey);
+		finReportProfitId.setUkey(iUKey);
 
 		FinReportProfit finReportProfit = finReportProfitService.findById(finReportProfitId, titaVo);
 
@@ -211,7 +211,7 @@ public class L1R03 extends TradeBuffer {
 			if (finReportDebt2 != null) {
 				FinReportProfitId finReportProfitId2 = new FinReportProfitId();
 				finReportProfitId2.setCustUKey(finReportDebt2.getCustUKey());
-				finReportProfitId2.setUKey(finReportDebt2.getUKey());
+				finReportProfitId2.setUkey(finReportDebt2.getUKey());
 
 				FinReportProfit finReportProfit2 = finReportProfitService.findById(finReportProfitId2, titaVo);
 				if (finReportProfit2 != null) {

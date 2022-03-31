@@ -30,15 +30,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunctionCode=9,1<br>
- * AuthApplCode=9,1<br>
- * CustNo=9,7<br>
- * PropDate=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L4041")
 @Scope("prototype")
 /**
@@ -223,19 +214,6 @@ public class L4041 extends TradeBuffer {
 					this.info("PropDate : " + propDate);
 					this.info("tempCheckAcctNo : " + tempCheckAcctNo);
 					this.info("F5 : " + result.get("F5"));
-//					if ("1".equals(result.get("F5"))) {
-//						checkFlag = 1;
-//						tempCheckAcctNo = result.get("F4");
-//						tempCustNo = FormatUtil.pad9(result.get("F2"), 7);
-//						tempFacmNo = FormatUtil.pad9(result.get("F6"), 3);
-//					} else {
-//						if (!tempCheckAcctNo.equals(result.get("F4"))) {
-//							throw new LogicException(titaVo, "E0014",
-//									"戶號:" + tempCustNo + "，額度:" + tempFacmNo + "，期款與火險需同時授權");
-//						} else {
-//							checkFlag = 0;
-//						}
-//					}
 
 					if (!"Y".equals(result.get("F13")) && propDate > 0) {
 						cnt = cnt + 1;
@@ -246,7 +224,6 @@ public class L4041 extends TradeBuffer {
 						if ("2".equals(result.get("F5"))) {
 							bCnt++;
 						}
-//					this.info("!*!*!*! AuthStatus : " + tempPostAuthLog.getAuthStatus());
 
 						MediaDate = dateUtil.getNowIntegerForBC();
 
@@ -399,10 +376,6 @@ public class L4041 extends TradeBuffer {
 				if (cnt == 0) {
 					throw new LogicException(titaVo, "CE001", "查無資料");
 				}
-				
-//				if (checkFlag == 1) {
-//					throw new LogicException(titaVo, "E0014", "戶號:" + tempCustNo + "-額度:" + tempFacmNo + "，期款與火險需同時授權");
-//				}
 
 //				Footer
 //				1	FootDataClass   資料別		0-1		X(1)	固定值為2	
@@ -435,9 +408,6 @@ public class L4041 extends TradeBuffer {
 				postAuthFileVo846.setOccursList(aTmp);
 				// 轉換資料格式
 				ArrayList<String> aFile = postAuthFileVo846.toFile();
-
-//				String outputFilePath11 = outFolder + "PO$P11P_846授權出.txt";
-//				String outputFilePath12 = outFolder + "PO$P12P_53N授權出.txt";
 
 				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
 						titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權.txt", 2);

@@ -140,7 +140,7 @@ public class L3731 extends TradeBuffer {
 		if (titaVo.isHcodeNormal()) {
 			// 交易需主管核可
 			if (!titaVo.getHsupCode().equals("1")) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0303", "");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			CaseCloseNormalRoutine(iCustNo, iFacmNo, iBormNo, titaVo);
 		} else {

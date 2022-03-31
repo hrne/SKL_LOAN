@@ -1,5 +1,4 @@
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB204_Upd"
+create or replace NONEDITIONABLE PROCEDURE "Usp_L8_JcicB204_Upd"
 (
 -- 程式功能：維護 JcicB204 聯徵授信餘額日報檔
 -- 執行時機：每日日終批次(換日前)
@@ -50,22 +49,45 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('INSERT JcicB204');
 
    INSERT INTO "JcicB204"
-   WITH "Work_B204" AS (
-    -- 當日清償
+   WITH closedData AS (
+    -- 選出當日清償客戶
     SELECT Tx."AcDate"         AS "AcDate"
          , Tx."CustNo"         AS "CustNo"
          , Tx."FacmNo"         AS "FacmNo"
          , Tx."BormNo"         AS "BormNo"
-         , 'P'                 AS "SubTranCode"       -- 交易別  -- P:每筆撥款清償後額度未解約(第10欄清償金額需大於0)
-         , SUM(Tx."Principal" + Tx."Interest" ) AS "Amt"
     FROM   "LoanBorTx" Tx
       LEFT JOIN "FacMain" F  ON F."CustNo"  =  Tx."CustNo"
                             AND F."FacmNo"  =  Tx."FacmNo"
     WHERE  Tx."AcDate"                =  TBSDYF
       AND  Tx."CustNo"                >  0
       AND  NVL(Tx."TitaHCode", ' ')   IN ('0')    -- 正常
-      AND  NVL(Tx."TitaTxCd", ' ')    IN ('L3200', 'L3410', 'L3420')
+      AND  NVL(Tx."TitaTxCd", ' ')    IN ('L3410', 'L3420') -- 結案
       AND  NVL(JSON_VALUE(Tx."OtherFields", '$.CaseCloseCode'),' ') IN ('0', '4', '5')   -- 結案區分: 正常, 催收戶本人清償, 催收戶保證人代償
+      AND  NVL(F."AdvanceCloseCode",0) <> 0
+      AND  NVL(F."UtilAmt",0)          =  0
+    GROUP BY Tx."AcDate"
+           , Tx."CustNo"
+           , Tx."FacmNo"
+           , Tx."BormNo"
+   )
+   , "Work_B204" AS (
+    -- 計算當日清償金額
+    SELECT Tx."AcDate"         AS "AcDate"
+         , Tx."CustNo"         AS "CustNo"
+         , Tx."FacmNo"         AS "FacmNo"
+         , Tx."BormNo"         AS "BormNo"
+         , 'P'                 AS "SubTranCode"       -- 交易別  -- P:每筆撥款清償後額度未解約(第10欄清償金額需大於0)
+         , SUM(Tx."Principal" + Tx."Interest" ) AS "Amt"
+    FROM closedData C
+    LEFT JOIN "LoanBorTx" Tx ON Tx."AcDate" = c."AcDate"
+                            AND Tx."CustNo" = c."CustNo"
+                            AND Tx."FacmNo" = c."FacmNo"
+                            AND Tx."BormNo" = c."BormNo"
+                            AND Tx."TitaTxCd" IN ('L3200', 'L3410', 'L3420')
+                            AND Tx."TitaHCode" IN ('0')    -- 正常
+      LEFT JOIN "FacMain" F  ON F."CustNo"  =  Tx."CustNo"
+                            AND F."FacmNo"  =  Tx."FacmNo"
+    WHERE  NVL(Tx."CustNo",0)                >  0
       AND  NVL(F."AdvanceCloseCode",0) <> 0
       AND  NVL(F."UtilAmt",0)          =  0
     GROUP BY  Tx."AcDate", Tx."CustNo", Tx."FacmNo", Tx."BormNo"

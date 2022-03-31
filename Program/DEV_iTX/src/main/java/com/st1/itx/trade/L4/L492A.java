@@ -22,14 +22,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CustNo=9,7<br>
- * FacmNo=9,3<br>
- * RepayCode=9,2<br>
- * END=X,1<br>
- */
-
 @Service("L492A")
 @Scope("prototype")
 /**
@@ -39,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L492A extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L492A.class);
 
 	/* 轉型共用工具 */
 	@Autowired

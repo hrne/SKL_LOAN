@@ -1,5 +1,43 @@
 ﻿!---------- BASIC LABEL Variables ----------
 <sub type="SYS">
+
+#test=X,1,S
+IF(#FKEY>0,$,s)
+T(3,@CurrencyCode,TWD)
+C(5,#CurrencyCode,TWD,SHOW(#TwRepayAmt,#TwOvduRepay,#TwCloseBreachAmt,#TwExtraRepay,#TwReduceAmt,
+                      #TwPrincipal,#TwInterest,#TwDelayInt,#TwBreachAmt,
+                      #TwAcctFee,#TwModifyFee,#TwFireFee,#TwLawFee,
+                      #TwExtraCloseBreachAmt)
+                 HIDE(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#UsExtraRepay,#UsReduceAmt,
+                      #UsPrincipal,#UsInterest,#UsDelayInt,#UsBreachAmt,
+                      #UsAcctFee,#UsModifyFee,#UsFireFee,#UsLawFee,
+                      #UsExtraCloseBreachAmt)
+                ,SHOW(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#UsExtraRepay,#UsReduceAmt,
+                      #UsPrincipal,#UsInterest,#UsDelayInt,#UsBreachAmt,
+                      #UsAcctFee,#UsModifyFee,#UsFireFee,#UsLawFee,
+                      #UsExtraCloseBreachAmt)
+                 HIDE(#TwRepayAmt,#TwOvduRepay,#TwCloseBreachAmt,#TwExtraRepay,#TwReduceAmt,
+                      #TwPrincipal,#TwInterest,#TwDelayInt,#TwBreachAmt,
+                      #TwAcctFee,#TwModifyFee,#TwFireFee,#TwLawFee,
+                      #TwExtraCloseBreachAmt))
+INVOKEJS(SHOW,grd9_2,0)
+INVOKEJS(SHOW,grd9_3,0)
+INVOKEJS(SHOW,grd9_4,0)
+INVOKEJS(SHOW,grd9_5,0)
+INVOKEJS(SHOW,p1,9,13,0)
+C(3,#RepayType,2,INVOKEJS(SHOW,p1,13,13,1),$)
+C(3,#RepayType,1,INVOKEJS(SHOW,p1,9,10,1),$)
+C(3,#RepayType,9,INVOKEJS(SHOW,p1,12,12,1),$)
+C(3,#RepayType,9,INVOKEJS(SHOW,p1,14,20,0),$)
+C(3,#RepayType,12
+,INVOKEJS(SHOW,p1,11,11,1)
+ T(F,@TwReduceAmt,0)
+ T(F,@UsReduceAmt,0)
+ ,T(F,@TwReduceAmt,1)
+  T(F,@UsReduceAmt,1))
+
+
+
 </sub>
 
 <sub type="SYS" name="label">

@@ -31,13 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunctionCode=9,1<br>
- * SearchRange=X,1<br>
- * END=X,1<br>
- */
-
 @Service("L4030")
 @Scope("prototype")
 /**
@@ -87,13 +80,6 @@ public class L4030 extends TradeBuffer {
 		this.limit = 100;
 
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
-//		FunctionCode = 
-//		2:處理  
-//		3:刪除 
-//		6:取消刪除
-//		9:查詢
-
-//		此交易為勾選
 		Slice<TxToDoDetail> sTxToDoDetail = null;
 
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
@@ -137,10 +123,6 @@ public class L4030 extends TradeBuffer {
 			}
 
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
-//				if (selectCodeIsNotQualify(tTxToDoDetail)) {
-//					continue;
-//				}
-
 				tmpFacm tmp = new tmpFacm(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo());
 
 				if (!loanBal.containsKey(tmp)) {
@@ -234,44 +216,7 @@ public class L4030 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private Boolean selectCodeIsNotQualify(TxToDoDetail tTxToDoDetail) throws LogicException {
-		Boolean result = false;
-		int today = this.getTxBuffer().getTxCom().getTbsdyf();
-
-		switch (selectCode) {
-		case 1:
-			if (tTxToDoDetail.getDataDate() >= today) {
-				result = true;
-			}
-			break;
-		case 2:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-		case 3:
-			break;
-		case 4:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-		case 5:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-		case 6:
-			break;
-		case 7:
-			break;
-		default:
-			break;
-		}
-		return result;
-	}
-
-//	暫時紀錄戶號額度
+	// 暫時紀錄戶號額度
 	private class tmpFacm {
 
 		private int custNo = 0;
@@ -282,16 +227,8 @@ public class L4030 extends TradeBuffer {
 			this.setFacmNo(facmNo);
 		}
 
-		public int getCustNo() {
-			return custNo;
-		}
-
 		public void setCustNo(int custNo) {
 			this.custNo = custNo;
-		}
-
-		public int getFacmNo() {
-			return facmNo;
 		}
 
 		public void setFacmNo(int facmNo) {

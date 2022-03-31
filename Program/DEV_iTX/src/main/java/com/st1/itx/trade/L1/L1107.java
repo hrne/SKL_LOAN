@@ -526,7 +526,7 @@ public class L1107 extends TradeBuffer {
 
 		FinReportProfitId finReportProfitId = new FinReportProfitId();
 		finReportProfitId.setCustUKey(iCustUKey);
-		finReportProfitId.setUKey(iUKey);
+		finReportProfitId.setUkey(iUKey);
 
 		FinReportProfit finReportProfit = finReportProfitService.holdById(finReportProfitId, titaVo);
 		if (finReportProfit == null) {

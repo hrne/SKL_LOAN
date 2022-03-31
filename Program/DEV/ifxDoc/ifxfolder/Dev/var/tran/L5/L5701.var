@@ -700,7 +700,7 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 #MainFinCode=X,8,I
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#IsMainFin=="Y",s,$)
-@T(3,@MainFInCodeName,)
+@T(3,@MainFinCodeName,)
 V(7)
 
 !總本金餘額
