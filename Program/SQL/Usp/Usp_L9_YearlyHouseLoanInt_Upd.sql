@@ -149,10 +149,6 @@ BEGIN
           ,NVL(LBM."MaturityDate",0)  AS "MaturityDate"        -- 到期日     
           ,A."YearlyInt"              AS "YearlyInt"          -- 年度繳息金額  
           ,NVL(CB."HouseBuyDate",0)   AS "HouseBuyDate"        -- 房屋取得日期
-          ,JOB_START_TIME             AS "CreateDate"          -- 建檔日期時間  
-          ,EmpNo                      AS "CreateEmpNo"         -- 建檔人員 
-          ,JOB_START_TIME             AS "LastUpdate"          -- 最後更新日期時間  
-          ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員 
           ,'{"BdLoacation":"'
            || CASE
                 WHEN NVL(TO_CHAR(CB."BdLocation"),' ') != ' '
@@ -174,6 +170,10 @@ BEGIN
               ELSE '0' END
            || '"' -- EndMonth	繳息所屬年月-迄月	DECIMAL	西元年月yyymm
            || '}'                         AS "JsonFields"          -- jason格式紀錄欄 NVARCHAR2 300
+          ,JOB_START_TIME             AS "CreateDate"          -- 建檔日期時間  
+          ,EmpNo                      AS "CreateEmpNo"         -- 建檔人員 
+          ,JOB_START_TIME             AS "LastUpdate"          -- 最後更新日期時間  
+          ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員 
     FROM A 
     LEFT JOIN LBM ON LBM."CustNo" = A."CustNo"
                  AND LBM."FacmNo" = A."FacmNo"

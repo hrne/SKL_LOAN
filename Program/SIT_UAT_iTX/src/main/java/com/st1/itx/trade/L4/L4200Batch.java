@@ -415,7 +415,7 @@ public class L4200Batch extends TradeBuffer {
 						sendMsg = e.getMessage();
 						checkFlag = false;
 					}
-				} else if (filename.indexOf("10H00") >= 0 && checkFlag) {
+				} else if (filename.indexOf("10H") >= 0 && checkFlag) {
 					String filePath31 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 							+ File.separatorChar + filename;
 					this.info("員工扣薪回應檔 Start With -> " + filePath31);
@@ -434,7 +434,7 @@ public class L4200Batch extends TradeBuffer {
 						checkFlag = false;
 					}
 
-				} else if (filename.indexOf("LNM617P") >= 0 && checkFlag) {
+				} else if (filename.indexOf("LNM") >= 0 && checkFlag) {
 					String filePath32 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 							+ File.separatorChar + filename;
 					this.info("員工扣薪回應檔 Start With -> " + filePath32);
@@ -1097,9 +1097,9 @@ public class L4200Batch extends TradeBuffer {
 
 		String mediaType = "";
 
-		if (filePath3.indexOf("10H00") >= 0) {
+		if (filePath3.indexOf("10H") >= 0) {
 			mediaType = "4";
-		} else if (filePath3.indexOf("LNM617P") >= 0) {
+		} else if (filePath3.indexOf("LNM") >= 0) {
 			mediaType = "5";
 		}
 
@@ -1189,9 +1189,9 @@ public class L4200Batch extends TradeBuffer {
 //				03.員工扣款
 				tBatxDetail.setRepayCode(3);
 				if ("4".equals(mediaType)) {
-					tBatxDetail.setFileName(filePath3.substring(filePath3.indexOf("10H00")));
+					tBatxDetail.setFileName(filePath3.substring(filePath3.indexOf("10H")));
 				} else if ("5".equals(mediaType)) {
-					tBatxDetail.setFileName(filePath3.substring(filePath3.indexOf("LNM617P")));
+					tBatxDetail.setFileName(filePath3.substring(filePath3.indexOf("LNM")));
 				}
 				tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("OccEntryDate")));
 				tBatxDetail.setCustNo(parse.stringToInteger(tempOccursList.get("OccCustNo")));
@@ -1202,20 +1202,19 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setRepayAcCode("");
 				tBatxDetail.setRepayAmt(reAcctAmt); // 實扣金額
 				// CheckMsg Message
-				// 01-扣款成功 && 17-扣款不足
+				// 01-扣款成功 && 17-扣款不足(含02)
 				if ("E".equals(procCode.substring(0, 1))) {
 					procStsCode = "1"; // 不處理
 				} else {
-					if ("01".equals(tempOccursList.get("OccReturnCode"))) {
-						procCode = "00000";
-					} else {
-						procCode = "004" + tempOccursList.get("OccReturnCode");
-					}
-					if ("01".equals(tempOccursList.get("OccReturnCode"))
-							|| "17".equals(tempOccursList.get("OccReturnCode"))) {
+					if (reAcctAmt.compareTo(tEmpDeductMedia.getRepayAmt()) >= 0) {
 						procStsCode = "0"; // 檢核正常
+						procCode = "00000";
+					} else if (reAcctAmt.compareTo(BigDecimal.ZERO) > 0) {
+						procStsCode = "0"; // 檢核正常
+						procCode = "00417";
 					} else {
 						procStsCode = "1"; // 不處理
+						procCode = "004" + tempOccursList.get("OccReturnCode");
 					}
 				}
 
@@ -1236,7 +1235,7 @@ public class L4200Batch extends TradeBuffer {
 						empAFailCnt = empAFailCnt + 1;
 					}
 				}
-				
+
 				if (!"00000".equals(procCode)) {
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 				}
@@ -1328,17 +1327,21 @@ public class L4200Batch extends TradeBuffer {
 				LoanCheque tLoanCheque = new LoanCheque();
 				tLoanChequeId.setChequeAcct(chequeAcct);
 				tLoanChequeId.setChequeNo(chequeNo);
-				tLoanCheque = loanChequeService.findById(tLoanChequeId, titaVo);
-				this.info("Cheque ReturnCode : " + tempOccursList.get("ReturnCode"));
-
-//              交換通過
-				if (!"H".equals(tempOccursList.get("ReturnCode"))) {
-					procCode = "00501";
-					procStsCode = "1";
-				}
+				tLoanCheque = loanChequeService.holdById(tLoanChequeId, titaVo);
 				if ("0".equals(procStsCode) && tLoanCheque == null) {
 					procCode = "E0014"; // 檔案錯誤
 					procCodeX = "支票檔不存在";
+					procStsCode = "1";
+				}
+				if (!"0".equals(tLoanCheque.getStatusCode())) {
+					procCode = "E0015"; // 檢查錯誤
+					procCodeX = "票據狀況碼應為0.未處理";
+					procStsCode = "1";
+				}
+				this.info("Cheque ReturnCode : " + tempOccursList.get("ReturnCode"));
+//              交換通過
+				if (!"H".equals(tempOccursList.get("ReturnCode"))) {
+					procCode = "00501";
 					procStsCode = "1";
 				}
 				if ("0".equals(procStsCode) && chequeAmt.compareTo(tLoanCheque.getChequeAmt()) != 0) {
@@ -1368,17 +1371,17 @@ public class L4200Batch extends TradeBuffer {
 						procCode = "E0015"; // 檢查錯誤
 						procCodeX = "銷帳檔支票金額不合";
 						procStsCode = "1";
-					} else {
-						procCode = "00000";
-						// update LoanCheque
-						LoanCheque t2LoanCheque = loanChequeService.holdById(tLoanCheque.getLoanChequeId(), titaVo);
-						t2LoanCheque.setStatusCode("4");
-						t2LoanCheque.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")));
-						try {
-							loanChequeService.update(t2LoanCheque, titaVo);
-						} catch (DBException e) {
-							throw new LogicException("E0007", "LoanCheque update error : " + e.getErrorMsg());
-						}
+					}
+				}
+				// update LoanCheque
+				if ("0".equals(procStsCode)) {
+					procCode = "00000";
+					tLoanCheque.setStatusCode("4");
+					tLoanCheque.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")));
+					try {
+						loanChequeService.update(tLoanCheque, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0007", "LoanCheque update error : " + e.getErrorMsg());
 					}
 				}
 // 
@@ -1612,7 +1615,8 @@ public class L4200Batch extends TradeBuffer {
 //        1).匯款轉帳： rbalmall
 //        2).ACH扣款： AHR11P, AHR12P
 //        3).郵局扣款：PRSBCP4_53N, PRSBCP4_8460001, PRSBCP4_8460002
-//        4).員工扣薪：10H00, LNM617P
+//        4).員工扣薪：10H, LNM
+//        5).支票兌現：mortgage
 //		2.檔案錯誤  ...： 檢核檔案內容，若格式不合，此階段先提出錯誤
 //		3.相同檔名已存在，需先刪除此批號     
 //      4.需按來源(匯款轉帳，銀行扣款、員工扣薪、支票兌現)，分開上傳;
@@ -1700,7 +1704,7 @@ public class L4200Batch extends TradeBuffer {
 					checkFlag = false;
 					break;
 				}
-			} else if (filename.indexOf("10H00") >= 0) {
+			} else if (filename.indexOf("10H") >= 0) {
 				empDeductKind = 1;
 				try {
 					empDeductFileVo.setValueFromFile(dataLineList1);
@@ -1709,7 +1713,7 @@ public class L4200Batch extends TradeBuffer {
 					checkFlag = false;
 					break;
 				}
-			} else if (filename.indexOf("LNM617P") >= 0) {
+			} else if (filename.indexOf("LNM") >= 0) {
 				empDeductKind = 1;
 				try {
 					empDeductFileVo.setValueFromFile(dataLineList1);

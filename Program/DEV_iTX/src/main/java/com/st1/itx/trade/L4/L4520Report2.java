@@ -166,7 +166,6 @@ public class L4520Report2 extends MakeReport {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 			int total = 0, i = 0, pageCnt = 0;
 			
-			BigDecimal sum = BigDecimal.ZERO;
 			BigDecimal sumA1 = BigDecimal.ZERO;
 			BigDecimal sumA2 = BigDecimal.ZERO;
 			BigDecimal sumA3 = BigDecimal.ZERO;
@@ -195,19 +194,10 @@ public class L4520Report2 extends MakeReport {
 	  		  }	  		
 	  		  
 	  		  this.print(0, 30, fnAllList.get(i).get("Fullname")); // 姓名
-	  		
 	  		  
-	  		  
-	  		  sum = sum.add(parse.stringToBigDecimal(fnAllList.get(i).get("Principal")))  // 扣款金額
-	  				  .add(parse.stringToBigDecimal(fnAllList.get(i).get("Interest")))
-	  				  .add(parse.stringToBigDecimal(fnAllList.get(i).get("BreachAmt")))
-	  						  .add(parse.stringToBigDecimal(fnAllList.get(i).get("Shortfall")))
-	  						  .add(parse.stringToBigDecimal(fnAllList.get(i).get("OtherAmt")));
-	  		  
-	  		  if(sum.intValue() > 0) {
-	  			this.print(0, 53, df1.format(sum),"R"); // 扣款金額
-	  			sumA1 = sumA1.add(sum);
-	  			sum = new BigDecimal("0");
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("TxAmt")) > 0) {
+	  			this.print(0, 53, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TxAmt"))),"R"); // 扣款金額
+	  			sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("TxAmt")));
 	  		  }
 	  		  
 	  		  if(parse.stringToInteger(fnAllList.get(i).get("Principal")) > 0) {
@@ -225,12 +215,12 @@ public class L4520Report2 extends MakeReport {
 	  			sumA4 = sumA4.add(parse.stringToBigDecimal(fnAllList.get(i).get("BreachAmt")));
 	  		  }
 	  		 
-	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempAmt")) > 0) {
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempDr")) > 0) {
 	  			this.print(0, 102, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt"))),"R"); // 暫收借
 	  			sumA5 = sumA5.add(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt")));
 	  		  }
 	  		 
-	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempAmt")) < 0) {
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempCr")) > 0) {
 	  			this.print(0, 113, df1.format(new BigDecimal("0").subtract(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt")))),"R"); // 暫收貸
 	  			sumA6 = sumA6.add(new BigDecimal("0").subtract(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt"))));
 	  		  }

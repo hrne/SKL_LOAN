@@ -97,7 +97,6 @@ public class L4510Batch extends TradeBuffer {
 
 	private int iEntryDate = 0; // 入帳日期
 	private int iRepayEndDate = 0; // 應繳截止日
-	private int iDelayYYMM = 0; // 滯繳年月
 
 //	繳息迄日 minNextPayIntDateList
 	private HashMap<tmpFacm, Integer> minNextPayIntDateList = new HashMap<>();
@@ -295,12 +294,6 @@ public class L4510Batch extends TradeBuffer {
 				this.iEntryDate = tEmpDeductSchedule.getEntryDate();
 				this.iRepayEndDate = tEmpDeductSchedule.getRepayEndDate();
 			}
-			if (tEmpDeductSchedule.getRepayEndDate() > 0) {
-				dDateUtil.init();
-				dDateUtil.setDate_1(this.iRepayEndDate);
-				dDateUtil.setMons(-1);
-				this.iDelayYYMM = dDateUtil.getCalenderDay() / 100;
-			}
 		}
 	}
 
@@ -334,18 +327,22 @@ public class L4510Batch extends TradeBuffer {
 				}
 				iPayIntDate = iRepayEndDate;
 			} else {
-				if (nextPayIntDate / 100 >= iDelayYYMM) {
-					this.info("skip NextPayIntDate / 100 >= iDelayYYMM  " + result);
+				if (nextPayIntDate >= iEntryDate) {
+					this.info("skip NextPayIntDate >= iEntryDate  " + result);
 					continue;
 				}
 				iPayIntDate = iEntryDate;
 			}
 
 			// 應繳試算
-			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate,
-					parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 0, 1,
-					BigDecimal.ZERO, titaVo);
-
+			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, parse.stringToInteger(result.get("CustNo")),
+					parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
+			if (flag == 2) {
+				if (baTxCom.getTerms() < 2) {
+					this.info("skip terms < 2  " + result);
+					continue;
+				}
+			}
 			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")),
 					parse.stringToInteger(result.get("FacmNo")), 0, 0, flag,
 					parse.stringToInteger(result.get("AgType1")));
@@ -815,8 +812,8 @@ public class L4510Batch extends TradeBuffer {
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
-                // 非15日薪僅扣期款
-				if (flag==2) {
+				// 非15日薪僅扣期款
+				if (flag == 2) {
 					if (tBaTxVo.getRepayType() != 1) {
 						continue;
 					}
