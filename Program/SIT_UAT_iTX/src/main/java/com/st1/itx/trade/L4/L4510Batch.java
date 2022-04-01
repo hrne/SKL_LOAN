@@ -132,7 +132,6 @@ public class L4510Batch extends TradeBuffer {
 	private HashMap<tmpFacm, BigDecimal> rpAmt30Map = new HashMap<>();
 
 	private HashMap<tmpFacm, Integer> mapFlag = new HashMap<>();
-	private HashMap<tmpFacm, Integer> mapFlag2 = new HashMap<>();
 // 火險單
 	private HashMap<tmpFacm, String> insuNoMap = new HashMap<>();
 	private HashMap<tmpFacm, Integer> bormMap = new HashMap<>();
@@ -337,7 +336,7 @@ public class L4510Batch extends TradeBuffer {
 			// 應繳試算
 			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, parse.stringToInteger(result.get("CustNo")),
 					parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
-			if (flag == 2) {
+			if (!"3".equals(result.get("RepayCode"))) {
 				if (baTxCom.getTerms() < 2) {
 					this.info("skip terms < 2  " + result);
 					continue;
@@ -524,7 +523,6 @@ public class L4510Batch extends TradeBuffer {
 		});
 
 		this.info("tempList ..." + tempList.toString());
-		mapFlag2 = new HashMap<>();
 		jsonField = new HashMap<>();
 //		RepayType = 0 先寫入jsonFild
 
@@ -578,29 +576,9 @@ public class L4510Batch extends TradeBuffer {
 			this.info("tmp2 ... " + tmp2);
 			this.info("tmp3 ... " + tmp3);
 			this.info("rpAmt30Map ... " + rpAmt30Map.get(tmp2));
-			this.info("mapFlag2 ... " + mapFlag2.containsKey(tmp3));
 
 //			暫收抵繳僅寫入第一筆為期款撥款(報表用)
 			tempVo = new TempVo();
-			if (!mapFlag2.containsKey(tmp3) && tmp.getAchRepayCode() == 1 && rpAmt30Map.get(tmp3) != null) {
-				tempVo.putParam("TempAmt", rpAmt30Map.get(tmp3));
-				mapFlag2.put(tmp3, 1);
-
-				this.info("tempVo ... " + tempVo.toString());
-
-			} else {
-				if (mapFlag2.containsKey(tmp3)) {
-					this.info(tmp3.toString() + "已寫入暫收抵繳");
-				}
-				if (tmp.getAchRepayCode() != 1) {
-					this.info(tmp3.toString() + "不為1");
-				}
-				if (rpAmt30Map.get(tmp3) == null) {
-					this.info(tmp3.toString() + "rpAmt30Map = null");
-				}
-			}
-
-			this.info("mapFlag2 ... " + mapFlag2.containsKey(tmp3));
 
 			if (rpAmt1CMap.get(tmp2) != null) {
 				tempVo.putParam("Breach", rpAmt1CMap.get(tmp2));
@@ -612,8 +590,45 @@ public class L4510Batch extends TradeBuffer {
 				tempVo.putParam("ShortInt", rpAmt42Map.get(tmp2));
 			}
 
-			if (insuNoMap.get(tmp2) != null) {
-				tempVo.putParam("InsuNo", insuNoMap.get(tmp2));
+			this.info("tmp.getAchRepayCode() : " + tmp.getAchRepayCode());
+			this.info("rpAmt01Map : " + rpAmt01Map.get(tmp));
+			this.info("rpAmt04Map : " + rpAmt04Map.get(tmp));
+			this.info("rpAmt06Map : " + rpAmt06Map.get(tmp));
+			this.info("rpAmt05Map : " + rpAmt05Map.get(tmp));
+
+			BigDecimal txAmt = BigDecimal.ZERO;
+
+			if (tmp.getAchRepayCode() == 1 && rpAmt01Map.get(tmp) != null) {
+				txAmt = rpAmt01Map.get(tmp);
+				if (rpAmt30Map.get(tmp3) != null) {
+					if (rpAmt30Map.get(tmp3).compareTo(txAmt) >= 0) {
+						rpAmt30Map.put(tmp3, rpAmt30Map.get(tmp3).subtract(txAmt));
+						tempVo.putParam("TempAmt", txAmt);
+						txAmt = BigDecimal.ZERO;
+					} else if (rpAmt30Map.get(tmp3).compareTo(BigDecimal.ZERO) > 0) {
+						txAmt = txAmt.subtract(rpAmt30Map.get(tmp3));
+						tempVo.putParam("TempAmt", rpAmt30Map.get(tmp3));
+						rpAmt30Map.put(tmp3, BigDecimal.ZERO);
+					}
+				}
+//				4D.短收	4C.溢收
+				if (rpAmt4DMap.get(tmp3) != null) {
+					tEmpDeductDtl.setSumOvpayAmt(rpAmt4DMap.get(tmp3));
+		            rpAmt4DMap.put(tmp3,BigDecimal.ZERO);
+				}
+				if (rpAmt4CMap.get(tmp3) != null) {
+					tEmpDeductDtl.setSumOvpayAmt(tEmpDeductDtl.getSumOvpayAmt().subtract(rpAmt4CMap.get(tmp3)));
+		            rpAmt4CMap.put(tmp3,BigDecimal.ZERO);
+				}
+			} else if (tmp.getAchRepayCode() == 4 && rpAmt04Map.get(tmp) != null) {
+				txAmt = rpAmt04Map.get(tmp);
+			} else if (tmp.getAchRepayCode() == 6 && rpAmt06Map.get(tmp) != null) {
+				txAmt = rpAmt06Map.get(tmp);
+			} else if (tmp.getAchRepayCode() == 5 && rpAmt05Map.get(tmp) != null) {
+				txAmt = rpAmt05Map.get(tmp);
+				if (insuNoMap.get(tmp) != null) {
+					tempVo.putParam("InsuNo", insuNoMap.get(tmp));
+				}
 			}
 
 			this.info("tempVo ... " + tempVo.toString());
@@ -690,28 +705,6 @@ public class L4510Batch extends TradeBuffer {
 			}
 			tEmpDeductDtl.setCustId(tCustMain.getCustId());
 
-			this.info("tmp.getAchRepayCode() : " + tmp.getAchRepayCode());
-			this.info("rpAmt01Map : " + rpAmt01Map.get(tmp));
-			this.info("rpAmt04Map : " + rpAmt04Map.get(tmp));
-			this.info("rpAmt06Map : " + rpAmt06Map.get(tmp));
-			this.info("rpAmt05Map : " + rpAmt05Map.get(tmp));
-
-			BigDecimal txAmt = BigDecimal.ZERO;
-
-			if (tmp.getAchRepayCode() == 1 && rpAmt01Map.get(tmp) != null) {
-				txAmt = rpAmt01Map.get(tmp);
-				txAmt = rpAmt01Map.get(tmp);
-			} else if (tmp.getAchRepayCode() == 4 && rpAmt04Map.get(tmp) != null) {
-				txAmt = rpAmt04Map.get(tmp);
-				txAmt = rpAmt04Map.get(tmp);
-			} else if (tmp.getAchRepayCode() == 6 && rpAmt06Map.get(tmp) != null) {
-				txAmt = rpAmt06Map.get(tmp);
-				txAmt = rpAmt06Map.get(tmp);
-			} else if (tmp.getAchRepayCode() == 5 && rpAmt05Map.get(tmp) != null) {
-				txAmt = rpAmt05Map.get(tmp);
-				txAmt = rpAmt05Map.get(tmp);
-			}
-
 			tEmpDeductDtl.setTxAmt(BigDecimal.ZERO);
 			tEmpDeductDtl.setRepayAmt(txAmt);
 
@@ -744,11 +737,6 @@ public class L4510Batch extends TradeBuffer {
 			} else {
 				tEmpDeductDtl.setInterest(BigDecimal.ZERO);
 				tEmpDeductDtl.setCurrIntAmt(BigDecimal.ZERO);
-			}
-			if (rpAmt4DMap.get(tmp) != null) {
-				tEmpDeductDtl.setSumOvpayAmt(rpAmt4DMap.get(tmp));
-			} else {
-				tEmpDeductDtl.setSumOvpayAmt(BigDecimal.ZERO);
 			}
 
 			if (jsonField.get(tmp2) != null) {
@@ -823,6 +811,7 @@ public class L4510Batch extends TradeBuffer {
 
 				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag,
 						procCode);
+				tmpFacm tmp3 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag, procCode);
 
 				if (!mapFlag.containsKey(tmp)) {
 					mapFlag.put(tmp, 1);
@@ -901,28 +890,34 @@ public class L4510Batch extends TradeBuffer {
 					}
 //					火險費
 				} else if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 5) {
-					if (!rpAmt05Map.containsKey(tmp2)) {
-						rpAmt05Map.put(tmp2, tBaTxVo.getUnPaidAmt());
-						insuNoMap.put(tmp2, tBaTxVo.getRvNo());
+					if (!rpAmt05Map.containsKey(tmp)) {
+						rpAmt05Map.put(tmp, tBaTxVo.getUnPaidAmt());
+						insuNoMap.put(tmp, tBaTxVo.getRvNo());
 					} else {
-						rpAmt05Map.put(tmp2, rpAmt05Map.get(tmp2).add(tBaTxVo.getUnPaidAmt()));
-						insuNoMap.put(tmp2, insuNoMap.get(tmp2) + "," + tBaTxVo.getRvNo());
+						rpAmt05Map.put(tmp, rpAmt05Map.get(tmp).add(tBaTxVo.getUnPaidAmt()));
+						insuNoMap.put(tmp, insuNoMap.get(tmp) + "," + tBaTxVo.getRvNo());
 					}
-//					短收 --結算至撥款，用tmp2
+//					短收 --結算至額度，用tmp3
 				} else if (tBaTxVo.getDataKind() == 4 && "D".equals(tBaTxVo.getDbCr())) {
 					if (!rpAmt4DMap.containsKey(tmp)) {
-						rpAmt4DMap.put(tmp, tBaTxVo.getUnPaidAmt());
+						rpAmt4DMap.put(tmp3, tBaTxVo.getUnPaidAmt());
 					} else {
-						rpAmt4DMap.put(tmp, rpAmt4DMap.get(tmp).add(tBaTxVo.getUnPaidAmt()));
+						rpAmt4DMap.put(tmp3, rpAmt4DMap.get(tmp3).add(tBaTxVo.getUnPaidAmt()));
 					}
 //					溢收
 				} else if (tBaTxVo.getDataKind() == 4 && "C".equals(tBaTxVo.getDbCr())) {
-					if (!rpAmt4CMap.containsKey(tmp)) {
-						rpAmt4CMap.put(tmp, tBaTxVo.getUnPaidAmt());
+					if (!rpAmt4CMap.containsKey(tmp3)) {
+						rpAmt4CMap.put(tmp3, tBaTxVo.getUnPaidAmt());
 					} else {
-						rpAmt4CMap.put(tmp, rpAmt4CMap.get(tmp).add(tBaTxVo.getUnPaidAmt()));
+						rpAmt4CMap.put(tmp3, rpAmt4CMap.get(tmp3).add(tBaTxVo.getUnPaidAmt()));
 					}
 				} else if (tBaTxVo.getReceivableFlag() == 4) {
+//					期款
+					if (!rpAmt01Map.containsKey(tmp)) {
+						rpAmt01Map.put(tmp, tBaTxVo.getUnPaidAmt());
+					} else {
+						rpAmt01Map.put(tmp, rpAmt01Map.get(tmp).add(tBaTxVo.getUnPaidAmt()));
+					}
 //					欠繳本金 --結算至撥款，用tmp2
 					if (!rpAmt41Map.containsKey(tmp2)) {
 						rpAmt41Map.put(tmp2, tBaTxVo.getPrincipal());
@@ -935,12 +930,12 @@ public class L4510Batch extends TradeBuffer {
 					} else {
 						rpAmt42Map.put(tmp2, rpAmt42Map.get(tmp2).add(tBaTxVo.getInterest()));
 					}
-//					暫收抵繳 --結算至第一筆撥款，用tmp2(到撥款) tmp3(到額度)
+//					暫收抵繳 --結算至到額度用tmp3
 				} else if (tBaTxVo.getDataKind() == 3) {
-					if (!rpAmt30Map.containsKey(tmp2)) {
-						rpAmt30Map.put(tmp2, tBaTxVo.getUnPaidAmt());
+					if (!rpAmt30Map.containsKey(tmp3)) {
+						rpAmt30Map.put(tmp3, tBaTxVo.getUnPaidAmt());
 					} else {
-						rpAmt30Map.put(tmp2, rpAmt30Map.get(tmp2).add(tBaTxVo.getUnPaidAmt()));
+						rpAmt30Map.put(tmp3, rpAmt30Map.get(tmp2).add(tBaTxVo.getUnPaidAmt()));
 					}
 				}
 			}

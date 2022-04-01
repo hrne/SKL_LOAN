@@ -1820,7 +1820,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkDelayInt = wkDelayInt.setScale(0, RoundingMode.HALF_UP);
 		this.info("延遲息 (四捨五入後) = " + wkDelayInt);
 
-		if (wkDelayBase.compareTo(wkBreachBase) == 0) {
+		if (wkDelayBase.compareTo(wkBreachBase) == 0 && wkDays == wkDaysA + wkDaysB + wkDaysC) {
 			// 2022-03-14 智偉增加
 			// 因為原系統延遲息及違約金為一個欄位運算及顯示
 			// 然而，新系統需求是要拆分為兩個欄位顯示

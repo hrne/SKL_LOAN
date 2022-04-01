@@ -62,7 +62,7 @@ public class L4510R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += " where d.\"ErrMsg\" is null                                          ";
 		sql += "   and d.\"MediaDate\" = :mediaDate" ;
 		sql += "   and d.\"ProcCode\" in (" + procCode + ") ";
-		sql += "   and d.\"AchRepayCode\" in (1, 5)                                        ";
+	//	sql += "   and d.\"AchRepayCode\" in (1, 5)                                        ";
 		sql += "   order by d.\"PerfMonth\",d.\"ProcCode\",d.\"AchRepayCode\",d.\"AcctCode\",d.\"CustNo\",d.\"FacmNo\",d.\"BormNo\" ";
 
 		this.info("sql=" + sql);

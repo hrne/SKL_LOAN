@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CustDataCtrl;
@@ -55,6 +57,17 @@ public interface CustDataCtrlService {
    * @return Slice CustDataCtrl CustDataCtrl of List
    */
   public Slice<CustDataCtrl> findCustUKey(String custUKey_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustId = 
+   *
+   * @param custId_0 custId_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CustDataCtrl CustDataCtrl of List
+   */
+  public Slice<CustDataCtrl> findCustId(String custId_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CustDataCtrl

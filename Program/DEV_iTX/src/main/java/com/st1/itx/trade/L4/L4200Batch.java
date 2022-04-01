@@ -1170,6 +1170,13 @@ public class L4200Batch extends TradeBuffer {
 //					回寫媒體檔
 					tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMedia, titaVo);
 					tEmpDeductMedia.setTxAmt(reAcctAmt);
+					if (reAcctAmt.compareTo(tEmpDeductMedia.getRepayAmt()) >= 0) {
+						tEmpDeductMedia.setErrorCode("01");
+					} else if (reAcctAmt.compareTo(BigDecimal.ZERO) > 0) {
+						tEmpDeductMedia.setErrorCode("17");
+					} else {
+						tEmpDeductMedia.setErrorCode("16");
+					}
 					tEmpDeductMedia.setErrorCode(tempOccursList.get("OccReturnCode"));
 					tEmpDeductMedia.setAcDate(iAcDate);
 					tEmpDeductMedia.setBatchNo(iBatchNo);

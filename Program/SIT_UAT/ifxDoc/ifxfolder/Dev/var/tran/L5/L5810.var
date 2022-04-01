@@ -45,7 +45,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 ! 選單代碼
 #CdCodeAcctCode=x,30,S
-T(3,CdCode.FacmAcctCode)
+T(3,CdCode.L5810AcctCode)
 
 ! 選單內容
 #CdCodeAcctCodeH=x,100,S
@@ -80,10 +80,12 @@ E(0,@EndMonth,#DefaultEndMonth)
 
 #StartMonth=A,5,I
 @V(2,0)
+A(YM,0,#StartMonth)
 V(5,00101,#NowMonth)
 
 #EndMonth=A,5,I
 @V(2,0)
+A(YM,0,#EndMonth)
 V(5,#StartMonth,#NowMonth)
 
 #CustNo=A,7,I

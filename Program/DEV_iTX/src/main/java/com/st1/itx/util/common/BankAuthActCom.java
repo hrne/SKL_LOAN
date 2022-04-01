@@ -411,7 +411,7 @@ public class BankAuthActCom extends TradeBuffer {
 		case "A":
 			if ("0".equals(t.getAuthStatus())) { // 0:成功
 				status = "0"; // 0:授權成功
-				isUpdFac = true;
+				isUpdFac = false;
 				updFacmRepayCode(t.getCustNo(), t.getFacmNo(), titaVo);
 			} else {
 				status = "8"; // 8.授權失敗

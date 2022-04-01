@@ -524,15 +524,15 @@ public class L5701 extends TradeBuffer {
 
 			if (InputNegMain.getDeferYMStart() > 0) {// 設定喘息期一併異動下次繳款日與還款結束日
 				if (sNegMsain.getDeferYMStart() != InputNegMain.getDeferYMStart() || sNegMsain.getDeferYMEnd() != InputNegMain.getDeferYMEnd()) {
-					int daystart = InputNegMain.getDeferYMStart() * 100 - 19110000 + 01;
-					int dayend = InputNegMain.getDeferYMEnd() * 100 - 19110000 + 01;
+					int daystart = InputNegMain.getDeferYMStart() * 100 - 19110000 + 10;
+					int dayend = InputNegMain.getDeferYMEnd() * 100 - 19110000 + 10;
 					int period = negCom.DiffMonth(1, daystart, dayend) + 1;
 					int odaystart = sNegMsain.getDeferYMStart();
 					int odayend = sNegMsain.getDeferYMEnd();
 					int operiod = 0;
 					if (odaystart > 0) {
-						odaystart = odaystart * 100 - 19110000 + 01;
-						odayend = odayend * 100 - 19110000 + 01;
+						odaystart = odaystart * 100 - 19110000 + 10;
+						odayend = odayend * 100 - 19110000 + 10;
 						operiod = negCom.DiffMonth(1, odaystart, odayend) + 1;
 					}
 					if (daystart <= sNegMsain.getPayIntDate()) {

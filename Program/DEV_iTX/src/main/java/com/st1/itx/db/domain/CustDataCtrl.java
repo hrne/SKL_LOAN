@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * CustDataCtrl 結清戶個資控管檔<br>
@@ -23,12 +27,7 @@ import javax.persistence.Column;
 public class CustDataCtrl implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8401732095364550582L;
-
-// 借款人戶號
+  // 借款人戶號
   @Id
   @Column(name = "`CustNo`")
   private int custNo = 0;

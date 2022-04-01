@@ -897,6 +897,18 @@ public class L3200 extends TradeBuffer {
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan + ", 試算償還本利:" + iRepayLoan);
 
+		wkIntStartDate = 9991231;
+		wkIntEndDate = 0;
+		wkLoanBal = ln.getLoanBal();
+		wkDueDate = ln.getNextPayIntDate();
+		wkPrevTermNo = 0;
+		wkPrincipal = BigDecimal.ZERO;
+		wkInterest = BigDecimal.ZERO;
+		wkDelayInt = BigDecimal.ZERO;
+		wkBreachAmt = BigDecimal.ZERO;
+		wkExtraRepay = BigDecimal.ZERO;
+		wkRepaidPeriod = 0;
+		
 		// 部分償還餘額 > 0
 		if (wkRepaykindCode == 1) {
 			wkExtraRepayRemaind = iExtraRepay.subtract(wkRepayLoan);
@@ -918,17 +930,6 @@ public class L3200 extends TradeBuffer {
 					.stringToInteger(iRepayIntDateByFacmNoVo.get(parse.IntegerToString(ln.getFacmNo(), 3)));
 		}
 
-		wkIntStartDate = 9991231;
-		wkIntEndDate = 0;
-		wkLoanBal = ln.getLoanBal();
-		wkDueDate = ln.getNextPayIntDate();
-		wkPrevTermNo = 0;
-		wkPrincipal = BigDecimal.ZERO;
-		wkInterest = BigDecimal.ZERO;
-		wkDelayInt = BigDecimal.ZERO;
-		wkBreachAmt = BigDecimal.ZERO;
-		wkExtraRepay = BigDecimal.ZERO;
-		wkRepaidPeriod = 0;
 
 		if (ln.getActFg() == 1) {
 			throw new LogicException(titaVo, "E0021", checkMsg); // 該筆資料待放行中
