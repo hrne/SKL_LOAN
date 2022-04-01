@@ -82,14 +82,12 @@ public class L4453Batch extends TradeBuffer {
 
 	private int iEntryDate = 0;
 	private int iRepayBank = 0;
-	private String sEntryDate = "";
 	private HashMap<tmpFacm, String> custPhone = new HashMap<>();
 	private HashMap<tmpFacm, String> custId = new HashMap<>();
 	private HashMap<tmpFacm, Integer> insuMonth = new HashMap<>();
 	private HashMap<tmpFacm, BigDecimal> insuFee = new HashMap<>();
 	private HashMap<Integer, Integer> custLoanFlag = new HashMap<>();
 	private HashMap<Integer, Integer> custFireFlag = new HashMap<>();
-	private HashMap<tmpFacm, Integer> sendFlag = new HashMap<>();
 
 	private Boolean checkFlag = true;
 	private String sendMsg = "";
@@ -138,9 +136,7 @@ public class L4453Batch extends TradeBuffer {
 
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
-
-		sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/" + ("" + iEntryDate).substring(6);
-
+		
 //		條件 : 入帳日 or 銀行代號
 		List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
 		if (iRepayBank == 999) {
@@ -212,11 +208,9 @@ public class L4453Batch extends TradeBuffer {
 	private void setText(tmpFacm tmp, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setText...");
-		String dataLines = "<" + noticePhoneNo + ">";
 		if (tmp.getRepayType() == 1 || tmp.getRepayType() == 3) {
 			this.info("RepayType() == 1 3...");
 			if (!custLoanFlag.containsKey(tmp.getCustNo())) {
-				dataLines += "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp) + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
@@ -225,7 +219,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<期款扣款通知>");
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(custPhone.get(tmp), "親愛的客戶，繳款通知；新光人壽關心您。", iEntryDate));
 
 				txToDoCom.setTxBuffer(this.getTxBuffer());
 				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
@@ -241,9 +235,7 @@ public class L4453Batch extends TradeBuffer {
 //				轉全形
 				String sInsuAmt = toFullWidth("" + insuFee.get(tmp));
 				String sInsuMonth = FormatUtil.pad9(toFullWidth("" + insuMonth.get(tmp)), 5).substring(3, 5);
-
-				dataLines += "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp) + "\",\"您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
-						+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
+				
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
@@ -252,7 +244,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<火險扣款通知>");
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(custPhone.get(tmp), "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　", iEntryDate));
 
 				txToDoCom.setTxBuffer(this.getTxBuffer());
 				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
@@ -318,19 +310,6 @@ public class L4453Batch extends TradeBuffer {
 				this.info("CustNo : " + tmp.getCustNo() + " is continue ...");
 			}
 		}
-	}
-
-	private String dateSlashFormat(int today) {
-		String slashedDate = "";
-		String acToday = "";
-		if (today >= 1 && today < 19110000) {
-			acToday = FormatUtil.pad9("" + (today + 19110000), 8);
-		} else if (today >= 19110000) {
-			acToday = FormatUtil.pad9("" + today, 8);
-		}
-		slashedDate = acToday.substring(0, 4) + "/" + acToday.substring(4, 6) + "/" + acToday.substring(6, 8);
-
-		return slashedDate;
 	}
 
 	private String toFullWidth(String Pwd) {

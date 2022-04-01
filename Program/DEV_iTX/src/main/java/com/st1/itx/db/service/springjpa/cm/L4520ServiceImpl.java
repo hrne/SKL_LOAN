@@ -72,7 +72,6 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 	
-	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4520.findAll");
@@ -149,36 +148,36 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  )";
 		
 		sql += "  SELECT ";
-		sql += "  substr(ed.\"TitaTxtNo\", 0, 2) AS \"BaTxNo\",";
+		sql += "  MIN(substr(ed.\"TitaTxtNo\", 0, 2)) AS \"BaTxNo\",";
 		sql += "  ed.\"CustNo\" AS \"CustNo\",   ";
-		sql += "  tx2.\"IntStartDate\" AS \"IntStartDate\",";
-		sql += "  tx2.\"IntEndDate\" AS \"IntEndDate\",  ";
-		sql += "  ce.\"Fullname\" AS \"Fullname\", ";
-		sql += "  tx2.\"TxAmt\" AS \"TxAmt\",";
-		sql += "  tx2.\"Principal\" AS \"Principal\",";
-		sql += "  tx2.\"Interest\"  AS \"Interest\" , ";
-		sql += "  tx2.\"BreachAmt\" + tx2.\"CloseBreachAmt\" + tx2.\"DelayInt\"  AS \"BreachAmt\" ";
-		sql += "     , CASE";
+		sql += "  MIN(tx2.\"IntStartDate\") AS \"IntStartDate\",";
+		sql += "  MAX(tx2.\"IntEndDate\") AS \"IntEndDate\",  ";
+		sql += "  MIN(ce.\"Fullname\") AS \"Fullname\", ";
+		sql += "  SUM(tx2.\"TxAmt\") AS \"TxAmt\",";
+		sql += "  SUM(tx2.\"Principal\") AS \"Principal\",";
+		sql += "  SUM(tx2.\"Interest\")  AS \"Interest\" , ";
+		sql += "  SUM(tx2.\"BreachAmt\" + tx2.\"CloseBreachAmt\" + tx2.\"DelayInt\")  AS \"BreachAmt\" ";
+		sql += "     , SUM( CASE";
 		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
 		sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\"";
 		sql += "         WHEN TX2.\"TempAmt\" < 0";
 		sql += "         THEN ABS(TX2.\"TempAmt\")";
-		sql += "       ELSE 0 END AS \"TempDr\" ";
-		sql += "     , CASE";
+		sql += "       ELSE 0 END ) AS \"TempDr\" ";
+		sql += "     , SUM( CASE";
 		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
 		sql += "         THEN TX2.\"TxAmt\"";
 		sql += "         WHEN TX2.\"TempAmt\" > 0";
 		sql += "         THEN TX2.\"TempAmt\"";
-		sql += "       ELSE 0 END AS \"TempCr\",";
-		sql += "  tx2.\"Shortfall\"  AS \"Shortfall\",";
-		sql += "  tx2.\"AcctFee\" + tx2.\"ModifyFee\" + tx2.\"FireFee\" + tx2.\"LawFee\" AS \"OtherAmt\",";
-		sql += "  ce.\"CenterCode\" AS \"CenterCode\", ";
-		sql += "  ce.\"EmployeeNo\" AS \"EmployeeNo\", ";
-		sql += "  cm.\"CustId\" AS \"CustId\", ";
-		sql += "  ed.\"RepayCode\" AS \"RepayCode\",  ";
-		sql += "  ed.\"AcctCode\" as \"AcctCode\",  ";
-		sql += "  ed.\"ProcCode\" as \"ProcCode\",";
-		sql += "  ed.\"Acdate\" as \"Acdate\"" ;
+		sql += "       ELSE 0 END )AS \"TempCr\",";
+		sql += "  SUM(tx2.\"Shortfall\")  AS \"Shortfall\",";
+		sql += "  SUM(tx2.\"AcctFee\" + tx2.\"ModifyFee\" + tx2.\"FireFee\" + tx2.\"LawFee\") AS \"OtherAmt\",";
+		sql += "  MIN(ce.\"CenterCode\") AS \"CenterCode\", ";
+		sql += "  MIN(ce.\"EmployeeNo\") AS \"EmployeeNo\", ";
+		sql += "  MIN(cm.\"CustId\") AS \"CustId\", ";
+		sql += "  MIN(ed.\"RepayCode\") AS \"RepayCode\",  ";
+		sql += "  MIN(ed.\"AcctCode\") as \"AcctCode\",  ";
+		sql += "  MIN(ed.\"ProcCode\") as \"ProcCode\",";
+		sql += "  MIN(ed.\"Acdate\") as \"Acdate\"" ;
 		sql += "  FROM";
 		sql += "  \"EmpDeductDtl\"   ed ";
 		
@@ -207,8 +206,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if(!"0".equals(ProcCode)) {
 			sql += "    AND ed.\"ProcCode\" = :ProcCode";
 		}
-		
-		sql += "  ORDER BY   ed.\"RepayCode\", ed.\"AcctCode\", ed.\"ProcCode\", ed.\"CustNo\", tx2.\"IntStartDate\", tx2.\"IntEndDate\"";
+		sql += "  GROUP BY   ed.\"CustNo\"";
+		sql += "  ORDER BY   \"RepayCode\", \"AcctCode\", \"ProcCode\", \"CustNo\", \"IntStartDate\", \"IntEndDate\"";
 
 		this.info("sql=" + sql);
 		Query query;

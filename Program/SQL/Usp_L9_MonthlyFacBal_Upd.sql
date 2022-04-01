@@ -65,7 +65,12 @@ BEGIN
           ,CASE
              WHEN NVL(B."CustNo",0) = 0
              THEN L."OvduTerm" 
-             WHEN B."NextPayIntDate" < "ThisMonthEndDate" AND B."NextPayIntDate" > 0 AND L."PrinBalance" + L."BadDebtBal" <> 0
+             WHEN B."MaturityDate" < "ThisMonthEndDate"
+              AND B."MaturityDate" < B."NextPayIntDate" -- 應繳日>到期日時用到期日計算
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
+             THEN TRUNC(MONTHS_BETWEEN(TO_DATE("ThisMonthEndDate",'YYYY-MM-DD'), TO_DATE(B."MaturityDate",'YYYY-MM-DD')))
+             WHEN B."NextPayIntDate" < "ThisMonthEndDate" AND B."NextPayIntDate" > 0
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
              THEN TRUNC(MONTHS_BETWEEN(TO_DATE("ThisMonthEndDate",'YYYY-MM-DD'), TO_DATE(B."NextPayIntDate",'YYYY-MM-DD')))
            ELSE 0 END                 AS "OvduTerm"            -- '逾期期數';
           -- 若 應繳息日 <= 系統營業日("ThisMonthEndDate")
@@ -74,7 +79,12 @@ BEGIN
           ,CASE
              WHEN NVL(B."CustNo",0) = 0
              THEN L."OvduDays" 
-             WHEN B."NextPayIntDate" <= "ThisMonthEndDate" AND B."NextPayIntDate" > 0 AND L."PrinBalance" + L."BadDebtBal" <> 0
+             WHEN B."MaturityDate" < "ThisMonthEndDate"
+              AND B."MaturityDate" < B."NextPayIntDate" -- 應繳日>到期日時用到期日計算
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
+             THEN TO_DATE("ThisMonthEndDate",'YYYY-MM-DD')  - TO_DATE(B."MaturityDate",'YYYY-MM-DD') 
+             WHEN B."NextPayIntDate" <= "ThisMonthEndDate" AND B."NextPayIntDate" > 0
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
              THEN TO_DATE("ThisMonthEndDate",'YYYY-MM-DD')  - TO_DATE(B."NextPayIntDate",'YYYY-MM-DD') 
            ELSE 0 END                 AS "OvduDays"            -- '逾期天數';
           ,L."CurrencyCode"           AS "CurrencyCode"        -- 幣別
@@ -146,6 +156,7 @@ BEGIN
                    THEN  99999999
                  ELSE "NextPayIntDate" END
                 ) AS "NextPayIntDate" -- '應繳息日'
+           , MAX("MaturityDate") AS "MaturityDate"
       FROM "LoanBorMain"
       WHERE "Status" in (0,2,3,4,5,6,7,8,9)
       GROUP BY "CustNo"

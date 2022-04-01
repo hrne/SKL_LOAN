@@ -353,10 +353,7 @@ public class L4603p extends TradeBuffer {
 		} else {
 			this.info("set Text...");
 		}
-		CustMain tCustMain = new CustMain();
-		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo(), titaVo);
-
-		ArrayList<String> dataList = new ArrayList<String>();
+		custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo(), titaVo);
 
 		String insuAmt = toFullWidth("" + tInsuRenew.getTotInsuPrem());
 		String insuMonth = toFullWidth(("" + tInsuRenew.getInsuYearMonth()).substring(4, 6));
@@ -365,13 +362,6 @@ public class L4603p extends TradeBuffer {
 		this.info("Text... insuMonth = " + insuMonth);
 
 		this.info("CustNotice is not null...");
-		String dataLines = "<" + noticePhoneNo + ">";
-		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo + "\",\"您好：提醒您" + insuMonth
-				+ "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
-				+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
-		dataList.add(dataLines);
-
-		this.info("Text... dataList = " + dataList);
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
@@ -382,7 +372,8 @@ public class L4603p extends TradeBuffer {
 		tTxToDoDetail.setDtlValue("<火險保費>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("TEXT00");
 		tTxToDoDetail.setStatus(0);
-		tTxToDoDetail.setProcessNote(dataLines);
+		tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo, "您好：提醒您" + insuMonth
+				+ "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　", this.getTxBuffer().getMgBizDate().getTbsDy()));
 
 		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo);
 	}
@@ -509,19 +500,6 @@ public class L4603p extends TradeBuffer {
 			outStr += (char) tranTemp;
 		}
 		return outStr;
-	}
-
-	private String dateSlashFormat(int today) {
-		String slashedDate = "";
-		String acToday = "";
-		if (today >= 1 && today < 19110000) {
-			acToday = FormatUtil.pad9("" + (today + 19110000), 8);
-		} else if (today >= 19110000) {
-			acToday = FormatUtil.pad9("" + today, 8);
-		}
-		slashedDate = acToday.substring(0, 4) + "/" + acToday.substring(4, 6) + "/" + acToday.substring(6, 8);
-
-		return slashedDate;
 	}
 
 	// 刪除處理清單

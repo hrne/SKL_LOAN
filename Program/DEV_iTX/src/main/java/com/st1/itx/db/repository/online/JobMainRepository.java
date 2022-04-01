@@ -227,5 +227,13 @@ public interface JobMainRepository extends JpaRepository<JobMain, JobMainId> {
   @Procedure(value = "\"Usp_L9_YearlyHouseLoanIntCheck_Upd\"")
   public void uspL9YearlyhouseloanintcheckUpd(int tbsdyf,  String empNo,int YYYYMM,int StartMonth,int EndMonth,int CustNo,String AcctCode);
 
+  // (每日複製)控制外來鍵
+  @Procedure(value = "\"Usp_Cp_ForeignKeyControl_Upd\"")
+  public void uspCpForeignkeycontrolUpd(int TBSDYF, String empNo,int Switch);
+
+  // (每日複製)CdCode
+  @Procedure(value = "\"Usp_Cp_CdCode_Ins\"")
+  public void uspCpCdcodeIns(String EmpNo);
+
 }
 

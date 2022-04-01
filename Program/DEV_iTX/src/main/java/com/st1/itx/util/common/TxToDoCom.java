@@ -95,6 +95,9 @@ public class TxToDoCom extends TradeBuffer {
 
 	@Autowired
 	Parse parse;
+	
+	@Autowired
+	MakeReport makeReport;
 
 	private TxToDoDetail tDetail = new TxToDoDetail();
 	private TxToDoDetailId tDetailId = new TxToDoDetailId();
@@ -831,5 +834,21 @@ public class TxToDoCom extends TradeBuffer {
 		tMain.setEraseFg(strAr[9]);
 		tMain.setItemDesc(strAr[10]);
 		this.info("mntMainFixValue =" + itemCode + tMain.toString());
+	}
+	
+	/**
+	 * 產生寄發簡訊時，寫入 TxToDoDetail.ProcessNote 的格式化文字<br>
+	 * 確保輸入正確後，把這個函數的產出塞進 ProcessNote 即可
+	 * @param phoneNumber 手機／簡訊號碼
+	 * @param content 簡訊內容
+	 * @param date 日期 YYYYMMDD
+	 * @return String
+	 */
+	public String getProcessNoteForText(String phoneNumber, String content, int date)
+	{
+		// "H1","","phoneNumber","content","YYYY/MM/DD"
+		String result = String.format("\"H1\",\"\",\"%s\",\"%s\",\"%s\"", phoneNumber, content, makeReport.showBcDate(date, 0));
+		this.info("getProcessNoteForText result = " + result);
+		return  result;
 	}
 }

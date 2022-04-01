@@ -1168,4 +1168,36 @@ em = null;
       jobMainRepos.uspL9YearlyhouseloanintcheckUpd(tbsdyf,  empNo,YYYYMM,StartMonth,EndMonth,CustNo,AcctCode);
   }
 
+  @Override
+  public void Usp_Cp_ForeignKeyControl_Upd(int TBSDYF, String empNo,int Switch, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspCpForeignkeycontrolUpd(TBSDYF, empNo,Switch);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspCpForeignkeycontrolUpd(TBSDYF, empNo,Switch);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspCpForeignkeycontrolUpd(TBSDYF, empNo,Switch);
+   else
+      jobMainRepos.uspCpForeignkeycontrolUpd(TBSDYF, empNo,Switch);
+  }
+
+  @Override
+  public void Usp_Cp_CdCode_Ins(String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspCpCdcodeIns(EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspCpCdcodeIns(EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspCpCdcodeIns(EmpNo);
+   else
+      jobMainRepos.uspCpCdcodeIns(EmpNo);
+  }
+
 }

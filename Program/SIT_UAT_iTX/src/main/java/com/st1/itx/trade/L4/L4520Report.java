@@ -45,6 +45,11 @@ public class L4520Report extends MakeReport {
 	private String MediaKind = "";
 	private String BatchNo= "";
 	
+	
+	private int tcount = 0;
+	private BigDecimal tRepayAmt = new BigDecimal("0");
+	private BigDecimal tTxAmt = new BigDecimal("0");
+
 	@Override
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
@@ -116,7 +121,7 @@ public class L4520Report extends MakeReport {
 
 		this.info("L4520Report exec");
 		
-		PerfMonth = titaVo.getParam("PerfMonth");
+		PerfMonth = titaVo.getCalDy();
 
 		List<Map<String, String>> lEmpDeductMediaA = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> lEmpDeductMediaB = new ArrayList<Map<String, String>>();
@@ -133,7 +138,9 @@ public class L4520Report extends MakeReport {
 //			this.info("L4520ServiceImpl.fs error = " + errors.toString());
 //		}
 
+		
 		if (fnAllList != null && fnAllList.size() != 0) {
+			
 			for (Map<String, String> tEmpDeductMedia : fnAllList) {
 				if (tEmpDeductMedia.get("ErrorCode") == null) {
 					continue;
@@ -150,6 +157,10 @@ public class L4520Report extends MakeReport {
 						 && "5".equals(tEmpDeductMedia.get("MediaKind"))) {
 					lEmpDeductMediaD.add(tEmpDeductMedia);
 				}
+				
+				tcount++; // 總和
+				tRepayAmt = tRepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get("RepayAmt"))); // 總和
+				tTxAmt = tTxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get("TxAmt"))); // 總和
 			} // for
 
 			int Asize = lEmpDeductMediaA.size();
@@ -199,8 +210,8 @@ public class L4520Report extends MakeReport {
 		BigDecimal RepayAmt = new BigDecimal("0");
 		BigDecimal TxAmt = new BigDecimal("0");
 
-		BigDecimal totalRepayAmt = new BigDecimal("0");
-		BigDecimal totalTxAmt = new BigDecimal("0");
+//		BigDecimal totalRepayAmt = new BigDecimal("0");
+//		BigDecimal totalTxAmt = new BigDecimal("0");
 
 		int total = 0, i = 0, pageCnt = 0;
 		for (int j = 1; j <= tEmpDeductMedia.size(); j++) {
@@ -268,8 +279,8 @@ public class L4520Report extends MakeReport {
 			TxAmt = TxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
 
 //			全部應扣金額，實扣金額總和			
-			totalRepayAmt = totalRepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt")));
-			totalTxAmt = totalTxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
+//			totalRepayAmt = totalRepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt")));
+//			totalTxAmt = totalTxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
 
 //			全部筆數統計
 			total++;
@@ -308,9 +319,9 @@ public class L4520Report extends MakeReport {
 					this.print(0, 83, df1.format(TxAmt), "R");// 實扣金額
 
 					this.print(1, 1, "         總計筆數：                                                                                                             ");
-					this.print(0, 64, df1.format(totalRepayAmt), "R");// 應扣金額
-					this.print(0, 83, df1.format(totalTxAmt), "R");// 實扣金額
-					this.print(0, 27, String.format("%,d", total), "R");
+					this.print(0, 64, df1.format(tRepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(tTxAmt), "R");// 實扣金額
+					this.print(0, 27, String.format("%,d", tcount), "R");
 
 				}
 			}
@@ -339,8 +350,8 @@ public class L4520Report extends MakeReport {
 		BigDecimal RepayAmt = new BigDecimal("0");
 		BigDecimal TxAmt = new BigDecimal("0");
 
-		BigDecimal totalRepayAmt = new BigDecimal("0");
-		BigDecimal totalTxAmt = new BigDecimal("0");
+//		BigDecimal totalRepayAmt = new BigDecimal("0");
+//		BigDecimal totalTxAmt = new BigDecimal("0");
 
 		int total = 0, i = 0, pageCnt = 0;
 
@@ -409,8 +420,8 @@ public class L4520Report extends MakeReport {
 			TxAmt = TxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
 
 //			全部應扣金額，實扣金額總和			
-			totalRepayAmt = totalRepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt")));
-			totalTxAmt = totalTxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
+//			totalRepayAmt = totalRepayAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("RepayAmt")));
+//			totalTxAmt = totalTxAmt.add(parse.stringToBigDecimal(tEmpDeductMedia.get(i).get("TxAmt")));
 
 //			全部筆數統計
 			total++;
@@ -449,9 +460,9 @@ public class L4520Report extends MakeReport {
 					this.print(0, 83, df1.format(TxAmt), "R");// 實扣金額
 
 					this.print(1, 1, "         總計筆數：                                                                                                             ");
-					this.print(0, 64, df1.format(totalRepayAmt), "R");// 應扣金額
-					this.print(0, 83, df1.format(totalTxAmt), "R");// 實扣金額
-					this.print(0, 27, String.format("%,d", total), "R");
+					this.print(0, 64, df1.format(tRepayAmt), "R");// 應扣金額
+					this.print(0, 83, df1.format(tTxAmt), "R");// 實扣金額
+					this.print(0, 27, String.format("%,d", tcount), "R");
 
 				}
 			}

@@ -222,11 +222,8 @@ public class L4703 extends TradeBuffer {
 
 		sCustNoticeC = custNoticeService.findCustNo(custNo, this.index, this.limit);
 
-		CustMain tCustMain = new CustMain();
-		tCustMain = custMainService.custNoFirst(custNo, custNo);
-
-		ArrayList<String> dataList = new ArrayList<String>();
-		String dataLines = "";
+		new CustMain();
+		custMainService.custNoFirst(custNo, custNo);
 
 		lCustNoticeC = sCustNoticeC == null ? null : sCustNoticeC.getContent();
 
@@ -234,8 +231,6 @@ public class L4703 extends TradeBuffer {
 			for (CustNotice tCustNotice : lCustNoticeC) {
 
 				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getMsgNotice())) {
-					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
-					dataList.add(dataLines);
 
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 					tTxToDoDetail.setCustNo(custNo);
@@ -244,7 +239,7 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setDtlValue("<滯繳通知>");
 					tTxToDoDetail.setItemCode("TEXT00");
 					tTxToDoDetail.setStatus(0);
-					tTxToDoDetail.setProcessNote(dataLines);
+					tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo, "親愛的客戶，繳款通知；新光人壽關心您。", iEntryDate));
 
 					txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo);
 				}

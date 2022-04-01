@@ -639,4 +639,24 @@ public interface JobMainService {
    */
   public void Usp_L9_YearlyHouseLoanIntCheck_Upd(int tbsdyf,  String empNo,int YYYYMM,int StartMonth,int EndMonth,int CustNo,String AcctCode, TitaVo... titaVo);
 
+  /**
+   * Stored Procedure<br>
+   * (每日複製)控制外來鍵
+   * @param  TBSDYF int
+   * @param  empNo String
+   * @param  Switch int
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_Cp_ForeignKeyControl_Upd(int TBSDYF, String empNo,int Switch, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (每日複製)CdCode
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_Cp_CdCode_Ins(String EmpNo, TitaVo... titaVo);
+
 }

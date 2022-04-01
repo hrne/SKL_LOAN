@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * CustDataCtrl 結清戶個資控管檔<br>
@@ -27,7 +23,12 @@ import com.st1.itx.Exception.LogicException;
 public class CustDataCtrl implements Serializable {
 
 
-  // 借款人戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4393488598757274363L;
+
+// 借款人戶號
   @Id
   @Column(name = "`CustNo`")
   private int custNo = 0;
@@ -58,7 +59,7 @@ public class CustDataCtrl implements Serializable {
   // 設定日期
   /* by eric 2022.3.31 */
   @Column(name = "`SetDate`")
-  private int setDate = 0;
+  private java.sql.Timestamp setDate;
 
   // 設定人員
   /* by eric 2022.3.31 */
@@ -68,7 +69,7 @@ public class CustDataCtrl implements Serializable {
   // 解除日期
   /* by eric 2022.3.31 */
   @Column(name = "`ReSetDate`")
-  private int reSetDate = 0;
+  private java.sql.Timestamp reSetDate;
 
   // 解除人員
   /* by eric 2022.3.31 */
@@ -215,9 +216,9 @@ public class CustDataCtrl implements Serializable {
 /**
 	* 設定日期<br>
 	* by eric 2022.3.31
-	* @return Integer
+	* @return java.sql.Timestamp
 	*/
-  public int getSetDate() {
+  public java.sql.Timestamp getSetDate() {
     return this.setDate;
   }
 
@@ -227,7 +228,7 @@ public class CustDataCtrl implements Serializable {
   *
   * @param setDate 設定日期
 	*/
-  public void setSetDate(int setDate) {
+  public void setSetDate(java.sql.Timestamp setDate) {
     this.setDate = setDate;
   }
 
@@ -253,9 +254,9 @@ public class CustDataCtrl implements Serializable {
 /**
 	* 解除日期<br>
 	* by eric 2022.3.31
-	* @return Integer
+	* @return java.sql.Timestamp
 	*/
-  public int getReSetDate() {
+  public java.sql.Timestamp getReSetDate() {
     return this.reSetDate;
   }
 
@@ -265,7 +266,7 @@ public class CustDataCtrl implements Serializable {
   *
   * @param reSetDate 解除日期
 	*/
-  public void setReSetDate(int reSetDate) {
+  public void setReSetDate(java.sql.Timestamp reSetDate) {
     this.reSetDate = reSetDate;
   }
 

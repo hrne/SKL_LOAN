@@ -341,9 +341,6 @@ public class L4454 extends TradeBuffer {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
 				cntText++;
-				String dataLines = "";
-				dataLines = "\"H1\",\"" + t.get("CustId") + "\",\"" + phoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\""
-						+ this.getTxBuffer().getTxCom().getTbsdy() + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);
@@ -352,7 +349,7 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<期款扣款失敗>" + repayBank);
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(phoneNo, "親愛的客戶，繳款通知；新光人壽關心您。", this.getTxBuffer().getTxCom().getTbsdy()));
 				tTxToDoDetail.setTitaEntdy(titaVo.getEntDyI());
 				tTxToDoDetail.setTitaKinbr(titaVo.getKinbr());
 				tTxToDoDetail.setTitaTlrNo(titaVo.getTlrNo());
@@ -375,10 +372,6 @@ public class L4454 extends TradeBuffer {
 				this.info("sInsuAmt ... " + sInsuAmt);
 				this.info("sInsuMonth ... " + toFullWidth("" + insuM));
 
-				String dataLines = "";
-				dataLines = "\"H1\",\"" + t.get("CustId") + "\",\"" + phoneNo + "\",\"您好：提醒您" + sInsuMonth
-						+ "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
-						+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);
@@ -387,7 +380,8 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<火險費扣款失敗>" + repayBank);
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(phoneNo, "您好：提醒您" + sInsuMonth
+						+ "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　", this.getTxBuffer().getTxCom().getTbsdy()));
 				tTxToDoDetail.setTitaEntdy(titaVo.getEntDyI());
 				tTxToDoDetail.setTitaKinbr(titaVo.getKinbr());
 				tTxToDoDetail.setTitaTlrNo(titaVo.getTlrNo());
@@ -535,75 +529,6 @@ public class L4454 extends TradeBuffer {
 		l4454Report.exec(titaVo, this.getTxBuffer(), l4454List);
 	}
 
-	private class tmpFacm {
-
-		@Override
-		public String toString() {
-			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", repayType=" + repayType + "]";
-		}
-
-		private int custNo = 0;
-		private int facmNo = 0;
-		private int repayType = 0;
-
-		public tmpFacm(int custNo, int facmNo, int repayType) {
-			this.setCustNo(custNo);
-			this.setFacmNo(facmNo);
-			this.setRepayType(repayType);
-		}
-
-		public void setCustNo(int custNo) {
-			this.custNo = custNo;
-		}
-
-		public void setFacmNo(int facmNo) {
-			this.facmNo = facmNo;
-		}
-
-		private int getRepayType() {
-			return repayType;
-		}
-
-		private void setRepayType(int repayType) {
-			this.repayType = repayType;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + custNo;
-			result = prime * result + facmNo;
-			result = prime * result + repayType;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpFacm other = (tmpFacm) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (custNo != other.custNo)
-				return false;
-			if (facmNo != other.facmNo)
-				return false;
-			if (repayType != other.repayType)
-				return false;
-			return true;
-		}
-
-		private L4454 getEnclosingInstance() {
-			return L4454.this;
-		}
-	}
-
 	public static boolean isNumeric(String str) {
 		for (int i = 0; i < str.length(); i++) {
 			if (!Character.isDigit(str.charAt(i))) {
@@ -611,19 +536,6 @@ public class L4454 extends TradeBuffer {
 			}
 		}
 		return true;
-	}
-
-	private String dateSlashFormat(int today) {
-		String slashedDate = "";
-		String acToday = "";
-		if (today >= 1 && today < 19110000) {
-			acToday = FormatUtil.pad9("" + (today + 19110000), 8);
-		} else if (today >= 19110000) {
-			acToday = FormatUtil.pad9("" + today, 8);
-		}
-		slashedDate = acToday.substring(0, 4) + "/" + acToday.substring(4, 6) + "/" + acToday.substring(6, 8);
-
-		return slashedDate;
 	}
 
 	private String toFullWidth(String Pwd) {

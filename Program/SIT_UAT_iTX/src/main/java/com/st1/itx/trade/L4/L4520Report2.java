@@ -216,13 +216,13 @@ public class L4520Report2 extends MakeReport {
 	  		  }
 	  		 
 	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempDr")) > 0) {
-	  			this.print(0, 102, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt"))),"R"); // 暫收借
-	  			sumA5 = sumA5.add(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt")));
+	  			this.print(0, 102, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TempDr"))),"R"); // 暫收借
+	  			sumA5 = sumA5.add(parse.stringToBigDecimal(fnAllList.get(i).get("TempDr")));
 	  		  }
 	  		 
 	  		  if(parse.stringToInteger(fnAllList.get(i).get("TempCr")) > 0) {
-	  			this.print(0, 113, df1.format(new BigDecimal("0").subtract(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt")))),"R"); // 暫收貸
-	  			sumA6 = sumA6.add(new BigDecimal("0").subtract(parse.stringToBigDecimal(fnAllList.get(i).get("TempAmt"))));
+	  			this.print(0, 113, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("TempCr"))),"R"); // 暫收貸
+	  			sumA6 = sumA6.add(parse.stringToBigDecimal(fnAllList.get(i).get("TempCr")));
 	  		  }
 	  		  
 	  		  if(parse.stringToInteger(fnAllList.get(i).get("Shortfall")) > 0) {
@@ -239,6 +239,7 @@ public class L4520Report2 extends MakeReport {
 	  		  this.print(0, 147, fnAllList.get(i).get("EmployeeNo")); // 員工
 	  		  this.print(0, 155, fnAllList.get(i).get("CustId")); // 身分證號碼
 	  		
+	  				  
 //			  每頁筆數相加
 	  		  pageCnt++;
 //			  全部筆數統計
