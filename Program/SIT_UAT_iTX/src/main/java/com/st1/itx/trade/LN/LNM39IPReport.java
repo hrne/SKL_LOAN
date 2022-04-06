@@ -237,8 +237,8 @@ public class LNM39IPReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 合約期限
 						case 27:
-							strField = makeFile.fillStringL(strField, 8, '0');
-							break; // 備忘分錄會計科目
+							//strField = makeFile.fillStringL(strField, 8, '0');
+							break; // 備忘分錄會計科目(舊:8碼/新:11碼) (直接搬值)
 						case 28:
 							strField = makeFile.fillStringL(strField, 1, '0');
 							break; // 記帳幣別

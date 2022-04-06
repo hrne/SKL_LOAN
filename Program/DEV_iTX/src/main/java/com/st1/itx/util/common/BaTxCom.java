@@ -1264,7 +1264,7 @@ public class BaTxCom extends TradeBuffer {
 						this.info("settleByPayintDate xxBal=" + this.xxBal + ", rePayIntDate=" + rePayIntDate
 								+ ", payintDateAmt=" + payintDateAmt + ", shortAmtLimit=" + shortAmtLimit);
 						// 匯款轉帳最後一期可欠繳
-						if (this.xxBal.add(iRepayCode == 1 ? this.shortAmtLimit : BigDecimal.ZERO)
+						if (this.xxBal.add(this.shortAmtLimit)
 								.compareTo(payintDateAmt) < 0) {
 							break;
 						} else {

@@ -319,6 +319,7 @@ public class L4510Batch extends TradeBuffer {
 //			F5 ProcCode (流程別)
 			getList(flag, slEmpDeductSchedule, result.get("AgType1"));
 			int nextPayIntDate = parse.stringToInteger(result.get("NextPayIntDate")) - 19110000;
+			int firstDueDate = parse.stringToInteger(result.get("FirstDueDate")) - 19110000;
 			if ("3".equals(result.get("RepayCode"))) {
 				if (nextPayIntDate > iRepayEndDate) {
 					this.info("skip NextPayIntDate > iPayIntDate " + result);
@@ -328,6 +329,10 @@ public class L4510Batch extends TradeBuffer {
 			} else {
 				if (nextPayIntDate >= iEntryDate) {
 					this.info("skip NextPayIntDate >= iEntryDate  " + result);
+					continue;
+				}
+				if (nextPayIntDate == firstDueDate) {
+					this.info("skip NextPayIntDate = FirstDueDate  " + result);
 					continue;
 				}
 				iPayIntDate = iEntryDate;
@@ -575,7 +580,7 @@ public class L4510Batch extends TradeBuffer {
 			this.info("tmp ... " + tmp);
 			this.info("tmp2 ... " + tmp2);
 			this.info("tmp3 ... " + tmp3);
-			this.info("rpAmt30Map ... " + rpAmt30Map.get(tmp2));
+			this.info("rpAmt30Map ... " + rpAmt30Map.get(tmp3));
 
 //			暫收抵繳僅寫入第一筆為期款撥款(報表用)
 			tempVo = new TempVo();
@@ -740,7 +745,7 @@ public class L4510Batch extends TradeBuffer {
 			}
 
 			if (jsonField.get(tmp2) != null) {
-				this.info("jsonField ... " + jsonField.toString());
+				this.info("jsonField ... " + jsonField.get(tmp2).toString());
 				tEmpDeductDtl.setJsonFields(jsonField.get(tmp2));
 			}
 
@@ -935,7 +940,7 @@ public class L4510Batch extends TradeBuffer {
 					if (!rpAmt30Map.containsKey(tmp3)) {
 						rpAmt30Map.put(tmp3, tBaTxVo.getUnPaidAmt());
 					} else {
-						rpAmt30Map.put(tmp3, rpAmt30Map.get(tmp2).add(tBaTxVo.getUnPaidAmt()));
+						rpAmt30Map.put(tmp3, rpAmt30Map.get(tmp3).add(tBaTxVo.getUnPaidAmt()));
 					}
 				}
 			}

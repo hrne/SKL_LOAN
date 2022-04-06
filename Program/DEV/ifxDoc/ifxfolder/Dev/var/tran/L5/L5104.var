@@ -269,7 +269,7 @@ C(3,#BackCCnt,0,E(0,@L514CPRT,0),E(0,@L514CPRT,1))
 E(0,1)ASGN(LOOP$)
 #ReportCUsageCode=A,2,O
 #ReportCUsageCodeX=x,4,O
-T(A,#ReportCUsageCode,L5DEF,UsageCodeDef,UsageCode,UsageCodeX)
+T(H,#ReportCUsageCode,#UsageCodeXHelp)
 
 #ReportCUsageCnt=m,6,O
 ![防止二次單據]

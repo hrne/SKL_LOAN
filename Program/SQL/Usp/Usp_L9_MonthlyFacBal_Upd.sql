@@ -509,20 +509,25 @@ BEGIN
            , M."FacmNo" 
            , CASE
                WHEN M."ClCode1" IN (1,2) 
+                AND M."AcctCode" <> 990
                 AND CDI."IndustryItem" LIKE '%不動產%'
                THEN '12'              -- 特定資產放款：建築貸款
                WHEN M."ClCode1" IN (1,2) 
+               AND M."AcctCode" <> 990
                 AND CDI."IndustryItem" LIKE '%建築%'
                THEN '12'              -- 特定資產放款：建築貸款
                WHEN M."ClCode1" IN (1,2) 
+                AND M."AcctCode" <> 990
                 AND F."FirstDrawdownDate" >= 20100101 
                 AND M."FacAcctCode" = 340
                THEN '11'               -- 正常繳息
                WHEN M."ClCode1" IN (1,2) 
+                AND M."AcctCode" <> 990
                 AND F."FirstDrawdownDate" >= 20100101 
                 AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
                THEN '11'               -- 正常繳息
                WHEN M."ClCode1" IN (1,2) 
+                AND M."AcctCode" <> 990
                 AND F."FirstDrawdownDate" >= 20100101 
                 AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
                THEN '11'               -- 正常繳息
@@ -548,6 +553,12 @@ BEGIN
                THEN '22'       --(22)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期1-6月者
                WHEN M."AcctCode" = 990
+                AND M."OvduTerm" >= 7
+                AND M."OvduTerm" <= 12
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者    
+               WHEN M."AcctCode" = 990
                 AND M."ProdNo" NOT IN ('60','61','62')
                 AND M."OvduTerm" > 12
                 AND M."PrinBalance" > 1
@@ -555,8 +566,7 @@ BEGIN
                                --   有足無擔保--逾繳超過清償期12月者
                                --   或無擔保部分--超過清償期3-6月者   
                WHEN M."AcctCode" = 990
-                AND M."OvduTerm" >= 7
-                AND M."OvduTerm" <= 12
+                AND M."ProdNo" IN ('60','61','62')
                THEN '23'       --(23)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期7-12月者
                                --    或無擔保部分--超過清償期1-3月者                         

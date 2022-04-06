@@ -243,8 +243,8 @@ public class L4511 extends TradeBuffer {
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("OccYearMonthA", setFormatMonth(tEmpDeductMedia.getPerfMonth()));
-//				occursList.putParam("OccUnit", FormatUtil.padX(centerCodeAcc, 6));
-				occursList.putParam("OccUnit", "10H400");
+				occursList.putParam("OccUnit", FormatUtil.padX(centerCodeAcc, 6));
+//				occursList.putParam("OccUnit", "10H400");
 				if (flag == 1) {
 					occursList.putParam("OccUnknowA", "0000000001");
 				} else {
@@ -255,20 +255,17 @@ public class L4511 extends TradeBuffer {
 				if (flag == 1) {
 					if (tEmpDeductMedia.getRepayCode() == 5) {
 						occursList.putParam("OccUnknowB", FormatUtil.padX("92 火險", 11));
-						occursList.putParam("OccRepayCode", 9);
 					} else {
 						occursList.putParam("OccUnknowB", FormatUtil.padX("XH 房貸", 11));
-						occursList.putParam("OccRepayCode", 1);
 					}
 				} else {
 					if (tEmpDeductMedia.getRepayCode() == 5) {
 						occursList.putParam("OccUnknowB", FormatUtil.padX("92 火險", 11));
-						occursList.putParam("OccRepayCode", 9);
 					} else {
 						occursList.putParam("OccUnknowB", FormatUtil.padX("XH 房貸扣款", 11));
-						occursList.putParam("OccRepayCode", 1);
 					}
 				}
+				occursList.putParam("OccRepayCode", tEmpDeductMedia.getPerfRepayCode());
 
 				occursList.putParam("OccUnknowC", FormatUtil.padX("", 11));
 				occursList.putParam("OccRepayAmt",

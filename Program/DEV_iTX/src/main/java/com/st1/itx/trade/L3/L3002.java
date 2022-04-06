@@ -12,11 +12,14 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
@@ -43,6 +46,8 @@ public class L3002 extends TradeBuffer {
 	public LoanBookService loanBookService;
 	@Autowired
 	public CustMainService custMainService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	Parse parse;
@@ -131,6 +136,8 @@ public class L3002 extends TradeBuffer {
 		CustMain tCustMain = new CustMain();
 		LoanBook tLoanBook = new LoanBook();
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
+			String department = "";
+			CdCode tCdCode = new CdCode();
 			OccursList occursList = new OccursList();
 			// 查詢額度檔
 			tFacMain = facMainService.findById(new FacMainId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo()),
@@ -151,8 +158,8 @@ public class L3002 extends TradeBuffer {
 			}
 
 			// if (iCustDataCtrl == 1) {
-			// 	occursList.putParam("OOCustNo", "");
-			// 	occursList.putParam("OOCustName", "");
+			// occursList.putParam("OOCustNo", "");
+			// occursList.putParam("OOCustName", "");
 			// }
 			occursList.putParam("OOFacmNo", tLoanBorMain.getFacmNo());
 			occursList.putParam("OOBormNo", tLoanBorMain.getBormNo());
@@ -168,6 +175,13 @@ public class L3002 extends TradeBuffer {
 			occursList.putParam("OOStoreRate", tLoanBorMain.getStoreRate());
 			occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode());
 			occursList.putParam("OOLoanBal", tLoanBorMain.getLoanBal());
+			occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額 3/29User簡易審查紀錄表
+			tCdCode = cdCodeService.findById(new CdCodeId("DepartmentCode", tFacMain.getDepartmentCode()), titaVo);
+			if (tCdCode != null) {
+				department = tCdCode.getItem();
+			}
+
+			occursList.putParam("OODepartment", department); // 企今別 3/29User簡易審查紀錄表
 			// 查詢放款約定還本檔 若有撥款序號為0者 額度下所有正常戶顯示按鈕
 			tLoanBook = new LoanBook();
 			tLoanBook = loanBookService.bookBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),

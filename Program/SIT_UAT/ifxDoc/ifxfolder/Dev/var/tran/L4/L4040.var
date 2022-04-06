@@ -61,7 +61,7 @@ T(3,*)
 
 ![銀行名稱]
 #CDDEF01=x,26,S
-T(3,CdCode.AuthBankCode)
+T(3,CdCode.BankCd)
 
 #BankCodeHelp=x,1024,S 
 
@@ -72,14 +72,14 @@ T(3,CdCode.AuthStatus)
 #AuthStatusHelp=x,1024,S 
 
 ! 新增或取消下拉選單
-#CreateFlagRimName=x,50,S
+#CDDEF03=x,50,S
 T(3,CdCode.CreateFlag)
 #CreateFlagHelp2=x,1024,S
 
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CreateFlagRimName)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
 R(1,XXR99)
 CALL(#HelpProc) 
 T(2,@BankCodeHelp,#HelpDesc1) 
@@ -215,7 +215,8 @@ E(0,1)ASGN(LOOP$)
 #OORepayBank=A,3,O
 ! 中文
 #OORepayBankX=X,16,O
-T(3,)T(H,#OORepayBank,#BankCodeHelp)T(1,
+T(3,)T(H,#OORepayBank,#BankCodeHelp)
+! T(1,
 !SWITCH(#OORepayBank,004,T(3,臺灣銀行),
 !                    005,T(3,土地銀行),
 !                    006,T(3,合庫商銀),

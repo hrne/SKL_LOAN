@@ -792,6 +792,10 @@ C(3,#RelationCode,0,C(4,#RelAcctGenderP,T(2,),T(H,#RelAcctGenderP,#SexHelp)),C(4
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L4412
+#CreateEmpNo
+#CreateDate
+#LastUpdateEmpNo
+#LastUpdate
 ^
 <include src="ROM.icf::L4R01.tom"/>
 <include src="ROM.icf::L4R03.tom"/>

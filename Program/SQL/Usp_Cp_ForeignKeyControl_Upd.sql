@@ -34,7 +34,12 @@ BEGIN
         LOOP
             DBMS_OUTPUT.PUT_LINE(x."Tb");
             DBMS_OUTPUT.PUT_LINE(x."Fk");
-            "vSql" := 'ALTER TABLE "' || x."Tb" || '" ' || "action" || ' CONSTRAINT "' || x."Fk" || '" ';
+            "vSql" := 'ALTER TABLE ' 
+                      || DBMS_ASSERT.ENQUOTE_NAME(x."Tb", FALSE)
+                      || ' '
+                      || "action" 
+                      || ' CONSTRAINT ' 
+                      || DBMS_ASSERT.ENQUOTE_NAME(x."Fk", FALSE);
             EXECUTE IMMEDIATE "vSql";
         END LOOP;
 

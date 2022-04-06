@@ -47,6 +47,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,f.\"RepayCode\"           as \"RepayCode\"                    ";
 		sql += " ,c.\"EmpNo\"               as \"EmpNo\"                        ";
 		sql += " ,min(l.\"NextPayIntDate\") as \"NextPayIntDate\"               ";
+		sql += " ,min(l.\"FirstDueDate\")   as \"FirstDueDate\"                 ";
 		sql += " from \"LoanBorMain\" l                                         ";
 		sql += " left join \"FacMain\"  f on f.\"CustNo\"     = l.\"CustNo\"    ";
 		sql += "                       and f.\"FacmNo\"       = l.\"FacmNo\"    ";

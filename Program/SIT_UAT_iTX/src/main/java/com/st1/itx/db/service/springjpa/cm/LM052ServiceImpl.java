@@ -35,7 +35,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param formNum 表格次序
 	 * 
 	 */
-	@SuppressWarnings({ "unchecked" })
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth,int lastYM, int formNum) throws Exception {
 		this.info("lM052.findAll");
 
@@ -44,6 +44,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("yymm=" + iYearMonth + ",lyymm=" + lastYM);
 
 		String sql = " ";
+		
 		if (formNum == 1) {
 
 			sql += "	SELECT \"AssetClassNo\"";
@@ -53,6 +54,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    WHERE \"YearMonth\" = :yymm ";
 			sql += "    ORDER BY \"AssetClassNo\"";
 			sql += "   			,\"AcSubBookCode\"";
+			
 		} else if (formNum == 2) {
 
 			// 此年月為上個月
@@ -85,6 +87,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    ORDER BY \"LoanAssetCode\"";
 
 		} else if (formNum == 5) {
+			
 			// 目前無科目，等確認有科目再寫
 			sql += "	SELECT SUM(\"DbAmt\" - \"CrAmt\" ) AS \"LoanBal\"";
 			sql += "    FROM \"AcMain\"";

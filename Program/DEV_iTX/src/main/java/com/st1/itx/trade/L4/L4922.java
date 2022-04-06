@@ -15,9 +15,11 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.RepayActChangeLog;
 import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.RepayActChangeLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -39,6 +41,8 @@ public class L4922 extends TradeBuffer {
 	CustMainService custMainService;
 	@Autowired
 	FacMainService facMainService;
+	@Autowired
+	RepayActChangeLogService repayActChangeLogService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -80,8 +84,10 @@ public class L4922 extends TradeBuffer {
 		// 如沒有找到資料
 		if (lFacMain == null || lFacMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "額度主檔"); // 查詢資料不存在
+		
 		}
 		this.totaVo.putParam("OCustNo", lFacMain.get(0).getCustNo());
+
 		// 如有有找到資料
 		for (FacMain tFacMain : lFacMain) {
 			slBankAuthAct = bankAuthActService.facmNoEq(tFacMain.getCustNo(), tFacMain.getFacmNo(), 0, Integer.MAX_VALUE, titaVo);
@@ -104,6 +110,21 @@ public class L4922 extends TradeBuffer {
 
 				occursList.putParam("OOStatus", lBankAuthAct.get(0).getStatus());
 			}
+			
+			
+			// 戶號額度查還款帳號變更紀錄檔
+			Slice<RepayActChangeLog> slRepayActChangeLog;
+			List<RepayActChangeLog> lRepayActChangeLog;
+
+			slRepayActChangeLog = repayActChangeLogService.findFacmNoEq(iCustNo, tFacMain.getFacmNo(), this.index, this.limit, titaVo);
+			lRepayActChangeLog = slRepayActChangeLog == null ? null : slRepayActChangeLog.getContent();
+			boolean hasHistory = true;
+			// 如沒有找到資料
+			if (lRepayActChangeLog == null || lRepayActChangeLog.size() == 0) {
+				hasHistory = false;
+			}
+			
+			occursList.putParam("OOHasHistory", hasHistory ? 1 : 0);
 
 			this.totaVo.addOccursList(occursList);
 		}

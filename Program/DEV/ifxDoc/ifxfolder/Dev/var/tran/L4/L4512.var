@@ -341,7 +341,7 @@ C(3,#FunctionCode,4,s,$)
 #ResignCode=X,6,L
 
 ![利息]
-#Interest=m,14.2,I
+#Interest=m,14,I
 C(3,#FunctionCode,4,s,$)
 
 ![職務代號]

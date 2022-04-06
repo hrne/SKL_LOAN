@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,177)ASGN(INQLEN$)
+E(0,208)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -453,6 +453,15 @@ E(0,0)T(H,#OOCurrencyCode,#CurrPrecisionHelp)
 CALL2(#ADJUSTDOT,#Precision,#OOLoanBal,#OOLoanBalX)
 P(R,#OOLoanBalX)
 
+#OODrawdownAmt=m,14.2,S
+
+#OODrawdownAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OODrawdownAmt,#OODrawdownAmtX)
+P(R,#OODrawdownAmtX)
+
+
+#OODepartment=X,15,S
+
 #OOBookFlag=A,1,S
 
 #OORenewFlag=A,1,S
@@ -494,7 +503,8 @@ C(3,#OOStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=L2079; ntxbuf=#OOBUF3}),$)
 
 TXFORM=L3002
 #OOCaseNo#OOApplNo#OOCustNo#OOCustName#OOFacmNo#OOBormNo#OODrawdownDate#OOMaturityDate
-#OOStatus#OOPrevIntDate#OOStoreRate#OOCurrencyCode#OOLoanBal#OOBookFlag#OORenewFlag
+#OOStatus#OOPrevIntDate#OOStoreRate#OOCurrencyCode#OOLoanBal#OODrawdownAmt#OODepartment
+#OOBookFlag#OORenewFlag
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -561,6 +571,12 @@ TXFORM=L3002
 #OOLoanBalX=放款餘額
 {width:170}
 
+#OODrawdownAmtX=撥款金額
+{width:170}
+
+#OODepartment=企金別 
+{width:80,align:'center'}
+
 #OOBTN3=展期件
 {width:70,search:false,formatter:'cust:bind-button:展期件;L2079 展期件新舊對照查詢',align:'center',canExport:false}
 
@@ -607,11 +623,11 @@ TXFORM=L3002
 #OOLoanBalX=放款餘額
 {width:170}
 
+#OODrawdownAmtX=撥款金額
+{width:170}
+
+#OODepartment=企金別 
+{width:80,align:'center'}
 ^
-<include src="PRT.icf::INQ01.sel" map="i=L3002;cpi=15"/>
-#CaseNo#CaseNoX#CustId#CustIdX#CustNo#CustNoX#ApplNo#ApplNoX
-%
-#OOCaseNo#OOApplNo#OOCustNo#OOFacmNo#OOBormNo#OODrawdownDate#OOMaturityDate
-#OOStatusX#OOPrevIntDate#OOStoreRate#OOCurrencyCode#OOLoanBalX
-@^
+
 </sub>

@@ -91,6 +91,11 @@ public class L4412 extends TradeBuffer {
 		} else {
 
 		}
+		
+		this.totaVo.putParam("CreateEmpNo", titaVo.getTlrNo() + " " + titaVo.getEmpNm());
+		this.totaVo.putParam("CreateDate", titaVo.getCalDy());
+		this.totaVo.putParam("LastUpdateEmpNo", titaVo.getTlrNo() + " " + titaVo.getEmpNm());
+		this.totaVo.putParam("LastUpdate", titaVo.getCalDy());
 
 		this.addList(this.totaVo);
 		return this.sendList();

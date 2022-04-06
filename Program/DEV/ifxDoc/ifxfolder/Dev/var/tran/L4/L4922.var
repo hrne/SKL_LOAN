@@ -239,9 +239,11 @@ T(H,#OOStatus,#AuthStatusCodeHelp)
 #OOBUF1=X,34,S
 T(2,#OCustNo+#OOFacmNo)
 
-#OOBTN1=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L4923; ntxbuf=#OOBUF1})
+!查有歷程時才顯示歷程按鈕
+#OOHasHistory=A,1,S
 
+#OOBTN1=X,1,S
+C(3,#OOHasHistory,1,BIND(grid,{ cmd=CHAIN; ntxcd=L4923; ntxbuf=#OOBUF1}),$)
 
 
 </sub>
@@ -266,6 +268,7 @@ TXFORM=L4922
 #OORepayBank
 #OORepayAcct
 #OOStatus
+#OOHasHistory
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R07.tom"/>

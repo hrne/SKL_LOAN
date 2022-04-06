@@ -1177,7 +1177,6 @@ public class L4200Batch extends TradeBuffer {
 					} else {
 						tEmpDeductMedia.setErrorCode("16");
 					}
-					tEmpDeductMedia.setErrorCode(tempOccursList.get("OccReturnCode"));
 					tEmpDeductMedia.setAcDate(iAcDate);
 					tEmpDeductMedia.setBatchNo(iBatchNo);
 					tEmpDeductMedia.setDetailSeq(i + 1);
@@ -1221,7 +1220,7 @@ public class L4200Batch extends TradeBuffer {
 						procCode = "00417";
 					} else {
 						procStsCode = "1"; // 不處理
-						procCode = "004" + tempOccursList.get("OccReturnCode");
+						procCode = "00416";
 					}
 				}
 
