@@ -210,7 +210,6 @@ C(2,#FuncCode,S,S,$,$,$)
 #LastUpdate=D,7,L
 C(2,#FuncCode,S,S,$,$,$)
 
-
 #StampCodeX=X,10,L
 T(3,)T(H,#StampCode,#StampCodeHelp)
 #AuthErrorCodeX=X,40,L
@@ -228,6 +227,7 @@ IF(#AuthErrorCode=="00",E(0,1),E(0,0))
 !授權方式
 #AuthType=X,1,L
 T(2,A)
+
 #AuthTypeX=X,8,L
 T(2,紙本新增)
 
@@ -558,10 +558,12 @@ IF(#FuncCode==4 || #FuncCode==5,s,$)
 ! 申請代號 ---20210202新增暫停功能
 #AuthApplCode=X,1,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
-C(4,#L4r22NewCreateFlag,T(2,A),T(2,#L4r22NewCreateFlag))
+C(4,#L4r22NewCreateFlag,T(2,1),T(2,#L4r22NewCreateFlag))
 C(3,#AcctCheckFlag,0,T(2,1),$)
 C(3,#AcctCheckFlag,0,T(F,@AuthApplCode,0),$)
 C(3,#AcctCheckFlag,0,s,$)
+C(4,#AuthErrorCode,T(F,@AuthApplCode,0),$)
+C(4,#AuthErrorCode,s,$)
 T(2,1)
 HELP(1:申請;9:暫停)
 @V(1,1,9)

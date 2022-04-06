@@ -1895,11 +1895,10 @@ C(5,#ProcessDateY,X,E(0,1),$)
 
 
 #MSGERR=X,1,S
-@C(3,#CHECKCHANGE,1,S,$)
-V(P,內容變更，必須至少變更一個項目)
 
 ![變更理由]
 #Reason=X,2,I
+C(3,#CHECKCHANGE,1,$,V(P,內容變更，必須至少變更一個項目))
 HELP(#ReasonHelp,cols:2)
 @C(4,#Reason,S,V(H,#ReasonHelp))
 IF(#Reason==99,$,s)

@@ -90,7 +90,6 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,34,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
@@ -242,9 +241,10 @@ T(2,#OCustNo+#OOFacmNo)
 !查有歷程時才顯示歷程按鈕
 #OOHasHistory=A,1,S
 
+!無歷程時cancel解綁
+!直接hide似乎不能透過再度bind蓋過去
 #OOBTN1=X,1,S
-C(3,#OOHasHistory,1,BIND(grid,{ cmd=CHAIN; ntxcd=L4923; ntxbuf=#OOBUF1}),$)
-
+C(3,#OOHasHistory,1,BIND(grid,{ cmd=CHAIN; ntxcd=L4923; ntxbuf=#OOBUF1}),BIND(grid,cancel))
 
 </sub>
 

@@ -242,7 +242,7 @@ public class L4511 extends TradeBuffer {
 				}
 
 				OccursList occursList = new OccursList();
-				occursList.putParam("OccYearMonthA", setFormatMonth(tEmpDeductMedia.getPerfMonth()));
+				occursList.putParam("OccYearMonthA", setFormatMonth(parse.stringToInteger(titaVo.getCalDy())+19110000));
 				occursList.putParam("OccUnit", FormatUtil.padX(centerCodeAcc, 6));
 //				occursList.putParam("OccUnit", "10H400");
 				if (flag == 1) {

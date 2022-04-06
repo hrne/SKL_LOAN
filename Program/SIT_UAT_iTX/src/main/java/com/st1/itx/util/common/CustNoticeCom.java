@@ -611,7 +611,7 @@ public class CustNoticeCom extends TradeBuffer {
 		{
 			// 沒有指定戶號，需檢查 CustNotice。
 			TempVo tempVo = getCustNotice(formNo, custNo, facmNo, titaVo);
-			boolean result = "Y".equals(tempVo.get("IsLetter")); // 僅回傳 Y 時允許產出
+			boolean result = "Y".equals(tempVo.get("isLetter")); // 僅回傳 Y 時允許產出
 			
 			this.info("checkIsLetterSendable returns " + result + ": getCustNotice says so");
 			return result;

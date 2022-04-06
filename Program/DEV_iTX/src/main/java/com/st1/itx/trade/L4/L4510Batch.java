@@ -147,7 +147,6 @@ public class L4510Batch extends TradeBuffer {
 	private HashMap<tmpFacm, String> facmAcctCode = new HashMap<>();
 	private HashMap<Integer, String> custAcctCode = new HashMap<>();
 	private TempVo tempVo = new TempVo();
-	private HashMap<tmpFacm, String> jsonField = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mapSetFlag = new HashMap<>();
 
 	Slice<EmpDeductSchedule> slEmpDeductSchedule = null;
@@ -528,13 +527,10 @@ public class L4510Batch extends TradeBuffer {
 		});
 
 		this.info("tempList ..." + tempList.toString());
-		jsonField = new HashMap<>();
-//		RepayType = 0 先寫入jsonFild
 
 		for (tmpFacm tmp : tempList) {
 			if (tmp.getAchRepayCode() == 0) {
 				this.info(tmp.toString() + " repayType = 0，不寫入DB... continue");
-//				repayType = 0 不寫入DB
 				continue;
 			}
 
@@ -619,11 +615,11 @@ public class L4510Batch extends TradeBuffer {
 //				4D.短收	4C.溢收
 				if (rpAmt4DMap.get(tmp3) != null) {
 					tEmpDeductDtl.setSumOvpayAmt(rpAmt4DMap.get(tmp3));
-		            rpAmt4DMap.put(tmp3,BigDecimal.ZERO);
+					rpAmt4DMap.put(tmp3, BigDecimal.ZERO);
 				}
 				if (rpAmt4CMap.get(tmp3) != null) {
 					tEmpDeductDtl.setSumOvpayAmt(tEmpDeductDtl.getSumOvpayAmt().subtract(rpAmt4CMap.get(tmp3)));
-		            rpAmt4CMap.put(tmp3,BigDecimal.ZERO);
+					rpAmt4CMap.put(tmp3, BigDecimal.ZERO);
 				}
 			} else if (tmp.getAchRepayCode() == 4 && rpAmt04Map.get(tmp) != null) {
 				txAmt = rpAmt04Map.get(tmp);
@@ -637,10 +633,6 @@ public class L4510Batch extends TradeBuffer {
 			}
 
 			this.info("tempVo ... " + tempVo.toString());
-
-			if (tempVo.getJsonString() != null && !"".equals(tempVo.getJsonString().trim())) {
-				jsonField.put(tmp2, tempVo.getJsonString());
-			}
 
 			tEmpDeductDtlId.setEntryDate(iEntryDate + 19110000);
 			tEmpDeductDtlId.setCustNo(tmp.getCustNo());
@@ -744,10 +736,7 @@ public class L4510Batch extends TradeBuffer {
 				tEmpDeductDtl.setCurrIntAmt(BigDecimal.ZERO);
 			}
 
-			if (jsonField.get(tmp2) != null) {
-				this.info("jsonField ... " + jsonField.get(tmp2).toString());
-				tEmpDeductDtl.setJsonFields(jsonField.get(tmp2));
-			}
+			tEmpDeductDtl.setJsonFields(tempVo.getJsonString());
 
 			try {
 				empDeductDtlService.insert(tEmpDeductDtl, titaVo);
@@ -807,7 +796,7 @@ public class L4510Batch extends TradeBuffer {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
 				// 非15日薪僅扣期款
 				if (flag == 2) {
-					if (tBaTxVo.getRepayType() != 1) {
+					if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() >= 4) {
 						continue;
 					}
 				}
