@@ -145,7 +145,7 @@ public class L9703Report2 extends MakeReport {
 
 		try {
 			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9703Vo.get("F4")), parse.stringToInteger(tL9703Vo.get("F5")), 0, termEnd,
+					parse.stringToInteger(tL9703Vo.get("CustNo")), parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd,
 					titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
@@ -178,16 +178,16 @@ public class L9703Report2 extends MakeReport {
 
 		printCm(1, 4, "【限定本人拆閱，若無此人，請寄回本公司】");
 
-		printCm(2, 5, tranNum(tL9703Vo.get("F17")) + tranNum(tL9703Vo.get("F18")));
+		printCm(2, 5, tranNum(tL9703Vo.get("CurrZip3")) + tranNum(tL9703Vo.get("CurrZip2")));
 
-		int custNo = Integer.valueOf(tL9703Vo.get("F4"));
+		int custNo = Integer.valueOf(tL9703Vo.get("CustNo"));
 
 		CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 		String addr = custNoticeCom.getCurrAddress(custMain, titaVo);
 
 		printCm(2, 6, addr);
 
-		printCm(2, 7, String.format("%07d", custNo) + "   " + tL9703Vo.get("F6"));
+		printCm(2, 7, String.format("%07d", custNo) + "   " + tL9703Vo.get("CustName"));
 
 		setFont(1, 11);
 
@@ -200,7 +200,7 @@ public class L9703Report2 extends MakeReport {
 		printCm(1.5, y, "製發日期：" + this.showRocDate(entdy, 1));
 
 		String tmp = "";
-		switch (tL9703Vo.get("F29")) {
+		switch (tL9703Vo.get("RepayCode")) {
 		case "1":
 			tmp = "匯款轉帳";
 			break;
@@ -233,12 +233,12 @@ public class L9703Report2 extends MakeReport {
 
 		y = top + yy + (++l) * h;
 		printCm(1.5, y,
-				"戶    號：" + String.format("%07d", Integer.valueOf(tL9703Vo.get("F4"))) + "-"
-						+ String.format("%03d", Integer.valueOf(tL9703Vo.get("F5"))) + "  目前利率："
+				"戶    號：" + String.format("%07d", Integer.valueOf(tL9703Vo.get("CustNo"))) + "-"
+						+ String.format("%03d", Integer.valueOf(tL9703Vo.get("FacmNo"))) + "  目前利率："
 						+ padStart(6, "" + intRate) + "%");
 
 		y = top + yy + (++l) * h;
-		printCm(1.5, y, "客戶名稱：" + tL9703Vo.get("F6"));
+		printCm(1.5, y, "客戶名稱：" + tL9703Vo.get("CustName"));
 		printCm(12, y, "溢短繳：", "R");
 		printCm(14, y, String.format("%,d", excessive), "R");
 
@@ -345,8 +345,8 @@ public class L9703Report2 extends MakeReport {
 
 		String iTLRNO = "";
 
-		if (tL9703Vo.get("F3") != null || "".equals(tL9703Vo.get("F3"))) {
-			iTLRNO = tL9703Vo.get("F3");
+		if (tL9703Vo.get("Fullname") != null || "".equals(tL9703Vo.get("Fullname"))) {
+			iTLRNO = tL9703Vo.get("Fullname");
 		}
 		y = top + yy + (++l) * h;
 		printCm(14, y, "製表人 " + iTLRNO);
@@ -354,13 +354,13 @@ public class L9703Report2 extends MakeReport {
 		String payIntAcct = "";
 		String payPriAcct = "";
 
-		if (tL9703Vo.get("F34") != null) {
-			if ("0".equals(tL9703Vo.get("F34"))) {
-				payIntAcct = "9510200" + String.format("%07d", Integer.valueOf(tL9703Vo.get("F4")));
-				payPriAcct = "9510300" + String.format("%07d", Integer.valueOf(tL9703Vo.get("F4")));
+		if (tL9703Vo.get("EntCode") != null) {
+			if ("0".equals(tL9703Vo.get("EntCode"))) {
+				payIntAcct = "9510200" + String.format("%07d", Integer.valueOf(tL9703Vo.get("CustNo")));
+				payPriAcct = "9510300" + String.format("%07d", Integer.valueOf(tL9703Vo.get("CustNo")));
 			} else {
-				payIntAcct = "9510100" + String.format("%07d", Integer.valueOf(tL9703Vo.get("F4")));
-				payPriAcct = "9510100" + String.format("%07d", Integer.valueOf(tL9703Vo.get("F4")));
+				payIntAcct = "9510100" + String.format("%07d", Integer.valueOf(tL9703Vo.get("CustNo")));
+				payPriAcct = "9510100" + String.format("%07d", Integer.valueOf(tL9703Vo.get("CustNo")));
 			}
 		}
 

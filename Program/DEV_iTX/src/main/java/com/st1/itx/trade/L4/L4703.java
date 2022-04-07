@@ -153,6 +153,7 @@ public class L4703 extends TradeBuffer {
 				setEMailFileVO(custNo, facmNo, titaVo);
 			}
 
+			
 //		2.整批
 //		若設定寄送簡訊或mail，則額外多寄，但信依舊要寄
 		case 2:
@@ -209,11 +210,14 @@ public class L4703 extends TradeBuffer {
 //		滯繳明細表 通知方式為書信者，於9703產出
 //		l9703p.run(titaVo);
 		MySpring.newTask("L9703p", this.txBuffer, titaVo);
-
+//      
+		MySpring.newTask("L4703p", this.txBuffer, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
+	
+	
 	private void setTextFileVO(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
 
 		List<CustNotice> lCustNoticeC = new ArrayList<CustNotice>();
@@ -222,8 +226,11 @@ public class L4703 extends TradeBuffer {
 
 		sCustNoticeC = custNoticeService.findCustNo(custNo, this.index, this.limit);
 
-		new CustMain();
-		custMainService.custNoFirst(custNo, custNo);
+		CustMain tCustMain = new CustMain();
+		tCustMain = custMainService.custNoFirst(custNo, custNo);
+
+		ArrayList<String> dataList = new ArrayList<String>();
+		String dataLines = "";
 
 		lCustNoticeC = sCustNoticeC == null ? null : sCustNoticeC.getContent();
 
@@ -231,6 +238,8 @@ public class L4703 extends TradeBuffer {
 			for (CustNotice tCustNotice : lCustNoticeC) {
 
 				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getMsgNotice())) {
+					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
+					dataList.add(dataLines);
 
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 					tTxToDoDetail.setCustNo(custNo);
@@ -239,7 +248,7 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setDtlValue("<滯繳通知>");
 					tTxToDoDetail.setItemCode("TEXT00");
 					tTxToDoDetail.setStatus(0);
-					tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo, "親愛的客戶，繳款通知；新光人壽關心您。", iEntryDate));
+					tTxToDoDetail.setProcessNote(dataLines);
 
 					txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo);
 				}

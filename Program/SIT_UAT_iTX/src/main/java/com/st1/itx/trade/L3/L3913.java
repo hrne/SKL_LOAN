@@ -60,7 +60,8 @@ public class L3913 extends TradeBuffer {
 		Slice<LoanIntDetail> slLoanIntDetail;
 		List<LoanIntDetail> lLoanIntDetail;
 
-		slLoanIntDetail = sLoanIntDetailService.fildFacmNoEq(iCustNo, iFacmNo, iBormNo, iAcDate, iTellerNo, iTxtNo, this.index, this.limit, titaVo);
+		slLoanIntDetail = sLoanIntDetailService.fildFacmNoEq(iCustNo, iFacmNo, iBormNo, iAcDate, iTellerNo, iTxtNo,
+				this.index, this.limit, titaVo);
 		if (slLoanIntDetail == null) {
 			throw new LogicException(titaVo, "E0001", "計息明細檔"); // 查詢資料不存在
 		}
@@ -77,11 +78,11 @@ public class L3913 extends TradeBuffer {
 
 		}
 
-		if (iCustDataCtrl == 1) {
-			this.totaVo.putParam("OCustNo", "");
-			this.totaVo.putParam("OCustName", "");
-		}
-
+		// if(iCustDataCtrl == 1) {
+		// 	this.totaVo.putParam("OCustNo", "");
+		// 	this.totaVo.putParam("OCustName", "");
+		// }
+		
 		for (LoanIntDetail tLoanIntDetail : lLoanIntDetail) {
 
 			OccursList occursList = new OccursList();

@@ -73,9 +73,13 @@ C(3,#FunCode,3,SHOW(#AuthNoFd2,#AuthNo2),HIDE(#AuthNoFd2,#AuthNo2))
 #Ap8=X,16,I,ui:button;value:L8.遵循法令作業;enable:1;tabbable:0
 #Ap9=X,16,I,ui:button;value:L9.報表作業;enable:1;tabbable:0
 
+#ApInit0=X,1,S
+##loop {times:8,i:2}
+INVOKEJS(SHOW,p{i},0)
+##end
+
 #ApInit=X,1,S
 ##loop {times:9,i:1}
-INVOKEJS(SHOW,p{i},0)
 BIND(#Ap{i},click, {cmd=CALLSEND;DOCODE=ApProc{i}})
 ##end
 ##loop {times:30,i:1}

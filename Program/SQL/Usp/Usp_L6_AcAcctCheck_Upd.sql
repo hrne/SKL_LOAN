@@ -228,7 +228,7 @@ BEGIN
     )
     ,"Insu" AS (
       SELECT CASE
-               WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'TMI'
+               WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0 THEN 'TMI'
                WHEN S1."StatusCode" = 1 THEN 'F09'
                WHEN S1."StatusCode" = 2 THEN 'F25'
              ELSE ' ' END           AS "AcctCode"
@@ -239,12 +239,12 @@ BEGIN
       WHERE S1."AcDate" = 0
         AND S1."TotInsuPrem" > 0
         AND CASE
-              WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'Y'
+              WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0 THEN 'Y'
               WHEN S1."StatusCode" = 1 THEN 'Y'
               WHEN S1."StatusCode" = 2 THEN 'Y'
             ELSE 'N' END = 'Y'
       GROUP BY CASE
-                 WHEN S1."StatusCode" = 0 AND S1."NotiTempFg" = 'Y' THEN 'TMI'
+                 WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0 THEN 'TMI'
                  WHEN S1."StatusCode" = 1 THEN 'F09'
                  WHEN S1."StatusCode" = 2 THEN 'F25'
                ELSE ' ' END

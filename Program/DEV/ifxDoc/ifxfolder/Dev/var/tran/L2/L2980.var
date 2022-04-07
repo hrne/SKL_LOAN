@@ -37,18 +37,6 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
-#button=x,100,S
-T(2,{ cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
-C(3,#CHAIN,0,K(MODIFYBUTTON,1,繳息狀況查詢),$)
-
-#button2=x,100,S
-T(2,{ cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2})ASGN(BTN_NEW2$)
-C(3,#CHAIN,0,K(MODIFYBUTTON,2,客戶基本資料查詢),$)
-
-#button3=x,100,S
-T(2,{ cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF2})ASGN(BTN_NEW3$)
-C(3,#CHAIN,0,K(MODIFYBUTTON,3,擔保品查詢),$)
-
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -222,20 +210,25 @@ T(2,@CustNo,#L2r07CustNo)
 #BUF3=X,42,S
 T(2,L2980+#CustNo)
 
-#button=_,_,S
+
+#button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF3})ASGN(BTN_NEW1$)
+C(3,#CHAIN,0,K(MODIFYBUTTON,1,繳息狀況查詢),$)
 
 #BUF4=X,42,S
-T(2,#CustNo)
+T(2,5+#CustId)
 
-#button2=_,_,S
-T(2,{ cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3})ASGN(BTN_NEW2$)
+#button2=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF4})ASGN(BTN_NEW2$)
+C(3,#CHAIN,0,K(MODIFYBUTTON,2,客戶基本資料查詢),$)
 
 #BUF5=X,42,S
 T(2,                               +#CustNo)
 
-#button3=_,_,S
+#button3=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF5})ASGN(BTN_NEW3$)
+C(3,#CHAIN,0,K(MODIFYBUTTON,3,擔保品查詢),$)
+
 
 
 ![額度編號]

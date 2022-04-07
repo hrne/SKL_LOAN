@@ -53,6 +53,8 @@ public class LM036Report extends MakeReport {
 		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
 		int useExcel = iMonth % 3 == 1 ? 2 : iMonth % 3 == 2 ? 3 : 1;
 		this.startRow =  iMonth % 3 == 1 ? 47 : iMonth % 3 == 2 ? 45 : 46;
+		//excel 2  3  1
+		//		47 45 46
 //		this.info("Excel" + useExcel);
 
 		this.info("startMonth = " + startMonth);
@@ -189,8 +191,13 @@ public class LM036Report extends MakeReport {
 		int iMonth = endMonth % 100;
 		// 因一季3個月 所以 月份/3 餘數 1=1個月,2=2個月,0=3個月 基本要找 39個月( XXX年一季~XXX+3年一季)
 		int rowCount = iMonth % 3 == 1? 2 :iMonth % 3 == 2? 0 : 1;
-		// 只有 (餘數1)40 (餘數2)38 (餘數3)39  筆
-
+		this.info("rowCount% = " + rowCount);
+		// 39 40 38 筆數
+		//月份餘數  1  2  0
+		//excel     2  3  1
+		//下方列數	47 45 46
+		//筆數      40 38 39 
+		//實際退回  39 37 38
 		// 回推12季(36個月)
 		endMonth = endMonth * 100 + 1;
 
@@ -198,7 +205,7 @@ public class LM036Report extends MakeReport {
 
 		dDateUtil.init();
 		dDateUtil.setDate_1(endMonth);
-		dDateUtil.setMons(-38 - rowCount); // XXX年一季~XXX+3年一季 + 多的月份
+		dDateUtil.setMons(-37 - rowCount); // XXX年一季~XXX+3年一季 + 多的月份
 		int startdate = dDateUtil.getCalenderDay();
 
 		this.info("startdate = " + startdate);
@@ -340,7 +347,7 @@ public class LM036Report extends MakeReport {
 					break;
 				}
 
-				int startRow = iMonth % 3 == 1 ? 2 : iMonth % 3 == 2 ? 3 : 1;
+
 				
 				if (iMonth == 3 || iMonth == 6 || iMonth == 9 || iMonth == 12) {
 					String text = iYear + "年第" + textQ + "季";
