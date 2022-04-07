@@ -1381,9 +1381,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				|| vCalcRepayIntVo.getStoreRate().compareTo(wkBeforeStoreRate) == 0) {
 			return;
 		}
-		// 有餘額
 		BigDecimal wkBal = vCalcRepayIntVo.getAmount().subtract(vCalcRepayIntVo.getPrincipal());
-		if (wkBal.compareTo(BigDecimal.ZERO) == 0) {
+		// 無餘額、最後一期
+		if (wkBal.compareTo(BigDecimal.ZERO) == 0 || vCalcRepayIntVo.getTermNo() == iTotalPeriod) {
 			return;
 		}
 

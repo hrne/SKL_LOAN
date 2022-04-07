@@ -352,6 +352,11 @@ public class L4611 extends TradeBuffer {
 			this.info("skip AcReceivable StatusCode= " + tInsuRenew.getStatusCode());
 			return;
 		}
+		
+		if (tInsuRenew.getTotInsuPrem().compareTo(BigDecimal.ZERO) == 0) {
+			this.info("skip AcReceivable TotInsuPrem = 0 ");
+			return;
+		}
 
 		AcReceivable acReceivable = new AcReceivable();
 		acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
