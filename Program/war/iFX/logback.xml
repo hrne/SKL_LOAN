@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="60 seconds">
+	<property name="IFX_BASE_LOG" value="/home/weblogic/ifxDoc/ifxwriter/weblog" />
+
+
+	<!--Basic file appender -->
+	<!-- <appender name="FILE" class="ch.qos.logback.core.FileAppender"> <file>${IFX_BASE_LOG}/ifxweb.log</file>
+		<encoder> <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n
+		</pattern> </encoder> </appender> -->
+
+	<!--Daily rolling file appender -->
+	<!--<contextName>myAppName</contextName> -%contextName -->
+	<appender name="FILE"	class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<Encoding>UTF-8</Encoding>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<FileNamePattern>${IFX_BASE_LOG}/ifx-${ifx_PortNumber:-}-%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+			<MaxHistory>7</MaxHistory>
+			<MaxFileSize>45MB</MaxFileSize>
+			<totalSizeCap>10GB</totalSizeCap>
+		</rollingPolicy>
+
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</Pattern>
+		</layout>
+	</appender>
+
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 1. 輸出SQL 到控制檯和檔案 -->
+	<logger name="org.hibernate.SQL" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<!-- 2. 輸出SQL 的引數到控制檯和檔案 -->
+	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" additivity="false" level="TRACE">
+		<level value="TRACE" />
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<!-- 非同步输出 -->
+  <appender name ="ASYNC" class= "ch.qos.logback.classic.AsyncAppender">
+      <!-- 不丟失日志.默認的,如果隊列的80%已滿,則會丟棄TRACT、DEBUG、INFO級別的日志 -->
+      <discardingThreshold>0</discardingThreshold>
+      <!-- 更改默認的隊列的深度,該值會影響性能.默認值為256 -->
+      <queueSize>256</queueSize>
+      <!-- 添加附加的appender,最多只能添加一個 -->
+      <appender-ref ref ="FILE"/>
+  </appender>
+
+
+
+	<!-- Strictly speaking, the level attribute is not necessary since -->
+	<!-- the level of the root level is set to DEBUG by default. -->
+	<root level="INFO">
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>
