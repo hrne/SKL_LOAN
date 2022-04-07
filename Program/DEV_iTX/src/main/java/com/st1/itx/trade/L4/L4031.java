@@ -137,14 +137,15 @@ public class L4031 extends TradeBuffer {
 					if (CheckFlag.get(tempL4031Vo) != null) {
 						checkFlag = CheckFlag.get(tempL4031Vo);
 					} else {
-						if (relCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+
+						if (relCnt.get(tempL4031Vo).equals(totCnt.get(tempL4031Vo))) {
 							status = 2; // 2.已確認放行
 							checkFlag = 1; // 1-已確認報表
-						} else if (conCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
-							status = 1; // 1.確認未放行 
-							checkFlag = 9;  
-						} else if (keyinCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
-							status = 0; // 0.未確認 
+						} else if (conCnt.get(tempL4031Vo).equals(totCnt.get(tempL4031Vo))) {
+							status = 1; // 1.確認未放行
+							checkFlag = 9;
+						} else if (keyinCnt.get(tempL4031Vo).equals(totCnt.get(tempL4031Vo))) {
+							status = 0; // 0.未確認
 							checkFlag = 0; // 0-確認
 						}
 					}
