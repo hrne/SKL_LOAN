@@ -286,7 +286,7 @@ TXFORM=L6032
 
 
 #OOBaseRateCodeX=指標利率種類
-{width:250,align:'center'}
+{width:250,align:'left'}
 
 #OOBaseRateX1=利率
 {width:70,align:'center'}

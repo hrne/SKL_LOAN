@@ -25,7 +25,6 @@ import com.st1.itx.db.service.CdLoanNotYetService;
  * @version 1.0.0
  */
 public class L6070 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6070.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,7 +46,7 @@ public class L6070 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		Slice<CdLoanNotYet> slCdLoanNotYet = cdLoanNotYetService.codeLike(iNotYetCode + "%", this.index, this.limit, titaVo);
+		Slice<CdLoanNotYet> slCdLoanNotYet = cdLoanNotYetService.codeLike("%" + iNotYetCode + "%", this.index, this.limit, titaVo);
 		List<CdLoanNotYet> lCdLoanNotYet = slCdLoanNotYet == null ? null : slCdLoanNotYet.getContent();
 
 		if (lCdLoanNotYet == null) {

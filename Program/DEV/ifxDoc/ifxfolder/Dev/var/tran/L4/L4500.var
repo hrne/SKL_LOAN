@@ -86,7 +86,7 @@ HELP(#EmpDeductTypeHelp)
 @V(H,#EmpDeductTypeHelp)
 
 
-#AgType1X=X,30,L
+#AgType1X=X,80,L
 T(H,#AgType1,#EmpDeductTypeHelp)
 
 ! 複製碼決定要調rim欄位
@@ -97,7 +97,7 @@ C(4,#CopyCode,S,$)
 V(6,#AgType1,#AgType1)C(4,#CopyCode,$,V(H,#EmpDeductTypeHelp))
 
 
-#CopyCodeX=X,20,L
+#CopyCodeX=X,80,L
 T(H,#CopyCode,#EmpDeductTypeHelp)
 
 <include src="ROM.icf::L4R15.dec"/>

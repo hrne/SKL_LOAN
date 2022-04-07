@@ -309,6 +309,8 @@ A(DATE,0,#AcDate)
 
 
 
+#MRKEY=_,_,S
+T(2,#TimCustNo+-+#FacmNo)
 
 
 

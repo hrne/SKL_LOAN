@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,30 +22,31 @@ import com.st1.itx.db.domain.ReltMainId;
  */
 public interface ReltMainRepositoryDay extends JpaRepository<ReltMain, ReltMainId> {
 
-	// ReltUKey =
-	public Optional<ReltMain> findTopByReltUKeyIs(String reltUKey_0);
+  // ReltUKey =
+  public Optional<ReltMain> findTopByReltUKeyIs(String reltUKey_0);
 
-	// ReltUKey =
-	public Slice<ReltMain> findAllByReltUKeyIs(String reltUKey_0, Pageable pageable);
+  // ReltUKey =
+  public Slice<ReltMain> findAllByReltUKeyIs(String reltUKey_0, Pageable pageable);
 
-	// CaseNo =
-	public Optional<ReltMain> findTopByCaseNoIs(int caseNo_0);
+  // CaseNo =
+  public Optional<ReltMain> findTopByCaseNoIs(int caseNo_0);
 
-	// CustNo =
-	public Slice<ReltMain> findAllByCustNoIsOrderByCaseNoAsc(int custNo_0, Pageable pageable);
+  // CustNo =
+  public Slice<ReltMain> findAllByCustNoIsOrderByCaseNoAsc(int custNo_0, Pageable pageable);
 
-	// CustNo =
-	public Optional<ReltMain> findTopByCustNoIs(int custNo_0);
+  // CustNo =
+  public Optional<ReltMain> findTopByCustNoIs(int custNo_0);
 
-	// CaseNo =
-	public Slice<ReltMain> findAllByCaseNoIsOrderByCustNoAsc(int caseNo_0, Pageable pageable);
+  // CaseNo =
+  public Slice<ReltMain> findAllByCaseNoIsOrderByCustNoAsc(int caseNo_0, Pageable pageable);
 
-	// CaseNo = ,AND CustNo =
-	public Slice<ReltMain> findAllByCaseNoIsAndCustNoIs(int caseNo_0, int custNo_1, Pageable pageable);
+  // CaseNo = ,AND CustNo = 
+  public Slice<ReltMain> findAllByCaseNoIsAndCustNoIs(int caseNo_0, int custNo_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<ReltMain> findByReltMainId(ReltMainId reltMainId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<ReltMain> findByReltMainId(ReltMainId reltMainId);
 
 }
+
