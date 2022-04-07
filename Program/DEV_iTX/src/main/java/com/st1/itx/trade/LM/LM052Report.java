@@ -77,7 +77,7 @@ public class LM052Report extends MakeReport {
 		makeExcel.setValue(1, 1, formTitle);
 
 		formTitle = (lastYM - 191100) + "\n" + "放款總額";
-		makeExcel.setValue(15, 3, formTitle, "C");
+		makeExcel.setValue(16, 3, formTitle, "C");
 
 		List<Map<String, String>> lM052List = null;
 
@@ -138,7 +138,7 @@ public class LM052Report extends MakeReport {
 			approvedLoss = formatAmt(thisMonthlyLM052Loss.getApprovedLoss().toString(), 2, 6);
 		}
 
-		if (lastMonthlyLM052Loss != null && last2MonthlyLM052Loss == null) {
+		if (lastMonthlyLM052Loss != null && last2MonthlyLM052Loss != null) {
 			// 前兩個月的備抵損失 減去 上個月的備抵損失 = 本月預期損失金額
 			approvedLossDiff = formatAmt(
 					(last2MonthlyLM052Loss.getApprovedLoss().subtract(lastMonthlyLM052Loss.getApprovedLoss()))
@@ -318,11 +318,11 @@ public class LM052Report extends MakeReport {
 					break;
 
 				case 5:
-					row = 28;
-
-					col = 15;
-
-					amt = tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0"));
+//					row = 28;
+//
+//					col = 15;
+//
+//					amt = tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0"));
 
 					break;
 				}

@@ -2,6 +2,7 @@ package com.st1.itx.eum;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 各線程自有變數
@@ -20,6 +21,9 @@ public class ThreadVariable {
 	}
 
 	public static void setObject(String id, Object value) {
+		if (Objects.isNull(value))
+			return;
+
 		if (threadLocal.get() == null) {
 			threadLocal.set(new LinkedHashMap<String, Object>());
 			threadLocal.get().put(id, value);
@@ -40,7 +44,7 @@ public class ThreadVariable {
 			return false;
 		return (boolean) threadLocal.get().get(ContentName.loggerFg);
 	}
-	
+
 	public static void setLoggerOn() {
 		setObject(ContentName.loggerFg, true);
 	}

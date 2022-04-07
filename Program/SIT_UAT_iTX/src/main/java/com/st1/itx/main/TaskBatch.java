@@ -59,6 +59,7 @@ public class TaskBatch extends CommBuffer implements Runnable {
 	}
 
 	private void setLog() {
+		ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
 		if (this.getLoggerFg())
 			ThreadVariable.setObject(ContentName.loggerFg, true);
 		else
