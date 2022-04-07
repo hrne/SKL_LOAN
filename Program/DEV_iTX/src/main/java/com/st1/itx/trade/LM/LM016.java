@@ -19,33 +19,8 @@ import com.st1.itx.util.MySpring;
  * @author Eric Chang
  * @version 1.0.0
  */
-//public class LM016 extends BatchBase implements Tasklet, InitializingBean {
-//
-//	@Autowired
-//	LM016Report lm016report;
-//
-//	@Override
-//	public void afterPropertiesSet() throws Exception {
-//		;
-//	}
-//
-//	@Override
-//	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-//		// logger = LoggerFactory.getLogger(LM016.class);
-//		return this.exec(contribution, "M");
-//	}
-//
-//	@Override
-//	public void run() throws LogicException {
-//		this.info("active LM016 ");
-//		lm016report.setParentTranCode(this.getParent());
-//		lm016report.exec(titaVo);
-//	}
-//
-//}
 
 public class LM016 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM016.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

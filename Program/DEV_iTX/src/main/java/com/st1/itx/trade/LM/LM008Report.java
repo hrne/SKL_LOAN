@@ -204,8 +204,8 @@ public class LM008Report extends MakeReport {
 		// 印合計
 		printTotal();
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 	private void resetSubtotal() {

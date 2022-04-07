@@ -100,7 +100,7 @@ public class L3702 extends TradeBuffer {
 
 			// 新增須刷主管卡 經理層級
 			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0703", "");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 
 			/* 存入DB */
@@ -162,12 +162,12 @@ public class L3702 extends TradeBuffer {
 
 			// 刪除須刷主管卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0704", "");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 
 			try {
 
-				this.info(" deleteCustRmkLog" + tLoanCustRmk);
+				this.info(" deleteLoanCustRmkLog" + tLoanCustRmk);
 
 				if (tLoanCustRmk != null) {
 					dataLog.setEnv(titaVo, tLoanCustRmk, tLoanCustRmk);

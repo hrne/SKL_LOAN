@@ -288,8 +288,7 @@ public class LM001Report extends MakeReport {
 		print(1, 1, "　　　　 三、續期放款利率：指本月份內〔月初至月底〕依契約規定調整有效放款戶數所採用");
 		print(1, 1, "　　　　     之放款利率，依其最高及最低放款利率填報。");
 
-		long sno = this.close();
-
+		this.close();
 		// this.toPdf(sno);
 	}
 
@@ -374,7 +373,7 @@ public class LM001Report extends MakeReport {
 		} else {
 			makeExcel.setValue(3, 1, "無資料");
 		}
-		long sno1 = makeExcel.close();
-		// makeExcel.toExcel(sno1);
+		makeExcel.close();
+		//makeExcel.toExcel(sno1);
 	}
 }

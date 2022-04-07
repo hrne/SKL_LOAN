@@ -115,7 +115,7 @@ public class LM007Report extends MakeReport {
 			this.print(-5, 3, "本日無資料");
 		}
 
-		long sno = this.close();
+		this.close();
 		// this.toPdf(sno);
 	}
 

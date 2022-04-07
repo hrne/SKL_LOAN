@@ -421,7 +421,7 @@ public class LM003Report extends MakeReport {
 			print(1, 42, " ●撥款金額包含企金件以自然人申貸撥款" + NatEnt + "億");
 		}
 
-		long sno = this.close();
+		this.close();
 		// this.toPdf(sno);
 
 		return true;

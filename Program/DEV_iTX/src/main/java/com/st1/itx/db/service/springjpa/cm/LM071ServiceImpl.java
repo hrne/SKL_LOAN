@@ -82,10 +82,10 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "								  			 AND REs.\"SEQ\" = 1";
 		sql += "	  WHERE L.\"Status\" IN(0,4)";
 		sql += "		AND M.\"ProdNo\" = '11'";
+		sql += " 		AND P.\"EmpFlag\" = 'Y'";
 		sql += "	  ORDER BY L.\"CustNo\"";
 		sql += "			  ,L.\"FacmNo\"";
 		sql += "			  ,L.\"BormNo\"";
-		// sql += " AND P.\"EmpFlag\" = 'Y'";
 		// sql += " AND E.\"CommLineType\" = '4'";
 		// sql += " AND E.\"QuitDate\" <= :iday";
 

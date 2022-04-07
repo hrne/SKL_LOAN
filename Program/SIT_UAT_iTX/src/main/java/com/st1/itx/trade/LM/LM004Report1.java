@@ -34,11 +34,8 @@ public class LM004Report1 extends MakeReport {
 	public void printHeaderL() {
 		this.print(-1, 172, "機密等級：密");
 		this.print(-2, 1, "　 程式 ID：" + this.getParentTranCode());
-//		this.print(-2, 1, "　 程式 ID：LN1341");
 		this.print(-2, 100, "新光人壽保險股份有限公司", "C");
-//		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(0, 2)));
 		this.print(-2, 172, "日　期：" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
-//		this.print(-3, 1, "　 報　 表：LN1341");
 		this.print(-3, 1, "　 報　 表："+ this.getRptCode());
 		this.print(-3, 100, "長中短期放款到期明細表", "C");
 		this.print(-3, 172, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
@@ -89,14 +86,13 @@ public class LM004Report1 extends MakeReport {
 			} // for
 
 		} // if
-		long sno = this.close();
-
-		// 測試用
+		
+		this.close();		
 		//this.toPdf(sno);
 	}
 
 	private String showDate(String date, int iType) {
-//		this.info("MakeReport.toPdf showRocDate1 = " + date);
+
 		if (date == null || date.equals("") || date.equals("0")) {
 			return "";
 		}
@@ -104,8 +100,11 @@ public class LM004Report1 extends MakeReport {
 		if (rocdate > 19110000) {
 			rocdate -= 19110000;
 		}
+		
 		String rocdatex = String.valueOf(rocdate);
+		
 		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
+		
 		if (iType == 1) {
 			if (rocdatex.length() == 6) {
 				return rocdatex.substring(0, 2) + "/" + rocdatex.substring(2, 4) + "/" + rocdatex.substring(4, 6);

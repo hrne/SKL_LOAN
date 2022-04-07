@@ -182,7 +182,7 @@ public class L3R02 extends TradeBuffer {
 		this.totaVo.putParam("L3r02CurrencyCode", tLoanBorMain.getCurrencyCode());
 		this.totaVo.putParam("L3r02DrawdownAmt", tLoanBorMain.getDrawdownAmt());
 		this.totaVo.putParam("L3r02LoanBal", tLoanBorMain.getLoanBal());
-		this.totaVo.putParam("L3r02DrawdownDate", tLoanRateChange.getEffectDate()); // 生效日
+		this.totaVo.putParam("L3r02DrawdownDate", tLoanBorMain.getDrawdownDate());
 		this.totaVo.putParam("L3r02LoanTermYy", tLoanBorMain.getLoanTermYy());
 		this.totaVo.putParam("L3r02LoanTermMm", tLoanBorMain.getLoanTermMm());
 		this.totaVo.putParam("L3r02LoanTermDd", tLoanBorMain.getLoanTermDd());

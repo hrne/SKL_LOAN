@@ -23,10 +23,10 @@ public class L9701Report3 extends MakeReport {
 
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Autowired
 	CustNoticeCom custNoticeCom;
 
@@ -102,16 +102,16 @@ public class L9701Report3 extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9701Report3 exec");
-		
+
 		iCUSTNO = titaVo.get("CustNo");
-		
+
 		entday = titaVo.getEntDyI();
-		
+
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-		
+
 		List<Map<String, String>> listL9701 = null;
-		
+
 		try {
 			listL9701 = l9701ServiceImpl.doQuery3(titaVo);
 		} catch (Exception e) {
@@ -119,37 +119,37 @@ public class L9701Report3 extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
-		
+
 		int cnt = 0;
-		
+
 		if (listL9701 != null && listL9701.size() > 0) {
 			this.custName = listL9701.get(0).get("CustName");
 			this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來交易明細表", "", "A4", "L");
-			
+
 			for (Map<String, String> tL9701Vo : listL9701) {
 				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
-				
+
 				// inputCustNo: #CustNo
 				// CustNo: Query.CustNo
 				// FacmNo: Query.FacmNo
-				
-				String inputCustNo = titaVo.get("CustNo");
-				String recordCustNoString = tL9701Vo.get("CustNo");
-				String recordFacmNoString = tL9701Vo.get("FacmNo");
-				int recordCustNo = parse.stringToInteger(recordCustNoString);
-				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
-				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9701", titaVo))
-					continue;
-						
-				// 印明細						
+
+//				String inputCustNo = titaVo.get("CustNo");
+//				String recordCustNoString = tL9701Vo.get("CustNo");
+//				String recordFacmNoString = tL9701Vo.get("FacmNo");
+//				int recordCustNo = parse.stringToInteger(recordCustNoString);
+//				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
+//				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9701", titaVo)) {
+//					continue;
+//				}
+
+				// 印明細
 				printDetail(tL9701Vo);
 				cnt++;
 			}
 			this.print(1, 3, "－－　－－　－－－－－　－－－－－－　－－－　－－－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－");
 		}
-		
-		if (cnt <= 0)
-		{
+
+		if (cnt <= 0) {
 			this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來交易明細表", "", "A4", "L");
 			this.print(1, 1, "本日無資料");
 			this.print(1, 3, "－－　－－　－－－－－　－－－－－－　－－－　－－－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－");

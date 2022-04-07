@@ -26,6 +26,13 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	/**
+	 * 客戶往來本息明細表
+	 * 
+	 * @param titaVo titaVo
+	 * @return 查詢結果
+	 * @throws Exception
+	 */
 	public List<Map<String, String>> doQuery1(TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.getParam("CustNo");
@@ -51,22 +58,21 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,NVL(NVL(CB.\"BdLocation\", CL.\"LandLocation\"),' ') F14";
 		sql += "            ,T.\"F15\"";
 		sql += "      FROM (SELECT DECODE(T.\"EntryDate\", 0, T.\"AcDate\" ,T.\"EntryDate\") F0";
-		sql += "                  ,T.\"LoanBal\" + T.\"ExtraRepay\" + T.\"Principal\" F1";
+		sql += "                  ,T.\"LoanBal\" + T.\"Principal\" F1";
 		sql += "                  ,T.\"IntStartDate\" F2 ";
 		sql += "                  ,T.\"IntEndDate\" F3";
 		sql += "                  ,T.\"Rate\" F4";
 		sql += "                  ,T.\"Interest\" F5";
 		sql += "                  ,T.\"DelayInt\" F6";
 		sql += "                  ,T.\"BreachAmt\" F7";
-		sql += "                  ,T.\"Principal\" + T.\"ExtraRepay\" F8";
+		sql += "                  ,T.\"Principal\" F8";
 		sql += "                  ,T.\"DueDate\" F10";
 		sql += "                  ,T.\"CustNo\"";
 		sql += "                  ,T.\"FacmNo\"";
 		sql += "                  ,1 F15";
 		sql += "            FROM \"LoanBorTx\" T";
 		sql += "            WHERE T.\"CustNo\" = :icustno";
-		sql += "             AND (T.\"ExtraRepay\" > 0";
-		sql += "               OR T.\"Interest\" > 0)";
+		sql += "             AND T.\"Principal\" + T.\"Interest\" > 0";
 
 		if (iTYPE.equals("1")) {
 			sql += "          AND DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") >= :isday";
@@ -120,9 +126,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                                 AND CB.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                                 AND CB.\"ClNo\"    = F.\"ClNo\"";
+		sql += "                                 AND F.\"ClCode1\" = 1 ";
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
+		sql += "                             AND F.\"ClCode1\" = 2 ";
 		sql += "      ORDER BY T.\"FacmNo\",T.\"F15\" , T.\"F0\"";
 
 		this.info("sql=" + sql);
@@ -219,7 +227,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , TX.\"TxAmt\" ";
 		sql += "      , TX.\"IntStartDate\" ";
 		sql += "      , TX.\"IntEndDate\" ";
-		sql += "      , TX.\"Principal\" + TX.\"ExtraRepay\" AS \"Principal\" ";
+		sql += "      , TX.\"Principal\" AS \"Principal\" ";
 		sql += "      , TX.\"Interest\" ";
 		sql += "      , TX.\"DelayInt\" ";
 		sql += "      , TX.\"BreachAmt\" + TX.\"CloseBreachAmt\" AS \"BreachAmt\" ";

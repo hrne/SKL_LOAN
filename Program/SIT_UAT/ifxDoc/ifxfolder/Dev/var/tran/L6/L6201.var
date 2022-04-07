@@ -113,7 +113,7 @@ T(3,全帳冊)
 
 #AcSubBookCode=X,3,I
 HELP(#ApHelp)
-@T(3,@AcSubBookCodeItem,)
+@T(3,@AcSubBookItem,)
 V(H,#ApHelp)
 
 #AcSubBookItem=X,20,L

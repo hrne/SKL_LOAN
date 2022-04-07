@@ -57,7 +57,6 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = A.\"CustNo\"";
 		sql += "                                      AND L.\"FacmNo\" = A.\"FacmNo\"";
 		sql += "                                      AND L.\"BormNo\" = A.\"BormNo\"";
-		;
 		sql += "           WHERE TRUNC(A.\"AcDate\" / 10000) = :entdy";
 		sql += "             AND A.\"AcctCode\" IN ('IC1', 'IC2', 'IC3', 'IC4', 'IOV', 'IOP')";
 		sql += "      ) S1";

@@ -17,9 +17,6 @@ import com.st1.itx.util.common.MakeReport;
 
 public class LM004Report extends MakeReport {
 
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(LM004Report.class);
-
 	@Autowired
 	public LM004Report1 lm004report1;
 
@@ -31,26 +28,25 @@ public class LM004Report extends MakeReport {
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 
-		List<Map<String, String>> LM004List = null;
+		List<Map<String, String>> lM004List = null;
 		try {
-			LM004List = lM004ServiceImpl.findAll(titaVo, "pdf");
+			lM004List = lM004ServiceImpl.findAll(titaVo, "pdf");
 		} catch (Exception e) {
 			this.info("lM004ServiceImpl.findAll error = " + e.toString());
 		}
 
-		List<Map<String, String>> LM004List_Excel = null;
+		List<Map<String, String>> lM004List_Excel = null;
 		try {
-			LM004List_Excel = lM004ServiceImpl.findAll(titaVo, "excel");
+			lM004List_Excel = lM004ServiceImpl.findAll(titaVo, "excel");
 		} catch (Exception e) {
 			this.info("lM004ServiceImpl.findAll_Excel error = " + e.toString());
 		}
-		this.getParentTranCode();
+		
+			
 		lm004report1.setParentTranCode(this.getParentTranCode());
 		lm004report2.setParentTranCode(this.getParentTranCode());
-		this.info("LM004List--->" + LM004List.toString());
-		this.info("LM004List_Excel--->" + LM004List_Excel.toString());
-		lm004report1.exec(titaVo, LM004List);
-		lm004report2.exec(titaVo, LM004List_Excel);
+		lm004report1.exec(titaVo, lM004List);
+		lm004report2.exec(titaVo, lM004List_Excel);
 
 		return true;
 	}

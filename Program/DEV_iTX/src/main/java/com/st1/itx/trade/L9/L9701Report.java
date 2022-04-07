@@ -18,17 +18,22 @@ import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.parse.Parse;
 
+/**
+ * L9701Report 客戶往來本息明細表
+ * 
+ * @author ST1 Chih Wei
+ *
+ */
 @Component
 @Scope("prototype")
-
 public class L9701Report extends MakeReport {
 
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
-	
+
 	@Autowired
 	CustNoticeCom custNoticeCom;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -46,7 +51,7 @@ public class L9701Report extends MakeReport {
 	// 客戶主要擔保品地址
 	private String clAddr;
 
-	int ptfg = 0;
+	int ptfg = 0; // ???
 
 	// 於本次產生報表中是否已列印未繳資料 0:尚未列印 1:已列印
 	int batxFg = 0;
@@ -116,33 +121,24 @@ public class L9701Report extends MakeReport {
 	}
 
 	private void printFacHead() {
-		if (this.NowRow >= 35) {
-			// 若剩餘行數不足5行,先換頁
-			this.newPage(); // 換頁時會印表頭
-		} else {
 
-			String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
+		String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
 
-			this.print(1, 1, " ");
-			this.print(1, 1, "額度     : " + tmpFacmNo);
-			this.print(0, 22, "押品地址 : " + clAddr);
-			this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－　－－－－　－－－－－－　－－－－－－－　－－－－－－－　－－－－－－　－－－－－－　－－－－－");
-			this.print(1, 7, "　入帳日　　　計息本金　　　　計息期間　　　　利率　　　　利息　　　　　逾期息　　　　　違約金　　　　　本金　　　　本息合計　　　應繳日");
-			this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－　－－－－　－－－－－－　－－－－－－－　－－－－－－－　－－－－－－　－－－－－－　－－－－－");
-		}
+		this.print(1, 1, " ");
+		this.print(1, 1, "額度     : " + tmpFacmNo);
+		this.print(0, 22, "押品地址 : " + clAddr);
+		this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－　－－－－　－－－－－－　－－－－－－－　－－－－－－－　－－－－－－　－－－－－－　－－－－－");
+		this.print(1, 7, "　入帳日　　　計息本金　　　　計息期間　　　　利率　　　　利息　　　　　逾期息　　　　　違約金　　　　　本金　　　　本息合計　　　應繳日");
+		this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－　－－－－　－－－－－－　－－－－－－－　－－－－－－－　－－－－－－　－－－－－－　－－－－－");
 
 	}
 
 	private void printCustHead() {
-		if (this.NowRow >= 36) {
-			// 若剩餘行數不足4行,先換頁
-			this.newPage(); // 換頁時會印表頭
-		} else {
-			this.print(1, 1, " ");
-			this.print(1, 7, "至" + showRocDate(entday, 1) + "未還本金餘額：");
-			this.print(1, 7, "　到期日　　　　放款餘額　　　　短收利息　  　短收本金　　　　溢收　　　　　應繳本金　　　　　應繳利息　　　　　應繳費用");
-			this.print(1, 7, "－－－－－　－－－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－");
-		}
+		this.print(1, 1, " ");
+		this.print(1, 7, "至" + showRocDate(entday, 1) + "未還本金餘額：");
+		this.print(1, 7, "　到期日　　　　放款餘額　　　　短收利息　  　短收本金　　　　溢收　　　　　應繳本金　　　　　應繳利息　　　　　應繳費用");
+		this.print(1, 7, "－－－－－　－－－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－");
+
 	}
 
 	public void exec(TitaVo titaVo, List<BaTxVo> listBaTxVo) throws LogicException {
@@ -175,16 +171,18 @@ public class L9701Report extends MakeReport {
 		int detailCounts = 0;
 
 		for (Map<String, String> tL9701Vo : listL9701) {
-			
+
 			// F11 CustNo
 			// F13 FacmNo
 			// INPUT #CustNo
-			
-			// 檢查 CustNoticeCom 確認該筆戶號額度是否能產出郵寄文件
-			int recordCustNo = parse.stringToInteger(tL9701Vo.get("F11"));
-			int recordFacmNo = parse.stringToInteger(tL9701Vo.get("F13"));
-			if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CustNo"), recordCustNo, recordFacmNo, this.getRptCode(), titaVo))
-				continue;
+
+//			// 檢查 CustNoticeCom 確認該筆戶號額度是否能產出郵寄文件
+//			int recordCustNo = parse.stringToInteger(tL9701Vo.get("F11"));
+//			int recordFacmNo = parse.stringToInteger(tL9701Vo.get("F13"));
+//			if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CustNo"), recordCustNo, recordFacmNo,
+//					this.getRptCode(), titaVo)) {
+//				continue;
+//			}
 
 			if (!this.facmNo.equals(tL9701Vo.get("F13"))) {
 
@@ -193,9 +191,9 @@ public class L9701Report extends MakeReport {
 				if (!facmNo.isEmpty() && detailCounts > 0) {
 					printCustHead();
 
-					printDetail3(lastL9701Vo, listBaTxVo);
+					printEndData(lastL9701Vo, listBaTxVo);
 
-					reportEnd();
+					printEndDataSum();
 				}
 
 				ptfg = 0;
@@ -205,7 +203,8 @@ public class L9701Report extends MakeReport {
 				detailCounts = 0;
 
 				if (tL9701Vo.get("F15").equals("2")) {
-					BigDecimal unpaidLoanBal = tL9701Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(tL9701Vo.get("F1"));
+					BigDecimal unpaidLoanBal = tL9701Vo.get("F1") == null ? BigDecimal.ZERO
+							: new BigDecimal(tL9701Vo.get("F1"));
 
 					if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
 						detailCounts = 1;
@@ -229,7 +228,7 @@ public class L9701Report extends MakeReport {
 			} else {
 				if (batxFg == 0) {
 					if (listBaTxVo != null && listBaTxVo.size() != 0) {
-						detailCounts = printDetail2(detailCounts, listBaTxVo);
+						detailCounts = printUnpaidDetail(detailCounts, listBaTxVo);
 					}
 					batxFg = 1;
 				}
@@ -244,17 +243,19 @@ public class L9701Report extends MakeReport {
 		if (!facmNo.isEmpty() && detailCounts > 0) {
 			printCustHead();
 
-			printDetail3(lastL9701Vo, listBaTxVo);
+			printEndData(lastL9701Vo, listBaTxVo);
 
-			reportEnd();
+			printEndDataSum();
 		}
 
-		long sno = this.close();
-
-		// 測試用
-		this.toPdf(sno);
+		this.close();
 	}
 
+	/**
+	 * 列印已收明細
+	 * 
+	 * @param tL9701Vo tL9701Vo
+	 */
 	private void printDetail1(Map<String, String> tL9701Vo) {
 		this.print(1, 7, showRocDate(tL9701Vo.get("F0"), 1));
 		this.print(0, 29, formatAmt(tL9701Vo.get("F1"), 0), "R"); // 計息本金
@@ -268,13 +269,21 @@ public class L9701Report extends MakeReport {
 //		 this.print(0, 124, showRocDate(tL9701Vo.get("F10"), 1)); // 未繳才會有應繳日 但這裡只出已繳
 	}
 
-	private int printDetail2(int detailCounts, List<BaTxVo> listBaTxVo) {
+	/**
+	 * 列印應收未收資料
+	 * 
+	 * @param detailCounts detailCounts
+	 * @param listBaTxVo   listBaTxVo
+	 * @return detailCounts
+	 */
+	private int printUnpaidDetail(int detailCounts, List<BaTxVo> listBaTxVo) {
 
 		for (BaTxVo tBaTxVo : listBaTxVo) {
 			if (tBaTxVo.getFacmNo() == Integer.valueOf(this.facmNo)) {
 				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPayIntDate() <= entday) {
 					this.print(1, 29, formatAmt(tBaTxVo.getAmount(), 0), "R"); // 計息本金
-					this.print(0, 31, showRocDate(tBaTxVo.getIntStartDate(), 3) + "-" + showRocDate(tBaTxVo.getIntEndDate(), 3)); // 計息期間
+					this.print(0, 31,
+							showRocDate(tBaTxVo.getIntStartDate(), 3) + "-" + showRocDate(tBaTxVo.getIntEndDate(), 3)); // 計息期間
 					this.print(0, 54, formatAmt(tBaTxVo.getIntRate(), 4), "R"); // 利率
 					this.print(0, 67, formatAmt(tBaTxVo.getInterest(), 0), "R"); // 利息
 					this.print(0, 82, formatAmt(tBaTxVo.getDelayInt(), 0), "R"); // 逾期息
@@ -289,7 +298,13 @@ public class L9701Report extends MakeReport {
 		return detailCounts;
 	}
 
-	private void printDetail3(Map<String, String> tL9701Vo, List<BaTxVo> listBaTxVo) {
+	/**
+	 * 列印截止至某日餘額
+	 * 
+	 * @param tL9701Vo
+	 * @param listBaTxVo
+	 */
+	private void printEndData(Map<String, String> tL9701Vo, List<BaTxVo> listBaTxVo) {
 
 		int tmpFacmNo = Integer.parseInt(this.facmNo);
 		maturityDate = Integer.valueOf(tL9701Vo.get("F0")) - 19110000;
@@ -303,7 +318,8 @@ public class L9701Report extends MakeReport {
 
 						if (tBaTxVo.getReceivableFlag() == 4) {
 
-							shortInt = shortInt.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
+							shortInt = shortInt
+									.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
 							shortPrin = shortPrin.add(tBaTxVo.getPrincipal());
 
 						} else {
@@ -317,18 +333,23 @@ public class L9701Report extends MakeReport {
 					} else if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPayIntDate() <= entday) {
 
 						repaidPrin = repaidPrin.add(tBaTxVo.getPrincipal());
-						repaidInt = repaidInt.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
+						repaidInt = repaidInt
+								.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
 
 					}
 				}
 			}
 		}
 
-		printLine();
+		printEndDataDetail();
 	}
 
-	private void printLine() {
-		if (loanBal.add(shortInt).add(shortPrin).add(overflow).add(repaidPrin).add(repaidInt).add(repaidExp).compareTo(BigDecimal.ZERO) == 0) {
+	/**
+	 * 列印截止至某日餘額明細
+	 */
+	private void printEndDataDetail() {
+		if (loanBal.add(shortInt).add(shortPrin).add(overflow).add(repaidPrin).add(repaidInt).add(repaidExp)
+				.compareTo(BigDecimal.ZERO) == 0) {
 			return;
 		}
 
@@ -358,7 +379,10 @@ public class L9701Report extends MakeReport {
 		repaidExp = BigDecimal.ZERO;
 	}
 
-	private void reportEnd() {
+	/**
+	 * 列印截止至某日餘額加總
+	 */
+	private void printEndDataSum() {
 
 		this.print(1, 7, "－－－－－　－－－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－");
 		this.print(1, 32, formatAmt(loanBalTotal, 0), "R"); // 放款餘額

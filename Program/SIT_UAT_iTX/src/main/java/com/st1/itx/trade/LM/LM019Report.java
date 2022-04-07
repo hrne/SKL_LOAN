@@ -27,7 +27,7 @@ public class LM019Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -40,10 +40,10 @@ public class LM019Report extends MakeReport {
 		int yyyMM = parse.stringToInteger(titaVo.get("ENTDY").toString()) / 100;
 		// sheet: 明細
 		makeExcel.setSheet("10912明細", yyyMM + "明細");
-		List<Map<String, String>> LM019List = null;
+		List<Map<String, String>> lM019List = null;
 		try {
-			LM019List = lM019ServiceImpl.findAll(titaVo, yyyMM + 191100);
-			exportExcel(titaVo, LM019List);
+			lM019List = lM019ServiceImpl.findAll(titaVo, yyyMM + 191100);
+			exportExcel(titaVo, lM019List);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -52,10 +52,10 @@ public class LM019Report extends MakeReport {
 		// sheet: 250元以上
 		makeExcel.setSheet("10912(250以上)");
 		makeExcel.setSheet("10912(250以上)", yyyMM + "(250以上)");
-		List<Map<String, String>> LM019List_1 = null;
+		List<Map<String, String>> lM019List_1 = null;
 		try {
-			LM019List_1 = lM019ServiceImpl.findAll_1(titaVo, yyyMM + 191100);
-			exportExcel_1(titaVo, LM019List_1);
+			lM019List_1 = lM019ServiceImpl.findAll_1(titaVo, yyyMM + 191100);
+			exportExcel_1(titaVo, lM019List_1);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -64,25 +64,25 @@ public class LM019Report extends MakeReport {
 		// sheet: 放款部
 		makeExcel.setSheet("10912放款部");
 		makeExcel.setSheet("10912放款部", yyyMM + "放款部");
-		List<Map<String, String>> LM019List_2 = null;
+		List<Map<String, String>> lM019List_2 = null;
 		try {
-			LM019List_2 = lM019ServiceImpl.findAll_2(titaVo, yyyMM + 191100);
-			exportExcel_2(titaVo, LM019List_2);
+			lM019List_2 = lM019ServiceImpl.findAll_2(titaVo, yyyMM + 191100);
+			exportExcel_2(titaVo, lM019List_2);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM019ServiceImpl.testExcel error = " + errors.toString());
 		}
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		if (LDList == null || LDList.isEmpty()) {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lDList) throws LogicException {
+		if (lDList == null || lDList.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料");
 		} else {
 			int row = 2;
-			for (Map<String, String> tLDVo : LDList) {
+			for (Map<String, String> tLDVo : lDList) {
 				String value = "";
 				for (int i = 0; i <= 3; i++) {
 					String acnacc = "";
@@ -104,12 +104,12 @@ public class LM019Report extends MakeReport {
 		}
 	}
 
-	private void exportExcel_1(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		if (LDList == null || LDList.isEmpty()) {
+	private void exportExcel_1(TitaVo titaVo, List<Map<String, String>> lDList) throws LogicException {
+		if (lDList == null || lDList.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料");
 		} else {
 			int row = 2;
-			for (Map<String, String> tLDVo : LDList) {
+			for (Map<String, String> tLDVo : lDList) {
 				String value = "";
 				for (int i = 0; i <= 4; i++) {
 					String acnacc = "";
@@ -134,10 +134,10 @@ public class LM019Report extends MakeReport {
 		}
 	}
 
-	private void exportExcel_2(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
+	private void exportExcel_2(TitaVo titaVo, List<Map<String, String>> lDList) throws LogicException {
 		String entdy = titaVo.get("ENTDY").toString();
 		makeExcel.setValue(2, 1, entdy.substring(1, 4) + "/" + entdy.substring(4, 6) + "/01~" + entdy.substring(1, 4) + "/" + entdy.substring(4, 6) + "/" + entdy.substring(6, 8));
-		if (LDList == null || LDList.isEmpty()) {
+		if (lDList == null || lDList.isEmpty()) {
 			makeExcel.setValue(5, 1, "本日無資料");
 		} else {
 			BigDecimal total[] = new BigDecimal[5];
@@ -145,7 +145,7 @@ public class LM019Report extends MakeReport {
 				total[i] = BigDecimal.ZERO;
 			}
 			int row = 5;
-			for (Map<String, String> tLDVo : LDList) {
+			for (Map<String, String> tLDVo : lDList) {
 				String value = "";
 				for (int i = 0; i <= 6; i++) {
 					String acnacc = "";

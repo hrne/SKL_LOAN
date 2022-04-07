@@ -59,7 +59,7 @@ public class LM015Report extends MakeReport {
 		} catch (Exception e) {
 			this.info("lM015ServiceImpl.findAll error = " + e.toString());
 		}
-//Ted 2021/01/22 修改
+		//Ted 2021/01/22
 		if (lm015List.size() > 0) {
 			// 格式
 			DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -175,8 +175,8 @@ public class LM015Report extends MakeReport {
 		} else {
 			noData();
 		}
-		long sno = this.close();
-		// this.toPdf(sno);
+		this.close();
+		//this.toPdf(sno);
 	}
 
 	// 無資料列印格式

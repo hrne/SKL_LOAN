@@ -41,11 +41,11 @@ public class LM011p extends TradeBuffer {
 		this.info("active LM011p");
 		this.totaVo.init(titaVo);
 
-		String dateYear = titaVo.getParam("Year");
-		String dateMonth = titaVo.getParam("Month");
-		int dateSent = Integer.parseInt(dateYear + dateMonth + "00") + 19110000;
+//		String dateYear = titaVo.getParam("Year");
+//		String dateMonth = titaVo.getParam("Month");
+//		int dateSent = Integer.parseInt(dateYear + dateMonth + "00") + 19110000;
 
-		String empNo = titaVo.getTlrNo();
+//		String empNo = titaVo.getTlrNo();
 
 		// IF RemakeYN = "Y" THEN 更新table
 

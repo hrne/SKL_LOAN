@@ -84,7 +84,6 @@ public class LM012Report extends MakeReport {
 		this.setMaxRows(30);
 	}
 
-	@Override
 	public void printFooter() {
 		this.print(0, 1, "└─────────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┘");
 	}
@@ -280,7 +279,7 @@ public class LM012Report extends MakeReport {
 			this.print(1, 1, "└─────────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┘");
 		}
 
-		long sno = this.close();
+		this.close();
 		// this.toPdf(sno);
 
 		return true;

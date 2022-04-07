@@ -77,9 +77,12 @@ E(0,0)
 [#<->#,"#FdCustomerRate+客戶要求利率",#CustomerRate,"@%"],
 [#<->#,"#FdExpectedRate+擬調利率",#ExpectedRate,"@%"],
 [#<->#,"#FdReason+2.變更繳款方式"],
-[#<->#,"#FdGracePeriod+3.延長寬限期",#GracePeriod,"@年"],
-[#<->#,"#FdShortenYear+4.縮短年期",#ShortenYear,"@年"],
-[#<->#,"#FdExtendYear+5.延長年期",#ExtendYear,"@年"],
+["#FdGracePeriod+3.延長寬限期",#GracePeriod,"@年"],
+["#FdLastPrintDate+前次列印日期",#LastPrintDate],
+["#FdShortenYear+4.縮短年期",#ShortenYear,"@年"],
+["#FdTlrNo+列印人",#TlrNo],
+["#FdExtendYear+5.延長年期",#ExtendYear,"@年"],
+["#FdLastExpectedRate+擬調利率",#LastExpectedRate],
 [#<->#,"#FdReMark+備註",#ReMark],
 ]
 
@@ -445,8 +448,24 @@ E(0,#L3r02StoreRate)
 
 #StoreRateX=X,8,L
 
+#RimEffectDate=D,7,L
+
+#RimChangFg=X,1,L
+
+!查詢下次利率調整日期的放款利率變動檔
+#SendL3r09=X,1,S
+!C(3,#L3r02NextRateAdjDate,0,S,$)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#TimBormNo)
+E(0,@RimEffectDate,#SYSDATE)
+T(2,@RimChangFg,A)
+RESET_RIM(#SendL3r09,L3R09)
+S(L3R09,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEffectDate,#RimChangFg)
+R(1,L3R09)
+
 #DrawdownDate=D,7,L
-T(2,#L3r02DrawdownDate)
+T(2,#L3r09EffectDate)
 
 ![利率加減碼]  
 !依核准額度自動顯示不必輸入
@@ -474,30 +493,17 @@ RESET_RIM(#RimL2r27A,L2R27)
 S(L2R27,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
 R(1,L2R27)
 
-#RimEffectDate=D,7,L
-
-!查詢下次利率調整日期的放款利率變動檔
-#SendL3r09=X,1,S
-C(3,#L3r02NextRateAdjDate,0,S,$)
-E(0,@RimCustNo,#CustNo)
-E(0,@RimFacmNo,#FacmNo)
-E(0,@RimBormNo,#TimBormNo)
-E(0,@RimEffectDate,#L3r02NextRateAdjDate)
-RESET_RIM(#SendL3r09,L3R09)
-S(L3R09,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEffectDate)
-R(1,L3R09)
 
 ![下次調整利率]
 #FdNextAdjRate=X,2,L
 
 #NextAdjRate=n,2.4,L
-!E(0,0)
-C(3,#L3r09BaseRate,0,S,$)
-E(0,#L3r09BaseRate)
+C(3,#L3r09NextFitRate,0,S,$)
+E(0,#L3r09NextFitRate)
 
 #NextAdjRateDate=D,7,L
-C(3,#L3r09BaseRate,0,S,$)
-E(0,#L3r02NextRateAdjDate)
+C(3,#L3r09NextFitRate,0,S,$)
+E(0,#L3r09NextEffectDate)
 
 ! [門牌號碼]
 #FdBdLocation=X,2,L
@@ -596,6 +602,10 @@ C(3,#Reason,1,$,S)
 #GracePeriod=A,3,I
 C(3,#Reason,3,$,S)
 
+![前次列印日期]
+#FdLastPrintDate=X,2,L
+
+#LastPrintDate=D,7,L
 
 ![4.縮短年期]
 #FdShortenYear=X,2,L
@@ -603,11 +613,21 @@ C(3,#Reason,3,$,S)
 #ShortenYear=A,2,I
 C(3,#Reason,4,$,S)
 
+![列印人]
+#FdTlrNo=X,2,L
+
+#TlrNo=X,10,L
+
 ![5.延長年期]
 #FdExtendYear=X,2,L
 
 #ExtendYear=A,2,I
 C(3,#Reason,5,$,S)
+
+![擬調利率]
+#FdLastExpectedRate=X,2,L
+
+#LastExpectedRate=n,2.4,L
 
 ![備註]
 #FdReMark=X,2,L
