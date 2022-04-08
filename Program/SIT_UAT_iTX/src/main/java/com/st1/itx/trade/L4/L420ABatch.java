@@ -60,9 +60,10 @@ public class L420ABatch extends TradeBuffer {
 	private int iAcDate;
 	private String iBatchNo;
 	private String iReconCode;
-	private HashMap<Integer, Integer> mergeCnt = new HashMap<>();
-	private HashMap<Integer, BigDecimal> mergeAmt = new HashMap<>();
-	private HashMap<Integer, String> mergeProcStsCode = new HashMap<>();
+	private String mapKey;
+	private HashMap<String, Integer> mergeCnt = new HashMap<>();
+	private HashMap<String, BigDecimal> mergeAmt = new HashMap<>();
+	private HashMap<String, String> mergeProcStsCode = new HashMap<>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -109,18 +110,20 @@ public class L420ABatch extends TradeBuffer {
 							continue;
 						}
 						lBatxDetail.add(t);
-						// 匯款轉帳期款
-						if (t.getRepayCode() == 1 && t.getRepayType() == 1) {
-							if (mergeAmt.containsKey(t.getCustNo())) {
-								mergeCnt.put(t.getCustNo(), mergeCnt.get(t.getCustNo()) + 1);
-								mergeAmt.put(t.getCustNo(), mergeAmt.get(t.getCustNo()).add(t.getRepayAmt()));
+						// 匯款轉帳同戶號多筆檢核放 01-期款、 02-部分償還、 03-結案
+						if (t.getRepayCode() == 1 && t.getRepayType() >= 1 && t.getRepayType() <= 3) {
+							mapKey = parse.IntegerToString(t.getCustNo(), 7)
+									+ parse.IntegerToString(t.getRepayType(), 2);
+							if (mergeAmt.containsKey(mapKey)) {
+								mergeCnt.put(mapKey, mergeCnt.get(mapKey) + 1);
+								mergeAmt.put(mapKey, mergeAmt.get(mapKey).add(t.getRepayAmt()));
 								if (!"4".equals(t.getProcStsCode())) {
-									mergeProcStsCode.put(t.getCustNo(), t.getProcStsCode());
+									mergeProcStsCode.put(mapKey, t.getProcStsCode());
 								}
 							} else {
-								mergeCnt.put(t.getCustNo(), 1);
-								mergeAmt.put(t.getCustNo(), t.getRepayAmt());
-								mergeProcStsCode.put(t.getCustNo(), t.getProcStsCode());
+								mergeCnt.put(mapKey, 1);
+								mergeAmt.put(mapKey, t.getRepayAmt());
+								mergeProcStsCode.put(mapKey, t.getProcStsCode());
 							}
 						}
 					}
@@ -131,11 +134,16 @@ public class L420ABatch extends TradeBuffer {
 			for (BatxDetail t : lBatxDetail) {
 				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
 					// 匯款轉帳期款多筆，看整個多筆狀態
-					if (t.getRepayCode() == 1 && t.getRepayType() == 1 && mergeCnt.get(t.getCustNo()) >= 2) {
-						if ("4".equals(mergeProcStsCode.get(t.getCustNo()))) {
-							continue;
+					if (t.getRepayCode() == 1 && t.getRepayType() >= 1 && t.getRepayType() <= 3) {
+						mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
+						if (mergeCnt.get(mapKey) >= 2) {
+							if ("4".equals(mergeProcStsCode.get(mapKey))) {
+								continue;
+							} else {
+								l2BatxDetail.add(t);
+							}
 						} else {
-							l2BatxDetail.add(t);
+							l1BatxDetail.add(t);
 						}
 					} else {
 						if ("4".equals(t.getProcStsCode())) {
@@ -186,23 +194,25 @@ public class L420ABatch extends TradeBuffer {
 			for (BatxDetail tDetail : l2BatxDetail) {
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tDetail.getProcNote());
+				mapKey = parse.IntegerToString(tDetail.getCustNo(), 7)
+						+ parse.IntegerToString(tDetail.getRepayType(), 2);
 				mergeSeq++;
 				this.info("L2BatxDetail = " + tDetail.getCustNo() + ", mergeSeq =" + mergeSeq + " ,mergeCnt="
-						+ mergeCnt.get(tDetail.getCustNo()));
+						+ mergeCnt.get(mapKey));
 				// 同戶號的前面幾筆放l3，最後一筆做檢核再將檢核狀態更新l3
-				if (mergeSeq < mergeCnt.get(tDetail.getCustNo())) {
+				if (mergeSeq < mergeCnt.get(mapKey)) {
 					l3BatxDetail.add(tDetail);
 				} else {
 					// 以總金額當作還款金額做檢核，檢核後再還原金額
 					BigDecimal wkRepayAmt = tDetail.getRepayAmt();
-					tDetail.setRepayAmt(mergeAmt.get(tDetail.getCustNo()));
+					tDetail.setRepayAmt(mergeAmt.get(mapKey));
 					tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
 					// 還原金額
 					tTempVo = tTempVo.getVo(tDetail.getProcNote());
 					tTempVo.putParam("CheckMsg",
 							"同戶號合併檢核 總金額:" + tDetail.getRepayAmt() + ", " + tTempVo.getParam("CheckMsg"));
-					tTempVo.putParam("MergeCnt", mergeCnt.get(tDetail.getCustNo()));
-					tTempVo.putParam("MergeAmt", mergeAmt.get(tDetail.getCustNo()));
+					tTempVo.putParam("MergeCnt", mergeCnt.get(mapKey));
+					tTempVo.putParam("MergeAmt", mergeAmt.get(mapKey));
 					tTempVo.putParam("MergeSeq", mergeSeq);
 					mergeSeq = 0;
 					tDetail.setProcNote(tTempVo.getJsonString());
@@ -236,7 +246,7 @@ public class L420ABatch extends TradeBuffer {
 		}
 
 		this.batchTransaction.commit();
-	// 更新作業狀態
+		// 更新作業狀態
 		String msg = updateHead(tBatxHead, lBatxDetail, titaVo);
 
 		// end

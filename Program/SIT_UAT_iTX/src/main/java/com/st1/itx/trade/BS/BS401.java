@@ -196,7 +196,7 @@ public class BS401 extends TradeBuffer {
 						isCheck = true;
 					}
 
-					// 人工入帳再檢和一次
+					// 人工入帳再檢核一次
 					if ("2".equals(tDetail.getProcStsCode())) {
 						isCheck = true;
 					}

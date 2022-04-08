@@ -18,12 +18,15 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
@@ -45,20 +48,7 @@ import com.st1.itx.util.parse.Parse;
  * c1.若多筆額度期款收回失敗時，帳掛在第一筆的額度編號。
  * c2.若多筆額度期款收回成功且有溢收金額時，帳掛在第一筆的額度編號。
  */
-/*
- * Tita
- * TimCustNo=9,7
- * TimFacmNo=9,3
- * CurrencyCode=X,3
- * TimTempAmt=9,14.2
- * ChequeAcct=9,9
- * ChequeNo=9,7
- * ChequeAmt=9,14.2
- * TempReasonCode=9,1 1:放款暫收款 2:債協暫收款
- * TempItemCode=9,2
- * TempDrawCode=X,1
- * Description=X,30
- */
+
 /**
  * L3220 暫收款退還
  * 
@@ -79,6 +69,8 @@ public class L3220 extends TradeBuffer {
 	public TxTempService txTempService;
 	@Autowired
 	public LoanBorTxService loanBorTxService;
+	@Autowired
+	public AcCloseService acCloseService;
 
 	@Autowired
 	AcDetailCom acDetailCom;
@@ -183,6 +175,7 @@ public class L3220 extends TradeBuffer {
 			titaVo.setBatchNo("RT"); // 整批批號 for 退款
 			TempAcDetailRoutine();
 		} else {
+//			抽退票
 			titaVo.setBatchNo("BCK"); // 整批批號 for L4103 列印傳票明細表
 			if (titaVo.isHcodeNormal()) {
 				ChequeAmtNormalRoutine(); // 抽退票
@@ -281,9 +274,20 @@ public class L3220 extends TradeBuffer {
 		if (!(tLoanCheque.getStatusCode().equals("0") || tLoanCheque.getStatusCode().equals("5"))) {
 			throw new LogicException(titaVo, "E3058", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 該票據狀況碼非未處理與即期票
 		}
-		// 期票未托收不可抽票
+		// 未關帳時當日不可抽退票,期票未托收不可抽票
 		if (tLoanCheque.getReceiveDate() == this.txBuffer.getTxCom().getTbsdy()) {
-			throw new LogicException(titaVo, "E0010", "期票未托收不可抽票"); // 功能選擇錯誤
+
+			AcClose tAcClose = new AcClose();
+			AcCloseId tAcCloseId = new AcCloseId();
+
+			tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+			tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+			tAcCloseId.setSecNo("02"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
+
+			tAcClose = acCloseService.findById(tAcCloseId);
+			if (tAcClose != null && tAcClose.getClsFg() != 1) {
+				throw new LogicException(titaVo, "E0010", "期票未托收不可抽票"); // 功能選擇錯誤
+			}
 		}
 
 		wkChequeAmt = tLoanCheque.getChequeAmt();

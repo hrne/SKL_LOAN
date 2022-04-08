@@ -88,6 +88,7 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND I.\"AdjRange\" IN (1,2)               ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
 		sql += "   AND I.\"Introducer\" IS NOT NULL ";
+		sql += "   AND ABS(NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\")) + ABS(NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\")) + ABS(NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\")) > 0 ";
 		if (useWorkMonth) {
 			sql += "   AND I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else {
@@ -102,10 +103,10 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useIntroducer) {
 			sql += "   AND I.\"Introducer\" = :introducer";
 		}
-		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=FRENCH') ";
-		sql += "         ,NLSSORT(I.\"DistCode\", 'NLS_SORT=FRENCH') ";
-		sql += "         ,NLSSORT(I.\"UnitCode\", 'NLS_SORT=FRENCH') "; // 原表排序用到這三個欄位, 但原環境會將英文排在數字前面;
-		sql += "         ,I.\"CustNo\" "; // 這裡利用 NLSSORT 取法語環境排序方式, 確保排序順序上英文先於數字
+		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=EBCDIC') ";
+		sql += "         ,NLSSORT(I.\"DistCode\", 'NLS_SORT=EBCDIC') ";
+		sql += "         ,NLSSORT(I.\"UnitCode\", 'NLS_SORT=EBCDIC') "; // 原表排序用到這三個欄位，但原環境會將英文排在數字前面；
+		sql += "         ,I.\"CustNo\" "; // 這裡利用 NLSSORT 取 EBCDIC 排序法，達到同樣效果。
 		sql += "         ,I.\"FacmNo\" ";
 		sql += "         ,I.\"BormNo\" ";
 		this.info("sql=" + sql);

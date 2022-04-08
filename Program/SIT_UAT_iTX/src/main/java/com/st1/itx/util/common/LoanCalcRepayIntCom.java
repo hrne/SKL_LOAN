@@ -1441,7 +1441,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
 					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(new BigDecimal(36500), b, RoundingMode.DOWN).setScale(0, RoundingMode.UP);
+					.divide(new BigDecimal(36500), b, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
 
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());
@@ -1458,8 +1458,8 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			this.info("   B算式 = " + vCalcRepayIntVo.getAmount());
 			this.info("         * " + vCalcRepayIntVo.getStoreRate());
 			this.info("         * " + wkDaysDenominator);
-			this.info("   四捨五入前 = " + vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
-					.multiply(wkDaysDenominator));
+			this.info("   四捨五入前 = "
+					+ vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate()).multiply(wkDaysDenominator));
 		} else {
 			dDateUtil.init();
 			dDateUtil.setDate_1(vCalcRepayIntVo.getStartDate());
