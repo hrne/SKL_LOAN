@@ -105,7 +105,7 @@ public class BS401 extends TradeBuffer {
 		txBatchCom.setTxBuffer(this.getTxBuffer());
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
-		// 處理代碼 0:入帳 1:刪除 2.轉暫收 3.檢核(單筆入帳完畢由TxBatchCom啟動)
+		// 處理代碼 0:整批入帳 1:整批刪除 2.整批轉暫收(銀扣入帳失敗整批轉暫收) 3.整批檢核(單筆處理後，該批號無未處理，由TxBatchCom啟動)
 		iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 
 		// 會計日期、批號
@@ -116,8 +116,7 @@ public class BS401 extends TradeBuffer {
 			iReconCode = titaVo.getParam("ReconCode").trim();
 		}
 
-		if (iFunctionCode == 3) {
-		} else {
+		if (iFunctionCode != 3) {
 			// hold 整批入帳總數檔
 			BatxHeadId tBatxHeadId = new BatxHeadId();
 			tBatxHeadId.setAcDate(iAcDate);
@@ -142,7 +141,17 @@ public class BS401 extends TradeBuffer {
 			if (slBatxDetail == null) {
 				throw new LogicException("E0014", "整批入帳明細檔= null"); // E0014 檔案錯誤
 			}
-			List<BatxDetail> lBatxDetail = slBatxDetail == null ? null : new ArrayList<BatxDetail>(slBatxDetail.getContent());
+			List<BatxDetail> lBatxDetail = new ArrayList<BatxDetail>();
+			for (BatxDetail t : slBatxDetail.getContent()) {
+				if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
+						|| "7".equals(t.getProcStsCode())) {
+					if (iFunctionCode == 1) {
+						throw new LogicException("E0010", "刪除時已有入帳成功資料，請執行<整批訂正>"); // E0010 功能選擇錯誤
+					}
+				} else {
+					lBatxDetail.add(t);
+				}
+			}
 			if (iFunctionCode == 0) {
 				// 員工扣薪費用先入帳
 				if (lBatxDetail.get(0).getRepayCode() == 3) {
@@ -156,8 +165,6 @@ public class BS401 extends TradeBuffer {
 					});
 				}
 			}
-			// 檢查明細狀態
-			checkDetail(iFunctionCode, lBatxDetail, titaVo);
 			this.batchTransaction.commitEnd();
 			this.batchTransaction.init();
 			boolean isUpdate = false;
@@ -181,7 +188,6 @@ public class BS401 extends TradeBuffer {
 				switch (iFunctionCode) {
 
 				case 0: // 0:入帳
-
 					// 是否重新檢核
 					boolean isCheck = false;
 
@@ -227,10 +233,6 @@ public class BS401 extends TradeBuffer {
 					break;
 
 				case 1: // 1:刪除
-					if ("5".equals(tDetail.getProcStsCode()) || "6".equals(tDetail.getProcStsCode())
-							|| "7".equals(tDetail.getProcStsCode())) {
-						throw new LogicException(titaVo, "E0007", "BS401 update batxDetail 已入帳 ");
-					}
 					ProcessCnt++;
 					tTempVo = tTempVo.getVo(tDetail.getProcNote());
 					tTempVo.putParam("StsCode", tDetail.getProcStsCode());
@@ -283,10 +285,10 @@ public class BS401 extends TradeBuffer {
 				}
 
 			}
+			// 更新作業狀態
+			this.batchTransaction.commitEnd();
+			this.batchTransaction.init();
 		}
-		// 更新作業狀態
-		this.batchTransaction.commitEnd();
-		this.batchTransaction.init();
 
 		String msg = updateHead(titaVo);
 		this.batchTransaction.commit();
@@ -466,19 +468,6 @@ public class BS401 extends TradeBuffer {
 		return msg;
 	}
 
-	/* 檢查明細狀態 */
-	private void checkDetail(int functionCode, List<BatxDetail> lBatxDetail, TitaVo titaVo) throws LogicException {
-// 處理代碼 0:入帳 1:刪除 2:訂正 4.刪除回復
-// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.虛擬轉暫收
-
-		if (functionCode == 1) {
-			for (BatxDetail t : lBatxDetail) {
-				if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode()) || "7".equals(t.getProcStsCode()))
-					throw new LogicException("E0010", "已有入帳成功資料，請執行<整批訂正>"); // E0010 功能選擇錯誤
-			}
-		}
-	}
-
 	private void excuteTx(int functionCode, BatxDetail tDetail, BatxHead tBatxHead, TitaVo titaVo)
 			throws LogicException {
 		// 組入帳交易電文
@@ -493,6 +482,7 @@ public class BS401 extends TradeBuffer {
 		apControl = null;
 	}
 
+	// 刪除及刪除回復時回寫媒體檔狀態
 	private void cancelUpdate(BatxDetail tBatxDetail, String StsCode, TitaVo titaVo) throws LogicException {
 		switch (tBatxDetail.getRepayCode()) {
 		case 2:
@@ -511,8 +501,9 @@ public class BS401 extends TradeBuffer {
 		}
 	}
 
+	// 回寫員工扣薪媒體檔
 	private void updateEmpDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
-//		回寫媒體檔
+
 		EmpDeductMedia tEmpDeductMedia = empDeductMediaService.holdById(new EmpDeductMediaId(
 				tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
 		if (tEmpDeductMedia == null || !tEmpDeductMedia.getBatchNo().equals(tBatxDetail.getBatchNo())) {
@@ -537,6 +528,7 @@ public class BS401 extends TradeBuffer {
 		}
 	}
 
+	// 更新支票檔狀態
 	private void updateLoanCheque(BatxDetail tBatxDetail, String StsCode, TitaVo titaVo) throws LogicException {
 		// 狀態為正常才會更新支票檔
 		if ("D".equals(tBatxDetail.getProcStsCode()) && !"0".equals(StsCode)) {
@@ -563,6 +555,7 @@ public class BS401 extends TradeBuffer {
 
 	}
 
+	// 回寫ACH扣帳媒體檔、銀扣檔
 	private void updateAchDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
 		// 正常回應碼為0XXXX
 		if (tBatxDetail.getProcCode().isEmpty() || !"0".equals(tBatxDetail.getProcCode().substring(0, 1))) {
@@ -606,6 +599,7 @@ public class BS401 extends TradeBuffer {
 		}
 	}
 
+	// 回寫POST扣帳媒體檔、銀扣檔
 	private void updatePostDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
 		// 正常回應碼為0XXXX
 		if (tBatxDetail.getProcCode().isEmpty() || !"0".equals(tBatxDetail.getProcCode().substring(0, 1))) {

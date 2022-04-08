@@ -374,15 +374,13 @@ C(3,#OORankFlag,3,BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOFileCntX; ntxbuf=#O
                   BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOFileCntX; ntxbuf=#OOBUF_L4920C2}),
                   BIND(grid,cancel)
                   )
-)! 已處理
+)! 已入帳
 #OOBTN_D=A,2,O
 C(3,#OOAlrCnt,0,BIND(grid,cancel),
-  C(3,#OORankFlag,3,BIND(grid,cancel),
-      C(3,#OORankFlag,2,
-        BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOAlrCntX; ntxbuf=#OOBUF_L4920D2}),
-        BIND(grid,cancel)
-       )
-   )
+                C(3,#OORankFlag,3,BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOAlrCntX; ntxbuf=#OOBUF_L4920D3}),
+                C(3,#OORankFlag,2,BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOAlrCntX; ntxbuf=#OOBUF_L4920D2}),
+	            BIND(grid,cancel)
+                ))
 )
 ! 待處理
 #OOBTN_E=A,2,O
@@ -517,7 +515,7 @@ TXFORM=L4002
 {width:105,align:'right'}
 #OOToDoRepayAmtX=需處理金額
 {width:105,align:'right'}
-#OOBTN_D=已處理
+#OOBTN_D=已入帳
 {search:false,formatter:'cust:bind-button:#OOAlrCntX',align:'right',canExport:false,width:65}
 #OOBTN_E=待處理
 {search:false,formatter:'cust:bind-button:#OOWatCntX',align:'right',canExport:false,width:65}

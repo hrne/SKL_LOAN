@@ -12,9 +12,7 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9714ServiceImpl;
-import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -23,12 +21,6 @@ public class L9714Report extends MakeReport {
 
 	@Autowired
 	L9714ServiceImpl l9714ServiceImpl;
-	
-	@Autowired
-	Parse parse;
-	
-	@Autowired
-	CustNoticeCom custNoticeCom;
 
 	String f0 = "";
 	String f1 = "";
@@ -43,8 +35,11 @@ public class L9714Report extends MakeReport {
 	String f10 = "";
 	String f11 = "";
 	String f12 = "";
+	
+	
+	int cnt = 0;
 
-	// 起始欄
+	//起始欄
 	int colCount = 8;
 
 	@Override
@@ -124,13 +119,13 @@ public class L9714Report extends MakeReport {
 		tmp = String.format("%07d", Integer.valueOf(f2)) + "-" + String.format("%03d", Integer.valueOf(f3));
 		this.print(-25, colCount + 18, tmp);
 		// 最初貸款金額
-		this.print(-25, colCount + 50, formatAmt(f4, 0), "R");
+		this.print(-25, colCount + 50, formatAmt(f4,0), "R");
 		// 貸款起日
-		this.print(-25, colCount + 64, showRocDate(f11, 1), "R");
+		this.print(-25, colCount + 64, showRocDate(f11, 1), "R"); 
 		// 貸款迄日
 		this.print(-25, colCount + 78, showRocDate(f12, 1), "R");
 		// 本期未償還本金額
-		this.print(-25, colCount + 98, formatAmt(f7, 0), "R");
+		this.print(-25, colCount + 98, formatAmt(f7,0), "R");
 		// 繳息期間
 		this.print(-31, colCount + 7, showRocDate(f5 + "01", 5)); // showRocDate 吃 yyymmdd, 加個dummy
 		this.print(-32, colCount + 7, showRocDate(f6 + "01", 5)); // showRocDate 吃 yyymmdd, 加個dummy
@@ -160,27 +155,9 @@ public class L9714Report extends MakeReport {
 		}
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9714", "繳息證明單", "", "A4", "P");
-		
-		int cnt = 0;
 
 		if (l9714List.size() > 0) {
 			for (Map<String, String> tL9714Vo : l9714List) {
-				
-				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
-				
-				// inputCustNo: #icustno
-				// CustNo: Query.CustNo
-				// FacmNo: Query.FacmNo
-				
-				String inputCustNo = titaVo.get("icustno");
-				String recordCustNoString = tL9714Vo.get("CustNo");
-				String recordFacmNoString = tL9714Vo.get("FacmNo");
-				int recordCustNo = parse.stringToInteger(recordCustNoString);
-				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
-				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9714", titaVo))
-					continue;
-				
-				cnt++;
 
 				if (!tL9714Vo.get("F3").equals(f3)) {
 
@@ -198,14 +175,13 @@ public class L9714Report extends MakeReport {
 					f11 = tL9714Vo.get("F11");
 					f12 = tL9714Vo.get("F12");
 					this.newPage();
+					cnt = 0;
 
 				}
-
+				
 				printEnd();
 			}
-		}
-		
-		if (cnt == 0) {
+		} else {
 
 			f0 = "本日無資料";
 			f1 = " ";

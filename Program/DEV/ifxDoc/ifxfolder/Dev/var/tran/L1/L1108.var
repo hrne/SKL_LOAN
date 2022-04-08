@@ -209,8 +209,6 @@ C(5,#EMailFg{i},N,$,E(0,@ChkA{i},#ChkA{i}+1))
 C(4,#Notice{i},INVOKEJS(SHOW,grd1,{j},{j},0),INVOKEJS(SHOW,grd1,{j},{j},1))
 ##end
 
-#CanMsg=X,1,S
-#CanEmail=X,1,S
 !RIM參數使用
 
 #RimFunc=A,1,S
@@ -223,8 +221,6 @@ RESET_RIM(#RimL1r13,L1R13)
 S(L1R13,1,#RimFunc,#RimCustNo,#RimFacmNo)
 R(1,L1R13)
 T(2,@CustName,#L1R13CustName)
-T(2,@CanMsg,#L1R13MsgFg)
-T(2,@CanEmail,#L1R13EmailFg)
 
 ##loop{times:40,i:1,j:3}
 
@@ -314,10 +310,8 @@ C(4,#Paper{i},$,IF(#Paper{i} == #CheckY,$,V(P,限輸入Y或空白)))
 #Msg{i}=X,1,I
 C(4,#FormNo{i},s,$)
 C(5,#MsgFg{i},N,s,$)
-C(3,#IsCheck,0,$,C(5,#CanMsg,0,T(3,Y),$))
 HELP(Y:不發送; :發送)
 @
-C(3,#IsCheck,0,$,C(5,#CanMsg,0,C(4,#Msg{i},V(P,此客戶尚未設定簡訊電話，故不可設定為發送),$),$))
 C(4,#Msg{i},$,IF(#Msg{i} == #CheckY,$,V(P,限輸入Y或空白)))
 
 #Err{i}=x,200,S
@@ -327,24 +321,16 @@ T(B,#NoticeX{i}+，不可申請全部不寄送)
 #EMail{i}=X,1,I
 C(4,#FormNo{i},s,$)
 C(5,#EMailFg{i},N,s,$)
-C(3,#IsCheck,0,$,C(5,#CanEmail,0,T(3,Y),$))
 HELP(Y:不發送; :發送)
 @
-C(3,#IsCheck,0,$,C(5,#CanEmail,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$))
 C(4,#EMail{i},$,IF(#EMail{i} == #CheckY,$,V(P,限輸入Y或空白)))
 C(5,#SendCode{i},1,$,s)
-!C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,不可申請全部不寄送))))
-!C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,#Err{i}))))
 E(0,@ChkB{i},0)
 C(5,#Paper{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
 C(5,#Msg{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
 C(5,#EMail{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
 C(3,#ChkA{i},#ChkB{i},V(P,#Err{i}),$)
 
-! 記號檢核
-!#CheckSendCode{i}=X,1,S
-!C(5,#SendCode{i},1,$,S)
-!C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,不可申請全部不寄送))))
 ##end
 
 

@@ -1439,17 +1439,27 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			BigDecimal wkDaysDenominator = new BigDecimal(vCalcRepayIntVo.getDays()).divide(new BigDecimal(36500), b,
 					RoundingMode.DOWN);
 
-			// 2022-04-08 智偉: AS400 CHANGE ROUND_UP(*YES)時,插入位數不足時,會使用RPG的half-adjust功能
-			BigDecimal halfAdjust = new BigDecimal("0.5");
-
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
-					.multiply(wkDaysDenominator).add(halfAdjust).setScale(0, RoundingMode.HALF_UP);
+					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
+					.divide(new BigDecimal(36500), b, RoundingMode.DOWN).setScale(0, RoundingMode.UP);
 
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());
 			this.info("   Amount     = " + vCalcRepayIntVo.getAmount());
 			this.info("   wkInterest = " + wkInterest);
 			this.info("   wkDaysDenominator = " + wkDaysDenominator);
+			this.info("   A算式 = " + vCalcRepayIntVo.getAmount());
+			this.info("         * " + vCalcRepayIntVo.getStoreRate());
+			this.info("         * " + vCalcRepayIntVo.getDays());
+			this.info("         / 36500");
+			this.info("   四捨五入前 = " + vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
+					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
+					.divide(new BigDecimal(36500), b, RoundingMode.DOWN));
+			this.info("   B算式 = " + vCalcRepayIntVo.getAmount());
+			this.info("         * " + vCalcRepayIntVo.getStoreRate());
+			this.info("         * " + wkDaysDenominator);
+			this.info("   四捨五入前 = " + vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
+					.multiply(wkDaysDenominator));
 		} else {
 			dDateUtil.init();
 			dDateUtil.setDate_1(vCalcRepayIntVo.getStartDate());
@@ -1467,12 +1477,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			// 最後決定固定9
 			int b = 9;
 
-			// 2022-04-08 智偉: AS400 CHANGE ROUND_UP(*YES)時,插入位數不足時,會使用RPG的half-adjust功能
-			BigDecimal halfAdjust = new BigDecimal("0.5");
-
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
 					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(wkMonthDenominator, b, RoundingMode.DOWN).add(halfAdjust).setScale(0, RoundingMode.HALF_UP);
+					.divide(wkMonthDenominator, b, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
 
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());

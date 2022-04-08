@@ -46,12 +46,12 @@ public class LM058Report extends MakeReport {
 
 		this.info("LM058Report exec");
 
-		// 年
-		int iYear = thisMonthEndDate / 10000;
+		// 民國年
+		int iYear = nowDate / 10000;
 		// 月
-		int iMonth = (thisMonthEndDate / 100) % 100;
+		int iMonth = (nowDate / 100) % 100;
 
-		// 當年月
+		// 當民國年月
 		int thisYM = 0;
 
 		// 判斷帳務日與月底日是否同一天
@@ -60,14 +60,16 @@ public class LM058Report extends MakeReport {
 			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
 		}
 
-		thisYM = iYear * 100 + iMonth;
-
-		String dateRocYM = String.valueOf(thisMonthEndDate);
+		// 11103
+		thisYM = (iYear + 1911) * 100 + iMonth;
+		//1110331
+		String dateRocYMD = String.valueOf(thisMonthEndDate);
+		this.info("thisYM="+thisYM);
+		this.info("dateRocYMD="+dateRocYMD);
 		
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表",
-				"LM058_表A19_會計部申報表_" + dateRocYM.substring(1, 6), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
-
-		makeExcel.setSheet("108.04", dateRocYM.substring(1, 4) + "." + dateRocYM.substring(4, 6));
+				"LM058_表A19_會計部申報表_" + dateRocYMD.substring(0, 5), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
+		makeExcel.setSheet("108.04", dateRocYMD.substring(0, 3) + "." + dateRocYMD.substring(3, 5));
 
 		try {
 			fnAllList = lm058ServiceImpl.findAll(titaVo, thisYM);
@@ -78,9 +80,9 @@ public class LM058Report extends MakeReport {
 		}
 
 		// 民國年月日
-		String date = "民國" + dateRocYM.substring(1, 4).replaceFirst("^0", "") + "年"
-				+ dateRocYM.substring(4, 6).replaceFirst("^0", "") + "月" + dateRocYM.substring(6, 8).replaceFirst("^0", "")
-				+ "日";
+		String date = "民國" + dateRocYMD.substring(0, 3).replaceFirst("^0", "") + "年"
+				+ dateRocYMD.substring(3, 5).replaceFirst("^0", "") + "月"
+				+ dateRocYMD.substring(5, 7).replaceFirst("^0", "") + "日";
 
 		makeExcel.setValue(2, 2, date);
 

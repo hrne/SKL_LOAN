@@ -95,7 +95,7 @@ public class L4454Report extends MakeReport {
 			// CustNo: Query.CustNo
 			// FacmNo: Query.FacmNo
 			
-			String inputCustNo = titaVo.get("icustno");
+			String inputCustNo = titaVo.get("CustNo");
 			String recordCustNoString = tL4454Vo.get("CustNo");
 			String recordFacmNoString = tL4454Vo.get("FacmNo");
 			int recordCustNo = parse.stringToInteger(recordCustNoString);

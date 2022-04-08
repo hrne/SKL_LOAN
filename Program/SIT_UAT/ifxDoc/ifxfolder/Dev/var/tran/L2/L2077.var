@@ -66,7 +66,7 @@ K(MODIFYBUTTON,1,新增)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 !CloseReasonCode,清償原因
 #CDDEF0001=x,22,S
-T(3,CdCode.CloseReasonCode)
+T(3,CdCode.AdvanceCloseCode)
 
 !CollectWayCode,領取方式
 #CDDEF0002=x,21,S
@@ -215,7 +215,7 @@ T(H,#OOFunCode,#FunCodeHelp)
 
 #OOCloseReasonCodeX=X,20,L
 ! C(3,#OOCloseReasonCode,00,T(3,無),$)
-T(H,#OOCloseReasonCode,#CloseReasonCodeHelp)
+T(3,)T(H,#OOCloseReasonCode,#CloseReasonCodeHelp)
 C(4,#OOCloseReasonCode,T(3,無),$)
 
 #OOCloseAmt=+m,14.2,S
