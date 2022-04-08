@@ -77,6 +77,7 @@ public class L3R11 extends TradeBuffer {
 	private int wkBormNoStart = 1;
 	private int wkBormNoEnd = 900;
 	private int wkTotaCount = 0;
+	private int oRpFacmNo = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -102,6 +103,7 @@ public class L3R11 extends TradeBuffer {
 		if (iFacmNo > 0) {
 			wkFacmNoStart = iFacmNo;
 			wkFacmNoEnd = iFacmNo;
+			oRpFacmNo = iFacmNo;
 		}
 		BigDecimal oPrincipal = BigDecimal.ZERO;
 		BigDecimal oInterest = BigDecimal.ZERO;
@@ -231,6 +233,10 @@ public class L3R11 extends TradeBuffer {
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
 			}
+
+			if (oRpFacmNo == 0) {
+				oRpFacmNo = ln.getFacmNo();
+			}
 			wkTotaCount++;
 			// 提前還款金額=> add 清償違約金 List
 			wkExtraRepay = loanCalcRepayIntCom.getExtraAmt();
@@ -298,6 +304,7 @@ public class L3R11 extends TradeBuffer {
 		}
 		this.totaVo.putParam("L3r11CloseAmt", oCloseAmt);
 		this.totaVo.putParam("L3r11CloseReasonCode", wkCloseReasonCode);
+		this.totaVo.putParam("L3r11RpFacmNo", oRpFacmNo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

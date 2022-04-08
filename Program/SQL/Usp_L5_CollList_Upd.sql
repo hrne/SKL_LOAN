@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_L5_CollList_Upd
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE PROCEDURE "Usp_L5_CollList_Upd" 
+create or replace PROCEDURE "Usp_L5_CollList_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -339,7 +334,9 @@ BEGIN
           ,N."PayIntDate"             AS "PrevIntDate"         -- '繳息迄日';
           ,N."NextPayDate"            AS "NextIntDate"         -- '應繳息日';
           ,'TWD'                      AS "CurrencyCode"        -- '幣別';
-          ,N."PrinBalance"            AS "PrinBalance"         -- '本金餘額';
+          ,CASE WHEN N."Status" = 3   THEN 0
+                ELSE N."PrinBalance"  
+           END                        AS "PrinBalance"         -- '本金餘額';
           ,0                          AS "BadDebtBal"          -- '呆帳餘額'; 
           ,CASE WHEN  N."Status" = 0
                   AND N."NextPayDate" > 0
@@ -362,8 +359,7 @@ BEGIN
                                AS  ROW_NUMBER
            ,"PayIntDate" 
            ,"NextPayDate"         
-           ,"TotalContrAmt" - "AccuTempAmt"   
-                               AS  "PrinBalance"        
+           ,"PrincipalBal"                AS  "PrinBalance"        
            ,CASE "Status"
                  WHEN '0' THEN 0            -- 0.正常       ==> 0.正常戶
                  WHEN '2' THEN 3            -- 2.毀諾       ==> 3.結案戶
@@ -425,112 +421,190 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('UPDATE CollList');
 
     MERGE INTO "CollList" C
-    USING ( SELECT C1."CustNo"                AS "CustNo"              -- '戶號';
-                  ,C1."FacmNo"                AS "FacmNo"              -- '額度';
-                  ,C1."CaseCode"              AS "CaseCode"            -- '案件種類';
-                  ,0                          AS "TxDate"              -- '作業日期';
-                  ,' '                        AS "TxCode"              -- '作業項目'; 
-                  ,C1."PrevIntDate"           AS "PrevIntDate"         -- '繳息迄日';
-                  ,C1."NextIntDate"           AS "NextIntDate"         -- '應繳息日';
-                  -- 若 應繳息日 < 系統營業日(TBSDYF)
-                  -- 則 計算逾期期數
-                  -- 否則 擺零
-                  ,CASE
-                     WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 AND C1."PrinBalance" + C1."BadDebtBal" <> 0
-                     THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(C1."NextIntDate",'YYYYMMDD')))
-                   ELSE 0 END                 AS "OvduTerm"            -- '逾期期數';
-                  -- 若 應繳息日 <= 系統營業日(TBSDYF)
-                  -- 則 計算逾期天數
-                  -- 否則 擺零
-                  ,CASE
-                     WHEN C1."NextIntDate" <= TBSDYF AND C1."NextIntDate" > 0 AND C1."PrinBalance" + C1."BadDebtBal" <> 0
-                     THEN TO_DATE(TBSDYF,'YYYYMMDD')  - TO_DATE(C1."NextIntDate",'YYYYMMDD') 
-                   ELSE 0 END                 AS "OvduDays"            -- '逾期天數';
-                  ,C1."CurrencyCode"          AS "CurrencyCode"        -- '幣別';
-                  ,C1."PrinBalance"           AS "PrinBalance"         -- '本金餘額';
-                  ,C1."BadDebtBal"            AS "BadDebtBal"          -- '呆帳餘額'; 
-                  -- 若 應繳息日 < 系統營業日(TBSDYF)
-                  -- 則 擺擔保品地區別在"CdCity"的催收員 (若該擔保品無地區別,擺台北市的催收員)
-                  -- 否則 擺空白
-                  ,NVL(S1."AccCollPsn",' ')   AS "AccCollPsn"          -- '催收員';
-                  -- 若 應繳息日 < 系統營業日(TBSDYF)
-                  -- 則 擺擔保品地區別在"CdCity"的法務人員 (若該擔保品無地區別,擺台北市的法務人員)
-                  -- 否則 擺空白
-                  ,NVL(S1."LegalPsn",' ')     AS "LegalPsn"            -- '法務人員';
-                  ,C1."Status"                AS "Status"              -- '戶況';
-                  ,C1."AcctCode"              AS "AcctCode"            -- 業務科目代號
-                  ,C1."FacAcctCode"           AS "FacAcctCode"         -- 額度業務科目   
-                  ,C1."ClCustNo"              AS "ClCustNo"            -- '同擔保品戶號';
-                  ,C1."ClFacmNo"              AS "ClFacmNo"            -- '同擔保品額度';
-                  ,C1."ClRowNo"               AS "ClRowNo"             -- '同擔保品序列號';
-                  ,NVL(S1."ClCode1",0)        AS "ClCode1"             -- '擔保品代號1';
-                  ,NVL(S1."ClCode2",0)        AS "ClCode2"             -- '擔保品代號2';
-                  ,NVL(S1."ClNo",0)           AS "ClNo"                -- '擔保品號碼';
-                  ,C1."RenewCode"             AS "RenewCode"           -- 空白、1.展期一般 2.展期協議 
-                  ,C1."AcDate"                AS "AcDate"              -- 會計日期
-                  ,C1."CreateDate"            AS "CreateDate"          -- 建檔日期時間  
-                  ,C1."CreateEmpNo"           AS "CreateEmpNo"         -- 建檔人員 
-                  ,C1."LastUpdate"            AS "LastUpdate"          -- 最後更新日期時間  
-                  ,C1."LastUpdateEmpNo"       AS "LastUpdateEmpNo"     -- 最後更新人員 
-                  ,S1."CityCode"              AS "CityCode"            -- 地區別
-                  ,NVL(Ori."IsSpecify",'N')   AS "IsSpecify"           -- 是否指定 VARCHAR2 1 "空白 Y:是 N:否 若催收或法務人員非CdCity裡設定的人，則此欄位為Y，否則預設N"
-                  ,CASE
-                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
-                     THEN Ori."AccTelArea"
-                   ELSE S1."AccTelArea" END   AS "AccTelArea"          -- 催收人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
-                  ,CASE
-                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
-                     THEN Ori."AccTelNo"
-                   ELSE S1."AccTelNo" END     AS "AccTelNo"            -- 催收人員電話 VARCHAR2 10 由連線交易維護此欄
-                  ,CASE
-                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
-                     THEN Ori."AccTelExt"
-                   ELSE S1."AccTelExt" END    AS "AccTelExt"           -- 催收人員電話-分機 VARCHAR2 5 由連線交易維護此欄
-                  ,CASE
-                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
-                     THEN Ori."LegalArea"
-                   ELSE S1."LegalArea" END    AS "LegalArea"           -- 法務人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
-                  ,CASE
-                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
-                     THEN Ori."LegalNo"
-                   ELSE S1."LegalNo" END      AS "LegalNo"             -- 法務人員電話 VARCHAR2 10 由連線交易維護此欄
-                  ,CASE
-                     WHEN NVL(Ori."IsSpecify",'N') = 'Y'
-                     THEN Ori."LegalExt"
-                   ELSE S1."LegalExt" END     AS "LegalExt"            -- 法務人員電話-分機 VARCHAR2 5 由連線交易維護此欄
-            FROM "CollListTmp" C1
-            LEFT JOIN ( 
-              SELECT CF."CustNo"
-                    ,CF."FacmNo"
-                    ,NVL(CM."ClCode1",0)      AS "ClCode1"
-                    ,NVL(CM."ClCode2",0)      AS "ClCode2"
-                    ,NVL(CM."ClNo",0)         AS "ClNo"
-                    ,CM."CityCode"            AS "CityCode" 
-                    ,NVL(CC."AccCollPsn",' ') AS "AccCollPsn"
-                    ,NVL(CC."LegalPsn",' ')   AS "LegalPsn"
-                    ,NVL(CC."AccTelArea",' ') AS "AccTelArea"
-                    ,NVL(CC."AccTelNo",' ')   AS "AccTelNo"
-                    ,NVL(CC."AccTelExt",' ')  AS "AccTelExt"
-                    ,NVL(CC."LegalArea",' ')  AS "LegalArea"
-                    ,NVL(CC."LegalNo",' ')    AS "LegalNo"
-                    ,NVL(CC."LegalExt",' ')   AS "LegalExt"
-                    ,ROW_NUMBER() OVER (PARTITION BY CF."CustNo"
-                                                    ,CF."FacmNo"
-                                        ORDER BY NVL(CM."ClCode1",0)
-                                                ,NVL(CM."ClCode2",0)
-                                                ,NVL(CM."ClNo",0))
-                                              AS "Seq"
-              FROM "ClFac" CF
-              LEFT JOIN "ClMain" CM ON CM."ClCode1"  = CF."ClCode1"
-                                   AND CM."ClCode1"  = CF."ClCode2"
-                                   AND CM."ClNo"     = CF."ClNo"
-              LEFT JOIN "CdCity" CC ON CC."CityCode" = NVL(CM."CityCode",'A')
-              WHERE CF."MainFlag" = 'Y'
-            ) S1 ON S1."CustNo" = C1."CustNo"
-                AND S1."FacmNo" = C1."FacmNo"
-                AND S1."Seq" = 1
-            LEFT JOIN "CollList" Ori ON Ori."CustNo" = C1."CustNo"
-                                    AND Ori."FacmNo" = C1."FacmNo"
+    USING ( 
+      WITH "rawData" AS (
+        SELECT "CaseCode"
+             , "CustNo"
+             , "FacmNo"
+             , "AcDate" AS "TxDate"
+             , '2'      AS "TxCode" -- 2:函催登錄
+             , "LastUpdate"
+        FROM "CollLetter"
+        UNION
+        SELECT "CaseCode"
+             , "CustNo"
+             , "FacmNo"
+             , "AcDate" AS "TxDate"
+             , '3'      AS "TxCode" -- 3:電催登錄
+             , "LastUpdate"
+        FROM "CollTel"
+        UNION
+        SELECT "CaseCode"
+             , "CustNo"
+             , "FacmNo"
+             , "AcDate" AS "TxDate"
+             , '4'      AS "TxCode" -- 4:面催登錄
+             , "LastUpdate"
+        FROM "CollMeet"
+        UNION
+        SELECT "CaseCode"
+             , "CustNo"
+             , "FacmNo"
+             , "AcDate" AS "TxDate"
+             , '5'      AS "TxCode" -- 5:法務進度登錄
+             , "LastUpdate"
+        FROM "CollLaw"
+        UNION
+        SELECT "CaseCode"
+             , "CustNo"
+             , "FacmNo"
+             , "AcDate" AS "TxDate"
+             , '6'      AS "TxCode" -- 6:提醒登錄
+             , "LastUpdate"
+        FROM "CollRemind"
+      )
+      , "lastTxData" AS (
+        SELECT "CaseCode"
+             , "CustNo"
+             , "FacmNo"
+             , "TxDate"
+             , "TxCode"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY "CaseCode"
+                            , "CustNo"
+                            , "FacmNo"
+                 ORDER BY "TxDate" DESC
+                        , "LastUpdate" DESC
+               ) AS "Seq"
+        FROM "rawData"
+      )
+      SELECT C1."CustNo"                AS "CustNo"              -- '戶號';
+            ,C1."FacmNo"                AS "FacmNo"              -- '額度';
+            ,C1."CaseCode"              AS "CaseCode"            -- '案件種類';
+            ,NVL(LTD."TxDate",0)        AS "TxDate"              -- '作業日期';
+            ,NVL(LTD."TxCode",' ')      AS "TxCode"              -- '作業項目'; 
+            ,C1."PrevIntDate"           AS "PrevIntDate"         -- '繳息迄日';
+            ,C1."NextIntDate"           AS "NextIntDate"         -- '應繳息日';
+            -- 若 應繳息日 < 系統營業日(TBSDYF)
+            -- 則 計算逾期期數
+            -- 否則 擺零
+            ,CASE
+               WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 AND C1."PrinBalance" + C1."BadDebtBal" <> 0
+               THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(C1."NextIntDate",'YYYYMMDD')))
+             ELSE 0 END                 AS "OvduTerm"            -- '逾期期數';
+            -- 若 應繳息日 <= 系統營業日(TBSDYF)
+            -- 則 計算逾期天數
+            -- 否則 擺零
+            ,CASE
+               WHEN C1."NextIntDate" <= TBSDYF AND C1."NextIntDate" > 0 AND C1."PrinBalance" + C1."BadDebtBal" <> 0
+               THEN TO_DATE(TBSDYF,'YYYYMMDD')  - TO_DATE(C1."NextIntDate",'YYYYMMDD') 
+             ELSE 0 END                 AS "OvduDays"            -- '逾期天數';
+            ,C1."CurrencyCode"          AS "CurrencyCode"        -- '幣別';
+            ,C1."PrinBalance"           AS "PrinBalance"         -- '本金餘額';
+            ,C1."BadDebtBal"            AS "BadDebtBal"          -- '呆帳餘額'; 
+            -- 若 應繳息日 < 系統營業日(TBSDYF)
+            -- 則 擺擔保品地區別在"CdCity"的催收員 (若該擔保品無地區別,擺台北市的催收員)
+            -- 否則 擺空白
+            -- 2022-03-22 新增條件 from Linda: CaseCode=2債協的時候,如果是否指定IsSpecify=N,催收人員AccCollPsn跟法務人員LegalPsn都固定放怡婷的員編CB7541
+            ,CASE
+               WHEN C1."CaseCode" = '2'
+                    AND NVL(Ori."IsSpecify",'N') = 'N'
+               THEN 'CB7541'
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN NVL(Ori."AccCollPsn",' ')
+             ELSE NVL(S1."AccCollPsn",' ')
+             END                        AS "AccCollPsn"          -- '催收員';
+            -- 若 應繳息日 < 系統營業日(TBSDYF)
+            -- 則 擺擔保品地區別在"CdCity"的法務人員 (若該擔保品無地區別,擺台北市的法務人員)
+            -- 否則 擺空白
+            -- 2022-03-22 新增條件 from Linda: CaseCode=2債協的時候,如果是否指定IsSpecify=N,催收人員AccCollPsn跟法務人員LegalPsn都固定放怡婷的員編CB7541
+            ,CASE
+               WHEN C1."CaseCode" = '2'
+                    AND NVL(Ori."IsSpecify",'N') = 'N'
+               THEN 'CB7541'
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN NVL(Ori."LegalPsn",' ')
+             ELSE NVL(S1."LegalPsn",' ')
+             END                        AS "LegalPsn"            -- '法務人員';
+            ,C1."Status"                AS "Status"              -- '戶況';
+            ,C1."AcctCode"              AS "AcctCode"            -- 業務科目代號
+            ,C1."FacAcctCode"           AS "FacAcctCode"         -- 額度業務科目   
+            ,C1."ClCustNo"              AS "ClCustNo"            -- '同擔保品戶號';
+            ,C1."ClFacmNo"              AS "ClFacmNo"            -- '同擔保品額度';
+            ,C1."ClRowNo"               AS "ClRowNo"             -- '同擔保品序列號';
+            ,NVL(S1."ClCode1",0)        AS "ClCode1"             -- '擔保品代號1';
+            ,NVL(S1."ClCode2",0)        AS "ClCode2"             -- '擔保品代號2';
+            ,NVL(S1."ClNo",0)           AS "ClNo"                -- '擔保品號碼';
+            ,C1."RenewCode"             AS "RenewCode"           -- 空白、1.展期一般 2.展期協議 
+            ,C1."AcDate"                AS "AcDate"              -- 會計日期
+            ,C1."CreateDate"            AS "CreateDate"          -- 建檔日期時間  
+            ,C1."CreateEmpNo"           AS "CreateEmpNo"         -- 建檔人員 
+            ,C1."LastUpdate"            AS "LastUpdate"          -- 最後更新日期時間  
+            ,C1."LastUpdateEmpNo"       AS "LastUpdateEmpNo"     -- 最後更新人員 
+            ,S1."CityCode"              AS "CityCode"            -- 地區別
+            ,NVL(Ori."IsSpecify",'N')   AS "IsSpecify"           -- 是否指定 VARCHAR2 1 "空白 Y:是 N:否 若催收或法務人員非CdCity裡設定的人，則此欄位為Y，否則預設N"
+            ,CASE
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN Ori."AccTelArea"
+             ELSE S1."AccTelArea" END   AS "AccTelArea"          -- 催收人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+            ,CASE
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN Ori."AccTelNo"
+             ELSE S1."AccTelNo" END     AS "AccTelNo"            -- 催收人員電話 VARCHAR2 10 由連線交易維護此欄
+            ,CASE
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN Ori."AccTelExt"
+             ELSE S1."AccTelExt" END    AS "AccTelExt"           -- 催收人員電話-分機 VARCHAR2 5 由連線交易維護此欄
+            ,CASE
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN Ori."LegalArea"
+             ELSE S1."LegalArea" END    AS "LegalArea"           -- 法務人員電話-區碼 VARCHAR2 5 由連線交易維護此欄
+            ,CASE
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN Ori."LegalNo"
+             ELSE S1."LegalNo" END      AS "LegalNo"             -- 法務人員電話 VARCHAR2 10 由連線交易維護此欄
+            ,CASE
+               WHEN NVL(Ori."IsSpecify",'N') = 'Y'
+               THEN Ori."LegalExt"
+             ELSE S1."LegalExt" END     AS "LegalExt"            -- 法務人員電話-分機 VARCHAR2 5 由連線交易維護此欄
+      FROM "CollListTmp" C1
+      LEFT JOIN ( 
+        SELECT CF."CustNo"
+              ,CF."FacmNo"
+              ,NVL(CM."ClCode1",0)      AS "ClCode1"
+              ,NVL(CM."ClCode2",0)      AS "ClCode2"
+              ,NVL(CM."ClNo",0)         AS "ClNo"
+              ,CM."CityCode"            AS "CityCode" 
+              ,NVL(CC."AccCollPsn",' ') AS "AccCollPsn"
+              ,NVL(CC."LegalPsn",' ')   AS "LegalPsn"
+              ,NVL(CC."AccTelArea",' ') AS "AccTelArea"
+              ,NVL(CC."AccTelNo",' ')   AS "AccTelNo"
+              ,NVL(CC."AccTelExt",' ')  AS "AccTelExt"
+              ,NVL(CC."LegalArea",' ')  AS "LegalArea"
+              ,NVL(CC."LegalNo",' ')    AS "LegalNo"
+              ,NVL(CC."LegalExt",' ')   AS "LegalExt"
+              ,ROW_NUMBER() OVER (PARTITION BY CF."CustNo"
+                                              ,CF."FacmNo"
+                                  ORDER BY NVL(CM."ClCode1",0)
+                                          ,NVL(CM."ClCode2",0)
+                                          ,NVL(CM."ClNo",0))
+                                        AS "Seq"
+        FROM "ClFac" CF
+        LEFT JOIN "ClMain" CM ON CM."ClCode1"  = CF."ClCode1"
+                             AND CM."ClCode1"  = CF."ClCode2"
+                             AND CM."ClNo"     = CF."ClNo"
+        LEFT JOIN "CdCity" CC ON CC."CityCode" = NVL(CM."CityCode",'A')
+        WHERE CF."MainFlag" = 'Y'
+      ) S1 ON S1."CustNo" = C1."CustNo"
+          AND S1."FacmNo" = C1."FacmNo"
+          AND S1."Seq" = 1
+      LEFT JOIN "CollList" Ori ON Ori."CustNo" = C1."CustNo"
+                              AND Ori."FacmNo" = C1."FacmNo"
+      LEFT JOIN "lastTxData" LTD ON LTD."CustNo" = C1."CustNo"
+                                AND LTD."FacmNo" = C1."FacmNo"
+                                AND LTD."CaseCode" = C1."CaseCode"
+                                AND LTD."Seq" = 1
     ) T    
     ON  (     C."CustNo" = T."CustNo"
           AND C."FacmNo" = T."FacmNo"
@@ -732,4 +806,3 @@ END;
 
 
 
-/

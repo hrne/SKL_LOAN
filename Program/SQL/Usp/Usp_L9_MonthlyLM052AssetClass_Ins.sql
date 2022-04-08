@@ -6,7 +6,7 @@ set define off;
   CREATE OR REPLACE PROCEDURE "Usp_L9_MonthlyLM052AssetClass_Ins" 
 (
     -- 參數
-    TYYMM           IN  INT,        -- 本月資料年月(西元)
+    TYYMM           IN  INT,       -- 本月資料年月(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
 
 )

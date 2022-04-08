@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_L5_CollList_Upd
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE PROCEDURE "Usp_L5_CollList_Upd" 
+create or replace PROCEDURE "Usp_L5_CollList_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -811,4 +806,3 @@ END;
 
 
 
-/

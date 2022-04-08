@@ -62,10 +62,21 @@ public class L2036 extends TradeBuffer {
 			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);			
 		}
 
-		if (iReltMain == null) {
-			throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
+//		if (iReltMain == null) {
+//			throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
+//		}
+//		
+		if (iCustNo == 0) {
+			iReltMain = iReltMainService.caseNoEq(iCaseNo, this.index, this.limit, titaVo);
+			if (iReltMain == null) {
+				throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
+			}
+		}else{
+			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);
+				if (iReltMain == null) {
+					throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
+				}
 		}
-
 		for (ReltMain rReltMain : iReltMain) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCaseNo", rReltMain.getCaseNo());

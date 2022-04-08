@@ -152,13 +152,11 @@ T(2,@FdRelId,#WKSTAR)
 T(2,@FdRelName,#WKSTAR)
 T(2,@FdPosInd,#WKSTAR)
 T(2,@FdRemarkType,#WKSTAR)
-T(2,@FdRemark,#WKSTAR)
 
 #WKNAME1=X,1,S
 IF(#FunCd == 2,$,S)
 T(2,@FdPosInd,#WKSTAR)
 T(2,@FdRemarkType,#WKSTAR)
-T(2,@FdRemark,#WKSTAR)
 
 #BUF1=X,18,S
 
@@ -278,7 +276,6 @@ T(H,#RemarkType,#RelationCode3Help)
 #Remark=X,100,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@V(7)
 
 #RPTFG=A,1,S
 </sub>

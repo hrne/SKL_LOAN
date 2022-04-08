@@ -33,19 +33,44 @@ public class LM058Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param nowDate          今天日期(民國)
+	 * @param thisMonthEndDate 當月底日期(民國)
+	 * 
+	 */
+	public void exec(TitaVo titaVo, int nowDate, int thisMonthEndDate) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM058Report exec");
 
-		String iENTDY = titaVo.get("ENTDY");
+		// 年
+		int iYear = thisMonthEndDate / 10000;
+		// 月
+		int iMonth = (thisMonthEndDate / 100) % 100;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表", "LM058_表A19_會計部申報表_" + iENTDY.substring(1, 6), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
+		// 當年月
+		int thisYM = 0;
 
-		makeExcel.setSheet("108.04", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6));
+		// 判斷帳務日與月底日是否同一天
+		if (nowDate < thisMonthEndDate) {
+			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+		}
+
+		thisYM = iYear * 100 + iMonth;
+
+		String dateRocYM = String.valueOf(thisMonthEndDate);
+		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表",
+				"LM058_表A19_會計部申報表_" + dateRocYM.substring(1, 6), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
+
+		makeExcel.setSheet("108.04", dateRocYM.substring(1, 4) + "." + dateRocYM.substring(4, 6));
 
 		try {
-			fnAllList = lm058ServiceImpl.findAll(titaVo);
+			fnAllList = lm058ServiceImpl.findAll(titaVo, thisYM);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -53,7 +78,9 @@ public class LM058Report extends MakeReport {
 		}
 
 		// 民國年月日
-		String date = "民國" + iENTDY.substring(1, 4).replaceFirst("^0", "") + "年" + iENTDY.substring(4, 6).replaceFirst("^0", "") + "月" + iENTDY.substring(6, 8).replaceFirst("^0", "") + "日";
+		String date = "民國" + dateRocYM.substring(1, 4).replaceFirst("^0", "") + "年"
+				+ dateRocYM.substring(4, 6).replaceFirst("^0", "") + "月" + dateRocYM.substring(6, 8).replaceFirst("^0", "")
+				+ "日";
 
 		makeExcel.setValue(2, 2, date);
 
@@ -66,7 +93,6 @@ public class LM058Report extends MakeReport {
 			Double total = 0.0;
 			Double maxTotal = 0.0;
 			for (Map<String, String> tLDVo : fnAllList) {
-//				this.info("tLDVo-------->" + tLDVo.toString());
 
 				row++;
 
@@ -148,7 +174,7 @@ public class LM058Report extends MakeReport {
 			makeExcel.setValue(6, 1, "本日無資料");
 		}
 
-		long sno = makeExcel.close();
+		makeExcel.close();
 		// makeExcel.toExcel(sno);
 	}
 
@@ -158,7 +184,6 @@ public class LM058Report extends MakeReport {
 	 * @param iamt 金額
 	 */
 	private double cpRate(String iamt) {
-//		this.info("cprate iamt=" + iamt);
 		if (iamt == null || iamt.equals("") || iamt.equals("0")) {
 			return 0.00;
 		} else {

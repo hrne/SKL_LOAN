@@ -1439,8 +1439,11 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			BigDecimal wkDaysDenominator = new BigDecimal(vCalcRepayIntVo.getDays()).divide(new BigDecimal(36500), b,
 					RoundingMode.DOWN);
 
+			// 2022-04-08 智偉: AS400 CHANGE ROUND_UP(*YES)時,插入位數不足時,會使用RPG的half-adjust功能
+			BigDecimal halfAdjust = new BigDecimal("0.5");
+
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
-					.multiply(wkDaysDenominator).setScale(0, RoundingMode.HALF_UP);
+					.multiply(wkDaysDenominator).add(halfAdjust).setScale(0, RoundingMode.HALF_UP);
 
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());
@@ -1464,9 +1467,12 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			// 最後決定固定9
 			int b = 9;
 
+			// 2022-04-08 智偉: AS400 CHANGE ROUND_UP(*YES)時,插入位數不足時,會使用RPG的half-adjust功能
+			BigDecimal halfAdjust = new BigDecimal("0.5");
+
 			wkInterest = vCalcRepayIntVo.getAmount().multiply(vCalcRepayIntVo.getStoreRate())
 					.multiply(new BigDecimal(vCalcRepayIntVo.getDays()))
-					.divide(wkMonthDenominator, b, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
+					.divide(wkMonthDenominator, b, RoundingMode.DOWN).add(halfAdjust).setScale(0, RoundingMode.HALF_UP);
 
 			this.info("   StartDate  = " + vCalcRepayIntVo.getStartDate());
 			this.info("   Days       = " + vCalcRepayIntVo.getDays());

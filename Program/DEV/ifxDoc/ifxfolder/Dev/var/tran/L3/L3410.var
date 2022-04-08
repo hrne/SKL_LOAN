@@ -641,7 +641,7 @@ E(3,@RPAMTZ,#Principal)
 E(0,@RP_CUSTNO,#TimCustNo)
 ! 額度
 #TmpFacmNo=X,1,S
-E(0,@RP_FACMNO,#FacmNo)
+E(0,@RP_FACMNO,#L3r11RpFacmNo)
 
 ![交易金額]
 #TXAMT=_,_,S

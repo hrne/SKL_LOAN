@@ -2954,10 +2954,12 @@ TXFORM=L2R30
 #L2r31CustNo=A,7,S
 #L2r31CustName=X,200,S
 #L2r31CuscCd=A,1,S
-#L2r31CreateEmpNo=X,6,S
-#L2r31CreateDate=D,7,S
-#L2r31CreateTime=X,8,S
 #L2r31Reason=X,50,S
+#L2r31SetEmpNo=X,6,S
+#L2r31SetDate=X,18,S
+#L2r31ReSetEmpNo=X,6,S
+#L2r31ReSetDate=X,18,S
+#L2r31ApplMark=A,1,S
 </L2R31.dec>
 
 <L2R31.tom>
@@ -2965,10 +2967,12 @@ TXFORM=L2R31
 #L2r31CustNo
 #L2r31CustName
 #L2r31CuscCd
-#L2r31CreateEmpNo
-#L2r31CreateDate
-#L2r31CreateTime
 #L2r31Reason
+#L2r31SetEmpNo
+#L2r31SetDate
+#L2r31ReSetEmpNo
+#L2r31ReSetDate
+#L2r31ApplMark
 ^
 </L2R31.tom>
 
@@ -4083,8 +4087,10 @@ TXFORM=L3R08
 #L3r09Remark=X,60,S
 #L3r09FacProdNo=X,5,S
 #L3r09FacBaseRateCode=X,2,S
-</L3R09.dec>
+#L3r09NextEffectDate=D,7,S
+#L3r09NextFitRate=n,2.4,S
 
+</L3R09.dec>
 <L3R09.tom>
 TXFORM=L3R09
 #L3r09EffectDate
@@ -4102,6 +4108,8 @@ TXFORM=L3R09
 #L3r09Remark
 #L3r09FacProdNo
 #L3r09FacBaseRateCode
+#L3r09NextEffectDate
+#L3r09NextFitRate
 ^
 </L3R09.tom>
 
@@ -4155,6 +4163,7 @@ TXFORM=L3R10
 #L3r11Excessive=m,14.2,S
 #L3r11CloseAmt=+n,14.2,S
 #L3r11CloseReasonCode=X,2,S
+#L3r11RpFacmNo=A,3,S
 </L3R11.dec>
 
 <L3R11.tom>
@@ -4177,6 +4186,7 @@ TXFORM=L3R11
 #L3r11Excessive
 #L3r11CloseAmt
 #L3r11CloseReasonCode
+#L3r11RpFacmNo
 ^
 </L3R11.tom>
 

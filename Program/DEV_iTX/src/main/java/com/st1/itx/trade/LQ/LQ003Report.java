@@ -3,9 +3,7 @@ package com.st1.itx.trade.LQ;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -33,34 +31,19 @@ public class LQ003Report extends MakeReport {
 	public void printTitle() {
 
 	}
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param thisYM 西元年月
+	 * 
+	 */
+	public void exec(TitaVo titaVo, int thisYM) throws LogicException {
 
-	public void exec(TitaVo titaVo) throws LogicException {
-
-		exportExcel(titaVo);
-
-	}
-
-	private void exportExcel(TitaVo titaVo) throws LogicException {
 		this.info("===========in exportExcel");
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日(int)
-		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthLastDate = Calendar.getInstance();
-		// 設當年月底日
-		calMonthLastDate.set(iYear, iMonth, 0);
-
-		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
-
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		if (nowDate < monthLastDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
+		int iYear = thisYM / 100;
+		int iMonth =thisYM % 100;
 
 		// 年
 		String rocYear = String.valueOf(iYear - 1911);
@@ -68,7 +51,10 @@ public class LQ003Report extends MakeReport {
 		String rocMon = String.format("%02d", iMonth);
 
 		// 上一季
-		String q = "";
+		String lastQ = "";
+		
+		// 上一季
+		String thisQ = "";
 
 		int inputYearMonth1 = 0;
 		int inputYearMonth2 = 0;
@@ -79,28 +65,32 @@ public class LQ003Report extends MakeReport {
 		case "03":
 			inputYearMonth1 = ((iYear - 1) * 100) + 12;
 			inputYearMonth2 = (iYear * 100) + 3;
-			q = String.valueOf(Integer.valueOf(rocYear) - 1) + "Q4";
+			lastQ = String.valueOf(Integer.valueOf(rocYear) - 1) + "Q4";
+			thisQ = "Q1";
 			break;
 		case "04":
 		case "05":
 		case "06":
 			inputYearMonth1 = (iYear * 100) + 3;
 			inputYearMonth2 = (iYear * 100) + 6;
-			q = rocYear + "Q1";
+			lastQ = rocYear + "Q1";
+			thisQ = "Q2";
 			break;
 		case "07":
 		case "08":
 		case "09":
 			inputYearMonth1 = (iYear * 100) + 6;
 			inputYearMonth2 = (iYear * 100) + 9;
-			q = rocYear + "Q2";
+			lastQ = rocYear + "Q2";
+			thisQ = "Q3";
 			break;
 		case "10":
 		case "11":
 		case "12":
 			inputYearMonth1 = (iYear * 100) + 9;
 			inputYearMonth2 = (iYear * 100) + 12;
-			q = rocYear + "Q3";
+			lastQ = rocYear + "Q3";
+			thisQ = "Q4";
 			break;
 		default:
 			break;
@@ -127,9 +117,10 @@ public class LQ003Report extends MakeReport {
 			this.error("LQP003ServiceImpl findAll error = " + errors.toString());
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ003", "住宅違約統計季報_服務課申報表", "LQ003住宅違約統計季報" + q, "LQ003_底稿_放款管理課_住宅違約統計季報_服務課申報表.xlsx", "填報");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ003", "住宅違約統計季報_服務課申報表", "LQ003住宅違約統計季報" + thisQ,
+				"LQ003_底稿_放款管理課_住宅違約統計季報_服務課申報表.xlsx", "填報");
 
-		makeExcel.setValue(1, 9, q, "C");
+		makeExcel.setValue(1, 9, lastQ, "C");
 
 		// 設欄寬
 		makeExcel.setWidth(3, 15);
@@ -164,7 +155,8 @@ public class LQ003Report extends MakeReport {
 				Map<String, String> tLDVo2 = findList2.get(loopPointer);
 
 				// 縣市名稱
-				int f0 = tLDVo.get("F0") == null || tLDVo.get("F0").length() == 0 ? 0 : Integer.parseInt(tLDVo.get("F0"));
+				int f0 = tLDVo.get("F0") == null || tLDVo.get("F0").length() == 0 ? 0
+						: Integer.parseInt(tLDVo.get("F0"));
 				makeExcel.setValue(rowCursor, 1, f0, "C");
 
 				// 縣市代號
@@ -214,7 +206,7 @@ public class LQ003Report extends MakeReport {
 			makeExcel.setValue(2, 2, "本日無資料");
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+//		makeExcel.toExcel(sno);
 	}
 }

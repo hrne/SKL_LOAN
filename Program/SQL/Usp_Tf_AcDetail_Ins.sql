@@ -52,10 +52,25 @@ BEGIN
            , "ATDCAS" AS "ACNASS"
       FROM "TB$ATFP"
     )
+    -- For 暫收款-債協
+    , tempTRXP AS (
+      SELECT TRXDAT
+           , TRXNMT
+           , LMSACN
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY TRXDAT
+                          , TRXNMT
+                          , LMSACN
+               ORDER BY TRXNM2
+             ) AS "TxSeq"
+      FROM "LA$TRXP"
+      WHERE "TRXCRC" = 0
+    )
     SELECT S."TRXDAT"                     AS "RelDy"               -- 登放日期 Decimald 8 0
           ,'0000999999'
           -- 2021-11-30 修改 只紀錄TRXNMT
-           || LPAD(S."TRXNMT",8,0)        AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0
+           || LPAD(S."TRXNMT",8,'0')      AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0
           ,ROW_NUMBER() OVER (PARTITION BY S."TRXDAT"
                                           ,S."TRXNMT"
                               ORDER BY S."JLNVNO"
@@ -86,7 +101,8 @@ BEGIN
              WHEN 4 -- 被沖正
              THEN 2 -- 被沖正(隔日訂正)
            ELSE 0 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0
-          ,NVL(S."LMSACN",0)              AS "CustNo"              -- 戶號 DECIMAL 7 0
+          ,NVL(S."LMSACN",tempTRXP."LMSACN")
+                                          AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,NVL(S."LMSAPN",0)              AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,NVL(S."LMSASQ",0)              AS "BormNo"              -- 撥款序號 DECIMAL 3 0
           ,NVL(S."RecordNo",'')           AS "RvNo"                -- 銷帳編號 VARCHAR2 30 0
@@ -105,8 +121,7 @@ BEGIN
           ,S."JLNVNO"                     AS "SlipNo"              -- 傳票號碼 DECIMAL 6 0
           ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0
           ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
-          ,LPAD(S."TRXNMT",5,0)
-           || LPAD(S."TRXNM2",3,0)        AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
+          ,LPAD(S."TRXNMT",8,'0')         AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
           ,S."TRXTRN"                     AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0
           ,''                             AS "TitaSecNo"           -- 業務類別 VARCHAR2 2 0
           ,''                             AS "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0
@@ -132,7 +147,6 @@ BEGIN
     FROM (SELECT DISTINCT
                  S1."TRXDAT"
                 ,S1."TRXNMT"
-                ,NVL(S4."TRXNM2",0) AS "TRXNM2"
                 ,S1."JLNVNO"
                 ,S1."CUSBRH"
                 ,S1."TRXATP"
@@ -170,7 +184,6 @@ BEGIN
                        AND NVL(ATF."ACNASS",' ') = NVL(S1."ACNASS",' ')
           LEFT JOIN (SELECT TR."TRXDAT"
                            ,TR."TRXNMT"
-                           ,TR."TRXNM2"
                            ,TR."TRXTRN"
                            ,TR."ACTACT"
                            ,TR."LMSACN"
@@ -189,7 +202,6 @@ BEGIN
                            ,ATF."ACNASS"
                      FROM (SELECT TR1."TRXDAT"
                                  ,TR1."TRXNMT"
-                                 ,TR1."TRXNM2"
                                  ,TR1."TRXTRN"
                                  ,TR1."ACTACT"
                                  ,TR1."LMSACN"
@@ -229,13 +241,13 @@ BEGIN
                              AND TR1."TRXDAT" > 20190101
                            GROUP BY TR1."TRXDAT"
                                    ,TR1."TRXNMT"
-                                   ,TR1."TRXNM2"
                                    ,TR1."TRXTRN"
                                    ,TR1."ACTACT"
                                    ,TR1."LMSACN"
                                    ,TR1."LMSAPN"
                                    ,TR1."LMSASQ"
                                    ,TR1."TRXAMT"
+                                   ,TR1."TRXMEM"
                           ) TR
                     LEFT JOIN ATF ON ATF."TRXTRN" = TR."TRXTRN"
                                  AND ATF."ACTACT" = TR."ACTACT"
@@ -293,6 +305,9 @@ BEGIN
                WHERE "ACTFSC" IS NOT NULL
               ) ACT ON ACT."LMSACN" = NVL(S."LMSACN",0)
                    AND NVL(S."LMSACN",0) > 0
+    LEFT JOIN tempTRXP ON tempTRXP."TRXDAT" = S."TRXDAT"
+                      AND tempTRXP."TRXNMT" = S."TRXNMT"
+                      AND tempTRXP."TxSeq" = 1
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S."TRXMEM"
     ;
 
@@ -414,7 +429,7 @@ BEGIN
                            AND S5."AcDtlCode" = '  '
     LEFT JOIN BOKOTHERS ON NVL(JORP."ACNBOK",' ') = '000'
                        AND BOKOTHERS."CORACC" = JORP."CORACC"
-                       AND BOKOTHERS."CORACS" = JORP."CORACS"
+                       AND NVL(BOKOTHERS."CORACS",' ') = NVL(JORP."CORACS",' ')
                        AND BOKOTHERS."NEWVBN" = JORP."NEWVBN"
                        AND BOKOTHERS."TRXDAT" = JORP."TRXDAT"
                        AND BOKOTHERS."TRXATP" = JORP."TRXATP"

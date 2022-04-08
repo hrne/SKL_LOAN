@@ -59,14 +59,21 @@ T(3,CdCode.ProcCode)
 
 #ProcCodeHelp=x,1024,S
 
+! 銀行代號
+#CDDEF04=x,20,S
+T(3,CdCode.BankCd)
+
+#BankCdHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@RepayTypeHelp,#HelpDesc1)
 T(2,@ProcStsCodeHelp,#HelpDesc2)
 T(2,@ProcCodeHelp,#HelpDesc3)
+T(2,@BankCdHelp,#HelpDesc4)
 
 
 #CHAIN=A,1,S
@@ -264,8 +271,9 @@ BIND(#BTN_L3420,click, {cmd=CHAIN; ntxcd=L3420; ntxbuf=#BUF_L3420})
 #Balance=m,14,L
 !匯款銀行代碼
 #RemintBank=A,3,L
+
 #RemintBankX=X,16,L
-T(A,#RemintBank,L4DEF,BANKCDDEF,BANKCD,BANKCDX)
+T(3,)T(H,#RemintBank,#BankCdHelp)
 
 !交易人資料
 #TraderInfo=X,40,L

@@ -646,6 +646,9 @@ T(2,@RateTypeHelp,#HelpDesc2)
 T(2,@BankCdHelp,#HelpDesc3)
 T(2,@ApprovedLevelHelp,#HelpDesc4)
 T(2,@FreqBase2Help,#HelpDesc5)
+#BankCdHelp2=x,1024,S
+T(2,700:郵局;+#BankCdHelp)
+
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -1880,8 +1883,8 @@ C(3,#RepayCode,2,
 #RepayBank=X,3,I
 C(3,#RepayCode,2,$,S)
 C(3,#Hide5Flag,0,CALL(#HideP5),$)
-HELP(#BankCdHelp)
-@V(H,#BankCdHelp)
+HELP(#BankCdHelp2)
+@V(H,#BankCdHelp2)
 V(2,0)
 #RimRepayBank=X,3,S
 #SendL2r53=X,1,S
@@ -1894,7 +1897,7 @@ R(1,L2R53)
 
 #RepayBankX=X,30,L
 C(3,#RepayCode,2,$,S)
-T(H,#RepayBank,#BankCdHelp)
+T(H,#RepayBank,#BankCdHelp2)
 ! T(2,#L2r09BankItem)
 
 #WkFDP5B=X,1,S

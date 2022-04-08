@@ -168,11 +168,11 @@ public class L9714Report extends MakeReport {
 				
 				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
 				
-				// inputCustNo: #icustno
+				// inputCustNo: #CustNo
 				// CustNo: Query.CustNo
 				// FacmNo: Query.FacmNo
 				
-				String inputCustNo = titaVo.get("icustno");
+				String inputCustNo = titaVo.get("CustNo");
 				String recordCustNoString = tL9714Vo.get("CustNo");
 				String recordFacmNoString = tL9714Vo.get("FacmNo");
 				int recordCustNo = parse.stringToInteger(recordCustNoString);

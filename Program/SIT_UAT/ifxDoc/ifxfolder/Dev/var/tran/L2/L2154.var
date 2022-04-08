@@ -759,6 +759,8 @@ T(2,@CurrencyHelp,#HelpDesc7)
 T(2,@CurrPrecisionHelp,#HelpDesc8)
 T(2,@BankCdHelp,#HelpDesc9)
 T(2,@ApprovedLevelHelp,#HelpDesc10)
+#BankCdHelp2=x,1024,S
+T(2,700:郵局;+#BankCdHelp)
 
 !ClTypeCode 
 #CDDEF31=x,25,S
@@ -2707,8 +2709,8 @@ C(3,#RepayCode,2,$,S)
 IF(#FuncCode==2,$,s)
 C(3,#BeforeAcctCheckFlag,7,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
-HELP(#BankCdHelp)
-@V(H,#BankCdHelp)
+HELP(#BankCdHelp2)
+@V(H,#BankCdHelp2)
 V(2,0)
 C(3,#UpdateCode,1,C(5,#RepayBank,700,T(3,@FdPostCode,*),T(3,@FdPostCode, )),$)
 
@@ -2737,7 +2739,7 @@ C(3,#RepayCode,2,$,S)
 #RepayBankX=X,20,L
 C(3,#RepayCode,2,$,S)
 C(4,#RepayBank,S,$)
-T(H,#RepayBank,#BankCdHelp)
+T(H,#RepayBank,#BankCdHelp2)
 ! T(2,#L2r09BankItem)
 
 

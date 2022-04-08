@@ -216,7 +216,7 @@ public class L9711Report2 extends MakeReport {
 		this.setFontSize(11);
 
 		int top = 0;// 上下微調用
-		double yy = 20;// 開始Y軸
+		double yy = 21;// 開始Y軸
 		double h = 0.4;// 列高
 		double l = 0;// 列數
 

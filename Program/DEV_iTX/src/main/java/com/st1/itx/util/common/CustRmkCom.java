@@ -75,8 +75,6 @@ public class CustRmkCom extends TradeBuffer {
 				s += custRmk.getRmkDesc() + " ("+ emp + " " + parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
 			}
 
-//			this.info("CustRmkCom.setHtmlContent = " + s);
-
 			this.totaVo.init(titaVo);
 
 			this.totaVo.setHtmlContent(s);

@@ -1112,7 +1112,7 @@ E(0,@RP_CUSTNO,#CustNo)
 
 ! 額度
 #TmpFacmNo=X,1,S
-E(0,@RP_FACMNO,#FacmNo)
+E(0,@RP_FACMNO,#L3r11RpFacmNo)
 
 !類別   摘要
 #TmpNote=X,1,S

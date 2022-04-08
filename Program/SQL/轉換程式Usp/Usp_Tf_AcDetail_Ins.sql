@@ -429,7 +429,7 @@ BEGIN
                            AND S5."AcDtlCode" = '  '
     LEFT JOIN BOKOTHERS ON NVL(JORP."ACNBOK",' ') = '000'
                        AND BOKOTHERS."CORACC" = JORP."CORACC"
-                       AND BOKOTHERS."CORACS" = JORP."CORACS"
+                       AND NVL(BOKOTHERS."CORACS",' ') = NVL(JORP."CORACS",' ')
                        AND BOKOTHERS."NEWVBN" = JORP."NEWVBN"
                        AND BOKOTHERS."TRXDAT" = JORP."TRXDAT"
                        AND BOKOTHERS."TRXATP" = JORP."TRXATP"

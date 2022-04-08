@@ -32,14 +32,21 @@ public class LM058 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM058.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM058 ");
-		lm058report.setTxBuffer(this.getTxBuffer());
-		lm058report.exec(titaVo);
+		
+		// 帳務日(民國)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdy();
+		// 月底日(民國)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdy();
+		
+//		lm058report.setTxBuffer(this.getTxBuffer());
+		lm058report.exec(titaVo, tbsdy, mfbsdy);
+
+
 	}
 }

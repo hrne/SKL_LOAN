@@ -154,6 +154,7 @@ public class L9705Report extends MakeReport {
 				
 				// 檢查 CustNoticeCom 確認此戶此報表是否能產出
 				// input parameter: CUSTNO
+				// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
 				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, "L9705", titaVo))
 					continue;
 				
@@ -222,7 +223,7 @@ public class L9705Report extends MakeReport {
 					setFont(1, 11);
 
 					int top = 0;// 上下微調用
-					double yy = 20;// 開始Y軸
+					double yy = 21;// 開始Y軸
 					double h = 0.4;// 列高
 					double l = 0;// 列數
 

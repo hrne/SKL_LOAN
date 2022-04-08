@@ -41,38 +41,36 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iEDAY = String.valueOf(Integer.valueOf(titaVo.getParam("EndDate")) + 19110000);
 		String iHFG = titaVo.getParam("CorrectType");
 
-		String sql = "SELECT T.\"F0\"";
-		sql += "            ,T.\"F1\"";
-		sql += "            ,T.\"F2\"";
-		sql += "            ,T.\"F3\"";
-		sql += "            ,T.\"F4\"";
-		sql += "            ,T.\"F5\"";
-		sql += "            ,T.\"F6\"";
-		sql += "            ,T.\"F7\"";
-		sql += "            ,T.\"F8\"";
-		sql += "            ,T.\"F5\" + T.\"F6\" + T.\"F7\" + T.\"F8\" AS F9";
-		sql += "            ,T.\"F10\"";
-		sql += "            ,T.\"CustNo\" F11";
-		sql += "            ,C.\"CustName\" F12";
-		sql += "            ,T.\"FacmNo\" F13";
-		sql += "            ,NVL(NVL(CB.\"BdLocation\", CL.\"LandLocation\"),' ') F14";
-		sql += "            ,T.\"F15\"";
-		sql += "      FROM (SELECT DECODE(T.\"EntryDate\", 0, T.\"AcDate\" ,T.\"EntryDate\") F0";
-		sql += "                  ,T.\"LoanBal\" + T.\"Principal\" F1";
-		sql += "                  ,T.\"IntStartDate\" F2 ";
-		sql += "                  ,T.\"IntEndDate\" F3";
-		sql += "                  ,T.\"Rate\" F4";
-		sql += "                  ,T.\"Interest\" F5";
-		sql += "                  ,T.\"DelayInt\" F6";
-		sql += "                  ,T.\"BreachAmt\" F7";
-		sql += "                  ,T.\"Principal\" F8";
-		sql += "                  ,T.\"DueDate\" F10";
+		String sql = "SELECT T.F0 "; // 入帳日期/會計日期
+		sql += "            ,T.F1 "; // 計息本金
+		sql += "            ,T.F2 "; // 計息起日
+		sql += "            ,T.F3 "; // 計息止日
+		sql += "            ,T.F4 "; // 計息利率
+		sql += "            ,T.F5 "; // 利息
+		sql += "            ,T.F6 "; // 遲延息
+		sql += "            ,T.F7 "; // 違約金
+		sql += "            ,T.F8 "; // 本金
+		sql += "            ,T.F5 + T.F6 + T.F7 + T.F8 AS F9 "; // 本息合計
+		sql += "            ,T.F10"; // 應繳日
+		sql += "            ,T.\"CustNo\"   AS F11"; // 戶號
+		sql += "            ,C.\"CustName\" AS F12"; // 戶名
+		sql += "            ,T.\"FacmNo\"   AS F13"; // 額度
+		sql += "            ,NVL(NVL(CB.\"BdLocation\", CL.\"LandLocation\"),' ') AS F14"; // 地址
+		sql += "      FROM (SELECT DECODE(T.\"EntryDate\", 0, T.\"AcDate\" ,T.\"EntryDate\") AS F0";
+		sql += "                  ,T.\"LoanBal\" + T.\"Principal\" AS F1";
+		sql += "                  ,T.\"IntStartDate\" AS F2 ";
+		sql += "                  ,T.\"IntEndDate\" AS F3";
+		sql += "                  ,T.\"Rate\" AS F4";
+		sql += "                  ,T.\"Interest\" AS F5";
+		sql += "                  ,T.\"DelayInt\" AS F6";
+		sql += "                  ,T.\"BreachAmt\" AS F7";
+		sql += "                  ,T.\"Principal\" AS F8";
+		sql += "                  ,T.\"DueDate\" AS F10";
 		sql += "                  ,T.\"CustNo\"";
 		sql += "                  ,T.\"FacmNo\"";
-		sql += "                  ,1 F15";
 		sql += "            FROM \"LoanBorTx\" T";
 		sql += "            WHERE T.\"CustNo\" = :icustno";
-		sql += "             AND T.\"Principal\" + T.\"Interest\" > 0";
+		sql += "              AND T.\"Principal\" + T.\"Interest\" > 0";
 
 		if (iTYPE.equals("1")) {
 			sql += "          AND DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") >= :isday";
@@ -81,43 +79,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "          AND T.\"AcDate\" >= :isday";
 			sql += "          AND T.\"AcDate\" <= :ieday";
 		}
-
 		if (iHFG.equals("0")) {
 			sql += "          AND T.\"TitaHCode\" = 0";
 		}
-		sql += "            UNION ALL";
-		sql += "            SELECT \"F0\"";
-		sql += "                    ,SUM(F1) F1";
-		sql += "                    ,0 F2";
-		sql += "                    ,0 F3";
-		sql += "                    ,0 F4";
-		sql += "                    ,0 F5";
-		sql += "                    ,0 F6";
-		sql += "                    ,0 F7";
-		sql += "                    ,0 F8";
-		sql += "                    ,0 F10";
-		sql += "                    ,\"CustNo\"";
-		sql += "                    ,\"FacmNo\"";
-		sql += "                    ,2 F15";
-		sql += "            FROM (SELECT F.\"CustNo\"";
-		sql += "                        ,F.\"FacmNo\"";
-		sql += "                        ,NVL(M.\"MaturityDate\", 99999999) F0";
-		sql += "                        ,CASE WHEN M.\"Status\" IN (2, 7) THEN O.\"OvduBal\"";
-		sql += "                              WHEN M.\"Status\"  =  0     THEN M.\"LoanBal\"";
-		sql += "                         ELSE 0 END F1";
-		sql += "                  FROM  \"FacMain\" F";
-		sql += "                  LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
-		sql += "                                             AND M.\"FacmNo\" = F.\"FacmNo\"";
-		sql += "                                             AND M.\"Status\" IN (0, 2, 7)";
-		sql += "                  LEFT JOIN \"LoanOverdue\" O ON O.\"CustNo\" = M.\"CustNo\"";
-		sql += "                                             AND O.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "                                             AND O.\"BormNo\" = M.\"BormNo\"";
-		sql += "                                             AND O.\"OvduNo\" = M.\"LastOvduNo\"";
-		sql += "                  WHERE F.\"CustNo\" = :icustno";
-		sql += "                 )";
-		sql += "            GROUP BY \"CustNo\"";
-		sql += "                    ,\"FacmNo\"";
-		sql += "                   , \"F0\"";
 		sql += "           ) T";
 		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = T.\"CustNo\"";
 		sql += "      LEFT JOIN \"ClFac\" F ON F.\"CustNo\" = T.\"CustNo\"";
@@ -131,7 +95,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
 		sql += "                             AND F.\"ClCode1\" = 2 ";
-		sql += "      ORDER BY T.\"FacmNo\",T.\"F15\" , T.\"F0\"";
+		sql += "      ORDER BY T.\"FacmNo\", T.F0";
 
 		this.info("sql=" + sql);
 		Query query;
