@@ -107,7 +107,7 @@ public class L2702 extends TradeBuffer {
 			if (titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0703", "");
 			}
-			
+
 			/* 存入DB */
 			try {
 				sCustRmkService.insert(tCustRmk);
@@ -135,10 +135,11 @@ public class L2702 extends TradeBuffer {
 			tCustRmk.setCustUKey(tCustMain.getCustUKey());
 			tCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
 			tCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
-			tCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
+			tCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));	
 
 			// 非建檔者修改須刷主管卡
-			if (tCustRmk.getCreateEmpNo() != tCustRmk.getLastUpdateEmpNo() && titaVo.getEmpNos().trim().isEmpty()) {
+			if (tCustRmk.getCreateEmpNo().equals(tCustRmk.getLastUpdateEmpNo())
+					&& titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "非建檔者修改");
 			}
 

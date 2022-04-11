@@ -146,10 +146,10 @@ public class L420ABatch extends TradeBuffer {
 						} else {
 							l1BatxDetail.add(t);
 						}
-					}
-				} else {
-					if (!"4".equals(t.getProcStsCode())) {
-						l1BatxDetail.add(t);
+					} else {
+						if (!"4".equals(t.getProcStsCode())) {
+							l1BatxDetail.add(t);
+						}
 					}
 				}
 			}

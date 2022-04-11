@@ -223,6 +223,9 @@ BEGIN
                 ,S0."TRXTRN"
                 ,SUM(CASE
                        WHEN S1."TRXTRN" IN ('3037','3083') THEN 0 - S1."TRXAMT" -- 2021-03-24 修改: 暫收款退還、轉出時,暫收金額改為負
+                       WHEN S1."TRXTRN" IN '3025'
+                            AND S1."TRXTCT" = '2'
+                       THEN 0 - S1."TRXAMT" -- 2022-04-11 修改: 轉催金額
                      ELSE S1."TRXAMT" END )     AS "TRXAMT" -- 計算交易總金額
                 ,SUM(CASE
                        WHEN S1."TRXTRN" = '3031' THEN S1."TRXAMT" -- 3031:回收登錄
