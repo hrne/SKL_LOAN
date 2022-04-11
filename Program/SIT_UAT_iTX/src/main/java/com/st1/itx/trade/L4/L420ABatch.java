@@ -133,24 +133,23 @@ public class L420ABatch extends TradeBuffer {
 			// 檢核正常，不需再檢核，單筆檢核放l1、匯款轉帳期款同戶號多筆檢核放l2
 			for (BatxDetail t : lBatxDetail) {
 				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
-					// 匯款轉帳期款多筆，看整個多筆狀態
+					TempVo tTempVo = new TempVo();
+					tTempVo = tTempVo.getVo(t.getProcNote());
+					// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次
 					if (t.getRepayCode() == 1 && t.getRepayType() >= 1 && t.getRepayType() <= 3) {
 						mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
-						if (mergeCnt.get(mapKey) >= 2) {
-							if ("4".equals(mergeProcStsCode.get(mapKey))) {
-								continue;
-							} else {
+						if (!"4".equals(mergeProcStsCode.get(mapKey)) || (tTempVo.get("MergeCnt") != null
+								&& parse.stringToInteger(tTempVo.get("MergeCnt")) != mergeCnt.get(mapKey))) {
+							if (mergeCnt.get(mapKey) >= 2) {
 								l2BatxDetail.add(t);
 							}
 						} else {
 							l1BatxDetail.add(t);
 						}
-					} else {
-						if ("4".equals(t.getProcStsCode())) {
-							continue;
-						} else {
-							l1BatxDetail.add(t);
-						}
+					}
+				} else {
+					if (!"4".equals(t.getProcStsCode())) {
+						l1BatxDetail.add(t);
 					}
 				}
 			}

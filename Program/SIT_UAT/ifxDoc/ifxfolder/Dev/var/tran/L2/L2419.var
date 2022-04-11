@@ -47,7 +47,7 @@ K(MODIFYBUTTON,上傳及檢查)
 [#<->#,"#FdCustId+統@@@@編",#CustId],
 [#<->#,"#FdCustName+戶@@@@名",#CustName],
 [#<->#,"#FdEvaCompany+鑑價公司",#EvaCompany,#EvaCompanyBtn,#EvaCompanyX],
-[#<->#,"#FdEvaDate+鑑價日期",#EvaDate,#SysDate],
+[#<->#,"#FdEvaDate+鑑價日期",#EvaDate],
 [#<->#,"@@","@@"],
 [#<->#,"#FdFileBtn+擔保品明細表","#FileBtn"],
 [#<->#,"@@","@@"],
@@ -72,7 +72,7 @@ T(2,L24190000000000000+#L2419Mrkey+#L2419Note)
 T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufL2419})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,範本查詢)
 
-#SysDate=D,7,L
+#SysDate=D,7,S
 E(0,#SYSCDATE)
 
 #FdFileBtn=X,2,L
@@ -232,7 +232,7 @@ T(3,1)ASGN(LOOP$)
 #Idx=A,5,L
 
 !No
-#No=x,3,L
+#No=x,4,L
 
 !擔保品編號
 #ClCode1=A,1,L
@@ -519,6 +519,9 @@ ifxBatch:{
 
 #Owner=所有權人
 {width:150,align:'left'}
+
+#InsuNo=保險單號碼
+{width:100,align:'left'}
 
 #InsuCompanyX=保險公司
 {width:120,align:'left'}

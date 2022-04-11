@@ -157,13 +157,16 @@ T(3,1)ASGN(LOOP$)
 #OOTlrNo=X,6,L
 #OOTlrItem=X,20,L
 
+!交易理由
+#OOTradeReason=x,200,S
+
 ! 授權理由代碼(TOTA)
-#OOReasonCode=X,10,S
-#OOReasonCodeX=X,4,L
-T(1,#OOReasonCode,1,4)
+!#OOReasonCode=X,10,S
+!#OOReasonCodeX=X,4,L
+!T(1,#OOReasonCode,1,4)
 
 ! 授權理由(TOTA)
-#OOReason=x,200,L
+#OOReasonAuth=x,200,L
 
 ! 交易代號(TOTA)
 #OOTxcd=X,10,S
@@ -202,8 +205,8 @@ TXFORM=L6044
 #OOEntdy
 #OOSupNo
 #OOTlrNo
-#OOReasonCode
-#OOReason
+#OOTradeReason
+#OOReasonAuth
 #OOTxcd
 #OOTxSeq
 #OOTranItem
@@ -237,10 +240,10 @@ TXFORM=L6044
 #OOTlrItem=交易經辦
 {width:80,align:'center'}
 
-#OOReasonCodeX=理由代碼
+#OOTradeReason=交易理由
 {width:70,align:'center'}
 
-#OOReason=授權理由
+#OOReasonAuth=授權編號與理由
 {width:300,align:'left'}
 
 #OOTranItemX=交易代號

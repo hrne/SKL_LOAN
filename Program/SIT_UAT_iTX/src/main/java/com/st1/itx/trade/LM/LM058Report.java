@@ -62,11 +62,11 @@ public class LM058Report extends MakeReport {
 
 		// 11103
 		thisYM = (iYear + 1911) * 100 + iMonth;
-		//1110331
+		// 1110331
 		String dateRocYMD = String.valueOf(thisMonthEndDate);
-		this.info("thisYM="+thisYM);
-		this.info("dateRocYMD="+dateRocYMD);
-		
+		this.info("thisYM=" + thisYM);
+		this.info("dateRocYMD=" + dateRocYMD);
+
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表",
 				"LM058_表A19_會計部申報表_" + dateRocYMD.substring(0, 5), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
 		makeExcel.setSheet("108.04", dateRocYMD.substring(0, 3) + "." + dateRocYMD.substring(3, 5));
@@ -133,21 +133,18 @@ public class LM058Report extends MakeReport {
 						makeExcel.setValue(row, i + 1, Integer.valueOf(tLDVo.get(fdnm)), "C");
 						break;
 
-					case 7:
-					case 8:
-					case 9:
-						// 金額(百萬單位)
+					case 7:// 當月最高餘額累計(百萬單位)
+						makeExcel.setValue(row, i + 1, cpRate(tLDVo.get(fdnm)), "#,##0", "R");
+						maxTotal += cpRate(tLDVo.get(fdnm));
+						break;
+					case 8:// 帳列餘額(百萬單位)
+						makeExcel.setValue(row, i + 1, cpRate(tLDVo.get(fdnm)), "#,##0", "R");
+						// 當月(最新)餘額累計
+						total += cpRate(tLDVo.get(fdnm));
+						break;
+					case 9:// 較上月增減(百萬單位)
 						makeExcel.setValue(row, i + 1, cpRate(tLDVo.get(fdnm)), "#,##0", "R");
 
-						// 當月最高餘額累計
-						if (i == 7) {
-							maxTotal += cpRate(tLDVo.get(fdnm));
-						}
-
-						// 當月(最新)餘額累計
-						if (i == 8) {
-							total += cpRate(tLDVo.get(fdnm));
-						}
 						break;
 					case 10:
 						// 金額

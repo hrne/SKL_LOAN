@@ -84,7 +84,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";
 		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";
 		sql += "         , SUM(\"TempAmt\")         AS \"TempAmt\"";
-		sql += "         , SUM(\"Shortfall\")       AS \"Shortfall\"";
+		sql += "         , SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\"+\"UnpaidCloseBreach\")       AS \"Shortfall\"";
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.AcctFee'),0))";
 		sql += "                                  AS \"AcctFee\"";
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.ModifyFee'),0))";
@@ -183,7 +183,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         WHEN TX2.\"TempAmt\" > 0";
 		sql += "         THEN TX2.\"TempAmt\"";
 		sql += "       ELSE 0 END AS \"TempCr\" ";
-		sql += "     , TX2.\"Shortfall\" ";
+		sql += "     , TX2.\"UnpaidInterest\"+TX2.\"UnpaidPrincipal\"+TX2.\"UnpaidCloseBreach\"";
 //		sql += "     , TX2.\"AcctFee\"";
 //		sql += "       + TX2.\"ModifyFee\"";
 //		sql += "       + TX2.\"FireFee\"";

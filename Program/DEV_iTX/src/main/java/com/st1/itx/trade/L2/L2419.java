@@ -52,7 +52,6 @@ import com.st1.itx.db.service.CdLandSectionService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
-import com.st1.itx.db.service.ClImmRankDetailService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandService;
@@ -98,7 +97,7 @@ public class L2419 extends TradeBuffer {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	public WebClient webClient;
 
@@ -108,8 +107,6 @@ public class L2419 extends TradeBuffer {
 
 	@Autowired
 	public ClImmService sClImmService;
-	@Autowired
-	public ClImmRankDetailService sClImmRankDetailService;
 	@Autowired
 	public ClMainService sClMainService;
 	@Autowired
@@ -242,6 +239,21 @@ public class L2419 extends TradeBuffer {
 			int clNo = (int) toNumeric(makeExcel.getValue(row, 4).toString());
 			occursList.putParam("ClNo", clNo);
 
+			if (clNo > 0) {
+				ClMainId clMainId = new ClMainId();
+
+				clMainId.setClCode1(clCode1);
+				clMainId.setClCode2(parse.stringToInteger(clCode2));
+				clMainId.setClNo(clNo);
+
+				ClMain clMain = sClMainService.findById(clMainId, titaVo);
+				if (clMain == null) {
+					String clNoX = String.format("%01d-%02d-%07d", clCode1, parse.stringToInteger(clCode2), clNo);
+					throw new LogicException("E0001", "欄位:D" + row + ",擔保品主檔(ClMain)=" + clNoX);
+				}
+
+			}
+
 			// 擔保品編號
 			occursList.putParam("ClCode", String.format("%01d-%s-%07d", clCode1, clCode2, clNo));
 
@@ -276,7 +288,7 @@ public class L2419 extends TradeBuffer {
 				// 地號
 				int ldno1 = (int) toNumeric(makeExcel.getValue(row, 8).toString());
 				if (ldno1 == 0) {
-					throw new LogicException("E0015", "欄位:H" + row + ",土號 = " + makeExcel.getValue(row, 8).toString());
+					throw new LogicException("E0015", "欄位:H" + row + ",地號 = " + makeExcel.getValue(row, 8).toString());
 				}
 				occursList.putParam("LdNo1", toString(makeExcel.getValue(row, 8).toString(), 4));
 				occursList.putParam("LdNo2", toString(makeExcel.getValue(row, 9).toString(), 4));
@@ -342,34 +354,69 @@ public class L2419 extends TradeBuffer {
 			}
 			occursList.putParam("IrCodeX", CdLandSection.getIrItem());
 
-			// 門牌
-			occursList.putParam("Road", makeExcel.getValue(row, 12).toString());
-			// 用途
-			String useCode = toString(makeExcel.getValue(row, 13).toString(), 2);
-			checkCode(titaVo, "BdMainUseCode", useCode, "M" + row, "用途", makeExcel.getValue(row, 11).toString());
-			occursList.putParam("UseCode", useCode);
-			// 建物類別
-			String buTypeCode = toString(makeExcel.getValue(row, 14).toString(), 2);
-			checkCode(titaVo, "BdTypeCode", buTypeCode, "N" + row, "建物類別", makeExcel.getValue(row, 12).toString());
-			occursList.putParam("BuTypeCode", buTypeCode);
-			// 建材
-			String mtrlCode = toString(makeExcel.getValue(row, 15).toString(), 2);
-			checkCode(titaVo, "BdMtrlCode", mtrlCode, "O" + row, "建材", makeExcel.getValue(row, 13).toString());
-			occursList.putParam("MtrlCode", mtrlCode);
-			// 樓層
-			occursList.putParam("FloorNo", makeExcel.getValue(row, 16).toString());
-			// 總樓層
-			occursList.putParam("TotalFloor", toNumeric(makeExcel.getValue(row, 17).toString()));
-			// 建築完成日期
-			String BdDate = makeExcel.getValue(row, 18).toString();
-			if (BdDate.length() != 9) {
-				throw new LogicException("E0015", "欄位:R" + row + ",建築完成日期(YYY/MM/DD) = " + BdDate);
+			if (clCode1 == 1) {
+				// 門牌
+				String road = makeExcel.getValue(row, 12).toString().trim();
+				occursList.putParam("Road", road);
+
+				if (road.isEmpty()) {
+					throw new LogicException("E0015", "欄位:L" + row + ",門牌不可空白");
+				}
+				// 用途
+				String useCode = toString(makeExcel.getValue(row, 13).toString(), 2);
+				checkCode(titaVo, "BdMainUseCode", useCode, "M" + row, "用途", makeExcel.getValue(row, 11).toString());
+				occursList.putParam("UseCode", useCode);
+				// 建物類別
+				String buTypeCode = toString(makeExcel.getValue(row, 14).toString(), 2);
+				checkCode(titaVo, "BdTypeCode", buTypeCode, "N" + row, "建物類別", makeExcel.getValue(row, 12).toString());
+				occursList.putParam("BuTypeCode", buTypeCode);
+				// 建材
+				String mtrlCode = toString(makeExcel.getValue(row, 15).toString(), 2);
+				checkCode(titaVo, "BdMtrlCode", mtrlCode, "O" + row, "建材", makeExcel.getValue(row, 13).toString());
+				occursList.putParam("MtrlCode", mtrlCode);
+				// 樓層
+				String floorNo = makeExcel.getValue(row, 16).toString().trim();
+				occursList.putParam("FloorNo", floorNo);
+				if (floorNo.isEmpty()) {
+					throw new LogicException("E0015", "欄位:P" + row + ",樓層不可空白");
+				}
+				// 總樓層
+				int totalFloor = (int) toNumeric(makeExcel.getValue(row, 17).toString());
+				occursList.putParam("TotalFloor", totalFloor);
+				if (totalFloor == 0) {
+					throw new LogicException("E0015", "欄位:Q" + row + ",總樓層=" + makeExcel.getValue(row, 17).toString());
+				}
+				// 建築完成日期
+				String BdDate = makeExcel.getValue(row, 18).toString();
+				if (BdDate.length() != 9) {
+					throw new LogicException("E0015", "欄位:R" + row + ",建築完成日期(YYY/MM/DD) = " + BdDate);
+				}
+				if (!checkDate(BdDate)) {
+					throw new LogicException("E0015", "欄位:R" + row + ",建築完成日期(YYY/MM/DD) = " + BdDate);
+				}
+				if (!compareDate(BdDate, titaVo.getParam("CALDY"))) {
+					throw new LogicException("E0015", "欄位:R" + row + ",建築完成日期(YYY/MM/DD) = " + BdDate + " ,不可大於日曆日");
+				}
+				occursList.putParam("BdDate", BdDate);
+			} else {
+				occursList.putParam("Road", "");
+				occursList.putParam("UseCode", "");
+				occursList.putParam("BuTypeCode", "");
+				occursList.putParam("MtrlCode", "");
+				occursList.putParam("FloorNo", "");
+				occursList.putParam("TotalFloor", "");
+				occursList.putParam("BdDate", "");
 			}
-			occursList.putParam("BdDate", BdDate);
 			// 設定日期
 			String SettingDate = makeExcel.getValue(row, 19).toString();
 			if (SettingDate.length() != 9) {
 				throw new LogicException("E0015", "欄位:S" + row + ",設定日期(YYY/MM/DD) = " + SettingDate);
+			}
+			if (!checkDate(SettingDate)) {
+				throw new LogicException("E0015", "欄位:S" + row + ",設定日期(YYY/MM/DD) = " + SettingDate);
+			}
+			if (!compareDate(SettingDate, titaVo.getParam("CALDY"))) {
+				throw new LogicException("E0015", "欄位:S" + row + ",設定日期(YYY/MM/DD) = " + SettingDate + " ,不可大於日曆日");
 			}
 			occursList.putParam("SettingDate", SettingDate);
 
@@ -378,21 +425,39 @@ public class L2419 extends TradeBuffer {
 //					+ Math.round(toNumeric(makeExcel.getValue(row, 15).toString()) * 100) + "/"
 //					+ (float) (Math.round(toNumeric(makeExcel.getValue(row, 15).toString()) * 100) / 100));
 			// 面積
-			double c = Math.round(toNumeric(makeExcel.getValue(row, 20).toString()) * 100);
-			occursList.putParam("FloorArea", c / 100);
-			// 單價
-			occursList.putParam("UnitPrice", Math.round(toNumeric(makeExcel.getValue(row, 21).toString())));
+			double floorArea = Math.round(toNumeric(makeExcel.getValue(row, 20).toString()) * 100);
+			if (floorArea == 0) {
+				throw new LogicException("E0015", "欄位:T" + row + ",面積 = " + makeExcel.getValue(row, 20).toString());
+			}
+			occursList.putParam("FloorArea", floorArea / 100);
+			// 鑑估單價
+			double unitPrice = Math.round(toNumeric(makeExcel.getValue(row, 21).toString()));
+			if (unitPrice == 0) {
+				throw new LogicException("E0015", "欄位:U" + row + ",鑑估單價 = " + makeExcel.getValue(row, 21).toString());
+			}
+			occursList.putParam("UnitPrice", unitPrice);
 			// 鑑估總價
-			occursList.putParam("EvaAmt", Math.round(toNumeric(makeExcel.getValue(row, 22).toString())));
+			double evaAmt = Math.round(toNumeric(makeExcel.getValue(row, 22).toString()));
+			if (evaAmt == 0) {
+				throw new LogicException("E0015", "欄位:V" + row + ",鑑估總價 = " + makeExcel.getValue(row, 22).toString());
+			}
+			occursList.putParam("EvaAmt", evaAmt);
 			// 增值稅
 			occursList.putParam("Tax", Math.round(toNumeric(makeExcel.getValue(row, 23).toString())));
 			// 淨值
 			occursList.putParam("NetWorth", Math.round(toNumeric(makeExcel.getValue(row, 24).toString())));
 			// 貸放成數
-			c = Math.round(toNumeric(makeExcel.getValue(row, 27).toString()) * 10000);
+			double c = Math.round(toNumeric(makeExcel.getValue(row, 27).toString()) * 10000);
+			if (c == 0) {
+				throw new LogicException("E0015", "欄位:AA" + row + ",貸放成數 = " + makeExcel.getValue(row, 27).toString());
+			}
 			occursList.putParam("LoanToValue", c / 100);
 			// 設定金額
-			occursList.putParam("SettingAmt", toNumeric(makeExcel.getValue(row, 30).toString()) * 1000);
+			double seetingAmt = toNumeric(makeExcel.getValue(row, 30).toString()) * 1000;
+			if (seetingAmt == 0) {
+				throw new LogicException("E0015", "欄位:AD" + row + ",設定金額 = " + makeExcel.getValue(row, 30).toString());
+			}
+			occursList.putParam("SettingAmt", seetingAmt);
 
 			// 所有權人
 			String ownerString = makeExcel.getValue(row, 32).toString().trim();
@@ -535,6 +600,9 @@ public class L2419 extends TradeBuffer {
 				}
 				if (!checkDate(InsuEndDate)) {
 					throw new LogicException("E0015", "欄位:AO" + row + ",保險迄日(YYY/MM/DD) = " + InsuEndDate);
+				}
+				if (!compareDate(InsuStartDate, InsuEndDate)) {
+					throw new LogicException("E0015", "欄位:AO" + row + ",保險起日>保險迄日");
 				}
 				occursList.putParam("InsuEndDate", InsuEndDate);
 			}
@@ -984,7 +1052,7 @@ public class L2419 extends TradeBuffer {
 
 		if (titaVo.getSelectTotal() == titaVo.getSelectIndex()) {
 			long fileno = toTxFile(titaVo, fileName);
-			
+
 			String msg = "不動產擔保品資料整批匯入，" + titaVo.getSelectTotal() + "數資料已處理完畢，請至【報表及製檔】下傳回饋檔";
 
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
@@ -1148,6 +1216,20 @@ public class L2419 extends TradeBuffer {
 
 		return r;
 
+	}
+
+	private boolean compareDate(String dtA, String dtB) throws LogicException {
+		boolean r = true;
+
+		String dtA2 = dtA.replace("/", "");
+		String dtB2 = dtB.replace("/", "");
+
+		int dt1 = parse.stringToInteger(dtA2);
+		int dt2 = parse.stringToInteger(dtB2);
+		if (dt1 > dt2) {
+			r = false;
+		}
+		return r;
 	}
 
 	private boolean checkDate(String dt) throws LogicException {

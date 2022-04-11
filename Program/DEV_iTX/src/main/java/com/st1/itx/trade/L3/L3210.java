@@ -188,12 +188,10 @@ public class L3210 extends TradeBuffer {
 			}
 		}
 
-		// 費用抵繳是否抵繳(整批入帳且非除合併戶號存入暫收)
+		// 費用抵繳是否抵繳(整批入帳)
 		this.isRepaidFee = false;
 		if (titaVo.isTrmtypBatch()) {
-			if (titaVo.get("MergeCnt") == null) {
-				this.isRepaidFee = true;
-			}
+			this.isRepaidFee = true;
 		}
 		// 帳務處理
 		AcDetailRoutine();
@@ -419,7 +417,7 @@ public class L3210 extends TradeBuffer {
 			// 4.本期溢(+)短(-)繳
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 4) {
-					// 貸: TAV  (交易金額)
+					// 貸: TAV (交易金額)
 					acDetail = new AcDetail();
 					acDetail.setDbCr("C");
 					acDetail.setAcctCode(ba.getAcctCode());

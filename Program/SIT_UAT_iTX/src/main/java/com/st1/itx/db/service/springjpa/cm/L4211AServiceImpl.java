@@ -77,7 +77,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , SUM(\"BreachAmt\")       AS \"BreachAmt\"";
 		sql += "        , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";
 		sql += "        , SUM(\"TempAmt\")         AS \"TempAmt\"";
-		sql += "        , SUM(\"Shortfall\")       AS \"Shortfall\"";
+		sql += "        , SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\"+\"UnpaidCloseBreach\")       AS \"Shortfall\"";
 		sql += "        , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.AcctFee'),0))  AS \"AcctFee\"";
 		sql += "      , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.ModifyFee'),0)) AS \"ModifyFee\"";
 		sql += "        , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.FireFee'),0)) AS \"FireFee\"";
@@ -131,7 +131,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        WHEN TX2.\"TempAmt\" > 0";
 		sql += "        THEN TX2.\"TempAmt\"";
 		sql += "      ELSE 0 END AS \"TempCr\" ";// 暫收貸(F) LoanBorTx.TempAmt值為正時放這欄
-		sql += "    , TX2.\"Shortfall\""; // 短繳(G)
+		sql += "    , TX2.\"UnpaidInterest\"+TX2.\"UnpaidPrincipal\"+TX2.\"UnpaidCloseBreach\""; // 短繳(G)\
 		sql += "    , TX2.\"AcctFee\"";
 		sql += "      + TX2.\"ModifyFee\"";
 		sql += "      + TX2.\"FireFee\"";

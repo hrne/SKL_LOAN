@@ -101,6 +101,49 @@ public class LoanDueAmtCom extends CommBuffer {
 
 				// 每期攤還金額 = 償還本金×每月應付本息之平均攤還率＋ 最後一期本金餘額的每月利息
 				oDueAmt = wkPrinciple.multiply(wkRateC).add(wkFinalInterest).setScale(0, RoundingMode.HALF_UP);
+
+//				// 2022-04-08 智偉新增 照AS400計算
+//				// LA850 69行 CHANGE FIELD(#WK1PR) TO('1 + (#IRTRAT * #LMSISC / 1200)')
+//				// 註:#WK1PR DECIMAL(11,9)
+//				BigDecimal wk1pr = new BigDecimal("1").add(
+//						iRate.multiply(new BigDecimal(iPayIntFreq).divide(wkFreqBaseConstant, 9, RoundingMode.DOWN))
+//								.setScale(9, RoundingMode.DOWN))
+//						.setScale(9, RoundingMode.DOWN);
+//				;
+//
+//				// LA850 70行 CHANGE FIELD(#WKPXR) TO('#LMSLBL * #IRTRAT * #LMSISC / 1200)')
+//				// 註:#WKPXR DECIMAL(11,9)
+//				BigDecimal wkpxr = wkPrinciple.multiply(iRate).multiply(new BigDecimal(iPayIntFreq))
+//						.divide(wkFreqBaseConstant, 9, RoundingMode.DOWN);
+//
+//				// LA850 71行 CHANGE FIELD(#LMSTPRWK #WK1RN) TO(1)
+//				BigDecimal lmstprwk = new BigDecimal("1");
+//				BigDecimal wk1rn = new BigDecimal("1");
+//
+//				// LA850 72行 DOWHILE COND('#LMSTPRWK *LE #LMSTPRWK2')
+//				// LA850 73行 CHANGE FIELD(#WK1RN) TO('#WK1RN * #WK1PR')
+//				// LA850 74行 CHANGE FIELD(#LMSTPRWK) TO('#LMSTPRWK + 1')
+//				// LA850 75行 ENDWHILE
+//				BigDecimal lmstprwk2 = new BigDecimal(wkTerm);
+//				this.info("lmstprwk = " + lmstprwk);
+//				this.info("lmstprwk2 = " + lmstprwk2);
+//				this.info("wk1rn = " + wk1rn);
+//				this.info("wk1pr = " + wk1pr);
+//				while (lmstprwk.compareTo(lmstprwk2) <= 0) {
+//					wk1rn = wk1rn.multiply(wk1pr).setScale(9, RoundingMode.DOWN);
+//					lmstprwk = lmstprwk.add(new BigDecimal("1"));
+//				}
+//
+//				// LA850 77行 CHANGE FIELD(#LMSPPA) TO('(#WKPXR * #WK1RN) / (#WK1RN - 1)')
+//				// ROUND_UP(*YES)
+//				BigDecimal lmsppa = wkpxr.multiply(wk1rn)
+//						.divide(wk1rn.subtract(new BigDecimal("1")), 9, RoundingMode.DOWN)
+//						.setScale(0, RoundingMode.HALF_UP);
+//				this.info("lmsppa四捨五入前 = "
+//						+ wkpxr.multiply(wk1rn).divide(wk1rn.subtract(new BigDecimal("1")), 9, RoundingMode.DOWN));
+//				this.info("oDueAmt = " + oDueAmt);
+//				this.info("lmsppa = " + lmsppa);
+//				oDueAmt = lmsppa;
 			}
 			this.info(
 					"   wkRate= " + wkRate + ", wkRateA=" + wkRateA + ", wkRateB=" + wkRateB + ", wkRateC=" + wkRateC);

@@ -58,17 +58,24 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 以當前月份取得月底日期 並格式化處理
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-		/*
-		 * String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" }; // 星期 X (排除六日用) 代號
-		 * 0~6對應 日到六 int day = calendar.get(Calendar.DAY_OF_WEEK); this.info("day = " +
-		 * dayItem[day - 1]); int diff = 0; if (day == 1) { diff = -2; } else if (day ==
-		 * 6) { diff = 1; } this.info("diff=" + diff); calendar.add(Calendar.DATE,
-		 * diff);
-		 * 
-		 * // 矯正月底日 thisMonthEndDate =
-		 * Integer.valueOf(dateFormat.format(calendar.getTime()));
-		 */
+//		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
+/*
+		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
+		// 星期 X (排除六日用) 代號 0~6對應 日到六
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		this.info("day = " + dayItem[day - 1]);
+		int diff = 0;
+		if (day == 1) {
+			diff = -2;
+		} else if (day == 6) {
+			diff = 1;
+		}
+		this.info("diff=" + diff);
+		calendar.add(Calendar.DATE, diff);
+	
+		// 矯正月底日
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+			*/
 //		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
 		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
@@ -80,7 +87,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
+		
 		// 月底日
 		int iDay = thisMonthEndDate % 100;
 
@@ -89,6 +96,8 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int lastYearDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
+	
+
 		String iOneYearAgo = String.valueOf(lastYearDate);
 
 		this.info("iOneYearAgo:" + iOneYearAgo + ",iYYMM:" + iYearMonth);
@@ -96,7 +105,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		sql += "      SELECT M.\"CustNo\"";
 		sql += "            ,M.\"FacmNo\"";
-		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
 		sql += "            ,F.\"LineAmt\"";
 		sql += "            ,M.\"UnpaidPrincipal\"";
 		sql += "             + M.\"UnpaidInterest\" AS \"OvduPay\"";
@@ -160,130 +169,12 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ORDER BY M.\"CustNo\"";
 		sql += "             ,M.\"FacmNo\"";
 
-		// String sql = "SELECT F.\"CustNo\" AS F0"; // 戶號
-		// sql += " ,F.\"FacmNo\" AS F1"; // 額度
-		// sql += " ,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS F2"; // 戶名
-		// sql += " ,F.\"LineAmt\" AS F3"; // 核貸金額
-		// sql += " ,NVL(LO.\"OvduAmt\",0) AS F4"; // 轉催收本息
-		// sql += " ,M.\"OvduBal\" AS F5"; // 催收款餘額
-		// sql += " ,M.\"PrevIntDate\" AS F6"; // 繳息迄日
-		// sql += " ,M.\"StoreRate\" AS F7"; // 利率
-		// sql += " ,F.\"MaturityDate\" AS F8"; // 到期日
-		// sql += " ,CASE";
-		// sql += " WHEN NVL(LO.\"OvduDate\",99991231) < 99991231 THEN LO.\"OvduDate\"";
-		// sql += " ELSE 0 END AS F9"; // 轉催收日
-		// sql += " ,F.\"Amount1\" AS F10"; // 鑑價(拍底)金額
-		// sql += " ,'LTV' AS F11"; // LTV
-		// sql += " ,NVL(F.\"Memo\",'')";
-		// sql += " || NVL(D.\"Item\",'') AS F12"; // 執行程序
-		// sql += " ,F.\"Amount2\" AS F13"; // 拍定不足金額
-		// sql += " ,M.\"BadDebtBal\" AS F14"; // 轉呆金額
-		// sql += " ,DECODE(M.\"RenewCode\",'2','V',' ')";
-		// sql += " AS F15"; // 協議分期
-		// sql += " ,F.\"Amount3\" AS F16"; // 協議金額
-		// sql += " ,NVL(B.\"BdLocation\",L.\"LandLocation\")";
-		// sql += " AS F17"; // 擔保品座落
-		// sql += " ,'F18' AS F18"; // 符合規範
-		// sql += " ,E.\"Fullname\" AS F19"; // 催收人員
-		// sql += " ,'F20' AS F20"; // 備註
-		// sql += " FROM(SELECT F.\"CustNo\"";
-		// sql += " ,F.\"FacmNo\"";
-		// sql += " ,F.\"LineAmt\"";
-		// sql += " ,F.\"MaturityDate\"";
-		// sql += " ,SUM(CASE";
-		// sql += " WHEN F.\"LegalProg\" = '048' AND F.\"SEQ\" = 1 THEN F.\"Amount\"";
-		// sql += " ELSE 0 END) \"Amount1\"";
-		// sql += " ,MAX(CASE";
-		// sql += " WHEN F.\"SEQ2\" = 1 THEN F.\"LegalProg\"";
-		// sql += " ELSE NULL END) \"LegalProg\"";
-		// sql += " ,MAX(CASE";
-		// sql += " WHEN F.\"SEQ2\" = 1 THEN F.\"Memo\"";
-		// sql += " ELSE NULL END) \"Memo\"";
-		// sql += " ,SUM(CASE";
-		// sql += " WHEN F.\"LegalProg\" = '901' AND F.\"SEQ\" = 1 THEN F.\"Amount\"";
-		// sql += " ELSE 0 END) \"Amount2\"";
-		// sql += " ,SUM(CASE";
-		// sql += " WHEN F.\"LegalProg\" = '077' AND F.\"SEQ\" = 1 THEN F.\"Amount\"";
-		// sql += " ELSE 0 END) \"Amount3\"";
-		// sql += " FROM(SELECT F.\"CustNo\"";
-		// sql += " ,F.\"FacmNo\"";
-		// sql += " ,F.\"LineAmt\"";
-		// sql += " ,F.\"MaturityDate\"";
-		// sql += " ,L.\"LegalProg\"";
-		// sql += " ,L.\"Amount\"";
-		// sql += " ,L.\"Memo\"";
-		// sql += " ,ROW_NUMBER() OVER (PARTITION BY F.\"CustNo\", F.\"FacmNo\",
-		// L.\"LegalProg\" ORDER BY L.\"RecordDate\" DESC) AS SEQ";
-		// sql += " ,ROW_NUMBER() OVER (PARTITION BY F.\"CustNo\", F.\"FacmNo\" ORDER BY
-		// L.\"RecordDate\" DESC) AS SEQ2";
-		// sql += " FROM(SELECT L.\"CustNo\"";
-		// sql += " ,L.\"FacmNo\"";
-		// sql += " ,F.\"LineAmt\"";
-		// sql += " ,F.\"MaturityDate\"";
-		// sql += " FROM \"CollList\" L";
-		// sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\"";
-		// sql += " AND F.\"FacmNo\" = L.\"FacmNo\"";
-		// sql += " WHERE L.\"FacmNo\" > 0";
-		// sql += " AND L.\"OvduDays\" > 0";
-		// sql += " AND L.\"PrevIntDate\" > 0";
-		// sql += " AND F.\"MaturityDate\" > 0";
-		// sql += " AND CASE";
-		// // 條件1:逾期兩年以上
-		// sql += " WHEN L.\"PrevIntDate\" <= :iTwoYearsAgo";
-		// sql += " THEN 1";
-		// // 條件2:逾期一年以上,即將屆清償期兩年
-		// sql += " WHEN L.\"PrevIntDate\" <= :iOneYearAgo";
-		// sql += " AND
-		// MONTHS_BETWEEN(TO_DATE(F.\"MaturityDate\",'YYYYMMDD'),TO_DATE(L.\"PrevIntDate\",'YYYYMMDD'))
-		// >= 12";
-		// sql += " THEN 2";
-		// sql += " ELSE 0 END > 0";
-		// sql += " ) F";
-		// sql += " LEFT JOIN \"CollLaw\" L ON L.\"CaseCode\" = '1'";
-		// sql += " AND L.\"CustNo\" = F.\"CustNo\"";
-		// sql += " AND L.\"FacmNo\" = F.\"FacmNo\"";
-		// sql += " ) F";
-		// sql += " WHERE F.\"SEQ\" = 1";
-		// sql += " GROUP BY
-		// F.\"CustNo\",F.\"FacmNo\",F.\"LineAmt\",F.\"MaturityDate\"";
-		// sql += " ) F";
-		// sql += " LEFT JOIN \"MonthlyFacBal\" M ON M.\"YearMonth\" = :yymm";
-		// sql += " AND M.\"CustNo\" = F.\"CustNo\"";
-		// sql += " AND M.\"FacmNo\" = F.\"FacmNo\"";
-		// sql += " LEFT JOIN (SELECT LBM.\"CustNo\"";
-		// sql += " ,LBM.\"FacmNo\"";
-		// sql += " ,SUM(NVL(LO.\"OvduAmt\",0)) AS \"OvduAmt\""; // 轉催收本息
-		// sql += " ,MIN(NVL(LO.\"OvduDate\",99991231)) AS \"OvduDate\""; // 轉催收本息
-		// sql += " FROM \"LoanBorMain\" LBM";
-		// sql += " LEFT JOIN \"LoanOverdue\" LO ON LO.\"CustNo\" = LBM.\"CustNo\"";
-		// sql += " AND LO.\"FacmNo\" = LBM.\"FacmNo\"";
-		// sql += " AND LO.\"BormNo\" = LBM.\"BormNo\"";
-		// sql += " AND LO.\"OvduNo\" = LBM.\"LastOvduNo\"";
-		// sql += " WHERE LBM.\"Status\" IN (2,7)";
-		// sql += " GROUP BY LBM.\"CustNo\"";
-		// sql += " ,LBM.\"FacmNo\"";
-		// sql += " ) LO ON LO.\"CustNo\" = M.\"CustNo\"";
-		// sql += " AND LO.\"FacmNo\" = M.\"FacmNo\"";
-		// sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\"";
-		// sql += " LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = M.\"AccCollPsn\"";
-		// sql += " LEFT JOIN \"ClBuilding\" B ON B.\"ClCode1\" = M.\"ClCode1\"";
-		// sql += " AND B.\"ClCode2\" = M.\"ClCode2\"";
-		// sql += " AND B.\"ClNo\" = M.\"ClNo\"";
-		// sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = M.\"ClCode1\"";
-		// sql += " AND L.\"ClCode2\" = M.\"ClCode2\"";
-		// sql += " AND L.\"ClNo\" = M.\"ClNo\"";
-		// sql += " LEFT JOIN \"CdCode\" D ON D.\"DefCode\" = 'LegalProg'";
-		// sql += " AND D.\"DefType\" = 2";
-		// sql += " AND D.\"Code\" = F.\"LegalProg\"";
-		// sql += " ORDER BY F.\"CustNo\", F.\"FacmNo\"";
-
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", iYearMonth);
-		// query.setParameter("iTwoYearsAgo", iTwoYearsAgo);
 		query.setParameter("iOneYearAgo", iOneYearAgo);
 
 		return this.convertToMap(query);

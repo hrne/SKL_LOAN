@@ -697,7 +697,7 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setTitaTxtNo("");
 				tBatxDetail.setMediaDate(0);
 				tBatxDetail.setMediaKind("");
-				tBatxDetail.setMediaSeq(0);
+				tBatxDetail.setMediaSeq(i + 1);
 
 //			D.寫VO入各個對應Table (BankRmtf皆寫入)
 				tBankRmtfId.setAcDate(iAcDate);
@@ -1444,7 +1444,7 @@ public class L4200Batch extends TradeBuffer {
 						tBatxDetail.setTitaTxtNo("");
 						tBatxDetail.setMediaDate(0);
 						tBatxDetail.setMediaKind("");
-						tBatxDetail.setMediaSeq(0);
+						tBatxDetail.setMediaSeq(i + cheqCnt);
 // 						AML 姓名檢核
 						txAmlCom.setTxBuffer(this.getTxBuffer());
 						tempVo = txAmlCom.batxCheque(tempVo, tLoanCheque, iBatchNo, titaVo);
@@ -1491,7 +1491,7 @@ public class L4200Batch extends TradeBuffer {
 					tBatxDetail.setTitaTxtNo("");
 					tBatxDetail.setMediaDate(0);
 					tBatxDetail.setMediaKind("");
-					tBatxDetail.setMediaSeq(0);
+					tBatxDetail.setMediaSeq(i + cheqCnt);
 					totAmt = totAmt.add(tBatxDetail.getRepayAmt());
 					entryDate = tBatxDetail.getEntryDate();
 

@@ -142,7 +142,11 @@ public class L9713Report extends MakeReport {
 
 //			this.info("map f6:" + map.get("f6") + "," + map.get("f6").toString().length());// 金額
 //			this.info("map f7:" + map.get("f7") + "," + map.get("f7").toString().length());// 支票日期
-
+			
+			//沒有入帳單位時，即中止loop
+			if(map.get("f1").toString().isEmpty() || map.get("f1").toString() == null) {
+				break;
+			}
 			cnt += 1;
 
 			if (cnt > 1) {
@@ -177,7 +181,7 @@ public class L9713Report extends MakeReport {
 					// 排除低於當月份的
 //					this.info("total=" + t7);
 					/* 結論：CSV上有當月份以前的都算低於30日以下的帳齡 */
-					// 當月+1的交換日+
+					// 當月+1的交換日
 					if (tday < Integer.valueOf(iday1)) {
 						t1 += tamt;
 

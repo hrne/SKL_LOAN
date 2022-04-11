@@ -8,13 +8,17 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.TxTemp;
+import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
@@ -51,6 +55,15 @@ public class L618D extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
+	@Autowired
+	public TxTempService txTempService;
+	private TxTemp tTxTemp;
+	private TxTempId tTxTempId;
+	private List<TxTemp> lTxTemp;
+	private String iItemCode;
+	private String iTxDtlValue;
+	private int iAcdate;
+	private int iSlipBatNo;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -59,28 +72,49 @@ public class L618D extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
 		// 提存項目
-		String iItemCode = titaVo.getParam("TxItemCode");
-		String iTxDtlValue = titaVo.getParam("TxDtlValue");
+		iItemCode = titaVo.getParam("TxItemCode");
+		iTxDtlValue = titaVo.getParam("TxDtlValue");
 		// 會計日期
-		int iAcdate = parse.stringToInteger(titaVo.getParam("TxAcDate"));
-		int iSlipBatNo = parse.stringToInteger(titaVo.getParam("TxSlipBatNo"));
-		boolean isSendMsg = false;
+		iAcdate = parse.stringToInteger(titaVo.getParam("TxAcDate"));
+		iSlipBatNo = parse.stringToInteger(titaVo.getParam("TxSlipBatNo"));
+//		boolean isSendMsg = false;
 		List<AcDetail> acDetailList = new ArrayList<AcDetail>();
 		AcDetail acDetail = new AcDetail();
 		TempVo tTempVo = new TempVo();
-		TxToDoDetail tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId(iItemCode, 0, 0, 0, iTxDtlValue), titaVo);
+		TempVo t2TempVo = new TempVo();
+
+		if (titaVo.isHcodeNormal()) {
+			String txtNo = "";
+			if (parse.stringToInteger(titaVo.get("selectIndex")) == 1) {
+				setTxTemp(txtNo, titaVo);
+			} else {
+				if (titaVo.getSelectReturnOK() == 0) {
+					setTxTemp(txtNo, titaVo);
+				} else {
+					TxTemp t2TxTemp = txTempService.txtNoLastFirst(titaVo.getTlrNo(), titaVo);
+					if (t2TxTemp != null) {
+						txtNo = t2TxTemp.getTxtNo();
+					}
+					setTxTemp(txtNo, titaVo);
+				}
+			}
+		}
+
+		TxToDoDetail tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId(iItemCode, 0, 0, 0, iTxDtlValue),
+				titaVo);
 		if (tTxToDoDetail == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料
 		}
 		// update應處理清單
 		txToDoCom.updDetailStatus(2, tTxToDoDetail.getTxToDoDetailId(), titaVo);
 
-		if (titaVo.isHcodeNormal()) {
-			Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index, Integer.MAX_VALUE, titaVo);
-			if (slTxToDoDetail == null) {
-				isSendMsg = true;
-			}
-		}
+//		if (titaVo.isHcodeNormal()) {
+//			Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index,
+//					Integer.MAX_VALUE, titaVo);
+//			if (slTxToDoDetail == null) {
+//				isSendMsg = true;
+//			}
+//		}
 
 		if (titaVo.isHcodeNormal()) {
 			tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
@@ -132,13 +166,93 @@ public class L618D extends TradeBuffer {
 			acDetailCom.run(titaVo);
 		}
 
-// BroadCast L6102
-		if (isSendMsg) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6102", titaVo.getParam("TxAcDate") + titaVo.getParam("TxSlipBatNo"),
-					"請執行L6102-核心傳票相關單獨作業，傳票批號: " + iSlipBatNo, titaVo);
+		if (titaVo.isHcodeNormal()) {
+
+			if (titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
+				String t3txtNo = "";
+				TxTemp t3TxTemp = txTempService.txtNoLastFirst(titaVo.getTlrNo(), titaVo);
+				if (t3TxTemp != null) {
+					t3txtNo = t3TxTemp.getTxtNo();
+				}
+				Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getEntDyI() + 19110000, titaVo.getKinbr(),
+						titaVo.getTlrNo(), t3txtNo, this.index, Integer.MAX_VALUE, titaVo);
+				lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
+				if (lTxTemp == null || lTxTemp.size() == 0) {
+					throw new LogicException(titaVo, "E0001",
+							"交易暫存檔 會計日期 = " + parse.stringToInteger(titaVo.getEntDy()) + 19110000 + "分行別 = "
+									+ titaVo.getKinbr() + " 交易員代號 = " + titaVo.getTlrNo() + " 交易序號 = " + t3txtNo); // 查詢資料不存在
+				}
+				int txSlipBatNo = 0;
+				for (TxTemp tx : lTxTemp) {
+					boolean isSendMsg = false;
+					String txItemCode = "";
+					String txAcDate = "";
+					t2TempVo = new TempVo();
+					t2TempVo = t2TempVo.getVo(tx.getText());
+					txItemCode = t2TempVo.getParam("TxItemCode");
+					txAcDate = t2TempVo.getParam("TxAcDate");
+
+					if (txSlipBatNo != this.parse.stringToInteger(t2TempVo.getParam("TxSlipBatNo"))) {
+						txSlipBatNo = this.parse.stringToInteger(t2TempVo.getParam("TxSlipBatNo"));
+						Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(txItemCode, 0, 0,
+								this.index, Integer.MAX_VALUE, titaVo);
+						if (slTxToDoDetail == null) {
+							isSendMsg = true;
+						}
+						if (isSendMsg) {
+							this.info("txAcDate =" + txAcDate);
+							this.info("txSlipBatNo =" + txSlipBatNo);
+							webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6102",
+									txAcDate + txSlipBatNo, "請執行L6102-核心傳票相關單獨作業，傳票批號: " + txSlipBatNo, titaVo);
+						}
+						this.info("isSendMsg 2 =" + isSendMsg);
+					}
+				}
+			}
 		}
+
+// BroadCast L6102
+//		if (isSendMsg) {
+//			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6102",
+//					titaVo.getParam("TxAcDate") + titaVo.getParam("TxSlipBatNo"),
+//					"請執行L6102-核心傳票相關單獨作業，傳票批號: " + iSlipBatNo, titaVo);
+//		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	public void setTxTemp(String txtNo, TitaVo titaVo) throws LogicException {
+		this.info("setTxTemp ... ");
+		this.info("   titaVo.getEntDy() = " + parse.stringToInteger(titaVo.getEntDy()) + 19110000);
+		this.info("   titaVo.getKinbr()  = " + titaVo.getKinbr());
+		this.info("   titaVo.getTlrNo()  = " + titaVo.getTlrNo());
+		this.info("   titaVo.getTxtNo()  = " + titaVo.getTxtNo());
+		tTxTempId = new TxTempId();
+		tTxTemp = new TxTemp();
+		TempVo tTempVo = new TempVo();
+		String wkSeqNo = titaVo.getTxtNo();
+		tTxTempId.setEntdy(parse.stringToInteger(titaVo.getEntDy()) + 19110000);
+		tTxTempId.setKinbr(titaVo.getKinbr());
+		tTxTempId.setTlrNo(titaVo.getTlrNo());
+		tTxTempId.setTxtNo(txtNo.isEmpty() ? titaVo.getTxtNo() : txtNo);
+		tTxTempId.setSeqNo(wkSeqNo);
+		tTxTemp.setEntdy(parse.stringToInteger(titaVo.getEntDy()) + 19110000);
+		tTxTemp.setKinbr(titaVo.getKinbr());
+		tTxTemp.setTlrNo(titaVo.getTlrNo());
+		tTxTemp.setTxtNo(txtNo.isEmpty() ? titaVo.getTxtNo() : txtNo);
+		tTxTemp.setSeqNo(wkSeqNo);
+		tTxTemp.setTxTempId(tTxTempId);
+
+		tTempVo.clear();
+		tTempVo.putParam("TxItemCode", iItemCode);
+		tTempVo.putParam("TxSlipBatNo", iSlipBatNo);
+		tTempVo.putParam("TxAcDate", iAcdate);
+		tTxTemp.setText(tTempVo.getJsonString());
+		try {
+			txTempService.insert(tTxTemp);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤 }
+		}
 	}
 }

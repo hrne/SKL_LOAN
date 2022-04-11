@@ -479,7 +479,7 @@ public class TxBatchCom extends TradeBuffer {
 	/**
 	 * 組入帳交易電文
 	 * 
-	 * @param functionCode 0:入帳 1:訂正 2.虛擬轉暫收
+	 * @param functionCode 0:入帳 1:訂正 2.轉暫收
 	 * @param tDetail      整批入帳明細檔
 	 * @param iTotalcnt    總筆數
 	 * @param titaVo       TitaVo
@@ -600,12 +600,6 @@ public class TxBatchCom extends TradeBuffer {
 
 		// 轉暫收
 		if (functionCode == 2) {
-			txTitaVo = setL3210Tita(functionCode, txTitaVo, tDetail);
-		}
-		// 匯款同戶號合併，非最後一筆轉暫收
-		else if (this.tTempVo.get("MergeCnt") != null
-				&& !this.tTempVo.get("MergeSeq").equals(this.tTempVo.get("MergeCnt"))) {
-			txTitaVo.putParam("MergeCnt", this.tTempVo.get("MergeCnt"));
 			txTitaVo = setL3210Tita(functionCode, txTitaVo, tDetail);
 		}
 		// 1:期款 2:部分償還 12:催收收回
@@ -1021,9 +1015,12 @@ public class TxBatchCom extends TradeBuffer {
 				throw new LogicException("E0014", tBatxHeadId + " hold not exist"); // E0014 檔案錯誤
 			}
 			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() + unfinishCnt);
+
+			// 訂正成功後為未檢核，需重新檢核
 			if ("0".equals(tDetail.getProcStsCode())) {
 				tBatxHead.setBatxExeCode("0");// 0.待檢核
 			}
+
 			try {
 				batxHeadService.update(tBatxHead, titaVo);
 			} catch (DBException e) {

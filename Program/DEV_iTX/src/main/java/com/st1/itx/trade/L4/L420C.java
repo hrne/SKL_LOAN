@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
-import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TotaVoList;
@@ -50,7 +49,7 @@ public class L420C extends TradeBuffer {
 	private int acDate = 0;
 	private String batchNo = "";
 	private int detailSeq = 0;
-	private int finishCnt = 0;
+	private int tmpFinishCnt = 0;
 	private int functionCode = 0;
 
 	/**
@@ -118,12 +117,12 @@ public class L420C extends TradeBuffer {
 			if (functionCode == 2) {
 				isUpdate = true;
 				procStsCode = "7";
-				finishCnt++;
+				tmpFinishCnt++;
 			}
 			if (functionCode == 1 && "7".equals(tBatxDetail.getProcStsCode())) {
 				isUpdate = true;
 				procStsCode = "0";
-				finishCnt--;
+				tmpFinishCnt--;
 			}
 		}
 
@@ -135,17 +134,12 @@ public class L420C extends TradeBuffer {
 			} catch (DBException e) {
 				e.printStackTrace();
 			}
-			int mergeCnt = 0;
-			TempVo tTempVo = new TempVo();
-			tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
-			if (tTempVo.get("MergeCnt") != null) {
-				mergeCnt = parse.stringToInteger(tTempVo.get("MergeCnt"));
-			}
-			updateHeadRoutine(titaVo, mergeCnt);
+			updateHeadRoutine(titaVo);
 		} else {
 			boolean isTx = true;
 			// 入帳檢核
 			if (functionCode == 0) {
+				tBatxDetail.setProcStsCode("0");				
 				tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
 				if (!"4".equals(tBatxDetail.getProcStsCode())) {
 					try {
@@ -175,7 +169,7 @@ public class L420C extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void updateHeadRoutine(TitaVo titaVo, int mergeCnt) throws LogicException {
+	private void updateHeadRoutine(TitaVo titaVo) throws LogicException {
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(acDate);
 		tBatxHeadId.setBatchNo(batchNo);
@@ -183,16 +177,7 @@ public class L420C extends TradeBuffer {
 		if (tBatxHead == null) {
 			throw new LogicException("E0014", tBatxHeadId + " hold not exist"); // E0014 檔案錯誤
 		}
-
-		if (functionCode == 1) {
-			tBatxHead.setBatxExeCode("0");// 0.待檢核
-		}
-		// 同戶號合併檢核須重新檢核
-		if (functionCode == 2 && mergeCnt > 1) {
-			tBatxHead.setBatxExeCode("0");// 0.待檢核
-		}
-
-		tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() - finishCnt);
+		tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() - tmpFinishCnt);
 
 		try {
 			batxHeadService.update(tBatxHead);
@@ -201,10 +186,10 @@ public class L420C extends TradeBuffer {
 		}
 
 		// 啟動背景作業－整批入帳完成
-		if (finishCnt > 0 && tBatxHead.getUnfinishCnt() == 0) {
+		if (tmpFinishCnt > 0 && tBatxHead.getUnfinishCnt() == 0) {
 			TitaVo bs401TitaVo = new TitaVo();
 			bs401TitaVo = (TitaVo) titaVo.clone();
-			bs401TitaVo.putParam("FunctionCode", "0");// 處理代碼 0:入帳
+			bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核
 			bs401TitaVo.putParam("AcDate", acDate - 19110000); // 會計日期
 			bs401TitaVo.putParam("BatchNo", batchNo);// 批號
 			MySpring.newTask("BS401", this.txBuffer, bs401TitaVo);

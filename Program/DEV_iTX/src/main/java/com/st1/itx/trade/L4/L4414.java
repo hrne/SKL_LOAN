@@ -34,11 +34,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * UploadPath=X,50<br>
- */
-
 @Service("L4414")
 @Scope("prototype")
 /**
@@ -372,12 +367,12 @@ public class L4414 extends TradeBuffer {
 					} else {
 						cancelCntC++;
 					}
-//					檢查期款、火險需同時成功才更新帳號檔
+//					檢查期款、火險需同時成功或失敗才更新帳號檔
 					PostAuthLog tPostAuthLog3 = postAuthLogService.repayAcctFirst(tPostAuthLog.getCustNo(),
 							tPostAuthLog.getPostDepCode(), tPostAuthLog.getRepayAcct(),
 							tPostAuthLog.getAuthCode().equals("1") ? "2" : "1", titaVo);
 					if (tPostAuthLog3 != null) {
-						if (tPostAuthLog3.getAuthErrorCode().equals("00")) {
+						if (tPostAuthLog3.getAuthErrorCode().equals(tPostAuthLog.getAuthErrorCode())) {
 							// 變更帳號檔
 							postToBankAuthAct(tPostAuthLog, titaVo);
 						}

@@ -96,7 +96,6 @@ CALL(#HelpProc)
 T(2,@FunCdHelp,#HelpDesc1)
 
 ! 第一行做成全選按鈕
-! #Enable1=X,1,I,ui:button;value:全選;enable:1;tabbable:0
 #Paper0=X,1,I,ui:button;value:全選;enable:1;tabbable:0
 #Msg0=X,1,I,ui:button;value:全選;enable:1;tabbable:0
 #EMail0=X,1,I,ui:button;value:全選;enable:1;tabbable:0
@@ -160,18 +159,6 @@ IF(#FunCd==3 && #CustNo==#CustNo2 && #FacmNo==#FacmNo2,V(P,請輸入不同戶號
 #RimFunCd=A,1,S
 E(0,#FunCd)
 <include src="ROM.icf::L1R11.dec"/>
-! 調報表代號名稱
-!#RimL1r11=X,1,S
-!RESET_RIM(#RimL1r11,L1R11)
-!C(3,#FunCd,1,$,S)
-!S(L1R11,1,#RimFunCd)
-!R(1,L1R11)
-!##loop{times:40,i:1}
-!T(2,@FormNo{i},#L1r11FormNo{i})
-!T(2,@Notice{i},#L1r11FormName{i})
-!T(2,@NoticeX{i},#L1r11FormNo{i}+#L1r11FormName{i})
-!T(2,@SendCode{i},#L1r11SendCode{i})
-!##end
 
 ! 修改複製預先調RIM
 <include src="ROM.icf::L1R04.dec"/>
@@ -181,10 +168,8 @@ E(0,#FunCd)
 C(3,#FunCd,3,E(0,@RimCustNo,#CustNo2),E(0,@RimCustNo,#CustNo))
 C(3,#FunCd,3,E(0,@RimFacmNo,#FacmNo2),E(0,@RimFacmNo,#FacmNo))
 RESET_RIM(#RimL1r04,L1R04)
-!C(3,#FunCd,1,S,$)
 S(L1R04,1,#RimCustNo,#RimFacmNo)
 R(1,L1R04)
-!E(0,@ApplyDt,#L1r04ApplyDt) 進來時固定代入系統日期
 ##loop{times:40,i:1}
 T(2,@FormNo{i},#L1r04FormNo{i})
 T(2,@Notice{i},#L1r04FormName{i})
@@ -209,6 +194,8 @@ C(5,#EMailFg{i},N,$,E(0,@ChkA{i},#ChkA{i}+1))
 C(4,#Notice{i},INVOKEJS(SHOW,grd1,{j},{j},0),INVOKEJS(SHOW,grd1,{j},{j},1))
 ##end
 
+#CanMsg=X,1,S
+#CanEmail=X,1,S
 !RIM參數使用
 
 #RimFunc=A,1,S
@@ -221,6 +208,8 @@ RESET_RIM(#RimL1r13,L1R13)
 S(L1R13,1,#RimFunc,#RimCustNo,#RimFacmNo)
 R(1,L1R13)
 T(2,@CustName,#L1R13CustName)
+T(2,@CanMsg,#L1R13MsgFg)
+T(2,@CanEmail,#L1R13EmailFg)
 
 ##loop{times:40,i:1,j:3}
 
@@ -239,9 +228,10 @@ C(4,#Notice{i},INVOKEJS(SHOW,grd1,{j},{j},0),INVOKEJS(SHOW,grd1,{j},{j},1))
 
 
 ! 若需要修改無簡訊電話或email時，會自動把不發送設為Y的功能請修改此處
+! 這個參數也控制選擇發送時，是否檢查有沒有對應的資料（如發送簡訊時，檢查客戶有無簡訊電話資料等等）
 ! 0:關閉 1:開啟
 #IsCheck=A,1,S
-E(0,1)
+E(0,0)
 
 !  申請日期
 #DATE=D,8,S
@@ -310,8 +300,10 @@ C(4,#Paper{i},$,IF(#Paper{i} == #CheckY,$,V(P,限輸入Y或空白)))
 #Msg{i}=X,1,I
 C(4,#FormNo{i},s,$)
 C(5,#MsgFg{i},N,s,$)
+C(3,#IsCheck,0,$,C(5,#CanMsg,0,T(3,Y),$))
 HELP(Y:不發送; :發送)
 @
+C(3,#IsCheck,0,$,C(5,#CanMsg,0,C(4,#Msg{i},V(P,此客戶尚未設定簡訊電話，故不可設定為發送),$),$))
 C(4,#Msg{i},$,IF(#Msg{i} == #CheckY,$,V(P,限輸入Y或空白)))
 
 #Err{i}=x,200,S
@@ -321,8 +313,10 @@ T(B,#NoticeX{i}+，不可申請全部不寄送)
 #EMail{i}=X,1,I
 C(4,#FormNo{i},s,$)
 C(5,#EMailFg{i},N,s,$)
+C(3,#IsCheck,0,$,C(5,#CanEmail,0,T(3,Y),$))
 HELP(Y:不發送; :發送)
 @
+C(3,#IsCheck,0,$,C(5,#CanEmail,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$))
 C(4,#EMail{i},$,IF(#EMail{i} == #CheckY,$,V(P,限輸入Y或空白)))
 C(5,#SendCode{i},1,$,s)
 E(0,@ChkB{i},0)

@@ -29,7 +29,7 @@ public class BaseTransaction extends SysLogger {
 		this.info("baseService init() getTransaction...");
 		this.def = new DefaultTransactionDefinition();
 		this.def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		this.def.setTimeout(90);
+		this.def.setTimeout(85);
 //		this.def.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);
 		this.def.setReadOnly(true);
 		this.def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
@@ -42,7 +42,7 @@ public class BaseTransaction extends SysLogger {
 		this.info("baseService init() getTransaction New...");
 		this.def = new DefaultTransactionDefinition();
 		this.def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		this.def.setTimeout(90);
+		this.def.setTimeout(85);
 //		this.def.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);
 		this.def.setReadOnly(true);
 		this.def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);

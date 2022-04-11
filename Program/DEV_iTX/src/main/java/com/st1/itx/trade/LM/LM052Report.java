@@ -240,6 +240,8 @@ public class LM052Report extends MakeReport {
 						col = 12;
 					}
 
+	
+
 					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 
 					assetClassTotal = assetClassTotal.add(amt.multiply(rate).setScale(0, BigDecimal.ROUND_HALF_UP));
@@ -284,7 +286,7 @@ public class LM052Report extends MakeReport {
 					col = "310".equals(tLDVo.get("F1")) ? 9 : "320".equals(tLDVo.get("F1")) ? 8 : 7;
 
 					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
-
+		
 					break;
 
 				case 4:
@@ -327,6 +329,8 @@ public class LM052Report extends MakeReport {
 					break;
 				}
 
+				this.info("formNum" + formNum + "row,col" + row + "-" + col);
+				
 				makeExcel.setValue(row, col, amt, "#,##0");
 
 			}

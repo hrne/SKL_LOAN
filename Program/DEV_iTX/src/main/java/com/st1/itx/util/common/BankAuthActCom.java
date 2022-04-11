@@ -286,33 +286,29 @@ public class BankAuthActCom extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg()); // TODO: 刪除
 					}
-
-					inserPostBankAuthAct(t, "01", titaVo);
-					inserPostBankAuthAct(t, "02", titaVo);
-				} else {
-					tBankAuthAct = bankAuthActService
-							.findById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "0" + t.getAuthCode()), titaVo);
-					if (tBankAuthAct == null) {
-						throw new LogicException("E0015",
-								"此筆授權 帳號檔找不到" + t.getCustNo() + t.getFacmNo() + t.getAuthCode()); // 檢查錯誤
-					}
+				}
+				inserPostBankAuthAct(t, "01", titaVo);
+				inserPostBankAuthAct(t, "02", titaVo);
+			} else {
+				tBankAuthAct = bankAuthActService
+						.findById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "0" + t.getAuthCode()), titaVo);
+				if (tBankAuthAct == null) {
+//					throw new LogicException("E0015", "此筆授權 帳號檔找不到" + t.getCustNo() + t.getFacmNo() + t.getAuthCode()); // 檢查錯誤
+					return;
 				}
 			}
 		}
 		String status = " ";
-		boolean isUpdFac = false; // 本額度更新
 		boolean isUpdAct = false; // 本帳號更新
 		switch (t.getAuthApplCode()) {
 		case "1": // 1.申請
 			if ("00".equals(t.getAuthErrorCode())) { // 00:成功
 				status = "0"; // 0:授權成功
 				updFacmRepayCode(t.getCustNo(), t.getFacmNo(), titaVo);
-				isUpdFac = false;
 			} else {
 				status = "8"; // 8.授權失敗
 				if (t.getRepayAcct().equals(tBankAuthAct.getRepayAcct())
 						&& t.getPostDepCode().equals(tBankAuthAct.getPostDepCode())) {
-					isUpdFac = true;
 				}
 			}
 			isUpdAct = true;
@@ -320,7 +316,6 @@ public class BankAuthActCom extends TradeBuffer {
 		case "2": // 2.終止
 			if ("00".equals(t.getAuthErrorCode())) { // 00:成功
 				status = "2"; // 2.取消授權
-				isUpdFac = true;
 				isUpdAct = true;
 			}
 			break;
@@ -334,21 +329,6 @@ public class BankAuthActCom extends TradeBuffer {
 			break;
 		default:
 			break;
-		}
-
-		if (isUpdFac) {
-			tBankAuthAct = bankAuthActService.holdById(tBankAuthAct, titaVo);
-			tBankAuthAct.setRepayBank("700");
-			tBankAuthAct.setRepayAcct(t.getRepayAcct());
-			tBankAuthAct.setPostDepCode(t.getPostDepCode());
-			tBankAuthAct.setLimitAmt(t.getLimitAmt());
-			tBankAuthAct.setAcctSeq(t.getRepayAcctSeq());
-			tBankAuthAct.setStatus(status);
-			try {
-				bankAuthActService.update(tBankAuthAct, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
-			}
 		}
 
 		if (isUpdAct) {
@@ -385,7 +365,7 @@ public class BankAuthActCom extends TradeBuffer {
 		BankAuthAct tBankAuthAct = null;
 
 		if ("0".equals(t.getAuthStatus())) { // 00:成功
-
+//			刪除原額度的扣款帳號,並新增提回扣款帳號
 			Slice<BankAuthAct> slBankAuthAct = bankAuthActService.facmNoEq(t.getCustNo(), t.getFacmNo(), 0,
 					Integer.MAX_VALUE, titaVo);
 			if (slBankAuthAct != null) {
@@ -394,13 +374,13 @@ public class BankAuthActCom extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg()); // TODO: 刪除
 				}
-				inserAchBankAuthAct(t, "00", titaVo);
-			} else {
-				tBankAuthAct = bankAuthActService.findById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "00"),
-						titaVo);
-				if (tBankAuthAct == null) {
-					throw new LogicException("E0015", "此筆授權 帳號檔找不到" + t.getCustNo() + t.getFacmNo()); // 檢查錯誤
-				}
+			}
+			inserAchBankAuthAct(t, "00", titaVo);
+		} else {
+//			失敗
+			tBankAuthAct = bankAuthActService.findById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "00"), titaVo);
+			if (tBankAuthAct == null) {
+				return;
 			}
 		}
 

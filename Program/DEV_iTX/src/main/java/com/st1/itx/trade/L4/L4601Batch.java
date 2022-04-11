@@ -12,20 +12,18 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
-import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.ClBuildingService;
-import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuOrignalService;
@@ -79,9 +77,6 @@ public class L4601Batch extends TradeBuffer {
 
 	@Autowired
 	public ClBuildingService clBuildingService;
-
-	@Autowired
-	public ClFacService clFacService;
 
 	@Autowired
 	public InsuRenewMediaTempService insuRenewMediaTempService;
@@ -165,7 +160,16 @@ public class L4601Batch extends TradeBuffer {
 						parse.stringToInteger(t.get("FacmNo").trim()), t.get("InsuNo").trim(), titaVo);
 //				無此保單號碼
 				if (tInsuRenew == null) {
-					checkResultA += "10";
+//					檢查無此戶號額度
+					Slice<InsuRenew> slInsuRenew = insuRenewService.findL4601A(
+							parse.stringToInteger(t.get("FireInsuMonth")),
+							parse.stringToInteger(t.get("CustNo").trim()),
+							parse.stringToInteger(t.get("FacmNo").trim()), 0, 1, titaVo);
+					if (slInsuRenew == null) {
+						checkResultA += "12";
+					} else {
+						checkResultA += "10";
+					}
 				} else {
 					checkReportA(t, tInsuRenew, titaVo);
 				}
@@ -373,19 +377,6 @@ public class L4601Batch extends TradeBuffer {
 				checkResultA = checkResultA + "11";
 			} else {
 				checkResultA = checkResultA + ",11";
-			}
-		}
-
-		Slice<ClFac> slClFac = clFacService.selectForL2038(parse.stringToInteger(t.get("ClCode1").trim()),
-				parse.stringToInteger(t.get("ClCode2").trim()), parse.stringToInteger(t.get("ClNo").trim()), 0, 9999999,
-				parse.stringToInteger(t.get("CustNo")), parse.stringToInteger(t.get("CustNo")),
-				parse.stringToInteger(t.get("FacmNo")), parse.stringToInteger(t.get("FacmNo")), 0, 1, titaVo);
-//		無此戶號額度
-		if (slClFac == null) {
-			if ("".equals(checkResultA)) {
-				checkResultA += "12";
-			} else {
-				checkResultA += ",12";
 			}
 		}
 
