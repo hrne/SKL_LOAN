@@ -238,6 +238,7 @@ BEGIN
       FROM "InsuRenew" S1
       WHERE S1."AcDate" = 0
         AND S1."TotInsuPrem" > 0
+        AND S1."RenewCode" != 1
         AND CASE
               WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0 THEN 'Y'
               WHEN S1."StatusCode" = 1 THEN 'Y'

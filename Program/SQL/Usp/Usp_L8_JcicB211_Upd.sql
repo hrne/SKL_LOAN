@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB211_Upd"
 (
 -- 程式功能：維護 JcicB211 聯徵每日授信餘額變動資料檔
 -- 執行時機：每日日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB211_Upd"(20200423,'System');
+-- 執行方式：EXEC "Usp_L8_JcicB211_Upd"(20200423,'999999');
 --
 
     -- 參數
@@ -104,7 +104,7 @@ BEGIN
                  WHEN T."OvduDay" >= 16 THEN '0'															 -- 現金卡科目才有AB,其他一個月內視同無延遲
                  WHEN T."OvduDay"  > 0  THEN '0'                               --
                  ELSE '0'  END                               AS "RepayCode"    -- 本筆還款後之還款紀錄
-          , CASE WHEN T."TitaTxCd" IN ('L3410', 'L3420')
+          , CASE WHEN T."TitaTxCd" IN ('L3410', 'L3420') AND T."Status" IN ( 1 , 3 )
                  THEN '3' ELSE ' ' END                       AS "NegStatus"    -- 本筆還款後之債權結案註記
           , CASE WHEN T."Status" = 6 AND NVL(O."BadDebtDate",0) > 0
                  THEN TRUNC(O."BadDebtDate" / 100) - 191100
@@ -137,8 +137,13 @@ BEGIN
                        AND  T1."TitaTxCd"  NOT IN ('L3410','L3420')
                     UNION
                     SELECT  T2."CustNo", T2."FacmNo", T2."BormNo", T2."BorxNo"
-                          , T2."Principal"  AS "Principal"
-                          , T2."LoanBal", T2."TitaHCode", T2."TitaTxCd", T2."AcDate"
+                          , CASE WHEN M."Status" IN ( 2 , 6 ) THEN 1
+                                 ELSE T2."Principal"  
+                            END             AS "Principal"
+                          , CASE WHEN M."Status" IN ( 2 , 6 ) THEN (T2."Principal" + T2."Interest")  -- 催收呆帳戶=本金+利息+費用
+                                 ELSE T2."LoanBal"
+                            END             AS  "LoanBal"     
+                          , T2."TitaHCode", T2."TitaTxCd", T2."AcDate"
                           , CASE WHEN T2."TitaHCode" = 3 AND T2."CorrectSeq" IS NOT NULL THEN
                                       CAST(SUBSTR(T2."CorrectSeq", 1, 8) AS decimal(8, 0))
                                  ELSE 0
@@ -151,7 +156,7 @@ BEGIN
                       AND  T2."TitaHCode" IN (0, 3)
                       AND  T2."Principal"  <> 0
                       AND  T2."TitaTxCd"  IN ('L3410', 'L3420')
-                      AND  M."Status" IN (1 , 2 , 3 , 5 , 6 , 7 , 8)  --結案登錄時可選擇的戶況增列2,5,6,7,8
+                      AND  M."Status" IN (1 , 2 , 3 , 6 )  --結案登錄戶況增列2催收戶,6呆帳戶
                   ) T3
              LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T3."CustNo"
                                          AND  M."FacmNo"    =  T3."FacmNo"
