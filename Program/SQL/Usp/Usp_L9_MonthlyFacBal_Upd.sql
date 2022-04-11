@@ -537,6 +537,7 @@ BEGIN
                 AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
                THEN '12'       -- 特定資產放款：購置住宅+修繕貸款
                WHEN M."PrinBalance" = 1
+                AND M."AcctCode" = 990
                THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)
                                --   無擔保部分--超過清償期12月者
                                --   或拍訂貨拍賣無實益之損失者
@@ -579,7 +580,7 @@ BEGIN
       LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
                         ,"IndustryItem"
                   FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
-      WHERE M."PrinBalance" > 0
+      WHERE M."PrinBalance" > 0 
         AND M."YearMonth" = YYYYMM
     ) TMP
     ON (

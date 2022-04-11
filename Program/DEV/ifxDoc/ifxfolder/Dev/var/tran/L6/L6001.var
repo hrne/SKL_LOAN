@@ -233,7 +233,7 @@ C(5,#ItemCode,AMLL,T(2,#AmlL0+#PSYSDATE+#SYSLDATE+#AutoYes),$)
 C(5,#ItemCode,L2921,T(2,#L2921Buf),$)
 
 #LDCNT_BTN=X,5,S
-C(4,#LDCNT_LB,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#LDCNT_LB;ntxbuf=#LDCNT_BUF}))
+C(4,#LDCNT_LB,BIND(grid,cancel),C(4,#ChainInqTxcd,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#LDCNT_LB;ntxbuf=#LDCNT_BUF})))
 
 ! 本日新增筆數按鈕
 #TDNEW_CD=A,1,S
@@ -247,7 +247,7 @@ C(5,#ItemCode,AMLL,T(2,#AmlL9+#SYSDATE+#SYSDATE+#AutoYes),$)
 C(5,#ItemCode,L2921,T(2,#L2921Buf),$)
 
 #TDNEW_BTN=X,5,S
-C(4,#TDNEW_LB,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TDNEW_LB;ntxbuf=#TDNEW_BUF}))
+C(4,#TDNEW_LB,BIND(grid,cancel),C(4,#ChainInqTxcd,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TDNEW_LB;ntxbuf=#TDNEW_BUF})))
 
 ! 總筆數按鈕
 #TOTALCNT_CD=A,1,S
@@ -260,7 +260,7 @@ C(5,#ItemCode,AMLL,T(2,#AmlL0+#PSYSDATE+#SYSDATE+#AutoYes),$)
 C(5,#ItemCode,L2921,T(2,#L2921Buf),$)
 
 #TOTALCNT_BTN=X,5,S
-C(4,#TOTALCNT_LB,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TOTALCNT_LB;ntxbuf=#TOTALCNT_BUF}))
+C(4,#TOTALCNT_LB,BIND(grid,cancel),C(4,#ChainInqTxcd,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TOTALCNT_LB;ntxbuf=#TOTALCNT_BUF})))
 
 ! 本日處理筆數按鈕
 #TDDONE_CD=A,1,S
@@ -274,7 +274,7 @@ C(5,#ItemCode,AMLL,T(2,#AmlL1+#SYSDATE+#SYSDATE+#AutoYes),$)
 C(5,#ItemCode,L2921,T(2,#L2921Buf),$)
 
 #TDDONE_BTN=X,5,S
-C(4,#TDDONE_LB,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TDDONE_LB;ntxbuf=#TDDONE_BUF}))
+C(4,#TDDONE_LB,BIND(grid,cancel),C(4,#ChainInqTxcd,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TDDONE_LB;ntxbuf=#TDDONE_BUF})))
 
 ! 本日刪除筆數按鈕
 #TD_DELETE_CD=A,1,S
@@ -282,7 +282,7 @@ E(0,5)
 #TD_DELETE_BUF=X,60,S
 T(2,#TD_DELETE_CD+#ITEM_LB)
 #TD_DELETE_BTN=X,5,S
-C(4,#TD_DELETE_LB,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TD_DELETE_LB;ntxbuf=#TD_DELETE_BUF}))
+C(4,#TD_DELETE_LB,BIND(grid,cancel),C(4,#ChainInqTxcd,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#TD_DELETE_LB;ntxbuf=#TD_DELETE_BUF})))
 
 ! 保留筆數按鈕
 #RESERVE_CD=A,1,S
@@ -290,7 +290,7 @@ E(0,6)
 #RESERVE_CNT_BUF=X,60,S
 T(2,#RESERVE_CD+#ITEM_LB)
 #RESERVE_CNT_BTN=X,5,S
-C(4,#RESERVE_CNT_LB,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#RESERVE_CNT_LB;ntxbuf=#RESERVE_CNT_BUF}))
+C(4,#RESERVE_CNT_LB,BIND(grid,cancel),C(4,#ChainInqTxcd,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#RESERVE_CNT_LB;ntxbuf=#RESERVE_CNT_BUF})))
 
 ! 未處理筆數按鈕
 #UNDONE_CD=A,1,S
@@ -304,7 +304,7 @@ C(5,#ItemCode,AMLL,T(2,#AmlL0+#SYSDATE+#SYSDATE+#AutoYes),$)
 C(5,#ItemCode,L2921,T(2,#L2921Buf),$)
 
 #UNDONE_CNT_BTN=X,5,S
-C(4,#UNDONE_CNT_LB,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#UNDONE_CNT_LB;ntxbuf=#UNDONE_CNT_BUF}))
+C(4,#UNDONE_CNT_LB,BIND(grid,cancel),C(4,#ChainInqTxcd,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#ChainInqTxcd;text=#UNDONE_CNT_LB;ntxbuf=#UNDONE_CNT_BUF})))
 
 ! 執行交易時固定傳 9:未處理-執行
 #EXEC_FUNCD=X,1,S
@@ -370,7 +370,7 @@ TXFORM=L6001
 #any={detail:true, header:'L6001.part', caption:'', width:1000, rowNum:60, rowList:[60,120,180]}
 
 #ITEM_LB=項目
-{width:200,align:'left'}
+{width:250,align:'left'}
 
 #LDCNT_BTN=昨日留存</br>筆數
 {width:90,search:false,formatter:'cust:bind-button:#LDCNT_BTN',align:'center',canExport:false}
@@ -397,7 +397,7 @@ TXFORM=L6001
 {width:100,align:'center'}
 
 #EXECUTE=處理交易
-{width:170,search:false,formatter:'cust:bind-button:#EXECUTE',align:'left',canExport:false}
+{width:220,search:false,formatter:'cust:bind-button:#EXECUTE',align:'left',canExport:false}
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6001;cpi=15"/>
 

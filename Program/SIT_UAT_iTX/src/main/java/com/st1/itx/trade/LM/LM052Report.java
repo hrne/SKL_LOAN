@@ -234,6 +234,7 @@ public class LM052Report extends MakeReport {
 					if ("61".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 6;
 					}
+					
 					if ("62".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 6;
 					} else {
@@ -329,9 +330,11 @@ public class LM052Report extends MakeReport {
 					break;
 				}
 
-				this.info("formNum" + formNum + "row,col" + row + "-" + col);
+				this.info("formNum" + formNum + ":row,col=" + row + "," + col);
 				
-				makeExcel.setValue(row, col, amt, "#,##0");
+				if(row!=0 && col != 0) {
+					makeExcel.setValue(row, col, amt, "#,##0");
+				}
 
 			}
 
