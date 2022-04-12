@@ -40,25 +40,29 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,1080];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[150,300,150,300];printer.width=[10,35,10,35];order=1;">
 [
 ["[L2703]                                 結清客戶申請個人資料控管維護"],
-["#FdFunCdX+功能",#FunCdX],
-["#FdCustId+客戶統一編號",#CustId,#BTN1],
-["#FdCustNo+借戶戶號",#CustNo],
-["#FdCustName+戶名",#CustName],
-["#FdCreateEmpNo+建立者",#CreateEmpNo,#CreateEmpName],
-["#FdCreateDate+建立時間",#CreateDate,#CreateTime],
-["#FdReason+解除原因",#Reason],
+[#<->#,"#FdFunCdX+功能",#FunCdX],
+[#<->#,"#FdCustId+客戶統一編號",#CustId,#BTN1],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo],
+[#<->#,"#FdCustName+戶名",#CustName],
+[#<->#,"#FdReason+解除原因",#Reason],
+["#FdSetEmpNo+設定人員",#SetEmpNo,#SetEmpName],
+["#FdSetDate+設定日期",#SetDate],
+["#FdReSetEmpNo+解除人員",#ReSetEmpNo,#ReSetEmpName],
+["#FdReSetDate+解除日期",#ReSetDate],
 ]
 
 #FdFunCdX=X,2,L
 #FdCustId=X,2,L
 #FdCustNo=X,2,L
 #FdCustName=X,2,L
-#FdCreateEmpNo=X,2,L
-#FdCreateDate=X,2,L
 #FdReason=X,2,L
+#FdSetEmpNo=X,2,L
+#FdSetDate=X,2,L
+#FdReSetEmpNo=X,2,L
+#FdReSetDate=X,2,L
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -78,39 +82,49 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2073結清客戶申請個�
 T(3,@CustId,)
 E(0,@CustNo,0)
 T(3,@CustName,)
-T(3,@CreateEmpNo,)
-T(3,@CreateEmpName,)
-E(0,@CreateDate,0)
-T(3,@CREATETMHH,)
-T(3,@CREATETMMM,)
-T(3,@CREATETMSS,)
-T(3,@CreateTime,)
+T(3,@SetEmpNo,)
+T(3,@SetEmpName,)
+T(3,@ReSetEmpNo,)
+T(3,@ReSetEmpName,)
 T(2,@RimTxCode,#TXCD)
+
+<include src="ROM.icf::L1R01.dec"/>
 
 #NTXBUF=X,142,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
-T(1,@CustId,#NTXBUF,2,10),$)
+T(1,@CustNo,#NTXBUF,2,7),$)
 
-!功能 下拉式選單 1.新增 4.刪除 5.查詢
+#FunCd5=A,1,S
+E(0,5)
+
+!因客戶主檔統一編號控管後會變動，改傳入戶號
+!再透過RIM抓取對應的身分證字號
+!如果戶號為0，跳過處理
+#RimL1r01=A,1,S
+C(3,#CustNo,0,s,$)
+E(0,@RimFunCd,#FunCd5)
+T(2,@RimCustNo,#CustNo)
+RESET_RIM(#Rim1r01,L1R01)
+S(L1R01,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R01)
+T(2,@CustId,#L1r01CustId)
+
+
+#FunCdHelp=X,34,S
+T(3,1:設定;2:解除;4:刪除;5:查詢)
+
+!功能 下拉式選單 1.設定 4.刪除 5.查詢
 #FunCd=A,1,S
 C(3,#CHAIN,1,s,$)
 CALL(#HideAll)
-HELP(1: 新增;2: 解除;4: 刪除;5: 查詢)
+HELP(#FunCdHelp)
 @V(1,1,2,4,5)
 E(0,@FUNCIND,#FunCd)
 
-#FunCdX=X,4,L
-C(4,#FunCd,S,$)
-C(2,#FunCd,T(3,),
-           T(3,新增),
-           T(3,解除),
-           T(3,),
-           T(3,刪除),
-           T(3,查詢),
-           )
-C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,解除),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
-
+#FunCdX=X,5,L
+T(H,#FunCd,#FunCdHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,設定),K(MODIFYBUTTON,解除),K(MODIFYBUTTON,設定),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 
 #ShowFd=X,1,S
 C(2,#FunCd,T(3, ),T(3,*),T(3,　),T(3,*),T(3, ),T(3, ))
@@ -129,11 +143,22 @@ IF(#FunCd==1,T(F,@Reason,0),$)
 #BIND1=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-OOCustId})
 
+#CustIdFirstTwo=X,2,S
 
 !統一編號 (可以不存在於顧客檔)
+!偵測為解除或查詢時，不予輸入
+!先隱藏全部,之後調RIM後再作顯示
+!如果是設定,且CustId已輸入時,也不予輸入
 #CustId=X,10,I
-IF(#FunCd==2 ||#FunCd==4 || #FunCd==5,s,$)
-@V(7)A(ID_UNINO,0,#CustId)
+INVOKEJS(SHOW,p1_5,0)INVOKEJS(SHOW,p1_6,0)INVOKEJS(SHOW,p1_7,0)
+IF(#FunCd==4,s,$)
+C(4,#CustId,$,C(3,#FunCd,1,T(F,0)HIDE(#BTN1)T(3,@FdCustId, ),$),$)
+C(4,#CustId,$,C(3,#FunCd,1,s,$),$)
+IF(#FunCd==2 || #FunCd==5,T(F,0)HIDE(#BTN1)T(3,@FdCustId, ),$)
+IF(#FunCd==2 || #FunCd==5,s,$)
+@V(7)
+T(1,@CustIdFirstTwo,#CustId,1,2)
+C(5,#CustIdFirstTwo,XX,$,A(ID_UNINO,0,#CustId))
 
 !RIM查顧客檔(取得戶號,戶名,建立者,建立時間)
 !調RIM參數
@@ -150,20 +175,18 @@ RESET_RIM(#RimL2r31,L2R31)
 S(L2R31,1,#RimFunCd,#RimCustId)
 R(1,L2R31)
 
-
+!帶入RIM參數
+!如果要做解除，原因欄不代入上次解除原因
 #checkL2R31=X,1,S
 E(0,@CustNo,#L2r31CustNo)
 T(2,@CustName,#L2r31CustName)
-T(2,@CreateEmpNo,#L2r31CreateEmpNo)
-T(2,@Reason,#L2r31Reason)
+C(3,#FunCd,2,$,T(2,@Reason,#L2r31Reason))
 E(0,@CuscCd,#L2r31CuscCd)
-C(3,#FunCd,1,S,$)
-T(2,@CreateDate,#L2r31CreateDate)
-T(2,@CreateTime,#L2r31CreateTime)
-
-!自然人檢查：僅新增時檢查
-#CuscCd=A,1,L
-C(3,#FunCd,1,IF(#CuscCd!=1,V(P,限自然人申請),$),$)
+T(2,@SetEmpNo,#L2r31SetEmpNo)
+T(2,@SetDate,#L2r31SetDate)
+T(2,@ReSetEmpNo,#L2r31ReSetEmpNo)
+T(2,@ReSetDate,#L2r31ReSetDate)
+E(0,@ApplMark,#L2r31ApplMark)
 
 !借戶戶號
 #CustNo=A,7,L
@@ -171,38 +194,53 @@ C(3,#FunCd,1,IF(#CuscCd!=1,V(P,限自然人申請),$),$)
 !戶名
 #CustName=X,100,L
 
-!建立者
-#CreateEmpNo=X,8,L
+#SetEmpNo=X,6,L
 
-#RimTxCode=X,5,S
+#SetDate=X,18,L
 
-#SendL2r13B=X,1,S
-C(4,#CreateEmpNo,S,$)
-T(2,@RimEmployeeNo,#CreateEmpNo)
+#ReSetEmpNo=X,6,L
+
+#ReSetDate=X,18,L
+
+#ApplMark=A,1,S
+
+#RimTxCode=X,5,L
+
+!自然人檢查：設定時檢查
+#CuscCd=A,1,S
+C(3,#FunCd,1,IF(#CuscCd!=1,V(P,限自然人申請),$),$)
+
+! 決定要顯示設定人員日期或解除人員日期
+! ApplMark => 3 解除狀態 為查詢時，顯示解除人員日期、解除原因；否則皆不顯示
+!          => 0 未設定   皆不顯示
+!          =>   其他    顯示設定人員日期，另判定FunCd為2時顯示解除原因 for 輸入
+#DecideShowing=X,1,S
+SWITCH(#ApplMark,3,C(3,#FunCd,5,INVOKEJS(SHOW,p1_5,1)INVOKEJS(SHOW,p1_6,0)INVOKEJS(SHOW,p1_7,1),INVOKEJS(SHOW,p1_5,0)INVOKEJS(SHOW,p1_6,0)INVOKEJS(SHOW,p1_7,0))
+                ,0,INVOKEJS(SHOW,p1_5,0)INVOKEJS(SHOW,p1_6,0)INVOKEJS(SHOW,p1_7,0)
+                  ,C(3,#FunCd,2,INVOKEJS(SHOW,p1_5,1),INVOKEJS(SHOW,p1_5,0))INVOKEJS(SHOW,p1_6,1)INVOKEJS(SHOW,p1_7,0)
+)
+
+#SendL2r13Set=X,1,S
+C(4,#SetEmpNo,S,$)
+T(2,@RimEmployeeNo,#SetEmpNo)
 E(0,@RimFunCd,5)
 S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
+C(4,#SetEmpNo,s,$)
+T(2,@SetEmpName,#L2r13FullName)
 
-#checkSendL2r13B=X,1,S
-C(4,#CreateEmpNo,S,$)
-T(2,@CreateEmpName,#L2r13FullName)
+#SendL2r13ReSet=X,1,S
+C(4,#ReSetEmpNo,S,$)
+T(2,@RimEmployeeNo,#ReSetEmpNo)
+E(0,@RimFunCd,5)
+S(L2R13,1,#RimFunCd,#RimEmployeeNo)
+R(1,L2R13)
+C(4,#ReSetEmpNo,s,$)
+T(2,@ReSetEmpName,#L2r13FullName)
 
-#CreateEmpName=X,100,L
+#SetEmpName=X,20,L
 
-
-!建立日期
-#CreateDate=D,7,L
-
-
-!建立時間
-!時
-#CREATETMHH=X,2,S
-!分
-#CREATETMMM=X,2,S
-!秒
-#CREATETMSS=X,2,S
-
-#CreateTime=X,8,L
+#ReSetEmpName=X,20,L
 
 #Reason=X,50,I
 IF(#FunCd==2,$,s)
@@ -230,25 +268,7 @@ T(3,[L2703] 結清客戶申請個人資料控管維護)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !建立日期
-#OCreateDate=D,7,L
-C(3,#FunCd,1,$,S)
-T(2,@CreateDate,#OCreateDate)
 
-!建立時間
-#OCreateTime=X,20,L
-C(3,#FunCd,1,$,S)
-T(1,@OCREATETMHH,#OCreateTime,1,2)
-T(1,@OCREATETMMM,#OCreateTime,3,2)
-T(1,@OCREATETMSS,#OCreateTime,5,2)
-T(2,@OCreateTime,#OCREATETMHH+:+#OCREATETMMM+:+#OCREATETMSS)
-T(2,@CreateTime,#OCreateTime)
-
-!時
-#OCREATETMHH=X,2,S
-!分
-#OCREATETMMM=X,2,S
-!秒
-#OCREATETMSS=X,2,S
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -262,8 +282,6 @@ T(2,@CreateTime,#OCreateTime)
 #CustId
 #CustNo
 #CustName
-#CreateEmpNo
-#CreateDate
 #Reason
 </sub>
 
@@ -271,12 +289,11 @@ T(2,@CreateTime,#OCreateTime)
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L2703
-#OCreateDate
-#OCreateTime
 ^
 <include src="ROM.icf::L2R31.tom"/>
 <include src="ROM.icf::L2R13.tom"/>
 <include src="ROM.icf::L1R09.tom"/>
+<include src="ROM.icf::L1R01.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 

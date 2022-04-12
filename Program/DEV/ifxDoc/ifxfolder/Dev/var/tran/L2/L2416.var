@@ -754,6 +754,9 @@ T(3,X)
 E(0,@OwnerPart,0)
 E(0,@OwnerTotal,0)
 
+#OwnerTotalTemp= m,10,L
+
+
 ##loop{times:10,i:1,j:0,rowSeq:2}
 
 #HIDE_LAND_{i}=@,1,S
@@ -804,8 +807,12 @@ E(0,@OwnerPart,#OwnerPart+#OwnerPart{i})
 #OwnerTotal{i}=m,10,I
 IF(#PageFg==3,$,CALL(#SHOW_3))
 IF(#FunCd==4,s,$)
+IF({i} != 1,E(0,@OwnerTotal{i},#OwnerTotalTemp),$)
 C(4,#OwnerId{i},S,$)
 @V(2,0)
+IF({i} == 1,E(0,@OwnerTotalTemp,#OwnerTotal{i}),$)
+IF({i}!= 1,V(1,#OwnerTotalTemp),$)
+
 !IF({i} == 1,E(0,@OwnerTotal,#OwnerTotal{i}),V(1,#OwnerTotal))
 
 #ta{i}=X,1,S
@@ -834,8 +841,8 @@ E(0,@OwnerPart,#OwnerPart+#OwnerPart{i})
 #OwnerPart=m,10,L
 
 #OwnerTotal=m,10,L
-IF(#FunCd==4,s,$)
-IF(#OwnerPart != #OwnerTotal,V(P,持份比例之分子總和需等於持份比例之分母),$)
+!IF(#FunCd==4,s,$)
+!IF(#OwnerPart != #OwnerTotal,V(P,持份比例之分子總和需等於持份比例之分母),$)
 
 #CheckOwnerPartend=X,1,L
 

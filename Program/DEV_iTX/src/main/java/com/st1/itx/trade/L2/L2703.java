@@ -1,8 +1,5 @@
 package com.st1.itx.trade.L2;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +21,7 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.SendRsp;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -48,11 +46,10 @@ public class L2703 extends TradeBuffer {
 	public LoanBorMainService sLoanBorMainService;
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	@Autowired
 	GSeqCom gSeqCom;
-	
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -60,6 +57,41 @@ public class L2703 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
+
+	@Autowired
+	DataLog dataLog;
+
+	private CustMain updateCustMain(CustMain tCustMainBefore, CustMain tCustMainAfter, String reason, TitaVo titaVo)
+			throws LogicException {
+		this.info("L2703 updateCustMain");
+		try {
+			tCustMainAfter = sCustMainService.update2(tCustMainAfter, titaVo);
+		} catch (DBException e) {
+			this.error(e.toString());
+			throw new LogicException(titaVo, "E0007", "寫回客戶主檔時錯誤");
+		}
+
+		// 紀錄變更前變更後
+//		dataLog.setEnv(titaVo, tCustMainBefore, tCustMainAfter);
+//		dataLog.exec(reason, "CustUKey:" + tCustMainAfter.getCustUKey());
+		return tCustMainAfter;
+	}
+
+	private CustDataCtrl updateCustDataCtrl(CustDataCtrl tCustDataCtrlBefore, CustDataCtrl tCustDataCtrlAfter,
+			String reason, TitaVo titaVo) throws LogicException {
+		this.info("L2703 updateCustDataCtrl");
+		try {
+			tCustDataCtrlAfter = sCustDataCtrlService.update2(tCustDataCtrlAfter, titaVo);
+		} catch (DBException e) {
+			this.error(e.toString());
+			throw new LogicException(titaVo, "E0007", "寫回顧客控管檔時錯誤");
+		}
+		// 紀錄變更前變更後
+//		dataLog.setEnv(titaVo, tCustDataCtrlBefore, tCustDataCtrlAfter);
+//		dataLog.exec(reason, "CustUKey:" + tCustDataCtrlAfter.getCustUKey());
+
+		return tCustDataCtrlAfter;
+	}
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -71,11 +103,9 @@ public class L2703 extends TradeBuffer {
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		// 客戶統編
 		String iCustId = titaVo.getParam("CustId");
-		
-		
+
 		String iReason = titaVo.getParam("Reason");
-		
-		
+
 		// new table
 		CustMain tCustMain = new CustMain();
 		CustDataCtrl tCustDataCtrl = new CustDataCtrl();
@@ -94,136 +124,139 @@ public class L2703 extends TradeBuffer {
 
 		if (iFunCd == 1) {
 
-			tCustDataCtrl = new CustDataCtrl();
-			// 新增時,測試該戶號是否存在結清戶個資控管檔 如存在 拋錯
-			tCustDataCtrl = sCustDataCtrlService.findById(custNo);
-			if (tCustDataCtrl != null) {
-				throw new LogicException(titaVo, "E0002", "L2703 該戶號" + custNo + "已存在於結清戶個資控管檔。");
+			tCustDataCtrl = sCustDataCtrlService.holdById(custNo);
+
+			if (tCustDataCtrl == null) {
+				tCustDataCtrl = new CustDataCtrl();
+				tCustDataCtrl.setCustNo(custNo);
+				tCustDataCtrl.setCustUKey(custUKet);
+				tCustDataCtrl.setReason("");
+				tCustDataCtrl.setCustId(tCustMain.getCustId());
+				tCustDataCtrl.setCustName(tCustMain.getCustName());
+				tCustDataCtrl.setCreateEmpNo(titaVo.getTlrNo());
+				tCustDataCtrl.setLastUpdateEmpNo(titaVo.getTlrNo());
+			} else if (tCustDataCtrl.getApplMark() == 1 || tCustDataCtrl.getApplMark() == 2) {
+				throw new LogicException(titaVo, "E0012", "該戶已設定為控管狀態");
 			}
+
+			CustDataCtrl tCustDataCtrlBefore = (CustDataCtrl) dataLog.clone(tCustDataCtrl);
+
 			// 檢查是否結清
-			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 999, 0,
+					Integer.MAX_VALUE, titaVo);
 			List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 			if (lLoanBorMain != null) {
 				for (LoanBorMain tLoanBorMain : lLoanBorMain) {
-					if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 99) {
+					if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
+							|| tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 99) {
 						throw new LogicException(titaVo, "E2003", "該戶號非結清戶");
 					}
 				}
 			}
 
-			tCustDataCtrl = new CustDataCtrl();
-			tCustDataCtrl.setCustNo(custNo);
-			tCustDataCtrl.setCustUKey(custUKet);
 			tCustDataCtrl.setApplMark(1);
-			tCustDataCtrl.setCustId(tCustMain.getCustId());
-			tCustDataCtrl.setCustName(tCustMain.getCustName());
-			tCustDataCtrl.setCreateEmpNo(titaVo.getParam("CreateEmpNo"));
-			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
-			
+			tCustDataCtrl.setSetEmpNo(titaVo.getTlrNo());
+			tCustDataCtrl
+					.setSetDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+
 			String custName = tCustMain.getCustName();
 			String custId = tCustMain.getCustId();
-			if (custName != null && !custName.isEmpty() && custId != null && !custId.isEmpty())
-			{
+
+			CustMain tCustMainBefore = (CustMain) dataLog.clone(tCustMain);
+
+			// 遮罩戶名
+			StringBuilder sb = new StringBuilder(custName);
+			for (int i = 1; i < sb.length(); i += 2)
+				sb.setCharAt(i, 'Ｏ');
+			tCustMain.setCustName(sb.toString());
+
+			if (tCustDataCtrl.getCustId().startsWith("XX")) {
+				// 為 XX 開頭時，表示這筆是設定後又解除過
+				// 這時將 CustMain 和 CustDataCtrl 互相交換，不取新編號
+
+				tCustMain.setCustId(tCustDataCtrl.getCustId());
+				tCustDataCtrl.setCustId(custId); // custId 是原本的 CustMain.CustId
+
+				updateCustMain(tCustMainBefore, tCustMain, "重新設定顧客控管", titaVo);
+
+			} else if (custName != null && !custName.isEmpty() && custId != null && !custId.isEmpty()) {
+
 				// Id
 				String newSeq = parse.IntegerToString(gSeqCom.getSeqNo(0, 0, "L2", "2703", 99999999, titaVo), 8);
 				String newId = "XX" + newSeq;
 				tCustMain.setCustId(newId);
-				
-				// 戶名
-				StringBuilder sb = new StringBuilder(custName);
-				for (int i = 1; i < sb.length(); i += 2)
-					sb.setCharAt(i, 'Ｏ');
-				tCustMain.setCustName(sb.toString());
+
 				// 寫回
-				try {
-					sCustMainService.update(tCustMain, titaVo);
-				} catch (DBException e) {
-					this.error(e.toString());
-					throw new LogicException(titaVo, "E0007", "寫回客戶主檔時錯誤");
-				}
+				tCustMain = updateCustMain(tCustMainBefore, tCustMain, "設定顧客控管", titaVo);
 			}
 
 			/* 存入DB */
-			try {
-				this.info("insert");
-				tCustDataCtrl = sCustDataCtrlService.insert(tCustDataCtrl);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
+			if (tCustDataCtrl.getReSetEmpNo() == null || tCustDataCtrl.getReSetEmpNo().isEmpty()) {
+				// 為新資料
+				updateCustDataCtrl(tCustDataCtrlBefore, tCustDataCtrl, "設定顧客控管", titaVo);
+			} else {
+				// 為重新設定
+				updateCustDataCtrl(tCustDataCtrlBefore, tCustDataCtrl, "重新設定顧客控管", titaVo);
 			}
-			// 解除
-		} else if (iFunCd == 2) {
+
+			// 紀錄變更前變更後
+			dataLog.setEnv(titaVo, tCustMainBefore, tCustMain);
+			dataLog.exec("設定顧客控管", "CustUKey:" + tCustMain.getCustUKey());
+
+		} else if (iFunCd == 2) { // 解除
 			tCustDataCtrl = sCustDataCtrlService.holdById(custNo);
 			if (tCustDataCtrl == null) {
 				throw new LogicException(titaVo, "E0003", "L2703 該戶號" + custNo + "不存在於結清戶個資控管檔。");
+			} else if (tCustDataCtrl.getApplMark() == 3) {
+				throw new LogicException(titaVo, "E0012", "該戶已解除控管");
 			}
-			
-			tCustDataCtrl.setCustId(tCustMain.getCustId());
-			tCustDataCtrl.setCustName(tCustMain.getCustName());
+
+			CustDataCtrl tCustDataCtrlBefore = (CustDataCtrl) dataLog.clone(tCustDataCtrl);
+
+			// 開頭為XX時表示已設定過，不再重寫
+			if (!iCustId.startsWith("XX")) {
+				tCustDataCtrl.setCustId(tCustMain.getCustId());
+				tCustDataCtrl.setCustName(tCustMain.getCustName());
+			}
 			tCustDataCtrl.setApplMark(3);
 			tCustDataCtrl.setReason(iReason);
-			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
+			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getTlrNo());
+			tCustDataCtrl.setReSetEmpNo(titaVo.getTlrNo());
+			tCustDataCtrl.setReSetDate(parse.StringToSqlDateO(dateUtil.getNowStringBc(), dateUtil.getNowStringTime()));
 
 			String custName = tCustDataCtrl.getCustName();
 			String custId = tCustDataCtrl.getCustId();
-			if (custName != null && !custName.isEmpty() && custId != null && !custId.isEmpty())
-			{
+
+			CustMain tCustMainBefore = (CustMain) dataLog.clone(tCustMain);
+			
+			//測試舊資料防
+			if (custName != null && !custName.isEmpty()) {
 				tCustMain.setCustName(custName);
+			}
+			
+			if (custId != null && !custId.isEmpty()) {
 				tCustMain.setCustId(custId);
-				try {
-					sCustMainService.update(tCustMain, titaVo);
-				} catch (DBException e) {
-					this.error(e.toString());
-					throw new LogicException(titaVo, "E0007", "寫回客戶主檔時錯誤");
-				}
 			}
-			
+
+			tCustMain = updateCustMain(tCustMainBefore, tCustMain, "解除顧客控管", titaVo);
+
 			/* UpdateDB */
-			try {
-				this.info("update");
-				tCustDataCtrl = sCustDataCtrlService.update(tCustDataCtrl);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
-			
-			// 刪除
-		} else if (iFunCd == 4) {
+			tCustDataCtrl = updateCustDataCtrl(tCustDataCtrlBefore, tCustDataCtrl, "解除顧客控管", titaVo);
 
-			tCustDataCtrl = sCustDataCtrlService.holdById(custNo);
-			if (tCustDataCtrl == null) {
-				throw new LogicException(titaVo, "E0004", "L2703 該戶號" + custNo + "不存在於結清戶個資控管檔。");
-			}
-
-			try {
-
-				this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
-
-				if (tCustDataCtrl != null) {
-					sCustDataCtrlService.delete(tCustDataCtrl);
-				}
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
-			}
+			// 紀錄變更前變更後
+			dataLog.setEnv(titaVo, tCustMainBefore, tCustMain);
+			dataLog.setLog("解除原因", "", tCustDataCtrl.getReason());
+			dataLog.exec("解除顧客控管", "CustUKey:" + tCustMain.getCustUKey());
 
 		} else if (iFunCd == 5) {
-
 			tCustDataCtrl = sCustDataCtrlService.findById(custNo);
 		}
 
 		// 宣告
-		Timestamp ts = tCustDataCtrl.getCreateDate();
-		this.info("ts = " + ts);
-		String createDate = "";
-		String createTime = "";
-		DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
-		DateFormat sdftime = new SimpleDateFormat("HHmmss");
-
-		createDate = sdfdate.format(ts);
-		createTime = sdftime.format(ts);
-		this.info("createDate = " + createDate);
-		this.info("createTime = " + createTime);
-
-		this.totaVo.putParam("OCreateDate", parse.stringToInteger(createDate) - 19110000);
-		this.totaVo.putParam("OCreateTime", createTime);
+		this.totaVo.putParam("OReSetDate", parse.timeStampToString(tCustDataCtrl.getReSetDate()));
+		this.totaVo.putParam("OReSetEmpNo", tCustDataCtrl.getReSetEmpNo());
+		this.totaVo.putParam("OSetDate", parse.timeStampToString(tCustDataCtrl.getSetDate()));
+		this.totaVo.putParam("OSetEmpNo", tCustDataCtrl.getSetEmpNo());
 
 		// 刷主管卡
 		if (titaVo.getEmpNos().trim().isEmpty()) {

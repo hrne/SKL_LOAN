@@ -223,20 +223,20 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("yearMonth=" + yearMonth + "-" + formNum);
 
 		int lYear = yearMonth / 100;
-		int lMonth = yearMonth % 100;
+		int lMonth = yearMonth % 100 - 1;
 
-		if (lMonth == 1) {
+		if (lMonth == 0) {
 			lYear = lYear - 1;
 			lMonth = 12;
 		}
 
 		int outStandingYMD = (lYear * 10000) + (lMonth * 100) + 1;
-
+		this.info("outStandingYMD=" + outStandingYMD);
 		String sql = " ";
 		if (formNum == 1) {
 			sql += "SELECT * FROM (";
 			sql += "	SELECT ( CASE";
-			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
@@ -252,7 +252,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"PrinBalance\" > 0";
 			sql += "	GROUP BY ( CASE";
-			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
@@ -281,7 +281,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			   ELSE '99'";
 			sql += "			 END ) AS \"ASBC\"";
 			sql += "		  ,( CASE";
-			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
@@ -303,7 +303,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			     ELSE '99'";
 			sql += "			   END )";
 			sql += "		    ,( CASE";
-			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
@@ -314,13 +314,13 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (formNum == 3) {
 			sql += "SELECT * FROM (";
 			sql += "	SELECT ( CASE";
-			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
 			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
 			sql += "			   ELSE '99'";
 			sql += "			 END ) AS \"TYPE\"";
 			sql += "		  ,( CASE";
-			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
@@ -338,13 +338,13 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	  AND M.\"PrevIntDate\"  >= :lyymmdd";
 //			sql += "	  AND M.\"AssetClass\" IS NULL";
 			sql += "	GROUP BY ( CASE";
-			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
 			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
 			sql += "			     ELSE '99'";
 			sql += "			   END ) ";
 			sql += "		    ,( CASE";
-			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";

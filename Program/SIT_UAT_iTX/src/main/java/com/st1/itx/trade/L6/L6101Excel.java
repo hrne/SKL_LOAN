@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxInquiry;
 import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxInquiryService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.TxTranCodeService;
@@ -47,22 +49,30 @@ public class L6101Excel extends MakeReport {
 	@Autowired
 	TxTranCodeService sTxTranCodeService;
 	
+	@Autowired
+	CustMainService sCustMainService;
+	
 	
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L6101", "結清戶滿五年查詢清單", "L6101" + "_" + "結清戶滿五年查詢清單");
 		printExcelHeader();
 		
-		int Caldy = Integer.parseInt(titaVo.getCalDy())+19110000;
+		int Caldy = parse.stringToInteger(titaVo.getCalDy())+19110000;
 		
 		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findImportFg(Caldy,Caldy, "1",0,9999999, 0,Integer.MAX_VALUE, titaVo);
 
-		List<TxInquiry> iTxInquiry = sTxInquiry== null ? null : sTxInquiry.getContent();
+		List<TxInquiry> iTxInquiry = sTxInquiry == null ? null : sTxInquiry.getContent();
+		
+		this.info("slice: " + sTxInquiry.toString());
+		this.info("list: " + iTxInquiry.toString());
 
 		TempVo tTempVo = new TempVo();
 		int rowCursor = 2;
 		
 		if (iTxInquiry != null) {
+			
+			this.info("list count: " + + iTxInquiry.size());
 			
 			for ( TxInquiry tTxInquiry : iTxInquiry) {
 				
@@ -71,7 +81,7 @@ public class L6101Excel extends MakeReport {
 				tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tTxInquiry.getTranData());
 				
-				if(tTempVo.get("TxReason") ==null || tTempVo.get("TxReason").isEmpty()) {
+				if(tTempVo.get("TxReason") == null || tTempVo.get("TxReason").isEmpty()) {
 					continue;
 				}
 				
@@ -80,24 +90,33 @@ public class L6101Excel extends MakeReport {
 				//交易代號
 				makeExcel.setValue(rowCursor, 1, tTempVo.get("TXCD")+" "+tranItem);
 				
+				//戶號
+				int custNo = tTxInquiry.getCustNo();
+				makeExcel.setValue(rowCursor, 2, custNo);
+				
+				//戶名
+				CustMain tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+				if (tCustMain != null)
+					makeExcel.setValue(rowCursor, 3, tCustMain.getCustName());
+				
 				//查詢理由
 				reason = tTempVo.get("TxReason");
-				makeExcel.setValue(rowCursor, 2, reason);
+				makeExcel.setValue(rowCursor, 4, reason);
 				
 				//經辦
-				makeExcel.setValue(rowCursor, 3, tTempVo.get("TLRNO")+" "+tTempVo.get("EMPNM"));
+				makeExcel.setValue(rowCursor, 5, tTempVo.get("TLRNO")+" "+tTempVo.get("EMPNM"));
 					
 				//交易日期
 				String date = tTempVo.get("CALDY");
 				if(date.length()>0 && date!=null && !date.isEmpty()) {
 					date = showDate(date,1);
 				}
-				makeExcel.setValue(rowCursor, 4, date);	
+				makeExcel.setValue(rowCursor, 6, date);	
 	
 				//交易時間
 				String time = tTempVo.get("CALTM");
-				time = time.substring(0, 2)+":"+time.substring(2, 4)+":"+time.substring(4, 6);
-				makeExcel.setValue(rowCursor, 5, time);
+				time = this.showTime(time);
+				makeExcel.setValue(rowCursor, 7, time);
 					
 					
 				rowCursor++;
@@ -107,8 +126,9 @@ public class L6101Excel extends MakeReport {
 		
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "結清戶滿五年查詢清單完成", titaVo);
 		
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		// long sno =
+		makeExcel.close();
+		// makeExcel.toExcel(sno);
 
 	}
 	
@@ -158,18 +178,23 @@ public class L6101Excel extends MakeReport {
 		makeExcel.setValue(1, 1, "交易代號");
 		makeExcel.setWidth(1, 40);
 		
-		makeExcel.setValue(1, 2, "查詢理由");
-		makeExcel.setWidth(2, 40);
+		makeExcel.setValue(1, 2, "戶號");
+		makeExcel.setWidth(2, 8);
 		
-		makeExcel.setValue(1, 3, "經辦");
-		makeExcel.setWidth(3, 20);
+		makeExcel.setValue(1, 3, "戶名");
+		makeExcel.setWidth(3, 32);
 		
-		makeExcel.setValue(1, 4, "交易日期");
-		makeExcel.setWidth(4, 18);
+		makeExcel.setValue(1, 4, "查詢理由");
+		makeExcel.setWidth(4, 40);
 		
+		makeExcel.setValue(1, 5, "經辦");
+		makeExcel.setWidth(5, 20);
 		
-		makeExcel.setValue(1, 5, "交易時間");
-		makeExcel.setWidth(5, 18);
+		makeExcel.setValue(1, 6, "交易日期");
+		makeExcel.setWidth(6, 18);
+		
+		makeExcel.setValue(1, 7, "交易時間");
+		makeExcel.setWidth(7, 18);
 		
 		
 	

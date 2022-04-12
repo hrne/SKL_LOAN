@@ -77,7 +77,7 @@ public class LM027ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		   AND O.\"Status\" in ('2','3') ";
 		sql += "		 GROUP BY O.\"CustNo\"";
 		sql += "				 ,O.\"FacmNo\"";
-		sql += "				 ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
+		sql += "				 ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "		 ORDER BY \"CustNo\"";
 		sql += "				 ,\"FacmNo\") M";
 		sql += "	LEFT JOIN(SELECT \"CustNo\"";

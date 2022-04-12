@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -49,61 +51,82 @@ public class L2R31 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// tita
-		// 功能 1新增 4刪除 5查詢
+		// 功能 1設定 2解除 5查詢
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
 		// 客戶統編
 		String iCustId = titaVo.getParam("RimCustId");
+		
 		// new table
 		CustMain tCustMain = new CustMain();
-		CustDataCtrl tCustDataCtrl = new CustDataCtrl();
-
 		// 客戶統編找客戶主檔戶號
 		tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		
+		CustDataCtrl tCustDataCtrl;
+		int custNo = 0;
+		
 		if (tCustMain == null) {
-			throw new LogicException(titaVo, "E2003", "該統編不存在客戶主檔");
+			// 如果抓不到 CustMain, 搜尋控管檔, 如果還是沒有再throw exception
+			
+			Slice<CustDataCtrl> sCustDataCtrl = sCustDataCtrlService.findCustId(iCustId, 0, 1, titaVo);
+			if (sCustDataCtrl == null)
+				throw new LogicException(titaVo, "E2003", "該統編不存在客戶主檔或結清戶個資控管檔");
+			
+			List<CustDataCtrl> lCustDataCtrl = sCustDataCtrl.getContent();
+			
+			if (lCustDataCtrl.isEmpty())
+				throw new LogicException(titaVo, "E2003", "該統編不存在客戶主檔或結清戶個資控管檔");
+						
+			tCustDataCtrl = lCustDataCtrl.get(0);
+			tCustMain = sCustMainService.custNoFirst(tCustDataCtrl.getCustNo(), tCustDataCtrl.getCustNo(), titaVo);
+			custNo = tCustMain.getCustNo();
+		} else
+		{
+			// 於客戶主檔有
+			custNo = tCustMain.getCustNo();
+			parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime());
+		    tCustDataCtrl = sCustDataCtrlService.findById(custNo, titaVo);
 		}
-		int custNo = tCustMain.getCustNo();
-		tCustMain.getCustUKey();
 
-		parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime());
 
 		if (iFunCd == 1) {
-
+			
+			if (tCustDataCtrl == null)
+			{
+				// 此為新增
+				tCustDataCtrl = new CustDataCtrl();
+			}
+			
 			this.totaVo.putParam("L2r31CustNo", custNo);
 			this.totaVo.putParam("L2r31CustName", tCustMain.getCustName());
-			this.totaVo.putParam("L2r31CreateEmpNo", titaVo.getTlrNo());
-			this.totaVo.putParam("L2r31CreateDate", dateUtil.getNowIntegerForBC() - 19110000);
-			this.totaVo.putParam("L2r31CreateTime", dateUtil.getNowIntegerTime());
-			this.totaVo.putParam("L2r31Reason", "");
+			this.totaVo.putParam("L2r31Reason", tCustDataCtrl.getReason());
 			this.totaVo.putParam("L2r31CuscCd", tCustMain.getCuscCd());
+			this.totaVo.putParam("L2r31SetEmpNo", tCustDataCtrl.getSetEmpNo());
+			this.totaVo.putParam("L2r31ReSetEmpNo", tCustDataCtrl.getReSetEmpNo());
+			
 			this.info("tlrno = " + titaVo.getTlrNo());
 
 		} else {
 
-			tCustDataCtrl = sCustDataCtrlService.findById(custNo, titaVo);
 			if (tCustDataCtrl == null) {
 				throw new LogicException(titaVo, "E2003", "結清戶個資控管檔");
-			}
-			String txDate4 = "";
-			String txTime2 = "";
-			if (tCustDataCtrl.getCreateDate() != null) {
-				String txDate = tCustDataCtrl.getCreateDate().toString();
-				this.info("txDate L2073 " + txDate);
-				String txDate2 = txDate.substring(0, 4) + txDate.substring(5, 7) + txDate.substring(8, 10);
-				int txDate3 = parse.stringToInteger(txDate2) - 19110000;
-				txDate4 = String.valueOf(txDate3);
-				txTime2 = txDate.substring(11, 13) + ":" + txDate.substring(14, 16) + ":" + txDate.substring(17, 19);
 			}
 
 			this.totaVo.putParam("L2r31CustNo", tCustDataCtrl.getCustNo());
 			this.totaVo.putParam("L2r31CustName", tCustMain.getCustName());
-			this.totaVo.putParam("L2r31CreateEmpNo", tCustDataCtrl.getLastUpdateEmpNo());
-			this.totaVo.putParam("L2r31CreateDate", txDate4);
-			this.totaVo.putParam("L2r31CreateTime", txTime2);
 			this.totaVo.putParam("L2r31Reason", tCustDataCtrl.getReason());
 			this.totaVo.putParam("L2r31CuscCd", tCustMain.getCuscCd());
+			this.totaVo.putParam("L2r31SetEmpNo", tCustDataCtrl.getSetEmpNo());			
+			this.totaVo.putParam("L2r31ReSetEmpNo", tCustDataCtrl.getReSetEmpNo());
+		
 		}
-
+		
+		this.totaVo.putParam("L2r31ApplMark", tCustDataCtrl.getApplMark());
+		this.totaVo.putParam("L2r31CreateEmpNo", titaVo.getTlrNo());
+		this.totaVo.putParam("L2r31CreateDate", dateUtil.getNowIntegerForBC() - 19110000);
+		this.totaVo.putParam("L2r31CreateTime", dateUtil.getNowIntegerTime());
+		
+		this.totaVo.putParam("L2r31SetDate", parse.timeStampToString(tCustDataCtrl.getSetDate()));
+		this.totaVo.putParam("L2r31ReSetDate", parse.timeStampToString(tCustDataCtrl.getReSetDate()));
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -54,6 +54,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              ,'40241601000'";
 		sql += "                              ,'40241602000'";
 		sql += "                              ,'40241603000')";
+		sql += "        AND A.\"SlipBatNo\" NOT BETWEEN 90 AND 99 ";
 		sql += "      GROUP BY A.\"AcNoCode\"";
 		sql += "              ,C.\"AcNoItem\"";
 		sql += "              ,A.\"AcDate\"";
@@ -97,6 +98,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    ,'40241603000')";
 		sql += "              AND TRUNC(A.\"AcDate\" / 100) = :entdy";
 		sql += "              AND A.\"DbCr\" = 'C'";
+		sql += "              AND A.\"SlipBatNo\" NOT BETWEEN 90 AND 99 ";
 		sql += "            GROUP BY A.\"AcNoCode\" ";
 		sql += "                    ,A.\"AcDate\" ";
 		sql += "                    ,A.\"CustNo\" ";
@@ -155,6 +157,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    ,'40241601000'";
 		sql += "                                    ,'40241602000'";
 		sql += "                                    ,'40241603000')";
+		sql += "              AND A.\"SlipBatNo\" NOT BETWEEN 90 AND 99 ";
 		sql += "            GROUP BY A.\"AcNoCode\" ";
 		sql += "                    ,C.\"AcNoItem\" ";
 		sql += "                    ,A.\"AcDate\" ";
@@ -189,6 +192,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                          ,'40241603000')";
 		sql += "                    AND TRUNC(A.\"AcDate\" / 100) = :entdy";
 		sql += "                    AND A.\"DbCr\" = 'C'";
+		sql += "                    AND A.\"SlipBatNo\" NOT BETWEEN 90 AND 99 ";
 		sql += "                  GROUP BY A.\"AcNoCode\" ";
 		sql += "                          ,A.\"AcDate\" ";
 		sql += "                          ,A.\"CustNo\" ";
@@ -221,6 +225,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    ,'40241601000'";
 		sql += "                                    ,'40241602000'";
 		sql += "                                    ,'40241603000')";
+		sql += "              AND A.\"SlipBatNo\" NOT BETWEEN 90 AND 99 ";
 		sql += "            GROUP BY A.\"AcNoCode\" ";
 		sql += "                    ,C.\"AcNoItem\" ";
 		sql += "                    ,A.\"CustNo\" ";
@@ -251,6 +256,7 @@ public class LM019ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    ,'40241601000'";
 		sql += "                                    ,'40241602000'";
 		sql += "                                    ,'40241603000')";
+		sql += "              AND A.\"SlipBatNo\" NOT BETWEEN 90 AND 99 ";
 		sql += "            GROUP BY A.\"AcNoCode\" ";
 		sql += "                    ,C.\"AcNoItem\" ";
 		sql += "                    ,A.\"CustNo\" ";

@@ -65,7 +65,7 @@ K(MODIFYBUTTON,1,新增)
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 !CloseReasonCode,清償原因
-#CDDEF0001=x,22,S
+#CDDEF0001=x,23,S
 T(3,CdCode.AdvanceCloseCode)
 
 !CollectWayCode,領取方式

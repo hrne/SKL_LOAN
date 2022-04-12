@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L9;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,9 +124,21 @@ public class L9130 extends TradeBuffer {
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
 				"L9130總帳傳票媒體檔產生已完成", titaVo);
 
-		tranL9131.run(titaVo);
+		try {
+			tranL9131.run(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9130產生L9131總帳日結單代傳票時發生錯誤 = " + errors.toString());
+		}
 
-		tranL9132.run(titaVo);
+		try {
+			tranL9132.run(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9130產生L9132傳票媒體總表(總帳)時發生錯誤 = " + errors.toString());
+		}
 
 		String doL9133 = "N";
 
@@ -136,12 +150,24 @@ public class L9130 extends TradeBuffer {
 		this.info("doL9133 = " + doL9133);
 
 		if (doL9133.equals("Y")) {
-			tranL9133.run(titaVo);
+			try {
+				tranL9133.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9133放款會計與主檔餘額檢核表時發生錯誤 = " + errors.toString());
+			}
 		}
 
 		titaVo.putParam("StartDate", iAcDate);
 		titaVo.putParam("EndDate", iAcDate);
-		tranL9134.run(titaVo);
+		try {
+			tranL9134.run(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9130產生L9134暫收款傳票金額表時發生錯誤 = " + errors.toString());
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -38,12 +38,12 @@ public class L9716Report extends MakeReport {
 		this.info(TXCD + "Report exec start ...");
 
 		List<Map<String, String>> lL9716_1 = null;
-//		List<Map<String, String>> lL9716_2 = null;
+		List<Map<String, String>> lL9716_2 = null;
 
 		try {
 
 			lL9716_1 = l9716ServiceImpl.findAll(titaVo);
-//			lL9716_2 = l9716ServiceImpl.ovduFindAll(titaVo);
+			lL9716_2 = l9716ServiceImpl.ovduFindAll(titaVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -52,10 +52,10 @@ public class L9716Report extends MakeReport {
 		}
 
 		exportExcel(titaVo, lL9716_1);
-//		exportExcel2(titaVo, lL9716_2);
+		exportExcel2(titaVo, lL9716_2);
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 
 		return true;
 
@@ -68,7 +68,8 @@ public class L9716Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
+				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -102,6 +103,8 @@ public class L9716Report extends MakeReport {
 						}
 						break;
 					}
+
+
 
 				} // for
 

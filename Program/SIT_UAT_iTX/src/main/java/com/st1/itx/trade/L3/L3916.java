@@ -32,15 +32,7 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/*
- * Tita
- * CaseNo=9,7
- * TimCustNo=9,7
- * CustId=X,10
- * ApplNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- */
+
 /**
  * L3916 撥款內容查詢
  * 
@@ -213,6 +205,7 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("PayIntFreq", tLoanBorMain.getPayIntFreq());
 		this.totaVo.putParam("GraceDate", tLoanBorMain.getGraceDate());
 		this.totaVo.putParam("RenewFlag", tLoanBorMain.getRenewFlag());
+		this.totaVo.putParam("PieceCode", tLoanBorMain.getPieceCode());
 		this.totaVo.putParam("StoreRate", tLoanBorMain.getStoreRate());
 		this.totaVo.putParam("RateCode", tLoanBorMain.getRateCode());
 		this.totaVo.putParam("RateIncr", tLoanBorMain.getRateIncr());

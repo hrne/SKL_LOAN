@@ -160,14 +160,18 @@ public class L4450Batch extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		int tbsdyf = txBuffer.getMgBizDate().getTbsDyf();
 		// 暫收抵繳整批入帳完畢，再產檔
-		BatxHead tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, "L4450", "8"); // <> 8-已刪除
-		if (tBatxHead == null || !"4".equals(tBatxHead.getBatxExeCode())) {
+		BatxHead tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, "L4450", " ");
+		if (tBatxHead == null) {
 			tBatxHead = bs020.exec(titaVo, this.txBuffer);
 			this.info("BatchNo = " + tBatxHead.getBatchNo());
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
-					"請先完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
-		} else {
+					"請完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
+		}
+		if ("4".equals(tBatxHead.getBatxExeCode()) || "8".equals(tBatxHead.getBatxExeCode())) {
 			exec(titaVo);
+		} else {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
+					"請先完成或刪除暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
 		}
 		return this.sendList();
 	}

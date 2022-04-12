@@ -27,6 +27,9 @@ public interface TxTellerRepositoryMon extends JpaRepository<TxTeller, String> {
   // BrNo = ,AND GroupNo >=,AND GroupNo <=,AND LevelFg>=,AND LevelFg<=
   public Slice<TxTeller> findAllByBrNoIsAndGroupNoGreaterThanEqualAndGroupNoLessThanEqualAndLevelFgGreaterThanEqualAndLevelFgLessThanEqualOrderByTlrNoAsc(String brNo_0, String groupNo_1, String groupNo_2, int levelFg_3, int levelFg_4, Pageable pageable);
 
+  // TlrNo %
+  public Slice<TxTeller> findAllByTlrNoLikeOrderByTlrNoAsc(String tlrNo_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

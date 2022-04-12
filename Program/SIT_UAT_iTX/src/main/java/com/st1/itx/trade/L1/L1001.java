@@ -446,7 +446,7 @@ public class L1001 extends TradeBuffer {
 		String cdate = aCustMain.getCreateDate() == null ? "" : aCustMain.getCreateDate().toString();
 		String udate = aCustMain.getLastUpdate() == null ? "" : aCustMain.getLastUpdate().toString();
 
-		List<String> txcds = Arrays.asList("L1103", "L1104", "L1105", "L1107", "L1108", "L1109", "L1110", "L1111");
+		List<String> txcds = Arrays.asList("L1103", "L1104", "L1105", "L1107", "L1108", "L1109", "L1110", "L1111","L2703");
 
 		TxDataLog txDataLog = txDataLogService.findByMrKeyFirst("CustUKey:" + aCustMain.getCustUKey(), txcds, titaVo);
 

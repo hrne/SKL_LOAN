@@ -88,7 +88,7 @@ E(0,#CDT)
 V(5,0010101,#CDT)
 
 #TxDateE=D,7,I
-E(0,#TxDateS)
+E(0,#CDT)
 @V(7)A(4,0,#TxDateE)
 V(5,#TxDateS,#CDT)
 
@@ -146,6 +146,12 @@ T(2,#OOTlrNo+ +#OOTlrItem)
 !交易時間
 #OOCaldy=x,20,S
 
+!戶號
+#OOCustNo=A,7,S
+
+!戶名
+#OOCustName=X,100,S,maxWidth:50
+
 </sub>
 
 
@@ -168,6 +174,8 @@ TXFORM=L6045
 #OOTlrNo
 #OOTlrItem
 #OOCaldy
+#OOCustNo
+#OOCustName
 ^
 TXFORM=L6R20
 #TlrItem
@@ -192,6 +200,12 @@ TXFORM=L6R20
 
 #OOTranCodeX=交易代號
 {width:250,align:'left'}
+
+#OOCustNo=戶號
+{width:60,align:'left'}
+
+#OOCustName=戶名
+{width:200,align:'left'}
 
 #OOReason=查詢理由
 {width:350,align:'left'}

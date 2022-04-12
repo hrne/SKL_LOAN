@@ -18,9 +18,11 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
@@ -57,6 +59,9 @@ public class L2073 extends TradeBuffer {
 	
 	@Autowired
 	MakeReport makeReport;
+	
+	@Autowired
+	TxDataLogService sTxDataLogService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -111,7 +116,7 @@ public class L2073 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();
 		}
 
-		for (CustDataCtrl tCustDateCtrl : lCustDateCtrl) {
+		for (CustDataCtrl tCustDataCtrl : lCustDateCtrl) {
 			
 			String lastUpdate = "";
 
@@ -119,16 +124,16 @@ public class L2073 extends TradeBuffer {
 			OccursList occurslist = new OccursList();
 			// new table
 			tCustMain = new CustMain();
-			String custUKey = tCustDateCtrl.getCustUKey();
+			String custUKey = tCustDataCtrl.getCustUKey();
 			tCustMain = sCustMainService.findById(custUKey, titaVo);
 			if (tCustMain == null) {
 				continue;
 			}
 
-			if (tCustDateCtrl.getLastUpdate() != null) {
+			if (tCustDataCtrl.getLastUpdate() != null) {
 
 				// 宣告
-				ts = tCustDateCtrl.getLastUpdate();
+				ts = tCustDataCtrl.getLastUpdate();
 				this.info("ts = " + ts);
 				DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
 				DateFormat sdftime = new SimpleDateFormat("HH:mm:ss");
@@ -144,21 +149,36 @@ public class L2073 extends TradeBuffer {
 			String EmpName = "";
 			CdEmp tCdEmp = new CdEmp();
 
-			if (tCustDateCtrl.getLastUpdateEmpNo() != null) {
-				TlrNo = tCustDateCtrl.getLastUpdateEmpNo();
+			if (tCustDataCtrl.getLastUpdateEmpNo() != null) {
+				TlrNo = tCustDataCtrl.getLastUpdateEmpNo();
 				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
 				if (tCdEmp != null) {
 					EmpName = tCdEmp.getFullname();
 				}
 			}
-
+			
+			List<String> searchTXCDs = new ArrayList<String>();
+			searchTXCDs.add("L2703");
+			searchTXCDs.add("L2073");
+			
+			TxDataLog txDataLog = sTxDataLogService.findByMrKeyFirst("CustUKey:"+tCustMain.getCustUKey(), searchTXCDs, titaVo);
+			
+			Boolean hasLog = txDataLog != null;
+			
+			occurslist.putParam("OOCustUKey", tCustMain.getCustUKey());
 			occurslist.putParam("OOCustId", tCustMain.getCustId());
-			occurslist.putParam("OOCustNo", tCustDateCtrl.getCustNo());
+			occurslist.putParam("OOCustNo", tCustDataCtrl.getCustNo());
 			occurslist.putParam("OOCustName", tCustMain.getCustName());
 			occurslist.putParam("OOTlrNo", TlrNo);
 			occurslist.putParam("OOEmpName", EmpName);
 			occurslist.putParam("OOLastUpdate", lastUpdate);
-			occurslist.putParam("OOReason", tCustDateCtrl.getReason());
+			occurslist.putParam("OOReason", tCustDataCtrl.getReason());
+			occurslist.putParam("OOApplMark", tCustDataCtrl.getApplMark());
+			occurslist.putParam("OOSetEmpNo", tCustDataCtrl.getSetEmpNo());
+			occurslist.putParam("OOSetDate", parse.timeStampToString(tCustDataCtrl.getSetDate()));
+			occurslist.putParam("OOReSetEmpNo", tCustDataCtrl.getReSetEmpNo());
+			occurslist.putParam("OOReSetDate", parse.timeStampToString(tCustDataCtrl.getReSetDate()));
+			occurslist.putParam("OOHasHistory", hasLog ? 1 : 0);
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
 		}

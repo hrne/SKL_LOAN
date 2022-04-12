@@ -15,9 +15,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxInquiry;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxInquiryService;
 import com.st1.itx.db.service.TxTranCodeService;
 
@@ -38,6 +40,9 @@ public class L6045 extends TradeBuffer {
 	public TxTranCodeService txTranCodeService;
 	@Autowired
 	public CdEmpService cdEmpService;
+	
+	@Autowired
+	CustMainService sCustMainService;
 	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -107,6 +112,20 @@ public class L6045 extends TradeBuffer {
 				time = time.substring(0, 2)+":"+time.substring(2, 4)+":"+time.substring(4, 6);
 				
 				occursList.putParam("OOCaldy", date+" "+time);
+				
+				// 放入戶號與戶名
+				int custNo = tTxInquiry.getCustNo();
+				occursList.putParam("OOCustNo", custNo);
+				
+				CustMain tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+				
+				if (tCustMain != null)
+				{
+					occursList.putParam("OOCustName", tCustMain.getCustName());
+				} else 
+				{
+					this.warn("CustNo " + custNo + " is not found in CustMain !?");
+				}
 				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

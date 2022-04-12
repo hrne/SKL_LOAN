@@ -58,9 +58,9 @@
 		<step id="eodFinal" parent="parentStep">
 			<tasklet ref="EodFinal" />
 			<next on="COMPLETED" to="startEomFlow" />
-			<next on="STOPPED" to="startDailyDbCopy" />
+			<next on="STOPPED" to="startDailyCopy" />
 		</step>
-		<step id="startEomFlow" parent="parentStep" next="startDailyDbCopy">
+		<step id="startEomFlow" parent="parentStep" next="startDailyCopy">
 			<job ref="eomFlow" job-launcher="jobLauncher" />
 		</step>
 		<!-- DailyCopy 每日資料庫複製 -->

@@ -29,7 +29,7 @@ public class SystemParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5856751104537736729L;
+	private static final long serialVersionUID = 8715792104317600511L;
 
 // 業務類型
   /* LN */
@@ -276,6 +276,11 @@ public class SystemParas implements Serializable {
   /* 範例格式:02-23895858#7279 */
   @Column(name = "`JcicEmpTel`", length = 16)
   private String jcicEmpTel;
+
+  // 自動批次記號
+  /* Y:啟用N:不啟用 */
+  @Column(name = "`AutoBatchFg`", length = 1)
+  private String autoBatchFg;
 
   // 建檔日期時間
   @CreatedDate
@@ -1337,6 +1342,27 @@ N:不啟用
   }
 
 /**
+	* 自動批次記號<br>
+	* Y:啟用
+N:不啟用
+	* @return String
+	*/
+  public String getAutoBatchFg() {
+    return this.autoBatchFg == null ? "" : this.autoBatchFg;
+  }
+
+/**
+	* 自動批次記號<br>
+	* Y:啟用
+N:不啟用
+  *
+  * @param autoBatchFg 自動批次記號
+	*/
+  public void setAutoBatchFg(String autoBatchFg) {
+    this.autoBatchFg = autoBatchFg;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1423,7 +1449,7 @@ N:不啟用
            + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortPrinLimit=" + shortPrinLimit
            + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
            + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", ftpUrl=" + ftpUrl + ", ftpAuth=" + ftpAuth
-           + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

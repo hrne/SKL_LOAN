@@ -385,10 +385,8 @@ public class BaTxCom extends TradeBuffer {
 		else
 			this.isPayAllFee = false; // 部分
 
-		// 批次可預收期數，限匯款轉帳
-		if (iRepayCode == 1) {
-			this.preRepayTermsBatch = this.txBuffer.getSystemParas().getPreRepayTermsBatch();
-		}
+		// 批次可預收期數
+		this.preRepayTermsBatch = this.txBuffer.getSystemParas().getPreRepayTermsBatch();
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
 		this.isEmptyLoanBaTxVo = true;
@@ -1264,8 +1262,7 @@ public class BaTxCom extends TradeBuffer {
 						this.info("settleByPayintDate xxBal=" + this.xxBal + ", rePayIntDate=" + rePayIntDate
 								+ ", payintDateAmt=" + payintDateAmt + ", shortAmtLimit=" + shortAmtLimit);
 						// 匯款轉帳最後一期可欠繳
-						if (this.xxBal.add(this.shortAmtLimit)
-								.compareTo(payintDateAmt) < 0) {
+						if (this.xxBal.add(this.shortAmtLimit).compareTo(payintDateAmt) < 0) {
 							break;
 						} else {
 							this.info("settleByPayintDate payintDateAmt=" + payintDateAmt);

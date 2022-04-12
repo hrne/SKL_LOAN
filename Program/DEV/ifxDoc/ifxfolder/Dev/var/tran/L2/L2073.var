@@ -36,7 +36,7 @@ T(2,1+)
 #BtnAddA=x,100,S
 T(2,{cmd=CHAIN; ntxcd=L2703; ntxbuf=#BTNADDBUF; ntxbuf5=type})
 ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,新增)
+K(MODIFYBUTTON,1,新增設定)
 
 </sub>
 
@@ -159,6 +159,7 @@ E(0,4)
 E(0,5)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 #LOOP=X,1,S
@@ -181,27 +182,51 @@ T(2,#OOTlrNo+  +#OOEmpName)
 
 #OOReason=X,50,S
 
-!解除
-#OOBUF2=X,142,S
-T(2,#FUNC2+#OOCustId)
+#OOApplMark=A,1,S
 
-#OOBTN2=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2703; ntxbuf=#OOBUF2})
-C(4,#OOReason,$,BIND(grid,cancel))
+#OOSetEmpNo=X,6,S
 
-!刪除
-#OOBUF4=X,142,S
-T(2,#FUNC4+#OOCustId)
+#OOSetDate=X,18,S
 
-#OOBTN4=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2703; ntxbuf=#OOBUF4})
+#OOReSetEmpNo=X,6,S
+
+#OOReSetDate=X,18,S
+
+#OOCustUKey=X,32,S
+
+
+
+!解除!解除2 = ApplMark為1或2時
+!    設定1 = ApplMark為0或3時
+#OOFunc=A,1,S
+C(2,#OOApplMark,E(0,1),E(0,2),E(0,2),E(0,1))
+C(3,#OOApplMark,3,$,T(3,#OOReason,))
+
+#OOBUF=X,142,S
+T(2,#OOFunc+#OOCustNo)
+
+#BTNNAME=X,4,S
+C(3,#OOApplMark,1,T(3,解除),T(3,設定))
+
+#OOBTN=X,1,S
+BIND(grid,{cmd=CHAIN;ntxcd=L2703;text=#BTNNAME;ntxbuf=#OOBUF})
 
 !查詢
 #OOBUF5=X,142,S
-T(2,#FUNC5+#OOCustId)
+T(2,#FUNC5+#OOCustNo)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2703; ntxbuf=#OOBUF5})
+
+
+#OOBUFHistory=x,46,S
+T(2,L2703+CustUKey:+#OOCustUKey)
+
+#OOHasHistory=A,1,S
+
+!出現在這裡的明細必有歷程
+#OOBTNHistory=X,1,S
+C(3,#OOHasHistory,1,BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OOBUFHistory}),BIND(grid,cancel))
 
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -222,6 +247,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2703; ntxbuf=#OOBUF5})
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L2073
+#OOCustUKey
 #OOCustId
 #OOCustNo
 #OOCustName
@@ -229,6 +255,8 @@ TXFORM=L2073
 #OOEmpName
 #OOLastUpdate
 #OOReason
+#OOApplMark
+#OOHasHistory
 ^
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L2R47.tom"/>
@@ -246,28 +274,28 @@ TXFORM=L2073
 #RPTFG=0,QUERY.GRID,L2073
 #any={detail:true, header:'L2073.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN2=解除
-{width:50,search:false,formatter:'cust:bind-button:解除',align:'center',canExport:false}
-
-! #OOBTN4=刪除
-! {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+#OOBTN=設定／解除
+{width:100,search:false,formatter:'cust:bind-button:;',align:'center',canExport:false}
 
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
+#OOBTNHistory=歷程
+{width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
+
 #OOCustNo=戶號
-{width:100,align:'center'}
+{width:60,align:'center'}
 
 #OOCustId=統一編號
-{width:120,align:'center'}
+{width:80,align:'center'}
 
 #OOCustName=戶名
-{width:150,align:'center'}
+{width:300,align:'left'}
 
-#OOEmpName=最後異動櫃員
+#OOEmpName=修改人員
 {width:120,align:'center'}
 
-#OOLastUpdate=最後異動時間
+#OOLastUpdate=修改時間
 {width:140,align:'center'}
 
 #OOReason=解除原因

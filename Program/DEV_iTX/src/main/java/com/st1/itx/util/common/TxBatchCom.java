@@ -385,22 +385,30 @@ public class TxBatchCom extends TradeBuffer {
 		TempVo tempVo = new TempVo();
 		initialProcNote(tempVo.getVo(tDetail.getProcNote()), titaVo);
 
+		// 入帳日期檢核
+		if (tDetail.getEntryDate()> this.txBuffer.getTxBizDate().getTbsDy()) {
+			this.checkMsg = "入帳日" + tDetail.getEntryDate() + " 大於會計日" + this.txBuffer.getTxBizDate().getTbsDy();
+			this.procStsCode = "3"; // 3.檢核錯誤
+		}
+
 		// --------------- 執行 AML 交易檢核(匯款轉帳及支票兌現) ------------------
 		// 檢核狀態 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單
 		// 如為 1,2，需再讀取AmlLog檔的最新確認狀態
 		// 匯款轉帳： 1.借款人 2.交易人
 		// 支票兌現： 1.借款人 2.發票人
-		if (tDetail.getRepayCode() == 1 || tDetail.getRepayCode() == 4) {
-			if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2"))
-					|| "2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2"))) {
-				txAmlCom.setTxBuffer(this.getTxBuffer());
-				this.tTempVo = txAmlCom.batxCheck(this.tTempVo, tDetail, titaVo);
-				if ("2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2"))) {
-					this.checkMsg = "AML姓名檢核：為凍結名單/未確定名單";
-					this.procStsCode = "3"; // 3.檢核錯誤
-				} else if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2"))) {
-					this.checkMsg = "AML姓名檢核：需審查/確認";
-					this.procStsCode = "3"; // 3.檢核錯誤
+		if ("0".equals(this.procStsCode)) {
+			if (tDetail.getRepayCode() == 1 || tDetail.getRepayCode() == 4) {
+				if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2"))
+						|| "2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2"))) {
+					txAmlCom.setTxBuffer(this.getTxBuffer());
+					this.tTempVo = txAmlCom.batxCheck(this.tTempVo, tDetail, titaVo);
+					if ("2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2"))) {
+						this.checkMsg = "AML姓名檢核：為凍結名單/未確定名單";
+						this.procStsCode = "3"; // 3.檢核錯誤
+					} else if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2"))) {
+						this.checkMsg = "AML姓名檢核：需審查/確認";
+						this.procStsCode = "3"; // 3.檢核錯誤
+					}
 				}
 			}
 		}
@@ -1592,7 +1600,7 @@ public class TxBatchCom extends TradeBuffer {
 // this.feeRepayType 費用還款類別
 
 		baTxList = new ArrayList<BaTxVo>();
-		// call 應繳試算，試算至會計日，匯款轉帳可預收(批次可預收期數)
+		// call 應繳試算，試算至會計日，可預收(批次可預收期數)
 		try {
 			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), this.txBuffer.getTxCom().getTbsdy(),
 					tDetail.getCustNo(), this.repayFacmNo, this.repayBormNo, tDetail.getRepayCode(), this.repayType,

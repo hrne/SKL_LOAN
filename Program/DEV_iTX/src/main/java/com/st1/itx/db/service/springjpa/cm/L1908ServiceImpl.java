@@ -69,7 +69,7 @@ public class L1908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",NVL(B.\"PaperNotice\",'Y') AS \"PaperNotice\"";
 		sql += ",NVL(B.\"MsgNotice\",'Y') AS \"MsgNotice\"";
 		sql += ",NVL(B.\"EmailNotice\",'Y') AS \"EmailNotice\"";
-		sql += ",NVL(B.\"ApplyDate\"-19110000,0) AS \"ApplyDate\" ";
+		sql += ",GREATEST(NVL(B.\"ApplyDate\"-19110000,0),0) AS \"ApplyDate\" "; // GREATEST(ApplyDate,0) 確保最小值為0
 		sql += ",B.\"LastUpdate\"";
 		sql += ",B.\"LastUpdateEmpNo\"";
 		sql += ",C.\"Fullname\"";

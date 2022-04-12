@@ -14,7 +14,9 @@ import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
+import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.AcCloseService;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.MySpring;
 
@@ -50,7 +52,41 @@ public class NightlyBatch extends ScheduledBase {
 			int nowDy = this.dateUtil.getNowIntegerForBC();
 			int mfbsDy = txBuffer.getTxBizDate().getMfbsDyf();
 
-			if (tbsDyf == nowDy && tbsDyf != mfbsDy) {
+			dateUtil.setDate_2(nowDy);
+			boolean isBsDay = !dateUtil.isHoliDay();
+
+			this.mustInfo("nightlyBatch tbsDyf = " + tbsDyf);
+			this.mustInfo("nightlyBatch mfbsDy = " + mfbsDy);
+			this.mustInfo("nightlyBatch nowDy = " + nowDy);
+			this.mustInfo("nightlyBatch nowDy isBsDay = " + isBsDay);
+
+			String autoBatchFg = "";
+
+			SystemParasService sSystemParasService = MySpring.getBean("systemParasService", SystemParasService.class);
+			SystemParas tSystemParas = sSystemParasService.findById("LN");
+			if (tSystemParas != null) {
+				autoBatchFg = tSystemParas.getAutoBatchFg();
+			}
+
+			if (autoBatchFg == null || autoBatchFg.isEmpty() || !autoBatchFg.equals("Y")) {
+				this.mustInfo("nightlyBatch 自動批次記號不為Y，不執行自動批次");
+				this.mustInfo("nightlyBatch finished.");
+				return;
+			}
+			if (!isBsDay) {
+				this.mustInfo("nightlyBatch 當日不為營業日，不執行自動批次");
+				this.mustInfo("nightlyBatch finished.");
+				return;
+			}
+			if (nowDy == mfbsDy) {
+				this.mustInfo("nightlyBatch 當日為月底營業日，不執行自動批次");
+				this.mustInfo("nightlyBatch finished.");
+				return;
+			}
+
+			// 當日等於系統會計日期(一般營業日日批)
+			if (nowDy == tbsDyf) {
+				this.mustInfo("nightlyBatch 當日與系統會計日期相同,檢察官帳檔");
 				AcCloseId acCloseId = new AcCloseId();
 				acCloseId.setAcDate(tbsDyf);
 				acCloseId.setBranchNo("0000");
@@ -73,7 +109,7 @@ public class NightlyBatch extends ScheduledBase {
 					this.mustInfo("nightlyBatch 會計業務關帳控制檔的會計日期為當日且業務類別為09放款時,關帳狀態不為1關帳,不啟動批次");
 				}
 			} else {
-				this.mustInfo("nightlyBatch 當日不為營業日或當日為月底日,不啟動批次");
+				this.mustInfo("nightlyBatch 當日與系統會計日期不同,不啟動批次");
 			}
 			txBuffer = null;
 		} catch (Exception e) {

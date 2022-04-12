@@ -65,12 +65,11 @@ public class L1908ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "AND (A.\"PaperNotice\"='N' OR A.\"MsgNotice\"='N' OR A.\"EmailNotice\"='N') ";
 //		sql += "ORDER BY A.\"CustNo\",A.\"FacmNo\",A.\"FormNo\" ";
 
-		
 		String sql = "SELECT A.\"FormNo\",A.\"FormName\",A.\"SendCode\",A.\"LetterFg\",A.\"MessageFg\",A.\"EmailFg\"";
 		sql += ",NVL(B.\"PaperNotice\",'Y') AS \"PaperNotice\"";
 		sql += ",NVL(B.\"MsgNotice\",'Y') AS \"MsgNotice\"";
 		sql += ",NVL(B.\"EmailNotice\",'Y') AS \"EmailNotice\"";
-		sql += ",NVL(B.\"ApplyDate\"-19110000,0) AS \"ApplyDate\" ";
+		sql += ",GREATEST(NVL(B.\"ApplyDate\"-19110000,0),0) AS \"ApplyDate\" "; // GREATEST(ApplyDate,0) 確保最小值為0
 		sql += ",B.\"LastUpdate\"";
 		sql += ",B.\"LastUpdateEmpNo\"";
 		sql += ",C.\"Fullname\"";

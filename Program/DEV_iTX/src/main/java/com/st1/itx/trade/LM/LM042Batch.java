@@ -57,12 +57,12 @@ public class LM042Batch extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LM042Batch");
 		
-		//先檢查當月資料 新增或更新
-		lMR42.run(titaVo);
-		
 		// 會計日期: 系統會計日 YYYMMDD
 		int acDate =titaVo.getEntDyI();
 		titaVo.putParam("YearMonth", acDate);
+		
+		//先檢查當月資料 新增或更新
+		lMR42.run(titaVo);
 		
 		int yearMonth = (acDate / 100) + 191100;
 				

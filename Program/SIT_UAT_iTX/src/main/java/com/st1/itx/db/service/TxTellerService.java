@@ -62,6 +62,17 @@ public interface TxTellerService {
   public Slice<TxTeller> findByGroupNo(String brNo_0, String groupNo_1, String groupNo_2, int levelFg_3, int levelFg_4, int index, int limit, TitaVo... titaVo);
 
   /**
+   * TlrNo %
+   *
+   * @param tlrNo_0 tlrNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxTeller TxTeller of List
+   */
+  public Slice<TxTeller> findByTlrNo(String tlrNo_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By TxTeller
    * 
    * @param tlrNo key
