@@ -263,13 +263,9 @@ public class L4321Batch extends TradeBuffer {
 				if (this.processCnt % commitCnt == 0) {
 					this.batchTransaction.commit();
 				}
-				BigDecimal fitRate = tBatxRateChange.getPresentRate();
-				if (tTempVo.get("FitRate") != null) {
-					fitRate = parse.stringToBigDecimal(tTempVo.get("FitRate"));
-				}
 				// 放款利率變動檔生效日，利率未變動為零
 				int txEffectDate = 0;
-				if (tBatxRateChange.getAdjustedRate().compareTo(fitRate) != 0) {
+				if (tBatxRateChange.getAdjustedRate().compareTo(tBatxRateChange.getPresentRate()) != 0) {
 					txEffectDate = tBatxRateChange.getCurtEffDate();
 				}
 				// 經辦更新

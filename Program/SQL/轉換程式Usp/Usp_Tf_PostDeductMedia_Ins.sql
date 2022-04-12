@@ -31,6 +31,21 @@ BEGIN
            , LastTRXIDT 
       FROM rawData
     )
+    , aplpData AS (
+      SELECT "LMSACN"
+           , "LMSPCN"
+           , "POSCDE"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "LMSACN"
+                          , "LMSPCN"
+               ORDER BY "LMSAPN" DESC
+             ) AS "Seq"
+      FROM "LA$APLP"
+      WHERE "LMSPBK" = '3'
+        AND "LMSPYS" = 2
+        AND "POSCDE" IS NOT NULL
+    )
     SELECT CASE
              WHEN NVL(t.LastTRXIDT,0) != 0
              THEN t.NewTRXIDT
@@ -60,7 +75,7 @@ BEGIN
            ELSE '0' END                   AS "RepayType"           -- 還款類別 DECIMAL 2 
           ,MBK."MBKAMT"                   AS "RepayAmt"            -- 扣款金額,還款金額 DECIMAL 14 
           ,LPAD(MBK."MBKRSN",2,'0')       AS "ProcNoteCode"        -- 處理說明 VARCHAR2 單格空白:成功 其他:參照需求書
-          ,APLP."POSCDE"                  AS "PostDepCode"         -- 帳戶別 VARCHAR2 1 P:存簿 G:劃撥
+          ,ad."POSCDE"                  AS "PostDepCode"         -- 帳戶別 VARCHAR2 1 P:存簿 G:劃撥
           ,CASE
              WHEN MBK."MBKTRX" = '2' -- 期款
              THEN '846'
@@ -81,7 +96,7 @@ BEGIN
            END                            AS "DistCode"            -- 區處代號 VARCHAR 4
           ,MBK."TRXIDT"                   AS "TransDate"           -- 轉帳日期 DECIMAL 8
           ,LPAD(MBK."LMSPCN",14,'0')      AS "RepayAcctNo"         -- 儲金帳號 VARCHAR2 14 0
-          ,LPAD(NVL(MBK."LMSPID",NVL(CUSP.CUSID1,' ')) || APLP."POSCDE" || LPAD(MBK."LMSACN",7,'0'),20,' ')
+          ,LPAD(NVL(MBK."LMSPID",NVL(CUSP.CUSID1,' ')) || ad."POSCDE" || LPAD(MBK."LMSACN",7,'0'),20,' ')
                                           AS "PostUserNo"          -- 用戶編號 VARCHAR2 20 0 右靠左補空，大寫英數字，不得填寫中文(扣款人ID+郵局存款別(POSCDE)+戶號)預計補2位帳號碼
           ,RPAD(LPAD(MBK."TRXIED",8,'0')
                 || LPAD(MBK."MBKAPN",3,'0')
@@ -111,8 +126,8 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LA$MBKP" MBK
-    LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
-                            AND APLP."LMSAPN" = MBK."MBKAPN"
+    LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
+                         AND ad."LMSAPN" = MBK."MBKAPN"
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = MBK."LMSACN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局

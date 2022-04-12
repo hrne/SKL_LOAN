@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_L9_MonthlyLM052Ovdu_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM052Ovdu_Ins" 
 (
     -- 參數
     TYYMM           IN  INT,        -- 本月資料年月(西元)
@@ -60,7 +60,7 @@ BEGIN
           ,EmpNo                                  AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "MonthlyFacBal"
     WHERE "YearMonth" = TYYMM
-      AND "Status" IN (0,2,6,7)
+      AND "AcctCode" <> 990
       AND "PrinBalance" > 0
     GROUP BY "YearMonth"
             ,CASE

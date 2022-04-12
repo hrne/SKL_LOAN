@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_L9_MonthlyLM052LoanAsset_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM052LoanAsset_Ins" 
 (
     -- 參數
     TYYMM           IN  INT,       -- 本月資料年月(西元)
@@ -112,7 +112,7 @@ BEGIN
           UNION
           SELECT "MonthEndYm"            AS "YearMonth"     --資料年月
                 ,'NS3'                   AS "LoanAssetCode" --放款資產項目代號
-                ,SUM("DbAmt" - "CrAmt")  AS "LoanBal"       --折溢價與催收費用
+                ,SUM("TdBal")  AS "LoanBal"       --折溢價與催收費用
           FROM "AcMain"
           WHERE "AcNoCode" IN ( '10600304000'    --擔保放款-折溢價
                                ,'10601301000'    --催收款項-法務費用

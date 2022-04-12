@@ -67,6 +67,21 @@ BEGIN
            , LastTRXIDT 
       FROM rawData
     )
+    , aplpData AS (
+      SELECT "LMSACN"
+           , "LMSPCN"
+           , "POSCDE"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "LMSACN"
+                          , "LMSPCN"
+               ORDER BY "LMSAPN" DESC
+             ) AS "Seq"
+      FROM "LA$APLP"
+      WHERE "LMSPBK" = '3'
+        AND "LMSPYS" = 2
+        AND "POSCDE" IS NOT NULL
+    )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -92,7 +107,7 @@ BEGIN
           ,MBK."MBKAMT"                   AS "RepayAmt"            -- 扣款金額 DECIMAL 14 0
           ,MBK."TRXISD"                   AS "IntStartDate"        -- 計息起日 Decimald 8 0
           ,MBK."TRXIED"                   AS "IntEndDate"          -- 計息迄日 Decimald 8 0
-          ,APLP."POSCDE"                  AS "PostCode"            -- 郵局存款別 VARCHAR2 1 0
+          ,ad."POSCDE"                    AS "PostCode"            -- 郵局存款別 VARCHAR2 1 0
           ,MBK."MBKCDE"                   AS "MediaCode"           -- 媒體碼 VARCHAR2 1 0
           ,MBK."LMSPRL"                   AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 0
           ,MBK."LMSPAN"                   AS "RelCustName"         -- 第三人帳戶戶名 NVARCHAR2 100 0
@@ -120,8 +135,8 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
     FROM "LA$MBKP" MBK
-    LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
-                            AND APLP."LMSAPN" = MBK."MBKAPN"
+    LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
+                         AND ad."LMSAPN" = MBK."MBKAPN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     LEFT JOIN PDM PDM ON PDM."MediaDate" = CASE
                                                WHEN NVL(t.LastTRXIDT,0) != 0
@@ -202,6 +217,21 @@ BEGIN
            , LastTRXIDT 
       FROM rawData
     )
+    , aplpData AS (
+      SELECT "LMSACN"
+           , "LMSPCN"
+           , "POSCDE"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "LMSACN"
+                          , "LMSPCN"
+               ORDER BY "LMSAPN" DESC
+             ) AS "Seq"
+      FROM "LA$APLP"
+      WHERE "LMSPBK" = '3'
+        AND "LMSPYS" = 2
+        AND "POSCDE" IS NOT NULL
+    )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -264,8 +294,8 @@ BEGIN
            END                            AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,NVL(AEM."EmpNo",'999999')      AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
     FROM "AH$MBKP" MBK
-    LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = MBK."LMSACN"
-                            AND APLP."LMSAPN" = MBK."MBKAPN"
+    LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
+                         AND ad."LMSAPN" = MBK."MBKAPN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     LEFT JOIN "ADM" ADM ON ADM."MediaDate" = CASE
                                                WHEN NVL(t.LastTRXIDT,0) != 0

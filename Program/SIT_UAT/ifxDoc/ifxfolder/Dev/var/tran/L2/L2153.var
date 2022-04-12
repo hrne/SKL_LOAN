@@ -1503,6 +1503,27 @@ C(3,#Precision,0,S,$)
 #TimAcctFee=m,14.2,S
 C(3,#Precision,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
 
+
+
+![案件隸屬單位]
+!可不輸入
+#FdDepartmentCode=X,2,L
+
+#DepartmentCode=A,1,I
+HELP(#DepartmentCodeHelp)
+@V(H,#DepartmentCodeHelp)
+
+#DepartmentCodeX=X,10,L
+T(H,#DepartmentCode,#DepartmentCodeHelp)
+C(3,#DepartmentCode,0,T(F,@BreachFlag,0)T(F,@ProdBreachFlag,0),T(F,@BreachFlag,1)T(F,@ProdBreachFlag,1))
+
+
+
+!依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
+#checkDepartmentCode=X,1,S
+C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
+
+
 !手續費 企金才可輸入
 #FdHandlingFee=X,2,L
 
@@ -1774,23 +1795,6 @@ HELP(#UsageCodeHelp)
 #UsageCodeX=X,20,L
 T(H,#UsageCode,#UsageCodeHelp)
 
-![案件隸屬單位]
-!可不輸入
-#FdDepartmentCode=X,2,L
-
-#DepartmentCode=A,1,L
-! HELP(#DepartmentCodeHelp)
-! @V(H,#DepartmentCodeHelp)
-
-#DepartmentCodeX=X,10,L
-T(H,#DepartmentCode,#DepartmentCodeHelp)
-C(3,#DepartmentCode,0,T(F,@BreachFlag,0)T(F,@ProdBreachFlag,0),T(F,@BreachFlag,1)T(F,@ProdBreachFlag,1))
-
-
-
-!依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
-#checkDepartmentCode=X,1,S
-C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
 
 ![代繳所得稅]
 !代繳所得稅只能為零
@@ -2557,6 +2561,7 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdRepayFreq+還本週期",#RepayFreq,#LbRepayFreq,#RepayFreqX],
 ["#FdUtilDeadline+動支期限",#UtilDeadline,"@前"],
 ["#FdGracePeriod+寬限總月數",#GracePeriod,#LbGracePeriod,#GracePeriodX],
+[#<->#,"#FdDepartmentCode+案件隸屬單位",#DepartmentCode,#DepartmentCodeX],
 ["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee],
 ["#FdHandlingFee+手續費",#TwHandlingFee,#UsHandlingFee],
 ]
@@ -2584,7 +2589,6 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdRecycleCode+循環動用",#RecycleCode,#RecycleCodeX],
 ["#FdRecycleDeadline+循環動用期限",#RecycleDeadline,#RecycleDeadlineX],
 ["#FdUsageCode+資金用途別",#UsageCode,#UsageCodeX],
-["#FdDepartmentCode+案件隸屬單位",#DepartmentCode,#DepartmentCodeX],
 ["#FdIncomeTaxFlag+代繳所得稅",#IncomeTaxFlagX],
 ["#FdCompensateFlag+代償碼",#CompensateFlag,#CompensateFlagX],
 ["#FdIrrevocableFlag+不可撤銷",#IrrevocableFlag,#IrrevocableFlagX],

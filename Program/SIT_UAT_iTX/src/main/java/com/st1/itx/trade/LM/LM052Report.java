@@ -73,7 +73,7 @@ public class LM052Report extends MakeReport {
 
 		String formTitle = "";
 
-		formTitle = ((yearMonth / 100) - 1911) + "年 " + String.format("%02d", yearMonth % 100) + "    放款資產品質分類";
+		formTitle = ((yearMonth / 100) - 1911) + "年 " + String.format("%02d", yearMonth % 100) + "月底   放款資產品質分類";
 		makeExcel.setValue(1, 1, formTitle);
 
 		formTitle = (lastYM - 191100) + "\n" + "放款總額";
@@ -230,7 +230,7 @@ public class LM052Report extends MakeReport {
 					}
 					
 					if ("201".equals(tLDVo.get("F1"))) {
-						col = 3;
+						col = 4;
 					}
 					if ("61".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 6;
@@ -357,12 +357,12 @@ public class LM052Report extends MakeReport {
 				}
 			}
 
-			// M14
+			// M15
 			makeExcel.formulaCaculate(15, 13);
 
-			// C26 D17~D26
+			// C26 D18~D26
 			makeExcel.formulaCaculate(26, 3);
-			for (int r = 17; r <= 26; r++) {
+			for (int r = 18; r <= 26; r++) {
 				makeExcel.formulaCaculate(r, 4);
 			}
 
@@ -373,14 +373,14 @@ public class LM052Report extends MakeReport {
 			makeExcel.formulaCaculate(21, 7);
 
 			// M17~19
-			makeExcel.formulaCaculate(16, 13);
 			makeExcel.formulaCaculate(17, 13);
 			makeExcel.formulaCaculate(18, 13);
+			makeExcel.formulaCaculate(19, 13);
 
-			// G28 L28 M24
-			makeExcel.formulaCaculate(28, 7);
-			makeExcel.formulaCaculate(28, 12);
-			makeExcel.formulaCaculate(24, 13);
+			// G29 L29 M25
+			makeExcel.formulaCaculate(29, 7);
+			makeExcel.formulaCaculate(29, 12);
+			makeExcel.formulaCaculate(25, 13);
 
 			// B31
 			makeExcel.formulaCaculate(31, 2);

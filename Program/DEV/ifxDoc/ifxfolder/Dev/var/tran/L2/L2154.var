@@ -1674,7 +1674,6 @@ C(3,#RateCode,3,$,T(3,無))
 #INVK3=X,1,S
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 
-
 #FDP3=X,1,S
 T(2,@FdCurrencyCode, )
 C(3,#L2r05BormNo,0,T(2,@FdApplAmt,#WkStar),$)
@@ -1700,10 +1699,10 @@ C(3,#L2r01RepayFreq,99,$,T(3,@FdRepayFreq, ))
 
 #ShowP3=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#AmortizedCode,#AmortizedCodeX,#TwApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX)
+    SHOW(#AmortizedCode,#AmortizedCodeX,#TwApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX,#RepayFreq,#RepayFreqX,#DepartmentCode,#DepartmentCodeX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX)
     HIDE(#LbApplAmt,#UsApplAmt,#LbApplAmt,#LbLoanTermYyX,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate)
-   ,SHOW(#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate)
-    HIDE(#AmortizedCode,#TwApplAmt,#UsApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX))
+   ,SHOW(#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#DepartmentCodeX,#LbGracePeriod,#LbGuaranteeDate)
+    HIDE(#AmortizedCode,#TwApplAmt,#UsApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX,#RepayFreq,#DepartmentCode,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX))
 C(3,#UpdateCode,1,$,s)   
 C(3,#L2r01GracePeriod,999,$,HIDE(#GracePeriod,#GracePeriodX)
                              SHOW(#LbGracePeriod))   
@@ -1943,6 +1942,7 @@ C(3,#FreqBase,0,S,$)
 T(H,#FreqBase,#FreqBaseHelp)
 T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
 T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
+T(H,@DepartmentCodeX,#DepartmentCode,#DepartmentCodeHelp)
 
 ![繳息週期]
 !當商品不限制時,(修改時自動顯示可修改,其他自動顯示不必須輸入)
@@ -2087,6 +2087,25 @@ X(#GracePeriod)
 T(B,#LbGracePeriod+#WkMonthX)
 
 #GracePeriodX=X,5,L
+
+![案件隸屬單位]
+!修改時自動顯示可修改,其他自動顯示不必須輸入
+#FdDepartmentCode=X,2,L
+
+#DepartmentCode=A,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Hide2Fg,0,CALL(#HideP2),$)
+HELP(#DepartmentCodeHelp)
+@V(H,#DepartmentCodeHelp)
+
+#DepartmentCodeX=X,10,L
+T(3,)
+T(H,#DepartmentCode,#DepartmentCodeHelp)
+C(3,#DepartmentCode,0,HIDE(#BreachFlag,#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#BreachFlag,#ProdBreachFlag,#Breach)HIDE(#LbBreach))
+
+!依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
+#checkDepartmentCode=X,1,S
+C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
 
 ![帳管費]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -2342,21 +2361,20 @@ C(3,#RecycleCode,0,T(2,@FdRecycleDeadline, )
 
 #ShowP4=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#ExtraRepayCode,#ExtraRepayCodeX,#CustTypeCode,#CustTypeCodeX,#RuleCode,#RuleCodeX,#RecycleCode,#RecycleCodeX,#RecycleDeadlineX,#UsageCode,#UsageCodeX,#DepartmentCode,#DepartmentCodeX,#CompensateFlag,#CompensateFlagX,#IrrevocableFlag,#IrrevocableFlagX,#RateAdjNoticeCode,#RateAdjNoticeCodeX,#PieceCode,#PieceCodeX,#CreditScore)
+    SHOW(#ExtraRepayCode,#ExtraRepayCodeX,#CustTypeCode,#CustTypeCodeX,#RuleCode,#RuleCodeX,#RecycleCode,#RecycleCodeX,#RecycleDeadlineX,#UsageCode,#UsageCodeX,#CompensateFlag,#CompensateFlagX,#IrrevocableFlag,#IrrevocableFlagX,#RateAdjNoticeCode,#RateAdjNoticeCodeX,#PieceCode,#PieceCodeX,#CreditScore)
     HIDE(#LbCreditScoreX)
     C(3,#RecycleCode,0,HIDE(#RecycleDeadline)T(3, )
                      ,SHOW(#RecycleDeadline)T(2,#WkStar))
     C(3,#L2r01ExtraRepayCode,9,$,HIDE(#ExtraRepayCode))
     C(3,#L2r01RecycleCode,9,$,HIDE(#RecycleCode))                     
-   ,SHOW(#ExtraRepayCodeX,#CustTypeCodeX,#RuleCodeX,#RecycleCodeX,#IntCalcCode,#LbRecycleDeadline,#UsageCodeX,#DepartmentCodeX,#CompensateFlagX,#IrrevocableFlagX,#RateAdjNoticeCodeX,#PieceCodeX,#LbCreditScoreX)
-    HIDE(#ExtraRepayCode,#CustTypeCode,#RuleCode,#RecycleCode,#IntCalcCode,#RecycleDeadline,#UsageCode,#DepartmentCode,#CompensateFlag,#IrrevocableFlag,#RateAdjNoticeCode,#CreditScore)
+   ,SHOW(#ExtraRepayCodeX,#CustTypeCodeX,#RuleCodeX,#RecycleCodeX,#IntCalcCode,#LbRecycleDeadline,#UsageCodeX,#CompensateFlagX,#IrrevocableFlagX,#RateAdjNoticeCodeX,#PieceCodeX,#LbCreditScoreX)
+    HIDE(#ExtraRepayCode,#CustTypeCode,#RuleCode,#RecycleCode,#IntCalcCode,#RecycleDeadline,#UsageCode,#CompensateFlag,#IrrevocableFlag,#RateAdjNoticeCode,#CreditScore)
     C(3,#RecycleCode,0,HIDE(#LbRecycleDeadline)
                      ,SHOW(#LbRecycleDeadline)))
 
 #InitP4=X,1,S
 T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeCodeHelp)
 T(H,@UsageCodeX,#UsageCode,#UsageCodeHelp)
-T(H,@DepartmentCodeX,#DepartmentCode,#DepartmentCodeHelp)
 T(H,@CompensateFlagX,#CompensateFlag,#YesNoHelp)
 T(H,@IrrevocableFlagX,#IrrevocableFlag,#YesNoHelp)
 T(H,@RateAdjNoticeCodeX,#RateAdjNoticeCode,#RateAdjNoticeCodeHelp)
@@ -2481,22 +2499,6 @@ HELP(#UsageCodeHelp)
 #UsageCodeX=X,20,L
 T(H,#UsageCode,#UsageCodeHelp)
 
-![案件隸屬單位]
-!修改時自動顯示可修改,其他自動顯示不必須輸入
-#FdDepartmentCode=X,2,L
-
-#DepartmentCode=A,1,L
-C(3,#UpdateCode,1,$,s)
-C(3,#Hide4Fg,0,CALL(#HideP4),$)
-! HELP(#DepartmentCodeHelp)
-! @V(H,#DepartmentCodeHelp)
-
-#DepartmentCodeX=X,10,L
-T(H,#DepartmentCode,#DepartmentCodeHelp)
-
-!依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
-#checkDepartmentCode=X,1,S
-C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
 
 ![代繳所得稅]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -3640,6 +3642,7 @@ C(3,#CheckCode,0,$,S)
 ["#FdRepayFreq+還本週期",#RepayFreq,#LbRepayFreq,#RepayFreqX],
 ["#FdUtilDeadline+動支期限",#UtilDeadline,#LbUtilDeadline,#UtilDeadlineX],
 ["#FdGracePeriod+寬限總月數",#GracePeriod,#LbGracePeriod,#GracePeriodX],
+[#<->#,"#FdDepartmentCode+案件隸屬單位",#DepartmentCode,#DepartmentCodeX],
 ["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee,#LbAcctFee],
 ["#FdHandlingFee+手續費",#TwHandlingFee,#UsHandlingFee,#LbHandlingFee],
 ]
@@ -3664,7 +3667,6 @@ C(3,#CheckCode,0,$,S)
 ["#FdRecycleCode+循環動用",#RecycleCode,#RecycleCodeX],
 ["#FdRecycleDeadline+循環動用期限",#RecycleDeadline,#LbRecycleDeadline,#RecycleDeadlineX],
 ["#FdUsageCode+資金用途別",#UsageCode,#UsageCodeX],
-["#FdDepartmentCode+案件隸屬單位",#DepartmentCode,#DepartmentCodeX],
 ["#FdIncomeTaxFlag+代繳所得稅",#IncomeTaxFlagX],
 ["#FdCompensateFlag+代償碼",#CompensateFlag,#CompensateFlagX],
 ["#FdIrrevocableFlag+不可撤銷",#IrrevocableFlag,#IrrevocableFlagX],

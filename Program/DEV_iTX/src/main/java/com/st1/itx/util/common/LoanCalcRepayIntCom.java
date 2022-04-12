@@ -961,36 +961,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if (wkIntStartDate < iMaturityDate && iMaturityDate < wkIntEndDate) {
 			wkFlag = 1;
 			if (wkTermIndex >= wkTerms) {
-				// 契約到期日為假日則不計遲延息
-				// 利息計算至次營業日（按原利率）
-				// 若客戶於次營業日以後來繳息還本，遲延息則自契約到期日起算。
-				dDateUtil.init();
-				dDateUtil.setDate_2(iMaturityDate);
-				if (dDateUtil.isHoliDay()) {
-					int i = 0;
-					int wkNextBusiDate = 0;
-					do {
-						i++;
-						dDateUtil.init();
-						dDateUtil.setDate_1(iMaturityDate);
-						dDateUtil.setDays(i);
-						wkNextBusiDate = dDateUtil.getCalenderDay();
-						dDateUtil.init();
-						dDateUtil.setDate_2(wkNextBusiDate);
-					} while (dDateUtil.isHoliDay());
-					if (iBreachValidDate <= wkNextBusiDate && iBreachValidDate >= iMaturityDate) {
-						if (iNextRepayDate == iMaturityDate) {
-							iNextRepayDate = wkNextBusiDate;
-						}
-						if (wkNextRepayDate == iMaturityDate) {
-							wkNextRepayDate = wkNextBusiDate;
-						}
-						iMaturityDate = wkNextBusiDate;
-						if (iMaturityDate >= wkIntEndDate) {
-							wkFlag = 0;
-						}
-					}
-				}
 			}
 			if (wkFlag == 1) {
 				wkDate = wkIntEndDate;
@@ -1020,31 +990,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			wkIntStartDate = iMaturityDate;
 		} else {
 			if (wkIntEndDate == iMaturityDate) { // 契約到期
-				dDateUtil.init();
-				dDateUtil.setDate_2(iMaturityDate);
-				if (dDateUtil.isHoliDay()) {
-					int i = 0;
-					int wkNextBusiDate = 0;
-					do {
-						i++;
-						dDateUtil.init();
-						dDateUtil.setDate_1(iMaturityDate);
-						dDateUtil.setDays(i);
-						wkNextBusiDate = dDateUtil.getCalenderDay();
-						dDateUtil.init();
-						dDateUtil.setDate_2(wkNextBusiDate);
-					} while (dDateUtil.isHoliDay());
-					if (iBreachValidDate <= wkNextBusiDate && iBreachValidDate >= iMaturityDate) {
-						if (iNextRepayDate == iMaturityDate) {
-							iNextRepayDate = wkNextBusiDate;
-						}
-						if (wkNextRepayDate == iMaturityDate) {
-							wkNextRepayDate = wkNextBusiDate;
-						}
-						iMaturityDate = wkNextBusiDate;
-						wkIntEndDate = wkNextBusiDate;
-					}
-				}
 			}
 			// 結案時,只計算到計息止日
 			if (iCaseCloseFlag.equals("Y") && wkIntEndDate > iIntEndDate) {

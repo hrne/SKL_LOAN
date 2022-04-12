@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_L9_MonthlyLM052AssetClass_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM052AssetClass_Ins" 
 (
     -- 參數
     TYYMM           IN  INT,       -- 本月資料年月(西元)
@@ -74,21 +74,27 @@ BEGIN
           SELECT "MonthEndYm"            AS "YearMonth"     --資料年月
                 ,'61'                    AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
-                ,"DbAmt" - "CrAmt"       AS "Amt"           --(6)折溢價與催收費用
+                ,SUM("TdBal")            AS "Amt"           --(61)擔保品溢折價
           FROM "AcMain"
           WHERE "AcNoCode" IN ( '10600304000' )  --擔保放款-折溢價
             AND "MonthEndYm" = TYYMM
+          GROUP BY "MonthEndYm"
+                  ,'61'
+                  ,'999'
           UNION 
           --催收款項-折溢價與催收費用
           SELECT "MonthEndYm"            AS "YearMonth"     --資料年月
                 ,'62'                    AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
-                ,"DbAmt" - "CrAmt"       AS "Amt"           --(6)折溢價與催收費用
+                ,SUM("TdBal")            AS "Amt"           --(62)折溢價與催收費用
           FROM "AcMain"
           WHERE "AcNoCode" IN ('10601301000'    --催收款項-法務費用
                               ,'10601302000'    --催收款項-火險費用
                               ,'10601304000')   --催收款項-折溢價
             AND "MonthEndYm" = TYYMM
+          GROUP BY "MonthEndYm"
+                  ,'62'
+                  ,'999'
           UNION 
           --應收利息
           SELECT "YearMonth"             AS "YearMonth"     --資料年月
