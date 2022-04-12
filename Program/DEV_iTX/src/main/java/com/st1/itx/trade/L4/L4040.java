@@ -34,7 +34,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L4040")
 @Scope("prototype")
 /**
@@ -142,6 +141,7 @@ public class L4040 extends TradeBuffer {
 
 		totaVo.put("PdfSno103", "0");
 		totaVo.put("PdfSno998", "0");
+		totaVo.put("PdfSno", "0");
 
 		int nPropDate = dateUtil.getNowIntegerForBC();
 

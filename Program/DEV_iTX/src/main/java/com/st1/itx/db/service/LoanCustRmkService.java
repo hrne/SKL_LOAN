@@ -47,24 +47,14 @@ public interface LoanCustRmkService {
   public Slice<LoanCustRmk> findCustNo(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * RmkCode =
-   *
-   * @param rmkCode_0 rmkCode_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice LoanCustRmk LoanCustRmk of List
-   */
-  public Slice<LoanCustRmk> findRmkCode(String rmkCode_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = 
+   * CustNo = ,AND AcDate =  
    *
    * @param custNo_0 custNo_0
+   * @param acDate_1 acDate_1
    * @param titaVo Variable-Length Argument
    * @return Slice LoanCustRmk LoanCustRmk of List
    */
-  public LoanCustRmk maxRmkNoFirst(int custNo_0, TitaVo... titaVo);
+  public LoanCustRmk maxRmkNoFirst(int custNo_0, int acDate_1, TitaVo... titaVo);
 
   /**
    * hold By LoanCustRmk

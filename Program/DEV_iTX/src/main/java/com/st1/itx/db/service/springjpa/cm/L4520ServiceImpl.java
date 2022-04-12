@@ -169,7 +169,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         WHEN TX2.\"TempAmt\" > 0";
 		sql += "         THEN TX2.\"TempAmt\"";
 		sql += "       ELSE 0 END )AS \"TempCr\",";
-		sql += "  SUM(tx2.\"UnpaidInterest\"+tx2.\"UnpaidPrincipal\"+tx2.\"UnpaidCloseBreach\")  AS \"Shortfall\",";
+		sql += "  SUM(tx2.\"Shortfall\")  AS \"Shortfall\",";
 		sql += "  SUM(tx2.\"AcctFee\" + tx2.\"ModifyFee\" + tx2.\"FireFee\" + tx2.\"LawFee\") AS \"OtherAmt\",";
 		sql += "  MIN(ce.\"CenterCode\") AS \"CenterCode\", ";
 		sql += "  MIN(ce.\"EmployeeNo\") AS \"EmployeeNo\", ";

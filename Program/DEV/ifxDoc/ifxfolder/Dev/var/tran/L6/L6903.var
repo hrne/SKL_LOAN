@@ -130,7 +130,7 @@ T(3,000)
 
 
 #AcBookItem=X,20,L
-T(3,全公司)
+T(3,全帳冊)
 
 !區隔帳冊
 #AcSubBookCode=X,3,I

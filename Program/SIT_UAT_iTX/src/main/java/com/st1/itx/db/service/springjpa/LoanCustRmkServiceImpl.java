@@ -91,9 +91,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "RmkNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "AcDate", "RmkNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "RmkNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "AcDate", "RmkNo"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = loanCustRmkReposDay.findAll(pageable);
@@ -124,13 +124,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = loanCustRmkReposDay.findAllByCustNoIs(custNo_0, pageable);
+      slice = loanCustRmkReposDay.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanCustRmkReposMon.findAllByCustNoIs(custNo_0, pageable);
+      slice = loanCustRmkReposMon.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanCustRmkReposHist.findAllByCustNoIs(custNo_0, pageable);
+      slice = loanCustRmkReposHist.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
     else 
-      slice = loanCustRmkRepos.findAllByCustNoIs(custNo_0, pageable);
+      slice = loanCustRmkRepos.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -139,48 +139,20 @@ em = null;
   }
 
   @Override
-  public Slice<LoanCustRmk> findRmkCode(String rmkCode_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<LoanCustRmk> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findRmkCode " + dbName + " : " + "rmkCode_0 : " + rmkCode_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = loanCustRmkReposDay.findAllByRmkCodeIs(rmkCode_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = loanCustRmkReposMon.findAllByRmkCodeIs(rmkCode_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = loanCustRmkReposHist.findAllByRmkCodeIs(rmkCode_0, pageable);
-    else 
-      slice = loanCustRmkRepos.findAllByRmkCodeIs(rmkCode_0, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public LoanCustRmk maxRmkNoFirst(int custNo_0, TitaVo... titaVo) {
+  public LoanCustRmk maxRmkNoFirst(int custNo_0, int acDate_1, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("maxRmkNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("maxRmkNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " acDate_1 : " +  acDate_1);
     Optional<LoanCustRmk> loanCustRmkT = null;
     if (dbName.equals(ContentName.onDay))
-      loanCustRmkT = loanCustRmkReposDay.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
+      loanCustRmkT = loanCustRmkReposDay.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
     else if (dbName.equals(ContentName.onMon))
-      loanCustRmkT = loanCustRmkReposMon.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
+      loanCustRmkT = loanCustRmkReposMon.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
     else if (dbName.equals(ContentName.onHist))
-      loanCustRmkT = loanCustRmkReposHist.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
+      loanCustRmkT = loanCustRmkReposHist.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
     else 
-      loanCustRmkT = loanCustRmkRepos.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
+      loanCustRmkT = loanCustRmkRepos.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
 
     return loanCustRmkT.isPresent() ? loanCustRmkT.get() : null;
   }

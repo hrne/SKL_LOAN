@@ -207,7 +207,7 @@ public class L9717Report extends MakeReport {
 		this.newPage();
 
 		List<Map<String, String>> lL9717 = null;
-
+		this.info("currentSort="+currentSort);
 		try {
 			lL9717 = l9717ServiceImpl.findAll(titaVo, currentSort);
 		} catch (Exception e) {

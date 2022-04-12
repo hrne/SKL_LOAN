@@ -23,13 +23,10 @@ import com.st1.itx.db.domain.LoanCustRmkId;
 public interface LoanCustRmkRepository extends JpaRepository<LoanCustRmk, LoanCustRmkId> {
 
   // CustNo = 
-  public Slice<LoanCustRmk> findAllByCustNoIs(int custNo_0, Pageable pageable);
+  public Slice<LoanCustRmk> findAllByCustNoIsOrderByAcDateDescRmkNoAsc(int custNo_0, Pageable pageable);
 
-  // RmkCode =
-  public Slice<LoanCustRmk> findAllByRmkCodeIs(String rmkCode_0, Pageable pageable);
-
-  // CustNo = 
-  public Optional<LoanCustRmk> findTopByCustNoIsOrderByRmkNoDesc(int custNo_0);
+  // CustNo = ,AND AcDate =  
+  public Optional<LoanCustRmk> findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(int custNo_0, int acDate_1);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

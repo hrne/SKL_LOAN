@@ -35,9 +35,10 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Boolean useWorkMonth = parse.stringToInteger(titaVo.getParam("workMonthStart")) > 0;
 		Boolean useCustNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0;
 		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
-		Boolean useBsOfficer = !titaVo.getParam("bsOfficer").trim().isEmpty();
+		String bsOfficer = titaVo.getParam("bsOfficer");
+		Boolean useBsOfficer = bsOfficer != null && !bsOfficer.trim().isEmpty();
 
-		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useBfOfficer:%s", useWorkMonth, useCustNo, useFacmNo, useBsOfficer));
+		this.info(String.format("lD007.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useBfOfficer:%s", useWorkMonth, useCustNo, useFacmNo, useBsOfficer));
 
 		String sql = "";
 		sql += " SELECT E0.\"DepItem\" \"LoanEmpItem\" ";
@@ -90,7 +91,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useBsOfficer) {
 			sql += "   AND B.\"BsOfficer\" = :bsOfficer";
 		}
-		sql += " ORDER BY NLSSORT(B.\"BsOfficer\", 'NLS_SORT=FRENCH') "; // 參考樣張，應是以此欄位排序；NLSSORT by FRENCH 效果為英文先於數字
+		sql += " ORDER BY NLSSORT(B.\"BsOfficer\", 'NLS_SORT=EBCDIC') "; // 參考樣張，應是以此欄位排序；NLSSORT by EBCDIC 效果為英文先於數字
 
 		this.info("sql=" + sql);
 		Query query;
@@ -115,7 +116,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (useBsOfficer) {
-			query.setParameter("bsOfficer", titaVo.getParam("bsOfficer"));
+			query.setParameter("bsOfficer", bsOfficer);
 		}
 
 		return this.convertToMap(query);

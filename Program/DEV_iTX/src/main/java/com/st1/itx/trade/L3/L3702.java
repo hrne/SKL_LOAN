@@ -60,6 +60,8 @@ public class L3702 extends TradeBuffer {
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		// 會計日期
+		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate"));
 		// 備忘錄序號
 		int iRmkNo = parse.stringToInteger(titaVo.getParam("RmkNo"));
 
@@ -70,42 +72,55 @@ public class L3702 extends TradeBuffer {
 		LoanCustRmkId loanCustRmkId = new LoanCustRmkId();
 		// 塞值到TablePK
 		loanCustRmkId.setCustNo(iCustNo);
+		loanCustRmkId.setAcDate(iAcDate);
 		loanCustRmkId.setRmkNo(iRmkNo);
 
 		// 新增
 		if (iFunCd == 1) {
 			// 測試該戶號是否存在客戶主檔
 			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
-			this.info("tCustMain = " + tCustMain);
 			// 該戶號部存在客戶主檔 拋錯
 			if (tCustMain == null) {
-				throw new LogicException(titaVo, "E0005", "該戶號" + iCustNo + "不存在客戶主檔。");
+				throw new LogicException(titaVo, "E0005", "戶號" + iCustNo + ",不存在客戶主檔。");
 			}
-			tLoanCustRmk = loanCustRmkService.findById(loanCustRmkId);
-			// 新增時 該戶號,備忘錄序號查有資料 拋錯
-			if (tLoanCustRmk != null) {
-				throw new LogicException(titaVo, "E0002", "該戶號,備忘錄序號" + iCustNo + iRmkNo + "已存在於帳務備忘錄明細檔。");
+//			tLoanCustRmk = loanCustRmkService.findById(loanCustRmkId);
+//			// 新增時 該戶號,備忘錄序號查有資料 拋錯
+//			if (tLoanCustRmk != null) {
+//				throw new LogicException(titaVo, "E0002", "該戶號,備忘錄序號" + iCustNo + iRmkNo + "已存在於帳務備忘錄明細檔。");
+//			}
+			
+			LoanCustRmk loanCustRmk = loanCustRmkService.maxRmkNoFirst(iCustNo, iAcDate + 19110000, titaVo);
+			if (loanCustRmk == null) {
+				iRmkNo = 1;
+			} else {
+				iRmkNo = loanCustRmk.getRmkNo() + 1;
 			}
+			
+			String mrkey = String.format("%07d-%07d-%03d", iCustNo,iAcDate,iRmkNo);
+			titaVo.put("MRKEY", mrkey);
+			
+			loanCustRmkId.setRmkNo(iRmkNo);
 
 			tLoanCustRmk = new LoanCustRmk();
 
 			tLoanCustRmk.setLoanCustRmkId(loanCustRmkId);
 			tLoanCustRmk.setCustNo(iCustNo);
+			tLoanCustRmk.setAcDate(iAcDate);
 			tLoanCustRmk.setRmkNo(iRmkNo);
 			tLoanCustRmk.setCustUKey(tCustMain.getCustUKey());
-			tLoanCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
+//			tLoanCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
 			tLoanCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
-			tLoanCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
-			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
+//			tLoanCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
+//			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
 			// 新增須刷主管卡 經理層級
-			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-			}
+//			if (titaVo.getEmpNos().trim().isEmpty()) {
+//				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+//			}
 
 			/* 存入DB */
 			try {
-				loanCustRmkService.insert(tLoanCustRmk, titaVo);
+				tLoanCustRmk = loanCustRmkService.insert(tLoanCustRmk, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
@@ -124,17 +139,10 @@ public class L3702 extends TradeBuffer {
 
 			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
 
-			tLoanCustRmk.setLoanCustRmkId(loanCustRmkId);
-			tLoanCustRmk.setCustNo(iCustNo);
-			tLoanCustRmk.setRmkNo(iRmkNo);
-			tLoanCustRmk.setCustUKey(tCustMain.getCustUKey());
-			tLoanCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
 			tLoanCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
-			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
 			// 非建檔者修改須刷主管卡
-			if (tLoanCustRmk.getCreateEmpNo() != tLoanCustRmk.getLastUpdateEmpNo()
-					&& titaVo.getEmpNos().trim().isEmpty()) {
+			if (!titaVo.getHsupCode().equals("1") && !tLoanCustRmk.getCreateEmpNo().equals(titaVo.getTlrNo())) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "非建檔者修改");
 			}
 
@@ -147,7 +155,7 @@ public class L3702 extends TradeBuffer {
 
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeLoanCustRmk, tLoanCustRmk);
-			dataLog.exec("修改帳務備忘錄明細檔資料");
+			dataLog.exec("修改帳務備忘錄");
 
 			// FunCd 4刪除
 		} else if (iFunCd == 4) {
@@ -161,8 +169,8 @@ public class L3702 extends TradeBuffer {
 			}
 
 			// 刪除須刷主管卡
-			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			if (!titaVo.getHsupCode().equals("1")) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "刪除帳務備忘錄");
 			}
 
 			try {
@@ -177,9 +185,9 @@ public class L3702 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
-		} else if (iFunCd == 5) {
-
-		}
+		} 
+		
+		this.totaVo.putParam("RmkNo", tLoanCustRmk.getRmkNo());
 
 		this.addList(this.totaVo);
 		return this.sendList();

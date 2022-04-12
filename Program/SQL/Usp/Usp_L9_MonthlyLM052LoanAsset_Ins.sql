@@ -71,10 +71,10 @@ BEGIN
                       AND F."UsageCode" = '02' 
                     THEN 'S1'       -- 特定資產放款：購置住宅+修繕貸款      
                     WHEN M."ClCode1" IN (3) 
-                      AND F."UsageCode" = '02' 
                     THEN 'NS2'       -- 非特定資產放款：股票質押
                     ELSE 'NS3'       -- 非特定資產放款：個金不動產抵押貸款
-                  END                  AS "AssetClass"	--放款資產項目	  
+                  END                  AS "LoanAssetCode"	--放款資產項目
+              ,SUM(M."PrinBalance") AS "LoanBal"	  
           FROM "MonthlyFacBal" M
           LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                                AND F."FacmNo" = M."FacmNo"
@@ -83,7 +83,7 @@ BEGIN
                             ,"IndustryItem"
                       FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
           WHERE M."PrinBalance" > 0
-            AND M."YearMonth" = YYYYMM 
+            AND M."YearMonth" = TYYMM 
           GROUP BY M."YearMonth"
                   ,CASE
                     WHEN M."ClCode1" IN (1,2) 
@@ -106,7 +106,6 @@ BEGIN
                       AND F."UsageCode" = '02' 
                     THEN 'S1'       -- 特定資產放款：購置住宅+修繕貸款      
                     WHEN M."ClCode1" IN (3) 
-                      AND F."UsageCode" = '02' 
                     THEN 'NS2'       -- 非特定資產放款：股票質押
                     ELSE 'NS3'       -- 非特定資產放款：個金不動產抵押貸款
                   END 

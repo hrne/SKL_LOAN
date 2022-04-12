@@ -283,7 +283,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,( CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
-			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
 			sql += "			   ELSE '99'";
 			sql += "			 END ) AS \"KIND\"";
@@ -297,7 +297,6 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"PrinBalance\" > 0";
 			sql += "	  AND M.\"PrevIntDate\"  >= :lyymmdd";
-//			sql += "	  AND M.\"AssetClass\" IS NULL";
 			sql += "	GROUP BY ( CASE";
 			sql += "			     WHEN M.\"AcSubBookCode\" = '00A' THEN '1'";
 			sql += "			     WHEN M.\"AcSubBookCode\" = '201' THEN 'A'";
@@ -306,7 +305,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		    ,( CASE";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
-			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
 			sql += "			     ELSE '99'";
 			sql += "			   END ))RES ";
@@ -323,7 +322,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,( CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
-			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
 			sql += "			   ELSE '99'";
 			sql += "			 END ) AS \"KIND\"";
@@ -347,7 +346,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		    ,( CASE";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
 			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
-			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
 			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
 			sql += "			     ELSE '99'";
 			sql += "			   END ))RES ";

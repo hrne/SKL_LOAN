@@ -367,7 +367,7 @@ T(2,#TimCustNo)
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L3072; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,備忘錄)
+K(MODIFYBUTTON,1,帳務備忘錄)
 
 
 #OCustNo=A,7,L

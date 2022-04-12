@@ -97,8 +97,9 @@ public class L3072 extends TradeBuffer {
 			OccursList occurslist = new OccursList();
 
 			occurslist.putParam("OOCustNo", t.getCustNo());
+			occurslist.putParam("OOAcDate", t.getAcDate());
 			occurslist.putParam("OORmkNo", t.getRmkNo());
-			occurslist.putParam("OORmkCode", t.getRmkCode());
+//			occurslist.putParam("OORmkCode", t.getRmkCode());
 			occurslist.putParam("OORmkDesc", t.getRmkDesc());
 
 			String tempEmpNo = t.getCreateEmpNo() == "" ? t.getLastUpdateEmpNo() : t.getCreateEmpNo();

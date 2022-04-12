@@ -57,7 +57,7 @@ INVOKEJS(SHOW,p1,16,20,#HIDEAOFG)
 [#BTN_UNIT],
 ["#R4+@件數",#UnitCnt,#UnitCntX],
 ["#R5+@計件金額門檻",#UnitAmtCond,#UnitAmtCondX,"元"],
-["#R6+@撥款業績比例",#UnitPercent,#UnitPercentX,"%"],
+["#R6+@撥款業績比例",#UnitPercent,#UnitPercentX],
 [#BTN_INTRODUCER],
 ["#R7+@介紹獎金比例",#IntrodPerccent,#IntrodPerccentX],
 ["#R8+@介紹獎金門檻（新增額度）",#IntrodAmtCond,#IntrodAmtCondX,"元"],
@@ -69,7 +69,7 @@ INVOKEJS(SHOW,p1,16,20,#HIDEAOFG)
 ["#R13+@件數",#BsOffrCnt,#BsOffrCntX],
 ["#R14+@件數上限",#BsOffrCntLimit,#BsOffrCntLimitX],
 ["#R15+@計件金額門檻",#BsOffrAmtCond,#BsOffrAmtCondX,"元"],
-["#R17+@撥款業績比例",#BsOffrPerccent,#BsOffrPerccentX,"%"],
+["#R17+@撥款業績比例",#BsOffrPerccent,#BsOffrPerccentX],
 ]
 !["#R16+@計件金額門檻（動支、增貸）",#BsOffrCntAmt,#BsOffrCntAmtX,"元"],
 

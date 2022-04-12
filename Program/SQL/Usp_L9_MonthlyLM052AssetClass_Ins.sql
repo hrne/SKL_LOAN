@@ -61,14 +61,14 @@ BEGIN
     FROM ( SELECT M."YearMonth"
                  ,M."AssetClass"         AS "AssetClass"	   --放款資產項目	  
                  ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
-                 ,M."PrinBalance"      AS "Amt"           --放款餘額
+                 ,SUM(M."PrinBalance")      AS "Amt"           --放款餘額
            FROM "MonthlyFacBal" M
-           LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
-                                AND F."FacmNo" = M."FacmNo"
-           LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
-           LEFT JOIN "CdIndustry" CDI ON CDI."IndustryCode" = CM."IndustryCode"
            WHERE M."PrinBalance" > 0
              AND M."YearMonth" = TYYMM
+             AND M."AssetClass" IS NOT NULL
+           GROUP BY M."YearMonth"
+                   ,M."AssetClass"  	  
+                   ,M."AcSubBookCode"
           UNION 
           --擔保放款-折溢價
           SELECT "MonthEndYm"            AS "YearMonth"     --資料年月

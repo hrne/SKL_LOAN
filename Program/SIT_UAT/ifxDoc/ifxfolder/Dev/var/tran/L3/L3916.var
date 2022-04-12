@@ -213,6 +213,11 @@ T(3,CdCode.RenewFlag)
 
 #RenewFlagHelp=x,1024,S 
 
+!PieceCode 計件代碼
+#CDDEF15=x,25,S
+T(3,CdCode.PieceCode)
+#PieceCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
@@ -231,13 +236,14 @@ T(2,@RateCodeHelp,#HelpDesc10)
 
 #HelpRim2=X,1,S
 RESET_RIM(#HelpRim2,XXR99)
-S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@SexHelp,#HelpDesc1) 
 T(2,@RelationCodeHelp,#HelpDesc2)
 T(2,@ProdIntCalcCodeHelp,#HelpDesc3)
 T(2,@RenewFlagHelp,#HelpDesc4)
+T(2,@PieceCodeHelp,#HelpDesc5)
 
 #FdMain=X,2,L
 T(3,*)
@@ -687,6 +693,16 @@ CALL2(#AdjustDate,#GraceDate,#GraceDateX)
 T(3,)
 T(H,#RenewFlag,#RenewFlagHelp)
 
+![計件代碼]
+!修改時自動顯示可修改,其他自動顯示不必須輸入
+#FdPieceCode=X,2,L
+
+#PieceCode=X,1,S
+
+#PieceCodeX=X,20,L
+T(3,)
+T(H,#PieceCode,#PieceCodeHelp)
+
 ![目前利率]
 #StoreRate=n,2.4,S
 
@@ -882,7 +898,7 @@ TXFORM=L3916
 #OCustNo#OFacmNo#OBormNo#ProdNo#ProdName#OApplNo#PROHIBITPERIOD#AcctCode#Status
 #CurrencyCode#DrawdownAmt#LoanBal#RemitBank#RemitBranch#RemitAcctNo#PaymentBank#CompensateAcct
 #DrawdownDate#DrawdownCode#MaturityDate#FirstDueDate#RepayCode#AcctFee#TotalPeriod#RepaidPeriod
-#IntCalcCode#AmortizedCode#DueAmt#FreqBase#RepayFreq#PayIntFreq#GraceDate#RenewFlag#StoreRate
+#IntCalcCode#AmortizedCode#DueAmt#FreqBase#RepayFreq#PayIntFreq#GraceDate#RenewFlag#PieceCode#StoreRate
 #RateCode#RateIncr#FirstAdjRateDate#IndividualIncr#RateAdjFreq#RepayBank#RepayBankItem
 #RepayAcctNo#PrevIntDate#Shortfall#ShortfallInt#ShortfallPrin
 #PrevRepayDate#NextRepayDate#NplRepay#NplTrfDate#NplTrfAmt#NplProcSitu#BadDebtAmt#BadDebtBal#Remark
@@ -923,8 +939,9 @@ TXFORM=L3916
 ["#FdPrevIntDateX+繳息迄日",#PrevIntDateX],
 ["#FdPrevRepayDateX+最後還本日",#PrevRepayDateX],
 ["#FdNextRepayDate+下次還本日",#NextRepayDate],
-["#FdGraceDateX+寬限到期日",#GraceDateX],
-[#<->#,"#FdRenewFlag+展期／借新還舊",#RenewFlagX],
+[#<->#,"#FdGraceDateX+寬限到期日",#GraceDateX],
+["#FdRenewFlag+展期／借新還舊",#RenewFlagX],
+["#FdPieceCode+計件代碼",#PieceCodeX],
 [#<->#,"<font color=red>@利率資料區","@"],
 [#<->#,"#FdProdNo+商品代碼",#ProdNo,#ProdName],
 ["#FdStoreRateX+目前利率",#StoreRateX],

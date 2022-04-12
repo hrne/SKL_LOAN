@@ -27,17 +27,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * SearchFlag=9,1<br>
- * CustNo=9,7<br>
- * AcDate=9,7<br>
- * BatchNo=X,6<br>
- * DrawdownCode=9,1<br>
- * StatusCode=9,1<br>
- * END=X,1<br>
- */
-
 @Service("L4901")
 @Scope("prototype")
 /**
@@ -182,6 +171,7 @@ public class L4901 extends TradeBuffer {
 				payCodeItem = tCdCode.getItem();
 			}
 
+			String relNo = titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo();
 			occursList.putParam("OORemitBankX", ckItem);
 			occursList.putParam("OORemitBranchX", brItem);
 			occursList.putParam("RemitAcctNo", tBankRemit.getRemitAcctNo());
@@ -196,6 +186,7 @@ public class L4901 extends TradeBuffer {
 			occursList.putParam("OOTxtNo", tBankRemit.getTitaTxtNo());
 			occursList.putParam("OOPayCode", tBankRemit.getPayCode());
 			occursList.putParam("OOPayCodeX", payCodeItem);
+			occursList.putParam("OORelNo", relNo);
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -210,7 +201,7 @@ public class L4901 extends TradeBuffer {
 		tTempVo = tTempVo.getVo(t.getModifyContent());
 		BankRemit t2 = new BankRemit();
 		t2 = (BankRemit) datalog.clone(t);
-	
+
 		t.setStatusCode(5);
 		lBankRemit.add(t);
 

@@ -93,10 +93,7 @@ public class L9133 extends TradeBuffer {
 		boolean isDiff = l9133Report.exec(titaVo);
 
 		// 寫產檔記錄到TxFile
-		long rptNo = l9133Report.close();
-
-		// 產生PDF檔案
-		l9133Report.toPdf(rptNo);
+		l9133Report.close();
 
 		// 若有差額才產生明細表
 		if (isDiff) {
@@ -111,10 +108,7 @@ public class L9133 extends TradeBuffer {
 			l9133Report2.exec(titaVo);
 
 			// 寫產檔記錄到TxFile
-			long rptNo2 = l9133Report2.close();
-
-			// 產生PDF檔案
-			l9133Report2.toPdf(rptNo2);
+			l9133Report2.close();
 
 			this.info("L9133 l9133Report2 finished.");
 		}

@@ -9,6 +9,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * LoanCustRmk 帳務備忘錄明細檔<br>
@@ -26,7 +28,7 @@ public class LoanCustRmk implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3766431276263338553L;
+	private static final long serialVersionUID = -8089459626926529337L;
 
 @EmbeddedId
   private LoanCustRmkId loanCustRmkId;
@@ -35,18 +37,19 @@ public class LoanCustRmk implements Serializable {
   @Column(name = "`CustNo`", insertable = false, updatable = false)
   private int custNo = 0;
 
+  // 會計日期
+  /* 2022.4.10 by eric轉換需同步調整邏輯 */
+  @Column(name = "`AcDate`", insertable = false, updatable = false)
+  private int acDate = 0;
+
   // 備忘錄序號
+  /* 轉換需同步調整邏輯 */
   @Column(name = "`RmkNo`", insertable = false, updatable = false)
   private int rmkNo = 0;
 
   // 客戶識別碼
   @Column(name = "`CustUKey`", length = 32)
   private String custUKey;
-
-  // 備忘錄代碼
-  /* 共用代碼檔 */
-  @Column(name = "`RmkCode`", length = 3)
-  private String rmkCode;
 
   // 備忘錄說明
   @Column(name = "`RmkDesc`", length = 120)
@@ -99,8 +102,29 @@ public class LoanCustRmk implements Serializable {
   }
 
 /**
+	* 會計日期<br>
+	* 2022.4.10 by eric
+轉換需同步調整邏輯
+	* @return Integer
+	*/
+  public int getAcDate() {
+    return StaticTool.bcToRoc(this.acDate);
+  }
+
+/**
+	* 會計日期<br>
+	* 2022.4.10 by eric
+轉換需同步調整邏輯
+  *
+  * @param acDate 會計日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcDate(int acDate) throws LogicException {
+    this.acDate = StaticTool.rocToBc(acDate);
+  }
+
+/**
 	* 備忘錄序號<br>
-	* 
+	* 轉換需同步調整邏輯
 	* @return Integer
 	*/
   public int getRmkNo() {
@@ -109,7 +133,7 @@ public class LoanCustRmk implements Serializable {
 
 /**
 	* 備忘錄序號<br>
-	* 
+	* 轉換需同步調整邏輯
   *
   * @param rmkNo 備忘錄序號
 	*/
@@ -134,25 +158,6 @@ public class LoanCustRmk implements Serializable {
 	*/
   public void setCustUKey(String custUKey) {
     this.custUKey = custUKey;
-  }
-
-/**
-	* 備忘錄代碼<br>
-	* 共用代碼檔
-	* @return String
-	*/
-  public String getRmkCode() {
-    return this.rmkCode == null ? "" : this.rmkCode;
-  }
-
-/**
-	* 備忘錄代碼<br>
-	* 共用代碼檔
-  *
-  * @param rmkCode 備忘錄代碼
-	*/
-  public void setRmkCode(String rmkCode) {
-    this.rmkCode = rmkCode;
   }
 
 /**
@@ -253,7 +258,7 @@ public class LoanCustRmk implements Serializable {
 
   @Override
   public String toString() {
-    return "LoanCustRmk [loanCustRmkId=" + loanCustRmkId + ", custUKey=" + custUKey + ", rmkCode=" + rmkCode + ", rmkDesc=" + rmkDesc + ", createDate=" + createDate
+    return "LoanCustRmk [loanCustRmkId=" + loanCustRmkId + ", custUKey=" + custUKey + ", rmkDesc=" + rmkDesc + ", createDate=" + createDate
            + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

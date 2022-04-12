@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.domain.LoanCustRmkId;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.LoanCustRmkService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -30,6 +32,9 @@ public class L2R62 extends TradeBuffer {
 	@Autowired
 	public LoanCustRmkService loanCustRmkService;
 
+	@Autowired
+	public CdEmpService cdEmpService;
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -48,6 +53,8 @@ public class L2R62 extends TradeBuffer {
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
+		// 會計日期
+		int iAcDate = parse.stringToInteger(titaVo.getParam("RimAcDate"));
 		// 備忘錄序號
 		int iRmkNo = parse.stringToInteger(titaVo.getParam("RimRmkNo"));
 
@@ -57,12 +64,13 @@ public class L2R62 extends TradeBuffer {
 		LoanCustRmkId loanCustRmkId = new LoanCustRmkId();
 		// 塞值到TablePK
 		loanCustRmkId.setCustNo(iCustNo);
+		loanCustRmkId.setAcDate(iAcDate);
 		loanCustRmkId.setRmkNo(iRmkNo);
 		// FunCd 1新增
 		if (iFunCd == 1) {
 
 			// 測試該戶號是否存在帳務備忘錄明細檔
-			tLoanCustRmk = loanCustRmkService.maxRmkNoFirst(iCustNo, titaVo);
+			tLoanCustRmk = loanCustRmkService.maxRmkNoFirst(iCustNo, iAcDate, titaVo);
 			// 不存在備忘錄序號為1
 			if (tLoanCustRmk == null) {
 				tLoanCustRmk = new LoanCustRmk();
@@ -76,13 +84,21 @@ public class L2R62 extends TradeBuffer {
 			tLoanCustRmk = loanCustRmkService.findById(loanCustRmkId, titaVo);
 			// 該戶號 備忘錄序號查不到資料 拋錯
 			if (tLoanCustRmk == null) {
-				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo + "備忘錄序號" + iRmkNo + "不存在帳務備忘錄明細檔。"); //查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo + "備忘錄序號" + iRmkNo + "不存在帳務備忘錄明細檔。"); // 查詢資料不存在
 			}
 
+			this.totaVo.putParam("L2r62AcDate", tLoanCustRmk.getAcDate());
 			this.totaVo.putParam("L2r62RmkNo", tLoanCustRmk.getRmkNo());
-			this.totaVo.putParam("L2r62RmkCode", tLoanCustRmk.getRmkCode());
+//			this.totaVo.putParam("L2r62RmkCode", tLoanCustRmk.getRmkCode());
 			this.totaVo.putParam("L2r62RmkDesc", tLoanCustRmk.getRmkDesc());
+			this.totaVo.putParam("L2r62EmpNo", tLoanCustRmk.getCreateEmpNo());
+			CdEmp cdEmp = cdEmpService.findById(tLoanCustRmk.getCreateEmpNo(), titaVo);
 
+			if (cdEmp == null) {
+				this.totaVo.putParam("L2r62EmpName", tLoanCustRmk.getCreateEmpNo());
+			} else {
+				this.totaVo.putParam("L2r62EmpName", cdEmp.getFullname());
+			}
 		}
 
 		this.addList(this.totaVo);

@@ -37,8 +37,7 @@ public class L2R41 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		loanAvailableAmt.setTxBuffer(this.txBuffer);
 
-		// tita
-		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
+		parse.stringToInteger(titaVo.getParam("RimFunCd"));
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("RimClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
@@ -74,9 +73,13 @@ public class L2R41 extends TradeBuffer {
 		}
 
 		wkAvailable = loanAvailableAmt.checkClAvailable(iClCode1, iClCode2, iClNo, wkShareTotal, titaVo); // 可用額度
-
+//		BigDecimal utilAmtFac = loanAvailableAmt.getUtilAmtFac();// 額度放款餘額
+//		BigDecimal shareAmtCl = loanAvailableAmt.getShareAmtCl();// 擔保品可分配金額
+//		this.info("UtilAmtFac=" + utilAmtFac + ",shareAmtCl=" + shareAmtCl);
+		
 		if (wkAvailable.compareTo(BigDecimal.ZERO) < 0) {
-			throw new LogicException("E3071", "可分配金額不足 ： = " + wkAvailable);
+			//throw new LogicException("E3071", "可分配金額不足 ： = " + wkAvailable);
+			this.totaVo.setWarnMsg("可分配金額不足 ： =" + wkAvailable);
 		}
 
 		this.addList(this.totaVo);

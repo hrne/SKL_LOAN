@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * LoanCustRmk 帳務備忘錄明細檔<br>
@@ -19,21 +21,28 @@ public class LoanCustRmkId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -791701434723623882L;
+	private static final long serialVersionUID = 3019610490014362560L;
 
 // 借款人戶號
   @Column(name = "`CustNo`")
   private int custNo = 0;
 
+  // 會計日期
+  /* 2022.4.10 by eric轉換需同步調整邏輯 */
+  @Column(name = "`AcDate`")
+  private int acDate = 0;
+
   // 備忘錄序號
+  /* 轉換需同步調整邏輯 */
   @Column(name = "`RmkNo`")
   private int rmkNo = 0;
 
   public LoanCustRmkId() {
   }
 
-  public LoanCustRmkId(int custNo, int rmkNo) {
+  public LoanCustRmkId(int custNo, int acDate, int rmkNo) {
     this.custNo = custNo;
+    this.acDate = acDate;
     this.rmkNo = rmkNo;
   }
 
@@ -57,8 +66,29 @@ public class LoanCustRmkId implements Serializable {
   }
 
 /**
+	* 會計日期<br>
+	* 2022.4.10 by eric
+轉換需同步調整邏輯
+	* @return Integer
+	*/
+  public int getAcDate() {
+    return  StaticTool.bcToRoc(this.acDate);
+  }
+
+/**
+	* 會計日期<br>
+	* 2022.4.10 by eric
+轉換需同步調整邏輯
+  *
+  * @param acDate 會計日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcDate(int acDate) throws LogicException {
+    this.acDate = StaticTool.rocToBc(acDate);
+  }
+
+/**
 	* 備忘錄序號<br>
-	* 
+	* 轉換需同步調整邏輯
 	* @return Integer
 	*/
   public int getRmkNo() {
@@ -67,7 +97,7 @@ public class LoanCustRmkId implements Serializable {
 
 /**
 	* 備忘錄序號<br>
-	* 
+	* 轉換需同步調整邏輯
   *
   * @param rmkNo 備忘錄序號
 	*/
@@ -78,7 +108,7 @@ public class LoanCustRmkId implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(custNo, rmkNo);
+    return Objects.hash(custNo, acDate, rmkNo);
   }
 
   @Override
@@ -88,11 +118,11 @@ public class LoanCustRmkId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     LoanCustRmkId loanCustRmkId = (LoanCustRmkId) obj;
-    return custNo == loanCustRmkId.custNo && rmkNo == loanCustRmkId.rmkNo;
+    return custNo == loanCustRmkId.custNo && acDate == loanCustRmkId.acDate && rmkNo == loanCustRmkId.rmkNo;
   }
 
   @Override
   public String toString() {
-    return "LoanCustRmkId [custNo=" + custNo + ", rmkNo=" + rmkNo + "]";
+    return "LoanCustRmkId [custNo=" + custNo + ", acDate=" + acDate + ", rmkNo=" + rmkNo + "]";
   }
 }

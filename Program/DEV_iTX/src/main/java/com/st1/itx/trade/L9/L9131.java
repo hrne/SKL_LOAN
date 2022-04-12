@@ -73,10 +73,7 @@ public class L9131 extends TradeBuffer {
 		l9131Report.exec(titaVo);
 
 		// 寫產檔記錄到TxReport
-		long rptNo = l9131Report.close();
-
-		// 產生PDF檔案
-		l9131Report.toPdf(rptNo);
+		l9131Report.close();
 
 		this.info("L9131 doRpt finished.");
 

@@ -499,8 +499,8 @@ BEGIN
 
     DBMS_OUTPUT.PUT_LINE('UPDATE LawAmount END');
 
---  更新  資產五分類
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass');
+--  更新  資產五分類(非1類)
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1');
 
     MERGE INTO "MonthlyFacBal" M
     USING (
@@ -508,40 +508,27 @@ BEGIN
            , M."CustNo"
            , M."FacmNo" 
            , CASE
-               WHEN M."ClCode1" IN (1,2) 
-                AND M."AcctCode" <> 990
-                AND CDI."IndustryItem" LIKE '%不動產%'
-               THEN '12'              -- 特定資產放款：建築貸款
-               WHEN M."ClCode1" IN (1,2) 
-               AND M."AcctCode" <> 990
-                AND CDI."IndustryItem" LIKE '%建築%'
-               THEN '12'              -- 特定資產放款：建築貸款
-               WHEN M."ClCode1" IN (1,2) 
-                AND M."AcctCode" <> 990
-                AND F."FirstDrawdownDate" >= 20100101 
-                AND M."FacAcctCode" = 340
-               THEN '11'               -- 正常繳息
-               WHEN M."ClCode1" IN (1,2) 
-                AND M."AcctCode" <> 990
-                AND F."FirstDrawdownDate" >= 20100101 
-                AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
-               THEN '11'               -- 正常繳息
-               WHEN M."ClCode1" IN (1,2) 
-                AND M."AcctCode" <> 990
-                AND F."FirstDrawdownDate" >= 20100101 
-                AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
-               THEN '11'               -- 正常繳息
-               WHEN M."ClCode1" IN (1,2) 
-                AND F."UsageCode" = '02' 
-                AND M."ProdNo" NOT IN ('60','61','62')
-                AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
-               THEN '12'       -- 特定資產放款：購置住宅+修繕貸款
                WHEN M."PrinBalance" = 1
                 AND M."AcctCode" = 990
                THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)
                                --   無擔保部分--超過清償期12月者
                                --   或拍訂貨拍賣無實益之損失者
-                               --   或放款資產經評估無法回收者        
+                               --   或放款資產經評估無法回收者   
+               WHEN M."AcctCode" = 990
+                AND M."ProdNo" IN ('60','61','62')
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者         
+               WHEN M."OvduTerm" >= 7
+                AND M."OvduTerm" <= 12
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者    
+               WHEN M."AcctCode" = 990
+                AND M."OvduTerm" <= 12
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者    
                WHEN M."AcctCode" <> 990
                 AND M."ProdNo" IN ('60','61','62')
                 AND M."OvduTerm" = 0
@@ -554,24 +541,11 @@ BEGIN
                THEN '22'       --(22)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期1-6月者
                WHEN M."AcctCode" = 990
-                AND M."OvduTerm" >= 7
-                AND M."OvduTerm" <= 12
-               THEN '23'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者    
-               WHEN M."AcctCode" = 990
-                AND M."ProdNo" NOT IN ('60','61','62')
                 AND M."OvduTerm" > 12
-                AND M."PrinBalance" > 1
                THEN '3'        --(3)第三類-可望收回：
                                --   有足無擔保--逾繳超過清償期12月者
-                               --   或無擔保部分--超過清償期3-6月者   
-               WHEN M."AcctCode" = 990
-                AND M."ProdNo" IN ('60','61','62')
-               THEN '23'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者                         
-               ELSE '11'       -- 正常繳息
+                               --   或無擔保部分--超過清償期3-6月者                         
+               ELSE '1'       -- 正常繳息
              END                  AS "AssetClass"	--放款資產項目	  
       FROM "MonthlyFacBal" M
       LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
@@ -594,7 +568,65 @@ BEGIN
     
     UPD_CNT := UPD_CNT + sql%rowcount;
 
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass END');
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1 END');
+
+--  更新  資產五分類(1類)
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (
+      SELECT M."YearMonth"
+           , M."CustNo"
+           , M."FacmNo" 
+           , CASE
+               WHEN M."ClCode1" IN (1,2) 
+                AND CDI."IndustryItem" LIKE '%不動產%'
+               THEN '12'              -- 特定資產放款：建築貸款
+               WHEN M."ClCode1" IN (1,2) 
+                AND CDI."IndustryItem" LIKE '%建築%'
+               THEN '12'              -- 特定資產放款：建築貸款
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."FirstDrawdownDate" >= 20100101 
+                AND M."FacAcctCode" = 340
+               THEN '11'               -- 正常繳息
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."FirstDrawdownDate" >= 20100101 
+                AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
+               THEN '11'               -- 正常繳息
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."FirstDrawdownDate" >= 20100101 
+                AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
+               THEN '11'               -- 正常繳息
+               WHEN M."ClCode1" IN (1,2) 
+                AND F."UsageCode" = '02' 
+                AND M."ProdNo" NOT IN ('60','61','62')
+                AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+               THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
+               ELSE '11'       
+             END                  AS "AssetClass"	--放款資產項目	  
+      FROM "MonthlyFacBal" M
+      LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
+                            AND F."FacmNo" = M."FacmNo"
+      LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
+      LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
+                        ,"IndustryItem"
+                  FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
+      WHERE M."PrinBalance" > 0 
+        AND M."YearMonth" = YYYYMM
+        AND M."AssetClass" = '1'
+    ) TMP
+    ON (
+      TMP."YearMonth" = M."YearMonth"
+      AND TMP."CustNo" = M."CustNo"
+      AND TMP."FacmNo" = M."FacmNo"
+    )
+    WHEN MATCHED THEN UPDATE SET
+    "AssetClass" = TMP."AssetClass"
+    ;
+    
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2 END');
 
 
     -- 記錄程式結束時間

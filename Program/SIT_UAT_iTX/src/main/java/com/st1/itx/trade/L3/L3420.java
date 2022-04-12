@@ -1364,8 +1364,8 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setRepaidPeriod(wkRepaidPeriod);
 		tLoanBorTx.setPrincipal(wkPrincipal);
-		// 利息收入金額=利息收入扣除轉催收利息
-		tLoanBorTx.setInterest(wkInterest.subtract(wkOvduIntAmt));
+		// 催收結案時：沖催收款項+利息收入=實收本金+實收利息
+		tLoanBorTx.setInterest(wkInterest);
 		tLoanBorTx.setDelayInt(wkDelayInt);
 		tLoanBorTx.setBreachAmt(wkBreachAmt);
 		tLoanBorTx.setCloseBreachAmt(wkCloseBreachAmt);

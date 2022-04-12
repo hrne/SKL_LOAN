@@ -135,16 +135,16 @@ public class L420ABatch extends TradeBuffer {
 				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
 					TempVo tTempVo = new TempVo();
 					tTempVo = tTempVo.getVo(t.getProcNote());
-					// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次
+					// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次檢核
 					if (t.getRepayCode() == 1 && t.getRepayType() >= 1 && t.getRepayType() <= 3) {
 						mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
 						if (!"4".equals(mergeProcStsCode.get(mapKey)) || (tTempVo.get("MergeCnt") != null
 								&& parse.stringToInteger(tTempVo.get("MergeCnt")) != mergeCnt.get(mapKey))) {
 							if (mergeCnt.get(mapKey) >= 2) {
 								l2BatxDetail.add(t);
+							} else {
+								l1BatxDetail.add(t);
 							}
-						} else {
-							l1BatxDetail.add(t);
 						}
 					} else {
 						if (!"4".equals(t.getProcStsCode())) {
@@ -246,7 +246,7 @@ public class L420ABatch extends TradeBuffer {
 
 		this.batchTransaction.commit();
 		// 更新作業狀態
-		String msg = updateHead(tBatxHead, lBatxDetail, titaVo);
+		String msg = updateHead(tBatxHead,  slBatxDetail.getContent(), titaVo);
 
 		// end
 		this.batchTransaction.commit();
@@ -305,12 +305,17 @@ public class L420ABatch extends TradeBuffer {
 		}
 
 		String msg = "檢核正常筆數 :" + checkOkCnt;
-		if (checkErrorCnt > 0)
+		if (checkErrorCnt > 0) {
 			msg = msg + ", 檢核錯誤筆數 :" + checkErrorCnt;
-		if (doneCnt > 0)
+		}
+
+		if (doneCnt > 0) {
 			msg = msg + ", 已入帳筆數 :" + doneCnt;
-		if (manualCnt > 0)
+		}
+
+		if (manualCnt > 0) {
 			msg = msg + ", 需人工處理筆數 :" + manualCnt;
+		}
 
 		String batxExeCode = "2"; // 2.檢核正常
 		if (checkErrorTotalCnt > 0) {

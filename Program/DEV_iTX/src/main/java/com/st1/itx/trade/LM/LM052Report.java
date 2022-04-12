@@ -228,6 +228,7 @@ public class LM052Report extends MakeReport {
 					if ("00A".equals(tLDVo.get("F1"))) {
 						col = 3;
 					}
+					
 					if ("201".equals(tLDVo.get("F1"))) {
 						col = 3;
 					}
@@ -237,9 +238,7 @@ public class LM052Report extends MakeReport {
 					
 					if ("62".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 6;
-					} else {
-						col = 12;
-					}
+					} 
 
 	
 

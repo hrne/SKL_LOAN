@@ -59,14 +59,16 @@ public class LD007Batch extends BatchBase implements Tasklet, InitializingBean {
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
 		CdWorkMonth cdWorkMonth = sCdWorkMonthService.findDateFirst(tbsdyf, tbsdyf, titaVo);
+		
+		if (cdWorkMonth == null)
+			throw new LogicException("E0001", "放款業績工作月對照檔查無本日資料");
 
 		int year = cdWorkMonth.getYear() - 1911;
 		int month = cdWorkMonth.getMonth();
 
-		titaVo.putParam("inputYearStart", year);
-		titaVo.putParam("inputYearEnd", year);
-		titaVo.putParam("inputMonthStart", month);
-		titaVo.putParam("inputMonthEnd", month);
+		// ServiceImpl.findAll 接收民國年月
+		titaVo.putParam("workMonthStart", year * 100 + month);
+		titaVo.putParam("workMonthEnd", year * 100 + month);
 
 		lD007Report.exec(titaVo);
 	}

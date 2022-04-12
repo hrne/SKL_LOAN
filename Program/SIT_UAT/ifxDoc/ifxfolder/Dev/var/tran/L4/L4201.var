@@ -199,7 +199,7 @@ IF(#RepayAmt >= 0,$,s)
 IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
 @
 C(3,#ProcStsCode,1,T(F,@CustNoA,0)T(F,@RepayTypeA,0),T(F,@CustNoA,1)T(F,@RepayTypeA,1))
-IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,0,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,0,1),IF(#ProcStsCodeTemp == 0,V(1,1),V(1,0))))))
+IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,0,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,0,1),IF(#ProcStsCodeTemp == 0,V(1,1,2),V(1,0))))))
 
 #ProcStsCodeX=X,10,L
 T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)

@@ -31,10 +31,12 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+		// parse.stringToInteger handles null as 0
 		Boolean useWorkMonth = parse.stringToInteger(titaVo.getParam("workMonthStart")) > 0;
 		Boolean useCustNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0;
 		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
-		Boolean useIntroducer = !titaVo.getParam("Introducer").trim().isEmpty();
+		String introducer = titaVo.getParam("Introducer");
+		Boolean useIntroducer = introducer != null && !introducer.trim().isEmpty();
 
 		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useIntroducer:%s", useWorkMonth, useCustNo, useFacmNo, useIntroducer));
 		// check titaVo for input values
@@ -132,7 +134,7 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (useIntroducer) {
-			query.setParameter("introducer", titaVo.getParam("Introducer"));
+			query.setParameter("introducer", introducer);
 		}
 
 		return this.convertToMap(query);

@@ -94,6 +94,7 @@ public class LM058Report extends MakeReport {
 
 			Double total = 0.0;
 			Double maxTotal = 0.0;
+			this.info("fnAllList=" + fnAllList.toString());
 			for (Map<String, String> tLDVo : fnAllList) {
 
 				row++;
