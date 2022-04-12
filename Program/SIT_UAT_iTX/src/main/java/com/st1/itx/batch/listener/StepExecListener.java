@@ -63,7 +63,20 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		Date date = new Date();
 		Timestamp endTime = new Timestamp(date.getTime());
 
-		String stepStatus = stepExecution.getExitStatus().getExitCode().equals("COMPLETED") ? "S" : "F";
+		// 2022-04-12 智偉增加:
+		String exitCode = stepExecution.getExitStatus().getExitCode();
+		String stepStatus = "";
+		switch (exitCode) {
+		case "COMPLETED":
+			stepStatus = "S";
+			break;
+		case "STOPPED":
+			stepStatus = "S";
+			break;
+		default:
+			stepStatus = "F";
+			break;
+		}
 
 		this.info("StepExecListener.afterStep : " + stepId);
 		this.info("batch execDate     : " + execDate);
