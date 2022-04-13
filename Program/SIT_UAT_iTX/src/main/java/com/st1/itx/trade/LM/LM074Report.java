@@ -135,7 +135,7 @@ public class LM074Report extends MakeReport {
 			makeExcel.setValue(4, 1, "本月無資料");
 		}
 
-		long sno = makeExcel.close();
+		makeExcel.close();
 		//makeExcel.toExcel(sno);
 	}
 }

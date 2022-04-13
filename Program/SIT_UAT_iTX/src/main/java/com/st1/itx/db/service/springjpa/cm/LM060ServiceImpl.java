@@ -30,12 +30,12 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+//		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
 		// 月
@@ -45,7 +45,7 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
 		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
+//		int nowDate = Integer.valueOf(iEntdy);
 
 		Calendar calendar = Calendar.getInstance();
 
@@ -58,15 +58,16 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("thisMonthEndDate=" + thisMonthEndDate);
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
+		
 		// 設上個月底日
 		calendar.set(iYear, iMonth - 1, 0);
 
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
 		this.info("lastMonthEndDate=" + lastMonthEndDate);
-
-		this.info("lM060.findAll YYMM=" + iYearMonth + ",LYYMM=" + lastMonthEndDate / 100 + ",lday" + lastMonthEndDate);
+		
+		this.info("lM060.findAll YYMM=" +iYearMonth + ",LYYMM=" + lastMonthEndDate / 100
+				+ ",lday" + lastMonthEndDate);
 
 //		F0 : 前期餘額               
 //		F1 : 借方暫付款項--法務費用   
@@ -95,6 +96,7 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,0 F5";
 		sql += "				 ,0 F6";
 		sql += "				 ,0 F7";
+		sql += "				 ,0 F8";
 		sql += "		   FROM \"AcMain\" A";
 		sql += "		   WHERE A.\"AcDate\" = :lday";
 		sql += "		     AND A.\"MonthEndYm\" = :lyymm";

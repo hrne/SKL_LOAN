@@ -184,59 +184,59 @@ public class LM054Report extends MakeReport {
 	}
 
 	// A041重要放款餘額明細表
-	private void sheetA01() throws LogicException {
-
-		makeExcel.setSheet("A041重要放款餘額明細表(大額、逾期、催收、國外)");
-
-		// 申報年月
-		makeExcel.setValue(2, 3, "");
-
-		// B 放款代號
-		makeExcel.formulaCaculate(7, 2);
-		// C 放款種類
-		makeExcel.setValue(7, 3, "");
-		// D 放款對象名稱
-		makeExcel.formulaCaculate(7, 4);
-		// E 放款對象關係人代碼
-		makeExcel.setValue(7, 5, "");
-		// F 利害關係人代碼
-		makeExcel.setValue(7, 6, "");
-		// G 是否為專案運用公共及社會福利事業投資
-		makeExcel.formulaCaculate(7, 7);
-		// H 聯合貸款
-		makeExcel.formulaCaculate(7, 8);
-		// I 持有資產幣別
-		makeExcel.setValue(7, 9, "");
-		// J 放款日期
-		makeExcel.formulaCaculate(7, 10);
-		// K 到期日期
-		makeExcel.formulaCaculate(7, 11);
-		// L 放款年利率
-		makeExcel.formulaCaculate(7, 12);
-		// M 到放款餘額
-		makeExcel.formulaCaculate(7, 13);
-		// N 應收利息
-		makeExcel.formulaCaculate(7, 14);
-		// O 擔保品 設定順位
-		makeExcel.setValue(7, 15, "");
-		// P 擔保品 估計總值
-		makeExcel.setValue(7, 16, "");
-		// Q 擔保品 核貸金額
-		makeExcel.formulaCaculate(7, 17);
-		// R 轉催收日期
-		makeExcel.formulaCaculate(7, 18);
-		// S 催收狀態
-		makeExcel.setValue(7, 19, "");
-		// T 評估分類
-		makeExcel.setValue(7, 20, "");
-		// U 轉催收日期
-		makeExcel.formulaCaculate(7, 21);
-		// V 評估分類
-		makeExcel.setValue(7, 22, "");
-		// W IFRS9評估階段
-		makeExcel.setValue(7, 23, "");
-		// Y 逾期繳款天數
-		makeExcel.formulaCaculate(7, 25);
-
-	}
+//	private void sheetA01() throws LogicException {
+//
+//		makeExcel.setSheet("A041重要放款餘額明細表(大額、逾期、催收、國外)");
+//
+//		// 申報年月
+//		makeExcel.setValue(2, 3, "");
+//
+//		// B 放款代號
+//		makeExcel.formulaCaculate(7, 2);
+//		// C 放款種類
+//		makeExcel.setValue(7, 3, "");
+//		// D 放款對象名稱
+//		makeExcel.formulaCaculate(7, 4);
+//		// E 放款對象關係人代碼
+//		makeExcel.setValue(7, 5, "");
+//		// F 利害關係人代碼
+//		makeExcel.setValue(7, 6, "");
+//		// G 是否為專案運用公共及社會福利事業投資
+//		makeExcel.formulaCaculate(7, 7);
+//		// H 聯合貸款
+//		makeExcel.formulaCaculate(7, 8);
+//		// I 持有資產幣別
+//		makeExcel.setValue(7, 9, "");
+//		// J 放款日期
+//		makeExcel.formulaCaculate(7, 10);
+//		// K 到期日期
+//		makeExcel.formulaCaculate(7, 11);
+//		// L 放款年利率
+//		makeExcel.formulaCaculate(7, 12);
+//		// M 到放款餘額
+//		makeExcel.formulaCaculate(7, 13);
+//		// N 應收利息
+//		makeExcel.formulaCaculate(7, 14);
+//		// O 擔保品 設定順位
+//		makeExcel.setValue(7, 15, "");
+//		// P 擔保品 估計總值
+//		makeExcel.setValue(7, 16, "");
+//		// Q 擔保品 核貸金額
+//		makeExcel.formulaCaculate(7, 17);
+//		// R 轉催收日期
+//		makeExcel.formulaCaculate(7, 18);
+//		// S 催收狀態
+//		makeExcel.setValue(7, 19, "");
+//		// T 評估分類
+//		makeExcel.setValue(7, 20, "");
+//		// U 轉催收日期
+//		makeExcel.formulaCaculate(7, 21);
+//		// V 評估分類
+//		makeExcel.setValue(7, 22, "");
+//		// W IFRS9評估階段
+//		makeExcel.setValue(7, 23, "");
+//		// Y 逾期繳款天數
+//		makeExcel.formulaCaculate(7, 25);
+//
+//	}
 }

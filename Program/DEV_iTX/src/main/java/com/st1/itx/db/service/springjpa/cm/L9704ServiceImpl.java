@@ -41,26 +41,24 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " ";
-		sql += " SELECT F.\"CustNo\"                                                      "; // -- F0 戶號
-		sql += "      , F.\"FacmNo\"                                                      "; // -- F1 額度
-		sql += "      , \"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\"                "; // -- F2 戶名/公司名稱
-		sql += "      , F.\"FirstDrawdownDate\"                                           "; // -- F3 初貸日
-		sql += "      , CASE WHEN L.\"PrevIntDate\" != 0                                  ";
-		sql += "             THEN L.\"PrevIntDate\"                                       ";
-		sql += "        ELSE LBM.\"PrevPayIntDate\" END AS F4                             "; // -- F4 繳息迄日
-		sql += "      , F.\"AcctCode\"                                                    "; // -- F5 核准科目
-		sql += "      , NVL(LASTM.\"OvduDate\", THISM.\"OvduDate\") AS \"OvduDate\"       "; // -- F6 轉催收日期
-		sql += "      , NVL(LASTM.\"OvduPrinBal\",0)                AS \"LastOvduPrinBal\""; // -- F7 上月催收本金餘額
-		sql += "      , NVL(LASTM.\"OvduIntBal\" + LASTM.\"OvduBreachBal\",0)             ";
-		sql += "                                                    AS \"LastOvduIntBal\" "; // -- F8 上月催收利息餘額 +
-																								// 上月催收違約金餘額
-		sql += "      , NVL(THISM.\"OvduPrinBal\",0)                AS \"ThisOvduPrinBal\""; // -- F9 本月催收本金餘額
-		sql += "      , NVL(THISM.\"OvduIntBal\" + THISM.\"OvduBreachBal\",0)             ";
-		sql += "                                                    AS \"ThisOvduIntBal\" "; // -- F10 本月催收利息餘額 +
-																								// 本月催收違約金餘額
-		sql += "      , E.\"Fullname\"                                                    "; // -- F11 催收人員姓名
-		sql += "      , CT.\"CityItem\"                                                   "; // -- F12 地區別名稱
-		sql += "      , NVL(DF.\"Item\", '一般帳戶')                AS \"AcBookItem\"     "; // -- F13 帳冊別中文
+		sql += " SELECT F.\"CustNo\" "; // F0 戶號
+		sql += "      , F.\"FacmNo\" "; // F1 額度
+		sql += "      , \"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\" "; // F2 戶名/公司名稱
+		sql += "      , F.\"FirstDrawdownDate\" "; // F3 初貸日
+		sql += "      , CASE WHEN L.\"PrevIntDate\" != 0 ";
+		sql += "             THEN L.\"PrevIntDate\" ";
+		sql += "        ELSE LBM.\"PrevPayIntDate\" END AS F4 "; // F4 繳息迄日
+		sql += "      , F.\"AcctCode\" "; // F5 核准科目
+		sql += "      , NVL(LO.\"OvduDate\", 0) AS \"OvduDate\" "; // F6 轉催收日期
+		sql += "      , NVL(LASTM.\"OvduPrinBal\",0)                AS \"LastOvduPrinBal\" "; // F7 上月催收本金餘額
+		sql += "      , NVL(LASTM.\"OvduIntBal\" + LASTM.\"OvduBreachBal\",0) ";
+		sql += "                                                    AS \"LastOvduIntBal\" "; // F8 上月催收利息餘額 + 上月催收違約金餘額
+		sql += "      , NVL(THISM.\"OvduPrinBal\",0)                AS \"ThisOvduPrinBal\" "; // F9 本月催收本金餘額
+		sql += "      , NVL(THISM.\"OvduIntBal\" + THISM.\"OvduBreachBal\",0) ";
+		sql += "                                                    AS \"ThisOvduIntBal\" "; // F10 本月催收利息餘額 + 上月催收違約金餘額
+		sql += "      , E.\"Fullname\" "; // F11 催收人員姓名
+		sql += "      , CT.\"CityItem\" "; // F12 地區別名稱
+		sql += "      , NVL(DF.\"Item\", '一般帳戶')                AS \"AcBookItem\" "; // F13 帳冊別中文
 		sql += " FROM \"FacMain\" F ";
 		sql += " LEFT JOIN \"CollList\" L ON L.\"CustNo\" = F.\"CustNo\" ";
 		sql += "                         AND L.\"FacmNo\" = F.\"FacmNo\" ";
@@ -75,13 +73,26 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdCode\" DF ON DF.\"DefCode\" = 'AcSubBookCode' ";
 		sql += "                        AND DF.\"Code\" = NVL(LASTM.\"AcSubBookCode\", THISM.\"AcSubBookCode\") ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\" ";
-		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = F.\"CustNo\" ";
-		sql += "                              AND LBM.\"FacmNo\" = F.\"FacmNo\" ";
-		sql += "                              AND LBM.\"LastEntDy\" LIKE :thisMonth || '%' ";
-		sql += " WHERE NVL(LASTM.\"OvduBal\", 0) + NVL(THISM.\"OvduBal\", 0) > 0 "; // -- 上月催收餘額 或 本月催收餘額 > 0 進表
+		sql += " LEFT JOIN (SELECT \"CustNo\" ";
+		sql += "                  ,\"FacmNo\" ";
+		sql += "                  ,\"BormNo\" ";
+		sql += "                  ,\"LastOvduNo\" ";
+		sql += "                  ,\"PrevPayIntDate\" ";
+		sql += "                  ,ROW_NUMBER() OVER (ORDER BY \"PrevPayIntDate\" ASC) \"Seq\" ";
+		sql += "            FROM \"LoanBorMain\" LBM ";
+		sql += "            WHERE TRUNC(\"LastEntDy\" / 100, 0) = :thisMonth) LBM ON LBM.\"CustNo\" = F.\"CustNo\" ";
+		sql += "                                                                 AND LBM.\"FacmNo\" = F.\"FacmNo\" ";
+		sql += "                                                                 AND LBM.\"Seq\" = 1 ";
+		sql += " LEFT JOIN \"LoanOverdue\" LO ON LO.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "                             AND LO.\"FacmNo\" = LBM.\"FacmNo\" ";
+		sql += "                             AND LO.\"BormNo\" = LBM.\"BormNo\" ";
+		sql += "                             AND LO.\"OvduNo\" = LBM.\"LastOvduNo\" ";
+		sql += " WHERE NVL(LASTM.\"OvduBal\", 0) + NVL(THISM.\"OvduBal\", 0) > 0 "; // 上月催收餘額 或 本月催收餘額 > 0 進表
 		sql += " ORDER BY NVL(LASTM.\"AcSubBookCode\", THISM.\"AcSubBookCode\") ";
 		sql += "        , F.\"CustNo\" ";
 		sql += "        , F.\"FacmNo\" ";
+		sql += " ; ";
+
 
 		this.info("sql=" + sql);
 		Query query;

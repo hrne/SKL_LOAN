@@ -26,7 +26,7 @@ public class LM078Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	private static final BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -38,7 +38,7 @@ public class LM078Report extends MakeReport {
 		List<Map<String, String>> lLM078 = null;
 
 		try {
-			lLM078 = lM077ServiceImpl.findAll(titaVo, iAcDate / 100);
+			lLM078 = lM077ServiceImpl.findAll(titaVo, iAcDate/100);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -59,7 +59,7 @@ public class LM078Report extends MakeReport {
 
 		this.info("LM078Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", date / 100 % 100) + " 月";
+		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", date / 100 % 100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM078", "B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形", "LM078_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形" + showRocDate(entdy, 0).substring(0, 7),
 				"LM078_底稿_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形.xlsx", 1, "FOA");
@@ -91,8 +91,9 @@ public class LM078Report extends MakeReport {
 						// 07 - col 7~8 (+4)
 						// 08 - col 9~10 (+6)
 						// 09 - col 11~12 (+8)
-						// 10 - col 13~14 (+10)
-						switch (value) {
+						// 10 - col 13~14 (+10)						
+						switch (value)
+						{
 						case "01":
 						case "02":
 						case "03":
@@ -134,7 +135,7 @@ public class LM078Report extends MakeReport {
 			makeExcel.setValue(4, 1, "本月無資料");
 		}
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 }

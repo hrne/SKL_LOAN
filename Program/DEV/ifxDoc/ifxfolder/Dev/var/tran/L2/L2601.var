@@ -235,7 +235,7 @@ T(H,#FeeCode,#FeeCodeHelp)
 T(2,      Y)
 
 #BIND1=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF1;ntxbuf5=type<-1:LegalStaff<-OOEmployeeNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF1;ntxbuf5=type<-1:LegalStaff<-OOEmployeeNo:LegalStaffName<-OOFullname})
 
 !法務人員 必須輸入
 #LegalStaff=X,6,I
@@ -248,7 +248,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF1;ntxbuf5=type<-1:LegalSta
 ! 修改、刪除時，調RIM查員工檔資料
 
 #RimL6r17=X,1,S
-E(0,@RimFuncCode,5)
+E(0,@RimFuncCode,1)
 T(2,@RimTxCode,L2601)
 T(2,@RimEmployeeNo,#LegalStaff)
 RESET_RIM(#RimL6r17,L6R17)

@@ -76,13 +76,15 @@ public class LM044Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM044", "地區_區域中心逾比及分級管理逾放比明細表", "LM044-地區逾放比分級管理明細表_內部控管", "LM044地區逾放比分級管理明細表_內部控管.xlsx", "10804_地區逾放比");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM044", "地區_區域中心逾比及分級管理逾放比明細表",
+				"LM044-地區逾放比分級管理明細表_內部控管", "LM044地區逾放比分級管理明細表_內部控管.xlsx", "10804_地區逾放比");
 
 		int iEntdy = parse.stringToInteger(titaVo.get("ENTDY")); // YYYMMDD
 
 		makeExcel.setSheet("10804_地區逾放比", iEntdy / 100 + "_地區逾放比");
 
-		makeExcel.setValue(1, 2, iEntdy / 100 + "  地區 / 區域中心逾比及分級管理逾放比明細表                                                   密等:密");
+		makeExcel.setValue(1, 2,
+				iEntdy / 100 + "  地區 / 區域中心逾比及分級管理逾放比明細表                                                   密等:密");
 		int thirdMonth = iEntdy / 100;
 		int secondMonth = thirdMonth - 1;
 		if (secondMonth % 13 == 0) {
@@ -109,8 +111,8 @@ public class LM044Report extends MakeReport {
 			this.info("LM044ServiceImpl.testExcel error = " + errors.toString());
 		}
 		exportExcel(LM044List);
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {

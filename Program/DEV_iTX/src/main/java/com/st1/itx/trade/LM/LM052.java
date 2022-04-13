@@ -73,23 +73,23 @@ public class LM052 extends BatchBase implements Tasklet, InitializingBean {
 		thisYM = iYear * 100 + iMonth;
 
 		this.info("exec updLM052SP");
-		updLM052ReportSP(thisYM);
+//		updLM052ReportSP(thisYM);
 
 		this.info("active LM052 ");
 		
 		lM052report.exec(titaVo,thisYM);
 	}
 
-	private void updLM052ReportSP(int yearMonth) {
-
-		empNo = titaVo.getTlrNo();
-		
-		this.info("yearMonth=" + yearMonth);
-		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
-		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
-		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);
-
-		this.info("upd LM052 SP finished.");
-	}
+//	private void updLM052ReportSP(int yearMonth) {
+//
+//		empNo = titaVo.getTlrNo();
+//		
+//		this.info("yearMonth=" + yearMonth);
+//		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
+//		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
+//		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);
+//
+//		this.info("upd LM052 SP finished.");
+//	}
 
 }

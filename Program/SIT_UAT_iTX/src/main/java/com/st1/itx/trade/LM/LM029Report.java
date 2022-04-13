@@ -97,13 +97,13 @@ public class LM029Report extends MakeReport {
 
 				row++;
 			} // for
-
+			
 			// 放款餘額總計的 excel formula
 			makeExcel.formulaCaculate(1, 23);
 		}
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 }

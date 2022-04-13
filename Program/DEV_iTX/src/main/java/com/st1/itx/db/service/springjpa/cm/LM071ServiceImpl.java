@@ -28,15 +28,9 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-//		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-//		// 5年前1911-5= 1906
-//		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19060000);
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-//				int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
 		// 月
@@ -82,6 +76,7 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "								  			 AND REs.\"SEQ\" = 1";
 		sql += "	  WHERE L.\"Status\" IN(0,4)";
 		sql += "		AND M.\"ProdNo\" = '11'";
+//		sql += "		AND M.\"ProdNo\" IN ('11','1F')";
 		sql += " 		AND P.\"EmpFlag\" = 'Y'";
 		sql += "	  ORDER BY L.\"CustNo\"";
 		sql += "			  ,L.\"FacmNo\"";

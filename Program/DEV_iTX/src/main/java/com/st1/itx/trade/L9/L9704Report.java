@@ -124,12 +124,12 @@ public class L9704Report extends MakeReport {
 				makeExcel.setValue(printRow, 6, this.showRocDate(ovduDate, 1), fontStyleVo);
 
 				// F7 上月催收本金餘額
-				BigDecimal lastMonthOvduPrinBal = getBigDecimal(mapL9704.get("F7"));
+				BigDecimal lastMonthOvduPrinBal = mapL9704.get("F7") == null ? BigDecimal.ZERO : new BigDecimal(mapL9704.get("F7"));
 
 				makeExcel.setValue(printRow, 7, lastMonthOvduPrinBal, "#,##0", "R", fontStyleVo);
 
 				// F8 上月催收利息餘額 + 上月催收違約金餘額
-				BigDecimal lastMonthOvduIntBal = mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : getBigDecimal(mapL9704.get("F8"));
+				BigDecimal lastMonthOvduIntBal = mapL9704.get("F8") == null ? BigDecimal.ZERO : mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : new BigDecimal(mapL9704.get("F8"));
 
 				makeExcel.setValue(printRow, 8, lastMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
@@ -137,12 +137,12 @@ public class L9704Report extends MakeReport {
 				makeExcel.setValue(printRow, 9, lastMonthOvduPrinBal.add(lastMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 
 				// F9 本月催收本金餘額
-				BigDecimal thisMonthOvduPrinBal = mapL9704.get("F8").equals("1") ? BigDecimal.ONE : getBigDecimal(mapL9704.get("F9"));
+				BigDecimal thisMonthOvduPrinBal = mapL9704.get("F9") == null ? BigDecimal.ZERO : mapL9704.get("F8").equals("1") ? new BigDecimal("1") : new BigDecimal(mapL9704.get("F9"));
 
 				makeExcel.setValue(printRow, 12, thisMonthOvduPrinBal, "#,##0", "R", fontStyleVo);
 
 				// F10 本月催收利息餘額 + 本月催收違約金餘額
-				BigDecimal thisMonthOvduIntBal = mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : getBigDecimal(mapL9704.get("F10"));
+				BigDecimal thisMonthOvduIntBal = mapL9704.get("F10") == null ? BigDecimal.ZERO : mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : new BigDecimal(mapL9704.get("F10"));
 
 				makeExcel.setValue(printRow, 13, thisMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
@@ -194,8 +194,8 @@ public class L9704Report extends MakeReport {
 		// 畫框線
 		makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 	// 印小計

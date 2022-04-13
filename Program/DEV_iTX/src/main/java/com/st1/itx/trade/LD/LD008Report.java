@@ -142,7 +142,7 @@ public class LD008Report extends MakeReport {
 			}
 		}
 
-		long sno = this.close();
+		this.close();
 
 		// this.toPdf(sno);
 		return true;

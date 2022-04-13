@@ -1485,6 +1485,25 @@ C(3,#GracePeriod,0,T(3,無),$)
 #GracePeriodX=X,5,L
 C(3,#GracePeriod,0,T(3,無)HIDE(#GracePeriod),T(2,#WkMonthX)SHOW(#GracePeriod))
 
+![案件隸屬單位]
+!可不輸入
+#FdDepartmentCode=X,2,L
+
+#DepartmentCode=A,1,I
+HELP(#DepartmentCodeHelp)
+@V(H,#DepartmentCodeHelp)
+
+#DepartmentCodeX=X,10,L
+T(H,#DepartmentCode,#DepartmentCodeHelp)
+C(3,#DepartmentCode,0,T(F,@BreachFlag,0)T(F,@ProdBreachFlag,0),T(F,@BreachFlag,1)T(F,@ProdBreachFlag,1))
+
+
+
+!依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
+#checkDepartmentCode=X,1,S
+C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
+
+
 ![帳管費]
 !依商品資料自動顯示,可修改
 !交易中[帳管費]在第一期繳款時收取，金額可修改。
@@ -1503,25 +1522,6 @@ C(3,#Precision,0,S,$)
 #TimAcctFee=m,14.2,S
 C(3,#Precision,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
 
-
-
-![案件隸屬單位]
-!可不輸入
-#FdDepartmentCode=X,2,L
-
-#DepartmentCode=A,1,I
-HELP(#DepartmentCodeHelp)
-@V(H,#DepartmentCodeHelp)
-
-#DepartmentCodeX=X,10,L
-T(H,#DepartmentCode,#DepartmentCodeHelp)
-C(3,#DepartmentCode,0,T(F,@BreachFlag,0)T(F,@ProdBreachFlag,0),T(F,@BreachFlag,1)T(F,@ProdBreachFlag,1))
-
-
-
-!依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
-#checkDepartmentCode=X,1,S
-C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
 
 
 !手續費 企金才可輸入

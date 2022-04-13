@@ -55,23 +55,24 @@ public class LM031Report extends MakeReport {
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-
+		
 		this.info("LM031Report exportExcel()");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM031", "企業動用率", "LM031企業動用率", "LM031企業動用率.xlsx", "10810", showDate(titaVo.get("ENTDY")));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM031", "企業動用率", "LM031企業動用率", "LM031企業動用率.xlsx",
+				"10810", showDate(titaVo.get("ENTDY")));
 		if (LDList == null || LDList.isEmpty()) {
 			makeExcel.setValue(3, 1, "本日無資料");
 		} else {
-
+			
 			int row = 3;
-
+			
 			BigDecimal totalLineAmt = BigDecimal.ZERO;
 			BigDecimal totalUtilBal = BigDecimal.ZERO;
 			String lastCustNo = "";
 			String lastFacmNo = "";
 			int set1 = 0;// 判斷戶號是否與上一筆相同
 			int set2 = 0;// 判斷額度是否與上一筆相同
-
+			
 			for (Map<String, String> tLDVo : LDList) {
 
 				for (int i = 0; i <= 9; i++) {
@@ -132,11 +133,10 @@ public class LM031Report extends MakeReport {
 
 		}
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
-	@Override
 	public String showDate(String date) {
 		this.info("MakeReport.toPdf showRocDate1 = " + date);
 

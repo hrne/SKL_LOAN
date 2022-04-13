@@ -26,51 +26,48 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	/**
-	 * 客戶往來本息明細表
-	 * 
-	 * @param titaVo titaVo
-	 * @return 查詢結果
-	 * @throws Exception
-	 */
+	
 	public List<Map<String, String>> doQuery1(TitaVo titaVo) throws Exception {
 
-		String iCUSTNO = titaVo.getParam("CustNo");
-		String iTYPE = titaVo.getParam("DateType");
-		String iSDAY = String.valueOf(Integer.valueOf(titaVo.getParam("BeginDate")) + 19110000);
-		String iEDAY = String.valueOf(Integer.valueOf(titaVo.getParam("EndDate")) + 19110000);
-		String iHFG = titaVo.getParam("CorrectType");
+		String iCUSTNO = titaVo.get("CustNo");
+		String iTYPE = titaVo.get("DateType");
+		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("BeginDate")) + 19110000);
+		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("EndDate")) + 19110000);
+		String iHFG = titaVo.get("CorrectType");
 
-		String sql = "SELECT T.F0 "; // 入帳日期/會計日期
-		sql += "            ,T.F1 "; // 計息本金
-		sql += "            ,T.F2 "; // 計息起日
-		sql += "            ,T.F3 "; // 計息止日
-		sql += "            ,T.F4 "; // 計息利率
-		sql += "            ,T.F5 "; // 利息
-		sql += "            ,T.F6 "; // 遲延息
-		sql += "            ,T.F7 "; // 違約金
-		sql += "            ,T.F8 "; // 本金
-		sql += "            ,T.F5 + T.F6 + T.F7 + T.F8 AS F9 "; // 本息合計
-		sql += "            ,T.F10"; // 應繳日
-		sql += "            ,T.\"CustNo\"   AS F11"; // 戶號
-		sql += "            ,C.\"CustName\" AS F12"; // 戶名
-		sql += "            ,T.\"FacmNo\"   AS F13"; // 額度
-		sql += "            ,NVL(NVL(CB.\"BdLocation\", CL.\"LandLocation\"),' ') AS F14"; // 地址
-		sql += "      FROM (SELECT DECODE(T.\"EntryDate\", 0, T.\"AcDate\" ,T.\"EntryDate\") AS F0";
-		sql += "                  ,T.\"LoanBal\" + T.\"Principal\" AS F1";
-		sql += "                  ,T.\"IntStartDate\" AS F2 ";
-		sql += "                  ,T.\"IntEndDate\" AS F3";
-		sql += "                  ,T.\"Rate\" AS F4";
-		sql += "                  ,T.\"Interest\" AS F5";
-		sql += "                  ,T.\"DelayInt\" AS F6";
-		sql += "                  ,T.\"BreachAmt\" AS F7";
-		sql += "                  ,T.\"Principal\" AS F8";
-		sql += "                  ,T.\"DueDate\" AS F10";
+		String sql = "SELECT T.\"F0\"";
+		sql += "            ,T.\"F1\"";
+		sql += "            ,T.\"F2\"";
+		sql += "            ,T.\"F3\"";
+		sql += "            ,T.\"F4\"";
+		sql += "            ,T.\"F5\"";
+		sql += "            ,T.\"F6\"";
+		sql += "            ,T.\"F7\"";
+		sql += "            ,T.\"F8\"";
+		sql += "            ,T.\"F5\" + T.\"F6\" + T.\"F7\" + T.\"F8\" AS F9";
+		sql += "            ,T.\"F10\"";
+		sql += "            ,T.\"CustNo\" F11";
+		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0) F12";
+		sql += "            ,T.\"FacmNo\" F13";
+		sql += "            ,NVL(NVL(CB.\"BdLocation\", CL.\"LandLocation\"),' ') F14";
+		sql += "            ,T.\"F15\"";
+		sql += "      FROM (SELECT DECODE(T.\"EntryDate\", 0, T.\"AcDate\" ,T.\"EntryDate\") F0";
+		sql += "                  ,T.\"LoanBal\" + T.\"ExtraRepay\" + T.\"Principal\" F1";
+		sql += "                  ,T.\"IntStartDate\" F2 ";
+		sql += "                  ,T.\"IntEndDate\" F3";
+		sql += "                  ,T.\"Rate\" F4";
+		sql += "                  ,T.\"Interest\" F5";
+		sql += "                  ,T.\"DelayInt\" F6";
+		sql += "                  ,T.\"BreachAmt\" F7";
+		sql += "                  ,T.\"Principal\" + T.\"ExtraRepay\" F8";
+		sql += "                  ,T.\"DueDate\" F10";
 		sql += "                  ,T.\"CustNo\"";
 		sql += "                  ,T.\"FacmNo\"";
+		sql += "                  ,1 F15";
 		sql += "            FROM \"LoanBorTx\" T";
 		sql += "            WHERE T.\"CustNo\" = :icustno";
-		sql += "              AND T.\"Principal\" + T.\"Interest\" > 0";
+		sql += "             AND (T.\"ExtraRepay\" > 0";
+		sql += "               OR T.\"Interest\" > 0)";
 
 		if (iTYPE.equals("1")) {
 			sql += "          AND DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") >= :isday";
@@ -79,9 +76,43 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "          AND T.\"AcDate\" >= :isday";
 			sql += "          AND T.\"AcDate\" <= :ieday";
 		}
+
 		if (iHFG.equals("0")) {
 			sql += "          AND T.\"TitaHCode\" = 0";
 		}
+		sql += "            UNION ALL";
+		sql += "            SELECT \"F0\"";
+		sql += "                    ,SUM(F1) F1";
+		sql += "                    ,0 F2";
+		sql += "                    ,0 F3";
+		sql += "                    ,0 F4";
+		sql += "                    ,0 F5";
+		sql += "                    ,0 F6";
+		sql += "                    ,0 F7";
+		sql += "                    ,0 F8";
+		sql += "                    ,0 F10";
+		sql += "                    ,\"CustNo\"";
+		sql += "                    ,\"FacmNo\"";
+		sql += "                    ,2 F15";
+		sql += "            FROM (SELECT F.\"CustNo\"";
+		sql += "                        ,F.\"FacmNo\"";
+		sql += "                        ,NVL(M.\"MaturityDate\", 99999999) F0";
+		sql += "                        ,CASE WHEN M.\"Status\" IN (2, 7) THEN O.\"OvduBal\"";
+		sql += "                              WHEN M.\"Status\"  =  0     THEN M.\"LoanBal\"";
+		sql += "                         ELSE 0 END F1";
+		sql += "                  FROM  \"FacMain\" F";
+		sql += "                  LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
+		sql += "                                             AND M.\"FacmNo\" = F.\"FacmNo\"";
+		sql += "                                             AND M.\"Status\" IN (0, 2, 7)";
+		sql += "                  LEFT JOIN \"LoanOverdue\" O ON O.\"CustNo\" = M.\"CustNo\"";
+		sql += "                                             AND O.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "                                             AND O.\"BormNo\" = M.\"BormNo\"";
+		sql += "                                             AND O.\"OvduNo\" = M.\"LastOvduNo\"";
+		sql += "                  WHERE F.\"CustNo\" = :icustno";
+		sql += "                 )";
+		sql += "            GROUP BY \"CustNo\"";
+		sql += "                    ,\"FacmNo\"";
+		sql += "                   , \"F0\"";
 		sql += "           ) T";
 		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = T.\"CustNo\"";
 		sql += "      LEFT JOIN \"ClFac\" F ON F.\"CustNo\" = T.\"CustNo\"";
@@ -90,12 +121,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                                 AND CB.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                                 AND CB.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                                 AND F.\"ClCode1\" = 1 ";
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                             AND F.\"ClCode1\" = 2 ";
-		sql += "      ORDER BY T.\"FacmNo\", T.F0";
+		sql += "      ORDER BY T.\"FacmNo\",T.\"F15\" , T.\"F0\"";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -108,18 +137,19 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+
 	public List<Map<String, String>> doQuery2(TitaVo titaVo) throws Exception {
 
-		String iCUSTNO = titaVo.getParam("CustNo");
-		String iTYPE = titaVo.getParam("DateType");
-		String iSDAY = String.valueOf(Integer.valueOf(titaVo.getParam("BeginDate")) + 19110000);
-		String iEDAY = String.valueOf(Integer.valueOf(titaVo.getParam("EndDate")) + 19110000);
+		String iCUSTNO = titaVo.get("CustNo");
+		String iTYPE = titaVo.get("DateType");
+		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("BeginDate")) + 19110000);
+		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("EndDate")) + 19110000);
 
 		String sql = "SELECT D.\"EntryDate\"";
 		sql += "            ,D.\"AcctItem\"";
 		sql += "            ,D.\"TxAmt\"";
 		sql += "            ,D.\"FacmNo\"";
-		sql += "            ,C.\"CustName\"";
+		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
 		sql += "      FROM (SELECT  D.\"EntryDate\"";
 		sql += "                   ,CA.\"AcctItem\" AS \"AcctItem\"";
 		sql += "                   ,SUM(\"TxAmt\")  AS \"TxAmt\"";
@@ -173,63 +203,157 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> doQuery3(TitaVo titaVo) throws Exception {
 
-		String iCUSTNO = titaVo.getParam("CustNo");
-		String iTYPE = titaVo.getParam("DateType");
-		String iSDAY = String.valueOf(Integer.valueOf(titaVo.getParam("BeginDate")) + 19110000);
-		String iEDAY = String.valueOf(Integer.valueOf(titaVo.getParam("EndDate")) + 19110000);
-		String iHFG = titaVo.getParam("CorrectType");
+		String iCUSTNO = titaVo.get("CustNo");
+		String iTYPE = titaVo.get("DateType");
+		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("BeginDate")) + 19110000);
+		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("EndDate")) + 19110000);
+		String iHFG = titaVo.get("CorrectType");
 
-		String sql = " ";
-		sql += " SELECT TX.\"CustNo\" ";
-		sql += "      , \"Fn_ParseEOL\"(CM.\"CustName\",0) AS \"CustName\" ";
-		sql += "      , LPAD(TX.\"FacmNo\", 3, '0') AS \"FacmNo\" ";
-		sql += "      , LPAD(TX.\"BormNo\", 3, '0') AS \"BormNo\" ";
-		sql += "      , TX.\"EntryDate\" ";
-		sql += "      , TX.\"Desc\" ";
-		sql += "      , TX.\"TitaHCode\" ";
-		sql += "      , \"Fn_GetCdCode\"('TitaHCode', TX.\"TitaHCode\") AS \"HItem\" ";
-		sql += "      , TX.\"TxAmt\" ";
-		sql += "      , TX.\"IntStartDate\" ";
-		sql += "      , TX.\"IntEndDate\" ";
-		sql += "      , TX.\"Principal\" AS \"Principal\" ";
-		sql += "      , TX.\"Interest\" ";
-		sql += "      , TX.\"DelayInt\" ";
-		sql += "      , TX.\"BreachAmt\" + TX.\"CloseBreachAmt\" AS \"BreachAmt\" ";
-		sql += "      , TX.\"TempAmt\" ";
-		sql += " FROM \"LoanBorTx\" TX ";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = TX.\"CustNo\" ";
-		sql += " WHERE TX.\"CustNo\" = :inputCustNo ";
-		sql += "   AND CASE ";
-		sql += "         WHEN :inputType = 2 ";
-		sql += "         THEN TX.\"AcDate\" ";
-		sql += "       ELSE TX.\"EntryDate\" ";
-		sql += "       END >= :inputStartDate ";
-		sql += "   AND CASE ";
-		sql += "         WHEN :inputType = 2 ";
-		sql += "         THEN TX.\"AcDate\" ";
-		sql += "       ELSE TX.\"EntryDate\" ";
-		sql += "       END <= :inputEndDate ";
-		sql += "   AND CASE ";
-		sql += "         WHEN :inputHCode = 9 AND  TX.\"TitaHCode\" IN (0,1,2,3,4) ";
-		sql += "         THEN 1 ";
-		sql += "         WHEN TX.\"TitaHCode\" = 0 ";
-		sql += "         THEN 1 ";
-		sql += "       ELSE 0 END = 1 ";
-		sql += " ORDER BY TX.\"TitaCalDy\" DESC ";
-		sql += "        , TX.\"TitaCalTm\" DESC ";
-		sql += "        , TX.\"TitaTxtNo\" DESC ";
-		sql += "        , TX.\"BorxNo\" DESC ";
+		String sql = "SELECT  D.\"EntryDate\"";
+		sql += "             ,D.\"Desc\"";
+		sql += "             ,D.\"TxAmt\"";
+		sql += "             ,D.\"F3\"";
+		sql += "             ,D.\"PrinAmt\"";
+		sql += "             ,D.\"IntAmt\"";
+		sql += "             ,D.\"F6\"";
+		sql += "             ,D.\"ShortfallOrOverflow\"";
+		sql += "             ,D.\"F8\"";
+		sql += "             ,D.\"F9\"";
+		sql += "             ,D.\"FacmNo\"";
+		sql += "             ,D.\"BormNo\"";
+		sql += "             ,D.\"BorxNo\"";
+		sql += "             ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
+		sql += "             ,NVL(D.\"TitaHCode\",'0') AS \"TitaHCode\"";
+		sql += "      FROM (SELECT \"EntryDate\"";
+		sql += "                  ,\"Desc\"";
+		sql += "                  ,SUM(\"TxAmt\")   AS \"TxAmt\"";
+		sql += "                  ,SUM(F3)          AS F3";
+		sql += "                  ,SUM(\"PrinAmt\") AS \"PrinAmt\"";
+		sql += "                  ,SUM(\"IntAmt\")  AS \"IntAmt\"";
+		sql += "                  ,SUM(F6) F6";
+		sql += "                  ,SUM(\"ShortfallOrOverflow\") AS \"ShortfallOrOverflow\"";
+		sql += "                  ,SUM(F8) F8";
+		sql += "                  ,SUM(F9) F9";
+		sql += "                  ,\"FacmNo\"";
+		sql += "                  ,\"BormNo\"";
+		sql += "                  ,\"BorxNo\"";
+		sql += "                  ,\"TitaCalDy\"";
+		sql += "                  ,\"TitaCalTm\"";
+		sql += "                  ,\"TitaHCode\"";
+		sql += "            FROM (SELECT DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\")                AS \"EntryDate\"";
+		sql += "                        ,T.\"Desc\"                                                               AS \"Desc\"";
+		sql += "                        ,DECODE(T.\"TitaHCode\", 0, T.\"TxAmt\", - T.\"TxAmt\")                   AS \"TxAmt\"";
+		sql += "                        ,0                                                                        AS F3";
+		sql += "                        ,T.\"Principal\" + T.\"ExtraRepay\"                                       AS \"PrinAmt\"";
+		sql += "                        ,T.\"Interest\" + T.\"DelayInt\" + T.\"BreachAmt\" + T.\"CloseBreachAmt\" AS \"IntAmt\"";
+		sql += "                        ,0                                                                        AS F6";
+		sql += "                        ,T.\"Overflow\"";
+		sql += "                         - T.\"UnpaidInterest\"";
+		sql += "                         - T.\"UnpaidPrincipal\"";
+		sql += "                         - T.\"UnpaidCloseBreach\"";
+		sql += "                                                                                                  AS \"ShortfallOrOverflow\"";
+		sql += "                        ,0                                                                        AS F8";
+		sql += "                        ,0                                                                        AS F9";
+		sql += "                        ,T.\"FacmNo\" ";
+		sql += "                        ,T.\"BormNo\" ";
+		sql += "                        ,T.\"BorxNo\" ";
+		sql += "                        ,T.\"TitaCalDy\"";
+		sql += "                        ,T.\"TitaCalTm\"";
+		sql += "                        ,T.\"TitaHCode\"";
+		sql += "                  FROM \"LoanBorTx\" T";
+		sql += "                  WHERE T.\"CustNo\" = :icustno";
+
+		if (iTYPE.equals("1")) {
+			sql += "                AND DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") >= :isday";
+			sql += "                AND DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") <= :ieday";
+		} else {
+			sql += "                AND T.\"AcDate\" >= :isday";
+			sql += "                AND T.\"AcDate\" <= :ieday";
+		}
+
+		if (iHFG.equals("0")) {
+			sql += "                AND T.\"TitaHCode\" = 0";
+		}
+
+		sql += "                  UNION ALL";
+		sql += "                  SELECT \"EntryDate\"";
+		sql += "                        ,\"Desc\"";
+		sql += "                        ,0                               AS \"TxAmt\"";
+		sql += "                        ,DECODE(\"T1\", 1, \"TxAmt\", 0) AS F3";
+		sql += "                        ,0                               AS \"PrinAmt\"";
+		sql += "                        ,0                               AS \"IntAmt\" ";
+		sql += "                        ,DECODE(\"T1\", 2, \"TxAmt\", 0) AS F6";
+		sql += "                        ,0                               AS \"ShortfallOrOverflow\"";
+		sql += "                        ,0                               AS F8";
+		sql += "                        ,DECODE(\"T1\", 3, \"TxAmt\", 0) AS F9";
+		sql += "                        ,\"FacmNo\"";
+		sql += "                        ,\"BormNo\"";
+		sql += "                        ,\"BorxNo\"";
+		sql += "                        ,\"TitaCalDy\"";
+		sql += "                        ,\"TitaCalTm\"";
+		sql += "                        ,\"TitaHCode\"";
+		sql += "                  FROM (SELECT DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") AS \"EntryDate\"";
+		sql += "                              ,T.\"Desc\" AS \"Desc\"";
+		sql += "                              ,CASE";
+		sql += "                                  WHEN A.\"SumNo\" = '092' THEN 1";
+		sql += "                                 WHEN A.\"SumNo\" = '090' THEN 3";
+		sql += "                               ELSE 2 END T1";
+		sql += "                              ,CASE";
+		sql += "                                 WHEN A.\"DbCr\" = 'C' THEN A.\"TxAmt\"";
+		sql += "                               ELSE - A.\"TxAmt\" END AS \"TxAmt\"";
+		sql += "                              ,T.\"FacmNo\" ";
+		sql += "                              ,T.\"BormNo\" ";
+		sql += "                              ,T.\"BorxNo\" ";
+		sql += "                              ,T.\"TitaCalDy\"";
+		sql += "                              ,T.\"TitaCalTm\"";
+		sql += "                              ,T.\"TitaHCode\"";
+		sql += "                        FROM \"LoanBorTx\" T";
+		sql += "                        LEFT JOIN \"AcDetail\" A ON A.\"AcDate\"    = T.\"AcDate\"";
+		sql += "                                                AND A.\"TitaTlrNo\" = T.\"TitaTlrNo\"";
+		sql += "                                                AND A.\"TitaTxtNo\" = T.\"TitaTxtNo\"";
+		sql += "                        WHERE T.\"CustNo\" = :icustno";
+
+		if (iTYPE.equals("1")) {
+			sql += "                      AND DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") >= :isday";
+			sql += "                      AND DECODE(T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\") <= :ieday";
+		} else {
+			sql += "                      AND T.\"AcDate\" >= :isday";
+			sql += "                      AND T.\"AcDate\" <= :ieday";
+		}
+
+		if (iHFG.equals("0")) {
+			sql += "                      AND T.\"TitaHCode\" = 0";
+		}
+
+		sql += "                          AND (   A.\"AcctCode\" = 'TMI'";
+		sql += "                               OR A.\"AcctCode\" LIKE 'F%'";
+		sql += "                               OR A.\"SumNo\" IN ('090', '092')";
+		sql += "                              )";
+		sql += "                       )";
+		sql += "                 )";
+		sql += "            GROUP BY \"EntryDate\"";
+		sql += "                    ,\"Desc\"";
+		sql += "                    ,\"FacmNo\"";
+		sql += "                    ,\"BormNo\"";
+		sql += "                    ,\"BorxNo\"";
+		sql += "                    ,\"TitaCalDy\"";
+		sql += "                    ,\"TitaCalTm\"";
+		sql += "                    ,\"TitaHCode\"";
+		sql += "           ) D";
+		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = :icustno";
+		sql += "      ORDER BY D.\"FacmNo\"";
+		sql += "              ,D.\"EntryDate\"";
+		sql += "              ,D.\"TitaCalDy\"";
+		sql += "              ,D.\"TitaCalTm\"";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("inputCustNo", iCUSTNO);
-		query.setParameter("inputType", iTYPE);
-		query.setParameter("inputStartDate", iSDAY);
-		query.setParameter("inputEndDate", iEDAY);
-		query.setParameter("inputHCode", iHFG);
+		query.setParameter("icustno", iCUSTNO);
+		query.setParameter("isday", iSDAY);
+		query.setParameter("ieday", iEDAY);
 		return this.convertToMap(query);
 	}
 

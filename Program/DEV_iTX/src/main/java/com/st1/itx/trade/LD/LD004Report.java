@@ -215,7 +215,7 @@ public class LD004Report extends MakeReport {
 			this.print(1, 1, "＊此聯由繳款人收執、無收款印章無效");
 		}
 
-		long sno = this.close();
+		this.close();
 		// this.toPdf(sno);
 
 	}

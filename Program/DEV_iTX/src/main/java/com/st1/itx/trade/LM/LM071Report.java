@@ -104,8 +104,8 @@ public class LM071Report extends MakeReport {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 
 	}
 }

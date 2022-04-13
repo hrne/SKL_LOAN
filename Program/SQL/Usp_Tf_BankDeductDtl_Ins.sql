@@ -136,7 +136,8 @@ BEGIN
           ,'999999'                       AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
     FROM "LA$MBKP" MBK
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
-                         AND ad."LMSAPN" = MBK."MBKAPN"
+                         AND ad."LMSPCN" = MBK."LMSPCN"
+                         AND ad."Seq" = 1
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     LEFT JOIN PDM PDM ON PDM."MediaDate" = CASE
                                                WHEN NVL(t.LastTRXIDT,0) != 0
@@ -262,7 +263,7 @@ BEGIN
           ,MBK."MBKAMT"                   AS "RepayAmt"            -- 扣款金額 DECIMAL 14 0
           ,MBK."TRXISD"                   AS "IntStartDate"        -- 計息起日 Decimald 8 0
           ,MBK."TRXIED"                   AS "IntEndDate"          -- 計息迄日 Decimald 8 0
-          ,APLP."POSCDE"                  AS "PostCode"            -- 郵局存款別 VARCHAR2 1 0
+          ,ad."POSCDE"                    AS "PostCode"            -- 郵局存款別 VARCHAR2 1 0
           ,MBK."MBKCDE"                   AS "MediaCode"           -- 媒體碼 VARCHAR2 1 0
           ,MBK."LMSPRL"                   AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 0
           ,MBK."LMSPAN"                   AS "RelCustName"         -- 第三人帳戶戶名 NVARCHAR2 100 0
@@ -295,7 +296,9 @@ BEGIN
           ,NVL(AEM."EmpNo",'999999')      AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
     FROM "AH$MBKP" MBK
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
-                         AND ad."LMSAPN" = MBK."MBKAPN"
+                         AND ad."LMSPCN" = MBK."LMSPCN"
+                         AND ad."Seq" = 1
+                         AND MBK."LMSPBK" = '3'
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     LEFT JOIN "ADM" ADM ON ADM."MediaDate" = CASE
                                                WHEN NVL(t.LastTRXIDT,0) != 0

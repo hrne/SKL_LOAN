@@ -43,8 +43,8 @@ public class LM025Report extends MakeReport {
 		makeExcel.setSheet("201903-浮動", entdy + "-浮動");
 		exportExcel(titaVo, 1);
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 	/**

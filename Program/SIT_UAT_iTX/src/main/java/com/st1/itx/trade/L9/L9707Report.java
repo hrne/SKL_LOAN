@@ -57,8 +57,7 @@ public class L9707Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LDList, TxBuffer txbuffer) throws LogicException {
 		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細", "L9707_底稿_新增逾放案件明細.xlsx", "工作表1");
-
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細", "新增逾放案件明細.xlsx", "工作表1");
 		// F0 申請日期
 		// F1 准駁日期
 		// F2 借款人戶號
@@ -88,44 +87,34 @@ public class L9707Report extends MakeReport {
 			int row = 3;
 			BigDecimal totalDataCount = BigDecimal.ZERO;
 			BigDecimal totalLoanAmt = BigDecimal.ZERO;
-
 			for (Map<String, String> tLDVo : LDList) {
-				for (String key : tLDVo.keySet()) {
-					this.info("L9707Report tLDVo " + key + "=" + tLDVo.get(key));
-				}
-
+				String ad = "";
 				int col = 0;
-
-				// 如果欄位數量有改變, 這裡也要改
-				for (int i = 0; i <= 13; i++) {
+				for (int i = 0; i < tLDVo.size(); i++) {
+					ad = "F" + String.valueOf(col);
 					col++;
-					String value = tLDVo.get("F" + i);
-
 					switch (i) {
 					case 2:
 						// 資料筆數
-						totalDataCount = totalDataCount.add(BigDecimal.ONE);
-						makeExcel.setValue(row, col, getBigDecimal(value), "R");
+						totalDataCount = totalDataCount.add(new BigDecimal(1));
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
 						break;
 					case 5:
 						// 貸出金額
-						BigDecimal F5Value = getBigDecimal(value);
-						totalLoanAmt = totalLoanAmt.add(F5Value);
-						makeExcel.setValue(row, col, F5Value, "R");
+						totalLoanAmt = totalLoanAmt.add(new BigDecimal(tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad)));
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
 						break;
 					case 11:
-						makeExcel.setValue(row, col, getBigDecimal(value), "R");
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "R");
 						break;
-					case 13:
-						// PieceCode有可能為英文字母
-						makeExcel.setValue(row, col, getBigDecimal(value), "L");
+					case 14:
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "L");
 						break;
 					default:
-						makeExcel.setValue(row, col, getBigDecimal(value), "R");
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
 						break;
 					}
 				}
-
 				row++;
 			}
 
@@ -136,8 +125,8 @@ public class L9707Report extends MakeReport {
 		} else {
 			makeExcel.setValue(3, 1, "無資料");
 		}
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 	public int calculateTimeDifferenceBySimpleDateFormat(String date1, String date2) throws ParseException {

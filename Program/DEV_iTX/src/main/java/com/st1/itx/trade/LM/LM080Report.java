@@ -27,10 +27,10 @@ public class LM080Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
-
+	
 	private static final BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -63,7 +63,7 @@ public class LM080Report extends MakeReport {
 
 		this.info("LM080Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
+		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM080", "B046金融機構承作「公司法人購置住宅貸款」統計表(110.3.19(含)起辦理案件)",
 				"LM080_B046金融機構承作「公司法人購置住宅貸款」統計表(110.3.19(含)起辦理案件)" + showRocDate(entdy, 0).substring(0, 7), "LM080_底稿_B046金融機構承作「公司法人購置住宅貸款」統計表(110.3.19(含)起辦理案件).xlsx", 1, "FOA");
@@ -121,7 +121,7 @@ public class LM080Report extends MakeReport {
 			makeExcel.setValue(4, 1, "本月無資料");
 		}
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 }

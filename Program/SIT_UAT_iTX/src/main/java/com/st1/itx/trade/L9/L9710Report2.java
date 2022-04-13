@@ -104,7 +104,7 @@ public class L9710Report2 extends MakeReport {
 			this.print(1, 86, "製表人 ");
 		}
 
-		long sno = this.close();
+		this.close();
 
 		// 測試用
 		//this.toPdf(sno);

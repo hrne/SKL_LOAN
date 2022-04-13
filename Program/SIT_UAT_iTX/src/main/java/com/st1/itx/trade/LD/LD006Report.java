@@ -31,7 +31,7 @@ public class LD006Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -105,7 +105,7 @@ public class LD006Report extends MakeReport {
 			this.info("LD006Report exportExcel ... 本日無資料");
 			makeExcel.setValue(row, 1, "本日無資料");
 		}
-		long sno = makeExcel.close();
+		makeExcel.close();
 		// makeExcel.toExcel(sno);
 	}
 

@@ -29,7 +29,7 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("lM053.findAll");
 		// 取得會計日(同頁面上會計日)
@@ -59,21 +59,6 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
 
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[day - 1]);
-		int diff = 0;
-		if (day == 1) {
-			diff = -2;
-		} else if (day == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
 		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
 

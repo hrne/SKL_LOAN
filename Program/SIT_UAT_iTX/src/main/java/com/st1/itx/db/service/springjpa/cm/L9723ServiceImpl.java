@@ -32,13 +32,13 @@ public class L9723ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public String findAll(TitaVo titaVo) throws Exception {
 		this.info("l9723.findAll ");
 
 		String inputYearMonth = Integer.toString(Integer.parseInt(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth");
 
-		this.info("l9723 inputYearMonth " + inputYearMonth);
+		this.info("l9723 inputYearMonth " + inputYearMonth + " peko");
 
 		String sql = "SELECT COUNT(*) AS \"Count\"";
 		sql += "      FROM ( SELECT \"CustNo\"";
@@ -62,7 +62,7 @@ public class L9723ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result = "0";
 		}
 
-		this.info("l9723 result:" + result);
+		this.info("l9723 result:" + result + " peko");
 
 		return result;
 	}

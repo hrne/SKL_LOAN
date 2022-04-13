@@ -246,8 +246,8 @@ public class LM027Report extends MakeReport {
 		makeExcel.setHeight(row + 13, 140);
 		makeExcel.setMergedRegionValue(row + 13, row + 13, 1, 4, "", "C");
 
-		long closeExcel = makeExcel.close();
-		// makeExcel.toExcel(closeExcel);
+		makeExcel.close();
+		//makeExcel.toExcel(closeExcel);
 
 	}
 

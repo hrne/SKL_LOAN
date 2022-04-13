@@ -30,11 +30,13 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
+
 	/**
 	 * 查詢 LM042 統計數 工作表資料1
+	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
-	 * */
+	 */
 	public List<Map<String, String>> findStatistics1(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics1");
 
@@ -52,7 +54,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 		 ,CASE";
 		sql += " 			WHEN M.\"ClCode1\" IN (1,2)";
 		sql += " 			 AND ( M.\"FacAcctCode\" = 340";
-		sql += " 			  OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]'))";
+		sql += " 			  OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')";
+		sql += "			  OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
 		sql += " 			THEN 'Z'";
 		sql += " 			WHEN M.\"ClCode1\" IN (1,2)";
 		sql += " 			THEN 'C'";
@@ -95,26 +98,35 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", yearMonth);
 		return this.convertToMap(query);
 	}
+
 	/**
 	 * 查詢 LM042 統計數 工作表資料2
+	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
-	 * */
+	 */
 	public List<Map<String, String>> findStatistics2(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics2");
 
 		this.info("yearMonth=" + yearMonth);
 
 		String sql = "";
-		// 折溢價與催收費用
-		sql += " SELECT 'DisPreRemFees' AS \"Item\" ";
-		sql += " 	   ,SUM(\"DbAmt\" - \"CrAmt\")  AS \"AMT\" ";
+		// 擔保放款-折溢價
+		sql += " SELECT 'tDisPreRemFees' AS \"Item\" ";
+		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " FROM \"AcMain\"";
-		sql += " WHERE \"AcNoCode\" IN ( '10600304000' "; // 擔保放款-折溢價
-		sql += "						,'10601301000' "; // 催收款項-法務費用
+		sql += " WHERE \"AcNoCode\" IN ( '10600304000' ) "; // 擔保放款-折溢價
+		sql += "   AND \"MonthEndYm\" = :yymm ";
+		sql += " GROUP BY 'tDisPreRemFees'";
+		// 催收款項
+		sql += " SELECT 'oDisPreRemFees' AS \"Item\" ";
+		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
+		sql += " FROM \"AcMain\"";
+		sql += " WHERE \"AcNoCode\" IN ( '10601301000' "; // 催收款項-法務費用
 		sql += "						,'10601302000' ";// 催收款項-火險費用
 		sql += "						,'10601304000') ";// 催收款項-折溢價
 		sql += "   AND \"MonthEndYm\" = :yymm ";
+		sql += " GROUP BY 'oDisPreRemFees'";
 		// 應收利息
 		sql += " UNION ";
 		sql += " SELECT 'IntRecv' AS \"Item\" ";
@@ -131,7 +143,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND \"YearMonth\" = :yymm ";
 		sql += "   AND \"ClCode1\" IN (1,2) ";
 		sql += "   AND (\"FacAcctCode\" = 340";
-		sql += "    OR REGEXP_LIKE(\"ProdNo\",'I[A-Z]'))";
+		sql += "    OR REGEXP_LIKE(\"ProdNo\",'I[A-Z]')";
+		sql += "    OR REGEXP_LIKE(\"ProdNo\",'8[1-8]'))";
 		// 利關人_職員數
 		sql += " UNION ";
 		sql += " SELECT 'Stakeholder' AS \"Item\" ";
@@ -166,12 +179,13 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", yearMonth);
 		return this.convertToMap(query);
 	}
-	
+
 	/**
 	 * 查詢 LM042 統計數 工作表資料3
+	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
-	 * */
+	 */
 	public List<Map<String, String>> findStatistics3(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics3 ");
 
@@ -180,7 +194,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		sql += "SELECT * FROM (";
 		sql += "	SELECT ( CASE";
-		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
 		sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
 		sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
 		sql += "			 END ) AS \"TYPE\"";
@@ -200,7 +214,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  AND M.\"PrinBalance\" > 0";
 		sql += "	  AND SUBSTR(M.\"AssetClass\",0,1) = '1'";
 		sql += "	GROUP BY( CASE";
-		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
 		sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
 		sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
 		sql += "			 END ) ";
@@ -223,18 +237,22 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 查詢 LM042 RBC工作表資料
+	 * 
 	 * @param titaVo
-	 * @param yearMonth 當西元年月
+	 * @param yearMonth     當西元年月
 	 * @param lastYearMonth 上西元年月
-	 * */
+	 */
 	public List<Map<String, String>> findRBC(TitaVo titaVo, int yearMonth, int lastYearMonth) throws Exception {
 		this.info("lM042.findRBC ");
 
 		// 去年 年月底
 		int lEndYearMonth = (yearMonth / 100) * 100 + 12;
 
+		//當月底
 		this.info("lEndYearMonth=" + lEndYearMonth);
+		//上月底
 		this.info("lastYearMonth=" + lastYearMonth);
+		//去年 年底日
 		this.info("yearMonth=" + yearMonth);
 
 		String sql = "";

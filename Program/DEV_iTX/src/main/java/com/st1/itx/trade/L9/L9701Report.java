@@ -12,35 +12,17 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
-import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
-import com.st1.itx.util.parse.Parse;
 
-/**
- * L9701Report 客戶往來本息明細表
- * 
- * @author ST1 Chih Wei
- *
- */
 @Component
 @Scope("prototype")
+
 public class L9701Report extends MakeReport {
 
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
-
-	@Autowired
-	CustMainService sCustMainService;
-
-	@Autowired
-	CustNoticeCom custNoticeCom;
-
-	@Autowired
-	Parse parse;
 
 	// 製表日期
 	private String NowDate;
@@ -50,16 +32,19 @@ public class L9701Report extends MakeReport {
 	// 客戶姓名
 	private String custName;
 
-	// 戶號
-	private String custNo;
-
 	// 額度號碼
 	private String facmNo;
 
 	// 客戶主要擔保品地址
 	private String clAddr;
 
+	int ptfg = 0;
+
+	// 於本次產生報表中是否已列印未繳資料 0:尚未列印 1:已列印
+	int batxFg = 0;
+
 	int entday = 0;
+	int stday = 0;
 
 	int maturityDate = 0; // 到期日
 	BigDecimal loanBal = BigDecimal.ZERO; // 放款餘額
@@ -99,36 +84,63 @@ public class L9701Report extends MakeReport {
 
 		this.print(-5, 110, "頁　　次：" + Integer.toString(this.getNowPage()));
 
-		this.print(-6, 1, "戶號     : " + custNo + " " + custName);
+		String iCUSTNO = titaVo.get("CustNo");
 
-		// 明細起始列(自訂亦必須)
-		this.setBeginRow(7);
+		if (this.facmNo.equals("")) {
+			this.print(-6, 1, "戶號     : " + iCUSTNO);
+		} else {
+			this.print(-6, 1, "戶號     : " + iCUSTNO + " " + custName);
+		}
+
+		if (ptfg == 0) {
+			printFacHead();
+			this.setBeginRow(12);
+		} else if (ptfg == 1) {
+			printCustHead();
+			this.setBeginRow(11);
+		} else {
+			this.setBeginRow(7);
+		}
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(38);
+		this.setMaxRows(40);
 
-	}
-
-	@Override
-	public void printContinueNext() {
-		this.print(1, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
 	}
 
 	private void printFacHead() {
-		this.print(1, 1, " ");
-		this.print(1, 1, "額度     : " + String.format("%03d", Integer.valueOf(facmNo)));
-		this.print(0, 22, "押品地址 : " + clAddr);
-		this.print(1, 7, "　入帳日　　　計息本金　　　　　計息期間　　　　　利率　　　　利息　　　　　逾期息　　　　　違約金　　　　　本金　　　　本息合計");
-		this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－－－　－－－－　－－－－－－　－－－－－－－　－－－－－－－　－－－－－－　－－－－－－");
+		if (this.NowRow >= 35) {
+			// 若剩餘行數不足5行,先換頁
+			this.newPage(); // 換頁時會印表頭
+		} else {
+
+			String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
+
+			this.print(1, 1, " ");
+			this.print(1, 1, "額度     : " + tmpFacmNo);
+			this.print(0, 22, "押品地址 : " + clAddr);
+			this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－　－－－－　－－－－－－　－－－－－－－　－－－－－－－　－－－－－－　－－－－－－　－－－－－");
+			this.print(1, 7, "　入帳日　　　計息本金　　　　計息期間　　　　利率　　　　利息　　　　　逾期息　　　　　違約金　　　　　本金　　　　本息合計　　　應繳日");
+			this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－　－－－－　－－－－－－　－－－－－－－　－－－－－－－　－－－－－－　－－－－－－　－－－－－");
+		}
+
+	}
+
+	private void printCustHead() {
+		if (this.NowRow >= 36) {
+			// 若剩餘行數不足4行,先換頁
+			this.newPage(); // 換頁時會印表頭
+		} else {
+			this.print(1, 1, " ");
+			this.print(1, 7, "至" + showRocDate(entday, 1) + "未還本金餘額：");
+			this.print(1, 7, "　到期日　　　　放款餘額　　　　短收利息　  　短收本金　　　　溢收　　　　　應繳本金　　　　　應繳利息　　　　　應繳費用");
+			this.print(1, 7, "－－－－－　－－－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－");
+		}
 	}
 
 	public void exec(TitaVo titaVo, List<BaTxVo> listBaTxVo) throws LogicException {
 
 		entday = titaVo.getEntDyI();
 
-		this.custNo = String.format("%07d", parse.stringToInteger(titaVo.getParam("CustNo")));
-		this.custName = "";
-		this.facmNo = "";
 		this.NowDate = dDateUtil.getNowStringRoc();
 		this.NowTime = dDateUtil.getNowStringTime();
 
@@ -142,49 +154,210 @@ public class L9701Report extends MakeReport {
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 
-		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		this.open(titaVo, entday, titaVo.getKinbr(), "L9701_1", "客戶往來本息明細表", "", "A4", "L");
 
-		CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-
-		if (tCustMain != null) {
-			this.custName = tCustMain.getCustName();
-		}
-
-		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", "客戶往來本息明細表", "", "A4", "L");
-
+		this.custName = "";
+		this.facmNo = "";
 		this.clAddr = "";
+
+		Map<String, String> lastL9701Vo = null;
+
+		boolean isFirst = true;
+
+		int detailCounts = 0;
 
 		for (Map<String, String> tL9701Vo : listL9701) {
 
-			String rowfacmNo = String.format("%03d", parse.stringToInteger(tL9701Vo.get("F13")));
-			clAddr = tL9701Vo.get("F14");
-			
-			// 若額度號碼與上一筆不同
-			if (facmNo.isEmpty() || !this.facmNo.equals(rowfacmNo)) {
-				facmNo = rowfacmNo;
-				printFacHead();
+			if (!this.facmNo.equals(tL9701Vo.get("F13"))) {
+
+				ptfg = 1;
+
+				if (!facmNo.isEmpty() && detailCounts > 0) {
+					printCustHead();
+
+					printDetail3(lastL9701Vo, listBaTxVo);
+
+					reportEnd();
+				}
+
+				ptfg = 0;
+				batxFg = 0;
+				stday = 0;
+
+				detailCounts = 0;
+
+				if (tL9701Vo.get("F15").equals("2")) {
+					BigDecimal unpaidLoanBal = tL9701Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(tL9701Vo.get("F1"));
+
+					if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
+						detailCounts = 1;
+						continue;
+					}
+				}
+
+				this.custName = tL9701Vo.get("F12");
+				this.facmNo = tL9701Vo.get("F13");
+				this.clAddr = tL9701Vo.get("F14");
+
+				if (!facmNo.isEmpty() && !isFirst) {
+					printFacHead();
+				}
+
 			}
-			printDetail(tL9701Vo);
+
+			if (tL9701Vo.get("F15").equals("1")) {
+				printDetail1(tL9701Vo);
+				detailCounts++;
+			} else {
+				if (batxFg == 0) {
+					if (listBaTxVo != null && listBaTxVo.size() != 0) {
+						detailCounts = printDetail2(detailCounts, listBaTxVo);
+					}
+					batxFg = 1;
+				}
+			}
+			lastL9701Vo = tL9701Vo;
+
+			isFirst = false;
+		}
+
+		ptfg = 1;
+
+		if (!facmNo.isEmpty() && detailCounts > 0) {
+			printCustHead();
+
+			printDetail3(lastL9701Vo, listBaTxVo);
+
+			reportEnd();
 		}
 
 		this.close();
+
+		// 測試用
+		//this.toPdf(sno);
 	}
 
-	/**
-	 * 列印已收明細
-	 * 
-	 * @param vo 單筆資料
-	 */
-	private void printDetail(Map<String, String> vo) {
-		this.print(1, 7, showRocDate(vo.get("F0"), 1));
-		this.print(0, 29, formatAmt(vo.get("F1"), 0), "R"); // 計息本金
-		this.print(0, 31, showRocDate(vo.get("F2"), 2) + "-" + showRocDate(vo.get("F3"), 2)); // 計息期間
-		this.print(0, 58, formatAmt(vo.get("F4"), 4), "R"); // 利率
-		this.print(0, 71, formatAmt(vo.get("F5"), 0), "R"); // 利息
-		this.print(0, 86, formatAmt(vo.get("F6"), 0), "R"); // 逾期息
-		this.print(0, 100, formatAmt(vo.get("F7"), 0), "R"); // 違約金
-		this.print(0, 113, formatAmt(vo.get("F8"), 0), "R"); // 本金
-		this.print(0, 126, formatAmt(vo.get("F9"), 0), "R"); // 本息合計
-//		 this.print(0, 128, showRocDate(vo.get("F10"), 1)); // 未繳才會有應繳日 但這裡只出已繳
+	private void printDetail1(Map<String, String> tL9701Vo) {
+		this.print(1, 7, showRocDate(tL9701Vo.get("F0"), 1));
+		this.print(0, 29, formatAmt(tL9701Vo.get("F1"), 0), "R"); // 計息本金
+		this.print(0, 31, showRocDate(tL9701Vo.get("F2"), 3) + "-" + showRocDate(tL9701Vo.get("F3"), 3)); // 計息期間
+		this.print(0, 54, formatAmt(tL9701Vo.get("F4"), 4), "R"); // 利率
+		this.print(0, 67, formatAmt(tL9701Vo.get("F5"), 0), "R"); // 利息
+		this.print(0, 82, formatAmt(tL9701Vo.get("F6"), 0), "R"); // 逾期息
+		this.print(0, 96, formatAmt(tL9701Vo.get("F7"), 0), "R"); // 違約金
+		this.print(0, 109, formatAmt(tL9701Vo.get("F8"), 0), "R"); // 本金
+		this.print(0, 122, formatAmt(tL9701Vo.get("F9"), 0), "R"); // 本息合計
+//		 this.print(0, 124, showRocDate(tL9701Vo.get("F10"), 1)); // 未繳才會有應繳日 但這裡只出已繳
 	}
+
+	private int printDetail2(int detailCounts, List<BaTxVo> listBaTxVo) {
+
+		for (BaTxVo tBaTxVo : listBaTxVo) {
+			if (tBaTxVo.getFacmNo() == Integer.valueOf(this.facmNo)) {
+				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPayIntDate() <= entday) {
+					this.print(1, 29, formatAmt(tBaTxVo.getAmount(), 0), "R"); // 計息本金
+					this.print(0, 31, showRocDate(tBaTxVo.getIntStartDate(), 3) + "-" + showRocDate(tBaTxVo.getIntEndDate(), 3)); // 計息期間
+					this.print(0, 54, formatAmt(tBaTxVo.getIntRate(), 4), "R"); // 利率
+					this.print(0, 67, formatAmt(tBaTxVo.getInterest(), 0), "R"); // 利息
+					this.print(0, 82, formatAmt(tBaTxVo.getDelayInt(), 0), "R"); // 逾期息
+					this.print(0, 96, formatAmt(tBaTxVo.getBreachAmt(), 0), "R"); // 違約金
+					this.print(0, 109, formatAmt(tBaTxVo.getPrincipal(), 0), "R"); // 本金
+					this.print(0, 122, formatAmt(tBaTxVo.getUnPaidAmt(), 0), "R"); // 本息合計
+					this.print(0, 124, showRocDate(tBaTxVo.getPayIntDate(), 1)); // 應繳日
+					detailCounts++;
+				}
+			}
+		}
+		return detailCounts;
+	}
+
+	private void printDetail3(Map<String, String> tL9701Vo, List<BaTxVo> listBaTxVo) {
+
+		int tmpFacmNo = Integer.parseInt(this.facmNo);
+		maturityDate = Integer.valueOf(tL9701Vo.get("F0")) - 19110000;
+		loanBal = tL9701Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(tL9701Vo.get("F1"));
+
+		if (listBaTxVo != null && listBaTxVo.size() != 0) {
+			for (BaTxVo tBaTxVo : listBaTxVo) {
+				if (tBaTxVo.getFacmNo() == tmpFacmNo) {
+
+					if (tBaTxVo.getDataKind() == 1) {
+
+						if (tBaTxVo.getReceivableFlag() == 4) {
+
+							shortInt = shortInt.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
+							shortPrin = shortPrin.add(tBaTxVo.getPrincipal());
+
+						} else {
+
+							repaidExp = repaidExp.add(tBaTxVo.getUnPaidAmt());
+						}
+					} else if (tBaTxVo.getDataKind() == 3) {
+
+						overflow = overflow.add(tBaTxVo.getUnPaidAmt());
+
+					} else if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPayIntDate() <= entday) {
+
+						repaidPrin = repaidPrin.add(tBaTxVo.getPrincipal());
+						repaidInt = repaidInt.add(tBaTxVo.getInterest().add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()));
+
+					}
+				}
+			}
+		}
+
+		printLine();
+	}
+
+	private void printLine() {
+		if (loanBal.add(shortInt).add(shortPrin).add(overflow).add(repaidPrin).add(repaidInt).add(repaidExp).compareTo(BigDecimal.ZERO) == 0) {
+			return;
+		}
+
+		this.print(1, 7, showRocDate(maturityDate, 1)); // 到期日
+		this.print(0, 32, formatAmt(loanBal, 0), "R"); // 放款餘額
+		this.print(0, 45, formatAmt(shortInt, 0), "R"); // 短收利息
+		this.print(0, 58, formatAmt(shortPrin, 0), "R"); // 短收本金
+		this.print(0, 71, formatAmt(overflow, 0), "R"); // 溢收
+		this.print(0, 87, formatAmt(repaidPrin, 0), "R"); // 應繳本金
+		this.print(0, 103, formatAmt(repaidInt, 0), "R"); // 應繳利息
+		this.print(0, 120, formatAmt(repaidExp, 0), "R"); // 應繳費用
+
+		loanBalTotal = loanBalTotal.add(loanBal);
+		shortIntTotal = shortIntTotal.add(shortInt);
+		shortPrinTotal = shortPrinTotal.add(shortPrin);
+		overflowTotal = overflowTotal.add(overflow);
+		repaidPrinTotal = repaidPrinTotal.add(repaidPrin);
+		repaidIntTotal = repaidIntTotal.add(repaidInt);
+		repaidExpTotal = repaidExpTotal.add(repaidExp);
+
+		loanBal = BigDecimal.ZERO;
+		shortInt = BigDecimal.ZERO;
+		shortPrin = BigDecimal.ZERO;
+		overflow = BigDecimal.ZERO;
+		repaidPrin = BigDecimal.ZERO;
+		repaidInt = BigDecimal.ZERO;
+		repaidExp = BigDecimal.ZERO;
+	}
+
+	private void reportEnd() {
+
+		this.print(1, 7, "－－－－－　－－－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－");
+		this.print(1, 32, formatAmt(loanBalTotal, 0), "R"); // 放款餘額
+		this.print(0, 45, formatAmt(shortIntTotal, 0), "R"); // 短收利息
+		this.print(0, 58, formatAmt(shortPrinTotal, 0), "R"); // 短收本金
+		this.print(0, 71, formatAmt(overflowTotal, 0), "R"); // 溢收
+		this.print(0, 87, formatAmt(repaidPrinTotal, 0), "R"); // 應繳本金
+		this.print(0, 103, formatAmt(repaidIntTotal, 0), "R"); // 應繳利息
+		this.print(0, 120, formatAmt(repaidExpTotal, 0), "R"); // 應繳費用
+
+		loanBalTotal = BigDecimal.ZERO;
+		shortIntTotal = BigDecimal.ZERO;
+		shortPrinTotal = BigDecimal.ZERO;
+		overflowTotal = BigDecimal.ZERO;
+		repaidPrinTotal = BigDecimal.ZERO;
+		repaidIntTotal = BigDecimal.ZERO;
+		repaidExpTotal = BigDecimal.ZERO;
+	}
+
 }

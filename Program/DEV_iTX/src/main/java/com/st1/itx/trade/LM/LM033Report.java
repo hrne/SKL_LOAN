@@ -98,8 +98,8 @@ public class LM033Report extends MakeReport {
 		makeExcel.formulaCaculate(1, 6);
 		makeExcel.formulaCaculate(1, 7);
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 }

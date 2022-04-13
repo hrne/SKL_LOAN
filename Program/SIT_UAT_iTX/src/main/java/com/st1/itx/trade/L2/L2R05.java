@@ -177,15 +177,15 @@ public class L2R05 extends TradeBuffer {
 			}
 			if ((iTxCode.equals("L3410") || iTxCode.equals("L3420")) && iCustNo > 0) {
 				if (iCustNo != tFacMain.getCustNo()) {
-					throw new LogicException(titaVo, "E3077", " 新核准號碼 戶號 = " + tFacMain.getCustNo()); // 新核准號碼與原核准號碼，非屬於同一人
+//					throw new LogicException(titaVo, "E3077", " 新核准號碼 戶號 = " + tFacMain.getCustNo()); // 新核准號碼與原核准號碼，非屬於同一人
 				}
 			}
-			// L2118新增時檢查 撥款後不可再建檔 TODO:測試期間暫不控管
-//			if (iTxCode.equals("L2118") & iFuncCode == 1) {
-//				if (tFacMain.getLastBormNo() > 0) {
-//					throw new LogicException(titaVo, "E2066", " 核准號碼  = " + tFacMain.getApplNo()); // 已撥款不可再建檔
-//				}
-//			}
+
+			if (iTxCode.equals("L2118") & iFuncCode == 1) {
+				if (tFacMain.getLastBormNo() > 0) {
+					throw new LogicException(titaVo, "E2066", " 核准號碼  = " + tFacMain.getApplNo()); // 已撥款不可再建檔
+				}
+			}
 		} else {
 			if (iCustNo > 0) {
 				tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);

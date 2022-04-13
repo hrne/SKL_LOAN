@@ -167,7 +167,7 @@ public class L9710Report extends MakeReport {
 			this.print(1, 1, "本日無資料");
 		}
 
-		long sno = this.close();
+		this.close();
 		//this.toPdf(sno);
 		return l9710List;
 

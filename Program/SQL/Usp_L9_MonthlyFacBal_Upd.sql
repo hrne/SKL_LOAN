@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -413,6 +413,7 @@ BEGIN
     USING ( SELECT M."YearMonth"
                   ,M."CustNo"
                   ,M."FacmNo"
+                  ,MIN(NVL(O."OvduDate",99991231)) AS "OvduDate"
                   ,SUM(NVL(O."OvduPrinAmt",0))   AS "UnpaidPrincipal" 
                   ,SUM(NVL(O."OvduIntAmt",0))    AS "UnpaidInterest"
                   ,SUM(NVL(O."OvduBreachAmt",0)) AS "UnpaidBreachAmt"
@@ -441,7 +442,11 @@ BEGIN
                                  M."OvduPrinBal"     = O."OvduPrinBal",
                                  M."OvduIntBal"      = O."OvduIntBal",
                                  M."OvduBreachBal"   = O."OvduBreachBal",
-                                 M."OvduBal"         = O."OvduBal"
+                                 M."OvduBal"         = O."OvduBal",
+                                 M."OvduDate"        = CASE
+                                                         WHEN O."OvduDate" = 99991231
+                                                         THEN M."OvduDate"
+                                                       ELSE O."OvduDate" END
                                  ;
 
     UPD_CNT := UPD_CNT + sql%rowcount;    

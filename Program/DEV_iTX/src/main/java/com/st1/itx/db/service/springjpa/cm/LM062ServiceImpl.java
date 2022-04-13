@@ -1,5 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		// 取得會計日(同頁面上會計日)

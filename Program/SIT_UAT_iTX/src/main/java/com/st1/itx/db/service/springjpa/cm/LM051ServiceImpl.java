@@ -37,13 +37,13 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @return result
+	 * 
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		this.info("lM051.findAll ");
 		this.info("yearMonth=" + yearMonth);
-		String sql = " ";
+		String sql = " "; 
 		sql += " WITH \"tempClass\" AS (";
 		sql += "	SELECT M.\"YearMonth\"";
 		sql += "		  ,M.\"CustNo\"";

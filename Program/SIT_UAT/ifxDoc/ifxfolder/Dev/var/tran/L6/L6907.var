@@ -124,7 +124,7 @@ C(4,#NTXBUF5,T(3,1),T(3,2))
 T(3,000)
 
 #AcBookCodeX=X,20,L
-T(3,全公司)
+T(3,全帳冊)
 
 !區隔帳冊
 #AcSubBookCode=X,3,I

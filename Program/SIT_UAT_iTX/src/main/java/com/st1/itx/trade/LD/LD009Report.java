@@ -256,7 +256,7 @@ public class LD009Report extends MakeReport {
 
 		fillData(titaVo);
 
-		long sno = this.close();
+		this.close();
 
 		// this.toPdf(sno, reportCode + "_" + reportItem);
 

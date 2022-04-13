@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L5_CollList_Upd" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L5_CollList_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -146,7 +146,7 @@ BEGIN
                  --                                                                 4: 催收回復               
                  --                                      97~99: 預約撥款
            ,MAX(NVL(R."RenewCode",' '))  AS "RenewCode"  
-           ,MAX(B."AcDate")              AS "AcDate"       
+           ,MAX(B."AcDate")              AS "AcDate"    
            FROM "LoanBorMain" B
            LEFT  JOIN  "LoanOverdue" O ON O."CustNo" = B."CustNo"
                                       AND O."FacmNo"  = B."FacmNo" 
@@ -479,6 +479,22 @@ BEGIN
                ) AS "Seq"
         FROM "rawData"
       )
+      , LBM AS (
+        SELECT "CustNo"
+             , "FacmNo"
+             , "SpecificDd"
+             , ROW_NUMBER()
+               OVER (
+                 PARTITION BY "CustNo"
+                            , "FacmNo"
+                 ORDER BY CASE
+                            WHEN "Status" in (2,6,7)
+                            THEN 10 + "Status"
+                          ELSE "Status" END -- 排序時,把戶況2、6、7的優先度往後排
+               ) AS "Seq"
+        FROM "LoanBorMain"
+        WHERE "Status" in (0,2,3,4,5,6,7,8,9)  
+      )
       SELECT C1."CustNo"                AS "CustNo"              -- '戶號';
             ,C1."FacmNo"                AS "FacmNo"              -- '額度';
             ,C1."CaseCode"              AS "CaseCode"            -- '案件種類';
@@ -490,7 +506,17 @@ BEGIN
             -- 則 計算逾期期數
             -- 否則 擺零
             ,CASE
-               WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 AND C1."PrinBalance" + C1."BadDebtBal" <> 0
+               WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 
+                    AND C1."PrinBalance" + C1."BadDebtBal" <> 0
+                    AND NVL(LBM."SpecificDd",0) != 0
+                    AND TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+                        - TRUNC(MONTHS_BETWEEN(TO_DATE(C1."NextIntDate",'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+                        > 0
+               THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+                    - TRUNC(MONTHS_BETWEEN(TO_DATE(C1."NextIntDate",'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+               WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 
+                    AND C1."PrinBalance" + C1."BadDebtBal" <> 0
+                    AND NVL(LBM."SpecificDd",0) = 0
                THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(C1."NextIntDate",'YYYYMMDD')))
              ELSE 0 END                 AS "OvduTerm"            -- '逾期期數';
             -- 若 應繳息日 <= 系統營業日(TBSDYF)
@@ -605,6 +631,9 @@ BEGIN
                                 AND LTD."FacmNo" = C1."FacmNo"
                                 AND LTD."CaseCode" = C1."CaseCode"
                                 AND LTD."Seq" = 1
+      LEFT JOIN LBM ON LBM."CustNo" = C1."CustNo"
+                   AND LBM."FacmNo" = C1."FacmNo"
+                   AND LBM."Seq" = 1
     ) T    
     ON  (     C."CustNo" = T."CustNo"
           AND C."FacmNo" = T."FacmNo"

@@ -145,7 +145,7 @@ public class LD005Report extends MakeReport {
 			this.print(1, 50, "===== 報 表 結 束 =====", "C");
 		}
 
-		long sno = this.close();
+		this.close();
 		// this.toPdf(sno);
 
 		return true;

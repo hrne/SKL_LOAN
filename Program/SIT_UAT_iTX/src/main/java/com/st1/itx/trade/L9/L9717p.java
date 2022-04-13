@@ -49,7 +49,8 @@ public class L9717p extends TradeBuffer {
 		boolean isFinish = false;
 
 		for (OutputSortBy o : OutputSortBy.values()) {
-			isFinish = isFinish || l9717Report.exec(titaVo, o); // 只要有任何一次執行是true, 就回傳有資料
+			boolean result = l9717Report.exec(titaVo, o);
+			isFinish = result || isFinish; // 只要有任何一次執行是true, 就回傳有資料
 		}
 
 		if (isFinish) {

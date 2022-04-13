@@ -28,9 +28,9 @@ public class L9708Report extends MakeReport {
 	DateUtil dateUtil;
 
 	// 製表日期
-	private String nowDate;
+//	private String nowDate;
 	// 製表時間
-	private String nowTime;
+//	private String nowTime;
 
 	int cnt = 0;
 	int tcnt = 0;
@@ -76,8 +76,8 @@ public class L9708Report extends MakeReport {
 
 		this.info("L9708Report exec");
 
-		this.nowDate = dDateUtil.getNowStringRoc();
-		this.nowTime = dDateUtil.getNowStringTime();
+//		this.nowDate = dDateUtil.getNowStringRoc();
+//		this.nowTime = dDateUtil.getNowStringTime();
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9708", "貸款自動轉帳申請書明細表", "", "A4", "L");
 
@@ -154,10 +154,11 @@ public class L9708Report extends MakeReport {
 			this.print(1, 1, "無資料");
 			print(1, 1, "　＊＊＊ＥＮＤＯＦＲＥＰＯＲＴ＊＊＊");
 		}
-		long sno = this.close();
+		this.close();
 
 		// 輸出PDF
-		// this.toPdf(sno);
+		//this.toPdf(sno);
 	}
+
 
 }

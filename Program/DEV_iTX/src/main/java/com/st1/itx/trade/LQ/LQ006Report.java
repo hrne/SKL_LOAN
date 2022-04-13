@@ -35,7 +35,7 @@ public class LQ006Report extends MakeReport {
 
 		List<Map<String, String>> lQ006List = null;
 		List<Map<String, String>> lQ006List_Total = null;
-
+		
 		try {
 			lQ006List = lQ006ServiceImpl.findAll(titaVo);
 			lQ006List_Total = lQ006ServiceImpl.findTotal(titaVo);
@@ -79,34 +79,36 @@ public class LQ006Report extends MakeReport {
 				row++;
 
 			}
-
-			makeExcel.formulaCaculate(1, 5);
-
-			// 換去做 Sheet1
-			if (LDListTotal != null && !LDListTotal.isEmpty()) {
-				makeExcel.setSheet("Sheet1");
-
-				row = 4; // 開始行, 1-based
-
-				for (Map<String, String> tLDVo : LDListTotal) {
-					// 日期
-					makeExcel.setValue(row, 1, tLDVo.get("F0"), "L");
-					// 31-60 天金額
-					makeExcel.setValue(row, 2, getBigDecimal(tLDVo.get("F1")), "#,##0", "R");
-					// 61-90 天金額
-					makeExcel.setValue(row, 3, getBigDecimal(tLDVo.get("F2")), "#,##0", "R");
-					// 合計
-					makeExcel.setValue(row, 4, getBigDecimal(tLDVo.get("F3")), "#,##0", "R");
-
-					row++;
-				}
+		
+		makeExcel.formulaCaculate(1, 5);
+			
+		// 換去做 Sheet1
+		if (LDListTotal != null && !LDListTotal.isEmpty())
+		{
+			makeExcel.setSheet("Sheet1");
+			
+			row = 4; // 開始行, 1-based
+			
+			for (Map<String, String> tLDVo : LDListTotal)
+			{
+				// 日期
+				makeExcel.setValue(row, 1, tLDVo.get("F0"), "L");
+				// 31-60 天金額
+				makeExcel.setValue(row, 2, getBigDecimal(tLDVo.get("F1")), "#,##0", "R");
+				// 61-90 天金額
+				makeExcel.setValue(row, 3, getBigDecimal(tLDVo.get("F2")), "#,##0", "R");
+				// 合計
+				makeExcel.setValue(row, 4, getBigDecimal(tLDVo.get("F3")), "#,##0", "R");
+				
+				row++;
 			}
-
+		}
+		
 		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
 
-		long sno = makeExcel.close();
+		makeExcel.close();
 		// makeExcel.toExcel(sno);
 	}
 

@@ -19,8 +19,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class L9721Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L9721Report.class);
 
 	@Autowired
 	L9721ServiceImpl l9721ServiceImpl;
@@ -115,7 +113,7 @@ public class L9721Report extends MakeReport {
 			makeExcel.setValue(pivotRow, pivotCol, "本月無資料");
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 }

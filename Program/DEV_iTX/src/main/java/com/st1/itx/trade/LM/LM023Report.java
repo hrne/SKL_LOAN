@@ -34,7 +34,8 @@ public class LM023Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM023", "利息收入", "LM023_利息收入", "LM023_底稿_利息收入.xlsx", "利息收入");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM023", "利息收入", "LM023_利息收入",
+				"LM023_底稿_利息收入.xlsx", "利息收入");
 
 		List<Map<String, String>> lM023List = null;
 
@@ -77,7 +78,8 @@ public class LM023Report extends MakeReport {
 				dataSeq = Integer.valueOf(lM023List.get(i).get("F0")).toString();
 
 				// 利息金額
-				tempAmt = lM023List.get(i).get("F3").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lM023List.get(i).get("F3"));
+				tempAmt = lM023List.get(i).get("F3").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lM023List.get(i).get("F3"));
 
 				// 欄位(月份判斷)
 				col = Integer.valueOf(lM023List.get(i).get("F2")) + 1;
@@ -126,8 +128,8 @@ public class LM023Report extends MakeReport {
 			makeExcel.formulaCaculate(12, 9);
 
 		}
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 }

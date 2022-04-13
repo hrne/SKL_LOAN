@@ -180,7 +180,7 @@ BEGIN
                                  AND S5."AcSubCode" = NVL(S3."CORACS",'     ')
                                  AND S5."AcDtlCode" = '  '
           LEFT JOIN ATF ON ATF."ACNACC"          = S1."ACNACC"
-                       AND ATF."ACNACS"          = S1."ACNACS"
+                       AND NVL(ATF."ACNACS",' ') = NVL(S1."ACNACS",' ')
                        AND NVL(ATF."ACNASS",' ') = NVL(S1."ACNASS",' ')
           LEFT JOIN (SELECT TR."TRXDAT"
                            ,TR."TRXNMT"
@@ -260,7 +260,7 @@ BEGIN
                         AND S4."DbCr"            = S1."TRXATP"
                         AND S4."OriDbCr"         = ATF."DbCr"
                         AND S4."ACNACC"          = ATF."ACNACC"
-                        AND S4."ACNACS"          = ATF."ACNACS"
+                        AND NVL(S4."ACNACS",' ') = NVL(ATF."ACNACS",' ')
                         AND NVL(S4."ACNASS",' ') = NVL(ATF."ACNASS",' ')
           LEFT JOIN ( SELECT F0."CustNo"
                            , F0."FacmNo"

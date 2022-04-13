@@ -78,9 +78,9 @@ public class L9709Report extends MakeReport {
 			this.print(0, 45, formatAmt(tL9709Vo.get("F2"), 0), "R"); // 貸方金額
 		}
 
-		long sno = this.close();
+		this.close();
 
 		// 測試用
-		this.toPdf(sno);
+//		this.toPdf(sno);
 	}
 }

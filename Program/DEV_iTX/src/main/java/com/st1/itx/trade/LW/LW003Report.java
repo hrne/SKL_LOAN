@@ -135,8 +135,8 @@ public class LW003Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LW003ServiceImpl.findAll error = " + errors.toString());
 		}
-//		if (data1.size() > 0 && data2.size() > 0 && data3.size() > 0 && data4.size() > 0 && data5.size() > 0) {
-		if (true) {
+		if (data1.size() > 0 || data2.size() > 0 || data3.size() > 0 || data4.size() > 0 || data5.size() > 0) {
+//		if (true) {
 			exportExcel(data1, wkYear, wkMonth, q, 1);// 個金總業績
 			exportExcel(data2, wkYear, wkMonth, q, 2);// 區部 獎勵金額
 			exportExcel(data3, wkYear, wkMonth, q, 3);// 通訓處 獎勵金額

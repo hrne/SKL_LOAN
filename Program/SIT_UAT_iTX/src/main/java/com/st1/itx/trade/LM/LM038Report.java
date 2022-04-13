@@ -49,7 +49,8 @@ public class LM038Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("LM038Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM038", "逾期案件明細", "LM038-逾期案件明細", "LM038逾期案件明細.xls", "D9210081");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM038", "逾期案件明細", "LM038-逾期案件明細",
+				"LM038逾期案件明細.xls", "D9210081");
 		if (LDList == null || LDList.isEmpty()) {
 			makeExcel.setValue(4, 1, "本日無資料");
 		} else {
@@ -67,7 +68,7 @@ public class LM038Report extends MakeReport {
 
 					String value = tLDVo.get("F" + i);
 					BigDecimal bd = null;
-
+					
 					col++;
 					switch (i) {
 					case 5:
@@ -82,7 +83,7 @@ public class LM038Report extends MakeReport {
 						break;
 
 					case 11:
-						bd = getBigDecimal(value);
+						 bd = getBigDecimal(value);
 						total_Principal = total_Principal.add(bd);
 						makeExcel.setValue(row, col, bd, "#,##0");
 						break;
@@ -121,8 +122,8 @@ public class LM038Report extends MakeReport {
 
 		}
 
-		long sno = makeExcel.close();
-		// makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 }

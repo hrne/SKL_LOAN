@@ -187,7 +187,7 @@ T(3,000)
 
 
 #AcBookItem=X,20,L
-T(2,全公司)
+T(2,全帳冊)
 
 #AcSubBookCode=X,3,I
 C(3,#CHAIN,1,s,$)

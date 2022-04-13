@@ -99,7 +99,7 @@ public class L9706Report extends MakeReport {
 			this.print(1, 4, "中 　 華 　 民 　 國  ");
 			this.print(0, 64, iENTDAY, "R");
 		}
-		long sno = this.close();
+		this.close();
 
 		// 測試用
 		//this.toPdf(sno);

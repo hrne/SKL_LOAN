@@ -19,8 +19,6 @@ import com.st1.itx.util.common.MakeReport;
 @Component
 @Scope("prototype")
 public class L9702Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L9702Report.class);
 
 	@Autowired
 	L9702ServiceImpl l9702ServiceImpl;
@@ -243,10 +241,10 @@ public class L9702Report extends MakeReport {
 			this.print(0, 37, "", "R");
 
 //				//測試用
-			long sno = this.close();
+			this.close();
 
 			// 測試用
-			this.toPdf(sno);
+			//this.toPdf(sno);
 
 		} else if ("2".equals(type)) {
 		} else { // type = 3
@@ -294,8 +292,8 @@ public class L9702Report extends MakeReport {
 			row++;
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+		//makeExcel.toExcel(sno);
 	}
 
 }

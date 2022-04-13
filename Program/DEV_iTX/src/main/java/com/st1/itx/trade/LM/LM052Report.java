@@ -221,7 +221,7 @@ public class LM052Report extends MakeReport {
 						rate = new BigDecimal("0.2");
 					}
 					if ("7".equals(tLDVo.get("F0"))) {
-						row = 14;
+						row = 15;
 						rate = new BigDecimal("0.02");
 					}
 
@@ -238,6 +238,10 @@ public class LM052Report extends MakeReport {
 					
 					if ("62".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 6;
+					} 
+
+					if ("7".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
+						col = 12;
 					} 
 
 	

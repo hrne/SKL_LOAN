@@ -4,8 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -115,8 +115,7 @@ public class L9703Report1 extends MakeReport {
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		this.info("L9703Report1 exec");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-				titaVo.getTxCode().isEmpty() ? "L9703A" : titaVo.getTxCode() + "A", "滯繳客戶明細表", "密", "A4", "");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703", "滯繳客戶明細表", "密", "A4", "");
 
 		bcAcDate = String.valueOf(titaVo.getEntDyI() + 19110000);
 
@@ -138,7 +137,7 @@ public class L9703Report1 extends MakeReport {
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9703ServiceImpl queryForDetail error = " + errors.toString());
+			this.error("L9703ServiceImpl.findAll error = " + errors.toString());
 		}
 
 		int counts = 0;// 筆數計算
@@ -148,6 +147,7 @@ public class L9703Report1 extends MakeReport {
 		BigDecimal totalOfBreachAmtAndDelayInt = BigDecimal.ZERO; // 違約金加總
 		BigDecimal totalOfOverflow = BigDecimal.ZERO; // 溢短繳加總
 		BigDecimal totalOfTotal = BigDecimal.ZERO; // 合計加總
+
 		int tbsdy = titaVo.getEntDyI();
 		if (listL9703 == null || listL9703.size() == 0) {
 			this.print(1, 1, "*******    查無資料   ******");
@@ -170,20 +170,48 @@ public class L9703Report1 extends MakeReport {
 				this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
 			}
 
+			BigDecimal unpaidPriInt = BigDecimal.ZERO; // 未收本息
+			BigDecimal breachAmtAndDelayInt = BigDecimal.ZERO; // 違約金(報表最終產出的違約金包含違約金及延遲息)
+			BigDecimal overflow = BigDecimal.ZERO; // 溢短繳
+			BigDecimal intRate = BigDecimal.ZERO; // 利率
+			BigDecimal total; // 合計
+
 			// 未收本息 = 本金+利息 baTxVo.Principal + baTxVo.Interest
 			// 違約金 有 但要扣成 0 baTxVo.BreachAmt
 			// 溢短繳 baTxVo.UnPaidAmt
+			for (BaTxVo baTxVo : listBaTxVo) {
 
-			BigDecimal intRate = baTxCom.getFitRate();
-			BigDecimal unpaidPriInt = baTxCom.getPrincipal().add(baTxCom.getInterest()); // 未收本息加總計算
-			BigDecimal breachAmtAndDelayInt = baTxCom.getBreachAmt().add(baTxCom.getDelayInt()); // 違約金加總計算
-			BigDecimal overflow = baTxCom.getExcessive().subtract(baTxCom.getShortfall()); // 溢短繳加總計算
-			BigDecimal total = unpaidPriInt.add(breachAmtAndDelayInt).subtract(overflow); // 合計加總計算
+				int dataKind = baTxVo.getDataKind();
+				int repayType = baTxVo.getRepayType();
 
-			totalOfUnpaidPriInt = totalOfUnpaidPriInt.add(unpaidPriInt);
-			totalOfBreachAmtAndDelayInt = totalOfBreachAmtAndDelayInt.add(breachAmtAndDelayInt);
-			totalOfOverflow = totalOfOverflow.add(overflow);
-			totalOfTotal = totalOfTotal.add(total);
+				if (dataKind == 2 && repayType == 1) {
+					unpaidPriInt = unpaidPriInt.add(baTxVo.getPrincipal()); // 未收本
+					unpaidPriInt = unpaidPriInt.add(baTxVo.getInterest()); // 未收息
+					breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getBreachAmt()); // 違約金
+
+					intRate = baTxVo.getIntRate();
+				}
+
+				// 溢短繳 = 溢繳 - 短繳
+
+				// 溢繳 dataKind = 3.暫收抵繳
+				if (dataKind == 3) {
+					overflow = overflow.add(baTxVo.getUnPaidAmt());
+				}
+
+				// 短繳
+				// dataKind = 1.應收費用+未收費用+短繳期金
+				// repayType = 01 期款
+				if (dataKind == 1 && repayType == 1) {
+					overflow = overflow.subtract(baTxVo.getUnPaidAmt());
+				}
+			}
+			total = unpaidPriInt.add(breachAmtAndDelayInt).add(overflow); // 合計
+
+			totalOfUnpaidPriInt = totalOfUnpaidPriInt.add(unpaidPriInt); // 未收本息加總計算
+			totalOfBreachAmtAndDelayInt = totalOfBreachAmtAndDelayInt.add(breachAmtAndDelayInt); // 違約金加總計算
+			totalOfOverflow = totalOfOverflow.add(overflow); // 溢短繳加總計算
+			totalOfTotal = totalOfTotal.add(total); // 合計加總計算
 
 			// 地區別
 			this.print(1, 1, tL9703.get("F0"));
@@ -306,7 +334,7 @@ public class L9703Report1 extends MakeReport {
 		print(0, 140, formatAmt(totalOfTotal, 0), "R");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
-		long sno = this.close();
-		this.toPdf(sno);
+		this.close();
+		//this.toPdf(sno);
 	}
 }

@@ -67,21 +67,26 @@ public class LM060Report extends MakeReport {
 		Calendar calendar = Calendar.getInstance();
 
 		// 設當年月底日
-		calendar.set(iYear, iMonth, 0);
-
+		 calendar.set(iYear, iMonth, 0);
+		
 		// 以當前月份取得月底日期 並格式化處理
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime())) - 19110000;
+
 
 		// 上個月底
 		calendar.set(iYear, iMonth - 1, 0);
 
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime())) - 19110000;
+		
+	
 
-		this.info("lM060.findAll YYMM=" + iYear + String.format("%02d", iMonth) + ",LYYMM=" + lastMonthEndDate / 100 + ",lday" + lastMonthEndDate);
+		this.info("lM060.findAll YYMM=" + iYear + String.format("%02d", iMonth) + ",LYYMM=" + lastMonthEndDate / 100
+				+ ",lday" + lastMonthEndDate);
 
 		String iENTDY = thisMonthEndDate / 10000 + "." + (thisMonthEndDate / 100) % 100 + "." + thisMonthEndDate % 100;
 
 		String iLMONDY = lastMonthEndDate / 10000 + "." + (lastMonthEndDate / 100) % 100 + "." + lastMonthEndDate % 100;
+
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM060", "暫付款金額調節表_內部控管", "密", "A4", "P");
 
@@ -148,8 +153,8 @@ public class LM060Report extends MakeReport {
 //				this.info("F" +i+":"+ tLVo.get(("F"+i).toString()));
 //			}
 		}
-		long sno = this.close();
-		// this.toPdf(sno);
+		this.close();
+		//this.toPdf(sno);
 	}
 
 	private String showAmt(String xamt) {

@@ -28,7 +28,7 @@ public class LM063ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		// 取得會計日(同頁面上會計日)
