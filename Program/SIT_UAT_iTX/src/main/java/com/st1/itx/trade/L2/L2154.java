@@ -372,20 +372,33 @@ public class L2154 extends TradeBuffer {
 					if (tCustMain == null) {
 						throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
 					}
-					if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
-						tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
-						try {
-							custMainService.update(tCustMain, titaVo);
-						} catch (DBException e) {
-							throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
-						}
-					}
+//					if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
+//						tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
+//						try {
+//							custMainService.update(tCustMain, titaVo);
+//						} catch (DBException e) {
+//							throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
+//						}
+//					}
 					try {
 						facMainService.delete(tFacMain, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E2008", "額度主檔"); // 刪除資料時，發生錯誤
 					}
 
+					// 抓更新刪除額度後目前最後一筆額度 2022.4.13
+					tFacMain = facMainService.findLastFacmNoFirst(wkCustNo, titaVo);
+					if(tFacMain == null) {
+						tCustMain.setLastFacmNo(0);
+					} else {
+						tCustMain.setLastFacmNo(tFacMain.getFacmNo());
+					}
+					try {
+						custMainService.update(tCustMain, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
+					}
+					
 					// 刪除階梯式利率
 					DeleteFacProdStepRateRoutine();
 					break;

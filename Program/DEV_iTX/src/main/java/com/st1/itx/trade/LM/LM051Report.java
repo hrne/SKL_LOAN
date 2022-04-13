@@ -40,7 +40,6 @@ public class LM051Report extends MakeReport {
 	 */
 	public void exec(TitaVo titaVo, int nowDate, int thisMonthEndDate) throws LogicException {
 
-		
 		// 年
 		int iYear = thisMonthEndDate / 10000;
 		// 月
@@ -75,31 +74,32 @@ public class LM051Report extends MakeReport {
 
 		List<Map<String, String>> lM051List = null;
 
-		int dataSize = 0;
+//		int dataSize = 0;
 
 		// 有四種不同條件，要query 5次
-		for (int i = 1; i <= 5; i++) {
-			try {
+//		for (int i = 1; i <= 5; i++) {
+		try {
 
-				lM051List = lM051ServiceImpl.findAll(titaVo, thisYM + 191100, i);
+//			lM051List = lM051ServiceImpl.findAll(titaVo, thisYM + 191100, i);
+			lM051List = lM051ServiceImpl.findAll(titaVo, thisYM + 191100);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.info("LM051ServiceImpl.findAll error = " + errors.toString());
-			}
-			dataSize += lM051List.size();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("LM051ServiceImpl.findAll error = " + errors.toString());
+		}
+//		dataSize += lM051List.size();
 
-			if (lM051List.size() > 0) {
+		if (lM051List.size() > 0) {
 
-				exportExcel(lM051List);
-
-			}
+			exportExcel(lM051List);
 
 		}
 
-		if (dataSize == 0) {
+//		}
+
+		if (lM051List.size() == 0) {
 			makeExcel.setValue(3, 1, "本日無資料");
 		}
 
@@ -177,19 +177,19 @@ public class LM051Report extends MakeReport {
 			makeExcel.setValue(row, 7, Integer.valueOf(tLDVo.get("F5")), "L");
 			// F6 逾期數；8
 
-			String ovduText = "";
-			if (!tLDVo.get("F18").isEmpty()) {
-				if (Integer.valueOf(tLDVo.get("F6")) == 99) {
-					// 協or協*or催協
-					ovduText = tLDVo.get("F18");
-				} else {
-					// *協-逾期數
-					ovduText = tLDVo.get("F18") + tLDVo.get("F6");
-				}
-			} else {
-				// 逾期數
-				ovduText = tLDVo.get("F6");
-			}
+			String ovduText = tLDVo.get("F6");
+//			if (!tLDVo.get("F17").isEmpty()) {
+//				if (Integer.valueOf(tLDVo.get("F6")) == 99) {
+//					// 協or協*or催協
+//					ovduText = tLDVo.get("F17");
+//				} else {
+//					// *協-逾期數
+//					ovduText = tLDVo.get("F17") + tLDVo.get("F6");
+//				}
+//			} else {
+			// 逾期數
+//				ovduText = tLDVo.get("F6");
+//			}
 
 			makeExcel.setValue(row, 8, ovduText, "C");
 			// F7 地區別；9
@@ -360,7 +360,9 @@ public class LM051Report extends MakeReport {
 	 * 資產五分類 欄位位置
 	 * 
 	 * @param row         列數
-	 * @param Map<String, String>
+	 * @param prinBalance 放款金額
+	 * @param assetClass  資產五分類
+	 * 
 	 * 
 	 */
 

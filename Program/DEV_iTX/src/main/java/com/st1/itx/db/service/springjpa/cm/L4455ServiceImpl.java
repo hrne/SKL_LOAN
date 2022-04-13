@@ -84,7 +84,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";
 		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";
 		sql += "         , SUM(\"TempAmt\")         AS \"TempAmt\"";
-		sql += "         , SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\"+\"UnpaidCloseBreach\")       AS \"Shortfall\"";
+		sql += "         , SUM(\"Shortfall\")       AS \"Shortfall\"";
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.AcctFee'),0))";
 		sql += "                                  AS \"AcctFee\"";
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.ModifyFee'),0))";
@@ -107,7 +107,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , \"TitaTlrNo\"";
 		sql += "           , \"TitaTxtNo\"";
 		sql += "  )";
-		sql += "  SELECT SUBSTR(BKD.\"TitaTxtNo\",0,2) AS \"BatchNo\"";
+		sql += "  SELECT BD.\"BatchNo\" AS \"BatchNo\"";
 		sql += "     , BKD.\"EntryDate\"";
 		sql += "     , BKD.\"RepayBank\"";
 		sql += "     , BKD.\"AcctCode\"";
@@ -191,12 +191,12 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , TX2.\"AcDate\" ";
 		sql += "     , TX2.\"TitaTlrNo\" ";
 		sql += "     , TX2.\"TitaTxtNo\" ";
-		sql += "     , ROW_NUMBER() OVER (PARTITION BY SUBSTR(BKD.\"TitaTxtNo\",0,2)";
+		sql += "     , ROW_NUMBER() OVER (PARTITION BY BD.\"BatchNo\"";
 		sql += "                                     , BKD.\"EntryDate\"";
 		sql += "                                     , BKD.\"RepayBank\"";
 		sql += "                                     , BKD.\"CustNo\"";
 		sql += "                                     , TX2.\"TitaTxtNo\"";
-		sql += "                          ORDER BY SUBSTR(BKD.\"TitaTxtNo\",0,2)";
+		sql += "                          ORDER BY BD.\"BatchNo\"";
 		sql += "                                , BKD.\"EntryDate\"";
 		sql += "                                , BKD.\"RepayBank\"";
 		sql += "                                , BKD.\"CustNo\"";
@@ -209,6 +209,9 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         ) AS \"TxSeq\" ";
 		sql += "  FROM \"BankDeductDtl\" BKD";
 		sql += "  LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BKD.\"CustNo\"";
+		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = BKD.\"AcDate\"" ;
+		sql += "                              AND BD.\"TitaTlrNo\" = BKD.\"TitaTlrNo\""; 
+		sql += "                              AND BD.\"TitaTxtNo\" = BKD.\"TitaTxtNo\"";
 		sql += "  LEFT JOIN TX1 ON TX1.\"CustNo\" = BKD.\"CustNo\"";
 		sql += "             AND TX1.\"AcDate\" = BKD.\"AcDate\"";
 		sql += "             AND TX1.\"TitaTlrNo\" = BKD.\"TitaTlrNo\"";
@@ -225,8 +228,8 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND CASE ";
 		sql += "        WHEN LPAD(:inputBatchNo,2,'0') != '00' ";
 		sql += "        THEN LPAD(:inputBatchNo,2,'0')";
-		sql += "      ELSE SUBSTR(BKD.\"TitaTxtNo\",0,2)";
-		sql += "      END = SUBSTR(BKD.\"TitaTxtNo\",0,2)";
+		sql += "      ELSE BD.\"BatchNo\"";
+		sql += "      END = BD.\"BatchNo\"";
 
 		switch (funcd) {
 		case 1:
@@ -254,7 +257,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "  AND BKD.\"AcDate\" = :inputAcDate";
 		sql += "  AND BKD.\"EntryDate\" = :inputEntryDate";
-		sql += "  ORDER BY SUBSTR(BKD.\"TitaTxtNo\",0,2)";
+		sql += "  ORDER BY BD.\"BatchNo\"";
 		sql += "       , BKD.\"EntryDate\"";
 		sql += "       , BKD.\"RepayBank\"";
 		sql += "       , BKD.\"AcctCode\"";

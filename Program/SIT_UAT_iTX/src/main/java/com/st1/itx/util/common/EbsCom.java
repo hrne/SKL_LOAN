@@ -60,10 +60,10 @@ public class EbsCom extends CommBuffer {
 		JSONObject requestJO = setEbsRequestJo(summaryTbl, journalTbl);
 
 		// 上傳及接收資料
-		String result = post(slipMediaUrl, ebsAuth, requestJO.toString());
+		String result = post(slipMediaUrl, ebsAuth, requestJO);
 
 		// 分析回傳資料
-		String returnStatus = analyzeResult(requestJO, result,titaVo);
+		String returnStatus = analyzeResult(requestJO, result, titaVo);
 
 		if (returnStatus != null && returnStatus.equals("E")) {
 			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
@@ -73,26 +73,6 @@ public class EbsCom extends CommBuffer {
 	private String analyzeResult(JSONObject requestJo, String result, TitaVo titaVo) throws LogicException {
 		JSONObject outputParameters = null;
 		String returnStatus = null;
-		String groupId = null;
-		try {
-			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL")
-					.getJSONArray("P_SUMMARY_TBL_ITEM").getJSONObject(0).getString("GROUP_ID");
-		} catch (JSONException e1) {
-			groupId = "RequestERR";
-		}
-
-		// 寫進TABLE存起來
-		SlipEbsRecord tSlipEbsRecord = new SlipEbsRecord();
-
-		tSlipEbsRecord.setGroupId(groupId);
-		tSlipEbsRecord.setRequestData(requestJo.toString());
-		tSlipEbsRecord.setResultData(result);
-
-		try {
-			sSlipEbsRecordService.insert(tSlipEbsRecord, titaVo);
-		} catch (DBException e1) {
-			throw new LogicException("E0001", "EbsCom,SlipEbsRecord");
-		}
 		try {
 			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
 			returnStatus = outputParameters.getString("X_RETURN_STATUS");
@@ -127,7 +107,8 @@ public class EbsCom extends CommBuffer {
 		return requestJO;
 	}
 
-	private String post(String slipMediaUrl, String ebsAuth, String jsonString) throws LogicException {
+	private String post(String slipMediaUrl, String ebsAuth, JSONObject requestJo) throws LogicException {
+		String jsonString = requestJo.toString();
 		HttpHeaders headers = setEbsHeader(ebsAuth);
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
 		RestTemplate restTemplate = new RestTemplate();
@@ -139,9 +120,11 @@ public class EbsCom extends CommBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("EbsCom Exception = " + e.getMessage());
+			insertSlipEbsRecord(requestJo, "EbsCom上傳及接收資料時發生錯誤,Exception = " + e.getMessage());
 			throw new LogicException("E9004", "EbsCom上傳及接收資料時發生錯誤");
 		}
 		this.info("EbsCom result = " + result);
+		insertSlipEbsRecord(requestJo, result);
 
 		return result;
 	}
@@ -158,5 +141,28 @@ public class EbsCom extends CommBuffer {
 	@Override
 	public void exec() throws LogicException {
 		this.info("EbsCom exec .");
+	}
+
+	private void insertSlipEbsRecord(JSONObject requestJo, String result) throws LogicException {
+		String groupId = null;
+		try {
+			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL")
+					.getJSONArray("P_SUMMARY_TBL_ITEM").getJSONObject(0).getString("GROUP_ID");
+		} catch (JSONException e1) {
+			groupId = "RequestERR";
+		}
+
+		// 寫進TABLE存起來
+		SlipEbsRecord tSlipEbsRecord = new SlipEbsRecord();
+
+		tSlipEbsRecord.setGroupId(groupId);
+		tSlipEbsRecord.setRequestData(requestJo.toString());
+		tSlipEbsRecord.setResultData(result);
+
+		try {
+			sSlipEbsRecordService.insert(tSlipEbsRecord, titaVo);
+		} catch (DBException e1) {
+			throw new LogicException("E0001", "EbsCom,SlipEbsRecord");
+		}
 	}
 }

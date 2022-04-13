@@ -31,7 +31,7 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo, int iYearMonth) throws Exception {
 
 		// 年
-		int iYear = iYearMonth / 10000;
+		int iYear = iYearMonth / 100;
 
 		this.info("lM058.findAll YYMM=" + iYearMonth);
 

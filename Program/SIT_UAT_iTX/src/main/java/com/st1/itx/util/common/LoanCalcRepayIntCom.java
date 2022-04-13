@@ -389,9 +389,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			throw new LogicException(titaVo, "E3911",
 					"利率區分 = " + iRateCode + " 戶號 = " + iCustNo + " 額度 = " + iFacmNo + " 撥款 = " + iBormNo); // 計算利息錯誤，利率區分錯誤
 		}
-		if (iPrincipal.compareTo(BigDecimal.ZERO) == 0 && iUnpaidFlag == 0) {
-			throw new LogicException(titaVo, "E3912", "戶號 = " + iCustNo + " 額度 = " + iFacmNo + " 撥款 = " + iBormNo); // 計算利息錯誤，計息本金為零
-		}
+//		if (iPrincipal.compareTo(BigDecimal.ZERO) == 0 && iUnpaidFlag == 0) {
+//			throw new LogicException(titaVo, "E3912", "戶號 = " + iCustNo + " 額度 = " + iFacmNo + " 撥款 = " + iBormNo); // 計算利息錯誤，計息本金為零
+//		}
 		if (iIntStartDate == 0) {
 			throw new LogicException(titaVo, "E3913", "戶號 = " + iCustNo + " 額度 = " + iFacmNo + " 撥款 = " + iBormNo); // 計算利息錯誤，計息起日為零
 		}

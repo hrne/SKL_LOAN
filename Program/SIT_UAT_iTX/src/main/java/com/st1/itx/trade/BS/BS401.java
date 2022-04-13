@@ -209,16 +209,13 @@ public class BS401 extends TradeBuffer {
 					}
 					if (isCheck) {
 						tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
-						if (!"4".equals(tDetail.getProcStsCode())) {
-							ProcessCnt++;
-							try {
-								batxDetailService.update(tDetail);
-							} catch (DBException e) {
-								throw new LogicException(titaVo, "E0007",
-										"BS401 update batxDetail " + tDetail + e.getErrorMsg());
-							}
-							isUpdate = true;
+						try {
+							batxDetailService.update(tDetail);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007",
+									"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 						}
+						isUpdate = true;
 					}
 					if ("4".equals(tDetail.getProcStsCode())) {
 						ProcessCnt++;
@@ -379,6 +376,15 @@ public class BS401 extends TradeBuffer {
 				}
 				doneTotalCnt++;
 				break;
+			}
+		}
+//      銀扣整批入帳、暫收抵繳整批入帳，自動轉暫收  
+		if (isBankDeduct || isTempRepay) {
+			if (iFunctionCode == 0) {
+				tempCnt = tempCnt + checkErrorCnt + manualCnt + unDoCnt;
+				checkErrorCnt = 0;
+				manualCnt = 0;
+				unDoCnt = 0;
 			}
 		}
 // BatxExeCode 作業狀態 0.待檢核 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除

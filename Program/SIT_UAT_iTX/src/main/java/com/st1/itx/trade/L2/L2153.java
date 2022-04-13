@@ -662,20 +662,34 @@ public class L2153 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
 		}
-		if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
-			tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
-			try {
-				custMainService.update(tCustMain, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
-			}
-		}
+//		if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
+//			tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
+//			try {
+//				custMainService.update(tCustMain, titaVo);
+//			} catch (DBException e) {
+//				throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
+//			}
+//		}
 		// 額度交易訂正交易須由最後一筆交易開始訂正
 		loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
 		try {
 			facMainService.delete(tFacMain, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0008", "額度主檔"); // 刪除資料時，發生錯誤
+		}
+		
+		
+		// 抓更新刪除額度後目前最後一筆額度 2022.4.13
+		tFacMain = facMainService.findLastFacmNoFirst(wkCustNo, titaVo);
+		if(tFacMain == null) {
+			tCustMain.setLastFacmNo(0);
+		} else {
+			tCustMain.setLastFacmNo(tFacMain.getFacmNo());
+		}
+		try {
+			custMainService.update(tCustMain, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
 		}
 	}
 
