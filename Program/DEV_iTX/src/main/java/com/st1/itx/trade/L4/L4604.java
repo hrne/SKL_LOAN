@@ -79,11 +79,12 @@ public class L4604 extends TradeBuffer {
 		// 已繳
 		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index,
 				this.limit);
-		List<InsuRenew> lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-		if (lInsuRenew != null) {
+		if (sInsuRenew != null) {
 			BigDecimal txAmt = BigDecimal.ZERO;
-			for (InsuRenew tInsuRenew : lInsuRenew) {
-				txAmt = txAmt.add(tInsuRenew.getTotInsuPrem());
+			for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
+				if (tInsuRenew.getStatusCode() == 0) {
+					txAmt = txAmt.add(tInsuRenew.getTotInsuPrem());
+				}
 			}
 			// 帳務處理
 			if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -109,10 +110,20 @@ public class L4604 extends TradeBuffer {
 
 		// 未繳
 		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, this.index, this.limit);
+		int status = 0;
+		if (titaVo.isHcodeNormal()) {
+			status = 0;
+		} else {
+			status = 1;
+		}
+		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+		for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
+			if (tInsuRenew.getStatusCode() == status) {
+				lInsuRenew.add(tInsuRenew);
+			}
+		}
 
-		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-
-		if (lInsuRenew != null) {
+		if (lInsuRenew.size() > 0) {
 //			一般
 			if (titaVo.isHcodeNormal()) {
 				updateInsuRenew(lInsuRenew, 1); // StatusCode = 1.借支

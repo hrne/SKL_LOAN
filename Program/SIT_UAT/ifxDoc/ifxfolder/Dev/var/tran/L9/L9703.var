@@ -41,7 +41,6 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L9703]                                 滯繳客戶明細表"],
-["#R1+@會計日期",#AcctDate],
 ["#R2+@戶號",#CustNo,"-",#FacmNo],
 ["#R3+@滯繳條件",#UnpaidCond,#UnpaidCondx],
 ["#R4+@滯繳期數",#UnpaidTermSt,"~",#UnpaidTermEd],
@@ -49,6 +48,9 @@ E(0,0)
 ["#R6+@繳款方式",#RepayType,#RepayTypex],
 ["#R7+@戶別",#CustType,#CustTypex],
 ["#R8+@本金餘額",#PrinBalance,"元以上"],
+["#R2+@會計日",#AcDate],
+["#R2+@入帳日",#EntryDate],
+["#R2+@最近繳款日",#PayIntDateSt,"~",#PayIntDateEd"],
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -75,7 +77,7 @@ T(3,@R7,*)
 #FdMsg=X,1,L
 #Msg=x,20.100,L
 K(LIGHT,#Msg,TXTRED,0)
-INVOKEJS(SHOW,p1,9,9,0)
+INVOKEJS(SHOW,p1,11,11,0)
 
 ! UnpaidCond=1 滯繳期數為必輸欄位,UnpaidCond=2 滯繳日數為必輸欄位
 #HIGHLIGHT_AFTER_UnpaidCond=@,1,S
@@ -132,11 +134,11 @@ T(1,#DT1,2,7)
 T(1,#DT1,2,5)
 
 !會計日期 必須輸入，不可大於本營業日
-#AcctDate=D,7,I
-T(2,#DT2)
-@V(7)
-V(5,0,#DT2)
-A(DATE,0,#AcctDate)
+!#AcctDate=D,7,I
+!T(2,#DT2)
+!@V(7)
+!V(5,0,#DT2)
+!A(DATE,0,#AcctDate)
 
 !戶號
 #CustNo=A,7,I
@@ -177,8 +179,8 @@ HELP(#UnpaidCondHelp)
 @T(3,@UnpaidCondx,)
 V(H,#UnpaidCondHelp)
 CALL(#HIGHLIGHT_AFTER_UnpaidCond)
-IF(#UnpaidCond==1,INVOKEJS(SHOW,p1,5,5,0),INVOKEJS(SHOW,p1,4,4,0))
-IF(#UnpaidCond==2,INVOKEJS(SHOW,p1,5,5,1),INVOKEJS(SHOW,p1,4,4,1))
+IF(#UnpaidCond==1,INVOKEJS(SHOW,p1,4,4,0),INVOKEJS(SHOW,p1,3,3,0))
+IF(#UnpaidCond==2,INVOKEJS(SHOW,p1,4,4,1),INVOKEJS(SHOW,p1,3,3,1))
 
 #UnpaidCondx=X,8,L
 T(H,#UnpaidCond,#UnpaidCondHelp)
@@ -225,6 +227,26 @@ T(H,#CustType,#CustTypeHelp)
 
 #PrinBalance=m,14,I
 
+#tmpAcDate=D,8,S
+D(6,3,#DT1,2)
+
+#AcDate=D,7,I
+T(1,#tmpAcDate,2,7) 
+
+#tmpEntryDate=D,8,S
+D(6,3,#DT1,1)
+
+#EntryDate=D,7,I
+T(1,#tmpEntryDate,2,7) 
+
+#tmpPayIntDate=D,8,S
+D(6,3,#DT1,7)
+
+#PayIntDateSt=D,7,I
+T(1,#tmpPayIntDate,2,7) 
+
+#PayIntDateEd=D,7,I
+T(1,#tmpPayIntDate,2,7) 
 
 <include src="ROM.icf::L1R20.dec"/>
 
@@ -244,7 +266,7 @@ T(2,@Msg,#L1R20Msg)
 
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
-INVOKEJS(SHOW,p1,9,9,#ShowMsg)
+INVOKEJS(SHOW,p1,11,11,#ShowMsg)
 
 </sub>
 
@@ -274,7 +296,6 @@ T(3,[L9703] 滯繳客戶明細表)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#AcctDate
 #CustNo
 #FacmNo
 #UnpaidCond
@@ -285,6 +306,10 @@ T(3,[L9703] 滯繳客戶明細表)
 #RepayType
 #CustType
 #PrinBalance
+#AcDate
+#EntryDate
+#PayIntDateSt
+#PayIntDateEd
 </sub>
 
 
@@ -307,5 +332,6 @@ TXFORM=L9703^
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 
-<include src="PRT.icf::INQ01.sel"/>
+!<include src="PRT.icf::INQ01.sel"/>
+<include src="PRT.icf::UPD01.sel"/>
 </sub>

@@ -45,7 +45,7 @@ E(0,0)
 ["#FdAcSubBookCode+區隔帳冊",#AcSubBookCode,#AcSubBookItem,"(空白:查詢全部)"],
 ["#FdBranchNo+單位別",#BranchNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
-["#FdAcNoCode+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],
+["#FdAcNoCode+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#AcNoItem],
 ["#FdCustNo+戶號",#CustNo,"-",#FacmNo],
 ["#FdAcctCode+業務科目",#AcctCode,#AcctCodeX],
 ["#FdRvNo+銷帳編號",#RvNo],
@@ -53,7 +53,7 @@ E(0,0)
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:會計科目查詢;enable:1;tabbable:0
+!#BTN1=X,15,I,ui:button;value:會計科目查詢;enable:1;tabbable:0
 #BUF1=X,42,S
 !ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
 
@@ -90,6 +90,7 @@ T(1,#DATE,2,7)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6907未銷帳餘額明細查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 
 #NTXBUF=X,92,S
@@ -171,11 +172,11 @@ T(3, )
 #FdAcSubBookCode=X,2,L
 T(3, )
 #FdAcNoCode=X,2,L
-T(3,*)
+T(3, )
 #FdCustNo=X,2,L
 T(3, )
 #FdAcDate=X,2,L
-T(3,*)
+T(3, )
 
 #RPTFG=A,1,S
 E(0,0)
@@ -189,7 +190,7 @@ T(3,000)
 #AcBookItem=X,20,L
 T(2,全帳冊)
 
-#AcSubBookCode=X,3,I
+#AcSubBookCode=X,3,L
 C(3,#CHAIN,1,s,$)
 HELP(#AcSubBookCodeHelp)
 @T(3,@AcSubBookItem,)
@@ -209,18 +210,18 @@ T(3,TWD)
 #BUF1A=X,18,S
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6061; ntxbuf=#BUF1A;ntxbuf5=type<-1:
-AcNoCode<-OOAcNoCode:
-AcSubCode<-OOAcSubCode:
-AcDtlCode<-OOAcDtlCode})
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6061; ntxbuf=#BUF1A;ntxbuf5=type<-1:
+!AcNoCode<-OOAcNoCode:
+!AcSubCode<-OOAcSubCode:
+!AcDtlCode<-OOAcDtlCode})
 
 ![科子細目]
-#AcNoCode=X,11,I
+#AcNoCode=X,11,L
 C(3,#CHAIN,1,s,$)
 @V(7)
-#AcSubCode=X,5,I
+#AcSubCode=X,5,L
 C(3,#CHAIN,1,s,$)
-#AcDtlCode=X,2,I
+#AcDtlCode=X,2,L
 C(3,#CHAIN,1,s,$)
 
 #SendL6R23=X,1,S
@@ -237,12 +238,12 @@ R(1,L6R23)
 T(2,#L6R23AcNoItem)
 
 ! 戶號
-#CustNo=A,7,I
+#CustNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(7)
-#FacmNo=A,3,I
+#FacmNo=A,3,L
 C(3,#CHAIN,1,s,$)
-!#BormNo=A,3,I
+!#BormNo=A,3,L
 !C(3,#CHAIN,1,s,$)
 
 #MRKEY=_,_,S
@@ -252,7 +253,7 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 
 #FdAcctCode=X,2,L
 ! 業務科目
-#AcctCode=X,3,I
+#AcctCode=X,3,L
 C(3,#CHAIN,1,s,$)
 HELP(#AcctCodeHelp,cols:2)
 @T(3,@AcctCodeX,)
@@ -265,7 +266,7 @@ T(H,#AcctCode,#AcctCodeHelp)
 
 
 ! 銷帳編號
-#RvNo=X,30,I
+#RvNo=X,30,L
 C(3,#CHAIN,1,s,$)
 
 
@@ -276,13 +277,13 @@ T(1,#DATE,2,5)
 #DT_01=A,2,S
 E(0,1)
 
-#AcDateSt=D,7,I
+#AcDateSt=D,7,L
 C(3,#CHAIN,1,s,$)
 T(2,#DT_MONTH+#DT_01)
 @V(7)A(4,0,#AcDateSt)
 IF(#AcDateSt > #DT,V(P,不可大於會計日),$)
 
-#AcDateEd=D,7,I
+#AcDateEd=D,7,L
 C(3,#CHAIN,1,XMT(),$)
 T(2,#DT)
 @V(7)A(4,0,#AcDateEd)

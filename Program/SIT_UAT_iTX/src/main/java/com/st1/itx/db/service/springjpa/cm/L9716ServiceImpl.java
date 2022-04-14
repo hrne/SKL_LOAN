@@ -28,7 +28,6 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		// LNW0581E
 		this.info("l9716.findAll ");
@@ -165,7 +164,6 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> ovduFindAll(TitaVo titaVo) throws Exception {
 		this.info("l9716.ovduFindAll");
 
@@ -197,7 +195,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,L.\"CustNo\" F1";
 		sql += "            ,L.\"FacmNo\" AS F2";
 		sql += "            ,L.\"BormNo\" F3";
-		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0) F4";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) F4";
 		sql += "            ,F.\"FirstDrawdownDate\" F5";
 		sql += "            ,M.\"PrevIntDate\" F6";
 		sql += "            ,LO.\"OvduBal\" F7";

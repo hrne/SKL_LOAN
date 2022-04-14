@@ -288,5 +288,6 @@ TXFORM=L9705^
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 
-<include src="PRT.icf::INQ01.sel"/>
+!<include src="PRT.icf::INQ01.sel"/>
+<include src="PRT.icf::UPD01.sel"/>
 </sub>

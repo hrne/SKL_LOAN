@@ -522,7 +522,11 @@ public class L4414 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCustNoB", tAchAuthLog.getCustNo());
 			occursList.putParam("OOFacmNoB", tAchAuthLog.getFacmNo());
-			occursList.putParam("OORepayBankXB", bankX(tAchAuthLog.getRepayBank(), titaVo).substring(0, 8));
+			if (bankX(tAchAuthLog.getRepayBank(), titaVo).length() > 8) {
+				occursList.putParam("OORepayBankXB", bankX(tAchAuthLog.getRepayBank(), titaVo).substring(0, 8));
+			} else {
+				occursList.putParam("OORepayBankXB", bankX(tAchAuthLog.getRepayBank(), titaVo));
+			}
 			occursList.putParam("OORepayAcctB", tAchAuthLog.getRepayAcct());
 			occursList.putParam("OOAuthStatusB", tAchAuthLog.getAuthStatus());
 			occursList.putParam("OOCreateFlagB", tAchAuthLog.getCreateFlag());

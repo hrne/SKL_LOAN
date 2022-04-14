@@ -609,6 +609,7 @@ public class AcEnterCom extends TradeBuffer {
 			acDetail.setSlipNote(ac.getSlipNote());
 			acDetail.setSumNo(ac.getSumNo());
 			acDetail.setAcBookCode(ac.getAcBookCode());
+			acDetail.setAcSubBookCode(ac.getAcSubBookCode());
 			acDetail.setAcSeq(i);
 			if (ac.getDbCr().equals("D")) {
 				acDetail.setDbCr("C");
