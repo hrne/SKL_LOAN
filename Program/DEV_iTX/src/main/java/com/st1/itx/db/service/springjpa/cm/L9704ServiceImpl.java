@@ -45,11 +45,11 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , F.\"FacmNo\" "; // F1 額度
 		sql += "      , \"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\" "; // F2 戶名/公司名稱
 		sql += "      , F.\"FirstDrawdownDate\" "; // F3 初貸日
-		sql += "      , CASE WHEN L.\"PrevIntDate\" != 0 ";
-		sql += "             THEN L.\"PrevIntDate\" ";
-		sql += "        ELSE LBM.\"PrevPayIntDate\" END AS F4 "; // F4 繳息迄日
+		sql += "      , NVL(MFBOrder.\"PrevIntDate\", L.\"PrevIntDate\") AS \"PrevPayIntDate\" "; // F4 繳息迄日：MFB都沒有再取 CollList - 如果本月已還款解催收，CollList 日期會不對
 		sql += "      , F.\"AcctCode\" "; // F5 核准科目
-		sql += "      , NVL(LO.\"OvduDate\", 0) AS \"OvduDate\" "; // F6 轉催收日期
+		sql += "      , CASE WHEN GREATEST(NVL(THISM.\"OvduDate\", 0), NVL(LASTM.\"OvduDate\", 0)) > 0";
+		sql += "             THEN GREATEST(NVL(THISM.\"OvduDate\", 0), NVL(LASTM.\"OvduDate\", 0)) ";
+		sql += "             ELSE NVL(LO.\"OvduDate\", 0) END AS \"OvduDate\" "; // F6 轉催收日期 優先取 THISM > LASTM > LoanOverdue
 		sql += "      , NVL(LASTM.\"OvduPrinBal\",0)                AS \"LastOvduPrinBal\" "; // F7 上月催收本金餘額
 		sql += "      , NVL(LASTM.\"OvduIntBal\" + LASTM.\"OvduBreachBal\",0) ";
 		sql += "                                                    AS \"LastOvduIntBal\" "; // F8 上月催收利息餘額 + 上月催收違約金餘額
@@ -69,7 +69,18 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"MonthlyFacBal\" THISM ON THISM.\"CustNo\" = F.\"CustNo\" ";
 		sql += "                                  AND THISM.\"FacmNo\" = F.\"FacmNo\" ";
 		sql += "                                  AND THISM.\"YearMonth\" = :thisMonth ";
-		sql += " LEFT JOIN \"CdCity\" CT ON CT.\"CityCode\" = NVL(LASTM.\"CityCode\", THISM.\"CityCode\") ";
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                   ,\"FacmNo\" ";
+		sql += "                   ,\"PrevIntDate\" ";
+		sql += "                   ,ROW_NUMBER() over (PARTITION BY \"CustNo\" ";
+		sql += "                                                   ,\"FacmNo\" ";
+		sql += "                                       ORDER BY \"YearMonth\" DESC) \"Seq\" ";
+		sql += "             FROM \"MonthlyFacBal\" ";
+		sql += "             WHERE \"PrevIntDate\" > 0 ";
+		sql += "               AND \"YearMonth\" <= :lastMonth ) MFBOrder ON MFBOrder.\"Seq\" = 1 ";               // 因為有可能上個月催收、這個月還款解催收了
+		sql += "                                                         AND MFBOrder.\"CustNo\" = F.\"CustNo\" "; // 這種情況取 thisMonth 的日期就會不對
+		sql += "                                                         AND MFBOrder.\"FacmNo\" = F.\"FacmNo\" "; // 如果依然還是催收，表示 thisMonth 這欄位會是 0
+		sql += " LEFT JOIN \"CdCity\" CT ON CT.\"CityCode\" = NVL(LASTM.\"CityCode\", THISM.\"CityCode\") ";       // 所以在任何情況下，都是從 lastMonth 開始往回取第一個非 0 的 PrevIntDate
 		sql += " LEFT JOIN \"CdCode\" DF ON DF.\"DefCode\" = 'AcSubBookCode' ";
 		sql += "                        AND DF.\"Code\" = NVL(LASTM.\"AcSubBookCode\", THISM.\"AcSubBookCode\") ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\" ";

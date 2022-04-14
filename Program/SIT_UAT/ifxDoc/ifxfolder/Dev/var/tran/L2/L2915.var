@@ -444,7 +444,7 @@ T(3,)T(H,#BdMainUseCode,#BdMainUseCodeHelp)
 ! [建物主要建材]
 #BdMtrlCode=A,2,L
 
-#BdMtrlCodeX=X,13,L
+#BdMtrlCodeX=X,25,L
 T(3,)T(H,#BdMtrlCode,#BdMtrlCodeHelp)
 
 ! [建物類別]

@@ -67,6 +67,7 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		int iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		int iAdjDate = parse.stringToInteger(titaVo.getParam("AdjDate")) + 19110000;
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		//
 		String iInqCode = titaVo.getParam("InqCode"); // 0-要處理 9-待處理 A-全部
 		int iOvduTerm = parse.stringToInteger(titaVo.getParam("OvduTerm"));
@@ -148,6 +149,9 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and b.\"CustCode\" <= " + custCode2;
 		sql += "   and b.\"TxKind\" = " + iTxKind;
 		sql += "   and b.\"AdjDate\"  = " + iAdjDate;
+		if (iCustNo > 0) {
+			sql += "   and b.\"CustNo\"  = " + iCustNo;
+		}
 		if (!"".equals(adjCode)) {
 			sql += "   and b.\"AdjCode\" = " + adjCode;
 		}

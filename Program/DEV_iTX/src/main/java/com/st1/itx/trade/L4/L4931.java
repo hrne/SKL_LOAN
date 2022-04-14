@@ -143,10 +143,12 @@ public class L4931 extends TradeBuffer {
 				if (tempVo.get("WarnMsg") != null) {
 					procNote += tempVo.get("WarnMsg");
 				}
+				if (tempVo.get("keyinMsg") != null) {
+					procNote += tempVo.get("keyinMsg");
+				}
 				if (!procNote.isEmpty()) {
 					procNote = "檢核訊息:" + procNote + " ";
 				}
-
 				occursList.putParam("OOProcNote", procNote);
 
 				this.totaVo.addOccursList(occursList);

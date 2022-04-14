@@ -89,6 +89,7 @@ public class L431A extends TradeBuffer {
 		this.info("titaVo.getBtnIndex() ..." + titaVo.getBtnIndex());
 		btnIndex = parse.stringToInteger(titaVo.getBtnIndex());
 		String checkMsg = "";
+		String keyinMsg = "";
 		this.info("adjDate ..." + adjDate);
 		this.info("txKind ..." + txKind);
 		this.info("adjCode ..." + adjCode);
@@ -105,20 +106,16 @@ public class L431A extends TradeBuffer {
 		tBatxRateChangeId.setFacmNo(facmNo);
 		tBatxRateChangeId.setBormNo(bormNo);
 
+		TempVo tTempVo = new TempVo();
 		tBatxRateChange = batxRateChangeService.holdById(tBatxRateChangeId);
 		if (tBatxRateChange == null) {
 			throw new LogicException("E0001", "L431A Couldn't Find CustNo : " + parse.IntegerToString(custNo, 7) + "-"
 					+ parse.IntegerToString(facmNo, 3) + "-" + parse.IntegerToString(bormNo, 3));
 		}
 
-		if (tBatxRateChange.getConfirmFlag() == 1) {
-			throw new LogicException("E0007", " 此筆資料已確認，請先訂正L4321。");
-		}
-
-		if (tBatxRateChange.getConfirmFlag() == 2) {
-			throw new LogicException("E0007", " 此筆資料已確認放行，請先主管訂正L4321。");
-		}
-
+		// get tempVo
+		tTempVo = new TempVo();
+		tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
 		// 選擇調整、取消調整
 		switch (tBatxRateChange.getRateKeyInCode()) {
 		case 0: // 0.未調整
@@ -129,17 +126,18 @@ public class L431A extends TradeBuffer {
 				tBatxRateChange.setRateKeyInCode(1); // 1.已調整
 				break;
 			case 1: // 1.按目前利率調整
-				checkMsg = "按目前利率調整 ";
+				keyinMsg = "按目前利率調整 ";
 				tBatxRateChange.setAdjustedRate(tBatxRateChange.getPresentRate());
 				tBatxRateChange.setRateKeyInCode(1); // 1.已調整
 				break;
 
 			case 2: // 2.按輸入利率調整
-				checkMsg = "按輸入利率調整 ";
+				keyinMsg = "按輸入利率調整 ";
 				tBatxRateChange.setAdjustedRate(BigDecimal.ZERO);
 				tBatxRateChange.setRateKeyInCode(2); // 2.待輸入
 				break;
 			}
+			tTempVo.putParam("keyinMsg", keyinMsg);
 			checkMsg = check(checkMsg, tBatxRateChange, titaVo);
 			if (!checkMsg.isEmpty()) {
 				throw new LogicException("E0015", checkMsg); // 檢查錯誤
@@ -151,9 +149,6 @@ public class L431A extends TradeBuffer {
 			tBatxRateChange.setAdjustedRate(BigDecimal.ZERO);
 			tBatxRateChange.setRateKeyInCode(0); // 0.未調整
 			tBatxRateChange.setConfirmFlag(0);
-			// get tempVo
-			TempVo tTempVo = new TempVo();
-			tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
 			// 放款利率變動檔生效日，利率未變動為零
 			int txEffectDate = 0;
 			if (tBatxRateChange.getAdjustedRate().compareTo(tBatxRateChange.getPresentRate()) != 0) {
@@ -191,6 +186,7 @@ public class L431A extends TradeBuffer {
 			break;
 		}
 
+		tBatxRateChange.setJsonFields(tTempVo.getJsonString());
 		try {
 			batxRateChangeService.update(tBatxRateChange);
 		} catch (DBException e) {

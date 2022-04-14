@@ -36,9 +36,9 @@ public class L9710p extends TradeBuffer {
 	@Autowired
 	L9710ServiceImpl l9710ServiceImpl;
 
-//	@Autowired
-//	L9710Report2 l9710Report1;
-
+	@Autowired
+	L9705Form l9705Form;
+	
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -84,6 +84,8 @@ public class L9710p extends TradeBuffer {
 
 				infoNotification = "L9710 通知單已完成";
 
+				//by eric 2021.12.10
+				l9705Form.exec(l9710List, titaVo, txbuffer);
 			} else {
 				this.info("active L9710report data detail");
 				l9710Report.exec(titaVo);
@@ -91,6 +93,7 @@ public class L9710p extends TradeBuffer {
 				infoNotification = "L9710寬限到期明細表已完成";
 			}
 
+			
 		} else {
 
 			infoNotification = "L9710 查無資料";

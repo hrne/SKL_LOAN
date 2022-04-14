@@ -32,7 +32,7 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L9714.findAll");
@@ -41,7 +41,7 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iFACMNO = titaVo.get("FacmNo");
 		String iUSEFG = titaVo.get("UsageCode");
 		String iYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("YearMonth")) + 191100);
-
+		String sYEARMONTH = String.valueOf(Integer.valueOf((titaVo.get("YearMonth")) + 191100)/100) + "01";
 		boolean useUsageCode = !"00".equals(iUSEFG);
 		boolean useFacmNo = !"000".equals(iFACMNO);
 
@@ -52,18 +52,22 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , YHLI.\"CustNo\" ";
 		sql += "      , YHLI.\"FacmNo\" ";
 		sql += "      , YHLI.\"LoanAmt\" ";
-		sql += "      , NVL(JSON_VALUE(YHLI.\"JsonFields\", '$.StartMonth'), 0) AS \"StartMonth\" ";
-		sql += "      , NVL(JSON_VALUE(YHLI.\"JsonFields\", '$.EndMonth'), 0)   AS \"EndMonth\" ";
+		sql += "      , NVL(JSON_VALUE(YHLI.\"JsonFields\", '$.StartMonth'), :syearmonth) AS \"StartMonth\" ";
+		sql += "      , NVL(JSON_VALUE(YHLI.\"JsonFields\", '$.EndMonth'), :iyearmonth)   AS \"EndMonth\" ";
 		sql += "      , YHLI.\"LoanBal\" ";
-		sql += "      , CC.\"Item\"                         AS \"Usage\" ";
+		sql += "      , NVL(CC.\"Item\",CC2.\"Item\")                         AS \"Usage\" ";
 		sql += "      , YHLI.\"YearlyInt\" ";
 		sql += "      , YHLI.\"HouseBuyDate\" ";
 		sql += "      , YHLI.\"FirstDrawdownDate\" ";
 		sql += "      , YHLI.\"MaturityDate\" ";
 		sql += " FROM \"YearlyHouseLoanInt\" YHLI ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = YHLI.\"CustNo\" ";
+		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = 'CustNo' ";
+		sql += "                        AND F.\"FacmNo\" = YHLI.\"FacmNo\" ";
 		sql += " LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'UsageCode' ";
 		sql += "                        AND CC.\"Code\" = YHLI.\"UsageCode\" ";
+		sql += " LEFT JOIN \"CdCode\" CC2 ON CC2.\"DefCode\" = 'UsageCode' ";
+		sql += "                         AND CC2.\"Code\" = F.\"UsageCode\" ";
 		sql += " WHERE YHLI.\"YearlyInt\" > 0 ";
 		sql += "   AND YHLI.\"YearMonth\" = :iyearmonth";
 		sql += "   AND YHLI.\"CustNo\" = :icustno ";
@@ -78,6 +82,7 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("icustno", iCUSTNO);
 		query.setParameter("iyearmonth", iYEARMONTH);
+		query.setParameter("syearmonth", sYEARMONTH);
 		if (useFacmNo) {
 			query.setParameter("ifacmno", iFACMNO);
 		}

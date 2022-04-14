@@ -45,6 +45,7 @@ E(0,0)
 [#<->#,"@@@@@@@@@狀態",#InqCode,#InqCodeX],
 [#<->#,"@@@@@調整日期",#AdjDate],
 [#<->#,"@@@@@逾期期數",#OvduTerm],
+[#<->#,"@@@@@戶號",#CustNo],
 ]
 
 ! Help
@@ -157,6 +158,10 @@ E(0,#SYSDATE)
 
 #OvduTerm=A,2,I
 C(3,#CHAIN,0,$,s)
+
+#CustNo=A,7,I
+C(3,#CHAIN,0,$,s)
+
 
 
 #RPTFG=A,1,S
@@ -342,6 +347,7 @@ T(6A,#AdjDate+#TxKind+#OOAdjCode+#OOCustNo+#OOFacmNo+#OOBormNo+#OOCurtEffDate)
 #InqCode
 #AdjDate
 #OvduTerm
+#CustNo
 #END
 
 

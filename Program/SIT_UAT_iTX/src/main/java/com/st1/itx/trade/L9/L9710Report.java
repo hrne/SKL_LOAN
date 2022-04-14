@@ -143,7 +143,7 @@ public class L9710Report extends MakeReport {
 
 			for (Map<String, String> tL9710Vo : l9710List) {
 
-				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("F1")))) {
+				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
 					if (cnt > 0) {
 						reportTot();
 					}
@@ -153,7 +153,7 @@ public class L9710Report extends MakeReport {
 				}
 
 				f0 = tL9710Vo.get("F0");
-				f1 = tL9710Vo.get("F1");
+				f1 = tL9710Vo.get("CityCode");
 
 				report(tL9710Vo);
 			}
@@ -179,54 +179,54 @@ public class L9710Report extends MakeReport {
 		if (ptfg == 0) {
 			this.print(1, 2, f0);
 			ptfg = 1;
-			this.print(0, 3, tL9710Vo.get("F1"));
+			this.print(0, 3, tL9710Vo.get("CityCode"));
 		} else {
-			this.print(1, 3, tL9710Vo.get("F1"));
+			this.print(1, 3, tL9710Vo.get("CityCode"));
 		}
-		this.print(0, 6, substr(tL9710Vo.get("F2"), 3));
+		this.print(0, 6, substr(tL9710Vo.get("CityItem"), 3));
 
 		// 經辦
-		this.print(0, 15, substr(tL9710Vo.get("F3"), 5));
+		this.print(0, 15, substr(tL9710Vo.get("Fullname"), 5));
 
 		// 戶號(戶號+額度)
-		tmp = String.format("%07d", Integer.valueOf(tL9710Vo.get("F4"))) + "-" + String.format("%03d", Integer.valueOf(tL9710Vo.get("F5")));
+		tmp = String.format("%07d", Integer.valueOf(tL9710Vo.get("CustNo"))) + "-" + String.format("%03d", Integer.valueOf(tL9710Vo.get("FacmNo")));
 		this.print(0, 22, tmp);
 
 		// 戶名
-		this.print(0, 36, substr(tL9710Vo.get("F6"), 5));
+		this.print(0, 36, substr(tL9710Vo.get("CustName"), 5));
 
 		// 核准號碼
-		this.print(0, 47, String.format("%07d", Integer.valueOf(tL9710Vo.get("F7"))));
+		this.print(0, 47, String.format("%07d", Integer.valueOf(tL9710Vo.get("ApplNo"))));
 
 		// 寬限到期日
-		this.print(0, 67, showRocDate(tL9710Vo.get("F8"), 1),"R");
+		this.print(0, 67, showRocDate(tL9710Vo.get("GraceDate"), 1),"R");
 
 		// 核准額度
-		this.print(0, 80, showAmt(tL9710Vo.get("F9")), "R");
+		this.print(0, 80, showAmt(tL9710Vo.get("LineAmt")), "R");
 
 		// 貸放餘額
-		this.print(0, 92, showAmt(tL9710Vo.get("F10")), "R");
+		this.print(0, 92, showAmt(tL9710Vo.get("LoanBal")), "R");
 
 		// 首次撥款日
-		this.print(0, 104, showRocDate(tL9710Vo.get("F11"), 1),"R");
+		this.print(0, 104, showRocDate(tL9710Vo.get("FirstDrawdownDate"), 1),"R");
 
 		// 上次繳息日
-		this.print(0, 117, showRocDate(tL9710Vo.get("F12"), 1),"R");
+		this.print(0, 117, showRocDate(tL9710Vo.get("PrevPayIntDate"), 1),"R");
 
 		// 計息利率
-		this.print(0, 128, String.format("%.4f", Double.valueOf(tL9710Vo.get("F13"))), "R");
+		this.print(0, 128, String.format("%.4f", Double.valueOf(tL9710Vo.get("StoreRate"))), "R");
 
 		// 連絡電話
-		this.print(0, 132, substr(tL9710Vo.get("F14"), 15));
+		this.print(0, 132, substr(tL9710Vo.get("TelNo"), 15));
 
 		// 聯絡人
-		this.print(0, 145, substr(tL9710Vo.get("F15"), 5));
+		this.print(0, 145, substr(tL9710Vo.get("LiaisonName"), 5));
 
 		// 下次還本日
-		this.print(0, 164, showRocDate(tL9710Vo.get("F16"), 1),"R");
+		this.print(0, 164, showRocDate(tL9710Vo.get("NextRepayDate"), 1),"R");
 
 		cnt += 1;
-		amt += Integer.valueOf(tL9710Vo.get("F10"));
+		amt += Integer.valueOf(tL9710Vo.get("LoanBal"));
 	}
 
 	/**

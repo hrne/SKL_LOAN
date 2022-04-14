@@ -89,11 +89,18 @@ BEGIN
                                           AND R."BormNo" = B."BormNo"
                                           AND CASE
                                                 -- 一般情況
-                                                WHEN R."EffectDate" >= B."PrevPayIntDate" 
+                                                WHEN B."Status" NOT IN (2,5,6,7,8,9) -- 2022-04-14 新增:排除欠繳情況
+                                                     AND R."EffectDate" >= B."PrevPayIntDate" 
                                                      AND R."EffectDate" <= TBSDYF
                                                 THEN 1
                                                 -- 利息繳超過的情況 2022-04-13 新增
                                                 WHEN B."PrevPayIntDate" >= TBSDYF 
+                                                     AND R."EffectDate" <= TBSDYF
+                                                THEN 1
+                                                -- 欠繳情況 2022-04-14 新增
+                                                WHEN B."Status" IN (2,5,6,7,8,9)  
+                                                     AND R."EffectDate" >= B."PrevPayIntDate" -- 上繳日
+                                                     AND R."EffectDate" <= B."NextPayIntDate" -- 下繳日
                                                      AND R."EffectDate" <= TBSDYF
                                                 THEN 1
                                               ELSE 0 END = 1

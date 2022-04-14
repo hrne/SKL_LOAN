@@ -75,6 +75,9 @@ BIND(#BtnExpand,click, {cmd=CALLSEND;DOCODE=Expand})
 
 #BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
 
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
 #PageFg=A,1,S
 E(0,0)
 
@@ -395,6 +398,9 @@ CALL(#SET_REQUIRED)
 HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
 
+#SetSysPar1=X,1,S
+IF(#FunCd ==3,E(0,0)ASGN(AGAIN$),$)
+
 #checkfuncd=X,1,S
 IF(#FunCd == 4,E(0,@LbCONTROL_FG,0),E(0,@LbCONTROL_FG,1))
 IF(#FunCd == 1,HIDE(#Btn4),SHOW(#Btn4))
@@ -709,7 +715,7 @@ HELP(#BdMtrlCodeHelp)
 
 #FdBD_MATERIAL=X,2,L
 
-#BdMtrlCodeX=X,13,L
+#BdMtrlCodeX=X,25,L
 T(H,#BdMtrlCode,#BdMtrlCodeHelp)
 
 ! [建物類別]
