@@ -72,8 +72,10 @@ public class L650B extends TradeBuffer {
 			if (iDeptCodeA.equals("") || iDeptCodeA.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSA" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEA" + i)) + 191100;
+			int workMonthSA = Integer.valueOf(titaVo.getParam("WorkMonthSA" + i));
+			int workMonthEA = Integer.valueOf(titaVo.getParam("WorkMonthEA" + i));
+			iWorkMonthS += workMonthSA > 0 ? 191100 : 0;
+			iWorkMonthE += workMonthEA > 0 ? 191100 : 0;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("1");
 			iCdPfParamsId.setCondition(iDeptCodeA);
@@ -94,8 +96,10 @@ public class L650B extends TradeBuffer {
 			if (iDeptCodeB.equals("") || iDeptCodeB.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSB" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEB" + i)) + 191100;
+			int workMonthSB = Integer.valueOf(titaVo.getParam("WorkMonthSB" + i));
+			int workMonthEB = Integer.valueOf(titaVo.getParam("WorkMonthEB" + i));
+			iWorkMonthS += workMonthSB > 0 ? 191100 : 0;
+			iWorkMonthE += workMonthEB > 0 ? 191100 : 0;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("2");
 			iCdPfParamsId.setCondition(iDeptCodeB);
@@ -117,8 +121,10 @@ public class L650B extends TradeBuffer {
 			if (iDeptCodeC.equals("") || iDeptCodeC.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSC" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEC" + i)) + 191100;
+			int workMonthSC = Integer.valueOf(titaVo.getParam("WorkMonthSC" + i));
+			int workMonthEC = Integer.valueOf(titaVo.getParam("WorkMonthEC" + i));
+			iWorkMonthS += workMonthSC > 0 ? 191100 : 0;
+			iWorkMonthE += workMonthEC > 0 ? 191100 : 0;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("3");
 			iCdPfParamsId.setCondition(iDeptCodeC);
@@ -140,8 +146,10 @@ public class L650B extends TradeBuffer {
 			if (iDeptCodeD.equals("") || iDeptCodeD.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSD" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthED" + i)) + 191100;
+			int workMonthSD = Integer.valueOf(titaVo.getParam("WorkMonthSD" + i));
+			int workMonthED = Integer.valueOf(titaVo.getParam("WorkMonthED" + i));
+			iWorkMonthS += workMonthSD > 0 ? 191100 : 0;
+			iWorkMonthE += workMonthED > 0 ? 191100 : 0;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("4");
 			iCdPfParamsId.setCondition(iDeptCodeD);
@@ -163,8 +171,10 @@ public class L650B extends TradeBuffer {
 			if (iDeptCodeE.equals("") || iDeptCodeE.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSE" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEE" + i)) + 191100;
+			int workMonthSE = Integer.valueOf(titaVo.getParam("WorkMonthSE" + i));
+			int workMonthEE = Integer.valueOf(titaVo.getParam("WorkMonthEE" + i));
+			iWorkMonthS += workMonthSE > 0 ? 191100 : 0;
+			iWorkMonthE += workMonthEE > 0 ? 191100 : 0;
 			iCdPfParamsId.setConditionCode1("2");
 			iCdPfParamsId.setConditionCode2("5");
 			iCdPfParamsId.setCondition(iDeptCodeE);

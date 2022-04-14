@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
@@ -1722,33 +1724,306 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("wkDaysC = " + wkDaysC);
 		if (wkDelayBase.compareTo(wkBreachBase) == 0 && wkDays == wkDaysA + wkDaysB + wkDaysC) {
 			this.info("延遲息與違約金計算基礎相同");
-			// 2022-03-14 智偉修改
-			// 因為原系統延遲息及違約金為一個欄位運算及顯示
-			// 然而，新系統需求是要拆分為兩個欄位顯示
-			// 若分開運算後各自四捨五入，合計後會比原本合計多一元
-			// 這裡原本係數是 0.1 改為1.1 ，0.2改為1.2
-			// 下段運算再減去延遲息所代表的1的部分
-			wkBreachAmtA = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysA))
-					.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.1"))
-					.setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
-			wkBreachAmtB = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysB))
-					.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
-					.setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
-			wkBreachAmtC = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysC))
-					.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
-					.setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
+			// 2022-04-13 智偉增加
+			// 計息止日 至 入帳日期 之間若有利率變動，需分段計算違約金與延遲息
+			int tempEndDate = vCalcRepayIntVo.getEndDate();
+			dDateUtil.init();
+			dDateUtil.setDate_1(tempEndDate);
+			dDateUtil.setDays(wkDays);
+			int tempEntryDate = dDateUtil.getCalenderDay();
+//			iCustNo + "-" + iFacmNo + "-" + iBormNo
+			Slice<LoanRateChange> sLoanRateChange = loanRateChangeService.rateChangeEffectDateRange(iCustNo, iFacmNo,
+					iFacmNo, iBormNo, iBormNo, tempEndDate + 19110000, tempEntryDate + 19110000, 0, Integer.MAX_VALUE,
+					titaVo);
+			List<LoanRateChange> listLoanRateChange = sLoanRateChange == null ? new ArrayList<>()
+					: new ArrayList<>(sLoanRateChange.getContent());
 
-			if (wkDaysA > 0) {
-				this.info("A段延遲息及違約金 = " + wkBreachAmtA + " = " + wkBreachBase + " * " + vCalcRepayIntVo.getStoreRate()
-						+ " * " + wkDaysA + " / 36500 * 1.1 (逾期6個月內)");
-			}
-			if (wkDaysB > 0) {
-				this.info("B段延遲息及違約金 = " + wkBreachAmtB + " = " + wkBreachBase + " * " + vCalcRepayIntVo.getStoreRate()
-						+ " * " + wkDaysB + " / 36500 * 1.2 (逾期6個月~ 9個月)");
-			}
-			if (wkDaysC > 0) {
-				this.info("C段延遲息及違約金 = " + wkBreachAmtC + " = " + wkBreachBase + " * " + vCalcRepayIntVo.getStoreRate()
-						+ " * " + wkDaysC + " / 36500 * 1.2 (逾期10個月以上)");
+			// 2022-04-13 智偉增加
+			// 若無利率變動資料,照舊
+			if (listLoanRateChange == null || listLoanRateChange.isEmpty()) {
+				// 2022-03-14 智偉修改
+				// 因為原系統延遲息及違約金為一個欄位運算及顯示
+				// 然而，新系統需求是要拆分為兩個欄位顯示
+				// 若分開運算後各自四捨五入，合計後會比原本合計多一元
+				// 這裡原本係數是 0.1 改為1.1 ，0.2改為1.2
+				// 下段運算再減去延遲息所代表的1的部分
+				wkBreachAmtA = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysA))
+						.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.1"))
+						.setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
+				wkBreachAmtB = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysB))
+						.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
+						.setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
+				wkBreachAmtC = wkBreachBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDaysC))
+						.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
+						.setScale(9, RoundingMode.DOWN); // AS400 運算過程小數位數最多九位
+
+				if (wkDaysA > 0) {
+					this.info("A段延遲息及違約金 = " + wkBreachAmtA + " = " + wkBreachBase + " * "
+							+ vCalcRepayIntVo.getStoreRate() + " * " + wkDaysA + " / 36500 * 1.1 (逾期6個月內)");
+				}
+				if (wkDaysB > 0) {
+					this.info("B段延遲息及違約金 = " + wkBreachAmtB + " = " + wkBreachBase + " * "
+							+ vCalcRepayIntVo.getStoreRate() + " * " + wkDaysB + " / 36500 * 1.2 (逾期6個月~ 9個月)");
+				}
+				if (wkDaysC > 0) {
+					this.info("C段延遲息及違約金 = " + wkBreachAmtC + " = " + wkBreachBase + " * "
+							+ vCalcRepayIntVo.getStoreRate() + " * " + wkDaysC + " / 36500 * 1.2 (逾期10個月以上)");
+				}
+			} else {
+
+				listLoanRateChange.sort((c1, c2) -> {
+					if (c1.getEffectDate() > c2.getEffectDate()) {
+						return 1;
+					}
+					if (c1.getEffectDate() < c2.getEffectDate()) {
+						return -1;
+					}
+					return 0;
+				});
+
+				// 2022-04-13 智偉增加
+				// 若有利率變動資料,分段算
+				// 違約金A
+				// 違約金B
+				// 違約金C
+				// 延遲息
+				int startDateA = tempEndDate;// 違約金A-起日
+				dDateUtil.init();
+				dDateUtil.setDate_1(startDateA);
+				dDateUtil.setDays(wkDaysA);
+				int endDateA = dDateUtil.getCalenderDay();// 違約金A-止日
+
+				int startDateB = endDateA;// 違約金B-起日
+				dDateUtil.init();
+				dDateUtil.setDate_1(startDateB);
+				dDateUtil.setDays(wkDaysB);
+				int endDateB = dDateUtil.getCalenderDay();// 違約金B-止日
+
+				int startDateC = endDateB;// 違約金C-起日
+				dDateUtil.init();
+				dDateUtil.setDate_1(startDateC);
+				dDateUtil.setDays(wkDaysC);
+				int endDateC = dDateUtil.getCalenderDay();// 違約金C-止日
+
+				int startDateD = tempEndDate;// 延遲息-起日
+				int endDateD = tempEntryDate;// 延遲息-止日
+
+				this.info("startDateA=" + startDateA);
+				this.info("endDateA=" + endDateA);
+				this.info("startDateB=" + startDateB);
+				this.info("endDateB=" + endDateB);
+				this.info("startDateC=" + startDateC);
+				this.info("endDateC=" + endDateC);
+				this.info("startDateD=" + startDateD);
+				this.info("endDateD=" + endDateD);
+
+				wkDelayInt = BigDecimal.ZERO;
+				BigDecimal lastRateA = vCalcRepayIntVo.getStoreRate();
+				BigDecimal lastRateB = vCalcRepayIntVo.getStoreRate();
+				BigDecimal lastRateC = vCalcRepayIntVo.getStoreRate();
+				BigDecimal lastRateD = vCalcRepayIntVo.getStoreRate();
+				for (LoanRateChange tempLoanRateChange : listLoanRateChange) {
+
+					int tempEffectDate = tempLoanRateChange.getEffectDate();
+					BigDecimal tempRate = tempLoanRateChange.getFitRate();
+
+					this.info("tempEffectDate=" + tempEffectDate);
+					this.info("lastRateA=" + lastRateA);
+					this.info("tempRate=" + tempRate);
+
+					// 若利率變動日在違約金A區間
+					if (tempEffectDate >= startDateA && tempEffectDate <= endDateA) {
+
+						endDateA = tempEffectDate;
+						dDateUtil.init();
+						dDateUtil.setDate_1(startDateA);
+						dDateUtil.setDate_2(endDateA);
+						dDateUtil.dateDiff();
+						if (dDateUtil.getDays() > 0) {
+							this.info("A段延遲息及違約金(多段) startDateA = " + startDateA);
+							this.info("A段延遲息及違約金(多段) endDateA = " + endDateA);
+							this.info("A段延遲息及違約金(多段) 天數 = " + dDateUtil.getDays());
+							wkBreachAmtA = wkBreachAmtA
+									.add(wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.multiply(new BigDecimal("1.1")).setScale(9, RoundingMode.DOWN)); // AS400
+																												// 運算過程小數位數最多九位
+							this.info("A段延遲息及違約金(多段) = " + wkBreachBase + " * " + lastRateA + " * "
+									+ dDateUtil.getDays() + " / 36500 * 1.1 (逾期6個月內)");
+							this.info("A段延遲息及違約金(多段) 算式 = "
+									+ wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.multiply(new BigDecimal("1.1")).setScale(9, RoundingMode.DOWN));
+						}
+						startDateA = tempEffectDate;
+						endDateA = tempEntryDate;
+						lastRateA = tempRate;
+					}
+					// 若利率變動日在違約金B區間
+					if (tempEffectDate >= startDateB && tempEffectDate <= endDateB) {
+
+						endDateB = tempEffectDate;
+						dDateUtil.init();
+						dDateUtil.setDate_1(startDateB);
+						dDateUtil.setDate_2(endDateB);
+						dDateUtil.dateDiff();
+						if (dDateUtil.getDays() > 0) {
+							this.info("B段延遲息及違約金(多段) startDateB = " + startDateB);
+							this.info("B段延遲息及違約金(多段) endDateB = " + endDateB);
+							this.info("B段延遲息及違約金(多段) 天數 = " + dDateUtil.getDays());
+							wkBreachAmtB = wkBreachAmtB
+									.add(wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN)); // AS400
+																												// 運算過程小數位數最多九位
+							this.info("B段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateB + " * "
+									+ dDateUtil.getDays() + " / 36500 * 1.2 (逾期6個月~ 9個月)");
+							this.info("B段延遲息及違約金(多段) 此段 = "
+									+ wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN));
+						}
+						startDateB = tempEffectDate;
+						endDateB = tempEntryDate;
+						lastRateB = tempRate;
+					}
+					// 若利率變動日在違約金C區間
+					if (tempEffectDate >= startDateC && tempEffectDate <= endDateC) {
+
+						endDateC = tempEffectDate;
+						dDateUtil.init();
+						dDateUtil.setDate_1(startDateC);
+						dDateUtil.setDate_2(endDateC);
+						dDateUtil.dateDiff();
+						if (dDateUtil.getDays() > 0) {
+							this.info("C段延遲息及違約金(多段) startDateC = " + startDateC);
+							this.info("C段延遲息及違約金(多段) endDateC = " + endDateC);
+							this.info("C段延遲息及違約金(多段) 天數 = " + dDateUtil.getDays());
+							wkBreachAmtC = wkBreachAmtC
+									.add(wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN)); // AS400
+																												// 運算過程小數位數最多九位
+							this.info("C段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateC + " * "
+									+ dDateUtil.getDays() + " / 36500 * 1.2 (逾期10個月以上)");
+							this.info("C段延遲息及違約金(多段) 此段 = "
+									+ wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN));
+						}
+						startDateC = tempEffectDate;
+						endDateC = tempEntryDate;
+						lastRateC = tempRate;
+					}
+					// 若利率變動日在延遲息區間
+					if (tempEffectDate >= startDateD && tempEffectDate <= endDateD) {
+
+						endDateD = tempEffectDate;
+						dDateUtil.init();
+						dDateUtil.setDate_1(startDateD);
+						dDateUtil.setDate_2(endDateD);
+						dDateUtil.dateDiff();
+						if (dDateUtil.getDays() > 0) {
+							this.info("延遲息(多段) startDateD = " + startDateD);
+							this.info("延遲息(多段) endDateD = " + endDateD);
+							this.info("延遲息(多段) 天數 = " + dDateUtil.getDays());
+							wkDelayInt = wkDelayInt
+									.add(wkDelayBase.multiply(lastRateD).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.setScale(9, RoundingMode.DOWN));
+							this.info("延遲息(多段) 算式 =  " + wkDelayBase + " * " + lastRateD + " * " + dDateUtil.getDays()
+									+ " / 36500");
+							this.info("延遲息(多段) 此段 = "
+									+ wkDelayBase.multiply(lastRateD).multiply(new BigDecimal(dDateUtil.getDays()))
+											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+											.setScale(9, RoundingMode.DOWN));
+						}
+						startDateD = tempEffectDate;
+						endDateD = tempEntryDate;
+						lastRateD = tempRate;
+					}
+				}
+				// 若違約金A仍有剩餘天數
+				dDateUtil.init();
+				dDateUtil.setDate_1(startDateA);
+				dDateUtil.setDate_2(endDateA);
+				dDateUtil.dateDiff();
+				if (dDateUtil.getDays() > 0) {
+					this.info("A段延遲息及違約金(多段) startDateA = " + startDateA);
+					this.info("A段延遲息及違約金(多段) endDateA = " + endDateA);
+					this.info("A段延遲息及違約金(多段) 天數 = " + dDateUtil.getDays());
+					wkBreachAmtA = wkBreachAmtA
+							.add(wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
+									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.1"))
+									.setScale(9, RoundingMode.DOWN)); // AS400
+																		// 運算過程小數位數最多九位
+					this.info("A段延遲息及違約金(多段) = " + wkBreachBase + " * " + lastRateA + " * " + dDateUtil.getDays()
+							+ " / 36500 * 1.1 (逾期6個月內)");
+					this.info("A段延遲息及違約金(多段) 算式 = "
+							+ wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
+									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.1"))
+									.setScale(9, RoundingMode.DOWN));
+				}
+				// 若違約金B仍有剩餘天數
+				dDateUtil.init();
+				dDateUtil.setDate_1(startDateB);
+				dDateUtil.setDate_2(endDateB);
+				dDateUtil.dateDiff();
+				if (dDateUtil.getDays() > 0) {
+					this.info("B段延遲息及違約金(多段) startDateB = " + startDateB);
+					this.info("B段延遲息及違約金(多段) endDateB = " + endDateB);
+					this.info("B段延遲息及違約金(多段) 天數 = " + dDateUtil.getDays());
+					wkBreachAmtB = wkBreachAmtB
+							.add(wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
+									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
+									.setScale(9, RoundingMode.DOWN)); // AS400
+																		// 運算過程小數位數最多九位
+					this.info("B段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateB + " * " + dDateUtil.getDays()
+							+ " / 36500 * 1.2 (逾期6個月~ 9個月)");
+					this.info("B段延遲息及違約金(多段) 此段 = "
+							+ wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
+									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
+									.setScale(9, RoundingMode.DOWN));
+				}
+				// 若違約金C仍有剩餘天數
+				dDateUtil.init();
+				dDateUtil.setDate_1(startDateC);
+				dDateUtil.setDate_2(endDateC);
+				dDateUtil.dateDiff();
+				if (dDateUtil.getDays() > 0) {
+					this.info("C段延遲息及違約金(多段) startDateC = " + startDateC);
+					this.info("C段延遲息及違約金(多段) endDateC = " + endDateC);
+					this.info("C段延遲息及違約金(多段) 天數 = " + dDateUtil.getDays());
+					wkBreachAmtC = wkBreachAmtC
+							.add(wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
+									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
+									.setScale(9, RoundingMode.DOWN)); // AS400
+																		// 運算過程小數位數最多九位
+					this.info("C段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateC + " * " + dDateUtil.getDays()
+							+ " / 36500 * 1.2 (逾期10個月以上)");
+					this.info("C段延遲息及違約金(多段) 此段 = "
+							+ wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
+									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
+									.setScale(9, RoundingMode.DOWN));
+				}
+				// 若延遲息仍有剩餘天數
+				dDateUtil.init();
+				dDateUtil.setDate_1(startDateD);
+				dDateUtil.setDate_2(endDateD);
+				dDateUtil.dateDiff();
+				if (dDateUtil.getDays() > 0) {
+					this.info("延遲息(多段) startDateD = " + startDateD);
+					this.info("延遲息(多段) endDateD = " + endDateD);
+					this.info("延遲息(多段) 天數 = " + dDateUtil.getDays());
+					wkDelayInt = wkDelayInt.add(wkDelayBase.multiply(lastRateD)
+							.multiply(new BigDecimal(dDateUtil.getDays()))
+							.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(9, RoundingMode.DOWN));
+					this.info("延遲息(多段) 算式 =  " + wkDelayBase + " * " + lastRateD + " * " + dDateUtil.getDays()
+							+ " / 36500");
+					this.info("延遲息(多段) 此段 = " + wkDelayBase.multiply(lastRateD)
+							.multiply(new BigDecimal(dDateUtil.getDays()))
+							.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(9, RoundingMode.DOWN));
+				}
 			}
 		} else {
 			this.info("延遲息與違約金計算基礎不同");

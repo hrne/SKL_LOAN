@@ -44,8 +44,8 @@ public class L6R41 extends TradeBuffer {
 
 		if (aCdPfParms != null) {
 			totaVo.putParam("L6R41YesNoA", aCdPfParms.getContent().get(0).getCondition());
-			totaVo.putParam("L6R41WorkMonthSA", aCdPfParms.getContent().get(0).getWorkMonthStart() - 191100);
-			totaVo.putParam("L6R41WorkMonthEA", aCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100);
+			totaVo.putParam("L6R41WorkMonthSA", Math.max(aCdPfParms.getContent().get(0).getWorkMonthStart() - 191100, 0)); // 工作月欄位接受輸入0, 避免-191100的情況,
+			totaVo.putParam("L6R41WorkMonthEA", Math.max(aCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100, 0));   // 用 Math.max(wm, 0) 做斜坡修正
 		} else {
 			totaVo.putParam("L6R41YesNoA", "");
 			totaVo.putParam("L6R41WorkMonthSA", "");
@@ -54,8 +54,8 @@ public class L6R41 extends TradeBuffer {
 
 		if (bCdPfParms != null) {
 			totaVo.putParam("L6R41YesNoB", bCdPfParms.getContent().get(0).getCondition());
-			totaVo.putParam("L6R41WorkMonthSB", bCdPfParms.getContent().get(0).getWorkMonthStart() - 191100);
-			totaVo.putParam("L6R41WorkMonthEB", bCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100);
+			totaVo.putParam("L6R41WorkMonthSB", Math.max(bCdPfParms.getContent().get(0).getWorkMonthStart() - 191100, 0));
+			totaVo.putParam("L6R41WorkMonthEB", Math.max(bCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100, 0));
 		} else {
 			totaVo.putParam("L6R41YesNoB", "");
 			totaVo.putParam("L6R41WorkMonthSB", "");
@@ -64,8 +64,8 @@ public class L6R41 extends TradeBuffer {
 
 		if (cCdPfParms != null) {
 			totaVo.putParam("L6R41YesNoC", cCdPfParms.getContent().get(0).getCondition());
-			totaVo.putParam("L6R41WorkMonthSC", cCdPfParms.getContent().get(0).getWorkMonthStart() - 191100);
-			totaVo.putParam("L6R41WorkMonthEC", cCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100);
+			totaVo.putParam("L6R41WorkMonthSC", Math.max(cCdPfParms.getContent().get(0).getWorkMonthStart() - 191100, 0));
+			totaVo.putParam("L6R41WorkMonthEC", Math.max(cCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100, 0));
 		} else {
 			totaVo.putParam("L6R41YesNoC", "");
 			totaVo.putParam("L6R41WorkMonthSC", "");
@@ -74,8 +74,8 @@ public class L6R41 extends TradeBuffer {
 
 		if (dCdPfParms != null) {
 			totaVo.putParam("L6R41YesNoD", dCdPfParms.getContent().get(0).getCondition());
-			totaVo.putParam("L6R41WorkMonthSD", dCdPfParms.getContent().get(0).getWorkMonthStart() - 191100);
-			totaVo.putParam("L6R41WorkMonthED", dCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100);
+			totaVo.putParam("L6R41WorkMonthSD", Math.max(dCdPfParms.getContent().get(0).getWorkMonthStart() - 191100, 0));
+			totaVo.putParam("L6R41WorkMonthED", Math.max(dCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100, 0));
 		} else {
 			totaVo.putParam("L6R41YesNoD", "");
 			totaVo.putParam("L6R41WorkMonthSD", "");
@@ -84,8 +84,8 @@ public class L6R41 extends TradeBuffer {
 
 		if (eCdPfParms != null) {
 			totaVo.putParam("L6R41YesNoE", eCdPfParms.getContent().get(0).getCondition());
-			totaVo.putParam("L6R41WorkMonthSE", eCdPfParms.getContent().get(0).getWorkMonthStart() - 191100);
-			totaVo.putParam("L6R41WorkMonthEE", eCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100);
+			totaVo.putParam("L6R41WorkMonthSE", Math.max(eCdPfParms.getContent().get(0).getWorkMonthStart() - 191100, 0));
+			totaVo.putParam("L6R41WorkMonthEE", Math.max(eCdPfParms.getContent().get(0).getWorkMonthEnd() - 191100, 0));
 		} else {
 			totaVo.putParam("L6R41YesNoE", "");
 			totaVo.putParam("L6R41WorkMonthSE", "");

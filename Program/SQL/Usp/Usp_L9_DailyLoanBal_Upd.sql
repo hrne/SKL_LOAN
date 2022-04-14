@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L9_DailyLoanBal_Upd" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_DailyLoanBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -87,8 +87,16 @@ BEGIN
            LEFT  JOIN   "LoanRateChange" R ON R."CustNo" = B."CustNo"
                                           AND R."FacmNo" = B."FacmNo"
                                           AND R."BormNo" = B."BormNo"
-                                          AND R."EffectDate" >= B."PrevPayIntDate" 
-                                          AND R."EffectDate" <= TBSDYF
+                                          AND CASE
+                                                -- 一般情況
+                                                WHEN R."EffectDate" >= B."PrevPayIntDate" 
+                                                     AND R."EffectDate" <= TBSDYF
+                                                THEN 1
+                                                -- 利息繳超過的情況 2022-04-13 新增
+                                                WHEN B."PrevPayIntDate" >= TBSDYF 
+                                                     AND R."EffectDate" <= TBSDYF
+                                                THEN 1
+                                              ELSE 0 END = 1
            WHERE B."Status" in (0,1,2,3,4,5,6,7,8,9)   
           ) M
      LEFT  JOIN  "DailyLoanBal" D ON D."CustNo" = M."CustNo"

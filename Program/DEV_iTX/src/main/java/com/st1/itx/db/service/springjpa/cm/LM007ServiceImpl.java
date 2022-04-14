@@ -40,7 +40,6 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4EntAmt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' AND S1.\"EntCode\" = '1' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4Amt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '990' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"ColAmt\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" IN ('310','320','330','340','990') THEN (S1.\"TxAmt\") ELSE 0 END) AS \"TotalAmt\"";
 		sql += "      FROM(SELECT A.\"AcSubBookCode\" AS F0";
 		sql += "                 ,MOD(TRUNC(A.\"AcDate\" / 100), 100) AS \"AcMonth\"";
 		sql += "                 ,DECODE (L.\"Status\", 5, '990', F.\"AcctCode\") AS \"AcctCode\"";

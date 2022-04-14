@@ -56,8 +56,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXA" + r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSA" + r, Integer.valueOf(aaCdPfParms.getWorkMonthStart()) - 191100);
-				totaVo.putParam("L6R38WorkMonthEA" + r, Integer.valueOf(aaCdPfParms.getWorkMonthEnd()) - 191100);
+				totaVo.putParam("L6R38WorkMonthSA" + r, Math.max(aaCdPfParms.getWorkMonthStart() - 191100, 0)); // 工作月欄位接受輸入0, 避免-191100的情況,
+				totaVo.putParam("L6R38WorkMonthEA" + r, Math.max(aaCdPfParms.getWorkMonthEnd() - 191100, 0));   // 用 Math.max(wm, 0) 做斜坡修正
 				r++;
 			}
 		}
@@ -78,8 +78,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXB" + r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSB" + r, Integer.valueOf(bbCdPfParms.getWorkMonthStart()) - 191100);
-				totaVo.putParam("L6R38WorkMonthEB" + r, Integer.valueOf(bbCdPfParms.getWorkMonthEnd()) - 191100);
+				totaVo.putParam("L6R38WorkMonthSB" + r, Math.max(bbCdPfParms.getWorkMonthStart() - 191100, 0));
+				totaVo.putParam("L6R38WorkMonthEB" + r, Math.max(bbCdPfParms.getWorkMonthEnd() - 191100, 0));
 				r++;
 			}
 		}
@@ -100,8 +100,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXC" + r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSC" + r, Integer.valueOf(ccCdPfParms.getWorkMonthStart()) - 191100);
-				totaVo.putParam("L6R38WorkMonthEC" + r, Integer.valueOf(ccCdPfParms.getWorkMonthEnd()) - 191100);
+				totaVo.putParam("L6R38WorkMonthSC" + r, Math.max(ccCdPfParms.getWorkMonthStart() - 191100, 0));
+				totaVo.putParam("L6R38WorkMonthEC" + r, Math.max(ccCdPfParms.getWorkMonthEnd() - 191100, 0));
 				r++;
 			}
 		}
@@ -122,8 +122,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXD" + r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSD" + r, Integer.valueOf(ddCdPfParms.getWorkMonthStart()) - 191100);
-				totaVo.putParam("L6R38WorkMonthED" + r, Integer.valueOf(ddCdPfParms.getWorkMonthEnd()) - 191100);
+				totaVo.putParam("L6R38WorkMonthSD" + r, Math.max(ddCdPfParms.getWorkMonthStart() - 191100, 0));
+				totaVo.putParam("L6R38WorkMonthED" + r, Math.max(ddCdPfParms.getWorkMonthEnd() - 191100, 0));
 				r++;
 			}
 		}
@@ -144,8 +144,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXE" + r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSE" + r, Integer.valueOf(eeCdPfParms.getWorkMonthStart()) - 191100);
-				totaVo.putParam("L6R38WorkMonthEE" + r, Integer.valueOf(eeCdPfParms.getWorkMonthEnd()) - 191100);
+				totaVo.putParam("L6R38WorkMonthSE" + r, Math.max(eeCdPfParms.getWorkMonthStart() - 191100, 0));
+				totaVo.putParam("L6R38WorkMonthEE" + r, Math.max(eeCdPfParms.getWorkMonthEnd() - 191100, 0));
 				r++;
 			}
 		}

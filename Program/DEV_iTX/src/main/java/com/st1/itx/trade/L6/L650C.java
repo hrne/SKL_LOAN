@@ -63,7 +63,7 @@ public class L650C extends TradeBuffer {
 		String iYesNoC = titaVo.getParam("YesNoC");
 		String iYesNoD = titaVo.getParam("YesNoD");
 		String iYesNoE = titaVo.getParam("YesNoE");
-		int iWorkMonthSA = Integer.valueOf(titaVo.getParam("WorkMonthSA")) + 191100;
+		int iWorkMonthSA = Integer.valueOf(titaVo.getParam("WorkMonthSA"));
 		int iWorkMonthEA = Integer.valueOf(titaVo.getParam("WorkMonthEA")) + 191100;
 		int iWorkMonthSB = Integer.valueOf(titaVo.getParam("WorkMonthSB")) + 191100;
 		int iWorkMonthEB = Integer.valueOf(titaVo.getParam("WorkMonthEB")) + 191100;
@@ -73,6 +73,17 @@ public class L650C extends TradeBuffer {
 		int iWorkMonthED = Integer.valueOf(titaVo.getParam("WorkMonthED")) + 191100;
 		int iWorkMonthSE = Integer.valueOf(titaVo.getParam("WorkMonthSE")) + 191100;
 		int iWorkMonthEE = Integer.valueOf(titaVo.getParam("WorkMonthEE")) + 191100;
+		
+		iWorkMonthSA += iWorkMonthSA > 0 ? 191100 : 0;
+		iWorkMonthSB += iWorkMonthSB > 0 ? 191100 : 0;
+		iWorkMonthSC += iWorkMonthSC > 0 ? 191100 : 0;
+		iWorkMonthSD += iWorkMonthSD > 0 ? 191100 : 0;
+		iWorkMonthSE += iWorkMonthSE > 0 ? 191100 : 0;
+		iWorkMonthEA += iWorkMonthEA > 0 ? 191100 : 0;
+		iWorkMonthEB += iWorkMonthEB > 0 ? 191100 : 0;
+		iWorkMonthEC += iWorkMonthEC > 0 ? 191100 : 0;
+		iWorkMonthED += iWorkMonthED > 0 ? 191100 : 0;
+		iWorkMonthEE += iWorkMonthEE > 0 ? 191100 : 0;
 
 		// 業績全部
 		if (!iYesNoA.trim().isEmpty()) {

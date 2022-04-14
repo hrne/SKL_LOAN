@@ -178,11 +178,14 @@ T(2,#OOTranNo+ +#OOTranItem)
 
 ! 交易序號(TOTA)
 #OOTxSeq=X,18,S
-#OOTxSeqX=X,8,L
-T(1,#OOTxSeq,11,8)
 
 ! 交易時間(TOTA)
 #OODateTime=X,18,L
+
+#OOTlrNoItem=X,27,L
+T(2,#OOTlrNo+ +#OOTlrItem)
+#OOSupNoItem=X,27,L
+T(2,#OOSupNo+ +#OOSupItem)
 
 </sub>
 
@@ -232,28 +235,25 @@ TXFORM=L6044
 #any={detail:true, header:'L6044.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOEntdy=會計日期
-{width:70,align:'center'}
+{width:75,align:'center'}
 
-#OOSupItem=授權主管
-{width:80,align:'center'}
+#OOSupNoItem=授權主管
+{width:95,align:'left'}
 
-#OOTlrItem=交易經辦
-{width:80,align:'center'}
-
-#OOTradeReason=交易理由
-{width:70,align:'center'}
+#OOTlrNoItem=交易經辦
+{width:95,align:'left'}
 
 #OOReasonAuth=授權編號與理由
-{width:300,align:'left'}
+{width:400,align:'left'}
 
 #OOTranItemX=交易代號
-{width:250,align:'left'}
+{width:350,align:'left'}
 
 #OODateTime=交易時間
-{width:150,align:'center'}
+{width:130,align:'left'}
 
-#OOTxSeqX=交易序號
-{width:80,align:'center'}
+#OOTxSeq=交易序號
+{width:130,align:'left'}
 
 ^
 

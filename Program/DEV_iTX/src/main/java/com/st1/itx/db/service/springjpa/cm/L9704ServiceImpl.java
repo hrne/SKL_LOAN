@@ -91,8 +91,6 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY NVL(LASTM.\"AcSubBookCode\", THISM.\"AcSubBookCode\") ";
 		sql += "        , F.\"CustNo\" ";
 		sql += "        , F.\"FacmNo\" ";
-		sql += " ; ";
-
 
 		this.info("sql=" + sql);
 		Query query;

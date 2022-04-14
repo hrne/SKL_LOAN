@@ -72,8 +72,10 @@ public class L650A extends TradeBuffer {
 			if (iProdNoA.equals("") || iProdNoA.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSA" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEA" + i)) + 191100;
+			int workMonthSA = Integer.valueOf(titaVo.getParam("WorkMonthSA" + i));
+			int workMonthEA = Integer.valueOf(titaVo.getParam("WorkMonthEA" + i));
+			iWorkMonthS = workMonthSA > 0 ? workMonthSA + 191100 : 0;
+			iWorkMonthE = workMonthEA > 0 ? workMonthEA + 191100 : 0;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("1");
 			iCdPfParamsId.setCondition(iProdNoA);
@@ -94,8 +96,10 @@ public class L650A extends TradeBuffer {
 			if (iProdNoB.equals("") || iProdNoB.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSB" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEB" + i)) + 191100;
+			int workMonthSB = Integer.valueOf(titaVo.getParam("WorkMonthSB" + i));
+			int workMonthEB = Integer.valueOf(titaVo.getParam("WorkMonthEB" + i));
+			iWorkMonthS = workMonthSB > 0 ? workMonthSB + 191100 : 0;
+			iWorkMonthE = workMonthEB > 0 ? workMonthEB + 191100 : 0;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("2");
 			iCdPfParamsId.setCondition(iProdNoB);
@@ -117,8 +121,10 @@ public class L650A extends TradeBuffer {
 			if (iProdNoC.equals("") || iProdNoC.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSC" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEC" + i)) + 191100;
+			int workMonthSC = Integer.valueOf(titaVo.getParam("WorkMonthSC" + i));
+			int workMonthEC = Integer.valueOf(titaVo.getParam("WorkMonthEC" + i));
+			iWorkMonthS = workMonthSC > 0 ? workMonthSC + 191100 : 0;
+			iWorkMonthE = workMonthEC > 0 ? workMonthEC + 191100 : 0;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("3");
 			iCdPfParamsId.setCondition(iProdNoC);
@@ -140,8 +146,10 @@ public class L650A extends TradeBuffer {
 			if (iProdNoD.equals("") || iProdNoD.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSD" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthED" + i)) + 191100;
+			int workMonthSD = Integer.valueOf(titaVo.getParam("WorkMonthSD" + i));
+			int workMonthED = Integer.valueOf(titaVo.getParam("WorkMonthED" + i));
+			iWorkMonthS = workMonthSD > 0 ? workMonthSD + 191100 : 0;
+			iWorkMonthE = workMonthED > 0 ? workMonthED + 191100 : 0;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("4");
 			iCdPfParamsId.setCondition(iProdNoD);
@@ -163,8 +171,10 @@ public class L650A extends TradeBuffer {
 			if (iProdNoE.equals("") || iProdNoE.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSE" + i)) + 191100;
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEE" + i)) + 191100;
+			int workMonthSE = Integer.valueOf(titaVo.getParam("WorkMonthSE" + i));
+			int workMonthEE = Integer.valueOf(titaVo.getParam("WorkMonthEE" + i));
+			iWorkMonthS = workMonthSE > 0 ? workMonthSE + 191100 : 0;
+			iWorkMonthE = workMonthEE > 0 ? workMonthEE + 191100 : 0;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("5");
 			iCdPfParamsId.setCondition(iProdNoE);
@@ -178,18 +188,6 @@ public class L650A extends TradeBuffer {
 			}
 			i++;
 		}
-//		int newWorkMonth =0;
-//		rCdPfParamsId.setCondition(" ");
-//		rCdPfParamsId.setConditionCode1("R");
-//		rCdPfParamsId.setConditionCode2(" ");
-//		rCdPfParms = iCdPfParmsService.holdById(rCdPfParamsId, titaVo);
-//		rCdPfParms.setWorkMonthEnd(0);
-//		rCdPfParms.setWorkMonthStart(newWorkMonth);
-//		try {
-//			iCdPfParmsService.udpate(iCdPfParams, titaVo);
-//		}catch (DBException e) {
-//			throw new LogicException("E0005", "排除商品別-協辦獎金");
-//		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

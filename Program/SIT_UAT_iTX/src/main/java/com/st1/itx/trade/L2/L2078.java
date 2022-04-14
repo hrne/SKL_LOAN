@@ -67,7 +67,8 @@ public class L2078 extends TradeBuffer {
 		List<ForeclosureFee> lForeclosureFee = new ArrayList<ForeclosureFee>();
 
 		// 依tita值查詢
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.selectForL2078(iReceiveDateStart, iReceiveDateEnd, iCustNoStart, CustNoEnd, this.index, this.limit, titaVo);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.selectForL2078(iReceiveDateStart,
+				iReceiveDateEnd, iCustNoStart, CustNoEnd, this.index, this.limit, titaVo);
 
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		// 查無資料 拋錯
@@ -80,16 +81,36 @@ public class L2078 extends TradeBuffer {
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
+
+//		BigDecimal iFeeTotal = BigDecimal.ZERO;
+//		BigDecimal iOvduFeeTotal = BigDecimal.ZERO;
+		int iFeeTotal     = 0;
+		int iOvduFeeTotal = 0;
+
 		for (ForeclosureFee tForeclosureFee : lForeclosureFee) {
 
 			// new occurs
 			OccursList occursList = new OccursList();
-
 			// 催收註記
 			if (tForeclosureFee.getOverdueDate() != 0) {
 				overdueCode = "Y";
 			} else {
 				overdueCode = "";
+			}
+
+			int oFee = tForeclosureFee.getFee().intValue();
+			int ioOverdueData = tForeclosureFee.getOverdueDate();
+			int ioCloseDate = tForeclosureFee.getCloseDate();
+			// 有銷號日期的為已還完費用
+			// 有催收無銷帳日期 - > 催收法務費
+			if (ioOverdueData != 0 && ioCloseDate == 0) {
+				this.info("這裡是催收法務費");
+				iOvduFeeTotal += oFee;
+			} else
+			// 無催收無銷帳日期 - > 法拍費用
+			if (ioOverdueData == 0 && ioCloseDate == 0) {
+				this.info("這裡是法拍費用");
+				iFeeTotal += oFee;
 			}
 
 			occursList.putParam("OORecordNo", tForeclosureFee.getRecordNo());
@@ -114,8 +135,10 @@ public class L2078 extends TradeBuffer {
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
-		}
 
+		}
+		this.totaVo.putParam("FeeTotal", iFeeTotal);
+		this.totaVo.putParam("OvduFeeTotal", iOvduFeeTotal);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

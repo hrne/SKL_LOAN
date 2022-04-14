@@ -95,12 +95,12 @@ C(4,#EmpNo{i},S,$)
 ! 起始年月1~30
 #WorkMonthS{i}=A,5,I
 C(4,#EmpNo{i},S,$)
-@A(YM13,1,#WorkMonthS{i})
+@A(YM13,0,#WorkMonthS{i})
 
 ! 結束年月1~30
 #WorkMonthE{i}=A,5,I
 C(4,#EmpNo{i},S,$)
-@C(3,#WorkMonthE{i},0,S,A(YM13,1,#WorkMonthE{i}))
+@C(3,#WorkMonthE{i},0,s,A(YM13,1,#WorkMonthE{i}))
 IF(#WorkMonthS{i}>#WorkMonthE{i},V(P,止月不可小於起月),$)
 ##end
 

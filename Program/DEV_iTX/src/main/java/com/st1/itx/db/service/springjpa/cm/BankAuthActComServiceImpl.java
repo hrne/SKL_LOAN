@@ -32,7 +32,6 @@ public class BankAuthActComServiceImpl extends ASpringJpaParm implements Initial
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> doQuery(int custNo, int facmNo, int adjDate, TitaVo titaVo) throws Exception {
 
 		sql = " ";
@@ -47,7 +46,6 @@ public class BankAuthActComServiceImpl extends ASpringJpaParm implements Initial
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> getAcctSeq(int custNo, String depCode, TitaVo titaVo) throws Exception {
 
 		sql = "";

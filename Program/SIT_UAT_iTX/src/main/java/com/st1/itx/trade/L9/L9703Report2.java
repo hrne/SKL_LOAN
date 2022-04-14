@@ -364,8 +364,8 @@ public class L9703Report2 extends MakeReport {
 			}
 		}
 
-		printCm(4, 28, payIntAcct);
-		printCm(14, 28, payPriAcct);
+		printCm(4, 29, payIntAcct);
+		printCm(14, 29, payPriAcct);
 	}
 
 	// 顯示民國年

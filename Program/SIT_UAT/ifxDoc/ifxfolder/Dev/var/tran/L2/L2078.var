@@ -173,6 +173,11 @@ E(0,4)
 #FUNC5=A,1,S
 E(0,5)
 
+!法拍費用
+#FeeTotal=m,14,L
+
+!催收法務費
+#OvduFeeTotal=m,14,L
 
 #OOCurrencyCode=X,3,O
 T(3,TWD)
@@ -284,6 +289,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2602; ntxbuf=#OOBUF5})
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L2078
+#FeeTotal
+#OvduFeeTotal
 #OORecordNo
 #OOReceiveDate
 #OOCustNo
@@ -308,7 +315,8 @@ TXFORM=L2078
 <sub type="PART" name="L2078" layout="cols=1;screen.width=[100,1000];printer.width=[15,30]">
 [
 ["[L2078]                                 法拍費用明細資料查詢"],
-[""],
+["法拍費用",#FeeTotal],
+["催收法務費",#OvduFeeTotal],
 ]
 </sub>
 !---------- 單據輸出組合 ----------

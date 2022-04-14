@@ -86,8 +86,11 @@ T(4,CHAIN$)
 #NTXBUF=X,4,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
+#BUF0=X,50,S
+T(2,1+0000000000000000000000000000000000000000000000000)
+
 #button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L8204; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+T(2,{cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF0; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增記錄)
 K(MODIFYBUTTON,查詢)
 
@@ -226,8 +229,8 @@ X(#OOActualRepayAmt1)
 #OOTxSno=A,2,S
 
 ! 修改的按鈕
-#OOBUF2=X,21,S
-T(2,2+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
+#OOBUF2=X,50,S
+T(2,2+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OORepayAmt)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=修改;ntxbuf=#OOBUF2})
@@ -240,22 +243,22 @@ T(2,#OOCustNo+#OOFacmNo+#OOBormNo+#OOActualRepayDate)
 BIND(grid,{cmd=CHAIN;ntxcd=L3005;text=明細;ntxbuf=#OOBUF3})
 
 ! 刪除的按鈕
-#OOBUF4=X,21,S
-T(2,4+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
+#OOBUF4=X,50,S
+T(2,4+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OORepayAmt)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=刪除;ntxbuf=#OOBUF4})
 
 ! 查詢的按鈕
-#OOBUF5=X,21,S
-T(2,5+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
+#OOBUF5=X,50,S
+T(2,5+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OORepayAmt)
 
 #OOBTN5=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=查詢;ntxbuf=#OOBUF5})
 
 ! 複製的按鈕
-#OOBUF6=X,21,S
-T(2,3+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo)
+#OOBUF6=X,50,S
+T(2,3+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OORepayAmt)
 
 #OOBTN6=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=複製;ntxbuf=#OOBUF6})

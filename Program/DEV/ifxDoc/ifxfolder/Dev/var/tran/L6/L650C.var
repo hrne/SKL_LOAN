@@ -85,11 +85,11 @@ C(4,#YesNoA,S,C(5,#YesNoA,Y,T(2,排除),S))
 #WorkMonthSA=A,5,I
 C(4,#YesNoA,S,$)
 C(5,#YesNoA,Y,$,S)
-@A(YM13,1,#WorkMonthSA)
+@A(YM13,0,#WorkMonthSA)
 #WorkMonthEA=A,5,I
 C(4,#YesNoA,S,$)
 C(5,#YesNoA,Y,$,S)
-@C(3,#WorkMonthEA,0,S,A(YM13,1,#WorkMonthEA))
+@C(3,#WorkMonthEA,0,s,A(YM13,1,#WorkMonthEA))
 IF(#WorkMonthSA>#WorkMonthEA,V(P,止月不可小於起月),$)
 ! 排除15日薪非業績人員-換算業績、業務報酬
 #YesNoB=X,1,I
@@ -99,11 +99,11 @@ C(4,#YesNoB,S,C(5,#YesNoB,Y,T(2,排除),S))
 #WorkMonthSB=A,5,I
 C(4,#YesNoB,S,$)
 C(5,#YesNoB,Y,$,S)
-@A(YM13,1,#WorkMonthSB)
+@A(YM13,0,#WorkMonthSB)
 #WorkMonthEB=A,5,I
 C(4,#YesNoB,S,$)
 C(5,#YesNoB,Y,$,S)
-@C(3,#WorkMonthEB,0,S,A(YM13,1,#WorkMonthEB))
+@C(3,#WorkMonthEB,0,s,A(YM13,1,#WorkMonthEB))
 IF(#WorkMonthSB>#WorkMonthEB,V(P,止月不可小於起月),$)
 ! 排除15日薪非業績人員-介紹獎金
 #YesNoC=X,1,I
@@ -113,11 +113,11 @@ C(4,#YesNoC,S,C(5,#YesNoC,Y,T(2,排除),S))
 #WorkMonthSC=A,5,I
 C(4,#YesNoC,S,$)
 C(5,#YesNoC,Y,$,S)
-@A(YM13,1,#WorkMonthSC)
+@A(YM13,0,#WorkMonthSC)
 #WorkMonthEC=A,5,I
 C(4,#YesNoC,S,$)
 C(5,#YesNoC,Y,$,S)
-@C(3,#WorkMonthEC,0,S,A(YM13,1,#WorkMonthEC))
+@C(3,#WorkMonthEC,0,s,A(YM13,1,#WorkMonthEC))
 IF(#WorkMonthSC>#WorkMonthEC,V(P,止月不可小於起月),$)
 ! 排除15日薪非業績人員-加碼獎勵津貼
 #YesNoD=X,1,I
@@ -127,11 +127,11 @@ C(4,#YesNoD,S,C(5,#YesNoD,Y,T(2,排除),S))
 #WorkMonthSD=A,5,I
 C(4,#YesNoD,S,$)
 C(5,#YesNoD,Y,$,S)
-@A(YM13,1,#WorkMonthSD)
+@A(YM13,0,#WorkMonthSD)
 #WorkMonthED=A,5,I
 C(4,#YesNoD,S,$)
 C(5,#YesNoD,Y,$,S)
-@C(3,#WorkMonthED,0,S,A(YM13,1,#WorkMonthED))
+@C(3,#WorkMonthED,0,s,A(YM13,1,#WorkMonthED))
 IF(#WorkMonthSD>#WorkMonthED,V(P,止月不可小於起月),$)
 ! 排除15日薪非業績人員-協辦獎金
 #YesNoE=X,1,I
@@ -141,11 +141,11 @@ C(4,#YesNoE,S,C(5,#YesNoE,Y,T(2,排除),S))
 #WorkMonthSE=A,5,I
 C(4,#YesNoE,S,$)
 C(5,#YesNoE,Y,$,S)
-@A(YM13,1,#WorkMonthSE)
+@A(YM13,0,#WorkMonthSE)
 #WorkMonthEE=A,5,I
 C(4,#YesNoE,S,$)
 C(5,#YesNoE,Y,$,S)
-@C(3,#WorkMonthEE,0,S,A(YM13,1,#WorkMonthEE))
+@C(3,#WorkMonthEE,0,s,A(YM13,1,#WorkMonthEE))
 IF(#WorkMonthSE>#WorkMonthEE,V(P,止月不可小於起月),$)
 </sub>
 

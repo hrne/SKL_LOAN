@@ -537,7 +537,8 @@ BEGIN
     SELECT 'T10'               AS "AcctCode"         -- 業務科目代號
           ,LPAD(S1."LMSACN",7,0)
                                AS "CustNo"           -- 戶號
-          ,LPAD(S1."LMSAPN",3,0)
+          ,LPAD(0,3,0)
+          -- ,LPAD(S1."LMSAPN",3,0)
                                AS "FacmNo"           -- 額度編號
           ,' '                 AS "RvNo"             -- 銷帳編號
           ,S2."AcNoCode"       AS "AcNoCode"         -- 科目代號

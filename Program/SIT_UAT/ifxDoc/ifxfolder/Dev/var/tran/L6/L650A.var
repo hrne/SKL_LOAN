@@ -191,13 +191,13 @@ C(4,#ProdNoA{i},S,$)
 #WorkMonthSA{i}=A,5,I
 IF(#PageFg==1,$,CALL(#Show1))
 C(4,#ProdNoA{j},S,$)
-@C(4,#ProdNoA{i},S,A(YM13,1,#WorkMonthSA{i}))
+@C(4,#ProdNoA{i},S,A(YM13,0,#WorkMonthSA{i}))
 
 #WorkMonthEA{i}=A,5,I
 IF(#PageFg==1,$,CALL(#Show1))
 C(4,#ProdNoA{j},S,$)
 @C(4,#ProdNoA{i},S,$)
-C(3,#WorkMonthEA{i},0,S,A(YM13,1,#WorkMonthEA{i}))
+C(3,#WorkMonthEA{i},0,s,A(YM13,0,#WorkMonthEA{i}))
 IF(#WorkMonthSA{i}>#WorkMonthEA{i},V(P,止月不可小於起月),$)
 ##end
 
@@ -233,13 +233,13 @@ C(4,#ProdNoB{i},S,$)
 #WorkMonthSB{i}=A,5,I
 IF(#PageFg==2,$,CALL(#Show2))
 C(4,#ProdNoB{j},S,$)
-@C(4,#ProdNoB{i},S,A(YM13,1,#WorkMonthSB{i}))
+@C(4,#ProdNoB{i},S,A(YM13,0,#WorkMonthSB{i}))
 
 #WorkMonthEB{i}=A,5,I
 IF(#PageFg==2,$,CALL(#Show2))
 C(4,#ProdNoB{j},S,$)
 @C(4,#ProdNoB{i},S,$)
-C(3,#WorkMonthEB{i},0,S,A(YM13,1,#WorkMonthEB{i}))
+C(3,#WorkMonthEB{i},0,s,A(YM13,0,#WorkMonthEB{i}))
 IF(#WorkMonthSB{i}>#WorkMonthEB{i},V(P,止月不可小於起月),$)
 ##end
 
@@ -274,15 +274,15 @@ C(4,#ProdNoC{i},S,$)
 #WorkMonthSC{i}=A,5,I
 IF(#PageFg==3,$,CALL(#Show3))
 C(4,#ProdNoC{j},S,$)
-@C(4,#ProdNoC{i},S,A(YM13,1,#WorkMonthSC{i}))
+@C(4,#ProdNoC{i},S,A(YM13,0,#WorkMonthSC{i}))
 
 #WorkMonthEC{i}=A,5,I
 IF(#PageFg==3,$,CALL(#Show3))
 C(4,#ProdNoC{j},S,$)
 @C(4,#ProdNoC{i},S,$)
-C(3,#WorkMonthEC{i},0,S,A(YM13,1,#WorkMonthEC{i}))
+C(3,#WorkMonthEC{i},0,s,A(YM13,0,#WorkMonthEC{i}))
 IF(#WorkMonthSC{i}>#WorkMonthEC{i},V(P,止月不可小於起月),$)
-##end
+##end-
 
 #ProdNoD0=X,1,S
 T(3,X)
@@ -315,13 +315,13 @@ C(4,#ProdNoD{i},S,$)
 #WorkMonthSD{i}=A,5,I
 IF(#PageFg==4,$,CALL(#Show4))
 C(4,#ProdNoD{j},S,$)
-@C(4,#ProdNoD{i},S,A(YM13,1,#WorkMonthSD{i}))
+@C(4,#ProdNoD{i},S,A(YM13,0,#WorkMonthSD{i}))
 
 #WorkMonthED{i}=A,5,I
 IF(#PageFg==4,$,CALL(#Show4))
 C(4,#ProdNoD{j},S,$)
 @C(4,#ProdNoD{i},S,$)
-C(3,#WorkMonthED{i},0,S,A(YM13,1,#WorkMonthED{i}))
+C(3,#WorkMonthED{i},0,s,A(YM13,0,#WorkMonthED{i}))
 IF(#WorkMonthSD{i}>#WorkMonthED{i},V(P,止月不可小於起月),$)
 ##end
 
@@ -356,13 +356,13 @@ C(4,#ProdNoE{i},S,$)
 #WorkMonthSE{i}=A,5,I
 IF(#PageFg==5,$,CALL(#Show5))
 C(4,#ProdNoE{j},S,$)
-@C(4,#ProdNoE{i},S,A(YM13,1,#WorkMonthSE{i}))
+@C(4,#ProdNoE{i},S,A(YM13,0,#WorkMonthSE{i}))
 
 #WorkMonthEE{i}=A,5,I
 IF(#PageFg==5,$,CALL(#Show5))
 C(4,#ProdNoE{j},S,$)
 @C(4,#ProdNoE{i},S,$)
-C(3,#WorkMonthEE{i},0,S,A(YM13,1,#WorkMonthEE{i}))
+C(3,#WorkMonthEE{i},0,s,A(YM13,0,#WorkMonthEE{i}))
 IF(#WorkMonthSE{i}>#WorkMonthEE{i},V(P,止月不可小於起月),$)
 ##end
 

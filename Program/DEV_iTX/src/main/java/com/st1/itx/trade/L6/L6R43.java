@@ -60,8 +60,8 @@ public class L6R43 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R43Email" + i, iCdEmp.getEmail());
 				}
-				totaVo.putParam("L6R43WorkMonthS" + i, Integer.valueOf(rCdPfParms.getWorkMonthStart()) - 191100);
-				totaVo.putParam("L6R43WorkMonthE" + i, Integer.valueOf(rCdPfParms.getWorkMonthEnd()) - 191100);
+				totaVo.putParam("L6R43WorkMonthS" + i, Math.max(Integer.valueOf(rCdPfParms.getWorkMonthStart()) - 191100, 0)); // 工作月欄位接受輸入0, 避免-191100的情況,
+				totaVo.putParam("L6R43WorkMonthE" + i, Math.max(Integer.valueOf(rCdPfParms.getWorkMonthEnd()) - 191100, 0));   // 用 Math.max(wm, 0) 做斜坡修正
 				i++;
 			}
 			while (i <= 30) {

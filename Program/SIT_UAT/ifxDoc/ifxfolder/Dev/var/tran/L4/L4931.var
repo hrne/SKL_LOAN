@@ -421,7 +421,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["戶號","執行狀態"],
+	col_captions:["戶號","執行狀態　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 	col_names:["#OOCustNumber","#batch-row-status"]
 }
 }
@@ -484,7 +484,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["戶號","執行狀態"],
+	col_captions:["戶號","執行狀態　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 	col_names:["#OOCustNumber","#batch-row-status"]
 }
 }
@@ -530,6 +530,8 @@ ifxBatch:{
 {width:120,align:'right'}
 #OOAdjCode=調整記號
 {width:120,align:'center'}
+#OOProcNote=檢核訊息
+{width:240}
 
 ^
 
@@ -570,6 +572,8 @@ ifxBatch:{
 {width:120,align:'right'}
 #OOAdjCode=調整記號
 {width:120,align:'center'}
+#OOProcNote=檢核訊息
+{width:240}
 ^
 
 #RPTFG=4,QUERY.GRID,L4931
@@ -580,7 +584,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["戶號","執行狀態"],
+	col_captions:["戶號","執行狀態　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 	col_names:["#OOCustNumber","#batch-row-status"]
 }
 }
@@ -629,6 +633,8 @@ ifxBatch:{
 {width:120,align:'right'}
 #OOAdjCode=調整記號
 {width:120,align:'center'}
+#OOProcNote=檢核訊息
+{width:240}
 ^
 
 #RPTFG=3,QUERY.GRID,L4931
@@ -639,7 +645,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["戶號","執行狀態"],
+	col_captions:["戶號","執行狀態　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 	col_names:["#OOCustNumber","#batch-row-status"]
 }
 }
@@ -705,7 +711,7 @@ ifxBatch:{
 	     rim:'L431A',
 	     txtno:'#secret-no',
 	pfnx:"L4931.PFNX",
-	col_captions:["戶號","執行狀態"],
+	col_captions:["戶號","執行狀態　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 	col_names:["#OOCustNumber","#batch-row-status"]
 }
 }

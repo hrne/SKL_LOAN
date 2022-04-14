@@ -67,8 +67,13 @@ public class L650D extends TradeBuffer {
 			iCdPfParamsId.setConditionCode1("4");
 			iCdPfParamsId.setConditionCode2(" ");
 			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-			iCdPfParams.setWorkMonthStart(Integer.valueOf(titaVo.getParam("WorkMonthS" + i)) + 191100);
-			iCdPfParams.setWorkMonthEnd(Integer.valueOf(titaVo.getParam("WorkMonthE" + i)) + 191100);
+			
+			int workMonthS = Integer.valueOf(titaVo.getParam("WorkMonthS" + i));
+			int workMonthE = Integer.valueOf(titaVo.getParam("WorkMonthE" + i));
+			workMonthS += workMonthS > 0 ? 191100 : 0;
+			workMonthE += workMonthE > 0 ? 191100 : 0;
+			iCdPfParams.setWorkMonthStart(workMonthS);
+			iCdPfParams.setWorkMonthEnd(workMonthE);
 			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
 			} catch (DBException e) {
