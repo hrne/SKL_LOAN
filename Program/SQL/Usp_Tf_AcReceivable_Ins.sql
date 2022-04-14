@@ -225,7 +225,8 @@ BEGIN
                                                  WHEN S1."StatusCode" = 2
                                                  THEN 'F25'
                                                ELSE ' ' END
-    WHERE S1."AcDate" = 0
+    WHERE S1."RenewCode" = 2 -- 2.續保
+      AND S1."AcDate" = 0
       AND S1."TotInsuPrem" > 0
       AND CASE
             WHEN S1."StatusCode" = 0 

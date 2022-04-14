@@ -31,7 +31,7 @@ public class L4606Report2 extends MakeReport {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
-
+	
 	// 自訂表頭
 	@Override
 	public void printHeader() {
@@ -83,14 +83,17 @@ public class L4606Report2 extends MakeReport {
 			this.info("L4606ServiceImpl.find error = " + errors.toString());
 		}
 
+		
+		
 		int times = 0;
 		int cnt = 0;
-		int i = 0;
+		int i = 0 ;
 		String officer = "";
 		String id = "";
 		BigDecimal totamt = new BigDecimal("0");
 		for (Map<String, String> tL4606Vo : L4606List) {
-
+			
+			
 			this.print(1, 1,
 					"                                                                                                                                                                               ");
 			this.print(0, 1, tL4606Vo.get("F0"));
@@ -102,29 +105,29 @@ public class L4606Report2 extends MakeReport {
 			this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
 			this.print(0, 90, "-");
 			this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-			this.print(0, 95, limitLength(tL4606Vo.get("F8"), 14));
+			this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
 			this.print(0, 109, tL4606Vo.get("F9"));
-			this.print(0, 120, limitLength(tL4606Vo.get("F10"), 12));
+			this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
 			this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
 			totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 			cnt++;
 			times++;
-			if (i == 0) {
+			if(i == 0) {
 				officer = tL4606Vo.get("F8").toString();
 				id = tL4606Vo.get("F10").toString();
-
+				
 			} else {
 				if (officer.equals(tL4606Vo.get("F8").toString()) && id.equals(tL4606Vo.get("F10").toString())) {
-
+					
 				} else {
 //					reset比較值
 					officer = tL4606Vo.get("F8").toString();
 					id = tL4606Vo.get("F10").toString();
 				}
 			}
-
+			
 			i++;
-			if (cnt >= 42) {
+			if (cnt >= 35) {
 				cnt = 0;
 				this.print(1, 70, "===== 續下頁======", "C");
 				this.newPage();

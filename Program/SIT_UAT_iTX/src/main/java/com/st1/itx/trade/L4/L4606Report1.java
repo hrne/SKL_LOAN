@@ -54,6 +54,9 @@ public class L4606Report1 extends MakeReport {
 //
 //	}
 
+//	每頁筆數
+	private int pageIndex = 40;
+	
 	public void printHeaderL() {
 		this.print(-1, 1, "程式ID：" + "L4606");
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
@@ -83,23 +86,25 @@ public class L4606Report1 extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L4606ServiceImpl.findAll error = " + errors.toString());
 		}
-
+		
 		ArrayList<String> tfire = new ArrayList<String>();
-
+		
 		String officer = "";
 		int i = 0;
 		int times = 0, total = 0;
 		BigDecimal amt = new BigDecimal("0");
 		BigDecimal totamt = new BigDecimal("0");
+		
+		int pageCnt = 0;
 		for (Map<String, String> tL4606Vo : L4606List) {
 
 			if (i == 0) {
-				officer = tL4606Vo.get("F8").toString();
-
-				if (officer != "") {
-					tfire.add(officer);
+				officer = tL4606Vo.get("F9").toString();
+				
+				if(officer != "") {
+				  tfire.add(officer);
 				}
-
+				
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
 				this.print(0, 1, tL4606Vo.get("F0"));
@@ -111,23 +116,23 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
 				this.print(0, 90, "-");
 				this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 95, limitLength(tL4606Vo.get("F8"), 14));
+				this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
 				this.print(0, 109, tL4606Vo.get("F9"));
-				this.print(0, 120, limitLength(tL4606Vo.get("F10"), 12));
+				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
-
+				
 				amt = amt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 				totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
-
+				pageCnt++;
 				times++;
 			} else {
-				if (tfire.contains(tL4606Vo.get("F8").toString()) || "".equals(tL4606Vo.get("F8").toString())) {
+				if(tfire.contains(tL4606Vo.get("F9").toString()) || "".equals(tL4606Vo.get("F9").toString())) {
 					times++;
 				} else {
 //					reset比較值
-					officer = tL4606Vo.get("F8").toString();
-					if (officer != "") {
-						tfire.add(officer);
+					officer = tL4606Vo.get("F9").toString();
+					if(officer != "") {
+						  tfire.add(officer);
 					}
 					this.print(1, 1, "                                                                小　計：           筆");
 					this.print(0, 81, String.format("%,d", times), "R");
@@ -136,6 +141,16 @@ public class L4606Report1 extends MakeReport {
 					amt = new BigDecimal("0");
 					total = total + times;
 					times = 1;
+					pageCnt = pageCnt + 2;
+					
+//					每頁第38筆 跳頁 
+					if (pageCnt >= 35) {
+						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+
+						pageCnt = 0;
+						this.newPage();
+					}
+					
 				}
 
 				this.print(1, 1,
@@ -149,15 +164,23 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
 				this.print(0, 90, "-");
 				this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 95, limitLength(tL4606Vo.get("F8"), 14));
+				this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
 				this.print(0, 109, tL4606Vo.get("F9"));
-				this.print(0, 120, limitLength(tL4606Vo.get("F10"), 12));
+				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
-
+				pageCnt++;
 				amt = amt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 				totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 			} // else
 
+//			每頁第38筆 跳頁 
+			if (pageCnt >= 35) {
+				this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+
+				pageCnt = 0;
+				this.newPage();
+			}
+			
 			i++;
 			if (i == L4606List.size()) {
 				this.print(1, 1, "                                                                小　計：           筆");
@@ -166,6 +189,15 @@ public class L4606Report1 extends MakeReport {
 				this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 				total = total + times;
 				times = 0;
+				pageCnt = pageCnt + 2;
+			}
+			
+//			每頁第35筆 跳頁 
+			if (pageCnt >= 35) {
+				this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+
+				pageCnt = 0;
+				this.newPage();
 			}
 		}
 

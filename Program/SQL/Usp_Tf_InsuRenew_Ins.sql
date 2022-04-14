@@ -62,7 +62,11 @@ BEGIN
           ,S0."FacmNo"                    AS "FacmNo"              -- 額度 DECIMAL 3 0
           ,S0."NowInsuNo"                 AS "NowInsuNo"           -- 保險單號碼 VARCHAR2 17 0
           ,' '                            AS "OrigInsuNo"          -- 原始保險單號碼 VARCHAR2 17 0
-          ,2                              AS "RenewCode"           -- 是否續保 DECIMAL 1 0
+          ,CASE
+             WHEN FR1P."CHKPRO" = 1
+             THEN 1 -- 1.自保
+           ELSE 2 -- 2.續保
+           END                            AS "RenewCode"           -- 是否續保 DECIMAL 1 0
           ,S0."InsuCompany"               AS "InsuCompany"         -- 保險公司 VARCHAR2 2 0
           ,S0."InsuTypeCode"              AS "InsuTypeCode"        -- 保險類別 VARCHAR2 2 0
           ,S0."RepayCode"                 AS "RepayCode"           -- 繳款方式 DECIMAL 1 0
@@ -119,6 +123,8 @@ BEGIN
            , FR1P."TRXNMT"                  AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
            , FR1P."CHKPRT"                  AS "NotiTempFg"          -- 入通知檔 VARCHAR2 1 0
            , CASE
+               WHEN FR1P."CHKPRO" = 1 -- 不處理
+               THEN 0
                WHEN FR1P."TFRBAD" > 0
                THEN 2 -- 催收
                WHEN "TbsDyf" = "MfbsDyf" -- 若轉換日是月底日
@@ -144,7 +150,7 @@ BEGIN
       WHERE NVL(TRIM(FR1P."ADTYMT"),0) > 0
         AND NVL(TRIM(FR1P."INSNUM"),' ') <> ' '
         -- AND NVL(TRIM(FR1P."INSNUM2"),' ') <> ' '
-        AND NVL(FR1P."CHKPRO",1) = 0 -- 若為1.不處理時,不轉入
+        -- AND NVL(FR1P."CHKPRO",1) = 0 -- 若為1.不處理時,不轉入
         AND NVL(CNM."ClNo",0) > 0
     ) S0
     WHERE S0."Seq" = 1
