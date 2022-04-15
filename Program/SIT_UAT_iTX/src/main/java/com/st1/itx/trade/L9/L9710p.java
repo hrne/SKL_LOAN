@@ -76,12 +76,14 @@ public class L9710p extends TradeBuffer {
 
 			String iCUSTNO = titaVo.get("CustNo");
 
-			// 0000000為查列印明細以外，皆列印通知單
+			// 0000000多列印一個寬限到期明細表
 			if (iCUSTNO.equals("0000000")) {
 				this.info("active L9710report data detail");
 				l9710Report.exec(titaVo);
 
 				infoNotification = "L9710寬限到期明細表已完成";
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+						titaVo.getParam("TLRNO"), infoNotification, titaVo);
 			}
 
 			this.info("active L9710report(form type by l9711) notice");

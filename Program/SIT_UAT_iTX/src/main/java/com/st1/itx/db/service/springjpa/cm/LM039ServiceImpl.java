@@ -22,10 +22,10 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-
+	
 	@Autowired
 	Parse parse;
-
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
@@ -35,13 +35,13 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		this.info("lM039.findAll ");
-
+		
 		String sql = "SELECT CASE WHEN B.\"AcctSource\" = 'A' THEN B.\"AcctSource\"";
 		sql += "             ELSE '' END AS C1";
 		sql += "            ,O.\"CustNo\"";
 		sql += "            ,O.\"FacmNo\"";
 		sql += "            ,O.\"BormNo\"";
-		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\" ";
+		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
 		sql += "            ,F.\"FirstDrawdownDate\"";
 		sql += "            ,L.\"PrevPayIntDate\"";
 		sql += "            ,O.\"OvduBal\"";
@@ -62,7 +62,8 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"StoreRate\"";
 		sql += "            ,F.\"UtilAmt\"";
 		sql += "            ,F.\"LineAmt\"";
-		sql += "            ,F.\"UtilBal\"";
+//		sql += "            ,F.\"UtilBal\"";
+		sql += "            ,L.\"DrawdownAmt\"";
 		sql += "            ,F.\"CreditOfficer\"";
 		sql += "            ,F.\"LoanOfficer\"";
 		sql += "            ,Li.\"AccCollPsn\"";
@@ -99,9 +100,9 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
+		
 		query.setParameter("entdy", yearMonth);
-
+		
 		return this.convertToMap(query);
 	}
 

@@ -122,7 +122,7 @@ public class LM007Report extends MakeReport {
 					isFirstPage = false;
 				}
 				
-				exportPdf(lLM007, rptTypeItem.equals("全部"));
+				exportPdf(lLM007, "全部".equals(rptTypeItem));
 			}
 		}
 

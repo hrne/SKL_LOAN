@@ -66,6 +66,7 @@ BEGIN
              ) AS "TxSeq"
       FROM "LA$TRXP"
       WHERE "TRXCRC" = 0
+        AND "LMSACN" != 0
     )
     SELECT S."TRXDAT"                     AS "RelDy"               -- 登放日期 Decimald 8 0
           ,'0000999999'
@@ -101,7 +102,7 @@ BEGIN
              WHEN 4 -- 被沖正
              THEN 2 -- 被沖正(隔日訂正)
            ELSE 0 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0
-          ,NVL(S."LMSACN",tempTRXP."LMSACN")
+          ,NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0)
                                           AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,NVL(S."LMSAPN",0)              AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,NVL(S."LMSASQ",0)              AS "BormNo"              -- 撥款序號 DECIMAL 3 0
@@ -290,10 +291,10 @@ BEGIN
             AND S1."TRXDAT" >= 20190101
             AND S1."TRXDAT" <= "TbsDyF"
             AND CASE
-                  WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16')
+                  WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29')
                        AND NVL(S4."TRXTRN",' ') <> ' '
                   THEN 1
-                  WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16')
+                  WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29')
                        AND NVL(S4."LMSACN",0) = 0
                   THEN 1
                 ELSE 0 
