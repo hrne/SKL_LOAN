@@ -63,7 +63,6 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           WHERE T.\"AcDate\" >= :isday ";
 		sql += "             AND T.\"AcDate\" <= :ieday ";
 		sql += "             AND  T.\"TitaHCode\" = '0' ";
-		sql += "             AND  T.\"Interest\" + T.\"DelayInt\" + T.\"BreachAmt\" > 0";
 		sql += "	         AND (NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt'),0)";
 		sql += "	         + NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt'),0) >0) ";
 		sql += "		   GROUP BY T.\"AcDate\"";

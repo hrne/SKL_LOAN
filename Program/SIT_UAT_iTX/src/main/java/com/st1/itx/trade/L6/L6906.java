@@ -16,11 +16,11 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
-import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -94,12 +94,32 @@ public class L6906 extends TradeBuffer {
 		} else {
 			throw new LogicException(titaVo, "E6011", "戶號或經辦或整批批號或交易代號擇一輸入"); // 查詢資料不可為空白
 		}
-		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
+		List<AcDetail> lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
-		if (lAcDetail == null || lAcDetail.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
-		}
-		// 如有找到資料
+		
+		// 排序依 交易序號 戶號 由小到大
+		lAcDetail.sort((c1, c2) -> {
+			int result = 0;
+			if(c1.getRelTxseq().compareTo(c2.getRelTxseq()) != 0) {
+				result = c1.getRelTxseq().compareTo(c2.getRelTxseq());
+		    } else if (c1.getCustNo() - c2.getCustNo() != 0) {
+				result = c1.getCustNo() - c2.getCustNo();
+			} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
+				result = c1.getFacmNo() - c2.getFacmNo();
+			}  else if (c1.getBormNo() - c2.getBormNo() != 0) {
+				result = c1.getBormNo() - c2.getBormNo();
+			} else if (c1.getAcNoCode().compareTo(c2.getAcNoCode()) != 0) {
+				result = c1.getAcNoCode().compareTo(c2.getAcNoCode());
+			} else if (c1.getAcSubCode().compareTo(c2.getAcSubCode()) != 0) {
+				result = c1.getAcSubCode().compareTo(c2.getAcSubCode());	
+			} else if (c1.getAcDtlCode().compareTo(c2.getAcDtlCode()) != 0) {
+				result = c1.getAcDtlCode().compareTo(c2.getAcDtlCode());	
+			} else {
+				result = 0;
+			}
+			return result;
+		});
+		
 		for (AcDetail tAcDetail : lAcDetail) {
 
 			this.info("L6906 RelTxseq : " + iRelTxseq);

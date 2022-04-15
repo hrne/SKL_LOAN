@@ -167,7 +167,6 @@ public class BS401 extends TradeBuffer {
 			}
 			this.batchTransaction.commitEnd();
 			this.batchTransaction.init();
-			boolean isUpdate = false;
 			// functionCode 處理代碼 0:入帳 1:刪除 3.檢核 4.刪除回復
 			// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.需轉暫收
 			// 訂正使用L420C
@@ -176,12 +175,7 @@ public class BS401 extends TradeBuffer {
 				if (!"".equals(iReconCode) && !tDetail.getReconCode().equals(iReconCode)) {
 					continue;
 				}
-				if (isUpdate && ProcessCnt % commitCnt == 0) {
-					this.batchTransaction.commitEnd();
-					this.batchTransaction.init();
-					isUpdate = false;
-				}
-
+				boolean isUpdate = false;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tDetail.getProcNote());
 				this.info("ProcNote=" + tDetail.getProcNote());
@@ -215,8 +209,10 @@ public class BS401 extends TradeBuffer {
 							throw new LogicException(titaVo, "E0007",
 									"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 						}
-						isUpdate = true;
+						this.batchTransaction.commitEnd();
+						this.batchTransaction.init();
 					}
+
 					if ("4".equals(tDetail.getProcStsCode())) {
 						ProcessCnt++;
 						if (tTempVo.get("MergeCnt") != null
@@ -225,7 +221,6 @@ public class BS401 extends TradeBuffer {
 						} else {
 							excuteTx(0, tDetail, tBatxHead, titaVo); // 正常交易
 						}
-						isUpdate = true;
 					}
 					break;
 
@@ -260,10 +255,10 @@ public class BS401 extends TradeBuffer {
 								throw new LogicException(titaVo, "E0007",
 										"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 							}
+							isUpdate = true;
 						} else {
 							excuteTx(2, tDetail, tBatxHead, titaVo); // 轉暫收
 						}
-						isUpdate = true;
 					}
 					break;
 
@@ -280,7 +275,11 @@ public class BS401 extends TradeBuffer {
 					cancelUpdate(tDetail, tTempVo.getParam("StsCode"), titaVo);
 					break;
 				}
-
+				// commit
+				if (isUpdate) {
+					this.batchTransaction.commitEnd();
+					this.batchTransaction.init();
+				}
 			}
 			// 更新作業狀態
 			this.batchTransaction.commitEnd();

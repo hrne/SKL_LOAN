@@ -136,7 +136,7 @@ public class L4601 extends TradeBuffer {
 		} else if (errorCode == 11) {
 			occursListReport.putParam("ReportAErrorMsg", "總保費 = 0");
 		} else if (errorCode == 12) {
-			occursListReport.putParam("ReportAErrorMsg", "無此戶號額度");
+			occursListReport.putParam("ReportAErrorMsg", "此戶號額度,無火險單續保檔資料");
 		} else if (errorCode == 13) {
 			occursListReport.putParam("ReportAErrorMsg", "已入通知檔");
 		} else if (errorCode == 14) {

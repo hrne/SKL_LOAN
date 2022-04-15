@@ -16,6 +16,7 @@ import com.st1.itx.db.domain.CdPfParmsId;
 import com.st1.itx.db.service.CdPfParmsService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L650C")
 @Scope("prototype")
@@ -33,6 +34,8 @@ public class L650C extends TradeBuffer {
 	public CdPfParmsService iCdPfParmsService;
 	@Autowired
 	SendRsp iSendRsp;
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -57,110 +60,38 @@ public class L650C extends TradeBuffer {
 
 		CdPfParms iCdPfParams = new CdPfParms();
 		CdPfParmsId iCdPfParamsId = new CdPfParmsId();
-		// Input
-		String iYesNoA = titaVo.getParam("YesNoA");
-		String iYesNoB = titaVo.getParam("YesNoB");
-		String iYesNoC = titaVo.getParam("YesNoC");
-		String iYesNoD = titaVo.getParam("YesNoD");
-		String iYesNoE = titaVo.getParam("YesNoE");
-		int iWorkMonthSA = Integer.valueOf(titaVo.getParam("WorkMonthSA"));
-		int iWorkMonthEA = Integer.valueOf(titaVo.getParam("WorkMonthEA")) + 191100;
-		int iWorkMonthSB = Integer.valueOf(titaVo.getParam("WorkMonthSB")) + 191100;
-		int iWorkMonthEB = Integer.valueOf(titaVo.getParam("WorkMonthEB")) + 191100;
-		int iWorkMonthSC = Integer.valueOf(titaVo.getParam("WorkMonthSC")) + 191100;
-		int iWorkMonthEC = Integer.valueOf(titaVo.getParam("WorkMonthEC")) + 191100;
-		int iWorkMonthSD = Integer.valueOf(titaVo.getParam("WorkMonthSD")) + 191100;
-		int iWorkMonthED = Integer.valueOf(titaVo.getParam("WorkMonthED")) + 191100;
-		int iWorkMonthSE = Integer.valueOf(titaVo.getParam("WorkMonthSE")) + 191100;
-		int iWorkMonthEE = Integer.valueOf(titaVo.getParam("WorkMonthEE")) + 191100;
-		
-		iWorkMonthSA += iWorkMonthSA > 0 ? 191100 : 0;
-		iWorkMonthSB += iWorkMonthSB > 0 ? 191100 : 0;
-		iWorkMonthSC += iWorkMonthSC > 0 ? 191100 : 0;
-		iWorkMonthSD += iWorkMonthSD > 0 ? 191100 : 0;
-		iWorkMonthSE += iWorkMonthSE > 0 ? 191100 : 0;
-		iWorkMonthEA += iWorkMonthEA > 0 ? 191100 : 0;
-		iWorkMonthEB += iWorkMonthEB > 0 ? 191100 : 0;
-		iWorkMonthEC += iWorkMonthEC > 0 ? 191100 : 0;
-		iWorkMonthED += iWorkMonthED > 0 ? 191100 : 0;
-		iWorkMonthEE += iWorkMonthEE > 0 ? 191100 : 0;
 
-		// 業績全部
-		if (!iYesNoA.trim().isEmpty()) {
-			iCdPfParamsId.setConditionCode1("3");
-			iCdPfParamsId.setConditionCode2("1");
-			iCdPfParamsId.setCondition(iYesNoA);
-			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-			iCdPfParams.setWorkMonthStart(iWorkMonthSA);
-			iCdPfParams.setWorkMonthEnd(iWorkMonthEA);
-			try {
-				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "業績全部");
+		String[] types = new String[] { "業績全部", "換算業績、業務報酬", "介紹獎金", "加碼獎勵津貼", "協辦獎金" };
+
+		for (int t = 0; t < types.length; t++) {
+			char code = (char) ((int) 'A' + t); // A B C D E
+			String yesNo = titaVo.getParam("YesNo" + code);
+
+			this.info("code: " + code);
+			
+			if (yesNo == null || yesNo.trim().isEmpty()) {
+				continue;
 			}
-		}
-		// 換算業績、業務報酬
-		if (!iYesNoB.trim().isEmpty()) {
-			iCdPfParams = new CdPfParms();
-			iCdPfParamsId = new CdPfParmsId();
+
+			int workMonthStart = parse.stringToInteger(titaVo.getParam("WorkMonthS" + code));
+			int workMonthEnd = parse.stringToInteger(titaVo.getParam("WorkMonthE" + code));
+
+			workMonthStart += workMonthStart > 0 ? 191100 : 0;
+			workMonthEnd += workMonthEnd > 0 ? 191100 : 0;
+
+			this.info("yesNo: " + yesNo + " workMonthStart: " + workMonthStart + " workMonthEnd: " + workMonthEnd);
+
 			iCdPfParamsId.setConditionCode1("3");
-			iCdPfParamsId.setConditionCode2("2");
-			iCdPfParamsId.setCondition(iYesNoB);
+			iCdPfParamsId.setConditionCode2(parse.IntegerToString(t + 1, 1));
+			iCdPfParamsId.setCondition(yesNo);
 			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-			iCdPfParams.setWorkMonthStart(iWorkMonthSB);
-			iCdPfParams.setWorkMonthEnd(iWorkMonthEB);
+			iCdPfParams.setWorkMonthStart(workMonthStart);
+			iCdPfParams.setWorkMonthEnd(workMonthEnd);
+
 			try {
 				iCdPfParmsService.insert(iCdPfParams, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "換算業績、業務報酬");
-			}
-		}
-		// 介紹獎金
-		if (!iYesNoC.trim().isEmpty()) {
-			iCdPfParams = new CdPfParms();
-			iCdPfParamsId = new CdPfParmsId();
-			iCdPfParamsId.setConditionCode1("3");
-			iCdPfParamsId.setConditionCode2("3");
-			iCdPfParamsId.setCondition(iYesNoC);
-			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-			iCdPfParams.setWorkMonthStart(iWorkMonthSC);
-			iCdPfParams.setWorkMonthEnd(iWorkMonthEC);
-			try {
-				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "介紹獎金");
-			}
-		}
-		// 加碼獎勵津貼
-		if (!iYesNoD.trim().isEmpty()) {
-			iCdPfParams = new CdPfParms();
-			iCdPfParamsId = new CdPfParmsId();
-			iCdPfParamsId.setConditionCode1("3");
-			iCdPfParamsId.setConditionCode2("4");
-			iCdPfParamsId.setCondition(iYesNoD);
-			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-			iCdPfParams.setWorkMonthStart(iWorkMonthSD);
-			iCdPfParams.setWorkMonthEnd(iWorkMonthED);
-			try {
-				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "加碼獎勵津貼");
-			}
-		}
-		// 協辦獎金
-		if (!iYesNoE.trim().isEmpty()) {
-			iCdPfParams = new CdPfParms();
-			iCdPfParamsId = new CdPfParmsId();
-			iCdPfParamsId.setConditionCode1("3");
-			iCdPfParamsId.setConditionCode2("5");
-			iCdPfParamsId.setCondition(iYesNoE);
-			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-			iCdPfParams.setWorkMonthStart(iWorkMonthSE);
-			iCdPfParams.setWorkMonthEnd(iWorkMonthEE);
-			try {
-				iCdPfParmsService.insert(iCdPfParams, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "協辦獎金");
+				throw new LogicException("E0008", types[t]);
 			}
 		}
 
