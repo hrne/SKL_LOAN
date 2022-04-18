@@ -196,8 +196,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
 		}
 		sql += " where b.\"Status\" = 0                                        ";
-		sql += "   and b.\"MaturityDate\" > b.\"NextAdjRateDate\"              ";
-		sql += "   and b.\"MaturityDate\" > " + iEffectDateE;
+		sql += "   and b.\"MaturityDate\" >= b.\"NextAdjRateDate\"              ";
+		sql += "   and b.\"MaturityDate\" >= " + iEffectDateE;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
 //  1.定期機動調整 ==>  1.撥款主檔的利率區分=3.定期機動，下次利率調整日為調整月份

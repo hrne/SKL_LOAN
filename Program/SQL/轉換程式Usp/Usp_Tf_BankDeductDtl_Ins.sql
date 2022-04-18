@@ -77,10 +77,21 @@ BEGIN
                           , "LMSPCN"
                ORDER BY "LMSAPN" DESC
              ) AS "Seq"
-      FROM "LA$APLP"
-      WHERE "LMSPBK" = '3'
-        AND "LMSPYS" = 2
-        AND "POSCDE" IS NOT NULL
+      FROM (
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , "LMSAPN"
+        FROM "LA$APLP"
+        WHERE "LMSPBK" = '3'
+          AND "LMSPYS" = 2
+          AND "POSCDE" IS NOT NULL
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , 1 AS "LMSAPN"
+        FROM "PO$AARP"
+      ) S
     )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
@@ -228,10 +239,21 @@ BEGIN
                           , "LMSPCN"
                ORDER BY "LMSAPN" DESC
              ) AS "Seq"
-      FROM "LA$APLP"
-      WHERE "LMSPBK" = '3'
-        AND "LMSPYS" = 2
-        AND "POSCDE" IS NOT NULL
+      FROM (
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , "LMSAPN"
+        FROM "LA$APLP"
+        WHERE "LMSPBK" = '3'
+          AND "LMSPYS" = 2
+          AND "POSCDE" IS NOT NULL
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , 1 AS "LMSAPN"
+        FROM "PO$AARP"
+      ) S
     )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0

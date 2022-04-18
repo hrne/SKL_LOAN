@@ -28,7 +28,7 @@ E(0,0)
 [
 ["[L6201]                                 其他傳票輸入"],
 ["@帳冊別",#AcBookCode,#AcBookItem],
-["@區隔帳冊",#AcSubBookCode,#AcSubBookItem],
+["@區隔帳冊",#AcSubBookCode,#AcSubBookItem,#AcSubBookNote],
 ["@單位別",#BranchNo,#BranchNoX],
 ["@幣別",#CurrencyCode],
 ["@會計日期",#AcDate],
@@ -118,6 +118,9 @@ V(H,#ApHelp)
 
 #AcSubBookItem=X,20,L
 T(H,#AcSubBookCode,#ApHelp)
+
+#AcSubBookNote=x,40,L
+C(5,#AcSubBookCode,00A,T(3,),T(3,注意:特殊區隔帳冊，限可細分帳冊別科目有效))
 
 
 !單位別

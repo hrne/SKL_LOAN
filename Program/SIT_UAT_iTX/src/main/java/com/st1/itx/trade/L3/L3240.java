@@ -40,19 +40,6 @@ import com.st1.itx.util.parse.Parse;
  * b.本交易不可訂正
  */
 
-/*
- * Tita
- * TimCustNo=9,7 戶號
- * FacmNo=9,3  額度編號 
- * IntStartDate 計息起日
- * IntEndDate 計息迄日
- * EntryDate 入帳日期
- * AcDate 會計日期
- * AcDate 經辦
- * TxtNo 交易序號
-  * 沖正交易序號 ，會計日(7)+單位別(4)+經辦(6)+交易序號(8)
- */
-
 /**
  * L3240 回收登錄
  * 
@@ -109,7 +96,6 @@ public class L3240 extends TradeBuffer {
 	private List<AcReceivable> lAcReceivableDelete = new ArrayList<AcReceivable>();
 	private List<AcReceivable> lAcReceivableInsert = new ArrayList<AcReceivable>();
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L3240 ");
@@ -162,7 +148,7 @@ public class L3240 extends TradeBuffer {
 
 			// 借： 本金利息、貸：暫收可抵繳
 			this.txBuffer.addAllAcDetailList(lAcDetail);
-			
+
 			// 產生會計分錄
 			acDetailCom.setTxBuffer(this.txBuffer);
 			acDetailCom.run(titaVo);
@@ -208,6 +194,9 @@ public class L3240 extends TradeBuffer {
 				continue;
 			}
 			if (tx.getIntStartDate() != iIntStartDate) {
+				continue;
+			}
+			if(!tx.getCreateEmpNo().equals("999999")) {
 				continue;
 			}
 			wkBorxNo = tx.getBorxNo();

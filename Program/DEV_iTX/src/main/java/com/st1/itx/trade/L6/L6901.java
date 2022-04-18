@@ -65,12 +65,13 @@ public class L6901 extends TradeBuffer {
 		// tita 登放序號 RelTxseq
 		String iRelTxseq = titaVo.getParam("RelTxseq");
 		int iSlipNo = parse.stringToInteger(titaVo.getParam("SlipNo"));
-		if (iSlipNo == 0 && iRelTxseq.length() < 18) {
+		if (iSlipNo == 0 && iRelTxseq.length() < 18) { 
 			throw new LogicException(titaVo, "E6105", ""); // 查無資料
 		}
 		this.info("iAcDate		=" + iAcDate);
 		this.info("iRelDy			=" + iRelDy);
 		this.info("iRelTxseq		=" + iRelTxseq);
+		this.info("iSlipNo          =" + iSlipNo);
 		// new ArrayList
 		List<AcDetail> lAcDetailList = new ArrayList<AcDetail>();
 		Slice<AcDetail> slAcDetailList;
@@ -81,10 +82,15 @@ public class L6901 extends TradeBuffer {
 			if (iSlipNo > 0) {
 				slAcDetailList = sAcDetailService.acdtlSlipNo2(iAcDate + 19110000, iSlipNo, this.index,
 						Integer.MAX_VALUE, titaVo);
-				if (slAcDetailList != null) {// 再依交易序號查詢
-					slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000,
-							slAcDetailList.getContent().get(0).getRelTxseq(), this.index, Integer.MAX_VALUE, titaVo);
-				}
+//				if (slAcDetailList != null) {// 再依交易序號查詢
+					this.info("slAcDetailList 不是null");
+					this.info("iRelDy     = " + iRelDy);
+					this.info("iSlipNo    = " + iSlipNo);
+					this.info("slAcDetailList     = "  + slAcDetailList);
+					//2022/4/15 查詢時 列印資料只要顯示傳真號碼就好，不需要該傳真號碼底下的登放序號去找所有筆數並印出 Mata
+//					slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000,
+//							slAcDetailList.getContent().get(0).getRelTxseq(), this.index, Integer.MAX_VALUE, titaVo);				
+//				}
 			} else {
 				slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000, iRelTxseq, this.index,
 						Integer.MAX_VALUE, titaVo);
@@ -95,10 +101,10 @@ public class L6901 extends TradeBuffer {
 			if (iSlipNo > 0) {
 				slAcDetailList = sAcDetailService.acdtlSlipNo(iRelDy + 19110000, iSlipNo, this.index, Integer.MAX_VALUE,
 						titaVo);
-				if (slAcDetailList != null) {// 再依交易序號查詢
-					slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000,
-							slAcDetailList.getContent().get(0).getRelTxseq(), this.index, Integer.MAX_VALUE, titaVo);
-				}
+//				if (slAcDetailList != null) {// 再依交易序號查詢
+//					slAcDetailList = sAcDetailService.acdtlRelTxseqEq2(iAcDate + 19110000,
+//							slAcDetailList.getContent().get(0).getRelTxseq(), this.index, Integer.MAX_VALUE, titaVo);
+//				}
 			} else {
 				slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy + 19110000, iRelTxseq, this.index,
 						Integer.MAX_VALUE, titaVo);

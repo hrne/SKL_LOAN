@@ -169,13 +169,13 @@ public class L8303 extends TradeBuffer {
 			// 4 start 本金融機構債務人必須填報'45':回報是否同意債務清償方案資料
 			if ("Y".equals(iIsClaims)) {
 				iJcicZ045 = sJcicZ045Service.findById(iJcicZ045Id, titaVo);
-				if (iJcicZ045 == null) {
-					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
-					} else {
-						throw new LogicException("E0007", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
-					}
-				}
+//				if (iJcicZ045 == null) {
+//					if ("A".equals(iTranKey)) {
+//						throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
+//					} else {
+//						throw new LogicException("E0007", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
+//					}
+//				}
 				// 4 end
 
 				// 5 start 本金融機構債務人+有擔保債權筆數0，則信用貸款+現金卡放款+信用卡 本息餘額應大於0

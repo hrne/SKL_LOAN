@@ -1147,18 +1147,16 @@ public class BaTxCom extends TradeBuffer {
 				v.setEndDate(iEntryDate);
 				iListCloseBreach.add(v);
 			}
-			if ("Y".equals(collectFlag)) {
-				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iCustNo, iFacmNo, 0, iListCloseBreach,
-						titaVo);
-			} else {
-				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, 0, iListCloseBreach,
-						titaVo);
-			}
+		}
+		if ("Y".equals(collectFlag)) {
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iCustNo, iFacmNo, 0, iListCloseBreach, titaVo);
+		} else {
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, 0, iListCloseBreach, titaVo);
+		}
 
-			if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
-				for (LoanCloseBreachVo v : oListCloseBreach) {
-					this.closeBreachAmt = this.closeBreachAmt.add(v.getCloseBreachAmt());
-				}
+		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
+			for (LoanCloseBreachVo v : oListCloseBreach) {
+				this.closeBreachAmt = this.closeBreachAmt.add(v.getCloseBreachAmt());
 			}
 		}
 		//

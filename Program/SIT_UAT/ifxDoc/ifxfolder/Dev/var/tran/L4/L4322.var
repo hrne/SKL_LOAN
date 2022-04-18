@@ -1,0 +1,155 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5704)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4322" layout="cols=5;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L4322]                                 地區別利率調整設定"],
+[#<->#,"#FdFunctionCode+功能",#FunctionCode,#FunctionCodeX],
+["#grid#,{id:1,expand:true,loop:30,row_height:1,s_cols:[50,100,150,150,150], p_cols:[10,20,20,20,20]}","","",
+["地區別","地區別名稱","利率加減碼","利率上限","利率下限"],
+[[#CityCode1],[#CityItem1],[#IntRateIncr1,#PersentA1],[#IntRateCeiling1,#PersentB1],[#IntRateFloor1,#PersentC1]]],
+]
+
+#FdFunctionCode=X,2,L
+!---------- AP Button AREA ----------
+ 
+! 參考L6074
+! 但要在畫面可一次修改,參考L5704
+! 資料庫使用 L6/CdCity
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#FunctionCodeHelp=x,100,S
+T(3,0:查詢;1:修改)
+
+#FunctionCode=A,1,I
+HELP(#FunctionCodeHelp)
+@
+V(H,#FunctionCodeHelp)
+E(0,@FUNCIND,#FunctionCode)
+
+#FunctionCodeX=X,4,L
+T(H,#FunctionCode,#FunctionCodeHelp)
+
+#HideBtn=X,1,S
+C(3,#FunctionCode,0,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY)K(MODIFYBUTTON,修改))
+
+! 一進入就掉RIM把資料輸出
+<include src="ROM.icf::L4R20.dec"/>
+#RimCityCode=X,2,S
+
+#RimL4r20=X,1,S
+RESET_RIM(#RimL4r20,L4R20)
+S(L4R20,1,#RimCityCode)
+R(1,L4R20)
+
+#SetValue=A,1,S
+##loop{times:30,i:1}
+T(2,@CityCode{i},#L4r20CityCode{i})
+T(2,@CityItem{i},#L4r20CityItem{i})
+E(0,@IntRateIncr{i},#L4r20IntRateIncr{i})
+E(0,@IntRateCeiling{i},#L4r20IntRateCeiling{i})
+E(0,@IntRateFloor{i},#L4r20IntRateFloor{i})
+##end
+
+##loop {times:30,i:1,j:1,k:2}
+IF(#CityCode{i}!="",$,INVOKEJS(SHOW,grd1,{j},{k},0))
+
+#PersentA{i}=x,2,L
+IF(#CityCode{i}!="",T(3, %),T(3,))
+
+#PersentB{i}=x,2,L
+IF(#CityCode{i}!="",T(3, %),T(3,))
+
+#PersentC{i}=x,2,L
+IF(#CityCode{i}!="",T(3, %),T(3,))
+
+#SetBorder{i}=A,1,S
+C(3,#FunctionCode,1,T(F,@IntRateIncr{i},1),T(F,@IntRateIncr{i},0))
+C(3,#FunctionCode,1,T(F,@IntRateCeiling{i},1),T(F,@IntRateCeiling{i},0))
+C(3,#FunctionCode,1,T(F,@IntRateFloor{i},1),T(F,@IntRateFloor{i},0))
+
+##end
+
+##loop{times:30,i:1}
+#CityCode{i}=X,2,L
+IF(#CityCode{i}!="",$,S)
+C(3,#FunctionCode,1,$,s)
+
+#CityItem{i}=X,20,L
+IF(#CityCode{i}!="",$,S)
+C(3,#FunctionCode,1,$,s)
+
+#IntRateIncr{i}=+m,2.4,I
+IF(#CityCode{i}!="",$,S)
+C(3,#FunctionCode,1,$,s)
+
+#IntRateCeiling{i}=m,2.4,I
+IF(#CityCode{i}!="",$,S)
+C(3,#FunctionCode,1,$,s)
+@
+V(2,0)
+
+#IntRateFloor{i}=m,2.4,I
+IF(#CityCode{i}!="",$,S)
+C(3,#FunctionCode,1,$,s)
+@
+V(5,0.0001,#IntRateCeiling{i})
+
+
+##end
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L4322 ----------
+<sub type="FORM" name="L4322">
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+##loop{times:30,i:1}
+#CityCode{i}
+#CityItem{i}
+#IntRateIncr{i}
+#IntRateCeiling{i}
+#IntRateFloor{i}
+##end
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L4R20.tom"/>
+TXFORM=L4322
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

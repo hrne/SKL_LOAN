@@ -41,10 +41,21 @@ BEGIN
                           , "LMSPCN"
                ORDER BY "LMSAPN" DESC
              ) AS "Seq"
-      FROM "LA$APLP"
-      WHERE "LMSPBK" = '3'
-        AND "LMSPYS" = 2
-        AND "POSCDE" IS NOT NULL
+      FROM (
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , "LMSAPN"
+        FROM "LA$APLP"
+        WHERE "LMSPBK" = '3'
+          AND "LMSPYS" = 2
+          AND "POSCDE" IS NOT NULL
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , 1 AS "LMSAPN"
+        FROM "PO$AARP"
+      ) S
     )
     SELECT CASE
              WHEN NVL(t.LastTRXIDT,0) != 0
@@ -128,6 +139,7 @@ BEGIN
     FROM "LA$MBKP" MBK
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
                          AND ad."LMSAPN" = MBK."MBKAPN"
+                         AND ad."Seq" = 1
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = MBK."LMSACN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局

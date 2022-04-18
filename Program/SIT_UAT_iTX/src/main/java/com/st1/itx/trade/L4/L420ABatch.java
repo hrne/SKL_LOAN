@@ -223,9 +223,10 @@ public class L420ABatch extends TradeBuffer {
 					}
 					// 更新同戶號狀態
 					if (l3BatxDetail.size() > 0) {
-						tTempVo.putParam("CheckMsg", "同戶號合併檢核");
 						mergeSeq = 0;
 						for (BatxDetail t : l3BatxDetail) {
+							tTempVo = tTempVo.getVo(tDetail.getProcNote());
+							tTempVo.putParam("CheckMsg", "同戶號合併檢核");
 							mergeSeq++;
 							tTempVo.putParam("MergeSeq", mergeSeq);
 							t.setProcNote(tTempVo.getJsonString());
@@ -246,7 +247,7 @@ public class L420ABatch extends TradeBuffer {
 
 		this.batchTransaction.commit();
 		// 更新作業狀態
-		String msg = updateHead(tBatxHead,  slBatxDetail.getContent(), titaVo);
+		String msg = updateHead(tBatxHead, slBatxDetail.getContent(), titaVo);
 
 		// end
 		this.batchTransaction.commit();

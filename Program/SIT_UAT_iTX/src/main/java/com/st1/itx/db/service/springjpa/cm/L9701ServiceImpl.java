@@ -47,7 +47,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"F5\" + T.\"F6\" + T.\"F7\" + T.\"F8\" AS F9";
 		sql += "            ,T.\"F10\"";
 		sql += "            ,T.\"CustNo\" F11";
-		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0) F12";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) F12";
 		sql += "            ,T.\"FacmNo\" F13";
 		sql += "            ,NVL(NVL(CB.\"BdLocation\", CL.\"LandLocation\"),' ') F14";
 		sql += "            ,T.\"F15\"";

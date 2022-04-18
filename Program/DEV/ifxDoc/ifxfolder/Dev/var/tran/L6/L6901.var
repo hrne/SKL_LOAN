@@ -121,6 +121,7 @@ C(3,#CHAIN,0,$,s)
 C(3,#SlipNo,0,$,S)
 @
 IF(#SlipNo==0 && #RelTxseq=="",V(P,傳票號碼、交易（登放）序號擇一輸入),$)
+V(8,18,18)
 
 #Submit=A,1,S
 C(3,#CHAIN,1,XMT(),$)

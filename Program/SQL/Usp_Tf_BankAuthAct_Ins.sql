@@ -198,10 +198,21 @@ BEGIN
                           , "LMSPCN"
                ORDER BY "LMSAPN" DESC
              ) AS "Seq"
-      FROM "LA$APLP"
-      WHERE "LMSPBK" = '3'
-        AND "LMSPYS" = 2
-        AND "POSCDE" IS NOT NULL
+      FROM (
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , "LMSAPN"
+        FROM "LA$APLP"
+        WHERE "LMSPBK" = '3'
+          AND "LMSPYS" = 2
+          AND "POSCDE" IS NOT NULL
+        SELECT "LMSACN"
+             , "LMSPCN"
+             , "POSCDE"
+             , 1 AS "LMSAPN"
+        FROM "PO$AARP"
+      ) S
     ) S
     ON (
       S."Seq" = 1

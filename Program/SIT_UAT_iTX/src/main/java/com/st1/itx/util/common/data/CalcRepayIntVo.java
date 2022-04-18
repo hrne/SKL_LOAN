@@ -30,6 +30,7 @@ public class CalcRepayIntVo {
 	int extraRepayFlag; // 部分償還金額記號 0:否 1:是
 	BigDecimal dueAmt; // 期金
 	String rateCode; // 利率區分 1: 機動 2: 固定 3: 定期機動
+	BigDecimal nextStoreRate; // 下段適用利率
 
 	public CalcRepayIntVo() {
 		custNo = 0;
@@ -57,6 +58,7 @@ public class CalcRepayIntVo {
 		monthLimit = 0;
 		interestFlag = 0;
 		rateCode = "";
+		nextStoreRate = BigDecimal.ZERO;
 	}
 
 	public int getCustNo() {
@@ -273,5 +275,13 @@ public class CalcRepayIntVo {
 
 	public void setRateCode(String rateCode) {
 		this.rateCode = rateCode;
+	}
+
+	public BigDecimal getNextStoreRate() {
+		return nextStoreRate;
+	}
+
+	public void setNextStoreRate(BigDecimal nextStoreRate) {
+		this.nextStoreRate = nextStoreRate;
 	}
 }

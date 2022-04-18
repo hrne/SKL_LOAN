@@ -134,6 +134,7 @@ public class L9703Report2 extends MakeReport {
 		if (titaVo.getParam("UnpaidTermEd") != null) {
 			termEnd = parse.stringToInteger(titaVo.getParam("UnpaidTermEd"));
 		}
+		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate"));
 
 //		未設定預設6期
 		if (termEnd == 0) {
@@ -144,7 +145,7 @@ public class L9703Report2 extends MakeReport {
 		this.info("entdy = " + entdy);
 
 		try {
-			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
+			lBaTxVo = dBaTxCom.termsPay(entryDate,
 					parse.stringToInteger(tL9703Vo.get("CustNo")), parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd,
 					titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);

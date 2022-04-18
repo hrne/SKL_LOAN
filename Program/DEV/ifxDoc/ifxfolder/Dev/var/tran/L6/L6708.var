@@ -26,18 +26,18 @@ E(0,0)
 ["[L6708]                                 利息收入預算數維護"],
 ["#FdFuncCode+功能",#FuncCodeX],
 ["#FdYear+預算年度",#Year],
-["@ 1月份",#Budget1],
-["@ 2月份",#Budget2],
-["@ 3月份",#Budget3],
-["@ 4月份",#Budget4],
-["@ 5月份",#Budget5],
-["@ 6月份",#Budget6],
-["@ 7月份",#Budget7],
-["@ 8月份",#Budget8],
-["@ 9月份",#Budget9],
-["@10月份",#Budget10],
-["@11月份",#Budget11],
-["@12月份",#Budget12],
+["@ 1月份","@@@",#Budget1],
+["@ 2月份","@@@",#Budget2],
+["@ 3月份","@@@",#Budget3],
+["@ 4月份","@@@",#Budget4],
+["@ 5月份","@@@",#Budget5],
+["@ 6月份","@@@",#Budget6],
+["@ 7月份","@@@",#Budget7],
+["@ 8月份","@@@",#Budget8],
+["@ 9月份","@@@",#Budget9],
+["@10月份","@@@",#Budget10],
+["@11月份","@@@",#Budget11],
+["@12月份","@@@",#Budget12],
 ["@  合計",#Total],
 ]
 !---------- AP Button AREA ----------
@@ -51,6 +51,9 @@ E(0,0)
 T(3,*)
 #FdYear=X,2,L
 T(3,*)
+
+#Sum=@,1,S
+E(0,@Total,#Budget1+#Budget2+#Budget3+#Budget4+#Budget5+#Budget6+#Budget7+#Budget8+#Budget9+#Budget10+#Budget11+#Budget12)
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -160,6 +163,8 @@ E(0,1)
 
 #Budget1=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 2月份
 #Month2=N,2,S
@@ -167,6 +172,8 @@ E(0,2)
 
 #Budget2=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 3月份
 #Month3=N,2,S
@@ -174,6 +181,8 @@ E(0,3)
 
 #Budget3=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 4月份
 #Month4=N,2,S
@@ -181,6 +190,8 @@ E(0,4)
 
 #Budget4=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 5月份
 #Month5=N,2,S
@@ -188,6 +199,8 @@ E(0,5)
 
 #Budget5=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 6月份
 #Month6=N,2,S
@@ -195,6 +208,8 @@ E(0,6)
 
 #Budget6=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 7月份
 #Month7=N,2,S
@@ -202,6 +217,8 @@ E(0,7)
 
 #Budget7=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 8月份
 #Month8=N,2,S
@@ -209,6 +226,8 @@ E(0,8)
 
 #Budget8=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 9月份
 #Month9=N,2,S
@@ -216,6 +235,8 @@ E(0,9)
 
 #Budget9=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 10月份
 #Month10=N,2,S
@@ -223,6 +244,8 @@ E(0,10)
 
 #Budget10=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 11月份
 #Month11=N,2,S
@@ -230,6 +253,8 @@ E(0,11)
 
 #Budget11=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 12月份
 #Month12=N,2,S
@@ -237,13 +262,15 @@ E(0,12)
 
 #Budget12=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 #AGAIN=X,1,S
 IF(#FuncCode==2 || #FuncCode==4,$,S)
 E(0,1)ASGN(AGAIN$)
 
 ! 合計
-#Total=m,14,L
+#Total=m,16,L
 E(0,#Budget1+#Budget2+#Budget3+#Budget4+#Budget5+#Budget6+#Budget7+#Budget8+#Budget9+#Budget10+#Budget11+#Budget12)
 
 #RPTFG=A,1,S

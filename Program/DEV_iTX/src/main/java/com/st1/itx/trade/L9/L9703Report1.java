@@ -117,7 +117,8 @@ public class L9703Report1 extends MakeReport {
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703", "滯繳客戶明細表", "密", "A4", "");
 
-		bcAcDate = String.valueOf(titaVo.getEntDyI() + 19110000);
+		bcAcDate = String.valueOf(Integer.parseInt(titaVo.getParam("AcDate")) + 19110000);
+		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate"));
 
 		rptFlag = Integer.parseInt(titaVo.getParam("UnpaidCond"));
 
@@ -148,7 +149,6 @@ public class L9703Report1 extends MakeReport {
 		BigDecimal totalOfOverflow = BigDecimal.ZERO; // 溢短繳加總
 		BigDecimal totalOfTotal = BigDecimal.ZERO; // 合計加總
 
-		int tbsdy = titaVo.getEntDyI();
 		if (listL9703 == null || listL9703.size() == 0) {
 			this.print(1, 1, "*******    查無資料   ******");
 			return;
@@ -165,7 +165,7 @@ public class L9703Report1 extends MakeReport {
 
 			baTxCom.setTxBuffer(txbuffer);
 			try {
-				listBaTxVo = baTxCom.settingUnPaid(tbsdy, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+				listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
 			} catch (LogicException e) {
 				this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
 			}
