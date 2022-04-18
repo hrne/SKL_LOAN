@@ -193,8 +193,8 @@ IF(#OOCheckFlag==1,T(2,已確認報表),IF(#OOCheckFlag==0,T(2,確認),IF(#OOChe
 
 #OOBuff_L4321=X,42,O
 T(2,#RateChangeDate+#OOLableA+#CustType+#OOLableB_AdjCode+#OOLableB_KeyinCode+#OOLableBX)
-#OOBuff_LC009=X,10,O
-T(2,#TLRNO)
+#OOBuff_LC009=X,15,O
+T(2,#TLRNO+L4321)
 
 #OOBuff_L4325=X,10,O
 T(2,#RateChangeDate+#OOLableA+#CustType)

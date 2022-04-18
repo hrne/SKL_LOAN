@@ -53,7 +53,7 @@ public class L4455Batch extends TradeBuffer {
 		  l4455Report2.exec(titaVo);
 		}
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "L4455銀行扣款報表 處理完畢", titaVo);
+				titaVo.getTlrNo()+"L4455", "L4455銀行扣款報表 處理完畢", titaVo);
 
 		// end
 		this.addList(this.totaVo);

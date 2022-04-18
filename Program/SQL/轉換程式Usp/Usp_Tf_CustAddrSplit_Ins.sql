@@ -202,36 +202,64 @@ BEGIN
     WHERE "SplitFg" = 'Y';
 
     MERGE INTO "CustMain" C1
-    USING (SELECT "CustId"       -- 客戶統編 VARCHAR2 10
-                 ,"OriginalRoad" -- 原檔路名 NVARCHAR2 40 
-                 ,"CityCode"     -- 比對縣市代碼 VARCHAR2 2 
-                 ,"CityItem"     -- 比對縣市名稱 NVARCHAR2 10
-                 ,"AreaCode"     -- 比對鄉鎮市區代碼 VARCHAR2 3 
-                 ,"AreaItem"     -- 比對鄉鎮區名稱 NVARCHAR2 12 
-                 ,"SplitRoad"    -- 切割後路名 NVARCHAR2 40 
-                 ,"SplitFg"      -- 切割是否成功 VARCHAR2 1
-                 ,"Section"      -- 段 VARCHAR2 5 
-                 ,"Alley"        -- 巷 VARCHAR2 5 
-                 ,"Lane"         -- 弄 VARCHAR2 5 
-                 ,"Num"          -- 號 VARCHAR2 5 
-                 ,"NumDash"      -- 號之 VARCHAR2 5 
-                 ,"Floor"        -- 樓 VARCHAR2 5 
-                 ,"FloorDash"    -- 樓之 VARCHAR2 5 
-           FROM "RegAddrSplit"
-           WHERE "SplitFg" = 'Y') C2
-    ON (C1."CustId" = C2."CustId"
-        AND C2."SplitFg" = 'Y')
+    USING (
+         SELECT "CustId"       -- 客戶統編 VARCHAR2 10
+              , "OriginalRoad" -- 原檔路名 NVARCHAR2 40 
+              , "CityCode"     -- 比對縣市代碼 VARCHAR2 2 
+              , "CityItem"     -- 比對縣市名稱 NVARCHAR2 10
+              , "AreaCode"     -- 比對鄉鎮市區代碼 VARCHAR2 3 
+              , "AreaItem"     -- 比對鄉鎮區名稱 NVARCHAR2 12 
+              , "SplitRoad"    -- 切割後路名 NVARCHAR2 40 
+              , "SplitFg"      -- 切割是否成功 VARCHAR2 1
+              , "Section"      -- 段 VARCHAR2 5 
+              , "Alley"        -- 巷 VARCHAR2 5 
+              , "Lane"         -- 弄 VARCHAR2 5 
+              , "Num"          -- 號 VARCHAR2 5 
+              , "NumDash"      -- 號之 VARCHAR2 5 
+              , "Floor"        -- 樓 VARCHAR2 5 
+              , "FloorDash"    -- 樓之 VARCHAR2 5 
+         FROM "RegAddrSplit"
+    ) C2
+    ON (
+         C1."CustId" = C2."CustId"
+     --     AND C2."SplitFg" = 'Y'
+    )
     WHEN MATCHED THEN UPDATE SET
      C1."RegCityCode"  = C2."CityCode"   -- 縣市代碼 VARCHAR2 2 
     ,C1."RegAreaCode"  = C2."AreaCode"   -- 鄉鎮市區代碼 VARCHAR2 3 
-    ,C1."RegRoad"      = C2."SplitRoad"  -- 路名 NVARCHAR2 40 
-    ,C1."RegSection"   = C2."Section"    -- 段 VARCHAR2 5 
-    ,C1."RegAlley"     = C2."Alley"      -- 巷 VARCHAR2 5 
-    ,C1."RegLane"      = C2."Lane"       -- 弄 VARCHAR2 5 
-    ,C1."RegNum"       = C2."Num"        -- 號 VARCHAR2 5 
-    ,C1."RegNumDash"   = C2."NumDash"    -- 號之 VARCHAR2 5 
-    ,C1."RegFloor"     = C2."Floor"      -- 樓 VARCHAR2 5 
-    ,C1."RegFloorDash" = C2."FloorDash"; -- 樓之 VARCHAR2 5 
+    ,C1."RegRoad"      = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."SplitRoad"  -- 路名 NVARCHAR2 40 
+                         ELSE C1."RegRoad" END
+    ,C1."RegSection"   = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."Section"    -- 段 VARCHAR2 5 
+                         ELSE '' END
+    ,C1."RegAlley"     = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."Alley"      -- 巷 VARCHAR2 5 
+                         ELSE '' END
+    ,C1."RegLane"      = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."Lane"       -- 弄 VARCHAR2 5 
+                         ELSE '' END
+    ,C1."RegNum"       = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."Num"        -- 號 VARCHAR2 5 
+                         ELSE '' END
+    ,C1."RegNumDash"   = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."NumDash"    -- 號之 VARCHAR2 5 
+                         ELSE '' END
+    ,C1."RegFloor"     = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."Floor"      -- 樓 VARCHAR2 5 
+                         ELSE '' END
+    ,C1."RegFloorDash" = CASE
+                           WHEN C2."SplitFg" = 'Y'
+                           THEN C2."FloorDash"  -- 樓之 VARCHAR2 5 
+                         ELSE '' END
+    ;
 
     -- 刪除舊資料
     EXECUTE IMMEDIATE 'ALTER TABLE "CurrAddrSplit" DISABLE PRIMARY KEY CASCADE';
@@ -417,37 +445,64 @@ BEGIN
     WHERE "SplitFg" = 'Y';
 
     MERGE INTO "CustMain" C1
-    USING (SELECT "CustId"       -- 客戶統編 VARCHAR2 10
-                 ,"OriginalRoad" -- 原檔路名 NVARCHAR2 40 
-                 ,"CityCode"     -- 比對縣市代碼 VARCHAR2 2 
-                 ,"CityItem"     -- 比對縣市名稱 NVARCHAR2 10
-                 ,"AreaCode"     -- 比對鄉鎮市區代碼 VARCHAR2 3 
-                 ,"AreaItem"     -- 比對鄉鎮區名稱 NVARCHAR2 12 
-                 ,"SplitRoad"    -- 切割後路名 NVARCHAR2 40 
-                 ,"SplitFg"      -- 切割是否成功 VARCHAR2 1
-                 ,"Section"      -- 段 VARCHAR2 5 
-                 ,"Alley"        -- 巷 VARCHAR2 5 
-                 ,"Lane"         -- 弄 VARCHAR2 5 
-                 ,"Num"          -- 號 VARCHAR2 5 
-                 ,"NumDash"      -- 號之 VARCHAR2 5 
-                 ,"Floor"        -- 樓 VARCHAR2 5 
-                 ,"FloorDash"    -- 樓之 VARCHAR2 5 
-           FROM "CurrAddrSplit"
-           WHERE "SplitFg" = 'Y') C2
-    ON (C1."CustId" = C2."CustId"
-        AND C2."SplitFg" = 'Y')
+    USING (
+         SELECT "CustId"       -- 客戶統編 VARCHAR2 10
+              , "OriginalRoad" -- 原檔路名 NVARCHAR2 40 
+              , "CityCode"     -- 比對縣市代碼 VARCHAR2 2 
+              , "CityItem"     -- 比對縣市名稱 NVARCHAR2 10
+              , "AreaCode"     -- 比對鄉鎮市區代碼 VARCHAR2 3 
+              , "AreaItem"     -- 比對鄉鎮區名稱 NVARCHAR2 12 
+              , "SplitRoad"    -- 切割後路名 NVARCHAR2 40 
+              , "SplitFg"      -- 切割是否成功 VARCHAR2 1
+              , "Section"      -- 段 VARCHAR2 5 
+              , "Alley"        -- 巷 VARCHAR2 5 
+              , "Lane"         -- 弄 VARCHAR2 5 
+              , "Num"          -- 號 VARCHAR2 5 
+              , "NumDash"      -- 號之 VARCHAR2 5 
+              , "Floor"        -- 樓 VARCHAR2 5 
+              , "FloorDash"    -- 樓之 VARCHAR2 5 
+         FROM "CurrAddrSplit"
+    ) C2
+    ON (
+         C1."CustId" = C2."CustId"
+     --    AND C2."SplitFg" = 'Y'
+    )
     WHEN MATCHED THEN UPDATE SET
      C1."CurrCityCode"  = C2."CityCode"   -- 縣市代碼 VARCHAR2 2 
     ,C1."CurrAreaCode"  = C2."AreaCode"   -- 鄉鎮市區代碼 VARCHAR2 3 
-    ,C1."CurrRoad"      = C2."SplitRoad"  -- 路名 NVARCHAR2 40 
-    ,C1."CurrSection"   = C2."Section"    -- 段 VARCHAR2 5 
-    ,C1."CurrAlley"     = C2."Alley"      -- 巷 VARCHAR2 5 
-    ,C1."CurrLane"      = C2."Lane"       -- 弄 VARCHAR2 5 
-    ,C1."CurrNum"       = C2."Num"        -- 號 VARCHAR2 5 
-    ,C1."CurrNumDash"   = C2."NumDash"    -- 號之 VARCHAR2 5 
-    ,C1."CurrFloor"     = C2."Floor"      -- 樓 VARCHAR2 5 
-    ,C1."CurrFloorDash" = C2."FloorDash"; -- 樓之 VARCHAR2 5 
-
+    ,C1."CurrRoad"      = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."SplitRoad"  -- 路名 NVARCHAR2 40 
+                          ELSE C1."CurrRoad" END
+    ,C1."CurrSection"   = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."Section"    -- 段 VARCHAR2 5 
+                          ELSE '' END
+    ,C1."CurrAlley"     = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."Alley"      -- 巷 VARCHAR2 5 
+                          ELSE '' END
+    ,C1."CurrLane"      = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."Lane"       -- 弄 VARCHAR2 5 
+                          ELSE '' END
+    ,C1."CurrNum"       = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."Num"        -- 號 VARCHAR2 5 
+                          ELSE '' END
+    ,C1."CurrNumDash"   = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."NumDash"    -- 號之 VARCHAR2 5 
+                          ELSE '' END
+    ,C1."CurrFloor"     = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."Floor"      -- 樓 VARCHAR2 5 
+                          ELSE '' END
+    ,C1."CurrFloorDash" = CASE
+                            WHEN C2."SplitFg" = 'Y'
+                            THEN C2."FloorDash" -- 樓之 VARCHAR2 5 
+                          ELSE '' END
+    ;
 
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;

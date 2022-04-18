@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9706p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9706p.class);
 
 	@Autowired
 	public L9706Report l9706Report;
@@ -50,7 +49,7 @@ public class L9706p extends TradeBuffer {
 			content = "L9706貸款餘額證明書查無資料";
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9706", content, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
 @Service("L9702p")
 @Scope("prototype")
 public class L9702p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9702p.class);
 
 	@Autowired
 	L9702Report l9702Report;
@@ -45,7 +44,7 @@ public class L9702p extends TradeBuffer {
 
 		l9702Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L9702放款餘額及財收統計表已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L9702", "L9702放款餘額及財收統計表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

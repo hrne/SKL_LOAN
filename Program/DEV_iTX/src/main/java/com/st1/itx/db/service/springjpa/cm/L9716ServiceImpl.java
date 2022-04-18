@@ -54,6 +54,12 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
+		
+		this.info("inputYearMonth=" + iYear + String.format("%02d", iMonth));
+		this.info("inputCollPsn=" + titaVo.getParam("inputCollPsn"));
+		this.info("inputOvduTermMin=" + titaVo.getParam("inputOvduTermMin"));
+		this.info("inputOvduTermMax=" + titaVo.getParam("inputOvduTermMax"));
+		
 
 		String sql = "SELECT M.\"OvduTerm\" F0";
 		sql += "            ,EMP.\"Fullname\" F1";
@@ -189,6 +195,8 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
+		
+	
 		String sql = " ";
 		sql += "      SELECT DECODE(M.\"AcSubBookCode\",'00A',' ','201','A') AS F0";
 		sql += "            ,L.\"CustNo\" F1";
@@ -275,8 +283,6 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClMain\" CL ON CL.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\" = CF.\"ClNo\"";
-		sql += "      LEFT JOIN \"CustTelNo\" T1 ON T1.\"CustUKey\" = C.\"CustUKey\"";
-		sql += "                             	AND T1.\"Enable\" = 'Y'";
 		sql += "      LEFT JOIN \"CdCity\" C1 ON C1.\"CityCode\" =  C.\"CurrCityCode\"";
 		sql += "      LEFT JOIN \"CdArea\" C2 ON C2.\"CityCode\" =  C.\"CurrCityCode\"";
 		sql += "                             AND C2.\"AreaCode\" =  C.\"CurrAreaCode\"";

@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9725p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9725p.class);
 
 	@Autowired
 	L9725Report l9725Report;
@@ -49,9 +48,9 @@ public class L9725p extends TradeBuffer {
 		boolean isFinish = l9725Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9725", TXCD + TXName + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9725", TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

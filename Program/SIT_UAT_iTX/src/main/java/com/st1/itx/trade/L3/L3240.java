@@ -31,6 +31,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.common.LoanDueAmtCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -61,6 +62,8 @@ public class L3240 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public LoanRateChangeService loanRateChangeService;
+	@Autowired
+	public LoanDueAmtCom loanDueAmtCom;
 
 	@Autowired
 	Parse parse;
@@ -196,8 +199,8 @@ public class L3240 extends TradeBuffer {
 			if (tx.getIntStartDate() != iIntStartDate) {
 				continue;
 			}
-			if(!tx.getCreateEmpNo().equals("999999")) {
-				continue;
+			if (!tx.getCreateEmpNo().equals("999999")) {
+				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
 			}
 			wkBorxNo = tx.getBorxNo();
 
@@ -323,7 +326,7 @@ public class L3240 extends TradeBuffer {
 		}
 
 		LoanRateChange tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo,
-				tx.getBormNo(), tx.getIntStartDate() + 19110000, titaVo);
+				tx.getBormNo(), tx.getIntEndDate() + 19110000, titaVo);
 		if (tLoanRateChange == null) {
 			throw new LogicException(titaVo, "E3926",
 					iCustNo + "-" + iFacmNo + "-" + tx.getBormNo() + " 無放款利率變動資料 = " + tx.getIntStartDate()); // 計算利息錯誤，放款利率變動檔查無資料
@@ -348,8 +351,39 @@ public class L3240 extends TradeBuffer {
 				.setNextRepayDate(loanCom.getNextRepayDate(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getRepayFreq(),
 						tLoanBorMain.getFreqBase(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
 						tLoanBorMain.getPrevRepaidDate(), tLoanBorMain.getMaturityDate(), tLoanBorMain.getGraceDate()));
+
+		BigDecimal wkDueAmt = BigDecimal.ZERO;
+
+		// 計算期金
+		// 攤還方式=3.本息平均法 且 攤還額異動碼=1:變 且利率有變動
+		if ("3".equals(tLoanBorMain.getAmortizedCode()) && "1".equals(tFacMain.getExtraRepayCode())) {
+			// 重新計算寬限期數
+			tLoanBorMain.setGracePeriod(loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(),
+					tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(),
+					tLoanBorMain.getSpecificDd(), tLoanBorMain.getGraceDate()));
+
+			int wkRestPeriod = 0;
+			int wkGracePeriod = 0;
+
+			// 期數不同且利率有變動 ==> 須調整期金
+			// 過了寬限期，用剩餘期數計算；寬緩期內用總期數期減寬限期數計算
+			if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getGraceDate()) {
+				wkRestPeriod = tLoanBorMain.getTotalPeriod() - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(),
+						tLoanBorMain.getRepayFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
+						tLoanBorMain.getPrevPayIntDate());
+				wkGracePeriod = 0;
+			} else {
+				wkRestPeriod = tLoanBorMain.getTotalPeriod();
+				wkGracePeriod = tLoanBorMain.getGracePeriod();
+			}
+
+			wkDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(), "3",
+					tLoanBorMain.getFreqBase(), wkRestPeriod, wkGracePeriod, tLoanBorMain.getPayIntFreq(),
+					tLoanBorMain.getFinalBal(), titaVo);
+			tLoanBorMain.setDueAmt(wkDueAmt);
+		}
 		wkNewBorxNo = tLoanBorMain.getLastBorxNo() + 1;
-		// 放款交易訂正交易須由最後一筆交易開始訂正
+
 		tLoanBorMain.setLastBorxNo(wkNewBorxNo);
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
 		tLoanBorMain.setLastKinbr(titaVo.getKinbr());

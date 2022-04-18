@@ -21,7 +21,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9713p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9713p.class);
 
 	@Autowired
 	L9713Report l9713Report;
@@ -50,7 +49,7 @@ public class L9713p extends TradeBuffer {
 
 //		this.info("L9713p content = " + content);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9713", content, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

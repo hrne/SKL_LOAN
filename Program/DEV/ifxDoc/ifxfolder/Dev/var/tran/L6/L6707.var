@@ -27,14 +27,14 @@ E(0,0)
 ["#FdFuncCode+功能",#FuncCodeX],
 ["#FdDataYearMonth+年月份",#DataYearMonth],
 ["@收入項目"],
-["#FdInterestIncome+利息收入",#InterestIncome],
-["#FdPrincipalAmortizeAmt+本金攤還金額",#PrincipalAmortizeAmt],
-["#FdPrepaymentAmt+提前還款金額",#PrepaymentAmt],
-["#FdDuePaymentAmt+到期清償金額",#DuePaymentAmt],
+["#FdInterestIncome+利息收入","@@@",#InterestIncome],
+["#FdPrincipalAmortizeAmt+本金攤還金額","@@@",#PrincipalAmortizeAmt],
+["#FdPrepaymentAmt+提前還款金額","@@@",#PrepaymentAmt],
+["#FdDuePaymentAmt+到期清償金額","@@@",#DuePaymentAmt],
 ["#FdIncome+收入合計",#Income],
 ["@支出項目"],
-["#FdExtendAmt+展期金額",#ExtendAmt],
-["#FdLoanAmt+貸放金額",#LoanAmt],
+["#FdExtendAmt+展期金額","@@@",#ExtendAmt],
+["#FdLoanAmt+貸放金額","@@@",#LoanAmt],
 ["#FdExpend+支出合計",#Expend],
 ]
 !---------- AP Button AREA ----------
@@ -62,6 +62,12 @@ T(3, )
 T(3, )
 #FdExpend=X,2,L
 T(3, )
+
+#Sum=@,1,S
+E(0,@Income,#InterestIncome+#PrincipalAmortizeAmt+#PrepaymentAmt+#DuePaymentAmt)
+
+#Sum2=@,1,S
+E(0,@Expend,#ExtendAmt,#LoanAmt)
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -185,34 +191,46 @@ E(0,@LoanAmt,#L6R15LoanAmt)
 ! 利息收入
 #InterestIncome=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 本金攤還金額
 #PrincipalAmortizeAmt=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 提前還款金額
 #PrepaymentAmt=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 到期清償金額
 #DuePaymentAmt=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum)
 
 ! 收入合計
-#Income=m,14,L
+#Income=m,16,L
 E(0,#InterestIncome+#PrincipalAmortizeAmt+#PrepaymentAmt+#DuePaymentAmt)
 
 ! 支出項目
 ! 展期金額
 #ExtendAmt=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum2)
 
 !貸放金額
 #LoanAmt=m,14,I
 C(2,#FuncCode,$,$,$,$,s,s)
+@
+CALL(#Sum2)
 
 ! 支出合計
-#Expend=m,14,L
+#Expend=m,16,L
 E(0,#ExtendAmt+#LoanAmt)
 
 #RPTFG=A,1,S

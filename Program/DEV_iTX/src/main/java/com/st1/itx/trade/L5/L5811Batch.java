@@ -94,7 +94,7 @@ public class L5811Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L5811",
 					"L5811國稅局申報檢核檔已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5811", titaVo.getTlrNo(),

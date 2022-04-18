@@ -187,7 +187,7 @@ public class L4511 extends TradeBuffer {
 			sendMsg += "非15日薪媒體檔已完成，筆數：" + cntN + "。";
 		}
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4511",
 				sendMsg, titaVo);
 
 		this.addList(this.totaVo);

@@ -83,7 +83,7 @@ public class L9710p extends TradeBuffer {
 
 				infoNotification = "L9710寬限到期明細表已完成";
 				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-						titaVo.getParam("TLRNO"), infoNotification, titaVo);
+						titaVo.getParam("TLRNO")+"L9710", infoNotification, titaVo);
 			}
 
 			this.info("active L9710report(form type by l9711) notice");
@@ -101,7 +101,7 @@ public class L9710p extends TradeBuffer {
 
 		}
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), infoNotification, titaVo);
+				titaVo.getParam("TLRNO")+"L9710", infoNotification, titaVo);
 
 		this.addList(this.totaVo);
 

@@ -145,7 +145,7 @@ public class L4606Report1 extends MakeReport {
 					
 //					每頁第38筆 跳頁 
 					if (pageCnt >= 35) {
-						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+						this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
 
 						pageCnt = 0;
 						this.newPage();
@@ -175,7 +175,7 @@ public class L4606Report1 extends MakeReport {
 
 //			每頁第38筆 跳頁 
 			if (pageCnt >= 35) {
-				this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+				this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
 
 				pageCnt = 0;
 				this.newPage();
@@ -194,7 +194,7 @@ public class L4606Report1 extends MakeReport {
 			
 //			每頁第35筆 跳頁 
 			if (pageCnt >= 35) {
-				this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+				this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
 
 				pageCnt = 0;
 				this.newPage();

@@ -231,7 +231,7 @@ public class L4454 extends TradeBuffer {
 			msg += ", 繳息還本通知單份數：" + (l9705ListA.size() + l9705ListB.size());
 			if (l4454List.size() > 0) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo(), msg, titaVo);
+						titaVo.getTlrNo()+"L4454", msg, titaVo);
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", msg, titaVo);
 			}

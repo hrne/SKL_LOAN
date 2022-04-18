@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9712p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9712p.class);
 
 	@Autowired
 	L9712Report l9712Report;
@@ -45,7 +44,7 @@ public class L9712p extends TradeBuffer {
 
 		l9712Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9712利息違約金減免明細表已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9712", "L9712利息違約金減免明細表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

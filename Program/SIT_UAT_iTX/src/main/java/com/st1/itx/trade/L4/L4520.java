@@ -146,7 +146,7 @@ public class L4520 extends TradeBuffer {
 		}
 		sendMsg = "L4520-報表已完成";
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4520",
 				sendMsg, titaVo);
 
 		this.addList(totaVo);

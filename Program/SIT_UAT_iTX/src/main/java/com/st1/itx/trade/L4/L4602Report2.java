@@ -56,7 +56,8 @@ public class L4602Report2 extends MakeReport {
 
 		List<String> file = getData(titaVo);
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-LN5811P.CSV", fileName, 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+				titaVo.getTxCode() + "-LN5811P.CSV", fileName, 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -68,7 +69,8 @@ public class L4602Report2 extends MakeReport {
 
 		makeFile.toFile(sno);
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), titaVo.getTxCode() + " 已產生LN5811P.CSV", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+				titaVo.getTxCode() + " 已產生LN5811P.CSV", titaVo);
 	}
 
 	private List<String> getData(TitaVo titaVo) {

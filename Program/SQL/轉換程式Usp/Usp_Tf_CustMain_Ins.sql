@@ -66,7 +66,7 @@ BEGIN
              WHEN LENGTH(TRIM(CUSP."CUSZPA")) >= 3 THEN SUBSTR(TRIM(CUSP."CUSZPA"),0,3)
            ELSE '' END                    AS "RegZip3"             -- 戶籍-郵遞區號前三碼 VARCHAR2 3 
           ,CASE 
-             WHEN LENGTH(TRIM(CUSP."CUSZPA")) = 5 THEN SUBSTR(TRIM(CUSP."CUSZPA"),3,2)
+             WHEN LENGTH(TRIM(CUSP."CUSZPA")) = 5 THEN SUBSTR(TRIM(CUSP."CUSZPA"),4,2)
            ELSE '' END                    AS "RegZip2"             -- 戶籍-郵遞區號後兩碼 VARCHAR2 2 
           ,''                             AS "RegCityCode"         -- 戶籍-縣市代碼 VARCHAR2 2 
           ,''                             AS "RegAreaCode"         -- 戶籍-鄉鎮市區代碼 VARCHAR2 3 
@@ -83,7 +83,7 @@ BEGIN
              WHEN LENGTH(TRIM(CUSP."CUSZP1")) >= 3 THEN SUBSTR(TRIM(CUSP."CUSZP1"),0,3)
            ELSE '' END                    AS "CurrZip3"            -- 通訊-郵遞區號前三碼 VARCHAR2 3 
           ,CASE 
-             WHEN LENGTH(TRIM(CUSP."CUSZP1")) = 5 THEN SUBSTR(TRIM(CUSP."CUSZP1"),3,2)
+             WHEN LENGTH(TRIM(CUSP."CUSZP1")) = 5 THEN SUBSTR(TRIM(CUSP."CUSZP1"),4,2)
            ELSE '' END                    AS "CurrZip2"            -- 通訊-郵遞區號後兩碼 VARCHAR2 2 
           ,''                             AS "CurrCityCode"        -- 通訊-縣市代碼 VARCHAR2 2 
           ,''                             AS "CurrAreaCode"        -- 通訊-鄉鎮市區代碼 VARCHAR2 3 

@@ -776,9 +776,12 @@ public class L3200 extends TradeBuffer {
 		}
 
 		if (iShortAmt.compareTo(wkTotalShortAmtLimit) > 0) {
-			throw new LogicException(titaVo, "E3096", "短繳金額 = " + iShortAmt + " 短繳限額 = " + wkTotalShortAmtLimit); // 短繳利息超過規定百分比金額
+			if (wkTotalPrincipal.compareTo(BigDecimal.ZERO) > 0) {
+				throw new LogicException(titaVo, "E3095", "短繳金額 = " + iShortAmt + " 短繳限額 = " + wkTotalShortAmtLimit); // 短繳本金超過規定百分比金額
+			} else {
+				throw new LogicException(titaVo, "E3096", "短繳金額 = " + iShortAmt + " 短繳限額 = " + wkTotalShortAmtLimit); // 短繳利息超過規定百分比金額
+			}
 		}
-
 	}
 
 	// 計算短繳
@@ -908,7 +911,7 @@ public class L3200 extends TradeBuffer {
 		wkBreachAmt = BigDecimal.ZERO;
 		wkExtraRepay = BigDecimal.ZERO;
 		wkRepaidPeriod = 0;
-		
+
 		// 部分償還餘額 > 0
 		if (wkRepaykindCode == 1) {
 			wkExtraRepayRemaind = iExtraRepay.subtract(wkRepayLoan);
@@ -929,7 +932,6 @@ public class L3200 extends TradeBuffer {
 			wkRepayIntDate = parse
 					.stringToInteger(iRepayIntDateByFacmNoVo.get(parse.IntegerToString(ln.getFacmNo(), 3)));
 		}
-
 
 		if (ln.getActFg() == 1) {
 			throw new LogicException(titaVo, "E0021", checkMsg); // 該筆資料待放行中

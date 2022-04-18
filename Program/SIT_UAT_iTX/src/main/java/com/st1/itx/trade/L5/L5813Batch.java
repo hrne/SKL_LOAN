@@ -105,7 +105,7 @@ public class L5813Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L5813國稅局申報媒體檔已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L5813", "L5813國稅局申報媒體檔已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(), sendMsg, titaVo);
 		}

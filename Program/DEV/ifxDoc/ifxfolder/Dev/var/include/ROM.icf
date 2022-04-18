@@ -3696,16 +3696,20 @@ TXFORM=L2R60
 
 !    L2R62 : 尋找帳務備忘錄明細檔(RmkNo DESC)
 <L2R62.dec>
+#L2r62AcDate=D,7,S
 #L2r62RmkNo=A,3,S
-#L2r62RmkCode=A,3,S
-#L2r62RmkDesc=c,120,S
+#L2r62RmkDesc=x,120,S
+#L2r62EmpNo=x,6,S
+#L2r62EmpName=x,20,S
 </L2R62.dec>
 
 <L2R62.tom>
 TXFORM=L2R62
+#L2r62AcDate
 #L2r62RmkNo
-#L2r62RmkCode
 #L2r62RmkDesc
+#L2r62EmpNo
+#L2r62EmpName
 ^
 </L2R62.tom>
 
@@ -5372,6 +5376,42 @@ TXFORM=L4R29
 #L4R29TitaTxtNo
 ^
 </L4R29.tom>
+
+<L4R30.dec>
+#L4R30CustId=X,10,S
+#L4R30FacmNo=A,3,S
+#L4R30RepayAcctSeq=X,2,S
+#L4R30StampCode=A,1,S
+#L4R30AuthErrorCode=A,2,S
+#L4R30PostMediaCode=X,1,S
+#L4R30AmlRsp=A,1,S
+#L4R30StampFinishDate=D,7,S
+#L4R30StampCancelDate=D,7,S
+#L4R30LimitAmt=m,8,S
+#L4R30CreateDate=D,7,S
+#L4R30CreateEmpNo=X,6,S
+#L4R30LastUpdate=D,7,S
+#L4R30LastUpdateEmpNo=X,6,S
+</L4R30.dec>
+
+<L4R30.tom>
+TXFORM=L4R30
+#L4R30CustId
+#L4R30FacmNo
+#L4R30RepayAcctSeq
+#L4R30StampCode
+#L4R30AuthErrorCode
+#L4R30PostMediaCode
+#L4R30AmlRsp
+#L4R30StampFinishDate
+#L4R30StampCancelDate
+#L4R30LimitAmt
+#L4R30CreateDate
+#L4R30CreateEmpNo
+#L4R30LastUpdate
+#L4R30LastUpdateEmpNo
+^
+</L4R30.tom>
 
 <L5R01.dec>
 #L5r01CustId=X,10,S

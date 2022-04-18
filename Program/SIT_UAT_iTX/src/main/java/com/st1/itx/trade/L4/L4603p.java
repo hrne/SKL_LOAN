@@ -309,7 +309,7 @@ public class L4603p extends TradeBuffer {
 
 			}
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "L4603火險通知作業已完成", titaVo);
+					titaVo.getParam("TLRNO")+"L4603", "L4603火險通知作業已完成", titaVo);
 
 		} // if
 

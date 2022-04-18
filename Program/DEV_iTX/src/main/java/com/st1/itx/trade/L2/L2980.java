@@ -49,7 +49,7 @@ public class L2980 extends TradeBuffer {
 
 		l2980report.exec(titaVo, this.getTxBuffer());
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L2980個人房貸調整案已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L2980", "L2980個人房貸調整案已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

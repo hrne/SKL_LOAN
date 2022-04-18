@@ -85,13 +85,11 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,p.\"DeleteDate\"        as F20                                      ";
 		sql += " ,row_number() over (partition by p.\"CustNo\",p.\"RepayAcct\",p.\"AuthCode\",p.\"PostDepCode\" order by p.\"CreateDate\" Desc) as F21 ";
 		sql += " ,p.\"TitaTxCd\"          as F22                                      ";
-		sql += " ,p.\"ProcessDate\"          as F23                                        ";
-		sql += " ,p.\"ProcessTime\"          as F24                                       ";
-		sql += " ,p.\"CreateEmpNo\"          as F25                                       ";
-		sql += " ,To_CHAR(p.\"CreateDate\",'YYYYMMDD')           as F26                                       ";
-		sql += " ,p.\"LastUpdateEmpNo\"      as F27                                       ";
-		sql += " ,To_CHAR(p.\"LastUpdate\",'YYYYMMDD')           as F28                                       ";
-		sql += " ,p.\"StampCancelDate\"   as F29                                      ";
+		sql += " ,p.\"CreateEmpNo\"          as F23                                       ";
+		sql += " ,To_CHAR(p.\"CreateDate\",'YYYYMMDD')           as F24                                       ";
+		sql += " ,p.\"LastUpdateEmpNo\"      as F25                                       ";
+		sql += " ,To_CHAR(p.\"LastUpdate\",'YYYYMMDD')           as F26                                       ";
+		sql += " ,p.\"StampCancelDate\"   as F27                                      ";
 		sql += " from \"PostAuthLog\" p                                               ";
 		sql += " where                                                                ";
 		if (iSearchFlag == 1) {

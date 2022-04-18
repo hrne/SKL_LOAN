@@ -276,7 +276,7 @@ public class L4510Batch extends TradeBuffer {
 					titaVo.get("MediaDate") + iOpItem, sendMsg, titaVo);
 		} else {
 			sendMsg = (iOpItem == 1 ? "15日薪" : "非15日薪") + " 扣薪報表已完成，扣薪明細筆數 = " + cnt;
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4510",
 					sendMsg, titaVo);
 		}
 

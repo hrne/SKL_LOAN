@@ -62,7 +62,7 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , YHLI.\"MaturityDate\" ";
 		sql += " FROM \"YearlyHouseLoanInt\" YHLI ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = YHLI.\"CustNo\" ";
-		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = 'CustNo' ";
+		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = YHLI.\"CustNo\" ";
 		sql += "                        AND F.\"FacmNo\" = YHLI.\"FacmNo\" ";
 		sql += " LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'UsageCode' ";
 		sql += "                        AND CC.\"Code\" = YHLI.\"UsageCode\" ";

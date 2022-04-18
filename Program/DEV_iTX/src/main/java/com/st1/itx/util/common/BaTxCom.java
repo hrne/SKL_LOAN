@@ -1161,6 +1161,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 		//
 		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
+			baTxVo = new BaTxVo();
 			baTxVo.setDataKind(6); // 6.另收欠款
 			baTxVo.setRepayType(9); // 09-其他(清償違約金)
 			baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
@@ -1172,6 +1173,7 @@ public class BaTxCom extends TradeBuffer {
 			baTxVo.setUnPaidAmt(baTxVo.getPrincipal().add(this.closeBreachAmt)); // 未收金額
 			baTxVo.setDbCr("C"); // 借貸別
 			baTxVo.setAcctAmt(BigDecimal.ZERO); // 出帳金額
+			this.baTxList.add(baTxVo);
 		}
 	}
 

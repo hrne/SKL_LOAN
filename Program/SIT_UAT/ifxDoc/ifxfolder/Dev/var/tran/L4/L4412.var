@@ -123,10 +123,6 @@ T(3,CdCode.AmlCheckItem)
 #CALDATE=D,8,S
 T(4,CDATE$)
 
-! PK =
-! AuthCreateDate,AuthApplCode,CustNo,
-! PostDepCode,RepayAcct,AuthCode
-
 #SexHelpRim=X,1,S
 RESET_RIM(#SexHelpRim,XXR99)
 S(XXR99,01,#SexRimName,#RelationCodeRimName,#FuncCodeRimName,#PostDepCodeRimName,#AuthCodeRimName,#StampCodeRimName,#AuthErrorCodeRimName,#AmlRspRimName)
@@ -142,35 +138,52 @@ T(2,@AuthErrorCodeHelp,#HelpDesc7)
 T(2,@AmlRspHelp,#HelpDesc8)
 
 
-#NTXBUF=X,500,S
+#NTXBUF=X,45,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FuncCode,#NTXBUF,1,1)
-T(1,@CustId,#NTXBUF,2,10)
-T(1,@CustIdTemp2,#NTXBUF,2,10)
-T(1,@CustNo,#NTXBUF,12,7)
-T(1,@FacmNo,#NTXBUF,19,3)
-T(1,@PostDepCode,#NTXBUF,22,1)
-T(1,@AuthCode,#NTXBUF,24,1)
-T(1,@RepayAcct,#NTXBUF,25,14)
-T(1,@AuthApplCode,#NTXBUF,39,1)
-T(1,@AuthApplCodeTemp,#NTXBUF,39,1)
-T(1,@RepayAcctSeq,#NTXBUF,40,2)
-T(1,@StampCode,#NTXBUF,42,1)
-T(1,@AuthErrorCode,#NTXBUF,43,2)
-T(1,@PostMediaCode,#NTXBUF,45,1)
-T(1,@AmlRsp,#NTXBUF,46,1)
-C(3,#FuncCode,1,$,T(1,@AuthCreateDate,#NTXBUF,47,7))
-T(1,@StampFinishDate,#NTXBUF,54,7)
+T(1,@AuthCreateDate,#NTXBUF,2,7)
+T(1,@AuthApplCode,#NTXBUF,9,1)
+T(1,@AuthApplCodeTemp,#NTXBUF,9,1)
+T(1,@CustNo,#NTXBUF,10,7)
+T(1,@PostDepCode,#NTXBUF,17,1)
+T(1,@RepayAcct,#NTXBUF,18,14)
+T(1,@AuthCode,#NTXBUF,32,1)
 INVOKEJS(SHOW,p1,02,02,1)
-IF(#FuncCode==4 || #FuncCode==5,T(1,@CDT,#NTXBUF,61,7),T(1,@CDT,#CALDATE,2,7))
-T(1,@SysTime,#NTXBUF,68,6)
-T(1,@CreateEmpNo,#NTXBUF,74,30)
-T(1,@CreateDate,#NTXBUF,104,7)
-T(1,@LastUpdateEmpNo,#NTXBUF,111,30)
-T(1,@LastUpdate,#NTXBUF,141,7)
-T(1,@StampCancelDate,#NTXBUF,148,7)
-T(1,@LimitAmt,#NTXBUF,155,14)
 
+
+#RimRepayAcct=A,14,S
+#RimAuthCode=A,1,S
+
+! L4R30 調PostAuthLog資料
+#SendL4R30=X,1,S
+C(3,#FuncCode,1,s,$)
+E(0,@RimAuthCreateDate,#AuthCreateDate)
+T(2,@RimAuthApplCode,#AuthApplCode)
+E(0,@RimCustNo,#CustNo)
+T(2,@RimPostDepCode,#PostDepCode)
+T(2,@RimRepayAcct,#RepayAcct)
+T(2,@RimAuthCode,#AuthCode)
+RESET_RIM(#SendL4R30,L4R30)
+S(L4R30,1,#RimAuthCreateDate,#RimAuthApplCode,#RimCustNo,#RimPostDepCode,#RimRepayAcct,#RimAuthCode)
+R(1,L4R30)
+
+T(2,@CustId,#L4R30CustId)
+T(2,@CustIdTemp2,#L4R30CustId)
+E(0,@FacmNo,#L4R30FacmNo)
+T(2,@RepayAcctSeq,#L4R30RepayAcctSeq)
+E(0,@StampCode,#L4R30StampCode)
+T(2,@AuthErrorCode,#L4R30AuthErrorCode)
+T(2,@PostMediaCode,#L4R30PostMediaCode)
+E(0,@AmlRsp,#L4R30AmlRsp)
+T(2,@StampFinishDate,#L4R30StampFinishDate)
+!T(2,@CalDate,#L4R30CalDate)
+!T(2,@CalTime,#L4R30CalTime)
+T(2,@CreateEmpNo,#L4R30CreateEmpNo)
+T(2,@CreateDate,#L4R30CreateDate)
+T(2,@LastUpdateEmpNo,#L4R30LastUpdateEmpNo)
+T(2,@LastUpdate,#L4R30LastUpdate)
+T(2,@StampCancelDate,#L4R30StampCancelDate)
+E(0,@LimitAmt,#L4R30LimitAmt)
 #PREVALUE=A,1,S
 
 
@@ -184,19 +197,9 @@ IF(#FuncCode==4 || #FuncCode==5,$,T(4,TIME$))
 
 !處理日期
 #CalDate=D,7,L
-E(0,#CDT)
-
-#HH=X,2,S
-T(1,#SysTime,1,2)
-#MM=X,2,S
-T(1,#SysTime,3,2)
-#SS=X,2,S
-T(1,#SysTime,5,2)
 
 !處理時間
 #CalTime=X,8,L
-C(3,#HH,0,C(4,#MM,s,$),$)
-T(2,#HH+:+#MM+:+#SS)
 
 #CreateEmpNo=X,30,L
 C(2,#FuncCode,S,S,$,$,$)
@@ -345,7 +348,6 @@ RESET_RIM(#SendL4R24A,L4R24)
 S(L4R24,1,#RimFuncCode,#RimAuthCreateDate,#RimCustNo,#RimAcctNo,#RimBankNo,#RimAuthApplCode,#RimPostDepCode)
 R(1,L4R24)
 
-
 ! 戶號
 #CustNo=A,7,I
 C(3,#FuncCode,1,$,s)
@@ -409,6 +411,7 @@ T(2,@CustName,#L4r03CustName)
 ! 戶名
 #CustName=x,100,L
 
+
 #BuffCancel=X,17,S
 T(2,Y+#SysDateRoc7+1+2+#CustNo)
 
@@ -456,6 +459,7 @@ C(3,#FuncCode,1,$,s)
 <include src="ROM.icf::L4R22.dec"/>
 <include src="ROM.icf::L4R23.dec"/>
 <include src="ROM.icf::L4R24.dec"/>
+<include src="ROM.icf::L4R30.dec"/>
 
 #RimL4r01=X,1,S
 C(3,#FuncCode,1,$,s)
@@ -806,7 +810,7 @@ TXFORM=L4412
 <include src="ROM.icf::L4R22.tom"/>
 <include src="ROM.icf::L4R23.tom"/>
 <include src="ROM.icf::L4R24.tom"/>
-
+<include src="ROM.icf::L4R30.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

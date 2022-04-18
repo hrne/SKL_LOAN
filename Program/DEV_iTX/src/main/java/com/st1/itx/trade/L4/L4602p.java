@@ -87,7 +87,8 @@ public class L4602p extends TradeBuffer {
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
 		// 刪除暫存檔
-		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth, "" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth,
+				"" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenewMediaTemp != null) {
 			try {
 				insuRenewMediaTempService.deleteAll(slInsuRenewMediaTemp.getContent(), titaVo);
@@ -159,9 +160,11 @@ public class L4602p extends TradeBuffer {
 		}
 		// 報表製作完成，發MESSAGE
 		if (isFinished) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4602火險出單明細表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+					"L4602火險出單明細表已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4602火險出單明細表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+					"L4602火險出單明細表查無資料", titaVo);
 		}
 
 		if (lInsuRenewMediaTemp.size() > 0) {
@@ -177,9 +180,11 @@ public class L4602p extends TradeBuffer {
 		ArrayList<String> file = insuRenewFileVo.toFile();
 
 		if (file.isEmpty()) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4602火險到期檔查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+					"L4602火險到期檔查無資料", titaVo);
 		} else {
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
 
 			for (String line : file) {
 				makeFile.put(line);
@@ -193,7 +198,8 @@ public class L4602p extends TradeBuffer {
 //		totaVo.put("PdfSnoM", "" + sno);
 
 			// TXT製作完成，發MESSAGE
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4602火險到期檔LNM01P.txt已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+					"L4602火險到期檔LNM01P.txt已完成", titaVo);
 		}
 
 		// 2021-11-09 智偉修改

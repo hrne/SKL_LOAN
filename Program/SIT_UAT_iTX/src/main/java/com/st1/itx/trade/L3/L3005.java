@@ -15,14 +15,10 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustRmk;
-import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorTx;
-import com.st1.itx.db.domain.LoanSynd;
-import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.service.CustRmkService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.parse.Parse;
@@ -52,8 +48,7 @@ public class L3005 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
-	@Autowired
-	public TxRecordService txRecordService;
+
 	@Autowired
 	BaTxCom baTxCom;
 
@@ -73,8 +68,6 @@ public class L3005 extends TradeBuffer {
 		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
 		int iTitaHCode = this.parse.stringToInteger(titaVo.getParam("TitaHCode"));
 
-		int iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
-
 		// work area
 		int wkFacmNoStart = 0;
 		int wkFacmNoEnd = 999;
@@ -86,25 +79,19 @@ public class L3005 extends TradeBuffer {
 
 		String oCustRmkFlag = "N";
 		String loanIntDetailFg = "N";
-//		String wkCurrencyCode = "";
-//		String wkSyndFlag = "N";
+
 		String AcFg;
 		String FeeFg;
-		String mrKey1;
 		String wkCurrencyCode = "";
 
 		Slice<CustRmk> slCustRmk;
 		Slice<LoanBorTx> slLoanBorTx;
-		Slice<TxRecord> slTxRecord;
-		Slice<LoanSynd> slLoanSynd;
-		Slice<LoanBorMain> slLoanBorMain;
+
 		TempVo tTempVo = new TempVo();
 
 		List<CustRmk> lCustRmk;
 		List<LoanBorTx> lLoanBorTx;
-		List<TxRecord> lTxRecord;
-		List<LoanSynd> lLoanSynd;
-		List<LoanBorMain> lLoanBorMain;
+
 //		LoanEachFeeVo loanEachFeeVo = new LoanEachFeeVo();
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -122,22 +109,6 @@ public class L3005 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		// 查詢聯貸案檔
-//		List<String> lCommitFeeFlag = new ArrayList<String>();
-//		lCommitFeeFlag.add("Y"); // 是否有收承諾費
-//		lCommitFeeFlag.add("N");
-
-//		slLoanSynd = loanSyndService.syndCustNoRange(iCustNo, iCustNo, "%", 0, 99991231, 0, 99991231, 0, 99991231, 0,
-//				Integer.MAX_VALUE, titaVo);
-//		lLoanSynd = slLoanSynd == null ? null : slLoanSynd.getContent();
-//		if (lLoanSynd == null || lLoanSynd.size() == 0) {
-//			wkSyndFlag = "N";
-//		} else {
-//			wkSyndFlag = "Y";
-//			for (LoanSynd sn : lLoanSynd) {
-//				wkCurrencyCode = sn.getCurrencyCode();
-//			}
-//		}
 		// 查詢顧客控管警訊檔
 		slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
@@ -184,27 +155,6 @@ public class L3005 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "會計日期  " + iAcDate + " 後無交易資料"); // 查詢資料不存在
 			}
 		}
-
-		mrKey1 = parse.IntegerToString(iCustNo, 7);
-		if (iFacmNo != 0) {
-			mrKey1 = mrKey1 + "-" + parse.IntegerToString(iFacmNo, 3);
-		}
-		if (iBormNo != 0) {
-			mrKey1 = mrKey1 + "-" + parse.IntegerToString(iBormNo, 3);
-		}
-
-		List<String> lTranNo = new ArrayList<String>();
-		lTranNo.add("L3210");
-		lTranNo.add("L3220");
-		lTranNo.add("L3230");
-		if (iAcDate == 0) {
-			slTxRecord = txRecordService.findByL3005(mrKey1 + "%", lTranNo, wkEntryDateStart, 99999999, 0,
-					Integer.MAX_VALUE, titaVo);
-		} else {
-			slTxRecord = txRecordService.findByL3005(mrKey1 + "%", lTranNo, wkAcDateStart, 99999999, 0,
-					Integer.MAX_VALUE, titaVo);
-		}
-		lTxRecord = slTxRecord == null ? null : new ArrayList<TxRecord>(slTxRecord.getContent());
 
 		String relNo = "";
 		String newRelNo = "";

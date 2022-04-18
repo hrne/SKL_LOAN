@@ -179,7 +179,11 @@ BEGIN
                                 AND NVL(S3."ACNASS",' ') = NVL(S1."ACNASS",' ')
           LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = S3."CORACC"
                                  AND S5."AcSubCode" = NVL(S3."CORACS",'     ')
-                                 AND S5."AcDtlCode" = '  '
+                                 AND S5."AcDtlCode" = CASE
+                                                        WHEN S3."CORACC" = '40903300'
+                                                             AND NVL(S3."CORACS",'     ') = '     '
+                                                        THEN '01' -- 放款帳管費
+                                                      ELSE '  ' END
           LEFT JOIN ATF ON ATF."ACNACC"          = S1."ACNACC"
                        AND NVL(ATF."ACNACS",' ') = NVL(S1."ACNACS",' ')
                        AND NVL(ATF."ACNASS",' ') = NVL(S1."ACNASS",' ')
@@ -291,10 +295,10 @@ BEGIN
             -- AND S1."TRXDAT" >= 20190101
             AND S1."TRXDAT" <= "TbsDyF"
             AND CASE
-                  WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29')
+                  WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
                        AND NVL(S4."TRXTRN",' ') <> ' '
                   THEN 1
-                  WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29')
+                  WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
                        AND NVL(S4."LMSACN",0) = 0
                   THEN 1
                 ELSE 0 

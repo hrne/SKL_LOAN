@@ -41,49 +41,49 @@ BEGIN
                , '02'               AS "TelTypeCode" -- 住家電話(戶籍)
                , "CUSNA4"
           FROM "CU$CUSP"
-          UNION ALL
+          UNION
           SELECT TRIM("CUSID1")     AS "CUSTID"
                , TRIM("CUSTL1")     AS "CUSTEL"
                , '01'               AS "TelTypeCode" -- 公司電話1
                , "CUSNA4"
           FROM "CU$CUSP"
-          UNION ALL
+          UNION
           SELECT TRIM("CUSID1")     AS "CUSTID"
                , TRIM("CUSTL2")     AS "CUSTEL"
                , '01'               AS "TelTypeCode" -- 公司電話2
                , "CUSNA4"
           FROM "CU$CUSP"
-          UNION ALL
+          UNION
           SELECT TRIM("CUSID1")     AS "CUSTID"
                , TRIM("CUSTL3")     AS "CUSTEL"
                , '02'               AS "TelTypeCode" -- 住家電話(通訊)
                , "CUSNA4"
           FROM "CU$CUSP"
-          UNION ALL
-          SELECT TRIM("CUSID1")     AS "CUSTID"
-               , TRIM("CUSTL4")     AS "CUSTEL"
-               , '03'               AS "TelTypeCode" -- 手機
-               , "CUSNA4"
-          FROM "CU$CUSP"
-          UNION ALL
-          SELECT TRIM("CUSID1")     AS "CUSTID"
-               , TRIM("CUSFX1")     AS "CUSTEL"
-               , '04'               AS "TelTypeCode" -- 傳真
-               , "CUSNA4"
-          FROM "CU$CUSP"
-          UNION ALL
+          UNION
           SELECT TRIM("CUSID1")     AS "CUSTID"
                , TRIM("CUSBBC")     AS "CUSTEL"
                , '03'               AS "TelTypeCode" -- 手機
                , "CUSNA4"
           FROM "CU$CUSP"
-          UNION ALL
+          UNION
+          SELECT TRIM("CUSID1")     AS "CUSTID"
+               , TRIM("CUSTL4")     AS "CUSTEL"
+               , '03'               AS "TelTypeCode" -- 手機
+               , "CUSNA4"
+          FROM "CU$CUSP"
+          UNION
+          SELECT TRIM("CUSID1")     AS "CUSTID"
+               , TRIM("CUSFX1")     AS "CUSTEL"
+               , '04'               AS "TelTypeCode" -- 傳真
+               , "CUSNA4"
+          FROM "CU$CUSP"
+          UNION
           SELECT TRIM("CUSID1")     AS "CUSTID"
                , TRIM("CUSTLA")     AS "CUSTEL"
                , '02'               AS "TelTypeCode" -- 住家電話(戶籍)
                , "CUSNA4"
           FROM "CU$CUSP"
-          UNION ALL
+          UNION
           -- 2022-01-21 FROM 新壽IT 珮琪
           -- 目前AS/400發送簡訊主要分以下兩種欄位順序依序檢核，第一隻符合手機格式的即以該隻手機發送對應簡訊
           -- LNM56OP、AHM71NP銀行扣款不成功簡訊通知檔
@@ -114,6 +114,12 @@ BEGIN
      ) s0
      WHERE "CUSTEL" != 'X'
      ORDER BY S0."CUSTID";
+
+     /* 漏打0的手機號碼 */
+     UPDATE "TempCustTelNo"
+     SET "CUSTEL" = '0' || "CUSTEL"
+     WHERE REGEXP_LIKE("CUSTEL",'^9\d{8}$')
+     ;
 
      /* EXT 改為 - */
      UPDATE "TempCustTelNo"

@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
 @Service("L9720p")
 @Scope("prototype")
 public class L9720p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9720p.class);
 
 	@Autowired
 	L9720Report l9720Report;
@@ -57,9 +56,9 @@ public class L9720p extends TradeBuffer {
 		boolean isFinish2 = l9720Report2.exec(titaVo);
 
 		if (isFinish1 && isFinish2) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9720", TXCD + TXName + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9720", TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

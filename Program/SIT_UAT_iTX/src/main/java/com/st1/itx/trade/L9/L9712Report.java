@@ -168,8 +168,9 @@ public class L9712Report extends MakeReport {
 		}
 
 //		 tL9712Vo.get("F8")
+		String txtNo =tL9712Vo.get("F8");
 		// 授權主管
-		this.print(0, 147, String.format("%04d", Integer.valueOf(tL9712Vo.get("F8"))));
+		this.print(0, 147, txtNo);
 	}
 
 	private String showAmt(String xamt) {
