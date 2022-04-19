@@ -70,7 +70,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,NVL(\"Fn_ParseEOL\"(C.\"CustName\",0),'') F6";
 		sql += "            ,FAC.\"FirstDrawdownDate\" - 19110000 AS  F7";
 		sql += "            ,M.\"PrinBalance\" F8";
-		sql += "            ,M.\"StoreRate\" F9";
+		sql += "            ,M2.\"StoreRate\" F9";
 		sql += "            ,M.\"PrevIntDate\" - 19110000 AS F10";
 		sql += "            ,M.\"OvduDays\" F11";
 		sql += "            ,M.\"UnpaidPrincipal\" + M.\"UnpaidInterest\" F12";
@@ -97,6 +97,17 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      FROM \"MonthlyFacBal\" M";
 		sql += "      LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = M.\"CustNo\"";
 		sql += "                               AND FAC.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "      LEFT JOIN (SELECT \"CustNo\"";
+		sql += "                       ,\"FacmNo\"";
+		sql += "                       ,\"StoreRate\"";
+		sql += "                       ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\",\"FacmNo\"";
+		sql += "                                           ORDER BY \"BormNo\" DESC) AS \"SEQ\"";
+		sql += "                 FROM \"MonthlyLoanBal\"";
+		sql += "                 WHERE \"YearMonth\" = :yymm ";
+		sql += "                   AND \"LoanBalance\" > 0 ";
+		sql += "                ) M2 ON M2.\"CustNo\" = M.\"CustNo\"";
+		sql += "                    AND M2.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "                    AND M2.\"SEQ\" = 1";
 		sql += "      LEFT JOIN (SELECT C.\"CustNo\"";
 		sql += "                       ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "                       ,NVL(T.\"LiaisonName\",\"Fn_ParseEOL\"(C.\"CustName\",0)) AS \"LiaisonName\"";
@@ -161,7 +172,6 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		this.info("L9716 inputYearMonth: " + iYear + String.format("%02d", iMonth));
 		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
 		query.setParameter("inputCollPsn", titaVo.getParam("inputCollPsn"));
 		query.setParameter("inputOvduTermMin", titaVo.getParam("inputOvduTermMin"));
@@ -247,7 +257,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"EntCode\" F23";
 		sql += "            ,F.\"CustTypeCode\" F24";
 		sql += "            ,M.\"FacAcctCode\" F25";
-		sql += "            ,L.\"MaturityDate\" F26";
+		sql += "            ,F.\"MaturityDate\" F26";
 		sql += "            ,M.\"StoreRate\" F27";
 		sql += "            ,MB.\"UnpaidPrincipal\" F28";
 		sql += "            ,F.\"LineAmt\" F29";
