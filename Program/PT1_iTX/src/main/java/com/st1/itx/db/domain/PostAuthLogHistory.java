@@ -32,7 +32,7 @@ public class PostAuthLogHistory implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1203339552784614913L;
+	private static final long serialVersionUID = 1L;
 
 // 序號
   @Id

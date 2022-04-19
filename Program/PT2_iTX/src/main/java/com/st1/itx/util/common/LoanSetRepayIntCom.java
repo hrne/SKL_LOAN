@@ -147,19 +147,20 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		// 3.已過到期日，按日、不分期(以到期取息(到期繳息還本)計算)
 		// 4.未到期以最後一段利率計算(計息程式內處理)
 		int nextMonth01 = (this.txBuffer.getTxCom().getNbsdy() / 100) * 100 + 1;
-		if (iIntEndCode == 2) {
+		if (iIntEndCode == 2) { // 每月月底提息參數設定-開始
 			String intCalcCode = t.getIntCalcCode();
 			String amortizedCode = t.getAmortizedCode();
 			if (tFacMain.getAcctCode().equals("310")) {
 				intCalcCode = "1";
-			} else {
-				intCalcCode = "2";
-				if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
-					intCalcCode = "2";
-				} else {
-					intCalcCode = "1";
-				}
 			}
+			// } else {
+			// 	intCalcCode = "2";
+			// 	if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
+			// 		intCalcCode = "2";
+			// 	} else {
+			// 		intCalcCode = "1";
+			// 	}
+			// }
 			if (t.getMaturityDate() < nextMonth01) {
 				intCalcCode = "1";
 				amortizedCode = "2";
@@ -171,7 +172,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 					+ ", AcctCode=" + tFacMain.getAcctCode() + ", CalcCode =" + t.getIntCalcCode() + "/" + intCalcCode
 					+ ", AmortizedCode=" + t.getAmortizedCode() + "/" + amortizedCode + ", SpecificDate ="
 					+ t.getSpecificDate() + " ,prevPayIntDate =" + prevPayIntDate);
-		}
+		} // 提息參數設定-結束
 		loanCalcRepayIntCom.setDelayFlag(0); // 0:收遲延息 1: 不收
 		loanCalcRepayIntCom.setNonePrincipalFlag(0); // 0:契約到期要還本 1:契約到期不還本記號
 		loanCalcRepayIntCom.setTbsDy(this.txBuffer.getTxCom().getTbsdy()); // 營業日期

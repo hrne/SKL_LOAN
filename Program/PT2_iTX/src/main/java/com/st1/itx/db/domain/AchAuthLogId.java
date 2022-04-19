@@ -21,7 +21,7 @@ public class AchAuthLogId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7807549501846701648L;
+	private static final long serialVersionUID = 1L;
 
 // 建檔日期
   @Column(name = "`AuthCreateDate`")

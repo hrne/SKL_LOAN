@@ -32,7 +32,7 @@ public class AchAuthLogHistory implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2151588128688823803L;
+	private static final long serialVersionUID = 1L;
 
 // 序號
   @Id

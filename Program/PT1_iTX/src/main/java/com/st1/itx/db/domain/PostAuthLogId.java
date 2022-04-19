@@ -21,7 +21,7 @@ public class PostAuthLogId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -562237241219930173L;
+	private static final long serialVersionUID = 1L;
 
 // 建檔日期
   @Column(name = "`AuthCreateDate`")

@@ -29,7 +29,7 @@ public class PostAuthLog implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6253308214672023446L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private PostAuthLogId postAuthLogId;
@@ -84,10 +84,6 @@ public class PostAuthLog implements Serializable {
   // 處理時間
   @Column(name = "`ProcessTime`")
   private int processTime = 0;
-
-  // 處理日期時間
-  @Column(name = "`ProcessDateTime`")
-  private java.sql.Timestamp processDateTime;
 
   // 核印完成日期
   @Column(name = "`StampFinishDate`")
@@ -437,25 +433,6 @@ G:劃撥
 	*/
   public void setProcessTime(int processTime) {
     this.processTime = processTime;
-  }
-
-/**
-	* 處理日期時間<br>
-	* 
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getProcessDateTime() {
-    return this.processDateTime;
-  }
-
-/**
-	* 處理日期時間<br>
-	* 
-  *
-  * @param processDateTime 處理日期時間
-	*/
-  public void setProcessDateTime(java.sql.Timestamp processDateTime) {
-    this.processDateTime = processDateTime;
   }
 
 /**
@@ -952,9 +929,9 @@ R:申請恢復
   public String toString() {
     return "PostAuthLog [postAuthLogId=" + postAuthLogId
            + ", facmNo=" + facmNo + ", custId=" + custId + ", limitAmt=" + limitAmt + ", repayAcctSeq=" + repayAcctSeq + ", processDate=" + processDate + ", processTime=" + processTime
-           + ", processDateTime=" + processDateTime + ", stampFinishDate=" + stampFinishDate + ", stampCancelDate=" + stampCancelDate + ", stampCode=" + stampCode + ", postMediaCode=" + postMediaCode + ", authErrorCode=" + authErrorCode
-           + ", authMeth=" + authMeth + ", fileSeq=" + fileSeq + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode
-           + ", relAcctName=" + relAcctName + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd
-           + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
+           + ", stampFinishDate=" + stampFinishDate + ", stampCancelDate=" + stampCancelDate + ", stampCode=" + stampCode + ", postMediaCode=" + postMediaCode + ", authErrorCode=" + authErrorCode + ", authMeth=" + authMeth
+           + ", fileSeq=" + fileSeq + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName
+           + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd + ", createEmpNo=" + createEmpNo
+           + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }

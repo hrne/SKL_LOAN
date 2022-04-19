@@ -62,21 +62,20 @@ public class L4R30 extends TradeBuffer {
 			this.totaVo.putParam("L4R30PostMediaCode", tPostAuthLog.getPostMediaCode());
 			this.totaVo.putParam("L4R30AmlRsp", tPostAuthLog.getAmlRsp());
 			this.totaVo.putParam("L4R30StampFinishDate", tPostAuthLog.getStampFinishDate());
-			this.totaVo.putParam("L4R30CalDate", "");
-			this.totaVo.putParam("L4R30CalTime", "");
+			this.totaVo.putParam("L4R30CalDate", tPostAuthLog.getProcessDate());
+			String ProcessTime = "";
+			if (tPostAuthLog.getProcessTime() == 0) {
+				this.totaVo.putParam("L4R30CalTime", tPostAuthLog.getProcessTime());
+			} else {
+				ProcessTime = "" + tPostAuthLog.getProcessTime();
+				ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"
+						+ ProcessTime.substring(4, 6);
+				this.totaVo.putParam("L4R30CalTime", ProcessTime);
+			}
 
 			String sCreateDate = parse.timeStampToStringDate(tPostAuthLog.getCreateDate()).replace("/", "");
 			String sLastUpdate = parse.timeStampToStringDate(tPostAuthLog.getLastUpdate()).replace("/", "");
 
-			if (tPostAuthLog.getProcessDateTime() != null) {
-				String caldate = "";
-				String caltime = "";
-				caldate = parse.timeStampToStringDate(tPostAuthLog.getProcessDateTime()).replace("/", "");
-				caltime = parse.timeStampToStringTime(tPostAuthLog.getProcessDateTime());
-				this.totaVo.putParam("L4R30CalDate", caldate);
-				this.totaVo.putParam("L4R30CalTime", caltime);
-			}
-			
 			this.totaVo.putParam("L4R30CreateEmpNo", tPostAuthLog.getCreateEmpNo());
 			this.totaVo.putParam("L4R30CreateDate", sCreateDate);
 			this.totaVo.putParam("L4R30LastUpdateEmpNo", tPostAuthLog.getLastUpdateEmpNo());

@@ -29,7 +29,7 @@ public class AchAuthLog implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3342891853806159306L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private AchAuthLogId achAuthLogId;
@@ -61,19 +61,14 @@ public class AchAuthLog implements Serializable {
   private int facmNo = 0;
 
   // 處理日期
-  /* 最新動作之日期時間(Ex.建檔提出產媒體) */
+  /* 產出媒體檔之日期 */
   @Column(name = "`ProcessDate`")
   private int processDate = 0;
 
   // 處理時間
-  /* 最新動作之日期時間 */
+  /* 產出媒體檔之時間 */
   @Column(name = "`ProcessTime`")
   private int processTime = 0;
-
-  // 處理日期時間
-  /* 提回並且成功之日期時間 */
-  @Column(name = "`ProcessDateTime`")
-  private java.sql.Timestamp processDateTime;
 
   // 核印完成日期時間
   /* CdCode.AuthStatus空:再次授權單格空白:未授權0:成功授權/取消授權1:印鑑不符2:無此帳號3:委繳戶統一編號不符4:已核印成功在案5:原交易不存在6:電子資料與授權書內容不符7:帳戶已結清8:印鑑不清9:其他A:未收到授權書B:用戶號碼錯誤C;靜止戶D:未收到聲明書E:授權書資料不全F:警示戶G:本帳戶不適用授權扣繳H:已於他行授權扣款I:該用戶已死亡Z:未交易或匯入失敗資料 */
@@ -296,7 +291,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理日期<br>
-	* 最新動作之日期時間(Ex.建檔提出產媒體)
+	* 產出媒體檔之日期
 	* @return Integer
 	*/
   public int getProcessDate() {
@@ -305,7 +300,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理日期<br>
-	* 最新動作之日期時間(Ex.建檔提出產媒體)
+	* 產出媒體檔之日期
   *
   * @param processDate 處理日期
   * @throws LogicException when Date Is Warn	*/
@@ -315,7 +310,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理時間<br>
-	* 最新動作之日期時間
+	* 產出媒體檔之時間
 	* @return Integer
 	*/
   public int getProcessTime() {
@@ -324,31 +319,12 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理時間<br>
-	* 最新動作之日期時間
+	* 產出媒體檔之時間
   *
   * @param processTime 處理時間
 	*/
   public void setProcessTime(int processTime) {
     this.processTime = processTime;
-  }
-
-/**
-	* 處理日期時間<br>
-	* 提回並且成功之日期時間
-	* @return java.sql.Timestamp
-	*/
-  public java.sql.Timestamp getProcessDateTime() {
-    return this.processDateTime;
-  }
-
-/**
-	* 處理日期時間<br>
-	* 提回並且成功之日期時間
-  *
-  * @param processDateTime 處理日期時間
-	*/
-  public void setProcessDateTime(java.sql.Timestamp processDateTime) {
-    this.processDateTime = processDateTime;
   }
 
 /**
@@ -821,9 +797,9 @@ Y:已產生媒體
   @Override
   public String toString() {
     return "AchAuthLog [achAuthLogId=" + achAuthLogId + ", facmNo=" + facmNo
-           + ", processDate=" + processDate + ", processTime=" + processTime + ", processDateTime=" + processDateTime + ", stampFinishDate=" + stampFinishDate + ", authStatus=" + authStatus + ", authMeth=" + authMeth
-           + ", limitAmt=" + limitAmt + ", mediaCode=" + mediaCode + ", batchNo=" + batchNo + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate
-           + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp
-           + ", titaTxCd=" + titaTxCd + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
+           + ", processDate=" + processDate + ", processTime=" + processTime + ", stampFinishDate=" + stampFinishDate + ", authStatus=" + authStatus + ", authMeth=" + authMeth + ", limitAmt=" + limitAmt
+           + ", mediaCode=" + mediaCode + ", batchNo=" + batchNo + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode
+           + ", relAcctName=" + relAcctName + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd
+           + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }
