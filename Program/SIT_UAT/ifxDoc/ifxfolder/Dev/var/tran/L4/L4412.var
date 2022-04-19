@@ -166,7 +166,6 @@ T(2,@RimAuthCode,#AuthCode)
 RESET_RIM(#SendL4R30,L4R30)
 S(L4R30,1,#RimAuthCreateDate,#RimAuthApplCode,#RimCustNo,#RimPostDepCode,#RimRepayAcct,#RimAuthCode)
 R(1,L4R30)
-
 T(2,@CustId,#L4R30CustId)
 T(2,@CustIdTemp2,#L4R30CustId)
 E(0,@FacmNo,#L4R30FacmNo)
@@ -176,14 +175,38 @@ T(2,@AuthErrorCode,#L4R30AuthErrorCode)
 T(2,@PostMediaCode,#L4R30PostMediaCode)
 E(0,@AmlRsp,#L4R30AmlRsp)
 T(2,@StampFinishDate,#L4R30StampFinishDate)
-!T(2,@CalDate,#L4R30CalDate)
-!T(2,@CalTime,#L4R30CalTime)
+T(2,@CalDate,#L4R30CalDate)
+T(2,@CalTime,#L4R30CalTime)
 T(2,@CreateEmpNo,#L4R30CreateEmpNo)
 T(2,@CreateDate,#L4R30CreateDate)
 T(2,@LastUpdateEmpNo,#L4R30LastUpdateEmpNo)
 T(2,@LastUpdate,#L4R30LastUpdate)
 T(2,@StampCancelDate,#L4R30StampCancelDate)
 E(0,@LimitAmt,#L4R30LimitAmt)
+
+#RimTxCode=X,5,S
+T(2,L4412)
+
+#GetCreateEmpName=X,1,S
+C(3,#FuncCode,1,s,$)
+C(4,#CreateEmpNo,s,$)
+RESET_RIM(#GetCreateEmpName,L6R17)
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimEmployeeNo,#CreateEmpNo)
+S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
+R(1,L6R17)
+T(2,@CreateEmpNo,#RimEmployeeNo+ +#L6R17Fullname)
+
+#GetLastUpdateEmpName=X,1,S
+C(3,#FuncCode,1,s,$)
+C(4,#LastUpdateEmpNo,s,$)
+RESET_RIM(#GetLastUpdateEmpName,L6R17)
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimEmployeeNo,#LastUpdateEmpNo)
+S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
+R(1,L6R17)
+T(2,@LastUpdateEmpNo,#RimEmployeeNo+ +#L6R17Fullname)
+
 #PREVALUE=A,1,S
 
 
@@ -334,6 +357,17 @@ T(F,@RelAcctBirthday,1)
 T(F,@RelAcctGender,1)
 T(F,@LimitAmt,1))
 
+#RimFuncCode=A,1,S
+#RimFindCode=A,1,S
+#RimCustId=X,10,S
+#RimPostDepCode=X,1,S
+#RimCustNo=A,7,S
+#RimFacmNo=A,3,S
+#RimAcctNo=X,14,S
+#RimBankNo=A,3,S
+#RimAuthApplCode=A,1,S
+#RimAuthCreateDate=D,7,S
+
 ! 4R24 檢核刪除/修改PostAuthLog存在與否
 #SendL4R24A=X,1,S
 C(3,#FuncCode,1,s,$)
@@ -441,17 +475,6 @@ E(0,700)
 C(3,#FuncCode,1,$,s)
 @V(2,0)
 
-#RimFuncCode=A,1,S
-#RimFindCode=A,1,S
-#RimCustId=X,10,S
-#RimPostDepCode=X,1,S
-#RimCustNo=A,7,S
-#RimFacmNo=A,3,S
-#RimAcctNo=X,14,S
-#RimBankNo=A,3,S
-#RimAuthApplCode=A,1,S
-#RimAuthCreateDate=D,7,S
-
 <include src="ROM.icf::L4R03Rim.dec"/>
 <include src="ROM.icf::L4R01.dec"/>
 <include src="ROM.icf::L4R03.dec"/>
@@ -460,6 +483,8 @@ C(3,#FuncCode,1,$,s)
 <include src="ROM.icf::L4R23.dec"/>
 <include src="ROM.icf::L4R24.dec"/>
 <include src="ROM.icf::L4R30.dec"/>
+<include src="ROM.icf::L6R17Rim.dec"/>
+<include src="ROM.icf::L6R17.dec"/>
 
 #RimL4r01=X,1,S
 C(3,#FuncCode,1,$,s)
@@ -811,6 +836,7 @@ TXFORM=L4412
 <include src="ROM.icf::L4R23.tom"/>
 <include src="ROM.icf::L4R24.tom"/>
 <include src="ROM.icf::L4R30.tom"/>
+<include src="ROM.icf::L6R17.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

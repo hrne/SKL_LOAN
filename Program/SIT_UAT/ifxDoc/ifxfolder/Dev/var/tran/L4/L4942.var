@@ -184,7 +184,7 @@ E(0,1)ASGN(LOOP$)
 #OOFacmNo=A,3,O
 
 ! 扣款別
-#OOAuthType=m,2,O
+#OOAuthType=m,1,O
 #OOAuthTypeX=x,4,O
 T(H,@OOAuthTypeX,#OOAuthType,#AuthCodeHelp)
 
@@ -242,54 +242,30 @@ IF(#OODeleteDate==0,T(2,),T(2,Y))
 ! T(2,1)
 #OOBUF_EDIT=X,500,S
 T(2,2
-+#OOCustId
-+#OOCustNo
-+#OOFacmNo
-+#OOPostDepCode
-+#OOAuthType
-+#OORepayAcctLog
-+#OOCreateFlag
-+#OOAcctSeq
-+#OOStampCode
-+#OOAuthErrorCode
-+#OOPostMediaCode
-+#OOAmlRsp
 +#OOAuthCreateDate
-+#OOStampFinishDate
++#OOCreateFlag
++#OOCustNo
++#OOPostDepCode
++#OORepayAcctLog
++#OOAuthType
 )
 #OOBUF_DELETE=X,500,S
 T(2,4
-+#OOCustId
-+#OOCustNo
-+#OOFacmNo
-+#OOPostDepCode
-+#OOAuthType
-+#OORepayAcctLog
-+#OOCreateFlag
-+#OOAcctSeq
-+#OOStampCode
-+#OOAuthErrorCode
-+#OOPostMediaCode
-+#OOAmlRsp
 +#OOAuthCreateDate
-+#OOStampFinishDate
++#OOCreateFlag
++#OOCustNo
++#OOPostDepCode
++#OORepayAcctLog
++#OOAuthType
 )
 #OOBUF_SEARCH=X,500,S
 T(2,5
-+#OOCustId
-+#OOCustNo
-+#OOFacmNo
-+#OOPostDepCode
-+#OOAuthType
-+#OORepayAcctLog
-+#OOCreateFlag
-+#OOAcctSeq
-+#OOStampCode
-+#OOAuthErrorCode
-+#OOPostMediaCode
-+#OOAmlRsp
 +#OOAuthCreateDate
-+#OOStampFinishDate
++#OOCreateFlag
++#OOCustNo
++#OOPostDepCode
++#OORepayAcctLog
++#OOAuthType
 )
 ! #OOBTN_CREAT=A,2,O
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_CREAT})

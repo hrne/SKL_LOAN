@@ -45,7 +45,7 @@ public class PostAuthLogId implements Serializable {
   @Column(name = "`RepayAcct`", length = 14)
   private String repayAcct = " ";
 
-  // 授權方式
+  // 授權類別
   /* CdCode.AuthCode1:期款2:火險 */
   @Column(name = "`AuthCode`", length = 1)
   private String authCode = " ";
@@ -172,7 +172,7 @@ G:劃撥
   }
 
 /**
-	* 授權方式<br>
+	* 授權類別<br>
 	* CdCode.AuthCode
 1:期款
 2:火險
@@ -183,12 +183,12 @@ G:劃撥
   }
 
 /**
-	* 授權方式<br>
+	* 授權類別<br>
 	* CdCode.AuthCode
 1:期款
 2:火險
   *
-  * @param authCode 授權方式
+  * @param authCode 授權類別
 	*/
   public void setAuthCode(String authCode) {
     this.authCode = authCode;

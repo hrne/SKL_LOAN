@@ -5386,6 +5386,8 @@ TXFORM=L4R29
 #L4R30PostMediaCode=X,1,S
 #L4R30AmlRsp=A,1,S
 #L4R30StampFinishDate=D,7,S
+#L4R30CalDate=D,7,S
+#L4R30CalTime=X,8,S
 #L4R30StampCancelDate=D,7,S
 #L4R30LimitAmt=m,8,S
 #L4R30CreateDate=D,7,S
@@ -5404,6 +5406,8 @@ TXFORM=L4R30
 #L4R30PostMediaCode
 #L4R30AmlRsp
 #L4R30StampFinishDate
+#L4R30CalDate
+#L4R30CalTime
 #L4R30StampCancelDate
 #L4R30LimitAmt
 #L4R30CreateDate

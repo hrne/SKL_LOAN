@@ -29,7 +29,7 @@ public class AchAuthLog implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1507319106665947712L;
+	private static final long serialVersionUID = 3342891853806159306L;
 
 @EmbeddedId
   private AchAuthLogId achAuthLogId;
@@ -70,28 +70,32 @@ public class AchAuthLog implements Serializable {
   @Column(name = "`ProcessTime`")
   private int processTime = 0;
 
-  // 核印完成日期時間
+  // 處理日期時間
   /* 提回並且成功之日期時間 */
+  @Column(name = "`ProcessDateTime`")
+  private java.sql.Timestamp processDateTime;
+
+  // 核印完成日期時間
+  /* CdCode.AuthStatus空:再次授權單格空白:未授權0:成功授權/取消授權1:印鑑不符2:無此帳號3:委繳戶統一編號不符4:已核印成功在案5:原交易不存在6:電子資料與授權書內容不符7:帳戶已結清8:印鑑不清9:其他A:未收到授權書B:用戶號碼錯誤C;靜止戶D:未收到聲明書E:授權書資料不全F:警示戶G:本帳戶不適用授權扣繳H:已於他行授權扣款I:該用戶已死亡Z:未交易或匯入失敗資料 */
   @Column(name = "`StampFinishDate`")
   private int stampFinishDate = 0;
 
   // 授權狀態
-  /* CdCode.AuthStatus空:再次授權單格空白:未授權0:成功授權/取消授權1:印鑑不符2:無此帳號3:委繳戶統一編號不符4:已核印成功在案5:原交易不存在6:電子資料與授權書內容不符7:帳戶已結清8:印鑑不清9:其他A:未收到授權書B:用戶號碼錯誤C;靜止戶D:未收到聲明書E:授權書資料不全F:警示戶G:本帳戶不適用授權扣繳H:已於他行授權扣款I:該用戶已死亡Z:未交易或匯入失敗資料 */
+  /* CdCode.AchAuthCodeA:紙本新增O:舊檔轉換X:紙本終止R:申請恢復 */
   @Column(name = "`AuthStatus`", length = 1)
   private String authStatus;
 
   // 授權方式
-  /* CdCode.AchAuthCodeA:紙本新增O:舊檔轉換X:紙本終止R:申請恢復 */
+  /* 媒體檔規格為X(8) */
   @Column(name = "`AuthMeth`", length = 1)
   private String authMeth;
 
   // 每筆扣款限額
-  /* 媒體檔規格為X(8) */
+  /* 空白:未產生媒體Y:已產生媒體 */
   @Column(name = "`LimitAmt`")
   private BigDecimal limitAmt = new BigDecimal("0");
 
   // 媒體碼
-  /* 空白:未產生媒體Y:已產生媒體 */
   @Column(name = "`MediaCode`", length = 1)
   private String mediaCode;
 
@@ -104,16 +108,16 @@ public class AchAuthLog implements Serializable {
   private int propDate = 0;
 
   // 提回日期
+  /* 已授權成功為暫停授權 */
   @Column(name = "`RetrDate`")
   private int retrDate = 0;
 
   // 刪除日期/暫停授權日期
-  /* 已授權成功為暫停授權 */
+  /* CdCode.RelationCode00:本人01:夫02:妻03:父04:母05:子06:女07:兄08:弟09:姊10:妹11:姪子99:其他 */
   @Column(name = "`DeleteDate`")
   private int deleteDate = 0;
 
   // 與借款人關係
-  /* CdCode.RelationCode00:本人01:夫02:妻03:父04:母05:子06:女07:兄08:弟09:姊10:妹11:姪子99:其他 */
   @Column(name = "`RelationCode`", length = 2)
   private String relationCode;
 
@@ -126,16 +130,16 @@ public class AchAuthLog implements Serializable {
   private String relationId;
 
   // 第三人出生日期
+  /* CdCode.Sex */
   @Column(name = "`RelAcctBirthday`")
   private int relAcctBirthday = 0;
 
   // 第三人性別
-  /* CdCode.Sex */
+  /* CdCode.AmlCheckItem0:非可疑名單/已完成名單確認1:需審查/確認2:為凍結名單/未確定名單 */
   @Column(name = "`RelAcctGender`", length = 1)
   private String relAcctGender;
 
   // AML回應碼
-  /* CdCode.AmlCheckItem0:非可疑名單/已完成名單確認1:需審查/確認2:為凍結名單/未確定名單 */
   @Column(name = "`AmlRsp`", length = 1)
   private String amlRsp;
 
@@ -329,8 +333,49 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
   }
 
 /**
-	* 核印完成日期時間<br>
+	* 處理日期時間<br>
 	* 提回並且成功之日期時間
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getProcessDateTime() {
+    return this.processDateTime;
+  }
+
+/**
+	* 處理日期時間<br>
+	* 提回並且成功之日期時間
+  *
+  * @param processDateTime 處理日期時間
+	*/
+  public void setProcessDateTime(java.sql.Timestamp processDateTime) {
+    this.processDateTime = processDateTime;
+  }
+
+/**
+	* 核印完成日期時間<br>
+	* CdCode.AuthStatus
+空:再次授權
+單格空白:未授權
+0:成功授權/取消授權
+1:印鑑不符
+2:無此帳號
+3:委繳戶統一編號不符
+4:已核印成功在案
+5:原交易不存在
+6:電子資料與授權書內容不符
+7:帳戶已結清
+8:印鑑不清
+9:其他
+A:未收到授權書
+B:用戶號碼錯誤
+C;靜止戶
+D:未收到聲明書
+E:授權書資料不全
+F:警示戶
+G:本帳戶不適用授權扣繳
+H:已於他行授權扣款
+I:該用戶已死亡
+Z:未交易或匯入失敗資料
 	* @return Integer
 	*/
   public int getStampFinishDate() {
@@ -339,7 +384,29 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 核印完成日期時間<br>
-	* 提回並且成功之日期時間
+	* CdCode.AuthStatus
+空:再次授權
+單格空白:未授權
+0:成功授權/取消授權
+1:印鑑不符
+2:無此帳號
+3:委繳戶統一編號不符
+4:已核印成功在案
+5:原交易不存在
+6:電子資料與授權書內容不符
+7:帳戶已結清
+8:印鑑不清
+9:其他
+A:未收到授權書
+B:用戶號碼錯誤
+C;靜止戶
+D:未收到聲明書
+E:授權書資料不全
+F:警示戶
+G:本帳戶不適用授權扣繳
+H:已於他行授權扣款
+I:該用戶已死亡
+Z:未交易或匯入失敗資料
   *
   * @param stampFinishDate 核印完成日期時間
   * @throws LogicException when Date Is Warn	*/
@@ -349,29 +416,11 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 授權狀態<br>
-	* CdCode.AuthStatus
-空:再次授權
-單格空白:未授權
-0:成功授權/取消授權
-1:印鑑不符
-2:無此帳號
-3:委繳戶統一編號不符
-4:已核印成功在案
-5:原交易不存在
-6:電子資料與授權書內容不符
-7:帳戶已結清
-8:印鑑不清
-9:其他
-A:未收到授權書
-B:用戶號碼錯誤
-C;靜止戶
-D:未收到聲明書
-E:授權書資料不全
-F:警示戶
-G:本帳戶不適用授權扣繳
-H:已於他行授權扣款
-I:該用戶已死亡
-Z:未交易或匯入失敗資料
+	* CdCode.AchAuthCode
+A:紙本新增
+O:舊檔轉換
+X:紙本終止
+R:申請恢復
 	* @return String
 	*/
   public String getAuthStatus() {
@@ -380,29 +429,11 @@ Z:未交易或匯入失敗資料
 
 /**
 	* 授權狀態<br>
-	* CdCode.AuthStatus
-空:再次授權
-單格空白:未授權
-0:成功授權/取消授權
-1:印鑑不符
-2:無此帳號
-3:委繳戶統一編號不符
-4:已核印成功在案
-5:原交易不存在
-6:電子資料與授權書內容不符
-7:帳戶已結清
-8:印鑑不清
-9:其他
-A:未收到授權書
-B:用戶號碼錯誤
-C;靜止戶
-D:未收到聲明書
-E:授權書資料不全
-F:警示戶
-G:本帳戶不適用授權扣繳
-H:已於他行授權扣款
-I:該用戶已死亡
-Z:未交易或匯入失敗資料
+	* CdCode.AchAuthCode
+A:紙本新增
+O:舊檔轉換
+X:紙本終止
+R:申請恢復
   *
   * @param authStatus 授權狀態
 	*/
@@ -412,11 +443,7 @@ Z:未交易或匯入失敗資料
 
 /**
 	* 授權方式<br>
-	* CdCode.AchAuthCode
-A:紙本新增
-O:舊檔轉換
-X:紙本終止
-R:申請恢復
+	* 媒體檔規格為X(8)
 	* @return String
 	*/
   public String getAuthMeth() {
@@ -425,11 +452,7 @@ R:申請恢復
 
 /**
 	* 授權方式<br>
-	* CdCode.AchAuthCode
-A:紙本新增
-O:舊檔轉換
-X:紙本終止
-R:申請恢復
+	* 媒體檔規格為X(8)
   *
   * @param authMeth 授權方式
 	*/
@@ -439,7 +462,8 @@ R:申請恢復
 
 /**
 	* 每筆扣款限額<br>
-	* 媒體檔規格為X(8)
+	* 空白:未產生媒體
+Y:已產生媒體
 	* @return BigDecimal
 	*/
   public BigDecimal getLimitAmt() {
@@ -448,7 +472,8 @@ R:申請恢復
 
 /**
 	* 每筆扣款限額<br>
-	* 媒體檔規格為X(8)
+	* 空白:未產生媒體
+Y:已產生媒體
   *
   * @param limitAmt 每筆扣款限額
 	*/
@@ -458,8 +483,7 @@ R:申請恢復
 
 /**
 	* 媒體碼<br>
-	* 空白:未產生媒體
-Y:已產生媒體
+	* 
 	* @return String
 	*/
   public String getMediaCode() {
@@ -468,8 +492,7 @@ Y:已產生媒體
 
 /**
 	* 媒體碼<br>
-	* 空白:未產生媒體
-Y:已產生媒體
+	* 
   *
   * @param mediaCode 媒體碼
 	*/
@@ -517,7 +540,7 @@ Y:已產生媒體
 
 /**
 	* 提回日期<br>
-	* 
+	* 已授權成功為暫停授權
 	* @return Integer
 	*/
   public int getRetrDate() {
@@ -526,7 +549,7 @@ Y:已產生媒體
 
 /**
 	* 提回日期<br>
-	* 
+	* 已授權成功為暫停授權
   *
   * @param retrDate 提回日期
   * @throws LogicException when Date Is Warn	*/
@@ -536,7 +559,20 @@ Y:已產生媒體
 
 /**
 	* 刪除日期/暫停授權日期<br>
-	* 已授權成功為暫停授權
+	* CdCode.RelationCode
+00:本人
+01:夫
+02:妻
+03:父
+04:母
+05:子
+06:女
+07:兄
+08:弟
+09:姊
+10:妹
+11:姪子
+99:其他
 	* @return Integer
 	*/
   public int getDeleteDate() {
@@ -545,7 +581,20 @@ Y:已產生媒體
 
 /**
 	* 刪除日期/暫停授權日期<br>
-	* 已授權成功為暫停授權
+	* CdCode.RelationCode
+00:本人
+01:夫
+02:妻
+03:父
+04:母
+05:子
+06:女
+07:兄
+08:弟
+09:姊
+10:妹
+11:姪子
+99:其他
   *
   * @param deleteDate 刪除日期/暫停授權日期
   * @throws LogicException when Date Is Warn	*/
@@ -555,20 +604,7 @@ Y:已產生媒體
 
 /**
 	* 與借款人關係<br>
-	* CdCode.RelationCode
-00:本人
-01:夫
-02:妻
-03:父
-04:母
-05:子
-06:女
-07:兄
-08:弟
-09:姊
-10:妹
-11:姪子
-99:其他
+	* 
 	* @return String
 	*/
   public String getRelationCode() {
@@ -577,20 +613,7 @@ Y:已產生媒體
 
 /**
 	* 與借款人關係<br>
-	* CdCode.RelationCode
-00:本人
-01:夫
-02:妻
-03:父
-04:母
-05:子
-06:女
-07:兄
-08:弟
-09:姊
-10:妹
-11:姪子
-99:其他
+	* 
   *
   * @param relationCode 與借款人關係
 	*/
@@ -638,7 +661,7 @@ Y:已產生媒體
 
 /**
 	* 第三人出生日期<br>
-	* 
+	* CdCode.Sex
 	* @return Integer
 	*/
   public int getRelAcctBirthday() {
@@ -647,7 +670,7 @@ Y:已產生媒體
 
 /**
 	* 第三人出生日期<br>
-	* 
+	* CdCode.Sex
   *
   * @param relAcctBirthday 第三人出生日期
   * @throws LogicException when Date Is Warn	*/
@@ -657,7 +680,10 @@ Y:已產生媒體
 
 /**
 	* 第三人性別<br>
-	* CdCode.Sex
+	* CdCode.AmlCheckItem
+0:非可疑名單/已完成名單確認
+1:需審查/確認
+2:為凍結名單/未確定名單
 	* @return String
 	*/
   public String getRelAcctGender() {
@@ -666,7 +692,10 @@ Y:已產生媒體
 
 /**
 	* 第三人性別<br>
-	* CdCode.Sex
+	* CdCode.AmlCheckItem
+0:非可疑名單/已完成名單確認
+1:需審查/確認
+2:為凍結名單/未確定名單
   *
   * @param relAcctGender 第三人性別
 	*/
@@ -676,10 +705,7 @@ Y:已產生媒體
 
 /**
 	* AML回應碼<br>
-	* CdCode.AmlCheckItem
-0:非可疑名單/已完成名單確認
-1:需審查/確認
-2:為凍結名單/未確定名單
+	* 
 	* @return String
 	*/
   public String getAmlRsp() {
@@ -688,10 +714,7 @@ Y:已產生媒體
 
 /**
 	* AML回應碼<br>
-	* CdCode.AmlCheckItem
-0:非可疑名單/已完成名單確認
-1:需審查/確認
-2:為凍結名單/未確定名單
+	* 
   *
   * @param amlRsp AML回應碼
 	*/
@@ -798,9 +821,9 @@ Y:已產生媒體
   @Override
   public String toString() {
     return "AchAuthLog [achAuthLogId=" + achAuthLogId + ", facmNo=" + facmNo
-           + ", processDate=" + processDate + ", processTime=" + processTime + ", stampFinishDate=" + stampFinishDate + ", authStatus=" + authStatus + ", authMeth=" + authMeth + ", limitAmt=" + limitAmt
-           + ", mediaCode=" + mediaCode + ", batchNo=" + batchNo + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate + ", relationCode=" + relationCode
-           + ", relAcctName=" + relAcctName + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp + ", titaTxCd=" + titaTxCd
-           + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
+           + ", processDate=" + processDate + ", processTime=" + processTime + ", processDateTime=" + processDateTime + ", stampFinishDate=" + stampFinishDate + ", authStatus=" + authStatus + ", authMeth=" + authMeth
+           + ", limitAmt=" + limitAmt + ", mediaCode=" + mediaCode + ", batchNo=" + batchNo + ", propDate=" + propDate + ", retrDate=" + retrDate + ", deleteDate=" + deleteDate
+           + ", relationCode=" + relationCode + ", relAcctName=" + relAcctName + ", relationId=" + relationId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", amlRsp=" + amlRsp
+           + ", titaTxCd=" + titaTxCd + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }

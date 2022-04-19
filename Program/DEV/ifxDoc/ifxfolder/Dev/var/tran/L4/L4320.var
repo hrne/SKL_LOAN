@@ -242,7 +242,7 @@ T(2,%)
 T(2,#BaseRateCode)
 
 #RimL4r12A=X,1,S
-IF(#TxKind==1,$,IF(#TxKind==2&&#BaseRateCode==2,$,s))
+IF(#TxKind==1,$,IF(#TxKind==2,$,s))
 RESET_RIM(#RimL4r12,L4R12)
 S(L4R12,1,#RimBaseRateCode)
 R(1,L4R12)

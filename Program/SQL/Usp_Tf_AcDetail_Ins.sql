@@ -243,7 +243,7 @@ BEGIN
                                                               AND ACN."LMSASQ1" = TR1."LMSASQ"
 
                            WHERE TR1."LMSACN" <> 0
-                            --  AND TR1."TRXDAT" > 20190101
+                             AND TR1."TRXDAT" > 20190101
                            GROUP BY TR1."TRXDAT"
                                    ,TR1."TRXNMT"
                                    ,TR1."TRXTRN"
@@ -292,7 +292,7 @@ BEGIN
             AND NVL(S3."AGLACC",' ') != ' ' -- 2021-12-08 新增判斷 有串到最新的11碼會科才寫入
             AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
             AND S1."JLNCRC" = '0'
-            -- AND S1."TRXDAT" >= 20190101
+            AND S1."TRXDAT" >= 20190101
             AND S1."TRXDAT" <= "TbsDyF"
             AND CASE
                   WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
@@ -439,6 +439,33 @@ BEGIN
                        AND BOKOTHERS."TRXDAT" = JORP."TRXDAT"
                        AND BOKOTHERS."TRXATP" = JORP."TRXATP"
     WHERE NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
+    ;
+
+    MERGE INTO "AcDetail" T
+    USING (
+      SELECT "AcctCode"
+           , "CustNo"
+           , "FacmNo"
+           , "RvNo"
+           , "RvAmt"
+           , "RvBal"
+           , "LastAcDate"
+           , "TitaTxtNo"
+      FROM "AcReceivable"
+      WHERE "AcctCode" IN ('F10','F29')
+    ) S
+    ON (
+      T."AcDate" = S."LastAcDate"
+      AND T."TitaTxtNo" = S."TitaTxtNo"
+      AND T."CustNo" = S."CustNo"
+      AND T."TxAmt" = S."RvAmt"
+    )
+    WHEN MATCHED THEN UPDATE
+    SET "FacmNo" = TO_NUMBER(S."FacmNo")
+      , "BormNo" = CASE
+                     WHEN "AcctCode" = 'F10'
+                     THEN TO_NUMBER(S."RvNo")
+                   ELSE "BormNo" END
     ;
 
     -- 記錄寫入筆數

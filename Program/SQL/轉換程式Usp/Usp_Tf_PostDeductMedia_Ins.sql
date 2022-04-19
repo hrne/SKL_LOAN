@@ -50,6 +50,7 @@ BEGIN
         WHERE "LMSPBK" = '3'
           AND "LMSPYS" = 2
           AND "POSCDE" IS NOT NULL
+        UNION
         SELECT "LMSACN"
              , "LMSPCN"
              , "POSCDE"
@@ -138,7 +139,7 @@ BEGIN
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LA$MBKP" MBK
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
-                         AND ad."LMSAPN" = MBK."MBKAPN"
+                         AND ad."LMSPCN" = MBK."LMSPCN"
                          AND ad."Seq" = 1
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = MBK."LMSACN"
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"

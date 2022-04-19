@@ -58,6 +58,7 @@ T(3,@FdRptFg,*)
 ["#FdOvduDate+催收開始日",#OvduDate],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdOvduPrinAmt+轉催收本金",#OvduPrinAmtX],
+["#FdOvduIntAmt+轉催收利息",#OvduIntAmtX],
 ["#FdOvduRepaid+催收還款金額",#OvduRepaidX],
 ["#FdOvduReduceAmt+催收減免金額",#OvduReduceAmtX],
 ["#FdOvduBal+催收餘額",#OvduBalX],
@@ -333,6 +334,16 @@ E(0,#L3r12OvduPrinAmt)
 
 #OvduPrinAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OvduPrinAmt,#OvduPrinAmtX)
+
+![轉催收利息]
+!自動顯示,不必輸入
+#FdOvduIntAmt=X,2,L
+
+#OvduIntAmt=m,14.2,S
+E(0,#L3r12OvduIntAmt)
+
+#OvduIntAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OvduIntAmt,#OvduIntAmtX)
 
 ![催收還款金額]
 !自動顯示,不必輸入

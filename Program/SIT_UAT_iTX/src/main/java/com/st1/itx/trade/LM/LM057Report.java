@@ -46,6 +46,7 @@ public class LM057Report extends MakeReport {
 	public void exec(TitaVo titaVo, int date) throws LogicException {
 
 		List<Map<String, String>> findList = new ArrayList<>();
+		List<Map<String, String>> findListTotal = new ArrayList<>();
 
 		this.info("LM057Report exec");
 
@@ -60,7 +61,7 @@ public class LM057Report extends MakeReport {
 		try {
 
 			findList = lM057ServiceImpl.findAll(titaVo, date);
-//			findList2 = lM057ServiceImpl.findAll(titaVo);
+			findListTotal = lM057ServiceImpl.findTotal(titaVo, date);
 //			findList3 = lM057ServiceImpl.findAll(titaVo);
 
 		} catch (Exception e) {
@@ -71,28 +72,26 @@ public class LM057Report extends MakeReport {
 
 		}
 
-//		reportData(findList, findList2);
+		reportData(findList);
 
-		exportExcel14_5(findList);
+		exportExcel14_5(findListTotal);
 
 		exportExcel14_6();
 
 		makeExcel.close();
 	}
 
-//	private void reportData(List<Map<String, String>> listData, List<Map<String, String>> listData2)
-//			throws LogicException {
-//		this.info("LM057report.reportData");
-//
-//		String sheetName = yearMon + "工作表";
-//
-//		makeExcel.setSheet("XXX工作表", sheetName);
-//
-//		int row = 1;
-//
-//
-//		if (listData.size() > 0 && listData2.size() > 0) {
-//		
+	private void reportData(List<Map<String, String>> listData) throws LogicException {
+		this.info("LM057report.reportData");
+
+		String sheetName = yearMon + "工作表";
+
+		makeExcel.setSheet("XXX工作表", sheetName);
+
+		int row = 1;
+
+		if (listData.size() > 0) {
+
 //			for (Map<String, String> lM057Vo : listData) {
 //				row++;
 //				// A~C 921受災戶 (要vlookup的)
@@ -100,54 +99,66 @@ public class LM057Report extends MakeReport {
 //				makeExcel.setValue(row, 2, "C7", "C");
 //				makeExcel.setValue(row, 3, lM057Vo.get("F??"));
 //			}
-//
-//			row = 1;
-//
-//			for (Map<String, String> lM057Vo : listData2) {
-//				row++;
-//
-//				// 戶號+額度
-//				makeExcel.setValue(row, 4, lM057Vo.get("F??"));
-//				// 帳冊別
-//				makeExcel.setValue(row, 5, lM057Vo.get("F??"));
-//				// 戶號
-//				makeExcel.setValue(row, 6, lM057Vo.get("F??"));
-//				// 額度
-//				makeExcel.setValue(row, 7, lM057Vo.get("F??"));
-//				// 序號
-//				makeExcel.setValue(row, 8, lM057Vo.get("F??"));
-//				// 姓名
-//				makeExcel.setValue(row, 9, lM057Vo.get("F??"));
-//				// 金額
-//				makeExcel.setValue(row, 10, lM057Vo.get("F??"));
-//				// 到期日
-//				makeExcel.setValue(row, 11, lM057Vo.get("F??"));
-//				// 利率代碼
-//				makeExcel.setValue(row, 12, lM057Vo.get("F??"));
-//				// 分類(需加判斷分類)
-//				makeExcel.setValue(row, 13, lM057Vo.get("F??"));
-//				// 跟921受災戶比
+
+			// 起始列
+			row = 2;
+
+			for (Map<String, String> lM057Vo : listData) {
+
+				String subbookCode = lM057Vo.get("F0").isEmpty() ? " " : lM057Vo.get("F0");
+				int custNo = lM057Vo.get("F1").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F1"));
+				int facmNo = lM057Vo.get("F2").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F2"));
+				int bormNo = lM057Vo.get("F3").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F3"));
+				String custName = lM057Vo.get("F4").isEmpty() ? " " : lM057Vo.get("F4");
+				int loan = lM057Vo.get("F5").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F5"));
+				String date = showBcDate(lM057Vo.get("F6"), 0);
+				int rate = lM057Vo.get("F7").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F7"));
+				String type = lM057Vo.get("F8");
+				String leg = lM057Vo.get("F9").isEmpty() ? " " : lM057Vo.get("F9");
+				String prodNo = lM057Vo.get("F10").isEmpty() ? " " : lM057Vo.get("F10");
+				// 戶號+額度
+				makeExcel.setValue(row, 4, custNo + "" + facmNo);
+				// 帳冊別
+				makeExcel.setValue(row, 5, subbookCode, "L");
+				// 戶號
+				makeExcel.setValue(row, 6, custNo, "R");
+				// 額度
+				makeExcel.setValue(row, 7, facmNo, "R");
+				// 序號
+				makeExcel.setValue(row, 8, bormNo, "R");
+				// 姓名
+				makeExcel.setValue(row, 9, custName, "L");
+				// 金額
+				makeExcel.setValue(row, 10, loan, "#,##0", "R");
+				// 到期日
+				makeExcel.setValue(row, 11, date, "R");
+				// 利率
+				makeExcel.setValue(row, 12, rate);
+				// 分類(需加判斷分類)
+				makeExcel.setValue(row, 13, type);
+
+				// 法務進度
+				makeExcel.setValue(row, 15, leg);
+				// 跟921受災戶比
 //				makeExcel.setValue(row, 14, "=VLOOKUP(F" + row + ",A:B,2,0)");
-//
-//		
-//
-//				// 法務進度
-//				makeExcel.setValue(row, 15, lM057Vo.get("F??"));
-//
-//			}
-//			
-//			//重整公式
-//			makeExcel.formulaCaculate(1, 8);
-//			makeExcel.formulaCaculate(1, 9);
-//
-//		} else {
-//
-//			makeExcel.setValue(2, 1, "本日無資料");
-//
-//
-//		}
-//
-//	}	
+
+				// 利率代碼
+				makeExcel.setValue(row, 16, prodNo);
+
+				row++;
+			}
+
+			// 重整公式
+			makeExcel.formulaCaculate(1, 9);
+			makeExcel.formulaCaculate(1, 10);
+
+		} else {
+
+			makeExcel.setValue(2, 1, "本日無資料");
+
+		}
+
+	}
 
 	private void exportExcel14_5(List<Map<String, String>> listData) throws LogicException {
 		this.info("LM057report.report14_5");
@@ -158,7 +169,7 @@ public class LM057Report extends MakeReport {
 		makeExcel.setValue(2, 4, dateF);
 
 		BigDecimal amount = BigDecimal.ZERO;
-
+		BigDecimal colTotal = BigDecimal.ZERO;
 		// 可能可去掉這層，
 		for (Map<String, String> lM057Vo : listData) {
 
@@ -166,27 +177,55 @@ public class LM057Report extends MakeReport {
 
 			switch (lM057Vo.get("F0")) {
 			case "B1":
+
 				// 甲類-放款本金超過清償期三個月而未獲清償，或雖未屆滿三個月，但以向主、從償務人訴追或楚芬擔保品者
 				makeExcel.setValue(5, 4, amount, "#,##0");
+				colTotal = colTotal.add(amount);
 				break;
 			case "B3":
 				// 甲類-放款本金未按期攤超過六個月
 				makeExcel.setValue(7, 4, amount, "#,##0");
+				colTotal = colTotal.add(amount);
 				break;
 			case "C2":
 				// 乙類-分期償還放款未按期攤超過三至六個月
 				makeExcel.setValue(11, 4, amount, "#,##0");
+				colTotal = colTotal.add(amount);
+				break;
+			case "Ovdu":
+				// 乙類-分期償還放款未按期攤超過三至六個月
+				makeExcel.setValue(11, 4, amount, "#,##0");
+				colTotal = colTotal.add(amount);
 				break;
 			case "C5":
 				// 已確定分配之債權，惟尚未獲分款者
 				makeExcel.setValue(14, 4, amount, "#,##0");
+				colTotal = colTotal.add(amount);
 				break;
-			case "TOTAL":
-				// 放款總額(含轉列催收款)
-				makeExcel.setValue(18, 4, amount, "#,##0");
-				break;
+//			case "TOTAL":
+//				// 放款總額(含轉列催收款)
+//				makeExcel.setValue(18, 4, amount, "#,##0");
+//				break;
+//			case "DPLoan":
+//				// 擔保放款(溢折價)
+//				makeExcel.setValue(18, 4, amount, "#,##0");
+//				break;
+
 			default:
 				break;
+			}
+
+			if ("DPCol".equals(lM057Vo.get("F0"))) {
+				// 逾期放款總額
+				colTotal = colTotal.add(amount);
+				makeExcel.setValue(19, 4, colTotal, "#,##0");
+
+			}
+
+			if ("Total".equals(lM057Vo.get("F0"))) {
+				// 放款總額
+				makeExcel.setValue(18, 4, amount, "#,##0");
+
 			}
 
 		}
@@ -194,7 +233,7 @@ public class LM057Report extends MakeReport {
 		// 重整公式
 		makeExcel.formulaCaculate(9, 4);
 		makeExcel.formulaCaculate(17, 4);
-		makeExcel.formulaCaculate(19, 4);
+//		makeExcel.formulaCaculate(19, 4);
 		makeExcel.formulaCaculate(20, 4);
 		makeExcel.formulaCaculate(21, 4);
 		makeExcel.formulaCaculate(22, 4);

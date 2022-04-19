@@ -86,6 +86,7 @@ BEGIN
         WHERE "LMSPBK" = '3'
           AND "LMSPYS" = 2
           AND "POSCDE" IS NOT NULL
+        UNION
         SELECT "LMSACN"
              , "LMSPCN"
              , "POSCDE"
@@ -248,6 +249,7 @@ BEGIN
         WHERE "LMSPBK" = '3'
           AND "LMSPYS" = 2
           AND "POSCDE" IS NOT NULL
+        UNION
         SELECT "LMSACN"
              , "LMSPCN"
              , "POSCDE"

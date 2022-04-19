@@ -47,134 +47,200 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 月
 		int iMonth = (monthDate / 100) % 100;
 
-		int last4Month = 0;
-		if (iMonth <= 4) {
-			last4Month = ((iYear - 1) * 100) + (12 - (4 - iMonth));
-		} else {
-			last4Month = iYear * 100 + (iMonth - 4);
+		int lastMonth = iYear * 100 + iMonth - 1;
+		
+		
+		if(iMonth == 1) {
+			
+			lastMonth = (iYear - 1) * 100 + 12 ;
 		}
+		
+//		int last4Month = 0;
+//		if (iMonth <= 4) {
+//			last4Month = ((iYear - 1) * 100) + (12 - (4 - iMonth));
+//		} else {
+//			last4Month = iYear * 100 + (iMonth - 4);
+//		}
 
-		this.info("lM057.findAll YYMM=" + ((iYear * 100) + iMonth) + ",last4Mon=" + last4Month);
+		this.info("lM057.findAll YYMM=" + ((iYear * 100) + iMonth) + ",lastMonth=" + lastMonth);
 
 		String sql = " ";
-		sql += " SELECT * FROM( ";
-		sql += " SELECT \"KIND\"";
-		sql += "       ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
-		sql += " FROM(";
-		sql += "	SELECT ( CASE";
-		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C2'";
-		sql += "       	       WHEN TRUNC(L.\"MaturityDate\" / 100) = :l4mdy AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'B1'";
-		sql += "       	       WHEN CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'C5'";
-		sql += "       	     ELSE 'B3' END ) AS \"KIND\"";
-		sql += "	      ,M.\"PrinBalance\" AS \"AMT\"";
-		sql += "	FROM \"MonthlyLoanBal\" ML";
-		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = ML.\"CustNo\"";
-		sql += "						   AND F.\"FacmNo\" = ML.\"FacmNo\"";
-		sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = ML.\"CustNo\"";
-		sql += "    LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" =  ML.\"CustNo\"";
-		sql += "                               AND L.\"FacmNo\" =  ML.\"FacmNo\"";
-		sql += "                               AND L.\"BormNo\" =  ML.\"BormNo\"";
-		sql += "    LEFT JOIN \"MonthlyFacBal\" M ON M.\"YearMonth\" = ML.\"YearMonth\"";
-		sql += "                                 AND M.\"CustNo\" = ML.\"CustNo\"";
-		sql += "                                 AND M.\"FacmNo\" = ML.\"FacmNo\"";
-		sql += "	LEFT JOIN(SELECT L.\"CustNo\"";
-		sql += "				    ,L.\"FacmNo\"";
-		sql += "					,L.\"LegalProg\"";
-		sql += "					,L.\"Amount\"";
-		sql += "					,L.\"Memo\"";
-		sql += "					,ROW_NUMBER() OVER (PARTITION BY L.\"CustNo\", L.\"FacmNo\" ORDER BY L.\"TitaTxtNo\" DESC) AS \"SEQ\"";
-		sql += "			  FROM \"CollLaw\" L";
-		sql += "		      WHERE TRUNC(L.\"AcDate\" / 100) <= :yymm ) CL";
-		sql += "	  ON CL.\"CustNo\" = M.\"CustNo\" AND CL.\"FacmNo\" = M.\"FacmNo\" ";
-		sql += "	 								  AND CL.\"SEQ\" = 1";
+		sql += " ";
+		sql += "	SELECT DECODE(M.\"AcSubBookCode\",'201','A',' ') AS \"AcSubBookCode\"";
+		sql += "       	  ,M.\"CustNo\"";
+		sql += "       	  ,M.\"FacmNo\"";
+		sql += "       	  ,M.\"BormNo\"";
+		sql += "       	  ,C.\"CustName\"";
+		sql += "       	  ,M.\"LoanBalance\"";
+		sql += "       	  ,L.\"PrevPayIntDate\"";
+		sql += "       	  ,( CASE";
+		sql += "       	       WHEN M.\"AcctCode\" = 990 AND M.\"LoanBalance\" = 1 THEN 'B3'";
+		sql += "       	       WHEN M2.\"CustNo\" = M.\"CustNo\" AND M2.\"FacmNo\" = M.\"FacmNo\" AND M2.\"BormNo\" = M.\"BormNo\" THEN 'B3'";
+		sql += "       	       WHEN CO.\"CustNo\" = M.\"CustNo\"  AND CO.\"LegalProg\" IN ('056','057','058','060') THEN 'C5'";
+		sql += "       	     ELSE 'B1' END ) AS \"Type\"";
+		sql += "		  ,NVL(CO.\"LegalProg\",' ') AS \"LegalProg\"";
+		sql += " 		  ,' ' AS \"Memo\"";
+		sql += "	      ,M.\"ProdNo\"";
+		sql += "	FROM \"MonthlyLoanBal\" M";
+		sql += "    LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" =  M.\"CustNo\"";
+		sql += "                               AND L.\"FacmNo\" =  M.\"FacmNo\"";
+		sql += "                               AND L.\"BormNo\" =  M.\"BormNo\"";
+		sql += "                               AND L.\"LoanBal\" > 0";
+		sql += "	LEFT JOIN (";
+		sql += "		SELECT \"CustNo\"";
+		sql += "			  ,\"FacmNo\"";
+		sql += "			  ,\"BormNo\"";
+		sql += "		FROM \"MonthlyLoanBal\"";
+		sql += "		WHERE \"YearMonth\" = :lyymm";
+		sql += "		  AND \"AcctCode\" = 990";
+		sql += "		  AND \"LoanBalance\" > 0";
+		sql += "	) M2 ON M2.\"CustNo\" =  M.\"CustNo\" AND M2.\"CustNo\" =  M.\"CustNo\"";
+		sql += "                               			  AND M2.\"FacmNo\" =  M.\"FacmNo\"";
+		sql += "                               			  AND M2.\"BormNo\" =  M.\"BormNo\"";
+		sql += "    LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"YearMonth\" = M.\"YearMonth\"";
+		sql += "                                  AND MF.\"CustNo\" = M.\"CustNo\"";
+		sql += "                                  AND MF.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
+		sql += "	LEFT JOIN(SELECT \"CustNo\"";
+		sql += "				    ,\"FacmNo\"";
+		sql += "					,\"LegalProg\"";
+		sql += "					,ROW_NUMBER() OVER (PARTITION BY \"CustNo\", \"FacmNo\" ORDER BY \"RecordDate\" DESC) AS \"SEQ\"";
+		sql += "			  FROM \"CollLaw\"";
+		sql += "		      WHERE TRUNC(\"RecordDate\" / 100) <= :yymm ) CO";
+		sql += "	  ON CO.\"CustNo\" = M.\"CustNo\" AND CO.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += "	 								  AND CO.\"SEQ\" = 1";
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
-		sql += "	  AND M.\"PrinBalance\" > 0 )";
-		sql += "    GROUP BY \"KIND\"";
-		sql += "	UNION";
-		sql += "	SELECT 'TOTAL' AS \"KIND\"";
-		sql += "       	  ,SUM(NVL(\"AMT\",0)) AS \"AMT\"";
-		sql += "	FROM ( SELECT SUM(M.\"PrinBalance\") AS \"AMT\"";
-		sql += "	       FROM \"MonthlyFacBal\" M";
-		sql += "		   WHERE M.\"YearMonth\" = :yymm";
-		sql += "	  		 AND M.\"PrinBalance\" > 0";
-		sql += "	       UNION";
-		sql += "	       SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
-		sql += "	       FROM \"AcMain\"";
-		sql += "	       WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
-		sql += "	         AND \"MonthEndYm\" = :yymm )";
-		sql += "	GROUP BY 'TOTAL'";
-		sql += " )";
+		sql += "	  AND M.\"AcctCode\" = 990 ";
+		sql += "	  AND M.\"LoanBalance\" > 0  ";
 		info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", (iYear * 100) + iMonth);
-		query.setParameter("l4mdy", last4Month);
+		query.setParameter("lyymm", lastMonth);
+
+		return this.convertToMap(query);
+
+	}
+	
+	
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param monthDate 西元年月底日
+	 * 
+	 */
+	public List<Map<String, String>> findTotal(TitaVo titaVo, int monthDate) throws Exception {
+		this.info("lM057.findAllTotal ");
+
+		// 年
+		int iYear = monthDate / 10000;
+		// 月
+		int iMonth = (monthDate / 100) % 100;
+
+		int lastMonth = iYear * 100 + iMonth - 1;
+		
+		
+		if(iMonth == 1) {
+			
+			lastMonth = (iYear - 1) * 100 + 12 ;
+		}
+		
+
+		this.info("lM057.findAll YYMM=" + ((iYear * 100) + iMonth) + ",lastMonth=" + lastMonth);
+
+		String sql = " ";
+		sql += " 	WITH \"tempTotal\" AS (";
+		sql += " 		SELECT 'ToTal' AS \"Item\"";
+		sql += " 			  ,SUM(\"LoanBalance\") AS \"AMT\" ";
+		sql += " 		FROM \"MonthlyLoanBal\"";
+		sql += " 		WHERE \"LoanBalance\" > 0 ";
+		sql += " 		  AND \"YearMonth\" = :yymm ";
+		sql += " 		UNION";
+		sql += "		SELECT 'DPLoan' AS \"Item\" ";
+		sql += " 	   		  ,SUM(\"TdBal\")  AS \"AMT\" ";
+		sql += " 		FROM \"AcMain\"";
+		sql += " 		WHERE \"AcNoCode\" IN ( '10600304000' ) "; //-- 擔保放款-折溢價
+		sql += "   		  AND \"MonthEndYm\" = :yymm ";
+		sql += " 		UNION";
+		sql += " 		SELECT 'DPCol' AS \"Item\" ";
+		sql += " 	   		  ,SUM(\"TdBal\")  AS \"AMT\" ";
+		sql += " 		FROM \"AcMain\"";
+		sql += " 		WHERE \"AcNoCode\" IN (  '10601301000' "; //-- 催收款項-法務費用
+		sql += "								,'10601302000' "; //-- 催收款項-火險費用
+		sql += "								,'10601304000') ";//-- 催收款項-折溢價
+		sql += "   		  AND \"MonthEndYm\" = :yymm ";
+		sql += " 	), \"ovduLoan\" AS (";
+		sql += " 		SELECT 'Ovdu' AS \"Item\"";
+		sql += "			  ,SUM(\"PrinBalance\") AS \"AMT\"";
+		sql += " 		FROM \"MonthlyFacBal\"";
+		sql += " 		WHERE \"YearMonth\" = :yymm";
+		sql += " 		  AND \"AcctCode\" <> 990 ";
+		sql += " 		  AND \"OvduTerm\" IN (3,4,5,6)";
+		sql += " 	)";
+		
+		sql += "	SELECT ( CASE";
+		sql += "       	       WHEN M.\"AcctCode\" = 990 AND M.\"LoanBalance\" = 1 THEN 'B3'";
+		sql += "       	       WHEN M2.\"CustNo\" = M.\"CustNo\" AND M2.\"FacmNo\" = M.\"FacmNo\" AND M2.\"BormNo\" = M.\"BormNo\" THEN 'B3'";
+		sql += "       	       WHEN CO.\"CustNo\" = M.\"CustNo\"  AND CO.\"LegalProg\" IN ('056','057','058','060') THEN 'C5'";
+		sql += "       	     ELSE 'B1' END ) AS \"Item\"";
+		sql += "       	  ,SUM(M.\"LoanBalance\") AS \"AMT\"";
+		sql += "	FROM \"MonthlyLoanBal\" M";
+		sql += "    LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" =  M.\"CustNo\"";
+		sql += "                               AND L.\"FacmNo\" =  M.\"FacmNo\"";
+		sql += "                               AND L.\"BormNo\" =  M.\"BormNo\"";
+		sql += "                               AND L.\"LoanBal\" > 0";
+		sql += "	LEFT JOIN (";
+		sql += "		SELECT \"CustNo\"";
+		sql += "			  ,\"FacmNo\"";
+		sql += "			  ,\"BormNo\"";
+		sql += "		FROM \"MonthlyLoanBal\"";
+		sql += "		WHERE \"YearMonth\" = :lyymm";
+		sql += "		  AND \"AcctCode\" = 990";
+		sql += "		  AND \"LoanBalance\" > 0";
+		sql += "	) M2 ON M2.\"CustNo\" =  M.\"CustNo\" AND M2.\"CustNo\" =  M.\"CustNo\"";
+		sql += "                               			  AND M2.\"FacmNo\" =  M.\"FacmNo\"";
+		sql += "                               			  AND M2.\"BormNo\" =  M.\"BormNo\"";
+		sql += "    LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"YearMonth\" = M.\"YearMonth\"";
+		sql += "                                  AND MF.\"CustNo\" = M.\"CustNo\"";
+		sql += "                                  AND MF.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
+		sql += "	LEFT JOIN(SELECT \"CustNo\"";
+		sql += "				    ,\"FacmNo\"";
+		sql += "					,\"LegalProg\"";
+		sql += "					,ROW_NUMBER() OVER (PARTITION BY \"CustNo\", \"FacmNo\" ORDER BY \"RecordDate\" DESC) AS \"SEQ\"";
+		sql += "			  FROM \"CollLaw\"";
+		sql += "		      WHERE TRUNC(\"RecordDate\" / 100) <= :yymm ) CO";
+		sql += "	  ON CO.\"CustNo\" = M.\"CustNo\" AND CO.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += "	 								  AND CO.\"SEQ\" = 1";
+		sql += "	WHERE M.\"YearMonth\" = :yymm";
+		sql += "	  AND M.\"AcctCode\" = 990 ";
+		sql += "	  AND M.\"LoanBalance\" > 0  ";
+		sql += "	GROUP BY CASE";
+		sql += "       	       WHEN M.\"AcctCode\" = 990 AND M.\"LoanBalance\" = 1 THEN 'B3'";
+		sql += "       	       WHEN M2.\"CustNo\" = M.\"CustNo\" AND M2.\"FacmNo\" = M.\"FacmNo\" AND M2.\"BormNo\" = M.\"BormNo\" THEN 'B3'";
+		sql += "       	       WHEN CO.\"CustNo\" = M.\"CustNo\"  AND CO.\"LegalProg\" IN ('056','057','058','060') THEN 'C5'";
+		sql += "       	     ELSE 'B1' END";
+		sql += "    UNION";
+		sql += "    SELECT \"Item\"";
+		sql += "    	  ,NVL(\"AMT\",0) AS \"AMT\"";
+		sql += "    FROM \"ovduLoan\"";
+		sql += "    UNION";
+		sql += "    SELECT \"Item\"";
+		sql += "    	  ,NVL(\"AMT\",0) AS \"AMT\"";
+		sql += "    FROM \"tempTotal\"";
+
+		info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", (iYear * 100) + iMonth);
 
 		return this.convertToMap(query);
 
 	}
 
 }
-
-//String sql = "SELECT J.\"SubTranCode\" AS F0";
-//sql += "			,J.\"CustNo\" AS F1";
-//sql += "			,J.\"FacmNo\" AS F2";
-//sql += "			,J.\"BormNo\" AS F3";
-//sql += "			,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS F4";
-//sql += "			,M.\"LoanBal\" AS F5";
-//sql += "			,M.\"MaturityDate\" AS F6";
-//sql += "			,CASE";
-//sql += "			   WHEN TRUNC(F.\"OvduDate\" / 100) = :yymm THEN 'B3'";
-//sql += "			   WHEN M.\"MaturityDate\" < :l4mdy THEN 'B1'";
-//sql += "			   WHEN L.\"LegalProg\" IN ('056','058','060') THEN 'C5'";
-//sql += "			 ELSE 'B3' END AS F7";
-//sql += "			,NVL(L.\"LegalProg\",'#N/A') AS F8";
-//sql += "			,'C7' AS F9";
-//sql += "			,DECODE(L.\"Amount\",0,'#N/A','無擔保') AS F10";
-//sql += "			,DECODE(F.\"RenewCode\",'2','協議',' ') AS F11";
-//sql += "	  FROM(SELECT CAST(SUBSTR(J.\"AcctNo\", 1, 7) AS DECIMAL) \"CustNo\"";
-//sql += "				 ,CAST(SUBSTR(J.\"AcctNo\",8,3) AS DECIMAL) \"FacmNo\"";
-//sql += "				 ,CAST(SUBSTR(J.\"AcctNo\",11, 3) AS DECIMAL) \"BormNo\"";
-//sql += "				 ,J.\"SubTranCode\"";
-//sql += "		   FROM \"JcicB201\" J";
-//sql += "		   WHERE J.\"DataYM\" = :yymm) J";
-//sql += "	  LEFT JOIN(SELECT L.\"CustNo\"";
-//sql += "					  ,L.\"FacmNo\"";
-//sql += "					  ,MAX(L.\"LegalProg\") \"LegalProg\"";
-//sql += "					  ,SUM(L.\"Amount\") \"Amount\"";
-//sql += "				FROM(SELECT CAST(SUBSTR(J.\"AcctNo\",1,7) AS DECIMAL) \"CustNo\"";
-//sql += "					  	   ,CAST(SUBSTR(J.\"AcctNo\",8,3) AS DECIMAL) \"FacmNo\"";
-//sql += "						   ,L.\"LegalProg\"";
-//sql += "					       ,0 \"Amount\"";
-//sql += "						   ,ROW_NUMBER() OVER (PARTITION BY SUBSTR(J.\"AcctNo\",1,10) ORDER BY L.\"RecordDate\" DESC) AS SEQ";
-//sql += "					 FROM \"JcicB201\" J";
-//sql += "					 LEFT JOIN \"CollLaw\" L ON L.\"CaseCode\" = '1'";
-//sql += "											AND L.\"CustNo\" = CAST(SUBSTR(J.\"AcctNo\", 1, 7) AS DECIMAL)";
-//sql += "											AND L.\"FacmNo\" = CAST(SUBSTR(J.\"AcctNo\", 8, 3) AS DECIMAL)";
-//sql += "											AND L.\"LegalProg\" < 900";
-//sql += "					 WHERE J.\"DataYM\" = :yymm";
-//sql += "					 UNION ALL";
-//sql += "					 SELECT CAST(SUBSTR(J.\"AcctNo\",1,7) AS DECIMAL) \"CustNo\"";
-//sql += "						   ,CAST(SUBSTR(J.\"AcctNo\",8,3) AS DECIMAL) \"FacmNo\"";
-//sql += "						   ,NULL \"LegalProg\"";
-//sql += "						   ,L.\"Amount\"";
-//sql += "						   ,ROW_NUMBER() OVER(PARTITION BY SUBSTR(J.\"AcctNo\",1,10) ORDER BY L.\"RecordDate\" DESC) AS SEQ";
-//sql += "					 FROM \"JcicB201\" J";
-//sql += "					 LEFT JOIN \"CollLaw\" L ON L.\"CaseCode\" ='1'";
-//sql += "											AND L.\"CustNo\" = CAST(SUBSTR(J.\"AcctNo\", 1, 7) AS DECIMAL)";
-//sql += "											AND L.\"FacmNo\" = CAST(SUBSTR(J.\"AcctNo\", 8, 3) AS DECIMAL)";
-//sql += "											AND L.\"LegalProg\" = 901";
-//sql += "					 WHERE J.\"DataYM\" = :yymm) L";
-//sql += "				 WHERE L.\"SEQ\" = 1";
-//sql += "				 GROUP BY L.\"CustNo\", L.\"FacmNo\") L";
-//sql += "	  ON L.\"CustNo\" = J.\"CustNo\"";
-//sql += "	  AND L.\"FacmNo\" = J.\"FacmNo\"";
-//sql += "	  LEFT JOIN \"MonthlyFacBal\" F ON F.\"YearMonth\" = :yymm";
-//sql += "								   AND F.\"CustNo\" = J.\"CustNo\"";
-//sql += "								   AND F.\"FacmNo\" = J.\"FacmNo\"";
-//sql += "	  LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = J.\"CustNo\"";
-//sql += "	  							 AND M.\"FacmNo\" = J.\"FacmNo\"";
-//sql += "	  							 AND M.\"BormNo\" = J.\"BormNo\"";
-//sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = J.\"CustNo\"";

@@ -61,21 +61,37 @@ public class L6301 extends TradeBuffer {
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E0010", "L6301"); // 功能選擇錯誤
 		}
+		
+		//取得代碼說明
+		String iItem = titaVo.getParam("Item");
+		this.info("Code  = " + iCode);
+		
+		this.info("代碼說明   = " + iItem);
+		this.info("進入FuncCode"+ iFuncCode);
 
+		this.info("放行前"+titaVo.isActfgSuprele());
 //		// isActfgSuprele() 放行
 //		this.info("ActfgSuprele="+titaVo.isActfgSuprele());
 		if (titaVo.isActfgSuprele() && iFuncCode == 1) {
 			iFuncCode = 2;
-		} else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4) {
+		} else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && !iItem.equals("")) {
+			this.info("放行後"+!(titaVo.isActfgSuprele()));
 			iFuncCode = 2;
 		}
-
+		this.info("產出FuncCode"+ iFuncCode);
+		this.info("產出code " + iCode );
+		
+		if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && iItem.equals("")) {
+			throw new LogicException(titaVo, "E0004", iCode);
+		}
+		
+		
 		// BaseRate0的選單-商品用含99:自訂(執行L6604建立)
 		insCdCode(iFuncCode, "BaseRate0", iCode, titaVo);
 
 		// BaseRate的選單-指標利率種類
 		insCdCode(iFuncCode, "BaseRate", iCode, titaVo);
-
+		
 		this.info("3");
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -86,13 +102,16 @@ public class L6301 extends TradeBuffer {
 		// 更新各類代碼檔
 		CdCode tCdCode = new CdCode();
 		CdCodeId tCdCodeId = new CdCodeId();
-
+		
 		tCdCodeId.setDefCode(mDefCode);
 		tCdCodeId.setCode(mCode);
 
 		Slice<CdBaseRate> tCdBaseRate = null;
 		List<CdBaseRate> lCdBaseRate = null;
 
+		this.info("mDefCode   = " + mDefCode );
+		this.info("mCode      = " + mCode);
+		
 		switch (mFuncCode) {
 		case 1: // 新增
 			tCdCode.setCdCodeId(tCdCodeId);
@@ -139,15 +158,18 @@ public class L6301 extends TradeBuffer {
 
 		case 4: // 刪除
 			tCdCode = sCdCodeService.holdById(new CdCodeId(mDefCode, mCode));
-
+			
 			// 檢查CdBAseRate是否已建立指標利率，如已有請先刪除再刪除指標利率種類
 			tCdBaseRate = sCdBaseRateService.baseRateCodeEq("TWD", mCode, 00000000, 99999999, 0, 1, titaVo);
 			lCdBaseRate = tCdBaseRate == null ? null : tCdBaseRate.getContent();
-			if (!titaVo.isActfgSuprele() && lCdBaseRate != null) {
+			if ((!(titaVo.isActfgSuprele())) && lCdBaseRate != null) {
 				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指標利率種類");
 			}
-
-			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 1) {
+			 
+			this.info("case4isActfgSuprele = " +titaVo.isActfgSuprele());
+			this.info("case4EffectFlag = " +tCdCode.getEffectFlag());
+			
+			if ((!(titaVo.isActfgSuprele())) && tCdCode.getEffectFlag() == 1) {
 				throw new LogicException(titaVo, "", "未放行交易不可修改/刪除");
 			}
 
@@ -160,7 +182,7 @@ public class L6301 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", mCode); // 刪除資料不存在
 			}
-
+			
 			dataLog.setEnv(titaVo, tCdCode, tCdCode); ////
 			dataLog.exec("刪除指標利率種類"); ////
 			break;
@@ -172,7 +194,7 @@ public class L6301 extends TradeBuffer {
 	private CdCode moveCdCode(CdCode mCdCode, int mFuncCode, TitaVo titaVo) throws LogicException {
 
 		mCdCode.setDefType(2);
-		mCdCode.setItem(titaVo.getParam("Item"));
+		mCdCode.setItem(titaVo.getParam("Item"));//說明
 		mCdCode.setEnable("N");
 		// 0:已放行 1:未放行
 		if (("BaseRate").equals(mCdCode.getCdCodeId().getDefCode())) {

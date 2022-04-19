@@ -61,14 +61,14 @@ K(MODIFYBUTTON,查詢)
 T(4,CHAIN$)
 IF(#CHAIN==0,V(P,本交易為連動交易，請從交易[L6932 資料變更交易查詢]進入),$)
 
-#NTXBUF=x,40,S
+#NTXBUF=x,46,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@TranNo,#NTXBUF,1,5)
-T(1,@MrKey,#NTXBUF,6,20)
+T(1,@MrKey,#NTXBUF,6,41)
 
 #TranNo=x,5,L
 
-#MrKey=x,20,L
+#MrKey=x,41,L
 
 #RPTFG=A,1,S
 E(0,0)

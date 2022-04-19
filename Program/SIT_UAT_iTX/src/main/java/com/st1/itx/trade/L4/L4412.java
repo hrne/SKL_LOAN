@@ -1,17 +1,24 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 //import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.BankAuthAct;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.BankAuthActService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita<br>
@@ -43,6 +50,15 @@ public class L4412 extends TradeBuffer {
 
 	@Autowired
 	public BankAuthActCom bankAuthActCom;
+	
+	@Autowired
+	CdEmpService sCdEmpService;
+	
+	@Autowired
+	BankAuthActService sBankAuthActService;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -56,6 +72,8 @@ public class L4412 extends TradeBuffer {
 
 		this.info("iFunCode = " + iFunCode);
 		this.info("iAuthApplCode = " + iAuthApplCode);
+		
+		CdEmp cdEmp = sCdEmpService.findById(titaVo.getTlrNo(), titaVo);
 
 		// FunCode 1 新增
 		if ("1".equals(iFunCode)) {
@@ -65,6 +83,11 @@ public class L4412 extends TradeBuffer {
 			} else {
 				bankAuthActCom.add("D", titaVo);
 			}
+			
+			this.totaVo.putParam("CreateEmpNo", titaVo.getTlrNo() + " " + cdEmp.getFullname());
+			this.totaVo.putParam("CreateDate", titaVo.getCalDy());
+			this.totaVo.putParam("LastUpdateEmpNo", titaVo.getTlrNo() + " " + cdEmp.getFullname());
+			this.totaVo.putParam("LastUpdate", titaVo.getCalDy());
 
 			// FunCode 2 修改
 		} else if ("2".equals(iFunCode)) {
@@ -80,6 +103,34 @@ public class L4412 extends TradeBuffer {
 					bankAuthActCom.mntPostAuth("1", titaVo);
 				}
 			}
+			
+			Slice<BankAuthAct> slBankAuthAct = sBankAuthActService.facmNoEq(parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")), 0, Integer.MAX_VALUE, titaVo);
+			
+			if (slBankAuthAct == null || slBankAuthAct.isEmpty())
+				throw new LogicException("E0003", "銀扣授權帳號檔");
+			
+			List<BankAuthAct> lBankAuthAct = slBankAuthAct.getContent();
+			
+			if (lBankAuthAct == null || lBankAuthAct.isEmpty())
+				throw new LogicException("E0003", "銀扣授權帳號檔");
+			
+			BankAuthAct tBankAuthAct = lBankAuthAct.get(0);
+			
+			cdEmp = sCdEmpService.findById(tBankAuthAct.getCreateEmpNo(), titaVo);
+			
+			if (cdEmp == null)
+				throw new LogicException("E0001", "員工資料檔 " + tBankAuthAct.getCreateEmpNo());
+			
+			this.totaVo.putParam("CreateEmpNo", tBankAuthAct.getCreateEmpNo() + " " + cdEmp.getFullname());
+			this.totaVo.putParam("CreateDate", parse.timeStampToStringDate(tBankAuthAct.getCreateDate()).replace("/", ""));
+			
+			cdEmp = sCdEmpService.findById(tBankAuthAct.getLastUpdateEmpNo(), titaVo);
+			
+			if (cdEmp == null)
+				throw new LogicException("E0001", "員工資料檔 " + tBankAuthAct.getLastUpdateEmpNo());
+			
+			this.totaVo.putParam("LastUpdateEmpNo", tBankAuthAct.getLastUpdateEmpNo() + " " + cdEmp.getFullname());
+			this.totaVo.putParam("LastUpdate", parse.timeStampToStringDate(tBankAuthAct.getLastUpdate()).replace("/", ""));
 
 			// FunCode 4 刪除
 		} else if ("4".equals(iFunCode)) {
@@ -88,14 +139,17 @@ public class L4412 extends TradeBuffer {
 			} else {
 				bankAuthActCom.del("A", titaVo);
 			}
+			
+			// 原樣奉還
+			
+			this.totaVo.putParam("CreateEmpNo", titaVo.getParam("CreateEmpNo"));
+			this.totaVo.putParam("CreateDate", titaVo.getParam("CreateDate"));
+			this.totaVo.putParam("LastUpdateEmpNo", titaVo.getParam("LastUpdateEmpNo"));
+			this.totaVo.putParam("LastUpdate", titaVo.getParam("LastUpdate"));
+			
 		} else {
 
 		}
-		
-		this.totaVo.putParam("CreateEmpNo", titaVo.getTlrNo() + " " + titaVo.getEmpNm());
-		this.totaVo.putParam("CreateDate", titaVo.getCalDy());
-		this.totaVo.putParam("LastUpdateEmpNo", titaVo.getTlrNo() + " " + titaVo.getEmpNm());
-		this.totaVo.putParam("LastUpdate", titaVo.getCalDy());
 
 		this.addList(this.totaVo);
 		return this.sendList();

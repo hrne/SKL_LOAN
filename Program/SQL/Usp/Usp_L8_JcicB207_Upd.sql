@@ -1,8 +1,8 @@
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB207_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB207_Upd"
 (
 -- 程式功能：維護 JcicB207 聯徵授信戶基本資料檔
 -- 執行時機：每月日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB207_Upd"(20200430,'System');
+-- 執行方式：EXEC "Usp_L8_JcicB207_Upd"(20200430,'999999');
 --
 
     -- 參數
@@ -61,8 +61,8 @@ BEGIN
     -- 寫入資料 Work_B207    -- 撈應申報之戶號
     SELECT DISTINCT
            M."CustId"                    AS "CustId"            -- ID
-         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate")
-                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最早貸放的那一筆)
+         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" DESC)
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最近貸放的那一筆)
     FROM   "JcicMonthlyLoanData" M
     WHERE  M."DataYM"   =  YYYYMM
       AND  M."CustId"   IS NOT NULL
@@ -90,27 +90,6 @@ BEGIN
              ELSE C."Birthday" - 19110000
            END                                   AS "Birthday"          -- 出生日期 (民國)
          , RPAD("Fn_GetCustAddr"(C."CustUKey",0),60,TO_NCHAR('　')) AS "RegAddr"  -- 戶籍地址
---         , SUBSTRB(NVL(
---             CASE
---               WHEN RegCity."CityItem" IS NOT NULL THEN RegCity."CityItem"
---             END ||
---             TRIM(NVL2(RegAddr."AreaItem", RegAddr."AreaItem", '')) ||
---             TRIM(NVL2(C."RegRoad", C."RegRoad", ''))  ||
---             TRIM(NVL2(C."RegSection", C."RegSection" || '段', ''))  ||
---             TRIM(NVL2(C."RegAlley", C."RegAlley" || '巷', ''))  ||
---             TRIM(NVL2(C."RegLane", C."RegLane" || '弄', ''))  ||
---             TRIM(NVL(C."RegNum", ''))  ||
---             ( CASE
---                 WHEN TRIM(NVL(C."RegNumDash", '')) IS NOT NULL THEN TRIM(NVL2(C."RegNumDash", '之' || C."RegNumDash", ''))
---                 ELSE ''
---               END) ||
---             ( CASE
---                 WHEN TRIM(NVL(C."RegNum", '')) IS NULL AND TRIM(NVL(C."RegNumDash", '')) IS NULL THEN ''
---                 ELSE '號'
---               END) ||
---             TRIM(NVL2(C."RegFloor", C."RegFloor" || '樓', ''))  ||
---             TRIM(NVL2(C."RegFloorDash", '之' || C."RegFloorDash", ''))
---           , ' '), 1, 66)                       AS "RegAddr"           -- 戶籍地址
          , NVL(
              CASE
                WHEN C."CurrZip3" IS NOT NULL THEN C."CurrZip3"
@@ -122,27 +101,6 @@ BEGIN
              END
            , ' ')                                AS "CurrZip"           -- 聯絡地址郵遞區號
          , RPAD("Fn_GetCustAddr"(C."CustUKey",1),60,TO_NCHAR('　')) AS "CurrAddr" -- 聯絡地址
---         , SUBSTRB(NVL(
---             CASE
---               WHEN MailCity."CityItem" IS NOT NULL THEN MailCity."CityItem"
---             END ||
---             TRIM(NVL2(MailAddr."AreaItem", MailAddr."AreaItem", '')) ||
---             TRIM(NVL2(C."CurrRoad", C."CurrRoad", ''))  ||
---             TRIM(NVL2(C."CurrSection", C."CurrSection" || '段', ''))  ||
---             TRIM(NVL2(C."CurrAlley", C."CurrAlley" || '巷', ''))  ||
---             TRIM(NVL2(C."CurrLane", C."CurrLane" || '弄', ''))  ||
---             TRIM(NVL(C."CurrNum", ''))  ||
---             ( CASE
---                 WHEN TRIM(NVL(C."CurrNumDash", '')) IS NOT NULL THEN TRIM(NVL2(C."CurrNumDash", '之' || C."CurrNumDash", ''))
---                 ELSE ''
---               END) ||
---             ( CASE
---                 WHEN TRIM(NVL(C."CurrNum", '')) IS NULL AND TRIM(NVL(C."CurrNumDash", '')) IS NULL THEN ''
---                 ELSE '號'
---               END) ||
---             TRIM(NVL2(C."CurrFloor", C."CurrFloor" || '樓', ''))  ||
---             TRIM(NVL2(C."CurrFloorDash", '之' || C."CurrFloorDash", ''))
---           , ' '), 1, 66)                       AS "CurrAddr"          -- 聯絡地址
          , CASE
              WHEN Phone1."TelNo" IS NULL AND  Phone2."TelNo" IS NULL THEN
                CASE
@@ -164,16 +122,9 @@ BEGIN
                       NVL2(Phone1."TelExt",  '#' || Phone1."TelExt",  '')
                END
            END                                   AS "Tel"               -- 聯絡電話 (公司Phone1優先，再住家Phone2)
---       , CASE
---           WHEN TRIM(NVL(Phone2."TelNo",' ')) IS NULL THEN TRIM(NVL(CPhone."Mobile",' '))
---           ELSE NVL2(Phone2."TelArea", Phone2."TelArea" || '-', '') ||
---                NVL2(Phone2."TelNo",   Phone2."TelNo",          '') ||
---                NVL2(Phone2."TelExt",  '#' || Phone2."TelExt",  '')
---         END                                   AS "Tel"               -- 聯絡電話
          , CASE
              WHEN CPhone."Mobile" IS NULL THEN ' '
              ELSE CPhone."Mobile"
---           ELSE SUBSTR(CPhone."Mobile",1,4) || '-' || SUBSTR(CPhone."Mobile",5)
            END                                   AS "Mobile"            -- 行動電話
          , ' '                                   AS "Filler14"          -- 空白
          , CASE
@@ -190,20 +141,15 @@ BEGIN
              WHEN TRIM(NVL(C."CurrCompName", ' ')) = ''  THEN TO_NCHAR('　　　　　　　　　　　　　　')
              ELSE RPAD(C."CurrCompName",28,TO_NCHAR('　')) 
            END                                   AS "CurrCompName"      -- 任職機構名稱
-         --, RPAD(C."CurrCompName",28,'　')        AS "CurrCompName"      -- 任職機構名稱
---       , NVL(C."CurrCompId",' ')               AS "CurrCompId"        -- 任職機構統一編號
          , CASE WHEN TRIM(NVL(C."CurrCompId",'0')) = '0' THEN '00000000'
-         --       ELSE NVL(C."CurrCompId",'00000000')                   -- 右靠左補0
                   ELSE LPAD(C."CurrCompId",8,'0')
            END                                   AS "CurrCompId"        -- 任職機構統一編號
---       , LPAD(NVL(C."IndustryCode",'0'),6,'0') AS "JobCode"           -- 職業類別
          , '060000'                              AS "JobCode"           -- 職業類別  (ref:LN15J1 (#M4019 1))
          , NVL(C."CurrCompTel",' ')              AS "CurrCompTel"       -- 任職機構電話
          , CASE 
              WHEN TRIM(NVL(C."JobTitle", ' ')) = ''  THEN TO_NCHAR('　　　　')
              ELSE RPAD(C."JobTitle",8,TO_NCHAR('　')) 
            END                                   AS "JobTitle"          -- 職位名稱
-         --, RPAD(C."JobTitle",8,'　')             AS "JobTitle"          -- 職位名稱
          , NVL(C."JobTenure",' ')                AS "JobTenure"         -- 服務年資
          , CASE
              WHEN TRUNC(NVL(C."IncomeOfYearly",0) / 1000,0) = 0 THEN 600  -- (ref:LN15J1 (#M4023 1))
@@ -215,11 +161,6 @@ BEGIN
              ELSE 0
            END                                   AS "IncomeDataDate"    -- 年收入資料年月 (民國)
          , DECODE(C."Sex",'1','M','2','F',' ')   AS "Sex"               -- 性別
---       , CASE
---           WHEN SUBSTR(C."CustId",1,8) BETWEEN '00000000' AND '99999999'
---            AND SUBSTR(C."CustId",9,2) BETWEEN 'AA' AND 'ZZ'  THEN NVL(C."NationalityCode",' ')
---           ELSE 'TW'
---         END                                   AS "NationalityCode"   -- 國籍
          , NVL(C."NationalityCode",'TW')         AS "NationalityCode"   -- 國籍
          , CASE
              WHEN SUBSTR(C."CustId",1,8) BETWEEN '00000000' AND '99999999'

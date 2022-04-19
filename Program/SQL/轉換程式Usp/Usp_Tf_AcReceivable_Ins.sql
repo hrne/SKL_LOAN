@@ -204,8 +204,8 @@ BEGIN
           ,0                   AS "LastTxDate"       -- 最後交易日
           ,''                  AS "TitaTxCd"         -- 交易代號
           ,''                  AS "TitaKinBr"        -- 
-          ,''                  AS "TitaTlrNo"        -- 經辦
-          ,0                   AS "TitaTxtNo"        -- 交易序號
+          ,S1."TitaTlrNo"      AS "TitaTlrNo"        -- 經辦
+          ,S1."TitaTxtNo"      AS "TitaTxtNo"        -- 交易序號
           ,''                  AS "JsonFields"       -- jason格式紀錄
           ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
@@ -339,8 +339,8 @@ BEGIN
           ,S1."TRXDAT"         AS "LastTxDate"       -- 最後交易日
           ,''                  AS "TitaTxCd"         -- 交易代號
           ,''                  AS "TitaKinBr"        -- 
-          ,''                  AS "TitaTlrNo"        -- 經辦
-          ,0                   AS "TitaTxtNo"        -- 交易序號
+          ,'999999'            AS "TitaTlrNo"        -- 經辦
+          ,S1."TRXNMT"         AS "TitaTxtNo"        -- 交易序號
           ,''                  AS "JsonFields"       -- jason格式紀錄
           ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
@@ -354,6 +354,7 @@ BEGIN
     LEFT JOIN "LA$LMSP" S2 ON S2."LMSACN" = S1."LMSACN"
                           AND S2."LMSAPN" = S1."LMSAPN"
                           AND S2."LMSASQ" = S1."LMSASQ"
+    WHERE S2."LMSLLD" <= "TbsDyF"
     ;
 
     -- 記錄寫入筆數

@@ -812,7 +812,7 @@ public class L3200 extends TradeBuffer {
 							.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
 							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
 					if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit
-							.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) < 0) {
+							.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) > 0) {
 						wkShortAmtLimit = new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit());
 					}
 					wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);

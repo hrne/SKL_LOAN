@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -301,6 +301,7 @@ public class L4041 extends TradeBuffer {
 						PostAuthLog tempPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						tempPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+						tempPostAuthLog.setProcessDateTime(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 						tempPostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 						tempPostAuthLog.setPostMediaCode("Y");
 
@@ -504,6 +505,7 @@ public class L4041 extends TradeBuffer {
 						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+						newPostAuthLog.setProcessDateTime(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 						if (result.get("F1").equals("1")) {
 							newPostAuthLog.setPropDate(0);
 						}

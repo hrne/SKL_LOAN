@@ -94,7 +94,7 @@ T(3,CDBR)
 
 #BrHelp=X,1024,S
 
-!帳冊別    
+!帳冊別
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #ApHelp=x,1024,S
 T(3,CdCode.AcSubBookCode)
@@ -120,6 +120,7 @@ V(H,#ApHelp)
 T(H,#AcSubBookCode,#ApHelp)
 
 #AcSubBookNote=x,40,L
+C(5,#AcSubBookCode,00A,K(LIGHT,#AcSubBookNote,RED,-1),K(LIGHT,#AcSubBookNote,RED,0))
 C(5,#AcSubBookCode,00A,T(3,),T(3,注意:特殊區隔帳冊，限可細分帳冊別科目有效))
 
 
@@ -154,7 +155,7 @@ E(0,1)
 INVOKEJS(SHOW,grd1_1,1)
 
 #DbAcNoCode0=X,8,S
-                           
+
 ##loop {times:6,i:1,j:2,k:0,l:3}
 
 #DbAcNoBTN{i}=X,1,I,ui:button;value:會計科目查詢;enable:1;tabbable:0
@@ -165,7 +166,7 @@ DbAcNoCode{i}<-OOAcNoCode:
 DbAcSubCode{i}<-OOAcSubCode:
 DbAcDtlCode{i}<-OOAcDtlCode})
 
-!借方科子細目  
+!借方科子細目
 #DbAcNoCode{i}=X,11,I
 IF({i}==1,$,C(4,#DbAcNoCode{k},S,$))
 IF({i}==1,$,C(4,#DbAcNoCode{k},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1)))
@@ -196,7 +197,7 @@ C(4,#DbAcNoCode{i},S,T(2,#L6R23AcNoItem))
 T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#DbAcNoCode{i}+#DbAcSubCode{i}+#DbAcDtlCode{i})
 #DbRvNoBIND{i}=X,1,S
 BIND(#DbRvNoBTN{i},click, {cmd=CHAIN; ntxcd=L6907; ntxbuf=#DbRvNoBUF{i};ntxbuf5=type<-1:DbRvNo{i}<-OORvNo})
-!銷帳編號    
+!銷帳編號
 #DbRvNo{i}=X,30,I
 C(4,#DbAcNoCode{i},S,$)
 
@@ -218,7 +219,7 @@ E(0,#DbTxAmt1+#DbTxAmt2+#DbTxAmt3+#DbTxAmt4+#DbTxAmt5+#DbTxAmt6)
 #CrAcNoCode0=X,8,S
 
 
-!貸方科子細目                              
+!貸方科子細目
 ##loop {times:6,i:1,j:2,k:0,l:3}
 #CR_SHOW_FG{i}=A,1,S
 IF({i}==1,E(0,1),)
@@ -263,7 +264,7 @@ T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#CrAcNoCode{i}+#CrAcSubCo
 #CrRvNoBIND{i}=X,1,S
 BIND(#CrRvNoBTN{i},click, {cmd=CHAIN; ntxcd=L6907; ntxbuf=#CrRvNoBUF{i};ntxbuf5=type<-1:CrRvNo{i}<-OORvNo})
 
-!銷帳編號 
+!銷帳編號
 #CrRvNo{i}=X,30,I
 C(4,#CrAcNoCode{i},S,$)
 

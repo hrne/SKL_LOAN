@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
@@ -147,7 +146,6 @@ public class L4603p extends TradeBuffer {
 			txToDoCom.setTxBuffer(this.getTxBuffer());
 			deleteTxToDo("TEXT00", titaVo);
 			deleteTxToDo("MAIL00", titaVo);
-			updateErase(lInsuRenew, titaVo);
 		}
 
 		// 正常交易
@@ -171,7 +169,6 @@ public class L4603p extends TradeBuffer {
 					custName = t2CustMain.getCustName();
 				}
 				checkC(t.getCustNo(), t.getFacmNo(), titaVo);
-				updateNormal(t, titaVo);
 				if (!"".equals(checkResultC)) {
 					// 押品號碼 原保單號碼 戶號 額度 戶名 新保險起日 新保險迄日 火險保額 火線保費 地震險保額 地震險保費 總保費 錯誤說明
 					OccursList occursListReport = new OccursList();
@@ -567,62 +564,6 @@ public class L4603p extends TradeBuffer {
 //		if (!"".equals(checkResultC)) {
 //			errorCCnt = errorCCnt + 1;
 //		}
-	}
-
-	// 入銷帳檔
-	private void updateNormal(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
-		tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
-		if ("".equals(checkResultC)) {
-			tInsuRenew.setNotiTempFg("Y");
-		} else {
-			tInsuRenew.setNotiTempFg("N");
-		}
-		try {
-			insuRenewService.update(tInsuRenew, titaVo);
-		} catch (DBException e) {
-			throw new LogicException("E0007", "InsuRenew update error");
-		}
-
-		AcReceivable acReceivable = new AcReceivable();
-		acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
-		if (tInsuRenew.getStatusCode() == 0) {
-			acReceivable.setAcctCode("TMI"); // 業務科目
-			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
-			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
-			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
-			lAcReceivable.add(acReceivable);
-		}
-	}
-
-//	將以入通知檔者將其刪除，並改為未入
-	private void updateErase(List<InsuRenew> lInsuRenew, TitaVo titaVo) throws LogicException {
-		for (InsuRenew tInsuRenew : lInsuRenew) {
-			if ("Y".equals(tInsuRenew.getNotiTempFg())) {
-				AcReceivable acReceivable = new AcReceivable();
-				acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
-				acReceivable.setAcctCode("TMI"); // 業務科目
-				acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
-				acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
-				acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-				acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
-				lAcReceivable.add(acReceivable);
-			}
-			tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
-			tInsuRenew.setNotiTempFg(""); // 待通知
-			try {
-				insuRenewService.update(tInsuRenew, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0007", "InsuRenew update error");
-			}
-		} // for
-		if (lAcReceivable.size() > 0) {
-			acReceivableCom.setTxBuffer(this.getTxBuffer());
-			acReceivableCom.mnt(2, lAcReceivable, titaVo); // 0-起帳 1-銷帳2-刪除
-		}
-
 	}
 
 }
