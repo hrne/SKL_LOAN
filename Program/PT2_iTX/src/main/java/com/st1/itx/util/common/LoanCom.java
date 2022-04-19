@@ -169,6 +169,7 @@ public class LoanCom extends TradeBuffer {
 			newBorxNo = tBorTx.getBorxNo() + 1;
 		}
 		setLoanBorTxHcode(iCustNo, iFacmNo, 0, oldBorxNo, newBorxNo, BigDecimal.ZERO, titaVo);
+
 	}
 
 	/**
@@ -251,13 +252,27 @@ public class LoanCom extends TradeBuffer {
 		setLoanBorTx(tLoanBorTx2, tLoanBorTx2Id, iCustNo, iFacmNo, iBormNo, iNewBorxNo, titaVo);
 		tLoanBorTx2.setTitaHCode(wkAcDate == titaVo.getEntDyI() ? "1" : "3"); // 0: 未訂正 1: 訂正 2: 被訂正 3: 沖正 4: 被沖正
 		tLoanBorTx.setCorrectSeq(parse.IntegerToString(titaVo.getOrgEntdyI() + 19110000, 8) + titaVo.getOrgTxSeq());
-		tLoanBorTx2.setDisplayflag(tLoanBorTx.getDisplayflag());
+		// 訂正轉換資料為帳務交易
+		if ("L3240".equals(titaVo.getTxcd()) || "L3250".equals(titaVo.getTxcd())) {
+			tLoanBorTx2.setDisplayflag("A");
+		} else {
+			if ("Y".equals(tLoanBorTx2.getDisplayflag())) {
+				tLoanBorTx2.setDisplayflag("Y");
+			} else {
+				tLoanBorTx2.setDisplayflag("A");
+			}
+		}
 		tLoanBorTx2.setLoanBal(iLoanBal);
 		try {
 			loanBorTxService.insert(tLoanBorTx2);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
+		// 新增放款交易內容檔(入帳金額轉暫收款-冲正產生)
+		if ("3".equals(tLoanBorTx2.getTitaHCode()) && tLoanBorTx2.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
+			addFacmBorTxNextDateErase(tLoanBorTx2,  titaVo);	
+		}
+		
 	}
 
 	/**
@@ -736,10 +751,11 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
-	 *  計算逾期數
-	 * @param iStartDate   起日
-	 * @param iEndDate     止日
-	 * @param iSpecificDd  指定應繳日
+	 * 計算逾期數
+	 * 
+	 * @param iStartDate  起日
+	 * @param iEndDate    止日
+	 * @param iSpecificDd 指定應繳日
 	 * @return 逾期數
 	 * @throws LogicException ...
 	 */
@@ -1182,6 +1198,28 @@ public class LoanCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E0018",
 						"撥款主檔 戶號 = " + fac.getCustNo() + "額度編號 = " + fac.getFacmNo() + " 交易流程步驟 = " + fac.getActFg()); // 該筆交易狀態非已放行，不可做訂正已放行交易
 			}
+		}
+	}
+
+	// 新增放款交易內容檔(入帳金額轉暫收款-冲正產生)
+	private void addFacmBorTxNextDateErase(LoanBorTx tx, TitaVo titaVo) throws LogicException {
+		this.info("addLoanBorTxRoutine ... ");
+
+		LoanBorTx tLoanBorTx = new LoanBorTx();
+		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
+		setFacmBorTx(tLoanBorTx, tLoanBorTxId, tx.getCustNo(), tx.getFacmNo(), titaVo);
+		tLoanBorTx.setCorrectSeq(tx.getCorrectSeq());
+		tLoanBorTx.setDesc("入帳金額轉暫收款-冲正產生");
+		tLoanBorTx.setRepayCode(tx.getRepayCode());
+		tLoanBorTx.setEntryDate(tx.getEntryDate());
+		tLoanBorTx.setDisplayflag("A"); // A:帳務
+		tLoanBorTx.setTxAmt(tx.getTxAmt());
+		tLoanBorTx.setTempAmt(tx.getTxAmt());
+		tLoanBorTx.setTitaHCode("0");
+		try {
+			loanBorTxService.insert(tLoanBorTx, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
 	}
 

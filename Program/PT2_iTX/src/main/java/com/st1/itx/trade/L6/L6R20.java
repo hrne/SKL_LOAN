@@ -79,6 +79,8 @@ public class L6R20 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0003", "使用者:" + iTlrNo);
 				} else if ("4".equals(iFunCode)) {
 					throw new LogicException(titaVo, "E0004", "使用者:" + iTlrNo);
+				} else if ("8".equals(iFunCode)) {
+					throw new LogicException(titaVo, "E0001", "使用者:" + iTlrNo);
 				}
 				MoveTota(iTlrNo, new TxTeller(), titaVo);
 			} else {
@@ -102,7 +104,7 @@ public class L6R20 extends TradeBuffer {
 					"使用者 " + tTxTeller.getTlrNo() + " 非隸屬單位 " + titaVo.get("BrNo").trim());
 		}
 
-		/*
+		/*-
 		 * if ("8".equals(iFunCode) && tTxTeller2.getAdminFg() == 0 &&
 		 * !tTxTeller2.getBrNo().equals(tTxTeller.getBrNo())) { throw new
 		 * LogicException(titaVo, "E0015", "無使用者 " + tTxTeller.getTlrNo() + " 查詢/異動權限");

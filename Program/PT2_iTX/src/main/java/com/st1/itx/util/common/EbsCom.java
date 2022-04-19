@@ -60,7 +60,7 @@ public class EbsCom extends CommBuffer {
 		JSONObject requestJO = setEbsRequestJo(summaryTbl, journalTbl);
 
 		// 上傳及接收資料
-		String result = post(slipMediaUrl, ebsAuth, requestJO);
+		String result = post(slipMediaUrl, ebsAuth, requestJO, titaVo);
 
 		// 分析回傳資料
 		String returnStatus = analyzeResult(requestJO, result, titaVo);
@@ -107,7 +107,7 @@ public class EbsCom extends CommBuffer {
 		return requestJO;
 	}
 
-	private String post(String slipMediaUrl, String ebsAuth, JSONObject requestJo) throws LogicException {
+	private String post(String slipMediaUrl, String ebsAuth, JSONObject requestJo, TitaVo titaVo) throws LogicException {
 		String jsonString = requestJo.toString();
 		HttpHeaders headers = setEbsHeader(ebsAuth);
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
@@ -120,11 +120,11 @@ public class EbsCom extends CommBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("EbsCom Exception = " + e.getMessage());
-			insertSlipEbsRecord(requestJo, "EbsCom上傳及接收資料時發生錯誤,Exception = " + e.getMessage());
+			insertSlipEbsRecord(requestJo, "EbsCom上傳及接收資料時發生錯誤,Exception = " + e.getMessage(), titaVo);
 			throw new LogicException("E9004", "EbsCom上傳及接收資料時發生錯誤");
 		}
 		this.info("EbsCom result = " + result);
-		insertSlipEbsRecord(requestJo, result);
+		insertSlipEbsRecord(requestJo, result, titaVo);
 
 		return result;
 	}
@@ -143,7 +143,7 @@ public class EbsCom extends CommBuffer {
 		this.info("EbsCom exec .");
 	}
 
-	private void insertSlipEbsRecord(JSONObject requestJo, String result) throws LogicException {
+	private void insertSlipEbsRecord(JSONObject requestJo, String result, TitaVo titaVo) throws LogicException {
 		String groupId = null;
 		try {
 			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL")

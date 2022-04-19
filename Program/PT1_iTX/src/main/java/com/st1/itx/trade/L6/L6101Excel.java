@@ -63,9 +63,6 @@ public class L6101Excel extends MakeReport {
 		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findImportFg(Caldy,Caldy, "1",0,9999999, 0,Integer.MAX_VALUE, titaVo);
 
 		List<TxInquiry> iTxInquiry = sTxInquiry == null ? null : sTxInquiry.getContent();
-		
-		this.info("slice: " + sTxInquiry.toString());
-		this.info("list: " + iTxInquiry.toString());
 
 		TempVo tTempVo = new TempVo();
 		int rowCursor = 2;

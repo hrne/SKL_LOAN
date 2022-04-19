@@ -1858,14 +1858,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 							wkBreachAmtA = wkBreachAmtA
 									.add(wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.multiply(new BigDecimal("1.1")).setScale(9, RoundingMode.DOWN)); // AS400
+											.multiply(new BigDecimal("1.1")).setScale(0, RoundingMode.HALF_UP)); // AS400
 																												// 運算過程小數位數最多九位
 							this.info("A段延遲息及違約金(多段) = " + wkBreachBase + " * " + lastRateA + " * "
 									+ dDateUtil.getDays() + " / 36500 * 1.1 (逾期6個月內)");
-							this.info("A段延遲息及違約金(多段) 算式 = "
+							this.info("A段延遲息及違約金(多段) 四捨五入前 = "
 									+ wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.multiply(new BigDecimal("1.1")).setScale(9, RoundingMode.DOWN));
+											.multiply(new BigDecimal("1.1")).setScale(0, RoundingMode.HALF_UP));
 						}
 						startDateA = tempEffectDate;
 						endDateA = tempEntryDate;
@@ -1886,14 +1886,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 							wkBreachAmtB = wkBreachAmtB
 									.add(wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN)); // AS400
+											.multiply(new BigDecimal("1.2")).setScale(0, RoundingMode.HALF_UP)); // AS400
 																												// 運算過程小數位數最多九位
 							this.info("B段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateB + " * "
 									+ dDateUtil.getDays() + " / 36500 * 1.2 (逾期6個月~ 9個月)");
 							this.info("B段延遲息及違約金(多段) 此段 = "
 									+ wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN));
+											.multiply(new BigDecimal("1.2")).setScale(0, RoundingMode.HALF_UP));
 						}
 						startDateB = tempEffectDate;
 						endDateB = tempEntryDate;
@@ -1914,14 +1914,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 							wkBreachAmtC = wkBreachAmtC
 									.add(wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN)); // AS400
+											.multiply(new BigDecimal("1.2")).setScale(0, RoundingMode.HALF_UP)); // AS400
 																												// 運算過程小數位數最多九位
 							this.info("C段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateC + " * "
 									+ dDateUtil.getDays() + " / 36500 * 1.2 (逾期10個月以上)");
 							this.info("C段延遲息及違約金(多段) 此段 = "
 									+ wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.multiply(new BigDecimal("1.2")).setScale(9, RoundingMode.DOWN));
+											.multiply(new BigDecimal("1.2")).setScale(0, RoundingMode.HALF_UP));
 						}
 						startDateC = tempEffectDate;
 						endDateC = tempEntryDate;
@@ -1942,13 +1942,13 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 							wkDelayInt = wkDelayInt
 									.add(wkDelayBase.multiply(lastRateD).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.setScale(9, RoundingMode.DOWN));
+											.setScale(0, RoundingMode.HALF_UP));
 							this.info("延遲息(多段) 算式 =  " + wkDelayBase + " * " + lastRateD + " * " + dDateUtil.getDays()
 									+ " / 36500");
 							this.info("延遲息(多段) 此段 = "
 									+ wkDelayBase.multiply(lastRateD).multiply(new BigDecimal(dDateUtil.getDays()))
 											.divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
-											.setScale(9, RoundingMode.DOWN));
+											.setScale(0, RoundingMode.HALF_UP));
 						}
 						startDateD = tempEffectDate;
 						endDateD = tempEntryDate;
@@ -1967,14 +1967,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					wkBreachAmtA = wkBreachAmtA
 							.add(wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
 									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.1"))
-									.setScale(9, RoundingMode.DOWN)); // AS400
+									.setScale(0, RoundingMode.HALF_UP)); // AS400
 																		// 運算過程小數位數最多九位
 					this.info("A段延遲息及違約金(多段) = " + wkBreachBase + " * " + lastRateA + " * " + dDateUtil.getDays()
 							+ " / 36500 * 1.1 (逾期6個月內)");
 					this.info("A段延遲息及違約金(多段) 算式 = "
 							+ wkBreachBase.multiply(lastRateA).multiply(new BigDecimal(dDateUtil.getDays()))
 									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.1"))
-									.setScale(9, RoundingMode.DOWN));
+									.setScale(0, RoundingMode.HALF_UP));
 				}
 				// 若違約金B仍有剩餘天數
 				dDateUtil.init();
@@ -1988,14 +1988,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					wkBreachAmtB = wkBreachAmtB
 							.add(wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
 									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
-									.setScale(9, RoundingMode.DOWN)); // AS400
+									.setScale(0, RoundingMode.HALF_UP)); // AS400
 																		// 運算過程小數位數最多九位
 					this.info("B段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateB + " * " + dDateUtil.getDays()
 							+ " / 36500 * 1.2 (逾期6個月~ 9個月)");
 					this.info("B段延遲息及違約金(多段) 此段 = "
 							+ wkBreachBase.multiply(lastRateB).multiply(new BigDecimal(dDateUtil.getDays()))
 									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
-									.setScale(9, RoundingMode.DOWN));
+									.setScale(0, RoundingMode.HALF_UP));
 				}
 				// 若違約金C仍有剩餘天數
 				dDateUtil.init();
@@ -2009,14 +2009,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					wkBreachAmtC = wkBreachAmtC
 							.add(wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
 									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
-									.setScale(9, RoundingMode.DOWN)); // AS400
+									.setScale(0, RoundingMode.HALF_UP)); // AS400
 																		// 運算過程小數位數最多九位
 					this.info("C段延遲息及違約金(多段) 算式 = " + wkBreachBase + " * " + lastRateC + " * " + dDateUtil.getDays()
 							+ " / 36500 * 1.2 (逾期10個月以上)");
 					this.info("C段延遲息及違約金(多段) 此段 = "
 							+ wkBreachBase.multiply(lastRateC).multiply(new BigDecimal(dDateUtil.getDays()))
 									.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).multiply(new BigDecimal("1.2"))
-									.setScale(9, RoundingMode.DOWN));
+									.setScale(0, RoundingMode.HALF_UP));
 				}
 				// 若延遲息仍有剩餘天數
 				dDateUtil.init();
@@ -2029,12 +2029,12 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					this.info("延遲息(多段) 天數 = " + dDateUtil.getDays());
 					wkDelayInt = wkDelayInt.add(wkDelayBase.multiply(lastRateD)
 							.multiply(new BigDecimal(dDateUtil.getDays()))
-							.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(9, RoundingMode.DOWN));
+							.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP));
 					this.info("延遲息(多段) 算式 =  " + wkDelayBase + " * " + lastRateD + " * " + dDateUtil.getDays()
 							+ " / 36500");
 					this.info("延遲息(多段) 此段 = " + wkDelayBase.multiply(lastRateD)
 							.multiply(new BigDecimal(dDateUtil.getDays()))
-							.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(9, RoundingMode.DOWN));
+							.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP));
 				}
 			}
 		} else {

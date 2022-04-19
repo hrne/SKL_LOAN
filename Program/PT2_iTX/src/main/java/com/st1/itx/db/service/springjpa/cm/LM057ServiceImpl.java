@@ -119,6 +119,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", (iYear * 100) + iMonth);
 		query.setParameter("lyymm", lastMonth);
+		
 
 		return this.convertToMap(query);
 
@@ -238,7 +239,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", (iYear * 100) + iMonth);
-
+		query.setParameter("lyymm", lastMonth);
 		return this.convertToMap(query);
 
 	}
