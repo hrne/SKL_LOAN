@@ -93,6 +93,12 @@ BEGIN
                                                      AND R."EffectDate" >= B."PrevPayIntDate" 
                                                      AND R."EffectDate" <= TBSDYF
                                                 THEN 1
+                                                -- 轉換日當日轉催的情況  2022-04-19
+                                                WHEN B."Status" IN (2,5,6,7,8,9)
+                                                     AND O."OvduDate" > TBSDYF --於本營業日尚未轉催
+                                                     AND R."EffectDate" >= B."PrevPayIntDate" 
+                                                     AND R."EffectDate" <= TBSDYF
+                                                THEN 1                                                
                                                 -- 利息繳超過的情況 2022-04-13 新增
                                                 WHEN B."PrevPayIntDate" >= TBSDYF 
                                                      AND R."EffectDate" <= TBSDYF
@@ -100,7 +106,8 @@ BEGIN
                                                 -- 欠繳情況 2022-04-14 新增
                                                 WHEN B."Status" IN (2,5,6,7,8,9)  
                                                      AND R."EffectDate" >= B."PrevPayIntDate" -- 上繳日
-                                                     AND R."EffectDate" <= B."NextPayIntDate" -- 下繳日
+                                                     AND R."EffectDate" <= O."OvduDate" -- 轉催日期
+                                                     AND O."OvduDate" <= TBSDYF --於本營業日尚未轉催
                                                      AND R."EffectDate" <= TBSDYF
                                                 THEN 1
                                               ELSE 0 END = 1

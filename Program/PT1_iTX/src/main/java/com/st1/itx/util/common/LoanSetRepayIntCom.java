@@ -34,13 +34,13 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public FacProdService facProdService;
+	FacProdService facProdService;
 	@Autowired
-	public FacMainService facMainService;
+	FacMainService facMainService;
 	@Autowired
-	public FacCaseApplService facCaseApplService;
+	FacCaseApplService facCaseApplService;
 	@Autowired
-	public LoanBorMainService loanBorMainService;
+	LoanBorMainService loanBorMainService;
 
 	@Autowired
 	Parse parse;
@@ -147,20 +147,29 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		// 3.已過到期日，按日、不分期(以到期取息(到期繳息還本)計算)
 		// 4.未到期以最後一段利率計算(計息程式內處理)
 		int nextMonth01 = (this.txBuffer.getTxCom().getNbsdy() / 100) * 100 + 1;
+		int thisMonth01 = (this.txBuffer.getTxCom().getTbsdy() / 100) * 100 + 1;
 		if (iIntEndCode == 2) { // 每月月底提息參數設定-開始
 			String intCalcCode = t.getIntCalcCode();
 			String amortizedCode = t.getAmortizedCode();
+			// 1.短擔
 			if (tFacMain.getAcctCode().equals("310")) {
-				intCalcCode = "1";
+				intCalcCode = "1";// 計息方式 1:按日計息
+			} else {// 2. 中長擔
+				// 2022-04-19 智偉增加
+				// 若帳號計息方式是1:按日計息 且 繳息日期(2碼)為1
+				if (intCalcCode.equals("1") && t.getSpecificDd() == 1) {
+					// 計息方式改為2:按月計息
+					intCalcCode = "2";
+				}
+				// 2022-04-19 智偉增加
+				// 若帳號計息方式是2:按月計息 且 下繳日大於等於下月1日 且 上繳日小於本月1日
+				if (intCalcCode.equals("2") && t.getNextPayIntDate() >= nextMonth01
+						&& t.getPrevPayIntDate() < thisMonth01) {
+					// 計息方式改為1:按日計息
+					intCalcCode = "1";
+				}
+				// 2022-04-19 智偉補充說明:其他照帳號原本的計息方式
 			}
-			// } else {
-			// 	intCalcCode = "2";
-			// 	if (t.getNextPayIntDate() <= nextMonth01 && t.getPrevPayIntDate() > t.getDrawdownDate()) {
-			// 		intCalcCode = "2";
-			// 	} else {
-			// 		intCalcCode = "1";
-			// 	}
-			// }
 			if (t.getMaturityDate() < nextMonth01) {
 				intCalcCode = "1";
 				amortizedCode = "2";

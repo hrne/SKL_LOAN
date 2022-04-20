@@ -71,7 +71,7 @@ public class L4041 extends TradeBuffer {
 
 	@Autowired
 	L4041Report l4041Report;
-	
+
 	private int authCreateDate = 0;
 	private int processDate = 0;
 	private int stampFinishDate = 0;
@@ -81,7 +81,6 @@ public class L4041 extends TradeBuffer {
 	private int relAcctBirthday = 0;
 	private TitaVo txtitaVo;
 
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4041 ");
@@ -138,7 +137,7 @@ public class L4041 extends TradeBuffer {
 			}
 
 			if (resultList != null && resultList.size() != 0) {
-				throw new LogicException(titaVo, "E0010", "不可一日多批"); //功能選擇錯誤
+				throw new LogicException(titaVo, "E0010", "不可一日多批"); // 功能選擇錯誤
 			}
 
 		}
@@ -194,14 +193,10 @@ public class L4041 extends TradeBuffer {
 			ArrayList<OccursList> aTmp = new ArrayList<>();
 			ArrayList<OccursList> bTmp = new ArrayList<>();
 
-			int checkFlag = 0;
-
 			if (resultList != null && resultList.size() != 0) {
 				this.info("For Loop Start !*!*!*! ");
 				int cnt = 0;
 				String tempCheckAcctNo = "";
-				String tempCustNo = "";
-				String tempFacmNo = "";
 
 				for (Map<String, String> result : resultList) {
 					setDate(result);
@@ -301,7 +296,6 @@ public class L4041 extends TradeBuffer {
 						PostAuthLog tempPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						tempPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-//						tempPostAuthLog.setProcessDateTime(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 						tempPostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 						tempPostAuthLog.setPostMediaCode("Y");
 
@@ -459,11 +453,11 @@ public class L4041 extends TradeBuffer {
 				totaVo.put("PdfSno53N", "" + sno);
 
 				l4041Report.setParentTranCode(titaVo.getTxcd());
-				
+
 				l4041Report.exec(resultList, titaVo);
 				sno = l4041Report.close();
 				l4041Report.toPdf(sno);
-				
+
 				totaVo.put("PdfSno", "" + sno);
 			} else {
 				throw new LogicException(titaVo, "CE001", "查無資料");
@@ -505,7 +499,6 @@ public class L4041 extends TradeBuffer {
 						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-//						newPostAuthLog.setProcessDateTime(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 						if (result.get("F1").equals("1")) {
 							newPostAuthLog.setPropDate(0);
 						}
@@ -601,7 +594,5 @@ public class L4041 extends TradeBuffer {
 		this.info("deleteDate ... " + deleteDate);
 		this.info("relAcctBirthday ... " + relAcctBirthday);
 	}
-	
-	
-	
+
 }

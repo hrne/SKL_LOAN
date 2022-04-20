@@ -68,7 +68,6 @@ E(0,0)
 ![Buttom資料查詢]
 #BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 
-
 !---------- AP TEXT AREA Variables ----------
 
 #SetSysPar=X,1,S
@@ -88,6 +87,11 @@ T(3,@ReSetEmpNo,)
 T(3,@ReSetEmpName,)
 T(2,@RimTxCode,#TXCD)
 
+!設定、解除資訊相關先都隱藏
+!後面DecideShowing再判定是否顯示
+#HideThingsFirst=X,1,S
+INVOKEJS(SHOW,p1_5,0)INVOKEJS(SHOW,p1_6,0)INVOKEJS(SHOW,p1_7,0)
+
 <include src="ROM.icf::L1R01.dec"/>
 
 #NTXBUF=X,142,S
@@ -95,6 +99,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
 T(1,@CustNo,#NTXBUF,2,7)
 T(1,@CustNoWork,#NTXBUF,2,7)
+IF(#FunCd==4 || #FunCd==3,V(P,此交易目前不開放此功能),$)
 
 ! 用於判定是否該隱藏輸入框
 #CustNoWork=A,7,S
@@ -149,13 +154,16 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-
 
 #CustIdFirstTwo=X,2,S
 
+#CustIdWork=X,10,S
+
 !統一編號 (可以不存在於顧客檔)
+!如果NTXBUF沒有傳CustNo,表示是新增,此時判定CustIdWork是否等於CustId,如果不相等表示輸入值有被BTN1變過(走L1001調統編回來),直接跳去調RIM
+!偵測為刪除時，應跳過（此功能目前取消，已先拿掉）
 !偵測為解除或查詢時，不予輸入
-!先隱藏全部,之後調RIM後再作顯示
-!如果是設定,且CustNo有東西時,也不予輸入
+!先隱藏全部,之後調RIM後再作顯示 (C重複兩次,第二個放s)
+!如果是設定,且NTXBUF的CustNo有東西時,也不予輸入 (IF重複兩次,第二個放s)
 #CustId=X,10,I
-INVOKEJS(SHOW,p1_5,0)INVOKEJS(SHOW,p1_6,0)INVOKEJS(SHOW,p1_7,0)
-IF(#FunCd==4,s,$)
+C(3,#CustNoWork,0,C(5,#CustId,#CustIdWork,$,s),$)
 C(3,#CustNoWork,0,$,C(3,#FunCd,1,T(F,0)HIDE(#BTN1)T(3,@FdCustId, ),$))
 C(3,#CustNoWork,0,$,C(3,#FunCd,1,s,$))
 IF(#FunCd==2 || #FunCd==5,T(F,0)HIDE(#BTN1)T(3,@FdCustId, ),$)
@@ -173,24 +181,26 @@ C(5,#CustIdFirstTwo,XX,$,A(ID_UNINO,0,#CustId))
 
 !調RIML2R31
 #RimL2r31=X,1,S
+C(5,#CustId,#CustIdWork,s,$)
 E(0,@RimFunCd,#FunCd)
 T(2,@RimCustId,#CustId)
 RESET_RIM(#RimL2r31,L2R31)
 S(L2R31,1,#RimFunCd,#RimCustId)
 R(1,L2R31)
-
-!帶入RIM參數
-!如果要做解除，原因欄不代入上次解除原因
-#checkL2R31=X,1,S
 E(0,@CustNo,#L2r31CustNo)
 T(2,@CustName,#L2r31CustName)
 C(3,#FunCd,2,$,T(2,@Reason,#L2r31Reason))
 E(0,@CuscCd,#L2r31CuscCd)
 T(2,@SetEmpNo,#L2r31SetEmpNo)
+T(3,@SetEmpName,)
 T(2,@SetDate,#L2r31SetDate)
 T(2,@ReSetEmpNo,#L2r31ReSetEmpNo)
+T(3,@ReSetEmpName,)
 T(2,@ReSetDate,#L2r31ReSetDate)
 E(0,@ApplMark,#L2r31ApplMark)
+
+#PutCustIdToWork=A,1,S
+T(2,#CustIdWork,#CustId)
 
 !借戶戶號
 #CustNo=A,7,L
@@ -224,10 +234,15 @@ SWITCH(#ApplMark,3,C(3,#FunCd,5,INVOKEJS(SHOW,p1_5,1)INVOKEJS(SHOW,p1_6,0)INVOKE
                   ,C(3,#FunCd,2,INVOKEJS(SHOW,p1_5,1),INVOKEJS(SHOW,p1_5,0))INVOKEJS(SHOW,p1_6,1)INVOKEJS(SHOW,p1_7,0)
 )
 
+! 如果FunCd為1設定且已是設定狀態，隱藏送出按鈕
+#HideButton=X,1,S
+C(3,#FunCd,1,IF(#ApplMark==1 || #ApplMark==2,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY)),$)
+
 #SendL2r13Set=X,1,S
 C(4,#SetEmpNo,S,$)
 T(2,@RimEmployeeNo,#SetEmpNo)
 E(0,@RimFunCd,5)
+RESET_RIM(#SendL2r13Set,L2R13)
 S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
 C(4,#SetEmpNo,s,$)
@@ -237,6 +252,7 @@ T(2,@SetEmpName,#L2r13FullName)
 C(4,#ReSetEmpNo,S,$)
 T(2,@RimEmployeeNo,#ReSetEmpNo)
 E(0,@RimFunCd,5)
+RESET_RIM(#SendL2r13ReSet,L2R13)
 S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
 C(4,#ReSetEmpNo,s,$)

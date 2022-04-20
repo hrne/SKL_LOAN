@@ -1,4 +1,4 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
+create or replace PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -319,6 +319,8 @@ BEGIN
                             THEN A."RvBal"
                             WHEN A."AcctCode" IN ('F09', 'F25')
                             THEN A."RvBal"
+                            WHEN IR."CustNo" IS NOT NULL
+                            THEN IR."TotInsuPrem"
                           ELSE 0 END AS "FireFee" -- 火險費用
                          ,CASE
                             WHEN A."AcctCode" IN ('F07', 'F24')
@@ -347,6 +349,9 @@ BEGIN
                    FROM "MonthlyFacBal" M
                    LEFT JOIN "AcReceivable" A ON A."CustNo" = M."CustNo"
                                              AND A."FacmNo" = M."FacmNo"
+                   LEFT JOIN "InsuRenew" IR ON IR."CustNo" = A."CustNo"
+                                           AND IR."FacmNo" = A."FacmNo"
+                                           AND IR."PreVInsuNo" = A."RvNo"                
                    WHERE M."YearMonth" = YYYYMM
                      AND (A."AcctCode" IN ('F10','F29','TMI', 'F09', 'F25', 'F07', 'F24','TAV')
                           OR SUBSTR(A."AcctCode",0,1) IN ('I','Z'))
@@ -413,7 +418,6 @@ BEGIN
     USING ( SELECT M."YearMonth"
                   ,M."CustNo"
                   ,M."FacmNo"
-                  ,MIN(NVL(O."OvduDate",99991231)) AS "OvduDate"
                   ,SUM(NVL(O."OvduPrinAmt",0))   AS "UnpaidPrincipal" 
                   ,SUM(NVL(O."OvduIntAmt",0))    AS "UnpaidInterest"
                   ,SUM(NVL(O."OvduBreachAmt",0)) AS "UnpaidBreachAmt"
@@ -442,11 +446,7 @@ BEGIN
                                  M."OvduPrinBal"     = O."OvduPrinBal",
                                  M."OvduIntBal"      = O."OvduIntBal",
                                  M."OvduBreachBal"   = O."OvduBreachBal",
-                                 M."OvduBal"         = O."OvduBal",
-                                 M."OvduDate"        = CASE
-                                                         WHEN O."OvduDate" = 99991231
-                                                         THEN M."OvduDate"
-                                                       ELSE O."OvduDate" END
+                                 M."OvduBal"         = O."OvduBal"
                                  ;
 
     UPD_CNT := UPD_CNT + sql%rowcount;    
