@@ -280,14 +280,10 @@ IF(#FunCd==2,$,s)
 !---------- TXFORM = L2703 ----------
 <sub type="FORM" name="L2703">
 
-!#SCRPRT=_,_,S
-!C(5,#TXFORM,L2703,$,S)
-
 #SCRTIL=_,_,S
 T(3,[L2703] 結清客戶申請個人資料控管維護)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-!建立日期
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 

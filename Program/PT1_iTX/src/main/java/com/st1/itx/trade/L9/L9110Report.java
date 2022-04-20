@@ -1016,13 +1016,16 @@ public class L9110Report extends MakeReport {
 		 */
 		this.print(1, 5, " 序號　保單號碼　　　　　　　 保險金額　 保險起日　 保險迄日　 保險公司");
 		this.print(1, 5, "---------------------------------------------------------------------------------------");
+		this.print(1, 5, " 序號　保單號碼　　　　　　　 火險金額        地震險金額      保險起日　 保險迄日　 保險公司");
+		this.print(1, 5, "------------------------------------------------------------------------------------------------------------");
 		for (Map<String, String> mInsu : listInsuQuery) {
 			this.print(1, 8, mInsu.get("F0"), "R");
 			this.print(0, 12, mInsu.get("F1"));
-			this.print(0, 43, formatAmt(mInsu.get("F2"), 0), "R");
-			this.print(0, 46, this.showRocDate(mInsu.get("F3"), 1));
-			this.print(0, 57, this.showRocDate(mInsu.get("F4"), 1));
-			this.print(0, 69, mInsu.get("F5"));
+			this.print(0, 43, formatAmt(mInsu.get("FireInsuAmt"), 0), "R");
+			this.print(0, 61, formatAmt(mInsu.get("EarthInsuAmt"), 0), "R");
+			this.print(0, 67, this.showRocDate(mInsu.get("F3"), 1));
+			this.print(0, 78, this.showRocDate(mInsu.get("F4"), 1));
+			this.print(0, 89, mInsu.get("F5"));
 		}
 	}
 

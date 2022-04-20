@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,22 +22,22 @@ import com.st1.itx.db.domain.ClBuildingId;
  */
 public interface ClBuildingRepositoryDay extends JpaRepository<ClBuilding, ClBuildingId> {
 
-	// ClCode1 =
-	public Slice<ClBuilding> findAllByClCode1Is(int clCode1_0, Pageable pageable);
+  // ClCode1 = 
+  public Slice<ClBuilding> findAllByClCode1Is(int clCode1_0, Pageable pageable);
 
-	// ClCode1 = ,AND ClCode2 =
-	public Slice<ClBuilding> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
+  // ClCode1 = ,AND ClCode2 = 
+  public Slice<ClBuilding> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
 
-	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
-	public Slice<ClBuilding> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+  public Slice<ClBuilding> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-	// CityCode = ,AND AreaCode = ,AND IrCode = ,AND BdNo1 = ,AND BdNo2 =
-	public Slice<ClBuilding> findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndBdNo1IsAndBdNo2IsOrderByClCode1AscClCode2AscClNoAsc(String cityCode_0, String areaCode_1, String irCode_2, String bdNo1_3,
-			String bdNo2_4, Pageable pageable);
+  // CityCode = ,AND AreaCode = ,AND IrCode = ,AND BdNo1 = ,AND BdNo2 =
+  public Slice<ClBuilding> findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndBdNo1IsAndBdNo2IsOrderByClCode1AscClCode2AscClNoAsc(String cityCode_0, String areaCode_1, String irCode_2, String bdNo1_3, String bdNo2_4, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<ClBuilding> findByClBuildingId(ClBuildingId clBuildingId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<ClBuilding> findByClBuildingId(ClBuildingId clBuildingId);
 
 }
+

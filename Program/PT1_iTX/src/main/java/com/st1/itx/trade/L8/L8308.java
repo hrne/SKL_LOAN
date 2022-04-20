@@ -165,6 +165,11 @@ public class L8308 extends TradeBuffer {
 //			} // 1.6 end
 //
 //			// 1.7 start 簽約完成日期需大於或等於協議完成日期--->(前端檢核)
+			// 1.7.1 start 簽約完成日期必定要大於協議日期
+			if(iSignDate != 0 && iSignDate < iPassDate) {
+				throw new LogicException("E0015", "簽約完成日期需大於協議日期");
+			}
+			
 //			// 1.8 start 首期應繳款日需大於或等簽約完成日期--->(前端檢核)
 //			
 //			// 1.9, 1.11, 1.13 start 若第25欄「屬二階段還款方案之階段註記」填報1者(第一階段)，3條件
