@@ -43,6 +43,14 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int iEntdySt = Integer.valueOf(titaVo.get("iEntdySt").trim());
 		int iEntdyEd = Integer.valueOf(titaVo.get("iEntdyEd").trim());
+		String iCustNo = titaVo.get("iCustNo").trim();
+		this.info("iMrKey = " + iCustNo);
+		String iMkey = "";
+		if (!iCustNo.equals("0000000")) {
+			iMkey = iCustNo + "-%";
+		}
+		this.info("iMkey = " + iMkey);
+		
 		if (iEntdySt > 0) {
 			iEntdySt += 19110000;
 			iEntdyEd += 19110000;
@@ -68,7 +76,9 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "AND A.\"BrNo\" = :BrNo ";
-
+		if (!iCustNo.equals("0000000")) {
+			sql += "   and A.\"MrKey\" like :iMkey ";
+		}
 		if (!"".equals(titaVo.getParam("iTlrNo").trim())) {
 			sql += "AND A.\"TlrNo\" = :TlrNo ";
 		}
@@ -122,7 +132,9 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!"".equals(titaVo.getParam("iTranNo").trim())) {
 			query.setParameter("TranNo", titaVo.getParam("iTranNo").trim());
 		}
-
+		if (!iCustNo.equals("0000000")) {
+			query.setParameter("iMkey", iMkey);
+		}
 		if (iStatus == 0) {
 			query.setParameter("ActionFg", 0);
 		} else if (iStatus == 1) {

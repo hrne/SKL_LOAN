@@ -1,0 +1,1346 @@
+﻿!***********************************************************
+! 記號類
+!   (1)維護記號      FUNCD
+!   (2)是否記號      YNCD
+!   (3)DBU/OBU       OBUFG
+!   (4)顯示方式      RPTFG
+! 編號類
+!   (1)三項參數
+!      i=變數名稱參數(例如:i=P)
+!      j=幣別選單(F:外幣j=F，空白:台外幣j=)
+!      m=輸入控管(1:必須輸入m=1，0:選擇輸入m=0)
+!      <1>幣別       CURNM  (j,m)
+!      <2>幣別       CURNMP (i,j,m)
+! PREDC區塊 FKEY=0時，系統會在執行第一塊DC前，先執行PREDC。
+!           FKEY非0時，調原電文RIM後，執行PREDC。
+!   (1)ACTFGX-RUN
+!   (2)TITLE-RUN
+! 外匯交易畫面共用HEAD
+! 版次MCNT
+! 電文PSWIFT
+! 登審放記號名稱ACTFGX
+!   (1)三項參數
+!      i=變數名稱參數(例如:i=#OACTFGX)
+!      j=依據變數取得ACTFGDEF(例如:J=#OACTFG)
+!      K=交易代號(例如:K=#OTXCD)
+!      <1>登審放記號名稱   ACTFGX(i,j,k)
+!***********************************************************
+!===========================================================
+! 維護記號
+!   (1)新增、變更、刪除       --- {i}=
+!   (2)新增、變更、註銷       --- {i}=1
+!   (3)新增、刪除             --- {i}=2
+!   (4)登錄、解除             --- {i}=3
+!   (5)新增、變更、刪除、查詢 --- {i}=4
+!   (6)修改、刪除             --- {i}=5
+!   (7)登錄、取消             --- {i}=6
+!   (8)新增、變更             --- {i}=7
+!   (9)新增、變更、查詢       --- {i}=8
+!===========================================================
+!
+!!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+!
+!----- type="DC" 交易畫面 -----
+<FUNCD.scr>
+#FUNCD{i},#FUNCD{i}X
+</FUNCD.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<FUNCD.dec>
+![維護記號]
+#FUNCD{i}=A,1,I
+C(3,#FKEY,0,$,s)
+HELP(FCDEF,FUNCDDEF{i},FUNCD,FUNCDX)
+@V(E,0,FCDEF,FUNCDDEF{i})
+
+![維護記號名稱]
+#FUNCD{i}X=X,4,O
+T(A,#FUNCD{i},FCDEF,FUNCDDEF{i},FUNCD,FUNCDX)
+</FUNCD.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<FUNCD.tim>
+#FUNCD{i}
+</FUNCD.tim>
+
+!===========================================================
+! 是否記號
+!   (1)0:是、1:否 --- {i}=
+!   (2)1:否、2:是 --- {i}=1
+!   (3)Y:是、N:否 --- {i}=2
+!   (4)1:是、2:否 --- {i}=3
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<YNCD.scr>
+#YNCD{i},#YNCD{i}X
+</YNCD.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<YNCD.dec>
+![是否記號]
+#YNCD{i}=X,1,I
+HELP(FCDEF,YNDEF{i},YNCD,YNCDX)
+@V(E,0,FCDEF,YNDEF{i})
+
+![是否記號名稱]
+#YNCD{i}X=X,2,O
+T(A,#YNCD{i},FCDEF,YNDEF{i},YNCD,YNCDX)
+</YNCD.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<YNCD.tim>
+#YNCD{i}
+</YNCD.tim>
+
+!===========================================================
+! DBU/OBU  1:DBU、2:OBU(OBUFG)
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<OBUFG.scr>
+#OBUFG,#OBUFGX
+</OBUFG.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<OBUFG.dec>
+![DBU/OBU]
+#OBUFG=_,_,I
+C(3,#FXLVL,5,E(0,2),E(0,1))
+C(3,#FXLVL,5,s,$)
+HELP(FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+@V(E,0,FCDEF,OBUFGDEF)
+
+![DBU/OBU]未ASGN(OBUFG$)，導致客戶統編判斷DBU/OBU錯誤
+#OBUFG_ASGN=A,1,S
+E(0,#OBUFG)ASGN(OBUFG$)
+
+#OBUFGX=X,3,O
+T(A,#OBUFG,FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+</OBUFG.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<OBUFG.tim>
+#OBUFG
+</OBUFG.tim>
+
+!===========================================================
+! 顯示方式記號  0:表格瀏覽、1:印表(RPTFG)
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<RPTFG.scr>
+#RPTFG,#RPTFGX
+</RPTFG.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<RPTFG.dec>
+![顯示方式]
+#RPTFG=A,1,I
+C(3,#CHAIN,0,C(3,#RPTFG,0,E(0,0),$),s)
+HELP(FCDEF,RPTDEF,RPTFG,RPTFGX)
+@V(E,0,FCDEF,RPTDEF)
+
+![顯示方式-中文說明]
+#RPTFGX=X,8,L
+T(A,#RPTFG,FCDEF,RPTDEF,RPTFG,RPTFGX)
+
+![確定傳送]自動或手動
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+</RPTFG.dec>
+
+!----- type="DC" 交易變數宣告 -----
+!單筆查詢使用
+<RPTFGS.dec>
+![顯示方式]
+#RPTFG=A,1,S
+E(0,1)
+
+![確定傳送]自動或手動
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+</RPTFGS.dec>
+
+!===========================================================
+! 幣別 {j}= 台外幣 F外幣 {m}=1必須輸入 0選擇輸入
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<CURNM.scr>
+#CURNM,#CURCD
+</CURNM.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<CURNM.dec>
+!0選擇輸入 1必須輸入
+#CURM=A,1,S
+E(0,{m})
+
+![幣別簡稱]
+#CURNM=_,_,I
+HELP(CURR,{j}CURDEF,ENAME,CNAME)
+@C(3,#CURM,1,V(7),$)
+C(4,#CURNM,S,$)
+V(E,0,CURR,{j}CURDEF)
+
+![幣別代碼]
+#CURCD=_,_,O
+C(4,#CURNM,S,$)
+T(A,#CURNM,CURR,{j}CURDEF,ENAME,CURCD)
+</CURNM.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<CURNM.tim>
+#CURNM#CURCDk
+</CURNM.tim>
+
+!===========================================================
+! 幣別 {j}= 台外幣 F外幣 {m}=1必須輸入 0選擇輸入
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<CURNMII.scr>
+#CURNM,#CURCD
+</CURNMII.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<CURNMII.dec>
+!0選擇輸入 1必須輸入
+#CURM=A,1,S
+E(0,{m})
+
+![幣別簡稱]
+#CURNM=_,_,I
+C(2,#FUNCD4,S,$,$,s,s,S)
+HELP(CURR,{j}CURDEF,ENAME,CNAME)
+@C(3,#CURM,1,V(7),$)
+C(4,#CURNM,S,$)
+V(E,0,CURR,{j}CURDEF)
+
+![幣別代碼]
+#CURCD=_,_,O
+C(4,#CURNM,S,$)
+T(A,#CURNM,CURR,{j}CURDEF,ENAME,CURCD)
+</CURNMII.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<CURNMII.tim>
+#CURNM#CURCD
+</CURNMII.tim>
+
+!===========================================================
+! 幣別 {i}=自定 {j}=台外幣 F外幣 {m}=1必須輸入 0選擇輸入
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<CURNMP.scr>
+#{i}CURNM,#{i}CURCD
+</CURNMP.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<CURNMP.dec>
+!0選擇輸入 1必須輸入
+#{i}CURM=A,1,S
+E(0,{m})
+
+![幣別簡稱]
+#{i}CURNM=X,3,I
+HELP(CURR,{j}CURDEF,ENAME,CNAME)
+@C(3,#{i}CURM,1,V(7),$)
+C(4,#{i}CURNM,S,$)
+V(E,0,CURR,{j}CURDEF)
+
+![幣別代碼]
+#{i}CURCD=A,2,O
+C(4,#{i}CURNM,S,$)
+T(A,#{i}CURNM,CURR,{j}CURDEF,ENAME,CURCD)
+</CURNMP.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<CURNMP.tim>
+#{i}CURNM#{i}CURCD
+</CURNMP.tim>
+
+
+!===========================================================
+! 統一編號 {m}=1必須輸入 0選擇輸入
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<CIFKEY.scr>
+#CIFKEY
+</CIFKEY.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<CIFKEY.dec>
+!0選擇輸入 1必須輸入
+#CIFM=A,1,S
+E(0,{m})
+
+![統一編號]
+#CIFKEY=_,_,I
+@C(3,#CIFM,1,V(7),$)
+C(4,#CIFKEY,s,$)
+A(ID_UNINO,1,#CIFKEY)
+
+![統一編號-OBU檢核前3碼BUA,BUB]
+#CIF3=X,3,S
+C(4,#CIFKEY,S,$)
+C(3,#OBUFG,2,T(1,#CIFKEY,1,3),S)
+@V(3,BUA,BUB)
+
+![統一編號-合併]
+#UNINO=X,11,S
+C(4,#CIFKEY,S,$)
+T(2,#CIFKEY)
+S(XCR50,1,0,#CIFKEY,$)
+</CIFKEY.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<CIFKEY.tim>
+#CIFKEY
+</CIFKEY.tim>
+
+!===========================================================
+! 統一編號 {i}=自定 {m}=1必須輸入 0選擇輸入
+!===========================================================
+!----- type="DC" 交易畫面     -----
+<CIFKEYP.scr>
+#CIFKEY{i}
+</CIFKEYP.scr>
+
+!----- type="DC" 交易變數宣告 -----
+<CIFKEYP.dec>
+!0選擇輸入 1必須輸入
+#CIFM{i}=A,1,S
+E(0,{m})
+
+![統一編號]
+#CIFKEY{i}=X,10,I
+@C(3,#CIFM{i},1,V(7),$)
+C(4,#CIFKEY{i},s,$)
+A(ID_UNINO,1,#CIFKEY{i})
+
+![統一編號-OBU檢核前3碼BUA,BUB]
+#CIF3{i}=X,3,S
+C(4,#CIFKEY{i},S,$)
+C(3,#OBUFG,2,T(1,#CIFKEY{i},1,3),S)
+@V(3,BUA,BUB)
+
+![統一編號-合併]
+#UNINO{i}=X,11,S
+C(4,#CIFKEY{i},S,$)
+T(2,#CIFKEY{i})
+S(XCR50,1,0,#CIFKEY{i})
+</CIFKEYP.dec>
+
+!----- type="TIM" 上行電文TIM -----
+<CIFKEYP.tim>
+#CIFKEY{i}
+</CIFKEYP.tim>
+
+
+!===========================================================
+! ACTFGX-RUN
+!===========================================================
+!----- type="PREDC"  -----
+<ACTFGX-RUN.pre>
+#ACTFGX_RUN=X,1,S
+C(3,#FKEY,0,$,RUN(#ACTFGX))
+</ACTFGX-RUN.pre>
+
+!===========================================================
+! TITLE-RUN
+!===========================================================
+!----- type="PREDC"  -----
+<TITLE-RUN.pre>
+#TITLE_RUN=X,1,S
+!IF(#TITLE_RUN == "1",INVOKEJS(APPEND_TITLE,---版次,#MCNT)T(3,@TITLE_RUN,2),T(3,@TITLE_RUN,1))
+
+!by eric 2020.06.17
+!!#FKEY 0:登錄,1:訂正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+#ModifyButton=x,1,S
+C(2,#FKEY,$,K(MODIFYBUTTON,訂正),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核),$,$,$,K(MODIFYBUTTON,修正),$,K(MODIFYBUTTON,提交),$)
+C(3,#FKEY,0,$,K(NOBUTTON,SAVE))
+
+#REJECT=x,100,S
+IF(#HCODE == "8",$,S)
+C(2,#FKEY,$,$,K(MODIFYBUTTON,1,退回),$,$,$,$,$,$,$,$)
+T(2,{cmd=canSubmit;HCODE=8})ASGN(BTN_NEW1$)
+T(2,@HCODE,0)
+</TITLE-RUN.pre>
+
+!===========================================================
+! 交易共用HEAD
+!===========================================================
+!BFHEAD.dec一般外匯使用，FXHEAD3.scr資金使用，請同歩維護
+<BFHEAD.dec>
+
+#TR_TXDNM=X,40,S
+
+!交易類別
+#TR_TXDFG=A,1,S
+
+!交易業務類別
+#TR_SBTYP=X,5,S
+
+!結帳業務類別
+#TR_SECNO=X,2,S
+
+!交易更正權限 0:禁止更正,1:可更正,2:需授權
+#TR_HCODECD=A,1,S
+
+!放行交易記號 0:非放行交易,1:放行交易
+#TR_PASSCD=A,1,S
+
+!櫃員執行權限 0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#TR_TLRFG=A,1,S
+
+!分行交易權限 0:不可交易,1:可交易,2:需主管授權
+#TR_DBUCD=A,1,S
+
+!代聯行交易權限 0:不可聯行,1:可聯行,2:需主管授權
+#TR_INBRCD=A,1,S
+
+!櫃員代理OBU權限  0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#TR_OTLRFG=A,1,S
+
+!分行代理OBU權限 0:不可代OBU,1:可代OBU,2:需主管授權
+#TR_OBUCD=A,1,S
+
+!分行交易流程(1-3)一/二/三段式交易
+#TR_DRELCD=A,1,S
+
+!掛帳行
+#TR_DABRNO=A,4,S
+
+!掛帳行央行字軌
+#TR_PREFIX=X,4,S
+
+!審核行
+#TR_DFBRNO=A,4,S
+
+!代理OBU交易流程(1-3)一/二/三段式交易
+#TR_ORELCD=A,1,S
+
+!代理OBU審核行
+#TR_OFBRNO=A,4,S
+
+!代理OBU交易字軌
+#TR_OPREFIX=X,4,S
+
+#FUNCIND=_,_,S
+E(0,0)
+
+!查詢交易不調RIM
+#TR_RIM=A,1,S
+!S(XXR21,0,#KINBR,#TLRNO,#TXCD,#SYSDATEF,#END)R(1,XXR21)
+C(5,#INQ,1,s,$)
+S(LCR22,0,#KINBR,#TLRNO,#TXCD,#FKEY,#ACTFG,#FUNCIND,#END)R(1,LCR22)
+!S(XXR22,0,#KINBR,#TLRNO,#TXCD,#FKEY,#ACTFG,#END)R(1,XXR22)
+
+!結帳業務類別
+#SECNO=_,_,S
+!T(2,#TR_SECNO)
+
+!交易更正權限 0:禁止更正,1:可更正,2:需授權
+#HCODECD=A,1,S
+E(0,#TR_HCODECD)
+
+!放行交易記號 0:非放行交易,1:放行交易
+#PASSCD=A,1,S
+E(0,#TR_PASSCD)
+
+!櫃員執行權限 0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#TLRFG=A,1,S
+E(0,#TR_TLRFG)
+
+!分行交易權限 0:不可交易,1:可交易
+#DBUCD=A,1,S
+E(0,#TR_DBUCD)
+
+#RELCD=_,_,S
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!E(0,#TR_DRELCD)
+
+#ACTFG=_,_,S
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#RELCD,E(0,0),E(0,0),E(0,5),E(0,1))
+
+!代聯行交易權限 0:不可聯行,1:可聯行,2:需主管授權
+#INBRCD=A,1,S
+E(0,#TR_INBRCD)
+
+!櫃員代理OBU權限  0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#OTLRFG=A,1,S
+E(0,#TR_OTLRFG)
+
+!分行代理OBU權限 0:不可代OBU,1:可代OBU
+#OBUCD=A,1,S
+E(0,#TR_OBUCD)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+#CHKHEAD=A,1,S
+C(5,#INQ,1,s,$)
+E(0,0)
+!IF(#TLRFG==3 && #FKEY==2,V(2,0,^_^無權放行本交易),$)
+!IF(#TLRFG==4 && #FKEY!=2,V(2,0,^_^無權登錄本交易),$)
+!IF(#TLRFG==0 && #OTLRFG==0,V(2,0,^_^無權執行本交易),$)
+!IF(#DBUCD==0 && #OBUCD==0,V(2,0,^_^無權執行本交易),$)
+IF(#HCODECD==0 && #FKEY==1,V(2,0,^_^本交易不可更正),$)
+IF(#PASSCD==0 && #FKEY==2,V(2,0,^_^本交易不可放行),$)
+
+!原始交易記號  0:原始交易,1:非原始交易
+#ORGFG=A,1,S
+E(0,0)
+
+!代聯行記號   0:非代聯交易,1:代聯行交易
+#INBRFG=A,1,S
+E(0,0)
+
+!代理DBU/OBU 1:非代理OBU,2:代理OBU
+#OBUTP=A,1,S
+E(0,1)
+
+!更正需主管授權
+#RQSP9=A,4,S
+IF(#HCODECD==2 && #FKEY==1,E(0,0001),S)ASGN(RQSP9$)
+
+!央行字軌
+#PREFIX=X,4,S
+
+!基礎幣
+#BCURCD=A,2,S
+
+![RBRNO的中文說明]
+#RBRNO_LABEL=X,10,L
+T(3,受理單位)
+
+![FBRNO的中文說明]
+#FBRNO_LABEL=X,10,L
+T(3,指定單位)
+
+!調整台幣不顯示小數點,欄位型態設為X,長度22
+!參數1:幣別有幾位小數點
+!參數2:調整前金額
+!參數3:調整後顯示金額
+#ADJUSTDOT=@,1,S
+X(@x3,#x2)
+P(R,@x3,#x3)
+C(3,#x1,0,T(1,@x3,#x3,1,19),$)
+P(L,@x3,#x3)
+
+!調整日期顯示,當日期為0時,顯示無,否則顯示999/99/99,型態為X(9)
+#AdjustDateWk1=X,3,S
+#AdjustDateWk2=X,2,S
+#AdjustDateWk3=X,2,S
+#AdjustDate=@,1,S
+T(1,@AdjustDateWk1,#x1,1,3)
+T(1,@AdjustDateWk2,#x1,4,2)
+T(1,@AdjustDateWk3,#x1,6,2)
+C(3,#x1,0,T(3,@x2,無),T(2,@x2,#AdjustDateWk1+/+#AdjustDateWk2+/+#AdjustDateWk3))
+
+!查詢後連結交易
+#CHAINTXCD=X,5,S
+
+!查詢後連結交易可以查詢 0.否 1.是
+#CHAININQ=A,1,S
+
+!查詢後連結交易可以維護 0.否 1.是
+#CHAINUPD=A,1,S
+
+</BFHEAD.dec>
+
+<TRCTL.tom>
+TXFORM=XXR21
+#TR_TXDNM#TR_TXDFG#TR_SBTYP#TR_SECNO#TR_HCODECD#TR_PASSCD
+#TR_TLRFG#TR_DBUCD#TR_INBRCD#TR_DRELCD#TR_DABRNO#TR_DFBRNO#TR_PREFIX
+#TR_OTLRFG#TR_OBUCD#TR_ORELCD#TR_OFBRNO#TR_OPREFIX^
+
+TXFORM=XXR22
+#TR_SECNO#TR_DBUCD#TR_DRELCD#TR_DABRNO#TR_DFBRNO#TR_PREFIX
+#TR_OBUCD#TR_ORELCD#TR_OFBRNO#TR_OPREFIX^
+
+TXFORM=LCR21
+#CHAININQ#CHAINUPD^
+
+TXFORM=LCR22
+#TR_SECNO#TR_DBUCD#TR_DRELCD#TR_DABRNO#TR_DFBRNO#TR_PREFIX
+#TR_OBUCD#TR_ORELCD#TR_OFBRNO#TR_OPREFIX^
+</TRCTL.tom>
+
+<OBUTP.dec>
+!代理DBU/OBU 1:非代理OBU,2:代理OBU
+#OBUTP=_,_,S
+C(5,#INQ,1,s,$)
+IF(#KINBR==#OBUBRNO || #OBUFG==0,E(0,1),E(0,#OBUFG))
+C(2,#OBUFG,S,T(2,@ACBRNO,#TR_DABRNO),T(2,@ACBRNO,#OBUBRNO))
+!IF(#TLRFG==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OTLRFG==0,V(2,2,^_^無權代理OBU),$)
+!IF(#DBUCD==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OBUCD==0,V(2,2,^_^無權代理OBU),$)
+STATUS(OD,#OBUFG)
+
+!櫃員執行本交易需主管授權 (cancel by eric 2015.02.24)
+!remove by eric 2015.02.24
+!#RQSP8=A,4,S
+!IF(#OBUTP==1 && #TLRFG==2,E(0,0002),IF(#OBUTP==2 && #OTLRFG==2,E(0,0003),S))ASGN(RQSP8$)
+
+!分行執行本交易需主管授權
+#RQSP7=A,4,S
+IF(#OBUTP==1 && #DBUCD==2,E(0,0004),IF(#OBUTP==2 && #OBUCD==2,E(0,0005),S))ASGN(RQSP7$)
+
+!代聯行交易需主管授權
+#RQSP6=A,4,S
+E(0,0)IF(#INBRFG==1 && #INBRCD==0,V(2,0,^_^分行無權代聯行交易),$)
+IF(#INBRFG==1 && #INBRCD==2,E(0,0004),S)ASGN(RQSP6$)
+
+</OBUTP.dec>
+
+!FXHEAD.scr一般外匯使用，FXHEAD1.scr、FXHEAD2.scr資金使用，請同歩維護
+!FXHEADXL.scr   放款還本繳息XL210, XL220使用，於 記帳單位 後面加欄位 "還本繳息方式"，請同歩維護
+!FXHEADXL0X2.scr網銀還本繳息央媒申報使用，請同歩維護
+!----- 外匯放行交易畫面     -----
+<FXHEAD.scr>
+[" ^ DBU/OBU ",#OBUFG,#OBUFGX],
+[" ^ 登審放記號",#ACTFG,#ACTFGX],
+[" ^ #RBRNO_LABEL,#RBRNO,#RBRNM],
+[" ^ #FBRNO_LABEL,#FBRNO,#FBRNM],
+[#<->#," ^ 記帳單位",#ACBRNO2,#ACBRNM2],
+</FXHEAD.scr>
+
+!FXHEADXL.scr   放款還本繳息XL210, XL220使用，於 記帳單位 後面加欄位 "還本繳息方式"，請同歩維護    -----
+<FXHEADXL.scr>
+[" ^ DBU/OBU ",#OBUFG,#OBUFGX],
+[" ^ 登審放記號",#ACTFG,#ACTFGX],
+[" ^ #RBRNO_LABEL,#RBRNO,#RBRNM],
+[" ^ #FBRNO_LABEL,#FBRNO,#FBRNM],
+[" ^ 記帳單位",#ACBRNO2,#ACBRNM2],
+[" ^ 還本繳息方式",#HEAD_PRCD,#HEAD_PRCDX],
+</FXHEADXL.scr>
+
+!----- XL0X2 網銀還本繳息央媒申報交易畫面，請同歩維護    -----
+!於 記帳單位 後面加說明
+<FXHEADXL0X2.scr>
+[" ^ DBU/OBU ",#OBUFG,#OBUFGX],
+[" ^ 登審放記號",#ACTFG,#ACTFGX],
+[" ^ #RBRNO_LABEL,#RBRNO,#RBRNM],
+[" ^ #FBRNO_LABEL,#FBRNO,#FBRNM],
+[#<->#," ^ 記帳單位",#ACBRNO2,#ACBRNM2,"@本交易僅處理水單列印及央媒申報，欲查相關帳務執行XA976。"],
+</FXHEADXL0X2.scr>
+
+!資金使用FXHEAD1.scr #RBRNO,#RBRNM不顯示
+!#ACBRNO2->#ACBRNO #ACBRNM2->#ACBRNM
+<FXHEAD1.scr>
+[" ^ DBU/OBU ",#OBUFG,#OBUFGX],
+[" ^ 登審放記號",#ACTFG,#ACTFGX],
+[" ^ 承作/審核單位",#FBRNO,#FBRNM],
+[" ^ 記帳單位",#ACBRNO,#ACBRNM],
+</FXHEAD1.scr>
+
+!資金使用FXHEAD2.scr #RBRNO三段式可輸入且預設空白
+!!#ACBRNO2->#ACBRNO #ACBRNM2->#ACBRNM
+<FXHEAD2.scr>
+[" ^ DBU/OBU ",#OBUFG,#OBUFGX],
+[" ^ 登審放記號",#ACTFG,#ACTFGX],
+[" ^ 受理單位",#RBRNO,#RBRNM],
+[" ^ 承作/審核單位",#FBRNO,#FBRNM],
+[#<->#," ^ 記帳單位",#ACBRNO,#ACBRNM],
+</FXHEAD2.scr>
+
+!FXHEAD.dec一般外匯使用，FXHEAD1.dec、FXHEAD2.dec資金使用，請同歩維護
+!版次，各交易內請加TITLE-RUN.pre
+!----- 交易變數宣告 -----
+<FXHEAD.dec>
+![版次]
+#MCNT=_,_,S
+T(2,@MCNTTMP,#MCNT)
+
+![版次]
+#MCNTTMP=A,2,L
+IF(#TITLE_RUN != "2",INVOKEJS(APPEND_TITLE,---版次,#MCNTTMP)T(3,@TITLE_RUN,2),$)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![DBU/OBU]
+!modify by eric 2015.02.24
+!IF(#OBUCD==0 || #OTLRFG==0,s,$)
+#OBUFG=_,_,I
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#KINBR,#OBUBRNO,s,$)C(3,#ORGFG,1,s,$)
+IF(#OBUCD==0,s,$)
+HELP(FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+@V(E,0,FCDEF,OBUFGDEF)
+
+![DBU/OBU]未ASGN(OBUFG$)，導致客戶統編判斷DBU/OBU錯誤
+#OBUFG_ASGN=A,1,S
+E(0,#OBUFG)ASGN(OBUFG$)
+
+#OBUFGX=X,3,O
+T(A,#OBUFG,FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+C(3,#OBUFG,2,E(0,@BCURCD,01),E(0,@BCURCD,00))
+
+!代理DBU/OBU 1:非代理OBU,2:代理OBU
+#OBUTP=_,_,S
+IF(#KINBR==#OBUBRNO || #OBUFG==0,E(0,1),E(0,#OBUFG))
+!IF(#TLRFG==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OTLRFG==0,V(2,2,^_^無權代理OBU),$)
+!IF(#DBUCD==0,V(2,1,^_^無權執行本交易),$)
+IF(#OBUCD==0,V(2,2,^_^無權代理OBU),$)
+STATUS(OD,#OBUFG)
+
+!櫃員執行本交易需主管授權
+!remove by eric 2015.02.24
+!#RQSP8=A,4,S
+!IF(#OBUTP==1 && #TLRFG==2,E(0,0002),IF(#OBUTP==2 && #OTLRFG==2,E(0,0003),S))ASGN(RQSP8$)
+
+!分行執行本交易需主管授權
+#RQSP7=A,4,S
+IF(#OBUTP==1 && #DBUCD==2,E(0,0004),IF(#OBUTP==2 && #OBUCD==2,E(0,0005),S))ASGN(RQSP7$)
+
+!========= 需要OBUFG來決定交易模式,記帳單位,指定單位
+![一／二／三段式交易記號]
+!1：一段式
+!2：二段式
+!3：三段式
+#RELCD=_,_,S
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#OBUFG,S,E(0,#TR_DRELCD),C(3,#KINBR,#OBUBRNO,E(0,#TR_DRELCD),E(0,#TR_ORELCD)))
+
+#ACTFG=_,_,I
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#RELCD,E(0,0),E(0,0),E(0,5),E(0,1))
+!C(3,#ACTFG,0,s,s)
+
+#ACTFGX=X,8,O
+C(5,#TXCD_AP,T,T(A,#ACTFG,FCDEF,ACTFGDEF1,ACTFG,ACTFGX),T(A,#ACTFG,FCDEF,ACTFGDEF,ACTFG,ACTFGX))
+
+![指定單位]
+#FBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(2,#OBUFG,S,T(2,#TR_DFBRNO),T(2,#TR_OFBRNO))
+
+#FBRNM=X,20,O
+T(A,#FBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![記帳單位]
+#ACBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)C(2,#OBUFG,S,T(2,#TR_DABRNO),T(2,#OBUBRNO))
+C(2,#OBUFG,S,T(2,@PREFIX,#TR_PREFIX),T(2,@PREFIX,#TR_OPREFIX))
+
+#ACBRNM=X,20,S
+T(A,#ACBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+#ACBRNO2=X,4,O
+C(3,#OBUFG,2,T(2,#OBUBRNO),C(3,#RELCD,3,T(2,#ACBRNO),T(2,#FBRNO)))
+
+#ACBRNM2=X,20,O
+T(A,#ACBRNO2,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![交易狀態]
+!1:受理登錄/前台登錄
+!2:受理確認/前台確認
+!3:指定審核/後台審核
+!4:指定放行/後台放行
+!5:登錄
+!6:放行
+
+
+![受理單位]
+#RBRNO=_,_,I
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)T(2,#KINBR)C(3,#ACTFG,5,$,s)C(3,#KINBR,#FBRNO,$,s)
+@V(2,0)V(7)
+C(3,#RBRNO,#KINBR,s,$)
+S(XXR23,0,#RBRNO,#OBUFG,#TXCD,#END)
+
+#RBRNM=X,20,O
+T(A,#RBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![RBRNO的中文說明]交易內給值CALL(#RBRNO_L,承作單位)
+#RBRNO_L=@,1,S
+T(2,@RBRNO_LABEL,#it1)
+
+![FBRNO的中文說明]交易內給值CALL(#FBRNO_L,審核單位)
+#FBRNO_L=@,1,S
+T(2,@FBRNO_LABEL,#it1)
+
+</FXHEAD.dec>
+
+!資金使用FXHEAD1.dec #RBRNO I->S
+!#ACBRNO S->O #ACBRNM S->O
+!----- 交易變數宣告 -----
+<FXHEAD1.dec>
+![版次]
+#MCNT=_,_,S
+T(2,@MCNTTMP,#MCNT)
+
+![版次]
+#MCNTTMP=A,2,L
+IF(#TITLE_RUN != "2",INVOKEJS(APPEND_TITLE,---版次,#MCNTTMP)T(3,@TITLE_RUN,2),$)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![DBU/OBU]
+!modify by eric 2015.02.24
+!IF(#OBUCD==0 || #OTLRFG==0,s,$)
+#OBUFG=_,_,I
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#KINBR,#OBUBRNO,s,$)C(3,#ORGFG,1,s,$)
+IF(#OBUCD==0,s,$)
+HELP(FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+@V(E,0,FCDEF,OBUFGDEF)
+
+![DBU/OBU]未ASGN(OBUFG$)，導致客戶統編判斷DBU/OBU錯誤
+#OBUFG_ASGN=A,1,S
+E(0,#OBUFG)ASGN(OBUFG$)
+
+#OBUFGX=X,3,O
+T(A,#OBUFG,FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+C(3,#OBUFG,2,E(0,@BCURCD,01),E(0,@BCURCD,00))
+
+!代理DBU/OBU 1:非代理OBU,2:代理OBU
+#OBUTP=_,_,S
+IF(#KINBR==#OBUBRNO || #OBUFG==0,E(0,1),E(0,#OBUFG))
+!IF(#TLRFG==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OTLRFG==0,V(2,2,^_^無權代理OBU),$)
+!IF(#DBUCD==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OBUCD==0,V(2,2,^_^無權代理OBU),$)
+STATUS(OD,#OBUFG)
+
+!櫃員執行本交易需主管授權
+!remove by eric 2015.02.24
+!#RQSP8=A,4,S
+!IF(#OBUTP==1 && #TLRFG==2,E(0,0002),IF(#OBUTP==2 && #OTLRFG==2,E(0,0003),S))ASGN(RQSP8$)
+
+!分行執行本交易需主管授權
+#RQSP7=A,4,S
+IF(#OBUTP==1 && #DBUCD==2,E(0,0004),IF(#OBUTP==2 && #OBUCD==2,E(0,0005),S))ASGN(RQSP7$)
+
+!========= 需要OBUFG來決定交易模式,記帳單位,指定單位
+![一／二／三段式交易記號]
+!1：一段式
+!2：二段式
+!3：三段式
+#RELCD=_,_,S
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#OBUFG,S,E(0,#TR_DRELCD),C(3,#KINBR,#OBUBRNO,E(0,#TR_DRELCD),E(0,#TR_ORELCD)))
+
+#ACTFG=_,_,I
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#RELCD,E(0,0),E(0,0),E(0,5),E(0,1))
+!C(3,#ACTFG,0,s,s)
+
+#ACTFGX=X,8,O
+C(5,#TXCD_AP,T,T(A,#ACTFG,FCDEF,ACTFGDEF1,ACTFG,ACTFGX),T(A,#ACTFG,FCDEF,ACTFGDEF,ACTFG,ACTFGX))
+
+![指定單位]
+#FBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(2,#OBUFG,S,T(2,#TR_DFBRNO),T(2,#TR_OFBRNO))
+
+#FBRNM=X,20,O
+T(A,#FBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![記帳單位]
+#ACBRNO=_,_,O
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)C(2,#OBUFG,S,T(2,#TR_DABRNO),T(2,#OBUBRNO))
+C(2,#OBUFG,S,T(2,@PREFIX,#TR_PREFIX),T(2,@PREFIX,#TR_OPREFIX))
+
+#ACBRNM=X,20,O
+T(A,#ACBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+#ACBRNO2=X,4,O
+C(3,#OBUFG,2,T(2,#OBUBRNO),C(3,#RELCD,3,T(2,#ACBRNO),T(2,#FBRNO)))
+
+#ACBRNM2=X,20,O
+T(A,#ACBRNO2,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![交易狀態]
+!1:受理登錄/前台登錄
+!2:受理確認/前台確認
+!3:指定審核/後台審核
+!4:指定放行/後台放行
+!5:登錄
+!6:放行
+
+
+![受理單位]
+#RBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)T(2,#KINBR)C(3,#ACTFG,5,$,s)C(3,#KINBR,#FBRNO,$,s)
+@V(2,0)V(7)
+C(3,#RBRNO,#KINBR,s,$)
+S(XXR23,0,#RBRNO,#OBUFG,#TXCD,#END)
+
+#RBRNM=X,20,O
+T(A,#RBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![RBRNO的中文說明]交易內給值CALL(#RBRNO_L,承作單位)
+#RBRNO_L=@,1,S
+T(2,@RBRNO_LABEL,#it1)
+
+![FBRNO的中文說明]交易內給值CALL(#FBRNO_L,審核單位)
+#FBRNO_L=@,1,S
+T(2,@FBRNO_LABEL,#it1)
+
+</FXHEAD1.dec>
+
+!資金使用FXHEAD2.dec
+!#RBRNO “T(2,#KINBR)C(3,#ACTFG,5,$,s)”->"T(3, )"
+!#RBRNO "V(2,0)"->"V(2,0,#ACBRNO)"
+!#RBRNO "C(3,#RBRNO,#KINBR,s,$)"->DEL
+!#RBRNO "S(XXR23,0,#RBRNO,#OBUFG,#TXCD,#END)"->DEL
+!#ACBRNO S->O #ACBRNM S->O
+!----- 交易變數宣告 -----
+<FXHEAD2.dec>
+![版次]
+#MCNT=_,_,S
+T(2,@MCNTTMP,#MCNT)
+
+![版次]
+#MCNTTMP=A,2,L
+IF(#TITLE_RUN != "2",INVOKEJS(APPEND_TITLE,---版次,#MCNTTMP)T(3,@TITLE_RUN,2),$)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![DBU/OBU]
+!modify by eric 2015.02.24
+!IF(#OBUCD==0 || #OTLRFG==0,s,$)
+#OBUFG=_,_,I
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#KINBR,#OBUBRNO,s,$)C(3,#ORGFG,1,s,$)
+IF(#OBUCD==0,s,$)
+HELP(FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+@V(E,0,FCDEF,OBUFGDEF)
+
+![DBU/OBU]未ASGN(OBUFG$)，導致客戶統編判斷DBU/OBU錯誤
+#OBUFG_ASGN=A,1,S
+E(0,#OBUFG)ASGN(OBUFG$)
+
+#OBUFGX=X,3,O
+T(A,#OBUFG,FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+C(3,#OBUFG,2,E(0,@BCURCD,01),E(0,@BCURCD,00))
+
+!代理DBU/OBU 1:非代理OBU,2:代理OBU
+#OBUTP=_,_,S
+IF(#KINBR==#OBUBRNO || #OBUFG==0,E(0,1),E(0,#OBUFG))
+!IF(#TLRFG==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OTLRFG==0,V(2,2,^_^無權代理OBU),$)
+!IF(#DBUCD==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OBUCD==0,V(2,2,^_^無權代理OBU),$)
+STATUS(OD,#OBUFG)
+
+!櫃員執行本交易需主管授權
+!remove by eric 2015.02.24
+!#RQSP8=A,4,S
+!IF(#OBUTP==1 && #TLRFG==2,E(0,0002),IF(#OBUTP==2 && #OTLRFG==2,E(0,0003),S))ASGN(RQSP8$)
+
+!分行執行本交易需主管授權
+#RQSP7=A,4,S
+IF(#OBUTP==1 && #DBUCD==2,E(0,0004),IF(#OBUTP==2 && #OBUCD==2,E(0,0005),S))ASGN(RQSP7$)
+
+!========= 需要OBUFG來決定交易模式,記帳單位,指定單位
+![一／二／三段式交易記號]
+!1：一段式
+!2：二段式
+!3：三段式
+#RELCD=_,_,S
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#OBUFG,S,E(0,#TR_DRELCD),C(3,#KINBR,#OBUBRNO,E(0,#TR_DRELCD),E(0,#TR_ORELCD)))
+
+#ACTFG=_,_,I
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#RELCD,E(0,0),E(0,0),E(0,5),E(0,1))
+!C(3,#ACTFG,0,s,s)
+
+#ACTFGX=X,8,O
+C(5,#TXCD_AP,T,T(A,#ACTFG,FCDEF,ACTFGDEF1,ACTFG,ACTFGX),T(A,#ACTFG,FCDEF,ACTFGDEF,ACTFG,ACTFGX))
+
+![指定單位]
+#FBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(2,#OBUFG,S,T(2,#TR_DFBRNO),T(2,#TR_OFBRNO))
+
+#FBRNM=X,20,O
+T(A,#FBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![記帳單位]
+#ACBRNO=_,_,O
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)C(2,#OBUFG,S,T(2,#TR_DABRNO),T(2,#OBUBRNO))
+C(2,#OBUFG,S,T(2,@PREFIX,#TR_PREFIX),T(2,@PREFIX,#TR_OPREFIX))
+
+#ACBRNM=X,20,O
+T(A,#ACBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+#ACBRNO2=X,4,O
+C(3,#OBUFG,2,T(2,#OBUBRNO),C(3,#RELCD,3,T(2,#ACBRNO),T(2,#FBRNO)))
+
+#ACBRNM2=X,20,O
+T(A,#ACBRNO2,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![交易狀態]
+!1:受理登錄/前台登錄
+!2:受理確認/前台確認
+!3:指定審核/後台審核
+!4:指定放行/後台放行
+!5:登錄
+!6:放行
+
+
+![受理單位]
+#RBRNO=_,_,I
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)T(3, )C(3,#KINBR,#FBRNO,$,s)
+@V(2,0,#ACBRNO)V(7)
+
+#RBRNM=X,20,O
+T(A,#RBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![RBRNO的中文說明]交易內給值CALL(#RBRNO_L,承作單位)
+#RBRNO_L=@,1,S
+T(2,@RBRNO_LABEL,#it1)
+
+![FBRNO的中文說明]交易內給值CALL(#FBRNO_L,審核單位)
+#FBRNO_L=@,1,S
+T(2,@FBRNO_LABEL,#it1)
+
+</FXHEAD2.dec>
+
+!版次，各交易內請加TITLE-RUN.pre
+!----- 交易變數宣告 -----
+<MCNT.dec>
+![版次]
+#MCNT=_,_,S
+T(2,@MCNTTMP,#MCNT)
+
+![版次]
+#MCNTTMP=A,2,L
+IF(#TITLE_RUN != "2",INVOKEJS(APPEND_TITLE,---版次,#MCNTTMP)T(3,@TITLE_RUN,2),$)
+
+</MCNT.dec>
+
+!----- 交易變數宣告 -----
+<PSWIFT.dec>
+!! render="swift" ==> 此區塊由swift程式控制
+!!<sub type="DC" name="pSwift" render="swift">
+![
+![""],
+!]
+!! 一定要有這個變數
+#_SWIFTFORM_=X,0,S
+</PSWIFT.dec>
+
+!==============================================================================
+! 登審放記號名稱
+!   (1)1:受理登錄、2:受理確認、3:指定審核、4:指定放行、5:登錄、6:放行 --- {k}=非T
+!   (2)1:前台登錄、2:前台確認、3:後台審核、4:後台放行、5:登錄、6:放行 --- {k}=T
+!===============================================================================
+!----- type="DC" 交易變數宣告 -----
+<ACTFGX.dec>
+
+![交易代號-交易大類代號]
+#TXCD_APTYPE=X,1,S
+T(1,{k},2,1)
+
+![登審放記號名稱]
+{i}=X,8,O
+C(5,#TXCD_APTYPE,T,T(A,{j},FCDEF,ACTFGDEF1,ACTFG,ACTFGX),T(A,{j},FCDEF,ACTFGDEF,ACTFG,ACTFGX))
+</ACTFGX.dec>
+
+!只有登審放記號使用ACTFG.scr #OBUFG,#OBUFGX,#RBRNO,#RBRNM,#FBRNO,#FBRNM,#ACBRNO2,#ACBRNM2不顯示
+<ACTFG.scr>
+[" ^ 登審放記號",#ACTFG,#ACTFGX],
+</ACTFG.scr>
+
+!版次，各交易內請加TITLE-RUN.pre
+!只有登審放記號使用ACTFG.scr #OBUFG I->S,#RBRNO I->S
+!----- 交易變數宣告 -----
+<ACTFG.dec>
+![版次]
+#MCNT=_,_,S
+T(2,@MCNTTMP,#MCNT)
+
+![版次]
+#MCNTTMP=A,2,L
+IF(#TITLE_RUN != "2",INVOKEJS(APPEND_TITLE,---版次,#MCNTTMP)T(3,@TITLE_RUN,2),$)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![DBU/OBU]
+!modify by eric 2015.02.24
+!IF(#OBUCD==0 || #OTLRFG==0,s,$)
+#OBUFG=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#KINBR,#OBUBRNO,s,$)C(3,#ORGFG,1,s,$)
+IF(#OBUCD==0,s,$)
+HELP(FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+@V(E,0,FCDEF,OBUFGDEF)
+
+![DBU/OBU]未ASGN(OBUFG$)，導致客戶統編判斷DBU/OBU錯誤
+#OBUFG_ASGN=A,1,S
+E(0,#OBUFG)ASGN(OBUFG$)
+
+#OBUFGX=X,3,O
+T(A,#OBUFG,FCDEF,OBUFGDEF,OBUFG,OBUFGX)
+C(3,#OBUFG,2,E(0,@BCURCD,01),E(0,@BCURCD,00))
+
+!代理DBU/OBU 1:非代理OBU,2:代理OBU
+#OBUTP=_,_,S
+IF(#KINBR==#OBUBRNO || #OBUFG==0,E(0,1),E(0,#OBUFG))
+!IF(#TLRFG==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OTLRFG==0,V(2,2,^_^無權代理OBU),$)
+!IF(#DBUCD==0,V(2,1,^_^無權執行本交易),$)
+!IF(#OBUCD==0,V(2,2,^_^無權代理OBU),$)
+STATUS(OD,#OBUFG)
+
+!櫃員執行本交易需主管授權
+!remove by eric 2015.02.24
+!#RQSP8=A,4,S
+!IF(#OBUTP==1 && #TLRFG==2,E(0,0002),IF(#OBUTP==2 && #OTLRFG==2,E(0,0003),S))ASGN(RQSP8$)
+
+!分行執行本交易需主管授權
+#RQSP7=A,4,S
+IF(#OBUTP==1 && #DBUCD==2,E(0,0004),IF(#OBUTP==2 && #OBUCD==2,E(0,0005),S))ASGN(RQSP7$)
+
+!========= 需要OBUFG來決定交易模式,記帳單位,指定單位
+![一／二／三段式交易記號]
+!1：一段式
+!2：二段式
+!3：三段式
+#RELCD=_,_,S
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#OBUFG,S,E(0,#TR_DRELCD),C(3,#KINBR,#OBUBRNO,E(0,#TR_DRELCD),E(0,#TR_ORELCD)))
+
+#ACTFG=_,_,I
+!C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+!C(2,#RELCD,E(0,0),E(0,0),E(0,5),E(0,1))
+!C(3,#ACTFG,0,s,s)
+
+#ACTFGX=X,8,O
+C(5,#TXCD_AP,T,T(A,#ACTFG,FCDEF,ACTFGDEF1,ACTFG,ACTFGX),T(A,#ACTFG,FCDEF,ACTFGDEF,ACTFG,ACTFGX))
+
+![指定單位]
+#FBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(2,#OBUFG,S,T(2,#TR_DFBRNO),T(2,#TR_OFBRNO))
+
+#FBRNM=X,20,O
+T(A,#FBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![記帳單位]
+#ACBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)C(2,#OBUFG,S,T(2,#TR_DABRNO),T(2,#OBUBRNO))
+C(2,#OBUFG,S,T(2,@PREFIX,#TR_PREFIX),T(2,@PREFIX,#TR_OPREFIX))
+
+#ACBRNM=X,20,S
+T(A,#ACBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+#ACBRNO2=X,4,O
+C(3,#OBUFG,2,T(2,#OBUBRNO),T(2,#FBRNO))
+
+#ACBRNM2=X,20,O
+T(A,#ACBRNO2,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![交易狀態]
+!1:受理登錄/前台登錄
+!2:受理確認/前台確認
+!3:指定審核/後台審核
+!4:指定放行/後台放行
+!5:登錄
+!6:放行
+
+
+![受理單位]
+#RBRNO=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)C(3,#ORGFG,1,s,$)T(2,#KINBR)C(3,#ACTFG,5,$,s)
+@V(2,0)V(7)
+
+#RBRNM=X,20,O
+T(A,#RBRNO,FBCTL,FBCTLDEF,BRNO,CNAME)
+
+![RBRNO的中文說明]交易內給值CALL(#RBRNO_L,承作單位)
+#RBRNO_L=@,1,S
+T(2,@RBRNO_LABEL,#it1)
+
+![FBRNO的中文說明]交易內給值CALL(#FBRNO_L,審核單位)
+#FBRNO_L=@,1,S
+T(2,@FBRNO_LABEL,#it1)
+
+</ACTFG.dec>
+
+<BFHEAD2.dec>
+
+#SECNO=_,_,S
+!T(1,#TXCD,2,1)
+
+#TR_TXDNM=X,40,S
+
+!交易類別
+#TR_TXDFG=A,1,S
+
+!交易業務類別
+#TR_SBTYP=X,5,S
+
+!結帳業務類別
+#TR_SECNO=X,2,S
+
+!交易更正權限 0:禁止更正,1:可更正,2:需授權
+#TR_HCODECD=A,1,S
+
+!放行交易記號 0:非放行交易,1:放行交易
+#TR_PASSCD=A,1,S
+
+!櫃員執行權限 0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#TR_TLRFG=A,1,S
+
+!分行交易權限 0:不可交易,1:可交易,2:需主管授權
+#TR_DBUCD=A,1,S
+
+!代聯行交易權限 0:不可聯行,1:可聯行,2:需主管授權
+#TR_INBRCD=A,1,S
+
+!櫃員代理OBU權限  0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#TR_OTLRFG=A,1,S
+
+!分行代理OBU權限 0:不可代OBU,1:可代OBU,2:需主管授權
+#TR_OBUCD=A,1,S
+
+!分行交易流程(1-3)一/二/三段式交易
+#TR_DRELCD=A,1,S
+
+!掛帳行
+!未調 分行權限 前, 先搬 KINBR
+#TR_DABRNO=A,4,S
+T(2,#KINBR)
+
+!掛帳行央行字軌
+#TR_PREFIX=X,4,S
+
+!審核行
+!未調 分行權限 前, 先搬 KINBR
+#TR_DFBRNO=A,4,S
+T(2,#KINBR)
+
+!代理OBU交易流程(1-3)一/二/三段式交易
+#TR_ORELCD=A,1,S
+
+!代理OBU審核行
+!與DBU審核行相同
+#TR_OFBRNO=A,4,S
+T(2,#TR_DFBRNO)
+!T(2,1069)
+
+!代理OBU交易字軌
+#TR_OPREFIX=X,4,S
+
+#TR_RIM=A,1,S
+!S(C0068,0,#KINBR,#TLRNO,#TXCD,#SYSDATEF)R(1,C0068)
+
+!結帳業務類別
+#SECNO=_,_,S
+!E(0,#TR_SECNO)
+
+!交易更正權限 0:禁止更正,1:可更正,2:需授權
+#HCODECD=A,1,S
+E(0,#TR_HCODECD)
+
+!放行交易記號 0:非放行交易,1:放行交易
+#PASSCD=A,1,S
+E(0,#TR_PASSCD)
+
+!櫃員執行權限 0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#TLRFG=A,1,S
+E(0,1)
+
+!分行交易權限 0:不可交易,1:可交易,2:需主管授權
+#DBUCD=A,1,S
+E(0,1)
+
+!代聯行交易權限 0:不可聯行,1:可聯行,2:需主管授權
+#INBRCD=A,1,S
+E(0,1)
+
+!櫃員代理OBU權限  0:禁止,1:允許,2:授權,3:僅可登錄,4:僅可放行
+#OTLRFG=A,1,S
+E(0,1)
+
+!分行代理OBU權限 0:不可代OBU,1:可代OBU,2:需主管授權
+#OBUCD=A,1,S
+E(0,1)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核登錄,4:複製登錄,5:更正重登,6:延遲重登
+#CHKHEAD=A,1,S
+E(0,0)
+!IF(#TLRFG==3 && #FKEY==2,V(2,0,^_^無權放行本交易),$)
+!IF(#TLRFG==4 && #FKEY!=2,V(2,0,^_^無權登錄本交易),$)
+!IF(#TLRFG==0 && #OTLRFG==0,V(2,0,^_^無權執行本交易),$)
+!IF(#DBUCD==0 && #OBUCD==0,V(2,0,^_^無權執行本交易),$)
+IF(#HCODECD==0 && #FKEY==1,V(2,0,^_^本交易不可更正),$)
+IF(#PASSCD==0 && #FKEY==2,V(2,0,^_^本交易不可放行),$)
+
+!原始交易記號  0:原始交易,1:非原始交易
+#ORGFG=A,1,S
+E(0,0)
+
+!代聯行記號   0:非代聯交易,1:代聯行交易
+#INBRFG=A,1,S
+E(0,0)
+
+!代理OBU記號 1:非代理OBU,2:代理OBU
+#OBUTP=A,1,S
+E(0,1)
+
+!更正需主管授權
+#RQSP9=A,4,S
+IF(#HCODECD==2 && #FKEY==1,E(0,0001),S)ASGN(RQSP9$)
+
+!央行字軌
+#PREFIX=X,4,S
+
+!基礎幣
+#BCURCD=A,2,S
+
+![RBRNO的中文說明]
+#RBRNO_LABEL=X,10,L
+T(3,受理單位)
+
+![FBRNO的中文說明]
+#FBRNO_LABEL=X,10,L
+T(3,指定單位)
+
+!!O/L是否自動儲存 0:不儲存,1:儲存
+!#RESV=A,1,S
+!T(4,@TXCD,TXCODE$)
+!T(1,#TXCD,2,1)
+!C(3,#RESV,0,E(0,0),E(0,1))
+!ASGN(RESV$)
+
+!查詢後連結交易
+#CHAINTXCD=X,5,S
+
+!查詢後連結交易可以查詢 0.否 1.是
+#CHAININQ=A,1,S
+
+!查詢後連結交易可以維護 0.否 1.是
+#CHAINUPD=A,1,S
+
+</BFHEAD2.dec>
+
+!***********************************************************
+!鎖定戶號共同模組
+!***********************************************************
+
+<LockControl.rtn>
+
+#oLockCustNo=A,7,S
+C(3,#FKEY,0,$,s)
+C(3,#oLockCustNo,#LockCustNo,s,$)
+S(LCR97,01,#LockCustNo,#LockNo)
+R(1,LCR97)
+T(2,@oLockCustNo,#LockCustNo)
+T(6,LCR98+1+#LockNo)ASGN(ESCRIM$)
+
+</LockControl.rtn>
+
+<CheckAuth.rtn>
+
+S(LCR22,0,#KINBR,#TLRNO,#TXCD,#FKEY,#ACTFG,#FUNCIND,#END)R(1,LCR22)
+
+</CheckAuth.rtn>
+
+
+<LockControl.tom>
+TXFORM=LCR97
+#LockNo
+^
+TXFORM=LCR98
+^
+</LockControl.tom>

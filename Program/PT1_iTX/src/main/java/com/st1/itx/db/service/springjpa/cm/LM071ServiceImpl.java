@@ -27,18 +27,24 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
-
+	/**
+	 * 查詢結果
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
 	
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+//		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
 		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+//		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
+//		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
-		this.info("LM071.findAll iday=" + iYear + String.format("%02d", iMonth));
+		this.info("LM071.findAll yearMonth=" + yearMonth);
 
 		String sql = "SELECT M.\"ProdNo\" AS F0"; // 商品代碼
 		sql += "			,C.\"CustId\" AS F1";
@@ -89,7 +95,7 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("iyymm", iYearMonth);
+		query.setParameter("iyymm", yearMonth);
 //		query.setParameter("iday", iDAY);
 		return this.convertToMap(query);
 	}

@@ -37,6 +37,13 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iBrNo = titaVo.get("iBrNo").trim();
 		String iTlrNo = titaVo.get("iTlrNo").trim();
 		String iTranNo = titaVo.get("iTranNo").trim();
+		String iCustNo = titaVo.get("iCustNo").trim();
+		this.info("iMrKey = " + iCustNo);
+		String iMkey = "";
+		if (!iCustNo.equals("0000000")) {
+			iMkey = iCustNo + "-%";
+		}
+		this.info("iMkey = " + iMkey);
 
 		String sql = "SELECT  A.\"CalDate\"";
 		sql += ",A.\"CalTime\"";
@@ -64,7 +71,9 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and A.\"CanCancel\"=:cancancel";
 		sql += "   and A.\"ActionFg\"=:actionfg";
 		sql += "   and A.\"Hcode\"<>:hcode";
-
+		if (!iCustNo.equals("0000000")) {
+			sql += "   and A.\"MrKey\" like :iMkey";
+		}
 		if (!"".equals(iTlrNo)) {
 			sql += "   and A.\"TlrNo\" like :tlrno";
 		}
@@ -94,7 +103,9 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!"".equals(iTranNo)) {
 			query.setParameter("tranNo", iTranNo + "%");
 		}
-
+		if (!iCustNo.equals("0000000")) {
+			query.setParameter("iMkey", iMkey);
+		}
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
 

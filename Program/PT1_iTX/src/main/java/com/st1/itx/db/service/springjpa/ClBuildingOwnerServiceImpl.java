@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.ClBuildingOwnerRepositoryHist;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -90,7 +91,7 @@ public class ClBuildingOwnerServiceImpl extends ASpringJpaParm implements ClBuil
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 		Pageable pageable = null;
 		if (limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+			pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "OwnerCustUKey"));
 		else
 			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "OwnerCustUKey"));
 		this.info("findAll " + dbName);
@@ -229,7 +230,9 @@ public class ClBuildingOwnerServiceImpl extends ASpringJpaParm implements ClBuil
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Insert..." + dbName + " " + clBuildingOwner.getClBuildingOwnerId());
 		if (this.findById(clBuildingOwner.getClBuildingOwnerId()) != null)
 			throw new DBException(2);
@@ -258,7 +261,9 @@ public class ClBuildingOwnerServiceImpl extends ASpringJpaParm implements ClBuil
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + clBuildingOwner.getClBuildingOwnerId());
 		if (!empNot.isEmpty())
 			clBuildingOwner.setLastUpdateEmpNo(empNot);
@@ -281,7 +286,9 @@ public class ClBuildingOwnerServiceImpl extends ASpringJpaParm implements ClBuil
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + clBuildingOwner.getClBuildingOwnerId());
 		if (!empNot.isEmpty())
 			clBuildingOwner.setLastUpdateEmpNo(empNot);
@@ -329,7 +336,9 @@ public class ClBuildingOwnerServiceImpl extends ASpringJpaParm implements ClBuil
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("InsertAll...");
 		for (ClBuildingOwner t : clBuildingOwner) {
 			if (!empNot.isEmpty())
@@ -361,7 +370,9 @@ public class ClBuildingOwnerServiceImpl extends ASpringJpaParm implements ClBuil
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("UpdateAll...");
 		if (clBuildingOwner == null || clBuildingOwner.size() == 0)
 			throw new DBException(6);

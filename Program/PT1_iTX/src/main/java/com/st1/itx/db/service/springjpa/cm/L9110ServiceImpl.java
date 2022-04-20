@@ -326,17 +326,19 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  , CF.\"ClNo\" ";
 		sql += "                          )   AS Seq "; // -- 序號
 		sql += "      , IR.\"NowInsuNo\"      AS NowInsuNo"; // -- 保單號碼
-		sql += "      , IR.\"InsuAmt\"        AS InsuAmt"; // -- 保險金額
+		sql += "      , IR.\"FireInsuAmt\"    AS \"FireInsuAmt\""; // -- 火險金額
 		sql += "      , IR.\"InsuStartDate\"  AS InsuStartDate"; // -- 保險起日
 		sql += "      , IR.\"InsuEndDate\"    AS InsuEndDate"; // -- 保險迄日
 		sql += "      , IR.\"InsuCompany\"    AS InsuCompany"; // -- 保險公司
+		sql += "      , IR.\"EarthInsuAmt\"   AS \"EarthInsuAmt\""; // -- 地震險金額
 		sql += " FROM \"ClFac\" CF";
 		sql += " LEFT JOIN ( SELECT IO.\"ClCode1\" ";
 		sql += "                  , IO.\"ClCode2\" ";
 		sql += "                  , IO.\"ClNo\" ";
 		sql += "                  , IO.\"OrigInsuNo\" AS \"PrevInsuNo\" ";
 		sql += "                  , IO.\"OrigInsuNo\" AS \"NowInsuNo\" ";
-		sql += "                  , IO.\"FireInsuCovrg\" + IO.\"EthqInsuCovrg\" AS \"InsuAmt\" ";
+		sql += "                  , IO.\"FireInsuCovrg\" AS \"FireInsuAmt\" ";
+		sql += "                  , IO.\"EthqInsuCovrg\" AS \"EarthInsuAmt\" ";
 		sql += "                  , IO.\"InsuStartDate\"";
 		sql += "                  , IO.\"InsuEndDate\"";
 		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\"";
@@ -349,7 +351,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  , IR.\"ClNo\"";
 		sql += "                  , IR.\"PrevInsuNo\"";
 		sql += "                  , IR.\"NowInsuNo\"";
-		sql += "                  , IR.\"FireInsuCovrg\" + IR.\"EthqInsuCovrg\" AS \"InsuAmt\"";
+		sql += "                  , IR.\"FireInsuCovrg\" AS \"FireInsuAmt\" ";
+		sql += "                  , IR.\"EthqInsuCovrg\" AS \"EarthInsuAmt\" ";
 		sql += "                  , IR.\"InsuStartDate\"";
 		sql += "                  , IR.\"InsuEndDate\"";
 		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\"";
@@ -406,9 +409,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 , LO.\"LandSeq\"";
 		sql += "            FROM \"ClLandOwner\" LO ";
 		sql += "            LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = LO.\"OwnerCustUKey\"";
-		sql += "           ) LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "               AND LO.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "               AND LO.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "           ) LO ON LO.\"ClCode1\" = L.\"ClCode1\"";
+		sql += "               AND LO.\"ClCode2\" = L.\"ClCode2\"";
+		sql += "               AND LO.\"ClNo\"    = L.\"ClNo\"";
+		sql += "               AND LO.\"LandSeq\" = L.\"LandSeq\"";
 		sql += " LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = L.\"CityCode\"";
 		sql += " LEFT JOIN \"CdArea\" AREA ON AREA.\"CityCode\" = L.\"CityCode\"";
 		sql += "                          AND AREA.\"AreaCode\" = L.\"AreaCode\"";
@@ -504,7 +508,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F37繳款方式 ";
 		sql += "      , \"Fn_GetCdCode\"('BankDeductCd',\"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')) ";
 		sql += "                                       AS F38扣款銀行 ";
-		sql += "      , \"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')";
+		sql += "      , \"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'1')";
 		sql += "                                       AS F39扣款帳號 ";
 		sql += "      , FAC.\"PayIntFreq\" ";
 		sql += "        || CASE FAC.\"FreqBase\" ";
@@ -523,7 +527,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "        ELSE NULL ";
 		sql += "        END                            AS F42違約適用方式 ";
 		sql += "      , \"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0)           AS F43團體戶名 "; // 法人不出
-		sql += "      , FAC.\"PieceCode\" || ' ' || \"Fn_GetCdCode\"('PieceCode',FAC.\"PieceCode\") ";
+		sql += "      , FAC.\"PieceCode\" ";
 		sql += "　　　　　　　　　　　　　　             AS F44計件代碼 ";
 		sql += "      , \"Fn_GetEmpName\"(FAC.\"FireOfficer\",1) ";
 		sql += "                                       AS F45火險服務姓名 ";
