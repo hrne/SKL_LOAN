@@ -71,7 +71,7 @@ public class LM058Report extends MakeReport {
 		makeExcel.setSheet("108.04", dateRocYMD.substring(0, 3) + "." + dateRocYMD.substring(3, 5));
 
 		try {
-			fnAllList = lm058ServiceImpl.findAll(titaVo, thisYM);
+			fnAllList = lm058ServiceImpl.findAll(titaVo, yearMonth);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

@@ -137,6 +137,7 @@ public class L3002 extends TradeBuffer {
 		LoanBook tLoanBook = new LoanBook();
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
 			String department = "";
+			String usageCode = "";
 			CdCode tCdCode = new CdCode();
 			OccursList occursList = new OccursList();
 			// 查詢額度檔
@@ -176,12 +177,18 @@ public class L3002 extends TradeBuffer {
 			occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode());
 			occursList.putParam("OOLoanBal", tLoanBorMain.getLoanBal());
 			occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額 3/29User簡易審查紀錄表
+			tCdCode = new CdCode();
 			tCdCode = cdCodeService.findById(new CdCodeId("DepartmentCode", tFacMain.getDepartmentCode()), titaVo);
 			if (tCdCode != null) {
 				department = tCdCode.getItem();
 			}
-
 			occursList.putParam("OODepartment", department); // 企今別 3/29User簡易審查紀錄表
+			tCdCode = new CdCode();
+			tCdCode = cdCodeService.findById(new CdCodeId("UsageCode", tFacMain.getUsageCode()), titaVo);
+			if (tCdCode != null) {
+				usageCode = tCdCode.getItem();
+			}
+			occursList.putParam("OOUsageCodeX", usageCode); // 用途別 4/21 L3002輸出欄位增加[用途別] , 以利查詢結案之額度順序
 			// 查詢放款約定還本檔 若有撥款序號為0者 額度下所有正常戶顯示按鈕
 			tLoanBook = new LoanBook();
 			tLoanBook = loanBookService.bookBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),

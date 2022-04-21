@@ -1,0 +1,13 @@
+" A4
+   虛擬轉暫收
+
+   TLR:{{#TLRNO}} {{#EMPNM}} ^ DATE:{{#SYSDATEF}} TIME:{{#now!}}
+
+total:{{#batch-rows}}  selected:{{#batch-rows-selected}}  success:{{#batch-rows-ok}} failed:{{#batch-rows-error}}
+   
+     虛擬轉暫收 
+
+{{#batch-detail}}
+
+
+PREPARED BY：________   REVIEWED BY：________  AUTHORIZED BY：________

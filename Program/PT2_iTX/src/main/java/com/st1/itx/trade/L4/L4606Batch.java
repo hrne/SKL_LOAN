@@ -346,7 +346,7 @@ public class L4606Batch extends TradeBuffer {
 				HashMap<String, Integer> cntComm = new HashMap<>();
 
 				for (InsuComm tInsuComm : lInsuComm) {
-//					if ("Y".equals(tInsuComm.getMediaCode())) {
+					if ("Y".equals(tInsuComm.getMediaCode())) {
 						String empId = tInsuComm.getEmpId();
 
 						if (sumComm.containsKey(empId)) {
@@ -366,7 +366,7 @@ public class L4606Batch extends TradeBuffer {
 						} else {
 							cntComm.put(empId, 1);
 						}
-//					}
+					}
 				}
 
 //				2.if already output -> continue
@@ -375,42 +375,43 @@ public class L4606Batch extends TradeBuffer {
 				int seq = 0;
 
 				for (InsuComm tInsuComm : lInsuComm) {
+					if ("Y".equals(tInsuComm.getMediaCode())) {
+						if (!"".equals(tInsuComm.getFireOfficer())) {
+							OccursList occursList = new OccursList();
 
-					if (!"".equals(tInsuComm.getFireOfficer())) {
-						OccursList occursList = new OccursList();
+							this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
 
-						this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
+							String empId = tInsuComm.getEmpId();
 
-						String empId = tInsuComm.getEmpId();
+							if (flagComm.containsKey(empId)) {
+								continue;
+							} else {
+								flagComm.put(empId, 1);
+							}
+							seq = seq + 1;
 
-						if (flagComm.containsKey(empId)) {
-							continue;
-						} else {
-							flagComm.put(empId, 1);
+							if (seq % commitCnt == 0) {
+								this.batchTransaction.commit();
+							}
+
+							occursList.putParam("SalesId", FormatUtil.padX(empId, 10));
+							occursList.putParam("FireInsuMonth", iInsuEndMonth);
+							occursList.putParam("ColumnA", 0);
+							occursList.putParam("TotCommA", FormatUtil.pad9("" + sumComm.get(empId), 9));
+							occursList.putParam("TotCommB", FormatUtil.pad9("" + sumComm.get(empId), 9));
+							occursList.putParam("ColumnB", 0);
+							occursList.putParam("ColumnC", 0);
+							occursList.putParam("ColumnD", 0);
+							occursList.putParam("ColumnE", 0);
+							occursList.putParam("Count", FormatUtil.pad9("" + cntComm.get(empId), 5));
+							occursList.putParam("TotFee", FormatUtil.pad9("" + sumPrem.get(empId), 9));
+							occursList.putParam("TotCommC", FormatUtil.pad9("" + sumComm.get(empId), 9));
+							occursList.putParam("ColumnF", 0);
+							occursList.putParam("ColumnG", 0);
+							occursList.putParam("ColumnH", 0);
+
+							tmp.add(occursList);
 						}
-						seq = seq + 1;
-
-						if (seq % commitCnt == 0) {
-							this.batchTransaction.commit();
-						}
-
-						occursList.putParam("SalesId", FormatUtil.padX(empId, 10));
-						occursList.putParam("FireInsuMonth", iInsuEndMonth);
-						occursList.putParam("ColumnA", 0);
-						occursList.putParam("TotCommA", FormatUtil.pad9("" + sumComm.get(empId), 9));
-						occursList.putParam("TotCommB", FormatUtil.pad9("" + sumComm.get(empId), 9));
-						occursList.putParam("ColumnB", 0);
-						occursList.putParam("ColumnC", 0);
-						occursList.putParam("ColumnD", 0);
-						occursList.putParam("ColumnE", 0);
-						occursList.putParam("Count", FormatUtil.pad9("" + cntComm.get(empId), 5));
-						occursList.putParam("TotFee", FormatUtil.pad9("" + sumPrem.get(empId), 9));
-						occursList.putParam("TotCommC", FormatUtil.pad9("" + sumComm.get(empId), 9));
-						occursList.putParam("ColumnF", 0);
-						occursList.putParam("ColumnG", 0);
-						occursList.putParam("ColumnH", 0);
-
-						tmp.add(occursList);
 					}
 				}
 				// 把明細資料容器裝到檔案資料容器內

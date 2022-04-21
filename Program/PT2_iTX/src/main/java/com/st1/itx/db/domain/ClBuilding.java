@@ -68,31 +68,31 @@ public class ClBuilding implements Serializable {
   private String road;
 
   // 段
-  @Column(name = "`Section`", length = 5)
+  @Column(name = "`Section`", length = 10)
   private String section;
 
   // 巷
-  @Column(name = "`Alley`", length = 5)
+  @Column(name = "`Alley`", length = 10)
   private String alley;
 
   // 弄
-  @Column(name = "`Lane`", length = 5)
+  @Column(name = "`Lane`", length = 10)
   private String lane;
 
   // 號
-  @Column(name = "`Num`", length = 5)
+  @Column(name = "`Num`", length = 10)
   private String num;
 
   // 號之
-  @Column(name = "`NumDash`", length = 5)
+  @Column(name = "`NumDash`", length = 10)
   private String numDash;
 
   // 樓
-  @Column(name = "`Floor`", length = 5)
+  @Column(name = "`Floor`", length = 10)
   private String floor;
 
   // 樓之
-  @Column(name = "`FloorDash`", length = 5)
+  @Column(name = "`FloorDash`", length = 10)
   private String floorDash;
 
   // 建號

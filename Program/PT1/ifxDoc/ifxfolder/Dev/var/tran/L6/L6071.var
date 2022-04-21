@@ -1,0 +1,295 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6071)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,207)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6071]                                 行庫資料查詢"],
+["#FdBankCode+行庫代號",#BankCode,#BranchCode],
+["#FdBankItem+行庫名稱",#BankItem],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:新增行庫代號;enable:1;tabbable:0;title:L6701 行庫資料維護
+!#BUF1=X,42,S
+
+!---------- AP TEXT AREA Variables ----------
+
+#FdBankCode=X,2,L
+#FdBankItem=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,107,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6701; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,查詢)
+C(3,#CHAIN,1,S,K(MODIFYBUTTON,1,新增行庫))
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+!行庫代號
+#BankCode=X,3,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,3),$)
+C(3,#CHAIN,1,s,$)
+@C(4,#BankCode,s,V(9))
+
+!分行代號
+#BranchCode=X,4,I
+C(3,#CHAIN,1,T(1,#NTXBUF,4,4),$)
+C(3,#CHAIN,1,s,$)
+@C(4,#BranchCode,s,V(9))
+
+!行庫名稱
+#BankItem=x,50,I
+C(3,#CHAIN,1,T(1,#NTXBUF,8,50),$)
+C(3,#CHAIN,1,s,$)
+!C(4,#BankCode,$,S)
+!@V(7)
+
+!<include src="COM.icf::RPTFG.dec"/>
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+!2022/4/21修改為不自動送出
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0))
+! C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6071 ----------
+<sub type="FORM" name="L6071">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6071,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6071] 行庫資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 行庫代號(TOTA)
+#OOBankCode=X,3,L
+
+! 分行代號(TOTA)
+#OOBranchCode=X,4,L
+
+#OOBankCodeA=X,3,S
+T(2,#OOBankCode)
+
+#OOBankCodeB=X,4,S
+T(2,#OOBranchCode)
+
+
+#OOEBankCodeA=A,3,S
+E(0,#OOBankCode)
+
+#OOEBankCodeB=A,4,S
+E(0,#OOBranchCode)
+
+#OOTBankCode=X,7,S
+C(4,#OOBranchCode,T(2,#OOEBankCodeA+#OOBankCodeB),T(2,#OOEBankCodeA+#OOEBankCodeB))
+
+
+! 行庫名稱(TOTA)
+#OOBankItem=x,50,L
+
+! 分行名稱(TOTA)
+#OOBranchItem=x,50,L
+
+#OOItem=x,40,S
+T(B,#OOBankItem+#OOBranchItem)
+
+#OOCHAIN=A,1,S
+T(4,CHAIN$)
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+#OOBUF2=X,108,S
+T(2,#OOFunc2+#OOBankCode+#OOBranchCode+#OOBankItem+#OOBranchItem)
+
+! 連結時隱藏按鈕
+#OOBTN2=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6701;text=修改;ntxbuf=#OOBUF2})
+IF(#OOCHAIN==1,BIND(grid,cancel),$)
+
+
+! 刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=X,208,S
+T(2,#OOFunc4+#OOBankCode+#OOBranchCode+#OOBankItem+#OOBranchItem)
+
+! 連結時隱藏按鈕
+#OOBTN4=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6701;text=刪除;ntxbuf=#OOBUF4})
+IF(#OOCHAIN==1,BIND(grid,cancel),$)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#BankCode
+#BranchCode
+#BankItem
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L6071
+#OOBankCode
+#OOBranchCode
+#OOBankItem
+#OOBranchItem
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6071" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6071]                                 行庫資料查詢                                             "],
+[""],
+]
+</sub>
+
+
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L6071
+#any={detail:true, header:'L6071.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+#OOBankCode=行庫代號
+{width:70,align:'center'}
+
+#OOBranchCode=分行代號
+{width:70,align:'center'}
+
+#OOBankItem=行庫名稱
+{width:200,align:'left'}
+
+#OOBranchItem=分行名稱
+{width:230,align:'left'}
+
+#OOItem=
+{width:1,hidden:true}
+
+#OOBankCodeA=
+{width:1,hidden:true}
+
+#OOBankCodeB=
+{width:1,hidden:true}
+
+#OOTBankCode=
+{width:1,hidden:true}
+
+^
+
+#RPTFG2=2,QUERY.GRID,L6071
+#any={detail:true, header:'L6071.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBankCode=行庫代號
+{width:70,align:'center'}
+
+#OOBranchCode=分行代號
+{width:70,align:'center'}
+
+#OOBankItem=行庫名稱
+{width:200,align:'left'}
+
+#OOBranchItem=分行名稱
+{width:230,align:'left'}
+
+#OOItem=
+{width:1,hidden:true}
+
+#OOBankCodeA=
+{width:1,hidden:true}
+
+#OOBankCodeB=
+{width:1,hidden:true}
+
+#OOTBankCode=
+{width:1,hidden:true}
+
+^
+</sub>

@@ -32,7 +32,7 @@ public interface CdBaseRateRepository extends JpaRepository<CdBaseRate, CdBaseRa
   public Optional<CdBaseRate> findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateAsc(String currencyCode_0, String baseRateCode_1, int effectDate_2, int effectDate_3);
 
   // CurrencyCode = ,AND BaseRateCode >= ,AND BaseRateCode <= ,AND EffectDate >= ,AND EffectDate <=
-  public Slice<CdBaseRate> findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateAsc(String currencyCode_0, String baseRateCode_1, String baseRateCode_2, int effectDate_3, int effectDate_4, Pageable pageable);
+  public Slice<CdBaseRate> findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(String currencyCode_0, String baseRateCode_1, String baseRateCode_2, int effectDate_3, int effectDate_4, Pageable pageable);
 
   // CurrencyCode = ,AND BaseRateCode = ,AND EffectFlag = ,AND EffectDate >=
   public Slice<CdBaseRate> findAllByCurrencyCodeIsAndBaseRateCodeIsAndEffectFlagIsAndEffectDateGreaterThanEqualOrderByEffectDateAsc(String currencyCode_0, String baseRateCode_1, int effectFlag_2, int effectDate_3, Pageable pageable);

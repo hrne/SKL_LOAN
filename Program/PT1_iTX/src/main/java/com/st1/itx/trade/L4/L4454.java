@@ -18,10 +18,14 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankDeductDtl;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.service.BankDeductDtlService;
+import com.st1.itx.db.service.CdReportService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.springjpa.cm.L4454ServiceImpl;
 import com.st1.itx.trade.L9.L9705Form;
@@ -69,9 +73,15 @@ public class L4454 extends TradeBuffer {
 
 	@Autowired
 	public CustNoticeCom custNoticeCom;
+	
+	@Autowired
+	CdReportService sCdReportService;
 
 	@Autowired
 	public BankDeductDtlService bankDeductDtlService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	@Autowired
 	public L4454ServiceImpl l4454ServiceImpl;
@@ -313,23 +323,60 @@ public class L4454 extends TradeBuffer {
 	private void unSuccText(String repayBank, Map<String, String> t, int insuM, TitaVo titaVo) throws LogicException {
 		boolean isSend = false;
 		TempVo tempVo = new TempVo();
-		tempVo = custNoticeCom.getCustNotice("L4454", custNo, facmNo, titaVo);
+		
+		functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+		
+		String phoneNo;
+		String emailAd;
+		
+		if (functionCode == 1) // 個別
+		{
+			CustMain tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+			CdReport tCdReport = sCdReportService.findById("L4454", titaVo);
+			
+			if (tCustMain == null)
+				throw new LogicException("E0001", "客戶主檔");
 
-		String phoneNo = tempVo.getParam("MessagePhoneNo");
-		String emailAd = tempVo.getParam("EmailAddress");
+			if (tCdReport == null)
+				throw new LogicException("E0001", "報表代碼檔");
+			
+			phoneNo = custNoticeCom.getPhone(tCustMain, titaVo);
+			emailAd = tCustMain.getEmail();
+			
+			int messagePriority = tCdReport.getMessage();
+			int emailPriority = tCdReport.getEmail();
+			// 數字愈小愈優先，而簡訊優先於email（參照批次部分的註釋，那是前人留下的）
+			
+			if (messagePriority <= emailPriority && phoneNo != null && !phoneNo.trim().isEmpty())
+			{
+				sendText(repayBank, t, phoneNo, insuM, titaVo);
+				isSend = true;
+			} else if (emailAd != null && !emailAd.trim().isEmpty())
+			{
+				sendEmail(repayBank, t, emailAd, insuM, titaVo);
+				isSend = true;
+			}
+			
+			
+		} else { // 批次
+			tempVo = custNoticeCom.getCustNotice("L4454", custNo, facmNo, titaVo);
+			phoneNo = tempVo.getParam("MessagePhoneNo");
+			emailAd = tempVo.getParam("EmailAddress");
+			
+//			寄送簡訊/電郵，若第一順位為書信，則找第二順位
+//			若為皆1則傳簡訊
+//			若為皆0則傳簡訊
 
-//		寄送簡訊/電郵，若第一順位為書信，則找第二順位
-//		若為皆1則傳簡訊
-//		若為皆0則傳簡訊
-
-		if ("Y".equals(tempVo.getParam("isMessage"))) {
-			sendText(repayBank, t, phoneNo, insuM, titaVo);
-			isSend = true;
+			if ("Y".equals(tempVo.getParam("isMessage"))) {
+				sendText(repayBank, t, phoneNo, insuM, titaVo);
+				isSend = true;
+			}
+			if ("Y".equals(tempVo.getParam("isEmail"))) {
+				sendEmail(repayBank, t, emailAd, insuM, titaVo);
+				isSend = true;
+			}
 		}
-		if ("Y".equals(tempVo.getParam("isEmail"))) {
-			sendEmail(repayBank, t, emailAd, insuM, titaVo);
-			isSend = true;
-		}
+		
 		if (!isSend) {
 			cntUnsend++;
 		}

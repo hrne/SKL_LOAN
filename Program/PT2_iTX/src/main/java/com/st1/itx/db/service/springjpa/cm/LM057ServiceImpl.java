@@ -73,6 +73,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  ,C.\"CustName\"";
 		sql += "       	  ,M.\"LoanBalance\"";
 		sql += "       	  ,L.\"PrevPayIntDate\"";
+		sql += "       	  ,M.\"StoreRate\"";
 		sql += "       	  ,( CASE";
 		sql += "       	       WHEN M.\"AcctCode\" = 990 AND M.\"LoanBalance\" = 1 THEN 'B3'";
 		sql += "       	       WHEN M2.\"CustNo\" = M.\"CustNo\" AND M2.\"FacmNo\" = M.\"FacmNo\" AND M2.\"BormNo\" = M.\"BormNo\" THEN 'B3'";

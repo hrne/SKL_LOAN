@@ -116,7 +116,9 @@ public class L4930 extends TradeBuffer {
 				occursList.putParam("OODetailSeq", tBatxDetail.getDetailSeq());
 				occursList.putParam("OOCustNo", tBatxDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tBatxDetail.getFacmNo());
+				occursList.putParam("OORepayCode", tBatxDetail.getRepayCode());
 				occursList.putParam("OORepayType", tBatxDetail.getRepayType());
+				occursList.putParam("OOReconCode", tBatxDetail.getReconCode());
 				occursList.putParam("OORepayAmt", tBatxDetail.getRepayAmt());
 				occursList.putParam("OOAcctAmt", tBatxDetail.getAcctAmt());
 				occursList.putParam("OODisAcctAmt", tBatxDetail.getRepayAmt().subtract(tBatxDetail.getAcctAmt()));

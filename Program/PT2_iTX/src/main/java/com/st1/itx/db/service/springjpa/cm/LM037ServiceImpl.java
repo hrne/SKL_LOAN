@@ -38,7 +38,7 @@ public class LM037ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
 
-		int entdy = yearMonth / 100;
+		int entdy = yearMonth;
 
 		this.info("lM037.findAll ");
 		String sql = "SELECT DECODE(M.\"EntCode\", '1', '1', '0')          F1";

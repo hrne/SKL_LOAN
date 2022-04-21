@@ -53,7 +53,6 @@ BEGIN
            ELSE 0 END                     AS "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
           ,S2."ATHCOD"                    AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
           ,S2."ACHCOD"                    AS "AuthMeth"            -- 授權方式 VARCHAR2 1 
-          ,S2."ACHLAMT"                   AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
           ,S2."ACHCDE"                    AS "MediaCode"           -- 媒體碼 VARCHAR2 1 
           ,''                             AS "BatchNo"             -- 批號 VARCHAR2 6 
           ,CASE WHEN S2."ACHCDT" > 0 THEN TRUNC(S2."ACHCDT" / 1000000)
@@ -82,6 +81,7 @@ BEGIN
            END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S2."ACHCDT" > 0 THEN MOD(S2."ACHCDT" , 1000000)
            ELSE 0 END                     AS "ProcessTime"
+          ,S2."ACHLAMT"                   AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
     FROM (SELECT "AH$ACRP"."CUSCDT"
                 ,"AH$ACRP"."LMSACN"
                 ,"AH$ACRP"."LMSPBK"
@@ -140,7 +140,6 @@ BEGIN
            ELSE 0 END                     AS "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
           ,NVL(S1."ATHCOD",' ')           AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
           ,S1."ACHCOD"                    AS "AuthMeth"            -- 授權方式 VARCHAR2 1 
-          ,S1."ACHLAMT"                   AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
           ,''                             AS "MediaCode"           -- 媒體碼 VARCHAR2 1 
           ,''                             AS "BatchNo"             -- 批號 VARCHAR2 6 
           ,CASE
@@ -171,6 +170,7 @@ BEGIN
            END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)
            ELSE 0 END                     AS "ProcessTime"
+          ,S1."ACHLAMT"                   AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
     FROM "AH$ACHP" S1
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."CRTEMP"
     LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = S1."CHGEMP"
@@ -202,9 +202,8 @@ BEGIN
           ,BAA."FacmNo"                   AS "FacmNo"              -- 額度號碼 DECIMAL 3 
           ,0                              AS "ProcessDate"         -- 處理日期 Decimald 8   
           ,0                              AS "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
-          ,'A'                            AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
+          ,' '                            AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
           ,'A'                            AS "AuthMeth"            -- 授權方式 VARCHAR2 1 
-          ,BAA."LimitAmt"                 AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
           ,''                             AS "MediaCode"           -- 媒體碼 VARCHAR2 1 
           ,''                             AS "BatchNo"             -- 批號 VARCHAR2 6 
           ,0                              AS "PropDate"            -- 提出日期 Decimald 8 
@@ -222,6 +221,7 @@ BEGIN
           ,BAA."LastUpdateEmpNo"          AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
           ,BAA."LastUpdate"               AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,0                              AS "ProcessTime"
+          ,BAA."LimitAmt"                 AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
     FROM "BankAuthAct" BAA
     LEFT JOIN (
       SELECT DISTINCT
@@ -241,8 +241,14 @@ BEGIN
     ) FACM ON FACM."LMSACN" = S1."LMSACN"
           AND FACM."LMSPCN" = S1."LMSPCN"
           AND FACM."SEQ" = 1
+    LEFT JOIN "AchAuthLog" AAL ON AAL."AuthCreateDate" = "TbsDyF"
+                              AND AAL."CustNo" = BAA."CustNo"
+                              AND AAL."RepayBank" = BAA."RepayBank"
+                              AND AAL."RepayAcct" = BAA."RepayAcct"
+                              AND AAL."CreateFlag" = 'A'
     WHERE BAA."Status" = ' ' -- 空白:未授權
       AND BAA."RepayBank" != '700' -- 非郵局
+      AND NVL(AAL."CustNo",0) = 0 -- 不存在的才寫入
     ;
 
     -- 記錄寫入筆數

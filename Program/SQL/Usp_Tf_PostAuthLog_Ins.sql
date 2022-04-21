@@ -112,7 +112,10 @@ BEGIN
           ,BAA."CustNo"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,BAA."PostDepCode"              AS "PostDepCode"         -- 帳戶別 VARCHAR2 1 0
           ,BAA."RepayAcct"                AS "RepayAcct"           -- 儲金帳號 VARCHAR2 14 0
-          ,BAA."AuthType"                 AS "AuthCode"            -- 授權方式 VARCHAR2 1 0
+          ,CASE
+             WHEN BAA."AuthType" = '01'
+             THEN '1'
+           ELSE '2' END                   AS "AuthCode"            -- 授權方式 VARCHAR2 1 0
           ,BAA."FacmNo"                   AS "FacmNo"              -- 額度 DECIMAL 3 0
           ,CM."CustId"                    AS "CustId"              -- 統一編號 VARCHAR2 10 0
           ,''                             AS "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0
@@ -160,8 +163,18 @@ BEGIN
     ) FACM ON FACM."LMSACN" = S1."LMSACN"
           AND FACM."LMSPCN" = S1."LMSPCN"
           AND FACM."SEQ" = 1
+    LEFT JOIN "PostAuthLog" PAL ON PAL."AuthCreateDate" = "TbsDyF"
+                               AND PAL."AuthApplCode" = '1'
+                               AND PAL."CustNo" = BAA."CustNo"
+                               AND PAL."PostDepCode" = BAA."PostDepCode"
+                               AND PAL."RepayAcct" = BAA."RepayAcct"
+                               AND PAL."AuthCode" = CASE
+                                                      WHEN BAA."AuthType" = '01'
+                                                      THEN '1'
+                                                    ELSE '2' END
     WHERE BAA."Status" = ' ' -- 空白:未授權
       AND BAA."RepayBank" = '700' -- 郵局
+      AND NVL(PAL."CustNo",0) = 0 -- 不存在的才寫入
     ;
 
     -- 記錄寫入筆數

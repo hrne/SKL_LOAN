@@ -120,27 +120,42 @@ T(2,@AuthStatusHelp,#HelpDesc6)
 T(2,@AmlRspHelp,#HelpDesc7)
 
 
-#NTXBUF=X,500,S
+#NTXBUF=X,45,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FuncCode,#NTXBUF,1,1)
-T(1,@CustNo,#NTXBUF,2,7)
-T(1,@FacmNo,#NTXBUF,9,3)
-T(1,@RepayBank,#NTXBUF,12,3)
-T(1,@RepayAcct,#NTXBUF,15,14)
-T(1,@LimitAmt,#NTXBUF,29,14)
-T(1,@CreateFlag,#NTXBUF,43,1)
-T(1,@CreateFlagTemp,#NTXBUF,43,1)
-T(1,@AuthStatus,#NTXBUF,44,1)
-T(1,@MediaCode,#NTXBUF,45,1)
-T(1,@AmlRsp,#NTXBUF,46,1)
-T(1,@StampFinishDate,#NTXBUF,54,7)
-C(3,#FuncCode,1,$,T(1,@AuthCreateDate,#NTXBUF,47,7))
-T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
+T(1,@AuthCreateDate,#NTXBUF,2,7)
+T(1,@CustNo,#NTXBUF,9,7)
+T(1,@RepayBank,#NTXBUF,16,3)
+T(1,@RepayAcct,#NTXBUF,19,14)
+T(1,@CreateFlag,#NTXBUF,33,1)
+T(1,@CreateFlagTemp,#NTXBUF,33,1)
 T(H,@RepayBankX,#RepayBank,#BankCdHelp)
+T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
 INVOKEJS(SHOW,p1,02,02,1)
-T(1,@CDT,#NTXBUF,61,7)
-T(1,@SysTime,#NTXBUF,68,6)
-T(1,@AuthType,#NTXBUF,74,1)
+
+#RimRepayAcct=A,14,S
+#RimRepayBank=A,3,S
+
+! L4R31 調AchAuthLog資料
+#SendL4R31=X,1,S
+C(3,#FuncCode,1,s,$)
+E(0,@RimAuthCreateDate,#AuthCreateDate)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimRepayBank,#RepayBank)
+T(2,@RimRepayAcct,#RepayAcct)
+T(2,@RimCreateFlag,#CreateFlag)
+RESET_RIM(#SendL4R31,L4R31)
+S(L4R31,1,#RimAuthCreateDate,#RimCustNo,#RimRepayBank,#RimRepayAcct,#RimCreateFlag)
+R(1,L4R31)
+E(0,@FacmNo,#L4R31FacmNo)
+E(0,@LimitAmt,#L4R31LimitAmt)
+T(2,@AuthStatus,#L4R31AuthStatus)
+T(2,@MediaCode,#L4R31MediaCode)
+T(2,@AmlRsp,#L4R31AmlRsp)
+T(2,@StampFinishDate,#L4R31StampFinishDate)
+T(2,@AuthType,#L4R31AuthType)
+T(2,@CalDate,#L4R31CalDate)
+T(2,@CalTime,#L4R31CalTime)
 
 
 ! 作業項目
@@ -168,30 +183,9 @@ T(2,@FdRelationCode,#ShowFd)
 ! IF(#FuncCode==4 || #FuncCode==5,s,$)
 ! INVOKEJS(SHOW,L4410,8,9,0)
 
-#CALDATE=D,8,S
-T(4,CDATE$)
-
-#CDT=D,7,S
-IF(#FuncCode==4 || #FuncCode==5,$,T(1,#CALDATE,2,7))
-
-
-#SysTime=X,6,S
-IF(#FuncCode==4 || #FuncCode==5,$,T(4,TIME$))
-
 #CalDate=D,7,L
-E(0,#CDT)
-
-#HH=X,2,S
-T(1,#SysTime,1,2)
-#MM=X,2,S
-T(1,#SysTime,3,2)
-#SS=X,2,S
-T(1,#SysTime,5,2)
 
 #CalTime=X,8,L
-C(3,#HH,0,C(4,#MM,s,$),$)
-T(2,#HH+:+#MM+:+#SS)
-
 
 #AuthStatusX=X,24,L
 !C(4,#AuthStatus,T(H,#AuthStatus,#AuthStatusHelp),$)
@@ -456,7 +450,7 @@ IF(#CreateFlagTemp==#CreateFlag,V(P,請變更狀態),$)
 
 ! 若已授權，下方欄位不可修改
 ! 每筆扣款限額
-#LimitAmt=m,14,I
+#LimitAmt=m,8,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
 IF(#AcctCheckFlag==0 || #AcctCheckFlag==8,$,s)
 
@@ -482,6 +476,7 @@ T(H,#RelationCode,#RelationCodeHelp)
 <include src="ROM.icf::L4R22.dec"/>
 <include src="ROM.icf::L4R23.dec"/>
 <include src="ROM.icf::L4R24.dec"/>
+<include src="ROM.icf::L4R31.dec"/>
 
 #SetValue3=A,1,S
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -590,11 +585,13 @@ C(4,#RelAcctGender,T(2,),T(H,#RelAcctGender,#SexHelp))
 #AuthStatus=X,1,S
 
 #MediaCode=X,1,S
-
+ 
 #AmlRsp=X,1,S
 
 #StampFinishDate=D,7,L
 
+#SysTime=X,6,S
+IF(#FuncCode==4 || #FuncCode==5,$,T(4,TIME$))
 
 </sub>
 
@@ -640,7 +637,7 @@ TXFORM=L4410
 <include src="ROM.icf::L4R22.tom"/>
 <include src="ROM.icf::L4R23.tom"/>
 <include src="ROM.icf::L4R24.tom"/>
-
+<include src="ROM.icf::L4R31.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

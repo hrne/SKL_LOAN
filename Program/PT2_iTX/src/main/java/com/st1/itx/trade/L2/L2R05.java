@@ -233,6 +233,10 @@ public class L2R05 extends TradeBuffer {
 					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
 		if (iTxCode.equals("L3100") || iTxCode.equals("L3110")) {
+
+			if (!tFacMain.getL9110Flag().equals("Y")) {
+				throw new LogicException(titaVo, "E3083", "額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 撥款審核資料表尚未列印，請先作L9110交易
+			}
 			if (iFKey != 7) {
 				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) <= 0) {
 					// TODO:檢查此額度是否為借新還舊

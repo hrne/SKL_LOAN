@@ -87,36 +87,39 @@ public class L2073 extends TradeBuffer {
 		// new table
 		CustMain tCustMain = new CustMain();
 		// new ArrayList
-		List<CustDataCtrl> lCustDateCtrl = new ArrayList<CustDataCtrl>();
-		Slice<CustDataCtrl> slCustDateCtrl = null;
+		List<CustDataCtrl> lCustDataCtrl = new ArrayList<CustDataCtrl>();
+		Slice<CustDataCtrl> slCustDataCtrl = null;
 		// 統編有輸入
 		if (!iCustId.isEmpty()) {
 			tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+
+			if (tCustMain == null) {
+				throw new LogicException(titaVo, "E0001", "L2073" + "指定統編不存在於客戶主檔。");
+			}
+
 			iCustNo = tCustMain.getCustNo();
-			slCustDateCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
-			lCustDateCtrl = slCustDateCtrl == null ? null : slCustDateCtrl.getContent();
-			// 統編沒輸入
-		} else if (iCustNo > 0) {
-			slCustDateCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
-
-			lCustDateCtrl = slCustDateCtrl == null ? null : slCustDateCtrl.getContent();
-		} else {
-			slCustDateCtrl = sCustDataCtrlService.findAll(this.index, this.limit, titaVo);
-
-			lCustDateCtrl = slCustDateCtrl == null ? null : slCustDateCtrl.getContent();
 		}
+
+		if (iCustNo > 0) {
+			slCustDataCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
+		} else {
+			slCustDataCtrl = sCustDataCtrlService.findAll(this.index, this.limit, titaVo);
+		}
+
+		lCustDataCtrl = slCustDataCtrl == null ? null : slCustDataCtrl.getContent();
+
 		// 查無資料 拋錯
-		if (lCustDateCtrl == null) {
+		if (lCustDataCtrl == null) {
 			throw new LogicException(titaVo, "E2003", "L2073" + "不存在於結清戶個資控管檔。");
 		}
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slCustDateCtrl != null && slCustDateCtrl.hasNext()) {
+		if (slCustDataCtrl != null && slCustDataCtrl.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
 
-		for (CustDataCtrl tCustDataCtrl : lCustDateCtrl) {
+		for (CustDataCtrl tCustDataCtrl : lCustDataCtrl) {
 			
 			String lastUpdate = "";
 

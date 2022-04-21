@@ -37,6 +37,10 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
+/**
+ * Tita<br>
+ */
+
 @Service("L2631")
 @Scope("prototype")
 /**
@@ -259,7 +263,7 @@ public class L2631 extends TradeBuffer {
 			BeforeFacClose.setReceiveFg(1);
 			// 自動取公文編號
 			this.txBuffer.getTxCom();
-			wkDocNo = gGSeqCom.getSeqNo(110, 0, "L2", "2631", 9999, titaVo);
+			wkDocNo = gGSeqCom.getSeqNo(titaVo.getEntDyI()/10000, 1, "L2", "2631", 9999, titaVo);
 			String finalDocNo = StringUtils.leftPad(String.valueOf(wkDocNo), 4, "0");
 
 			this.info("BeforeFacClose = " + BeforeFacClose);

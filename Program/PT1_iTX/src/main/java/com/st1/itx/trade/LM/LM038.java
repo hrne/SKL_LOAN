@@ -38,6 +38,7 @@ public class LM038 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM038 ");
+		
 		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日(西元)
 		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
