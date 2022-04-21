@@ -54,7 +54,27 @@ public class LM042p extends TradeBuffer {
 		this.info("active LM042p");
 		this.totaVo.init(titaVo);
 
-		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
+		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底日(西元)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+		// 年
+		int iYear = mfbsdy / 10000;
+		// 月
+		int iMonth = (mfbsdy / 100) % 100;
+		// 當年月
+		int thisYM = 0;
+
+		// 判斷帳務日與月底日是否同一天 
+		if (tbsdy < mfbsdy) {
+			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+		}
+
+		thisYM = iYear * 100 + iMonth;
+
+		
+		
+		int yearMonth = thisYM;
 
 		int tYMD = ymd(yearMonth, 0);//本月底日
 		int lYMD = ymd(yearMonth, -1);//上月底日
@@ -72,6 +92,7 @@ public class LM042p extends TradeBuffer {
 
 		this.info("ntxbuf = " + ntxbuf);
 
+		
 		boolean isFinish = LM042Report.exec(titaVo, lYMD, tYMD);
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,

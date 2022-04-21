@@ -37,33 +37,32 @@ public class LM058Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param nowDate          今天日期(民國)
-	 * @param thisMonthEndDate 當月底日期(民國)
-	 * 
+	 * @param yearMonth 西元年月
+	 * @param yearMonthEnd 月底日
 	 */
-	public void exec(TitaVo titaVo, int nowDate, int thisMonthEndDate) throws LogicException {
+	public void exec(TitaVo titaVo, int yearMonth ,int yearMonthEnd) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM058Report exec");
 
 		// 民國年
-		int iYear = nowDate / 10000;
+		int iYear = yearMonth / 100;
 		// 月
-		int iMonth = (nowDate / 100) % 100;
+		int iMonth = yearMonth % 100;
 
 		// 當民國年月
 		int thisYM = 0;
 
-		// 判斷帳務日與月底日是否同一天
-		if (nowDate < thisMonthEndDate) {
-			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
-			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
-		}
+//		// 判斷帳務日與月底日是否同一天
+//		if (nowDate < thisMonthEndDate) {
+//			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+//			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+//		}
 
 		// 11103
 		thisYM = (iYear + 1911) * 100 + iMonth;
 		// 1110331
-		String dateRocYMD = String.valueOf(thisMonthEndDate);
+		String dateRocYMD = String.valueOf(yearMonthEnd);
 		this.info("thisYM=" + thisYM);
 		this.info("dateRocYMD=" + dateRocYMD);
 

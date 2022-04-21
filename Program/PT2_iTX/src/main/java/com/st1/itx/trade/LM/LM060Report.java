@@ -48,8 +48,14 @@ public class LM060Report extends MakeReport {
 		this.setMaxRows(60);
 
 	}
-
-	public void exec(TitaVo titaVo, TxCom txcom) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param txcom
+	 * @param yearMonthEnd 月底日
+	 */
+	public void exec(TitaVo titaVo, TxCom txcom, int yearMonth) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM060Report exec txcom " + txcom);
@@ -57,9 +63,9 @@ public class LM060Report extends MakeReport {
 		// 年月日
 //		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iYear = yearMonth / 100;
 		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+		int iMonth = yearMonth % 100;
 
 		// 格式
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -91,7 +97,7 @@ public class LM060Report extends MakeReport {
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM060", "暫付款金額調節表_內部控管", "密", "A4", "P");
 
 		try {
-			fnAllList = lm060ServiceImpl.findAll(titaVo);
+			fnAllList = lm060ServiceImpl.findAll(titaVo,yearMonth);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

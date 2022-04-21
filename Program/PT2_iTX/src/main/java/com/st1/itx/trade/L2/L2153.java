@@ -47,138 +47,7 @@ import com.st1.itx.util.parse.Parse;
  * c.資料拷貝碼:若此案件為團體戶則出現此欄位
  * 'Y’:將此次核准之資料保留下來,作為下 次同一團體戶之案件核准時的初值資料
  */
-/*
- * Tita
- * CustId=X,10
- * ApplNo=9,7
- * CustNo=9,7
- * FacmNo=9,3
- * ProdNo=X,5
- * BaseRateCode=9,2
- * RateIncr=+9,2.4
- * ApproveRate=9,2.4
- * RateCode=9,1
- * FirstRateAdjFreq=9,2
- * RateAdjFreq=9,2
- * CurrencyCode=X,3
- * TimApplAmt=9,14.2
- * AcctCode=9,3
- * ApproveDate=9,7
- * LoanTermYy=9,2
- * LoanTermMm=9,2
- * LoanTermDd=9,3
- * AmortizedCode=9,1
- * FreqBase=9,1
- * PayIntFreq=9,2
- * RepayFreq=9,2
- * UtilDeadline=9,7
- * TimDuePayAmt=9,14.2
- * TimDuePayLimit=9,14.2
- * TimPayIntLimit=9,14.2
- * GracePeriod=9,3
- * TimAcctFee=9,14.2
- * ExtraRepayCode=9,1
- * CustTypeCode=X,1
- * RuleCode=X,2
- * RecycleCode=9,1
- * RecycleDeadline=9,7
- * UsageCode=9,1
- * DepartmentCode=9,1
- * IncomeTaxFlag=9,1
- * CompensateFlag=9,1
- * IrrevocableFlag=9,1
- * RateAdjNoticeCode=9,1
- * RepayCode=9,2
- * RepayBank=9,3
- * RepayAcctNo=9,14
- * PostCode=X,1
- * Introducer=X,6
- * District=X,6
- * FireOfficer=X,6
- * Estimate=X,6
- * CreditOfficer=X,6
- * LoanOfficer=X,6
- * BusinessOfficer=X,6
- * Supervisor=X,6
- * Coorgnizer=X,6
- * AdvanceCloseCode=9,1
- * BreachCode=9,3
- * BreachGetCode=9,1
- * DecreaseFlag=X,1
- * GroupId=X,10
- * CopyCode=X,1
- * CreditScore=9,3
- * GuaranteeDate=9,7
- * ContractNo=X,10
- * RelationCode=X,2
- * RelationName=X,100
- * RelationId=X,10
- * RelationBirthday=9,7
- * RelationGender=X,1
- * AchAuthCode=X,1
- * AchBank=9,4
- * AchAuthNo=X,6
- * BreachaYyA1=9,1
- * BreachaYyB1=9,1
- * BreachaPercent1=9,1.2
- * BreachaYyA2=9,1
- * BreachaYyB2=9,1
- * BreachaPercent2=9,1.2
- * BreachaYyA3=9,1
- * BreachaYyB3=9,1
- * BreachaPercent3=9,1.2
- * BreachaYyA4=9,1
- * BreachaYyB4=9,1
- * BreachaPercent4=9,1.2
- * BreachaYyA5=9,1
- * BreachaYyB5=9,1
- * BreachaPercent5=9,1.2
- * BreachaYyA6=9,1
- * BreachaYyB6=9,1
- * BreachaPercent6=9,1.2
- * BreachaYyA7=9,1
- * BreachaYyB7=9,1
- * BreachaPercent7=9,1.2
- * BreachaYyA8=9,1
- * BreachaYyB8=9,1
- * BreachaPercent8=9,1.2
- * BreachaYyA9=9,1
- * BreachaYyB9=9,1
- * BreachaPercent9=9,1.2
- * BreachaYyA10=9,1
- * BreachaYyB10=9,1
- * BreachaPercent10=9,1.2
- * BreachbMmA1=9,2
- * BreachbMmB1=9,2
- * BreachbPercent1=9,1.2
- * BreachbMmA2=9,2
- * BreachbMmB2=9,2
- * BreachbPercent2=9,1.2
- * BreachbMmA3=9,2
- * BreachbMmB3=9,2
- * BreachbPercent3=9,1.2
- * BreachbMmA4=9,2
- * BreachbMmB4=9,2
- * BreachbPercent4=9,1.2
- * BreachbMmA5=9,2
- * BreachbMmB5=9,2
- * BreachbPercent5=9,1.2
- * BreachbMmA6=9,2
- * BreachbMmB6=9,2
- * BreachbPercent6=9,1.2
- * BreachbMmA7=9,2
- * BreachbMmB7=9,2
- * BreachbPercent7=9,1.2
- * BreachbMmA8=9,2
- * BreachbMmB8=9,2
- * BreachbPercent8=9,1.2
- * BreachbMmA9=9,2
- * BreachbMmB9=9,2
- * BreachbPercent9=9,1.2
- * BreachbMmA10=9,2
- * BreachbMmB10=9,2
- * BreachbPercent10=9,1.2
- */
+
 /**
  * L2153 核准額度登錄
  * 
@@ -310,7 +179,7 @@ public class L2153 extends TradeBuffer {
 			// 取得客戶編號及額度編號
 			GetCustNoAndFacmNoRoutine();
 			EntryNormalRoutine();
-			//檢查案件隸屬單位為1 企金時 檢查商品是否為企金可使用JAVA VAR檢查
+			// 檢查案件隸屬單位為1 企金時 檢查商品是否為企金可使用JAVA VAR檢查
 			if ("1".equals(titaVo.get("DepartmentCode")) && !("Y".equals(tFacProd.getEnterpriseFg()))) {
 				throw new LogicException(titaVo, "E0006", "商品參數不正確"); // 鎖定資料時，發生錯誤
 			}
@@ -573,7 +442,17 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setApplNo(this.parse.stringToInteger(titaVo.getParam("ApplNo")));
 		tFacMain.setCreditSysNo(this.parse.stringToInteger(titaVo.getParam("CreditSysNo")));
 		tFacMain.setProdNo(titaVo.getParam("ProdNo"));
-		tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
+//		E-LOAN處理 
+		if (isEloan) {
+//			指標利率代碼為NULL時放99自訂利率
+			if (titaVo.getParam("BaseRateCode") == null) {
+				tFacMain.setBaseRateCode("99");
+			} else {
+				tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
+			}
+		} else {
+			tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
+		}
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(new BigDecimal("0"));
 		tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
@@ -598,7 +477,7 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setPayIntFreq(this.parse.stringToInteger(titaVo.getParam("PayIntFreq")));
 		tFacMain.setRepayFreq(this.parse.stringToInteger(titaVo.getParam("RepayFreq")));
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(titaVo.getParam("UtilDeadline")));
- // 預設0正常,該欄位需進維護交易L2154維護
+
 		tFacMain.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
 		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
@@ -628,6 +507,7 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(titaVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(titaVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(titaVo.getParam("Coorgnizer"));
+
 		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
 		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
@@ -662,14 +542,7 @@ public class L2153 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
 		}
-//		if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
-//			tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
-//			try {
-//				custMainService.update(tCustMain, titaVo);
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
-//			}
-//		}
+
 		// 額度交易訂正交易須由最後一筆交易開始訂正
 		loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
 		try {
@@ -677,11 +550,10 @@ public class L2153 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0008", "額度主檔"); // 刪除資料時，發生錯誤
 		}
-		
-		
+
 		// 抓更新刪除額度後目前最後一筆額度 2022.4.13
 		tFacMain = facMainService.findLastFacmNoFirst(wkCustNo, titaVo);
-		if(tFacMain == null) {
+		if (tFacMain == null) {
 			tCustMain.setLastFacmNo(0);
 		} else {
 			tCustMain.setLastFacmNo(tFacMain.getFacmNo());
@@ -691,6 +563,7 @@ public class L2153 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
 		}
+
 	}
 
 	// 更新案件申請檔
@@ -768,7 +641,9 @@ public class L2153 extends TradeBuffer {
 				tFacProdStepRate.setMonthStart(this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i)));
 				tFacProdStepRate.setFacProdStepRateId(
 						new FacProdStepRateId(sProdNo, this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i))));
+
 				tFacProdStepRate.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("StepMonthE" + i)));
+
 				tFacProdStepRate.setRateType(titaVo.getParam("StepRateType" + i));
 				tFacProdStepRate.setRateIncr(parse.stringToBigDecimal(titaVo.getParam("StepRateIncr" + i)));
 				try {

@@ -103,7 +103,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\",\"FacmNo\"";
 		sql += "                                           ORDER BY \"BormNo\" DESC) AS \"SEQ\"";
 		sql += "                 FROM \"MonthlyLoanBal\"";
-		sql += "                 WHERE \"YearMonth\" = :yymm ";
+		sql += "                 WHERE \"YearMonth\" = :inputYearMonth ";
 		sql += "                   AND \"LoanBalance\" > 0 ";
 		sql += "                ) M2 ON M2.\"CustNo\" = M.\"CustNo\"";
 		sql += "                    AND M2.\"FacmNo\" = M.\"FacmNo\"";

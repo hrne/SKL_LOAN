@@ -29,17 +29,22 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
-
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
 //		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iYear = yearMonth / 100;
 		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+		int iMonth = yearMonth % 100;
 
 		// 格式
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");

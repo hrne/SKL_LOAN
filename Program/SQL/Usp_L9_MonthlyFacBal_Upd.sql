@@ -351,7 +351,7 @@ BEGIN
                                              AND A."FacmNo" = M."FacmNo"
                    LEFT JOIN "InsuRenew" IR ON IR."CustNo" = A."CustNo"
                                            AND IR."FacmNo" = A."FacmNo"
-                                           AND IR."PreVInsuNo" = A."RvNo"                
+                                           AND IR."PrevInsuNo" = A."RvNo"                
                    WHERE M."YearMonth" = YYYYMM
                      AND (A."AcctCode" IN ('F10','F29','TMI', 'F09', 'F25', 'F07', 'F24','TAV')
                           OR SUBSTR(A."AcctCode",0,1) IN ('I','Z'))

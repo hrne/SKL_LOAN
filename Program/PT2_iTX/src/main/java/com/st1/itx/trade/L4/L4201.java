@@ -12,11 +12,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxDetailId;
-import com.st1.itx.db.domain.BatxHead;
-import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.TxBatchCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -50,11 +49,15 @@ public class L4201 extends TradeBuffer {
 
 	@Autowired
 	public BatxHeadService batxHeadService;
+	
+	@Autowired
+	public TxBatchCom txBatchCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4201 ");
 		this.totaVo.init(titaVo);
+		txBatchCom.setTxBuffer(this.getTxBuffer());
 
 		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		String iBatchNo = titaVo.getParam("BatchNo");
@@ -74,33 +77,20 @@ public class L4201 extends TradeBuffer {
 		if (tBatxDetail == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
-		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA && iProcStsCode.equals(tBatxDetail.getProcStsCode())) {
+		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA
+				&& iProcStsCode.equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException(titaVo, "E0012", "修改值與現有資料相同");
 		}
 		tBatxDetail = batxDetailService.holdById(tBatxDetailId);
 		tBatxDetail.setRepayType(iRepayTypeA);
 		tBatxDetail.setCustNo(iCustNoA);
+		tBatxDetail.setProcStsCode("0");				
+		tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
 		tBatxDetail.setProcStsCode(iProcStsCode);
 		try {
 			batxDetailService.update(tBatxDetail);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "update " + e.getErrorMsg());
-		}
-		//
-		BatxHead tBatxHead = new BatxHead();
-		BatxHeadId tBatxHeadId = new BatxHeadId();
-		tBatxHeadId.setAcDate(iAcDate);
-		tBatxHeadId.setBatchNo(iBatchNo);
-		tBatxHead = batxHeadService.holdById(tBatxHeadId);
-		if (tBatxHead == null) {
-			throw new LogicException(titaVo, "E0001", "查無資料");
-		}
-		tBatxHead.setBatxExeCode("0");
-		tBatxHead.setBatxStsCode("0");
-		try {
-			batxHeadService.update(tBatxHead);
-		} catch (DBException e) {
-			throw new LogicException("E0007", "L4210 BatxHead update : " + e.getErrorMsg());
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

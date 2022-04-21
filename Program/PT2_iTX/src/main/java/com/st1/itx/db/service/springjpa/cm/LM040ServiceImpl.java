@@ -23,19 +23,25 @@ public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-
+	
 	@Autowired
 	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth)throws Exception {
 		this.info("LM040ServiceImpl findAll ");
-		int entryMonth = (titaVo.getEntDyI() + 19110000) / 100;
+		int entryMonth = yearMonth;
 		int inputDate = parse.stringToInteger(titaVo.getParam("InputDate")) + 19110000;
-
+		
 		this.info("LM040ServiceImpl entryMonth = " + entryMonth);
 		this.info("LM040ServiceImpl inputDate =  " + inputDate);
 
@@ -65,7 +71,7 @@ public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
+		
 		query.setParameter("entryMonth", entryMonth);
 		query.setParameter("inputDate", inputDate);
 

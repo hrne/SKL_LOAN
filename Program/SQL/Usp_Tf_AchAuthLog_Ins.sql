@@ -18,6 +18,16 @@ BEGIN
     -- 記錄程式起始時間
     JOB_START_TIME := SYSTIMESTAMP;
 
+    DECLARE 
+        "TbsDyF" DECIMAL(8); --西元帳務日
+    BEGIN
+
+    SELECT "TbsDy" + 19110000
+    INTO "TbsDyF"
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
+    ;
+
     -- 刪除舊資料
     EXECUTE IMMEDIATE 'ALTER TABLE "AchAuthLog" DISABLE PRIMARY KEY CASCADE';
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "AchAuthLog" DROP STORAGE';
@@ -131,7 +141,7 @@ BEGIN
           ,NVL(S1."ATHCOD",' ')           AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
           ,S1."ACHCOD"                    AS "AuthMeth"            -- 授權方式 VARCHAR2 1 
           ,S1."ACHLAMT"                   AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
-          ,' '                            AS "MediaCode"           -- 媒體碼 VARCHAR2 1 
+          ,''                             AS "MediaCode"           -- 媒體碼 VARCHAR2 1 
           ,''                             AS "BatchNo"             -- 批號 VARCHAR2 6 
           ,CASE
              WHEN S1."ACHCDT" > 0 THEN TRUNC(S1."ACHCDT" / 1000000)
@@ -182,11 +192,68 @@ BEGIN
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
+    -- LA$APLP有授權帳號資料，AH$ACHP、AH$ACRP都沒資料的資料補寫入
+    INSERT INTO "AchAuthLog"
+    SELECT "TbsDyF"                       AS "AuthCreateDate"      -- 建檔日期 Decimald 8 
+          ,BAA."CustNo"                   AS "CustNo"  
+          ,BAA."RepayBank"                AS "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+          ,BAA."RepayAcct"                AS "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
+          ,'A'                            AS "CreateFlag"          -- 新增或取消 VARCHAR2 1 
+          ,BAA."FacmNo"                   AS "FacmNo"              -- 額度號碼 DECIMAL 3 
+          ,0                              AS "ProcessDate"         -- 處理日期 Decimald 8   
+          ,0                              AS "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
+          ,'A'                            AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
+          ,'A'                            AS "AuthMeth"            -- 授權方式 VARCHAR2 1 
+          ,BAA."LimitAmt"                 AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
+          ,''                             AS "MediaCode"           -- 媒體碼 VARCHAR2 1 
+          ,''                             AS "BatchNo"             -- 批號 VARCHAR2 6 
+          ,0                              AS "PropDate"            -- 提出日期 Decimald 8 
+          ,0                              AS "RetrDate"            -- 提回日期 Decimald 8 
+          ,0                              AS "DeleteDate"          -- 刪除日期 Decimald 8 
+          ,NVL(FACM."LMSPRL",'00')        AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+          ,NVL(FACM."LMSPAN",u' ')        AS "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
+          ,NVL(FACM."LMSPID",' ')         AS "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+          ,0                              AS "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
+          ,''                             AS "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
+          ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1
+          ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5
+          ,BAA."CreateEmpNo"              AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+          ,BAA."CreateDate"               AS "CreateDate"          -- 建檔日期 DATE 0 0
+          ,BAA."LastUpdateEmpNo"          AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+          ,BAA."LastUpdate"               AS "LastUpdate"          -- 異動日期 DATE 0 0
+          ,0                              AS "ProcessTime"
+    FROM "BankAuthAct" BAA
+    LEFT JOIN (
+      SELECT DISTINCT
+             "LMSACN"
+           , "LMSPCN"
+           , "LMSPRL"
+           , "LMSPAN"
+           , "LMSPID"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "LMSACN"
+                          , "LMSPCN"
+               ORDER BY "LMSPRL"
+             ) AS "SEQ"
+      FROM "LA$APLP"
+      WHERE "LMSPYS" = 2
+    ) FACM ON FACM."LMSACN" = S1."LMSACN"
+          AND FACM."LMSPCN" = S1."LMSPCN"
+          AND FACM."SEQ" = 1
+    WHERE BAA."Status" = ' ' -- 空白:未授權
+      AND BAA."RepayBank" != '700' -- 非郵局
+    ;
+
+    -- 記錄寫入筆數
+    INS_CNT := INS_CNT + sql%rowcount;
+
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 
     commit;
 
+    END;
     -- 例外處理
     Exception
     WHEN OTHERS THEN

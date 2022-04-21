@@ -32,11 +32,18 @@ public class LM038Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public void exec(TitaVo titaVo, int yearMonth)  throws LogicException {
 
 		List<Map<String, String>> LM038List = null;
 		try {
-			LM038List = lM038ServiceImpl.findAll(titaVo);
+			LM038List = lM038ServiceImpl.findAll(titaVo,yearMonth);
 			exportExcel(titaVo, LM038List);
 
 		} catch (Exception e) {

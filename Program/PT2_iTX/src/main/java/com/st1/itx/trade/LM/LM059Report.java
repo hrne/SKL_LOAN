@@ -29,17 +29,29 @@ public class LM059Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth    西元年月
+	 * @param yearMonthEnd 月底日
+	 */
+	public void exec(TitaVo titaVo, int yearMonth, int yearMonthEnd) throws LogicException {
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM059Report exec");
 
-		String iENTDY = titaVo.get("ENTDY");
+//		int iENTDY = yearMonthEnd;
+		int iYear = (yearMonth - 191100) / 100;
+		int iMonth = (yearMonth - 191100) % 100;
+		int iYYYMM = yearMonth - 191100;
+		int iDay = (yearMonthEnd - 19110000) % 100;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM059", "表F22_會計部申報表", "LM059-表F22_會計部申報表_" + iENTDY.substring(1, 6), "LM059_底稿_表F22_會計部申報表.xlsx", "108.04.30");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM059", "表F22_會計部申報表",
+				"LM059-表F22_會計部申報表_" + iYYYMM, "LM059_底稿_表F22_會計部申報表.xlsx", "108.04.30");
 
-		makeExcel.setSheet("108.04.30", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6) + "." + iENTDY.substring(6, 8));
+		makeExcel.setSheet("108.04.30", iYear + "." + iMonth + "." + iDay);
 
 		ExcelFontStyleVo tmpStyle = new ExcelFontStyleVo();
 
@@ -47,10 +59,10 @@ public class LM059Report extends MakeReport {
 
 		tmpStyle.setFont((short) 1);
 
-		makeExcel.setValue(2, 5, "民國" + iENTDY.substring(1, 4) + "年" + iENTDY.substring(4, 6) + "月" + iENTDY.substring(6, 8) + "日", tmpStyle);
+		makeExcel.setValue(2, 5, "民國" + iYear + "年" + iMonth + "月" + iDay + "日", tmpStyle);
 
 		try {
-			fnAllList = lM059ServiceImpl.findAll(titaVo);
+			fnAllList = lM059ServiceImpl.findAll(titaVo, yearMonth);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -68,9 +80,12 @@ public class LM059Report extends MakeReport {
 		if (fnAllList.size() > 0) {
 			Map<String, String> tLDVo = fnAllList.get(0);
 
-			BigDecimal loanBal = tLDVo.get("F0") == null || tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0"));
-			BigDecimal badDebt = tLDVo.get("F1") == null || tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
-			BigDecimal loanNet = tLDVo.get("F2") == null || tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+			BigDecimal loanBal = tLDVo.get("F0") == null || tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F0"));
+			BigDecimal badDebt = tLDVo.get("F1") == null || tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F1"));
+			BigDecimal loanNet = tLDVo.get("F2") == null || tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F2"));
 
 			makeExcel.setValue(45, 4, loanBal, "#,##0", "R", tmpStyle2);
 			makeExcel.setValue(46, 4, loanBal, "#,##0", "R", tmpStyle2);
@@ -86,6 +101,6 @@ public class LM059Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 }

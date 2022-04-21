@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class LM040p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM040p.class);
 
 	@Autowired
 	LM040Report lM040Report;
@@ -36,6 +35,25 @@ public class LM040p extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LM040p");
+
+		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底日(西元)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+		// 年
+		int iYear = mfbsdy / 10000;
+		// 月
+		int iMonth = (mfbsdy / 100) % 100;
+		// 當年月
+		int thisYM = 0;
+
+		// 判斷帳務日與月底日是否同一天
+		if (tbsdy < mfbsdy) {
+			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+		}
+
+		thisYM = iYear * 100 + iMonth;
+
 		this.totaVo.init(titaVo);
 
 		this.info("LM040p titaVo.getTxcd() = " + titaVo.getTxcd());
@@ -43,12 +61,14 @@ public class LM040p extends TradeBuffer {
 
 		lM040Report.setParentTranCode(parentTranCode);
 
-		boolean isFinished = lM040Report.exec(titaVo);
+		boolean isFinished = lM040Report.exec(titaVo, thisYM);
 
 		if (isFinished) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM040地區別正常戶金額已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), "LM040地區別正常戶金額已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM040地區別正常戶金額無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), "LM040地區別正常戶金額無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

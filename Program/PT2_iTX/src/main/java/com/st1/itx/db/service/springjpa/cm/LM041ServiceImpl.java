@@ -30,10 +30,17 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM041.findAll ");
 
-		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
+//		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		String sql = "";
 		sql += " SELECT CT.\"CityItem\" ";
@@ -41,7 +48,7 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,ViableCusts.\"CustNo\" ";
 		sql += "       ,ViableCusts.\"FacmNo\" ";
 		sql += "       ,ViableCusts.\"Status\" ";
-		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0) \"CustName\" ";
+		sql += "       ,\"Fn_ParseEOL\"(CM.\"CustName\",0) ";
 		sql += "       ,A.\"RvBal\" ";
 		sql += " FROM ( SELECT \"CityCode\" ";
 		sql += "              ,MAX(\"Status\") \"Status\" ";

@@ -27,19 +27,27 @@ public class LM040Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public void printTitle() {
 
 	}
 
-	public boolean exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+
+	public boolean exec(TitaVo titaVo, int yearMonth) throws LogicException {
 		List<Map<String, String>> LM040List = null;
 		try {
-			LM040List = lM040ServiceImpl.findAll(titaVo);
+			LM040List = lM040ServiceImpl.findAll(titaVo,yearMonth);
 			exportExcel(titaVo, LM040List);
 
 			return true;
@@ -73,7 +81,7 @@ public class LM040Report extends MakeReport {
 
 					String value = tLDVo.get("F" + i);
 					int col = i + 1;
-					
+
 					switch (col) {
 					case 1:
 						if (row == 3) {
@@ -136,9 +144,9 @@ public class LM040Report extends MakeReport {
 			makeExcel.setValue(row, 3, thirdTotal.add(secondTotal.add(firstTotal)), "#,##0");
 
 		}
-		
+
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 }

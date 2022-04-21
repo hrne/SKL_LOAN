@@ -26,12 +26,19 @@ public class LM029Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
 
 		List<Map<String, String>> listLM029 = null;
 
 		try {
-			listLM029 = lM029ServiceImpl.findAll(titaVo);
+			listLM029 = lM029ServiceImpl.findAll(titaVo,yearMonth);
 			exportExcel(titaVo, listLM029);
 
 		} catch (Exception e) {
