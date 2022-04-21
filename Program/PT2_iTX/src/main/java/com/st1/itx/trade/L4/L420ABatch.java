@@ -110,8 +110,8 @@ public class L420ABatch extends TradeBuffer {
 							continue;
 						}
 						lBatxDetail.add(t);
-						// 匯款轉帳同戶號多筆檢核放 01-期款、 02-部分償還、 03-結案
-						if (t.getRepayCode() == 1 && t.getRepayType() >= 1 && t.getRepayType() <= 3) {
+						// 匯款轉帳同戶號多筆檢核放 01-期款、 03-結案
+						if (t.getRepayCode() == 1 && (t.getRepayType() == 1 || t.getRepayType() == 3)) {
 							mapKey = parse.IntegerToString(t.getCustNo(), 7)
 									+ parse.IntegerToString(t.getRepayType(), 2);
 							if (mergeAmt.containsKey(mapKey)) {
@@ -136,7 +136,7 @@ public class L420ABatch extends TradeBuffer {
 					TempVo tTempVo = new TempVo();
 					tTempVo = tTempVo.getVo(t.getProcNote());
 					// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次檢核
-					if (t.getRepayCode() == 1 && t.getRepayType() >= 1 && t.getRepayType() <= 3) {
+					if (t.getRepayCode() == 1 && (t.getRepayType() == 1 || t.getRepayType() == 3)) {
 						mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
 						if (!"4".equals(mergeProcStsCode.get(mapKey)) || (tTempVo.get("MergeCnt") != null
 								&& parse.stringToInteger(tTempVo.get("MergeCnt")) != mergeCnt.get(mapKey))) {

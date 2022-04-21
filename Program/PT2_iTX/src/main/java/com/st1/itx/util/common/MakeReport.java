@@ -2437,7 +2437,8 @@ public class MakeReport extends CommBuffer {
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put("Action", 2);
 				map2.put("Printer", Printer);
-				map2.put("ReportNo", tTxFile.getFileItem());
+				map2.put("ReportNo", tTxFile.getFileCode());
+				map2.put("ReportNm", tTxFile.getFileItem());
 				pMap.add(map2);
 
 				nowPage++;

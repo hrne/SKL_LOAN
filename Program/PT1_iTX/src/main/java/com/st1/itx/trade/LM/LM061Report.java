@@ -32,11 +32,23 @@ public class LM061Report extends MakeReport {
 	Map<String, Object> mergeMap = null;
 	int countAmt = 1;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth    西元年月
+	 * @param yearMonthEnd 月底日
+	 */
+	public void exec(TitaVo titaVo, int yearMonth, int yearMonthEnd) throws LogicException {
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM061Report exec");
+
+		int iYear = (yearMonth - 191100) / 100;
+		int iMonth = (yearMonth - 191100) % 100;
+		int iDay = (yearMonthEnd - 19110000) % 100;
+//		int iYYYMM = yearMonth - 191100;
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM061", "逾清償期二年案件追蹤控管表", "LM061_逾清償期二年案件追蹤控管表",
 				"LM061-逾清償期二年案件追蹤控管表.xlsx", "1080430");
@@ -45,11 +57,10 @@ public class LM061Report extends MakeReport {
 
 		makeExcel.setSheet("1080430", iENTDY.substring(1, 8));
 
-		makeExcel.setValue(1, 23, "機密等級：機密\n單位：元\n" + iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6) + "."
-				+ iENTDY.substring(6, 8) + "止");
+		makeExcel.setValue(1, 23, "機密等級：機密\n單位：元\n" + iYear + "." + iMonth + "." + iDay + "止");
 
 		try {
-			fnAllList = lM061ServiceImpl.findAll(titaVo);
+			fnAllList = lM061ServiceImpl.findAll(titaVo,yearMonth,yearMonthEnd);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -235,7 +246,7 @@ public class LM061Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void checkMergeRegionValue(String custNo, String custName, BigDecimal eAmt, BigDecimal ovduAmt, int row) {

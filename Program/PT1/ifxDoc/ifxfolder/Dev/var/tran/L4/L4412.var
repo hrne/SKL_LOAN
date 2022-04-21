@@ -37,6 +37,23 @@ E(0,0)
 ["#FdCreateDateX+建檔日",#CreateDate],["#FdLastUpdateX+異動日期",#LastUpdate],
 ]
 
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易: [L4043 郵局授權資料查詢]進入),$)
+
+#NTXBUF=X,45,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FuncCode,#NTXBUF,1,1)
+T(1,@AuthCreateDate,#NTXBUF,2,7)
+T(1,@AuthApplCode,#NTXBUF,9,1)
+T(1,@AuthApplCodeTemp,#NTXBUF,9,1)
+T(1,@CustNo,#NTXBUF,10,7)
+T(1,@PostDepCode,#NTXBUF,17,1)
+T(1,@RepayAcct,#NTXBUF,18,14)
+T(1,@AuthCode,#NTXBUF,32,1)
+INVOKEJS(SHOW,p1,02,02,1)
+
 #FdFuncCodeX=X,2,L
 #FdCustNo=X,2,L
 T(3,*)
@@ -44,7 +61,10 @@ T(3,*)
 T(3,*)
 #FdRepayAcct=X,2,L
 T(3,*)
+
 #FdAuthApplCode=X,2,L
+C(3,#FuncCode,2,T(3,*),T(3,))
+
 #FdLimitAmt=X,2,L
 #FdRelationCode=X,2,L
 T(3,*)
@@ -70,10 +90,6 @@ T(3,*)
 
 #RepayCode=A,2,S
 E(0,2)
-
-#CHAIN=A,1,S
-T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易: [L4043 郵局授權資料查詢]進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 ! 性別下拉選單
@@ -136,19 +152,6 @@ T(2,@AuthCodeHelp,#HelpDesc5)
 T(2,@StampCodeHelp,#HelpDesc6)
 T(2,@AuthErrorCodeHelp,#HelpDesc7)
 T(2,@AmlRspHelp,#HelpDesc8)
-
-
-#NTXBUF=X,45,S
-C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@FuncCode,#NTXBUF,1,1)
-T(1,@AuthCreateDate,#NTXBUF,2,7)
-T(1,@AuthApplCode,#NTXBUF,9,1)
-T(1,@AuthApplCodeTemp,#NTXBUF,9,1)
-T(1,@CustNo,#NTXBUF,10,7)
-T(1,@PostDepCode,#NTXBUF,17,1)
-T(1,@RepayAcct,#NTXBUF,18,14)
-T(1,@AuthCode,#NTXBUF,32,1)
-INVOKEJS(SHOW,p1,02,02,1)
 
 
 #RimRepayAcct=A,14,S
@@ -239,7 +242,7 @@ C(2,#FuncCode,S,S,$,$,$)
 #StampCodeX=X,10,L
 T(3,)T(H,#StampCode,#StampCodeHelp)
 #AuthErrorCodeX=X,40,L
-T(3,)T(H,#AuthErrorCode,#AuthErrorCodeHelp)
+C(4,#AuthErrorCode,T(3,未授權),T(H,#AuthErrorCode,#AuthErrorCodeHelp))
 #PostMediaCodeX=X,10,L
 T(3,)T(H,#PostMediaCode,#MediaCodeHelp)
 #AmlRspX=X,30,L
@@ -346,6 +349,7 @@ C(3,#PostSuccessFg,1,
 T(F,@CustId,0)
 T(F,@RelationCode,0)
 T(F,@RelAcctName,0)
+T(F,@RelationId,0)
 T(F,@RelAcctBirthday,0)
 T(F,@RelAcctGender,0)
 T(F,@LimitAmt,0)
@@ -353,6 +357,7 @@ T(F,@LimitAmt,0)
 T(F,@CustId,1)
 T(F,@RelationCode,1)
 T(F,@RelAcctName,1)
+T(F,@RelationId,1)
 T(F,@RelAcctBirthday,1)
 T(F,@RelAcctGender,1)
 T(F,@LimitAmt,1))
@@ -817,6 +822,10 @@ C(3,#RelationCode,0,C(4,#RelAcctGenderP,T(2,),T(H,#RelAcctGenderP,#SexHelp)),C(4
 #END
 #RepayCode
 #SysTime
+#CreateEmpNo
+#CreateDate
+#LastUpdateEmpNo
+#LastUpdate
 </sub>
 
 !------ 下行電文TOM ------

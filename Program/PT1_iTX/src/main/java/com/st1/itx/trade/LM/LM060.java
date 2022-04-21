@@ -32,13 +32,39 @@ public class LM060 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM060.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM060 ");
-		lm060report.exec(titaVo, this.txBuffer.getTxCom());
+
+		// 帳務日(西元)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底日(西元)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+
+		// 上個月底日(西元)
+//		int lmndy = this.txBuffer.getTxCom().getLmndyf();
+		// 年
+		int iYear = mfbsdy / 10000;
+		// 月
+		int iMonth = (mfbsdy / 100) % 100;
+		// 當年月
+		int thisYM = 0;
+		//月底日
+//		int ymEnd = mfbsdy;
+
+		// 月底日是否大於帳務日 判斷取哪個年月
+		if (tbsdy < mfbsdy) {
+			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+//			ymEnd = lmndy;
+
+		}
+
+		thisYM = iYear * 100 + iMonth;
+
+		lm060report.exec(titaVo, this.txBuffer.getTxCom(),thisYM);
 	}
 }

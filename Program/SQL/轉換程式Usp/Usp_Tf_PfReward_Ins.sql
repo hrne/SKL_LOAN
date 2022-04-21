@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_PfReward_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_PfReward_Ins" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_Tf_PfReward_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -25,6 +20,67 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "PfReward"
+    WITH IB AS (
+        SELECT QTAP."PRZCMD"
+             , QTAP."LMSLLD"
+             , QTAP."LMSACN"
+             , QTAP."LMSAPN"
+             , QTAP."LMSASQ"
+             , QTAP."CUSEM3"
+             , LSEP."EMPCOD"
+             , QTAP."PRZCMT" AS "IntroducerBonus" -- 介紹人介紹獎金
+             , QTAP."PRZCMD" AS "IntroducerBonusDate" -- 介紹獎金發放日
+             , ROW_NUMBER()
+               OVER (
+                   PARTITION BY QTAP."PRZCMD"
+                              , QTAP."LMSLLD"
+                              , QTAP."LMSACN"
+                              , QTAP."LMSAPN"
+                   ORDER BY QTAP."LMSASQ"
+               ) AS "IbSeq"
+        FROM "LA$QTAP" QTAP
+        LEFT JOIN "LN$LSEP" LSEP ON LSEP."LMSACN" = QTAP."LMSACN"
+                                AND LSEP."LMSAPN" = QTAP."LMSAPN"
+        WHERE QTAP."PRZTYP" = '1' -- 介紹獎金
+          AND QTAP."PRZCMD" >= 20211201
+    )
+    , CB AS (
+        SELECT QTAP."PRZCMD"
+             , QTAP."LMSLLD" -- *** 協辦獎金的撥款日期會放0
+             , APLP."APLFSD"
+             , QTAP."LMSACN"
+             , QTAP."LMSAPN"
+             , QTAP."LMSASQ" -- *** 協辦獎金的撥款序號會放0
+             , QTAP."CUSEM3" -- *** 協辦獎金的CUSEM3 是協辦人員
+             , QTAP."PRZCMT" AS "CoorgnizerBonus" -- 協辦人員協辦獎金
+             , QTAP."PRZCMD" AS "CoorgnizerBonusDate" -- 協辦獎金發放日
+        FROM "LA$QTAP" QTAP
+        LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = QTAP."LMSACN"
+                                AND APLP."LMSAPN" = QTAP."LMSAPN"
+        WHERE QTAP."PRZTYP" = '5' -- 協辦獎金
+          AND QTAP."PRZCMD" >= 20211201
+    )
+    , joinedData AS (
+        SELECT NVL(IB."PRZCMD",CB."PRZCMD") AS "PRZCMD"
+             , NVL(IB."LMSLLD",CASE
+                                 WHEN CB."LMSLLD" = 0
+                                 THEN CB."APLFSD"
+                               ELSE CB."LMSLLD" END ) AS "LMSLLD"
+             , NVL(IB."LMSACN",CB."LMSACN") AS "LMSACN"
+             , NVL(IB."LMSAPN",CB."LMSAPN") AS "LMSAPN"
+             , NVL(IB."LMSASQ",CB."LMSASQ") AS "LMSASQ"
+             , IB."CUSEM3"
+             , NVL(IB."EMPCOD",CB."CUSEM3")    AS "EMPCOD" -- 協辦人員員編
+             , NVL(IB."IntroducerBonus",0)     AS "IntroducerBonus"     -- 介紹人介紹獎金
+             , NVL(IB."IntroducerBonusDate",0) AS "IntroducerBonusDate" -- 介紹獎金發放日
+             , NVL(CB."CoorgnizerBonus",0)     AS "CoorgnizerBonus"     -- 協辦人員協辦獎金
+             , NVL(CB."CoorgnizerBonusDate",0) AS "CoorgnizerBonusDate" -- 協辦獎金發放日
+        FROM CB
+        FULL OUTER JOIN IB ON CB."PRZCMD" = IB."PRZCMD"
+                          AND CB."LMSACN" = IB."LMSACN"
+                          AND CB."LMSAPN" = IB."LMSAPN"
+                          AND IB."IbSeq" = 1
+    )
     SELECT ROW_NUMBER() OVER (ORDER BY S1."LMSLLD"
                                      , S1."LMSACN"
                                      , S1."LMSAPN"
@@ -61,56 +117,19 @@ BEGIN
          , '999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
          , '999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM (SELECT CASE
-                   WHEN "LMSLLD" = 0 AND "PRZCMD" < 19110101 THEN "PRZCMD" + 19110000
-                   WHEN "LMSLLD" = 0 THEN "PRZCMD"
-                   WHEN "LMSLLD" > 0 AND "LMSLLD" < 19110101 THEN "LMSLLD" + 19110000
-                 ELSE "LMSLLD" END AS "LMSLLD"
-                ,"LMSACN"
-                ,"LMSAPN"
-                ,"LMSASQ"
-                ,MAX(NVL("CUSEM3",' ')) AS "CUSEM3"
-                 --  14        ********** #PRZTYP:1- 介紹獎金        2- 放款業務專員津貼           
-                 --  15        **********         3- 晤談一人員津貼  4- 晤談二人員津貼             
-                 --  16        **********         5- 協辦獎金        6- 專業獎勵金     
-                ,SUM(CASE
-                       WHEN "PRZTYP" = '1' THEN "PRZCMT"
-                     ELSE 0 END) AS "IntroducerBonus"     -- 介紹人介紹獎金 decimal 16 2
-                ,SUM(CASE
-                       WHEN "PRZTYP" = '1' THEN "PRZCMD"
-                     ELSE 0 END) AS "IntroducerBonusDate" -- 介紹獎金發放日 decimal(8,0)	
-                ,SUM(CASE
-                       WHEN "PRZTYP" = '5' THEN "PRZCMT"
-                     ELSE 0 END) AS "CoorgnizerBonus"     -- 協辦人員協辦獎金 decimal 16 2
-                ,SUM(CASE
-                       WHEN "PRZTYP" = '5' THEN "PRZCMD"
-                     ELSE 0 END) AS "CoorgnizerBonusDate" -- 協辦獎金發放日 decimal(8,0)	
-          FROM "LA$QTAP"
-          WHERE "PRZTYP" IN ('1','5') -- 只取介紹獎金及協辦獎金 排除 6156 筆後剩餘 113584 筆
-            AND "LMSLLD" >= 20200610
-          GROUP BY CASE
-                     WHEN "LMSLLD" = 0 AND "PRZCMD" < 19110101 THEN "PRZCMD" + 19110000
-                     WHEN "LMSLLD" = 0 THEN "PRZCMD"
-                     WHEN "LMSLLD" > 0 AND "LMSLLD" < 19110101 THEN "LMSLLD" + 19110000
-                   ELSE "LMSLLD" END
-                  ,"LMSACN"
-                  ,"LMSAPN"
-                  ,"LMSASQ" -- 群組合併後 實際寫入 112969 筆
-         ) S1
+    FROM joinedData S1
     LEFT JOIN "LN$LSEP" S2 ON S2."LMSACN" = S1."LMSACN"
                           AND S2."LMSAPN" = S1."LMSAPN"
     LEFT JOIN "TB$WKMP" S3 ON S3."DATES" <= S1."LMSLLD"
                           AND S3."DATEE" >= S1."LMSLLD"
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = S1."LMSACN"
                            AND FAC."FacmNo" = S1."LMSAPN"
-    LEFT JOIN ( SELECT YAC."LMSACN"
+    LEFT JOIN ( SELECT DISTINCT
+                       YAC."LMSACN"
                      , YAC."LMSAPN"
                      , YAC."LMSASQ"
-                     , MAX(YAC."CASCDE") AS "CASCDE"
+                     , YAC."CASCDE"
                 FROM "LN$YACP" YAC
-                GROUP BY YAC."LMSACN"
-                       , YAC."LMSAPN"
-                       , YAC."LMSASQ"
               ) YAC ON YAC."LMSACN" = S1."LMSACN"
                    AND YAC."LMSAPN" = S1."LMSAPN"
                    AND YAC."LMSASQ" = S1."LMSASQ"
@@ -118,34 +137,6 @@ BEGIN
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
-
-    -- MERGE INTO "PfReward" T1
-    -- USING (SELECT S1."PerfDate"
-    --              ,S1."CustNo"
-    --              ,S1."FacmNo"
-    --              ,S1."BormNo"
-    --              ,S3."Year" * 100 + S3."Month"   AS "WorkMonth"           -- 工作月 decimal 6 0
-    --              ,TO_NUMBER(TO_CHAR(S3."Year") || 
-    --                         CASE
-    --                           WHEN S3."Month" >= 1 AND S3."Month" <= 3 THEN '1'
-    --                           WHEN S3."Month" >= 4 AND S3."Month" <= 6 THEN '2'
-    --                           WHEN S3."Month" >= 7 AND S3."Month" <= 9 THEN '3'
-    --                         ELSE '4' END )       AS "WorkSeason"          -- 工作季 decimal 5 0
-    --        FROM "PfReward" S1
-    --        LEFT JOIN "CdWorkMonth" S3 ON S3."StartDate" <= S1."PerfDate"
-    --                                  AND S3."EndDate" >= S1."PerfDate"
-    --        WHERE S1."PerfDate" > 0
-    --          AND NVL(S3."StartDate",0) > 0
-    --       ) S1
-    -- ON (S1."PerfDate" = T1."PerfDate"
-    --     AND S1."CustNo" = T1."CustNo"
-    --     AND S1."FacmNo" = T1."FacmNo"
-    --     AND S1."BormNo" = T1."BormNo")
-    -- WHEN MATCHED THEN UPDATE SET
-    --  T1."WorkMonth" = S1."WorkMonth"
-    -- ,T1."WorkSeason" = S1."WorkSeason"
-    -- ;
-
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 
@@ -160,4 +151,3 @@ END;
 
 
 
-/

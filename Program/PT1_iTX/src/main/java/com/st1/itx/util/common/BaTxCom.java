@@ -59,6 +59,8 @@ public class BaTxCom extends TradeBuffer {
 	LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
 	LoanCloseBreachCom loanCloseBreachCom;
+	@Autowired
+	FacStatusCom facStatusCom;
 
 	@Autowired
 	public AcReceivableService acReceivableService;
@@ -80,8 +82,9 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal shortAmt = BigDecimal.ZERO; // 短繳(正值)
 	private BigDecimal overAmt = BigDecimal.ZERO; // 溢繳(正值)
 	private int overRpFacmNo = 0; // 溢短繳額度;
+	private int facStatus = 0; // 戶況
 
-// isPayAllFee 是否全部回收費用
+	// isPayAllFee 是否全部回收費用
 	// true->回收全部費用，false 回收金額足夠的費用
 	// RepayType 還款類別
 	// 1.期款 3.結案 => true
@@ -156,6 +159,7 @@ public class BaTxCom extends TradeBuffer {
 		this.shortAmt = BigDecimal.ZERO; // 短繳(正值)
 		this.overAmt = BigDecimal.ZERO; // 溢繳(正值)
 		this.overRpFacmNo = 0; // 溢短繳額度;
+		this.facStatus = 0; // 戶況
 
 		// 費用、短繳
 		this.shortfall = BigDecimal.ZERO; // 累短收
@@ -763,11 +767,21 @@ public class BaTxCom extends TradeBuffer {
 		}
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
 				wkBormNoStart, wkBormNoEnd, this.index, Integer.MAX_VALUE, titaVo);
-		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null
-				: new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
-		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
+		if (slLoanBorMain == null) {
 			throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
 		}
+		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+		for (LoanBorMain ln : slLoanBorMain.getContent()) {
+			if (ln.getStatus() == 0) {
+				lLoanBorMain.add(ln);
+			}
+		}
+		// 戶況
+		if (lLoanBorMain.size() == 0) {
+			this.facStatus = facStatusCom.settingStatus(slLoanBorMain.getContent(), iEntryDate);
+
+		}
+
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
 			@Override
 			public int compare(LoanBorMain c1, LoanBorMain c2) {
@@ -884,7 +898,7 @@ public class BaTxCom extends TradeBuffer {
 				}
 				break;
 			case 2: // 部分償還金額
-				if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+				if (ln.getNextPayIntDate() <= iEntryDate) {
 					throw new LogicException(titaVo, "E3072", "額度=" + parse.IntegerToString(ln.getFacmNo(), 3)
 							+ ", 部分償還前應先償還期款, 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有未回收期款
 				}
@@ -1015,9 +1029,7 @@ public class BaTxCom extends TradeBuffer {
 			this.ovduDays = dDateUtil.getDays();
 		}
 
-		if (this.baTxList != null && this.baTxList.size() > 0)
-
-		{
+		if (this.baTxList != null && this.baTxList.size() > 0) {
 			this.baTxList.sort((c1, c2) -> {
 				return c1.compareTo(c2);
 			});
@@ -1124,10 +1136,10 @@ public class BaTxCom extends TradeBuffer {
 		this.info("getCloseBreachAmt...");
 		String collectFlag = "";
 		Slice<FacClose> facCloseList = facCloseService.findCustNo(iCustNo, this.index, Integer.MAX_VALUE, titaVo); // 清償作業檔
-		// 還清金額需相同
+		// 還款金額>=償還清金額
 		if (facCloseList != null) {
 			for (FacClose tFacClose : facCloseList.getContent()) {
-				if (tFacClose.getCloseDate() == 0 && tFacClose.getCloseAmt().equals(iTxAmt)
+				if (tFacClose.getCloseDate() == 0 && iTxAmt.compareTo(tFacClose.getCloseAmt()) >= 0
 						&& tFacClose.getFacmNo() == iFacmNo) {
 					collectFlag = tFacClose.getCollectFlag();
 				}
@@ -1977,4 +1989,14 @@ public class BaTxCom extends TradeBuffer {
 	public int getPreRepayTermsBatch() {
 		return preRepayTermsBatch;
 	}
+	
+	/**
+	 * 戶況
+	 * 
+	 * @return 戶況
+	 */
+	public int getFacStatus() {
+		return facStatus;
+	}
+
 }

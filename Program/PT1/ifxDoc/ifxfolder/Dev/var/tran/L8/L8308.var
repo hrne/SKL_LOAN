@@ -149,13 +149,14 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
 T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
 T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
-T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
+T(F,@SignDate,1)
+T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdPassDate,*)
 T(2,@FdLimitDate,*)
-T(2,@FdSignDate,*)
+!T(2,@FdSignDate,*)
 T(2,@FdMonthPayAmt,*)
 T(2,@FdFirstPayDate,*)
 T(2,@FdGradeType,*)
@@ -170,7 +171,8 @@ C(5,#TranKey_Tmp,2,$,S)
 T(F,@TranKey,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
 T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
 T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
-T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
+T(F,@SignDate,1)
+T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
@@ -447,8 +449,10 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@SignDate,#L8r18SignDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
-@V(7)A(DATE,0,#SignDate)
-IF(#SignDate >= #PassDate,$,V(P,簽約完成日期須大於或等於協議完成日期))
+!@C(5,#TranKey,C,V(7)A(DATE,0,#SignDate),V(P,簽約完成日期須大於或等於協議完成日期))
+!IF(@TranKey = C,V(7)A(DATE,0,#SignDate),$)
+!@V(7)A(DATE,0,#SignDate)
+!IF(#SignDate >= #PassDate,$,V(P,簽約完成日期須大於或等於協議完成日期))
 ![月付金]
 #MonthPayAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -536,6 +540,10 @@ C(5,#TranKey,D,s,$)
 
 ! 流水號
 #Ukey=X,32,S
+
+! 修改時開啟
+IF(#TranKey_Tmp == 2,ALERT(需填寫簽約完成日期與面談日期),S) 
+
 
 ! !<儲存>
 ! #BUF1=X,10,S

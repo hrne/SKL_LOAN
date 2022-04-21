@@ -1,0 +1,2075 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2411)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[180,265,180,405];printer.width=[20,40,20,40];order=1">
+[
+["[L2411]                                 不動產擔保品資料登錄"],
+[#<->#,"#FdFunCd+功能",#FunCdX],
+[#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN8,#ApplNoX],
+["#FdColInd1+擔保品代號1",#ClCode1,#ClCode1X],["#FdColInd2+擔保品代號2",#ClCode2,#ClCode2X],
+["#FdCOLNO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
+[#<->#,"#FdSubType+擔保品類別",#ClTypeCode,#ClTypeCodeX],
+[#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#BtnExpand],
+]
+!---------- AP Button AREA ----------
+
+![Buttom資料查詢]
+#Buf1=X,42,S
+#Btn1=X,8,I,ui:button;value:建物門牌;enable:1;tabbable:0
+#Btn2=X,8,I,ui:button;value:所有權人;enable:1;tabbable:0
+#Btn3=X,4,I,ui:button;value:鑑價;enable:1;tabbable:0
+#Btn4=X,4,I,ui:button;value:抵押;enable:1;tabbable:0
+#Btn5=X,4,I,ui:button;value:處分;enable:1;tabbable:0
+#Btn6=X,4,I,ui:button;value:設定;enable:1;tabbable:0
+#BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
+#BTN1=X,15,I,ui:button;value:保險/鑑定公司查詢;enable:1;tabbable:0;
+#BTN8=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+
+![瀏覽1]
+#BUF1A=X,4,S
+T(2,2+  +0)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6073; ntxbuf=#BUF1A;ntxbuf5=type<-1:EvaCompany<-OOInsurerCode:EvaCompanyX<-OOInsurerItem})
+
+#MtgAllbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
+
+#MtgCheckbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
+
+#MtgLoanbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
+
+#MtgPledgebtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
+
+#MtgAllProc=@,1,S
+C(5,#MtgAllbtn,V,C(5,#MtgCheckbtn,V,C(5,#MtgLoanbtn,C(5,#MtgPledgebtn,V,s,$),$),$),$)
+T(3,@MtgAllbtn,V)T(3,@MtgCheckbtn,V)T(3,@MtgLoanbtn,V)T(3,@MtgPledgebtn,V)T(3,@MtgCheck,Y)T(3,@MtgLoan,Y)T(3,@MtgPledge,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgCheckProc=@,1,S
+C(5,#MtgCheckbtn,V,C(4,#MtgLoanbtn,C(4,#MtgPledgebtn,s,$),$),$)
+C(5,#MtgCheckbtn,V,T(3,@MtgCheckbtn, )T(3,@MtgAllbtn, )T(3,@MtgCheck,N),T(3,@MtgCheckbtn,V)T(3,@MtgCheck,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgLoanProc=@,1,S
+C(5,#MtgLoanbtn,V,C(4,#MtgCheckbtn,C(4,#MtgPledgebtn,s,$),$),$)
+C(5,#MtgLoanbtn,V,T(3,@MtgLoanbtn, )T(3,@MtgAllbtn, )T(3,@MtgLoan,N),T(3,@MtgLoanbtn,V)T(3,@MtgLoan,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgPledgeProc=@,1,S
+C(5,#MtgPledgebtn,V,C(4,#MtgCheckbtn,C(4,#MtgLoanbtn,s,$),$),$)
+C(5,#MtgPledgebtn,V,T(3,@MtgPledgebtn, )T(3,@MtgAllbtn, )T(3,@MtgPledge,N),T(3,@MtgPledgebtn,V)T(3,@MtgPledge,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgAllBind=X,1,S
+BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
+
+#MtgCheckBind=X,1,S
+BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
+
+#MtgLoanBind=X,1,S
+BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
+
+#MtgPledgeBind=X,1,S
+BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
+
+#Bind1=X,1,S
+BIND(#Btn1,click, {cmd=CALLSEND;DOCODE=Show1})
+
+#Bind2=X,1,S
+BIND(#Btn2,click, {cmd=CALLSEND;DOCODE=Show2})
+
+#Bind3=X,1,S
+BIND(#Btn3,click, {cmd=CALLSEND;DOCODE=Show3})
+
+#Bind4=X,1,S
+BIND(#Btn4,click, {cmd=CALLSEND;DOCODE=Show4})
+
+#Bind5=X,1,S
+BIND(#Btn5,click, {cmd=CALLSEND;DOCODE=Show5})
+
+#Bind6=X,1,S
+BIND(#Btn6,click, {cmd=CALLSEND;DOCODE=Show6})
+
+!---- Expand 展開
+
+#BindExpand=X,1,S
+BIND(#BtnExpand,click, {cmd=CALLSEND;DOCODE=Expand})
+
+#PageFg=A,1,S
+E(0,0)
+
+! 顯示第1頁
+#Show1=@,1,S
+IF(#PageFg==1,E(0,@PageFg,0),E(0,@PageFg,1))
+CALL(#ResetPages)
+
+! 顯示第2頁
+#Show2=@,1,S
+IF(#PageFg==2,E(0,@PageFg,0),E(0,@PageFg,2))
+CALL(#ResetPages)
+
+! 顯示第3頁
+#Show3=@,1,S
+IF(#PageFg==3,E(0,@PageFg,0),E(0,@PageFg,3))
+CALL(#ResetPages)
+
+! 顯示第4頁
+#Show4=@,1,S
+IF(#PageFg==4,E(0,@PageFg,0),E(0,@PageFg,4))
+CALL(#ResetPages)
+
+! 顯示第5頁
+#Show5=@,1,S
+IF(#PageFg==5,E(0,@PageFg,0),E(0,@PageFg,5))
+CALL(#ResetPages)
+
+! 顯示第6頁
+#Show6=@,1,S
+IF(#PageFg==6,E(0,@PageFg,0),E(0,@PageFg,6))
+CALL(#ResetPages)
+
+
+! 展開全部頁籤
+#Expand=@,1,S
+IF(#PageFg==7,E(0,@PageFg,0),E(0,@PageFg,7))
+CALL(#ResetPages)
+
+
+!控制按鈕變色
+#KLIGHT=@,1,S
+C(3,#PageFg,1,K(LIGHT,#Btn1,TXTRED,0),K(LIGHT,#Btn1,TXTRED,-1))
+C(3,#PageFg,2,K(LIGHT,#Btn2,TXTRED,0),K(LIGHT,#Btn2,TXTRED,-1))
+C(3,#PageFg,3,K(LIGHT,#Btn3,TXTRED,0),K(LIGHT,#Btn3,TXTRED,-1))
+C(3,#PageFg,4,K(LIGHT,#Btn4,TXTRED,0),K(LIGHT,#Btn4,TXTRED,-1))
+C(3,#PageFg,5,K(LIGHT,#Btn5,TXTRED,0),K(LIGHT,#Btn5,TXTRED,-1))
+C(3,#PageFg,6,K(LIGHT,#Btn6,TXTRED,0),K(LIGHT,#Btn6,TXTRED,-1))
+C(3,#PageFg,7,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
+
+#Ranktxt1=x,2,S
+T(3,前)
+#Ranktxt3=x,4,S
+T(3,順位)
+
+#CALLGRID=@,1,S
+##loop{times:10,n:1,k:2,j:3}
+C(4,#OwnerId{n},INVOKEJS(SHOW,grd3_{k},0),INVOKEJS(SHOW,grd3_{k},1))
+##end
+
+#ResetPages=@,1,S
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+INVOKEJS(SHOW,p4,0)
+INVOKEJS(SHOW,p5,0)
+INVOKEJS(SHOW,p6,0)
+INVOKEJS(SHOW,p7,0)
+CALL(#KLIGHT)
+CALL(#CALLGRID)
+IF(#PageFg==1 || #PageFg==7,INVOKEJS(SHOW,p2,1),$)
+IF(#PageFg==2 || #PageFg==7,INVOKEJS(SHOW,p3,1),$)
+IF(#PageFg==3 || #PageFg==7,INVOKEJS(SHOW,p4,1),$)
+IF(#PageFg==4 || #PageFg==7,INVOKEJS(SHOW,p5,1),$)
+IF(#PageFg==5 || #PageFg==7,INVOKEJS(SHOW,p6,1),$)
+IF(#PageFg==6 || #PageFg==7,INVOKEJS(SHOW,p7,1),$)
+C(3,#MtgCode,0,ENABLE(#MtgAllbtn)ENABLE(#MtgCheckbtn)ENABLE(#MtgLoanbtn)ENABLE(#MtgPledgebtn)
+              ,DISABLE(#MtgAllbtn)DISABLE(#MtgCheckbtn)DISABLE(#MtgLoanbtn)DISABLE(#MtgPledgebtn))
+               
+CALL(#checkclcode)
+
+#checkclcode=@,1,S
+C(3,#ClCode1,1,INVOKEJS(SHOW,p2,1,1,1)INVOKEJS(SHOW,p2,2,2,0),$)
+C(3,#ClCode1,2,INVOKEJS(SHOW,p2,2,2,1)INVOKEJS(SHOW,p2,1,1,0),$)
+
+
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="ROM.icf::L6R03.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R43.dec"/>
+<include src="ROM.icf::L2R27.dec"/>
+<include src="ROM.icf::L2R28.dec"/>
+<include src="ROM.icf::L2R23.dec"/>
+<include src="ROM.icf::L2R22.dec"/>
+<include src="ROM.icf::L1R09.dec"/>
+<include src="COM.icf::CheckAuth.rtn"/>
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!ClCode21
+#CDDEF01=x,20,S
+T(3,CdCode.ClCode21)
+
+#ClCode21Help=x,1024,S
+
+!ClCode22
+#CDDEF02=x,20,S
+T(3,CdCode.ClCode22)
+
+#ClCode22Help=x,1024,S
+
+!ClTypeCode21
+#CDDEF03=x,20,S
+T(3,CdCode.ClTypeCode21)
+
+#ClTypeCode21Help=x,1024,S
+
+!ClTypeCode22
+#CDDEF04=x,20,S
+T(3,CdCode.ClTypeCode22)
+
+#ClTypeCode22Help=x,1024,S
+
+#CDDEF05=x,20,S
+T(3,CdGuarantor)
+
+
+#RelationCodeHelp=x,3000,S
+
+!EvaCompany 鑑價公司
+#CDDEF06=x,30,S
+T(3,CdCode.EvaCompanyCode)
+
+#EvaCompanyHelp=x,1024,S
+
+!OwnershipCode 權利種類
+#CDDEF07=x,30,S
+T(3,CdCode.OwnershipCode)
+
+#OwnershipCodeHelp=x,1024,S
+
+!MtgCode 抵押權註記
+#CDDEF08=x,30,S
+T(3,CdCode.MtgCode)
+
+#MtgCodeHelp=x,1024,S
+
+!ClStatus 擔保品狀況碼
+#CDDEF09=x,30,S
+T(3,CdCode.ClStatus)
+
+#ClStatusHelp=x,1024,S
+
+!ClStat擔保品狀態
+#CDDEF10=x,30,S
+T(3,CdCode.ClStatCode)
+
+#ClStatHelp=x,1024,S
+
+!ClCode 擔保註記
+#CDDEF11=x,30,S
+T(3,CdCode.ClCode)
+
+#ClCodeHelp=x,1024,S
+
+!SyndCode 聯貸案類型
+#CDDEF12=x,30,S
+T(3,CdCode.SyndCode)
+
+#SyndCodeHelp=x,1024,S
+
+!MtgReasonCode 最高抵押權確定事由
+#CDDEF13=x,30,S
+T(3,CdCode.MtgReasonCode)
+
+#MtgReasonCodeHelp=x,1024,S
+
+!SettingStat 設定狀態
+#CDDEF14=x,30,S
+T(3,CdCode.SettingStatCode)
+
+#SettingStatHelp=x,1024,S
+
+!SettingSeq 設定順位
+#CDDEF15=x,20,S
+T(3,CdCode.SettingSeq)
+
+#SettingSeqHelp=x,1024,S
+
+#RelationCodeHelp2=X,12,S
+T(3,00:同借款人;)
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClCode21Help,#HelpDesc1)
+T(2,@ClCode22Help,#HelpDesc2)
+T(2,@ClTypeCode21Help,#HelpDesc3)
+T(2,@ClTypeCode22Help,#HelpDesc4)
+! T(2,@RelationCodeHelp,#RelationCodeHelp2+#HelpDesc5)
+T(2,@RelationCodeHelp,#HelpDesc5)
+T(2,@EvaCompanyHelp,#HelpDesc6)
+T(2,@OwnershipCodeHelp,#HelpDesc7)
+T(2,@MtgCodeHelp,#HelpDesc8)
+T(2,@ClStatusHelp,#HelpDesc9)
+T(2,@ClStatHelp,#HelpDesc10)
+
+
+#HelpRim2=X,1,S
+RESET_RIM(#HelpRim2,XXR99)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClCodeHelp,#HelpDesc1)
+T(2,@SyndCodeHelp,#HelpDesc2)
+T(2,@MtgReasonCodeHelp,#HelpDesc3)
+T(2,@SettingStatHelp,#HelpDesc4)
+T(2,@SettingSeqHelp,#HelpDesc5)
+
+#FunCdHelp=x,50,S
+T(3,1:新增;2:修改;4:刪除)
+
+#ClCode1Help=x,20,S
+T(3,1:房地;2:土地)
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+#ZeroOneHelp=x,20,S
+T(3,0:無;1:有)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2038擔保品明細資料查詢]進入),$)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+T(1,@ApplNo,#NTXBUF,2,7)
+T(1,@ClCode1,#NTXBUF,9,1)
+T(1,@ClCode2,#NTXBUF,11,2)
+T(1,@ClNo,#NTXBUF,14,7)
+
+
+#Init=X,1,S
+CALL(#HideAll)
+CALL(#ResetPages)
+##loop{times:10,i:1}
+CALL(#HIDE_OWNER_ROW_{i})
+##end
+C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
+HIDE(#MtgAllfg)
+HIDE(#MtgCheckfg)
+HIDE(#MtgLoanfg)
+HIDE(#MtgPledgefg)
+
+#FdFunCd=X,2,L
+#FdApplNo=X,2,L
+#FdColInd1=X,2,L
+#FdColInd2=X,2,L
+#FdCOLNO=X,2,L
+#FdGdRid=X,2,L
+#FdSubType=X,2,L
+#FdADDRESS_1=X,2,L
+T(3,*)
+#FdLD_1=X,2,L
+T(3,*)
+#FdOWNER=X,2,L
+T(3,*)
+#FdEvaDate=X,2,L
+#FdEvaAmt=X,2,L
+#FdEvaNetWorth=X,2,L
+#FdLVITax=X,2,L
+#FdRentEvaValue=X,2,L
+#FdRentPrice=X,2,L
+#FdEvaCompany=X,2,L
+#FdOwnershipCode=X,2,L
+#FdMtgCode=X,2,L
+#FdKind=X,2,L
+#FdMtgCheck=X,2,L
+#FdMtgLoan=X,2,L
+#FdMtgPledge=X,2,L
+#FdClStatus=X,2,L
+#FdClStat=X,2,L
+#FdAgreement=X,2,L
+#FdLimitCancelDate=X,2,L
+#FdClCode=X,2,L
+#FdLoanToValue=X,2,L
+#FdOtherOwnerTotal=X,2,L
+#FdCompensationCopy=X,2,L
+#FdBdRmk=X,2,L
+#FdSynd=X,2,L
+#FdSyndCode=X,2,L
+#FdDispPrice=X,2,L
+#FdDispDate=X,2,L
+#FdMtgReasonCode=X,2,L
+#FdREC_DT=X,2,L
+#FdReceivedNo=X,2,L
+#FdCancelDate=X,2,L
+#FdCancelNo=X,2,L
+#FdSettingDate=X,2,L
+#FdSettingStat=X,2,L
+#FdSettingAmt=X,2,L
+#FdClaimDate=X,2,L
+#FdSettingSeq=X,2,L
+#FdFirstAmt=X,2,L
+#FdFirstCreditor=X,2,L
+
+#HideAll=@,1,S
+T(3,@FdApplNo,)
+T(3,@FdFunCd,*)
+T(3,@FdColInd1,*)
+T(3,@FdColInd2,*)
+T(3,@FdCOLNO,)
+T(3,@FdSubType,)
+T(3,@FdEvaDate,)
+T(3,@FdEvaAmt,)
+T(3,@FdEvaNetWorth,)
+T(3,@FdOwnershipCode,)
+T(3,@FdAgreement,)
+T(3,@FdClCode,)
+T(3,@FdSynd,)
+T(3,@FdSettingDate,)
+T(3,@FdSettingAmt,)
+T(3,@FdClaimDate,)
+T(3,@FdSettingSeq,)
+T(3,@FdFirstAmt,)
+T(3,@FdFirstCreditor,)
+T(3,@FdEvaCompany,*)
+T(3,@FdMtgCode,*)
+T(3,@FdClStatus,*)
+T(3,@FdClStat,*)
+T(3,@FdCompensationCopy,*)
+E(0,@EvaDate,0)
+E(0,@EvaAmt,0)
+E(0,@EvaNetWorth,0)
+E(0,@LVITax,0)
+E(0,@RentEvaValue,0)
+E(0,@RentPrice,0)
+E(0,@OwnershipCode,0)
+E(0,@MtgCode,0)
+T(3,@MtgCheck,)
+T(3,@MtgLoan,)
+T(3,@MtgPledge,)
+E(0,@ClStatus,0)
+T(3,@Agreement,)
+E(0,@LimitCancelDate,0)
+E(0,@ClCode,0)
+E(0,@LoanToValue,0)
+E(0,@OtherOwnerTotal,0)
+E(0,@CompensationCopy,0)
+T(3,@BdRmk,)
+T(3,@Synd,)
+T(3,@SyndCode,)
+E(0,@DispPrice,0)
+E(0,@DispDate,0)
+T(3,@MtgReasonCode,)
+E(0,@ReceivedDate,0)
+T(3,@ReceivedNo,)
+E(0,@CancelDate,0)
+T(3,@CancelNo,)
+E(0,@SettingDate,0)
+E(0,@SettingAmt,0)
+E(0,@ClaimDate,0)
+E(0,@SettingSeq,0)
+
+
+! [功能]
+#FunCd=A,1,S
+CALL(#HideAll)
+C(3,#CHAIN,1,s,$)
+HELP(#FunCdHelp)
+@V(H,#FunCdHelp)
+
+! 權限檢查
+#FUNCIND=_,_,S
+E(0,#FunCd)
+
+#FunCdX=X,5,L
+T(H,#FunCd,#FunCdHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+!FunCd=2 隱藏框線
+#WKTF=X,1,S
+IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0),$)
+
+! 若功能為 4 刪除 : 顯示LABEL欄位
+#FunCd4=X,1,S
+IF(#FunCd == 4,$,S)
+T(F,@CustId,0)
+T(F,@CustNo,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@ClTypeCode,0)
+T(F,@ClTypeCode,0)
+T(F,@CityCode,0)
+T(F,@AreaCode,0)
+T(F,@IrCode,0)
+T(F,@Road,0)
+T(F,@Section,0)
+T(F,@Alley,0)
+T(F,@Lane,0)
+T(F,@Num,0)
+T(F,@NumDash,0)
+T(F,@Floor,0)
+T(F,@FloorDash,0)
+T(F,@BdNo1,0)
+T(F,@BdNo2,0)
+T(F,@CityCodeB,0)
+T(F,@AreaCodeB,0)
+T(F,@IrCodeB,0)
+T(F,@LandNo1,0)
+T(F,@LandNo2,0)
+T(F,@EvaDate,0)
+T(F,@EvaAmt,0)
+T(F,@EvaNetWorth,0)
+T(F,@LVITax,0)
+T(F,@RentEvaValue,0)
+T(F,@RentPrice,0)
+T(F,@EvaCompany,0)
+T(F,@OwnershipCode,0)
+T(F,@MtgCode,0)
+T(F,@MtgCheck,0)
+T(F,@MtgLoan,0)
+T(F,@MtgPledge,0)
+T(F,@ClStatus,0)
+T(F,@Agreement,0)
+T(F,@LimitCancelDate,0)
+T(F,@ClCode,0)
+T(F,@LoanToValue,0)
+T(F,@OtherOwnerTotal,0)
+T(F,@CompensationCopy,0)
+T(F,@BdRmk,0)
+T(F,@Synd,0)
+T(F,@SyndCode,0)
+T(F,@DispPrice,0)
+T(F,@DispDate,0)
+T(F,@MtgReasonCode,0)
+T(F,@ReceivedDate,0)
+T(F,@ReceivedNo,0)
+T(F,@CancelDate,0)
+T(F,@CancelNo,0)
+T(F,@SettingDate,0)
+T(F,@SettingAmt,0)
+T(F,@ClaimDate,0)
+T(F,@SettingSeq,0)
+T(F,@SettingStat,0)
+T(F,@ClStat,0)
+##loop{times:10,n:1,}
+T(F,@OwnerId{n},0)
+T(F,@OwnerName{n},0)
+T(F,@OwnerRelCode{n},0)
+T(F,@OwnerPart{n},0)
+T(F,@OwnerTotal{n},0)
+##end
+
+##loop{times:8,n:1,}
+T(F,@FirstAmt{n},0)
+T(F,@FirstCreditor{n},0)
+##end
+HIDE(#BTN1)
+HIDE(#MtgAllbtn)
+HIDE(#MtgCheckbtn)
+HIDE(#MtgLoanbtn)
+HIDE(#MtgPledgebtn)
+SHOW(#MtgAllfg)
+SHOW(#MtgCheckfg)
+SHOW(#MtgLoanfg)
+SHOW(#MtgPledgefg)
+
+
+! 若功能為 1 新增 或 2 修改  :
+! (1) 必輸欄位上*號
+! (2) 顯示INPUT欄位
+#FunCd12=X,1,S
+IF(#FunCd == 1 || #FunCd == 2,$,S)
+T(3,@FdADDRESS_1,*)
+T(3,@FdLD_1,*)
+T(3,@FdOWNER,*)
+T(3,@FdSubType,*)
+T(3,@FdEvaDate,*)
+T(3,@FdEvaAmt,*)
+T(3,@FdEvaNetWorth,*)
+T(3,@FdOwnershipCode,*)
+T(3,@FdAgreement,*)
+T(3,@FdClCode,*)
+T(3,@FdSynd,*)
+T(3,@FdReceivedNo,*)
+T(3,@FdCancelNo,*)
+T(3,@FdSettingDate,*)
+T(3,@FdSettingStat,*)
+T(3,@FdSettingAmt,*)
+T(3,@FdClaimDate,*)
+T(3,@FdSettingSeq,*)
+T(F,@EvaDate,1)
+T(F,@EvaAmt,1)
+T(F,@EvaNetWorth,1)
+T(F,@LVITax,1)
+T(F,@RentEvaValue,1)
+T(F,@RentPrice,1)
+T(F,@EvaCompany,1)
+T(F,@OwnershipCode,1)
+T(F,@MtgCode,1)
+T(F,@MtgCheck,1)
+T(F,@MtgLoan,1)
+T(F,@MtgPledge,1)
+T(F,@ClStatus,1)
+T(F,@Agreement,1)
+T(F,@LimitCancelDate,1)
+T(F,@ClCode,1)
+T(F,@LoanToValue,1)
+T(F,@OtherOwnerTotal,1)
+T(F,@CompensationCopy,1)
+T(F,@BdRmk,1)
+T(F,@Synd,1)
+T(F,@SyndCode,1)
+T(F,@DispPrice,1)
+T(F,@DispDate,1)
+T(F,@MtgReasonCode,1)
+T(F,@ReceivedDate,1)
+T(F,@ReceivedNo,1)
+T(F,@CancelDate,1)
+T(F,@CancelNo,1)
+T(F,@SettingDate,1)
+T(F,@SettingAmt,1)
+T(F,@ClaimDate,1)
+T(F,@SettingSeq,1)
+
+! 若功能為 2 修改 或 4 刪除  : 擔保品號碼為必輸欄位，上*號
+#FunCd24=X,1,S
+IF(#FunCd == 2 || #FunCd == 4,T(3,@FdCOLNO,*),S)
+
+#FdCustId=X,2,L
+
+#CustId=X,10,S
+
+#CustIdX=X,100,S
+
+#FdCustNo=X,2,L
+
+#CustNo=A,7,S
+
+
+#CustNoX=X,100,L
+C(3,#CustNo,0,S,$)
+
+#BUF8=X,14,S
+T(2,00000019999999)
+
+#BIND8=X,1,S
+BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF8;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+!申請號碼
+
+#ApplNo=A,7,I
+C(3,#FunCd,1,$,s)
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+T(2,@CustId,#L2r05CustId)
+
+#SendL2r07D=X,1,S
+C(3,#ApplNo,0,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07D,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+C(3,#ApplNo,0,S,$)
+T(2,#L2r07CustName)
+
+
+! [擔保品代號1]
+#ClCode1=A,1,I
+C(3,#FunCd,1,$,s)
+HELP(#ClCode1Help)
+@V(H,#ClCode1Help)
+CALL(#checkclcode)
+IF(#PageFg==1,$,CALL(#Show1))
+
+
+#ClCode1X=X,4,L
+C(4,#ClCode1,S,$)
+T(H,#ClCode1,#ClCode1Help)
+C(3,#ClCode1,2,T(3,@Btn1,土地座落),T(3,@Btn1,建物門牌))
+
+
+! [擔保品代號2]
+#ClCode2=A,2,I
+C(3,#FunCd,1,$,s)
+C(2,#ClCode1,T(3,),
+             HELP(#ClCode21Help),
+             HELP(#ClCode22Help))
+@C(2,#ClCode1,T(3,),
+             V(H,#ClCode21Help),
+             V(H,#ClCode22Help)
+ )
+
+#COLIND=A,3,S
+T(2,#ClCode1+#ClCode2)
+
+#ClCode2X=X,13,L
+C(2,#ClCode1,T(3,),
+             T(H,#ClCode2,#ClCode21Help),
+             T(H,#ClCode2,#ClCode22Help)
+ )
+
+
+
+! [擔保品編號]
+#ClNo=A,7,L
+
+<include src="ROM.icf::L2R17.dec"/>
+!RIM取原擔保品編號
+#RimL2r17=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r17,L2R17)
+S(L2R17,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R17)
+E(0,@GdRid1,#L2r17GdrId1)
+E(0,@GdRid2,#L2r17GdrId2)
+E(0,@GdRnum,#L2r17GdrNum)
+E(0,@Lgtseq,#L2r17LgtSeq)
+
+![原擔保品編號]
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
+#Lgtseq=A,2,L
+
+#GdALL=X,15,L
+C(3,#GdRid1,0,S,$)
+T(2,#GdRid1+-+#GdRid2+-+#GdRnum+-+#Lgtseq)
+
+!調RIM參數
+#RimClNo=A,7,S
+
+! 修改、刪除時，調RIM查擔保品主檔(ClMain)資料
+#RimL2r22=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+RESET_RIM(#RimL2r22,L2R22)
+S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R22)
+
+#checkL2r22=X,1,S
+C(3,#FunCd,1,S,$)
+T(2,@ClTypeCode,#L2r22ClTypeCode)
+E(0,@EvaDate,#L2r22EvaDate)
+E(0,@EvaAmt,#L2r22EvaAmt)
+E(0,@ClStatus,#L2r22ClStatus)
+T(2,@Synd,#L2r22Synd)
+T(2,@SyndCode,#L2r22SyndCode)
+E(3,@DispPrice,#L2r22DispPrice)
+E(0,@DispDate,#L2r22DispDate)
+
+
+! 修改、刪除時，調RIM查擔保品不動產檔(ClImm)資料
+#RimL2r23=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+RESET_RIM(#RimL2r23,L2R23)
+S(L2R23,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R23)
+
+#checkL2r23=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@EvaNetWorth,#L2r23EvaNetWorth)
+E(0,@LVITax,#L2r23LVITax)
+E(0,@RentEvaValue,#L2r23RentEvaValue)
+E(0,@RentPrice,#L2r23RentPrice)
+T(2,@EvaCompany,#L2r23EvaCompany)
+T(2,@OwnershipCode,#L2r23OwnershipCode)
+T(2,@MtgCode,#L2r23MtgCode)
+
+T(2,@MtgCheck,#L2r23MtgCheck)
+IF(#MtgCheck == "Y",T(3,@MtgCheckbtn,V)T(3,@MtgCheckfg,V),T(3,@MtgCheckbtn,)T(3,@MtgCheckfg,))
+T(2,@MtgLoan,#L2r23MtgLoan)
+IF(#MtgLoan == "Y",T(3,@MtgLoanbtn,V)T(3,@MtgLoanfg,V),T(3,@MtgLoanbtn,)T(3,@MtgLoanfg,))
+T(2,@MtgPledge,#L2r23MtgPledge)
+IF(#MtgPledge == "Y",T(3,@MtgPledgebtn,V)T(3,@MtgPledgefg,V),T(3,@MtgPledgebtn,)T(3,@MtgPledgefg,))
+IF(#MtgCheck == "Y" && #MtgLoan == "Y" && #MtgPledge == "Y",T(3,@MtgAllbtn,V)T(3,@MtgAllfg,V),T(3,@MtgAllbtn,)T(3,@MtgAllfg,))
+
+T(2,@Agreement,#L2r23Agreement)
+E(0,@LimitCancelDate,#L2r23LimitCancelDate)
+E(0,@ClCode,#L2r23ClCode)
+E(0,@LoanToValue,#L2r23LoanToValue)
+T(2,@OtherOwnerTotal,#L2r23OtherOwnerTotal)
+E(0,@CompensationCopy,#L2r23CompensationCopy)
+T(2,@BdRmk,#L2r23BdRmk)
+T(2,@MtgReasonCode,#L2r23MtgReasonCode)
+E(0,@ReceivedDate,#L2r23ReceivedDate)
+T(2,@ReceivedNo,#L2r23ReceivedNo)
+E(0,@CancelDate,#L2r23CancelDate)
+T(2,@CancelNo,#L2r23CancelNo)
+E(0,@SettingDate,#L2r23SettingDate)
+T(2,@ClStat,#L2r23ClStat)
+T(2,@SettingStat,#L2r23SettingStat)
+E(0,@SettingAmt,#L2r23SettingAmt)
+E(0,@ClaimDate,#L2r23ClaimDate)
+E(0,@SettingSeq,#L2r23SettingSeq)
+##loop{times:9,i:0}
+T(2,@FirstCreditor{i},#L2r23FirstCreditor{i})
+T(2,@FirstAmt{i},#L2r23FirstAmt{i})
+##end
+##loop{times:8,n:1,k:2,}
+C(3,#FirstAmt{n},0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
+#Ranktxt2{n}=x,2,S
+IF({n} == 1,T(3,一),$) 
+IF({n} == 2,T(3,二),$)
+IF({n} == 3,T(3,三),$)
+IF({n} == 4,T(3,四),$)
+IF({n} == 5,T(3,五),$)
+IF({n} == 6,T(3,六),$)
+IF({n} == 7,T(3,七),$)
+IF({n} == 8,T(3,八),$)
+#Rank{n}=X,40,L
+T(2,#Ranktxt1+#Ranktxt2{n}+#Ranktxt3)
+##end
+IF(#L2r23MtgCheck == "",$,s)
+IF(#L2r23MtgLoan == "Y",$,s)
+IF(#L2r23MtgPledge == "Y",$,s)
+
+
+
+!RIM取擔保主檔(不動產)
+#RimL2r27=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#ClCode1,1,$,S)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+RESET_RIM(#RimL2r27,L2R27)
+S(L2R27,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R27)
+
+#checkL2r27=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#ClCode1,1,$,S)
+T(2,@CityCode,#L2r27CityCode)
+T(2,@AreaCode,#L2r27AreaCode)
+T(2,@IrCode,#L2r27IrCode)
+T(2,@Road,#L2r27Road)
+T(2,@Section,#L2r27Section)
+T(2,@Alley,#L2r27Alley)
+T(2,@Lane,#L2r27Lane)
+T(2,@Num,#L2r27Num)
+T(2,@NumDash,#L2r27NumDash)
+T(2,@Floor,#L2r27Floor)
+T(2,@FloorDash,#L2r27FloorDash)
+E(0,@BdNo1,#L2r27BdNo1)
+E(0,@BdNo2,#L2r27BdNo2)
+##loop{times:10,i:1}
+T(2,@OwnerId{i},#L2r27OwnerId{i})
+T(2,@OwnerName{i},#L2r27OwnerName{i})
+T(2,@OwnerRelCode{i},#L2r27OwnerRelCode{i})
+E(0,@OwnerPart{i},#L2r27OwnerPart{i})
+E(0,@OwnerTotal{i},#L2r27OwnerTotal{i})
+##end
+
+
+!RIM取擔保主檔
+#RimL2r28=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#ClCode1,2,$,S)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+E(0,@RimLandSeq,000)
+RESET_RIM(#RimL2r28,L2R28)
+S(L2R28,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd,#RimLandSeq)
+R(1,L2R28)
+
+#checkL2r28=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#ClCode1,2,$,S)
+T(2,@CityCodeB,#L2r28CityCode)
+T(2,@AreaCodeB,#L2r28AreaCode)
+E(0,@checkircode,#L2r28IrCode)
+E(0,@LandNo1,#L2r28LandNo1)
+E(0,@LandNo2,#L2r28LandNo2)
+##loop{times:10,i:1}
+T(2,@OwnerId{i},#L2r28OwnerId{i})
+T(2,@OwnerName{i},#L2r28OwnerName{i})
+T(2,@OwnerRelCode{i},#L2r28OwnerRelCode{i})
+E(0,@OwnerPart{i},#L2r28OwnerPart{i})
+E(0,@OwnerTotal{i},#L2r28OwnerTotal{i})
+##end
+
+#checkircode=A,4,S
+C(3,#FunCd,1,S,$)
+C(3,#ClCode1,2,$,S)
+T(2,@IrCodeB,#checkircode)
+
+
+! [擔保品類別]
+#ClTypeCode=X,3,I
+C(3,#FunCd,1,$,s)
+IF(#ClCode1==1,
+HELP(#ClTypeCode21Help),
+HELP(#ClTypeCode22Help))
+@V(7)
+IF(#ClCode1==1,
+   V(H,#ClTypeCode21Help),
+   V(H,#ClTypeCode22Help))
+
+#ClTypeCodeX=X,24,L
+IF(#ClCode1==1,T(H,#ClTypeCode,#ClTypeCode21Help),
+               T(H,#ClTypeCode,#ClTypeCode22Help))
+
+
+
+
+!調RIM參數
+#RimCityCode=X,2,S
+#RimAreaCode=X,3,S
+
+! 調RIM取縣市代碼
+#RimL6r03City=X,1,S
+C(3,#ClCode1,1,$,S)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimFunCd,1)
+T(3,@RimCityCode,)
+T(3,@RimAreaCode,)
+RESET_RIM(#RimL6r03City,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 縣市代碼的下拉選單
+#L6r03ResultCity=x,50000,S
+T(2,#L6r03Result)
+
+! 市
+#CityCode=X,2,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+HIDE(#CityItem)
+HELP(#L6r03ResultCity,cols:3)
+@V(H,#L6r03ResultCity)
+SHOW(#CityItem)
+
+! 縣市代碼對應名稱
+#CityItem=x,10,L
+T(H,#CityCode,#L6r03ResultCity)
+
+!調RIM縣市 ED
+
+!調RIM鄉鎮 ST
+! 調RIM取鄉鎮市區代碼
+#RimL6r03Area=X,1,S
+C(3,#ClCode1,1,$,S)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#CityCode)
+T(3,@RimAreaCode,)
+RESET_RIM(#RimL6r03Area,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 鄉鎮市區代碼的下拉選單
+#L6r03ResultArea=x,50000,S
+T(2,#L6r03Result)
+
+
+! 區
+#AreaCode=X,3,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+HIDE(#AreaItem)
+HELP(#L6r03ResultArea,cols:3)
+@V(H,#L6r03ResultArea)
+SHOW(#AreaItem)
+
+! 鄉鎮市區代碼的對應名稱
+#AreaItem=x,20,L
+T(H,#AreaCode,#L6r03ResultArea)
+
+!調RIM鄉鎮 ED
+
+
+!調RIM地段 ST
+! 調RIM取地段代碼
+#RimL6r03Ir=X,1,S
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimFunCd,3)
+T(2,@RimCityCode,#CityCode)
+T(2,@RimAreaCode,#AreaCode)
+RESET_RIM(#RimL6r03Ir,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 地段代碼的下拉選單
+#L6r03ResultIr=X,50000,S
+T(2,#L6r03Result)
+
+
+! 地段
+#IrCode=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+HIDE(#IrItem)
+HELP(#L6r03ResultIr,cols:3)
+@V(H,#L6r03ResultIr)
+SHOW(#IrItem)
+
+! 地段代碼的對應名稱
+#IrItem=X,20,L
+T(H,#IrCode,#L6r03ResultIr)
+
+!調RIM地段 ED
+
+! 路/街/村里
+#Road=x,20,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@V(7)
+
+! 段
+#Section=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@C(4,#Section,s,$)
+
+
+! 巷
+#Alley=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@C(4,#Alley,s,$)
+
+
+! 弄
+#Lane=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@C(4,#Lane,s,$)
+
+
+! 號
+#Num=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@C(4,#Num,s,$)
+
+
+#NumDash=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+IF(#Num=="",S,$)
+@C(4,#NumDash,s,$)
+
+
+! 樓
+#Floor=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@C(4,#Floor,s,$)
+
+
+#FloorDash=X,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+IF(#Floor=="",S,$)
+@C(4,#FloorDash,s,$)
+
+
+! 建號
+#BdNo1=A,5,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@V(9)V(2,00000)
+
+
+#BdNo2=A,3,I
+C(3,#ClCode1,1,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+IF(#BdNo1=="",S,$)
+@
+V(9)
+
+
+!-------------
+
+
+! 調RIM取縣市代碼
+#RimL6r03CityB=X,1,S
+C(3,#ClCode1,2,$,S)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimFunCd,1)
+T(3,@RimCityCode,)
+T(3,@RimAreaCode,)
+RESET_RIM(#RimL6r03CityB,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 縣市代碼的下拉選單
+#L6r03ResultCityB=x,50000,S
+T(2,#L6r03Result)
+
+
+
+! 市
+#CityCodeB=X,2,I
+C(3,#ClCode1,2,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+HIDE(#CityItemB)
+HELP(#L6r03ResultCityB,cols:3)
+@V(H,#L6r03ResultCityB)
+SHOW(#CityItemB)
+
+! 縣市代碼對應名稱
+#CityItemB=X,10,L
+T(H,#CityCodeB,#L6r03ResultCityB)
+
+! 調RIM取鄉鎮市區代碼
+#RimL6r03AreaB=X,1,S
+C(3,#ClCode1,2,$,S)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#CityCodeB)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03AreaB,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 鄉鎮市區代碼的下拉選單
+#L6r03ResultAreaB=x,50000,S
+T(2,#L6r03Result)
+
+
+! 區
+#AreaCodeB=X,3,I
+C(3,#ClCode1,2,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+HIDE(#AreaItemB)
+HELP(#L6r03ResultAreaB,cols:3)
+@V(H,#L6r03ResultAreaB)
+SHOW(#AreaItemB)
+
+! 鄉鎮市區代碼的對應名稱
+#AreaItemB=X,20,L
+T(H,#AreaCodeB,#L6r03ResultAreaB)
+
+!調RIM鄉鎮 ED
+
+
+!調RIM地段 ST
+! 調RIM取地段代碼
+#RimL6r03IrB=X,1,S
+C(3,#ClCode1,2,$,S)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimFunCd,3)
+T(2,@RimCityCode,#CityCodeB)
+T(2,@RimAreaCode,#AreaCodeB)
+RESET_RIM(#RimL6r03IrB,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 地段代碼的下拉選單
+#L6r03ResultIrB=x,50000,S
+T(2,#L6r03Result)
+
+
+! 地段
+#IrCodeB=X,4,I
+C(3,#ClCode1,2,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+HIDE(#IrItemB)
+HELP(#L6r03ResultIrB,cols:3)
+@V(H,#L6r03ResultIrB)
+SHOW(#IrItemB)
+
+! 地段代碼的對應名稱
+#IrItemB=X,20,L
+T(H,#IrCodeB,#L6r03ResultIrB)
+
+!調RIM地段 ED
+
+! 地號
+#LandNo1=A,4,I
+C(3,#ClCode1,2,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@V(9)V(2,0)
+
+#LandNo2=A,4,I
+C(3,#ClCode1,2,$,S)
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#PageFg==1,$,CALL(#Show1))
+IF(#FunCd==4,s,$)
+@V(9)
+
+
+! [土地座落]
+#LandLocation=x,150,L
+IF(#FunCd==4,s,T(B,#CityItemB+#AreaItemB+#IrItemB))
+T(B,#LandLocation+，+地號+#LandNo1+-+#LandNo2)
+
+
+!-------------
+
+
+#OwnerId0=X,1,S
+T(3,X)
+
+
+#clcode1txt1=x,34,S
+T(3,建物門牌之建物所有權人與擔保品編號)
+#clcode1txt2=x,20,S
+T(3,相同，請改用修改功能)
+#clcode2txt1=x,34,S
+T(3,土地座落之土地所有權人與擔保品編號)
+
+#Dash=X,1,S
+T(3,-)
+
+
+##loop{times:10,i:1,j:0,rowSeq:2}
+
+#HIDE_OWNER_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd3_{rowSeq},0)
+
+#SHOW_OWNER_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd3_{rowSeq},1)
+
+#CheckCustId{i}=X,10,S
+T(3, )
+
+! [建物所有權人-統編]
+#OwnerId{i}=X,10,I
+IF(#PageFg==2,$,CALL(#Show2))
+IF(#FunCd==4,s,$)
+C(4,#OwnerId{j},CALL(#HIDE_OWNER_ROW_{i}),CALL(#SHOW_OWNER_ROW_{i}))
+C(4,#OwnerId{j},S,$)
+@IF({i} == 1,V(7),$)
+C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
+C(4,#OwnerId{i},s,$)
+V(7)A(ID_UNINO,0,#OwnerId{i})
+V(4,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10)
+
+
+#tt{i}=X,1,S
+!C(3,#FunCd,1,C(4,#CustId,T(F,#OwnerRelCode{i},0),C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1))),T(F,#OwnerRelCode{i},0))
+C(4,#CustId,T(F,#OwnerRelCode{i},0),C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1)))
+!RIM取擔保主檔
+#RimL2r43{i}=X,1,S
+C(4,#OwnerId{i},S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+T(2,@RimCustId,#OwnerId{i})
+RESET_RIM(#RimL2r43{i},L2R43)
+S(L2R43,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd,#RimCustId,#CityCode,#AreaCode,#IrCode,#BdNo1,#BdNo2,#CityCodeB,#AreaCodeB,#IrCodeB,#LandNo1,#LandNo2)
+R(1,L2R43)
+
+
+#CheckClno{i}=x,70,S
+C(3,#ClCode1,1,T(B,#clcode1txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2),
+               T(B,#clcode2txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2))
+
+#CheckL2R43{i}=X,1,S
+C(4,#OwnerId{i},S,$)
+T(2,@OwnerName{i},#L2r43CustName)
+C(5,#EMPNOT,ELTEST,s,$)
+C(3,#L2r43ClNo,0,$,V(P,#CheckClno{i}))
+
+! T(2,@OwnerName{i},#L1r09CustName)
+
+! [建物所有權人-姓名]
+#OwnerName{i}=x,2.50,I
+IF(#PageFg==2,$,CALL(#Show2))
+IF(#FunCd==4,s,$)
+C(4,#L2r43CustName,$,s)
+C(4,#OwnerId{i},S,$)
+
+
+! [建物所有權人-持份比率(分子)]
+#OwnerPart{i}=m,10,I
+IF(#PageFg==2,$,CALL(#Show2))
+IF(#FunCd==4,s,$)
+C(4,#OwnerId{i},S,$)
+@V(2,0)
+
+! [建物所有權人-持份比率(分母)]
+#OwnerTotal{i}=m,10,I
+IF(#PageFg==2,$,CALL(#Show2))
+IF(#FunCd==4,s,$)
+C(4,#OwnerId{i},S,$)
+@V(2,0)
+IF({i} == 1,E(0,@OwnerTotal,#OwnerTotal{i}),V(1,#OwnerTotal))
+
+! [建物所有權人-與授信戶關係]
+#OwnerRelCode{i}=X,2,I
+IF(#PageFg==2,$,CALL(#Show2))
+IF(#FunCd==4,s,$)
+C(4,#OwnerId{i},S,$)
+C(4,#CustId,S,$)
+C(5,#OwnerId{i},#CustId,S,$)
+HELP(#RelationCodeHelp)
+@
+IF(#OwnerRelCode{i}==#L2r27OwnerRelCode{i}||#OwnerRelCode{i}==#L2r28OwnerRelCode{i},s,$)
+V(H,#RelationCodeHelp)
+V(7)
+
+
+#OwnerRelCodeX{i}=X,40,L
+C(4,#OwnerRelCode{i},S,$)
+T(H,#OwnerRelCode{i},#RelationCodeHelp)
+
+#WKI{i}=X,1,S
+T(2,@CheckCustId{i},#OwnerId{i})
+
+##end
+
+#closeOwnerPart=X,1,S
+E(0,@OwnerPart,0)
+
+##loop{times:10,i:1}
+#CheckOwnerPart{i}=x,1,S
+E(0,@OwnerPart,#OwnerPart+#OwnerPart{i})
+##end
+
+#OwnerPart=m,10,L
+IF(#FunCd==4,s,$)
+
+#OwnerTotal=m,10,L
+IF(#FunCd==4,s,$)
+IF(#OwnerPart != #OwnerTotal,$,s)
+V(P,持份比率之分子總和需等於持份比率之分母)
+
+#CheckOwnerPartend=X,1,L
+
+#POSINTDT=D,8,S
+T(4,CDATE$)
+!取日曆日7碼
+#PosIntDt7=D,7,S
+T(1,#POSINTDT,2,7)
+
+
+! [鑑估日期]
+#EvaDate=D,7,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==3,$,CALL(#Show3))
+D(8)
+@V(7)A(4,0,#EvaDate)
+IF(#EvaDate>#PosIntDt7,V(P,不得超過日曆日),$)
+
+
+! [鑑估總值]
+#EvaAmt=m,14,I
+IF(#FunCd==4,s,$)
+@V(2,0)
+
+
+! [評估淨值]
+#EvaNetWorth=m,14,I
+IF(#FunCd==4,s,$)
+@IF(#EvaNetWorth == #L2r23EvaNetWorth,s,$)
+V(2,0)
+
+
+! [土地增值稅]
+#LVITax=m,14,I
+IF(#FunCd==4,s,$)
+@IF(#LVITax=="",s,$)
+
+
+! [出租評估淨值]
+#RentEvaValue=m,14,I
+IF(#FunCd==4,s,$)
+@IF(#RentEvaValue=="",s,$)
+
+
+! [押租金]
+#RentPrice=m,14,I
+IF(#FunCd==4,s,$)
+@IF(#RentPrice=="",s,$)
+
+
+! [鑑價公司]
+#EvaCompany=X,2,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==3,$,CALL(#Show3))
+@V(7)
+
+#RimL6R10InsurerType=X,1,S
+#RimL6R10InsurerCode=X,2,S
+
+#SendL6R10=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimL6R10InsurerType,2)
+T(2,@RimL6R10InsurerCode,#EvaCompany)
+RESET_RIM(#SendL6R10,L6R10)
+S(L6R10,1,#RimFuncCode,#RimTxCode,#RimL6R10InsurerType,#RimL6R10InsurerCode)
+R(1,L6R10)
+
+
+#EvaCompanyX=x,100,L
+T(2,#L6R10InsurerItem)
+
+
+! [權利種類]
+#OwnershipCode=A,1,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+HELP(#OwnershipCodeHelp)
+@V(H,#OwnershipCodeHelp)
+
+#OwnershipCodeX=X,15,L
+T(3,)T(H,#OwnershipCode,#OwnershipCodeHelp)
+
+
+! [抵押權註記]
+#MtgCode=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+HELP(#MtgCodeHelp)
+@V(H,#MtgCodeHelp)
+C(3,#MtgCode,0,ENABLE(#MtgAllbtn)ENABLE(#MtgCheckbtn)ENABLE(#MtgLoanbtn)ENABLE(#MtgPledgebtn)
+               T(3,@MtgAllbtn,V)T(3,@MtgCheckbtn,V)T(3,@MtgLoanbtn,V)T(3,@MtgPledgebtn,V)
+               T(3,@MtgCheck,Y)T(3,@MtgLoan,Y)T(3,@MtgPledge,Y),
+               DISABLE(#MtgAllbtn)DISABLE(#MtgCheckbtn)DISABLE(#MtgLoanbtn)DISABLE(#MtgPledgebtn)
+               T(3,@MtgAllbtn, )T(3,@MtgCheckbtn, )T(3,@MtgLoanbtn, )T(3,@MtgPledgebtn, )
+               T(3,@MtgCheck,N)T(3,@MtgLoan,N)T(3,@MtgPledge,N))
+
+#MtgCodeX=X,25,L
+T(3,)T(H,#MtgCode,#MtgCodeHelp)
+
+#MtgAllfg=X,1,L
+#MtgCheckfg=X,1,L
+#MtgLoanfg=X,1,L
+#MtgPledgefg=X,1,L
+
+
+#MtgCheck=X,1,L
+#MtgLoan=X,1,L
+#MtgPledge=X,1,L
+
+![擔保品狀況碼]
+#ClStatus=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+C(3,#FunCd,1,E(0,1),$)
+HELP(#ClStatusHelp)
+IF(#FunCd==4,s,$)
+@V(H,#ClStatusHelp)
+
+#ClStatusX=X,7,L
+T(3,)T(H,#ClStatus,#ClStatusHelp)
+
+
+![擔保品狀態]
+#ClStat=X,1,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+C(3,#FunCd,1,E(0,0),$)
+HELP(#ClStatHelp)
+@V(H,#ClStatHelp)
+
+#ClStatX=X,10,L
+T(3,)T(H,#ClStat,#ClStatHelp)
+
+
+![檢附同意書]
+#Agreement=X,1,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+#AgreementX=X,2,L
+T(3,)T(H,#Agreement,#YNHelp)
+
+
+![限制塗銷日期]
+#LimitCancelDate=D,7,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+D(8)
+@IF(#LimitCancelDate == 0,s,$)
+A(4,0,#LimitCancelDate)
+
+
+![擔保註記]
+#ClCode=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+HELP(#ClCodeHelp)
+@V(H,#ClCodeHelp)
+IF(#ClCode==1,T(3,@FdLoanToValue,*),T(3,@FdLoanToValue, ))
+
+#ClCodeX=X,6,L
+T(3,)T(H,#ClCode,#ClCodeHelp)
+
+
+![貸放成數]
+#LoanToValue=m,3.2,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+IF(#ClCode==2,S,$)
+@IF(#ClCode==2,S,$)
+IF(#LoanToValue == #L2r23LoanToValue,s,$)
+V(2,0)
+
+
+
+![其他債權人設定總額]
+#OtherOwnerTotal=m,14,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+
+
+
+![代償後謄本]
+#CompensationCopy=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+HELP(#ZeroOneHelp)
+@V(H,#ZeroOneHelp)
+
+#CompensationCopyX=X,2,L
+T(3,)T(H,#CompensationCopy,#ZeroOneHelp)
+
+
+![建物標示備註]
+#BdRmk=x,60,I
+IF(#PageFg==4,$,CALL(#Show4))
+IF(#FunCd==4,s,$)
+
+
+
+![聯貸案]
+#Synd=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#PageFg==4,$,CALL(#Show4))
+!HELP(#YNHelp)
+!@V(H,#YNHelp)
+!IF(#Synd=="Y",T(3,@FdSyndCode,*),T(3,@FdSyndCode, ))
+
+#SyndX=X,2,L
+!T(3,)T(H,#Synd,#YNHelp)
+
+
+![聯貸案類型]
+#SyndCode=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#PageFg==4,$,CALL(#Show4))
+!IF(#Synd=="Y",$,S)
+!HELP(#SyndCodeHelp)
+!@IF(#Synd=="Y",$,S)
+!V(H,#SyndCodeHelp)
+
+#SyndCodeX=X,6,L
+!T(3,)T(H,#SyndCode,#SyndCodeHelp)
+
+
+![處分價格]
+#DispPrice=m,14,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==5,$,CALL(#Show5))
+
+
+![處分日期]
+#DispDate=D,7,I
+IF(#FunCd==4,s,$)
+D(8)
+@IF(#DispDate==0,s,$)
+A(4,0,#DispDate)
+
+
+![最高抵押權確定事由]
+#MtgReasonCode=X,1,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==5,$,CALL(#Show5))
+HELP(#MtgReasonCodeHelp)
+@V(H,#MtgReasonCodeHelp)
+IF(#MtgReasonCode=="",T(3,@FdReceivedNo, ),T(3,@FdReceivedNo,*))
+IF(#MtgReasonCode=="",T(3,@FdCancelNo, ),T(3,@FdCancelNo,*))
+
+
+#MtgReasonCodeX=X,32,L
+T(3,)T(H,#MtgReasonCode,#MtgReasonCodeHelp)
+
+
+! [收文日期]
+#ReceivedDate=D,7,I
+IF(#FunCd==4,s,$)
+IF(#MtgReasonCode=="",S,$)
+D(8)
+@IF(#MtgReasonCode=="",S,$)
+A(4,0,#ReceivedDate)
+
+
+! [收文案號]
+#ReceivedNo=X,20,I
+IF(#FunCd==4,s,$)
+IF(#MtgReasonCode=="",S,$)
+@IF(#MtgReasonCode=="",S,$)
+V(7)
+
+
+! [撤銷日期]
+#CancelDate=D,7,I
+IF(#FunCd==4,s,$)
+IF(#MtgReasonCode=="",S,$)
+D(8)
+@IF(#MtgReasonCode=="",S,$)
+A(4,0,#CancelDate)
+
+
+! [撤銷案號]
+#CancelNo=X,20,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==5,$,CALL(#Show5))
+IF(#MtgReasonCode=="",S,$)
+@IF(#MtgReasonCode=="",S,$)
+V(7)
+
+! [設定日期]
+#SettingDate=D,7,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==6,$,CALL(#Show6))
+D(8)
+@
+V(7)V(2,0)A(4,0,#SettingDate)
+
+
+![設定狀態]
+#SettingStat=X,1,I
+IF(#FunCd==4,s,$)
+HELP(#SettingStatHelp)
+@V(H,#SettingStatHelp)
+
+#SettingStatX=X,4,L
+C(4,#SettingStat,S,$)
+T(H,#SettingStat,#SettingStatHelp)
+
+! [設定金額]
+#SettingAmt=m,14,I
+IF(#FunCd==4,s,$)
+@V(7)V(2,0)
+
+!Rim參數
+#RimEvaAmt=m,14,S
+#RimLoanToValue=m,3.2,S
+#RimSettingAmt=m,14,S
+#RimEvaNetWorth=m,14.2,S
+#RimSettingStat=X,1,S
+#RimClStat=X,1,S
+
+#SendL2R41=X,1,S
+C(3,#FunCd,2,$,S)
+E(0,@RimFunCd,5)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimEvaAmt,#EvaAmt)
+E(0,@RimEvaNetWorth,#EvaNetWorth)
+E(0,@RimLoanToValue,#LoanToValue)
+E(0,@RimSettingAmt,#SettingAmt)
+T(2,@RimSettingStat,#SettingStat)
+T(2,@RimClStat,#ClStat)
+RESET_RIM(#SendL2R41,L2R41)
+S(L2R41,1,#RimFunCd,#RimClCode1,#RimClCode2,#RimClNo,#RimEvaAmt,#RimEvaNetWorth,#RimLoanToValue,#RimSettingAmt,#RimSettingStat,#RimClStat)
+R(1,L2R41)
+
+
+
+
+! [擔保債權確定日期]
+#ClaimDate=D,7,I
+IF(#FunCd==4,s,$)
+D(8)
+@V(7)V(2,0)A(4,0,#ClaimDate)
+
+
+
+! [設定順位]
+#SettingSeq=A,1,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==6,$,CALL(#Show6))
+HELP(#SettingSeqHelp)
+@V(H,#SettingSeqHelp)
+
+#Rank0=X,40,S
+#FirstAmt0=m,14,S
+#FirstCreditor0=X,40,S
+
+
+##loop{times:8,i:1,rowSeq:2}
+
+#CheckSettingSeq{i}=x,1,L
+IF(#SettingSeq>{i},INVOKEJS(SHOW,grd4_{rowSeq},1),INVOKEJS(SHOW,grd4_{rowSeq},0))
+##end
+
+
+##loop{times:8,i:1,j:0,rowSeq:2}
+
+! [前一順位金額]
+#FirstAmt{i}=m,14,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==6,$,CALL(#Show6))
+IF(#SettingSeq>{i},$,S)
+@V(2,0)
+
+
+! [前一順位債權人]
+#FirstCreditor{i}=X,40,I
+IF(#FunCd==4,s,$)
+IF(#PageFg==6,$,CALL(#Show6))
+T(3,新光人壽保險股份有限公司)
+C(3,#FirstAmt{i},0,S,$)
+@V(7)
+
+##end
+
+
+#ShowAll=X,1,S
+ENABLE(#BtnExpand)
+E(0,@PageFg,7)
+CALL(#ResetPages)
+
+
+
+
+#RPTFG=A,1,S
+E(0,1)
+<include src="ROM.icf::L6R10.dec"/>
+
+</sub>
+
+<sub type="DC" name="p2" layout="cols=2;screen.width=[180,850];printer.width=[20,40];order=1">
+[
+["建物門牌"],
+[#<->#,"#FdADDRESS_1+建物門牌",#CityCode,#CityItem,"（縣／市）</BR>",
+                              #AreaCode,#AreaItem,"（鄉／鎮／市／區）</BR>",
+                              #IrCode,#IrItem,"（地段）</BR>",
+                              #Road,"（路／街／村）</BR>",
+                              #Section,"段@",#Alley,"巷@",#Lane,"弄</BR>",
+                              #Num,"號之",#NumDash,"</BR>",
+                              #Floor,"樓之",#FloorDash,"</BR>",
+                              "建號",#BdNo1,"-",#BdNo2],
+[#<->#,"#FdLD_1+土地座落",#CityCodeB,#CityItemB,"（縣／市）</BR>",
+                         #AreaCodeB,#AreaItemB,"（鄉／鎮／市／區）</BR>",
+                         #IrCodeB,#IrItemB,"（地段）</BR>",
+                         "地號",#LandNo1,"－",#LandNo2],
+]
+</sub>
+
+<sub type="DC" name="p3" layout="cols=2;screen.width=[180,850];printer.width=[20,40];order=1">
+[
+["所有權人"],
+["#grid#,{id:3,expand:true,loop:10,row_height:1,s_cols:[150,500,250,500], p_cols:[20,20,20,20]}","#FdOWNER+所有權人","","",
+["統編","姓名","持份比率","與授信戶關係"],
+[[#OwnerId1],#OwnerName1,[#OwnerPart1,"/",#OwnerTotal1],[#OwnerRelCode1,#OwnerRelCodeX1]]
+],
+[#<->#,"@","@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@合@@@計@@@@",#OwnerPart,"/",#OwnerTotal],
+]
+</sub>
+
+<sub type="DC" name="p4" layout="cols=3;screen.width=[180,265,180,405];printer.width=[20,40,20,40];order=1">
+[
+["鑑價"],
+["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+鑑估總值",#EvaAmt],
+["#FdEvaNetWorth+評估淨值",#EvaNetWorth],["#FdLVITax+土地增值稅",#LVITax],
+["#FdRentEvaValue+出租評估淨值",#RentEvaValue],["#FdRentPrice+押租金",#RentPrice],
+[#<->#,"#FdEvaCompany+鑑價公司",#EvaCompany,#BTN1,#EvaCompanyX],
+]
+</sub>
+
+<sub type="DC" name="p5" layout="cols=3;screen.width=[180,265,260,325];printer.width=[20,40,20,40];order=1">
+[
+["抵押"],
+[#<->#,"#FdOwnershipCode+權利種類",#OwnershipCode,#OwnershipCodeX],
+["#FdMtgCode+抵押權註記",#MtgCode,#MtgCodeX],["#FdKind+最高限額抵押權之擔保債權種類",#MtgAllfg,#MtgAllbtn,"全選",#MtgCheckfg,#MtgCheckbtn,"票據",#MtgLoanfg,#MtgLoanbtn,"借款",#MtgPledgefg,#MtgPledgebtn,"保證債務"],
+["#FdClStatus+擔保品狀況碼",#ClStatus,#ClStatusX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
+["#FdAgreement+檢附同意書",#Agreement,#AgreementX],["#FdLimitCancelDate+限制塗銷日期",#LimitCancelDate],
+["#FdClCode+擔保註記",#ClCode,#ClCodeX],["#FdLoanToValue+貸放成數",#LoanToValue,"%"],
+[#<->#,"#FdOtherOwnerTotal+其他債權人設定總額",#OtherOwnerTotal],
+[#<->#,"#FdCompensationCopy+代償後謄本",#CompensationCopy,#CompensationCopyX],
+[#<->#,"#FdBdRmk+建物標示備註",#BdRmk],
+]
+</sub>
+
+<sub type="DC" name="p6" layout="cols=3;screen.width=[180,265,180,405];printer.width=[20,40,20,40];order=1">
+[
+["處分"],
+["#FdDispPrice+處分價格",#DispPrice],["#FdDispDate+處分日期",#DispDate],
+[#<->#,"#FdMtgReasonCode+最高抵押權確定事由",#MtgReasonCode,#MtgReasonCodeX],
+["#FdREC_DT+收文日期",#ReceivedDate],["#FdReceivedNo+收文案號",#ReceivedNo],
+["#FdCancelDate+撤銷日期",#CancelDate],["#FdCancelNo+撤銷案號",#CancelNo],
+]
+</sub>
+
+<sub type="DC" name="p7" layout="cols=3;screen.width=[180,265,180,405];printer.width=[20,40,20,40];order=1">
+[
+["設定"],
+["#FdSettingDate+設定日期",#SettingDate],["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],
+["#FdSettingAmt+設定金額",#SettingAmt],["#FdClaimDate+擔保債權確定日期",#ClaimDate],
+[#<->#,"#FdSettingSeq+設定順位",#SettingSeq],
+["#grid#,{id:4,expand:true,loop:8,row_height:1,s_cols:[100,100,150,300], p_cols:[20,20,20,20]}","","","",
+["順位說明","順位金額","順位債權人"],
+[[#Rank1],[#FirstAmt1],[#FirstCreditor1]]
+],
+]
+</sub>
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+! #PRTSCRFG=_,_,S
+! E(0,2)
+
+</sub>
+
+
+!---------- TXFORM = L2411 ----------
+<sub type="FORM" name="L2411">
+
+! #SCRPRT=_,_,S
+! C(5,#TXFORM,L2411,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2411] 不動產擔保品資料登錄)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+#OClNo=A,7,S
+IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
+
+
+
+#BUF1=X,11,S
+T(2,1+#ClCode1+#ClCode2+#ClNo)
+
+#button=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L2415; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
+C(3,#FunCd,1,$,S)
+C(3,#ClCode1,1,$,S)
+K(MODIFYBUTTON,1,不動產建物擔保品資料登錄)
+
+#BUF2=X,14,S
+T(2,1+#ClCode1+#ClCode2+#ClNo+000)
+
+#button2=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L2416; ntxbuf=#BUF2})ASGN(BTN_NEW2$)
+C(3,#FunCd,1,$,S)
+K(MODIFYBUTTON,2,不動產土地擔保品資料登錄)
+
+#BUF3=X,14,S
+T(2,1+#ClCode1+#ClCode2+#ClNo)
+
+#button3=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L4610; ntxbuf=#BUF3})ASGN(BTN_NEW3$)
+C(3,#FunCd,1,$,S)
+C(3,#ClCode1,1,$,S)
+K(MODIFYBUTTON,3,保險單)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#CustId
+#CustNo
+#ApplNo
+#ClCode1
+#ClCode2
+#ClNo
+#ClTypeCode
+#CityCode
+#AreaCode
+#IrCode
+#Road
+#Section
+#Alley
+#Lane
+#Num
+#NumDash
+#Floor
+#FloorDash
+#BdNo1
+#BdNo2
+#CityCodeB
+#AreaCodeB
+#IrCodeB
+#LandNo1
+#LandNo2
+#LandLocation
+#EvaDate
+#EvaAmt
+#EvaNetWorth
+#LVITax
+#RentEvaValue
+#RentPrice
+#EvaCompany
+#OwnershipCode
+#MtgCode
+#MtgCheck
+#MtgLoan
+#MtgPledge
+#ClStatus
+#ClStat
+#Agreement
+#LimitCancelDate
+#ClCode
+#LoanToValue
+#OtherOwnerTotal
+#CompensationCopy
+#BdRmk
+#Synd
+#SyndCode
+#DispPrice
+#DispDate
+#MtgReasonCode
+#ReceivedDate
+#ReceivedNo
+#CancelDate
+#CancelNo
+#SettingDate
+#SettingStat
+#SettingAmt
+#ClaimDate
+#SettingSeq
+##loop{times:8,i:1}
+#FirstAmt{i}
+#FirstCreditor{i}
+##end
+##loop{times:10,i:1}
+#OwnerId{i}
+#OwnerName{i}
+#OwnerRelCode{i}
+#OwnerPart{i}
+#OwnerTotal{i}
+#EvaCompanyX
+##end
+
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2411
+#OClNo
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R09.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R17.tom"/>
+<include src="ROM.icf::L2R33.tom"/>
+<include src="ROM.icf::L2R22.tom"/>
+<include src="ROM.icf::L2R23.tom"/>
+<include src="ROM.icf::L2R27.tom"/>
+<include src="ROM.icf::L2R28.tom"/>
+<include src="ROM.icf::L2R41.tom"/>
+<include src="ROM.icf::L2R43.tom"/>
+<include src="ROM.icf::L6R03.tom"/>
+<include src="ROM.icf::L6R10.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -24,6 +24,12 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
+/* Tita
+ACCTDATE=9,7
+TELLERID=X,6
+END=X,1
+*/
+
 @Service("L4002")
 @Scope("prototype")
 public class L4002 extends TradeBuffer {
@@ -116,33 +122,33 @@ public class L4002 extends TradeBuffer {
 	}
 
 	private void setL4002Tota(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
-				String batchNo =  tBatxHead.getBatchNo();
+		String batchNo = tBatxHead.getBatchNo();
 		int labelRankFlag = 1;
 		Slice<BatxDetail> sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
 
 		List<BatxDetail> lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 		if (lBatxDetail == null) {
-		OccursList occursList = new OccursList();
-		occursList.putParam("OOBatchNo", batchNo);
-		occursList.putParam("OORankFlag", 1);
-		occursList.putParam("OOStatusCode", batxStatus);
-		occursList.putParam("OORepayCode", 90);
-		occursList.putParam("OOReconCode", "   ");
-		occursList.putParam("OOFileName", tBatxHead.getTitaTxCd());
-		occursList.putParam("OOFileCnt", 0);
-		occursList.putParam("OODntCnt", 0);
-		occursList.putParam("OOAlrCnt", 0);
-		occursList.putParam("OOWatCnt", 0);
-		occursList.putParam("OOVirCnt", 0);
-		occursList.putParam("OOTotalRepayAmt", 0);
-		occursList.putParam("OOToDoRepayAmt", 0);
-		occursList.putParam("OOUnDoRepayAmt", 0);
-		occursList.putParam("OOLabelFgA", "");
-		occursList.putParam("OOLabelFgB", "");
-		occursList.putParam("OOLabelFgC", "");
+			OccursList occursList = new OccursList();
+			occursList.putParam("OOBatchNo", batchNo);
+			occursList.putParam("OORankFlag", 1);
+			occursList.putParam("OOStatusCode", batxStatus);
+			occursList.putParam("OORepayCode", 90);
+			occursList.putParam("OOReconCode", "   ");
+			occursList.putParam("OOFileName", tBatxHead.getTitaTxCd());
+			occursList.putParam("OOFileCnt", 0);
+			occursList.putParam("OODntCnt", 0);
+			occursList.putParam("OOAlrCnt", 0);
+			occursList.putParam("OOWatCnt", 0);
+			occursList.putParam("OOVirCnt", 0);
+			occursList.putParam("OOTotalRepayAmt", 0);
+			occursList.putParam("OOToDoRepayAmt", 0);
+			occursList.putParam("OOUnDoRepayAmt", 0);
+			occursList.putParam("OOLabelFgA", "");
+			occursList.putParam("OOLabelFgB", "");
+			occursList.putParam("OOLabelFgC", "");
 
-		/* 將每筆資料放入Tota的OcList */
-		this.totaVo.addOccursList(occursList);
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
 		} else {
 			totalCnt++;
 			// 會計日期 整批批號 還款來源 對帳類別 檔名
@@ -173,9 +179,11 @@ public class L4002 extends TradeBuffer {
 			HashMap<tmpBatx, Integer> virCnt = new HashMap<>();
 			// 需檢核筆數
 			HashMap<tmpBatx, Integer> canCheckCnt = new HashMap<>();
-			// 需入帳筆數
+			// 可入帳筆數
 			HashMap<tmpBatx, Integer> canEnterCnt = new HashMap<>();
-			// 需訂正筆數
+			// 可暫收筆數
+			HashMap<tmpBatx, Integer> canTempCnt = new HashMap<>();
+			// 可訂正筆數
 			HashMap<tmpBatx, Integer> canEraseCnt = new HashMap<>();
 
 			for (BatxDetail tBatxDetail : lBatxDetail) {
@@ -256,7 +264,7 @@ public class L4002 extends TradeBuffer {
 					grp1.setRepayCode(0);
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
-					grp1.setRankFlag(1);	
+					grp1.setRankFlag(1);
 					grp2.setAcDate(tBatxDetail.getAcDate());
 					grp2.setBatchNo(tBatxDetail.getBatchNo());
 					grp2.setRepayCode(tBatxDetail.getRepayCode());
@@ -453,6 +461,15 @@ public class L4002 extends TradeBuffer {
 						} else {
 							canEnterCnt.put(grp1, 1);
 						}
+						// 可暫收筆數
+						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
+								|| tBatxDetail.getProcStsCode().equals("4")) {
+							if (canTempCnt.containsKey(grp3)) {
+								canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
+							} else {
+								canTempCnt.put(grp3, 1);
+							}
+						}
 					}
 				} else {
 					// 可訂正筆數
@@ -478,6 +495,15 @@ public class L4002 extends TradeBuffer {
 							canEnterCnt.put(grp3, canEnterCnt.get(grp3) + 1);
 						} else {
 							canEnterCnt.put(grp3, 1);
+						}
+					}
+					// 可暫收筆數
+					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
+							|| tBatxDetail.getProcStsCode().equals("4")) {
+						if (canTempCnt.containsKey(grp3)) {
+							canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
+						} else {
+							canTempCnt.put(grp3, 1);
 						}
 					}
 				}
@@ -550,7 +576,7 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
-					if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
+					if (canTempCnt.get(tempL4002Vo) != null && canTempCnt.get(tempL4002Vo) > 0) {
 						labelFgC = "T";
 					}
 				}
@@ -573,6 +599,15 @@ class tmpBatx implements Comparable<tmpBatx> {
 	private String reconCode = "";
 	private String fileName = "";
 	private int rankFlag = 0;
+
+//	public tmpBatx(int acDate, String batchNo, int repayCode, String reconCode, String fileName, int rankFlag) {
+//		this.acDate = acDate;
+//		this.batchNo = batchNo;
+//		this.repayCode = repayCode;
+//		this.reconCode = reconCode;
+//		this.fileName = fileName;
+//		this.rankFlag = rankFlag;
+//	}
 
 	@Override
 	public String toString() {

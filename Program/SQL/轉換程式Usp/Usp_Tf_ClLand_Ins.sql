@@ -354,19 +354,13 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM (  SELECT B0."ClCode1"
+    FROM (  SELECT DISTINCT
+                   B0."ClCode1"
                   ,B0."ClCode2"
                   ,B0."ClNo"
                   ,M."GDRID1"
                   ,M."GDRID2"
                   ,M."GDRNUM"
-                  ,NVL(LG."LGTCTY",' ') AS "LGTCTY"
-                  ,NVL(LG."LGTTWN",' ') AS "LGTTWN"
-                  ,NVL(LG."LGTSGM",' ') AS "LGTSGM"
-                  ,NVL(LG."LGTSSG",' ') AS "LGTSSG"
-                  ,NVL(LG."LGTNM1",0)   AS "LGTNM1"
-                  ,NVL(LG."LGTNM2",0)   AS "LGTNM2"
-                  ,MAX(LG."LGTSEQ")     AS "LGTSEQ"
             FROM "ClBuilding" B0 
             LEFT JOIN "ClNoMapping" M ON M."ClCode1" = B0."ClCode1"
                                      AND M."ClCode2" = B0."ClCode2"
@@ -376,23 +370,12 @@ BEGIN
                                   AND LG."GDRNUM" = M."GDRNUM"
             WHERE B0."ClCode1" = '1' -- 撈建物
               AND NVL(LG."LGTNM1",0) > 0
-            GROUP BY B0."ClCode1"
-                    ,B0."ClCode2"
-                    ,B0."ClNo"
-                    ,M."GDRID1"
-                    ,M."GDRID2"
-                    ,M."GDRNUM"
-                    ,NVL(LG."LGTCTY",' ')
-                    ,NVL(LG."LGTTWN",' ')
-                    ,NVL(LG."LGTSGM",' ')
-                    ,NVL(LG."LGTSSG",' ')
-                    ,NVL(LG."LGTNM1",0)
-                    ,NVL(LG."LGTNM2",0)
+              AND B0."ClNo" = M."GDRNUM"
          ) S1
     LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1"
                           AND S2."GDRID2" = S1."GDRID2"
                           AND S2."GDRNUM" = S1."GDRNUM"
-                          AND S2."LGTSEQ" = S1."LGTSEQ"
+                          -- AND S2."LGTSEQ" = S1."LGTSEQ"
     LEFT JOIN ( SELECT CITY."CityCode"
                       ,CITY."CityItem"
                       ,AREA."AreaCode"

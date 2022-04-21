@@ -31,9 +31,16 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
 
-		int yearMonth = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
+//		int yearMonth = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
 
 		this.info("yearMonth = " + yearMonth);
 		this.info("lM038.findAll ");

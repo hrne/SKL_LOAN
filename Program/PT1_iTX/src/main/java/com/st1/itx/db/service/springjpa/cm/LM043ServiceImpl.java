@@ -22,18 +22,24 @@ public class LM043ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-
+	
 	@Autowired
 	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
-	public List<Map<String, String>> findAll(int type, TitaVo titaVo) throws Exception {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll(int type, TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM043.findAll ");
 
-		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
+//		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		String sql = "SELECT M.\"EntCode\"";
 		sql += "            ,M.\"CityCode\"";
@@ -83,9 +89,9 @@ public class LM043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
+		
 		query.setParameter("entdy", yearMonth);
-
+		
 		return this.convertToMap(query);
 	}
 

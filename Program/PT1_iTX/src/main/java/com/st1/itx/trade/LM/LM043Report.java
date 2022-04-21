@@ -37,34 +37,48 @@ public class LM043Report extends MakeReport {
 	}
 
 	int type = 0;// 種類，0: 正常戶，1: 催收戶。2: 逾期戶
-
-	public void exec(TitaVo titaVo) throws LogicException {
-		int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
-		int year = entdy / 10000;
-		int month = entdy / 100 % 100;
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
+//		int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
+//		int year = entdy / 10000;
+//		int month = entdy / 100 % 100;
+		
+//		int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
+		int year = yearMonth / 100;
+		int month = yearMonth % 100;
+		
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM043", "地區放款數_內部控管", "LM043地區放款數_內部控管", "LM043地區放款數_內部控管.xlsx", "N總額");
 		makeExcel.setValue(1, 1, year  + "." + parse.IntegerToString(month, 2));
 		List<Map<String, String>> LM043List = null;
 		for (int i = 0; i < 3; i++) {// 3次，分別是正常戶，催收戶跟逾期戶
 			type = i;
 			try {
-				LM043List = lM043ServiceImpl.findAll(i, titaVo);
+				LM043List = lM043ServiceImpl.findAll(i, titaVo,yearMonth);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.info("LM043ServiceImpl.testExcel error = " + errors.toString());
 			}
-			exportExcel(titaVo, LM043List);
+			exportExcel(titaVo, LM043List,yearMonth);
 		}
 		makeExcel.close();
 		//makeExcel.toExcel(sno);
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList, int yearMonth) throws LogicException {
 		this.info("LM043Report exportExcel");
-		String yymm = titaVo.get("ENTDY");
-		makeExcel.setValue(1, 1, yymm.substring(1, 4) + "." + yymm.substring(4, 6));
+//		String yymm = titaVo.get("ENTDY");
+//		makeExcel.setValue(1, 1, yymm.substring(1, 4) + "." + yymm.substring(4, 6));
+		int year = yearMonth / 100;
+		int month = yearMonth % 100;
+		makeExcel.setValue(1, 1, year + "." + month);
 		int row = 2;
 		BigDecimal entCode0 = BigDecimal.ZERO;// 個人戶餘額
 		BigDecimal entCode1 = BigDecimal.ZERO;// 企金戶餘額

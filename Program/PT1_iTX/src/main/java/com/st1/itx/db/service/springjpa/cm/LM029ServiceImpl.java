@@ -29,11 +29,17 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
 		this.info("LM029ServiceImpl findAll ");
 
-		int entdy = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
+		int entdy = yearMonth;
 
 		String sql = "";
 		sql += " SELECT M.\"CustNo\"                              AS F0 ";
@@ -61,7 +67,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,M.\"CityCode\"                            AS F22 ";
 		sql += "       ,NVL(CL.\"LandNo\",'00000000')             AS F23  "; // 地號格式為 4-4
 		sql += "       ,NVL(CL.\"BdNo\",'00000000')               AS F24  "; // 建號格式為 5-3
-		sql += "       ,M.\"AcSubBookCode\"                       AS F25 ";
+		sql += "       ,DECODE(M.\"AcSubBookCode\",'00A',' ','A') AS F25 ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";

@@ -503,12 +503,15 @@ public class L4320Batch extends TradeBuffer {
 		case 3:
 			// 本次利率 = 原利率 + 地區別利率
 			rateCurt = fitRate.add(cityIntRateIncr);
+			warnMsg += "地區別加減碼:" + cityIntRateIncr ;			
 			// 依地區別利率上、下限調整
 			if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
 				rateCurt = cityIntRateCeiling;
+				warnMsg += "達地區別上限 ";
 			}
 			if (rateCurt.compareTo(cityIntRateFloor) < 0) {
 				rateCurt = cityIntRateFloor;
+				warnMsg += "達地區別下限 ";
 			}
 			// 3.人工調整
 			adjCode = 3;
@@ -629,7 +632,7 @@ public class L4320Batch extends TradeBuffer {
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
 			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
 				batxRateChangeService.holdById(tBatxRateChange, titaVo);
-				if (tBatxRateChange.getConfirmFlag() == 1) {
+				if (tBatxRateChange.getConfirmFlag() > 0) {
 					throw new LogicException("E0008", ", 該筆已確認，請先訂正L4321 ");
 				} else {
 					try {

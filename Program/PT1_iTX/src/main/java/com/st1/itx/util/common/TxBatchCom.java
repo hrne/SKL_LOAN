@@ -34,6 +34,7 @@ import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
@@ -176,6 +177,9 @@ public class TxBatchCom extends TradeBuffer {
 	@Autowired
 	public TxErrCodeService txErrCodeService;
 
+	@Autowired
+	public CdCodeService cdCodeService;
+
 	private ArrayList<BaTxVo> baTxList;
 //  全部應繳
 	private BigDecimal unPayTotal = BigDecimal.ZERO;
@@ -251,6 +255,9 @@ public class TxBatchCom extends TradeBuffer {
 //	溢短收記號
 	private int overRpFg = 0; // 1->溢短收記號 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 
+// 戶況
+	private int facStatus = 0;
+
 //  結案記號  1.正常結案  2.提前結案 
 	private int closeFg = 0;
 //  部分償還 
@@ -318,6 +325,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.repayType = 0;
 		this.repayIntDate = 0;
 		this.repayIntDateByFacmNoVo = new TempVo();
+		this.facStatus = 0;
 		this.closeFg = 0;
 		this.closeReasonCode = null;
 		this.collectFlag = "";
@@ -386,7 +394,7 @@ public class TxBatchCom extends TradeBuffer {
 		initialProcNote(tempVo.getVo(tDetail.getProcNote()), titaVo);
 
 		// 入帳日期檢核
-		if (tDetail.getEntryDate()> this.txBuffer.getTxBizDate().getTbsDy()) {
+		if (tDetail.getEntryDate() > this.txBuffer.getTxBizDate().getTbsDy()) {
 			this.checkMsg = "入帳日" + tDetail.getEntryDate() + " 大於會計日" + this.txBuffer.getTxBizDate().getTbsDy();
 			this.procStsCode = "3"; // 3.檢核錯誤
 		}
@@ -840,9 +848,15 @@ public class TxBatchCom extends TradeBuffer {
 		l3200TitaVo.putParam("ShortPrinPercent", "0"); // 短收本金比率
 		l3200TitaVo.putParam("ShortIntPercent", "0"); // 短收利息比率
 		if (tBatxDetail.getRepayType() == 2) {
-			l3200TitaVo.putParam("TimExtraRepay", this.tTempVo.getParam("ExtraRepay")); // 部分償還金額
-			l3200TitaVo.putParam("TwExtraRepay", this.tTempVo.getParam("ExtraRepay"));
-			l3200TitaVo.putParam("UsExtraRepay", this.tTempVo.getParam("ExtraRepay"));
+			if (!"".equals(this.tTempVo.getParam("MergeAmt"))) {
+				l3200TitaVo.putParam("TimExtraRepay", this.tTempVo.getParam("MergeAmt")); // 部分償還金額
+				l3200TitaVo.putParam("TwExtraRepay", this.tTempVo.getParam("MergeAmt"));
+				l3200TitaVo.putParam("UsExtraRepay", this.tTempVo.getParam("MergeAmt"));
+			} else {
+				l3200TitaVo.putParam("TimExtraRepay", this.tTempVo.getParam("ExtraRepay")); // 部分償還金額
+				l3200TitaVo.putParam("TwExtraRepay", this.tTempVo.getParam("ExtraRepay"));
+				l3200TitaVo.putParam("UsExtraRepay", this.tTempVo.getParam("ExtraRepay"));
+			}
 			l3200TitaVo.putParam("IncludeIntFlag", this.tTempVo.getParam("IncludeIntFlag")); // 是否內含利息
 			l3200TitaVo.putParam("UnpaidIntFlag", this.tTempVo.getParam("UnpaidIntFlag")); // 利息是否可欠繳
 			l3200TitaVo.putParam("PayFeeFlag", this.tTempVo.getParam("PayFeeFlag")); // 是否回收費用
@@ -1192,11 +1206,12 @@ public class TxBatchCom extends TradeBuffer {
 				apendcheckMsgAmounts(tBatxDetail, titaVo);
 				this.procStsCode = "2"; // 2.人工處理
 				break;
-			}
+			}			
 			// 撥款序號 = 0
 			// 處理狀態:2.人工處理
 			// 處理說明: 無可償還撥款資料
 			if (this.repayLoan.compareTo(BigDecimal.ZERO) == 0) {
+			// 催呆結案戶			
 				this.checkMsg = "無可償還撥款資料 ";
 				apendcheckMsgAmounts(tBatxDetail, titaVo);
 				this.procStsCode = "2"; // 2.人工處理
@@ -1448,10 +1463,10 @@ public class TxBatchCom extends TradeBuffer {
 	private void facCloseRepayType(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
 		Slice<FacClose> facCloseList = facCloseService.findCustNo(tDetail.getCustNo(), this.index, Integer.MAX_VALUE,
 				titaVo); // 清償作業檔
-		// 還清金額需相同
+		// 還款金額>=償還清金額
 		if (facCloseList != null) {
 			for (FacClose tFacClose : facCloseList.getContent()) {
-				if (tFacClose.getCloseDate() == 0 && tFacClose.getCloseAmt().equals(tDetail.getRepayAmt())) {
+				if (tFacClose.getCloseDate() == 0 && tDetail.getRepayAmt().compareTo(tFacClose.getCloseAmt()) >= 0) {
 					this.repayType = 3; // 03-結案
 					if (tDetail.getFacmNo() == 0) {
 						this.repayFacmNo = tFacClose.getFacmNo(); // 還款額度
@@ -1633,6 +1648,8 @@ public class TxBatchCom extends TradeBuffer {
 			this.payMethod = baTxCom.getPayMethod();// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 			this.payFeeFlag = baTxCom.getPayFeeFlag(); // 是否回收費用
 		}
+		// 戶況
+		this.facStatus = baTxCom.getFacStatus();
 
 		// 結案記號判斷
 		boolean isCloseFg = true;

@@ -28,6 +28,13 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
+	/**
+	 * 查詢資料
+	 * 
+	 * @param titaVo
+	 * @param iYearMonth 西元年月底日
+	 * 
+	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int iYearMonth) throws Exception {
 
 		// 年

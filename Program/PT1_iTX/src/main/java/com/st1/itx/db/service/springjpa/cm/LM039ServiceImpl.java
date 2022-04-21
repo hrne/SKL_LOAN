@@ -30,9 +30,16 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
 
-		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
+//		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		this.info("lM039.findAll ");
 		
@@ -41,7 +48,7 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,O.\"CustNo\"";
 		sql += "            ,O.\"FacmNo\"";
 		sql += "            ,O.\"BormNo\"";
-		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "            ,F.\"FirstDrawdownDate\"";
 		sql += "            ,L.\"PrevPayIntDate\"";
 		sql += "            ,O.\"OvduBal\"";
@@ -75,6 +82,10 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND M.\"CustNo\"    = O.\"CustNo\"";
 		sql += "                                    AND M.\"FacmNo\"    = O.\"FacmNo\"";
 		sql += "                                    AND M.\"BormNo\"    = O.\"BormNo\"";
+//		sql += "      LEFT JOIN \"DailyLoanBal\" D   ON D.\"MonthEndYm\" = :entdy";
+//		sql += "                                    AND D.\"CustNo\"    = O.\"CustNo\"";
+//		sql += "                                    AND D.\"FacmNo\"    = O.\"FacmNo\"";
+//		sql += "                                    AND D.\"BormNo\"    = O.\"BormNo\"";
 		sql += "      LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"YearMonth\" = :entdy";
 		sql += "                                    AND MF.\"CustNo\"    = O.\"CustNo\"";
 		sql += "                                    AND MF.\"FacmNo\"    = O.\"FacmNo\"";
