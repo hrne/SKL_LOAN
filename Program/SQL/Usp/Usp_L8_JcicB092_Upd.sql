@@ -1,4 +1,4 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd"
 (
 -- 程式功能：維護 JcicB092 每月聯徵不動產擔保品明細檔
 -- 執行時機：每月底日終批次(換日前)
@@ -223,7 +223,7 @@ BEGIN
 
     UPDATE "Work_B092" M
     SET   M."ClTypeJCIC" = '20'
-    WHERE to_number(NVL(M."LandOwnedArea",'0')) >= 3
+    WHERE to_number(NVL(M."LandOwnedArea",'0')) >= 300
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;

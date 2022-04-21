@@ -53,7 +53,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
-		int prinBalance = parse.stringToInteger(titaVo.getParam("PrinBalance"));
+		int prinBalance = titaVo.containsKey("PrinBalance") ? parse.stringToInteger(titaVo.getParam("PrinBalance")) : 0;
 		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) +19110000;
 		int payIntDateSt = parse.stringToInteger(titaVo.getParam("PayIntDateSt"));
 		if (payIntDateSt> 0) {
@@ -290,7 +290,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
-		int prinBalance = parse.stringToInteger(titaVo.getParam("PrinBalance"));
+		int prinBalance = titaVo.containsKey("PrinBalance") ? parse.stringToInteger(titaVo.getParam("PrinBalance")) : 0;
 		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) +19110000;
 		int payIntDateSt = parse.stringToInteger(titaVo.getParam("PayIntDateSt"));
 		if (payIntDateSt> 0) {

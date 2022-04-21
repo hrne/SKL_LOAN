@@ -33,7 +33,7 @@ public class L9730p extends TradeBuffer {
 	WebClient webClient;
 
 	String txcd = "L9730";
-	String txname = "X800";
+	String txname = "定期機動資料檢核";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

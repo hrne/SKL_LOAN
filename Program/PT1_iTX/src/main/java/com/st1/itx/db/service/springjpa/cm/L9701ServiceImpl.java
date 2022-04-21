@@ -149,7 +149,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,D.\"AcctItem\"";
 		sql += "            ,D.\"TxAmt\"";
 		sql += "            ,D.\"FacmNo\"";
-		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
+		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "      FROM (SELECT  D.\"EntryDate\"";
 		sql += "                   ,CA.\"AcctItem\" AS \"AcctItem\"";
 		sql += "                   ,SUM(\"TxAmt\")  AS \"TxAmt\"";
@@ -222,7 +222,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             ,D.\"FacmNo\"";
 		sql += "             ,D.\"BormNo\"";
 		sql += "             ,D.\"BorxNo\"";
-		sql += "             ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
+		sql += "             ,\"Fn_ParseEOL\"(C.\"CustName\",0)";
 		sql += "             ,NVL(D.\"TitaHCode\",'0') AS \"TitaHCode\"";
 		sql += "      FROM (SELECT \"EntryDate\"";
 		sql += "                  ,\"Desc\"";

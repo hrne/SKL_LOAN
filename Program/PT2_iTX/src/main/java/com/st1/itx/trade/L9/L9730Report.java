@@ -34,7 +34,7 @@ public class L9730Report extends MakeReport {
 	MakeExcel makeExcel;
 
 	String txcd = "L9730";
-	String txName = "X800";
+	String txName = "定期機動資料檢核";
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info(txcd + "Report exec start ...");

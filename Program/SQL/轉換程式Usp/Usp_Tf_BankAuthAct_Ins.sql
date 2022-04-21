@@ -18,6 +18,16 @@ BEGIN
     -- 記錄程式起始時間
     JOB_START_TIME := SYSTIMESTAMP;
 
+    DECLARE 
+        "TbsDyF" DECIMAL(8); --西元帳務日
+    BEGIN
+
+    SELECT "TbsDy" + 19110000
+    INTO "TbsDyF"
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
+    ;
+
     -- 刪除舊資料
     EXECUTE IMMEDIATE 'ALTER TABLE "BankAuthAct" DISABLE PRIMARY KEY CASCADE';
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "BankAuthAct" DROP STORAGE';
@@ -58,6 +68,7 @@ BEGIN
           ,LPAD(S1."LMSPCN",14,'0')       AS "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
           ,CASE
              WHEN NVL(S2."LMSACN",0) = 0 -- 在授權紀錄檔沒資料
+                  AND S1."APLADT" >= "TbsDyF" -- 且動支期限大於等於轉換日
              THEN ' ' -- 空白:未授權
            ELSE '0' END                   AS "Status"              -- 狀態碼 VARCHAR2 1 
           ,0                              AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
@@ -107,6 +118,7 @@ BEGIN
           ,LPAD(S1."LMSPCN",14,'0')       AS "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
           ,CASE
              WHEN NVL(S2."LMSACN",0) = 0 -- 在授權紀錄檔沒資料
+                  AND S1."APLADT" >= "TbsDyF" -- 且動支期限大於等於轉換日
              THEN ' ' -- 空白:未授權
            ELSE '0' END                   AS "Status"              -- 狀態碼 VARCHAR2 1 
           ,0                              AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
@@ -171,6 +183,7 @@ BEGIN
 
     commit;
 
+    END;
     -- 例外處理
     Exception
     WHEN OTHERS THEN

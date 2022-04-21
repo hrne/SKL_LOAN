@@ -97,6 +97,7 @@ BEGIN
                                                 WHEN B."Status" IN (2,5,6,7,8,9)
                                                      AND O."OvduDate" > TBSDYF --於本營業日尚未轉催
                                                      AND R."EffectDate" >= B."PrevPayIntDate" 
+                                                     AND R."EffectDate" <= B."NextPayIntDate" 
                                                      AND R."EffectDate" <= TBSDYF
                                                 THEN 1                                                
                                                 -- 利息繳超過的情況 2022-04-13 新增

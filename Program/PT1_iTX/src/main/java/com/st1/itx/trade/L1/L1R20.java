@@ -125,7 +125,7 @@ public class L1R20 extends TradeBuffer {
 				s2 = ",";
 			}
 			if ("N".equals(custNotice.getEmailNotice())) {
-				s1 += s2 + "書面Email不通知";
+				s1 += s2 + "申請Email不通知";
 				s2 = ",";
 			}
 			if (!s1.isEmpty()) {

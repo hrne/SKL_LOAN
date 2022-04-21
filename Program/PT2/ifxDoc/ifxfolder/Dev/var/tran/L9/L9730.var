@@ -46,17 +46,28 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20];">
 [
-["[L9730]                                     X800"],
-["@資料日期",#InputStartDate,"～",#InputEndDate]
+["[L9730]                                定期機動資料檢核"],
+["@調整日期區間",#InputStartDate,"～",#InputEndDate]
 ]
 !---------- AP TEXT AREA Variables ----------
 
+#TODAY=A,8,S
+T(4,DATE$)
+
+#TodayYearMonth=A,5,S
+T(1,#TODAY,2,5)
+
+#DefaultStartDate=A,7,S
+T(2,#TodayYearMonth+01)
+
 !資料日期
 #InputStartDate=D,7,I
+E(0,#DefaultStartDate)
 @V(7)
 A(DATE,0,#InputStartDate)
 
 #InputEndDate=D,7,I
+T(4,MFBSDY$)
 @V(7)
 A(DATE,0,#InputEndDate)
 V(5,#InputStartDate,9991231)
@@ -106,7 +117,7 @@ TXFORM=L9730
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="L9730" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L9730]                                    X800                                                                      "],
+["[L9730]                                    定期機動資料檢核                                                             "],
 ]
 </sub>
 
