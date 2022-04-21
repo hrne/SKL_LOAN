@@ -320,6 +320,11 @@ public class L4603p extends TradeBuffer {
 		CustMain tCustMain = new CustMain();
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo(), titaVo);
 		if (tCustMain != null) {
+			
+			// 判定是否有設定不通知
+			if (!custNoticeCom.checkIsLetterSendable(null, tCustMain.getCustNo(), tInsuRenew.getFacmNo(), "L4603", titaVo))
+				return;
+			
 //			QC 495 中文欄位前+半形空格
 			dataLines = " " + FormatUtil.padX(getZipCode(tCustMain), 9) + ", " + FormatUtil.padX(noticeAddress, 64)
 					+ "," + FormatUtil.padX("", 42) + "," + FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + ", "
