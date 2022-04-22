@@ -20,6 +20,7 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -48,6 +49,9 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 	LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
 	LoanCom loanCom;
+
+	@Autowired
+	DateUtil dDateUtil;
 
 	/**
 	 * 設定放款計息參數
@@ -174,6 +178,22 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				intCalcCode = "1";
 				amortizedCode = "2";
 				loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
+
+				// 2022-04-22 智偉增加判斷:若到期日在當月者，照AS400多算一天利息
+				if (t.getMaturityDate() >= thisMonth01) {
+
+					int orignalMaturityDate = t.getMaturityDate();
+					dDateUtil.init();
+					dDateUtil.setDate_1(orignalMaturityDate);
+					dDateUtil.setDays(1);
+					int newMaturityDate = dDateUtil.getCalenderDay();// 違約金C-止日
+
+					this.info("月底提息時，若到期日在當月者，照AS400多算一天利息");
+					this.info("orignalMaturityDate = " + orignalMaturityDate);
+					this.info("newMaturityDate = " + newMaturityDate);
+
+					loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
+				}
 			}
 			loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
 			loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));

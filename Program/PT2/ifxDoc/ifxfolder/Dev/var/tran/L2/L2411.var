@@ -1480,7 +1480,8 @@ V(2,0)
 ! [評估淨值]
 #EvaNetWorth=m,14,I
 IF(#FunCd==4,s,$)
-@IF(#EvaNetWorth == #L2r23EvaNetWorth,s,$)
+@
+IF(#FunCd==2,IF(#EvaNetWorth == #L2r23EvaNetWorth,s,$),$)
 V(2,0)
 
 
@@ -1507,7 +1508,7 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 IF(#PageFg==3,$,CALL(#Show3))
 @
-IF(#EvaCompany == #L2r23EvaCompany,s,$)
+IF(#FunCd==2,IF(#EvaCompany == #L2r23EvaCompany,s,$),$)
 V(7)
 
 #RimL6R10InsurerType=X,1,S
@@ -1531,7 +1532,7 @@ IF(#FunCd==4,s,$)
 IF(#PageFg==4,$,CALL(#Show4))
 HELP(#OwnershipCodeHelp)
 @
-IF(#OwnershipCode == #L2r23OwnershipCode,s,$)
+IF(#FunCd==2,IF(#OwnershipCode == #L2r23OwnershipCode,s,$),$)
 V(H,#OwnershipCodeHelp)
 
 #OwnershipCodeX=X,15,L
@@ -1583,7 +1584,7 @@ C(3,#FunCd,1,E(0,1),$)
 HELP(#ClStatusHelp)
 IF(#FunCd==4,s,$)
 @
-IF(#ClStatus == #L2r22ClStatus,s,$)
+IF(#FunCd==2,IF(#ClStatus == #L2r22ClStatus,s,$),$)
 V(H,#ClStatusHelp)
 
 #ClStatusX=X,7,L
@@ -1640,7 +1641,7 @@ IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 IF(#ClCode==2,S,$)
 @IF(#ClCode==2,S,$)
-IF(#LoanToValue == #L2r23LoanToValue,s,$)
+IF(#FunCd==2,IF(#LoanToValue == #L2r23LoanToValue,s,$),$)
 V(2,0)
 
 
@@ -2077,7 +2078,6 @@ K(MODIFYBUTTON,3,保險單)
 #OwnerRelCode{i}
 #OwnerPart{i}
 #OwnerTotal{i}
-#EvaCompanyX
 ##end
 
 #END

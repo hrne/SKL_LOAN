@@ -701,7 +701,7 @@ IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 HELP(#BdMainUseCodeHelp)
 @
-IF(#BdMainUseCode == #L2r27BdMainUseCode,s,$)
+IF(#FunCd==2,IF(#BdMainUseCode == #L2r27BdMainUseCode,s,$),$)
 V(H,#BdMainUseCodeHelp)
 
 #FdUSAGE_IND=X,2,L
@@ -714,7 +714,7 @@ T(H,#BdMainUseCode,#BdMainUseCodeHelp)
 IF(#FunCd==4,s,$)
 HELP(#BdMtrlCodeHelp)
 @
-IF(#BdMtrlCode == #L2r27BdMtrlCode,s,$)
+IF(#FunCd==2,IF(#BdMtrlCode == #L2r27BdMtrlCode,s,$),$)
 V(H,#BdMtrlCodeHelp)
 
 #FdBD_MATERIAL=X,2,L
@@ -727,7 +727,7 @@ T(H,#BdMtrlCode,#BdMtrlCodeHelp)
 IF(#FunCd==4,s,$)
 HELP(#BdTypeCodeHelp)
 @
-IF(#BdTypeCode == #L2r27BdTypeCode,s,$)
+IF(#FunCd==2,IF(#BdTypeCode == #L2r27BdTypeCode,s,$),$)
 V(H,#BdTypeCodeHelp)
 
 #FdBD_CATEGORY=X,2,L
@@ -739,7 +739,7 @@ T(H,#BdTypeCode,#BdTypeCodeHelp)
 #TotalFloor=m,3,I
 IF(#FunCd==4,s,$)
 @
-IF(#TotalFloor == #L2r27TotalFloor,s,$)
+IF(#FunCd==2,IF(#TotalFloor == #L2r27TotalFloor,s,$),$)
 V(2,0)
 
 #FdTOTAL_FLOOR=X,2,L
@@ -748,7 +748,7 @@ V(2,0)
 #FloorNo=X,7,I
 IF(#FunCd==4,s,$)
 @
-IF(#FloorNo == #L2r27FloorNo,s,$)
+IF(#FunCd==2,IF(#FloorNo == #L2r27FloorNo,s,$),$)
 V(2,0)V(7)
 
 #FdFLOOR_NO=X,2,L
@@ -757,7 +757,7 @@ V(2,0)V(7)
 #FloorArea=m,5.2,I
 IF(#FunCd==4,s,$)
 @
-IF(#FloorArea == #L2r27FloorArea,s,$)
+IF(#FunCd==2,IF(#FloorArea == #L2r27FloorArea,s,$),$)
 V(2,0)
 
 #FdFLOOR_AREA=X,2,L
@@ -788,9 +788,8 @@ T(H,#RoofStructureCode,#RoofStructureHelp)
 #BdDate=D,7,I
 D(8)
 IF(#FunCd==4,s,$)
-
 @
-IF(#BdDate == #L2r27BdDate,s,$)
+IF(#FunCd==2,IF(#BdDate == #L2r27BdDate,s,$),$)
 V(7)V(2,0)A(4,0,#BdDate)
 
 #FdBD_DT=X,2,L
@@ -858,7 +857,7 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 D(8)
 @
-IF(#ContractDate == #L2r27ContractDate,s,$)
+IF(#FunCd==2,IF(#ContractDate == #L2r27ContractDate,s,$),$)
 A(4,0,#ContractDate)
 
 #FdCONTRACT_DT=X,2,L
@@ -868,7 +867,7 @@ A(4,0,#ContractDate)
 IF(#FunCd==4,s,$)
 HELP(#BdUsageCodeHelp)
 @
-IF(#BdUsageCode == #L2r27BdUsageCode,s,$)
+IF(#FunCd==2,IF(#BdUsageCode == #L2r27BdUsageCode,s,$),$)
 V(H,#BdUsageCodeHelp)
 
 #FdBD_USE=X,2,L
@@ -881,7 +880,7 @@ T(H,#BdUsageCode,#BdUsageCodeHelp)
 IF(#FunCd==4,s,$)
 HELP(#ParkingTypeCodeHelp)
 @
-IF(#ParkingTypeCode == #L2r27ParkingTypeCode,s,$)
+IF(#FunCd==2,IF(#ParkingTypeCode == #L2r27ParkingTypeCode,s,$),$)
 V(H,#ParkingTypeCodeHelp)
 
 #ParkingTypeCodeX=X,13,L
@@ -910,7 +909,7 @@ IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 D(8)
 @
-IF(#HouseBuyDate == #L2r27HouseBuyDate,s,$)
+IF(#FunCd==2,IF(#HouseBuyDate == #L2r27HouseBuyDate,s,$),$)
 V(7)V(2,0)A(4,0,#HouseBuyDate)
 
 #FdHOUSE_BUY_DT=X,2,L

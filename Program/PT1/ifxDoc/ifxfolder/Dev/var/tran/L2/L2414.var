@@ -504,7 +504,7 @@ E(0,@SettingBal,#L2r26SettingAmt)
 IF(#FunCd==1,$,s)
 HELP(#ClTypeCodeHelp)
 @
-IF(#ClTypeCode == #L2r22ClTypeCode,s,$)
+IF(#FunCd==2,IF(#ClTypeCode == #L2r22ClTypeCode,s,$),$)
 V(H,#ClTypeCodeHelp)
 
 ! 保證記號 若擔保品類別為998 or 999,需顯示保證相關欄位
@@ -580,7 +580,7 @@ T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
 #EvaDate=D,7,I
 IF(#FunCd==4,s,$)
 @
-IF(#EvaDate == #L2r22EvaDate,s,$)
+IF(#FunCd==2,IF(#EvaDate == #L2r22EvaDate,s,$),$)
 V(7)A(4,0,#EvaDate)
 
 
@@ -591,7 +591,7 @@ IF(#FunCd==4,s,$)
 IF(#ClTypeCode >= 998,T(F,0),T(F,1))
 IF(#ClTypeCode >= 998,s,$)
 @
-IF(#EvaAmt ==#L2r22EvaAmt,s,$)
+IF(#FunCd==2,IF(#EvaAmt == #L2r22EvaAmt,s,$),$)
 V(2,0)
 
 #FdEvaAmt=X,2,L
@@ -601,7 +601,7 @@ V(2,0)
 IF(#FunCd==4,s,$)
 IF(#ClTypeCode >= 998,$,S)
 @
-IF(#PledgeAmt == #L2r22EvaAmt,s,$)
+IF(#FunCd==2,IF(#PledgeAmt == #L2r22EvaAmt,s,$),$)
 V(2,0)
 
 
@@ -611,7 +611,7 @@ IF(#FunCd==4,s,$)
 IF(#ClTypeCode >= 998,$,S)
 HELP(#PledgeBankCodeHelp)
 @
-IF(#PledgeBankCode == #L2r26PledgeBankCode,s,$)
+IF(#FunCd==2,IF(#PledgeBankCode == #L2r26PledgeBankCode,s,$),$)
 V(H,#PledgeBankCodeHelp)
 
 #PledgeBankCodeX=X,20,L
@@ -622,7 +622,7 @@ T(H,#PledgeBankCode,#PledgeBankCodeHelp)
 IF(#FunCd==4,s,$)
 IF(#ClTypeCode >= 998,$,S)
 @
-IF(#PledgeStartDate == #L2r26PledgeStartDate,s,$)
+IF(#FunCd==2,IF(#PledgeStartDate == #L2r26PledgeStartDate,s,$),$)
 V(7)A(4,0,#PledgeStartDate)
 
 !保證日期止
@@ -631,7 +631,7 @@ IF(#FunCd==4,s,$)
 IF(#ClTypeCode >= 998,$,S)
 @
 IF(#PledgeEndDate < #PledgeStartDate,V(P,保證迄日不可小於保證起日),s)
-IF(#PledgeEndDate == #L2r26PledgeEndDate,s,$)
+IF(#FunCd==2,IF(#PledgeEndDate == #L2r26PledgeEndDate,s,$),$)
 V(7)A(4,0,#PledgeEndDate)
 
 !保證書字號
@@ -639,7 +639,7 @@ V(7)A(4,0,#PledgeEndDate)
 IF(#FunCd==4,s,$)
 IF(#ClTypeCode >= 998,$,S)
 @
-IF(#PledgeNO == #L2r26PledgeNO,s,$)
+IF(#FunCd==2,IF(#PledgeNO == #L2r26PledgeNO,s,$),$)
 V(7)
 
 ! [所有權人統編]
@@ -714,7 +714,7 @@ IF(#FunCd==4,s,$)
 #LoanToValue=m,3.2,I
 IF(#FunCd==4,s,$)
 @
-IF(#LoanToValue == #L2r26LoanToValue,s,$)
+IF(#FunCd==2,IF(#LoanToValue == #L2r26LoanToValue,s,$),$)
 V(2,0)
 
 
@@ -749,7 +749,7 @@ T(H,#Listed,#ListedHelp)
 C(3,#PHFG,1,$,S)
 IF(#FunCd==4,s,$)
 @
-IF(#OfferingDate == #L2r26OfferingDate,s,$)
+IF(#FunCd==2,IF(#OfferingDate == #L2r26OfferingDate,s,$),$)
 A(4,0,#OfferingDate)
 
 !到期日 ExpirationDate 
@@ -757,7 +757,7 @@ A(4,0,#OfferingDate)
 C(3,#PHFG,1,$,S)
 IF(#FunCd==4,s,$)
 @
-IF(#ExpirationDate == #L2r26ExpirationDate,s,$)
+IF(#FunCd==2,IF(#ExpirationDate == #L2r26ExpirationDate,s,$),$)
 A(4,0,#ExpirationDate)
 
 #TargetIssuerHelp=x,50,S
@@ -791,7 +791,7 @@ T(H,#SubTargetIssuer,#TargetIssuerHelp)
 C(3,#PHFG,1,$,S)
 IF(#FunCd==4,s,$)
 @
-IF(#CreditDate == #L2r26CreditDate,s,$)
+IF(#FunCd==2,IF(#CreditDate == #L2r26CreditDate,s,$),$)
 A(4,0,#CreditDate)
 
 #CreditHelp=x,100,S
@@ -884,7 +884,7 @@ T(H,#ClStat,#ClStatCodeHelp)
 #SettingDate=D,7,I
 IF(#FunCd==4,s,$)
 @
-IF(#SettingDate == #L2r26SettingDate,s,$)
+IF(#FunCd==2,IF(#SettingDate == #L2r26SettingDate,s,$),$)
 V(7)A(4,0,#SettingDate)
 
 
@@ -892,7 +892,7 @@ V(7)A(4,0,#SettingDate)
 #SettingBal=m,14,I
 IF(#FunCd==4,s,$)
 @
-IF(#SettingBal == #L2r26SettingAmt,s,$)
+IF(#FunCd==2,IF(#SettingBal == #L2r26SettingAmt,s,$),$)
 V(2,0)
 
 
@@ -954,7 +954,7 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 IF(#DispPrice == 0,S,$)
 @
-IF(#DispDate ==#L2r22DispDate,s,$)
+IF(#FunCd==2,IF(#DispDate == #L2r22DispDate,s,$),$)
 V(7)A(4,0,#DispDate)
 
 

@@ -631,7 +631,7 @@ T(2,#L6r03Result)
 IF(#FunCd==4,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @
-IF(#CityCode == #L2r22CityCode,s,$)
+IF(#FunCd==2,IF(#CityCode == #L2r22CityCode,s,$),$)
 C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
 
 
@@ -663,7 +663,7 @@ T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
 #StockCode=X,10,I
 IF(#FunCd==4,s,$)
 @
-IF(#StockCode==#L2r25StockCode,s,$)
+IF(#FunCd==2,IF(#StockCode == #L2r25StockCode,s,$),$)
 V(7)
 
 #RimStockCode=X,10,S
@@ -726,14 +726,14 @@ IF(#FunCd==4,s,$)
 #DataYear=A,3,I
 IF(#FunCd==4,s,$)
 @
-IF(#DataYear==#L2r25DataYear,s,$)
+IF(#FunCd==2,IF(#DataYear == #L2r25DataYear,s,$),$)
 V(9)
 
 ! [發行股數]
 #IssuedShares=n,14,I
 IF(#FunCd==4,s,$)
 @
-IF(#IssuedShares==#L2r25IssuedShares,s,$)
+IF(#FunCd==2,IF(#IssuedShares == #L2r25IssuedShares,s,$),$)
 V(9)
 
 
@@ -742,7 +742,7 @@ V(9)
 IF(#FunCd==4,s,$)
 HELP(#EvaStandardHelp)
 @
-IF(#EvaStandard == #L2r25EvaStandard,s,$)
+IF(#FunCd==2,IF(#EvaStandard == #L2r25EvaStandard,s,$),$)
 V(H,#EvaStandardHelp)
 T(3,@FdSHARE_VALUE,)T(3,@FdBVPS,)T(3,@FdMONTHLY_AVG,)T(3,@FdClosingPrice,)T(3,@FdQUARTER_AVG,)
 IF(#EvaStandard==01,T(3,@FdSHARE_VALUE,*),$)
@@ -839,7 +839,7 @@ C(4,#CustId,S,$)
 C(5,#OwnerId,#CustId,S,$)
 HELP(#RelationCodeHelp)
 @
-IF(#OwnerRelCode == #L2r52OwnerRelCode1,s,$)
+IF(#FunCd==2,IF(#OwnerRelCode == #L2r52OwnerRelCode1,s,$),$)
 V(H,#RelationCodeHelp)
 
 #OwnerRelCodeX=X,40,L
@@ -908,7 +908,7 @@ T(3,:<font color=red>下列「擔保維持率」、「通知追繳維持率」�
 IF(#FunCd==4,s,$)
 HELP(#LoanToValueHelp)
 @
-IF(#LoanToValue == #L2r25LoanToValue,s,$)
+IF(#FunCd==2,IF(#LoanToValue == #L2r25LoanToValue,s,$),$)
 V(7)V(2,0)
 IF(#LoanToValue==50,E(0,@ClMtr,170)E(0,@NoticeMtr,160)E(0,@ImplementMtr,140),$)
 IF(#LoanToValue==60,E(0,@ClMtr,140)E(0,@NoticeMtr,135)E(0,@ImplementMtr,125),$)
@@ -941,7 +941,7 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 HELP(#YNHelp)
 @
-IF(#ComputeMTR ==#L2r25ComputeMTR,s,$)
+IF(#FunCd==2,IF(#ComputeMTR == #L2r25ComputeMTR,s,$),$)
 V(H,#YNHelp)
 
 
@@ -953,7 +953,7 @@ T(H,#ComputeMTR,#YNHelp)
 IF(#FunCd==4,s,$)
 HELP(#SettingStatHelp)
 @
-IF(#SettingStat == #L2r25SettingStat,s,$)
+IF(#FunCd==2,IF(#SettingStat == #L2r25SettingStat,s,$),$)
 V(H,#SettingStatHelp)
 
 #SettingStatX=x,4,L
@@ -965,7 +965,7 @@ T(H,#SettingStat,#SettingStatHelp)
 IF(#FunCd==4,s,$)
 HELP(#ClStatHelp)
 @
-IF(#ClStat == #L2r25ClStat,s,$)
+IF(#FunCd==2,IF(#ClStat == #L2r25ClStat,s,$),$)
 V(H,#ClStatHelp)
 
 #ClStatX=x,10,L
@@ -976,7 +976,7 @@ T(H,#ClStat,#ClStatHelp)
 #SettingDate=D,7,I
 IF(#FunCd==4,s,$)
 @
-IF(#SettingDate == #L2r25SettingDate,s,$)
+IF(#FunCd==2,IF(#SettingDate == #L2r25SettingDate,s,$),$)
 V(7)A(4,0,#SettingDate)
 
 
@@ -984,7 +984,7 @@ V(7)A(4,0,#SettingDate)
 #SettingBalance=m,14,I
 IF(#FunCd==4,s,$)
 @
-IF(#SettingBalance == #L2r25SettingBalance,s,$)
+IF(#FunCd==2,IF(#SettingBalance == #L2r25SettingBalance,s,$),$)
 V(2,0)
 V(9)
 
@@ -992,7 +992,7 @@ V(9)
 #EvaDate=D,7,I
 IF(#FunCd==4,s,$)
 @
-IF(#EvaDate == #L2r22EvaDate,s,$)
+IF(#FunCd==2,IF(#EvaDate == #L2r22EvaDate,s,$),$)
 V(7)A(4,0,#EvaDate)
 
 
@@ -1000,7 +1000,7 @@ V(7)A(4,0,#EvaDate)
 #EvaAmt=m,14,I
 IF(#FunCd==4,s,$)
 @
-IF(#EvaAmt == #L2r22EvaAmt,s,$)
+IF(#FunCd==2,IF(#EvaAmt == #L2r22EvaAmt,s,$),$)
 V(2,0)
 V(9)
 
@@ -1038,7 +1038,7 @@ R(1,L2R41)
 #MtgDate=D,7,I
 IF(#FunCd==4,s,$)
 @
-IF(#MtgDate == #L2r25MtgDate,s,$)
+IF(#FunCd==2,IF(#MtgDate == #L2r25MtgDate,s,$),$)
 V(7)A(4,0,#MtgDate)
 
 

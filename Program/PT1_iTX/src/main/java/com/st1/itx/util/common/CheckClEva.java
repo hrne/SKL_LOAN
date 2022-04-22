@@ -130,6 +130,10 @@ public class CheckClEva extends CommBuffer {
 
 		tClEva = sClEvaService.ClNoFirst(iClCode1, iClCode2, iClNo); // 新增完00的資料再查一次
 
+		ClImm tClImm = new ClImm();
+
+		tClImm = sClImmService.holdById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
+		
 		if (tClEva.getEvaDate() != parse.stringToInteger(titaVo.getParam("EvaDate"))) { // 鑑估日期跟上次重評日期不同
 
 			tClEvaId = new ClEvaId();
@@ -149,7 +153,15 @@ public class CheckClEva extends CommBuffer {
 			tClEva.setEvaNetWorth(parse.stringToBigDecimal(titaVo.getParam("EvaNetWorth")));
 			tClEva.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
 			tClEva.setEvaCompanyId(titaVo.getParam("EvaCompany"));
-			tClEva.setEvaCompanyName(titaVo.getParam("EvaCompanyX"));
+
+			// 查詢保險公司資料檔
+			CdInsurer tCdInsurer = sCdInsurerService.findById(new CdInsurerId("2", tClImm.getEvaCompanyCode()), titaVo);
+
+			tClEva.setEvaCompanyName("");
+			if (tCdInsurer != null) {
+				tClEva.setEvaCompanyName(tCdInsurer.getInsurerItem());
+			}
+
 			tClEva.setEvaEmpno("");
 			tClEva.setEvaReason(EvaReason);
 			tClEva.setOtherReason(EvaReasonX);
@@ -198,10 +210,6 @@ public class CheckClEva extends CommBuffer {
 		dataLog.setEnv(titaVo, beforeClMain, tClMain);
 		dataLog.exec();
 
-		// ClImm
-		ClImm tClImm = new ClImm();
-
-		tClImm = sClImmService.holdById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
 		// 變更前
 		ClImm beforeClImm = (ClImm) dataLog.clone(tClImm);
 
@@ -325,7 +333,8 @@ public class CheckClEva extends CommBuffer {
 			shareCompAmt = wkEvaAmt;
 		}
 
-		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
+				BigDecimal.ROUND_HALF_UP);
 
 		// 分配金額和設定金額比較 較低的為可分配金額
 		this.info("分配金額和設定金額比較 = " + shareTotal + "," + settingAmt);

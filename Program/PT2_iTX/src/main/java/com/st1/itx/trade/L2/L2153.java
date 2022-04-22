@@ -445,7 +445,7 @@ public class L2153 extends TradeBuffer {
 //		E-LOAN處理 
 		if (isEloan) {
 //			指標利率代碼為NULL時放99自訂利率
-			if (titaVo.getParam("BaseRateCode") == null) {
+			if (titaVo.getParam("BaseRateCode").trim().isEmpty() || titaVo.getParam("BaseRateCode") == null) {
 				tFacMain.setBaseRateCode("99");
 			} else {
 				tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));

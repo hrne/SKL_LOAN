@@ -379,6 +379,15 @@ public class L4601Batch extends TradeBuffer {
 				checkResultA = checkResultA + ",11";
 			}
 		}
+//		已入帳,總保費與入帳金額不符 
+		if (tInsuRenew.getAcDate() > 0
+				&& parse.stringToBigDecimal(t.get("NewTotalFee")).compareTo(tInsuRenew.getTotInsuPrem()) != 0) {
+			if ("".equals(checkResultA)) {
+				checkResultA = checkResultA + "15";
+			} else {
+				checkResultA = checkResultA + ",15";
+			}
+		}
 
 		if ("Y".equals(tInsuRenew.getNotiTempFg())) {
 			if ("".equals(checkResultA)) {

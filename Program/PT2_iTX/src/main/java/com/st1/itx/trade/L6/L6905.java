@@ -2,6 +2,7 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +23,7 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
+import com.st1.itx.db.service.springjpa.cm.L6905ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -53,6 +55,10 @@ public class L6905 extends TradeBuffer {
 	public TxTranCodeService sTxTranCodeService;
 	@Autowired
 	CdEmpService cdEmpService;
+
+	@Autowired
+	private L6905ServiceImpl l6905ServiceImpl;
+
 	@Autowired
 	Parse parse;
 
@@ -61,6 +67,85 @@ public class L6905 extends TradeBuffer {
 		this.info("active L6905 ");
 		this.totaVo.init(titaVo);
 
+		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		this.index = titaVo.getReturnIndex();
+
+		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
+		this.limit = 50; // 482 * 100 = 48,200
+
+		List<Map<String, String>> dList = null;
+
+		try {
+			dList = l6905ServiceImpl.FindData(titaVo, this.index, this.limit);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			throw new LogicException(titaVo, "E5004", "");
+		}
+
+		if (this.index == 0 && dList == null || dList.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "會計帳務明細檔");
+		}
+
+		for (Map<String, String> d : dList) {
+
+			OccursList occursList = new OccursList();
+			occursList.putParam("OOAcNoCode", d.get("AcNoCode"));
+			occursList.putParam("OOAcSubCode", d.get("AcSubCode"));
+			occursList.putParam("OOAcDtlCode", d.get("AcDtlCode"));
+			occursList.putParam("OOCustNo", d.get("CustNo"));
+			occursList.putParam("OOFacmNo", d.get("FacmNo"));
+			occursList.putParam("OOBormNo", d.get("BormNo"));
+			occursList.putParam("OORelDy", parse.stringToInteger(d.get("RelDy"))-19110000);
+			occursList.putParam("OOSlipNote", d.get("SlipNote"));
+			occursList.putParam("OOTranItem", d.get("TranItem"));
+			occursList.putParam("OOTitaTxCd", d.get("TitaTxCd"));
+			occursList.putParam("OOSumNo", d.get("SumNo"));
+
+			occursList.putParam("OOSupItem", d.get("TitaSupNo"));
+			occursList.putParam("OOTitaSupNo", d.get("SUPNAME"));
+
+			occursList.putParam("OOTlrItem", d.get("TitaTlrNo"));
+			occursList.putParam("OOTitaTlrNo", d.get("TLRNAME"));
+
+			occursList.putParam("OORelTxseq", d.get("RelTxseq"));
+
+			if ("D".equals(d.get("DbCr"))) {
+				occursList.putParam("OODbAmt", parse.stringToBigDecimal(d.get("TxAmt")));
+				occursList.putParam("OOCrAmt", 0);
+			} else {
+				occursList.putParam("OODbAmt", 0);
+				occursList.putParam("OOCrAmt", parse.stringToBigDecimal(d.get("TxAmt")));
+			}
+
+			String DateTime = parse.stringToStringDateTime(d.get("LastUpdate"));
+			this.info("L6905 DateTime : " + DateTime);
+			String Date = FormatUtil.left(DateTime, 9);
+			occursList.putParam("OOLastDate", Date);
+			String Time = FormatUtil.right(DateTime, 8);
+			occursList.putParam("OOLastTime", Time);
+
+			// 查詢會計科子細目設定檔
+			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));
+			occursList.putParam("OOSlipNo", d.get("SlipNo"));
+			
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
+		}
+
+		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		if (dList != null && dList.size() >= this.limit) {
+			titaVo.setReturnIndex(this.setIndexNext());
+//			 this.totaVo.setMsgEndToEnter();// 手動折返
+			this.totaVo.setMsgEndToAuto();// 自動折返
+		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+
+	public ArrayList<TotaVo> run2(TitaVo titaVo) throws LogicException {
+		this.info("active L6905 ");
+		this.totaVo.init(titaVo);
 		// 取得輸入資料
 		String DateTime; // YYY/MM/DD hh:mm:ss
 		String Date = "";
@@ -193,8 +278,8 @@ public class L6905 extends TradeBuffer {
 			this.info("into erro 1");
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
-		
-		this.info("lAcDetail=="+lAcDetail.size());
+
+		this.info("lAcDetail==" + lAcDetail.size());
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
 
@@ -306,12 +391,12 @@ public class L6905 extends TradeBuffer {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
 			occursList.putParam("OOSlipNo", tAcDetail.getSlipNo());
-			
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
-			
+
 		}
-		
+
 //		if (this.totaVo.getOccursList().size() == 0) {
 //			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 //		}

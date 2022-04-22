@@ -527,7 +527,7 @@ T(2,#L6r03Result)
 IF(#FunCd==4,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @
-IF(#CityCode == #L2r28CityCode,s,$)
+IF(#FunCd==2,IF(#CityCode == #L2r28CityCode,s,$),$)
 V(H,#L6r03ResultCity)
 
 
@@ -556,7 +556,7 @@ T(2,@L6r03ResultArea,#L6r03Result)
 IF(#FunCd==4,s,$)
 HELP(#L6r03ResultArea,cols:5)
 @
-IF(#AreaCode == #L2r28AreaCode,s,$)
+IF(#FunCd==2,IF(#AreaCode == #L2r28AreaCode,s,$),$)
 V(H,#L6r03ResultArea)
 
 ! 鄉鎮市區代碼的對應名稱
@@ -588,7 +588,7 @@ T(2,@L6r03ResultIr,#L6r03Result)
 IF(#FunCd==4,s,$)
 HELP(#L6r03ResultIr,cols:5)
 @
-IF(#IrCode==#L2r28IrCode,s,$)
+IF(#FunCd==2,IF(#IrCode == #L2r28IrCode,s,$),$)
 V(H,#L6r03ResultIr)
 
 ! 地段代碼的對應名稱
@@ -601,7 +601,7 @@ T(H,#IrCode,#L6r03ResultIr)
 #LandNo1=A,4,I
 IF(#FunCd==4,s,$)
 @
-IF(#LandNo1==#L2r28LandNo1,s,$)
+IF(#FunCd==2,IF(#LandNo1 == #L2r28LandNo1,s,$),$)
 V(2,0)
 
 #LandNo2=A,4,I
@@ -638,7 +638,7 @@ T(H,#LandCode,#LandCodeHelp)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 @
-IF(#Area == #L2r28Area,s,$)
+IF(#FunCd==2,IF(#Area == #L2r28Area,s,$),$)
 V(2,0)
 
 #FdAREA=X,2,L
@@ -678,7 +678,7 @@ T(H,#LandUsageType,#LandUsageTypeHelp)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 @
-IF(#PostedLandValue == #L2r28PostedLandValue,s,$)
+IF(#FunCd==2,IF(#PostedLandValue == #L2r28PostedLandValue,s,$),$)
 V(2,0)
 
 #FdCURRENT_LD_VALUE=X,2,L
@@ -688,7 +688,7 @@ V(2,0)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 @
-IF(#PostedLandValueYear == #L2r28PostedLandValueYear,s,$)
+IF(#FunCd==2,IF(#PostedLandValueYear == #L2r28PostedLandValueYear,s,$),$)
 V(2,0)
 
 #FdCLV_YYYY=X,2,L
@@ -697,7 +697,7 @@ V(2,0)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 @
-IF(#PostedLandValueMonth == #L2r28PostedLandValueMonth,s,$)
+IF(#FunCd==2,IF(#PostedLandValueMonth == #L2r28PostedLandValueMonth,s,$),$)
 V(1,01,02,03,04,05,06,07,08,09,10,11,12)
 
 #CLV_YM=X,6,S
@@ -708,7 +708,7 @@ T(2,#PostedLandValueYear+#PostedLandValueMonth)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 @
-IF(#TransferedYear == #L2r28TransferedYear,s,$)
+IF(#FunCd==2,IF(#TransferedYear == #L2r28TransferedYear,s,$),$)
 V(2,0)V(7)
 V(9)
 
@@ -735,7 +735,7 @@ IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 HELP(#LandUsageCodeHelp)
 @
-IF(#LandUsageCode == #L2r28LandUsageCode,s,$)
+IF(#FunCd==2,IF(#LandUsageCode == #L2r28LandUsageCode,s,$),$)
 V(H,#LandUsageCodeHelp)
 
 #FdLD_USAGE_IND=X,2,L
@@ -748,7 +748,7 @@ T(H,#LandUsageCode,#LandUsageCodeHelp)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 @
-IF(#LandRentStartDate == #L2r28LandRentStartDate,s,$)
+IF(#FunCd==2,IF(#LandRentStartDate == #L2r28LandRentStartDate,s,$),$)
 A(DATE,0,#LandRentStartDate)
 
 #FdLD_RENT_ST=X,2,L
@@ -758,7 +758,7 @@ A(DATE,0,#LandRentStartDate)
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#SHOW_2))
 @
-IF(#LandRentEndDate == #L2r28LandRentEndDate,s,$)
+IF(#FunCd==2,IF(#LandRentEndDate == #L2r28LandRentEndDate,s,$),$)
 A(DATE,0,#LandRentEndDate)
 
 #FdLD_RENT_ED=X,2,L

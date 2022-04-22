@@ -956,7 +956,7 @@ IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 @
-IF(#LiceneIssueDate ==#L2r24LiceneIssueDate,s,$)
+IF(#FunCd==2,IF(#LiceneIssueDate == #L2r24LiceneIssueDate,s,$),$)
 A(4,0,#LiceneIssueDate)
 
 
@@ -1038,7 +1038,7 @@ IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#Show2))
 HELP(#YNHelp)
 @
-IF(#Insurance==#L2r24Insurance,s,$)
+IF(#FunCd==2,IF(#Insurance == #L2r24Insurance,s,$),$)
 V(H,#YNHelp)
 
 
@@ -1051,7 +1051,7 @@ T(3,)T(H,#Insurance,#YNHelp)
 IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 @
-IF(#LoanToValue == #L2r24LoanToValue,s,$)
+IF(#FunCd==2,IF(#LoanToValue == #L2r24LoanToValue,s,$),$)
 V(2,0)
 
 !抵押權註記
