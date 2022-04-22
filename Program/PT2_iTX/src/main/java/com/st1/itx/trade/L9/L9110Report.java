@@ -827,11 +827,12 @@ public class L9110Report extends MakeReport {
 		 * ------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
 		checkSpace(5);
-		print(1, 5, "　　　　　　　　　　　　　　　　　　　　　　　　　　主建物　　　公設　　　（坪）　　　(坪)　　　(坪)　　(仟／坪)　　　(仟)");
-		print(1, 5, "序號　提供人／門牌號碼　　　　　　　　　　　　　　　建　號　　　建號　　　主建物　　　公設　　　車位　　鑑定單價　　　設定　　　　賣方姓名　　　 賣方 ID");
-		print(1, 5, "－－　－－－－－－－－－－－－－－－－－－－－－　－－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－－　－－－－－　－－－－－－－　－－－－－");
+		print(1, 5, "　　　　　　　　　　　　　　　　　　　　　　　　　　主建物　　　公設　　　（坪）　　 （坪） 　　(坪)　　　(坪)　　(仟／坪)　　　(仟)");
+		print(1, 5, "序號　提供人／門牌號碼　　　　　　　　　　　　　　　建　號　　　建號　　　主建物　　附屬建物　　公設　　　車位　　鑑定單價　　　設定　　　賣方姓名　　　 賣方 ID");
+		print(1, 5, "－－　－－－－－－－－－－－－－－－－－－－－－　－－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－－　－－－－－　－－－－－－　－－－－－");
 
 		BigDecimal totalFloorArea = BigDecimal.ZERO;
+		BigDecimal totalBdSubArea = BigDecimal.ZERO;
 		BigDecimal totalPublicArea = BigDecimal.ZERO;
 		BigDecimal totalCarArea = BigDecimal.ZERO;
 		BigDecimal totalSettingAmt = BigDecimal.ZERO;
@@ -846,33 +847,38 @@ public class L9110Report extends MakeReport {
 			this.print(0, 55, mBuilding.get("F2")); // 主建物建號
 			this.print(0, 67, mBuilding.get("F3")); // 公設建號
 
-			this.print(0, 86, formatAmt(mBuilding.get("F4"), 2), "R"); // 主建物面積
+			this.print(0, 87, formatAmt(mBuilding.get("F4"), 2), "R"); // 主建物面積
 			totalFloorArea = totalFloorArea.add(getBigDecimal(mBuilding.get("F4")));
 
-			this.print(0, 96, formatAmt(mBuilding.get("F5"), 2), "R"); // 公設面積
+			// 2022-04-22 智偉新增:附屬建物面積
+			this.print(0, 97, formatAmt(mBuilding.get("F12"), 2), "R"); // 附屬建物面積
+			totalBdSubArea = totalBdSubArea.add(getBigDecimal(mBuilding.get("F12")));
+			
+			this.print(0, 107, formatAmt(mBuilding.get("F5"), 2), "R"); // 公設面積
 			totalPublicArea = totalPublicArea.add(getBigDecimal(mBuilding.get("F5")));
 
-			this.print(0, 106, formatAmt(mBuilding.get("F6"), 2), "R"); // 車位面積
+			this.print(0, 117, formatAmt(mBuilding.get("F6"), 2), "R"); // 車位面積
 			totalCarArea = totalCarArea.add(getBigDecimal(mBuilding.get("F6")));
 
-			this.print(0, 119, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F7")), thousand, 0), 0), "R"); // 鑑定單價
+			this.print(0, 129, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F7")), thousand, 0), 0), "R"); // 鑑定單價
 
-			this.print(0, 131, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F8")), thousand, 0), 0), "R");// 設定金額
+			this.print(0, 141, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F8")), thousand, 0), 0), "R");// 設定金額
 			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F8")));
 
-			this.print(0, 133, mBuilding.get("F10")); // 賣方姓名
-			this.print(0, 149, mBuilding.get("F11")); // 賣方ID
+			this.print(0, 143, mBuilding.get("F10")); // 賣方姓名
+			this.print(0, 157, mBuilding.get("F11")); // 賣方ID
 
 			this.print(1, 11, mBuilding.get("F9")); // 門牌號碼
 		}
 
 		checkSpace(2);
-		print(1, 5, "－－　－－－－－－－－－－－－－－－－－－－－－　－－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－－　－－－－－　－－－－－－－　－－－－－");
+		print(1, 5, "－－　－－－－－－－－－－－－－－－－－－－－－　－－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－－　－－－－－　－－－－－－　－－－－－");
 		print(1, 5, " 建物合計：");
-		print(0, 86, formatAmt(totalFloorArea, 2), "R");
-		print(0, 96, formatAmt(totalPublicArea, 2), "R");
-		print(0, 106, formatAmt(totalCarArea, 2), "R");
-		print(0, 131, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
+		print(0, 87, formatAmt(totalFloorArea, 2), "R");
+		print(0, 97, formatAmt(totalBdSubArea, 2), "R");
+		print(0, 107, formatAmt(totalPublicArea, 2), "R");
+		print(0, 117, formatAmt(totalCarArea, 2), "R");
+		print(0, 141, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
 	}
 
 	/**

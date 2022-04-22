@@ -38,26 +38,26 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                          ORDER BY LO.\"OwnerPart\" DESC "; // -- ??? 待確認排序方式
 		sql += "                         )              AS Seq "; // -- 序號 F0
 		sql += "      , LO.\"Owner\"                    AS Owner "; // -- 提供人 F1
-		sql += "      , LPAD(L.\"BdNo1\",5,'0') ";
+		sql += "      , LPAD(NVL(L.\"BdNo1\",0),5,'0') ";
 		sql += "        || '-' ";
-		sql += "        || LPAD(L.\"BdNo2\",3,'0')      AS BdNo "; // -- 主建物建號 F2
-		sql += "      , LPAD(CBP1.\"PublicBdNo1\",5,'0') ";
+		sql += "        || LPAD(NVL(L.\"BdNo2\",0),3,'0')      AS BdNo "; // -- 主建物建號 F2
+		sql += "      , LPAD(NVL(CBP1.\"PublicBdNo1\",0),5,'0') ";
 		sql += "        || '-' ";
-		sql += "        || LPAD(CBP1.\"PublicBdNo2\",3,'0') ";
+		sql += "        || LPAD(NVL(CBP1.\"PublicBdNo2\",0),3,'0') ";
 		sql += "                                        AS PublicBdNo ";// -- 公設建號 F3
-		sql += "      , NVL(L.\"FloorArea\",0) ";
-		sql += "        + NVL(L.\"BdSubArea\",0)        AS BdArea "; // -- 主建物 F4
-		sql += "      , CBP2.\"PublicArea\"             AS PublicArea "; // -- 公設 F5
+		sql += "      , NVL(L.\"FloorArea\",0)          AS BdArea "; // -- 主建物 F4
+		sql += "      , NVL(CBP2.\"PublicArea\",0)      AS PublicArea "; // -- 公設 F5
 		sql += "      , CASE ";
 		sql += "          WHEN CF.\"ClCode1\" = 1 AND CF.\"ClCode2\" = 5 "; // -- 獨立產權車位時，車位跟主建物面積顯示一樣
-		sql += "          THEN NVL(L.\"FloorArea\",0)+ NVL(L.\"BdSubArea\",0) ";
+		sql += "          THEN NVL(L.\"FloorArea\",0) ";
 		sql += "        ELSE 0 END                      AS ParkingArea "; // -- 車位 F6
 		sql += "      , L.\"EvaUnitPrice\"              AS EvaUnitPrice "; // -- 鑑定單價 F7
 		sql += "      , CLI.\"SettingAmt\"              AS SettingAmt "; // -- 設定 F8
 		sql += "      , L.\"BdLocation\"                AS BdLocation "; // -- 門牌地址 F9
-		sql += "      , NVL(SUBSTR(L.\"SellerName\",0,7),' ') ";
+		sql += "      , NVL(SUBSTR(L.\"SellerName\",0,6),' ') ";
 		sql += "                                        AS SellerName "; // -- 賣方姓名 F10
 		sql += "      , NVL(L.\"SellerId\",' ')         AS SellerId "; // -- 賣方ID F11
+		sql += "      , NVL(L.\"BdSubArea\",0)          AS BdSubArea "; // -- 附屬建物 F12
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN \"ClBuilding\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                           AND L.\"ClCode2\" = CF.\"ClCode2\"";

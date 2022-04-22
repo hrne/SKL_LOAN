@@ -186,7 +186,6 @@ public class L3001 extends TradeBuffer {
 		}
 		// 如有有找到資料
 		for (FacMain tFacMain : lFacMain) {
-			wkClShareFg = loanAvailableAmt.getClShareFlag();
 			int deadline = 0;
 			// 判斷循環非循環日期
 			if (tFacMain.getRecycleCode().equals("1")) {
@@ -196,6 +195,7 @@ public class L3001 extends TradeBuffer {
 			}
 
 			wkAvailable = loanAvailableAmt.caculate(tFacMain, titaVo); // 可用額度
+			wkClShareFg = loanAvailableAmt.getClShareFlag();
 			// 動支期限循環動用止日到期時顯示0
 			if (deadline < this.txBuffer.getTxCom().getTbsdy()) {
 				wkAvailable = BigDecimal.ZERO;
@@ -232,6 +232,8 @@ public class L3001 extends TradeBuffer {
 
 		// 顧客控管警訊通知訊息
 		if (titaVo.getReturnIndex() == 0) {
+//			custRmkCom.getCustRmk(titaVo, iCustNo);
+//			this.addAllList(custRmkCom.getCustRmk(titaVo, iCustNo));
 		}
 
 		// end
