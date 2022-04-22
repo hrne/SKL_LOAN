@@ -49,13 +49,17 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = LRC.\"CustNo\" ";
 		sql += "                              AND LBM.\"FacmNo\" = LRC.\"FacmNo\" ";
 		sql += "                              AND LBM.\"BormNo\" = LRC.\"BormNo\" ";
-		sql += " WHERE NVL(LBM.\"LoanBal\", 0) != 0 ";
-		sql += "   AND (    NVL(LBM.\"NextAdjRateDate\" , 0) BETWEEN :inputStartDate AND :inputEndDate ";
-		sql += "         OR NVL(LBM.\"FirstAdjRateDate\", 0) BETWEEN :inputStartDate AND :inputEndDate) ";
+		sql += " WHERE LRC.\"Status\" = 2 "; // 只抓加碼利率（定期機動）
+		sql += "   AND ( (     NVL(LBM.\"LoanBal\", 0) != 0 ";
+		sql += "           AND NVL(LBM.\"NextAdjRateDate\", 0) BETWEEN :inputStartDate AND :inputEndDate "; // A. 如果不餘額為0且下次調整日在此區間
+		sql += "         ) ";
+		sql += "         OR NVL(LBM.\"FirstAdjRateDate\", 0) BETWEEN :inputStartDate AND :inputEndDate ";   // B. 如果首次調整日在此區間（餘額可為0）
+		sql += "       ) ";
 		sql += " ORDER BY \"LMSACN\" ASC ";
 		sql += "         ,\"LMSAPN\" ASC ";
 		sql += "         ,\"LMSASQ\" ASC ";
 		sql += "         ,\"ASCADT\" ASC ";
+
 
 		this.info("sql=" + sql);
 
