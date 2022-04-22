@@ -62,7 +62,7 @@ public class LM058Report extends MakeReport {
 		// 11103
 		thisYM = (iYear + 1911) * 100 + iMonth;
 		// 1110331
-		String dateRocYMD = String.valueOf(yearMonthEnd);
+		String dateRocYMD = String.valueOf(yearMonthEnd - 19110000);
 		this.info("thisYM=" + thisYM);
 		this.info("dateRocYMD=" + dateRocYMD);
 

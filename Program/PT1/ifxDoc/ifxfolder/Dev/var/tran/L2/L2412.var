@@ -753,11 +753,14 @@ IF(#L2r24MtgCheck == "Y",$,s)
 IF(#L2r24MtgLoan == "Y",$,s)
 IF(#L2r24MtgPledge == "Y",$,s)
 
+
 !擔保品類別
 #ClTypeCode=X,3,I
 IF(#FunCd==1,$,s)
 HELP(#ClTypeCodeHelp)
-@V(H,#ClTypeCodeHelp)
+@
+IF(#FunCd==2,IF(#ClTypeCode == #L2r22ClTypeCode,s,$),$)
+V(H,#ClTypeCodeHelp)
 
 
 #SUB_TYPE_X=X,24,L
@@ -784,7 +787,9 @@ T(2,#L6r03Result)
 #CityCode=X,2,I
 IF(#FunCd==1,$,s)
 HELP(#L6r03ResultCity,cols:5)
-@C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
+@
+IF(#FunCd==2,IF(#CityCode == #L2r22CityCode,s,$),$)
+C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
 
 
 #COL_AREA_X=X,10,L
@@ -857,14 +862,19 @@ T(H,#OwnerRelCode,#RelationCodeHelp)
 #EvaDate=D,7,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
-@V(7)A(4,0,#EvaDate)
+@
+IF(#FunCd==2,IF(#EvaDate == #L2r22EvaDate,s,$),$)
+V(7)
+A(4,0,#EvaDate)
 
 
 !鑑價總值
 #EvaAmt=m,14,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
-@V(2,0)
+@
+IF(#FunCd==2,IF(#EvaAmt == #L2r22EvaAmt,s,$),$)
+V(2,0)
 
 
 ! 耐用年限
@@ -945,7 +955,9 @@ T(3,)T(H,#LicenseUsageCode,#LicenseUsageHelp)
 IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
-@A(4,0,#LiceneIssueDate)
+@
+IF(#LiceneIssueDate ==#L2r24LiceneIssueDate,s,$)
+A(4,0,#LiceneIssueDate)
 
 
 #MANU_MM=A,2,S
@@ -1020,23 +1032,27 @@ IF(#Currency=="TWD",E(0,1),$)
 
 #TMP_EX_RATE=m,3.2,S
 
-
 ! 投保註記
 #Insurance=X,1,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==2,$,CALL(#Show2))
 HELP(#YNHelp)
-@V(H,#YNHelp)
+@
+IF(#Insurance==#L2r24Insurance,s,$)
+V(H,#YNHelp)
 
 
 #INSU_IND_X=X,2,L
 T(3,)T(H,#Insurance,#YNHelp)
 
+
 !貸放成數
 #LoanToValue=m,3.2,I
 IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
-@V(2,0)
+@
+IF(#LoanToValue == #L2r24LoanToValue,s,$)
+V(2,0)
 
 !抵押權註記
 #MtgCode=A,1,I
@@ -1114,11 +1130,11 @@ IF(#FunCd==4,s,$)
 #INTERSYND_TYPE_X=X,6,S
 !T(3,)T(H,#SyndCode,#SyndCodeHelp)
 
+
 !處分價格
 #DispPrice=m,14,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==3,$,CALL(#Show3))
-@IF(#DispPrice=="",S,$)
 
 
 !處分日期

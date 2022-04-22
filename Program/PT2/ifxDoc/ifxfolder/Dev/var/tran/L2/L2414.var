@@ -1,0 +1,1078 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2414)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[170,380,170,380];printer.width=[15,30,15,30];order=1">
+[
+["[L2414]                                 其他擔保品資料登錄"],
+[#<->#,"#FdFuncd+功能",#FunCdX],
+[#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN1,#ApplNoX],
+["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
+["#FdClNo+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
+["#FdClTypeCode+擔保品類別",#ClTypeCode,#ClTypeItem],
+[#<->#,"#FdCityCode+地區別",#CityCode,#CityItem],
+["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+#EvaAmtLabel",#EvaAmt],
+["#FdPledgeAmt+保證金額",#PledgeAmt],["#FdPledgeBankCode+保證銀行",#PledgeBankCode,#PledgeBankCodeX],
+["#FdPledgeStartDate+保證起日",#PledgeStartDate],["#FdPledgeEndDate+保證迄日",#PledgeEndDate],
+[#<->#,"#FdPledgeNO+保證書字號",#PledgeNO],
+[#<->#,"#FdOwnerId+所有權人統編",#OwnerId],
+[#<->#,"#FdOwnerName+所有權人姓名",#OwnerName],
+[#<->#,"#FdOwnerRelCode+與授信戶關係",#OwnerRelCode,#OwnerRelCodeX],
+[#<->#,"#FdIssuingId+發行機構統編",#IssuingId],
+[#<->#,"#FdIssuingCounty+發行機構所在國別",#IssuingCounty,#IssuingCountyX],
+["#FdDocNo+憑證編號",#DocNo],["#FdLoanToValue+貸放成數",#LoanToValue,"％"],
+["@@@@@@有價證券類別",#SecuritiesType,#SecuritiesTypeX],["@@@@@@掛牌交易所",#Listed,#ListedX],
+["@@@@@@發行日",#OfferingDate],["@@@@@@到期日",#ExpirationDate],
+["@@@@@@發行者對象別",#TargetIssuer,#TargetIssuerX],["@@@@@@發行者次對象別",#SubTargetIssuer,#SubTargetIssuerX],
+["@@@@@@評等日期",#CreditDate],["@@@@@@評等公司",#Credit,#CreditX],
+["@@@@@@外部評等",#ExternalCredit],["@@@@@@主要指數",#Index,#IndexX],
+["@@@@@@交易方法",#TradingMethod,#TradingMethodX],["@@@@@@受償順位",#Compensation],
+[#<->#,"#FdClStatus+投資內容",#Investment],
+[#<->#,"#FdClStatus+公開價值",#PublicValue],
+["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
+["#FdSettingDate+設定日期",#SettingDate],["#FdSettingBal+設定金額",#SettingBal],
+["#FdDispPrice+處分價格",#DispPrice],["#FdDispDate+處分日期",#DispDate],
+[#<->#,"#FdClStatus+擔保品狀況碼",#ClStatus,#ClStatusX],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L6R11Rim.dec"/>
+!ClStatCode
+#CDDEF01=x,20,S
+T(3,CdCode.ClStatCode)
+
+#ClStatCodeHelp=x,1024,S
+!SettingStatCode
+#CDDEF02=x,22,S
+T(3,CdCode.SettingStatCode)
+
+#SettingStatCodeHelp=x,1024,S
+
+
+!ClTypeCode,其他擔保品類別
+#CDDEF03=x,20,S
+T(3,CdCode.ClTypeCode4)
+
+#ClTypeCodeHelp=x,2048,S
+
+!PledgeBankCode,保證銀行代碼
+#CDDEF04=x,21,S
+T(3,CdCode.PledgeBankCode)
+
+#PledgeBankCodeHelp=x,1024,S
+
+!YESNO,是否
+#CDDEF05=x,21,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,1024,S
+
+!SyndCode,聯貸案代碼
+#CDDEF06=x,21,S
+T(3,CdCode.SyndCode)
+
+#SyndCodeHelp=x,1024,S
+
+!NationalityCode
+#CDDEF07=x,22,S
+T(3,CdCode.NationalityCode)
+
+#NationalityCodeHelp=x,1024,S
+
+#CDDEF08=x,20,S
+T(3,CdGuarantor)
+
+#RelationCodeHelp=x,3000,S
+
+#CDDEF09=x,20,S
+T(3,CdCode.Listed)
+
+#ListedHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClStatCodeHelp,#HelpDesc1)
+T(2,@SettingStatCodeHelp,#HelpDesc2)
+T(2,@ClTypeCodeHelp,#HelpDesc3)
+T(2,@PledgeBankCodeHelp,#HelpDesc4)
+T(2,@YesNoHelp,#HelpDesc5)
+T(2,@SyndCodeHelp,#HelpDesc6)
+T(2,@NationalityCodeHelp,#HelpDesc7)
+T(2,@RelationCodeHelp,#HelpDesc8)
+T(2,@ListedHelp,#HelpDesc9)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2038擔保品明細資料查詢]進入),$)
+CALL(#Init)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+T(1,@ApplNo,#NTXBUF,2,7)
+T(1,@ClCode1,#NTXBUF,9,1)
+T(1,@ClCode2,#NTXBUF,11,2)
+T(1,@ClNo,#NTXBUF,14,7)
+
+
+
+
+
+#EvaAmtLabel=x,10,L
+T(2,估值／現值)
+
+#Init=@,1,S
+!INVOKEJS(SHOW,p1,15,22,0)
+C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
+
+#AFTER_FUNCD_1=X,1,S
+T(3,@FdCityCode, )
+T(3,@FdClTypeCode,*)
+T(3,@FdEvaDate,*)
+T(3,@FdEvaAmt,*)
+T(3,@FdOwnerId,*)
+T(3,@FdOwnerName,*)
+T(3,@FdOwnerRelCode,*)
+T(3,@FdSynd,*)
+T(3,@FdSettingStat,*)
+T(3,@FdClStat,*)
+T(3,@FdSettingDate,*)
+T(3,@FdSettingBal,*)
+T(3,@FdLoanToValue,*)
+T(F,@EvaDate,1)
+T(F,@EvaAmt,1)
+T(F,@PledgeAmt,1)
+T(F,@PledgeStartDate,1)
+T(F,@PledgeEndDate,1)
+T(F,@PledgeBankCode,1)
+T(F,@PledgeNO,1)
+T(F,@OwnerId,1)
+T(F,@OwnerName,1)
+T(F,@IssuingId,1)
+T(F,@IssuingCounty,1)
+T(F,@DocNo,1)
+T(F,@LoanToValue,1)
+T(F,@SecuritiesType,1)
+T(F,@Listed,1)
+T(F,@OfferingDate,1)
+T(F,@ExpirationDate,1)
+T(F,@TargetIssuer,1)
+T(F,@SubTargetIssuer,1)
+T(F,@CreditDate,1)
+T(F,@Credit,1)
+T(F,@ExternalCredit,1)
+T(F,@Index,1)
+T(F,@TradingMethod,1)
+T(F,@Compensation,1)
+T(F,@Investment,1)
+T(F,@PublicValue,1)
+T(F,@SettingStat,1)
+T(F,@ClStat,1)
+T(F,@SettingDate,1)
+T(F,@SettingBal,1)
+T(F,@Synd,1)
+T(F,@SyndCode,1)
+T(F,@DispPrice,1)
+T(F,@DispDate,1)
+
+!FunCd=2 隱藏框線
+#WKTF=X,1,S
+IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0),$)
+
+#IF_FUNCD_4=X,1,S
+IF(#FunCd==4,$,S)
+T(F,@CustId,0)
+T(F,@CustNo,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@ClTypeCode,0)
+T(F,@CityCode,0)
+T(F,@ClTypeCode,0)
+T(F,@EvaDate,0)
+T(F,@EvaAmt,0)
+T(F,@PledgeAmt,0)
+T(F,@PledgeStartDate,0)
+T(F,@PledgeEndDate,0)
+T(F,@PledgeBankCode,0)
+T(F,@PledgeNO,0)
+T(F,@OwnerId,0)
+T(F,@OwnerName,0)
+T(F,@IssuingId,0)
+T(F,@IssuingCounty,0)
+T(F,@DocNo,0)
+T(F,@LoanToValue,0)
+T(F,@SettingStat,0)
+T(F,@ClStat,0)
+T(F,@SettingDate,0)
+T(F,@SettingBal,0)
+T(F,@Synd,0)
+T(F,@SyndCode,0)
+T(F,@DispPrice,0)
+T(F,@DispDate,0)
+
+T(F,@SecuritiesType,0)
+T(F,@Listed,0)
+T(F,@OfferingDate,0)
+T(F,@ExpirationDate,0)
+T(F,@TargetIssuer,0)
+T(F,@SubTargetIssuer,0)
+T(F,@CreditDate,0)
+T(F,@Credit,0)
+T(F,@ExternalCredit,0)
+T(F,@Index,0)
+T(F,@TradingMethod,0)
+T(F,@Compensation,0)
+T(F,@Investment,0)
+T(F,@PublicValue,0)
+
+
+
+! [功能]
+#FunCd=X,1,S
+CALL(#Init)
+C(3,#CHAIN,1,$,s)
+HELP(1: 新增;2: 修改;4: 刪除)
+@V(7)V(9)V(1,1,2,4)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+! 權限檢查
+#FUNCIND=_,_,S
+E(0,#FunCd)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#FdFuncd=X,2,L
+#FdApplNo=X,2,L
+#FdClCode1=X,2,L
+#FdClCode2=X,2,L
+#FdClNo=X,2,L
+#FdGdRid=X,2,L
+#FdClTypeCode=X,2,L
+#FdCityCode=X,2,L
+#FdEvaDate=X,2,L
+#FdPledgeAmt=X,2,L
+#FdPledgeStartDate=X,2,L
+#FdPledgeEndDate=X,2,L
+#FdPledgeBankCode=X,2,L
+#FdPledgeNO=X,2,L
+#FdOwnerId=X,2,L
+#FdOwnerName=X,2,L
+#FdOwnerRelCode=X,2,L
+#FdIssuingId=X,2,L
+#FdIssuingCounty=X,2,L
+#FdDocNo=X,2,L
+#FdLoanToValue=X,2,L
+#FdSettingStat=X,2,L
+#FdClStat=X,2,L
+#FdSettingDate=X,2,L
+#FdSettingBal=X,2,L
+#FdSynd=X,2,L
+#FdSyndCode=X,2,L
+#FdDispPrice=X,2,L
+#FdDispDate=X,2,L
+#FdClStatus=X,2,L
+
+#FunCdX=X,4,L
+SWITCH(#FunCd,1,T(3,新增),2,T(3,修改),4,T(3,刪除))
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+
+#FdCustId=X,2,L
+
+! 統編
+#CustId=X,10,L
+
+
+#FdCustNo=X,2,L
+
+! 戶號
+#CustNo=A,7,L
+
+
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L1R09.dec"/>
+
+#BUF1=X,14,S
+T(2,00000019999999)
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+
+!申請號碼
+
+#ApplNo=A,7,I
+C(3,#FunCd,1,$,s)
+@C(3,#ApplNo,0,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
+
+#RimFuncCode=A,1,S
+#RimTxCode=X,5,S
+#RimFKey=A,1,S
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+T(2,@CustId,#L2r05CustId)
+
+#SendL2r07D=X,1,S
+C(3,#ApplNo,0,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07D,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+T(2,#L2r07CustName)
+
+#APPCHECK=X,1,L
+C(3,#ApplNo,0,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
+
+! [擔保品代號1]
+#ClCode1=A,1,L
+C(3,#FunCd,1,$,s)
+E(0,5)
+
+
+#ClCode1X=X,10,L
+C(3,#FunCd,1,$,s)
+T(3,銀行保證)
+
+! [擔保品代號2]
+#ClCode2=A,2,L
+C(3,#FunCd,1,$,s)
+E(0,01)
+
+
+#ClCode2X=X,30,L
+C(3,#FunCd,1,$,s)
+T(3,銀行保證－銀行保證)
+
+! [擔保品編號]
+#ClNo=A,7,L
+
+
+<include src="ROM.icf::L2R17.dec"/>
+!RIM取原擔保品編號
+#RimL2r17=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r17,L2R17)
+S(L2R17,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R17)
+E(0,@GdRid1,#L2r17GdrId1)
+E(0,@GdRid2,#L2r17GdrId2)
+E(0,@GdRnum,#L2r17GdrNum)
+
+![原擔保品編號]
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
+
+#GdALL=X,12,L
+C(3,#GdRid1,0,S,$)
+T(2,#GdRid1+-+#GdRid2+-+#GdRnum)
+
+!調RIM參數
+#RimClNo=A,7,S
+
+<include src="ROM.icf::L2R22.dec"/>
+!RIM取擔保主檔
+#RimL2r22=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+RESET_RIM(#RimL2r22,L2R22)
+S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R22)
+
+#checkL2r22=X,1,S
+T(2,@ClTypeCode,#L2r22ClTypeCode)
+E(0,@EvaDate,#L2r22EvaDate)
+T(2,@CityCode,#L2r22CityCode)
+E(0,@ClStatus,#L2r22ClStatus)
+E(0,@EvaAmt,#L2r22EvaAmt)
+E(0,@PledgeAmt,#L2r22EvaAmt)
+T(2,@Synd,#L2r22Synd)
+T(2,@SyndCode,#L2r22SyndCode)
+E(3,@DispPrice,#L2r22DispPrice)
+E(0,@DispDate,#L2r22DispDate)
+
+
+<include src="ROM.icf::L2R26.dec"/>
+!RIM取其他擔保品檔
+#RimL2r26=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+RESET_RIM(#RimL2r26,L2R26)
+S(L2R26,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R26)
+
+#checkL2R26=X,1,S
+E(0,@PledgeStartDate,#L2r26PledgeStartDate)
+E(0,@PledgeEndDate,#L2r26PledgeEndDate)
+T(2,@PledgeBankCode,#L2r26PledgeBankCode)
+T(2,@PledgeNO,#L2r26PledgeNO)
+T(2,@OwnerId,#L2r26OwnerId)
+T(2,@OwnerName,#L2r26OwnerName)
+T(2,@IssuingId,#L2r26IssuingId)
+T(2,@IssuingCounty,#L2r26IssuingCounty)
+T(2,@DocNo,#L2r26DocNo)
+E(0,@LoanToValue,#L2r26LoanToValue)
+T(2,@SecuritiesType,#L2r26SecuritiesType)
+T(2,@Listed,#L2r26Listed)
+E(0,@OfferingDate,#L2r26OfferingDate)
+E(0,@ExpirationDate,#L2r26ExpirationDate)
+T(2,@TargetIssuer,#L2r26TargetIssuer)
+T(2,@SubTargetIssuer,#L2r26SubTargetIssuer)
+E(0,@CreditDate,#L2r26CreditDate)
+T(2,@Credit,#L2r26Credit)
+T(2,@ExternalCredit,#L2r26ExternalCredit)
+T(2,@Index,#L2r26Index)
+T(2,@TradingMethod,#L2r26TradingMethod)
+T(2,@Compensation,#L2r26Compensation)
+T(2,@Investment,#L2r26Investment)
+T(2,@PublicValue,#L2r26PublicValue)
+E(0,@SettingStat,#L2r26SettingStat)
+E(0,@ClStat,#L2r26ClStat)
+E(0,@SettingDate,#L2r26SettingDate)
+E(0,@SettingBal,#L2r26SettingAmt)
+
+
+! [擔保品類別]
+#ClTypeCode=X,3,I
+IF(#FunCd==1,$,s)
+HELP(#ClTypeCodeHelp)
+@
+IF(#ClTypeCode == #L2r22ClTypeCode,s,$)
+V(H,#ClTypeCodeHelp)
+
+! 保證記號 若擔保品類別為998 or 999,需顯示保證相關欄位
+#PledgeFlag=A,1,S
+IF(#ClTypeCode >= 998,E(0,1),E(0,0))
+INVOKEJS(SHOW,p1,8,10,#PledgeFlag)
+IF(#ClTypeCode >= 998,T(2,@FdPledgeAmt,*),T(2,@FdPledgeAmt,))
+IF(#ClTypeCode >= 998,T(2,@FdPledgeStartDate,*),T(2,@FdPledgeStartDate,))
+IF(#ClTypeCode >= 998,T(2,@FdPledgeEndDate,*),T(2,@FdPledgeEndDate,))
+IF(#ClTypeCode >= 998,T(2,@FdPledgeBankCode,*),T(2,@FdPledgeBankCode,))
+IF(#ClTypeCode >= 998,T(2,@FdPledgeNO,*),T(2,@FdPledgeNO,))
+
+!有價證券記號
+#PHFG=X,1,S
+IF(#ClTypeCode=="101" ||#ClTypeCode=="102" ||#ClTypeCode=="103" ||#ClTypeCode=="110" ||#ClTypeCode=="130" ||#ClTypeCode=="1E1" ,E(0,1),E(0,0))
+INVOKEJS(SHOW,p1,17,24,#PHFG)
+
+
+
+#EvaAmtLabel=_,_,L
+IF(#ClTypeCode >= 998,HIDE(#EvaAmtLabel),SHOW(#EvaAmtLabel))
+IF(#ClTypeCode >= 998,HIDE(#EvaAmt),SHOW(#EvaAmt))
+IF(#ClTypeCode >= 998,T(2,@FdEvaAmt,),T(2,@FdEvaAmt,*))
+
+
+#ClTypeItem=X,50,L
+T(H,#ClTypeCode,#ClTypeCodeHelp)
+
+
+<include src="ROM.icf::L6R03.dec"/>
+
+!調RIM參數
+
+! 調RIM取縣市代碼
+#RimL6r03City=X,1,S
+E(0,@RimFunCd,1)
+T(2,@RimCityCode,)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03City,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 縣市代碼的下拉選單
+#L6r03ResultCity=X,10000,S
+T(2,#L6r03Result)
+
+! [地區別]
+#CityCode=X,2,I
+IF(#FunCd==4,s,$)
+HELP(#L6r03ResultCity,cols:5)
+@C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
+
+! 縣市代碼對應名稱
+#CityItem=X,6,L
+C(4,#CityCode,S,$)
+T(H,#CityCode,#L6r03ResultCity)
+
+#ApproveNo=A,7,L
+
+<include src="ROM.icf::L2R52.dec"/>
+#RimL2R52=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#FunCd,4,S,$)
+C(3,#ApplNo,0,S,$)
+RESET_RIM(#RimL2R52,L2R52)
+E(0,@ApproveNo,#ApplNo)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
+
+
+! [鑑估日期]
+#EvaDate=D,7,I
+IF(#FunCd==4,s,$)
+@
+IF(#EvaDate == #L2r22EvaDate,s,$)
+V(7)A(4,0,#EvaDate)
+
+
+
+! [鑑估值]
+#EvaAmt=m,14,I
+IF(#FunCd==4,s,$)
+IF(#ClTypeCode >= 998,T(F,0),T(F,1))
+IF(#ClTypeCode >= 998,s,$)
+@
+IF(#EvaAmt ==#L2r22EvaAmt,s,$)
+V(2,0)
+
+#FdEvaAmt=X,2,L
+
+!保證金額
+#PledgeAmt=m,14,I
+IF(#FunCd==4,s,$)
+IF(#ClTypeCode >= 998,$,S)
+@
+IF(#PledgeAmt == #L2r22EvaAmt,s,$)
+V(2,0)
+
+
+!保證銀行
+#PledgeBankCode=X,2,I
+IF(#FunCd==4,s,$)
+IF(#ClTypeCode >= 998,$,S)
+HELP(#PledgeBankCodeHelp)
+@
+IF(#PledgeBankCode == #L2r26PledgeBankCode,s,$)
+V(H,#PledgeBankCodeHelp)
+
+#PledgeBankCodeX=X,20,L
+T(H,#PledgeBankCode,#PledgeBankCodeHelp)
+
+!保證日期起
+#PledgeStartDate=D,7,I
+IF(#FunCd==4,s,$)
+IF(#ClTypeCode >= 998,$,S)
+@
+IF(#PledgeStartDate == #L2r26PledgeStartDate,s,$)
+V(7)A(4,0,#PledgeStartDate)
+
+!保證日期止
+#PledgeEndDate=D,7,I
+IF(#FunCd==4,s,$)
+IF(#ClTypeCode >= 998,$,S)
+@
+IF(#PledgeEndDate < #PledgeStartDate,V(P,保證迄日不可小於保證起日),s)
+IF(#PledgeEndDate == #L2r26PledgeEndDate,s,$)
+V(7)A(4,0,#PledgeEndDate)
+
+!保證書字號
+#PledgeNO=X,30,I
+IF(#FunCd==4,s,$)
+IF(#ClTypeCode >= 998,$,S)
+@
+IF(#PledgeNO == #L2r26PledgeNO,s,$)
+V(7)
+
+! [所有權人統編]
+#OwnerId=X,10,I
+IF(#FunCd==4,s,$)
+@V(7)A(ID_UNINO,0,#OwnerId)
+
+
+#RimL1r09=X,1,S
+T(2,@L1r09CustName,)
+E(0,@RimFunCd,5)
+T(2,@RimCustId,#OwnerId)
+E(0,@RimCustNo,0)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+
+
+#CheckL1R09=X,1,S
+C(4,#L1r09CustName,$,T(2,@OwnerName,#L1r09CustName))
+
+
+
+! [所有權人姓名]
+#OwnerName=x,2.50,I
+IF(#FunCd==4,s,$)
+C(4,#L1r09CustName,$,s)
+@V(7)
+
+
+#OwnerCHECK=X,1,S
+C(4,#CustId,s,$)
+C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
+
+!與授信戶關係
+#OwnerRelCode=X,2,I
+IF(#FunCd==4,s,$)
+C(4,#OwnerId,S,$)
+C(4,#CustId,S,$)
+C(5,#OwnerId,#CustId,S,$)
+HELP(#RelationCodeHelp)
+@V(H,#RelationCodeHelp)
+
+#OwnerRelCodeX=X,40,L
+C(4,#OwnerRelCode,S,$)
+T(H,#OwnerRelCode,#RelationCodeHelp)
+
+! [發行機構統編]
+#IssuingId=X,10,I
+IF(#FunCd==4,s,$)
+@C(4,#IssuingId,$,A(ID_UNINO,0,#IssuingId))
+
+
+! [發行機構所在國別]
+#IssuingCounty=X,3,I
+IF(#FunCd==4,s,$)
+T(3,TW)
+C(4,#IssuingId,s,$)
+HELP(#NationalityCodeHelp)
+@V(H,#NationalityCodeHelp)
+
+#IssuingCountyX=X,10,L
+T(H,#IssuingCounty,#NationalityCodeHelp)
+
+
+! [憑證編號]
+#DocNo=X,30,I
+IF(#FunCd==4,s,$)
+
+
+! [貸放成數]
+#LoanToValue=m,3.2,I
+IF(#FunCd==4,s,$)
+@
+IF(#LoanToValue == #L2r26LoanToValue,s,$)
+V(2,0)
+
+
+#SecuritiesTypeHelp=x,50,S
+T(3,01:股票;02:基金;03:債券;04:票券/國庫儲蓄券;05:其他)
+!有價證券類別 SecuritiesType
+#SecuritiesType=X,2,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+HELP(#SecuritiesTypeHelp)
+@C(4,#SecuritiesType,S,V(H,#SecuritiesTypeHelp))
+
+#SecuritiesTypeX=X,20,L
+C(3,#PHFG,1,$,S)
+C(4,#SecuritiesType,S,$)
+T(H,#SecuritiesType,#SecuritiesTypeHelp)
+
+!掛牌交易所 Listed
+#Listed=X,2,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+HELP(#ListedHelp)
+@C(4,#Listed,S,V(H,#ListedHelp))
+
+#ListedX=X,30,L
+C(3,#PHFG,1,$,S)
+C(4,#Listed,S,$)
+T(H,#Listed,#ListedHelp)
+
+!發行日 OfferingDate
+#OfferingDate=D,7,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+@
+IF(#OfferingDate == #L2r26OfferingDate,s,$)
+A(4,0,#OfferingDate)
+
+!到期日 ExpirationDate 
+#ExpirationDate=D,7,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+@
+IF(#ExpirationDate == #L2r26ExpirationDate,s,$)
+A(4,0,#ExpirationDate)
+
+#TargetIssuerHelp=x,50,S
+T(3,01:主權國家;02:銀行;03:企業;04:無;99:其他)
+!發行者對象別 TargetIssuer
+#TargetIssuer=X,2,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+HELP(#TargetIssuerHelp)
+@C(4,#TargetIssuer,S,V(H,#TargetIssuerHelp))
+
+#TargetIssuerX=X,15,L
+C(3,#PHFG,1,$,S)
+C(4,#TargetIssuer,S,$)
+T(H,#TargetIssuer,#TargetIssuerHelp)
+
+!發行者次對象別 SubTargetIssuer
+#SubTargetIssuer=X,2,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+HELP(#TargetIssuerHelp)
+@C(4,#SubTargetIssuer,S,V(H,#TargetIssuerHelp))
+
+#SubTargetIssuerX=X,15,L
+C(3,#PHFG,1,$,S)
+C(4,#SubTargetIssuer,S,$)
+T(H,#SubTargetIssuer,#TargetIssuerHelp)
+
+!評等日期 CreditDate
+#CreditDate=D,7,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+@
+IF(#CreditDate == #L2r26CreditDate,s,$)
+A(4,0,#CreditDate)
+
+#CreditHelp=x,100,S
+T(3,10:中華信評;20:穆迪;30:惠譽;40:TCRI;50:標準普爾;90:其他)
+!評等公司 Credit
+#Credit=X,2,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+HELP(#CreditHelp)
+@C(4,#Credit,S,V(H,#CreditHelp))
+
+#CreditX=X,15,L
+C(3,#PHFG,1,$,S)
+C(4,#Credit,S,$)
+T(H,#Credit,#CreditHelp)
+
+
+!外部評等 ExternalCredit
+#ExternalCredit=X,3,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+
+#IndexHelp=x,50,S
+T(3,01:臺灣加權指數;02:日經指數;03:恆生指數;99:無)
+!主要指數 Index
+#Index=X,2,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+HELP(#IndexHelp)
+@C(4,#Index,S,V(H,#IndexHelp))
+
+#IndexX=X,15,L
+C(3,#PHFG,1,$,S)
+C(4,#Index,S,$)
+T(H,#Index,#IndexHelp)
+
+#TradingMethodHelp=X,20,S
+T(3,0:正常;1:全額交割)
+!交易方法 TradingMethod
+#TradingMethod=X,1,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+HELP(#TradingMethodHelp)
+@C(4,#TradingMethod,S,V(H,#TradingMethodHelp))
+
+#TradingMethodX=X,10,L
+C(3,#PHFG,1,$,S)
+C(4,#TradingMethod,S,$)
+T(H,#TradingMethod,#TradingMethodHelp)
+
+!受償順位 Compensation
+#Compensation=X,3,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+@C(4,#Compensation,S,V(9))
+
+!投資內容 Investment
+
+#Investment=x,3.100,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+
+!公開價值 PublicValue
+
+#PublicValue=x,3.100,I
+C(3,#PHFG,1,$,S)
+IF(#FunCd==4,s,$)
+
+! [設定狀態]
+#SettingStat=A,1,I
+IF(#FunCd==4,s,$)
+HELP(#SettingStatCodeHelp)
+@V(H,#SettingStatCodeHelp)
+
+#SettingStatX=x,4,L
+T(H,#SettingStat,#SettingStatCodeHelp)
+
+
+! [擔保品狀態]
+#ClStat=A,1,I
+IF(#FunCd==4,s,$)
+HELP(#ClStatCodeHelp)
+@V(H,#ClStatCodeHelp)
+
+#ClStatX=x,10,L
+T(H,#ClStat,#ClStatCodeHelp)
+
+
+! [設定日期]
+#SettingDate=D,7,I
+IF(#FunCd==4,s,$)
+@
+IF(#SettingDate == #L2r26SettingDate,s,$)
+V(7)A(4,0,#SettingDate)
+
+
+! [設定金額]
+#SettingBal=m,14,I
+IF(#FunCd==4,s,$)
+@
+IF(#SettingBal == #L2r26SettingAmt,s,$)
+V(2,0)
+
+
+!Rim參數
+#RimEvaAmt=m,14,S
+#RimLoanToValue=m,3.2,S
+#RimSettingAmt=m,14,S
+#RimEvaNetWorth=m,14.2,S
+#RimSettingStat=X,1,S
+#RimClStat=X,1,S
+
+#SendL2R41=X,1,S
+C(3,#FunCd,2,$,S)
+E(0,@RimFunCd,5)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+IF(#ClTypeCode >= 998,E(0,@RimEvaAmt,#PledgeAmt),E(0,@RimEvaAmt,#EvaAmt))
+! E(0,@RimEvaAmt,#EvaAmt)
+! E(0,@RimEvaNetWorth,#EvaNetWorth)
+E(0,@RimLoanToValue,#LoanToValue)
+E(0,@RimSettingAmt,#SettingBal)
+T(2,@RimSettingStat,#SettingStat)
+T(2,@RimClStat,#ClStat)
+RESET_RIM(#SendL2R41,L2R41)
+S(L2R41,1,#RimFunCd,#RimClCode1,#RimClCode2,#RimClNo,#RimEvaAmt,#RimEvaNetWorth,#RimLoanToValue,#RimSettingAmt,#RimSettingStat,#RimClStat)
+R(1,L2R41)
+
+! [是否聯貸案]
+#Synd=X,1,S
+!IF(#FunCd==4,s,$)
+!HELP(#YesNoHelp)
+!@V(H,#YesNoHelp)
+!IF(#Synd=="Y",T(3,@FdSyndCode,*),T(3,@FdSyndCode, ))
+
+
+#SyndX=X,2,L
+!T(H,#Synd,#YesNoHelp)
+
+
+! [聯貸案類型]
+#SyndCode=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#Synd=="Y",$,S)
+!HELP(#SyndCodeHelp)
+!@V(H,#SyndCodeHelp)
+
+#SyndCodeX=X,6,L
+!T(H,#SyndCode,#SyndCodeHelp)
+
+
+! [處分價格]
+#DispPrice=m,14,I
+IF(#FunCd==4,s,$)
+
+
+! [處分日期]
+#DispDate=D,7,I
+IF(#FunCd==4,s,$)
+IF(#DispPrice == 0,S,$)
+@
+IF(#DispDate ==#L2r22DispDate,s,$)
+V(7)A(4,0,#DispDate)
+
+
+! [擔保品狀況碼]
+#ClStatus=A,1,L
+E(0,1)
+
+
+#ClStatusX=X,7,L
+T(3,已抵押)
+
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+! #PRTSCRFG=_,_,S
+! E(0,2)
+
+</sub>
+
+
+!---------- TXFORM = L2414 ----------
+<sub type="FORM" name="L2414">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2414,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2414] 其他擔保品資料登錄)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+#OClNo=A,7,L
+IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#CustId
+#CustNo
+#ApplNo
+#ClCode1
+#ClCode2
+#ClNo
+#CityCode
+#ClTypeCode
+#EvaDate
+#EvaAmt
+#PledgeAmt
+#PledgeStartDate
+#PledgeEndDate
+#PledgeBankCode
+#PledgeNO
+#OwnerId
+#OwnerName
+#OwnerRelCode
+#IssuingId
+#IssuingCounty
+#DocNo
+#LoanToValue
+#SecuritiesType
+#Listed
+#OfferingDate
+#ExpirationDate
+#TargetIssuer
+#SubTargetIssuer
+#CreditDate
+#Credit
+#ExternalCredit
+#Index
+#TradingMethod
+#Compensation
+#Investment
+#PublicValue
+#SettingStat
+#ClStat
+#SettingDate
+#SettingBal
+#Synd
+#SyndCode
+#DispPrice
+#DispDate
+#ClStatus
+#END
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2414
+#OClNo
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L1R09.tom"/>
+<include src="ROM.icf::L6R03.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R17.tom"/>
+<include src="ROM.icf::L2R22.tom"/>
+<include src="ROM.icf::L2R26.tom"/>
+<include src="ROM.icf::L2R41.tom"/>
+<include src="ROM.icf::L2R52.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
