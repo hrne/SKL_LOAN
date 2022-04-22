@@ -388,7 +388,7 @@ public class L2154 extends TradeBuffer {
 
 					// 抓更新刪除額度後目前最後一筆額度 2022.4.13
 					tFacMain = facMainService.findLastFacmNoFirst(wkCustNo, titaVo);
-					if(tFacMain == null) {
+					if (tFacMain == null) {
 						tCustMain.setLastFacmNo(0);
 					} else {
 						tCustMain.setLastFacmNo(tFacMain.getFacmNo());
@@ -398,7 +398,7 @@ public class L2154 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
 					}
-					
+
 					// 刪除階梯式利率
 					DeleteFacProdStepRateRoutine();
 					break;
@@ -541,6 +541,13 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("LastTlrNo", tFacMain.getLastTlrNo());
 		tTempVo.putParam("LastTxtNo", tFacMain.getLastTxtNo());
 		tTempVo.putParam("AcDate", tFacMain.getAcDate());
+		// 新增綠色授信
+		tTempVo.putParam("Grcd", tFacMain.getGrcd());
+		tTempVo.putParam("GrKind", tFacMain.getGrKind());
+		tTempVo.putParam("EsGcd", tFacMain.getEsGcd());
+		tTempVo.putParam("EsGKind", tFacMain.getEsGKind());
+		tTempVo.putParam("EsGcnl", tFacMain.getEsGcnl());
+
 		tTxTemp.setText(tTempVo.getJsonString());
 		try {
 			txTempService.insert(tTxTemp, titaVo);
@@ -610,6 +617,12 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLastTlrNo(titaVo.getTlrNo());
 		tFacMain.setLastTxtNo(titaVo.getTxtNo());
 		tFacMain.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		// 新增綠色授信相關
+		tFacMain.setGrcd(titaVo.getParam("Grcd"));
+		tFacMain.setGrKind(titaVo.getParam("GrKind"));
+		tFacMain.setEsGcd(titaVo.getParam("EsGcd"));
+		tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
+		tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
 
 		this.info("RepayCode = " + titaVo.getParam("RepayCode"));
 		if ("02".equals(titaVo.getParam("RepayCode")) || "2".equals(titaVo.getParam("RepayCode"))) {
@@ -696,6 +709,13 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 		tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
+
+		// 新增綠色授信相關
+		tFacMain.setGrcd(tTempVo.getParam("Grcd"));
+		tFacMain.setGrKind(tTempVo.getParam("GrKind"));
+		tFacMain.setEsGcd(tTempVo.getParam("EsGcd"));
+		tFacMain.setEsGKind(tTempVo.getParam("EsGKind"));
+		tFacMain.setEsGcnl(tTempVo.getParam("EsGcnl"));
 
 		try {
 			tFacMain = facMainService.update2(tFacMain, titaVo);
@@ -792,6 +812,13 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 		tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
+
+		// 新增綠色授信相關
+		tFacMain.setGrcd(tTempVo.getParam("Grcd"));
+		tFacMain.setGrKind(tTempVo.getParam("GrKind"));
+		tFacMain.setEsGcd(tTempVo.getParam("EsGcd"));
+		tFacMain.setEsGKind(tTempVo.getParam("EsGKind"));
+		tFacMain.setEsGcnl(tTempVo.getParam("EsGcnl"));
 		try {
 			tFacMain = facMainService.insert(tFacMain, titaVo);
 		} catch (DBException e) {
@@ -833,7 +860,7 @@ public class L2154 extends TradeBuffer {
 			txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
 			txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
 			bankAuthActCom.del("A", txtitaVo);
-	
+
 		}
 		// 新還款帳號(含還款方式)刪除
 		if ("02".equals(titaVo.getParam("RepayCode"))) {

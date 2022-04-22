@@ -450,9 +450,41 @@ public class L2153 extends TradeBuffer {
 			} else {
 				tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
 			}
+
+			// 綠色授信註記
+			if (titaVo.getParam("Grcd") != null) {
+				tFacMain.setGrcd(titaVo.getParam("Grcd"));
+			}
+
+			// 綠色支出類別
+			if (titaVo.getParam("GrKind") != null) {
+				tFacMain.setGrKind(titaVo.getParam("GrKind"));
+			}
+
+			// 永續績效連結授信
+			if (titaVo.getParam("EsGcd") != null) {
+				tFacMain.setEsGcd(titaVo.getParam("EsGcd"));
+			}
+
+			// 永續績效連結授信類別
+			if (titaVo.getParam("EsGKind") != null) {
+				tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
+			}
+
+			// 永續績效連結授信約定條件全部未達成通報
+			if (titaVo.getParam("EsGcnl") != null) {
+				tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
+			}
 		} else {
 			tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
+			tFacMain.setGrcd(titaVo.getParam("Grcd"));
+			tFacMain.setGrKind(titaVo.getParam("GrKind"));
+			tFacMain.setEsGcd(titaVo.getParam("EsGcd"));
+			tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
+			tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
 		}
+
+
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(new BigDecimal("0"));
 		tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));

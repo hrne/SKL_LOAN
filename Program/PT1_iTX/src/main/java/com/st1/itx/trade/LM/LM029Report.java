@@ -51,7 +51,7 @@ public class LM029Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM029) throws LogicException {
 		this.info("LM029Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表", "LM029-放款餘額明細表.xlsx", "la$w30p");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表", "LM029_底稿_放款餘額明細表.xlsx", "la$w30p");
 
 		if (listLM029 == null || listLM029.isEmpty()) {
 
@@ -87,13 +87,13 @@ public class LM029Report extends MakeReport {
 						BigDecimal rate = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col + 1, rate, "0.0000", "R");
 						break;
-					case 19:
-					case 20:
-					case 21:
+					case 13:
+					case 14:
+					case 15:
 						BigDecimal amt = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col + 1, amt, "#,##0", "R");
 						break;
-					case 25:
+					case 16:
 						makeExcel.setValue(row, 4, fieldValue, "L"); // 帳冊別
 						break;
 					default:
@@ -106,11 +106,11 @@ public class LM029Report extends MakeReport {
 			} // for
 			
 			// 放款餘額總計的 excel formula
-			makeExcel.formulaCaculate(1, 23);
+			makeExcel.formulaCaculate(1, 17);
 		}
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+
 	}
 
 }
