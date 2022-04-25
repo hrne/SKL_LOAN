@@ -48,15 +48,12 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (formNum == 1) {
 
 			sql += "WITH rawData AS ( ";
-			sql += "      SELECT DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') AS \"AcctCode\"";
-			sql += "            ,SUM(CASE WHEN DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') = 'OTHER' ";
-			sql += "                       AND I.\"YearMonth\" = :yymm ";
+			sql += "      SELECT SUM(CASE WHEN I.\"YearMonth\" = :yymm ";
 			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
 			sql += "                 ELSE 0 END";
 			sql += "                )";
 			sql += "             -";
-			sql += "             SUM(CASE WHEN DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') = 'OTHER' ";
-			sql += "                       AND I.\"YearMonth\" = :lyymm";
+			sql += "             SUM(CASE WHEN I.\"YearMonth\" = :lyymm";
 			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
 			sql += "                 ELSE 0 END";
 			sql += "                )";
@@ -68,11 +65,11 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                      AND I.\"BormNo\" = MLB.\"BormNo\"";
 			sql += "      WHERE NVL(I.\"YearMonth\", ' ') IN (:lyymm, :yymm) ";
 			sql += "        AND NVL(MLB.\"CurrencyCode\",' ') = 'TWD'";
+			sql += "        AND MLB.\"AcctCode\" <> 990 ";
 			sql += "      GROUP BY DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') ";
 			sql += "      ),";
 			sql += "      roundData AS (";
-			sql += "      SELECT \"AcctCode\"";
-			sql += "            ,CASE WHEN \"LnAmt\" < 0";
+			sql += "      SELECT CASE WHEN \"LnAmt\" < 0";
 			sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"LnAmt\")+1 ";
 			sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"LnAmt\")-1";
 			sql += "                            ELSE 0 END ";
@@ -90,12 +87,11 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    UNION ";			
 			sql += "    SELECT '61' AS \"AssetClassNo\" ";
 			sql += "      	  ,'999' AS \"AcSubBookCode\" ";
-			sql += "          ,CASE WHEN Loan.\"LnAmt\" >= 0 ";
-			sql += "                THEN Loan.\"LnAmt\" ";
-			sql += "                ELSE ABS(Loan.\"LnAmt\") END AS \"LoanBal\"";
-			sql += "    FROM roundData Ovdu";
-			sql += "    LEFT JOIN roundData Loan   ON Loan.\"AcctCode\"   = 'OTHER'";
-			sql += "    WHERE Ovdu.\"AcctCode\" = '990'";
+			sql += "          ,CASE WHEN R.\"LnAmt\" >= 0 ";
+			sql += "                THEN R.\"LnAmt\" ";
+			sql += "                ELSE ABS(R.\"LnAmt\") END AS \"LoanBal\"";
+			sql += "    FROM roundData R";
+
 			
 		} else if (formNum == 2) {
 

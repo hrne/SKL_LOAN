@@ -5453,6 +5453,20 @@ TXFORM=L4R31
 ^
 </L4R31.tom>
 
+<L4R32.dec>
+#L4R32Date1=D,7,S
+#L4R32Date2=D,7,S
+#L4R32Date7=D,7,S
+</L4R32.dec>
+
+<L4R32.tom>
+TXFORM=L4R32
+#L4R32Date1
+#L4R32Date2
+#L4R32Date7
+^
+</L4R32.tom>
+
 <L5R01.dec>
 #L5r01CustId=X,10,S
 #L5r01CustNo=9,7,S

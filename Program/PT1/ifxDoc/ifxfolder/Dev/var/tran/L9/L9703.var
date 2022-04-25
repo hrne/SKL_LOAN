@@ -127,6 +127,14 @@ T(4,CHAIN$)
 #INIT=X,1,S
 CALL(#ALWAYS_HIGHLIGHT)
 
+#RimDate=D,8,S
+
+#L4R32Rim=X,1,S
+RESET_RIM(#L4R32Rim,L4R32)
+E(0,@RimDate,DATE$)
+S(L4R32,01,#RimDate)
+R(1,L4R32)
+
 #DT1=D,8,S
 T(4,DATE$)
 
@@ -230,36 +238,30 @@ T(H,#CustType,#CustTypeHelp)
 
 #PrinBalance=m,14,I
 
-#tmpAcDate=D,8,S
-D(6,3,#DT1,2)
-
 #AcDate=D,7,I
-T(1,#tmpAcDate,2,7) 
+E(0,#L4R32Date1)
 @A(DATE,0,#AcDate)
 V(7)
 
-#tmpEntryDate=D,8,S
-D(6,3,#DT1,1)
 
 #EntryDate=D,7,I
-T(1,#tmpEntryDate,2,7) 
+E(0,#L4R32Date2)
 @A(DATE,0,#EntryDate)
 V(7)
 
-#tmpPayIntDate=D,8,S
-D(6,3,#DT1,7)
 
 #PayIntDateSt=D,7,I
-T(1,#tmpPayIntDate,2,7) 
+E(0,#L4R32Date7)
 @A(DATE,0,#PayIntDateSt)
-V(7)
+@V(7)
 
 #PayIntDateEd=D,7,I
-T(1,#tmpPayIntDate,2,7) 
+E(0,#L4R32Date7)
 @A(DATE,0,#PayIntDateEd)
-V(7)
-<include src="ROM.icf::L1R20.dec"/>
+@V(7)
 
+<include src="ROM.icf::L1R20.dec"/>
+<include src="ROM.icf::L4R32.dec"/>
 
 #FormNo=x,10,S
 T(3,L9703A)
@@ -328,6 +330,7 @@ T(3,[L9703] 滯繳客戶明細表)
 ! 調Rim相關 開始
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L1R20.tom"/>
+<include src="ROM.icf::L4R32.tom"/>
 ! 調Rim相關 結束
 TXFORM=L9703^
 <include src="COM.icf::TRCTL.tom"/>

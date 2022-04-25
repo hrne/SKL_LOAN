@@ -53,6 +53,9 @@ public interface FacCloseRepositoryMon extends JpaRepository<FacClose, FacCloseI
   // CustNo >= ,AND CustNo <= 
   public Slice<FacClose> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, int custNo_1, Pageable pageable);
 
+  // CustNo = ,AND FacmNo = 
+  public Optional<FacClose> findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(int custNo_0, int facmNo_1);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

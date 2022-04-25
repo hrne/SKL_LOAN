@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L9;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +35,7 @@ public class L9705Form extends MakeReport {
 
 	@Autowired
 	private Parse parse;
-
+	
 	@Autowired
 	WebClient webClient;
 
@@ -48,10 +47,10 @@ public class L9705Form extends MakeReport {
 	public void printHeader() {
 	}
 
-	public void exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
-
+	public long exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
+		
 		String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
-
+		
 		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "B", "存入憑條", "cm,20,9.31333", "P");
 
 		if (l9705List.size() > 0) {
@@ -65,7 +64,7 @@ public class L9705Form extends MakeReport {
 				int custNo = 0;
 				int facmNo = 0;
 				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
-				String repayCode = "";
+//				String repayCode = "";
 				String custName = "";
 
 				if (tL9Vo.get("CustNo") != null) {
@@ -74,9 +73,9 @@ public class L9705Form extends MakeReport {
 				if (tL9Vo.get("FacmNo") != null) {
 					facmNo = parse.stringToInteger(tL9Vo.get("FacmNo"));
 				}
-				if (tL9Vo.get("RepayCode") != null) {
-					repayCode = tL9Vo.get("RepayCode");
-				}
+//				if (tL9Vo.get("RepayCode") != null) {
+//					repayCode = tL9Vo.get("RepayCode");
+//				}
 
 				if (tL9Vo.get("CustName") != null) {
 					custName = tL9Vo.get("CustName");
@@ -98,11 +97,11 @@ public class L9705Form extends MakeReport {
 					HashMap<Integer, BigDecimal> interest = new HashMap<>();
 					HashMap<Integer, BigDecimal> breachAmt = new HashMap<>();
 					HashMap<Integer, Integer> flag = new HashMap<>();
-					BigDecimal intRate;
+//					BigDecimal intRate;
 					BigDecimal loanBal = BigDecimal.ZERO;
 					BigDecimal unPaidAmt = BigDecimal.ZERO;
 					BigDecimal acctFee = BigDecimal.ZERO;
-					DecimalFormat df1 = new DecimalFormat("#,##0");
+//					DecimalFormat df1 = new DecimalFormat("#,##0");
 					int payIntDate = 0;
 
 					// 未收本息 = 本金+利息 Principal + Interest
@@ -200,9 +199,10 @@ public class L9705Form extends MakeReport {
 
 						setFont(1, 14);
 
-						printCm(4, 4, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/" + sPayIntDate.substring(5, 7));
+						printCm(4, 4, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/"
+								+ sPayIntDate.substring(5, 7));
 
-						printCm(4, 4.8, custName);
+						printCm(4,4.8,custName);
 						String custnoX = String.format("%07d", custNo);
 
 						for (int i = 0; i < 7; i++) {
@@ -222,18 +222,22 @@ public class L9705Form extends MakeReport {
 						}
 
 						printCm(16, 6.2, titaVo.getTlrNo());
-
+						
 						break;
 					} // loop -- batxCom
 				}
 
 			}
+		} else {
+			this.setRptItem("存入憑條通知單(無符合資料)");
+			printCm(1, 4, "【無符合資料】");
 		}
-
+		
 		long sno = this.close();
-
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"),
-				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成", titaVo);
+		
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成", titaVo);
+		return sno;
 	}
 
 	private String toChinese(String s) {
@@ -262,7 +266,7 @@ public class L9705Form extends MakeReport {
 		}
 		return rs;
 	}
-
+	
 	private String toChinese2(String s) {
 		String rs = "";
 

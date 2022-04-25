@@ -154,6 +154,16 @@ public interface FacCloseService {
   public Slice<FacClose> findCustNoRange(int custNo_0, int custNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = 
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param titaVo Variable-Length Argument
+   * @return Slice FacClose FacClose of List
+   */
+  public FacClose findFacmNoMaxCloseNoFirst(int custNo_0, int facmNo_1, TitaVo... titaVo);
+
+  /**
    * hold By FacClose
    * 
    * @param facCloseId key

@@ -159,6 +159,7 @@ public class L9703Report1 extends MakeReport {
 		BigDecimal totalOfTotal = BigDecimal.ZERO; // 合計加總
 
 		if (listL9703 == null || listL9703.size() == 0) {
+			this.setRptItem("滯繳客戶明細表(無符合資料)");
 			this.print(1, 1, "*******    查無資料   ******");
 			long sno = this.close();
 			return sno;

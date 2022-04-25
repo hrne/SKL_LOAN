@@ -373,6 +373,25 @@ em = null;
   }
 
   @Override
+  public FacClose findFacmNoMaxCloseNoFirst(int custNo_0, int facmNo_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findFacmNoMaxCloseNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
+    Optional<FacClose> facCloseT = null;
+    if (dbName.equals(ContentName.onDay))
+      facCloseT = facCloseReposDay.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+    else if (dbName.equals(ContentName.onMon))
+      facCloseT = facCloseReposMon.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+    else if (dbName.equals(ContentName.onHist))
+      facCloseT = facCloseReposHist.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+    else 
+      facCloseT = facCloseRepos.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+
+    return facCloseT.isPresent() ? facCloseT.get() : null;
+  }
+
+  @Override
   public FacClose holdById(FacCloseId facCloseId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
