@@ -364,6 +364,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo ";
+		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
 
 		this.info("sql=" + sql);
 		Query query;

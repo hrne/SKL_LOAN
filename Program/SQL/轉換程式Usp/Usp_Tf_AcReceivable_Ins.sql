@@ -439,16 +439,23 @@ BEGIN
     -- 2022-03-02 轉入該戶號下依條件排序後之第一額度
     -- 排序:依應繳日順序由小到大、利率順序由大到小、額度由小到大
     INSERT INTO "AcReceivable"
-    WITH ACT AS (
+    WITH lastDateData AS (
+      SELECT MAX(BKPDAT) AS MAX_BKPDAT
+      FROM LADACTP ACTP
+      WHERE ACTP.LMSACN != 601776
+    )
+    , ACT AS (
       -- 篩選出基本資料
       -- 條件1:排除戶號為601776
-      -- 條件2:BKPDAT = 轉換基準日
+      -- 條件2:BKPDAT = 有資料的最後一天的值
       SELECT ACTP.BKPDAT
            , ACTP.LMSACN
            , ACTP.LMSTOA
       FROM LADACTP ACTP
+      LEFT JOIN lastDateData ON lastDateData.MAX_BKPDAT = ACTP.BKPDAT
       WHERE ACTP.LMSACN != 601776
         AND ACTP.BKPDAT = "TbsDyF"
+        AND NVL(lastDateData.MAX_BKPDAT,0) != 0
     )
     , OrderedFacmNo AS (
       SELECT "CustNo"

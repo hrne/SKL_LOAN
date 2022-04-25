@@ -61,7 +61,6 @@ T(3,*)
 #FdRepayBank=X,2,L
 T(3,*)
 
-
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
@@ -97,7 +96,6 @@ T(3,CdCode.AuthStatus)
 ! 媒體碼下拉選單
 #MediaCodeHelp2=x,50,S
 T(3,Y:已產生媒體; :未產生媒體)
-
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -222,6 +220,8 @@ E(0,1)ASGN(LOOP$)
 #OOAuthTypeX=x,4,O
 T(H,@OOAuthTypeX,#OOAuthType,#AuthCodeHelp)
 
+#OOStatus=x,1,O
+
 #OORepayBank=A,3,O
 #OORepayBankX=x,16,O
 T(2,)
@@ -230,7 +230,6 @@ T(H,@OORepayBankX,#OORepayBank,#BankCdHelp)
 
 #OORepayAcct=A,14,O
 
-#OOStatus=x,1,O
 #OOStatusX=x,10,O
 T(2,)
 IF(#OOStatus=="9"||#OOStatus=="0"||#OOStatus=="2"||#OOStatus=="1",$,s)
@@ -296,53 +295,27 @@ T(1,#OOTitaTxCd,1,2)
 ! T(2,1)
 #OOBUF_EDIT=X,500,S
 T(2,2
-+#OOCustNo
-+#OOFacmNo
-+#OORepayBankLog
-+#OORepayAcctLog
-+#OOLimitAmt
-+#OOCreateFlag
-+#OOAuthStatus
-+#OOMediaCode
-+#OOAmlRsp
 +#OOAuthCreateDate
-+#OOStampFinishDate
-+0000000
-+000000
-+#OOAuthMeth)
++#OOCustNo
++#OORepayBank
++#OORepayAcctLog
++#OOCreateFlag
+)
 #OOBUF_DELETE=X,500,S
 T(2,4
-+#OOCustNo
-+#OOFacmNo
-+#OORepayBankLog
-+#OORepayAcctLog
-+#OOLimitAmt
-+#OOCreateFlag
-+#OOAuthStatus
-+#OOMediaCode
-+#OOAmlRsp
 +#OOAuthCreateDate
-+#OOStampFinishDate
-+#OOProcessDate
-+#OOProcessTime
-+#OOAuthMeth
++#OOCustNo
++#OORepayBank
++#OORepayAcctLog
++#OOCreateFlag
 )
 #OOBUF_SEARCH=X,500,S
 T(2,5
-+#OOCustNo
-+#OOFacmNo
-+#OORepayBankLog
-+#OORepayAcctLog
-+#OOLimitAmt
-+#OOCreateFlag
-+#OOAuthStatus
-+#OOMediaCode
-+#OOAmlRsp
 +#OOAuthCreateDate
-+#OOStampFinishDate
-+#OOProcessDate
-+#OOProcessTime
-+#OOAuthMeth
++#OOCustNo
++#OORepayBank
++#OORepayAcctLog
++#OOCreateFlag
 )
 
 ! #OOBTN_CREAT=A,2,O 改為頁面上方新增
@@ -442,6 +415,8 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
+#OOFacmNo=額度
+{width:40,align:'center'}
 #OORepayBankX=扣款銀行
 {width:120}
 #OORepayAcct=扣款帳號
@@ -477,7 +452,8 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
-
+#OOFacmNo=額度
+{width:40,align:'center'}
 #OORepayBankX=扣款銀行
 {width:120}
 #OORepayAcct=扣款帳號
@@ -512,6 +488,8 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
+#OOFacmNo=額度
+{width:40,align:'center'}
 #OORepayBankX=扣款銀行
 {width:120}
 #OORepayAcct=扣款帳號
@@ -546,6 +524,8 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
+#OOFacmNo=額度
+{width:40,align:'center'}
 #OORepayBankX=扣款銀行
 {width:120}
 #OORepayAcct=扣款帳號

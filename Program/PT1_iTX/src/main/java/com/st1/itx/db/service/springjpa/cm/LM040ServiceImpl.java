@@ -31,16 +31,18 @@ public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 	/**
-	 * 執行報表輸出
+	 * 查詢資料
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
+	 * @param iYearMonth 西元年月
+	 * @param ymdEnd 西元年月底日
 	 * 
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth)throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int iYearMonth, int ymdEnd)throws Exception {
 		this.info("LM040ServiceImpl findAll ");
-		int entryMonth = yearMonth;
-		int inputDate = parse.stringToInteger(titaVo.getParam("InputDate")) + 19110000;
+		int entryMonth = iYearMonth;
+//		int inputDate = parse.stringToInteger(titaVo.getParam("InputDate")) + 19110000;
+		int inputDate = ymdEnd ;
 		
 		this.info("LM040ServiceImpl entryMonth = " + entryMonth);
 		this.info("LM040ServiceImpl inputDate =  " + inputDate);

@@ -38,32 +38,17 @@ public class LM058Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @param yearMonthEnd 月底日
+	 * @param yearMonthEnd 西元月底日
 	 */
 	public void exec(TitaVo titaVo, int yearMonth ,int yearMonthEnd) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM058Report exec");
 
-		// 民國年
-		int iYear = yearMonth / 100;
-		// 月
-		int iMonth = yearMonth % 100;
 
-		// 當民國年月
-		int thisYM = 0;
-
-//		// 判斷帳務日與月底日是否同一天
-//		if (nowDate < thisMonthEndDate) {
-//			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
-//			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
-//		}
-
-		// 11103
-		thisYM = (iYear + 1911) * 100 + iMonth;
 		// 1110331
 		String dateRocYMD = String.valueOf(yearMonthEnd - 19110000);
-		this.info("thisYM=" + thisYM);
+
 		this.info("dateRocYMD=" + dateRocYMD);
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表",

@@ -779,7 +779,6 @@ public class L9110Report extends MakeReport {
 					custEntCode = tCustMain.getEntCode();
 				} else {
 					this.warn("L9110Report thisApplNo(" + thisApplNo + ")'s CustUKey is not found in CustMain. ");
-					continue; // 跳下一圈
 				}
 
 				// 企金別無值時，預設為0:個金

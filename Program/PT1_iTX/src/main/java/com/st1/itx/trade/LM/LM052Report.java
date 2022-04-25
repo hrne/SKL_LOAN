@@ -81,7 +81,7 @@ public class LM052Report extends MakeReport {
 
 		List<Map<String, String>> lM052List = null;
 
-		for (int formNum = 1; formNum <= 4; formNum++) {
+		for (int formNum = 1; formNum <= 5; formNum++) {
 
 			try {
 
@@ -145,6 +145,8 @@ public class LM052Report extends MakeReport {
 							.toString(),
 					2, 6);
 		}
+
+		makeExcel.setFontType(1);
 		makeExcel.setValue(31, 2, "一、依放款資產評估辦法三項標準評估後，以五類資產評估 (Ａ)金額 " + assetClass + " 百萬元為高。\n"
 				+ "二、依金管會104年07月24日金管保財字第10402506096號令備抵損失提存比率為放款餘額\n" + "1.5%評估金額為 " + legalLoss + " 百萬元。\n"
 				+ "三、IFRS 9預期損失金額依據放款各相關權責單位：PD違約機率（放款審查課）、LGD違約損失率\n"
@@ -228,23 +230,21 @@ public class LM052Report extends MakeReport {
 					if ("00A".equals(tLDVo.get("F1"))) {
 						col = 3;
 					}
-					
+
 					if ("201".equals(tLDVo.get("F1"))) {
 						col = 4;
 					}
 					if ("61".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 6;
 					}
-					
+
 					if ("62".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 6;
-					} 
+					}
 
 					if ("7".equals(tLDVo.get("F0")) && "999".equals(tLDVo.get("F1"))) {
 						col = 12;
-					} 
-
-	
+					}
 
 					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 
@@ -290,7 +290,7 @@ public class LM052Report extends MakeReport {
 					col = "310".equals(tLDVo.get("F1")) ? 9 : "320".equals(tLDVo.get("F1")) ? 8 : 7;
 
 					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
-		
+
 					break;
 
 				case 4:
@@ -324,18 +324,25 @@ public class LM052Report extends MakeReport {
 					break;
 
 				case 5:
-//					row = 28;
-//
-//					col = 15;
-//
-//					amt = tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0"));
 
+					amt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
+					makeExcel.setValue(28, 15, amt, "#,##0");
+					makeExcel.setValue(28, 16, "五類資產評估合計");
+
+					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+					makeExcel.setValue(29, 15, amt, "#,##0");
+					makeExcel.setValue(29, 16, "法定備抵損失提撥");
+
+					amt = tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3"));
+					makeExcel.setValue(30, 15, amt, "#,##0");
+					makeExcel.setValue(30, 16, "會計部核定備抵損失");
+
+					col = 0;
 					break;
 				}
 
-				this.info("formNum" + formNum + ":row,col=" + row + "," + col);
-				
-				if(row!=0 && col != 0) {
+				if (row != 0 && col != 0) {
+					this.info("formNum" + formNum + ":row,col=" + row + "," + col);
 					makeExcel.setValue(row, col, amt, "#,##0");
 				}
 

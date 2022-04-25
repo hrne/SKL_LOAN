@@ -145,9 +145,8 @@ public class L9703Report2 extends MakeReport {
 		this.info("entdy = " + entdy);
 
 		try {
-			lBaTxVo = dBaTxCom.termsPay(entryDate,
-					parse.stringToInteger(tL9703Vo.get("CustNo")), parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd,
-					titaVo);
+			lBaTxVo = dBaTxCom.termsPay(entryDate, parse.stringToInteger(tL9703Vo.get("CustNo")),
+					parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd, titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
@@ -272,13 +271,25 @@ public class L9703Report2 extends MakeReport {
 		int UnPaidAmt = 0;
 		int LoanBal = 0;
 		int terms = 0;
+
+		dDateUtil.init();
+		dDateUtil.setDate_1(entdy);
+		dDateUtil.setMons(0);
+		dDateUtil.setDays(1);
+		int nextday = dDateUtil.getCalenderDay();
+
 		for (BaTxVo baTxVo : listBaTxVo) {
 			if (baTxVo.getDataKind() != 2) {
 				continue;
 			}
-			terms++;
-			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 
+			if (baTxVo.getPayIntDate() > nextday) { // 製發日期跟應繳日比 超過不列印
+				continue;
+			}
+
+			terms++;
+
+			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 			// 違約金
 			BreachAmt = baTxVo.getBreachAmt().intValue() + baTxVo.getDelayInt().intValue();
 			// 本金
@@ -324,13 +335,6 @@ public class L9703Report2 extends MakeReport {
 			// 應繳淨額
 			printCm(19, y, String.format("%,d", UnPaidAmt), "R");
 		}
-
-		dDateUtil.init();
-		dDateUtil.setDate_1(entdy);
-		dDateUtil.setMons(0);
-		dDateUtil.setDays(1);
-
-		int nextday = dDateUtil.getCalenderDay();
 
 		l++;
 		y = top + yy + (++l) * h;

@@ -41,13 +41,12 @@ public class LM040Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * 
+	 * @param yearMonthEnd 月底日
 	 */
-
-	public boolean exec(TitaVo titaVo, int yearMonth) throws LogicException {
+	public boolean exec(TitaVo titaVo, int yearMonth ,int yearMonthEnd) throws LogicException {
 		List<Map<String, String>> LM040List = null;
 		try {
-			LM040List = lM040ServiceImpl.findAll(titaVo,yearMonth);
+			LM040List = lM040ServiceImpl.findAll(titaVo,yearMonth, yearMonthEnd);
 			exportExcel(titaVo, LM040List);
 
 			return true;
