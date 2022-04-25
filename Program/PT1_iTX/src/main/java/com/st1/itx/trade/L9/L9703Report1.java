@@ -114,10 +114,12 @@ public class L9703Report1 extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
+	public long exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		this.info("L9703Report1 exec");
-
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703", "滯繳客戶明細表", "密", "A4", "");
+		
+		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
+		
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "滯繳客戶明細表", "密", "A4", "");
 
 		bcAcDate = String.valueOf(Integer.parseInt(titaVo.getParam("AcDate")) + 19110000);
 		bcEntryDate = String.valueOf(Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000);
@@ -158,7 +160,9 @@ public class L9703Report1 extends MakeReport {
 
 		if (listL9703 == null || listL9703.size() == 0) {
 			this.print(1, 1, "*******    查無資料   ******");
-			return;
+			long sno = this.close();
+			return sno;
+
 		}
 
 		for (Map<String, String> tL9703 : listL9703) {
@@ -343,8 +347,8 @@ public class L9703Report1 extends MakeReport {
 		print(0, 140, formatAmt(totalOfTotal, 0), "R");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
-		this.close();
-		// this.toPdf(sno);
+		long sno = this.close();
+		return sno;
 	}
 
 	private int getCashDay(int date, int days) throws LogicException {
@@ -366,7 +370,7 @@ public class L9703Report1 extends MakeReport {
 			tdays--;
 		}
 
-		return days - bussCnt;
+		return days - bussCnt + 1 ;
 
 	}
 

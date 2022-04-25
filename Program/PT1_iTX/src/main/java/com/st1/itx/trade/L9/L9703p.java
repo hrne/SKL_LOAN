@@ -38,13 +38,17 @@ public class L9703p extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		this.info("L9703p titaVo.getTxcd() = " + titaVo.getTxcd());
+		
+		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
+		
 		String parentTranCode = titaVo.getTxcd();
 
 		l9703report.setParentTranCode(parentTranCode);
 
 		l9703report.exec(titaVo, this.getTxBuffer());
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9703", "L9703滯留客戶明細表已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO") + parentTranCode, tran + "滯留客戶明細表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

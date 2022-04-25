@@ -110,12 +110,12 @@ public class LM057Report extends MakeReport {
 				int facmNo = lM057Vo.get("F2").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F2"));
 				int bormNo = lM057Vo.get("F3").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F3"));
 				String custName = lM057Vo.get("F4").isEmpty() ? " " : lM057Vo.get("F4");
-				int loan = lM057Vo.get("F5").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F5"));
+				BigDecimal loan = lM057Vo.get("F5").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lM057Vo.get("F5"));
 				String date = showBcDate(lM057Vo.get("F6"), 0);
-				int rate = lM057Vo.get("F7").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F7"));
+				BigDecimal rate = lM057Vo.get("F7").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lM057Vo.get("F7"));
 				String type = lM057Vo.get("F8");
 				String leg = lM057Vo.get("F9").isEmpty() ? " " : lM057Vo.get("F9");
-				String prodNo = lM057Vo.get("F10").isEmpty() ? " " : lM057Vo.get("F10");
+				String prodNo = lM057Vo.get("F11").isEmpty() ? " " : lM057Vo.get("F11");
 				// 戶號+額度
 				makeExcel.setValue(row, 4, custNo + "" + facmNo);
 				// 帳冊別
@@ -133,7 +133,7 @@ public class LM057Report extends MakeReport {
 				// 到期日
 				makeExcel.setValue(row, 11, date, "R");
 				// 利率
-				makeExcel.setValue(row, 12, rate);
+				makeExcel.setValue(row, 12, rate, "#.000", "R");
 				// 分類(需加判斷分類)
 				makeExcel.setValue(row, 13, type);
 

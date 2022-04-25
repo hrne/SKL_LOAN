@@ -150,12 +150,11 @@ public class L4321Batch extends TradeBuffer {
 
 		// 處理更新
 		processUpdate(titaVo);
-		this.batchTransaction.commit();
 
 		// 產出確認清單
 		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
-			l4321Report.exec(titaVo);
 			this.batchTransaction.commit();
+			l4321Report.exec(titaVo);
 		}
 	}
 
@@ -164,9 +163,9 @@ public class L4321Batch extends TradeBuffer {
 			// 設定訊息
 			if (iTxKind <= 3) {
 				if (this.iCustType == 1) {
-					sendMsg = "個金" + sendMsg;
+					sendMsg = "個金，" + sendMsg;
 				} else {
-					sendMsg = "企金" + sendMsg;
+					sendMsg = "企金，" + sendMsg;
 				}
 			}
 
@@ -221,8 +220,6 @@ public class L4321Batch extends TradeBuffer {
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
 			}
-		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "執行有誤", titaVo);
 		}
 	}
 
@@ -238,7 +235,6 @@ public class L4321Batch extends TradeBuffer {
 				isComplete = true;
 			}
 		}
-		this.info("isComplete " + isComplete);
 		return isComplete;
 	}
 
@@ -263,9 +259,13 @@ public class L4321Batch extends TradeBuffer {
 				if (this.processCnt % commitCnt == 0) {
 					this.batchTransaction.commit();
 				}
+				BigDecimal fitRate = tBatxRateChange.getPresentRate();
+				if (tTempVo.get("FitRate") != null) {
+					fitRate = parse.stringToBigDecimal(tTempVo.get("FitRate"));
+				}
 				// 放款利率變動檔生效日，利率未變動為零
 				int txEffectDate = 0;
-				if (tBatxRateChange.getAdjustedRate().compareTo(tBatxRateChange.getPresentRate()) != 0) {
+				if (tBatxRateChange.getAdjustedRate().compareTo(fitRate) != 0) {
 					txEffectDate = tBatxRateChange.getCurtEffDate();
 				}
 				// 經辦更新

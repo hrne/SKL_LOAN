@@ -87,9 +87,11 @@ public class L9703Report2 extends MakeReport {
 
 		String rptitem = "放款本息攤還表暨繳息通知單";
 
+		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
+
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703A", "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
 		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-				titaVo.getTxCode().isEmpty() ? "L9703B" : titaVo.getTxCode() + "B", rptitem, "inch,8.5,12", "P");
+				titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B", rptitem, "inch,8.5,12", "P");
 
 		List<Map<String, String>> L9703List = null;
 		try {

@@ -48,6 +48,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"AcDate\"";
 		sql += "        , \"TitaTlrNo\"";
 		sql += "        , \"TitaTxtNo\"";
+		sql += "        , \"RepaidPeriod\" ";
 		sql += "   FROM \"LoanBorTx\"";
 		sql += "   WHERE \"AcDate\" = :inputAcDate";
 		sql += "     AND \"TitaHCode\" = 0";
@@ -59,6 +60,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"AcDate\"";
 		sql += "          , \"TitaTlrNo\"";
 		sql += "          , \"TitaTxtNo\"";
+		sql += "          , \"RepaidPeriod\"";
 		sql += " )";
 		sql += ", TX2 AS (";
 		// 將戶號下相同計息起迄日的明細金額加總
@@ -70,6 +72,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"AcDate\"";
 		sql += "        , \"TitaTlrNo\"";
 		sql += "        , \"TitaTxtNo\"";
+		sql += "        , \"RepaidPeriod\" ";
 		sql += "        , SUM(\"TxAmt\")           AS \"TxAmt\"";
 		sql += "        , SUM(\"Principal\")       AS \"Principal\"";
 		sql += "        , SUM(\"Interest\")        AS \"Interest\"";
@@ -94,6 +97,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"AcDate\"";
 		sql += "          , \"TitaTlrNo\"";
 		sql += "          , \"TitaTxtNo\"";
+		sql += "          , \"RepaidPeriod\" ";
 		sql += " )";
 		sql += " SELECT BATX.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 		sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
@@ -109,7 +113,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "      + TX2.\"ModifyFee\"";
 		sql += "      + TX2.\"FireFee\"";
 		sql += "      + TX2.\"LawFee\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
-		sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
+		sql += "    , LPAD(BATX.\"CustNo\",7,' ')";
 		sql += "      || '-'";
 		sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
 		sql += "      || '-'";
@@ -142,12 +146,14 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    , NVL(FAC.\"AcctCode\",'999') AS \"SortingForSubTotal\""; // 配合小計產生的排序
 		sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
 		sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
+		sql += "    , NVL(TX1.\"RepaidPeriod\", 0) AS \"RepaidPeriod\" ";
+		sql += "    , '  ' AS \"CloseReasonCode\" ";
 		sql += " FROM \"BatxDetail\" BATX";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 		sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
 		sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
 		sql += "            AND TX1.\"TitaTlrNo\" = BATX.\"TitaTlrNo\"";
-		sql += "            ANd TX1.\"TitaTxtNo\" = BATX.\"TitaTxtNo\"";
+		sql += "            AND TX1.\"TitaTxtNo\" = BATX.\"TitaTxtNo\"";
 		sql += " LEFT JOIN TX2 ON TX2.\"CustNo\" = TX1.\"CustNo\"";
 		sql += "            AND TX2.\"FacmNo\" = TX1.\"FacmNo\"";
 		sql += "            AND TX2.\"BormNo\" = TX1.\"BormNo\"";
@@ -156,6 +162,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "            AND TX2.\"AcDate\" = TX1.\"AcDate\"";
 		sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
 		sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
+		sql += "            AND TX2.\"RepaidPeriod\" = TX1.\"RepaidPeriod\" ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 		sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 		sql += " WHERE BATX.\"AcDate\" = :inputAcDate";

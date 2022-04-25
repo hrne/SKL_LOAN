@@ -206,7 +206,7 @@
 			<!-- Step: LM040  地區別正常戶金額 -->
 			<flow>
 				<step id="sLM040" parent="parentStep">
-					<tasklet ref="sLM040" />
+					<tasklet ref="LM040" />
 				</step>
 			</flow>
 			<!-- Step: LM041 催收及呆帳戶暫收款明細表 -->

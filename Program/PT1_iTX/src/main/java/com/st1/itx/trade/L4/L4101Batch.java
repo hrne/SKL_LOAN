@@ -350,11 +350,11 @@ public class L4101Batch extends TradeBuffer {
 		}
 		
 		SystemParas systemParas = systemParasService.findById("LN", titaVo);
-		String[] auth = systemParas.getFtpAuth().split(":");
+		String[] auth = systemParas.getLoanMediaFtpAuth().split(":");
 		String fileName = txFile.getFileOutput();
 		Path fullPath = Paths.get(outFolder, fileName);
 		
-		ftpClient.sendFile(systemParas.getFtpUrl(), auth[0], auth[1], fullPath.toString(), "outbound");
+		ftpClient.sendFile(systemParas.getLoanMediaFtpUrl(), auth[0], auth[1], fullPath.toString(), "outbound");
 	}
 	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {
 		String batchNo = "";

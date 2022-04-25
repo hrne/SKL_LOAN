@@ -67,6 +67,8 @@ public class L4320Batch extends TradeBuffer {
 
 	@Autowired
 	public CdCityService cdCityService;
+	@Autowired
+	public L4321Report l4321Report;
 
 	@Autowired
 	public L4320ServiceImpl l4320BatchServiceImpl;
@@ -125,7 +127,7 @@ public class L4320Batch extends TradeBuffer {
 		// 預調週期
 		iNextAdjPeriod = parse.stringToInteger(titaVo.getParam("NextAdjPeriod"));
 
-		iCustType = parse.stringToInteger(titaVo.getParam("EntCode"));
+		iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
 		// 調整日期
 		wkAdjDate = this.getTxBuffer().getTxCom().getTbsdy();
 
@@ -153,6 +155,13 @@ public class L4320Batch extends TradeBuffer {
 			}
 		}
 
+		// 產出確認清單
+		if (titaVo.isHcodeNormal()) {
+			this.batchTransaction.commit();
+			l4321Report.exec(titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo() + "L4320", "Y", "LC009",
+					titaVo.getTlrNo(), sendMsg, titaVo);
+		}
 		if (flag) {
 			// Broadcast message Link to L4031-利率調整清單
 			setSendMsg(titaVo);
@@ -250,11 +259,13 @@ public class L4320Batch extends TradeBuffer {
 				b = batxRateChangeService.holdById(bId, titaVo);
 				// 已輸入利率跳過
 				boolean isInsert = false;
+				this.info("b = " + b);
 				if (b == null) {
 					isInsert = true;
 					b = new BatxRateChange();
 					b.setBatxRateChangeId(bId);
 				} else {
+					this.info("bsetBatxRateChangeId = " + b.getRateKeyInCode());
 					if (b.getRateKeyInCode() == 1) {
 						continue;
 					}
@@ -451,7 +462,7 @@ public class L4320Batch extends TradeBuffer {
 				adjCode = 2;
 				// 本次利率 = 目前利率 + 地區別加減碼
 				rateCurt = fitRate.add(cityIntRateIncr);
-				warnMsg += "地區別加減碼:" + cityIntRateIncr ;			
+				warnMsg += "地區別加減碼:" + cityIntRateIncr;
 				// 依地區別利率上、下限調整
 				if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
 					rateCurt = cityIntRateCeiling;
@@ -462,7 +473,7 @@ public class L4320Batch extends TradeBuffer {
 					warnMsg += "達地區別下限 ";
 				}
 			}
-			
+
 			if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateCurt) < 0) {
 				rateCurt = contractRate;
 				warnMsg += "達合約利率上限 ";
@@ -503,15 +514,12 @@ public class L4320Batch extends TradeBuffer {
 		case 3:
 			// 本次利率 = 原利率 + 地區別利率
 			rateCurt = fitRate.add(cityIntRateIncr);
-			warnMsg += "地區別加減碼:" + cityIntRateIncr ;			
 			// 依地區別利率上、下限調整
 			if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
 				rateCurt = cityIntRateCeiling;
-				warnMsg += "達地區別上限 ";
 			}
 			if (rateCurt.compareTo(cityIntRateFloor) < 0) {
 				rateCurt = cityIntRateFloor;
-				warnMsg += "達地區別下限 ";
 			}
 			// 3.人工調整
 			adjCode = 3;
@@ -585,7 +593,7 @@ public class L4320Batch extends TradeBuffer {
 
 //		調整記號，批次自動調整有錯誤轉為人工處理
 		if (adjCode == 1 && errorFlag > 0) {
-			adjCode = 3;	
+			adjCode = 3;
 		}
 
 		b.setAdjCode(adjCode);
@@ -632,7 +640,7 @@ public class L4320Batch extends TradeBuffer {
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
 			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
 				batxRateChangeService.holdById(tBatxRateChange, titaVo);
-				if (tBatxRateChange.getConfirmFlag() > 0) {
+				if (tBatxRateChange.getConfirmFlag() == 1) {
 					throw new LogicException("E0008", ", 該筆已確認，請先訂正L4321 ");
 				} else {
 					try {

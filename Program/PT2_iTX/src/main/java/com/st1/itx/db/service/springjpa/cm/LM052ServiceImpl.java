@@ -47,13 +47,55 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		if (formNum == 1) {
 
+			sql += "WITH rawData AS ( ";
+			sql += "      SELECT DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') AS \"AcctCode\"";
+			sql += "            ,SUM(CASE WHEN DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') = 'OTHER' ";
+			sql += "                       AND I.\"YearMonth\" = :yymm ";
+			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
+			sql += "                 ELSE 0 END";
+			sql += "                )";
+			sql += "             -";
+			sql += "             SUM(CASE WHEN DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') = 'OTHER' ";
+			sql += "                       AND I.\"YearMonth\" = :lyymm";
+			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
+			sql += "                 ELSE 0 END";
+			sql += "                )";
+			sql += "             AS \"LnAmt\"";
+			sql += "      FROM \"Ias39IntMethod\" I";
+			sql += "      LEFT JOIN \"MonthlyLoanBal\" MLB ON I.\"YearMonth\" = MLB.\"YearMonth\" ";
+			sql += "                                      AND I.\"CustNo\" = MLB.\"CustNo\" ";
+			sql += "                                      AND I.\"FacmNo\" = MLB.\"FacmNo\" ";
+			sql += "                                      AND I.\"BormNo\" = MLB.\"BormNo\"";
+			sql += "      WHERE NVL(I.\"YearMonth\", ' ') IN (:lyymm, :yymm) ";
+			sql += "        AND NVL(MLB.\"CurrencyCode\",' ') = 'TWD'";
+			sql += "      GROUP BY DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') ";
+			sql += "      ),";
+			sql += "      roundData AS (";
+			sql += "      SELECT \"AcctCode\"";
+			sql += "            ,CASE WHEN \"LnAmt\" < 0";
+			sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"LnAmt\")+1 ";
+			sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"LnAmt\")-1";
+			sql += "                            ELSE 0 END ";
+			sql += "                  WHEN \"LnAmt\" > 0";
+			sql += "                  THEN ROUND(\"LnAmt\")";
+			sql += "                  ELSE 0 END ";
+			sql += "             AS \"LnAmt\"";
+			sql += "      FROM rawData";
+			sql += "      )";
 			sql += "	SELECT \"AssetClassNo\"";
 			sql += "          ,\"AcSubBookCode\"";
 			sql += "          ,\"LoanBal\"";
 			sql += "    FROM \"MonthlyLM052AssetClass\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
-			sql += "    ORDER BY \"AssetClassNo\"";
-			sql += "   			,\"AcSubBookCode\"";
+			sql += "    UNION ";			
+			sql += "    SELECT '61' AS \"AssetClassNo\" ";
+			sql += "      	  ,'999' AS \"AcSubBookCode\" ";
+			sql += "          ,CASE WHEN Loan.\"LnAmt\" >= 0 ";
+			sql += "                THEN Loan.\"LnAmt\" ";
+			sql += "                ELSE ABS(Loan.\"LnAmt\") END AS \"LoanBal\"";
+			sql += "    FROM roundData Ovdu";
+			sql += "    LEFT JOIN roundData Loan   ON Loan.\"AcctCode\"   = 'OTHER'";
+			sql += "    WHERE Ovdu.\"AcctCode\" = '990'";
 			
 		} else if (formNum == 2) {
 
@@ -88,11 +130,13 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		} else if (formNum == 5) {
 			
-			// 目前無科目，等確認有科目再寫
-			sql += "	SELECT SUM(\"DbAmt\" - \"CrAmt\" ) AS \"LoanBal\"";
-			sql += "    FROM \"AcMain\"";
-			sql += "    WHERE \"MonthEndYm\" = :yymm ";
-			sql += "      AND \"AcNoCode\" IN ('10621301000','10621302000')";
+			sql += "	SELECT \"YearMonth\" ";
+			sql += "          ,\"AssetEvaTotal\" "; //--五類資產評估合計
+			sql += "          ,\"LegalLoss\"";		//--法定備抵損失提撥
+			sql += "          ,\"ApprovedLoss\"";   //--會計部核定備抵損失
+			sql += "    FROM \"MonthlyLM052LoanAsset\"";
+			sql += "    WHERE \"YearMonth\" = :yymm ";
+			sql += "    ORDER BY \"LoanAssetCode\"";
 
 		}
 
@@ -101,6 +145,9 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		if (formNum == 1) {
+			query.setParameter(":yymm", lastYM);
+		}
 		query.setParameter("yymm", iYearMonth);
 		return this.convertToMap(query);
 	}

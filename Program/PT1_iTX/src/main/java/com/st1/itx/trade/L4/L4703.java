@@ -186,7 +186,8 @@ public class L4703 extends TradeBuffer {
 //		滯繳明細表 通知方式為書信者，於9703產出
 //		l9703p.run(titaVo);
 		MySpring.newTask("L9703p", this.txBuffer, titaVo);
-
+//		套印
+		MySpring.newTask("L4703p", this.txBuffer, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
