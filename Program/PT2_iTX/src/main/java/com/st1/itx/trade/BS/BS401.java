@@ -91,7 +91,6 @@ public class BS401 extends TradeBuffer {
 	@Autowired
 	public WebClient webClient;
 
-	private int commitCnt = 1;
 	private int ProcessCnt = 0;
 	private int iFunctionCode;
 	private int iAcDate;
@@ -190,11 +189,6 @@ public class BS401 extends TradeBuffer {
 						isCheck = true;
 					}
 
-					// 人工入帳再檢核一次
-					if ("2".equals(tDetail.getProcStsCode())) {
-						isCheck = true;
-					}
-
 					// 02.銀行扣款 03.員工扣款 => 1.整批檢核時設定檢核正常，整批入帳時才進行檢核
 					if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
 						if ("4".equals(tDetail.getProcStsCode())) {
@@ -284,6 +278,7 @@ public class BS401 extends TradeBuffer {
 			// 更新作業狀態
 			this.batchTransaction.commitEnd();
 			this.batchTransaction.init();
+			this.info(" BS401 ProcessCnt= " + ProcessCnt);
 		}
 
 		String msg = updateHead(titaVo);

@@ -790,9 +790,9 @@ public class BaTxCom extends TradeBuffer {
 	/**
 	 * 本金利息(按應繳日加總至額度)
 	 * 
-	 * @param iBatxList ArrayList of BaTxVo
+	 * @param iBatxList 還款明細
 	 * @param titaVo    TitaVo
-	 * @return ArrayList of BaTxVo
+	 * @return 還款明細
 	 * @throws LogicException ...
 	 */
 	public ArrayList<BaTxVo> addByPayintDate(ArrayList<BaTxVo> iBatxList, TitaVo titaVo) throws LogicException {
@@ -888,9 +888,9 @@ public class BaTxCom extends TradeBuffer {
 	/**
 	 * 本金利息(加總至撥款)
 	 * 
-	 * @param iBatxList ArrayList＜BaTxVo＞
+	 * @param iBatxList 還款明細
 	 * @param titaVo    TitaVo
-	 * @return ArrayList＜BaTxVo＞
+	 * @return 還款明細
 	 * @throws LogicException ...
 	 */
 	public ArrayList<BaTxVo> addByBormNo(ArrayList<BaTxVo> iBatxList, TitaVo titaVo) throws LogicException {
@@ -1691,9 +1691,9 @@ public class BaTxCom extends TradeBuffer {
 	 * 計算作帳金額
 	 * 
 	 * @param iTxAmt    還款金額
-	 * @param iBatxList ArrayList＜BaTxVo＞
+	 * @param iBatxList ArrayList of BaTxVo
 	 * @param titaVo    TitaVo
-	 * @return ArrayList＜BaTxVo＞
+	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
 	public ArrayList<BaTxVo> settleAcAmt(BigDecimal iTxAmt, ArrayList<BaTxVo> iBatxList, TitaVo titaVo)

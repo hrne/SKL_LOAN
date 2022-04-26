@@ -378,6 +378,7 @@ public class L4601Batch extends TradeBuffer {
 			} else {
 				checkResultA = checkResultA + ",11";
 			}
+			return;
 		}
 //		已入帳,總保費與入帳金額不符 
 		if (tInsuRenew.getAcDate() > 0
@@ -387,6 +388,7 @@ public class L4601Batch extends TradeBuffer {
 			} else {
 				checkResultA = checkResultA + ",15";
 			}
+			return;
 		}
 
 		if ("Y".equals(tInsuRenew.getNotiTempFg())) {

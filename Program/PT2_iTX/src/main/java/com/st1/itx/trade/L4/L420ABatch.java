@@ -24,8 +24,6 @@ import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdCodeService;
@@ -337,19 +335,9 @@ public class L420ABatch extends TradeBuffer {
 				continue;
 			}
 			String facAcctCode = "999";
-			String facAcctItem = " ";
-			if ("3".equals(baTxVo.getAcctCode().substring(0, 1))) {
+			String facAcctItem = "暫收款 ";
+			if (tDetail.getRepayType() >= 1 && tDetail.getRepayType() <= 3 ) {
 				facAcctCode = baTxVo.getAcctCode();
-			} else {
-				if (baTxVo.getFacmNo() > 0) {
-					FacMain tfacMain = facMainService.findById(new FacMainId(baTxVo.getCustNo(), baTxVo.getFacmNo()),
-							titaVo);
-					if (tfacMain != null) {
-						facAcctCode = tfacMain.getAcctCode();
-					}
-				}
-			}
-			if (!"999".equals(facAcctCode)) {
 				facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
 			}
 			Map<String, String> da = new HashMap<>();

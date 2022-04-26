@@ -490,7 +490,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可入帳筆數
-					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("4")) {
+					if (tBatxDetail.getProcStsCode().equals("4")) {
 						if (canEnterCnt.containsKey(grp3)) {
 							canEnterCnt.put(grp3, canEnterCnt.get(grp3) + 1);
 						} else {

@@ -50,6 +50,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"TitaTxtNo\"";
 		sql += "        , \"RepaidPeriod\" ";
 		sql += "        , \"OtherFields\" ";
+		sql += "        , \"TitaTxCd\" ";
 		sql += "   FROM \"LoanBorTx\"";
 		sql += "   WHERE \"AcDate\" = :inputAcDate";
 		sql += "     AND \"TitaHCode\" = 0";
@@ -63,6 +64,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"TitaTxtNo\"";
 		sql += "          , \"RepaidPeriod\"";
 		sql += "          , \"OtherFields\" ";
+		sql += "          , \"TitaTxCd\" ";
 		sql += " )";
 		sql += ", TX2 AS (";
 		// 將戶號下相同計息起迄日的明細金額加總
@@ -76,6 +78,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"TitaTxtNo\"";
 		sql += "        , \"RepaidPeriod\" ";
 		sql += "        , \"OtherFields\" ";
+		sql += "        , \"TitaTxCd\" ";
 		sql += "        , SUM(\"TxAmt\")           AS \"TxAmt\"";
 		sql += "        , SUM(\"Principal\")       AS \"Principal\"";
 		sql += "        , SUM(\"Interest\")        AS \"Interest\"";
@@ -102,6 +105,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"TitaTxtNo\"";
 		sql += "          , \"RepaidPeriod\" ";
 		sql += "          , \"OtherFields\" ";
+		sql += "          , \"TitaTxCd\" ";
 		sql += " )";
 		sql += " SELECT BATX.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 		sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
@@ -147,7 +151,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
 		sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 		sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
-		sql += "    , NVL(FAC.\"AcctCode\",'999') AS \"SortingForSubTotal\""; // 配合小計產生的排序
+		sql += "    , DECODE(TX1.\"TitaTxCd\", 'L3210', '999', NVL(FAC.\"AcctCode\",'999')) AS \"SortingForSubTotal\""; // 配合小計產生的排序
 		sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
 		sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 		sql += "    , NVL(TX1.\"RepaidPeriod\", 0) AS \"RepaidPeriod\" ";
@@ -168,6 +172,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
 		sql += "            AND TX2.\"RepaidPeriod\" = TX1.\"RepaidPeriod\" ";
 		sql += "            AND TX2.\"OtherFields\" = TX1.\"OtherFields\" ";
+		sql += "            AND TX2.\"TitaTxCd\" = TX1.\"TitaTxCd\" ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 		sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 		sql += " WHERE BATX.\"AcDate\" = :inputAcDate";

@@ -142,9 +142,9 @@ public class L9713Report extends MakeReport {
 
 //			this.info("map f6:" + map.get("f6") + "," + map.get("f6").toString().length());// 金額
 //			this.info("map f7:" + map.get("f7") + "," + map.get("f7").toString().length());// 支票日期
-			
-			//沒有入帳單位時，即中止loop
-			if(map.get("f1").toString().isEmpty() || map.get("f1").toString() == null) {
+
+			// 沒有入帳單位時，即中止loop
+			if (map.get("f1").toString().isEmpty() || map.get("f1").toString() == null) {
 				break;
 			}
 			cnt += 1;
@@ -152,10 +152,8 @@ public class L9713Report extends MakeReport {
 			if (cnt > 1) {
 
 				tmpAmt = map.get("f6").toString();
-				// 去除雙引號和單引號
-				tmpAmt = tmpAmt.replace("\"", "");
-				tmpAmt = tmpAmt.replace("\'", "");
 
+				tmpAmt = tmpAmt.replaceAll("[^\\d.]", "");
 				// 取得支票日期
 				if (!"0".equals(tmpAmt)) {
 
@@ -213,7 +211,10 @@ public class L9713Report extends MakeReport {
 		int[] tempAmtPos = { t1, t2, t3, t4, t5, t6 };
 		int[] rank = { 1, 2, 3, 4, 5, 6 };
 
-		//判斷各區帳齡金額 由大到小排列
+		this.info("tempAmtPos" + tempAmtPos.toString());
+		this.info("rank" + rank.toString());
+
+		// 判斷各區帳齡金額 由大到小排列
 		for (int i = 0; i < tempAmtPos.length; i++) {
 			for (int j = 0; j < tempAmtPos.length; j++) {
 				if (tempAmtPos[i] > tempAmtPos[j]) {
@@ -240,10 +241,12 @@ public class L9713Report extends MakeReport {
 		return true;
 
 	}
+
 	/**
 	 * 輸出報表
+	 * 
 	 * @param rank 帳齡排序
-	 * */
+	 */
 	private void report(int[] rank) {
 		String tmp = "";
 		String iCALDY = String.valueOf(Integer.valueOf(titaVo.get("CALDY")) + 19110000);
@@ -309,12 +312,12 @@ public class L9713Report extends MakeReport {
 		this.print(-21 - startRow, 58, showAmt(t7), "R");
 
 		// 各帳齡區間比例
-		int pt1 = (int) Math.floor(t1 * 100.00 / t7);// 30日以下
-		int pt2 = (int) Math.floor(t2 * 100.00 / t7);// 30~60日
-		int pt3 = (int) Math.floor(t3 * 100.00 / t7);// 60~90日
-		int pt4 = (int) Math.floor(t4 * 100.00 / t7);// 4~6個月
-		int pt5 = (int) Math.floor(t5 * 100.00 / t7);// 7~12個月
-		int pt6 = (int) Math.floor(t6 * 100.00 / t7);// 1年以上
+		int pt1 = (int) Math.round((t1 / t7) * 100.00);// 30日以下
+		int pt2 = (int) Math.round((t2 / t7) * 100.00 );// 30~60日
+		int pt3 = (int) Math.round((t3 / t7) * 100.00 );// 60~90日
+		int pt4 = (int) Math.round((t4 / t7) * 100.00 );// 4~6個月
+		int pt5 = (int) Math.round((t5 / t7) * 100.00 );// 7~12個月
+		int pt6 = (int) Math.round((t6 / t7) * 100.00 );// 1年以上
 
 		// 比例總和 暫存
 		int t = 0;
@@ -326,7 +329,7 @@ public class L9713Report extends MakeReport {
 		// 如果% 總和不滿100%
 		if (t != 100) {
 			tempT = 100 - t;
-			//根據排序分配餘數
+			// 根據排序分配餘數
 			for (int no = 0; no < tempT; no++) {
 				switch (rank[no]) {
 				case 1:

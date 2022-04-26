@@ -1,4 +1,4 @@
-package com.st1.itx.util.common;
+	package com.st1.itx.util.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -447,14 +447,18 @@ public class TxBatchCom extends TradeBuffer {
 			settingUnPaid(tDetail, titaVo);
 			// 催呆戶(非結案戶)轉暫收
 			if ("0".equals(this.procStsCode) && this.repayLoan.compareTo(BigDecimal.ZERO) == 0 && this.facStatus > 0) {
-				CdCode tCdCode = cdCodeService.findById(new CdCodeId("Status", "" + this.facStatus), titaVo);
+				CdCode tCdCode = cdCodeService
+						.findById(new CdCodeId("Status", "" + parse.IntegerToString(this.facStatus, 2)), titaVo);
 				if (tCdCode != null) {
 					this.checkMsg += tCdCode.getItem() + "";
 				}
-				if (this.facStatus == 3) {
-					this.procStsCode = "2"; // 2.人工處理
-				} else {
-					this.procStsCode = "4"; // 4.檢核正常
+				// 催呆戶須轉暫收
+				if (this.repayType >= 4) {
+					if (this.facStatus == 3) {
+						this.procStsCode = "2"; // 2.人工處理
+					} else {
+						this.procStsCode = "4"; // 4.檢核正常
+					}
 				}
 			}
 			// step02. 匯款轉帳未設定還款類別，與未收費用金額相同，則設定為費用類別
@@ -480,6 +484,7 @@ public class TxBatchCom extends TradeBuffer {
 		if (titaVo.getTxCode().equals("L420A") && "A1".equals(tDetail.getReconCode())) {
 			this.procStsCode = "2"; // 2.人工處理
 		}
+
 		// ------------- 將檢核結果存入整批入帳明細檔(還款類別、處理說明、處理狀態) -----------
 		// 檢核正常
 		if ("0".equals(this.procStsCode)) {
@@ -1177,6 +1182,7 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg += "同戶號合併檢核 總金額:" + this.tTempVo.get("MergeAmt") + " ";
 			checkAmt = parse.stringToBigDecimal(this.tTempVo.get("MergeAmt"));
 		}
+
 		if (this.tTempVo.get("MergeAmt") != null && !tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
 			this.checkMsg += "轉暫收";
 		} else {
@@ -1374,15 +1380,6 @@ public class TxBatchCom extends TradeBuffer {
 
 	/* append this.checkMsg Amount Field */
 	private void apendcheckMsgAmounts(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
-		// 戶況
-		if (this.facStatus > 0) {
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("Status", parse.IntegerToString(this.facStatus, 2)),
-					titaVo);
-			if (tCdCode != null) {
-				this.checkMsg += ", " + tCdCode.getItem();
-			}
-		}
-
 		if (this.repayFacmNo != tBatxDetail.getFacmNo())
 			this.checkMsg += ", 額度:" + parse.IntegerToString(this.repayFacmNo, 3);
 		if (this.repayBormNo > 0)
@@ -1803,7 +1800,7 @@ public class TxBatchCom extends TradeBuffer {
 	/**
 	 * 整批入帳明細
 	 * 
-	 * @return ArrayList＜BaTxVo＞
+	 * @return ArrayList of BaTxVo
 	 */
 	public ArrayList<BaTxVo> getBaTxList() {
 		return baTxList;

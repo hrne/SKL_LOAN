@@ -72,7 +72,7 @@ public class L4964 extends TradeBuffer {
 		this.info("active L4964 ");
 		this.totaVo.init(titaVo);
 
-		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+		List<InsuRenew> l0InsuRenew = new ArrayList<InsuRenew>();
 		List<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>();
 
 		int clCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
@@ -91,7 +91,7 @@ public class L4964 extends TradeBuffer {
 		slInsuRenew = insuRenewService.findNowInsuEq(clCode1, clCode2, clNo, this.index, this.limit);
 		sInsuOrignal = insuOrignalService.clNoEqual(clCode1, clCode2, clNo, this.index, this.limit);
 
-		lInsuRenew = slInsuRenew == null ? null : slInsuRenew.getContent();
+		l0InsuRenew = slInsuRenew == null ? null : slInsuRenew.getContent();
 		lInsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
 
 		String bdLocation;
@@ -121,7 +121,30 @@ public class L4964 extends TradeBuffer {
 
 		Boolean occursflg = true;
 
-		if (lInsuRenew != null && lInsuRenew.size() != 0) {
+		if (l0InsuRenew != null && l0InsuRenew.size() != 0) {
+			
+			ArrayList<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+
+			lInsuRenew = new ArrayList<InsuRenew>(l0InsuRenew);
+
+//			ClCode1 > ClCode2 > ClNo > InsuMonth DESC
+			lInsuRenew.sort((c1, c2) -> {
+				int result = 0;
+				if (c1.getClCode1() - c2.getClCode1() != 0) {
+					result = c1.getClCode1() - c2.getClCode1();
+				} else if (c1.getClCode2() - c2.getClCode2() != 0) {
+					result = c1.getClCode2() - c2.getClCode2();
+				} else if (c1.getClNo() - c2.getClNo() != 0) {
+					result = c1.getClNo() - c2.getClNo();
+				} else if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
+					result = c2.getInsuYearMonth() - c1.getInsuYearMonth();
+				} else {
+					result = 0;
+				}
+				return result;
+			});
+			
+			
 			for (InsuRenew tInsuRenew : lInsuRenew) {
 
 				tmpInsu tmp = new tmpInsu(tInsuRenew.getOrigInsuNo(), tInsuRenew.getInsuCompany());
@@ -133,7 +156,8 @@ public class L4964 extends TradeBuffer {
 //				僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 				if (btnShowFlag.containsKey(tmp)) {
 					btnShowFlag.put(tmp, 0);
-					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo()) && !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
+					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo())
+							&& !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
 						this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuRenew.getEndoInsuNo());
 						btnShowFlag.put(tmp, 1);
 					}
@@ -174,7 +198,8 @@ public class L4964 extends TradeBuffer {
 					this.totaVo.addOccursList(occursList);
 					occursflg = false;
 				} else { // 近三個月、未結案
-					if ((tInsuRenew.getInsuEndDate() >= threeMonthsB4Date) || (tInsuRenew.getRenewCode() == 2 && tInsuRenew.getAcDate() == 0 && tInsuRenew.getStatusCode() != 4)) {
+					if ((tInsuRenew.getInsuEndDate() >= threeMonthsB4Date) || (tInsuRenew.getRenewCode() == 2
+							&& tInsuRenew.getAcDate() == 0 && tInsuRenew.getStatusCode() != 4)) {
 						OccursList occursList = new OccursList();
 
 						occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
@@ -219,7 +244,8 @@ public class L4964 extends TradeBuffer {
 //					僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 					if (btnShowFlag.containsKey(tmp)) {
 						btnShowFlag.put(tmp, 0);
-						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo()) && !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo())
+								&& !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
 							this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuOrignal.getEndoInsuNo());
 							btnShowFlag.put(tmp, 1);
 						}
@@ -258,7 +284,8 @@ public class L4964 extends TradeBuffer {
 //						僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 						if (btnShowFlag.containsKey(tmp)) {
 							btnShowFlag.put(tmp, 0);
-							if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo()) && !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+							if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo())
+									&& !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
 								this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuOrignal.getEndoInsuNo());
 								btnShowFlag.put(tmp, 1);
 							}
@@ -291,7 +318,7 @@ public class L4964 extends TradeBuffer {
 
 				} // else
 			} // for
-		}
+		} 
 //		else {
 //			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
 //		}

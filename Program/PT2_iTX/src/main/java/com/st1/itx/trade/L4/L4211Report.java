@@ -1,17 +1,3 @@
-//戶名 58
-//清償原因 69
-//起日 72
-//橫槓 81
-//迄日 82
-//利息 108,R	allsum4
-//暫付款 119,R	allsum5
-//違約金 130,R	allsum6
-//暫收貸 154,R	allsum7
-//短腳 162,R	allsum9
-//費用 173,R	allsum10
-//本金 97,R	allsum3
-//暫收借 144,R	allsum8
-
 package com.st1.itx.trade.L4;
 
 import java.io.PrintWriter;
@@ -258,10 +244,6 @@ public class L4211Report extends MakeReport {
 			fnAllList1 = l4211ARServiceImpl.findAll(titaVo, 1);
 			fnAllList2 = l4211ARServiceImpl.findAll(titaVo, 2);
 			fnAllList3 = l4211ARServiceImpl.findAll(titaVo, 3);
-
-			this.info("Going to execWithBatchMapList");
-			execWithBatchMapList(l4211ARServiceImpl.findAll(titaVo, 0), titaVo);
-			this.info("Done execWithBatchMapList !! wow!");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -370,8 +352,8 @@ public class L4211Report extends MakeReport {
 	}
 
 	private void report1(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
-		String msCode = ""; // 代號
-		String txCode = ""; // 代號名稱
+		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
+		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
 		String msNum = ""; // 批次號碼
 		int count = 0;
@@ -411,11 +393,11 @@ public class L4211Report extends MakeReport {
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					String aName = tfnAllList.get("AcctItem");
-					if (aName.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
-						this.print(1, 2, msCode);
+						this.print(1, 2, lastAcctItem);
 					}
 					this.print(0, 14, " 小計 ");
 
@@ -466,17 +448,17 @@ public class L4211Report extends MakeReport {
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("AcctItem").toString())
-							|| !txCode.equals(tfnAllList.get("RepayItem").toString())) {
-						this.info("msCode       = " + msCode);
-						this.info("22       = " + tfnAllList.get("AcctItem").toString());
+					String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+					if (!lastSortingForSubTotal.equals(currentSortingForSubTotal)) {
+						this.info("currSort     = " + currentSortingForSubTotal);
+						this.info("curracctItem = " + tfnAllList.get("AcctItem"));
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 							this.print(1, 2, "暫收款");
 						} else {
-							this.print(1, 2, msCode);
+							this.print(1, 2, lastAcctItem);
 						}
 						this.print(0, 14, " 小計 ");
 
@@ -534,9 +516,9 @@ public class L4211Report extends MakeReport {
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-			msCode = tfnAllList.get("AcctItem").toString();
-			// 當前代碼對應中文 當下一筆不同時取用
-			txCode = tfnAllList.get("RepayItem").toString();
+			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+			
+			lastAcctItem = tfnAllList.get("AcctItem");
 
 			// 報表邏輯及排序
 
@@ -621,15 +603,11 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("RepayItem"))) {
-					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
-						this.print(1, 2, msCode);
+						this.print(1, 2, lastAcctItem);
 					}
-				} else {
-					this.print(1, 2, tfnAllList.get("RepayItem"));
-				}
 				this.print(0, 14, " 小計 ");
 
 				atAll();
@@ -686,8 +664,8 @@ public class L4211Report extends MakeReport {
 	}
 
 	private void report2(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
-		String msCode = ""; // 代號
-		String txCode = ""; // 代號名稱
+		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
+		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
 		String msNum = ""; // 批次號碼
 		int count = 0;
@@ -727,11 +705,11 @@ public class L4211Report extends MakeReport {
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					String aName = tfnAllList.get("AcctItem");
-					if (aName.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
-						this.print(1, 2, msCode);
+						this.print(1, 2, lastAcctItem);
 					}
 					this.print(0, 14, " 小計 ");
 
@@ -783,17 +761,17 @@ public class L4211Report extends MakeReport {
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("AcctItem").toString())
-							|| !txCode.equals(tfnAllList.get("RepayItem").toString())) {
-						this.info("msCode       = " + msCode);
-						this.info("22       = " + tfnAllList.get("AcctItem").toString());
+					String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+					if (!lastSortingForSubTotal.equals(currentSortingForSubTotal)) {
+						this.info("currSort     = " + currentSortingForSubTotal);
+						this.info("curracctItem = " + tfnAllList.get("AcctItem"));
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 							this.print(1, 2, "暫收款");
 						} else {
-							this.print(1, 2, msCode);
+							this.print(1, 2, lastAcctItem);
 						}
 						this.print(0, 14, " 小計 ");
 
@@ -850,9 +828,9 @@ public class L4211Report extends MakeReport {
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-			msCode = tfnAllList.get("AcctItem").toString();
-			// 當前代碼對應中文 當下一筆不同時取用
-			txCode = tfnAllList.get("RepayItem").toString();
+			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+			
+			lastAcctItem = tfnAllList.get("AcctItem");
 
 			// 報表邏輯及排序
 
@@ -937,14 +915,10 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("RepayItem"))) {
-					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, msCode);
-					}
+				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+					this.print(1, 2, "暫收款");
 				} else {
-					this.print(1, 2, tfnAllList.get("RepayItem"));
+					this.print(1, 2, lastAcctItem);
 				}
 				this.print(0, 14, " 小計 ");
 
@@ -998,8 +972,8 @@ public class L4211Report extends MakeReport {
 	}
 
 	private void report3(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
-		String msCode = ""; // 代號
-		String txCode = ""; // 代號名稱
+		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
+		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
 		String msNum = ""; // 批次號碼
 		int count = 0;
@@ -1039,11 +1013,11 @@ public class L4211Report extends MakeReport {
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					String aName = tfnAllList.get("AcctItem");
-					if (aName.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
-						this.print(1, 2, msCode);
+						this.print(1, 2, lastAcctItem);
 					}
 					this.print(0, 14, " 小計 ");
 
@@ -1095,17 +1069,17 @@ public class L4211Report extends MakeReport {
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("AcctItem").toString())
-							|| !txCode.equals(tfnAllList.get("RepayItem").toString())) {
-						this.info("msCode       = " + msCode);
-						this.info("22       = " + tfnAllList.get("AcctItem").toString());
+					String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+					if (!lastSortingForSubTotal.equals(currentSortingForSubTotal)) {
+						this.info("currSort     = " + currentSortingForSubTotal);
+						this.info("curracctItem = " + tfnAllList.get("AcctItem"));
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 							this.print(1, 2, "暫收款");
 						} else {
-							this.print(1, 2, msCode);
+							this.print(1, 2, lastAcctItem);
 						}
 						this.print(0, 14, " 小計 ");
 
@@ -1162,9 +1136,9 @@ public class L4211Report extends MakeReport {
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-			msCode = tfnAllList.get("AcctItem").toString();
-			// 當前代碼對應中文 當下一筆不同時取用
-			txCode = tfnAllList.get("RepayItem").toString();
+			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+			
+			lastAcctItem = tfnAllList.get("AcctItem");
 
 			// 報表邏輯及排序
 
@@ -1249,15 +1223,11 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("RepayItem"))) {
-					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
-						this.print(1, 2, msCode);
+						this.print(1, 2, lastAcctItem);
 					}
-				} else {
-					this.print(1, 2, tfnAllList.get("RepayItem"));
-				}
 				this.print(0, 14, " 小計 ");
 
 				atAll();

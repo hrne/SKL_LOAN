@@ -29,7 +29,7 @@ public class SystemParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8715792104317600511L;
+	private static final long serialVersionUID = 8869427583903109895L;
 
 // 業務類型
   /* LN */
@@ -188,7 +188,7 @@ public class SystemParas implements Serializable {
   private int acctCode330B = 0;
 
   // 減免金額限額
-  /* L6501維護預設值=200 */
+  /* 超過時需主管刷卡L6501維護預設值=200 */
   @Column(name = "`ReduceAmtLimit`")
   private int reduceAmtLimit = 0;
 
@@ -257,15 +257,30 @@ public class SystemParas implements Serializable {
   @Column(name = "`EbsAuth`", length = 100)
   private String ebsAuth;
 
-  // FTP網址
+  // FTP網址（撥款匯款媒體檔）
   /* 撥款匯款媒體檔傳遞至FTP */
-  @Column(name = "`FtpUrl`", length = 100)
-  private String ftpUrl;
+  @Column(name = "`LoanMediaFtpUrl`", length = 100)
+  private String loanMediaFtpUrl;
 
-  // FTP認證
+  // FTP帳號（撥款匯款媒體檔）
   /* username：password */
-  @Column(name = "`FtpAuth`", length = 100)
-  private String ftpAuth;
+  @Column(name = "`LoanMediaFtpAuth`", length = 100)
+  private String loanMediaFtpAuth;
+
+  // FTP網址（簡訊媒體檔）
+  /* 簡訊媒體檔傳遞至FTP（L4710） */
+  @Column(name = "`SmsFtpUrl`", length = 100)
+  private String smsFtpUrl;
+
+  // FTP帳號（簡訊媒體檔）
+  /* username：password */
+  @Column(name = "`SmsFtpAuth`", length = 100)
+  private String smsFtpAuth;
+
+  // 是否上傳簡訊媒體檔
+  /* Y:啟用N:不啟用 */
+  @Column(name = "`SmsFtpFlag`", length = 1)
+  private String smsFtpFlag;
 
   // JCIC放款報送聯絡人姓名
   /* 配合聯徵格式,最多4個中文字 */
@@ -972,7 +987,8 @@ N:一日多批
 
 /**
 	* 減免金額限額<br>
-	* L6501維護
+	* 超過時需主管刷卡
+L6501維護
 預設值=200
 	* @return Integer
 	*/
@@ -982,7 +998,8 @@ N:一日多批
 
 /**
 	* 減免金額限額<br>
-	* L6501維護
+	* 超過時需主管刷卡
+L6501維護
 預設值=200
   *
   * @param reduceAmtLimit 減免金額限額
@@ -1266,41 +1283,100 @@ N:不啟用
   }
 
 /**
-	* FTP網址<br>
+	* FTP網址（撥款匯款媒體檔）<br>
 	* 撥款匯款媒體檔傳遞至FTP
 	* @return String
 	*/
-  public String getFtpUrl() {
-    return this.ftpUrl == null ? "" : this.ftpUrl;
+  public String getLoanMediaFtpUrl() {
+    return this.loanMediaFtpUrl == null ? "" : this.loanMediaFtpUrl;
   }
 
 /**
-	* FTP網址<br>
+	* FTP網址（撥款匯款媒體檔）<br>
 	* 撥款匯款媒體檔傳遞至FTP
   *
-  * @param ftpUrl FTP網址
+  * @param loanMediaFtpUrl FTP網址（撥款匯款媒體檔）
 	*/
-  public void setFtpUrl(String ftpUrl) {
-    this.ftpUrl = ftpUrl;
+  public void setLoanMediaFtpUrl(String loanMediaFtpUrl) {
+    this.loanMediaFtpUrl = loanMediaFtpUrl;
   }
 
 /**
-	* FTP認證<br>
+	* FTP帳號（撥款匯款媒體檔）<br>
 	* username：password
 	* @return String
 	*/
-  public String getFtpAuth() {
-    return this.ftpAuth == null ? "" : this.ftpAuth;
+  public String getLoanMediaFtpAuth() {
+    return this.loanMediaFtpAuth == null ? "" : this.loanMediaFtpAuth;
   }
 
 /**
-	* FTP認證<br>
+	* FTP帳號（撥款匯款媒體檔）<br>
 	* username：password
   *
-  * @param ftpAuth FTP認證
+  * @param loanMediaFtpAuth FTP帳號（撥款匯款媒體檔）
 	*/
-  public void setFtpAuth(String ftpAuth) {
-    this.ftpAuth = ftpAuth;
+  public void setLoanMediaFtpAuth(String loanMediaFtpAuth) {
+    this.loanMediaFtpAuth = loanMediaFtpAuth;
+  }
+
+/**
+	* FTP網址（簡訊媒體檔）<br>
+	* 簡訊媒體檔傳遞至FTP（L4710）
+	* @return String
+	*/
+  public String getSmsFtpUrl() {
+    return this.smsFtpUrl == null ? "" : this.smsFtpUrl;
+  }
+
+/**
+	* FTP網址（簡訊媒體檔）<br>
+	* 簡訊媒體檔傳遞至FTP（L4710）
+  *
+  * @param smsFtpUrl FTP網址（簡訊媒體檔）
+	*/
+  public void setSmsFtpUrl(String smsFtpUrl) {
+    this.smsFtpUrl = smsFtpUrl;
+  }
+
+/**
+	* FTP帳號（簡訊媒體檔）<br>
+	* username：password
+	* @return String
+	*/
+  public String getSmsFtpAuth() {
+    return this.smsFtpAuth == null ? "" : this.smsFtpAuth;
+  }
+
+/**
+	* FTP帳號（簡訊媒體檔）<br>
+	* username：password
+  *
+  * @param smsFtpAuth FTP帳號（簡訊媒體檔）
+	*/
+  public void setSmsFtpAuth(String smsFtpAuth) {
+    this.smsFtpAuth = smsFtpAuth;
+  }
+
+/**
+	* 是否上傳簡訊媒體檔<br>
+	* Y:啟用
+N:不啟用
+	* @return String
+	*/
+  public String getSmsFtpFlag() {
+    return this.smsFtpFlag == null ? "" : this.smsFtpFlag;
+  }
+
+/**
+	* 是否上傳簡訊媒體檔<br>
+	* Y:啟用
+N:不啟用
+  *
+  * @param smsFtpFlag 是否上傳簡訊媒體檔
+	*/
+  public void setSmsFtpFlag(String smsFtpFlag) {
+    this.smsFtpFlag = smsFtpFlag;
   }
 
 /**
@@ -1448,8 +1524,8 @@ N:不啟用
            + ", empNoList=" + empNoList + ", acctCode310A=" + acctCode310A + ", acctCode310B=" + acctCode310B + ", acctCode320A=" + acctCode320A + ", acctCode320B=" + acctCode320B + ", acctCode330A=" + acctCode330A
            + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortPrinLimit=" + shortPrinLimit
            + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
-           + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", ftpUrl=" + ftpUrl + ", ftpAuth=" + ftpAuth
-           + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth
+           + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }
