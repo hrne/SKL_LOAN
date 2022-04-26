@@ -282,7 +282,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "";
 		sql += " SELECT GUACM.\"CustId\"     AS GuaId "; // -- F0 保證人統編
-		sql += "      , \"Fn_ParseEOL\"(GUACM.\"CustName\", 0)   AS GuaName "; // -- F1 保證人姓名
+		sql += "      , SUBSTR(\"Fn_ParseEOL\"(GUACM.\"CustName\", 0),0,15)   AS GuaName "; // -- F1 保證人姓名
 		sql += "      , CDG.\"GuaRelItem\"   AS GuaRelItem "; // -- F2 保證人關係
 		sql += "      , GUA.\"GuaAmt\"       AS GuaAmt "; // -- F3 保證金額
 		sql += "      , \"Fn_GetCustAddr\"(GUACM.\"CustUKey\",'1') ";
@@ -473,7 +473,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F14通訊地址 ";
 		sql += "      , NVL(CM.\"CurrZip3\",'') || NVL(CM.\"CurrZip2\",'')";
 		sql += "                                       AS F15通訊郵遞區號 ";
-		sql += "      , FC.\"ApplDate\"                AS F16鍵檔日期 ";
+		sql += "      , TO_CHAR(FAC.\"CreateDate\",'YYYYMMDD') ";
+		sql += "                                       AS F16鍵檔日期 ";
 		sql += "      , FAC.\"LineAmt\"                AS F17核准額度 ";
 		sql += "      , \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") || FAC.\"AcctCode\" ";
 		sql += "                                       AS F18核准科目 ";

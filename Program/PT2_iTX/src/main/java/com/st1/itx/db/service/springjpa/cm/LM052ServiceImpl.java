@@ -142,7 +142,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		if (formNum == 1) {
-			query.setParameter(":yymm", lastYM);
+			query.setParameter(":lyymm", lastYM);
 		}
 		query.setParameter("yymm", iYearMonth);
 		return this.convertToMap(query);

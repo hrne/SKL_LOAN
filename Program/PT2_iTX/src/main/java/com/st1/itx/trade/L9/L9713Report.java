@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L9;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
@@ -77,9 +78,9 @@ public class L9713Report extends MakeReport {
 
 		this.info("L9713Report exec");
 
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+		int iEntdy = Integer.valueOf(titaVo.getParam("ACCTDATE")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.getParam("ACCTDATE")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.getParam("ACCTDATE")) + 19110000) / 100) % 100;
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		// 當日(int)
@@ -135,9 +136,6 @@ public class L9713Report extends MakeReport {
 			return false;
 		}
 
-//		this.info(" count:" + makeExcel.getListMap().size());
-//		this.info(" makeExcel.getListMap:" + makeExcel.getListMap());
-
 		for (Map<String, Object> map : makeExcel.getListMap()) {
 
 //			this.info("map f6:" + map.get("f6") + "," + map.get("f6").toString().length());// 金額
@@ -172,12 +170,11 @@ public class L9713Report extends MakeReport {
 
 					// 金額
 					tmp = (String) map.get("f6");
-					tmp = tmp.trim().replace("\"", "");
+					tmp = tmp.replaceAll("[^\\d.]", "");
 					tamt = Integer.valueOf(tmp);
-
 					t7 += tamt;
 					// 排除低於當月份的
-//					this.info("total=" + t7);
+					
 					/* 結論：CSV上有當月份以前的都算低於30日以下的帳齡 */
 					// 當月+1的交換日
 					if (tday < Integer.valueOf(iday1)) {
@@ -207,20 +204,20 @@ public class L9713Report extends MakeReport {
 			}
 		}
 
+//		int[] AmtPos = { t1, t2, t3, t4, t5, t6 };
 		// 暫存金額
 		int[] tempAmtPos = { t1, t2, t3, t4, t5, t6 };
 		int[] rank = { 1, 2, 3, 4, 5, 6 };
 
-		this.info("tempAmtPos" + tempAmtPos.toString());
-		this.info("rank" + rank.toString());
-
 		// 判斷各區帳齡金額 由大到小排列
-		for (int i = 0; i < tempAmtPos.length; i++) {
-			for (int j = 0; j < tempAmtPos.length; j++) {
-				if (tempAmtPos[i] > tempAmtPos[j]) {
-//					int temp = tempAmtPos[i];
-//					tempAmtPos[i] = tempAmtPos[j];
-//					tempAmtPos[j] = temp;
+		for (int i = 0; i < tempAmtPos.length - 1; i++) {
+			for (int j = i + 1; j < tempAmtPos.length; j++) {
+				if (tempAmtPos[i] < tempAmtPos[j]) {
+
+					int amtTemp = tempAmtPos[i];
+					tempAmtPos[i] = tempAmtPos[j];
+					tempAmtPos[j] = amtTemp;
+
 					int rankTemp = rank[i];
 					rank[i] = rank[j];
 					rank[j] = rankTemp;
@@ -228,9 +225,6 @@ public class L9713Report extends MakeReport {
 			}
 		}
 
-		// print的row至少要大於0，才能讓getNowpage()=1，才可以newPage()換頁
-		// this.print(1, 0, "");
-		// newPage();
 
 		// 輸出報表
 		report(rank);
@@ -246,8 +240,10 @@ public class L9713Report extends MakeReport {
 	 * 輸出報表
 	 * 
 	 * @param rank 帳齡排序
+	 * @throws LogicException
+	 * @throws NumberFormatException
 	 */
-	private void report(int[] rank) {
+	private void report(int[] rank) throws NumberFormatException, LogicException {
 		String tmp = "";
 		String iCALDY = String.valueOf(Integer.valueOf(titaVo.get("CALDY")) + 19110000);
 		this.setCharSpaces(0);
@@ -311,44 +307,72 @@ public class L9713Report extends MakeReport {
 		this.print(-19 - startRow, 58, showAmt(t6), "R");
 		this.print(-21 - startRow, 58, showAmt(t7), "R");
 
+		BigDecimal pbt1 = new BigDecimal(t1);// 30日以下
+		BigDecimal pbt2 = new BigDecimal(t2);// 30~60日
+		BigDecimal pbt3 = new BigDecimal(t3);// 60~90日
+		BigDecimal pbt4 = new BigDecimal(t4);// 4~6個月
+		BigDecimal pbt5 = new BigDecimal(t5);// 7~12個月
+		BigDecimal pbt6 = new BigDecimal(t6);// 1年以上
+		BigDecimal pbt7 = new BigDecimal(t7);
+		BigDecimal percent = new BigDecimal("100");
+		
+		pbt1 = pbt1.divide(pbt7, 2, BigDecimal.ROUND_HALF_UP).multiply(percent);
+		pbt2 = pbt2.divide(pbt7, 2, BigDecimal.ROUND_HALF_UP).multiply(percent);
+		pbt3 = pbt3.divide(pbt7, 2, BigDecimal.ROUND_HALF_UP).multiply(percent);
+		pbt4 = pbt4.divide(pbt7, 2, BigDecimal.ROUND_HALF_UP).multiply(percent);
+		pbt5 = pbt5.divide(pbt7, 2, BigDecimal.ROUND_HALF_UP).multiply(percent);
+		pbt6 = pbt6.divide(pbt7, 2, BigDecimal.ROUND_HALF_UP).multiply(percent);
+
+
 		// 各帳齡區間比例
-		int pt1 = (int) Math.round((t1 / t7) * 100.00);// 30日以下
-		int pt2 = (int) Math.round((t2 / t7) * 100.00 );// 30~60日
-		int pt3 = (int) Math.round((t3 / t7) * 100.00 );// 60~90日
-		int pt4 = (int) Math.round((t4 / t7) * 100.00 );// 4~6個月
-		int pt5 = (int) Math.round((t5 / t7) * 100.00 );// 7~12個月
-		int pt6 = (int) Math.round((t6 / t7) * 100.00 );// 1年以上
+		int pt1 = pbt1.intValue();// 30日以下
+		int pt2 = pbt2.intValue();// 30~60日
+		int pt3 = pbt3.intValue();// 60~90日
+		int pt4 = pbt4.intValue();// 4~6個月
+		int pt5 = pbt5.intValue();// 7~12個月
+		int pt6 = pbt6.intValue();// 1年以上
 
 		// 比例總和 暫存
-		int t = 0;
+		BigDecimal totalPercent = BigDecimal.ZERO;
+		totalPercent = pbt1.add(pbt2).add(pbt3).add(pbt4).add(pbt5).add(pbt6);
 
-		t = pt1 + pt2 + pt3 + pt4 + pt5 + pt6;
-
+		int t = totalPercent.intValue();
 		int tempT = 0;
 
+		this.info("ttttttt=" + t);
 		// 如果% 總和不滿100%
 		if (t != 100) {
-			tempT = 100 - t;
+			int temp = 0;
+			if (t > 100) {
+				temp = -1;
+			}
+			if (t< 100) {
+				temp = 1;
+			}
+			tempT = Math.abs(100 - t);
+
+			this.info("tempT=" + tempT);
+
 			// 根據排序分配餘數
 			for (int no = 0; no < tempT; no++) {
 				switch (rank[no]) {
 				case 1:
-					pt1 = pt1 + 1;
+					pt1 = pt1 + (1 * temp);
 					break;
 				case 2:
-					pt2 = pt2 + 1;
+					pt2 = pt2 + (1 * temp);
 					break;
 				case 3:
-					pt3 = pt3 + 1;
+					pt3 = pt3 + (1 * temp);
 					break;
 				case 4:
-					pt4 = pt4 + 1;
+					pt4 = pt4 + (1 * temp);
 					break;
 				case 5:
-					pt5 = pt5 + 1;
+					pt5 = pt5 + (1 * temp);
 					break;
 				case 6:
-					pt6 = pt6 + 1;
+					pt6 = pt6 + (1 * temp);
 					break;
 				default:
 					break;
@@ -356,6 +380,7 @@ public class L9713Report extends MakeReport {
 			}
 			// 再所有%總和
 			t = pt1 + pt2 + pt3 + pt4 + pt5 + pt6;
+
 		}
 
 		// 印製各區間比例
@@ -391,21 +416,9 @@ public class L9713Report extends MakeReport {
 
 	}
 
-//	private void tot(int amt) {
-//		double d = 0.00;
-//
-//		t += amt;
-//		// t7為總金額
-//		if (t == t7) {
-//			p = 100 - tp;
-//		} else {
-//			d = Math.round(amt * 100.00 / t7);
-//			p = (int) d;
-//		}
-//		tp += p;
-//	}
 
 	private String showAmt(int amt) {
+
 		if (amt == 0) {
 			return "-";
 		}
@@ -413,6 +426,7 @@ public class L9713Report extends MakeReport {
 	}
 
 	private String showP(int p) {
+
 		return String.valueOf(p) + "％";
 	}
 

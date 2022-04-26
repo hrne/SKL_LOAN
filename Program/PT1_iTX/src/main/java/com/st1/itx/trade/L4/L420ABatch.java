@@ -57,7 +57,7 @@ public class L420ABatch extends TradeBuffer {
 
 	@Autowired
 	public TxBatchCom txBatchCom;
-	
+
 	@Autowired
 	private BaTxCom baTxCom;
 
@@ -329,16 +329,24 @@ public class L420ABatch extends TradeBuffer {
 		// 計算帳務作帳金額
 		lbaTxVo = baTxCom.settleAcAmt(tDetail.getRepayAmt(), lbaTxVo, titaVo);
 
-		for (BaTxVo baTxVo : lbaTxVo) {
+		String facAcctCode = "999";
+		String facAcctItem = "暫收款 ";
+		if (tDetail.getRepayType() >= 1 && tDetail.getRepayType() <= 3) {
+			for (BaTxVo baTxVo : lbaTxVo) {
+				if ("3".equals(baTxVo.getAcctCode().substring(0, 1))) {
+					facAcctCode = baTxVo.getAcctCode();
+					facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
+					break;
+				}
+			}
+		}
+
+		for (
+
+		BaTxVo baTxVo : lbaTxVo) {
 			if (baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0
 					&& baTxVo.getTempAmt().compareTo(BigDecimal.ZERO) == 0) {
 				continue;
-			}
-			String facAcctCode = "999";
-			String facAcctItem = "暫收款 ";
-			if (tDetail.getRepayType() >= 1 && tDetail.getRepayType() <= 3 ) {
-				facAcctCode = baTxVo.getAcctCode();
-				facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
 			}
 			Map<String, String> da = new HashMap<>();
 			da.put("ReconCode", "" + tDetail.getReconCode());
@@ -355,10 +363,11 @@ public class L420ABatch extends TradeBuffer {
 			da.put("CloseReasonCode", tTempVo.getParam("CloseReasonCode"));
 			da.put("IntStartDate", "" + baTxVo.getIntStartDate());
 			da.put("IntEndDate", "" + baTxVo.getIntEndDate());
-			//  本金(A) = 本金 - 本次短繳  + 回收短繳
-			da.put("Principal", "" + baTxVo.getPrincipal().subtract(baTxVo.getUnpaidPrin()).add(baTxVo.getShortfallPrin()));
-			//  利息(B) = 利息 - 本次短繳  + 回收短繳
-			da.put("Interest", "" + baTxVo.getInterest().subtract(baTxVo.getUnpaidInt()).add(baTxVo.getShortfallInt())); 
+			// 本金(A) = 本金 - 本次短繳 + 回收短繳
+			da.put("Principal",
+					"" + baTxVo.getPrincipal().subtract(baTxVo.getUnpaidPrin()).add(baTxVo.getShortfallPrin()));
+			// 利息(B) = 利息 - 本次短繳 + 回收短繳
+			da.put("Interest", "" + baTxVo.getInterest().subtract(baTxVo.getUnpaidInt()).add(baTxVo.getShortfallInt()));
 			da.put("TempPayAmt", "0"); // 暫付款(C)
 			da.put("BreachAmt", "" + baTxVo.getDelayInt().add(baTxVo.getBreachAmt()).add(baTxVo.getCloseBreachAmt())); // 違約金(D)
 			da.put("TempDr",

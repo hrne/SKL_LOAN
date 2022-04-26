@@ -2,6 +2,7 @@ package com.st1.itx.trade.L4;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,38 +68,38 @@ public class L4211Report extends MakeReport {
 		this.setMaxRows(54);
 	}
 
-	int allsumTransferAmt = 0;
-	int allsumMakeferAmt = 0;
-	int allsumPrincipal = 0;
-	int allsumInterest = 0;
-	int allsumPayment = 0;
-	int allsumDamages = 0;
-	int allsumTemporaryLoan = 0;
-	int allsumCollection = 0;
-	int allsumShortPayment = 0;
-	int allsumOthers = 0;
+	BigDecimal allsumTransferAmt = BigDecimal.ZERO;
+	BigDecimal allsumMakeferAmt = BigDecimal.ZERO;
+	BigDecimal allsumPrincipal = BigDecimal.ZERO;
+	BigDecimal allsumInterest = BigDecimal.ZERO;
+	BigDecimal allsumPayment = BigDecimal.ZERO;
+	BigDecimal allsumDamages = BigDecimal.ZERO;
+	BigDecimal allsumTemporaryLoan = BigDecimal.ZERO;
+	BigDecimal allsumCollection = BigDecimal.ZERO;
+	BigDecimal allsumShortPayment = BigDecimal.ZERO;
+	BigDecimal allsumOthers = BigDecimal.ZERO;
 
-	int totalsumTransferAmt = 0;
-	int totalsumMakerferAmt = 0;
-	int totalsumPrincipal = 0;
-	int totalsumInterest = 0;
-	int totalsumPayment = 0;
-	int totalsumDamages = 0;
-	int totalsumTemporaryLoan = 0;
-	int totalsumCollection = 0;
-	int totalsumShortPayment = 0;
-	int totalsumOthers = 0;
+	BigDecimal totalsumTransferAmt = BigDecimal.ZERO;
+	BigDecimal totalsumMakerferAmt = BigDecimal.ZERO;
+	BigDecimal totalsumPrincipal = BigDecimal.ZERO;
+	BigDecimal totalsumInterest = BigDecimal.ZERO;
+	BigDecimal totalsumPayment = BigDecimal.ZERO;
+	BigDecimal totalsumDamages = BigDecimal.ZERO;
+	BigDecimal totalsumTemporaryLoan = BigDecimal.ZERO;
+	BigDecimal totalsumCollection = BigDecimal.ZERO;
+	BigDecimal totalsumShortPayment = BigDecimal.ZERO;
+	BigDecimal totalsumOthers = BigDecimal.ZERO;
 
-	int transferamt = 0;
-	int makeferamt = 0;
-	int principal = 0;
-	int interest = 0;
-	int payment = 0;
-	int damages = 0;
-	int temporaryloan = 0;
-	int collection = 0;
-	int shortpayment = 0;
-	int others = 0;
+	BigDecimal transferamt = BigDecimal.ZERO;
+	BigDecimal makeferamt = BigDecimal.ZERO;
+	BigDecimal principal = BigDecimal.ZERO;
+	BigDecimal interest = BigDecimal.ZERO;
+	BigDecimal payment = BigDecimal.ZERO;
+	BigDecimal damages = BigDecimal.ZERO;
+	BigDecimal temporaryloan = BigDecimal.ZERO;
+	BigDecimal collection = BigDecimal.ZERO;
+	BigDecimal shortpayment = BigDecimal.ZERO;
+	BigDecimal others = BigDecimal.ZERO;
 
 	String acdate = "";
 	String year = "";
@@ -375,16 +376,16 @@ public class L4211Report extends MakeReport {
 			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
 			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = Integer.valueOf(tfnAllList.get("RepayAmt"));
-			makeferamt = Integer.valueOf(tfnAllList.get("AcctAmt"));
-			principal = Integer.valueOf(tfnAllList.get("Principal"));
-			interest = Integer.valueOf(tfnAllList.get("Interest"));
-			payment = Integer.valueOf(tfnAllList.get("TempPayAmt"));
-			damages = Integer.valueOf(tfnAllList.get("BreachAmt"));
-			temporaryloan = Integer.valueOf(tfnAllList.get("TempDr"));
-			collection = Integer.valueOf(tfnAllList.get("TempCr"));
-			shortpayment = Integer.valueOf(tfnAllList.get("Shortfall"));
-			others = Integer.valueOf(tfnAllList.get("Fee"));
+			transferamt = getBigDecimal(tfnAllList.get("RepayAmt"));
+			makeferamt = getBigDecimal(tfnAllList.get("AcctAmt"));
+			principal = getBigDecimal(tfnAllList.get("Principal"));
+			interest = getBigDecimal(tfnAllList.get("Interest"));
+			payment = getBigDecimal(tfnAllList.get("TempPayAmt"));
+			damages = getBigDecimal(tfnAllList.get("BreachAmt"));
+			temporaryloan = getBigDecimal(tfnAllList.get("TempDr"));
+			collection = getBigDecimal(tfnAllList.get("TempCr"));
+			shortpayment = getBigDecimal(tfnAllList.get("Shortfall"));
+			others = getBigDecimal(tfnAllList.get("Fee"));
 			count++;
 
 			// 判斷當前的批號與批次號碼不同
@@ -403,27 +404,27 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
-					totalsumTransferAmt += allsumTransferAmt;
-					totalsumMakerferAmt += allsumMakeferAmt;
-					totalsumPrincipal += allsumPrincipal;
-					totalsumInterest += allsumInterest;
-					totalsumPayment += allsumPayment;
-					totalsumDamages += allsumDamages;
-					totalsumTemporaryLoan += allsumTemporaryLoan;
-					totalsumCollection += allsumCollection;
-					totalsumShortPayment += allsumShortPayment;
-					totalsumOthers += allsumOthers;
+					totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+					totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+					totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+					totalsumInterest = totalsumInterest.add(allsumInterest);
+					totalsumPayment = totalsumPayment.add(allsumPayment);
+					totalsumDamages = totalsumDamages.add(allsumDamages);
+					totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+					totalsumCollection = totalsumCollection.add(allsumCollection);
+					totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+					totalsumOthers = totalsumOthers.add(allsumOthers);
 
-					allsumTransferAmt = 0;
-					allsumMakeferAmt = 0;
-					allsumPrincipal = 0;
-					allsumInterest = 0;
-					allsumPayment = 0;
-					allsumDamages = 0;
-					allsumTemporaryLoan = 0;
-					allsumCollection = 0;
-					allsumShortPayment = 0;
-					allsumOthers = 0;
+					allsumTransferAmt = BigDecimal.ZERO;
+					allsumMakeferAmt = BigDecimal.ZERO;
+					allsumPrincipal = BigDecimal.ZERO;
+					allsumInterest = BigDecimal.ZERO;
+					allsumPayment = BigDecimal.ZERO;
+					allsumDamages = BigDecimal.ZERO;
+					allsumTemporaryLoan = BigDecimal.ZERO;
+					allsumCollection = BigDecimal.ZERO;
+					allsumShortPayment = BigDecimal.ZERO;
+					allsumOthers = BigDecimal.ZERO;
 
 					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
@@ -468,27 +469,27 @@ public class L4211Report extends MakeReport {
 
 						pageCnt = pageCnt + 2;
 
-						totalsumTransferAmt += allsumTransferAmt;
-						totalsumMakerferAmt += allsumMakeferAmt;
-						totalsumPrincipal += allsumPrincipal;
-						totalsumInterest += allsumInterest;
-						totalsumPayment += allsumPayment;
-						totalsumDamages += allsumDamages;
-						totalsumTemporaryLoan += allsumTemporaryLoan;
-						totalsumCollection += allsumCollection;
-						totalsumShortPayment += allsumShortPayment;
-						totalsumOthers += allsumOthers;
+						totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+						totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+						totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+						totalsumInterest = totalsumInterest.add(allsumInterest);
+						totalsumPayment = totalsumPayment.add(allsumPayment);
+						totalsumDamages = totalsumDamages.add(allsumDamages);
+						totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+						totalsumCollection = totalsumCollection.add(allsumCollection);
+						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+						totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						allsumTransferAmt = 0;
-						allsumMakeferAmt = 0;
-						allsumPrincipal = 0;
-						allsumInterest = 0;
-						allsumPayment = 0;
-						allsumDamages = 0;
-						allsumTemporaryLoan = 0;
-						allsumCollection = 0;
-						allsumShortPayment = 0;
-						allsumOthers = 0;
+						allsumTransferAmt = BigDecimal.ZERO;
+						allsumMakeferAmt = BigDecimal.ZERO;
+						allsumPrincipal = BigDecimal.ZERO;
+						allsumInterest = BigDecimal.ZERO;
+						allsumPayment = BigDecimal.ZERO;
+						allsumDamages = BigDecimal.ZERO;
+						allsumTemporaryLoan = BigDecimal.ZERO;
+						allsumCollection = BigDecimal.ZERO;
+						allsumShortPayment = BigDecimal.ZERO;
+						allsumOthers = BigDecimal.ZERO;
 					}
 
 				}
@@ -529,7 +530,7 @@ public class L4211Report extends MakeReport {
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 
-				allsumTransferAmt += transferamt;
+				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
 
@@ -589,15 +590,15 @@ public class L4211Report extends MakeReport {
 				this.print(0, 143, dfTemporaryLoan, "R"); // 暫收借
 			}
 
-			allsumMakeferAmt += makeferamt;
-			allsumPrincipal += principal;
-			allsumInterest += interest;
-			allsumPayment += payment;
-			allsumDamages += damages;
-			allsumTemporaryLoan += temporaryloan;
-			allsumCollection += collection;
-			allsumShortPayment += shortpayment;
-			allsumOthers += others;
+			allsumMakeferAmt = allsumMakeferAmt.add(makeferamt);
+			allsumPrincipal = allsumPrincipal.add(principal);
+			allsumInterest = allsumInterest.add(interest);
+			allsumPayment = allsumPayment.add(payment);
+			allsumDamages = allsumDamages.add(damages);
+			allsumTemporaryLoan = allsumTemporaryLoan.add(temporaryloan);
+			allsumCollection = allsumCollection.add(collection);
+			allsumShortPayment = allsumShortPayment.add(shortpayment);
+			allsumOthers = allsumOthers.add(others);
 
 			// 最後一筆產出
 			if (count == fnAllList.size()) {
@@ -612,16 +613,16 @@ public class L4211Report extends MakeReport {
 
 				atAll();
 
-				totalsumTransferAmt += allsumTransferAmt;
-				totalsumMakerferAmt += allsumMakeferAmt;
-				totalsumPrincipal += allsumPrincipal;
-				totalsumInterest += allsumInterest;
-				totalsumPayment += allsumPayment;
-				totalsumDamages += allsumDamages;
-				totalsumTemporaryLoan += allsumTemporaryLoan;
-				totalsumCollection += allsumCollection;
-				totalsumShortPayment += allsumShortPayment;
-				totalsumOthers += allsumOthers;
+				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+				totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+				totalsumInterest = totalsumInterest.add(allsumInterest);
+				totalsumPayment = totalsumPayment.add(allsumPayment);
+				totalsumDamages = totalsumDamages.add(allsumDamages);
+				totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+				totalsumCollection = totalsumCollection.add(allsumCollection);
+				totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+				totalsumOthers = totalsumOthers.add(allsumOthers);
 
 				this.print(1, 0, "");
 				this.print(1, 0,
@@ -630,27 +631,27 @@ public class L4211Report extends MakeReport {
 
 				totalAll();
 				pageCnt = pageCnt + 4;
-				allsumTransferAmt = 0;
-				allsumMakeferAmt = 0;
-				allsumPrincipal = 0;
-				allsumInterest = 0;
-				allsumPayment = 0;
-				allsumDamages = 0;
-				allsumTemporaryLoan = 0;
-				allsumCollection = 0;
-				allsumShortPayment = 0;
-				allsumOthers = 0;
+				allsumTransferAmt = BigDecimal.ZERO;
+				allsumMakeferAmt = BigDecimal.ZERO;
+				allsumPrincipal = BigDecimal.ZERO;
+				allsumInterest = BigDecimal.ZERO;
+				allsumPayment = BigDecimal.ZERO;
+				allsumDamages = BigDecimal.ZERO;
+				allsumTemporaryLoan = BigDecimal.ZERO;
+				allsumCollection = BigDecimal.ZERO;
+				allsumShortPayment = BigDecimal.ZERO;
+				allsumOthers = BigDecimal.ZERO;
 
-				totalsumTransferAmt = 0;
-				totalsumMakerferAmt = 0;
-				totalsumPrincipal = 0;
-				totalsumInterest = 0;
-				totalsumPayment = 0;
-				totalsumDamages = 0;
-				totalsumTemporaryLoan = 0;
-				totalsumCollection = 0;
-				totalsumShortPayment = 0;
-				totalsumOthers = 0;
+				totalsumTransferAmt = BigDecimal.ZERO;
+				totalsumMakerferAmt = BigDecimal.ZERO;
+				totalsumPrincipal = BigDecimal.ZERO;
+				totalsumInterest = BigDecimal.ZERO;
+				totalsumPayment = BigDecimal.ZERO;
+				totalsumDamages = BigDecimal.ZERO;
+				totalsumTemporaryLoan = BigDecimal.ZERO;
+				totalsumCollection = BigDecimal.ZERO;
+				totalsumShortPayment = BigDecimal.ZERO;
+				totalsumOthers = BigDecimal.ZERO;
 
 				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
 				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
@@ -687,16 +688,16 @@ public class L4211Report extends MakeReport {
 			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
 			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = Integer.valueOf(tfnAllList.get("RepayAmt"));
-			makeferamt = Integer.valueOf(tfnAllList.get("AcctAmt"));
-			principal = Integer.valueOf(tfnAllList.get("Principal"));
-			interest = Integer.valueOf(tfnAllList.get("Interest"));
-			payment = Integer.valueOf(tfnAllList.get("TempPayAmt"));
-			damages = Integer.valueOf(tfnAllList.get("BreachAmt"));
-			temporaryloan = Integer.valueOf(tfnAllList.get("TempDr"));
-			collection = Integer.valueOf(tfnAllList.get("TempCr"));
-			shortpayment = Integer.valueOf(tfnAllList.get("Shortfall"));
-			others = Integer.valueOf(tfnAllList.get("Fee"));
+			transferamt = getBigDecimal(tfnAllList.get("RepayAmt"));
+			makeferamt = getBigDecimal(tfnAllList.get("AcctAmt"));
+			principal = getBigDecimal(tfnAllList.get("Principal"));
+			interest = getBigDecimal(tfnAllList.get("Interest"));
+			payment = getBigDecimal(tfnAllList.get("TempPayAmt"));
+			damages = getBigDecimal(tfnAllList.get("BreachAmt"));
+			temporaryloan = getBigDecimal(tfnAllList.get("TempDr"));
+			collection = getBigDecimal(tfnAllList.get("TempCr"));
+			shortpayment = getBigDecimal(tfnAllList.get("Shortfall"));
+			others = getBigDecimal(tfnAllList.get("Fee"));
 			count++;
 
 			// 判斷當前的批號與批次號碼不同
@@ -715,27 +716,27 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
-					totalsumTransferAmt += allsumTransferAmt;
-					totalsumMakerferAmt += allsumMakeferAmt;
-					totalsumPrincipal += allsumPrincipal;
-					totalsumInterest += allsumInterest;
-					totalsumPayment += allsumPayment;
-					totalsumDamages += allsumDamages;
-					totalsumTemporaryLoan += allsumTemporaryLoan;
-					totalsumCollection += allsumCollection;
-					totalsumShortPayment += allsumShortPayment;
-					totalsumOthers += allsumOthers;
+					totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+					totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+					totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+					totalsumInterest = totalsumInterest.add(allsumInterest);
+					totalsumPayment = totalsumPayment.add(allsumPayment);
+					totalsumDamages = totalsumDamages.add(allsumDamages);
+					totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+					totalsumCollection = totalsumCollection.add(allsumCollection);
+					totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+					totalsumOthers = totalsumOthers.add(allsumOthers);
 
-					allsumTransferAmt = 0;
-					allsumMakeferAmt = 0;
-					allsumPrincipal = 0;
-					allsumInterest = 0;
-					allsumPayment = 0;
-					allsumDamages = 0;
-					allsumTemporaryLoan = 0;
-					allsumCollection = 0;
-					allsumShortPayment = 0;
-					allsumOthers = 0;
+					allsumTransferAmt = BigDecimal.ZERO;
+					allsumMakeferAmt = BigDecimal.ZERO;
+					allsumPrincipal = BigDecimal.ZERO;
+					allsumInterest = BigDecimal.ZERO;
+					allsumPayment = BigDecimal.ZERO;
+					allsumDamages = BigDecimal.ZERO;
+					allsumTemporaryLoan = BigDecimal.ZERO;
+					allsumCollection = BigDecimal.ZERO;
+					allsumShortPayment = BigDecimal.ZERO;
+					allsumOthers = BigDecimal.ZERO;
 
 					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
@@ -781,27 +782,27 @@ public class L4211Report extends MakeReport {
 
 						pageCnt = pageCnt + 2;
 
-						totalsumTransferAmt += allsumTransferAmt;
-						totalsumMakerferAmt += allsumMakeferAmt;
-						totalsumPrincipal += allsumPrincipal;
-						totalsumInterest += allsumInterest;
-						totalsumPayment += allsumPayment;
-						totalsumDamages += allsumDamages;
-						totalsumTemporaryLoan += allsumTemporaryLoan;
-						totalsumCollection += allsumCollection;
-						totalsumShortPayment += allsumShortPayment;
-						totalsumOthers += allsumOthers;
+						totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+						totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+						totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+						totalsumInterest = totalsumInterest.add(allsumInterest);
+						totalsumPayment = totalsumPayment.add(allsumPayment);
+						totalsumDamages = totalsumDamages.add(allsumDamages);
+						totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+						totalsumCollection = totalsumCollection.add(allsumCollection);
+						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+						totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						allsumTransferAmt = 0;
-						allsumMakeferAmt = 0;
-						allsumPrincipal = 0;
-						allsumInterest = 0;
-						allsumPayment = 0;
-						allsumDamages = 0;
-						allsumTemporaryLoan = 0;
-						allsumCollection = 0;
-						allsumShortPayment = 0;
-						allsumOthers = 0;
+						allsumTransferAmt = BigDecimal.ZERO;
+						allsumMakeferAmt = BigDecimal.ZERO;
+						allsumPrincipal = BigDecimal.ZERO;
+						allsumInterest = BigDecimal.ZERO;
+						allsumPayment = BigDecimal.ZERO;
+						allsumDamages = BigDecimal.ZERO;
+						allsumTemporaryLoan = BigDecimal.ZERO;
+						allsumCollection = BigDecimal.ZERO;
+						allsumShortPayment = BigDecimal.ZERO;
+						allsumOthers = BigDecimal.ZERO;
 					}
 
 				}
@@ -841,7 +842,7 @@ public class L4211Report extends MakeReport {
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 
-				allsumTransferAmt += transferamt;
+				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
 
@@ -901,15 +902,15 @@ public class L4211Report extends MakeReport {
 				this.print(0, 143, dfTemporaryLoan, "R"); // 暫收借
 			}
 
-			allsumMakeferAmt += makeferamt;
-			allsumPrincipal += principal;
-			allsumInterest += interest;
-			allsumPayment += payment;
-			allsumDamages += damages;
-			allsumTemporaryLoan += temporaryloan;
-			allsumCollection += collection;
-			allsumShortPayment += shortpayment;
-			allsumOthers += others;
+			allsumMakeferAmt = allsumMakeferAmt.add(makeferamt);
+			allsumPrincipal = allsumPrincipal.add(principal);
+			allsumInterest = allsumInterest.add(interest);
+			allsumPayment = allsumPayment.add(payment);
+			allsumDamages = allsumDamages.add(damages);
+			allsumTemporaryLoan = allsumTemporaryLoan.add(temporaryloan);
+			allsumCollection = allsumCollection.add(collection);
+			allsumShortPayment = allsumShortPayment.add(shortpayment);
+			allsumOthers = allsumOthers.add(others);
 
 			// 最後一筆產出
 			if (count == fnAllList.size()) {
@@ -924,16 +925,16 @@ public class L4211Report extends MakeReport {
 
 				atAll();
 
-				totalsumTransferAmt += allsumTransferAmt;
-				totalsumMakerferAmt += allsumMakeferAmt;
-				totalsumPrincipal += allsumPrincipal;
-				totalsumInterest += allsumInterest;
-				totalsumPayment += allsumPayment;
-				totalsumDamages += allsumDamages;
-				totalsumTemporaryLoan += allsumTemporaryLoan;
-				totalsumCollection += allsumCollection;
-				totalsumShortPayment += allsumShortPayment;
-				totalsumOthers += allsumOthers;
+				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+				totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+				totalsumInterest = totalsumInterest.add(allsumInterest);
+				totalsumPayment = totalsumPayment.add(allsumPayment);
+				totalsumDamages = totalsumDamages.add(allsumDamages);
+				totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+				totalsumCollection = totalsumCollection.add(allsumCollection);
+				totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+				totalsumOthers = totalsumOthers.add(allsumOthers);
 
 				this.print(1, 0, "");
 				this.print(1, 0,
@@ -942,27 +943,27 @@ public class L4211Report extends MakeReport {
 
 				totalAll();
 				pageCnt = pageCnt + 4;
-				allsumTransferAmt = 0;
-				allsumMakeferAmt = 0;
-				allsumPrincipal = 0;
-				allsumInterest = 0;
-				allsumPayment = 0;
-				allsumDamages = 0;
-				allsumTemporaryLoan = 0;
-				allsumCollection = 0;
-				allsumShortPayment = 0;
-				allsumOthers = 0;
+				allsumTransferAmt = BigDecimal.ZERO;
+				allsumMakeferAmt = BigDecimal.ZERO;
+				allsumPrincipal = BigDecimal.ZERO;
+				allsumInterest = BigDecimal.ZERO;
+				allsumPayment = BigDecimal.ZERO;
+				allsumDamages = BigDecimal.ZERO;
+				allsumTemporaryLoan = BigDecimal.ZERO;
+				allsumCollection = BigDecimal.ZERO;
+				allsumShortPayment = BigDecimal.ZERO;
+				allsumOthers = BigDecimal.ZERO;
 
-				totalsumTransferAmt = 0;
-				totalsumMakerferAmt = 0;
-				totalsumPrincipal = 0;
-				totalsumInterest = 0;
-				totalsumPayment = 0;
-				totalsumDamages = 0;
-				totalsumTemporaryLoan = 0;
-				totalsumCollection = 0;
-				totalsumShortPayment = 0;
-				totalsumOthers = 0;
+				totalsumTransferAmt = BigDecimal.ZERO;
+				totalsumMakerferAmt = BigDecimal.ZERO;
+				totalsumPrincipal = BigDecimal.ZERO;
+				totalsumInterest = BigDecimal.ZERO;
+				totalsumPayment = BigDecimal.ZERO;
+				totalsumDamages = BigDecimal.ZERO;
+				totalsumTemporaryLoan = BigDecimal.ZERO;
+				totalsumCollection = BigDecimal.ZERO;
+				totalsumShortPayment = BigDecimal.ZERO;
+				totalsumOthers = BigDecimal.ZERO;
 
 				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
 				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
@@ -995,16 +996,16 @@ public class L4211Report extends MakeReport {
 			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
 			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = Integer.valueOf(tfnAllList.get("RepayAmt"));
-			makeferamt = Integer.valueOf(tfnAllList.get("AcctAmt"));
-			principal = Integer.valueOf(tfnAllList.get("Principal"));
-			interest = Integer.valueOf(tfnAllList.get("Interest"));
-			payment = Integer.valueOf(tfnAllList.get("TempPayAmt"));
-			damages = Integer.valueOf(tfnAllList.get("BreachAmt"));
-			temporaryloan = Integer.valueOf(tfnAllList.get("TempDr"));
-			collection = Integer.valueOf(tfnAllList.get("TempCr"));
-			shortpayment = Integer.valueOf(tfnAllList.get("Shortfall"));
-			others = Integer.valueOf(tfnAllList.get("Fee"));
+			transferamt = getBigDecimal(tfnAllList.get("RepayAmt"));
+			makeferamt = getBigDecimal(tfnAllList.get("AcctAmt"));
+			principal = getBigDecimal(tfnAllList.get("Principal"));
+			interest = getBigDecimal(tfnAllList.get("Interest"));
+			payment = getBigDecimal(tfnAllList.get("TempPayAmt"));
+			damages = getBigDecimal(tfnAllList.get("BreachAmt"));
+			temporaryloan = getBigDecimal(tfnAllList.get("TempDr"));
+			collection = getBigDecimal(tfnAllList.get("TempCr"));
+			shortpayment = getBigDecimal(tfnAllList.get("Shortfall"));
+			others = getBigDecimal(tfnAllList.get("Fee"));
 			count++;
 
 			// 判斷當前的批號與批次號碼不同
@@ -1023,27 +1024,27 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
-					totalsumTransferAmt += allsumTransferAmt;
-					totalsumMakerferAmt += allsumMakeferAmt;
-					totalsumPrincipal += allsumPrincipal;
-					totalsumInterest += allsumInterest;
-					totalsumPayment += allsumPayment;
-					totalsumDamages += allsumDamages;
-					totalsumTemporaryLoan += allsumTemporaryLoan;
-					totalsumCollection += allsumCollection;
-					totalsumShortPayment += allsumShortPayment;
-					totalsumOthers += allsumOthers;
+					totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+					totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+					totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+					totalsumInterest = totalsumInterest.add(allsumInterest);
+					totalsumPayment = totalsumPayment.add(allsumPayment);
+					totalsumDamages = totalsumDamages.add(allsumDamages);
+					totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+					totalsumCollection = totalsumCollection.add(allsumCollection);
+					totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+					totalsumOthers = totalsumOthers.add(allsumOthers);
 
-					allsumTransferAmt = 0;
-					allsumMakeferAmt = 0;
-					allsumPrincipal = 0;
-					allsumInterest = 0;
-					allsumPayment = 0;
-					allsumDamages = 0;
-					allsumTemporaryLoan = 0;
-					allsumCollection = 0;
-					allsumShortPayment = 0;
-					allsumOthers = 0;
+					allsumTransferAmt = BigDecimal.ZERO;
+					allsumMakeferAmt = BigDecimal.ZERO;
+					allsumPrincipal = BigDecimal.ZERO;
+					allsumInterest = BigDecimal.ZERO;
+					allsumPayment = BigDecimal.ZERO;
+					allsumDamages = BigDecimal.ZERO;
+					allsumTemporaryLoan = BigDecimal.ZERO;
+					allsumCollection = BigDecimal.ZERO;
+					allsumShortPayment = BigDecimal.ZERO;
+					allsumOthers = BigDecimal.ZERO;
 
 					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
@@ -1089,27 +1090,27 @@ public class L4211Report extends MakeReport {
 
 						pageCnt = pageCnt + 2;
 
-						totalsumTransferAmt += allsumTransferAmt;
-						totalsumMakerferAmt += allsumMakeferAmt;
-						totalsumPrincipal += allsumPrincipal;
-						totalsumInterest += allsumInterest;
-						totalsumPayment += allsumPayment;
-						totalsumDamages += allsumDamages;
-						totalsumTemporaryLoan += allsumTemporaryLoan;
-						totalsumCollection += allsumCollection;
-						totalsumShortPayment += allsumShortPayment;
-						totalsumOthers += allsumOthers;
+						totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+						totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+						totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+						totalsumInterest = totalsumInterest.add(allsumInterest);
+						totalsumPayment = totalsumPayment.add(allsumPayment);
+						totalsumDamages = totalsumDamages.add(allsumDamages);
+						totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+						totalsumCollection = totalsumCollection.add(allsumCollection);
+						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+						totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						allsumTransferAmt = 0;
-						allsumMakeferAmt = 0;
-						allsumPrincipal = 0;
-						allsumInterest = 0;
-						allsumPayment = 0;
-						allsumDamages = 0;
-						allsumTemporaryLoan = 0;
-						allsumCollection = 0;
-						allsumShortPayment = 0;
-						allsumOthers = 0;
+						allsumTransferAmt = BigDecimal.ZERO;
+						allsumMakeferAmt = BigDecimal.ZERO;
+						allsumPrincipal = BigDecimal.ZERO;
+						allsumInterest = BigDecimal.ZERO;
+						allsumPayment = BigDecimal.ZERO;
+						allsumDamages = BigDecimal.ZERO;
+						allsumTemporaryLoan = BigDecimal.ZERO;
+						allsumCollection = BigDecimal.ZERO;
+						allsumShortPayment = BigDecimal.ZERO;
+						allsumOthers = BigDecimal.ZERO;
 					}
 
 				}
@@ -1149,7 +1150,7 @@ public class L4211Report extends MakeReport {
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 
-				allsumTransferAmt += transferamt;
+				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
 
@@ -1209,15 +1210,15 @@ public class L4211Report extends MakeReport {
 				this.print(0, 143, dfTemporaryLoan, "R"); // 暫收借
 			}
 
-			allsumMakeferAmt += makeferamt;
-			allsumPrincipal += principal;
-			allsumInterest += interest;
-			allsumPayment += payment;
-			allsumDamages += damages;
-			allsumTemporaryLoan += temporaryloan;
-			allsumCollection += collection;
-			allsumShortPayment += shortpayment;
-			allsumOthers += others;
+			allsumMakeferAmt = allsumMakeferAmt.add(makeferamt);
+			allsumPrincipal = allsumPrincipal.add(principal);
+			allsumInterest = allsumInterest.add(interest);
+			allsumPayment = allsumPayment.add(payment);
+			allsumDamages = allsumDamages.add(damages);
+			allsumTemporaryLoan = allsumTemporaryLoan.add(temporaryloan);
+			allsumCollection = allsumCollection.add(collection);
+			allsumShortPayment = allsumShortPayment.add(shortpayment);
+			allsumOthers = allsumOthers.add(others);
 
 			// 最後一筆產出
 			if (count == fnAllList.size()) {
@@ -1232,17 +1233,17 @@ public class L4211Report extends MakeReport {
 
 				atAll();
 
-				totalsumTransferAmt += allsumTransferAmt;
-				totalsumMakerferAmt += allsumMakeferAmt;
-				totalsumPrincipal += allsumPrincipal;
-				totalsumInterest += allsumInterest;
-				totalsumPayment += allsumPayment;
-				totalsumDamages += allsumDamages;
-				totalsumTemporaryLoan += allsumTemporaryLoan;
-				totalsumCollection += allsumCollection;
-				totalsumShortPayment += allsumShortPayment;
-				totalsumOthers += allsumOthers;
-
+				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+				totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+				totalsumInterest = totalsumInterest.add(allsumInterest);
+				totalsumPayment = totalsumPayment.add(allsumPayment);
+				totalsumDamages = totalsumDamages.add(allsumDamages);
+				totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+				totalsumCollection = totalsumCollection.add(allsumCollection);
+				totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+				totalsumOthers = totalsumOthers.add(allsumOthers);
+				
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -1250,27 +1251,27 @@ public class L4211Report extends MakeReport {
 
 				totalAll();
 				pageCnt = pageCnt + 4;
-				allsumTransferAmt = 0;
-				allsumMakeferAmt = 0;
-				allsumPrincipal = 0;
-				allsumInterest = 0;
-				allsumPayment = 0;
-				allsumDamages = 0;
-				allsumTemporaryLoan = 0;
-				allsumCollection = 0;
-				allsumShortPayment = 0;
-				allsumOthers = 0;
+				allsumTransferAmt = BigDecimal.ZERO;
+				allsumMakeferAmt = BigDecimal.ZERO;
+				allsumPrincipal = BigDecimal.ZERO;
+				allsumInterest = BigDecimal.ZERO;
+				allsumPayment = BigDecimal.ZERO;
+				allsumDamages = BigDecimal.ZERO;
+				allsumTemporaryLoan = BigDecimal.ZERO;
+				allsumCollection = BigDecimal.ZERO;
+				allsumShortPayment = BigDecimal.ZERO;
+				allsumOthers = BigDecimal.ZERO;
 
-				totalsumTransferAmt = 0;
-				totalsumMakerferAmt = 0;
-				totalsumPrincipal = 0;
-				totalsumInterest = 0;
-				totalsumPayment = 0;
-				totalsumDamages = 0;
-				totalsumTemporaryLoan = 0;
-				totalsumCollection = 0;
-				totalsumShortPayment = 0;
-				totalsumOthers = 0;
+				totalsumTransferAmt = BigDecimal.ZERO;
+				totalsumMakerferAmt = BigDecimal.ZERO;
+				totalsumPrincipal = BigDecimal.ZERO;
+				totalsumInterest = BigDecimal.ZERO;
+				totalsumPayment = BigDecimal.ZERO;
+				totalsumDamages = BigDecimal.ZERO;
+				totalsumTemporaryLoan = BigDecimal.ZERO;
+				totalsumCollection = BigDecimal.ZERO;
+				totalsumShortPayment = BigDecimal.ZERO;
+				totalsumOthers = BigDecimal.ZERO;
 
 				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
 				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
@@ -1281,113 +1282,89 @@ public class L4211Report extends MakeReport {
 
 	private void atAll() {
 
-		if (allsumTransferAmt != 0) {
-			this.print(0, 29, String.format("%,d", allsumTransferAmt), "R");
-		} else {
-			this.print(0, 29, "");
-		}
-		if (allsumMakeferAmt != 0) {
-			this.print(0, 40, String.format("%,d", allsumMakeferAmt), "R");
-		} else {
-			this.print(0, 40, "");
+		if (allsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 29, formatAmt(allsumTransferAmt, 0), "R");
+		} 
+		
+		if (allsumMakeferAmt.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 40, formatAmt(allsumMakeferAmt, 0), "R");
 		}
 
-		if (allsumPrincipal != 0) {
-			this.print(0, 103, String.format("%,d", allsumPrincipal), "R");
-		} else {
-			this.print(0, 103, "");
+		if (allsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 103, formatAmt(allsumPrincipal, 0), "R");
 		}
-		if (allsumPayment != 0) {
-			this.print(0, 121, String.format("%,d", allsumPayment), "R");
-		} else {
-			this.print(0, 121, "");
+		
+		if (allsumPayment.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 121, formatAmt(allsumPayment, 0), "R");
 		}
-		if (allsumDamages != 0) {
-			this.print(0, 131, String.format("%,d", allsumDamages), "R");
-		} else {
-			this.print(0, 131, "");
+		
+		if (allsumDamages.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 131, formatAmt(allsumDamages, 0), "R");
 		}
-		if (allsumTemporaryLoan != 0) {
-			this.print(0, 143, String.format("%,d", allsumTemporaryLoan), "R");
-		} else {
-			this.print(0, 143, "");
+		
+		if (allsumTemporaryLoan.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 143, formatAmt(allsumTemporaryLoan, 0), "R");
 		}
-		if (allsumShortPayment != 0) {
-			this.print(0, 160, String.format("%,d", allsumShortPayment), "R");
-		} else {
-			this.print(0, 160, "");
+		
+		if (allsumShortPayment.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 160, formatAmt(allsumShortPayment, 0), "R");
 		}
-		if (allsumOthers != 0) {
-			this.print(0, 167, String.format("%,d", allsumOthers), "R");
-		} else {
-			this.print(0, 167, "");
+		
+		if (allsumOthers.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 167, formatAmt(allsumOthers, 0), "R");
 		}
-		if (allsumInterest != 0) {
-			this.print(1, 112, String.format("%,d", allsumInterest), "R");
-		} else {
-			this.print(1, 112, "");
+		
+		if (allsumInterest.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(1, 112, formatAmt(allsumInterest, 0), "R");
 		}
-		if (allsumCollection != 0) {
-			this.print(0, 151, String.format("%,d", allsumCollection), "R");
-		} else {
-			this.print(0, 151, "");
+		
+		if (allsumCollection.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 151, formatAmt(allsumCollection, 0), "R");
 		}
 
 	}
 
 	private void totalAll() {
 
-		if (totalsumTransferAmt != 0) {
-			this.print(0, 29, String.format("%,d", totalsumTransferAmt), "R");
-		} else {
-			this.print(0, 29, "");
+		if (totalsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 29, formatAmt(totalsumTransferAmt, 0), "R");
 		}
-		if (totalsumMakerferAmt != 0) {
-			this.print(0, 40, String.format("%,d", totalsumMakerferAmt), "R");
-		} else {
-			this.print(0, 40, "");
+		
+		if (totalsumMakerferAmt.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 40, formatAmt(totalsumMakerferAmt, 0), "R");
 		}
-
-		if (totalsumPrincipal != 0) {
-			this.print(0, 103, String.format("%,d", totalsumPrincipal), "R");
-		} else {
-			this.print(0, 103, "");
+		if (totalsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 103, formatAmt(totalsumPrincipal, 0), "R");
 		}
-		if (totalsumPayment != 0) {
-			this.print(0, 121, String.format("%,d", totalsumPayment), "R");
-		} else {
-			this.print(0, 121, "");
+		
+		if (totalsumPayment.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 121, formatAmt(totalsumPayment, 0), "R");
 		}
-		if (totalsumDamages != 0) {
-			this.print(0, 131, String.format("%,d", totalsumDamages), "R");
-		} else {
-			this.print(0, 131, "");
+		
+		if (totalsumDamages.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 131, formatAmt(totalsumDamages, 0), "R");
 		}
-		if (totalsumTemporaryLoan != 0) {
-			this.print(0, 143, String.format("%,d", totalsumTemporaryLoan), "R");
-		} else {
-			this.print(0, 143, "");
+		
+		if (totalsumTemporaryLoan.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 143, formatAmt(totalsumTemporaryLoan, 0), "R");
 		}
-		if (totalsumShortPayment != 0) {
-			this.print(0, 160, String.format("%,d", totalsumShortPayment), "R");
-		} else {
-			this.print(0, 160, "");
+		
+		if (totalsumShortPayment.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 160, formatAmt(totalsumShortPayment, 0), "R");
 		}
-		if (totalsumOthers != 0) {
-			this.print(0, 167, String.format("%,d", totalsumOthers), "R");
-		} else {
-			this.print(0, 167, "");
+		
+		if (totalsumOthers.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 167, formatAmt(totalsumOthers, 0), "R");
 		}
-		if (totalsumInterest != 0) {
-			this.print(1, 112, String.format("%,d", totalsumInterest), "R");
-		} else {
-			this.print(1, 112, "");
+		
+		if (totalsumInterest.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(1, 112, formatAmt(totalsumInterest, 0), "R");
 		}
-		if (totalsumCollection != 0) {
-			this.print(0, 151, String.format("%,d", totalsumCollection), "R");
-		} else {
-			this.print(0, 151, "");
+		
+		if (totalsumCollection.compareTo(BigDecimal.ZERO) != 0) {
+			this.print(0, 151, formatAmt(totalsumCollection, 0), "R");
 		}
+		
 
 	}
 

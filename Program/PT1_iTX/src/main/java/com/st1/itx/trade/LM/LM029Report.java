@@ -97,7 +97,7 @@ public class LM029Report extends MakeReport {
 						makeExcel.setValue(row, 4, fieldValue, "L"); // 帳冊別
 						break;
 					case 17:
-						makeExcel.setValue(row, col + 1, fieldValue, "L"); // 餘期數
+						makeExcel.setValue(row, col, fieldValue, "L"); // 餘期數
 						break;
 					default:
 						makeExcel.setValue(row, col + 1, fieldValue, "L");

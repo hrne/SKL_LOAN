@@ -51,7 +51,7 @@ public class L9705Form extends MakeReport {
 		
 		String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
 		
-		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "B", "存入憑條", "cm,20,9.31333", "P");
+		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode().isEmpty() ? "L9705B" : tran + "C", "存入憑條", "cm,20,9.31333", "P");
 
 		if (l9705List.size() > 0) {
 
@@ -175,10 +175,12 @@ public class L9705Form extends MakeReport {
 						// 本金
 						// 利息
 						// 未還本金餘額
+						// -溢短繳
+						// +帳管費
 						BigDecimal bBreachAmt = breachAmt.get(payIntDate);
 						BigDecimal bPrincipal = principal.get(payIntDate);
 						BigDecimal bInterest = interest.get(payIntDate);
-						BigDecimal bSummry = bBreachAmt.add(bPrincipal.add(bInterest));
+						BigDecimal bSummry = bBreachAmt.add(bPrincipal).add(bInterest).subtract(unPaidAmt).add(acctFee);
 
 						loanBal = loanBal.subtract(bPrincipal);
 
@@ -229,7 +231,7 @@ public class L9705Form extends MakeReport {
 
 			}
 		} else {
-			this.setRptItem("存入憑條通知單(無符合資料)");
+			this.setRptItem("存入憑條(無符合資料)");
 			printCm(1, 4, "【無符合資料】");
 		}
 		

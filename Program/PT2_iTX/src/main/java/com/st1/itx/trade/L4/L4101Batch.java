@@ -115,6 +115,8 @@ public class L4101Batch extends TradeBuffer {
 	@Autowired
 	L4101ReportC l4101ReportC;
 	@Autowired
+	L4101ReportD l4101ReportD;
+	@Autowired
 	L4101Vo l4101Vo;
 
 	@Value("${iTXOutFolder}")
@@ -252,6 +254,9 @@ public class L4101Batch extends TradeBuffer {
 //			3.傳票明細表
 		doRptC(titaVo);
 
+//		4.撥款未齊件表
+	    doRptD(titaVo);
+	
 		String checkMsg = "撥款匯款產檔已完成。   批號 = " + batchNo;
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4101",
@@ -581,4 +586,24 @@ public class L4101Batch extends TradeBuffer {
 
 	}
 
+	public void doRptD(TitaVo titaVo) throws LogicException {
+		this.info("L411D doRpt started.");
+		l4101ReportD.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+
+		l4101ReportD.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l4101ReportD.exec(titaVo);
+
+		// 寫產檔記錄到TxReport
+		long rptNod = l4101ReportD.close();
+
+		// 產生PDF檔案
+		l4101ReportD.toPdf(rptNod);
+
+		this.info("L411D doRpt finished.");
+
+	}
+	
 }
