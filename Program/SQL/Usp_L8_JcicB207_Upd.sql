@@ -160,7 +160,7 @@ BEGIN
              WHEN NVL(WK."DrawdownDate",0) > 0                    THEN TRUNC((WK."DrawdownDate" - 19110000) / 100)
              ELSE 0
            END                                   AS "IncomeDataDate"    -- 年收入資料年月 (民國)
-         , DECODE(C."Sex",'1','M','2','F',' ')   AS "Sex"               -- 性別
+         , DECODE(C."Sex",'1','M','2','F','F')   AS "Sex"               -- 性別,若代碼非1或2則值放F
          , NVL(C."NationalityCode",'TW')         AS "NationalityCode"   -- 國籍
          , CASE
              WHEN SUBSTR(C."CustId",1,8) BETWEEN '00000000' AND '99999999'

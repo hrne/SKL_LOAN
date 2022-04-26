@@ -49,6 +49,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"TitaTlrNo\"";
 		sql += "        , \"TitaTxtNo\"";
 		sql += "        , \"RepaidPeriod\" ";
+		sql += "        , \"OtherFields\" ";
 		sql += "   FROM \"LoanBorTx\"";
 		sql += "   WHERE \"AcDate\" = :inputAcDate";
 		sql += "     AND \"TitaHCode\" = 0";
@@ -61,6 +62,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"TitaTlrNo\"";
 		sql += "          , \"TitaTxtNo\"";
 		sql += "          , \"RepaidPeriod\"";
+		sql += "          , \"OtherFields\" ";
 		sql += " )";
 		sql += ", TX2 AS (";
 		// 將戶號下相同計息起迄日的明細金額加總
@@ -73,6 +75,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"TitaTlrNo\"";
 		sql += "        , \"TitaTxtNo\"";
 		sql += "        , \"RepaidPeriod\" ";
+		sql += "        , \"OtherFields\" ";
 		sql += "        , SUM(\"TxAmt\")           AS \"TxAmt\"";
 		sql += "        , SUM(\"Principal\")       AS \"Principal\"";
 		sql += "        , SUM(\"Interest\")        AS \"Interest\"";
@@ -98,6 +101,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"TitaTlrNo\"";
 		sql += "          , \"TitaTxtNo\"";
 		sql += "          , \"RepaidPeriod\" ";
+		sql += "          , \"OtherFields\" ";
 		sql += " )";
 		sql += " SELECT BATX.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 		sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
@@ -147,7 +151,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
 		sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 		sql += "    , NVL(TX1.\"RepaidPeriod\", 0) AS \"RepaidPeriod\" ";
-		sql += "    , '  ' AS \"CloseReasonCode\" ";
+		sql += "    , NVL(JSON_VALUE(TX1.\"OtherFields\", '$.AdvanceCloseCode'), '  ') AS \"CloseReasonCode\" ";
 		sql += " FROM \"BatxDetail\" BATX";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 		sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
@@ -163,6 +167,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
 		sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
 		sql += "            AND TX2.\"RepaidPeriod\" = TX1.\"RepaidPeriod\" ";
+		sql += "            AND TX2.\"OtherFields\" = TX1.\"OtherFields\" ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 		sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 		sql += " WHERE BATX.\"AcDate\" = :inputAcDate";

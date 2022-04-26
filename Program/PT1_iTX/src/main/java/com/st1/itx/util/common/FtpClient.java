@@ -23,7 +23,7 @@ import com.st1.itx.tradeService.CommBuffer;
 public class FtpClient extends CommBuffer {
 
 	private FTPClient ftp;
-	private Boolean isSendingFile;
+	private Boolean isSendingFile = false;
 
 	/**
 	 * 取得目前連接的 FTP 伺服器位置。<br>

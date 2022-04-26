@@ -69,33 +69,33 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "WHERE A.\"AcDate\" = :AcDate ";
 
 		if (!iBranchNo.isEmpty()) {
-			sql += "AND \"BranchNo\" = :BranchNo ";
+			sql += "AND A.\"BranchNo\" = :BranchNo ";
 		}
 		if (!iCurrencyCode.isEmpty()) {
-			sql += "AND \"CurrencyCode\" = :CurrencyCode ";
+			sql += "AND A.\"CurrencyCode\" = :CurrencyCode ";
 		}
 		if (!iAcBookCode.isEmpty()) {
-			sql += "AND \"AcBookCode\" = :AcBookCode ";
+			sql += "AND A.\"AcBookCode\" = :AcBookCode ";
 		}
 		if (!iAcSubBookCode.isEmpty()) {
-			sql += "AND \"AcSubBookCode\" = :AcSubBookCode ";
+			sql += "AND A.\"AcSubBookCode\" = :AcSubBookCode ";
 		}
 		if (!iAcNoCode.isEmpty()) {
-			sql += "AND \"AcNoCode\" = :AcNoCode ";
+			sql += "AND A.\"AcNoCode\" = :AcNoCode ";
 		}
 		if (!iAcSubCode.isEmpty()) {
-			sql += "AND \"AcSubCode\" = :AcSubCode ";
+			sql += "AND A.\"AcSubCode\" = :AcSubCode ";
 		}
 		if (!iAcDtlCode.isEmpty()) {
-			sql += "AND \"AcDtlCode\" = :AcDtlCode ";
+			sql += "AND A.\"AcDtlCode\" = :AcDtlCode ";
 		}
 		if (!iRvNo.isEmpty()) {
-			sql += "AND \"RvNo\" like :RvNo ";
+			sql += "AND A.\"RvNo\" like :RvNo ";
 		}
 		if ("1".equals(iDbCr)) {
-			sql += "AND \"DbCr\"='D' ";
+			sql += "AND A.\"DbCr\"='D' ";
 		} else if ("2".equals(iDbCr)) {
-			sql += "AND \"DbCr\"='C' ";
+			sql += "AND A.\"DbCr\"='C' ";
 		}
 		if (iInqType == 0) {
 			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\" ";

@@ -532,7 +532,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "　　　　　　　　　　　　　　             AS F44計件代碼 ";
 		sql += "      , \"Fn_GetEmpName\"(FAC.\"FireOfficer\",1) ";
 		sql += "                                       AS F45火險服務姓名 ";
-		sql += "      , \"Fn_GetEmpName\"(FAC.\"LoanOfficer\",1) ";
+		sql += "      , \"Fn_GetEmpName\"(NVL(FAC.\"LoanOfficer\",FC.\"LoanOfficer\"),1) ";
 		sql += "                                       AS F46放款專員 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ApprovedLevel\" = '9' ";

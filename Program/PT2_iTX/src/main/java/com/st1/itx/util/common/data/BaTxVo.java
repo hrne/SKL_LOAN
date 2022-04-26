@@ -144,10 +144,51 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	private BigDecimal breachAmt = BigDecimal.ZERO;
 
 	/**
+	 * 短繳本金
+	 */
+	private BigDecimal unpaidPrin = BigDecimal.ZERO;
+
+	/**
+	 * 短繳利息
+	 */
+	private BigDecimal unpaidInt = BigDecimal.ZERO;
+
+	/**
 	 * 短繳清償違約金
 	 */
 	private BigDecimal closeBreachAmt = BigDecimal.ZERO;
-	
+
+
+	/**
+	 * 回收短繳本金
+	 */
+	private BigDecimal shortfallPrin = BigDecimal.ZERO;
+
+	/**
+	 * 回收短繳利息
+	 */
+	private BigDecimal shortfallInt = BigDecimal.ZERO;
+
+	/**
+	 * 費用金額
+	 */
+	private BigDecimal feeAmt = BigDecimal.ZERO;
+
+	/**
+	 * 暫收款金額(暫收借(-)、暫收貸(+))
+	 */
+	private BigDecimal tempAmt = BigDecimal.ZERO;
+
+	/**
+	 * 交易金額
+	 */
+	private BigDecimal TxAmt = BigDecimal.ZERO;
+
+	/**
+	 * 作帳金額
+	 */
+	private BigDecimal AcAmt = BigDecimal.ZERO;
+
 	/**
 	 * 還款後餘額
 	 */
@@ -176,8 +217,10 @@ public class BaTxVo implements Comparable<BaTxVo> {
 				+ repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", acctAmt=" + acctAmt + ", loanBal="
 				+ loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate
 				+ ", amount=" + amount + ", intRate=" + intRate + ", principal=" + principal + ", interest=" + interest
-				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt
-				+ ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
+				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", unpaidPrin=" + unpaidPrin + ", unpaidInt="
+				+ unpaidInt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt
+				+ ", TxAmt=" + TxAmt + ", AcAmt=" + AcAmt + ", loanBalPaid=" + loanBalPaid + ", rateIncr=" + rateIncr
+				+ ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
 	}
 
 	public int getDataKind() {
@@ -372,12 +415,76 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		this.breachAmt = breachAmt;
 	}
 
+	public BigDecimal getUnpaidPrin() {
+		return unpaidPrin;
+	}
+
+	public void setUnpaidPrin(BigDecimal unpaidPrin) {
+		this.unpaidPrin = unpaidPrin;
+	}
+
+	public BigDecimal getUnpaidInt() {
+		return unpaidInt;
+	}
+
+	public void setUnpaidInt(BigDecimal unpaidInt) {
+		this.unpaidInt = unpaidInt;
+	}
+
 	public BigDecimal getCloseBreachAmt() {
 		return closeBreachAmt;
 	}
 
 	public void setCloseBreachAmt(BigDecimal closeBreachAmt) {
 		this.closeBreachAmt = closeBreachAmt;
+	}
+	
+	public BigDecimal getShortfallPrin() {
+		return shortfallPrin;
+	}
+
+	public void setShortfallPrin(BigDecimal shortfallPrin) {
+		this.shortfallPrin = shortfallPrin;
+	}
+
+	public BigDecimal getShortfallInt() {
+		return shortfallInt;
+	}
+
+	public void setShortfallInt(BigDecimal shortfallInt) {
+		this.shortfallInt = shortfallInt;
+	}
+
+	public BigDecimal getFeeAmt() {
+		return feeAmt;
+	}
+
+	public void setFeeAmt(BigDecimal feeAmt) {
+		this.feeAmt = feeAmt;
+	}
+
+	public BigDecimal getTempAmt() {
+		return tempAmt;
+	}
+
+	public void setTempAmt(BigDecimal tempAmt) {
+		this.tempAmt = tempAmt;
+	}
+
+	public BigDecimal getTxAmt() {
+		return TxAmt;
+	}
+
+	public void setTxAmt(BigDecimal txAmt) {
+		TxAmt = txAmt;
+	}
+
+	public BigDecimal getAcAmt() {
+		return AcAmt;
+	}
+
+	public void setAcAmt(BigDecimal acAmt) {
+		AcAmt = acAmt;
 	}
 
 	public BigDecimal getLoanBalPaid() {

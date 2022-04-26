@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicMonthlyLoanData_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicMonthlyLoanData_Upd"
 (
 -- 程式功能：維護 JcicMonthlyLoanData 聯徵放款月報資料檔
 -- 執行時機：每月底日終批次(換日前)
@@ -384,7 +384,7 @@ BEGIN
                                          ELSE NVL(Tx."CloseBreachAmt", 0) 
                                        END )                           AS "CloseBreachAmt"
                           FROM   "LoanBorTx" Tx
-                          WHERE  TRUNC(Tx."EntryDate" / 100)  = YYYYMM
+                          WHERE  TRUNC(Tx."AcDate" / 100)  = YYYYMM
                             AND  SUBSTR(NVL(Tx."TitaTxCd",' '), 1, 2) = 'L3'
                           GROUP  BY  Tx."CustNo", Tx."FacmNo", Tx."BormNo"
                         ) Tx   ON Tx."CustNo"  =  M."CustNo"

@@ -170,6 +170,12 @@ public class L3210 extends TradeBuffer {
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
+		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
+		// 費用抵繳是否抵繳(整批入帳)
+		this.isRepaidFee = false;
+		if (titaVo.get("PayFeeFlag") != null && "Y".equals(titaVo.get("PayFeeFg"))) {
+			this.isRepaidFee = true;
+		}
 		// 交易金額
 		if (iTempReasonCode == 3 || iTempReasonCode == 6) // 期票、即期票
 			this.isBortx = false;
@@ -188,11 +194,6 @@ public class L3210 extends TradeBuffer {
 			}
 		}
 
-		// 費用抵繳是否抵繳(整批入帳)
-		this.isRepaidFee = false;
-		if (titaVo.isTrmtypBatch()) {
-			this.isRepaidFee = true;
-		}
 		// 帳務處理
 		AcDetailRoutine();
 

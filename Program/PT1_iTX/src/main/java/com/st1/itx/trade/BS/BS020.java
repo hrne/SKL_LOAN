@@ -126,7 +126,8 @@ public class BS020 extends TradeBuffer {
 			dStatusCode.add("2");
 			dStatusCode.add("3");
 			dStatusCode.add("4");
-			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode, this.index, Integer.MAX_VALUE);
+			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode,
+					this.index, Integer.MAX_VALUE);
 			lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 			if (lBatxDetail != null) {
 				detailSeq = lBatxDetail.size();
@@ -144,7 +145,8 @@ public class BS020 extends TradeBuffer {
 			if (tBatxHead == null)
 				this.batchNo = "BATX01";
 			else
-				this.batchNo = "BATX" + parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+				this.batchNo = "BATX"
+						+ parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
 		}
 	}
 
@@ -179,14 +181,16 @@ public class BS020 extends TradeBuffer {
 			if ("L4450".equals(txCode) && repayCode == 0) {
 				continue;
 			}
+			TempVo tTempVo = new TempVo();
+			tTempVo.putParam("Note", repayType == 01 ? "暫收抵繳期款" : "暫收抵繳費用");
 			try {
-				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, 0, 0, repayCode, repayType, BigDecimal.ZERO, titaVo);
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, 0, 0, repayCode, repayType, BigDecimal.ZERO,
+						tTempVo, titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());
 				continue;
 			}
 			boolean isTermPay = false;
-			boolean isShortAmt = false;
 			boolean isRecvPay = false;
 			// dataKind = 0; // 資料類型
 			// 1.應收費用+未收費用+短繳期金
@@ -213,10 +217,10 @@ public class BS020 extends TradeBuffer {
 				}
 			}
 			if (isTermPay) {
-				addDetail(custNo, 1, titaVo);
+				addDetail(custNo, 1, tTempVo, titaVo);
 			} else {
 				if (isRecvPay) {
-					addDetail(custNo, 9, titaVo); // 其他
+					addDetail(custNo, 9, tTempVo, titaVo); // 其他
 				}
 			}
 		}
@@ -257,7 +261,7 @@ public class BS020 extends TradeBuffer {
 
 	}
 
-	private void addDetail(int custNo, int repayType, TitaVo titaVo) throws LogicException {
+	private void addDetail(int custNo, int repayType,TempVo tTempVo, TitaVo titaVo) throws LogicException {
 		tBatxDetail = new BatxDetail();
 		tBatxDetailId = new BatxDetailId();
 		tBatxDetailId.setAcDate(this.tbsdy);
@@ -280,8 +284,6 @@ public class BS020 extends TradeBuffer {
 		tBatxDetail.setTitaTlrNo("");
 		tBatxDetail.setTitaTxtNo("");
 
-		TempVo tTempVo = new TempVo();
-		tTempVo.putParam("Note", repayType == 01 ? "暫收抵繳期款" : "暫收抵繳費用");
 		tBatxDetail.setProcNote(tTempVo.getJsonString());
 
 		lBatxDetail.add(tBatxDetail);

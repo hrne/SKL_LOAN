@@ -333,7 +333,7 @@ public class L3200 extends TradeBuffer {
 		iExtraRepay = this.parse.stringToBigDecimal(titaVo.getParam("TimExtraRepay"));
 		iExtraRepayFlag = titaVo.getParam("IncludeIntFlag");
 		iUnpaidIntFlag = titaVo.getParam("UnpaidIntFlag");
-		iPayFeeFlag = titaVo.getParam("PayFeeFlag"); // 部分償還是否內含費用
+		iPayFeeFlag = titaVo.getParam("PayFeeFlag"); // 是否內含費用
 		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 			iCloseBreachAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimExtraCloseBreachAmt"));
 		} else {

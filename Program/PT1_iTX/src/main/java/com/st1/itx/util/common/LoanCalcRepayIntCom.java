@@ -126,6 +126,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	private BigDecimal wkBeforeStoreRate;
 	private BigDecimal wkRateIncr; // 加碼利率
 	private BigDecimal wkIndividualIncr; // 個別加碼利率
+	private int wkTermEndDate; // 期款止日
 	private int wkTerms; // 繳息期數
 	private int wkFreqCode; // 1:週期為日 2:週期為月 3:週期為週
 	private int wkNextRepayDate; // 下次還本日,應還本日,預定還本日
@@ -359,6 +360,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkAmt = BigDecimal.ZERO;
 		wkType = 0;
 		wkCalcVoIndex = -1;
+		wkLastTermNo = 0;
 		wkTermIndex = 0;
 		wkFitRate = BigDecimal.ZERO;
 		wkNextEffectDate = 0;
@@ -812,6 +814,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				dDateUtil.setDate_2(wkIntEndDate);
 				dDateUtil.dateDiff();
 				wkMonthLimit = dDateUtil.getDays();
+				wkTermEndDate = wkIntEndDate;
 			}
 			break;
 		case 3: // 3:週期為週
@@ -1085,23 +1088,23 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if (wkIntStartDate <= iSpecificDate) {
 			this.info("CalcTermNo end wkTermNo = 1 ");
 			return 1;
+		} else {
+			dDateUtil.init();
+			dDateUtil.setDate_1(wkSpecificDate);
+			dDateUtil.setDate_2(wkIntStartDate);
+			switch (iFreqBase) { // 週期基準 1:日 2:月 3:週
+			case 2:
+				dDateUtil.dateDiff();
+				wkMons = dDateUtil.getMons();
+				wkTermNo = ((wkMons - wkSpecificMons) / iPayIntFreq) + 1;
+				break;
+			case 3:
+				dDateUtil.dateDiff();
+				wkDays = dDateUtil.getDays();
+				wkTermNo = (wkDays / (iPayIntFreq * 7)) + 1;
+				break;
+			}
 		}
-		dDateUtil.init();
-		dDateUtil.setDate_1(wkSpecificDate);
-		dDateUtil.setDate_2(wkIntStartDate);
-		switch (iFreqBase) { // 週期基準 1:日 2:月 3:週
-		case 2:
-			dDateUtil.dateDiff();
-			wkMons = dDateUtil.getMons();
-			wkTermNo = ((wkMons - wkSpecificMons) / iPayIntFreq) + 1;
-			break;
-		case 3:
-			dDateUtil.dateDiff();
-			wkDays = dDateUtil.getDays();
-			wkTermNo = (wkDays / (iPayIntFreq * 7)) + 1;
-			break;
-		}
-
 		this.info("CalcTermNo end wkTermNo = " + wkTermNo);
 		return wkTermNo;
 	}
@@ -1448,49 +1451,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 		this.info("calcInterestRoutine end ");
 		return wkInterest;
-	}
-
-	private int getVariableDecimal(BigDecimal storeRate) {
-
-		String stringOfStoreRate = storeRate.toString();
-
-		// 小數點位製
-		int pointPosition = stringOfStoreRate.indexOf(".");
-
-		if (pointPosition < 0) {
-			// 小數點不存在
-			return 9;
-		}
-
-		// 擷取小數字串
-		String decimal = stringOfStoreRate.substring(pointPosition);
-
-		int lengthOfDecimal = decimal.length();
-
-		// 變動小數位數處理
-		// a = 利率的小數位數
-		// b = 天數/36500後的小數位數
-		// b = 9 - a
-		int a = 0;
-
-		for (int i = lengthOfDecimal - 1; i > 0; i--) {
-			String tempNumber = decimal.substring(i, i + 1);
-			if (!tempNumber.equals("0")) {
-				// 從後面找回來，第一個非0的數字則為真正的小數位數長度
-				a = i;
-				// 不能使用 BigDecimal.scale()
-				// 該方法回傳的長度是該物件被設定的小數位數長度
-				// 若使用該方法時,數值 1.234500 會被判斷為6碼長
-				// 不符合此處需求
-				break;
-			}
-		}
-
-		if (a > 9) {
-			a = 9; // 理論上不可能出現，利率欄位設計是最多4位
-		}
-
-		return 9 - a;
 	}
 
 	// 計算違約金
@@ -2146,53 +2106,64 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   wkExtraRepay    = " + wkExtraRepay);
 		this.info("   iSyndFlag       = " + iSyndFlag);
 		this.info("   DuraFlag()      = " + vCalcRepayIntVo.getDuraFlag());
+		this.info("   oPaidTerms      = " + oPaidTerms);
+		this.info("   oPaidTerms      = " + oPaidTerms);
+		oPaidTerms--;
 
 		BigDecimal wkIntAmt = BigDecimal.ZERO;
 
 		vCalcRepayIntVo = lCalcRepayIntVo.get(wkIndex);
-		// 部分償還本金計算利息
+		// 計算wkTotalExtraRepay(部分償還累計金額 )及 wkExtraRepay(部分償還餘額)
+		BigDecimal wkRepayAmt = vCalcRepayIntVo.getPrincipal().add(vCalcRepayIntVo.getInterest())
+				.add(vCalcRepayIntVo.getDelayInt()).add(vCalcRepayIntVo.getBreachAmt());
 		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
-			// 聯貸案件不計算利息，聯貸案件 Y:是 N:否
-			if (iSyndFlag.equals("Y")) {
-				vCalcRepayIntVo.setAmount(BigDecimal.ZERO);
-				vCalcRepayIntVo.setInterest(BigDecimal.ZERO);
-			} else {
-				vCalcRepayIntVo.setAmount(iExtraRepay);
-				wkIntAmt = calcInterestRoutine();
-				vCalcRepayIntVo.setInterest(wkIntAmt);
+			// 收回期款(計息止日<=期款止日
+			if (vCalcRepayIntVo.getEndDate() <= wkTermEndDate) {
+				wkExtraRepay = wkExtraRepay.subtract(wkRepayAmt);
+				wkTotalExtraRepay = wkTotalExtraRepay.add(wkRepayAmt);
+				if (wkExtraRepay.compareTo(BigDecimal.ZERO) < 0) {
+					throw new LogicException(titaVo, "E3928", "超過金額 = " + df.format(wkExtraRepay.add(BigDecimal.ONE))); // 計算利息錯誤，部分償還本金超過應償還本金利息
+				}
 			}
-			lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
-			// 部分償還內含利息
-			if (iExtraRepayFlag.equals("Y")) {
-				wkExtraRepay = wkExtraRepay.subtract(wkIntAmt);
-				wkTotalExtraRepay = wkTotalExtraRepay.add(wkIntAmt);
+			// 部分還本金額利息計篹
+			else {
+				// 聯貸案件不計算利息，聯貸案件 Y:是 N:否
+				if (iSyndFlag.equals("Y")) {
+					vCalcRepayIntVo.setAmount(BigDecimal.ZERO);
+					vCalcRepayIntVo.setInterest(BigDecimal.ZERO);
+				} else {
+					// 部分償還本金計算利息，計息止日大於期款止日
+					vCalcRepayIntVo.setAmount(wkExtraRepay);
+					wkIntAmt = calcInterestRoutine();
+					vCalcRepayIntVo.setInterest(wkIntAmt);
+				}
+				lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
+				// 部分償還內含利息(結案不內涵
+				if (iExtraRepayFlag.equals("Y")) {
+					wkTotalExtraRepay = wkTotalExtraRepay.add(wkIntAmt);
+				}
+				this.info("   wkExtraRepay = " + wkExtraRepay);
+				this.info("   wkIntAmt     = " + wkIntAmt);
+				this.info("   Amount       = " + vCalcRepayIntVo.getAmount());
+				this.info("   Principal    = " + vCalcRepayIntVo.getPrincipal());
+				this.info("   Interest     = " + vCalcRepayIntVo.getInterest());
 			}
-			this.info("   wkExtraRepay = " + wkExtraRepay);
-			this.info("   wkIntAmt     = " + wkIntAmt);
-			this.info("   Amount       = " + vCalcRepayIntVo.getAmount());
-			this.info("   Principal    = " + vCalcRepayIntVo.getPrincipal());
-			this.info("   Interest     = " + vCalcRepayIntVo.getInterest());
 		}
 
-		// 計算wkTotalExtraRepay(部分償還累計金額 )及 wkExtraRepay(部分償還餘額)
 		// 最後一筆處理
 		if (wkIndex == wkCalcVoCount) {
-			// 非結案，部分償還餘額應小於最後一筆計息金額
 			// 分段計息記號 0:按日計息 1:按週/月計息 2:利率分段計息
 			switch (vCalcRepayIntVo.getDuraFlag()) {
 			// 按日計息時(零星日)，結案時將計息金額(餘額)放入還款金額，回收時放入部分償還餘額
 			case 0:
-				if (iCaseCloseFlag.equals("Y") || wkExtraRepay.compareTo(BigDecimal.ZERO) >= 0) {
+				if (iCaseCloseFlag.equals("Y") || iExtraRepay.compareTo(BigDecimal.ZERO) >= 0) {
 					if (iCaseCloseFlag.equals("Y")) {
 						vCalcRepayIntVo.setPrincipal(vCalcRepayIntVo.getAmount());
 						oExtraAmt = vCalcRepayIntVo.getAmount();
 					} else {
-						if (wkExtraRepay.compareTo(wkLoanBal) >= 0) {
-							throw new LogicException(titaVo, "E3928",
-									"超過金額 = " + df.format(wkExtraRepay.subtract(wkLoanBal).add(BigDecimal.ONE))); // 計算利息錯誤，部分償還本金超過應償還本金利息
-						}
 						oPaidTerms--;
 						vCalcRepayIntVo.setExtraRepayFlag(1); // 部分償還金額記號 0:否 1:是
+						wkExtraRepay = iExtraRepay.subtract(wkTotalExtraRepay);
 						vCalcRepayIntVo.setPrincipal(wkExtraRepay);
 						oExtraAmt = wkExtraRepay;
 						wkTotalExtraRepay = wkTotalExtraRepay.add(wkExtraRepay);
@@ -2212,7 +2183,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					this.info("extraRepayRoutine end A");
 					return false;
 				}
-				if (iCaseCloseFlag.equals("Y") || wkExtraRepay.compareTo(vCalcRepayIntVo.getPrincipal()) >= 0) {
+				if (iCaseCloseFlag.equals("Y") || wkExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 					wkCalcVoCount++;
 					CalcRepayIntVo w = new CalcRepayIntVo();
 					w.setCustNo(iCustNo);
@@ -2231,7 +2202,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 						w.setPrincipal(w.getAmount());
 						oExtraAmt = w.getAmount();
 					} else {
-						wkExtraRepay = wkExtraRepay.subtract(vCalcRepayIntVo.getPrincipal());
 						w.setPrincipal(wkExtraRepay); // 應還本金
 						oExtraAmt = wkExtraRepay;
 					}
@@ -2249,13 +2219,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					oCalcCount = wkCalcVoCount + 1;
 					this.info("extraRepayRoutine end B");
 					return true;
-				} else {
-					wkTotalExtraRepay = wkTotalExtraRepay.add(vCalcRepayIntVo.getPrincipal());
 				}
 				break;
 			}
-		} else {
-			wkTotalExtraRepay = wkTotalExtraRepay.add(vCalcRepayIntVo.getPrincipal());
 		}
 		this.info("   wkExtraRepay      = " + wkExtraRepay);
 		this.info("   wkTotalExtraRepay = " + wkTotalExtraRepay);
@@ -2263,7 +2229,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		return false;
 	}
 
-	private void totalAmtRoutine(int wkIndex) {
+	private void totalAmtRoutine(int wkIndex) throws LogicException {
 		this.info("totalAmtRoutine ... ");
 		this.info("   wkIndex    = " + wkIndex);
 		this.info("   iSyndFlag  = " + iSyndFlag);
@@ -2273,6 +2239,12 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		vCalcRepayIntVo = lCalcRepayIntVo.get(wkIndex);
 		// vCalcRepayIntVo.setLoanBal(vCalcRepayIntVo.getAmount().subtract(vCalcRepayIntVo.getPrincipal()));
 		wkLoanBal = wkLoanBal.subtract(vCalcRepayIntVo.getPrincipal());
+		// 部分償還本金超過應償還本金利息
+		if (wkLoanBal.compareTo(BigDecimal.ZERO) < 0) {
+			throw new LogicException(titaVo, "E3928",
+					"超過金額 = " + df.format(wkTotalExtraRepay.subtract(wkLoanBal).add(BigDecimal.ONE))); // 計算利息錯誤，部分償還本金超過應償還本金利息
+		}
+
 		vCalcRepayIntVo.setLoanBal(wkLoanBal);
 		switch (iSyndFlag) {
 		case "Y":

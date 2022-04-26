@@ -580,10 +580,15 @@ public class L4002 extends TradeBuffer {
 						labelFgC = "T";
 					}
 				}
-				occursList.putParam("OOLabelFgA", labelFgA);
-				occursList.putParam("OOLabelFgB", labelFgB);
-				occursList.putParam("OOLabelFgC", labelFgC);
-
+				if (acDate != titaVo.getEntDyI() + 19110000) {
+					occursList.putParam("OOLabelFgA", "");
+					occursList.putParam("OOLabelFgB", "");
+					occursList.putParam("OOLabelFgC", "");
+				} else {
+					occursList.putParam("OOLabelFgA", labelFgA);
+					occursList.putParam("OOLabelFgB", labelFgB);
+					occursList.putParam("OOLabelFgC", labelFgC);
+				}
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

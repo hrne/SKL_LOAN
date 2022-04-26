@@ -2,8 +2,11 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -18,10 +21,20 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.TxBatchCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -46,6 +59,9 @@ public class L420ABatch extends TradeBuffer {
 
 	@Autowired
 	public TxBatchCom txBatchCom;
+	
+	@Autowired
+	private BaTxCom baTxCom;
 
 	@Autowired
 	public BatxDetailService batxDetailService;
@@ -54,7 +70,19 @@ public class L420ABatch extends TradeBuffer {
 	public BatxHeadService batxHeadService;
 
 	@Autowired
+	public CdCodeService cdCodeService;
+
+	@Autowired
+	public CustMainService custMainService;
+
+	@Autowired
+	public FacMainService facMainService;
+
+	@Autowired
 	public WebClient webClient;
+
+	@Autowired
+	public L4211Report l4211Report;
 
 	private int commitCnt = 20;
 	private int iAcDate;
@@ -64,6 +92,9 @@ public class L420ABatch extends TradeBuffer {
 	private HashMap<String, Integer> mergeCnt = new HashMap<>();
 	private HashMap<String, BigDecimal> mergeAmt = new HashMap<>();
 	private HashMap<String, String> mergeProcStsCode = new HashMap<>();
+	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
+	private List<Map<String, String>> l4211MapList = new ArrayList<Map<String, String>>();
+	private TempVo tTempVo = new TempVo();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -71,6 +102,7 @@ public class L420ABatch extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		txBatchCom.setTxBuffer(this.getTxBuffer());
+		baTxCom.setTxBuffer(this.getTxBuffer());
 
 		// 會計日期、批號
 		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
@@ -109,9 +141,15 @@ public class L420ABatch extends TradeBuffer {
 								|| "7".equals(t.getProcStsCode())) {
 							continue;
 						}
+						this.tTempVo = new TempVo();
+						tTempVo = tTempVo.getVo(t.getProcNote());
+						tTempVo.remove("MergeCnt");
+						tTempVo.remove("MergeAmt");
+						tTempVo.remove("MergeSeq");
+						t.setProcNote(tTempVo.getJsonString());
 						lBatxDetail.add(t);
-						// 匯款轉帳同戶號多筆檢核放 01-期款、 03-結案
-						if (t.getRepayCode() == 1 && t.getRepayType() >= 1 && t.getRepayType() <= 3) {
+						// 匯款轉帳同戶號多筆檢核放 00-未定 01-期款 02-部分還本 03-結案
+						if (t.getRepayCode() == 1 && t.getRepayType() <= 3) {
 							mapKey = parse.IntegerToString(t.getCustNo(), 7)
 									+ parse.IntegerToString(t.getRepayType(), 2);
 							if (mergeAmt.containsKey(mapKey)) {
@@ -133,10 +171,10 @@ public class L420ABatch extends TradeBuffer {
 			// 檢核正常，不需再檢核，單筆檢核放l1、匯款轉帳期款同戶號多筆檢核放l2
 			for (BatxDetail t : lBatxDetail) {
 				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
-					TempVo tTempVo = new TempVo();
+					this.tTempVo = new TempVo();
 					tTempVo = tTempVo.getVo(t.getProcNote());
 					// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次檢核
-					if (t.getRepayCode() == 1 &&  t.getRepayType() >= 1  && t.getRepayType() <= 3) {
+					if (t.getRepayCode() == 1 && t.getRepayType() <= 3) {
 						mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
 						if (!"4".equals(mergeProcStsCode.get(mapKey)) || (tTempVo.get("MergeCnt") != null
 								&& parse.stringToInteger(tTempVo.get("MergeCnt")) != mergeCnt.get(mapKey))) {
@@ -168,14 +206,14 @@ public class L420ABatch extends TradeBuffer {
 				// 更新整批入帳明細檔
 				// 02.銀行扣款 03.員工扣款 => 整批檢核時設定為 4.檢核正常，整批入帳時才進行檢核
 				if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
-					TempVo tTempVo = new TempVo();
+					this.tTempVo = new TempVo();
 					tTempVo = tTempVo.getVo(tDetail.getProcNote());
 					tTempVo.putParam("CheckMsg", "");
 					tTempVo.putParam("ErrorMsg", "");
 					tDetail.setProcNote(tTempVo.getJsonString());
 					tDetail.setProcStsCode("4"); // 4.檢核正常
 				} else {
-					tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
+					tDetail = doTxCheck(tDetail, titaVo);
 				}
 				try {
 					batxDetailService.update(tDetail);
@@ -186,51 +224,52 @@ public class L420ABatch extends TradeBuffer {
 			}
 		}
 
-		// 匯款轉帳期款同戶號多筆
+		// 匯款轉帳同戶號多筆檢核
 		if (l2BatxDetail.size() > 0) {
 			int mergeSeq = 0;
 			List<BatxDetail> l3BatxDetail = new ArrayList<BatxDetail>();
+			// sort by CustNo, RepayType, MediaSeq
+			Collections.sort(l2BatxDetail, new Comparator<BatxDetail>() {
+				@Override
+				public int compare(BatxDetail c1, BatxDetail c2) {
+					if (c1.getCustNo() != c2.getCustNo()) {
+						return c1.getCustNo() - c2.getCustNo();
+					}
+					if (c1.getRepayType() != c2.getRepayType()) {
+						return c1.getRepayType() - c2.getRepayType();
+					}
+					if (c1.getMediaSeq() != c2.getMediaSeq()) {
+						return c1.getMediaSeq() - c2.getMediaSeq();
+					}
+					return 0;
+				}
+			});
+
 			for (BatxDetail tDetail : l2BatxDetail) {
-				TempVo tTempVo = new TempVo();
+				this.tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tDetail.getProcNote());
 				mapKey = parse.IntegerToString(tDetail.getCustNo(), 7)
 						+ parse.IntegerToString(tDetail.getRepayType(), 2);
 				mergeSeq++;
-				this.info("L2BatxDetail = " + tDetail.getCustNo() + ", mergeSeq =" + mergeSeq + " ,mergeCnt="
-						+ mergeCnt.get(mapKey));
-				// 同戶號的前面幾筆放l3，最後一筆做檢核再將檢核狀態更新l3
+				tTempVo.putParam("MergeCnt", mergeCnt.get(mapKey));
+				tTempVo.putParam("MergeAmt", mergeAmt.get(mapKey));
+				tTempVo.putParam("MergeSeq", mergeSeq);
+				tDetail.setProcNote(tTempVo.getJsonString());
+				tDetail = doTxCheck(tDetail, titaVo);
+				// 以同戶號最後一筆檢核狀態更新全部
 				if (mergeSeq < mergeCnt.get(mapKey)) {
 					l3BatxDetail.add(tDetail);
 				} else {
-					// 以總金額當作還款金額做檢核，檢核後再還原金額
-					BigDecimal wkRepayAmt = tDetail.getRepayAmt();
-					tDetail.setRepayAmt(mergeAmt.get(mapKey));
-					tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
-					// 還原金額
-					tTempVo = tTempVo.getVo(tDetail.getProcNote());
-					tTempVo.putParam("CheckMsg",
-							"同戶號合併檢核 總金額:" + tDetail.getRepayAmt() + ", " + tTempVo.getParam("CheckMsg"));
-					tTempVo.putParam("MergeCnt", mergeCnt.get(mapKey));
-					tTempVo.putParam("MergeAmt", mergeAmt.get(mapKey));
-					tTempVo.putParam("MergeSeq", mergeSeq);
-					mergeSeq = 0;
-					tDetail.setProcNote(tTempVo.getJsonString());
-					tDetail.setRepayAmt(wkRepayAmt);
 					try {
 						batxDetailService.update(tDetail);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "lA2BatxDetail" + e.getErrorMsg());
 					}
-					// 更新同戶號狀態
 					if (l3BatxDetail.size() > 0) {
-						mergeSeq = 0;
 						for (BatxDetail t : l3BatxDetail) {
-							tTempVo = tTempVo.getVo(tDetail.getProcNote());
-							tTempVo.putParam("CheckMsg", "同戶號合併檢核");
-							mergeSeq++;
-							tTempVo.putParam("MergeSeq", mergeSeq);
-							t.setProcNote(tTempVo.getJsonString());
-							t.setProcStsCode(tDetail.getProcStsCode());
+							if ("4".equals(t.getProcStsCode())) {
+								t.setProcStsCode(tDetail.getProcStsCode());
+							}
 						}
 						try {
 							batxDetailService.updateAll(l3BatxDetail);
@@ -254,8 +293,115 @@ public class L420ABatch extends TradeBuffer {
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
 				iBatchNo + " 整批檢核, " + msg, titaVo);
 
+		// 匯款轉帳檢核明細表
+		if (l4211MapList.size() > 0) {
+			// 產生匯款轉帳檢核明細表
+			l4211Report.setParentTranCode("L420A");
+			l4211Report.execWithBatchMapList(l4211MapList, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L420A", "L4211-匯款總傳票明細表", titaVo);
+		}
 		return null;
 
+	}
+
+	private BatxDetail doTxCheck(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
+		this.info("doTxCheck ... " + tDetail.toString());
+		tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
+		this.baTxList = txBatchCom.getBaTxList();
+		if (tDetail.getRepayCode() == 1) {
+			addL4211MapList(tDetail, titaVo);
+		}
+		return tDetail;
+	}
+
+	/* 匯款明細表 */
+	private void addL4211MapList(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
+		String custName = " ";
+		CustMain tCustMain = custMainService.custNoFirst(tDetail.getCustNo(), tDetail.getCustNo(), titaVo);
+		if (tCustMain != null) {
+			custName = tCustMain.getCustName();
+		}
+		/* STEP 9 : 計算帳務作帳金額 */
+
+		// 本金利息(加總至撥款)
+		ArrayList<BaTxVo> lbaTxVo = new ArrayList<BaTxVo>();
+		lbaTxVo = baTxCom.addByBormNo(this.baTxList, titaVo);
+
+		// 計算帳務作帳金額
+		lbaTxVo = baTxCom.settleAcAmt(tDetail.getRepayAmt(), lbaTxVo, titaVo);
+
+		for (BaTxVo baTxVo : lbaTxVo) {
+			if (baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0
+					&& baTxVo.getTempAmt().compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+			}
+			String facAcctCode = "999";
+			String facAcctItem = " ";
+			if ("3".equals(baTxVo.getAcctCode().substring(0, 1))) {
+				facAcctCode = baTxVo.getAcctCode();
+			} else {
+				if (baTxVo.getFacmNo() > 0) {
+					FacMain tfacMain = facMainService.findById(new FacMainId(baTxVo.getCustNo(), baTxVo.getFacmNo()),
+							titaVo);
+					if (tfacMain != null) {
+						facAcctCode = tfacMain.getAcctCode();
+					}
+				}
+			}
+			if (!"999".equals(facAcctCode)) {
+				facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
+			}
+			Map<String, String> da = new HashMap<>();
+			da.put("ReconCode", "" + tDetail.getReconCode());
+			da.put("BatchNo", "" + tDetail.getBatchNo());
+			da.put("EntryDate", "" + tDetail.getEntryDate());
+			da.put("DetailSeq", "" + tDetail.getDetailSeq());
+			da.put("RepayAmt", "" + tDetail.getRepayAmt());
+			da.put("AcctAmt", "" + baTxVo.getAcAmt());
+			da.put("CustNo",
+					parse.IntegerToString(tDetail.getCustNo(), 7) + "-" + parse.IntegerToString(baTxVo.getFacmNo(), 3)
+							+ "-" + parse.IntegerToString(baTxVo.getBormNo(), 3));
+			da.put("RepaidPeriod", baTxVo.getPaidTerms() > 0 ? "" + baTxVo.getPaidTerms() : "");
+			da.put("CustName", custName);
+			da.put("CloseReasonCode", tTempVo.getParam("CloseReasonCode"));
+			da.put("IntStartDate", "" + baTxVo.getIntStartDate());
+			da.put("IntEndDate", "" + baTxVo.getIntEndDate());
+			//  本金(A) = 本金 - 本次短繳  + 回收短繳
+			da.put("Principal", "" + baTxVo.getPrincipal().subtract(baTxVo.getUnpaidPrin()).add(baTxVo.getShortfallPrin()));
+			//  利息(B) = 利息 - 本次短繳  + 回收短繳
+			da.put("Interest", "" + baTxVo.getInterest().subtract(baTxVo.getUnpaidInt()).add(baTxVo.getShortfallInt())); 
+			da.put("TempPayAmt", "0"); // 暫付款(C)
+			da.put("BreachAmt", "" + baTxVo.getDelayInt().add(baTxVo.getBreachAmt()).add(baTxVo.getCloseBreachAmt())); // 違約金(D)
+			da.put("TempDr",
+					"" + (baTxVo.getTempAmt().compareTo(BigDecimal.ZERO) < 0
+							? BigDecimal.ZERO.subtract(baTxVo.getTempAmt())
+							: "0")); // 暫收借(E)
+			da.put("TempCr", "" + (baTxVo.getTempAmt().compareTo(BigDecimal.ZERO) > 0 ? baTxVo.getTempAmt() : "0")); // 暫收貸(F)
+			da.put("Shortfall", "" + baTxVo.getUnpaidPrin().add(baTxVo.getUnpaidInt())); // 短繳(G)
+			da.put("Fee", "" + baTxVo.getFeeAmt()); // 帳管費及其他(H) );
+			da.put("AcDate", "" + tDetail.getAcDate());
+			da.put("TitaTlrNo", titaVo.getTlrNo());
+			da.put("TitaTxtNo",
+					tDetail.getBatchNo().substring(4, 6) + parse.IntegerToString(tDetail.getDetailSeq(), 6));
+			da.put("SortingForSubTotal", facAcctCode); // 配合小計產生的排序
+			da.put("AcctItem", facAcctItem);
+			da.put("RepayItem", getCdCode("RepayType", parse.IntegerToString(tDetail.getRepayType(), 2), titaVo));
+			l4211MapList.add(da);
+		}
+
+		for (Map<String, String> da : l4211MapList) {
+			this.info("addL4211MapList = " + da.toString());
+		}
+	}
+
+	private String getCdCode(String iDefCode, String iCode, TitaVo titaVo) throws LogicException {
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId(iDefCode, iCode), titaVo);
+		if (tCdCode == null) {
+			return " ";
+		} else {
+			return tCdCode.getItem();
+		}
 	}
 
 	/* 更新作業狀態 */

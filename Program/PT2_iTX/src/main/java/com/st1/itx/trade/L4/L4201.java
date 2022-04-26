@@ -84,9 +84,9 @@ public class L4201 extends TradeBuffer {
 		tBatxDetail = batxDetailService.holdById(tBatxDetailId);
 		tBatxDetail.setRepayType(iRepayTypeA);
 		tBatxDetail.setCustNo(iCustNoA);
-		tBatxDetail.setProcStsCode("0");				
-		tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
+		tBatxDetail.setProcStsCode("0");		
 		tBatxDetail.setProcStsCode(iProcStsCode);
+		tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
 		try {
 			batxDetailService.update(tBatxDetail);
 		} catch (DBException e) {

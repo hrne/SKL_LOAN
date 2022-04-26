@@ -1,3 +1,17 @@
+//戶名 58
+//清償原因 69
+//起日 72
+//橫槓 81
+//迄日 82
+//利息 108,R	allsum4
+//暫付款 119,R	allsum5
+//違約金 130,R	allsum6
+//暫收貸 154,R	allsum7
+//短腳 162,R	allsum9
+//費用 173,R	allsum10
+//本金 97,R	allsum3
+//暫收借 144,R	allsum8
+
 package com.st1.itx.trade.L4;
 
 import java.io.PrintWriter;
@@ -16,14 +30,15 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4211AServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.date.DateUtil;
-//import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.parse.Parse;
 
 @Component("L4211Report")
 @Scope("prototype")
 public class L4211Report extends MakeReport {
-//	@Autowired
-//	private Parse parse;
+//    @Autowired
+//    private Parse parse;
 
 	@Autowired
 	private DateUtil dateUtil;
@@ -36,6 +51,12 @@ public class L4211Report extends MakeReport {
 
 	@Autowired
 	public CustMainService custMainService;
+
+	@Autowired
+	Parse parse;
+
+	@Autowired
+	SortMapListCom sortMapListCom;
 
 	// 每頁筆數
 	private int pageIndex = 38;
@@ -60,27 +81,27 @@ public class L4211Report extends MakeReport {
 		this.setMaxRows(54);
 	}
 
-	int allsum = 0;
-	int allsum2 = 0;
-	int allsum3 = 0;
-	int allsum4 = 0;
-	int allsum5 = 0;
-	int allsum6 = 0;
-	int allsum7 = 0;
-	int allsum8 = 0;
-	int allsum9 = 0;
-	int allsum10 = 0;
+	int allsumTransferAmt = 0;
+	int allsumMakeferAmt = 0;
+	int allsumPrincipal = 0;
+	int allsumInterest = 0;
+	int allsumPayment = 0;
+	int allsumDamages = 0;
+	int allsumTemporaryLoan = 0;
+	int allsumCollection = 0;
+	int allsumShortPayment = 0;
+	int allsumOthers = 0;
 
-	int totalsum = 0;
-	int totalsum2 = 0;
-	int totalsum3 = 0;
-	int totalsum4 = 0;
-	int totalsum5 = 0;
-	int totalsum6 = 0;
-	int totalsum7 = 0;
-	int totalsum8 = 0;
-	int totalsum9 = 0;
-	int totalsum10 = 0;
+	int totalsumTransferAmt = 0;
+	int totalsumMakerferAmt = 0;
+	int totalsumPrincipal = 0;
+	int totalsumInterest = 0;
+	int totalsumPayment = 0;
+	int totalsumDamages = 0;
+	int totalsumTemporaryLoan = 0;
+	int totalsumCollection = 0;
+	int totalsumShortPayment = 0;
+	int totalsumOthers = 0;
 
 	int transferamt = 0;
 	int makeferamt = 0;
@@ -97,18 +118,23 @@ public class L4211Report extends MakeReport {
 	String year = "";
 	String month = "";
 	String date = "";
+	
+	String txCode = "";
+	String reportName = "";
 
 	public void printHeaderP() {
-		this.setFont(1, 8);
 		this.print(-1, 150, "機密等級：密");
-		this.print(-2, 3, "程式 ID：" + "L4211A");
+		this.print(-2, 3, "程式 ID：" + txCode);
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
-//			月/日/年(西元後兩碼)
-		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
-		this.print(-3, 3, "報  表 ：" + "L4211A");
-		this.print(-3, 82, "匯款總傳票明細表 ----(									)", "C");
-		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+//            月/日/年(西元後兩碼)
+		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-3, 3, "報  表 ：" + txCode);
+		this.print(-3, this.getMidXAxis() - 1 , reportName, "R");
+		this.print(-3, this.getMidXAxis() + 1 , " ---- (     )", "L");
+		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
@@ -129,22 +155,30 @@ public class L4211Report extends MakeReport {
 
 		this.print(-5, 161, "單    位：元", "R");
 		this.print(-6, 0, "");
-		this.print(-7, 1, " 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
+		/**
+		 * ------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6---------7---------8---------9
+		 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+		 */
+		this.print(-7, 1,
+				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	   戶名    	          計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 費用");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		// 1234567-001-001 11 我是一二三 11 111/11/11-111/11/11
 	}
 
 	public void printHeaderP1() {
-		this.setFont(1, 8);
 		this.print(-1, 150, "機密等級：密");
-		this.print(-2, 3, "程式 ID：" + "L4211A");
+		this.print(-2, 3, "程式 ID：" + txCode);
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
-//			月/日/年(西元後兩碼)
-		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
-		this.print(-3, 3, "報  表 ：" + "L4211A");
-		this.print(-3, 77, "匯款總傳票明細表－以金額排序 ----(									)", "C");
-		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+//            月/日/年(西元後兩碼)
+		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-3, 3, "報  表 ：" + txCode);
+		this.print(-3, this.getMidXAxis() - 1 , reportName + " - 以金額排序", "R");
+		this.print(-3, this.getMidXAxis() + 1 , " ---- (     )", "L");
+		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
@@ -165,22 +199,25 @@ public class L4211Report extends MakeReport {
 
 		this.print(-5, 161, "單    位：元", "R");
 		this.print(-6, 0, "");
-		this.print(-7, 1, " 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
+		this.print(-7, 1,
+				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	   戶名    	          計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 費用");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void printHeaderP2() {
-		this.setFont(1, 8);
 		this.print(-1, 150, "機密等級：密");
-		this.print(-2, 3, "程式 ID：" + "L4211A");
+		this.print(-2, 3, "程式 ID：" + txCode);
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
-//			月/日/年(西元後兩碼)
-		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
-		this.print(-3, 3, "報  表 ：" + "L4211A");
-		this.print(-3, 82, "匯款明細表－依戶號 ----(									)", "C");
-		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+//            月/日/年(西元後兩碼)
+		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-3, 3, "報  表 ：" + txCode);
+		this.print(-3, this.getMidXAxis() - 1 , reportName + " - 依戶號", "R");
+		this.print(-3, this.getMidXAxis() + 1 , " ---- (     )", "L");
+		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
 		this.print(-5, 2, "批次號碼 ....");
 		this.print(-5, 81, "年    月   日", "C");
@@ -201,64 +238,138 @@ public class L4211Report extends MakeReport {
 
 		this.print(-5, 161, "單    位：元", "R");
 		this.print(-6, 0, "");
-		this.print(-7, 1, " 匯款日    匯款序號    匯款金額   作帳金額 戶號           	  戶名    	     計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 帳管費及其他");
+		this.print(-7, 1,
+				/**
+				 * ------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6---------7---------8---------9
+				 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+				 */
+				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	   戶名    	          計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 費用");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		long sno = 0;
-
-		acdate = titaVo.get("AcDate");
-		List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> fnAllList1 = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> fnAllList2 = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> fnAllList3 = new ArrayList<Map<String, String>>();
 
 		try {
-			fnAllList = l4211ARServiceImpl.findAll(titaVo, 1);
+			fnAllList1 = l4211ARServiceImpl.findAll(titaVo, 1);
+			fnAllList2 = l4211ARServiceImpl.findAll(titaVo, 2);
+			fnAllList3 = l4211ARServiceImpl.findAll(titaVo, 3);
+
+			this.info("Going to execWithBatchMapList");
+			execWithBatchMapList(l4211ARServiceImpl.findAll(titaVo, 0), titaVo);
+			this.info("Done execWithBatchMapList !! wow!");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		if (fnAllList.size() == 0) {
+		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
+	}
+
+	public void execWithBatchMapList(List<Map<String, String>> fnAllList, TitaVo titaVo) throws LogicException {
+		List<Map<String, String>> fnAllList1, fnAllList2, fnAllList3;
+
+//        1
+//        "ReconCode" ASC
+//        "BatchNo" ASC
+//        "SortingForSubTotal" ASC
+//        "EntryDate" ASC
+//        "DetailSeq" ASC
+//        "CustNo" ASC
+//        "FacmNo" ASC
+//        "BormNo" ASC
+//
+//        2
+//        "ReconCode" ASC
+//        "BatchNo" ASC
+//        "SortingForSubTotal" ASC
+//        "EntryDate" ASC
+//        "RepayAmt" DESC
+//        "CustNo" ASC
+//        "FacmNo" ASC
+//        "BormNo" ASC
+//
+//        3
+//        "ReconCode" ASC
+//        "BatchNo" ASC
+//        "SortingForSubTotal" ASC
+//        "EntryDate" ASC
+//        "CustNo" ASC
+//        "FacmNo" ASC
+//        "BormNo" ASC
+
+		// facmno, bormno 已經在 query 裡面 concat 到 custno，所以不在這裡加sort
+		
+		fnAllList1 = sortMapListCom.beginSort(fnAllList)
+				.ascString("ReconCode")
+				.ascString("BatchNo")
+				.ascString("SortingForSubTotal")
+				.ascString("EntryDate")
+				.ascString("DetailSeq")
+				.ascString("CustNo")
+				.getList();
+
+		fnAllList2 = sortMapListCom.beginSort(fnAllList)
+				.ascString("ReconCode")
+				.ascString("BatchNo")
+				.ascString("SortingForSubTotal")
+				.ascString("EntryDate")
+				.descNumber("RepayAmt")
+				.ascString("CustNo")
+				.getList();
+
+		fnAllList3 = sortMapListCom.beginSort(fnAllList)
+				.ascString("ReconCode")
+				.ascString("BatchNo")
+				.ascString("SortingForSubTotal")
+				.ascString("EntryDate")
+				.ascString("CustNo")
+				.getList();
+
+		makePdf(fnAllList1, fnAllList2, fnAllList3, true, titaVo);
+	}
+
+	private void makePdf(List<Map<String, String>> fnAllList1, List<Map<String, String>> fnAllList2,
+			List<Map<String, String>> fnAllList3, boolean isBatchMapList, TitaVo titaVo) throws LogicException {
+		
+		txCode = this.getParentTranCode();
+		
+		if (txCode == null || txCode.trim().isEmpty())
+		{
+			txCode = titaVo.getTxcd();
+		}
+		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表" : "匯款總傳票明細表";
+		acdate = titaVo.get("AcDate");
+
+		if (fnAllList1.size() == 0) {
 			throw new LogicException("E2003", "查無資料"); // 查無資料
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4211", "匯款總傳票明細表", "", "A4", "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
+		this.setFont(1, 8);
 
 		reportkind = 1;
-		report1(fnAllList);
-
-		try {
-			fnAllList = l4211ARServiceImpl.findAll(titaVo, 2);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
-		}
+		report1(fnAllList1, isBatchMapList);
 
 		reportkind = 2;
 		newPage();
-		report2(fnAllList);
-
-		try {
-			fnAllList = l4211ARServiceImpl.findAll(titaVo, 3);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
-		}
+		report2(fnAllList2, isBatchMapList);
 
 		reportkind = 3;
 		newPage();
-		report3(fnAllList);
+		report3(fnAllList3, isBatchMapList);
 
-		sno = this.close();
-		this.toPdf(sno);
+//        long sno = 
+		this.close();
+//        this.toPdf(sno);
 	}
 
-	private void report1(List<Map<String, String>> fnAllList) {
+	private void report1(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
 		String msCode = ""; // 代號
 		String txCode = ""; // 代號名稱
 		String msName = ""; // 表頭P號
@@ -271,36 +382,36 @@ public class L4211Report extends MakeReport {
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String df2 = formatAmt(tfnAllList.get("F4"), 0);
-			String df3 = formatAmt(tfnAllList.get("F5"), 0);
-			String df4 = formatAmt(tfnAllList.get("F10"), 0);
-			String df5 = formatAmt(tfnAllList.get("F11"), 0);
-			String df6 = formatAmt(tfnAllList.get("F12"), 0);
-			String df7 = formatAmt(tfnAllList.get("F13"), 0);
-			String df8 = formatAmt(tfnAllList.get("F14"), 0);
-			String df9 = formatAmt(tfnAllList.get("F15"), 0);
-			String df10 = formatAmt(tfnAllList.get("F16"), 0);
-			String df11 = formatAmt(tfnAllList.get("F17"), 0);
+			String dfTransferAmt = formatAmt(tfnAllList.get("RepayAmt"), 0);
+			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
+			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
+			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
+			String dfPayment = formatAmt(tfnAllList.get("TempPayAmt"), 0);
+			String dfDamages = formatAmt(tfnAllList.get("BreachAmt"), 0);
+			String dfTemporaryLoan = formatAmt(tfnAllList.get("TempDr"), 0);
+			String dfCollection = formatAmt(tfnAllList.get("TempCr"), 0);
+			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
+			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = Integer.valueOf(tfnAllList.get("F4"));
-			makeferamt = Integer.valueOf(tfnAllList.get("F5"));
-			principal = Integer.valueOf(tfnAllList.get("F10"));
-			interest = Integer.valueOf(tfnAllList.get("F11"));
-			payment = Integer.valueOf(tfnAllList.get("F12"));
-			damages = Integer.valueOf(tfnAllList.get("F13"));
-			temporaryloan = Integer.valueOf(tfnAllList.get("F14"));
-			collection = Integer.valueOf(tfnAllList.get("F15"));
-			shortpayment = Integer.valueOf(tfnAllList.get("F16"));
-			others = Integer.valueOf(tfnAllList.get("F17"));
+			transferamt = Integer.valueOf(tfnAllList.get("RepayAmt"));
+			makeferamt = Integer.valueOf(tfnAllList.get("AcctAmt"));
+			principal = Integer.valueOf(tfnAllList.get("Principal"));
+			interest = Integer.valueOf(tfnAllList.get("Interest"));
+			payment = Integer.valueOf(tfnAllList.get("TempPayAmt"));
+			damages = Integer.valueOf(tfnAllList.get("BreachAmt"));
+			temporaryloan = Integer.valueOf(tfnAllList.get("TempDr"));
+			collection = Integer.valueOf(tfnAllList.get("TempCr"));
+			shortpayment = Integer.valueOf(tfnAllList.get("Shortfall"));
+			others = Integer.valueOf(tfnAllList.get("Fee"));
 			count++;
 
 			// 判斷當前的批號與批次號碼不同
-			if (!msName.equals(tfnAllList.get("F0")) || !msNum.equals(tfnAllList.get("F1"))) {
+			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
 
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					String aName = tfnAllList.get("F22");
+					String aName = tfnAllList.get("AcctItem");
 					if (aName.equals("999") || msCode.equals("") || msCode.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
@@ -310,29 +421,29 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
-					totalsum += allsum;
-					totalsum2 += allsum2;
-					totalsum3 += allsum3;
-					totalsum4 += allsum4;
-					totalsum5 += allsum5;
-					totalsum6 += allsum6;
-					totalsum7 += allsum7;
-					totalsum8 += allsum8;
-					totalsum9 += allsum9;
-					totalsum10 += allsum10;
+					totalsumTransferAmt += allsumTransferAmt;
+					totalsumMakerferAmt += allsumMakeferAmt;
+					totalsumPrincipal += allsumPrincipal;
+					totalsumInterest += allsumInterest;
+					totalsumPayment += allsumPayment;
+					totalsumDamages += allsumDamages;
+					totalsumTemporaryLoan += allsumTemporaryLoan;
+					totalsumCollection += allsumCollection;
+					totalsumShortPayment += allsumShortPayment;
+					totalsumOthers += allsumOthers;
 
-					allsum = 0;
-					allsum2 = 0;
-					allsum3 = 0;
-					allsum4 = 0;
-					allsum5 = 0;
-					allsum6 = 0;
-					allsum7 = 0;
-					allsum8 = 0;
-					allsum9 = 0;
-					allsum10 = 0;
+					allsumTransferAmt = 0;
+					allsumMakeferAmt = 0;
+					allsumPrincipal = 0;
+					allsumInterest = 0;
+					allsumPayment = 0;
+					allsumDamages = 0;
+					allsumTemporaryLoan = 0;
+					allsumCollection = 0;
+					allsumShortPayment = 0;
+					allsumOthers = 0;
 
-					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
+					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
 					npcount = 0;
@@ -340,26 +451,25 @@ public class L4211Report extends MakeReport {
 				} // if
 
 				// 頁面設置配置
-
-				this.setFont(1, 8);
-				String A17 = tfnAllList.get("F0");
+				String A17 = tfnAllList.get("ReconCode");
 				if (A17.equals("P03")) {
-					this.print(-3, 90, "A7");
+					this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 				} else {
-					this.print(-3, 90, A17);// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+					this.print(-3, this.getMidXAxis() + 10, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 				}
-				this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
+				this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 				this.print(-8, 0, "");
 
-				msName = tfnAllList.get("F0");
-				msNum = tfnAllList.get("F1");
+				msName = tfnAllList.get("ReconCode");
+				msNum = tfnAllList.get("BatchNo");
 			} else {
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("F22").toString()) || !txCode.equals(tfnAllList.get("F23").toString())) {
+					if (!msCode.equals(tfnAllList.get("AcctItem").toString())
+							|| !txCode.equals(tfnAllList.get("RepayItem").toString())) {
 						this.info("msCode       = " + msCode);
-						this.info("22       = " + tfnAllList.get("F22").toString());
+						this.info("22       = " + tfnAllList.get("AcctItem").toString());
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -376,42 +486,42 @@ public class L4211Report extends MakeReport {
 
 						pageCnt = pageCnt + 2;
 
-						totalsum += allsum;
-						totalsum2 += allsum2;
-						totalsum3 += allsum3;
-						totalsum4 += allsum4;
-						totalsum5 += allsum5;
-						totalsum6 += allsum6;
-						totalsum7 += allsum7;
-						totalsum8 += allsum8;
-						totalsum9 += allsum9;
-						totalsum10 += allsum10;
+						totalsumTransferAmt += allsumTransferAmt;
+						totalsumMakerferAmt += allsumMakeferAmt;
+						totalsumPrincipal += allsumPrincipal;
+						totalsumInterest += allsumInterest;
+						totalsumPayment += allsumPayment;
+						totalsumDamages += allsumDamages;
+						totalsumTemporaryLoan += allsumTemporaryLoan;
+						totalsumCollection += allsumCollection;
+						totalsumShortPayment += allsumShortPayment;
+						totalsumOthers += allsumOthers;
 
-						allsum = 0;
-						allsum2 = 0;
-						allsum3 = 0;
-						allsum4 = 0;
-						allsum5 = 0;
-						allsum6 = 0;
-						allsum7 = 0;
-						allsum8 = 0;
-						allsum9 = 0;
-						allsum10 = 0;
+						allsumTransferAmt = 0;
+						allsumMakeferAmt = 0;
+						allsumPrincipal = 0;
+						allsumInterest = 0;
+						allsumPayment = 0;
+						allsumDamages = 0;
+						allsumTemporaryLoan = 0;
+						allsumCollection = 0;
+						allsumShortPayment = 0;
+						allsumOthers = 0;
 					}
 
 				}
 
 				if (pageCnt >= 30) { // 超過30筆自動換頁 並印出當前的代碼
 
-					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
+					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					if (tfnAllList.get("F0").equals("P03")) {
-						this.print(-3, 90, "A7");
+					if (tfnAllList.get("ReconCode").equals("P03")) {
+						this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 					} else {
-						this.print(-3, 90, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 					}
-					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
+					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 
 				}
@@ -420,118 +530,120 @@ public class L4211Report extends MakeReport {
 			npcount++;
 			tround++;
 
-//			每頁筆數相加
+//            每頁筆數相加
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-			msCode = tfnAllList.get("F22").toString();
+			msCode = tfnAllList.get("AcctItem").toString();
 			// 當前代碼對應中文 當下一筆不同時取用
-			txCode = tfnAllList.get("F23").toString();
+			txCode = tfnAllList.get("RepayItem").toString();
 
 			// 報表邏輯及排序
 
 			// 匯款日 * type = 1: yyy/mm/dd<BR>
-			this.print(1, 2, showRocDate((tfnAllList.get("F2")), 1));
+			this.print(1, 2, showRocDate((tfnAllList.get("EntryDate")), 1));
 
-			if (!scode.equals(tfnAllList.get("F3"))) { // 匯款序號不同 印匯款金額
-				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號
-				this.print(0, 29, df2, "R");// 匯款金額
+			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
+				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
+				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 
-				allsum += transferamt;
+				allsumTransferAmt += transferamt;
 
-				scode = tfnAllList.get("F3");
+				scode = tfnAllList.get("DetailSeq");
 
 			}
 
-			this.print(0, 40, df3, "R");// 作帳金額
-			this.print(0, 41, tfnAllList.get("F6"));// 戶號
-			String name = tfnAllList.get("F7");
+			this.print(0, 40, dfMakeferAmt, "R");// 作帳金額
+			String custNo = tfnAllList.get("CustNo");
+			custNo += isBatchMapList ? "-" : " ";
+			custNo += tfnAllList.get("RepaidPeriod");
+			this.print(0, 41, custNo);// 戶號
+			String name = tfnAllList.get("CustName");
 			if (name.length() > 5) {// 戶名
 				name = name.substring(0, 5);
 			}
-			this.print(0, 57, name);
-			this.print(0, 68, showRocDate(tfnAllList.get("F8"), 1));// 起日
-			this.print(0, 77, "-");
-			this.print(0, 78, showRocDate(tfnAllList.get("F9"), 1));// 迄日
+			this.print(0, 60, name + " " + tfnAllList.get("CloseReasonCode"));
+			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
+					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
-			if (df5.equals("0")) {
-				this.print(0, 106, "", "R"); // 利息
+			if (dfInterest.equals("0")) {
+				this.print(0, 112, "", "R"); // 利息
 			} else {
-				this.print(0, 106, df5, "R"); // 利息
+				this.print(0, 112, dfInterest, "R"); // 利息
 			}
-			if (df6.equals("0")) {
-				this.print(0, 115, "", "R"); // 暫付款
+			if (dfPayment.equals("0")) {
+				this.print(0, 121, "", "R"); // 暫付款
 			} else {
-				this.print(0, 115, df6, "R"); // 暫付款
+				this.print(0, 121, dfPayment, "R"); // 暫付款
 			}
-			if (df7.equals("0")) {
-				this.print(0, 125, "", "R"); // 違約金
+			if (dfDamages.equals("0")) {
+				this.print(0, 131, "", "R"); // 違約金
 			} else {
-				this.print(0, 125, df7, "R"); // 違約金
+				this.print(0, 131, dfDamages, "R"); // 違約金
 			}
-			if (df9.equals("0")) {
-				this.print(0, 145, "", "R"); // 暫收貸
+			if (dfCollection.equals("0")) {
+				this.print(0, 151, "", "R"); // 暫收貸
 			} else {
-				this.print(0, 145, df9, "R"); // 暫收貸
+				this.print(0, 151, dfCollection, "R"); // 暫收貸
 			}
-			if (df10.equals("0")) {
-				this.print(0, 155, "", "R"); // 短繳
+			if (dfShortPayment.equals("0")) {
+				this.print(0, 160, "", "R"); // 短繳
 			} else {
-				this.print(0, 155, df10, "R"); // 短繳
+				this.print(0, 160, dfShortPayment, "R"); // 短繳
 			}
-			if (df11.equals("0")) {
-				this.print(0, 165, "", "R"); // 帳管費及其他
+			if (dfOthers.equals("0")) {
+				this.print(0, 167, "", "R"); // 帳管費及其他
 			} else {
-				this.print(0, 165, df11, "R"); // 帳管費及其他
+				this.print(0, 167, dfOthers, "R"); // 帳管費及其他
 			}
-			if (df4.equals("0")) {
-				this.print(0, 97, "", "R"); // 本金
+			if (dfPrincipal.equals("0")) {
+				this.print(0, 103, "", "R"); // 本金
 			} else {
-				this.print(0, 97, df4, "R"); // 本金
+				this.print(0, 103, dfPrincipal, "R"); // 本金
 			}
-			if (df8.equals("0")) {
-				this.print(0, 137, "", "R"); // 暫收借
+			if (dfTemporaryLoan.equals("0")) {
+				this.print(0, 143, "", "R"); // 暫收借
 			} else {
-				this.print(0, 137, df8, "R"); // 暫收借
+				this.print(0, 143, dfTemporaryLoan, "R"); // 暫收借
 			}
 
-			allsum2 += makeferamt;
-			allsum3 += principal;
-			allsum4 += interest;
-			allsum5 += payment;
-			allsum6 += damages;
-			allsum7 += temporaryloan;
-			allsum8 += collection;
-			allsum9 += shortpayment;
-			allsum10 += others;
+			allsumMakeferAmt += makeferamt;
+			allsumPrincipal += principal;
+			allsumInterest += interest;
+			allsumPayment += payment;
+			allsumDamages += damages;
+			allsumTemporaryLoan += temporaryloan;
+			allsumCollection += collection;
+			allsumShortPayment += shortpayment;
+			allsumOthers += others;
 
 			// 最後一筆產出
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("F23"))) {
+				if ("".equals(tfnAllList.get("RepayItem"))) {
 					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, msCode);
 					}
 				} else {
-					this.print(1, 2, tfnAllList.get("F23"));
+					this.print(1, 2, tfnAllList.get("RepayItem"));
 				}
 				this.print(0, 14, " 小計 ");
 
 				atAll();
 
-				totalsum += allsum;
-				totalsum2 += allsum2;
-				totalsum3 += allsum3;
-				totalsum4 += allsum4;
-				totalsum5 += allsum5;
-				totalsum6 += allsum6;
-				totalsum7 += allsum7;
-				totalsum8 += allsum8;
-				totalsum9 += allsum9;
-				totalsum10 += allsum10;
+				totalsumTransferAmt += allsumTransferAmt;
+				totalsumMakerferAmt += allsumMakeferAmt;
+				totalsumPrincipal += allsumPrincipal;
+				totalsumInterest += allsumInterest;
+				totalsumPayment += allsumPayment;
+				totalsumDamages += allsumDamages;
+				totalsumTemporaryLoan += allsumTemporaryLoan;
+				totalsumCollection += allsumCollection;
+				totalsumShortPayment += allsumShortPayment;
+				totalsumOthers += allsumOthers;
 
 				this.print(1, 0, "");
 				this.print(1, 0,
@@ -540,30 +652,30 @@ public class L4211Report extends MakeReport {
 
 				totalAll();
 				pageCnt = pageCnt + 4;
-				allsum = 0;
-				allsum2 = 0;
-				allsum3 = 0;
-				allsum4 = 0;
-				allsum5 = 0;
-				allsum6 = 0;
-				allsum7 = 0;
-				allsum8 = 0;
-				allsum9 = 0;
-				allsum10 = 0;
+				allsumTransferAmt = 0;
+				allsumMakeferAmt = 0;
+				allsumPrincipal = 0;
+				allsumInterest = 0;
+				allsumPayment = 0;
+				allsumDamages = 0;
+				allsumTemporaryLoan = 0;
+				allsumCollection = 0;
+				allsumShortPayment = 0;
+				allsumOthers = 0;
 
-				totalsum = 0;
-				totalsum2 = 0;
-				totalsum3 = 0;
-				totalsum4 = 0;
-				totalsum5 = 0;
-				totalsum6 = 0;
-				totalsum7 = 0;
-				totalsum8 = 0;
-				totalsum9 = 0;
-				totalsum10 = 0;
+				totalsumTransferAmt = 0;
+				totalsumMakerferAmt = 0;
+				totalsumPrincipal = 0;
+				totalsumInterest = 0;
+				totalsumPayment = 0;
+				totalsumDamages = 0;
+				totalsumTemporaryLoan = 0;
+				totalsumCollection = 0;
+				totalsumShortPayment = 0;
+				totalsumOthers = 0;
 
-				this.print(pageIndex - pageCnt - 2, 80, "=====報表結束=====", "C");
-				this.print(2, 80, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
+				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
+				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
 
 				pageCnt = 0;
 				npcount = 0;
@@ -573,7 +685,7 @@ public class L4211Report extends MakeReport {
 		} // for
 	}
 
-	private void report2(List<Map<String, String>> fnAllList) {
+	private void report2(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
 		String msCode = ""; // 代號
 		String txCode = ""; // 代號名稱
 		String msName = ""; // 表頭P號
@@ -586,36 +698,36 @@ public class L4211Report extends MakeReport {
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String df2 = formatAmt(tfnAllList.get("F4"), 0);
-			String df3 = formatAmt(tfnAllList.get("F5"), 0);
-			String df4 = formatAmt(tfnAllList.get("F10"), 0);
-			String df5 = formatAmt(tfnAllList.get("F11"), 0);
-			String df6 = formatAmt(tfnAllList.get("F12"), 0);
-			String df7 = formatAmt(tfnAllList.get("F13"), 0);
-			String df8 = formatAmt(tfnAllList.get("F14"), 0);
-			String df9 = formatAmt(tfnAllList.get("F15"), 0);
-			String df10 = formatAmt(tfnAllList.get("F16"), 0);
-			String df11 = formatAmt(tfnAllList.get("F17"), 0);
+			String dfTransferAmt = formatAmt(tfnAllList.get("RepayAmt"), 0);
+			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
+			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
+			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
+			String dfPayment = formatAmt(tfnAllList.get("TempPayAmt"), 0);
+			String dfDamages = formatAmt(tfnAllList.get("BreachAmt"), 0);
+			String dfTemporaryLoan = formatAmt(tfnAllList.get("TempDr"), 0);
+			String dfCollection = formatAmt(tfnAllList.get("TempCr"), 0);
+			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
+			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = Integer.valueOf(tfnAllList.get("F4"));
-			makeferamt = Integer.valueOf(tfnAllList.get("F5"));
-			principal = Integer.valueOf(tfnAllList.get("F10"));
-			interest = Integer.valueOf(tfnAllList.get("F11"));
-			payment = Integer.valueOf(tfnAllList.get("F12"));
-			damages = Integer.valueOf(tfnAllList.get("F13"));
-			temporaryloan = Integer.valueOf(tfnAllList.get("F14"));
-			collection = Integer.valueOf(tfnAllList.get("F15"));
-			shortpayment = Integer.valueOf(tfnAllList.get("F16"));
-			others = Integer.valueOf(tfnAllList.get("F17"));
+			transferamt = Integer.valueOf(tfnAllList.get("RepayAmt"));
+			makeferamt = Integer.valueOf(tfnAllList.get("AcctAmt"));
+			principal = Integer.valueOf(tfnAllList.get("Principal"));
+			interest = Integer.valueOf(tfnAllList.get("Interest"));
+			payment = Integer.valueOf(tfnAllList.get("TempPayAmt"));
+			damages = Integer.valueOf(tfnAllList.get("BreachAmt"));
+			temporaryloan = Integer.valueOf(tfnAllList.get("TempDr"));
+			collection = Integer.valueOf(tfnAllList.get("TempCr"));
+			shortpayment = Integer.valueOf(tfnAllList.get("Shortfall"));
+			others = Integer.valueOf(tfnAllList.get("Fee"));
 			count++;
 
 			// 判斷當前的批號與批次號碼不同
-			if (!msName.equals(tfnAllList.get("F0")) || !msNum.equals(tfnAllList.get("F1"))) {
+			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
 
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					String aName = tfnAllList.get("F22");
+					String aName = tfnAllList.get("AcctItem");
 					if (aName.equals("999") || msCode.equals("") || msCode.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
@@ -625,29 +737,29 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
-					totalsum += allsum;
-					totalsum2 += allsum2;
-					totalsum3 += allsum3;
-					totalsum4 += allsum4;
-					totalsum5 += allsum5;
-					totalsum6 += allsum6;
-					totalsum7 += allsum7;
-					totalsum8 += allsum8;
-					totalsum9 += allsum9;
-					totalsum10 += allsum10;
+					totalsumTransferAmt += allsumTransferAmt;
+					totalsumMakerferAmt += allsumMakeferAmt;
+					totalsumPrincipal += allsumPrincipal;
+					totalsumInterest += allsumInterest;
+					totalsumPayment += allsumPayment;
+					totalsumDamages += allsumDamages;
+					totalsumTemporaryLoan += allsumTemporaryLoan;
+					totalsumCollection += allsumCollection;
+					totalsumShortPayment += allsumShortPayment;
+					totalsumOthers += allsumOthers;
 
-					allsum = 0;
-					allsum2 = 0;
-					allsum3 = 0;
-					allsum4 = 0;
-					allsum5 = 0;
-					allsum6 = 0;
-					allsum7 = 0;
-					allsum8 = 0;
-					allsum9 = 0;
-					allsum10 = 0;
+					allsumTransferAmt = 0;
+					allsumMakeferAmt = 0;
+					allsumPrincipal = 0;
+					allsumInterest = 0;
+					allsumPayment = 0;
+					allsumDamages = 0;
+					allsumTemporaryLoan = 0;
+					allsumCollection = 0;
+					allsumShortPayment = 0;
+					allsumOthers = 0;
 
-					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
+					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
 					npcount = 0;
@@ -656,25 +768,25 @@ public class L4211Report extends MakeReport {
 
 				// 頁面設置配置
 
-				this.setFont(1, 8);
-				String A17 = tfnAllList.get("F0");
+				String A17 = tfnAllList.get("ReconCode");
 				if (A17.equals("P03")) {
-					this.print(-3, 90, "A7");
+					this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 				} else {
-					this.print(-3, 90, A17);// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+					this.print(-3, this.getMidXAxis() + 10, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 				}
-				this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
+				this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 				this.print(-8, 0, "");
 
-				msName = tfnAllList.get("F0");
-				msNum = tfnAllList.get("F1");
+				msName = tfnAllList.get("ReconCode");
+				msNum = tfnAllList.get("BatchNo");
 			} else {
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("F22").toString()) || !txCode.equals(tfnAllList.get("F23").toString())) {
+					if (!msCode.equals(tfnAllList.get("AcctItem").toString())
+							|| !txCode.equals(tfnAllList.get("RepayItem").toString())) {
 						this.info("msCode       = " + msCode);
-						this.info("22       = " + tfnAllList.get("F22").toString());
+						this.info("22       = " + tfnAllList.get("AcctItem").toString());
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -691,42 +803,42 @@ public class L4211Report extends MakeReport {
 
 						pageCnt = pageCnt + 2;
 
-						totalsum += allsum;
-						totalsum2 += allsum2;
-						totalsum3 += allsum3;
-						totalsum4 += allsum4;
-						totalsum5 += allsum5;
-						totalsum6 += allsum6;
-						totalsum7 += allsum7;
-						totalsum8 += allsum8;
-						totalsum9 += allsum9;
-						totalsum10 += allsum10;
+						totalsumTransferAmt += allsumTransferAmt;
+						totalsumMakerferAmt += allsumMakeferAmt;
+						totalsumPrincipal += allsumPrincipal;
+						totalsumInterest += allsumInterest;
+						totalsumPayment += allsumPayment;
+						totalsumDamages += allsumDamages;
+						totalsumTemporaryLoan += allsumTemporaryLoan;
+						totalsumCollection += allsumCollection;
+						totalsumShortPayment += allsumShortPayment;
+						totalsumOthers += allsumOthers;
 
-						allsum = 0;
-						allsum2 = 0;
-						allsum3 = 0;
-						allsum4 = 0;
-						allsum5 = 0;
-						allsum6 = 0;
-						allsum7 = 0;
-						allsum8 = 0;
-						allsum9 = 0;
-						allsum10 = 0;
+						allsumTransferAmt = 0;
+						allsumMakeferAmt = 0;
+						allsumPrincipal = 0;
+						allsumInterest = 0;
+						allsumPayment = 0;
+						allsumDamages = 0;
+						allsumTemporaryLoan = 0;
+						allsumCollection = 0;
+						allsumShortPayment = 0;
+						allsumOthers = 0;
 					}
 
 				}
 
 				if (pageCnt >= 30) { // 超過40筆自動換頁 並印出當前的代碼
 
-					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
+					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					if (tfnAllList.get("F0").equals("P03")) {
-						this.print(-3, 90, "A7");
+					if (tfnAllList.get("ReconCode").equals("P03")) {
+						this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 					} else {
-						this.print(-3, 90, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 					}
-					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
+					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}
 			} // else
@@ -734,118 +846,120 @@ public class L4211Report extends MakeReport {
 			npcount++;
 			tround++;
 
-//			每頁筆數相加
+//            每頁筆數相加
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-			msCode = tfnAllList.get("F22").toString();
+			msCode = tfnAllList.get("AcctItem").toString();
 			// 當前代碼對應中文 當下一筆不同時取用
-			txCode = tfnAllList.get("F23").toString();
+			txCode = tfnAllList.get("RepayItem").toString();
 
 			// 報表邏輯及排序
 
 			// 匯款日 * type = 1: yyy/mm/dd<BR>
-			this.print(1, 2, showRocDate((tfnAllList.get("F2")), 1));
+			this.print(1, 2, showRocDate((tfnAllList.get("EntryDate")), 1));
 
-			if (!scode.equals(tfnAllList.get("F3"))) { // 匯款序號不同 印匯款金額
-				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號
-				this.print(0, 29, df2, "R");// 匯款金額
+			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
+				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
+				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 
-				allsum += transferamt;
+				allsumTransferAmt += transferamt;
 
-				scode = tfnAllList.get("F3");
+				scode = tfnAllList.get("DetailSeq");
 
 			}
 
-			this.print(0, 40, df3, "R");// 作帳金額
-			this.print(0, 41, tfnAllList.get("F6"));// 戶號
-			String name = tfnAllList.get("F7");
+			this.print(0, 40, dfMakeferAmt, "R");// 作帳金額
+			String custNo = tfnAllList.get("CustNo");
+			custNo += isBatchMapList ? "-" : " ";
+			custNo += tfnAllList.get("RepaidPeriod");
+			this.print(0, 41, custNo);// 戶號
+			String name = tfnAllList.get("CustName");
 			if (name.length() > 5) {// 戶名
 				name = name.substring(0, 5);
 			}
-			this.print(0, 57, name);
-			this.print(0, 68, showRocDate(tfnAllList.get("F8"), 1));// 起日
-			this.print(0, 77, "-");
-			this.print(0, 78, showRocDate(tfnAllList.get("F9"), 1));// 迄日
+			this.print(0, 60, name + " " + tfnAllList.get("CloseReasonCode"));
+			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
+					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
-			if (df5.equals("0")) {
-				this.print(0, 106, "", "R"); // 利息
+			if (dfInterest.equals("0")) {
+				this.print(0, 112, "", "R"); // 利息
 			} else {
-				this.print(0, 106, df5, "R"); // 利息
+				this.print(0, 112, dfInterest, "R"); // 利息
 			}
-			if (df6.equals("0")) {
-				this.print(0, 115, "", "R"); // 暫付款
+			if (dfPayment.equals("0")) {
+				this.print(0, 121, "", "R"); // 暫付款
 			} else {
-				this.print(0, 115, df6, "R"); // 暫付款
+				this.print(0, 121, dfPayment, "R"); // 暫付款
 			}
-			if (df7.equals("0")) {
-				this.print(0, 125, "", "R"); // 違約金
+			if (dfDamages.equals("0")) {
+				this.print(0, 131, "", "R"); // 違約金
 			} else {
-				this.print(0, 125, df7, "R"); // 違約金
+				this.print(0, 131, dfDamages, "R"); // 違約金
 			}
-			if (df9.equals("0")) {
-				this.print(0, 145, "", "R"); // 暫收貸
+			if (dfCollection.equals("0")) {
+				this.print(0, 151, "", "R"); // 暫收貸
 			} else {
-				this.print(0, 145, df9, "R"); // 暫收貸
+				this.print(0, 151, dfCollection, "R"); // 暫收貸
 			}
-			if (df10.equals("0")) {
-				this.print(0, 155, "", "R"); // 短繳
+			if (dfShortPayment.equals("0")) {
+				this.print(0, 160, "", "R"); // 短繳
 			} else {
-				this.print(0, 155, df10, "R"); // 短繳
+				this.print(0, 160, dfShortPayment, "R"); // 短繳
 			}
-			if (df11.equals("0")) {
-				this.print(0, 165, "", "R"); // 帳管費及其他
+			if (dfOthers.equals("0")) {
+				this.print(0, 167, "", "R"); // 帳管費及其他
 			} else {
-				this.print(0, 165, df11, "R"); // 帳管費及其他
+				this.print(0, 167, dfOthers, "R"); // 帳管費及其他
 			}
-			if (df4.equals("0")) {
-				this.print(0, 97, "", "R"); // 本金
+			if (dfPrincipal.equals("0")) {
+				this.print(0, 103, "", "R"); // 本金
 			} else {
-				this.print(0, 97, df4, "R"); // 本金
+				this.print(0, 103, dfPrincipal, "R"); // 本金
 			}
-			if (df8.equals("0")) {
-				this.print(0, 137, "", "R"); // 暫收借
+			if (dfTemporaryLoan.equals("0")) {
+				this.print(0, 143, "", "R"); // 暫收借
 			} else {
-				this.print(0, 137, df8, "R"); // 暫收借
+				this.print(0, 143, dfTemporaryLoan, "R"); // 暫收借
 			}
 
-			allsum2 += makeferamt;
-			allsum3 += principal;
-			allsum4 += interest;
-			allsum5 += payment;
-			allsum6 += damages;
-			allsum7 += temporaryloan;
-			allsum8 += collection;
-			allsum9 += shortpayment;
-			allsum10 += others;
+			allsumMakeferAmt += makeferamt;
+			allsumPrincipal += principal;
+			allsumInterest += interest;
+			allsumPayment += payment;
+			allsumDamages += damages;
+			allsumTemporaryLoan += temporaryloan;
+			allsumCollection += collection;
+			allsumShortPayment += shortpayment;
+			allsumOthers += others;
 
 			// 最後一筆產出
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("F23"))) {
+				if ("".equals(tfnAllList.get("RepayItem"))) {
 					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, msCode);
 					}
 				} else {
-					this.print(1, 2, tfnAllList.get("F23"));
+					this.print(1, 2, tfnAllList.get("RepayItem"));
 				}
 				this.print(0, 14, " 小計 ");
 
 				atAll();
 
-				totalsum += allsum;
-				totalsum2 += allsum2;
-				totalsum3 += allsum3;
-				totalsum4 += allsum4;
-				totalsum5 += allsum5;
-				totalsum6 += allsum6;
-				totalsum7 += allsum7;
-				totalsum8 += allsum8;
-				totalsum9 += allsum9;
-				totalsum10 += allsum10;
+				totalsumTransferAmt += allsumTransferAmt;
+				totalsumMakerferAmt += allsumMakeferAmt;
+				totalsumPrincipal += allsumPrincipal;
+				totalsumInterest += allsumInterest;
+				totalsumPayment += allsumPayment;
+				totalsumDamages += allsumDamages;
+				totalsumTemporaryLoan += allsumTemporaryLoan;
+				totalsumCollection += allsumCollection;
+				totalsumShortPayment += allsumShortPayment;
+				totalsumOthers += allsumOthers;
 
 				this.print(1, 0, "");
 				this.print(1, 0,
@@ -854,36 +968,36 @@ public class L4211Report extends MakeReport {
 
 				totalAll();
 				pageCnt = pageCnt + 4;
-				allsum = 0;
-				allsum2 = 0;
-				allsum3 = 0;
-				allsum4 = 0;
-				allsum5 = 0;
-				allsum6 = 0;
-				allsum7 = 0;
-				allsum8 = 0;
-				allsum9 = 0;
-				allsum10 = 0;
+				allsumTransferAmt = 0;
+				allsumMakeferAmt = 0;
+				allsumPrincipal = 0;
+				allsumInterest = 0;
+				allsumPayment = 0;
+				allsumDamages = 0;
+				allsumTemporaryLoan = 0;
+				allsumCollection = 0;
+				allsumShortPayment = 0;
+				allsumOthers = 0;
 
-				totalsum = 0;
-				totalsum2 = 0;
-				totalsum3 = 0;
-				totalsum4 = 0;
-				totalsum5 = 0;
-				totalsum6 = 0;
-				totalsum7 = 0;
-				totalsum8 = 0;
-				totalsum9 = 0;
-				totalsum10 = 0;
+				totalsumTransferAmt = 0;
+				totalsumMakerferAmt = 0;
+				totalsumPrincipal = 0;
+				totalsumInterest = 0;
+				totalsumPayment = 0;
+				totalsumDamages = 0;
+				totalsumTemporaryLoan = 0;
+				totalsumCollection = 0;
+				totalsumShortPayment = 0;
+				totalsumOthers = 0;
 
-				this.print(pageIndex - pageCnt - 2, 80, "=====報表結束=====", "C");
-				this.print(2, 80, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
+				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
+				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
 			}
 
 		} // for
 	}
 
-	private void report3(List<Map<String, String>> fnAllList) {
+	private void report3(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
 		String msCode = ""; // 代號
 		String txCode = ""; // 代號名稱
 		String msName = ""; // 表頭P號
@@ -896,36 +1010,36 @@ public class L4211Report extends MakeReport {
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String df2 = formatAmt(tfnAllList.get("F4"), 0);
-			String df3 = formatAmt(tfnAllList.get("F5"), 0);
-			String df4 = formatAmt(tfnAllList.get("F10"), 0);
-			String df5 = formatAmt(tfnAllList.get("F11"), 0);
-			String df6 = formatAmt(tfnAllList.get("F12"), 0);
-			String df7 = formatAmt(tfnAllList.get("F13"), 0);
-			String df8 = formatAmt(tfnAllList.get("F14"), 0);
-			String df9 = formatAmt(tfnAllList.get("F15"), 0);
-			String df10 = formatAmt(tfnAllList.get("F16"), 0);
-			String df11 = formatAmt(tfnAllList.get("F17"), 0);
+			String dfTransferAmt = formatAmt(tfnAllList.get("RepayAmt"), 0);
+			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
+			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
+			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
+			String dfPayment = formatAmt(tfnAllList.get("TempPayAmt"), 0);
+			String dfDamages = formatAmt(tfnAllList.get("BreachAmt"), 0);
+			String dfTemporaryLoan = formatAmt(tfnAllList.get("TempDr"), 0);
+			String dfCollection = formatAmt(tfnAllList.get("TempCr"), 0);
+			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
+			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = Integer.valueOf(tfnAllList.get("F4"));
-			makeferamt = Integer.valueOf(tfnAllList.get("F5"));
-			principal = Integer.valueOf(tfnAllList.get("F10"));
-			interest = Integer.valueOf(tfnAllList.get("F11"));
-			payment = Integer.valueOf(tfnAllList.get("F12"));
-			damages = Integer.valueOf(tfnAllList.get("F13"));
-			temporaryloan = Integer.valueOf(tfnAllList.get("F14"));
-			collection = Integer.valueOf(tfnAllList.get("F15"));
-			shortpayment = Integer.valueOf(tfnAllList.get("F16"));
-			others = Integer.valueOf(tfnAllList.get("F17"));
+			transferamt = Integer.valueOf(tfnAllList.get("RepayAmt"));
+			makeferamt = Integer.valueOf(tfnAllList.get("AcctAmt"));
+			principal = Integer.valueOf(tfnAllList.get("Principal"));
+			interest = Integer.valueOf(tfnAllList.get("Interest"));
+			payment = Integer.valueOf(tfnAllList.get("TempPayAmt"));
+			damages = Integer.valueOf(tfnAllList.get("BreachAmt"));
+			temporaryloan = Integer.valueOf(tfnAllList.get("TempDr"));
+			collection = Integer.valueOf(tfnAllList.get("TempCr"));
+			shortpayment = Integer.valueOf(tfnAllList.get("Shortfall"));
+			others = Integer.valueOf(tfnAllList.get("Fee"));
 			count++;
 
 			// 判斷當前的批號與批次號碼不同
-			if (!msName.equals(tfnAllList.get("F0")) || !msNum.equals(tfnAllList.get("F1"))) {
+			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
 
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					String aName = tfnAllList.get("F22");
+					String aName = tfnAllList.get("AcctItem");
 					if (aName.equals("999") || msCode.equals("") || msCode.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
@@ -935,29 +1049,29 @@ public class L4211Report extends MakeReport {
 
 					atAll();
 
-					totalsum += allsum;
-					totalsum2 += allsum2;
-					totalsum3 += allsum3;
-					totalsum4 += allsum4;
-					totalsum5 += allsum5;
-					totalsum6 += allsum6;
-					totalsum7 += allsum7;
-					totalsum8 += allsum8;
-					totalsum9 += allsum9;
-					totalsum10 += allsum10;
+					totalsumTransferAmt += allsumTransferAmt;
+					totalsumMakerferAmt += allsumMakeferAmt;
+					totalsumPrincipal += allsumPrincipal;
+					totalsumInterest += allsumInterest;
+					totalsumPayment += allsumPayment;
+					totalsumDamages += allsumDamages;
+					totalsumTemporaryLoan += allsumTemporaryLoan;
+					totalsumCollection += allsumCollection;
+					totalsumShortPayment += allsumShortPayment;
+					totalsumOthers += allsumOthers;
 
-					allsum = 0;
-					allsum2 = 0;
-					allsum3 = 0;
-					allsum4 = 0;
-					allsum5 = 0;
-					allsum6 = 0;
-					allsum7 = 0;
-					allsum8 = 0;
-					allsum9 = 0;
-					allsum10 = 0;
+					allsumTransferAmt = 0;
+					allsumMakeferAmt = 0;
+					allsumPrincipal = 0;
+					allsumInterest = 0;
+					allsumPayment = 0;
+					allsumDamages = 0;
+					allsumTemporaryLoan = 0;
+					allsumCollection = 0;
+					allsumShortPayment = 0;
+					allsumOthers = 0;
 
-					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
+					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
 					npcount = 0;
@@ -966,25 +1080,25 @@ public class L4211Report extends MakeReport {
 
 				// 頁面設置配置
 
-				this.setFont(1, 8);
-				String A17 = tfnAllList.get("F0");
+				String A17 = tfnAllList.get("ReconCode");
 				if (A17.equals("P03")) {
-					this.print(-3, 90, "A7");
+					this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 				} else {
-					this.print(-3, 90, A17);// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+					this.print(-3, this.getMidXAxis() + 10, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 				}
-				this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
+				this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 				this.print(-8, 0, "");
 
-				msName = tfnAllList.get("F0");
-				msNum = tfnAllList.get("F1");
+				msName = tfnAllList.get("ReconCode");
+				msNum = tfnAllList.get("BatchNo");
 			} else {
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					if (!msCode.equals(tfnAllList.get("F22").toString()) || !txCode.equals(tfnAllList.get("F23").toString())) {
+					if (!msCode.equals(tfnAllList.get("AcctItem").toString())
+							|| !txCode.equals(tfnAllList.get("RepayItem").toString())) {
 						this.info("msCode       = " + msCode);
-						this.info("22       = " + tfnAllList.get("F22").toString());
+						this.info("22       = " + tfnAllList.get("AcctItem").toString());
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -1001,42 +1115,42 @@ public class L4211Report extends MakeReport {
 
 						pageCnt = pageCnt + 2;
 
-						totalsum += allsum;
-						totalsum2 += allsum2;
-						totalsum3 += allsum3;
-						totalsum4 += allsum4;
-						totalsum5 += allsum5;
-						totalsum6 += allsum6;
-						totalsum7 += allsum7;
-						totalsum8 += allsum8;
-						totalsum9 += allsum9;
-						totalsum10 += allsum10;
+						totalsumTransferAmt += allsumTransferAmt;
+						totalsumMakerferAmt += allsumMakeferAmt;
+						totalsumPrincipal += allsumPrincipal;
+						totalsumInterest += allsumInterest;
+						totalsumPayment += allsumPayment;
+						totalsumDamages += allsumDamages;
+						totalsumTemporaryLoan += allsumTemporaryLoan;
+						totalsumCollection += allsumCollection;
+						totalsumShortPayment += allsumShortPayment;
+						totalsumOthers += allsumOthers;
 
-						allsum = 0;
-						allsum2 = 0;
-						allsum3 = 0;
-						allsum4 = 0;
-						allsum5 = 0;
-						allsum6 = 0;
-						allsum7 = 0;
-						allsum8 = 0;
-						allsum9 = 0;
-						allsum10 = 0;
+						allsumTransferAmt = 0;
+						allsumMakeferAmt = 0;
+						allsumPrincipal = 0;
+						allsumInterest = 0;
+						allsumPayment = 0;
+						allsumDamages = 0;
+						allsumTemporaryLoan = 0;
+						allsumCollection = 0;
+						allsumShortPayment = 0;
+						allsumOthers = 0;
 					}
 
 				}
 
 				if (pageCnt >= 30) { // 超過40筆自動換頁 並印出當前的代碼
 
-					this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
+					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					if (tfnAllList.get("F0").equals("P03")) {
-						this.print(-3, 90, "A7");
+					if (tfnAllList.get("ReconCode").equals("P03")) {
+						this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 					} else {
-						this.print(-3, 90, tfnAllList.get("F0"));// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 					}
-					this.print(-5, 15, tfnAllList.get("F1"));// 批次號碼(表頭)
+					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}
 			} // else
@@ -1044,118 +1158,120 @@ public class L4211Report extends MakeReport {
 			npcount++;
 			tround++;
 
-//			每頁筆數相加
+//            每頁筆數相加
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-			msCode = tfnAllList.get("F22").toString();
+			msCode = tfnAllList.get("AcctItem").toString();
 			// 當前代碼對應中文 當下一筆不同時取用
-			txCode = tfnAllList.get("F23").toString();
+			txCode = tfnAllList.get("RepayItem").toString();
 
 			// 報表邏輯及排序
 
 			// 匯款日 * type = 1: yyy/mm/dd<BR>
-			this.print(1, 2, showRocDate((tfnAllList.get("F2")), 1));
+			this.print(1, 2, showRocDate((tfnAllList.get("EntryDate")), 1));
 
-			if (!scode.equals(tfnAllList.get("F3"))) { // 匯款序號不同 印匯款金額
-				this.print(0, 16, tfnAllList.get("F3"), "C");// 匯款序號
-				this.print(0, 29, df2, "R");// 匯款金額
+			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
+				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
+				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 
-				allsum += transferamt;
+				allsumTransferAmt += transferamt;
 
-				scode = tfnAllList.get("F3");
+				scode = tfnAllList.get("DetailSeq");
 
 			}
 
-			this.print(0, 40, df3, "R");// 作帳金額
-			this.print(0, 41, tfnAllList.get("F6"));// 戶號
-			String name = tfnAllList.get("F7");
+			this.print(0, 40, dfMakeferAmt, "R");// 作帳金額
+			String custNo = tfnAllList.get("CustNo");
+			custNo += isBatchMapList ? "-" : " ";
+			custNo += tfnAllList.get("RepaidPeriod");
+			this.print(0, 41, custNo);// 戶號
+			String name = tfnAllList.get("CustName");
 			if (name.length() > 5) {// 戶名
 				name = name.substring(0, 5);
 			}
-			this.print(0, 57, name);
-			this.print(0, 68, showRocDate(tfnAllList.get("F8"), 1));// 起日
-			this.print(0, 77, "-");
-			this.print(0, 78, showRocDate(tfnAllList.get("F9"), 1));// 迄日
+			this.print(0, 60, name + " " + tfnAllList.get("CloseReasonCode"));
+			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
+					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
-			if (df5.equals("0")) {
-				this.print(0, 106, "", "R"); // 利息
+			if (dfInterest.equals("0")) {
+				this.print(0, 112, "", "R"); // 利息
 			} else {
-				this.print(0, 106, df5, "R"); // 利息
+				this.print(0, 112, dfInterest, "R"); // 利息
 			}
-			if (df6.equals("0")) {
-				this.print(0, 115, "", "R"); // 暫付款
+			if (dfPayment.equals("0")) {
+				this.print(0, 121, "", "R"); // 暫付款
 			} else {
-				this.print(0, 115, df6, "R"); // 暫付款
+				this.print(0, 121, dfPayment, "R"); // 暫付款
 			}
-			if (df7.equals("0")) {
-				this.print(0, 125, "", "R"); // 違約金
+			if (dfDamages.equals("0")) {
+				this.print(0, 131, "", "R"); // 違約金
 			} else {
-				this.print(0, 125, df7, "R"); // 違約金
+				this.print(0, 131, dfDamages, "R"); // 違約金
 			}
-			if (df9.equals("0")) {
-				this.print(0, 145, "", "R"); // 暫收貸
+			if (dfCollection.equals("0")) {
+				this.print(0, 151, "", "R"); // 暫收貸
 			} else {
-				this.print(0, 145, df9, "R"); // 暫收貸
+				this.print(0, 151, dfCollection, "R"); // 暫收貸
 			}
-			if (df10.equals("0")) {
-				this.print(0, 155, "", "R"); // 短繳
+			if (dfShortPayment.equals("0")) {
+				this.print(0, 160, "", "R"); // 短繳
 			} else {
-				this.print(0, 155, df10, "R"); // 短繳
+				this.print(0, 160, dfShortPayment, "R"); // 短繳
 			}
-			if (df11.equals("0")) {
-				this.print(0, 165, "", "R"); // 帳管費及其他
+			if (dfOthers.equals("0")) {
+				this.print(0, 167, "", "R"); // 帳管費及其他
 			} else {
-				this.print(0, 165, df11, "R"); // 帳管費及其他
+				this.print(0, 167, dfOthers, "R"); // 帳管費及其他
 			}
-			if (df4.equals("0")) {
-				this.print(0, 97, "", "R"); // 本金
+			if (dfPrincipal.equals("0")) {
+				this.print(0, 103, "", "R"); // 本金
 			} else {
-				this.print(0, 97, df4, "R"); // 本金
+				this.print(0, 103, dfPrincipal, "R"); // 本金
 			}
-			if (df8.equals("0")) {
-				this.print(0, 137, "", "R"); // 暫收借
+			if (dfTemporaryLoan.equals("0")) {
+				this.print(0, 143, "", "R"); // 暫收借
 			} else {
-				this.print(0, 137, df8, "R"); // 暫收借
+				this.print(0, 143, dfTemporaryLoan, "R"); // 暫收借
 			}
 
-			allsum2 += makeferamt;
-			allsum3 += principal;
-			allsum4 += interest;
-			allsum5 += payment;
-			allsum6 += damages;
-			allsum7 += temporaryloan;
-			allsum8 += collection;
-			allsum9 += shortpayment;
-			allsum10 += others;
+			allsumMakeferAmt += makeferamt;
+			allsumPrincipal += principal;
+			allsumInterest += interest;
+			allsumPayment += payment;
+			allsumDamages += damages;
+			allsumTemporaryLoan += temporaryloan;
+			allsumCollection += collection;
+			allsumShortPayment += shortpayment;
+			allsumOthers += others;
 
 			// 最後一筆產出
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if ("".equals(tfnAllList.get("F23"))) {
+				if ("".equals(tfnAllList.get("RepayItem"))) {
 					if (msCode.equals("999") || msCode.equals("") || msCode.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, msCode);
 					}
 				} else {
-					this.print(1, 2, tfnAllList.get("F23"));
+					this.print(1, 2, tfnAllList.get("RepayItem"));
 				}
 				this.print(0, 14, " 小計 ");
 
 				atAll();
 
-				totalsum += allsum;
-				totalsum2 += allsum2;
-				totalsum3 += allsum3;
-				totalsum4 += allsum4;
-				totalsum5 += allsum5;
-				totalsum6 += allsum6;
-				totalsum7 += allsum7;
-				totalsum8 += allsum8;
-				totalsum9 += allsum9;
-				totalsum10 += allsum10;
+				totalsumTransferAmt += allsumTransferAmt;
+				totalsumMakerferAmt += allsumMakeferAmt;
+				totalsumPrincipal += allsumPrincipal;
+				totalsumInterest += allsumInterest;
+				totalsumPayment += allsumPayment;
+				totalsumDamages += allsumDamages;
+				totalsumTemporaryLoan += allsumTemporaryLoan;
+				totalsumCollection += allsumCollection;
+				totalsumShortPayment += allsumShortPayment;
+				totalsumOthers += allsumOthers;
 
 				this.print(1, 0, "");
 				this.print(1, 0,
@@ -1164,30 +1280,30 @@ public class L4211Report extends MakeReport {
 
 				totalAll();
 				pageCnt = pageCnt + 4;
-				allsum = 0;
-				allsum2 = 0;
-				allsum3 = 0;
-				allsum4 = 0;
-				allsum5 = 0;
-				allsum6 = 0;
-				allsum7 = 0;
-				allsum8 = 0;
-				allsum9 = 0;
-				allsum10 = 0;
+				allsumTransferAmt = 0;
+				allsumMakeferAmt = 0;
+				allsumPrincipal = 0;
+				allsumInterest = 0;
+				allsumPayment = 0;
+				allsumDamages = 0;
+				allsumTemporaryLoan = 0;
+				allsumCollection = 0;
+				allsumShortPayment = 0;
+				allsumOthers = 0;
 
-				totalsum = 0;
-				totalsum2 = 0;
-				totalsum3 = 0;
-				totalsum4 = 0;
-				totalsum5 = 0;
-				totalsum6 = 0;
-				totalsum7 = 0;
-				totalsum8 = 0;
-				totalsum9 = 0;
-				totalsum10 = 0;
+				totalsumTransferAmt = 0;
+				totalsumMakerferAmt = 0;
+				totalsumPrincipal = 0;
+				totalsumInterest = 0;
+				totalsumPayment = 0;
+				totalsumDamages = 0;
+				totalsumTemporaryLoan = 0;
+				totalsumCollection = 0;
+				totalsumShortPayment = 0;
+				totalsumOthers = 0;
 
-				this.print(pageIndex - pageCnt - 2, 80, "=====報表結束=====", "C");
-				this.print(2, 80, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
+				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
+				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
 			}
 
 		} // for
@@ -1195,112 +1311,112 @@ public class L4211Report extends MakeReport {
 
 	private void atAll() {
 
-		if (allsum != 0) {
-			this.print(0, 29, String.format("%,d", allsum), "R");
+		if (allsumTransferAmt != 0) {
+			this.print(0, 29, String.format("%,d", allsumTransferAmt), "R");
 		} else {
 			this.print(0, 29, "");
 		}
-		if (allsum2 != 0) {
-			this.print(0, 40, String.format("%,d", allsum2), "R");
+		if (allsumMakeferAmt != 0) {
+			this.print(0, 40, String.format("%,d", allsumMakeferAmt), "R");
 		} else {
 			this.print(0, 40, "");
 		}
 
-		if (allsum3 != 0) {
-			this.print(0, 97, String.format("%,d", allsum3), "R");
+		if (allsumPrincipal != 0) {
+			this.print(0, 103, String.format("%,d", allsumPrincipal), "R");
 		} else {
-			this.print(0, 97, "");
+			this.print(0, 103, "");
 		}
-		if (allsum5 != 0) {
-			this.print(0, 117, String.format("%,d", allsum5), "R");
+		if (allsumPayment != 0) {
+			this.print(0, 121, String.format("%,d", allsumPayment), "R");
 		} else {
-			this.print(0, 117, "");
+			this.print(0, 121, "");
 		}
-		if (allsum6 != 0) {
-			this.print(0, 125, String.format("%,d", allsum6), "R");
+		if (allsumDamages != 0) {
+			this.print(0, 131, String.format("%,d", allsumDamages), "R");
 		} else {
-			this.print(0, 125, "");
+			this.print(0, 131, "");
 		}
-		if (allsum7 != 0) {
-			this.print(0, 137, String.format("%,d", allsum7), "R");
+		if (allsumTemporaryLoan != 0) {
+			this.print(0, 143, String.format("%,d", allsumTemporaryLoan), "R");
 		} else {
-			this.print(0, 137, "");
+			this.print(0, 143, "");
 		}
-		if (allsum9 != 0) {
-			this.print(0, 154, String.format("%,d", allsum9), "R");
+		if (allsumShortPayment != 0) {
+			this.print(0, 160, String.format("%,d", allsumShortPayment), "R");
 		} else {
-			this.print(0, 154, "");
+			this.print(0, 160, "");
 		}
-		if (allsum10 != 0) {
-			this.print(0, 165, String.format("%,d", allsum10), "R");
+		if (allsumOthers != 0) {
+			this.print(0, 167, String.format("%,d", allsumOthers), "R");
 		} else {
-			this.print(0, 165, "");
+			this.print(0, 167, "");
 		}
-		if (allsum4 != 0) {
-			this.print(1, 106, String.format("%,d", allsum4), "R");
+		if (allsumInterest != 0) {
+			this.print(1, 112, String.format("%,d", allsumInterest), "R");
 		} else {
-			this.print(1, 106, "");
+			this.print(1, 112, "");
 		}
-		if (allsum8 != 0) {
-			this.print(0, 145, String.format("%,d", allsum8), "R");
+		if (allsumCollection != 0) {
+			this.print(0, 151, String.format("%,d", allsumCollection), "R");
 		} else {
-			this.print(0, 145, "");
+			this.print(0, 151, "");
 		}
 
 	}
 
 	private void totalAll() {
 
-		if (totalsum != 0) {
-			this.print(0, 29, String.format("%,d", totalsum), "R");
+		if (totalsumTransferAmt != 0) {
+			this.print(0, 29, String.format("%,d", totalsumTransferAmt), "R");
 		} else {
 			this.print(0, 29, "");
 		}
-		if (totalsum2 != 0) {
-			this.print(0, 40, String.format("%,d", totalsum2), "R");
+		if (totalsumMakerferAmt != 0) {
+			this.print(0, 40, String.format("%,d", totalsumMakerferAmt), "R");
 		} else {
 			this.print(0, 40, "");
 		}
 
-		if (totalsum3 != 0) {
-			this.print(0, 97, String.format("%,d", totalsum3), "R");
+		if (totalsumPrincipal != 0) {
+			this.print(0, 103, String.format("%,d", totalsumPrincipal), "R");
 		} else {
-			this.print(0, 97, "");
+			this.print(0, 103, "");
 		}
-		if (totalsum5 != 0) {
-			this.print(0, 117, String.format("%,d", totalsum5), "R");
+		if (totalsumPayment != 0) {
+			this.print(0, 121, String.format("%,d", totalsumPayment), "R");
 		} else {
-			this.print(0, 117, "");
+			this.print(0, 121, "");
 		}
-		if (totalsum6 != 0) {
-			this.print(0, 125, String.format("%,d", totalsum6), "R");
+		if (totalsumDamages != 0) {
+			this.print(0, 131, String.format("%,d", totalsumDamages), "R");
 		} else {
-			this.print(0, 125, "");
+			this.print(0, 131, "");
 		}
-		if (totalsum7 != 0) {
-			this.print(0, 137, String.format("%,d", totalsum7), "R");
+		if (totalsumTemporaryLoan != 0) {
+			this.print(0, 143, String.format("%,d", totalsumTemporaryLoan), "R");
 		} else {
-			this.print(0, 137, "");
+			this.print(0, 143, "");
 		}
-		if (totalsum9 != 0) {
-			this.print(0, 154, String.format("%,d", totalsum9), "R");
+		if (totalsumShortPayment != 0) {
+			this.print(0, 160, String.format("%,d", totalsumShortPayment), "R");
 		} else {
-			this.print(0, 154, "");
+			this.print(0, 160, "");
 		}
-		if (totalsum10 != 0) {
-			this.print(0, 165, String.format("%,d", totalsum10), "R");
+		if (totalsumOthers != 0) {
+			this.print(0, 167, String.format("%,d", totalsumOthers), "R");
 		} else {
-			this.print(0, 165, "");
+			this.print(0, 167, "");
 		}
-		if (totalsum4 != 0) {
-			this.print(1, 106, String.format("%,d", totalsum4), "R");
+		if (totalsumInterest != 0) {
+			this.print(1, 112, String.format("%,d", totalsumInterest), "R");
 		} else {
-			this.print(1, 106, "");
+			this.print(1, 112, "");
 		}
-		if (totalsum8 != 0) {
-			this.print(0, 145, String.format("%,d", totalsum8), "R");
+		if (totalsumCollection != 0) {
+			this.print(0, 151, String.format("%,d", totalsumCollection), "R");
 		} else {
-			this.print(0, 145, "");
+			this.print(0, 151, "");
 		}
 
 	}

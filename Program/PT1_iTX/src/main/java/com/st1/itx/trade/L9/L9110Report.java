@@ -834,7 +834,7 @@ public class L9110Report extends MakeReport {
 		BigDecimal totalBdSubArea = BigDecimal.ZERO;
 		BigDecimal totalPublicArea = BigDecimal.ZERO;
 		BigDecimal totalCarArea = BigDecimal.ZERO;
-		BigDecimal totalSettingAmt = BigDecimal.ZERO;
+//		BigDecimal totalSettingAmt = BigDecimal.ZERO;
 
 		BigDecimal thousand = getBigDecimal("1000");
 
@@ -862,7 +862,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 129, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F7")), thousand, 0), 0), "R"); // 鑑定單價
 
 			this.print(0, 141, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F8")), thousand, 0), 0), "R");// 設定金額
-			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F8")));
+//			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F8")));
 
 			this.print(0, 143, mBuilding.get("F10")); // 賣方姓名
 			this.print(0, 157, mBuilding.get("F11")); // 賣方ID
@@ -877,7 +877,8 @@ public class L9110Report extends MakeReport {
 		print(0, 97, formatAmt(totalBdSubArea, 2), "R");
 		print(0, 107, formatAmt(totalPublicArea, 2), "R");
 		print(0, 117, formatAmt(totalCarArea, 2), "R");
-		print(0, 141, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
+		// 2022-04-25 智偉:改為不顯示加總的設定金額
+//		print(0, 141, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
 	}
 
 	/**
@@ -1042,7 +1043,7 @@ public class L9110Report extends MakeReport {
 		// land
 		BigDecimal totalArea = new BigDecimal(0);
 		BigDecimal totalLastTransferred = new BigDecimal(0);
-		BigDecimal totalSettingAmt = new BigDecimal(0);
+//		BigDecimal totalSettingAmt = new BigDecimal(0);
 
 		BigDecimal thousand = getBigDecimal("1000");
 
@@ -1078,7 +1079,7 @@ public class L9110Report extends MakeReport {
 
 			totalArea = totalArea.add(getBigDecimal(mLand.get("F6")));
 			totalLastTransferred = totalLastTransferred.add(getBigDecimal(mLand.get("F8")));
-			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mLand.get("F10")));
+//			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mLand.get("F10")));
 
 		}
 		checkSpace(2);
@@ -1086,7 +1087,8 @@ public class L9110Report extends MakeReport {
 		print(1, 5, "土地合計：");
 		print(0, 101, formatAmt(totalArea, 2), "R"); // 合計-面積
 		print(0, 123, formatAmt(totalLastTransferred, 0), "R"); // 合計-前次移轉
-		print(0, 149, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R"); // 合計-設定
+		// 2022-04-25 智偉:改為不顯示加總的設定金額
+//		print(0, 149, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R"); // 合計-設定
 	}
 
 	/**

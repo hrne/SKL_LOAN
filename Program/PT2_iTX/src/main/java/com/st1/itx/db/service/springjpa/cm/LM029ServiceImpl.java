@@ -70,6 +70,9 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "       ,NVL(CL.\"LandNo\",'00000000')             AS F23  "; // 地號格式為 4-4
 //		sql += "       ,NVL(CL.\"BdNo\",'00000000')               AS F24  "; // 建號格式為 5-3
 		sql += "       ,DECODE(M.\"AcSubBookCode\",'00A',' ','A') AS F16 ";
+		sql += "       ,CASE ";
+		sql += "       	  WHEN MF.\"OvduTerm\" IN (1,2,3,4,5) THEN MF.\"OvduTerm\" ";
+		sql += "       	ELSE 0 END AS F17";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";
@@ -80,6 +83,9 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND O.\"BormNo\" = M.\"BormNo\" ";
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\" ";
 		sql += "                        AND F.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += " LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"CustNo\" = F.\"CustNo\" ";
+		sql += "                               AND MF.\"FacmNo\" = F.\"FacmNo\" ";
+		sql += "                               AND MF.\"YearMonth\" = M.\"YearMonth\" ";
 //		sql += " LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = M.\"ClCode1\" ";
 //		sql += "                       AND CI.\"ClCode2\" = M.\"ClCode2\" ";
 //		sql += "                       AND CI.\"ClNo\"    = M.\"ClNo\" ";

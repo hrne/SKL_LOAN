@@ -1,4 +1,4 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_L8_JcicB201_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB201_Upd"
 (
 -- 程式功能：維護 JcicB201 每月聯徵授信餘額月報資料檔
 -- 執行時機：每月底日終批次(換日前)
@@ -65,6 +65,7 @@ BEGIN
       LEFT JOIN "CustMain" CM ON CM."CustUKey" = G."GuaUKey"
       LEFT JOIN "CdGuarantor" CDG ON CDG."GuaRelCode" = G."GuaRelCode"
       WHERE NVL(G."GuaRelCode",'00') != '00'
+        AND G."GuaStatCode" IN ('1')  -- 設定
       UNION ALL
       -- 取得擔保品所有權人與授信戶關係檔資料
       SELECT FCA."ApplNo"          -- 授信戶案件申請號碼
@@ -379,8 +380,9 @@ BEGIN
            , M."SuvId"                             AS "SuvId"             -- 負責人IDN/負責之事業體BAN
            , ' '                                   AS "SuvIdErr"          -- 上欄IDN或BAN錯誤註記
            , M."OverseasId"                        AS "OverseasId"        -- 外僑兼具中華民國國籍IDN
-           , SUBSTR('000000' || TRIM(NVL(M."IndustryCode",' ')), -6)
-                                                   AS "IndustryCode"      -- 授信戶行業別
+           , CASE WHEN M."EntCode" IN ('0') THEN '060000'                 -- 個人戶固定為60000
+                  ELSE SUBSTR('000000' || TRIM(NVL(M."IndustryCode",' ')), -6)
+             END                                   AS "IndustryCode"      -- 授信戶行業別
            , ' '                                   AS "Filler12"          -- 空白
            , CASE
                WHEN M."Status"   IN (2, 7)         THEN 'A' -- 催收款項
@@ -473,7 +475,7 @@ BEGIN
              END                                   AS "DelayBal"          -- 逾期未還餘額（台幣千元）  (後面再更新)
            , 0                                     AS "DelayBalFx"        -- 逾期未還餘額（外幣）
            , '9'                                   AS "DelayPeriodCode"   -- 逾期期限  (先視為未逾期，後面再判斷更新)
-           , ' '                                   AS "RepayCode"         -- 本月還款紀錄  (後面再更新)
+           , '0'                                   AS "RepayCode"         -- 本月還款紀錄  (後面再更新)
 --         , ROUND((NVL(M."PrevAmt",0) + NVL(M."IntAmt",0)) / 1000, 3)
 --                                                 AS "PayAmt"            -- 本月（累計）應繳金額
            , CASE WHEN M."Status" IN (3, 5, 9) THEN 0   -- 結案:0
@@ -486,8 +488,12 @@ BEGIN
            , ROUND(NVL(M."FeeAmtRcv",0) / 1000,3)  AS "Fee"               -- 本月收取其他費用
            , 'X'                                   AS "FirstDelayCode"    -- 甲類逾期放款分類 (催收後面再更新)
            , CASE
-               WHEN M."Status"   IN (0, 4) AND M."RepayDelayMon" IN (1,2,3) THEN '1' -- 正常戶逾期未滿3個月
-               WHEN M."Status"   IN (0, 4) AND M."RepayDelayMon" IN (4,5,6) THEN '2' -- 正常戶逾期未滿6個月
+--               WHEN M."Status"   IN (0, 4) AND M."RepayDelayMon" IN (1,2,3) THEN '1' -- 正常戶逾期未滿3個月
+--               WHEN M."Status"   IN (0, 4) AND M."RepayDelayMon" IN (4,5,6) THEN '2' -- 正常戶逾期未滿6個月
+               WHEN M."Status"   IN (0, 4) AND M."RepayDelayMon" >= M."IntDelayMon"
+                    AND M."RepayDelayMon" IN (4,5,6) THEN '2'
+               WHEN M."Status"   IN (0, 4) AND M."RepayDelayMon" < M."IntDelayMon"
+                    AND M."IntDelayMon"   IN (4,5,6) THEN '2'
                ELSE 'X'
              END                                    AS "SecondDelayCode"  -- 乙類逾期放款分類 (催收後面再更新)
            , CASE
@@ -534,30 +540,53 @@ BEGIN
            , ' '                                   AS "Filler52"          -- 空白
            , 'N'                                   AS "PayablesFg"        -- 代放款註記
            , CASE
-               WHEN N."CustNo" IS NOT NULL THEN 'Y'
+               WHEN N."CustNo" IS NULL THEN 'N'
+               WHEN N."CaseKindCode" IN ('1' , '2') THEN 'A'
+               WHEN N."CaseKindCode" IN ('3') THEN 'B'
+               WHEN N."CaseKindCode" IN ('4') THEN 'C'
                ELSE 'N'
              END                                   AS "NegFg"             -- 債務協商註記
            , 'N'                                   AS "Filler533"         -- (109年新增)無擔保貸款......
-           , NVL(WK1."GuaTypeJcic",' ')            AS "GuaTypeCode1"      -- 共同債務人或債務關係人身份代號1
+           , CASE WHEN NVL(WK1."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK1."GuaTypeJcic",' ')  
+             END               AS "GuaTypeCode1"      -- 共同債務人或債務關係人身份代號1
            , NVL(WK1."CustId",' ')                 AS "GuaId1"            -- 共同債務人或債務關係人身份統一編號1
            , ' '                                   AS "GuaIdErr1"         -- 上欄IDN或BAN錯誤註記
-           , NVL(WK1."GuaRelJcic",' ')             AS "GuaRelCode1"       -- 與主債務人關係1
-           , NVL(WK2."GuaTypeJcic",' ')            AS "GuaTypeCode2"      -- 共同債務人或債務關係人身份代號2
+           , CASE WHEN NVL(WK1."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK1."GuaRelJcic",' ')
+             END               AS "GuaRelCode1"       -- 與主債務人關係1
+           , CASE WHEN NVL(WK2."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK2."GuaTypeJcic",' ')
+             END               AS "GuaTypeCode2"      -- 共同債務人或債務關係人身份代號2
            , NVL(WK2."CustId",' ')                 AS "GuaId2"            -- 共同債務人或債務關係人身份統一編號2
            , ' '                                   AS "GuaIdErr2"         -- 上欄IDN或BAN錯誤註記
-           , NVL(WK2."GuaRelJcic",' ')             AS "GuaRelCode2"       -- 與主債務人關係2
-           , NVL(WK3."GuaTypeJcic",' ')            AS "GuaTypeCode3"      -- 共同債務人或債務關係人身份代號3
+           , CASE WHEN NVL(WK2."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK2."GuaRelJcic",' ')
+             END               AS "GuaRelCode2"       -- 與主債務人關係2
+           , CASE WHEN NVL(WK3."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK3."GuaTypeJcic",' ')
+             END               AS "GuaTypeCode3"      -- 共同債務人或債務關係人身份代號3
            , NVL(WK3."CustId",' ')                 AS "GuaId3"            -- 共同債務人或債務關係人身份統一編號3
            , ' '                                   AS "GuaIdErr3"         -- 上欄IDN或BAN錯誤註記
-           , NVL(WK3."GuaRelJcic",' ')             AS "GuaRelCode3"       -- 與主債務人關係3
-           , NVL(WK4."GuaTypeJcic",' ')            AS "GuaTypeCode4"      -- 共同債務人或債務關係人身份代號4
+           , CASE WHEN NVL(WK3."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK3."GuaRelJcic",' ')
+             END               AS "GuaRelCode3"       -- 與主債務人關係3
+           , CASE WHEN NVL(WK4."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK4."GuaTypeJcic",' ')
+             END               AS "GuaTypeCode4"      -- 共同債務人或債務關係人身份代號4
            , NVL(WK4."CustId",' ')                 AS "GuaId4"            -- 共同債務人或債務關係人身份統一編號4
            , ' '                                   AS "GuaIdErr4"         -- 上欄IDN或BAN錯誤註記
-           , NVL(WK4."GuaRelJcic",' ')             AS "GuaRelCode4"       -- 與主債務人關係4
-           , NVL(WK5."GuaTypeJcic",' ')            AS "GuaTypeCode5"      -- 共同債務人或債務關係人身份代號5
+           , CASE WHEN NVL(WK4."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK4."GuaRelJcic",' ')
+             END               AS "GuaRelCode4"       -- 與主債務人關係4
+           , CASE WHEN NVL(WK5."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK5."GuaTypeJcic",' ')
+             END               AS "GuaTypeCode5"      -- 共同債務人或債務關係人身份代號5
            , NVL(WK5."CustId",' ')                 AS "GuaId5"            -- 共同債務人或債務關係人身份統一編號5
            , ' '                                   AS "GuaIdErr5"         -- 上欄IDN或BAN錯誤註記
-           , NVL(WK5."GuaRelJcic",' ')             AS "GuaRelCode5"       -- 與主債務人關係5
+           , CASE WHEN NVL(WK5."CustId",' ') = ' ' THEN ' '
+                  ELSE NVL(WK5."GuaRelJcic",' ')
+             END               AS "GuaRelCode5"       -- 與主債務人關係5
            , ' '                                   AS "Filler741"         -- 空白
            , CASE WHEN M."FinCode" NOT IN ('L','M','2')    THEN ' '
                   WHEN NVL(L."GraceDate",0) = 0            THEN '00000'
@@ -639,12 +668,13 @@ BEGIN
                                   AND Tx.ROW_NO     = 1   -- 撈最後一筆
           LEFT JOIN ( SELECT  N."CustNo"
                            ,  N."CaseSeq"
+                           ,  N."CaseKindCode"
                            ,  ROW_NUMBER() Over (Partition By "CustNo"
                                                  Order By "CaseSeq" DESC)
                                               AS ROW_NO
                       FROM  "NegMain" N
-                     WHERE  N."CaseKindCode" = '1'    --案件種類-債協
-                       AND  N."Status"    = '0'       --戶況正常
+                     WHERE  --N."CaseKindCode" = '1'    --案件種類-債協
+                            N."Status"    = '0'       --戶況正常
                     ) N            ON N."CustNo"    = M."CustNo"
                                   AND N.ROW_NO      = 1
           LEFT JOIN "Work_B201_Guarantor" WK1  ON WK1."DataYM"   = M."DataYM"
@@ -745,6 +775,7 @@ BEGIN
                  , NVL(M."NextRepayDate",0)    AS "NextRepayDate"
                  , NVL(M."IntDelayMon",0)      AS "IntDelayMon"
                  , NVL(M."RepayDelayMon",0)    AS "RepayDelayMon"
+                 , M."Status"                  AS "Status"
             FROM "JcicMonthlyLoanData" M
             WHERE M."DataYM" = YYYYMM ) B
     ON (    M."DataYM"    = YYYYMM
@@ -752,6 +783,7 @@ BEGIN
        )
     WHEN MATCHED THEN UPDATE
       SET M."RepayCode" = CASE
+                            WHEN B."Status" IN ( 2 , 6 , 7 ) THEN '6'
                             WHEN ( B."PrevPayIntDate" / 100 ) < YYYYMM AND ( B."PrevRepaidDate" / 100 ) < YYYYMM
                              AND ( B."NextPayIntDate" / 100 ) > YYYYMM AND ( B."NextRepayDate"  / 100 ) > YYYYMM  THEN '0'
                             WHEN B."IntDelayMon" =   0 THEN '0'
@@ -851,6 +883,19 @@ BEGIN
       AND M."AcctCode"        = 'A'
       AND M."FirstDelayCode"  = 'X'
       AND M."SecondDelayCode" = 'X'
+      ;
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+    DBMS_OUTPUT.PUT_LINE('UPDATE 催收 SecondDelayCode=其他 END');
+
+-- 催收：更新 SecondDelayCode 乙類逾期放款分類＝其他 (ref: LNSP15A-LN15G1 (#M3101 253 1))
+    DBMS_OUTPUT.PUT_LINE('UPDATE 催收 SecondDelayCode=其他');
+
+    UPDATE "JcicB201" M
+    SET   M."DelayPeriodCode" = '9'
+    WHERE M."DataYM"          = YYYYMM
+      AND M."AcctCode"        = 'A'
+      AND M."SecondDelayCode" IN ('5' , '7')
       ;
 
     UPD_CNT := UPD_CNT + sql%rowcount;

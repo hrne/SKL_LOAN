@@ -21,11 +21,13 @@ BEGIN
                , "RepayAcct"
                , ROW_NUMBER() OVER (PARTITION BY "CustNo"
                                                , "FacmNo"
-                                    ORDER BY "AuthType") AS "Seq"
+                                    ORDER BY "AuthType"
+                                           , "Status"
+                                    ) AS "Seq"
           FROM "BankAuthAct"
           WHERE "CustNo" = "InputCustNo"
             AND "FacmNo" = "InputFacmNo"
-            AND "Status" = '0' -- 授權成功
+            -- AND "Status" = '0' -- 授權成功
          ) BAA
     WHERE "Seq" = 1
     ;

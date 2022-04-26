@@ -1,13 +1,13 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TotaVoList;
@@ -137,9 +137,15 @@ public class L420C extends TradeBuffer {
 			updateHeadRoutine(titaVo);
 		} else {
 			boolean isTx = true;
-			// 入帳檢核
+			// 入帳一律再檢核一次
 			if (functionCode == 0) {
-				tBatxDetail.setProcStsCode("0");				
+				tBatxDetail.setProcStsCode("0");
+				// 移除匯款轉帳同戶號多筆檢核
+				TempVo tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
+				tTempVo.remove("MergeCnt");
+				tTempVo.remove("MergeAmt");
+				tTempVo.remove("MergeSeq");
 				tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
 				if (!"4".equals(tBatxDetail.getProcStsCode())) {
 					try {
