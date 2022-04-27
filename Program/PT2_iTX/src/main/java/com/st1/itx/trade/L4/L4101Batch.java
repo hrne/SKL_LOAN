@@ -117,6 +117,8 @@ public class L4101Batch extends TradeBuffer {
 	@Autowired
 	L4101ReportD l4101ReportD;
 	@Autowired
+	L4101ReportE l4101ReportE;
+	@Autowired
 	L4101Vo l4101Vo;
 
 	@Value("${iTXOutFolder}")
@@ -249,25 +251,24 @@ public class L4101Batch extends TradeBuffer {
 
 		totaVo.put("PdfSnoF", "" + snoF);
 
-//			2.匯款明細
+//			4.匯款明細
 		doRptB(titaVo);
-//			3.傳票明細表
+//			5.傳票明細表
 		doRptC(titaVo);
 
-//		4.撥款未齊件表
-	    doRptD(titaVo);
-	
+//		6.撥款未齊件表
+		doRptD(titaVo);
+//		7.貸款自動轉帳申請書明細表
+		doRptE(titaVo);
+
 		String checkMsg = "撥款匯款產檔已完成。   批號 = " + batchNo;
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4101",
-				checkMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo() + "L4101", checkMsg, titaVo);
 
 		return this.sendList();
 	}
 
-	
-	
-	
 	private void procBankRemitMedia(List<BankRemit> lBankRemit, TitaVo titaVo) throws LogicException {
 		this.info("procBankRemitMedia ...");
 //		String path = outFolder + "LNM24p.txt";
@@ -338,9 +339,9 @@ public class L4101Batch extends TradeBuffer {
 		this.info("snoM : " + snoM);
 
 		makeFile.toFile(snoM);
-		
+
 		sendToFTP(snoM, titaVo);
-		
+
 		totaVo.put("PdfSnoM", "" + snoM);
 
 	}
@@ -353,14 +354,15 @@ public class L4101Batch extends TradeBuffer {
 			this.error("fileNo: " + fileNo);
 			return;
 		}
-		
+
 		SystemParas systemParas = systemParasService.findById("LN", titaVo);
 		String[] auth = systemParas.getLoanMediaFtpAuth().split(":");
 		String fileName = txFile.getFileOutput();
 		Path fullPath = Paths.get(outFolder, fileName);
-		
+
 		ftpClient.sendFile(systemParas.getLoanMediaFtpUrl(), auth[0], auth[1], fullPath.toString(), "outbound");
 	}
+
 	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {
 		String batchNo = "";
 		AcCloseId tAcCloseId = new AcCloseId();
@@ -527,7 +529,7 @@ public class L4101Batch extends TradeBuffer {
 	}
 
 	public void doRptA(TitaVo titaVo) throws LogicException {
-		this.info("L411A doRpt started.");
+		this.info("L4101A doRpt started.");
 		l4101ReportA.setTxBuffer(txBuffer);
 		String parentTranCode = titaVo.getTxcd();
 
@@ -542,12 +544,12 @@ public class L4101Batch extends TradeBuffer {
 		// 產生PDF檔案
 		l4101ReportA.toPdf(rptNo);
 
-		this.info("L411A doRpt finished.");
+		this.info("L4101A doRpt finished.");
 
 	}
 
 	public void doRptB(TitaVo titaVo) throws LogicException {
-		this.info("L411B doRpt started.");
+		this.info("L4101B doRpt started.");
 		l4101ReportB.setTxBuffer(txBuffer);
 		String parentTranCode = titaVo.getTxcd();
 
@@ -562,12 +564,12 @@ public class L4101Batch extends TradeBuffer {
 		// 產生PDF檔案
 		l4101ReportB.toPdf(rptNoB);
 
-		this.info("L411B doRpt finished.");
+		this.info("L4101B doRpt finished.");
 
 	}
 
 	public void doRptC(TitaVo titaVo) throws LogicException {
-		this.info("L411C doRpt started.");
+		this.info("L4101C doRpt started.");
 		l4101ReportC.setTxBuffer(txBuffer);
 		String parentTranCode = titaVo.getTxcd();
 
@@ -582,12 +584,12 @@ public class L4101Batch extends TradeBuffer {
 		// 產生PDF檔案
 		l4101ReportC.toPdf(rptNoB);
 
-		this.info("L411C doRpt finished.");
+		this.info("L4101C doRpt finished.");
 
 	}
 
 	public void doRptD(TitaVo titaVo) throws LogicException {
-		this.info("L411D doRpt started.");
+		this.info("L4101D doRpt started.");
 		l4101ReportD.setTxBuffer(txBuffer);
 		String parentTranCode = titaVo.getTxcd();
 
@@ -602,8 +604,28 @@ public class L4101Batch extends TradeBuffer {
 		// 產生PDF檔案
 		l4101ReportD.toPdf(rptNod);
 
-		this.info("L411D doRpt finished.");
+		this.info("L4101D doRpt finished.");
 
 	}
-	
+
+	public void doRptE(TitaVo titaVo) throws LogicException {
+		this.info("L4101E doRpt started.");
+		l4101ReportE.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+
+		l4101ReportE.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l4101ReportE.exec(titaVo);
+
+		// 寫產檔記錄到TxReport
+		long rptNod = l4101ReportE.close();
+
+		// 產生PDF檔案
+		l4101ReportE.toPdf(rptNod);
+
+		this.info("L4101E doRpt finished.");
+
+	}
+
 }

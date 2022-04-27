@@ -130,9 +130,8 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "          ,\"AssetEvaTotal\" "; //--五類資產評估合計
 			sql += "          ,\"LegalLoss\"";		//--法定備抵損失提撥
 			sql += "          ,\"ApprovedLoss\"";   //--會計部核定備抵損失
-			sql += "    FROM \"MonthlyLM052LoanAsset\"";
+			sql += "    FROM \"MonthlyLM052Loss\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
-			sql += "    ORDER BY \"LoanAssetCode\"";
 
 		}
 

@@ -56,12 +56,13 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int intSearchFlag = parse.stringToInteger(titaVo.getParam("SearchFlag"));
 		int intInsuYearMonth = parse.stringToInteger(titaVo.getParam("InsuYearMonth")) + 191100;
 		int intInsuYearMonthEnd = parse.stringToInteger(titaVo.getParam("InsuYearMonthEnd")) + 191100;
-		
+		int intReportYearMonth = parse.stringToInteger(titaVo.getParam("ReportYearMonth"));
 		int intSearchOption = parse.stringToInteger(titaVo.getParam("SearchOption"));
 		int intRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 
 		this.info("intSearchFlag = " + intSearchFlag);
 		this.info("intInsuYearMonth = " + intInsuYearMonth);
+		this.info("intReportYearMonth = " + intReportYearMonth);
 		this.info("intSearchOption = " + intSearchOption);
 		this.info("intRepayCode = " + intRepayCode);
 
@@ -79,28 +80,35 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,i.\"AcDate\"          as F9                              ";
 		sql += " from \"InsuRenew\" i                                      ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"   ";
-        // 查詢方式: 1.火險到期年月 2.未銷全部
+		// 查詢方式: 1.火險到期年月 2.報表年月 3.未銷全部
 		if (intSearchFlag == 1) {
 			sql += " where i.\"InsuYearMonth\" >= " + intInsuYearMonth;
 			sql += "   and i.\"InsuYearMonth\" <= " + intInsuYearMonthEnd;
-		} else if (intSearchFlag == 2) {
+		} else if (intSearchFlag == 2 && intSearchOption != 0 && intSearchOption != 1) {
+			sql += " where substr(i.\"AcDate\" - 19110000,1,5) = " + intReportYearMonth;
+
+		} else if (intSearchFlag == 3) {
 			sql += " where i.\"AcDate\" = 0                                ";
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" in (0, 1, 2)                   ";
 		}
-        // 繳款方式
-		if (intRepayCode != 99) {
-			sql += "   and i.\"RepayCode\" = " + intRepayCode;
-		}
-		// SearchOption 0:正常未繳 1:正常已繳 2:借支 3:轉催 4:結案 7:續保 8:自保 9:全部
+		// SearchOption 0:正常未繳 1:正常已繳 2:借支 3:轉催 4:催收未繳 5:結案 7:續保 8:自保 9:全部
 		// status 0:正常 1:借支 2:催收 4:結案
 		switch (intSearchOption) {
-		case 0: // 0:正常未繳  0:正常
+		case 0: // 0:正常未繳 0:正常
+			if (intSearchFlag == 2) {
+				sql += " where substr(i.\"AcDate\" - 19110000,1,5) > " + intReportYearMonth + " or i.\"AcDate\" = 0 ";
+			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";
-			sql += "   and i.\"AcDate\" = 0                                ";
+			if(intSearchFlag != 2) {
+			  sql += "   and i.\"AcDate\" = 0                              ";
+			}
 			break;
-		case 1: // 1:正常已繳  0:正常
+		case 1: // 1:正常已繳 0:正常
+			if (intSearchFlag == 2) {
+				sql += " where substr(i.\"AcDate\" - 19110000,1,5) <= " + intReportYearMonth;
+			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";
 			sql += "   and i.\"AcDate\" > 0                                ";
@@ -109,11 +117,16 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 1                            ";
 			break;
-		case 3: // 3:轉催  2:催收
+		case 3: // 3:轉催 2:催收
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 2                            ";
 			break;
-		case 4: // 4:結案  4:結案
+		case 4: // 4:催收未繳 2:催收 未入帳
+			sql += "   and i.\"RenewCode\" = 2                             ";
+			sql += "   and i.\"StatusCode\" = 2                            ";
+			sql += "   and i.\"AcDate\" = 0                                ";
+			break;
+		case 5: // 5:結案 4:結案
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 4                            ";
 			break;
@@ -123,6 +136,10 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 8: // 8:自保
 			sql += "   and i.\"RenewCode\" = 1                             ";
 			break;
+		}
+		// 繳款方式
+		if (intRepayCode != 99) {
+			sql += "   and i.\"RepayCode\" = " + intRepayCode;
 		}
 		sql += "  order by i.\"InsuYearMonth\", i.\"CustNo\", i.\"FacmNo\" ";
 

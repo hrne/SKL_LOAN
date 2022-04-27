@@ -59,13 +59,13 @@ public class L9731Report extends MakeReport {
 		try {
 
 			findSheet1 = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
-			exportSheet1(titaVo,findSheet1);
-			
+			exportSheet1(titaVo, findSheet1);
+
 			findSheet2_1 = l9731ServiceImpl.findSheet2_1(titaVo, yearMonth);
-			exportSheet2(titaVo,findSheet2_1,1);
+			exportSheet2(titaVo, findSheet2_1, 1);
 			findSheet2_2 = l9731ServiceImpl.findSheet2_2(titaVo, yearMonth);
-			exportSheet2(titaVo,findSheet2_2,2);
-			
+			exportSheet2(titaVo, findSheet2_2, 2);
+
 			findLA$W30P = l9731ServiceImpl.findLA$W30P(titaVo, yearMonth);
 			exportLA$W30P(titaVo, findLA$W30P);
 
@@ -75,11 +75,10 @@ public class L9731Report extends MakeReport {
 			this.info("L9731ServiceImpl.findAll error = " + errors.toString());
 		}
 
-
 		if (findLA$W30P.size() == 0 && findSheet1.size() == 0 && findSheet2_1.size() == 0 && findSheet2_2.size() == 0) {
 			return false;
 		}
-		
+
 		makeExcel.close();
 		return true;
 	}
@@ -128,7 +127,7 @@ public class L9731Report extends MakeReport {
 	/**
 	 * Sheet2
 	 */
-	private void exportSheet2(TitaVo titaVo, List<Map<String, String>> listL9731, int no) throws LogicException {
+	private void exportSheet2(TitaVo titaVo, List<Map<String, String>> listL9731, int form) throws LogicException {
 		this.info("L9731Report exportSheet2");
 
 		makeExcel.setSheet("工作表2");
@@ -139,7 +138,7 @@ public class L9731Report extends MakeReport {
 
 		} else {
 
-			if (no == 1) {
+			if (form == 1) {
 
 				int row = 2;
 
@@ -199,23 +198,31 @@ public class L9731Report extends MakeReport {
 					row++;
 				} // for
 
+				// excel formula
+				makeExcel.formulaCaculate(1, 6);
+				makeExcel.formulaCaculate(1, 13);
+
+				for (int i = 1; i <= listL9731.size(); i++) {
+					makeExcel.formulaCalculate(i + 1, 1);
+				}
+
 			}
-			if (no == 2) {
+			if (form == 2) {
 
 				int row = 2;
 
 				for (Map<String, String> tLDVo : listL9731) {
 					// 戶號額度
-					String custfacm = tLDVo.get("F0") != null && !tLDVo.get("F0").isEmpty() ? " " : tLDVo.get("F0");
+					String custfacm = tLDVo.get("F0") == null && !tLDVo.get("F0").isEmpty() ? " " : tLDVo.get("F0");
 					makeExcel.setValue(row, 20, custfacm, "R");
 					// 擔保品類別
-					String clType = tLDVo.get("F1") != null && !tLDVo.get("F1").isEmpty() ? " " : tLDVo.get("F1");
+					String clType = tLDVo.get("F1") == null && !tLDVo.get("F1").isEmpty() ? " " : tLDVo.get("F1");
 					makeExcel.setValue(row, 21, clType, "R");
 					// 商品利率代碼
-					String prodNo = tLDVo.get("F2") != null && !tLDVo.get("F2").isEmpty() ? " " : tLDVo.get("F2");
+					String prodNo = tLDVo.get("F2") == null && !tLDVo.get("F2").isEmpty() ? " " : tLDVo.get("F2");
 					makeExcel.setValue(row, 23, prodNo, "C");
 					// 初貸日期
-					String fDrawDownDate = tLDVo.get("F3") != null && !tLDVo.get("F3").isEmpty() ? " "
+					String fDrawDownDate = tLDVo.get("F3") == null && !tLDVo.get("F3").isEmpty() ? " "
 							: tLDVo.get("F3");
 					makeExcel.setValue(row, 24, fDrawDownDate, "C");
 
@@ -224,9 +231,6 @@ public class L9731Report extends MakeReport {
 
 			}
 
-			// excel formula
-			makeExcel.formulaCaculate(1, 6);
-			makeExcel.formulaCaculate(1, 13);
 		}
 
 	}
@@ -253,33 +257,44 @@ public class L9731Report extends MakeReport {
 
 					String fieldValue = tLDVo.get("F" + i);
 
-					int col = i + 1;
+					int col = i + 2;
 
 					switch (i) {
-					case 0:
-					case 1:
-					case 2:
-						makeExcel.setValue(row, col, fieldValue, "#0");
+					case 0://戶號
+					case 1://額度
+					case 2://序號
+						makeExcel.setValue(row, col, fieldValue, "#0","R");
 						break;
-					case 6:
-					case 7:
-					case 10:
-					case 11:
+						
+						
+					case 3://ID
+					case 4://戶名
+						makeExcel.setValue(row, col, fieldValue,"L");
+						break;
+					case 5:// 科目
+					case 6://撥款日
+					case 7://到期日
+					case 10://繳息迄日
+					case 11://轉催收日期
 						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
 							makeExcel.setValue(row, col + 1, showBcDate(fieldValue, 0), "C");
 						}
 						break;
-					case 8:
+					case 8://利率
 						BigDecimal rate = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col + 1, rate, "0.0000", "R");
 						break;
-					case 13:
-					case 14:
-					case 15:
+					case 9://繳息周期
+					case 12://資金用讀別
+						makeExcel.setValue(row, col + 1, fieldValue, "C");
+						break;
+					case 13://核貸金額
+					case 14://撥款金額
+					case 15://放款餘額
 						BigDecimal amt = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col + 1, amt, "#,##0", "R");
 						break;
-					case 16:
+					case 16://利變
 						makeExcel.setValue(row, 4, fieldValue, "L"); // 帳冊別
 						break;
 
@@ -301,7 +316,10 @@ public class L9731Report extends MakeReport {
 			} // for
 
 			// 放款餘額總計的 excel formula
-			makeExcel.formulaCaculate(1, 17);
+			for (int i = 1; i <= listL9731.size(); i++) {
+				makeExcel.formulaCalculate(i + 1, 1);
+			}
+			makeExcel.formulaCaculate(1, 18);
 		}
 
 	}

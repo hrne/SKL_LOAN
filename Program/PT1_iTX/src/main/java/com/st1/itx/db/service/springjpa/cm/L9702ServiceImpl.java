@@ -31,7 +31,6 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> getType1(int startDate, int endDate, TitaVo titaVo) throws Exception {
 
 		// 2021-08-09 智偉 新增 : 清值
@@ -145,10 +144,161 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("endMonth", endMonth);
 		query.setParameter("startDate", startDate);
 		query.setParameter("endDate", endDate);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> getType2(int startDate, int endDate, TitaVo titaVo) throws Exception {
+
+		// 2021-08-09 智偉 新增 : 清值
+		dDateUtil.init();
+
+		// 取期初日期
+
+		this.info("L9702ServiceImpl getType1 startDate = " + startDate);
+
+		dDateUtil.setDate_1(startDate);
+
+		dDateUtil.setMons(-1);
+
+		int lastMonth = dDateUtil.getCalenderDay() / 100;
+
+		this.info("L9702ServiceImpl getType1 lastMonth = " + lastMonth);
+
+		int endMonth = endDate / 100;
+
+		String sql = "";
+		sql += "  SELECT S1.\"DepartmentCode\"";// 案件隸屬單位
+		sql += "        ,S1.\"EntCode\""; // 企金別
+		sql += "        ,S1.\"SumLoanBal\"         AS \"BeginBal\""; // 期初餘額
+		sql += "        ,NVL(S3.\"DrawdownAmt\",0) AS \"DrawdownAmt\""; // 撥款金額
+		sql += "        ,NVL(S2.\"SumLoanBal\",0)  AS \"EndBal\""; // 期末餘額
+		sql += "        ,NVL(S4.\"OvduPrinAmt\",0) AS \"OvduPrinAmt\""; // 轉催收金額
+		sql += "        ,NVL(S5.\"LoanBalance\",0) AS \"OvduBal\""; // 期末催收餘額
+		sql += "        ,NVL(S6.\"IntRcv\",0)      AS \"IntRcv\""; // 當期利息收入
+		// 期初餘額
+		sql += "  FROM (";
+		sql += "              SELECT CASE";
+		sql += "                       WHEN \"DepartmentCode\" = '1' THEN '1'"; // 案件隸屬單位 (0:非企金單位;1:企金推展課)
+		sql += "                     ELSE '0' END                AS \"DepartmentCode\"";
+		sql += "                    ,CASE";
+		sql += "                       WHEN \"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
+		sql += "                     ELSE '0' END                AS \"EntCode\"";
+		sql += "                    ,SUM(\"LoanBalance\")        AS \"SumLoanBal\""; // 放款餘額加總
+		sql += "              FROM \"MonthlyLoanBal\"";
+		sql += "              WHERE \"YearMonth\" = :lastMonth";
+		sql += "                AND \"AcctCode\" <> '990'";
+		sql += "                AND \"LoanBalance\" > 0";
+		sql += "              GROUP BY CASE WHEN \"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "                      ,CASE WHEN \"EntCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "       ) S1 ";
+		// 期末餘額
+		sql += "  LEFT JOIN (";
+		sql += "              SELECT CASE";
+		sql += "                       WHEN \"DepartmentCode\" = '1' THEN '1'"; // 案件隸屬單位 (0:非企金單位;1:企金推展課)
+		sql += "                     ELSE '0' END                AS \"DepartmentCode\"";
+		sql += "                    ,CASE";
+		sql += "                       WHEN \"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
+		sql += "                     ELSE '0' END                AS \"EntCode\"";
+		sql += "                    ,SUM(\"LoanBalance\")        AS \"SumLoanBal\""; // 放款餘額加總
+		sql += "              FROM \"MonthlyLoanBal\"";
+		sql += "              WHERE \"YearMonth\" = :endMonth";
+		sql += "                AND \"AcctCode\" <> '990'";
+		sql += "                AND \"LoanBalance\" > 0";
+		sql += "              GROUP BY CASE WHEN \"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "                      ,CASE WHEN \"EntCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "            ) S2 ON S2.\"EntCode\" = S1.\"EntCode\" ";
+		sql += "                AND S2.\"DepartmentCode\" = S1.\"DepartmentCode\"";
+		// 撥款金額
+		sql += "  LEFT JOIN (";
+		sql += "              SELECT CASE";
+		sql += "                       WHEN F.\"DepartmentCode\" = '1' THEN '1'"; // 案件隸屬單位 (0:非企金單位;1:企金推展課)
+		sql += "                     ELSE '0' END                AS \"DepartmentCode\"";
+		sql += "                    ,CASE";
+		sql += "                       WHEN C.\"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
+		sql += "                     ELSE '0' END                AS \"EntCode\"";
+		sql += "                    ,SUM(LBM.\"DrawdownAmt\")    AS \"DrawdownAmt\""; // 撥款金額加總
+		sql += "              FROM \"LoanBorMain\" LBM";
+		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "              LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "                                     AND F.\"FacmNo\" = LBM.\"FacmNo\" ";
+		sql += "              WHERE LBM.\"DrawdownDate\" >= :startDate";
+		sql += "                AND LBM.\"DrawdownDate\" <= :endDate";
+		sql += "                AND LBM.\"RenewFlag\" = 'N'"; // 排除展期撥款
+		sql += "              GROUP BY CASE WHEN F.\"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "                      ,CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "            ) S3 ON S3.\"EntCode\" = S1.\"EntCode\" ";
+		sql += "                AND S3.\"DepartmentCode\" = S1.\"DepartmentCode\"";
+		// 轉催收
+		sql += "  LEFT JOIN (";
+		sql += "              SELECT CASE";
+		sql += "                       WHEN F.\"DepartmentCode\" = '1' THEN '1'"; // 案件隸屬單位 (0:非企金單位;1:企金推展課)
+		sql += "                     ELSE '0' END                AS \"DepartmentCode\"";
+		sql += "                    ,CASE";
+		sql += "                       WHEN C.\"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
+		sql += "                     ELSE '0' END                AS \"EntCode\"";
+		sql += "                    ,SUM(LO.\"OvduPrinAmt\")     AS \"OvduPrinAmt\""; // 撥款金額加總
+		sql += "              FROM \"LoanOverdue\" LO";
+		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = LO.\"CustNo\" ";
+		sql += "              LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = LO.\"CustNo\" ";
+		sql += "                                     AND F.\"FacmNo\" = LO.\"FacmNo\" ";
+		sql += "              WHERE LO.\"OvduDate\" >= :startDate";
+		sql += "                AND LO.\"OvduDate\" <= :endDate";
+		sql += "              GROUP BY CASE WHEN F.\"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "                      ,CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "            ) S4 ON S4.\"EntCode\" = S1.\"EntCode\" ";
+		sql += "                AND S4.\"DepartmentCode\" = S1.\"DepartmentCode\"";
+		// 期末催收餘額
+		sql += "  LEFT JOIN (";
+		sql += "              SELECT CASE";
+		sql += "                       WHEN \"DepartmentCode\" = '1' THEN '1'"; // 案件隸屬單位 (0:非企金單位;1:企金推展課)
+		sql += "                     ELSE '0' END                AS \"DepartmentCode\"";
+		sql += "                    ,CASE";
+		sql += "                       WHEN \"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
+		sql += "                     ELSE '0' END                AS \"EntCode\"";
+		sql += "                    ,SUM(\"LoanBalance\")        AS \"LoanBalance\""; // 放款餘額加總
+		sql += "              FROM \"MonthlyLoanBal\"";
+		sql += "              WHERE \"YearMonth\" = :endMonth";
+		sql += "                AND \"AcctCode\" = '990'";
+		sql += "                AND \"LoanBalance\" > 0";
+		sql += "              GROUP BY CASE WHEN \"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "                      ,CASE WHEN \"EntCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "            ) S5 ON S5.\"EntCode\" = S1.\"EntCode\" ";
+		sql += "                AND S5.\"DepartmentCode\" = S1.\"DepartmentCode\"";
+		// 當期利息收入
+		sql += "  LEFT JOIN (";
+		sql += "              SELECT CASE";
+		sql += "                       WHEN F.\"DepartmentCode\" = '1' THEN '1'"; // 案件隸屬單位 (0:非企金單位;1:企金推展課)
+		sql += "                     ELSE '0' END                AS \"DepartmentCode\"";
+		sql += "                    ,CASE";
+		sql += "                       WHEN C.\"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
+		sql += "                     ELSE '0' END                AS \"EntCode\"";
+		sql += "                    ,SUM(\"Interest\"";
+		sql += "                        +\"DelayInt\"";
+		sql += "                        +\"BreachAmt\"";
+		sql += "                        +\"CloseBreachAmt\")     AS \"IntRcv\""; // 當期利息收入
+		sql += "              FROM \"LoanBorTx\" LBT ";
+		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = LBT.\"CustNo\" ";
+		sql += "              LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = LBT.\"CustNo\" ";
+		sql += "                                     AND F.\"FacmNo\" = LBT.\"FacmNo\" ";
+		sql += "              WHERE LBT.\"AcDate\" >= :startDate";
+		sql += "                AND LBT.\"AcDate\" <= :endDate";
+		sql += "              GROUP BY CASE WHEN F.\"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "                      ,CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
+		sql += "            ) S6 ON S6.\"EntCode\" = S1.\"EntCode\" ";
+		sql += "                AND S6.\"DepartmentCode\" = S1.\"DepartmentCode\"";
+		sql += "  ORDER BY \"DepartmentCode\",\"EntCode\"";
+
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("lastMonth", lastMonth);
+		query.setParameter("endMonth", endMonth);
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
+		return this.convertToMap(query);
+	}
+
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("l9702.findAll");
@@ -214,11 +364,10 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("isday", iSDAY);
 		query.setParameter("ieday", iEDAY);
 		this.info(" isday=" + iSDAY + ",ieday=" + iEDAY);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List findNow(TitaVo titaVo, String ltbsdy) throws Exception {
+	public List<Map<String, String>> findNow(TitaVo titaVo, String ltbsdy) throws Exception {
 
 		this.info("l9702.findSUM");
 
@@ -249,10 +398,9 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iday", ltbsdy);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> finddbf(TitaVo titaVo) throws Exception {
 
 		String ACCTDATE_ST = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
@@ -297,7 +445,7 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("st", ACCTDATE_ST);
 		query.setParameter("ed", ACCTDATE_ED);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

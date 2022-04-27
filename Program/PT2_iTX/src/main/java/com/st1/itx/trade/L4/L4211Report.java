@@ -545,7 +545,8 @@ public class L4211Report extends MakeReport {
 			if (name.length() > 5) {// 戶名
 				name = name.substring(0, 5);
 			}
-			this.print(0, 60, name + " " + tfnAllList.get("CloseReasonCode"));
+			this.print(0, 60, name);
+			this.print(0, 71, tfnAllList.get("CloseReasonCode"));
 			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
 					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
@@ -857,7 +858,8 @@ public class L4211Report extends MakeReport {
 			if (name.length() > 5) {// 戶名
 				name = name.substring(0, 5);
 			}
-			this.print(0, 60, name + " " + tfnAllList.get("CloseReasonCode"));
+			this.print(0, 60, name);
+			this.print(0, 71, tfnAllList.get("CloseReasonCode"));
 			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
 					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
@@ -1165,7 +1167,8 @@ public class L4211Report extends MakeReport {
 			if (name.length() > 5) {// 戶名
 				name = name.substring(0, 5);
 			}
-			this.print(0, 60, name + " " + tfnAllList.get("CloseReasonCode"));
+			this.print(0, 60, name);
+			this.print(0, 71, tfnAllList.get("CloseReasonCode"));
 			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
 					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 

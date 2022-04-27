@@ -180,7 +180,7 @@ T(3,Y:是;N:否)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
-#NTXBUF=X,34,S
+#NTXBUF=X,55,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 ![會計日期]
@@ -236,8 +236,19 @@ C(3,#CHAIN,1,s,$)
 
 #RPTFG=A,2,S
 E(0,8)
-
+#CurrencyCode=X,3,S
+T(3,TWD)
+#OPrecision=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
 !<include src="COM.icf::RPTFG.dec"/>
+!本筆占(tota)
+#ChainAmt=+m,14.2,S
+C(3,#CHAIN,1,T(1,#NTXBUF,35,17),$)
+E(0,#ChainAmt)
+C(3,#CHAIN,1,s,$)
+#ChainAmtX=X,22,L
+CALL2(#ADJUSTDOT,#OPrecision,#ChainAmt,#ChainAmtX)
+
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -404,15 +415,17 @@ T(2,@L3712CurrencyCode,#OCurrencyCode)
 E(0,0)T(H,#OCurrencyCode,#CurrPrecisionHelp)
 
 ![交易金額]
-#OTxAmt=m,14.2,S
+#OTxAmt=+m,14.2,S
 
 #OTxAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OTxAmt,#OTxAmtX)
-T(2,@L3200TxAmtX,#OTxAmtX)
-T(2,@L3410TxAmtX,#OTxAmtX)
-T(2,@L3440TxAmtX,#OTxAmtX)
-T(2,@L3712TxAmtX,#OTxAmtX)
-T(2,@L3610TxAmtX,#OTxAmtX)
+#OTxAmtXX=X,52,L
+C(5,#ChainAmt,#OTxAmt,T(2,#OTxAmtX),T(B,#ChainAmtX+（本筆占+#OTxAmtX+）))
+T(2,@L3200TxAmtX,#OTxAmtXX)
+T(2,@L3410TxAmtX,#OTxAmtXX)
+T(2,@L3440TxAmtX,#OTxAmtXX)
+T(2,@L3712TxAmtX,#OTxAmtXX)
+T(2,@L3610TxAmtX,#OTxAmtXX)
 
 ![放款餘額]
 #OLoanBal=m,14.2,S
@@ -1316,7 +1329,7 @@ T(3,[L3912] 交易內容查詢)
 #L3200CurrencyCode=X,3,L
 
 ![交易金額]
-#L3200TxAmtX=X,22,L
+#L3200TxAmtX=X,52,L
 #L3230TxAmtX=X,22,L
 
 ![暫收款]
@@ -1448,7 +1461,7 @@ T(3,[L3912] 交易內容查詢)
 #L3410CurrencyCode=X,3,L
 
 ![交易金額]
-#L3410TxAmtX=X,22,L
+#L3410TxAmtX=X,52,L
 
 ![結案區分]
 #L3410CaseCloseCodeX=X,20,L
@@ -1558,7 +1571,7 @@ T(3,[L3912] 交易內容查詢)
 #L3440CurrencyCode=X,3,L
 
 ![交易金額]
-#L3440TxAmtX=X,22,L
+#L3440TxAmtX=X,52,L
 
 ![暫收款]
 #L3440TempAmtX=X,22,L
@@ -1673,7 +1686,7 @@ T(3,[L3912] 交易內容查詢)
 #L3712CurrencyCode=X,3,L
 
 ![交易金額]
-#L3712TxAmtX=X,22,L
+#L3712TxAmtX=X,52,L
 
 ![欠繳利息]
 #L3712UnpaidInterestX=X,22,L
@@ -1942,7 +1955,7 @@ T(3,[L3912] 交易內容查詢)
 #L3610CurrencyCode=X,3,L
 
 ![交易金額]
-#L3610TxAmtX=X,22,L
+#L3610TxAmtX=X,52,L
 
 ![暫收款]
 #L3610TempAmtX=X,22,L
@@ -2063,7 +2076,7 @@ TXFORM=L3912
 ["@會計日期",#OAcctDate],["@櫃員編號",#OTellerNo,#OTellerNoX],
 ["@交易序號",#OTxtNo],["@還款來源",#ORepayCode,#ORepayCodeX],
 ["@訂正別",#OHCode,#OHCodeX],["@入帳日期",#OEntryDate],
-["@幣別",#OCurrencyCode],["@交易金額",#OTxAmtX],
+["@幣別",#OCurrencyCode],["@交易金額",#OTxAmtXX],
 ["@放款餘額",#OLoanBalX],["@電匯金額",#ORemitAmtX],
 ["@本金",#OPrinciPalX],["@支票金額",#OChequeAmtX],
 ["@利息",#OInterestX],["@暫收抵繳",#OTempRepayX],
@@ -2287,7 +2300,7 @@ TXFORM=L3912
 ["[L3912]                                 交易內容查詢"],
 [#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@",#OCustNoX],
 ["@交易代號",#OTxCode,#OTxCodeX],["@交易序號",#L3440TxtNo],
-["@會計日期",#OAcctDate],["@轉催收金額",#OTxAmtX],
+["@會計日期",#OAcctDate],["@轉催收金額",#OTxAmtXX],
 ["@交易序號",#OTxtNo],["@銷帳編號",#ORvNo],
 ["@訂正別",#OHCode,#OHCodeX],["@還款來源",#ORepayCode,#ORepayCodeX],
 ]

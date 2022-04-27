@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_InsuRenew_Ins" 
+  CREATE OR REPLACE EDITIONABLE PROCEDURE "Usp_Tf_InsuRenew_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -63,7 +63,7 @@ BEGIN
           ,S0."NowInsuNo"                 AS "NowInsuNo"           -- 保險單號碼 VARCHAR2 17 0
           ,' '                            AS "OrigInsuNo"          -- 原始保險單號碼 VARCHAR2 17 0
           ,CASE
-             WHEN FR1P."CHKPRO" = 1
+             WHEN S0."CHKPRO" = 1
              THEN 1 -- 1.自保
            ELSE 2 -- 2.續保
            END                            AS "RenewCode"           -- 是否續保 DECIMAL 1 0
@@ -139,9 +139,11 @@ BEGIN
            , NVL(FR1P."TFRBAD",0)           AS "OvduDate"            -- 轉催收日 DECIMAL 8 0
            , NVL(FR1P."TFRNO",0)            AS "OvduNo"              -- 轉催編號 DECIMAL 10 0
            , ROW_NUMBER() OVER (PARTITION BY FR1P."INSNUM"
-                                ORDER BY FR1P."TRXDAT" DESC
+                                ORDER BY FR1P."CHKPRO"
+                                       , FR1P."TRXDAT" DESC
                                        , FR1P."ADTYMT" DESC
                                )            AS "Seq"
+           , FR1P.CHKPRO
       FROM "LN$FR1P" FR1P
       LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = FR1P."GDRID1"
                              AND CNM."GdrId2" = FR1P."GDRID2"
@@ -171,6 +173,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_InsuRenew_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 
