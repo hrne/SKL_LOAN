@@ -70,7 +70,7 @@ public class L9713Report extends MakeReport {
 		this.setBeginRow(37);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(50);
+		this.setMaxRows(60);
 
 	}
 
@@ -229,6 +229,8 @@ public class L9713Report extends MakeReport {
 		// 輸出報表
 		report(rank);
 
+		
+		this.setFontSize(12);
 		// 輸出結束
 		this.close();
 

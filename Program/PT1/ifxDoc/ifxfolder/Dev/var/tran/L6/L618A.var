@@ -1,0 +1,54 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L618A" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L618A]                                 應處理明細更新"],
+[#<->#,"@@@@@",#Test],
+]
+
+#DF1=A,1,S
+E(0,1) 
+! INVOKEJS(SHOW,L618A_1,0)
+
+#Test=A,1,L
+C(3,DF1,0,$,s)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+
+
+
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

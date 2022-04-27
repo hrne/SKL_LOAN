@@ -111,7 +111,10 @@ public class L420C extends TradeBuffer {
 		if (functionCode == 1 && "5".equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException("E0015", tBatxDetail.getDetailSeq() + "非整批入帳，請執行交易訂正"); // 檢查錯誤
 		}
-
+		// 2:轉暫收
+		if (functionCode == 2) {
+			tBatxDetail.setRepayType(9);
+		}
 		// 暫收抵繳 ， 轉暫收時直接更新、不送交易
 		if (tBatxDetail.getRepayCode() == 90) {
 			if (functionCode == 2) {

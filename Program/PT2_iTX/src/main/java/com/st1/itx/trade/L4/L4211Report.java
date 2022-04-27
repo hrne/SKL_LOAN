@@ -539,7 +539,7 @@ public class L4211Report extends MakeReport {
 			this.print(0, 40, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";
-			custNo += tfnAllList.get("RepaidPeriod");
+			custNo += tfnAllList.get("PaidTerms");
 			this.print(0, 41, custNo);// 戶號
 			String name = tfnAllList.get("CustName");
 			if (name.length() > 5) {// 戶名
@@ -851,7 +851,7 @@ public class L4211Report extends MakeReport {
 			this.print(0, 40, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";
-			custNo += tfnAllList.get("RepaidPeriod");
+			custNo += tfnAllList.get("PaidTerms");
 			this.print(0, 41, custNo);// 戶號
 			String name = tfnAllList.get("CustName");
 			if (name.length() > 5) {// 戶名
@@ -1159,7 +1159,7 @@ public class L4211Report extends MakeReport {
 			this.print(0, 40, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";
-			custNo += tfnAllList.get("RepaidPeriod");
+			custNo += tfnAllList.get("PaidTerms");
 			this.print(0, 41, custNo);// 戶號
 			String name = tfnAllList.get("CustName");
 			if (name.length() > 5) {// 戶名

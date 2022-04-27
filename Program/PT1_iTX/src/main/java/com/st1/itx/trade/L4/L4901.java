@@ -187,6 +187,7 @@ public class L4901 extends TradeBuffer {
 			occursList.putParam("OOPayCode", tBankRemit.getPayCode());
 			occursList.putParam("OOPayCodeX", payCodeItem);
 			occursList.putParam("OORelNo", relNo);
+			occursList.putParam("OOBankCode", tBankRemit.getRemitBank()+tBankRemit.getRemitBranch());
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

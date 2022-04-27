@@ -117,6 +117,8 @@ public class L4101Batch extends TradeBuffer {
 	@Autowired
 	L4101ReportD l4101ReportD;
 	@Autowired
+	L4101ReportE l4101ReportE;
+	@Autowired
 	L4101Vo l4101Vo;
 
 	@Value("${iTXOutFolder}")
@@ -601,6 +603,25 @@ public class L4101Batch extends TradeBuffer {
 
 		// 產生PDF檔案
 		l4101ReportD.toPdf(rptNod);
+
+		this.info("L411D doRpt finished.");
+
+	}
+	public void doRptE(TitaVo titaVo) throws LogicException {
+		this.info("L411E doRpt started.");
+		l4101ReportE.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+
+		l4101ReportE.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l4101ReportE.exec(titaVo);
+
+		// 寫產檔記錄到TxReport
+		long rptNod = l4101ReportE.close();
+
+		// 產生PDF檔案
+		l4101ReportE.toPdf(rptNod);
 
 		this.info("L411D doRpt finished.");
 

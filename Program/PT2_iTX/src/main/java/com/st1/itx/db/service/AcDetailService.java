@@ -665,6 +665,20 @@ public interface AcDetailService {
   public Slice<AcDetail> acdtlSlipNo(int relDy_0, int slipNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND TitaBatchNo = 
+   *
+   * @param branchNo_0 branchNo_0
+   * @param currencyCode_1 currencyCode_1
+   * @param acDate_2 acDate_2
+   * @param titaBatchNo_3 titaBatchNo_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> acdtlTitaBatchNoSlipNo(String branchNo_0, String currencyCode_1, int acDate_2, String titaBatchNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AcDetail
    * 
    * @param acDetailId key

@@ -1,4 +1,4 @@
-	package com.st1.itx.util.common;
+package com.st1.itx.util.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -57,14 +57,20 @@ import com.st1.itx.util.parse.Parse;
 //    匯款轉帳： 1.借款人 2.交易人
 //    支票兌現： 1.借款人 2.發票人
 //  3.預設匯款轉帳還款類別 
-//    帳還款類別 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他 11.債協匯入款 
-//    企金戶:95101 ==> 還款類別: 00 處理狀態 : 2.人工處理 處理說明: 企金戶請變更<還款類別>後，重新檢核
-//    個人戶期款:95102 ==> 最後一期(還款後本金餘額 =0 )=> 還款類別: 03-結案 ---->
-//    個人戶還本:95103 ==>
+//    1. 債協匯入款:(A6) ==> 11-債協匯入款
+//    2. 期款(A2):95102 ==> 01-期款
+//    3. 有約定還本  ==> 還款類別:02-部分償還 
+//       條件：匯入金額>=約定金額、入帳日期與約定日期相同 
+//    4. 有清償作業  ==> 還款類別:03-結案
+//條件：匯入金額>=約定金額、入帳日期與約定日期相同 
+//    企金戶 (A1):95101 ==> <預設還款類別>，處理狀態 : 2.人工處理
+//    個人戶期款(A2):95102 ==> 最後一期(還款後本金餘額 =0 )=> 還款類別: 03-結案 ---->
+//    個人戶還本(A3):95103 ==> 
 //      1.與約定還本金額相同 ==> 還款類別:02-部分償還
-//        (if LoanBook.BookAmt = txamt and status = 0: 未回收 & entryDate = LoanBook.BookDate)
+//        (if LoanBook.BookAmt >= txamt and status = 0: 未回收 & entryDate = LoanBook.BookDate)
 //      2.執行過清償作業     ==> 還款類別:03-結案  (check FacClose exist)
-//    債協匯入款:95105     ==> 11-債協匯入款
+//    債協匯入款:95105(A6)     ==> 11-債協匯入款
+//企金戶 (A1):95101 ==> <預設還款類別>，處理狀態 : 2.人工處理
 //  4.執行債協匯入款戶號檢核
 //  5.執行應繳試算，依結果重設還款類別，再依還款類別進行檢核
 //    step01. 應繳試算
@@ -98,7 +104,7 @@ import com.st1.itx.util.parse.Parse;
 //           3.回收金額 + 暫收可抵繳 - 全部應繳 > 結案金額
 //             處理狀態:2.人工處理
 //             處理說明: 結案有溢繳款：999,999,999,999
-//        case 04-帳管費 05-火險費 06-契變手續費 07-法務費
+//        case 04-帳管費 05-火險費 06-契變手續費 07-法務費 
 //           1.有回收該還款類別費用
 //             處理狀態:4.檢核正常
 //           2.無該還款類別未繳費用
@@ -107,9 +113,17 @@ import com.st1.itx.util.parse.Parse;
 //           3.金額不足
 //             處理狀態:2.人工處理
 //             處理說明: ：金額不足: 999,999,999,999
-//         case 09-其他
-//             處理狀態::2.人工處理
-//      		if (this.unPayLoan.compareTo(BigDecimal.ZERO) > 0)
+//        case 09-其他
+//           1.清償違約金
+//             處理狀態:4.檢核正常
+//             處理說明:戶況說明 
+//           2.催呆戶
+//             處理狀態:4.檢核正常
+//             處理說明:戶況說明 
+//           3.結案戶
+//             處理狀態:2.人工處理
+//             處理說明:戶況說明 
+//              
 //         處理說明之金額欄：
 //           1.償還本利:  短繳利息:  短繳本金:  清償違約金:
 //           2.帳管費: 火險費:  契變手續費:  法務費: 未到期火險費用:
@@ -608,10 +622,11 @@ public class TxBatchCom extends TradeBuffer {
 		}
 		txTitaVo.putParam("MRKEY", MRKEY);
 
+		txTitaVo.putParam("CURBM", "TWD");
+
 		// 交易金額
 		txTitaVo.putParam("TXAMT", tDetail.getRepayAmt());
 
-		//
 		txTitaVo.putParam("HCODE", "0"); // 正常交易
 		txTitaVo.putParam("RELCD", "1"); // 一段式
 		txTitaVo.putParam("ACTFG", "0"); // 登錄
@@ -1012,7 +1027,7 @@ public class TxBatchCom extends TradeBuffer {
 				// 訂正交易
 				unfinishCnt = 1;
 				this.info("updBatxResult 訂正交易");
-				tDetail.setProcStsCode("0"); // 訂正後為未檢核，需重新檢核或刪除
+				tDetail.setProcStsCode("2"); // 訂正後為 2.人工處理
 				tDetail.setDisacctAmt(BigDecimal.ZERO);
 				tDetail.setAcctAmt(BigDecimal.ZERO); // 還款金額 - 入暫收金額
 				if (this.tTempVo.get("EraseCnt") != null) {
@@ -1252,12 +1267,6 @@ public class TxBatchCom extends TradeBuffer {
 					apendcheckMsgAmounts(tBatxDetail, titaVo);
 					this.procStsCode = "2"; // 2.人工處理
 					break;
-				}
-				// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
-				if ("1".equals(this.tTempVo.get("PayMethod"))) {
-					this.checkMsg += "減少每期攤還金額 ";
-				} else {
-					this.checkMsg += "縮短應繳期數";
 				}
 				// 部分償還本金
 				this.checkMsg += "部分償還金額 :" + this.tTempVo.get("ExtraRepay");
@@ -1551,6 +1560,9 @@ public class TxBatchCom extends TradeBuffer {
 			this.tTempVo.putParam("MergeCnt", t.get("MergeCnt")); // 合併總筆數
 			this.tTempVo.putParam("MergeAmt", t.get("MergeAmt")); // 合併總金額
 			this.tTempVo.putParam("MergeSeq", t.get("MergeSeq")); // 合併序號
+		}
+		if (t.get("PreRepayTerms") != null) {
+			tTempVo.putParam("PreRepayTerms", t.get("PreRepayTerms")); // 批次預收期數
 		}
 	}
 

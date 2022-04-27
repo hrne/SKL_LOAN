@@ -105,7 +105,7 @@ public class L4101ReportC extends MakeReport {
 //		print(-4, 14, this.nowAcBookItem);
 
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(9);
+		this.setBeginRow(10);
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(28);
@@ -116,9 +116,10 @@ public class L4101ReportC extends MakeReport {
 		 */
 
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　戶號　　　　　　戶名　　　　　　借方金額　　　　貸方金額　　　銀行別　分行別　　　　　　　　　帳號　　　");
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－－－－－－－　－－－－－－－");
-
+		print(1, 1, "傳票　　　　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　戶號　　　　　　　　　借方金額　　　　貸方金額　　　銀行別　　　　　　　　　　　　　帳號　　　");
+		print(1, 1, "號碼　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　戶名　　　　　　　　　　　　　　　　　　　　　　　　分行別　　　　　　　　　　　　　　　　　　");
+		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－－－－－－－　－－－－－－－");
+		print(1, 1, " ");
 	}
 
 	// 自訂表尾
@@ -162,8 +163,8 @@ public class L4101ReportC extends MakeReport {
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 
-		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
-				batchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNoSlipNo(titaVo.getAcbrNo(), titaVo.getCurName(),
+				acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
@@ -213,13 +214,10 @@ public class L4101ReportC extends MakeReport {
 			}
 
 			// 明細資料第一行
-			print(1, 1, "　　");
-			print(0, 1, this.showRocDate(acDate, 1)); // 會計日期
-			print(0, 12, acNoCode + acSubCode); // 科子細目
-			print(0, 57, "" + FormatUtil.pad9("" + tAcDetail.getCustNo(), 7));// 戶號
-			if (c != null) {
-				print(0, 67, FormatUtil.padX("" + c.getCustName(), 20));// 戶名
-			}
+			print(1, 1, parse.IntegerToString(tAcDetail.getSlipNo(), 6)); // 會計日期
+			print(0, 11, this.showRocDate(acDate, 1)); // 會計日期
+			print(0, 22, acNoCode + acSubCode); // 科子細目
+			print(0, 67, "" + FormatUtil.pad9("" + tAcDetail.getCustNo(), 7));// 戶號
 			if ("D".equals(tAcDetail.getDbCr())) {
 				print(0, 103, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 借方金額
 				sumDbAmt = sumDbAmt.add(tAcDetail.getTxAmt());
@@ -233,7 +231,10 @@ public class L4101ReportC extends MakeReport {
 			print(0, 149, wkAcctNo);// 帳號
 			// 明細資料第二行
 			print(1, 1, "");
-			print(0, 12, tCdAcCode.getAcNoItem());// 科子細目名稱
+			print(0, 22, tCdAcCode.getAcNoItem());// 科子細目名稱
+			if (c != null) {
+				print(0, 67, FormatUtil.padX("" + c.getCustName(), 20));// 戶名
+			}
 			print(0, 121, wkBranchItem);// 分行別
 
 			// 如是第三人則第二行顯示第三人名稱
@@ -250,7 +251,7 @@ public class L4101ReportC extends MakeReport {
 
 		}
 
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－－－－－－－　－－－－－－－");
+		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－－－－－－－　－－－－－－－");
 		print(1, 1, "　　　　　　       共　" + cnt + "　筆數");
 
 //		print(0, 61, currencyCode);

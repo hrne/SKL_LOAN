@@ -250,6 +250,9 @@ public class L3410 extends TradeBuffer {
 				iTmpAmt = iTmpAmt.subtract(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 暫收抵繳金額
 			}
 		}
+	
+		// 系統交易記錄檔的金額為展期金額
+		titaVo.setTxAmt(wkTxAmtRemaind);
 
 		// 按違約金、 延滯息、利息順序減免
 		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -712,7 +715,7 @@ public class L3410 extends TradeBuffer {
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
-		tLoanBorTx.setRepaidPeriod(wkRepaidPeriod);
+		tLoanBorTx.setPaidTerms(0);
 		tLoanBorTx.setPrincipal(wkPrincipal);
 		tLoanBorTx.setInterest(wkShortfallInterest); // 短繳收回
 		tLoanBorTx.setDelayInt(BigDecimal.ZERO);

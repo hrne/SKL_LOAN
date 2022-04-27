@@ -136,6 +136,9 @@ public interface AcDetailRepository extends JpaRepository<AcDetail, AcDetailId> 
   // RelDy = ,AND SlipNo = 
   public Slice<AcDetail> findAllByRelDyIsAndSlipNoIsOrderByAcSeqAsc(int relDy_0, int slipNo_1, Pageable pageable);
 
+  // BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND TitaBatchNo = 
+  public Slice<AcDetail> findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaBatchNoIsOrderBySlipNoAscRelTxseqAscAcSeqAsc(String branchNo_0, String currencyCode_1, int acDate_2, String titaBatchNo_3, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

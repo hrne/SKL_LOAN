@@ -111,8 +111,8 @@ public class LM057Report extends MakeReport {
 				int bormNo = lM057Vo.get("F3").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F3"));
 				String custName = lM057Vo.get("F4").isEmpty() ? " " : lM057Vo.get("F4");
 				BigDecimal loan = lM057Vo.get("F5").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lM057Vo.get("F5"));
-				String date = showBcDate(lM057Vo.get("F6"), 0);
-				BigDecimal rate = lM057Vo.get("F7").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lM057Vo.get("F7"));
+				String date = showBcDate(lM057Vo.get("F6"), 0);			
+				BigDecimal rate = getBigDecimal(lM057Vo.get("F7"));
 				String type = lM057Vo.get("F8");
 				String leg = lM057Vo.get("F9").isEmpty() ? " " : lM057Vo.get("F9");
 				String prodNo = lM057Vo.get("F11").isEmpty() ? " " : lM057Vo.get("F11");

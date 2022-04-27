@@ -121,7 +121,7 @@ public class L4101ReportA extends MakeReport {
 		this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 		this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 		this.print(-43, 1, "　放 款 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
-		this.print(-44, 1, "　財 務 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+		this.print(-47, 1, "　財 務 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
 //		this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 	}
 
@@ -205,8 +205,16 @@ public class L4101ReportA extends MakeReport {
 		cntR = new HashMap<>();
 		slipNo = new HashMap<>();
 		cnt = 0;
+		int oldCustNo = 0;
+		int oldFacmNo = 0;
 		if (lAcDetail.size() > 0) {
 			for (AcDetail tAcDetail : lAcDetail) {
+
+				if (tAcDetail.getCustNo() != oldCustNo || tAcDetail.getFacmNo() != oldFacmNo) {
+					oldCustNo = tAcDetail.getCustNo();
+					oldFacmNo = tAcDetail.getFacmNo();
+					cnt++;
+				}
 				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11)
 						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5);
 				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2)
@@ -232,7 +240,6 @@ public class L4101ReportA extends MakeReport {
 
 				if (!cntR.containsKey(tAcDetail.getRelTxseq())) {
 					cntR.put(tAcDetail.getRelTxseq(), 1);
-					cnt = cnt + 1;
 				}
 
 			}

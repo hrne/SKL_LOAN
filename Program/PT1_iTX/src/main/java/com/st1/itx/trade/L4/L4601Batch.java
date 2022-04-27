@@ -241,6 +241,12 @@ public class L4601Batch extends TradeBuffer {
 		if (tInsuRenew.getTotInsuPrem().compareTo(BigDecimal.ZERO) == 0) {
 			return;
 		}
+		
+		// 已入帳
+		if(tInsuRenew.getAcDate() > 0) {
+			return;
+		}
+		
 		AcReceivable acReceivable = new AcReceivable();
 		acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
 		acReceivable.setAcctCode("TMI"); // 業務科目
@@ -390,15 +396,15 @@ public class L4601Batch extends TradeBuffer {
 			}
 			return;
 		}
-
-		if ("Y".equals(tInsuRenew.getNotiTempFg())) {
-			if ("".equals(checkResultA)) {
-				checkResultA += "13";
-			} else {
-				checkResultA += ",13";
-			}
-			return;
-		}
+//
+//		if ("Y".equals(tInsuRenew.getNotiTempFg())) {
+//			if ("".equals(checkResultA)) {
+//				checkResultA += "13";
+//			} else {
+//				checkResultA += ",13";
+//			}
+//			return;
+//		}
 
 //		已入通知檔
 		if ("Y".equals(tInsuRenew.getNotiTempFg())) {

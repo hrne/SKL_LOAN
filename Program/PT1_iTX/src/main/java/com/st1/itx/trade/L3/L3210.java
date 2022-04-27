@@ -170,7 +170,7 @@ public class L3210 extends TradeBuffer {
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
-		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
+		titaVo.setTxAmt(iTempAmt);
 		// 費用抵繳是否抵繳(整批入帳)
 		this.isRepaidFee = false;
 		if (titaVo.get("PayFeeFlag") != null && "Y".equals(titaVo.get("PayFeeFg"))) {

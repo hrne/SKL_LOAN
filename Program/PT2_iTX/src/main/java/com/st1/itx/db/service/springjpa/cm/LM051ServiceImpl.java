@@ -43,7 +43,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("lM051.findAll ");
 		this.info("yearMonth=" + yearMonth);
-		String sql = " "; 
+		String sql = " ";
 		sql += " WITH \"tempClass\" AS (";
 		sql += "	SELECT M.\"YearMonth\"";
 		sql += "		  ,M.\"CustNo\"";
@@ -372,7 +372,41 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("outStandingYMD=" + outStandingYMD);
 		String sql = " ";
 		if (formNum == 1) {
-			sql += "SELECT * FROM (";
+			sql += "WITH rawData AS ( ";
+			sql += "      SELECT SUM(CASE WHEN I.\"YearMonth\" = :yymm ";
+			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
+			sql += "                 ELSE 0 END";
+			sql += "                )";
+			sql += "             -";
+			sql += "             SUM(CASE WHEN I.\"YearMonth\" = :lyymm";
+			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
+			sql += "                 ELSE 0 END";
+			sql += "                )";
+			sql += "             AS \"LnAmt\"";
+			sql += "      FROM \"Ias39IntMethod\" I";
+			sql += "      LEFT JOIN \"MonthlyLoanBal\" MLB ON I.\"YearMonth\" = MLB.\"YearMonth\" ";
+			sql += "                                      AND I.\"CustNo\" = MLB.\"CustNo\" ";
+			sql += "                                      AND I.\"FacmNo\" = MLB.\"FacmNo\" ";
+			sql += "                                      AND I.\"BormNo\" = MLB.\"BormNo\"";
+			sql += "      WHERE NVL(I.\"YearMonth\", ' ') IN (:lyymm, :yymm) ";
+			sql += "        AND NVL(MLB.\"CurrencyCode\",' ') = 'TWD'";
+			sql += "        AND MLB.\"AcctCode\" <> 990 ";
+			sql += "      GROUP BY DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') ";
+			sql += "      ),";
+			sql += "      roundData AS (";
+			sql += "      SELECT CASE WHEN \"LnAmt\" < 0";
+			sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"LnAmt\")+1 ";
+			sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"LnAmt\")-1";
+			sql += "                            ELSE 0 END ";
+			sql += "                  WHEN \"LnAmt\" > 0";
+			sql += "                  THEN ROUND(\"LnAmt\")";
+			sql += "                  ELSE 0 END ";
+			sql += "             AS \"LnAmt\"";
+			sql += "      FROM rawData";
+			sql += "      ) ";
+			sql += " SELECT \"KIND\" ";
+			sql += "	   ,SUM(\"AMT\")  AS \"AMT\" ";
+			sql += " FROM (";
 			sql += "	SELECT ( CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
@@ -405,12 +439,24 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "						   		  AND F.\"FacmNo\" = M.\"FacmNo\"";
 			sql += "		   WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  	     AND M.\"PrinBalance\" > 0";
-			sql += "		   UNION";
+			sql += "    	   UNION ";
+			sql += "    	   SELECT CASE WHEN R.\"LnAmt\" >= 0 ";
+			sql += "                	   THEN R.\"LnAmt\" ";
+			sql += "                	   ELSE ABS(R.\"LnAmt\") END AS \"AMT\"";
+			sql += "    	  FROM roundData R";
+			sql += "		  UNION";
 			sql += "	      SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
 			sql += "		  FROM \"AcMain\"";
-			sql += "		  WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
+			sql += "		  WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000)";
 			sql += "	  		AND \"MonthEndYm\" = :yymm ) ";
-			sql += ")ORDER BY \"KIND\" ASC";
+			sql += "    UNION ";
+			sql += "    SELECT '99' AS \"KIND\" ";
+			sql += "          ,CASE WHEN R.\"LnAmt\" >= 0 ";
+			sql += "                THEN R.\"LnAmt\" ";
+			sql += "                ELSE ABS(R.\"LnAmt\") END AS \"AMT\"";
+			sql += "    FROM roundData R";
+			sql += ")GROUP BY \"KIND\"";
+			sql += " ORDER BY \"KIND\" ASC";
 		} else if (formNum == 2) {
 			sql += "SELECT * FROM (";
 			sql += "	SELECT ( CASE";
@@ -501,6 +547,8 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", String.valueOf(yearMonth));
 		if (formNum != 1) {
 			query.setParameter("lyymmdd", String.valueOf(outStandingYMD));
+		} else {
+			query.setParameter("lyymm", String.valueOf(outStandingYMD / 100));
 		}
 
 		return this.convertToMap(query);

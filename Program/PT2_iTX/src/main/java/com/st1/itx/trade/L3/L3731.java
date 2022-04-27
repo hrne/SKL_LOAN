@@ -343,7 +343,7 @@ public class L3731 extends TradeBuffer {
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(0);
 		tLoanBorTx.setIntEndDate(0);
-		tLoanBorTx.setRepaidPeriod(0);
+		tLoanBorTx.setPaidTerms(0);
 		tLoanBorTx.setPrincipal(od.getOvduPrinBal());
 		tLoanBorTx.setInterest(od.getOvduIntBal());
 		tLoanBorTx.setDelayInt(BigDecimal.ZERO);

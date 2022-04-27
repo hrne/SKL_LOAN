@@ -44,7 +44,7 @@ E(0,0)
 [#<->#,"#FdLableA+生效日期",#EffectDate,"@@@@@@",#LableB,#BaseRate,#LableC],
 [#<->#,"#FdRate+批次利率",#Rate],
 [#<->#,"#FdRateIncr+批次加減碼",#RateIncr],
-[#<->#,"#FdEntCode+個金/企金",#EntCode,#EntCodeX],
+[#<->#,"#FdCustType+個金/企金",#CustType,#CustTypeX],
 [#<->#,"#FdNextAdjPeriod+預調週期",#NextAdjPeriod," 個月"],
 [#<->#,"#FdProdNo1+商品",#ProdNo1,#ProdNo1X],
 [#<->#,"@",#ProdNo2,#ProdNo2X],
@@ -67,7 +67,7 @@ T(3,*)
 #FdEffectDate=X,2,L
 #FdRate=X,2,L
 #FdRateIncr=X,2,L
-#FdEntCode=X,2,L
+#FdCustType=X,2,L
 T(3,*)
 #FdNextAdjPeriod=X,2,L
 T(3,*)
@@ -90,7 +90,7 @@ T(3,*)
 #CDDEF01=x,26,S
 T(3,CdCode.EntCode2)
 
-#EntCodeHelp=x,1024,S 
+#CustTypeHelp=x,1024,S 
 
 ![作業項目]
 #CDDEF02=x,26,S
@@ -117,7 +117,7 @@ RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
 R(1,XXR99)
 CALL(#HelpProc) 
-T(2,@EntCodeHelp,#HelpDesc1)
+T(2,@CustTypeHelp,#HelpDesc1)
 T(2,@TxKindHelp,#HelpDesc2)  
 T(B,@BaseRateHelp,#HelpDesc3+;09:重新產生;98:員工利率)  
 T(2,@BatchProdRateChangeHelp,#HelpDesc4)  
@@ -269,14 +269,14 @@ C(3,#Rate,0,$,S)
 @V(2,0)
 
 ! 戶別
-#EntCode=A,1,I
+#CustType=A,1,I
 IF(#TxKind==1||#TxKind==2||#TxKind==3,$,s)
 E(0,1)
-HELP(#EntCodeHelp)
-@V(H,#EntCodeHelp)
-#EntCodeX=X,30,L
-T(3,)T(H,#EntCode,#EntCodeHelp)
-!SWITCH(#EntCode,1,T(3,個金),2,T(3,企金（含企金自然人）),T(3,))
+HELP(#CustTypeHelp)
+@V(H,#CustTypeHelp)
+#CustTypeX=X,30,L
+T(3,)T(H,#CustType,#CustTypeHelp)
+!SWITCH(#CustType,1,T(3,個金),2,T(3,企金（含企金自然人）),T(3,))
 
 ! 預調週期
 #NextAdjPeriod=A,2,I
@@ -880,7 +880,7 @@ A(ID_UNINO,0,#GroupId)
 #BaseRate
 #Rate
 #RateIncr
-#EntCode
+#CustType
 #NextAdjPeriod
 #ProdNo1
 #ProdNo2

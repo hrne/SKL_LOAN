@@ -1,0 +1,1 @@
+ALTER TABLE "LoanBorTx" rename column "RepaidPeriod" to "PaidTerms"; commit;

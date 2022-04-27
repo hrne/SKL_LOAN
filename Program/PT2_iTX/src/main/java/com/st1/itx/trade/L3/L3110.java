@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +13,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
@@ -34,6 +37,7 @@ import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
+import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanDueAmtCom;
@@ -123,6 +127,8 @@ public class L3110 extends TradeBuffer {
 	public LoanRateChangeService loanRateChangeService;
 	@Autowired
 	public TxTempService txTempService;
+	@Autowired
+	AcPaymentCom acPaymentCom;
 
 	@Autowired
 	Parse parse;
@@ -136,6 +142,8 @@ public class L3110 extends TradeBuffer {
 	LoanCom loanCom;
 	@Autowired
 	public AuthLogCom authLogCom;
+	@Autowired
+	public L3100Report l3100Report;
 
 	TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -155,8 +163,10 @@ public class L3110 extends TradeBuffer {
 	private LoanBorMain tLoanBorMain;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
+	private AcDetail acDetail;
 	private TxTemp tTxTemp;
 	private TxTempId tTxTempId;
+	List<AcDetail> lAcDetail ;
 	private TempVo tTempVo;
 	private TempVo tempVo = new TempVo();
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
@@ -226,6 +236,12 @@ public class L3110 extends TradeBuffer {
 
 //		// 維護放款交易內容檔
 //		LoanBorTxRoutine();
+		totaVo.put("DPdfSnoF", 0);
+		// 登錄 修正撥款傳票主管審核
+		if (titaVo.isActfgEntry() && (titaVo.isHcodeNormal() || titaVo.isHcodeModify())) {
+//			撥款傳票主管審核
+			doRptA(titaVo);
+		}
 
 		this.totaVo.putParam("BormNo", wkBormNo);
 		this.addList(this.totaVo);
@@ -669,7 +685,7 @@ public class L3110 extends TradeBuffer {
 								|| iSpecificDd == this.txBuffer.getSystemParas().getAchDeductDD5())) {
 					throw new LogicException(titaVo, "E3040", "指定應繳日 = " + iSpecificDd); // 指定應繳日與扣款特定日設定不符
 				}
-				
+
 //				檢查郵局扣款特定日
 				if (wkRepayBank.equals("700") && this.txBuffer.getSystemParas().getPostDeductFlag() == 1
 						&& !(iSpecificDd == this.txBuffer.getSystemParas().getPostDeductDD1()
@@ -683,4 +699,25 @@ public class L3110 extends TradeBuffer {
 		}
 
 	}
+
+	public void doRptA(TitaVo titaVo) throws LogicException {
+		this.info("L4701 doRpt started.");
+		l3100Report.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+		l3100Report.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l3100Report.exec(titaVo);
+
+		// 寫產檔記錄到TxReport
+		long rptNoA = l3100Report.close();
+
+		// 產生PDF檔案
+		l3100Report.toPdf(rptNoA);
+
+		this.info("L3100 doRpt finished.");
+		totaVo.put("DPdfSnoF", Long.toString(rptNoA));
+
+	}
+
 }

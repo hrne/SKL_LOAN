@@ -678,7 +678,7 @@ C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
 
-#TimCustNoX=X,100,S
+#TimCustNoX=x,100,S
 C(4,#CustNo,$,T(2,#CustNoX))
 C(4,#CustId,$,T(2,#CustIdX))
 C(4,#ApplNo,$,T(2,#ApplNoX))
@@ -2336,6 +2336,17 @@ E(2,@Sno,#PdfSnoF)
 ! 匯款單FileNo
 #PdfPrtF=A,1,S
 C(3,#Sno,0,E(0,0),E(0,1))
+
+
+! 匯款單FileNo
+#DPdfSnoF=X,8,S
+E(2,@DSnoF,#DPdfSnoF)
+#DSnoF=A,8,S
+
+! 匯款單FileNo
+#DPdfPrtF=A,1,S
+C(3,#DSnoF,0,E(0,0),E(0,1))
+
 ![防止二次單據]
 
 
@@ -2389,7 +2400,7 @@ C(3,#Sno,0,E(0,0),E(0,1))
 <include src="RPDTL.icf::RPDTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L3100
-#BormNo#PdfSnoF^
+#BormNo#PdfSnoF#DPdfSnoF^
 
 </sub>
 
@@ -2404,5 +2415,7 @@ TXFORM=L3100
 <include src="PRT.icf::FMHR01.sel"/>
 <include src="PRT.icf::FM101.sel" map="landscape=1;size=830:1170" />
 #PdfPrtF=1,PDF,,,,,,,,,,,,,PdfSnoF,單筆匯款匯款單
+^
+#DPdfPrtF=1,PDF,,,,,,,,,,,,,DPdfSnoF,撥款傳票（主管審核）
 ^
 </sub>

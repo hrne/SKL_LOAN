@@ -124,7 +124,7 @@ public class L3005 extends TradeBuffer {
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
 		// if (iCustDataCtrl == 1) {
-		// 	this.totaVo.putParam("OCustNo", "");
+		// this.totaVo.putParam("OCustNo", "");
 		// }
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -214,6 +214,16 @@ public class L3005 extends TradeBuffer {
 			relNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
 			occursList.putParam("OOEntryDate", ln.getEntryDate());
 			occursList.putParam("OOAcDate", ln.getAcDate());
+			if ("1".equals(ln.getTitaHCode()) || "3".equals(ln.getTitaHCode())) {
+				if ("3210".equals(ln.getTitaTxCd()) || "3220".equals(ln.getTitaTxCd())
+						|| "3230".equals(ln.getTitaTxCd())) {
+					occursList.putParam("OODesc", "暫收款訂正");
+				} else {
+					occursList.putParam("OODesc", "訂正");
+				}
+			} else {
+				occursList.putParam("OODesc", ln.getDesc());
+			}
 			occursList.putParam("OODesc", ln.getDesc());
 			occursList.putParam("OOFacmNo", ln.getFacmNo());
 			occursList.putParam("OOBormNo", ln.getBormNo());

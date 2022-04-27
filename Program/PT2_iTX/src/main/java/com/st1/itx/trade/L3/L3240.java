@@ -133,9 +133,12 @@ public class L3240 extends TradeBuffer {
 		// Check Input
 
 		checkInputRoutine();
-
+		
 		// 沖正處理
 		repayEraseRoutine();
+
+		titaVo.setTxAmt(wkTempAmt);
+		titaVo.put("CURNM","TWD");
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -334,16 +337,23 @@ public class L3240 extends TradeBuffer {
 		tLoanBorMain.setStatus(0);
 		tLoanBorMain.setStoreRate(tLoanRateChange.getFitRate());
 		tLoanBorMain.setLoanBal(tLoanBorMain.getLoanBal().add(tx.getPrincipal()));
-		tLoanBorMain.setRepaidPeriod(tLoanBorMain.getRepaidPeriod() - tx.getRepaidPeriod());
-		tLoanBorMain.setPaidTerms(tLoanBorMain.getPaidTerms() - tx.getRepaidPeriod());
+		tLoanBorMain.setPaidTerms(tLoanBorMain.getPaidTerms() - tx.getPaidTerms());
 		tLoanBorMain.setPrevPayIntDate(tx.getIntStartDate());
-		if (tLoanBorMain.getPrevRepaidDate() > 0) {
-			if (tx.getIntStartDate() >= tLoanBorMain.getGraceDate()) {
-				tLoanBorMain.setPrevRepaidDate(tx.getIntStartDate());
-			} else {
-				tLoanBorMain.setPrevRepaidDate(0);
+
+		// 上次還本日
+		if ("3".equals(tLoanBorMain.getAmortizedCode()) || "4".equals(tLoanBorMain.getAmortizedCode())) {
+			if (tLoanBorMain.getPrevRepaidDate() > 0) {
+				if (tx.getIntStartDate() >= tLoanBorMain.getGraceDate()) {
+					tLoanBorMain.setPrevRepaidDate(tx.getIntStartDate());
+					tLoanBorMain.setRepaidPeriod(tLoanBorMain.getPaidTerms() - tLoanBorMain.getGracePeriod());
+				} else {
+					tLoanBorMain.setPrevRepaidDate(0);
+					tLoanBorMain.setRepaidPeriod(0);
+				}
 			}
 		}
+		
+		
 		tLoanBorMain.setNextPayIntDate(loanCom.getNextPayIntDate(tLoanBorMain.getAmortizedCode(),
 				tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFreqBase(), tLoanBorMain.getSpecificDate(),
 				tLoanBorMain.getSpecificDd(), tLoanBorMain.getPrevPayIntDate(), tLoanBorMain.getMaturityDate()));

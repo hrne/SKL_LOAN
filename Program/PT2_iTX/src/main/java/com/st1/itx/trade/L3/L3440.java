@@ -727,7 +727,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
-		tLoanBorTx.setRepaidPeriod(wkRepaidPeriod);
+		tLoanBorTx.setPaidTerms(wkPaidTerms);
 		tLoanBorTx.setPrincipal(wkPrincipal);
 		tLoanBorTx.setInterest(wkInterest);
 		tLoanBorTx.setDelayInt(wkDelayInt);

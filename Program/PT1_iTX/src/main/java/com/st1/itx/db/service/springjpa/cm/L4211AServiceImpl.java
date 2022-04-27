@@ -48,7 +48,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"AcDate\"";
 		sql += "        , \"TitaTlrNo\"";
 		sql += "        , \"TitaTxtNo\"";
-		sql += "        , \"RepaidPeriod\" ";
+		sql += "        , \"PaidTerms\" ";
 		sql += "        , \"OtherFields\" ";
 		sql += "        , \"TitaTxCd\" ";
 		sql += "   FROM \"LoanBorTx\"";
@@ -62,7 +62,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"AcDate\"";
 		sql += "          , \"TitaTlrNo\"";
 		sql += "          , \"TitaTxtNo\"";
-		sql += "          , \"RepaidPeriod\"";
+		sql += "          , \"PaidTerms\"";
 		sql += "          , \"OtherFields\" ";
 		sql += "          , \"TitaTxCd\" ";
 		sql += " )";
@@ -76,7 +76,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "        , \"AcDate\"";
 		sql += "        , \"TitaTlrNo\"";
 		sql += "        , \"TitaTxtNo\"";
-		sql += "        , \"RepaidPeriod\" ";
+		sql += "        , \"PaidTerms\" ";
 		sql += "        , \"OtherFields\" ";
 		sql += "        , \"TitaTxCd\" ";
 		sql += "        , SUM(\"TxAmt\")           AS \"TxAmt\"";
@@ -103,7 +103,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "          , \"AcDate\"";
 		sql += "          , \"TitaTlrNo\"";
 		sql += "          , \"TitaTxtNo\"";
-		sql += "          , \"RepaidPeriod\" ";
+		sql += "          , \"PaidTerms\" ";
 		sql += "          , \"OtherFields\" ";
 		sql += "          , \"TitaTxCd\" ";
 		sql += " )";
@@ -154,7 +154,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    , DECODE(TX1.\"TitaTxCd\", 'L3210', '999', NVL(FAC.\"AcctCode\",'999')) AS \"SortingForSubTotal\""; // 配合小計產生的排序
 		sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
 		sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
-		sql += "    , NVL(TX1.\"RepaidPeriod\", 0) AS \"RepaidPeriod\" ";
+		sql += "    , NVL(TX1.\"PaidTerms\", 0) AS \"PaidTerms\" ";
 		sql += "    , NVL(JSON_VALUE(TX1.\"OtherFields\", '$.AdvanceCloseCode'), '  ') AS \"CloseReasonCode\" ";
 		sql += " FROM \"BatxDetail\" BATX";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
@@ -170,7 +170,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "            AND TX2.\"AcDate\" = TX1.\"AcDate\"";
 		sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
 		sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
-		sql += "            AND TX2.\"RepaidPeriod\" = TX1.\"RepaidPeriod\" ";
+		sql += "            AND TX2.\"PaidTerms\" = TX1.\"PaidTerms\" ";
 		sql += "            AND TX2.\"OtherFields\" = TX1.\"OtherFields\" ";
 		sql += "            AND TX2.\"TitaTxCd\" = TX1.\"TitaTxCd\" ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";

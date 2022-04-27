@@ -193,11 +193,11 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("ORepayBankX", loanCom.getBankItemByBankCode(tTempVo.getParam("RepayBank")));
 		this.totaVo.putParam("OAcctDivisionCode", tTempVo.getParam("AcctDivisionCode"));
 		this.totaVo.putParam("OChequeAcctNo", tTempVo.getParam("ChequeAcctNo"));
-		this.totaVo.putParam("ORepayPeriod", tLoanBorTx.getRepaidPeriod());
+		this.totaVo.putParam("ORepayPeriod", tLoanBorTx.getPaidTerms());
 		this.totaVo.putParam("OChequeNo", tTempVo.getParam("ChequeNo"));
 		this.totaVo.putParam("ONewDueAmt", tTempVo.getParam("NewDueAmt"));
 		this.totaVo.putParam("ONewTotalPeriod", tTempVo.getParam("NewTotalPeriod"));
-		this.totaVo.putParam("ORepayTerms", tLoanBorTx.getRepaidPeriod());
+		this.totaVo.putParam("ORepayTerms", tLoanBorTx.getPaidTerms());
 		this.totaVo.putParam("ORepayAmt", wkRepayAmt);
 		this.totaVo.putParam("OCloseBreachAmt", tLoanBorTx.getCloseBreachAmt());
 		this.totaVo.putParam("OCloseBreachAmtUnpaid", tTempVo.getParam("CloseBreachAmtUnpaid"));

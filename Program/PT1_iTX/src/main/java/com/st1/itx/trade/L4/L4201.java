@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
@@ -67,11 +68,6 @@ public class L4201 extends TradeBuffer {
 		int iRepayTypeA = parse.stringToInteger(titaVo.getParam("RepayTypeA"));
 		int iCustNoA = parse.stringToInteger(titaVo.getParam("CustNoA"));
 		String iProcStsCode = titaVo.getParam("ProcStsCode");
-//		整批變更還款類別
-		if (titaVo.get("selectTotal") != null) {
-			btnIndex = parse.stringToInteger(titaVo.getBtnIndex());
-			iRepayTypeA = btnIndex + 1;
-		}
 		BatxDetail tBatxDetail = new BatxDetail();
 		BatxDetailId tBatxDetailId = new BatxDetailId();
 
@@ -79,19 +75,54 @@ public class L4201 extends TradeBuffer {
 		tBatxDetailId.setBatchNo(iBatchNo);
 		tBatxDetailId.setDetailSeq(iDetailSeq);
 
-		tBatxDetail = batxDetailService.findById(tBatxDetailId);
+		tBatxDetail = batxDetailService.holdById(tBatxDetailId);
 		if (tBatxDetail == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
+		TempVo tTempVo = new TempVo();
+		tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
+		int oldPreRepayTerms = 1;
+		if (tBatxDetail.getRepayType() == 1) {
+			if (tTempVo.get("PreRepayTerms") != null) {
+				oldPreRepayTerms = 0;
+				tTempVo.remove("PreRepayTerms");
+			}
+		}
+//		整批變更還款類別
+		int newPreRepayTerms = 1;
+		if (titaVo.get("selectTotal") != null) {
+			btnIndex = parse.stringToInteger(titaVo.getBtnIndex());
+			// 期款 0-1, 1-2, 2-3, 3-1(不預收)
+			switch (btnIndex) {
+			case 0:
+				iRepayTypeA = 1;
+				newPreRepayTerms = 1;
+				break;
+			case 1:
+				iRepayTypeA = 2;
+				break;
+			case 2:
+				iRepayTypeA = 3;
+				break;
+			case 3:
+				iRepayTypeA = 1;
+				newPreRepayTerms = 0;
+				break;
+			}
+		}
 		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA
-				&& iProcStsCode.equals(tBatxDetail.getProcStsCode())) {
+				&& iProcStsCode.equals(tBatxDetail.getProcStsCode()) && oldPreRepayTerms == newPreRepayTerms) {
 			throw new LogicException(titaVo, "E0012", "修改值與現有資料相同");
 		}
-		tBatxDetail = batxDetailService.holdById(tBatxDetailId);
 		tBatxDetail.setRepayType(iRepayTypeA);
 		tBatxDetail.setCustNo(iCustNoA);
 		tBatxDetail.setProcStsCode("0");
 		tBatxDetail.setProcStsCode(iProcStsCode);
+		if (newPreRepayTerms == 0) {
+			tTempVo.putParam("PreRepayTerms", 0);
+		}
+
+		tBatxDetail.setProcNote(tTempVo.getJsonString());
 		tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
 		try {
 			batxDetailService.update(tBatxDetail);

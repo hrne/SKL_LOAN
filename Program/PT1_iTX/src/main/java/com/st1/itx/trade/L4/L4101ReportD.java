@@ -142,7 +142,7 @@ public class L4101ReportD extends MakeReport {
 				print(0, 64, result.get("FacmNo"), "R");
 				print(0, 88, result.get("BormNo"), "R");
 				print(0, 107, result.get("NotYetCode"), "R");
-				print(0, 139, result.get("NotYetItem"), "R");
+				print(0, 129, result.get("NotYetItem"));
 
 				pageCnt++;
 

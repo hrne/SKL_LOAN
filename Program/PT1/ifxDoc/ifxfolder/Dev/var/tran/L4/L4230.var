@@ -1,0 +1,177 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4230)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,90)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4230" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4230]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@虛擬轉暫收"],
+[#<->#,"@戶    號:",#CUSTNO],
+[#<->#,"@批    號:",#BATNO],
+]
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+! 戶號
+#CUSTNO=A,7,I
+
+! 批號
+#BATNO=X,6,I
+
+![顯示方式]
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4230 -----------
+<sub type="FORM" name="L4230">
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+! 批號
+#OOBATNO=X,6,O
+! 戶號
+#OOCUSTNO=A,7,O
+! 額度
+#OOFACMNO=A,3,O
+! 還款來源
+#OORPTYP=A,2,O
+#OORPTYPX=X,16,O
+SWITCH(#OORPTYP,01,T(3,匯款轉帳),
+                02,T(3,銀行扣款),
+                03,T(3,員工扣款),
+                04,T(3,支票),
+                05,T(3,法院扣薪),
+                06,T(3,理賠金),
+                07,T(3,代收款－債權協商),
+                09,T(3,其他),
+                11,T(3,匯款轉帳預先作業))
+! 還款類別
+#OOREPCAT=A,1,O 
+#OOREPCATX=X,10,O
+SWITCH(#OOREPCAT,1,T(3,期款),
+                 2,T(3,部分償還),
+                 3,T(3,結案),
+                 4,T(3,帳管費),
+                 5,T(3,火險費),
+                 6,T(3,契變手續費),
+                 7,T(3,法務費),
+                 9,T(3,其他),
+                 T(3, ))
+! 扣款金額
+#OODEDUCTAMT=m,14.2,O 
+
+#secret-no=X,85,S
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CUSTNO#BATNO
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4230
+#OOBATNO#OOCUSTNO#OOFACMNO#OORPTYP#OOREPCAT#OODEDUCTAMT
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#batch-print=1,L4230.PFNX,NA,,,,,,1169:827
+^
+
+#YN=9,QUERY.GRID,L4230
+#any={caption:'[L4230]',width:1020,rowNum:40,
+ifxBatch:{
+	name:'批次執行',
+	type:'5',
+	rim:'L4230',
+	txtno:'#secret-no',
+	pfnx:"L4230.PFNX",
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#OOBATNO=批號
+{width:70}
+#OOCUSTNO=戶號
+{width:70}
+#OOFACMNO=額度
+{width:40}
+#OORPTYPX=還款來源
+{width:95}
+#OOREPCATX=還款類別
+{width:95}
+#OODEDUCTAMT=扣款金額
+{width:95}
+
+^
+</sub>

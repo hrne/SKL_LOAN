@@ -1,4 +1,4 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_L8_JcicB204_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB204_Upd"
 (
 -- 程式功能：維護 JcicB204 聯徵授信餘額日報檔
 -- 執行時機：每日日終批次(換日前)
@@ -58,13 +58,18 @@ BEGIN
     FROM   "LoanBorTx" Tx
       LEFT JOIN "FacMain" F  ON F."CustNo"  =  Tx."CustNo"
                             AND F."FacmNo"  =  Tx."FacmNo"
+      LEFT JOIN "AcLoanRenew"  M  ON M."CustNo"    = Tx."CustNo"
+                                 AND M."OldFacmNo" = Tx."FacmNo"
+                                 AND M."OldBormNo" = Tx."BormNo"
+                                 AND M."AcDate"    = Tx."AcDate"   
     WHERE  Tx."AcDate"                =  TBSDYF
       AND  Tx."CustNo"                >  0
       AND  NVL(Tx."TitaHCode", ' ')   IN ('0')    -- 正常
       AND  NVL(Tx."TitaTxCd", ' ')    IN ('L3410', 'L3420') -- 結案
       AND  NVL(JSON_VALUE(Tx."OtherFields", '$.CaseCloseCode'),' ') IN ('0', '4', '5')   -- 結案區分: 正常, 催收戶本人清償, 催收戶保證人代償
-      AND  NVL(F."AdvanceCloseCode",0) <> 0
-      AND  NVL(F."UtilAmt",0)          =  0
+      AND  M(Tx."CustNo",0)           =    0  -- 展期不申報
+      --AND  NVL(F."AdvanceCloseCode",0) <> 0
+      --AND  NVL(F."UtilAmt",0)          =  0
     GROUP BY Tx."AcDate"
            , Tx."CustNo"
            , Tx."FacmNo"
@@ -88,8 +93,8 @@ BEGIN
       LEFT JOIN "FacMain" F  ON F."CustNo"  =  Tx."CustNo"
                             AND F."FacmNo"  =  Tx."FacmNo"
     WHERE  NVL(Tx."CustNo",0)                >  0
-      AND  NVL(F."AdvanceCloseCode",0) <> 0
-      AND  NVL(F."UtilAmt",0)          =  0
+      --AND  NVL(F."AdvanceCloseCode",0) <> 0
+      --AND  NVL(F."UtilAmt",0)          =  0
     GROUP BY  Tx."AcDate", Tx."CustNo", Tx."FacmNo", Tx."BormNo"
     
     -- 當日授信

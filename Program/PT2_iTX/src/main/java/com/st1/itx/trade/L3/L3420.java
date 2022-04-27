@@ -281,7 +281,6 @@ public class L3420 extends TradeBuffer {
 		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
 		iRealRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("RealRepayAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
-		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
 		// 收取本金、利息
 		iPrincipal = this.parse.stringToBigDecimal(titaVo.getParam("TimPrincipal"));
 		iInterest = this.parse.stringToBigDecimal(titaVo.getParam("TimInterest"));
@@ -330,6 +329,16 @@ public class L3420 extends TradeBuffer {
 			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 90) {
 				iTmpAmt = iTmpAmt.subtract(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 暫收抵繳金額
 			}
+		}
+		
+		// 放款交易明細檔的交易金額為實際支付金額
+		iTxAmt = iRealRepayAmt; 
+	
+		// 系統交易記錄檔的金額為實際支付金額或暫收款金額
+		if (iTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+			titaVo.setTxAmt(iTxAmt);
+		} else {
+			titaVo.setTxAmt(BigDecimal.ZERO.subtract(iTmpAmt));		
 		}
 
 		// 按清償違約金、違約金、 延滯息、利息順序減免
@@ -1362,7 +1371,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
-		tLoanBorTx.setRepaidPeriod(wkRepaidPeriod);
+		tLoanBorTx.setPaidTerms(0);
 		tLoanBorTx.setPrincipal(wkPrincipal);
 		// 催收結案時：沖催收款項+利息收入=實收本金+實收利息
 		tLoanBorTx.setInterest(wkInterest);
@@ -1462,7 +1471,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(0);
 		tLoanBorTx.setIntEndDate(0);
-		tLoanBorTx.setRepaidPeriod(0);
+		tLoanBorTx.setPaidTerms(0);
 		tLoanBorTx.setPrincipal(od.getOvduPrinBal());
 		tLoanBorTx.setInterest(od.getOvduIntBal());
 		tLoanBorTx.setDelayInt(BigDecimal.ZERO);
@@ -1542,7 +1551,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(0);
 		tLoanBorTx.setIntEndDate(0);
-		tLoanBorTx.setRepaidPeriod(0);
+		tLoanBorTx.setPaidTerms(0);
 		tLoanBorTx.setPrincipal(wkTrfPrin);
 		tLoanBorTx.setInterest(wkTrfInt);
 		tLoanBorTx.setDelayInt(BigDecimal.ZERO);
@@ -1584,7 +1593,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(0);
 		tLoanBorTx.setIntEndDate(0);
-		tLoanBorTx.setRepaidPeriod(0);
+		tLoanBorTx.setPaidTerms(0);
 		tLoanBorTx.setPrincipal(od.getOvduPrinBal());
 		tLoanBorTx.setInterest(od.getOvduIntBal());
 		tLoanBorTx.setDelayInt(BigDecimal.ZERO);

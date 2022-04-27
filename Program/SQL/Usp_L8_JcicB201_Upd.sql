@@ -189,6 +189,96 @@ BEGIN
       WHERE F."ApplNo" = F."MainApplNo"
         AND NVL(J."BormNo",0) != 0
     )
+    , RecycleData AS (
+    	SELECT JM."DataYM"            -- 資料年月
+	         , JM."CustNo"            -- 戶號
+	         , JM."FacmNo"            -- 額度編號
+	         , JM."BormNo"            -- 撥款序號
+	         , JM."CustId"            -- 借款人ID / 統編
+	         , JM."Status"            -- 戶況
+	         , JM."EntCode"           -- 企金別
+	         , JM."SuvId"             -- 負責人IDN/負責之事業體BAN
+	         , JM."OverseasId"        -- 外僑兼具中華民國國籍IDN
+	         , JM."IndustryCode"      -- 授信戶行業別
+	         , JM."AcctCode"          -- 科目別
+	         , JM."SubAcctCode"       -- 科目別註記
+	         , JM."OrigAcctCode"      -- 轉催收款(或呆帳)前原科目別
+	         , JM."UtilAmt"            -- (額度)貸出金額
+	         , JM."UtilBal"            -- (額度)已動用額度餘額
+	         , JM."RecycleCode"       -- 循環動用
+	         , JM."RecycleDeadline"   -- 循環動用期限
+	         , JM."IrrevocableFlag"   -- 不可撤銷
+	         , JM."FinCode"           -- 融資分類
+	         , JM."ProjCode"          -- 政府專業補助貸款分類
+	         , JM."NonCreditCode"     -- 不計入授信項目
+	         , JM."UsageCode"         -- 用途別
+	         , JM."ApproveRate"       -- 本筆撥款利率
+	         , JM."StoreRate"         -- 計息利率
+	         , JM."DrawdownDate"      -- 撥款日期
+	         , JM."MaturityDate"      -- 到期日
+	         , JM."AmortizedCode"     -- 攤還方式
+	         , JM."CurrencyCode"      -- 幣別
+	         , 0 AS "DrawdownAmt"     -- 撥款金額
+	         , 0 AS "LoanBal"         -- 放款餘額
+	         , 0 AS "PrevAmt"         -- 本月應收本金
+	         , 0 AS "IntAmt"          -- 本月應收利息
+	         , 0 AS "PrevAmtRcv"      -- 本月實收本金
+	         , 0 AS "IntAmtRcv"       -- 本月實收利息
+	         , 0 AS "FeeAmtRcv"       -- 本月收取費用
+	         , 0 AS "PrevPayIntDate"  -- 上次繳息日
+	         , 0 AS "PrevRepaidDate"  -- 上次還本日
+	         , 0 AS "NextPayIntDate"  -- 下次繳息日
+	         , 0 AS "NextRepayDate"   -- 下次還本日
+	         , 0 AS "IntDelayMon"     -- 利息逾期月數
+	         , 0 AS "RepayDelayMon"   -- 本金逾期月數
+	         , 0 AS "RepaidEndMon"    -- 本金逾到期日(清償期)月數
+	         , JM."ClCode1"           -- 主要擔保品代號1
+	         , JM."ClCode2"           -- 主要擔保品代號2
+	         , JM."ClNo"              -- 主要擔保品編號
+	         , JM."ClTypeCode"        -- 主要擔保品類別代碼(JCIC)
+	         , JM."ClType"            -- 擔保品組合型態
+	         , JM."EvaAmt"            -- 鑑估總值
+	         , JM."DispDate"          -- 擔保品處分日期
+	         , JM."SyndNo"            -- 聯貸案序號
+	         , JM."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+	         , JM."SigningDate"       -- 聯貸合約訂定日期
+	         , JM."SyndAmt"           -- 聯貸總金額
+	         , JM."PartAmt"           -- 參貸金額
+	         , JM."OvduDate"          -- 轉催收日期
+	         , JM."BadDebtDate"       -- 轉呆帳日期
+	         , JM."BadDebtSkipFg"     -- 不報送呆帳記號
+	         , JM."AcBookCode"        -- 帳冊別
+	         , JM."AcSubBookCode"     -- 區隔帳冊
+	         , JM."CreateDate"        -- 建檔日期時間
+	         , JM."CreateEmpNo"       -- 建檔人員
+	         , JM."LastUpdate"        -- 最後更新日期時間
+	         , JM."LastUpdateEmpNo"   -- 最後更新人員
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY JM."DataYM"
+                          , JM."CustNo"
+                          , JM."FacmNo"
+               ORDER BY JM."BormNo" DESC
+             ) AS "RecycleSeq" -- 排序,只取一筆
+	    FROM   "FacMain" M
+	    LEFT JOIN "FacShareAppl" FSA ON FSA."CustNo" = M."CustNo"
+	                                AND FSA."FacmNo" = M."FacmNo"
+	    LEFT JOIN "JcicMonthlyLoanData" JM ON JM."CustNo" = M."CustNo"
+	                                      AND JM."FacmNo" = M."FacmNo"
+	                                      AND JM."DataYM" = YYYYMM
+	                                      AND CASE
+	                                          WHEN FSA."ApplNo" = FSA."MainApplNo" -- 主要借款人資料
+	                                               THEN 1
+	                                          WHEN NVL(FSA."ApplNo",0) = 0 -- 非共同借款人
+	                                               THEN 1
+	                                          ELSE 0
+	                                          END = 1
+   	 WHERE M."RecycleCode" = 1 -- 循環動用
+     	 AND M."RecycleDeadline" >= TBSDYF -- 未至循環動用期限
+     	 AND M."UtilAmt" = 0 -- 放款餘額為0 
+     	 AND M."LineAmt" - M."UtilBal" > 0 -- 尚有可動用額度餘額
+     	 AND JM."FacmNo" !=0 -- 有串到的才進
+    )
     , TmpMainData AS (
     -- 共同借款人合併申報
     -- "非主要共同借款人"的資料,部分申報欄位以"主要借款人"資料申報
@@ -357,6 +447,72 @@ BEGIN
             THEN 1
           ELSE 0
           END = 1
+    UNION -- 循環動用 且 未至循環動用期限 且 放款餘額為0 且 尚有可動用額度餘額
+    SELECT JM."DataYM"            -- 資料年月
+         , JM."CustNo"            -- 戶號
+         , JM."FacmNo"            -- 額度編號
+         , 0   AS "BormNo"        -- 撥款序號
+         , JM."CustId"            -- 借款人ID / 統編
+         , JM."Status"            -- 戶況
+         , JM."EntCode"           -- 企金別
+         , JM."SuvId"             -- 負責人IDN/負責之事業體BAN
+         , JM."OverseasId"        -- 外僑兼具中華民國國籍IDN
+         , JM."IndustryCode"      -- 授信戶行業別
+         , JM."AcctCode"          -- 科目別
+         , JM."SubAcctCode"       -- 科目別註記
+         , JM."OrigAcctCode"      -- 轉催收款(或呆帳)前原科目別
+         , JM."UtilAmt"           -- (額度)貸出金額
+         , JM."UtilBal"           -- (額度)已動用額度餘額
+         , JM."RecycleCode"       -- 循環動用
+         , JM."RecycleDeadline"   -- 循環動用期限
+         , JM."IrrevocableFlag"   -- 不可撤銷
+         , JM."FinCode"           -- 融資分類
+         , JM."ProjCode"          -- 政府專業補助貸款分類
+         , JM."NonCreditCode"     -- 不計入授信項目
+         , JM."UsageCode"         -- 用途別
+         , JM."ApproveRate"       -- 本筆撥款利率
+         , JM."StoreRate"         -- 計息利率
+         , JM."DrawdownDate"      -- 撥款日期
+         , JM."MaturityDate"      -- 到期日
+         , JM."AmortizedCode"     -- 攤還方式
+         , JM."CurrencyCode"      -- 幣別
+         , JM."DrawdownAmt"       -- 撥款金額
+         , JM."LoanBal"           -- 放款餘額
+         , JM."PrevAmt"           -- 本月應收本金
+         , JM."IntAmt"            -- 本月應收利息
+         , JM."PrevAmtRcv"        -- 本月實收本金
+         , JM."IntAmtRcv"         -- 本月實收利息
+         , JM."FeeAmtRcv"         -- 本月收取費用
+         , JM."PrevPayIntDate"    -- 上次繳息日
+         , JM."PrevRepaidDate"    -- 上次還本日
+         , JM."NextPayIntDate"    -- 下次繳息日
+         , JM."NextRepayDate"     -- 下次還本日
+         , JM."IntDelayMon"       -- 利息逾期月數
+         , JM."RepayDelayMon"     -- 本金逾期月數
+         , JM."RepaidEndMon"      -- 本金逾到期日(清償期)月數
+         , JM."ClCode1"           -- 主要擔保品代號1
+         , JM."ClCode2"           -- 主要擔保品代號2
+         , JM."ClNo"              -- 主要擔保品編號
+         , JM."ClTypeCode"        -- 主要擔保品類別代碼(JCIC)
+         , JM."ClType"            -- 擔保品組合型態
+         , JM."EvaAmt"            -- 鑑估總值
+         , JM."DispDate"          -- 擔保品處分日期
+         , JM."SyndNo"            -- 聯貸案序號
+         , JM."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , JM."SigningDate"       -- 聯貸合約訂定日期
+         , JM."SyndAmt"           -- 聯貸總金額
+         , JM."PartAmt"           -- 參貸金額
+         , JM."OvduDate"          -- 轉催收日期
+         , JM."BadDebtDate"       -- 轉呆帳日期
+         , JM."BadDebtSkipFg"     -- 不報送呆帳記號
+         , JM."AcBookCode"        -- 帳冊別
+         , JM."AcSubBookCode"     -- 區隔帳冊
+         , JM."CreateDate"        -- 建檔日期時間
+         , JM."CreateEmpNo"       -- 建檔人員
+         , JM."LastUpdate"        -- 最後更新日期時間
+         , JM."LastUpdateEmpNo"   -- 最後更新人員
+    FROM RecycleData JM
+    WHERE JM."RecycleSeq" = 1
     )
       SELECT
              YYYYMM                                AS "DataYM"            -- 資料年月
@@ -708,6 +864,7 @@ BEGIN
                    AND M."UtilAmt" = 0
                    AND Tx."CustNo" IS NOT NULL -- 是結案戶
               THEN 1
+              WHEN M."BormNo" = 0 THEN 1 -- 循環動用 且 未至循環動用期限 且 放款餘額為0 且 尚有可動用額度餘額
             ELSE 0
             END = 1
         ;

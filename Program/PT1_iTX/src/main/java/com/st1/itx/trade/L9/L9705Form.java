@@ -181,7 +181,11 @@ public class L9705Form extends MakeReport {
 						BigDecimal bPrincipal = principal.get(payIntDate);
 						BigDecimal bInterest = interest.get(payIntDate);
 						BigDecimal bSummry = bBreachAmt.add(bPrincipal).add(bInterest).subtract(unPaidAmt).add(acctFee);
-
+						this.info("bBreachAmt ..." + bBreachAmt);
+						this.info("bPrincipal ..." + bPrincipal);
+						this.info("bInterest ..." + bInterest);
+						this.info("bSummry ..." + bSummry);
+						
 						loanBal = loanBal.subtract(bPrincipal);
 
 //						this.print(1, 1,

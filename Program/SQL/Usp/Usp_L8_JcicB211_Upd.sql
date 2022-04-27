@@ -1,5 +1,4 @@
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB211_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB211_Upd"
 (
 -- 程式功能：維護 JcicB211 聯徵每日授信餘額變動資料檔
 -- 執行時機：每日日終批次(換日前)
@@ -104,8 +103,9 @@ BEGIN
                  WHEN T."OvduDay" >= 16 THEN '0'															 -- 現金卡科目才有AB,其他一個月內視同無延遲
                  WHEN T."OvduDay"  > 0  THEN '0'                               --
                  ELSE '0'  END                               AS "RepayCode"    -- 本筆還款後之還款紀錄
-          , CASE WHEN T."TitaTxCd" IN ('L3410', 'L3420') AND T."Status" IN ( 1 , 3 )
-                 THEN '3' ELSE ' ' END                       AS "NegStatus"    -- 本筆還款後之債權結案註記
+          , CASE --WHEN T."TitaTxCd" IN ('L3410', 'L3420') AND T."Status" IN ( 1 , 3 ) THEN '3'
+                 WHEN T."TitaTxCd" IN ('L3410', 'L3420') THEN T."TxStatus"
+                 ELSE ' ' END                       AS "NegStatus"    -- 本筆還款後之債權結案註記
           , CASE WHEN T."Status" = 6 AND NVL(O."BadDebtDate",0) > 0
                  THEN TRUNC(O."BadDebtDate" / 100) - 191100
                  ELSE 0 END                                  AS "BadDebtDate"  -- 呆帳轉銷年月
@@ -120,9 +120,13 @@ BEGIN
                          WHEN  M."Status" = 1  THEN 0             -- 展期
                          WHEN  M."NextPayIntDate" >= T3."AcDate"  THEN 0
                          WHEN  M."NextPayIntDate" = 0 THEN 0
+                         WHEN  MOD( NVL(M."PrevPayIntDate", 0) , 100) = MOD( NVL(T3."AcDate", 0) , 100)   THEN 
+                               TRUNC(MONTHS_BETWEEN(TO_DATE(T3."AcDate",'YYYY-MM-DD')  
+                                     , TO_DATE(M."PrevPayIntDate",'YYYY-MM-DD'))) - 1    -- 計算後剛好為1個月時,當成未超過1個月故需減1個月
                          ELSE  TRUNC(MONTHS_BETWEEN(TO_DATE(T3."AcDate",'YYYY-MM-DD')
-                             , TO_DATE(M."NextPayIntDate",'YYYY-MM-DD')))  END "OvduMon"
-                  , M."Status", M."LastOvduNo"
+                                     , TO_DATE(M."PrevPayIntDate",'YYYY-MM-DD')))  -- 由NextPayIntDate改為PrevPayIntDate
+                    END    AS "OvduMon"
+                  , M."Status", M."LastOvduNo",T3."TxStatus"
              FROM ( SELECT  T1."CustNo", T1."FacmNo", T1."BormNo", T1."BorxNo"
                           , ( T1."Principal"  ) AS "Principal"
                           , T1."LoanBal", T1."TitaHCode", T1."TitaTxCd", T1."AcDate"
@@ -130,6 +134,7 @@ BEGIN
                                       CAST(SUBSTR(T1."CorrectSeq", 1, 8) AS decimal(8, 0))
                                  ELSE 0
                             END  AS "OrigAcDate"   -- 原交易會計日期
+                          , ' ' AS "TxStatus"  -- 非結案-債權結案註記= ' ' 
                       FROM  "LoanBorTx" T1
                      WHERE  T1."AcDate"    =  TBSDYF
                        AND  T1."TitaHCode" IN (0, 3)
@@ -140,7 +145,7 @@ BEGIN
                           , CASE WHEN M."Status" IN ( 2 , 6 ) THEN 1
                                  ELSE T2."Principal"  
                             END             AS "Principal"
-                          , CASE WHEN M."Status" IN ( 2 , 6 ) THEN (T2."Principal" + T2."Interest")  -- 催收呆帳戶=本金+利息+費用
+                          , CASE WHEN M."Status" IN ( 2 , 6 ) THEN (T2."Principal" + T2."Interest")  -- 催收呆帳戶=本金+利息
                                  ELSE T2."LoanBal"
                             END             AS  "LoanBal"     
                           , T2."TitaHCode", T2."TitaTxCd", T2."AcDate"
@@ -148,6 +153,15 @@ BEGIN
                                       CAST(SUBSTR(T2."CorrectSeq", 1, 8) AS decimal(8, 0))
                                  ELSE 0
                             END  AS "OrigAcDate"   -- 原交易會計日期
+                          , CASE WHEN M."Status" IN ( 5 , 9 ) AND 
+                                    NVL( JSON_VALUE (T2."OtherFields", '$.CaseCloseCode'),0) = '4'  THEN 'P' -- 不良債權
+                                 WHEN M."Status" IN ( 5 , 9 ) AND 
+                                    NVL( JSON_VALUE (T2."OtherFields", '$.CaseCloseCode'),0) = '5'  THEN 'Q' -- 不良債權
+                                 WHEN M."Status" IN ( 5 , 9 ) AND 
+                                    NVL( JSON_VALUE (T2."OtherFields", '$.CaseCloseCode'),0) = '6'  THEN 'D' -- 不良債權
+                                 WHEN M."Status" IN ( 1 , 3 ) THEN '3'  -- 展期,正常結案
+                                 ELSE ' '
+                            END  AS "TxStatus"  -- 結案-債權結案註記   
                     FROM  "LoanBorTx" T2
                     LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T2."CustNo"
                                                 AND  M."FacmNo"    =  T2."FacmNo"
@@ -156,7 +170,7 @@ BEGIN
                       AND  T2."TitaHCode" IN (0, 3)
                       AND  T2."Principal"  <> 0
                       AND  T2."TitaTxCd"  IN ('L3410', 'L3420')
-                      AND  M."Status" IN (1 , 2 , 3 , 6 )  --結案登錄戶況增列2催收戶,6呆帳戶
+                      AND  M."Status" IN (1 , 2 , 3 , 5 , 6 , 7 , 9)  -- 結案登錄戶況增列5,7,9
                   ) T3
              LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T3."CustNo"
                                          AND  M."FacmNo"    =  T3."FacmNo"
@@ -166,8 +180,8 @@ BEGIN
                          FROM  "RptJcic" A
                        ) A    ON  A."CustNo"    =  T3."CustNo"
                              AND  A."FacmNo"    =  T3."FacmNo"     -- 呆帳不報送檔
-             WHERE (  M."Status" IN (0, 1, 2, 3) OR
-                     (M."Status" IN (6) AND A."CustNo" IS NULL)
+             WHERE (  M."Status" IN (0, 1, 2, 3, 5, 7 ) OR
+                     (M."Status" IN (6, 9) AND A."CustNo" IS NULL)
                    )
                AND (  T3."TitaHCode" = 0      OR
                      (T3."TitaHCode" = 3 AND T3."OrigAcDate" <> T3."AcDate" AND TRUNC(T3."OrigAcDate" / 100) = YYYYMM)
@@ -179,8 +193,8 @@ BEGIN
         AND  O."FacmNo"    =  T."FacmNo"
         AND  O."BormNo"    =  T."BormNo"
         AND  O."OvduNo"    =  T."LastOvduNo"
-      WHERE  T."Status" IN (0, 1 , 2, 3)
-         OR (T."Status" = 6  AND O."AcctCode" = '990')
+      WHERE  T."Status" IN (0, 1 , 2, 3, 5, 7 )
+         OR (T."Status" IN (6 , 9 ) AND O."AcctCode" = '990')
       )
 
     SELECT TBSDYF                                AS "DataYMD"           -- 資料日期

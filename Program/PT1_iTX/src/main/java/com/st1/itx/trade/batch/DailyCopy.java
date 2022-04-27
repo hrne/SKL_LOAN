@@ -59,6 +59,16 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void run() throws LogicException {
+		this.info("DailyCopy Start ... ");
+		String execEnv = this.titaVo.getParam(ContentName.dataBase);
+
+		this.info("DailyCopy execEnv = " + execEnv);
+
+		if (!execEnv.equals(ContentName.onLine)) {
+			this.info("DailyCopy 執行環境非Online,不做備份,結束程式.");
+			return;
+		}
+
 		this.info("DailyCopy 日報環境開始複製");
 
 		TitaVo tempTitaVo = (TitaVo) this.titaVo.clone();

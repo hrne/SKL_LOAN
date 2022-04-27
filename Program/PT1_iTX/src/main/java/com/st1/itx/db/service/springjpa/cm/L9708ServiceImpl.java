@@ -38,20 +38,17 @@ public class L9708ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9708.findAll");
 
 		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
-
+		this.info("會計日期     = " + iDAY);
+		
 		String sql = "";
-		sql += "   	   SELECT (CASE";
-		sql += "					WHEN B.\"RepayBank\" = '812' THEN '1' ";
-		sql += "					WHEN B.\"RepayBank\" = '006' THEN '2' ";
-		sql += "					WHEN B.\"RepayBank\" = '700' THEN '3' ";
-		sql += "					WHEN B.\"RepayBank\" = '103' THEN '4' ";
-		sql += "				   ELSE '0' END ) F0";
-		sql += "               , M.\"DrawdownDate\" F1";
-		sql += "               , M.\"CustNo\" F2";
-		sql += "               , M.\"FacmNo\" F3";
-		sql += "               , M.\"FirstDueDate\" F4";
-		sql += "               , B.\"RepayAcct\" F5";
-		sql += "               , \"Fn_ParseEOL\"(C.\"CustName\",0) F6 ";
+		sql += "   	   SELECT    B.\"RepayBank\" F0";
+		sql += "   	   		   , B.\"RepayBank\"||D.\"BankItem\" F1";
+		sql += "               , M.\"DrawdownDate\" F2";
+		sql += "               , M.\"CustNo\" F3";
+		sql += "               , M.\"FacmNo\" F4";
+		sql += "               , M.\"FirstDueDate\" F5";
+		sql += "               , B.\"RepayAcct\" F6";
+		sql += "               , \"Fn_ParseEOL\"(C.\"CustName\",0) F7 ";
 		sql += "        FROM \"LoanBorMain\" M";
 		sql += "        LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "                               AND F.\"FacmNo\" = M.\"FacmNo\"";
@@ -59,16 +56,42 @@ public class L9708ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"BankAuthAct\" B ON B.\"CustNo\" = M.\"CustNo\"";
 		sql += "                                   AND B.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "                                   AND B.\"AuthType\" <> '02' ";
-		sql += "        WHERE M.\"DrawdownDate\" = :iday ";
+		sql += "        LEFT JOIN \"CdBank\" D ON B.\"RepayBank\" = D.\"BankCode\"";
+		sql += "        WHERE M.\"DrawdownDate\" = :iDAY ";
 		sql += "          AND M.\"BormNo\" = 1 ";
 		sql += "          AND F.\"RepayCode\" IN (1, 2, 3)";
+        sql += "          AND D.\"BranchCode\" = '    ' ";
 		sql += "        ORDER BY \"F0\",\"F2\"";
+//		String sql = "";
+//		sql += "   	   SELECT (CASE";
+//		sql += "					WHEN B.\"RepayBank\" = '812' THEN '1' ";
+//		sql += "					WHEN B.\"RepayBank\" = '006' THEN '2' ";
+//		sql += "					WHEN B.\"RepayBank\" = '700' THEN '3' ";
+//		sql += "					WHEN B.\"RepayBank\" = '103' THEN '4' ";
+//		sql += "				   ELSE '0' END ) F0";
+//		sql += "               , M.\"DrawdownDate\" F1";
+//		sql += "               , M.\"CustNo\" F2";
+//		sql += "               , M.\"FacmNo\" F3";
+//		sql += "               , M.\"FirstDueDate\" F4";
+//		sql += "               , B.\"RepayAcct\" F5";
+//		sql += "               , \"Fn_ParseEOL\"(C.\"CustName\",0) F6 ";
+//		sql += "        FROM \"LoanBorMain\" M";
+//		sql += "        LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
+//		sql += "                               AND F.\"FacmNo\" = M.\"FacmNo\"";
+//		sql += "        LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"";
+//		sql += "        LEFT JOIN \"BankAuthAct\" B ON B.\"CustNo\" = M.\"CustNo\"";
+//		sql += "                                   AND B.\"FacmNo\" = M.\"FacmNo\"";
+//		sql += "                                   AND B.\"AuthType\" <> '02' ";
+//		sql += "        WHERE M.\"DrawdownDate\" = :iday ";
+//		sql += "          AND M.\"BormNo\" = 1 ";
+//		sql += "          AND F.\"RepayCode\" IN (1, 2, 3)";
+//		sql += "        ORDER BY \"F0\",\"F2\"";
 
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iday", iDAY);
+		query.setParameter("iDAY", iDAY);
 		return this.convertToMap(query.getResultList());
 	}
 

@@ -157,6 +157,7 @@ public class L4320Batch extends TradeBuffer {
 
 		// 產出確認清單
 		if (titaVo.isHcodeNormal()) {
+			this.info("產出確認清單");
 			this.batchTransaction.commit();
 			l4321Report.exec(titaVo);
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo() + "L4320", "Y", "LC009",

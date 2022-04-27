@@ -24,6 +24,8 @@ import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdCodeService;
@@ -297,7 +299,7 @@ public class L420ABatch extends TradeBuffer {
 			l4211Report.setParentTranCode("L420A");
 			l4211Report.execWithBatchMapList(l4211MapList, titaVo);
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L420A", "L4211-匯款總傳票明細表", titaVo);
+					titaVo.getTlrNo() + "L420A", "L4211-匯款轉帳檢核明細表", titaVo);
 		}
 		return null;
 
@@ -339,11 +341,20 @@ public class L420ABatch extends TradeBuffer {
 					break;
 				}
 			}
+			if (facAcctCode.equals("999")) {
+				for (BaTxVo baTxVo : lbaTxVo) {
+					if (baTxVo.getFacmNo() > 0) {
+						FacMain tFacMain = facMainService
+								.findById(new FacMainId(baTxVo.getCustNo(), baTxVo.getFacmNo()));
+						facAcctCode = baTxVo.getAcctCode();
+						facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
+						break;
+					}
+				}
+			}
 		}
 
-		for (
-
-		BaTxVo baTxVo : lbaTxVo) {
+		for (BaTxVo baTxVo : lbaTxVo) {
 			if (baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0
 					&& baTxVo.getTempAmt().compareTo(BigDecimal.ZERO) == 0) {
 				continue;

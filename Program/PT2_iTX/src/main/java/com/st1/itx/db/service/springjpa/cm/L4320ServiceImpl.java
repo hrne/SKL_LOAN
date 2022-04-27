@@ -104,7 +104,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		客戶檔 0:個金1:企金2:企金自然人
 		int iEntCode1 = 0;
 		int iEntCode2 = 0;
-		if (Integer.parseInt(titaVo.getParam("EntCode")) == 2) {
+		if (Integer.parseInt(titaVo.getParam("CustType")) == 2) {
 			iEntCode1 = 1;
 			iEntCode2 = 2;
 		}

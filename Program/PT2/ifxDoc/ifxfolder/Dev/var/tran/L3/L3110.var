@@ -701,7 +701,7 @@ C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
 
-#TimCustNoX=X,100,S
+#TimCustNoX=x,100,S
 E(0,0)
 C(4,#CustNo,$,T(2,#CustNoX))
 C(4,#CustId,$,T(2,#CustIdX))
@@ -2237,6 +2237,17 @@ T(2,#KINBR+#TLRNO+#TXTNO)
 #RimData=x,100,S
 T(6A,#Entdy+#TxNo)
 
+
+! 匯款單FileNo
+#DPdfSnoF=X,8,S
+E(2,@DSnoF,#DPdfSnoF)
+#DSnoF=A,8,S
+
+! 匯款單FileNo
+#DPdfPrtF=A,1,S
+C(3,#DSnoF,0,E(0,0),E(0,1))
+
+
 !#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
 #button=x,100,S
 C(2,#FKEY,$,S,S,S,S,S,S,$,S,S,S)
@@ -2272,7 +2283,7 @@ K(MODIFYBUTTON,1,提交)
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L3110
-#BormNo^
+#BormNo#DPdfSnoF^
 
 <include src="COM.icf::TRCTL.tom"/>
 <include src="COM.icf::LockControl.tom"/>
@@ -2296,4 +2307,6 @@ TXFORM=L3110
 <include src="PRT.icf::FMR01.sel"/>
 <include src="PRT.icf::FMH01.sel"/>
 <include src="PRT.icf::FMHR01.sel"/>
+#DPdfPrtF=1,PDF,,,,,,,,,,,,,DPdfSnoF,撥款傳票（主管審核）
+^
 </sub>

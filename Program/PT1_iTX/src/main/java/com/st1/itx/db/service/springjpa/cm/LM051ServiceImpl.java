@@ -403,9 +403,10 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                  ELSE 0 END ";
 			sql += "             AS \"LnAmt\"";
 			sql += "      FROM rawData";
-			sql += "      )";
-			sql += "SELECT \"KIND\" ";
-			sql += "	  ,SUM(\"AMT\") FROM (";
+			sql += "      ) ";
+			sql += " SELECT \"KIND\" ";
+			sql += "	   ,SUM(\"AMT\")  AS \"AMT\" ";
+			sql += " FROM (";
 			sql += "	SELECT ( CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
