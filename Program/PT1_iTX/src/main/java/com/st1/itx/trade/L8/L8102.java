@@ -257,7 +257,13 @@ public class L8102 extends TradeBuffer {
 		tTxToDoDetail.setFacmNo(0);
 		tTxToDoDetail.setBormNo(0);
 		tTxToDoDetail.setDtlValue(dataDt7 + "-" + txAmlCredit.getCustKey());
-		tTxToDoDetail.setItemCode("AML" + txAmlCredit.getReviewType());
+		String itemCode = "";
+		if ("H".equals(txAmlCredit.getReviewType())) {
+			itemCode = "AMLH";
+		} else {
+			itemCode = "AMLM";
+		}
+		tTxToDoDetail.setItemCode(itemCode);
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote("AML定審");
 

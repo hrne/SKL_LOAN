@@ -250,7 +250,9 @@ public class L3005 extends TradeBuffer {
 			occursList.putParam("OOFeeFg", FeeFg); // 資料
 			occursList.putParam("OOLoanIntDetailFg", loanIntDetailFg); // 計息明細Fg
 			occursList.putParam("OOTxCd", ln.getTitaTxCd()); // 交易代號
-
+			// 新增摘要 跟費用明細
+			occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
+			
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);
 		}

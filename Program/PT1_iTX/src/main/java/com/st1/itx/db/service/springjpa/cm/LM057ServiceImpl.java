@@ -154,26 +154,65 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM057.findAll YYMM=" + ((iYear * 100) + iMonth) + ",lastMonth=" + lastMonth);
 
 		String sql = " ";
-		sql += " 	WITH \"tempTotal\" AS (";
+		
+		sql += "	WITH \"rawData\" AS ( ";
+		sql += "      SELECT SUM(CASE WHEN I.\"YearMonth\" = :yymm ";
+		sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
+		sql += "                 ELSE 0 END";
+		sql += "                )";
+		sql += "             -";
+		sql += "             SUM(CASE WHEN I.\"YearMonth\" = :lyymm";
+		sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
+		sql += "                 ELSE 0 END";
+		sql += "                )";
+		sql += "             AS \"LnAmt\"";
+		sql += "      FROM \"Ias39IntMethod\" I";
+		sql += "      LEFT JOIN \"MonthlyLoanBal\" MLB ON I.\"YearMonth\" = MLB.\"YearMonth\" ";
+		sql += "                                      AND I.\"CustNo\" = MLB.\"CustNo\" ";
+		sql += "                                      AND I.\"FacmNo\" = MLB.\"FacmNo\" ";
+		sql += "                                      AND I.\"BormNo\" = MLB.\"BormNo\"";
+		sql += "      WHERE NVL(I.\"YearMonth\", ' ') IN (:lyymm, :yymm) ";
+		sql += "        AND NVL(MLB.\"CurrencyCode\",' ') = 'TWD'";
+		sql += "        AND MLB.\"AcctCode\" <> 990 ";
+		sql += "      GROUP BY DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') ";
+		sql += "      ),";
+		sql += "      \"roundData\" AS (";
+		sql += "      SELECT CASE WHEN \"LnAmt\" < 0";
+		sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"LnAmt\")+1 ";
+		sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"LnAmt\")-1";
+		sql += "                            ELSE 0 END ";
+		sql += "                  WHEN \"LnAmt\" > 0";
+		sql += "                  THEN ROUND(\"LnAmt\")";
+		sql += "                  ELSE 0 END ";
+		sql += "             AS \"LnAmt\"";
+		sql += "      FROM \"rawData\" ";
+		sql += "      ),";
+		sql += " 	\"tempTotal\" AS (";
 		sql += " 		SELECT 'ToTal' AS \"Item\"";
 		sql += " 			  ,SUM(\"LoanBalance\") AS \"AMT\" ";
 		sql += " 		FROM \"MonthlyLoanBal\"";
 		sql += " 		WHERE \"LoanBalance\" > 0 ";
 		sql += " 		  AND \"YearMonth\" = :yymm ";
+//		sql += " 		UNION";
+//		sql += "		SELECT 'DPLoan' AS \"Item\" ";
+//		sql += " 	   		  ,SUM(\"TdBal\")  AS \"AMT\" ";
+//		sql += " 		FROM \"AcMain\"";
+//		sql += " 		WHERE \"AcNoCode\" IN ( '10600304000' ) "; //-- 擔保放款-折溢價
+//		sql += "   		  AND \"MonthEndYm\" = :yymm ";
 		sql += " 		UNION";
-		sql += "		SELECT 'DPLoan' AS \"Item\" ";
-		sql += " 	   		  ,SUM(\"TdBal\")  AS \"AMT\" ";
-		sql += " 		FROM \"AcMain\"";
-		sql += " 		WHERE \"AcNoCode\" IN ( '10600304000' ) "; //-- 擔保放款-折溢價
-		sql += "   		  AND \"MonthEndYm\" = :yymm ";
-		sql += " 		UNION";
-		sql += " 		SELECT 'DPCol' AS \"Item\" ";
+		sql += " 		SELECT 'Collection' AS \"Item\" ";
 		sql += " 	   		  ,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " 		FROM \"AcMain\"";
 		sql += " 		WHERE \"AcNoCode\" IN (  '10601301000' "; //-- 催收款項-法務費用
 		sql += "								,'10601302000' "; //-- 催收款項-火險費用
 		sql += "								,'10601304000') ";//-- 催收款項-折溢價
 		sql += "   		  AND \"MonthEndYm\" = :yymm ";
+		sql += "    	UNION ";			
+		sql += "    	SELECT 'Loss' AS \"Item\" ";
+		sql += "          	  ,CASE WHEN R.\"LnAmt\" >= 0 ";
+		sql += "                	THEN R.\"LnAmt\" ";
+		sql += "                ELSE ABS(R.\"LnAmt\") END AS \"AMT\"";
+		sql += "    	FROM \"roundData\" R";
 		sql += " 	), \"ovduLoan\" AS (";
 		sql += " 		SELECT 'Ovdu' AS \"Item\"";
 		sql += "			  ,SUM(\"PrinBalance\") AS \"AMT\"";
@@ -182,7 +221,6 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 		  AND \"AcctCode\" <> 990 ";
 		sql += " 		  AND \"OvduTerm\" IN (3,4,5,6)";
 		sql += " 	)";
-		
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN M.\"AcctCode\" = 990 AND M.\"LoanBalance\" = 1 THEN 'B3'";
 		sql += "       	       WHEN M2.\"CustNo\" = M.\"CustNo\" AND M2.\"FacmNo\" = M.\"FacmNo\" AND M2.\"BormNo\" = M.\"BormNo\" THEN 'B3'";

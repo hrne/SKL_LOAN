@@ -48,9 +48,9 @@ T(3,@FdTitaHCode,*)
 [
 ["[L3005]                                 交易明細資料查詢"],
 ["#FdMain+查詢條件","@(借戶戶號、統一編號、核准編號，需擇一輸入)"],
-["#FdCustNo+借戶戶號",#CustNo,"@",#BTN1,#CustNoX],
-["#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
-["#FdApplNo+核准編號",#ApplNo,"@",#BTN3,#ApplNoX],
+["#FdCustNo+@@借戶戶號",#CustNo,"@",#BTN1,#CustNoX],
+["#FdCustId+@@統一編號",#CustId,#BTN2,#CustIdX],
+["#FdApplNo+@@核准編號",#ApplNo,"@",#BTN3,#ApplNoX],
 ["#FdFacmNo+額度編號",#FacmNo,"@",#BTN4],
 ["#FdBormNo+撥款序號",#BormNo,"@",#BTN5],
 ["#FdAcDate+會計日期",#AcDate],
@@ -442,6 +442,8 @@ T(2,#OOAcDate+#OORelNo)
 
 #OODesc=X,20,O
 
+#OONote=X,60,O
+
 #OOCurrencyCode=X,3,O 
 
 #OOPrecision=N,1,S
@@ -592,7 +594,10 @@ TXFORM=L3005
 #OOFacmNoX=額度編號
 {width:80,align:'center'}
 
-#OODesc=摘要
+#OODesc=交易別
+{width:90}
+
+#OONote=摘要
 {width:90}
 
 #OOCurrencyCode=幣別 

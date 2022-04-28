@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,12 +67,14 @@ public class L8081 extends TradeBuffer {
 
 		Slice<TxAmlCredit> slTxAmlCredit = null;
 
+		List<String> reviewType = Arrays.asList("H");
+		
 		if ("9".equals(iStatus)) {
-			slTxAmlCredit = txAmlCreditService.processAll(iReviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
+			slTxAmlCredit = txAmlCreditService.processAll(reviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
 		} else if ("1".equals(iStatus)) {
-			slTxAmlCredit = txAmlCreditService.processYes(iReviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
+			slTxAmlCredit = txAmlCreditService.processYes(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
 		} else {
-			slTxAmlCredit = txAmlCreditService.processNo(iReviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
+			slTxAmlCredit = txAmlCreditService.processNo(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
 		}
 
 		List<TxAmlCredit> lTxAmlCredit = slTxAmlCredit == null ? null : slTxAmlCredit.getContent();

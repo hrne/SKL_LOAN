@@ -813,11 +813,11 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "AMLH  ;-;Y;-;-;-;L8081;L8081;L8101;Y;AML定審高風險處理";
 			break;
 		case "AMLM":
-			settingValue = "AMLM  ;-;Y;-;-;-;L8082;L8082;L8101;Y;AML定審中風險處理";
+			settingValue = "AMLM  ;-;Y;-;-;-;L8082;L8082;L8101;Y;AML定審中、低風險處理";
 			break;
-		case "AMLL":
-			settingValue = "AMLL  ;-;Y;-;-;-;L8083;L8083;L8101;Y;AML定審低風險處理";
-			break;
+//		case "AMLL":
+//			settingValue = "AMLL  ;-;Y;-;-;-;L8083;L8083;L8101;Y;AML定審低風險處理";
+//			break;
 		default:
 			throw new LogicException(titaVo, "E0013", "項目代號有誤" + itemCode);
 		}

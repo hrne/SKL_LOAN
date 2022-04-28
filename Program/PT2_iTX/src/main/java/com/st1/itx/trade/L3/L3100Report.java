@@ -80,7 +80,7 @@ public class L3100Report extends MakeReport {
 	private String reportItem = "撥款傳票(主管審核)";
 	private String security = "機密";
 	private String pageSize = "A4";
-	private String pageOrientation = "L";
+	private String pageOrientation = "P";
 	private AcClose tAcClose = new AcClose();
 	private AcCloseId acCloseId = new AcCloseId();
 	// 製表日期
@@ -109,15 +109,15 @@ public class L3100Report extends MakeReport {
 		this.info("L3100Report.printHeader");
 
 		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
-		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + this.security);
+		this.print(-1, 59, "新光人壽保險股份有限公司", "C");
+		this.print(-1, 98, "機密等級：" + this.security);
 		this.print(-2, 2, "報　表：" + this.reportCode);
-		this.print(-2, 85, this.reportItem, "C");
-		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
+		this.print(-2, 59, this.reportItem, "C");
+		this.print(-2, 98, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 2, "來源別：放款服務課");
-		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
+		this.print(-3, 98, "時　　間：" + showTime(this.nowTime));
 //		this.print(-4, 2, "批號：" + "01");
-		this.print(-4, 145, "頁　　次：" + this.getNowPage());
+		this.print(-4, 98, "頁　　次：" + this.getNowPage());
 
 		// 頁首帳冊別判斷
 //		print(-4, 10, this.nowAcBookCode);
@@ -133,9 +133,9 @@ public class L3100Report extends MakeReport {
 		 * ---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "　傳票號碼　　科子目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　貸方金額　　");
-		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		print(1, 1, "　傳票號碼　　科子目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　貸方金額　　");
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 	}
 
@@ -145,8 +145,8 @@ public class L3100Report extends MakeReport {
 //		this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 //		this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 //		this.print(-43, 1, "　放 款 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
-		this.print(-44, 1, "總經理：　　　　　　　　副總經理：　　　　　　　　資深協理：　　　　　　　　協理：　　　　　　　　經理：　　　　　　　　經辦：　　　　　　　　");
-		this.print(-47, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　覆核：　　　　　　　　");
+//		this.print(-44, 1, "總經理：　　　　　　　副總經理：　　　　　　　資深協理：　　　　　　　協理：　　　　　　　經理：　　　　　　　經辦：" + this.titaVo.getEmpNm());
+//		this.print(-47, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　覆核：　　　　　　　　");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -185,12 +185,11 @@ public class L3100Report extends MakeReport {
 			if (slLoanBorMain != null) {
 				for (LoanBorMain rv : slLoanBorMain.getContent()) {
 					wkRvCnt++;
-					wkRvDrawdownAmt = wkRvDrawdownAmt.add(rv.getDrawdownAmt());
 				}
 			}
 
 			facLastBormNo = tFacMain.getLastBormNo();
-			wkRvBormNo = wkRvCnt + facLastBormNo + 1;
+			wkRvBormNo = wkRvCnt + facLastBormNo;
 			// 借方
 			acDetail.setDbCr("D");
 			acDetail.setAcctCode(tFacMain.getAcctCode());
@@ -258,14 +257,14 @@ public class L3100Report extends MakeReport {
 
 			this.setCharSpaces(0);
 //				測試
-//				int b = 1;
-//				for (int i = 1; i <= 400; i++) {
-//					if ((i % 10) == 0) {
-//						this.print(-2, i, "" + (i / 10));
-//					}
-//					this.print(-1, i, "" + (i % 10));
-//					this.print(-i, 1, "" + (i % 10));
+//			int b = 1;
+//			for (int i = 1; i <= 400; i++) {
+//				if ((i % 10) == 0) {
+//					this.print(-2, i, "" + (i / 10));
 //				}
+//				this.print(-1, i, "" + (i % 10));
+//				this.print(-i, 1, "" + (i % 10));
+//			}
 			LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(
 					parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")),
 					parse.stringToInteger(titaVo.getParam("BormNo"))), titaVo);
@@ -292,7 +291,7 @@ public class L3100Report extends MakeReport {
 					"借款人戶號　:" + parse.IntegerToString(headAcDetail.getCustNo(), 7) + "-"
 							+ parse.IntegerToString(headAcDetail.getFacmNo(), 3) + "-"
 							+ parse.IntegerToString(headAcDetail.getBormNo(), 3));
-			print(-4, 80, this.showRocDate(acDate, 1)); // 日期
+			print(-4, 59, this.showRocDate(acDate, 1), "C"); // 日期
 			print(-5, 2, "戶名　　　　:" + loanCom.getCustNameByNo(headAcDetail.getCustNo()));
 
 			for (AcDetail tAcDetail : acDetailList) {
@@ -310,12 +309,12 @@ public class L3100Report extends MakeReport {
 				print(0, 15, acNoCodeX); // 科子目名稱
 
 				if ("D".equals(tAcDetail.getDbCr())) {
-					print(0, 103, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 借方金額
+					print(0, 97, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 借方金額
 					sumDbAmt = sumDbAmt.add(tAcDetail.getTxAmt());
 				}
 				if ("C".equals(tAcDetail.getDbCr())) {
 
-					print(0, 119, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 貸方金額
+					print(0, 113, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 貸方金額
 					sumCrAmt = sumCrAmt.add(tAcDetail.getTxAmt());
 				}
 			}
@@ -324,20 +323,24 @@ public class L3100Report extends MakeReport {
 			print(1, 1, "　　　　　　           ");
 
 			print(0, 3, "總　計  ");
-			print(0, 103, formatAmt(sumDbAmt, 0), "R");// 總借方金額
-			print(0, 119, formatAmt(sumCrAmt, 0), "R");// 總貸方金額
+			print(0, 97, formatAmt(sumDbAmt, 0), "R");// 總借方金額
+			print(0, 113, formatAmt(sumCrAmt, 0), "R");// 總貸方金額
 
 			print(1, 3, "　　　　　　           ");
-			print(1, 3, "收款戶名　　　:" + payNm);
-			print(1, 3, "附言　　　　　:" + remark);
-			print(1, 3, "匯款帳號　　　:" + FormatUtil.pad9(remitAcctNo, 14));
-			print(1, 3, "匯款銀行　　　:" + remitBankt);
-			print(1, 3, "解付單位代號　:" + paymentBank);
+			print(1, 3, "收款戶名　:" + payNm);
+			print(1, 3, "附言　　　:" + remark);
+			print(0, 65, "解付單位代號　:" + paymentBank);
+			print(1, 3, "匯款帳號　:" + FormatUtil.pad9(remitAcctNo, 14));
+			print(0, 65, "匯款銀行　　　:" + remitBankt);
+			print(1, 1, "　　　　　　           ");
+			print(1, 1, "　　　　　　           ");
+
+			this.setFont(1, 8);
+			print(3, 1, "總經理：　　　　　　　　　副總經理：　　　　　　　　　資深協理：　　　　　　　　　協理：　　　　　　　　經理：　　　　　　　　經辦：");
+			print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　覆核：　　　　　　　　");
+			this.setFont(1, 12);
+			print(-15, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　" + this.titaVo.getEmpNm());
+			this.setFont(1, 12);
 		}
 	}
-
-	public void setAcDetail(ArrayList<AcDetail> acDetaillist) {
-		this.lAcDetail = acDetaillist;
-	}
-
 }

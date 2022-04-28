@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,12 +67,20 @@ public class L8082 extends TradeBuffer {
 
 		Slice<TxAmlCredit> slTxAmlCredit = null;
 
-		if ("9".equals(iStatus)) {
-			slTxAmlCredit = txAmlCreditService.processAll(iReviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
-		} else if ("1".equals(iStatus)) {
-			slTxAmlCredit = txAmlCreditService.processYes(iReviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
+		List<String> reviewType = null;
+		if ("9".equals(iReviewType)) {
+			reviewType = Arrays.asList("M","L");
 		} else {
-			slTxAmlCredit = txAmlCreditService.processNo(iReviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
+			reviewType = Arrays.asList(iReviewType);
+		}
+
+		
+		if ("9".equals(iStatus)) {
+			slTxAmlCredit = txAmlCreditService.processAll(reviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
+		} else if ("1".equals(iStatus)) {
+			slTxAmlCredit = txAmlCreditService.processYes(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
+		} else {
+			slTxAmlCredit = txAmlCreditService.processNo(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
 		}
 
 		List<TxAmlCredit> lTxAmlCredit = slTxAmlCredit == null ? null : slTxAmlCredit.getContent();

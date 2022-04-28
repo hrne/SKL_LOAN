@@ -49,9 +49,10 @@ public class L9705Form extends MakeReport {
 
 	public long exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		
-		String tran = titaVo.getTxcd().isEmpty() ? "L9705" : titaVo.getTxcd();
+		String tran = "L9705".equals(titaVo.getTxcd()) ? "L9705" : titaVo.getTxcd();
 		
-		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd().isEmpty() ? tran + "B" : titaVo.getTxCode() + "C", "存入憑條", "cm,20,9.31333", "P");
+		this.info("titaVo = " + titaVo);
+		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C", "存入憑條", "cm,20,9.31333", "P");
 
 		if (l9705List.size() > 0) {
 

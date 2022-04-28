@@ -92,7 +92,7 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "              WHERE LBM.\"DrawdownDate\" >= :startDate";
 		sql += "                AND LBM.\"DrawdownDate\" <= :endDate";
-		sql += "                AND LBM.\"RenewFlag\" = 'N'"; // 排除展期撥款
+		sql += "                AND LBM.\"RenewFlag\" = '0'"; // 排除展期撥款
 		sql += "              GROUP BY CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "            ) S3 ON S3.\"EntCode\" = S1.\"EntCode\" ";
 		// 轉催收
@@ -223,7 +223,7 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     AND F.\"FacmNo\" = LBM.\"FacmNo\" ";
 		sql += "              WHERE LBM.\"DrawdownDate\" >= :startDate";
 		sql += "                AND LBM.\"DrawdownDate\" <= :endDate";
-		sql += "                AND LBM.\"RenewFlag\" = 'N'"; // 排除展期撥款
+		sql += "                AND LBM.\"RenewFlag\" = '0'"; // 排除展期撥款
 		sql += "              GROUP BY CASE WHEN F.\"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "                      ,CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "            ) S3 ON S3.\"EntCode\" = S1.\"EntCode\" ";
@@ -236,13 +236,34 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ,CASE";
 		sql += "                       WHEN C.\"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
 		sql += "                     ELSE '0' END                AS \"EntCode\"";
-		sql += "                    ,SUM(LO.\"OvduPrinAmt\")     AS \"OvduPrinAmt\""; // 撥款金額加總
-		sql += "              FROM \"LoanOverdue\" LO";
-		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = LO.\"CustNo\" ";
-		sql += "              LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = LO.\"CustNo\" ";
-		sql += "                                     AND F.\"FacmNo\" = LO.\"FacmNo\" ";
-		sql += "              WHERE LO.\"OvduDate\" >= :startDate";
-		sql += "                AND LO.\"OvduDate\" <= :endDate";
+		sql += "                    ,SUM(CASE ";
+		sql += "                           WHEN TX.\"TitaTxCd\" = 'L3420' ";
+		sql += "                                AND TX.\"TitaHCode\" = '0' ";
+		sql += "                                AND NVL(JSON_VALUE(TX.\"OtherFields\", '$.CaseCloseCode'), ' ') = '3' ";
+		sql += "                           THEN TX.\"Principal\" ";
+		sql += "                           WHEN TX.\"TitaTxCd\" = 'L3100' ";
+		sql += "                                AND TX.\"TitaHCode\" = '3' ";
+		sql += "                                AND TX.\"EntryDate\" <= :startDate ";
+		sql += "                                AND NVL(JSON_VALUE(TX.\"OtherFields\", '$.CaseCloseCode'), ' ') = '3' ";
+		sql += "                           THEN 0 - TX.\"Principal\" ";
+		sql += "                         ELSE 0 END )            AS \"OvduPrinAmt\""; // 轉催收金額加總
+		sql += "              FROM \"LoanBorTx\" TX ";
+		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = TX.\"CustNo\" ";
+		sql += "              LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = TX.\"CustNo\" ";
+		sql += "                                     AND F.\"FacmNo\" = TX.\"FacmNo\" ";
+		sql += "              WHERE TX.\"AcDate\" >= :startDate";
+		sql += "                AND TX.\"AcDate\" <= :endDate";
+		sql += "                AND CASE ";
+		sql += "                      WHEN TX.\"TitaTxCd\" = 'L3420' ";
+		sql += "                           AND TX.\"TitaHCode\" = '0' ";
+		sql += "                           AND NVL(JSON_VALUE(TX.\"OtherFields\", '$.CaseCloseCode'), ' ') = '3' ";
+		sql += "                      THEN 1 ";
+		sql += "                      WHEN TX.\"TitaTxCd\" = 'L3100' ";
+		sql += "                           AND TX.\"TitaHCode\" = '3' ";
+		sql += "                           AND TX.\"EntryDate\" <= :startDate ";
+		sql += "                           AND NVL(JSON_VALUE(TX.\"OtherFields\", '$.CaseCloseCode'), ' ') = '3' ";
+		sql += "                      THEN 1 ";
+		sql += "                    ELSE 0 END = 1 ";
 		sql += "              GROUP BY CASE WHEN F.\"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "                      ,CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "            ) S4 ON S4.\"EntCode\" = S1.\"EntCode\" ";
@@ -282,6 +303,8 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     AND F.\"FacmNo\" = LBT.\"FacmNo\" ";
 		sql += "              WHERE LBT.\"AcDate\" >= :startDate";
 		sql += "                AND LBT.\"AcDate\" <= :endDate";
+		sql += "                AND LBT.\"TitaHCode\" = '0' ";
+		sql += "                AND NVL(JSON_VALUE(\"OtherFields\", '$.CaseCloseCode'), ' ') NOT IN ('3', '4', '5', '6', '7', '8')";
 		sql += "              GROUP BY CASE WHEN F.\"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "                      ,CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "            ) S6 ON S6.\"EntCode\" = S1.\"EntCode\" ";

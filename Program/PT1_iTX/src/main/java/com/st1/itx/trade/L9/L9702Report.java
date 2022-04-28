@@ -256,6 +256,26 @@ public class L9702Report extends MakeReport {
 		} else if ("2".equals(type)) {
 			rptFg = 1;
 
+			// 期末催收餘額先累加
+			if (listL9702 != null) {
+				if (listL9702.size() >= 1) {
+					totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(0).get("F6") == null ? BigDecimal.ZERO
+							: new BigDecimal(listL9702.get(0).get("F6"))); // 期末催收餘額
+					if (listL9702.size() >= 2) {
+						totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(1).get("F6") == null ? BigDecimal.ZERO
+								: new BigDecimal(listL9702.get(1).get("F6"))); // 期末催收餘額
+						if (listL9702.size() >= 3) {
+							totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(2).get("F6") == null ? BigDecimal.ZERO
+									: new BigDecimal(listL9702.get(2).get("F6"))); // 期末催收餘額
+							if (listL9702.size() >= 4) {
+								totalOfEndvduBal = totalOfEndvduBal
+										.add(listL9702.get(3).get("F6") == null ? BigDecimal.ZERO
+												: new BigDecimal(listL9702.get(3).get("F6"))); // 期末催收餘額
+							}
+						}
+					}
+				}
+			}
 			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9702", "放款餘額及財收統計表-通路別", "", "A4", "");
 
 			this.setFontSize(12);
@@ -272,7 +292,6 @@ public class L9702Report extends MakeReport {
 			BigDecimal drawdownAmt = null; // 撥款金額
 			BigDecimal endBal = null; // 期末餘額
 			BigDecimal ovduPrinAmt = null; // 轉催收金額
-			BigDecimal ovduBal = null; // 期末催收餘額
 			BigDecimal intRcv = null;
 
 			BigDecimal repaidAmt = BigDecimal.ZERO; // 還款金額
@@ -283,7 +302,6 @@ public class L9702Report extends MakeReport {
 				drawdownAmt = tL9702.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F3")); // 撥款金額
 				endBal = tL9702.get("F4") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F4")); // 期末餘額
 				ovduPrinAmt = tL9702.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F5")); // 轉催收金額
-				ovduBal = tL9702.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F6")); // 期末催收餘額
 				intRcv = tL9702.get("F7") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F7")); // 當期利息收入
 
 				repaidAmt = beginBal.add(drawdownAmt).subtract(ovduPrinAmt).subtract(endBal);
@@ -292,7 +310,6 @@ public class L9702Report extends MakeReport {
 				totalOfDrawdownAmt = totalOfDrawdownAmt.add(drawdownAmt);
 				totalOfEndBal = totalOfEndBal.add(endBal);
 				totalOfOvduPrinAmt = totalOfOvduPrinAmt.add(ovduPrinAmt);
-				totalOfEndvduBal = totalOfEndvduBal.add(ovduBal);
 				totalOfRepaidAmt = totalOfRepaidAmt.add(repaidAmt);
 				totalOfIntRcv = totalOfIntRcv.add(intRcv);
 			} else {
@@ -319,7 +336,6 @@ public class L9702Report extends MakeReport {
 				drawdownAmt = tL9702.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F3")); // 撥款金額
 				endBal = tL9702.get("F4") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F4")); // 期末餘額
 				ovduPrinAmt = tL9702.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F5")); // 轉催收金額
-				ovduBal = tL9702.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F6")); // 期末催收餘額
 				intRcv = tL9702.get("F7") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F7")); // 當期利息收入
 
 				repaidAmt = beginBal.add(drawdownAmt).subtract(ovduPrinAmt).subtract(endBal);
@@ -328,7 +344,6 @@ public class L9702Report extends MakeReport {
 				totalOfDrawdownAmt = totalOfDrawdownAmt.add(drawdownAmt);
 				totalOfEndBal = totalOfEndBal.add(endBal);
 				totalOfOvduPrinAmt = totalOfOvduPrinAmt.add(ovduPrinAmt);
-				totalOfEndvduBal = totalOfEndvduBal.add(ovduBal);
 				totalOfRepaidAmt = totalOfRepaidAmt.add(repaidAmt);
 				totalOfIntRcv = totalOfIntRcv.add(intRcv);
 			} else {
@@ -367,6 +382,13 @@ public class L9702Report extends MakeReport {
 			// 換頁
 			rptFg = 2;
 			this.newPage();
+			totalOfBeginBal = BigDecimal.ZERO;
+			totalOfDrawdownAmt = BigDecimal.ZERO;
+			totalOfRepaidAmt = BigDecimal.ZERO;
+			totalOfOvduPrinAmt = BigDecimal.ZERO;
+			totalOfEndBal = BigDecimal.ZERO;
+			totalOfEndBal = BigDecimal.ZERO;
+			totalOfIntRcv = BigDecimal.ZERO;
 
 			this.print(1, 2, "會計日期：　" + this.showRocDate(startDate, 1) + " － " + this.showRocDate(endDate, 1));
 			this.print(2, 2, "類別　　　　　　期初餘額　　　　 撥款金額　　　　 催收回復　　　　 還款金額　　　　　 轉催收　　　　　　期末餘額");
@@ -380,7 +402,6 @@ public class L9702Report extends MakeReport {
 			drawdownAmt = null; // 撥款金額
 			endBal = null; // 期末餘額
 			ovduPrinAmt = null; // 轉催收金額
-			ovduBal = null; // 期末催收餘額
 			intRcv = null;
 
 			repaidAmt = BigDecimal.ZERO; // 還款金額
@@ -391,7 +412,6 @@ public class L9702Report extends MakeReport {
 				drawdownAmt = tL9702.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F3")); // 撥款金額
 				endBal = tL9702.get("F4") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F4")); // 期末餘額
 				ovduPrinAmt = tL9702.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F5")); // 轉催收金額
-				ovduBal = tL9702.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F6")); // 期末催收餘額
 				intRcv = tL9702.get("F7") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F7")); // 當期利息收入
 
 				repaidAmt = beginBal.add(drawdownAmt).subtract(ovduPrinAmt).subtract(endBal);
@@ -400,7 +420,6 @@ public class L9702Report extends MakeReport {
 				totalOfDrawdownAmt = totalOfDrawdownAmt.add(drawdownAmt);
 				totalOfEndBal = totalOfEndBal.add(endBal);
 				totalOfOvduPrinAmt = totalOfOvduPrinAmt.add(ovduPrinAmt);
-				totalOfEndvduBal = totalOfEndvduBal.add(ovduBal);
 				totalOfRepaidAmt = totalOfRepaidAmt.add(repaidAmt);
 				totalOfIntRcv = totalOfIntRcv.add(intRcv);
 			} else {
@@ -427,7 +446,6 @@ public class L9702Report extends MakeReport {
 				drawdownAmt = tL9702.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F3")); // 撥款金額
 				endBal = tL9702.get("F4") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F4")); // 期末餘額
 				ovduPrinAmt = tL9702.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F5")); // 轉催收金額
-				ovduBal = tL9702.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F6")); // 期末催收餘額
 				intRcv = tL9702.get("F7") == null ? BigDecimal.ZERO : new BigDecimal(tL9702.get("F7")); // 當期利息收入
 
 				repaidAmt = beginBal.add(drawdownAmt).subtract(ovduPrinAmt).subtract(endBal);
@@ -436,7 +454,6 @@ public class L9702Report extends MakeReport {
 				totalOfDrawdownAmt = totalOfDrawdownAmt.add(drawdownAmt);
 				totalOfEndBal = totalOfEndBal.add(endBal);
 				totalOfOvduPrinAmt = totalOfOvduPrinAmt.add(ovduPrinAmt);
-				totalOfEndvduBal = totalOfEndvduBal.add(ovduBal);
 				totalOfRepaidAmt = totalOfRepaidAmt.add(repaidAmt);
 				totalOfIntRcv = totalOfIntRcv.add(intRcv);
 			} else {

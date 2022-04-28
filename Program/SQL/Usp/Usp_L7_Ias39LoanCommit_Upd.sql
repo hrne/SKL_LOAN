@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias39LoanCommit_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_Ias39LoanCommit_Upd"
 (
 -- 程式功能：維護 Ias39LoanCommit 每月IAS39放款承諾明細檔
 -- 執行時機：每月底日終批次(換日前)
@@ -69,7 +69,7 @@ BEGIN
     LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                          AND F."FacmNo" = M."FacmNo"
     WHERE M."DataYM" = YYYYMM
-      AND M."IrrevocableFlag" = 1   
+      AND F."IrrevocableFlag" = 'Y'   
       AND ( TRUNC(NVL(M."UtilDeadline", 0) / 100 )  > YYYYMM  OR 
             TRUNC(NVL(F."RecycleDeadline", 0) / 100 )  > YYYYMM )
       AND TRUNC(NVL(M."ApproveDate", 0) / 100 )  <= YYYYMM      
