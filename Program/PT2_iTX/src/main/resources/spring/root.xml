@@ -32,12 +32,10 @@
 	<import resource="classpath:spring/batch/batch-context.xml" />
     -->
     
-    <!-- 
     <import resource="file:${itx_Config}/spring/batch/batch-context.xml" />      
     <import resource="file:${itx_Config}/spring/itx-database-Online.xml" />
 	<import resource="file:${itx_Config}/spring/itx-database-Day.xml" />
 	<import resource="file:${itx_Config}/spring/itx-database-Mon.xml" />
 	<import resource="file:${itx_Config}/spring/itx-database-Hist.xml" />
-    --> 
      
 </beans>
