@@ -1,0 +1,383 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L8204)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,100];">
+[
+["[L8204]                                 疑似洗錢交易訪談記錄維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdRecordDate+訪談日期  ",#RecordDate],
+["#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,"-",#BormNo,#CustName],
+["#FdRepayDate+預定還款日期",#RepayDate],
+["#FdRepayAmt+約定還款金額",#RepayAmt],
+["#FdCareer+職業別",#Career],
+["#FdIncome+年收入（萬）",#Income],  
+["#FdRepaySource+還款來源",#RepaySource,#RepaySourceX],
+["#FdRepayBank+代償銀行",#RepayBank],
+["#FdActualRepayDate+實際還款日期",#ActualRepayDate],
+["#FdActualRepayAmt+實際還款金額",#ActualRepayAmt],
+["#FdDescription+其他說明",#Description],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN_SELECT_ALL=X,15,I,ui:button;value:查詢;enable:0;tabbable:0;title:LXXXX
+
+#FdFuncCode=X,2,L
+#FdRecordDate=X,2,L
+#FdCustNo=X,2,L
+#FdRepayDate=X,2,L
+#FdRepayAmt=X,2,L
+#FdCareer=X,2,L
+#FdIncome=X,2,L
+#FdRepaySource=X,2,L
+#FdRepayBank=X,2,L
+#FdActualRepayDate=X,2,L
+#FdActualRepayAmt=X,2,L
+#FdDescription=X,2,L
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#CDCODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode)                  
+                                      
+#FuncCodeHelp=x,100,S        
+
+!AP
+#CDCODEAp=x,20,S                  
+T(3,CdCode.RepaySource)
+
+#ApHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode2,#CDCODEAp)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+T(2,@ApHelp,#HelpDesc2)
+            
+!#ApHelp=x,1024,S
+!T(3,CdCode.RepaySource)
+!S(XXR99,01,#ApHelp)
+!R(1,XXR99)
+!CALL(#HelpProc)
+!T(2,#HelpDesc1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L8923 疑似洗錢交易訪談記錄查詢]進入),$)
+
+#NTXBUF=X,50,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_RecordDate=X,7,S
+T(1,#NTXBUF,2,7)
+
+#CHAIN_CustNo=X,7,S
+T(1,#NTXBUF,9,7)
+
+#CHAIN_FacmNo=X,3,S
+T(1,#NTXBUF,16,3)
+
+#CHAIN_BormNo=X,3,S
+T(1,#NTXBUF,19,3)
+
+#CHAIN_RepayDate=D,7,S
+T(1,#NTXBUF,22,7)
+
+#CHAIN_RepayAmt=m,14.2,S
+T(1,#NTXBUF,29,14)
+
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+! C(3,#FuncCode,1,S,$)
+E(0,@RecordDate,#CHAIN_RecordDate)
+E(0,@CustNo,#CHAIN_CustNo)
+E(0,@FacmNo,#CHAIN_FacmNo)
+E(0,@BormNo,#CHAIN_BormNo)
+E(0,@RepayDate,#CHAIN_RepayDate)
+E(0,@RepayAmt,#CHAIN_RepayAmt)
+
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5:查詢)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+T(F,@CustName,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCodeHelp)
+@V(H,#FuncCodeHelp)
+E(0,@FUNCIND,#FuncCode)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(NOBUTTON,CLOSEY))
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==1 || #FuncCode==2 || #FuncCode==3 ,T(F,@RepayDate,1)T(F,@RepayAmt,1)T(F,@Career,1)T(F,@Income,1)T(F,@RepaySource,1)T(F,@RepayBank,1)T(F,@ActualRepayDate,1)T(F,@ActualRepayAmt,1)T(F,@Description,1),
+                                  T(F,@RepayDate,0)T(F,@RepayAmt,0)T(F,@Career,0)T(F,@Income,0)T(F,@RepaySource,0)T(F,@RepayBank,0)T(F,@ActualRepayDate,0)T(F,@ActualRepayAmt,0)T(F,@Description,0))
+
+IF (#FuncCode==1 ||#FuncCode==3,T(F,@RecordDate,1)T(F,@CustNo,1)T(F,@FacmNo,1)T(F,@BormNo,1),
+                                T(F,@RecordDate,0)T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@BormNo,0))
+
+#WKPSC=X,2,S
+
+#WKSTAR1=X,2,S
+C(2,#FuncCode,S,T(3,*),S,S,S,S)
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+T(2,@FdCustNo,#WKSTAR1)
+T(2,@FdRepayDate,#WKSTAR2)
+T(2,@FdRepayAmt,#WKSTAR2)
+T(2,@FdCareer,#WKPSC)
+T(2,@FdIncome,#WKPSC)
+T(2,@FdRepaySource,#WKSTAR2)
+T(2,@FdRepayBank,#WKPSC)
+T(2,@FdActualRepayDate,#WKPSC)
+T(2,@FdActualRepayAmt,#WKPSC)
+T(2,@FdDescription,#WKPSC)
+
+
+!本營業日
+#DATE=D,8,S
+T(4,CDATE$)
+
+#RimRecordDate=9,7,S
+E(0,#RecordDate)
+#RimCustNo=9,7,S
+E(0,#CustNo)
+#RimFacmNo=9,3,S
+E(0,#FacmNo)
+#RimBormNo=9,3,S
+E(0,#BormNo)
+
+!複製先調RIM
+#SendL8R51A=X,1,S
+C(3,#FuncCode,3,$,s)
+E(0,@RimFuncCode,5)
+T(2,@RimTxCode,#TXCD)
+RESET_RIM(#SendL8R51,L8R51)
+S(L8R51,1,#RimFuncCode,#RimTxCode,#RimRecordDate,#RimCustNo,#RimFacmNo,#RimBormNo)
+R(1,L8R51)
+E(0,@RepayDate,#L8R51RepayDate)
+E(0,@RepayAmt,#L8R51RepayAmt)
+T(2,@Career,#L8R51Career)
+T(2,@Income,#L8R51Income)
+E(0,@RepaySource,#L8R51RepaySource)
+T(2,@RepayBank,#L8R51RepayBank)
+E(0,@ActualRepayDate,#L8R51ActualRepayDate)
+E(0,@ActualRepayAmt,#L8R51ActualRepayAmt)
+T(2,@Description,#L8R51Description)
+T(2,@CustName,#L8R51CustName)
+T(H,#RepaySourceX,#RepaySource,#ApHelp)
+
+!訪談日期  
+#RecordDate=D,7,L
+C(3,#FuncCode,3,$,T(1,#DATE,2,7))
+!C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+!C(3,#FuncCode,3,$,T(1,#DATE,2,7))
+!D(8)
+!@V(7)A(DATE,0,#RecordDate)
+
+
+!戶號
+#CustNo=A,7,I
+C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+@T(3,@CustName,)
+V(7)
+IF(#CustNo==0,V(P,戶號不可為0),s)
+
+!額度號碼
+#FacmNo=A,3,I
+C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+@V(7)
+
+!撥款序號
+#BormNo=A,3,I
+C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
+@V(7)
+
+#SendL8R51B=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimTxCode,#TXCD)
+IF(#FuncCode==1 || #FuncCode==3,
+E(0,#RimRecordDate,#RecordDate)
+E(0,#RimCustNo,#CustNo)
+E(0,#RimFacmNo,#FacmNo)
+E(0,#RimBormNo,#BormNo)
+,$)
+RESET_RIM(#SendL8R51,L8R51)
+S(L8R51,1,#RimFuncCode,#RimTxCode,#RimRecordDate,#RimCustNo,#RimFacmNo,#RimBormNo)
+R(1,L8R51)
+
+#SETA=X,1,S
+T(2,@CustName,#L8R51CustName)
+IF(#FuncCode==2 || #FuncCode==4 || #FuncCode==5,$,s)
+E(0,@RepayDate,#L8R51RepayDate)
+E(0,@RepayAmt,#L8R51RepayAmt)
+T(2,@Career,#L8R51Career)
+T(2,@Income,#L8R51Income)
+E(0,@RepaySource,#L8R51RepaySource)
+T(2,@RepayBank,#L8R51RepayBank)
+E(0,@ActualRepayDate,#L8R51ActualRepayDate)
+E(0,@ActualRepayAmt,#L8R51ActualRepayAmt)
+T(2,@Description,#L8R51Description)
+T(2,@CustName,#L8R51CustName)
+T(H,#RepaySourceX,#RepaySource,#ApHelp)
+)
+!戶名
+#CustName=x,80,L
+
+!預定還款日期
+#RepayDate=D,7,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+C(3,#CHAIN,1,$,T(1,#DATE,2,7))
+D(8)
+@V(7)A(DATE,0,#RepayDate)
+
+!約定還款金額
+#RepayAmt=m,14,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+C(3,#RepayDate,0,S,$)
+@V(2,0)
+
+!職業別
+#Career=x,40,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+
+!年收入(萬)
+#Income=x,30,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+
+!還款來源             
+#RepaySource=A,2,I    
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+HELP(#ApHelp)
+@T(3,@RepaySourceX,)
+V(H,#ApHelp)
+
+#RepaySourceX=X,20,L
+T(H,#RepaySource,#ApHelp)
+
+#WKSTAR3=X,2,S
+C(3,#FuncCode,4,T(3, ),C(3,#RepaySource,1,T(3,*),T(3, )))
+T(2,@FdRepayBank,#WKSTAR3)
+
+!代償銀行
+#RepayBank=x,20,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+C(3,#RepaySource,1,$,S)
+@V(7)
+
+!實際還款日期
+#ActualRepayDate=D,7,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+D(8)
+@A(DATE,0,#ActualRepayDate)
+
+!實際還款金額
+#ActualRepayAmt=m,14,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+C(3,#ActualRepayDate,0,T(3,@FdActualRepayAmt,),T(3,@FdActualRepayAmt,*))
+C(3,#ActualRepayDate,0,S,$)
+@V(2,0)
+
+!其他說明
+#Description=x,10.50,I
+IF(#FuncCode == 4 || #FuncCode == 5,s,$)
+
+#RPTFG=A,1,S
+E(0,0)
+
+#AGAIN=X,1,S
+IF(#FuncCode==2 || #FuncCode==4,$,S)
+E(0,1)ASGN(AGAIN$)
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#RecordDate+#CustNo+#FacmNo+#BormNo)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L8R51.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L8204 ----------
+<sub type="FORM" name="L8204">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L8204,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8204]  疑似洗錢交易訪談記錄維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+#RecordDate
+#CustNo
+#FacmNo
+#BormNo
+#RepayDate
+#RepayAmt
+#Career
+#Income
+#RepaySource
+#RepayBank
+#ActualRepayDate
+#ActualRepayAmt
+#Description
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8204^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R51.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

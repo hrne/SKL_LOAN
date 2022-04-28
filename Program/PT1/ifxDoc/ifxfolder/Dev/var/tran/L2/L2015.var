@@ -259,6 +259,12 @@ T(H,#OOAcctCode,#FacmAcctCodeHelp)
 
 #OOLoanFg=X,1,S
 
+#OOLastUpdate=x,20,S
+
+#OOLastEmp=x,20,S
+
+#OOLogFg=x,1,S
+
 !修改
 #OOBUF2=X,11,S
 T(2,#Func2+#OOCustNo+#OOFacmNo)
@@ -284,6 +290,13 @@ T(2,#Func5+#OOCustNo+#OOFacmNo)
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2154; ntxbuf=#OOBUF5})
 
+!歷桯
+#OOBUF6=X,46,S
+T(2,L2154+#OOCustNo+-+#OOFacmNo+-+#OOApplNo)
+
+#OOBTN6=X,1,S
+C(5,#OOLogFg,1,BIND(grid,{ cmd=CHAIN; ntxcd=L6933; ntxbuf=#OOBUF6}),BIND(grid,cancel))
+
 </sub>
 
 
@@ -301,6 +314,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2154; ntxbuf=#OOBUF5})
 TXFORM=L2015
 #OOCustNo#OOCustName#OOFacmNo#OOApplNo#OOCurrencyCode#OOLineAmt#OOApproveRate
 #OOUtilAmt#OOUtilBal#OOAcctCode#OOLoanFg
+#OOLastUpdate#OOLastEmp#OOLogFg
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
@@ -330,7 +344,8 @@ TXFORM=L2015
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢;L2154 額度資料維護',align:'center',canExport:false}
 
-#OOCustName
+#OOBTN6=變更
+{width:50,search:false,formatter:'cust:bind-button:紀錄;L6933 資料變更明細查詢',align:'center',canExport:false}
 
 #OOCustNo=戶號
 {width:80,align:'center'}
@@ -355,6 +370,13 @@ TXFORM=L2015
 
 #OOAcctCodeX=業務科目
 {width:150,align:'center'}
+
+#OOLastUpdate=最後修改日
+{width:130,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:120,align:'center'}
+
 
 ^
 

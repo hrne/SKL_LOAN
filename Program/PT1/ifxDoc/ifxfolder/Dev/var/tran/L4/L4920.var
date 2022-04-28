@@ -601,7 +601,7 @@ ifxBatch:{
 #RPTFG=3,QUERY.GRID,L4920
 #any={detail:true, header:'L4920.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
 ifxBatch:{
-	name:'設定還款類別為期款;設定還款類別為部分償還;設定還款類別為結案;設定還款類別為期款（不預收）',
+	name:'設定還款類別為期款（依預收設定）;設定還款類別為部分償還;設定還款類別為結案;設定還款類別為期款（不預收）',
 	type:'5',
 	rim:'L4201',
 	txtno:'#secret-no',

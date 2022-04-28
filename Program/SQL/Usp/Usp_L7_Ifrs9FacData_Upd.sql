@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ifrs9FacData_Upd"
+CREATE OR REPLACE NONEDTIONABLE PROCEDURE "Usp_L7_Ifrs9FacData_Upd"
 (
 -- 程式功能：維護 Ifrs9FacData 每月IFRS9額度資料檔
 -- 執行時機：每月底日終批次(換日前)
@@ -95,6 +95,19 @@ BEGIN
     INS_CNT := 0;
 
     INSERT INTO "Ifrs9FacData"
+    WITH AR AS (
+      SELECT "CustNo"
+           , "AcBookCode"
+           , "AcSubBookCode"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY "CustNo"
+               ORDER BY "OpenAcDate" DESC
+             ) AS "ArSeq"
+      FROM "AcReceivable"
+      WHERE TRUNC("OpenAcDate" / 100) <= YYYYMM
+        AND "AcctFlag" = 1
+    )
     SELECT
            YYYYMM                               AS "DataYM"            -- 資料年月
          , M."CustNo"                           AS "CustNo"            -- 戶號
@@ -166,11 +179,15 @@ BEGIN
                 ELSE 0                                                 -- 可撤銷
            END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷
          , NVL(Tav."TempAmt",0)                 AS "TempAmt"           -- 暫收款金額(台幣)
-         , CASE WHEN MF."AcBookCode"  IS NULL  THEN '000'
-                ELSE MF."AcBookCode"     
+         , CASE
+             WHEN M."DrawdownFg" = 0
+             THEN NVL(AR."AcBookCode", '000')
+           ELSE NVL(MF."AcBookCode", '000')
            END                                  AS "AcBookCode"        -- 帳冊別
-         , CASE WHEN MF."AcSubBookCode"  IS NULL THEN '00A'
-                ELSE MF."AcSubBookCode"                   
+         , CASE
+             WHEN M."DrawdownFg" = 0
+             THEN NVL(AR."AcSubBookCode", '00A')
+           ELSE NVL(MF."AcSubBookCode", '00A')
            END                                  AS "AcSubBookCode"     -- 區隔帳冊
          , JOB_START_TIME                       AS "CreateDate"        -- 建檔日期時間
          , EmpNo                                AS "CreateEmpNo"       -- 建檔人員
@@ -309,6 +326,8 @@ BEGIN
                  GROUP BY A."CustNo", A."FacmNo"
                ) Tav    ON Tav."CustNo"        = F."CustNo"
                        AND Tav."FacmNo"        = F."FacmNo"   --暫收款"
+      LEFT JOIN AR ON AR."CustNo" = M."CustNo"
+                  AND AR."ArSeq" = 1
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;
@@ -325,41 +344,3 @@ BEGIN
 
   END;
 END;
-
---       , 0                                    AS "Rate"              -- 利率(撥款)
---       , 0                                    AS "ApplNo"            -- 核准號碼
---       , ' '                                  AS "CustId"            -- 借款人ID / 統編
---       , 0                                    AS "DrawdownFg"        -- 已核撥記號
---       , 0                                    AS "ApproveDate"       -- 核准日期(額度)
---       , 0                                    AS "UtilDeadline"      -- 動支期限
---       , 0                                    AS "FirstDrawdownDate" -- 初貸日期
---       , 0                                    AS "MaturityDate"      -- 到期日(額度)
---       , 0                                    AS "LineAmt"           -- 核准金額
---       , 0                                    AS "AcctFee"           -- 帳管費
---       , 0                                    AS "LawFee"            -- 法務費
---       , 0                                    AS "FireFee"           -- 火險費
---       , 0                                    AS "GracePeriod"       -- 初貸時約定還本寬限期
---       , 0                                    AS "AmortizedCode"     -- 契約當時還款方式(月底日)
---       , 0                                    AS "RateCode"          -- 契約當時利率調整方式(月底日)
---       , 0                                    AS "RepayFreq"         -- 契約約定當時還本週期(月底日)
---       , 0                                    AS "PayIntFreq"        -- 契約約定當時繳息週期(月底日)
---       , ' '                                  AS "Ifrs9StepProdCode" -- IFRS階梯商品別
---       , ' '                                  AS "IndustryCode"      -- 授信行業別
---       , ' '                                  AS "ClTypeJCIC"        -- 擔保品類別
---       , ' '                                  AS "CityCode"          -- 擔保品地區別
---       , ' '                                  AS "AreaCode"          -- 擔保品鄉鎮區
---       , ' '                                  AS "Zip3"              -- 擔保品郵遞區號
---       , ' '                                  AS "ProdNo"            -- 商品利率代碼
---       , ' '                                  AS "AgreementFg"       -- 是否為協議商品 (Y:是 N:否)
---       , ' '                                  AS "EntCode"           -- 企金別
---       , 0                                    AS "AssetClass"        -- 資產五分類代號
---       , ' '                                  AS "Ifrs9ProdCode"     -- 產品別
---       , 0                                    AS "EvaAmt"            -- 原始鑑價金額
---       , 0                                    AS "UtilAmt"           -- 累計撥款金額(額度層)
---       , 0                                    AS "UtilBal"           -- 已動用餘額(額度層)
---       , 0                                    AS "TotalLoanBal"      -- 本金餘額(額度層)合計
---       , 0                                    AS "RecycleCode"       -- 該筆額度是否可循環動用
---       , 0                                    AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷
---       , 0                                    AS "TempAmt"           -- 暫收款金額(台幣)
---       , ' '                                  AS "AcBookCode"        -- 帳冊別
---       , ' '                                  AS "AcSubBookCode"     -- 區隔帳冊

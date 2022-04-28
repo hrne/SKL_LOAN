@@ -509,11 +509,11 @@ BEGIN
                WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 
                     AND C1."PrinBalance" + C1."BadDebtBal" <> 0
                     AND NVL(LBM."SpecificDd",0) != 0
-                    AND TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
-                        - TRUNC(MONTHS_BETWEEN(TO_DATE(C1."NextIntDate",'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+                    AND TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(19110100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+                        - TRUNC(MONTHS_BETWEEN(TO_DATE(C1."NextIntDate",'YYYYMMDD'), TO_DATE(19110100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
                         > 0
-               THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
-                    - TRUNC(MONTHS_BETWEEN(TO_DATE(C1."NextIntDate",'YYYYMMDD'), TO_DATE(00010100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+               THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(19110100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
+                    - TRUNC(MONTHS_BETWEEN(TO_DATE(C1."NextIntDate",'YYYYMMDD'), TO_DATE(19110100 + NVL(LBM."SpecificDd",1),'YYYYMMDD')))
                WHEN C1."NextIntDate" < TBSDYF AND C1."NextIntDate" > 0 
                     AND C1."PrinBalance" + C1."BadDebtBal" <> 0
                     AND NVL(LBM."SpecificDd",0) = 0
