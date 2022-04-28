@@ -23,7 +23,6 @@ import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
-import com.st1.itx.db.domain.FacProdBreach;
 import com.st1.itx.db.domain.FacProdStepRate;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
@@ -107,14 +106,14 @@ public class L2R05 extends TradeBuffer {
 	private String wkCustId = "";
 	private String wkCustName = "";
 	private String wkGroupId = "";
-	private String wkBreachNo;
+
 	private String sProdNo;
 	private String wkCloseFg = "N"; // 未齊件未消註記
 	private BigDecimal wkAcctFee = BigDecimal.ZERO;
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private CustMain tCustMain;
-	private Slice<FacProdBreach> slFacProdBreach;
+
 	private Slice<FacProdStepRate> slFacProdStepRate;
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 	private int FirstAdjRateDate = 0;
@@ -239,7 +238,7 @@ public class L2R05 extends TradeBuffer {
 			}
 			if (iFKey != 7) {
 				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) <= 0) {
-					// TODO:檢查此額度是否為借新還舊
+					// 檢查此額度是否為借新還舊
 					tAcReceivable = acReceivableService.findById(new AcReceivableId("TRO", iCustNo, iFacmNo,
 							"FacmNo" + StringUtils.leftPad(String.valueOf(iFacmNo), 3, "0")), titaVo);
 					if (tAcReceivable == null) {
@@ -273,8 +272,6 @@ public class L2R05 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 500;
 
-		wkBreachNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
-				+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
 		// 檢查是否未齊件
 		Slice<LoanNotYet> slLoanNotYet = sLoanNotYetService.notYetCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 99991231, 0,
 				99991231, this.index, this.limit, titaVo);
@@ -288,7 +285,7 @@ public class L2R05 extends TradeBuffer {
 		}
 
 		// 預定撥款序號 (LoanBorMain戶況為99筆數)+(FacMain最後撥款序號)+1
-		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, iFacmNo, iFacmNo,
 				0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorMain != null) {
@@ -300,7 +297,7 @@ public class L2R05 extends TradeBuffer {
 		if (iTxCode.equals("L3100") || iTxCode.equals("L3110")) {
 			if (iFKey != 7) {
 				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal().add(wkRvDrawdownAmt)) <= 0) {
-					// TODO:檢查此額度是否為借新還舊
+					// 檢查此額度是否為借新還舊
 					tAcReceivable = acReceivableService.findById(new AcReceivableId("TRO", iCustNo, iFacmNo,
 							"FacmNo" + StringUtils.leftPad(String.valueOf(iFacmNo), 3, "0")), titaVo);
 					if (tAcReceivable == null) {
@@ -479,6 +476,13 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05AvailableAmt", tAcReceivable == null ? wkAvailableAmt : tAcReceivable.getAcBal());
 		this.totaVo.putParam("L2r05LimitFlag", wkLimitFlag);
 
+		// 綠色授信
+		this.totaVo.putParam("L2r05Grcd", tFacMain.getGrcd());
+		this.totaVo.putParam("L2r05GrKind", tFacMain.getGrKind());
+		this.totaVo.putParam("L2r05EsGcd", tFacMain.getEsGcd());
+		this.totaVo.putParam("L2r05EsGKind", tFacMain.getEsGKind());
+		this.totaVo.putParam("L2r05EsGcnl", tFacMain.getEsGcnl());
+
 	}
 
 	private void PrevIntDateRoutine() throws LogicException {
@@ -489,7 +493,6 @@ public class L2R05 extends TradeBuffer {
 		int wkSpecificDd = 0;
 		int wkSpecificDate = 0;
 		int wkBormCount = 0;
-		int wkBormNo = 0;
 		int wkDate = 0;
 		BigDecimal wkLoanBal = BigDecimal.ZERO;
 		BigDecimal wkDueAmt = BigDecimal.ZERO;
@@ -661,5 +664,11 @@ public class L2R05 extends TradeBuffer {
 			this.totaVo.putParam("L2r05StepRateType" + i, "");
 			this.totaVo.putParam("L2r05StepRateIncr" + i, 0);
 		}
+		// 綠色授信
+		this.totaVo.putParam("L2r05Grcd", "");
+		this.totaVo.putParam("L2r05GrKind", "");
+		this.totaVo.putParam("L2r05EsGcd", "");
+		this.totaVo.putParam("L2r05EsGKind", "");
+		this.totaVo.putParam("L2r05EsGcnl", "");
 	}
 }

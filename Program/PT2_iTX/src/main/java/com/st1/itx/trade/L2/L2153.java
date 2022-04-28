@@ -445,14 +445,46 @@ public class L2153 extends TradeBuffer {
 //		E-LOAN處理 
 		if (isEloan) {
 //			指標利率代碼為NULL時放99自訂利率
-			if (titaVo.getParam("BaseRateCode").trim().isEmpty() || titaVo.getParam("BaseRateCode") == null) {
+			if (titaVo.get("BaseRateCode") == null) {
 				tFacMain.setBaseRateCode("99");
 			} else {
-				tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
+				tFacMain.setBaseRateCode(titaVo.get("BaseRateCode"));
+			}
+
+			// 綠色授信註記
+			if (titaVo.get("Grcd") != null) {
+				tFacMain.setGrcd(titaVo.get("Grcd"));
+			}
+
+			// 綠色支出類別
+			if (titaVo.get("GrKind") != null) {
+				tFacMain.setGrKind(titaVo.get("GrKind"));
+			}
+
+			// 永續績效連結授信
+			if (titaVo.get("EsGcd") != null) {
+				tFacMain.setEsGcd(titaVo.get("EsGcd"));
+			}
+
+			// 永續績效連結授信類別
+			if (titaVo.get("EsGKind") != null) {
+				tFacMain.setEsGKind(titaVo.get("EsGKind"));
+			}
+
+			// 永續績效連結授信約定條件全部未達成通報
+			if (titaVo.get("EsGcnl") != null) {
+				tFacMain.setEsGcnl(titaVo.get("EsGcnl"));
 			}
 		} else {
 			tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
+			tFacMain.setGrcd(titaVo.getParam("Grcd"));
+			tFacMain.setGrKind(titaVo.getParam("GrKind"));
+			tFacMain.setEsGcd(titaVo.getParam("EsGcd"));
+			tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
+			tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
 		}
+
+
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(new BigDecimal("0"));
 		tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));

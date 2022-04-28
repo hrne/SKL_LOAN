@@ -148,7 +148,7 @@ public class L9703Report2 extends MakeReport {
 
 		try {
 			lBaTxVo = dBaTxCom.termsPay(entryDate, parse.stringToInteger(tL9703Vo.get("CustNo")),
-					parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd, titaVo);
+					parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd, 0, titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();

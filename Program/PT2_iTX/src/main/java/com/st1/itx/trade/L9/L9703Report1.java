@@ -4,8 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -56,6 +56,12 @@ public class L9703Report1 extends MakeReport {
 	 */
 	private String bcAcDate = "";
 
+	// 入帳日期(西元年)
+
+	private String bcEntryDate = "";
+
+	private String PayIntDateSt = "";
+	private String PayIntDateEd = "";
 	// 逾期期數範圍
 	private String unpaidTermSt;
 	private String unpaidTermEd;
@@ -70,20 +76,16 @@ public class L9703Report1 extends MakeReport {
 
 		this.setFontSize(8);
 
-		String today = dDateUtil.getNowStringBc();
-		String nowTime = dDateUtil.getNowStringTime();
-
 		this.print(-1, 150, "機密等級：密");
 
 		this.print(-2, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
-		this.print(-2, 150, "入帳日：" + this.showBcDate(bcAcDate, 0));
+		this.print(-2, 150, "應繳日：" + this.showBcDate(PayIntDateSt, 0));
 
 		this.print(-3, 3, "報　表：" + this.getRptCode());
 		this.print(-3, 80, "滯繳客戶明細表", "C");
-		this.print(-3, 150, "會計日：" + this.showBcDate(bcAcDate, 0));
-
-		this.print(-4, 150, "日　期：" + this.showBcDate(today, 1));
+		this.print(-3, 150, "　　　：" + this.showBcDate(PayIntDateEd, 0));
+		this.print(-4, 150, "入帳日：" + this.showBcDate(bcEntryDate, 0));
 
 		if (rptFlag == 1) {
 			// 逾期期數
@@ -92,9 +94,9 @@ public class L9703Report1 extends MakeReport {
 			// 逾期日數
 			this.print(-5, 80, "逾　" + unpaidDaySt + " - " + unpaidDayEd + "　天", "C");
 		}
-		this.print(-5, 150, "時　間：" + this.showTime(nowTime));
+		this.print(-5, 150, "會計日：" + this.showBcDate(bcAcDate, 0));
 
-		this.print(-6, 150, "頁　次：　" + this.getNowPage());
+		this.print(-6, 150, "頁　數：　" + this.getNowPage());
 
 		/**
 		 * --------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
@@ -112,12 +114,19 @@ public class L9703Report1 extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
+	public long exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		this.info("L9703Report1 exec");
-
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703", "滯繳客戶明細表", "密", "A4", "");
+		
+		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
+		
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "滯繳客戶明細表", "密", "A4", "");
 
 		bcAcDate = String.valueOf(Integer.parseInt(titaVo.getParam("AcDate")) + 19110000);
+		bcEntryDate = String.valueOf(Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000);
+		// 最近應繳日
+		PayIntDateSt = String.valueOf(Integer.parseInt(titaVo.getParam("PayIntDateSt")) + 19110000);
+		PayIntDateEd = String.valueOf(Integer.parseInt(titaVo.getParam("PayIntDateEd")) + 19110000);
+
 		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate"));
 
 		rptFlag = Integer.parseInt(titaVo.getParam("UnpaidCond"));
@@ -150,8 +159,11 @@ public class L9703Report1 extends MakeReport {
 		BigDecimal totalOfTotal = BigDecimal.ZERO; // 合計加總
 
 		if (listL9703 == null || listL9703.size() == 0) {
+			this.setRptItem("滯繳客戶明細表(無符合資料)");
 			this.print(1, 1, "*******    查無資料   ******");
-			return;
+			long sno = this.close();
+			return sno;
+
 		}
 
 		for (Map<String, String> tL9703 : listL9703) {
@@ -206,7 +218,7 @@ public class L9703Report1 extends MakeReport {
 					overflow = overflow.subtract(baTxVo.getUnPaidAmt());
 				}
 			}
-			total = unpaidPriInt.add(breachAmtAndDelayInt).add(overflow); // 合計
+			total = unpaidPriInt.add(breachAmtAndDelayInt).subtract(overflow); // 合計
 
 			totalOfUnpaidPriInt = totalOfUnpaidPriInt.add(unpaidPriInt); // 未收本息加總計算
 			totalOfBreachAmtAndDelayInt = totalOfBreachAmtAndDelayInt.add(breachAmtAndDelayInt); // 違約金加總計算
@@ -264,8 +276,10 @@ public class L9703Report1 extends MakeReport {
 				this.print(0, 75, this.showRocDate(lastRepaidDate, 1));
 			}
 
+			int days = getCashDay(parse.stringToInteger(lastRepaidDate), parse.stringToInteger(tL9703.get("F9")));
+
 			// 日數
-			this.print(0, 89, tL9703.get("F9"), "R");
+			this.print(0, 89, "" + days, "R");
 
 			// 未收本息
 			this.print(0, 103, formatAmt(unpaidPriInt, 0), "R");
@@ -334,7 +348,31 @@ public class L9703Report1 extends MakeReport {
 		print(0, 140, formatAmt(totalOfTotal, 0), "R");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
-		this.close();
-		//this.toPdf(sno);
+		long sno = this.close();
+		return sno;
 	}
+
+	private int getCashDay(int date, int days) throws LogicException {
+		int bussCnt = 0;
+		int tdate = date;
+		int iPayDate = 0;
+		int tdays = days;
+		while (tdays > 0) {
+			dateUtil.init();
+			dateUtil.setDate_1(tdate);
+			dateUtil.setDays(1);
+			iPayDate = dateUtil.getCalenderDay();
+			dateUtil.init();
+			dateUtil.setDate_2(iPayDate);
+			tdate = iPayDate;
+			if (dateUtil.isHoliDay()) {
+				bussCnt++;
+			}
+			tdays--;
+		}
+
+		return days - bussCnt + 1 ;
+
+	}
+
 }

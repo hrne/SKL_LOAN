@@ -177,7 +177,7 @@ public class L9705Report extends MakeReport {
 				}
 
 				try {
-					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, titaVo);
+					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0,titaVo);
 					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 				} catch (LogicException e) {
 					this.error("listBaTxVo ErrorMsg :" + e.getMessage());
@@ -351,9 +351,9 @@ public class L9705Report extends MakeReport {
 						this.printCm(1, y, "＊＊您好！本月份扣款含年度火險、地震險保費、每月房貸期款，因您存款不足；");
 						y = top + yy + (++l) * h;
 						this.printCm(1, y, "　　請速將本期款匯入期款專用帳號。");
-						y = top + yy + (++l) * h;
-						this.printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
 					}
+					y = top + yy + (++l) * h;
+					this.printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
 
 					String iTLRNO = "";
 

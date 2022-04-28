@@ -177,7 +177,7 @@ public class L9705Report extends MakeReport {
 				}
 
 				try {
-					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, titaVo);
+					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0,titaVo);
 					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 				} catch (LogicException e) {
 					this.error("listBaTxVo ErrorMsg :" + e.getMessage());

@@ -87,9 +87,11 @@ public class L9703Report2 extends MakeReport {
 
 		String rptitem = "放款本息攤還表暨繳息通知單";
 
+		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
+
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703A", "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
 		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-				titaVo.getTxCode().isEmpty() ? "L9703B" : titaVo.getTxCode() + "B", rptitem, "inch,8.5,12", "P");
+				titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B", rptitem, "inch,8.5,12", "P");
 
 		List<Map<String, String>> L9703List = null;
 		try {
@@ -145,9 +147,8 @@ public class L9703Report2 extends MakeReport {
 		this.info("entdy = " + entdy);
 
 		try {
-			lBaTxVo = dBaTxCom.termsPay(entryDate,
-					parse.stringToInteger(tL9703Vo.get("CustNo")), parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd,
-					titaVo);
+			lBaTxVo = dBaTxCom.termsPay(entryDate, parse.stringToInteger(tL9703Vo.get("CustNo")),
+					parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd, 0, titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
@@ -272,13 +273,25 @@ public class L9703Report2 extends MakeReport {
 		int UnPaidAmt = 0;
 		int LoanBal = 0;
 		int terms = 0;
+
+		dDateUtil.init();
+		dDateUtil.setDate_1(entdy);
+		dDateUtil.setMons(0);
+		dDateUtil.setDays(1);
+		int nextday = dDateUtil.getCalenderDay();
+
 		for (BaTxVo baTxVo : listBaTxVo) {
 			if (baTxVo.getDataKind() != 2) {
 				continue;
 			}
-			terms++;
-			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 
+			if (baTxVo.getPayIntDate() > nextday) { // 製發日期跟應繳日比 超過不列印
+				continue;
+			}
+
+			terms++;
+
+			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 			// 違約金
 			BreachAmt = baTxVo.getBreachAmt().intValue() + baTxVo.getDelayInt().intValue();
 			// 本金
@@ -324,13 +337,6 @@ public class L9703Report2 extends MakeReport {
 			// 應繳淨額
 			printCm(19, y, String.format("%,d", UnPaidAmt), "R");
 		}
-
-		dDateUtil.init();
-		dDateUtil.setDate_1(entdy);
-		dDateUtil.setMons(0);
-		dDateUtil.setDays(1);
-
-		int nextday = dDateUtil.getCalenderDay();
 
 		l++;
 		y = top + yy + (++l) * h;

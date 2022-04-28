@@ -1845,6 +1845,11 @@ TXFORM=L2R04
 #L2r05RvBormNo=A,3,S
 #L2r05NextRvBormNo=A,3,S
 #L2r05RvDrawdownAmt=m,14.2,S
+#L2r05Grcd=X,1,S
+#L2r05GrKind=X,1,S
+#L2r05EsGcd=X,1,S
+#L2r05EsGKind=X,1,S
+#L2r05EsGcnl=X,1,S
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}=n,1,S
 #L2r05BreachaYyB{n}=n,1,S
@@ -1958,6 +1963,11 @@ TXFORM=L2R05
 #L2r05RvBormNo
 #L2r05NextRvBormNo
 #L2r05RvDrawdownAmt
+#L2r05Grcd
+#L2r05GrKind
+#L2r05EsGcd
+#L2r05EsGKind
+#L2r05EsGcnl
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}
 #L2r05BreachaYyB{n}
@@ -5442,6 +5452,20 @@ TXFORM=L4R31
 #L4R31CalTime
 ^
 </L4R31.tom>
+
+<L4R32.dec>
+#L4R32Date1=D,7,S
+#L4R32Date2=D,7,S
+#L4R32Date7=D,7,S
+</L4R32.dec>
+
+<L4R32.tom>
+TXFORM=L4R32
+#L4R32Date1
+#L4R32Date2
+#L4R32Date7
+^
+</L4R32.tom>
 
 <L5R01.dec>
 #L5r01CustId=X,10,S

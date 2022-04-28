@@ -55,32 +55,43 @@ public class L9731Report extends MakeReport {
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表", "L9731-人工檢核表",
 				"L9731_底稿_人工檢核表.xlsx", "工作表1");
-
+		
 		try {
 
 			findSheet1 = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
-			exportSheet1(titaVo, findSheet1);
-
 			findSheet2_1 = l9731ServiceImpl.findSheet2_1(titaVo, yearMonth);
-			exportSheet2(titaVo, findSheet2_1, 1);
 			findSheet2_2 = l9731ServiceImpl.findSheet2_2(titaVo, yearMonth);
+			findLA$W30P = l9731ServiceImpl.findLA$W30P(titaVo, yearMonth);
+
+			if (findLA$W30P.size() == 0 && findSheet1.size() == 0 && findSheet2_1.size() == 0
+					&& findSheet2_2.size() == 0) {
+				return false;
+			}
+
+	
+
+			exportSheet1(titaVo, findSheet1);
+			exportSheet2(titaVo, findSheet2_1, 1);
 			exportSheet2(titaVo, findSheet2_2, 2);
 
-			findLA$W30P = l9731ServiceImpl.findLA$W30P(titaVo, yearMonth);
+		
+
+//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表2", "L9731-人工檢核表",
+//					"L9731_底稿_人工檢核表.xlsx", "工作表1");
+
 			exportLA$W30P(titaVo, findLA$W30P);
+//			makeExcel.close();
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L9731ServiceImpl.findAll error = " + errors.toString());
-		}
-
-		if (findLA$W30P.size() == 0 && findSheet1.size() == 0 && findSheet2_1.size() == 0 && findSheet2_2.size() == 0) {
 			return false;
 		}
 
 		makeExcel.close();
 		return true;
+
 	}
 
 	/**
@@ -256,58 +267,57 @@ public class L9731Report extends MakeReport {
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
-
+					// 從B欄開始
 					int col = i + 2;
 
 					switch (i) {
-					case 0://戶號
-					case 1://額度
-					case 2://序號
-						makeExcel.setValue(row, col, fieldValue, "#0","R");
+					case 0:// 戶號
+					case 1:// 額度
+					case 2:// 序號
+						makeExcel.setValue(row, col, fieldValue, "#0", "R");
 						break;
-						
-						
-					case 3://ID
-					case 4://戶名
-						makeExcel.setValue(row, col, fieldValue,"L");
+
+					case 3://利變		
+					case 6:// 科目
+						makeExcel.setValue(row, col , fieldValue, "C");
 						break;
-					case 5:// 科目
-					case 6://撥款日
-					case 7://到期日
-					case 10://繳息迄日
-					case 11://轉催收日期
+					case 4:// ID
+					case 5:// 戶名
+						makeExcel.setValue(row, col , fieldValue, "L");
+						break;
+
+					case 7:// 撥款日
+					case 8:// 到期日
+					case 11:// 繳息迄日
+					case 12://轉催收日期
 						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
-							makeExcel.setValue(row, col + 1, showBcDate(fieldValue, 0), "C");
+							makeExcel.setValue(row, col , showBcDate(fieldValue, 0), "C");
 						}
 						break;
-					case 8://利率
+					case 9:// 利率
 						BigDecimal rate = getBigDecimal(fieldValue);
-						makeExcel.setValue(row, col + 1, rate, "0.0000", "R");
+						makeExcel.setValue(row, col , rate, "0.0000", "R");
 						break;
-					case 9://繳息周期
-					case 12://資金用讀別
-						makeExcel.setValue(row, col + 1, fieldValue, "C");
+					case 10:// 繳息周期
+					case 13:// 資金用讀別
+						makeExcel.setValue(row, col , fieldValue, "C");
 						break;
-					case 13://核貸金額
-					case 14://撥款金額
-					case 15://放款餘額
+					case 14:// 核貸金額
+					case 15:// 撥款金額
+					case 16:// 放款餘額
 						BigDecimal amt = getBigDecimal(fieldValue);
-						makeExcel.setValue(row, col + 1, amt, "#,##0", "R");
-						break;
-					case 16://利變
-						makeExcel.setValue(row, 4, fieldValue, "L"); // 帳冊別
+						makeExcel.setValue(row, col, amt, "#,##0", "R");
 						break;
 
 					case 17:// 商品利率代碼
 					case 18:// 初貸日
 					case 19:// 政策性_專案貸款
 					case 20:// 擔保品類別
-
 						makeExcel.setValue(row, col + 1, fieldValue, "C");
 						break;
 
 					default:
-						makeExcel.setValue(row, col + 1, fieldValue, "L");
+						makeExcel.setValue(row, col, fieldValue, "L");
 						break;
 					}
 				} // for

@@ -29,7 +29,7 @@ public class FacMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6398939364063758911L;
+	private static final long serialVersionUID = -4631755510457400623L;
 
 @EmbeddedId
   private FacMainId facMainId;
@@ -367,6 +367,31 @@ public class FacMain implements Serializable {
   /* CdCode.ApprovedLevel(2021.8.27異動)by eric */
   @Column(name = "`ApprovedLevel`", length = 1)
   private String approvedLevel;
+
+  // 綠色授信註記
+  /* Y:是N:否(2022.4.21異動)by 昱衡 */
+  @Column(name = "`Grcd`", length = 1)
+  private String grcd;
+
+  // 綠色支出類別
+  /* CdCode.GrKindA:再生能源B:節能C:污染防制D:生命自然資源環境永續管理及土地利用環境永續管理E:地域與水域生物多樣性保護F:潔淨交通運輸G:永續水源及廢水處理H:氣候變遷調適I:具生態效率與環境經濟調適之產品J:綠能建築Z:其他(2022.4.21異動)by 昱衡 */
+  @Column(name = "`GrKind`", length = 1)
+  private String grKind;
+
+  // 永續績效連結授信註記
+  /* Y:是N:否(2022.4.21異動)by 昱衡 */
+  @Column(name = "`EsGcd`", length = 1)
+  private String esGcd;
+
+  // 永續績效連結授信類別
+  /* CdCode.EsGKind1:E環境2:S社會責任3:G公司治理 4:ES環境及社會責任 5:EG環境及公司治理 6:SG社會責任及公司治理 7:ESG環境、社會責任及公司治理(2022.4.21異動)by 昱衡 */
+  @Column(name = "`EsGKind`", length = 1)
+  private String esGKind;
+
+  // 永續績效連結授信約定條件全部未達成通報
+  /* Y:是N:否(2022.4.21異動)by 昱衡 */
+  @Column(name = "`EsGcnl`", length = 1)
+  private String esGcnl;
 
   // 建檔日期時間
   @CreatedDate
@@ -2032,6 +2057,153 @@ N:否
   }
 
 /**
+	* 綠色授信註記<br>
+	* Y:是
+N:否
+(2022.4.21異動)by 昱衡
+	* @return String
+	*/
+  public String getGrcd() {
+    return this.grcd == null ? "" : this.grcd;
+  }
+
+/**
+	* 綠色授信註記<br>
+	* Y:是
+N:否
+(2022.4.21異動)by 昱衡
+  *
+  * @param grcd 綠色授信註記
+	*/
+  public void setGrcd(String grcd) {
+    this.grcd = grcd;
+  }
+
+/**
+	* 綠色支出類別<br>
+	* CdCode.GrKind
+A:再生能源
+B:節能
+C:污染防制
+D:生命自然資源環境永續管理及土地利用環境永續管理
+E:地域與水域生物多樣性保護
+F:潔淨交通運輸
+G:永續水源及廢水處理
+H:氣候變遷調適
+I:具生態效率與環境經濟調適之產品
+J:綠能建築
+Z:其他
+(2022.4.21異動)by 昱衡
+	* @return String
+	*/
+  public String getGrKind() {
+    return this.grKind == null ? "" : this.grKind;
+  }
+
+/**
+	* 綠色支出類別<br>
+	* CdCode.GrKind
+A:再生能源
+B:節能
+C:污染防制
+D:生命自然資源環境永續管理及土地利用環境永續管理
+E:地域與水域生物多樣性保護
+F:潔淨交通運輸
+G:永續水源及廢水處理
+H:氣候變遷調適
+I:具生態效率與環境經濟調適之產品
+J:綠能建築
+Z:其他
+(2022.4.21異動)by 昱衡
+  *
+  * @param grKind 綠色支出類別
+	*/
+  public void setGrKind(String grKind) {
+    this.grKind = grKind;
+  }
+
+/**
+	* 永續績效連結授信註記<br>
+	* Y:是
+N:否
+(2022.4.21異動)by 昱衡
+	* @return String
+	*/
+  public String getEsGcd() {
+    return this.esGcd == null ? "" : this.esGcd;
+  }
+
+/**
+	* 永續績效連結授信註記<br>
+	* Y:是
+N:否
+(2022.4.21異動)by 昱衡
+  *
+  * @param esGcd 永續績效連結授信註記
+	*/
+  public void setEsGcd(String esGcd) {
+    this.esGcd = esGcd;
+  }
+
+/**
+	* 永續績效連結授信類別<br>
+	* CdCode.EsGKind
+1:E環境
+2:S社會責任
+3:G公司治理 
+4:ES環境及社會責任 
+5:EG環境及公司治理 
+6:SG社會責任及公司治理 
+7:ESG環境、社會責任及公司治理
+(2022.4.21異動)by 昱衡
+	* @return String
+	*/
+  public String getEsGKind() {
+    return this.esGKind == null ? "" : this.esGKind;
+  }
+
+/**
+	* 永續績效連結授信類別<br>
+	* CdCode.EsGKind
+1:E環境
+2:S社會責任
+3:G公司治理 
+4:ES環境及社會責任 
+5:EG環境及公司治理 
+6:SG社會責任及公司治理 
+7:ESG環境、社會責任及公司治理
+(2022.4.21異動)by 昱衡
+  *
+  * @param esGKind 永續績效連結授信類別
+	*/
+  public void setEsGKind(String esGKind) {
+    this.esGKind = esGKind;
+  }
+
+/**
+	* 永續績效連結授信約定條件全部未達成通報<br>
+	* Y:是
+N:否
+(2022.4.21異動)by 昱衡
+	* @return String
+	*/
+  public String getEsGcnl() {
+    return this.esGcnl == null ? "" : this.esGcnl;
+  }
+
+/**
+	* 永續績效連結授信約定條件全部未達成通報<br>
+	* Y:是
+N:否
+(2022.4.21異動)by 昱衡
+  *
+  * @param esGcnl 永續績效連結授信約定條件全部未達成通報
+	*/
+  public void setEsGcnl(String esGcnl) {
+    this.esGcnl = esGcnl;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -2122,7 +2294,8 @@ N:否
            + ", loanOfficer=" + loanOfficer + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer
            + ", advanceCloseCode=" + advanceCloseCode + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo
            + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo
-           + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", grcd=" + grcd + ", grKind=" + grKind
+           + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }
