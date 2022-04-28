@@ -92,25 +92,29 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "              ,DECODE(MFB.\"OvduTerm\", 4, MFB.\"PrinBalance\", 0) \"4TermAmount\" ";
 			sql += "              ,DECODE(MFB.\"OvduTerm\", 5, 1, 0) \"5TermCount\" ";
 			sql += "              ,DECODE(MFB.\"OvduTerm\", 5, MFB.\"PrinBalance\", 0) \"5TermAmount\" ";
-			sql += "              ,CASE WHEN MFB.\"OvduTerm\" > 6 AND MFB.\"AcctCode\" != '990' ";
-			sql += "                    THEN 1 ";
-			sql += "               ELSE 0 END \"6TermCount\" ";
-			sql += "              ,CASE WHEN MFB.\"OvduTerm\" > 6 AND MFB.\"AcctCode\" != '990' ";
-			sql += "                    THEN MFB.\"PrinBalance\" ";
-			sql += "               ELSE 0 END \"6TermAmount\" ";
-			sql += "              ,DECODE(MFB.\"AcctCode\", '990', 1, 0) \"TurnOvduCount\" ";
-			sql += "              ,DECODE(MFB.\"AcctCode\", '990', MFB.\"PrinBalance\", 0) \"TurnOvduAmount\" ";
+			sql += "              ,DECODE(MFB.\"OvduTerm\", 6, 1, 0) \"6TermCount\" ";
+			sql += "              ,DECODE(MFB.\"OvduTerm\", 6, MFB.\"PrinBalance\", 0) \"6TermAmount\" ";
+			sql += "              ,DECODE(MFB.\"OvduTerm\", 9, 1, 0) \"TurnOvduCount\" ";
+			sql += "              ,DECODE(MFB.\"OvduTerm\", 9, MFB.\"PrinBalance\", 0) \"TurnOvduAmount\" ";
 			sql += "              ,1 \"TotalCount\" ";
 			sql += "              ,MFB.\"PrinBalance\" \"TotalAmount\" ";
-			sql += "        FROM \"MonthlyFacBal\" MFB ";
+			sql += " 		FROM ( ";
+			sql += " 			SELECT \"CustNo\" ";
+			sql += " 		  		  ,\"FacmNo\" ";
+			sql += " 		  		  ,CASE ";
+			sql += " 		   	 		 WHEN \"AcctCode\" = 990 THEN 9";
+			sql += " 		   	 		 WHEN \"OvduTerm\" IN (1,2,3,4,5) THEN \"OvduTerm\" ";
+			sql += " 		   		   ELSE 0 END AS \"OvduTerm\" ";
+			sql += " 		  		  ,\"PrinBalance\" ";
+			sql += " 			FROM \"MonthlyFacBal\"";
+			sql += " 			WHERE \"YearMonth\" = \"Fn_GetLastMonth\"(:entYearMonth) ";
+			sql += " 	  		  AND \"PrinBalance\" > 0 ";
+			sql += " 		) MFB ";
 			sql += "        LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = MFB.\"CustNo\" ";
 			sql += "                              AND FM.\"FacmNo\" = MFB.\"FacmNo\" ";
-			sql += "        WHERE MFB.\"YearMonth\" = \"Fn_GetLastMonth\"(:entYearMonth) ";
-			sql += "          AND ((MFB.\"OvduTerm\" BETWEEN :ovduTermMin AND :ovduTermMax AND MFB.\"OvduDays\" > 0) ";
-			sql += "               OR MFB.\"AcctCode\" = '990') ";
-			sql += "          AND MFB.\"PrinBalance\" > 0 ";
-			sql += "          AND FM.\"FirstDrawdownDate\" >= 19810101 ";
+			sql += "        WHERE  FM.\"FirstDrawdownDate\" >= 19810101 ";
 			sql += "          AND (NVL(:businessOfficer, ' ') = ' ' OR :businessOfficer = FM.\"BusinessOfficer\") ";
+			sql += "   		  AND MFB.\"OvduTerm\" <> 0 ";
 			sql += "      ) ";
 			sql += " GROUP BY \"FirstDrawdownYear\" ";
 			sql += " ORDER BY \"FirstDrawdownYear\" ";
@@ -118,51 +122,64 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 
 		case Agent:
-			sql += " SELECT CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
+			sql += " SELECT NVL( ";
+			sql += "		CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
 			sql += "             THEN FM.\"BusinessOfficer\" ";
-			sql += "        ELSE FM.\"CreditOfficer\" END \"Officer\" ";
-			sql += "       ,CE.\"Fullname\" \"EmpName\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 1, 1, 0)) \"1TermCount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 1, MFB.\"PrinBalance\", 0)) \"1TermAmount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 2, 1, 0)) \"2TermCount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 2, MFB.\"PrinBalance\", 0)) \"2TermAmount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 3, 1, 0)) \"3TermCount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 3, MFB.\"PrinBalance\", 0)) \"3TermAmount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 4, 1, 0)) \"4TermCount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 4, MFB.\"PrinBalance\", 0)) \"4TermAmount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 5, 1, 0)) \"5TermCount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"OvduTerm\", 5, MFB.\"PrinBalance\", 0)) \"5TermAmount\" ";
-			sql += "       ,SUM(CASE WHEN MFB.\"OvduTerm\" > 6 AND MFB.\"AcctCode\" != '990' ";
-			sql += "                 THEN 1 ";
-			sql += "            ELSE 0 END) \"6TermCount\" ";
-			sql += "       ,SUM(CASE WHEN MFB.\"OvduTerm\" > 6 AND MFB.\"AcctCode\" != '990' ";
-			sql += "                 THEN MFB.\"PrinBalance\" ";
-			sql += "            ELSE 0 END) \"6TermAmount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"AcctCode\", '990', 1, 0)) \"TurnOvduCount\" ";
-			sql += "       ,SUM(DECODE(MFB.\"AcctCode\", '990', MFB.\"PrinBalance\", 0)) \"TurnOvduAmount\" ";
+			sql += "        ELSE FM.\"CreditOfficer\" END ,' ')\"Officer\" ";
+			sql += "	   ,NVL(";
+			sql += " 	    CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
+			sql += "             THEN BusinessOfficer.\"Fullname\" ";
+			sql += "        ELSE CreditOfficer.\"Fullname\" END,' ') \"EmpName\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 1, 1, 0) ) \"1TermCount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 1, M.\"PrinBalance\", 0)) \"1TermAmount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 2, 1, 0)) \"2TermCount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 2, M.\"PrinBalance\", 0)) \"2TermAmount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 3, 1, 0)) \"3TermCount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 3, M.\"PrinBalance\", 0)) \"3TermAmount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 4, 1, 0)) \"4TermCount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 4, M.\"PrinBalance\", 0)) \"4TermAmount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 5, 1, 0)) \"5TermCount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 5, M.\"PrinBalance\", 0)) \"5TermAmount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 6, 1, 0)) \"6TermCount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", 6, M.\"PrinBalance\", 0)) \"6TermAmount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", '9', 1, 0)) \"TurnOvduCount\" ";
+			sql += "       ,SUM(DECODE(M.\"OvduTerm\", '9', M.\"PrinBalance\", 0)) \"TurnOvduAmount\" ";
 			sql += "       ,COUNT(*) \"TotalCount\" ";
-			sql += "       ,SUM(MFB.\"PrinBalance\") \"TotalAmount\" ";
-			sql += " FROM \"MonthlyFacBal\" MFB ";
-			sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = MFB.\"CustNo\" ";
-			sql += "                       AND FM.\"FacmNo\" = MFB.\"FacmNo\" ";
-			sql += " LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
-			sql += "                                                    THEN FM.\"BusinessOfficer\" ";
-			sql += "                                               ELSE FM.\"CreditOfficer\" END ";
-			sql += " WHERE ((MFB.\"OvduTerm\" BETWEEN :ovduTermMin AND :ovduTermMax AND MFB.\"OvduDays\" > 0) ";
-			sql += "        OR MFB.\"AcctCode\" = '990') ";
-			sql += "   AND MFB.\"PrinBalance\" > 0 ";
-			sql += "   AND MFB.\"YearMonth\" = \"Fn_GetLastMonth\"(:entYearMonth) ";
-			sql += "   AND NVL(CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
-			sql += "                THEN FM.\"BusinessOfficer\" ";
-			sql += "       ELSE FM.\"CreditOfficer\" END,  ' ') != ' ' ";
-			sql += "   AND (:businessOfficer = ' ' OR CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
-			sql += "                                       THEN FM.\"BusinessOfficer\" ";
-			sql += "                                  ELSE FM.\"CreditOfficer\" END = :businessOfficer ) ";
-			sql += " GROUP BY CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
-			sql += "               THEN FM.\"BusinessOfficer\" ";
-			sql += "          ELSE FM.\"CreditOfficer\" END ";
-			sql += "         ,CE.\"Fullname\" ";
-			sql += " ORDER BY \"Officer\" ";
+			sql += "       ,SUM(M.\"PrinBalance\") \"TotalAmount\" ";
+			sql += " FROM ( ";
+			sql += " 	SELECT \"CustNo\" ";
+			sql += " 		  ,\"FacmNo\" ";
+			sql += " 		  ,CASE ";
+			sql += " 		   	 WHEN \"AcctCode\" = 990 THEN 9";
+			sql += " 		   	 WHEN \"OvduTerm\" IN (1,2,3,4,5) THEN \"OvduTerm\" ";
+			sql += " 		   ELSE 0 END AS \"OvduTerm\" ";
+			sql += " 		  ,\"PrinBalance\" ";
+			sql += " 	FROM \"MonthlyFacBal\"";
+			sql += " 	WHERE \"YearMonth\" =  \"Fn_GetLastMonth\"(:entYearMonth)";
+			sql += " 	  AND \"PrinBalance\" > 0 ";
+			sql += " ) M ";
+			sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = M.\"CustNo\" ";
+			sql += "                       AND FM.\"FacmNo\" = M.\"FacmNo\" ";
+			sql += " LEFT JOIN \"CdEmp\" BusinessOfficer ON BusinessOfficer.\"EmployeeNo\" = FM.\"BusinessOfficer\" ";
+			sql += " LEFT JOIN \"CdEmp\" CreditOfficer ON CreditOfficer.\"EmployeeNo\" = FM.\"CreditOfficer\" ";
+			sql += " WHERE :businessOfficer = ' '  ";
+			sql += "    OR ( NVL (CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
+			sql += "                   THEN BusinessOfficer.\"EmployeeNo\" ";
+			sql += "       		  ELSE CreditOfficer.\"EmployeeNo\" END,  ' ') != :businessOfficer )";
+			sql += "   AND M.\"OvduTerm\" <> 0 ";
+			sql += " GROUP BY NVL( CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
+			sql += "             		THEN FM.\"BusinessOfficer\" ";
+			sql += "        	   ELSE FM.\"CreditOfficer\" END ,' ')";
+			sql += "		 ,NVL( CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
+			sql += "             		THEN BusinessOfficer.\"Fullname\" ";
+			sql += "        	   ELSE CreditOfficer.\"Fullname\" END,' ')";
+			sql += " ORDER BY CASE ";
+			sql += " 			WHEN ASCII(SUBSTR(\"Officer\",0,1)) IS NULL OR \"Officer\" = ' ' ";
+			sql += "            THEN 64 ";
+			sql += " 			WHEN ASCII(SUBSTR(\"Officer\",0,1)) >= 65 ";
+			sql += "            THEN ASCII(SUBSTR(\"Officer\",0,1)) ";
+			sql += "          ELSE ASCII(SUBSTR(\"Officer\",0,1)) + 43 END ASC";
+			sql += "         ,\"Officer\" ASC";
 
 			break;
 
@@ -239,18 +256,24 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 表中實際要查lastYearMonth
 		// 利用 DB 的 Function 做, 簡短一些
-		String entYearMonth = (parse.stringToInteger(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth");
+		String entYearMonth = (parse.stringToInteger(titaVo.getParam("inputYear")) + 1911)
+				+ titaVo.getParam("inputMonth");
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
 		query.setParameter("entYearMonth", entYearMonth);
-		query.setParameter("ovduTermMin", titaVo.getParam("inputOverdueTermMin"));
-		query.setParameter("ovduTermMax", titaVo.getParam("inputOverdueTermMax"));
+
+		if (kind == OutputSortBy.LargeAmt_Agent ||kind == OutputSortBy.LargeAmt_Customer) {
+			query.setParameter("ovduTermMin", titaVo.getParam("inputOverdueTermMin"));
+			query.setParameter("ovduTermMax", titaVo.getParam("inputOverdueTermMax"));
+		}
+
 
 		// 員編輸入空白代表所有員編
-		query.setParameter("businessOfficer", titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " " : titaVo.getParam("inputBusinessOfficer"));
+		query.setParameter("businessOfficer", titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " "
+				: titaVo.getParam("inputBusinessOfficer"));
 
 		if (kind == OutputSortBy.Year) {
 			query.setParameter("entYear", entYearMonth);
@@ -260,7 +283,8 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("entYearMonth: " + entYearMonth);
 		this.info("ovduTermMin: " + titaVo.getParam("inputOverdueTermMin"));
 		this.info("ovduTermMax: " + titaVo.getParam("inputOverdueTermMax"));
-		this.info("businessOfficer: '" + (titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " " : titaVo.getParam("inputBusinessOfficer")) + "'");
+		this.info("businessOfficer: '" + (titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " "
+				: titaVo.getParam("inputBusinessOfficer")) + "'");
 		this.info("entYear: " + entYearMonth);
 
 		return this.convertToMap(query);

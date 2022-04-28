@@ -495,9 +495,9 @@ public class TxBatchCom extends TradeBuffer {
 			this.procStsCode = "3"; // 3.檢核錯誤
 		}
 		// 企金戶整批檢核設定為 人工入帳
-		if (titaVo.getTxCode().equals("L420A") && "A1".equals(tDetail.getReconCode())) {
-			this.procStsCode = "2"; // 2.人工處理
-		}
+//		if (titaVo.getTxCode().equals("L420A") && "A1".equals(tDetail.getReconCode())) {
+//			this.procStsCode = "2"; // 2.人工處理
+//		}
 
 		// ------------- 將檢核結果存入整批入帳明細檔(還款類別、處理說明、處理狀態) -----------
 		// 檢核正常
@@ -1006,6 +1006,11 @@ public class TxBatchCom extends TradeBuffer {
 				tDetail.setDisacctAmt(disacctAmt);
 				tDetail.setAcctAmt(tDetail.getRepayAmt().subtract(disacctAmt)); // 還款金額 - 入暫收金額
 				unfinishCnt = -1;
+				if ("L3210".equals(titaVo.getTxcd())) {
+					if (tDetail.getRepayCode() >= 1 && tDetail.getRepayCode() <= 3) {
+						tDetail.setRepayCode(9); // 9.其他
+					}
+				}
 				if (titaVo.isTrmtypBatch()) { // 批次入帳
 					// 轉暫收功能
 					if ("2".equals(titaVo.get("FunctionCode"))) {

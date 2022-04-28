@@ -133,6 +133,7 @@ public class BaTxCom extends TradeBuffer {
 	private int ovduTerms = 0; // 逾期數
 	private int ovduDays = 0; // 逾期天數
 	private int terms = 0; // 繳期數
+	private int endFlag = 0; // 0:正常 1.至下次利率調整日
 
 	private String unpaidFlag = "";// 是否可欠繳 Y/N
 	private int preRepayTerms = 0; // 可預收期數
@@ -212,6 +213,7 @@ public class BaTxCom extends TradeBuffer {
 		this.includeIntFlag = "N";// 是否內含利息
 		this.unpaidIntFlag = "Y";// 利息是否可欠繳
 		this.payMethod = "1";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
+		this.endFlag = 0; // 0:正常 1.至下次利率調整日
 
 	}
 
@@ -747,10 +749,12 @@ public class BaTxCom extends TradeBuffer {
 	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
-	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, int iEndFlag, TitaVo titaVo)
-			throws LogicException {
+	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, int iEndFlag,
+			TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom termsPay ..." + iEntryDate + "/ " + iCustNo + "-" + iFacmNo + "-" + iBormNo + "/ " + iTerms);
 		init();
+		// 0:正常 1.至下次利率調整日
+		this.endFlag = iEndFlag;
 
 		// 費用是否全部回收
 		this.isPayAllFee = true; // 全部
@@ -897,6 +901,10 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setInterest(ba.getInterest()); // // 利息
 				baTxVo.setDelayInt(ba.getDelayInt()); // 延滯息
 				baTxVo.setBreachAmt(ba.getBreachAmt()); // 違約金
+				baTxVo.setShortfallPrin(ba.getShortfallPrin()); // 收回短繳本金
+				baTxVo.setShortfallInt(ba.getShortfallInt()); // 收回短繳利息
+				baTxVo.setUnpaidPrin(ba.getUnpaidPrin()); // 短繳本金
+				baTxVo.setUnpaidInt(ba.getUnpaidInt()); // 短繳利息
 				baTxVo.setLoanBalPaid(ba.getLoanBalPaid()); // 還款後餘額
 				baTxVo.setUnPaidAmt(ba.getUnPaidAmt());
 				baTxVo.setAcctAmt(ba.getAcctAmt()); // 出帳金額
@@ -919,6 +927,10 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setInterest(baTxVo.getInterest().add(ba.getInterest())); // // 利息
 				baTxVo.setDelayInt(baTxVo.getDelayInt().add(ba.getDelayInt())); // 延滯息
 				baTxVo.setBreachAmt(baTxVo.getBreachAmt().add(ba.getBreachAmt())); // 違約金
+				baTxVo.setShortfallPrin(baTxVo.getShortfallPrin().add(ba.getShortfallPrin())); // 收回短繳本金
+				baTxVo.setShortfallInt(baTxVo.getShortfallInt().add(ba.getShortfallInt())); // 收回短繳利息
+				baTxVo.setUnpaidPrin(baTxVo.getUnpaidPrin().add(ba.getUnpaidPrin())); // 短繳本金
+				baTxVo.setUnpaidInt(baTxVo.getUnpaidInt().add(ba.getUnpaidInt())); // 短繳利息
 				baTxVo.setLoanBalPaid(baTxVo.getLoanBalPaid().add(ba.getLoanBalPaid())); // 還款後餘額
 				baTxVo.setUnPaidAmt(baTxVo.getPrincipal().add(ba.getUnPaidAmt()));
 				baTxVo.setAcctAmt(baTxVo.getAcctAmt().add(ba.getAcctAmt())); // 出帳金額
@@ -1001,6 +1013,10 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setInterest(ba.getInterest()); // // 利息
 				baTxVo.setDelayInt(ba.getDelayInt()); // 延滯息
 				baTxVo.setBreachAmt(ba.getBreachAmt()); // 違約金
+				baTxVo.setShortfallPrin(ba.getShortfallPrin()); // 收回短繳本金
+				baTxVo.setShortfallInt(ba.getShortfallInt()); // 收回短繳利息
+				baTxVo.setUnpaidPrin(ba.getUnpaidPrin()); // 短繳本金
+				baTxVo.setUnpaidInt(ba.getUnpaidInt()); // 短繳利息
 				baTxVo.setLoanBalPaid(ba.getLoanBalPaid()); // 還款後餘額
 				baTxVo.setUnPaidAmt(ba.getUnPaidAmt());
 				baTxVo.setAcctAmt(ba.getAcctAmt()); // 出帳金額
@@ -1024,6 +1040,10 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setDelayInt(baTxVo.getDelayInt().add(ba.getDelayInt())); // 延滯息
 				baTxVo.setBreachAmt(baTxVo.getBreachAmt().add(ba.getBreachAmt())); // 違約金
 				baTxVo.setLoanBalPaid(baTxVo.getLoanBalPaid().add(ba.getLoanBalPaid())); // 還款後餘額
+				baTxVo.setShortfallPrin(baTxVo.getShortfallPrin().add(ba.getShortfallPrin())); // 收回短繳本金
+				baTxVo.setShortfallInt(baTxVo.getShortfallInt().add(ba.getShortfallInt())); // 收回短繳利息
+				baTxVo.setUnpaidPrin(baTxVo.getUnpaidPrin().add(ba.getUnpaidPrin())); // 短繳本金
+				baTxVo.setUnpaidInt(baTxVo.getUnpaidInt().add(ba.getUnpaidInt())); // 短繳利息
 				baTxVo.setUnPaidAmt(baTxVo.getPrincipal().add(ba.getUnPaidAmt()));
 				baTxVo.setAcctAmt(baTxVo.getAcctAmt().add(ba.getAcctAmt())); // 出帳金額
 				baTxVo.setLoanBal(baTxVo.getLoanBal().add(ba.getLoanBal())); // 放款餘額(還款前、只放第一期)
@@ -1209,6 +1229,12 @@ public class BaTxCom extends TradeBuffer {
 				// 輸出每期
 				for (int i = 1; i <= wkTerms; i++) {
 					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+					// 其款試算至下次利率調整日
+					if (this.endFlag == 1 && ln.getNextAdjRateDate() > 0) {
+						if (loanCalcRepayIntCom.getPrevPaidIntDate() > ln.getNextAdjRateDate()) {
+							break;
+						}
+					}
 					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, i);
 					loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
 					loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
@@ -1762,22 +1788,27 @@ public class BaTxCom extends TradeBuffer {
 		this.baTxList = iBatxList;
 
 		// 計算金額
-		BigDecimal wkTxAmt = iTxAmt;
-		BigDecimal wkOverAmt = BigDecimal.ZERO;
-		BigDecimal wkShortAmt = BigDecimal.ZERO;
-		BigDecimal wkTempAmt = BigDecimal.ZERO;
-		BigDecimal wkFeeAmt = BigDecimal.ZERO;
 		BigDecimal wkTxBal = iTxAmt;
+		BigDecimal wkOverAmt = BigDecimal.ZERO;
+		BigDecimal wkOverBal = BigDecimal.ZERO;
+		BigDecimal wkShortAmt = BigDecimal.ZERO;
+		BigDecimal wkShortBal = BigDecimal.ZERO;
+		BigDecimal wkTempAmt = BigDecimal.ZERO;
+		BigDecimal wkTempBal = BigDecimal.ZERO;
+		BigDecimal wkFeeAmt = BigDecimal.ZERO;
+		BigDecimal wkFeeBal = BigDecimal.ZERO;
 
 		// 計算短溢收金額 ，溢(C)短(D)繳
 		for (BaTxVo ba : this.baTxList) {
+			this.info("settleAcAmt= " + ba.toString());
 			// 計算短溢收金額 ，溢(C)短(D)繳
 			if (ba.getDataKind() == 4) {
-				this.info("DataKind=" + ba.toString());
 				if ("C".equals(ba.getDbCr())) {
 					wkOverAmt = wkOverAmt.add(ba.getUnPaidAmt());
+					wkOverBal = wkOverAmt;
 				} else {
 					wkShortAmt = wkShortAmt.add(ba.getUnPaidAmt());
+					wkShortBal = wkShortAmt;
 				}
 			}
 			// 計算暫收抵繳
@@ -1794,7 +1825,7 @@ public class BaTxCom extends TradeBuffer {
 				BigDecimal shortfallInt = ba.getInterest();
 				// 放相同額度撥款的本利資料筆
 				for (BaTxVo da : this.baTxList) {
-					if (ba.getDataKind() == 1 && da.getFacmNo() == ba.getFacmNo() && da.getBormNo() == ba.getFacmNo()) {
+					if (ba.getDataKind() == 2 && da.getFacmNo() == ba.getFacmNo() && da.getBormNo() == ba.getFacmNo()) {
 						da.setShortfallPrin(shortfallPrin);
 						da.setShortfallInt(shortfallInt);
 						shortfallPrin = BigDecimal.ZERO;
@@ -1814,28 +1845,31 @@ public class BaTxCom extends TradeBuffer {
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 				// 交易金額放第一筆
-				ba.setTxAmt(wkTxAmt);
-				wkTxAmt = BigDecimal.ZERO;
+				ba.setTxAmt(wkTxBal);
+				wkTxBal = BigDecimal.ZERO;
 				// 本金、利息包含本次短繳，作帳金額扣除
 				ba.setAcAmt(ba.getAcctAmt().add(wkFeeAmt).add(ba.getShortfallPrin()).add(ba.getShortfallInt()));
 				// 本金、利息包含本次短繳，作帳金額扣除
 				ba.setAcAmt(ba.getAcAmt().subtract(ba.getUnpaidPrin()).subtract(ba.getUnpaidInt()));
 				// 費用放第一筆
-				ba.setFeeAmt(wkFeeAmt);
-				wkFeeAmt = BigDecimal.ZERO;
+				if (wkFeeBal.compareTo(BigDecimal.ZERO) > 0) {
+					ba.setFeeAmt(wkFeeBal);
+					wkFeeBal = BigDecimal.ZERO;
+				}
 				// 溢繳款放第一筆
 				if (wkOverAmt.compareTo(BigDecimal.ZERO) > 0) {
-					ba.setTempAmt(wkOverAmt);
-					wkOverAmt = BigDecimal.ZERO;
+					ba.setTempAmt(wkOverBal);
+					wkOverBal = BigDecimal.ZERO;
 				}
 				// 暫收抵繳
-				else {
+				if (wkTempAmt.compareTo(BigDecimal.ZERO) > 0) {
 					if (wkTxBal.compareTo(ba.getAcAmt()) >= 0) {
 						wkTxBal = wkTxBal.subtract(ba.getAcAmt());
 					} else {
 						BigDecimal tempAmt = wkTxBal.subtract(ba.getAcAmt()); // 暫收抵繳為負值
-						wkTxBal = BigDecimal.ZERO;
 						ba.setTempAmt(tempAmt);
+						wkTxBal = BigDecimal.ZERO;
+						wkTempBal = wkTempBal.add(tempAmt);
 					}
 				}
 				this.info("settleAcAmt 1.TxBal = " + wkTxBal + ", AcAmt = " + ba.getAcAmt() + ", TempAmt="
@@ -1847,28 +1881,25 @@ public class BaTxCom extends TradeBuffer {
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 4) {
 				// 交易金額放第一筆
-				ba.setTxAmt(wkTxAmt);
-				wkTxAmt = BigDecimal.ZERO;
-
 				// 費用放第一筆
-				ba.setAcAmt(wkFeeAmt);
-				ba.setFeeAmt(wkFeeAmt);
-				wkFeeAmt = BigDecimal.ZERO;
-
+				if (wkFeeBal.compareTo(BigDecimal.ZERO) > 0) {
+					ba.setFeeAmt(wkFeeBal);
+					wkFeeBal = BigDecimal.ZERO;
+				}
 				// 溢繳款放第一筆
 				if (wkOverAmt.compareTo(BigDecimal.ZERO) > 0) {
-					ba.setTempAmt(wkOverAmt);
-					wkOverAmt = BigDecimal.ZERO;
+					ba.setTempAmt(wkOverBal);
+					wkOverBal = BigDecimal.ZERO;
 				}
 				// 暫收抵繳
-				else {
+				if (wkTempAmt.compareTo(BigDecimal.ZERO) > 0) {
 					if (wkTxBal.compareTo(ba.getAcAmt()) >= 0) {
 						wkTxBal = wkTxBal.subtract(ba.getAcAmt());
 					} else {
-						BigDecimal tempAmt = wkTxBal.subtract(ba.getAcAmt());
-						wkTxBal = BigDecimal.ZERO;
+						BigDecimal tempAmt = wkTxBal.subtract(ba.getAcAmt()); // 暫收抵繳為負值
 						ba.setTempAmt(tempAmt);
-						wkTempAmt = wkTempAmt.subtract(tempAmt);
+						wkTxBal = BigDecimal.ZERO;
+						wkTempBal = wkTempBal.add(tempAmt);
 					}
 				}
 				this.info("settleAcAmt 2.TxBal = " + wkTxBal + ", AcAmt = " + ba.getAcAmt() + ", TempAmt="
@@ -1878,14 +1909,18 @@ public class BaTxCom extends TradeBuffer {
 
 		// 交易金額 = 作帳金額 + (暫收貸 - 暫收借)
 		BigDecimal balance = BigDecimal.ZERO;
+		BigDecimal acAmt = BigDecimal.ZERO;
+		BigDecimal tmAmt = BigDecimal.ZERO;
 		for (BaTxVo ba : this.baTxList) {
-			balance = ba.getTxAmt().subtract(ba.getAcAmt()).subtract(ba.getTempAmt());
-			wkTempAmt = wkTempAmt.add(ba.getTempAmt()); // wkTempAmt為正值、TempAmt為復職
+			acAmt = acAmt.add(ba.getAcAmt());
+			tmAmt = wkTempAmt.add(ba.getTempAmt());
 		}
-		if (balance.compareTo(BigDecimal.ZERO) == 0 && wkTempAmt.compareTo(BigDecimal.ZERO) == 0) {
-			this.info("SettleAcAmt Equal 交易金額 =  作帳金額 + (暫收貸 - 暫收借)，差額= " + balance + ", 暫收抵繳差額=" + wkTempAmt);
+		balance = iTxAmt.subtract(acAmt.add(tmAmt));
+		if (balance.compareTo(BigDecimal.ZERO) == 0) {
+			this.info("SettleAcAmt Equal 交易金額" + iTxAmt + "= 作帳金額 " + acAmt + "(暫收貸 - 暫收借)" + tmAmt);
 		} else {
-			this.info("SettleAcAmt unEqual 交易金額 =  作帳金額 + (暫收貸 - 暫收借)，差額= " + balance + ", 暫收抵繳差額=" + wkTempAmt);
+			this.info("SettleAcAmt unEqual 交易金額" + iTxAmt + "<> 作帳金額 " + acAmt + "(暫收貸 - 暫收借)" + tmAmt + "，差額= "
+					+ balance + ", 暫收抵繳差額=" + wkTempBal);
 		}
 		return this.baTxList;
 	}

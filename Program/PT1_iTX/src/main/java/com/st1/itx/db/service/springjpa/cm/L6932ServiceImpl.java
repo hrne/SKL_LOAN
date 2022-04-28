@@ -101,7 +101,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND A.\"MrKey\" = :Mrkey ";
 		}
 
-		sql += "ORDER BY A.\"LastUpdate\" ASC ";
+		sql += "ORDER BY A.\"LastUpdate\" DESC ";
 
 		sql += sqlRow;
 
