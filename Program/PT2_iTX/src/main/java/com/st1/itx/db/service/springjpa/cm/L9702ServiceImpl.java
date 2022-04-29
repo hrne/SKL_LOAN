@@ -293,18 +293,28 @@ public class L9702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ,CASE";
 		sql += "                       WHEN C.\"EntCode\" = '1' THEN '1'"; // 企金別 (自然人;法人;企金自然人)
 		sql += "                     ELSE '0' END                AS \"EntCode\"";
-		sql += "                    ,SUM(\"Interest\"";
-		sql += "                        +\"DelayInt\"";
-		sql += "                        +\"BreachAmt\"";
-		sql += "                        +\"CloseBreachAmt\")     AS \"IntRcv\""; // 當期利息收入
+		sql += "                    ,SUM( CASE ";
+		sql += "                            WHEN LBT.\"TitaHCode\" IN ('1', '3') ";
+		sql += "                            THEN 0 - \"Interest\" ";
+		sql += "                          ELSE \"Interest\" END ";
+		sql += "                        + CASE ";
+		sql += "                            WHEN LBT.\"TitaHCode\" IN ('1', '3') ";
+		sql += "                            THEN 0 - \"DelayInt\" ";
+		sql += "                          ELSE \"DelayInt\" END ";
+		sql += "                        + CASE ";
+		sql += "                            WHEN LBT.\"TitaHCode\" IN ('1', '3') ";
+		sql += "                            THEN 0 - \"BreachAmt\" ";
+		sql += "                          ELSE \"BreachAmt\" END ";
+		sql += "                        + CASE ";
+		sql += "                            WHEN LBT.\"TitaHCode\" IN ('1', '3') ";
+		sql += "                            THEN 0 - \"CloseBreachAmt\" ";
+		sql += "                          ELSE \"CloseBreachAmt\" END )     AS \"IntRcv\""; // 當期利息收入
 		sql += "              FROM \"LoanBorTx\" LBT ";
 		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = LBT.\"CustNo\" ";
 		sql += "              LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = LBT.\"CustNo\" ";
 		sql += "                                     AND F.\"FacmNo\" = LBT.\"FacmNo\" ";
 		sql += "              WHERE LBT.\"AcDate\" >= :startDate";
 		sql += "                AND LBT.\"AcDate\" <= :endDate";
-		sql += "                AND LBT.\"TitaHCode\" = '0' ";
-		sql += "                AND NVL(JSON_VALUE(\"OtherFields\", '$.CaseCloseCode'), ' ') NOT IN ('3', '4', '5', '6', '7', '8')";
 		sql += "              GROUP BY CASE WHEN F.\"DepartmentCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "                      ,CASE WHEN C.\"EntCode\" = '1' THEN '1' ELSE '0' END";
 		sql += "            ) S6 ON S6.\"EntCode\" = S1.\"EntCode\" ";

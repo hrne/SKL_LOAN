@@ -44,10 +44,11 @@ E(0,0)
 ["#R1+@會計日期",#ACCTDATE_ST,"～",#ACCTDATE_ED,"止有變動者"],
 ["#R2+@戶號",#CUSTNO],
 ["#R3+@選擇條件一",#CONDITION1,#CONDITION1X],
-["#R4+@選擇條件二",#CONDITION2,#CONDITION2X],
-["#R5+@戶別",#ID_TYPE,#ID_TYPEX],
-["#R6+@企金別",#CORP_IND,#CORP_INDX],
-["#R7+@業務科目",#APNO,#APNOX],
+["#R4+@列印期數",#Terms],
+["#R5+@選擇條件二",#CONDITION2,#CONDITION2X],
+["#R6+@戶別",#ID_TYPE,#ID_TYPEX],
+["#R7+@企金別",#CORP_IND,#CORP_INDX],
+["#R8+@業務科目",#APNO,#APNOX],
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -58,7 +59,7 @@ E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
 ! 必輸欄位
-##loop{times:7,i:1}
+##loop{times:8,i:1}
 #R{i}=X,1,L
 INVOKEJS(SHOW,#R{i},0)
 K(LIGHT,#R{i},TXTRED,0)
@@ -73,11 +74,12 @@ T(3,@R4,*)
 T(3,@R5,*)
 T(3,@R6,*)
 T(3,@R7,*)
+T(3,@R8,*)
 
 #FdMsg=X,1,L
 #Msg=x,20.100,L
 K(LIGHT,#Msg,TXTRED,0)
-INVOKEJS(SHOW,p1,8,8,0)
+INVOKEJS(SHOW,p1,9,9,0)
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -167,6 +169,9 @@ V(H,#Condition1Help)
 #CONDITION1X=X,12,L
 T(H,#CONDITION1,#Condition1Help)
 
+#Terms=A,1,I
+@V(2,0)V(5,1,6)
+
 !選擇條件二
 #CONDITION2=A,1,I
 HELP(#Condition2Help)
@@ -226,7 +231,7 @@ T(2,@Msg,#L1R20Msg)
 
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
-INVOKEJS(SHOW,p1,8,8,#ShowMsg)
+INVOKEJS(SHOW,p1,9,9,#ShowMsg)
 
 </sub>
 
@@ -261,6 +266,7 @@ T(3,[L9705] 放款本息攤還表暨繳息通知單)
 #CUSTNO
 #CUSTNOB
 #CONDITION1
+#Terms
 #CONDITION2
 #ID_TYPE
 #CORP_IND

@@ -420,7 +420,7 @@ E(0,0)T(H,#OCurrencyCode,#CurrPrecisionHelp)
 #OTxAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OTxAmt,#OTxAmtX)
 #OTxAmtXX=X,52,L
-C(5,#ChainAmt,#OTxAmt,T(2,#OTxAmtX),T(B,#ChainAmtX+（本筆占+#OTxAmtX+）))
+C(5,#ChainAmt,#OTxAmt,T(2,#OTxAmtX),T(B,#ChainAmtX+（本筆：+#OTxAmtX+）))
 T(2,@L3200TxAmtX,#OTxAmtXX)
 T(2,@L3410TxAmtX,#OTxAmtXX)
 T(2,@L3440TxAmtX,#OTxAmtXX)
@@ -2073,8 +2073,7 @@ TXFORM=L3912
 ["[L3912]                                 交易內容查詢"],
 [#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
-["@會計日期",#OAcctDate],["@櫃員編號",#OTellerNo,#OTellerNoX],
-["@交易序號",#OTxtNo],["@還款來源",#ORepayCode,#ORepayCodeX],
+["@會計日期",#OAcctDate],["@還款來源",#ORepayCode,#ORepayCodeX],
 ["@訂正別",#OHCode,#OHCodeX],["@入帳日期",#OEntryDate],
 ["@幣別",#OCurrencyCode],["@交易金額",#OTxAmtXX],
 ["@放款餘額",#OLoanBalX],["@電匯金額",#ORemitAmtX],
@@ -2089,6 +2088,7 @@ TXFORM=L3912
 [#CloseBreachX,#OUnpaidAmt],["@匯款帳號",#ORemitAcctNo],
 ["@短收金額",#OShortFallX],["@溢收金額",#OOverflowX],
 ["@主管編號",#OSupperNo,#OSupperNoX],["@減免金額",#OReduceAmt],
+["@櫃員編號",#OTellerNo,#OTellerNoX],["@交易序號",#OTxtNo]
 ["@作業日期",#OTxDate,#OTxTimeX],["@",""],
 ["@批次號碼",#OBatchNo],["@匯款序號",#ORemitSeq],
 ["@暫收原因",#OTempReasonCode,#OTempReasonCodeX],["@扣款銀行",#ORepayBank,#ORepayBankX],
@@ -2104,8 +2104,6 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#L3100CustNo,"@-",#L3100FacmNo,"@-",#L3100BormNo,"@",#L3100CustNoX],
 [#<->#,"@交易代號",#L3100TxCode,#L3100TxCodeX],
 ["@會計日期",#L3100AcctDate],
-["@櫃員編號",#L3100TellerNo,#L3100TellerNoX],
-["@交易序號",#L3100TxtNo],
 ["@還款來源",#L3100RepayCodeX],
 ["@訂正別",#L3100HCodeX],
 ["@幣別",#L3100CurrencyCode],
@@ -2117,6 +2115,8 @@ TXFORM=L3912
 ["@匯款附言",#L3100RemitRemark],
 ["@匯款金額",#ORemitAmtX],
 ["@主管編號",#L3100SupperNo,#L3100SupperNoX],
+["@櫃員編號",#L3100TellerNo,#L3100TellerNoX],
+["@交易序號",#L3100TxtNo],
 ["@作業日期",#L3100TxDate,#L3100TxTimeX],
 ]
 
@@ -2127,7 +2127,6 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#L3100CustNo,"@-",#L3200FacmNo,"@-",#L3200BormNo,"@",#L3100CustNoX],
 [#<->#,"@交易代號",#L3200TxCode,#L3200TxCodeX],
 ["@會計日期",#L3200AcctDate],["@入帳日期",#L3200EntryDateX],
-["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#L3200TxtNo],
 ["@還款來源",#L3200RepayCodeX],["@訂正別",#L3200HCodeX],
 ["@幣別",#L3200CurrencyCode],["@交易金額",#L3200TxAmtX],
 ["@回收金額",#L3200RepayAmtX],["@暫收抵繳",#L3200TempRepayX],
@@ -2142,6 +2141,7 @@ TXFORM=L3912
 ["@溢收金額",#OOverflowX],["@部分償還金額",#L3200ExtraRepayX],
 ["@短收金額",#OShortFallX],["@部分償還欠繳利息",#L3200ExtraUnpaidIntX],
 ["@新攤還金額",#L3200NewDueAmtX],["@主管編號",#L3200SupperNo,#L3200SupperNoX],
+["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#L3200TxtNo],
 ["@",""],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
 
@@ -2152,7 +2152,6 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#L3712CustNo,"@-",#L3712FacmNo,"@-",#L3712BormNo,"@",#L3712CustNoX],
 [#<->#,"@交易代號",#L3712TxCode,#L3712TxCodeX],
 ["@會計日期",#L3712AcctDate],["@入帳日期",#L3712EntryDateX],
-["@櫃員編號",#L3712TellerNo,#L3712TellerNoX],["@交易序號",#L3712TxtNo],
 ["@還款來源",#L3712RepayCodeX],["@訂正別",#L3712HCodeX],
 ["@幣別",#L3712CurrencyCode],["@交易金額",#L3712TxAmtX],
 ["@回收金額",#L3712RepayAmtX],["@暫收款",#L3712TempAmtX],
@@ -2163,6 +2162,7 @@ TXFORM=L3912
 [#<->#,"@延遲息",#L3712DelayIntX],
 [#<->#,"@違約金",#L3712BreachAmtX],
 [#<->#,"@減免金額",#L3712ReduceAmtX],
+["@櫃員編號",#L3712TellerNo,#L3712TellerNoX],["@交易序號",#L3712TxtNo],
 ["@累溢短收",#L3712OverflowX],["@作業日期",#L3712TxDate,#L3712TxTimeX],
 ]
 
@@ -2173,13 +2173,13 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#L3721CustNo,"@-",#L3721FacmNo,"@-",#L3721BormNo,"@",#L3721CustNoX],
 [#<->#,"@交易代號",#L3721TxCode,#L3721TxCodeX],
 ["@會計日期",#L3721AcctDate],["@入帳日期",#L3721EntryDateX],
-["@櫃員編號",#L3721TellerNo,#L3721TellerNoX],["@交易序號",#L3721TxtNo],
 ["@還款來源",#L3721RepayCodeX],["@訂正別",#L3721HCodeX],
 ["@利率區分",#L3721RateCodeX],["@生效日",#L3721EffectDate],
 ["@商品名稱",#L3721ProdName],["@指標利率代碼",#L3721BaseRateCodeX],
 ["@商品利率",#L3721ProdRateX],["@指標利率",#L3721BaseRateX],
 ["@適用利率",#L3721FitRateX],["@加減碼是否依合約",#L3721IncrFlagX],
 ["@加碼利率",#L3721RateIncrX],["@個別加碼利率",#L3721IndividualIncrX],
+["@櫃員編號",#L3721TellerNo,#L3721TellerNoX],["@交易序號",#L3721TxtNo],
 ["@備註",#L3721Remark],["@作業日期",#L3721TxDate,#L3721TxTimeX],
 ]
 
@@ -2191,7 +2191,6 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#L3410CustNo,"@-",#L3410FacmNo,"@-",#OBormNo,"@",#L3410CustNoX],
 [#<->#,"@交易代號",#L3410TxCode,#L3410TxCodeX],
 ["@會計日期",#L3410AcctDate],["@入帳日期",#L3410EntryDateX],
-["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
 ["@還款來源",#L3410RepayCodeX],["@訂正別",#L3410HCodeX],
 ["@幣別",#L3410CurrencyCode],["@交易金額",#L3410TxAmtX],
 ["@回收金額",#L3410RepayAmtX],["@暫收抵繳",#L3410TempRepayX],
@@ -2204,6 +2203,7 @@ TXFORM=L3912
 ["@延遲息",#L3410DelayIntX],["@法務費",#L3420LawFeeX],
 ["@違約金",#L3410BreachAmtX],["@清償違約金",#L3200CloseBreachAmtX],
 ["@累溢短收",#L3410OverflowX],["@主管編號",#L3410SupperNo,#L3410SupperNoX],
+["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
 ["@作業日期",#L3410TxDate,#L3410TxTimeX],
 ]
 </sub>
@@ -2214,13 +2214,13 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#L3410CustNo,"@-",#L3410FacmNo,"@-",#OBormNo,"@",#L3410CustNoX],
 [#<->#,"@交易代號",#L3410TxCode,#L3410TxCodeX],
 ["@會計日期",#L3410AcctDate],["@入帳日期",#L3410EntryDateX],
-["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
 ["@還款來源",#L3410RepayCodeX],["@訂正別",#L3410HCodeX],
 [#<->#,"幣別",#L3410CurrencyCode],
 [#<->#,"火險費用轉銷呆帳",#L3420FireFeeX],
 [#<->#,"法務費用轉銷呆帳",#L3420LawFeeX],
 [#<->#,"催收餘額轉銷呆帳",#L3420TrfOvDuAmt],
 [#<->#,"轉銷呆帳金額",#L3420TrfBadAmt],
+["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
 ["@主管編號",#L3410SupperNo,#L3410SupperNoX],["@作業日期",#L3410TxDate,#L3410TxTimeX],
 ]
 </sub>
@@ -2231,7 +2231,6 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#L3440CustNo,"@-",#L3440FacmNo,"@-",#L3440BormNo,"@",#L3440CustNoX],
 [#<->#,"@交易代號",#L3440TxCode,#L3440TxCodeX],
 ["@會計日期",#L3440AcctDate],["@入帳日期",#L3440EntryDateX],
-["@櫃員編號",#L3440TellerNo,#L3440TellerNoX],["@交易序號",#L3440TxtNo],
 ["@還款來源",#L3440RepayCodeX],["@訂正別",#L3440HCodeX],
 ["@幣別",#L3440CurrencyCode],["@交易金額",#L3440TxAmtX],
 ["@回收金額",#L3440RepayAmtX],["@暫收款",#L3440TempAmtX],
@@ -2242,7 +2241,8 @@ TXFORM=L3912
 ["@利息",#L3440InterextX],["@催收減免金額",#L3440OvduReduceAmtX],
 [#<->#,"@延遲息",#L3440DelayIntX],
 ["@違約金",#L3440BreachAmtX],["@免印花稅金額",#OStampFreeAmtX],
-["@減免金額",#L3440ReduceAmtX],["@主管編號",#L3440SupperNo,#L3440SupperNoX],                
+["@減免金額",#L3440ReduceAmtX],["@主管編號",#L3440SupperNo,#L3440SupperNoX],  
+["@櫃員編號",#L3440TellerNo,#L3440TellerNoX],["@交易序號",#L3440TxtNo],              
 ["@累溢短收",#L3440OverflowX],["@作業日期",#L3440TxDate,#L3440TxTimeX],
 ]
 </sub>

@@ -113,31 +113,30 @@ C(3,#CHAIN,0,$,s)
 HELP(#SearchFlagHelp)
 @V(H,#SearchFlagHelp)
 IF(#SearchFlag == 1 ,INVOKEJS(SHOW,L4961_3,0)INVOKEJS(SHOW,L4961_2,1),$)
-IF(#SearchFlag == 2 ,INVOKEJS(SHOW,L4961_2,0)INVOKEJS(SHOW,L4961_3,1),$)
+IF(#SearchFlag == 2 ,INVOKEJS(SHOW,L4961_2,1)INVOKEJS(SHOW,L4961_3,1),$)
 IF(#SearchFlag == 3 ,INVOKEJS(SHOW,L4961_2,0)INVOKEJS(SHOW,L4961_3,0),$)
 C(3,#SearchFlag,3,E(0,@InsuYearMonth,0)E(0,@InsuYearMonthEnd,0)E(0,@ReportYearMonth,0),T(1,@InsuYearMonth,#FORE_MONTH,2,5)T(1,@InsuYearMonthEnd,#FORE_MONTH,2,5)T(1,@ReportYearMonth,#FORE_MONTH,2,5))
 
 #SearchFlagX=X,16,L
 T(3,)T(H,#SearchFlag,#SearchFlagHelp)
 
-! 報表年月
-#ReportYearMonth=A,5,I
-C(3,#CHAIN,0,$,s)
-C(3,#SearchFlag,2,$,s)
-@A(YM,1,#ReportYearMonth)
-
-
 ! 火險到期年月
 #InsuYearMonth=A,5,I
 C(3,#CHAIN,0,$,s)
-C(3,#SearchFlag,1,$,s)
+C(3,#SearchFlag,3,S,$)
 @A(YM,1,#InsuYearMonth)
 
 #InsuYearMonthEnd=A,5,I
 C(3,#CHAIN,0,$,s)
-C(3,#SearchFlag,1,$,s)
+C(3,#SearchFlag,3,S,$)
 E(0,#InsuYearMonth)
 @A(YM,1,#InsuYearMonthEnd)V(5,#InsuYearMonth,99912)
+
+! 報表年月
+#ReportYearMonth=A,5,I
+C(3,#CHAIN,0,$,s)
+C(3,#SearchFlag,2,$,S)
+@A(YM,1,#ReportYearMonth)
 
 ! 繳款方式
 #RepayCode=A,2,I

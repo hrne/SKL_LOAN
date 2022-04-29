@@ -388,8 +388,11 @@ public class L4601Batch extends TradeBuffer {
 				"" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 
 		if (slInsuRenewMediaTemp != null) {
+			
+			List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>(); 
+			lInsuRenewMediaTemp = slInsuRenewMediaTemp.getContent();
 			try {
-				insuRenewMediaTempService.deleteAll(slInsuRenewMediaTemp.getContent(), titaVo);
+				insuRenewMediaTempService.deleteAll(lInsuRenewMediaTemp, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0008", "InsuRenew insert error : " + e.getErrorMsg());
 			}

@@ -91,6 +91,16 @@ public class L9702Report extends MakeReport {
 
 	}
 
+	@Override
+	public void printContinueNext() {
+		this.print(1, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
+	}
+
+	@Override
+	public void printRptFooter() {
+		this.print(1, this.getMidXAxis(), "=====　報　表　結　束　=====", "C");
+	}
+
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		// 範圍起日

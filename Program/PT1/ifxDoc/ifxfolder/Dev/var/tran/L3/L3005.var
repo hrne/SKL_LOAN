@@ -418,9 +418,13 @@ IF(#OOEntryDate==0,S,$)
 #OOAcDate=D,7,S
 IF(#OOAcDate==0,S,$)
 
+#OOHasRemark=X,1,S
+
 #OOFacmNo=A,3,S
 
 #OOBormNo=A,3,S
+
+#OOBorxNo=A,4,S
 
 #OOFacmNoX=X,7,L
 C(3,#OOBormNo,0,T(2,#OOFacmNo),T(2,#OOFacmNo+-+#OOBormNo))
@@ -460,6 +464,7 @@ P(R,#OOTxAmtX)
 #OOTempAmtX=X,22,O
 CALL2(#ADJUSTDOT,#OOPrecision,#OOTempAmt,#OOTempAmtX)
 P(R,#OOTempAmtX)
+#OOTotTxAmt=+m,14.2,S
 
 #OOShortfall=+m,14.2,S
 
@@ -490,8 +495,8 @@ T(H,#OOTitaHCode,#TitaHCodeHelp)
 !分錄Fg
 #OOAcFg=X,1,S
 
-!查詢Fg
-#OOFeeFg=X,1,S
+!feemsg
+#OOFeeMsg=X,120,S
 
 !計息明細Fg
 #OOLoanIntDetailFg=X,1,S
@@ -503,7 +508,7 @@ T(H,#OOTitaHCode,#TitaHCodeHelp)
 
 !查詢
 #OOBUF1=X,61,S
-IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#5sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo+#OOTxAmt))
+IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#5sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo+#OOTotTxAmt))
 
 #OOchain=X,5,S
 IF(#OOTxCd=="L3701",T(3,L6932),T(3,L3912))
@@ -513,6 +518,12 @@ IF(#OOAcFg=="",T(3,內容),T(3,內容查詢))
 
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
+
+#OOBTNRMKNTXBUF=X,17,S
+T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
+
+#OOBTNRMK=X,1,S
+C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=備忘錄查詢;ntxbuf=#OOBTNRMKNTXBUF}),BIND(grid,cancel))
 
 !備忘錄
 #OOBUF2=X,7,S
@@ -552,9 +563,34 @@ C(5,#OOLoanIntDetailFg,"Y",$,BIND(grid,cancel))
 <sub type="TOM">
 
 TXFORM=L3005
-#OCustNo#OCustRmkFlag#OExcessive#OShortfall#OCurrencyCode
-#OOEntryDate#OOAcDate#OOFacmNo#OOBormNo#OORelNo#OOTellerNo#OOTxtNo#OODesc#OOCurrencyCode#OOTxAmt
-#OOShortfall#OOLoanBal#OORate#OOTitaHCode#OOAcFg#OOFeeFg#OOLoanIntDetailFg#OOTxCd#OOTempAmt
+#OCustNo
+#OCustRmkFlag
+#OExcessive
+#OShortfall
+#OCurrencyCode
+#OOEntryDate
+#OOAcDate
+#OOFacmNo
+#OOBormNo
+#OOBorxNo
+#OOHasRemark
+#OORelNo
+#OOTellerNo
+#OOTxtNo
+#OODesc
+#OOCurrencyCode
+#OOTxAmt
+#OOShortfall
+#OOLoanBal
+#OORate
+#OOTitaHCode
+#OOAcFg
+#OOFeeMsg
+#OOLoanIntDetailFg
+#OOTxCd
+#OOTempAmt
+#OONote
+#OOTotTxAmt
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -584,6 +620,9 @@ TXFORM=L3005
 
 ! #OOBTN2=
 ! {width:60,search:false,formatter:'cust:bind-button:備忘錄;L2072 顧客控管警訊明細資料查詢',align:'center',canExport:false}
+
+#OOBTNRMK=備忘錄查詢
+{width:90,search:false,formatter:'cust:bind-button:備忘錄查詢;L3072 帳務備忘錄明細資料查詢',align:'center',canExport:false}
 
 #OOEntryDate=入帳日期
 {width:80,align:'center'}
@@ -624,8 +663,8 @@ TXFORM=L3005
 #OOBTN3=分錄
 {width:40,search:true,formatter:'cust:bind-button:分錄;L6901 分錄',align:'center',canExport:false,}
 
-#OOFeeFg=費用
-{width:45,align:'center'}
+#OOFeeMsg=費用
+{width:150}
 
 #OOAcDtRelNo=交易序號
 {width:200,align:'center'}
@@ -638,6 +677,6 @@ TXFORM=L3005
 #OCustNo#OFacmNo#OBormNo#OCustNoX#OAcDate#OExcessiveX#OShortfallX
 %
 #OOEntryDate#OOAcDate#OOFacmNoX#OODesc#OOCurrencyCode#OOTxAmtX#OOTempAmtX#OOShortfallX#OOLoanBalX
-#OORateX#OOTitaHCodeX#OOFeeFg#OOAcDtRelNo
+#OORateX#OOTitaHCodeX#OOFeeMsg#OOAcDtRelNo
 @^
 </sub>

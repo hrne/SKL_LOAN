@@ -117,7 +117,7 @@ BEGIN
                          ELSE  TO_DATE(T3."AcDate",'yyyy-mm-dd')
                              - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') END "OvduDay"
                   , CASE WHEN  M."Status" IN ( 2 , 6 ) THEN 6     -- 催收戶,呆帳戶
-                         WHEN  M."Status" = 1  THEN 0             -- 展期
+                         WHEN  M."Status" IN ( 1, 5 , 9 ) THEN 0  -- 展期,催收結案,呆帳結案
                          WHEN  M."NextPayIntDate" >= T3."AcDate"  THEN 0
                          WHEN  M."NextPayIntDate" = 0 THEN 0
                          WHEN  MOD( NVL(M."PrevPayIntDate", 0) , 100) = MOD( NVL(T3."AcDate", 0) , 100)   THEN 

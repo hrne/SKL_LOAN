@@ -59,34 +59,35 @@ BEGIN
            , G."GuaRelCode"    -- 保證人與授信戶關係
            , CDG."GuaRelJcic"  -- 保證人與授信戶關係JCIC代碼
            , G."GuaTypeCode"   -- 保證類別
-           , 1 AS "DataSource" -- 資料源
+           --, 1 AS "DataSource" -- 資料源
       FROM "FacCaseAppl" FCA
       LEFT JOIN "Guarantor" G ON G."ApproveNo" = FCA."ApplNo"
       LEFT JOIN "CustMain" CM ON CM."CustUKey" = G."GuaUKey"
       LEFT JOIN "CdGuarantor" CDG ON CDG."GuaRelCode" = G."GuaRelCode"
       WHERE NVL(G."GuaRelCode",'00') != '00'
         AND G."GuaStatCode" IN ('1')  -- 設定
-      UNION ALL
+      UNION 
       -- 取得擔保品所有權人與授信戶關係檔資料
       SELECT FCA."ApplNo"          -- 授信戶案件申請號碼
            , CM."CustId"           -- 擔保品所有權人統編
            , COR."OwnerRelCode"    -- 擔保品所有權人與授信戶關係
            , CDG."GuaRelJcic"      -- 擔保品所有權人與授信戶關係JCIC代碼
            , '05' AS "GuaTypeCode" -- 保證類別
-           , 2 AS "DataSource"     -- 資料源
+           --, 2 AS "DataSource"     -- 資料源
       FROM "FacCaseAppl" FCA
       LEFT JOIN "ClOwnerRelation" COR ON COR."CreditSysNo" = FCA."CreditSysNo"
       LEFT JOIN "CustMain" CM ON CM."CustUKey" = COR."OwnerCustUKey"
       LEFT JOIN "CdGuarantor" CDG ON CDG."GuaRelCode" = COR."OwnerRelCode"
       WHERE NVL(COR."OwnerRelCode",'00') != '00'
-      UNION ALL
+       AND NVL(CM."CustId",' ') != ' '
+      UNION 
       -- 取得共同借款人闗係檔資料
       SELECT FCA."ApplNo"          -- 授信戶案件申請號碼
            , CM."CustId"           -- 共同借款人統編
            , FSR."RelCode"         -- 共同借款人與授信戶關係
            , CDG."GuaRelJcic"      -- 共同借款人與授信戶關係JCIC代碼
            , '06' AS "GuaTypeCode" -- 保證類別
-           , 3 AS "DataSource"     -- 資料源
+           --, 3 AS "DataSource"     -- 資料源
       FROM "FacCaseAppl" FCA
       LEFT JOIN "FacShareRelation" FSR ON FSR."ApplNo" = FCA."ApplNo"
       LEFT JOIN "FacCaseAppl" FCA2 ON FCA2."ApplNo" = FSR."RelApplNo"
@@ -100,7 +101,7 @@ BEGIN
            , "GuaRelCode"
            , "GuaRelJcic"
            , "GuaTypeCode"
-           , "DataSource"
+           --, "DataSource"
            , DENSE_RANK()
              OVER (
                PARTITION BY "ApplNo"
@@ -110,8 +111,8 @@ BEGIN
              OVER (
                PARTITION BY "ApplNo"
                           , "CustId"
-               ORDER BY "DataSource"
-                      , "GuaRelCode"
+               ORDER BY --"DataSource"
+                       "GuaRelCode"
              ) AS "DetailSeq"
       FROM RawData
     )
@@ -120,7 +121,8 @@ BEGIN
          , G."CustId"                          AS "CustId"        -- 保證人身份統一編號
          , G."Seq"                             AS "ROW_NUM"       -- 序號（同一核准號碼編列流水號）
          , S."ApplNoCount"                     AS "ApplNoCount"   -- 筆數（同一核准號碼）
-         , G."DataSource"                      AS "Source"        -- 資料來源(1=保證人檔 2=擔保品提供人與授信戶關係檔 3=共同借款人關係檔)
+         --, G."DataSource"                      AS "Source"        -- 資料來源(1=保證人檔 2=擔保品提供人與授信戶關係檔 3=共同借款人關係檔)
+         , 0                                   AS "Source"        -- 資料來源(1=保證人檔 2=擔保品提供人與授信戶關係檔 3=共同借款人關係檔)
          , G."GuaRelCode"                      AS "GuaRelCode"    -- 保證人關係代碼
          , G."GuaRelJcic"                      AS "GuaRelJcic"    -- 保證人關係ＪＣＩＣ代碼
          , G."GuaTypeCode"                     AS "GuaTypeCode"   -- 保證類別代碼
@@ -631,7 +633,9 @@ BEGIN
              END                                   AS "DelayBal"          -- 逾期未還餘額（台幣千元）  (後面再更新)
            , 0                                     AS "DelayBalFx"        -- 逾期未還餘額（外幣）
            , '9'                                   AS "DelayPeriodCode"   -- 逾期期限  (先視為未逾期，後面再判斷更新)
-           , '0'                                   AS "RepayCode"         -- 本月還款紀錄  (後面再更新)
+           , CASE WHEN M."BormNo" = 0 THEN 'X' -- 循環動用 且 未至循環動用期限 且 放款餘額為0 且 尚有可動用額度餘額
+                  ELSE '0'  
+             END                                   AS "RepayCode"         -- 本月還款紀錄  (後面再更新)
 --         , ROUND((NVL(M."PrevAmt",0) + NVL(M."IntAmt",0)) / 1000, 3)
 --                                                 AS "PayAmt"            -- 本月（累計）應繳金額
            , CASE WHEN M."Status" IN (3, 5, 9) THEN 0   -- 結案:0

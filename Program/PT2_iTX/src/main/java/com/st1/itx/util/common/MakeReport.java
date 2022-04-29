@@ -175,7 +175,7 @@ public class MakeReport extends CommBuffer {
 
 	// 批號(控制分別出表,但記錄在同一TxFile)
 	private String batchNo = "";
-	
+
 	// 目前的字距
 	private int currentCharSpaces = 1;
 
@@ -194,7 +194,8 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize, String pageOrientation) throws LogicException {
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize,
+			String pageOrientation) throws LogicException {
 
 		formMode = true;
 
@@ -243,7 +244,8 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String PageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String PageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -281,7 +283,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
+			throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -313,7 +316,8 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -572,6 +576,10 @@ public class MakeReport extends CommBuffer {
 	 * 預設續下頁
 	 */
 	public void printContinueNext() {
+
+	}
+
+	public void printRptFooter() {
 
 	}
 
@@ -916,7 +924,7 @@ public class MakeReport extends CommBuffer {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 6);
 		map.put("x", charSpaces);
-		
+
 		currentCharSpaces = charSpaces;
 
 		listMap.add(map);
@@ -1004,10 +1012,12 @@ public class MakeReport extends CommBuffer {
 		List<HashMap<String, Object>> orgMap = new ArrayList<HashMap<String, Object>>();
 
 		try {
-			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), new TypeReference<List<Map<String, Object>>>() {
-			});
+			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(),
+					new TypeReference<List<Map<String, Object>>>() {
+					});
 		} catch (IOException e) {
-			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
+			throw new LogicException("EC009",
+					"(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
 		}
 
 		orgMap.addAll(listMap);
@@ -1036,6 +1046,8 @@ public class MakeReport extends CommBuffer {
 
 		tmpTitaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
+		this.printRptFooter();
+
 		// 檢查是否需核核
 		CdReport tCdReport = cdReportService.findById(this.rptCode, tmpTitaVo);
 		if (tCdReport == null) {
@@ -1045,7 +1057,7 @@ public class MakeReport extends CommBuffer {
 
 			// 2021-1-5 增加判斷 SignCode == 1 才印
 			if (tCdReport.getSignCode() == 1 && !useDefault) {
-				
+
 				if ("P".equals(pageOrientation)) {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
 					this.print(1, this.getMidXAxis(), signOff1, "C");
@@ -2176,7 +2188,8 @@ public class MakeReport extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString
+						+ "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -2195,7 +2208,8 @@ public class MakeReport extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble
+					+ "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -2558,21 +2572,21 @@ public class MakeReport extends CommBuffer {
 	public void setBatchNo(String batchNo) {
 		this.batchNo = batchNo;
 	}
-	
+
 	/**
-	 * 回傳目前紙張設定 X 軸正中央的座標
-	 * 由 doToPdf 的 print 邏輯反推出來的
+	 * 回傳目前紙張設定 X 軸正中央的座標 由 doToPdf 的 print 邏輯反推出來的
+	 * 
 	 * @return col for print
 	 */
 	public int getMidXAxis() {
 		this.info("getMidXAxis fontSize = " + this.fontSize);
 		this.info("getMidXAxis charSpaces = " + this.currentCharSpaces);
 		int fontWidth = this.fontSize / 2 + this.currentCharSpaces; // 實際產檔時這邊存成 int, 因此這裡也用 int 以便完全模擬回去
-		float paperWidthPt =  ("P".equals(this.pageOrientation) ? 8.3f : 11.7f) * 72f;
+		float paperWidthPt = ("P".equals(this.pageOrientation) ? 8.3f : 11.7f) * 72f;
 		float paperWidthPtHalf = paperWidthPt / 2f;
 		int frameX = 5; // hard coded because it's hard coded in doToPdf()
-		
-		return (int)((paperWidthPtHalf - frameX) / fontWidth + 1);
+
+		return (int) ((paperWidthPtHalf - frameX) / fontWidth + 1);
 	}
- 
+
 }

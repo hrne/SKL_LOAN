@@ -82,7 +82,7 @@ BEGIN
          , Tx."FacmNo"         AS "FacmNo"
          , Tx."BormNo"         AS "BormNo"
          , 'P'                 AS "SubTranCode"       -- 交易別  -- P:每筆撥款清償後額度未解約(第10欄清償金額需大於0)
-         , SUM(Tx."Principal" + Tx."Interest" ) AS "Amt"
+         , SUM(Tx."Principal" + Tx."Interest" + Tx."DelayInt" + Tx."BreachAmt" + Tx."CloseBreachAmt") AS "Amt"
     FROM closedData C
     LEFT JOIN "LoanBorTx" Tx ON Tx."AcDate" = c."AcDate"
                             AND Tx."CustNo" = c."CustNo"

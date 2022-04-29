@@ -7,10 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.ClBuilding;
-import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
-import com.st1.itx.db.service.ClBuildingService;
+import com.st1.itx.db.service.ClNoMapService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.InsuRenewMediaTempService;
@@ -37,8 +35,11 @@ public class L4601Report extends MakeReport {
 	@Autowired
 	public InsuRenewMediaTempService insuRenewMediaTempService;
 
+//	@Autowired
+//	public ClBuildingService clBuildingService;
+
 	@Autowired
-	public ClBuildingService clBuildingService;
+	public ClNoMapService clNoMapService;
 
 	@Autowired
 	Parse parse;
@@ -109,8 +110,7 @@ public class L4601Report extends MakeReport {
 				if (!tempcustno.equals(t.getCustNo()) || !tempfacmno.equals(t.getFacmNo())) {
 					this.print(1, 0,
 							"------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 0, "");
-					rowcount = rowcount + 2;
+					rowcount = rowcount + 1;
 				}
 				this.print(1, 2, t.getCustNo());
 				this.print(0, 14, t.getFacmNo());
@@ -122,17 +122,30 @@ public class L4601Report extends MakeReport {
 				this.print(0, 115, showBcDate(t.getInsuStartDate(), 0));
 				this.print(0, 127, showBcDate(t.getInsuEndDate(), 0));
 
-				ClBuilding tClBuilding = clBuildingService
-						.findById(
-								new ClBuildingId(parse.stringToInteger(t.getClCode1()),
-										parse.stringToInteger(t.getClCode2()), parse.stringToInteger(t.getClNo())),
-								titaVo);
+				this.print(1, 21, t.getAddress());
 
-				if (tClBuilding != null) {
-					this.print(1, 21, tClBuilding.getBdLocation().trim());
-				} else {
-					this.print(1, 21, "");
-				}
+//				ClBuilding tClBuilding = clBuildingService
+//						.findById(
+//								new ClBuildingId(parse.stringToInteger(t.getClCode1()),
+//										parse.stringToInteger(t.getClCode2()), parse.stringToInteger(t.getClNo())),
+//								titaVo);
+//
+//				if (tClBuilding != null) {
+//					this.print(0, 21, tClBuilding.getBdLocation().trim());
+//				} else { // 抓新舊擔保品對照表資料
+//					Slice<ClNoMap> slClNoMap = clNoMapService.findGdrNum(parse.stringToInteger(t.getClCode1()),
+//							parse.stringToInteger(t.getClCode2()), parse.stringToInteger(t.getClNo()), 0,
+//							Integer.MAX_VALUE, titaVo);
+//
+//					if (slClNoMap.getContent() != null) { // 抓第一筆
+//						ClBuilding tClBuilding1 = clBuildingService.findById(new ClBuildingId(
+//								slClNoMap.getContent().get(0).getClCode1(), slClNoMap.getContent().get(0).getClCode2(),
+//								slClNoMap.getContent().get(0).getClNo()), titaVo);
+//						if (tClBuilding1 != null) {
+//							this.print(0, 21, tClBuilding1.getBdLocation().trim());
+//						}
+//					}
+//				}
 				rowcount = rowcount + 2;
 				tempcustno = t.getCustNo();
 				tempfacmno = t.getFacmNo();

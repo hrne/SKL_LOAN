@@ -120,7 +120,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "      + TX2.\"AcctFee\"";
 		sql += "      + TX2.\"ModifyFee\"";
 		sql += "      + TX2.\"FireFee\"";
-		sql += "      + TX2.\"LawFee\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
+		sql += "      + TX2.\"LawFee\" ";
+		sql += "      + TX2.\"TempAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H+暫收款)
 		sql += "    , LPAD(BATX.\"CustNo\",7,' ')";
 		sql += "      || '-'";
 		sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
