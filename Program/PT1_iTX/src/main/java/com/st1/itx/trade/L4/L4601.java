@@ -3,16 +3,16 @@ package com.st1.itx.trade.L4;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.ClBuilding;
-import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.InsuRenewMediaTempService;
@@ -49,7 +49,7 @@ public class L4601 extends TradeBuffer {
 	public TotaVo totaC;
 
 	private int errorACnt = 0;
-	private int errorBCnt = 0;
+//	private int errorBCnt = 0;
 	private int errorCCnt = 0;
 
 	private int iInsuEndMonth = 0;
@@ -61,7 +61,7 @@ public class L4601 extends TradeBuffer {
 
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 		String reportA = titaVo.getParam("ReportA");
-		String reportB = titaVo.getParam("ReportB");
+//		String reportB = titaVo.getParam("ReportB");
 		String reportC = titaVo.getParam("ReportC");
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 //		this.index = titaVo.getReturnIndex();
@@ -75,7 +75,7 @@ public class L4601 extends TradeBuffer {
 		// 執行報表
 		else {
 			totaA.putParam("MSGID", "L461A");
-			totaB.putParam("MSGID", "L461B");
+//			totaB.putParam("MSGID", "L461B");
 			totaC.putParam("MSGID", "L461C");
 			Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService
 					.fireInsuMonthRg(iInsuEndMonth + "", iInsuEndMonth + "", 0, Integer.MAX_VALUE, titaVo);
@@ -88,13 +88,13 @@ public class L4601 extends TradeBuffer {
 							totaA = errorReportA(t, parse.stringToInteger(checkA), titaVo);
 						}
 					}
-					if (!"".equals(reportB) && !"".equals(t.getCheckResultB())) {
-						String[] checkResultB = t.getCheckResultB().split(",");
-						List<String> strListB = Arrays.asList(checkResultB);
-						for (String checkB : strListB) {
-							totaB = errorReportB(t, parse.stringToInteger(checkB), titaVo);
-						}
-					}
+//					if (!"".equals(reportB) && !"".equals(t.getCheckResultB())) {
+//						String[] checkResultB = t.getCheckResultB().split(",");
+//						List<String> strListB = Arrays.asList(checkResultB);
+//						for (String checkB : strListB) {
+//							totaB = errorReportB(t, parse.stringToInteger(checkB), titaVo);
+//						}
+//					}
 					if (!"".equals(reportC) && !"".equals(t.getCheckResultC())) {
 						String[] checkResultC = t.getCheckResultC().split(",");
 						List<String> strListC = Arrays.asList(checkResultC);
@@ -109,15 +109,17 @@ public class L4601 extends TradeBuffer {
 			totaA.putParam("ErrorACnt", errorACnt);
 			this.addList(totaA);
 
-			this.info("ErrorBCnt  = " + errorBCnt);
-			totaB.putParam("ErrorBCnt", errorBCnt);
-			this.addList(totaB);
+//			this.info("ErrorBCnt  = " + errorBCnt);
+//			totaB.putParam("ErrorBCnt", errorBCnt);
+//			this.addList(totaB);
 
 			this.info("errorCCnt  = ");
 			totaC.putParam("ErrorCCnt", errorCCnt);
 			this.addList(totaC);
 		}
-
+		// 產重複投保報表
+		MySpring.newTask("L4601Batch", this.txBuffer, titaVo);
+		
 		this.info("totavoList L4601  = " + this.sendList());
 
 		return this.sendList();
@@ -153,35 +155,6 @@ public class L4601 extends TradeBuffer {
 		return totaA;
 	}
 
-	private TotaVo errorReportB(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
-		this.info("ReportB Start, errorCode :" + +errorCode);
-//		戶號 額度 借款人 押品號碼 新保險單起日 新保險單迄日 原有保險單號 保險起日 保險迄日
-		OccursList occursListReport = new OccursList();
-
-		occursListReport.putParam("ReportBCustNo", t.getCustNo());
-		occursListReport.putParam("ReportBFacmNo", t.getFacmNo());
-		occursListReport.putParam("ReportBCustName", t.getLoanCustName());
-		occursListReport.putParam("ReportBClCode1", t.getClCode1());
-		occursListReport.putParam("ReportBClCode2", t.getClCode2());
-		occursListReport.putParam("ReportBClNo", t.getClNo());
-		occursListReport.putParam("ReportBNewInsuStartDate", t.getNewInsuStartDate());
-		occursListReport.putParam("ReportBNewInsuEndDate", t.getNewInsuEndDate());
-		occursListReport.putParam("ReportBPrevInsuNo", t.getInsuNo());
-		occursListReport.putParam("ReportBInsuStartDate", t.getInsuStartDate());
-		occursListReport.putParam("ReportBInsuEndDate", t.getInsuEndDate());
-		ClBuilding tClBuilding = clBuildingService.findById(new ClBuildingId(parse.stringToInteger(t.getClCode1()),
-				parse.stringToInteger(t.getClCode2()), parse.stringToInteger(t.getClNo())), titaVo);
-
-		if (tClBuilding != null) {
-			occursListReport.putParam("ReportBAddress", tClBuilding.getBdLocation().trim());
-		} else {
-			occursListReport.putParam("ReportBAddress", "");
-		}
-		totaB.addOccursList(occursListReport);
-
-		errorBCnt = errorBCnt + 1;
-		return totaB;
-	}
 
 	private TotaVo errorReportC(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
 		this.info("ReportC Start, errorCode :" + +errorCode);

@@ -96,6 +96,9 @@ public class L4601Batch extends TradeBuffer {
 	@Autowired
 	public WebClient webClient;
 
+	@Autowired
+	public L4601Report l4601Report;
+
 	private String checkMsg = "";
 	private int errorACnt = 0;
 	private int errorBCnt = 0;
@@ -118,111 +121,129 @@ public class L4601Batch extends TradeBuffer {
 
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
+		if (titaVo.getParam("FunCd").equals("1")) {
+
 //			吃檔
 //			String filePath1 = "D:\\temp\\test\\火險\\Test\\Return\\1)R-10904LNM01P.txt";
-		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-				+ File.separatorChar + titaVo.getParam("FILENA").trim();
+			String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+					+ File.separatorChar + titaVo.getParam("FILENA").trim();
 
-		ArrayList<String> dataLineList = new ArrayList<>();
+			ArrayList<String> dataLineList = new ArrayList<>();
 
 //		if (titaVo.getParam("FILENA").trim().indexOf("LNM01P") < 0) {
 //			throw new LogicException("E0014", "檔案錯誤，檔名 : " + titaVo.getParam("FILENA").trim());
 //		}
 
 //			 編碼參數，設定為UTF-8 || big5
-		try {
-			dataLineList = fileCom.intputTxt(filePath1, "big5");
-		} catch (IOException e) {
-			throw new LogicException("E0014", "L4601(" + filePath1 + ") : " + e.getMessage());
-		}
+			try {
+				dataLineList = fileCom.intputTxt(filePath1, "big5");
+			} catch (IOException e) {
+				throw new LogicException("E0014", "L4601(" + filePath1 + ") : " + e.getMessage());
+			}
 
 //			 使用資料容器內定義的方法切資料
-		insuRenewFileVo.setValueFromFile(dataLineList);
+			insuRenewFileVo.setValueFromFile(dataLineList);
 
-		ArrayList<OccursList> uploadFile = insuRenewFileVo.getOccursList();
+			ArrayList<OccursList> uploadFile = insuRenewFileVo.getOccursList();
 
-		if (uploadFile != null && uploadFile.size() != 0) {
+			if (uploadFile != null && uploadFile.size() != 0) {
 
-			deleInsuRenewMediaTemp(titaVo);
+				deleInsuRenewMediaTemp(titaVo);
 
-			for (OccursList t : uploadFile) {
-				if (iInsuEndMonth != parse.stringToInteger(t.get("FireInsuMonth"))) {
-					throw new LogicException("E0014", "輸入火險年月與檔案不同");
-				}
-				checkResultA = "";
-				checkResultB = "";
-				checkResultC = "";
+				for (OccursList t : uploadFile) {
+					if (iInsuEndMonth != parse.stringToInteger(t.get("FireInsuMonth"))) {
+						throw new LogicException("E0014", "輸入火險年月與檔案不同");
+					}
+					checkResultA = "";
+					checkResultB = "";
+					checkResultC = "";
 
 //		1.火險詢價上傳檔轉檔作業(檢核清單)
 //			1.總保費=0) 
 //			2.無資料(無此戶號額度、擔保品號碼
-				InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(parse.stringToInteger(t.get("CustNo").trim()),
-						parse.stringToInteger(t.get("FacmNo").trim()), t.get("InsuNo").trim(), titaVo);
-//				無此保單號碼
-				if (tInsuRenew == null) {
-//					檢查無此戶號額度
-					Slice<InsuRenew> slInsuRenew = insuRenewService.findL4601A(
-							parse.stringToInteger(t.get("FireInsuMonth")),
+					InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(
 							parse.stringToInteger(t.get("CustNo").trim()),
-							parse.stringToInteger(t.get("FacmNo").trim()), 0, 1, titaVo);
-					if (slInsuRenew == null) {
-						checkResultA += "12";
+							parse.stringToInteger(t.get("FacmNo").trim()), t.get("InsuNo").trim(), titaVo);
+//				無此保單號碼
+					if (tInsuRenew == null) {
+//					檢查無此戶號額度
+						Slice<InsuRenew> slInsuRenew = insuRenewService.findL4601A(
+								parse.stringToInteger(t.get("FireInsuMonth")),
+								parse.stringToInteger(t.get("CustNo").trim()),
+								parse.stringToInteger(t.get("FacmNo").trim()), 0, 1, titaVo);
+						if (slInsuRenew == null) {
+							checkResultA += "12";
+						} else {
+							checkResultA += "10";
+						}
 					} else {
-						checkResultA += "10";
+						checkReportA(t, tInsuRenew, titaVo);
 					}
-				} else {
-					checkReportA(t, tInsuRenew, titaVo);
-				}
 //					a.檢核
-				if ("".equals(checkResultA)) {
+					if ("".equals(checkResultA)) {
 
-					resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
-					tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(t.get("NewFireInsuAmt").trim()));
-					tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(t.get("NewEqInsuAmt").trim()));
-					tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(t.get("NewFireInsuFee").trim()));
-					tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(t.get("NewEqInsuFee").trim()));
-					tInsuRenew.setInsuStartDate(parse.stringToInteger(t.get("NewInsuStartDate").replaceAll("/", "")));
-					tInsuRenew.setInsuEndDate(parse.stringToInteger(t.get("NewInsuEndDate").replaceAll("/", "")));
-					tInsuRenew.setTotInsuPrem(parse.stringToBigDecimal(t.get("NewTotalFee").trim()));
-					try {
-						insuRenewService.update(tInsuRenew);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "L4601 InsuRenew update " + e.getErrorMsg());
+						resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
+						tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(t.get("NewFireInsuAmt").trim()));
+						tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(t.get("NewEqInsuAmt").trim()));
+						tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(t.get("NewFireInsuFee").trim()));
+						tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(t.get("NewEqInsuFee").trim()));
+						tInsuRenew
+								.setInsuStartDate(parse.stringToInteger(t.get("NewInsuStartDate").replaceAll("/", "")));
+						tInsuRenew.setInsuEndDate(parse.stringToInteger(t.get("NewInsuEndDate").replaceAll("/", "")));
+						tInsuRenew.setTotInsuPrem(parse.stringToBigDecimal(t.get("NewTotalFee").trim()));
+						try {
+							insuRenewService.update(tInsuRenew);
+						} catch (DBException e) {
+							throw new LogicException("E0007", "L4601 InsuRenew update " + e.getErrorMsg());
+						}
+						resetAcReceivable(0, tInsuRenew, titaVo); // 0-起帳
+						succesCnt = succesCnt + 1;
+						checkReportB(tInsuRenew, titaVo);
+						checkReportC(tInsuRenew, titaVo);
+					} else {
+						errorACnt = errorACnt + 1;
 					}
-					resetAcReceivable(0, tInsuRenew, titaVo); // 0-起帳
-					succesCnt = succesCnt + 1;
-					checkReportB(tInsuRenew, titaVo);
-					checkReportC(tInsuRenew, titaVo);
-				} else {
-					errorACnt = errorACnt + 1;
-				}
 
-				InsuRenewMediaTemp tInsuRenewMediaTemp = new InsuRenewMediaTemp();
+					InsuRenewMediaTemp tInsuRenewMediaTemp = new InsuRenewMediaTemp();
 
-				tInsuRenewMediaTemp = this.getInsuRenewMediaTemp(t, tInsuRenewMediaTemp, titaVo);
-				// 檢核結果
-				tInsuRenewMediaTemp.setCheckResultA(checkResultA);
-				tInsuRenewMediaTemp.setCheckResultB(checkResultB);
-				tInsuRenewMediaTemp.setCheckResultC(checkResultC);
+					tInsuRenewMediaTemp = this.getInsuRenewMediaTemp(t, tInsuRenewMediaTemp, titaVo);
+					// 檢核結果
+					tInsuRenewMediaTemp.setCheckResultA(checkResultA);
+					tInsuRenewMediaTemp.setCheckResultB(checkResultB);
+					tInsuRenewMediaTemp.setCheckResultC(checkResultC);
 
-				try {
-					insuRenewMediaTempService.insert(tInsuRenewMediaTemp);
-				} catch (DBException e) {
-					throw new LogicException("E0005", "L4601 InsuRenewMediaTemp insert " + e.getErrorMsg());
+					try {
+						insuRenewMediaTempService.insert(tInsuRenewMediaTemp);
+					} catch (DBException e) {
+						throw new LogicException("E0005", "L4601 InsuRenewMediaTemp insert " + e.getErrorMsg());
+					}
 				}
 			}
+
+			checkMsg = "請點擊訊息列印報表，檢核正常筆數：" + succesCnt + "筆，檢核錯誤筆數：" + errorACnt + "筆。";
+
+			checkMsg += "火險詢價重複投保：" + errorBCnt + "筆。";
+
+			checkMsg += "續保資料錯誤：" + errorCCnt + "筆。";
+
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4601",
+					"2" + titaVo.getParam("InsuEndMonth"), checkMsg, titaVo);
+
+			return null;
+
+		} else {
+			// 產重複投保報表
+			l4601Report.exec(titaVo);
+
+			String sendMsg = "L4601-報表已完成";
+
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4601", sendMsg, titaVo);
+
+			this.addList(this.totaVo);
+			return this.sendList();
 		}
 
-		checkMsg = "請點擊訊息列印報表，檢核正常筆數：" + succesCnt + "筆，檢核錯誤筆數：" + errorACnt + "筆。";
-
-		checkMsg += "火險詢價重複投保：" + errorBCnt + "筆。";
-
-		checkMsg += "續保資料錯誤：" + errorCCnt + "筆。";
-
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4601",
-				"2" + titaVo.getParam("InsuEndMonth"), checkMsg, titaVo);
-
-		return null;
 	}
 
 	private void resetAcReceivable(int flag, InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
@@ -241,12 +262,12 @@ public class L4601Batch extends TradeBuffer {
 		if (tInsuRenew.getTotInsuPrem().compareTo(BigDecimal.ZERO) == 0) {
 			return;
 		}
-		
+
 		// 已入帳
-		if(tInsuRenew.getAcDate() > 0) {
+		if (tInsuRenew.getAcDate() > 0) {
 			return;
 		}
-		
+
 		AcReceivable acReceivable = new AcReceivable();
 		acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
 		acReceivable.setAcctCode("TMI"); // 業務科目

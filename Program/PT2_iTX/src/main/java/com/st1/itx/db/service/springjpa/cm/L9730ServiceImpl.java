@@ -35,16 +35,16 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9730ServiceImpl inputEndDate = " + inputEndDate);
 		
 		String sql = "";
-		sql += " SELECT LRC.\"CustNo\" AS \"LMSACN\" ";
-		sql += "       ,LRC.\"FacmNo\" AS \"LMSAPN\" ";
-		sql += "       ,LRC.\"BormNo\" AS \"LMSASQ\" ";
-		sql += "       ,LBM.\"NextAdjRateDate\" AS \"LMSNSD\" ";
-		sql += "       ,LBM.\"FirstAdjRateDate\" AS \"LMSFSD\" ";
-		sql += "       ,LRC.\"ProdNo\" AS \"IRTBCD\" ";
-		sql += "       ,LBM.\"RateIncr\" AS \"IRTASC\" ";
-		sql += "       ,LRC.\"EffectDate\" AS \"ASCADT\" ";
-		sql += "       ,LRC.\"RateIncr\" AS \"ASCRAT\" ";
-		sql += "       ,LBM.\"LoanBal\" AS \"LMSLBL\" ";
+		sql += " SELECT LRC.\"CustNo\"           AS \"CustNo\" ";
+		sql += "       ,LRC.\"FacmNo\"           AS \"FacmNo\" ";
+		sql += "       ,LRC.\"BormNo\"           AS \"BormNo\" ";
+		sql += "       ,LBM.\"NextAdjRateDate\"  AS \"NextAdjRateDate\" ";
+		sql += "       ,LBM.\"FirstAdjRateDate\" AS \"FirstAdjRateDate\" ";
+		sql += "       ,LRC.\"ProdNo\"           AS \"ProdNo\" ";
+		sql += "       ,LBM.\"RateIncr\"         AS \"LBMRateIncr\" ";
+		sql += "       ,LRC.\"EffectDate\"       AS \"EffectDate\" ";
+		sql += "       ,LRC.\"RateIncr\"         AS \"LRCRateIncr\" ";
+		sql += "       ,LBM.\"LoanBal\"          AS \"LoanBal\" ";
 		sql += " FROM \"LoanRateChange\" LRC ";
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = LRC.\"CustNo\" ";
 		sql += "                              AND LBM.\"FacmNo\" = LRC.\"FacmNo\" ";
@@ -55,10 +55,10 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         ) ";
 		sql += "         OR NVL(LBM.\"FirstAdjRateDate\", 0) BETWEEN :inputStartDate AND :inputEndDate ";   // B. 如果首次調整日在此區間（餘額可為0）
 		sql += "       ) ";
-		sql += " ORDER BY \"LMSACN\" ASC ";
-		sql += "         ,\"LMSAPN\" ASC ";
-		sql += "         ,\"LMSASQ\" ASC ";
-		sql += "         ,\"ASCADT\" ASC ";
+		sql += " ORDER BY \"CustNo\" ASC ";
+		sql += "         ,\"FacmNo\" ASC ";
+		sql += "         ,\"BormNo\" ASC ";
+		sql += "         ,\"EffectDate\" ASC ";
 
 
 		this.info("sql=" + sql);

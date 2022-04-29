@@ -166,11 +166,16 @@ BEGIN
                     LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T2."CustNo"
                                                 AND  M."FacmNo"    =  T2."FacmNo"
                                                 AND  M."BormNo"    =  T2."BormNo"
+                    LEFT JOIN "AcLoanRenew"  AL  ON AL."CustNo"    =  T2."CustNo"
+                                                AND AL."OldFacmNo" =  T2."FacmNo"
+                                                AND AL."OldBormNo" =  T2."BormNo"
+                                                AND AL."AcDate"    =  T2."AcDate"   
                     WHERE  T2."AcDate"    =  TBSDYF
                       AND  T2."TitaHCode" IN (0, 3)
                       AND  T2."Principal"  <> 0
                       AND  T2."TitaTxCd"  IN ('L3410', 'L3420')
                       AND  M."Status" IN (1 , 2 , 3 , 5 , 6 , 7 , 9)  -- 結案登錄戶況增列5,7,9
+                      AND  NVL(AL."CustNo",0)       =    0  -- 比照204檔-展期不申報
                   ) T3
              LEFT JOIN "LoanBorMain" M    ON  M."CustNo"    =  T3."CustNo"
                                          AND  M."FacmNo"    =  T3."FacmNo"

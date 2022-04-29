@@ -247,6 +247,8 @@ public class LM052Report extends MakeReport {
 					}
 
 					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+					
+					this.info("asset=" + amt.multiply(rate).setScale(0, BigDecimal.ROUND_HALF_UP));
 
 					assetClassTotal = assetClassTotal.add(amt.multiply(rate).setScale(0, BigDecimal.ROUND_HALF_UP));
 
@@ -319,6 +321,8 @@ public class LM052Report extends MakeReport {
 
 					amt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
 
+					this.info("loss=" + amt.multiply(rate).setScale(0, BigDecimal.ROUND_HALF_UP));
+					
 					lossTotal = lossTotal.add(amt.multiply(rate).setScale(0, BigDecimal.ROUND_HALF_UP));
 
 					break;

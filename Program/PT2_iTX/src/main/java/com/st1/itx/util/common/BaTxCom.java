@@ -396,7 +396,7 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom settleUnPaid TxAmt 回收金額=" + iTxAmt);
 		this.info("BaTxCom settleUnPaid TempVo 處理說明=" + iTempVo.toString());
 		init();
-		tempVo = iTempVo;
+		this.tempVo = iTempVo;
 
 // STEP 1: 設定預設值
 
@@ -1472,6 +1472,7 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom EmptyLoanBaTxVo ...");
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(2); // 2.本金利息
+		baTxVo.setIntStartDate(ln.getPrevPayIntDate()); // 繳息迄日
 		baTxVo.setRepayType(iRepayType); // 還款類別
 		baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
 		baTxVo.setCustNo(iCustNo); // 借款人戶號
@@ -1792,7 +1793,6 @@ public class BaTxCom extends TradeBuffer {
 		BigDecimal wkOverAmt = BigDecimal.ZERO;
 		BigDecimal wkOverBal = BigDecimal.ZERO;
 		BigDecimal wkShortAmt = BigDecimal.ZERO;
-		BigDecimal wkShortBal = BigDecimal.ZERO;
 		BigDecimal wkTempAmt = BigDecimal.ZERO;
 		BigDecimal wkTempBal = BigDecimal.ZERO;
 		BigDecimal wkFeeAmt = BigDecimal.ZERO;
@@ -1808,8 +1808,7 @@ public class BaTxCom extends TradeBuffer {
 					wkOverBal = wkOverAmt;
 				} else {
 					wkShortAmt = wkShortAmt.add(ba.getUnPaidAmt());
-					wkShortBal = wkShortAmt;
-				}
+		}
 			}
 			// 計算暫收抵繳
 			if (ba.getDataKind() == 3) {
@@ -2138,14 +2137,14 @@ public class BaTxCom extends TradeBuffer {
 										this.isUnOpenfireFee = 1;
 									}
 									switch (this.isUnOpenfireFee) {
-									case 0:
+									case 0: // 含未到期
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 										this.fireFee = this.fireFee.add(rv.getRvBal());
 										if (rv.getOpenAcDate() >= iPayIntDate) {
 											this.unOpenfireFee = this.unOpenfireFee.add(rv.getRvBal());
 										}
 										break;
-									case 1:
+									case 1: // 不含未到期
 										if ((rv.getOpenAcDate() / 100) <= (iPayIntDate / 100)) {
 											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 											this.fireFee = this.fireFee.add(rv.getRvBal());

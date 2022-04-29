@@ -52,14 +52,13 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> findAll(TitaVo titaVo, EntCodeCondition entCodeCondition, IsRelsCondition isRelsCondition) throws Exception {
-		this.info("lM009.findAll ");
+		this.info("lM013.findAll ");
 
 		int entdy = (parse.stringToInteger(titaVo.getParam("inputDate")) + 19110000);
 
 		String sql = " ";
 		sql += "  WITH TotalData AS (  ";
-		sql += "      SELECT *  ";
-		sql += "      FROM ( SELECT DECODE(C.\"EntCode\",'1','1','0') AS \"EntCode\"  ";
+		sql += "      		SELECT DECODE(C.\"EntCode\",'1','1','0') AS \"EntCode\"  ";
 		sql += "                   ,R.\"IsRels\" AS \"IsRels\"  ";
 		sql += "                   ,TO_CHAR(D.\"CustNo\") AS \"CustNo\"  ";
 		sql += "                   ,LPAD(D.\"FacmNo\", 3, '0') AS \"FacmNo\"  ";
@@ -133,11 +132,10 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           ELSE CF.\"ClCode1\" END  ";
 		sql += "                      END  ";
 		sql += "                     ,F.\"LineAmt\"  ";
-		sql += "      )  ";
-		sql += "      ORDER BY \"EntCode\" ";
-		sql += "              ,\"IsRels\" ";
-		sql += "              ,\"CustNo\" ";
-		sql += "              ,\"FacmNo\" ";
+		sql += "      		 ORDER BY TO_NUMBER(\"CustNo\") ASC ";
+		sql += "              	 	 ,TO_NUMBER(\"FacmNo\") ASC ";
+		sql += "              		 ,\"EntCode\" ";
+		sql += "              		 ,\"IsRels\" ";
 		sql += "  ),  ";
 		sql += "    ";
 		sql += "  TotalData_LineTotal AS (  ";

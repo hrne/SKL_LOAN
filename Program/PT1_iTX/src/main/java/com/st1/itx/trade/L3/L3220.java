@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -389,7 +389,6 @@ public class L3220 extends TradeBuffer {
 //		05:退款他行(整批匯款)
 //		11:退款新光(存款憑條)
 
-// TODO:
 		if (titaVo.isHcodeNormal() && titaVo.isActfgEntry() && (iTempItemCode == 4 || iTempItemCode == 11)) {
 			sno = acPaymentCom.printRemitForm(titaVo);
 		}
@@ -416,6 +415,8 @@ public class L3220 extends TradeBuffer {
 		tTempVo.putParam("RemitCustName", titaVo.getParam("RpCustName1"));
 		tTempVo.putParam("RemitRemark", titaVo.getParam("RpRemark1"));
 		tTempVo.putParam("RemitAmt", titaVo.getParam("RpAmt1"));
+		// 新增摘要
+		tTempVo.putParam("Note", titaVo.getParam("Description"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);

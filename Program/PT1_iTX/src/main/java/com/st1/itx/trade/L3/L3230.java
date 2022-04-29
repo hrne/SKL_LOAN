@@ -685,7 +685,8 @@ public class L3230 extends TradeBuffer {
 		// 其他欄位
 		tTempVo.clear();
 		tTempVo.putParam("TempItemCode", iTempItemCode);
-		tTempVo.putParam("Description", titaVo.getParam("Description"));
+		// 新增摘要
+		tTempVo.putParam("Note", titaVo.getParam("Description"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);

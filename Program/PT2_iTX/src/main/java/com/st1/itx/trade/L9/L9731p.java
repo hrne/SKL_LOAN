@@ -32,7 +32,7 @@ public class L9731p extends TradeBuffer {
 
 	@Autowired
 	Parse parse;
-	
+
 	@Autowired
 	public WebClient webClient;
 
@@ -43,7 +43,6 @@ public class L9731p extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active " + TXCD + "p");
 		this.totaVo.init(titaVo);
-
 
 		this.info(TXCD + "p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
@@ -56,7 +55,8 @@ public class L9731p extends TradeBuffer {
 
 		this.info("iYearMonth= " + iYearMonth);
 
-		boolean isFinish = l9731Report.exec(titaVo, iYearMonth);
+		boolean isFinish = l9731Report.exec(titaVo, iYearMonth, 1);
+		isFinish = l9731Report.exec(titaVo, iYearMonth, 2);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",

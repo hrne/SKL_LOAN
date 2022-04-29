@@ -63,8 +63,37 @@ public class L9730Report extends MakeReport {
 				txcd + "_" + txName + ".xlsx", "X800");
 
 		int row = 2;
+		
+		String lastCustNo = "";
+		String lastFacmNo = "";
+		String lastBormNo = "";
+		String lastLRCRateIncr = "";
 
 		for (Map<String, String> l9730Vo : listL9730) {
+			
+			String thisCustNo = l9730Vo.get("CustNo");
+			String thisFacmNo = l9730Vo.get("FacmNo");
+			String thisBormNo = l9730Vo.get("BormNo");
+			String thisLRCRateIncr = l9730Vo.get("LRCRateIncr");
+			
+			if (!lastCustNo.equals(thisCustNo) 
+					|| !lastFacmNo.equals(thisFacmNo)
+					|| !lastBormNo.equals(thisBormNo)
+					|| !lastLRCRateIncr.equals(thisLRCRateIncr))
+			{
+				lastCustNo = l9730Vo.get("CustNo");
+			    lastFacmNo = l9730Vo.get("FacmNo");
+				lastBormNo = l9730Vo.get("BormNo");
+				lastLRCRateIncr = l9730Vo.get("LRCRateIncr");
+			} else if (lastCustNo.equals(thisCustNo) 
+					&& lastFacmNo.equals(thisFacmNo)
+					&& lastBormNo.equals(thisBormNo)
+					&& lastLRCRateIncr.equals(thisLRCRateIncr))
+			{
+				// 賴桑指示: 連續相同 RateIncr 時，不重覆出
+				continue;
+			}
+			
 			for (int i = 0; i < 10; i++) {
 				String valueStr = l9730Vo.get("F" + i);
 				switch (i) {

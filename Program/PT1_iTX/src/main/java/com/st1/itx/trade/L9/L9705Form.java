@@ -51,6 +51,18 @@ public class L9705Form extends MakeReport {
 		
 		String tran = "L9705".equals(titaVo.getTxcd()) ? "L9705" : titaVo.getTxcd();
 		
+		
+		int terms = 6; // 預設印6期
+
+		if (titaVo.containsKey("Terms") && titaVo.getParam("Terms") != null) {
+			try {
+				terms = Integer.parseInt(titaVo.getParam("Terms"));
+			} catch (Exception e) {
+				terms = 6; // 若無法轉為數值,改為預設6
+			}
+		}
+		
+		
 		this.info("titaVo = " + titaVo);
 		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C", "存入憑條", "cm,20,9.31333", "P");
 
@@ -87,7 +99,7 @@ public class L9705Form extends MakeReport {
 				dBaTxCom.setTxBuffer(txbuffer);
 
 				try {
-					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, 6, 1, titaVo);
+					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 1, titaVo);
 				} catch (LogicException e) {
 					this.info("listBaTxVo ErrorMsg :" + e.getMessage());
 				}

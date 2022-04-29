@@ -194,6 +194,8 @@ public class LD003Report extends MakeReport {
 
 			this.print(-51, 83, df1.format(totalSC.add(totalMC).add(totalLC).add(totalTC)), "R");
 			this.print(-51, 115, df1.format(totalSA.add(totalMA).add(totalLA).add(totalTA)), "R");
+			
+			this.print(-53, 0, ""); // 把 cursor 移動到最後一行以後，避免簽核歪掉
 
 		} else {
 			this.print(-11, 115, "本日無資料", "R");
@@ -202,110 +204,6 @@ public class LD003Report extends MakeReport {
 		this.close();
 
 		//this.toPdf(sno);
-
+		
 	}
-
-	public void makeReport(TitaVo titaVo, List<Map<String, String>> LD003List) throws LogicException {
-
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD003", "放款明細餘額總表(日)", "機密", "A4", "P");
-		BigDecimal cnt = new BigDecimal("0");
-		BigDecimal amt = new BigDecimal("0");
-		BigDecimal tcnt = new BigDecimal("0");
-		BigDecimal tamt = new BigDecimal("0");
-		boolean printfg = false;
-		this.print(1, 1, "┌────────────────────────┬─────────────┬───────────────┐");
-		this.print(1, 1, "│　　　　　　　　 　　　　　 　　　　　　　　　　│　　　　件　　　數　　　　│　　　　貸　款　金　額　　　　│");
-		String o1 = "";
-		String last = " ";
-		int count = 0;
-		if (LD003List != null && LD003List.size() != 0) {
-
-			for (Map<String, String> tLD003Vo : LD003List) {
-
-				if (printfg && !o1.equals(tLD003Vo.get("F0"))) {
-					printSum("　　　　　　　　　　小　　計", cnt, amt);
-					o1 = tLD003Vo.get("F0");
-					cnt = new BigDecimal(0);
-					amt = new BigDecimal(0);
-				} else {
-					o1 = tLD003Vo.get("F0");
-				}
-
-				this.print(1, 1, "├────────────────────────┼─────────────┼───────────────┤");
-				this.print(1, 1, "│　　　　　　　　　　　　　  　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　│");
-				// 用equals去做比對，如果不同會直接print出來
-				if (!tLD003Vo.get("F1").equals(last)) {
-					this.print(0, 5, tLD003Vo.get("F1"));
-				}
-				// 將會放到last，跟下一次帶進來的值做比對
-				last = tLD003Vo.get("F1");
-
-				this.print(0, 23, tLD003Vo.get("F2"));
-
-				BigDecimal f3 = new BigDecimal(tLD003Vo.get("F3").toString());
-				BigDecimal f4 = new BigDecimal(tLD003Vo.get("F4").toString());
-				DecimalFormat df1 = new DecimalFormat("#,##0");
-				this.print(0, 75, df1.format(f3), "R");// format字串格式化
-				this.print(0, 115, df1.format(f4), "R");
-
-				printfg = true;
-				cnt = cnt.add(new BigDecimal(tLD003Vo.get("F3")));
-				amt = amt.add(new BigDecimal(tLD003Vo.get("F4")));
-				tcnt = tcnt.add(new BigDecimal(tLD003Vo.get("F3")));
-				tamt = tamt.add(new BigDecimal(tLD003Vo.get("F4")));
-				count++;
-				if (count % 2 == 0) {
-					this.print(1, 1, "├────────────────────────┼─────────────┼───────────────┤");
-					this.print(1, 1, "│　　　　　　　　　　　　　  　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　│");
-					this.print(0, 23, "利變B");
-					this.print(0, 75, "0", "R");// format字串格式化
-					this.print(0, 115, "0", "R");
-					this.print(1, 1, "├────────────────────────┼─────────────┼───────────────┤");
-					this.print(1, 1, "│　　　　　　　　　　　　　  　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　│");
-					this.print(0, 23, "傳統A");
-					this.print(0, 75, "0", "R");// format字串格式化
-					this.print(0, 115, "0", "R");
-				}
-			}
-
-			if (printfg) {
-				printSum("　　　　　　　　　　小　　計", cnt, amt);
-				printSum("　　　　合　　　　　　計", tcnt, tamt);
-				this.print(1, 1, "└────────────────────────┴─────────────┴───────────────┘");
-//				this.print(2, 1, "　協　　　　　　經　　　　　　副　　　　　　襄　　　　　　覆　　　　　　製");
-//				this.print(1, 1, "　理　　　　　　理　　　　　　理　　　　　　理　　　　　　核　　　　　　表");
-//				this.print(1, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　人");
-			} else {
-				this.print(1, 1, "無資料");
-			}
-
-		} else {
-			this.print(1, 1, "├────────────────────────┼─────────────┼───────────────┤");
-			this.print(1, 1, "│　　　　　　　　　　　　　  　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　│");
-			this.print(0, 15, "本日無資料");
-			this.print(1, 1, "├────────────────────────┼─────────────┼───────────────┤");
-			this.print(1, 1, "│　　　　　　　　　　　　　　　　　　　　小　　計├─────────────┼───────────────┤");
-			;
-			this.print(1, 1, "├────────────────────────┼─────────────┼───────────────┤");
-			this.print(1, 1, "│　　　　　　　　　　　　　　　　合　　　　　　計├─────────────┼───────────────┤");
-			this.print(1, 1, "└────────────────────────┴─────────────┴───────────────┘");
-		}
-		this.close();
-
-		//this.toPdf(sno);
-
-	}
-
-//小計、總計
-	private void printSum(String title, BigDecimal cnt, BigDecimal amt) {
-		this.print(1, 1, "├────────────────────────┼─────────────┼───────────────┤");
-		this.print(1, 1, "│　　　　　　　　　　　　　　　　　　　　　　　　│　　　　　　　　　　　　　│　　　　　　　　　　　　　　　│");
-		this.print(0, 5, title);
-
-		DecimalFormat df1 = new DecimalFormat("#,##0");
-		this.print(0, 75, df1.format(cnt), "R");
-		this.print(0, 115, df1.format(amt), "R");
-
-	}
-
 }

@@ -168,27 +168,20 @@ public class L420ABatch extends TradeBuffer {
 				}
 			}
 
-			// 檢核正常，不需再檢核，單筆檢核放l1、匯款轉帳期款同戶號多筆檢核放l2
+			// 需檢核明細
 			for (BatxDetail t : lBatxDetail) {
-				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
-					this.tTempVo = new TempVo();
-					tTempVo = tTempVo.getVo(t.getProcNote());
-					// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次檢核
-					if (t.getRepayCode() == 1 && t.getRepayType() <= 3) {
-						mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
-						if (!"4".equals(mergeProcStsCode.get(mapKey)) || (tTempVo.get("MergeCnt") != null
-								&& parse.stringToInteger(tTempVo.get("MergeCnt")) != mergeCnt.get(mapKey))) {
-							if (mergeCnt.get(mapKey) >= 2) {
-								l2BatxDetail.add(t);
-							} else {
-								l1BatxDetail.add(t);
-							}
-						}
+				this.tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(t.getProcNote());
+				// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次檢核
+				if (t.getRepayCode() == 1 && t.getRepayType() <= 3) {
+					mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
+					if (mergeCnt.get(mapKey) != null && mergeCnt.get(mapKey) >= 2) {
+						l2BatxDetail.add(t);
 					} else {
-						if (!"4".equals(t.getProcStsCode())) {
-							l1BatxDetail.add(t);
-						}
+						l1BatxDetail.add(t);
 					}
+				} else {
+					l1BatxDetail.add(t);
 				}
 			}
 		}
@@ -246,6 +239,7 @@ public class L420ABatch extends TradeBuffer {
 			});
 
 			for (BatxDetail tDetail : l2BatxDetail) {
+				this.info("L2 BatxDetail=" + tDetail.toString());
 				this.tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tDetail.getProcNote());
 				mapKey = parse.IntegerToString(tDetail.getCustNo(), 7)
@@ -267,9 +261,7 @@ public class L420ABatch extends TradeBuffer {
 					}
 					if (l3BatxDetail.size() > 0) {
 						for (BatxDetail t : l3BatxDetail) {
-							if ("4".equals(t.getProcStsCode())) {
-								t.setProcStsCode(tDetail.getProcStsCode());
-							}
+							t.setProcStsCode(tDetail.getProcStsCode());
 						}
 						try {
 							batxDetailService.updateAll(l3BatxDetail);
@@ -309,7 +301,7 @@ public class L420ABatch extends TradeBuffer {
 		this.info("doTxCheck ... " + tDetail.toString());
 		tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
 		this.baTxList = txBatchCom.getBaTxList();
-		if (tDetail.getRepayCode() == 1) {
+		if (tDetail.getRepayCode() == 1 && !tDetail.getReconCode().equals("A6")) {
 			addL4211MapList(tDetail, titaVo);
 		}
 		return tDetail;
@@ -317,6 +309,9 @@ public class L420ABatch extends TradeBuffer {
 
 	/* 匯款明細表 */
 	private void addL4211MapList(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
+		if (this.baTxList == null || this.baTxList.size() == 0) {
+			return;
+		}
 		String custName = " ";
 		CustMain tCustMain = custMainService.custNoFirst(tDetail.getCustNo(), tDetail.getCustNo(), titaVo);
 		if (tCustMain != null) {
@@ -346,9 +341,11 @@ public class L420ABatch extends TradeBuffer {
 					if (baTxVo.getFacmNo() > 0) {
 						FacMain tFacMain = facMainService
 								.findById(new FacMainId(baTxVo.getCustNo(), baTxVo.getFacmNo()));
-						facAcctCode = baTxVo.getAcctCode();
-						facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
-						break;
+						if (tFacMain != null) {
+							facAcctCode = tFacMain.getAcctCode();
+							facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
+							break;
+						}
 					}
 				}
 			}

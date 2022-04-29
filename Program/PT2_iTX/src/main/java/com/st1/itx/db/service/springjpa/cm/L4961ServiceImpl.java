@@ -86,7 +86,8 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and i.\"InsuYearMonth\" <= " + intInsuYearMonthEnd;
 		} else if (intSearchFlag == 2 && intSearchOption != 0 && intSearchOption != 1) {
 			sql += " where substr(i.\"AcDate\" - 19110000,1,5) = " + intReportYearMonth;
-
+			sql += "   and i.\"InsuYearMonth\" >= " + intInsuYearMonth;
+			sql += "   and i.\"InsuYearMonth\" <= " + intInsuYearMonthEnd;
 		} else if (intSearchFlag == 3) {
 			sql += " where i.\"AcDate\" = 0                                ";
 			sql += "   and i.\"RenewCode\" = 2                             ";
@@ -107,7 +108,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 1: // 1:正常已繳 0:正常
 			if (intSearchFlag == 2) {
-				sql += " where substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth ;
+				sql += " where substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth  + "and i.\"AcDate\" > 0";
 			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";

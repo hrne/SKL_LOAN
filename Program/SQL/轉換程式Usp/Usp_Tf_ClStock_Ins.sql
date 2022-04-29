@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_ClStock_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_ClStock_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -31,7 +31,7 @@ BEGIN
           ,S1."StockCode"                 AS "StockCode"           -- 股票代號 VARCHAR2 10 
           ,''                             AS "ListingType"         -- 掛牌別 VARCHAR2 2 
           ,''                             AS "StockType"           -- 股票種類 VARCHAR2 1 
-          ,''                             AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
+          ,SPRP."STKPID"                  AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
           ,0                              AS "DataYear"            -- 資料年度 DECIMAL 4 
           ,0                              AS "IssuedShares"        -- 發行股數 DECIMAL 16 2
           ,0                              AS "NetWorth"            -- 非上市(櫃)每股淨值 DECIMAL 16 2
@@ -87,6 +87,8 @@ BEGIN
                             AND S3."GDRNUM" = S1."GDRNUM"
       LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S3."LGTCIF"
                             AND S3."LGTCIF" > 0
+      LEFT JOIN DAT_LN$SPRP SPRP ON SPRP."STKNO1" = S2."SGTNO1"
+                                AND SPRP."STKNO2" = S2."SGTNO2"
       LEFT JOIN "TempCdStockMapping" TCS ON TCS."STKNO1" = S2."SGTNO1"
                                         AND TCS."STKNO2" = S2."SGTNO2"
       WHERE S1."ClCode1" >= 3
@@ -122,7 +124,7 @@ BEGIN
                        WHEN S."StockType" = 2 THEN '142' -- 上櫃公司股票
                      ELSE '145' END
     ;
-    
+
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 
@@ -134,6 +136,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClStock_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 

@@ -3,7 +3,6 @@ package com.st1.itx.trade.L9;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,55 +42,68 @@ public class L9731Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月底日
+	 * @param form      工作表
 	 * 
 	 */
-	public boolean exec(TitaVo titaVo, int yearMonth) throws LogicException {
+	public boolean exec(TitaVo titaVo, int yearMonth, int form) throws LogicException {
 		this.info(" exec");
 
-		List<Map<String, String>> findSheet1 = new ArrayList<>();
-		List<Map<String, String>> findSheet2_1 = new ArrayList<>();
-		List<Map<String, String>> findSheet2_2 = new ArrayList<>();
-		List<Map<String, String>> findLA$W30P = new ArrayList<>();
+		List<Map<String, String>> findList = null;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表", "L9731-人工檢核表",
-				"L9731_底稿_人工檢核表.xlsx", "工作表1");
-		
+		boolean isSize = false;
+
 		try {
 
-			findSheet1 = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
-			findSheet2_1 = l9731ServiceImpl.findSheet2_1(titaVo, yearMonth);
-			findSheet2_2 = l9731ServiceImpl.findSheet2_2(titaVo, yearMonth);
-			findLA$W30P = l9731ServiceImpl.findLA$W30P(titaVo, yearMonth);
+			switch (form) {
+			case 1:
 
-			if (findLA$W30P.size() == 0 && findSheet1.size() == 0 && findSheet2_1.size() == 0
-					&& findSheet2_2.size() == 0) {
-				return false;
+				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表", "L9731-人工檢核表",
+						"L9731_底稿_人工檢核表.xlsx", "工作表1");
+
+				findList = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
+				isSize = findList.size() == 0 ? false : true;
+				exportSheet1(titaVo, findList);
+
+				findList = null;
+				findList = l9731ServiceImpl.findSheet2_1(titaVo, yearMonth);
+				isSize = findList.size() == 0 ? false : true;
+				exportSheet2(titaVo, findList, 1);
+
+				findList = null;
+				findList = l9731ServiceImpl.findSheet2_2(titaVo, yearMonth);
+				isSize = findList.size() == 0 ? false : true;
+				exportSheet2(titaVo, findList, 2);
+
+				break;
+			case 2:
+
+				List<Map<String, String>> findLA$W30P = null;
+
+				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表2", "L9731-人工檢核表2",
+						"L9731_底稿_人工檢核表.xlsx", "工作表1");
+
+				findList = l9731ServiceImpl.findLA$W30P(titaVo, yearMonth);
+				isSize = findList.size() == 0 ? false : true;
+				exportLA$W30P(titaVo, findLA$W30P);
+
+				break;
 			}
-
-	
-
-			exportSheet1(titaVo, findSheet1);
-			exportSheet2(titaVo, findSheet2_1, 1);
-			exportSheet2(titaVo, findSheet2_2, 2);
-
-		
-
-//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表2", "L9731-人工檢核表",
-//					"L9731_底稿_人工檢核表.xlsx", "工作表1");
-
-			exportLA$W30P(titaVo, findLA$W30P);
-//			makeExcel.close();
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L9731ServiceImpl.findAll error = " + errors.toString());
-			return false;
+
+		}
+
+		if (isSize == false) {
+			makeExcel.setSheet("工作表1");
+			makeExcel.setValue(2, 1, "本日無資料");
 		}
 
 		makeExcel.close();
-		return true;
 
+		return true;
 	}
 
 	/**
@@ -231,11 +243,11 @@ public class L9731Report extends MakeReport {
 					makeExcel.setValue(row, 21, clType, "R");
 					// 商品利率代碼
 					String prodNo = tLDVo.get("F2") == null && !tLDVo.get("F2").isEmpty() ? " " : tLDVo.get("F2");
-					makeExcel.setValue(row, 23, prodNo, "C");
+					makeExcel.setValue(row, 22, prodNo, "C");
 					// 初貸日期
 					String fDrawDownDate = tLDVo.get("F3") == null && !tLDVo.get("F3").isEmpty() ? " "
 							: tLDVo.get("F3");
-					makeExcel.setValue(row, 24, fDrawDownDate, "C");
+					makeExcel.setValue(row, 23, fDrawDownDate, "C");
 
 					row++;
 				}
@@ -277,30 +289,30 @@ public class L9731Report extends MakeReport {
 						makeExcel.setValue(row, col, fieldValue, "#0", "R");
 						break;
 
-					case 3://利變		
+					case 3:// 利變
 					case 6:// 科目
-						makeExcel.setValue(row, col , fieldValue, "C");
+						makeExcel.setValue(row, col, fieldValue, "C");
 						break;
 					case 4:// ID
 					case 5:// 戶名
-						makeExcel.setValue(row, col , fieldValue, "L");
+						makeExcel.setValue(row, col, fieldValue, "L");
 						break;
 
 					case 7:// 撥款日
 					case 8:// 到期日
 					case 11:// 繳息迄日
-					case 12://轉催收日期
+					case 12:// 轉催收日期
 						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
-							makeExcel.setValue(row, col , showBcDate(fieldValue, 0), "C");
+							makeExcel.setValue(row, col, showBcDate(fieldValue, 0), "C");
 						}
 						break;
 					case 9:// 利率
 						BigDecimal rate = getBigDecimal(fieldValue);
-						makeExcel.setValue(row, col , rate, "0.0000", "R");
+						makeExcel.setValue(row, col, rate, "0.0000", "R");
 						break;
 					case 10:// 繳息周期
 					case 13:// 資金用讀別
-						makeExcel.setValue(row, col , fieldValue, "C");
+						makeExcel.setValue(row, col, fieldValue, "C");
 						break;
 					case 14:// 核貸金額
 					case 15:// 撥款金額

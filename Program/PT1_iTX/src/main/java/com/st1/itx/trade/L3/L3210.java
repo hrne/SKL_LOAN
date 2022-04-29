@@ -525,6 +525,8 @@ public class L3210 extends TradeBuffer {
 		if (this.lawFee.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("LawFee", this.lawFee);
 		}
+		// 新增摘要
+		tTempVo.putParam("Note", titaVo.getParam("TempReasonCodeX"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
