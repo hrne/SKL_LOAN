@@ -16,12 +16,14 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
@@ -89,7 +91,9 @@ public class L3210 extends TradeBuffer {
 	public FacMainService facMainService;
 	@Autowired
 	public LoanBorTxService loanBorTxService;
-
+	@Autowired
+	private CdCodeService cdCodeService;
+	
 	@Autowired
 	Parse parse;
 	@Autowired
@@ -526,7 +530,14 @@ public class L3210 extends TradeBuffer {
 			tTempVo.putParam("LawFee", this.lawFee);
 		}
 		// 新增摘要
-		tTempVo.putParam("Note", titaVo.getParam("TempReasonCodeX"));
+		
+		
+		CdCode cdCode = cdCodeService.getItemFirst(3, "TempReasonCode", titaVo.getParam("TempReasonCode"), titaVo);
+
+		if (cdCode != null) {
+			tTempVo.putParam("Note", cdCode.getItem());
+		}
+		
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
